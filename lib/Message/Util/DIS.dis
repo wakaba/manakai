@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/02/27 14:27:56 $
+      $Date: 2005/02/28 04:32:40 $
     @@ContentType:
       dis:Date.RCS
   
@@ -297,6 +297,41 @@ ClsDef:
         }
 
   @ResourceDef:
+    @@QName: tfpurisToURI
+    @@rdf:type:
+      dis2pm:BlockCode
+    @@enDesc:
+        Converts a set of name URI reference and <QUOTE::for> URI reference 
+        and <QUOTE::for+> URI references into a URi reference. 
+    @@PerlDef:      
+        if ($furi eq <Q::ManakaiDOM:all> and @{$forp} == 0) {
+          $uri = $turi;
+        } elsif (@{$forp}) {
+          my $__turi = $turi;
+          my $__furi = $furi;
+          for my $__uri ($__turi, $__furi) {
+            $__uri =~ s{([^0-9A-Za-z:;?=_./~!&+-])}{sprintf '%%%02X', ord $1}ge;
+          }
+          my @__fp;
+          for my $__uri (@{$forp}) {
+            my $__fpuri = $__uri;
+            $__fpuri =~ s{([^0-9A-Za-z:;?=_./~!&+-])}
+                         {sprintf '%%%02X', ord $1}ge;
+            push @__fp, $__fpuri;
+          }
+          $uri = qq<data:,200411tf#xmlns(t=data:,200411tf%23)>.
+                               qq<t:tfp($__turi,$__furi,>.join (',', @__fp).q<)>;
+        } else {
+          my $__turi = $turi;
+          my $__furi = $furi;
+          for my $__uri ($__turi, $__furi) {
+            $__uri =~ s{([^0-9A-Za-z:;?=_./-])}{sprintf '%%%02X', ord $1}ge;
+          }
+          $uri = qq<data:,200411tf#xmlns(t=data:,200411tf%23)>.
+                                qq<t:tf($__turi,$__furi)>;
+        }
+
+  @ResourceDef:
     @@QName: getChildResourceURI
     @@rdf:type: 
       dis2pm:BlockCode
@@ -307,7 +342,7 @@ ClsDef:
       my $__parent = $parentURI;
       my $__ln = $localName;
       for my $__uri ($__parent, $__ln) {
-        $__uri =~ s{([^0-9A-Za-z:;?=_./~-])}{sprintf '%%%02X', ord $1}ge;
+        $__uri =~ s{([^0-9A-Za-z:;?=_./~!&+-])}{sprintf '%%%02X', ord $1}ge;
       }
       $result = q<data:,200411tf#xmlns(t=data:,200411tf%23)>.
                               qq<t:child($__parent,$__ln)>;
@@ -1214,7 +1249,7 @@ ClsDef:
           }
         }__;
 
-  @Attr:
+  @Method:
     @@Name: tfqnamesValueURI
     @@enDesc:
       The element value (written as <TYPE::dis:TFQNames>),
@@ -1223,7 +1258,37 @@ ClsDef:
       {NOTE:: What should be if list value?
       \
       }
-    @@Get:
+    @@Param:
+      @@@Name: defaultTypeURI
+      @@@Type: NameURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A name URI reference used if it is missing from 
+          <P::tfqnames>. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Equivalent to <Q::DOMMain:any>. 
+    @@Param:
+      @@@Name: defaultForURI
+      @@@Type: ForURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A <QUOTE::for> URI reference used if it is missing from 
+          <P::tfqnames>. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Equivalent to <QUOTE::for all>, i.e. <Q::ManakaiDOM:all>. 
+    @@Return:
       @@@Type:ResourceURI
       @@@nullCase:
         @@@@enDesc:
@@ -1233,7 +1298,8 @@ ClsDef:
         my $v = $self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
         if (defined $v and not ref $v eq 'ARRAY') {
           __DEEP{
-            $r = $self-><AG::ManakaiDISElement.tfqnamesToURI> ($v);
+            $r = $self-><AG::ManakaiDISElement.tfqnamesToURI>
+                                  ($v, $defaultTypeURI, $defaultForURI);
           }__;
         } else {
           $r = null;
@@ -1516,6 +1582,7 @@ ClsDef:
           $r = $self->{resDef}->{$resURI}
              = bless {
                  uri => $resURI,
+                 aliasURI => {$resURI => true},
                  subOf => {},
                  supOf => {},
                  db => $self,
@@ -1855,6 +1922,15 @@ ClsDef:
         $forArg = <Q::ManakaiDOM:all> unless defined $forArg;
         $forpArg ||= [];
         __DEEP{
+          ## -- Node names
+
+          ## Unique resource identifier generated from node id
+          my $node_id = $el-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest.nodeID>;
+          my $node_uri;
+          __CODE{tfpurisToURI:: $turi => $node_id, $furi => $forArg,
+                                $forp => $forpArg, $uri => $node_uri}__;
+
+          ## User defined resource identifiers
           my $qn_node = $el-><M::ManakaiDISElement.disGetAttribute>
                                       (<Q::dis:QName>, for_arg => $forArg,
                                        forp_arg => $forpArg);
@@ -1872,7 +1948,7 @@ ClsDef:
                   DIS:sourceNode => {$qn_node},
                   DIS:anotherSourceNode => {$res->{src}},
                 }__;
-             }__;
+              }__;
             }
             $res->{nameURI} = $qn_uri;
             $res->{localName} = $qn_node-><AG::ManakaiDISElement
@@ -1884,8 +1960,6 @@ ClsDef:
                                       (<Q::dis:Name>, for_arg => $forArg,
                                        forp_arg => $forpArg);
             if ($n_node) {
-              $res->{localName} = $n_node-><AG::swcfg21:SWCFGNode
-                                              ::swcfg21:ForLatest.value>;
               if ($parentResource) {
                 my $puri = $parentResource->{uri};
                 my $ru;
@@ -1898,27 +1972,60 @@ ClsDef:
                                      $uri => $uri}__;
                 $res = $self-><M::ManakaiDISDatabase.getResource> ($uri);
                 $res->{nameURI} = $ru;
+                $res->{localName} = $n_node-><AG::swcfg21:SWCFGNode
+                                                ::swcfg21:ForLatest.value>;
                 $res->{<Q::isAnon>} = true;
+                $res->{aliasURI}->{$node_uri} = true;
+                $self->{resDef}->{$node_uri} = $res;
               } else {  ## Root local name resource
+                my $qn_uri = $res->{namespaceURI} . $res->{localName};
+                my $uri;
+                __CODE{tfurisToURI:: $turi => $qn_uri, $furi => $forArg,
+                                     $uri => $uri}__;
+                $res = $self-><M::ManakaiDISDatabase.getResource> ($uri);
+                if ($res-><M::ManakaiDISForDefinition.isDefined>) {
+                  __UNDEEP{
+                    __EXCEPTION{RESOURCE_ALREADY_DEFINED_ERR::
+                      DIS:uri => {$uri},
+                      DIS:sourceNode => {$n_node},
+                      DIS:anotherSourceNode => {$res->{src}},
+                    }__;
+                 }__;
+                }
+                $res->{nameURI} = $qn_uri;
                 $res->{namespaceURI}
                    = $mod-><M::ManakaiDISPropertyAccessor.getPropertyText>
                                                  (<Q::dis:Namespace>, null);
-                $res->{nameURI} = $res->{namespaceURI} . $res->{localName};
+                $res->{localName} = $n_node-><AG::swcfg21:SWCFGNode
+                                                ::swcfg21:ForLatest.value>;
               }
             } else {
-              $res = $self-><M::ManakaiDISDatabase.getResource>
-                                   (<Code::ManakaiDOM:generateUniqueID
-                                         ||ManakaiDOM:all>);
+              $res = $self-><M::ManakaiDISDatabase.getResource> ($node_uri);
               $res->{<Q::isAnon>} = true;
             }
-            
-          }
+          } # anon
           $res->{for} = $forArg;
           $res->{forp} = $forpArg;
           $res->{src} = $el;
           $res->{<Q::definingModule>} = $mod->{uri};
           $res->{<Q::dis2pm:parentResource>} = $parentResource->{uri}
              if $parentResource;
+          $res->{aliasURI}->{$node_uri} = true;
+          $self->{resDef}->{$node_uri} = $res;
+
+          ## -- Alias
+          my $al_node = $el-><M::ManakaiDISElement.disGetAttribute>
+                                      (<Q::dis:AliasFor>, for_arg => $forArg,
+                                       forp_arg => $forpArg);
+          if ($al_node) {
+            my $canon_uri = $al_node-><M::ManakaiDISElement.tfqnamesValueURI>
+                                                           ($node_id, $forArg);
+            my $canon_res = $self-><M::ManakaiDISDatabase.getResource>
+                                                           ($canon_uri);
+            $canon_res-><M::ManakaiDISResourceDefinition.isReferred> ($al_node);
+            $canon_res-><M::ManakaiDISResourceDefinition.mergeAsAlias> ($res);
+            $res = $canon_res;
+          }
 
  =pod
 
@@ -2396,7 +2503,7 @@ ClsDef:
         @@@@enDesc:
           <P::superURI> is not a super-resource of this resource. 
       @@@PerlDef:
-        $r = $superURI eq $self->{uri} ? true : $self->{subOf}->{$superURI};
+        $r = $self->{aliasURI}->{$superURI} || $self->{subOf}->{$superURI};
 
   @Attr:
     @@Name: isDefined
@@ -2470,6 +2577,50 @@ ClsDef:
        $self->{<Q::defininingModule>}
                  = $given-><AG::ManakaiDISModuleDefinition.uri>;
    
+  @Method:
+    @@Name: mergeAsAlias
+    @@enDesc:
+      Merges another resource definition as an alias of this resource. 
+    @@Param:
+      @@@Name: aliasResource
+      @@@Type: ManakaiDISResourceDefinition
+      @@@enDesc:
+        A resource to merge.
+        \
+        {NOTE:: After merging all references to <P::aliasResource> 
+                should be discarded.
+        \
+        }
+    @@Return:
+      @@@PerlDef:
+        for my $uri ($aliasResource->{uri}, 
+                     grep {$aliasResource->{aliasURI}->{$_}}
+                          keys %{$aliasResource->{aliasURI}}) {
+          $self->{aliasURI}->{$uri} = true;
+          $self->{db}->{resDef}->{$uri} = $self;
+          $self->{subOf}->{$uri} = true;
+          $self->{supOf}->{$uri} = true;
+        }
+        for my $uri (grep {$aliasResource->{subOf}->{$_}}
+                          keys %{$aliasResource->{subOf}}) {
+          $self->{subOf}->{$uri} = true;
+        }
+        for my $uri (grep {$aliasResource->{supOf}->{$_}}
+                          keys %{$aliasResource->{supOf}}) {
+          $self->{supOf}->{$uri} = true;
+        }
+        my @from = grep {$self->{supOf}->{$_}} keys %{$self->{supOf}};
+        my @to   = grep {$self->{subOf}->{$_}} keys %{$self->{subOf}};
+        __DEEP{
+          for my $from (@from) {
+            for my $to (@to) {
+              $self->{db}-><M::ManakaiDISDatabase.getResource>
+                                      ($from)->{subOf}->{$to} = true;
+              $self->{db}-><M::ManakaiDISDatabase.getResource>
+                                      ($to)->{supOf}->{$from} = true;
+            }
+          }
+        }__;
 ##DISResourceDefinition
 
 ClsDef:

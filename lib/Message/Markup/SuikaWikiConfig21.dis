@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/02/27 14:27:56 $
+      $Date: 2005/02/28 04:32:40 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2543,6 +2543,24 @@ IFClassDef:
             \## TODO: Implement warning reporting
             warn $err->stringify;
           }
+
+  @Attr:
+    @@Name: nodeID
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A unique identifier of this node. 
+        \
+        {NOTE:: Node IDs are a globally unique opaque string.  Note that 
+                two nodes separetely parsed and constructed from the 
+                same document would have different node IDs. 
+        \
+        }
+    @@Get:
+      @@@Type: SWCFGString
+      @@@disDef:
+        @@@@GetProp:
+          TreeCore:nodeID
 ##SWCFGNode
 
 IFClassDef:

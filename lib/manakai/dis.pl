@@ -1222,10 +1222,10 @@ sub dis_load_classdef_element ($;%) {
       $cls->{ExpandedURI q<d:supersetOf>}->{$_} = 1
                           if grep {$oldcls->{ExpandedURI q<d:supersetOf>}->{$_}}
                              keys %{$oldcls->{ExpandedURI q<d:supersetOf>}};
-      my @from = $canon, $dfuri, grep {$cls->{ExpandedURI q<d:supersetOf>}->{$_}}
-                         keys %{$cls->{ExpandedURI q<d:supersetOf>}};
-      my @to = $canon, $dfuri, grep {$cls->{subsetOf}->{$_}}
-                       keys %{$cls->{subsetOf}};
+      my @from =($canon, $dfuri, grep {$cls->{ExpandedURI q<d:supersetOf>}->{$_}}
+                         keys %{$cls->{ExpandedURI q<d:supersetOf>}});
+      my @to =($canon, $dfuri, grep {$cls->{subsetOf}->{$_}}
+                       keys %{$cls->{subsetOf}});
       for my $from (@from) {
         for my $to (@to) {
           $State->{Type}->{$from}->{subsetOf}->{$to} = 1;
@@ -2770,4 +2770,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/02/25 07:32:35 $
+1; # $Date: 2005/02/28 04:32:40 $
