@@ -280,7 +280,7 @@ sub dis_node_for_match ($$%) {
   my $has_for = 0;
   for (@{$node->child_nodes}) {
     next unless $_->node_type eq '#element';
-    if (dis_element_type_match ($_->local_name, 'ForCheck', %opt)) {
+    if (dis_element_type_match ($_->local_name, 'ForCheck', %opt, node => $_)) {
       my $for = [split /\s+/, $_->value];
       FCs: for my $f (@$for) {
         if ($f =~ /^!=(.+)$/) {
@@ -465,10 +465,13 @@ Return whether the C<$uri> matches to the C<$for_uri>.
 =cut
 
 {our $dis_uri_for_match_loop = 0;
+my $checked = {};
 sub dis_uri_for_match ($$%);
 sub dis_uri_for_match ($$%) {
   my ($uri, $for_uri, %opt) = @_;
   return 1 if $uri eq $for_uri;
+  return 0 if $checked->{$for_uri};
+  local $checked->{$for_uri} = 1;
   local $dis_uri_for_match_loop = $dis_uri_for_match_loop + 1;
   if ($dis_uri_for_match_loop == 1024) {
     valid_err (qq'$0: "For" URI inheritance might be looping');
@@ -1095,15 +1098,16 @@ sub dis_load_classdef_element ($;%) {
       $cls->{parentModule} = $State->{module};
       $cls->{src} = $node;
     } else {
-      my $canon = dis_qname_to_uri ($al->value, 
+      my $canon = dis_typeforqnames_to_uri ($al->value, 
                                     use_default_namespace => 1,
-                                    %opt, node => $al);
+                                    %opt, node => $al,
+                                    use_default_type => $uri);
       if (defined $State->{Type}->{$dfuri}->{Name}) {
         valid_err (qq<Class <$dfuri> is already defined>, node => $node);
       }
       $oldcls = $State->{Type}->{$dfuri};
       $cls = ($State->{Type}->{$canon} ||= {});
-      for (keys %{$State->{Type}->{$dfuri}->{aliasURI}||{}}, $dfuri) {
+      for (keys %{$State->{Type}->{$dfuri}->{aliasURI}||{}}, $dfuri, $canon) {
         $cls->{aliasURI}->{$_} = 1;
         $State->{Type}->{$_} = $cls;
       }
@@ -1116,9 +1120,10 @@ sub dis_load_classdef_element ($;%) {
       ## Note: Alias to alias might make confusion.
     }
     $State->{def_required}->{Class}->{$dfuri} = -1;
-    unless ($opt{For} eq ExpandedURI q<ManakaiDOM:all>) {
-      my $alluri = dis_typeforuris_to_uri ($uri, ExpandedURI q<ManakaiDOM:all>,
-                                           %opt);
+    my $alluri = dis_typeforuris_to_uri ($uri, ExpandedURI q<ManakaiDOM:all>,
+                                         %opt);
+    if ($opt{For} ne ExpandedURI q<ManakaiDOM:all> and
+        not $cls->{aliasURI}->{$alluri}) {
       push @{$cls->{ISA}||=[]}, $alluri;
       #$State->{def_required}->{Class}->{$alluri} ||= 1;
     }
@@ -1138,11 +1143,12 @@ sub dis_load_classdef_element ($;%) {
         $cls->{parentModule} = $State->{module};
         $cls->{src} = $node;
       } else {
-        my $canon = dis_qname_to_uri ($al->value, use_default_namespace => 1,
-                                      %opt, node => $al);
+        my $canon = dis_typeforqnames_to_uri
+                              ($al->value, use_default_namespace => 1,
+                               %opt, node => $al, use_default_type => $uri);
         $oldcls = $State->{Type}->{$dfuri};
         $cls = ($State->{Type}->{$canon} ||= {});
-        for (keys %{$State->{Type}->{$dfuri}->{aliasURI}||{}}, $dfuri) {
+        for (keys %{$State->{Type}->{$dfuri}->{aliasURI}||{}}, $dfuri, $canon) {
           $cls->{aliasURI}->{$_} = 1;
           $State->{Type}->{$_} = $cls;
         }
@@ -1151,9 +1157,10 @@ sub dis_load_classdef_element ($;%) {
       }
       $cls->{For}->{$opt{For} || ExpandedURI q<ManakaiDOM:all>} = 1;
       $State->{def_required}->{Class}->{$dfuri} = -1;
-      unless ($opt{For} eq ExpandedURI q<ManakaiDOM:all>) {
-        my $alluri = dis_typeforuris_to_uri ($uri, ExpandedURI q<ManakaiDOM:all>,
-                                             %opt);
+      my $alluri = dis_typeforuris_to_uri ($uri, ExpandedURI q<ManakaiDOM:all>,
+                                           %opt);
+      if ($opt{For} ne ExpandedURI q<ManakaiDOM:all> and
+          not $cls->{aliasURI}->{$alluri}) {
         push @{$cls->{ISA}||=[]}, $alluri;
         #$State->{def_required}->{Class}->{$alluri} ||= 1;
       }
@@ -1224,11 +1231,13 @@ sub dis_load_classdef_element ($;%) {
         $State->{def_required}->{Class}->{$uri} ||= $_;
       }
     } elsif ($ln eq ExpandedURI q<d:ResourceDef> and not $is_multiresource) {
-      valid_err ("Alias class name cannot be able to have this type of elements",
-                 node => $_) if $al;
-      local $State->{current_class_container} = $cls;
-      local $State->{multiple_resource_parent} = {};
-      dis_load_classdef_element ($_, %opt);
+     #valid_err ("Alias class name cannot be able to have this type of elements",
+     #           node => $_) if $al;
+      unless ($al) {
+        local $State->{current_class_container} = $cls;
+        local $State->{multiple_resource_parent} = {};
+        dis_load_classdef_element ($_, %opt);
+      }
     }
   }
   unless (keys %{$cls->{Type}}) {
@@ -2030,4 +2039,4 @@ sub disdoc_inline2pod ($;%) {
 
 =cut
 
-1; # $Date: 2004/11/23 13:20:33 $
+1; # $Date: 2004/11/24 12:00:13 $

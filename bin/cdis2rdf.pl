@@ -127,6 +127,16 @@ for (keys %{$State->{For}}) {
   }
 }}
 
+sub res_canon ($) {
+  my $uri = shift;
+  if (defined $State->{Type}->{$uri}->{Name} and
+      defined $State->{Type}->{$uri}->{URI}) {
+    return $State->{Type}->{$uri}->{URI};
+  } else {
+    return $uri;
+  }
+}
+
 if ($Opt{output_resource}) {
   sub class_to_rdf ($;%);
   sub class_to_rdf ($;%) {
@@ -162,13 +172,14 @@ if ($Opt{output_resource}) {
                              $mod->{parentModule});
       }
       for (keys %{$mod->{Type}}) {
-        $result->add_triple ($uri =>ExpandedURI q<rdf:type>=> $_);
+        $result->add_triple ($uri =>ExpandedURI q<rdf:type>=> res_canon $_);
       }
       for (@{$mod->{ISA}}) {
-        $result->add_triple ($uri =>ExpandedURI q<rdfs:subClassOf>=> $_);
+        $result->add_triple ($uri =>ExpandedURI q<rdfs:subClassOf>=>
+                             res_canon $_);
       }
       for (@{$mod->{Implement}}) {
-        $result->add_triple ($uri =>ExpandedURI q<d:Implement>=> $_);
+        $result->add_triple ($uri =>ExpandedURI q<d:Implement>=> res_canon $_);
       }
       if ($Opt{output_for}) {
         for (keys %{$mod->{For}}) {
@@ -204,7 +215,7 @@ if ($Opt{output_resource}) {
         }
         for my $prop ([ExpandedURI q<d:Type>],
                       [ExpandedURI q<d:actualType>]) {
-          $result->add_triple ($uri =>$prop->[0]=> $mod->{$prop->[0]})
+          $result->add_triple ($uri =>$prop->[0]=> res_canon $mod->{$prop->[0]})
             if defined $mod->{$prop->[0]};
         }
         for my $prop ([ExpandedURI q<dis2pm:getter>],
@@ -294,11 +305,11 @@ sub add_triple ($$$$) {
 
 sub stringify ($) {
   my ($self) = @_;
-  return join "\n", (map {"$_."} map {
+  return join "\n", @{main::array_uniq ([sort map {"$_."} map {
     sprintf '%s %s %s', map {
       $_ =~ /^[_"]/ ? $_ : "<$_>"
     } @{$_}[0, 1, 2];
-  } @{$self->{triple}}), '';
+  } @{$self->{triple}}])}, '';
 }
 
 sub stringify_as_xml ($) {

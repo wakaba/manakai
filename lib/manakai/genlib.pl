@@ -45,6 +45,25 @@ sub impl_msg ($;%) {
 }
 
 
+
+=item \@uniqed = array_uniq \@array
+
+Removes duplicated string from an array.
+
+=cut
+
+sub array_uniq ($) {
+  my $a = shift;
+  my @a;
+  my %a;
+  no warnings 'uninitialized';
+  for (@$a) {
+    push @a, $_ unless $a{$_}++;
+  }
+  \@a;
+}
+
+
 sub english_number ($;%) {
   my ($num, %opt) = @_;
   if ($num == 0) {
@@ -111,6 +130,7 @@ sub perl_internal_name ($) {
 sub perl_inherit ($;$) {
   my ($isa, $mod) = @_;
   return '' unless @$isa;
+  $isa = array_uniq $isa;
   if ($mod) {
     perl_statement 'push ' . perl_var (type => '@',
                                        local_name => 'ISA',

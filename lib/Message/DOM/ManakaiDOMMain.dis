@@ -42,7 +42,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/11/23 13:20:33 $
+     $Date: 2004/11/24 12:00:13 $
   
   @Description:
     @@lang:en
@@ -52,7 +52,7 @@ Module:
       manakai DOM implementation.
 
   @DefaultFor:
-    ManakaiDOM:ManakaiDOMLatest
+    ManakaiDOM:ManakaiDOMCommon
 
   @Feature:
     @@QName: 
@@ -72,6 +72,13 @@ Module:
   @Require:
     @@Module:
       @@@Name: DOMMain
+    @@Module:
+      @@@Name: ManakaiDOMMain
+      @@@WithFor: ManakaiDOMCommon
+    @@Module:
+      @@@Name: ManakaiDOMMain
+      @@@WithFor: ManakaiDOMLatest
+      @@@For: ManakaiDOMCommon
 
 ForDef:
   @QName:
@@ -181,6 +188,16 @@ ForDef:
       ManakaiDOM:ManakaiDOM3
 ForDef:
   @QName:
+    ManakaiDOM:ManakaiDOMCommon
+  @FullName:
+    @@lang:en
+    @@@: The manakai implementation of DOM, level independent
+  @Implement:
+    ManakaiDOM:DOM
+  @ISA:
+    ManakaiDOM:ManakaiDOM
+ForDef:
+  @QName:
     ManakaiDOM:Java
   @FullName:
     @@lang:en
@@ -225,6 +242,11 @@ ResourceTypeDef:
     @@@:
       An abstract resource - it has zero or more concrete representations, 
       that are distinguished by <CODE:For> URI references.
+  @AliasFor:
+    @@@:
+      ::ManakaiDOM:all
+    @@For:
+      ManakaiDOM:all !=ManakaiDOM:all
 PropDef:
   @QName:
     dis:resourceFor
@@ -237,6 +259,14 @@ PropDef:
     @@@:
       A <CODE:For> URI reference that can identity one representation 
       of the resource.
+      \
+      {NOTE:: To test <CODE:For> declared with <Q:dis:resourceFor> 
+              element, use <Q:dis:ForCheck> attribute, rather than
+              <Q:dis:For> attribute.  <Q:dis:For> attribute does 
+              not check additional <CODE:For> URI references 
+              declared with <Q:dis:resourceFor> element.
+      \
+      }
 
 ResourceTypeDef:
   @QName:
@@ -314,6 +344,11 @@ ElementTypeBinding:
     @@ISA: ManakaiDOMException
     @@ForCheck:
       ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOMCommon
+      @@@For:
+        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOMCommon
 
 ResourceTypeDef:
   @Name: WarningClass
@@ -331,6 +366,11 @@ ElementTypeBinding:
     @@ISA: ManakaiDOMWarning
     @@ForCheck:
       ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOMCommon
+      @@@For:
+        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOMCommon
 
 PropDef:
   @Name: exceptionOrWarningParameter
@@ -395,6 +435,21 @@ ElementTypeBinding:
       ManakaiDOM:Class
     @@ForCheck:
       ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOMCommon
+      @@@For:
+        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOMCommon
+ResourceTypeDef:
+  @Name: PrimitiveTypeClass
+  @Description:
+    @@lang:en
+    @@@:
+      A programing language primitive type class (aka wrapper class). 
+      \
+      <Q:PrimitiveTypeClass> may or may not have its instance object; 
+      it is typically accessed via class method, not via object method.
+  @ISA: Class
 
 ResourceTypeDef:
   @QName: 
@@ -480,6 +535,11 @@ ResourceDef:
     @@ManakaiDOM:moduleSuffix: Level1
     @@For: 
       ManakaiDOM:ManakaiDOM1
+  @AppName:
+    @@@:
+      Message::DOM::
+    @@For:
+      ManakaiDOM:ManakaiDOMCommon
 
 ResourceTypeDef:
   @QName:
@@ -1026,7 +1086,7 @@ PropDef:
       The subject is same as the object.
 PropDef:
   @QName:
-    dis:aliasFor
+    dis:AliasFor
   @Description:
     @@lang:en
     @@@:
@@ -1117,8 +1177,6 @@ DataTypeDef:
 DataTypeDef:
   @QName:
     lang:Perl
-  @ISA:
-    DOMMain:DOMString
   @FullName:
     @@lang:en
     @@@: Perl 5 code
@@ -1149,8 +1207,6 @@ DataTypeDef:
   @FullName:
     @@lang:en
     @@@: disdoc text format
-  @ISA:
-    DOMMain:DOMString
 DataTypeDef:
   @QName:
     lang:muf
@@ -1158,19 +1214,41 @@ DataTypeDef:
     @@lang:en
     @@@: 
       <PerlModule:Message::Util::Formatter> template
-  @ISA:
-    DOMMain:DOMString
 DataTypeDef:
   @QName:
     lang:Java
   @FullName:
     @@lang:en
     @@@: Java
-
 DataTypeDef:
+  @QName:
+    dis:Date.RCS
+  @FullName:
+    @@lang:en
+    @@@: RCS tag-style date and time specification
+
+ElementTypeBinding:
+  @Name: StringDataTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DataType
+    @@ISA:
+      @@@@:
+        DOMMain:ManakaiDOMString
+      @@@For:
+        !=ManakaiDOM:ManakaiDOMCommon
+    @@AliasFor: 
+      @@@@:
+        ::ManakaiDOM:ManakaiDOMLatest
+      @@@For:
+        ManakaiDOM:ManakaiDOMCommon
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+
+StringDataTypeDef:
   @Name: ManakaiDOMURI
-  @ISA: 
-    DOMMain:DOMString
   @FullName: 
     @@lang:en
     @@@: DOM URI
@@ -1197,10 +1275,8 @@ DataTypeDef:
       Examples of the DOM URI include RFC 2396/2773 URI reference and 
       IRI reference.
 
-DataTypeDef:
+StringDataTypeDef:
   @Name: ManakaiDOMNamespaceURI
-  @ISA: 
-    DOMMain:DOMString
   @FullName:
     @@lang:en
     @@@: DOM Namespace URI
@@ -1230,10 +1306,8 @@ DataTypeDef:
       "ManakaiDOMNamespaceURI", the Perl code to check the empty 
       string is outputed as part of the implementation.
 
-DataTypeDef:
+StringDataTypeDef:
   @Name: ManakaiDOMFeatureName
-  @ISA: 
-    DOMMain:DOMString
   @FullName:
     @@lang:en
     @@@: feature name
@@ -1242,10 +1316,8 @@ DataTypeDef:
     @@@:
       The DOM feature name.
 
-DataTypeDef:
+StringDataTypeDef:
   @Name: ManakaiDOMFeatureVersion
-  @ISA: 
-    DOMMain:DOMString
   @FullName:
     @@lang:en
     @@@: feature version
@@ -1253,12 +1325,10 @@ DataTypeDef:
     @@lang:en
     @@@: The DOM feature version.
 
-DataTypeDef:
+StringDataTypeDef:
   @Name: ManakaiDOMFeatures
   @For:
     ManakaiDOM:ManakaiDOM3
-  @ISA: 
-    DOMMain:DOMString
   @FullName:
     @@lang:en
     @@@: features
@@ -1269,12 +1339,10 @@ DataTypeDef:
       and an optional <TYPE:ManakaiDOM:ManakaiDOMFeatureVersion>, 
       separated by white space.
 
-DataTypeDef:
+StringDataTypeDef:
   @Name:ManakaiDOMKeyIdentifier
   @For:
     ManakaiDOM:ManakaiDOM3
-  @ISA:
-    DOMMain:DOMString
   @FullName:
     @@lang:en
     @@@: key identifier
@@ -1288,12 +1356,10 @@ DataTypeDef:
     \
       }
 
-DataTypeDef:
+StringDataTypeDef:
   @Name:ManakaiDOMKeyIdentifiers
   @For:
     ManakaiDOM:ManakaiDOM3
-  @ISA:
-    DOMMain:DOMString
   @FullName:
     @@lang:en
     @@@:list of key identifiers
@@ -1627,6 +1693,10 @@ ResourceDef:
     ManakaiDOM:ExceptionClass
   @ISA: ManakaiDOMExceptionOrWarning
   @For: ManakaiDOM !=ManakaiDOM
+  @AliasFor:
+    @@@:
+      ::ManakaiDOM:ManakaiDOMCommon
+    @@For: !=ManakaiDOMCommon
   @Description:
     @@lang:en
     @@@:
@@ -1638,6 +1708,10 @@ ResourceDef:
     ManakaiDOM:WarningClass
   @ISA: ManakaiDOMExceptionOrWarning
   @For: ManakaiDOM !=ManakaiDOM
+  @AliasFor:
+    @@@:
+      ::ManakaiDOM:ManakaiDOMCommon
+    @@For: !=ManakaiDOMCommon
   @Description:
     @@lang:en
     @@@:

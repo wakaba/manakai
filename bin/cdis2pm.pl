@@ -100,18 +100,19 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
                                 scope => 'our')
                    => perl_literal version_date time;
     ## Inheritance
-    my @isa;
+    my $isa = [];
     for my $uri (@{$pack->{ISA}||[]}, @{$pack->{Implement}||[]}) {
       my $pack = $State->{Type}->{$uri};
       if (defined $pack->{ExpandedURI q<dis2pm:packageName>}) {
-        push @isa, $pack->{ExpandedURI q<dis2pm:packageName>};
-        $result .= '$' . $pack->{ExpandedURI q<dis2pm:packageName>} . "::;\n";
+        push @$isa, $pack->{ExpandedURI q<dis2pm:packageName>};
       } else {
         impl_msg ("Inheriting package name for <$uri> not defined",
                   node => $pack->{src}) if $Opt{verbose};
       }
     }
-    $result .= perl_inherit \@isa;
+    $isa = array_uniq $isa;
+    $result .= perl_inherit $isa;
+    $result .= '$' . $_ . "::;\n" for @$isa;
     ## Members
     if ({
          ExpandedURI q<ManakaiDOM:Class> => 1,
