@@ -1001,8 +1001,13 @@ sub disdoc2text ($;%) {
         node => $opt{node};
     } elsif (defined $cdata) {
       $r = $cdata;
+    } elsif ({CODE => 1}->{$type}) {
+      $r = disdoc2text $data;
+    } elsif ({SRC => 1}->{$type}) {
+      $r = q<[>. disdoc2text ($data) . q<]>;
     } elsif ({IF => 1, Type => 1, Param => 1, XML => 1, SGML => 1, DOM => 1,
-              Feature => 1, FeatureVer => 1}->{$type}) {
+              Feature => 1, FeatureVer => 1, CHAR => 1, Q => 1,
+              Module => 1}->{$type}) {
       $r = q<"> . $data . q<">;
     } elsif ({M => 1, A => 1, X => 1, Warn => 1}->{$type}) {
       if ($data =~ /^([^.]+)\.([^.]+)$/) {
@@ -1033,10 +1038,15 @@ sub disdoc2pod ($;%) {
       valid_err qq<Invalid character "$err" in DISDOC>,
         node => $opt{node};
     } elsif (defined $cdata) {
-      $r = pod_cdata $cdata;
+      $r = pod_cdata $cdata; 
+    } elsif ({CODE => 1}->{$type}) {
+      $r = pod_code disdoc2pod $data;
+    } elsif ({SRC => 1}->{$type}) {
+      $r = q<[>. disdoc2pod ($data) . q<]>;
     } elsif ({
               IF => 1, Type => 1, Param => 1, DOM => 1, XML => 1,
-              SGML => 1, Feature => 1, FeatureVer => 1,
+              SGML => 1, Feature => 1, FeatureVer => 1, CHAR => 1,
+              Q => 1, Module => 1,
              }->{$type}) {
       $r = pod_code $data;
     } elsif ({
@@ -1095,25 +1105,31 @@ sub get_description ($;%) {
     $opt{default};
   } else {
     my $srctype = $def->get_attribute_value ('Type', default => $default);
+    my $value = $def->value;
     valid_err q<Description undefined>, node => $def
-      unless defined $def->value;
+      unless defined $value;
     if ($srctype eq ExpandedURI q<lang:disdoc>) {
       if ($opt{type} eq ExpandedURI q<lang:pod>) {
-        disdoc2pod ($def->value, node => $def);
+        $value = disdoc2pod ($value, node => $def);
       } else {
-        disdoc2text ($def->value, node => $def); 
+        $value = disdoc2text ($value, node => $def); 
       }
     } elsif ($srctype eq ExpandedURI q<lang:muf>) {
-      muf_template $def->value;
+      if ($opt{type} eq ExpandedURI q<lang:muf>) {
+        $value = muf_template $value;
+      } else {
+        impl_err q<Can't convert MUF tempalte to >.$opt{type};
+      }
     } elsif ($srctype eq $opt{type}) {
-      $def->value;
+      # 
     } else {
       if ($opt{type} eq ExpandedURI q<lang:pod>) {
-        pod_paras $textplain;
-      } else {
-        $textplain;
+        $value = pod_paras $def->value;
+      } elsif ($opt{type} eq ExpandedURI q<lang:muf>) {
+        $value =~ s/%/%percent;/g;
       }
     }
+    $value;
   }
 }
 
@@ -1158,7 +1174,7 @@ sub get_redef_description ($;%) {
                                                      is_pod => 1)
                                  : qq<super-$opt{if} of this $opt{if}>).
                          q< but that definition has been overridden here.>;
-  } else {
+  }
     my @redefBy;
     for (@{$node->child_nodes}) {
       next unless $_->node_type eq '#element' and
@@ -1171,7 +1187,6 @@ sub get_redef_description ($;%) {
                            (@redefBy > 1 ? 's ' : ' ').
                            english_list (\@redefBy, connector => 'and').'.';
     }
-  }
   @desc;
 } # get_redef_description;
 
@@ -2324,6 +2339,8 @@ sub datatype2perl ($;%) {
       push @{$Info->{DataTypeAlias}->{type_expanded_uri $if_name}
                   ->{isa_uri}||=[]},
            type_expanded_uri $_->value;
+    } elsif ($_->local_name eq 'Param') {
+      ## TODO:
     } elsif ({qw/Name 1 FullName 1 Spec 1 Description 1
                  Level 1 SpecLevel 1 Def 1 ImplNote 1/}->{$_->local_name}) {
       #
@@ -3050,6 +3067,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/09/20 05:53:14 $
+# $Date: 2004/09/20 13:58:44 $
 
 

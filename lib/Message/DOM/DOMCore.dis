@@ -3,6 +3,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/9/10/dom#
   @DOMCore:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @DOMXML:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @infoset:
      http://www.w3.org/2001/04/infoset#
   @lang:
@@ -46,7 +48,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/20 05:53:13 $
+     $Date: 2004/09/20 13:58:44 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -2102,8 +2104,8 @@ IF:
                 if ({
                       <Q:infoset:Element> => 1,
                       <Q:DOMCore:DocumentFragment> => 1,
-                      <Q:DOMCore:Entity> => 1,
-                      <Q:DOMCore:EntityReference> => 1,
+                      <Q:DOMXML:Entity> => 1,
+                      <Q:DOMXML:EntityReference> => 1,
                     }->{$node->{<Q:DOMCore:nodeType>}}) {
                   CHILDTYPE: {
                     for (@newNode) {
@@ -2112,8 +2114,8 @@ IF:
                             <Q:DOMCore:Text> => 1,
                             <Q:infoset:Comment> => 1,
                             <Q:infoset:ProcessingInstruction> => 1,
-                            <Q:DOMCore:CDATASection> => 1,
-                            <Q:DOMCore:EntityReference> => 1,
+                            <Q:DOMXML:CDATASection> => 1,
+                            <Q:DOMXML:EntityReference> => 1,
                           }->{$_->{<Q:DOMCore:nodeType>}}) {
                         last CHILDTYPE;
                       }
@@ -2165,7 +2167,7 @@ IF:
                     for my $newNode (@newNode) {
                       unless ({
                             <Q:DOMCore:Text> => 1,
-                            <Q:DOMCore:EntityReference> => 1,
+                            <Q:DOMXML:EntityReference> => 1,
                           }->{$newNode->{<Q:DOMCore:nodeType>}}) {
                         last CHILDTYPE;
                       }
@@ -2436,8 +2438,8 @@ IF:
                 if ({
                       <Q:infoset:Element> => 1,
                       <Q:DOMCore:DocumentFragment> => 1,
-                      <Q:DOMCore:Entity> => 1,
-                      <Q:DOMCore:EntityReference> => 1,
+                      <Q:DOMXML:Entity> => 1,
+                      <Q:DOMXML:EntityReference> => 1,
                     }->{$node->{<Q:DOMCore:nodeType>}}) {
                   CHILDTYPE: {
                     for (@newNode) {
@@ -2446,8 +2448,8 @@ IF:
                             <Q:DOMCore:Text> => 1,
                             <Q:infoset:Comment> => 1,
                             <Q:infoset:ProcessingInstruction> => 1,
-                            <Q:DOMCore:CDATASection> => 1,
-                            <Q:DOMCore:EntityReference> => 1,
+                            <Q:DOMXML:CDATASection> => 1,
+                            <Q:DOMXML:EntityReference> => 1,
                           }->{$_->{<Q:DOMCore:nodeType>}}) {
                         last CHILDTYPE;
                       }
@@ -2499,7 +2501,7 @@ IF:
                     for my $newNode (@newNode) {
                       unless ({
                             <Q:DOMCore:Text> => 1,
-                            <Q:DOMCore:EntityReference> => 1,
+                            <Q:DOMXML:EntityReference> => 1,
                           }->{$newNode->{<Q:DOMCore:nodeType>}}) {
                         last CHILDTYPE;
                       }
@@ -2836,8 +2838,8 @@ IF:
                 if ({
                       <Q:infoset:Element> => 1,
                       <Q:DOMCore:DocumentFragment> => 1,
-                      <Q:DOMCore:Entity> => 1,
-                      <Q:DOMCore:EntityReference> => 1,
+                      <Q:DOMXML:Entity> => 1,
+                      <Q:DOMXML:EntityReference> => 1,
                     }->{$node->{<Q:DOMCore:nodeType>}}) {
                   CHILDTYPE: {
                     for (@newNode) {
@@ -2846,8 +2848,8 @@ IF:
                             <Q:DOMCore:Text> => 1,
                             <Q:infoset:Comment> => 1,
                             <Q:infoset:ProcessingInstruction> => 1,
-                            <Q:DOMCore:CDATASection> => 1,
-                            <Q:DOMCore:EntityReference> => 1,
+                            <Q:DOMXML:CDATASection> => 1,
+                            <Q:DOMXML:EntityReference> => 1,
                           }->{$_->{<Q:DOMCore:nodeType>}}) {
                         last CHILDTYPE;
                       }
@@ -2899,7 +2901,7 @@ IF:
                     for my $newNode (@newNode) {
                       unless ({
                             <Q:DOMCore:Text> => 1,
-                            <Q:DOMCore:EntityReference> => 1,
+                            <Q:DOMXML:EntityReference> => 1,
                           }->{$newNode->{<Q:DOMCore:nodeType>}}) {
                         last CHILDTYPE;
                       }
@@ -3001,6 +3003,24 @@ IF:
         @@@Type:  boolean
   @Method:
      @@Name:  normalize
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Put all <IF:Text> nodes in the full depth of the sub-tree 
+         underneath this <IF:Node>, including attribute nodes 
+         attaced to the <IF:Element>, 
+         into a "normal" form where only structure separates 
+         <IF:Text> nodes, i.e. there are neither adjacent <IF:Text> 
+         nodes nor empty <IF:Text> nodes. <SRC:DOM 1, 2, 3>
+       \
+         If the parameter <DOM:normalize-characters> of the 
+         <A:Document.domConfig> is <DOM:true>, the characters 
+         of the <IF:Text> nodes will also be fully normalized. 
+         <SRC:DOM 3>
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Isn't <IF:CDATASection> node fully-normalized?
      @@Level[list]:
        2
        3
@@ -3013,7 +3033,7 @@ IF:
          This method was defined in the "Element" interface in the DOM 
          Level 1, but has beem moved to the "Node" interface in the 
          DOM Level 2.
-     @@RedefinedBy: Element
+     @@RedefinedBy:Element
   @Method:
      @@Name:  isSupported
      @@Return:
@@ -3527,21 +3547,26 @@ IF:
           lang:Perl
         @@@@@:
           my $node = $r = __CLASS{ManakaiDOMNodeObject::}__->__INT{new}__;
-          push @{$node->{<Q:TreeCore:origin>}}, <Q:infoset:parent>;
+          push @{$node->{<Q:TreeCore:origin>}}, <Q:infoset:parent>,
+                                                <Q:infoset:ownerElement>;
           push @{$node->{<Q:TreeCore:subnode>}}, <Q:infoset:children>;
+          push @{$node->{<Q:TreeCore:subnode2>}}, <Q:infoset:attributes>;
           push @{$node->{<Q:TreeCore:irefnode>}}, <Q:DOMCore:ownerDocument>;
           $node->{<Q:infoset:children>} = [];
+          $node->{<Q:infoset:attributes>} = {};
           $node->{<Q:DOMCore:hasFeature>}->{XML} = true;
               ## More consideration required for the feature
        @@@ImplNote:
          @@@@lang:en
          @@@@@:
            Other properties required to be a legal "Node" object:
-           DOMCore:nodeType.
+           <Q:DOMCore:nodeType>.
          \
-           Optional properties: infoset:localName, infoset:prefix,
-           DOMCore:ownerDocument, infoset:namespaceName, DOMCore:name,
-           DOMCore:read-only.
+           Optional properties: <Q:infoset:localName>, <Q:infoset:prefix>,
+           <Q:DOMCore:ownerDocument> (required for an <IF:Node> whose 
+           type is other than <IF:Document> and <IF:DocumentType>), 
+           <Q:infoset:namespaceName>, <Q:DOMCore:name>,
+           <Q:DOMCore:read-only>.
 
   @IntMethod:
     @@Name: getNodeReference
@@ -3592,17 +3617,17 @@ IF:
           } elsif ($nt eq <Q:DOMCore:DocumentFragment>) {
                        ## Condition sensitive
             $class = q<__CLASS{DocumentFragment}__>;
-          } elsif ($nt eq <Q:DOMCore:EntityReference>) {
+          } elsif ($nt eq <Q:DOMXML:EntityReference>) {
                        ## Condition sensitive
             $class = q<__CLASS{EntityReference}__>;
           } elsif ($nt eq <Q:infoset:ProcessingInstruction>) {
             ## TODO: Find class by namespace URI and local name
                        ## Condition sensitive
             $class = q<__CLASS{ProcessingInstruction}__>;
-          } elsif ($nt eq <Q:DOMCore:Entity>) {
+          } elsif ($nt eq <Q:DOMXML:Entity>) {
                        ## Condition sensitive
             $class = q<__CLASS{Entity}__>;
-          } elsif ($nt eq <Q:DOMCore:CDATASection>) {
+          } elsif ($nt eq <Q:DOMXML:CDATASection>) {
                        ## Condition sensitive
             $class = q<__CLASS{CDATASection}__>;
           } elsif ($nt eq <Q:infoset:Notation>) {
@@ -4925,19 +4950,6 @@ IF:
      @@SpecLevel:3
   
   @ReAttr:
-    @@Name: attributes
-    @@Spec:
-      @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-84CF096
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
-    @@Get:
-      @@@Type: NamedNodeMap
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          $r = null;
-  @ReAttr:
      @@Name:  localName
      @@Description:
        @@@lang:en
@@ -5222,6 +5234,43 @@ IF:
      @@SpecLevel:2
      @@Redefine: Node
 
+  @IntMethod:
+    @@Name: newObject
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Construct an object for a new instance of the <IF:Attr> node.
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The new object for the <IF:Attr> node.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+               ## Condition sensitive
+          $r = __CLASS{Node}__->__INT{newObject}__;
+          $r->{<Q:DOMCore:nodeType>} = <Q:infoset:Attribute>;
+     @@Level[list]:
+       1
+       2
+       3
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Other properties required to be a legal <IF:Attr> object:
+         Either <Q:DOMCore:name> or <Q:infoset:localName>, 
+         <Q:DOMCore:ownerDocument>.
+       \
+         Other available properties: <Q:infoset:prefix>, 
+         <Q:DOMCore:read-only>, <Q:infoset:specified>, 
+         <Q:infoset:ownerElement>, <Q:infoset:children>, 
+         <Q:infoset:namespaceName>.
+## IF:Attr
+
 IF:
   @Name:  Element
   @Description:
@@ -5275,7 +5324,7 @@ IF:
                    $node->{<Q:infoset:prefix>} . ':' : '') . 
                    $node->{<Q:infoset:localName>};
             } else {
-              $r = $node->{<Q:DOMCore:tagName>};
+              $r = $node->{<Q:DOMCore:name>};
             }
  ## TODO: toUpper if HTML
  ## ISSUE: What to do if XHTML?       
@@ -5484,15 +5533,30 @@ IF:
      @@SpecLevel:3
   @ReMethod:
     @@Name: normalize
-    @@Return:
-      @@@
+    @@Description:
+      @@@lang:en
+      @@@@:
+         Put all <IF:Text> nodes in the full depth of the sub-tree 
+         underneath this <IF:Node>, including attribute nodes 
+         attaced to the <IF:Element>, 
+         into a "normal" form where only structure separates 
+         <IF:Text> nodes, i.e. there are neither adjacent <IF:Text> 
+         nodes nor empty <IF:Text> nodes. <SRC:DOM 1, 2, 3>
     @@ImplNote:
       @@@lang:en
       @@@@:
         The method "normalize" was defined in the "Element" interface in 
         the DOM Level 1 but has been moved to 
         the "Node" interface in the DOM Level 2 and higher.
-    @@Redefine: Node
+    @@Level[list]:
+      1
+      2
+      3
+    @@SpecLevel[list]:
+      1
+      2
+      3
+    @@Redefine:Node
   
   @ReAttr:
      @@Name:  localName
@@ -5714,6 +5778,42 @@ IF:
        3
      @@SpecLevel:2
      @@Redefine: Node
+  
+  @IntMethod:
+    @@Name: newObject
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Construct an object for a new instance of the <IF:Element> node.
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The new object for the <IF:Element> node.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+               ## Condition sensitive
+          $r = __CLASS{Node}__->__INT{newObject}__;
+          $r->{<Q:DOMCore:nodeType>} = <Q:infoset:Element>;
+     @@Level[list]:
+       1
+       2
+       3
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Other properties required to be a legal <IF:Element> object:
+         Either <Q:DOMCore:name> or <Q:infoset:localName>, 
+         <Q:DOMCore:ownerDocument>.
+       \
+         Other available properties: <Q:infoset:prefix>, 
+         <Q:DOMCore:read-only>, <Q:infoset:parent>, <Q:infoset:children>, 
+         <Q:infoset:attributes>, <Q:infoset:namespaceName>.
+## IF:Element
 
 IF:
   @Name:  Text
@@ -5810,7 +5910,7 @@ IF:
           if ($node->{<Q:DOMCore:nodeType>} eq <Q:DOMCore:Text>) {
                         ## Condition sensitive
             $newNode = __CLASS{Text}__->__INT{newObject}__;
-          } elsif ($node->{<Q:DOMCore:nodeType>} eq <Q:DOMCore:CDATASection>) {
+          } elsif ($node->{<Q:DOMCore:nodeType>} eq <Q:DOMXML:CDATASection>) {
                         ## Condition sensitive
             $newNode = __CLASS{CDATASection}__->__INT{newObject}__;
           } else {
@@ -5888,19 +5988,6 @@ IF:
      @@SpecLevel:3
   
   @ReAttr:
-    @@Name: attributes
-    @@Spec:
-      @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-84CF096
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
-    @@Get:
-      @@@Type: NamedNodeMap
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          $r = null;
-  @ReAttr:
     @@Name: nodeName
     @@Description:
       @@@lang:en
@@ -5936,6 +6023,37 @@ IF:
         @@@@@: $r = __SUPER{Node}__->TEXT_NODE;
     @@Redefine: Node
     @@RedefinedBy: CDATASection
+
+  @IntMethod:
+    @@Name: newObject
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Construct an object for a new instance of the <IF:Text> node.
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The new object for the <IF:Text> node.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+               ## Condition sensitive
+          $r = __CLASS{Node}__->__INT{newObject}__;
+          $r->{<Q:DOMCore:nodeType>} = <Q:DOMCore:Text>;
+          $r->{<Q:infoset:content>} = '';
+     @@Level[list]:
+       1
+       2
+       3
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Other available properties: <Q:infoset:ElementContentWhitespace>, 
+         <Q:infoset:parent>, <Q:infoset:content>, <Q:DOMCore:read-only>.
 ## IF:Text
 
 IF:
@@ -5990,6 +6108,37 @@ IF:
           lang:Perl
         @@@@@: $r = __SUPER{Node}__->COMMENT_NODE;
     @@Redefine: Node
+
+  @IntMethod:
+    @@Name: newObject
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Construct an object for a new instance of the <IF:Comment> node.
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The new object for the <IF:Comment> node.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+               ## Condition sensitive
+          $r = __CLASS{Node}__->__INT{newObject}__;
+          $r->{<Q:DOMCore:nodeType>} = <Q:infoset:Comment>;    
+          $r->{<Q:infoset:content>} = '';
+     @@Level[list]:
+       1
+       2
+       3
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Other available properties: <Q:infoset:parent>, <Q:infoset:content>, 
+         <Q:DOMCore:read-only>.
 ## IF:Comment
 
 IF:
@@ -6654,40 +6803,153 @@ IF:
   @ImplNote:
     @@lang:en
     @@@:
-      Parameters affect: "Document.normalizeDocument", 
-      validation, "DOMParser" and "DOMSerializer", etc.
+      Parameters affect: <M:Document.normalizeDocument>, 
+      validation, <IF:DOMParser>, <IF:DOMSerializer>, etc.
   @Level[list]:  3
   @SpecLevel:3
   @Method:
      @@Name:  setParameter
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Set the value of a parameter.
      @@Param:
         @@@Name:  name
-        @@@Type:  DOMString
+        @@@Type:
+          ManakaiDOMCore:ManakaiDOMConfigurationParameter
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The name of the parameter to set.
      @@Param:
         @@@Name:  value
         @@@Type:  DOMUserData
+        @@@Description:
+          @@@@lang:en
+          @@@@@: 
+            The new value.  The object type must match the type 
+            defined by the definition of the parameter.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: Unset the parameter.
      @@Return:
-        @@@Exception[list]:  DOMException
+        @@@Exception:
+          @@@@Name: NOT_FOUND_ERR
+          @@@@Type: DOMException
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The parameter name is not recognized.
+        @@@Exception:
+          @@@@Name: NOT_SUPPORTED_ERR
+          @@@@Type: DOMException
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The parameter name is recognized but the requested 
+              value cannot be set.
+        @@@Exception:
+          @@@@Name: TYPE_MISMATCH_ERR
+          @@@@Type: DOMException
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The value type for this parameter name is 
+              incompatible with the expected value type.
   @Method:
      @@Name:  getParameter
+     @@Description:
+       @@@lang:en
+       @@@@: Return the value of a parameter.
+     @@Param:
+        @@@Name:  name
+        @@@Type:  
+          ManakaiDOMCore:ManakaiDOMConfigurationParameter
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The name of the parameter.
      @@Return:
         @@@Type:  DOMUserData
-        @@@Exception[list]:  DOMException
-     @@Param:
-        @@@Name:  name
-        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The current object associated with the specified 
+            parameter.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either no object has been associated or the parameter 
+              is not supported.
+        @@@Exception:
+          @@@@Name: NOT_FOUND_ERR
+          @@@@Type: DOMException
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The parameter name is not recognized.
   @Method:
      @@Name:  canSetParameter
-     @@Return:
-        @@@Type:  boolean
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Check if setting a parameter to a specific value is supported. 
+         The current value of the parameter itself is not changed.
      @@Param:
         @@@Name:  name
-        @@@Type:  DOMString
+        @@@Type:
+          ManakaiDOMCore:ManakaiDOMConfigurationParameter
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The name of the parameter to check.
      @@Param:
         @@@Name:  value
         @@@Type:  DOMUserData
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An object to check.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              <DOM:true> will be returned.
+     @@Return:
+        @@@Type:  boolean
+        @@@InCase:
+          @@@@Value:true
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The parameter could be successfully set to the 
+              specified value.
+        @@@InCase:
+          @@@@Value:false
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The parameter is not recognized or the 
+              requested value is not supported.
   @Attr:
      @@Name:  parameterNames
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The list of the parameters supported by this 
+         <IF:DOMConfiguration> object and for which at least 
+         one value can be set by the DOM application.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Parameternames defined outside the DOM Level 3 Core Specification 
+         also contained.
      @@Get:
         @@@Type:  DOMStringList
 
@@ -6718,25 +6980,22 @@ IF:
         @@@@Type:
           lang:Perl
         @@@@@:
-                            ## Condition sensitive
+               ## Condition sensitive
           $r = __CLASS{Node}__->__INT{newObject}__;
           $r->{<Q:DOMCore:nodeType>} = <Q:DOMCore:DocumentFragment>;          
+       @@@ImplNote:
+         @@@@lang:en
+         @@@@@:
+           Other properties required to be a legal <IF:DocumentFragment> 
+           object: <Q:ownerDocument>. 
+         \
+           Other available properties: <Q:infoset:children>, 
+           <Q:DOMCore:read-only>.
      @@Level[list]:
        1
        2
        3
   
-  @ReAttr:
-    @@Name: attributes
-    @@Spec:
-      @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-84CF096
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
-    @@Get:
-      @@@Type: NamedNodeMap
-      @@@DefaultValue:
-        @@@@is-null: 1
-      @@@Def: \
   @ReAttr:
     @@Name: nodeName
     @@Description:
@@ -7338,6 +7597,26 @@ IF:
      @@SpecLevel:3
   @Method:
      @@Name:  normalizeDocument
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Act as if the document was going through a save and 
+         load cycle, putting the document in a "normal" form.
+       \
+         - Update the replacement tree of <IF:EntityReference> nodes.
+       \
+         - Normalize <IF:Text> nodes, as the method <M:Node.normalize> does.
+       \
+         - Other normalization specified by the <M:Document.domConfig>.
+       \
+         Mutation events, when supported, are generated to reflect  
+         the changes occuring on the document.
+       \
+         If errors occur, such as an attempt to update a read-only 
+         node or a <A:Node.nodeName> contains an invalid character, 
+         (fatal and non-fatal) errors and warnings will be reported using 
+         the <IF:DOMErrorHandler> object associated with the 
+         <DOM:error-handler> parameter.
      @@Level[list]:  3
      @@SpecLevel:3
   @Method:
@@ -7474,13 +7753,14 @@ IF:
        @@@ImplNote:
          @@@@lang:en
          @@@@@:
-           Other properties required to be a legal "Document" object:
-           DOMCore:implementation.
+           Other properties required to be a legal <IF:Document> object:
+           <Q:DOMCore:implementation>.
          \
-           Default-null (or false) properties: DOMCore:read-only,
-           infoset:characterEncodingScheme, DOMCore:xmlEncoding,
-           infoset:standalone,
-           DOMCore:documentURI, DOMCore:domConfig.
+           Other available properties: <Q:DOMCore:read-only>,
+           <Q:infoset:characterEncodingScheme>, <Q:DOMCore:xmlEncoding>,
+           <Q:infoset:standalone>, <Q:infoset:version>,
+           <Q:DOMCore:documentURI>, <Q:DOMCore:strictErrorChecking>, 
+           <Q:infoset:children>.
     @@Level[list]:
       1
       2

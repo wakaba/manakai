@@ -24,7 +24,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/20 05:53:13 $
+     $Date: 2004/09/20 13:58:44 $
   
   @Description:
     @@lang:en
@@ -421,6 +421,7 @@ IF:
           $r = bless {
             <Q:TreeCore:origin> => [],
             <Q:TreeCore:subnode> => [],
+            <Q:TreeCore:subnode2> => [],
             <Q:TreeCore:irefnode> => [],
             <Q:TreeCore:urefnode> => [],
             <Q:TreeCore:anydata> => [],
@@ -492,10 +493,23 @@ IF:
             unless (@{$self->{<Q:TreeCore:origin>}}) {
               SUBNODES:
               for my $key (@{$self->{<Q:TreeCore:subnode>}}) {
-                for (@{$self->{$key}}) {
+                for (ref $self->{$key} eq 'ARRAY' ? @{$self->{$key}}
+                                                  : values %{$self->{$key}}) {
                   if ($_->__SUPER{ManakaiDOMNodeObject::}__::__INT{isExternallyReferredDownward}__) {
                     $r = true;
                     last SUBNODES;
+                  }
+                }
+              }
+              SUBNODES2:
+              for my $key (@{$self->{<Q:TreeCore:subnode2>}}) {
+                for (ref $self->{$key} eq 'ARRAY' ? @{$self->{$key}}
+                                                  : values %{$self->{$key}}) {
+                  for (ref $_ eq 'ARRAY' ? @$_ : values %$_) {
+                    if ($_->__SUPER{ManakaiDOMNodeObject::}__::__INT{isExternallyReferredDownward}__) {
+                      $r = true;
+                      last SUBNODES2;
+                    }
                   }
                 }
               }
@@ -515,11 +529,25 @@ IF:
           if ($self->{<Q:TreeCore:rc>}) {
             $r = true;
           } else {
+            SUBNODES:
             for my $key (@{$self->{<Q:TreeCore:subnode>}}) {
-              for (@{$self->{$key} || []}) {
+              for (ref $self->{$key} eq 'ARRAY' ? @{$self->{$key}}
+                                                : values %{$self->{$key}||{}}) {
                 if ($_->__SUPER{ManakaiDOMNodeObject::}__::__INT{isExternallyReferredDownward}__) {
                   $r = true;
                   last SUBNODES;
+                }
+              }
+            }
+            SUBNODES2:
+            for my $key (@{$self->{<Q:TreeCore:subnode2>}}) {
+              for (ref $self->{$key} eq 'ARRAY' ? @{$self->{$key}}
+                                                : values %{$self->{$key}||{}}) {
+                for (ref $_ eq 'ARRAY' ? @$_ : values %$_) {
+                  if ($_->__SUPER{ManakaiDOMNodeObject::}__::__INT{isExternallyReferredDownward}__) {
+                    $r = true;
+                    last SUBNODES2;
+                  }
                 }
               }
             }
@@ -548,7 +576,16 @@ IF:
         @@@@@:
           delete $self->{$_} for @{$self->{<Q:TreeCore:origin>}};
           for my $key (@{$self->{<Q:TreeCore:subnode>}}) {
-            my @node = @{$self->{$key} || []};
+            my @node = ref $self->{$key} eq 'ARRAY' ? @{$self->{$key}}
+                                         : values %{$self->{$key}||{}};
+            delete $self->{$key};
+            $_->__SUPER{ManakaiDOMNodeObject::}__::__INT{destroyDownward}__
+                                                                   for @node;
+          }
+          for my $key (@{$self->{<Q:TreeCore:subnode2>}}) {
+            my @node = map {ref $_ eq 'ARRAY' ? @$_ : values %$_}
+                       ref $self->{$key} eq 'ARRAY' ? @{$self->{$key}}
+                                         : values %{$self->{$key}||{}};
             delete $self->{$key};
             $_->__SUPER{ManakaiDOMNodeObject::}__::__INT{destroyDownward}__
                                                                    for @node;
@@ -613,8 +650,17 @@ IF:
         @@@@@:
           $self->{<Q:TreeCore:treeID>} = ''.$treeID;
           for my $key (@{$self->{<Q:TreeCore:subnode>}}) {
-            for (@{$self->{$key}||[]}) {
+            for (ref $self->{$key} eq 'ARRAY' ? @{$self->{$key}}
+                                              : values %{$self->{$key}||{}}) {
               $_->__SUPER{ManakaiDOMNodeObject::}__::__INT{changeTreeIDDownward}__ ($treeID);
+            }
+          }
+          for my $key (@{$self->{<Q:TreeCore:subnode2>}}) {
+            for (ref $self->{$key} eq 'ARRAY' ? @{$self->{$key}}
+                                              : values %{$self->{$key}||{}}) {
+              for (ref $_ eq 'ARRAY' ? @$_ : values %$_) {
+                $_->__SUPER{ManakaiDOMNodeObject::}__::__INT{changeTreeIDDownward}__ ($treeID);
+              }
             }
           }
   @IntMethod:
@@ -714,13 +760,15 @@ IF:
           }
 
 ## - For ManakaiDOMNodeObject
-## TreeCore:nodeID  - The world-unique node identifier.
-## TreeCore:origin  - The hash key names of the origin node properties.
-## TreeCore:rc      - The number that denotes there is how many external
-##                    references to the node.
-## TreeCore:subnode - The hash key names of the subnode properties.
-## TreeCore:treeID  - The world-unique tree identifier.
+## TreeCore:nodeID  - The world-unique identifier of the node object.
+## TreeCore:origin  - Hash key names of the origin properties.
+## TreeCore:rc      - The number that denotes how many external references 
+##                    ("ManakaiDOMNodeReference"s) there are.
+## TreeCore:subnode - Hash key names of subnode properties.
+## TreeCore:subnode2 - Hash key names of two-step subnode properties.
+## TreeCore:treeID  - The world-unique identifier of the grove.
 ## - For ManakaiDOMNodeReference
-## TreeCore:node    - The node to which referring.
+## TreeCore:node    - The node object ("ManakaiDOMNodeObject") to which
+##                    this is referring.
 
 ## ManakaiDOMMain.dis ends here

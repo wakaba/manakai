@@ -43,7 +43,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/20 05:53:13 $
+     $Date: 2004/09/20 13:58:44 $
   @Require:
     @@Module:
       @@@Name: DOMCore
@@ -190,6 +190,37 @@ IF:
           lang:Perl
         @@@@@: $r = __CLASS{Node}__->CDATA_SECTION_NODE;
     @@Redefine: Node
+
+  @IntMethod:
+    @@Name: newObject
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Construct an object for a new instance of the <IF:CDATASection> node.
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The new object for the <IF:CDATASection> node.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+               ## Condition sensitive
+          $r = __CLASS{Node}__->__INT{newObject}__;
+          $r->{<Q:DOMCore:nodeType>} = <Q:DOMXML:CDATASection>;
+          $r->{<Q:infoset:content>} = '';
+     @@Level[list]:
+       1
+       2
+       3
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Other available properties: <Q:infoset:parent>, 
+         <Q:infoset:content>.
 ## IF:CDATASection
 
 IF:
@@ -397,6 +428,42 @@ IF:
      @@SpecLevel:3
      @@Redefine: Node
 
+  @IntMethod:
+    @@Name: newObject
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Construct an object for a new instance of the <IF:DocumentType> node.
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The new object for the <IF:DocumentType> node.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+               ## Condition sensitive
+          $r = __CLASS{Node}__->__INT{newObject}__;
+          $r->{<Q:DOMCore:nodeType>} = <Q:infoset:DocumentTypeDeclaration>;
+     @@Level[list]:
+       1
+       2
+       3
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Properties required for a <IF:Node> to be a legal 
+         <IF:DocumentType>: either <Q:infoset:localName> or 
+         <Q:DOMCore:name>.
+         \
+         Other available properties: <Q:infoset:parent>, 
+         <Q:infoset:publicIdentifier>, <Q:infoset:systemIdentifier>, 
+         <Q:infoset:prefix>, <Q:DOMCore:read-only>.
+## IF:DocumentType
+
 IF:
   @Name:  Notation
   @ISA:  Node
@@ -528,6 +595,41 @@ IF:
      @@Level[list]: 3
      @@SpecLevel:3
      @@Redefine: Node
+ 
+  @IntMethod:
+    @@Name: newObject
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Construct an object for a new instance of the <IF:Notation> node.
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The new object for the <IF:Notation> node.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+               ## Condition sensitive
+          $r = __CLASS{Node}__->__INT{newObject}__;
+          $r->{<Q:DOMCore:nodeType>} = <Q:infoset:Notation>;
+     @@Level[list]:
+       1
+       2
+       3
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Properties required for a <IF:Node> to be a legal 
+         <IF:Notation>: <Q:DOMCore:name>.
+         \
+         Other available properties: <Q:infoset:declarationBaseURI>, 
+         <Q:infoset:publicIdentifier>, <Q:infoset:systemIdentifier>, 
+         <Q:DOMCore:read-only>.
+## IF:Notation
 
 IF:
   @Name:  Entity
@@ -639,7 +741,7 @@ IF:
            @@@@Type:
              lang:dis
            @@@@GetProp:
-             DOMXML:inputEncoding
+             infoset:characterEncodingScheme
      @@Level[list]:  3
      @@SpecLevel:3
   @Attr:
@@ -669,7 +771,7 @@ IF:
           @@@@Type:
             lang:dis
           @@@@GetProp:
-            DOMCore:xmlVersion
+            DOMCore:xmlEncoding
      @@Level[list]:  3
      @@SpecLevel:3
   @Attr:
@@ -704,6 +806,11 @@ IF:
             The XML Specifications allows the text declaration omitted. 
             Does the DOM implementation need to provide the default value? 
             What's the default value?
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            infoset:version
      @@Level[list]:  3
      @@SpecLevel:1
      @@ImplNote:
@@ -748,6 +855,43 @@ IF:
           lang:Perl
         @@@@@: $r = __CLASS{Node}__->ENTITY_NODE;
     @@Redefine: Node
+
+  @IntMethod:
+    @@Name: newObject
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Construct an object for a new instance of the <IF:Entity> node.
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The new object for the <IF:Entity> node.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+               ## Condition sensitive
+          $r = __CLASS{Node}__->__INT{newObject}__;
+          $r->{<Q:DOMCore:nodeType>} = <Q:DOMXML:Entity>;
+     @@Level[list]:
+       1
+       2
+       3
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Properties required for a <IF:Node> to be a legal 
+         <IF:Entity>: <Q:DOMCore:name>.
+         \
+         Other available properties: <Q:infoset:declarationBaseURI>, 
+         <Q:infoset:publicIdentifier>, <Q:infoset:systemIdentifier>, 
+         <Q:DOMCore:read-only>, <Q:infoset:notationName>, 
+         <Q:infoset:version>, <Q:DOMCore:xmlEncoding>, 
+         <Q:infoset:characterEncodingScheme>.
+## IF:Entity
 
 IF:
   @Name:  EntityReference
@@ -826,6 +970,41 @@ IF:
           lang:Perl
         @@@@@: $r = __SUPER{Node}__->ENTITY_REFERENCE_NODE;
     @@Redefine: Node
+
+  @IntMethod:
+    @@Name: newObject
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Construct an object for a new instance of the <IF:EntityReference> node.
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The new object for the <IF:EntityReference> node.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+               ## Condition sensitive
+          $r = __CLASS{Node}__->__INT{newObject}__;
+          $r->{<Q:DOMCore:nodeType>} = <Q:DOMXML:EntityReference>;
+     @@Level[list]:
+       1
+       2
+       3
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Properties required for a <IF:Node> to be a legal 
+         <IF:EntityReference>: <Q:DOMCore:name>.
+         \
+         Other available properties: <Q:infoset:declarationBaseURI>, 
+         <Q:DOMCore:read-only>, <Q:infoset:parent>, <Q:infoset:children>, 
+         ??:expanded. 
+## IF:EntityReference
 
 IF:
   @Name:  ProcessingInstruction
@@ -959,7 +1138,7 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: 
-              The node is read-only.
+              This node is read-only.
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -1024,4 +1203,40 @@ IF:
      @@SpecLevel:3
      @@Redefine: Node
 
+  @IntMethod:
+    @@Name: newObject
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Construct an object for a new instance of the 
+        <IF:ProcessingInstruction> node.
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The new object for the <IF:ProcessingInstruction> node.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+               ## Condition sensitive
+          $r = __CLASS{Node}__->__INT{newObject}__;
+          $r->{<Q:DOMCore:nodeType>} = <Q:infoset:ProcessingInstruction>;
+          $r->{<Q:infoset:content>} = '';
+     @@Level[list]:
+       1
+       2
+       3
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Properties required for a <IF:Node> to be a legal 
+         <IF:ProcessingInstruction>: <Q:infoset:target>.
+         \
+         Other available properties: <Q:infoset:baseURI>, 
+         <Q:DOMCore:read-only>, <Q:infoset:parent>, <Q:infoset:content>.
+## IF:ProcessingInstruction
+    
 ## DOMXML.dis ends here

@@ -1,5 +1,5 @@
 Namespace:
-  @DOMCore:
+  @DOMXML:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @infoset:
      http://www.w3.org/2001/04/infoset#
@@ -33,7 +33,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/20 05:53:13 $
+     $Date: 2004/09/20 13:58:44 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -42,6 +42,12 @@ Module:
   @ConditionDef:
     @@Name: DOM3
   
+  @Require:
+    @@Module:
+      @@@Name: DOMCore
+      @@@Namespace:
+        http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+
   @Feature:
     @@QName: 
       ManakaiDOM:ManakaiDOMCore
@@ -103,8 +109,8 @@ IF:
           if ({
                 <Q:infoset:Element> => 1,
                 <Q:infoset:Attribute> => 1,
-                <Q:DOMCore:Entity> => 1,
-                <Q:DOMCore:EntityReference> => 1,
+                <Q:DOMXML:Entity> => 1,
+                <Q:DOMXML:EntityReference> => 1,
                 <Q:DOMCore:DocumentFragment> => 1,
               }->{$self->{<Q:DOMCore:nodeType>}}) {
             __DEEP{
@@ -122,7 +128,7 @@ IF:
             }__;
           } elsif ({
                      <Q:DOMCore:Text> => 1,
-                     <Q:DOMCore:CDATASection> => 1,
+                     <Q:DOMXML:CDATASection> => 1,
                      <Q:infoset:Comment> => 1,
                      <Q:infoset:ProcessingInstruction> => 1,
                    }->{$self->{<Q:DOMCore:nodeType>}}) {
@@ -671,5 +677,615 @@ IF:
     @@Redefine:
       DOMCore:NamedNodeMap
 ## IF:ManakaiDOMAttributes
+
+DataType:
+  @Name: ManakaiDOMConfigurationParameter
+  @ISA:
+    DOMMain:DOMString
+  @Description:
+    @@lang:en
+    @@@:
+      A parameter name used with the <IF:DOMConfiguration>.
+    \
+      Names are case-insensitive.  To avoid possible conflicts, 
+      names referring to parameters defined outside the DOM 
+      specification should be made unique.  Names are 
+      recommended to follow the Unicode identifier specification 
+      with the addition of the character <CHAR:HYPHEN-MINUS>.
+  @ImplNote:
+    @@lang:en
+    @@@:
+      DOM implementations must recognize all parameters 
+      and some parameter values defined in the DOM Level 3 Core Specification.
+    \
+      DOM parameters are similar to features and properties of SAX2.
+  @Param:
+    @@Name: canonical-form
+    @@IsSupportRequired:1
+    @@Type: boolean
+    @@InCase:
+      @@@Value: true
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Canonicalize the document accoding to the rules specified in 
+          the XML C14N Version 1.0 Specification.
+        \
+          This is limited to what can be represented in the DOM.  
+          For example, there is no way to specify the order of 
+          the attributes in the DOM.
+      @@@SetParam:
+        @@@@Name: entities
+        @@@@Type: boolean
+        @@@@Value: false
+      @@@SetParam:
+        @@@@Name: normalize-characters
+        @@@@Type: boolean
+        @@@@Value: false
+      @@@SetParam:
+        @@@@Name: cdata-sections
+        @@@@Type: boolean
+        @@@@Value: false
+      @@@SetParam:
+        @@@@Name: namespaces
+        @@@@Type: boolean
+        @@@@Value: true
+      @@@SetParam:
+        @@@@Name: namespace-declarations
+        @@@@Type: boolean
+        @@@@Value: true
+      @@@SetParam:
+        @@@@Name: well-formed
+        @@@@Type: boolean
+        @@@@Value: true
+      @@@SetParam:
+        @@@@Name: element-content-whitespace
+        @@@@Type: boolean
+        @@@@Value: true
+    @@InCase:
+      @@@Value: false
+      @@@IsSupportRequired:1
+      @@@IsDefault:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@: Do not canonicalize the document.
+  @Param:
+    @@Name: cdata-sections
+    @@IsSupportRequired:1
+    @@Type:boolean
+    @@InCase:
+      @@@Value: true
+      @@@IsSupportRequired:1
+      @@@IsDefault:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Keep <IF:CDATASection> nodes in the document.
+      @@@SetParam:
+        @@@@Name: canonicel-form
+        @@@@Type:boolean
+        @@@@Value:false
+    @@InCase:
+      @@@Value: false
+      @@@IsSupportRequred:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Transform <IF:CDATASection> nodes in the document into 
+          <IF:Text> nodes.  The new <IF:Text> node is then 
+          combined with any adjacent <IF:Text> node.
+  @Param:
+    @@Name: check-character-normalization
+    @@IsSupportRequired
+    @@Type:boolean
+    @@InCase:
+      @@@Value: true
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Check whether the characters in the document are fully normalized 
+          as defined in Appendix B of the XML 1.1 Specification.  When 
+          a sequence of characters is encountered that fails 
+          normalization checking, an error with the 
+          <A:DOMError.type> equals to 
+          <DOM:check-character-normalization-failure> is issued.
+    @@InCase:
+      @@@Value: false
+      @@@IsSupportRequired:1
+      @@@IsDefault:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@: Do not check whether characters are normalized.
+  @Param:
+    @@Name: comments
+    @@IsSupportRequired:1
+    @@Type:boolean
+    @@InCase:
+      @@@Value:true
+      @@@IsSupportRequired:1
+      @@@IsDefault:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Keep <IF:Comment> nodes in the document.
+    @@InCase:
+      @@@Value:false
+      @@@IsSupportRequired:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+           Discard <IF:Comment> nodes in the document.
+  @Param:
+    @@Name: datatype-normalization
+    @@IsSupportRequired:1
+    @@Type:boolean
+    @@InCase:
+      @@@Value:true
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Expose schema normalized values in the tree.
+        \
+          This parameter required to have <DOM:validate> parameter 
+          equals to <DOM:true>, or this parameter has no effect.
+        \
+          Note that the attribute value normalization as defined 
+          in the XML Specifications does not applied.  This 
+          parameter is only meant for schema languages other 
+          than the DTD.
+    @@InCase:
+      @@@Value:false
+      @@@IsSupportRequired:1
+      @@@IsDefault:0
+      @@@Description:
+        @@@@lang:en
+        @@@@@: Do not perform schema normalization on the tree.
+  @Param:
+    @@Name: element-content-whitespace
+    @@IsSupportRequired:1
+    @@Type:boolean
+    @@InCase:
+      @@@Value:true
+      @@@IsSupportRequired:1
+      @@@IsDefault:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Keep all whitespaces in the document.
+    @@InCase:
+      @@@Value:false
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Discard all <IF:Text> nodes that contain whitespaces 
+          in element content.
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          DOM implementations are expected to use the attribute 
+          <A:Text.isElementContentWhitespace> to determine 
+          whether a <IF:Text> node should be discarded.
+      @@@SetParam:
+        @@@@Name:canonical-form
+        @@@@Type:boolean
+        @@@@Value:false
+  @Param:
+    @@Name: entities
+    @@Type:boolean
+    @@IsSupportRequired:1
+    @@InCase:
+      @@@Value:true
+      @@@IsSupportRequired:1
+      @@@IsDefault:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Keep <IF:EntityReferences> nodes in the document.
+      @@@SetParam:
+        @@@@Name:canonical-form
+        @@@@Type:boolean
+        @@@@Value:false
+    @@InCase:
+      @@@Value:false
+      @@@IsSupportRequired:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Remove all <IF:EntityReference> nodes from the document, 
+          putting the entity expansions directly in their place. 
+          <IF:Text> nodes are normalized as defined in 
+          <M:Node.normalize>.  Only unexpanded entity references 
+          are kept in the document.
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          This parameter does not affect <IF:Entity> nodes.
+  @Param:
+    @@Name: error-handler
+    @@Type: 
+      DOMCore:DOMErrorHandler
+    @@IsSupportRequired:1
+    @@Description:
+      @@@lang:en
+      @@@@:
+        If an error is encountered in the document, the DOM 
+        implementation will callback the <IF:DOMErrorHandler>. 
+      \
+        When called, <A:DOMError.relatedData> will contain 
+        the closest node to where the error occurred. 
+        If the implementation is unable to determine the node 
+        where the error occurs, <A:DOMError.relatedData> will 
+        contain the <IF:Document> node. 
+      \
+        Mutations to the document from within an error handler 
+        will result in implementation dependent behavior.
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        DOM implementations may provide a default <IF:DOMErrorHandler> 
+        object.  
+  @Param:
+    @@Name: infoset
+    @@IsSupportRequired:1
+    @@Type:boolean
+    @@InCase:
+      @@@Value:true
+      @@@IsSupportRequired:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Keep in the document information defined in the 
+          XML Infoset Specification.
+      @@@SetParam:
+        @@@@Name: validate-if-schema
+        @@@@Type: boolean
+        @@@@Value:false
+      @@@SetParam:
+        @@@@Name: entities
+        @@@@Type:boolean
+        @@@@Value:false
+      @@@SetParam:
+        @@@@Name:datatype-normalization
+        @@@@Type:boolean
+        @@@@Value:false
+      @@@SetParam:
+        @@@@Name:cdata-sections
+        @@@@Type:boolean
+        @@@@Value:false
+      @@@SetParam:
+        @@@@Name:namespace-declarations
+        @@@@Type:boolean
+        @@@@Value:true
+      @@@SetParam:
+        @@@@Name:well-formed
+        @@@@Type:boolean
+        @@@@Value:true
+      @@@SetParam:
+        @@@@Name:element-content-whitespace
+        @@@@Type:boolean
+        @@@@Value:true
+      @@@SetParam:
+        @@@@Name:comments
+        @@@@Type:boolean
+        @@@@Value:true
+      @@@SetParam:
+        @@@@Name:namespaces
+        @@@@Type:boolean
+        @@@@Value:true
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          <M:DOMConfiguration.getParameter> with this parameter 
+          returns <DOM:true> iif <CODE:!<DOM:validate-if-schema> && 
+          !<DOM:entities> && !<DOM:datatype-normalization> && 
+          !<DOM:cdata-sections> && <DOM:namespace-declarations> && 
+          <DOM:well-formed> && <DOM:element-content-whitespace> && 
+          <DOM:comment> && <DOM:namespaces>>.
+    @@InCase:
+      @@@Value:false
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Setting <DOM:infoset> to <DOM:false> has no effect.
+  @Param:
+    @@Name: namespaces
+    @@Type:boolean
+    @@IsSupportRequired:1
+    @@InCase:
+      @@@Value:true
+      @@@IsSupportRequired:1
+      @@@IsDefault:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Perform the namespace normalization processing.
+    @@InCase:
+      @@@Value:false
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Do not perform the namespace processing.
+      @@@SetParam:
+        @@@@Name:canonical-form
+        @@@@Type:boolean
+        @@@@Value:false
+  @Param:
+    @@Name: namespace-declarations
+    @@IsSupportRequired:1
+    @@Type:boolean
+    @@InCase:
+      @@@Value:true
+      @@@IsSupportRequired:1
+      @@@IsDefault:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Include namespace declaration attributes, specified or 
+          defaulted from the schema, in the document.
+    @@InCase:
+      @@@Value:false
+      @@@IsSupportRequired:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Discade all namespace declaration attributes.  The namespace 
+          prefixes are retained.
+      @@@SetParam:
+        @@@@Name:canonical-form
+        @@@@Type:boolean
+        @@@@Value:false
+  @Param:
+    @@Name: normalize-characters
+    @@Type:boolean
+    @@IsSupportRequired:1
+    @@InCase:
+      @@@Value:true
+      @@@Description:
+        @@@@lang:en
+        @@@@@: 
+          Fully normalize the characters in the document as defined in 
+          the Appendix B of the XML 1.1 Specification.
+      @@@SetParam:
+        @@@@Name:canonical-form
+        @@@@Type:boolean
+        @@@@Value:false
+    @@InCase:
+      @@@Value:false
+      @@@IsSupportRequired:1
+      @@@IsDefault:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@: Do not perform character normalization.
+  @Param:
+    @@Name:schema-location
+    @@IsSupportRequired:1
+    @@Type:
+      DOMMain:DOMString
+    @@InCase:
+      @@@Label:
+        @@@@lang:en
+        @@@@@: A list of DOM URIs, separated by whitespaces
+      @@@IsSupportRequired:0
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The schemas against which validation should occur, i.e. 
+          the current schema.
+      \
+        The types of schemas must match the <DOM:schema-type>, 
+        otherwise the behaviour is undefined.
+      \
+        The schemas specified here take precedence to the schema 
+        specified in the document itself.  For namespace aware schema, 
+        if a schema specified using this parameter and a schema 
+        specified in the document instance in a schema document 
+        share the same <CODE:targetNamespace>, the schema specified 
+        by the DOM application will be used.  If two schemas 
+        specified by the application share the same 
+        <CODE:targetNamespace> or have no namespace, the behavior 
+        is implementation dependent.
+      \
+        This parameter is ignored unless the <DOM:schema-type> 
+        value is set.
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+        Whitespace = <XML:S> in the XML 1.0 Specification.
+      \
+        It is strongly recommended that the <A:Document.documentURI>, 
+        will be set so that an implementation can successfully resolve 
+        any external entities referred. 
+    @@InCase:
+      @@@Value:
+        @@@@@is-null:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@: No location has been provided.
+  @Param:
+    @@Name:schema-type
+    @@IsSupportRequired:1
+    @@Type:
+      ManakaiDOM:ManakaiDOMURI
+    @@InCase:
+      @@@Label:
+        @@@@lang:en
+        @@@@@:
+          An absolute DOM URI
+      @@@IsSupportRequired:0
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The type of the schema language used to validate a document against.
+        \
+          No lexical cheking is done on the absolute URI.
+        \
+          A default value may be provided by the DOM implementation, 
+          based on the schema languages supported and on the 
+          schema language used at load time.
+    @@InCase:
+      @@@Value:
+        http://www.w3.org/TR/REC-xml
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The XML DTD.
+    @@InCase:
+      @@@Value:
+        http://www.w3.org/2001/XMLSchema
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The XML Schema.
+    @@InCase:
+      @@@Value:
+        @@@@is-null:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@: No valus is provided.
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        Other schema languages are outside the scope of the W3C 
+        and should recommentd an absolute URI in order to use here.
+  @Param:
+    @@Name: split-cdata-sections
+    @@Type:boolean
+    @@IsSupportRequired:1
+    @@InCase:
+      @@@Value:true
+      @@@IsSupportRequired:1
+      @@@IsDefault:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Split CDATA sections containing the <SGML:MSE> 
+          (<XML:]]<gt>>).
+        \
+          When CDATA section is split, a warning is issued with 
+          a <A:DOMError.type> equals to <DOM:cdata-sections-splitted> 
+          and <A:DOMError.relatedData> equals to the first 
+          <IF:CDATASection> node in document order.
+    @@InCase:
+      @@@Value:false
+      @@@IsSupportRequired:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Signal an error if <IF:CDATASection> contains an 
+          unrepresentable character.
+  @Param:
+    @@Name:validate
+    @@IsSupportRequired:1
+    @@Type:boolean
+    @@InCase:
+      @@@Value:true
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Require the validation against a schema of the document 
+          as it is being normalized as defined by the XML 1.0 Specification. 
+        \
+          If validation errors are found or no schema was found, 
+          the error handler is notified.
+        \
+          Schema-normalized values will not exposed unless the 
+          parameter <DOM:datatype-normalization> is <DOM:true>.
+        \
+          Following attributes are revaluated:
+        \
+          - Attribute nodes with <A:Attr.specified> equals to <DOM:false>.
+        \
+          - The value of the attribute <A:Text.isElementContentWhitespace> 
+          for all <IF:Text> nodes.
+        \
+          - The value of the attribute <A:Attr.isId> for all <IF:Attr> nodes.
+        \
+          - The attributes <A:Element.schemaTypeInfo> and 
+          <A:Attr.schemaTypeInfo>.
+        \
+          DOM applications should consider setting the parameter 
+          <DOM:well-formed> to <DOM:true>.
+      @@@SetParam:
+        @@@@Name: validate-if-schema
+        @@@@Type:boolean
+        @@@@Value: false
+    @@InCase:
+      @@@Value:false
+      @@@IsSupportRequired:1
+      @@@IsDefault:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Do not accomplish schema processing, including internal subset 
+          processing.  Default attribute information are kept.
+        \
+          Note that validation might still happen in case 
+          <DOM:validate-if-schema> is <DOM:true>.
+  @Param:
+    @@Name:validate-if-schema
+    @@Type:boolean
+    @@IsSupportRequired:1
+    @@InCase:
+      @@@Value:true
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Enable validation only if a declaration for the document 
+          element can be found in a schema.  If validation is enabled, 
+          this parameter has the same behavior as the parameter 
+          <DOM:validate> set to <DOM:true>.
+      @@@SetParam:
+        @@@@Name:validate
+        @@@@Type:boolean
+        @@@@Value:false
+    @@InCase:
+      @@@Value:false
+      @@@IsSupportRequired:1
+      @@@IsDefault:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          No schema processing should be performed if the document has 
+          a schema, including internal subset 
+          processing.  Default attribute information are kept.
+        \
+          Note that validation might still happen in case 
+          <DOM:validate> is <DOM:true>.
+  @Param:
+    @@Name:well-formed
+    @@Type:boolean
+    @@IsSupportRequired:1
+    @@InCase:
+      @@@Value:true
+      @@@IsSupportRequired:1
+      @@@IsDefault:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Check if all nodes are well-formed according to the XML 
+          version in use (<A:Document.xmlVersion>), i.e.:
+        \
+          - Check if the attribute <A:Node.nodeName> contains 
+          invalid characters according to its node type and generate 
+          a <IF:DOMError> of type <DOM:wf-invalid-character-in-node-name>, 
+          with a <DOM:SEVERITY_ERROR> severity, if necessary.
+        \
+          - Check if the text content inside <IF:Attr>, <IF:Element>, 
+          <IF:Comment>, <IF:Text> and <IF:CDATASection> nodes for 
+          invalid characters and generate a <IF:DOMError> of type 
+          <DOM:wf-invalid-character>, with a 
+          <DOM:SEVERITY_ERROR> severity, if necessary.
+        \
+          - Check if the data inside <IF:ProcessingInstruction> nodes 
+          for invalid characters and generate a <IF:DOMError> 
+          of type <DOM:wf-invalid-character>, with a
+          <DOM:SEVERITY_ERROR> severity, if necessary.
+    @@InCase:
+      @@@Value:false
+      @@@Description:
+        @@@@lang:en
+        @@@@@: Do not check for XML well-formedness.
+      @@@SetParam:
+        @@@@Name:canonical-form
+        @@@@Type:boolean
+        @@@@Value:false
 
 ## ManakaiDOMCore.dis ends here
