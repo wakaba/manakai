@@ -1,3 +1,22 @@
+2002-07-22  Wakaba <w@suika.fam.cx>
+
+	* Charset.pm:
+	- (encode, decode): Reformed.  Return a hash as second or
+	greter'th element of returned array.  (Now only 'success'
+	key is used.)
+	* EncodedWord.pm (_decode_eword): Fix for new 
+	Message::MIME::Charset::decode.
+
+2002-07-22  Wakaba <w@suika.fam.cx>
+
+	* Charset.pm:
+	- Separate 'x-unknown' from 'unknown-8bit'.
+	(unknown-8bit is now suitable as MIME text charset.
+	(But I don't know whether this is correct.
+	This charset is "8bit" (not "binary"!) and defined
+	for 8BITSMTP, so interpret like this.))
+	- New internal charset, '*undef' is defined.
+
 2002-07-20  Wakaba <w@suika.fam.cx>
 
 	* Charset.pm (msname2iananame): New function.

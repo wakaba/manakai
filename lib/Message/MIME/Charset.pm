@@ -17,7 +17,7 @@ Perl module for MIME charset.
 package Message::MIME::Charset;
 use strict;
 use vars qw(%CHARSET %MSNAME2IANANAME %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 &_builtin_charset;
 sub _builtin_charset () {
@@ -41,6 +41,7 @@ $CHARSET{'us-ascii'} = {
 	decoder	=> sub { $_[1] },
 	
 	mime_text	=> 1,
+	cte_7bit_preferred	=> 'quoted-printable',
 };
 
 $CHARSET{'iso-2022-int-1'} = {
@@ -58,10 +59,29 @@ $CHARSET{'unknown-8bit'} = {
 	encoder	=> sub { $_[1] },
 	decoder	=> sub { $_[1] },
 	
+	mime_text	=> 1,
+	cte_7bit_preferred	=> 'base64',
+};
+
+$CHARSET{'x-unknown'} = {
+	preferred_name	=> 'x-unknown',
+	
+	encoder	=> sub { $_[1] },
+	decoder	=> sub { $_[1] },
+	
 	mime_text	=> 0,
 	cte_7bit_preferred	=> 'base64',
 };
-$CHARSET{'x-unknown'} = $CHARSET{'unknown-8bit'};
+
+$CHARSET{'*undef'} = {
+	preferred_name	=> '',
+	
+	#encoder	=> sub { $_[1] },
+	#decoder	=> sub { $_[1] },
+	
+	mime_text	=> 0,
+	cte_7bit_preferred	=> 'base64',
+};
 
 }	# /builtin_charset
 
@@ -133,18 +153,28 @@ sub make_charset ($%) {
 
 sub encode ($$) {
   my ($charset, $s) = (lc shift, shift);
-  if (ref $CHARSET{$charset}->{encoder}) {
-    return (&{$CHARSET{$charset}->{encoder}} ($charset, $s), success => 1);
+  my $c = ref $CHARSET{$charset}->{encoder}? $charset: '*undef';
+  if (ref $CHARSET{$c}->{encoder}) {
+    my ($t, %r) = &{$CHARSET{$c}->{encoder}} ($charset, $s);
+    unless (defined $r{success}) {
+      $r{success} = 1;
+    }
+    return ($t, %r);
   }
   ($s, success => 0);
 }
 
 sub decode ($$) {
   my ($charset, $s) = (lc shift, shift);
-  if (ref $CHARSET{$charset}->{decoder}) {
-    return (&{$CHARSET{$charset}->{decoder}} ($charset, $s), 1);
+  my $c = ref $CHARSET{$charset}->{decoder}? $charset: '*undef';
+  if (ref $CHARSET{$c}->{decoder}) {
+    my ($t, %r) = &{$CHARSET{$c}->{decoder}} ($charset, $s);
+    unless (defined $r{success}) {
+      $r{success} = 1;
+    }
+    return ($t, %r);
   }
-  ($s, 0);
+  ($s, success => 0);
 }
 
 sub name_normalize ($) {
@@ -158,6 +188,8 @@ sub name_minimumize ($$) {
     return &{$CHARSET{$charset}->{name_minimumizer}} ($charset, $s);
   } elsif (ref $_MINIMUMIZER{$charset}) {
     return &{$_MINIMUMIZER{$charset}} ($charset, $s);
+  } elsif (ref $CHARSET{'*undef'}->{name_minimumizer} eq 'CODE') {
+    return &{$CHARSET{'*undef'}->{name_minimumizer}} ($charset, $s);
   }
   (charset => $charset);
 }
@@ -434,6 +466,13 @@ sub _name_utf32be ($$) {
   }
 }
 
+sub _utf8_on ($) {
+  Encode::_utf8_on ($_[0]) if $Encode::VERSION;
+}
+sub _utf8_off ($) {
+  Encode::_utf8_off ($_[0]) if $Encode::VERSION;
+}
+
 =head1 LICENSE
 
 Copyright 2002 wakaba E<lt>w@suika.fam.cxE<gt>.
@@ -456,7 +495,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/21 03:25:23 $
+$Date: 2002/07/22 02:48:55 $
 
 =cut
 

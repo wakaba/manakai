@@ -14,7 +14,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%ENCODER %DECODER %OPTION %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::MIME::Charset;
 
 $REG{WSP} = qr/[\x09\x20]/;
@@ -146,11 +146,11 @@ sub decode_ccontent ($$) {
 sub _decode_eword ($$$$) {
   my ($charset, $lang, $encoding, $etext) = (shift, shift, lc shift, shift);
   $charset = Message::MIME::Charset::name_normalize ($charset);
-  my ($r,$s) = ('', 0);
+  my ($r,%s) = ('');
   if (ref $DECODER{$encoding}) {	## decode TE
     $r = &{$DECODER{$encoding}} ($encoding, $etext);
-    ($r,$s) = Message::MIME::Charset::decode ($charset, $r);
-    if (!$s && $OPTION{forcedecode} && $charset =~ /^iso-8859-([0-9]+(?:-[ie])?)$/) {
+    ($r,%s) = Message::MIME::Charset::decode ($charset, $r);
+    if (!$s{success} && $OPTION{forcedecode} && $charset =~ /^iso-8859-([0-9]+(?:-[ie])?)$/) {
       my $n = $1;
       $r =~ s{([\x09\x0A\x0D\x20]*[\x80-\xFF]+[\x09\x0A\x0D\x20]*)}{
         my $t = $1;
@@ -158,10 +158,10 @@ sub _decode_eword ($$$$) {
         $t =~ tr/\x20/_/;
         sprintf ' =?iso-8859-%s?q?%s?= ', $n.($lang?'*'.$lang:''), $t;
       }goex;
-      $s = 1;
+      $s{success} = 1;
     }
   }
-  ($r, $s);
+  ($r, $s{success});
 }
 
 
@@ -187,7 +187,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/04 06:38:21 $
+$Date: 2002/07/22 02:48:55 $
 
 =cut
 
