@@ -9,7 +9,7 @@ header field body consist of C<product> tokens
 package Message::Field::UA;
 use strict;
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -365,13 +365,15 @@ sub clone ($) {
 }
 
 sub add_our_name ($;%) {
-  require Message::Entity;
   my $ua = shift;
-  my %o = @_;  my %option = %{$ua->{option}};
+  my %o = @_;  my %option = %{ $ua->{option} };
   for (grep {/^-/} keys %o) {$option{substr ($_, 1)} = $o{$_}}
-  $option{date} =~ s/^Date:\x20//;  $option{date} =~ s/\x20$//;
   
-    $ua->replace ('Message-pm' => [$Message::Entity::VERSION, $option{date}], -prepend => 0);
+  if ($Message::Entity::VERSION) {
+    $ua->replace_rcs ($option{date}, name => 'Message-pm', 
+                      version => $Message::Entity::VERSION, 
+                      -prepend => 0);
+  }
     my (@os, @os_comment);
     my @perl_comment;
     if ($option{use_Config}) {
@@ -425,6 +427,32 @@ sub add_our_name ($;%) {
   $ua;
 }
 
+sub add_rcs ($$;%) {
+  my $self = shift;
+  my ($rcsid, %option) = @_;
+  my ($name, $version, $date) = ($option{name}, $option{version}, $option{date});
+  for (grep {/^[^-]/} keys %option) { delete $option{$_} }
+  if ($rcsid =~ m!(?:Id|Header): (?:.+?/)?([^/]+?),v ([\d.]+) (\d+/\d+/\d+ \d+:\d+:\d+)!) {
+    $name ||= $1;
+    $version ||= $2;
+    $date ||= $3;
+  } elsif ($rcsid =~ m!^Date: (\d+/\d+/\d+ \d+:\d+:\d+)!) {
+    $date ||= $1;
+  } elsif ($rcsid =~ m!^Revision: ([\d.]+)!) {
+    $version ||= $1;
+  } elsif ($rcsid =~ m!(?:Source|RCSfile): (?:.+?/)?([^/]+?),v!) {
+    $name ||= $1;
+  }
+  if ($option{is_replace}) {
+    $self->replace ($name => [$version, $date], %option);
+  } else {
+    $self->add ($name => [$version, $date], %option);
+  }
+}
+sub replace_rcs ($$;%) {
+  shift->add_rcs (@_, is_replace => 1);
+}
+
 =back
 
 =head1 LICENSE
@@ -449,7 +477,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/22 02:42:17 $
+$Date: 2002/07/28 00:30:49 $
 
 =cut
 
