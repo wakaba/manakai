@@ -46,7 +46,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/24 12:19:46 $
+     $Date: 2004/09/25 12:58:20 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -264,6 +264,20 @@ Exception:
             modifications are not allowed. 
         @@@SubType:
           @@@@QName:
+            MDOM_EXCEPTION:NOMOD_ATTR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              One of attribute nodes is read-only. 
+        @@@SubType:
+          @@@@QName:
+            MDOM_EXCEPTION:NOMOD_CHILD
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              One of child nodes is read-only. 
+        @@@SubType:
+          @@@@QName:
             MDOM_EXCEPTION:NOMOD_PARENT
           @@@@Description:
             @@@@@lang:en
@@ -306,13 +320,6 @@ Exception:
             The DOM implementation does not support the type of object requested.
         @@@SubType:
           @@@@QName:
-            MDOM_EXCEPTION:MDOM_IMPL_NOSUPPORT_XML
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The DOM implementation does not support the <DOM:XML> feature.
-        @@@SubType:
-          @@@@QName:
             MDOM_EXCEPTION:MDOM_DOC_NOSUPPORT_XML
           @@@@Description:
             @@@@@lang:en
@@ -332,6 +339,13 @@ Exception:
               both levels.
         @@@SubType:
           @@@@QName:
+            MDOM_EXCEPTION:MDOM_IMPL_NOSUPPORT_XML
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The DOM implementation does not support the <DOM:XML> feature.
+        @@@SubType:
+          @@@@QName:
             MDOM_EXCEPTION:MDOM_IMPL_NOSUPPORT_XMLVER
           @@@@Description:
             @@@@@lang:en
@@ -345,6 +359,24 @@ Exception:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: The XML version
+        @@@SubType:
+          @@@@QName:
+            MDOM_EXCEPTION:MDOM_NODE_NOSUPPORT_XMLNS
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The node does not support XML Namespaces.  The node 
+              might have been created by the DOM Level 1 methods or
+              instantiated from the markup language that does not 
+              support XML Namespaces.
+          @@@@Param:
+            @@@@@QName:
+              MDOM_EXCEPTION:param-name
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The name of the parameter that provides the node 
+                that does not support XML Namespaces.
      @@Const:
         @@@Name:  INUSE_ATTRIBUTE_ERR
         @@@Type:  unsigned-short
@@ -2037,8 +2069,40 @@ IF:
             infoset:parent
   @Attr:
      @@Name:  childNodes
+     @@Description:
+       @@@lang:en
+       @@@@:
+         A list of node that contains all children of this node if any.
      @@Get:
-        @@@Type:  NodeList
+        @@@Type:
+          ManakaiDOM:ManakaiDOMChildNodeList
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A <IF:NodeList> object.
+        @@@InCase:
+          @@@@Label:
+            @@@@@lang:en
+            @@@@@@:
+              A <IF:NodeList> containing no nodes
+          @@@@Type:
+            ManakaiDOM:ManakaiDOMChildNodeList
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: This node has no child node.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            $r = $self->{<Q:DOMCore:node>}->
+                   __SUPER{ManakaiDOMNodeObject::}__::__INT{newReference}__
+                         ## Condition sensitive
+                        ('__CLASS{ManakaiDOMChildNodeList}__');
+     @@SpecLevel:1
+     @@Level[list]:
+       1
+       2
+       3
   @Attr:
      @@Name:  firstChild
      @@Description:
@@ -2183,8 +2247,25 @@ IF:
     @@SpecLevel:1
   @Attr:
      @@Name:  attributes
+     @@Description:
+       @@@lang:en
+       @@@@:
+         A node map containing the attributes of this node.
      @@Get:
-        @@@Type:  NamedNodeMap
+        @@@Type: NamedNodeMap
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A (possibly empty) <IF:NamedNodeMap> object.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This node is not of type <IF:Element>.
+        @@@Def:\
+    @@RedefinedBy:Element
   @Attr:
      @@Name:  ownerDocument
      @@Description:
@@ -3499,19 +3580,109 @@ IF:
      @@RedefinedBy: Attr
   @Method:
      @@Name:  hasAttributes
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Return whether this node has any attributes.
      @@Return:
         @@@Type:  boolean
+        @@@InCase:
+          @@@@Value:true
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This node is an <IF:Element> and has any attributes.
+        @@@InCase:
+          @@@@Value:false
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This node does not have any attribute.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            for (values %{$self->{<Q:TreeCore:node>}
+                               ->{<Q:infoset:attributes>}}) {
+              if (keys %$_) {
+                $r = true;
+                last;
+              }
+            }
      @@Level[list]:  2
      @@SpecLevel:2
   @Attr:
      @@Name:  baseURI
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The base URI of this node.
      @@Get:
-        @@@Type:  DOMString
+        @@@Type: 
+          ManakaiDOM:ManakaiDOMURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The absolute base URI.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The DOM implementation was not able to obtain 
+              an absolute URI.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            if ($self->{<Q:TreeCore:node>}->{<Q:DOMCore:hasFeature>}->{HTML}) {
+              $r = $self->{<Q:TreeCore:node>}
+                        ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{htmlBaseURI}__;
+            } else {
+              $r = null;
+            }
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         = If the <IF:Document> support the feature <Feature:HTML>,
+       \
+         == If there is a <HTML:base> element with the <HTML:base> attribute, 
+            the base URI is its value.
+       \
+         == Otherwise, the base URI is the value of <A:Document.documentURI>.
+       \
+         = Elsif the <IF:Document> support the feature <Feature:XML>, 
+           compute the base URI accodint to the XML Base Specification.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         The descriptions in the sections of Base URIs (DOM Level 3 Core 
+         1.3.4) and <A:Node.baseURI> (and some readings from XML Base 
+         and XML Infoset specifications) is insufficient to understand 
+         and implement this attribute.  The <CITE:Infoset Mapping>, a 
+         normative appendix of the DOM Level 3 Core Specification, is 
+         useful for this purpose.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         The DOM Level 3 Specification does not address to 
+         <HTML:codebase> attributes.
      @@Level[list]:  3
      @@SpecLevel:3
      @@Spec:
        @@@DOM3:
          http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#baseURIs-Considerations
+    @@RedefinedBy:Document
+    @@RedefinedBy:Element
+    @@RedefinedBy:
+      DOMXML:ProcessingInstruction
+    @@RedefinedBy:
+      DOMXML:EntityReference
+    @@RedefinedBy:
+      DOMXML:Entity
+    @@RedefinedBy:
+      DOMXML:Notation
   @ConstGroup:
      @@Name:  DocumentPosition
      @@Description:
@@ -3686,10 +3857,14 @@ IF:
             }
                            ## Condition sensitive
             my $textNode = __CLASS{Text}__->__INT{newObject}__;
+            $textNode->{<Q:DOMCore:ownerDocument>}
+                                   = $node->{<Q:DOMCore:ownerDocument>};
+            $node->__SUPER{ManakaiDOMNodeObject::}__::__INT{importTree}__
+                                                           ($textNode);
             $textNode->{<Q:infoset:content>} = $given;
             $node->{<Q:infoset:children>} = [$textNode];
             for (@oldChild) {
-              $_->__SUPER{ManakaiDOMNodeObject}__::__INT{orphanate}__;
+              $_->__SUPER{ManakaiDOMNodeObject::}__::__INT{orphanate}__;
             }
      @@Level[list]:
         3
@@ -3994,7 +4169,7 @@ IF:
               equal to the number of nodes in the list.
         @@@Def:
           @@@@Type:
-            lang:dis
+             lang:dis
           @@@@Overridden:1
     @@RedefinedBy:
       ManakaiDOMCore:ManakaiDOMChildNodeList
@@ -4192,7 +4367,7 @@ IF:
               This exception is added by the DOM Level 1 First Edition Errata.
         @@@Def:
           @@@@Type:
-            lang:dis
+             lang:dis
           @@@@Overridden:1
     @@RedefinedBy:
       ManakaiDOMCore:ManakaiDOMAttributes 
@@ -5559,7 +5734,7 @@ IF:
          Other available properties: <Q:infoset:prefix>, 
          <Q:DOMCore:read-only>, <Q:infoset:specified>, 
          <Q:infoset:ownerElement>, <Q:infoset:children>, 
-         <Q:infoset:namespaceName>.
+         <Q:infoset:namespaceName>, <Q:DOMCore:userDeterminedId>.
 ## IF:Attr
 
 IF:
@@ -5580,8 +5755,12 @@ IF:
           @@@@@Import[list]:
             InXML_NameStartChar10
             InXMLNameChar10
+            InXML_NCNameStartChar10
+            InXMLNCNameChar10
             InXMLNameStartChar11
             InXMLNameChar11
+            InXMLNCNameStartChar11
+            InXMLNCNameChar11
       @@@Condition[list]:
         DOM1
         DOM2
@@ -5619,6 +5798,84 @@ IF:
             }
  ## TODO: toUpper if HTML
  ## ISSUE: What to do if XHTML?       
+  @IntMethod:
+    @@Name:selectAttrNodeObject
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Select an <IF:ManakaiDOMNodeObject> object that represents an 
+        <IF:Attr> node.
+    @@NSVersion:selectAttrNodeObjectNS
+    @@Param:
+      @@@Name:name
+      @@@Type:
+        DOMMain:DOMString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The name of the attribute to select.
+    @@Return:
+      @@@Type: 
+        ManakaiDOM:ManakaiDOMNodeObject
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The <IF:ManakaiDOMNodeObject> object.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: There is no such attribute.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+            my $attr = $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>};
+            if ($attr->{<Q:ManakaiDOM:noNS>}->{$name}) {
+              $r = $attr->{<Q:ManakaiDOM:noNS>}->{$name};
+              __WHEN{IS{<Q:DOMCore:removeAttribute>}::
+                delete $attr->{<Q:ManakaiDOM:noNS>};
+              }__;
+            } elsif ($name eq 'xmlns') {
+              for my $a (keys %{$attr->{<Q:xmlns:>}||{}}) {
+                if ($attr->{<Q:xmlns:>}->{$a}->{<Q:infoset:localName>}) {
+                  $r = $attr->{<Q:xmlns:>}->{$a};
+                  __WHEN{IS{<Q:DOMCore:removeAttribute>}::
+                    delete $attr->{<Q:xmlns:>}->{$a};
+                  }__;
+                  last;
+                }
+              }
+            } elsif ($name eq 'xmlns:xmlns') {
+              # 
+            } else {
+              for my $ns (keys %$attr) {
+                if ($ns eq <Q:ManakaiDOM:noNS>) {
+                  # 
+                } else {
+                  for my $a (keys %{$attr->{$ns}||{}}) {
+                    if (defined $attr->{$ns}->{$a}->{<Q:infoset:prefix>} and
+                        $attr->{$ns}->{$a}->{<Q:infoset:prefix>}.':'.
+                        $attr->{$ns}->{$a}->{<Q:infoset:localName>} eq $name) {
+                      $r = $attr->{$ns}->{$a};
+                      __WHEN{IS{<Q:DOMCore:removeAttribute>}::
+                        delete $attr->{$ns}->{$a};
+                      }__;
+                      last;
+                    } elsif (not defined $attr->{$ns}->{$a}->{<Q:infoset:prefix>}
+                         and
+                         $attr->{$ns}->{$a}->{<Q:infoset:localName>} eq $name) {
+                      $r = $attr->{$ns}->{$a};
+                      __WHEN{IS{<Q:DOMCore:removeAttribute>}::
+                        delete $attr->{$ns}->{$a};
+                      }__;
+                      last;
+                    }
+                  }
+                }
+              }
+            }
   @Method:
      @@Name:  getAttribute
      @@Description:
@@ -5649,60 +5906,168 @@ IF:
           @@@@Type:
             lang:Perl
           @@@@@:
-            my $attr = $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>};
-            if ($attr->{<Q:ManakaiDOM:noNS>}->{$name}) {
-                          ## Condition insensitive
-              $r = $attr->{<Q:ManakaiDOM:noNS>}->{$name};
-            } elsif ($name eq 'xmlns') {
-              for my $a (%{$attr->{<Q:xmlns:>}||{}}) {
-                if ($a->{<Q:infoset:localName>}) {
-                  $r = $a;
-                  last;
-                }
-              }
-            } elsif ($name eq 'xmlns:xmlns') {
-              # 
-            } else {
-              for my $ns (keys %$attr) {
-                if ($ns eq <Q:ManakaiDOM:noNS>) {
-                  # 
-                } else {
-                  for my $a (%{$attr->{$ns}||{}}) {
-                    if (defined $a->{<Q:infoset:prefix>} and
-                        $a->{<Q:infoset:prefix>}.':'.
-                        $a->{<Q:infoset:localName>} eq $name) {
-                      $r = $a;
-                      last;
-                    } elsif ($a->{<Q:infoset:localName>} eq $name) {
-                      $r = $a;
-                      last;
-                    }
-                  }
-                }
-              }
-            }
+            __INT{{selectAttrNodeObject}}__;
             if ($r) {
                          ## Condition insensitive
-              $r = $r->__SUPER{ManakaiDOMNodeObjectNode}__::__INT{textContent}__;
+              $r = $r->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{textContent}__;
             }
     @@SpecLevel:1
   @Method:
      @@Name:  setAttribute
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Add a new attribute.  If an attribute with that name is 
+         already present in the element, its value is changed. 
+     @@NSVersion:setAttributeNS
      @@Param:
         @@@Name:  name
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The name of the attribute to create or alter.
      @@Param:
         @@@Name:  value
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The value to set.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              How <DOM:null> should be treated is not specified. 
+              This DOM implementation converts it to an empty string.
      @@Return:
-        @@@Exception[list]:  DOMException
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:INVALID_CHARACTER_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_BAD_NAME
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:name> is not a legal SGML or XML <XML:Name>.
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:NO_MODIFICATION_ALLOWED_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:NOMOD_THIS
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                This (<IF:Element>) node is read-only.
+            @@@@@SpecLevel:1
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:NOMOD_ATTR
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <IF:Attr> node to edit is read-only.
+            @@@@@SpecLevel[list]:
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            if ($self->{<Q:TreeCore:node>}->{<Q:DOMCore:read-only>}) {
+              __EXCEPTION{
+                DOMException.NO_MODIFICATION_ALLOWED_ERR.
+                MDOM_EXCEPTION:NOMOD_THIS::
+              }__;
+            }
+            my $r;
+            __INT{{selectAttrNodeObject}}__;
+            my $node = $self->{<Q:TreeCore:node>};
+            if ($r) {
+              if ($r->{<Q:DOMCore:read-only>}) {
+                __EXCEPTION{
+                  DOMException.NO_MODIFICATION_ALLOWED_ERR.
+                  MDOM_EXCEPTION:NOMOD_ATTR::
+                }__;
+              }
+              my @children = @{$r->{<Q:infoset:children>}};
+              $r->{<Q:infoset:children>} = [];
+              for (@children) {
+                delete $_->{<Q:infoset:parent>};
+                $_->__SUPER{ManakaiDOMNodeObject::}__::__INT{orphanate}__;
+              }
+            } else {
+                   ## Condition insensitive
+              $r = __CLASS{Attr::}__->__INT{newObject}__;
+              $r->{<Q:DOMCore:name>} = $name;
+              $node->__SUPER{ManakaiDOMNodeObject::}__::__INT{importTree}__ ($r);
+              $r->{<Q:infoset:ownerElement>} = $node;
+              $r->{<Q:DOMCore:ownerDocument>} = $node
+                                                 ->{<Q:DOMCore:ownerDocument>};
+              $node->{<Q:infoset:attributes>}
+                   ->{<Q:ManakaiDOM:noNS>}->{$name} = $r;
+            }
+                       ## Condition insensitive
+            my $text = __CLASS{Text::}__->__INT{newObject}__;
+            $node->__SUPER{ManakaiDOMNodeObject::}__::__INT{importTree}__
+                                                                    ($text);
+            $text->{<Q:infoset:content>} = defined $value ? $value : '';
+            $text->{<Q:DOMCore:ownerDocument>} = $self->{<Q:TreeCore:node>}
+                                                 ->{<Q:DOMCore:ownerDocument>};
+            $text->{<Q:infoset:parent>} = $r;
+            $r->{<Q:infoset:children>} = [$text];
+            $r->{<Q:infoset:specified>} = true;
+     @@SpecLevel:1
   @Method:
      @@Name:  removeAttribute
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Remove an attribute by name.
+       \
+         If a default value for the removed attribute is defined in 
+         the DTD, a new attribute immediately appears.  The DOM 
+         implementation may handle default values from other schemas.
+     @@NSVersion:removeAttributeNS
      @@Param:
         @@@Name:  name
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The name of the attribute to remove.  If no attribute 
+            with this <P:name> is found, this method has no effect.
      @@Return:
-        @@@Exception[list]:  DOMException
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:NO_MODIFICATION_ALLOWED_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:NOMOD_THIS
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                This (<IF:Element>) node is read-only.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            if ($self->{<Q:TreeCore:node>}->{<Q:DOMCore:read-only>}) {
+              __EXCEPTION{
+                DOMException.NO_MODIFICATION_ALLOWED_ERR.
+                MDOM_EXCEPTION:NOMOD_THIS::
+              }__;
+            }
+            my $r;
+            __INT{{selectAttrNodeObject: <Q:DOMCore:removeAttribute>}}__;
+            if ($r) {
+              delete $r->{<Q:infoset:ownerElement>};
+              $r->__SUPER{ManakaiDOMNodeObject::}__::__INT{orphanate}__;
+            }
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              TODO: Default attribute
   @Method:
      @@Name:  getAttributeNode
      @@Description:
@@ -5733,37 +6098,7 @@ IF:
           @@@@Type:
             lang:Perl
           @@@@@:
-            my $attr = $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>};
-            if ($attr->{<Q:ManakaiDOM:noNS>}->{$name}) {
-              $r = $attr->{<Q:ManakaiDOM:noNS>}->{$name};
-            } elsif ($name eq 'xmlns') {
-              for my $a (%{$attr->{<Q:xmlns:>}||{}}) {
-                if ($a->{<Q:infoset:localName>}) {
-                  $r = $a;
-                  last;
-                }
-              }
-            } elsif ($name eq 'xmlns:xmlns') {
-              # 
-            } else {
-              for my $ns (keys %$attr) {
-                if ($ns eq <Q:ManakaiDOM:noNS>) {
-                  # 
-                } else {
-                  for my $a (%{$attr->{$ns}||{}}) {
-                    if (defined $a->{<Q:infoset:prefix>} and
-                        $a->{<Q:infoset:prefix>}.':'.
-                        $a->{<Q:infoset:localName>} eq $name) {
-                      $r = $a;
-                      last;
-                    } elsif ($a->{<Q:infoset:localName>} eq $name) {
-                      $r = $a;
-                      last;
-                    }
-                  }
-                }
-              }
-            }
+            __INT{{selectAttrNodeObject}}__;
             if ($r) {
                          ## Condition sensitive
               $r = __CLASS{Node}__->__INT{getNodeReference}__ ($r, $self);
@@ -5775,20 +6110,208 @@ IF:
      3
   @Method:
      @@Name:  setAttributeNode
-     @@Return:
-        @@@Type:  Attr
-        @@@Exception[list]:  DOMException
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Add a new attribute node.  If an attribute with that name is 
+         already present in the element, it is replaced by the new one. 
+         \
+         Replacing an attribute node by itself has no effect.
+     @@NSVersion:setAttributeNodeNS
      @@Param:
         @@@Name:  newAttr
         @@@Type:  Attr
-  @Method:
-     @@Name:  removeAttributeNode
+        @@@Description:
+          @@@@lang:en
+          @@@@@: 
+            The <IF:Attr> node to add to the attribute list.
      @@Return:
         @@@Type:  Attr
-        @@@Exception[list]:  DOMException
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The replaced <IF:Attr> node.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              No <IF:Attr> node was replaced.
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:WRONG_DOCUMENT_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The <P:newAttr> node was created from a different document.
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:NO_MODIFICATION_ALLOWED_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:NOMOD_THIS
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@: 
+                This (<IF:Element>) node is read-only.
+         @@@Exception:
+           @@@@Type:DOMException
+           @@@@Name:INUSE_ATTRIBUTE_ERR
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The <P:newAttr> node is already used as an attribute 
+               of another <IF:Element> object.
+         @@@Def:
+           @@@@Type:
+             lang:Perl
+           @@@@@:
+            if ($self->{<Q:TreeCore:node>}->{<Q:DOMCore:read-only>}) {
+              __EXCEPTION{
+                DOMException.NO_MODIFICATION_ALLOWED_ERR.
+                MDOM_EXCEPTION:NOMOD_THIS::
+              }__;
+            }
+            my $attrNode = $newAttr->{<Q:TreeCore:node>};
+            if ($attrNode->{<Q:infoset:ownerElement>}) {
+              __EXCEPTION{
+                DOMException.INUSE_ATTRIBUTE_ERR::
+                  <Q:MDOM_EXCEPTION:param-name> => 'newAttr',
+              }__;
+            } elsif ($attrNode->{<Q:DOMCore:ownerDocument>}
+                              ->{<Q:TreeCore:nodeID>} ne
+                     $self->{<Q:TreeCore:node>}->{<Q:DOMCore:ownerDocument>}
+                          ->{<Q:TreeCore:nodeID>}) {
+              __EXCEPTION{
+                DOMException.WRONG_DOCUMENT_ERR::
+              }__;
+            }
+
+            if (defined $attrNode->{<Q:infoset:localName>}) {
+              $r = $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>}
+                     ->{defined $attrNode->{<Q:infoset:namespaceName>}
+                              ? $attrNode->{<Q:infoset:namespaceName>}
+                              : <Q:null:>}
+                     ->{$attrNode->{<Q:infoset:localName>}};
+            } else {
+              $r = $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>}
+                     ->{<Q:ManakaiDOM:noNS>}
+                     ->{$attrNode->{<Q:DOMCore:name>}};
+            }
+
+            if ($r->{<Q:TreeCore:nodeID>} eq $attrNode->{<Q:TreeCore:nodeID>}) {
+              __WARNING{
+                ManakaiDOMImplementationException.
+                MDOM_REPLACE_BY_ITSELF_NO_EFFECT::
+              }__;
+              $r = $newAttr;
+            } else {
+              $attrNode->{<Q:infoset:ownerElement>} = $self->{<Q:TreeCore:node>};
+              if (defined $attrNode->{<Q:infoset:localName>}) {
+                $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>}
+                     ->{defined $attrNode->{<Q:infoset:namespaceName>}
+                              ? $attrNode->{<Q:infoset:namespaceName>}
+                              : <Q:null:>}
+                     ->{$attrNode->{<Q:infoset:localName>}} = $attrNode;
+              } else {
+                $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>}
+                     ->{<Q:ManakaiDOM:noNS>}
+                     ->{$attrNode->{<Q:DOMCore:name>}} = $attrNode;
+              }
+              if ($r) {
+                delete $r->{<Q:infoset:parent>};
+                $r->__SUPER{ManakaiDOMNodeObject::}__::__INT{orphanate}__;
+                     ## Condition sensitive
+                $r = __CLASS{Node}__->__INT{getNodeReference}__ ($r, $self)
+                  if defined wantarray;
+              }
+            }
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              It is unclear whether the node should be returned if 
+              the node is <QUOTE:replaced> by itself.
+    @@Level[list]:
+       1
+       2
+       3
+    @@SpecLevel:1
+  @Method:
+     @@Name:  removeAttributeNode
+     @@Description:
+        @@@lang:en
+        @@@@:
+          Remove the specified attribute node.
+        \
+          If a default value for the removed attribute is defined 
+          in the DTD, a new node immediately appears.  The DOM 
+          implementation may handle default values from other schemas.
      @@Param:
         @@@Name:  oldAttr
         @@@Type:  Attr
+        @@@Description:
+          @@@@lang:en
+          @@@@@: 
+            The attribute node to remove from the attribute list.
+     @@Return:
+        @@@Type:  Attr
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The attribute node that was removed.
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:NO_MODIFICATION_ALLOWED_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:NOMOD_THIS
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                This (<IF:Element>) node is read-only.
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:NOT_FOUND_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The <P:oldAttr> node is not an attribute of this element.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $node = $self->{<Q:TreeCore:node>};
+            if ($node->{<Q:DOMCore:read-only>}) {
+              __EXCEPTION{
+                DOMException.NO_MODIFICATION_ALLOWED_ERR.
+                MDOM_EXCEPTION:NOMOD_THIS::
+              }__;
+            }
+            $r = $oldAttr;
+            my $attrNode = $r->{<Q:TreeCore:node>};
+            FIND: {
+              my $attrID = $attrNode->{<Q:TreeCore:nodeID>};
+              for my $ns (keys %{$node->{<Q:infoset:attributes>}}) {
+                for my $ln (keys %{$node->{<Q:infoset:attributes>}->{$ns}}) {
+                  if ($attrID eq $node->{<Q:infoset:attributes>}->{$ns}->{$ln}
+                                      ->{<Q:TreeCore:nodeID>}) {
+                    delete $node->{<Q:infoset:attributes>}->{$ns}->{$ln};
+                    last FIND;
+                  }
+                }
+              }
+              __EXCEPTION{
+                DOMException.NOT_FOUND_ERR::
+                  <Q:MDOM_EXCEPTION:param-name> => 'oldAttr',
+              }__;
+            }
+            delete $attrNode->{<Q:infoset:ownerElement>};
+            $attrNode->__SUPER{ManakaiDOMNodeObject::}__::__INT{orphanate}__; 
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              TODO: Default attribute
   @Method:
      @@Name:  getElementsByTagName
      @@Param:
@@ -5796,6 +6319,62 @@ IF:
         @@@Type:  DOMString
      @@Return:
         @@@Type:  NodeList
+  @IntMethod:
+     @@Name: selectAttrNodeObjectNS
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Select a <IF:ManakaiDOMNodeObject> object that represents 
+         an <IF:Attr> node, by namespace URI and local name.
+     @@NoNSVersion:selectAttrNodeObject
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The namespace URI of the attribute to select.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The attribute to select has no namespace.
+     @@Param:
+        @@@Name:  localName
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The local name of the attribute to select.
+     @@Return:
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNodeObject
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The <IF:ManakaiDOMNOdeObject> object.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: There is no such attribute.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $attr = $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>};
+            $namespaceURI = <Q:null:> unless defined $namespaceURI;
+            $r = $attr->{$namespaceURI}->{$localName};
+            __WHEN{IS{<Q:DOMCore:removeAttribute>}::
+              delete $attr->{$namespaceURI}->{$localName} if $r;
+            }__;
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The same method is defined in <IF:ManakaiDOMAttributes>.
   @Method:
      @@Name:  getAttributeNS
      @@Description:
@@ -5851,9 +6430,7 @@ IF:
           @@@@Type:
             lang:Perl
           @@@@@:
-            my $attr = $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>};
-            $namespaceURI = <Q:null:> unless defined $namespaceURI;
-            $r = $attr->{$namespaceURI}->{$localName};
+            __INT{{selectAttrNodeObjectNS}}__;
             if ($r) {
                          ## Condition insensitive
               $r = $r->__SUPER{ManakaiDOMNodeObjectNode}__::__INT{textContent}__;
@@ -5862,29 +6439,306 @@ IF:
      @@SpecLevel:2
   @Method:
      @@Name:  setAttributeNS
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Add a new attribute.  If an attribute with the same 
+         local name and namespace URI is already present on the element, 
+         its value is changed and its prefix is also changed to be the 
+         prefix of the new qualified name. 
+     @@NoNSVersion:setAttribute
      @@Param:
         @@@Name:  namespaceURI
-        @@@Type:  DOMString
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The namespace URI of the attribute to create or alter.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              The attribute to create or alter has no namespace.
      @@Param:
         @@@Name:  qualifiedName
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:The qualified name of the attribute to create or alter.
      @@Param:
         @@@Name:  value
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The value to set.
      @@Return:
-        @@@Exception[list]:  DOMException
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: INVALID_CHARACTER_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_BAD_NAME
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:qualifiedName> is not an XML <XML:Name>.
+          @@@@SpecLevel:2
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NAMESPACE_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_NS_MALFORMED_QNAME
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@: 
+                The <P:qualifiedName> is malformed as a qualified name.
+            @@@@@SpecLevel:2
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_NS_PREFIX_WITH_NULL_URI
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:qualifiedName> has a prefix and the
+                <P:namespaceURI> is <DOM:null>.
+            @@@@@SpecLevel:2
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_NS_XML_WITH_OTHER_URI
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:qualifiedName> has a prefix that is <XML:xml> and the
+                <P:namespaceURI> is different from
+                <URI:http://www.w3.org/XML/1998/namespace>.
+            @@@@@SpecLevel:2
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_NS_XMLNS_WITH_OTHER_URI
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:qualifiedName> has a prefix that is <XML:xmlns> and
+                the <P:namespaceURI> is different from the
+                <URI:http://www.w3.org/2000/xmlns>.
+            @@@@@SpecLevel:3
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_NS_XMLNSQ_WITH_OTHER_URI
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:qualifiedName> is <XML:xmlns> and
+                the <P:namespaceURI> is different from the
+                <URI:http://www.w3.org/2000/xmlns>.
+            @@@@@SpecLevel:2
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_NS_OTHER_WITH_XML_URI
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:namespaceURI> is 
+                <URI:http://www.w3.org/XML/1998/namespace> and the 
+                prefix of the <P:qualifiedName> is different from 
+                <XML:xml>.
+            @@@@@SpecLevel[list]:
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_NS_OTHER_WITH_XMLNS_URI
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:namespaceURI> is <URI:http://www.w3.org/2000/xmlns> and 
+                neither the <P:qualifiedName> nor its prefix is <XML:xmlns>.
+            @@@@@SpecLevel:3
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_NS_XMLNS_XMLNS
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:qualifiedName> is <XML:xmlns:xmlns>.
+            @@@@@SpecLevel[list]:
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@: Is no-prefix with URI is OK?
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:NOT_SUPPORTED_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_DOC_NOSUPPORT_XML
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                This document does not support the <Feature:XML> 
+                feature.
+            @@@@@SpecLevel:2
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:NO_MODIFICATION_ALLOWED_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:NOMOD_THIS
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                This (<IF:Element>) node is read-only.
+            @@@@@SpecLevel:2
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:NOMOD_ATTR
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <IF:Attr> node to edit is read-only.
+            @@@@@SpecLevel[list]:
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            if ($self->{<Q:TreeCore:node>}->{<Q:DOMCore:read-only>}) {
+              __EXCEPTION{
+                DOMException.NO_MODIFICATION_ALLOWED_ERR.
+                MDOM_EXCEPTION:NOMOD_THIS::
+              }__;
+            }
+            my ($version, $prefix, $localName);
+            my $docNode = $self->{<Q:TreeCore:node>};
+            __CODE{XMLNS: docNode => docNode,
+                          qualifiedName => qualifiedName,
+                          namespaceURI => namespaceURI,
+                          out-version => version,
+                          out-localName => localName,
+                          out-prefix => prefix}__;
+            my $r;
+            __INT{{selectAttrNodeObjectNS}}__;
+            my $node = $self->{<Q:TreeCore:node>};
+            if ($r) {
+              if ($r->{<Q:DOMCore:read-only>}) {
+                __EXCEPTION{
+                  DOMException.NO_MODIFICATION_ALLOWED_ERR.
+                  MDOM_EXCEPTION:NOMOD_ATTR::
+                }__;
+              }
+              my @children = @{$r->{<Q:infoset:children>}};
+              $r->{<Q:infoset:children>} = [];
+              for (@children) {
+                delete $_->{<Q:infoset:parent>};
+                $_->__SUPER{ManakaiDOMNodeObject::}__::__INT{orphanate}__;
+              }
+            } else {
+                   ## Condition insensitive
+              $r = __CLASS{Attr::}__->__INT{newObject}__;
+              $node->__SUPER{ManakaiDOMNodeObject::}__::__INT{importTree}__ ($r);
+              $r->{<Q:DOMCore:ownerDocument>} = $node
+                                                 ->{<Q:DOMCore:ownerDocument>};
+              $r->{<Q:infoset:prefix>} = $prefix;
+              $r->{<Q:infoset:namespaceName>} = $namespaceURI;
+              $r->{<Q:infoset:localName>} = $localName;
+              $r->{<Q:infoset:ownerElement>} = $node;
+              $node->{<Q:infoset:attributes>}
+                   ->{defined $namespaceURI ? $namespaceURI : <Q:null:>}
+                   ->{$localName} = $r;
+            }
+                       ## Condition insensitive
+            my $text = __CLASS{Text::}__->__INT{newObject}__;
+            $node->__SUPER{ManakaiDOMNodeObject::}__::__INT{importTree}__ 
+                                                                    ($text);
+            $text->{<Q:DOMCore:ownerDocument>} = $self->{<Q:TreeCore:node>}
+                                                 ->{<Q:DOMCore:ownerDocument>};
+            $text->{<Q:infoset:content>} = defined $value ? $value : '';
+            $text->{<Q:infoset:parent>} = $r;
+            $r->{<Q:infoset:children>} = [$text];
+            $r->{<Q:infoset:specified>} = true;
      @@Level[list]:  2
      @@SpecLevel:2
   @Method:
      @@Name:  removeAttributeNS
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Remove an attribute by local name and namespace URI.
+       \
+         If a default value for the removed attribute is defined 
+         in the DTD, a new attribute is immediately appears. 
+         The DOM implementation may handle default values from 
+         other schemas.
+     @@NoNSVersion:removeAttribute
      @@Param:
         @@@Name:  namespaceURI
-        @@@Type:  DOMString
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace URI of the attribute to remove.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The attribute to remove has no namespace.
      @@Param:
         @@@Name:  localName
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The local name of the attribute to remove.
+          \
+            If no attribute with this <P:localName> and 
+            <P:namespaceURI> is found, this method has no effect.
      @@Return:
-        @@@Exception[list]:  DOMException
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:NO_MODIFICATION_ALLOWED_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:NOMOD_THIS
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                This (<IF:Element>) node is read-only.
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:NOT_SUPPORTED_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_IMPL_NOSUPPORT_XML
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The DOM implementation does not support the feature 
+                <Feature:XML> and the language exposed through 
+                the <IF:Document> does not support XML Namespaces.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            if ($self->{<Q:TreeCore:node>}->{<Q:DOMCore:read-only>}) {
+              __EXCEPTION{
+                DOMException.NO_MODIFICATION_ALLOWED_ERR.
+                MDOM_EXCEPTION:NOMOD_THIS::
+              }__;
+            }
+            my $r;
+            __INT{{selectAttrNodeObjectNS: <Q:DOMCore:removeAttribute>}}__;
+            if ($r) {
+              delete $r->{<Q:infoset:ownerElement>};
+              $r->__SUPER{ManakaiDOMNodeObject::}__::__INT{orphanate}__;
+            }
+         @@@@ImplNote:
+           @@@@@lang:en
+           @@@@@@:
+             TODO: default attribute
+           \
+             Almost same as <M:ManakaiDOMAttributes.removeNamedItemNS>.
      @@Level[list]:  2
      @@SpecLevel:2
   @Method:
@@ -5939,9 +6793,7 @@ IF:
           @@@@Type:
             lang:Perl
           @@@@@:
-            my $attr = $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>};
-            $namespaceURI = <Q:null:> unless defined $namespaceURI;
-            $r = $attr->{$namespaceURI}->{$localName};
+            __INT{{selectAttrNodeObjectNS}}__;
             if ($r) {
                          ## Condition sensitive
               $r = __CLASS{Node}__->__INT{getNodeReference}__ ($r, $self);
@@ -5952,13 +6804,155 @@ IF:
      @@SpecLevel:2
   @Method:
      @@Name:  setAttributeNodeNS
-     @@Return:
-        @@@Type:  Attr
-        @@@Exception[list]:  DOMException
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Add a new attribute.  If an attribute with that local name and 
+         namespace URI is already present in the element, 
+         it is replaced by the new node.
+       \
+         Replacing an attribute node by itself has no effect.
+     @@NoNSVersion:setAttributeNS
      @@Param:
         @@@Name:  newAttr
         @@@Type:  Attr
-     @@Level[list]:  2
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The attribute node to add to the attribute list.
+     @@Return:
+        @@@Type:  Attr
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The <IF:Attr> node replaced by the <P:newAttr> node.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The <P:newAttr> node replaces no existing node.
+         @@@Exception:
+           @@@@Name:WRONG_DOCUMENT_ERR
+           @@@@Type:DOMException
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The <P:newAttr> node was created from a different document.
+         @@@Exception:
+           @@@@Name:NO_MODIFICATION_ALLOWED_ERR
+           @@@@Type:DOMException
+           @@@@SubType:
+             @@@@@QName: 
+               MDOM_EXCEPTION:NOMOD_THIS
+             @@@@@Description:
+               @@@@@@lang:en
+               @@@@@@@:
+                 This (<IF:Element>) node is read-only.
+         @@@Exception:
+           @@@@Name:INUSE_ATTRIBUTE_ERR
+           @@@@Type:DOMException
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The <P:newAttr> node is already used as an attribute 
+               of another <IF:Element> object.
+         @@@Exception:
+           @@@@Name:NOT_SUPPORTED_ERR
+           @@@@Type:DOMException
+           @@@@SubType:
+             @@@@@QName:
+               MDOM_EXCEPTION:MDOM_IMPL_NOSUPPORT_XML
+             @@@@@Description:
+               @@@@@@lang:en
+               @@@@@@@:
+                 The DOM implementation does not support the feature 
+                 <Feature:XML> and the language exposed through the 
+                 <IF:Document> does not support XML Namespaces.
+             @@@@@SpecLevel:2
+           @@@@SubType:
+             @@@@@QName:
+               MDOM_EXCEPTION:MDOM_NODE_NOSUPPORT_XMLNS
+             @@@@@Description:
+               @@@@@@lang:en
+               @@@@@@@:
+                 The <P:newAttr> node does not support XML Namespace.
+             @@@@@SpecLevel[list]:
+         @@@Def:
+           @@@@Type:
+             lang:Perl
+           @@@@@:
+            if ($self->{<Q:TreeCore:node>}->{<Q:DOMCore:read-only>}) {
+              __EXCEPTION{
+                DOMException.NO_MODIFICATION_ALLOWED_ERR.
+                MDOM_EXCEPTION:NOMOD_THIS::
+              }__;
+            }
+            my $attrNode = $newAttr->{<Q:TreeCore:node>};
+            if ($attrNode->{<Q:infoset:ownerElement>}) {
+              __EXCEPTION{
+                DOMException.INUSE_ATTRIBUTE_ERR::
+                  <Q:MDOM_EXCEPTION:param-name> => 'newAttr',
+              }__;
+            } elsif ($attrNode->{<Q:DOMCore:ownerDocument>}
+                              ->{<Q:TreeCore:nodeID>} ne
+                     $self->{<Q:TreeCore:node>}->{<Q:DOMCore:ownerDocument>}
+                          ->{<Q:TreeCore:nodeID>}) {
+              __EXCEPTION{
+                DOMException.WRONG_DOCUMENT_ERR::
+              }__;
+            }
+
+            if (defined $attrNode->{<Q:infoset:localName>}) {
+              $r = $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>}
+                     ->{defined $attrNode->{<Q:infoset:namespaceName>}
+                              ? $attrNode->{<Q:infoset:namespaceName>}
+                              : <Q:null:>}
+                     ->{$attrNode->{<Q:infoset:localName>}};
+            } else {
+              __EXCEPTION{
+                DOMException.NOT_SUPPORTED_ERR.
+                MDOM_EXCEPTION:MDOM_NODE_NOSUPPORT_XMLNS::
+                  <Q:MDOM_EXCEPTION:param-name> => 'newAttr',
+              }__;
+            }
+
+            if ($r->{<Q:TreeCore:nodeID>} eq $attrNode->{<Q:TreeCore:nodeID>}) {
+              __WARNING{
+                ManakaiDOMImplementationException.
+                MDOM_REPLACE_BY_ITSELF_NO_EFFECT::
+              }__;
+              $r = $newAttr;
+            } else {
+              $attrNode->{<Q:infoset:ownerElement>} = $self->{<Q:TreeCore:node>};
+              if (defined $attrNode->{<Q:infoset:localName>}) {
+                $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>}
+                     ->{defined $attrNode->{<Q:infoset:namespaceName>}
+                              ? $attrNode->{<Q:infoset:namespaceName>}
+                              : <Q:null:>}
+                     ->{$attrNode->{<Q:infoset:localName>}} = $attrNode;
+              } else {
+                $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>}
+                     ->{<Q:ManakaiDOM:noNS>}
+                     ->{$attrNode->{<Q:DOMCore:name>}} = $attrNode;
+              }
+              if ($r) {
+                delete $r->{<Q:infoset:parent>};
+                $r->__SUPER{ManakaiDOMNodeObject::}__::__INT{orphanate}__;
+                     ## Condition sensitive
+                $r = __CLASS{Node}__->__INT{getNodeReference}__ ($r, $self)
+                  if defined wantarray;
+              }
+            }
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              It is unclear whether the node should be returned if 
+              the node is <QUOTE:replaced> by itself.
+     @@Level[list]:  
+        2
+        3
      @@SpecLevel:2
   @Method:
      @@Name:  getElementsByTagNameNS
@@ -6006,37 +7000,7 @@ IF:
           @@@@Type:
             lang:Perl
           @@@@@:
-            my $attr = $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>};
-            if ($attr->{<Q:ManakaiDOM:noNS>}->{$name}) {
-              $r = $attr->{<Q:ManakaiDOM:noNS>}->{$name};
-            } elsif ($name eq 'xmlns') {
-              for my $a (%{$attr->{<Q:xmlns:>}||{}}) {
-                if ($a->{<Q:infoset:localName>}) {
-                  $r = $a;
-                  last;
-                }
-              }
-            } elsif ($name eq 'xmlns:xmlns') {
-              # 
-            } else {
-              for my $ns (keys %$attr) {
-                if ($ns eq <Q:ManakaiDOM:noNS>) {
-                  # 
-                } else {
-                  for my $a (%{$attr->{$ns}||{}}) {
-                    if (defined $a->{<Q:infoset:prefix>} and
-                        $a->{<Q:infoset:prefix>}.':'.
-                        $a->{<Q:infoset:localName>} eq $name) {
-                      $r = $a;
-                      last;
-                    } elsif ($a->{<Q:infoset:localName>} eq $name) {
-                      $r = $a;
-                      last;
-                    }
-                  }
-                }
-              }
-            }
+            __INT{{selectAttrNodeObject}}__;
             $r = true if $r;
      @@Level[list]:  2
      @@SpecLevel:2
@@ -6098,9 +7062,8 @@ IF:
           @@@@Type:
             lang:Perl
           @@@@@:
-            my $attr = $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>};
-            $namespaceURI = <Q:null:> unless defined $namespaceURI;
-            $r = $attr->{$namespaceURI}->{$localName} ? true : false;
+            __INT{{selectAttrNodeObjectNS}}__;
+            $r = $r ? true : false;
      @@Level[list]:  2
      @@SpecLevel:2
   @Attr:
@@ -6117,41 +7080,295 @@ IF:
      @@SpecLevel:3
   @Method:
      @@Name:  setIdAttribute
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Set whether an attribute is a user-determined ID attribute or not.
+       \
+         Note that this does not affect any schema that may be 
+         in use.  Whether this attribute is a DTD-, Schema- or 
+         externally-determined ID attribute is unable to change by 
+         this method.
+     @@NSVersion:setIdAttributeNS
      @@Param:
         @@@Name:  name
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The name of the attribute.
      @@Param:
         @@@Name:  isId
         @@@Type:  boolean
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            Whether the attribtue is a user-determined ID attribute.
+        @@@InCase:
+          @@@@Value:true
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              Declare the attribute to be a user-determined ID attribute.
+        @@@InCase:
+          @@@@Value:false
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Undeclare the attribute for being a user-determined ID attribute.
      @@Return:
-        @@@Exception[list]:  DOMException
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:NO_MODIFICATION_ALLOWED_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:NOMOD_THIS
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                This (<IF:Element>) node is read-only.
+            @@@@@SpecLevel:3
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:NOMOD_ATTR
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The attribute node is read-only.
+            @@@@@SpecLevel[list]:
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              Is <QUOTE:user-determined ID> a property of the 
+              <IF:Attr> or of the <IF:Element>?
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:NOT_FOUND_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              There is no such attribute.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            if ($self->{<Q:TreeCore:node>}->{<Q:DOMCore:read-only>}) {
+              __EXCEPTION{
+                DOMException.NO_MODIFICATION_ALLOWED_ERR.
+                MDOM_EXCEPTION:NOMOD_THIS::
+              }__;
+            }
+            my $r;
+            __INT{{selectAttrNodeObject}}__;
+            unless ($r) {
+              __EXCEPTION{
+                DOMException.NOT_FOUND_ERR::
+              }__;
+            }
+            if ($r->{<Q:DOMCore:read-only>}) {
+              __EXCEPTION{
+                DOMException.NO_MODIFICATION_ALLOWED_ERR.
+                MDOM_EXCEPTION:NOMOD_ATTR::
+              }__;
+            }
+            $r->{<Q:DOMCore:userDeterminedId>} = $isId;
      @@Level[list]:  3
      @@SpecLevel:3
   @Method:
      @@Name:  setIdAttributeNS
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Set whether an attribute is a user-determined ID attribute or not.
+       \
+         Note that this does not affect any schema that may be 
+         in use.  Whether this attribute is a DTD-, Schema- or 
+         externally-determined ID attribute is unable to change by 
+         this method.
+     @@NoNSVersion:setIdAttribute
      @@Param:
         @@@Name:  namespaceURI
-        @@@Type:  DOMString
+        @@@Type: 
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace URI of the attribute.
      @@Param:
         @@@Name:  localName
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The local name of the attribute.
      @@Param:
         @@@Name:  isId
         @@@Type:  boolean
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            Whether the attribtue is a user-determined ID attribute.
+        @@@InCase:
+          @@@@Value:true
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              Declare the attribute to be a user-determined ID attribute.
+        @@@InCase:
+          @@@@Value:false
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Undeclare the attribute for being a user-determined ID attribute.
      @@Return:
-        @@@Exception[list]:  DOMException
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:NO_MODIFICATION_ALLOWED_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:NOMOD_THIS
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                This (<IF:Element>) node is read-only.
+            @@@@@SpecLevel:3
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:NOMOD_ATTR
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The attribute node is read-only.
+            @@@@@SpecLevel[list]:
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              Is <QUOTE:user-determined ID> a property of the 
+              <IF:Attr> or of the <IF:Element>?
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:NOT_FOUND_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              There is no such attribute.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            if ($self->{<Q:TreeCore:node>}->{<Q:DOMCore:read-only>}) {
+              __EXCEPTION{
+                DOMException.NO_MODIFICATION_ALLOWED_ERR.
+                MDOM_EXCEPTION:NOMOD_THIS::
+              }__;
+            }
+            my $r;
+            __INT{{selectAttrNodeObjectNS}}__;
+            unless ($r) {
+              __EXCEPTION{
+                DOMException.NOT_FOUND_ERR::
+              }__;
+            }
+            if ($r->{<Q:DOMCore:read-only>}) {
+              __EXCEPTION{
+                DOMException.NO_MODIFICATION_ALLOWED_ERR.
+                MDOM_EXCEPTION:NOMOD_ATTR::
+              }__;
+            }
+            $r->{<Q:DOMCore:userDeterminedId>} = $isId;
      @@Level[list]:  3
      @@SpecLevel:3
   @Method:
      @@Name:  setIdAttributeNode
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Set whether an attribute is a user-determined ID attribute or not.
+       \
+         Note that this does not affect any schema that may be 
+         in use.  Whether this attribute is a DTD-, Schema- or 
+         externally-determined ID attribute is unable to change by 
+         this method.
      @@Param:
         @@@Name:  idAttr
         @@@Type:  Attr
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The attribute node.
      @@Param:
         @@@Name:  isId
         @@@Type:  boolean
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            Whether the attribtue is a user-determined ID attribute.
+        @@@InCase:
+          @@@@Value:true
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              Declare the attribute to be a user-determined ID attribute.
+        @@@InCase:
+          @@@@Value:false
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Undeclare the attribute for being a user-determined ID attribute.
      @@Return:
-        @@@Exception[list]:  DOMException
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:NO_MODIFICATION_ALLOWED_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:NOMOD_THIS
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                This (<IF:Element>) node is read-only.
+            @@@@@SpecLevel:3
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:NOMOD_ATTR
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The attribute node is read-only.
+            @@@@@SpecLevel[list]:
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              Is <QUOTE:user-determined ID> a property of the 
+              <IF:Attr> or of the <IF:Element>?
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:NOT_FOUND_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The <P:idAttr> is not an attribute of this element.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            if ($self->{<Q:TreeCore:node>}->{<Q:DOMCore:read-only>}) {
+              __EXCEPTION{
+                DOMException.NO_MODIFICATION_ALLOWED_ERR.
+                MDOM_EXCEPTION:NOMOD_THIS::
+              }__;
+            }
+            unless ($idAttr->{<Q:TreeCore:node>}->{<Q:infoset:ownerElement>} and
+                    $idAttr->{<Q:TreeCore:node>}->{<Q:infoset:ownerElement>}
+                           ->{<Q:TreeCore:nodeID>} eq
+                    $self->{<Q:TreeCore:node>}->{<Q:TreeCore:nodeID>}) {
+              __EXCEPTION{
+                DOMException.NOT_FOUND_ERR::
+              }__;
+            }
+            if ($idAttr->{<Q:TreeCore:node>}->{<Q:DOMCore:read-only>}) {
+              __EXCEPTION{
+                DOMException.NO_MODIFICATION_ALLOWED_ERR.
+                MDOM_EXCEPTION:NOMOD_ATTR::
+              }__;
+            }
+            $idAttr->{<Q:TreeCore:node>}
+                   ->{<Q:DOMCore:userDeterminedId>} = $isId;
      @@Level[list]:  3
      @@SpecLevel:3
   @ReMethod:
@@ -6181,6 +7398,74 @@ IF:
       3
     @@Redefine:Node
   
+  @ReAttr:
+    @@Name: attributes
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A node map containing the attributes of this node.
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMAttributes
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A <IF:NamedNodeMap> object.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = $self->{<Q:TreeCore:node>}
+                    ->__SUPER{ManakaiDOMNodeObject::}__::__INT{newReference}__
+                         ## Condition sensitive
+                        (__CLASS{ManakaiDOMAttributes}__);
+    @@SpecLevel:1
+    @@Level[list]:
+      1
+      2
+      3
+    @@Redefine:Node
+  @ReAttr:
+    @@Name:baseURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The base URI of this element.
+    @@Get:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The base URI.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The DOM implementation is unable to obtain an absolute URI.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          if ($self->{<Q:TreeCore:node>}->{<Q:DOMCore:hasFeature>}->{HTML}) {
+            $r = $self->{<Q:TreeCore:node>}
+                      ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{htmlBaseURI}__;
+          } else {
+            $r = $self->{<Q:TreeCore:node>}
+                      ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{contentBaseURI}__
+                                                 (false);
+          }
+       @@@ImplNote:
+         @@@@lang:en
+         @@@@@:
+           If a document has both a <HTML:base> element and 
+           an <XML:xml:base> attribute, or even in the case that 
+           an XHTML 1 document has an <XML:xml:base> attribute, 
+           its result is not defined by any W3C specification.
+    @@SpecLevel:3
+    @@Level[list]:3
+    @@Redefine:Node
   @ReAttr:
      @@Name:  localName
      @@Description:
@@ -6541,6 +7826,8 @@ IF:
             }__;
           }
           $newNode->{<Q:infoset:content>} = $after;
+          $newNode->{<Q:DOMCore:ownerDocument>} = $parentNode
+                                                 ->{<Q:DOMCore:ownerDocument>};
           if ($parentNode) {
             $parentNode->__SUPER{ManakaiDOMNodeObject::}__::__INT{importTree}__
                                                                    ($newNode);
@@ -7678,12 +8965,14 @@ IF:
           @@@@@@:
             Char::Class::XML
           @@@@@Import[list]:
-            InXMLNameChar10
-            InXMLNCNameChar10
             InXML_NameStartChar10
+            InXMLNameChar10
             InXML_NCNameStartChar10
-            InXMLNameChar11
+            InXMLNCNameChar10
             InXMLNameStartChar11
+            InXMLNameChar11
+            InXMLNCNameStartChar11
+            InXMLNCNameChar11
     @@Condition[list]:
       DOM1
       DOM2
@@ -8687,8 +9976,8 @@ IF:
                           out-localName => localName,
                           out-prefix => prefix}__;
 
-                       ## Condition sensitive
-            my $node = __CLASS{Attr}__->__INT{newObject}__;
+                       ## Condition insensitive
+            my $node = __CLASS{Attr::}__->__INT{newObject}__;
             $node->{<Q:DOMCore:ownerDocument>} = $docNode;
             $node->{<Q:infoset:localName>} = $localName;
             $node->{<Q:infoset:namespaceName>} = $namespaceURI;
@@ -9249,18 +10538,46 @@ IF:
      @@SpecLevel:3
   
   @ReAttr:
-    @@Name: attributes
-    @@Spec:
-      @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-84CF096
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Name:baseURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The base URI of this document.
     @@Get:
-      @@@Type: NamedNodeMap
+      @@@Type:
+        ManakaiDOM:ManakaiDOMURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The base URI.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The DOM implementation is unable to obtain an absolute URI.
       @@@Def:
         @@@@Type:
           lang:Perl
         @@@@@:
-          $r = null;
+          if ($self->{<Q:TreeCore:node>}->{<Q:DOMCore:hasFeature>}->{HTML}) {
+            $r = $self->{<Q:TreeCore:node>}
+                      ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{htmlBaseURI}__;
+          } else {
+            $r = $self->{<Q:TreeCore:node>}
+                      ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{contentBaseURI}__
+                                                 (false);
+          }
+       @@@ImplNote:
+         @@@@lang:en
+         @@@@@:
+           If a document has both a <HTML:base> element and 
+           an <XML:xml:base> attribute, or even in the case that 
+           an XHTML 1 document has an <XML:xml:base> attribute, 
+           its result is not defined by any W3C specification.
+    @@SpecLevel:3
+    @@Level[list]:3
+    @@Redefine:Node
   @ReAttr:
     @@Name: nodeName
     @@Description:

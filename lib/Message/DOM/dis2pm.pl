@@ -280,10 +280,24 @@ sub perl_code ($;%) {
                              condition => $Status->{condition};
     } elsif ($name eq 'INT') {    ## Internal Method / Attr Name
       if (defined $data) {
-        if ($data =~ /^{(\w+)}$/) {
+        if ($data =~ /^{($RegBlockContent)}$/o) {
+          $data = $1;
+          my $name = $1 if $data =~ s/^\s*(\w+)\s*(?:$|:\s*)// or
+            valid_err qq<Syntax of preprocessing macro "INT" is invalid>,
+            node => $opt{node};
+          local $Status->{preprocess_variable}
+                           = {%{$Status->{preprocess_variable}||{}}};
+          while ($data =~ /\G(\S+)\s*(?:=>\s*(\S+)\s*)?(?:,\s*|$)/g) {
+            my ($n, $v) = ($1, defined $2 ? $2 : 1);
+            for ($n, $v) {
+              s/^'([^']+)'$/$1/; ## ISSUE: Doesn't support quoted-'
+            }
+            $Status->{preprocess_variable}->{$n} = $v;
+          }
           valid_err q<Preprocessing macro INT{} cannot be used here>
             unless $opt{internal};
-          $r = $opt{internal}->($1);
+          $r = perl_comment ("INT: $name").
+               $opt{internal}->($name);
         } else {
           $r = perl_internal_name $data;
         }
@@ -316,7 +330,7 @@ sub perl_code ($;%) {
       } else {
         valid_err q<Built-in code name required>;
       }
-      while ($data =~ /\G(\S+)\s*=>\s*(\S+)\s*(,\s*|$)/g) {
+      while ($data =~ /\G(\S+)\s*=>\s*(\S+)\s*(?:,\s*|$)/g) {
         $param{$1} = $2;
       }
       $r = perl_builtin_code ($nm, condition => $opt{condition}, %param);
@@ -328,6 +342,23 @@ sub perl_code ($;%) {
       }
     } elsif ($name eq 'REQUIRE') {
       $r = perl_statement (q<require >. perl_package_name name => $data);
+    } elsif ($name eq 'WHEN') {
+      if ($data =~ s/^\s*IS\s*\{($RegBlockContent)\}::\s*//o) {
+        my $v = $1;
+        if ($v =~ /^\s*'([^']+)'\s*$/) { ## ISSUE: Doesn't support quoted-'
+          if ($Status->{preprocess_variable}->{$1}) {
+            $r = perl_code ($data, %opt);
+          } else {
+            $r = perl_comment ($data);
+          }
+        } else {
+          valid_err qq<WHEN-IS condition "$v" is invalid>,
+            node => $opt{node};
+        }
+      } else {
+        valid_err qq<Syntax for preprocessing macro "WHEN" is invalid>,
+          node => $opt{node};
+      }
     } elsif ($name eq 'FILE' or $name eq 'LINE' or $name eq 'PACKAGE') {
       $r = qq<__${name}__>;
     } else {
@@ -458,6 +489,10 @@ sub perl_builtin_code ($;%) {
                     q< and >.
                     perl_var (type => '$', local_name => $opt{version}) .
                     q< eq '1.1'>, $chk11, $chk10);
+      %class = (qw/InXML_NameStartChar10 InXMLNameChar10
+                   InXML_NCNameStartChar10 InXMLNCNameChar10
+                   InXMLNameStartChar11 InXMLNameChar11
+                   InXMLNCNameStartChar11 InXMLNCNameChar11/);
     } else {
       valid_err q<Built-in code parameter "version" required>;
     }
@@ -537,6 +572,8 @@ sub perl_builtin_code ($;%) {
                     q< and >.
                     perl_var (type => '$', local_name => $opt{version}) .
                     q< eq '1.1'>, $chk11, $chk10);
+      %class = (qw/InXML_NameStartChar10 InXMLNameChar10
+                   InXMLNameStartChar11 InXMLNameChar11/);
     } else {
       valid_err q<Built-in code parameter "version" required>;
     }
@@ -590,6 +627,8 @@ sub perl_builtin_code ($;%) {
                     q< and >.
                     perl_var (type => '$', local_name => $opt{version}) .
                     q< eq '1.1'>, $chk11, $chk10);
+      %class = (qw/InXML_NameStartChar10 InXMLNameChar10
+                   InXMLNameStartChar11 InXMLNameChar11/);
     } else {
       valid_err q<Built-in code parameter "version" required>;
     }
@@ -774,6 +813,14 @@ sub perl_builtin_code ($;%) {
                              => perl_code_literal ($nsURI),
                          })),
             ));
+  } elsif ($name eq 'isRelativeDOMURI') {
+    $r = q<$in !~ /^[0-9A-Za-z+_.%-]:/>;
+    ## TODO: I18n consideration
+    for (qw/in/) {
+      $opt{$_} or valid_err qq<Built-in code parameter "$_" required>,
+                    node => $opt{node};
+      $r =~ s/\$$_/\$$opt{$_}/g;
+    }
   } else {
     valid_err qq<Built-in code "$name" not defined>;
   }
@@ -808,6 +855,7 @@ sub perl_literal ($) {
   } elsif (ref $s eq '__code') {
     return $$s;
   } else {
+    ## NOTE: Don't change quote char - perl_code depends this quote.
     $s =~ s/(['\\])/\\$1/g;
     return q<'> . $s . q<'>;
   }
@@ -1260,7 +1308,9 @@ sub dis2perl ($) {
                      type => 'MDOM_DEBUG_BUG',
                      param => {
                        ExpandedURI q<MDOM_EXCEPTION:values> => {
-                         msg => q<Should be overriddenly defined>,
+                         msg => q<This class defines only the interface; >.
+                                q<some other class must inherit this class >.
+                                q<and implement this subroutine.>,
                        },
                      };
     } elsif ($_->local_name eq 'Type') {
@@ -1296,7 +1346,7 @@ sub disdoc2text ($;%) {
     } elsif ({URI => 1}->{$type}) {
       $r = q{<} . $data . q{>};
     } elsif ({IF => 1, TYPE => 1, P => 1, XML => 1, SGML => 1, DOM => 1,
-              Feature => 1, FeatureVer => 1, CHAR => 1,
+              Feature => 1, FeatureVer => 1, CHAR => 1, HTML => 1,
               Module => 1, QUOTE => 1}->{$type}) {
       $r = q<"> . $data . q<">;
     } elsif ({Q => 1}->{$type}) {
@@ -1307,6 +1357,8 @@ sub disdoc2text ($;%) {
       } else {
         $r = q<"> . $data . q<">;
       }
+    } elsif ({InfosetP => 1}->{$type}) {
+      $r = q<[> . $data . q<]>;
     } elsif ($type eq 'lt') {
       $r = '<';
     } elsif ($type eq 'gt') {
@@ -1338,7 +1390,7 @@ sub disdoc2pod ($;%) {
     } elsif ({URI => 1}->{$type}) {
       $r = q{L<} . $data . q{>};
     } elsif ({
-              IF => 1, TYPE => 1, P => 1, DOM => 1, XML => 1,
+              IF => 1, TYPE => 1, P => 1, DOM => 1, XML => 1, HTML => 1,
               SGML => 1, Feature => 1, FeatureVer => 1, CHAR => 1,
               Module => 1,
              }->{$type}) {
@@ -1360,8 +1412,10 @@ sub disdoc2pod ($;%) {
       } else {
         $r = pod_code $data;
       }
+    } elsif ({InfosetP => 1}->{$type}) {
+      $r = q<[> . $data . q<]>;
     } elsif ({QUOTE => 1}->{$type}) {
-      $r = <"> . $data . <">;
+      $r = q<"> . $data . q<">;
     } elsif ($type eq 'lt' or $type eq 'gt') {
       $r = qq<E<$type>>;
     } else {
@@ -2073,33 +2127,52 @@ sub method2perl ($;%) {
   my $has_exception = 0;
   my $code_node = get_perl_definition_node $return,
                               condition => $opt{condition},
-                              level_default => $opt{level_default};
+                              level_default => $opt{level_default},
+                              use_dis => 1;
   my $int_code_node = get_perl_definition_node $return, name => 'IntDef',
                               condition => $opt{condition},
-                              level_default => $opt{level_default};
+                              level_default => $opt{level_default},
+                              use_dis => 1;
   my $code = '';
   my $int_code = '';
+  for ({code => \$code, code_node => $code_node,
+        internal => sub {
+          return get_internal_code $node, $_[0] if $_[0];
+          if ($int_code_node) {
+            perl_code $int_code_node->value,
+              internal => sub {
+                $_[0] ? get_internal_code $node, $_[0] :
+                valid_err q<Preprocessing macro INT cannot be used here>;
+              };
+          } else {
+            valid_err "<IF[Name = $Status->{IF}]/Method[Name = $m_name]/" .
+                      "Return/IntDef> required";
+          }
+        }},
+       {code => \$int_code, code_node => $int_code_node,
+        internal => sub {$_[0]?get_internal_code $node,$_[0]:
+                         valid_err q<Preprocessing macro INT cannot be> .
+                                   q<used here>}}) {
+    if ($_->{code_node}) {
+      my $mcode;
+      if (type_expanded_uri ($_->{code_node}->get_attribute_value
+                                       ('Type', default => q<DOMMain:any>))
+            eq ExpandedURI q<lang:dis>) {
+        $mcode = dis2perl $_->{code_node};
+      } else {
+        $mcode = perl_code $_->{code_node}->value,
+                           internal => $_->{internal};
+      }
+      if ($mcode =~ /^\s*$/) {
+        ${$_->{code}} = '';
+      } else {
+        ${$_->{code}} = perl_code_source ($mcode,
+                                          path => $_->{code_node}->node_path
+                                                              (key => 'Name'));
+      }
+    }
+  }
   if ($code_node) {
-    $code = perl_code_source (perl_code ($code_node->value,
-                                         internal => sub {
-                                           return get_internal_code ($node, 
-                                                                     $_[0])
-                                             if $_[0];
-                                           if ($int_code_node) {
-                                             perl_code $int_code_node->value,
-                                               internal => sub {
-                                                 $_[0]?get_internal_code
-                                                         ($node, $_[0]) :
-                                                 valid_err q<Preprocessing >.
-                                                   q<macro INT cannot be used >.
-                                                   q<here>;
-                                               };
-                                           } else {
-                                             valid_err "<IntDef> for $m_name" .
-                                                       " required";
-                                           }
-                                         }),
-                              path => $code_node->node_path (key => 'Name'));
     if ($has_return) {
       $code = perl_statement (perl_assign 'my $r' => get_value_literal $return,
                                                         name => 'DefaultValue',
@@ -2117,6 +2190,8 @@ sub method2perl ($;%) {
         }
       }
       $code .= perl_statement ('$r');
+    } else {
+      $code .= perl_statement ('undef');
     }
     if ($code_node->get_attribute_value ('auto-argument', default => 1)) {
       if ($code_node->get_attribute_value ('cast-input', default => 1)) {
@@ -2132,17 +2207,13 @@ sub method2perl ($;%) {
               $code;
     }
     if ($int_code_node) {
-      $int_code = perl_code_source (perl_code ($int_code_node->value,
-                                               internal => sub {
-                $_[0] ? get_internal_code $node, $_[0] :
-                valid_err q<Preprocessing macro INT cannot be used here>;
-                                               }),
-                                    path => $int_code_node->node_path
-                                              (key => 'Name'));
-      $int_code = perl_statement (perl_assign 'my $r' => perl_literal '') .
-                  $int_code .
-                  perl_statement ('$r')
-        if $has_return;
+      if ($has_return) {
+        $int_code = perl_statement (perl_assign 'my $r' => perl_literal '') .
+                    $int_code .
+                    perl_statement ('$r');
+      } else {
+        $int_code .= perl_statement ('undef');
+      }
       $int_code = perl_statement (perl_assign 'my (' .
                                         join (', ', '$self', @param_list) .
                                         ')' => '@_') .
@@ -2192,6 +2263,7 @@ sub method2perl ($;%) {
       }
     }
   } else {
+    $Status->{is_implemented} = 0;
     $int_code = $code
               = perl_statement ('my $self = shift').
                 perl_statement perl_exception
@@ -2350,7 +2422,7 @@ sub attr2perl ($;%) {
     if ($_->{code_node}) {
       my $mcode;
       if (type_expanded_uri ($_->{code_node}->get_attribute_value
-                                                  ('Type', default => ''))
+                                       ('Type', default => q<DOMMain:any>))
             eq ExpandedURI q<lang:dis>) {
         $mcode = dis2perl $_->{code_node};
       } else {
@@ -2586,7 +2658,8 @@ sub attr2perl ($;%) {
             perl_if
               q<exists $_[0]>,
               ($set_code =~/\bgiven\b/ ?
-                    perl_statement (q<my $given = shift>) : '') . $set_code,
+                    perl_statement (q<my $given = shift>) : '') . $set_code .
+              perl_statement ('undef'),
               $code;
     $int_code = perl_statement (perl_assign
               perl_var (scope => 'my', type => '$', local_name => 'self')
@@ -2683,8 +2756,6 @@ sub datatype2perl ($;%) {
       push @{$Info->{DataTypeAlias}->{type_expanded_uri $if_name}
                   ->{isa_uri}||=[]},
            type_expanded_uri $_->value;
-    } elsif ($_->local_name eq 'Param') {
-      ## TODO:
     } elsif ({qw/Name 1 FullName 1 Spec 1 Description 1
                  Level 1 SpecLevel 1 Def 1 ImplNote 1/}->{$_->local_name}) {
       #
@@ -3479,6 +3550,68 @@ if (@feature_desc) {
                pod_list 4, @feature_desc;
 }
 
+## TODO list
+my @todo;
+    ## From not-implemented list
+    for my $if (sort keys %{$Info->{is_implemented}}) {
+      for my $mem (sort keys %{$Info->{is_implemented}->{$if}}) {
+        for my $cond (sort keys %{$Info->{is_implemented}->{$if}->{$mem}}) {
+          if (not $Info->{is_implemented}->{$if}->{$mem}->{$cond}) {
+            push @todo, pod_item ('Implement '.pod_code ($if).'.'.
+                                  pod_code ($mem).'.'),
+                        pod_para ('Condition = '.
+                                  ($Info->{Condition}->{$cond}->{FullName} ||
+                                   '(empty)'));
+          }
+        }
+      }
+    }
+    ## From Description, ImplNote, Def
+    my $a;
+    $a = sub {
+      my $n = shift;
+      for (@{$n->child_nodes}) {
+        if ($_->node_type eq '#element') {
+          $a->($_);
+        }
+      }
+      if (($n->node_type eq '#element' and
+           {qw/Description 1 ImplNote 1
+               Def 1 IntDef 1/}->{$n->local_name}) or
+          $n->node_type eq '#comment') {
+        my $v = $n->value;
+        if (defined $v) {
+          if (ref $v eq 'ARRAY') {
+            $v = join "\n", @$v;
+          }
+          if ($v =~ /\b(TODO|ISSUE|BUG):/) {
+            push @todo, pod_item ($1.': '.pod_code $n->node_path(key => 'Name'));
+            my $t = $n->node_type eq '#comment' ? ExpandedURI q<DOMMain:any> :
+                    $n->get_attribute_value
+                           ('Type',
+                            default => {
+                              Description => ExpandedURI q<lang:disdoc>,
+                              ImplNote => ExpandedURI q<lang:disdoc>,
+                              Def => ExpandedURI q<DOMMain:any>,
+                              IntDef => ExpandedURI q<DOMMain:any>,
+                            }->{$n->local_name});
+            if ($t eq ExpandedURI q<lang:disdoc>) {
+              push @todo, disdoc2pod $v;
+            } else {
+              push @todo, pod_pre ($v);
+            }
+          }
+        }
+      }
+    };
+  $a->($source);
+  if (@todo) {
+    $result .= pod_block
+                 pod_head (1, 'TO DO'),
+                 @todo;
+  }
+
+
 ## Namespace bindings for documentation
 if (my $n = keys %{$Status->{ns_in_doc}}) {
   my @desc = (pod_head (1, 'NAMESPACE BINDING'.($n > 1 ? 'S' : '')),
@@ -3542,6 +3675,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/09/24 12:19:46 $
+# $Date: 2004/09/25 12:58:21 $
 
 

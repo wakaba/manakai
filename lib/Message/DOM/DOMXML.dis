@@ -43,7 +43,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/24 12:19:46 $
+     $Date: 2004/09/25 12:58:20 $
   @Require:
     @@Module:
       @@@Name: DOMCore
@@ -528,6 +528,39 @@ IF:
             infoset:systemIdentifier
   
   @ReAttr:
+    @@Name: baseURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The base URI of this node.
+        \
+        For the <IF:Notation> node, it is the <InfosetP:declaration base URI> 
+        of the notation information item.
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The absolute base DOM URI.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The DOM implementation was not able to 
+            obtain an absolute URI.
+      @@@Def:
+        @@@@Type:
+          lang:dis
+        @@@@GetProp:
+          infoset:declarationBaseURI
+    @@SpecLevel:3
+    @@Level:3
+    @@Redefine:
+      DOMCore:Node
+  @ReAttr:
     @@Name: nodeName
     @@Description:
       @@@lang:en
@@ -696,6 +729,11 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: The system identifier is not specified.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            infoset:systemIdentifier
   @Attr:
      @@Name:  notationName
      @@Description:
@@ -826,6 +864,39 @@ IF:
          <Module:DOMCore> module.
   
   @ReAttr:
+    @@Name: baseURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The base URI of this node.
+        \
+        For the <IF:Entity> node, it is the <InfosetP:declaration base URI> 
+        of the unparsed entity information item.
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The absolute base DOM URI.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The DOM implementation was not able to 
+            obtain an absolute URI.
+      @@@Def:
+        @@@@Type:
+          lang:dis
+        @@@@GetProp:
+          infoset:declarationBaseURI
+    @@SpecLevel:3
+    @@Level:3
+    @@Redefine:
+      DOMCore:Node
+  @ReAttr:
     @@Name: nodeName
     @@Description:
       @@@lang:en
@@ -891,10 +962,16 @@ IF:
          <IF:Entity>: <Q:DOMCore:name>, <Q:DOMCore:ownerDocument>.
          \
          Other available properties: <Q:infoset:declarationBaseURI>, 
-         <Q:infoset:publicIdentifier>, <Q:infoset:systemIdentifier>, 
-         <Q:DOMCore:read-only>, <Q:infoset:notationName>, 
-         <Q:infoset:version>, <Q:DOMCore:xmlEncoding>, 
-         <Q:infoset:characterEncodingScheme>.
+         <Q:DOMCore:read-only>,
+         <Q:ManakaiDOM:isExpanded>, <Q:ManakaiDOM:isExternallyDeclared>, 
+         <Q:ManakaiDOM:isExternalEntity>.
+         \
+         Other available properties (for external entity): 
+         <Q:DOMCore:documentURI>, <Q:infoset:publicIdentifier>,
+         <Q:infoset:systemIdentifier>, <Q:infoset:notationName>,
+         <Q:infoset:version>, <Q:DOMCore:xmlEncoding>,
+         <Q:infoset:characterEncodingScheme>,
+         <Q:infoset:baseURI>.
 ## IF:Entity
 
 IF:
@@ -940,6 +1017,40 @@ IF:
       For example, calling the <A:Node.childNodes> method might trigger the 
       evaluation.
   
+  @ReAttr:
+    @@Name: baseURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The base URI of this node.
+        \
+        For the <IF:EntityReference> node, it is the 
+        <InfosetP:declaration base URI> of the unexpanded entity 
+        reference information item.
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The absolute base DOM URI.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The DOM implementation was not able to 
+            obtain an absolute URI.
+      @@@Def:
+        @@@@Type:
+          lang:dis
+        @@@@GetProp:
+          infoset:declarationBaseURI
+    @@SpecLevel:3
+    @@Level:3
+    @@Redefine:
+      DOMCore:Node
   @ReAttr:
     @@Name: nodeName
     @@Description:
@@ -1007,8 +1118,13 @@ IF:
          \
          Other available properties: <Q:infoset:declarationBaseURI>, 
          <Q:DOMCore:read-only>, <Q:infoset:parent>, <Q:infoset:children>, 
-         ??:expanded. 
-## IF:EntityReference
+         <Q:ManakaiDOM:isExpanded>, <Q:ManakaiDOM:isExternallyDeclared>, 
+         <Q:ManakaiDOM:isExternalEntity>.
+         \
+         Other available properties (for external entity): 
+         <Q:infoset:baseURI>, <Q:DOMCore:documentURI>, 
+         <Q:infoset:publicIdentifier>, <Q:infoset:systemIdentifier>.
+# IF:EntityReference
 
 IF:
   @Name:  ProcessingInstruction
@@ -1082,6 +1198,38 @@ IF:
               infoset:content
             @@@@@CheckReadOnly:1
   
+  @ReAttr:
+    @@Name: baseURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The base URI of this node.
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The absolute base DOM URI.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The DOM implementation was not able to 
+            obtain an absolute URI.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = $self->{<Q:TreeCore:node>}
+                    ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{contentBaseURI}__
+                                                                      (false);
+    @@SpecLevel:3
+    @@Level:3
+    @@Redefine:
+      DOMCore:Node
   @ReAttr:
     @@Name: nodeName
     @@Description:

@@ -1,3 +1,18 @@
+2004-09-25  Wakaba  <wakaba@suika.fam.cx>
+
+	* dis2pm.pl: Generate TODO list.
+	(method2perl): Use "dis".
+	(disdoc2pod, disdoc2text): 'HTML', 'InfosetP' element types added.
+	(perl_builtin_code): New code 'isRelativeDOMURI' added.
+
+	* ManakaiDOMMain.dis (MDOM_REPLACE_BY_ITSELF_NO_EFFECT): New
+	warning code.
+
+	* dis2pm.pl (attr2perl, method2perl): Output 'undef;' if the 
+	method or attribute(set) does not return a value.
+	(perl_code): New macro 'WHEN' added.  Macro 'INT{}' now allow
+	parameter.
+
 2004-09-24  Wakaba  <wakaba@suika.fam.cx>
 
 	* dis2pm.pl (perl_exception): New 'subtype' parameter added.

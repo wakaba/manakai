@@ -24,7 +24,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/20 13:58:44 $
+     $Date: 2004/09/25 12:58:21 $
   
   @Description:
     @@lang:en
@@ -351,6 +351,16 @@ Warning:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: The parameter name for "refChild" node.
+
+    @@Const:
+      @@@Name: MDOM_REPLACE_BY_ITSELF_NO_EFFECT
+      @@@Type:unsigned-short
+      @@@Value:2
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          An attempt to replace a node by itself is made. 
+          It is no effect by definition.
     
     @@Const:
       @@@Name: MDOM_NS_EMPTY_URI
@@ -717,7 +727,7 @@ IF:
             $r = true;
           }
   @IntMethod:
-    @@Name: orhpanate
+    @@Name: orphanate
     @@Description:
       @@@lang:en
       @@@@:
