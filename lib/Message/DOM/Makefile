@@ -22,39 +22,73 @@ DIS2POD = $(PERL) $(DIS2POD_PL) --output-pod=only
 IDL2DIS_PL = idl2dis.pl
 IDL2DIS = $(PERL) $(IDL2DIS_PL)
 
-DIS_FILES = DOMMain.dis DOMCore.dis DOMXML.dis
+DIS_FILES = DOMMain.dis DOMCore.dis DOMXML.dis \
+  DOMLS.dis ManakaiDOMLS2003.dis \
+  DOMEvents.dis
 
-MAIN_CDIS_FILE = mdom.cdis
-GENERATED_FILES_DOMLATEST = DOMMain.pm DOMCore.pm
+GENERATED_FILES_DOMLATEST = core.cdis ev.cdis ls.cdis \
+  DOMMain.pm DOMCore.pm DOMXML.pm DOMLS.pm ManakaiDOMLS2003.pm \
+  DOMEvents.pm
 GENERATED_FILES = $(MAIN_CDIS_FILE) $(GENERATED_FILES_DOMLATEST)
 
 NS_MANAKAIDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#
 
-all: $(MAIN_CDIS_FILE) dom
+all: dom
 
 dom: dom-latest
-dom-latest: $(MAIN_CDIS_FILE) $(GENERATED_FILES_DOMLATEST) \
-	DOMMain.pm-chk DOMCore.pm-chk
+dom-latest: DOMMain.pm-chk DOMCore.pm-chk \
+	$(GENERATED_FILES_DOMLATEST)
 
-$(MAIN_CDIS_FILE): $(DIS_FILES) $(DISC_PL)
-	$(DISC) DOMMain.dis --output-file-name=$@
+core.cdis: DOMCore.dis DOMMain.dis DOMXML.dis $(DISC_PL)
+	$(DISC) DOMCore.dis --output-file-name=$@
 
-DOMMain.pm: $(MAIN_CDIS_FILE) $(CDIS2PM_PL)
+ev.cdis: core.cdis DOMEvents.dis $(DISC_PL)
+	$(DISC) DOMEvents.dis --input-cdis-file-name=$< \
+                            --output-file-name=$@
+
+ls.cdis: ev.cdis DOMLS.dis ManakaiDOMLS2003.dis $(DISC_PL)
+	$(DISC) DOMLS.dis --input-cdis-file-name=$< \
+	                    --output-file-name=.$@.1.tmp
+	$(DISC) ManakaiDOMLS2003.dis --input-cdis-file-name=.$@.1.tmp \
+	                    --output-file-name=$@
+	$(RM) .$@.1.tmp
+
+DOMMain.pm: core.cdis $(CDIS2PM_PL)
 	$(CDIS2PM) $< --for="$(NS_MANAKAIDOM)ManakaiDOMCommon" \
 	  --module-name=DOMMain > $@
 	$(CDIS2PM) $< --for="$(NS_MANAKAIDOM)ManakaiDOMLatest" \
 	  --module-name=DOMMain >> $@
 
-DOMMain.pm-chk:
-	$(PERL_CHK) DOMMain.pm
+DOMMain.pm-chk: DOMMain.pm
+	$(PERL_CHK) $<
 
-DOMCore.pm: $(MAIN_CDIS_FILE) $(CDIS2PM_PL)
+DOMCore.pm: core.cdis $(CDIS2PM_PL)
 	$(CDIS2PM) $< --for="$(NS_MANAKAIDOM)ManakaiDOMLatest" \
 	  --module-name=DOMCore > $@
 
-DOMCore.pm-chk:
-	$(PERL_CHK) DOMCore.pm
+DOMCore.pm-chk: DOMCore.pm
+	$(PERL_CHK) $<
+
+DOMXML.pm: core.cdis $(CDIS2PM_PL)
+	$(CDIS2PM) $< --for="$(NS_MANAKAIDOM)ManakaiDOMLatest" \
+	  --module-name=DOMXML > $@
+	$(PERL_CHK) $@
+
+DOMEvents.pm: ev.cdis $(CDIS2PM_PL)
+	$(CDIS2PM) $< --for="$(NS_MANAKAIDOM)ManakaiDOMLatest" \
+	  --module-name=DOMEvents > $@
+	$(PERL_CHK) $@
+
+DOMLS.pm: ls.cdis $(CDIS2PM_PL)
+	$(CDIS2PM) $< --for="$(NS_MANAKAIDOM)ManakaiDOMLatest" \
+	  --module-name=DOMLS > $@
+	$(PERL_CHK) $@
+
+ManakaiDOMLS2003.pm: ls.cdis $(CDIS2PM_PL)
+	$(CDIS2PM) $< --for="$(NS_MANAKAIDOM)ManakaiDOMLatest" \
+	  --module-name=ManakaiDOMLS2003 > $@
+	$(PERL_CHK) $@
 	
 clean:
-	$(RM) $(GENERATED_FILES)
+	$(RM) $(GENERATED_FILES) .*.tmp
 

@@ -1,19 +1,6 @@
-Namespace:
-  @ev:
-    http://www.w3.org/2001/xml-events
-  @infoset:
-     http://www.w3.org/2001/04/infoset#
-  @lang:
-     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
-  @license:
-     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
-  @ManakaiDOMCore:
-    http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
-  @ManakaiDOMEvents:
-    http://suika.fam.cx/~wakaba/archive/2004/mdom-ev#
-  @TreeCore:\
 Module:
-  @Name:  DOMEvents
+  @QName: 
+    MDOM:DOMEvents
   @Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/dom/events#
   @BindingName:
@@ -24,79 +11,122 @@ Module:
   @FullName:
     @@lang:en
     @@@: DOM Events Module
+
   @Author:
      @@FullName:  Wakaba
      @@Mail:  w@suika.fam.cx
   @License:
      license:Perl+MPL
-  @Date.RCS:
-     $Date: 2004/10/17 04:46:43 $
+  @Date:
+    @@@:
+      $Date: 2004/12/29 12:17:42 $
+    @@ContentType:
+      dis:Date.RCS
 
-  @ConditionDef:
-    @@Name:DOM2
-  @ConditionDef:
-    @@Name:DOM3
-    @@ISA:DOM2
-  @NormalCondition:DOM3
-
-  @Feature:
-    @@Name:Events
-    @@Version:2.0
-    @@FullName: DOM Level 2 Events
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        The support for <Feature:Core>/<FeatureVer:2.0> is required.
-    @@Condition[list]:
-      DOM2
-      DOM3
-    @@Contrib:
-      DOMCore:DOMImplementation::
-    @@Contrib:
-      DocumentEvent::DOM2
-    @@Contrib:
-      DocumentEvent::DOM3
-    @@Contrib:
-      EventTarget::DOM2
-    @@Contrib:
-      EventTarget::DOM3
-  @Feature:
-    @@Name:Events
-    @@Version:3.0
-    @@FullName: DOM Level 3 Events
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        The support for <Feature:Core>/<FeatureVer:2.0> is required.
-    @@Condition[list]:
-      DOM3
-    @@Contrib:
-      DOMCore:DOMImplementation::
-    @@Contrib:
-      DocumentEvent::DOM3
-    @@Contrib:
-      EventTarget::DOM3
-
+  @DefaultFor:
+    ManakaiDOM:ManakaiDOMLatest
 
   @Require:
      @@Module:
         @@@Name:  DOMCore
-        @@@FileName:
-           @@@@@:  dom.idl
-           @@@@For:
-              lang:IDL-DOM
-        @@@Namespace:
-           http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
-     @@Module:
-        @@@Name:  DOMViews
-        @@@FileName:
-           @@@@@:  views.idl
-           @@@@For:
-              lang:IDL-DOM
-        @@@Namespace:
-           :: TBD ::
+## TODO:
+#     @@Module:
+#        @@@Name:  DOMViews
+    @@Module:
+      @@@Name: DOMEvents
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOM
+    @@Module:
+      @@@Name: DOMEvents
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOM2
+    @@Module:
+      @@@Name: DOMEvents
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOM3
+    @@Module:
+      @@@Name: DOMEvents
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOMLatest
 
-Doc:
+Namespace:
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @ev:
+    http://www.w3.org/2001/xml-events
+  @infoset:
+     http://www.w3.org/2001/04/infoset#
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @ManakaiDOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
+  @ManakaiDOMEvents:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-ev#
+  @MDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
+  @MDOMX:
+    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @Perl:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @TreeCore:\
+
+## -- Features
+
+ElementTypeBinding:
+  @Name: FeatureDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DOMMain:DOMFeature
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+ElementTypeBinding:
+  @Name: FeatureVerDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DOMMain:DOMFeature
+
+ElementTypeBinding:
+  @Name: featureName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ContentType:
+      dis:String
+
+FeatureDef:
+  @featureName: Events
+  @QName: EventsFeature
+  @FeatureVerDef:
+    @@Version:2.0
+    @@FullName: DOM Level 2 Events
+    @@QName: EventsFeature20
+    @@ISA: EventsFeature
+    @@ISA:
+      DOMCore:CoreFeature20
+  @FeatureVerDef:
+    @@Version:3.0
+    @@FullName: DOM Level 3 Events
+    @@QName: EventsFeature30
+    @@ISA: EventsFeature20
+    @@ISA:
+      DOMCore:CoreFeature20
+
+ImplNote:
   @FullName:
     @@lang:en
     @@@: Event Types and Event Categories
@@ -142,7 +172,7 @@ Doc:
       events were strongly recommended to start with 
       some prefix to avoid confusion.
 
-Doc:
+ImplNote:
   @FullName:
     @@lang:en
     @@@: DOM Event Flow
@@ -174,7 +204,7 @@ Doc:
       an ancestor is added or removed, the event propagation 
       will always be based on the nodes determined before the dispatching.
 
-Doc:
+ImplNote:
   @FullName:
     @@lang:en
     @@@: Event Listeners
@@ -233,41 +263,215 @@ Doc:
       \
       }
 
-DataTypeAlias:
-  @Name:  DOMString
-  @Type:
-     DOMMain:DOMString
-DataTypeAlias:
-  @Name:  DOMTimeStamp
-  @Type:
-     DOMMain:DOMTimeStamp
-DataTypeAlias:
-  @Name:  DOMObject
-  @Type:
-     DOMMain:DOMObject
-DataTypeAlias:
-  @Name:  Node
-  @Type:
-     DOMCore:Node
+ElementTypeBinding:
+  @Name: DataTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DataType
+    @@ForCheck:
+      ManakaiDOM:DOM2
 
-Exception:
-  @Name:  EventException
+DataTypeDef:
+  @Name:  DOMString
+  @AliasFor:
+    @@@:
+      DOMMain:DOMString
+    @@For:
+      !ManakaiDOM:IDL
+  @Def:
+    @@For:
+      ManakaiDOM:IDL
+    @@@DISLang:dataTypeAliasFor:
+      DOMMain:DOMString
+DataTypeDef:
+  @Name:  DOMTimeStamp
+  @AliasFor:
+    @@@:
+      DOMMain:DOMTimeStamp
+    @@For:
+      !ManakaiDOM:IDL
+  @Def:
+    @@For:
+      ManakaiDOM:IDL
+    @@@DISLang:dataTypeAliasFor:
+      DOMMain:DOMTimeStamp
+DataTypeDef:
+  @Name:  DOMObject
+  @AliasFor:
+    @@@:
+      DOMMain:DOMObject
+    @@For:
+      !ManakaiDOM:IDL
+  @Def:
+    @@For:
+      ManakaiDOM:IDL
+    @@@DISLang:dataTypeAliasFor:
+      DOMMain:DOMObject
+  @For:
+    ManakaiDOM:DOM3
+DataTypeDef:
+  @Name:  Node
+  @AliasFor:
+    @@@:
+      DOMCore:Node
+    @@For:
+      !ManakaiDOM:IDL
+  @Def:
+    @@For:
+      ManakaiDOM:IDL
+    @@@DISLang:dataTypeAliasFor:
+      DOMCore:Node
+
+ElementTypeBinding:
+  @Name: ExceptionDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@:
+        dis:MultipleResource
+      @@@ForCheck:
+        !ManakaiDOM:ForClass !ManakaiDOM:ForIF
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:ExceptionIF
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:ExceptionClass
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@resourceFor:
+      ManakaiDOM:ForIF
+    @@resourceFor:
+      @@@@:
+        ManakaiDOM:ForClass
+      @@@ForCheck:
+        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:DOM
+    @@ISA:
+      @@@@:
+        ManakaiDOM:ManakaiDOMException
+      @@@ForCheck:
+        ManakaiDOM:ManakaiDOM
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@ISA:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOM
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+      @@@For:
+        ManakaiDOM:ManakaiDOM2
+
+ElementTypeBinding:
+  @Name: L2
+  @ElementType:
+    DOMMain:implementFeature
+  @ShadowContent:
+    @@@: EventsFeature20
+    @@For:
+      ManakaiDOM:DOM2
+  @ShadowSibling:
+    @@DOMMain:implementFeature
+    @@For:
+      ManakaiDOM:DOM3
+
+ElementTypeBinding:
+  @Name: L2IF
+  @ElementType:
+    DOMMain:implementFeature
+  @ShadowContent:
+    @@@: EventsFeature20
+    @@For:
+      ManakaiDOM:DOM2
+  @ShadowSibling:
+    @@DOMMain:implementFeature:
+      @@@@: EventsFeature30
+      @@@For:
+        ManakaiDOM:DOM3
+    @@ISA:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOM2
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+      @@@For:
+        ManakaiDOM:ManakaiDOM3
+    @@For:
+      ManakaiDOM:DOM2
+    @@For:
+      =ManakaiDOM:ManakaiDOM
+
+ElementTypeBinding:
+  @Name: L3
+  @ElementType:
+    DOMMain:implementFeature
+  @ShadowContent:
+    @@@: EventsFeature30
+    @@For:
+      ManakaiDOM:DOM3
+
+ElementTypeBinding:
+  @Name: L3IF
+  @ElementType:
+    DOMMain:implementFeature
+  @ShadowContent:
+    @@@: EventsFeature30
+    @@For:
+      ManakaiDOM:DOM3
+  @ShadowSibling:
+    @@For:
+      ManakaiDOM:DOM3
+    @@For:
+      =ManakaiDOM:ManakaiDOM
+
+ExceptionDef:
+  @Name: 
+    @@@: EventException
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @QName:
+    @@@: ManakaiDOMEventException
+    @@ForCheck:
+      ManakaiDOM:ForClass
+
   @Level[list]:  2
   @SpecLevel[list]:  2
+  @L2IF:
+
   @Attr:
      @@Name:  code
      @@Get:
         @@@Type:
            DOMMain:unsigned-short
-  @ConstGroup:
-     @@Name:  EventExceptionCode
+        @@@actualType: ManakaiDOMEventExceptionCode
+        @@@PerlDef:
+          __CODE{ManakaiDOM:getExceptionCode}__;
+  @XConstGroup:
+     @@QName:
+       @@@@: EventExceptionCode
+       @@@ForCheck:
+         ManakaiDOM:ForIF
+     @@QName:
+       @@@@:ManakaiDOMEventExceptionCode
+       @@@ForCheck:
+         ManakaiDOM:ForClass
      @@Description: 
        @@@lang:en
        @@@@:
          The type of error generated.
-     @@Type:
-        DOMMain:unsigned-short
-     @@Const:
+
+     @@ISA:
+       @@@@:
+         DOMMain:unsigned-short
+       @@@ForCheck:
+         ManakaiDOM:ForClass
+
+     @@XConst:
         @@@Name:  UNSPECIFIED_EVENT_TYPE_ERR
         @@@Type:
            DOMMain:unsigned-short
@@ -277,7 +481,7 @@ Exception:
           @@@@@:
             The event type was not specified or the event type 
             is <DOM:null> or an empty string.
-     @@Const:
+     @@XConst:
         @@@Name:  DISPATCH_REQUEST_ERR
         @@@Type:
            DOMMain:unsigned-short
@@ -289,8 +493,245 @@ Exception:
           @@@@@:
             The <IF:Event> object is already dispatched in the tree.
 
+ElementTypeBinding:
+  @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
+
+ElementTypeBinding:
+  @Name: IF
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@:
+        dis:MultipleResource
+      @@@ForCheck:
+        !ManakaiDOM:ForClass !ManakaiDOM:ForIF
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:IF
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:Class
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@resourceFor:
+      ManakaiDOM:ForIF
+    @@resourceFor:
+      @@@@:
+        ManakaiDOM:ForClass
+      @@@ForCheck:
+        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:DOM
+    @@ISA:
+      @@@@:
+        ManakaiDOM:ManakaiDOMObject
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@ISA:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOM
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+      @@@For:
+        ManakaiDOM:ManakaiDOM2
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+ElementTypeBinding:
+  @Name: IntMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isForInternal: 1
+ElementTypeBinding:
+  @Name: ReMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isRedefining: 1
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethodParameter
+ElementTypeBinding:
+  @Name: Exception
+  @ElementType:
+    ManakaiDOM:raises
+
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethodReturn
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttribute
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+
+ElementTypeBinding:
+  @Name: ReAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttribute
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isRedefining: 1
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttrGet
+ElementTypeBinding:
+  @Name: Set
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttrSet
+ElementTypeBinding:
+  @Name: InCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+
+ElementTypeBinding:
+  @Name: ConstGroup
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:ConstGroup
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+
+ElementTypeBinding:
+  @Name: XConstGroup
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:ConstGroup
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+    @@aliasChild:
+      @@@@: 1
+      @@@For:
+        ManakaiDOM:ManakaiDOM
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOMLatest
+      @@@For:
+        !ManakaiDOM:ManakaiDOM1
+
+ElementTypeBinding:
+  @Name: Const
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: 
+      ManakaiDOM:Const
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+ElementTypeBinding:
+  @Name: XConst
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: 
+      ManakaiDOM:Const
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+    @@aliasChild:
+      @@@@: 1
+      @@@For:
+        ManakaiDOM:ManakaiDOM
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOMLatest
+      @@@For:
+        !ManakaiDOM:ManakaiDOM1
+ElementTypeBinding:
+  @Name: XParam
+  @ElementType:
+    ManakaiDOM:exceptionOrWarningParameter
+  @ShadowContent:
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM
+ElementTypeBinding:
+  @Name: SubTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:ExceptionOrWarningSubType
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:ForClass
+    @@aliasChild:1
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOMLatest
+      @@@For:
+        !ManakaiDOM:ManakaiDOM1
+
+
 IF:
-  @Name:  Event
+  @Name:
+    @@@: Event
+    @@ForCheck:
+      ManakaiDOM:ForIF
+
+  @QName:
+    @@@: ManakaiDOMEvent
+    @@ForCheck:
+      ManakaiDOM:ForClass
+  @Role:
+    DOMEvents:ManakaiDOMEvent::ManakaiDOM:ManakaiDOMLatest
+
+  @L2IF:
+  @Level[list]:  2
+  @SpecLevel[list]:  2  
+
   @Description:
     @@lang:en
     @@@:
@@ -309,19 +750,23 @@ IF:
               use the <M:DocumentEvent.createEvent> method.
     \
       }
-  @Level[list]:  2
-  @SpecLevel[list]:  2
-  
-  @Role:
-    @@@:
-      DOMEvents:Event
-    @@compat:
-      ManakaiDOMEvents:Event
 
   @ConstGroup:
-     @@Name:  PhaseType
-     @@Type:
-        DOMMain:unsigned-short
+     @@QName:
+       @@@@: PhaseType
+       @@@ForCheck:
+         ManakaiDOM:ForIF
+
+     @@QName:
+       @@@@: ManakaiDOMPhaseType
+       @@@ForCheck:
+         ManakaiDOM:ForClass
+     @@ISA:
+       @@@@:
+         DOMMain:unsigned-short
+       @@@ForCheck:
+         ManakaiDOM:ForClass
+
      @@Description:
        @@@lang:en
        @@@@:
@@ -359,6 +804,14 @@ IF:
        @@@lang:en
        @@@@:
          The event type.
+     @@DOMEvents:isNSAware:
+       @@@@:1
+       @@@For:
+         ManakaiDOM:DOM3
+     @@DOMEvents:isNSUnaware:
+       @@@@:1
+       @@@For:
+         !ManakaiDOM:DOM3
      @@Get:
         @@@Type:  DOMString
         @@@Description:
@@ -394,7 +847,7 @@ IF:
               The <A:type> should be an XML Namespace 1.0 <XML:NCName> 
               in DOM Level 3 Events.
        @@@Def:
-         @@@@Type:
+         @@@@ContentType:
            lang:dis
          @@@@GetProp:
            infoset:localName
@@ -407,7 +860,7 @@ IF:
      @@Get:
         @@@Type:  EventTarget
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetProp:
             DOMEvents:target
@@ -421,7 +874,7 @@ IF:
      @@Get:
         @@@Type:  EventTarget
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetProp:
             DOMEvents:currentTarget
@@ -432,12 +885,14 @@ IF:
        @@@@:
          Which phase of event flow is currently being accomplished.
      @@Get:
-        @@@Type: PhaseType
+        @@@Type: 
+          DOMMain:unsigned-short
+        @@@actualType: ManakaiDOMPhaseType
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetProp:
-            DOMEvents:PhaseType
+            DOMEvents:eventPhase
   @Attr:
      @@Name:  bubbles
      @@Description:
@@ -458,7 +913,7 @@ IF:
              @@@@@lang:en
              @@@@@@: The event cannot bubble.
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetProp:
             DOMEvents:bubbles
@@ -482,7 +937,7 @@ IF:
              @@@@@lang:en
              @@@@@@: The default action cannot be prevented.
        @@@Def:
-         @@@@Type:
+         @@@@ContentType:
            lang:dis
          @@@@GetProp:
            DOMEvents:cancelable
@@ -506,7 +961,7 @@ IF:
             @@@@@@:
               The time is not available.
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetProp:
             DOMEvents:timeStamp
@@ -525,12 +980,10 @@ IF:
        \
          }
      @@Return:  
-       @@@Def:
-         @@@@Type:
-           lang:Perl
+       @@@PerlDef:
          @@@@@:
-           $self->{<Q:TreeCore:node>}
-                ->{<Q:DOMEvents:isPropagationStopped>} = true;
+           $self->{<Q::TreeCore:node>}
+                ->{<Q::DOMEvents:isPropagationStopped>} = true;
          @@@@ImplNote:
            @@@@@lang:en
            @@@@@@:
@@ -551,12 +1004,10 @@ IF:
        \
          }
      @@Return: 
-       @@@Def:
-         @@@@Type:
-           lang:Perl
+       @@@PerlDef:
          @@@@@:
-           $self->{<Q:TreeCore:node>}
-                ->{<Q:DOMEvents:isDefaultPrevented>} = true;
+           $self->{<Q::TreeCore:node>}
+                ->{<Q::DOMEvents:isDefaultPrevented>} = true;
          @@@@ImplNote:
            @@@@@lang:en
            @@@@@@:
@@ -581,7 +1032,8 @@ IF:
          a subclass of the <IF:Event> interface, only the values 
          specified in this method are modified; all other attributes 
          are left unchanged.
-     @@NSVersion:initEventNS
+     @@DOMEvents:isNSUnaware:1
+     @@DOMEvents:NSVariant:.initEventNS
      @@Param:
         @@@Name:  eventTypeArg
         @@@Type:  DOMString
@@ -623,16 +1075,13 @@ IF:
         @@@InCase:
            @@@@Value:  false
      @@Return: 
-       @@@Def:
-         @@@@Type:
-           lang:Perl
-         @@@@@:
-           my $node = $self->{<Q:TreeCore:node>};
-           unless ($node->{<Q:DOMEvents:isDispatched>}) {
-             $node->{<Q:infoset:namespaceName>} = null;
-             $node->{<Q:infoset:localName>} = $eventTypeArg;
-             $node->{<Q:DOMEvents:bubbles>} = $canBubbleArg;
-             $node->{<Q:DOMEvents:cancelable>} = $cancelableArg;
+       @@@PerlDef:
+           my $node = $self->{<Q::TreeCore:node>};
+           unless ($node->{<Q::DOMEvents:isDispatched>}) {
+             $node->{<Q::infoset:namespaceName>} = null;
+             $node->{<Q::infoset:localName>} = $eventTypeArg;
+             $node->{<Q::DOMEvents:bubbles>} = $canBubbleArg;
+             $node->{<Q::DOMEvents:cancelable>} = $cancelableArg;
            }
   @Attr:
      @@Name:  namespaceURI
@@ -640,8 +1089,11 @@ IF:
        @@@lang:en
        @@@@:
          The namespace URI associated with this event.
+     @@DOMEvents:isNSAware:1
      @@Get:
         @@@Type: 
+          DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMNamespaceURI
         @@@InCase:
           @@@@Value:
@@ -656,13 +1108,15 @@ IF:
               \
               }
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetProp:
             infoset:namespaceName
-     @@NoNSVersion[list]:type 
      @@Level[list]:  3
      @@SpecLevel[list]:  3
+     @@L3:
+     @@For:
+       ManakaiDOM:DOM3
   @Method:
      @@Name:  isCustom
      @@Description:
@@ -685,10 +1139,12 @@ IF:
              @@@@@@:
                The event object does not implement the 
                <IF:CustomEvent> interface.
-        @@@Def:\
+        @@@PerlDef: \
      @@Level[list]:  3
      @@SpecLevel[list]:  3
-     @@RedefinedBy:CustomEvent
+     @@L3:
+     @@For:
+       ManakaiDOM:DOM3
   @Method:
      @@Name:  stopImmediatePropagation
      @@Description:
@@ -702,14 +1158,14 @@ IF:
        \
          }
      @@Return:  
-       @@@Def:
-         @@@@Type:
-           lang:Perl
-         @@@@@:
-           $self->{<Q:TreeCore:node>}
-                ->{<Q:DOMEvents:isImmediatePropagationStopped>} = true;
+       @@@PerlDef:
+         $self->{<Q::TreeCore:node>}
+              ->{<Q::DOMEvents:isImmediatePropagationStopped>} = true;
      @@Level[list]:  3
      @@SpecLevel[list]:  3
+     @@L3:
+     @@For:
+       ManakaiDOM:DOM3
   @Method:
      @@Name:  isDefaultPrevented
      @@Description:
@@ -732,12 +1188,15 @@ IF:
              @@@@@@:
                The <M:Event.preventDefault> method has not been called.
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetProp:
             DOMEvents:isDefaultPrevented
      @@Level[list]:  3
      @@SpecLevel[list]:  3
+     @@L3:
+     @@For:
+       ManakaiDOM:DOM3
   @Method:
      @@Name:  initEventNS
      @@Description:
@@ -756,10 +1215,13 @@ IF:
          a subclass of the <IF:Event> interface, only the values 
          specified in this method are modified; all other attributes 
          are left unchanged.
-     @@NoNSVersion:initEvent
+     @@DOMEvents:noNSVariant:.initEvent
+     @@DOMEvents:isNSAware:1
      @@Param:
         @@@Name:  namespaceURIArg
         @@@Type: 
+          DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
@@ -810,23 +1272,79 @@ IF:
         @@@InCase:
            @@@@Value:  false
      @@Return: 
-       @@@Def:
-         @@@@Type:
-           lang:Perl
-         @@@@@:
-           my $node = $self->{<Q:TreeCore:node>};
-           unless ($node->{<Q:DOMEvents:isDispatched>}) {
-             $node->{<Q:infoset:namespaceName>} = $namespaceURIArg;
-             $node->{<Q:infoset:localName>} = $eventTypeArg;
-             $node->{<Q:DOMEvents:bubbles>} = $canBubbleArg;
-             $node->{<Q:DOMEvents:cancelable>} = $cancelableArg;
+       @@@PerlDef:
+           my $node = $self->{<Q::TreeCore:node>};
+           unless ($node->{<Q::DOMEvents:isDispatched>}) {
+             $node->{<Q::infoset:namespaceName>} = $namespaceURIArg;
+             $node->{<Q::infoset:localName>} = $eventTypeArg;
+             $node->{<Q::DOMEvents:bubbles>} = $canBubbleArg;
+             $node->{<Q::DOMEvents:cancelable>} = $cancelableArg;
            }
      @@Level[list]:  3
      @@SpecLevel[list]:  3
+     @@L3:
+     @@For:
+       ManakaiDOM:DOM3
 ##IF:Events
 
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdfs:Property
+
+PropDef:
+  @QName: isNSAware
+  @Description:
+    @@lang:en
+    @@@:
+      Whether a subject resource is namespace aware or not. 
+      Namespaces for event types are introduced in DOM Level 3.
+  @dataType:
+    dis:Boolean
+PropDef:
+  @QName: isNSUnaware
+  @Description:
+    @@lang:en
+    @@@:
+      Whether a subject resource is namespace unware or not. 
+      Namespaces for event types are introduced in DOM Level 3.
+PropDef:
+  @QName: NSVariant
+  @Description:
+    @@lang:en
+    @@@:
+      A namespace aware variant of subject resource.
+  @dataType:
+    DISPerl:MemRef
+PropDef:
+  @QName: noNSVariant
+  @Description:
+    @@lang:en
+    @@@:
+      A namespace unaware variant of subject resource.
+  @dataType:
+    DISPerl:MemRef
+
 IF:
-  @Name:  EventTarget
+  @Name:
+    @@@: EventTarget
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  
+  @QName:
+    @@@: ManakaiDOMEventTarget
+    @@ForCheck:
+      ManakaiDOM:ForClass
+  @Role:
+    DOMCore:ManakaiDOMNode::ManakaiDOM:ManakaiDOMLatest
+
+  @L2IF:
+  @Level[list]:  2
+  @SpecLevel[list]:  2
+
   @Description:
     @@lang:en
     @@@:
@@ -845,14 +1363,6 @@ IF:
               affect event listeners.
     \
       }
-  @Level[list]:  2
-  @SpecLevel[list]:  2
-
-  @Role:
-    @@@:
-      DOMCore:Node
-    @@compat:
-      ManakaiDOMCore:Node
   
   @ImplNote:
     @@lang:en
@@ -875,7 +1385,8 @@ IF:
          the triggering order or to guarantee that an event listener 
          will be added to the event target for the specified 
          event group, invoke <M:removeEventListenerNS> first.
-     @@NSVersion:addEventListenerNS
+     @@DOMEvents:isNSAware:1
+     @@DOMEvents:NSVariant:.addEventListenerNS
      @@Param:
         @@@Name:  type
         @@@Type:  DOMString
@@ -910,11 +1421,8 @@ IF:
                The event listener will be triggered during 
                the target and bubbling phases.
      @@Return:  
-       @@@Def:
-         @@@@Type:
-           lang:Perl
-         @@@@@:
-           my $ev = $self->{<Q:TreeCore:node>}->{<Q:DOMEvents:eventListener>}
+       @@@PerlDef:
+           my $ev = $self->{<Q::TreeCore:node>}->{<Q::DOMEvents:eventListener>}
                          ->{$type}->[$useCapture ? 1 : 0] ||= [];
            REGISTER: {
              for (@$ev) {
@@ -926,8 +1434,7 @@ IF:
                }
              }
              if (ref $listener eq 'CODE') {
-                                ## Conditional
-               $listener = __CLASS{EventListener}__::__INT{newByCODE}__
+               $listener = <ClassM::ManakaiDOMEventListener.newByCODE>
                                   ($listener);
              }
              push @$ev, {
@@ -955,7 +1462,8 @@ IF:
          arguments and that has a namespace URI, this method 
          could remove any or none of those listeners - the 
          result is implementation dependent.
-     @@NSVersion:removeEventListenerNS
+     @@DOMEvents:isNSAware:1
+     @@DOMEvents:NSVariant:removeEventListenerNS
      @@Param:
         @@@Name:  type
         @@@Type:  DOMString
@@ -1003,16 +1511,13 @@ IF:
           @@@@@@:
             TODO: A warning about NS required.
      @@Return:  
-       @@@Def:
-         @@@@Type:
-           lang:Perl
-         @@@@@:
-           my $ev = $self->{<Q:TreeCore:node>}->{<Q:DOMEvents:eventListener>}
+       @@@PerlDef:
+           my $ev = $self->{<Q::TreeCore:node>}->{<Q::DOMEvents:eventListener>}
                          ->{$type}->[$useCapture ? 1 : 0] ||= [];
            for (0..$#$ev) {
              if (not defined $ev->[$_]->{namespaceURI} and
                  $ev->[$_]->{eventListener} eq $listener) {
-               delete $ev->[$_];
+               CORE::delete $ev->[$_];
                last;
              }
            }
@@ -1059,7 +1564,7 @@ IF:
                The <IF:Event.type> is not specified or its value 
                is <DOM:null> or an empty string.
            @@@@SpecLevel:2
-        @@@Exeption:
+        @@@Exception:
           @@@@Name:DISPATCH_REQUEST_ERR
           @@@@Type:EventException
           @@@@Description:
@@ -1116,10 +1621,13 @@ IF:
          the triggering order or to guarantee that an event listener 
          will be added to the event target for the specified 
          event group, invoke <M:removeEventListenerNS> first.
-     @@NoNSVersion:addEventListener
+     @@DOMEvents:isNSAware:1
+     @@DOMEvents:noNSVariant:.addEventListener
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:  
+          DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
@@ -1173,11 +1681,8 @@ IF:
             @@@@@@:
               The event listener is attached to the default group.
      @@Return:  
-       @@@Def:
-         @@@@Type:
-           lang:Perl
-         @@@@@:
-           my $ev = $self->{<Q:TreeCore:node>}->{<Q:DOMEvents:eventListener>}
+       @@@PerlDef:
+           my $ev = $self->{<Q::TreeCore:node>}->{<Q::DOMEvents:eventListener>}
                          ->{$type}->[$useCapture ? 1 : 0] ||= [];
            REGISTER: {
              for (@$ev) {
@@ -1191,8 +1696,7 @@ IF:
                }
              }
              if (ref $listener eq 'CODE') {
-                                ## Conditional
-               $listener = __CLASS{EventListener}__::__INT{newByCODE}__
+               $listener = <ClassM::ManakaiDOMEventListener.newByCODE>
                                   ($listener);
              }
              push @$ev, {
@@ -1203,6 +1707,9 @@ IF:
            }#REGISTER
      @@Level[list]:  3
      @@SpecLevel[list]:  3
+     @@For:
+       ManakaiDOM:DOM3
+     @@L3:
   @Method:
      @@Name:  removeEventListenerNS
      @@Description:
@@ -1211,10 +1718,13 @@ IF:
          Remove an event listener.
          If arguments do not identify any currently registered 
          <IF:EventListener>, the method call has no effect.
-     @@NoNSVersion:removeEventListener
+     @@DOMEvents:isNSAware:1
+     @@DOMEvents:noNSVariant:.removeEventListener
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:  
+          DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
@@ -1264,11 +1774,8 @@ IF:
                The event listener to remove was registered for 
                the target and bubbling phases.
      @@Return:  
-       @@@Def:
-         @@@@Type:
-           lang:Perl
-         @@@@@:
-           my $ev = $self->{<Q:TreeCore:node>}->{<Q:DOMEvents:eventListener>}
+       @@@PerlDef:
+           my $ev = $self->{<Q::TreeCore:node>}->{<Q::DOMEvents:eventListener>}
                          ->{$type}->[$useCapture ? 1 : 0] ||= [];
            for (0..$#$ev) {
              if (((defined $ev->[$_]->{namespaceURI} and
@@ -1283,6 +1790,9 @@ IF:
            }
      @@Level[list]:  3
      @@SpecLevel[list]:  3
+     @@For:
+       ManakaiDOM:DOM3
+     @@L3:
   @Method:
      @@Name:  willTriggerNS
      @@Description:
@@ -1293,10 +1803,12 @@ IF:
          triggered by the specified event type during the 
          dispatch of the event to this <IF:EventTarget> 
          or one of its descendants.
-     @@NoNSVersion[list]:
+     @@DOMEvents:isNSAware:1
      @@Param:
         @@@Name:  namespaceURI
         @@@Type: 
+          DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
@@ -1324,6 +1836,9 @@ IF:
                No event listener will be triggered.
      @@Level[list]:  3
      @@SpecLevel[list]:  3
+     @@For:
+       ManakaiDOM:DOM3
+     @@L3:
   @Method:
      @@Name:  hasEventListenerNS
      @@Description:
@@ -1331,9 +1846,12 @@ IF:
        @@@@:
          Return whether this <IF:EventTarget> contains an 
          event listener registered for the specified event type.
+     @@DOMEvents:isNSAware:1
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:  
+          DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
@@ -1361,11 +1879,8 @@ IF:
              @@@@@lang:en
              @@@@@@:
                No event listener is registered.
-        @@@Def:
-          @@@@Type:
-            lang:Perl
-          @@@@@:
-            for (@{$self->{<Q:TreeCore:node>}->{<Q:DOMEvents:eventListener>}
+        @@@PerlDef:
+            for (@{$self->{<Q::TreeCore:node>}->{<Q::DOMEvents:eventListener>}
                                              ->{$type}||[]}) {
               if (@$_) {
                 $r = true;
@@ -1374,10 +1889,27 @@ IF:
             }
      @@Level[list]:  3
      @@SpecLevel[list]:  3
+     @@For:
+       ManakaiDOM:DOM3
+     @@L3:
 ##IF:EventTarget
 
 IF:
-  @Name:  EventListener
+  @Name:
+    @@@: EventListener
+    @@ForCheck:
+      ManakaiDOM:ForIF
+
+  @QName:
+    @@@: ManakaiDOMEventListener
+    @@ForCheck:
+      ManakaiDOM:ForClass
+  @ISA:
+    @@@:
+      Perl:CODE
+    @@ForCheck:
+      ManakaiDOM:ForClass
+
   @Description:
     @@lang:en
     @@@:
@@ -1397,14 +1929,13 @@ IF:
     @@@:
       In the ECMAScript binding, an <IF:EventListener> is 
       a function with a parameter <P:evt>.
+
   @Level[list]:  2
   @SpecLevel[list]:  2
-  @IsAbstract:1
-  @IsFinal:-1
-  @ImplByApp:1
+  @L2IF:
+
   @Method:
      @@Name:  handleEvent
-     @@IsAbstract:1
      @@Description:
        @@@lang:en
        @@@@:
@@ -1418,15 +1949,13 @@ IF:
           @@@@@:
             The contextual information about the event.
      @@Return:  
-       @@@Type:
-         lang:Perl
-       @@@@:
+       @@@PerlDef:
          $self->($evt);
   @IntMethod:
     @@Name:isSameEventListener
     @@Operator:
       @@@@:eq
-      @@@Type:
+      @@@ContentType:
         lang:Perl
     @@Description:
       @@@lang:en
@@ -1438,19 +1967,12 @@ IF:
     @@Return:
       @@@Type:
         DOMMain:boolean
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
+      @@@PerlDef:
           if (ref $listener eq 'CODE') {
             $r = overload::Overloaded ($self) eq $listener ? true : false;
           } elsif (not ref $listener) {
             $r = false;
-          } elsif ($listener->isa ('__IIF{EventListener}__')) {
-            $r = overload::Overloaded ($self) eq
-                 overload::Overloaded ($listener) ? true : false;
           } else {
-          #} elsif ($listener->isa ('__IF{EventListener}__')) {
             $r = overload::Overloaded ($self) eq $listener ? true : false;
           }
   @IntMethod:
@@ -1463,7 +1985,7 @@ IF:
     @@Param:
       @@@Name:code
       @@@Type:
-        DOMMain:Object
+        Perl:CODE
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1477,19 +1999,37 @@ IF:
           }
     @@Return:
       @@@Type:EventListener
+      @@@actualType: ManakaiDOMEventListener
       @@@Description:
         @@@@lang:en
         @@@@@:
           The newly created event listener.
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          $r = bless $code, ref $self ? ref $self : $self;
+      @@@PerlDef:
+        $r = bless $code, ref $self ? ref $self : $self;
 ##IF:EventListener
 
 IF:
-  @Name:  DocumentEvent
+  @Name:
+    @@@: DocumentEvent
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  
+  @QName:
+    @@@: ManakaiDOMDocumentEvent
+    @@ForCheck:
+      ManakaiDOM:ForClass
+  @ISA:
+    @@@:
+      DOMCore:ManakaiDOMDocument
+    @@ForCheck:
+      ManakaiDOM:ForClass
+  @Role:
+    DOMCore:ManakaiDOMDocument::ManakaiDOM:ManakaiDOMLatest
+
+  @Level[list]:  2
+  @SpecLevel[list]:  2
+  @L2IF:
+
   @Description:
     @@lang:en
     @@@:
@@ -1506,14 +2046,6 @@ IF:
       this interface must be returned by invoking the method 
       <M:Node.getFeature> with arguements <DOM:+Events> and 
       <FeatureVer:3.0> on the <IF:Document> object.
-  @Role:
-    @@@:
-      DOMCore:Document
-    @@compat:
-      ManakaiDOMCore:Document
-
-  @Level[list]:  2
-  @SpecLevel[list]:  2
 
   @Method:
      @@Name:  createEvent
@@ -1620,10 +2152,12 @@ IF:
        @@@@:
          Test if the DOM implementation can generate events 
          of a specified type.
-     @@NoNSVersion[list]:
+     @@DOMEvents:isNSAware:1
      @@Param:
         @@@Name:  namespaceURI
         @@@Type: 
+          DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
@@ -1653,10 +2187,34 @@ IF:
                the event type specified.
      @@Level[list]:  3
      @@SpecLevel[list]:  3
+     @@For:
+       ManakaiDOM:DOM3
+     @@L3:
 ##IF:DocumentEvent
 
 IF:
-  @Name:  CustomEvent
+  @Name:
+    @@@: CustomEvent
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @ISA:
+    @@@: Event
+    @@ForCheck:
+      ManakaiDOM:ForIF
+
+  @QName:
+    @@@: ManakaiDOMCustomEvent
+    @@ForCheck:
+      ManakaiDOM:ForClass
+  @ISA:
+    @@@: ManakaiDOMEvent
+    @@ForCheck:
+      ManakaiDOM:ForClass
+
+  @Level[list]:  3
+  @SpecLevel[list]:  3
+  @L3IF:
+
   @Description:
     @@lang:en
     @@@:
@@ -1687,10 +2245,7 @@ IF:
               the <M:Event.isCustom> method returning <DOM:true>.
       \
       }
-  @ISA:  Event
 
-  @Level[list]:  3
-  @SpecLevel[list]:  3
   @Method:
      @@Name:  setDispatchState
      @@Description:
@@ -1708,20 +2263,19 @@ IF:
           @@@@@: The new event target.
      @@Param:
         @@@Name:  phase
-        @@@Type: PhaseType
+        @@@Type: 
+          DOMMain:unsigned-short
+        @@@actualType:ManakaiDOMPhaseType
         @@@Description:
           @@@@lang:en
           @@@@@: The event phase.
      @@Return:  
-        @@@Def:
-          @@@@Type:
-            lang:Perl
-          @@@@@:
-            for ($self->{<Q:TreeCore:node>}) {
-              $_->{<Q:DOMEvents:currentTarget>} = $target;
-              $_->{<Q:DOMEvents:phase>} = $phase;
-              $_->{<Q:DOMEvents:isPropagationStopped>} = false;
-              $_->{<Q:DOMEvents:isImmediatePropagationStopped>} = false;
+        @@@PerlDef:
+            for ($self->{<Q::TreeCore:node>}) {
+              $_->{<Q::DOMEvents:currentTarget>} = $target;
+              $_->{<Q::DOMEvents:phase>} = $phase;
+              $_->{<Q::DOMEvents:isPropagationStopped>} = false;
+              $_->{<Q::DOMEvents:isImmediatePropagationStopped>} = false;
             }
   @Method:
      @@Name:  isPropagationStopped
@@ -1742,7 +2296,7 @@ IF:
         @@@InCase:
            @@@@Value:  false
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetProp:
             DOMEvents:isPropagationStopped
@@ -1771,7 +2325,7 @@ IF:
         @@@InCase:
            @@@@Value:  false
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetProp:
             DOMEvents:isImmediatePropagationStopped
@@ -1784,9 +2338,7 @@ IF:
     @@Return:
       @@@Type:
         DOMMain:boolean
-      @@@Def:
-        @@@@Type:
-          lang:Perl
+      @@@PerlDef:
         @@@@@:$r=true;
       @@@ImplNote:
         @@@@lang:en
@@ -1794,6 +2346,9 @@ IF:
           This method must returns <DOM:true>.
     @@SpecLevel:3
     @@Level:3
+    @@For:
+      ManakaiDOM:DOM3
+    @@L3:
 ##IF:CustomEvent
 
 ## DOMEvents.dis ends here

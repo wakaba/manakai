@@ -8,6 +8,7 @@ use Message::Util::QName::Filter {
   DISPerl => q<http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#>,
   disPerl => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl-->,
   DOMCore => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#>,
+  DOMEvents => q<http://suika.fam.cx/~wakaba/archive/2004/dom/events#>,
   DOMMain => q<http://suika.fam.cx/~wakaba/archive/2004/dom/main#>,
   DOMXML => q<http://suika.fam.cx/~wakaba/archive/2004/dom/xml#>,
   lang => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#>,
@@ -1299,6 +1300,10 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
            dis_typeforuris_to_uri
                 (ExpandedURI q<DOMCore:ManakaiDOMText>,
                  ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>, %opt) => 1,
+
+           dis_typeforuris_to_uri
+                (ExpandedURI q<DOMEvents:ManakaiDOMEvent>,
+                 ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>, %opt) => 1,
           }->{$_->{Role}}) {
         unless ($feature) {
           $feature = {};
@@ -1545,18 +1550,8 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
               } else {
                 $nm = '';
               }
-              my $default = dispm_get_value
-                           (%opt, resource => $setter,
-                            ExpandedURI q<dis2pm:ValueKeyName>
-                                => ExpandedURI q<d:DefaultValue>,
-                            ExpandedURI q<dis2pm:useDefaultValue> => 1,
-                            ExpandedURI q<dis2pm:valueType>
-                              => $getter->{ExpandedURI q<d:actualType>});
               $set_code = $nm .
-                          perl_statement
-                            (defined $default ? 'my $r = '.$default : 'my $r').
-                          $set_code. "\n" .
-                          perl_statement ('$r');
+                          $set_code. "\n";
             } else { ## Set code not defined
               $set_code = perl_statement
                       dispm_perl_throws

@@ -15,7 +15,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/19 10:57:49 $
+      $Date: 2004/12/29 12:17:42 $
     @@ContentType:
       dis:Date.RCS
   
@@ -118,6 +118,19 @@ TreeElementType:
     @@lang:en
     @@@:
       Returns a constant value.
+
+TreeElementType:
+  @Name: dataTypeAliasFor
+  @rdf:type:
+    rdfs:Property
+  @Description:
+    @@lang:en
+    @@@:
+      Declares the subject resource is an alias for the object resource.
+  @rdfs:range:
+    ManakaiDOM:DataType
+  @rdfs:domain:
+    ManakaiDOM:DataType
 
 TreeElementType:
   @Name: value

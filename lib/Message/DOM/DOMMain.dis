@@ -28,7 +28,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/29 04:49:48 $
+      $Date: 2004/12/29 12:17:42 $
     @@ContentType:
       dis:Date.RCS
   
@@ -73,6 +73,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @dis2pm:
     http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
+  @DOMEvents:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/events#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @infoset:
@@ -208,6 +210,12 @@ ForDef:
   @FullName:
     @@lang:en
     @@@: For Java binding
+ForDef:
+  @QName:
+    ManakaiDOM:ECMAScript
+  @FullName:
+    @@lang:en
+    @@@: For ECMAScript binding
 
 ## For the Document Object Model
 
@@ -1132,6 +1140,10 @@ PropDef:
       \
       {P:: Currently, its values includes: 
       \
+        - <CODE::DOMEvents:ManakaiDOMEvent::ManakaiDOM:ManakaiDOMLatest>::: 
+            Classes that should be available via 
+            <M::DOMEvents:ManakaiDOMDocumentEvent.createEvent>.
+      \
         - <CODE::DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM>::: 
             Classes that might be available via <IF::DOMImplementationRegistry>, 
             <IF::DOMCore:DOMImplementationSource> or 
@@ -1253,6 +1265,13 @@ DataTypeDef:
     @@lang:en
     @@@: 
       <PerlModule::Message::Util::Formatter> template
+
+DataTypeDef:
+  @QName:
+    lang:ECMAScript
+  @FullName:
+    @@lang:en
+    @@@: ECMAScript code
 
 ## -- Obsolete properties
 
@@ -1650,6 +1669,16 @@ IDLDataTypeDef:
   @FullName:
     @@lang:en
     @@@: Unsigned short integer
+
+IDLDataTypeDef:
+  @QName: short
+  @Def:
+    @@ContentType:
+      lang:IDL-DOM
+    @@@: short
+  @FullName:
+    @@lang:en
+    @@@: Signed short integer
 
 IDLDataTypeDef:
   @Name: float
@@ -4058,6 +4087,7 @@ WarningDef:
       ManakaiDOM:ConstGroup
     @@ISA: 
       DOMMain:unsigned-short
+    @@Type: unsigned-short
     @@aliasChild:1
     @@AliasFor:
       @@@@:
@@ -4159,6 +4189,57 @@ WarningDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: The parameter to which inappropriate value is specified.
+
+    @@XConst:
+      @@@QName:
+        MDOMX:BAD_BASE_URI
+      @@@Value:5
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Malformed base URI reference is specified.
+      @@@SubTypeDef:
+        @@@@QName:
+          MDOMX:NULL_BASE_URI
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The specified base URI reference is <DOM::null>. 
+      @@@SubTypeDef:
+        @@@@QName:
+          MDOMX:RELATIVE_BASE_URI
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The specified base URI reference is a relative URI reference.
+        @@@@XParam:
+          @@@@@QName:
+            infoset:baseURI
+          @@@@@Type:
+            ManakaiDOM:ManakaiDOMURI
+          @@@@@Description:
+            @@@@@@lang:en
+            @@@@@@@:
+              The specified relative base URI reference.
+
+    @@XConst:
+      @@@QName:
+        MDOMX:RELATIVE_URI
+      @@@Value: 6
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A relative URI reference is specified; the result is 
+          implementation dependent.
+      @@@XParam:
+        @@@@QName:
+          MDOMX:uri
+        @@@@Type:
+          ManakaiDOM:ManakaiDOMURI
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The specified URI reference.
 
 ## -- Frequently used code fragments
 

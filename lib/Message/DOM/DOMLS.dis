@@ -1,18 +1,6 @@
-Namespace:
-  @infoset:
-     http://www.w3.org/2001/04/infoset#
-  @lang:
-     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
-  @license:
-     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
-  @LSEV:
-    http://www.w3.org/2002/DOMLS
-  @ManakaiDOMCore:
-    http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
-  @ManakaiDOMLS:
-    http://suika.fam.cx/~wakaba/archive/2004/mdom-ls#
 Module:
-  @Name: DOMLS
+  @QName: 
+    MDOM:DOMLS
   @Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
   @BindingName:
@@ -23,6 +11,7 @@ Module:
   @FullName:
     @@@: DOM Load and Save Module
     @@@@lang:en
+
   @Description:
     @@lang:en
     @@@:
@@ -37,70 +26,123 @@ Module:
      @@Mail: w@suika.fam.cx
   @License:
      license:Perl+MPL
-  @Date.RCS:
-     $Date: 2004/10/11 10:37:12 $
+  @Date:
+    @@@:
+      $Date: 2004/12/29 12:17:42 $
+    @@ContentType:
+      dis:Date.RCS
 
-  @ConditionDef:
-    @@Name:DOM3
-  
-  @Feature:
-    @@Name:LS
-    @@Version:3.0
-    @@FullName:
-      @@@lang:en
-      @@@@:
-        DOM Load and Save Module Fundamental Interfaces, Level 3.
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        Support of <Feature:Core>/<FeatureVer:2.0> is required.
-    @@Condition:DOM3
-    @@Contrib:
-      DOMImplementationLS::DOM3
-
-  @Feature:
-    @@Name:LS-Async
-    @@Version:3.0
-    @@FullName:
-      @@@lang:en
-      @@@@:
-        DOM Load and Save Module Fundamental Interfaces, Level 3 
-        (asynchronous mode).
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        Support of <Feature:LS>/<FeatureVer:3.0> is required.
-    @@Condition:DOM3
-    #@@Contribute:
-    #  DOMImplementationLS::DOM3
+  @@DefaultFor:
+    ManakaiDOM:ManakaiDOMLatest
 
   @Require:
      @@Module:
         @@@Name:  DOMCore
-        @@@FileName:
-           @@@@@:  dom.idl
-           @@@@Type:
-              lang:IDL-DOM
-        @@@Namespace:
-           http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
      @@Module:
         @@@Name:  DOMEvents
-        @@@FileName:
-           @@@@@:  events.idl
-           @@@@Type:
-              lang:IDL-DOM
-        @@@Namespace:
-           :: TBD ::
-     @@Module:
-        @@@Name:  DOMTraversal
-        @@@FileName:
-           @@@@@:  traversal.idl
-           @@@@Type:
-              lang:IDL-DOM
-        @@@Namespace:
-           :: TBD ::
+## TODO: Implement these modules
+#     @@Module:
+#        @@@Name:  DOMTraversal
+    @@Module:
+      @@@Name: DOMLS
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOM
+    @@Module:
+      @@@Name: DOMLS
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOM3
+    @@Module:
+      @@@Name: DOMLS
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOMLatest
 
-## Basic Types
+Namespace:
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @infoset:
+     http://www.w3.org/2001/04/infoset#
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @LSEV:
+    http://www.w3.org/2002/DOMLS
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @ManakaiDOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
+  @ManakaiDOMLS:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-ls#
+  @MDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
+  @MDOMX:
+    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @Perl:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+
+## -- Features
+
+ElementTypeBinding:
+  @Name: FeatureDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DOMMain:DOMFeature
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+ElementTypeBinding:
+  @Name: FeatureVerDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DOMMain:DOMFeature
+
+ElementTypeBinding:
+  @Name: featureName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ContentType:
+      dis:String
+
+FeatureDef:
+  @featureName: LS
+  @QName: LSFeature
+  @FeatureVerDef:
+    @@Version:3.0
+    @@QName: LSFeature30
+    @@ISA: LSFeature
+    @@ISA: 
+      DOMCore:CoreFeature20
+    @@FullName:
+      @@@lang:en
+      @@@@:
+        DOM Load and Save Module Fundamental Interfaces, Level 3
+
+FeatureDef:
+  @featureName: LS-Async
+  @QName: LSAsyncFeature
+  @FeatureVerDef:
+    @@Version:3.0
+    @@QName: LSAsyncFeature30
+    @@ISA: LSAsyncFeature
+    @@ISA: LSFeature30
+    @@FullName:
+      @@@lang:en
+      @@@@:
+        DOM Load and Save Module Fundamental Interfaces, Level 3 
+        (asynchronous mode)
+
+## -- Basic Types
 
 ImplNote:
   @lang:en
@@ -108,105 +150,221 @@ ImplNote:
     Basic types are specified to ensure interoperability.  Bindings 
     may use different types.
 
-DataTypeAlias:
+ElementTypeBinding:
+  @Name: DataTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DataType
+
+DataTypeDef:
   @Name:  LSInputStream
   @Description:
     @@lang:en
     @@@:
       A reference to a byte stream source of an XML input.
-  @Type:
-     DOMMain:Object
-  @Def:
-    @@Type:
-      lang:Java
-    @@@:
-      java.io.InputStream
-  @Def:
-    @@Type:
-      lang:ECMAScript
-    @@@: Object
 
-DataTypeAlias:
+  @Def:
+    @@For:
+      ManakaiDOM:IDL
+    @@ContentType:
+      lang:dis
+    @@DISLang:dataTypeAliasFor:
+      @@@@:
+        DOMMain:Object
+      @@@ContentType:
+        dis:TypeQName
+  @Def:
+    @@For:
+      ManakaiDOM:Java
+    @@DISLang:dataTypeAliasFor:
+      @@@@: java.io.InputStream
+      @@@ContentType:
+        lang:Java
+  @Def:
+    @@For:
+      ManakaiDOM:ECMAScript
+    @@DISLang:dataTypeAliasFor:
+      @@@@: Object
+      @@@ContentType:
+        lang:ECMAScript
+
+DataTypeDef:
   @Name:  LSOutputStream
-  @Type:
-     DOMMain:Object
   @Description:
     @@lang:en
     @@@:
       A byte stream destination for the XML output.
-  @Def:
-    @@Type:
-      lang:Java
-    @@@: java.io.OutputStream
-  @Def:
-    @@Type:
-      lang:ECMAScript
-    @@@: Object
 
-DataTypeAlias:
+  @Def:
+    @@For:
+      ManakaiDOM:IDL
+    @@DISLang:dataTypeAliasFor:
+      @@@@:
+        DOMMain:Object
+      @@@ContentType:
+        dis:TypeQName
+  @Def:
+    @@For:
+      ManakaiDOM:Java
+    @@DISLang:dataTypeAliasFor:
+      @@@@: java.io.OutputStream
+      @@@ContentType:
+        lang:Java
+  @Def:
+    @@For:
+      ManakaiDOM:ECMAScript
+    @@DISLang:dataTypeAliasFor:
+      @@@@: Object
+      @@@ContentType:
+        lang:ECMAScript
+
+DataTypeDef:
   @Name:  LSReader
-  @Type:
-     DOMMain:Object
   @Description:
     @@lang:en
     @@@:
       A character stream, i.e. a sequence of input characters 
       in 16-bit units, for the XML input.
-  @Def:
-    @@Type:
-      lang:Java
-    @@@:java.io.Reader
-  @Def:
-    @@Type:
-      lang:ECMAScript
-    @@@:\
-    @@Description: 
-      @@@lang:en
-      @@@@:
-        Not bound; <TYPE:LSReader> has no recommended meaning in ECMAScript.
 
-DataTypeAlias:
+  @Def:
+    @@For:
+      ManakaiDOM:IDL
+    @@DISLang:dataTypeAliasFor:
+      @@@@:
+        DOMMain:Object
+      @@@ContentType:
+        dis:TypeQName
+  @Def:
+    @@For:
+      ManakaiDOM:Java
+    @@DISLang:dataTypeAliasFor:
+      @@@@: java.io.Reader
+      @@@ContentType:
+        lang:Java
+  @Description:
+    @@lang:en
+    @@@:
+      The <TYPE::LSReader> has no recommended meaning in ECMAScript binding.
+    @@For:
+      ManakaiDOM:ECMAScript
+
+DataTypeDef:
   @Name:  LSWriter
-  @Type:
-     DOMMain:Object
   @Description:
     @@lang:en
     @@@:
       A character stream, i.e. a sequence of characters in 16-bit units, 
       for the XML output.
-  @Def:
-    @@Type:
-      lang:Java
-    @@@:java.io.Writer
-  @Def:
-    @@Type:
-      lang:ECMAScript
-    @@@:\
-    @@Description:
-      @@@lang:en
-      @@@@:
-        Not bound; <TYPE:LSWriter> has no recommended meaning in ECMAScript.
 
-DataTypeAlias:
-  @Name:  DOMString
-  @Type:
-     DOMMain:DOMString
-DataTypeAlias:
+  @Def:
+    @@For:
+      ManakaiDOM:IDL
+    @@DISLang:dataTypeAliasFor:
+      @@@@:
+        DOMMain:Object
+      @@@ContentType:
+        dis:TypeQName
+  @Def:
+    @@For:
+      ManakaiDOM:Java
+    @@DISLang:dataTypeAliasFor:
+      @@@@: java.io.Writer
+      @@@ContentType:
+        lang:Java
+  @Description:
+    @@For:
+      ManakaiDOM:ECMAScript
+    @@lang:en
+    @@@:
+      The <TYPE::LSWriter> has no recommended meaning in ECMAScript binding.
+
+DataTypeDef:
+  @Name: DOMString
+  @AliasFor:
+    @@@:
+      DOMMain:DOMString
+    @@For:
+      !ManakaiDOM:IDL
+  @Def:
+    @@For:
+      ManakaiDOM:IDL
+    @@DISLang:dataTypeAliasFor:
+      @@@@:
+        DOMMain:DOMString
+      @@@ContentType:
+        dis:TypeQName
+  @For:
+    ManakaiDOM:DOM
+DataTypeDef:
   @Name:  DOMConfiguration
-  @Type:
-     DOMCore:DOMConfiguration
-DataTypeAlias:
+  @AliasFor:
+    @@@:
+      DOMCore:DOMConfiguration
+    @@For:
+      !ManakaiDOM:IDL
+  @Def:
+    @@DISLang:dataTypeAliasFor:
+      @@@@:
+        DOMCore:DOMConfiguration
+      @@@ContentType:
+        dis:TypeQName
+    @@For:
+      ManakaiDOM:IDL
+  @For:
+    ManakaiDOM:DOM
+DataTypeDef:
   @Name:  Node
-  @Type:
-     DOMCore:Node
-DataTypeAlias:
+  @AliasFor:
+    @@@:
+      DOMCore:Node
+    @@For:
+      !ManakaiDOM:IDL
+  @Def:
+    @@For:
+      ManakaiDOM:IDL
+    @@DISLang:dataTypeAliasFor:
+      @@@@:
+        DOMCore:Node
+      @@@ContentType:
+        dis:TypeQName
+  @For:
+    ManakaiDOM:DOM
+DataTypeDef:
   @Name:  Document
-  @Type:
-     DOMCore:Document
-DataTypeAlias:
+  @AliasFor:
+    @@@:
+      DOMCore:Document
+    @@For:
+      !ManakaiDOM:IDL
+  @Def:
+    @@For:
+      ManakaiDOM:IDL
+    @@DISLang:dataTypeAliasFor:
+      @@@@:
+        DOMCore:Document
+      @@@ContentType:
+        dis:TypeQName
+  @For:
+    ManakaiDOM:DOM
+DataTypeDef:
   @Name:  Element
-  @Type:
-     DOMCore:Element
+  @AliasFor:
+    @@@:
+      DOMCore:Element
+    @@For:
+      !ManakaiDOM:IDL
+  @Def:
+    @@For:
+      ManakaiDOM:IDL
+    @@DISLang:dataTypeAliasFor:
+      @@@@:
+        DOMCore:Element
+      @@@ContentType:
+        dis:TypeQName
+  @For:
+    ManakaiDOM:DOM
 
 ## Fundamental Interfaces
 
@@ -216,22 +374,106 @@ ImplNote:
     The fundamental interfaces must be fully implemented by all 
     conforming implementations.
 
-Exception:
-  @Name:  LSException
+ElementTypeBinding:
+  @Name: L3
+  @ElementType:
+    DOMMain:implementFeature
+  @ShadowContent:
+    @@@: LSFeature30
+    @@For:
+      ManakaiDOM:DOM3
+
+ElementTypeBinding:
+  @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
+
+ElementTypeBinding:
+  @Name: ExceptionDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@:
+        dis:MultipleResource
+      @@@ForCheck:
+        !ManakaiDOM:ForClass !ManakaiDOM:ForIF
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:ExceptionIF
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:ExceptionClass
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@resourceFor:
+      ManakaiDOM:ForIF
+    @@resourceFor:
+      @@@@:
+        ManakaiDOM:ForClass
+      @@@ForCheck:
+        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:DOM
+    @@ISA:
+      @@@@:
+        ManakaiDOM:ManakaiDOMException
+      @@@ForCheck:
+        ManakaiDOM:ManakaiDOM
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@ISA:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOM
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+      @@@For:
+        ManakaiDOM:ManakaiDOM1
+
+ExceptionDef:
+  @Name:  
+    @@@: LSException
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @QName:
+    @@@: ManakaiDOMLSException
+    @@ForCheck:
+      ManakaiDOM:ForClass
+  @L3:
+
   @ImplNote:
     @@lang:en
     @@@:
       Parser or writer may throw an <X:LSException> if the processing 
       is stopped.  The processing can be stopped due to a <IF:DOMError>.
+
   @Attr:
      @@Name:  code
      @@Get:
         @@@Type:
            DOMMain:unsigned-short
+        @@@actualType: ManakaiDOMLSExceptionCode
+        @@@PerlDef:
+          __CODE{ManakaiDOM:getExceptionCode}__;
   @ConstGroup:
-     @@Name:  LSExceptionCode
-     @@Type:
-        DOMMain:unsigned-short
+     @@QName:  
+       @@@@: LSExceptionCode
+       @@@ForCheck:
+         ManakaiDOM:ForIF
+     @@QName:
+       @@@@: ManakaiDOMLSExceptionCode
+       @@@ForCheck:
+         ManakaiDOM:ForClass
+     @@ISA:
+       @@@@:
+         DOMMain:unsigned-short
+       @@@ForCheck:
+         ManakaiDOM:ForClass
      @@Description:
         @@@lang:en
         @@@@: The type of error generated.
@@ -256,8 +498,251 @@ Exception:
             An attempt was made to serialize a <IF:Node> using 
             <IF:LSSerializer> and the processing has been stop.
 
+ElementTypeBinding:
+  @Name: IF
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@:
+        dis:MultipleResource
+      @@@ForCheck:
+        !ManakaiDOM:ForClass !ManakaiDOM:ForIF
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:IF
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:Class
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@resourceFor:
+      ManakaiDOM:ForIF
+    @@resourceFor:
+      @@@@:
+        ManakaiDOM:ForClass
+      @@@ForCheck:
+        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@For:
+      =ManakaiDOM:ManakaiDOM
+    @@ISA:
+      @@@@:
+        ManakaiDOM:ManakaiDOMObject
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@ISA:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOM
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+      @@@For:
+        ManakaiDOM:ManakaiDOM3
+
+ElementTypeBinding:
+  @Name: IFDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:IF
+    @@ISA:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOM
+      @@@For:
+        ManakaiDOM:ManakaiDOM3
+    @@For:
+      ManakaiDOM:DOM3
+    @@For:
+      =ManakaiDOM:ManakaiDOM
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+
+ElementTypeBinding:
+  @Name: IntMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isForInternal: 1
+
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethodParameter
+
+ElementTypeBinding:
+  @Name: Exception
+  @ElementType:
+    ManakaiDOM:raises
+
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethodReturn
+
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttribute
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttrGet
+
+ElementTypeBinding:
+  @Name: Set
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttrSet
+
+ElementTypeBinding:
+  @Name: InCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+
+ElementTypeBinding:
+  @Name: ConstGroup
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:ConstGroup
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+
+ElementTypeBinding:
+  @Name: Const
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: 
+      ManakaiDOM:Const
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+
+ElementTypeBinding:
+  @Name: XConstGroup
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:ConstGroup
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+    @@aliasChild:
+      @@@@: 1
+      @@@For:
+        ManakaiDOM:ManakaiDOM
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOMLatest
+      @@@For:
+        !ManakaiDOM:ManakaiDOM1
+
+ElementTypeBinding:
+  @Name: XConst
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: 
+      ManakaiDOM:Const
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+    @@aliasChild:
+      @@@@: 1
+      @@@For:
+        ManakaiDOM:ManakaiDOM
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOMLatest
+      @@@For:
+        !ManakaiDOM:ManakaiDOM1
+ElementTypeBinding:
+  @Name: XParam
+  @ElementType:
+    ManakaiDOM:exceptionOrWarningParameter
+  @ShadowContent:
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM
+ElementTypeBinding:
+  @Name: SubTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:ExceptionOrWarningSubType
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:ForClass
+    @@aliasChild:1
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOMLatest
+      @@@For:
+        !ManakaiDOM:ManakaiDOM1
+
+
 IF:
-  @Name:  DOMImplementationLS
+  @Name:
+    @@@: DOMImplementationLS
+    @@ForCheck:
+      ManakaiDOM:ForIF
+
+  @QName:
+    @@@: ManakaiDOMImplementationLS
+    @@ForCheck:
+      ManakaiDOM:ForClass
+  @ISA:
+    @@@: 
+      DOMCore:ManakaiDOMImplementation
+    @@ForCheck:
+      ManakaiDOM:ForClass
+  @Role:
+    @@@:
+      DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM
+    @@compat:
+      DOMCore:ManakaiDOMImplementation::ManakaiDOM:ManakaiDOMLatest
+    @@ForCheck:
+      ManakaiDOM:ForClass
+
+  @L3:
+  @For:
+    ManakaiDOM:DOM3
+
   @Description:
     @@lang:en
     @@@:
@@ -271,17 +756,23 @@ IF:
       methods on an instance of the <IF:DOMImplementation> interface 
       or <M:DOMImplementation.getFeature> with parameters <Feature:LS> or 
       <Feature:LS-Async> version <FeatureVer:3.0>.
-  
-  @Role:
-    @@@:
-      DOMCore:DOMImplementation
-    @@compat:
-      ManakaiDOMCore:DOMImplementation
+    @@ForCheck:
+      ManakaiDOM:ForIF
    
   @ConstGroup:
-     @@Name:  DOMImplementationLSMode
-     @@Type:
-        DOMMain:unsigned-short
+     @@QName:
+       @@@@: DOMImplementationLSMode
+       @@@ForCheck:
+         ManakaiDOM:ForIF
+     @@QName:
+       @@@@: ManakaiDOMImplementationLSMode
+       @@@ForCheck:
+         ManakaiDOM:ForClass
+     @@ISA:
+       @@@@:
+         DOMMain:unsigned-short
+       @@@ForCheck:
+          ManakaiDOM:ForClass
      @@Description:
        @@@lang:en
        @@@@:The mode of the parser.
@@ -311,7 +802,9 @@ IF:
          Create a new parser object.
      @@Param:
         @@@Name:  mode
-        @@@Type: DOMImplementationLSMode
+        @@@Type: 
+          DOMMain:unsigned-short
+        @@@actualType: DOMImplementationLSMode
         @@@InCase:
           @@@@Label:
             <DOM:MODE_SYNCHRONOUS>
@@ -329,6 +822,8 @@ IF:
      @@Param:
         @@@Name:  schemaType
         @@@Type: 
+          DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMURI
         @@@Description:
           @@@@lang:en
@@ -384,7 +879,7 @@ IF:
                @@@@@@@: The requested mode is not supported.
            @@@@SubType:
              @@@@@QName:
-               MDOM_EXCEPTION:MDOM_IMPL_NOSUPPORT_SCHEMA
+               MDOMX:MDOM_IMPL_NOSUPPORT_SCHEMA
              @@@@@Description:
                @@@@@@lang:en
                @@@@@@@: The requested schema language is not supported.
@@ -408,14 +903,12 @@ IF:
          Create a new empty input source object.
      @@Return:
         @@@Type:  LSInput
+        @@@actualType: ManakaiDOMLSInput
         @@@Description:
           @@@@lang:en
           @@@@@: The newly created input object.
-        @@@Def:
-          @@@@Type:
-            lang:Perl
-          @@@@@:
-            $r = __CLASS{LSInput}__->__INT{new}__;
+        @@@PerlDef:
+          $r = <ClassM::ManakaiDOMLSInput.new>;
   @Method:
      @@Name:  createLSOutput
      @@Description:
@@ -423,13 +916,29 @@ IF:
        @@@@: Create a new empty output destination object.
      @@Return:
         @@@Type:  LSOutput
+        @@@actualType: ManakaiDOMLSOutput
         @@@Description:
           @@@@lang:en
           @@@@@: The newly created output object.
+       @@@PerlDef:
+         $r = <ClassM::ManakaiDOMLSOutput.new>;
 ##IF:DOMImplementationLS
 
 IF:
-  @Name:  LSParser
+  @Name:
+    @@@: LSParser
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  
+  @QName:
+    @@@: ManakaiDOMLSParser
+    @@ForCheck:
+      ManakaiDOM:ForClass
+
+  @L3:
+  @For:
+    ManakaiDOM:DOM3
+
   @Description:
     @@lang:en
     @@@:
@@ -640,13 +1149,26 @@ IF:
                DOM applications should use an error handler to get 
                details on the error.
   @ConstGroup:
-     @@Name:  ACTION_TYPES
-     @@Type:
-        DOMMain:unsigned-short
+     @@QName:  
+       @@@@: ACTION_TYPES
+       @@@ForCheck:
+         ManakaiDOM:ForIF
+     @@QName:
+       @@@@: ManakaiDOMActionTypes
+       @@@ForCheck:
+         ManakaiDOM:ForClass
+
+     @@ISA:
+       @@@@:
+         DOMMain:unsigned-short
+       @@@ForCheck:
+         ManakaiDOM:ForClass
+
      @@Description:
        @@@lang:en
        @@@@:
          A set of possible actions for the <M:LSParser.parseWithContext>.
+
      @@Const:
         @@@Name:  ACTION_APPEND_AS_CHILDREN
         @@@Type:
@@ -672,6 +1194,7 @@ IF:
         @@@Type:
            DOMMain:unsigned-short
         @@@Value:  5
+
   @Method:
      @@Name:  parseWithContext
      @@Param:
@@ -703,9 +1226,23 @@ IF:
        \
          If the <IF:LSParser> is currently not busy, this method does nothing.
      @@Return: 
+##LSParser
 
 IF:
-  @Name:  LSInput
+  @Name:
+    @@@: LSInput
+    @@ForCheck:
+      ManakaiDOM:ForIF
+
+  @QName:
+    @@@: ManakaiDOMLSInput
+    @@ForCheck:
+      ManakaiDOM:ForClass
+
+  @L3:
+  @For:
+    ManakaiDOM:DOM3
+
   @Description:
     @@lang:en
     @@@:
@@ -773,8 +1310,12 @@ IF:
          available.
      @@Get:
         @@@Type:  LSReader
+        @@@PerlDef:
+          $r = $self->{characterStream};
      @@Set:
         @@@Type:  LSReader
+        @@@PerlDef:
+          $self->{characterStream} = $given;
   @Attr:
      @@Name:  byteStream
      @@Description:
@@ -783,8 +1324,12 @@ IF:
          A stream of bytes.
      @@Get:
         @@@Type:  LSInputStream
+        @@@PerlDef:
+          $r = $self->{byteStream};
      @@Set:
         @@@Type:  LSInputStream
+        @@@PerlDef:
+          $self->{byteStream} = $given;
   @Attr:
      @@Name:  stringData
      @@Description:
@@ -795,20 +1340,27 @@ IF:
          The document in the data need not have an XML declaration. 
          If an XML declaration is present, the <XML:encoding> 
          declaration will be ignored.
+     @@Type:  
+       DOMMain:DOMString
+     @@actualType:
+       DOMMain:ManakaiDOMString
      @@Get:
-        @@@Type:  DOMString
-        @@@Def:
-          @@@@Type:
-            lang:dis
-          @@@@GetProp:
-            DOMLS:stringData
+       @@@PerlDef:
+         $r = ref $self->{stringData} eq 'SCALAR'
+                ? ${$self->{stringData}} : $self->{stringData};
      @@Set:
-        @@@Type:  DOMString
-        @@@Def:
-          @@@@Type:
-            lang:dis
-          @@@@SetProp:
-            DOMLS:stringData
+       @@@InCase:
+         @@@@Type:
+           Perl:SCALAR
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             The value referred from the given value is set to the new 
+             attribute value.
+         @@@@For:
+           ManakaiDOM:ManakaiDOM
+       @@@PerlDef:
+         $self->{stringData} = ref $given eq 'SCALAR' ? $given : \$given;
   @Attr:
      @@Name:  systemId
      @@Description:
@@ -826,19 +1378,15 @@ IF:
          with the <A:baseURI>.  If that fails, the behavior is 
          implementation dependent.
      @@Get:
-        @@@Type:  DOMString
-        @@@Def:
-          @@@@Type:
-            lang:dis
-          @@@@GetProp:
-            infoset:systemIdentifier
+        @@@Type:  
+          DOMMain:DOMString
+        @@@PerlDef:
+          $r = $self->{systemId};
      @@Set:
-        @@@Type:  DOMString
-        @@@Def:
-          @@@@Type:
-            lang:dis
-          @@@@SetProp:
-            infoset:systemIdentifier
+        @@@Type:  
+          DOMMain:DOMString
+        @@@PerlDef:
+          $self->{systemId} = $given;
   @Attr:
      @@Name:  publicId
      @@Description:
@@ -849,19 +1397,15 @@ IF:
           This may be mapped to an input source using a DOM implementation 
           dependent mechanism.
      @@Get:
-        @@@Type:  DOMString
-        @@@Def:
-          @@@@Type:
-            lang:dis
-          @@@@GetProp:
-            infoset:publicIdentifier
+        @@@Type:  
+          DOMMain:DOMString
+        @@@PerlDef:
+          $r = $self->{publicId};
      @@Set:
-        @@@Type:  DOMString
-        @@@Def:
-          @@@@Type:
-            lang:dis
-          @@@@SetProp:
-            infoset:publicIdentifier
+        @@@Type:  
+          DOMMain:DOMString
+        @@@PerlDef:
+          $self->{publicId} = $self;
   @Attr:
      @@Name:  baseURI
      @@Description:
@@ -873,27 +1417,26 @@ IF:
          If, when used, the base URI is a relative URI, including 
          empty string, or <DOM:null>, the behavior is implementation 
          dependent.
+     @@Type:
+       DOMMain:DOMString
+     @@actualType:
+       ManakaiDOM:ManakaiDOMURI
      @@Get:
-        @@@Type:
-          ManakaiDOM:ManakaiDOMURI
-        @@@Def:
-          @@@@Type:
-            lang:dis
-          @@@@GetProp:
-            infoset:baseURI
+       @@@PerlDef:
+         $r = $self->{baseURI};
      @@Set:
-        @@@Type:
-          ManakaiDOM:ManakaiDOMURI
-        @@@Def:
-          @@@@Type:
-            lang:dis
-          @@@@SetProp:
-            @@@@@@:
-              infoset:baseURI
-            @@@@@warn-if:
-              ManakaiDOM:isNull
-            @@@@@warn-if: 
-              ManakaiDOM:isRelativeURI
+       @@@PerlDef:
+         if (not defined $given) {
+           __WARNING{
+             MDOMX:NULL_BASE_URI::
+           }__;
+         } elsif (<Code::DOMMain:isRelativeDOMURI:: $INPUT = $given>) {
+           __WARNING{
+             MDOMX:RELATIVE_BASE_URI::
+               infoset:baseURI => {$given},
+           }__;
+         }
+         $self->{baseURI} = $given;
   @Attr:
      @@Name:  encoding
      @@Description:
@@ -905,26 +1448,20 @@ IF:
          a character stream or string data.  For other sources, 
          the <A:encoding> will override any encoding specified in the 
          XML or text declaration or higher level protocol.
+     @@Type:
+       DOMMain:DOMString
      @@Get:
-        @@@Type:  DOMString
-        @@@Def:
-          @@@@Type:
-            lang:dis
-          @@@@GetProp:
-            infoset:characterEncodingScheme
+        @@@PerlDef:
+          $r = $self->{encoding};
      @@Set:
-        @@@Type:  DOMString
         @@@Description:
           @@@@lang:en
           @@@@@:
             The encoding name acceptable for an XML 1.0 <XML:encoding> 
             declaration <SRC:<CITE:XML 1.0> 4.3.3 Character Encoding in 
             Entities>.
-        @@@Def:
-          @@@@Type:
-            lang:dis
-          @@@@SetProp:
-            infoset:characterEncodingScheme
+        @@@PerlDef:
+          $self->{encoding} = $given;
   @Attr:
      @@Name:  certifiedText
      @@Get:
@@ -934,11 +1471,8 @@ IF:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
-        @@@Def:
-          @@@@Type:
-            lang:dis
-          @@@@GetProp:
-            DOMLS:certifiedText
+        @@@PerlDef:
+          $r = $self->{certifiedText};
      @@Set:
         @@@Type:
            DOMMain:boolean
@@ -952,39 +1486,47 @@ IF:
                parsing an XML 1.1 document.
         @@@InCase:
            @@@@Value:  false
-        @@@Def:
-          @@@@Type:
-            lang:dis
-          @@@@SetProp:
-            DOMLS:certifiedText
+        @@@PerlDef:
+          $self->{certifiedText} = $given;
 
   @IntMethod:
     @@Name:new
+    @@ManakaiDOM:isStatic:1
     @@Description:
       @@@lang:en
       @@@@:
         Construct a new instance of the <IF:LSInput>.
-    @@Operator:
-      @@@Type:
-        lang:Perl
-      @@@@:new
     @@Return:
-      @@@Type:LSInput
+      @@@Type:ManakaiDOMLSInput
       @@@Description:
         @@@@lang:en
         @@@@@:
           The newly created <IF:LSInput> object.
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          $r = __CLASS{ManakaiDOMNodeObject::}__->__INT{new}__
-                                           ## Condition sensitive
-                 ->__INT{newReference}__ ('__CLASS{LSInput}__');
-   @@Level[list]:3
+      @@@PerlDef:
+        $r = bless {}, $self;
+
+  @ManakaiDOM:inputNormalizer:
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM3 ManakaiDOM:ForClass
+    @@ContentType:
+      lang:Perl
+    @@@:
+      if (ref $INPUT eq 'HASH') {
+        $INPUT = bless $INPUT, <ClassName::ManakaiDOMLSInput>;
+      }
+  @ManakaiDOM:inputNormalizer:
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM !ManakaiDOM:ManakaiDOM3 ManakaiDOM:ForClass
+    @@ContentType:
+      lang:Perl
+    @@@:
+      if (ref $INPUT eq 'HASH') {
+        $INPUT = bless $INPUT, 
+                 <ClassName::ManakaiDOMLSInput::ManakaiDOM:ManakaiDOMLatest>;
+      }
 ##IF:LSInput
 
-IF:
+IFDef:
   @Name:  LSResourceResolver
   @Description:
     @@lang:en
@@ -1010,7 +1552,7 @@ IF:
      @@Return:
         @@@Type:  LSInput
 
-IF:
+IFDef:
   @Name:  LSParserFilter
   @Description:
     @@lang:en
@@ -1065,7 +1607,7 @@ IF:
         @@@Type:
            DOMMain:unsigned-long
 
-IF:
+IFDef:
   @Name:  LSSerializer
   @Description:
     @@lang:en
@@ -1300,21 +1842,22 @@ IF:
              @@@@@@:
                DOM applications should use error handler to get 
                details on the error.
-        @@@Error:
-          @@@@Name:unsupported-encoding
-          @@@@Severity:Fatal
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The encoding specified explicitly or implicitly is 
-              not supported by the serializer.
-        @@@Error:
-          @@@@Name:no-output-specified
-          @@@@Severity:Fatal
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              No output is specified in the <P:destination>.
+## TODO:
+#        @@@Error:
+#          @@@@Name:unsupported-encoding
+#          @@@@Severity:Fatal
+#          @@@@Description:
+#            @@@@@lang:en
+#            @@@@@@:
+#              The encoding specified explicitly or implicitly is 
+#              not supported by the serializer.
+#        @@@Error:
+#          @@@@Name:no-output-specified
+#          @@@@Severity:Fatal
+#          @@@@Description:
+#            @@@@@lang:en
+#            @@@@@@:
+#              No output is specified in the <P:destination>.
   @Method:
      @@Name:  writeToURI
      @@Description:
@@ -1406,7 +1949,19 @@ IF:
                The serializer was unable to serialize the node.
 
 IF:
-  @Name:  LSOutput
+  @QName:
+    @@@: LSOutput
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @QName:
+    @@@: ManakaiDOMLSOutput
+    @@ForCheck:
+      ManakaiDOM:ForClass
+
+  @L3:
+  @For:
+    ManakaiDOM:DOM3
+
   @Description:
     @@lang:en
     @@@:
@@ -1461,8 +2016,12 @@ IF:
          this attribute may not be available.
      @@Get:
         @@@Type:  LSWriter
+        @@@PerlDef:
+          $r = $self->{characterStream};
      @@Set:
         @@@Type:  LSWriter
+        @@@PerlDef:
+          $self->{characterStream} = $given;
   @Attr:
      @@Name:  byteStream
      @@Description:
@@ -1476,8 +2035,12 @@ IF:
          binding dependent.
      @@Get:
         @@@Type:  LSOutputStream
+        @@@PerlDef:
+          $r = $self->{byteStream};
      @@Set:
         @@@Type:  LSOutputStream
+        @@@PerlDef:
+          $self->{byteStream} = $given;
   @Attr:
      @@Name:  systemId
      @@Description:
@@ -1486,14 +2049,13 @@ IF:
          The system identifier or an RFC 2396 URI reference 
          for this output destination.
      @@Get:
-        @@@Type:  DOMString
-        @@@Def:
-          @@@@Type:
-            lang:dis
-          @@@@GetProp:
-            infoset:systemIdentifier
+        @@@Type:  
+          DOMMain:DOMString
+        @@@PerlDef:
+          $r = $self->{systemId};
      @@Set:
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
         @@@InCase:
           @@@@Label:
             @@@@@lang:en
@@ -1503,11 +2065,14 @@ IF:
             @@@@@lang:en
             @@@@@@:
               The behavior is implementation dependent.
-        @@@Def:
-          @@@@Type:
-            lang:dis
-          @@@@SetProp:
-            infoset:systemIdentifier
+        @@@PerlDef:
+          if (<Code::DOMMain:isRelativeDOMURI:: $INPUT = $given>) {
+            __WARNING{
+              MDOMX:RELATIVE_URI::
+                MDOMX:uri => {$given},
+            }__;
+          }
+          $self->{systemId} = $given;
   @Attr:
      @@Name:  encoding
      @@Description:
@@ -1518,48 +2083,33 @@ IF:
          an XML 1.0 <XML:encoding> declaration and it is 
          recommended that character encodings registered 
          in IANAREG be referred to using their registered names.
+     @@Type:
+       DOMMain:DOMString
      @@Get:
-        @@@Type:  DOMString
-        @@@Def:
-          @@@@Type:
-            lang:dis
-          @@@@GetProp:
-            infoset:characterEncodingScheme
+       @@@PerlDef:
+         $r = $self->{encoding};
      @@Set:
-        @@@Type:  DOMString
-        @@@Def:
-          @@@@Type:
-            lang:dis
-          @@@@SetProp:
-            infoset:characterEncodingScheme
+       @@@PerlDef:
+         $self->{encoding} = $given;
 
   @IntMethod:
     @@Name:new
+    @@ManakaiDOM:isStatic:1
     @@Description:
       @@@lang:en
       @@@@:
         Construct a new instance of the <IF:OutInput>.
-    @@Operator:
-      @@@Type:
-        lang:Perl
-      @@@@:new
     @@Return:
-      @@@Type:LSOut
+      @@@Type: ManakaiDOMLSOutput
       @@@Description:
         @@@@lang:en
         @@@@@:
           The newly created <IF:LSOutput> object.
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          $r = __CLASS{ManakaiDOMNodeObject::}__->__INT{new}__
-                                           ## Conditional
-                 ->__INT{newReference}__ ('__CLASS{LSOutput}__');
-   @@Level[list]:3
+      @@@PerlDef:
+        $r = bless {}, $self;
 ##IF:LSOutput
 
-IF:
+IFDef:
   @Name:  LSProgressEvent
   @ISA:
      DOMEvents:Event
@@ -1577,7 +2127,7 @@ IF:
      @@Get:
         @@@Type:
            DOMMain:unsigned-long
-IF:
+IFDef:
   @Name:  LSLoadEvent
   @ISA:
      DOMEvents:Event
@@ -1590,22 +2140,23 @@ IF:
      @@Get:
         @@@Type:  LSInput
 
-IF:
+IFDef:
   @Name:  LSSerializerFilter
   @Description:
     @@lang:en
     @@@:
       Examine and filter DOM nodes as they are being processed for 
       the serialization.
-  @ISA:
-     DOMTraversal:NodeFilter
+#  @ISA:
+#     DOMTraversal:NodeFilter
   @Attr:
      @@Name:  whatToShow
      @@Get:
         @@@Type:
            DOMMain:unsigned-long
 
-ErrorSet:
+ImplNote:
+#ErrorSet:
   @Description:
     @@lang:en
     @@@:
@@ -1716,7 +2267,8 @@ ErrorSet:
 ##Error:LSParser
 
 
-ErrorSet:
+ImplNote:
+#ErrorSet:
   @Description:
     @@lang:en
     @@@:
@@ -1779,7 +2331,8 @@ ErrorSet:
         but it was required.
 ##Error:LSSerializer
 
-ConfigParam:
+ImplNote:
+#ConfigParam:
   @Description:
     @@lang:en
     @@@:

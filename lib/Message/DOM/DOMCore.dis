@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/29 04:49:48 $
+      $Date: 2004/12/29 12:17:42 $
     @@ContentType:
       dis:Date.RCS
 
@@ -96,6 +96,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/events#
   @DOMLS:
     http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
+  @DOMMain:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @DOMViews:
     http://suika.fam.cx/~wakaba/archive/2004/dom/views#
   @infoset:
@@ -617,6 +619,7 @@ ElementTypeBinding:
         ::ManakaiDOM:ManakaiDOMLatest
       @@@For:
         !ManakaiDOM:ManakaiDOM1
+
 ElementTypeBinding:
   @Name: Const
   @ElementType:
@@ -698,7 +701,7 @@ PropDef:
     @@@:
       Temporary - should be bound to ManakaiDOM:DOMConfigParameter
 
-## -- Feature
+## -- Features
 
 ElementTypeBinding:
   @Name: FeatureDef
@@ -3129,6 +3132,12 @@ IF:
       ManakaiDOM:ForClass
     @@For:
       ManakaiDOM:ManakaiDOM
+  @Role:
+    @@@: 
+      DOMCore:ManakaiDOMNode::ManakaiDOM:ManakaiDOMLatest
+    @@ForCheck:
+      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
+
   @ConstGroup:
      @@QName:
        @@@@: NodeType
@@ -5440,7 +5449,24 @@ IF:
         @@@Type:  Node
         @@@Description:
           @@@@lang:en
-          @@@@@: The node to compare equality with.
+          @@@@@: 
+            The node to compare equality with.
+            \
+            {NOTE:: The <P::arg> may or may not be an instance of 
+                    the manakai DOM implementation, while: 
+              \
+              - It implements the feature <Feature::Core> version 
+                <FeatureVer::2.0> and, if it is a <IF::DOMXML:DocumentType> 
+                node, the feature <Feature::XML> version <Feature::2.0>; 
+                to test their equality, as defined by DOM Level 3 Core, 
+                some DOM Level 2 attributes are required.
+              \
+              - It shares the same naming convention for method and 
+                attribute names.
+              \
+              - Its implementation overloads the operator <Perl::==> 
+                for <IF::NodeList> and <IF::NamedNodeMap> objects, 
+                testing their equality as per DOM Level 3. 
      @@Return:
         @@@Type:  
           DOMMain:boolean
@@ -6567,7 +6593,7 @@ ClassDef:
         Checks whether this node and another node are equal or not. 
     @@Param:
       @@@Name: node
-      @@@Type:
+      @@@Type: 
         ManakaiDOMCore:ManakaiDOMNodeObjectNode
       @@@Description:
         @@@@lang:en
@@ -6834,8 +6860,6 @@ ResourceDef:
     @@Param:
       @@@Name:arg
       @@@Type: NodeList
-      @@@actualType:
-        ManakaiDOMCore:ManakaiDOMChildNodeList
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -6845,17 +6869,18 @@ ResourceDef:
         DOMMain:boolean
       @@@PerlDef:
         @@@@ForCheck: ForChildNodeList
-   \      EQ: {
-   \        last EQ unless @{$self->{<Q::TreeCore:node>}
-   \                              ->{<Q::infoset:children>}} ==
-   \                       @{$arg->{<Q::TreeCore:node>}
-                                 ->{<Q::infoset:children>}};
-            for my $i (0..$#{$self->{<Q::TreeCore:node>}
-                                  ->{<Q::infoset:children>}}) {
-              unless ($self->{<Q::TreeCore:node>}
-                                  ->{<Q::infoset:children>}->[$i] ==
-                      $arg->{<Q::TreeCore:node>}
-                                  ->{<Q::infoset:children>}->[$i]) {
+        @@@@@:
+          EQ: {
+            last EQ unless @{$self->{<Q::TreeCore:node>}
+                                  ->{<Q::infoset:children>}} ==
+                           $arg->length;
+            for my $i (0..@{$self->{<Q::TreeCore:node>}
+                                 ->{<Q::infoset:children>}}) { 
+              unless (<M::DOMCore:ManakaiDOMNode.isEqualNode>
+                         (<ClassM::ManakaiDOMNode.getNodeReference>
+                                ($self->{<Q::TreeCore:node>}
+                                      ->{<Q::infoset:children>}->[$i]),
+                          $arg->item ($i))) {
                 last EQ;
               }
             }
@@ -7824,10 +7849,6 @@ ResourceDef:
     @@Param:
       @@@Name:arg
       @@@Type:NamedNodeMap
-      @@@actualType:
-        @@@@ForCheck:ForAttrMap
-        @@@@@:
-          ManakaiDOMCore:ManakaiDOMAttributes
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -7839,22 +7860,33 @@ ResourceDef:
         @@@@ForCheck:ForAttrMap
         @@@@@:
           EQ: {
-            for my $ns (keys %{$self->{<Q::TreeCore:node>}
-                                    ->{<Q::infoset:attributes>}}) {
-              last EQ unless $arg->{<Q::TreeCore:node>}
-                                 ->{<Q::infoset:attributes>}->{$ns};
-              last EQ unless keys (%{$arg->{<Q::TreeCore:node>}
-                                 ->{<Q::infoset:attributes>}->{$ns}}) ==
-                             keys (%{$self->{<Q::TreeCore:node>}
-                                 ->{<Q::infoset:attributes>}->{$ns}});
-              for my $ln (keys %{$self->{<Q::TreeCore:node>}
-                                      ->{<Q::infoset:attributes>}->{$ns}}) {
-                last EQ unless $arg->{<Q::TreeCore:node>}
-                                   ->{<Q::infoset:attributes>}->{$ns}->{$ln};
-                last EQ unless $self->{<Q::TreeCore:node>}
-                                    ->{<Q::infoset:attributes>}->{$ns}->{$ln} ==
-                               $arg->{<Q::TreeCore:node>}
-                                    ->{<Q::infoset:attributes>}->{$ns}->{$ln};
+            last EQ unless $self->length != $arg->length;
+            my $attr = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>};
+            for (keys %{$attr->{<Q::ManakaiDOM:noNS>}}) {
+              unless (<M::DOMCore:ManakaiDOMNode.isEqualNode>
+                         (<ClassM::ManakaiDOMNode.getNodeReference>
+                                ($attr->{<Q::ManakaiDOM:noNS>}->{$_}),
+                          $arg->getNamedItem ($_))) {
+                last EQ;
+              }
+            }
+            for (keys %{$attr->{<Q::null:>}}) {
+              unless (<M::DOMCore:ManakaiDOMNode.isEqualNode>
+                         (<ClassM::ManakaiDOMNode.getNodeReference>
+                                ($attr->{<Q::null:>}->{$_}),
+                          $arg->getNamedItemNS (null, $_))) {
+                last EQ;
+              }
+            }
+            for my $ns (grep {$_ ne <Q::null> and $_ ne <Q::ManakaiDOM:noNS>}
+                        keys %{$attr}) {
+              for (keys %{$attr->{$ns}}) {
+                unless (<M::DOMCore:ManakaiDOMNode.isEqualNode>
+                           (<ClassM::ManakaiDOMNode.getNodeReference>
+                                  ($attr->{$ns}->{$_}),
+                            $arg->getNamedItemNS ($ns, $_))) {
+                  last EQ;
+                }
               }
             }
             $r = true;

@@ -1118,7 +1118,6 @@ markup language element type, etc.) definition.
 
 {
 our $dis_load_classdef_element_loop = 0;
-our $dis_anon_class_id = 0;
 sub dis_load_classdef_element ($;%);
 sub dis_load_classdef_element ($;%) {
   my ($node, %opt) = @_;
@@ -1243,7 +1242,9 @@ sub dis_load_classdef_element ($;%) {
     if ($al) {
       valid_err (q<Anonymous class aliasing is not supported>, node => $node);
     }
-    my $lname = sprintf '_:dis-class-%d', $dis_anon_class_id++;
+    no warnings 'uninitialized';
+    my $lname = sprintf '_:dis-class-%d', 
+                        $State->{ExpandedURI q<d:anonClassID>}++;
     my $dfuri = dis_typeforuris_to_uri ($lname, $opt{For}, %opt);
     if ($State->{current_class_container}) {
       $cls = ($State->{current_class_container}->{Resource}->{$dfuri} ||= {});
@@ -1252,7 +1253,7 @@ sub dis_load_classdef_element ($;%) {
       $State->{Resource}->{$dfuri} = $cls;
     }
     if (defined $cls->{Name}) {
-      impl_err (q<Anonymous class <$dfuri> already defined>, node => $node);
+      impl_err (qq<Anonymous class <$dfuri> already defined>, node => $node);
     }
     $cls->{Name} = '';
     $cls->{For}->{$opt{For} || ExpandedURI q<ManakaiDOM:all>} = 1;
@@ -1952,7 +1953,7 @@ sub dis_perl_init_classdef ($;%) {
         $res->{ExpandedURI q<d:Version>} = $_->value;
       }
       if (defined $fn) {
-        $res->{ExpandedURI q<dis2pm:featureName>}->{$fn} = 1;
+        $res->{ExpandedURI q<dis2pm:featureName>}->{lc $fn} = 1;
         $has_name = 1;
       }
     }
@@ -1965,9 +1966,9 @@ sub dis_perl_init_classdef ($;%) {
     }
     unless ($has_name) {
       if (defined $res->{NameURI}) {
-        $res->{ExpandedURI q<dis2pm:featureName>}->{$res->{NameURI}} = 1;
+        $res->{ExpandedURI q<dis2pm:featureName>}->{lc $res->{NameURI}} = 1;
       } elsif (length $res->{Name}) {
-        $res->{ExpandedURI q<dis2pm:featureName>}->{$res->{Name}} = 1;
+        $res->{ExpandedURI q<dis2pm:featureName>}->{lc $res->{Name}} = 1;
       } else {
         valid_err (q<Feature name is required>, node => $res->{src});
       }
@@ -2450,4 +2451,4 @@ sub disdoc_inline2pod ($;%) {
 
 =cut
 
-1; # $Date: 2004/12/29 04:49:48 $
+1; # $Date: 2004/12/29 12:17:42 $

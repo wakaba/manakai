@@ -42,6 +42,9 @@ if (defined $Opt{input_file_name}) {
      or die "$0: $Opt{input_file_name}: Cannot load";
 }
 $State->{DefaultFor} = $Opt{For} if defined $Opt{For};
+$State->{Namespace} = {};
+$State->{ETBinding} = {};
+undef $State->{module};
 my $source = dis_load_module_file 
                  (module_file_name => $Opt{file_name},
                   For => $Opt{For},
