@@ -14,7 +14,7 @@ This module is part of manakai.
 
 package Message::Util::Formatter::Base;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 sub ___rule_def () {+{
   -bare_text => {
@@ -104,7 +104,7 @@ sub replace ($$;%) {
             $attr_name =~ s/\\(.)/$1/gs if defined $3; # "quoted"
             $attr_name =~ tr/-/_/;
             my $nflag;
-            $nflag = $1 if $format =~ /\G(\w+)\s*/gc;
+            $nflag = $1 if $format =~ /\G($Token)\s*/goc;
             if ($format =~ /\G=>\s*$WordM\s*/gco) {
               my $attr_val = $+;
               $attr_val =~ s/\\(.)/$1/gs if defined $3; # "quoted"
@@ -216,4 +216,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/01/17 08:28:25 $
+1; # $Date: 2004/02/14 11:05:57 $

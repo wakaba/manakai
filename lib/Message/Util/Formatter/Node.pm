@@ -19,7 +19,7 @@ This module is part of manakai.
 
 package Message::Util::Formatter::Node;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util::Formatter::Base;
 our @ISA = 'Message::Util::Formatter::Base';
 
@@ -94,12 +94,12 @@ sub ___rule_def () {+{
 
 sub parse_attr ($$$$;%) {
   my ($self, $p, $name, $o, %opt) = @_;
-  if ($p->{-parse_flag}->{$name} > 0) {
+  if ($p->{-parse_flag}->{$name} and $p->{-parse_flag}->{$name} > 0) {
     $p->{-parse_flag}->{$name} = -1;
     $p->{$name} = $self->replace ($p->{$name},
                                   %{$opt{option}}, param => $o,
                                   -parent => $opt{-parent});
-  } elsif ($p->{-parse_flag}->{$name} < 0) {
+  } elsif ($p->{-parse_flag}->{$name} and $p->{-parse_flag}->{$name} < 0) {
     $p->{$name};
   } elsif ($opt{-non_parsed_to_node}) {
     $p->{$name} = $self->call (-attr_bare_text => 'main', $p, $o,
@@ -120,4 +120,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/12/06 05:09:39 $
+1; # $Date: 2004/02/14 11:05:57 $
