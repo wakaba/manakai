@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/02/22 08:21:00 $
+      $Date: 2005/02/25 07:32:35 $
     @@ContentType:
       dis:Date.RCS
   
@@ -36,8 +36,14 @@ Module:
     @@Module:
       @@@Name: SuikaWikiConfig21
       @@@WithFor:
-        ManakaiDOM:Perl
-  @defaultFor: ForLatest
+        swcfg21:ForLatest
+    @@Module:
+      @@@Name: DIS
+      @@@WithFor: 
+        DIS:ForLatest
+
+  @DefaultFor: 
+    DIS:ForLatest
 
 Namespace:
   @DIS:
@@ -46,12 +52,22 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @dis2pm:
     http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
+  @DOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @DOMLS:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
+  @DOMMain:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @infoset:
+    http://www.w3.org/2001/04/infoset#
   @lang:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
   @ManakaiDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @MDOMX:
+    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @owl:
     http://www.w3.org/2002/07/owl#
   @Perl:
@@ -60,6 +76,8 @@ Namespace:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
+  @swcfg21:
+    http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
   @TreeCore:\
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
@@ -129,7 +147,7 @@ FeatureDef:
 ClsDef:
   @ClsQName: ManakaiDISImplementation
   @ClsISA:
-    swcfg21:SWCFGImplementation
+    swcfg21:ManakaiSWCFGImplementation::swcfg21:ForLatest
   @Description:
     @@lang:en
     @@@:
@@ -148,8 +166,10 @@ ClsDef:
         @@@@@:
           The newly created <QUOTE::dis> document object.
       @@@PerlDef:
-        $r = $self-><M::swcfg21:SWCFGImplementation.createSWCFGDocument>;
-        $r-><AS::swcfg21:SWCFGDocument.defaultElementTypeNamespaceURI>
+        $r = $self-><M::swcfg21:SWCFGImplementation::swcfg21:ForLatest
+                                              .createSWCFGDocument>;
+        $r-><AS::swcfg21:SWCFGDocument::swcfg21:ForLatest
+                                        .defaultElementTypeNamespaceURI>
                     (<Q::dis:>);
 
   @Method:
@@ -165,7 +185,8 @@ ClsDef:
         @@@@@: 
           A newly created <QUOTE::dis> parser. 
       @@@PerlDef:
-        $r = bless $self-><M::swcfg21:SWCFGImplementation.createParser>,
+        $r = bless $self-><M::swcfg21:SWCFGImplementation::swcfg21:ForLatest
+                                           .createSWCFGParser>,
                    <ClassName::ManakaiDISParser>;
 
   @Method:
@@ -190,37 +211,102 @@ ClsDef:
             },
           },
           resDef => {},
-        }, <CassName::ManakaiDISDatabase>;
+        }, <ClassName::ManakaiDISDatabase>;
+
+  @Method:
+    @@Name: tfurisToURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Converts a pair of name URI reference and <QUOTE::for> URI reference 
+        into a <TYPE::dis:TFQNames>-expanded URI reference. 
+    @@Param:
+      @@@Name: typeURI
+      @@@Type: NameURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A URI reference to identify a resource. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Equivalent to <Q::DOMMain:any> (for historical reason). 
+    @@Param:
+      @@@Name: forURI
+      @@@Type: ForURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A <QUOTE::for> URI reference. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Equivalent to <QUOTE::for all>, i.e. <Q::ManakaiDOM:all>. 
+    @@Return:
+      @@@Type: 
+        DISCore:TFURI::ManakaiDOM:all
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The <TYPE::dis:TFQNames>-expanded URI references.  
+      @@@PerlDef:
+        $typeURI = <Q::DOMMain:any> unless defined $typeURI;
+        $forURI = <Q::ManakaiDOM:all> unless defined $forURI;
+        if ($forURI eq <Q::ManakaiDOM:all>) {
+          $r = $typeURI;
+        } else {
+          ## NOTE: [RFC 3986]
+          ##       fragment    := *(pchar / "/" / "?")
+          ##       pchar       := unreserved / pct-encoded / sub-delims / [:@]
+          ##       unreserved  := ALPHA / DIGIT / [._~-]
+          ##       sub-delims  := [!$&'()*+,;=]
+          ## NOTE: [XPointer Framework]
+          ##       SchemeData  := *EscapedData
+          ##       EscapedData := NormalChar / "^(" / "^)" / "^^"
+          ##                    / "(" SchemeData ")"
+          ##       NormalChar  := UnicodeChar - [()^]
+          for my $uri ($typeURI, $forURI) {
+            $uri =~ s{([^0-9A-Za-z:;?=_./-])}{sprintf '%%%02X', ord $1}ge;
+          }
+          $r =qq<data:,200411tf#xmlns(t=data:,200411tf%23)>.
+                             qq<t:tf($typeURI,$forURI)>;
+        }
 
 ##DISImplementation
 
 ClsDef:
   @ClsQName: ManakaiDISParser
   @ClsISA:
-    swcfg21:SWCFGParser
+    swcfg21:ManakaiSWCFGParser::swcfg21:ForLatest
   @Description:
     @@lang:en
     @@@:
       A SuikaWikiConfig/2.1 parser that returns <QUOTE::dis> object. 
   @Method:
-    @Name: parse
-    @Description:
-      @@lang:en
-      @@@:
+    @@Name: parse
+    @@Description:
+      @@@lang:en
+      @@@@:
         Parses a <QUOTE::dis> document and returns it as an object tree. 
-    @Param:
-      @@Name: input
-      @@Type:
-        DOMLS:LSInput
-      @@Description:
-        @@@lang:en
-        @@@@:
+    @@Param:
+      @@@Name: input
+      @@@Type:
+        DOMLS:LSInput::ManakaiDOM:ManakaiDOM3
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
           The input source. 
-    @Return:
-      @@Type: DISDocument
-      @@Description:
-        @@@lang:en
-        @@@@:
+    @@Return:
+      @@@Type: ManakaiDISDocument
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
           The <QUOTE::dis> document object created from the <P::input>. 
       @@@RaiseException:
         @@@@@:
@@ -232,7 +318,8 @@ ClsDef:
             document. 
       @@@PerlDef:
         __DEEP{
-          $r = $self-><M::swcfg21:ManakaiSWCFGParser.parse> ($input);
+          $r = $self-><M::swcfg21:ManakaiSWCFGParser
+                        ::swcfg21:ForLatest.parse> ($input);
         }__;
         if (defined $r) {
           $r = bless $r, <ClassName::ManakaiDISDocument>;
@@ -242,7 +329,7 @@ ClsDef:
 ClsDef:
   @ClsQName: ManakaiDISNode
   @ClsISA:
-    swcfg21:ManakaiSWCFGNode
+    swcfg21:ManakaiSWCFGNode::swcfg21:ForLatest
   @Description:
     @@lang:en
     @@@:
@@ -257,8 +344,7 @@ ClsDef:
         namespace URI.  The default namespaces are ignored. 
     @@Param:
       @@@Name:namespaceURI
-      @@@Type:
-        swcfg21:SWCFGString
+      @@@Type: AnyURI
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -293,7 +379,7 @@ ClsDef:
             Simply returns the <DOM::null> if no prefix associated. 
     @@Return:
       @@@Type:
-        swcfg21:SWCFGString
+        DISCore:NamespacePrefix::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -303,15 +389,14 @@ ClsDef:
       @@@InCase:
         @@@@Value:
           @@@@@is-null:1
-        @@@@Type:
-          swcfg21:SWCFGString
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
             No associated namespace prefix found. 
       @@@PerlDef:
         $r = null;
-        my $od = $self-><AG::swcfg21:SWCFGNode.ownerDocument> || $self;
+        my $od = $self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
+                                          .ownerDocument> || $self;
         my $binds = $od->{<Q::TreeCore:node>}->{<Q::nsBinding>};
         if (defined $namespaceURI) {
           FIND: {
@@ -378,7 +463,7 @@ ClsDef:
     @@Param:
       @@@Name:prefix
       @@@Type:
-        swcfg21:SWCFGString
+        DISCore:NamespacePrefix::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -409,23 +494,21 @@ ClsDef:
             even if no association newly created, this method 
             returns the <DOM::null> value. 
     @@Return:
-      @@@Type:
-        swcfg21:SWCFGString
+      @@@Type: AnyURI
       @@@Description:
         @@@@lang:en
         @@@@@:The associated namespace URI. 
       @@@InCase:
         @@@@Value:
           @@@@@is-null:1
-        @@@@Type:
-          swcfg21:SWCFGString
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
-            No namespace prefix is associated to the prefix or 
+            No namespace URI is associated to the prefix or 
             the <DOM::null> namespace is associated. 
       @@@PerlDef:
-        my $od = $self-><AG::swcfg21:SWCFGNode.ownerDocument> || $self;
+        my $od = $self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
+                                               .ownerDocument> || $self;
         my $binds = $od->{<Q::TreeCore:node>}->{<Q::nsBinding>};
         if (exists $binds->{$prefix}) {
           $r = $binds->{$prefix};
@@ -478,13 +561,12 @@ ClsDef:
   
   @Attr:
     @@Name:ownerDISDocument
-    @@NewIn21:
     @@Description:
       @@@lang:en
       @@@@:
         The <QUOTE::dis> document object associated with this node. 
     @@Get:
-      @@@Type:DISDocument
+      @@@Type:ManakaiDISDocument
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -492,7 +574,6 @@ ClsDef:
       @@@InCase:
         @@@@Value:
           @@@@@is-null:1
-        @@@@Type:DISDocument
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
@@ -506,7 +587,7 @@ ClsDef:
 ClsDef:
   @ClsQName: ManakaiDISElement
   @ClsISA:
-    swcfg21:ManakaiSWCFGElement
+    swcfg21:ManakaiSWCFGElement::swcfg21:ForLatest
   @ClsISA: ManakaiDISNode
   @Description:
     @@lang:en
@@ -540,6 +621,7 @@ ClsDef:
           @@@@@lang:en
           @@@@@@:
             No additional <QUOTE::For> URI reference. 
+            Equivalent to an empty array reference. 
     @@Return:
       @@@Type:
         DOMMain:boolean
@@ -550,16 +632,18 @@ ClsDef:
       @@@UndeclaredPrefixException:
       @@@NoDBException:
       @@@PerlDef:
-        $for_arg = <Q::ManakaiDOM:all> unless defined $for_arg;
-        $forp_arg ||= [];
+        $forArg = <Q::ManakaiDOM:all> unless defined $forArg;
+        $forpArg ||= [];
 
         FORMATCH: {
           __DEEP{
             my @ce = @{$self-><AG::ManakaiDISElement.disChildElements>};
             for my $ce (@ce) {
-              my $et = $ce-><AG::swcfg21:SWCFGElement.expandedURI>;
+              my $et = $ce-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
+                                                      .expandedURI>;
               if ($et eq <Q::dis:ForCheck>) {
-                my $for = [split /\s+/, $ce-><AG::swcfg21:SWCFGNode.value>];
+                my $for = [split /\s+/, $ce-><AG::swcfg21:SWCFGNode
+                                                ::swcfg21:ForLatest.value>];
                 FCs: for my $f (@$for) {
                   if ($f =~ /^!=(.+)$/) {        ## -- NOT EQUAL TO
                     my $uri = $self-><AG::ManakaiDISElement.qnameToURI> ($1);
@@ -567,7 +651,7 @@ ClsDef:
                                  -><AG::ManakaiDISDocument.disDatabase>
                                  -><M::ManakaiDISDatabase.getFor> ($uri);
                     $f-><AG::ManakaiDISForDefinition.isReferred> ($ce);
-                    for my $arg_uri ($for_arg, @{$forp_arg}) {
+                    for my $arg_uri ($forArg, @{$forpArg}) {
                       if ($uri eq $arg_uri) {
                         $r = false;
                         last FORMATCH;
@@ -579,7 +663,7 @@ ClsDef:
                                  -><AG::ManakaiDISDocument.disDatabase>
                                  -><M::ManakaiDISDatabase.getFor> ($uri);
                     $f-><AG::ManakaiDISForDefinition.isReferred> ($ce);
-                    for my $arg_uri ($for_arg, @{$forp_arg}) {
+                    for my $arg_uri ($forArg, @{$forpArg}) {
                       if ($f-><M::ManakaiDISForDefinition.isaURI> ($arg_uri)) {
                         $r = false;
                         last FORMATCH;
@@ -591,7 +675,7 @@ ClsDef:
                                  -><AG::ManakaiDISDocument.disDatabase>
                                  -><M::ManakaiDISDatabase.getFor> ($uri);
                     $f-><AG::ManakaiDISForDefinition.isReferred> ($ce);
-                    for my $arg_uri ($for_arg, @{$forp_arg}) {
+                    for my $arg_uri ($forArg, @{$forpArg}) {
                       if ($arg_uri eq $uri) {
                         next FCs;
                       }
@@ -604,7 +688,7 @@ ClsDef:
                                  -><AG::ManakaiDISDocument.disDatabase>
                                  -><M::ManakaiDISDatabase.getFor> ($uri);
                     $f-><AG::ManakaiDISForDefinition.isReferred> ($ce);
-                    for my $arg_uri ($for_arg, @{$forp_arg}) {
+                    for my $arg_uri ($forArg, @{$forpArg}) {
                       if ($f-><M::ManakaiDISForDefinition.isaURI> ($arg_uri)) {
                         next FCs;
                       }
@@ -618,9 +702,11 @@ ClsDef:
 
             my $has_for = false;
             for my $ce (@ce) {
-              if ($self-><AG::swcfg21:SWCFGElement.expandedURI> eq
+              if ($self-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
+                                                     .expandedURI> eq
                   <Q::dis:For>) {
-                my $for = [split /\s+/, $ce-><AG::swcfg21:SWCFGNode.value>];
+                my $for = [split /\s+/, $ce-><AG::swcfg21:SWCFGNode
+                                                ::swcfg21:ForLatest.value>];
                 my $ok = true;
                 $has_for = true;
                 AFOR: for my $f (@$for) {
@@ -630,7 +716,7 @@ ClsDef:
                                  -><AG::ManakaiDISDocument.disDatabase>
                                  -><M::ManakaiDISDatabase.getFor> ($uri);
                     $f-><AG::ManakaiDISForDefinition.isReferred> ($ce);
-                    if ($uri eq $for_arg) {
+                    if ($uri eq $forArg) {
                       $ok = false;
                       last AFOR;
                     }
@@ -640,7 +726,7 @@ ClsDef:
                                  -><AG::ManakaiDISDocument.disDatabase>
                                  -><M::ManakaiDISDatabase.getFor> ($uri);
                     $f-><AG::ManakaiDISForDefinition.isReferred> ($ce);
-                    if ($f-><M::ManakaiDISForDefinition.isaURI> ($for_arg)) {
+                    if ($f-><M::ManakaiDISForDefinition.isaURI> ($forArg)) {
                       $ok = false;
                       last AFOR;
                     }
@@ -650,7 +736,7 @@ ClsDef:
                                  -><AG::ManakaiDISDocument.disDatabase>
                                  -><M::ManakaiDISDatabase.getFor> ($uri);
                     $f-><AG::ManakaiDISForDefinition.isReferred> ($ce);
-                    unless ($uri eq $for_arg) {
+                    unless ($uri eq $forArg) {
                       $ok = false;
                       last AFOR;
                     }
@@ -660,17 +746,17 @@ ClsDef:
                                  -><AG::ManakaiDISDocument.disDatabase>
                                  -><M::ManakaiDISDatabase.getFor> ($uri);
                     $f-><AG::ManakaiDISForDefinition.isReferred> ($ce);
-                    unless ($f-><M::ManakaiDISForDefinition.isaURI> ($for_arg)) {
+                    unless ($f-><M::ManakaiDISForDefinition.isaURI> ($forArg)) {
                       $ok = false;
                       last AFOR;
                     }
                   }
                 } # AFOR
+                if ($ok) {
+                  $r = true;
+                  last FORMATCH;
+                }
               } # dis:For
-              if ($ok) {
-                $r = true;
-                last FORMATCH;
-              }
             } # $ce
             $r = $has_for ? false : true;
           }__;
@@ -691,7 +777,7 @@ ClsDef:
         @@@@@:
           A media type URI reference to test against. 
     @@Param:
-      @@@Name: mediaTypeDefault
+      @@@Name: defaultMediaType
       @@@Type: MediaTypeURI
       @@@Description:
         @@@@lang:en
@@ -742,7 +828,7 @@ ClsDef:
     @@Param:
       @@@Name: prefix
       @@@Type:
-        swcfg21:SWCFGString
+        DISCore:NamespacePrefix::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -756,16 +842,16 @@ ClsDef:
             Returns the default namespace URI. 
     @@NodeParam:
     @@Return:
-      @@@Type:
-        swcfg21:SWCFGString
+      @@@Type: AnyURI
       @@@Description:
         @@@@lang:en
         @@@@@: The URI references associated. 
       @@@UndeclaredPrefixException:
       @@@PerlDef:
-        if (defined $param) {
+        if (defined $prefix) {
           __DEEP{
-            $r = $self-><M::swcfg21:SWCFGNode.lookupNamespaceURI> ($prefix);
+            $r = $self-><M::swcfg21:SWCFGNode::swcfg21:ForLatest
+                                       .lookupNamespaceURI> ($prefix);
           }__;
           unless (defined $r) {
             __EXCEPTION{UNDECLARED_NS_PREFIX_ERR::
@@ -848,20 +934,20 @@ ClsDef:
         }
 
   @Method:
-    @@Name: typeforqnamesToURI
+    @@Name: tfqnamesToURI
     @@Description:
       @@@lang:en
       @@@@:
-        Converts a <TYPE::dis:TypeForQNames>
+        Converts a <TYPE::dis:TFQNames>
         into an expanded URI reference. 
     @@Param:
       @@@Name: tfqnames
       @@@Type: 
-        dis:TypeForQNames
+        dis:TFQNames
       @@@Description:
         @@@@lang:en
         @@@@@:
-          A <TYPE::dis:TypeForQNames> to identify a resource. 
+          A <TYPE::dis:TFQNames> to identify a resource. 
     @@Param:
       @@@Name: defaultTypeURI
       @@@Type: NameURI
@@ -895,11 +981,11 @@ ClsDef:
     @@NodeParam:
     @@Return:
       @@@Type: 
-        DISCore:TypeForURI
+        DISCore:TFURI::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The <TYPE::dis:TypeForQNames>-expanded URI references.  
+          The <TYPE::dis:TFQNames>-expanded URI references.  
       @@@UndeclaredPrefixException:
       @@@PerlDef:
         my ($typeq, $forq) = split /\s*::\s*/, $tfqnames, 2;
@@ -923,12 +1009,14 @@ ClsDef:
                                                  : <Q::DOMMain:any>
                        : $self-><M::ManakaiDISElement.qnameToURI> ($typeq, %opt);
           }__;
-          $for = defined $defaultForURI ? $defaultForURI : <Q::ManakaiDOM:all>;
+          $forURI = defined $defaultForURI ? $defaultForURI
+                                           : <Q::ManakaiDOM:all>;
         }
         __DEEP{
-          $r = $self-><AG::swcfg21:SWCFGNode.ownerDocument>
-                    -><AG::swcfg21:SWCFGDocument.implementation>
-                    -><M::DISImplementation.typeforqnamesToURI>
+          $r = $self-><AG::ManakaiDISNode.ownerDISDocument>
+                    -><AG::swcfg21:SWCFGDocument::swcfg21:ForLatest
+                                                    .implementation>
+                    -><M::ManakaiDISImplementation.tfurisToURI>
                                                   ($typeURI, $forURI);
         }__;
 
@@ -954,10 +1042,11 @@ ClsDef:
           No attribute node found. 
       @@@PerlDef:
         for my $c (@{$self->{src}-><AG::ManakaiDISElement.disChildElements>}) {
-          if ($c-><AG::DISElement.expandedURI> eq $attrName and
+          if ($c-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
+                                    .expandedURI> eq $attrName and
               $c-><AG::ManakaiDISElement.forMatch> ($forArg, $forpArg) and
               $c-><AG::ManakaiDISElement.mediaTypeMatch>
-                                         ($mediaType, $mediaTypeDefault)) {
+                                         ($mediaType, $defaultMediaType)) {
             $r = $c;
             last;
           }
@@ -967,7 +1056,11 @@ ClsDef:
     @@Name: disGetAttributeList
     @@enDesc:
       Gets attribute nodes. 
-    @@AttrNameParam:
+    @@Param:
+      @@@Name: attrName
+      @@@Type: AnyURI
+      @@@enDesc:
+        The name expanded URI of the node to retrieve. 
     @@ForParam:
     @@ForpParam:
     @@MediaTypeParam:
@@ -979,10 +1072,11 @@ ClsDef:
       @@@PerlDef:
         $r = bless [], <ClassName::ManakaiDISElementList>;
         for my $c (@{$self->{src}-><AG::ManakaiDISElement.disChildElements>}) {
-          if ($c-><AG::DISElement.expandedURI> eq $attrName and
+          if ($c-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
+                                          .expandedURI> eq $attrName and
               $c-><AG::ManakaiDISElement.forMatch> ($forArg, $forpArg) and
               $c-><AG::ManakaiDISElement.mediaTypeMatch>
-                                         ($mediaType, $mediaTypeDefault)) {
+                                         ($mediaType, $defaultMediaType)) {
             push @$r, $c;
           }
         }
@@ -996,7 +1090,8 @@ ClsDef:
       @@@enDesc:
         The current snapshot of child nodes. 
       @@@PerlDef:
-        $r = bless [@{$self-><AG::swcfg21:SWCFGElement.childNodes>}],
+        $r = bless [@{$self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
+                                                     .childNodes>}],
                    <ClassName::ManakaiDISElementList>;    
 
   @Attr:
@@ -1013,8 +1108,8 @@ ClsDef:
         @@@@enDesc:
           No value. 
       @@@UndeclaredPrefixException:
-      @@@GetProp:
-        my $v = $self-><AG::swcfg21:SWCFGNode.value>;
+      @@@PerlDef:
+        my $v = $self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
         if (defined $v and not ref $v eq 'ARRAY') {
           __DEEP{
             $r = $self-><AG::ManakaiDISElement.qnameToURI> ($v);
@@ -1024,9 +1119,9 @@ ClsDef:
         }
 
   @Attr:
-    @@Name: typeforqnamesValueURI
+    @@Name: tfqnamesValueURI
     @@enDesc:
-      The element value (written as <TYPE::dis:TypeForQNames>),
+      The element value (written as <TYPE::dis:TFQNames>),
       as URI reference. 
       \
       {NOTE:: What should be if list value?
@@ -1038,11 +1133,11 @@ ClsDef:
         @@@@enDesc:
           No value. 
       @@@UndeclaredPrefixException:
-      @@@GetProp:
-        my $v = $self-><AG::swcfg21:SWCFGNode.value>;
+      @@@PerlDef:
+        my $v = $self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
         if (defined $v and not ref $v eq 'ARRAY') {
           __DEEP{
-            $r = $self-><AG::ManakaiDISElement.typeforqnamesToURI> ($v);
+            $r = $self-><AG::ManakaiDISElement.tfqnamesToURI> ($v);
           }__;
         } else {
           $r = null;
@@ -1065,7 +1160,7 @@ ClsDef:
 ClsDef:
   @ClsQName: ManakaiDISComment
   @ClsISA:
-    swcfg21:ManakaiSWCFGComment
+    swcfg21:ManakaiSWCFGComment::swcfg21:ForLatest
   @ClsISA: ManakaiDISNode
   @Description:
     @@lang:en
@@ -1076,7 +1171,7 @@ ClsDef:
 ClsDef:
   @ClsQName: ManakaiDISDocumentFragment
   @ClsISA:
-    swcfg21:ManakaiSWCFGDocumentFragment
+    swcfg21:ManakaiSWCFGDocumentFragment::swcfg21:ForLatest
   @ClsISA: ManakaiDISNode
   @Description:
     @@lang:en
@@ -1087,7 +1182,7 @@ ClsDef:
 ClsDef:
   @ClsQName: ManakaiDISDocument
   @ClsISA:
-    swcfg21:ManakaiSWCFGDocument
+    swcfg21:ManakaiSWCFGDocument::swcfg21:ForLatest
   @ClsISA: ManakaiDISNode
   @Description:
     @@lang:en
@@ -1128,71 +1223,6 @@ ClsDef:
   @ClsQName: ManakaiDISDatabase
   @enDesc:
     Resource database created from <QUOTE::dis> source data. 
-
-  @Method:
-    @@Name: typeforurisToURI
-    @@Description:
-      @@@lang:en
-      @@@@:
-        Converts a pair of name URI reference and <QUOTE::for> URI reference 
-        into a <TYPE::dis:TypeForQNames>-expanded URI reference. 
-    @@Param:
-      @@@Name: typeURI
-      @@@Type: NameURI
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          A URI reference to identify a resource. 
-      @@@InCase:
-        @@@@Value:
-          @@@@@is-null:1
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            Equivalent to <Q::DOMMain:any> (for historical reason). 
-    @@Param:
-      @@@Name: forURI
-      @@@Type: ForURI
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          A <QUOTE::for> URI reference. 
-      @@@InCase:
-        @@@@Value:
-          @@@@@is-null:1
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            Equivalent to <QUOTE::for all>, i.e. <Q::ManakaiDOM:all>. 
-    @@Return:
-      @@@Type: 
-        DISCore:TypeForURI
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The <TYPE::dis:TypeForQNames>-expanded URI references.  
-      @@@PerlDef:
-        $typeURI = <Q::DOMMain:any> unless defined $typeURI;
-        $forURI = <Q::ManakaiDOM:all> unless defined $forURI;
-        if ($forURI eq <Q::ManakaiDOM:all>) {
-          $r = $typeURI;
-        } else {
-          ## NOTE: [RFC 3986]
-          ##       fragment    := *(pchar / "/" / "?")
-          ##       pchar       := unreserved / pct-encoded / sub-delims / [:@]
-          ##       unreserved  := ALPHA / DIGIT / [._~-]
-          ##       sub-delims  := [!$&'()*+,;=]
-          ## NOTE: [XPointer Framework]
-          ##       SchemeData  := *EscapedData
-          ##       EscapedData := NormalChar / "^(" / "^)" / "^^"
-          ##                    / "(" SchemeData ")"
-          ##       NormalChar  := UnicodeChar - [()^]
-          for my $uri ($typeURI, $forURI) {
-            $uri =~ s{([^0-9A-Za-z:;?=_./-])}{sprintf '%%%02X', ord $1}ge;
-          }
-          $r =qq<data:,200411tf#xmlns(t=data:,200411tf%23)>.
-                             qq<t:tf($typeURI,$forURI)>;
-        }
 
   @Method:
     @@Name: getModule
@@ -1280,8 +1310,7 @@ ClsDef:
         @@@@lang:en
         @@@@@:
           A <QUOTE::dis> resource URI reference. 
-      @@@InCase:
-        @@@@nullValue:
+      @@@nullCase:
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
@@ -1309,7 +1338,51 @@ ClsDef:
           require Scalar::Util;
           Scalar::Util::weaken ($r->{db});
         }
+
+  @Method:
+    @@Name: getSourceFile
+    @@enDesc:
+      Gets <QUOTE::dis> source document. 
+    @@Param:
+      @@@Name: fileName
+      @@@Type: FileURI
+      @@@enDesc:
+        A URI reference identifying a file. 
+    @@Return:
+      @@@Type: ManakaiDISDocument
+      @@@enDesc:
+        The <QUOTE::dis> source document. 
+      @@@nullCase:
+        @@@@enDesc:
+          No document associated with that <P::fileName>. 
+      @@@PerlDef:
+        $r = $self->{<Q::sourceFile>}->{$fileName};
+  @Method:
+    @@Name: setSourceFile
+    @@enDesc:
+      Puts <QUOTE::dis> source document object. 
+    @@Param:
+      @@@Name: fileName
+      @@@Type: FileURI
+      @@@enDesc:
+        A URI reference identifying a file.  If there is alredy a 
+        source document, then the association has been updated. 
+    @@Param:
+      @@@Name: doc
+      @@@Type: ManakaiDISDocument
+      @@@enDesc:
+        The document object to set. 
+    @@Return:
+      @@@PerlDef:
+        $self->{<Q::sourceFile>}->{$fileName} = $doc;
 ##DISDatabase
+
+PropDef:
+  @QName: sourceFile
+  @enDesc:
+    Source <QUOTE::dis> documents. 
+  @rdfs:domain: ManakaiDISDatabase
+  @rdfs:range: ManakaiDISDocument
 
 ClsDef:
   @ClsQName: ManakaiDISModuleDefinition
@@ -1335,7 +1408,7 @@ ClsDef:
       The URI reference of this module, without 
       <QUOTE::for> identifier. 
     @@Get:
-      @@@PropDef:
+      @@@PerlDef:
         $r = $self->{uri};
 
   @Attr:
@@ -1343,7 +1416,7 @@ ClsDef:
     @@enDesc:
       The local name of this module. 
     @@Type:
-      DISCore:localName
+      DISCore:LocalName::ManakaiDOM:all
     @@Get:
       @@@PerlDef:
         $r = $self->{localName};
@@ -1477,7 +1550,7 @@ ClsDef:
         @@@@lang:en
         @@@@@:
           The module object. 
-      @@@NullCase:
+      @@@nullCase:
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
@@ -1508,7 +1581,7 @@ ClsDef:
             The <QUOTE::for> definition for this <QUOTE::for> is already read. 
       @@@PerlDef:
         if ($self->{<Q::isDefined>}) {
-          __EXCEPTION{FOR_ALREADY_DEFINED_ERR}__;
+  #        __EXCEPTION{FOR_ALREADY_DEFINED_ERR}__;
         }
         ## TODO: 
         $self->{<Q::isDefined>} = true;
@@ -1543,7 +1616,7 @@ ClsDef:
       @@@nullCase:
         @@@@enDesc:
           This resource does not have its name URI reference. 
-      @@@PropDef:
+      @@@PerlDef:
         $r = $self->{uri};
 
   @Attr:
@@ -1551,7 +1624,7 @@ ClsDef:
     @@enDesc:
       The local name of this resource. 
     @@Type:
-      DISCore:localName
+      DISCore:LocalName::ManakaiDOM:all
     @@Get:
       @@@nullCase:
         @@@@enDesc:
@@ -1604,7 +1677,7 @@ ClsDef:
       The <QUOTE::for+> URI references for which this resource is defined. 
     @@Type: ForURIList
     @@Get:
-      @@@PropDef:
+      @@@PerlDef:
         $r = $self->{forp};
   
   @Method:
@@ -1685,7 +1758,7 @@ ClsDef:
         @@@@lang:en
         @@@@@:
           The module object. 
-      @@@NullCase:
+      @@@nullCase:
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
@@ -1710,7 +1783,7 @@ ClsDef:
 
 ClsDef:
   @ClsQName: ManakaiDISPropertyAccessor
-  @enDescription:
+  @enDesc:
     Accessor methods for resource or module properties. 
   
   @Method:
@@ -1721,7 +1794,7 @@ ClsDef:
     @@Param:
       @@@Name:default
       @@@Type:
-        swcfg21:SWCFGString
+        swcfg21:SWCFGString::swcfg21:ForLatest
       @@@enDesc:
         The default value that is returned if no explicit property 
         value specification found for this resource. 
@@ -1731,7 +1804,7 @@ ClsDef:
           no value specified. 
     @@Return:
       @@@Type:
-        swcfg21:SWCFGString
+        swcfg21:SWCFGString::swcfg21:ForLatest
       @@@enDesc:
         The property value string. 
       @@@nullCase:
@@ -1793,6 +1866,20 @@ ClsDef:
           $self->{$propName} = [$res->{uri}];
         }
 
+ElementTypeBinding:
+  @Name: PropNameParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@Name: propName
+    @@Type: ResourceURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The name of the property. 
+
 ##DISPropertyAccessor
 
 PropDef:
@@ -1812,7 +1899,7 @@ PropDef:
       Whether the subject resource is defined or not. 
 
 PropDef:
-  @Qname:isReferred
+  @QName:isReferred
   @Description:
     @@lang:en
     @@@:
@@ -1832,6 +1919,18 @@ PropDef:
 ## -- Datatypes
 
 URITypeDef:
+  @QName: AnyURI
+  @Description:
+    @@lang:en
+    @@@:
+      Any URI references. 
+
+URITypeDef:
+  @QName: FileURI
+  @enDesc:
+    URI references identifying file. 
+
+URITypeDef:
   @QName: ForURI
   @Description:
     @@lang:en
@@ -1846,11 +1945,48 @@ DataTypeDef:
       References to the array containing <QUOTE::for> URI references. 
 
 URITypeDef:
+  @QName: ResourceURI
+  @Description:
+    @@lang:en
+    @@@:
+      A URI reference for a <QUOTE::dis> resource. 
+
+URITypeDef:
   @QName: MediaTypeURI
   @Description:
     @@lang:en
     @@@:
       Media type URI references. 
+  @rdfs:subClassOf: ResourceURI
+
+URITypeDef:
+  @QName: ModuleURI
+  @enDesc:
+    URI references for <QUOET::dis> modules. 
+  @rdfs:subClassOf: ResourceURI
+
+URITypeDef:
+  @QName: NameURI
+  @enDesc:
+    URI references identifying a resource. 
+  @rdfs:subClassOf: ResourceURI
+
+ElementTypeBinding:
+  @Name: DataTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DataType
+
+ElementTypeBinding:
+  @Name: URITypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DataType
+    @@rdfs:subClassOf: AnyURI
 
 ## -- Exceptions
 
@@ -1861,3 +1997,431 @@ XParamDef:
     @@@:
       The node from which the string has come. 
   @Type: DISNode
+
+ExceptionDef:
+  @ClsQName: ManakaiDISException
+  @enDesc:
+    Exceptions for the <QUOTE::dis> operations. 
+  @XConstGroupDef:
+    @@ClsQName: ManakaiDISExceptionCode
+    @@enDesc:
+      Exception codes for <Class::ManakaiDISException>. 
+    @@XConstDef:
+      @@@Name: NAMESPACE_ERR
+      @@@Value:14
+      @@@enDesc:
+        An error related to namespaces has occurred. 
+      @@@XSubTypeDef:
+        @@@@QName: UNDECLARED_NS_PREFIX_ERR
+        @@@@enDesc:
+          The implementation has encounted an undeclared namespace 
+          prefix. 
+    @@XConstDef:
+      @@@Name: INVALID_STATE_ERR
+      @@@Value:11
+      @@@enDesc:
+        An attempt is made to use an object that is not (or no longer) usable. 
+      @@@XSubTypeDef:
+        @@@@QName: NO_ASSOCIATED_DB_ERR
+        @@@@enDesc:
+          No <QUOTE::dis> database has been associated with this document. 
+
+ElementTypeBinding:
+  @Name: ClsDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:Class
+    @@AliasFor:
+      @@@@:
+        ::ForLatest
+      @@@For:
+        !=ForLatest
+    @@ForCheck:
+      ManakaiDOM:Perl
+    @@DOMMain:implementFeature: CoreFeature10
+
+ElementTypeBinding:
+  @Name: ExceptionDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:ExceptionClass
+    @@AliasFor:
+      @@@@:
+        ::ForLatest
+      @@@For:
+        !=ForLatest
+    @@ForCheck:
+      ManakaiDOM:Perl
+    @@DOMMain:implementFeature: CoreFeature10
+
+ElementTypeBinding:
+  @Name: ClsQName
+  @ElementType:
+    dis:QName
+
+ElementTypeBinding:
+  @Name: ClsISA
+  @ElementType:
+    dis:ISA
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Method
+
+ElementTypeBinding:
+  @Name: IntMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Method
+    @@ManakaiDOM:isForInternal:1
+
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Attribute
+
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodReturn
+
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:AttributeGet
+
+ElementTypeBinding:
+  @Name: Set
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:AttributeSet
+
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+
+ElementTypeBinding:
+  @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
+
+ElementTypeBinding:
+  @Name: disDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:dis
+
+ElementTypeBinding:
+  @Name: InCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+
+ElementTypeBinding:
+  @Name: nullCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@is-null:1
+
+ElementTypeBinding:
+  @Name: TrueCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:true
+    @@Type:
+      DOMMain:boolean
+
+
+ElementTypeBinding:
+  @Name: FalseCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:false
+    @@Type:
+      DOMMain:boolean
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdf:Property
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: MethodRedef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Method
+    @@ManakaiDOM:isRedefining:1
+
+ElementTypeBinding:
+  @Name: NamedParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1
+
+ElementTypeBinding:
+  @Name: NodeParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1
+    @@Name: node
+    @@Type: ManakaiDISNode
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The node in which the name has occurred.  It is intended 
+        to be reported when an exception had been raised. 
+    @@ResourceDef:
+      @@@rdf:type:
+        ManakaiDOM:InCase
+      @@@Value:
+        @@@@is-null:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The source of the name is not a node. 
+
+ElementTypeBinding:
+  @Name: ForParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1
+    @@Name: forArg
+    @@Type: ForURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The <QUOTE::for> URI reference. 
+    @@ResourceDef:
+      @@@rdf:type:
+        ManakaiDOM:InCase
+      @@@Value:
+        @@@@is-null:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Equivalent to <Q::ManakaiDOM:all>, i.e. <QUOTE::for all>. 
+
+ElementTypeBinding:
+  @Name: ForpParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1
+    @@Name: forpArg
+    @@Type: ForURIList
+    @@Description:
+      @@@lang:en
+      @@@@:
+        An array reference containing additional <QUOTE::for> 
+        constraints (<QUOTE::For+> list).
+    @@ResourceDef:
+      @@@rdf:type:
+        ManakaiDOM:InCase
+      @@@Value:
+        @@@@is-null:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Equivalent to the empty array reference. 
+
+ElementTypeBinding:
+  @Name: MediaTypeParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1
+    @@Name: mediaType
+    @@Type: MediaTypeURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The URI reference identifying a media type. 
+    @@ResourceDef:
+      @@@rdf:type:
+        ManakaiDOM:InCase
+      @@@Value:
+        @@@@is-null:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          No media type specified. 
+
+ElementTypeBinding:
+  @Name: MediaTypeDefaultParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1
+    @@Name: defaultMediaType
+    @@Type: MediaTypeURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The default media type, i.e. the type used when no explicit 
+        specification is not found in the source tree. 
+    @@ResourceDef:
+      @@@rdf:type:
+        ManakaiDOM:InCase
+      @@@Value:
+        @@@@is-null:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Defaulted to <Q::DOMMain:any>. 
+
+ElementTypeBinding:
+  @Name: RaiseException
+  @ElementType:
+    ManakaiDOM:raises
+
+ElementTypeBinding:
+  @Name: UndeclaredPrefixException
+  @ElementType:
+    ManakaiDOM:raises
+  @ShadowContent:
+    @@@: UNDECLARED_NS_PREFIX_ERR
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The implementation has encounted an undeclared namespace prefix. 
+
+ElementTypeBinding:
+  @Name: NoDBException
+  @ElementType:
+    ManakaiDOM:raises
+  @ShadowContent:
+    @@@: NO_DB_ASSOCIATED_ERR
+    @@Description:
+      @@@lang:en
+      @@@@:
+        No <QUOTE::dis> database is associated to this document. 
+
+ElementTypeBinding:
+  @Name: XConstGroupDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:ConstGroup
+    @@Type:
+      DOMMain:unsigned-short::ManakaiDOM:all
+    @@rdfs:subClassOf:
+      DOMMain:unsigned-short::ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: XConstDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:Const
+
+ElementTypeBinding:
+  @Name: XSubTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:ExceptionOrWarningSubType
+
+ElementTypeBinding:
+  @Name: XParam
+  @ElementType:
+    ManakaiDOM:exceptionOrWarningParameter
+
+ElementTypeBinding:
+  @Name: XParamDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: 
+      DOMMain:XWParameter
+    @@AliasFor:
+      @@@For:
+        !=ManakaiDOM:all
+      @@@@:
+        ::ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: enMufDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:muf
+    @@lang:en
+

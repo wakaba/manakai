@@ -420,7 +420,7 @@ sub dis_node_ctype_match ($$%) {
     next unless $_->node_type eq '#element';
     if ($_->local_name eq 'ContentType') {
       my $uri = dis_qname_to_uri ($_->value, use_default_namespace => 1, %opt);
-      $State->{def_required}->{Class}->{$uri} ||= 1;
+      $State->{def_required}->{Class}->{$uri} ||= $_;
       unless (dis_uri_ctype_match ($uri, $type_uri, %opt)) {
         return undef;
       }
@@ -1215,7 +1215,7 @@ sub dis_load_classdef_element ($;%) {
           unless defined $State->{current_class_container};
       }
       $State->{def_required}->{Class}->{$dfuri} = -1;
-      $State->{def_required}->{Class}->{$canon} ||= 1;
+      $State->{def_required}->{Class}->{$canon} ||= $al;
 
       $cls->{subsetOf}->{$_} = 1 if grep {$oldcls->{subsetOf}->{$_}}
                                     keys %{$oldcls->{subsetOf}};
@@ -1247,7 +1247,7 @@ sub dis_load_classdef_element ($;%) {
     if ($opt{For} ne ExpandedURI q<ManakaiDOM:all> and
         not $cls->{aliasURI}->{$alluri}) {
       push @{$cls->{ISA}||=[]}, $alluri;
-      #$State->{def_required}->{Class}->{$alluri} ||= 1;
+      #$State->{def_required}->{Class}->{$alluri} ||= $node;
     }
   } elsif ($ln) {
     my $lname = $ln->value;
@@ -1280,7 +1280,7 @@ sub dis_load_classdef_element ($;%) {
           $State->{Resource}->{$_} = $cls;
         }
         $State->{def_required}->{Class}->{$dfuri} ||= -1;
-        $State->{def_required}->{Class}->{$canon} ||= 1;
+        $State->{def_required}->{Class}->{$canon} ||= $al;
 
         $cls->{subsetOf}->{$_} = 1 if grep {$oldcls->{subsetOf}->{$_}}
                                       keys %{$oldcls->{subsetOf}};
@@ -1307,7 +1307,7 @@ sub dis_load_classdef_element ($;%) {
       if ($opt{For} ne ExpandedURI q<ManakaiDOM:all> and
           not $cls->{aliasURI}->{$alluri}) {
         push @{$cls->{ISA}||=[]}, $alluri;
-        #$State->{def_required}->{Class}->{$alluri} ||= 1;
+        #$State->{def_required}->{Class}->{$alluri} ||= $node;
       }
     } else {  ## Local class
       my $dfuri = dis_typeforuris_to_uri ($lname, $opt{For}, %opt);
@@ -2770,4 +2770,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/02/18 11:40:52 $
+1; # $Date: 2005/02/25 07:32:35 $

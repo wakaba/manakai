@@ -21,7 +21,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/18 06:13:52 $
+      $Date: 2005/02/25 07:32:35 $
     @@ContentType:
       dis:Date.RCS
   
@@ -649,6 +649,31 @@ DataTypeDef:
       The <QUOTE:disdoc> text format
 
 DataTypeDef:
+  @QName: NCName
+  @FullName:
+    @@lang:en
+    @@@:
+      <QUOTE::dis> NCName
+
+DataTypeDef:
+  @QName: NamespacePrefix
+  @FullName:
+    @@lang:en
+    @@@:
+      <QUOTE::dis> Namespace Prefix
+  @subsetOf: NCName
+  @rdfs:subClassOf: NCName
+
+DataTypeDef:
+  @QName: LocalName
+  @FullName:
+    @@lang:en
+    @@@:
+      <QUOTE::dis> Local Name
+  @subsetOf: NCName
+  @rdfs:subClassOf: NCName
+
+DataTypeDef:
   @QName:
     dis:TypeQName
   @FullName:
@@ -673,6 +698,13 @@ DataTypeDef:
     @@lang:en
     @@@:
       A pair of resource QName and optional <QUOTE:For> QName.
+
+DataTypeDef:
+  @QName: TFURI
+  @Description:
+    @@lang:en
+    @@@:
+      <Q::dis:TFQNames>-expanded URI references. 
 
 DataTypeDef:
   @QName:
