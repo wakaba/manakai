@@ -1,4 +1,6 @@
 Namespace:
+  @DOMXML:  
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @infoset:
      http://www.w3.org/2001/04/infoset#
   @lang:
@@ -17,7 +19,7 @@ Module:
   @Spec:
     @@DOM3:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-BBACDC08
-  @Namespace:
+  @Namespace:     
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @Package:
     @@Type:
@@ -41,7 +43,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/19 07:14:42 $
+     $Date: 2004/09/19 12:49:34 $
   @Require:
     @@Module:
       @@@Name: DOMCore
@@ -51,7 +53,14 @@ Module:
       @@@Name: ManakaiDOMXML
       @@@Namespace:
         http://suika.fam.cx/~wakaba/archive/2004/mdom-xml#
-
+  
+  @ConditionDef:
+    @@Name: DOM1
+  @ConditionDef:
+    @@Name: DOM2
+  @ConditionDef:
+    @@Name: DOM3
+    
   @Feature:
     @@Name: XML
     @@Version: 1.0
@@ -101,6 +110,12 @@ Module:
       @@@DOM3[list]:
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#Document3-version
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-E067D597
+    @@Description:
+      @@@lang:en
+      @@@@: The Extensible Markup Language (XML) 1.0. 
+    @@ImplNote:
+      @@@lang:en
+      @@@@: The "XML"/"3.0" feature must be supported [DOM 3].
   @Feature:
     @@Name: XMLVersion
     @@Version: 1.1
@@ -110,6 +125,12 @@ Module:
       @@@DOM3[list]:
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#Document3-version
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-E067D597
+    @@Description:
+      @@@lang:en
+      @@@@: The Extensible Markup Language (XML) 1.1.
+    @@ImplNote:
+      @@@lang:en
+      @@@@: The "XML"/"3.0" feature must be supported [DOM 3].
 
 IF:
   @Name:  CDATASection

@@ -1233,6 +1233,16 @@ sub condition_match ($%) {
                          default_list => @$conds ? []
                                                  : ($opt{level_default} || []),
                          as_array => 1);
+  for (@$conds) {
+    unless ($Info->{Condition}->{$_}) {
+      valid_err qq<Condition "$_" not defined>;
+    }
+  }
+  for (@$level) {
+    unless ($Info->{Condition}->{"DOM".$_}) {
+      valid_err qq<Condition "DOM$_" not defined>;
+    }
+  }
   if (not $opt{condition}) {
     if (@$conds == 0 and @$level == 0) {
       return 1;
@@ -2293,6 +2303,9 @@ sub constgroup2perl ($;%) {
   my $mod = get_level_description $node, level => \@level;
   my $result = '';
   my $consts = {};
+  $Info->{DataTypeAlias}->{expanded_uri $node->get_attribute_value ('Name')}
+       ->{isa_uri} = [type_expanded_uri $node->get_attribute_value
+                                         ('Type', default => q<DOMMain:any>)];
 
   my $i = 0;
   {
@@ -2325,7 +2338,7 @@ sub constgroup2perl ($;%) {
                                any_unless_condition
                                        => $opt{any_unless_condition});
         $i++;
-      } elsif ({qw/Name 1 Spec 1 ISA 1 Description 1
+      } elsif ({qw/Name 1 Spec 1 ISA 1 Description 1 Type 1 IsBitMask 1
                    Level 1 SpecLevel 1 Def 1 ImplNote 1/}->{$_->local_name}) {
         #
       } else {
@@ -2601,6 +2614,8 @@ $Info->{Package} = perl_code (get_perl_definition $Module, name => 'Package',
 $Info->{Namespace}->{(DEFAULT_PFX)}
   = $Module->get_attribute_value ('Namespace')
   or valid_err q<Module namespace URI (/Module/Namespace) MUST be specified>;
+$Info->{Namespace}->{$Module->get_attribute_value ('Name')}
+  = $Info->{Namespace}->{(DEFAULT_PFX)};
 $Info->{uri_to_perl_package}->{$Info->{Namespace}->{(DEFAULT_PFX)}}
   = $Info->{Package};
 $Info->{Require_perl_package} = {};
@@ -2748,20 +2763,20 @@ for my $condition (sort keys %{$Info->{Condition}}, '') {
                         pod_paras (get_description $Feature);
 
     if (@$not_implemented) {
-      push @feature_desc, pod_para ('This module supports the interfaces '.
-                                    'in this feature but not yet fully ' .
+      push @feature_desc, pod_para ('This module provides interfaces '.
+                                    'of this feature but not yet fully ' .
                                     'implemented.');
       $result .= perl_comment "$f_name, $f_ver: $not_implemented->[0]." .
                               "$not_implemented->[1]<$not_implemented->[2]>" .
                               " not implemented.";
     } else {
       push @feature_desc, pod_para ('This module implements this feature, ' .
-                                    'so that the method calls ' .
+                                    'so that the method calls such as ' .
                                     pod_code ('$DOMImplementation' .
                                               '->hasFeature (' .
                                               perl_literal ($f_name) .
                                               ', ' . perl_literal ($f_ver) .
-                                              ')') . ' and ' .
+                                              ')') . ' or ' .
                                     pod_code ('$DOMImplementation' .
                                               '->hasFeature (' .
                                               perl_literal ($f_name) .
@@ -2832,6 +2847,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/09/19 07:57:43 $
+# $Date: 2004/09/19 12:49:34 $
 
 

@@ -1,7 +1,15 @@
 2004-09-19  Wakaba  <wakaba@suika.fam.cx>
 
+	* dis2pm.pl (condition_match): Report error if the condition 
+	not defined.
+
+	* ManakaiDOMMain.dis (MDOM_IMPL_BY_APP): New exception code.
+
 	* dis2pm.pl (datatype2perl, datatypealias2perl): "FullName" attribute 
 	introduced.
+	(constgroup2perl): Define is-a relationship between group 
+	Name and its Type.
+	(constgroup2perl): "IsBitMask" attribute introduced.
 
 	* ManakaiDOMMain.dis: Renamed from "ManakaiDOM.dis".
 

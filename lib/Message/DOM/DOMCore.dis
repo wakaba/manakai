@@ -46,7 +46,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/19 07:14:42 $
+     $Date: 2004/09/19 12:49:34 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -2082,13 +2082,15 @@ IF:
                 ## This node is read-only.
                 __EXCEPTION{
                   DOMException.NO_MODIFICATION_ALLOWED_ERR:
-                    <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_DEST>,
+                    <Q:MDOM_EXCEPTION:subtype>
+                                    => <Q:MDOM_EXCEPTION:NOMOD_THIS>,
                 }__;
               } elsif ($parentNode and $parentNode->{<Q:DOMCore:read-only>}) {
                 ## Parent of new node(s) is read-only
                 __EXCEPTION{
                   DOMException.NO_MODIFICATION_ALLOWED_ERR:
-                    <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_SRC>,
+                    <Q:MDOM_EXCEPTION:subtype>
+                                     => <Q:MDOM_EXCEPTION:NOMOD_SRC_PARENT>,
                     <Q:MDOM_EXCEPTION:param-name> => 'newChild',
                 }__;
               }
@@ -2415,13 +2417,14 @@ IF:
                 ## This node is read-only.
                 __EXCEPTION{
                   DOMException.NO_MODIFICATION_ALLOWED_ERR:
-                    <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_DEST>,
+                    <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_THIS>,
                 }__;
               } elsif ($parentNode and $parentNode->{<Q:DOMCore:read-only>}) {
                 ## Parent of new node(s) is read-only
                 __EXCEPTION{
                   DOMException.NO_MODIFICATION_ALLOWED_ERR:
-                    <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_SRC>,
+                    <Q:MDOM_EXCEPTION:subtype>
+                                          => <Q:MDOM_EXCEPTION:NOMOD_SRC_PARENT>,
                     <Q:MDOM_EXCEPTION:param-name> => 'newChild',
                 }__;
               }
@@ -2667,7 +2670,7 @@ IF:
             if ($node->{<Q:DOMCore:read-only>}) {
               __EXCEPTION{
                 DOMException.NO_MODIFICATION_ALLOWED_ERR:
-                  
+                  <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_THIS>,
               }__;
             }
             my $oldChildID = ref $oldChild ?
@@ -2814,13 +2817,14 @@ IF:
                 ## This node is read-only.
                 __EXCEPTION{
                   DOMException.NO_MODIFICATION_ALLOWED_ERR:
-                    <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_DEST>,
+                    <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_THIS>,
                 }__;
               } elsif ($parentNode and $parentNode->{<Q:DOMCore:read-only>}) {
                 ## Parent of new node(s) is read-only
                 __EXCEPTION{
                   DOMException.NO_MODIFICATION_ALLOWED_ERR:
-                    <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_SRC>,
+                    <Q:MDOM_EXCEPTION:subtype>
+                                       => <Q:MDOM_EXCEPTION:NOMOD_SRC_PARENT>,
                     <Q:MDOM_EXCEPTION:param-name> => 'newChild',
                 }__;
               }
@@ -3266,7 +3270,9 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         The text content of this node and its descendants.
+         The text content of this node and its descendants. 
+         Note that element content whitespaces are not considered 
+         as the text content of an "Element".
      @@Get:
         @@@Type:  DOMString
         @@@Description:
@@ -3314,13 +3320,23 @@ IF:
           @@@@@:
             __DEEP{
               for (@{$self->{<Q:TreeCore:node>}->{<Q:infoset:children>}}) {
-                if ($_->{<Q:DOMCore:nodeType>} ne <Q:infoset:Comment> and
+                if ($_->{<Q:DOMCore:nodeType>} eq <Q:DOMCore:Text>) {
+                  unless ($_->{<Q:infoset:elementContentWhitespace>}) {
+                    $r .= $_->textContent;
+                  }
+                } elsif ($_->{<Q:DOMCore:nodeType>} ne <Q:infoset:Comment> and
                    $_->{<Q:DOMCore:nodeType>} ne
                                        <Q:infoset:ProcessingInstruction>) {
                   $r .= $_->textContent;
                 }
               }
             }__;
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            ISSUE: Element content does not allow non-whitespace 
+            character data or CDATA section.  In invalid document, 
+            how this is?
      @@Set:
         @@@Type:  DOMString
         @@@Description:
@@ -3361,6 +3377,7 @@ IF:
             if ($node->{<Q:DOMCore:read-only>}) {
               __EXCEPTION{
                 DOMException.NO_MODIFICATION_ALLOWED_ERR:
+                  <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:THIS>,
               }__;
             }
             my @oldChild = @{$node->{<Q:infoset:children>}};
@@ -3538,7 +3555,6 @@ IF:
            DOMCore:nodeType.
          \
            Optional properties: infoset:localName, infoset:prefix,
-           infoset:publicIdentifier, infoset:systemIdentifier,
            DOMCore:ownerDocument, infoset:namespaceName, DOMCore:name,
            DOMCore:read-only.
 
@@ -4287,6 +4303,7 @@ IF:
             if ($node->{<Q:DOMCore:read-only>}) {
               __EXCEPTION{
                 DOMException.NO_MODIFICATION_ALLOWED_ERR:
+                  <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_THIS>,
               }__;
             }
             $node->{<Q:infoset:content>} .= $arg;
@@ -4336,6 +4353,7 @@ IF:
           if ($self->{<Q:TreeCore:node>}->{<Q:DOMCore:read-only>}) {
             __EXCEPTION{
               DOMException.NO_MODIFICATION_ALLOWED_ERR:
+                <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_THIS>,
             }__;
           }
           my $r;
@@ -4396,6 +4414,7 @@ IF:
           if ($self->{<Q:TreeCore:node>}->{<Q:DOMCore:read-only>}) {
             __EXCEPTION{
               DOMException.NO_MODIFICATION_ALLOWED_ERR:
+                <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_THIS>,
             }__;
           }
           my $r;
@@ -4462,6 +4481,7 @@ IF:
           if ($self->{<Q:TreeCore:node>}->{<Q:DOMCore:read-only>}) {
             __EXCEPTION{
               DOMException.NO_MODIFICATION_ALLOWED_ERR:
+                <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_THIS>,
             }__;
           }
           my $r;
@@ -4517,7 +4537,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@: The text content of this node and its descendants.
-     @@@ImplNote:
+     @@ImplNote:
         @@@lang:en
         @@@@:
           CharacterData->data == CharacterData->nodeValue == 
@@ -4801,12 +4821,6 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@: The type information.
-        @@@Def:
-          @@@@Type:
-            lang:dis
-          @@@@GetProp:
-            DOMCore:schemaTypeInfo
-## TODO: This might need reconsideration by the definition of the "TypeInfo".
      @@Level[list]:  3
      @@SpecLevel:3
   @Attr:
@@ -5113,7 +5127,7 @@ IF:
               __WARNING{
                 DOMException.NO_MODIFICATION_ALLOWED_ERR:
                   <Q:MDOM_EXCEPTION:subtype>
-                              => <Q:MDOM_EXCEPTION:NODE_READ_ONLY>,
+                              => <Q:MDOM_EXCEPTION:NOMOD_THIS>,
               }__;
             } elsif (not defined $node->{<Q:infoset:prefix>} and
                      $node->{<Q:infoset:localName>} and
@@ -5385,12 +5399,6 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@: The type information.
-        @@@Def:
-          @@@@Type:
-            lang:dis
-          @@@@GetProp:
-            DOMCore:schemaTypeInfo
-## TODO: This might need reconsideration by the definition of the "TypeInfo".
      @@Level[list]:  3
      @@SpecLevel:3
   @Method:
@@ -5630,7 +5638,7 @@ IF:
               __WARNING{
                 DOMException.NO_MODIFICATION_ALLOWED_ERR:
                   <Q:MDOM_EXCEPTION:subtype>
-                              => <Q:MDOM_EXCEPTION:NODE_READ_ONLY>,
+                              => <Q:MDOM_EXCEPTION:NOMOD_THIS>,
               }__;
             } else {
               __CODE{CheckNCName: ncname => given, version => version,
@@ -5668,22 +5676,156 @@ IF:
 IF:
   @Name:  Text
   @ISA:  CharacterData
+  @Description:
+    @@lang:en
+    @@@:
+      The textual content of an "Element" or "Attr".
+    \
+      When a document is first made available via the DOM, 
+      there is only one "Text" node for each block of text. 
+      DOM applications may create adjust "Text" nodes that 
+      represent the contents of a given node (but there is no 
+      way to represent the separation between these nodes in 
+      XML or HTML so they will not persist between DOM editing sessions 
+      in general).
   @ImplNote:
     @@lang:en
     @@@:
      "Text" is a "CharacterData" is a "Node".  "CDATASection" is a "Text".
   @Method:
      @@Name:  splitText
-     @@Return:
-        @@@Type:  Text
-        @@@Exception[list]:  DOMException
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Break this node into two nodes.  After being split, 
+         this node will contain all the content up to the break point 
+         and a new node of the same type will contain all the content 
+         at and after the break point.
+      \
+         If the original node had a parent node, the new node is 
+         inserted as the next sibling of this node.
      @@Param:
         @@@Name:  offset
         @@@Type:  unsigned-long
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The 16-bit unit offset at which to split.
+     @@Return:
+        @@@Type:  Text
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The new node, of the same type as this node.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: INDEX_SIZE_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The "offset" is negative or greater than the number 
+              of 16-bit units.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either this node is read-only [DOM 1, 2, 3] or 
+              the parent node of this node is read-only.
+      @@@Exception:
+        @@@@Type: 
+          ManakaiDOM:ManakaiDOMImplementationException
+        @@@@Name: MDOM_INDEX_IN_SURROGATE_PAIR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: An attempt is made to break surrogate pair.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          my $node = $self->{<Q:TreeCore:node>};
+          my $parentNode = $node->{<Q:infoset:parent>};
+          if ($node->{<Q:DOMCore:read-only>}) {
+            __EXCEPTION{
+              DOMException.NO_MODIFICATION_ALLOWED_ERR:
+                <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_THIS>,
+            }__;
+          } elsif ($parentNode and $parentNode->{<Q:DOMCore:read-only>}) {
+            __EXCEPTION{
+              DOMException.NO_MODIFICATION_ALLOWED_ERR:
+                <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_PARENT>,
+            }__;
+          }
+                          ## Condition sensitive
+          my $ds = $self->__SUPER{CharacterData}__::__INT{getDOMStringValue}__;
+          my $len = length ($node->{<Q:infoset:content>}) * 2;
+          my $after;
+          __DEEP{
+            $after = $ds->__INT{substring}__ ($offset, $len);
+            $ds->__INT{delete}__ ($offset, $len);
+          }__;
+          my $newNode;
+          if ($node->{<Q:DOMCore:nodeType>} eq <Q:DOMCore:Text>) {
+                        ## Condition sensitive
+            $newNode = __CLASS{Text}__->__INT{newObject}__;
+          } elsif ($node->{<Q:DOMCore:nodeType>} eq <Q:DOMCore:CDATASection>) {
+                        ## Condition sensitive
+            $newNode = __CLASS{CDATASection}__->__INT{newObject}__;
+          } else {
+            __EXCEPTION{
+              ManakaiDOMImplementationException.MDOM_DEBUG_BUG:
+                <Q:MDOM_EXCEPTION:values> => {
+                  <Q:DOMCore:nodeType> => $node->{<Q:DOMCore:nodeType>},
+                },
+            }__;
+          }
+          $newNode->{<Q:infoset:content>} = $after;
+          if ($parentNode) {
+            $parentNode->__SUPER{ManakaiDOMNodeObject::}__::__INT{importTree}__
+                                                                   ($newNode);
+            for my $i (0..$#{$parentNode->{<Q:infoset:children>}}) {
+              if ($parentNode->{<Q:infoset:children>}->[$i]
+                             ->{<Q:TreeCore:nodeID>} eq
+                  $node->{<Q:TreeCore:nodeID>}) {
+                splice @{$parentNode->{<Q:infoset:children>}},
+                       $i + 1, 0, $newNode;
+                last;
+              }
+            }
+            $newNode->{<Q:infoset:parent>} = $parentNode;
+          }
+          $newNode->{<Q:DOMCore:ownerDocument>}
+                                           = $node->{<Q:DOMCore:ownerDocument>};
+    @@SpecLevel:1
+    @@Level[list]:
+      1
+      2
+      3
   @Attr:
      @@Name:  isElementContentWhitespace
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Whether this text node contains element content whitespaces.
      @@Get:
         @@@Type:  boolean
+        @@@InCase:
+          @@@@Value:true
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: This text node contains element content whitespaces.
+        @@@InCase:
+          @@@@Value:false
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This text node contains element content whitespaces or 
+              no validation occurs so that it is unknown.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            infoset:elementContentWhitespace
      @@Level[list]:  3
      @@SpecLevel:3
   @Attr:
@@ -5752,28 +5894,25 @@ IF:
         @@@@@: $r = __SUPER{Node}__->TEXT_NODE;
     @@Redefine: Node
     @@RedefinedBy: CDATASection
+## IF:Text
 
 IF:
   @Name:  Comment
   @ISA:  CharacterData
+  @Description:
+    @@lang:en
+    @@@:
+      A comment, corresponding to a comment declaration in the HTML or 
+      XML or a comment information item in the XML Infoset.
   @ImplNote:
     @@lang:en
     @@@:
       "Comment" is a "CharacterData" is a "Node".
+  @ImplNote:
+    @@lang:en
+    @@@:
+      HTML comment declaration might have multiple "comment". 
   
-  @ReAttr:
-    @@Name: attributes
-    @@Spec:
-      @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-84CF096
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
-    @@Get:
-      @@@Type: NamedNodeMap
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          $r = null;
   @ReAttr:
     @@Name: nodeName
     @@Spec:
@@ -5809,178 +5948,659 @@ IF:
           lang:Perl
         @@@@@: $r = __SUPER{Node}__->COMMENT_NODE;
     @@Redefine: Node
+## IF:Comment
 
 IF:
   @Name:  TypeInfo
+  @Description:
+    @@lang:en
+    @@@:
+      A type referenced from "Element" or "Attr" nodes, 
+      specified in the schemas associated with the document.
+    \
+      The type is a pair of namespace URI and name.  It depsnds 
+      on the schema language in use.
+  @ImplNote:
+    @@lang:en
+    @@@:
+      If the schema language is the XML Schema:
+     \
+      - If [validity] property exists and its value is 
+      "invalid" or "notKnown": ("typeNamespace", "typeName") = 
+      ({target namespace}, {name}) or ("null", "null").
+     \
+      NOTE: The XML Schema specification does not require 
+      exposing the declared type.  DOM implementation might choose 
+      not to provide type information if validity is not valid.
+     \
+      - If [validity] exists and its value is "valid":
+     \
+      -- If [member type definition] exists:
+     \
+      --- If {name} is not absent: ("typeNamespace", "typeName") = 
+      [member type definition].({target namespace}, {name}).
+     \
+      --- Otherwise: ("typeNamespace", "typeName") = 
+      (namespace, local name) of the corresponding anonymous type name.
+     \
+      -- If [type definition] exists:
+     \
+      --- If {name} is not absent: ("typeNamespace", "typeName") =
+      [type definition].({target namespace}, {name}).
+     \
+      --- Otherwise: ("typeNamespace", "typeName") =
+      (namespace, local name) of the corresponding anonymous type name.
+     \
+      -- If [member type definition anonymous] exists:
+     \
+      --- If false: ("typeNamespace", "typeName") =
+      ([member type definition namespace], [member type definition name]).
+     \
+      --- Otherwise: ("typeNamespace", "typeName") =
+      (namespace, local name) of the corresponding anonymous type name.
+     \
+      -- If [type definition anonymous] exists:
+     \
+      --- If false: ("typeNamespace", "typeName") =
+      ([type definition namespace], [type definition name]).
+     \
+      --- Otherwise: ("typeNamespace", "typeName") =
+      (namespace, local name) of the corresponding anonymous type name.
+     \
+      Other schema languages are outside of the scope of the W3C and 
+      should define how to represent their type systems using "TypeInfo".
   @Level[list]:  3
   @SpecLevel:3
   @Attr:
      @@Name:  typeName
+     @@Description:
+       @@@lang:en
+       @@@@: The name of the type.
      @@Get:
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The name of the type.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The name is unknown.
+       
   @Attr:
      @@Name:  typeNamespace
+     @@Description:
+       @@@lang:en
+       @@@@: The namespace of the type.
      @@Get:
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace of the type.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either the associated element or attribute does not have 
+              declaration or no namespace information is available.
+        @@@InCase:
+          @@@@Value:
+            http://www.w3.org/TR/REC-xml
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              The schema language is the XML DTD and the node 
+              associated is an "Attr".
+            \
+              In this case, the "typeName" is the value of 
+              the [attribute type] property of the XML Infoset.
+     @@ImplNote:
+       @@@lang:en
+       @@@@: Is this namespace *URI*?
   @ConstGroup:
      @@Name:  DerivationMethods
+     @@Description:
+       @@@lang:en
+       @@@@:
+         A set of possible types of derivation.
+     @@Type: unsigned-long
+     @@IsBitMask:1
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Any type derives from "xsd:anyType".
      @@Const:
         @@@Name:  DERIVATION_RESTRICTION
         @@@Type:  unsigned-long
         @@@Value:  0x00000001
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The derivation by restriction.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            Other type definition = reference type definition or 
+            reference type definition.{base type definition}. ... 
+            .{base type definition} = other type definition and 
+            all the derivation methods involved are restriction.
+          \
+            Any simple type derives from "xsd:anySimpleType" by restriction.
      @@Const:
         @@@Name:  DERIVATION_EXTENSION
         @@@Type:  unsigned-long
         @@@Value:  0x00000002
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The derivation by extension.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            Reference type definition.{base type definition}.
+            ... .{base type definition} = other type definition 
+            and at least one of the derivation methods 
+            involeved is an extension. 
+          \
+            Both types are complex types or both are simple types.
      @@Const:
         @@@Name:  DERIVATION_UNION
         @@@Type:  unsigned-long
         @@@Value:  0x00000004
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The union.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            Other type definition --derive<DERIVATION_RESTRICTION>--> T2 
+            or other type definition = T2,
+            T1 --derive<DERIVATION_RESTRICTION or DERIVATION_EXTENSION>--> 
+            reference type definition or T1 = reference type definition, 
+            T1.{variety} = union and T1.{member type definition} = T2.
      @@Const:
         @@@Name:  DERIVATION_LIST
         @@@Type:  unsigned-long
         @@@Value:  0x00000008
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The list.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@: 
+            Other type definition --derive<DERIVATION_RESTRICTION>--> T2 
+            or other type definition = T2,
+            T1 --derive<DERIVATION_RESTRICTION or DERIVATION_EXTENSION>--> 
+            reference type definition or T1 = reference type definition, 
+            T1.{variety} = list and T1.{item type definition} = T2.
   @Method:
      @@Name:  isDerivedFrom
-     @@Return:
-        @@@Type:  boolean
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Return whether there is a derivation between the definition 
+         of this type and the other type definition.
      @@Param:
         @@@Name:  typeNamespaceArg
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace of the other type definition.
      @@Param:
         @@@Name:  typeNameArg
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The name of the other type definition.
      @@Param:
         @@@Name:  derivationMethod
-        @@@Type:  unsigned-long
+        @@@Type:  DerivationMethods
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The type of derivation and conditions applied between 
+            two types.
+     @@Return:
+        @@@Type:  boolean
+        @@@InCase:
+          @@@@Value:true
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The schema language is the XML Schema and 
+              the definition of this type is derived from the 
+              other type definition according to the derivation 
+              parameter.
+            \
+              If the "derivationMethod" is "0", the other 
+              type definition can be reached by recursing any 
+              combination of {base type definition}, 
+              {item type definition} or {member type definition} 
+              from the definition of this type.
+        @@@InCase:
+          @@@@Value:false
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either the schema language is the XML Schema and 
+              the other type definition is not derived from 
+              the definition of this type, the schema language 
+              is the XML DTD or no schama language is associated.
 
 IF:
   @Name:  UserDataHandler
+  @Description:
+    @@lang:en
+    @@@:
+      A handler to implement various behaviors regarding the 
+      data associated to the DOM nodes.
   @Level[list]:  3
   @SpecLevel:3
   @ConstGroup:
      @@Name:  OperationType
+     @@Type: unsigned-short
+     @@Description:
+       @@@lang:en
+       @@@@: The type of operation being performed on a node.
      @@Const:
         @@@Name:  NODE_CLONED
         @@@Type:  unsigned-short
         @@@Value:  1
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node is cloned.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@: The node is cloned.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@: "Node.cloneNode".
      @@Const:
         @@@Name:  NODE_IMPORTED
         @@@Type:  unsigned-short
         @@@Value:  2
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node is imported.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@: "Document.importNode".
      @@Const:
         @@@Name:  NODE_DELETED
         @@@Type:  unsigned-short
         @@@Value:  3
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The node is deleted.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            This may not be supported or may not be reliable in certain 
+            environment, such as Java, where the DOM implementation 
+            has no real control over when objects are actually deleted.
      @@Const:
         @@@Name:  NODE_RENAMED
         @@@Type:  unsigned-short
         @@@Value:  4
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node is renamed.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@: "Document.renameNode".
      @@Const:
         @@@Name:  NODE_ADOPTED
         @@@Type:  unsigned-short
         @@@Value:  5
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node is adopted.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@: "Document.adoptNode".
   @Method:
      @@Name:  handle
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Called whenever the node for which the handler is registered 
+         is imported or cloned.
+       \
+         DOM applications MUST NOT raise exceptions in a 
+         "UserDataHandler".  The effect of throwing exceptions 
+         from the handler is implementation dependent.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         The manakai DOM implementation does NOT warn when 
+         an exception is thrown.
      @@Param:
         @@@Name:  operation
-        @@@Type:  unsigned-short
+        @@@Type:  OperationType
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The type of operation that is being performed on the node.
      @@Param:
         @@@Name:  key
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The key for which this handler is being called.
      @@Param:
         @@@Name:  data
         @@@Type:  DOMUserData
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The data for which this handler is being called.
      @@Param:
         @@@Name:  src
         @@@Type:  Node
+        @@@Description:
+          @@@@lang:en
+          @@@@@: 
+            The node being cloned, adopted, imported or renamed.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The node is being deleted.
      @@Param:
         @@@Name:  dst
         @@@Type:  Node
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node newly created.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: No node is newly created.
 
 IF:
   @Name:  DOMError
+  @Description:
+    @@lang:en
+    @@@: Describes an error.
   @Level[list]:  3
   @SpecLevel:3
   @ConstGroup:
      @@Name:  ErrorSeverity
+     @@Type: unsigned-short
+     @@Description:
+       @@@lang:en
+       @@@@: The severity of the error.
      @@Const:
         @@@Name:  SEVERITY_WARNING
         @@@Type:  unsigned-short
         @@@Value:  1
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            Warning.  It will not cause the processing stop unless 
+            "DOMErrorHandler.handleError" returns "false".
      @@Const:
         @@@Name:  SEVERITY_ERROR
         @@@Type:  unsigned-short
         @@@Value:  2
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            Error.  It may not cause the processing to stop 
+            if the error can be recovered, unless 
+            "DOMErrorHandler.handleError" returns "false".
      @@Const:
         @@@Name:  SEVERITY_FATAL_ERROR
         @@@Type:  unsigned-short
         @@@Value:  3
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            Fatal error.  It will cause the normal processing to stop.  
+            The return value of "DOMErrorHandler.handleError" is 
+            ignored unless the implementation chooses to continue, 
+            in which case the behavior becomes undefined.
   @Attr:
      @@Name:  severity
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The severity of the error.
      @@Get:
-        @@@Type:  unsigned-short
+        @@@Type:  ErrorSeverity     
   @Attr:
      @@Name:  message
+     @@Description:
+       @@@lang:en
+       @@@@:
+         An implementation specific string describing the error that occurred.
      @@Get:
         @@@Type:  DOMString
   @Attr:
      @@Name:  type
+     @@Description:
+       @@@lang:en
+       @@@@:
+         A string indicating which related data is expected in 
+         "relatedData".
+       \
+         Implementators of DOM applications should refer to the 
+         specification of the error in order to find "type" and 
+         "relatedData" defiition if any.
+     @@ImplNote:
+       @@@lang:en
+       @@@@: "Document.normalizeDocument".
      @@Get:
         @@@Type:  DOMString
   @Attr:
      @@Name:  relatedException
+     @@Description:
+       @@@lang:en
+       @@@@: The related platform dependent exception if any.
      @@Get:
         @@@Type:  DOMObject
   @Attr:
      @@Name:  relatedData
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The related "DOMError.type" dependent data if any.
      @@Get:
         @@@Type:  DOMObject
   @Attr:
      @@Name:  location
+     @@Description:
+       @@@lang:en
+       @@@@: The location of the error.
      @@Get:
         @@@Type:  DOMLocator
 
 IF:
   @Name:  DOMErrorHandler
+  @Description:
+    @@lang:en
+    @@@:
+      A callback interface that the DOM implementation can call when 
+      reporting errors that happens while processing XML data or 
+      when doing some other processing.
+    \
+      A "DOMErrorHandler" object can be attached to a "Document" using 
+      the "error-handler" on the "DOMConfiguration" interface.
+    \
+      If more than one error needs to be reported during an operation, 
+      the sequence and numbers of the errors passed to the error handler 
+      are implementation dependent.
   @Level[list]:  3
   @SpecLevel:3
   @Method:
      @@Name:  handleError
-     @@Return:
-        @@@Type:  boolean
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Called when an error occurs.
      @@Param:
         @@@Name:  error
         @@@Type:  DOMError
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The error object that describes the error.
+          \
+            This object may be reused by the DOM implementation 
+            across multiple calls to the method "handleError".
+     @@Return:
+        @@@Type:  boolean
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            Whether the processing should be continued.
+          \
+            Throwing an exception from this method is considered 
+            to be equivalent of returning "true".
+        @@@InCase:
+          @@@@Value: true
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The processing may continue depending on "DOMError.severity".
+        @@@InCase:
+          @@@@Value:false
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The processing should be stopped when possible.
+        @@@Exception:
+          @@@@Type: 
+            ManakaiDOM:ManakaiDOMImplementationException
+          @@@@Name: MDOM_IMPL_BY_APP
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The method MUST be implemented by the DOM application.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            __EXCEPTION{
+              ManakaiDOMImplementationException.MDOM_IMPL_BY_APP:
+            }__;
 
 IF:
   @Name:  DOMLocator
   @Level[list]:  3
   @SpecLevel:3
+  @Description:
+    @@lang:en
+    @@@: Describes a location.
   @Attr:
      @@Name:  lineNumber
+     @@Description:
+        @@@lang:en
+        @@@@: The line number to which this locator is pointing.
      @@Get:
         @@@Type:  long
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The line number.
+        @@@InCase:
+          @@@@Value:-1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: There is no column number available.
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              "Column" in the DOM 3 Specification should be "line"? 
+              Or this is correct?
   @Attr:
      @@Name:  columnNumber
+     @@Description:
+       @@@lang:en
+       @@@@: The column number to which this locator is pointing.
      @@Get:
         @@@Type:  long
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The column number.
+        @@@InCase:
+          @@@@Value:-1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              There is no column number available.
   @Attr:
      @@Name:  byteOffset
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The byte offset into the input source to which this locator 
+         is pointing.
      @@Get:
         @@@Type:  long
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The byte offset.
+        @@@InCase:
+          @@@@Value: -1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: There is no byte offset available.
   @Attr:
      @@Name:  utf16Offset
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The UTF-16 offset into the input source to which 
+         this locator is pointing.
      @@Get:
         @@@Type:  long
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The UTF-16 offset.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: There is no UTF-16 offset available.
   @Attr:
      @@Name:  relatedNode
+     @@Description:
+       @@@lang:en
+       @@@@: The node to which this locator is pointing.
      @@Get:
         @@@Type:  Node
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node pointed.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: There is no node available.
   @Attr:
      @@Name:  uri
+     @@Description:
+       @@@lang:en
+       @@@@: The URI to which this locator is pointing.
      @@Get:
-        @@@Type:  DOMString
+        @@@Type:
+          ManakaiDOM:ManakaiDOMURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The URI.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: There is no URI is available.
 
 IF:
   @Name:  DOMConfiguration

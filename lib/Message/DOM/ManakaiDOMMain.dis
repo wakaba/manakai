@@ -24,7 +24,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/19 07:57:43 $
+     $Date: 2004/09/19 12:49:34 $
   
   @Description:
     @@lang:en
@@ -277,7 +277,13 @@ Exception:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          Unexpected case occurs.
+          Unexpected case occurs.  In general, this exception is not 
+          reported.  If the DOM implementation has a bug and 
+          something unexpected is occur, this exception is raised. 
+        \
+          DOM application MUST NOT try to catch this exception. 
+          If this exception is raised, please report to the 
+          author of that module.
       @@@Param:
         @@@@QName:
           ManakaiDOMImplementationException:values
@@ -286,6 +292,16 @@ Exception:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: Arbitrary values for debugging.
+  
+  @Const:
+    @@Name: MDOM_IMPL_BY_APP
+    @@Type: unsigned-short
+    @@Value: 4
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The method or attribute called is part of the callback 
+        interface so that the DOM application must implement it.
 
 Warning:
   @Name: ManakaiDOMImplementationWarning
