@@ -420,7 +420,7 @@ sub fold ($$;$) {
      # next split a whitespace
      # else we are looking at a single word and probably don't want to split
      my $x = "";
-     $x .= "$1\n    "
+     $x .= "$1\n "
        while($string =~ s/^$REG{WSP}*(
                           [^"]{$min,$max}?[\,\;]
                           |[^"]{1,$max}$REG{WSP}
@@ -492,7 +492,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/26 05:41:16 $
+$Date: 2002/03/26 15:19:53 $
 
 =cut
 

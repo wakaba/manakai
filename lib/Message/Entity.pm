@@ -13,7 +13,7 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw($VERSION %DEFAULT);
-$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 use Message::Header;
 use overload '""' => sub {shift->stringify};
@@ -210,9 +210,8 @@ sub _add_ua_field ($) {
       push @perl_comment, $^O;
     }
     if ($^V) {	## 5.6 or later
-      $ua->replace (name => 'Perl', version => sprintf ('%vd', $^V,
-        add_prepend => -1),
-                    comment => [@perl_comment]);
+      $ua->replace (name => 'Perl', version => sprintf ('%vd', $^V),
+                    comment => [@perl_comment], add_prepend => -1);
     } elsif ($]) {	## Before 5.005
       $ua->replace (name => 'Perl', version => $],
                     comment => [@perl_comment], add_prepend => -1);
@@ -258,7 +257,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/26 05:41:16 $
+$Date: 2002/03/26 15:19:53 $
 
 =cut
 
