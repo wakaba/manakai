@@ -17,7 +17,7 @@ Perl module for MIME charset.
 package Message::MIME::Charset;
 use strict;
 use vars qw(%CHARSET %MSNAME2IANANAME %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 &_builtin_charset;
 sub _builtin_charset () {
@@ -119,6 +119,41 @@ my %_MINIMUMIZER = (
 	'utf-32be'	=> \&_name_utf32be,
 );
 
+my %_IsMimeText;
+for (qw(
+	adobe-standard-encoding	adobe-symbol-encoding
+	big5	big5-eten	big5-hkscs
+	cp950
+	gbk	gb18030
+	euc-jp	euc-jisx0213	euc-kr	euc-tw
+	hp-roman8
+	hz-gb-2312
+	ibm437
+	iso-2022-cn	iso-2022-cn-ext
+	iso-2022-int-1
+	iso-2022-jp	iso-2022-jp-1	iso-2022-jp-2	iso-2022-jp-3
+	iso-2022-kr
+	iso-8859-1	iso-8859-2	iso-8859-3
+	iso-8859-4	iso-8859-5	iso-8859-6
+	iso-8859-7	iso-8859-8	iso-8859-9
+	iso-8859-10	iso-8859-12	iso-8859-13
+	iso-8859-14	iso-8859-15	iso-8859-16
+	jis_encoding
+	koi8-r	koi8-u
+	x-mac-arabic	x-mac-centralroman	x-mac-cyrillic	x-mac-greek
+	x-mac-hebrew	x-mac-icelandic	macintosh	x-mac-turkish
+	x-mac-ukrainian	x-mac-chinesesimp	x-mac-japanese	x-mac-korean
+	shift_jis	shift_jisx0213	x-sjis
+	tis-620
+	unicode-1-1-utf-7	unicode-1-1-utf-8
+	unicode-2-0-utf-7	unicode-2-0-utf-8
+	utf-7	utf-8	utf-9
+	viscii
+	windows-1250	windows-1251	windows-1252	windows-1253
+	windows-1254	windows-1255	windows-1256	windows-1257
+	windows-1258	windows-31j	windows-949
+)) { $_IsMimeText{$_} = 1 }
+
 %MSNAME2IANANAME = (
 	'iso-2022-jp'	=> 'x-iso2022jp-cp932',
 	'ks_c_5601-1987'	=> 'windows-949',
@@ -179,7 +214,14 @@ sub decode ($$) {
 
 sub name_normalize ($) {
   my $name = lc shift;
-  $CHARSET{$name}->{preferred_name} || $name;
+  if (ref $CHARSET{$name}->{preferred_name} eq 'CODE') {
+    return &{ $CHARSET{$name}->{preferred_name} } ($name);
+  } elsif ($CHARSET{$name}->{preferred_name}) {
+    return $CHARSET{$name}->{preferred_name};
+  } elsif (ref $CHARSET{'*undef'}->{preferred_name} eq 'CODE') {
+    return &{ $CHARSET{'*undef'}->{preferred_name} } ($name);
+  }
+  $name;
 }
 
 sub name_minimumize ($$) {
@@ -473,6 +515,20 @@ sub _utf8_off ($) {
   Encode::_utf8_off ($_[0]) if $Encode::VERSION;
 }
 
+sub is_mime_text ($) {
+  my $name = lc shift;
+  if (ref $CHARSET{$name}->{mime_text} eq 'CODE') {
+    return &{ $CHARSET{$name}->{mime_text} } ($name);
+  } elsif (defined $CHARSET{$name}->{mime_text}) {
+    return $CHARSET{$name}->{mime_text};
+  } elsif (defined $_IsMimeText{$name}) {
+    return $_IsMimeText{$name};
+  } elsif (ref $CHARSET{'*undef'}->{mime_text} eq 'CODE') {
+    return &{ $CHARSET{'*undef'}->{mime_text} } ($name);
+  }
+  0;
+}
+
 =head1 LICENSE
 
 Copyright 2002 wakaba E<lt>w@suika.fam.cxE<gt>.
@@ -495,7 +551,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/22 02:48:55 $
+$Date: 2002/07/22 07:48:01 $
 
 =cut
 
