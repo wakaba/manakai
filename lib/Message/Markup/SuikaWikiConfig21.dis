@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/02/19 07:21:14 $
+      $Date: 2005/02/19 11:53:29 $
     @@ContentType:
       dis:Date.RCS
   
@@ -348,7 +348,7 @@ IFClassDef:
             as the owner of this node. 
       @@@PerlDef:
         unless (UNIVERSAL::isa ($node, <IFName::SWCFGNode>)) {
-          if ($opt{nodeOrText}) {
+          if ($nodeOrText) {
             __DEEP{
               $r = $self-><M::ManakaiSWCFGNode.appendText> ($node);
             }__;
@@ -363,11 +363,15 @@ IFClassDef:
           if ($this_node_type eq '#comment') {
             __EXCEPTION{HIERARCHY_BAD_TYPE_ERR::
               MDOMX:param-name => 'node',
+              swcfg21:parentNodeType => {$this_node_type},
+              swcfg21:childNodeType => {$that_node_type},
             }__;
           } elsif ($this_node_type ne '#document') {
             if ($that_node_type eq '#comment') {
               __EXCEPTION{HIERARCHY_BAD_TYPE_ERR::
                 MDOMX:param-name => 'node',
+                swcfg21:parentNodeType => {$this_node_type},
+                swcfg21:childNodeType => {$that_node_type},
               }__;
             }
           } else {
@@ -375,6 +379,8 @@ IFClassDef:
                 $that_node_type eq '#fragment') {
               __EXCEPTION{HIERARCHY_BAD_TYPE_ERR::
                 MDOMX:param-name => 'node',
+                swcfg21:parentNodeType => {$this_node_type},
+                swcfg21:childNodeType => {$that_node_type},
               }__;
             }
           }
@@ -474,6 +480,8 @@ IFClassDef:
         if ($this_type eq '#comment') {
           __EXCEPTION{HIERARCHY_BAD_TYPE_ERR::
             MDOMX:param-name => 'type',
+            swcfg21:parentNodeType => {$this_type},
+            swcfg21:childNodeType => {$type},
           }__;
         }
         if ($type eq '#element') {
@@ -488,6 +496,8 @@ IFClassDef:
           if ($this_type ne '#document') {
             __EXCEPTION{HIERARCHY_BAD_TYPE_ERR::
               MDOMX:param-name => 'type',
+              swcfg21:parentNodeType => {$this_type},
+              swcfg21:childNodeType => {$type},
             }__;
           }
           __DEEP{
@@ -497,6 +507,8 @@ IFClassDef:
         } else {
           __EXCEPTION{HIERARCHY_BAD_TYPE_ERR::
             MDOMX:param-name => 'type',
+            swcfg21:parentNodeType => {$this_type},
+            swcfg21:childNodeType => {$type},
           }__;
         }
         $self->{<Q::TreeCore:node>}
@@ -523,17 +535,17 @@ IFClassDef:
           A text to append. 
     @@Return:
       @@@RaiseException:
-        @@@@@: HIERARCHY_BAD_TYPE_ERR
+        @@@@@: HIERARCHY_NO_VALUE_ERR
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
-            An attempt is made to set a value to document or 
-            document fragment node. 
+            An attempt is made to set a value to document node.
       @@@PerlDef:
         my $nt = $self-><AG::SWCFGNode.nodeType>;
-        if ($nt eq '#document' or $nt eq '#fragment') {
-          __EXCEPTION{HIERARCHY_BAD_TYPE_ERR::
+        if ($nt eq '#document') {
+          __EXCEPTION{HIERARCHY_NO_VALUE_ERR::
             MDOMX:param-name => 'text',
+            swcfg21:parentNodeType => {$nt},
           }__;
         } elsif (ref ($self->{<Q::TreeCore:node>}->{<Q::value>}) eq 'ARRAY') {
           push @{$self->{<Q::TreeCore:node>}->{<Q::value>}}, $text;
@@ -1468,7 +1480,48 @@ IFClassDef:
             $r .= <ClassM::ManakaiSWCFGNode.getNodeReference> ($_)->stringify;
           }
 
-          $r .= "\x0A";
+          ## Element Type Binding
+          my $eb = '';
+          for (sort keys %{$self->{<Q::TreeCore:node>}->{<Q::etBinding>}}) {
+            my $b = $self->{<Q::TreeCore:node>}->{<Q::etBinding>}->{$_};
+            next unless $b;
+            $eb .= "\x0A" . 'ElementTypeBinding:' . "\x0A"
+                          . '  @Name:' . "\x0A"
+                          . '    ' . $b->{elementType} . "\x0A"
+                          . '  @ElementType:' . "\x0A"
+                          . '    ';
+            if ($b->{namespaceExpanded}) {
+              $eb .= $self-><M::SWCFGNode.lookupNamespacePrefix>
+                            ($b->{shadowNamespaceURI}, make_new_binding => true);
+              $eb .= $b->{shadowLocalName};
+            } else {
+              ## NOTE: If namespace binding has changed, 
+              ##       associated namespace URI might change. 
+              $eb .= $b->{shadowLocalName};
+            }
+            $eb .= "\x0A";
+            for (qw/shadowContent shadowSibling/) {
+              next unless $b->{$_};
+              $eb .= '  @' . ucfirst ($_) . ":\x0A";
+              my $rc = <ClassM::ManakaiSWCFGNode.getNodeReference> ($b->{$_});
+              my $ebc = $rc->stringify;
+              $ebc =~ s/\x0A  /\x0A       /gs;
+              $ebc =~ s/(\x0A +\@)/$1\@\@/gs;
+              $ebc =~ s/\x0A(?=\S)/\x0A    \@\@/gs;
+              $eb .= '    @@' . $ebc;
+              $ebc = $rc-><M::SWCFGNode.innerText>;
+              if (defined $ebc) {
+                $ebc =~ s/(^|\x0A)(?=([\\\@\#\s]|$))?/$1.'      '.
+                                                  (defined $2?"\\":"")/ges;
+                $eb .= '    @@@'
+                    . (ref ($b->{$_}->{<Q::value>}) eq 'ARRAY' ? '[list]' : '')
+                    . ":" . ((($ebc !~ /[\x0D\x0A:]/) and (length ($ebc) < 50))
+                             ? '' : "\x0A")
+                    . (length $ebc ? $ebc : '\\') . "\x0A";
+              }
+            }
+          } # <Q::etBinding>
+          $r .= $eb;
 
           ## Namespace bindings
           my $ns = '';
@@ -1492,7 +1545,7 @@ IFClassDef:
               }
             }
           }
-          $r .= 'Namespace:' . "\x0A" . $ns . "\x0A" if length $ns;
+          $r .= "\x0A" . 'Namespace:' . "\x0A" . $ns . "\x0A" if length $ns;
         } elsif ($nt eq '#comment') {
           $r = $self-><AG::SWCFGNode.innerText>;
           $r =~ s/\x0A/\x0A#/gs;
@@ -1508,13 +1561,15 @@ IFClassDef:
         }
       ## TODO: Namespace & binding support
 
-  @Method:
+  @Attr:
     @@Name:rootNode
     @@Description:
       @@@lang:en
       @@@@:
-        Returns the root node in the tree to which this node belongs. 
-    @@Return:
+        The root node of the tree to which this node belongs. 
+        If this node is part of a shadow master tree, the root node 
+        of the main tree. 
+    @@Get:
       @@@Type:SWCFGNode
       @@@PerlDef:
         $r = $self->{<Q::TreeCore:node>};
@@ -1522,6 +1577,14 @@ IFClassDef:
           if ($r->{<Q::parent>}) {
             $r = $r->{<Q::parent>};
             redo;
+          } elsif ($r->{<Q::shadowParent>}) {
+            $r = $r->{<Q::shadowParent>};
+            redo;
+          } elsif ($r->{<Q::shadowSiblingOf>}) {
+            $r = $r->{<Q::shadowSiblingOf>};
+            redo;
+          } elsif ($r->{<Q::isShadowMaster>}) {
+            $r = $r->{<Q::DOMCore:ownerDocument>};
           }
         }
         $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($r);
@@ -1750,9 +1813,40 @@ IFClassDef:
                             ($self->{<Q::TreeCore:node>}->{<Q::value>});
           } elsif ($nt eq '#fragment') {
             $r = $od-><M::SWCFGDocument.createDocumentFragment>;
+            ## <Q::isShadowMaster> property is not copied
           } elsif ($nt eq '#document') {
             $r = $od-><AG::SWCFGDocument.implementation>
                     -><M::SWCFGImplementation.createSWCFGDocument>;
+            $r->{<Q::TreeCore:node>}->{<Q::nsBinding>}
+               = {%{$self->{<Q::TreeCore:node>}->{<Q::nsBinding>}}};
+            for (keys %{$self->{<Q::TreeCore:node>}->{<Q::etBinding>}}) {
+              my $b = $self->{<Q::TreeCore:node>}->{<Q::etBinding>}->{$_};
+              next unless $b;
+              my $c = $r->{<Q::TreeCore:node>}->{<Q::etBinding>}->{$_} = {
+                elementType => $b->{elementType},
+                shadowLocalName => $b->{shadowLocalName},
+                shadowNamespaceURI => $b->{shadowNamespaceURI},
+                namespaceExpanded => $b->{namespaceExpanded},
+              };
+              for (qw/shadowContent shadowSibling/) {
+                if ($b->{$_}) {
+                  $c->{$_} = <ClassM::ManakaiSWCFGNode.getNodeReference>
+                                 ($b->{$_})->clone->{<Q::TreeCore:node>};
+                  $r->{<Q::TreeCore:node>}
+                    -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+                          .importTree> ($c->{$_});
+                  my @l = $c->{$_};
+                  while (@l) {
+                    my $l = shift @l;
+                    $l->{<Q::DOMCore:ownerDocument>} = $r->{<Q::TreeCore:node>};
+                    push @l, $_ for @{$l->{<Q::childNodes>}}, 
+          \                         @{$l->{<Q::shadowChildNodes>}},
+          \                         @{$l->{<Q::shadowSiblingNodes>}};
+                  }
+                  $c->{$_}->{<Q::isShadowMaster>} = true;
+                }
+              }
+            }
           } else {
             __ASSERT{DISPerl:invariant::
               msg => {qq[Node type: "$nt"]},
@@ -2131,17 +2225,21 @@ IFClassDef:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
           push @{$node->{<Q::TreeCore:origin>}}, <Q::parent>;
-          push @{$node->{<Q::TreeCore:subnode>}}, <Q::childNodes>;
+          push @{$node->{<Q::TreeCore:subnode>}}, <Q::childNodes>,
+                      <Q::shadowChildNodes>, <Q::shadowSiblingNodes>;
           push @{$node->{<Q::TreeCore:irefnode>}}, <Q::DOMCore:ownerDocument>;
           push @{$node->{<Q::TreeCore:anydata2>}}, <Q::flag>, <Q::option>;
           $node->{<Q::childNodes>} = [];
+          $node->{<Q::shadowChildNodes>} = [];
+          $node->{<Q::shadowSiblingNodes>} = [];
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
             Required property: <Q::nodeType>, <Q::DOMCore:ownerDocument>. 
             \
             Optional properties: <Q::value>, <Q::parent>, 
-                  <Q::childNodes>, <Q::flag>, <Q::option>. 
+                  <Q::childNodes>, <Q::shadowChildNodes>,
+                  <Q::shadowSiblingNodes>, <Q::flag>, <Q::option>. 
 
   @IntMethod:
     @@Operator:
@@ -2733,11 +2831,14 @@ IFClassDef:
           $r = <ClassM::ManakaiSWCFGNode.newObject>;
           $r->{<Q::nodeType>} = '#document';
           $r->{<Q::nsBinding>} = {URI => ''};
+          $r->{<Q::etBinding>} = {};
+          push @{$r->{<Q::TreeCore:subnode2>}}, <Q::etBinding>;
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
             Required property: <Q::DOMCore:ownerDocument>, <Q::nodeType>, 
-                  <Q::DOMCore:implementation>, <Q::nsBinding>. 
+                  <Q::DOMCore:implementation>, <Q::nsBinding>, 
+                  <Q::etBinding>. 
             \
             Optional properties: <Q::childNodes>, <Q::flag>, <Q::option>, 
                   <Q::defaultETNamespaceURI>. 
@@ -2753,12 +2854,28 @@ IFClassDef:
     @@@:
       A document fragment node. 
       \
-      {NOTE:: A document fragment node does not have any value.
+      {NOTE:: A document fragment node may have its value if 
+              and only if its <A::SWCFGDocumentFragment.isShadowMaster> 
+              is <DOM::true>.
               A document fragment node can have child elements. 
               Future version of SuikaWikiConfig might allow a comment child. 
               A document fragment node has no parent. 
       \
       }
+
+  @Attr:
+    @@Name: isShadowMaster
+    @@Type: 
+      DOMMain:boolean
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Whether this node is the root node for the shadow content 
+        or shadow sibling tree or not. 
+    @@NewIn21:
+    @@Get:
+      @@@disDef:
+        @@@@GetProp: isShadowMaster
   
   @RedefAttr:
     @@Name:nodeType
@@ -2776,36 +2893,6 @@ IFClassDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@:This node is a document fragment node. 
-  @RedefMethod:
-    @@Name:innerText
-    @@Description:
-      @@@lang:en
-      @@@@:
-        Returns the text value of this node. 
-    @@NamedParam:
-      @@@Name:newValue
-      @@@Type:
-        DOMMain:any
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          An attempt to set a value to document node has no effect. 
-    @@Return:
-      @@@Type:SWCFGString
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The value of this node.
-      @@@InCase:
-        @@@@Value:
-          @@@@@is-null:1
-        @@@@Type:SWCFGString
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            The node has no value. 
-      @@@disDef:
-        @@@@DISLang:nop:
 
   @IntMethod:
     @@Name:newObject
@@ -2830,7 +2917,7 @@ IFClassDef:
           @@@@@@:
             Required property: <Q::DOMCore:ownerDocument>, <Q::nodeType>. 
             \
-            Optional properties: <Q::parent>, 
+            Optional properties: <Q::parent>, <Q::value>,
                   <Q::childNodes>, <Q::flag>, <Q::option>. 
 ##SWCFGDocumentFragment
 
@@ -2882,6 +2969,20 @@ PropDef:
       Child nodes of a node. 
 
 PropDef:
+  @QName:shadowChildNodes
+  @Description:
+    @@lang:en
+    @@@:
+      Child nodes of a node, copied from the shadow master tree. 
+
+PropDef:
+  @QName:shadowSiblingNodes
+  @Description:
+    @@lang:en
+    @@@:
+      Younger sibling nodes of a node, copied from the shadow master tree. 
+
+PropDef:
   @QName:value
   @Description:
     @@lang:en
@@ -2929,6 +3030,24 @@ PropDef:
     @@lang:en
     @@@:
       Namespace prefix and URI bindings. 
+
+PropDef:
+  @QName:etBinding
+  @Description:
+    @@lang:en
+    @@@:
+      Element type bindings. 
+
+PropDef:
+  @QName:isShadowMaster
+  @Description:
+    @@lang:en
+    @@@:
+      Whether a document fragment node is the root node of a 
+      shadow master tree or not. 
+  @Type:
+    DOMMain:boolean
+  @rdfs:range: SWCFGDocumentFragment
 
 PropDef:
   @QName:defaultETNamespaceURI
@@ -3002,6 +3121,40 @@ ExceptionDef:
             An attempt is made to insert a comment node into non-document 
             node or a document or document fragment node somwehre or 
             any node into comment node. 
+        @@@@enMufDef:
+          An attempt is made to insert a node %p (
+          name => {<Q::swcfg21:childNodeType>}, prefix => { of type });
+          into the node %p (name => {<Q::swcfg21:parentNodeType>},
+          prefix => {of type });, which is not allowed
+        @@@@XParam:
+          @@@@@QName: parentNodeType
+          @@@@@Description:
+            @@@@@@lang:en
+            @@@@@@@:
+              The type of the node into which an attempt is made to
+              insert another node. 
+        @@@@XParam:
+          @@@@@QName: childNodeType
+          @@@@@Description:
+            @@@@@@lang:en
+            @@@@@@@:
+              The type of the node that an attempt is made to
+              insert into another node.
+      @@@XSubTypeDef:
+        @@@@QName: HIERARCHY_NO_VALUE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            An attempt is made to set a node value for a document node. 
+        @@@@enMufDef:
+          An attempt is made to set a node value for a 
+          %p (name => {<Q::parentNodeType>}); node
+        @@@@XParam:
+          @@@@@QName: parentNodeType
+          @@@@@Description:
+            @@@@@@lang:en
+            @@@@@@@:
+              The type of the node to which the value is attempted to set. 
     @@XConst:
       @@@Name:WRONG_DOCUMENT_ERR
       @@@Value:4
@@ -3016,6 +3169,8 @@ ExceptionDef:
           @@@@@lang:en
           @@@@@@:
             An attempt is made to insert a foreign node. 
+        @@@@enMufDef:
+          An attempt is made to append a node created for another document
     @@XConst:
       @@@Name:TYPE_MISMATCH_ERR
       @@@Value:17
@@ -3030,6 +3185,9 @@ ExceptionDef:
           @@@@@lang:en
           @@@@@@:
             The type of an object is not a string nor a list (array reference). 
+        @@@@enMufDef:
+          A value%p (name => {<Q::actualType>}, prefix => { of type }); is 
+          specified where only either string or array reference is allowed
         @@@@XParam:
           @@@@@QName:actualType
           @@@@@Description:
@@ -3082,6 +3240,22 @@ ExceptionDef:
             The implementation is unable to read and parse the 
             SuikaWikiConfig document. 
 ##SWCFGException
+
+XPropDef:
+  @QName: parentNodeType
+  @Description:
+    @@lang:en
+    @@@:
+      The type of the node that an attempt is made to
+      insert into another node.
+
+XPropDef:
+  @QName: childNodeType
+  @Description:
+    @@lang:en
+    @@@:
+      The type of the node into which an attempt is made to
+      insert another node.
 
 XPropDef:
   @QName:actualType
@@ -3318,7 +3492,8 @@ IFClassDef:
                 $vfragment = '';
               }
             } elsif ($line =~ /^(\s*)$/) {
-              $vfragment .= "\x0A" . substr ($1, $wsp_length);
+              $vfragment .= "\x0A" . substr ($1, $wsp_length)
+                   unless $no_preserve_wsp;
               $current = $root
                    if $current-><AG::SWCFGNode.nodeType> eq '#comment';
             } else { $line =~ /^\#?(.*)$/;
@@ -3362,10 +3537,43 @@ IFClassDef:
                     } # ISNULL
                   }
                 }
+                ## TODO: DOM error if unknown node
                 push @remove, $_;
               } elsif (not $no_binding and
                        $n->{<Q::localName>} eq 'ElementTypeBinding') {
-                ## TODO: 
+                my ($et, $sn, $sc, $ss) = ('', '');
+                for (@{$n->{<Q::childNodes>}}) {
+                  next unless $_->{<Q::nodeType>} eq '#element';
+                  if ($_->{<Q::localName>} eq 'Name') {
+                    $et = $_->{<Q::value>} if defined $_->{<Q::value>};
+                  } elsif ($_->{<Q::localName>} eq 'ElementType') {
+                    $sn = $_->{<Q::value>} if defined $_->{<Q::value>};
+                  } elsif ($_->{<Q::localName>} eq 'ShadowContent') {
+                    $sc = $_;
+                    $sc->{<Q::nodeType>} = '#fragment';
+                    $sc->{<Q::parent>} = null;
+                    $sc->{<Q::isShadowMaster>} = true;
+                  } elsif ($_->{<Q::localName>} eq 'ShadowSibling') {
+                    $ss = $_;
+                    $ss->{<Q::nodeType>} = '#fragment';
+                    $ss->{<Q::parent>} = null;
+                    $ss->{<Q::isShadowMaster>} = true;
+                  }
+                }
+                $n->{<Q::childNodes>} = [];
+                unless (defined $root->{<Q::TreeCore:node>}
+                                     ->{<Q::etBinding>}->{$et}) {
+                  $root->{<Q::TreeCore:node>}
+                       ->{<Q::etBinding>}->{$et} = {
+                    elementType => $et,
+                    shadowLocalName => $sn,
+                    namespaceExpanded => false,
+                    shadowContent => $sc,
+                    shadowSibling => $ss,
+                  };
+                }
+                ## TODO: DOM error if unknown node
+                push @remove, $_;
               }
             }
             splice @{$root->{<Q::TreeCore:node>}->{<Q::childNodes>}},
@@ -4069,5 +4277,14 @@ ElementTypeBinding:
   @ShadowContent:
     @@ContentType:
       DISCore:String
+
+ElementTypeBinding:
+  @Name: enMufDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:muf
+    @@lang:en
 
 ## SuikaWikiConfig21.dis ends here
