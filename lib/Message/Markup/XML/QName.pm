@@ -14,7 +14,7 @@ This module is part of manakai XML.
 
 package Message::Markup::XML::QName;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NCNameStartChar InXMLNCNameChar!;
 use Exporter;
 our @ISA = qw/Exporter/;
@@ -315,7 +315,7 @@ sub prefix_to_name ($$;%) {
 sub name_to_prefix ($$;%);
 sub name_to_prefix ($$;%) {
   my ($decls, $name, %opt) = @_;
-  Carp::croak 'Use NULL_URI instead of empty string or undef'
+  Carp::croak ('Use NULL_URI instead of empty string or undef')
       unless defined $name;
   if ($opt{use_xml} and $name eq NS_xml_URI) {
     return {success => 1, prefix => 'xml', name => $name};
@@ -517,4 +517,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/02/22 01:46:02 $
+1; # $Date: 2004/11/06 05:50:26 $
