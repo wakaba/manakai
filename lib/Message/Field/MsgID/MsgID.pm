@@ -14,7 +14,7 @@ draft-ietf-usefor-msg-id-alt-00 is supported.
 package Message::Field::MsgID::MsgID;
 use strict;
 use vars qw(%REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Carp;
 use overload '""' => sub {shift->stringify};
 #use autouse Digest::MD2 => qw(md2_hex md2_base64);
@@ -73,7 +73,7 @@ sub new ($;%) {
            || ($c1 == 192 && (($c2 == 0 && $c3 == 2)	## "TEST-NET"
            || ($c2 == 88 && $c3 == 99)	## 6to4 anycast [RFC3068]
            || ($c2 == 168)))	## private [RFC1918]
-           || ($c1 == 198 && ($c2 == 18 || $c2 =19))	## benchmark [RFC2544]
+           || ($c1 == 198 && ($c2 == 18 || $c2 == 19))	## benchmark [RFC2544]
            || ($c1 >= 224);	## class D,E [RFC3171]
     }
     $$o{fqdn} ||= '['.$$o{ip_address}.']';
@@ -271,7 +271,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/05 14:55:28 $
+$Date: 2002/04/13 01:33:54 $
 
 =cut
 

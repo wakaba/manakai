@@ -1,61 +1,77 @@
 
 =head1 NAME
 
-Message::Field::Path Perl module
-
-=head1 DESCRIPTION
-
-Perl module for C<Path:> header field.
+Message::Field::Path -- Perl module for C<Path:> header 
+field body of Usenet news format messages
 
 =cut
 
 package Message::Field::Path;
 use strict;
-use vars qw(%REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use vars qw(@ISA %REG $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+require Message::Util;
+require Message::Field::Structured;
+push @ISA, qw(Message::Field::Structured);
+use Carp;
+
 use overload '@{}' => sub {shift->{path}},
              '""' => sub {shift->stringify};
-require Message::Util;
-use Carp;
-$REG{WSP} = qr/[\x20\x09]+/;
-$REG{FWS} = qr/[\x20\x09]*/;
 
+*REG = \%Message::Util::REG;
 $REG{delimiter} = qr/[^0-9A-Za-z.:_-]+/;
 $REG{delimiter_char} = qr#[!%,/?]#;
 $REG{path_identity} = qr/[0-9A-Za-z.:_-]+/;
 $REG{NON_delimiter} = qr#[^!%,/?]#;
 $REG{NON_path_identity} = qr/[^0-9A-Za-z.:_-]/;
 
-my %DEFAULT = (
-  check_invalid_path_identity	=> 1,
-  max_line_length	=> 50,
-  output_obs_delimiter	=>  -1,
-);
 
-=head2 Message::Field::Path->new ()
+=head1 CONSTRUCTORS
 
-Returns new instance for Message::Field::Path.
+The following methods construct new objects:
+
+=over 4
 
 =cut
 
-sub new ($;%) {
-  my $self = bless {option => {@_}, path => []}, shift;
-  for (%DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
-  $self;
+## Initialize of this class -- called by constructors
+sub _init ($;%) {
+  my $self = shift;
+  my %options = @_;
+  my %DEFAULT = (
+    -check_path_identity	=> 1,
+    -max_line_length	=> 50,
+    -output_obs_delimiter	=>  -1,
+  );
+  $self->SUPER::_init (%DEFAULT, %options);
+  my @a = ();
+  for (grep {/^[^-]/} keys %options) {
+    push @a, $_ => $options{$_};
+  }
+  $self->add (@a) if $#a > -1;
 }
 
-=head2 Message::Field::Path->parse ($unfolded-field-body)
+=item $p = Message::Field::Path->new ([%options])
 
-Parses C<field-body> as C<Path> field.
+Constructs a new object.  You might pass some 
+options as parameters to the constructor.
+
+=cut
+
+## Inherited
+
+=item $p = Message::Field::Path->parse ($field-body, [%options])
+
+Constructs a new object with given field body.  
+You might pass some options as parameters to the constructor.
 
 =cut
 
 sub parse ($$;%) {
-  my $self = bless {}, shift;
+  my $class = shift;
+  my $self = bless {}, $class;
   my $fbody = shift;
-  my %option = @_;
-  for (%DEFAULT) {$option{$_} ||= $DEFAULT{$_}}
-  $self->{option} = \%option;
+  $self->_init (@_);
   my @p = ();
   $fbody =~ s{^$REG{FWS}($REG{path_identity})}{
     push @p, [$1, ''];
@@ -71,29 +87,36 @@ sub parse ($$;%) {
   $self;
 }
 
-=head2 $self->add ($path-identity, [$delimiter], [%options])
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item $p->add ($path-identity, [$delimiter], [%options])
 
 Adds new C<path-identity> and C<delimiter> (optional).
-Only one option, C<check_invalid_path_identity> is available.
+Only one option, C<check_path_identity> is available.
 
 See also L<EXAMPLE>.
 
 =cut
 
-sub add ($$;$%) {
+sub add ($%) {
   my $self = shift;
-  my ($path_identity, $delimiter, %option) = (@_);
-  $option{check_invalid_path_identity}
-    ||= $self->{option}->{check_invalid_path_identity};
-  croak "add: $path_identity: invalid path-identity"
-    if $option{check_invalid_path_identity}>0 
-       && $path_identity =~ /$REG{NON_path_identity}/;
-  unshift @{$self->{path}}, [$path_identity, ''];
-  $self->{path}->[1]->[1] = $delimiter if $#{$self->{path}} > 0;
-  $self;
+  my %p = @_;
+  my %option = %{$self->{option}};
+  for (grep {/^-/} keys %p) {$option{substr ($_, 1)} = $p{$_}}
+  for (grep {/^[^-]/} keys %p) {
+    croak "add: $_: invalid path-identity"
+      if $option{check_path_identity} && $_ =~ /$REG{NON_path_identity}/;
+    unshift @{$self->{path}}, [$_, ''];
+    $self->{path}->[1]->[1] = $p{$_} if $#{$self->{path}} > 0;
+  }
 }
 
-=head2 $self->path_identity ($index)
+
+=item $p->path_identity ($index)
 
 Returns C<$index>'th C<path-identity>, if any.
 You can't set value.  (Is it necessary?)  Use C<add> method
@@ -107,7 +130,7 @@ sub path_identity ($$) {
   $self->{path}->[$i]->[0] if ref $self->{path}->[$i];
 }
 
-=head2 $self->delimiter ($index)
+=item $p->delimiter ($index)
 
 Returns C<$index>'th C<delimiter>, if any.
 You can't set new value.  (Is it necessary?)
@@ -123,23 +146,26 @@ sub delimiter ($$) {
   $self->{path}->[$i]->[1] if ref $self->{path}->[$i];
 }
 
+=item $p->stringify ([%options])
+
+Returns C<field-body> as a string.
+
+=cut
+
 sub stringify ($;%) {
   my $self = shift;
-  my %option = @_;
-  $option{check_invalid_path_identity}
-    ||= $self->{option}->{check_invalid_path_identity};
-  $option{max_line_length} ||= $self->{option}->{max_line_length};
-  $option{output_obs_delimiter} ||= $self->{option}->{output_obs_delimiter};
+  my %option = %{$self->{option}};  my %p = @_;
+  for (grep {/^-/} keys %p) {$option{substr ($_, 1)} = $p{$_}}
   my ($r, $l) = ('', 0);
   for (@{$self->{path}}) {
     my ($path_identity, $delimiter) = (${$_}[0], ${$_}[1] || '!');
     next unless $path_identity;
-    next if $option{check_invalid_path_identity}>0 
+    next if $option{check_path_identity}
             && $path_identity =~ /$REG{NON_path_identity}/;
     if ($l) {
-      $delimiter = '!' if $option{output_obs_delimiter}<0 
+      $delimiter = '!' if !$option{output_obs_delimiter}
                           && $delimiter !~ /^$REG{delimiter_char}$/;
-      if ($option{max_line_length}>0 && $l > $option{max_line_length}) {
+      if ($option{max_line_length} && $l > $option{max_line_length}) {
         $delimiter .= ' ';  $l = 0;
       }
       $r .= $delimiter;  $l += length $delimiter;
@@ -149,19 +175,36 @@ sub stringify ($;%) {
   $r;
 }
 
-=head2 $self->option ($option_name, [$option_value])
+=item $option-value = $p->option ($option-name)
 
-Set/gets new value of the option.
+Gets option value.
+
+=item $p->option ($option-name, $option-value, ...)
+
+Set option value(s).  You can pass multiple option name-value pair
+as parameter when setting.
 
 =cut
 
-sub option ($$;$) {
+## Inherited
+
+=item $clone = $p->clone ()
+
+Returns a copy of the object.
+
+=cut
+
+sub clone ($) {
   my $self = shift;
-  my ($name, $value) = @_;
-  if (defined $value) {
-    $self->{option}->{$name} = $value;
+  my $clone = $self->SUPER::clone;
+  my @p;
+  for (@{$self->{path}}) {
+    my $id = ref $_->[0]? $_->[0]->clone: $_->[0];
+    my $dl = ref $_->[1]? $_->[1]->clone: $_->[1];
+    push @p, [$id, $dl];
   }
-  $self->{option}->{$name};
+  $clone->{path} = \@p;
+  $clone;
 }
 
 =head1 NOTE
@@ -198,8 +241,7 @@ insert any white-space characters.
   $p->add ('not-for-mail');
   $p->add ('spool.foo.example', '!');
   $p->add ('injecter.foo.example', '%');
-  $p->add ('news.bar.example', '/');
-  $p->add ('news.local.example', '/');
+  $p->add ('news.local.example' => '/' => 'news.bar.example' => '/');
   print "Path: ", fold ($p), "\n";	## fold() is assumed as a function to fold
   # Path: news.local.example/news.bar.example/injecter.foo.example%
   #   spool.foo.example!not-for-mail
@@ -226,7 +268,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/02 11:52:12 $
+$Date: 2002/04/13 01:33:54 $
 
 =cut
 

@@ -9,7 +9,7 @@ structured header field bodies of the Internet message
 package Message::Field::Structured;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 use overload '""' => sub { $_[0]->stringify },
              '.=' => sub { $_[0]->value_append ($_[1]) },
@@ -93,7 +93,7 @@ quoted if necessary (by C<hook_encode_string>).
 
 =cut
 
-sub stringify ($) {
+sub stringify ($;%) {
   my $self = shift;
   #$self->Message::Util::encode_qcontent ($self->{field_body});
   $self->{field_body};
@@ -228,7 +228,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/06 06:01:04 $
+$Date: 2002/04/13 01:33:54 $
 
 =cut
 

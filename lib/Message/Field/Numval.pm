@@ -9,11 +9,11 @@ Internet message header field body that takes numeric values
 package Message::Field::Numval;
 use strict;
 use vars qw(@ISA $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
-use overload '.=' => sub { $_[0]->comment_add ($_[1]) },
+use overload '.=' => sub { $_[0]->comment_add ($_[1]); $_[0] },
              '0+' => sub { $_[0]->{value} || $_[0]->{option}->{value_default} },
              '+=' => sub {
                my $n = $_[0]->{value} + $_[1];
@@ -275,7 +275,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/05 14:55:28 $
+$Date: 2002/04/13 01:33:54 $
 
 =cut
 

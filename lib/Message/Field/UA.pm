@@ -9,12 +9,23 @@ header field body consist of C<product> tokens
 package Message::Field::UA;
 use strict;
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
-use overload '""' => sub {shift->stringify},
-             '@{}' => sub {shift->product};
+use overload '""'	=> sub { $_[0]->stringify },
+             '@{}'	=> sub { $_[0]->product },
+             '.='	=> sub { 
+             	if (ref $_[1] eq 'HASH') {
+             	  $_[0]->add (%{$_[1]});
+             	} elsif (ref $_[1] eq 'ARRAY') {
+             	  $_[0]->add (@{$_[1]});
+             	} else {
+             	  $_[0]->add ($_[1] => '', -prepend => 0);
+             	}
+             	$_[0];
+             },
+             fallback	=> 1;
 
 *REG = \%Message::Util::REG;
 $REG{product} = qr#(?:$REG{http_token}|$REG{quoted_string})(?:$REG{FWS}/$REG{FWS}(?:$REG{http_token}|$REG{quoted_string}))?#;
@@ -22,7 +33,7 @@ $REG{M_product} = qr#($REG{http_token}|$REG{quoted_string})(?:$REG{FWS}/$REG{FWS
 
 =head1 CONSTRUCTORS
 
-The following methods construct new C<Message::Field::Numval> objects:
+The following methods construct new objects:
 
 =over 4
 
@@ -42,9 +53,14 @@ sub _init ($;%) {
     -prepend	=> 1,
   );
   $self->SUPER::_init (%DEFAULT, %options);
+  my @a = ();
+  for (grep {/^[^-]/} keys %options) {
+    push @a, $_ => $options{$_};
+  }
+  $self->add (@a) if $#a > -1;
 }
 
-=item Message::Field::UA->new ([%options])
+=item $ua = Message::Field::UA->new ([%options])
 
 Constructs a new C<Message::Field::UA> object.  You might pass some 
 options as parameters to the constructor.
@@ -53,7 +69,7 @@ options as parameters to the constructor.
 
 ## Inherited
 
-=item Message::Field::UA->parse ($field-body, [%options])
+=item $ua = Message::Field::UA->parse ($field-body, [%options])
 
 Constructs a new C<Message::Field::UA> object with
 given field body.  You might pass some options as parameters to the constructor.
@@ -89,7 +105,7 @@ sub parse ($$;%) {
     push @ua, {name => $product, version => $product_version, 
                comment => \@comment};
   }goex;
-  $self->{product} = \@ua;
+  push @{$self->{product}}, @ua;
   $self;
 }
 
@@ -370,7 +386,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/06 06:01:04 $
+$Date: 2002/04/13 01:33:54 $
 
 =cut
 

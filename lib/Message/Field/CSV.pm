@@ -18,7 +18,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%OPTION %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload '@{}' => sub {shift->value},
              '""' => sub {shift->stringify};
 require Message::Util;
@@ -74,9 +74,11 @@ sub _init_option ($) {
      list-archive list- list-digest list- list-help list- 
      list-owner list- list-post list- list-subscribe list- 
      list-unsubscribe list- list-url list- uri list-
+     posted-to newsgroups
      x-brother x-moe x-daughter x-moe
      x-respect x-moe x-syster x-moe x-wife x-moe);
-  my $field_name = lc $self->{option}->{field_name};
+  my $field_name = lc $self->{option}->{field_name}
+                || lc $self->{option}->{-field_name};	## AD HOC
   $field_name = $field_type{$field_name} || $field_name;
   if ($field_name eq 'newsgroups') {
     $self->{option}->{separator} = ',';
@@ -351,7 +353,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/01 05:32:15 $
+$Date: 2002/04/13 01:33:54 $
 
 =cut
 
