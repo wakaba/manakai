@@ -129,7 +129,8 @@ sub perl_sub (%) {
 sub perl_cases (@) {
   my $r = '';
   while (my ($when, $code) = splice @_, 0, 2) {
-    $r .= qq<} elsif ($when) {\n$code\n>;
+    $r .= $when ne 'else' ? qq<} elsif ($when) {\n$code\n>
+                          : qq<} else {\n$code\n>;
   }
   $r =~ s/^\} els//;
   $r .= qq<}\n> if $r;
