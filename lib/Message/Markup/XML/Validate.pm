@@ -15,7 +15,7 @@ This module is part of SuikaWiki XML support.
 
 package SuikaWiki::Markup::XML::Validate;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require SuikaWiki::Markup::XML::Parser;
 our (%NS);
 *NS = \%SuikaWiki::Markup::XML::NS;
@@ -394,12 +394,14 @@ sub _validate_document_instance ($$;%) {
 sub _validate_element ($$$) {
   my ($self, $node, $opt) = @_;
   my $valid = 1;
+  ## DEBUG: 
+  Carp::croak join qq!\t!, caller(0) unless eval q{$node->qname};
   my $qname = $node->qname;
   unless ($opt->{_element}->{$qname}) {
     $opt->{_element}->{$qname} = $opt->{entMan}->is_declared_entity ($qname,
                                                  namespace_uri => $NS{SGML}.'element');
     unless ($opt->{_element}->{$qname}) {
-      $self->{error}->raise_error ($_, type => 'VC_ELEMENT_VALID_DECLARED', t => $qname);
+      $self->{error}->raise_error ($node, type => 'VC_ELEMENT_VALID_DECLARED', t => $qname);
       $opt->{_element}->{$qname} = 'undeclared';
       $valid = 0;
     }
@@ -612,126 +614,130 @@ sub _validate_element ($$$) {
             }
           }
         }
+        my $tree =
         {connector => ($node->get_attribute ('connector', make_new_node => 1)->inner_text || '|'),
          occurence => ($node->get_attribute ('occurence', make_new_node => 1)->inner_text || '1'),
          element => \@r, type => 'group'};
+        if ($tree->{connector} eq '|') {
+          if ($tree->{occurence} eq '1' || $tree->{occurence} eq '+') {
+            for (@{$tree->{element}}) {
+              if ($_->{occurence} eq '?' || $_->{occurence} eq '*') {
+                $tree->{occurence} = {'1'=>'?','+'=>'*'}->{$tree->{occurence}};
+                last;
+              }
+            }
+          }
+        }
+        $tree;
       };	# $make_cmodel_arraytree
       my $tree = &$make_cmodel_arraytree ($opt->{_element}->{$qname});
       
       my $find_myname;
       $find_myname = sub {
-        my ($node, $qname, $tree) = @_;
-        require Data::Dump;print scalar Data::Dump::dump ($tree) if $main::DEBUG;
-        print qq(\@\@ [$qname] $tree->{element_pos}..$#{$tree->{element}}\n) if $main::DEBUG;
-        for my $i ($tree->{element_pos}..$#{$tree->{element}}) {
-          my $match = 0;
-          if ($tree->{element}->[$i]->{type} eq 'group') {	## sub group
-            $match = &$find_myname ($node, $qname, $tree->{element}->[$i]);
-            $match += 1 if $match > 0;
-            print qq(\@\@ grpMatch[$i/$#{$tree->{element}}] "$qname" : $match\n) if $main::DEBUG;
-          } else {	## Child element type
-            if ($qname eq '<LAST>') {
-              $match = ($tree->{element}->[$i]->{occurence} eq '1'
-                     || ($tree->{element}->[$i]->{occurence_r}
-                      || $tree->{element}->[$i]->{occurence}) eq '+') ? 1 : 0;
-            } else {
-              $match = ($qname eq $tree->{element}->[$i]->{qname}) ? 1 : 0;
-            }
-            print qq(\@\@ elemMatch[$i/$#{$tree->{element}}] "$qname" == "$tree->{element}->[$i]->{qname}" = $match\n) if $main::DEBUG;
-          }
-            if ($match > 0) {
-              if ($match > 1) {	# group
-                #print "$tree->{connector}#($tree->{element}->[$i]->{element_pos} > $#{$tree->{element}->[$i]->{element}})";
-                if ($tree->{element}->[$i]->{connector} eq ','
-                 && ($tree->{element}->[$i]->{element_pos}
-                     <= $#{$tree->{element}->[$i]->{element}})) {
-                  ## Don't go next to continue matching
-                  $tree->{element_pos} = $i;
+        my ($nodes=>$idx, $tree, $opt) = @_;
+        if ($tree->{type} eq 'group') {
+          my $return = {match => 1, some_match => 0, actually_no_match => 1};
+          my $original_idx = $$idx;
+          for (my $i = 0; $i <= $#{$tree->{element}}; $i++) {
+            my $result = (&$find_myname ($nodes=>$idx, $tree->{element}->[$i],
+                                         {depth => 1+$opt->{depth},
+                                          nodes_max => $opt->{nodes_max}}));
+            print STDERR qq(** Lower level match [$opt->{depth}] ("$nodes->[$$idx]->[1]") : Exact = $result->{match}, Some = $result->{some_match}\n) if $main::DEBUG;
+            if ($result->{match} == 1 && !$result->{actually_no_match}) {
+              $return->{actually_no_match} = 0;
+              if ($tree->{connector} eq '|') {
+                $return->{match} = 1;
+                $return->{some_match} = 1;
+                if (($tree->{element}->[$i]->{occurence} eq '*'
+                  || $tree->{element}->[$i]->{occurence} eq '+')
+                  && $$idx <= $opt->{nodes_max}) {
+                  print STDERR qq(** More matching chance ($tree->{element}->[$i]->{occurence}) [$opt->{depth}] : "$tree->{element}->[$i]->{qname}" (model) vs "$nodes->[$$idx]->[1]" (instance)\n) if $main::DEBUG;
+                  $return->{more} = 1;
+                  $i--;
+                  #$$idx++;
+                  next;
                 } else {
-                  if ($match == 2) {
-                    if ($tree->{connector} eq '|'
-                     && $tree->{element}->[$i]->{element_pos}
-                        >= $#{$tree->{element}->[$i]->{element}}) {
-                      $tree->{element_pos} = $#{$tree->{element}}+1;
-                    } else {
-                      $tree->{element}->[$i]->{element_pos} = $#{$tree->{element}->[$i]->{element}}+1;
-                      $tree->{element_pos} = $i+1;
+                  return $return;
+                }
+              } else {	# ','
+                $return->{match} &= 1;
+                $return->{some_match} = 1;
+                if ($$idx > $opt->{nodes_max}) {	# already last of instance's nodes
+                  if ($i == $#{$tree->{element}}) {
+                    return $return;
+                  } else {	## (foo1,foo2,foo3,foo4) and <foo1/><foo2/>.
+                          	## If foo3 and foo4 is optional, valid, otherwise invalid
+                    my $isopt = 1;
+                    for ($i+1..$#{$tree->{element}}) {
+                      if ($tree->{element}->[$_]->{occurence} ne '*'
+                       && $tree->{element}->[$_]->{occurence} ne '?') {
+                        $isopt = 0;
+                        last;
+                      }
                     }
-                    for my $j (0..$#{$tree->{element}}) {
-                      $tree->{element}->[$j]->{occurence_r} = undef;
-                    }
+                    $return->{match} = 0 unless $isopt;
+                    return $return;
+                  }
+                } else {	# not yet last of instance's nodes
+                  if ($tree->{element}->[$i]->{occurence} eq '*'
+                   || $tree->{element}->[$i]->{occurence} eq '+') {
+                    $return->{more} = 1;
+                    $i--;
+                    #$$idx++;
+                    next;
+                  } elsif ($i == $#{$tree->{element}}) {	# already last of model group
+                    return $return;
                   } else {
-                    if ($tree->{connector} eq '|'
-                     && $tree->{element}->[$i]->{element_pos}
-                        > $#{$tree->{element}->[$i]->{element}}) {
-                      ## Note: Is this case work??
-                      $tree->{element_pos} = $#{$tree->{element}}+1;
-                    } else {
-                      $tree->{element_pos} = $i;
-                    }
+                    #$$idx++;
+                    next;
                   }
                 }
-              } elsif ($tree->{element}->[$i]->{occurence} eq '+'
-               || $tree->{element}->[$i]->{occurence} eq '*') {
-                $tree->{element}->[$i]->{occurence_r} = '*';
-                $tree->{element_pos} = $i;	# don't change
-              } else {	# child element type
-                $tree->{element_pos} = $i+1;
               }
-              return $match;
-            } else {	## Does not match
-              if ($tree->{element}->[$i]->{occurence} eq '?'
-               || $tree->{element}->[$i]->{occurence_r} eq '*'
-               || $tree->{element}->[$i]->{occurence} eq '*') {
-                $tree->{element_pos} = $i+1;
-                
+            } else {	# doesn't match
+              # <$return->{match} == 1>
+              if ($return->{more}	## (something*) but not matched
+              || ($tree->{element}->[$i]->{occurence} eq '?'
+               && $tree->{connector} eq ',')) {
+                $return->{more} = 0;
+                $return->{match} = 0 if $result->{some_match};
+                if ($tree->{connector} eq '|') {
+                  return $return;
+                } else {	# ','
+                  next;
+                }
+              } elsif ($result->{some_match} && $tree->{connector} eq '|') {
+                $$idx = $original_idx;
+              }
+              if ($tree->{element}->[$i]->{occurence} eq '*') {
+                $return->{match} = 1;
+                #$return->{actually_no_match} &= 1;	# default
               } else {
+                $return->{match} = 0;
                 if ($tree->{connector} eq ',') {
-                  if ($match == -1) {
-                    $tree->{element_pos} = $i + 1;
-                  } else {
-                    return 0;
-                  }
-                } elsif ($qname eq '<LAST>') {
-                  return -1;
-                } elsif ($tree->{connector} eq '|' && $tree->{element}->[$i]->{connector} eq ',') {
-                  for my $i (0..$#{$tree->{element}}) {
-                    $tree->{element}->[$i]->{occurence_r} = undef;
-                  }
-                  if ($tree->{element}->[$i]->{element_pos}) {
-                    $tree->{element_pos} = undef;
-                    return -1;
-                  } else {
-                    $tree->{element_pos} = $i+1;
-                  }
-                } else {
-                  $tree->{element_pos} = $i;
+                  return $return;
                 }
               }
-            }
-        }	# for content model elements
-        ## No more element in this content model group
-        for my $i (0..$#{$tree->{element}}) {
-          $tree->{element}->[$i]->{occurence_r} = undef;
+            }	# match or nomatch
+          }	# content group elements
+          ## - ',' and all matched
+          ## - '|' and match to no elements
+          return $return;
+        } else {	# terminal element
+          print STDERR qq(** Element match [$opt->{depth}] : "$tree->{qname}" (model) vs "$nodes->[$$idx]->[1]" (instance)\n) if $main::DEBUG;
+          if ($tree->{qname} eq $nodes->[$$idx]->[1]) {
+            $$idx++;
+            return {match => 1, some_match => 1};
+          #} elsif ($tree->{occurence} eq '*' || $tree->{occurence} eq '?') {
+          #  return {match => 1, some_match => 1, actually_no_match => 1};
+          } else {
+            return {match => 0, some_match => 0};
+          }
         }
-        $tree->{element_pos} = undef;
-        return (-1);
       };
+      my @nodes;
       for my $child (@{$node->{node}}) {
         if ($child->{type} eq '#element') {
-          my $child_qname = $child->qname;
-          my $match = $tree->{element_pos} eq 'end' ? 0
-                    : (&$find_myname ($child, $child_qname, $tree));
-          unless ($match > 0) {
-            $self->{error}->raise_error ($child, type => 'VC_ELEMENT_VALID_ELEMENT_MATCH',
-                                         t => $child_qname);
-            $valid = 0;
-            if ($match == -1) {	# the very last of content model
-              $tree->{element_pos} = 'end';
-            }
-          }
-          
-          $valid &= $self->_validate_element ($child, $opt);
+          push @nodes, [$child, $child->qname];
         } elsif ($child->{type} eq '#section') {
           $self->{error}->raise_error ($child, type => 'VC_ELEMENT_VALID_ELEMENT_SECTION');
           $valid = 0;
@@ -746,14 +752,55 @@ sub _validate_element ($$$) {
           }
         }
       }	# children
-        unless ($tree->{element_pos} eq 'end') {
-          my $match = (&$find_myname (undef, '<LAST>', $tree));
-          unless ($match == -1) {
-            $self->{error}->raise_error ($node, type => 'VC_ELEMENT_VALID_ELEMENT_MATCH',
-                                         t => '<LAST>');	## TODO: 
-            $valid = 0;
+      
+      my $nodes_max = $#nodes;
+      if (@nodes == 0) {	## Empty
+        my $check_empty_ok;
+        $check_empty_ok = sub {
+          my ($tree) = @_;
+          if ($tree->{occurence} eq '*'
+           || $tree->{occurence} eq '?') {
+            return 1;
+          } elsif ($tree->{type} eq 'group') {
+            if ($tree->{connector} eq ',') {
+              my $ok = 1;
+              for (@{$tree->{element}}) {
+                $ok &= &$check_empty_ok ($_);
+                last unless $ok;
+              }
+              return $ok;
+            } else {	# '|'
+              my $ok = 0;
+              for (@{$tree->{element}}) {
+                $ok ||= &$check_empty_ok ($_);
+                last if $ok;
+              }
+              return $ok;
+            }
+          } else {
+            return 0;
           }
+        };
+        if (&$check_empty_ok ($tree)) {
+          
+        } else {
+          $self->{error}->raise_error ($node, type => 'VC_ELEMENT_VALID_ELEMENT_MATCH');
+          $valid = 0;
         }
+      } else {
+        my $i = 0;
+        my $result = &$find_myname (\@nodes, \$i, $tree, {depth => 0, nodes_max => $nodes_max});
+        if ($result->{match} && $i > $nodes_max) {
+          
+        } else {
+          $self->{error}->raise_error ($node, type => 'VC_ELEMENT_VALID_ELEMENT_MATCH', t => $nodes[$i]->[1]);
+          $valid = 0;
+        }
+      }
+      for (0..$nodes_max) {
+        $valid &= $self->_validate_element ($nodes[$_]->[0], $opt);
+      }
+      
     }	# element content
   }	# not EMPTY
   $valid;
@@ -790,4 +837,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/07/16 12:10:22 $
+1; # $Date: 2003/07/17 23:58:30 $
