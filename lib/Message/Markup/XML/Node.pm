@@ -13,9 +13,13 @@ This module is part of manakai XML.
 
 package Message::Markup::XML::Node;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload
   '""'     => \&outer_xml,
+  bool     => sub { 
+                    #Carp::carp ('DEBUG: XML::Node is called in bool context'); 
+                    1;
+                  },
   fallback => 1;
 use Char::Class::XML
   qw/InXML_NameStartChar InXMLNameChar InXML_NCNameStartChar InXMLNCNameChar/;
@@ -56,7 +60,6 @@ Available options: C<data_type>, C<default_decl>, C<type> (default: C<#element>)
 
 =cut
 
-sub _CLASS_NAME { 'Message::Markup::XML::Node' }
 sub new ($;%) {
   my $class = shift;
   my $self = {@_};
@@ -64,7 +67,7 @@ sub new ($;%) {
     Carp::carp '{type} should be specified explicitly';
     $self->{type} = '#element';
   }
-  $self = bless $self, _CLASS_NAME . '::' . substr ($self->{type}, 1);
+  $self = bless $self, __PACKAGE__ . '::' . substr ($self->{type}, 1);
   if ($self->{qname}) {
     my $q = Message::Markup::XML::QName::split_qname 
       ($self->{qname},
@@ -83,7 +86,7 @@ sub new ($;%) {
          use_prefix_default => 1, use_name_null => 1,
          check_xml => 1, check_xmlns => 1,
          check_registered_as_is => 1, ask_parent_node => 1);
-    Carp::carp qq'new: "$self->{namespace_prefix}": $result->{reason}'
+    Carp::carp (qq(new: "$self->{namespace_prefix}": $result->{reason}))
       if $result->{reason};
   }
   if ($self->{type} eq '#element' or $self->{type} eq '#attribute') {
@@ -130,7 +133,11 @@ sub append_node ($$;%) {
   my ($new_node, %opt) = @_;
   unless (ref $new_node) {
     if ($opt{node_or_text}) {
-      return $self->append_text ($new_node);
+      if ($opt{ignore_empty_string} and not length $new_node) {
+        return undef;
+      } else {
+        return $self->append_text ($new_node);
+      }
     } else {
       Carp::croak "append_node: Something other than node object is given";
     }
@@ -171,12 +178,11 @@ Appends an text as a new text node child and returns it.
 =cut
 
 sub append_text ($$;%) {
-  $_[0]->append_new_node (type => '#text', value => $_[1]);
-}
-
-## Non public interface
-sub append_baretext ($$;%) {
-  $_[0]->append_new_node (type => '#xml', value => $_[1]);
+  my $self = shift;
+  my $new_node = ref ($self)->new (type => '#text', value => shift,
+                                   parent => $self);
+  push @{$self->{node}}, $new_node;
+  $new_node;
 }
 
 =item $x->remove_child_node ($node)
@@ -188,8 +194,8 @@ Removes parent-and-child-relationship between $x and $node.
 sub remove_child_node ($$;%) {
   my ($self, $node) = @_;
   return unless ref $node;
-  $node = overload::StrVal ($node);
-  $self->{node} = [grep { overload::StrVal ($_) ne $node } @{$self->{node}}];
+  my $node_str = overload::StrVal ($node);
+  $self->{node} = [grep { overload::StrVal ($_) ne $node_str } @{$self->{node}}];
   delete $node->{parent};
   1;
 }
@@ -544,22 +550,22 @@ sub inner_text ($;%) {
   $r;
 }
 
-sub value ($;%) { inner_text (@_) }
+sub value ($;%) { shift->inner_text (@_) }
 
 sub stringify ($;%) { shift->outer_xml (@_) }
 
+## obsolete
 sub _is_same_class ($$) {
   my ($self, $something) = @_;
-  return 0 if {qw/ARRAY 1 HASH 1 CODE 1 :nonref: 1/}
-           -> {ref ($something) or ':nonref:'};
-  eval {$self->_CLASS_NAME eq $something->_CLASS_NAME} ? 1 : 0;
+  return 0 unless ref $something;
+  return $something->isa (__PACKAGE__) ? 1 : 0;
 }
 
 sub _get_ns_decls_node ($;%) {
   my ($self, %opt) = @_;
   if ($self->{type} eq '#element') {
     return $self;
-  } elsif (ref $self->{parent}) {
+  } elsif (ref $self->{parent} and $self->{parent}->can ('_get_ns_decls_node')) {
     return $self->{parent}->_get_ns_decls_node;
   } elsif (exists $opt{default}) {
     return $opt{default};
@@ -679,6 +685,7 @@ sub qname ($;%) {
      $self->{namespace_uri}, $self->{local_name},
      make_new_prefix => 1, check_local_name => 1,
      use_xml => 1, use_xmlns => 1,
+     use_prefix_default_null => 1,
      ask_parent_node => 1, %opt);
   Carp::carp $result->{reason} if $result->{reason};
   return $result->{qname};
@@ -709,7 +716,7 @@ sub attribute_value ($;%) {
 
 sub attribute ($;%) {
   my $self = shift;
-  $self->attribute_name . '=' . $self->attribute_value;
+  $self->qname . '=' . $self->attribute_value;
 }
 
 ## Returns EntityValue
@@ -1377,4 +1384,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/11/15 07:42:34 $
+1; # $Date: 2003/12/01 07:52:08 $

@@ -16,7 +16,7 @@ This module is part of manakai XML.
 
 package Message::Markup::XML::QName;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NCNameStartChar InXMLNCNameChar!;
 use Exporter;
 our @ISA = qw/Exporter/;
@@ -211,7 +211,8 @@ sub prefix_to_name ($$;%) {
       return prefix_to_name ($decls->{parent}->_get_ns_decls_node, $prefix, %opt,
                              check_prefix => 0);
     } else {
-      if ($opt{use_name_null} && ($prefix eq DEFAULT_PFX)) {
+      if ($opt{use_name_null} and not $opt{ignore_implicit_null}
+          and ($prefix eq DEFAULT_PFX)) {
         return {success => 1, prefix => $prefix, name => NULL_URI};
       } else {
         return {success => 0, prefix => $prefix, reason => '__NOT_FOUND'};
@@ -257,7 +258,8 @@ sub name_to_prefix ($$;%) {
     }
   }
 
-    if ($opt{use_prefix_default} and $name eq NULL_URI
+    if (($opt{use_prefix_default} or $opt{use_prefix_default_null})
+        and $name eq NULL_URI
         and not $opt{preserve_prefix_default}) {
       $decls->{ns}->{(DEFAULT_PFX)} = NULL_URI
         if (not $decls->{ns}->{(DEFAULT_PFX)}
@@ -282,7 +284,8 @@ sub generate_prefix ($;$%) {
     for (@{$Namespace_URI_to_prefix{$name}}) {
       my $pfx = $_;
       next if !$opt{use_prefix_default} && ($pfx eq DEFAULT_PFX);
-      unless (prefix_to_name ($decls, $pfx, %opt, check_prefix => 0)
+      unless (prefix_to_name ($decls, $pfx, %opt, check_prefix => 0,
+                              ignore_implicit_null => 1)
               ->{success}) {
         return $pfx;
       }
@@ -364,7 +367,7 @@ sub split_qname ($;%) {
 
 sub join_qname ($$;%) {
   my ($pfx, $ln, %opt) = @_;
-  $pfx ||= DEFAULT_PFX unless defined $pfx and $pfx eq '0';
+  $pfx = DEFAULT_PFX unless defined $pfx;
   $opt{qname_separator} ||= ':';
   if ($opt{check_qname} || $opt{check_prefix}) {
     if ($pfx ne DEFAULT_PFX) {
@@ -410,4 +413,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/11/15 07:42:34 $
+1; # $Date: 2003/12/01 07:51:48 $
