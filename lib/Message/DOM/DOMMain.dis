@@ -28,75 +28,9 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/19 10:57:49 $
+      $Date: 2004/12/26 09:24:37 $
     @@ContentType:
       dis:Date.RCS
-  
-  @Feature:
-    @@QName: 
-      ManakaiDOM:ManakaiDOM
-    @@Version: 1.0
-    @@Description:
-      @@@lang:en
-      @@@@:
-        The Manakai DOM Implementation Main Module, version 1.0.
-    @@Contrib:
-      DOMCore:DOMImplementation::DOM1
-    @@Contrib:
-      DOMCore:DOMImplementation::DOM2
-    @@Contrib:
-      DOMCore:DOMImplementation::DOM3
-  @Feature:
-    @@QName: 
-      ManakaiDOM:DOMMain
-    @@For:
-      ManakaiDOM:ManakaiDOM
-    @@FullName:
-      @@@lang:en
-      @@@@:
-        The manakai DOM implementation <Module:DOMMain> module
-  @Feature:
-    @@QName:
-      ManakaiDOM:DOMMain
-    @@Version: 1.0
-    @@For:
-      ManakaiDOM:ManakaiDOM1
-    @@FullName:
-      @@@lang:en
-      @@@@:
-        The manakai DOM implementation <Module:DOMMain> module, level 1
-    @@Contrib:
-      DOMCore:DOMImplementation::DOM1
-    @@Contrib:
-      DOMCore:DOMImplementation::DOM2
-    @@Contrib:
-      DOMCore:DOMImplementation::DOM3
-  @Feature:
-    @@QName:
-      ManakaiDOM:DOMMain
-    @@Version: 2.0
-    @@For:
-      ManakaiDOM:ManakaiDOM2
-    @@FullName:
-      @@@lang:en
-      @@@@:
-        The manakai DOM implementation <Module:DOMMain> module, level 2
-    @@Contrib:
-      DOMCore:DOMImplementation::DOM2
-    @@Contrib:
-      DOMCore:DOMImplementation::DOM3
-  @Feature:
-    @@QName: 
-      ManakaiDOM:DOMMain
-    @@Version: 3.0
-    @@For:
-      ManakaiDOM:ManakaiDOM3
-    @@FullName:
-      @@@lang:en
-      @@@@:
-        The manakai DOM implementation <Module:DOMMain> module, level 3
-    @@Contrib:
-      DOMCore:DOMImplementation::DOM3
   
   @Require:
     @@Module:
@@ -139,6 +73,10 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @dis2pm:
     http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
+  @DOMMain:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @infoset:
+    http://www.w3.org/2001/04/infoset#
   @lang:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
@@ -160,6 +98,10 @@ Namespace:
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
   @TreeCore:\
+  @xml:
+    http://www.w3.org/XML/1998/namespace
+  @xmlns:
+    http://www.w3.org/2000/xmlns/
 
 ResourceDef:
   @QName:
@@ -565,6 +507,21 @@ ResourceTypeDef:
     @@lang:en
     @@@:
       A subtype of an exception or warning.
+ElementTypeBinding:
+  @Name: SubTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:ExceptionOrWarningSubType
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM
+    @@aliasChild:1
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOMCommon
+      @@@For:
+        !=ManakaiDOM:ManakaiDOMCommon
 
 PropDef:
   @QName: 
@@ -1180,6 +1137,14 @@ PropDef:
   @rdfs:domain:
     ManakaiDOM:DataType
 
+TreeElementType:
+  @QName:
+    ManakaiDOM:InputNormalize
+  @Description:
+    @@lang:en
+    @@@:
+      Inserts an input normalizing code, if any, for a parameter.
+
 PropDef:
   @QName:
     ManakaiDOM:noInputNormalize
@@ -1266,6 +1231,229 @@ ResourceTypeDef:
     @@@:
       A block code fragment referred by <CODE::__CODE{<VAR::qname>}__> 
       preprocessed block.
+
+
+## -- DOM Feature
+
+StringDataTypeDef:
+  @QName: 
+    ManakaiDOM:ManakaiDOMFeatureName
+  @FullName:
+    @@lang:en
+    @@@: DOM feature name
+  @Description:
+    @@lang:en
+    @@@:
+      A DOM feature name. 
+      \
+      In some context, a feature name might be prefixed by <CHAR::PLUS SIGN> 
+      to indicate that feature is not required to be <EM::directly> 
+      accessible.
+
+StringDataTypeDef:
+  @QName: 
+    ManakaiDOM:ManakaiDOMFeatureVersion
+  @FullName:
+    @@lang:en
+    @@@: DOM feature version
+  @Description:
+    @@lang:en
+    @@@: 
+      A DOM feature version number. 
+      \
+      In most contexts, an empty string and the <DOM:null> value are 
+      also valid values.  Both values indicate that any version of 
+      that feature is acceptable.
+
+StringDataTypeDef:
+  @QName: 
+    ManakaiDOM:ManakaiDOMFeatures
+  @For:
+    ManakaiDOM:ManakaiDOM3
+  @FullName:
+    @@lang:en
+    @@@: 
+      A DOM <P:features>
+  @Description:
+    @@lang:en
+    @@@:
+      A list of zero or more pairs of a <TYPE::ManakaiDOM:ManakaiDOMFeature> 
+      and an optional <TYPE::ManakaiDOM:ManakaiDOMFeatureVersion>, 
+      separated by white space.
+      \
+      In the manakai DOM implementation, method parameters and attributes 
+      whose actual datatype is <P::features> also accept a reference 
+      to hash whose key is a feature name and value is corresponding 
+      a feature version (or an empty string).  Don't forget to quote 
+      version number when its fraction part is <CODE:0> (e.g. 
+      quote <FeatureVer:2.0> like <Perl:'2.0'>).
+  @ManakaiDOM:inputNormalizer:
+    @@ContentType:
+      lang:Perl
+    @@@:
+      if (CORE::defined $INPUT) {
+        unless (CORE::ref $INPUT) {
+          my @f = split /\s+/, $INPUT;
+          $INPUT = {};
+          while (@f) {
+            my $name = shift @f;
+            if (@f and $f[0] =~ /^[\d\.]+$/) {
+              $INPUT->{$name} = shift @f;
+            } else {
+              $INPUT->{$name} = '';
+            }
+          }
+        }
+      } else {
+        $INPUT = {};
+      }
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        In current specifications of DOM, order of features are not 
+        significant and treatement for dupulication of a feature name 
+        is not specified.  
+        If <P::features> in future levels of DOM does not 
+        have this characteristic, this and some other implementation 
+        must be revisited for that levels. 
+  @ResourceDef:
+    @@QName:
+      DOMMain:stringifyFeatures
+    @@rdf:type:
+      dis2pm:BlockCode
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Converts a manakai internal hash representation of <P::features> 
+        (<PerlVar::$IN>) to a DOM standard string representation of it 
+        (<PerlVar::$OUT>). 
+        \
+        Note that whether input is valid feature name-value pairs is 
+        not checked; bad input will produce bad output.
+    @@PerlDef:
+      $OUT = join ' ', %{$IN};
+
+ResourceDef:
+  @QName: docSupportsXMLFeature
+  @rdf:type:
+    dis2pm:InlineCode
+  @Description:
+    @@lang:en
+    @@@:
+      Whether a document has support for the <Feature::XML> feature or not.
+  @PerlDef:
+    ($DOCOBJ->{<Q::DOMCore:hasFeature>}->{XML})
+
+ResourceDef:
+  @QName: DOMFeature
+  @FullName:
+    @@lang:en
+    @@@: DOM feature
+  @rdf:type:
+    rdfs:Class
+  @ISA:
+    rdfs:Class
+ElementTypeBinding:
+  @Name: FeatureDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DOMMain:DOMFeature
+
+PropDef:
+  @QName:
+    dis:Version
+  @FullName:
+    @@lang:en
+    @@@: Feature version
+  @Description:
+    @@lang:en
+    @@@:
+      A version number of a feature to define.
+  @rdfs:domain: DOMFeature
+
+PropDef:
+  @QName: featureImplementedBy
+  @Description:
+    @@lang:en
+    @@@:
+      A subject resource is a feature (<Q::DOMMain:DOMFeature>) and 
+      it is implemented by object resource.
+  @rdfs:domain: DOMFeature
+  @dataType:
+    dis:TypeForQNames
+ElementTypeBinding:
+  @Name: fImplBy
+  @ElementType: 
+    DOMMain:featureImplementedBy
+  @ShadowContent:
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM
+
+FeatureDef:
+  @QName: 
+    ManakaiDOM:ManakaiDOMMain
+  @Version: 1.0
+  @FullName:
+    @@lang:en
+    @@@:
+      The Manakai DOM Implementation Main Module, version 1.0
+  @fImplBy:
+    DOMCore:ManakaiDOMImplementation::ManakaiDOM:DOM
+ImplNote:
+  @Feature:
+    @@QName: 
+      ManakaiDOM:DOMMain
+    @@For:
+      ManakaiDOM:ManakaiDOM
+    @@FullName:
+      @@@lang:en
+      @@@@:
+        The manakai DOM implementation <Module:DOMMain> module
+  @Feature:
+    @@QName:
+      ManakaiDOM:DOMMain
+    @@Version: 1.0
+    @@For:
+      ManakaiDOM:ManakaiDOM1
+    @@FullName:
+      @@@lang:en
+      @@@@:
+        The manakai DOM implementation <Module:DOMMain> module, level 1
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM1
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM2
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM3
+  @Feature:
+    @@QName:
+      ManakaiDOM:DOMMain
+    @@Version: 2.0
+    @@For:
+      ManakaiDOM:ManakaiDOM2
+    @@FullName:
+      @@@lang:en
+      @@@@:
+        The manakai DOM implementation <Module:DOMMain> module, level 2
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM2
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM3
+  @Feature:
+    @@QName: 
+      ManakaiDOM:DOMMain
+    @@Version: 3.0
+    @@For:
+      ManakaiDOM:ManakaiDOM3
+    @@FullName:
+      @@@lang:en
+      @@@@:
+        The manakai DOM implementation <Module:DOMMain> module, level 3
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM3
+
 
 ## -- IDL datatypes
 
@@ -2292,104 +2480,6 @@ StringDataTypeDef:
         }__;
       }
 
-StringDataTypeDef:
-  @QName: 
-    ManakaiDOM:ManakaiDOMFeatureName
-  @FullName:
-    @@lang:en
-    @@@: DOM feature name
-  @Description:
-    @@lang:en
-    @@@:
-      A DOM feature name. 
-      \
-      In some context, a feature name might be prefixed by <CHAR::PLUS SIGN> 
-      to indicate that feature is not required to be <EM::directly> 
-      accessible.
-
-StringDataTypeDef:
-  @QName: 
-    ManakaiDOM:ManakaiDOMFeatureVersion
-  @FullName:
-    @@lang:en
-    @@@: DOM feature version
-  @Description:
-    @@lang:en
-    @@@: 
-      A DOM feature version number. 
-      \
-      In most contexts, an empty string and the <DOM:null> value are 
-      also valid values.  Both values indicate that any version of 
-      that feature is acceptable.
-
-StringDataTypeDef:
-  @QName: 
-    ManakaiDOM:ManakaiDOMFeatures
-  @For:
-    ManakaiDOM:ManakaiDOM3
-  @FullName:
-    @@lang:en
-    @@@: 
-      A DOM <P:features>
-  @Description:
-    @@lang:en
-    @@@:
-      A list of zero or more pairs of a <TYPE::ManakaiDOM:ManakaiDOMFeature> 
-      and an optional <TYPE::ManakaiDOM:ManakaiDOMFeatureVersion>, 
-      separated by white space.
-      \
-      In the manakai DOM implementation, method parameters and attributes 
-      whose actual datatype is <P::features> also accept a reference 
-      to hash whose key is a feature name and value is corresponding 
-      a feature version (or an empty string).  Don't forget to quote 
-      version number when its fraction part is <CODE:0> (e.g. 
-      quote <FeatureVer:2.0> like <Perl:'2.0'>).
-  @ManakaiDOM:inputNormalizer:
-    @@ContentType:
-      lang:Perl
-    @@@:
-      if (CORE::defined $INPUT) {
-        unless (CORE::ref $INPUT) {
-          my @f = split /\s+/, $INPUT;
-          $INPUT = {};
-          while (@f) {
-            my $name = shift @f;
-            if (@f and $f[0] =~ /^[\d\.]+$/) {
-              $INPUT->{$name} = shift @f;
-            } else {
-              $INPUT->{$name} = '';
-            }
-          }
-        }
-      } else {
-        $INPUT = {};
-      }
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        In current specifications of DOM, order of features are not 
-        significant and treatement for dupulication of a feature name 
-        is not specified.  
-        If <P::features> in future levels of DOM does not 
-        have this characteristic, this and some other implementation 
-        must be revisited for that levels. 
-  @ResourceDef:
-    @@QName:
-      DOMMain:stringifyFeatures
-    @@rdf:type:
-      dis2pm:BlockCode
-    @@Description:
-      @@@lang:en
-      @@@@:
-        Converts a manakai internal hash representation of <P::features> 
-        (<PerlVar::$IN>) to a DOM standard string representation of it 
-        (<PerlVar::$OUT>). 
-        \
-        Note that whether input is valid feature name-value pairs is 
-        not checked; bad input will produce bad output.
-    @@PerlDef:
-      $OUT = join ' ', %{$IN};
-
 ImplNote:
   @lang:en
   @@:
@@ -2445,7 +2535,202 @@ StringDataTypeDef:
       }
 
 StringDataTypeDef:
-  @Name: ManakaiDOMQName
+  @QName: ManakaiDOMXMLName
+  @FullName:
+    @@lang:en
+    @@@: XML Name
+  @ManakaiDOM:inputNormalizer:
+
+  @ResourceDef:
+    @@QName: validateXMLName
+    @@rdf:type:
+      dis2pm:InlineCode
+    @@aliasChild:1
+    @@Def:
+      @@@ContentType:
+        dis:Perl
+      @@@DISPerl:selectByProp:
+        @@@@DISPerl:propName:
+          infoset:version
+        @@@@DISPerl:case:
+          @@@@@Value:
+            @@@@@@@: 1.0
+            @@@@@@Type:
+              DOMMain:DOMString
+          @@@@@@:
+            ($INPUT =~ /\A\p{InXML_NameStartChar10}\p{InXMLNameChar10}*\z/)
+        @@@@DISPerl:case:
+          @@@@@Value:
+            @@@@@@@: 1.1
+            @@@@@@Type:
+              DOMMain:DOMString
+          @@@@@@:
+            ($INPUT =~ /\A\p{InXMLNameStartChar11}\p{InXMLNameChar11}*\z/)
+        @@@@DISPerl:else:
+          ** NOT IMPLEMENTED **
+
+  @ResourceDef:
+    @@QName: ensureXMLName
+    @@rdf:type: 
+      dis2pm:BlockCode
+    @@Description:
+      @@@lang:en
+      @@@@: 
+        Tests whether a string is a legal XML Name and 
+        if not, raises an exception.
+        \
+        {NOTE:: This code fragment does not support non-<Feature::XML>. 
+        \
+        }
+    @@PerlDef:
+        if (defined $INPUT) {
+          __FOR{ManakaiDOM:DOM3::
+            if (($XMLVERSION eq '1.0' and
+                 <Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
+                            infoset:version = '1.0'>) or
+                ($XMLVERSION eq '1.1' and
+                 <Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
+                            infoset:version = '1.1'>)) {
+              __EXCEPTION{MDOMX:MDOM_BAD_NAME::
+                DOMCore:name => {$INPUT},
+                MDOMX:param-name => '$INPUT_PARAM_NAME',
+                infoset:version => {$XMLVERSION},
+              }__;
+            }
+          }__;
+          __FOR{ManakaiDOM:DOM2 !ManakaiDOM:DOM3::
+            unless (<Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
+                           infoset:version = '1.0'>) {
+              __EXCEPTION{MDOMX:MDOM_BAD_NAME::
+                DOMCore:name => {$INPUT},
+                MDOMX:param-name => '$INPUT_PARAM_NAME',
+                infoset:version => '1.0',
+              }__;
+            }
+          }__;
+        }
+
+StringDataTypeDef:
+  @QName: ManakaiDOMXMLNCName
+  @ISA: ManakaiDOMXMLName
+  @FullName:
+    @@lang:en
+    @@@: XML NCName
+  @ManakaiDOM:inputNormalizer:
+
+  @ResourceDef:
+    @@QName: validateXMLNCName
+    @@rdf:type:
+      dis2pm:InlineCode
+    @@aliasChild:1
+    @@Def:
+      @@@ContentType:
+        dis:Perl
+      @@@DISPerl:selectByProp:
+        @@@@DISPerl:propName:
+          infoset:version
+        @@@@DISPerl:case:
+          @@@@@Value:
+            @@@@@@@: 1.0
+            @@@@@@Type:
+              DOMMain:DOMString
+          @@@@@@:
+            ($INPUT =~ /\A\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*\z/)
+        @@@@DISPerl:case:
+          @@@@@Value:
+            @@@@@@@: 1.1
+            @@@@@@Type:
+              DOMMain:DOMString
+          @@@@@@:
+            ($INPUT =~ /\A\p{InXMLNCNameStartChar11}\p{InXMLNCNameChar11}*\z/)
+        @@@@DISPerl:else:
+          ** NOT IMPLEMENTED **
+
+StringDataTypeDef:
+  @QName: ManakaiDOMNamespacePrefix
+  @ISA: ManakaiDOMXMLNCName
+  @FullName:
+    @@lang:en
+    @@@: XML Namespace Prefix
+
+  @ResourceDef:
+    @@QName: ensureNamespacePrefix
+    @@rdf:type:
+      dis2pm:BlockCode
+    @@Description:
+      @@@lang:en
+      @@@@: 
+        Tests whether a string is a legal XML Namespace prefix and 
+        if not, raises an exception.
+        \
+        {NOTE:: This code fragment does not support non-<Feature::XML>. 
+        \
+        }
+    @@Description:
+      @@@lang:en
+      @@@@:
+        DOM Level 3 defines that the treatement for empty prefix 
+        is implementation dependent.  The manakai DOM implementation 
+        assumes ut as uf <DOM::null> is specified.
+      @@@For:
+        ManakaiDOM:DOM3
+    @@PerlDef:
+        __FOR{ManakaiDOM:DOM3::
+          if (defined $INPUT and $INPUT eq '') {
+            __WARNING{DOMMain:MDOMX_EMPTY_NS_PREFIX::
+              MDOMX:param-name => '$INPUT_PARAM_NAME',
+            }__;
+          }
+        }__;
+        if (defined $INPUT) {
+          __FOR{ManakaiDOM:DOM3::
+            if (($XMLVERSION eq '1.0' and
+                 <Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
+                            infoset:version = '1.0'>) or
+                ($XMLVERSION eq '1.1' and
+                 <Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
+                            infoset:version = '1.1'>)) {
+              __EXCEPTION{MDOMX:MDOM_BAD_NAME::
+                DOMCore:name => {$INPUT},
+                MDOMX:param-name => '$INPUT_PARAM_NAME',
+                infoset:version => {$XMLVERSION},
+              }__;
+            } elsif (index ($INPUT, ':') > -1) {
+              __EXCEPTION{MDOMX:MDOM_NS_BAD_NCNAME::
+                infoset:name => {$INPUT},
+                MDOMX:param-name => '$INPUT_PARAM_NAME',
+                infoset:version => {$XMLVERSION},
+              }__;
+            }
+          }__;
+          __FOR{ManakaiDOM:DOM2 !ManakaiDOM:DOM3::
+            unless (<Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
+                           infoset:version = '1.0'>) {
+              __EXCEPTION{MDOMX:MDOM_BAD_NAME::
+                DOMCore:name => {$INPUT},
+                MDOMX:param-name => '$INPUT_PARAM_NAME',
+                infoset:version => '1.0',
+              }__;
+            } elsif (index ($INPUT, ':') > -1) {
+              __EXCEPTION{MDOMX:MDOM_NS_BAD_NCNAME::
+                infoset:name => {$INPUT},
+                MDOMX:param-name => '$INPUT_PARAM_NAME',
+                infoset:version => '1.0',
+              }__;
+            }
+          }__;
+        }
+
+StringDataTypeDef:
+  @QName: ManakaiDOMXMLLocalName
+  @ISA: ManakaiDOMXMLNCName
+  @FullName:
+    @@lang:en
+    @@@: XML local name
+
+StringDataTypeDef:
+  @Name: ManakaiDOMXMLQName
+  @ISA: ManakaiDOMXMLName
   @FullName:
     @@lang:en
     @@@:
@@ -2455,55 +2740,199 @@ StringDataTypeDef:
       dis:Perl
     @@DISPerl:selectByProp:
       @@@DISPerl:propName:
-        DOMCore:xmlVersion
+        infoset:version
       @@@DISPerl:case:
         @@@@Value: 1.0
         @@@@@:
-          unless ($INPUT
-                    =~ /\A\p{InXML_NameStartChar10}\p{InXMLNameChar10}*\z/) {
+          unless (<Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
+                           infoset:version = '1.0'>) {
             __EXCEPTION{
               MDOMX:MDOM_BAD_NAME::
                 DOMCore:name => {$INPUT},
                 MDOMX:param-name => '$INPUT_NAME',
-                DOMCore:xmlVersion => '1.0',
+                infoset:version => '1.0',
             }__;
           }
-          unless ($INPUT =~ /\A\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*(?::\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*)?\z/) {
+          unless (<Code::DOMMain:validateXMLQName:: $INPUT = $INPUT,
+                      infoset:version = '1.0'>) {
             __EXCEPTION{
               MDOMX:MDOM_NS_MALFORMED_QNAME::
                 DOMCore:name => {$INPUT},
                 MDOMX:param-name => '$INPUT_NAME',
-                DOMCore:xmlVersion => '1.0',
+                infoset:version => '1.0',
             }__;
           }
       @@@DISPerl:case:
         @@@@Value: 1.1
         @@@@@:
-          unless ($INPUT =~ /\A\p{InXMLNameStartChar11}\p{InXMLNameChar11}*\z/) {
+          unless (<Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
+                      infoset:version = '1.1'>) {
             __EXCEPTION{
               MDOMX:MDOM_BAD_NAME::
                 DOMCore:name => {$INPUT},
                 MDOMX:param-name => '$INPUT_NAME',
-                DOMCore:xmlVersion => '1.1',
+                infoset:version => '1.1',
             }__;
           }
-          unless ($INPUT =~ /\A\p{InXMLNCNameStartChar11}\p{InXMLNCNameChar11}*(?::\p{InXMLNCNameStartChar11}\p{InXMLNCNameChar11}*)?\z/) {
+          unless (<Code::DOMMain:validateXMLQName:: $INPUT = $INPUT,
+                      infoset:version = '1.1'>) {
             __EXCEPTION{
               MDOMX:MDOM_NS_MALFORMED_QNAME::
                 DOMCore:name => {$INPUT},
                 MDOMX:param-name => '$INPUT_NAME',
-                DOMCore:xmlVersion => '1.1',
+                infoset:version => '1.1',
             }__;
           }
-      @@@DISPerl:else:
-        @@@@@:
-          unless ($INPUT =~ //) {
-            
-          }
-        @@@@ImplNote:
-          @@@@@lang:en
+      @@@DISPerl:else: ** NOT IMPLEMENTED **
+
+  @ResourceDef:
+    @@QName: validateXMLQName
+    @@rdf:type:
+      dis2pm:InlineCode
+    @@aliasChild:1
+    @@Def:
+      @@@ContentType:
+        dis:Perl
+      @@@DISPerl:selectByProp:
+        @@@@DISPerl:propName:
+          infoset:version
+        @@@@DISPerl:case:
+          @@@@@Value: 1.0
           @@@@@@:
-            TODO: Implement this.
+            ($INPUT =~ /\A\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*(?::\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*)?\z/)
+        @@@@DISPerl:case:
+          @@@@@Value: 1.1
+          @@@@@@:
+            ($INPUT =~ /\A\p{InXMLNCNameStartChar11}\p{InXMLNCNameChar11}*(?::\p{InXMLNCNameStartChar11}\p{InXMLNCNameChar11}*)?\z/)
+        @@@@DISPerl:else:
+          ** NOT IMPLEMENTED **
+
+  @ResourceDef:
+    @@QName: ensureXMLQName
+    @@rdf:type: 
+      dis2pm:BlockCode
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Checks whether a string is a legal XML qualified name and if not 
+        then raises an exception.
+    @@PerlDef:
+      @@@For:
+        ManakaiDOM:DOM3
+      @@@@:
+        if ($XMLVERSION eq '1.1') {
+          unless (<Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
+                      infoset:version = '1.1'>) {
+            __EXCEPTION{
+              MDOMX:MDOM_BAD_NAME::
+                DOMCore:name => {$INPUT},
+                MDOMX:param-name => '$INPUT_NAME',
+                infoset:version => '1.1',
+            }__;
+          }
+          unless (<Code::DOMMain:validateXMLQName:: $INPUT = $INPUT,
+                      infoset:version = '1.1'>) {
+            __EXCEPTION{
+              MDOMX:MDOM_NS_MALFORMED_QNAME::
+                DOMCore:name => {$INPUT},
+                MDOMX:param-name => '$INPUT_NAME',
+                infoset:version => '1.1',
+            }__;
+          }
+        } else {
+          unless (<Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
+                           infoset:version = '1.0'>) {
+            __EXCEPTION{
+              MDOMX:MDOM_BAD_NAME::
+                DOMCore:name => {$INPUT},
+                MDOMX:param-name => '$INPUT_NAME',
+                infoset:version => '1.0',
+            }__;
+          }
+          unless (<Code::DOMMain:validateXMLQName:: $INPUT = $INPUT,
+                      infoset:version = '1.0'>) {
+            __EXCEPTION{
+              MDOMX:MDOM_NS_MALFORMED_QNAME::
+                DOMCore:name => {$INPUT},
+                MDOMX:param-name => '$INPUT_NAME',
+                infoset:version => '1.0',
+            }__;
+          }
+        }
+     @@PerlDef:
+       @@@For:
+         ManakaiDOM:DOM2 !ManakaiDOM:DOM3
+       @@@@:
+          unless (<Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
+                           infoset:version = '1.0'>) {
+            __EXCEPTION{
+              MDOMX:MDOM_BAD_NAME::
+                DOMCore:name => {$INPUT},
+                MDOMX:param-name => '$INPUT_NAME',
+                infoset:version => '1.0',
+            }__;
+v          }
+          unless (<Code::DOMMain:validateXMLQName:: $INPUT = $INPUT,
+                      infoset:version = '1.0'>) {
+            __EXCEPTION{
+              MDOMX:MDOM_NS_MALFORMED_QNAME::
+                DOMCore:name => {$INPUT},
+                MDOMX:param-name => '$INPUT_NAME',
+                infoset:version => '1.0',
+            }__;
+          }
+        
+
+ResourceDef:
+  @QName: checkXMLNamesQName
+  @rdf:type:
+    dis2pm:BlockCode
+  @Description:
+    @@lang:en
+    @@@:
+      Checks validness of XML Namespace Name (Namespace URI) and QName. 
+      \
+      {NOTE:: This code fragment checks their combination; it does not 
+              test whether the URI or the QName is itself valid or not.
+      \
+      }
+  @PerlDef:
+    if (defined $PREFIX) {
+      if (not defined $NSURI) {
+        __EXCEPTION{MDOMX:MDOM_NS_PREFIX_WITH_NULL_URI::
+          infoset:prefix => {$PREFIX},
+        }__;
+      } elsif ($PREFIX eq 'xml' and $NSURI ne <Q::xml:>) {
+        __EXCEPTION{MDOMX:MDOM_NS_XML_WITH_OTHER_URI::
+          infoset:namespaceName => {$NSURI},
+        }__;
+      } elsif ($PREFIX eq 'xmlns' and $NSURI ne <Q::xmlns:>) {
+        __EXCEPTION{MDOMX:MDOM_NS_XMLNS_WITH_OTHER_URI::
+          infoset:namespaceName => {$NSURI},
+        }__;
+      } elsif ($NSURI eq <Q::xml:> and $PREFIX ne 'xml') {
+        __EXCEPTION{MDOMX:MDOM_NS_OTHER_WITH_XML_URI::
+          infoset:prefix => {$PREFIX},
+        }__;
+      } elsif ($NSURI eq <Q::xmlns:> and $PREFIX ne 'xmlns') {
+        __EXCEPTION{MDOMX:MDOM_NS_OTHER_WITH_XMLNS_URI::
+          infoset:prefix => {$PREFIX},
+        }__;
+      } elsif ($NSURI eq <Q::xmlns:> and $PREFIX eq 'xmlns' and
+               $LNAME eq 'xmlns') {
+        __EXCEPTION{MDOMX:MDOM_NS_XMLNS_XMLNS}__;
+      }
+    } else { ## No prefix
+      if ($NSURI eq <Q::xml:>) {
+        __EXCEPTION{MDOMX:MDOM_NS_OTHER_WITH_XML_URI::
+          infoset:prefix => {undef},
+        }__;
+      } elsif ($NSURI eq <Q::xmlns:> and $LNAME ne 'xmlns') {
+        __EXCEPTION{MDOMX:MDOM_NS_OTHER_WITH_XMLNS_URI::
+          infoset:prefix => {undef},
+        }__;
+      }
+    }
 
 ## -- The bootstrap object
 
@@ -2850,11 +3279,9 @@ ClassDef:
       ManakaiDOM:getExceptionCode
     @@rdf:type:
       dis2pm:BlockCode
-    @@Def:
-      @@@ContentType:
-        lang:Perl
-      @@@@:
-        $OUTPUT = $self->{<Q::MUErrorCore:def>}->{<Q::DOMCore:code>};
+    @@aliasChild:1
+    @@PerlDef:
+      $r = $self->{<Q::MUErrorCore:def>}->{<Q::DOMCore:code>};
     @@Description:
       @@@lang:en
       @@@@:
@@ -3294,6 +3721,8 @@ ExceptionDef:
          DOMMain:unsigned-short
        @@@actualType: 
          ManakaiDOM:ManakaiDOMImplementationExceptionCode
+       @@@PerlDef: 
+         __CODE{ManakaiDOM:getExceptionCode}__;
 
   @ResourceDef:
     @@QName: 
@@ -3446,6 +3875,8 @@ WarningDef:
          @@@@@:
            The warning code from the constant value group
            ManakaiDOMImplementationWarningCode.
+       @@@PerlDef: 
+         __CODE{ManakaiDOM:getExceptionCode}__;
 
   @ResourceDef:
     @@QName: 
@@ -3470,6 +3901,20 @@ WarningDef:
         @@@@lang:en
         @@@@@:
           Setting an attribute value has no effect by definition.
+      @@@SubTypeDef:
+        @@@@QName: MDOMX_NOEFFECT_SINCE_DOC_NOSUPPORT_XML
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The action has no effect since a document does not 
+            support the <Feature::XML> feature. 
+      @@@SubTypeDef:
+        @@@@QName: MDOMX_NOEFFECT_SINCE_NODE_NOSUPPORT_XMLNS
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The action has no effect since a node does not 
+            support XML Namespaces.
 
     @@XConst:
       @@@QName: 
@@ -3503,6 +3948,16 @@ WarningDef:
         @@@@@:
           An attempt to replace a node by itself is made. 
           It is no effect by definition.
+
+    @@XConst:
+      @@@QName: MDOMX_EMPTY_NS_PREFIX
+      @@@Type: unsigned-short
+      @@@Value: 3
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          An empty namespace prefix is specified; its result 
+          is implementation dependent <SRC::DOM Level 3>. 
     
     @@XConst:
       @@@QName: 
@@ -3516,8 +3971,15 @@ WarningDef:
           string is treated as a real namespace URI.  The Errata for 
           the DOM Level 2 Specifications says that it is an error and 
           the way empty strings are treated is implementation dependent. 
-          The DOM Level 3 Core Specification defines that empty strings 
-          are converted to "null".
+        @@@@For:
+          !ManakaiDOM:DOM3
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          An empty string namespace URI is coverted into <DOM::null> 
+          <SRC::DOM Level 3 Core>. 
+        @@@@For:
+          ManakaiDOM:DOM3
       @@@XParam:
         @@@@QName:
           MDOMX:param-name

@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/19 10:57:49 $
+      $Date: 2004/12/26 09:24:37 $
     @@ContentType:
       dis:Date.RCS
 
@@ -574,10 +574,8 @@ ExceptionDef:
          @@@@lang:en
          @@@@@: 
            The error code of this object. 
-       @@@Def: 
-         @@@@ContentType:
-           lang:dis
-         @@@@ManakaiDOM:getExceptionCode: 
+       @@@PerlDef: 
+         __CODE{ManakaiDOM:getExceptionCode}__;
 
   @XConstGroup:
      @@QName:
@@ -719,13 +717,27 @@ ExceptionDef:
                 The name of the parameter the node is specified.
      @@XConst:
         @@@Name:  WRONG_DOCUMENT_ERR
-        @@@Type:  unsigned-short
+        @@@Type:  
+          DOMMain:unsigned-short
         @@@Value:  4
         @@@Description:
           @@@@lang:en
           @@@@@:
             A node is used in a different document than the one
             that created it.
+        @@@SubTypeDef:
+          @@@@QName: MDOMX_DOCTYPE_ALREADY_USED
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              A specified document type node has already been 
+              used as part of a different document tree.
+        @@@SubTypeDef:
+          @@@@QName: MDOMX_EXTERNAL_NODE
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              A specified node was created from a different DOM implementation.
      @@XConst:
         @@@Name:  INVALID_CHARACTER_ERR
         @@@Type:  unsigned-short
@@ -749,6 +761,14 @@ ExceptionDef:
               @@@@@@lang:en
               @@@@@@@: 
                 The <XML:Name> specified.
+          @@@@XParam:
+            @@@@@QName:
+              infoset:version
+            @@@@@Type:
+              DOMMain:DOMString
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@: The version of XML.
      @@XConst:
         @@@Name:  NO_DATA_ALLOWED_ERR
         @@@Type:  unsigned-short
@@ -758,7 +778,8 @@ ExceptionDef:
           @@@@@: Data is specified for a node that does not support data.
      @@XConst:
         @@@Name:  NO_MODIFICATION_ALLOWED_ERR
-        @@@Type:  unsigned-short
+        @@@Type:  
+          DOMMain:unsigned-short
         @@@Value:  7
         @@@Description:
           @@@@lang:en
@@ -803,7 +824,9 @@ ExceptionDef:
             MDOMX:NOMOD_THIS
           @@@@Description:
             @@@@@lang:en
-            @@@@@@: This node is read-only.
+            @@@@@@:
+              An attempt is made to modify this node but 
+              this node is read-only.
      @@XConst:
         @@@Name:  NOT_FOUND_ERR
         @@@Type:  unsigned-short
@@ -840,6 +863,13 @@ ExceptionDef:
            \
               This DOM implementation throws the exception in 
               both levels.
+        @@@SubTypeDef:
+          @@@@QName:
+            MDOMX:MDOM_DOC_NOSUPPORT_XMLNS
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This document does not support XML Namespaces.
         @@@SubTypeDef:
           @@@@QName:
             MDOMX:MDOM_IMPL_NOSUPPORT_SCHEMA
@@ -1061,7 +1091,8 @@ ExceptionDef:
           @@@@@: An attempt is made to modify the type of underlying object.
      @@XConst:
         @@@Name:  NAMESPACE_ERR
-        @@@Type:  unsigned-short
+        @@@Type:  
+          DOMMain:unsigned-short
         @@@Value:  14
         @@@SpecLevel: 2
         @@@Level[list]:  2
@@ -1103,6 +1134,14 @@ ExceptionDef:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: The qualified name specified.
+        @@@SubTypeDef:
+          @@@@QName:
+            MDOMX:MDOM_NS_NOPREFIX_WITH_NON_NULL_URI
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              There is no namespace prefix but there is a 
+              non-namespace URI specified.
         @@@SubTypeDef:
           @@@@QName:
             MDOMX:MDOM_NS_NULL_QNAME_WITH_NON_NULL_URI
@@ -1247,6 +1286,13 @@ ExceptionDef:
            @@@@@@:
              The qualified name is <XML:xmlns:xmlns>.  It is prohibited 
              by the XML Namespace Specifications.
+        @@@SubTypeDef:
+          @@@@QName: MDOMX_HTML_NSURI
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              An attempt is made to set a namespace URI to 
+              an HTML node. 
      @@XConst:
         @@@Name:  INVALID_ACCESS_ERR
         @@@Type:  unsigned-short
@@ -1771,7 +1817,6 @@ IF:
           $r = bless [], ref $self ? ref $self : $self;
   @IntMethod:
     @@Name: add
-    @@ManakaiDOM:isStatic: 1
     @@Description:
       @@@lang: en
       @@@@:
@@ -1798,9 +1843,9 @@ IF:
           for (@list) {
             if (UNIVERSAL::isa ($_, <IFName::DOMImplementationList>)) {
               __DEEP{
-                my $len = $_-><M::DOMImplementationList:length>; 
+                my $len = $_-><M::DOMImplementationList.length>; 
                 for (my $i = 0; $i < $len; $i++) {
-                  push @$self, $_-><M::DOMImplementationList:item> ($i);
+                  push @$self, $_-><M::DOMImplementationList.item> ($i);
                 }
               }__;
             } elsif (UNIVERSAL::isa ($_, <ClassName::DOMImplementation>)) {
@@ -2114,18 +2159,32 @@ IF:
           DOMMain:DOMString
         @@@actualType:
           @@@@@:
-            DOMMain:ManakaiDOMQName
-          @@@DOMCore:xmlVersion:
-            @@@@: 1.1
-            @@@For:
+            DOMMain:ManakaiDOMXMLQName
+          @@@@infoset:version:
+            @@@@@@: 1.1
+            @@@@@For:
               ManakaiDOM:ManakaiDOMLatest
-          @@@DOMCore:xmlVersion:
-            @@@@: 1.0
-            @@@For:
+          @@@@infoset:version:
+            @@@@@@: 1.0
+            @@@@@For:
               !ManakaiDOM:ManakaiDOMLatest
         @@@Description:
           @@@@lang:en
           @@@@@: The qualified name of the document type to be created.
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            {NOTE:: DOM levels 2 and 3 requires DOM implementations to 
+                    test whether a <P::qualifiedName> is a valid XML 1.0
+                    Name or not.  The manakai DOM implementation
+                    for the <QUOTE::latest> level tests against both XML 1.0 
+                    and XML 1.1; if it is invalid against XML 1.1, an exception 
+                    is thrown; otherwise, the node created is marked as 
+                    an XML 1.1 document type node.
+             \
+            }
+          @@@@For:
+            ManakaiDOM:ManakaiDOMLatest
      @@Param:
         @@@Name:  publicId
         @@@Type:  
@@ -2203,6 +2262,12 @@ IF:
             my $node = <ClassM::DOMXML:ManakaiDOMDocumentType.newObject>;
             $node->{<Q::infoset:prefix>} = $prefix;
             $node->{<Q::infoset:localName>} = $lname;
+            __FOR{ManakaiDOM:ManakaiDOMLatest::
+              unless (<Code::DOMMain:validateXMLQName:: $INPUT = $qualifiedName,
+                           infoset:version = '1.0'>) {
+                $node->{<Q::infoset:version>} = '1.1';
+              }
+            }__;
             $node->{<Q::infoset:publicIdentifier>} = $publicId;
             $node->{<Q::infoset:systemIdentifier>} = $systemId; 
             ## Note: No DOM Level 3 method/attribute provides access 
@@ -2225,6 +2290,18 @@ IF:
        @@@lang:en
        @@@@:
          Creates a new <IF::Document> object, with a document element.
+     @@Description:
+       @@@lang:en
+       @@@@:
+         {NOTE:: Either if the <P::doctype> is an XML 1.1 node 
+                 or if the <P::qualifiedName> is a valid XML Namespace 1.1 
+                 QName but is not a valid XML Namespace 1.0 QName,
+                 then the XML version of the document to be created 
+                 is <XML::1.1>; otherwise, it is <XML::1.0>.
+          \
+          }
+       @@@For:
+         ManakaiDOM:ManakaiDOMLatest
      @@XML2Feature:
      @@ImplNote:
        @@@lang:en
@@ -2253,6 +2330,18 @@ IF:
         @@@Name:  qualifiedName
         @@@Type:  
           DOMMain:DOMString
+        @@@actualType:
+          @@@@@:
+            DOMMain:ManakaiDOMXMLQName
+          @@@@infoset:version:
+            @@@@@@: 1.1
+            @@@@@For:
+              ManakaiDOM:ManakaiDOMLatest
+          @@@@infoset:version:
+            @@@@@@: 1.0
+            @@@@@For:
+              !ManakaiDOM:ManakaiDOMLatest
+          @@@@ManakaiDOM:noInputNormalize:1
         @@@Description:
           @@@@lang:en
           @@@@@: The qualified name of the document element to create.
@@ -2306,8 +2395,15 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The specified qualified name is not an XML name 
-              accoding to the XML 1.0 specification.
+              The specified qualified name is not an XML 1.0 Name.
+            @@@@@For:
+              !ManakaiDOM:ManakaiDOMLatest
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The specified qualified name is not an XML 1.1 Name.
+            @@@@@For:
+              ManakaiDOM:ManakaiDOMLatest
           @@@@ImplNote:
             @@@@@lang:en
             @@@@@@:
@@ -2344,97 +2440,67 @@ IF:
               these cases since the specification does not mention 
               to raise any exception.
         @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: WRONG_DOCUMENT_ERR
+          @@@@@: MDOMX_DOCTYPE_ALREADY_USED
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The "doctype" has already been used with a different 
-              document or was created from a different implementation.
+              The <P::doctype> has already been used with a different 
+              document.
         @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: NOT_SUPPORTED_ERR
-          @@@@SubType:
-            @@@@@QName:
-              MDOMX:MDOM_IMPL_NOSUPPORT_XML
-            @@@@@Description:
-              @@@@@@lang:en
-              @@@@@@@:
+          @@@@@: MDOMX_EXTERNAL_NODE
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The <P::doctype> was created from a different DOM implementation.
+        @@@Exception:
+          @@@@@:
+            MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
               The DOM implementation does not support the <DOM:XML> feature and 
               the language exposed through the <IF:Document> does not support 
               XML Namespaces.
-        @@@Exception:
-          @@@@Type: 
-            ManakaiDOM:ManakaiDOMImplementationException
-          @@@@Name: MDOM_TYPE_MISMATCH_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: 
-              The object specified to the "doctype" parameter is not a 
-              "DocumentType".
+            @@@@@ImplNote:
+              @@@@@@lang:en
+              @@@@@@@:
+                DOM Level 2 Core described that this method creates 
+                a <QUOTE::XML <IF::Document> object> and that 
+                HTML-only implementations need not implement it. 
+                DOM Level 2 Errata and DOM Level 3 Core describes that 
+                such implementations should return a 
+                <X::DOMException.NOT_SUPPORTED_ERR>.  In addition, 
+                DOM Level 3 Core specifies this method to create 
+                a <QUOTE::DOM <IF::Document> object>. Note also that 
+                DOM Level 3 Core explicitly allows non-<Feature::XML> 
+                document node to be created.
         @@@PerlDef:
+          @@@@For:
+            ManakaiDOM:DOMXMLFeature
+          @@@@@:
             my ($prefix, $lname);
-            if (defined $qualifiedName) {     
-              #       ## Condition sensitive
-              #__CODE{CheckQName: version => 1.0,
-              #                   qname => qualifiedName}__; # [DOM 2,3]
-              if (($lname = $qualifiedName) =~ s/^([^:]+)://) {
-                $prefix = $1;
+            if (defined $qualifiedName) {
+              __ManakaiDOM:InputNormalize{qualifiedName}__;
+              ($prefix, $lname) = split /:/, $qualifiedName, 2;
+              unless (defined $lname) {
+                ($prefix, $lname) = (null, $prefix);
               }
-              if (defined $namespaceURI) {    # ($uri, $qname, $doctype)
-                ## If namespace not supported: # [DOM 3]
-                #__EXCEPTION{
-                #  DOMException.NOT_SUPPORTED_ERR.
-                #  MDOMX:MDOM_IMPL_NOSUPPORT_XML::
-                #}__;
-              } else {                        # (null, $qname, $doctype)
-                if ($prefix) {
-                  __EXCEPTION{
-                    MDOMX:MDOM_NS_PREFIX_WITH_NULL_URI::
-                      infoset:prefix => {$prefix},
-                  }__;                        # [DOM 2,3]
+              __CODE{DOMMain:checkXMLNamesQName::
+                $NSURI => $namespaceURI,
+                $PREFIX => $prefix,
+                $LNAME => $lname,
+              }__;
+              if ($lname eq 'xmlns') {
+                if (not defined $prefix) {
+                  __EXCEPTION{MDOMX:MDOM_NS_QNAME_IS_XMLNS::
+                  }__;
+                } elsif ($prefix eq 'xmlns') {
+                  __EXCEPTION{MDOMX:MDOM_NS_XMLNS_XMLNS::
+                  }__;
                 }
               }
-            } elsif (defined $namespaceURI) { # ($uri, null, $doctype)
-              __EXCEPTION{
-                MDOMX:MDOM_NS_NULL_QNAME_WITH_NON_NULL_URI::
-                  infoset:namespaceName => {$namespaceURI},
-              }__;                            # [DOM 3]
-            }
-            if (not $prefix) {
-              if ($prefix eq 'xml' and 
-                  (not $namespaceURI or
-                   $namespaceURI ne q<http://www.w3.org/XML/1998/namespace>)) {
-                __EXCEPTION{
-                  MDOMX:MDOM_NS_XML_WITH_OTHER_URI::
-                    infoset:namespaceName => {$namespaceURI},
-                }__;                          # [DOM 2,3]
-              } elsif ($prefix eq 'xmlns' and
-                  (not $namespaceURI or
-                   $namespaceURI ne q<http://www.w3.org/2000/xmlns/>)) {
-                __EXCEPTION{
-                  MDOMX:MDOM_NS_XMLNS_WITH_OTHER_URI::
-                    infoset:namespaceName => {$namespaceURI},
-                }__;                          # DOM doesn't specify this
-              }
-            }
-            if (defined $namespaceURI) {
-              if ($namespaceURI eq q<http://www.w3.org/XML/1998/namespace> and
-                  (not $prefix or $prefix ne 'xml')) {
-                __EXCEPTION{
-                  MDOMX:MDOM_NS_OTHER_WITH_XML_URI::
-                    infoset:prefix => {$prefix},
-                }__;                          # DOM doesn't specify this
-              } elsif ($namespaceURI eq q<http://www.w3.org/2000/xmlns/> and
-                  (not $prefix or $prefix ne 'xmlns')) {
-                __EXCEPTION{
-                  MDOMX:MDOM_NS_OTHER_WITH_XMLNS_URI::
-                    infoset:prefix => {$prefix},
-                }__;                          # DOM doesn't specify this
-              }
-            }
- \## ISSUE: Should be exception not warning ("malformed"!)
- \## ISSUE: Should be "xmlns" and "xmlns:xmlns" checked
+            } # $qualifiedName
+
             my $node = <ClassM::ManakaiDOMDocument.newObject>;
             $node->{<Q::DOMCore:implementation>} = $self;
             $node->{<Q::ManakaiDOM:implID>}
@@ -2442,18 +2508,9 @@ IF:
             if ($doctype) {
               if (not UNIVERSAL::isa
                         ($doctype, <ClassName::DOMXML:ManakaiDOMDocumentType>)) {
-                if (not UNIVERSAL::isa
-                          ($doctype, <IFName::DOMXML:DocumentType>)) {
-                  __EXCEPTION{
-                    MDOMX:MDOM_TYPE_MISMATCH_ERR::
-                      MDOMX:param-name => 'doctype',
-                      MDOMX:class      => {ref $doctype},
-                  }__;
-                } else {
-                  __EXCEPTION{
-                    ManakaiDOMException.WRONG_DOCUMENT_ERR::
-                  }__;
-                }
+                __EXCEPTION{MDOMX_EXTERNAL_NODE::
+                  MDOMX:param-name => 'doctype',
+                }__;
               }
               my $doctypeNode = $doctype->{<Q::TreeCore:node>};
               if ($node->{<Q::TreeCore:treeID>} ne
@@ -2461,8 +2518,8 @@ IF:
                   $doctypeNode->{<Q::DOMCore:ownerDocument>} or
                   $doctypeNode->{<Q::ManakaiDOM:implID>} ne 
                     $node->{<Q::ManakaiDOM:implID>}) {
-                __EXCEPTION{
-                  ManakaiDOMException.WRONG_DOCUMENT_ERR::
+                __EXCEPTION{MDOMX_DOCTYPE_ALREADY_USED::
+                  MDOMX:param-name => 'doctype',
                 }__;
               }
               $doctypeNode-><M::ManakaiDOM:ManakaiDOMNodeObject.importTree>
@@ -2470,18 +2527,115 @@ IF:
               $doctypeNode->{<Q::DOMCore:ownerDocument>} = $node;
               $doctypeNode->{<Q::infoset:parent>} = $node;
               push @{$node->{<Q::infoset:children>}}, $doctypeNode;
+              __FOR{ManakaiDOM:ManakaiDOMLatest::
+                $node->{<Q::infoset:version>}
+                    = $doctypeNode->{<Q::infoset:version>};
+              }__;
             }
             if ($lname) {
-              my $docEl = <ClassM::ManakaiDOMElement.new>;
-              my $docNode = $docEl->{<Q::TreeCore:node>};
-              $node-><M::ManakaiDOM:ManakaiDOMNodeObject.importNode> ($docNode);
-              $docNode->{<Q::infoset:prefix>} = $prefix;
-              $docNode->{<Q::infoset:namespaceName>} = $namespaceURI;
-              $docNode->{<Q::infoset:localName>} = $lname;
-              $docNode->{<Q::infoset:parent>} = $node;
-              push @{$node->{<Q::infoset:children>}}, $docNode;
+              __FOR{ManakaiDOM:ManakaiDOMLatest::
+                if (not defined $node->{<Q::infoset:version>} and
+                    not <Code::DOMMain:validateXMLName:: $INPUT = $lname,
+                             infoset:version = '1.0'>) {
+                  $node->{<Q::infoset:version>} = '1.1';
+                }
+              }__;
+              my $docElObj = <ClassM::ManakaiDOMElement.newObject>;
+              $node-><M::ManakaiDOM:ManakaiDOMNodeObject.importTree> ($docElObj);
+              $docElObj->{<Q::infoset:prefix>} = $prefix;
+              $docElObj->{<Q::infoset:namespaceName>} = $namespaceURI;
+              $docElObj->{<Q::infoset:localName>} = $lname;
+              $docElObj->{<Q::infoset:parent>} = $node;
+              push @{$node->{<Q::infoset:children>}}, $docElObj;
             }
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node);
+        @@@PerlDef:
+          @@@@ForCheck:
+            ManakaiDOM:DOMHTMLFeature !ManakaiDOM:DOMXMLFeature 
+            ManakaiDOM:DOM3
+          @@@@@:
+            my ($prefix, $lname);
+            \## ISSUE: Should be checked against HTML namechar?
+            if (defined $namespaceURI) {
+              __EXCEPTION{DOMCore:MDOMX_HTML_NSURI::
+                MDOMX:param-name => 'namespaceURI',
+                infoset:namespaceName => {$namespaceURI},
+              }__;
+            }
+            if (defined $qualifiedName) {
+              __ManakaiDOM:InputNormalize{qualifiedName}__;
+              ($prefix, $lname) = split /:/, $qualifiedName, 2;
+              unless (defined $lname) {
+                ($prefix, $lname) = (null, $prefix);
+              }
+              __CODE{DOMMain:checkXMLNamesQName::
+                $NSURI => $namespaceURI,
+                $PREFIX => $prefix,
+                $LNAME => $lname,
+              }__;
+              if ($lname eq 'xmlns') {
+                if (not defined $prefix) {
+                  __EXCEPTION{MDOMX:MDOM_NS_QNAME_IS_XMLNS::
+                  }__;
+                } elsif ($prefix eq 'xmlns') {
+                  __EXCEPTION{MDOMX:MDOM_NS_XMLNS_XMLNS::
+                  }__;
+                }
+              }
+            } # $qualifiedName
+
+            my $node = <ClassM::ManakaiDOMDocument.newObject>;
+            $node->{<Q::DOMCore:implementation>} = $self;
+            $node->{<Q::ManakaiDOM:implID>}
+                = $self->{<Q::TreeCore:node>}->{<Q::ManakaiDOM:implID>};
+            if ($doctype) {
+              if (not UNIVERSAL::isa
+                        ($doctype, <ClassName::DOMXML:ManakaiDOMDocumentType>)) {
+                __EXCEPTION{MDOMX_EXTERNAL_NODE::
+                  MDOMX:param-name => 'doctype',
+                }__;
+              }
+              my $doctypeNode = $doctype->{<Q::TreeCore:node>};
+              if ($node->{<Q::TreeCore:treeID>} ne
+                  $doctypeNode->{<Q::TreeCore:treeID>} or
+                  $doctypeNode->{<Q::DOMCore:ownerDocument>} or
+                  $doctypeNode->{<Q::ManakaiDOM:implID>} ne 
+                    $node->{<Q::ManakaiDOM:implID>}) {
+                __EXCEPTION{MDOMX_DOCTYPE_ALREADY_USED::
+                  MDOMX:param-name => 'doctype',
+                }__;
+              }
+              $doctypeNode-><M::ManakaiDOM:ManakaiDOMNodeObject.importTree>
+                                                                     ($node);
+              $doctypeNode->{<Q::DOMCore:ownerDocument>} = $node;
+              $doctypeNode->{<Q::infoset:parent>} = $node;
+              push @{$node->{<Q::infoset:children>}}, $doctypeNode;
+              __FOR{ManakaiDOM:ManakaiDOMLatest::
+                if (defined $doctypeNode->{<Q::infoset:version>}) {
+                  __EXCEPTION{MDOMX:MDOM_IMPL_NOSUPPORT_XML::
+                    MDOMX:param-name => 'doctype',
+                    infoset:version => {$doctypeNode->{<Q::infoset:version>}},
+                  }__;
+                }
+              }__;
+            }
+            if ($lname) {
+              my $docElObj = <ClassM::ManakaiDOMElement.newObject>;
+              $node-><M::ManakaiDOM:ManakaiDOMNodeObject.importTree> ($docElObj);
+              $docElObj->{<Q::infoset:prefix>} = $prefix;
+              $docElObj->{<Q::infoset:namespaceName>} = $namespaceURI;
+              $docElObj->{<Q::infoset:localName>} = $lname;
+              $docElObj->{<Q::infoset:parent>} = $node;
+              push @{$node->{<Q::infoset:children>}}, $docElObj;
+            }
+            $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node);
+        @@@Def:
+          @@@@ForCheck:
+            !ManakaiDOM:DOMXMLFeature
+          @@@@ContentType:
+            lang:dis
+          @@@@DOMMain:raiseException:
+            MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
      @@SpecLevel:2
      @@Level[list]:
        2
@@ -2594,8 +2748,8 @@ IF:
         @@@@@:
           The newly created DOM implementation object.
       @@@PerlDef:
-        my $node = <ClassM::ManakaiDOMNodeObject.new>;
-        $r = $node-><M::ManakaiDOMNodeObject.newReference> ($self);
+        my $node = <ClassM::ManakaiDOM:ManakaiDOMNodeObject.new>;
+        $r = $node-><M::ManakaiDOM:ManakaiDOMNodeObject.newReference> ($self);
         $node->{<Q::ManakaiDOM:implID>} = $node->{<Q::TreeCore:nodeID>};
       
 ##IF:DOMImplementation
@@ -3676,7 +3830,7 @@ IF:
                   }
                 } # $node->{<Q::DOMCore:nodeType>}
                 __EXCEPTION{
-                  MDOMX::HIERARCHY_BAD_TYPE::
+                  MDOMX:HIERARCHY_BAD_TYPE::
                     infoset:nodeType => {$newNode->{<Q::infoset:nodeType>}},
                     MDOMX:param-name => 'newChild',
                 }__;
@@ -3828,10 +3982,7 @@ IF:
               This node is of type "Document" and the DOM implementation 
               does not support the removal of the "DocumentType" or 
               "Element" child.
-        @@@Def:
-          @@@@Type:
-            lang:Perl
-          @@@@@:
+        @@@PerlDef:
             my $node = $self->{<Q::TreeCore:node>};
             if ($node->{<Q::DOMCore:read-only>}) {
               __EXCEPTION{
@@ -3857,7 +4008,7 @@ IF:
               $r = $oldChild;
               delete $oldChild->{<Q::TreeCore:node>}->{<Q::infoset:parent>};
               $oldChild->{<Q::TreeCore:node>}
-                -><Q::ManakaiDOM:ManakaiDONNodeObject.orphanate>;
+                -><M::ManakaiDOM:ManakaiDOMNodeObject.orphanate>;
             }
      @@Level[list]:  3
      @@SpecLevel:3
@@ -4183,6 +4334,7 @@ IF:
        @@@lang:en
        @@@@:
          Isn't <IF:CDATASection> node fully-normalized?
+     @@Return:
      @@Level[list]:
        2
        3
@@ -4423,7 +4575,7 @@ IF:
         @@@PerlDef:
             if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:hasFeature>}->{HTML}) {
               $r = $self->{<Q::TreeCore:node>}
-                        -><M::ManakaiDOM:ManakaiDOMNodeObjectNode.htmlBaseURI>;
+                     -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode.htmlBaseURI>;
             } else {
               $r = null;
             }
@@ -4593,7 +4745,7 @@ IF:
               platform.
         @@@PerlDef:
           $r = $self->{<Q::TreeCore:node>}
-                    -><M::ManakaiDOM:ManakaiDOMNodeObjectNode.textContent>;
+                    -><AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode.textContent>;
      @@Set:
         @@@Type:  
           DOMMain:DOMString
@@ -4628,6 +4780,24 @@ IF:
             @@@@@lang:en
             @@@@@@: This node is read-only.
         @@@PerlDef:
+          __CODE{DOMCore:setNodeTextContent}__;
+     @@Level[list]:
+        3
+     @@SpecLevel:3
+     @@For:
+       ManakaiDOM:DOM3
+  @ResourceDef:
+    @@QName: setNodeTextContent
+    @@aliasChild:1
+    @@rdf:type:
+      dis2pm:BlockCode
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Sets a string as the text content of a node.
+    @@ForCheck:
+      ManakaiDOM:ForClass
+    @@PerlDef:
             my $node = $self->{<Q::TreeCore:node>};
             if ($node->{<Q::DOMCore:read-only>}) {
               __EXCEPTION{
@@ -4647,11 +4817,6 @@ IF:
             for (@oldChild) {
               $_-><M::ManakaiDOM:ManakaiDOMNodeObject.orphanate>;
             }
-     @@Level[list]:
-        3
-     @@SpecLevel:3
-     @@For:
-       ManakaiDOM:DOM3
   @Method:
      @@Name:  isSameNode
      @@Description:
@@ -4762,7 +4927,7 @@ IF:
                 if ($n->{<Q::infoset:parent>}) {
                   $n = $n->{<Q::infoset:parent>};
                   if ($n->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
-                    $r = $n-><M::ManakaiDOM:ManakaiDOMNodeObjectNode
+                    $r = $n-><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
                                   .lookupNamespacePrefix> ($namespaceURI, $n);
                     last ANCESTOR;
                   } else {
@@ -4810,7 +4975,7 @@ IF:
               The specified <P:namespaceURI> is not the default namespace.
         @@@PerlDef:
             $r = $self->{<Q::TreeCore:node>}
-                      -><M::ManakaiDOM:ManakaiDOMNodeObjectNode
+                      -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
                               .isDefaultNamespace> ($namespaceURI);
      @@For:
        ManakaiDOM:DOM3
@@ -4857,7 +5022,7 @@ IF:
               No associated namespace URI found.
         @@@PerlDef:
             $r = $self->{<Q::TreeCore:node>}
-                      -><M::ManakaiDOM:ManakaiDOMNodeObjectNode
+                      -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
                                     .lookupNamespaceURI> ($prefix);
      @@For:
        ManakaiDOM:DOM3
@@ -4942,14 +5107,13 @@ IF:
                   last EQ;
                 }
               }
-              if ($self-><M::Node.nodeType> ==
-                  $self-><C::Node.DOCUMENT_TYPE_NODE>) {
-                for my $v ([$self-><M::Node.publicId>,
-                            $arg-><M::Node.publicId>],
-                           [$self-><M::Node.sysyemId>, 
-                            $arg-><M::Node.systemId>],
-                           [$self-><M::Node.internalSubset>,
-                            $arg-><M::Node.internalSubset>]) {
+              if ($self-><M::Node.nodeType> == <C::Node.DOCUMENT_TYPE_NODE>) {
+                for my $v ([$self-><M::DOMXML:DocumentType.publicId>,
+                            $arg-><M::DOMXML:DocumentType.publicId>],
+                           [$self-><M::DOMXML:DocumentType.systemId>, 
+                            $arg-><M::DOMXML:DocumentType.systemId>],
+                           [$self-><M::DOMXML:DocumentType.internalSubset>,
+                            $arg-><M::DOMXML:DocumentType.internalSubset>]) {
                   if (not defined $v->[0] and not defined $v->[1]) {
                     #
                   } elsif (defined $v->[0] and defined $v->[1] and
@@ -4959,10 +5123,10 @@ IF:
                     last EQ;
                   }
                 }
-                for my $v ([$self-><M::Node.entities>,
-                            $arg-><M::Node.entities>],
-                           [$self-><M::Node.notations>,
-                            $arg-><M::Node.notations>]) {
+                for my $v ([$self-><M::DOMXML:DocumentType.entities>,
+                            $arg-><M::DOMXML:DocumentType.entities>],
+                           [$self-><M::DOMXML:DocumentType.notations>,
+                            $arg-><M::DOMXML:DocumentType.notations>]) {
                   if (not defined $v->[0] and not defined $v->[1]) {
                     #
                   } elsif (defined $v->[0] and defined $v->[1] and
@@ -5665,7 +5829,7 @@ IF:
               fit in a "DOMString" variable on the implementation 
               platform.
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetProp:
             infoset:content
@@ -5837,7 +6001,7 @@ IF:
           }__;
         }
         __DEEP{
-          $r = <M::DOMMain:ManakaiDOMString.insert>
+          <M::DOMMain:ManakaiDOMString.insert>
                    (\$self->{<Q::TreeCore:node>}
                           ->{<Q::infoset:content>}, $offset, $arg);
         }__;
@@ -5895,7 +6059,7 @@ IF:
           }__;
         }
         __DEEP{
-          $r = <M::DOMMain:ManakaiDOMString.delete>
+          <M::DOMMain:ManakaiDOMString.delete>
                    (\$self->{<Q::TreeCore:node>}
                           ->{<Q::infoset:content>}, $offset, $count);
         }__;
@@ -5961,7 +6125,7 @@ IF:
           }__;
         }
         __DEEP{
-          $r = <M::DOMMain:ManakaiDOMString.replace>
+          <M::DOMMain:ManakaiDOMString.replace>
                    (\$self->{<Q::TreeCore:node>}
                           ->{<Q::infoset:content>}, $offset, $count, $arg);
         }__;
@@ -5983,7 +6147,7 @@ IF:
         @@@Def:
           @@@@ContentType:
             lang:dis
-          @@@@disPerl:cloneCode: .getData
+          @@@@DISPerl:cloneCode: .getData
      @@Set:
         @@@Type:  
           DOMMain:DOMString
@@ -6036,7 +6200,7 @@ IF:
         @@@Def:
           @@@@ContentType: 
             lang:dis
-          @@@@disPerl:cloneCode: .getData
+          @@@@DISPerl:cloneCode: .getData
      @@Set:
         @@@Type:  
           DOMMain:DOMString
@@ -6061,7 +6225,7 @@ IF:
         @@@Def:
           @@@@ContentType:
             lang:dis
-          @@@@disPerl:cloneCode: .setData
+          @@@@DISPerl:cloneCode: .setData
      @@Level[list]:
         3
      @@SpecLevel:3
@@ -6245,19 +6409,8 @@ IF:
             @@@@@@:
               This exception is added in the DOM Level 1 Errata and 
               incorporated into the DOM Level 1 Second Edition.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
-          @@@@DISPerl:cloneCode:
-            @@@@@@:
-              ManakaiDOMAttr.setTextContent
-            @@@@@For:
-              ManakaiDOM:DOM3
-          @@@@DISPerl:cloneCode:
-            @@@@@@:
-              ManakaiDOMAttr::DOM3.setTextContent
-            @@@@@For:
-              ManakaiDOM:DOM3
+        @@@PerlDef:
+          __CODE{DOMCore:setNodeTextContent}__;
   @Attr:
      @@Name:  ownerElement
      @@Description:
@@ -6573,7 +6726,7 @@ IF:
           @@@@ContentType: 
             lang:dis
           @@@@DISPerl:cloneCode:
-            .getValue
+            ManakaiDOMAttr.getValue
      @@Set:
         @@@Type:  
           DOMMain:DOMString
@@ -6591,7 +6744,7 @@ IF:
         @@@Def:
           @@@@ContentType:
             lang:dis
-          @@@@DISPerl:cloneCode: .setName
+          @@@@DISPerl:cloneCode: ManakaiDOMAttr.setValue
     @@Level[list]:
         1
         2
@@ -6603,9 +6756,11 @@ IF:
        @@@lang:en
        @@@@: The namespace prefix of this node.
      @@DOMMain:isNamespaceAware:1
+     @@Type:  
+       DOMMain:DOMString
+     @@actualType:
+       DOMMain:ManakaiDOMNamespacePrefix
      @@Get:
-        @@@Type:  
-          DOMMain:DOMString
         @@@Description:
           @@@@lang:en
           @@@@@: The namespace prefix.
@@ -6623,8 +6778,6 @@ IF:
           @@@@GetProp:
             infoset:prefix
      @@Set:
-        @@@Type:  
-          DOMMain:DOMString
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -6648,7 +6801,8 @@ IF:
           @@@@Value: \
           @@@@Description:
             @@@@@lang:en
-            @@@@@@: The result is implementation dependent in DOM Level 3.
+            @@@@@@:
+              The result is implementation dependent <SRC::DOM Level 3>.
         @@@Exception:
           @@@@Type: DOMException
           @@@@Name: INVALID_CHARACTER_ERR
@@ -6681,8 +6835,7 @@ IF:
         @@@PerlDef:
             my $node = $self->{<Q::TreeCore:node>};
             my $docnode = $node->{<Q::DOMCore:ownerDocument>};
-            my $version;
-            __CODE{XMLVersion: out => version, docNode => docnode}__;
+            my $version = <Code::getDocumentXMLVersion:: $DOCOBJ = $docnode>;
             if (not defined $version) {
               __WARNING{
                 MDOMX:MDOM_DOC_NOSUPPORT_XML::
@@ -6702,33 +6855,45 @@ IF:
                 MDOMX:MDOM_NS_QNAME_IS_XMLNS::
               }__;
             } else {
-              \## TODO: Implement this
-              #__CODE{CheckNCName: ncname => given, version => version,
-              #                    empty => warn3}__;
+              __CODE{DOMMain:ensureNamespacePrefix::
+                $INPUT => $given, $INPUT_PARAM_NAME => '',
+                $XMLVERSION => $version,
+              }__;
+              my $nsURI = $node->{<Q::infoset:namespaceName>};
               if (not defined $given) {
-                #
-              } else {
-                if (not defined $node->{<Q::infoset:namespaceName>}) {
+                if (defined $nsURI) {
+                  __EXCEPTION{MDOMX:MDOM_NS_NOPREFIX_WITH_NON_NULL_URI::
+                    infoset:namespaceName
+                        => {$node->{<Q::infoset:namespaceName>}},
+                  }__;
+                }
+              } else {  ## Non-null prefix
+                if (not defined $nsURI) {
                   __EXCEPTION{
                     MDOMX:MDOM_NS_PREFIX_WITH_NULL_URI::
                       infoset:prefix => {$given},
                   }__;
-                } elsif ($given eq 'xml' and
-                         (not $node->{<Q::infoset:namespaceName>} or
-                          $node->{<Q::infoset:namespaceName>} ne <Q::xml:>)) {
+                } elsif ($given eq 'xml' and $nsURI ne <Q::xml:>) {
                   __EXCEPTION{
-                    ManakaiDOMException.NAMESPACE_ERR.
                     MDOMX:MDOM_NS_XML_WITH_OTHER_URI::
-                      infoset:namespaceName
-                           => {$node->{<Q::infoset:namespaceName>}},
+                      infoset:prefix => {$given},
+                      infoset:namespaceName => {$nsURI},
                   }__;
-                } elsif ($given eq 'xmlns' and
-                         (not $node->{<Q::infoset:namespaceName>} or
-                          $node->{<Q::infoset:nanespaceName>} eq <Q::xmlns:>)) {
+                } elsif ($given eq 'xmlns' and $nsURI ne <Q::xmlns:>) {
                   __EXCEPTION{
                     MDOMX:MDOM_NS_XMLNS_WITH_OTHER_URI::
-                      infoset:namespaceName
-                           => {$node->{<Q::infoset:namespaceName>}},
+                      infoset:prefix => {$given},
+                      infoset:namespaceName => {$nsURI},
+                  }__;
+                } elsif ($nsURI eq <Q::xml:> and $given ne 'xml') {
+                  __EXCEPTION{MDOMX:MDOM_NS_OTHER_WITH_XML_URI::
+                    infoset:prefix => {$given},
+                    infoset:namespaceName => {$nsURI},
+                  }__;
+                } elsif ($nsURI eq <Q::xmlns:> and $given ne 'xmlns') {
+                  __EXCEPTION{MDOMX:MDOM_NS_OTHER_WITH_XMLNS_URI::
+                    infoset:prefix => {$given},
+                    infoset:namespaceName => {$nsURI},
                   }__;
                 }
               }
@@ -6804,18 +6969,25 @@ IF:
         @@@Type:  
           DOMMain:DOMString
         @@@InCase:
-          @@@@Label: Qualified name
+          @@@@Label:
+            @@@@@@: Qualified name
+            @@@@@lang:en
+          @@@@actualType:
+            DOMMain:ManakaiDOMXMLQName
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              If the "localName" is different from "null".
+              If the <A::Node.localName> is different from <DOM::null>.
         @@@InCase:
-          @@@@Label: Canonical uppercase form of name
+          @@@@Label: 
+            @@@@@@:Canonical uppercase form of name
+            @@@@@lang:en
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
               If this is an HTML element node.
         @@@PerlDef:
+          @@@@@:
             my $node = $self->{<Q::TreeCore:node>};
             if (defined $node->{<Q::infoset:localName>}) {
               $r = (defined $node->{<Q::infoset:prefix>} ?
@@ -6824,8 +6996,12 @@ IF:
             } else {
               $r = $node->{<Q::DOMCore:name>};
             }
- ## TODO: toUpper if HTML
- ## ISSUE: What to do if XHTML?       
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              The manakai DOM implementation has HTML element type names 
+              as uppercase normalized form so that no convertion is 
+              required in this attribute.
   @BlockCode:
     @@QName:selectAttrNodeObject
     @@ForCheck:
@@ -6839,7 +7015,9 @@ IF:
     @@Param:
       @@@Name:name
       @@@Type:
-        DOMMain:DOMString
+        @@@@@:
+          DOMMain:ManakaiDOMXMLName
+        @@@@ManakaiDOM:noInputNormalize:1
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -6857,7 +7035,7 @@ IF:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: There is no such attribute.
-      @@@PerlDef:
+    @@PerlDef:
             my $attr = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>};
             if ($attr->{<Q::ManakaiDOM:noNS>}->{$name}) {
               $r = $attr->{<Q::ManakaiDOM:noNS>}->{$name};
@@ -6872,7 +7050,7 @@ IF:
                     CORE::delete $attr->{<Q::xmlns:>}->{$a};
                   }__;
                   last;
-                }
+               }
               }
             } elsif ($name eq 'xmlns:xmlns') {
               # 
@@ -6908,12 +7086,16 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Retrieve an attribute value by name.
-     @@NSVersion:getAttribute
+         Retrieves an attribute value by name.
+     @@NSVersion:.getAttribute
      @@Param:
         @@@Name:  name
         @@@Type:  
           DOMMain:DOMString
+        @@@actualType:
+          @@@@@:
+            DOMMain:ManakaiDOMXMLName
+          @@@@ManakaiDOM:noInputNormalize:1
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -6924,7 +7106,7 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The <IF:Attr> value as a string.
+            The <IF::Attr> value as a string.
         @@@InCase:
           @@@@Value:\
           @@@@Description:
@@ -6935,6 +7117,8 @@ IF:
           __CODE{selectAttrNodeObject}__;
           if ($r) {
             $r = $r-><AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode.textContent>;
+          } else {
+            $r = '';
           }
   @Method:
      @@Name:  setAttribute
@@ -6948,6 +7132,10 @@ IF:
         @@@Name:  name
         @@@Type:  
           DOMMain:DOMString
+        @@@actualType:
+          @@@@@:
+            DOMMain:ManakaiDOMXMLName
+          @@@@ManakaiDOM:noInputNormalize:1
         @@@Description:
           @@@@lang:en
           @@@@@: The name of the attribute to create or alter.
@@ -6964,8 +7152,14 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              How <DOM:null> should be treated is not specified. 
-              This DOM implementation converts it to an empty string.
+              How to process <DOM::null> <P::value> is not mentioned.
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The manakai DOM implementation converts <DOM::null> value 
+              to an empty string. 
+            @@@@@For:
+              ManakaiDOM:ManakaiDOM
      @@Return:
         @@@Exception:
           @@@@Type:DOMException
@@ -7046,11 +7240,15 @@ IF:
          If a default value for the removed attribute is defined in 
          the DTD, a new attribute immediately appears.  The DOM 
          implementation may handle default values from other schemas.
-     @@NSVersion:removeAttributeNS
+     @@NSVersion:.removeAttributeNS
      @@Param:
         @@@Name:  name
         @@@Type:  
           DOMMain:DOMString
+        @@@actualType:
+          @@@@@:
+            DOMMain:ManakaiDOMXMLName
+          @@@@ManakaiDOM:noInputNormalize:1
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -7094,12 +7292,17 @@ IF:
         @@@Name:  name
         @@@Type:  
           DOMMain:DOMString
+        @@@actualType:
+          @@@@@:
+            DOMMain:ManakaiDOMXMLName
+          @@@@ManakaiDOM:noInputNormalize:1
         @@@Description:
           @@@@lang:en
           @@@@@:
             The name (<A:nodeName>) of the attribute to retrieve.
      @@Return:
         @@@Type:  Attr
+        @@@actualType: ManakaiDOMAttr
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -7128,12 +7331,14 @@ IF:
      @@Param:
         @@@Name:  newAttr
         @@@Type:  Attr
+        @@@actualType: ManakaiDOMAttr
         @@@Description:
           @@@@lang:en
           @@@@@: 
             The <IF:Attr> node to add to the attribute list.
      @@Return:
         @@@Type:  Attr
+        @@@actualType: ManakaiDOMAttr
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -7232,8 +7437,8 @@ IF:
           @@@@ImplNote:
             @@@@@lang:en
             @@@@@@:
-              It is unclear whether the node should be returned if 
-              the node is <QUOTE:replaced> by itself.
+              It is unclear whether a node should be returned if 
+              it is <QUOTE::replace>d by itself.
     @@Level[list]:
        1
        2
@@ -7252,12 +7457,14 @@ IF:
      @@Param:
         @@@Name:  oldAttr
         @@@Type:  Attr
+        @@@actualType: ManakaiDOMAttr
         @@@Description:
           @@@@lang:en
           @@@@@: 
             The attribute node to remove from the attribute list.
      @@Return:
         @@@Type:  Attr
+        @@@actualType: ManakaiDOMAttr
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -7294,7 +7501,7 @@ IF:
                 for my $ln (keys %{$node->{<Q::infoset:attributes>}->{$ns}}) {
                   if ($attrID eq $node->{<Q::infoset:attributes>}->{$ns}->{$ln}
                                       ->{<Q::TreeCore:nodeID>}) {
-                    delete $node->{<Q::infoset:attributes>}->{$ns}->{$ln};
+                    CORE::delete $node->{<Q::infoset:attributes>}->{$ns}->{$ln};
                     last FIND;
                   }
                 }
@@ -7321,6 +7528,10 @@ IF:
         @@@Name:  name
         @@@Type:  
           DOMMain:DOMString
+        @@@actualType:
+          @@@@@:
+            DOMMain:ManakaiDOMXMLName
+          @@@@ManakaiDOM:noInputNormalize:1
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -7378,7 +7589,6 @@ IF:
        @@@@:
          Select a <IF:ManakaiDOMNodeObject> object that represents 
          an <IF:Attr> node, by namespace URI and local name.
-     @@NoNSVersion:.selectAttrNodeObject
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
@@ -7399,7 +7609,9 @@ IF:
      @@Param:
         @@@Name:  localName
         @@@Type:  
-          DOMMain:DOMString
+          @@@@@:
+            DOMMain:ManakaiDOMXMLLocalName
+          @@@@ManakaiDOM:noInputNormalize:1
         @@@Description:
           @@@@lang:en
           @@@@@: The local name of the attribute to select.
@@ -7416,7 +7628,7 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: There is no such attribute.
-        @@@PerlDef:
+     @@PerlDef:
             my $attr = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>};
             $namespaceURI = <Q::null:> unless defined $namespaceURI;
             $r = $attr->{$namespaceURI}->{$localName};
@@ -7455,6 +7667,10 @@ IF:
         @@@Name:  localName
         @@@Type:  
           DOMMain:DOMString
+        @@@actualType:
+          @@@@@: 
+            DOMMain:ManakaiDOMXMLLocalName
+          @@@@ManakaiDOM:noInputNormalize:1
         @@@Description:
           @@@@lang:en
           @@@@@: The local name of the attribute to retrieve.
@@ -7483,10 +7699,20 @@ IF:
                 <Feature:XML> and the language exposed through the 
                 <IF:Document> does not support XML Namespaces.
         @@@PerlDef:
+          @@@@@:
             __CODE{selectAttrNodeObjectNS}__;
             if ($r) {
               $r = $r-><AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode.textContent>;
             }
+          @@@@For:
+            ManakaiDOM:DOMXMLFeature
+        @@@Def:
+          @@@@ForCheck:
+            !ManakaiDOM:DOMXMLFeature
+          @@@@ContentType:
+            lang:dis
+          @@@@DOMMain:raiseException:
+            MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
      @@For:
        ManakaiDOM:DOM2
      @@Level[list]:  2
@@ -7656,26 +7882,33 @@ IF:
               @@@@@@@:
                 The <IF:Attr> node to edit is read-only.
             @@@@@SpecLevel[list]:
-        @@@Def:
-          @@@@ContentType:
-            lang:Perl
+        @@@PerlDef:
+          @@@@For:
+            ManakaiDOM:DOMXMLFeature
           @@@@@:
             if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:read-only>}) {
               __EXCEPTION{
                 MDOMX:NOMOD_THIS::
               }__;
             }
-            my ($version, $prefix, $localName);
             my $docNode = $self->{<Q::TreeCore:node>};
-            \## TODO: Implement this
-            #__CODE{XMLNS: docNode => docNode,
-            #              qualifiedName => qualifiedName,
-            #              namespaceURI => namespaceURI,
-            #              out-version => version,
-            #              out-localName => localName,
-            #              out-prefix => prefix}__;
+            my $version = <Code::getDocumentXMLVersion:: $DOCOBJ = $docNode>;
+            unless (defined $version) {
+              __EXCEPTION{MDOMX:MDOM_DOC_NOSUPPORT_XMLNS}__;
+            }
+            __CODE{DOMMain:ensureXMLQName::
+                     $INPUT = $qualifiedName, 
+                     $INPUT_NAME = 'qualifiedName',
+                     $XMLVERSION = $version,
+            }__;
+            my ($prefix, $localName) = split /:/, $qualifiedName, 2;
+            ($prefix, $localName) = (null, $prefix) unless defined $localName;
+            __CODE{DOMMain:checkXMLNamesQName::
+                     $PREFIX => $prefix, $NSURI => $namespaceURI,
+                     $LNAME => $localName,
+            }__;
             my $r;
-            __CODE{selectAttrNodeObjectNS}__;
+            __CODE{selectAttrNodeObjectNS:: $localName => $localName}__;
             my $node = $self->{<Q::TreeCore:node>};
             if ($r) {
               if ($r->{<Q::DOMCore:read-only>}) {
@@ -7710,6 +7943,13 @@ IF:
             $text->{<Q::infoset:parent>} = $r;
             $r->{<Q::infoset:children>} = [$text];
             $r->{<Q::infoset:specified>} = true;
+        @@@Def:
+          @@@@ForCheck:
+            !ManakaiDOM:DOMXMLFeature
+          @@@@ContentType:
+            lang:dis
+          @@@@DOMMain:raiseException:
+            MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
      @@For:
        ManakaiDOM:DOM2
      @@Level[list]:  2
@@ -7746,6 +7986,10 @@ IF:
         @@@Name:  localName
         @@@Type:  
           DOMMain:DOMString
+        @@@actualType:
+          @@@@@:
+            DOMMain:ManakaiDOMXMLLocalName
+          @@@@ManakaiDOM:noInputNormalize:1
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -7777,6 +8021,9 @@ IF:
                 <Feature:XML> and the language exposed through 
                 the <IF:Document> does not support XML Namespaces.
         @@@PerlDef:
+          @@@@For:
+            ManakaiDOM:DOMXMLFeature
+          @@@@@:
             if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:read-only>}) {
               __EXCEPTION{
                 MDOMX:NOMOD_THIS::
@@ -7794,6 +8041,13 @@ IF:
              TODO: default attribute
            \
              Almost same as <M:ManakaiDOMAttributes.removeNamedItemNS>.
+        @@@Def:
+          @@@@ForCheck:
+            !ManakaiDOM:DOMXMLFeature
+          @@@@ContentType:
+            lang:dis
+          @@@@DOMMain:raiseException:
+            MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
      @@For:
        ManakaiDOM:DOM2
      @@Level[list]:  2
@@ -7804,7 +8058,7 @@ IF:
        @@@lang:en
        @@@@:
          Retrieve an <IF:Attr> node by local name and namespace URI.
-     @@NoNSVersion:getAttributeNode
+     @@NoNSVersion:.getAttributeNode
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
@@ -7850,10 +8104,20 @@ IF:
                 <Feature:XML> and the language exposed through the 
                 <IF:Document> does not support XML Namespaces.
         @@@PerlDef:
+          @@@@For:
+            ManakaiDOM:DOMXMLFeature
+          @@@@@:
             __CODE{selectAttrNodeObjectNS}__;
             if ($r) {
               $r = <ClassM::ManakaiDOMNode.getNodeReference> ($r, $self);
             }
+        @@@Def:
+          @@@@ForCheck:
+            !ManakaiDOM:DOMXMLFeature
+          @@@@ContentType:
+            lang:dis
+          @@@@DOMMain:raiseException:
+            MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
      @@Level[list]:
         2
         3
@@ -7874,12 +8138,14 @@ IF:
      @@Param:
         @@@Name:  newAttr
         @@@Type:  Attr
+        @@@actualType: ManakaiDOMAttr
         @@@Description:
           @@@@lang:en
           @@@@@:
             The attribute node to add to the attribute list.
      @@Return:
         @@@Type:  Attr
+        @@@actualType: ManakaiDOMAttr
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -7938,6 +8204,9 @@ IF:
                  The <P:newAttr> node does not support XML Namespace.
              @@@@@SpecLevel[list]:
          @@@PerlDef:
+           @@@@For:
+             ManakaiDOM:DOMXMLFeature
+           @@@@@:
             if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:read-only>}) {
               __EXCEPTION{
                 MDOMX:NOMOD_THIS::
@@ -7975,6 +8244,7 @@ IF:
                 $r->{<Q::TreeCore:nodeID>} eq $attrNode->{<Q::TreeCore:nodeID>}) {
               __WARNING{
                 MDOMX:MDOM_REPLACE_BY_ITSELF_NO_EFFECT::
+                  MDOMX:param-name => 'newAttr',
               }__;
               $r = $newAttr;
             } else {
@@ -8002,6 +8272,13 @@ IF:
             @@@@@@:
               It is unclear whether the node should be returned if 
               the node is <QUOTE:replaced> by itself.
+        @@@Def:
+          @@@@ForCheck:
+            !ManakaiDOM:DOMXMLFeature
+          @@@@ContentType:
+            lang:dis
+          @@@@DOMMain:raiseException:
+            MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
      @@Level[list]:  
         2
         3
@@ -8039,6 +8316,10 @@ IF:
         @@@Name:  localName
         @@@Type:  
           DOMMain:DOMString
+        @@@actualType:
+          @@@@@:
+            DOMMain:ManakaiDOMXMLLocalName
+          @@@@ManakaiDOM:noInputNormalize:1
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -8080,12 +8361,10 @@ IF:
             A new <IF:NodeList> object containing all the matched 
             <IF:Element> nodes.
         @@@PerlDef:
+          @@@@For:
+            ManakaiDOM:DOMXMLFeature
+          @@@@@:
             my $node = $self->{<Q::TreeCore:node>};
-            unless ($node->{<Q::DOMCore:hasFeature>}->{XML}) {
-              __EXCEPTION{
-                MDOMX:MDOM_IMPL_NOSUPPORT_XML::
-              }__;
-            }
             my $chk;
             if (defined $namespaceURI) {
               if ($namespaceURI eq '*') {
@@ -8154,6 +8433,13 @@ IF:
                      (<ClassName::ManakaiDOMCore:ManakaiDOMGetElementsNodeList>);
             }__;
             $r->{<Q::ManakaiDOMCore:nodeMatch>} = $chk;
+        @@@Def:
+          @@@@ForCheck:
+            !ManakaiDOM:DOMXMLFeature
+          @@@@ContentType:
+            lang:dis
+          @@@@DOMMain:raiseException:
+            MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
      @@Level[list]:  
        2
        3
@@ -8173,6 +8459,10 @@ IF:
         @@@Name:  name
         @@@Type:  
           DOMMain:DOMString
+        @@@actualType:
+          @@@@@:
+            DOMMain:ManakaiDOMXMLName
+          @@@@ManakaiDOM:noInputNormalize:1
         @@Description:
           @@@lang:en
           @@@@: The name of the attribute to look for.
@@ -8227,6 +8517,10 @@ IF:
         @@@Name:  localName
         @@@Type:  
           DOMMain:DOMString
+        @@@actualType:
+          @@@@@:
+            DOMMain:ManakaiDOMXMLLocalName
+          @@@@ManakaiDOM:noInputNormalize:1
         @@@Description:
           @@@@lang:en
           @@@@@: The local name of the attribute to look for.
@@ -8258,8 +8552,18 @@ IF:
                 <Feature:XML> and the language exposed through the 
                 <IF:Document> does not support XML Namespaces.
         @@@PerlDef:
+          @@@@For:
+            ManakaiDOM:DOMXMLFeature
+          @@@@@:
             __CODE{selectAttrNodeObjectNS}__;
             $r = $r ? true : false;
+        @@@Def:
+          @@@@ForCheck:
+            !ManakaiDOM:DOMXMLFeature
+          @@@@ContentType:
+            lang:dis
+          @@@@DOMMain:raiseException:
+            MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
      @@Level[list]:  2
      @@SpecLevel:2
      @@For:
@@ -8401,6 +8705,10 @@ IF:
         @@@Name:  localName
         @@@Type:  
           DOMMain:DOMString
+        @@@actualType:
+          @@@@@:
+            DOMMain:ManakaiDOMXMLLocalName
+          @@@@ManakaiDOM:noInputNormalize:1
         @@@Description:
           @@@@lang:en
           @@@@@: The local name of the attribute.
@@ -8456,9 +8764,9 @@ IF:
             @@@@@lang:en
             @@@@@@:
               There is no such attribute.
-        @@@Def:
-          @@@@ContentType:
-            lang:Perl
+        @@@PerlDef:
+          @@@@For:
+            ManakaiDOM:DOMXMLFeature
           @@@@@:
             if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:read-only>}) {
               __EXCEPTION{
@@ -8478,6 +8786,13 @@ IF:
               }__;
             }
             $r->{<Q::DOMCore:userDeterminedId>} = $isId;
+        @@@Def:
+          @@@@ForCheck:
+            !ManakaiDOM:DOMXMLFeature
+          @@@@ContentType:
+            lang:dis
+          @@@@DOMMain:raiseException:
+            MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
      @@Level[list]:  3
      @@SpecLevel:3
      @@For:
@@ -8496,6 +8811,7 @@ IF:
      @@Param:
         @@@Name:  idAttr
         @@@Type:  Attr
+        @@@actualType: ManakaiDOMAttr
         @@@Description:
           @@@@lang:en
           @@@@@: The attribute node.
@@ -8595,6 +8911,7 @@ IF:
         the "Node" interface in the DOM Level 2 and higher.
     @@For:
       ManakaiDOM:DOM1 !ManakaiDOM:DOM2
+    @@Return:
   
   @ReAttr:
     @@Name: attributes
@@ -8741,16 +9058,17 @@ IF:
               $r = null;
             } else {
               my $n = $self->{<Q::TreeCore:node>};
-              $r = $n-><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+              __DEEP{
+                $r = $n-><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
                                 .lookupNamespacePrefix>
                                                  ($namespaceURI, $n);
+              }__;
             }
      @@Level[list]:  3
      @@SpecLevel:3
      @@For:
        ManakaiDOM:DOM3
-     @@Redefine:Node
-  @Attr:
+  @ReAttr:
      @@Name:  namespaceURI
      @@Description:
        @@@lang:en
@@ -8781,7 +9099,6 @@ IF:
      @@SpecLevel:2
      @@For:
        ManakaiDOM:DOM2
-     @@Redefined: Node
   @ReAttr:
     @@Name: nodeName
     @@Description:
@@ -8897,42 +9214,59 @@ IF:
               "http://www.w3.org/XML/1998/namespace".
         @@@PerlDef:
             my $node = $self->{<Q::TreeCore:node>};
-            my $version;
             my $docNode = $node->{<Q::DOMCore:ownerDocument>};
-            \## TODO: impl this
-            #__CODE{XMLVersion: out => version, docNode => node}__;
+            my $version = <Code::getDocumentXMLVersion:: $DOCOBJ = $docNode>;
             if (not defined $version) {
-              #__WARNING{
-              #  ManakaiDOMImplementationWarning.ATTR_SET_NO_EFFECT.
-              #  MDOMX:MDOM_DOC_NOSUPPORT_XML::
-              #}__;
+              __WARNING{DOMMain:MDOMX_NOEFFECT_SINCE_DOC_NOSUPPORT_XML}__;
             } elsif (not defined $node->{<Q::infoset:localName>}) {
-              #__WARNING{
-              #  ManakaiDOMImplementationWarning.ATTR_SET_NO_EFFECT.
-              #  MDOMX:MDOM_NODE_NOSUPPORT_XMLNS::
-              #}__;
+              __WARNING{DOMMain:MDOMX_NOEFFECT_SINCE_NODE_NOSUPPORT_XMLNS}__;
             } elsif ($node->{<Q::DOMCore:read-only>}) {
-              __EXCEPTION{
-                MDOMX:NOMOD_THIS::
-              }__;
+              __EXCEPTION{MDOMX:NOMOD_THIS}__;
             } else {
-              #__CODE{CheckNCName: ncname => given, version => version,
-              #                    empty => warn3}__;
+              __CODE{DOMMain:ensureNamespacePrefix::
+                $INPUT => $given, $INPUT_PARAM_NAME => '',
+                $XMLVERSION => $version,
+              }__;
+              my $nsURI = $node->{<Q::infoset:namespaceName>};
               if (not defined $given) {
-                #
+                if ($nsURI eq <Q::xml:>) {
+                  __EXCEPTION{MDOMX:MDOM_NS_OTHER_WITH_XML_URI::
+                    infoset:prefix => {undef},
+                    infoset:namespaceName => {$nsURI},
+                  }__;
+                } elsif ($nsURI eq <Q::xmlns:>) {
+                  __EXCEPTION{MDOMX:MDOM_NS_OTHER_WITH_XMLNS_URI::
+                    infoset:prefix => {undef},
+                    infoset:namespaceName => {$nsURI},
+                  }__;
+                }
               } else {
-                if (not defined $node->{<Q::infoset:namespaceName>}) {
+                if (not defined $nsURI) {
                   __EXCEPTION{
                     MDOMX:MDOM_NS_PREFIX_WITH_NULL_URI::
                       infoset:prefix => {$given},
                   }__;
-                } elsif ($given eq 'xml' and
-                         (not $node->{<Q::infoset:namespaceName>} or
-                          $node->{<Q::infoset:namespaceName>} ne <Q::xml:>)) {
+                } elsif ($given eq 'xml' and $nsURI ne <Q::xml:>) {
                   __EXCEPTION{
                     MDOMX:MDOM_NS_XML_WITH_OTHER_URI::
-                      infoset:namespaceName
-                           => {$node->{<Q::infoset:namespaceName>}},
+                      infoset:prefix => {$given},
+                      infoset:namespaceName => {$nsURI},
+                  }__;
+                } elsif ($given eq 'xmlns' and $nsURI ne <Q::xmlns:>) {
+                  __EXCEPTION{
+                    MDOMX:MDOM_NS_XMLNS_WITH_OTHER_URI::
+                      infoset:prefix => {$given},
+                      infoset:namespaceName => {$nsURI},
+                  }__;
+                } elsif ($nsURI eq <Q::xml:> and $given ne 'xml') {
+                  __EXCEPTION{MDOMX:MDOM_NS_OTHER_WITH_XML_URI::
+                    infoset:prefix => {$given},
+                    infoset:namespaceName => {$nsURI},
+                  }__;
+                } elsif ($nsURI eq <Q::xmlns:> and $given ne 'xmlns') {
+                  __EXCEPTION{MDOMX:MDOM_NS_OTHER_WITH_XMLNS_URI::
+                    infoset:prefix => {$given},
+                    infoset:namespaceName => {$nsURI},
                   }__;
                 }
               }
@@ -9784,6 +10118,7 @@ IFDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: No node is newly created.
+      @@Return:
 
 IFDef:
   @Name:  DOMError
@@ -10558,29 +10893,23 @@ IF:
             by the DOM implementation.
      @@Return:
         @@@Type:  Element
+        @@@actualType: ManakaiDOMElement
         @@@Description:
           @@@@lang:en
           @@@@@:
-            A new <IF:Element> object.
+            A newly created <IF::Element> object.
         @@@Exception:
-          @@@@Type:DOMException
-          @@@@Name:INVALID_CHARACTER_ERR
-          @@@@SubType:
-            @@@@@QName:
-              MDOMX:MDOM_BAD_NAME
-            @@@@@Description:
-              @@@@@@lang:en
-              @@@@@@@:
-                The <P:tagName> is not a SGML or XML <XML:Name>.
-        @@@Def:
-          @@@@Type:
-            lang:Perl
           @@@@@:
-            my $version;
+            MDOMX:MDOM_BAD_NAME
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The <P:tagName> is not a legal SGML or XML Name.
+        @@@PerlDef:
             my $docNode = $self->{<Q::TreeCore:node>};
-  \## TODO: Reimpl this
-            #__CODE{XMLVersion: out => version, docNode => docNode}__;
-            #__CODE{CheckName: name => tagName, version => version}__;
+            my $version = <Code::getDocumentXMLVersion:: $DOCOBJ = $docNode>;
+            __CODE{DOMMain:ensureXMLName:: $INPUT => $tagName,
+                                           $XMLVERSION => $version}__;
             my $node = <ClassM::ManakaiDOMElement.newObject>;
             $node->{<Q::DOMCore:ownerDocument>} = $docNode;
             $node->{<Q::DOMCore:name>} = $tagName;
@@ -10713,17 +11042,14 @@ IF:
               to <QUOTE:if this document does not support the <Feature:XML> 
               feature> for consistency with other non-HTML methods.
         @@@PerlDef:
-            my $version;
             my $docNode = $self->{<Q::TreeCore:node>};
-  \## TODO: Reimpl this
- #           __CODE{XMLVersion: out => version, docNode => docNode}__;
-            unless (defined $version) {
+            unless (<Code::DOMMain:docSupportsXMLFeature::
+                              $DOCOBJ = $docNode>) {
               __EXCEPTION{
                 MDOMX:MDOM_DOC_NOSUPPORT_XML::
               }__;
             }
- #           __REQUIRE{DOMXML}__;
-            my $node = <ClassM::ManakaiDOMCDATASection.newObject>;
+            my $node = <ClassM::DOMXML:ManakaiDOMCDATASection.newObject>;
             $node->{<Q::DOMCore:ownerDocument>} = $docNode;
             $node->{<Q::infoset:content>} = defined $data ? $data : '';
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node, $self);
@@ -10792,17 +11118,16 @@ IF:
               @@@@@@@:
                 This document does not support the <Feature:XML> feature.
         @@@PerlDef:
-            my $version;
             my $docNode = $self->{<Q::TreeCore:node>};
- \## TODO: Reimpl this
- #           __CODE{XMLVersion: out => version, docNode => docNode}__;
+            my $version = <Code::getDocumentXMLVersion::
+                                    $DOCOBJ = $docNode>;
             unless (defined $version) {
               __EXCEPTION{
                 MDOMX:MDOM_DOC_NOSUPPORT_XML::
               }__;
             }
- #           __CODE{CheckName: name => target, version => version}__;
- #           __REQUIRE{DOMXML}__;
+            __CODE{DOMMain:ensureXMLName:: $INPUT => $target,
+                                           $XMLVERSION => $version}__;
             my $node = <ClassM::DOMXML:ManakaiDOMProcessingInstruction
                                                .newObject>;
             $node->{<Q::DOMCore:ownerDocument>} = $docNode;
@@ -10820,7 +11145,7 @@ IF:
        @@@lang:en
        @@@@:
          Create an <IF:Attr> node.
-     @@NSVersion: createAttributeNS
+     @@NSVersion: .createAttributeNS
      @@Param:
         @@@Name:  name
         @@@Type:  
@@ -10857,11 +11182,11 @@ IF:
               @@@@@@@:
                 The <P:name> is not a SGML or XML <XML:Name>.
         @@@PerlDef:
-            my $version;
             my $docNode = $self->{<Q::TreeCore:node>};
-  \## TODO: Reimpl this
- #           __CODE{XMLVersion: out => version, docNode => docNode}__;
- #           __CODE{CheckName: name => name, version => version}__;
+            my $version = <Code::getDocumentXMLVersion::
+                                   $DOCOBJ = $docNode>;
+            __CODE{DOMMain:ensureXMLName:: $INPUT => $name,
+                                           $XMLVERSION => $version}__;
             my $node = <ClassM::ManakaiDOMAttr.newObject>;
             $node->{<Q::DOMCore:ownerDocument>} = $docNode;
             $node->{<Q::DOMCore:name>} = $name;
@@ -10929,17 +11254,16 @@ IF:
               @@@@@@@:
                 This document does not support the <Feature:XML> feature.
         @@@PerlDef:
-            my $version;
             my $docNode = $self->{<Q::TreeCore:node>};
- \## TODO: Reimpl this
- #           __CODE{XMLVersion: out => version, docNode => docNode}__;
+            my $version = <Code::getDocumentXMLVersion::
+                                    $DOCOBJ = $docNode>;
             unless (defined $version) {
               __EXCEPTION{
                 MDOMX:MDOM_DOC_NOSUPPORT_XML::
               }__;
             }
- #           __CODE{CheckName: name => name, version => version}__;
- #           __REQUIRE{DOMXML}__;
+            __CODE{DOMMain:ensureXMLName::
+                        $INPUT => $name, $XMLVERSION => $version}__;
             my $node = <ClassM::DOMXML:ManakaiDOMEntityReference.newObject>;
             $node->{<Q::DOMCore:ownerDocument>} = $docNode;
             $node->{<Q::DOMCore:name>} = $name;
@@ -11144,7 +11468,7 @@ IF:
          If there are known attributes with default values, 
          <IF:Attr> nodes representing them are automatically 
          created and attached to the element created.
-     @@NoNSVersion:createElement
+     @@NoNSVersion:.createElement
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
@@ -11166,12 +11490,17 @@ IF:
         @@@Name:  qualifiedName
         @@@Type:  
           DOMMain:DOMString
+        @@@actualType:
+          @@@@@:
+            DOMMain:ManakaiDOMXMLQName
+          @@@@ManakaiDOM:noInputNormalize:1
         @@@Description:
           @@@@lang:en
           @@@@@:
             The qualified name of the type of the element to create.
      @@Return:
         @@@Type:  Element
+        @@@actualType: ManakaiDOMElement
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -11277,26 +11606,43 @@ IF:
                 This document does not support the <Feature:XML> 
                 feature.
         @@@PerlDef:
-            my ($version, $prefix, $localName);
+          @@@@For:
+            ManakaiDOM:DOMXMLFeature
+          @@@@@:
             my $docNode = $self->{<Q::TreeCore:node>};
-  \## TODO: Reimpl this
-  #          __CODE{XMLNS: docNode => docNode,
-  #                        qualifiedName => qualifiedName,
-  #                        namespaceURI => namespaceURI,
-  #                        out-version => version,
-  #                        out-localName => localName,
-  #                        out-prefix => prefix}__;
+            my $version = <Code::getDocumentXMLVersion:: $DOCOBJ = $docNode>;
+            unless (defined $version) {
+              __EXCEPTION{MDOMX:MDOM_DOC_NOSUPPORT_XMLNS}__;
+            }
+            __CODE{DOMMain:ensureXMLQName::
+                     $INPUT = $qualifiedName, 
+                     $INPUT_NAME = 'qualifiedName',
+                     $XMLVERSION = $version,
+            }__;
+            my ($prefix, $lname) = split /:/, $qualifiedName, 2;
+            ($prefix, $lname) = (null, $prefix) unless defined $lname;
+            __CODE{DOMMain:checkXMLNamesQName::
+                     $PREFIX => $prefix, $NSURI => $namespaceURI,
+                     $LNAME => $lname,
+            }__;
 
             my $node = <ClassM::ManakaiDOMElement.newObject>;
             $node->{<Q::DOMCore:ownerDocument>} = $docNode;
             $node->{<Q::infoset:namespaceName>} = $namespaceURI;
             $node->{<Q::infoset:prefix>} = $prefix;
-            $node->{<Q::infoset:localName>} = $localName;
+            $node->{<Q::infoset:localName>} = $lname;
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node, $self);
           @@@@ImplNote:
             @@@@@lang:en
             @@@@@@:
               TODO: Default attribute should be implemented.
+        @@@Def:
+          @@@@ForCheck:
+            !ManakaiDOM:DOMXMLFeature
+          @@@@ContentType:
+            lang:dis
+          @@@@DOMMain:raiseException:
+            MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
     @@SpecLevel:2
     @@Level[list]:
       2
@@ -11309,7 +11655,7 @@ IF:
        @@@lang:en
        @@@@:
          Create an attribute of the given qualified name and namespace URI.
-     @@NoNSVersion: createAttribute
+     @@NoNSVersion: .createAttribute
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
@@ -11329,11 +11675,16 @@ IF:
         @@@Name:  qualifiedName
         @@@Type:  
           DOMMain:DOMString
+        @@@actualType:
+          @@@@@:
+            DOMMain:ManakaiDOMXMLQName
+          @@@@ManakaiDOM:noInputNormalize:1
         @@@Description:
           @@@@lang:en
           @@@@@: The qualified name of the attribute to create.
      @@Return:
         @@@Type:  Attr
+        @@@actualType: ManakaiDOMAttr
         @@@Description:
           @@@@lang:en
           @@@@@: A new attribute object.
@@ -11440,23 +11791,40 @@ IF:
                 This document does not support the <Feature:XML> 
                 feature.
         @@@PerlDef:
-            my ($version, $prefix, $localName);
+          @@@@For:
+            ManakaiDOM:DOMXMLFeature
+          @@@@@:
             my $docNode = $self->{<Q::TreeCore:node>};
- \## TODO: Reimpl this
- #           __CODE{XMLNS: docNode => docNode,
- ##                         qualifiedName => qualifiedName,
- ##                         namespaceURI => namespaceURI,
- #                         out-version => version,
- #                         out-localName => localName,
- #                         out-prefix => prefix}__;
-
+            my $version = <Code::getDocumentXMLVersion:: $DOCOBJ = $docNode>;
+            unless (defined $version) {
+              __EXCEPTION{MDOMX:MDOM_DOC_NOSUPPORT_XMLNS}__;
+            }
+            __CODE{DOMMain:ensureXMLQName::
+                     $INPUT = $qualifiedName, 
+                     $INPUT_NAME = 'qualifiedName',
+                     $XMLVERSION = $version,
+            }__;
+            my ($prefix, $lname) = split /:/, $qualifiedName, 2;
+            ($prefix, $lname) = (null, $prefix) unless defined $lname;
+            __CODE{DOMMain:checkXMLNamesQName::
+                     $PREFIX => $prefix, $NSURI => $namespaceURI,
+                     $LNAME => $lname,
+            }__;
+            
             my $node = <ClassM::ManakaiDOMAttr.newObject>;
             $node->{<Q::DOMCore:ownerDocument>} = $docNode;
-            $node->{<Q::infoset:localName>} = $localName;
+            $node->{<Q::infoset:localName>} = $lname;
             $node->{<Q::infoset:namespaceName>} = $namespaceURI;
             $node->{<Q::infoset:prefix>} = $prefix;
             $node->{<Q::infoset:specified>} = true;
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node, $self);
+        @@@Def:
+          @@@@ForCheck:
+            !ManakaiDOM:DOMXMLFeature
+          @@@@ContentType:
+            lang:dis
+          @@@@DOMMain:raiseException:
+            MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
     @@SpecLevel:2
     @@Level[list]:
       2
@@ -11498,6 +11866,10 @@ IF:
         @@@Name:  localName
         @@@Type:  
           DOMMain:DOMString
+        @@@actualType:
+          @@@@@:
+            DOMMain:ManakaiDOMXMLLocalName
+          @@@@ManakaiDOM:noInputNormalize:1
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -11532,19 +11904,17 @@ IF:
         @@@ImplNote:
           @@@@lang:en
           @@@@@:
-            For <M:Element.getElementsByTagName>, DOM Level 2 allows 
+            For <M:Element.getElementsByTagNameNS>, DOM Level 2 allows 
             HTML-only DOM implementations not to implement that method 
             and its Errata and DOM Level 3 say to raise 
             <X:NOT_SUPPORTED_ERROR> if it is called.  
-            <M:Document.getElementsByTagName> should also raise the 
+            <M:Document.getElementsByTagNameNS> should also raise the 
             exception, shouldn't it?
         @@@PerlDef:
+          @@@@For:
+            ManakaiDOM:DOMXMLFeature
+          @@@@@:
             my $node = $self->{<Q::TreeCore:node>};
-            unless ($node->{<Q::DOMCore:hasFeature>}->{XML}) {
-              __EXCEPTION{
-                MDOMX:MDOM_IMPL_NOSUPPORT_XML::
-              }__;
-            }
             my $chk;
             if (defined $namespaceURI) {
               if ($namespaceURI eq '*') {
@@ -11613,6 +11983,13 @@ IF:
                     (<ClassName::ManakaiDOMCore:ManakaiDOMGetElementsNodeList>);
               $r->{<Q::ManakaiDOMCore:nodeMatch>} = $chk;
             }__;
+        @@@Def:
+          @@@@ForCheck:
+            !ManakaiDOM:DOMXMLFeature
+          @@@@ContentType:
+            lang:dis
+          @@@@DOMMain:raiseException:
+            MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
      @@Level[list]:  
        2
        3
@@ -11644,6 +12021,10 @@ IF:
         @@@Name:  elementId
         @@@Type:  
           DOMMain:DOMString
+        @@@actualType:
+          @@@@@:
+            DOMMain:ManakaiDOMXMLName
+          @@@@ManakaiDOM:noInputNormalize:1
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -11655,10 +12036,11 @@ IF:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         This method is defined in the interface <IF:HTMLDocument> 
+         This method was first defined in the interface <IF:HTMLDocument> 
          in the DOM Level 1.
      @@Return:
         @@@Type:  Element
+        @@@actualType: ManakaiDOMElement
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -11835,10 +12217,11 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: The document does not support the "XML" feature.
-        @@@PerlDef:
-            my $node = $self->{<Q::TreeCore:node>};
- \## TODO: Reimpl this
- #           __CODE{XMLVersion: out => r, docNode => node}__;
+        @@@Def:
+          @@@@ContentType:
+            lang:dis
+          @@@@GetProp:
+            infoset:version
      @@Set:
         @@@Type:  
           DOMMain:DOMString
@@ -11863,7 +12246,7 @@ IF:
               } else {
                 __EXCEPTION{
                   MDOMX:MDOM_IMPL_NOSUPPORT_XMLVER::
-                    <Q::infoset:version> => $given,
+                    infoset:version => {$given},
                 }__;
               }
             } else {
@@ -11964,12 +12347,13 @@ IF:
             DOMCore:documentURI
   @Method:
      @@Name:  adoptNode
-     @@Return:
-        @@@Type:  Node
-        @@@Exception[list]:  DOMException
      @@Param:
         @@@Name:  source
         @@@Type:  Node
+     @@Return:
+        @@@Type:  Node
+        @@@actualType: ManakaiDOMNode
+        @@@Exception[list]:  DOMException
      @@Level[list]:  3
      @@SpecLevel:3
      @@For:
@@ -12017,6 +12401,7 @@ IF:
          (fatal and non-fatal) errors and warnings will be reported using 
          the <IF:DOMErrorHandler> object associated with the 
          <DOM:error-handler> parameter.
+     @@Return:
      @@Level[list]:  3
      @@SpecLevel:3
      @@For:
@@ -12241,14 +12626,16 @@ IF:
             if (not defined $namespaceURI) {
               $r = null;
             } else {
-              for (@{$self->{<Q::TreeCore:node>}->{<Q::infoset:children>}}) {
-                if ($_->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
-                  $r = $_-><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
-                                 .lookupNamespacePrefix>
-                                                 ($namespaceURI, $_);
-                  last;
+              __DEEP{
+                for (@{$self->{<Q::TreeCore:node>}->{<Q::infoset:children>}}) {
+                  if ($_->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
+                    $r = $_-><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                   .lookupNamespacePrefix>
+                                                   ($namespaceURI, $_);
+                    last;
+                  }
                 }
-              }
+              }__;
             }
      @@Level[list]:  3
      @@SpecLevel:3
@@ -12383,12 +12770,6 @@ PropDef:
     @@lang:en
     @@@:
       A name.
-PropDef:
-  @Name: xmlVersion
-  @FullName:
-    @@lang:en
-    @@@: 
-      An XML version number.
 
 ConfigParam:
   @Description:

@@ -1579,6 +1579,7 @@ sub dis_perl_init_classdef ($;%) {
       $res->{ExpandedURI q<d:Type>}
         = dis_typeforqnames_to_type_uri ($t->value, use_default_namespace => 1,
                                          %opt, node => $t);
+      $res->{ExpandedURI q<dis2pm:TypeNode>} = $t;
       my $i = dis_get_attr_node (%opt, name => 'actualType',
                                  parent => $res->{src}) ||
             ({
@@ -1594,8 +1595,11 @@ sub dis_perl_init_classdef ($;%) {
         $res->{ExpandedURI q<d:actualType>}
           = dis_typeforqnames_to_type_uri ($t->value, use_default_namespace => 1,
                                            %opt, node => $t);
+        $res->{ExpandedURI q<dis2pm:actualTypeNode>} = $t;
       } else {
         $res->{ExpandedURI q<d:actualType>} = $res->{ExpandedURI q<d:Type>};
+        $res->{ExpandedURI q<dis2pm:actualTypeNode>}
+          = $res->{ExpandedURI q<dis2pm:TypeNode>};
       }
     } elsif ({
               ExpandedURI q<ManakaiDOM:DOMAttrGet> => 1,
@@ -1629,21 +1633,31 @@ sub dis_perl_init_classdef ($;%) {
     $res->{ExpandedURI q<d:Type>}
       = dis_typeforqnames_to_type_uri ($t->value, use_default_namespace => 1,
                                        %opt, node => $t);
+    $res->{ExpandedURI q<dis2pm:TypeNode>} = $t;
     my $i = dis_get_attr_node (%opt, name => 'actualType',
                                parent => $res->{src});
     if ($i) {
       $res->{ExpandedURI q<d:actualType>}
         = dis_typeforqnames_to_type_uri ($i->value, use_default_namespace => 1,
                                          %opt, node => $i);
+      $res->{ExpandedURI q<dis2pm:actualTypeNode>} = $i;
     } else {
       $res->{ExpandedURI q<d:actualType>} = $res->{ExpandedURI q<d:Type>};
+      $res->{ExpandedURI q<dis2pm:actualTypeNode>}
+        = $res->{ExpandedURI q<dis2pm:TypeNode>};
     }
 
     ## Input or output?
     my $read = dis_get_attr_node (%opt, name => 'Read', parent => $res->{src});
     $res->{ExpandedURI q<d:Read>} = ($read and $read->value) ? 1 : 0;
     my $write = dis_get_attr_node (%opt, name => 'Write', parent => $res->{src});
-    $res->{ExpandedURI q<d:Write>} = ($read and not $read->value) ? 0 : 1;
+    $res->{ExpandedURI q<d:Write>} = ($write and not $write->value) ? 0 : 1;
+
+    if ($res->{ExpandedURI q<d:Write>} and
+        dis_uri_ctype_match ($res->{ExpandedURI q<d:actualType>},
+                             ExpandedURI q<DOMMain:boolean>, %opt)) {
+      $res->{ExpandedURI q<dis2pm:nullable>} = 1;
+    }
     
     ## Register the parameter
     push @{$State->{ExpandedURI q<dis2pm:parentResource>}
@@ -1659,10 +1673,13 @@ sub dis_perl_init_classdef ($;%) {
       $res->{ExpandedURI q<d:Type>}
         = dis_typeforqnames_to_type_uri ($t->value, use_default_namespace => 1,
                                          %opt, node => $t);
+      $res->{ExpandedURI q<dis2pm:TypeNode>} = $t;
     } else {
       my $pr = $State->{ExpandedURI q<dis2pm:parentResource>};
       if (defined $pr->{ExpandedURI q<d:Type>}) {
         $res->{ExpandedURI q<d:Type>} = $pr->{ExpandedURI q<d:Type>};
+        $res->{ExpandedURI q<dis2pm:TypeNode>}
+          = $pr->{ExpandedURI q<dis2pm:TypeNode>};
       }
     }
     my $i = dis_get_attr_node (%opt, name => 'actualType',
@@ -1671,12 +1688,17 @@ sub dis_perl_init_classdef ($;%) {
       $res->{ExpandedURI q<d:actualType>}
         = dis_typeforqnames_to_type_uri ($i->value, use_default_namespace => 1,
                                          %opt, node => $i);
+      $res->{ExpandedURI q<dis2pm:actualTypeNode>} = $i;
     } else {
       my $pr = $State->{ExpandedURI q<dis2pm:parentResource>};
       if (defined $pr->{ExpandedURI q<d:actualType>}) {
         $res->{ExpandedURI q<d:actualType>} = $pr->{ExpandedURI q<d:actualType>};
+        $res->{ExpandedURI q<dis2pm:actualTypeNode>}
+          = $pr->{ExpandedURI q<dis2pm:actualTypeNode>};
       } else {
         $res->{ExpandedURI q<d:actualType>} = $pr->{ExpandedURI q<d:Type>};
+        $res->{ExpandedURI q<dis2pm:actualTypeNode>}
+          = $pr->{ExpandedURI q<dis2pm:TypeNode>};
       }
     }
     
@@ -1716,10 +1738,13 @@ sub dis_perl_init_classdef ($;%) {
       $res->{ExpandedURI q<d:Type>}
         = dis_typeforqnames_to_type_uri ($t->value, use_default_namespace => 1,
                                          %opt, node => $t);
+      $res->{ExpandedURI q<dis2pm:TypeNode>} = $t;
     } else {
       my $pr = $State->{ExpandedURI q<dis2pm:parentResource>};
       if (defined $pr->{ExpandedURI q<d:Type>}) {
         $res->{ExpandedURI q<d:Type>} = $pr->{ExpandedURI q<d:Type>};
+        $res->{ExpandedURI q<dis2pm:TypeNode>}
+          = $pr->{ExpandedURI q<dis2pm:TypeNpde>};
       } else {
         valid_err (q<Constant value type required>, node => $res->{src});
       }
@@ -1730,12 +1755,17 @@ sub dis_perl_init_classdef ($;%) {
       $res->{ExpandedURI q<d:actualType>}
         = dis_typeforqnames_to_type_uri ($i->value, use_default_namespace => 1,
                                          %opt, node => $i);
+      $res->{ExpandedURI q<dis2pm:actualTypeNode>} = $i;
     } else {
       my $pr = $State->{ExpandedURI q<dis2pm:parentResource>};
       if (defined $pr->{ExpandedURI q<d:actualType>}) {
         $res->{ExpandedURI q<d:actualType>} = $pr->{ExpandedURI q<d:actualType>};
+        $res->{ExpandedURI q<dis2pm:actualTypeNode>}
+          = $pr->{ExpandedURI q<dis2pm:actualTypeNode>};
       } else {
         $res->{ExpandedURI q<d:actualType>} = $pr->{ExpandedURI q<d:Type>};
+        $res->{ExpandedURI q<dis2pm:actualTypeNode>}
+          = $pr->{ExpandedURI q<dis2pm:TypeNode>};
       }
     }
     
@@ -1790,10 +1820,13 @@ sub dis_perl_init_classdef ($;%) {
       $res->{ExpandedURI q<d:Type>}
         = dis_typeforqnames_to_type_uri ($t->value, use_default_namespace => 1,
                                          %opt, node => $t);
+      $res->{ExpandedURI q<dis2pm:TypeNode>} = $t;
     } else {
       my $pr = $State->{ExpandedURI q<dis2pm:parentResource>};
       if (defined $pr->{ExpandedURI q<d:Type>}) {
         $res->{ExpandedURI q<d:Type>} = $pr->{ExpandedURI q<d:Type>};
+        $res->{ExpandedURI q<dis2pm:TypeNode>} 
+          = $pr->{ExpandedURI q<dis2pm:TypeNode>};
       } else {
         valid_err (q<InCase value type required>, node => $res->{src});
       }
@@ -1804,12 +1837,17 @@ sub dis_perl_init_classdef ($;%) {
       $res->{ExpandedURI q<d:actualType>}
         = dis_typeforqnames_to_type_uri ($i->value, use_default_namespace => 1,
                                          %opt, node => $i);
+      $res->{ExpandedURI q<dis2pm:actualTypeNode>} = $i;
     } else {
       my $pr = $State->{ExpandedURI q<dis2pm:parentResource>};
       if (defined $pr->{ExpandedURI q<d:actualType>}) {
         $res->{ExpandedURI q<d:actualType>} = $pr->{ExpandedURI q<d:actualType>};
+        $res->{ExpandedURI q<dis2pm:actualTypeNode>}
+          = $pr->{ExpandedURI q<dis2pm:actualTypeNode>};
       } else {
         $res->{ExpandedURI q<d:actualType>} = $pr->{ExpandedURI q<d:Type>};
+        $res->{ExpandedURI q<dis2pm:actualTypeNode>}
+          = $pr->{ExpandedURI q<dis2pm:TypeNode>};
       }
     }
     
@@ -1820,7 +1858,7 @@ sub dis_perl_init_classdef ($;%) {
       my $null = dis_get_attr_node (%opt, name => 'is-null', parent => $v);
       if ($null and $null->value) {
         $State->{ExpandedURI q<dis2pm:parentResource>}
-              ->{ExpandedURI q<dis2pm:undefable>} = 1;
+              ->{ExpandedURI q<dis2pm:nullable>} = 1;
         $res->{ExpandedURI q<dis2pm:valueIsNull>} = 1;
       }
     }
@@ -1863,9 +1901,11 @@ sub dis_perl_init_classdef ($;%) {
                 qq{[<$res->{ExpandedURI q<dis2pm:grandGrandParentResource>
                          }->{ExpandedURI q<dis2pm:type>}>] }.
                 qq{must be a "ManakaiDOM:ExceptionClass"}, node => $res->{src}
-            unless $res->{ExpandedURI q<dis2pm:grandGrandParentResource>}
-                       ->{ExpandedURI q<dis2pm:type>} eq
-                   ExpandedURI q<ManakaiDOM:ExceptionClass>;
+            unless {
+                     ExpandedURI q<ManakaiDOM:ExceptionClass> => 1,
+                     ExpandedURI q<ManakaiDOM:WarningClass> => 1,
+                   }->{$res->{ExpandedURI q<dis2pm:grandGrandParentResource>}
+                           ->{ExpandedURI q<dis2pm:type>}};              
     }
     $res->{ExpandedURI q<dis2pm:grandGrandParentResource>}
         ->{ExpandedURI q<dis2pm:xConstGroup>}
@@ -1917,6 +1957,14 @@ sub dis_perl_init_classdef ($;%) {
       }
     }
     valid_err (qq<<$ln>: Undefined element type>, node => $_);
+  }
+
+  if ($type eq ExpandedURI q<ManakaiDOM:DOMMethod>) {
+    valid_err (q<Method "dis:Return" element is required>, node => $res->{src})
+      unless defined $res->{ExpandedURI q<dis2pm:return>}->{Name};
+  } elsif ($type eq ExpandedURI q<ManakaiDOM:DOMAttribute>) {
+    valid_err (q<Method "dis:Get" element is required>, node => $res->{src})
+      unless defined $res->{ExpandedURI q<dis2pm:getter>}->{Name};    
   }
 
   $res->{ExpandedURI q<dis2pm:done>} = 1;
@@ -2236,4 +2284,4 @@ sub disdoc_inline2pod ($;%) {
 
 =cut
 
-1; # $Date: 2004/12/19 10:57:49 $
+1; # $Date: 2004/12/26 09:24:37 $

@@ -42,7 +42,6 @@ require 'manakai/dis.pl';
 }
 our $State = retrieve ($Opt{file_name})
      or die "$0: $Opt{file_name}: Cannot load";
-our $result = '';
 
 eval q{
   sub impl_msg ($;%) {
@@ -55,12 +54,49 @@ sub perl_change_package (%) {
   my $fn = $opt{full_name};
   impl_err (qq<$fn: Bad package name>) unless $fn;
   unless ($fn eq $State->{ExpandedURI q<dis2pm:currentPackage>}) {
+    my $r = dispm_package_declarations (%opt);
     $State->{ExpandedURI q<dis2pm:currentPackage>} = $fn;
-    return perl_statement qq<package $fn>;
+    $State->{ExpandedURI q<dis2pm:referredPackage>}->{$fn} = -1;
+    return $r . perl_statement qq<package $fn>;
   } else {
     return '';
   }
 } # perl_change_package
+
+=item $code = dispm_package_declarations (%opt)
+
+Generates a code fragment that declares what is required 
+in the current package, including import statements for 
+character classes.
+
+=cut
+
+sub dispm_package_declarations (%) {
+  my %opt = @_;
+  my $pack_name = $State->{ExpandedURI q<dis2pm:currentPackage>};
+  my $pack = $State->{ExpandedURI q<dis2pm:Package>}->{$pack_name};
+  my $r = '';
+  my @xml_class;
+  for (keys %{$pack->{ExpandedURI q<dis2pm:requiredCharClass>}||{}}) {
+    my $val = $pack->{ExpandedURI q<dis2pm:requiredCharClass>}->{$_};
+    next if not ref $val and $val <= 0;
+    if (/^InXML/) {
+      push @xml_class, $_;
+      $pack->{ExpandedURI q<dis2pm:requiredCharClass>}->{$_} = -1;
+    } else {
+      valid_err (qq<"$_": Unknown character class>,
+                 node => ref $val ? $val : $opt{node});
+    }
+  }
+  if (@xml_class) {
+    $State->{Module}->{$State->{module}}
+          ->{ExpandedURI q<dis2pm:requiredModule>}
+          ->{'Char::Class::XML'} = 1;
+    $r .= perl_statement 'Char::Class::XML->import ('.
+                         perl_list (@xml_class).')';
+  }
+  $r;
+} # dispm_package_declarations
 
 =item $code = dispm_perl_throws (%opt)
 
@@ -104,7 +140,7 @@ sub dispm_perl_throws (%) {
   return $r;
 } # dispm_perl_throw
 
-my $RegQNameChar = qr/[^\s<>"'\\\[\]\{\}]/;
+my $RegQNameChar = qr/[^\s<>"'\\\[\]\{\},=]/;
 {
 use re 'eval';
 my $RegBlockContent;
@@ -116,12 +152,16 @@ sub perl_code ($;%) {
     node => $opt{node} unless defined $s;
   local $State->{Namespace}
     = $State->{Module}->{$opt{resource}->{parentModule}}->{nsBinding};
-  $s =~ s[<($RegQNameChar[^<>]+)>|\b(null|true|false)\b][
+  $s =~ s[(?<![qwr])<($RegQNameChar[^<>]+)>|\b(null|true|false)\b][
     my ($q, $l) = ($1, $2);
     my $r;
     if (defined $q) {
       if ($q =~ /\}/) {
-        valid_warn qq<"<$q>" has a "}" - it might be a typo>;
+        valid_warn qq<Inline element "<$q>" has a "}" - it might be a typo>;
+      }
+      if ($q =~ /=$/) {
+        valid_warn qq<Inline element "<$q>" ends with a "=" - >.
+                   q{should "=" be used place of "=>"?};
       }
       if ($q =~ s/^(.+?):://) {
         my $et = dis_qname_to_uri
@@ -197,19 +237,62 @@ sub perl_code ($;%) {
               node => $opt{node};
           }
         } elsif ($et eq ExpandedURI q<disPerl:Code>) {  ## CODE constant
-          my $uri = dis_typeforqnames_to_uri ($q, use_default_namespace => 1,
-                                              %opt);
+          my ($nm);
+          $q =~ s/^\s+//;
+          if ($q =~ s/^((?>(?!::).)+)//) {
+            $nm = $1;
+          } else {
+            valid_err qq<"$q": Code name required>, node => $opt{node};
+          }
+          $q =~ s/^::\s*//;
+          my $param = dispm_parse_param (\$q, %opt,
+                                         ExpandedURI q<dis2pm:endOrErr> => 1,
+                                         use_default_namespace => '');
+          my $uri = dis_typeforqnames_to_uri
+                               ($nm, use_default_namespace => 1,
+                                %opt);
           if (defined $State->{Type}->{$uri}->{Name} and
               dis_resource_ctype_match (ExpandedURI q<dis2pm:InlineCode>,
                                         $State->{Type}->{$uri}, %opt)) {
+            local $State->{ExpandedURI q<dis2pm:blockCodeParam>} = $param;
             ## ISSUE: It might be required to check loop referring
             $r = dispm_get_code (%opt, resource => $State->{Type}->{$uri},
                                  For => [keys %{$State->{Type}->{$uri}
                                                       ->{For}}]->[0],
-                                 is_inline => 1);
+                                 is_inline => 1,
+                                 ExpandedURI q<dis2pm:selParent> => $param,
+                                 ExpandedURI q<dis2pm:DefKeyName>
+                                   => ExpandedURI q<d:Def>);
+            for (grep {/^\$/} keys %$param) {
+              $r =~ s/\Q$_\E\b/ $param->{$_} /g;
+            }
           } else {
             valid_err qq<Inline code constant <$uri> must be defined>,
               node => $opt{node};
+          }
+        } elsif ($et eq ExpandedURI q<disPerl:C>) {
+          if ($q =~ /^((?>(?!\.)$RegQNameChar)*)\.($RegQNameChar+)$/o) {
+            my ($cls, $constn) = ($1, $2);
+            if (length $cls) {
+              my $clsu = dis_typeforqnames_to_uri ($cls, %opt,
+                                                   use_default_namespace => 1,
+                                                   node => $_);
+              $cls = $State->{Type}->{$clsu};
+              valid_err qq<Class/IF <$clsu> must be defined>, node => $_
+                unless defined $cls->{Name};
+            } else {
+              $cls = $State->{ExpandedURI q<dis2pm:thisClass>};
+              valid_err q<Class/IF name required in this context>, node => $_
+                unless defined $cls->{Name};
+            }
+            
+            my $const = $cls->{ExpandedURI q<dis2pm:const>}->{$constn};
+            valid_err qq<Constant value "$constn" not defined in class/IF >.
+                      qq{"$cls->{Name}" (<$cls->{URI}>)}, node => $_
+                        unless defined $const->{Name};
+            $r = dispm_const_value (resource => $const);
+          } else {
+            valid_err qq<"$q": Syntax error>, node => $opt{node};
           }
         } else {
           valid_err qq<"$et": Unknown element type>, node => $opt{node};
@@ -225,7 +308,7 @@ sub perl_code ($;%) {
   ## TODO: Ensure Message::Util::Error imported if "try"ing.
   ## ISSUE: __FILE__ & __LINE__ will break if multiline substition happens.
   $s =~ s{
-    \b__([A-Z]+)
+    \b__($RegQNameChar+)
     (?:\{($RegBlockContent)\})?
     __\b
   }{
@@ -234,41 +317,14 @@ sub perl_code ($;%) {
     my $et = dis_qname_to_uri
                      ($name, %opt,
                       use_default_namespace => ExpandedURI q<disPerl:>);
-    if ($name eq 'XINT') {    ## Inserting point of the for-internal code
-      if (defined $data) {
-        if ($data =~ /^{($RegBlockContent)}$/o) {
-          $data = $1;
-          my $name = $1 if $data =~ s/^\s*(\w+)\s*(?:$|:\s*)// or
-            valid_err qq<Syntax of preprocessing macro "INT" is invalid>,
-            node => $opt{node};
-          #local $Status->{preprocess_variable}
-          #                 = {%{$Status->{preprocess_variable}||{}}};
-          while ($data =~ /\G(\S+)\s*(?:=>\s*(\S+)\s*)?(?:,\s*|$)/g) {
-            my ($n, $v) = ($1, defined $2 ? $2 : 1);
-            for ($n, $v) {
-              s/^'([^']+)'$/$1/; ## ISSUE: Doesn't support quoted-'
-            }
-            #$Status->{preprocess_variable}->{$n} = $v;
-          }
-          valid_err q<Preprocessing macro INT{} cannot be used here>
-            unless $opt{internal};
-          $r = perl_comment ("INT: $name").
-               $opt{internal}->($name);
-        } elsif ($data =~ s/^SP://) {
-          $r = '___'.$data;
-        } else {
-          $r = perl_internal_name $data;
-        }
-      } else {
-        valid_err q<Preprocessing macro INT cannot be used here>
-          unless $opt{internal};
-        $r = $opt{internal}->();
-      }
-    } elsif ($name eq 'DEEP') {   ## Deep Method Call
+    if ($et eq ExpandedURI q<disPerl:DEEP>) {   ## Deep Method Call
       $r = '{'.perl_statement ('local $Error::Depth = $Error::Depth + 1').
               perl_code ($data) .
            '}';
-    } elsif ($name eq 'EXCEPTION' or $name eq 'WARNING') {
+    } elsif ({
+              ExpandedURI q<disPerl:EXCEPTION> => 1,
+              ExpandedURI q<disPerl:WARNING> => 1,
+             }->{$et}) {
                                   ## Raising an Exception or Warning
       if ($data =~ s/^         \s* ((?>(?! ::|\.)$RegQNameChar)+) \s*
                      (?:    \. \s* ((?>(?! ::|\.)$RegQNameChar)+) \s*
@@ -407,7 +463,7 @@ sub perl_code ($;%) {
           node => $opt{node};
       }      
     } elsif ($et eq ExpandedURI q<disPerl:CODE>) {
-      my ($nm, %param);
+      my ($nm);
       $data =~ s/^\s+//;
       if ($data =~ s/^((?>(?!::).)+)//) {
         $nm = $1;
@@ -415,45 +471,60 @@ sub perl_code ($;%) {
         valid_err q<Code name required>, node => $opt{node};
       }
       $data =~ s/^::\s*//;
-      while ($data
-          =~ s/^($RegQNameChar+)\s*(?:=>\s*($RegQNameChar+)\s*)?(?:,\s*|$)//o) {
-        my ($n, $v) = ($1, $2);
-        $v = 1 unless defined $v;
-        if ($n =~ /^\$/) {
-          $param{$n} = $v;
-        } else {
-          $param{dis_qname_to_uri ($n, %opt, use_default_namespace => '')} = $v;
-        }
-      }
-      valid_err qq<Broken CODE argument: "$data">, node => $opt{node}
-        if length $data;
-      
+      my $param = dispm_parse_param (\$data, %opt,
+                                     use_default_namespace => '',
+                                     ExpandedURI q<dis2pm:endOrErr> => 1);      
       my $uri = dis_typeforqnames_to_uri ($nm, use_default_namespace => 1,
                                           %opt);
       if (defined $State->{Type}->{$uri}->{Name} and
           dis_resource_ctype_match (ExpandedURI q<dis2pm:BlockCode>,
                                     $State->{Type}->{$uri}, %opt)) {
-        local $State->{ExpandedURI q<dis2pm:blockCodeParam>} = \%param;
+        local $State->{ExpandedURI q<dis2pm:blockCodeParam>} = $param;
         ## ISSUE: It might be required to detect a loop
         $r = dispm_get_code (%opt, resource => $State->{Type}->{$uri},
                              For => [keys %{$State->{Type}->{$uri}
-                                                  ->{For}}]->[0]);
-        for (grep {/^\$/} keys %param) {
-          $r =~ s/\Q$_\E\b/ $param{$_} /g;
+                                                  ->{For}}]->[0],
+                             ExpandedURI q<dis2pm:selParent> => $param,
+                             ExpandedURI q<dis2pm:DefKeyName>
+                               => ExpandedURI q<d:Def>);
+        for (grep {/^\$/} keys %$param) {
+          $r =~ s/\Q$_\E\b/ $param->{$_} /g;
         }
+        valid_err qq<Block code <$uri> is empty>, node => $opt{node}
+          unless length $r;
         $r = "\n{\n$r\n}\n";
       } else {
         valid_err qq<Block code constant <$uri> must be defined>,
                   node => $opt{node};
       }
-    } elsif ($name eq 'XPACKAGE' and $data) {
-      if ($data eq 'Global') {
-        #$r = $ManakaiDOMModulePrefix;
-      } else {
-        valid_err qq<PACKAGE "$data" not supported>;
+    } elsif ($et eq ExpandedURI q<ManakaiDOM:InputNormalize>) {
+      my $method = $opt{ExpandedURI q<dis2pm:currentMethodResource>};
+      valid_err q<Element <ManakaiDOM:InputNroamlize> cannot be used here>,
+            node => $opt{node} unless defined $method->{Name};
+      PARAM: {
+        for my $param (@{$method->{ExpandedURI q<dis2pm:param>}||[]}) {
+          if ($data eq $param->{ExpandedURI q<dis2pm:paramName>}) {
+            ## NOTE: <ManakaiDOM:noInputNormalize> property is not
+            ##       checked for this element.
+            my $nm = dispm_get_code 
+                        (%opt, resource => $State->{Type}
+                              ->{$param->{ExpandedURI q<d:actualType>}},
+                         ExpandedURI q<dis2pm:DefKeyName>
+                             => ExpandedURI q<ManakaiDOM:inputNormalizer>,
+                         ExpandedURI q<dis2pm:getCodeNoTypeCheck> => 1,
+                         ExpandedURI q<dis2pm:selParent>
+                             => $param->{ExpandedURI q<dis2pm:actualTypeNode>});
+            if (defined $nm) {
+              $nm =~ s[\$INPUT\b][\$$param->{ExpandedURI q<dis2pm:paramName>} ]g;
+              $r = $nm;
+            } else {
+              $r = '';
+            }
+            last PARAM;
+          }
+        }
+        valid_err q<Parameter "$data" is not found>, node => $opt{node};
       }
-    } elsif ($name eq 'XREQUIRE') {
-      #$r = perl_statement (q<require >. perl_package_name name => $data);
     } elsif ($et eq ExpandedURI q<disPerl:WHEN>) {
       if ($data =~ s/^\s*IS\s*\{($RegBlockContent)\}::\s*//o) {
         my $v = dis_qname_to_uri ($1, use_default_namespace => 1, %opt);
@@ -481,16 +552,85 @@ sub perl_code ($;%) {
       } else {
         valid_err (qq<Broken <$et> block: "$data">, node => $opt{node});
       }
-    } elsif ($name eq 'FILE' or $name eq 'LINE' or $name eq 'PACKAGE') {
+    } elsif ({
+              ExpandedURI q<disPerl:FILE> => 1,
+              ExpandedURI q<disPerl:LINE> => 1,
+              ExpandedURI q<disPerl:PACKAGE> => 1,
+             }->{$et}) {
       $r = qq<__${name}__>;
+      valid_err (q<Block element content cannot be specified for >.
+                 qq<element type <$et>>, node => $opt{node})
+        if length $data;
     } else {
       valid_err qq<Preprocessing macro <$et> not supported>, node => $opt{node};
     }
     $r;
   }goex;
+
+  ## Checks \p character classes
+  while ($s =~ /\\p{([^{}]+)}/gs) {
+    my $name = $1;
+    $State->{ExpandedURI q<dis2pm:Package>}
+          ->{$State->{ExpandedURI q<dis2pm:currentPackage>}}
+          ->{ExpandedURI q<dis2pm:requiredCharClass>}
+          ->{$name} ||= $opt{node} || 1;
+  }
+
   $s;
 }
 }
+
+=item {%param} = dispm_parse_param (\$paramspec, %opt)
+
+Parses parameter specification and returns it as a reference
+to hash.
+
+=cut
+
+sub dispm_parse_param ($%) {
+  my ($src, %opt) = @_;
+  my %param;
+  while ($$src =~ s/^
+    ## Parameter name
+      (\$? $RegQNameChar+)\s*
+
+    (?: =>? \s*
+
+    ## Parameter value
+      (
+         ## Bare string
+           $RegQNameChar+ |
+
+         ## Quoted string
+           '(?>[^'\\]*)' ## ISSUE: escape mechanism required?
+
+      )
+
+    \s*)?
+
+  (?:,\s*|$)//ox) {
+    my ($n, $v) = ($1, $2);
+    if (defined $v) {
+      if ($v =~ /^'/) {
+        $v = substr ($v, 1, length ($v) - 2);
+      } else {
+        # 
+      }
+    } else {
+      $v = 1;
+    }
+    
+    if ($n =~ /^\$/) {
+      $param{$n} = $v;
+    } else {
+      $param{dis_qname_to_uri ($n, %opt)} = $v;
+    }
+  }
+  if ($opt{ExpandedURI q<dis2pm:endOrErr>} and length $$src) {
+    valid_err qq<Broken parameter specification: "$$src">, node => $opt{node};
+  }
+  \%param;
+} # dispm_parse_param
 
 ## Defined in genlib.pl but overridden.
 sub perl_code_source ($%) {
@@ -558,7 +698,9 @@ sub dispm_get_code (%) {
                                      name => 'require')}) {
         $code .= perl_statement 'require ' . $_->value;
       }
-      $code .= perl_code ($n->value, %opt, node => $n);
+      my $v = $n->value;
+      valid_err q<Perl code is required>, node => $n unless defined $v;
+      $code .= perl_code ($v, %opt, node => $n);
       if ($opt{is_inline} and
           dis_resource_ctype_match ([ExpandedURI q<dis2pm:InlineCode>],
                                     $opt{resource}, %opt,
@@ -692,7 +834,7 @@ sub dispm_const_group (%) {
   }
   for my $cv (values %{$opt{resource}->{ExpandedURI q<dis2pm:const>}}) {
     next unless defined $cv->{ExpandedURI q<dis2pm:constName>};
-    $result .= dispm_const_value_sub (%opt, resource => $cv);
+    #$result .= dispm_const_value_sub (%opt, resource => $cv);
     push @cname, $cv->{ExpandedURI q<dis2pm:constName>};
   }
   return $result;
@@ -756,62 +898,122 @@ sub disperl_to_perl (%) {
       if ($et eq ExpandedURI q<d:GetPropNode>) {
         $code .= perl_if
                    'defined $r',
-                   perl_code (q{<M::ManakaiDOMNode.getNodeReference> ($r)},
+                   perl_code (q{<ClassM::ManakaiDOMNode.getNodeReference> ($r)},
                               %opt, node => $_);
       }
+    } elsif ($et eq ExpandedURI q<d:SetProp>) {
+      my $uri = dis_qname_to_uri ($_->value, %opt, node => $_,
+                                  use_default_namespace => 1);
+      my $chk = dis_get_attr_node (%opt, parent => $_, name => 'CheckReadOnly');
+      if ($chk and $chk->value) {
+        my $for1 = $opt{For} || ExpandedURI q<ManakaiDOM:all>;
+        unless (dis_uri_for_match (ExpandedURI q<ManakaiDOM:ManakaiDOM1>,
+                                   $for1, node => $_)) {
+          $for1 = ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>;
+        }
+        $code .= perl_if
+                   q[$self->{].(perl_literal ExpandedURI q<TreeCore:node>).
+                   q[}->{].(perl_literal ExpandedURI q<DOMCore:read-only>).
+                   q[}],
+                   perl_statement
+                     dispm_perl_throws
+                       (%opt, class_for => $for1,
+                        class => ExpandedURI q<DOMCore:ManakaiDOMException>,
+                        type => 'NO_MODIFICATION_ALLOWED_ERR',
+                        subtype => ExpandedURI q<MDOMX:NOMOD_THIS>);
+      }
+      $code .= perl_statement
+                   perl_assign
+                        '$self->{'.(ExpandedURI q<TreeCore:node>).
+                        '}->{'.(perl_literal $uri).'}'
+                     => perl_var (type => '$', local_name => 'given');
+    } elsif ($et eq ExpandedURI q<DISPerl:cloneCode>) {
+      my $memref = $_->value;
+      my $mem = dispm_memref_to_resource
+                    ($memref, %opt, node => $_,
+                     return_returner => 1,
+                     use_default_type_resource =>
+                       $State->{ExpandedURI q<dis2pm:thisClass>},
+                       ## ISSUE: Reference in a resource that is 
+                       ##        referred from another resource might
+                       ##        not be interpreted correctly.
+                    );
+      ## ISSUE: It might be required to detect a loop
+      $code .= dispm_get_code (%opt, resource => $mem,
+                               For => [keys %{$mem->{For}}]->[0],
+                               ExpandedURI q<dis2pm:DefKeyName>
+                                 => ExpandedURI q<d:Def>);
     } elsif ($et eq ExpandedURI q<DISPerl:selectByProp>) {
-          my $prop = dis_get_attr_node
+      my $cprop = dis_get_attr_node
                        (%opt, parent => $_,
                         name => {uri => ExpandedURI q<DISPerl:propName>});
-          my $propvalue;
-          if ($prop) {
-            $prop = dis_qname_to_uri ($prop->value,
-                                      use_default_namespace => 1,
-                                      %opt, node => $prop);
-            $prop = dis_get_attr_node
-                        (%opt, parent => $opt{Type},
-                         name => {uri => $prop}) if $opt{Type};
-            unless ($prop) {
-              if ($prop) {
-                valid_err q<Element "DISPerl:selectByProp" cannot be used here>,
-                          node => $opt{node};
-              } else {
-                $propvalue = '';
-              }
+      my $propvalue;
+      if ($cprop) {
+        my $cpropuri = dis_qname_to_uri ($cprop->value,
+                                         use_default_namespace => 1,
+                                         %opt, node => $cprop);
+        my $prop;
+        if ($opt{ExpandedURI q<dis2pm:selParent>}) {
+          if (ref $opt{ExpandedURI q<dis2pm:selParent>} eq 'HASH') {
+            $prop = $opt{ExpandedURI q<dis2pm:selParent>};
+            if (defined $prop->{$cpropuri}) {
+              $propvalue = $prop->{$cpropuri};
             } else {
-              $propvalue = $prop->value;
+              $propvalue = '';
             }
           } else {
-            valid_err q<Attribute "DISPerl:propName" required>,
-                      node => $_;
+            $prop = dis_get_attr_node
+                         (%opt, parent => $opt{ExpandedURI q<dis2pm:selParent>},
+                          name => {uri => $cpropuri});
+            if ($prop) {
+              $propvalue = $prop->value;
+            } else {
+              $propvalue = '';
+            }
           }
-          my $selcase;
-          for my $case (@{$_->child_nodes}) {
-            next unless $case->node_type eq '#element';
-            next unless dis_node_for_match ($case, $opt{For}, %opt);
-            my $et = dis_element_type_to_uri ($case->local_name,
-                                              %opt, node => $case);
-            if ($et eq ExpandedURI q<DISPerl:case>) {
-              my $val = dis_get_attr_node
+        } else {
+          valid_err q<Element "DISPerl:selectByProp" cannot be used here>,
+              node => $_;
+        }
+      } else {
+        valid_err q<Attribute "DISPerl:propName" required>,
+          node => $_;
+      }
+      my $selcase;
+      for my $case (@{$_->child_nodes}) {
+        next unless $case->node_type eq '#element';
+        next unless dis_node_for_match ($case, $opt{For}, %opt);
+        my $et = dis_element_type_to_uri ($case->local_name,
+                                          %opt, node => $case);
+        if ($et eq ExpandedURI q<DISPerl:case>) {
+          my $val = dis_get_attr_node
                            (%opt, parent => $case,
                             name => 'Value',
                             ContentType => ExpandedURI q<lang:dis>,
                             defaultContentType => ExpandedURI q<lang:dis>);
-              if ($val and $val->value eq $propvalue) {
-                $selcase = $case; last;
-              } elsif (not $val and not $val->value) {
-                $selcase = $case; last;
-              }
-            } elsif ($et eq ExpandedURI q<DISPerl:else>) {
-              $selcase = $case; last;
-            } else {
-              valid_err q<Element type <$et> not allowed here>,
-                        node => $case;
-            }
+          if ($val and $val->value eq $propvalue) {
+            $selcase = $case; last;
+          } elsif ($propvalue eq '' and (not $val or not $val->value)) {
+            $selcase = $case; last;
           }
+        } elsif ($et eq ExpandedURI q<DISPerl:else>) {
+          $selcase = $case; last;
+        } elsif ({
+                  ExpandedURI q<DISPerl:propName> => 1,
+                 }->{$et}) {
+          # 
+        } else {
+          valid_err qq<Element type <$et> not allowed here>,
+                    node => $case;
+        }
+      }
       if ($selcase) {
         my $lcode = perl_code ($selcase->value, %opt, node => $selcase);
-        $code .= perl_code_source ($lcode, %opt, node => $selcase);
+        if ($opt{is_inline}) {
+          $code .= $lcode;
+        } else {
+          $code .= perl_code_source ($lcode, %opt, node => $selcase);
+        }
       }
     } elsif ({
               ExpandedURI q<d:ContentType> => 1,
@@ -828,10 +1030,108 @@ sub disperl_to_perl (%) {
   
   my $val = $opt{node}->value;
   if (defined $val and length $val) {
-    $code .= perl_code_source (perl_code ($val, %opt), %opt);
+    my $lcode = perl_code ($val, %opt);
+    if ($opt{is_inline}) {
+      $code .= $lcode;
+    } else {
+      $code .= perl_code_source ($lcode, %opt);
+    }
   }
   return $code;
 } # disperl_to_perl
+
+=item $res = dispm_memref_to_resource ($memref, %opt)
+
+Converts a C<DISPerl:MemRef> (a reference to a class member,
+i.e. either method, attribute, attribute getter or attribute
+setter) to a resource.
+
+=cut
+
+sub dispm_memref_to_resource ($%) {
+  my ($memref, %opt) = @_;
+  my ($clsq, $memq) = split /\./, $memref, 2;
+  unless (defined $memq) {
+    valid_err qq<"$memref": Member name required>. node => $opt{node};
+  } elsif ($memq =~ /:/) {
+    valid_err qq<"$memref": Prefixed member name not supported>,
+              node => $opt{node};
+  }
+
+  ## Class
+  my $cls;
+  my $clsuri;
+  if ($clsq eq '') {
+    if (defined $opt{use_default_type_resource}->{Name}) {
+      $cls = $opt{use_default_type_resource};
+      $clsuri = $cls->{URI};
+    } elsif ($opt{use_default_type}) {
+      $clsuri = $opt{use_default_type};
+    } else {
+      $clsuri = dis_typeforqnames_to_uri
+                     ($clsq, use_default_namespace => 1, %opt);
+    }
+  } else {
+    $clsuri = dis_typeforqnames_to_uri
+                     ($clsq, use_default_namespace => 1, %opt);
+  }
+  unless ($cls) {
+    $cls = $State->{Type}->{$clsuri};
+    valid_err qq<Class <$clsuri> must be defined>, node => $opt{node}
+      unless defined $cls->{Name};
+  }
+
+  ## Method or attribute
+  my $memname = $memq;
+  my $mem;
+  for (values %{$cls->{ExpandedURI q<dis2pm:method>}||{}}) {
+    if (defined $_->{Name} and $_->{Name} eq $memname) {
+      $mem = $_;
+      last;
+    }
+  }
+  if ($mem) {
+    if ($opt{return_method_returner}) {
+      if (defined $mem->{ExpandedURI q<dis2pm:return>}->{Name}) {
+        $mem = $mem->{ExpandedURI q<dis2pm:return>};
+      } elsif (defined $mem->{ExpandedURI q<dis2pm:getter>}->{Name}) {
+        $mem = $mem->{ExpandedURI q<dis2pm:getter>};
+      } else {
+        valid_err qq{Neither "return" nor "getter" is defined for }.
+                  qq{the class "$cls->{Name}" <$cls->{URI}>},
+                    node => $opt{node};
+      }
+    }
+  } elsif ($memname =~ s/^([gs]et)(?=.)//) {
+    my $gs = $1;
+    $memname = lcfirst $memname;
+    my $memp;
+    for (values %{$cls->{ExpandedURI q<dis2pm:method>}||{}}) {
+      if (defined $_->{Name} and $_->{Name} eq $memname) {
+        $memp = $_;
+        last;
+      }
+    }
+    if ($memp) {
+      if ($gs eq 'set') {
+        $mem = $memp->{ExpandedURI q<dis2pm:setter>};
+        unless (defined $mem->{Name}) {
+          valid_err qq{Setter for "$memp->{Name}" <$memp->{URI}> is not defined},
+            node => $opt{node};
+        }
+      } else {
+        $mem = $memp->{ExpandedURI q<dis2pm:getter>};
+        unless (defined $mem->{Name}) {
+          valid_err qq{Getter for "$memp->{Name}" <$memp->{URI}> is not defined},
+            node => $opt{node};
+        }
+      }
+    }
+  }
+  valid_err qq<Member "$memq" for class <$clsuri> is not defined>,
+    node => $opt{node} unless defined $mem->{Name};
+  return $mem;
+} # dispm_memref_to_resource
 
 
 ## Outputed module and "For"
@@ -840,6 +1140,7 @@ my $mf = dis_get_module_uri (module_name => $Opt{module_name},
                              For => $Opt{For});
 $State->{DefaultFor} = $mf->{For};
 $State->{module} = $mf->{module};
+our $result = '';
 
 valid_err
  (qq{Perl module <$State->{module}> not defined for <$State->{DefaultFor}>},
@@ -848,18 +1149,18 @@ valid_err
                  ->{ExpandedURI q<dis2pm:packageName>};
 
 $State->{ExpandedURI q<dis2pm:currentPackage>} = 'main';
-$result .= "#!/usr/bin/perl \n";
-$result .= perl_comment q<This file is automatically generated from> . "\n" .
+my $header = "#!/usr/bin/perl \n";
+$header .= perl_comment q<This file is automatically generated from> . "\n" .
                         q<"> . $Opt{file_name} . q<" at > .
                         rfc3339_date (time) . qq<.\n> .
                         q<Don't edit by hand!>;
-$result .= perl_comment qq{Module <$State->{module}>};
-$result .= perl_comment qq{For <$State->{DefaultFor}>};
-$result .= perl_statement q<use strict>;
-$result .= perl_change_package
+$header .= perl_comment qq{Module <$State->{module}>};
+$header .= perl_comment qq{For <$State->{DefaultFor}>};
+$header .= perl_statement q<use strict>;
+$header .= perl_change_package
                   (full_name => $State->{Module}->{$State->{module}}
                                       ->{ExpandedURI q<dis2pm:packageName>});
-$result .= perl_statement
+$header .= perl_statement
                  perl_assign
                       perl_var (type => '$', local_name => 'VERSION',
                                 scope => 'our')
@@ -899,14 +1200,15 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
     }
     $isa = array_uniq $isa;
     $result .= perl_inherit $isa;
-    $result .= '$' . $_ . "::;\n" for @$isa;
+    $State->{ExpandedURI q<dis2pm:referredPackage>}->{$_} ||= $pack->{src} || 1
+      for @$isa;
     ## Members
     if ({
          ExpandedURI q<ManakaiDOM:Class> => 1,
          ExpandedURI q<ManakaiDOM:ExceptionClass> => 1,
          ExpandedURI q<ManakaiDOM:WarningClass> => 1,
         }->{$pack->{ExpandedURI q<dis2pm:type>}}) {
-      local $State->{ExpandedURI q<dis2pm:thisClass>} => $pack;
+      local $State->{ExpandedURI q<dis2pm:thisClass>} = $pack;
       local $opt{ExpandedURI q<MDOMX:class>}
         = $pack->{ExpandedURI q<dis2pm:packageName>};
       for my $method (values %{$pack->{ExpandedURI q<dis2pm:method>}}) {
@@ -916,36 +1218,61 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
             ExpandedURI q<ManakaiDOM:DOMMethod>) {
           local $opt{ExpandedURI q<MDOMX:method>}
             = $method->{ExpandedURI q<dis2pm:methodName>};
+          local $opt{ExpandedURI q<dis2pm:currentMethodResource>} = $method;
           my $proto = '$';
-          my @param = ('self');
+          my @param = ('$self');
           my $param_norm = '';
           my $param_opt = 0;
           my $for = [keys %{$method->{For}}]->[0];
           for my $param (@{$method->{ExpandedURI q<dis2pm:param>}||[]}) {
+            my $atype = $param->{ExpandedURI q<d:actualType>};
             if ($param->{ExpandedURI q<dis2pm:nullable>}) {
               $proto .= ';' unless $param_opt;
               $param_opt++;
             }
-            $proto .= '$';
-            push @param, $param->{ExpandedURI q<dis2pm:paramName>};
-            my $nm = dispm_get_code 
-                        (%opt, resource => $State->{Type}
-                              ->{$param->{ExpandedURI q<d:actualType>}},
+            if (dis_uri_ctype_match ($atype, ExpandedURI q<Perl:Array>, %opt)) {
+              $proto .= '@';
+              push @param, '@'.$param->{ExpandedURI q<dis2pm:paramName>};
+            } elsif (dis_uri_ctype_match ($atype, ExpandedURI q<Perl:Hash>,
+                                          %opt)) {
+              $proto .= '%';
+              push @param, '%'.$param->{ExpandedURI q<dis2pm:paramName>};
+            } else {
+              $proto .= '$';
+              push @param, '$'.$param->{ExpandedURI q<dis2pm:paramName>};
+            }
+            my $nin = dis_get_attr_node
+                         (%opt,
+                          parent =>
+                            $param->{ExpandedURI q<dis2pm:actualTypeNode>},
+                          name => {uri =>
+                                     ExpandedURI q<ManakaiDOM:noInputNormalize>},
+                         );
+            if ($nin and $nin->value) {
+              ## No input normalizing
+            } else {
+              my $nm = dispm_get_code 
+                        (%opt, resource => $State->{Type}->{$atype},
                          ExpandedURI q<dis2pm:DefKeyName>
                              => ExpandedURI q<ManakaiDOM:inputNormalizer>,
                          For => $for,
-                         ExpandedURI q<dis2pm:getCodeNoTypeCheck> => 1);
-            if (defined $nm) {
-              $nm =~ s/\$INPUT\b/\$$param[-1] /g;
-              $param_norm .= $nm;
+                         ExpandedURI q<dis2pm:getCodeNoTypeCheck> => 1,
+                         ExpandedURI q<dis2pm:selParent>
+                             => $param->{ExpandedURI q<dis2pm:actualTypeNode>});
+              if (defined $nm) {
+                $nm =~ s/\$INPUT\b/\$$param[-1] /g;
+                $param_norm .= $nm;
+              }
             }
           }
           my $code = dispm_get_code
                        (%opt, 
                         resource => $method->{ExpandedURI q<dis2pm:return>},
-                        For => $for);
+                        For => $for,
+                        ExpandedURI q<dis2pm:DefKeyName>
+                          => ExpandedURI q<d:Def>);
           if (defined $code) {
-            my $my = perl_statement ('my ('.join (", ", map {"\$$_"} @param).
+            my $my = perl_statement ('my ('.join (", ", @param).
                                      ') = @_');
             my $return = defined $method->{ExpandedURI q<dis2pm:return>}->{Name}
                             ? $method->{ExpandedURI q<dis2pm:return>} : undef;
@@ -971,7 +1298,8 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
                                        $for, node => $method->{src})) {
               $for1 = ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>;
             }
-            $code = perl_statement
+            $code = perl_statement 'my $self = shift;';
+            $code .= perl_statement
                       dispm_perl_throws
                         class => ExpandedURI q<DOMCore:ManakaiDOMException>,
                         class_for => $for1,
@@ -1004,7 +1332,9 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
             $for1 = ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>;
           }
           local $opt{ExpandedURI q<MDOMX:on>} = 'get';
-          my $get_code = dispm_get_code (resource => $getter, For => $for);
+          my $get_code = dispm_get_code (resource => $getter, For => $for,
+                                         ExpandedURI q<dis2pm:DefKeyName>
+                                           => ExpandedURI q<d:Def>);
           if (defined $get_code) {
             my $default = dispm_get_value
                            (%opt, resource => $getter,
@@ -1036,7 +1366,9 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
           if ($setter) {
             local $opt{ExpandedURI q<MDOMX:on>} = 'set';
             my $set_code = dispm_get_code
-                              (%opt, resource => $setter, For => $for);
+                              (%opt, resource => $setter, For => $for,
+                               ExpandedURI q<dis2pm:DefKeyName>
+                                  => ExpandedURI q<d:Def>);
             if (defined $set_code) {
               my $nm = dispm_get_code 
                         (%opt, resource => $State->{Type}
@@ -1099,20 +1431,33 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
       } # package const group
       for my $cv (values %{$pack->{ExpandedURI q<dis2pm:const>}}) {
         next unless defined $cv->{Name};
-        $result .= dispm_const_value (resource => $cv);
+        $result .= dispm_const_value_sub (resource => $cv);
       } # package const value
     }
   } # root object
 }
 
+$result .= dispm_package_declarations;
+my $begin = '';
 for (keys %{$State->{Module}->{$State->{module}}
                   ->{ExpandedURI q<dis2pm:requiredModule>}||{}}) {
   next if $_ eq $State->{Module}->{$State->{module}}
                       ->{ExpandedURI q<dis2pm:packageName>};
-  $result .= perl_statement ('require ' . $_);
+  $begin .= perl_statement ('require ' . $_);
 }
+$result = $begin . $result if $begin;
 
-$result .= perl_statement 1;
+my @ref;
+for (keys %{$State->{ExpandedURI q<dis2pm:referredPackage>}||{}}) {
+  my $v = $State->{ExpandedURI q<dis2pm:referredPackage>}->{$_};
+  if (ref $v or $v >= 0) {
+    push @ref, $_;
+  }
+}
+$result .= "for (" . join (", ", map {'$'.$_.'::'} @ref) . ") {}"
+  if @ref;
+
+$result = $header . $result . perl_statement 1;
 
 output_result $result;
 

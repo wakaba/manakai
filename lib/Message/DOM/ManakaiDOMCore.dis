@@ -1,6 +1,8 @@
 Namespace:
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @dis2pm:
+    http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
   @DOMXML:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @infoset:
@@ -49,7 +51,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/12/01 11:49:46 $
+     $Date: 2004/12/26 09:24:37 $
 
   @Require:
     @@Module:
@@ -229,6 +231,14 @@ ElementTypeBinding:
   @ElementType:
     ManakaiDOM:raises
 
+ElementTypeBinding:
+  @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
+
 ClassDef:
   @Name: ManakaiDOMNodeObjectNode
 
@@ -245,46 +255,46 @@ ClassDef:
     @@Description:
       @@@lang:en
       @@@@:
-        Get text content of this node.
+        Text (character data) content of this node (including 
+        its descendants).
     @@ImplNote:
       @@@lang:en
       @@@@:
         This attribute is parallel to the attribute "textContent" of 
         the "Node" interface.
+    @@Type:
+      DOMMain:ManakaiDOMString
     @@Get:
-      @@@Type:
-        DOMMain:DOMString
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
+      @@@PerlDef:
           if ({
-                <Q:infoset:Element> => 1,
-                <Q:infoset:Attribute> => 1,
-                <Q:DOMXML:Entity> => 1,
-                <Q:DOMXML:EntityReference> => 1,
-                <Q:DOMCore:DocumentFragment> => 1,
-              }->{$self->{<Q:DOMCore:nodeType>}}) {
+                <Q::infoset:Element> => 1,
+                <Q::infoset:Attribute> => 1,
+                <Q::DOMXML:Entity> => 1,
+                <Q::DOMXML:EntityReference> => 1,
+                <Q::DOMCore:DocumentFragment> => 1,
+              }->{$self->{<Q::DOMCore:nodeType>}}) {
             __DEEP{
-              for (@{$self->{<Q:infoset:children>}}) {
-                if ($_->{<Q:DOMCore:nodeType>} eq <Q:DOMCore:Text>) {
-                  unless ($_->{<Q:infoset:elementContentWhitespace>}) {
-                    $r .= $_->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{textContent}__;
+              for (@{$self->{<Q::infoset:children>}}) {
+                if ($_->{<Q::DOMCore:nodeType>} eq <Q::DOMCore:Text>) {
+                  unless ($_->{<Q::infoset:elementContentWhitespace>}) {
+                    $r .= $_-><AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                   .textContent>;
                   }
-                } elsif ($_->{<Q:DOMCore:nodeType>} ne <Q:infoset:Comment> and
-                   $_->{<Q:DOMCore:nodeType>} ne
-                                       <Q:infoset:ProcessingInstruction>) {
-                  $r .= $_->__SUPER{ManakaiDOMNodeObjectNode}__::__INT{textContent}__;
+                } elsif ($_->{<Q::DOMCore:nodeType>} ne <Q::infoset:Comment> and
+                   $_->{<Q::DOMCore:nodeType>} ne
+                                       <Q::infoset:ProcessingInstruction>) {
+                  $r .= $_-><AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                 .textContent>;
                 }
               }
             }__;
           } elsif ({
-                     <Q:DOMCore:Text> => 1,
-                     <Q:DOMXML:CDATASection> => 1,
-                     <Q:infoset:Comment> => 1,
-                     <Q:infoset:ProcessingInstruction> => 1,
-                   }->{$self->{<Q:DOMCore:nodeType>}}) {
-            $r = $self->{<Q:infoset:content>};
+                     <Q::DOMCore:Text> => 1,
+                     <Q::DOMXML:CDATASection> => 1,
+                     <Q::infoset:Comment> => 1,
+                     <Q::infoset:ProcessingInstruction> => 1,
+                   }->{$self->{<Q::DOMCore:nodeType>}}) {
+            $r = $self->{<Q::infoset:content>};
           } else {
             $r = null;
           }
@@ -299,8 +309,6 @@ ClassDef:
         @@@@:
           Setting is not defined - use the attribute "textContent" of 
           the  "Node" interface.
-      @@Level: 1
-      @@SpecLevel:1
   @IntMethod:
     @@Name: contentBaseURI
     @@Description:
@@ -335,49 +343,49 @@ ClassDef:
           lang:Perl
         @@@@@:
           $r = null;
-          if ($useInfosetProperty and defined $self->{<Q:infoset:baseURI>}) {
-            ## Note: In XML Infoset, <Q:infoset:Document>, 
-            ##       <Q:infoset:Element> and <Q:infoset:ProcessingInstruction>
-            ##       allow <Q:infoset:baseURI>.  In addition, 
-            ##       <Q:DOMCore:Entity> and <Q:DOMCore:EntityReference>
-            ##       may have it, if it is <Q:ManakaiDOM:isExternalEntity>,
+          if ($useInfosetProperty and defined $self->{<Q::infoset:baseURI>}) {
+            ## Note: In XML Infoset, <Q::infoset:Document>, 
+            ##       <Q::infoset:Element> and <Q::infoset:ProcessingInstruction>
+            ##       allow <Q::infoset:baseURI>.  In addition, 
+            ##       <Q::DOMCore:Entity> and <Q::DOMCore:EntityReference>
+            ##       may have it, if it is <Q::ManakaiDOM:isExternalEntity>,
             ##       in this implementation.
-            $r = $self->{<Q:infoset:baseURI>};
+            $r = $self->{<Q::infoset:baseURI>};
           } else {
-            if ($self->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
-              if ($self->{<Q:infoset:attributes>}
-                       ->{<Q:xml:>}->{'base'}) {
-                $r = $self->{<Q:infoset:attributes>}
-                          ->{<Q:xml:>}->{'base'}
+            if ($self->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
+              if ($self->{<Q::infoset:attributes>}
+                       ->{<Q::xml:>}->{'base'}) {
+                $r = $self->{<Q::infoset:attributes>}
+                          ->{<Q::xml:>}->{'base'}
                               ## Condition insensitive
                           ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{contentBaseURI}__
                                                      ($useInfosetProperty);
-              } elsif ($self->{<Q:infoset:attributes>}
-                            ->{<Q:ManakaiDOM:noNS>}->{'xml:base'}) {
-                $r = $self->{<Q:infoset:attributes>}
-                          ->{<Q:ManakaiDOM:noNS>}->{'xml:base'}
+              } elsif ($self->{<Q::infoset:attributes>}
+                            ->{<Q::ManakaiDOM:noNS>}->{'xml:base'}) {
+                $r = $self->{<Q::infoset:attributes>}
+                          ->{<Q::ManakaiDOM:noNS>}->{'xml:base'}
                               ## Condition insensitive
                           ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{contentBaseURI}__
                                                      ($useInfosetProperty);
               }
-              if (not defined $r and $self->{<Q:infoset:parent>}) {
-                $r = $self->{<Q:infoset:parent>}
+              if (not defined $r and $self->{<Q::infoset:parent>}) {
+                $r = $self->{<Q::infoset:parent>}
                           ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{contentBaseURI}__
                                                      ($useInfosetProperty);  
               }
-            } elsif ($self->{<Q:DOMCore:nodeType>} eq <Q:infoset:Attribute>) {
-              if ((defined $self->{<Q:infoset:localName>} and
-                   $self->{<Q:infoset:localName>} eq 'base' and
-                   defined $self->{<Q:infoset:namespaceName>} and
-                   $self->{<Q:infoset:namespaceName>} eq <Q:xml:>) or
-                  (not defined $self->{<Q:infoset:localName>} and
-                   $self->{<Q:DOMCore:name>} eq 'xml:base')) {
+            } elsif ($self->{<Q::DOMCore:nodeType>} eq <Q::infoset:Attribute>) {
+              if ((defined $self->{<Q::infoset:localName>} and
+                   $self->{<Q::infoset:localName>} eq 'base' and
+                   defined $self->{<Q::infoset:namespaceName>} and
+                   $self->{<Q::infoset:namespaceName>} eq <Q::xml:>) or
+                  (not defined $self->{<Q::infoset:localName>} and
+                   $self->{<Q::DOMCore:name>} eq 'xml:base')) {
                 $r = $self->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{textContent}__;
                 if (defined $r and __CODE{isRelativeDOMURI: in => r}__) {
-                  if ($self->{<Q:infoset:ownerElement>} and
-                      $self->{<Q:infoset:ownerElement>}->{<Q:infoset:parent>}) {
-                    my $base = $self->{<Q:infoset:ownerElement>}
-                                    ->{<Q:infoset:parent>}
+                  if ($self->{<Q::infoset:ownerElement>} and
+                      $self->{<Q::infoset:ownerElement>}->{<Q::infoset:parent>}) {
+                    my $base = $self->{<Q::infoset:ownerElement>}
+                                    ->{<Q::infoset:parent>}
                                     ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{contentBaseURI}__
                                                      ($useInfosetProperty);
                     if (defined $base) {
@@ -391,60 +399,60 @@ ClassDef:
                   }
                 }
               } else { # not xml:base
-                if ($self->{<Q:infoset:ownerElement>}) {
-                  $r = $self->{<Q:infoset:ownerElement>}
+                if ($self->{<Q::infoset:ownerElement>}) {
+                  $r = $self->{<Q::infoset:ownerElement>}
                             ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{contentBaseURI}__
                                                       ($useInfosetProperty);
                 }
               }
             } elsif ({
-                       <Q:DOMCore:Text> => 1,
-                       <Q:DOMXML:CDATASection> => 1,
-                       <Q:infoset:DocumentTypeDeclaration> => 1,
-                       <Q:infoset:Comment> => 1,
-                       <Q:infoset:ProcessingInstruction> => 1,
-                       <Q:DOMXML:Notation> => 1, ## but does not have content
-                     }->{$self->{<Q:DOMCore:nodeType>}}) {
-              if ($self->{<Q:infoset:parent>}) {
-                $r = $self->{<Q:infoset:parent>}
+                       <Q::DOMCore:Text> => 1,
+                       <Q::DOMXML:CDATASection> => 1,
+                       <Q::infoset:DocumentTypeDeclaration> => 1,
+                       <Q::infoset:Comment> => 1,
+                       <Q::infoset:ProcessingInstruction> => 1,
+                       <Q::DOMXML:Notation> => 1, ## but does not have content
+                     }->{$self->{<Q::DOMCore:nodeType>}}) {
+              if ($self->{<Q::infoset:parent>}) {
+                $r = $self->{<Q::infoset:parent>}
                           ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{contentBaseURI}__
                                                       ($useInfosetProperty);
               }
-            } elsif ($self->{<Q:DOMCore:nodeType>} eq <Q:infoset:Document>) {
+            } elsif ($self->{<Q::DOMCore:nodeType>} eq <Q::infoset:Document>) {
               ## 2. The base URI of the protocol entity
-                # <Q:infoset:baseURI>
+                # <Q::infoset:baseURI>
               ## 3. The URI to retrieve the protocol entity
               ## 4. The application defined base URI
-              if (defined $self->{<Q:DOMCore:documentURI>} and
+              if (defined $self->{<Q::DOMCore:documentURI>} and
                   not __CODE{isRelativeDOMURI: in => r}__) {
-                $r = $self->{<Q:DOMCore:documentURI>};
+                $r = $self->{<Q::DOMCore:documentURI>};
               }
             } elsif ({
-                       <Q:DOMXML:Entity> => 1,
-                       <Q:DOMXML:EntityReference> => 1,
-                     }->{$self->{<Q:DOMCore:nodeType>}}) {
-              if ($self->{<Q:ManakaiDOM:isExpanded>}) {
-                if ($self->{<Q:ManakaiDOM:isExternalEntity>}) {
+                       <Q::DOMXML:Entity> => 1,
+                       <Q::DOMXML:EntityReference> => 1,
+                     }->{$self->{<Q::DOMCore:nodeType>}}) {
+              if ($self->{<Q::ManakaiDOM:isExpanded>}) {
+                if ($self->{<Q::ManakaiDOM:isExternalEntity>}) {
                   ## 2. Tge base URI of the protocol entity
-                    # <Q:infoset:baseURI>
+                    # <Q::infoset:baseURI>
                   ## 3. The URI to retrieve the protocol entity
                   ## 4. The application defined base URI
-                  if (defined $self->{<Q:DOMCore:documentURI>} and
+                  if (defined $self->{<Q::DOMCore:documentURI>} and
                     not __CODE{isRelativeDOMURI: in => r}__) {
-                    $r = $self->{<Q:DOMCore:documentURI>};
+                    $r = $self->{<Q::DOMCore:documentURI>};
                   }
-                  ## Should <Q:infoset:systemIdentifier> +
-                  ## <Q:infoset:declarationBaseURI> also be used?
+                  ## Should <Q::infoset:systemIdentifier> +
+                  ## <Q::infoset:declarationBaseURI> also be used?
                 }
               } else {
-                if ($self->{<Q:infoset:parent>}) {
-                  $r = $self->{<Q:infoset:parent>}
+                if ($self->{<Q::infoset:parent>}) {
+                  $r = $self->{<Q::infoset:parent>}
                             ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{contentBaseURI}__
                                                       ($useInfosetProperty);
                 }
               }
             } else {
-              # <Q:DOMCore:DocumentFragment> or 
+              # <Q::DOMCore:DocumentFragment> or 
               # unknown node types
             }
           }
@@ -492,40 +500,40 @@ ClassDef:
           lang:Perl
         @@@@@:
           $r = null;
-          my $doc = $self->{<Q:TreeCore:node>}->{<Q:DOMCore:ownerDocument>};
-          if ($doc and $doc->{<Q:DOMCore:hasFeature>}->{HTML}) {
+          my $doc = $self->{<Q::TreeCore:node>}->{<Q::DOMCore:ownerDocument>};
+          if ($doc and $doc->{<Q::DOMCore:hasFeature>}->{HTML}) {
             HTML: {
-              DOC: for (@{$doc->{<Q:infoset:children>}}) {
-                if ($_->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element> and
-                    (defined $_->{<Q:infoset:localName>} and
-                     $_->{<Q:infoset:localName>} eq 'html' and
-                     ((defined $_->{<Q:infoset:namespaceName>} and
-                       $_->{<Q:infoset:namespaceName>} eq <Q:xhtml1:>) or
-                      not defined $_->{<Q:infoset:namespaceName>})) or
-                    (not defined $_->{<Q:infoset:localName>} and
-                     $_->{<Q:DOMCore:name>} eq 'html')) {
-                  for (@{$_->{<Q:infoset:children>}}) {
-                    if ($_->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element> and
-                        (defined $_->{<Q:infoset:localName>} and
-                         $_->{<Q:infoset:localName>} eq 'head' and
-                         ((defined $_->{<Q:infoset:namespaceName>} and
-                           $_->{<Q:infoset:namespaceName>} eq <Q:xhtml1:>) or
-                          not defined $_->{<Q:infoset:namespaceName>})) or
-                        (not defined $_->{<Q:infoset:localName>} and
-                         $_->{<Q:DOMCore:name>} eq 'head')) {
-                      for (@{$_->{<Q:infoset:children>}}) {
-                        if ($_->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element> and
-                            (defined $_->{<Q:infoset:localName>} and
-                             $_->{<Q:infoset:localName>} eq 'base' and
-                             ((defined $_->{<Q:infoset:namespaceName>} and
-                               $_->{<Q:infoset:namespaceName>} eq <Q:xhtml1:>) or
-                              not defined $_->{<Q:infoset:namespaceName>})) or
-                            (not defined $_->{<Q:infoset:localName>} and
-                             $_->{<Q:DOMCore:name>} eq 'base')) {
-                          my $a = $_->{<Q:infoset:attributes>}
-                                    ->{<Q:null:>}->{href} ||
-                                  $_->{<Q:infoset:attributes>}
-                                    ->{<Q:ManakaiDOM:noNS>}->{href};
+              DOC: for (@{$doc->{<Q::infoset:children>}}) {
+                if ($_->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element> and
+                    (defined $_->{<Q::infoset:localName>} and
+                     $_->{<Q::infoset:localName>} eq 'html' and
+                     ((defined $_->{<Q::infoset:namespaceName>} and
+                       $_->{<Q::infoset:namespaceName>} eq <Q::xhtml1:>) or
+                      not defined $_->{<Q::infoset:namespaceName>})) or
+                    (not defined $_->{<Q::infoset:localName>} and
+                     $_->{<Q::DOMCore:name>} eq 'html')) {
+                  for (@{$_->{<Q::infoset:children>}}) {
+                    if ($_->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element> and
+                        (defined $_->{<Q::infoset:localName>} and
+                         $_->{<Q::infoset:localName>} eq 'head' and
+                         ((defined $_->{<Q::infoset:namespaceName>} and
+                           $_->{<Q::infoset:namespaceName>} eq <Q::xhtml1:>) or
+                          not defined $_->{<Q::infoset:namespaceName>})) or
+                        (not defined $_->{<Q::infoset:localName>} and
+                         $_->{<Q::DOMCore:name>} eq 'head')) {
+                      for (@{$_->{<Q::infoset:children>}}) {
+                        if ($_->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element> and
+                            (defined $_->{<Q::infoset:localName>} and
+                             $_->{<Q::infoset:localName>} eq 'base' and
+                             ((defined $_->{<Q::infoset:namespaceName>} and
+                               $_->{<Q::infoset:namespaceName>} eq <Q::xhtml1:>) or
+                              not defined $_->{<Q::infoset:namespaceName>})) or
+                            (not defined $_->{<Q::infoset:localName>} and
+                             $_->{<Q::DOMCore:name>} eq 'base')) {
+                          my $a = $_->{<Q::infoset:attributes>}
+                                    ->{<Q::null:>}->{href} ||
+                                  $_->{<Q::infoset:attributes>}
+                                    ->{<Q::ManakaiDOM:noNS>}->{href};
                           if ($a) {
                             $r = $a->__SUPER{ManakaiDOMNodeObjectNode}__::__INT{textContent}__;
                             unless (__CODE{isRelativeDOMURI: in => r}__) {
@@ -543,11 +551,11 @@ ClassDef:
                   last DOC;
                 }
               } # DOC
-              if (defined $doc->{<Q:infoset:baseURI>}) {
-                $r = $doc->{<Q:infoset:baseURI>};
+              if (defined $doc->{<Q::infoset:baseURI>}) {
+                $r = $doc->{<Q::infoset:baseURI>};
                 $r = null if __CODE{isRelativeDOMURI: in => r}__;
-              } elsif (defined $doc->{<Q:DOMCore:documentURI>}) {
-                $r = $doc->{<Q:DOMCore:documentURI>};
+              } elsif (defined $doc->{<Q::DOMCore:documentURI>}) {
+                $r = $doc->{<Q::DOMCore:documentURI>};
                 $r = null if __CODE{isRelativeDOMURI: in => r}__;
               }
             } # HTML
@@ -617,22 +625,22 @@ ClassDef:
           $r = null;
           FIND: {
           if ($originalElement) {
-            if (defined $self->{<Q:infoset:namespaceName>} and
-                $self->{<Q:infoset:namespaceName>} eq $namespaceURI and
-                defined $self->{<Q:infoset:prefix>} and
+            if (defined $self->{<Q::infoset:namespaceName>} and
+                $self->{<Q::infoset:namespaceName>} eq $namespaceURI and
+                defined $self->{<Q::infoset:prefix>} and
                 $originalElement->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{lookupNamespaceURI}__
-                      ($self->{<Q:infoset:prefix>}) eq $namespaceURI) {
-              $r = $self->{<Q:infoset:prefix>};
+                      ($self->{<Q::infoset:prefix>}) eq $namespaceURI) {
+              $r = $self->{<Q::infoset:prefix>};
               last FIND;
             }
-            for (values %{$self->{<Q:infoset:attributes>}->{<Q:xmlns:>}||{}}) {
-              if (defined $_->{<Q:infoset:prefix>} and
-                  $_->{<Q:infoset:prefix>} eq 'xmlns' and
+            for (values %{$self->{<Q::infoset:attributes>}->{<Q::xmlns:>}||{}}) {
+              if (defined $_->{<Q::infoset:prefix>} and
+                  $_->{<Q::infoset:prefix>} eq 'xmlns' and
                   $_->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{textContent}__
                     eq $namespaceURI and
                   $originalElement->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{lookupNamespaceURI}__
-                            ($_->{<Q:infoset:localName>}) eq $namespaceURI) {
-                $r = $_->{<Q:infoset:localName>};
+                            ($_->{<Q::infoset:localName>}) eq $namespaceURI) {
+                $r = $_->{<Q::infoset:localName>};
                 last FIND;
               }
             }
@@ -640,9 +648,9 @@ ClassDef:
             ## If element has ancestor element
             my $n = $self;
             ANCESTOR: {
-              if ($n->{<Q:infoset:parent>}) {
-                $n = $n->{<Q:infoset:parent>};
-                if ($n->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
+              if ($n->{<Q::infoset:parent>}) {
+                $n = $n->{<Q::infoset:parent>};
+                if ($n->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
                   $r = $n->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{lookupNamespacePrefix}__
                                                ($namespaceURI, $originalElement);
                   last FIND;
@@ -684,21 +692,21 @@ ClassDef:
         @@@@Type:
           lang:Perl
         @@@@@:
-          if ($self->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
-            if (not defined $self->{<Q:infoset:prefix>}) {
+          if ($self->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
+            if (not defined $self->{<Q::infoset:prefix>}) {
               if (defined $namespaceURI and
-                  defined $self->{<Q:infoset:namespaceName>} and
-                  $namespaceURI eq $self->{<Q:infoset:namespaceName>}) {
+                  defined $self->{<Q::infoset:namespaceName>} and
+                  $namespaceURI eq $self->{<Q::infoset:namespaceName>}) {
                 $r = true;
               } elsif (not defined $namespaceURI and
-                       not defined $self->{<Q:infoset:namespaceName>}) {
+                       not defined $self->{<Q::infoset:namespaceName>}) {
                 $r = true;
               }
               # else false
-            } elsif ($self->{<Q:infoset:attributes>}
-                          ->{<Q:infoset:xmlns:>}->{xmlns}) {
-              my $v = $self->{<Q:infoset:attributes>}
-                           ->{<Q:infoset:xmlns:>}->{xmlns}
+            } elsif ($self->{<Q::infoset:attributes>}
+                          ->{<Q::infoset:xmlns:>}->{xmlns}) {
+              my $v = $self->{<Q::infoset:attributes>}
+                           ->{<Q::infoset:xmlns:>}->{xmlns}
                            ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{textContent}__;
               if (defined $namespaceURI and $namespaceURI eq $v) {
                 $r = true;
@@ -710,9 +718,9 @@ ClassDef:
               ## If element has ancestor element
               my $n = $self;
               ANCESTOR: {
-                if ($n->{<Q:infoset:parent>}) {
-                  $n = $n->{<Q:infoset:parent>};
-                  if ($n->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
+                if ($n->{<Q::infoset:parent>}) {
+                  $n = $n->{<Q::infoset:parent>};
+                  if ($n->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
                     $r = $n->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{isDefaultNamespace}__
                                                ($namespaceURI);
                     last ANCESTOR;
@@ -723,42 +731,42 @@ ClassDef:
                 # false
               }
             }
-          } elsif ($self->{<Q:DOMCore:nodeType>} eq <Q:infoset:Document>) {
-            for (@{$self->{<Q:infoset:children>}}) {
-              if ($_->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
+          } elsif ($self->{<Q::DOMCore:nodeType>} eq <Q::infoset:Document>) {
+            for (@{$self->{<Q::infoset:children>}}) {
+              if ($_->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
                 $r = $_->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{isDefaultNamespace}__
                                                ($namespaceURI);
                 last;
               }
             }
-          } elsif ($self->{<Q:DOMCore:nodeType>} eq <Q:infoset:Attribute>) {
-            if ($self->{<Q:infoset:ownerElement>}) {
-              $r = $self->{<Q:infoset:ownerElement>}
+          } elsif ($self->{<Q::DOMCore:nodeType>} eq <Q::infoset:Attribute>) {
+            if ($self->{<Q::infoset:ownerElement>}) {
+              $r = $self->{<Q::infoset:ownerElement>}
                         ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{isDefaultNamespace}__
                                                ($namespaceURI);
               last FIND;
             }
           } elsif ({
-                     <Q:DOMXML:Entity> => 1,
-                     <Q:DOMXML:Notation> => 1,
-                     <Q:DOMXML:DocumentType> => 1,
-                     <Q:DOMCore:DocumentFragment> => 1,
-                   }->{$self->{<Q:DOMCore:nodeType>}}) {
+                     <Q::DOMXML:Entity> => 1,
+                     <Q::DOMXML:Notation> => 1,
+                     <Q::DOMXML:DocumentType> => 1,
+                     <Q::DOMCore:DocumentFragment> => 1,
+                   }->{$self->{<Q::DOMCore:nodeType>}}) {
             #
           } else {
           #} elsif ({
-          #           <Q:DOMCore:Text> => 1,
-          #           <Q:DOMCore:Comment> => 1,
-          #           <Q:DOMXML:EntityReference> => 1,
-          #           <Q:DOMXML:CDATASection> => 1,
-          #           <Q:infoset:ProcessingInstruction> => 1,
-          #         }->{$self->{<Q:DOMCore:nodeType>}}) {
+          #           <Q::DOMCore:Text> => 1,
+          #           <Q::DOMCore:Comment> => 1,
+          #           <Q::DOMXML:EntityReference> => 1,
+          #           <Q::DOMXML:CDATASection> => 1,
+          #           <Q::infoset:ProcessingInstruction> => 1,
+          #         }->{$self->{<Q::DOMCore:nodeType>}}) {
             ## If node has ancestor element
             my $n = $self;
             ANCESTOR: {
-              if ($n->{<Q:infoset:parent>}) {
-                $n = $n->{<Q:infoset:parent>};
-                if ($n->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
+              if ($n->{<Q::infoset:parent>}) {
+                $n = $n->{<Q::infoset:parent>};
+                if ($n->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
                   $r = $n->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{isDefaultNamespace}__
                                                ($namespaceURI);
                   last ANCESTOR;
@@ -812,26 +820,26 @@ ClassDef:
         @@@@@:
           $r = null;
           FIND: {
-          if ($self->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
-            if (defined $self->{<Q:infoset:localName>} and
-                defined $self->{<Q:infoset:namespaceName>} and
-                ((defined $self->{<Q:infoset:prefix>} and defined $prefix and
-                  $self->{<Q:infoset:prefix>} eq $prefix) or
-                 (not defined $self->{<Q:infoset:prefix>} and
+          if ($self->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
+            if (defined $self->{<Q::infoset:localName>} and
+                defined $self->{<Q::infoset:namespaceName>} and
+                ((defined $self->{<Q::infoset:prefix>} and defined $prefix and
+                  $self->{<Q::infoset:prefix>} eq $prefix) or
+                 (not defined $self->{<Q::infoset:prefix>} and
                   not defined $prefix))) {
-              $r = $self->{<Q:infoset:namespaceName>};
+              $r = $self->{<Q::infoset:namespaceName>};
               last FIND;
             }
-            for (values %{$self->{<Q:infoset:attributes>}->{<Q:xmlns:>}||{}}) {
-              if (defined $_->{<Q:infoset:prefix>} and defined $prefix and
-                  $_->{<Q:infoset:prefix>} eq 'xmlns' and
-                  $_->{<Q:infoset:localName>} eq $prefix) {
+            for (values %{$self->{<Q::infoset:attributes>}->{<Q::xmlns:>}||{}}) {
+              if (defined $_->{<Q::infoset:prefix>} and defined $prefix and
+                  $_->{<Q::infoset:prefix>} eq 'xmlns' and
+                  $_->{<Q::infoset:localName>} eq $prefix) {
                 ## Non default namespace
                 $r = $_->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{textContent}__;
                 $r = null unless length $r;
                 last FIND;
               } elsif (not defined $prefix and
-                       $_->{<Q:infoset:localName>} eq 'xmlns') {
+                       $_->{<Q::infoset:localName>} eq 'xmlns') {
                 ## Default namespace
                 $r = $_->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{textContent}__;
                 $r = null unless length $r;
@@ -841,9 +849,9 @@ ClassDef:
             ## If element has ancestor element
             my $n = $self;
             ANCESTOR: {
-              if ($n->{<Q:infoset:parent>}) {
-                $n = $n->{<Q:infoset:parent>};
-                if ($n->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
+              if ($n->{<Q::infoset:parent>}) {
+                $n = $n->{<Q::infoset:parent>};
+                if ($n->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
                   $r = $n->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{lookupNamespaceURI}__
                                                ($prefix);
                   last FIND;
@@ -852,42 +860,42 @@ ClassDef:
                 }
               }
             }
-          } elsif ($self->{<Q:DOMCore:nodeType>} eq <Q:infoset:Document>) {
-            for (@{$self->{<Q:infoset:children>}}) {
-              if ($_->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
+          } elsif ($self->{<Q::DOMCore:nodeType>} eq <Q::infoset:Document>) {
+            for (@{$self->{<Q::infoset:children>}}) {
+              if ($_->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
                 $r = $_->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{lookupNamespaceURI}__
                                                ($prefix);
                 last FIND;
               }
             }
-          } elsif ($self->{<Q:DOMCore:nodeType>} eq <Q:infoset:Attribute>) {
-            if ($self->{<Q:infoset:ownerElement>}) {
-              $r = $self->{<Q:infoset:ownerElement>}
+          } elsif ($self->{<Q::DOMCore:nodeType>} eq <Q::infoset:Attribute>) {
+            if ($self->{<Q::infoset:ownerElement>}) {
+              $r = $self->{<Q::infoset:ownerElement>}
                         ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{lookupNamespaceURI}__
                                                ($prefix);
               last FIND;
             }
           } elsif ({
-                     <Q:DOMXML:Entity> => 1,
-                     <Q:DOMXML:Notation> => 1,
-                     <Q:DOMXML:DocumentType> => 1,
-                     <Q:DOMCore:DocumentFragment> => 1,
-                   }->{$self->{<Q:DOMCore:nodeType>}}) {
+                     <Q::DOMXML:Entity> => 1,
+                     <Q::DOMXML:Notation> => 1,
+                     <Q::DOMXML:DocumentType> => 1,
+                     <Q::DOMCore:DocumentFragment> => 1,
+                   }->{$self->{<Q::DOMCore:nodeType>}}) {
             #
           } else {
           #} elsif ({
-          #           <Q:DOMCore:Text> => 1,
-          #           <Q:DOMCore:Comment> => 1,
-          #           <Q:DOMXML:EntityReference> => 1,
-          #           <Q:DOMXML:CDATASection> => 1,
-          #           <Q:infoset:ProcessingInstruction> => 1,
-          #         }->{$self->{<Q:DOMCore:nodeType>}}) {
+          #           <Q::DOMCore:Text> => 1,
+          #           <Q::DOMCore:Comment> => 1,
+          #           <Q::DOMXML:EntityReference> => 1,
+          #           <Q::DOMXML:CDATASection> => 1,
+          #           <Q::infoset:ProcessingInstruction> => 1,
+          #         }->{$self->{<Q::DOMCore:nodeType>}}) {
             ## If node has ancestor element
             my $n = $self;
             ANCESTOR: {
-              if ($n->{<Q:infoset:parent>}) {
-                $n = $n->{<Q:infoset:parent>};
-                if ($n->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
+              if ($n->{<Q::infoset:parent>}) {
+                $n = $n->{<Q::infoset:parent>};
+                if ($n->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
                   $r = $n->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{lookupNamespaceURI}__
                                                ($prefix);
                   last FIND;
@@ -1002,9 +1010,9 @@ ClassDef:
         @@@@Type:
           lang:Perl
         @@@@@:
-          for (@{$self->{<Q:infoset:children>}}) {
+          for (@{$self->{<Q::infoset:children>}}) {
             last if $$index < 0;
-            if ($_->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
+            if ($_->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
               if ($check->($_)) {
                 if ($$index-- == 0) {
                   $r = $_;
@@ -1015,8 +1023,8 @@ ClassDef:
                         ($check, $index);
               last if $$index == -1;
             } elsif ({
-                       <Q:DOMXML:EntityReference> => 1,
-                     }->{$_->{<Q:DOMCore:nodeType>}}) {
+                       <Q::DOMXML:EntityReference> => 1,
+                     }->{$_->{<Q::DOMCore:nodeType>}}) {
               $r = $_->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{getElementBy}__
                          ($check, $index);
               last if $$index == -1;
@@ -1052,8 +1060,8 @@ ClassDef:
           lang:Perl
         @@@@@:
           $r = [];
-          for (@{$self->{<Q:infoset:children>}}) {
-            if ($_->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
+          for (@{$self->{<Q::infoset:children>}}) {
+            if ($_->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
               if ($check->($_)) {
                 push @$r, $_;
               }
@@ -1061,14 +1069,32 @@ ClassDef:
          \         @{$_->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{getElementsBy}__
          \               ($check)};
             } elsif ({
-                       <Q:DOMXML:EntityReference> => 1,
-                     }->{$_->{<Q:DOMCore:nodeType>}}) {
+                       <Q::DOMXML:EntityReference> => 1,
+                     }->{$_->{<Q::DOMCore:nodeType>}}) {
          \    push @$r,
          \         @{$_->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{getElementsBy}__
          \               ($check)};
             }
           }
 
+
+    @ResourceDef:
+      @@QName:
+        DOMCore:getDocumentXMLVersion
+      @@rdf:type:
+        dis2pm:InlineCode
+      @@Description:
+        @@@lang:en
+        @@@@: 
+          Returns the XML version of a document.  If the document 
+          does not support the <Feature::XML> feature, 
+          <DOM::null> is returned.
+      @@PerlDef:
+        (CORE::defined $DOCOBJ->{<Q::DOMCore:hasFeature>}->{XML}
+             ? CORE::defined $DOCOBJ->{<Q::infoset:version>}
+                   ? $DOCOBJ->{<Q::infoset:version>}
+                   : '1.0'
+             : null)
 ## ClassDef:ManakaiDOMNodeObjectNode
 
 ClassDef:
@@ -1113,7 +1139,7 @@ ClassDef:
           @@@@Type:
             lang:Perl
           @@@@@:
-            $r = $self->{<Q:TreeCore:node>}->{<Q:infoset:children>}->[$index];
+            $r = $self->{<Q::TreeCore:node>}->{<Q::infoset:children>}->[$index];
             if (defined $r) {
                    ## Condition sensitive
               $r = __CLASS{Node}__->__INT{getNodeReference}__ ($r);
@@ -1135,7 +1161,7 @@ ClassDef:
           @@@@Type:
              lang:Perl
           @@@@@:
-            $r = @{$self->{<Q:TreeCore:node>}->{<Q:infoset:children>}};
+            $r = @{$self->{<Q::TreeCore:node>}->{<Q::infoset:children>}};
 
   @IntMethod:
     @@Name: isEqualNodeList
@@ -1161,16 +1187,16 @@ ClassDef:
           lang:Perl
         @@@@@:
    \      EQ: {
-   \        last EQ unless @{$self->{<Q:TreeCore:node>}
-   \                              ->{<Q:infoset:children>}} ==
-   \                       @{$arg->{<Q:TreeCore:node>}
-                                 ->{<Q:infoset:children>}};
-            for my $i (0..$#{$self->{<Q:TreeCore:node>}
-                                  ->{<Q:infoset:children>}}) {
-              unless ($self->{<Q:TreeCore:node>}
-                                  ->{<Q:infoset:children>}->[$i] ==
-                      $arg->{<Q:TreeCore:node>}
-                                  ->{<Q:infoset:children>}->[$i]) {
+   \        last EQ unless @{$self->{<Q::TreeCore:node>}
+   \                              ->{<Q::infoset:children>}} ==
+   \                       @{$arg->{<Q::TreeCore:node>}
+                                 ->{<Q::infoset:children>}};
+            for my $i (0..$#{$self->{<Q::TreeCore:node>}
+                                  ->{<Q::infoset:children>}}) {
+              unless ($self->{<Q::TreeCore:node>}
+                                  ->{<Q::infoset:children>}->[$i] ==
+                      $arg->{<Q::TreeCore:node>}
+                                  ->{<Q::infoset:children>}->[$i]) {
                 last EQ;
               }
             }
@@ -1224,9 +1250,9 @@ ClassDef:
          @@@@Type:
            lang:Perl
          @@@@@:
-           $r = $self->{<Q:TreeCore:node>}
+           $r = $self->{<Q::TreeCore:node>}
                      ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{getElementBy}__
-                         ($self->{<Q:ManakaiDOMCore:nodeMatch>}, \$index);
+                         ($self->{<Q::ManakaiDOMCore:nodeMatch>}, \$index);
            if (defined $r) {
                   ## Conditional
              $r = __CLASS{Node}__->__INT{getNodeReference}__ ($r, $self);
@@ -1252,9 +1278,9 @@ ClassDef:
           @@@@Type:
             lang:Perl
           @@@@@:
-            my $l = $self->{<Q:TreeCore:node>}
+            my $l = $self->{<Q::TreeCore:node>}
                          ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{getElementsBy}__
-                             ($self->{<Q:ManakaiDOMCore:nodeMatch>});
+                             ($self->{<Q::ManakaiDOMCore:nodeMatch>});
             $r = @$l;
 ## IF:ManakaiDOMGetElementsNodeList
 
@@ -1315,18 +1341,18 @@ ClassDef:
         @@@@Type:
           lang:Perl
         @@@@@:
-            my $attr = $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>};
-            if ($attr->{<Q:ManakaiDOM:noNS>}->{$name}) {
-              $r = $attr->{<Q:ManakaiDOM:noNS>}->{$name};
-              __WHEN{IS{<Q:DOMCore:removeAttribute>}::
-                delete $attr->{<Q:ManakaiDOM:noNS>};
+            my $attr = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>};
+            if ($attr->{<Q::ManakaiDOM:noNS>}->{$name}) {
+              $r = $attr->{<Q::ManakaiDOM:noNS>}->{$name};
+              __WHEN{IS{<Q::DOMCore:removeAttribute>}::
+                delete $attr->{<Q::ManakaiDOM:noNS>};
               }__;
             } elsif ($name eq 'xmlns') {
-              for my $a (keys %{$attr->{<Q:xmlns:>}||{}}) {
-                if ($attr->{<Q:xmlns:>}->{$a}->{<Q:infoset:localName>}) {
-                  $r = $attr->{<Q:xmlns:>}->{$a};
-                  __WHEN{IS{<Q:DOMCore:removeAttribute>}::
-                    delete $attr->{<Q:xmlns:>}->{$a};
+              for my $a (keys %{$attr->{<Q::xmlns:>}||{}}) {
+                if ($attr->{<Q::xmlns:>}->{$a}->{<Q::infoset:localName>}) {
+                  $r = $attr->{<Q::xmlns:>}->{$a};
+                  __WHEN{IS{<Q::DOMCore:removeAttribute>}::
+                    delete $attr->{<Q::xmlns:>}->{$a};
                   }__;
                   last;
                 }
@@ -1335,23 +1361,23 @@ ClassDef:
               # 
             } else {
               for my $ns (keys %$attr) {
-                if ($ns eq <Q:ManakaiDOM:noNS>) {
+                if ($ns eq <Q::ManakaiDOM:noNS>) {
                   # 
                 } else {
                   for my $a (keys %{$attr->{$ns}||{}}) {
-                    if (defined $attr->{$ns}->{$a}->{<Q:infoset:prefix>} and
-                        $attr->{$ns}->{$a}->{<Q:infoset:prefix>}.':'.
-                        $attr->{$ns}->{$a}->{<Q:infoset:localName>} eq $name) {
+                    if (defined $attr->{$ns}->{$a}->{<Q::infoset:prefix>} and
+                        $attr->{$ns}->{$a}->{<Q::infoset:prefix>}.':'.
+                        $attr->{$ns}->{$a}->{<Q::infoset:localName>} eq $name) {
                       $r = $attr->{$ns}->{$a};
-                      __WHEN{IS{<Q:DOMCore:removeAttribute>}::
+                      __WHEN{IS{<Q::DOMCore:removeAttribute>}::
                         delete $attr->{$ns}->{$a};
                       }__;
                       last;
-                    } elsif (not defined $attr->{$ns}->{$a}->{<Q:infoset:prefix>}
+                    } elsif (not defined $attr->{$ns}->{$a}->{<Q::infoset:prefix>}
                          and
-                         $attr->{$ns}->{$a}->{<Q:infoset:localName>} eq $name) {
+                         $attr->{$ns}->{$a}->{<Q::infoset:localName>} eq $name) {
                       $r = $attr->{$ns}->{$a};
-                      __WHEN{IS{<Q:DOMCore:removeAttribute>}::
+                      __WHEN{IS{<Q::DOMCore:removeAttribute>}::
                         delete $attr->{$ns}->{$a};
                       }__;
                       last;
@@ -1484,68 +1510,68 @@ ClassDef:
            @@@@Type:
              lang:Perl
            @@@@@:
-            if ($self->{<Q:TreeCore:node>}->{<Q:DOMCore:read-only>}) {
+            if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:read-only>}) {
               __EXCEPTION{
                 DOMException.NO_MODIFICATION_ALLOWED_ERR.
                 MDOM_EXCEPTION:NOMOD_THIS::
               }__;
             }
-            my $attrNode = $arg->{<Q:TreeCore:node>};
-            if ($attrNode->{<Q:infoset:ownerElement>}) {
+            my $attrNode = $arg->{<Q::TreeCore:node>};
+            if ($attrNode->{<Q::infoset:ownerElement>}) {
               __EXCEPTION{
                 DOMException.INUSE_ATTRIBUTE_ERR::
-                  <Q:MDOM_EXCEPTION:param-name> => 'arg',
+                  <Q::MDOM_EXCEPTION:param-name> => 'arg',
               }__;
-            } elsif ($attrNode->{<Q:DOMCore:ownerDocument>}
-                              ->{<Q:TreeCore:nodeID>} ne
-                     $self->{<Q:TreeCore:node>}->{<Q:DOMCore:ownerDocument>}
-                          ->{<Q:TreeCore:nodeID>}) {
+            } elsif ($attrNode->{<Q::DOMCore:ownerDocument>}
+                              ->{<Q::TreeCore:nodeID>} ne
+                     $self->{<Q::TreeCore:node>}->{<Q::DOMCore:ownerDocument>}
+                          ->{<Q::TreeCore:nodeID>}) {
               __EXCEPTION{
                 DOMException.WRONG_DOCUMENT_ERR::
               }__;
-            } elsif ($attrNode->{<Q:DOMCore:nodeType>} ne
-                     <Q:infoset:Attribute>) {
+            } elsif ($attrNode->{<Q::DOMCore:nodeType>} ne
+                     <Q::infoset:Attribute>) {
               __EXCEPTION{
                 DOMException.HIERARCHY_REQUEST_ERR.
                 MDOM_EXCEPTION:HIERARCHY_BAD_TYPE::
-                  <Q:MDOM_EXCEPTION:param-name> => 'arg',
-                  <Q:DOMCore:nodeType> => $attrNode->{<Q:DOMCore:nodeType>},
+                  <Q::MDOM_EXCEPTION:param-name> => 'arg',
+                  <Q::DOMCore:nodeType> => $attrNode->{<Q::DOMCore:nodeType>},
               }__;
             }
 
-            if (defined $attrNode->{<Q:infoset:localName>}) {
-              $r = $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>}
-                     ->{defined $attrNode->{<Q:infoset:namespaceName>}
-                              ? $attrNode->{<Q:infoset:namespaceName>}
-                              : <Q:null:>}
-                     ->{$attrNode->{<Q:infoset:localName>}};
+            if (defined $attrNode->{<Q::infoset:localName>}) {
+              $r = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                     ->{defined $attrNode->{<Q::infoset:namespaceName>}
+                              ? $attrNode->{<Q::infoset:namespaceName>}
+                              : <Q::null:>}
+                     ->{$attrNode->{<Q::infoset:localName>}};
             } else {
-              $r = $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>}
-                     ->{<Q:ManakaiDOM:noNS>}
-                     ->{$attrNode->{<Q:DOMCore:name>}};
+              $r = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                     ->{<Q::ManakaiDOM:noNS>}
+                     ->{$attrNode->{<Q::DOMCore:name>}};
             }
 
-            if ($r->{<Q:TreeCore:nodeID>} eq $attrNode->{<Q:TreeCore:nodeID>}) {
+            if ($r->{<Q::TreeCore:nodeID>} eq $attrNode->{<Q::TreeCore:nodeID>}) {
               __WARNING{
                 ManakaiDOMImplementationException.
                 MDOM_REPLACE_BY_ITSELF_NO_EFFECT::
               }__;
               $r = $arg;
             } else {
-              $attrNode->{<Q:infoset:ownerElement>} = $self->{<Q:TreeCore:node>};
-              if (defined $attrNode->{<Q:infoset:localName>}) {
-                $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>}
-                     ->{defined $attrNode->{<Q:infoset:namespaceName>}
-                              ? $attrNode->{<Q:infoset:namespaceName>}
-                              : <Q:null:>}
-                     ->{$attrNode->{<Q:infoset:localName>}} = $attrNode;
+              $attrNode->{<Q::infoset:ownerElement>} = $self->{<Q::TreeCore:node>};
+              if (defined $attrNode->{<Q::infoset:localName>}) {
+                $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                     ->{defined $attrNode->{<Q::infoset:namespaceName>}
+                              ? $attrNode->{<Q::infoset:namespaceName>}
+                              : <Q::null:>}
+                     ->{$attrNode->{<Q::infoset:localName>}} = $attrNode;
               } else {
-                $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>}
-                     ->{<Q:ManakaiDOM:noNS>}
-                     ->{$attrNode->{<Q:DOMCore:name>}} = $attrNode;
+                $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                     ->{<Q::ManakaiDOM:noNS>}
+                     ->{$attrNode->{<Q::DOMCore:name>}} = $attrNode;
               }
               if ($r) {
-                delete $r->{<Q:infoset:parent>};
+                delete $r->{<Q::infoset:parent>};
                 $r->__SUPER{ManakaiDOMNodeObject::}__::__INT{orphanate}__;
                      ## Condition sensitive
                 $r = __CLASS{Node}__->__INT{getNodeReference}__ ($r, $self)
@@ -1612,15 +1638,15 @@ ClassDef:
           @@@@Type:
             lang:Perl
           @@@@@:
-            if ($self->{<Q:TreeCore:node>}->{<Q:DOMCore:read-only>}) {
+            if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:read-only>}) {
               __EXCEPTION{
                 DOMException.NO_MODIFICATION_ALLOWED_ERR.
                 MDOM_EXCEPTION:NOMOD_THIS::
               }__;
             }
-            __INT{{selectAttrNodeObject: <Q:DOMCore:removeAttribute>}}__;
+            __INT{{selectAttrNodeObject: <Q::DOMCore:removeAttribute>}}__;
             if ($r) {
-              delete $r->{<Q:infoset:ownerElement>};
+              delete $r->{<Q::infoset:ownerElement>};
               $r->__SUPER{ManakaiDOMNodeObject::}__::__INT{orphanate}__;
                   ## Condition sensitive
               $r = __CLASS{Node}__->__INT{getNodeReference}__ ($r, $self)
@@ -1675,12 +1701,12 @@ ClassDef:
             lang:Perl
           @@@@@:
             my $i = 0;
-            FIND: for my $ns (sort keys %{$self->{<Q:TreeCore:node>}
-                                               ->{<Q:infoset:attributes>}}) {
-              for my $ln (sort keys %{$self->{<Q:TreeCore:node>}
-                                           ->{<Q:infoset:attributes>}->{$ns}}) {
+            FIND: for my $ns (sort keys %{$self->{<Q::TreeCore:node>}
+                                               ->{<Q::infoset:attributes>}}) {
+              for my $ln (sort keys %{$self->{<Q::TreeCore:node>}
+                                           ->{<Q::infoset:attributes>}->{$ns}}) {
                 if ($i++ == $index) {
-                  $r = $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>}
+                  $r = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
                             ->{$ns}->{$ln};
                   last FIND;
                 }
@@ -1710,7 +1736,7 @@ ClassDef:
           @@@@Type:
             lang:Perl
           @@@@@:
-            for (values %{$self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>}}) {
+            for (values %{$self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}}) {
               $r += keys %$_;
             }
 
@@ -1760,10 +1786,10 @@ ClassDef:
           @@@@Type:
             lang:Perl
           @@@@@:
-            my $attr = $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>};
-            $namespaceURI = <Q:null:> unless defined $namespaceURI;
+            my $attr = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>};
+            $namespaceURI = <Q::null:> unless defined $namespaceURI;
             $r = $attr->{$namespaceURI}->{$localName};
-            __WHEN{IS{<Q:DOMCore:removeAttribute>}::
+            __WHEN{IS{<Q::DOMCore:removeAttribute>}::
               delete $attr->{$namespaceURI}->{$localName} if $r;
             }__;
     @@ImplNote:
@@ -1931,70 +1957,70 @@ ClassDef:
            @@@@Type:
              lang:Perl
            @@@@@:
-            if ($self->{<Q:TreeCore:node>}->{<Q:DOMCore:read-only>}) {
+            if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:read-only>}) {
               __EXCEPTION{
                 DOMException.NO_MODIFICATION_ALLOWED_ERR.
                 MDOM_EXCEPTION:NOMOD_THIS::
               }__;
             }
-            my $attrNode = $arg->{<Q:TreeCore:node>};
-            if ($attrNode->{<Q:infoset:ownerElement>}) {
+            my $attrNode = $arg->{<Q::TreeCore:node>};
+            if ($attrNode->{<Q::infoset:ownerElement>}) {
               __EXCEPTION{
                 DOMException.INUSE_ATTRIBUTE_ERR::
-                  <Q:MDOM_EXCEPTION:param-name> => 'arg',
+                  <Q::MDOM_EXCEPTION:param-name> => 'arg',
               }__;
-            } elsif ($attrNode->{<Q:DOMCore:ownerDocument>}
-                              ->{<Q:TreeCore:nodeID>} ne
-                     $self->{<Q:TreeCore:node>}->{<Q:DOMCore:ownerDocument>}
-                          ->{<Q:TreeCore:nodeID>}) {
+            } elsif ($attrNode->{<Q::DOMCore:ownerDocument>}
+                              ->{<Q::TreeCore:nodeID>} ne
+                     $self->{<Q::TreeCore:node>}->{<Q::DOMCore:ownerDocument>}
+                          ->{<Q::TreeCore:nodeID>}) {
               __EXCEPTION{
                 DOMException.WRONG_DOCUMENT_ERR::
               }__;
-            } elsif ($attrNode->{<Q:DOMCore:nodeType>} ne
-                     <Q:infoset:Attribute>) {
+            } elsif ($attrNode->{<Q::DOMCore:nodeType>} ne
+                     <Q::infoset:Attribute>) {
               __EXCEPTION{
                 DOMException.HIERARCHY_REQUEST_ERR.
                 MDOM_EXCEPTION:HIERARCHY_BAD_TYPE::
-                  <Q:MDOM_EXCEPTION:param-name> => 'arg',
-                  <Q:DOMCore:nodeType> => $attrNode->{<Q:DOMCore:nodeType>},
+                  <Q::MDOM_EXCEPTION:param-name> => 'arg',
+                  <Q::DOMCore:nodeType> => $attrNode->{<Q::DOMCore:nodeType>},
               }__;
             }
 
-            if (defined $attrNode->{<Q:infoset:localName>}) {
-              $r = $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>}
-                     ->{defined $attrNode->{<Q:infoset:namespaceName>}
-                              ? $attrNode->{<Q:infoset:namespaceName>}
-                              : <Q:null:>}
-                     ->{$attrNode->{<Q:infoset:localName>}};
+            if (defined $attrNode->{<Q::infoset:localName>}) {
+              $r = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                     ->{defined $attrNode->{<Q::infoset:namespaceName>}
+                              ? $attrNode->{<Q::infoset:namespaceName>}
+                              : <Q::null:>}
+                     ->{$attrNode->{<Q::infoset:localName>}};
             } else {
               __EXCEPTION{
                 DOMException.NOT_SUPPORTED_ERR.
                 MDOM_EXCEPTION:MDOM_NODE_NOSUPPORT_XMLNS::
-                  <Q:MDOM_EXCEPTION:param-name> => 'arg',
+                  <Q::MDOM_EXCEPTION:param-name> => 'arg',
               }__;
             }
 
-            if ($r->{<Q:TreeCore:nodeID>} eq $attrNode->{<Q:TreeCore:nodeID>}) {
+            if ($r->{<Q::TreeCore:nodeID>} eq $attrNode->{<Q::TreeCore:nodeID>}) {
               __WARNING{
                 ManakaiDOMImplementationException.
                 MDOM_REPLACE_BY_ITSELF_NO_EFFECT::
               }__;
               $r = $arg;
             } else {
-              $attrNode->{<Q:infoset:ownerElement>} = $self->{<Q:TreeCore:node>};
-              if (defined $attrNode->{<Q:infoset:localName>}) {
-                $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>}
-                     ->{defined $attrNode->{<Q:infoset:namespaceName>}
-                              ? $attrNode->{<Q:infoset:namespaceName>}
-                              : <Q:null:>}
-                     ->{$attrNode->{<Q:infoset:localName>}} = $attrNode;
+              $attrNode->{<Q::infoset:ownerElement>} = $self->{<Q::TreeCore:node>};
+              if (defined $attrNode->{<Q::infoset:localName>}) {
+                $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                     ->{defined $attrNode->{<Q::infoset:namespaceName>}
+                              ? $attrNode->{<Q::infoset:namespaceName>}
+                              : <Q::null:>}
+                     ->{$attrNode->{<Q::infoset:localName>}} = $attrNode;
               } else {
-                $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>}
-                     ->{<Q:ManakaiDOM:noNS>}
-                     ->{$attrNode->{<Q:DOMCore:name>}} = $attrNode;
+                $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                     ->{<Q::ManakaiDOM:noNS>}
+                     ->{$attrNode->{<Q::DOMCore:name>}} = $attrNode;
               }
               if ($r) {
-                delete $r->{<Q:infoset:parent>};
+                delete $r->{<Q::infoset:parent>};
                 $r->__SUPER{ManakaiDOMNodeObject::}__::__INT{orphanate}__;
                      ## Condition sensitive
                 $r = __CLASS{Node}__->__INT{getNodeReference}__ ($r, $self)
@@ -2089,15 +2115,15 @@ ClassDef:
           @@@@Type:
             lang:Perl
           @@@@@:
-            if ($self->{<Q:TreeCore:node>}->{<Q:DOMCore:read-only>}) {
+            if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:read-only>}) {
               __EXCEPTION{
                 DOMException.NO_MODIFICATION_ALLOWED_ERR.
                 MDOM_EXCEPTION:NOMOD_THIS::
               }__;
             }
-            __INT{{selectAttrNodeObjectNS: <Q:DOMCore:removeAttribute>}}__;
+            __INT{{selectAttrNodeObjectNS: <Q::DOMCore:removeAttribute>}}__;
             if ($r) {
-              delete $r->{<Q:infoset:ownerElement>};
+              delete $r->{<Q::infoset:ownerElement>};
               $r->__SUPER{ManakaiDOMNodeObject::}__::__INT{orphanate}__;
                      ## Condition sensitive
               $r = __CLASS{Node}__->__INT{getNodeReference}__ ($r, $self)
@@ -2151,22 +2177,22 @@ ClassDef:
           lang:Perl
         @@@@@:
           EQ: {
-            for my $ns (keys %{$self->{<Q:TreeCore:node>}
-                                    ->{<Q:infoset:attributes>}}) {
-              last EQ unless $arg->{<Q:TreeCore:node>}
-                                 ->{<Q:infoset:attributes>}->{$ns};
-              last EQ unless keys (%{$arg->{<Q:TreeCore:node>}
-                                 ->{<Q:infoset:attributes>}->{$ns}}) ==
-                             keys (%{$self->{<Q:TreeCore:node>}
-                                 ->{<Q:infoset:attributes>}->{$ns}});
-              for my $ln (keys %{$self->{<Q:TreeCore:node>}
-                                      ->{<Q:infoset:attributes>}->{$ns}}) {
-                last EQ unless $arg->{<Q:TreeCore:node>}
-                                   ->{<Q:infoset:attributes>}->{$ns}->{$ln};
-                last EQ unless $self->{<Q:TreeCore:node>}
-                                    ->{<Q:infoset:attributes>}->{$ns}->{$ln} ==
-                               $arg->{<Q:TreeCore:node>}
-                                    ->{<Q:infoset:attributes>}->{$ns}->{$ln};
+            for my $ns (keys %{$self->{<Q::TreeCore:node>}
+                                    ->{<Q::infoset:attributes>}}) {
+              last EQ unless $arg->{<Q::TreeCore:node>}
+                                 ->{<Q::infoset:attributes>}->{$ns};
+              last EQ unless keys (%{$arg->{<Q::TreeCore:node>}
+                                 ->{<Q::infoset:attributes>}->{$ns}}) ==
+                             keys (%{$self->{<Q::TreeCore:node>}
+                                 ->{<Q::infoset:attributes>}->{$ns}});
+              for my $ln (keys %{$self->{<Q::TreeCore:node>}
+                                      ->{<Q::infoset:attributes>}->{$ns}}) {
+                last EQ unless $arg->{<Q::TreeCore:node>}
+                                   ->{<Q::infoset:attributes>}->{$ns}->{$ln};
+                last EQ unless $self->{<Q::TreeCore:node>}
+                                    ->{<Q::infoset:attributes>}->{$ns}->{$ln} ==
+                               $arg->{<Q::TreeCore:node>}
+                                    ->{<Q::infoset:attributes>}->{$ns}->{$ln};
               }
             }
             $r = true;

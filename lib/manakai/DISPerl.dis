@@ -15,7 +15,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/19 10:57:49 $
+      $Date: 2004/12/26 09:24:37 $
     @@ContentType:
       dis:Date.RCS
   
@@ -43,7 +43,7 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @owl:
     http://www.w3.org/2002/07/owl#
-  @perl:
+  @Perl:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
@@ -87,35 +87,35 @@ DataTypeDef:
 
 DataTypeDef:
   @QName:
-    perl:Scalar
+    Perl:Scalar
   @FullName:
     @@lang:en
     @@@: Perl Scalar Value
 
 DataTypeDef:
   @QName:
-    perl:Array
+    Perl:Array
   @FullName:
     @@lang:en
     @@@: Perl Array
 
 DataTypeDef:
   @QName:
-    perl:ARRAY
+    Perl:ARRAY
   @FullName:
     @@lang:en
     @@@: Perl array reference
 
 DataTypeDef:
   @QName:
-    perl:Hash
+    Perl:Hash
   @FullName:
     @@lang:en
     @@@: Perl Hash
 
 DataTypeDef:
   @QName:
-    perl:hash
+    Perl:hash
   @FullName:
     @@lang:en
     @@@: Perl hash reference
@@ -129,6 +129,20 @@ PropDef:
     @@lang:en
     @@@:
       A string suffixing module names.
+
+DataTypeDef:
+  @QName: MemRef
+  @Description:
+    @@lang:en
+    @@@:
+      A reference to a member of a class. 
+      \
+      MemRef := [dis:TFQNames] "." NCName
+      \
+      The optional C<dis:TFQNames> identifiers the class to which the 
+      member referred belongs.  The NCName is the name of 
+      the member (either a method name or a capitalized attribute 
+      name prefixed with "get" or "set").
 
 ## -- The dis:Perl tree language vocabulary
 
@@ -213,6 +227,10 @@ BlockElementType:
 
 BlockElementType:
   @QName:
+    disPerl:DEEP
+
+BlockElementType:
+  @QName:
     disPerl:EXCEPTION
 
 BlockElementType:
@@ -226,6 +244,30 @@ BlockElementType:
     @@lang:en
     @@@:
       <QUOTE::For> selection.
+
+BlockElementType:
+  @QName: 
+    disPerl:FILE
+  @Description:
+    @@lang:en
+    @@@:
+       The name of source file. 
+
+BlockElementType:
+  @QName:
+    disPerl:LINE
+  @Description:
+    @@lang:en
+    @@@:
+      The line number in source code.
+
+BlockElementType:
+  @QName:
+    disPerl:PACKAGE
+  @Description:
+    @@lang:en
+    @@@:
+      The current Perl package name. 
 
 ## -- The dis:Perl inline preprocessing vocabulary
 
@@ -303,6 +345,9 @@ InlineElementType:
 InlineElementType:
   @QName:
     disPerl:C
+  @Description:
+    @@lang:en
+    @@@: A constant value.
 
 InlineElementType:
   @QName:
