@@ -19,6 +19,7 @@ This script is part of manakai.
 =cut
 
 use strict;
+use lib qw<../../ ../../../bin>;
 use Message::Markup::SuikaWikiConfig20::Parser;
 use Message::Markup::XML::QName qw/DEFAULT_PFX/;
 use Message::Util::QName::General [qw/ExpandedURI/], { 
@@ -44,103 +45,10 @@ my $s;
 my $source = Message::Markup::SuikaWikiConfig20::Parser->parse_text ($s);
 my $Info = {};
 my $Status = {package => 'main', depth => 0, generated_fragment => 0};
-my $result = '';
+our $result = '';
 
-sub output_result ($) {
-  print shift;
-}
-
-## Source file might be broken
-sub valid_err ($;%) {
-  my ($s, %opt) = @_;
-  require Carp;
-  output_result $result;
-  if ($opt{node}) {
-    $s = $opt{node}->node_path (key => 'Name') . ': ' . $s;
-  }
-  Carp::croak ($s);
-}
-sub valid_warn ($;%) {
-  my ($s, %opt) = @_;
-  require Carp;
-  if ($opt{node}) {
-    $s = $opt{node}->node_path (key => 'Name') . ': ' . $s;
-  }
-  Carp::carp ($s);
-}
-
-## Implementation (this script) might be broken
-sub impl_err (@) {
-  require Carp;
-  Carp::croak (@_);
-}
-sub impl_warn (@) {
-  require Carp;
-  Carp::carp (@_);
-}
-
-
-sub english_number ($;%) {
-  my ($num, %opt) = @_;
-  if ($num == 0) {
-    qq<no $opt{singular}>;
-  } elsif ($num == 1) {
-    qq<a $opt{singular}>;
-  } elsif ($num < 0) {
-    qq<$num $opt{plural}>;
-  } elsif ($num < 10) {
-    [qw/0 1 two three four five seven six seven eight nine/]->[$num] . ' ' .
-    $opt{plural};
-  } else {
-    qq<$num $opt{plural}>;
-  }
-} # english_number
-
-sub english_list ($;%) {
-  my ($list, %opt) = @_;
-  if (@$list > 1) {
-    $opt{connector} = defined $opt{connector}
-                          ? qq< $opt{connector} > : qq<, >;
-    join (', ', @$list[0..($#$list-1)]).$opt{connector}.
-    $list->[-1];
-  } else {
-    $list->[0];
-  }
-} # english_list
-
-
-sub perl_comment ($) {
-  my $s = shift;
-  $s =~ s/\n/\n## /g;
-  $s =~ s/\n## $/\n/s;
-  $s .= "\n" unless $s =~ /\n$/;
-  $s = q<## > . $s;
-  $s;
-}
-
-sub perl_statement ($) {
-  my $s = shift;
-  $s . ";\n";
-}
-
-sub perl_assign ($@) {
-  my ($left, @right) = @_;
-  $left . ' = ' . (@right > 1 ? '(' . join (', ', @right) . ')' : $right[0]);
-}
-
-sub perl_name ($;%) {
-  my ($s, %opt) = @_;
-  valid_err q<Uninitialized value in name>, node => $opt{node}
-    unless defined $s;
-  $s =~ s/[- ](.|$)/uc $1/ge;
-  $s = ucfirst $s if $opt{ucfirst};
-  $s = uc $s if $opt{uc};
-  $s;
-}
-
-sub perl_internal_name ($) {
-  my $s = shift;
-  '_' . perl_name $s;
+BEGIN {
+  require 'genlib.pl';
 }
 
 sub perl_package_name (%) {
@@ -227,53 +135,33 @@ sub perl_package (%) {
   }
 }
 
-sub perl_inherit ($;$) {
-  my ($isa, $mod) = @_;
-  if ($mod) {
-    perl_statement 'push ' . perl_var (type => '@',
-                                       local_name => 'ISA',
-                                       package => {full_name => $mod}) .
-                   ', ' . perl_list (@$isa);
+sub perl_exception (@) {
+  my %opt = @_;
+  if ($opt{class} !~ /:/) {
+    $opt{class} = perl_package_name name => $opt{class};
   } else {
-    perl_statement 'push our @ISA, ' . perl_list (@$isa);
+    $opt{class} = perl_package_name full_name => $opt{class};
   }
-}
-
-sub perl_sub (%) {
-  my %opt = @_;
-  my $r = 'sub ';
-  $r .= $opt{name} . ' ' if $opt{name};
-  $r .= '(' . $opt{prototype} . ') ' if defined $opt{prototype};
-  $r .= "{\n";
-  $r .= $opt{code};
-  $r .= "}\n";
-}
-
-sub perl_cases (@) {
-  my $r = '';
-  while (my ($when, $code) = splice @_, 0, 2) {
-    $r .= qq<} elsif ($when) {\n$code\n>;
+  my @param = (-type => $opt{type},
+               -object => perl_code_literal ('$self'));
+  if (ref $opt{param}) {
+    push @param, %{$opt{param}};
+  } elsif ($opt{param}) {
+    push @param, perl_code_literal ($opt{param});
   }
-  $r =~ s/^\} els//;
-  $r .= qq<}\n> if $r;
-  $r = "\n" . $r if $r;
-  $r;
+  if ($opt{subtype} or $opt{subtype_uri}) {
+    my $uri = $opt{subtype_uri} || expanded_uri ($opt{subtype});
+    push @param, ExpandedURI q<MDOM_EXCEPTION:subtype> => $uri;
+  }
+  q<report > . $opt{class} . q< > . perl_list @param;
 }
 
-sub perl_var (%) {
-  my %opt = @_;
-  my $r = $opt{type} || '';                   # $, @, *, &, $# or empty
-  $r = $opt{scope} . ' ' . $r if $opt{scope}; # my, our or local
-  $r .= perl_package_name (%{$opt{package}}) . '::' if $opt{package};
-  $r .= $opt{local_name};
-  $r;
-}
 
 {
 use re 'eval';
 my $RegBlockContent;
 $RegBlockContent = qr/(?>[^{}\\]*)(?>(?>[^{}\\]+|\\.|\{(??{$RegBlockContent})\})*)/s;
-sub perl_code ($;%);
+## Defined by genlib.pl but overridden.
 sub perl_code ($;%) {
   my ($s, %opt) = @_;
   valid_err q<Uninitialized value in perl_code>,
@@ -402,6 +290,16 @@ sub perl_code ($;%) {
   }goex;
   $s;
 }
+}
+
+## Defined in genlib.pl but overridden.
+sub perl_code_source ($%) {
+  my ($s, %opt) = @_;
+  sprintf qq<\n#line %d "File <%s> Node <%s>"\n%s\n> .
+          qq<#line 1 "File <%s> Chunk #%d"\n>,
+    $opt{line} || 1, $opt{file} || $Info->{source_filename},
+    $opt{path} || 'x:unknown ()', $s, 
+    $opt{file} || $Info->{source_filename}, ++$Status->{generated_fragment};
 }
 
 sub perl_builtin_code ($;%);
@@ -649,6 +547,7 @@ sub perl_builtin_code ($;%) {
                {q<$qname =~ /\A\p{InXMLNameStartChar11}>.
                 q<\p{InXMLNameChar11}*\z/>}ge;
     my %class;
+
     if ($opt{version} and $opt{version} eq '1.0') {
       $r = $chk10;
       %class = (qw/InXML_NameStartChar10 InXMLNameChar10/);
@@ -895,88 +794,6 @@ sub perl_builtin_code ($;%) {
   $r;
 }
 
-sub perl_code_source ($%) {
-  my ($s, %opt) = @_;
-  sprintf qq<\n#line %d "File <%s> Node <%s>"\n%s\n> .
-          qq<#line 1 "File <%s> Chunk #%d"\n>,
-    $opt{line} || 1, $opt{file} || $Info->{source_filename},
-    $opt{path} || 'x:unknown ()', $s, 
-    $opt{file} || $Info->{source_filename}, ++$Status->{generated_fragment};
-}
-
-sub perl_code_literal ($) {
-  my $s = shift;
-  bless \$s, '__code';
-}
-
-sub perl_literal ($) {
-  my $s = shift;
-  unless (defined $s) {
-    impl_warn q<Undefined value is passed to perl_literal ()>;
-    return q<undef>;
-  } elsif (ref $s eq 'ARRAY') {
-    return q<[> . perl_list (@$s) . q<]>;
-  } elsif (ref $s eq 'HASH') {
-    return q<{> . perl_list (%$s) . q<}>;
-  } elsif (ref $s eq 'CODE') {
-    impl_err q<CODE reference cannot be serialized>;
-  } elsif (ref $s eq '__code') {
-    return $$s;
-  } else {
-    ## NOTE: Don't change quote char - perl_code depends this quote.
-    $s =~ s/(['\\])/\\$1/g;
-    return q<'> . $s . q<'>;
-  }
-}
-
-sub perl_list (@) {
-  join ', ', map perl_literal $_, @_;
-}
-
-sub perl_exception (@) {
-  my %opt = @_;
-  if ($opt{class} !~ /:/) {
-    $opt{class} = perl_package_name name => $opt{class};
-  } else {
-    $opt{class} = perl_package_name full_name => $opt{class};
-  }
-  my @param = (-type => $opt{type},
-               -object => perl_code_literal ('$self'));
-  if (ref $opt{param}) {
-    push @param, %{$opt{param}};
-  } elsif ($opt{param}) {
-    push @param, perl_code_literal ($opt{param});
-  }
-  if ($opt{subtype} or $opt{subtype_uri}) {
-    my $uri = $opt{subtype_uri} || expanded_uri ($opt{subtype});
-    push @param, ExpandedURI q<MDOM_EXCEPTION:subtype> => $uri;
-  }
-  q<report > . $opt{class} . q< > . perl_list @param;
-}
-
-sub perl_if ($$;$) {
-  my ($condition, $true, $false) = @_;
-  my $if = q<if>;
-  unless (defined $true) {
-    $if = q<unless>;
-    $true = $false;
-    $false = undef;
-  }
-  for ($true, $false) {
-    $_ = "\n" . $_ if $_ and /\A#\w+/;
-  }
-  my $r = qq<\n$if ($condition) {\n>.
-          qq<  $true>.
-          qq<}>;
-  if (defined $false) {
-     $r .=  qq< else {\n>.
-           qq<  $false>.
-           qq<}>;
-  }
-  $r .= qq<\n>;
-  $r;
-} # perl_if
-
 sub ops2perl () {
   my $result = '';
   for (keys %{$Status->{Operator}}) {
@@ -1029,152 +846,6 @@ sub ops2perl () {
   $result;
 }
 
-
-sub pod_comment (@) {
-  (q<=begin comment>, @_, q<=end comment>);
-}
-
-sub pod_block (@) {
-  my @v = grep ((defined and length), @_);
-  join "\n\n", '', ($v[0] =~ /^=/ ? () : '=pod'), @v, '=cut', '';
-}
-
-sub pod_head ($$) {
-  my ($level, $s) = @_;
-  $s =~ s/\s+/ /g;
-  if ($level < 5) {
-    '=head' . $level . ' ' . $s;  ## pod has only head1-head4.
-  } else {
-    'B<' . $s . '>';
-  }
-}
-
-sub pod_list ($@) {
-  my $m = shift;
-  ('=over ' . $m, @_, '=back');
-}
-
-sub pod_item ($) {
-  my ($s) = @_;
-  valid_err q<Uninitialized value in pod_item> unless defined $s;
-  $s =~ s/\s+/ /g;
-  '=item ' . $s;
-}
-
-sub pod_pre ($) {
-  my $s = shift;
-  return '' unless defined $s;
-  $s =~ s/\n/\n  /g;
-  '  ' . $s;
-}
-
-sub pod_para ($) {
-  my $s = shift;
-  return '' unless defined $s;
-  $s =~ s/\n\s+/\n/g;
-  $s;
-}
-
-sub pod_paras ($) {
-  shift;
-}
-
-sub pod_cdata ($) {
-  my $s = shift;
-  $s =~ s/([<>])/{'<' => 'E<lt>', '>' => 'E<gt>'}->{$1}/ge;
-  $s;
-}
-
-sub pod_code ($) {
-  my $s = shift;
-  $s =~ s/([<>])/{'<' => 'E<lt>', '>' => 'E<gt>'}->{$1}/ge;
-  qq<C<$s>>;
-}
-
-sub pod_em ($) {
-  my $s = shift;
-  $s =~ s/([<>])/{'<' => 'E<lt>', '>' => 'E<gt>'}->{$1}/ge;
-  qq<I<$s>>;
-}
-
-sub pod_dfn ($) {
-  my $s = shift;
-  $s =~ s/([<>])/{'<' => 'E<lt>', '>' => 'E<gt>'}->{$1}/ge;
-  qq<I<$s>X<$s>>;
-}
-
-sub pod_char (%) {
-  my %opt = @_;
-  if ($opt{name}) {
-    if ($opt{name} eq 'copy') {
-      qq<E<169>>;
-    } else {
-      qq<E<$opt{name}>>;
-    }
-  } else {
-    impl_err q<Bad parameter for "pod_char">;
-  }
-} # pod_char
-
-sub pod_uri ($) {
-  my $uri = shift;
-  qq<E<lt>${uri}E<gt>>;
-} # pod_uri
-
-sub pod_mail ($) {
-  my $mail = shift;
-  qq<E<lt>${mail}E<gt>>;
-} # pod_mail
-
-sub pod_link (%) {
-  my %opt = @_;
-  if ($opt{label}) {
-    $opt{label} .= '|';
-  } else {
-    $opt{label} = '';
-  }
-  if ($opt{section}) {
-    qq<L<$opt{label}/"$opt{section}">>;
-  } elsif ($opt{module}) {
-    qq<L<$opt{label}$opt{module}>>;
-  } else {
-    impl_err q<Bad parameter for "pod_link">;
-  }
-}
-
-
-sub muf_template ($) {
-  my $s = shift;
-  $s =~ s{<Q:([^<>]+)>}{           ## QName
-    expanded_uri ($1)
-  }ge;
-  $s;
-}
-
-sub section (@) {
-  my @r;
-  while (my ($t, $s) = splice @_, 0, 2) {
-    if ($t eq 'req' and (not defined $s or not length $s)) {
-      return ();
-    } elsif (defined $s and length $s) {
-      push @r, $s;
-    }
-  }
-  return @r;
-}
-
-
-sub rfc3339_date ($) {
-  my @time = gmtime shift;
-  sprintf q<%04d-%02d-%02dT%02d:%02d:%02d+00:00>,
-          $time[5] + 1900, $time[4] + 1, @time[3,2,1,0];
-}
-
-sub version_date ($) {
-  my @time = gmtime shift;
-  sprintf q<%04d%02d%02d.%02d%02d>,
-          $time[5] + 1900, $time[4] + 1, @time[3,2,1];
-}
 
 
 sub qname_label ($;%) {
@@ -2547,13 +2218,14 @@ sub if2perl ($) {
                          }
                        }
                      ].
+                     (@isa + @isaa ?
                      q[for (].perl_list (@isa, @isaa).q[) {
                        if (my $c = $_->can ('___classHasFeature')) {
                          if ($c->($self, %f)) {
                            return 1;
                          }
                        }
-                     }].
+                     }] : '').
                      (($has_role and $has_role->get_attribute ('compat'))?
                      q[
                        my %g;
@@ -4489,6 +4161,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/10/09 05:32:30 $
+# $Date: 2004/10/09 07:55:22 $
 
 
