@@ -1,8 +1,7 @@
 #!/usr/bin/perl -w
 
 use strict;
-
-use Message::Util::QName::General [qw/ExpandedURI/], {
+use Message::Util::QName::Filter {
   d => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis-->,
   dis2pm => q<http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#>,
   DOMCore => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#>,
@@ -1126,7 +1125,9 @@ sub dis_perl_init ($;%) {
     my $mg = $State->{Type}->{$mod->{ModuleGroup}};
     my $an = dis_get_attr_node (%opt, parent => $mg->{src}, name => 'AppName');
     if ($an) {
-      my $pn = $an->value . $mod->{Name};
+      my $pn = $an->value;
+      $pn =~ s/(?:::)+$//;
+      $pn .= '::' . $mod->{Name};
       my $suffix = dis_get_attr_node
                       (%opt, parent => $an, 
                        name => {uri => ExpandedURI q<ManakaiDOM:moduleSuffix>});
@@ -1136,10 +1137,20 @@ sub dis_perl_init ($;%) {
     ## Perl interface name
     my $if = dis_get_attr_node (%opt, parent => $mod->{src}, name => 'AppName',
                                 'For+' => [ExpandedURI q<ManakaiDOM:ForIF>],
+                                ContentType => ExpandedURI q<lang:Perl>) ||
+             dis_get_attr_node (%opt, parent => $mod->{src}, name => 'AppName',
+                                'For+' => [ExpandedURI q<ManakaiDOM:ForIF>],
+                                ContentType => ExpandedURI q<lang:Java>) ||
+             dis_get_attr_node (%opt, parent => $mg->{src}, name => 'AppName',
+                                'For+' => [ExpandedURI q<ManakaiDOM:ForIF>],
+                                ContentType => ExpandedURI q<lang:Perl>) ||
+             dis_get_attr_node (%opt, parent => $mg->{src}, name => 'AppName',
+                                'For+' => [ExpandedURI q<ManakaiDOM:ForIF>],
                                 ContentType => ExpandedURI q<lang:Java>);
     if ($if) {
       my $if_name = $if->value;
       $if_name =~ s/\./::/g;
+      $if_name =~ s/(?:::)+$//;
       $mod->{ExpandedURI q<dis2pm:ifPackagePrefix>} = $if_name . '::';
     }
     $mod->{ExpandedURI q<dis2pm:done>} = 1;
@@ -1161,30 +1172,40 @@ Load Perl-specific properties for class.
 sub dis_perl_init_classdef ($;%);
 sub dis_perl_init_classdef ($;%) {
   my ($res, %opt) = @_;
-  my $type = '';
-  for (keys %{$res->{Type}}) {
-    if (dis_uri_ctype_match (ExpandedURI q<ManakaiDOM:Class>, $_, %opt)) {
-      $type = 'class';
-      last;
-    } elsif (dis_uri_ctype_match (ExpandedURI q<ManakaiDOM:IF>, $_, %opt)) {
-      $type = 'if';
-      last;
+
+  ## Check resource type
+  my $type = $res->{ExpandedURI q<dis2pm:type>} || '';
+  TYPES: for my $t (keys %{$res->{Type}}) {
+    for (ExpandedURI q<ManakaiDOM:DOMMethod>,
+         ExpandedURI q<ManakaiDOM:DOMAttribute>,
+         ExpandedURI q<ManakaiDOM:DOMParameter>,
+         ExpandedURI q<ManakaiDOM:Class>,
+         ExpandedURI q<ManakaiDOM:IF>) {
+      if (dis_uri_ctype_match ($_, $t, %opt)) {
+        $type = $_;
+        last TYPES;
+      }
     }
   }
-  if ($type eq 'class') {
-    ## Class package name is...
-    my $pack = $State->{Module}->{$res->{parentModule}}
+  $res->{ExpandedURI q<dis2pm:type>} = $type;
+
+  my $pack;
+  if ($type eq ExpandedURI q<ManakaiDOM:Class>) {
+    ## Class package name
+    $pack = $State->{Module}->{$res->{parentModule}}
                      ->{ExpandedURI q<dis2pm:packageName>};
     valid_err ("Perl package name for <$res->{parentModule}> not defined",
                node => $res->{src})
       unless defined $pack;
     my $an = dis_get_attr_node (%opt, parent => $res->{src}, name => 'AppName');
     if ($an) {
-      $res->{ExpandedURI q<dis2pm:packageName>} = $pack . '::' . $an->value;
+      $pack = $res->{ExpandedURI q<dis2pm:packageName>}
+            = $pack . '::' . $an->value;
     } else {
       valid_err ("Class name required", node => $res->{src})
         unless $res->{Name};
-      $res->{ExpandedURI q<dis2pm:packageName>} = $pack . '::' . $res->{Name};
+      $pack = $res->{ExpandedURI q<dis2pm:packageName>}
+            = $pack . '::' . $res->{Name};
     }
     ## This class implements...
     if ($res->{multiple_resource_parent}) {
@@ -1197,9 +1218,9 @@ sub dis_perl_init_classdef ($;%) {
         }
       }
     }
-  } elsif ($type eq 'if') {
+  } elsif ($type eq ExpandedURI q<ManakaiDOM:IF>) {
     ## Interface package name is...
-    my $pack = $State->{Module}->{$res->{parentModule}}
+    $pack = $State->{Module}->{$res->{parentModule}}
                      ->{ExpandedURI q<dis2pm:ifPackagePrefix>};
     valid_err ("Perl interface package name for <$res->{parentModule}> not ".
                "defined", node => $res->{src})
@@ -1210,20 +1231,62 @@ sub dis_perl_init_classdef ($;%) {
       $an = $an->value;
       if ($an =~ /\./) {
         $an =~ s/\./::/g;
-        $res->{ExpandedURI q<dis2pm:packageName>} = $an;
+        $pack = $res->{ExpandedURI q<dis2pm:packageName>} = $an;
       } else {
-        $res->{ExpandedURI q<dis2pm:packageName>} = $pack . $an;
+        $pack = $res->{ExpandedURI q<dis2pm:packageName>} = $pack . $an;
       }
     } else {
       valid_err ("Interface name required", node => $res->{src})
         unless $res->{Name};
-      $res->{ExpandedURI q<dis2pm:packageName>} = $pack . $res->{Name};
+      $pack = $res->{ExpandedURI q<dis2pm:packageName>} = $pack . $res->{Name};
     }    
+  } elsif ({ExpandedURI q<ManakaiDOM:DOMMethod> => 1,
+            ExpandedURI q<ManakaiDOM:DOMAttribute> => 1}->{$type}) {
+    ## Method or attribute name
+    valid_err (qq<Method name required>, node => $res->{node})
+      unless $res->{Name};
+    my $name = $res->{Name};
+    my $int = dis_get_attr_node
+                 (%opt, name => {uri => ExpandedURI q<ManakaiDOM:isForInternal>},
+                  parent => $res->{src});
+    if ($int and $int->value) {
+      $res->{ExpandedURI q<ManakaiDOM:isForInternal>} = 1;
+      $name = '_' . $name;
+    }
+    $res->{ExpandedURI q<dis2pm:methodName>} = $name;
+    my $re = dis_get_attr_node
+                 (%opt, name => {uri => ExpandedURI q<ManakaiDOM:isRedefining>},
+                  parent => $res->{src});
+    if ($re and $re->value) {
+      $res->{ExpandedURI q<ManakaiDOM:isRedefining>} = 1;
+    }
+    
+    ## Register the method
+    valid_err (qq<Perl method "$name" already defined>, node => $res->{node})
+      if defined $State->{ExpandedURI q<dis2pm:parentResource>}
+                       ->{ExpandedURI q<dis2pm:method>}->{$name}->{Name};
+    $State->{ExpandedURI q<dis2pm:parentResource>}
+          ->{ExpandedURI q<dis2pm:method>}->{$name} = $res;
   } # $type
-  for my $res (values %{$res->{Resource}}) {
-    next if $res->{ExpandedURI q<dis2pm:done>};
-    next unless defined $res->{Name};
-    dis_perl_init_classdef ($res, %opt);
+  
+  ## Register the package
+  if ($pack) {
+    valid_err (qq<Perl package "$pack" is already defined>)
+      if defined $State->{ExpandedURI q<dis2pm:package>}->{$pack}->{Name};
+    $State->{ExpandedURI q<dis2pm:package>}->{$pack} = $res;
+    impl_err (qq<Perl package "$pack" is already defined>)
+      if defined $State->{Module}->{$res->{parentModule}}
+                       ->{ExpandedURI q<dis2pm:package>}->{Pack}->{Name};
+    $State->{Module}->{$res->{parentModule}}
+          ->{ExpandedURI q<dis2pm:package>}->{$pack} = $res;
+  }
+  
+  ## Child resources
+  for my $cres (values %{$res->{Resource}}) {
+    next if $cres->{ExpandedURI q<dis2pm:done>};
+    next unless defined $cres->{Name};
+    local $State->{ExpandedURI q<dis2pm:parentResource>} = $res;
+    dis_perl_init_classdef ($cres, %opt);
   }
   $res->{ExpandedURI q<dis2pm:done>} = 1;
 } # dis_perl_init_classdef
@@ -1542,4 +1605,4 @@ sub disdoc_inline2pod ($;%) {
 
 =cut
 
-1; # $Date: 2004/11/19 14:12:30 $
+1; # $Date: 2004/11/20 11:12:50 $

@@ -2,8 +2,7 @@
 use strict;
 use Test;
 
-use Message::Util::QName::General
-  [qw/ExpandedURI/],
+use Message::Util::QName::Filter
   {
     xhtml1 => q<http://www.w3.org/1999/xhtml>,
     About  => q<about:>,

@@ -54,8 +54,6 @@ Module:
       ManakaiDOM:ForIF
     @@For:
       ManakaiDOM:Java
-    @@For:
-      ManakaiDOM:ManakaiDOM
   @FullName:
     @@lang:en
     @@@: DOM Core Module
@@ -78,7 +76,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/11/19 14:12:30 $
+     $Date: 2004/11/20 11:12:50 $
 
   @DefaultFor:
     ManakaiDOM:ManakaiDOMLatest
@@ -126,7 +124,7 @@ Module:
       Node::DOM3
 
 ElementTypeBinding:
-  @Name: Exception
+  @Name: ExceptionDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
@@ -190,7 +188,96 @@ ElementTypeBinding:
     @@rdf:type:
       ManakaiDOM:DOMEventSet
 
-Exception:
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@For:
+      ManakaiDOM:DOM
+ElementTypeBinding:
+  @Name: IntMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@For:
+      ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isForInternal: 1
+ElementTypeBinding:
+  @Name: ReMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@For:
+      ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isRedefining: 1
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethodReturn
+    @@For:
+      ManakaiDOM:DOM
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttribute
+    @@For:
+      ManakaiDOM:DOM
+ElementTypeBinding:
+  @Name: IntAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttribute
+    @@For:
+      ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isForInternal: 1
+ElementTypeBinding:
+  @Name: ReAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttribute
+    @@For:
+      ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isRedefining: 1
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttrGet
+ElementTypeBinding:
+  @Name: Set
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttrSet
+ElementTypeBinding:
+  @Name: InCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+
+ExceptionDef:
   @Name:  DOMException
   @Spec:
     @@DOM3:

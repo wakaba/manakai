@@ -1,5 +1,23 @@
 #!/usr/bin/perl -w 
 use strict;
+use Message::Util::QName::Filter {
+  d => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis-->,
+  dis2pm => q<http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#>,
+  DOMCore => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#>,
+  DOMMain => q<http://suika.fam.cx/~wakaba/archive/2004/dom/main#>,
+  infoset => q<http://www.w3.org/2001/04/infoset#>,
+  lang => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#>,
+  Perl => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl-->,
+  license => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/license#>,
+  ManakaiDOM => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#>,
+  MDOM_EXCEPTION => q<http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#>,
+  owl => q<http://www.w3.org/2002/07/owl#>,
+  rdf => q<http://www.w3.org/1999/02/22-rdf-syntax-ns#>,
+  rdfs => q<http://www.w3.org/2000/01/rdf-schema#>,
+  xml => q<http://www.w3.org/XML/1998/namespace>,
+  xmlns => q<http://www.w3.org/2000/xmlns/>,
+  xsd => q<http://www.w3.org/2001/XMLSchema#>,
+};
 
 use Getopt::Long;
 use Pod::Usage;
@@ -98,6 +116,16 @@ for (keys %{$State->{Module}}) {
       $result->add_triple ($mod->{URI} =>ExpandedURI q<dis2pm:packageName>=>
                            n3_literal $mod->{ExpandedURI q<dis2pm:packageName>})
         if defined $mod->{ExpandedURI q<dis2pm:packageName>};
+      if ($Opt{output_resource}) {
+        for (values %{$mod->{ExpandedURI q<dis2pm:package>}}) {
+          my $uri = defined $_->{URI}
+                       ? $_->{URI}
+                       : ($_->{ExpandedURI q<d:anonID>}
+                            ||= $result->get_new_anon_id (Name => $_->{Name}));
+          $result->add_triple ($mod->{URI} =>ExpandedURI q<dis2pm:package>=>
+                               $uri);
+        }
+      }
     }
   } else {
     $result->add_triple ($_ =>ExpandedURI q<owl:sameAs>=> $mod->{URI});
@@ -169,10 +197,23 @@ if ($Opt{output_resource}) {
         $result->add_triple ($uri =>ExpandedURI q<d:hasResource>=> $ruri);
       }
       if ($Opt{output_prop_perl}) {
-        for my $prop (ExpandedURI q<dis2pm:packageName>,
-                      ExpandedURI q<dis2pm:ifPackagePrefix>) {
-          $result->add_triple ($mod->{URI} =>$prop=> n3_literal $mod->{$prop})
-            if defined $mod->{$prop};
+        for my $prop ([ExpandedURI q<dis2pm:packageName>],
+                      [ExpandedURI q<dis2pm:ifPackagePrefix>],
+                      [ExpandedURI q<dis2pm:methodName>],
+                      [ExpandedURI q<ManakaiDOM:isRedefining>,
+                        ExpandedURI q<DOMMain:boolean>],
+                      [ExpandedURI q<ManakaiDOM:isForInternal>,
+                        ExpandedURI q<DOMMain:boolean>]) {
+          $result->add_triple ($uri =>$prop->[0]=>
+                               n3_literal $mod->{$prop->[0]})
+            if defined $mod->{$prop->[0]};
+        }
+        for (values %{$mod->{ExpandedURI q<dis2pm:method>}||{}}) {
+          my $ruri = defined $_->{URI}
+                      ? $_->{URI}
+                      : ($_->{ExpandedURI q<d:anonID>}
+                              ||= $result->get_new_anon_id (Name => $_->{Name}));
+          $result->add_triple ($uri =>ExpandedURI q<dis2pm:method>=> $ruri);
         }
       }
       if ($Opt{output_local_resource}) {
