@@ -20,7 +20,7 @@ This module requires L<Message::Util::Formatter>.
 package Message::Util::Formatter;
 use strict;
 use vars qw(%FMT2STR $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 
 =head1 INITIAL FORMATTING RULES
@@ -31,13 +31,17 @@ your script.
 
 =over 4
 
-=item %char(ucs=>0xHHHH);
+=cut
 
-Replaced to a character with given perl's internal representation.
-With pre-utfized perl (before 5.6), 0x00-0xFF can be specified.
+#=item %char(ucs=>0xHHHH);
+#
+#Replaced to a character with given perl's internal representation.
+#With pre-utfized perl (before 5.6), 0x00-0xFF can be specified.
+#
+#Code position value in coding system other than perl internal is
+#currently not supported.
 
-Code position value in coding system other than perl internal is
-currently not supported.
+## %char; is commented out in default, because of unsecureness.
 
 =item %percent;
 
@@ -63,16 +67,16 @@ special letters in (to-be-) fragment of HTML document.
 
 ## Initial formatting rules
 %FMT2STR = (
-	char	=> sub {
-	  my $p = $_[0];
-	  if ($p->{ucs} =~ /^0[xob][0-9A-Fa-f]+$/) {
-	    return pack 'U', oct $p->{ucs};
-	  } elsif (defined $p->{ucs}) {
-	    return pack 'U', $p->{ucs};
-	  } else {
-	    return "\x{FFFD}";
-	  }
-	},
+#	char	=> sub {
+#	  my $p = $_[0];
+#	  if ($p->{ucs} =~ /^0[xob][0-9A-Fa-f]+$/) {
+#	    return pack 'U', oct $p->{ucs};
+#	  } elsif (defined $p->{ucs}) {
+#	    return pack 'U', $p->{ucs};
+#	  } else {
+#	    return "\x{FFFD}";
+#	  }
+#	},
 	percent	=> '%',
 	    -bare_text => sub { $_[0]->{-bare_text} },
 );
@@ -175,4 +179,4 @@ Boston, MA 02111-1307, USA.
 =cut
 
 1;
-# $Date: 2002/12/05 00:25:33 $
+# $Date: 2002/12/15 05:58:11 $
