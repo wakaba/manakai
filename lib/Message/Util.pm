@@ -12,15 +12,15 @@ Utilities for Message::* Perl modules.
 package Message::Util;
 use strict;
 use vars qw(%REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 $REG{WSP} = qr/[\x09\x20]/;
 $REG{FWS} = qr/[\x09\x20]*/;
 
 sub encode_header_string ($$;%) {
   require Message::MIME::Charset;
-  my $self = shift; my $s = shift; my %o = @_;
-  $o{charset} ||= $self->{option}->{encoding_after_encode};
+  my $yourself = shift; my $s = shift; my %o = @_;
+  $o{charset} ||= $yourself->{option}->{encoding_after_encode};
   $o{charset} = Message::MIME::Charset::name_normalize ($o{charset});
   $o{current_charset} = Message::MIME::Charset::name_normalize ($o{current_charset});
   my ($t,$r) = Message::MIME::Charset::encode ($o{charset}, $s);
@@ -35,8 +35,8 @@ sub encode_header_string ($$;%) {
 sub decode_header_string ($$;%) {
   require Message::MIME::EncodedWord;
   require Message::MIME::Charset;
-  my $self = shift; my $s = shift; my %o = @_;
-  $o{charset} ||= $self->{option}->{encoding_before_decode};
+  my $yourself = shift; my $s = shift; my %o = @_;
+  $o{charset} ||= $yourself->{option}->{encoding_before_decode};
   $o{charset} = Message::MIME::Charset::name_normalize ($o{charset});
   $s = Message::MIME::EncodedWord::decode ($s)
     if $o{type} !~ /quoted/ && $o{type} !~ /encoded/;
@@ -48,8 +48,8 @@ sub decode_header_string ($$;%) {
 
 sub encode_body_string {
   require Message::MIME::Charset;
-  my $self = shift; my $s = shift; my %o = @_;
-  $o{charset} ||= $self->{option}->{encoding_after_encode};
+  my $yourself = shift; my $s = shift; my %o = @_;
+  $o{charset} ||= $yourself->{option}->{encoding_after_encode};
   $o{charset} = Message::MIME::Charset::name_normalize ($o{charset});
   $o{current_charset} = Message::MIME::Charset::name_normalize ($o{current_charset});
   my ($t,$r) = Message::MIME::Charset::encode ($o{charset}, $s);
@@ -64,8 +64,8 @@ sub encode_body_string {
 sub decode_body_string {
   require Message::MIME::EncodedWord;
   require Message::MIME::Charset;
-  my $self = shift; my $s = shift; my %o = @_;
-  $o{charset} ||= $self->{option}->{encoding_before_decode};
+  my $yourself = shift; my $s = shift; my %o = @_;
+  $o{charset} ||= $yourself->{option}->{encoding_before_decode};
   $o{charset} = Message::MIME::Charset::name_normalize ($o{charset});
   my ($t,$r) = Message::MIME::Charset::decode ($o{charset}, $s);
   $r>0 ? (value => $t):	## suceess
@@ -95,7 +95,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/31 13:12:41 $
+$Date: 2002/04/03 13:31:36 $
 
 =cut
 
