@@ -16,7 +16,7 @@ This module is part of SuikaWiki XML support.
 
 package SuikaWiki::Markup::XML::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 our %NS;
 *NS = \%SuikaWiki::Markup::XML::NS;
 
@@ -636,7 +636,7 @@ sub raise_error ($$%) {
       $self->_default_error_handler_2 ($node, $error_type, $error_msg, \%err)
         if $resolver;	## don't call this.
     } else {
-      $self->_default_error_handler ($node, $error_type, $error_msg, \%err);
+      $self->_default_error_handler_2 ($node, $error_type, $error_msg, \%err);
     }
 }
 
@@ -738,4 +738,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/07/16 12:10:22 $
+1; # $Date: 2003/08/06 01:51:43 $
