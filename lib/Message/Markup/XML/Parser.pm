@@ -16,9 +16,11 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.20.2.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.20.2.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXMLChar
                         InXML_deprecated_noncharacter InXML_unicode_xml_not_suitable!;
+require Message::Markup::XML::Parser::Error;
+
 require Message::Markup::XML;
 require Message::Markup::XML::Error;
 *_raise_error = \&Message::Markup::XML::Error::raise;
@@ -231,10 +233,11 @@ $xml_re{__AttlistDecl_simple} = qr/<!ATTLIST(?:$xml_re{PEReference}|$xml_re{Name
 # [20] NameChar = {XML1.1}.NameChar    ;; 1.1 draft
 # [21] NameStartChar = {XML1.1}.NameStartChar ;; 1.1 draft
 
-
 sub new ($;%) {
   my $class = shift;
   my $self = bless {@_}, $class;
+  $self->{error} ||= Message::Util::Error::TextParser->new
+                       (package => 'Message::Markup::XML::Parser::Error');
   $self;
 }
 
@@ -2001,433 +2004,730 @@ or not.
 
 =cut
 
+sub URI_CONFIG () {
+  q<http://suika.fam.cx/~wakaba/-temp/2004/2/22/Parser/>
+}
+use Message::Markup::XML::QName qw/DEFAULT_PFX/;
+use Message::Util::QName::General [qw/ExpandedURI/],
+    {
+     (DEFAULT_PFX) => URI_CONFIG,
+     tree => q<http://suika.fam.cx/~wakaba/-temp/2004/2/22/Parser/TreeConstruct/>,
+    };
 my $REG_S = qr/[\x09\x0A\x0D\x20]/; 
         # S := 1*(U+0020 / U+0009 / U+000D / U+000A) ;; [3]
 
-sub parse_con_mode ($$%) {
-  my ($self, $src, %opt) = @_;
-  while (pos $$src < length $$src) {
-    if ($$src =~ /\G([^<&]+)/gc) {
-      $self->got_text_in_con_mode ($src, $1, \%opt);
-    } elsif ($$src =~ /\G(?=<)/gc) {
-      if ($src =~ /\G(?=<!)/gc) {
-        
-      } elsif ($$src =~ /\G(?=<\?)/gc) {
-        
-      } else {
-        $self->parse_tag ($src, %opt, match_or_error => 1,
-                          allow_start_tag => 1, allow_end_tag => 1);
-        return if $opt{end_of_con_mode};
-      }
-    } elsif ($$src =~ /\G(?=&)/gc) {
-      $self->parse_reference ($src, %opt, match_or_error => 1,
-                              use_character_reference => 1,
-                              use_general_entity_reference => 1,
-                              context => 'con_mode');
-    } else {
-      die "Buggy implementation: @{[substr ($$src, pos $$src)]}";
-    }
-  }
-}
+sub parse_element ($$$%) {
+  my ($self, $src, $p, %opt) = @_;
 
-sub parse_tag ($$%) {
-  my ($self, $src, %opt) = (shift || __PACKAGE__, @_);
-  if ($$src =~ /\G</gc) {
-    my $tag_type = 'start';
-    if ($$src =~ m#\G/#gc) {
-      $tag_type = 'end';
-      unless ($opt{allow_end_tag}) {
-        $self->error (\%opt)->report
-             (-type => 'SYNTAX_END_TAG_NOT_ALLOWED',
-              -class => 'WFC',
-              source => $src, position_diff => 2);
-      }
-    } elsif (not $opt{allow_start_tag}) {
-      $self->error (\%opt)->report
-               (-type => 'SYNTAX_START_TAG_NOT_ALLOWED',
-                -class => 'WFC',
-                source => $src, position_diff => 1);
-    }
-    if ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
-      $self->got_element_type_name ($src, $1, \%opt);
-      if ($tag_type eq 'end') {
-        $$src =~ /\G$REG_S*/ogc;
-        $$src =~ /\G>/gc or $self->error (\%opt)->report
-                              (-type => 'SYNTAX_END_TAG_TAGC_REQUIRED',
-                               -class => 'WFC',
-                               source => $src);
-        $self->got_end_tag ($src, undef, \%opt);
-        return;
-      } else { # start tag
-        $$src =~ /\G$REG_S*/ogc or undef $tag_type;
-        while (pos $$src < length $$src) {
-          if ($$src =~ m#\G(?=[^/>])#gc) {
-            $self->error (\%opt)->report
-                     (-type => 'SYNTAX_S_REQUIRED_BETWEEN_ATTR_SPEC',
-                      -class => 'WFC',
-                      source => $src), $tag_type = 'start' unless $tag_type;
-            $self->parse_attribute_specification ($src, %opt,
-                                                  match_or_error => 1);
-            $$src =~ /\G$REG_S/ogc or undef $tag_type;
-          } elsif ($$src =~ /\G>/gc) {
-            $self->got_start_tag ($src, undef, \%opt);
-            return;
-          } elsif ($$src =~ m#\G/#gc) {
-            $$src =~ /\G>/gc or $self->error (\%opt)->report
-                              (-type => 'SYNTAX_NET_REQUIRED',
-                               -class => 'WFC',
-                               source => $src);
-            $self->got_s_before_nestc ($src, undef, \%opt) if $tag_type;
-            $self->got_empty_element_tag ($src, undef, \%opt);
-            return;
+  if ($$src =~ /\G(?=<\p{InXML_NameStartChar})/gc) {
+    $self->element_start ($src, $p, my $pp = {}, %opt);
+    $self->parse_start_tag
+             ($src, $pp, %opt);
+    my $ename = $pp->{ExpandedURI q<element-type-name>};
+    
+    if ($pp->{ExpandedURI q<tag-type>} eq 'start') {
+      my $end_tag = 0;
+      while (pos $$src < length $$src) {
+        if ($$src =~ /\G([^<&]+)/gc) {
+          local $pp->{ExpandedURI q<CDATA>} = $1;
+          $self->element_content
+                   ($src, $p, $pp, %opt);
+        } elsif (substr ($$src, pos $$src, 1) eq '<') {
+          my $n = substr ($$src, 1 + pos $$src, 1);
+          if ($n eq '/') {
+            if ($$src =~ m#\G</(\p{InXML_NameStartChar}\p{InXMLNameChar}*)#gc) {
+              my $type = $1;
+              if ($type eq $ename) {
+                $$src =~ /\G$REG_S+/gco;
+                $$src =~ /\G>/gc
+                  or $self->report
+                    (-type => 'SYNTAX_ETAGC_REQUIRED',
+                     -class => 'WFC',
+                     source => $src);
+              } else {
+                $self->report
+                  (-type => 'WFC_ELEMENT_TYPE_MATCH',
+                   -class => 'WFC',
+                   source => $src,
+                   position_diff => length $type,
+                   start_tag_type_name => $ename,
+                   end_tag_type_name => $type);
+                my $tag = '</' . $type;
+                $$src =~ /\G($REG_S+)/gco and $tag .= $1;
+                if ($$src =~ /\G>/gc) {
+                  $tag .= '>';
+                } else {
+                  $self->report
+                    (-type => 'SYNTAX_ETAGC_REQUIRED',
+                     -class => 'WFC',
+                     source => $src);
+                }
+                local $pp->{ExpandedURI q<CDATA>} = $tag;
+                $self->element_content
+                  ($src, $p, $pp, %opt);
+              }
+              $self->end_tag_start ($src, $p, $pp, %opt);
+              $self->end_tag_end ($src, $p, $pp, %opt);
+              $end_tag = 1;
+              last;
+            } else {
+              pos ($$src) += 2;
+              $self->report
+                 (-type => 'SYNTAX_ELEMENT_TYPE_NAME_FOLLOWING_ETAGO_REQUIRED',
+                  -class => 'WFC',
+                  source => $src);
+              local $pp->{ExpandedURI q<CDATA>} = '</';
+              $self->element_content
+                   ($src, $p, $pp, %opt);
+            }
+          } elsif ($n eq '!') {
+            $self->parse_markup_declaration
+                   ($src, $pp, %opt)
+              or local $pp->{ExpandedURI q<CDATA>} = '<',
+                 pos ($$src)++,
+                 $self->element_content
+                   ($src, $p, $pp, %opt);
+          } elsif ($n eq '?') {
+            $self->parse_processing_instruction
+                   ($src, $pp, %opt)
+              or local $pp->{ExpandedURI q<CDATA>} = '<',
+                 pos ($$src)++,
+                 $self->element_content
+                   ($src, $p, $pp, %opt);
           } else {
-            last;
-            #die "Buggy implementation: ".substr ($$src, pos ($$src), 20);
+            $self->parse_element
+                   ($src, $pp, %opt)
+              or local $pp->{ExpandedURI q<CDATA>} = '<',
+                 pos ($$src)++,
+                 $self->element_content
+                   ($src, $p, $pp, %opt);
           }
+        } elsif (substr ($$src, pos $$src, 1) eq '&') {
+          $self->parse_reference_in_content
+            ($src, $pp,
+             %opt,
+             ExpandedURI q<match_or_error> => 1);
+        } else {
+          Carp::croak "Buggy implementation!";
         }
-        $self->error (\%opt)->report
-                 (-type => 'SYNTAX_START_TAG_TAGC_OR_NESTC_REQUIRED',
+      }
+    
+      unless ($end_tag) {
+        $self->report
+                 (-type => 'SYNTAX_END_TAG_REQUIRED',
+                  -class => 'WFC',
+                  source => $src,
+                  element_type_name => $ename);
+      }
+    } # Not empty
+    
+    $self->element_end ($src, $p, $pp, %opt);
+    return 1;
+  } else {
+    if ($opt{ExpandedURI q<match_or_error>}) {
+      if (substr ($$src, pos $$src, 1) eq '<') {
+        $self->report
+                 (-type => 'SYNTAX_ELEMENT_TYPE_NAME_FOLLOWING_STAGO_REQUIRED',
+                  -class => 'WFC',
+                  source => $src,
+                  position_diff => -1);
+      } else {
+        $self->report
+                 (-type => 'SYNTAX_START_TAG_REQUIRED',
                   -class => 'WFC',
                   source => $src);
       }
-    } elsif ($tag_type eq 'end') {
-      if ($opt{allow_end_tag}) {
-        $self->error (\%opt)->report
-                   (-type => 'SYNTAX_ELEMENT_TYPE_NAME_REQUIRED',
-                    -class => 'WFC',
-                    source => $src);
-      } else {
-        $self->error (\%opt)->report
-                   (-type => 'SYNTAX_END_TAG_NOT_ALLOWED',
-                    -class => 'WFC',
-                    source => $src, position_diff => 2);
-      }
-    } else {
-      if ($opt{allow_start_tag}) {
-        if ($opt{allow_end_tag}) {
-          $self->error (\%opt)->report
-                   (-type => 'SYNTAX_SLASH_OR_ELEMENT_TYPE_NAME_REQUIRED',
-                    -class => 'WFC',
-                    source => $src);
-        } else {
-          $self->error (\%opt)->report
-                   (-type => 'SYNTAX_ELEMENT_TYPE_NAME_REQUIRED',
-                    -class => 'WFC',
-                    source => $src);
-        }
-      } else {
-        $self->error (\%opt)->report
-                   (-type => 'SYNTAX_SLASH_REQUIRED',
-                    -class => 'WFC',
-                    source => $src);
-      }
     }
-  } elsif ($opt{match_or_error}) {
-    $self->error (\%opt)->report
-             (-type => 'SYNTAX_TAG_REQUIRED',
-              -class => 'WFC',
-              source => $src);
+    return 0;
   }
 }
 
-sub parse_attribute_specification ($$%) {
-  my ($self, $src, %opt) = (shift || __PACKAGE__, @_);
-  if ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)$REG_S*/ogc) {
-    $self->got_attribute_name ($src, $1, \%opt);
-    if ($$src =~ /\G=$REG_S*/ogc) {
-      $self->parse_attribute_value_specification ($src, %opt,
-                                                  match_or_error => 1);
+sub parse_start_tag ($$$%) {
+  my ($self, $src, $p, %opt) = @_;
+  if ($$src =~ /\G</gc) {
+    my $element_type;
+    if ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+      $element_type = $1;
+    } elsif ($$src =~ /\G>/gc) {
+      pos ($$src)--;
+      $self->report
+                (-type => 'SYNTAX_EMPTY_START_TAG',
+                 -class => 'WFC',
+                 source => $src,
+                 position_diff => 1);
+      return 0;
     } else {
-      $self->error (\%opt)->report
+      $self->report
+                (-type => 'SYNTAX_ELEMENT_TYPE_NAME_FOLLOWING_STAGO_REQUIRED',
+                 -class => 'WFC',
+                 source => $src);
+      pos ($$src)--;
+      return 0;
+    }
+    
+    my $pp = {};
+    $pp->{ExpandedURI q<element-type-name>}
+      = $p->{ExpandedURI q<element-type-name>}
+      = $element_type;
+    $self->start_tag_start ($src, $p, $pp, %opt);
+    
+    $self->parse_attribute_specifications
+            ($src, $pp,
+             %opt,
+             ExpandedURI q<s-before-attribute-specifications> => 1,
+             ExpandedURI q<use-numeric-character-reference> => 1,
+             ExpandedURI q<use-hex-character-reference> => 1,
+             ExpandedURI q<use-general-entity-reference> => 1);
+
+    if ($$src =~ m#\G/#gc) {
+      $p->{ExpandedURI q<tag-type>} = 'empty';
+      $pp->{ExpandedURI q<s-preceding-nestc>}
+        = $pp->{ExpandedURI q<s-after-attribute-specifications>};
+      $self->start_tag_end ($src, $p, $pp, %opt);
+      unless ($$src =~ /\G>/gc) {
+        $self->report
+                (-type => 'SYNTAX_NET_REQUIRED',
+                 -class => 'WFC',
+                 source => $src);
+      }
+      $self->end_tag_start ($src, $p, $pp, %opt);
+      $self->end_tag_end ($src, $p, $pp, %opt);
+    } else {
+      $p->{ExpandedURI q<tag-type>} = 'start';
+      unless ($$src =~ /\G>/gc) {
+        $self->report
+                 (-type => 'SYNTAX_STAGC_OR_NESTC_REQUIRED',
+                  -class => 'WFC',
+                  source => $src);
+      }
+      $self->start_tag_end ($src, $p, $pp, %opt);
+    }
+        
+    return 1;
+  } else {
+    if ($opt{ExpandedURI q<match_or_error>}) {
+      $self->report
+                (-type => 'SYNTAX_START_TAG_REQUIRED',
+                 -class => 'WFC',
+                 source => $src);
+    }
+    return 0;
+  }
+}
+
+sub parse_attribute_specifications ($$$%) {
+  my ($self, $src, $p, %opt) = @_;
+    $self->attribute_specifications_start
+                 ($src, $p, my $pp = {}, %opt);
+    my $sep = $opt{ExpandedURI q<s-before-attribute-specifications>};
+    my @sep = ($sep);
+    while (pos $$src < length $$src) {
+      if ($$src =~ /\G(?=\p{InXML_NameStartChar})/gc) {
+        unless ($sep) {
+          $self->report
+            (-type => 'SYNTAX_S_REQUIRED_BETWEEN_ATTR_SPEC',
+             -class => 'WFC',
+             source => $src);
+          push @sep, ' ';
+        }
+        $self->parse_attribute_specification
+                  ($src, $pp, %opt);
+        $sep = 0;
+      } elsif ($$src =~ /\G($REG_S+)/gc) {
+        my $s = $1;
+        push @sep, $s;
+        $sep = 1;
+      } else {
+        last;
+      }
+    }
+    $pp->{ExpandedURI q<s-between-attribute-specifications>} = \@sep;
+    $p->{ExpandedURI q<s-after-attribute-specifications>} = $sep;
+    
+    $self->attribute_specifications_end
+                  ($src, $p, $pp, %opt);
+    return 1;
+}
+
+sub parse_attribute_specification ($$$%) {
+  my ($self, $src, $p, %opt) = @_;
+  if ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)$REG_S*/ogc) {
+    my $pp = {ExpandedURI q<attribute-name> => $1};
+    $self->attribute_specification_start ($src, $p, $pp, %opt);
+    if ($$src =~ /\G=$REG_S*/ogc) {
+      $self->parse_attribute_value_specification 
+        ($src, $pp,
+         %opt,
+         ExpandedURI q<match_or_error> => 1);
+    } else {
+      $self->report
         (-type => 'SYNTAX_VI_REQUIRED',
          -class => 'WFC',
          source => $src);
     }
-    $self->got_attribute ($src, undef, \%opt);
-  } elsif ($opt{match_or_error}) {
-    $self->error (\%opt)->report
+    $self->attribute_specification_end ($src, $p, $pp, %opt);
+    return 1;
+  } elsif ($opt{ExpandedURI q<match_or_error>}) {
+    $self->report
       (-type => 'SYNTAX_ATTR_NAME_REQUIRED',
        -class => 'WFC',
        source => $src);
+    return 0;
   }
 }
 
-sub parse_attribute_value_specification ($$%) {
-  my ($self, $src, %opt) = (shift || __PACKAGE__, @_);
+sub parse_attribute_value_specification ($$$%) {
+  my ($self, $src, $p, %opt) = @_;
   if ($$src =~ /\G(["'])/gc) {
-    $self->parse_lit_mode
-      ($src, %opt, literal_delimiter => $1, match_or_error => 1,
-       terminated_or_error => 1);
-  } elsif ($opt{match_or_error}) {
-    $self->error (\%opt)->report
-      (-type => 'SYNTAX_OPEN_LIT_OR_LITA_REQUIRED',
-      -class => 'WFC',
-      source => $src);
-  }
-}
-
-sub parse_lit_mode ($$%) {
-  my ($self, $src, %opt) = (shift || __PACKAGE__, @_);
-  while (pos $$src < length $$src) {
-    if ($$src =~ /\G([^<&$opt{literal_delimiter}]+)/gc) {
-      $self->got_attribute_value_fragment ($src, $1, \%opt);
-    } elsif ($$src =~ /\G(?=&)/gc) {
-      $self->parse_reference ($src, %opt, match_or_error => 1,
-                              use_character_reference => 1,
-                              use_general_entity_reference => 1,
-                              context => 'attribute_value_literal');
-    } elsif ($$src =~ /\G$opt{literal_delimiter}/gc) { 
-      return;
-    } elsif ($$src =~ /\G</gc) {
-      $self->error (\%opt)->report (-type => 'WFC_NO_LESS_THAN_IN_ATTR_VAL',
-                                    -class => 'WFC',
-                                    source => $src,
-                                    position_diff => 1);
-    }
-  }
-  if ($opt{terminated_or_error}) {
-    $self->error (\%opt)->report
-      (-type => 'SYNTAX_CLOSE_LIT'.($opt{literal_delimiter} eq '"'?'':'A')
-               .'_REQUIRED',
-       -class => 'WFC',
-       source => $src);
-  }
-}
-
-sub parse_reference ($$%) {
-  my ($self, $src, %opt) = (shift || __PACKAGE__, @_);
-  if ($opt{use_character_reference} and 
-      $$src =~ /\G&\#/gc) {
-    if ($$src =~ /\Gx/gc) {
-      if ($$src =~ /\G([0-9A-Fa-f]+)/gc) {
-        $self->got_hex_character_reference ($src, $1, \%opt);
-        $$src =~ /\G;/gc or $self->error (\%opt)->report
-                              (-type => 'SYNTAX_REFERENCE_END_REQUIRED',
-                               -class => 'WFC', source => $src);
-      } else {
-        $self->error (\%opt)->report (-type => 'SYNTAX_HEXDIGIT_REQUIRED',
-                               -class => 'WFC', source => $src);
+    my $pp = {};
+    $pp->{ExpandedURI q<literal-delimiter>} = my $litdelim = $1;
+    $self->{error}->set_position ($src, moved => 1);
+    $pp->{ExpandedURI q<position>} = [$self->{error}->get_position ($src)];
+    $self->attribute_value_specification_start ($src, $p, $pp, %opt);
+    if ($litdelim eq '"') {
+      while (pos $$src < length $$src) {
+        if ($$src =~ /\G([^"&<]+)/gc) {
+          local $pp->{ExpandedURI q<CDATA>} = $1;
+          $self->attribute_value_specification_content
+                   ($src, $p, $pp, %opt);
+        } elsif ($$src =~ /\G(?=&)/gc) {
+          $self->parse_reference_in_attribute_value_literal
+                   ($src, $pp,
+                    %opt,
+                    ExpandedURI q<match_or_error> => 1)
+            or local $pp->{ExpandedURI q<CDATA>} = '&',
+               pos ($$src)++,
+               $self->attribute_value_specification_content
+                   ($src, $p, $pp, %opt);
+        } elsif ($$src =~ /\G</gc) {
+          $self->report
+                   (-type => 'WFC_NO_LESS_THAN_IN_ATTR_VAL',
+                    -class => 'WFC',
+                    source => $src,
+                    position_diff => 1);
+          local $pp->{ExpandedURI q<CDATA>} = '<';
+          $self->attribute_value_specification_content
+                   ($src, $p, $pp, %opt);
+        } else {
+          last;
+        }
       }
-    } elsif ($$src =~ /\G([0-9]+)/gc) {
-      $self->got_numeric_character_reference ($src, $1, \%opt);
-      $$src =~ /\G;/gc or $self->error (\%opt)->report
-                              (-type => 'SYNTAX_REFERENCE_END_REQUIRED',
-                               -class => 'WFC', source => $src);
-    } else {
-      $self->error (\%opt)->report (-type => 'SYNTAX_X_OR_DIGIT_REQUIRED',
-                             -class => 'WFC', source => $src);
+      unless ($$src =~ /\G"/gc) {
+        $self->report (-type => 'SYNTAX_ALITC_REQUIRED',
+                       -class => 'WFC',
+                       source => $src);
+      }
+    } else { #if ($litdelim eq "'") {
+      while (pos $$src < length $$src) {
+        if ($$src =~ /\G([^'&<]+)/gc) {
+          local $pp->{ExpandedURI q<CDATA>} = $1;
+          $self->attribute_value_specification_content
+                   ($src, $p, $pp, %opt);
+        } elsif ($$src =~ /\G(?=&)/gc) {
+          $self->parse_reference_in_attribute_value_literal
+                   ($src, $pp, 
+                    %opt,
+                    ExpandedURI q<match_or_error> => 1)
+            or local $pp->{ExpandedURI q<CDATA>} = '&',
+               pos ($$src)++,
+               $self->attribute_value_specification_content
+                   ($src, $p, $pp, %opt);
+        } elsif ($$src =~ /\G</gc) {
+          $self->report
+                   (-type => 'WFC_NO_LESS_THAN_IN_ATTR_VAL',
+                    -class => 'WFC',
+                    source => $src,
+                    position_diff => 1);
+          local $pp->{ExpandedURI q<CDATA>} = '<';
+          $self->attribute_value_specification_content
+                   ($src, $p, $pp, %opt);
+        } else {
+          last;
+        }
+      }
+      unless ($$src =~ /\G'/gc) {
+        $self->report (-type => 'SYNTAX_ALITAC_REQUIRED',
+                       -class => 'WFC',
+                       source => $src);
+      }
     }
-  } elsif ($opt{use_general_entity_reference} and
-           $$src =~ /\G&(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
-    my $method = 'got_general_entity_reference_in_'.$opt{context};
-    $self->$method ($src, $1, \%opt);
-    $$src =~ /\G;/gc or $self->error (\%opt)->report
-                              (-type => 'SYNTAX_REFERENCE_END_REQUIRED',
-                               -class => 'WFC', source => $src);
-  } elsif ($$src =~ /\G&/gc) {
-    $self->error (\%opt)->report (-type => 'SYNTAX_HASH_OR_NAME_REQUIRED',
-                                  -class => 'WFC', source => $src);
-  } else {
-    die "Buggy implementation";
+    $self->attribute_value_specification_end ($src, $p, $pp, %opt);
+    return 1;
+  } elsif ($opt{ExpandedURI q<match_or_error>}) {
+    $self->report (-type => 'SYNTAX_ALITO_OR_ALITAO_REQUIRED',
+                   -class => 'WFC',
+                   source => $src);
+    return 0;
   }
 }
 
-sub got_text_in_con_mode ($$$$) {
-  my ($self, $src, $s, $opt) = @_;
-  $opt->{parent}->append_text ($s);
+sub parse_reference_in_attribute_value_literal ($$$%) {
+  my ($self, $src, $p, %opt) = @_;
+  if ($$src =~ /\G&/gc) {
+    if ($$src =~ /\G\#/gc) {
+      if ($$src =~ /\Gx/gc) {
+        if ($$src =~ /\G([0-9A-Fa-f]+)/gc) {
+          $self->hex_character_reference_in_attribute_value_literal_start
+               ($src,
+                $p,
+                {ExpandedURI q<character-number> => hex $1},
+                %opt);
+        } else {
+          $self->report
+            (-type => 'SYNTAX_HEXDIGIT_REQUIRED',
+             -class => 'WFC',
+             source => $src);
+          pos ($$src) -= 3;
+          return 0;
+        }
+      } elsif ($$src =~ /\G([0-9]+)/gc) {
+        $self->numeric_character_reference_in_attribute_value_literal_start
+               ($src,
+                $p,
+                {ExpandedURI q<character-number> => 0 + $1},
+                %opt);
+      } elsif ($$src =~ /\GX/gc) {
+        $self->report
+               (-type => 'SYNTAX_HCRO_CASE',
+                -class => 'WFC',
+                source => $src,
+                position_diff => 1);
+        pos ($$src) -= 3;
+        return 0;
+      } elsif ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+        my $name = $1;
+        $self->report
+               (-type => 'SYNTAX_NAMED_CHARACTER_REFERENCE',
+                -class => 'WFC',
+                source => $src,
+                function_name => $name,
+                position_diff => length $name);
+        pos ($$src) -= 2 + length $name;
+        return 0;
+      } else {
+        $self->report
+               (-type => 'SYNTAX_X_OR_DIGIT_REQUIRED',
+                -class => 'WFC',
+                source => $src);
+        pos ($$src) -= 2;
+        return 0;
+      }
+    } elsif ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+     $self->general_entity_reference_in_attribute_value_literal_start
+               ($src,
+                $p,
+                {ExpandedURI q<entity-name> => $1},
+                %opt);
+    } else {
+      $self->report
+               (-type => 'SYNTAX_HASH_OR_NAME_REQUIRED',
+                -class => 'WFC',
+                source => $src);
+      pos ($$src) -= 1;
+      return 0;
+    }
+    
+    $$src =~ /\G;/gc or $self->report
+               (-type => 'SYNTAX_REFC_REQUIRED',
+                -class => 'WFC',
+                source => $src);
+    return 1;
+  } else {
+    if ($opt{ExpandedURI q<match_or_error>}) {
+      $self->report
+               (-type => 'SYNTAX_REFERENCE_AMP_REQUIRED',
+                -class => 'WFC',
+                source => $src);
+    }
+    return 0;
+  }
 }
 
-sub got_start_tag ($$$$) {
-  my ($self, $src, undef, $opt) = @_;
-
+sub parse_reference_in_content ($$$%) {
+  my ($self, $src, $p, %opt) = @_;
+  if ($$src =~ /\G&/gc) {
+    if ($$src =~ /\G\#/gc) {
+      if ($$src =~ /\Gx/gc) {
+        if ($$src =~ /\G([0-9A-Fa-f]+)/gc) {
+          $self->hex_character_reference_in_content_start
+               ($src,
+                $p,
+                {ExpandedURI q<character-number> => hex $1},
+                %opt);
+        } else {
+          $self->report
+            (-type => 'SYNTAX_HEXDIGIT_REQUIRED',
+             -class => 'WFC',
+             source => $src);
+          pos ($$src) -= 3;
+          return 0;
+        }
+      } elsif ($$src =~ /\G([0-9]+)/gc) {
+        $self->numeric_character_reference_in_content_start
+               ($src,
+                $p,
+                {ExpandedURI q<character-number> => 0 + $1},
+                %opt);
+      } elsif ($$src =~ /\GX/gc) {
+        $self->report
+               (-type => 'SYNTAX_HCRO_CASE',
+                -class => 'WFC',
+                source => $src,
+                position_diff => 1);
+        pos ($$src) -= 3;
+        return 0;
+      } elsif ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+        my $name = $1;
+        $self->report
+               (-type => 'SYNTAX_NAMED_CHARACTER_REFERENCE',
+                -class => 'WFC',
+                source => $src,
+                function_name => $name,
+                position_diff => length $name);
+        pos ($$src) -= 2 + length $name;
+        return 0;
+      } else {
+        $self->report
+               (-type => 'SYNTAX_X_OR_DIGIT_REQUIRED',
+                -class => 'WFC',
+                source => $src);
+        pos ($$src) -= 2;
+        return 0;
+      }
+    } elsif ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+     $self->general_entity_reference_in_content_start
+               ($src,
+                $p,
+                {ExpandedURI q<entity-name> => $1},
+                %opt);
+    } else {
+      $self->report
+               (-type => 'SYNTAX_HASH_OR_NAME_REQUIRED',
+                -class => 'WFC',
+                source => $src);
+      pos ($$src) -= 1;
+      return 0;
+    }
+    
+    $$src =~ /\G;/gc or $self->report
+               (-type => 'SYNTAX_REFC_REQUIRED',
+                -class => 'WFC',
+                source => $src);
+    return 1;
+  } else {
+    if ($opt{ExpandedURI q<match_or_error>}) {
+      $self->report
+               (-type => 'SYNTAX_REFERENCE_AMP_REQUIRED',
+                -class => 'WFC',
+                source => $src);
+    }
+    return 0;
+  }
 }
 
-sub got_empty_element_tag ($$$$) {
-  my ($self, $src, undef, $opt) = @_;
 
+sub parse_markup_declaration ($$$%) {
+  my ($self, $src, $p, %opt) = @_;
+  if ($$src =~ /\G(?=<!--)/gc) {
+    $self->parse_comment_declaration ($src, $p, %opt);
+  } elsif ($$src =~ /\G<!(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+    my $keyword = $1;
+    
+  } elsif ($$src =~ /\G<!\[/gc) {
+    
+  } elsif ($$src =~ /\G<!>/gc) {
+    $self->report
+             (-type => 'SYNTAX_EMPTY_COMMENT_DECLARATION',
+              -class => 'WFC',
+              source => $src);
+    $self->comment_declaration_start
+             ($src, $p, my $pp = {}, %opt);
+    $self->comment_declaration_end
+             ($src, $p, $pp, %opt);
+  } elsif ($opt{ExpandedURI q<match_or_error>}) {
+    if (substr ($$src, pos $$src, 2) eq '<!') {
+      $self->report
+             (-type => 'SYNTAX_NAME_OR_DSO_OR_COM_REQUIRED',
+              -class => 'WFC',
+              source => $src);
+    } else {
+      $self->report
+             (-type => 'SYNTAX_MARKUP_DECLARATION_REQUIRED',
+              -class => 'WFC',
+              source => $src);
+    }
+    return 0;
+  }
+  return 1;
 }
 
-sub got_s_before_nestc ($$$$) {
-  my ($self, $src, undef, $opt) = @_;
-
+sub parse_comment_declaration ($$$%) {
+  my ($self, $src, $p, %opt) = @_;
+  my $pp = {};
+  if ($$src =~ /\G<!(?=--)/gc) {
+    $self->comment_declaration_start ($src, $p, $pp, %opt);
+    $self->parse_comment ($src, $pp, %opt);
+  } elsif ($opt{ExpandedURI q<match_or_error>}) {
+    $self->report (-type => 'SYNTAX_COMMENT_DECLARATION_REQUIRED',
+                   -class => 'WFC',
+                   source => $src);
+    return 0;
+  }
+  while (pos $$src < length $$src) {
+    if ($$src =~ /\G(?=--)/gc) {
+      $self->report (-type => 'SYNTAX_MULTIPLE_COMMENT',
+                     -class => 'WFC',
+                     source => $src);
+      $self->parse_comment ($src, $pp, %opt);
+    } elsif ($$src =~ /\G$REG_S+/gco) {
+      $self->report (-type => 'SYNTAX_S_IN_COMMENT_DECLARATION',
+                     -class => 'WFC',
+                     source => $src);
+    } else {
+      last;
+    }
+  }
+  unless ($$src =~ /\G>/gc) {
+    $self->report (-type => 'SYNTAX_MDC_FOR_COMMENT_REQUIRED',
+                   -class => 'WFC',
+                   source => $src);
+  }
+  $self->comment_declaration_end ($src, $p, $pp, %opt);
+  return 1;
 }
 
-sub got_end_tag ($$$$) {
-  my ($self, $src, undef, $opt) = @_;
-
+sub parse_comment ($$$$%) {
+  my ($self, $src, $p, %opt) = @_;
+  my $pp = {};
+  unless ($$src =~ /\G--/gc) {
+    if ($opt{ExpandedURI q<match_or_error>}) {
+      $self->report (-type => 'SYNTAX_COMO_REQUIRED',
+                     -class => 'WFC',
+                     source => $src);
+    }
+    return 0;
+  }
+  $self->comment_start ($src, $p, $pp, %opt);
+  if ($$src =~ /\G((?:(?!--).)+)/gcs) {
+    $pp->{ExpandedURI q<CDATA>} = $1;
+    $self->comment_content
+             ($src,
+              $p, $pp,
+              %opt);
+  }
+  unless ($$src =~ /\G--/gc) {
+    $self->report
+             (-type => 'SYNTAX_COMC_REQUIRED',
+              -class => 'WFC',
+              source => $src);
+  }
+  $self->comment_end ($src, $p, $pp, %opt);
+  return 1;
 }
 
-sub got_element_type_name ($$$$) {
-  my ($self, $src, undef, $opt) = @_;
 
+sub parse_processing_instruction ($$$%) {
+  my ($self, $src, $p, %opt) = @_;
+  if ($$src =~ /\G<\?/gc) {
+    my $pp = {};
+    if ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+      $pp->{ExpandedURI q<target-name>} = $1;
+    } else {
+      $self->report
+               (-type => 'SYNTAX_TARGET_NAME_REQUIRED',
+                -class => 'WFC',
+                source => $src);
+    }
+    $self->processing_instruction_start
+               ($src, $p, $pp, %opt);
+    
+    if ($$src =~ /\G$REG_S/gco) {
+      $self->{error}->set_position ($src, moved => 1);
+      my $data = '';
+      if ($$src =~ /\G((?:(?!\?>).)+)/gcs) {
+        $data = $1;
+      }
+      $pp->{ExpandedURI q<target-data>} = \$data;
+      pos $data = 0;
+      $self->{error}->fork_position ($src => \$data);
+      ## Note: _content called if there is S after target name
+      $self->processing_instruction_content
+               ($src, $p, $pp, %opt);
+    }
+    
+    unless ($$src =~ /\G\?>/gc) {
+      $self->report
+               (-type => 'SYNTAX_PIC_REQUIRED',
+                -class => 'WFC',
+                source => $src);
+    }
+    
+    $self->processing_instruction_end
+               ($src, $p, $pp, %opt);
+  } else {
+    if ($opt{ExpandedURI q<match_or_error>}) {
+      $self->report
+               (-type => 'SYNTAX_PROCESSING_INSTRUCTION_REQUIRED',
+                -class => 'WFC',
+                source => $src);
+    }
+    return 0;
+  }
 }
 
-sub got_attribute ($$$$) {
-  my ($self, $src, undef, $opt) = @_;
-  
+
+sub report ($@) {
+  shift->{error}->report (@_);
 }
 
-sub got_attribute_name ($$$$) {
-  my ($self, $src, $s, $opt) = @_;
-  $opt->{parent} = $opt->{parent}->append_new_node
-                                     (type => '#attribute',
-                                      local_name => $s);
-}
+sub element_start ($$$$%) {}
+sub element_content ($$$$%) {}
+sub element_end ($$$$%) {}
 
-sub got_attribute_value_fragment ($$$$) {
-  my ($self, $src, $s, $opt) = @_;
-  $opt->{parent}->append_text ($s);
-}
+sub start_tag_start ($$$$%) {}
+sub start_tag_end ($$$$%) {}
 
-use Message::Markup::XML::Node qw/:charref :entity/;
-sub got_hex_character_reference ($$$$) {
-  my ($self, $src, $s, $opt) = @_;
-  $opt->{parent}->append_new_node (type => '#reference',
-                                   namespace_uri => SGML_HEX_CHAR_REF,
-                                   value => hex $s);
-}
+sub end_tag_start ($$$$%) {}
+sub end_tag_end ($$$$%) {}
 
-sub got_numeric_character_reference ($$$$) {
-  my ($self, $src, $s, $opt) = @_;
-  $opt->{parent}->append_new_node (type => '#reference',
-                                   namespace_uri => SGML_NCR,
-                                   value => 0+$s);
-}
+sub attribute_specifications_start ($$$$%) {}
+sub attribute_specifications_end ($$$$%) {}
 
-sub got_general_entity_reference ($$$$) {
-  my ($self, $src, $s, $opt) = @_;
-  $opt->{parent}->append_new_node (type => '#reference',
-                                   namespace_uri => SGML_GENERAL_ENTITY,
-                                   local_name => $s);
-}
+sub attribute_specification_start ($$$$%) {}
+sub attribute_specification_end ($$$$%) {}
 
-sub got_general_entity_reference_in_attribute_value_literal ($$$$) {
-  my ($self, $src, $s, $opt) = @_;
-  $opt->{parent}->append_new_node (type => '#reference',
-                                   namespace_uri => SGML_GENERAL_ENTITY,
-                                   local_name => $s);
-}
+sub attribute_value_specification_start ($$$$%) {}
+sub attribute_value_specification_content ($$$$%) {}
+sub attribute_value_specification_end ($$$$%) {}
 
-sub got_general_entity_reference_in_con_mode ($$$$) {
-  my ($self, $src, $s, $opt) = @_;
-  $opt->{parent}->append_new_node (type => '#reference',
-                                   namespace_uri => SGML_GENERAL_ENTITY,
-                                   local_name => $s);
-}
+sub comment_declaration_start ($$$$%) {}
+sub comment_declaration_end ($$$$%) {}
 
-sub error ($$) {
-  my ($self, $opt) = @_;
-  $opt->{-error} ||= Message::Util::Error::TextParser->new
-                       (package => 'Message::Markup::XML::Parser::Error');
-}
+sub comment_start ($$$$%) {}
+sub comment_content ($$$$%) {}
+sub comment_end ($$$$%) {}
 
-package Message::Markup::XML::Parser::Error;
-require Message::Util::Error::TextParser;
-push our @ISA, 'Message::Util::Error::TextParser::error';
+sub processing_instruction_start ($$$$%) {}
+sub processing_instruction_content ($$$$%) {}
+sub processing_instruction_end ($$$$%) {}
 
-sub ___error_def () {+{
-  
-}}
-
-sub text {
-  my $self = shift;
-  $self->_FORMATTER_PACKAGE_->new
-       ->replace ('%err-line;.%err-char;: '.$self->{-def}->{description}.' %err-at (prefix => {at "}, suffix => {"}, before => 20, after => 20);', param => $self);
-}
-
-package Message::Markup::XML::Parser::Error::WFC;
-push our @ISA, 'Message::Markup::XML::Parser::Error';
-
-sub ___error_def () {+{
-  SYNTAX_ATTR_NAME_REQUIRED => {
-    description => q(Attribute name expected),
-    level => 'ebnf',
-  },
-  SYNTAX_CLOSE_LIT_REQUIRED => {
-    description => q(lit (") closing attribute value literal expected),
-    level => 'ebnf',
-  },
-  SYNTAX_CLOSE_LITA_REQUIRED => {
-    description => q(lita (') closing attribute value literal expected),
-    level => 'ebnf',
-  },
-  SYNTAX_ELEMENT_TYPE_NAME_REQUIRED => {
-    description => q(Element type name expected),
-    level => 'ebnf',
-  },
-  SYNTAX_END_TAG_NOT_ALLOWED => {
-    description => q(End tag not allowed),
-    level => 'ebnf',
-  },
-  SYNTAX_END_TAG_TAGC_REQUIRED => {
-    description => q(tagc (>) terminating end tag is required),
-    level => 'ebnf',
-  },
-  SYNTAX_HASH_OR_NAME_REQUIRED => {
-    description => q("#" or Name expected after "&"),
-    level => 'ebnf',
-  },
-  SYNTAX_HEXDIGIT_REQUIRED => {
-    description => q(HEXDIGIT ([0-9A-Fa-f]) required after "&#x"),
-    level => 'ebnf',
-  },
-  SYNTAX_NET_REQUIRED => {
-    description => q(net (>) required just after nestc (/)),
-    level => 'ebnf',
-  },
-  SYNTAX_OPEN_LIT_OR_LITA_REQUIRED => {
-    description => q(lit (") or lita (') opening attribute value literal expected),
-    level => 'ebnf',
-  },
-  SYNTAX_REFERENCE_END_REQUIRED => {
-    description => q(refc (;) expected),
-    level => 'ebnf',
-  },
-  SYNTAX_S_REQUIRED_BETWEEN_ATTR_SPEC => {
-    description => q(Whitespace required between attribute specification),
-    level => 'ebnf',
-  },
-  SYNTAX_SLASH_OR_ELEMENT_TYPE_NAME_REQUIRED => {
-    description => q(Element type name or SOLIDUS (/) expected),
-    level => 'ebnf',
-  },
-  SYNTAX_SLASH_REQUIRED => {
-    description => q(SOLIDUS (/) expected),
-    level => 'ebnf',
-  },
-  SYNTAX_START_TAG_NOT_ALLOWED => {
-    description => q(Start tag not allowed),
-    level => 'ebnf',
-  },
-  SYNTAX_START_TAG_TAGC_OR_NESTC_REQUIRED => {
-    description => q(tagc (>) or nestc (/) expected),
-    level => 'ebnf',
-  },
-  SYNTAX_TAG_REQUIRED => {
-    description => q(Tag expected),
-    level => 'ebnf',
-  },
-  SYNTAX_VI_REQUIRED => {
-    description => q(vi (=) expected),
-    level => 'ebnf',
-  },
-  SYNTAX_X_OR_DIGIT_REQUIRED => {
-    description => q("x" (for hex character reference) or DIGIT ([0-9]) required after "&#"),
-    level => 'ebnf',
-  },
-  WFC_NO_LESS_THAN_IN_ATTR_VAL => {
-    description => q(LESS-THAN SIGN (<) not allowed in attribute value literal),
-    level => 'wfc',
-  },
-}}
+sub numeric_character_reference_in_attribute_value_literal_start
+    ($$$$%) {}
+sub numeric_character_reference_in_content_start ($$$$%) {}
+sub hex_character_reference_in_attribute_value_literal_start
+    ($$$$%) {}
+sub hex_character_reference_in_content_start ($$$$%) {}
+sub general_entity_reference_in_attribute_value_literal_start
+    ($$$$%) {}
+sub general_entity_reference_in_content_start ($$$$%) {}
 
 =head1 LICENSE
 
-Copyright 2003 Wakaba <w@suika.fam.cx>
+Copyright 2003-2004 Wakaba <w@suika.fam.cx>.  All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/02/14 11:20:58 $
+1; # $Date: 2004/02/24 07:24:57 $
