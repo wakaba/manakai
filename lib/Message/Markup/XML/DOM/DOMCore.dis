@@ -1,0 +1,1829 @@
+Namespace:
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @DOM3Core:
+     http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/
+Module:
+  @Name:  dom
+    @@Prefix:  w3c.org
+  @FullName:
+    @@lang:en
+    @@@: Core Module
+  @Spec:
+    @@DOM3:
+      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-BBACDC08
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @Package:
+    @@Type:
+      lang:Perl
+    @@@: DOMCore
+  
+  @Description:
+    @@lang:en
+    @@@:
+      Fundemental DOM interfaces that must be fully implemented by
+      all conforming implementations of DOM.
+  
+  @License:
+     license:Perl
+  @Date.RCS:
+     $Date: 2004/08/21 00:48:19 $
+  @Require:
+    @@Module:
+      @@@Name: ManakaiDOM
+      @@@Namespace:
+        http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+    @@Module:
+      @@@Name: DOMMain
+      @@@Namepsace:
+        http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@use:
+          @@@@@@: __CLASS{DOMMain}__
+          @@@@@Import[list]:
+            :boolean
+            null
+  
+  @Feature:
+    @@Name: Core
+    @@Version: 
+    @@Condition[list]:
+      DOM3
+    @@Spec:
+      @@@DOM3:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-BBACDC08
+  @Feature:
+    @@Name: Core
+    @@Version: 2.0
+    @@Condition[list]:
+      DOM2
+      DOM3
+    @@Spec:
+      @@@DOM3:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-BBACDC08
+  @Feature:
+    @@Name: Core
+    @@Version: 3.0
+    @@Condition[list]:
+      DOM3
+    @@Spec:
+      @@@DOM3:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-BBACDC08
+
+Exception:
+  @Name:  DOMException
+  @Spec:
+    @@DOM3:
+      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-17189187
+  @Attr:
+     @@Name:  code
+     @@Get:
+       @@@Type:  unsigned-short
+  @ConstGroup:
+     @@Name:  ExceptionCode
+     @@Spec:
+       @@DOM3:
+         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-258A00AF
+     @@Const:
+        @@@Name:  INDEX_SIZE_ERR
+        @@@Type:  unsigned-short
+        @@@Value:  1
+     @@Const:
+        @@@Name:  DOMSTRING_SIZE_ERR
+        @@@Type:  unsigned-short
+        @@@Value:  2
+     @@Const:
+        @@@Name:  HIERARCHY_REQUEST_ERR
+        @@@Type:  unsigned-short
+        @@@Value:  3
+     @@Const:
+        @@@Name:  WRONG_DOCUMENT_ERR
+        @@@Type:  unsigned-short
+        @@@Value:  4
+     @@Const:
+        @@@Name:  INVALID_CHARACTER_ERR
+        @@@Type:  unsigned-short
+        @@@Value:  5
+     @@Const:
+        @@@Name:  NO_DATA_ALLOWED_ERR
+        @@@Type:  unsigned-short
+        @@@Value:  6
+     @@Const:
+        @@@Name:  NO_MODIFICATION_ALLOWED_ERR
+        @@@Type:  unsigned-short
+        @@@Value:  7
+     @@Const:
+        @@@Name:  NOT_FOUND_ERR
+        @@@Type:  unsigned-short
+        @@@Value:  8
+     @@Const:
+        @@@Name:  NOT_SUPPORTED_ERR
+        @@@Type:  unsigned-short
+        @@@Value:  9
+     @@Const:
+        @@@Name:  INUSE_ATTRIBUTE_ERR
+        @@@Type:  unsigned-short
+        @@@Value:  10
+     @@Const:
+        @@@Name:  INVALID_STATE_ERR
+        @@@Type:  unsigned-short
+        @@@Value:  11
+        @@@Level[list]:  2
+     @@Const:
+        @@@Name:  SYNTAX_ERR
+        @@@Type:  unsigned-short
+        @@@Value:  12
+        @@@Level[list]:  2
+     @@Const:
+        @@@Name:  INVALID_MODIFICATION_ERR
+        @@@Type:  unsigned-short
+        @@@Value:  13
+        @@@Level[list]:  2
+     @@Const:
+        @@@Name:  NAMESPACE_ERR
+        @@@Type:  unsigned-short
+        @@@Value:  14
+        @@@Level[list]:  2
+     @@Const:
+        @@@Name:  INVALID_ACCESS_ERR
+        @@@Type:  unsigned-short
+        @@@Value:  15
+        @@@Level[list]:  2
+     @@Const:
+        @@@Name:  VALIDATION_ERR
+        @@@Type:  unsigned-short
+        @@@Value:  16
+        @@@Level[list]:  3
+     @@Const:
+        @@@Name:  TYPE_MISMATCH_ERR
+        @@@Type:  unsigned-short
+        @@@Value:  17
+        @@@Level[list]:  3
+
+IF:
+  @Name:  DOMStringList
+  @Level[list]:  3
+  @Spec:
+    @@DOM3:
+      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DOMStringList
+  @Description:
+    @@lang:en
+    @@@:
+      An ordered collection of DOMString values.
+  @Method:
+     @@Name:  item
+     @@Spec:
+       @@@DOM3:
+         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DOMStringList-item
+     @@Param:
+        @@@Name:  index
+        @@@Type:  unsigned-long
+        @@@Description:
+          @@@@lang:en
+          @@@@@: An integral index, starting from 0.
+     @@Return:
+        @@@Type:  DOMString
+        @@@Def:
+          if (not defined $index or
+              $index < 0 or
+              $index > $#$self) {
+            $r = null;
+          } else {
+            __INT__;
+          }
+        @@@IntDef:
+          $r = $self->[$index];
+  @Attr:
+     @@Name:  length
+     @@Spec:
+       @@@DOM3:
+         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DOMStringList-length
+     @@Get:
+        @@@Type:  unsigned-long
+        @@@Def:
+          $r = @$self;
+  @Method:
+     @@Name:  contains
+     @@Spec:
+       @@@DOM3: 
+         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DOMStringList-contains
+     @@Param:
+        @@@Name:  str
+        @@@Type:  DOMString
+     @@Return:
+        @@@Type:  boolean
+        @@@Def:
+          $r = false;
+          CHK: {
+            __DEEP{
+              for (@$self) {
+                if ($str eq $_) {
+                  $r = true;
+                  last CHK;
+                }
+              }
+            }__;
+          }
+
+IF:
+  @Name:  NameList
+  @Level[list]:  3
+  @Spec:
+    @@DOM3:
+      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#NameList
+  @Description:
+    @@lang:en
+    @@@:
+      An ordered collection of parallel pairs of name and namespace values.
+  @Method:
+     @@Name:  getName
+     @@Spec:
+       @@@DOM3:
+         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#NameList-getName
+     @@Param:
+        @@@Name:  index
+        @@@Type:  unsigned-long
+     @@Return:
+        @@@Type:  DOMString
+        @@@Def:
+          if (not defined $index or
+              $index < 0 or
+              $index > $#$self) {
+            $r = null;
+          } else {
+            __INT__;
+          }
+        @@@IntDef:
+          $r = $self->[$index]->{name};
+  @Method:
+     @@Name:  getNamespaceURI
+     @@Spec:
+       @@@DOM3:
+         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#NameList-getNamespaceURI
+     @@Param:
+        @@@Name:  index
+        @@@Type:  unsigned-long
+     @@Return:
+        @@@Type:  DOMString
+        @@@Def:
+          if (not defined $index or
+              $index < 0 or
+              $index > $#$self) {
+            $r = null;
+          } else {
+            __INT__;
+          }
+        @@@IntDef:
+          $r = $self->[$index]->{nsURI};
+  @Attr:
+     @@Name:  length
+     @@Spec:
+       @@@DOM3:
+         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#NameList-length
+     @@Get:
+        @@@Type:  unsigned-long
+        @@@Def:
+          $r = @$self;
+  @Method:
+     @@Name:  contains
+     @@Spec:
+       @@@DOM3:
+         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#NameList-contains
+     @@Param:
+        @@@Name:  str
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: A name.
+     @@Return:
+        @@@Type:  boolean
+        @@@Def:
+          $r = false;
+          CHK: {
+            __DEEP{
+              for (@$self) {
+                if ($str eq $_->{name}) {
+                  $r = true;
+                  last CHK;
+                }
+              }
+            }__;
+          }
+  @Method:
+     @@Name:  containsNS
+     @@Spec:
+       @@@DOM3:
+         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#NameList-containsNS
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  name
+        @@@Type:  DOMString
+     @@Return:
+        @@@Type:  boolean
+          $r = false;
+          CHK: {
+            __DEEP{
+              for (@$self) {
+                if ($namespaceURI eq $_->{nsURI} and
+                    $name eq $_->{name}) {
+                  $r = true;
+                  last CHK;
+                }
+              }
+            }__;
+          }
+
+IF:
+  @Name:  DOMImplementationList
+  @Level[list]:  3
+  @Spec:
+    @@DOM3:
+      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DOMImplementationList
+  @Method:
+     @@Name:  item
+     @@Spec:
+       @@@DOM3:
+         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DOMImplementationList-item
+     @@Param:
+        @@@Name:  index
+        @@@Type:  unsigned-long
+     @@Return:
+        @@@Type:  DOMImplementation
+        @@@Def:
+          if (not defined $index or
+              $index < 0 or
+              $index > $#$self) {
+            $r = null;
+          } else {
+            __INT__;
+          }
+        @@@IntDef:
+          $r = $self->[$index];
+  @Attr:
+     @@Name:  length
+     @@Spec:
+       @@@DOM3:
+         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DOMImplementationList-length
+     @@Get:
+        @@@Type:  unsigned-long
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            $r = @$self;
+  @IntMethod:
+    @@Name: new
+    @@Return:
+      @@@Type: DOMImplementationList
+      @@@Description:
+        @@@@lang:en
+        @@@@@: Construct a new instance of DOMImplementationList.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = bless [], $self;
+  @IntMethod:
+    @@Name: append
+    @@Param:
+      @@@Name: list
+      @@@Type: DOMImplementationList
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A list of DOMImplementation objects.  Instead of a DOMImplementationList
+          object, one or more DOMImplementation and/or DOMImplementationList
+          objects can be specified.
+    @@Return:
+      @@@Description:
+        @@@@lang: en
+        @@@@@: Append one or more DOMImplementation objects to the list.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@preprocess: none
+        @@@@@:
+          my $self = shift;
+          for (@_) {
+            if ($_->isa (__CLASS{DOMImplementationList}__)) {
+              push @$self, @$_;
+            } elsif ($_->isa (__CLASS{DOMImplementation}__)) {
+              push @$self, $_;
+            } elsif ($_->isa (__IF{DOMImplementationList}__)) {
+              __DEEP{
+                my $len = $_->length;
+                for (my $i = 0; $i < $len; $i++) {
+                  push @$self, $_->item ($i);
+                }
+              }__;
+            } elsif ($_->isa (__IF{DOMImplementation}__)) {
+              push @$self, $_;
+            } else {
+              __EXCEPTION{ManakaiDOMImplementationException}{
+                -class => 'exception',
+                -type => 'PARAM_INVALID_CLASS',
+                <Q:ManakaiDOMImplementationException:class> => ref $_,
+              }__;
+            }
+          }
+IF:
+  @Name:  DOMImplementationSource
+  @Level[list]:  3
+  @Spec:
+    @@DOM3:
+      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DOMImplementationSource
+  @Method:
+     @@Name:  getDOMImplementation
+     @@Spec:
+       @@@DOM3:
+         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-getDOMImpl
+     @@Param:
+        @@@Name:  features
+        @@@Type:  DOMString
+     @@Return:
+        @@@Type:  DOMImplementation
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The first DOMImplementation that supports the specified features.
+  @Method:
+     @@Name:  getDOMImplementationList
+     @@Return:
+        @@@Type:  DOMImplementationList
+     @@Param:
+        @@@Name:  features
+        @@@Type:  DOMString
+IF:
+  @Name:  DOMImplementation
+  @Spec:
+    @@DOM3:
+      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-102161490
+  @Method:
+     @@Name:  hasFeature
+     @@Return:
+        @@@Type:  boolean
+     @@Param:
+        @@@Name:  feature
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  version
+        @@@Type:  DOMString
+  @Method:
+     @@Name:  createDocumentType
+     @@Return:
+        @@@Type:  DocumentType
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  qualifiedName
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  publicId
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  systemId
+        @@@Type:  DOMString
+     @@Level[list]:  2
+  @Method:
+     @@Name:  createDocument
+     @@Return:
+        @@@Type:  Document
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  qualifiedName
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  doctype
+        @@@Type:  DocumentType
+     @@Level[list]:  2
+  @Method:
+     @@Name:  getFeature
+     @@Return:
+        @@@Type:  DOMObject
+     @@Param:
+        @@@Name:  feature
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  version
+        @@@Type:  DOMString
+     @@Level[list]:  3
+IF:
+  @Name:  Node
+  @ConstGroup:
+     @@Name:  NodeType
+     @@Const:
+        @@@Name:  ELEMENT_NODE
+        @@@Type:  unsigned-short
+        @@@Value:  1
+     @@Const:
+        @@@Name:  ATTRIBUTE_NODE
+        @@@Type:  unsigned-short
+        @@@Value:  2
+     @@Const:
+        @@@Name:  TEXT_NODE
+        @@@Type:  unsigned-short
+        @@@Value:  3
+     @@Const:
+        @@@Name:  CDATA_SECTION_NODE
+        @@@Type:  unsigned-short
+        @@@Value:  4
+     @@Const:
+        @@@Name:  ENTITY_REFERENCE_NODE
+        @@@Type:  unsigned-short
+        @@@Value:  5
+     @@Const:
+        @@@Name:  ENTITY_NODE
+        @@@Type:  unsigned-short
+        @@@Value:  6
+     @@Const:
+        @@@Name:  PROCESSING_INSTRUCTION_NODE
+        @@@Type:  unsigned-short
+        @@@Value:  7
+     @@Const:
+        @@@Name:  COMMENT_NODE
+        @@@Type:  unsigned-short
+        @@@Value:  8
+     @@Const:
+        @@@Name:  DOCUMENT_NODE
+        @@@Type:  unsigned-short
+        @@@Value:  9
+     @@Const:
+        @@@Name:  DOCUMENT_TYPE_NODE
+        @@@Type:  unsigned-short
+        @@@Value:  10
+     @@Const:
+        @@@Name:  DOCUMENT_FRAGMENT_NODE
+        @@@Type:  unsigned-short
+        @@@Value:  11
+     @@Const:
+        @@@Name:  NOTATION_NODE
+        @@@Type:  unsigned-short
+        @@@Value:  12
+  @Attr:
+     @@Name:  nodeName
+     @@Get:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  nodeValue
+     @@Get:
+        @@@Type:  DOMString
+        @@@Exception[list]:  DOMException
+     @@Set:
+        @@@Type:  DOMString
+        @@@Exception[list]:  DOMException
+  @Attr:
+     @@Name:  nodeType
+     @@Get:
+        @@@Type:  unsigned-short
+  @Attr:
+     @@Name:  parentNode
+     @@Get:
+        @@@Type:  Node
+  @Attr:
+     @@Name:  childNodes
+     @@Get:
+        @@@Type:  NodeList
+  @Attr:
+     @@Name:  firstChild
+     @@Get:
+        @@@Type:  Node
+  @Attr:
+     @@Name:  lastChild
+     @@Get:
+        @@@Type:  Node
+  @Attr:
+     @@Name:  previousSibling
+     @@Get:
+        @@@Type:  Node
+  @Attr:
+     @@Name:  nextSibling
+     @@Get:
+        @@@Type:  Node
+  @Attr:
+     @@Name:  attributes
+     @@Get:
+        @@@Type:  NamedNodeMap
+  @Attr:
+     @@Name:  ownerDocument
+     @@Get:
+        @@@Type:  Document
+     @@ModifiedLevel[list]:  2
+  @Method:
+     @@Name:  insertBefore
+     @@Return:
+        @@@Type:  Node
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  newChild
+        @@@Type:  Node
+     @@Param:
+        @@@Name:  refChild
+        @@@Type:  Node
+     @@ModifiedLevel[list]:  3
+  @Method:
+     @@Name:  replaceChild
+     @@Return:
+        @@@Type:  Node
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  newChild
+        @@@Type:  Node
+     @@Param:
+        @@@Name:  oldChild
+        @@@Type:  Node
+     @@ModifiedLevel[list]:  3
+  @Method:
+     @@Name:  removeChild
+     @@Return:
+        @@@Type:  Node
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  oldChild
+        @@@Type:  Node
+     @@ModifiedLevel[list]:  3
+  @Method:
+     @@Name:  appendChild
+     @@Return:
+        @@@Type:  Node
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  newChild
+        @@@Type:  Node
+     @@ModifiedLevel[list]:  3
+  @Method:
+     @@Name:  hasChildNodes
+     @@Return:
+        @@@Type:  boolean
+  @Method:
+     @@Name:  cloneNode
+     @@Return:
+        @@@Type:  Node
+     @@Param:
+        @@@Name:  deep
+        @@@Type:  boolean
+  @Method:
+     @@Name:  normalize
+     @@ModifiedLevel[list]:  3
+  @Method:
+     @@Name:  isSupported
+     @@Return:
+        @@@Type:  boolean
+     @@Param:
+        @@@Name:  feature
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  version
+        @@@Type:  DOMString
+     @@Level[list]:  2
+  @Attr:
+     @@Name:  namespaceURI
+     @@Get:
+        @@@Type:  DOMString
+     @@Level[list]:  2
+  @Attr:
+     @@Name:  prefix
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+        @@@Exception[list]:  DOMException
+     @@Level[list]:  2
+  @Attr:
+     @@Name:  localName
+     @@Get:
+        @@@Type:  DOMString
+     @@Level[list]:  2
+  @Method:
+     @@Name:  hasAttributes
+     @@Return:
+        @@@Type:  boolean
+     @@Level[list]:  2
+  @Attr:
+     @@Name:  baseURI
+     @@Get:
+        @@@Type:  DOMString
+     @@Level[list]:  3
+     @@Spec:
+       @@@DOM3:
+         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#baseURIs-Considerations
+  @ConstGroup:
+     @@Name:  DocumentPosition
+     @@Const:
+        @@@Name:  DOCUMENT_POSITION_DISCONNECTED
+        @@@Type:  unsigned-short
+        @@@Value:  0x01
+     @@Const:
+        @@@Name:  DOCUMENT_POSITION_PRECEDING
+        @@@Type:  unsigned-short
+        @@@Value:  0x02
+     @@Const:
+        @@@Name:  DOCUMENT_POSITION_FOLLOWING
+        @@@Type:  unsigned-short
+        @@@Value:  0x04
+     @@Const:
+        @@@Name:  DOCUMENT_POSITION_CONTAINS
+        @@@Type:  unsigned-short
+        @@@Value:  0x08
+     @@Const:
+        @@@Name:  DOCUMENT_POSITION_CONTAINED_BY
+        @@@Type:  unsigned-short
+        @@@Value:  0x10
+     @@Const:
+        @@@Name:  DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC
+        @@@Type:  unsigned-short
+        @@@Value:  0x20
+  @Method:
+     @@Name:  compareDocumentPosition
+     @@Return:
+        @@@Type:  unsigned-short
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  other
+        @@@Type:  Node
+     @@Level[list]:  3
+  @Attr:
+     @@Name:  textContent
+     @@Get:
+        @@@Type:  DOMString
+        @@@Exception[list]:  DOMException
+     @@Set:
+        @@@Type:  DOMString
+        @@@Exception[list]:  DOMException
+     @@Level[list]:  3
+  @Method:
+     @@Name:  isSameNode
+     @@Return:
+        @@@Type:  boolean
+     @@Param:
+        @@@Name:  other
+        @@@Type:  Node
+     @@Level[list]:  3
+  @Method:
+     @@Name:  lookupPrefix
+     @@Return:
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  DOMString
+     @@Level[list]:  3
+  @Method:
+     @@Name:  isDefaultNamespace
+     @@Return:
+        @@@Type:  boolean
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  DOMString
+     @@Level[list]:  3
+  @Method:
+     @@Name:  lookupNamespaceURI
+     @@Return:
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  prefix
+        @@@Type:  DOMString
+     @@Level[list]:  3
+  @Method:
+     @@Name:  isEqualNode
+     @@Return:
+        @@@Type:  boolean
+     @@Param:
+        @@@Name:  arg
+        @@@Type:  Node
+     @@Level[list]:  3
+  @Method:
+     @@Name:  getFeature
+     @@Return:
+        @@@Type:  DOMObject
+     @@Param:
+        @@@Name:  feature
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  version
+        @@@Type:  DOMString
+     @@Level[list]:  3
+  @Method:
+     @@Name:  setUserData
+     @@Return:
+        @@@Type:  DOMUserData
+     @@Param:
+        @@@Name:  key
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  data
+        @@@Type:  DOMUserData
+     @@Param:
+        @@@Name:  handler
+        @@@Type:  UserDataHandler
+     @@Level[list]:  3
+  @Method:
+     @@Name:  getUserData
+     @@Return:
+        @@@Type:  DOMUserData
+     @@Param:
+        @@@Name:  key
+        @@@Type:  DOMString
+     @@Level[list]:  3
+IF:
+  @Name:  NodeList
+  @Method:
+     @@Name:  item
+     @@Return:
+        @@@Type:  Node
+     @@Param:
+        @@@Name:  index
+        @@@Type:  unsigned-long
+  @Attr:
+     @@Name:  length
+     @@Get:
+        @@@Type:  unsigned-long
+IF:
+  @Name:  NamedNodeMap
+  @Method:
+     @@Name:  getNamedItem
+     @@Return:
+        @@@Type:  Node
+     @@Param:
+        @@@Name:  name
+        @@@Type:  DOMString
+  @Method:
+     @@Name:  setNamedItem
+     @@Return:
+        @@@Type:  Node
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  arg
+        @@@Type:  Node
+  @Method:
+     @@Name:  removeNamedItem
+     @@Return:
+        @@@Type:  Node
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  name
+        @@@Type:  DOMString
+  @Method:
+     @@Name:  item
+     @@Return:
+        @@@Type:  Node
+     @@Param:
+        @@@Name:  index
+        @@@Type:  unsigned-long
+  @Attr:
+     @@Name:  length
+     @@Get:
+        @@@Type:  unsigned-long
+  @Method:
+     @@Name:  getNamedItemNS
+     @@Return:
+        @@@Type:  Node
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  localName
+        @@@Type:  DOMString
+     @@Level[list]:  2
+  @Method:
+     @@Name:  setNamedItemNS
+     @@Return:
+        @@@Type:  Node
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  arg
+        @@@Type:  Node
+     @@Level[list]:  2
+  @Method:
+     @@Name:  removeNamedItemNS
+     @@Return:
+        @@@Type:  Node
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  localName
+        @@@Type:  DOMString
+     @@Level[list]:  2
+IF:
+  @Name:  CharacterData
+  @ISA[list]:  Node
+  @Attr:
+     @@Name:  data
+     @@Get:
+        @@@Type:  DOMString
+        @@@Exception[list]:  DOMException
+     @@Set:
+        @@@Type:  DOMString
+        @@@Exception[list]:  DOMException
+  @Attr:
+     @@Name:  length
+     @@Get:
+        @@@Type:  unsigned-long
+  @Method:
+     @@Name:  substringData
+     @@Return:
+        @@@Type:  DOMString
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  offset
+        @@@Type:  unsigned-long
+     @@Param:
+        @@@Name:  count
+        @@@Type:  unsigned-long
+  @Method:
+     @@Name:  appendData
+     @@Param:
+        @@@Name:  arg
+        @@@Type:  DOMString
+     @@Return:
+        @@@Exception[list]:  DOMException
+  @Method:
+     @@Name:  insertData
+     @@Param:
+        @@@Name:  offset
+        @@@Type:  unsigned-long
+     @@Param:
+        @@@Name:  arg
+        @@@Type:  DOMString
+     @@Return:
+        @@@Exception[list]:  DOMException
+  @Method:
+     @@Name:  deleteData
+     @@Param:
+        @@@Name:  offset
+        @@@Type:  unsigned-long
+     @@Param:
+        @@@Name:  count
+        @@@Type:  unsigned-long
+     @@Return:
+        @@@Exception[list]:  DOMException
+  @Method:
+     @@Name:  replaceData
+     @@Param:
+        @@@Name:  offset
+        @@@Type:  unsigned-long
+     @@Param:
+        @@@Name:  count
+        @@@Type:  unsigned-long
+     @@Param:
+        @@@Name:  arg
+        @@@Type:  DOMString
+     @@Return:
+        @@@Exception[list]:  DOMException
+IF:
+  @Name:  Attr
+  @ISA[list]:  Node
+  @Attr:
+     @@Name:  name
+     @@Get:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  specified
+     @@Get:
+        @@@Type:  boolean
+  @Attr:
+     @@Name:  value
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+        @@@Exception[list]:  DOMException
+  @Attr:
+     @@Name:  ownerElement
+     @@Get:
+        @@@Type:  Element
+     @@Level[list]:  2
+  @Attr:
+     @@Name:  schemaTypeInfo
+     @@Get:
+        @@@Type:  TypeInfo
+     @@Level[list]:  3
+  @Attr:
+     @@Name:  isId
+     @@Get:
+        @@@Type:  boolean
+     @@Level[list]:  3
+  
+  @ReAttr:
+    @@Name: attributes
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-84CF096
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Get:
+      @@@Type: NamedNodeMap
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = null;
+
+IF:
+  @Name:  Element
+  @ISA[list]:  Node
+  @Attr:
+     @@Name:  tagName
+     @@Get:
+        @@@Type:  DOMString
+  @Method:
+     @@Name:  getAttribute
+     @@Return:
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  name
+        @@@Type:  DOMString
+  @Method:
+     @@Name:  setAttribute
+     @@Param:
+        @@@Name:  name
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  value
+        @@@Type:  DOMString
+     @@Return:
+        @@@Exception[list]:  DOMException
+  @Method:
+     @@Name:  removeAttribute
+     @@Param:
+        @@@Name:  name
+        @@@Type:  DOMString
+     @@Return:
+        @@@Exception[list]:  DOMException
+  @Method:
+     @@Name:  getAttributeNode
+     @@Return:
+        @@@Type:  Attr
+     @@Param:
+        @@@Name:  name
+        @@@Type:  DOMString
+  @Method:
+     @@Name:  setAttributeNode
+     @@Return:
+        @@@Type:  Attr
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  newAttr
+        @@@Type:  Attr
+  @Method:
+     @@Name:  removeAttributeNode
+     @@Return:
+        @@@Type:  Attr
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  oldAttr
+        @@@Type:  Attr
+  @Method:
+     @@Name:  getElementsByTagName
+     @@Return:
+        @@@Type:  NodeList
+     @@Param:
+        @@@Name:  name
+        @@@Type:  DOMString
+  @Method:
+     @@Name:  getAttributeNS
+     @@Return:
+        @@@Type:  DOMString
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  localName
+        @@@Type:  DOMString
+     @@Level[list]:  2
+  @Method:
+     @@Name:  setAttributeNS
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  qualifiedName
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  value
+        @@@Type:  DOMString
+     @@Return:
+        @@@Exception[list]:  DOMException
+     @@Level[list]:  2
+  @Method:
+     @@Name:  removeAttributeNS
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  localName
+        @@@Type:  DOMString
+     @@Return:
+        @@@Exception[list]:  DOMException
+     @@Level[list]:  2
+  @Method:
+     @@Name:  getAttributeNodeNS
+     @@Return:
+        @@@Type:  Attr
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  localName
+        @@@Type:  DOMString
+     @@Level[list]:  2
+  @Method:
+     @@Name:  setAttributeNodeNS
+     @@Return:
+        @@@Type:  Attr
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  newAttr
+        @@@Type:  Attr
+     @@Level[list]:  2
+  @Method:
+     @@Name:  getElementsByTagNameNS
+     @@Return:
+        @@@Type:  NodeList
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  localName
+        @@@Type:  DOMString
+     @@Level[list]:  2
+  @Method:
+     @@Name:  hasAttribute
+     @@Return:
+        @@@Type:  boolean
+     @@Param:
+        @@@Name:  name
+        @@@Type:  DOMString
+     @@Level[list]:  2
+  @Method:
+     @@Name:  hasAttributeNS
+     @@Return:
+        @@@Type:  boolean
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  localName
+        @@@Type:  DOMString
+     @@Level[list]:  2
+  @Attr:
+     @@Name:  schemaTypeInfo
+     @@Get:
+        @@@Type:  TypeInfo
+     @@Level[list]:  3
+  @Method:
+     @@Name:  setIdAttribute
+     @@Param:
+        @@@Name:  name
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  isId
+        @@@Type:  boolean
+     @@Return:
+        @@@Exception[list]:  DOMException
+     @@Level[list]:  3
+  @Method:
+     @@Name:  setIdAttributeNS
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  localName
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  isId
+        @@@Type:  boolean
+     @@Return:
+        @@@Exception[list]:  DOMException
+     @@Level[list]:  3
+  @Method:
+     @@Name:  setIdAttributeNode
+     @@Param:
+        @@@Name:  idAttr
+        @@@Type:  Attr
+     @@Param:
+        @@@Name:  isId
+        @@@Type:  boolean
+     @@Return:
+        @@@Exception[list]:  DOMException
+     @@Level[list]:  3
+  
+  @ReAttr:
+    @@Name: nodeValue
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D080
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Get:
+      @@@Type: DOMString
+      @@@Exception[list]: DOMException
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = null;
+    @@Set:
+      @@@Type: DOMString
+      @@@Exception[list]: DOMException
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          __EXCEPTION{ManakaiDOMImplementationException}{
+            -class => 'warn',
+            -type => 'ATTR_SET_NO_EFFECT',
+          }__;
+
+IF:
+  @Name:  Text
+  @ISA[list]:  CharacterData
+  @Method:
+     @@Name:  splitText
+     @@Return:
+        @@@Type:  Text
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  offset
+        @@@Type:  unsigned-long
+  @Attr:
+     @@Name:  isElementContentWhitespace
+     @@Get:
+        @@@Type:  boolean
+     @@Level[list]:  3
+  @Attr:
+     @@Name:  wholeText
+     @@Get:
+        @@@Type:  DOMString
+     @@Level[list]:  3
+  @Method:
+     @@Name:  replaceWholeText
+     @@Return:
+        @@@Type:  Text
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  content
+        @@@Type:  DOMString
+     @@Level[list]:  3
+  
+  @ReAttr:
+    @@Name: attributes
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-84CF096
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Get:
+      @@@Type: NamedNodeMap
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = null;
+  @ReAttr:
+    @@Name: nodeName
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Get:
+      @@@Type: DOMString
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = q<#text>;
+
+IF:
+  @Name:  Comment
+  @ISA[list]:  CharacterData
+  
+  @ReAttr:
+    @@Name: attributes
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-84CF096
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Get:
+      @@@Type: NamedNodeMap
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = null;
+  @ReAttr:
+    @@Name: nodeName
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Get:
+      @@@Type: DOMString
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = q<#comment>;
+
+IF:
+  @Name:  TypeInfo
+  @Level[list]:  3
+  @Attr:
+     @@Name:  typeName
+     @@Get:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  typeNamespace
+     @@Get:
+        @@@Type:  DOMString
+  @ConstGroup:
+     @@Name:  DerivationMethods
+     @@Const:
+        @@@Name:  DERIVATION_RESTRICTION
+        @@@Type:  unsigned-long
+        @@@Value:  0x00000001
+     @@Const:
+        @@@Name:  DERIVATION_EXTENSION
+        @@@Type:  unsigned-long
+        @@@Value:  0x00000002
+     @@Const:
+        @@@Name:  DERIVATION_UNION
+        @@@Type:  unsigned-long
+        @@@Value:  0x00000004
+     @@Const:
+        @@@Name:  DERIVATION_LIST
+        @@@Type:  unsigned-long
+        @@@Value:  0x00000008
+  @Method:
+     @@Name:  isDerivedFrom
+     @@Return:
+        @@@Type:  boolean
+     @@Param:
+        @@@Name:  typeNamespaceArg
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  typeNameArg
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  derivationMethod
+        @@@Type:  unsigned-long
+
+IF:
+  @Name:  UserDataHandler
+  @Level[list]:  3
+  @ConstGroup:
+     @@Name:  OperationType
+     @@Const:
+        @@@Name:  NODE_CLONED
+        @@@Type:  unsigned-short
+        @@@Value:  1
+     @@Const:
+        @@@Name:  NODE_IMPORTED
+        @@@Type:  unsigned-short
+        @@@Value:  2
+     @@Const:
+        @@@Name:  NODE_DELETED
+        @@@Type:  unsigned-short
+        @@@Value:  3
+     @@Const:
+        @@@Name:  NODE_RENAMED
+        @@@Type:  unsigned-short
+        @@@Value:  4
+     @@Const:
+        @@@Name:  NODE_ADOPTED
+        @@@Type:  unsigned-short
+        @@@Value:  5
+  @Method:
+     @@Name:  handle
+     @@Param:
+        @@@Name:  operation
+        @@@Type:  unsigned-short
+     @@Param:
+        @@@Name:  key
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  data
+        @@@Type:  DOMUserData
+     @@Param:
+        @@@Name:  src
+        @@@Type:  Node
+     @@Param:
+        @@@Name:  dst
+        @@@Type:  Node
+
+IF:
+  @Name:  DOMError
+  @Level[list]:  3
+  @ConstGroup:
+     @@Name:  ErrorSeverity
+     @@Const:
+        @@@Name:  SEVERITY_WARNING
+        @@@Type:  unsigned-short
+        @@@Value:  1
+     @@Const:
+        @@@Name:  SEVERITY_ERROR
+        @@@Type:  unsigned-short
+        @@@Value:  2
+     @@Const:
+        @@@Name:  SEVERITY_FATAL_ERROR
+        @@@Type:  unsigned-short
+        @@@Value:  3
+  @Attr:
+     @@Name:  severity
+     @@Get:
+        @@@Type:  unsigned-short
+  @Attr:
+     @@Name:  message
+     @@Get:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  type
+     @@Get:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  relatedException
+     @@Get:
+        @@@Type:  DOMObject
+  @Attr:
+     @@Name:  relatedData
+     @@Get:
+        @@@Type:  DOMObject
+  @Attr:
+     @@Name:  location
+     @@Get:
+        @@@Type:  DOMLocator
+
+IF:
+  @Name:  DOMErrorHandler
+  @Level[list]:  3
+  @Method:
+     @@Name:  handleError
+     @@Return:
+        @@@Type:  boolean
+     @@Param:
+        @@@Name:  error
+        @@@Type:  DOMError
+
+IF:
+  @Name:  DOMLocator
+  @Level[list]:  3
+  @Attr:
+     @@Name:  lineNumber
+     @@Get:
+        @@@Type:  long
+  @Attr:
+     @@Name:  columnNumber
+     @@Get:
+        @@@Type:  long
+  @Attr:
+     @@Name:  byteOffset
+     @@Get:
+        @@@Type:  long
+  @Attr:
+     @@Name:  utf16Offset
+     @@Get:
+        @@@Type:  long
+  @Attr:
+     @@Name:  relatedNode
+     @@Get:
+        @@@Type:  Node
+  @Attr:
+     @@Name:  uri
+     @@Get:
+        @@@Type:  DOMString
+
+IF:
+  @Name:  DOMConfiguration
+  @Level[list]:  3
+  @Method:
+     @@Name:  setParameter
+     @@Param:
+        @@@Name:  name
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  value
+        @@@Type:  DOMUserData
+     @@Return:
+        @@@Exception[list]:  DOMException
+  @Method:
+     @@Name:  getParameter
+     @@Return:
+        @@@Type:  DOMUserData
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  name
+        @@@Type:  DOMString
+  @Method:
+     @@Name:  canSetParameter
+     @@Return:
+        @@@Type:  boolean
+     @@Param:
+        @@@Name:  name
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  value
+        @@@Type:  DOMUserData
+  @Attr:
+     @@Name:  parameterNames
+     @@Get:
+        @@@Type:  DOMStringList
+
+IF:
+  @Name:  Document
+  @ISA[list]:  Node
+  @Attr:
+     @@Name:  doctype
+     @@Get:
+        @@@Type:  DocumentType
+     @@ModifiedLevel[list]:  3
+  @Attr:
+     @@Name:  implementation
+     @@Get:
+        @@@Type:  DOMImplementation
+  @Attr:
+     @@Name:  documentElement
+     @@Get:
+        @@@Type:  Element
+  @Method:
+     @@Name:  createElement
+     @@Return:
+        @@@Type:  Element
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  tagName
+        @@@Type:  DOMString
+  @Method:
+     @@Name:  createDocumentFragment
+     @@Return:
+        @@@Type:  DocumentFragment
+  @Method:
+     @@Name:  createTextNode
+     @@Return:
+        @@@Type:  Text
+     @@Param:
+        @@@Name:  data
+        @@@Type:  DOMString
+  @Method:
+     @@Name:  createComment
+     @@Return:
+        @@@Type:  Comment
+     @@Param:
+        @@@Name:  data
+        @@@Type:  DOMString
+  @Method:
+     @@Name:  createCDATASection
+     @@Return:
+        @@@Type:  CDATASection
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  data
+        @@@Type:  DOMString
+  @Method:
+     @@Name:  createProcessingInstruction
+     @@Return:
+        @@@Type:  ProcessingInstruction
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  target
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  data
+        @@@Type:  DOMString
+  @Method:
+     @@Name:  createAttribute
+     @@Return:
+        @@@Type:  Attr
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  name
+        @@@Type:  DOMString
+  @Method:
+     @@Name:  createEntityReference
+     @@Return:
+        @@@Type:  EntityReference
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  name
+        @@@Type:  DOMString
+  @Method:
+     @@Name:  getElementsByTagName
+     @@Return:
+        @@@Type:  NodeList
+     @@Param:
+        @@@Name:  tagname
+        @@@Type:  DOMString
+  @Method:
+     @@Name:  importNode
+     @@Return:
+        @@@Type:  Node
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  importedNode
+        @@@Type:  Node
+     @@Param:
+        @@@Name:  deep
+        @@@Type:  boolean
+     @@Level[list]:  2
+  @Method:
+     @@Name:  createElementNS
+     @@Return:
+        @@@Type:  Element
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  qualifiedName
+        @@@Type:  DOMString
+     @@Level[list]:  2
+  @Method:
+     @@Name:  createAttributeNS
+     @@Return:
+        @@@Type:  Attr
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  qualifiedName
+        @@@Type:  DOMString
+     @@Level[list]:  2
+  @Method:
+     @@Name:  getElementsByTagNameNS
+     @@Return:
+        @@@Type:  NodeList
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  localName
+        @@@Type:  DOMString
+     @@Level[list]:  2
+  @Method:
+     @@Name:  getElementById
+     @@Return:
+        @@@Type:  Element
+     @@Param:
+        @@@Name:  elementId
+        @@@Type:  DOMString
+     @@Level[list]:  2
+  @Attr:
+     @@Name:  inputEncoding
+     @@Get:
+        @@@Type:  DOMString
+     @@Level[list]:  3
+  @Attr:
+     @@Name:  xmlEncoding
+     @@Get:
+        @@@Type:  DOMString
+     @@Level[list]:  3
+  @Attr:
+     @@Name:  xmlStandalone
+     @@Get:
+        @@@Type:  boolean
+     @@Set:
+        @@@Type:  boolean
+        @@@Exception[list]:  DOMException
+     @@Level[list]:  3
+  @Attr:
+     @@Name:  xmlVersion
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+        @@@Exception[list]:  DOMException
+     @@Level[list]:  3
+  @Attr:
+     @@Name:  strictErrorChecking
+     @@Get:
+        @@@Type:  boolean
+     @@Set:
+        @@@Type:  boolean
+     @@Level[list]:  3
+  @Attr:
+     @@Name:  documentURI
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+     @@Level[list]:  3
+  @Method:
+     @@Name:  adoptNode
+     @@Return:
+        @@@Type:  Node
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  source
+        @@@Type:  Node
+     @@Level[list]:  3
+  @Attr:
+     @@Name:  domConfig
+     @@Get:
+        @@@Type:  DOMConfiguration
+     @@Level[list]:  3
+  @Method:
+     @@Name:  normalizeDocument
+     @@Level[list]:  3
+  @Method:
+     @@Name:  renameNode
+     @@Return:
+        @@@Type:  Node
+        @@@Exception[list]:  DOMException
+     @@Param:
+        @@@Name:  n
+        @@@Type:  Node
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  qualifiedName
+        @@@Type:  DOMString
+     @@Level[list]:  3
+  
+  @ReAttr:
+    @@Name: attributes
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-84CF096
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Get:
+      @@@Type: NamedNodeMap
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = null;
+  @ReAttr:
+    @@Name: nodeName
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Get:
+      @@@Type: DOMString
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = q<#document>;
+  @ReAttr:
+    @@Name: nodeValue
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D080
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Get:
+      @@@Type: DOMString
+      @@@Exception[list]: DOMException
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = null;
+    @@Set:
+      @@@Type: DOMString
+      @@@Exception[list]: DOMException
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          __EXCEPTION{ManakaiDOMImplementationException}{
+            -class => 'warn',
+            -type => 'ATTR_SET_NO_EFFECT',
+          }__;
+  @ReAttr:
+    @@Name: textContent
+    @@Spec:
+      @@@DOM3:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#Node3-textContent
+    @@Get:
+      @@@Type: DOMString
+      @@@Exception[list]: DOMException
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = null;
+    @@Set:
+      @@@Type: DOMString
+      @@@Exception[list]: DOMException
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          __EXCEPTION{ManakaiDOMImplementationException}{
+            -class => 'warn',
+            -type => 'ATTR_SET_NO_EFFECT',
+          }__;
+
+## DOMCore.dis ends here
