@@ -17,7 +17,7 @@ Perl module for MIME charset.
 package Message::MIME::Charset;
 use strict;
 use vars qw(%CHARSET %MSNAME2IANANAME %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 &_builtin_charset;
 sub _builtin_charset () {
@@ -101,11 +101,6 @@ my %_MINIMUMIZER = (
 	'iso-2022-jp-3-plane1'	=> \&_name_8bit_iso2022,
 	'iso-2022-kr'	=> \&_name_8bit_iso2022,
 	'iso-8859-1'	=> \&_name_8bit_iso2022,
-	'iso-10646-j-1'	=> \&_name_utf16be,
-	'iso-10646-ucs-2'	=> \&_name_utf16be,
-	'iso-10646-ucs-4'	=> \&_name_utf32be,
-	'iso-10646-ucs-basic'	=> \&_name_utf16be,
-	'iso-10646-unicode-latin1'	=> \&_name_utf16be,
 	jis_x0201	=> \&_name_shift_jis,
 	junet	=> \&_name_8bit_iso2022,
 	'x-junet8'	=> \&_name_net_ascii_8bit,
@@ -115,8 +110,6 @@ my %_MINIMUMIZER = (
 	'x-sjis'	=> \&_name_shift_jis,
 	'us-ascii'	=> \&_name_net_ascii_8bit,
 	'utf-8'	=> \&_name_net_ascii_8bit,
-	'utf-16be'	=> \&_name_utf16be,
-	'utf-32be'	=> \&_name_utf32be,
 );
 
 my %_IsMimeText;
@@ -227,9 +220,12 @@ sub name_normalize ($) {
 }
 
 sub name_minimumize ($$) {
+  require Message::MIME::Charset::MinName;
   my ($charset, $s) = (lc shift, shift);
   if (ref $CHARSET{$charset}->{name_minimumizer} eq 'CODE') {
     return &{$CHARSET{$charset}->{name_minimumizer}} ($charset, $s);
+  } elsif (ref $Message::MIME::Charset::MinName::MIN{$charset}) {
+    return &{$Message::MIME::Charset::MinName::MIN{$charset}} ($charset, $s);
   } elsif (ref $_MINIMUMIZER{$charset}) {
     return &{$_MINIMUMIZER{$charset}} ($charset, $s);
   } elsif (ref $CHARSET{'*undef'}->{name_minimumizer} eq 'CODE') {
@@ -467,49 +463,6 @@ sub _name_shift_jis ($$) {
   }
 }
 
-sub _name_utf16be ($$) {
-  shift; my $s = shift;
-  if ($s =~ /[\xD8-\xDB][\x00-\xFF][\xDC-\xDF][\x00-\xFF]
-             (?=(?:[\x00-\xFF][\x00-\xFF])*\z)/sx) {
-    (charset => 'utf-16be');
-  } elsif ($s =~ /[\x01-\xFF][\x00-\xFF]
-             (?=(?:[\x00-\xFF][\x00-\xFF])*\z)/sx) {
-    if ($s =~ /([^\x00\x03\x04\x23\x25\x30\xFE\xFF]
-                     [\x00-\xFF]	# ^\x20\x22\x4E-\x9F\xF9\xFA
-                  |\x03[^\x00-\x6F\xD0-\xFF]
-                  #|\x20[^\x00-\x6F]
-                  |\x25[^\x00-\x7F]
-                  |\xFE[^\x30-\x4F]
-                  |\xFF[^\x00-\xEF]
-                  ## note 1 of RFC 1816 is ambitious, so block entire
-                  ## is excepted
-                    |\x30[\x00-\x3F]
-                  )
-             (?=(?:[\x00-\xFF][\x00-\xFF])*\z)/sx) {
-      (charset => 'iso-10646-ucs-2');
-    } else {
-      (charset => 'iso-10646-j-1');
-    }
-  } elsif ($s =~ /\x00[\x80-\xFF]
-             (?=(?:[\x00-\xFF][\x00-\xFF])*\z)/sx) {
-    (charset => 'iso-10646-unicode-latin1');
-  } else {
-    (charset => 'iso-10646-ucs-basic');
-  }
-}
-
-sub _name_utf32be ($$) {
-  shift; my $s = shift;
-  if ($s =~ /
-    ([\x01-\x7F][\x00-\xFF]{3}
-    |\x00[\x11-\xFF][\x00-\xFF][\x00-\xFF])
-             (?=(?:[\x00-\xFF]{4})*\z)/sx) {
-    (charset => 'iso-10646-ucs-4');
-  } else {
-    (charset => 'utf-32be');
-  }
-}
-
 sub _utf8_on ($) {
   Encode::_utf8_on ($_[0]) if $Encode::VERSION;
 }
@@ -553,7 +506,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/27 00:39:54 $
+$Date: 2002/08/18 06:22:36 $
 
 =cut
 
