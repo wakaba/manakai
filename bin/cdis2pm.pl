@@ -216,6 +216,10 @@ sub dispm_perl_throws (%) {
           perl_list -type => $opt{type},
                     -object => perl_code_literal ('$self'),
                     %{$opt{xparam} || {}};
+    $State->{Module}->{$State->{module}}
+                    ->{ExpandedURI q<dis2pm:requiredModule>}
+                    ->{$State->{Module}->{$x->{parentModule}}
+                             ->{ExpandedURI q<dis2pm:packageName>}} = 1;
   } else {
     no warnings 'uninitialized';
     valid_err (qq{Resource <$opt{class}> [<$x->{ExpandedURI q<dis2pm:type>}>] }.
@@ -640,7 +644,7 @@ sub perl_code ($;%) {
                  dispm_perl_throws
                    class =>
                      ExpandedURI q<DX:CoreException>,
-                   class_for => ExpandedURI q<ManakaiDOM:all>,
+                   class_for => ExpandedURI q<ManakaiDOM:Perl>,
                    type => 'MDOM_DEBUG_BUG',
                    subtype => ExpandedURI q<DOMMain:ASSERTION_ERR>,
                    xparam => {
@@ -1903,16 +1907,11 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
               $code = $my . $code;
             }
           } else { ## Code not defined
-            my $for1 = $for;
-            unless (dis_uri_for_match (ExpandedURI q<ManakaiDOM:ManakaiDOM1>,
-                                       $for, node => $method->{src})) {
-              $for1 = ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>;
-            }
             $code = perl_statement 'my $self = shift;';
             $code .= perl_statement
                       dispm_perl_throws
                         class => ExpandedURI q<DX:CoreException>,
-                        class_for => $for1,
+                        class_for => ExpandedURI q<ManakaiDOM:Perl>,
                         type => 'NOT_SUPPORTED_ERR',
                         subtype =>
                           ExpandedURI q<MDOMX:MDOM_IMPL_METHOD_NOT_IMPLEMENTED>,
@@ -1942,11 +1941,6 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
                          ? $method->{ExpandedURI q<dis2pm:setter>} : undef;
           my $for = [keys %{$method->{For}}]->[0];
           local $opt{'For+'} = [keys %{$method->{'For+'}||{}}];
-          my $for1 = $for;
-          unless (dis_uri_for_match (ExpandedURI q<ManakaiDOM:ManakaiDOM1>,
-                                     $for, node => $method->{src})) {
-            $for1 = ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>;
-          }
           local $opt{ExpandedURI q<MDOMX:on>} = 'get';
           my $get_code = dispm_get_code (%opt, resource => $getter, For => $for,
                                          ExpandedURI q<dis2pm:DefKeyName>
@@ -1967,7 +1961,7 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
             $get_code = perl_statement
                       dispm_perl_throws
                         class => ExpandedURI q<DX:CoreException>,
-                        class_for => $for1,
+                        class_for => ExpandedURI q<ManakaiDOM:Perl>,
                         type => 'NOT_SUPPORTED_ERR',
                         subtype =>
                           ExpandedURI q<MDOMX:MDOM_IMPL_ATTR_NOT_IMPLEMENTED>,
@@ -2004,7 +1998,7 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
               $set_code = perl_statement
                       dispm_perl_throws
                         class => ExpandedURI q<DX:CoreException>,
-                        class_for => $for1,
+                        class_for => ExpandedURI q<ManakaiDOM:Perl>,
                         type => 'NOT_SUPPORTED_ERR',
                         subtype =>
                           ExpandedURI q<MDOMX:MDOM_IMPL_ATTR_NOT_IMPLEMENTED>,
@@ -2360,4 +2354,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/02/18 08:55:41 $
+1; # $Date: 2005/02/19 07:21:13 $

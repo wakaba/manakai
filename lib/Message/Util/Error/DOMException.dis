@@ -22,7 +22,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/18 12:14:19 $
+      $Date: 2005/02/19 07:21:14 $
     @@ContentType:
       dis:Date.RCS
   
@@ -31,6 +31,16 @@ Module:
       @@@Name: DISPerl
       @@@WithFor:
         ManakaiDOM:all
+    @@Module:
+      @@@Name: DISIDL
+      @@@WithFor:
+        ManakaiDOM:all
+    @@Module:
+      @@@Name: DOMException
+      @@@WithFor:
+        ManakaiDOM:Perl
+  @DefaultFor:
+    ManakaiDOM:Perl
 
 Namespace:
   @dis:
@@ -150,9 +160,9 @@ ElementTypeBinding:
     @@rdf:type:
       rdfs:Class
     @@rdfs:subClassOf:
-      rdfs:Class
+      rdfs:Class::ManakaiDOM:all
     @@subsetOf:
-      rdfs:Class
+      rdfs:Class::ManakaiDOM:all
     @@AliasFor:
       @@@@:
         ::ManakaiDOM:all
@@ -240,6 +250,8 @@ ResourceDef:
       lang:Perl
     @@@:
       Message::Util::Error
+  @For:
+    ManakaiDOM:Perl
 
   @Description:
     @@lang:en
@@ -353,6 +365,8 @@ ResourceDef:
     DOMMain:ManakaiDOMExceptionIF
   @rdf:type:
     ManakaiDOM:ExceptionIF
+  @For:
+    ManakaiDOM:Perl
   @Description:
     @@lang:en
     @@@:
@@ -371,6 +385,8 @@ ResourceDef:
     ManakaiDOM:ExceptionClass
   @ISA: 
     ManakaiDOM:ManakaiDOMExceptionOrWarning
+  @For:
+    ManakaiDOM:Perl
 
   @Description:
     @@lang:en
@@ -385,6 +401,8 @@ ResourceDef:
     ManakaiDOM:WarningClass
   @ISA: 
     ManakaiDOM:ManakaiDOMExceptionOrWarning
+  @For:
+    ManakaiDOM:Perl
 
   @Description:
     @@lang:en
@@ -401,6 +419,8 @@ ResourceDef:
     @@lang:en
     @@@:
       Exceptions common to all manakai DOM-style modules. 
+  @For:
+    ManakaiDOM:Perl
   @ResourceDef:
     @@QName: CoreExceptionCode
     @@rdf:type:
@@ -408,7 +428,7 @@ ResourceDef:
     @@Type:
       DOMMain:unsigned-short
     @@rdfs:subClassOf:
-      DOMMain:unsigned-short
+      DOMMain:unsigned-short::ManakaiDOM:all
 
     @@ResourceDef:
       @@@QName: 
@@ -440,34 +460,40 @@ ResourceDef:
           @@@@@@: Arbitrary values for debugging.
 
       @@@XSubTypeDef:
-        @@@@QName: ASSERTION_ERR
+        @@@@QName: 
+          DOMMain:ASSERTION_ERR
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
             Failure to pass an assertion. 
         @@@@XParam:
-          @@@@@QName:assertionType
+          @@@@@QName:
+            DOMMain:assertionType
           @@@@@Description:
             @@@@@@lang:en
             @@@@@@@:Type of the assertion.
         @@@@XParam:
-          @@@@@QName:actualValue
+          @@@@@QName:
+            DOMMain:actualValue
           @@@@@Description:
             @@@@@@lang:en
             @@@@@@@: The actual value.
         @@@@XParam:
-          @@@@@QName:expectedValue
+          @@@@@QName:
+            DOMMain:expectedValue
           @@@@@Description:
             @@@@@@lang:en
             @@@@@@@@: The expected value.
         @@@@XParam:
-          @@@@@QName:expectedLabel
+          @@@@@QName:
+            DOMMain:expectedLabel
           @@@@@Description:
             @@@@@@lang:en
             @@@@@@@:
               A simple explaination for expected value. 
         @@@@XParam:
-          @@@@@QName:traceText
+          @@@@@QName:
+            DOMMain:traceText
           @@@@@Description:
             @@@@@@lang:en
             @@@@@@@:

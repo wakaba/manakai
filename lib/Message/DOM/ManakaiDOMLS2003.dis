@@ -33,7 +33,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/01/05 12:19:39 $
+      $Date: 2005/02/19 07:21:14 $
     @@ContentType:
       dis:Date.RCS
 
@@ -499,20 +499,25 @@ ResourceDef:
            ## 1. characterStream
            ## 2. byteStream
            ## 3. stringData
-           if (defined (my $sd = $input->stringData)) {
+           if (defined (my $sd = $input-><AG::DOMLS:LSInput
+                                    ::ManakaiDOM:ManakaiDOMLatest.stringData>)) {
              $text = \$sd;
            }
            ## 4. systemId
            ## 5. publicId
-           elsif (defined (my $sysId = $input->systemId) or
-                  defined (my $pubId = $input->publicId)) {
+           elsif (defined (my $sysId = $input-><AG::DOMLS:LSInput
+                                    ::ManakaiDOM:ManakaiDOMLatest.systemId>) or
+                  defined (my $pubId = $input-><AG::DOMLS:LSInput
+                                    ::ManakaiDOM:ManakaiDOMLatest.publicId>)) {
              $uri = $sysId;
              __EXCEPTION{
                DOMCore:ManakaiDOMException.NOT_SUPPORTED_ERR::
              }__;
            }
 
-           $self->option (document_entity_base_uri => $input->baseURI);
+           $self->option (document_entity_base_uri =>
+                                    $input-><AG::DOMLS:LSInput
+                                    ::ManakaiDOM:ManakaiDOMLatest.baseURI>);
 
            my $doc;
            __DEEP{

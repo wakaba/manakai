@@ -28,7 +28,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/18 12:14:19 $
+      $Date: 2005/02/19 07:21:13 $
     @@ContentType:
       dis:Date.RCS
   
@@ -410,7 +410,7 @@ ElementTypeBinding:
     @@rdf:type:
       ManakaiDOM:ExceptionClass
     @@ISA: 
-      ManakaiDOM:ManakaiDOMException::ManakaiDOM:all
+      ManakaiDOM:ManakaiDOMException::ManakaiDOM:Perl
     @@ISA:
       ManakaiDOM:ManakaiDOMObject
     @@ForCheck:
@@ -3199,7 +3199,7 @@ ClassDef:
     @@Param:
       @@@Name:err
       @@@Type: 
-        ManakaiDOM:ManakaiDOMExceptionOrWarning::ManakaiDOM:all
+        ManakaiDOM:ManakaiDOMExceptionOrWarning::ManakaiDOM:Perl
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -3213,7 +3213,8 @@ ClassDef:
           }
     @@Return:
       @@@PerlDef:
-          if ($err->isa (<ClassName::ManakaiDOM:ManakaiDOMException>)) {
+          if ($err->isa (<ClassName::ManakaiDOM:ManakaiDOMException
+                                   ::ManakaiDOM:Perl>)) {
             $err->throw;
           } else {
             \## TODO: Implement warning reporting

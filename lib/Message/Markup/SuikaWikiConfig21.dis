@@ -18,10 +18,18 @@ Module:
     @@FullName: Wakaba
     @@Mail: w@suika.fam.cx
   @License:
-     license:Perl+MPL
+    @@@:
+      license:Perl+MPL
+    @@Original:
+      @@@FullName:
+        SuikaWiki <PerlModule::SuikaWiki::Markup::SuikaWikiConfig20>
+      @@@Year:2003
+      @@@Author:
+        @@@@FullName:Wakaba
+        @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/02/18 12:14:19 $
+      $Date: 2005/02/19 07:21:14 $
     @@ContentType:
       dis:Date.RCS
   
@@ -61,6 +69,8 @@ Module:
 Namespace:
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @dis2pm:
+    http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
   @DISLang:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Lang#
   @DOMCore:
@@ -469,7 +479,7 @@ IFClassDef:
         if ($type eq '#element') {
           __DEEP{
             $r = ($self-><AG::SWCFGNode.ownerDocument> || $self)
-                      -><M::SWCFGDocument.createElementNS>
+                       -><M::SWCFGDocument.createElementNS>
                                   ($namespaceURI, $localName);
           }__;
           $r->{<Q::TreeCore:node>}->{<Q::value>} = $value
@@ -589,9 +599,10 @@ IFClassDef:
       @@@PerlDef:
         FIND: {
           for (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
-            if ($_->{<Q::nodeType>} eq '#element' and
-                $_->{<Q::localName>} eq $localName) {
-              $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
+            my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
+            if ($c-><AG::SWCFGNode.nodeType> eq '#element' and
+                $c-><AG::SWCFGNode.localName> eq $localName) {
+              $r = $c;
               last FIND;
             }
           }
@@ -654,14 +665,15 @@ IFClassDef:
       @@@PerlDef:
         FIND: {
           for (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
-            if ($_->{<Q::nodeType>} eq '#element' and
+            my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
+            if ($c-><AG::SWCFGNode.nodeType> eq '#element' and
                 ((not defined $namespaceURI and 
-                  not defined $_->{<Q::namespaceURI>}) or
+                  not defined $c-><AG::SWCFGNode.namespaceURI>) or
                  (defined $namespaceURI and
-                  defined $_->{<Q::namespaceURI>} and
-                  $namespaceURI eq $_->{<Q::namespaceURI>})) and
-                $_->{<Q::localName>} eq $localName) {
-              $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
+                  defined $c-><AG::SWCFGNode.namespaceURI> and
+                  $namespaceURI eq $c-><AG::SWCFGNode.namespaceURI>)) and
+                $c-><AG::SWCFGNode.localName> eq $localName) {
+              $r = $c;
               last FIND;
             }
           }
@@ -922,9 +934,10 @@ IFClassDef:
 
         FIND: {
           for (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
-            if ($_->{<Q::nodeType>} eq '#element' and
-                $_->{<Q::localName>} eq $localName) {
-              $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
+            my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
+            if ($c-><AG::SWCFGNode.nodeType> eq '#element' and
+                $c-><AG::SWCFGNode.localName> eq $localName) {
+              $r = $c;
               $r->{<Q::TreeCore:node>}->{<Q::value>} = $value;
               for (@{$r->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
                 CORE::delete $_->{<Q::parent>};
@@ -995,14 +1008,15 @@ IFClassDef:
 
         FIND: {
           for (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
-            if ($_->{<Q::nodeType>} eq '#element' and
+            my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
+            my $cnsuri = $c-><AG::SWCFGNode.namespaceURI>;
+            if ($c-><AG::SWCFGNode.nodeType> eq '#element' and
                 ((not defined $namespaceURI and 
-                  not defined $_->{<Q::namespaceURI>}) or
-                 (defined $namespaceURI and
-                  defined $_->{<Q::namespaceURI>} and
-                  $namespaceURI eq $_->{<Q::namespaceURI>})) and
-                $_->{<Q::localName>} eq $localName) {
-              $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
+                  not defined $cnsuri) or
+                 (defined $namespaceURI and defined $cnsuri and
+                  $namespaceURI eq $cnsuri)) and
+                $_-><AG::SWCFGNode.localName> eq $localName) {
+              $r = $c;
               $r->{<Q::TreeCore:node>}->{<Q::value>} = $value;
               for (@{$r->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
                 CORE::delete $_->{<Q::parent>};
@@ -1047,8 +1061,9 @@ IFClassDef:
       @@@PerlDef:
         my @removed;
         $self->{<Q::TreeCore:node>}->{<Q::childNodes>} = [grep {
-          if ($_->{<Q::nodeType>} eq '#element' and
-              $_->{<Q::localName>} eq $localName) {
+          my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
+          if ($c-><AG::SWCFGNode.nodeType> eq '#element' and
+              $c-><AG::SWCFGNode.localName> eq $localName) {
             push @removed, $_;
             CORE::delete $_->{<Q::parent>};
             false;
@@ -1094,13 +1109,13 @@ IFClassDef:
       @@@PerlDef:
         my @removed;
         $self->{<Q::TreeCore:node>}->{<Q::childNodes>} = [grep {
-          if ($_->{<Q::nodeType>} eq '#element' and
-              ((not defined $namespaceURI and 
-                not defined $_->{<Q::namespaceURI>}) or
-               (defined $namespaceURI and
-                defined $_->{<Q::namespaceURI>} and
-                $namespaceURI eq $_->{<Q::namespaceURI>})) and
-              $_->{<Q::localName>} eq $localName) {
+          my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
+          my $cnsuri = $c-><AG::SWCFGNode.namespaceURI>;
+          if ($c-><AG::SWCFGNode.nodeType> eq '#element' and
+              ((not defined $namespaceURI and not defined $cnsuri) or
+               (defined $namespaceURI and defined $cnsuri and
+                $namespaceURI eq $cnsuri)) and
+              $c-><AG::SWCFGNode.localName> eq $localName) {
             push @removed, $_;
             CORE::delete $_->{<Q::parent>};
             false;
@@ -1382,6 +1397,19 @@ IFClassDef:
       @@@@:
         The string representation of the node, i.e. the serialized 
         text form of a SuikaWikiConfig/2.0 document or document fragment. 
+        \
+        {NOTE:: If a namespace URI in any node in the subtree rooted 
+                by this node does not have its corresponding namespace 
+                prefix, then this method assigns a prefix to that URI. 
+        \
+        }
+        \
+        {NOTE:: This method results in a ill-formed SuikaWikiConfig 
+                document (fragment) if any node has unserializable 
+                property, e.g. a value starts with <CODE::?SuikaWikiConfig> 
+                on the comment node. 
+        \
+        }
     @@NamedParam:
       @@@Name:outputHeader
       @@@Type:
@@ -1396,37 +1424,26 @@ IFClassDef:
       @@@PerlDef:
         my $nt = $self-><AG::SWCFGNode.nodeType>;
         my $node = $self->{<Q::TreeCore:node>};
-        if ($nt eq '#document') {
-          if ($outputHeader) {
-            $r = '#?SuikaWikiConfig/' . $node->{<Q::version>} . "\n";
-          }
-          
-          my $ptype = '#';  ## Brother's type
-          for (@{$node->{<Q::childNodes>}}) {
-            $r .= "\x0A" if $ptype eq '#comment' and
-                            $_->{<Q::nodeType>} eq '#comment';
-            $ptype = $_->{<Q::nodeType>};
-            $r .= <ClassM::ManakaiSWCFGNode.getNodeReference> ($_)->stringify;
-          }
-        } elsif ($nt eq '#element') {
+        if ($nt eq '#element') {
           $r = $self-><M::SWCFGNode.innerText>;
           if (scalar @{$node->{<Q::childNodes>}}) {
             if (defined $r) {
               $r =~ s/(^|\x0A)(?=([\\\@\#\s]|$))?/$1."  ".
                                                   (defined $2?"\\":"")/ges;
-              $r = $node->{<Q::localName>}
+              $r = $self-><AG::SWCFGElement.qualifiedName>
                  . ":\x0A  \@\@"
                  . (ref ($node->{<Q::value>}) eq 'ARRAY' ? '[list]' : '')
-                 . ":" . (($r !~ /[\x0D\x0A:]/) and (length ($r) < 50)
+                 . ":" . ((($r !~ /[\x0D\x0A:]/) and (length ($r) < 50))
                           ? '' : "\x0A")
                  . (length $r ? $r : '\\') . "\x0A";
             } else {
-              $r = $node->{<Q::localName>}
+              $r = $self-><AG::SWCFGElement.qualifiedName>
                  . ":\x0A";
             }
             for (@{$node->{<Q::childNodes>}}) {
               next unless $_->{<Q::nodeType>} eq '#element';
-              my $rc = $_->stringify;
+              my $rc = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_)
+                         ->stringify;
               $rc =~ s/\x0A  /\x0A     /gs;
               $rc =~ s/(\x0A +\@)/$1\@/gs;
               $r .= '  @' . $rc;
@@ -1434,17 +1451,60 @@ IFClassDef:
           } else {
             $r = '' unless defined $r;
             $r =~ s/(^|\x0A)(?=([\\\@\#\s]|$))?/$1."  ".(defined $2?"\\":"")/ges;
-            $r = $node->{<Q::localName>}
+            $r = $self-><AG::SWCFGElement.qualifiedName>
                . (ref ($node->{<Q::value>}) eq 'ARRAY' ? '[list]' : '')
                . ":" . ((($r !~ /[\x0D\x0A:]/) and (length ($r) < 50))
                         ? '' : "\x0A")
                . (length $r ? $r : '\\') . "\x0A";
           }
           $r = "\\" . $r if substr ($r, 0, 1) =~ /[\\\@\#\s]/;
-        } else {
+        } elsif ($nt eq '#document') {
+          if ($outputHeader) {
+            $r = '#?SuikaWikiConfig/' . $node->{<Q::version>} . "\n";
+          }
+          
+          for (@{$node->{<Q::childNodes>}}) {
+            $r .= "\x0A";
+            $r .= <ClassM::ManakaiSWCFGNode.getNodeReference> ($_)->stringify;
+          }
+
+          $r .= "\x0A";
+
+          ## Namespace bindings
+          my $ns = '';
+          for (sort keys %{$self->{<Q::TreeCore:node>}->{<Q::nsBinding>}}) {
+            if ($_ ne 'URI') {
+              $ns .= '  @' . $_ . ':' . "\x0A"
+                  .  '    ';
+              my $uri = $self->{<Q::TreeCore:node>}->{<Q::nsBinding>}->{$_};
+              if (defined $uri) {
+                if (length $uri) {
+                  if ($uri =~ /^[\\#\s\@]/) {
+                    $ns .= '\\' . $uri . "\x0A";
+                  } else {
+                    $ns .= $uri . "\x0A";
+                  }
+                } else {
+                  $ns .= "\\\x0A";
+                }
+              } else {
+                $ns .= '@@is-null: 1' . "\x0A";
+              }
+            }
+          }
+          $r .= 'Namespace:' . "\x0A" . $ns . "\x0A" if length $ns;
+        } elsif ($nt eq '#comment') {
           $r = $self-><AG::SWCFGNode.innerText>;
           $r =~ s/\x0A/\x0A#/gs;
           $r = '#' . $r . "\n";
+        } elsif ($nt eq '#fragment') {
+          for (@{$node->{<Q::childNodes>}}) {
+            $r .= <ClassM::ManakaiSWCFGNode.getNodeReference> ($_)->stringify;
+          }
+        } else {
+          __ASSERT{DISPerl:invariant::
+            msg => {qq[Node type: "$nt"]},
+          }__;
         }
       ## TODO: Namespace & binding support
 
@@ -1501,8 +1561,7 @@ IFClassDef:
         }
         my $node_type = $self-><M::SWCFGNode.nodeType>;
         if ($node_type eq '#element') {
-          ## TODO: Namespace support
-          $r .= '/' . $self-><M::SWCFGNode.localName>;
+          $r .= '/' . $self-><AG::SWCFGElement.qualifiedName>;
           if ($key) {
             for (ref $key eq 'ARRAY' ? @{$key} : $key) {
               my $key_val = $self-><M::SWCFGNode.getAttributeValue> ($_);
@@ -1597,7 +1656,7 @@ IFClassDef:
           $r = $self->{<Q::TreeCore:node>}->{<Q::flag>}->{$name} = $value;
         } else {
           $r = defined $self->{<Q::TreeCore:node>}->{<Q::flag>}->{$name}
-                  ? $self->{<Q::TreeCore:node>}->{<Q::flag>} : $default;
+                  ? $self->{<Q::TreeCore:node>}->{<Q::flag>}->{$name} : $default;
         }
 
   @Method:
@@ -1667,26 +1726,48 @@ IFClassDef:
       @@@@:
         Makes a copy of this node.  All child nodes are cloned and 
         all flags and options are copied (rather than cloned).  
-        The new node does not have any parent. 
+        The new node does not have any parent.  
     @@Return:
       @@@Type:SWCFGNode
       @@@Description:
         @@@@lang:en
-        @@@@@:The cloned node. 
+        @@@@@: 
+          The cloned node.
+          \
+          If this node is a document node, then the another document is made.  
       @@@PerlDef:
-        ## TODO:
-
-  my $clone = bless {node => []}, ref $self;
-  ## TODO: Cloning recursively
-  $clone->{flag} = {%{$self->{flag}||{}}};
-  $clone->{option} = {%{$self->{option}||{}}};
-  for (qw/local_name value type/) {
-    $clone->{$_} = $self->{$_};
-  }
-  for (@{$self->{node}}) {
-    push @{$clone->{node}}, $_->clone;
-  }
-  $_->{parent} = $clone for @{$clone->{node}};
+        __DEEP{
+          my $od = $self-><AG::SWCFGNode.ownerDocument> || $self;
+          my $nt = $self-><AG::SWCFGNode.nodeType>;
+          if ($nt eq '#element') {
+            $r = $od-><M::SWCFGDocument.createElementNS>
+                            ($self-><AG::SWCFGNode.namespaceURI>,
+                             $self-><AG::SWCFGNode.localName>);
+            $r->{<Q::TreeCore:node>}->{<Q::value>}
+                      = $self->{<Q::TreeCore:node>}->{<Q::value>};
+          } elsif ($nt eq '#comment') {
+            $r = $od-><M::SWCFGDocument.createComment>
+                            ($self->{<Q::TreeCore:node>}->{<Q::value>});
+          } elsif ($nt eq '#fragment') {
+            $r = $od-><M::SWCFGDocument.createDocumentFragment>;
+          } elsif ($nt eq '#document') {
+            $r = $od-><AG::SWCFGDocument.implementation>
+                    -><M::SWCFGImplementation.createSWCFGDocument>;
+          } else {
+            __ASSERT{DISPerl:invariant::
+              msg => {qq[Node type: "$nt"]},
+            }__;
+          }
+          for (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
+            my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
+            $r-><AG::SWCFGNode.appendNode> ($c->clone);
+          }
+        }__;
+        ## TODO: shadow
+        $r->{<Q::TreeCore:node>}->{<Q::flag>}
+                           = {%{$self->{<Q::TreeCore:node>}->{<Q::flag>}||{}}};
+        $r->{<Q::TreeCore:node>}->{<Q::option>}
+                           = {%{$self->{<Q::TreeCore:node>}->{<Q::option>}||{}}};
 
   @Attr:
     @@Name:ownerDocument
@@ -1713,31 +1794,8 @@ IFClassDef:
         @@@@swcfg21:GetPropNode:
           DOMCore:ownerDocument
 
-  @Attr:
-    @@Name:prefix
-    @@Description:
-      @@@lang:en
-      @@@@:
-        The namespace prefix of this node. 
-    @@NewIn21:
-    @@Get:
-      @@@Type:SWCFGString
-      @@@Description:
-        @@@@lang:en
-        @@@@@:The namespace prefix. 
-      @@@InCase:
-        @@@@Value:
-          @@@@@is-null:1
-        @@@@Type:SWCFGString
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            Either this node is not an element node or its namespace 
-            is the default and no prefix is required. 
-      #@@@PerlDef:
-        
   @Method:
-    @@Name:lookupPrefix
+    @@Name:lookupNamespacePrefix
     @@Description:
       @@@lang:en
       @@@@:
@@ -1751,6 +1809,34 @@ IFClassDef:
         @@@@lang:en
         @@@@@:
           The namespace URI to look for. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The <DOM::null> namespace. 
+    @@NamedParam:
+      @@@Name: makeNewBinding
+      @@@Type: 
+        DOMMain:boolean
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Whether a new namespace prefix should be bound when 
+          no namespace URI has been associated yet. 
+      @@@InCase:
+        @@@@Value:true
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            New binding is made if no prefix associated. 
+      @@@InCase:
+        @@@@Value:false
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Simply returns the <DOM::null> if no prefix associated. 
     @@Return:
       @@@Type:SWCFGString
       @@@Description:
@@ -1767,6 +1853,65 @@ IFClassDef:
           @@@@@lang:en
           @@@@@@:
             No associated namespace prefix found. 
+      @@@PerlDef:
+        $r = null;
+        my $od = $self-><AG::SWCFGNode.ownerDocument> || $self;
+        my $binds = $od->{<Q::TreeCore:node>}->{<Q::nsBinding>};
+        if (defined $namespaceURI) {
+          FIND: {
+            for my $prefix (keys %$binds) {
+              if (defined $binds->{$prefix} and
+                  $binds->{$prefix} eq $namespaceURI) {
+                $r = $prefix;
+                last FIND;
+              }
+            }
+            last FIND unless $makeNewBinding;
+            ## Not found
+            if ($namespaceURI =~ /(\w+)$/) {
+              my $prefix = $1;
+              unless (exists $binds->{$prefix}) {
+                $binds->{$prefix} = $namespaceURI;
+                $r = $prefix;
+                last FIND;
+              }
+            }
+            my $i = 1;
+            {
+              unless (exists $binds->{'ns'.$i}) {
+                $binds->{$r = 'ns'.$i} = $namespaceURI;
+                last FIND;
+              }
+              $i++;
+              redo;
+            }
+          } # FIND
+        } else {  ## Null namespace
+          FIND: {
+            if (exists $binds->{'nu'.'ll'} and not defined $binds->{'nu'.'ll'}) {
+              $r = 'nu'.'ll';
+              last FIND;
+            }
+            for my $prefix (keys %$binds) {
+              if (not defined $prefix) {
+                $r = $prefix;
+                last FIND;
+              }
+            }
+            last FIND unless $makeNewBinding;
+            ## Not found
+            my $i = '';
+            {
+              unless (exists $binds->{'nu'.'ll'.$i}) {
+                $binds->{$r = 'nu'.'ll'.$i} = null;
+                last FIND;
+              }
+              $i++;
+              redo;
+            }
+          }
+        }
+
   @Method:
     @@Name:lookupNamespaceURI
     @@Description:
@@ -1781,11 +1926,36 @@ IFClassDef:
         @@@@lang:en
         @@@@@:
           The namespace URI to look for. 
+    @@NamedParam:
+      @@@Name: makeNewBinding
+      @@@Type:
+        DOMMain:boolean
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Whether a new binding should be created if no namespace URI 
+          is associated with the <P::prefix> or not. 
+      @@@InCase:
+        @@@@Value:true
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            A new binding to the temporary namespace URI 
+            exactly same as <P::prefix> is created 
+            if no binding found. 
+      @@@InCase:
+        @@@@Value:false
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            No new binding is created if no binding found.  Note that 
+            even if no association newly created, this method 
+            returns the <DOM::null> value. 
     @@Return:
       @@@Type:SWCFGString
       @@@Description:
         @@@@lang:en
-        @@@@@:The associated namespace prefix.
+        @@@@@:The associated namespace URI. 
       @@@InCase:
         @@@@Value:
           @@@@@is-null:1
@@ -1793,7 +1963,68 @@ IFClassDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
-            No namespace prefix is associated to the URI. 
+            No namespace prefix is associated to the prefix or 
+            the <DOM::null> namespace is associated. 
+      @@@PerlDef:
+        my $od = $self-><AG::SWCFGNode.ownerDocument> || $self;
+        my $binds = $od->{<Q::TreeCore:node>}->{<Q::nsBinding>};
+        if (exists $binds->{$prefix}) {
+          $r = $binds->{$prefix};
+        } elsif ($makeNewBinding) {
+          $r = $binds->{$prefix} = $prefix;
+        } else {
+          $r = null;
+        }
+
+  @Method:
+    @@Name:bindNamespaceURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Binds a namespace URI to a prefix. 
+    @@NewIn21:
+    @@Param:
+      @@@Name:prefix
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The namespace prefix to which the URI is bound. 
+          If this <P::prefix> is already bound to another URI, 
+          that binding is overwritten. 
+      @@@InCase:
+        @@@@Value:URI
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Any attempt to change the namespace URI will not success, 
+            i.e. the namespace binding left unchanged. 
+    @@Param:
+      @@@Name:namespaceURI
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The namespace URI. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The namespace binding for <P::prefix> is removed. 
+    @@Return:
+      @@@PerlDef:
+        unless ($prefix eq 'URI') {
+          my $od = $self-><AG::SWCFGNode.ownerDocument> || $self;
+          if (defined $namespaceURI) {
+            $od->{<Q::TreeCore:node>}->{<Q::nsBinding>}->{$prefix}
+                                   = $namespaceURI;
+          } else {
+            CORE::delete $od->{<Q::TreeCore:node>}->{<Q::nsBinding>}->{$prefix};
+          }
+        }
 
   @IntMethod:
     @@Name:getNodeReference
@@ -1940,7 +2171,7 @@ IFClassDef:
     @@Param:
       @@@Name:err
       @@@Type: 
-        ManakaiDOM:ManakaiDOMExceptionOrWarning::ManakaiDOM:all
+        ManakaiDOM:ManakaiDOMExceptionOrWarning::ManakaiDOM:Perl
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1955,7 +2186,7 @@ IFClassDef:
     @@Return:
       @@@PerlDef:
           if ($err->isa (<ClassName::ManakaiDOM:ManakaiDOMException
-                                   ::ManakaiDOM:all>)) {
+                                   ::ManakaiDOM:Perl>)) {
             $err->throw;
           } else {
             \## TODO: Implement warning reporting
@@ -2051,11 +2282,103 @@ IFClassDef:
     @@NewIn21:
     @@Get:
       @@@PerlDef:
+        __CODE{expandNamespace}__;
         if (defined $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>}) {
           $r = $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>} .
                $self->{<Q::TreeCore:node>}->{<Q::localName>};
         } else {
           $r = $self->{<Q::TreeCore:node>}->{<Q::localName>};
+        }
+
+  @Attr:
+    @@Name:prefix
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The namespace prefix of this node. 
+    @@NewIn21:
+    @@Get:
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:The namespace prefix. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Either this node is not an element node or its namespace 
+            is the default and no prefix is required. 
+      @@@PerlDef:
+        __CODE{expandNamespace}__;
+        my $node = $self->{<Q::TreeCore:node>};
+        my $od = $self-><AG::SWCFGNode.ownerDocument>;
+        my $defURI = $od-><AG::SWCFGDocument.defaultElementTypeNamespaceURI>;
+        if (defined $node->{<Q::namespaceURI>}) {
+          if (not defined $defURI or
+              $node->{<Q::namespaceURI>} ne $defURI or
+              $node->{<Q::localName>} eq 'Namespace' or
+              $node->{<Q::localName>} eq 'ElementTypeBinding' or
+              $node->{<Q::localName>} =~ /:/) {
+            $r = $self-><AG::SWCFGNode.lookupNamespacePrefix>
+                                             ($node->{<Q::namespaceURI>},
+                                              make_new_binding => 1);
+          } else {
+            $r = null;
+          }
+        } else {  ## Null namespace
+          if (defined $defURI or $node->{<Q::localName>} =~ /:/ or
+              $node->{<Q::localName>} eq 'Namespace' or
+              $node->{<Q::localName>} eq 'ElementTypeBinding') {
+            $r = $self-><AG::SWCFGNode.lookupNamespacePrefix>
+                                             ($node->{<Q::namespaceURI>},
+                                              make_new_binding => 1);
+          } else {
+            $r = null;
+          }
+        }
+
+  @Attr:
+    @@Name: qualifiedName
+    @@Type: SWCFGString
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The qualified name of the element type, i.e. the local name 
+        with or with out the namespace prefix followed by a <CHAR::COLON>. 
+    @@NewIn21:
+    @@Get:
+      @@@PerlDef:
+        __CODE{expandNamespace}__;
+        my $node = $self->{<Q::TreeCore:node>};
+        my $od = $self-><AG::SWCFGNode.ownerDocument>;
+        my $defURI = $od-><AG::SWCFGDocument.defaultElementTypeNamespaceURI>;
+        if (defined $node->{<Q::namespaceURI>}) {
+          if (not defined $defURI or
+              $node->{<Q::namespaceURI>} ne $defURI or
+              $node->{<Q::localName>} eq 'Namespace' or
+              $node->{<Q::localName>} eq 'ElementTypeBinding' or
+              $node->{<Q::localName>} =~ /:/) {
+            $r = $self-><AG::SWCFGNode.lookupNamespacePrefix>
+                                             ($node->{<Q::namespaceURI>},
+                                              make_new_binding => 1) .
+                 ':' . $node->{<Q::localName>};
+          } else {
+            $r = $node->{<Q::localName>};
+          }
+        } else {  ## Null namespace
+          if (defined $defURI or $node->{<Q::localName>} =~ /:/ or
+              $node->{<Q::localName>} eq 'Namespace' or
+              $node->{<Q::localName>} eq 'ElementTypeBinding') {
+            $r = $self-><AG::SWCFGNode.lookupNamespacePrefix>
+                                             ($node->{<Q::namespaceURI>},
+                                              make_new_binding => 1) .
+                 ':' . $node->{<Q::localName>};
+          } else {
+            $r = $node->{<Q::localName>};
+          }
         }
   
   @RedefAttr:
@@ -2082,8 +2405,6 @@ IFClassDef:
         The local name of the node. 
     @@Type:SWCFGString
     @@Get:
-      @@@disDef:
-        @@@@GetProp:localName
       @@@Type:SWCFGString
       @@@Description:
         @@@@lang:en
@@ -2098,14 +2419,18 @@ IFClassDef:
           @@@@@@:
             The node does not have the local name. 
             No node of type other than <CODE::#element> has the local name. 
+      @@@PerlDef:
+        __CODE{expandNamespace}__;
+        $r = $self->{<Q::TreeCore:node>}->{<Q::localName>};
     @@Set:
-      @@@disDef:
-        @@@@SetProp:localName
       @@@Description:
         @@@@lang:en
         @@@@@:
           Sets the local name.  Setting the local name to the node 
           whose type is other than <CODE::#element> has no effect. 
+      @@@PerlDef:
+        __CODE{expandNamespace}__;
+        $self->{<Q::TreeCore:node>}->{<Q::localName>} = $given;
 
   @RedefAttr:
     @@Name:namespaceURI
@@ -2116,8 +2441,6 @@ IFClassDef:
         The namespace URI of the node. 
     @@Type:SWCFGString
     @@Get:
-      @@@disDef:
-        @@@@GetProp:namespaceURI
       @@@Type:SWCFGString
       @@@Description:
         @@@@lang:en
@@ -2131,9 +2454,10 @@ IFClassDef:
           @@@@@lang:en
           @@@@@@:
             The node does not have the namespace URI. 
+      @@@PerlDef:
+        __CODE{expandNamespace}__;
+        $r = $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>};
     @@Set:
-      @@@disDef:
-        @@@@SetProp:namespaceURI
       @@@Type:SWCFGString
       @@@Description:
         @@@@lang:en
@@ -2148,6 +2472,9 @@ IFClassDef:
           @@@@@@: 
             Sets the node not to have its namespace URI (or sets 
             the namespace as the <QUOTE::<DOM::null> namespace>. 
+      @@@PerlDef:
+        __CODE{expandNamespace}__;
+        $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>} = $given;
   @IntMethod:
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
@@ -2175,6 +2502,29 @@ IFClassDef:
             Optional properties: <Q::value>, <Q::parent>, 
                   <Q::childNodes>, <Q::flag>, <Q::option>, 
                   <Q::namespaceURI>, <Q::namespaceExpanded>. 
+
+  @ResourceDef:
+    @@QName: expandNamespace
+    @@rdf:type:
+      dis2pm:BlockCode
+    @@ForCheck: ForClass
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Expands qualified name into namespace URI and local name. 
+    @@PerlDef:
+      unless ($self->{<Q::TreeCore:node>}->{<Q::namespaceExpanded>}) {
+        if ($self->{<Q::TreeCore:node>}->{<Q::localName>}
+            =~ s/^([^:]*)://g) {
+          my $prefix = $1;
+          __DEEP{
+            $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>}
+                 = $self-><M::SWCFGNode.lookupNamespaceURI>
+                                 ($prefix, make_new_binding => 1);
+          }__;
+        }
+        $self->{<Q::TreeCore:node>}->{<Q::namespaceExpanded>} = true;
+      }
 ##SWCFGElement
 
 IFClassDef:
@@ -2229,7 +2579,7 @@ IFClassDef:
           The newly created element. 
       @@@PerlDef:
         $r = <ClassM::ManakaiSWCFGElement.newObject>;
-        $r->{<Q::DOMCore:ownerDocument>} = $self;
+        $r->{<Q::DOMCore:ownerDocument>} = $self->{<Q::TreeCore:node>};
         $r->{<Q::namespaceURI>} = $namespaceURI;
         $r->{<Q::localName>} = $localName;
         $r->{<Q::namespaceExpanded>} = true;
@@ -2265,7 +2615,7 @@ IFClassDef:
           The newly created comment. 
       @@@PerlDef:
         $r = <ClassM::ManakaiSWCFGComment.newObject>;
-        $r->{<Q::DOMCore:ownerDocument>} = $self;
+        $r->{<Q::DOMCore:ownerDocument>} = $self->{<Q::TreeCore:node>};
         $r->{<Q::value>} = defined $data ? $data : '';
         $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($r);
 
@@ -2284,48 +2634,8 @@ IFClassDef:
           The newly created document fragment node. 
       @@@PerlDef:
         $r = <ClassM::ManakaiSWCFGDocumentFragment.newObject>;
-        $r->{<Q::DOMCore:ownerDocument>} = $self;
+        $r->{<Q::DOMCore:ownerDocument>} = $self->{<Q::TreeCore:node>};
         $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($r);
-
-  @Method:
-    @@Name:bindNamespaceURI
-    @@Description:
-      @@@lang:en
-      @@@@:
-        Binds a namespace URI to a prefix. 
-    @@NewIn21:
-    @@Param:
-      @@@Name:prefix
-      @@@Type:SWCFGString
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The namespace prefix to which the URI is bound. 
-          If this <P::prefix> is already bound to another URI, 
-          that binding is overwritten. 
-    @@Param:
-      @@@Name:namespaceURI
-      @@@Type:SWCFGString
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The namespace URI. 
-      @@@InCase:
-        @@@@Value:
-          @@@@@is-null:1
-        @@@@Type:SWCFGString
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            The namespace binding for <P::prefix> is removed. 
-    @@Return:
-      @@@PerlDef:
-        if (defined $namespaceURI) {
-          $self->{<Q::TreeCore:node>}->{<Q::nsBinding>}->{$prefix}
-                                 = $namespaceURI;
-        } else {
-          CORE::delete $self->{<Q::TreeCore:node>}->{<Q::nsBinding>}->{$prefix};
-        }
 
   @Attr:
     @@Name: defaultElementTypeNamespaceURI
@@ -2341,6 +2651,20 @@ IFClassDef:
     @@Set:
       @@@disDef:
         @@@@SetProp:defaultETNamespaceURI
+
+  @Attr:
+    @@Name: implementation
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The SuikaWikiConfig implementation to which this document 
+        belongs. 
+    @@NewIn21:
+    @@Type: SWCFGImplementation
+    @@Get:
+      @@@disDef:
+        @@@@GetProp:
+          DOMCore:implementation
   
   @RedefAttr:
     @@Name:nodeType
@@ -2389,6 +2713,7 @@ IFClassDef:
             The node has no value. 
       @@@disDef:
         @@@@DISLang:nop:
+
   @IntMethod:
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
@@ -2407,14 +2732,15 @@ IFClassDef:
         @@@@@:
           $r = <ClassM::ManakaiSWCFGNode.newObject>;
           $r->{<Q::nodeType>} = '#document';
+          $r->{<Q::nsBinding>} = {URI => ''};
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
             Required property: <Q::DOMCore:ownerDocument>, <Q::nodeType>, 
-                  <Q::DOMCore:implementation>. 
+                  <Q::DOMCore:implementation>, <Q::nsBinding>. 
             \
             Optional properties: <Q::childNodes>, <Q::flag>, <Q::option>, 
-                  <Q::nsBinding>, <Q::defaultETNamespaceURI>. 
+                  <Q::defaultETNamespaceURI>. 
 ##SWCFGDocument
 
 IFClassDef:
@@ -2824,6 +3150,278 @@ IFClassDef:
           @@@@@@:
             The <IF::SWCFGParser> was unable to load the SuikaWikiConfig 
             document. 
+      @@@PerlDef:
+           my $text;
+           ## 1. characterStream
+           if (defined (my $cs = $input-><AG::DOMLS:LSInput
+                              ::ManakaiDOM:ManakaiDOMLatest.characterStream>)) {
+             local $/ = undef;
+             $text = \ (readline $cs);
+           }
+           ## 2. byteStream
+           elsif (defined (my $bs = $input-><AG::DOMLS:LSInput
+                              ::ManakaiDOM:ManakaiDOMLatest.byteStream>)) {
+             __EXCEPTION{
+               ManakaiSWCFGException.NOT_SUPPORTED_ERR::
+                 MDOMX:param-name => 'input',
+             }__;
+           }
+           ## 3. stringData
+           elsif (defined (my $sd = $input-><AG::DOMLS:LSInput
+                                   ::ManakaiDOM:ManakaiDOMLatest.stringData>)) {
+             $text = \$sd;
+           }
+           ## 4. systemId
+           ## 5. publicId
+           elsif (defined (my $sysId = $input-><AG::DOMLS:LSInput
+                                      ::ManakaiDOM:ManakaiDOMLatest.systemId>) or
+                  defined (my $pubId = $input-><AG::DOMLS:LSInput
+                                      ::ManakaiDOM:ManakaiDOMLatest.publicId>)) {
+             __EXCEPTION{
+               ManakaiSWCFGException.NOT_SUPPORTED_ERR::
+                 MDOMX:param-name => 'input',
+             }__;
+           } else {
+             ## TODO: no-input-specified DOM error
+             __EXCEPTION{SWCFG_PARSE_ERR::
+               MDOMX:param-name => 'input',
+             }__;
+           }
+           
+           my $root = $self->{<Q::DOMCore:implementation>}
+                           -><M::SWCFGImplementation.createSWCFGDocument>;
+
+           ## TODO: Make configurable
+           my $no_magic_line = false;
+           my $no_namespace = false;
+           my $no_preserve_wsp = false;
+           my $no_binding = false;
+           
+           ## Magic line
+           if (not $no_magic_line and
+               $$text =~ s[^\#\?SuikaWikiConfig/(\d+\.\d+)\x0D?\x0A][]s) {
+             my $version = $1;
+             if ($version eq '2.1') {
+               # 
+             } elsif ($version eq '2.0') {
+               $no_namespace = true;
+               $no_preserve_wsp = true;
+               $no_binding = true;
+             } else {
+               ## TODO: Version unsupported DOM error
+               __EXCEPTION{SWCFG_PARSE_ERR::
+                 MDOMX:param-name => 'input',
+               }__;
+             }
+           }
+
+           my $current = $root;
+           my $current_element = $root;
+           my $is_new_element = 0;
+           my $is_list_element = 0;
+           my $wsp_length = 0;
+           my $vfragment = '';
+           for my $line (split /\x0D?\x0A/, $$text) {
+             if ($line =~ /^([^#\s].*):\s*([^\s:][^:]*)?$/) {
+               my ($name, $val) = ($1, $2);
+               substr ($name, 0, 1) = '' if defined $name and 
+                                            substr ($name, 0, 1) eq '\\';
+               substr ($val, 0, 1) = '' if defined $val and
+                                           substr ($val, 0, 1) eq '\\';
+              if (substr ($name, -6) eq '[list]') {
+                substr ($name, -6) = '';
+                $val = length ($val) ? [$val] : [];
+                $is_list_element = 1;
+              } else {
+                $is_list_element = 0;
+              }
+              $current_element = $root-><AG::SWCFGNode.appendNewNode>
+                                            (type => '#element',
+                                             local_name => $name,
+                                             value => $val);
+              $current_element->{<Q::TreeCore:node>}
+                              ->{<Q::namespaceExpanded>} = false
+                unless $no_namespace;
+              if (defined $2) {  ## Foo: bar
+                $current = $root;
+                $current_element = $root;
+              } else {           ## Foo:\n  bar\n  baz
+                $current = $current_element;
+                $is_new_element = 1;
+              }
+            } elsif ($line =~ /^\s+(\@+)(.*):\s*([^\s:][^:]*)?$/) {
+              my ($nest, $name, $val) = (length $1, $2, $3);
+              substr ($name, 0, 1) = '' if defined $name and 
+                                           substr ($name, 0, 1) eq '\\';
+              substr ($val, 0, 1) = '' if defined $val and
+                                          substr ($val, 0, 1) eq '\\';
+              if (substr ($name, -6) eq '[list]') {
+                substr ($name, -6) = '';
+                $val = (defined ($val) and length ($val)) ? [$val] : [];
+                $is_list_element = 1;
+              } else {
+                $is_list_element = 0;
+              }
+              my $ce;
+              if (length ($name)) {
+                while ($current_element-><M::SWCFGNode.flag>
+                                                   ('p__nest_level' => null,
+                                                    default => 0) >= $nest) {
+                  $current_element
+                       = $current_element-><AG::SWCFGNode.parentNode>;
+                }
+                $ce = $current_element-><AG::SWCFGNode.appendNewNode>
+                                           (type => '#element',
+                                            local_name => $name,
+                                            value => $val);
+                $ce->{<Q::TreeCore:node>}
+                              ->{<Q::namespaceExpanded>} = false
+                  unless $no_namespace;
+                $ce-><M::SWCFGNode.flag> ('p__nest_level'
+                      => $current_element-><M::SWCFGNode.flag>
+                                             ('p__nest_level' => null,
+                                              default => 0) + 1);
+                unless (defined $3) {  ##  @foo: \nbar
+                  $current_element = $ce;
+                  $current = $ce;
+                  $is_new_element = 1;
+                }
+              } else {  ## @@:
+                while ($current_element-><M::SWCFGNode.flag>
+                                           ('p__nest_level' => null,
+                                            default => 0) >= $nest - 1) {
+                  $current_element
+                            = $current_element-><AG::SWCFGNode.parentNode>;
+                }
+                $current_element-><M::SWCFGNode.appendText> ($val)
+                   if defined $val;
+                $current = $current_element;
+                unless (defined $3) {  ##  @@: \nbar
+                  $is_new_element = 1;
+                }
+              }
+            } elsif ($line =~ /^(\s+)(\S.*)$/) {
+              my ($wsp, $val) = ($1, $2);
+              if (substr ($val, 0, 1) eq '\\') {
+                substr ($val, 0, 1) = '';
+                $wsp = '';
+              }
+              if ($is_new_element or $is_list_element) {
+                $wsp_length = length $wsp;
+                $current_element-><M::SWCFGNode.appendText> ($val);
+                $is_new_element = 0;
+                $vfragment = '';
+              } else {
+                $wsp = $no_preserve_wsp ? '' : substr ($wsp, $wsp_length);
+                $current_element-><M::SWCFGNode.appendText>
+                                         ($vfragment . "\x0A" . $wsp . $val);
+                $vfragment = '';
+              }
+            } elsif ($line =~ /^(\s*)$/) {
+              $vfragment .= "\x0A" . substr ($1, $wsp_length);
+              $current = $root
+                   if $current-><AG::SWCFGNode.nodeType> eq '#comment';
+            } else { $line =~ /^\#?(.*)$/;
+            #} elsif ($line =~ /^\#(.*)$/) {
+              my ($v) = ($1);
+              if ($current-><AG::SWCFGNode.nodeType> eq '#comment') {
+                $current-><M::SWCFGNode.appendText> ("\x0A" . $v);
+              } else {
+                $current = $root-><M::SWCFGNode.appendNewNode>
+                                         (type => '#comment', value => $v);
+              }
+            #} else {
+            #  $current = $root;
+            #  #print STDERR qq(**$line**\n); 
+            }
+          }
+          unless ($no_namespace and $no_binding) {
+            my @remove;
+            for (0..$#{$root->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
+              my $n = $root->{<Q::TreeCore:node>}->{<Q::childNodes>}->[$_];
+              next unless $n->{<Q::nodeType>} eq '#element';
+              if (not $no_namespace and $n->{<Q::localName>} eq 'Namespace') {
+                for (@{$n->{<Q::childNodes>}}) {
+                  next unless $_->{<Q::nodeType>} eq '#element';
+                  if ($_->{<Q::value>}) {
+                    $root->{<Q::TreeCore:node>}->{<Q::nsBinding>}
+                         ->{$_->{<Q::localName>}} = $_->{<Q::value>};
+                  } else {
+                    ISNULL: {
+                      for my $in (@{$_->{<Q::childNodes>}}) {
+                        if ($in->{<Q::nodeType>} eq '#element' and
+                            $in->{<Q::localName>} eq 'is-null' and
+                            $in->{<Q::value>}) {
+                          $root->{<Q::TreeCore:node>}->{<Q::nsBinding>}
+                               ->{$_->{<Q::localName>}} = undef;
+                          last ISNULL;
+                        }
+                      }
+                      $root->{<Q::TreeCore:node>}->{<Q::nsBinding>}
+                           ->{$_->{<Q::localName>}} = $_->{<Q::value>};
+                    } # ISNULL
+                  }
+                }
+                push @remove, $_;
+              } elsif (not $no_binding and
+                       $n->{<Q::localName>} eq 'ElementTypeBinding') {
+                ## TODO: 
+              }
+            }
+            splice @{$root->{<Q::TreeCore:node>}->{<Q::childNodes>}},
+                   $_, 1, () for reverse @remove;
+          }
+          $r = $root;
+
+  @IntMethod:
+    @@Operator:
+      @@@@:
+        ManakaiDOM:MUErrorHandler
+      @@@ContentType:
+        dis:TypeQName
+    @@Description:
+      @@@lang:en
+      @@@@:
+        This method is a generic error handler; all manakai exceptions 
+        and warnings associated to an object are once reported to this method 
+        and then delivered to appropriate entities. 
+        \
+        If the error is an exception (such as <X::DOMCore:DOMException> or 
+        <X::ManakaiDOM:ManakaiDOMImplementationException>), it is 
+        simply thrown.  If the error is only a warning, it is reported 
+        via the <IF::DOMCore:DOMError> interface. 
+        \
+        See <PerlModule::Message::Util::Error> documentation for more 
+        information on the error reporting mechanism.
+        \
+        {NOTE:: This kind of methods are named as <Perl::___report_error> 
+                in the convention of <PerlModule::Message::Util::Error>. 
+        \
+        }
+    @@Param:
+      @@@Name:err
+      @@@Type: 
+        ManakaiDOM:ManakaiDOMExceptionOrWarning::ManakaiDOM:Perl
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          An exception object that describes what kind of error it is 
+          and how it should be recovered. 
+          \
+          {NOTE:: Exception objects in manakai implementation 
+                  inherit the class <PerlModule::Message::Util::Error>, 
+                  that in turn inherits <PerlModule::Error>.
+          \
+          }
+    @@Return:
+      @@@PerlDef:
+          if ($err->isa (<ClassName::ManakaiDOM:ManakaiDOMException
+                                   ::ManakaiDOM:Perl>)) {
+            $err->throw;
+          } else {
+            \## TODO: Implement warning reporting
+            warn $err->stringify;
+          }
 
 ## -- Bootstraps
 
@@ -2941,7 +3539,7 @@ IFClassDef:
           __EXCEPTION{SWCFG_VERSION_NOT_SUPPORTED_ERR}__;
         }
         $r = bless {<Q::DOMCore:implementation> => $self},
-                   <ClassName::SWCFGParser>;
+                   <ClassName::ManakaiSWCFGParser>;
 
 ## -- lang:dis vocabulary
 
@@ -3396,11 +3994,11 @@ ElementTypeBinding:
       @@@ForCheck: ForLatest
     @@ISA:
       @@@@:
-        DOMMain:ManakaiDOMExceptionIF::ManakaiDOM:all
+        DOMMain:ManakaiDOMExceptionIF::ManakaiDOM:Perl
       @@@ForCheck: ForIF
     @@ISA:
       @@@@:
-        ManakaiDOM:ManakaiDOMException::ManakaiDOM:all
+        ManakaiDOM:ManakaiDOMException::ManakaiDOM:Perl
       @@@ForCheck: ForClass
 
 ElementTypeBinding:
