@@ -9,7 +9,7 @@ for Default Namespace of Header Fields
 package Message::Header::Default;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Header;
 
 our %OPTION;
@@ -34,17 +34,24 @@ $OPTION{value_type} = {
 	':default'	=> ['Message::Field::Unstructured'],
 };
 
+## mailto: URL safe level
+$OPTION{uri_mailto_safe}	= {
+  ## 1 all (no check)	2 no trace & bcc & from
+  ## 3 no sender's info	4 (default) (currently not used)
+  ## 5 only a few
+	':default'	=> 1,
+};
+
 ## 
 
 $Message::Header::NS_phname2uri{$OPTION{namespace_phname}} = $OPTION{namespace_uri};
 $Message::Header::NS_uri2phpackage{$OPTION{namespace_uri}} = __PACKAGE__;
 
-## $self->_goodcase ($namespace_package_name, $field_name)
-sub _goodcase ($$$) {
+## $self->_goodcase ($namespace_package_name, $field_name, \%option)
+sub _goodcase ($$$\%) {
   no strict 'refs';
   my $self = shift;
-  my $nspack = shift;
-  my $name = shift;
+  my ($nspack, $name, $option) = @_;
   if (${$nspack.'::OPTION'}{goodcase}->{$name}) {
     return ${$nspack.'::OPTION'}{goodcase}->{$name};
   }
@@ -64,86 +71,6 @@ sub _name_n11n ($$$) {
   }
 }
 
-package Message::Header::RFC822;
-our %OPTION = %Message::Header::Default::OPTION;
-$OPTION{namespace_uri} = 'urn:x-suika-fam-cx:msgpm:header:mail-rfc822';
-$OPTION{namespace_phname} = 'rfc822';
-$OPTION{namespace_phname_goodcase} = 'RFC822';
-
-$OPTION{case_sensible} = 0;
-
-$OPTION{goodcase} = {
-	fax	=> 'FAX',
-	'pics-label'	=> 'PICS-Label',
-	'list-url'	=> 'List-URL',
-	'list-id'	=> 'List-ID',
-	'message-id'	=> 'Message-ID',
-	'mime-version'	=> 'MIME-Version',
-	'nic'	=> 'NIC',
-	'nntp-posting-date'	=> 'NNTP-Posting-Date',
-	'nntp-posting-host'	=> 'NNTP-Posting-Host',
-	url	=> 'URL',
-	'x-dearfriend'	=> 'X-DearFriend',
-	'x-jsmail-priority'	=> 'X-JsMail-Priority',
-	'x-mime-autoconverted'	=> 'X-MIME-Autoconverted',
-	'x-mimeole'	=> 'X-MimeOLE',
-	'x-msmail-priority'	=> 'X-MSMail-Priority',
-	'x-nntp-posting-date'	=> 'X-NNTP-Posting-Date',
-	'x-nntp-posting-host'	=> 'X-NNTP-Posting-Host',
-	'x-uidl'	=> 'X-UIDL',
-	'x-uri'	=> 'X-URI',
-	'x-url'	=> 'X-URL',
-};
-$OPTION{to_be_goodcase} = \&Message::Header::Default::_goodcase;
-
-$OPTION{value_type} = {
-	':default'	=> ['Message::Field::Unstructured'],
-	'date'	=> ['Message::Field::Date'],
-};
-
-$Message::Header::NS_phname2uri{$OPTION{namespace_phname}} = $OPTION{namespace_uri};
-$Message::Header::NS_uri2phpackage{$OPTION{namespace_uri}} = __PACKAGE__;
-
-package Message::Header::Resent;
-our %OPTION = %Message::Header::RFC822::OPTION;
-$OPTION{namespace_uri} = 'urn:x-suika-fam-cx:msgpm:header:mail-rfc822:resent';
-$OPTION{namespace_phname} = 'resent';
-$OPTION{namespace_phname_goodcase} = 'Resent';
-$OPTION{namespace_phname_regex} = 'resent';
-
-$Message::Header::NS_phname2uri{$OPTION{namespace_phname}} = $OPTION{namespace_uri};
-$Message::Header::NS_uri2phpackage{$OPTION{namespace_uri}} = __PACKAGE__;
-
-package Message::Header::Content;
-our %OPTION = %Message::Header::RFC822::OPTION;
-$OPTION{namespace_uri} = 'urn:x-suika-fam-cx:msgpm:header:mail-mime-entity';
-$OPTION{namespace_phname} = 'content';
-$OPTION{namespace_phname_goodcase} = 'Content';
-$OPTION{namespace_phname_regex} = 'content';
-
-$OPTION{goodcase} = {
-	'id'	=> 'ID',
-	'md5'	=> 'MD5',
-	'sgml-entity'	=> 'SGML-Entity',
-};
-
-$OPTION{value_type} = {
-	':default'	=> ['Message::Field::Unstructured'],
-	alias	=> ['Message::Field::URI'],
-	base	=> ['Message::Field::URI'],
-	disposition	=> ['Message::Field::ValueParams'],
-	features	=> ['Message::Field::Structured'],
-	id	=> ['Message::Field::MsgID'],
-	length	=> ['Message::Field::Numval'],
-	location	=> ['Message::Field::URI'],
-	md5	=> ['Message::Field::Structured'],
-	'transfer-encoding'	=> ['Message::Field::ValueParams'],
-	type	=> ['Message::Field::ContentType'],
-};
-
-$Message::Header::NS_phname2uri{$OPTION{namespace_phname}} = $OPTION{namespace_uri};
-$Message::Header::NS_uri2phpackage{$OPTION{namespace_uri}} = __PACKAGE__;
-
 package Message::Header::XCGI;
 our %OPTION = %Message::Header::Default::OPTION;
 $OPTION{namespace_uri} = 'urn:x-suika-fam-cx:msgpm:header:http:cgi:x';
@@ -155,6 +82,11 @@ $OPTION{to_be_goodcase} = \&Message::Header::Default::_goodcase;
 
 $Message::Header::NS_phname2uri{$OPTION{namespace_phname}} = $OPTION{namespace_uri};
 $Message::Header::NS_uri2phpackage{$OPTION{namespace_uri}} = __PACKAGE__;
+
+
+## 
+
+require Message::Header::RFC822;
 
 =head1 LICENSE
 
@@ -178,7 +110,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/25 09:50:07 $
+$Date: 2002/05/26 01:18:48 $
 
 =cut
 
