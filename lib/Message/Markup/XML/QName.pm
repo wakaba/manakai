@@ -16,7 +16,7 @@ This module is part of manakai XML.
 
 package Message::Markup::XML::QName;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NCNameStartChar InXMLNCNameChar!;
 use Exporter;
 our @ISA = qw/Exporter/;
@@ -217,15 +217,16 @@ sub prefix_to_name ($$;%) {
     }
   } else {
     if ($opt{ask_parent_node} && ref $decls->{parent}) {    
-      return prefix_to_name ($decls->{parent}->_get_ns_decls_node, $prefix, %opt,
-                             check_prefix => 0);
+      my $parent_decls = $decls->{parent}->_get_ns_decls_node (default => "n/a");
+      return prefix_to_name ($parent_decls, $prefix, %opt,
+                             check_prefix => 0) if ref $parent_decls;
+    }
+    if ($opt{use_name_null} and
+        not $opt{ignore_implicit_null} and
+        $prefix eq DEFAULT_PFX) {
+      return {success => 1, prefix => $prefix, name => NULL_URI};
     } else {
-      if ($opt{use_name_null} and not $opt{ignore_implicit_null}
-          and ($prefix eq DEFAULT_PFX)) {
-        return {success => 1, prefix => $prefix, name => NULL_URI};
-      } else {
-        return {success => 0, prefix => $prefix, reason => '__NOT_FOUND'};
-      }
+      return {success => 0, prefix => $prefix, reason => '__NOT_FOUND'};
     }
   }
 }
@@ -422,4 +423,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/12/05 11:41:45 $
+1; # $Date: 2004/02/14 11:07:50 $
