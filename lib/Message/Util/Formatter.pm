@@ -1,7 +1,7 @@
 
 =head1 NAME
 
-Message::Util::Formatter --- General format text to composed text converter
+Message::Util::Formatter --- Manakai: General format text to composed text converter
 
 =head1 DESCRIPTION
 
@@ -15,12 +15,14 @@ perl code.
 
 This module requires L<Message::Util::Formatter>.
 
+This module is part of Manakai.
+
 =cut
 
 package Message::Util::Formatter;
 use strict;
 use vars qw(%FMT2STR $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 
 =head1 INITIAL FORMATTING RULES
@@ -108,10 +110,8 @@ value so you can give any data.)
 
 =cut
 
-sub replace ($$;\%) {
-  my $self = shift;
-  my $format = shift;
-  my $gparam = shift;
+sub replace ($$;$$) {
+  my ($self, $format, $gparam, $option) = @_;
   $format =~ s{%([A-Za-z0-9_-]+)(?:\(((?:[^"\)]|"(?:[^"\\]|\\.)*")*)\))?;|(%|[^%]+)}{
       my ($f, $a, $t) = ($1, $2, $3);
       $f =~ tr/-/_/;
@@ -122,8 +122,24 @@ sub replace ($$;\%) {
 	  $a =~ s(((?:[^",]|"(?:[^"\\]|\\.)*")+)){
 	      my $s = $1; $s =~ s/^[\x09\x0A\x0D\x20]+//; $s =~ s/[\x09\x0A\x0D\x20]+$//;
 	      if ($s =~ /^([^=]*[^\x09\x0A\x0D\x20=])[\x09\x0A\x0D\x20]*=>[\x09\x0A\x0D\x20]*([^\x09\x0A\x0D\x20].*)$/s) {
-		  $a{ Message::Util::Wide::unquote_if_quoted_string ($1) } = Message::Util::Wide::unquote_if_quoted_string ($2);
+	        my ($n, $v) = ($1, $2);
+	        $n =~ tr/-/_/;
+	        if ($option->{formatter}) {
+	          $n = Message::Util::Wide::unquote_if_quoted_string ($n);
+	          if ($v =~ /^"((?:[^"\\]|\\.)+)"([a-z]+)$/) {
+	            $v = $1;
+	            my $p = $2;
+	            $v =~ s/\\(.)/$1/g;
+	            $v = $option->{formatter}->replace ($v, ($option->{formatter_o} || $gparam), ($option->{formatter_option} || {formatter => $option->{formatter}}))
+	              if index ($p, 'p') > -1;
+	            $a{-option}->{$n} = $p;
+	          }
+	          $a{ $n } = Message::Util::Wide::unquote_if_quoted_string ($v);
+	        } else {
+		  $a{ Message::Util::Wide::unquote_if_quoted_string ($n) } = Message::Util::Wide::unquote_if_quoted_string ($v);
+	        }
 	      } else {
+	          $s =~ tr/-/_/;
 		  $a{ Message::Util::Wide::unquote_if_quoted_string ($s) } = 1;
 	      }
 	  }ges;
@@ -159,7 +175,7 @@ SuikaWiki <http://suika.fam.cx/~wakaba/-temp/wiki/wiki?SuikaWiki>.
 
 =head1 LICENSE
 
-Copyright 2002 Wakaba <w@suika.fam.cx>.
+Copyright 2002-2003 Wakaba <w@suika.fam.cx>.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -179,4 +195,4 @@ Boston, MA 02111-1307, USA.
 =cut
 
 1;
-# $Date: 2003/01/26 01:35:40 $
+# $Date: 2003/03/28 01:26:17 $
