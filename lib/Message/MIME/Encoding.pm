@@ -8,14 +8,19 @@ Message::MIME::Encoding --- Encoding (MIME CTE, HTTP encodings, etc) definitions
 package Message::MIME::Encoding;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 our %ENCODER = (
 	'7bit'	=> sub { ($_[1], decide_coderange (@_[0,1,2])) },
 	'8bit'	=> sub { ($_[1], decide_coderange (@_[0,1,2])) },
 	binary	=> sub { ($_[1], decide_coderange (@_[0,1,2])) },
-	base64	=> sub { require MIME::Base64; 
-		         (MIME::Base64::encode ($_[1]), 'base64') },
+	base64	=> sub {
+		require MIME::Base64;
+		my $s = MIME::Base64::encode ($_[1]);
+		$s =~ s/\x0D(?!\x0A)/\x0D\x0A/gs;
+		$s =~ s/(?<!\x0D)\x0A/\x0D\x0A/gs;
+		($s, 'base64');
+	},
 	'quoted-printable'	=> \&encode_qp,
 	#	=> sub { require MIME::QuotedPrint; 
 	#	         (MIME::QuotedPrint::encode ($_[1]), 'quoted-printable') },
@@ -23,7 +28,10 @@ our %ENCODER = (
 		if (eval {require Compress::Zlib}) {
 		  require MIME::Base64;
 		  my $s = Compress::Zlib::memGzip ($_[1]);
-		  (MIME::Base64::encode ($s), 'x-gzip64');
+		  $s = MIME::Base64::encode ($s);
+		  $s =~ s/\x0D(?!\x0A)/\x0D\x0A/gs;
+		  $s =~ s/(?<!\x0D)\x0A/\x0D\x0A/gs;
+		  ($s, 'x-gzip64');
 		} else {
 		  Carp::carp "gzip64 encode: $@";
 		  ($_[1], 'binary');
@@ -90,16 +98,16 @@ sub encode_qp ($$) {
   ## - RFC 2049 "mail-safe"	[^\x09\x20\x25-\x3C\x3E\x3F\x41-\x5A\x5F\x61-\x7A]
   $s =~ s/([^\x09\x20\x25-\x3C\x3E\x3F\x41-\x5A\x5F\x61-\x7A])/sprintf('=%02X', ord($1))/eg;  # rule #2,#3
   if ($mt_is_text) {
-    $s =~ s/([\x09\x20]+)(?==0D=0A|$)/
-      join('', map { sprintf('=%02X', ord($_)) }
-        split('', $1)
-    )/egm;                        # rule #3 (encode whitespace at eol)
+    $s =~ s/([\x09\x20])(?==0D=0A|$)/
+      sprintf '=%02X', ord($1)
+      #join('', map { sprintf('=%02X', ord($_)) } split('', $1) )
+    /egm;                        # rule #3 (encode whitespace at eol)
     $s =~ s/=0D=0A/\x0D\x0A/g;
   } else {
-    $s =~ s/([\x09\x20]+)$/
-      join('', map { sprintf('=%02X', ord($_)) }
-        split('', $1)
-    )/egm;                        # rule #3 (encode whitespace at eol)
+    $s =~ s/([\x09\x20])$/
+      sprintf '=%02X', ord($1)
+      #join('', map { sprintf('=%02X', ord($_)) } split('', $1) )
+    /egm;                        # rule #3 (encode whitespace at eol)
   }
   
   # rule #5 (lines must be shorter than 76 chars, but we are not allowed
@@ -245,7 +253,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/01 05:37:18 $
+$Date: 2002/06/09 11:13:14 $
 
 =cut
 

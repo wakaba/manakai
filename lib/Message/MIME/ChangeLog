@@ -1,3 +1,13 @@
+2002-06-09  wakaba <w@suika.fam.cx>
+
+	* Charset.pm:
+	- Support of 'name_minimumizer' property of charset object.
+	- (name_minimumize): New function.
+	* Encoding.pm (encode_qp): Don't encode inner WSPs within
+	tailing WSPs.
+	* MediaType.pm: Support of some new media types
+	and their parameters.
+
 2002-06-01  wakaba <w@suika.fam.cx>
 
 	* Charset.pm:

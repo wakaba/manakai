@@ -14,7 +14,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%ENCODER %DECODER %OPTION %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::MIME::Charset;
 
 $REG{WSP} = qr/[\x09\x20]/;
@@ -44,11 +44,11 @@ for C<ISO-8859-I<n>> is defined, and this option is TRUE,
 decoding C<encoded-word> functions attempt to decode
 ASCII part of these charset.
 
-RFC 2047 says to support ASCII part of C<ISO-8859-I<n>> at least.
-This requirement is convinient for human users who see final rendering
-result.  But it is not appropriate to process message.
+RFC 2047 says that ASCII part of C<ISO-8859-I<n>> be at least
+supported.  This requirement is convinience for human user who 
+sees final rendering result.  But it is not appropriate to process message.
 
-Defalt value is C<1>, force decoding is enabled.
+Defalt value is C<0>, force decoding is disenabled.
 
 =back
 
@@ -82,7 +82,8 @@ Shold be:
 =cut
 
 %DECODER = (
-  '*DEFAULT'	=> sub {$_[1]},
+  '*DEFAULT'	=> sub { $_[1] },
+  '7'	=> sub { $_[1] },
   b	=> sub {require MIME::Base64; MIME::Base64::decode ($_[1])},
   q	=> sub {my $s = $_[1]; $s =~ tr/_/\x20/; 
     $s=~ s/=([0-9A-Fa-f]{2})/pack("C", hex($1))/ge; $s},
@@ -186,7 +187,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/25 09:53:24 $
+$Date: 2002/06/09 11:13:14 $
 
 =cut
 
