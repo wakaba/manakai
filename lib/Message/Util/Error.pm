@@ -15,7 +15,7 @@ This module is part of manakai.
 
 package Message::Util::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error;
 push our @ISA, 'Error';
 
@@ -56,7 +56,7 @@ sub new ($;%) {
   $opt{-def} = $class->___get_error_def ($opt{-type})
             || $class->___get_error_def ('UNKNOWN')
             or die qq(Error definition for "$opt{-type}" not found);
-  local $Error::Depth = $Error::Depth + 1;
+#  local $Error::Depth = $Error::Depth + 1;
   $class->SUPER::new (%opt);
 }
 
@@ -81,12 +81,14 @@ sub report ($;%) {
       # => {-object}->{method}
       # => ->report
       # => {-object}->___report_error
-    local $@;
-    my $err = $self->new (%opt);
-    undef $@;
+    my $err;
+    {
+      local $@;
+      $err = $self->new (%opt);
+    }
     $opt{-object}->___report_error ($err);
   } else {
-    local $Error::Depth = $Error::Depth + 1;
+    local $Error::Depth = $Error::Depth + 2;
       # => {-object}->{method}
       # (=> ->report)
     throw $self %opt;
@@ -252,4 +254,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/12/06 05:10:50 $
+1; # $Date: 2004/01/17 08:29:45 $
