@@ -28,7 +28,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/28 13:10:20 $
+      $Date: 2004/12/29 04:49:48 $
     @@ContentType:
       dis:Date.RCS
   
@@ -791,16 +791,6 @@ PropDef:
 
 PropDef:
   @QName:
-    dis:Operator
-  @Description:
-    @@lang:en
-    @@@:
-      An operator the subject resource (either method or attribute) 
-      is to be used to evaluate an expression whose at least one operand object 
-      is of a class to which the subject resource belongs.
-
-PropDef:
-  @QName:
     ManakaiDOM:isRedefining
   @dataType:
     DOMMain:boolean
@@ -944,6 +934,40 @@ PropDef:
       that a method is static does not means the method should not 
       be called via an object.  Inappropriateness of the use as an 
       object method should be indicated by other property.
+
+## - Operator
+
+PropDef:
+  @QName:
+    dis:Operator
+  @Description:
+    @@lang:en
+    @@@:
+      An operator the subject resource (either method or attribute) 
+      is to be used to evaluate an expression whose at least one operand object 
+      is of a class to which the subject resource belongs.
+  @rdfs:range: Operator
+
+ResourceDef:
+  @QName: Operator
+  @rdf:type:
+    rdfs:Class
+  @ISA:
+    rdfs:Class
+  @Description:
+    @@lang:en
+    @@@:
+      A resource that might be an object of <Q::dis:Operator> property. 
+
+ResourceDef:
+  @QName:
+    ManakaiDOM:MUErrorHandler
+  @rdf:type: Operator
+  @Description:
+    @@lang:en
+    @@@:
+      A Perl <Perl::___error_handler> subroutine called by 
+      <PerlModule::Message::Util::Error> exception reporting. 
 
 ## -- lang:dis vocabulary
 
@@ -3287,7 +3311,10 @@ ClassDef:
   
   @IntMethod:
     @@Operator:
-      ManakaiDOM:MUErrorHandler
+      @@@@:
+        ManakaiDOM:MUErrorHandler
+      @@@ContentType:
+        dis:TypeQName
     @@Description:
       @@@lang:en
       @@@@:
@@ -3806,7 +3833,7 @@ ClassDef:
       @@@lang:en
       @@@@: Destroy this reference object.
     @@Operator:
-      @@@Type:
+      @@@ContentType:
         lang:Perl
       @@@@: DESTROY
     @@Return:

@@ -268,6 +268,8 @@ sub perl_code ($;%) {
             $r = dispm_get_code (%opt, resource => $State->{Type}->{$uri},
                                  For => [keys %{$State->{Type}->{$uri}
                                                       ->{For}}]->[0],
+                                 'For+' => [keys %{$State->{Type}->{$uri}
+                                                      ->{'For+'}||{}}],
                                  is_inline => 1,
                                  ExpandedURI q<dis2pm:selParent> => $param,
                                  ExpandedURI q<dis2pm:DefKeyName>
@@ -493,6 +495,8 @@ sub perl_code ($;%) {
         $r = dispm_get_code (%opt, resource => $State->{Type}->{$uri},
                              For => [keys %{$State->{Type}->{$uri}
                                                   ->{For}}]->[0],
+                             'For+' => [keys %{$State->{Type}->{$uri}
+                                                     ->{'For+'}||{}}],
                              ExpandedURI q<dis2pm:selParent> => $param,
                              ExpandedURI q<dis2pm:DefKeyName>
                                => ExpandedURI q<d:Def>);
@@ -787,6 +791,7 @@ Returns a code fragment corresponding to the vaue of C<$const>.
 sub dispm_const_value (%) {
   my %opt = @_;
   my $for = [keys %{$opt{resource}->{For}}]->[0];
+  local $opt{'For+'} = [keys %{$opt{resource}->{'For+'}||{}}];
   my $value = dispm_get_value
                         (%opt,
                          ExpandedURI q<dis2pm:ValueKeyName>
@@ -940,7 +945,7 @@ sub disperl_to_perl (%) {
       my $memref = $_->value;
       my $mem = dispm_memref_to_resource
                     ($memref, %opt, node => $_,
-                     return_returner => 1,
+                     return_method_returner => 1,
                      use_default_type_resource =>
                        $State->{ExpandedURI q<dis2pm:thisClass>},
                        ## ISSUE: Reference in a resource that is 
@@ -950,6 +955,7 @@ sub disperl_to_perl (%) {
       ## ISSUE: It might be required to detect a loop
       $code .= dispm_get_code (%opt, resource => $mem,
                                For => [keys %{$mem->{For}}]->[0],
+                               'For+' => [keys %{$mem->{'For+'}||{}}],
                                ExpandedURI q<dis2pm:DefKeyName>
                                  => ExpandedURI q<d:Def>);
     } elsif ($et eq ExpandedURI q<DISPerl:selectByProp>) {
@@ -1363,17 +1369,17 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
         = $pack->{ExpandedURI q<dis2pm:packageName>};
       for my $method (values %{$pack->{ExpandedURI q<dis2pm:method>}}) {
         next unless defined $method->{Name};
-        next unless length $method->{ExpandedURI q<dis2pm:methodName>};
         if ($method->{ExpandedURI q<dis2pm:type>} eq
             ExpandedURI q<ManakaiDOM:DOMMethod>) {
           local $opt{ExpandedURI q<MDOMX:method>}
-            = $method->{ExpandedURI q<dis2pm:methodName>};
+            = $method->{ExpandedURI q<dis2pm:methodName+>};
           local $opt{ExpandedURI q<dis2pm:currentMethodResource>} = $method;
           my $proto = '$';
           my @param = ('$self');
           my $param_norm = '';
           my $param_opt = 0;
           my $for = [keys %{$method->{For}}]->[0];
+          local $opt{'For+'} = [keys %{$method->{'For+'}||{}}];
           for my $param (@{$method->{ExpandedURI q<dis2pm:param>}||[]}) {
             my $atype = $param->{ExpandedURI q<d:actualType>};
             if ($param->{ExpandedURI q<dis2pm:nullable>}) {
@@ -1461,29 +1467,35 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
                           ExpandedURI q<MDOMX:class>
                                  => $pack->{ExpandedURI q<dis2pm:packageName>},
                           ExpandedURI q<MDOMX:method>
-                                 => $method->{ExpandedURI q<dis2pm:methodName>},
+                                 => $method->{ExpandedURI q<dis2pm:methodName+>},
                         };
           }
-          $result .= perl_sub
-                       (name => $method->{ExpandedURI q<dis2pm:methodName>},
-                        code => $code, prototype => $proto);
+          if (length $method->{ExpandedURI q<dis2pm:methodName>}) {
+            $result .= perl_sub
+                         (name => $method->{ExpandedURI q<dis2pm:methodName>},
+                          code => $code, prototype => $proto);
+          } else {
+            $method->{ExpandedURI q<dis2pm:methodCodeRef>}
+                     = perl_sub (name => '', code => $code, prototype => $proto);
+          }
         } elsif ($method->{ExpandedURI q<dis2pm:type>} eq
                  ExpandedURI q<ManakaiDOM:DOMAttribute>) {
           local $opt{ExpandedURI q<MDOMX:attr>}
-            = $method->{ExpandedURI q<dis2pm:methodName>};
+            = $method->{ExpandedURI q<dis2pm:methodName+>};
           my $getter = $method->{ExpandedURI q<dis2pm:getter>};
           valid_err qq{Getter for attribute "$method->{Name}" must be }.
                     q{defined}, node => $method->{src} unless $getter;
           my $setter = defined $method->{ExpandedURI q<dis2pm:setter>}->{Name}
                          ? $method->{ExpandedURI q<dis2pm:setter>} : undef;
           my $for = [keys %{$method->{For}}]->[0];
+          local $opt{'For+'} = [keys %{$method->{'For+'}||{}}];
           my $for1 = $for;
           unless (dis_uri_for_match (ExpandedURI q<ManakaiDOM:ManakaiDOM1>,
                                      $for, node => $method->{src})) {
             $for1 = ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>;
           }
           local $opt{ExpandedURI q<MDOMX:on>} = 'get';
-          my $get_code = dispm_get_code (resource => $getter, For => $for,
+          my $get_code = dispm_get_code (%opt, resource => $getter, For => $for,
                                          ExpandedURI q<dis2pm:DefKeyName>
                                            => ExpandedURI q<d:Def>);
           if (defined $get_code) {
@@ -1510,7 +1522,7 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
                           ExpandedURI q<MDOMX:class>
                                  => $pack->{ExpandedURI q<dis2pm:packageName>},
                           ExpandedURI q<MDOMX:attr>
-                                 => $method->{ExpandedURI q<dis2pm:methodName>},
+                                 => $method->{ExpandedURI q<dis2pm:methodName+>},
                           ExpandedURI q<MDOMX:on> => 'get',
                         };
           }
@@ -1557,7 +1569,7 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
                           ExpandedURI q<MDOMX:class>
                                  => $pack->{ExpandedURI q<dis2pm:packageName>},
                           ExpandedURI q<MDOMX:attr>
-                                 => $method->{ExpandedURI q<dis2pm:methodName>},
+                                 => $method->{ExpandedURI q<dis2pm:methodName+>},
                           ExpandedURI q<MDOMX:on> => 'set',
                       };
             }
@@ -1570,12 +1582,20 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
             $get_code = perl_statement ('my ($self) = @_').
                         $get_code;
           }
-          $result .= perl_sub
-                       (name => $method->{ExpandedURI q<dis2pm:methodName>},
-                        prototype => $setter ? '$;$' : '$',
-                        code => $get_code);
+          if (length $method->{ExpandedURI q<dis2pm:methodName>}) {
+            $result .= perl_sub
+                         (name => $method->{ExpandedURI q<dis2pm:methodName>},
+                          prototype => $setter ? '$;$' : '$',
+                          code => $get_code);
+          } else {
+            $method->{ExpandedURI q<dis2pm:methodCodeRef>}
+                     = perl_sub (name => '', code => $get_code,
+                                 prototype => $setter ? '$;$' : '$');
+          }
         }
       } # package method
+
+      ## -- Constants
       for my $cg (values %{$pack->{ExpandedURI q<dis2pm:constGroup>}}) {
         next unless defined $cg->{Name};
         $result .= dispm_const_group (resource => $cg);
@@ -1584,6 +1604,60 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
         next unless defined $cv->{Name};
         $result .= dispm_const_value_sub (resource => $cv);
       } # package const value
+
+      ## -- Operators
+      my %ol;
+      for (values %{$pack->{ExpandedURI q<dis2pm:overload>}||{}}) {
+        next unless defined $_->{resource}->{Name};
+        if ($_->{resource}->{ExpandedURI q<dis2pm:methodName+>} =~ /^\#/) {
+          if ($_->{operator} =~ /^[A-Z]+$/) {
+            my $code = $_->{resource}->{ExpandedURI q<dis2pm:methodCodeRef>};
+            $code =~ s/\bsub /sub $_->{operator} /;
+            $result .= $code;
+          } else {
+            $ol{$_->{operator}} = perl_code_literal $_->{resource}
+                                    ->{ExpandedURI q<dis2pm:methodCodeRef>};
+          }
+        } else {
+          if ($_->{operator} =~ /^[A-Z]+$/) {
+            $result .= perl_statement
+                         perl_assign
+                              perl_var (type => '*',
+                                        local_name => $_->{operator})
+                           => perl_var (type => '\&',
+                                        local_name => $_->{resource}
+                                          ->{ExpandedURI q<dis2pm:methodName>});
+          } else {
+            $ol{$_->{operator}}
+              = $_->{resource}->{ExpandedURI q<dis2pm:methodName>};
+          }
+        }
+      }
+      if (keys %ol) {
+        $ol{fallback} = 1;
+        $result .= perl_statement 'use overload '.perl_list %ol;
+      }
+      for (values %{$pack->{ExpandedURI q<d:Operator>}||{}}) {
+        next unless defined $_->{resource}->{Name};
+        if ($_->{operator} eq ExpandedURI q<ManakaiDOM:MUErrorHandler>) {
+          if ($_->{resource}->{ExpandedURI q<dis2pm:methodName+>} =~ /^\#/) {
+            my $code = $_->{resource}->{ExpandedURI q<dis2pm:methodCodeRef>};
+            $code =~ s/\bsub /sub ___error_handler /;
+            $result .= $code;
+          } else {
+            $result .= perl_statement
+                         perl_assign
+                              perl_var (type => '*',
+                                        local_name => '___error_handler')
+                           => perl_var (type => '\&',
+                                        local_name => $_->{resource}
+                                          ->{ExpandedURI q<dis2pm:methodName>});
+          }
+        } else {
+          valid_err qq{Operator <$_->{operator}> is not supported},
+                    node => $_->{resource}->{src};
+        }
+      }
     }
   } # root object
 }

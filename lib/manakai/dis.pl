@@ -1535,8 +1535,6 @@ sub dis_perl_init_classdef ($;%) {
             ExpandedURI q<ManakaiDOM:DOMAttribute> => 1,
            }->{$type}) {
     ## Method or attribute name
-    #valid_err (qq<Method name required>, node => $res->{node})
-    #  unless $res->{Name};
     my $name = $res->{Name};
     my $int = dis_get_attr_node
                  (%opt, name => {uri => ExpandedURI q<ManakaiDOM:isForInternal>},
@@ -2026,6 +2024,63 @@ sub dis_perl_init_classdef ($;%) {
         $role->{compat} = $f;
       }
       next N;
+    } elsif (dis_uri_ctype_match (ExpandedURI q<d:Operator>, $ln, %opt)) {
+      my $t = dis_get_attr_node (%opt, name => 'ContentType', parent => $_);
+      if ($t) {
+        my $tu = dis_qname_to_uri ($t->value, %opt, node => $t);
+        if (dis_uri_ctype_match (ExpandedURI q<lang:Perl>, $tu, %opt)) {
+          my $op = $_->value;
+          unless ({qw[
+                    +  1 -  1 *  1 /  1 %  1 **  1 <<  1 >>  1 x  1 .  1
+                    += 1 -= 1 *= 1 /= 1 %= 1 **= 1 <<= 1 >>= 1 x= 1 .= 1
+                    <  1 <= 1 >  1 >= 1 == 1 != 1 <=> 1
+                    lt 1 le 1 gt 1 ge 1 eq 1 ne 1 cmp 1
+                    & 1 | 1 ^ 1
+                    neg 1 ! 1 ~ 1
+                    ++ 1 -- 1
+                    atan2 1 cos 1 sin 1 exp 1 abs 1 log 1 sqrt 1
+                    bool 1 "" 1 0+ 1
+                    <> 1
+                    ${} 1 @{} 1 %{} 1 &{} 1 *{} 1
+                    DESTROY 1
+                  ]}->{$op}) {
+            valid_err qq<Operator "op" is not supported>, node => $_;
+          }
+          valid_err qq<Overloading for operator "$op" is already declared>,
+            node => $_
+              if defined $State->{ExpandedURI q<dis2pm:parentResource>}
+                               ->{ExpandedURI q<dis2pm:overload>}->{$op}
+                               ->{resource}->{Name};
+          $State->{ExpandedURI q<dis2pm:parentResource>}
+                ->{ExpandedURI q<dis2pm:overload>}->{$op}
+                  = {
+                     resource => $res,
+                     operator => $op,
+                    };
+        } elsif (dis_uri_ctype_match (ExpandedURI q<d:TypeQName>, $tu, %opt)) {
+          my $op = dis_qname_to_uri ($_->value, %opt, node => $_,
+                                     use_default_namespace => 1);
+          valid_err qq<Operator <$op> must be defined>, node => $_
+            unless defined $State->{Type}->{$op}->{Name};
+          valid_err qq<Overloading for operator <$op> is already declared>,
+            node => $_
+              if defined $State->{ExpandedURI q<dis2pm:parentResource>}
+                               ->{ExpandedURI q<d:Operator>}->{$op}
+                               ->{resource}->{Name};
+          $State->{ExpandedURI q<dis2pm:parentResource>}
+                ->{ExpandedURI q<d:Operator>}->{$op}
+                  = {
+                     resource => $res,
+                     operator => $op,
+                    };
+        } else {
+          valid_err qq<<$tu>: Unsupported content type for "dis:Operator">, 
+            node => $t;
+        }
+      } else {
+        valid_err q<"dis:ContentType" attribute is required>, node => $_;
+      }
+      next N;
     } elsif (dis_uri_ctype_match (ExpandedURI q<d:AppISA>, $ln, %opt)) {
       my $t = dis_get_attr_node (%opt, name => 'ContentType', parent => $_);
       if ($t) {
@@ -2395,4 +2450,4 @@ sub disdoc_inline2pod ($;%) {
 
 =cut
 
-1; # $Date: 2004/12/28 13:10:20 $
+1; # $Date: 2004/12/29 04:49:48 $

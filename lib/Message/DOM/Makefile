@@ -22,8 +22,7 @@ DIS2POD = $(PERL) $(DIS2POD_PL) --output-pod=only
 IDL2DIS_PL = idl2dis.pl
 IDL2DIS = $(PERL) $(IDL2DIS_PL)
 
-DIS_FILES = DOMMain.dis DOMCore.dis DOMXML.dis \
-  ManakaiDOMCore.dis
+DIS_FILES = DOMMain.dis DOMCore.dis DOMXML.dis
 
 MAIN_CDIS_FILE = mdom.cdis
 GENERATED_FILES_DOMLATEST = DOMMain.pm DOMCore.pm

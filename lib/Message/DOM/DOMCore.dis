@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/28 13:10:20 $
+      $Date: 2004/12/29 04:49:48 $
     @@ContentType:
       dis:Date.RCS
 
@@ -52,8 +52,6 @@ Module:
   @Require:
     @@Module:
       @@@Name: DOMMain
-    @@Module:
-      @@@Name: ManakaiDOMCore
     @@Module:
       @@@Name: DOMXML
     @@Module:
@@ -92,6 +90,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
   @disPerl:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl--
+  @DOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @DOMEvents:
     http://suika.fam.cx/~wakaba/archive/2004/dom/events#
   @DOMLS:
@@ -106,10 +106,12 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
   @ManakaiDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @ManakaiDOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
   @ManakaiDOMLS:
     http://suika.fam.cx/~wakaba/archive/2004/mdom-ls#
   @ManakaiDOMXML:
-    http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-xml#
   @MDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
@@ -1112,6 +1114,87 @@ ExceptionDef:
               This document does not support XML Namespaces.
         @@@SubTypeDef:
           @@@@QName:
+            MDOMX:MDOM_IMPL_ATTR_NOT_IMPLEMENTED
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The DOM implementation does not support this attribute.
+          @@@@XParam:
+            @@@@@QName:
+              MDOMX:class
+            @@@@@Type:
+              DOMMain:DOMString
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The name of class to which the attribute not implemented belongs.
+          @@@@XParam:
+            @@@@@QName:
+              MDOMX:attr
+            @@@@@Type:
+              DOMMain:DOMString
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The name of attribute that is not implemented.
+          @@@@XParam:
+            @@@@@QName:
+              MDOMX:on
+            @@@@@Type:
+              DOMMain:DOMString
+            @@@@@InCase:
+              @@@@@@Value:get
+              @@@@@@Description:
+                @@@@@@@lang:en
+                @@@@@@@@: Getting this attribute is not implemented.
+            @@@@@InCase:
+              @@@@@@Value:set
+              @@@@@@Description:
+                @@@@@@@lang:en
+                @@@@@@@@: Setting this attribute is not implemented.
+          @@@@Def:
+            @@@@@lang:en
+            @@@@@ContentType:
+              lang:muf
+            @@@@@@:
+              The attribute "%p (name => {<Q::MDOMX:class>}, suffix => {.}
+              );%p (name => {<Q::MDOMX:attr>});"
+              %p (name => {<Q::MDOMX:on>},
+                  prefix => {(}, suffix => {)}); not implemented
+        @@@SubTypeDef:
+          @@@@QName:
+            MDOMX:MDOM_IMPL_METHOD_NOT_IMPLEMENTED
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The DOM implementation does not support this method.
+          @@@@XParam:
+            @@@@@QName:
+              MDOMX:class
+            @@@@@Type:
+              DOMMain:DOMString
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The name of class to which the method not implemented belongs.
+          @@@@XParam:
+            @@@@@QName:
+              MDOMX:method
+            @@@@@Type:
+              DOMMain:DOMString
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The name of method that is not implemented.
+          @@@@Def:
+            @@@@@lang:en
+            @@@@@ContentType:
+              lang:muf
+            @@@@@@:
+              The method "%p (name => {<Q::MDOMX:class>}, suffix => {.}
+              );%p (name => {<Q::MDOMX:method>});" not implemented
+        @@@SubTypeDef:
+          @@@@QName:
             MDOMX:MDOM_IMPL_NOSUPPORT_SCHEMA
           @@@@Description:
             @@@@@lang:en
@@ -1165,85 +1248,6 @@ ExceptionDef:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: The XML version
-        @@@SubTypeDef:
-          @@@@QName:
-            MDOMX:MDOM_IMPL_ATTR_NOT_IMPLEMENTED
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The DOM implementation does not implement the 
-              attribute.
-          @@@@XParam:
-            @@@@@Name:attr
-            @@@@@Type:
-              DOMMain:DOMString
-            @@@@@Description:
-              @@@@@@lang:en
-              @@@@@@@:
-                The name of the attribute that is not implemented.
-          @@@@XParam:
-            @@@@@Name:if
-            @@@@@Type:
-              DOMMain:DOMString
-            @@@@@Description:
-              @@@@@@lang:en
-              @@@@@@@:
-                The interface name.
-          @@@@XParam:
-            @@@@@Name:on
-            @@@@@Type:
-              DOMMain:DOMString
-            @@@@@InCase:
-              @@@@@@Value:get
-              @@@@@@Description:
-                @@@@@@@lang:en
-                @@@@@@@@:
-                  Getting the value from the attribute is not implemented.
-            @@@@@InCase:
-              @@@@@@Value:set
-              @@@@@@Description:
-                @@@@@@@lang:en
-                @@@@@@@@:
-                  Setting a value to the attribute is not implemented.
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@Type:
-              lang:muf
-            @@@@@@:
-              The attribute "%p (name => {<Q::MDOMX:if>}, suffix => {.}
-              );%p (name => {<Q::MDOMX:attr>});"
-              %p (name => {<Q::MDOMX:on>},
-                  prefix => {(}, suffix => {)}); not implemented
-        @@@SubTypeDef:
-          @@@@QName:
-            MDOMX:MDOM_IMPL_METHOD_NOT_IMPLEMENTED
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The DOM implementation does not implement the method.
-          @@@@XParam:
-            @@@@@Name:if
-            @@@@@Type:
-              DOMMain:DOMString
-            @@@@@Description:
-              @@@@@@lang:en
-              @@@@@@@:
-                The interface name.
-          @@@@XParam:
-            @@@@@Name:method
-            @@@@@Type:
-              DOMMain:DOMString
-            @@@@@Description:
-              @@@@@@lang:en
-              @@@@@@@:
-                The name of the method that is not implemented.
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@Type:
-              lang:muf
-            @@@@@@:
-              The method "%p (name => {<Q::MDOMX:if>}, suffix => {.}
-              );%p (name => {<Q::MDOMX:method>});" not implemented
         @@@SubTypeDef:
           @@@@QName:
             MDOMX:MDOM_NODE_NOSUPPORT_XMLNS
@@ -5401,6 +5405,14 @@ IF:
      @@SpecLevel:3
   @Method:
      @@Name:  isEqualNode
+     @@ManakaiDOM:isForInternal:
+       @@@@:1
+       @@@For:
+         !ManakaiDOM:DOM3
+     @@For:
+       ManakaiDOM:DOM3
+     @@For:
+       ManakaiDOM:ManakaiDOM
      @@Operator:
        @@@@: ==
        @@@ContentType:
@@ -6543,12 +6555,182 @@ ClassDef:
                    ? $DOCOBJ->{<Q::infoset:version>}
                    : '1.0'
              : null)
+  @IntMethod:
+    @@Name: isEqualNode
+    @@Operator:
+      @@@@: ==
+      @@@ContentType:
+        lang:Perl
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Checks whether this node and another node are equal or not. 
+    @@Param:
+      @@@Name: node
+      @@@Type:
+        ManakaiDOMCore:ManakaiDOMNodeObjectNode
+      @@@Description:
+        @@@@lang:en
+        @@@@@: Another node object to compare.
+    @@Return:
+      @@@Type:
+        DOMMain:boolean
+      @@@InCase:
+        @@@@Value:true
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: Two nodes are equal.
+      @@@InCase:
+        @@@@Value:false
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: Two nodes are not equal.
+      @@@PerlDef:
+         $r = <M::DOMCore:ManakaiDOMNode.isEqualNode>
+                (<ClassM::ManakaiDOMNode.getNodeReference> ($self),
+                 <ClassM::ManakaiDOMNode.getNodeReference> ($node));
 ## ClassDef:ManakaiDOMNodeObjectNode
 
+ForDef:
+  @QName:
+    DOMCore:ForChildNodeList
+  @Description:
+    @@lang:en
+    @@@:
+      For <Class::ManakaiDOMCore:ManakaiDOMChildNodeList> class.
 
+ForDef:
+  @QName:
+    DOMCore:ForGetNodeList
+  @Description:
+    @@lang:en
+    @@@:
+      For <Class::ManakaiDOMCore:ManakaiDOMGetElementsNodeList> class.
 
-IFDef:
-  @Name:  NodeList
+ResourceDef:
+  @rdf:type:
+    @@@:
+      dis:MultipleResource
+    @@ForCheck:
+      !ManakaiDOM:ForIF !DOMCore:ForChildNodeList !DOMCore:ForGetNodeList
+
+  @resourceFor:
+    ManakaiDOM:ForIF
+  @rdf:type:
+    @@@:
+      ManakaiDOM:IF
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @Name:
+    @@@: NodeList
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @ISA:
+    @@@:
+      ::ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM1 ManakaiDOM:ForIF
+  @ISA:
+    @@@:
+      ::ManakaiDOM:ManakaiDOM1
+    @@ForCheck:
+      ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM2
+  @ISA:
+    @@@:
+      ::ManakaiDOM:ManakaiDOM2
+    @@ForCheck:
+      ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM3
+  @ISA:
+    @@@:
+      ::ManakaiDOM:ManakaiDOM3
+    @@ForCheck:
+      ManakaiDOM:ForIF ManakaiDOM:ManakaiDOMLatest
+  @DOMMain:implementFeature:
+    @@@: CoreFeature
+    @@ForCheck:
+      ManakaiDOM:DOM
+  @DOMMain:implementFeature:
+    @@@: CoreFeature20
+    @@ForCheck:
+      ManakaiDOM:DOM2
+  @DOMMain:implementFeature:
+    @@@: CoreFeature30
+    @@ForCheck:
+      ManakaiDOM:DOM3
+
+  @resourceFor:
+    @@@:
+      DOMCore:ForChildNodeList
+    @@For:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+  @QName:
+    @@@:
+      ManakaiDOMCore:ManakaiDOMChildNodeList
+    @@ForCheck:
+      DOMCore:ForChildNodeList
+  @rdf:type:
+    @@@:
+      ManakaiDOM:Class
+    @@ForCheck:
+      DOMCore:ForChildNodeList
+  @ISA:
+    @@@:
+      ManakaiDOM:ManakaiDOMNodeReference
+    @@ForCheck:
+      DOMCore:ForChildNodeList
+  @Implement:
+    @@@:
+      DOMCore:NodeList
+    @@ForCheck:
+      DOMCore:ForChildNodeList
+  @DOMMain:implementFeature:
+    @@@: MDOMCoreFeature10
+    @@ForCheck:
+      ForChildNodeList ManakaiDOM:ManakaiDOM1
+  @DOMMain:implementFeature:
+    @@@: MDOMCoreFeature20
+    @@ForCheck:
+      ForChildNodeList ManakaiDOM:ManakaiDOM2
+  @DOMMain:implementFeature:
+    @@@: MDOMCoreFeature30
+    @@ForCheck:
+      ForChildNodeList ManakaiDOM:ManakaiDOM3
+
+  @resourceFor:
+    @@@: ForGetNodeList
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+  @QName:
+    @@@:
+      ManakaiDOMCore:ManakaiDOMGetElementsNodeList
+    @@ForCheck: ForGetNodeList
+  @rdf:type:
+    @@@:
+      ManakaiDOM:Class
+    @@ForCheck: ForGetNodeList
+  @ISA:
+    @@@:
+      ManakaiDOM:ManakaiDOMNodeReference
+    @@ForCheck:
+      DOMCore:ForGetNodeList
+  @Implement:
+    @@@:
+      DOMCore:NodeList
+    @@ForCheck:
+      DOMCore:ForGetNodeList
+  @DOMMain:implementFeature:
+    @@@: MDOMCoreFeature10
+    @@ForCheck:
+      ForGetNodeList ManakaiDOM:ManakaiDOM1
+  @DOMMain:implementFeature:
+    @@@: MDOMCoreFeature20
+    @@ForCheck:
+      ForGetNodeList ManakaiDOM:ManakaiDOM2
+  @DOMMain:implementFeature:
+    @@@: MDOMCoreFeature30
+    @@ForCheck:
+      ForGetNodeList ManakaiDOM:ManakaiDOM3
+
   @Description:
     @@lang:en
     @@@:
@@ -6562,6 +6744,7 @@ IFDef:
     @@lang:en
     @@@:
       How this collection is implemented is not defined or constrained.
+
   @Method:
      @@Name:  item
      @@Description:
@@ -6577,6 +6760,7 @@ IFDef:
           @@@@@: The index of the item into the collection.
      @@Return:
         @@@Type:  Node
+        @@@actualType: ManakaiDOMNode
         @@@Description:
           @@@@lang:en
           @@@@@: 
@@ -6589,6 +6773,28 @@ IFDef:
             @@@@@@:
               The "index" is invalid, i.e. it is greater than or 
               equal to the number of nodes in the list.
+        @@@PerlDef:
+          @@@@ForCheck:
+            DOMCore:ForChildNodeList
+          @@@@@:
+            $r = $self->{<Q::TreeCore:node>}->{<Q::infoset:children>}->[$index];
+            if (defined $r) {
+              $r = <ClassM::ManakaiDOMNode.getNodeReference> ($r);
+            }
+        @@@PerlDef:
+          @@@@ForCheck:ForGetNodeList
+          @@@@@:
+            $r = $self->{<Q::TreeCore:node>}
+                      -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                   .getElementBy> 
+                          ($self->{<Q::ManakaiDOMCore:nodeMatch>}, \$index);
+           if (defined $r) {
+             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($r, $self);
+           }
+         @@@@ImplNote:
+           @@@@@lang:en
+           @@@@@@:
+             TODO: Cache mechanism required.
   @Attr:
      @@Name:  length
      @@Description:
@@ -6598,9 +6804,293 @@ IFDef:
      @@Get:
         @@@Type:  
           DOMMain:unsigned-long
+        @@@PerlDef:
+          @@@@ForCheck: ForChildNodeList
+          @@@@@:
+            $r = @{$self->{<Q::TreeCore:node>}->{<Q::infoset:children>}};
+        @@@PerlDef:
+          @@@@ForCheck: ForGetNodeList
+          @@@@@:
+            my $l = $self->{<Q::TreeCore:node>}
+                         -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                  .getElementsBy>
+                             ($self->{<Q::ManakaiDOMCore:nodeMatch>});
+            $r = @$l;
+  @IntMethod:
+    @@Name: isEqualNodeList
+    @@ForCheck: ForChildNodeList
+    @@Operator:
+      @@@ContentType:
+        lang:Perl
+      @@@@:==
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Checks whether two node lists are equal or not.  
+        Two node lists are equal iff their <A::NodeList.length> are 
+        equal and their item at the same index are equal. 
+        \
+        See <M::Node.isEqualNode>.
+    @@Param:
+      @@@Name:arg
+      @@@Type: NodeList
+      @@@actualType:
+        ManakaiDOMCore:ManakaiDOMChildNodeList
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The node list to compare equality with.
+    @@Return:
+      @@@Type:
+        DOMMain:boolean
+      @@@PerlDef:
+        @@@@ForCheck: ForChildNodeList
+   \      EQ: {
+   \        last EQ unless @{$self->{<Q::TreeCore:node>}
+   \                              ->{<Q::infoset:children>}} ==
+   \                       @{$arg->{<Q::TreeCore:node>}
+                                 ->{<Q::infoset:children>}};
+            for my $i (0..$#{$self->{<Q::TreeCore:node>}
+                                  ->{<Q::infoset:children>}}) {
+              unless ($self->{<Q::TreeCore:node>}
+                                  ->{<Q::infoset:children>}->[$i] ==
+                      $arg->{<Q::TreeCore:node>}
+                                  ->{<Q::infoset:children>}->[$i]) {
+                last EQ;
+              }
+            }
+            $r = true;
+          }
+##NodeList
 
-IFDef:
-  @Name:  NamedNodeMap
+ForDef:
+  @QName:
+    DOMCore:ForAttrMap
+  @Description:
+    @@lang:en
+    @@@:
+      For <ClassM::ManakaiDOMCore:ManakaiDOMAttributes> class.
+
+ForDef:
+  @QName:
+    DOMCore:ForEntityMap
+  @Description:
+    @@lang:en
+    @@@:
+      For <ClassM::ManakaiDOMXML:ManakaiDOMEntities> class.
+
+ForDef:
+  @QName:
+    DOMCore:ForNotationMap
+  @Description:
+    @@lang:en
+    @@@:
+      For <ClassM::ManakaiDOMXML:ManakaiDOMNotations> class.
+
+ResourceDef:
+  @rdf:type:
+    @@@:
+      dis:MultipleResource
+    @@ForCheck:
+      !ManakaiDOM:ForIF !ForAttrMap !ForEntityMap !ForNotationMap
+
+  @resourceFor:
+    ManakaiDOM:ForIF
+  @Name:
+    @@@: NamedNodeMap
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @rdf:type:
+    @@@:
+      ManakaiDOM:IF
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @ISA:
+    @@@:
+      ::ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM1
+  @ISA:
+    @@@:
+      ::ManakaiDOM:ManakaiDOM1
+    @@ForCheck:
+      ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM2
+  @ISA:
+    @@@:
+      ::ManakaiDOM:ManakaiDOM2
+    @@ForCheck:
+      ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM3
+  @ISA:
+    @@@:
+      ::ManakaiDOM:ManakaiDOM3
+    @@ForCheck:
+      ManakaiDOM:ForIF ManakaiDOM:ManakaiDOMLatest
+  @DOMMain:implementFeature:
+    @@@: CoreFeature
+    @@ForCheck:
+      ManakaiDOM:ForIF ManakaiDOM:DOM
+  @DOMMain:implementFeature:
+    @@@: CoreFeature20
+    @@ForCheck:
+      ManakaiDOM:ForIF ManakaiDOM:DOM2
+  @DOMMain:implementFeature:
+    @@@: CoreFeature30
+    @@ForCheck:
+      ManakaiDOM:ForIF ManakaiDOM:DOM3
+
+  @resourceFor:
+    @@@: ForAttrMap
+    @@For:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+  @QName:
+    @@@: 
+      ManakaiDOMCore:ManakaiDOMAttributes
+    @@ForCheck: ForAttrMap
+  @rdf:type:
+    @@@: 
+      ManakaiDOM:Class
+    @@ForCheck: ForAttrMap
+  @ISA:
+    @@@:
+      ManakaiDOM:ManakaiDOMNodeReference
+    @@ForCheck:
+      DOMCore:ForAttrMap
+  @Implement:
+    @@@:
+      DOMCore:NamedNodeMap
+    @@ForCheck:
+      DOMCore:ForAttrMap
+  @DOMMain:implementFeature:
+    @@@: CoreFeature
+    @@ForCheck:
+      ForAttrMap ManakaiDOM:DOM
+  @DOMMain:implementFeature:
+    @@@: CoreFeature20
+    @@ForCheck:
+      ForAttrMap ManakaiDOM:DOM2
+  @DOMMain:implementFeature:
+    @@@: CoreFeature30
+    @@ForCheck:
+      ForAttrMap ManakaiDOM:DOM3
+  @DOMMain:implementFeature:
+    @@@: MDOMCoreFeature10
+    @@ForCheck:
+      ForAttrMap ManakaiDOM:ManakaiDOM1
+  @DOMMain:implementFeature:
+    @@@: MDOMCoreFeature20
+    @@ForCheck:
+      ForAttrMap ManakaiDOM:ManakaiDOM2
+  @DOMMain:implementFeature:
+    @@@: MDOMCoreFeature30
+    @@ForCheck:
+      ForAttrMap ManakaiDOM:ManakaiDOM3
+
+  @resourceFor:
+    @@@: ForEntityMap
+    @@For:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+  @QName:
+    @@@: 
+      ManakaiDOMXML:ManakaiDOMEntities
+    @@ForCheck: ForEntityMap
+  @rdf:type:
+    @@@: 
+      ManakaiDOM:Class
+    @@ForCheck: ForEntityMap
+  @ISA:
+    @@@:
+      ManakaiDOM:ManakaiDOMNodeReference
+    @@ForCheck:
+      DOMCore:ForEntityMap
+  @Implement:
+    @@@:
+      DOMCore:NamedNodeMap
+    @@ForCheck:
+      DOMCore:ForEntityMap
+  @DOMMain:implementFeature:
+    @@@: 
+      DOMXML:XMLFeature10
+    @@ForCheck:
+      ForEntityMap ManakaiDOM:DOM1
+  @DOMMain:implementFeature:
+    @@@: 
+      DOMXML:XMLFeature20
+    @@ForCheck:
+      ForEntityMap ManakaiDOM:DOM2
+  @DOMMain:implementFeature:
+    @@@: 
+      DOMXML:XMLFeature30
+    @@ForCheck:
+      ForEntityMap ManakaiDOM:DOM3
+  @DOMMain:implementFeature:
+    @@@: 
+      DOMXML:MDOMXMLFeature10
+    @@ForCheck:
+      ForEntityMap ManakaiDOM:ManakaiDOM1
+  @DOMMain:implementFeature:
+    @@@: 
+      DOMXML:MDOMXMLFeature20
+    @@ForCheck:
+      ForEntityMap ManakaiDOM:ManakaiDOM2
+  @DOMMain:implementFeature:
+    @@@: 
+      DOMXML:MDOMXMLFeature30
+    @@ForCheck:
+      ForEntityMap ManakaiDOM:ManakaiDOM3
+
+  @resourceFor:
+    @@@: ForNotationMap
+    @@For:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+  @QName:
+    @@@: 
+      ManakaiDOMXML:ManakaiDOMNotations
+    @@ForCheck: ForNotationMap
+  @rdf:type:
+    @@@: 
+      ManakaiDOM:Class
+    @@ForCheck: ForNotationMap
+  @ISA:
+    @@@:
+      ManakaiDOM:ManakaiDOMNodeReference
+    @@ForCheck:
+      DOMCore:ForNotationMap
+  @Implement:
+    @@@:
+      DOMCore:NamedNodeMap
+    @@ForCheck:
+      DOMCore:ForNotationMap
+  @DOMMain:implementFeature:
+    @@@: 
+      DOMXML:XMLFeature10
+    @@ForCheck:
+      ForNotationMap ManakaiDOM:DOM1
+  @DOMMain:implementFeature:
+    @@@: 
+      DOMXML:XMLFeature20
+    @@ForCheck:
+      ForNotationMap ManakaiDOM:DOM2
+  @DOMMain:implementFeature:
+    @@@: 
+      DOMXML:XMLFeature30
+    @@ForCheck:
+      ForNotationMap ManakaiDOM:DOM3
+  @DOMMain:implementFeature:
+    @@@: 
+      DOMXML:MDOMXMLFeature10
+    @@ForCheck:
+      ForNotationMap ManakaiDOM:ManakaiDOM1
+  @DOMMain:implementFeature:
+    @@@: 
+      DOMXML:MDOMXMLFeature20
+    @@ForCheck:
+      ForNotationMap ManakaiDOM:ManakaiDOM2
+  @DOMMain:implementFeature:
+    @@@: 
+      DOMXML:MDOMXMLFeature30
+    @@ForCheck:
+      ForNotationMap ManakaiDOM:ManakaiDOM3
+
   @Description:
     @@lang:en
     @@@:
@@ -6612,21 +7102,66 @@ IFDef:
       a <IF:NamedNodeMap>.
     \
     \ <IF:NamedNodeMap> objects are <QUOTE:live>.
+
+  @Description:
+    @@lang:en
+    @@@:
+      A collection of the general entities, both external and internal, 
+      declared in the DTD.  Parameter entities and duplicating 
+      declarations are not contained.
+    @@ForCheck:ForEntityMap
+  @ImplNote:
+    @@lang:en
+    @@@:
+      This interface is used by the attribute "DocumentType.entities". 
+    @@ForCheck:ForEntityMap
+
+  @Description:
+    @@lang:en
+    @@@:
+      A collection of notations declared in the DTD.
+    @@ForCheck:ForNotationMap
+  @ImplNote:
+    @@lang:en
+    @@@:
+      This interface is used by the attribute "DocumentType.notations".
+    @@ForCheck:ForNotationMap
+
+  @ImplNote:
+    @@lang:en
+    @@@:
+      An element may have two (or more) attributes that have the same 
+      <A:Node.nodeName>, but different <A:Node.namespaceURI>s. 
+      Which of them is returned by DOM Level 1 methods is 
+      implementation dependent.  The only guarantee is 
+      that all methods that access a named item by its <A:Node.nodeName> 
+      will access the same item, and all methods by its namespace URI
+      and local name will access the same item. 
+      <SRC:<CITE:DOM Level 2 Core> 1.4.8 XML Namespaces,
+      <CITE:DOM Level 3 Core> 1.3.3 XML Namespaces>
+
   @Method:
      @@Name:  getNamedItem
      @@Description:
        @@@lang:en
        @@@@: Retrieve a node specified by name.
-     @@NSVersion:getNamedItemNS
+     @@NSVersion:.getNamedItemNS
      @@Param:
         @@@Name:  name
         @@@Type:  
           DOMMain:DOMString
+        @@@actualType:
+          @@@@@:
+            DOMMain:ManakaiDOMXMLName
+          @@@@ManakaiDOM:noInputNormalize:1
         @@@Description:
           @@@@lang:en
           @@@@@: The "nodeName" of a node to retrieve.
      @@Return:
         @@@Type:  Node
+        @@@actualType:
+          @@@@@: ManakaiDOMAttr
+          @@@@ForCheck: ForAttrMap
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -6637,6 +7172,12 @@ IFDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: The "name" does not identify any node in this map.
+         @@@Def:
+           @@@@For: ForAttrMap
+           @@@@ContentType: 
+             lang:dis
+           @@@@DISPerl:cloneCode:
+             ManakaiDOMElement.getAttributeNode
   @Method:
      @@Name:  setNamedItem
      @@Description:
@@ -6648,15 +7189,21 @@ IFDef:
      @@ImplNote:
        @@@lang:en
        @@@@: "Replacing ... no effect" is clarified by the DOM Level 2 Errata. 
-     @@NSVersion:setNamedItemNS
+     @@NSVersion:.setNamedItemNS
      @@Param:
         @@@Name:  arg
         @@@Type:  Node
+        @@@actualType:
+          @@@@@:ManakaiDOMAttr
+          @@@@ForCheck:ForAttrMap
         @@@Description:
           @@@@lang:en
           @@@@@: A node to store in this map.
      @@Return:
         @@@Type:  Node
+        @@@actualType:
+          @@@@@:ManakaiDOMAttr
+          @@@@ForCheck:ForAttrMap
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -6700,6 +7247,12 @@ IFDef:
           @@@@ImplNote:
             @@@@@lang:en
             @@@@@@: This exception has added by the DOM Level 2 Errata.
+       @@@PerlDef:
+         @@@@For: ForAttrMap
+         @@@@@:
+           __DEEP{
+             $self-><M::ManakaiDOMNode.setAttributeNode> ($arg);
+           }__;
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -6707,13 +7260,16 @@ IFDef:
          name?  If it is, can that node be retrieved via the "NS" methods? 
          Is it possible to add the node that has "nodeName" crushing 
          with existing "NS" node?
+         \
+              It is unclear whether the node should be returned if 
+              the node is <QUOTE:replaced> by itself.
   @Method:
      @@Name:  removeNamedItem
      @@Description:
         @@@lang:en
         @@@@:
           Remove a node specified by name.
-     @@NSVersion:removeNamedItemNS
+     @@NSVersion:.removeNamedItemNS
      @@Param:
         @@@Name:  name
         @@@Type:  
@@ -6723,6 +7279,9 @@ IFDef:
           @@@@@: The "nodeName" of the node to remove.
      @@Return:
         @@@Type:  Node
+        @@@actualType:
+          @@@@For:ForAttrMap
+          @@@@@: ManakaiDOMAttr
         @@@Description:
           @@@@lang:en
           @@@@@: The node removed from this map.
@@ -6749,6 +7308,33 @@ IFDef:
             @@@@@lang:en
             @@@@@@:
               This exception is added by the DOM Level 1 First Edition Errata.
+        @@@PerlDef:
+          @@@@ForCheck:ForAttrMap
+          @@@@@:
+            if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:read-only>}) {
+              __EXCEPTION{
+                MDOMX:NOMOD_THIS::
+              }__;
+            }
+            __CODE{selectAttrNodeObject:: DOMCore:removeAttribute}__;
+            if ($r) {
+              CORE::delete $r->{<Q::infoset:ownerElement>};
+              $r-><M::ManakaiDOM:ManakaiDOMNodeObject.orphanate>;
+              $r = <ClassM::ManakaiDOMNode.getNodeReference> ($r, $self)
+                if defined wantarray;
+            } else {
+              __EXCEPTION{
+                ManakaiDOMException.NOT_FOUND_ERR::
+              }__;
+            }
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              TODO: Default attribute
+            \
+              This code is almost same as <M:Element.removeAttribute>. 
+              This method returns an <IF:Attr> removed but that method 
+              does not (<M:Element.removeAttributeNode> does).
   @Method:
      @@Name:  item
      @@Description:
@@ -6763,6 +7349,10 @@ IFDef:
           @@@@@: The index of the item into this map.
      @@Return:
         @@@Type:  Node
+        @@@actualType:
+          @@@@For:ForAttrMap
+          @@@@@:
+            DOMCore:ManakaiDOMAttr
         @@@Description:
           @@@@lang:en
           @@@@@: The node at the "index"th position in the map.
@@ -6774,6 +7364,28 @@ IFDef:
             @@@@@@: 
               The "index" is invalid, i.e. it is greater than or 
               equal to the number of nodes in this map.
+        @@@PerlDef:
+          @@@@For:ForAttrMap
+          @@@@@:
+            my $i = 0;
+            FIND: for my $ns (sort keys %{$self->{<Q::TreeCore:node>}
+                                               ->{<Q::infoset:attributes>}}) {
+              for my $ln (sort keys %{$self->{<Q::TreeCore:node>}
+                                           ->{<Q::infoset:attributes>}->{$ns}}) {
+                if ($i++ == $index) {
+                  $r = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                            ->{$ns}->{$ln};
+                  last FIND;
+                }
+              }
+            }
+            if ($r) {
+              $r = <ClassM::ManakaiDOMNode.getNodeReference> ($r, $self);
+            }
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        Attribute order is not defined by the specifications.
   @Attr:
      @@Name:  length
      @@Description:
@@ -6782,13 +7394,20 @@ IFDef:
      @@Get:
         @@@Type:  
           DOMMain:unsigned-long
+        @@@PerlDef:
+          @@@@For:ForAttrMap
+          @@@@@:
+            for (values %{$self->{<Q::TreeCore:node>}
+                               ->{<Q::infoset:attributes>}}) {
+              $r += keys %$_;
+            }
   @Method:
      @@Name:  getNamedItemNS
      @@Description:
        @@@lang:en
        @@@@:
          Retrieve a node specified by local name and namespace URI.
-     @@NoNSVersion:getNamedItem
+     @@NoNSVersion:.getNamedItem
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
@@ -6814,6 +7433,9 @@ IFDef:
           @@@@@: The local name of the node to retrieve.
      @@Return:
         @@@Type:  Node
+        @@@actualType:
+          @@@@For:ForAttrMap
+          @@@@@:ManakaiDOMAttr
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -6836,6 +7458,36 @@ IFDef:
               The DOM implementation does not support the feature "XML" and 
               the language exposed through the "Document" does not 
               support XML Namespaces.
+       @@@Def:
+         @@@@ForCheck:
+           ForAttrMap ManakaiDOM:DOMXMLFeature
+         @@@@ContentType:
+           lang:dis
+         @@@@DISPerl:cloneCode:
+           ManakaiDOMElement.getAttributeNodeNS
+        @@@Def:
+          @@@@ForCheck:
+            !ManakaiDOM:DOMXMLFeature
+          @@@@ContentType:
+            lang:dis
+          @@@@DOMMain:raiseException:
+            MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
+     @@DOMMain:implementFeature:
+       @@@@: CoreFeature20
+       @@@ForCheck:
+         ManakaiDOM:DOM2
+     @@DOMMain:implementFeature:
+       @@@@: MDOMCoreFeature20
+       @@@ForCheck:
+         ForAttrMap ManakaiDOM:ManakaiDOM2
+     @@DOMMain:implementFeature:
+       @@@@: CoreFeature30
+       @@@ForCheck:
+         ManakaiDOM:DOM3
+     @@DOMMain:implementFeature:
+       @@@@: MDOMCoreFeature30
+       @@@ForCheck:
+         ForAttrMap ManakaiDOM:ManakaiDOM3
      @@For:
        ManakaiDOM:DOM2
      @@Level[list]:  2
@@ -6859,15 +7511,21 @@ IFDef:
      @@ImplNote:
        @@@lang:en
        @@@@: "Replacing ... no effect" is clarified by the DOM Level 2 Errata. 
-     @@NoNSVersion:setNamedItem
+     @@NoNSVersion:.setNamedItem
      @@Param:
         @@@Name:  arg
         @@@Type:  Node
+        @@@actualType:
+          @@@@ForCheck:ForAttrMap
+          @@@@@:ManakaiDOMAttr
         @@@Description:
           @@@@lang:en
           @@@@@: A node to store in this map.
      @@Return:
         @@@Type:  Node
+        @@@actualType:
+          @@@@ForCheck:ForAttrMap
+          @@@@@:ManakaiDOMAttr
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -6920,6 +7578,106 @@ IFDef:
              the language exposed through the "Document" does not 
              support XML Namespaces
            @@@@SpecLevel:2
+       @@@PerlDef:
+         @@@@ForCheck:
+           ForAttrMap ManakaiDOM:DOMXMLFeature
+         @@@@@:
+            if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:read-only>}) {
+              __EXCEPTION{
+                MDOMX:NOMOD_THIS::
+              }__;
+            }
+            my $attrNode = $arg->{<Q::TreeCore:node>};
+            if ($attrNode->{<Q::infoset:ownerElement>}) {
+              __EXCEPTION{
+                ManakaiDOMException.INUSE_ATTRIBUTE_ERR::
+                  MDOMX:param-name => 'arg',
+              }__;
+            } elsif ($attrNode->{<Q::DOMCore:ownerDocument>}
+                              ->{<Q::TreeCore:nodeID>} ne
+                     $self->{<Q::TreeCore:node>}->{<Q::DOMCore:ownerDocument>}
+                          ->{<Q::TreeCore:nodeID>}) {
+              __EXCEPTION{
+                ManakaiDOMException.WRONG_DOCUMENT_ERR::
+              }__;
+            } elsif ($attrNode->{<Q::DOMCore:nodeType>} ne
+                     <Q::infoset:Attribute>) {
+              __EXCEPTION{
+                MDOMX:HIERARCHY_BAD_TYPE::
+                  MDOMX:param-name => 'arg',
+                  DOMCore:nodeType => {$attrNode->{<Q::DOMCore:nodeType>}},
+              }__;
+            }
+
+            if (defined $attrNode->{<Q::infoset:localName>}) {
+              $r = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                     ->{defined $attrNode->{<Q::infoset:namespaceName>}
+                              ? $attrNode->{<Q::infoset:namespaceName>}
+                              : <Q::null:>}
+                     ->{$attrNode->{<Q::infoset:localName>}};
+            } else {
+              __EXCEPTION{
+                MDOMX:MDOM_NODE_NOSUPPORT_XMLNS::
+                  MDOMX:param-name => 'arg',
+              }__;
+            }
+
+            if ($r->{<Q::TreeCore:nodeID>} eq $attrNode->{<Q::TreeCore:nodeID>}) {
+              __WARNING{
+                MDOMX:MDOM_REPLACE_BY_ITSELF_NO_EFFECT::
+              }__;
+              $r = $arg;
+            } else {
+              $attrNode->{<Q::infoset:ownerElement>} = $self->{<Q::TreeCore:node>};
+              if (defined $attrNode->{<Q::infoset:localName>}) {
+                $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                     ->{defined $attrNode->{<Q::infoset:namespaceName>}
+                              ? $attrNode->{<Q::infoset:namespaceName>}
+                              : <Q::null:>}
+                     ->{$attrNode->{<Q::infoset:localName>}} = $attrNode;
+              } else {
+                $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                     ->{<Q::ManakaiDOM:noNS>}
+                     ->{$attrNode->{<Q::DOMCore:name>}} = $attrNode;
+              }
+              if ($r) {
+                CORE::delete $r->{<Q::infoset:parent>};
+                $r-><M::ManakaiDOM:ManakaiDOMNodeObject.orphanate>;
+                $r = <ClassM::ManakaiDOMNode.getNodeReference> ($r, $self)
+                  if defined wantarray;
+              }
+            }
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              It is unclear whether the node should be returned if 
+              the node is <QUOTE:replaced> by itself.
+             \
+              This code is almost same as <M:Element.setAttributeNodeNS>
+              without some points.
+        @@@Def:
+          @@@@ForCheck:
+            !ManakaiDOM:DOMXMLFeature
+          @@@@ContentType:
+            lang:dis
+          @@@@DOMMain:raiseException:
+            MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
+     @@DOMMain:implementFeature:
+       @@@@: CoreFeature20
+       @@@ForCheck:
+         ManakaiDOM:DOM2
+     @@DOMMain:implementFeature:
+       @@@@: MDOMCoreFeature20
+       @@@ForCheck:
+         ForAttrMap ManakaiDOM:ManakaiDOM2
+     @@DOMMain:implementFeature:
+       @@@@: CoreFeature30
+       @@@ForCheck:
+         ManakaiDOM:DOM3
+     @@DOMMain:implementFeature:
+       @@@@: MDOMCoreFeature30
+       @@@ForCheck:
+         ForAttrMap ManakaiDOM:ManakaiDOM3
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -6937,7 +7695,12 @@ IFDef:
         @@@lang:en
         @@@@:
           Remove a node specified by local name and namespace URI.
-     @@NoNSVersion:removeNamedItem
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         New non-"specified" attribute will be generated if the schema 
+         defines some default value for the attribute removed.
+     @@NoNSVersion:.removeNamedItem
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
@@ -6962,6 +7725,9 @@ IFDef:
           @@@@@: The local name of the node to remove.
      @@Return:
         @@@Type:  Node
+        @@@actualType:
+          @@@@ForCheck:ForAttrMap
+          @@@@@:ManakaiDOMAttr
         @@@Description:
           @@@@lang:en
           @@@@@: The node removed from this map.
@@ -6988,7 +7754,49 @@ IFDef:
              The DOM implementation does not support the feature "XML" and 
              the language exposed through the "Document" does not 
              support XML Namespaces
-     @@IsAbstract:1
+       @@@PerlDef:
+         @@@@ForCheck:
+           ForAttrMap ManakaiDOM:DOMXMLFeature
+         @@@@@:
+            if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:read-only>}) {
+              __EXCEPTION{
+                MDOMX:NOMOD_THIS::
+              }__;
+            }
+            __CODE{selectAttrNodeObjectNS:: DOMCore:removeAttribute}__;
+            if ($r) {
+              CORE::delete $r->{<Q::infoset:ownerElement>};
+              $r-><M::ManakaiDOM:ManakaiDOMNodeObject.orphanate>;
+              $r = <ClassM::ManakaiDOMNode.getNodeReference> ($r, $self)
+                  if defined wantarray;
+            } else {
+              __EXCEPTION{
+                ManakaiDOMException.NOT_FOUND_ERR::
+              }__;
+            }
+        @@@Def:
+          @@@@ForCheck:
+            !ManakaiDOM:DOMXMLFeature
+          @@@@ContentType:
+            lang:dis
+          @@@@DOMMain:raiseException:
+            MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
+     @@DOMMain:implementFeature:
+       @@@@: CoreFeature20
+       @@@ForCheck:
+         ManakaiDOM:DOM2
+     @@DOMMain:implementFeature:
+       @@@@: MDOMCoreFeature20
+       @@@ForCheck:
+         ForAttrMap ManakaiDOM:ManakaiDOM2
+     @@DOMMain:implementFeature:
+       @@@@: CoreFeature30
+       @@@ForCheck:
+         ManakaiDOM:DOM3
+     @@DOMMain:implementFeature:
+       @@@@: MDOMCoreFeature30
+       @@@ForCheck:
+         ForAttrMap ManakaiDOM:ManakaiDOM3
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -7000,6 +7808,61 @@ IFDef:
        ManakaiDOM:DOM2
      @@Level[list]:  2
      @@SpecLevel:2
+
+  @IntMethod:
+    @@Name: isEqualNamedNodeMap
+    @@ForCheck:
+      !ManakaiDOM:ForIF
+    @@Operator:
+      @@@ContentType:
+        lang:Perl
+      @@@@:==
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Return whether two <IF:NamedNodeMap>s are equal.
+    @@Param:
+      @@@Name:arg
+      @@@Type:NamedNodeMap
+      @@@actualType:
+        @@@@ForCheck:ForAttrMap
+        @@@@@:
+          ManakaiDOMCore:ManakaiDOMAttributes
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The node list to compare equality with.
+    @@Return:
+      @@@Type:
+        DOMMain:boolean
+      @@@PerlDef:
+        @@@@ForCheck:ForAttrMap
+        @@@@@:
+          EQ: {
+            for my $ns (keys %{$self->{<Q::TreeCore:node>}
+                                    ->{<Q::infoset:attributes>}}) {
+              last EQ unless $arg->{<Q::TreeCore:node>}
+                                 ->{<Q::infoset:attributes>}->{$ns};
+              last EQ unless keys (%{$arg->{<Q::TreeCore:node>}
+                                 ->{<Q::infoset:attributes>}->{$ns}}) ==
+                             keys (%{$self->{<Q::TreeCore:node>}
+                                 ->{<Q::infoset:attributes>}->{$ns}});
+              for my $ln (keys %{$self->{<Q::TreeCore:node>}
+                                      ->{<Q::infoset:attributes>}->{$ns}}) {
+                last EQ unless $arg->{<Q::TreeCore:node>}
+                                   ->{<Q::infoset:attributes>}->{$ns}->{$ln};
+                last EQ unless $self->{<Q::TreeCore:node>}
+                                    ->{<Q::infoset:attributes>}->{$ns}->{$ln} ==
+                               $arg->{<Q::TreeCore:node>}
+                                    ->{<Q::infoset:attributes>}->{$ns}->{$ln};
+              }
+            }
+            $r = true;
+          }
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        See: <M:Node.isEqualNode>.
 ## IF:NamedNodeMap
 
 IF:
@@ -8513,6 +9376,7 @@ IF:
               @@@@@@@:
                 This (<IF:Element>) node is read-only.
         @@@PerlDef:
+          @@@@@:
             if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:read-only>}) {
               __EXCEPTION{
                 MDOMX:NOMOD_THIS::
