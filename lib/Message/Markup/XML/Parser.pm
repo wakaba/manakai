@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXMLChar
                         InXML_deprecated_noncharacter InXML_unicode_xml_not_suitable!;
 require Message::Markup::XML;
@@ -1336,8 +1336,8 @@ sub _parse_entity_declaration ($\$$$;%) {
             $self->_raise_error ($o, c => $e,
                                  type => 'VC_UNIQUE_NOTATION_NAME', t => $ename);
           } else {
-            $self->_raise_error ($o, c => $e, t => $t,
-                                 type => 'WARN_UNIQUE_'.($p eq '%' ? 'PARAMETER_' : ''));
+            $self->_raise_error ($o, c => $e, t => $ename,
+                                 type => 'WARN_UNIQUE_'.($p eq '%' ? 'PARAMETER_' : '').'ENTITY_NAME');
           }
         } else {	## Regist to entMan
           $entMan->is_declared_entity ($ename, namespace_uri => $e->namespace_uri,
@@ -1927,4 +1927,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/07 03:09:18 $
+1; # $Date: 2003/09/12 11:29:26 $
