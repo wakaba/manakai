@@ -17,7 +17,7 @@ markup constructures.  (SuikaWiki is not "tiny"?  Oh, yes, I see:-))
 
 package Message::Markup::XML;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload '""' => \&outer_xml,
              fallback => 1;
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXML_NCNameStartChar InXMLNCNameChar!;
@@ -89,17 +89,17 @@ sub new ($;%) {
       if defined $self->{namespace_uri};
   }
   for (qw/local_name value/) {
-    if ($self->_is_same_class ($self->{$_})) {
+    if ($self->{$_} && $self->_is_same_class ($self->{$_})) {
       $self->{$_}->{parent} = $self;
     }
   }
-  $self->{node} ||= [];
+  $self->{node} = [];
   $self;
 }
 
 sub _ns_parse_qname ($$) {
   my $qname = $_[1];
-  if ($qname =~ /:/) {
+  if (index ($qname, ':') > -1) {
     return split /:/, $qname, 2;
   } else {
     return (undef, $qname);
@@ -152,9 +152,8 @@ Available options: C<type>, C<namespace_uri>, C<local_name>, C<value>.
 
 sub append_new_node ($;%) {
   my $self = shift;
-  my $new_node = __PACKAGE__->new (@_);
+  my $new_node = ref ($self)->new (@_, parent => $self);
   push @{$self->{node}}, $new_node;
-  $new_node->{parent} = $self;
   $new_node;
 }
 
@@ -165,15 +164,12 @@ Appending given text as a new text node.  The new text node is returned.
 =cut
 
 sub append_text ($$;%) {
-  my $self = shift;
-  my $s = shift;
-  $self->append_new_node (type => '#text', value => $s);
+  $_[0]->append_new_node (type => '#text', value => $_[1]);
 }
 
+## Non public interface
 sub append_baretext ($$;%) {
-  my $self = shift;
-  my $s = shift;
-  $self->append_new_node (type => '#xml', value => $s);
+  $_[0]->append_new_node (type => '#xml', value => $_[1]);
 }
 
 sub remove_child_node ($$) {
@@ -507,7 +503,10 @@ sub remove_marked_section ($) {
   my $self = shift;
   my @node;
   for (@{$self->{node}}) {
-    $_->remove_marked_section;
+    if ({qw/#declaration 1 #element 1 #section 1 #reference 1 #attribute 1
+            #document 1 #fragment 1/}->{$_->{type}}) {
+      $_->remove_marked_section;
+    }
   }
   for (@{$self->{node}}) {
     if ($_->{type} ne '#section') {
@@ -516,7 +515,7 @@ sub remove_marked_section ($) {
       my $status = $_->get_attribute ('status', make_new_node => 1)->inner_text;
       if ($status eq 'CDATA') {
         $_->{type} = '#text';
-        $_->remove_child_node ($_->get_attribute ('status'));
+        $_->remove_attribute ('status');
         push @node, $_;
       } elsif ($status ne 'IGNORE') {	# INCLUDE
         for my $e (@{$_->{node}}) {
@@ -535,14 +534,17 @@ sub remove_references ($) {
   my $self = shift;
   my @node;
   for (@{$self->{node}}) {
-    $_->remove_references;
+    if ({qw/#declaration 1 #element 1 #section 1 #reference 1 #attribute 1
+            #document 1 #fragment 1/}->{$_->{type}}) {
+      $_->remove_references;
+    }
   }
   for (@{$self->{node}}) {
     if ($_->{type} ne '#reference'
     || ($self->{type} eq '#declaration' && $_->{namespace_uri} eq $NS{SGML}.'entity')) {
       push @node, $_;
     } else {
-      if ($_->{namespace_uri} =~ /char/) {
+      if (index ($_->{namespace_uri}, 'char')) {
         my $e = ref ($_)->new (type => '#text', value => chr $_->{value});
         $e->{parent} = $self;
         push @node, $e;
@@ -894,15 +896,15 @@ sub inner_xml ($;%) {
   } elsif ($self->{type} eq '#declaration') {
     if ($self->{namespace_uri} eq $NS{SGML}.'doctype') {
       my $root = $self->get_attribute ('qname');
-      ref $root ? ($root = $root->inner_text) : (ref $self->{parent} ? (do {
+      $root = (ref $root ? $root->inner_text : undef) || (ref $self->{parent} ? (do {
         for (@{$self->{parent}->{node}}) {
           if ($_->{type} eq '#element') {
             $root = $_->qname;
             last if $root;
           }
         }
-        $root = '#IMPLIED';
-      }) : ($root = '#IMPLIED'));	## error!
+        $root || '#IMPLIED';
+      }) : '#IMPLIED');	## error!
       my ($isub, $xid) = ('', $self->external_id);
       for (@{$self->{node}}) {
         $isub .= $_->outer_xml if $_->{type} ne '#attribute';
@@ -1251,7 +1253,7 @@ sub _get_entity_manager ($) {
   }
 }
 
-sub _CLASS_NAME ($) { 'SuikaWiki::Markup::XML' }
+sub _CLASS_NAME { 'SuikaWiki::Markup::XML' }
 
 # $s = $x->_entitize ($s)
 sub _entitize ($$;%) {
@@ -1406,4 +1408,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/13 09:04:02 $
+1; # $Date: 2003/09/13 22:35:00 $
