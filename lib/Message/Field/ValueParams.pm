@@ -8,8 +8,8 @@ Internet message field bodies
 
 package Message::Field::ValueParams;
 use strict;
-use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use vars qw(%DEFAULT @ISA %REG $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Params;
 push @ISA, qw(Message::Field::Params);
 
@@ -29,6 +29,42 @@ use overload '+=' => sub { $_[0]->{value} = $_[0]->{value} + $_[1]; $_[0] },
 	## param, parameter
 	## M_parameter, M_parameter_name, M_parameter_extended_value
 
+%DEFAULT = (
+	#_HASH_NAME
+	#_MEMBERS
+	#_METHODS
+	#accept_coderange
+	#encoding_after_encode
+	#encoding_before_decode
+	#field_param_name
+	#field_name
+	#field_ns
+	#format
+	#header_default_charset
+	#header_default_charset_input
+	#hook_encode_string
+	#hook_decode_string
+	#output_comment
+	#output_parameter_extension
+	#parameter_rule
+	#parameter_attribute_case_sensible
+	#parameter_attribute_unsafe_rule
+	#parameter_av_Mrule
+	#parameter_no_value_attribute_unsafe_rule
+	#parameter_value_max_length
+	#parameter_value_split_length
+	#parameter_value_unsafe_rule
+	#parse_all
+	#separator
+	#separator_rule
+	#use_comment
+	#use_parameter_extension
+	-value_case_sensible	=> 1,
+	-value_default	=> '',
+	#value_type
+	-value_unsafe_rule	=> 'NON_http_attribute_char',
+);
+
 =head1 CONSTRUCTORS
 
 The following methods construct new objects:
@@ -41,71 +77,36 @@ The following methods construct new objects:
 sub _init ($;%) {
   my $self = shift;
   my %options = @_;
-  my %DEFAULT = (
-    #delete_fws	## Inheritted
-    #encoding_after_encode	## Inherited
-    #encoding_before_decode	## Inherited
-    #format	## Inherited
-    #hook_encode_string	## Inherited
-    #hook_decode_string	## Inherited
-    #parameter_name_case_sensible	## Inherited
-    #parameter_value_max_length	## Inherited
-    #parse_all	## Inherited
-    #use_parameter_extension	## Inherited
-    -value_case_sensible	=> 1,
-    -value_default	=> '',
-    -value_no_regex	=> qr/(?!)/,	## default = (none)
-    -value_regex	=> qr/[\x00-\xFF]+/,
-    #value_type	## Inherited
-  );
   $self->SUPER::_init (%DEFAULT, %options);
+  push @{$self->{option}->{_METHODS}}, 'value';
   
-  #my $fname = $self->_n11n_field_name ($self->{option}->{field_name});
   my $fname = $self->{option}->{field_name};
   my $format = $self->{option}->{format};
-  if ($fname eq 'content-disposition') {
+  if ($fname eq 'disposition') {	## Content-Disposition
     $self->{option}->{value_case_sensible} = 0;
     $self->{option}->{value_default} = 'inline';
-    $self->{option}->{value_no_regex} = $REG{NON_token};
-    unless ($self->{option}->{format} =~ /^http/) {
-      $self->{option}->{value_no_regex} = $REG{NON_http_token};
-      $self->{option}->{use_parameter_extension} = 1;
+    unless ($self->{option}->{format} =~ /http/) {
+      $self->{option}->{output_parameter_extension} = 1;
     }
-    $self->{option}->{value_type}->{'creation-date'} = ['Message::Field::Date'];
-    $self->{option}->{value_type}->{'modification-date'} = ['Message::Field::Date'];
-    $self->{option}->{value_type}->{'read-date'} = ['Message::Field::Date'];
-  } elsif ($fname eq 'content-transfer-encoding') {
+    my $dateclass = ['Message::Field::Date', {format => 'mail-rfc822+rfc1123'}];
+    $self->{option}->{value_type}->{'creation-date'} = $dateclass;
+    $self->{option}->{value_type}->{'modification-date'} = $dateclass;
+    $self->{option}->{value_type}->{'read-date'} = $dateclass;
+  } elsif ($fname eq 'transfer-encoding') {	## Content-Transfer-Encoding
     $self->{option}->{value_case_sensible} = 0;
-    $self->{option}->{value_no_regex} = $REG{NON_token};
     if ($format =~ /http/) {
       $self->{option}->{value_default} = 'binary';
-    } elsif ($format =~ /news-usefor/) {
-      $self->{option}->{value_default} = '8bit';
     } else {
       $self->{option}->{value_default} = '7bit';
     }
+    $self->{option}->{output_parameter_extension} = 1;
   } elsif ($fname eq 'link') {
-    $self->{option}->{parameter_value_unsafe_rule}->{'*value'} = 'MATCH_NONE';
     $self->{option}->{value_type}->{'*value'} = ['Message::Field::URI'];
   } elsif ($fname eq 'auto-submitted') {
-    $self->{option}->{parameter_value_unsafe_rule}->{'*value'} = 'NON_token';
     $self->{option}->{value_type}->{increment} = ['Message::Field::Numval'];
-  } else {
-    $self->{option}->{parameter_value_unsafe_rule}->{'*value'}
-      = 'NON_http_token_wsp';
   }
-}
-
-## Initialization for new () method.
-sub _initialize_new ($;%) {
-  my $self = shift;
   $self->{value} = $self->{option}->{value_default};
 }
-
-## Initialization for parse () method.
-#sub _initialize_parse ($;%) {
-  ## Inherited
-#}
 
 =item $vp = Message::Field::ValueParams->new ([%options])
 
@@ -125,21 +126,17 @@ some options as parameters to the constructor.
 
 ## Inherited
 
-sub _save_param ($@) {
+## $self->_save_parameters (\@parameter, \%option)
+## -- Save parameters in $self
+sub _save_parameters ($\@\%) {
   my $self = shift;
-  my @p = @_;
-  $self->{value} = $self->{option}->{value_default};
-  if (@p > 0 && $p[0]->[1]->{is_parameter} == 0) {
-    my $type = shift (@p)->[0];
-    if ($type && $type !~ /$self->{option}->{value_no_regex}/) {
-      $self->{value} = $type;
-    } elsif ($type) {
-      push @p, ['x-invalid-value' => {value => $type, is_parameter => 1}];
-    }
+  my ($param, $option) = @_;
+  if ($param->[0]->{no_value}) {
+    $self->{value} = shift (@$param)->{attribute};
+    $self->{value} = $self->_parse_value ('*value' => $self->{value})
+      if $option->{parse_all};
   }
-  #$self->{param} = \@p;
-  $self->SUPER::_save_param (@p);
-  $self;
+  $self->SUPER::_save_parameters ($param, $option);
 }
 
 =back
@@ -193,28 +190,6 @@ is a reference to the object.
 
 ## add, replace, count, parameter, parameter_name, parameter_value: Inherited.
 
-## Hook called before returning C<value>.
-## $self->_param_value ($name, $value);
-## -- Inherited.
-
-=item $field-body = $vp->stringify ()
-
-Returns C<field-body> as a string.
-
-=cut
-
-sub stringify ($;%) {
-  my $self = shift;
-  my $param = $self->SUPER::stringify (@_);
-  $self->value_as_string (@_).(length $param? '; '.$param: '');
-}
-*as_string = \&stringify;
-
-## This method is intended to be used by child classes
-sub stringify_params ($;%) {
-  shift->SUPER::stringify (@_);
-}
-
 =item $value = $vp->value ([$new_value])
 
 Returns or set value.
@@ -225,14 +200,14 @@ sub value ($;$%) {
   my $self = shift;
   my $new_value = shift;
   my %option = @_;
-  if (defined $new_value && $new_value !~ m#$self->{option}->{value_no_regex}#) {
+  if (defined $new_value) {
     $self->{value} = $new_value;
   }
   $self->{value} = $self->_parse_value ('*value' => $self->{value});
   $self->{option}->{value_case_sensible}? $self->{value}: lc $self->{value};
 }
 
-=item $value = $vp->value_as_string ([%options])
+=item $value = $vp->stringify_value ([%options])
 
 Returns value.  If necessary, quoted and encoded in
 message format.  Same as C<stringify> except that
@@ -240,14 +215,32 @@ only first "value" is outputed.
 
 =cut
 
-sub value_as_string ($;%) {
+sub stringify_value ($;%) {
   my $self = shift;
-  my (%e) = &{$self->{option}->{hook_encode_string}} ($self, 
-          $self->{value}, type => 'phrase');
-  my $unsafe_rule = $self->{option}->{parameter_value_unsafe_rule}->{'*value'};
-  Message::Util::quote_unsafe_string ($e{value}, unsafe => $unsafe_rule);
+  my (%e) = &{$self->{option}->{hook_encode_string}}
+    ($self, $self->{value}, type => 'phrase');
+  Message::Util::quote_unsafe_string
+    ($e{value}, unsafe => $self->{option}->{value_unsafe_rule});
 }
 
+
+=item $field-body = $vp->stringify ()
+
+Returns C<field-body> as a string.
+
+=cut
+
+sub stringify ($;%) {
+  my $self = shift;
+  my $param = $self->stringify_params (@_);
+  $self->stringify_value (@_).(length $param? '; '.$param: '');
+}
+*as_string = \&stringify;
+
+## This method is intended to be used by child classes
+sub stringify_params ($;%) {
+  shift->SUPER::stringify (@_);
+}
 
 =item $option-value = $vp->option ($option-name)
 
@@ -261,6 +254,14 @@ as parameter when setting.
 =cut
 
 ## Inherited.
+
+## $self->_option_recursive (\%argv)
+sub _option_recursive ($\%) {
+  my $self = shift;
+  my $o = shift;
+  $self->{value}->option (%$o) if ref $self->{value};
+  $self->SUPER::_option_recursive (%$o);
+}
 
 =item $clone = $ua->clone ()
 
@@ -315,7 +316,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/23 12:10:16 $
+$Date: 2002/06/29 09:31:46 $
 
 =cut
 

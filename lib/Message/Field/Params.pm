@@ -11,8 +11,9 @@ use strict;
 require 5.6.0;
 use re 'eval';
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
+require Message::MIME::Charset;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 
@@ -22,48 +23,46 @@ use overload '""' => sub { $_[0]->stringify },
              fallback => 1;
 
 %REG = %Message::Util::REG;
-## Inherited: comment, quoted_string, domain_literal, angle_quoted
-	## WSP, FWS, atext, atext_dot, token, attribute_char
-	## S_encoded_word
-	## M_quoted_string
 
-$REG{param} = qr/(?:$REG{atext_dot}|$REG{quoted_string}|$REG{angle_quoted})(?:$REG{atext_dot}|$REG{quoted_string}|$REG{WSP}|,)*/;
-$REG{param_nocomma} = qr/(?:$REG{atext_dot}|$REG{quoted_string}|$REG{angle_quoted})(?:$REG{atext_dot}|$REG{quoted_string}|$REG{WSP})*/;
-	## more naive C<parameter>.  (Comma is allowed for RFC 1049)
-$REG{param_free} = qr/(?:[^\x09\x20\x22\x3B\x3C]|$REG{quoted_string}|$REG{angle_quoted})(?:[^\x22\x3B\x3C]|$REG{quoted_string})*/;
-$REG{parameter} = qr/$REG{token}=(?:$REG{token}|$REG{quoted_string})?/;
-	## as defined by RFC 2045, not RFC 2231.
-
-#$REG{M_parameter} = qr/($REG{token})=($REG{token}|$REG{quoted_string})?/;
-$REG{M_parameter} = qr/($REG{token})=($REG{quoted_string}|[^\x22]*)/;
-	## as defined by RFC 2045, not RFC 2231.
-$REG{M_parameter_name} = qr/($REG{attribute_char}+)(?:\*([0-9]+)(\*)?|(\*))/;
-	## as defined by RFC 2231.
-$REG{M_parameter_extended_value} = qr/([^']*)'([^']*)'($REG{token}*)/;
-	## as defined by RFC 2231, but more naive.
+$REG{S_parameter} = qr/(?:[^\x22\x28\x3B\x3C]|$REG{comment}|$REG{quoted_string}|$REG{angle_quoted})+/;
+$REG{S_parameter_separator} = qr/;/;
+$REG{S_comma_parameter} = qr/(?:[^\x22\x28\x2C\x3C]|$REG{comment}|$REG{quoted_string}|$REG{angle_quoted})+/;
+$REG{S_comma_parameter_separator} = qr/,/;
+$REG{MS_parameter_avpair} = qr/([^\x22\x3C\x3D]+)=([\x00-\xFF]*)/;
 
 %DEFAULT = (
-	-_HASH_NAME	=> 'param',
-    -delete_fws	=> 1,## BUG: this option MUST be '1'.
-    	## parameter parser cannot procede CFWS.
-    #encoding_after_encode
-    #encoding_before_decode
-    #field_param_name
-    #field_name
-    #format
-    #hook_encode_string
-    #hook_decode_string
-    -parameter_rule	=> 'param',
-    -parameter_name_case_sensible	=> 0,
-    -parameter_value_max_length	=> 60,
-    -parameter_value_split_length	=> 35,
-    -parameter_value_unsafe_rule	=> {'*default'	=> 'NON_http_attribute_char'},
-    -parse_all	=> 0,
-    -separator	=> '; ',
-    -separator_regex	=> qr/$REG{FWS};$REG{FWS}/,
-    -use_comment	=> 1,
-    -use_parameter_extension	=> 0,
-    #value_type
+	-_HASH_NAME	=> 'params',
+	-_MEMBERS	=> [qw/params/],
+	-_METHODS	=> [qw/add replace delete item parameter scan/],
+		## count item_exist <- not implemented yet
+	-accept_coderange	=> '7bit',
+	-by	=> 'attribute',
+	#encoding_after_encode
+	#encoding_before_decode
+	#field_param_name
+	#field_name
+	#field_ns
+	#format
+	#header_default_charset
+	#header_default_charset_input
+	#hook_encode_string
+	#hook_decode_string
+	-output_comment	=> 1,
+	-output_parameter_extension	=> 0,
+	-parameter_rule	=> 'S_parameter',	## regex name of parameter
+	-parameter_attribute_case_sensible	=> 0,
+	-parameter_attribute_unsafe_rule	=> 'NON_http_attribute_char',
+	-parameter_av_Mrule	=> 'MS_parameter_avpair',
+	-parameter_no_value_attribute_unsafe_rule	=> 'NON_http_attribute_char',
+	-parameter_value_max_length	=> 60,
+	-parameter_value_split_length	=> 35,
+	-parameter_value_unsafe_rule	=> 'NON_http_attribute_char',
+	#parse_all
+	-separator	=> '; ',
+	-separator_rule	=> 'parameter_separator',
+	-use_comment	=> 1,
+	-use_parameter_extension	=> 1,
+	#value_type
 );
 
 =head1 CONSTRUCTORS
@@ -80,19 +79,17 @@ sub _init ($;%) {
   my %options = @_;
   $self->SUPER::_init (%DEFAULT, %options);
   $self->{param} = [];
-  my $fname = $self->{option}->{field_name};
-  if ($fname eq 'p3p') {
-    $self->{option}->{parameter_rule} = 'param_nocomma';
+  my $field = $self->{option}->{field_name};
+  if ($field eq 'p3p') {
+    $self->{option}->{parameter_rule} = 'S_comma_parameter';
+    $self->{option}->{separator_rule} = 'S_comma_parameter_separator';
     $self->{option}->{separator} = ', ';
-    $self->{option}->{separator_regex} = qr/$REG{FWS},$REG{FWS}/;
   }
-  if ($self->{option}->{format} =~ /^http-sip/) {
-    $self->{option}->{encoding_before_decode} = 'utf-8';
-    $self->{option}->{encoding_after_decode} = 'utf-8';
-  } elsif ($self->{option}->{format} =~ /^http/) {
-    $self->{option}->{encoding_before_decode} = 'iso-8859-1';
-    $self->{option}->{encoding_after_decode} = 'iso-8859-1';
-  }	## TODO: news-usefor -> x-junet8
+  if ($self->{option}->{format} =~ /news-usefor/) {
+    $self->{option}->{accept_coderange} = '8bit';
+  } elsif ($self->{option}->{format} =~ /http/) {
+    $self->{option}->{accept_coderange} = 'binary';
+  }
 }
 
 =item $p = Message::Field::Params->new ([%options])
@@ -116,131 +113,179 @@ sub parse ($$;%) {
   my $self = bless {}, $class;
   my $body = shift;
   $self->_init (@_);
-  $body = Message::Util::delete_comment ($body)
-    if $self->{option}->{use_comment};
-  $body = $self->_delete_fws ($body) if $self->{option}->{delete_fws};
-  my @b = ();
-  $body =~ s{$REG{FWS}($REG{$self->{option}->{parameter_rule}})
-             (?:$self->{option}->{separator_regex}|$)}{
-    my $param = $1;
-    push @b, $self->_parse_param ($param);
-  }goex;
-  @b = $self->_restore_param (@b);
-  $self->_save_param (@b);
+  my @param;
+  $body =~ s{
+    ($REG{ $self->{option}->{parameter_rule} })
+    (?: $REG{ $self->{option}->{separator_rule} } | $ )
+  }{
+    push @param, $self->_parse_parameter_item ($1, $self->{option});
+    '';
+  }gesx;
+  $self->_decode_parameters (\@param, $self->{option});
+  $self->_save_parameters (\@param, $self->{option});
   $self;
 }
 
-sub _parse_param ($$) {
+## $self->_parse_parameter_item ($item, \%option)
+## -- parses a parameter item (into attribute/value pair or no-value-attribute)
+sub _parse_parameter_item ($$\%) {
   my $self = shift;
-  my $param = shift;
-  if ($param =~ /^$REG{M_parameter}$/) {
-    my ($name, $value) = ($self->_n11n_param_name ($1), $2);
-    my ($seq, $isencoded, $charset, $lang) = (-1, 0, '', '');
-    if ($name =~ /^$REG{M_parameter_name}$/) {
-      ($name, $seq, $isencoded) = ($1, $4?-1:$2, ($3||$4)?1:0);
-    }
-    if ($isencoded && $value =~ /^$REG{M_parameter_extended_value}$/) {
-      ($charset, $lang, $value) = ($1, $2, $3);
-    }
-    return [$name, {value => $value, seq => $seq, is_encoded => $isencoded,
-                    charset => $charset, language => $lang, is_parameter => 1}];
-  } else {
-    return [$param, {is_parameter => 0}];
-  }
-}
-
-sub _restore_param ($@) {
-  my $self = shift;
-  my @p = @_;
-  my @ret;
-  my %part;
-  for my $i (@p) {
-    if ($i->[1]->{is_parameter}) {
-      my $p = $i->[1];
-      if ($p->{seq}<0) {
-        my $s = $p->{value};
-        if ($p->{is_encoded}) {
-          $s =~ s/%([0-9A-Fa-f][0-9A-Fa-f])/chr(hex($1))/eg;
-          my %s = &{$self->{option}->{hook_decode_string}} ($self, $s,
-                language => $p->{language}, charset => $p->{charset},
-                type => 'parameter/encoded');
-          if ($p->{charset} && !$s{charset}) {
-            $p->{charset_to_be} = $p->{charset};	## Original charset
-          }
-          ($s, $p->{charset}, $p->{language}) = (@s{qw(value charset language)});
-        } elsif ($p->{is_internal}) {
-          $s = $p->{value};
-        } else {
-          my $q = 0;
-          ($s,$q) = Message::Util::unquote_if_quoted_string ($p->{value});
-          my %s = &{$self->{option}->{hook_decode_string}} ($self, $s,
-                type => ($q?'parameter/quoted':'parameter'));
-          ($s, $p->{charset}, $p->{language}) = (@s{qw(value charset language)});
-        }
-        push @ret, [$i->[0], {value => $s, language => $p->{language},
-                              charset => $p->{charset}, 
-                              charset_to_be => $p->{charset_to_be},
-                              is_parameter => 1}];
-      } else {
-        $part{$i->[0]}->[$p->{seq}] = {
-        value => scalar Message::Util::unquote_if_quoted_string ($p->{value}),
-        language => $p->{language}, charset => $p->{charset},
-        is_encoded => $p->{is_encoded}};
+  my ($item, $option) = @_;
+  my @comment;
+  ($item, @comment) = $self->Message::Util::delete_comment_to_array
+    ($item, -use_angle_quoted);
+  $item =~ s/^$REG{WSP}+//g;
+  $item =~ s/$REG{WSP}+$//g;
+  my %item;
+  if ($item =~ /^$REG{ $option->{parameter_av_Mrule} }$/) {
+    my $encoded = 0;
+    ($item{attribute}, $item{value}) = ($1, $2);
+    $item{attribute} =~ tr/\x09\x0A\x0D\x20//d;
+    $item{value} =~ s/^$REG{WSP}+//g;
+    if ($option->{use_parameter_extension}
+     && $item{attribute} =~ /^([^*]+)(?:\*([0-9]+)(\*)?|(\*))\z/) {
+      $item{attribute} = $1;
+      $item{section_no} = $2;
+      $encoded = $3 || $4;
+      $item{section_no} = -1 if $4;
+      if ($item{section_no} <= 0 && $encoded
+       && $item{value} =~ /^([^']*)'([^']*)'([\x00-\xFF]*)$/) {
+        $item{charset} = $1;  $item{charset} =~ tr/\x09\x0A\x0D\x20//d;
+        $item{language} = $2; $item{language} =~ tr/\x09\x0A\x0D\x20//d;
+        $item{value} = $3;    $item{value} =~ s/^$REG{WSP}+//g;
+      }
+      if ($encoded) {
+        $item{value} =~ s/%([0-9A-Fa-f][0-9A-Fa-f])/chr(hex($1))/ge;
       }
     } else {
-      #my $q = 0;
-      #($i->[0], $q) = Message::Util::unquote_if_quoted_string ($i->[0]);
-      #my %s = &{$self->{option}->{hook_decode_string}} ($self, $i->[0],
-      #          type => ($q?'phrase/quoted':'phrase'));
-      push @ret, [Message::Util::decode_quoted_string ($self, $i->[0]), 
-                  {is_parameter => 0}];
+      $item{section_no} = -1;
+    }
+    ($item{value}, $encoded) = Message::Util::unquote_if_quoted_string ($item{value}) unless $encoded;
+    ($item{value}, $encoded) = Message::Util::unquote_if_angle_quoted ($item{value}) unless $encoded;
+    $item{charset} = '*bare' if !$encoded && !$item{charset};
+    $item{attribute} = lc $item{attribute}
+      unless $option->{parameter_attribute_case_sensible};
+  } else {
+    my $encoded = 0;
+    ($item, $encoded) = Message::Util::unquote_if_quoted_string ($item) unless $encoded;
+    ($item, $encoded) = Message::Util::unquote_if_angle_quoted ($item) unless $encoded;
+    $item{attribute} = $item;
+    $item{charset} = '*bare' if !$encoded;
+    $item{no_value} = 1;
+  }
+  $item{comment} = \@comment;
+  \%item;
+}
+
+## $self->_decode_parameters (\@parameter, \%option)
+## -- join RFC 2231 splited fragments and decode each parameter
+sub _decode_parameters ($\@\%) {
+  my $self = shift;
+  my ($param, $option) = @_;
+  my %fragment;
+  my @fparameter;
+  for my $parameter (@$param) {
+    if ($parameter->{no_value}) {
+      my %item;
+      $item{no_value} = 1;
+      $item{comment} = $parameter->{comment};
+      if ($parameter->{charset} ne '*bare') {
+        my %s = &{$self->{option}->{hook_decode_string}}
+          ($self, $parameter->{attribute},
+           charset	=> $option->{encoding_before_decode},
+           type => 'parameter/no-value-attribute');
+        if ($s{charset}) {	## Convertion failed
+          $item{charset} = $s{charset};
+        }
+        $item{attribute} = $s{value};
+      } else {
+        $item{attribute} = $parameter->{attribute};
+      }
+      $parameter = \%item;
+    } elsif ($parameter->{section_no} < 0) {
+      my %item;
+      $item{attribute} = $parameter->{attribute};
+      $item{language} = $parameter->{language} if $parameter->{language};
+      $item{comment} = $parameter->{comment};
+      if ($parameter->{charset} ne '*bare') {
+        my %s = &{$self->{option}->{hook_decode_string}}
+          ($self, $parameter->{value},
+           charset	=> $parameter->{charset} || $option->{encoding_before_decode},
+           type => 'parameter/value/quoted-string');
+        if ($s{charset}) {	## Convertion failed
+          $item{charset} = $s{charset};
+        } elsif ($parameter->{charset}) {
+          $item{output_charset} = $parameter->{charset};
+        }
+        $item{value} = $s{value};
+      } else {
+        $item{value} = $parameter->{value};
+      }
+      $parameter = \%item;
+    } else {	## fragment
+      $fragment{ $parameter->{attribute} }->[ $parameter->{section_no} ]
+        = $parameter->{value};
+      if ($parameter->{section_no} == 0) {
+        $fragment{'*property'}->{ $parameter->{attribute} }
+          ->{language} = $parameter->{language};
+        $fragment{'*property'}->{ $parameter->{attribute} }
+          ->{charset} = $parameter->{charset};
+      }
+      if (ref $parameter->{comment} && @{$parameter->{comment}} > 0) {
+        push @{ $fragment{'*property'}->{ $parameter->{attribute} }
+          ->{comment} }, @{$parameter->{comment}};
+      }
+      $parameter = undef;
     }
   }
-  for my $name (keys %part) {
-    my $t = join '', map {
-      my $v = $_;
-      my $s = $v->{value};
-      $s =~ s/%([0-9A-Fa-f][0-9A-Fa-f])/chr(hex($1))/eg if $v->{is_encoded};
-      $s;
-    } @{$part{$name}};
-    my %s = &{$self->{option}->{hook_decode_string}} ($self, $t,
-                type => 'parameter/encoded');
-          if ($part{$name}->[0]->{charset} && !$s{charset}) {	## Original charset
-            $part{$name}->[0]->{charset_to_be} = $part{$name}->[0]->{charset};
-          }
-    ($t,@{$part{$name}->[0]}{qw(charset language)})=(@s{qw(value charset language)});
-    push @ret, [$name, {value => $t, charset => $part{$name}->[0]->{charset},
-                        charset_to_be => $part{$name}->[0]->{charset_to_be},
-                        language => $part{$name}->[0]->{language}, 
-                        is_parameter => 1}];
+  for (keys %fragment) {
+    next if $_ eq '*property';
+    my %item;
+    $item{attribute} = $_;
+    $item{comment} = $fragment{'*property'}->{ $item{attribute} }->{comment};
+    $item{language} = $fragment{'*property'}->{ $item{attribute} }->{language};
+    delete $item{language} unless $item{language};
+    my $charset = $fragment{'*property'}->{ $item{attribute} }->{charset};
+    my %s = &{$self->{option}->{hook_decode_string}}
+      ($self, join ('', @{ $fragment{ $item{attribute} } }),
+       charset	=> $charset || $option->{encoding_before_decode},
+       type => 'parameter/extended-value/encoded');
+    if ($s{charset}) {	## Convertion failed
+      $item{charset} = $s{charset};
+    } elsif ($charset) {
+      $item{output_charset} = $charset;
+    }
+    $item{value} = $s{value};
+    push @fparameter, \%item;
   }
-  @ret;
+  @$param = (grep { ref $_ eq 'HASH' } @$param, @fparameter);
 }
 
-## $self->_save_param (@parameters)
-## --- Save parameter values to $self
-sub _save_param ($@) {
-  my $self = shift;
-  my @p = @_;
-  $self->_parse_param_value (\@p) if $self->{option}->{parse_all};
-  $self->{param} = \@p;
-  $self;
-}
-*__save_param = \&_save_param;	## SHOULD NOT BE OVERRIDDEN!
-
-## $self->_parse_param_value (\@parameters)
+## $self->_parse_values_of_paramters (\@parameter, \%option)
 ## --- Parse each values of parameters
-sub _parse_param_value ($\@) {
+sub _parse_values_of_parameters ($\@\%) {
   my $self = shift;
-  my $p = shift;
-  @$p = map {
-    if ($_->[1]->{is_parameter}) {
-      $_->[1]->{value} = $self->_parse_value ($_->[0] => $_->[1]->{value});
+  my ($param, $option) = @_;
+  @$param = map {
+    if (!$_->{no_value}) {
+      $_->{value} = $self->_parse_value ($_->{attribute} => $_->{value});
+    } else {
+      $_->{value} = $self->_parse_value ('*no_value_attribute' => $_->{value});
     }
     $_;
-  } @$p;
-  #$p;
+  } @$param;
 }
+
+## $self->_save_parameters (\@parameter, \%option)
+## -- Save parameters in $self
+sub _save_parameters ($\@\%) {
+  my $self = shift;
+  my ($param, $option) = @_;
+  $self->_parse_values_of_parameters ($param, $option) if $option->{parse_all};
+  $self->{ $option->{_HASH_NAME} } = $param;
+}
+*__save_parameters = \&_save_parameters;
+
 
 =back
 
@@ -272,164 +317,127 @@ sub _add_hash_check ($$$\%) {
   if (ref $value eq 'ARRAY') {
     ($value, %$value_option) = @$value;
   }
-  if ($value_option->{value}) {	## Non-value parameter
-    $name = $self->_parse_value ('*novalue' => $name) if $$option{parse};
-    return (1, $name => [$name, {is_parameter => 0}]);
+  ## -- attribute only (no value) parameter
+  if ($value_option->{no_value}) {
+    $name = $self->_parse_value ('*no_value_attribute' => $name) if $$option{parse};
+    return (1, $name => {
+      attribute => $name, no_value => 1,
+      language	=> $value_option->{language},
+      comment	=> $value_option->{comment},
+    });
   }
-    if ($$option{validate} && !$value_option->{value}
-     && $name =~ /^$REG{NON_http_attribute_char}$/) {
-      if ($$option{dont_croak}) {
-        return (0);
-      } else {
-        Carp::croak qq{add: $name: Invalid parameter name};
-      }
-    $value = $self->_parse_value ($name => $value) if $$option{parse};
-  }
-  (1, $name => [$name => {value => $value, is_parameter => 1,
-                charset_to_be => $value_option->{charset},
-                language => $value_option->{language},
-                }]);
-}
-
-
-sub Xadd ($$;$%) {
-  my $self = shift;
-  my %gp = @_;
-  my %option = %{$self->{option}};
-  for (grep {/^-/} keys %gp) {$option{substr ($_, 1)} = $gp{$_}}
-  $option{parse} = 1 if defined wantarray;
-  my $p;
-  for (grep {/^[^-]/} keys %gp) {
-    my ($name, $value, %po) = ($self->_n11n_param_name ($_));
-    if (ref $gp{$_}) {($value, %po) = @{$gp{$_}}} else {$value = $gp{$_}}
-    $p = [$name, {value => $value, charset => $po{charset},
-                   is_parameter => 1, language => $po{language}}];
-    $p->[1]->{is_parameter} = 0 if !$value && $po{value};
-    Carp::croak "add: \$name contains of non-attribute-char: $name"
-      if $p->[1]->{is_parameter} && $name =~ /$REG{NON_http_attribute_char}/;
-    $p->[1]->{value} = $self->_parse_value ($name => $p->[1]->{value})
-      if $option{parse};
-    if ($option{prepend}) {
-      unshift @{$self->{param}}, $p;
+  ## -- attribute=value pair
+  if ($$option{validate} && $name =~ /^$REG{NON_http_attribute_char}$/) {
+    if ($$option{dont_croak}) {
+      return (0);
     } else {
-      push @{$self->{param}}, $p;
+      Carp::croak qq{add: $name: Invalid parameter name};
     }
   }
-  $p->[1]->{is_parameter}? $p->[1]->{value}: $p->[0];
+  $value = $self->_parse_value ($name => $value) if $$option{parse};
+  (1, $name => {
+    attribute	=> $name, value => $value,
+    output_charset	=> $value_option->{charset},
+    charset	=> $value_option->{current_charset},
+    language	=> $value_option->{language},
+    comment	=> $value_option->{comment},
+  });
 }
 
-sub replace ($%) {
-  my $self = shift;
-  my %gp = @_;
-  my %option = %{$self->{option}};
-  for (grep {/^-/} keys %gp) {$option{substr ($_, 1)} = $gp{$_}}
-  $option{parse} = 1 if defined wantarray;
-  my $p;
-  for (grep {/^[^-]/} keys %gp) {
-    my ($name, $value, %po) = ($self->_n11n_param_name ($_));
-    if (ref $gp{$_} eq 'ARRAY') {($value, %po) = @{$gp{$_}}} else {$value = $gp{$_}}
-    $p = [$name, {value => $value, charset => $po{charset},
-                  is_parameter => 1, language => $po{language}}];
-    $p->[1]->{is_parameter} = 0 if !defined ($value) && $po{value};
-    Carp::croak "replace: \$name contains of non-attribute-char: $name"
-      if $p->[1]->{is_parameter} && $name =~ /$REG{NON_http_attribute_char}/;
-    $p->[1]->{value} = $self->_parse_value ($name => $p->[1]->{value})
-      if $option{parse};
-    my $f = 0;
-    for my $param (@{$self->{param}}) {
-      if ($param->[0] eq $name) {$param = $p; $f = 1}
-    }
-    push @{$self->{param}}, $p unless $f == 1;
+*_add_return_value = \&_replace_return_value;
+
+## (1/0, $name => $value) = $self->_replace_hash_check ($name => $value, \%option)
+## -- Checks given value and prepares saving value (hash version)
+*_replace_hash_check = \&_add_hash_check;
+
+## $value = $self->_replace_hash_shift (\%values, $name, $option)
+## -- Returns a value (from %values) and deletes it from %values
+##    (like CORE::shift for array).
+sub _replace_hash_shift ($\%$\%) {
+  shift; my $r = shift;  my $n = $_[0]->{attribute};
+  if ($$r{$n}) {
+    my $d = $$r{$n};
+    $$r{$n} = undef;
+    return $d;
   }
-  $p->[1]->{is_parameter}? $p->[1]->{value}: $p->[0];
+  undef;
 }
 
-## TODO: multiple parameters support
-sub delete ($$;%) {
+## $value = $self->_replace_return_value (\$item, \%option)
+## -- Returns returning value of replace method
+sub _replace_return_value ($\$\%) {
   my $self = shift;
-  my ($name, $index) = ($self->_n11n_param_name (shift), shift);
-  my $i = 0;
-  for my $param (@{$self->{param}}) {
-    if ($param->[0] eq $name) {
-      $i++;
-      if ($index == 0 || $i == $index) {
-        undef $param;
-        return $self if $i == $index;
-      }
-    }
+  my ($item, $value) = @_;
+  if ($$item->{no_value}) {
+    $$item->{attribute};
+  } else {
+    $$item->{value};
   }
-  $self;
 }
 
-sub count ($;$%) {
+## 1/0 = $self->_delete_match ($by, \$item, \%delete_list, \%option)
+## -- Checks and returns whether given item is matched with
+##    deleting item list
+sub _delete_match ($$\$\%\%) {
   my $self = shift;
-  my $name = $self->_n11n_param_name (shift);
-  unless ($name) {
-    $self->_delete_empty ();
-    return $#{$self->{param}}+1;
-  }
-  my $count = 0;
-  for my $param (@{$self->{param}}) {
-    if ($param->[0] eq $name) {
-      $count++;
-    }
-  }
-  $count;
-}
-
-
-sub parameter ($$;$%) {
-  my $self = shift;
-  my $name = $self->_n11n_param_name (shift);
-  my $newvalue = shift;
-  return $self->replace ($name => $newvalue,@_) if defined $newvalue;
-  my @ret;
-  for my $param (@{$self->{param}}) {
-    if ($param->[0] eq $name) {
-      unless (wantarray) {
-        $param->[1]->{value} 
-          = $self->_parse_value ($name => $param->[1]->{value});
-        return $param->[1]->{value};
-      } else {
-        $param->[1]->{value} 
-          = $self->_parse_value ($name => $param->[1]->{value});
-        push @ret, $param->[1]->{value};
-      }
+  my ($by, $item, $list, $option) = @_;
+  return 0 unless ref $$item;	## Already removed
+  if ($by eq 'attribute' || $by eq 'name') {
+    return 1 if $$list{ $$item->{attribute} };
+  } elsif ($by eq 'value') {
+    return 1 if $$list{ $$item->{value} };
+  } elsif ($by eq 'charset') {
+    return 1 if $$list{ $$item->{output_charset} } || $$list{ $$item->{charset} };
+  } elsif ($by eq 'language') {
+    return 1 if $$list{ $$item->{language} };
+  } elsif ($by eq 'type') {
+    if ($$item->{no_value}) {
+      return 1 if $$list{no_value_attribute};
+    } else {
+      return 1 if $$list{attribute_value_pair};
     }
   }
-  wantarray? @ret: undef;
+  0;
 }
 
-sub parameter_name ($$;$) {
-  my $self = shift;
-  my $i = shift;
-  my $newname = shift;
-  if ($newname) {
-    return 0 if $newname =~ /$REG{NON_http_attribute_char}/;
-    $self->{param}->[$i]->[0] = $newname;
-  }
-  $self->{param}->[$i]->[0];
-}
-sub parameter_value ($$;$) {
-  my $self = shift;
-  my $i = shift;
-  my $newvalue = shift;
-  if ($newvalue) {
-    $newvalue = $self->_parse_value ($self->{param}->[$i]->[0] => $newvalue);
-    $self->{param}->[$i]->[1]->{value} = $newvalue;
-  }
-  $self->{param}->[$i]->[1]->{value} 
-    = $self->_parse_value 
-      ($self->{param}->[$i]->[0] => $self->{param}->[$i]->[1]->{value});
-  $self->{param}->[$i]->[1]->{value};
-}
-
-
+## Delete empty items
 sub _delete_empty ($) {
   my $self = shift;
-  $self->{param} = [grep {ref $_} @{$self->{param}}];
+  my $array = $self->{option}->{_HASH_NAME};
+  $self->{ $array } = [grep { ref $_ } @{$self->{ $array }}] if $array;
 }
 
+=item @param = $p->parameter ($name => ($new_value), (%option))
+
+
+=cut
+
+sub parameter ($;@) {
+  my $self = shift;
+  if (@_ == 2) {	## $p->parameter (hoge => 'foo')
+    $self->replace (@_);
+  } else {	## $p->parameter ('foo')
+    $self->item (@_);
+  }
+}
+
+*_item_match = \&_delete_match;
+*_item_return_value = \&_replace_return_value;
+
+## $item = $self->_item_new_value ($name, \%option)
+## -- Returns new item with key of $name (called when
+##    no returned value is found and -new_value_unless_exist
+##    option is true)
+sub _item_new_value ($$\%) {
+  my $self = shift;
+  my ($key, $option) = @_;
+  if ($option->{by} eq 'attribute' || $option->{by} eq 'name') {
+    return {attribute => $key};
+  }
+  undef;
+}
+
+## TODO: Implement count,item_exist method
 
 =item $field-body = $p->stringify ()
 
@@ -439,111 +447,138 @@ Returns C<field-body> as a string.
 
 sub stringify ($;%) {
   my $self = shift;
-  my %o = @_;
-  my %option = %{$self->{option}};
+  my %o = @_; my %option = %{$self->{option}};
   for (grep {/^-/} keys %o) {$option{substr ($_, 1)} = $o{$_}}
+  $option{output_parameter_extension} = 0
+    unless $option{use_parameter_extension};
+  $option{output_comment} = 0 unless $option{use_comment};
   $self->_delete_empty;
-  my @ret = ();
-  $self->scan (sub {
-    my $self = shift;
-      my ($n => $v) = @_[0 => 2]; #$_->[1];
-      return unless $self->_stringify_params_check (@_[0 => 2]);
-      my $new = '';
-      if ($v->{is_parameter}) {
-        my ($encoded, @value) = (0, '');
-        my (%e) = &{$self->{option}->{hook_encode_string}} ($self, 
-          $v->{value}, charset => $v->{charset_to_be},
-          current_charset => $v->{charset}, language => $v->{language},
-          type => 'parameter');
-        if (!defined $e{value}) {
-          $value[0] = undef;
-        } elsif ($option{use_parameter_extension} && ($e{charset} || $e{language} 
-                           || $e{value} =~ /[\x00\x0D\x0A\x80-\xFF]/)) {
-          my ($charset, $lang);
-          $encoded = 1;
-          ($charset, $lang) = ($e{charset}, $e{language});
-          ## Note: %-quoting for charset and for language is not allowed.
-          ## But charset name can be included non-sttribute-char such as "'".
-          ## How can we treat this?
-          $charset =~ s/($REG{NON_http_attribute_char})/sprintf('%%%02X', ord $1)/ge;
-          $lang =~ s/($REG{NON_http_attribute_char})/sprintf('%%%02X', ord $1)/ge;
-          if (length $e{value} > $option{parameter_value_max_length}) {
-            for my $i (0..length ($e{value})/$option{parameter_value_split_length}) {
-              $value[$i] = substr ($e{value},
-                                     $i*$option{parameter_value_split_length},
-                                     $option{parameter_value_split_length});
-            }
-          } else {$value[0] = $e{value}}
-          for my $i (0..$#value) {
-            $value[$i] =~ 
-              s/($REG{NON_http_attribute_char})/sprintf('%%%02X', ord $1)/ge;
-          }
-          $value[0] = "${charset}'${lang}'".$value[0];
-        } elsif (length $e{value} == 0) {
-          $value[0] = '""';
+  my @param;
+  $self->scan( sub {shift;
+    my ($item, $option) = @_;
+    my $r = 1;
+    ($r, $item) = $self->_stringify_param_check ($item, $option);
+    return unless $r;
+    my $comment = '';
+    if ($option->{output_comment} && ref $item->{comment}
+      && @{$item->{comment}} > 0) {
+      my @c;
+      for (@{$item->{comment}}) {
+        push @c, '('. $self->Message::Util::encode_ccontent ($_) .')';
+      }
+      $comment = ' '. join ' ', @c;
+    }
+    if ($item->{no_value}) {
+      push @param, Message::Util::quote_unsafe_string ($item->{attribute},
+        unsafe => $option->{parameter_no_value_attribute_unsafe_rule}).$comment;
+    } else {
+      my $xparam = 0;
+      my $attribute = $item->{attribute};
+      return unless length $attribute;
+      my $value = ''.$item->{value};
+      if ($attribute =~ /$REG{ $option->{parameter_attribute_unsafe_rule} }/) {
+        #return 0;
+        $attribute =~ s/($REG{NON_http_attribute_char})/sprintf('%%%02X', ord $1)/ge;
+      }
+      my %e;
+      if ($option->{output_parameter_extension}) {
+        if ($item->{charset}) {
+          %e = %$item;
         } else {
-          if ($option{use_parameter_extension} 
-              && length $e{value} > $option{parameter_value_max_length}) {
-            for my $i (0..length ($e{value})/$option{parameter_value_split_length}) {
-              $value[$i] = Message::Util::quote_unsafe_string 
-                (substr ($e{value}, $i*$option{parameter_value_split_length},
-                    $option{parameter_value_split_length}), 
-                    unsafe => 'NON_http_attribute_char');
-            }
-          } else {
-            my $unsafe = $self->{option}->{parameter_value_unsafe_rule}->{$n}
-                     || $self->{option}->{parameter_value_unsafe_rule}->{'*default'};
-            $value[0] = Message::Util::quote_unsafe_string 
-              ($e{value}, unsafe => $unsafe);
-          }
+          %e = &{$self->{option}->{hook_encode_string}}
+            ($self, $value,
+             charset => $item->{output_charset} || $option->{encoding_after_encode},
+             current_charset => $option->{header_default_charset}, 
+             language => $item->{language},
+             type => 'parameter/value');
         }
-        ## Note: quoted-string for parameter name is not allowed.
-        ## But it is better than output bare non-atext.
-        if ($#value == 0) {
-          $new = 
-            Message::Util::quote_unsafe_string ($n, 
-              unsafe => 'NON_attribute_char')
-            .($encoded?'*':'').'='.$value[0]
-              if defined $value[0];
+        $xparam = 1 if (length $e{value} > $option->{parameter_value_max_length})
+                    || $e{charset}
+                    || $e{language}
+                    || $e{value} =~ /\x0D|\x0A/s
+                    || ($option->{accept_coderange} eq '7bit'
+                        && $e{value} =~ /[\x80-\xFF]/)
+                    || ($option->{accept_coderange} ne 'binary'
+                        && $e{value} =~ /\x00/)
+                    ;
+      } else {	## Don't use paramext
+        if ($item->{charset}) {	## But parameter value is undecodable charset value
+          %e = %$item;
+          $xparam = 1;
         } else {
-          my @new;
-          my $name = Message::Util::quote_unsafe_string 
-            ($n, unsafe => 'NON_http_attribute_char');
-          for my $i (0..$#value) {
-            push @new, $name.'*'.$i.($encoded?'*':'').'='.$value[$i];
+          %e = &{$self->{option}->{hook_encode_string}}
+            ($self, $value,
+             charset => $option->{encoding_after_encode},
+             current_charset => $option->{header_default_charset}, 
+             language => $item->{language},
+             type => 'parameter/value');
+        }
+      }
+      if ($xparam) {
+        if (length $e{value} > $option->{parameter_value_max_length}) {
+          for my $i (0..(length ($e{value})
+                         /$option->{parameter_value_split_length})) {
+            my $v = substr ($e{value},
+              $i * $option->{parameter_value_split_length},
+              $option->{parameter_value_split_length});
+            if ($i == 0) {
+              $v
+                =~ s/($REG{NON_http_attribute_char})/sprintf('%%%02X', ord $1)/ge;
+              my $charset = Message::MIME::Charset::name_minimumize
+                ($e{charset} || $option->{header_default_charset}, $value);
+              push @param, sprintf q{%s*0*=%s'%s'%s%s}, $attribute,
+                $charset, $e{language}, $v, $comment;
+            } else {	# $i > 0
+              if ($e{charset} || $v =~ /\x0A|\x0D/s
+               || ($option->{accept_coderange} ne 'binary' && $v =~ /\x00/)
+               || ($option->{accept_coderange} eq '7bit' && $v =~ /[\x80-\xFF]/)) {
+                $v =~ s/($REG{NON_http_attribute_char})/sprintf('%%%02X', ord $1)/ge;
+                push @param, sprintf q{%s*%d*=%s}, $attribute, $i, $v;
+              } else {
+                $v = Message::Util::quote_unsafe_string ($v,
+                  unsafe => $option->{parameter_value_unsafe_rule});
+                $v = q{""} if length $v == 0;
+                push @param, sprintf q{%s*%d=%s}, $attribute, $i, $v;
+              }
+            }
           }
-          $new = join $self->{option}->{separator}, @new;
+        } else {
+          $e{value}
+            =~ s/($REG{NON_http_attribute_char})/sprintf('%%%02X', ord $1)/ge;
+          unless ($e{charset}) {
+            $e{charset} = Message::MIME::Charset::name_minimumize
+              ($option->{header_default_charset}, $e{value});
+          }
+          push @param, sprintf q{%s*=%s'%s'%s%s}, $attribute,
+            $e{charset}, $e{language}, $e{value}, $comment;
         }
       } else {
-        my %e = &{$self->{option}->{hook_encode_string}} ($self, 
-          $n, type => 'phrase');
-        $new = Message::Util::quote_unsafe_string ($e{value}, 
-          unsafe => 'NON_http_token_wsp');
+        $e{value} = Message::Util::quote_unsafe_string ($e{value},
+          unsafe => $option->{parameter_value_unsafe_rule});
+        $e{value} = q{""} if length $e{value} == 0;
+        push @param, sprintf '%s=%s%s', $attribute, $e{value}, $comment;
       }
-      push @ret, $new if length $new;
-  });
-  join $self->{option}->{separator}, @ret;
+    }
+  }, options => \%option );
+  join $option{separator}, @param;
 }
 *as_string = \&stringify;
 
-sub _stringify_params_check ($$$) {
+## $self->_stringify_param_check (\%item, \%option)
+## -- Checks parameter (and modify if necessary).
+##    Returns either 1 (ok) or 0 (don't output)
+sub _stringify_param_check ($\%\%) {
   my $self = shift;
-  my ($name, $value) = @_;
-  1;
+  my ($item, $option) = @_;
+  (1, $item);
 }
 
-sub scan ($&) {
-  my ($self, $sub) = @_;
-  #my $sort;
-  #$sort = \&_header_cmp if $self->{option}->{sort} eq 'good-practice';
-  #$sort = {$a cmp $b} if $self->{option}->{sort} eq 'alphabetic';
-  my @param = @{$self->{param}};
-  #if (ref $sort) {
-  #  @field = sort $sort @{$self->{param}};
-  #}
-  for my $param (@param) {
-    &$sub($self, $param->[0] => $param->[1]->{value}, $param->[1]);
-  }
+## scan: Inherited
+
+## TODO: ...
+sub _scan_sort ($\@) {
+  #my $self = shift;
+  @{$_[1]};
 }
 
 =item $option-value = $p->option ($option-name)
@@ -557,31 +592,16 @@ as parameter when setting.
 
 =cut
 
-sub option ($;$%) {
+## $self->_option_recursive (\%argv)
+sub _option_recursive ($\%) {
   my $self = shift;
-  my $format = $self->{option}->{format};
-  $self->SUPER::option (@_);
-  if ($format ne $self->{option}->{format}) {
-    $self->scan (sub {
-      if (ref $_[1]) {
-        $_[1]->option (-format => $self->{option}->{format});
-      }
-    });
+  my $o = shift;
+  for (@{$self->{ $self->{option}->{_HASH_NAME} }}) {
+    $_->{value}->option (%$o) if ref $_ && ref $_->{value};
   }
 }
 
 ## value_type: Inherited
-
-sub value_unsafe_rule ($$;$%) {
-  my $self = shift;
-  if (@_ == 1) {
-    return $self->{option}->{parameter_value_unsafe_rule}->{ $_[0] };
-  }
-  while (my ($name, $value) = splice (@_, 0, 2)) {
-    $name = $self->_n11n_param_name ($name);
-    $self->{option}->{parameter_value_unsafe_rule}->{$name} = $value;
-  }
-}
 
 =item $clone = $p->clone ()
 
@@ -589,33 +609,7 @@ Returns a copy of the object.
 
 =cut
 
-sub clone ($) {
-  my $self = shift;
-  $self->_delete_empty;
-  my $clone = $self->SUPER::clone;
-  $clone->{param} = Message::Util::make_clone ($self->{param});
-  $clone->{value_type} = Message::Util::make_clone ($self->{value_type});
-  $clone;
-}
-
-sub _delete_fws ($$) {
-  my $self = shift;
-  my $body = shift;
-  $body =~ s{($REG{quoted_string}|$REG{domain_literal})|((?:$REG{token}|$REG{S_encoded_word})(?:$REG{WSP}+(?:$REG{token}|$REG{S_encoded_word}))+)|$REG{WSP}+}{
-    my ($o,$p) = ($1,$2);
-    if ($o) {$o}
-    elsif ($p) {$p=~s/$REG{WSP}+/\x20/g;$p}
-    else {''}
-  }gex;
-  $body;
-}
-
-sub _n11n_param_name ($$) {
-  my $self = shift;
-  my $s = shift;
-  $s = lc $s unless $self->{option}->{parameter_name_case_sensible};
-  $s;
-}
+## Inherited
 
 =head1 LICENSE
 
@@ -639,7 +633,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/23 12:10:16 $
+$Date: 2002/06/29 09:31:45 $
 
 =cut
 

@@ -8,8 +8,8 @@ Internet message C<Content-Type:> field body
 
 package Message::Field::ContentType;
 use strict;
-use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use vars qw(%DEFAULT @ISA %REG $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::ValueParams;
 push @ISA, qw(Message::Field::ValueParams);
 require Message::MIME::MediaType;
@@ -22,6 +22,49 @@ require Message::MIME::MediaType;
 	## param, parameter
 	## M_parameter, M_parameter_name, M_parameter_extended_value
 
+%DEFAULT = (
+	#_HASH_NAME
+	#_MEMBERS
+	#_METHODS
+	#accept_coderange
+	#encoding_after_encode
+	#encoding_before_decode
+	#field_param_name
+	#field_name
+	#field_ns
+	#format
+	#header_default_charset
+	#header_default_charset_input
+	#hook_encode_string
+	#hook_decode_string
+	-media_type_default	=> 'text',
+	-media_subtype_default	=> 'plain',
+	#output_comment
+	-output_parameter_extension	=> 1,
+	#parameter_rule
+	#parameter_attribute_case_sensible
+	#parameter_attribute_unsafe_rule
+	#parameter_av_Mrule
+	#parameter_no_value_attribute_unsafe_rule
+	#parameter_value_max_length
+	#parameter_value_split_length
+	#parameter_value_unsafe_rule
+	#parse_all
+    -rfc1049_vs_mime =>
+    	{postscript	=> 'application/postscript',
+    	scribe	=> 'application/x-scribe',
+    	sgml	=> 'application/sgml',	## text/sgml
+    	troff	=> 'application/x-troff',
+    	dvi	=> 'application/x-dvi',
+    	text	=> 'text/plain',
+    },
+	#separator
+	#separator_rule
+	#use_comment
+	-use_mime_text_alternate	=> 1,
+	#use_parameter_extension
+	#value_type
+);
 
 =head1 CONSTRUCTORS
 
@@ -35,48 +78,17 @@ The following methods construct new objects:
 sub _init ($;%) {
   my $self = shift;
   my %options = @_;
-  my %DEFAULT = (
-    -_MEMBERS	=> [qw/media_type media_subtype not_mime_text/],
-    #delete_fws	## Inheritted
-    #encoding_after_encode	## Inherited
-    #encoding_before_decode	## Inherited
-    #format	## Inherited
-    #hook_encode_string	## Inherited
-    #hook_decode_string	## Inherited
-    -media_type_default	=> 'text',
-    -media_subtype_default	=> 'plain',
-    #parameter_name_case_sensible	## Inherited
-    #parameter_value_max_length	## Inherited
-    #parse_all	## Inherited
-    -rfc1049_vs_mime =>
-    	{postscript	=> 'application/postscript',
-    	scribe	=> 'application/x-scribe',
-    	sgml	=> 'application/sgml',	## text/sgml
-    	troff	=> 'application/x-troff',
-    	dvi	=> 'application/x-dvi',
-    	text	=> 'text/plain',
-    },
-    -use_mime_text_alternate	=> 1,
-    -use_parameter_extension	=> 1,
-    #value_type	## Inherited
-  );
+  $self->SUPER::_init (%DEFAULT, %options);
+  push @{$self->{option}->{_MEMBERS}}, qw/media_type media_subtype not_mime_text/;
   $self->SUPER::_init (%DEFAULT, %options);
   
-  $self->{option}->{use_mime_text_alternate} = 0
-    if $self->{option}->{format} =~ /http/;
-}
-
-## Initialization for new () method.
-sub _initialize_new ($;%) {
-  my $self = shift;
+  if ($self->{option}->{format} =~ /http/) {
+    $self->{option}->{use_mime_text_alternate} = 0;
+    $self->{option}->{output_parameter_extension} = 0;
+  }
   $self->{media_type} = $self->{option}->{media_type_default};
   $self->{media_subtype} = $self->{option}->{media_subtype_default};
 }
-
-## Initialization for parse () method.
-#sub _initialize_parse ($;%) {
-  ## Inherited
-#}
 
 =item $ct = Message::Field::ContentType->new ([%options])
 
@@ -96,60 +108,48 @@ some options as parameters to the constructor.
 
 ## Inherited
 
-sub _save_param ($@) {
+## $self->_save_parameters (\@parameter, \%option)
+## -- Save parameters in $self
+sub _save_parameters ($\@\%) {
   my $self = shift;
-  my @p = @_;
-  if (@p == 0) {
-    $self->{media_type} = $self->{option}->{media_type_default};
-    $self->{media_subtype} = $self->{option}->{media_subtype_default};
-    return;
-  }
-  my $media_type;
-  if ($p[0]->[1]->{is_parameter} == 0) {
-    $media_type = shift (@p)->[0] || '';
-    if ($media_type =~ m#^($REG{token})/($REG{token})$#) {
+  my ($param, $option) = @_;
+  if ($param->[0]->{no_value}) {
+    my $type = shift (@$param)->{attribute};
+    if ($type =~ m#^application/x-(text|message)#) {
+      my $mt = $1;
+      for (@$param) {
+        if ($_->{attribute} eq 'media-subtype') {
+          $self->{media_type} = $mt;
+          $self->{media_subtype} = $_->{value};
+          $self->{not_mime_text} = 1;
+          undef $_; last;
+        }
+      }
+    } elsif ($type =~ m#^($REG{token})/($REG{token})$#) {
       $self->{media_type} = lc $1;
       $self->{media_subtype} = lc $2;
-    } elsif ($self->{option}->{rfc1049_vs_mime}->{lc $media_type}) {
-      ($self->{media_type},$self->{media_subtype}) = ($1,$2)
-        if $self->{option}->{rfc1049_vs_mime}->{lc $media_type}
-           =~ m#^($REG{token})/($REG{token})$#;
-      push @p, ['x-rfc1049-type', {value => $media_type,
-        is_parameter => 1}] if $media_type;
-      push @p, ['x-rfc1049-ver-num', {value => shift (@p)->[0],
-        is_parameter => 1}] if $p[0]->[1]->{is_parameter} == 0;
-      push @p, ['x-rfc1049-resource-ref', {value => shift (@p)->[0],
-        is_parameter => 1}] if $p[0]->[1]->{is_parameter} == 0;
+    } elsif ($self->{option}->{rfc1049_vs_mime}->{ lc $type }
+      =~ m#^($REG{token})/($REG{token})$#) {
+      ($self->{media_type}, $self->{media_subtype}) = ($1, $2);
+      push @$param, {attribute => 'x-rfc1049-type', value => $type};
+      if ($param->[0]->{no_value}) {
+        push @$param, {attribute => 'x-rfc1049-ver-num',
+                       value => shift (@$param)->{attribute}};
+        if ($param->[0]->{no_value}) {
+          push @$param, {attribute => 'x-rfc1049-resource-ref',
+                    value => shift (@$param)->{attribute}};
+        }
+      }
     } else {
-      push @p, ['x-invalid-media-type', {value => $media_type,
-        is_parameter => 1}] if $media_type;
+      push @$param, {attribute => 'x-invalid-media-type', value => $type};
       $self->{media_type} = 'application';
       $self->{media_subtype} = 'octet-stream';
     }
+  } else {
+    $self->{media_type} = 'application';
+    $self->{media_subtype} = 'octet-stream';
   }
-  unless ($media_type) {
-    $media_type  = $self->{option}->{media_type_default}
-              .'/'.$self->{option}->{media_subtype_default};
-    $self->{media_type} = $self->{option}->{media_type_default};
-    $self->{media_subtype} = $self->{option}->{media_subtype_default};
-  }
-  if ($media_type =~ m#^application/x-(?:text|message)#) {
-    my $mt = $1;
-    for (@p) {
-      if ($_->[0] eq 'media-subtype') {
-        $self->{media_type} = $mt;
-        $self->{media_subtype} = $_->[1]->{value};
-        $self->{not_mime_text} = 1;
-        undef $_;
-        last;
-      }
-    }
-  }
-  $self->_delete_empty;
-  $self->_parse_param_value (\@p) if $self->{option}->{parse_all};
-  $self->{param} = \@p;
-  #$self->SUPER::_save_param (@p);
-  $self;
+  $self->SUPER::_save_parameters ($param, $option);
 }
 
 =back
@@ -199,13 +199,7 @@ Returns C<field-body> as a string.
 
 =cut
 
-sub stringify ($;%) {
-  my $self = shift;
-  my $param = $self->SUPER::stringify_params (@_);
-  $self->_mime_type ().(length $param? '; '.$param: '');
-}
-
-sub _mime_type ($) {
+sub stringify_value ($) {
   my $self = shift;
   my $media_type = $self->media_type;
   ## See also Message::Entity::_encode_body
@@ -269,7 +263,6 @@ sub media_type_minor ($;$) {
 }
 *media_subtype = \&media_type_minor;
 *value = \&media_type;
-*value_as_string = \&media_type;
 
 sub not_mime_text ($;$) {
   my $self = shift;
@@ -415,7 +408,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/23 12:10:16 $
+$Date: 2002/06/29 09:31:45 $
 
 =cut
 

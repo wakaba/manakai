@@ -8,11 +8,49 @@ Internet message C<X-Moe:> field body items
 
 package Message::Field::XMoe;
 use strict;
-use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use vars qw(%DEFAULT @ISA %REG $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::ValueParams;
 push @ISA, qw(Message::Field::ValueParams);
-*REG = \%Message::Field::Params::REG;
+*REG = \%Message::Field::ValueParams::REG;
+$REG{MS_parameter_avpair_noslash} = qr/([^\x22\x2F\x3C\x3D]+)=([\x00-\xFF]*)/;
+
+%DEFAULT = (
+	#_HASH_NAME
+	#_MEMBERS
+	#_METHODS
+	#accept_coderange
+	#encoding_after_encode
+	#encoding_before_decode
+	#field_param_name
+	#field_name
+	#field_ns
+	#format
+	#header_default_charset
+	#header_default_charset_input
+	#hook_encode_string
+	#hook_decode_string
+	#output_comment
+	-output_parameter_extension	=> 1,
+	#parameter_rule
+	#parameter_attribute_case_sensible
+	#parameter_attribute_unsafe_rule
+	-parameter_av_Mrule	=> 'MS_parameter_avpair_noslash',
+	#parameter_no_value_attribute_unsafe_rule
+	#parameter_value_max_length
+	#parameter_value_split_length
+	#parameter_value_unsafe_rule
+	#parse_all
+	#separator
+	#separator_rule
+	-use_comment	=> 1,
+	-use_parameter_extension	=> 1,
+	-value_case_sensible	=> 0,
+	-value_default	=> '',
+	-value_style	=> 'slash',	## name / slash / at
+	#value_type
+	-value_unsafe_rule	=> 'NON_http_attribute_char',
+);
 
 =head1 CONSTRUCTORS
 
@@ -26,36 +64,8 @@ The following methods construct new objects:
 sub _init ($;%) {
   my $self = shift;
   my %options = @_;
-  my %DEFAULT = (
-    #delete_fws
-    #encoding_after_encode
-    #encoding_before_decode
-    #field_name
-    #field_param_name
-    #format
-    #hook_encode_string
-    #hook_decode_string
-    #parameter_name_case_sensible
-    -parameter_rule	=> 'param_free',
-    #parameter_value_max_length
-    #parse_all
-    -use_parameter_extension	=> 1,
-    -value_default	=> 'Moe',
-    -value_style	=> 'slash',	## name / slash / at
-    #value_type
-  );
   $self->SUPER::_init (%DEFAULT, %options);
 }
-
-## Initialization for new () method.
-#sub _initialize_new ($;%) {
-#  my $self = shift;
-#}
-
-## Initialization for parse () method.
-#sub _initialize_parse ($;%) {
-  ## Inherited
-#}
 
 =item $moe = Message::Field::XMoe->new ([%options])
 
@@ -75,29 +85,33 @@ some options as parameters to the constructor.
 
 ## Inherited
 
-sub _restore_param ($@) {
+
+## $self->_decode_parameters (\@parameter, \%option)
+## -- join RFC 2231 splited fragments and decode each parameter
+sub _decode_parameters ($\@\%) {
   my $self = shift;
-  my @p = @_;
-  my ($name, $from) = ('', '');
-  if ($p[0]->[1]->{is_parameter} == 0) {
-    $name = shift (@p)->[0];
+  my ($param, $option) = @_;
+  if ($param->[0]->{no_value} && $param->[0]->{charset} eq '*bare') {
+    my $name = shift (@$param)->{attribute};
+    my $from = '';
     if ($name =~ m#^((?:$REG{quoted_string}|[^\x22\x2F])+)/((?:$REG{quoted_string}|[^\x22])+)$#) {
       ($from, $name) = ($1, $2);
     } elsif ($name =~ m#^((?:$REG{quoted_string}|[^\x22\x40])+)$REG{FWS}\@$REG{FWS}((?:$REG{quoted_string}|[^\x22])+)$#) {
       ($name, $from) = ($1, $2);
     }
+    $name =~ s/^$REG{WSP}+//; $name =~ s/$REG{WSP}+$//;
     $self->{value} = Message::Util::decode_quoted_string ($self, $name);
-    $from = Message::Util::decode_quoted_string ($self, $from) if $from;
+    $from =~ s/^$REG{WSP}+//; $from =~ s/$REG{WSP}+$//;
+    $from = Message::Util::decode_quoted_string ($self, $from) if length $from;
     if (length $from) {
-      push @p, [of => {value => $from, is_parameter => 1, is_internal => 1}];
+      push @$param, {attribute => 'of', value => $from};
     }
+  } elsif ($param->[0]->{no_value}) {	## was A quoted-string
+    my %s = &{$option->{hook_decode_string}}
+        ($self, shift (@$param)->{attribute}, type => 'phrase/quoted-string');
+    $self->{value} = $s{value};
   }
-  $self->SUPER::_restore_param (@p);
-}
-
-sub _save_param ($@) {
-  my $self = shift;
-  $self->SUPER::__save_param (@_);
+  $self->SUPER::_decode_parameters ($param, $option);
 }
 
 =back
@@ -135,6 +149,15 @@ Returns (and set) C<$index>'th C<parameter>'s value.
 ## replace, add, count, parameter, parameter_name, parameter_value: Inherited.
 ## (add should not be used for these field)
 
+sub value ($;$) {
+  my $self = shift;
+  my $new_value = shift;
+  if (defined $new_value) {
+    $self->{value} = $new_value;
+  }
+  $self->{value};
+}
+
 =item $field-body = $moe->stringify ()
 
 Returns C<field-body> as a string.
@@ -144,48 +167,37 @@ Returns C<field-body> as a string.
 sub stringify ($;%) {
   my $self = shift;
   my $param = $self->SUPER::stringify_params (@_);
-  my $name = $self->value_as_string || $self->{option}->{value_default};
-  if ($self->{option}->{value_style} eq 'slash') {
-    my %e = &{$self->{option}->{hook_encode_string}} ($self, 
-            $self->parameter ('of') || '', type => 'phrase');
-    my $v = Message::Util::quote_unsafe_string ($e{value}, 
-          unsafe => 'NON_http_token_wsp');
+  my %o = @_; my %option = %{$self->{option}};
+  for (grep {/^-/} keys %o) {$option{substr ($_, 1)} = $o{$_}}
+  my $name = $self->stringify_value || $option{value_default};
+  if ($option{value_style} eq 'slash') {
+    my %e = &{$option{hook_encode_string}}
+      ($self,$self->parameter ('of') || '', type => 'parameter/value/quoted-string');
+    my $v = Message::Util::quote_unsafe_string
+      ($e{value}, unsafe => 'NON_http_token_wsp');
     $name = $v.'/'.$name if length $v;
-  } elsif ($self->{option}->{value_style} eq 'at') {
-    my %e = &{$self->{option}->{hook_encode_string}} ($self, 
-            $self->parameter ('of') || '', type => 'phrase');
-    my $v = Message::Util::quote_unsafe_string ($e{value}, 
-          unsafe => 'NON_http_token_wsp');
+  } elsif ($option{value_style} eq 'at') {
+    my %e = &{$option{hook_encode_string}}
+      ($self,$self->parameter ('of') || '', type => 'parameter/value/quoted-string');
+    my $v = Message::Util::quote_unsafe_string
+      ($e{value}, unsafe => 'NON_http_token_wsp');
     $name .= ' @ '.$v if length $v;
   }
   $name.(length $param? '; '.$param: '');
 }
 
-sub _stringify_params_check ($$$) {
+## $self->_stringify_param_check (\%item, \%option)
+## -- Checks parameter (and modify if necessary).
+##    Returns either 1 (ok) or 0 (don't output)
+sub _stringify_param_check ($\%\%) {
   my $self = shift;
-  my ($name, $value) = @_;
-  if ($self->{option}->{value_style} eq 'slash'
-   || $self->{option}->{value_style} eq 'at') {
-    return 0 if $name eq 'of' && $value->{is_parameter};
+  my ($item, $option) = @_;
+  if ($option->{value_style} eq 'slash' || $option->{value_style} eq 'at') {
+    return (0) if $item->{attribute} eq 'of' && !$item->{no_value};
   }
-  1;
+  (1, $item);
 }
 
-sub value ($;$) {
-  my $self = shift;
-  my $new_value = shift;
-  if (defined $new_value) {
-    $self->{value} = $new_value;
-  }
-  $self->{value};
-}
-sub value_as_string ($) {
-  my $self = shift;
-  my %e = &{$self->{option}->{hook_encode_string}} ($self, 
-            $self->{value}, type => 'phrase');
-  Message::Util::quote_unsafe_string ($e{value}, 
-          unsafe => 'NON_http_token_wsp');
-}
 
 =item $option-value = $moe->option ($option-name)
 
@@ -230,7 +242,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/04 06:03:58 $
+$Date: 2002/06/29 09:31:46 $
 
 =cut
 

@@ -9,7 +9,7 @@ Message Structured Header Field Bodies
 package Message::Field::Structured;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 use overload '""' => sub { $_[0]->stringify },
              '.=' => sub { $_[0]->value_append ($_[1]) },
@@ -297,12 +297,26 @@ sub replace ($$$%) {
   }
 }
 
+## $self->_replace_cleaning
+## -- Cleans the array/hash before replacing
 sub _replace_cleaning ($) {
   $_[0]->_delete_empty;
 }
+#*_replace_cleaning = \&_delete_empty;
+	## Be not aliasing for inheriting class
+
+## (1/0, $name => $value) = $self->_replace_array_check ($value, \%option)
+## -- Checks given value and prepares saving value (array version)
+##    Note that $name of return value is used as key for _replace_array_shift.
+##    Usually, it is same as $value.
+## Note: In many case, same code as _add_array_check can be used.
 sub _replace_array_check ($$\%) {
   shift; 1, $_[0] => $_[0];
 }
+
+## $value = $self->_replace_array_shift (\%values, $name, $option)
+## -- Returns a value (from %values, with key of $name) and deletes 
+##    it from %values (like CORE::shift for array) (array version)
 sub _replace_array_shift ($\%$\%) {
   shift; my $r = shift;  my $n = $_[0]->[0];
   if ($$r{$n}) {
@@ -312,9 +326,17 @@ sub _replace_array_shift ($\%$\%) {
   }
   undef;
 }
+
+## (1/0, $name => $value) = $self->_replace_hash_check ($name => $value, \%option)
+## -- Checks given value and prepares saving value (hash version)
+## Note: In many case, same code as _add_hash_check can be used.
 sub _replace_hash_check ($$$\%) {
   shift; 1, $_[0] => [@_[0,1]];
 }
+
+## $value = $self->_replace_hash_shift (\%values, $name, $option)
+## -- Returns a value (from %values, with key of $name) and 
+##    deletes it from %values (like CORE::shift for array) (hash version)
 sub _replace_hash_shift ($\%$\%) {
   shift; my $r = shift;  my $n = $_[0]->[0];
   if ($$r{$n}) {
@@ -324,11 +346,15 @@ sub _replace_hash_shift ($\%$\%) {
   }
   undef;
 }
-## Returns returned item value    \$item-value, \%option
+
+## $value = $self->_replace_return_value (\$item, \%option)
+## -- Returns returning value of replace method
+## Note: Usually this can share code with _item_return_value.
 sub _replace_return_value ($\$\%) {
   $_[1];
 }
 
+## TODO: Implement count by any and merge with item_exist
 sub count ($;%) {
   my $self = shift; my %option = @_;
   my $array = $self->{option}->{_ARRAY_NAME}
@@ -341,9 +367,13 @@ sub count ($;%) {
   return $self->_count_by_name ($array => \%option) if defined $option{-name};
   $#{$self->{$array}} + 1;
 }
+
+## $self->_count_cleaning
+## -- Cleans the array/hash before counting
 sub _count_cleaning ($) {
   $_[0]->_delete_empty;
 }
+
 sub _count_by_name ($$\%) {
   # my $self = shift;
   # my ($array, $option) = @_;
@@ -377,9 +407,22 @@ sub delete ($@) {
   $self->_delete_cleaning;
 }
 
-## delete-by?, \$checked-item, \%delete-list, \%option
+## 1/0 = $self->_delete_match ($by, \$item, \%delete_list, \%option)
+## -- Checks and returns whether given item is matched with
+##    deleting item list
+## Note: Usually this code can be shared with _item_match.
+## Note: $by eq 'index' is already defined in delete method
+##       itself, so in this function it need not be checked.
 sub _delete_match ($$\$\%\%) {
-  0 #return 1 / 0
+  my $self = shift;
+  my ($by, $item, $list, $option) = @_;
+  return 0 unless ref $$item;	## Already removed
+  ## An example definition
+  if ($by eq 'name') {
+    $$item->{value} = $self->_parse_value ($$item->{type}, $$item->{value});
+    return 1 if ref $$item->{value} && $$list{ $$item->{value}->{name} };
+  }
+  0;
 }
 
 sub _delete_cleaning ($) {
@@ -395,7 +438,8 @@ sub _delete_empty ($) {
 
 sub item ($$;%) {
   my $self = shift;
-  my ($name, %p) = (shift, @_);	## BUG: don't support -by
+  my ($name, %p) = (shift, @_);
+  ## BUG: don't support -by
   return $self->replace ($name => $p{-value}, @_) if defined $p{-value};
   my %option = %{$self->{option}};
   $option{new_item_unless_exist} = 1;
@@ -459,17 +503,36 @@ sub item_exist ($$;%) {
   0;
 }
 
-## item-by?, \$checked-item, {item-key => 1}, \%option
+## 1/0 = $self->_item_match ($by, \$item, \%delete_list, \%option)
+## -- Checks and returns whether given item is matched with
+##    returning item list
+## Note: $by eq 'index' is already defined in delete method
+##       itself, so in this function it need not be checked.
 sub _item_match ($$\$\%\%) {
-  0 #return 1 / 0
+  my $self = shift;
+  my ($by, $item, $list, $option) = @_;
+  return 0 unless ref $$item;	## Removed
+  ## An example definition
+  if ($by eq 'name') {
+    $$item->{value} = $self->_parse_value ($$item->{type}, $$item->{value});
+    return 1 if ref $$item->{value} && $$list{ $$item->{value}->{name} };
+  }
+  0;
 }
 
-## Returns returned item value    \$item-value, \%option
+## $value = $self->_item_return_value (\$item, \%option)
+## -- Returns returning value of item method
 sub _item_return_value ($\$\%) {
   $_[1];
 }
 
-## Returns returned (new created) item value    $name, \%option
+## $item = $self->_item_new_value ($name, \%option)
+## -- Returns new item with key of $name (called when
+##    no returned value is found and -new_value_unless_exist
+##    option is true)
+##    (Note that the kind of key ('by' option) can be getten
+##    from $option->{by})
+##    Return undef when new value can't be generated.
 sub _item_new_value ($$\%) {
   $_[1];
 }
@@ -759,7 +822,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/23 12:10:16 $
+$Date: 2002/06/29 09:31:46 $
 
 =cut
 
