@@ -29,7 +29,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/02 08:55:26 $
+     $Date: 2004/09/08 05:38:38 $
   @Require:
     @@Module:
       @@@Def:
@@ -277,9 +277,13 @@ DataType:
         The number of 16-bit units (i.e. the number of octets
         in the UTF-16BE representation of the string).
         \
-        This attribute is taken from the DOM CharacterData interface.
+        This attribute is taken from the DOM CharacterData interface
+        and ECMAScript String object.
     @@Get:
       @@@Type: unsignedLong
+      @@@Description:
+        @@@lang:en
+        @@@@: The number of 16-bit units.
       @@@InCase:
         @@@@Value: 0
         @@@@Description:
@@ -289,8 +293,8 @@ DataType:
         @@@@Type:
           lang:Perl
         @@@@@:
-          #$r = length ($self->__INT{valueUTF16BE}__) / 2;
-          $r = length $self->{value};
+          #$r = CORE::length ($self->__INT{valueUTF16BE}__) / 2;
+          $r = CORE::length $self->{value};
           while ($self->{value} =~ /[\x{10000}-\x{10FFFF}]/g) {
             $r++;
           }
@@ -350,7 +354,7 @@ DataType:
         @@@@@:
           use integer;
           pos ($self->{value}) = 0;
-          while ($offset and pos $self->{value} <= length $self->{value}) {
+          while ($offset and pos $self->{value} <= CORE::length $self->{value}) {
             if ($self->{value} =~ /[^\x{10000}-\x{10FFFF}]{1,$offset}/gc) {
               $offset -= $+[0] - $-[0];
             } elsif ($self->{value}
@@ -465,7 +469,7 @@ DataType:
           lang:Perl
         @@@@cast-input: 0
         @@@@@:
-          if ($offset < 0 or $offset > length $self->{value} or
+          if ($offset < 0 or $offset > CORE::length $self->{value} or
               $offset > $self->__INT{length}__) {
             __EXCEPTION{DOMException.INDEX_SIZE_ERR:
               <Q:ManakaiDOMImplementationException:param-name> => 'offset',
@@ -542,7 +546,7 @@ DataType:
           lang:Perl
         @@@@cast-input: 0
         @@@@@:
-          if ($offset < 0 or $offset > length $self->{value} or
+          if ($offset < 0 or $offset > CORE::length $self->{value} or
               $offset > $self->__INT{length}__) {
             __EXCEPTION{DOMException.INDEX_SIZE_ERR:
               <Q:ManakaiDOMImplementationException:param-name> => 'offset',
@@ -569,7 +573,7 @@ DataType:
                                  =~ /[\x{10000}-\x{10FFFF}]/) {
                 substr ($self->{value}, $offset, $count) = $arg;
                 last REPLACE;
-              } elsif (length $self->{value} < $offset + $count) {
+              } elsif (CORE::length $self->{value} < $offset + $count) {
                 substr ($self->{value}, $offset) = $arg;
                 last REPLACE;
               } else {
@@ -664,7 +668,7 @@ DataType:
         @@@@Type:
           lang:Perl
         @@@@@:
-          if ($offset < 0 or $offset > length $self->{value} or
+          if ($offset < 0 or $offset > CORE::length $self->{value} or
               $offset > $self->__INT{length}__) {
             __EXCEPTION{DOMException.INDEX_SIZE_ERR:
               <Q:ManakaiDOMImplementationException:param-name> => 'offset',
@@ -691,7 +695,7 @@ DataType:
                                  =~ /[\x{10000}-\x{10FFFF}]/) {
                 $r = substr ($self->{value}, $offset, $count);
                 last SUBSTR;
-              } elsif (length $self->{value} < $offset + $count) {
+              } elsif (CORE::length $self->{value} < $offset + $count) {
                 $r = substr ($self->{value}, $offset);
                 last SUBSTR;
               } else {
@@ -790,27 +794,27 @@ DataType:
   @Description:
     @@lang:en
     @@@: An absolute or relative time.  A number of milliseconds.
-  @IntAttr:
-    @@Name: unixTime
-    @@Description:
-      @@@lang:en
-      @@@@: A number of seconds from the Epoch (i.e. 1970-01-01T00:00:00Z).
-    @@Get:
-      @@@Type: unsigned-long
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          use integer;
-          $r = ($$self / 1000) - $EPOCH;
-## TODO: Define $EPOCH
-    @@Set:
-      @@@Type: unsigned-long
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          $$self = $given * 1000 + $EPOCH;
+#  @IntAttr:
+#    @@Name: unixTime
+#    @@Description:
+#      @@@lang:en
+#      @@@@: A number of seconds from the Epoch (i.e. 1970-01-01T00:00:00Z).
+#    @@Get:
+#      @@@Type: unsigned-long
+#      @@@Def:
+#        @@@@Type:
+#          lang:Perl
+#        @@@@@:
+#          use integer;
+#          $r = ($$self / 1000) - $EPOCH;
+### TODO: Define $EPOCH
+#    @@Set:
+#      @@@Type: unsigned-long
+#      @@@Def:
+#        @@@@Type:
+#          lang:Perl
+#        @@@@@:
+#          $$self = $given * 1000 + $EPOCH;
   @IntAttr:
     @@Name: millisecond
     @@Description:

@@ -7,6 +7,10 @@ Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
   @ManakaiDOMImplementationException:
      http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @MDOM_EXCEPTION:
+     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @TreeCore:
+     \
 Module:
   @Name: ManakaiDOM
   @FullName:
@@ -22,7 +26,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/02 08:55:26 $
+     $Date: 2004/09/08 05:38:38 $
 
   @Require:
     @@Module:
@@ -56,37 +60,48 @@ Module:
         @@@@lang:en
         @@@@@: Dummy.
 
-  @ConditionDef:
-    @@Name: DOM1
-  @ConditionDef:
-    @@Name: DOM2
-  @NormalCondition: DOM2
-
 Exception:
   @Name: ManakaiDOMImplementationException
-  @Description:
-    @@lang:en
-     @@@:
-       ManakaiDOMImplementationException is the class of 
-       exceptions that reports 
 
   @Attr:
      @@Name:  code
      @@Get:
        @@@Type:  unsigned-short
+       @@@Description:
+         @@@@lang:en
+         @@@@@:
+           The error code from the constant value group
+           ManakaiDOMImplementationExceptionCode.
 
   @ConstGroup:
     @@Name: ManakaiDOMImplementationExceptionCode
 
     @@Const:
       @@@Name: PARAM_INVALID_CLASS
-      @@@Type: unsigned-long
+      @@@Type: unsigned-short
       @@@Value: 0
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The perameter value must be of some class (interface),
+          The parameter value must be of some class (interface),
           but given value does not.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The parameter%t (name => {<Q:MDOM_EXCEPTION:param-name>}, 
+            prefix => { "}, suffix => {"'s}) value must be an 
+            instance of the class%t (name => {<Q:MDOM_EXCEPTION:class>}, 
+            prefix => { "}, suffix => {"}).
+      @@@Param:
+        @@@@QName:
+          ManakaiDOMImplementationException:param-name
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The parameter name.
+          
       @@@Param:
         @@@@QName:
           ManakaiDOMImplementationException:class
@@ -95,10 +110,11 @@ Exception:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: Class name to which given value belongs.
+          
 
     @@Const:
       @@@Name: PARAM_NULL_POINTER
-      @@@Type: unsigned-long
+      @@@Type: unsigned-short
       @@@Value: 1
       @@@Description:
         @@@@lang:en
@@ -130,6 +146,7 @@ Exception:
     @@Const:
       @@@Name: MDOM_DEBUG_BUG
       @@@Type: unsigned-long
+      @@@Value: 3
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -138,17 +155,30 @@ Exception:
         @@@@QName:
           ManakaiDOMImplementationException:values
         @@@@Type: 
-          Perl:hash
+          perl:hash
         @@@@Description:
           @@@@@lang:en
           @@@@@@: Arbitrary values for debugging.
+
+Warning:
+  @Name: ManakaiDOMImplementationWarning
+  
+  @Attr:
+     @@Name:  code
+     @@Get:
+       @@@Type:  unsigned-short
+       @@@Description:
+         @@@@lang:en
+         @@@@@:
+           The warning code from the constant value group
+           ManakaiDOMImplementationWarningCode.
 
   @ConstGroup:
     @@Name: ManakaiDOMImplementationWarningCode
     
     @@Const:
       @@@Name: ATTR_SET_NO_EFFECT
-      @@@Type: unsigned-long
+      @@@Type: unsigned-short
       @@@Value: 0
       @@@Description:
         @@@@lang:en
@@ -156,37 +186,55 @@ Exception:
           Setting an attribute value has no effect by definition.
 
 IF:
-  @Name: ManakaiDOMTreeNode
+  @Name: ManakaiDOMObject
   @Description:
     @@lang:en
     @@@:
-      The ManakaiDOMTreeNode interface defines the basic tree-node
-      operations.
-      \
-      Strictly, the ManakaiDOMTreeNode object is not the node itself,
-      rather a reference to the node.
+      The ManakaiDOMObject interface is the common interface that is 
+      implemented by all Manakai DOM objects.
+
+# ___report_error
+
+IF:
+  @Name: ManakaiDOMNodeObject
+  @Description:
+    @@lang:en
+    @@@:
+      The ManakaiDOMNodeObject interface defines a number of basic 
+      operations to the node or the grove.  It is intended to be 
+      implemented by the (actual) node objects.  (Note that in the 
+      manakai DOM implementation, most of DOM objects such as of the
+      DOM Node interface are implemented as a reference to the node 
+      in fact.)
   @IntMethod:
     @@Name: new
     @@Description:
       @@@lang:en
-      @@@@: Return a reference to the new node.
+      @@@@: 
+        Construct a new ManakaiDOMNodeObject object.
     @@Return:
-      @@@Type: ManakaiDOMTreeNode
+      @@@Type: ManakaiDOMNodeObject
       @@@Description:
         @@@@lang:en
-        @@@@@: A reference to the new node.
+        @@@@@: The new node created.
       @@@Def:
         @@@@Type:
           lang:Perl
         @@@@@:
-          $r = bless {object => {rc => 1}}, $self;
+          $r = bless {
+            <Q:TreeCore:origin> => [],
+            <Q:TreeCore:subnode> => [],
+            <Q:TreeCore:rc> => 0,
+            <Q:TreeCore:treeID> => __CODE{UniqueID}__,
+            <Q:TreeCore:nodeID> => __CODE{UniqueID}__,
+          }, $self;
   @IntMethod:
     @@Name: newReference
     @@Description:
       @@@lang:en
       @@@@: Return a new reference to the node.
     @@Return:
-      @@@Type: ManakaiDOMTreeNode
+      @@@Type: ManakaiDOMNodeReference
       @@@Description:
         @@@@lang:en
         @@@@@: A new reference to the node.
@@ -194,13 +242,214 @@ IF:
         @@@@Type:
           lang:Perl
         @@@@@:
-          $self->{object}->{rc}++;
-          $r = bless {object => $self->{object}}, $self;
+          $r = bless {
+            <Q:TreeCore:node> => $self,
+          }, '__CLASS{ManakaiDOMNodeReference}__';
+          $self->{<Q:TreeCore:rc>}++;
+  @IntMethod:
+    @@Name: isExternallyReferred
+    @@Description:
+      @@@lang:en
+      @@@@: Check whether the tree is externally referred or not.
+    @@Return:
+      @@@Type: boolean
+      @@@InCase:
+        @@@@Value: true
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: There is a node referred externally.
+      @@@InCase:
+        @@@@Value: false
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: No external reference to the node in this tree found.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          if ($self->{<Q:TreeCore:rc>}) {
+            $r = true;
+          } else {
+            ## Up - toward root node
+            for my $key (@{$self->{<Q:TreeCore:origin>}}) {
+              if ($self->{$key}) {
+                if ($self->{$key}->__INT{isExternallyReferred}__) {
+                  $r = true;
+                  last;
+                }
+              }
+            }
+            ## Down - toward leaf nodes
+            unless (@{$self->{<Q:TreeCore:origin>}}) {
+              SUBNODES:
+              for my $key (@{$self->{<Q:TreeCore:subnode>}}) {
+                for (@{$self->{$key}}) {
+                  if ($_->__INT{isExternallyReferredDownward}__) {
+                    $r = true;
+                    last SUBNODES;
+                  }
+                }
+              }
+            }
+          }
+  @IntMethod:
+    @@Name: isExternallyReferredDownward
+    @@Description:
+      @@@lang:en
+      @@@@: Check whether the node or any of subnodes is externally referred.
+    @@Return:
+      @@@Type: boolean
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          if ($self->{<Q:TreeCore:rc>}) {
+            $r = true;
+          } else {
+            for my $key (@{$self->{<Q:TreeCore:subnode>}}) {
+              for (@{$self->{$key}}) {
+                if ($_->__INT{isExternallyReferredDownward}__) {
+                  $r = true;
+                  last SUBNODES;
+                }
+              }
+            }
+          }
   @IntMethod:
     @@Name: destroy
     @@Description:
       @@@lang:en
-      @@@@: Destroy this reference to the node object.
+      @@@@: Destroy this tree.
+    @@Return:
+      @@@Def:
+        @@@@Type: 
+          lang:Perl
+        @@@@@:
+          $_->__INT{destroyDownward}__ for @{$self->__INT{getRootNodes}__};
+  @IntMethod:
+    @@Name: destroyDownward
+    @@Description:
+      @@@lang:en
+      @@@@: Destroy this node and subnodes.
+    @@Return:
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          delete $self->{$_} for @{$self->{<Q:TreeCore:origin>}};
+          for my $key (@{$self->{<Q:TreeCore:subnode>}}) {
+            my @node = @{$self->{$key} || []};
+            delete $self->{$key};
+            $_->__INT{destroyDownward}__ for @node;
+          }
+  @IntMethod:
+    @@Name: importTree
+    @@Description:
+      @@@lang:en
+      @@@@: Change internal tree identifier to be same as this node.
+    @@Param:
+      @@@Name: node
+      @@@Type: ManakaiDOMNodeObject
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The node that belongs to the tree the identifier is changed.
+    @@Return:
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          unless ($node->{<Q:TreeCore:treeID>} ne $self->{<Q:TreeCore:treeID>}) {
+            $_->__INT{changeTreeIDDownward}__ ($self->{<Q:TreeCore:treeID>})
+              for @{$node->__INT{getRootNodes}__};
+          }
+  @IntMethod:
+    @@Name: changeTreeIDDownward
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Change internal tree identifier of the node and subnodes.
+        This method is intended to be used by the internal method 
+        importTree.
+    @@Param:
+      @@@Name: treeID
+      @@@Type: DOMString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The new tree identifier to which the tree identifier of this node
+          is changed.
+    @@Return:
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $self->{<Q:TreeCore:treeID>} = ''.$treeID;
+          for my $key (@{$self->{<Q:TreeCore:subnode>}}) {
+            for (@{$self->{$key}||[]}) {
+              $_->__INT{changeTreeIDDownward}__ ($treeID);
+            }
+          }
+  @IntMethod:
+    @@Name: getRootNodes
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Get all root nodes (i.e. nodes that does not have the origin) in 
+        the tree. 
+    @@Return:
+      @@@Type:
+        perl:ARRAY
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          for (@{$self->{<Q:TreeCore:origin>}}) {
+            NEW: for my $new (@{$_->__INT{getRootNodes}__}) {
+              for my $old (@$r) {
+                next NEW if $old eq $new;
+              }
+              push @$r, $new;
+            }
+          }
+  @IntMethod:
+    @@Name: isSameNode
+    @@Description:
+      @@@lang:en
+      @@@@: Check whether the two nodes are same or not.
+    @@Operator:
+      @@@Type:
+        lang:Perl
+      @@@@: eq
+    @@Param:
+      @@@Name: node
+      @@@Type: ManakaiDOMNodeObject
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The node to be compared.
+    @@Return:
+      @@@Type: boolean
+      @@@Description:
+        @@@@lang:en
+        @@@@@: Whether the two nodes are same or not.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          if (ref $node and
+              $node->isa ('__IF{ManakaiDOMNodeObject}__') and
+              $node->{<Q:TreeCore:nodeID>} eq $self->{<Q:TreeCore:nodeID>}) {
+            $r = true;
+          } else {
+            $r = false;
+          }
+
+IF:
+  @Name: ManakaiDOMNodeReference
+  @IntMethod:
+    @@Name: destroy
+    @@Description:
+      @@@lang:en
+      @@@@: Destroy this reference object.
     @@Operator:
       @@@Type:
         lang:Perl
@@ -210,8 +459,21 @@ IF:
         @@@@Type:
           lang:Perl
         @@@@@:
-          $self->{object}->{rc}--;
- ## TODO:
-          delete $self->{object};
-       
+          my $node = $self->{<Q:TreeCore:node>};
+          delete $self->{<Q:TreeCore:node>};
+          $node->{<Q:TreeCore:rc>}--;
+          unless ($node->__INT{isExternallyReferred}__) {
+            $node->__INT{destroy}__;
+          }
+
+## - For ManakaiDOMNodeObject
+## TreeCore:nodeID  - The world-unique node identifier.
+## TreeCore:origin  - The hash key names of the origin node properties.
+## TreeCore:rc      - The number that denotes there is how many external
+##                    references to the node.
+## TreeCore:subnode - The hash key names of the subnode properties.
+## TreeCore:treeID  - The world-unique tree identifier.
+## - For ManakaiDOMNodeReference
+## TreeCore:node    - The node to which referring.
+
 ## ManakaiDOM.dis ends here

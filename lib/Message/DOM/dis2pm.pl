@@ -24,10 +24,13 @@ use Message::Markup::XML::QName qw/DEFAULT_PFX/;
 use Message::Util::QName::General [qw/ExpandedURI/], {
   DOMMain => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#>,
   lang => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#>,
+  Perl => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl-->,
   license => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/license#>,
   ManakaiDOM => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#>,
+  MDOM_EXCEPTION => q<http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#>,
 };
 my $ManakaiDOMModulePrefix = q<Message::DOM>;
+my $MAX_DOM_LEVEL = 3;
 
 my $s;
 {
@@ -253,7 +256,7 @@ sub perl_code ($;%) {
       }      
     } elsif ($name eq 'CODE') { # Built-in code
       my ($nm, %param);
-      if ($data =~ s/^(\w+)\s*:\s*//) {
+      if ($data =~ s/^(\w+)\s*(?::\s*|$)//) {
         $nm = $1;
       } else {
         valid_err q<Built-in code name required>;
@@ -307,6 +310,16 @@ sub perl_builtin_code ($%) {
     $r =~ s/\$$opt{r} = \$$opt{s};/#/g if $opt{r} eq $opt{s};
     $r =~ s/'IF'/perl_literal (perl_package_name (if => 'DOMString'))/ge;
     $r =~ s/\$self\b/perl_literal (perl_package_name (name => 'DOMString'))/ge;
+  } elsif ($name eq 'UniqueID') {
+    $r = q{(
+      sprintf 'mid:%d.%d.%s.dom.manakai@suika.fam.cx',
+              time, $$,
+              ['A'..'Z', 'a'..'z', '0'..'9']->[rand 62] .
+              ['A'..'Z', 'a'..'z', '0'..'9']->[rand 62] .
+              ['A'..'Z', 'a'..'z', '0'..'9']->[rand 62] .
+              ['A'..'Z', 'a'..'z', '0'..'9']->[rand 62] .
+              ['A'..'Z', 'a'..'z', '0'..'9']->[rand 62]
+    )};
   } else {
     valid_err qq<Built-in code "$name" not defined>;
   }
@@ -322,14 +335,24 @@ sub perl_code_source ($%) {
     $opt{file} || $Info->{source_filename}, ++$Status->{generated_fragment};
 }
 
+sub perl_code_literal ($) {
+  my $s = shift;
+  bless \$s, '__code';
+}
+
 sub perl_literal ($) {
   my $s = shift;
-  if (ref $s eq 'ARRAY') {
+  unless (defined $s) {
+    impl_warn q<Undefined value is passed to perl_literal ()>;
+    return q<undef>;
+  } elsif (ref $s eq 'ARRAY') {
     return q<[> . perl_list (@$s) . q<]>;
   } elsif (ref $s eq 'HASH') {
     return q<{> . perl_list (%$s) . q<}>;
   } elsif (ref $s eq 'CODE') {
     impl_err q<CODE reference cannot be serialized>;
+  } elsif (ref $s eq '__code') {
+    return $$s;
   } else {
     $s =~ s/(['\\])/\\$1/g;
     return q<'> . $s . q<'>;
@@ -408,9 +431,17 @@ sub pod_paras ($) {
 sub pod_code ($) {
   my $s = shift;
   $s =~ s/([<>])/{'<' => 'E<lt>', '>' => 'E<gt>'}->{$1}/ge;
-  qq<S<C<$s>>>;
+  qq<C<$s>>;
 }
 
+
+sub muf_template ($) {
+  my $s = shift;
+  $s =~ s{<Q:([^>]+)>}{           ## QName
+    expanded_uri ($1)
+  }ge;
+  $s;
+}
 
 sub section (@) {
   my @r;
@@ -423,6 +454,7 @@ sub section (@) {
   }
   return @r;
 }
+
 
 sub rfc3339_date ($) {
   my @time = gmtime shift;
@@ -453,7 +485,10 @@ sub type_normalize ($) {
 sub type_label ($) {
   my $uri = type_normalize shift;
   if ($uri =~ /([\w_-]+)$/) {
-    return $1;
+    my $label = $1;
+    $label =~ s/--+/ /g;
+    $label =~ s/__+/ /g;
+    return $label;
   } else {
     return "<$uri>";
   }
@@ -470,11 +505,20 @@ sub ns_uri_to_perl_package_name ($) {
 
 sub ns_prefix_to_uri ($) {
   my $pfx = shift;
-  if ($Info->{Namespace}->{$pfx}) {
+  if (exists $Info->{Namespace}->{$pfx}) {
     return $Info->{Namespace}->{$pfx};
   } else {
     valid_err qq<Namespace prefix "$pfx" not declared>;
   }  
+}
+
+sub type_expanded_uri ($) {
+  my $qname = shift || '';
+  if ($qname =~ /^[a-z-]+$/) {
+    expanded_uri ("DOMMain:$qname");
+  } else {
+    expanded_uri ($qname);
+  }
 }
 
 sub expanded_uri ($) {
@@ -505,7 +549,7 @@ sub get_perl_definition_node ($%) {
   my $def = $node->get_element_by (sub {
     my ($me, $you) = @_;
     $you->local_name eq $ln and
-    expanded_uri $you->get_attribute_value ('Type', default => '')
+    type_expanded_uri $you->get_attribute_value ('Type', default => '')
       eq ExpandedURI q<lang:Perl> and
     condition_match ($you, %opt);
   }) || $node->get_element_by (sub {
@@ -516,7 +560,7 @@ sub get_perl_definition_node ($%) {
   }) || $node->get_element_by (sub {
     my ($me, $you) = @_;
     $you->local_name eq $ln and
-    expanded_uri $you->get_attribute_value ('Type', default => '')
+    type_expanded_uri $you->get_attribute_value ('Type', default => '')
       eq ExpandedURI q<lang:Perl> and
     condition_match ($you); # no condition specified
   }) || $node->get_element_by (sub {
@@ -556,7 +600,7 @@ sub get_level_description ($%) {
   my @l = @{$node->get_attribute_value ('Level', default => [], as_array => 1)};
   unless (@l) {
     my $min = $opt{level}->[0] || 1;
-    for ($min..3) {
+    for ($min..$MAX_DOM_LEVEL) {
       if ($Info->{Condition}->{'DOM' . $_}) {
         unshift @l, $_;
         last;
@@ -582,8 +626,12 @@ sub get_incase_label ($;%) {
   my $label = $node->get_attribute_value ('Label', default => '');
   unless (length $label) {
     $label = $node->get_attribute_value ('Value', default => undef); 
-    my $type = type_normalize expanded_uri $node->get_attribute_value
-                                              ('Type', default => 'DOMMain:any');
+    my $type = type_normalize
+                 type_expanded_uri
+                    ($node->get_attribute_value ('Type') ||
+                     $node->parent_node->get_attribute_value
+                                                ('Type',
+                                                 default => q<DOMMain:any>));
     if (defined $label) {
       if ($type eq ExpandedURI q<DOMMain:DOMString>) {
         $label = qq<"$label">;
@@ -599,7 +647,7 @@ sub get_incase_label ($;%) {
 sub get_value_literal ($%) {
   my ($node, %opt) = @_;
   my $value = get_perl_definition_node $node, %opt;
-  my $type = type_normalize expanded_uri
+  my $type = type_normalize type_expanded_uri
                $node->get_attribute_value ($opt{type_name} || 'Type',
                                            default => q<DOMMain:any>);
   my $r;
@@ -615,15 +663,27 @@ sub get_value_literal ($%) {
            $type eq ExpandedURI q<DOMMain:float> or
            $type eq ExpandedURI q<DOMMain:unsigned-short>) {
     if ($value) {
-      $r = 0 + $value->value;
+      $r = $value->value;
     } else {
-      $r = 0 + defined $opt{default} ? $opt{default} : 0;
+      $r = defined $opt{default} ? $opt{default} : 0;
     }
   } elsif ($type eq ExpandedURI q<DOMMain:DOMString>) {
     if ($value) {
       $r = perl_literal $value->value;
     } else {
       $r = perl_literal (defined $opt{default} ? $opt{default} : '');
+    }
+  } elsif ($type eq ExpandedURI q<Perl:ARRAY>) {
+    if ($value) {
+      $r = perl_literal $value->value (as_array => 1);
+    } else {
+      $r = perl_literal (defined $opt{default} ? $opt{default} : []);
+    }
+  } elsif ($type eq ExpandedURI q<Perl:HASH>) {
+    if ($value) {
+      $r = perl_literal $value->value;
+    } else {
+      $r = perl_literal (defined $opt{default} ? $opt{default} : {});
     }
   } else {
     if ($value) {
@@ -632,7 +692,6 @@ sub get_value_literal ($%) {
       $r = defined $opt{default} ? perl_literal $opt{default} : 'undef';
     }
   }
-  print STDERR "$type: $r\n";
   $r;
 }
 
@@ -655,7 +714,8 @@ sub is_implemented (%) {
   my (%opt) = @_;
   my $r = 0;
   $nest++ == 100 and valid_err q<Condition loop detected>;
-  my $member = $Info->{is_implemented}->{$opt{if}}->{$opt{method} || $opt{attr}}
+  my $member = $Info->{is_implemented}->{$opt{if}}->{$opt{method} ||
+                                                     $opt{attr} . '.' . $opt{on}}
             ||= {};
   if (exists $opt{set}) {
     $r = $member->{$opt{condition} || ''} = $opt{set};
@@ -692,6 +752,8 @@ sub condition_match ($%) {
       return 1;
     } elsif ($opt{ge} and not @$conds) {
       return 1;
+    } elsif ($opt{any_unless_condition}) {
+      return 1;
     } else {
       return 0;
     }
@@ -711,6 +773,7 @@ sub condition_match ($%) {
         }
       }
     }
+    ## 'default_any': Match to 'any' condition (no condition specified)
     if ($opt{default_any} and @$conds == 0 and @$level == 0) {
       return 1;
     }
@@ -806,6 +869,7 @@ sub if2perl ($) {
                   condition_match $_, condition => $condition,
                                       default_any => 1, ge => 1;
       push @isa, perl_package_name qname_with_condition => $_->value,
+                                   condition => $condition,
                                    is_internal => 1;
     }
     $result .= perl_inherit [$cond_int_pack_name, @isa] => $cond_pack_name;
@@ -847,7 +911,8 @@ sub if2perl ($) {
       } elsif ($_->local_name eq 'Attr' or
                $_->local_name eq 'IntAttr' or
                $_->local_name eq 'ReAttr') {
-        # unless $gt
+        $result .= attr2perl ($_, level => \@level, condition => $condition)
+          unless $gt;
       } elsif ($_->local_name eq 'ConstGroup') {
         $result .= constgroup2perl ($_, level => \@level,
                                     condition => $condition,
@@ -927,7 +992,7 @@ sub method2perl ($;%) {
     for (@{$node->child_nodes}) {
       if ($_->local_name eq 'Param') {
         my $name = perl_name $_->get_attribute_value ('Name');
-        my $type = expanded_uri $_->get_attribute_value
+        my $type = type_expanded_uri $_->get_attribute_value
                                             ('Type',
                                              default => 'DOMMain:any');
         push @param_list, '$' . $name;
@@ -999,7 +1064,7 @@ sub method2perl ($;%) {
               $code;
       if ($code_node->get_attribute_value ('cast-output', default => 1)) {
         if (type_normalize
-              expanded_uri $return->get_attribute_value
+              type_expanded_uri $return->get_attribute_value
                                          ('Type',
                                           default => q<DOMMain:any>)
                   eq ExpandedURI q<DOMMain:DOMString>) {
@@ -1033,12 +1098,12 @@ sub method2perl ($;%) {
                                         join (', ', '$self', @param_list) .
                                         ')' => '@_') .
                   $int_code
-         if $code_node->get_attribute_value ('auto-argument', default => 1);
+         if $int_code_node->get_attribute_value ('auto-argument', default => 1);
     }
 
     if ($has_return) {
       push @return, pod_item ('Return Value: ' .
-                              type_label expanded_uri
+                              type_label type_expanded_uri
                                      $return->get_attribute_value
                                                 ('Type',
                                                  default => 'DOMMain:any')),
@@ -1060,8 +1125,8 @@ sub method2perl ($;%) {
                   class => 'DOMException',
                   type => 'NOT_SUPPORTED_ERR',
                   param => {
-                    if => $Status->{IF},
-                    method => $Status->{Method},
+                    ExpandedURI q<MDOM_EXCEPTION:if> => $Status->{IF},
+                    ExpandedURI q<MDOM_EXCEPTION:method> => $Status->{Method},
                   };
     @return = ();
     push @return, pod_item ('Exception ' . pod_code ('DOMException') . '.' .
@@ -1111,6 +1176,230 @@ sub method2perl ($;%) {
   $result;
 } # method2perl
 
+sub attr2perl ($;%) {
+  my ($node, %opt) = @_;
+  local $Status->{depth} = $Status->{depth} + 1;
+  my $m_name = perl_name $node->get_attribute_value ('Name');
+  my $level;
+  my @level = @{$opt{level} || []};
+  local $Status->{Method} = $m_name;
+  my $result = '';
+  if ($node->local_name eq 'IntAttr') {
+    $m_name = perl_internal_name $m_name;
+    $level = '';
+  } else {
+    $level = get_level_description $node, level => \@level;
+  }
+  
+  my $return = $node->get_attribute ('Get', make_new_node => 1);
+  my $set = $node->get_attribute ('Set');
+  my $has_set = defined $set ? 1 : 0;
+  push my @desc,
+               pod_head ($Status->{depth}, 'Attribute ' . 
+                         pod_code ('$obj->' . $m_name)),
+               pod_paras (get_description ($node)),
+               $level ? pod_para ('The method ' . pod_code ($m_name) .
+                           q< has been > . $level . '.') : ();
+
+  my @return;
+  my $code_node = get_perl_definition_node $return,
+                              condition => $opt{condition},
+                              level_default => $opt{level_default};
+  my $int_code_node = get_perl_definition_node $return, name => 'IntDef',
+                              condition => $opt{condition},
+                              level_default => $opt{level_default};
+  my ($set_code_node, $int_set_code_node);
+  if ($has_set) {
+    $code_node = get_perl_definition_node $set,
+                              condition => $opt{condition},
+                              level_default => $opt{level_default};
+    $int_code_node = get_perl_definition_node $set, name => 'IntDef',
+                              condition => $opt{condition},
+                              level_default => $opt{level_default};
+  }
+  my $code = '';
+  my $int_code = '';
+  my $set_code = '';
+  my $int_set_code = '';
+  for ({code => \$code, code_node => $code_node,
+        internal => sub {
+          if ($int_code_node) {
+            perl_code $int_code_node->value;
+          } else {
+            valid_err "<IF[Name = $Status->{IF}]/Attr[Name = $m_name]/" .
+                      "Get/IntDef> required";
+          }
+        }},
+       {code => \$int_code, code_node => $int_code_node},
+       {code => \$set_code, code_node => $set_code_node},
+       {code => \$int_set_code, code_node => $int_set_code_node}) {
+    ${$_->{code}} = perl_code_source (perl_code ($_->{code_node}->value,
+                                                 internal => $_->{internal}),
+                                      path => $_->{code_node}->node_path
+                                                              (key => 'Name'))
+      if $_->{code_node};
+  }
+
+  if ($code_node) {
+    is_implemented if => $Status->{IF}, attr => $Status->{Method},
+                   condition => $opt{condition}, set => 1, on => 'get';
+    $code = perl_statement (perl_assign 'my $r' => get_value_literal $return,
+                                                        name => 'DefaultValue',
+                                                        type_name => 'Type') .
+              $code;
+    if ($code_node->get_attribute_value ('cast-output', default => 1)) {
+      if (type_normalize
+              type_expanded_uri $return->get_attribute_value
+                                         ('Type',
+                                          default => q<DOMMain:any>)
+                  eq ExpandedURI q<DOMMain:DOMString>) {
+        $code .= perl_builtin_code 'DOMString',
+                                     s => 'r', r => 'r';
+      }
+    }
+    $code .= perl_statement ('$r');
+    if ($int_code_node) {
+      $int_code = perl_statement (perl_assign 'my $r' => perl_literal '') .
+                  $int_code .
+                  perl_statement ('$r');
+      $int_code = perl_statement (perl_assign 'my ($self)' => '@_') . $int_code
+         if $int_code_node->get_attribute_value ('auto-argument', default => 1);
+    }
+
+    push @return, pod_item ('Return Value: ' .
+                              type_label type_expanded_uri
+                                     $return->get_attribute_value
+                                                ('Type',
+                                                 default => 'DOMMain:any')),
+                    pod_para (get_description $return);
+    for (@{$return->child_nodes}) {
+      next unless $_->local_name eq 'InCase';
+      push @return, pod_item ('Return Value: ' . get_incase_label $_,
+                                                                  is_pod => 1),
+                    pod_para (get_description $_);
+    }
+  } else {
+    is_implemented if => $Status->{IF}, attr => $Status->{Method},
+                   condition => $opt{condition}, set => 0, on => 'get';
+    $int_code = $code
+              = perl_exception
+                  level => 'EXCEPTION',
+                  class => 'DOMException',
+                  type => 'NOT_SUPPORTED_ERR',
+                  param => {
+                    ExpandedURI q<MDOM_EXCEPTION:if> => $Status->{IF},
+                    ExpandedURI q<MDOM_EXCEPTION:attr> => $Status->{Method},
+                    ExpandedURI q<MDOM_EXCEPTION:on> => 'get',
+                  };
+    @return = ();
+    push @return, pod_item ('Exception ' . pod_code ('DOMException') . '.' .
+                            pod_code ('NOT_SUPPORTED_ERR')),
+                  pod_para ('Getting of this attribute allways result in
+                             this exception raisen, since this
+                             attribute is not implemented yet.');
+  }
+
+  my @set_desc;
+  my @set_xcept;
+  if ($set_code_node) {
+    is_implemented if => $Status->{IF}, attr => $Status->{Method},
+                   condition => $opt{condition}, set => 1, on => 'set';
+    if ($code_node->get_attribute_value ('cast-input', default => 1)) {
+      if (type_normalize
+              type_expanded_uri $set->get_attribute_value
+                                         ('Type',
+                                          default => q<DOMMain:any>)
+                  eq ExpandedURI q<DOMMain:DOMString>) {
+        $set_code = perl_builtin_code ('DOMString',
+                                       s => 'given', r => 'given')
+                  . $set_code;
+      }
+    }
+
+    push @set_desc, pod_item ('Setting Value: ' .
+                              type_label type_expanded_uri
+                                     $set->get_attribute_value
+                                                ('Type',
+                                                 default => 'DOMMain:any')),
+                    pod_para (get_description $set);
+    for (@{$set->child_nodes}) {
+      next unless $_->local_name eq 'InCase';
+      push @set_desc, pod_item ('Setting Value: ' . get_incase_label $_,
+                                                                  is_pod => 1),
+                    pod_para (get_description $_);
+    }
+  } elsif ($has_set) {
+    is_implemented if => $Status->{IF}, attr => $Status->{Method},
+                   condition => $opt{condition}, set => 0, on => 'set';
+    $int_set_code = $set_code
+              = perl_exception
+                  level => 'EXCEPTION',
+                  class => 'DOMException',
+                  type => 'NOT_SUPPORTED_ERR',
+                  param => {
+                    ExpandedURI q<MDOM_EXCEPTION:if> => $Status->{IF},
+                    ExpandedURI q<MDOM_EXCEPTION:attr> => $Status->{Method},
+                    ExpandedURI q<MDOM_EXCEPTION:on> => 'set',
+                  };
+    @set_xcept = ();
+    push @set_xcept, pod_item ('Exception ' . pod_code ('DOMException') . '.' .
+                            pod_code ('NOT_SUPPORTED_ERR')),
+                  pod_para ('Setting of this attribute allways result in
+                             this exception raisen, since this
+                             attribute is not implemented yet.');
+  }
+  
+  if ($has_set) {
+    push @desc, pod_para ('This attribute can be set the value by:'),
+                pod_pre (qq{\$obj->$m_name (\$given)}),
+                pod_para ('Value to set to this attribute:'),
+                pod_list 4, @set_desc;
+  } else {
+    push @desc, pod_para ('This attribute is read-only.');
+  }
+
+  push @desc, pod_list 4,
+                  pod_item (q<Result on getting:>),
+                  pod_list (4, @return),
+                  (@set_xcept ?
+                    (pod_item (q<Exception on setting:>),
+                     pod_list (4, @set_xcept)) : ());
+
+  if ($node->local_name eq 'IntAttr' or
+      $Status->{if}->{method_documented}->{$m_name}++) {
+    $result .= pod_block pod_comment @desc;
+  } else {
+    $result .= pod_block @desc;
+  }
+  
+  my $proto;
+  if ($has_set) {
+    $code = q<my ($self, $given) = @_; if (defined $given) {> . $set_code .
+            q<} else {> . $code . q<}>;
+    $int_code = q<my ($self, $given) = @_; if (defined $given) {> .
+                $int_set_code . q<} else {> . $int_code . q<}>;
+    $proto = '$;$';
+  } else {
+    $code = q<my $self = shift; > . $code;
+    $int_code = q<my $self = shift; > . $int_code;
+    $proto = '$';
+  }
+  $result .= perl_sub name => $m_name,
+                      prototype => $proto,
+                      code => $code;
+  $result .= perl_sub name => perl_internal_name $m_name,
+                      prototype => $proto,
+                      code => $int_code
+     if $int_code_node;
+
+  if (my $op = get_perl_definition_node $node, name => 'Operator') {
+    $Status->{Operator}->{$op->value} = '\\' . perl_var type => '&', 
+                                                        local_name => $m_name;
+  }
+
+  $result;
+} # attr2perl
+
 =head2 DataType element
 
 The C<DataType> element defines a datatype.
@@ -1125,6 +1414,8 @@ sub datatype2perl ($;%) {
                                  = perl_name $node->get_attribute_value ('Name'),
                                              ucfirst => 1;
   local $Status->{IF} = $if_name;
+  local $Status->{if} = {}; ## Temporary data
+  local $Info->{Namespace} = {%{$Info->{Namespace}}};
   local $Status->{Operator} = {};
   my $result = perl_package full_name => $pack_name;
   $result .= perl_statement perl_assign 'our $VERSION', version_date time;
@@ -1144,7 +1435,7 @@ sub datatype2perl ($;%) {
                               condition => $opt{condition});
     } elsif ($_->local_name eq 'Attr' or
              $_->local_name eq 'IntAttr') {
-      
+      $result .= attr2perl ($_, level => \@level, condition => $opt{condition});
     } elsif ($_->local_name eq 'ConstGroup') {
       $result .= constgroup2perl ($_, level => \@level, 
                                   condition => $opt{condition},
@@ -1165,12 +1456,103 @@ sub datatype2perl ($;%) {
     $result .= perl_statement 'use overload ' .
                    join (', ', map {(perl_literal ($_),
                                      $Status->{Operator}->{$_})}
+                               grep {!/^[A-Z]+$/}
                                    keys %{$Status->{Operator}}) . ', ' .
                    perl_list fallback => 1;
+## DESTROY
   }
 
   $result;
 } # datatype2perl
+
+=item Exception top-level element
+
+=item Warning top-level element
+
+=cut
+
+sub exception2perl ($;%) {
+  my ($node, %opt) = @_;
+  local $Status->{depth} = $Status->{depth} + 1;
+  local $Status->{const} = {};
+  local $Status->{if} = {}; ## Temporary data
+  local $Info->{Namespace} = {%{$Info->{Namespace}}};
+  my $pack_name = perl_package_name
+                    name => my $if_name
+                                 = perl_name $node->get_attribute_value ('Name'),
+                                             ucfirst => 1;
+  my $type = $node->local_name eq 'Exception' ? 'Exception' : 'Warning';
+  local $Status->{IF} = $if_name;
+  my $result = perl_package full_name => $pack_name;
+  $result .= perl_statement perl_assign 'our $VERSION', version_date time;
+  $result .= perl_statement 'push our @ISA, ' .
+                            perl_list 'Message::Util::Error',
+                                      perl_package_name (if => $if_name),
+                                      $ManakaiDOMModulePrefix . '::' . $type;
+  my @level = @{$opt{level} || []};
+  my $mod = get_level_description $node, level => \@level;
+  $result .= pod_block
+               pod_head ($Status->{depth}, $type . ' ' . pod_code $if_name),
+               pod_paras (get_description ($node)),
+               ($mod ? pod_para ('This ' . lc ($type) . ' is introduced in ' .
+                                 $mod . '.') : ());
+
+  for (@{$node->child_nodes}) {
+    if ($_->local_name eq 'Method' or
+        $_->local_name eq 'IntMethod') {
+      $result .= method2perl ($_, level => \@level, 
+                              condition => $opt{condition},
+                              any_unless_condition => 1);
+    } elsif ($_->local_name eq 'Attr' or
+             $_->local_name eq 'IntAttr') {
+      my $get;
+      if ($_->local_name eq 'Attr' and
+          $_->get_attribute_value ('Name') eq 'code' and
+          $get = $_->get_attribute ('Get') and
+          not get_perl_definition_node $get, name => 'Def') {
+        for ($get->append_new_node (type => '#element',
+                                    local_name => 'Def',
+                                    value => q{
+                                      $r = $self->{<Q:ManakaiDOM:code>};
+                                    })) {
+          $_->set_attribute (type => 'lang:Perl'); ## ISSUE: NS prefix assoc.
+        }
+      }
+      $result .= attr2perl ($_, level => \@level, condition => $opt{condition},
+                            any_unless_condition => 1);
+    } elsif ($_->local_name eq 'ConstGroup') {
+      $result .= constgroup2perl ($_, level => \@level, 
+                                  condition => $opt{condition},
+                                  package => $pack_name,
+                                  any_unless_condition => 1);
+    } elsif ($_->local_name eq 'Const') {
+      $result .= const2perl ($_, level => \@level,
+                             condition => $opt{condition},
+                             package => $pack_name,
+                             any_unless_condition => 1);
+    } elsif ({qw/Name 1 Spec 1 Description 1
+                 Level 1 Condition 1/}->{$_->local_name}) {
+      #
+    } else {
+      valid_warn qq{Element @{[$_->local_name]} not supported};
+    }
+  }
+
+  $result .= perl_sub
+               name => '___error_def', prototype => '',
+               code => perl_list {
+                 map {
+                   $_ => {
+                     ExpandedURI q<ManakaiDOM:code> => perl_code_literal
+                               ($Status->{const}->{$_}->{code_literal}),
+                     ExpandedURI q<ManakaiDOM:description>
+                            => $Status->{const}->{$_}->{description},
+                   }
+                 } sort keys %{$Status->{const}}
+               };
+
+  $result;
+} # exception2perl
 
 sub constgroup2perl ($;%);
 sub constgroup2perl ($;%) {
@@ -1190,7 +1572,9 @@ sub constgroup2perl ($;%) {
       my $only_document = $opt{only_document} || 0;
       unless ($_->node_type eq '#element' and
               condition_match $_, level_default => \@level,
-                                  condition => $opt{condition}) {
+                                  condition => $opt{condition},
+                                  any_unless_condition
+                                            => $opt{any_unless_condition}) {
         $only_document = 1;
       }
       
@@ -1199,14 +1583,18 @@ sub constgroup2perl ($;%) {
                                     condition => $opt{condition},
                                     without_document => $opt{without_document},
                                     only_document => $only_document,
-                                    package => $opt{package});
+                                    package => $opt{package},
+                                    any_unless_condition
+                                            => $opt{any_unless_condition});
         $i++;
       } elsif ($_->local_name eq 'Const') {
         $result .= const2perl ($_, level => \@level,
                                condition => $opt{condition},
                                without_document => $opt{without_document},
                                only_document => $only_document,
-                               package => $opt{package});
+                               package => $opt{package},
+                               any_unless_condition
+                                       => $opt{any_unless_condition});
         $i++;
       } elsif ({qw/Name 1 Spec 1 ISA 1 Description 1
                    Level 1 Def 1/}->{$_->local_name}) {
@@ -1261,8 +1649,8 @@ sub const2perl ($;%) {
   my $result = '';
   unless ($opt{only_document}) {
     $result = perl_sub name => $longname, prototype => '',
-                       code => get_perl_definition $node, name => 'Value';
-## TODO: Value should be Type sensible (DOMString should be quoted)
+                       code => my $code = get_value_literal
+                                                $node, name => 'Value';
     $result .= perl_statement
                  perl_assign
                       perl_var (type => '*',
@@ -1270,6 +1658,16 @@ sub const2perl ($;%) {
                                 local_name => $name)
                    => '\&' . $longname
        if $opt{package} and $Info->{Package} ne $opt{package};
+    my $desc_template = get_perl_definition_node ($node);
+    if ($desc_template) {
+      $desc_template = muf_template get_description $desc_template;
+    } else {
+      $desc_template = get_description ($node, default => $name);
+    }
+    $Status->{const}->{$name} = {
+      description => $desc_template,
+      code_literal => $code,
+    };
   }
 
   $Status->{EXPORT_OK}->{$name} = 1;
@@ -1530,10 +1928,9 @@ for my $node (@{$source->child_nodes}) {
     ##
   } elsif ($node->local_name eq 'IF') {
     $result .= if2perl $node;
-  } elsif ($node->local_name eq 'Exception') {
-
-  } elsif ($node->local_name eq 'Warning') {
-    
+  } elsif ($node->local_name eq 'Exception' or
+           $node->local_name eq 'Warning') {
+    $result .= exception2perl $node;
   } elsif ($node->local_name eq 'DataType') {
     $result .= datatype2perl $node;
   } elsif ($node->local_name eq 'DataTypeAlias') {
@@ -1681,6 +2078,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/09/02 08:55:26 $
+# $Date: 2004/09/08 05:38:38 $
 
 

@@ -7,12 +7,14 @@ Namespace:
      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/
   @ManakaiDOMImplementationException:
      http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @MDOM_EXCEPTION:
+     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
 Module:
   @Name:  dom
     @@Prefix:  w3c.org
   @FullName:
     @@lang:en
-    @@@: Core Module
+    @@@: DOM Core Module
   @Spec:
     @@DOM3:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-BBACDC08
@@ -32,7 +34,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/02 08:55:26 $
+     $Date: 2004/09/08 05:38:38 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -50,6 +52,9 @@ Module:
     @@Spec:
       @@@DOM3:
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-BBACDC08
+    @@Description:
+      @@@lang:en
+      @@@@: DOM Core module, as defined by the DOM Level 2 Core specification.
   @Feature:
     @@Name: Core
     @@Version: 3.0
@@ -58,6 +63,9 @@ Module:
     @@Spec:
       @@@DOM3:
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-BBACDC08
+    @@Description:
+      @@@lang:en
+      @@@@: DOM Core module, as defined by the DOM Level 3 Core specification.
 
 Exception:
   @Name:  DOMException
@@ -68,11 +76,17 @@ Exception:
      @@Name:  code
      @@Get:
        @@@Type:  unsigned-short
+       @@@Description:
+         @@@@lang:en
+         @@@@@: The error code from the constant value group ExceptionCode.
   @ConstGroup:
      @@Name:  ExceptionCode
      @@Spec:
-       @@DOM3:
+       @@@DOM3:
          http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-258A00AF
+     @@Description:
+       @@@lang:en
+       @@@@: Integers indicating the type of error generated.
      @@Const:
         @@@Name:  INDEX_SIZE_ERR
         @@@Type:  unsigned-short
@@ -83,6 +97,19 @@ Exception:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: Parameter to which inappropriate value specified.
+        @@@Description:
+          @@@@lang:en
+          @@@@@: Index or size is negative, or greater than the allowed value.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              Index or size specified as parameter%t (
+                name => {<Q:MDOM_EXCEPTION:param-name>},
+                prefix => { "}, suffix => {"}); is negative, or 
+              greater than the allowed value.
      @@Const:
         @@@Name:  DOMSTRING_SIZE_ERR
         @@@Type:  unsigned-short
@@ -115,6 +142,44 @@ Exception:
         @@@Name:  NOT_SUPPORTED_ERR
         @@@Type:  unsigned-short
         @@@Value:  9
+        @@@Param:
+          @@@@QName:
+            MDOM_EXCEPTION:if
+          @@@@Type: DOMString
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The interface name.
+        @@@Param:
+          @@@@QName:
+            MDOM_EXCEPTION:method
+          @@@@Type: DOMString
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The method name.
+        @@@Param:
+          @@@@QName:
+            MDOM_EXCEPTION:attr
+          @@@@Type: DOMString
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The attribute name.
+        @@@Param:
+          @@@@QName:
+            MDOM_EXCEPTION:on
+          @@@@Type: DOMString
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: Type of the attribute procedure.
+          @@@@InCase:
+            @@@@@Value: get
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@: On getting.
+          @@@@InCase:
+            @@@@@Value: set
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@: On setting.
      @@Const:
         @@@Name:  INUSE_ATTRIBUTE_ERR
         @@@Type:  unsigned-short
@@ -421,6 +486,7 @@ IF:
               push @$self, $_;
             } else {
               __EXCEPTION{ManakaiDOMImplementationException.PARAM_INVALID_CLASS:
+                <Q:ManakaiDOMImplementationException:param-name> => 'list',
                 <Q:ManakaiDOMImplementationException:class> => ref $_,
               }__;
             }
