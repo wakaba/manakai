@@ -19,7 +19,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/01/05 12:19:39 $
+      $Date: 2005/01/06 10:41:32 $
     @@ContentType:
       dis:Date.RCS
 
@@ -345,6 +345,11 @@ ElementTypeBinding:
         ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
     @@ForCheck:
       ManakaiDOM:DOM
+    @@ISA:
+      @@@@:
+        DOMMain:ManakaiDOMExceptionIF::ManakaiDOM:ManakaiDOMCommon
+      @@@ForCheck:
+        ManakaiDOM:ManakaiDOM ManakaiDOM:ForIF
     @@ISA:
       @@@@:
         ManakaiDOM:ManakaiDOMException
@@ -2168,7 +2173,7 @@ IF:
       DOM Level 2 Events Specification said that any 
       exceptions throw inside an <IF::EventListener> will not 
       stop propagation of the event.  DOM Level 3 Events Specification 
-      does not have such clause. 
+      does have no such clause. 
     @@ForCheck:
       ManakaiDOM:ForIF
   @Description:

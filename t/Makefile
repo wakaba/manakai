@@ -1,5 +1,8 @@
 MKDIR = mkdir -p
 
+RM = rm
+RMALL = $(RM) -fv
+
 MANAKAI_ROOT_DIR = ../
 BIN_DIR = $(MANAKAI_ROOT_DIR)bin/
 LIB_DIR = $(MANAKAI_ROOT_DIR)lib/
@@ -32,3 +35,9 @@ dom1core-perl: $(DOMTS2PERL_PL)
 dom1core:
 	MANAKAI_DOMTEST_FILE_DIR=$(DOMTEST_TESTS_DIR)level1/core/files/ \
 	  $(PERL_TEST) $(DOMTEST_PERL_DIR)level1/core/$(DOMTEST_FILE).pl
+
+clean: clean-dom1core-perl
+
+clean-dom1core-perl:
+	$(RMALL) $(DOMTEST_PERL_DIR)level1/core/*
+	$(RMALL) *~ .*~ *.BAK .*.BAK

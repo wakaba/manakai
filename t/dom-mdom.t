@@ -1,7 +1,7 @@
 use Test;
 use Message::DOM::DOMMain;
 use Data::Dumper;
-plan tests => 24;
+plan tests => 28;
 
 my $node = Message::DOM::DOMMain::ManakaiDOMNodeObject->_new;
 

@@ -28,7 +28,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/01/05 12:19:39 $
+      $Date: 2005/01/06 10:41:32 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1245,6 +1245,28 @@ PropDef:
     dis:TypeForQNames
 
 ElementTypeBinding:
+  @Name: ImplementLevel1
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@@:
+      ::ManakaiDOM:ManakaiDOM1
+    @@ForCheck:
+      ManakaiDOM:ForIF
+    @@For:
+      ManakaiDOM:ManakaiDOM2
+ElementTypeBinding:
+  @Name: ImplementLevel2
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@@:
+      ::ManakaiDOM:ManakaiDOM2
+    @@ForCheck:
+      ManakaiDOM:ForIF
+    @@For:
+      ManakaiDOM:ManakaiDOM3
+ElementTypeBinding:
   @Name: ImplementLevel3
   @ElementType:
     dis:ISA
@@ -1844,6 +1866,8 @@ ElementTypeBinding:
 ResourceDef:
   @For:
     ManakaiDOM:DOM2
+  @ImplementLevel2:
+  @ImplementLevel3:
   @rdf:type:
     @@@:
       dis:MultipleResource
@@ -1865,29 +1889,41 @@ ResourceDef:
     @@ForCheck:
       ManakaiDOM:ForClass
   @rdf:type:
+    @@@:
+      ManakaiDOM:IF
+    @@ForCheck:
+      ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM
+  @rdf:type:
     @@@: DOMDataType
     @@ForCheck:
-      ManakaiDOM:ForIF
+      ManakaiDOM:ForIF !ManakaiDOM:ManakaiDOM
   @rdf:type:
     @@@: 
       ManakaiDOM:PrimitiveTypeClass
     @@ForCheck:
       ManakaiDOM:ForClass
+  @AliasFor:
+    @@@:
+      ::ManakaiDOM:ManakaiDOMLatest
+    @@ForCheck:
+      ManakaiDOM:ForIF ManakaiDOM:ManakaiDOMCommon
   @Description:
     @@lang:en
     @@@: 
       An absolute or relative time.  It is represented 
       as a number of milliseconds.
-  @AliasFor:
-    @@@: unsigned-long-long
+  @Def:
+    @@ContentType:
+      lang:dis
+    @@DISLang:dataTypeAliasFor: unsigned-long-long
     @@ForCheck:
-      ManakaiDOM:ForIF
+      ManakaiDOM:ForIF ManakaiDOM:IDL
   @ImplNote:
     @@lang:en
     @@@:
       TODO: How implements this type is not yet decided.
     @@ForCheck:
-      ManakaiDOM:ForClass
+      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
 
 DOMDataTypeDef:
   @Name:  DOMUserData
@@ -1930,10 +1966,20 @@ ResourceDef:
     @@@: ManakaiDOMString
     @@ForCheck:
       ManakaiDOM:ForClass
+  @AliasFor:
+    @@@:
+      ::ManakaiDOM:ManakaiDOMLatest
+    @@ForCheck:
+      ManakaiDOM:ForIF ManakaiDOM:ManakaiDOMCommon
   @rdf:type:
     @@@: DOMDataType
     @@ForCheck: 
-      ManakaiDOM:ForIF
+      ManakaiDOM:ForIF !ManakaiDOM:ManakaiDOM
+  @rdf:type:
+    @@@:
+      ManakaiDOM:IF
+    @@ForCheck:
+      ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM
   @rdf:type:
     @@@: 
       ManakaiDOM:PrimitiveTypeClass
@@ -1944,11 +1990,13 @@ ResourceDef:
       lang:IDL-DOM
     @@@: sequence<unsigned short>
     @@ForCheck:
-      ManakaiDOM:ForIF
+      ManakaiDOM:ForIF ManakaiDOM:IDL
+  @ImplementLevel1:
+  @ImplementLevel2:
   @ImplementLevel3: 
   @ISA:
-    @@For:
-      ManakaiDOM:ManakaiDOMLatest
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOMLatest ManakaiDOM:ForClass
     @@@: ManakaiDOMStringExtend
   @DOMMFeature:
 
@@ -2970,10 +3018,14 @@ StringDataTypeDef:
         {NOTE:: This code fragment does not support non-<Feature::XML>. 
         \
         }
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        What should be done for HTML name is not studied yet. 
     @@PerlDef:
         if (defined $INPUT) {
           __FOR{ManakaiDOM:DOM3::
-            if (($XMLVERSION eq '1.0' and
+            if (((not defined $XMLVERSION or $XMLVERSION eq '1.0') and
                  not <Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
                             infoset:version = '1.0'>) or
                 ($XMLVERSION eq '1.1' and
@@ -4242,13 +4294,66 @@ ClassDef:
               $node-><M::ManakaiDOM:ManakaiDOMNodeObject.destroy>;
             }
           } else {
-            warn "An object of type ".ref ($self).
-                 " that does not have associated node object is ".
-                 "to be destroied; there might be a memory-leak code";
+            warn q<An object of type ">.ref ($self).
+                 q<" that does not have associated node object is >.
+                 "to be destroied; there might be a memory-leak code"
+              unless $Message::DOM::DOMMain::OnGlobalDestruction;
+          }
+          END {
+            $Message::DOM::DOMMain::OnGlobalDestruction = true;
           }
 ##Class:ManakaiDOMNodeReference
 
+ResourceDef:
+  @QName:OnGlobalDestruction
+  @rdf:type:
+    DISPerl:ScalarVariable
+  @AppName:
+    @@@:
+      Message::DOM::DOMMain::OnGlobalDestruction
+    @@ContentType:
+      lang:Perl
+  @For:
+    ManakaiDOM:ManakaiDOMCommon
+  @DefaultValue:
+    @@@:false
+    @@ContentType:
+      dis:Boolean
+  @Type:
+    DOMMain:boolean
+  @Description:
+    @@lang:en
+    @@@:
+      Whether the Perl is during the global destruction or not. 
+      \
+      This flag is turned on by the <Perl::END> code in the 
+      definition of <M::ManakaiDOM:ManakaiDOMNodeReference.destroy>. 
+
 ## -- Manakai implementation-specific exception and warning
+
+ResourceDef:
+  @QName: ManakaiDOMExceptionIF
+  @rdf:type:
+    ManakaiDOM:ExceptionIF
+  @Description:
+    @@lang:en
+    @@@:
+      An exception interface that all manakai DOM exception interfaces 
+      should inherit. 
+  @ForCheck:
+    ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+  @AliasFor:
+    @@@:
+      ::ManakaiDOM:ManakaiDOMCommon
+    @@For:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOMCommon
+  @AppISA:
+    @@ContentType:
+      lang:Perl
+    @@For:
+      ManakaiDOM:ManakaiDOM
+    @@@:
+      Message::Util::Error
 
 ExceptionDef:
   @QName: 

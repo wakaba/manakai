@@ -36,10 +36,15 @@ the standard output).  Applications of this library can redefine
 this function in their own code so that they customize the output 
 if they want.  Otherwise, it is simply C<print>ed. 
 
+=item Global Variable C<$ResultOutput> (default: C<STDOUT>)
+
+The file handle to which the result is outputed. 
+
 =cut
 
+our $ResultOutput ||= \*STDOUT;
 sub output_result ($) {
-  print shift;
+  print $ResultOutput shift;
 }
 
 =item Global Variable C<$NodePathKey> = [I<name1>, I<name2>,,,,]
@@ -251,7 +256,8 @@ sub perl_var (%) {
   my %opt = @_;
   my $r = $opt{type} || '';                   # $, @, *, &, $# or empty
   $r = $opt{scope} . ' ' . $r if $opt{scope}; # my, our or local
-  $r .= $opt{package} . '::' if $opt{package};
+  my $pack = ref $opt{package} ? $opt{package}->{full_name} : $opt{package};
+  $r .= $pack . '::' if $pack;
   impl_err q<Local name of variable must be specified>, %opt
     unless defined $opt{local_name};
   $r .= $opt{local_name};
@@ -521,4 +527,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/01/05 12:19:39 $
+1; # $Date: 2005/01/06 10:41:32 $

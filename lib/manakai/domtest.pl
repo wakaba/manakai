@@ -20,11 +20,25 @@ use Message::DOM::DOMLS qw/MODE_SYNCHRONOUS/;
 use Message::DOM::ManakaiDOMLS2003;
 use Getopt::Long;
 
+our $REPORT = *STDOUT;
+our $MSG = *STDOUT;
+
 =item Global Variable $builder = {}
 
 =cut
 
 our $builder = {};
+  $builder->{impl_attr} = {
+    validating => "false",
+    expandEntityReferences => "false",
+    coalescing => "false",
+    signed => "true",
+    hasNullString => "true",
+    ignoringElementContentWhitespace => "false",
+    namespaceAware => "true",
+    ignoringComments => "false",
+    schemaValidating => "false",
+  };
 
 =item Global Variable $Info = {}
 
@@ -106,7 +120,7 @@ Outputs a success message.
 =cut
 
 sub is_ok () {
-  print STDOUT "ok ".++($Status->{Count})."\n";
+  print $REPORT "ok ".++($Status->{Count})."\n";
 }
 
 =item is_not_ok id => I<identifier>, value => I<received value>, expected => I<expected value>
@@ -118,24 +132,107 @@ Outputs a failure message and exits the test.
 sub is_not_ok (%) {
   my %opt = @_;
   local $Error::Depth = $Error::Depth + 1;
-  print STDOUT "not ok ".++($Status->{Count})." - $opt{id}\n";
-  print STDERR test_comment 
+  print $REPORT "not ok ".++($Status->{Count})." - $opt{id}\n";
+  print $MSG test_comment 
       "Got ".test_value ($opt{value})." (expected: ".
       test_value ($opt{expected}) .")";
   $Status->{Failed}->{$opt{id}} = 1;
+  skip_rest (not_ok => 1, msg => q<Untestable after failure>);
   exit;
 }
 
+=item skip_n ($n, %opt)
+
+Skips I<n> tests. 
+
+=cut
+
+sub skip_n ($%) {
+  my ($n, %opt) = @_;
+  $opt{msg} = '' unless defined $opt{msg};
+  for (1..$n) {
+    print $REPORT qq<ok >.++($Status->{Count})." # Skip ".test_comment $opt{msg};
+  }
+} # skip_n
+
+=item skip_rest (%opt)
+
+Skips the rest of tests. 
+
+Options:
+
+=over 4
+
+=item msg => I<text>
+
+Briefly describes why test are skipped, if necessary.
+
+=item not_ok => 1/0
+
+Whether skipped because of failure of a test (C<1>) or of other reason (C<0>). 
+
+=back
+
+=cut
+
+sub skip_rest (%) {
+  my %opt = @_;
+  my $n = $Status->{Number} - $Status->{Count};
+  $opt{msg} = '' unless defined $opt{msg};
+  if ($n > 0) {
+    my $s = $opt{not_ok} ? 'not ok' : 'ok';
+    for (my $i = $Status->{Count} + 1; $i <= $Status->{Number}; $i++) {
+      print $REPORT "$s $i # Skip ".test_comment $opt{msg};
+    }
+    $Status->{Count} = $Status->{Number};
+  } elsif (not $opt{not_ok}) {
+    print $MSG test_comment "Skip: planned - count = $n\n";
+    print $MSG test_comment $opt{msg};
+  }
+} # skip_rest
+
 =item plan $n
 
-Plans a test with the number of C<$n>. 
+Plans a test with the number of C<$n>.  Any more tests might be 
+added later.
+
+Note: This function must be called at the top of the test script.  
+Once this is called, the script cannot call C<plan_local>. 
 
 =cut
 
 sub plan ($) {
   $Status->{Number} = shift;
-  print STDOUT "1..".$Status->{Number}."\n";
+  print $REPORT "1..".$Status->{Number}."\n";
 }
+
+=item plan_local ($n)
+
+Plans C<$n> tests.  More number of tests might be added later. 
+
+Note: This function can be called from anywhere in the test script 
+as far as C<plan> is not called. 
+
+=cut
+
+sub plan_local ($) {
+  my $n = shift;
+  $Status->{Number} += $n;
+  $Status->{Number_local} = 1;
+} # plan_local
+
+=item end_of_test
+
+Declares that the test has exited. 
+
+=cut
+
+sub end_of_test () {
+  if ($Status->{Number_local}) {
+    print $REPORT "1..".$Status->{Number}."\n";
+    $Status->{Number_local} = 0;
+  }
+} # end_of_test
 
 =item Special Function C<END>
 
@@ -145,28 +242,32 @@ Reports the result of the test for Perl's test manager and user
 =cut
 
 END {
+  if ($Status->{Number_local}) {
+    print $MSG test_comment "Looks like tests has stopped before the end";
+    print $REPORT "1..".($Status->{Count}+1)."\n";
+  }
   if ($Status->{Count} < $Status->{Number}) {
-    print STDERR test_comment
+    print $MSG test_comment
                    sprintf "Looks like you planned %d tests but only ran %d.",
                            $Status->{Number}, $Status->{Count};
   } elsif ($Status->{Number} < $Status->{Count}) {
-    print STDERR test_comment
+    print $MSG test_comment
                    sprintf "Looks like you planned %d tests but ran %d extra.",
                            $Status->{Number},
                            $Status->{Number} - $Status->{Count};
   }
   if (keys %{$Status->{Failed}}) {
-    print STDERR test_comment $Info->{Name};
-    print STDERR test_comment $Info->{Description};
-    print STDERR test_comment sprintf "Looks like you failed %d tests of %d.",
+    print $MSG test_comment $Info->{Name};
+    print $MSG test_comment $Info->{Description};
+    print $MSG test_comment sprintf "Looks like you failed %d tests of %d.",
                                       0 + keys %{$Status->{Failed}},
                                       $Status->{Number};
   } else {
     if ($Status->{Count} < $Status->{Number}) {
-      print STDERR test_comment $Info->{Name};
-      print STDERR test_comment $Info->{Description};
+      print $MSG test_comment $Info->{Name};
+      print $MSG test_comment $Info->{Description};
     }
-    print STDERR test_comment 
+    print $MSG test_comment 
                    sprintf "Looks like you passed %d tests.",
                            $Status->{Count};
   }
@@ -218,7 +319,10 @@ with a value; otherwise, this test script is skipped.
 
 sub impl_attr ($$) {
   my ($name, $val) = @_;
-  ## TODO: 
+  unless ($builder->{impl_attr}->{$name} eq $val) {
+    skip_rest
+      (msg => qq<implementation attribute "$name"="$val" does not match>);
+  }
 } # impl_attr
 
 =item hasFeature ($feature, $version)
@@ -231,7 +335,8 @@ this test script is skipped.
 sub hasFeature ($;$) {
   my ($name, $ver) = @_;
   unless ($Info->{__impl}->hasFeature ($name, $ver)) {
-    ## TODO: 
+    no warnings 'uninitialized';
+    skip_rest (msg => qq<feature "$name"/"$ver" is not supported>);
   }
 } # hasFeature
 
@@ -277,7 +382,11 @@ Asserts that the size of C<$collection> is equal to C<$size>.
 
 sub assertSize ($$$) {
   my ($id, $size, $coll) = @_;
-  if ($size == size ($coll)) {
+  if (not defined $coll) {
+    is_not_ok (id => $id,
+               value => $coll,
+               expected => ['non-null']);
+  } elsif ($size == size ($coll)) {
     is_ok;
   } else {
     is_not_ok (id => $id,
@@ -348,7 +457,34 @@ sub assertEqualsList ($$$) {
     is_not_ok (id => $id, value => 'length = '.@$actual,
                expected => 'length = '.@$expected);
   }
-}
+} # assertEqualsList
+
+sub assertEqualsCollection ($$$) {
+  my ($id, $ex, $ac) = @_;
+  unless (ref $ex eq 'ARRAY') {
+    die qq["@{[ref $ex]}": Unsupported expected collection type];
+  }
+  my $exl = @$ex;
+  my $acl = $ac->length;
+  if ($exl != $acl) {
+    is_not_ok (id => $id,
+               value => 'length = '.$acl,
+               expected => 'length = '.$exl);
+  }
+  for my $exi (@$ex) {
+    my $n = 0;
+    for (my $i = 0; $i < $acl; $i++) {
+      my $aci = $ac->item ($i);
+      $n++ if $aci eq $exi;
+    }
+    if ($n != 1) {
+      is_not_ok (id => $id,
+                 value => 'n ('.$exi.') = '.$n,
+                 expected => 'n = 1');
+    }
+  }
+  is_ok;
+} # assertEqualsCollection
 
 =item assertTrue $id, $condition
 
@@ -398,4 +534,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/01/05 12:19:39 $
+1; # $Date: 2005/01/06 10:41:32 $

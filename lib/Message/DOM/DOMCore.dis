@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/01/05 12:19:38 $
+      $Date: 2005/01/06 10:41:31 $
     @@ContentType:
       dis:Date.RCS
 
@@ -167,6 +167,11 @@ ElementTypeBinding:
         ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
     @@ForCheck:
       ManakaiDOM:DOM
+    @@ISA:
+      @@@@:
+        DOMMain:ManakaiDOMExceptionIF::ManakaiDOM:ManakaiDOMCommon
+      @@@ForCheck:
+        ManakaiDOM:ManakaiDOM ManakaiDOM:ForIF
     @@ISA:
       @@@@:
         ManakaiDOM:ManakaiDOMException
@@ -1132,6 +1137,13 @@ ExceptionDef:
             @@@@@lang:en
             @@@@@@:
               One of child nodes is read-only. 
+        @@@SubTypeDef:
+          @@@@QName:NOMOD_DESCENDANT_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              One of descendant nodes (including attribute nodes 
+              or its descendants) is read-only. 
         @@@SubTypeDef:
           @@@@QName:NOMOD_NAMEDNODEMAP_ERR
           @@@@Description:
@@ -4950,8 +4962,42 @@ IF:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         Isn't <IF:CDATASection> node fully-normalized?
+         The spec does not say to normalize nodes other than 
+         <IF::Text> (such as <IF::DOMXML:CDATASection>, 
+         <IF::Comment> and so on).
      @@Return:
+       @@@Exception:
+         @@@@@:
+           MDOMX:NOMOD_THIS
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             This node is read-only. 
+         @@@@For:
+           ManakaiDOM:ManakaiDOM
+       @@@Exception:
+         @@@@@:NOMOD_DESCENDANT_ERR
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             One of descendant (or attribute) is read-only. 
+         @@@@For:
+           ManakaiDOM:ManakaiDOM
+       @@@PerlDef:
+         @@@@@:
+           __DEEP{
+             $self->{<Q::TreeCore:node>}
+                -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode.normalizeText>
+                                                               (false, false);
+           }__;
+         @@@@ImplNote:
+           @@@@@lang:en
+           @@@@@@:
+             {TODO:: Character normalization should be implemented.
+             \
+             }
+           @@@@@ForCheck:
+             ManakaiDOM:ManakaiDOM3
      @@Level[list]:
        2
        3
@@ -5219,7 +5265,8 @@ IF:
               The DOM implementation was not able to obtain 
               an absolute URI.
         @@@PerlDef:
-            if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:ownerDocument>}
+            if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:ownerDocument>} and
+                $self->{<Q::TreeCore:node>}->{<Q::DOMCore:ownerDocument>}
                      ->{<Q::DOMCore:hasFeature>}->{HTML}) {
               $r = $self->{<Q::TreeCore:node>}
                      -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode.htmlBaseURI>;
@@ -6886,6 +6933,208 @@ ClassDef:
          $r = <M::DOMCore:ManakaiDOMNode.isEqualNode>
                 (<ClassM::ManakaiDOMNode.getNodeReference> ($self),
                  <ClassM::ManakaiDOMNode.getNodeReference> ($node));
+
+  @IntMethod:
+    @@Name:normalizeText
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Puts all <IF::Text> nodes in the full depth of the subtree 
+        underneath this node object, including attribute nodes attached 
+        to the element nodes, into a <QUOTE::normalized> form where 
+        only structure such as XML tags separates text nodes, i.e. 
+        there are neither adjacent text nodes nor empty text nodes. 
+        (For the support of DOM Level 1 <M::Element.normalize> and 
+        DOM levels 2 and 3 <M::Node.normalize>.) 
+        \
+        In addition, this method may also normalize text nodes in the subtree, 
+        i.e. the characters of the text nodes will be fully normalized. 
+        (For the support of DOM Level 3 <M::Node.normalize> with the 
+        configuration parameter <CP::normalize-characters> turned on.)
+     @@Param:
+       @@@Name:fullyNormalize
+       @@@Type:
+         DOMMain:boolean
+       @@@Description:
+         @@@@lang:en
+         @@@@@:
+           Whether the characters in the text nodes in the subtree  
+           should be fully normalized or not. 
+     @@Param:
+       @@@Name:isDescendant
+       @@@Type:
+         DOMMain:DOMString
+       @@@Description:
+         @@@@lang:en
+         @@@@@:
+           Whether this node is a descendant of the node to normalize or not. 
+       @@@InCase:
+         @@@@Value:true
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             This node is a descendant (or an attribute and 
+             an descendant of attribute of the root or its descendant)
+             of the node. 
+       @@@InCase:
+         @@@@Value:false
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             This node is the node to normalize. 
+   @@Return:
+       @@@Exception:
+         @@@@@:
+           MDOMX:NOMOD_THIS
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             This node is read-only. 
+       @@@Exception:
+         @@@@@:NOMOD_DESCENDANT_ERR
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             One of descendant (or attribute) is read-only. 
+     @@@PerlDef:
+       @@@@@:
+         if (@{$self->{<Q::infoset:children>}}) {
+           my @new;
+           my $changed = false;
+           my @change;
+           my @removed;
+           my $pchild;
+           for my $child (@{$self->{<Q::infoset:children>}}) {
+             if ($self->{<Q::DOMCore:nodeType>} eq <Q::DOMCore:Text>) {
+               if (length $child->{<Q::infoset:content>}) {
+                 if ($pchild) {
+                   if ($self->{<Q::DOMCore:read-only>}) {
+                     if ($isDescendant) {
+                       __EXCEPTION{NOMOD_DESCENDANT_ERR::
+                         DOMCore:nodeObject => {$self},
+                       }__;
+                     } else {
+                       __EXCEPTION{MDOMX:NOMOD_THIS::
+                         DOMCore:nodeObject => {$self},
+                       }__;
+                     }
+                   } elsif ($pchild->{<Q::DOMCore:read-only>}) {
+                     if ($child->{<Q::DOMCore:read-only>}) {
+                       ## Creates a new node
+                       my $text = <ClassM::ManakaiDOMText.newObject>;
+                       $self-><M::ManakaiDOM:ManakaiDOMNodeObject.importTree>
+                                                                       ($text);
+                       push @change, [$text, 'append', $pchild];
+                       push @change, [$text, 'append', $child];
+                       $text->{<Q::infoset:content>} = '';
+                       $text->{<Q::DOMCore:ownerDocument>}
+                                    = $child->{<Q::DOMCore:ownerDocument>};
+                       $text->{<Q::infoset:parent>} = $self;
+                       push @removed, $pchild, $child;
+                       $pchild = $text;
+                       push @new, $text;
+                       $changed = true;
+                     } else {
+                       push @change, [$child, 'prepend', $pchild];
+                       push @removed, $pchild;
+                       $pchild = $child;
+                       pop @new;
+                       push @new, $child;
+                       $changed = true;
+                     }
+                   } else {
+                     push @change, [$pchild, 'append', $child];
+                     push @removed, $child;
+                     $changed = true;
+                   }
+                 } else {
+                   $pchild = $child;
+                   push @new, $child;
+                 }
+               } else { # length zero
+                 if ($self->{<Q::DOMCore:read-only>}) {
+                   if ($isDescendant) {
+                     __EXCEPTION{NOMOD_DESCENDANT_ERR::
+                       DOMCore:nodeObject => {$self},
+                     }__;
+                   } else {
+                     __EXCEPTION{MDOMX:NOMOD_THIS::
+                       DOMCore:nodeObject => {$self},
+                     }__;
+                   }
+                 }
+                 push @removed, $child;
+                 $changed = true;
+               }
+             } elsif ({
+                         <Q::infoset:Element> => 1,
+                         <Q::DOMXML:EntityReference> => 1,
+                      }->{$self->{<Q::DOMCore:nodeType>}}) {
+               $pchild = null;
+               push @new, $child;
+               __DEEP{
+                 $child-><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                       .normalizeText> ($fullyNormalize, true);
+               }__;
+             } else {
+               $pchild = null;
+               push @new, $child;
+             }
+           }
+
+           if ($changed) {
+             ## NOTE: Actual changes made here, to avoid breaking data 
+             ##       when some of children are read-only. 
+             for (@change) {
+               if ($_->[1] eq 'append') {
+                 $_->[0]->{<Q::infoset:content>}
+                     .= $_->[2]->{<Q::infoset:content>};
+               } elsif ($_->[1] eq 'preprend') {
+                 $_->[0]->{<Q::infoset:content>}
+                      = $_->[1]->{<Q::infoset:content>} . 
+                        $_->[0]->{<Q::infoset:content>};
+               } else {
+                 __ASSERT{DISPerl:invariant::
+                   msg => {qq{Normalizing operation "$_->[1]"}},
+                 }__;
+               }
+             }
+  
+             for (@removed) {
+               CORE::delete $_->{<Q::infoset:parent>};
+               $_-><M::ManakaiDOM:ManakaiDOMNodeObject.orphanate>;
+             }
+   
+             $self->{<Q::infoset:children>} = \@new;
+
+             ## infoset:specified should turn on if normalization occured.
+             ## Otherwise, infoset does not change so that no change required. 
+           }
+         }
+
+         if ($self->{<Q::DOMCore:nodeType>} eq <Q::infoset:Attribute>) {
+           for (values %{$self->{<Q::infoset:attribute>}}) {
+             for (values %$_) {
+               $_-><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                       .normalizeText> ($fullyNormalize, true);
+             }
+           }
+         }
+
+         \## TODO: Normalization
+       @@@@ImplNote:
+         @@@@@lang:en
+         @@@@@@:
+           {NOTE:: Read-only status must not be changed by others
+                   during this process.
+           \
+           }
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        Normalization should be done after the merge of adjacent 
+        text nodes, since the merge might change the status 
+        of normalization. 
 ## ClassDef:ManakaiDOMNodeObjectNode
 
 ForDef:
@@ -10173,6 +10422,11 @@ IF:
                 $_-><M::ManakaiDOM:ManakaiDOMNodeObject.orphanate>;
               }
             } else {
+              my $docNode = $self->{<Q::DOMCore:ownerDocument>};
+              my $version = <Code::getDocumentXMLVersion:: $DOCOBJ = $docNode>;
+              __CODE{DOMMain:ensureXMLName:: $INPUT => $name,
+                                             $INPUT_PARAM_NAME => 'name',
+                                             $XMLVERSION => $version}__;
               $r = <ClassM::ManakaiDOMAttr.newObject>;
               $r->{<Q::DOMCore:name>} = $name;
               $node-><M::ManakaiDOM:ManakaiDOMNodeObject.importTree> ($r);
@@ -10390,7 +10644,7 @@ IF:
                      ->{$attrNode->{<Q::DOMCore:name>}} = $attrNode;
               }
               if ($r) {
-                delete $r->{<Q::infoset:parent>};
+                CORE::delete $r->{<Q::infoset:parent>};
                 $r-><M::ManakaiDOM:ManakaiDOMNodeObject.orphanate>;
                 $r = <ClassM::ManakaiDOMNode.getNodeReference> ($r, $self)
                   if defined wantarray;
@@ -11864,22 +12118,43 @@ IF:
     @@Description:
       @@@lang:en
       @@@@:
-         Put all <IF:Text> nodes in the full depth of the sub-tree 
-         underneath this <IF:Node>, including attribute nodes 
-         attaced to the <IF:Element>, 
-         into a "normal" form where only structure separates 
-         <IF:Text> nodes, i.e. there are neither adjacent <IF:Text> 
-         nodes nor empty <IF:Text> nodes. <SRC:DOM 1, 2, 3>
+         Puts all <IF::Text> nodes in the full depth of the sub-tree 
+         underneath this <IF::Node>, including attribute nodes 
+         attaced to the <IF::Element>, 
+         into a <QUOTE::normal> form where only structure separates 
+         <IF::Text> nodes, i.e. there are neither adjacent <IF::Text> 
+         nodes nor empty <IF::Text> nodes. 
     @@ImplNote:
       @@@lang:en
       @@@@:
-        The method "normalize" was defined in the "Element" interface in 
-        the DOM Level 1 but has been moved to 
-        the "Node" interface in the DOM Level 2 and higher.
+        DOM level 2 and 3 defines <M::Node.normalize> instead 
+        of <M::Element.normalize>. 
     @@DOMMain:implementFeature: CoreFeature10
     @@For:
       ManakaiDOM:DOM1 !ManakaiDOM:DOM2
     @@Return:
+       @@@Exception:
+         @@@@@:
+           MDOMX:NOMOD_THIS
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             This node is read-only. 
+         @@@@For:
+           ManakaiDOM:ManakaiDOM
+       @@@Exception:
+         @@@@@:NOMOD_DESCENDANT_ERR
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             One of descendant (or attribute) is read-only. 
+        @@@@For:
+          ManakaiDOM:ManakaiDOM
+      @@@PerlDef:
+       __DEEP{
+         $self->{<Q::TreeCore:node>}
+              -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode.normalizeText>;
+       }__;
   
   @ReAttr:
     @@Name: attributes
@@ -12475,6 +12750,8 @@ IF:
          The DOM Level 3 Core Specification is unclear about <IF:CDATASection>s.
          They should also be included (c.f. the definition for 
          <A:Text.replaceWholeText>).
+         \
+         What about unexpanded entity references?
      @@Get:
         @@@Type:  
           DOMMain:DOMString
@@ -12482,6 +12759,40 @@ IF:
           @@@@ContentType:
             lang:Perl
           @@@@@:
+            my $parent = $self-><AG::DOMCore:Node.parentNode>;
+            if ($parent-><AG::DOMCore:Node.nodeType> !=
+                <X::DOMCore:Node.ENTITY_REFERENCE_NODE>) {
+              my $start = -1;
+              my $end = -1;
+              my $mfound = 0;
+              my $sibs = $parent-><AG::DOMCore:Node.childNodes>;
+              my $sibl = $sibs-><AG::DOMCore:NodeList.length>;
+              for (my $i = 0; $i < $sibl; $i++) {
+                my $sib = $sibs-><AG::DOMCore:NodeList.item> ($i);
+                if (not $mfound and $sib-><M::DOMCore:Node.isSameNode> ($self)) {
+                  $start = $i if $start == -1;
+                  $end = $i;
+                  $mfound = 1;
+                } elsif ({
+                           <X::Node.TEXT_NODE> => 1,
+                           <X::Node.CDATA_SECTION_NODE> => 1,
+                         }->{$sib-><AG::DOMCore:Node.nodeType>}) {
+                  if ($mfound) {
+                    $end = $i;
+                  } else {
+                    $start = $end = $i;
+                  }
+                } elsif ($sib-><AG::DOMCore:Node.nodeType> ==
+                         <X::Node.ENTITY_REFERENCE_NODE>) {
+                  if ($mfound) {
+                    
+                  } else {
+
+                  }
+                }
+              }
+            }
+
    TODO: Implement this.
             my $node = $self->{<Q::TreeCore:node>};
             if ($node->{<Q::infoset:parent>}) {
@@ -12566,13 +12877,14 @@ IF:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: Always this value for the "Text" node.
+      @@@DefaultValue:
+        @@@@@: \#text
+        @@@@ContentType:
+          DISCore:String
       @@@Def:
         @@@@ContentType:
           lang:dis
-        @@@@DISLang:value:
-          @@@@@@: \#text
-          @@@@@ContentType:
-            DISCore:String
+        @@@@DISLang:nop:
   @ReAttr:
     @@Name: nodeType
     @@Description:
@@ -13235,8 +13547,17 @@ IFDef:
      @@Get:
         @@@Type:  DOMLocator
 
-IFDef:
-  @Name:  DOMErrorHandler
+IF:
+  @QName:
+    @@@: DOMErrorHandler
+    @@ForCheck:
+      ManakaiDOM:ForIF
+
+  @QName:
+    @@@: ManakaiDOMErrorHandler
+    @@ForCheck:
+      ManakaiDOM:ForClass
+
   @Description:
     @@lang:en
     @@@:
@@ -13250,12 +13571,31 @@ IFDef:
       If more than one error needs to be reported during an operation, 
       the sequence and numbers of the errors passed to the error handler 
       are implementation dependent.
+      \
+      {NOTE:: In the manakai DOM implementation, any Perl 
+              <Perl::CODE> reference is able to register 
+              as an error handler.
+      \
+      }
+
   @Level[list]:  3
   @SpecLevel:3
   @For:
     ManakaiDOM:DOM3
   @For:
     =ManakaiDOM:ManakaiDOM
+
+  @ManakaiDOM:inputNormalizer:
+    @@ContentType:
+      lang:Perl
+    @@@:
+      $INPUT = bless $INPUT, __PACKAGE__ if ref $INPUT eq 'CODE';
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        Classes inheriting this class must redefine this normalizer 
+        because of <Perl::__PACKAGE__>. 
+
   @Method:
      @@Name:  handleError
      @@Description:
@@ -13294,21 +13634,20 @@ IFDef:
             @@@@@lang:en
             @@@@@@:
               The processing should be stopped when possible.
-        @@@Exception:
-          @@@@Type: 
-            ManakaiDOM:ManakaiDOMImplementationException
-          @@@@Name: MDOM_IMPL_BY_APP
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The method MUST be implemented by the DOM application.
-        @@@Def:
-          @@@@ContentType:
-            lang:Perl
-          @@@@@:
-            __EXCEPTION{
-              MDOMX:MDOM_IMPL_BY_APP::
-            }__;
+        @@@PerlDef:
+          $r = $self->($error);
+  @IntMethod:
+    @@Name:createNOPHandler
+    @@ManakaiDOM:isStatic:1
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates a no-op error handler. 
+    @@Return:
+      @@@Type: ManakaiDOMErrorHandler
+      @@@PerlDef:
+        $r = bless sub {return false}, ref $self ? ref $self : $self;
+##DOMErrorHandler
 
 IFDef:
   @Name:  DOMLocator

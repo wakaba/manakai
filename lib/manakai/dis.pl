@@ -1564,10 +1564,7 @@ sub dis_perl_init_classdef ($;%) {
                 ExpandedURI q<ManakaiDOM:ExceptionClass>
                                      => ExpandedURI q<ManakaiDOM:ExceptionIF>,
                 ExpandedURI q<ManakaiDOM:WarningClass> => 'dummy',
-                                   }->{$type}, $_, %opt) or
-              ($type eq ExpandedURI q<ManakaiDOM:Class> and
-               dis_uri_ctype_match (ExpandedURI q<ManakaiDOM:DataType>,
-                                    $_, %opt))) {
+                                   }->{$type}, $_, %opt)) {
             push @{$res->{Implement}||=[]}, $if->{URI};
             last IF;
           }
@@ -2637,4 +2634,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/01/05 12:19:39 $
+1; # $Date: 2005/01/06 10:41:32 $

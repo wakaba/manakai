@@ -28,7 +28,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/01/05 12:19:39 $
+      $Date: 2005/01/06 10:41:32 $
     @@ContentType:
       dis:Date.RCS
 
@@ -420,6 +420,11 @@ ElementTypeBinding:
         ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
     @@ForCheck:
       ManakaiDOM:DOM
+    @@ISA:
+      @@@@:
+        DOMMain:ManakaiDOMExceptionIF::ManakaiDOM:ManakaiDOMCommon
+      @@@ForCheck:
+        ManakaiDOM:ManakaiDOM ManakaiDOM:ForIF
     @@ISA:
       @@@@:
         ManakaiDOM:ManakaiDOMException

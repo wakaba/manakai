@@ -1577,11 +1577,18 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
       $State->{Module}->{$State->{module}}
             ->{ExpandedURI q<dis2pm:requiredModule>}->{$_} ||= 1;
     }
+    $State->{ExpandedURI q<dis2pm:xifReferred>}
+          ->{$pack->{ExpandedURI q<dis2pm:packageName>}} = -1;
     for my $uri (@{$pack->{ISA}||[]}, 
                  @{$pack->{Implement}||[]}) {
       my $pack = $State->{Type}->{$uri};
       if (defined $pack->{ExpandedURI q<dis2pm:packageName>}) {
         push @$isa, $pack->{ExpandedURI q<dis2pm:packageName>};
+        if ($pack->{ExpandedURI q<dis2pm:type>} eq 
+            ExpandedURI q<ManakaiDOM:ExceptionIF>) {
+          $State->{ExpandedURI q<dis2pm:xifReferred>}
+                ->{$pack->{ExpandedURI q<dis2pm:packageName>}} ||= 1;
+        }
       } else {
         impl_msg ("Inheriting package name for <$uri> not defined",
                   node => $pack->{src}) if $Opt{verbose};
@@ -2211,10 +2218,19 @@ for (keys %{$State->{Module}->{$State->{module}}
 }
 $result = $begin . $result if $begin;
 
+## Exception interfaces
+for my $p (keys %{$State->{ExpandedURI q<dis2pm:xifReferred>}||{}}) {
+  my $v = $State->{ExpandedURI q<dis2pm:xifReferred>}->{$p};
+  if (ref $v or $v > 0) {
+    $result .= perl_inherit ['Message::Util::Error'], $p;
+    $State->{ExpandedURI q<dis2pm:referredPackage>}->{$p} = -1;
+  }
+}
+
 my @ref;
 for (keys %{$State->{ExpandedURI q<dis2pm:referredPackage>}||{}}) {
   my $v = $State->{ExpandedURI q<dis2pm:referredPackage>}->{$_};
-  if (ref $v or $v >= 0) {
+  if (ref $v or $v > 0) {
     push @ref, $_;
   }
 }
@@ -2253,4 +2269,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/01/05 12:19:38 $
+1; # $Date: 2005/01/06 10:41:31 $
