@@ -11,8 +11,8 @@ Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
   @DOM3Core:
      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/
-  @ManakaiDOMImplementationException:
-     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @ManakaiDOMXML:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
   @MDOM_EXCEPTION:
      http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @TreeCore: \
@@ -46,7 +46,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/19 12:49:34 $
+     $Date: 2004/09/20 05:53:13 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -115,7 +115,7 @@ Exception:
         @@@Value:  1
         @@@Param:
           @@@@QName:
-            ManakaiDOMImplementationException:param-name
+            MDOM_EXCEPTION:param-name
           @@@@Description:
             @@@@@lang:en
             @@@@@@: Parameter to which inappropriate value specified.
@@ -816,8 +816,8 @@ IF:
             } else {
               __EXCEPTION{ManakaiDOMImplementationException.
                           MDOM_TYPE_MISMATCH_ERR:
-                <Q:ManakaiDOMImplementationException:param-name> => 'list',
-                <Q:ManakaiDOMImplementationException:class> => ref $_,
+                <Q:MDOM_EXCEPTION:param-name> => 'list',
+                <Q:MDOM_EXCEPTION:class> => ref $_,
               }__;
             }
           }
@@ -1126,7 +1126,8 @@ IF:
               the language exposed through the "Document" does not support 
               XML Namespaces.
         @@@Exception:
-          @@@@Type: ManakaiDOMImplementationException
+          @@@@Type: 
+            ManakaiDOM:ManakaiDOMImplementationException
           @@@@Name: PARAM_NULL_POINTER
           @@@@Description:
             @@@@@lang:en
@@ -1305,7 +1306,8 @@ IF:
               and the language exposed through the "Document" does 
               not support XML Namespaces.
         @@@Exception:
-          @@@@Type: ManakaiDOMImplementationException
+          @@@@Type: 
+            ManakaiDOM:ManakaiDOMImplementationException
           @@@@Name: MDOM_TYPE_MISMATCH_ERR
           @@@@Description:
             @@@@@lang:en
@@ -3318,25 +3320,8 @@ IF:
           @@@@Type:
             lang:Perl
           @@@@@:
-            __DEEP{
-              for (@{$self->{<Q:TreeCore:node>}->{<Q:infoset:children>}}) {
-                if ($_->{<Q:DOMCore:nodeType>} eq <Q:DOMCore:Text>) {
-                  unless ($_->{<Q:infoset:elementContentWhitespace>}) {
-                    $r .= $_->textContent;
-                  }
-                } elsif ($_->{<Q:DOMCore:nodeType>} ne <Q:infoset:Comment> and
-                   $_->{<Q:DOMCore:nodeType>} ne
-                                       <Q:infoset:ProcessingInstruction>) {
-                  $r .= $_->textContent;
-                }
-              }
-            }__;
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@:
-            ISSUE: Element content does not allow non-whitespace 
-            character data or CDATA section.  In invalid document, 
-            how this is?
+            $r = $self->{<Q:TreeCore:node>}
+                  ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{textContent}__;
      @@Set:
         @@@Type:  DOMString
         @@@Description:
@@ -3691,6 +3676,10 @@ IF:
           @@@@Type:
             lang:dis
           @@@@Overridden:1
+    @@RedefinedBy:
+      ManakaiDOMCore:ManakaiDOMChildNodeList
+    @@RedefinedBy:
+      ManakaiDOMCore:ManakaiDOMGetElementsNodeList
   @Attr:
      @@Name:  length
      @@Description:
@@ -3703,6 +3692,10 @@ IF:
           @@@@Type:
              lang:dis
           @@@@Overridden:1
+    @@RedefinedBy:
+      ManakaiDOMCore:ManakaiDOMChildNodeList
+    @@RedefinedBy:
+      ManakaiDOMCore:ManakaiDOMGetElementsNodeList
 
 IF:
   @Name:  NamedNodeMap
@@ -3724,7 +3717,7 @@ IF:
       interface is not defined here, since each use of this interface 
       requires different treatment of it to be live object. 
     \
-      See also "ManakaiDOMCore" module.
+      See also "ManakaiDOMCore" and "ManakaiDOMXML" modules.
   @Method:
      @@Name:  getNamedItem
      @@Description:
@@ -3752,6 +3745,12 @@ IF:
           @@@@Type:
             lang:dis
           @@@@Overridden:1
+    @@RedefinedBy:
+      ManakaiDOMCore:ManakaiDOMAttributes 
+    @@RedefinedBy:
+      ManakaiDOMXML:ManakaiDOMEntities
+    @@RedefinedBy:
+      ManakaiDOMXML:ManakaiDOMNotations
   @Method:
      @@Name:  setNamedItem
      @@Description:
@@ -3825,6 +3824,12 @@ IF:
          name?  If it is, can that node be retrived via the "NS" methods? 
          Is it possible to add the node that has "nodeName" crushing 
          with existing "NS" node?
+    @@RedefinedBy:
+      ManakaiDOMCore:ManakaiDOMAttributes 
+    @@RedefinedBy:
+      ManakaiDOMXML:ManakaiDOMEntities
+    @@RedefinedBy:
+      ManakaiDOMXML:ManakaiDOMNotations
   @Method:
      @@Name:  removeNamedItem
      @@Description:
@@ -3869,6 +3874,12 @@ IF:
           @@@@Type:
             lang:dis
           @@@@Overridden:1
+    @@RedefinedBy:
+      ManakaiDOMCore:ManakaiDOMAttributes 
+    @@RedefinedBy:
+      ManakaiDOMXML:ManakaiDOMEntities
+    @@RedefinedBy:
+      ManakaiDOMXML:ManakaiDOMNotations
   @Method:
      @@Name:  item
      @@Description:
@@ -3897,6 +3908,12 @@ IF:
           @@@@Type:
             lang:dis
           @@@@Overridden:1
+    @@RedefinedBy:
+      ManakaiDOMCore:ManakaiDOMAttributes 
+    @@RedefinedBy:
+      ManakaiDOMXML:ManakaiDOMEntities
+    @@RedefinedBy:
+      ManakaiDOMXML:ManakaiDOMNotations
   @Attr:
      @@Name:  length
      @@Description:
@@ -3908,6 +3925,12 @@ IF:
           @@@@Type:
             lang:dis
           @@@@Overridden:1
+    @@RedefinedBy:
+      ManakaiDOMCore:ManakaiDOMAttributes 
+    @@RedefinedBy:
+      ManakaiDOMXML:ManakaiDOMEntities
+    @@RedefinedBy:
+      ManakaiDOMXML:ManakaiDOMNotations
   @Method:
      @@Name:  getNamedItemNS
      @@Description:
@@ -3970,6 +3993,12 @@ IF:
          implenentations do not need to implement this method. 
          The DOM Level 2 Errata and the DOM Level 3 Specification 
          says that the NOT_SUPPORTED_ERR should be raised.
+    @@RedefinedBy:
+      ManakaiDOMCore:ManakaiDOMAttributes 
+    @@RedefinedBy:
+      ManakaiDOMXML:ManakaiDOMEntities
+    @@RedefinedBy:
+      ManakaiDOMXML:ManakaiDOMNotations
   @Method:
      @@Name:  setNamedItemNS
      @@Description:
@@ -4055,6 +4084,12 @@ IF:
          says that the NOT_SUPPORTED_ERR should be raised.
      @@Level[list]:  2
      @@SpecLevel:2
+    @@RedefinedBy:
+      ManakaiDOMCore:ManakaiDOMAttributes 
+    @@RedefinedBy:
+      ManakaiDOMXML:ManakaiDOMEntities
+    @@RedefinedBy:
+      ManakaiDOMXML:ManakaiDOMNotations
   @Method:
      @@Name:  removeNamedItemNS
      @@Description:
@@ -4121,6 +4156,12 @@ IF:
          says that the NOT_SUPPORTED_ERR should be raised.
      @@Level[list]:  2
      @@SpecLevel:2
+    @@RedefinedBy:
+      ManakaiDOMCore:ManakaiDOMAttributes 
+    @@RedefinedBy:
+      ManakaiDOMXML:ManakaiDOMEntities
+    @@RedefinedBy:
+      ManakaiDOMXML:ManakaiDOMNotations
 ## IF:NamedNodeMap
 
 IF:
@@ -4730,7 +4771,8 @@ IF:
             lang:Perl
           @@@@@:
             __DEEP{
-              $r = $self->__SUPER{Attr::DOM3}__::textContent;
+              $r = $self->{<Q:TreeCore:node>}
+                  ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{textContent}__;
             }__;
           @@@@ImplNote:
             @@@@@lang:en
@@ -6604,6 +6646,16 @@ IF:
 
 IF:
   @Name:  DOMConfiguration
+  @Description:
+    @@lang:en
+    @@@:
+      The configuration of a document.  It maintains a table 
+      of recognized parameters.
+  @ImplNote:
+    @@lang:en
+    @@@:
+      Parameters affect: "Document.normalizeDocument", 
+      validation, "DOMParser" and "DOMSerializer", etc.
   @Level[list]:  3
   @SpecLevel:3
   @Method:

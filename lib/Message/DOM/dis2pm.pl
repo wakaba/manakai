@@ -48,14 +48,22 @@ sub output_result ($) {
 }
 
 ## Source file might be broken
-sub valid_err (@) {
+sub valid_err ($;%) {
+  my ($s, %opt) = @_;
   require Carp;
   output_result $result;
-  Carp::croak (@_);
+  if ($opt{node}) {
+    $s = $opt{node}->node_path (key => 'Name') . ': ' . $s;
+  }
+  Carp::croak ($s);
 }
-sub valid_warn (@) {
+sub valid_warn ($;%) {
+  my ($s, %opt) = @_;
   require Carp;
-  Carp::carp (@_);
+  if ($opt{node}) {
+    $s = $opt{node}->node_path (key => 'Name') . ': ' . $s;
+  }
+  Carp::carp ($s);
 }
 
 ## Implementation (this script) might be broken
@@ -83,7 +91,18 @@ sub english_number ($;%) {
   } else {
     qq<$num $opt{plural}>;
   }
-}
+} # english_number
+
+sub english_list ($;%) {
+  my ($list, %opt) = @_;
+  if (@$list > 1) {
+    join (', ', @$list[0..($#$list-1)]).
+    ' '.($opt{connector} || 'or').' '.
+    $list->[-1];
+  } else {
+    $list->[0];
+  }
+} # english_list
 
 
 sub perl_comment ($) {
@@ -666,6 +685,12 @@ sub pod_paras ($) {
   shift;
 }
 
+sub pod_cdata ($) {
+  my $s = shift;
+  $s =~ s/([<>])/{'<' => 'E<lt>', '>' => 'E<gt>'}->{$1}/ge;
+  $s;
+}
+
 sub pod_code ($) {
   my $s = shift;
   $s =~ s/([<>])/{'<' => 'E<lt>', '>' => 'E<gt>'}->{$1}/ge;
@@ -742,30 +767,32 @@ sub type_isa ($$) {
 }
 }
 
-sub type_label ($) {
+sub type_label ($;%) {
   my $uri = type_normalize shift;
+  my %opt = @_;
+  my $pod_code = sub { $opt{is_pod} ? pod_code $_[0] : $_[0] };
   my $r = {
     ExpandedURI q<DOMMain:unsigned-long> => q<Unsigned Long Integer>,
     ExpandedURI q<DOMMain:unsigned-short> => q<Unsigned Short Integer>,
     ExpandedURI q<ManakaiDOM:ManakaiDOMURI>
-      => q<DOMString (DOM URI)>,
+      => $pod_code->(q<DOMString>).q< (DOM URI)>,
     ExpandedURI q<ManakaiDOM:ManakaiDOMNamespaceURI>
-      => q<DOMString (Namespace URI)>,
+      => $pod_code->(q<DOMString>).q< (Namespace URI)>,
     ExpandedURI q<ManakaiDOM:ManakaiDOMFeatureName>
-      => q<DOMString (DOM Feature name)>,
+      => $pod_code->(q<DOMString>).q< (DOM Feature name)>,
     ExpandedURI q<ManakaiDOM:ManakaiDOMFeatureVersion>
-      => q<DOMString (DOM Feature version)>,
+      => $pod_code->(q<DOMString>).q< (DOM Feature version)>,
     ExpandedURI q<ManakaiDOM:ManakaiDOMFeatures>
-      => q<DOMString (DOM features)>,
+      => $pod_code->(q<DOMString>).q< (DOM features)>,
   }->{$uri};
   unless ($r) {
     if ($uri =~ /([\w_-]+)$/) {
       my $label = $1;
       $label =~ s/--+/ /g;
       $label =~ s/__+/ /g;
-      $r = $label;
+      $r = $pod_code->($label);
     } else {
-      $r = "<$uri>";
+      $r = $pod_code->("<$uri>");
     }
   }
   $r;
@@ -957,21 +984,137 @@ sub dis2perl ($) {
   $r;
 } # dis2perl
 
-sub get_description ($%) {
+{
+use re 'eval';
+our $Element;
+$Element = qr/[A-Za-z0-9]+(?>:(?>[^<>]*)(?>(?>[^<>]+|<(??{$Element})>)*))?/;
+my $MElement = qr/([A-Za-z0-9]+)(?>:((?>[^<>]*)(?>(?>[^<>]+|<(??{$Element})>)*)))?/;
+  
+sub disdoc2text ($;%);
+sub disdoc2text ($;%) {
+  my ($s, %opt) = @_;
+  $s =~ s{\G(?:([^<>]+)|<$MElement>|(.))}{
+    my ($cdata, $type, $data, $err) = ($1, $2, defined $3 ? $3 : '', $4);
+    my $r = '';
+    if (defined $err) {
+      valid_err qq<Invalid character "$err" in DISDOC>,
+        node => $opt{node};
+    } elsif (defined $cdata) {
+      $r = $cdata;
+    } elsif ({IF => 1, Type => 1, Param => 1, XML => 1, SGML => 1, DOM => 1,
+              Feature => 1, FeatureVer => 1}->{$type}) {
+      $r = q<"> . $data . q<">;
+    } elsif ({M => 1, A => 1, X => 1, Warn => 1}->{$type}) {
+      if ($data =~ /^([^.]+)\.([^.]+)$/) {
+        $r = q<"> . $1 . '->' . $2 . q<">;
+      } else {
+        $r = q<"> . $data . q<">;
+      }
+    } elsif ($type eq 'lt') {
+      $r = '<';
+    } elsif ($type eq 'gt') {
+      $r = '>';
+    } else {
+      valid_err qq<DISDOC element type "$type" not supported>,
+        node => $opt{node};
+    }
+    $r;
+  }ges;
+  $s;
+}
+
+sub disdoc2pod ($;%);
+sub disdoc2pod ($;%) {
+  my ($s, %opt) = @_;
+  $s =~ s{\G(?:([^<>]+)|<$MElement>|(.))}{
+    my ($cdata, $type, $data, $err) = ($1, $2, defined $3 ? $3 : '', $4);
+    my $r = '';
+    if (defined $err) {
+      valid_err qq<Invalid character "$err" in DISDOC>,
+        node => $opt{node};
+    } elsif (defined $cdata) {
+      $r = pod_cdata $cdata;
+    } elsif ({
+              IF => 1, Type => 1, Param => 1, DOM => 1, XML => 1,
+              SGML => 1, Feature => 1, FeatureVer => 1,
+             }->{$type}) {
+      $r = pod_code $data;
+    } elsif ({
+              M => 1, A => 1,
+             }->{$type}) {
+      if ($data =~ /^([^.]+)\.([^.]+)$/) {
+        $r = pod_code ($1 . '->' . $2);
+      } else {
+        $r = pod_code $data;
+      }
+    } elsif ({X => 1, Warn => 1}->{$type}) {
+      if ($data =~ /^([^.]+)\.([^.]+)$/) {
+        $r = pod_code ($1) . '.' . pod_code ($2);
+      } else {
+        $r = pod_code $data;
+      }
+    } elsif ($type eq 'lt' or $type eq 'gt') {
+      $r = qq<E<$type>>;
+    } else {
+      valid_err qq<DISDOC element type "$type" not supported>,
+        node => $opt{node};
+    }
+    $r;
+  }ges;
+  $s;
+}
+}
+
+sub get_description ($;%) {
   my ($node, %opt) = @_;
   my $ln = $opt{name} || 'Description';
   my $lang = $opt{lang} || q<en> || q<i-default>;
+  my $textplain = ExpandedURI q<DOMMain:any>;
+  my $default = ExpandedURI q<lang:disdoc>;
+  $opt{type} ||= ExpandedURI q<lang:pod>;
   my $script = $opt{script} || q<>;
-  my $def = $node->get_element_by (sub {
-    my ($me, $you) = @_;
-    $you->local_name eq $ln and
-    $you->get_attribute_value ('lang', default => 'i-default') eq $lang;
-  }) || $node->get_element_by (sub {
-    my ($me, $you) = @_;
-    $you->local_name eq $ln and
-    $you->get_attribute_value ('lang', default => 'i-default') eq 'i-default';
-  });
-  $def ? $def->value : $opt{default};
+  my $def;
+  for my $type (($opt{type} ne $textplain ? $opt{type} : ()),
+                ExpandedURI q<lang:disdoc>,
+                $textplain) {
+    $def = $node->get_element_by (sub {
+      my ($me, $you) = @_;
+      $you->local_name eq $ln and
+      $you->get_attribute_value ('lang', default => 'i-default') eq $lang and
+      $you->get_attribute_value ('Type', default => $default) eq $type;
+    }) || $node->get_element_by (sub {
+      my ($me, $you) = @_;
+      $you->local_name eq $ln and
+      $you->get_attribute_value ('lang', default => 'i-default')
+                                 eq 'i-default' and
+      $you->get_attribute_value ('Type', default => $default) eq $type;
+    });
+    last if $def;
+  }
+  unless ($def) {
+    $opt{default};
+  } else {
+    my $srctype = $def->get_attribute_value ('Type', default => $default);
+    valid_err q<Description undefined>, node => $def
+      unless defined $def->value;
+    if ($srctype eq ExpandedURI q<lang:disdoc>) {
+      if ($opt{type} eq ExpandedURI q<lang:pod>) {
+        disdoc2pod ($def->value, node => $def);
+      } else {
+        disdoc2text ($def->value, node => $def); 
+      }
+    } elsif ($srctype eq ExpandedURI q<lang:muf>) {
+      muf_template $def->value;
+    } elsif ($srctype eq $opt{type}) {
+      $def->value;
+    } else {
+      if ($opt{type} eq ExpandedURI q<lang:pod>) {
+        pod_paras $textplain;
+      } else {
+        $textplain;
+      }
+    }
+  }
 }
 
 sub get_level_description ($%) {
@@ -999,7 +1142,56 @@ sub get_level_description ($%) {
     $r .= q< and modified in DOM Level > . (0 + $l[0]);
   }
   $r;
-}
+} # get_level_description
+
+sub get_redef_description ($;%) {
+  my ($node, %opt) = @_;
+  my @desc;
+  $opt{if} ||= 'interface';
+  $opt{method} ||= 'method';
+  if ($node->local_name eq 'ReMethod' or
+      $node->local_name eq 'ReAttr') {
+    my $redef = $node->get_attribute_value ('Redefine');
+    push @desc, pod_para qq<This $opt{method} is defined by the >.
+                         ($redef ? qq<$opt{if} > . type_label
+                                                    (type_expanded_uri ($redef),
+                                                     is_pod => 1)
+                                 : qq<super-$opt{if} of this $opt{if}>).
+                         q< but that definition has been overridden here.>;
+  } else {
+    my @redefBy;
+    for (@{$node->child_nodes}) {
+      next unless $_->node_type eq '#element' and
+                  $_->local_name eq 'RedefinedBy';
+      push @redefBy, type_label (type_expanded_uri ($_->value), is_pod => 1);
+    }
+    if (@redefBy) {
+      push @desc, pod_para qq<This $opt{method} is redefined by the >.
+                           qq<implementation of the sub-$opt{if}>.
+                           (@redefBy > 1 ? 's ' : ' ').
+                           english_list (\@redefBy, connector => 'and').'.';
+    }
+  }
+  @desc;
+} # get_redef_description;
+
+sub get_isa_description ($;%) {
+  my ($node, %opt) = @_;
+  $opt{if} ||= 'interface';
+  my @desc;
+  my @isa;
+  for (@{$node->child_nodes}) {
+    next unless $_->node_type eq '#element' and
+                $_->local_name eq 'ISA';
+    my $v = $_->value;
+    $v =~ s/::[^:]*$//g;
+    push @isa, type_label (type_expanded_uri ($v), is_pod => 1);
+  }
+  push @desc, pod_para (qq<This $opt{if} inherits >.
+                        english_list (\@isa, connector => 'and').q<.>)
+    if @isa;
+  @desc;
+} # get_isa_description
 
 sub get_incase_label ($;%) {
   my ($node, %opt) = @_;
@@ -1022,7 +1214,7 @@ sub get_incase_label ($;%) {
       }
       $label = $opt{is_pod} ? pod_code $label : $label;
     } else {
-      $label = type_label $type;
+      $label = type_label $type, is_pod => $opt{is_pod};
     }
   }
   $label;
@@ -1350,7 +1542,8 @@ sub if2perl ($) {
                pod_paras (get_description ($node)),
                pod_para ('The package ' . pod_code ($pack_name) .
                          q< implements the DOM interface > .
-                         pod_code ($if_name) . $mod . q<.>);
+                         pod_code ($if_name) . $mod . q<.>),
+               get_isa_description ($node);
   
   for my $condition ((sort keys %{$Info->{Condition}}), '') {
     if ($condition =~ /^DOM(\d+)$/) {
@@ -1527,7 +1720,7 @@ sub method2perl ($;%) {
           push @param_domstring, [$name, $type];
         }
         push my @param_desc_val,
-                          pod_item (type_label $type),
+                          pod_item (type_label $type, is_pod => 1),
                           pod_para get_description $_;
         $param_prototype .= '$';
         for (@{$_->child_nodes}) {
@@ -1644,10 +1837,11 @@ sub method2perl ($;%) {
     }
 
     if ($has_return) {
-      push @return, pod_item (type_label type_expanded_uri
-                                     $return->get_attribute_value
+      push @return, pod_item (type_label (type_expanded_uri
+                                     ($return->get_attribute_value
                                                 ('Type',
                                                  default => 'DOMMain:any')),
+                                          is_pod => 1)),
                     pod_para (get_description $return);
     }
     for (@{$return->child_nodes}) {
@@ -1657,9 +1851,10 @@ sub method2perl ($;%) {
         $has_return++;
       } elsif ($_->local_name eq 'Exception') {
         push @exception, pod_item ('Exception: ' .
-                                pod_code (type_label ($_->get_attribute_value
+                                     (type_label ($_->get_attribute_value
                                                    ('Type',
-                                                    default => 'DOMMain:any'))) .
+                                                    default => 'DOMMain:any'),
+                                                      is_pod => 1)).
                                 '.' . pod_code $_->get_attribute_value
                                                    ('Name',
                                                     default => '<unknown>')),
@@ -1708,6 +1903,8 @@ sub method2perl ($;%) {
     push @desc, pod_para q<This method does not return any value
                            nor does raise any exceptions.>;
   }
+
+  push @desc, get_redef_description $node;
 
   if ($node->local_name eq 'IntMethod' or
       $Status->{if}->{method_documented}->{$m_name}++) {
@@ -1762,7 +1959,6 @@ sub attr2perl ($;%) {
                $level ? pod_para ('The method ' . pod_code ($m_name) .
                            q< has been > . $level . '.') : ();
 
-  my @return;
   my $code_node = get_perl_definition_node $return,
                               condition => $opt{condition},
                               level_default => $opt{level_default},
@@ -1842,6 +2038,8 @@ sub attr2perl ($;%) {
     }
   }
 
+  my @return;
+  my @return_xcept;
   if ($code_node) {
     is_implemented if => $Status->{IF}, attr => $Status->{Method},
                    condition => $opt{condition}, set => 1, on => 'get';
@@ -1878,22 +2076,22 @@ sub attr2perl ($;%) {
          if $int_code_node->get_attribute_value ('auto-argument', default => 1);
     }
 
-    push @return, pod_item ('Return Value: ' .
-                              type_label type_expanded_uri
+    push @return, pod_item (type_label (type_expanded_uri
                                      $return->get_attribute_value
                                                 ('Type',
-                                                 default => 'DOMMain:any')),
+                                                 default => 'DOMMain:any'),
+                                          is_pod => 1)),
                     pod_para (get_description $return);
     for (@{$return->child_nodes}) {
       if ($_->local_name eq 'InCase') {
-        push @return, pod_item ('Return Value: ' . get_incase_label $_,
-                                                                    is_pod => 1),
+        push @return, pod_item (get_incase_label $_, is_pod => 1),
                       pod_para (get_description $_);
       } elsif ($_->local_name eq 'Exception') {
-        push @return, pod_item ('Exception: ' .
-                                pod_code (type_label ($_->get_attribute_value
+        push @return_xcept, pod_item ('Exception: ' .
+                                (type_label ($_->get_attribute_value
                                                    ('Type',
-                                                    default => 'DOMMain:any'))) .
+                                                    default => 'DOMMain:any'),
+                                                      is_pod => 1)) .
                                 '.' . pod_code $_->get_attribute_value
                                                    ('Name',
                                                     default => '<unknown>')),
@@ -1915,12 +2113,19 @@ sub attr2perl ($;%) {
                     ExpandedURI q<MDOM_EXCEPTION:on> => 'get',
                   };
     @return = ();
-    push @return, pod_item ('Exception: ' . pod_code ('DOMException') . '.' .
+    push @return_xcept,
+                  pod_item ('Exception: ' . pod_code ('DOMException') . '.' .
                             pod_code ('NOT_SUPPORTED_ERR')),
                   pod_para ('Getting of this attribute allways result in
                              this exception raisen, since this
                              attribute is not implemented yet.');
   }
+  push @desc, pod_para ('DOM applications can get the value by:'),
+              pod_pre (qq{\$return = \$obj->$m_name}),
+              pod_list (4,
+                        @return ? (pod_item pod_code q<$return>,
+                                   pod_list 4, @return): (),
+                        @return_xcept);
 
   my @set_desc;
   my @set_xcept;
@@ -1942,22 +2147,22 @@ sub attr2perl ($;%) {
     }
     $set_code = get_warning_perl_code ($set) . $set_code;
 
-    push @set_desc, pod_item ('Setting Value: ' .
-                              type_label type_expanded_uri
-                                     $set->get_attribute_value
+    push @set_desc, pod_item (type_label (type_expanded_uri
+                                     ($set->get_attribute_value
                                                 ('Type',
                                                  default => 'DOMMain:any')),
+                                          is_pod => 1)),
                     pod_para (get_description $set);
     for (@{$set->child_nodes}) {
       if ($_->local_name eq 'InCase') {
-        push @set_desc, pod_item ('Setting Value: ' . get_incase_label $_,
-                                                                  is_pod => 1),
+        push @set_desc, pod_item (get_incase_label $_, is_pod => 1),
                         pod_para (get_description $_);
       } elsif ($_->local_name eq 'Exception') {
         push @set_xcept, pod_item ('Exception: ' .
-                                pod_code (type_label ($_->get_attribute_value
+                                (type_label ($_->get_attribute_value
                                                    ('Type',
-                                                    default => 'DOMMain:any'))) .
+                                                    default => 'DOMMain:any'),
+                                                      is_pod => 1)) .
                                 '.' . pod_code $_->get_attribute_value
                                                    ('Name',
                                                     default => '<unknown>')),
@@ -1987,22 +2192,23 @@ sub attr2perl ($;%) {
   }
   
   if ($has_set) {
-    push @desc, pod_para ('This attribute can be set the value by:'),
+    push @desc, pod_para ('DOM applications can set the value by:'),
                 pod_pre (qq{\$obj->$m_name (\$given)}),
-                pod_para ('Value to set to this attribute:'),
-                pod_list 4, @set_desc;
+                pod_list 4, 
+                  pod_item (pod_code q<$given>),
+                  pod_list 4, @set_desc;
+    push @desc, (@set_xcept ?
+                    (pod_para (q<Setting this attribute may raise exception:>),
+                     pod_list (4, @set_xcept)) :
+                    (pod_para (q<Setting this attribute does not raise >.
+                               q<exception in general.>)));
   } else {
     push @desc, pod_para ('This attribute is read-only.');
   }
   is_implemented if => $Status->{IF}, method => $Status->{Method},
                  condition => $opt{condition}, set => $Status->{is_implemented};
 
-  push @desc, pod_list 4,
-                  pod_item (q<Result on getting:>),
-                  pod_list (4, @return),
-                  (@set_xcept ?
-                    (pod_item (q<Exception on setting:>),
-                     pod_list (4, @set_xcept)) : ());
+  push @desc, get_redef_description $node, method => 'attribute';
 
   if ($node->local_name eq 'IntAttr' or
       $Status->{if}->{method_documented}->{$m_name}++) {
@@ -2139,7 +2345,7 @@ sub datatypealias2perl ($;%) {
   my $real_long_name = type_expanded_uri
                          (my $real_name = $node->get_attribute_value
                                              ('Type', default => 'DOMMain:any'));
-  if (type_label $real_long_name eq type_label $long_name) {
+  if (type_label ($real_long_name) eq type_label ($long_name)) {
     $Info->{DataTypeAlias}->{$long_name}->{canon_uri} = $real_long_name;
     return perl_comment sprintf '%s <%s> := %s <%s>',
                                 type_label $long_name, $long_name,
@@ -2172,7 +2378,7 @@ sub datatypealias2perl ($;%) {
                pod_head ($Status->{depth}, 'Type ' . pod_code $if_name),
                pod_paras (get_description ($node)),
                pod_para ('This type is an alias of the type ' .
-                         pod_code (type_label $real_long_name) . '.'),
+                         (type_label $real_long_name, is_pod => 1) . '.'),
                ($mod ? pod_para ('This type is ' . $mod) : ());
 
   for (@{$node->child_nodes}) {
@@ -2398,12 +2604,9 @@ sub const2perl ($;%) {
                                          local_name => $name), prototype => '',
                        code => $code
        if $opt{package} and $Info->{Package} ne $opt{package};
-    my $desc_template = get_perl_definition_node ($node);
-    if ($desc_template) {
-      $desc_template = muf_template get_description $desc_template;
-    } else {
-      $desc_template = get_description ($node, default => $name);
-    }
+    my $desc_template = get_description $node,
+                                      type => ExpandedURI q<lang:muf>,
+                                      default => $name;
     $Status->{const}->{$name} = {
       description => $desc_template,
       code_literal => $code,
@@ -2847,6 +3050,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/09/19 12:49:34 $
+# $Date: 2004/09/20 05:53:14 $
 
 

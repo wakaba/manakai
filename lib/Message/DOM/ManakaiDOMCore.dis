@@ -33,7 +33,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/19 07:14:42 $
+     $Date: 2004/09/20 05:53:13 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -74,6 +74,77 @@ Module:
       @@@@: The Manakai DOM Core Module, Level 3.
 
 IF:
+  @Name: ManakaiDOMNodeObjectNode
+  @Description:
+    @@lang:en
+    @@@:
+      The extended internal interface for the "ManakaiDOMNodeObject" 
+      object used as a "Node".
+  @ISA:
+    ManakaiDOM:ManakaiDOMNodeObject
+  @IntAttr:
+    @@Name: textContent
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Get text content of this node.
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        This attribute is parallel to the attribute "textContent" of 
+        the "Node" interface.
+    @@Get:
+      @@@Type:
+        DOMMain:DOMString
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          if ({
+                <Q:infoset:Element> => 1,
+                <Q:infoset:Attribute> => 1,
+                <Q:DOMCore:Entity> => 1,
+                <Q:DOMCore:EntityReference> => 1,
+                <Q:DOMCore:DocumentFragment> => 1,
+              }->{$self->{<Q:DOMCore:nodeType>}}) {
+            __DEEP{
+              for (@{$self->{<Q:infoset:children>}}) {
+                if ($_->{<Q:DOMCore:nodeType>} eq <Q:DOMCore:Text>) {
+                  unless ($_->{<Q:infoset:elementContentWhitespace>}) {
+                    $r .= $_->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{textContent}__;
+                  }
+                } elsif ($_->{<Q:DOMCore:nodeType>} ne <Q:infoset:Comment> and
+                   $_->{<Q:DOMCore:nodeType>} ne
+                                       <Q:infoset:ProcessingInstruction>) {
+                  $r .= $_->__SUPER{ManakaiDOMNodeObjectNode}__::__INT{textContent}__;
+                }
+              }
+            }__;
+          } elsif ({
+                     <Q:DOMCore:Text> => 1,
+                     <Q:DOMCore:CDATASection> => 1,
+                     <Q:infoset:Comment> => 1,
+                     <Q:infoset:ProcessingInstruction> => 1,
+                   }->{$self->{<Q:DOMCore:nodeType>}}) {
+            $r = $self->{<Q:infoset:content>};
+          } else {
+            $r = null;
+          }
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            ISSUE: Element content does not allow non-whitespace 
+            character data or CDATA section.  In invalid document, 
+            how this is?
+      @@ImplNote:
+        @@@lang:en
+        @@@@:
+          Setting is not defined - use the attribute "textContent" of 
+          the  "Node" interface.
+      @@Level: 1
+      @@SpecLevel:1
+
+IF:
   @Name:  ManakaiDOMChildNodeList
   @ISA:
     ManakaiDOM:ManakaiDOMNodeReference
@@ -83,7 +154,7 @@ IF:
     @@lang:en
     @@@:
       An ordered collection of child nodes.
-  @Method:
+  @ReMethod:
      @@Name:  item
      @@Description:
        @@@lang:en
@@ -123,7 +194,9 @@ IF:
       1
       2
       3
-  @Attr:
+    @@Redefine:
+      DOMCore:NodeList
+  @ReAttr:
      @@Name:  length
      @@Description:
        @@@lang:en
@@ -136,6 +209,8 @@ IF:
              lang:dis
           @@@@@:
             $r = @{$self->{<Q:TreeCore:node>}->{<Q:infoset:children>}};
+    @@Redefine:
+       DOMCore:NodeList
 ## IF:ManakaiDOMChildNodeList
 
 IF:
@@ -146,7 +221,7 @@ IF:
     @@lang:en
     @@@:
       An ordered collection of nodes, returned by "getElementsBy"-methods.
-  @Method:
+  @ReMethod:
      @@Name:  item
      @@Description:
        @@@lang:en
@@ -173,7 +248,9 @@ IF:
               The "index" is invalid, i.e. it is greater than or 
               equal to the number of nodes in the list.
 
-  @Attr:
+    @@Redefine:
+      DOMCore:NodeList
+  @ReAttr:
      @@Name:  length
      @@Description:
        @@@lang:en
@@ -181,6 +258,8 @@ IF:
          The number of nodes in the list.
      @@Get:
         @@@Type:  unsigned-long
+    @@Redefine:
+      DOMCore:NodeList
 ## IF:ManakaiDOMGetElementsNodeList
 
 IF:
@@ -193,7 +272,7 @@ IF:
     @@lang:en
     @@@:
       A list of attributes attached to an "Element" node.
-  @Method:
+  @ReMethod:
      @@Name:  getNamedItem
      @@Description:
        @@@lang:en
@@ -221,7 +300,9 @@ IF:
           @@@@Type:
             lang:dis
           @@@@Overridden:1
-  @Method:
+    @@Redefine:
+      DOMCore:NamedNodeMap
+  @ReMethod:
      @@Name:  setNamedItem
      @@Description:
        @@@lang:en
@@ -289,7 +370,9 @@ IF:
           @@@@Type:
             lang:dis
           @@@@Overridden:1
-  @Method:
+    @@Redefine:
+      DOMCore:NamedNodeMap
+  @ReMethod:
      @@Name:  removeNamedItem
      @@Description:
         @@@lang:en
@@ -330,7 +413,9 @@ IF:
             @@@@@lang:en
             @@@@@@:
               This exception is added by the DOM Level 1 First Edition Errata.
-  @Method:
+    @@Redefine:
+      DOMCore:NamedNodeMap
+  @ReMethod:
      @@Name:  item
      @@Description:
        @@@lang:en
@@ -355,7 +440,9 @@ IF:
             @@@@@@: 
               The "index" is invalid, i.e. it is greater than or 
               equal to the number of nodes in this map.
-  @Attr:
+    @@Redefine:
+      DOMCore:NamedNodeMap
+  @ReAttr:
      @@Name:  length
      @@Description:
        @@@lang:en
@@ -366,7 +453,9 @@ IF:
           @@@@Type:
             lang:dis
           @@@@Overridden:1
-  @Method:
+    @@Redefine:
+      DOMCore:NamedNodeMap
+  @ReMethod:
      @@Name:  getNamedItemNS
      @@Description:
        @@@lang:en
@@ -419,7 +508,9 @@ IF:
               support XML Namespaces.
      @@Level[list]:  2
      @@SpecLevel:2
-  @Method:
+    @@Redefine:
+      DOMCore:NamedNodeMap
+  @ReMethod:
      @@Name:  setNamedItemNS
      @@Description:
        @@@lang:en
@@ -503,7 +594,9 @@ IF:
          says that the NOT_SUPPORTED_ERR should be raised.
      @@Level[list]:  2
      @@SpecLevel:2
-  @Method:
+    @@Redefine:
+      DOMCore:NamedNodeMap
+  @ReMethod:
      @@Name:  removeNamedItemNS
      @@Description:
         @@@lang:en
@@ -575,6 +668,8 @@ IF:
          says that the NOT_SUPPORTED_ERR should be raised.
      @@Level[list]:  2
      @@SpecLevel:2
+    @@Redefine:
+      DOMCore:NamedNodeMap
 ## IF:ManakaiDOMAttributes
 
 ## ManakaiDOMCore.dis ends here

@@ -37,13 +37,13 @@ Module:
   @ImplNote:
     @@lang:en
     @@@:
-      The DOM Core Module ("Core" feature) and the feature "XMLVersion" 
-      with version "1.0" must be supported.
+      The DOM Core Module (<Feature:Core> feature) and the feature 
+      <Feature:XMLVersion> with version <FeatureVer:1.0> must be supported.
   
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/19 12:49:34 $
+     $Date: 2004/09/20 05:53:13 $
   @Require:
     @@Module:
       @@@Name: DOMCore
@@ -115,7 +115,9 @@ Module:
       @@@@: The Extensible Markup Language (XML) 1.0. 
     @@ImplNote:
       @@@lang:en
-      @@@@: The "XML"/"3.0" feature must be supported [DOM 3].
+      @@@@:
+        The <Feature:XML>/<FeatureVer:3.0> feature must be supported 
+        <SRC:DOM 3>.
   @Feature:
     @@Name: XMLVersion
     @@Version: 1.1
@@ -130,11 +132,13 @@ Module:
       @@@@: The Extensible Markup Language (XML) 1.1.
     @@ImplNote:
       @@@lang:en
-      @@@@: The "XML"/"3.0" feature must be supported [DOM 3].
+      @@@@:
+        The <Feature:XML>/<FeatureVer:3.0> feature must be supported 
+        <SRC:DOM 3>.
 
 IF:
   @Name:  CDATASection
-  @ISA[list]:  Text
+  @ISA:  Text
   @Spec:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-667469212
@@ -142,10 +146,11 @@ IF:
     @@lang:en
     @@@:
       The CDATA section, i.e. the marked section with its effective status 
-      of "CDATA".
+      of <XML:CDATA>.
   @ImplNote:
     @@lang:en
-    @@@: "CDATASection" is a "Text" is a "CharacterData" is a "Node".
+    @@@: 
+      <IF:CDATASection> is a <IF:Text> is a <IF:CharacterData> is a <IF:Node>.
   
   @ReAttr:
     @@Name: nodeName
@@ -162,7 +167,8 @@ IF:
         @@@@Value:\#cdata-section
         @@@@Description:
           @@@@@lang:en
-          @@@@@@: Always this value for the "CDATASection" node.
+          @@@@@@:
+            Always this value for the <IF:CDATASection> node.
       @@@DefaultValue: \#cdata-section
       @@@Def: \
     @@Redefine: Node
@@ -177,7 +183,8 @@ IF:
         @@@@Label: CDATA_SECTION_NODE
         @@@@Description:
           @@@@@lang:en
-          @@@@@@: The node is a "CDATASection".
+          @@@@@@:
+            The node is a <IF:CDATASection>.
       @@@Def:
         @@@@Type:
           lang:Perl
@@ -187,24 +194,24 @@ IF:
 
 IF:
   @Name:  DocumentType
-  @ISA[list]:  Node
+  @ISA:  Node
   @Spec:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-412266927
   @Description:
     @@lang:en
     @@@:
-      A "Node" corresponding to a document type declaration in the XML 
+      A <IF:Node> corresponding to a document type declaration in the XML 
       document entity or the document type declaration information 
       item of the XML Infoset.
     \
-      DOM Levels 1 to 3 do not support editing "DocumentType" nodes so 
-      that all "DocumentType" nodes are read-only.
+      DOM Levels 1 to 3 do not support editing <IF:DocumentType> nodes so 
+      that all <IF:DocumentType> nodes are read-only.
     \
-      A "DocumentType" node can be a child of the "Document" node. 
-      DOM Levels 2 or higher allows a "DocumentType" node without 
-      any parent.  "DocumentType" nodes are not able to have 
-      their child nodes ("Entity"s and "Notation"s are defined not 
+      A <IF:DocumentType> node can be a child of the <IF:Document> node. 
+      DOM Levels 2 or higher allows a <IF:DocumentType> node without 
+      any parent.  <IF:DocumentType> nodes are not able to have 
+      their child nodes (<IF:Entity>s and <IF:Notation>s are defined not 
       to have any parent node).
   @Attr:
      @@Name:  name
@@ -242,7 +249,8 @@ IF:
           ManakaiDOMXML:ManakaiDOMEntities
         @@@Description:
           @@@@lang:en
-          @@@@@: A "NamedNodeMap" containing "Entity"s.
+          @@@@@:
+            A <IF:NamedNodeMap> containing <IF:Entity>s.
   @Attr:
      @@Name:  notations
      @@Description:
@@ -255,7 +263,7 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            A "NamedNodeMap" containing "Notation"s.
+            A <IF:NamedNodeMap> containing <IF:Notation>s.
   @Attr:
      @@Name:  publicId
      @@Description:
@@ -343,7 +351,8 @@ IF:
         @@@@Label: DOCUMENT_TYPE_NODE
         @@@@Description:
           @@@@@lang:en
-          @@@@@@: The node is a "DocumentType".
+          @@@@@@:
+            This node is a <IF:DocumentType>.
       @@@Def:
         @@@@Type:
           lang:Perl
@@ -365,7 +374,8 @@ IF:
             @@@@@is-null:1
           @@@@Description:
             @@@@@lang:en
-            @@@@@@: The text content is defined to be "null".
+            @@@@@@:
+              The text content is defined to be <DOM:null>.
         @@@Def:
           @@@@Type:
             lang:Perl
@@ -389,7 +399,7 @@ IF:
 
 IF:
   @Name:  Notation
-  @ISA[list]:  Node
+  @ISA:  Node
   @Spec:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-5431D1B9
@@ -399,10 +409,10 @@ IF:
       A notation declaration in the DTD or 
       the notation information item in the XML Infoset.
     \
-      DOM Levels 1 to 3 do not support editing "Notation" nodes so that 
-      all "Notation" nodes are read-only.
+      DOM Levels 1 to 3 do not support editing <IF:Notation> nodes so that 
+      all <IF:Notation> nodes are read-only.
     \
-      A "Notation" node does not have any parent.
+      A <IF:Notation> node does not have any parent.
   @Attr:
      @@Name:  publicId
      @@Description:
@@ -473,7 +483,8 @@ IF:
         @@@@Label: NOTATION_NODE
         @@@@Description:
           @@@@@lang:en
-          @@@@@@: The node is a "Notation".
+          @@@@@@:
+            This node is a <IF:Notation>.
       @@@Def:
         @@@@Type:
           lang:Perl
@@ -495,7 +506,8 @@ IF:
             @@@@@is-null:1
           @@@@Description:
             @@@@@lang:en
-            @@@@@@: The text content is defined to be "null".
+            @@@@@@:
+              The text content is defined to be <DOM:null>.
         @@@Def:
           @@@@Type:
             lang:Perl
@@ -519,7 +531,7 @@ IF:
 
 IF:
   @Name:  Entity
-  @ISA[list]:  Node
+  @ISA:  Node
   @Spec:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-527DCFF2
@@ -530,17 +542,17 @@ IF:
       or either internal or external.
     \
       When the replacement text of the entity is available, 
-      the child list of the "Entity" node represents the structure 
+      the child list of the <IF:Entity> node represents the structure 
       of that replacement value (assuming that the replacement text would be 
-      parsed in context of "content").  Otherwise, the child list is empty.
+      parsed in context of <XML:content>).  Otherwise, the child list is empty.
       Note that if the entity contains an unbound namespace prefix, 
-      the "namespaceURI" of the corresponding node in the "Entity" 
-      node subtree is "null".
+      the <A:namespaceURI> of the corresponding node in the <IF:Entity> 
+      node subtree is <DOM:null>.
     \
-      DOM Levels 1 to 3 do not support editing "Entity" nodes, so that 
-      all "Entity" nodes and their descendants are read-only.
+      DOM Levels 1 to 3 do not support editing <IF:Entity> nodes, so that 
+      all <IF:Entity> nodes and their descendants are read-only.
     \
-      An "Entity" node does not have any parent.
+      An <IF:Entity> node does not have any parent.
   @Attr:
      @@Name:  publicId
      @@Description:
@@ -698,8 +710,9 @@ IF:
        @@@lang:en
        @@@@:
          Need consideration for the internal structure of the 
-         XML and text declarations.  See "xmlEncoding" and 
-         "xmlVersion" attributes defined in the "DOMCore" module.
+         XML and text declarations.  See <A:Document.xmlEncoding> and 
+         <A:Document.xmlVersion> attributes defined in the 
+         <Module:DOMCore> module.
   
   @ReAttr:
     @@Name: nodeName
@@ -728,7 +741,8 @@ IF:
         @@@@Label: ENTITY_NODE
         @@@@Description:
           @@@@@lang:en
-          @@@@@@: The node is an "Entity".
+          @@@@@@:
+            This node is an <IF:Entity>.
       @@@Def:
         @@@@Type:
           lang:Perl
@@ -737,7 +751,7 @@ IF:
 
 IF:
   @Name:  EntityReference
-  @ISA[list]:  Node
+  @ISA:  Node
   @Spec:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-11C98490
@@ -746,19 +760,19 @@ IF:
     @@@:
       An entity reference.
     \
-      When an "EntityReference" node represents a reference to an "Entity" 
-      node, the subtree of the "EntityReference" node is a copy of 
-      the "Entity" node subtree, except that when an entity contains 
+      When an <IF:EntityReference> node represents a reference to an <IF:Entity> 
+      node, the subtree of the <IF:EntityReference> node is a copy of 
+      the <IF:Entity> node subtree, except that when an entity contains 
       an unbound namespace prefix, the descendants of the 
-      "EntityReference" node may be bound to different namespace URIs.
+      <IF:EntityReference> node may be bound to different namespace URIs.
     \
-      When an "EntityReference" node represents a reference to an 
+      When an <IF:EntityReference> node represents a reference to an 
       known entity, the node has no child node.
     \
-      In DOM Levels 1 to 3, an "EntityReference" node and all 
+      In DOM Levels 1 to 3, an <IF:EntityReference> node and all 
       descendants are read-only.
     \
-      Note that "EntitiReference" nodes may cause normalization 
+      Note that <IF:EntitiReference> nodes may cause normalization 
       problems when the normalization is performed after 
       entity references are expanded.
   @ImplNote:
@@ -774,8 +788,8 @@ IF:
     @@lang:en
     @@@:
       The DOM Level 1 Specifications allow the lazy 
-      evaluation of the children of the "EntityReference".
-      For example, calling the "childNodes" method might trigger the 
+      evaluation of the children of the <IF:EntityReference>.
+      For example, calling the <A:Node.childNodes> method might trigger the 
       evaluation.
   
   @ReAttr:
@@ -805,7 +819,8 @@ IF:
         @@@@Label: ENTITY_REFERENCE_NODE
         @@@@Description:
           @@@@@lang:en
-          @@@@@@: The node is an "EntityReference".
+          @@@@@@:
+            This node is an <IF:EntityReference>.
       @@@Def:
         @@@@Type:
           lang:Perl
@@ -814,7 +829,7 @@ IF:
 
 IF:
   @Name:  ProcessingInstruction
-  @ISA[list]:  Node
+  @ISA:  Node
   @Spec:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1004215813
@@ -861,13 +876,14 @@ IF:
             infoset:data
         @@@ImplNote:
           @@@@lang:en
-          @@@@@: Can "null" be returned (to represent "<?name?>")?
+          @@@@@:
+            Can <DOM:null> be returned (to represent <XML:<lt>?name?<gt>>)?
      @@Set:
         @@@Type:  DOMString
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The content.  It may contain the PIC ("?>") but such 
+            The content.  It may contain the <SGML:PIC> (<XML:?<gt>>) but such 
             data result the document in unserializable.
         @@@Exception:
           @@@@Type: DOMException
@@ -892,7 +908,8 @@ IF:
       @@@Type: DOMString
       @@@Description:
         @@@@lang:en
-        @@@@@: The target name, i.e. same as "target".
+        @@@@@: 
+          The target name, i.e. same as <A:ProcessingInstruction.target>.
       @@@Def:
         @@@@Type:
           lang:Perl
@@ -909,7 +926,8 @@ IF:
         @@@@Label: PROCESSING_INSTRUCTION_NODE
         @@@@Description:
           @@@@@lang:en
-          @@@@@@: The node is a "ProcessingInstruction".
+          @@@@@@:
+            This node is a <IF:ProcessingInstruction>.
       @@@Def:
         @@@@Type:
           lang:Perl
@@ -928,7 +946,7 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: 
-              The target data, i.e. same as "data".
+              The target data, i.e. same as <A:ProcessingInstruction.data>.
         @@@Def:
           @@@@Type: 
             lang:Perl
@@ -959,16 +977,17 @@ IF:
        @@@lang:en
        @@@@: The text content of this node and its descendants. 
      @@@ImplNote:
-        @@@lang:en
-        @@@@:
-          PI->data == PI->nodeValue == 
-          PI->textContent.
+        @@@@lang:en
+        @@@@@:
+          <A:ProcessingInstruction.data> == 
+          <A:ProcessingInstruction.nodeValue> == 
+          <A:ProcessingInstruction.textContent>.
      @@Get:
         @@@Type:  DOMString
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The text content of this node, i.e. the "nodeValue".
+            The text content of this node, i.e. the <A:Node.nodeValue>.
         @@@Exception:
           @@@@Type: DOMException
           @@@@Name: DOMSTRING_SIZE_ERR
@@ -976,7 +995,7 @@ IF:
             @@@@@lang:en
             @@@@@@:
               The attribute would return more characters than 
-              fit in a "DOMString" variable on the implementation 
+              fit in a <Type:DOMString> variable on the implementation 
               platform.
         @@@Def:
           @@@@Type: 
