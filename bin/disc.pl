@@ -13,6 +13,7 @@ GetOptions (
   'help' => \$Opt{help},
   'input-cdis-file-name=s' => \$Opt{input_file_name},
   'output-file-name=s' => \$Opt{output_file_name},
+  'search-path|I=s' => ($Opt{module_file_search_path} = []),
   'undef-check!' => \$Opt{no_undef_check},
   'verbose!' => $Opt{verbose},
 ) or pod2usage (2);
@@ -22,6 +23,7 @@ pod2usage ({-exitval => 2, -verbose => 0}) unless $Opt{file_name};
 pod2usage ({-exitval => 2, -verbose => 0}) unless $Opt{output_file_name};
 $Opt{no_undef_check} = defined $Opt{no_undef_check}
                          ? $Opt{no_undef_check} ? 0 : 1 : 0;
+push @{$Opt{module_file_search_path}}, '.';
 
 BEGIN {
 require 'manakai/genlib.pl';
@@ -40,10 +42,12 @@ if (defined $Opt{input_file_name}) {
      or die "$0: $Opt{input_file_name}: Cannot load";
 }
 $State->{DefaultFor} = $Opt{For} if defined $Opt{For};
-my $source = dis_load_module_file (module_file_name => $Opt{file_name},
-                                   For => $Opt{For},
-                                   use_default_for => 1);
-$State->{for_def_required}->{$State->{DefaultFor}} ||= 1;
+my $source = dis_load_module_file 
+                 (module_file_name => $Opt{file_name},
+                  For => $Opt{For},
+                  use_default_for => 1,
+                  module_file_search_path => $Opt{module_file_search_path});
+$State->{def_required}->{For}->{$State->{DefaultFor}} ||= 1;
 dis_check_undef_type_and_for () unless $Opt{no_undef_check};
 if (dis_uri_for_match (ExpandedURI q<ManakaiDOM:Perl>, $State->{DefaultFor})) {
   dis_perl_init ($source, For => $State->{DefaultFor});

@@ -552,7 +552,9 @@ sub dis_get_attr_node (%) {
   my $en = defined $opt{name} ? $opt{name}
                               : impl_err (q<"name" parameter required>,
                                           node => $opt{parent});
-  impl_err (q<"parent" parameter required>) unless $opt{parent};
+  impl_err (q<"parent" parameter required>)
+    if not $opt{parent} or ref $opt{parent} eq 'HASH' or
+       ref $opt{parent} eq 'ARRAY';
   for (@{$opt{parent}->child_nodes}) {
     next unless $_->node_type eq '#element';
     if (dis_element_type_match ($_->local_name, $en, %opt, node => $_)) {
@@ -2044,4 +2046,4 @@ sub disdoc_inline2pod ($;%) {
 
 =cut
 
-1; # $Date: 2004/11/26 10:55:11 $
+1; # $Date: 2004/11/27 10:59:09 $

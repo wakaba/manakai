@@ -14,7 +14,7 @@ sub valid_err ($;%) {
   output_result $result;
   if ($opt{node}) {
     if ($opt{node}->isa ('Message::Markup::SuikaWikiConfig20::Node')) {
-      $s = $opt{node}->node_path (key => 'Name') . ': ' . $s;
+      $s = $opt{node}->node_path (key => [qw/Name QName Label/]) . ': ' . $s;
     } elsif ($opt{node}->isa ('Message::DOM::IF::Node')) {
       $s = 'dom:nodeName ("'.$opt{node}->nodeName . '"): ' . $s;
     }

@@ -1,32 +1,3 @@
-Namespace:
-  @dis:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
-  @DOMCore:
-     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
-  @lang:
-     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
-  @perl:
-     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
-  @license:
-     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
-  @ManakaiDOM:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
-  @ManakaiDOMImplementationException:
-     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
-  @MDOM:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
-  @MDOM_EXCEPTION:
-     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
-  @MUError:\
-  @MUErrorCore:-
-  @owl:
-    http://www.w3.org/2002/07/owl#
-  @rdf:
-    http://www.w3.org/1999/02/22-rdf-syntax-ns#
-  @rdfs:
-    http://www.w3.org/2000/01/rdf-schema#
-  @TreeCore:
-     \
 Module:
   @QName: 
     MDOM:ManakaiDOMMain
@@ -41,8 +12,11 @@ Module:
     @@Mail:w@suika.fam.cx
   @License:
      license:Perl+MPL
-  @Date.RCS:
-     $Date: 2004/11/24 12:00:13 $
+  @Date:
+    @@@:
+      $Date: 2004/11/27 10:59:09 $
+    @@ContentType:
+      dis:Date.RCS
   
   @Description:
     @@lang:en
@@ -71,6 +45,8 @@ Module:
 
   @Require:
     @@Module:
+      @@@Name: DISCore
+    @@Module:
       @@@Name: DOMMain
     @@Module:
       @@@Name: ManakaiDOMMain
@@ -80,12 +56,33 @@ Module:
       @@@WithFor: ManakaiDOMLatest
       @@@For: ManakaiDOMCommon
 
-ForDef:
-  @QName:
-      ManakaiDOM:all
-  @FullName:
-    @@lang:en
-    @@@: For all
+Namespace:
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @DOMCore:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @perl:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @MDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
+  @MDOMX:
+     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @MUError:\
+  @MUErrorCore:-
+  @owl:
+    http://www.w3.org/2002/07/owl#
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @TreeCore:\
+
 ForDef:
   @QName:
       ManakaiDOM:IDL
@@ -216,76 +213,6 @@ ForDef:
     @@lang:en
     @@@: A class definition.
 
-ResourceDef:
-  @QName:
-    rdfs:Resource
-  @rdf:type:
-    rdfs:Class
-  @Description:
-    @@lang:en
-    @@@: A RDF resource.
-ResourceDef:
-  @QName:
-    dis:ResourceDef
-  @rdf:type:
-    dis:ElementType
-  @Description:
-    @@lang:en
-    @@@:
-      A <Q:dis:ResourceDef> element defines a resource.
-
-ResourceTypeDef:
-  @QName: 
-    dis:MultipleResource
-  @Description:
-    @@lang:en
-    @@@:
-      An abstract resource - it has zero or more concrete representations, 
-      that are distinguished by <CODE:For> URI references.
-  @AliasFor:
-    @@@:
-      ::ManakaiDOM:all
-    @@For:
-      ManakaiDOM:all !=ManakaiDOM:all
-PropDef:
-  @QName:
-    dis:resourceFor
-  @rdfs:domain:
-    dis:MultipleResource
-  @rdfs:range:
-    dis:For
-  @Description:
-    @@lang:en
-    @@@:
-      A <CODE:For> URI reference that can identity one representation 
-      of the resource.
-      \
-      {NOTE:: To test <CODE:For> declared with <Q:dis:resourceFor> 
-              element, use <Q:dis:ForCheck> attribute, rather than
-              <Q:dis:For> attribute.  <Q:dis:For> attribute does 
-              not check additional <CODE:For> URI references 
-              declared with <Q:dis:resourceFor> element.
-      \
-      }
-
-ResourceTypeDef:
-  @QName:
-    dis:ElementType
-  @Description:
-    @@lang:en
-    @@@:
-      A dis element type.
-
-ResourceDef:
-  @QName:
-    rdfs:Class
-  @rdf:type:
-    rdfs:Class
-  @ISA:
-    rdfs:Resource
-  @Description:
-    @@lang:en
-    @@@: A RDF class.
 ElementTypeBinding:
   @Name: ResourceTypeDef
   @ElementType: 
@@ -303,17 +230,6 @@ ResourceTypeDef:
     @@@:
       An interface.
 
-ResourceTypeDef:
-  @QName:
-    rdfs:Datatype
-ResourceTypeDef:
-  @Name: DataType
-  @Description:
-    @@lang:en
-    @@@:
-      A data type.
-  @ISA:
-    rdfs:Datatype
 ElementTypeBinding:
   @Name: DataTypeDef
   @ElementType:
@@ -451,13 +367,6 @@ ResourceTypeDef:
       it is typically accessed via class method, not via object method.
   @ISA: Class
 
-ResourceTypeDef:
-  @QName: 
-    dis:ModuleGroup
-  @Description:
-    @@lang:en
-    @@@: A set of modules
-
 ResourceDef:
   @QName:
     MDOM:
@@ -541,12 +450,6 @@ ResourceDef:
     @@For:
       ManakaiDOM:ManakaiDOMCommon
 
-ResourceTypeDef:
-  @QName:
-    rdfs:Property
-  @Description:
-    @@lang:en
-    @@@: An RDF property.
 ElementTypeBinding:
   @Name: PropDef
   @ElementType:
@@ -766,196 +669,6 @@ ElementTypeBinding:
 
 PropDef:
   @QName:
-    rdf:type
-  @rdfs:domain:
-    rdfs:Resource
-  @rdfs:range:
-    rdfs:Class
-PropDef:
-  @QName:
-    rdfs:domain
-  @rdfs:domain:
-    rdfs:Property
-  @rdfs:range:
-    rdfs:Class
-PropDef:
-  @QName:
-    rdfs:range
-  @rdfs:domain:
-    rdfs:Property
-  @rdfs:range:
-    rdfs:Class
-
-PropDef:
-  @QName:
-    dis:For
-  @rdfs:domain:
-    rdfs:Resource
-  @dataType:
-    dis:TypeQName
-  @Description:
-    @@lang:en
-    @@@:
-      A <Q:For> for which the resource is used (<QUOTE:OR> filter).
-PropDef:
-  @QName:
-    dis:ForCheck
-  @rdfs:domain:
-    rdfs:Resource
-  @dataType:
-    dis:TypeQName
-  @Description:
-    @@lang:en
-    @@@:
-      A <Q:For> for which the resource is used (<QUOTE:AND> filter).
-PropDef:
-  @QName:
-    dis:ContentType
-  @rdfs:domain:
-    DOMMain:any
-  @rdfs:range:
-    ManakaiDOM:DataType
-  @dataType:
-    dis:TypeQName
-  @Description:
-    @@lang:en
-    @@@:
-      The media type (content type) of the content.
-PropDef:
-  @QName:
-    dis:lang
-  @rdfs:domain:
-    rdfs:Resource
-  @Description:
-    @@lang:en
-    @@@:
-      The natural language in which the content is written.
-PropDef:
-  @QName:
-    dis:script
-  @rdfs:domain:
-    rdfs:Resource
-  @Description:
-    @@lang:en
-    @@@:
-      The writting script in which the content is written.
-
-PropDef:
-  @QName:
-    dis:Name
-  @Description:
-    @@lang:en
-    @@@:
-      A name of a resource.
-PropDef:
-  @QName:
-    dis:QName
-  @Description:
-    @@lang:en
-    @@@:
-      A qualified name of a resource.
-PropDef:
-  @QName:
-    dis:AppName
-  @Description:
-    @@lang:en
-    @@@: An application (binding) dependent name of a resource.
-PropDef:
-  @QName:
-    rdfs:label
-  @Description:
-    @@lang:en
-    @@@: A human-readable name of the subject resource.
-PropDef:
-  @QName:
-    dis:FullName
-  @Description:
-    @@lang:en
-    @@@:
-      A human-readable name of a resource.
-  @ISA:
-    rdfs:label
-PropDef:
-  @QName:
-    dis:Label
-  @Description:
-    @@lang:en
-    @@@:
-      A human-readable simple header of a resource.
-  @ISA:
-    rdfs:label
-
-PropDef:
-  @QName:
-    rdfs:comment
-  @Description:
-    @@lang:en
-    @@@: A description of the subject resource.
-PropDef:
-  @QName:
-    dis:Description
-  @Description:
-    @@lang:en
-    @@@:
-      A human-readable description of a resource.
-  @ISA:
-    rdfs:comment
-PropDef:
-  @QName:
-    dis:ImplNote
-  @Description:
-    @@lang:en
-    @@@:
-      An implementor's node about resource.
-PropDef:
-  @QName:
-    dis:Spec
-  @Description:
-    @@lang:en
-    @@@:
-      A reference to a specification.  (Obsolete)
-PropDef:
-  @QName:
-    dis:Level
-  @Description:
-    @@lang:en
-    @@@:
-      DOM Level (obsolete)
-PropDef:
-  @QName:
-    dis:SpecLevel
-  @Description:
-    @@lang:en
-    @@@:
-      DOM Level of specification (obsolete) - use <CODE:For> instead.
-PropDef:
-  @QName:
-    dis:Condition
-  @Description:
-    @@lang:en
-    @@@:
-      Condition (obsolete) - use <CODE:For> instead.
-PropDef:
-  @QName:
-    dis:Redefine
-  @Description:
-    @@lang:en
-    @@@: Declares redefining (obsolete)
-PropDef:
-  @QName:
-    dis:RedefinedBy
-  @Description:
-    @@lang:en
-    @@@: Declares redefined in elsewhere (obsolete)
-PropDef:
-  @QName:
-    dis:Redefined
-  @Description:
-    @@lang:en
-    @@@: Declares redefined in elsewhere (obsolete)
-
-PropDef:
-  @QName:
     dis:Operator
   @Description:
     @@lang:en
@@ -1030,83 +743,18 @@ PropDef:
     @@@:
       Whether the resource is overloadable or not.
 
-PropDef:
-  @QName:
-    dis:dataType
+ResourceTypeDef:
+  @QName: 
+    ManakaiDOM:DataType
   @Description:
     @@lang:en
     @@@:
-      Lexical data type of the property object.
-  @rdfs:domain:
-    rdfs:Property
-  @rdfs:range:
-    rdfs:Property
-  @dataType:
-    dis:TypeQName
-
-PropDef:
-  @QName:
-    rdfs:subClassOf
-  @Description:
-    @@lang:en
-    @@@:
-      The subject is a subclass of a class.
-  @rdfs:domain:
+      A data type.
+  @rdf:type:
     rdfs:Class
-  @rdfs:range:
-    rdfs:Class
-PropDef:
-  @QName:
-    dis:ISA
-  @Description:
-    @@lang:en
-    @@@:
-      Inheritance relationship of a resource.
   @ISA:
-    rdfs:subClassOf
-  @rdfs:domain:
-    rdfs:Property
-  @rdfs:range:
-    rdfs:Property
-  @dataType:
-    dis:TypeQName
-PropDef:
-  @QName:
-    dis:Implement
-  @Description:
-    @@lang:en
-    @@@:
-      <QUOTE:Implementing> relationship of a resource.
-PropDef:
-  @QName:
-    owl:sameAs
-  @Description:
-    @@lang:en
-    @@@:
-      The subject is same as the object.
-PropDef:
-  @QName:
-    dis:AliasFor
-  @Description:
-    @@lang:en
-    @@@:
-      Make a resource as alias for another resource.
-  @ISA:
-    owl:sameAs
-  @rdfs:domain:
-    rdfs:Resource
-  @rdfs:range:
-    rdfs:Resource
-  @dataType:
-    dis:TFQNames
+    rdfs:Datatype
 
-PropDef:
-  @QName:
-    dis:Require
-  @Description:
-    @@lang:en
-    @@@: 
-      References to external modules.
 PropDef:
   @QName:
     ManakaiDOM:isForInternal
@@ -1117,6 +765,25 @@ PropDef:
     ManakaiDOM:isRedefining
   @dataType:
     DOMMain:boolean
+
+PropDef:
+  @QName:
+    dis:Redefine
+  @Description:
+    @@lang:en
+    @@@: Declares redefining (obsolete)
+PropDef:
+  @QName:
+    dis:RedefinedBy
+  @Description:
+    @@lang:en
+    @@@: Declares redefined in elsewhere (obsolete)
+PropDef:
+  @QName:
+    dis:Redefined
+  @Description:
+    @@lang:en
+    @@@: Declares redefined in elsewhere (obsolete)
 
 PropDef:
   @QName:
@@ -1147,35 +814,6 @@ PropDef:
 
 DataTypeDef:
   @QName:
-    lang:dis
-  @FullName:
-    @@lang:en
-    @@@: dis grove
-DataTypeDef:
-  @QName:
-    dis:TypeQName
-  @FullName:
-    @@lang:en
-    @@@: A dis QName
-DataTypeDef:
-  @QName: 
-    dis:TFQNames
-  @FullName:
-    @@lang:en
-    @@@:
-      A pair of resource QName and optional <QUOTE:For> QName
-DataTypeDef:
-  @QName:
-    dis:Boolean
-  @FullName:
-    @@lang:en
-    @@@: 
-      The boolean truth value, i.e. true or false.
-  @ISA:
-    DOMMain:boolean
-
-DataTypeDef:
-  @QName:
     lang:Perl
   @FullName:
     @@lang:en
@@ -1203,12 +841,6 @@ DataTypeDef:
 
 DataTypeDef:
   @QName:
-    lang:disdoc
-  @FullName:
-    @@lang:en
-    @@@: disdoc text format
-DataTypeDef:
-  @QName:
     lang:muf
   @FullName:
     @@lang:en
@@ -1220,12 +852,6 @@ DataTypeDef:
   @FullName:
     @@lang:en
     @@@: Java
-DataTypeDef:
-  @QName:
-    dis:Date.RCS
-  @FullName:
-    @@lang:en
-    @@@: RCS tag-style date and time specification
 
 ElementTypeBinding:
   @Name: StringDataTypeDef
@@ -1376,11 +1002,14 @@ ExceptionDef:
   @Description:
     @@lang:en
     @@@:
-      Exceptions not covered by the language- and platform-independent 
-      official DOM specifications.
+      A set of implementation-dependent exceptions.
 
   @Attr:
      @@Name:  code
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The error code that denotes what kind of exception occures.
      @@Get:
        @@@Type:  
          DOMMain:unsigned-short
@@ -1408,20 +1037,20 @@ ExceptionDef:
           lang:muf
         @@@@@:
             The type of an object specified as the value of parameter
-            %t (name => {<Q:MDOM_EXCEPTION:param-name>},
+            %t (name => {<Q:MDOMX:param-name>},
             prefix => { "}, suffix => {"}); is incompatible with the
-            expected type%t (name => {<Q:MDOM_EXCEPTION:class>}, 
+            expected type%t (name => {<Q:MDOMX:class>}, 
             prefix => {: "}, suffix => {"}).
       @@@XParam:
         @@@@QName:
-          ManakaiDOMImplementationException:param-name
+          MDOMX:param-name
         @@@@Description:
           @@@@@lang:en
           @@@@@@: The parameter name.
           
       @@@XParam:
         @@@@QName:
-          ManakaiDOMImplementationException:class
+          MDOMX:class
         @@@@Type:
           perl:package-name
         @@@@Description:
@@ -1442,11 +1071,11 @@ ExceptionDef:
           lang:muf
         @@@@@:
             The null value is passed to the parameter%t (
-            name => {<Q:MDOM_EXCEPTION:param-name>},
+            name => {<Q:MDOMX:param-name>},
             prefix => { "}, suffix => {"});.
       @@@XParam:
         @@@@QName:
-          ManakaiDOMImplementationException:param-name
+          MDOMX:param-name
         @@@@Description:
           @@@@@lang:en
           @@@@@@: The name of the parameter to which the null value is given.
@@ -1464,7 +1093,7 @@ ExceptionDef:
           (the first 16-bit unit of the surrogate pair).
       @@@XParam:
         @@@@QName:
-          ManakaiDOMImplementationException:param-name
+          MDOMX:param-name
         @@@@Description:
           @@@@@lang:en
           @@@@@@: The parameter to which inappropriate value is specified.
@@ -1485,7 +1114,7 @@ ExceptionDef:
           author of that module.
       @@@XParam:
         @@@@QName:
-          ManakaiDOMImplementationException:values
+          MDOMX:values
         @@@@Type: 
           perl:hash
         @@@@Description:
@@ -1515,7 +1144,8 @@ WarningDef:
   @Attr:
      @@Name:  code
      @@Get:
-       @@@Type:  unsigned-short
+       @@@Type:  
+         DOMMain:unsigned-short
        @@@Description:
          @@@@lang:en
          @@@@@:
@@ -1548,13 +1178,13 @@ WarningDef:
           The node to be inserted is same as the reference node.
       @@@XParam:
         @@@@QName:
-          MDOM_EXCEPTION:newChild-param-name
+          MDOMX:newChild-param-name
         @@@@Description:
           @@@@@lang:en
           @@@@@@: The parameter name for "newChild" node.
       @@@XParam:
         @@@@QName:
-          MDOM_EXCEPTION:refChild-param-name
+          MDOMX:refChild-param-name
         @@@@Description:
           @@@@@lang:en
           @@@@@@: The parameter name for "refChild" node.
@@ -1584,7 +1214,7 @@ WarningDef:
           are converted to "null".
       @@@XParam:
         @@@@QName:
-          ManakaiDOMImplementationException:param-name
+          MDOMX:param-name
         @@@@Description:
           @@@@@lang:en
           @@@@@@: The parameter to which inappropriate value is specified.
@@ -1595,13 +1225,7 @@ ClassDef:
   @Description:
     @@lang:en
     @@@:
-      The common interface that is implemented by all Manakai DOM objects.
-  @ImplNote:
-    @@lang:en
-    @@@:
-      "ISA" attribute whose value is "ManakaiDOMObject" MUST NOT 
-      be written in the "dis" files.  It will be generated by 
-      converters such as "dis2pm.pl".
+      The common class that is inherited by all manakai DOM object classes.
   
   @IntMethod:
     @@Name:reportError
@@ -1609,6 +1233,10 @@ ClassDef:
       @@@@:object-error-handler
       @@@Type:
         lang:Perl
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          TODO: Operator name required.
     @@Description:
       @@@lang:en
       @@@@:
@@ -1669,13 +1297,13 @@ ClassDef:
           lang:Perl
         @@@@@:
           my $template;
-          if (defined $self->{<Q:MDOM_EXCEPTION:subtype>} and
-              defined $self->{<Q:MUErrorCore:def>}->{<Q:MDOM_EXCEPTION:subtype>}
-                   ->{$self->{<Q:MDOM_EXCEPTION:subtype>}}
+          if (defined $self->{<Q:MDOMX:subtype>} and
+              defined $self->{<Q:MUErrorCore:def>}->{<Q:MDOMX:subtype>}
+                   ->{$self->{<Q:MDOMX:subtype>}}
                    ->{<Q:MUError:description>}) {
             $template = $self->{<Q:MUErrorCore:def>}
-                   ->{<Q:MDOM_EXCEPTION:subtype>}
-                   ->{$self->{<Q:MDOM_EXCEPTION:subtype>}}
+                   ->{<Q:MDOMX:subtype>}
+                   ->{$self->{<Q:MDOMX:subtype>}}
                    ->{<Q:MUError:description>};
           } elsif (defined $self->{<Q:MUErrorCore:def>}
                    ->{<Q:MUError:description>}) {
@@ -1700,8 +1328,7 @@ ResourceDef:
   @Description:
     @@lang:en
     @@@:
-      The common interface that is implemented by all Manakai DOM 
-      exceptions.
+      An abstract class that is inherited by all manakai DOM exception classes.
 ResourceDef:
   @Name: ManakaiDOMWarning
   @rdf:type:
@@ -1715,8 +1342,7 @@ ResourceDef:
   @Description:
     @@lang:en
     @@@:
-      The common interface that is implemented by all Manakai DOM 
-      warnings.
+      An abstract class that is inherited by all manakai DOM warning classes.
 
 ClassDef:
   @Name: ManakaiDOMNodeObject
@@ -1725,28 +1351,28 @@ ClassDef:
   @Description:
     @@lang:en
     @@@:
-      An internal node object.  This interface defines a number of basic 
-      operations to the node or the grove. 
+      An internal node object that is accessed via <CLS:ManakaiDOMNodeReference>.
   @ImplNote:
     @@lang:en
     @@@:
-      In manakai DOM implementation, most of DOM objects such as 
-      "Element" or "Document" are implemented as a reference 
-      (implementing the "ManakaiDOMNodeReference" interface) to 
-      the node object.
+      In manakai DOM implementation, most of DOM objects including 
+      <IF:Element> and <IF:Document> instances are implemented as a 
+      reference, i.e. <CLS:ManakaiDOMNodeReference>, to node object.
   @IntMethod:
     @@Name: new
     @@Description:
       @@@lang:en
       @@@@: 
-        Construct a new "ManakaiDOMNodeObject" object.
+        Constructs a new instance of <CLS:ManakaiDOMNodeObject> and 
+        returns it.
     @@Return:
       @@@Type: ManakaiDOMNodeObject
       @@@Description:
         @@@@lang:en
-        @@@@@: The new "ManakaiDOMNodeObject" created.
+        @@@@@: 
+          The newly created <CLS:ManakaiDOMNodeObject>.
       @@@Def:
-        @@@@Type:
+        @@@@ContentType:
           lang:Perl
         @@@@@:
           $r = bless {
@@ -1766,21 +1392,26 @@ ClassDef:
     @@Name: newReference
     @@Description:
       @@@lang:en
-      @@@@: Return a new reference to the node.
+      @@@@:
+        Creates a new reference to this node and returns it.
     @@Param:
       @@@Name: class
       @@@Type:
         DOMMain:any
       @@@Description:
         @@@@lang:en
-        @@@@@: A class the new reference is blessed with.
+        @@@@@:
+          A Perl class package name with which the newly created 
+          reference is blessed.  The <P:class> class must be a 
+          subset of <CLS:ManakaiDOMNodeReference>.
     @@Return:
       @@@Type: ManakaiDOMNodeReference
       @@@Description:
         @@@@lang:en
-        @@@@@: A new reference to the node.
+        @@@@@:
+          The newly created node reference.
       @@@Def:
-        @@@@Type:
+        @@@@ContentType:
           lang:Perl
         @@@@@:
           $r = bless {
@@ -1792,21 +1423,26 @@ ClassDef:
     @@Name: isExternallyReferred
     @@Description:
       @@@lang:en
-      @@@@: Check whether the tree is externally referred or not.
+      @@@@:
+        Tests and returns whether the tree that contains this node 
+        is externally referred or not.
     @@Return:
-      @@@Type: boolean
+      @@@Type: 
+        DOMMain:boolean
       @@@InCase:
         @@@@Value: true
         @@@@Description:
           @@@@@lang:en
-          @@@@@@: There is a node referred externally.
+          @@@@@@: 
+            There is one or more nodes that has been 
+            referred from <CLS:ManakaiDOMNodeReference> objects.
       @@@InCase:
         @@@@Value: false
         @@@@Description:
           @@@@@lang:en
           @@@@@@: No external reference to the node in this tree found.
       @@@Def:
-        @@@@Type:
+        @@@@ContentType:
           lang:Perl
         @@@@@:
           if ($self->{<Q:TreeCore:rc>}) {
@@ -1876,7 +1512,7 @@ ClassDef:
       @@@@: Destroy this node and subnodes.
     @@Return:
       @@@Def:
-        @@@@Type:
+        @@@@ContentType:
           lang:Perl
         @@@@@:
           delete $self->{$_} for @{$self->{<Q:TreeCore:origin>}};

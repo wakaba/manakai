@@ -19,7 +19,7 @@ This module is part of manakai.
 
 package Message::Markup::SuikaWikiConfig20::Node;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 =head1 METHODS
 
@@ -349,13 +349,24 @@ sub root_node ($) {
   }
 }
 
-=item $node->node_path ([key => attr-name])
+=item $node->node_path (key => attr-name)
 
 Represent position in the tree in informal XPath-like expression.
 
 Note: In current implementation, the format of expressions
 is insufficient to identify a node uniquely and it is
 not XPath compatible.
+
+Options:
+
+=over 4
+
+=item key => ( attr-name | [attr-name1, attr-name2, ...] )
+
+An attribute name or an array reference of attribute names that 
+are used as 'key's.
+
+=back
 
 =cut
 
@@ -370,9 +381,11 @@ sub node_path ($;%) {
   if ($self->node_type eq '#element') {
     $r .= '/' . $self->local_name;
     if ($opt{key}) {
-      my $key = $self->get_attribute_value ($opt{key});
-      if (defined $key) {
-        $r .= '[@' . $opt{key} . '=' . $key . ']';
+      for (ref $opt{key} eq 'ARRAY' ? @{$opt{key}} : $opt{key}) {
+        my $key = $self->get_attribute_value ($_);
+        if (defined $key) {
+          $r .= '[@' . $_ . '=' . $key . ']';
+        }
       }
     }
   } elsif ($self->node_type eq '#comment') {
@@ -494,4 +507,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/09/18 11:51:37 $
+1; # $Date: 2004/11/27 10:59:09 $
