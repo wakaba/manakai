@@ -45,7 +45,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/10/11 12:02:00 $
+     $Date: 2004/10/16 13:34:17 $
 
   @ConditionDef:
     @@Name:DOM3
@@ -101,36 +101,51 @@ EventSet:
       @@@Type:
         DOMCore:Element
     @@SpecLevel:3
-    @@UIEvent.view:
-      @@@Type:
-        DOMViews:AbstractView
-    @@KeyboardEvent.keyIdentifier:
-      @@@Type:
-        ManakaiDOM:ManakaiDOMKeyIdentifier
-    @@KeyboardEvent.keyLocation:
-      @@@Type:KeyLocationCode
+    @@ContextInfo:
+      @@@Attr:
+        @@@@IF:UIEvent
+        @@@@Name:view
+        @@@@Type:
+          DOMViews:AbstractView
+      @@@Attr:
+        @@@@IF:KeyboardEvent
+        @@@@Name:keyIdentifier
+        @@@@Type:
+          ManakaiDOM:ManakaiDOMKeyIdentifier
+      @@@Attr:
+        @@@@IF:KeyboardEvent
+        @@@@Name:keyLocation
+        @@@@Type:KeyLocationCode
+        @@@@ImplNote:
+          @@@@@lang:en
+          @@@@@@:
+            <A:KeyboardEvent.location> in the DOM Level 3 Events Specification 
+            is maybe an error.
+      @@@Attr:
+        @@@@IF:KeyboardEvent
+        @@@@Name:altKey
+        @@@@Type:
+          DOMMain:boolean
       @@@ImplNote:
         @@@@lang:en
         @@@@@:
-          <A:KeyboardEvent.location> in the DOM Level 3 Events Specification 
-          is maybe an error.
-    @@KeyboardEvent.altKey:
-      @@@Type:
-        DOMMain:boolean
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        <A:KeyboardEvent.altGraphKey>: Maybe error of the DOM Level 3 Events 
-        specification.
-    @@KeyboardEvent.shiftKey:
-      @@@Type:
-        DOMMain:boolean
-    @@KeyboardEvent.ctrlKey:
-      @@@Type:
-        DOMMain:boolean
-    @@KeyboardEvent.metaKey:
-      @@@Type:
-        DOMMain:boolean
+          <A:KeyboardEvent.altGraphKey>: Maybe error of the DOM Level 3 Events 
+          specification.
+      @@@Attr:
+        @@@@IF:KeyboardEvent
+        @@@@Name:shiftKey
+        @@@@Type:
+          DOMMain:boolean
+      @@@Attr:
+        @@@@IF:KeyboardEvent
+        @@@@Name:ctrlKey
+        @@@@Type:
+          DOMMain:boolean
+      @@@Attr:
+        @@@@IF:KeyboardEvent
+        @@@@Name:metaKey
+        @@@@Type:
+          DOMMain:boolean
   @Event:
     @@QName:
       ev:keyup
@@ -158,59 +173,76 @@ EventSet:
       @@@Type:
         DOMCore:Element
     @@SpecLevel:3
-    @@UIEvent.view:
-      @@@Type:
-        DOMViews:AbstractView
-    @@KeyboardEvent.keyIdentifier:
-      @@@Type:
-        ManakaiDOM:ManakaiDOMKeyIdentifier
-    @@KeyboardEvent.keyLocation:
-      @@@Type:KeyLocationCode
+    @@ContextInfo:
+      @@@Attr:
+        @@@@IF:
+          DOMUIEvents:UIEvent
+        @@@@Name:view
+        @@@@Type:
+          DOMViews:AbstractView
+      @@@Attr:
+        @@@@IF:
+          KeyboardEvent
+        @@@@Name:keyIdentifier
+        @@@@Type:
+          ManakaiDOM:ManakaiDOMKeyIdentifier
+      @@@Attr:
+        @@@@IF:KeyboardEvent
+        @@@@Name:keyLocation
+        @@@@Type:KeyLocationCode
+        @@@@ImplNote:
+          @@@@@lang:en
+          @@@@@@:
+            <A:KeyboardEvent.location> in the DOM Level 3 Events Specification 
+            is maybe an error.
+      @@@Attr:
+        @@@@IF:KeyboardEvent
+        @@@@Name:altKey
+        @@@@Type:
+          DOMMain:boolean
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Set unless the <A:KeyboardEvent.keyIdentifier> corresponding 
+            to the key modifier itself.
       @@@ImplNote:
         @@@@lang:en
         @@@@@:
-          <A:KeyboardEvent.location> in the DOM Level 3 Events Specification 
-          is maybe an error.
-    @@KeyboardEvent.altKey:
-      @@@Type:
-        DOMMain:boolean
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Set unless the <A:KeyboardEvent.keyIdentifier> corresponding 
-          to the key modifier itself.
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        <A:KeyboardEvent.altGraphKey>: Maybe error of the DOM Level 3 Events 
-        specification.
+          <A:KeyboardEvent.altGraphKey>: Maybe error of the DOM Level 3 Events 
+          specification.
         \
           Set unless the <A:KeyboardEvent.keyIdentifier> corresponding 
           to the key modifier itself.
-    @@KeyboardEvent.shiftKey:
-      @@@Type:
-        DOMMain:boolean
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Set unless the <A:KeyboardEvent.keyIdentifier> corresponding 
-          to the key modifier itself.
-    @@KeyboardEvent.ctrlKey:
-      @@@Type:
-        DOMMain:boolean
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Set unless the <A:KeyboardEvent.keyIdentifier> corresponding 
-          to the key modifier itself.
-    @@KeyboardEvent.metaKey:
-      @@@Type:
-        DOMMain:boolean
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Set unless the <A:KeyboardEvent.keyIdentifier> corresponding 
-          to the key modifier itself.
+      @@@Attr:
+        @@@@IF:KeyboardEvent
+        @@@@Name:shiftKey
+        @@@@Type:
+          DOMMain:boolean
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Set unless the <A:KeyboardEvent.keyIdentifier> corresponding 
+            to the key modifier itself.
+      @@@Attr:
+        @@@@IF:KeyboardEvent
+        @@@@Name:ctrlKey
+        @@@@Type:
+          DOMMain:boolean
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Set unless the <A:KeyboardEvent.keyIdentifier> corresponding 
+            to the key modifier itself.
+      @@@Attr:
+        @@@@IF:KeyboardEvent
+        @@@@Name:metaKey
+        @@@@Type:
+          DOMMain:boolean
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Set unless the <A:KeyboardEvent.keyIdentifier> corresponding 
+            to the key modifier itself.
 ##ErrorSet
 
 IF:
@@ -541,7 +573,7 @@ IF:
          @@@@@:
            __DEEP{
                     ## Conditional
-             $self->__SUPER{UIEvent}__::initEvent
+             $self->__SUPER{UIEvent}__::initUIEvent
                        ($typeArg, $canBubbleArg, $cancelableArg,
                         $viewArg, null);
            }__;    ## NOTE: $detailArg not used
@@ -608,7 +640,7 @@ IF:
          @@@@@:
            __DEEP{
                     ## Conditional
-             $self->__SUPER{UIEvent}__::initEventNS
+             $self->__SUPER{UIEvent}__::initUIEventNS
                        ($namespaceURI, $typeArg, $canBubbleArg, $cancelableArg,
                         $viewArg, null);
            }__;    ## NOTE: $detailArg not used

@@ -1,0 +1,1009 @@
+Namespace:
+  @DOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @DOMEvents:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/events#
+  @DOMViews:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/views#
+  @ev:
+    http://www.w3.org/2001/xml-events
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOMEvents:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-ev#
+  @TreeCore:\
+Module:
+  @Name:  DOMMouseEvents
+  @Namespace:
+     http://suika.fam.cx/~wakaba/archive/2004/dom/events#
+  @BindingName:
+     @@@:  events
+     @@Type:
+        lang:IDL-DOM
+     @@prefix:  dom.w3c.org
+  @FullName:
+    @@lang:en
+    @@@: DOM Mouse Events Module
+  @Description:
+    @@lang:en
+    @@@:
+      This event module is specifically designed for use with 
+      pointing input devices, such as a mouse or a track ball. 
+
+  @Author:
+     @@FullName:  Wakaba
+     @@Mail:  w@suika.fam.cx
+  @License:
+     license:Perl+MPL
+  @Date.RCS:
+     $Date: 2004/10/16 13:34:17 $
+
+  @ConditionDef:
+    @@Name:DOM2
+  @ConditionDef:
+    @@Name:DOM3
+    @@ISA:DOM2
+  @NormalCondition:DOM3
+
+  @Feature:
+    @@Name:MouseEvents
+    @@Version:2.0
+    @@FullName: DOM Level 2 Mouse Events
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The support for <Feature:UIEvents>/<FeatureVer:2.0> is required.
+    @@Condition[list]:
+      DOM2
+      DOM3
+    @@Contrib:
+      DOMCore:DOMImplementation::
+  @Feature:
+    @@Name:MouseEvents
+    @@Version:3.0
+    @@FullName: DOM Level 3 Mouse Events
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The support for <Feature:UIEvents>/<FeatureVer:3.0> is required.
+    @@Condition[list]:
+      DOM3
+    @@Contrib:
+      DOMCore:DOMImplementation::
+
+  @Require:
+     @@Module:
+        @@@Name:  DOMUIEvents
+        @@@FileName:
+           @@@@@:  events.idl
+           @@@@For:
+              lang:IDL-DOM
+        @@@Namespace:
+           http://suika.fam.cx/~wakaba/archive/2004/dom/events#
+
+EventSet:
+  @Event:
+    @@Name:click
+    @@QName: 
+      ev:click
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A pointing device button is clicked over an element.  The 
+        definition of a <QUOTE:click> depends on the environment 
+        configuration.
+       \
+        In the case of nested elements, this event is always targeted 
+        at the most deeply nested element.
+       \
+          Events <EV:ev:mousedown> and <EV:ev:mouseup> are 
+          dispatched before the <EV:ev:click>.  The target node 
+          must be the same betweeb these three events; otherwise, i.e. 
+          <EV:ev:mousemove> and <EV:ev:mouseout> occur betweeb the 
+          press and release of the button, <EV:ev:click> cannot occur.
+    @@Type:MouseEvent
+    @@IsBubbling:1
+    @@IsCancelable:1
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+    @@SpecLevel:2
+    @@ContextInfo:
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:screenX
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:screenY
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:clientX
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:clientY
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:altKey
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:ctrlKey
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:shiftKey
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:metaKey
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          <A:MouseEvent.altGraphKey>
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:button
+      @@@Attr:
+        @@@@IF:
+          DOMUIEvents:UIEvent
+        @@@@Name:view
+      @@@Attr:
+        @@@@IF:
+          DOMUIEvents:UIEvent
+        @@@@Name:detail
+        @@@@Type:
+          DOMMain:unsigned-long
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The number of consecutive clicks of a pointing device button 
+            during a user action.
+          \
+            {NOTE:: The notion of consecutive clicks depends on 
+                    the environment configuration.
+          \
+            }
+  @Event:
+    @@Name:mousedown
+    @@QName:
+      ev:mousedown
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A pointing device button is pressed over an element.
+        \
+        In the case of nested elements, this event is always targeted
+        at the most deeply nested element.
+    @@Type:MouseEvent
+    @@IsBubbling:1
+    @@IsCancelable:1
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+    @@SpecLevel:2
+    @@ContextInfo:
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:screenX
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:screenY
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:clientX
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:clientY
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:altKey
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:ctrlKey
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:shiftKey
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:metaKey
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          <A:MouseEvent.altGraphKey>
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:button
+      @@@Attr:
+        @@@@IF:
+          DOMUIEvents:UIEvent
+        @@@@Name:view
+      @@@Attr:
+        @@@@IF:
+          DOMUIEvents:UIEvent
+        @@@@Name:detail
+        @@@@Type:
+          DOMMain:unsigned-long
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The number of consecutive clicks of a pointing device button 
+            during a user action.
+          \
+            {NOTE:: The notion of consecutive clicks depends on 
+                    the environment configuration.
+          \
+            }
+          \
+            {eg:: 
+              \
+              If no click happend before the mousedown, 
+              the value will be <DOM:1>.
+              \
+            }
+  @Event:
+    @@Name:mouseup
+    @@QName:
+      ev:mouseup
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A pointing device button is released over an element.
+        \
+        In the case of nested elements, this event is always targeted
+        at the most deeply nested element.
+    @@Type:MouseEvent
+    @@IsBubbling:1
+    @@IsCancelable:1
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+    @@SpecLevel:2
+    @@ContextInfo:
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:screenX
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:screenY
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:clientX
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:clientY
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:altKey
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:ctrlKey
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:shiftKey
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:metaKey
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          <A:MouseEvent.altGraphKey>
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:button
+      @@@Attr:
+        @@@@IF:
+          DOMUIEvents:UIEvent
+        @@@@Name:view
+      @@@Attr:
+        @@@@IF:
+          DOMUIEvents:UIEvent
+        @@@@Name:detail
+        @@@@Type:
+          DOMMain:unsigned-long
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The number of consecutive clicks of a pointing device button 
+            during a user action.
+          \
+            {NOTE:: The notion of consecutive clicks depends on 
+                    the environment configuration.
+          \
+            }
+  @Event:
+    @@Name:mouseover
+    @@QName:
+      ev:mouseover
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A pointing device is moved onto an element.
+        \
+        In the case of nested elements, this event is always targeted
+        at the most deeply nested element.
+    @@Type:MouseEvent
+    @@IsBubbling:1
+    @@IsCancelable:1
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+    @@SpecLevel:2
+    @@ContextInfo:
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:screenX
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:screenY
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:clientX
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:clientY
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:altKey
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:ctrlKey
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:shiftKey
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:metaKey
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          <A:MouseEvent.altGraphKey>
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:button
+      @@@Attr:
+        @@@@IF:
+          DOMUIEvents:UIEvent
+        @@@@Name:view
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:relatedTarget
+        @@@@Type:
+          DOMEvents:EventTarget
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The event target a pointing device is exiting.
+  @Event:
+    @@Name:mousemove
+    @@QName:
+      ev:mousemove
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A pointing device is moved while it is over an element. 
+        \
+        In the case of nested elements, this event is always targeted
+        at the most deeply nested element.
+    @@Type:MouseEvent
+    @@IsBubbling:1
+    @@IsCancelable:1
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+    @@SpecLevel:2
+    @@ContextInfo:
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:screenX
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:screenY
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:clientX
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:clientY
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:altKey
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:ctrlKey
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:shiftKey
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:metaKey
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          <A:MouseEvent.altGraphKey>
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:button
+      @@@Attr:
+        @@@@IF:
+          DOMUIEvents:UIEvent
+        @@@@Name:view
+  @Event:
+    @@Name:mouseout
+    @@QName:
+      ev:mouseout
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A pointing device is moved away from an element.
+        \
+        In the case of nested elements, this event is always targeted
+        at the most deeply nested element.
+    @@Type:MouseEvent
+    @@IsBubbling:1
+    @@IsCancelable:1
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+    @@SpecLevel:2
+    @@ContextInfo:
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:screenX
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:screenY
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:clientX
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:clientY
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:altKey
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:ctrlKey
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:shiftKey
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:metaKey
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          <A:MouseEvent.altGraphKey>
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:button
+      @@@Attr:
+        @@@@IF:
+          DOMUIEvents:UIEvent
+        @@@@Name:view
+      @@@Attr:
+        @@@@IF:MouseEvent
+        @@@@Name:relatedTarget
+        @@@@Type:
+          DOMEvents:EventTarget
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The event target a pointing device is entering.
+  @ImplNote:
+    @@lang:en
+    @@@:
+      {P:: An <QUOTE:double click> will produce:
+         \
+         = <ev:mousedown> with <A:UIEvent.detail> that equals <DOM:1>.
+         \
+         = <ev:mouseup> with <A:UIEvent.detail> that equals <DOM:1>.
+         \
+         = <ev:mouseclick> with <A:UIEvent.detail> that equals <DOM:1>.
+         \
+         = <ev:mousedown> with <A:UIEvent.detail> that equals <DOM:2>.
+         \
+         = <ev:mouseup> with <A:UIEvent.detail> that equals <DOM:2>.
+         \
+         = <ev:mouseclick> with <A:UIEvent.detail> that equals <DOM:2>.
+         \
+      }
+##EventSet
+
+IF:
+  @Name:  MouseEvent
+  @Description:
+    @@lang:en
+    @@@:
+      Provide specific contextual information associated 
+      with Mouse Events.
+    \
+      {NOTE:: In the case of nested elements, mouse events are 
+              always targeted at the most deeply nested element.  
+    \
+      }
+  @Example:
+    @@FullName:
+      @@@lang:en
+      @@@@:
+        Create an instance of the <IF:MouseEvent> interface
+    @@Code:
+      @@@Type:
+         lang:Perl
+      @@@@:
+        my $me = $DocumentEvents->createEvent ('MouseEvent');
+
+  @ISA:  
+    DOMUIEvents:UIEvent
+  @Role:
+    @@@:
+      DOMEvents:Event
+    @@compat:
+      ManakaiDOMEvents:Events
+
+  @Level[list]:  2
+  @SpecLevel[list]:  
+    2
+    3
+  @Attr:
+     @@Name:  screenX
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The horizontal coordinate at which the event occurred 
+         relative to the origin of the screen coordinate system.
+     @@Get:
+        @@@Type:
+           DOMMain:long
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMMouseEvents:screenX
+  @Attr:
+     @@Name:  screenY
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The vertical coordinate at which the event occurred 
+         relative to the origin of the screen coordinate system.
+     @@Get:
+        @@@Type:
+           DOMMain:long
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMMouseEvents:screenY
+  @Attr:
+     @@Name:  clientX
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The horizontal coordinate at which the event 
+         occurred relative to the client area of the DOM 
+         implementation.
+     @@Get:
+        @@@Type:
+           DOMMain:long
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMMouseEvents:clientX
+  @Attr:
+     @@Name:  clientY
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The vertical coordinate at which the event occurred 
+         relative to the client area of the DOM implementation.
+     @@Get:
+        @@@Type:
+           DOMMain:long
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMMouseEvents:clientY
+  @Attr:
+     @@Name:  ctrlKey
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Whether the Ctrl (<KEY:Control>) key modifier 
+         is activated or not.
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  shiftKey
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Whether the <KEY:Shift> key modifier is activated or not.
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  altKey
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Whether the <KEY:Alt> (alternative) key modifier is 
+         activated or not. 
+      \
+         {NOTE:: The Macintosh <CODE:Option> key modifier must be 
+                 represented using this key modifier.
+      \
+         }
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  metaKey
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Whether the <KEY:Meta> key modifier is activated or not.
+       \
+         {NOTE:: The Macintosh <CODE:Command> key modifier must 
+                 be represented using this key.
+       \
+         }
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  button
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Mouse button that changed the state. 
+     @@Get:
+        @@@Type:
+           DOMMain:unsigned-short
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A number that indicates which mouse button changed 
+            the state.
+        @@@InCase:
+          @@@@Value:0
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The normal button of the mouse. 
+            \
+              {NOTE:: In general, it is the left button or the one button 
+                      on the Macintosh mouse. 
+            \
+              }
+        @@@InCase:
+          @@@@Value:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The extra button. 
+            \
+              {NOTE:: In general, it is the middle button and often 
+                      combined with the mouse wheel.
+            \
+              }
+        @@@InCase:
+          @@@@Value:2
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The contextual property button.
+            \
+              {NOTE:: In general, it is the right button.
+            \
+              }
+        @@@InCase:
+          @@@@Label:
+            @@@@@lang:en
+            @@@@@@:
+              Values higher than <DOM:2>
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Other button.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMMouseEvents:button
+  @Attr:
+     @@Name:  relatedTarget
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The secondary <IF:EventTarget> related to a UI event.
+     @@Get:
+        @@@Type:  
+          DOMEvents:EventTarget
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMMouseEvents:relatedTarget
+
+  @ImplNote:
+    @@lang:en
+    @@@:
+      When initializing using <M:initMouseEvent> or 
+      <M:initMouseEventNS>, the DOM implementation should 
+      use the client coordinates <A:clientX> and <A:clientY> 
+      for calculation of other coordinates such as 
+      target coordinates exposed by the DOM implementation.
+
+  @Method:
+     @@Name:  initMouseEvent
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Initialize the value of a <IF:MouseEvent> object.  It has 
+         the same behavior as <M:UIEvent.initUIEvent>.
+     @@NSVersion:initMouseEventNS
+     @@Param:
+        @@@Name:  typeArg
+        @@@Type:  
+          DOMMain:DOMString
+     @@Param:
+        @@@Name:  canBubbleArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  cancelableArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  viewArg
+        @@@Type:
+           DOMViews:AbstractView
+     @@Param:
+        @@@Name:  detailArg
+        @@@Type:
+           DOMMain:long
+     @@Param:
+        @@@Name:  screenXArg
+        @@@Type:
+           DOMMain:long
+     @@Param:
+        @@@Name:  screenYArg
+        @@@Type:
+           DOMMain:long
+     @@Param:
+        @@@Name:  clientXArg
+        @@@Type:
+           DOMMain:long
+     @@Param:
+        @@@Name:  clientYArg
+        @@@Type:
+           DOMMain:long
+     @@Param:
+        @@@Name:  ctrlKeyArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  altKeyArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  shiftKeyArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  metaKeyArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  buttonArg
+        @@@Type:
+           DOMMain:unsigned-short
+     @@Param:
+        @@@Name:  relatedTargetArg
+        @@@Type:  
+          DOMEvents:EventTarget
+     @@Return:  
+       @@@Def:
+         @@@@Type:
+           lang:Perl
+         @@@@@:
+           __DEEP{
+                    ## Conditional
+             $self->__SUPER{UIEvent}__::initUIEvent
+                       ($typeArg, $canBubbleArg, $cancelableArg,
+                        $viewArg, $detailArg);
+           }__;
+           for ($self->{<Q:TreeCore:node>}) {
+             $_->{<Q:DOMMouseEvents:screenX>} = $screenXArg;
+             $_->{<Q:DOMMouseEvents:screenY>} = $screenYArg;
+             $_->{<Q:DOMMouseEvents:clientX>} = $clientXArg;
+             $_->{<Q:DOMMouseEvents:clientY>} = $clientYArg;
+             $_->{<Q:DOMMouseEvents:modifiersList>} = '';
+             $_->{<Q:DOMMouseEvents:modifiersList>} .= ' Control'
+                                            if $ctrlKeyArg;
+             $_->{<Q:DOMMouseEvents:modifiersList>} .= ' Alt'
+                                            if $altKeyArg;
+             $_->{<Q:DOMMouseEvents:modifiersList>} .= ' Shift'
+                                            if $shiftKeyArg;
+             $_->{<Q:DOMMouseEvents:modifiersList>} .= ' Meta'
+                                            if $metaKeyArg;
+             $_->{<Q:DOMMouseEvents:button>} = $buttonArg;
+             $_->{<Q:DOMMouseEvents:relatedTarget>} = $relatedTargetArg;
+           }
+    @@SpecLevel:2
+    @@Level[list]:
+      2
+      3
+  @Method:
+     @@Name:  getModifierState
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Return the state of a modifier.
+     @@Param:
+        @@@Name:  keyIdentifierArg
+        @@@Type: 
+          ManakaiDOM:ManakaiDOMKeyIdentifier
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The modifier key of which the state is queries. 
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            If a DOM application wishes to distinguish between 
+            left and right key modifiers, use keyboard events.
+     @@Return:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The <P:keyIdentifierArg> is a modifier key and 
+               the modifier is activated.
+        @@@InCase:
+           @@@@Value:  false
+     @@Level[list]:  3
+     @@SpecLevel[list]:  3
+  @Method:
+     @@Name:  initMouseEventNS
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Initialize the value of a <IF:MouseEvent> object.  It has 
+         the same behavior as <M:UIEvent.initUIEventNS>.
+     @@NoNSVersion:initMouseEvent
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  
+          ManakaiDOM:ManakaiDOMNamespaceURI
+     @@Param:
+        @@@Name:  typeArg
+        @@@Type:  
+          DOMMain:DOMString
+     @@Param:
+        @@@Name:  canBubbleArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  cancelableArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  viewArg
+        @@@Type:
+           DOMViews:AbstractView
+     @@Param:
+        @@@Name:  detailArg
+        @@@Type:
+           DOMMain:long
+     @@Param:
+        @@@Name:  screenXArg
+        @@@Type:
+           DOMMain:long
+     @@Param:
+        @@@Name:  screenYArg
+        @@@Type:
+           DOMMain:long
+     @@Param:
+        @@@Name:  clientXArg
+        @@@Type:
+           DOMMain:long
+     @@Param:
+        @@@Name:  clientYArg
+        @@@Type:
+           DOMMain:long
+     @@Param:
+        @@@Name:  buttonArg
+        @@@Type:
+           DOMMain:unsigned-short
+     @@Param:
+        @@@Name:  relatedTargetArg
+        @@@Type:  
+          DOMEvents:EventTarget
+     @@Param:
+        @@@Name:  modifiersList
+        @@@Type: 
+          ManakaiDOM:ManakaiDOMKeyIdentifiers
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            Modifier key identifiers to be activated.
+     @@Return: 
+       @@@Def:
+         @@@@Type:
+           lang:Perl
+         @@@@@:
+           __DEEP{
+                    ## Conditional
+             $self->__SUPER{UIEvent}__::initUIEventNS
+                       ($namespaceURI, $typeArg, $canBubbleArg, $cancelableArg,
+                        $viewArg, $detailArg);
+           }__;
+           for ($self->{<Q:TreeCore:node>}) {
+             $_->{<Q:DOMMouseEvents:screenX>} = $screenXArg;
+             $_->{<Q:DOMMouseEvents:screenY>} = $screenYArg;
+             $_->{<Q:DOMMouseEvents:clientX>} = $clientXArg;
+             $_->{<Q:DOMMouseEvents:clientY>} = $clientYArg;
+             $_->{<Q:DOMMouseEvents:button>} = $buttonArg;
+             $_->{<Q:DOMMouseEvents:relatedTarget>} = $relatedTargetArg;
+             $_->{<Q:DOMMouseEvents:modifiersList>} = $modifiersList;
+           }
+     @@Level[list]:  3
+     @@SpecLevel[list]:  3
+##IF:MouseEvent
+
+## DOMMouseEvents.dis ends here
