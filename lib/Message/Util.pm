@@ -16,7 +16,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%FMT2STR %OPTION %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 use Carp ();
 require Message::MIME::EncodedWord;
@@ -449,7 +449,7 @@ sub encode_header_string ($$;%) {
     (value => $t, @o, Message::MIME::Charset::name_minimumize ($o{charset}, $t));
   } else {	## Fault
     $o{current_charset} = '' if $o{current_charset} =~ /\*/;
-    (value => $t, @o, 
+    (value => $t, failed => 1, @o, 
      Message::MIME::Charset::name_minimumize ($o{current_charset}, $t));
   }
 }
@@ -503,7 +503,7 @@ sub encode_body_string {
     (value => $t, @o, Message::MIME::Charset::name_minimumize ($o{charset}, $t));
   } else {	## Fault
     $o{current_charset} = '' if $o{current_charset} =~ /\*/;
-    (value => $t, @o, 
+    (value => $t, failed => 1, @o, 
      Message::MIME::Charset::name_minimumize ($o{current_charset}, $t));
   }
 }
@@ -786,7 +786,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/13 09:34:50 $
+$Date: 2002/07/21 03:26:02 $
 
 =cut
 

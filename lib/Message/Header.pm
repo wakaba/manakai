@@ -8,7 +8,7 @@ Message::Header --- A Perl Module for Internet Message Headers
 package Message::Header;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.37 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.38 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;	## This may seem silly:-)
 push @ISA, qw(Message::Field::Structured);
 
@@ -385,6 +385,7 @@ sub _parse_value ($$$;%) {
       -field_name	=> $name,
     -header_default_charset	=> $self->{option}->{header_default_charset},
     -header_default_charset_input	=> $self->{option}->{header_default_charset_input},
+    -internal_charset_name	=> $self->{option}->{internal_charset_name},
       -parse_all	=> $self->{option}->{parse_all},
     %vopt);
   } else {
@@ -395,6 +396,7 @@ sub _parse_value ($$$;%) {
       -field_name	=> $name,
     -header_default_charset	=> $self->{option}->{header_default_charset},
     -header_default_charset_input	=> $self->{option}->{header_default_charset_input},
+    -internal_charset_name	=> $self->{option}->{internal_charset_name},
       -parse_all	=> $self->{option}->{parse_all},
     %vopt);
   }
@@ -963,7 +965,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/17 00:33:29 $
+$Date: 2002/07/21 03:26:02 $
 
 =cut
 

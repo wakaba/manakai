@@ -13,7 +13,7 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.29 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.30 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::Header;
@@ -43,6 +43,7 @@ use overload '""' => sub { $_[0]->stringify },
     -force_mime_entity	=> 0,
     -format	=> 'mail-rfc2822',
     -guess_media_type	=> 1,
+    #internal_charset_name
     -header_default_charset	=> 'iso-2022-int-1',
     -header_default_charset_input	=> 'iso-2022-int-1',
     -hook_init_fill_options	=> sub {},
@@ -317,6 +318,7 @@ sub _parse_value ($$$) {
     -parse_all	=> $self->{option}->{parse_all},
     -body_default_charset	=> $self->{option}->{body_default_charset},
     -body_default_charset_input	=> $self->{option}->{body_default_charset_input},
+    -internal_charset_name	=> $self->{option}->{internal_charset_name},
     entity_header	=> $self->{header},
   );
   ## Media type specified option/parameters
@@ -553,7 +555,7 @@ sub stringify ($;%) {
       $self->{header}->field ($option{fill_ua_name})->add_our_name (
         -use_Config	=> $option{ua_use_Config},
         -use_Win32	=> $option{ua_use_Win32},
-        -date	=> q$Date: 2002/07/20 03:11:47 $,
+        -date	=> q$Date: 2002/07/21 03:26:02 $,
       );
     }
     $header = $self->{header}->stringify (-format => $option{format},
@@ -766,6 +768,20 @@ sub method_available ($$) {
   0;
 }
 
+sub import ($;%) {
+  my $self = shift;
+  my %option = @_;
+  for (keys %option) {
+    $DEFAULT{$_} = $option{$_};
+  }
+  if ($option{-body_default_charset} && !$option{-body_default_charset_input}) {
+    $DEFAULT{-body_default_charset_input} = $option{-body_default_charset};
+  }
+  if ($option{-header_default_charset} && !$option{-header_default_charset_input}) {
+    $DEFAULT{-header_default_charset_input} = $option{-header_default_charset};
+  }
+}
+
 =back
 
 =head1 C<format>
@@ -965,7 +981,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/20 03:11:47 $
+$Date: 2002/07/21 03:26:02 $
 
 =cut
 
