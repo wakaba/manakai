@@ -1,0 +1,871 @@
+Module:
+  @QName:
+    Util:DIS
+  @FullName:
+    @@lang: en
+    @@@:
+      <QUOTE::DIS> Object Model
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#
+  
+  @Description:
+    @@lang:en
+    @@@:
+      This module provides an object model for <QUITE::dis> document format.  
+
+  @Author:
+    @@FullName: Wakaba
+    @@Mail: w@suika.fam.cx
+  @License:
+    @@@:
+      license:Perl+MPL
+    @@Original:
+      @@@FullName:
+        manakai <CODE::lib/manakai/dis.pl>
+      @@@Year:2004
+      @@@Author:
+        @@@@FullName:Wakaba
+        @@@@Mail:w@suika.fam.cx
+  @Date:
+    @@@:
+      $Date: 2005/02/21 08:06:19 $
+    @@ContentType:
+      dis:Date.RCS
+  
+  @Require:
+    @@Module:
+      @@@Name: SuikaWikiConfig21
+      @@@WithFor:
+        ManakaiDOM:Perl
+  @defaultFor: ForLatest
+
+Namespace:
+  @DIS:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @dis2pm:
+    http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
+  @lang:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @owl:
+    http://www.w3.org/2002/07/owl#
+  @Perl:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @TreeCore:\
+  @Util:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
+
+## -- "For" definitions
+
+ForDef:
+  @QName: 
+    DIS:ForLatest
+  @Description:
+    @@lang:en
+    @@@:
+      For latest version of the <Module::Util:DIS> module implementation
+  @ISA:
+    ManakaiDOM:Perl
+
+## -- Features
+
+ElementTypeBinding:
+  @Name: FeatureDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DOMMain:DOMFeature
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: FeatureVerDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DOMMain:DOMFeature
+
+ElementTypeBinding:
+  @Name: featureQName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ContentType:
+      dis:TypeQName
+
+FeatureDef:
+  @QName: Core
+  @FeatureVerDef:
+    @@QName: CoreFeature10
+    @@Version: 1.0
+    @@ISA: Core
+    @@FullName:
+      @@@lang:en
+      @@@@:
+        The <QUOTE::dis> object model, version 1.0
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The <QUOTE::dis> object model, version 1.0. 
+    @@DOMMain:requireFeature: 
+      swcfg21:CoreFeature21
+
+## -- SuikaWikiConfig/2.1 extended classes
+
+ClsDef:
+  @ClsQName: ManakaiDISImplementation
+  @ClsISA:
+    swcfg21:SWCFGImplementation
+  @Description:
+    @@lang:en
+    @@@:
+      A <QUOTE::dis> implementation object. 
+
+  @Method:
+    @@Name: createDISDocument
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates an empty <Class::ManakaiDISDocument> object. 
+    @@Return:
+      @@@Type:ManakaiDISDocument
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The newly created <QUOTE::dis> document object.
+      @@@PerlDef:
+        $r = $self-><M::swcfg21:SWCFGImplementation.createSWCFGDocument>;
+        $r-><AS::swcfg21:SWCFGDocument.defaultElementTypeNamespaceURI>
+                    (<Q::dis:>);
+
+  @Method:
+    @Name: createDISParser
+    @Description:
+      @@lang:en
+      @@@:
+        Creates a <Class::ManakaiDISParser> object. 
+    @Return:
+      @@Type: ManakaiDISParser
+      @@Description:
+        @@@lang:en
+        @@@@: 
+          A newly created <QUOTE::dis> parser. 
+      @@PerlDef:
+        $r = bless $self-><M::swcfg21:SWCFGImplementation.createParser>,
+                   <ClassName::ManakaiDISParser>;
+
+  @Method:
+    @@Name: typeforurisToURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Converts a pair of name URI reference and <QUOTE::for> URI reference 
+        into a <TYPE::dis:TypeForQNames>-expanded URI reference. 
+    @@Param:
+      @@@Name: typeURI
+      @@@Type: NameURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A URI reference to identify a resource. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Equivalent to <Q::DOMMain:any> (for historical reason). 
+    @@Param:
+      @@@Name: forURI
+      @@@Type: ForURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A <QUOTE::for> URI reference. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Equivalent to <QUOTE::for all>, i.e. <Q::ManakaiDOM:all>. 
+    @@Return:
+      @@@Type: 
+        DISCore:TypeForURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The <TYPE::dis:TypeForQNames>-expanded URI references.  
+          If it is canonicalizable, this method does canonicalize it. 
+      @@@PerlDef:
+        $typeURI = <Q::DOMMain:any> unless defined $typeURI;
+        $forURI = <Q::ManakaiDOM:all> unless defined $forURI;
+        if ($forURI eq <Q::ManakaiDOM:all>) {
+               ## TODO:
+          $r = dis_type_canon_uri ($typeURI);
+        } else {
+          ## NOTE: [RFC 3986]
+          ##       fragment    := *(pchar / "/" / "?")
+          ##       pchar       := unreserved / pct-encoded / sub-delims / [:@]
+          ##       unreserved  := ALPHA / DIGIT / [._~-]
+          ##       sub-delims  := [!$&'()*+,;=]
+          ## NOTE: [XPointer Framework]
+          ##       SchemeData  := *EscapedData
+          ##       EscapedData := NormalChar / "^(" / "^)" / "^^"
+          ##                    / "(" SchemeData ")"
+          ##       NormalChar  := UnicodeChar - [()^]
+          for my $uri ($typeURI, $forURI) {
+            $uri =~ s{([^0-9A-Za-z:;?=_./-])}{sprintf '%%%02X', ord $1}ge;
+          }
+               ## TODO:
+          $r = dis_type_canon_uri
+                  (qq<data:,200411tf#xmlns(t=data:,200411tf%23)>.
+                   qq<t:tf($typeURI,$forURI)>);
+        }
+##DISImplementation
+
+ClsDef:
+  @ClsQName: ManakaiDISParser
+  @ClsISA:
+    swcfg21:SWCFGParser
+  @Description:
+    @@lang:en
+    @@@:
+      A SuikaWikiConfig/2.1 parser that returns <QUOTE::dis> object. 
+  @Method:
+    @Name: parse
+    @Description:
+      @@lang:en
+      @@@:
+        Parses a <QUOTE::dis> document and returns it as an object tree. 
+    @Param:
+      @@Name: input
+      @@Type:
+        DOMLS:LSInput
+      @@Description:
+        @@@lang:en
+        @@@@:
+          The input source. 
+    @Return:
+      @@Type: DISDocument
+      @@Description:
+        @@@lang:en
+        @@@@:
+          The <QUOTE::dis> document object created from the <P::input>. 
+      @@@RaiseException:
+        @@@@@:
+          swcfg21:SWCFG_PARSE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The <IF::swcfg21:SWCFGParser> was unable to load the SuikaWikiConfig 
+            document. 
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::swcfg21:ManakaiSWCFGParser.parse> ($input);
+        }__;
+        if (defined $r) {
+          $r = bless $r, <ClassName::ManakaiDISDocument>;
+        }
+##DISParser
+
+ClsDef:
+  @ClsQName: ManakaiDISNode
+  @ClsISA:
+    swcfg21:ManakaiSWCFGNode
+  @Description:
+    @@lang:en
+    @@@:
+      <QUOTE::dis> node objects. 
+
+  @MethodRedef:
+    @@Name:lookupNamespacePrefix
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Looks up the namespace prefix associated to the given 
+        namespace URI.  The default namespaces are ignored. 
+    @@Param:
+      @@@Name:namespaceURI
+      @@@Type:
+        swcfg21:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The namespace URI to look for. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The <DOM::null> namespace. 
+    @@NamedParam:
+      @@@Name: makeNewBinding
+      @@@Type: 
+        DOMMain:boolean
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Whether a new namespace prefix should be bound when 
+          no namespace URI has been associated yet. 
+      @@@InCase:
+        @@@@Value:true
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            New binding is made if no prefix associated. 
+      @@@InCase:
+        @@@@Value:false
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Simply returns the <DOM::null> if no prefix associated. 
+    @@Return:
+      @@@Type:
+        swcfg21:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+           An associated namespace prefix.  If more than one prefix 
+           are associated to the namespace URI, the returned prefix 
+           is implementation dependent. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:
+          swcfg21:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            No associated namespace prefix found. 
+      @@@PerlDef:
+        $r = null;
+        my $od = $self-><AG::swcfg21:SWCFGNode.ownerDocument> || $self;
+        my $binds = $od->{<Q::TreeCore:node>}->{<Q::nsBinding>};
+        if (defined $namespaceURI) {
+          FIND: {
+            for my $prefix (keys %$binds) {
+              if (defined $binds->{$prefix} and
+                  $binds->{$prefix} eq $namespaceURI) {
+                $r = $prefix;
+                last FIND;
+              }
+            }
+            last FIND unless $makeNewBinding;
+            ## Not found
+            if ($namespaceURI =~ /(\w+)$/) {
+              my $prefix = $1;
+              unless (exists $binds->{$prefix}) {
+                $binds->{$prefix} = $namespaceURI;
+                $r = $prefix;
+                last FIND;
+              }
+            }
+            my $i = 1;
+            {
+              unless (exists $binds->{'ns'.$i}) {
+                $binds->{$r = 'ns'.$i} = $namespaceURI;
+                last FIND;
+              }
+              $i++;
+              redo;
+            }
+          } # FIND
+        } else {  ## Null namespace
+          FIND: {
+            if (exists $binds->{'nu'.'ll'} and not defined $binds->{'nu'.'ll'}) {
+              $r = 'nu'.'ll';
+              last FIND;
+            }
+            for my $prefix (keys %$binds) {
+              if (not defined $prefix) {
+                $r = $prefix;
+                last FIND;
+              }
+            }
+            last FIND unless $makeNewBinding;
+            ## Not found
+            my $i = '';
+            {
+              unless (exists $binds->{'nu'.'ll'.$i}) {
+                $binds->{$r = 'nu'.'ll'.$i} = null;
+                last FIND;
+              }
+              $i++;
+              redo;
+            }
+          }
+        }
+        ## TODO: Module ns support
+
+  @MethodRedef:
+    @@Name:lookupNamespaceURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Looks up the namespace URI associated to the given prefix. 
+    @@Param:
+      @@@Name:prefix
+      @@@Type:
+        swcfg21:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The namespace URI to look for. 
+    @@NamedParam:
+      @@@Name: makeNewBinding
+      @@@Type:
+        DOMMain:boolean
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Whether a new binding should be created if no namespace URI 
+          is associated with the <P::prefix> or not. 
+      @@@InCase:
+        @@@@Value:true
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            A new binding to the temporary namespace URI 
+            exactly same as <P::prefix> is created 
+            if no binding found. 
+      @@@InCase:
+        @@@@Value:false
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            No new binding is created if no binding found.  Note that 
+            even if no association newly created, this method 
+            returns the <DOM::null> value. 
+    @@Return:
+      @@@Type:
+        swcfg21:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:The associated namespace URI. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:
+          swcfg21:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            No namespace prefix is associated to the prefix or 
+            the <DOM::null> namespace is associated. 
+      @@@PerlDef:
+        my $od = $self-><AG::swcfg21:SWCFGNode.ownerDocument> || $self;
+        my $binds = $od->{<Q::TreeCore:node>}->{<Q::nsBinding>};
+        if (exists $binds->{$prefix}) {
+          $r = $binds->{$prefix};
+        } elsif ($makeNewBinding) {
+          $r = $binds->{$prefix} = $prefix;
+        } else {
+          $r = null;
+        }
+        ## TODO: Module ns support
+
+  @IntMethod:
+    @@Name:getNodeReference
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns a new reference to the node object. 
+    @@ManakaiDOM:isStatic:1
+    @@Param:
+      @@@Name:object
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The node object to be referred. 
+    @@Return:
+      @@@Type: ManakaiDISNode
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A newly created reference.
+      @@@PerlDef:
+        my $class;
+        if ($object->{<Q::nodeType>} eq '#element') {
+          $class = <ClassName::ManakaiDISElement>;
+        } elsif ($object->{<Q::nodeType>} eq '#comment') {
+          $class = <ClassName::ManakaiDISComment>;
+        } elsif ($object->{<Q::nodeType>} eq '#document') {
+          $class = <ClassName::ManakaiDISDocument>;
+        } elsif ($object->{<Q::nodeType>} eq '#fragment') {
+          $class = <ClassName::ManakaiDISDocumentFragment>;
+        } else {
+          __ASSERT{DISPerl:invariant::
+            msg => {qq[Node type: "$object->{<Q::nodeType>}" ].
+                    qq[(ref: "@{[ref $object]}")]},
+          }__;
+        }
+        $r = $object-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+                                  .newReference> ($class);
+  
+##DISNode
+
+ClsDef:
+  @ClsQName: ManakaiDISElement
+  @ClsISA:
+    swcfg21:ManakaiSWCFGElement
+  @ClsISA: ManakaiDISNode
+  @Description:
+    @@lang:en
+    @@@:
+      <QUOTE::dis> element node objects. 
+
+  @Method:
+    @@Name: forMatch
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Tests whether this element is for a <QUOTE::for> or not. 
+    @@Param:
+      @@@Name: forArg
+      @@@Type: ForURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The <QUOTE::For> URI reference to test against. 
+    @@Param:
+      @@@Name: forpArg
+      @@@Type: ForURIList
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The <QUOTE::For+> URI references to test against. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            No additional <QUOTE::For> URI reference. 
+    @@Return:
+      @@@Type:
+        DOMMain:boolean
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Whether this element is for <P::forArg> and <P::forpArg> or not. 
+
+  @Method:
+    @@Name: mediaTypeMatch
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Tests whether the content media type of this element matches to 
+        a type or not. 
+    @@Param:
+      @@@Name: mediaType
+      @@@Type: MediaTypeURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A media type URI reference to test against. 
+    @@Param:
+      @@@Name: mediaTypeDefault
+      @@@Type: MediaTypeURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The default media type for this element. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            No default type provided.  All <P::mediaType> will match. 
+    @@Return:
+      @@@Type:
+        DOMMain:boolean
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Whether this element is of <P::mediaType> or not. 
+
+  @Method:
+    @@Name: prefixToURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Converts a namespace prefix into associated URI reference. 
+    @@Param:
+      @@@Name: prefix
+      @@@Type:
+        swcfg21:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A namespace prefix to look for. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Returns the default namespace URI. 
+    @@NodeParam:
+    @@Return:
+      @@@Type:
+        swcfg21:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The URI references associated. 
+      @@@UndeclaredPrefixException:
+      @@@PerlDef:
+        if (defined $param) {
+          __DEEP{
+            $r = $self-><M::swcfg21:SWCFGNode.lookupNamespaceURI> ($prefix);
+          }__;
+          unless (defined $r) {
+            __EXCEPTION{UNDECLARED_NS_PREFIX_ERR::
+              infoset:prefix => {$prefix},
+              MDOMX:param-name => 'prefix',
+              DIS:sourceNode => {$node},
+            }__;
+          }
+        } else {
+          ## TODO: default namespace
+        }
+
+  @Method:
+    @@QName: qnameToURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Converts a qualified name (<TYPE::dis:TypeQName>) to 
+        an expanded URI reference. 
+    @@Param:
+      @@@Name: qname
+      @@@Type:
+        dis:TypeQName
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A qualified name. 
+    @@NodeParam:
+    @@Return:
+      @@@Type: AnyURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The expanded URI reference. 
+      @@@UndeclaredPrefixException:
+      @@@PerlDef:
+        $qname =~ s/^\s+//; $qname =~ s/\s+$//;
+        my ($prefix, $lname) = split /:/, $qname;
+        __DEEP{
+          if (defined $lname) {
+            $r = $self-><M::ManakaiDISElement.prefixToURI> ($prefix) . $lname;
+          } else {  ## In default namespace
+            $r = $self-><M::ManakaiDISElement.prefixToURI> (null) . $prefix;
+          }
+        }
+
+  @Method:
+    @@QName: qnameToPair
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Converts a qualified name (<TYPE::dis:TypeQName>) to 
+        a pair of namespace URI and local name. 
+    @@Param:
+      @@@Name: qname
+      @@@Type:
+        dis:TypeQName
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A qualified name. 
+    @@NodeParam:
+    @@Return:
+      @@@Type:
+        Perl:ARRAY
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A list of namespace URI and local name. 
+      @@@UndeclaredPrefixException:
+      @@@PerlDef:
+        $qname =~ s/^\s+//; $qname =~ s/\s+$//;
+        my ($prefix, $lname) = split /:/, $qname;
+        __DEEP{
+          if (defined $lname) {
+            $r = [$self-><M::ManakaiDISElement.prefixToURI> ($prefix), $lname];
+          } else {  ## In default namespace
+            $r = [$self-><M::ManakaiDISElement.prefixToURI> (null), $prefix];
+          }
+        }
+
+  @Method:
+    @@Name: typeforqnamesToURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Converts a <TYPE::dis:TypeForQNames>
+        into an expanded URI reference. 
+    @@Param:
+      @@@Name: tfqnames
+      @@@Type: 
+        dis:TypeForQNames
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A <TYPE::dis:TypeForQNames> to identify a resource. 
+    @@Param:
+      @@@Name: defaultTypeURI
+      @@@Type: NameURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A name URI reference used if it is missing from 
+          <P::tfqnames>. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Equivalent to <Q::DOMMain:any>. 
+    @@Param:
+      @@@Name: defaultForURI
+      @@@Type: ForURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A <QUOTE::for> URI reference used if it is missing from 
+          <P::tfqnames>. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Equivalent to <QUOTE::for all>, i.e. <Q::ManakaiDOM:all>. 
+    @@NodeParam:
+    @@Return:
+      @@@Type: 
+        DISCore:TypeForURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The <TYPE::dis:TypeForQNames>-expanded URI references.  
+          If it is canonicalizable, this method does canonicalize it. 
+      @@@UndeclaredPrefixException:
+      @@@PerlDef:
+        my ($typeq, $forq) = split /\s*::\s*/, $tfqnames, 2;
+        my ($typeURI, $forURI);
+        if (defined $forq) {
+          __DEEP{
+            $typeURI = $typeq eq ''
+                       ? defined $defaultTypeURI ? $defaultTypeURI
+                                                 : <Q::DOMMain:any>
+                       : $self-><M::ManakaiDISElement.qnameToURI> ($typeq, %opt);
+          }__;
+          if (length $forq) {
+            $forURI = $self-><M::ManakaiDISElement.qnameToURI> ($forq, %opt);
+          } else {
+            $forURI = <Q::ManakaiDOM:all>;
+          }
+        } else {  ## "For" omitted
+          __DEEP{
+            $typeURI = $typeq eq ''
+                       ? defined $defaultTypeURI ? $defaultTypeURI
+                                                 : <Q::DOMMain:any>
+                       : $self-><M::ManakaiDISElement.qnameToURI> ($typeq, %opt);
+          }__;
+          $for = defined $defaultForURI ? $defaultForURI : <Q::ManakaiDOM:all>;
+        }
+        __DEEP{
+          $r = $self-><AG::swcfg21:SWCFGNode.ownerDocument>
+                    -><AG::swcfg21:SWCFGDocument.implementation>
+                    -><M::DISImplementation.typeforqnamesToURI>
+                                                  ($typeURI, $forURI);
+        }__;
+##DISElement
+
+ClsDef:
+  @ClsQName: ManakaiDISComment
+  @ClsISA:
+    swcfg21:ManakaiSWCFGComment
+  @ClsISA: ManakaiDISNode
+  @Description:
+    @@lang:en
+    @@@:
+      <QUOTE::dis> comment node objects. 
+##DISComment
+
+ClsDef:
+  @ClsQName: ManakaiDISDocumentFragment
+  @ClsISA:
+    swcfg21:ManakaiSWCFGDocumentFragment
+  @ClsISA: ManakaiDISNode
+  @Description:
+    @@lang:en
+    @@@:
+      <QUOTE::dis> document fragment node objects. 
+##DISDocumentFragment
+
+ClsDef:
+  @ClsQName: ManakaiDISDocument
+  @ClsISA:
+    swcfg21:ManakaiSWCFGDocument
+  @ClsISA: ManakaiDISNode
+  @Description:
+    @@lang:en
+    @@@:
+      <QUOTE::dis> document node objects. 
+##DISDocument
+
+## -- Datatypes
+
+URITypeDef:
+  @QName: ForURI
+  @Description:
+    @@lang:en
+    @@@:
+      <QUOTE::For> URI references. 
+
+DataTypeDef:
+  @QName: ForURIList
+  @Description:
+    @@lang:en
+    @@@:
+      References to the array containing <QUOTE::for> URI references. 
+
+URITypeDef:
+  @QName: MediaTypeURI
+  @Description:
+    @@lang:en
+    @@@:
+      Media type URI references. 
+
+## -- Exceptions
+
+XParamDef:
+  @QName: sourceNode
+  @Description:
+    @@lang:en
+    @@@:
+      The node from which the string has come. 
+  @Type: DISNode

@@ -13,7 +13,9 @@ PERL = perl -I$(MANAKAI_LIB_DIR)
 PERL_CHK = $(PERL) -c -w
 
 DISC_PL = $(MANAKAI_BIN_DIR)disc.pl
-DISC = $(PERL) $(DISC_PL) -I=$(MANAKAI_LIB_MANAKAI_DIR)
+DISC = $(PERL) $(DISC_PL) -I=$(MANAKAI_LIB_MANAKAI_DIR) \
+                -I=$(MANAKAI_LIB_DIR)Message/Util/ \
+                -I=$(MANAKAI_LIB_DIR)Message/Util/Error/
 CDIS2PM_OPTIONS = --enable-assert
                   ## TODO: Official release should remove this option.
 CDIS2PM_PL = ../../../bin/cdis2pm.pl
@@ -27,12 +29,14 @@ IDL2DIS = $(PERL) $(IDL2DIS_PL)
 DIS_FILES = DOMMain.dis DOMCore.dis DOMXML.dis \
   DOMLS.dis ManakaiDOMLS2003.dis \
   DOMEvents.dis DOMViews.dis \
-  DOMHTML.dis DOMWebForms.dis
+  DOMHTML.dis DOMWebForms.dis \
+  DOMMetaImpl.dis
 
 GENERATED_FILES_DOMLATEST = core.cdis ev.cdis ls.cdis html.cdis \
   DOMMain.pm DOMCore.pm DOMXML.pm DOMLS.pm ManakaiDOMLS2003.pm \
   DOMEvents.pm DOMViews.pm \
-  DOMHTML.pm DOMWebForms.pm
+  DOMHTML.pm DOMWebForms.pm \
+  meta.cdis DOMMetaImpl.dis
 GENERATED_FILES = $(MAIN_CDIS_FILE) $(GENERATED_FILES_DOMLATEST)
 
 NS_MANAKAIDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#
@@ -41,6 +45,13 @@ all: dom
 
 dom: dom-latest
 dom-latest: $(GENERATED_FILES_DOMLATEST)
+
+meta.cdis: DOMBoot.dis DOMMetaImpl.dis $(DISC_PL)
+	$(DISC) DOMBoot.dis --output-file-name=.$@.1.tmp \
+	                    --for="$(NS_MANAKAIDOM)ManakaiDOM1"
+	$(DISC) DOMMetaImpl.dis --input-cdis-file-name=.$@.1.tmp \
+	                    --output-file-name=$@
+	$(RM) .$@.1.tmp
 
 core.cdis: DOMCore.dis DOMMain.dis DOMXML.dis $(DISC_PL)
 	$(DISC) DOMCore.dis --output-file-name=$@
@@ -65,6 +76,11 @@ html.cdis: ls.cdis DOMHTML.dis DOMWebForms.dis $(DISC_PL)
 	$(DISC) DOMWebForms.dis --input-cdis-file-name=.$@.1.tmp \
 	                    --output-file-name=$@
 	$(RM) .$@.1.tmp
+
+DOMMetaImpl.pm: meta.cdis $(CDIS2PM_PL)
+	$(CDIS2PM) $< --for="$(NS_MANAKAIDOM)ManakaiDOMLatest" \
+	  --module-name=DOMMetaImpl > $@
+	$(PERL_CHK) $@
 
 DOMMain.pm: core.cdis $(CDIS2PM_PL)
 	$(CDIS2PM) $< --for="$(NS_MANAKAIDOM)ManakaiDOMCommon" \

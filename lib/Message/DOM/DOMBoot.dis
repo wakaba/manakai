@@ -30,7 +30,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/20 12:28:06 $
+      $Date: 2005/02/21 08:06:19 $
     @@ContentType:
       dis:Date.RCS
   
@@ -50,7 +50,21 @@ Module:
     @@Module:
       @@@Name: DOMBoot
       @@@WithFor:
+        ManakaiDOM:ManakaiDOM
+    @@Module:
+      @@@Name: DOMBoot
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOM1
+    @@Module:
+      @@@Name: DOMBoot
+      @@@WithFor:
         ManakaiDOM:ManakaiDOM3
+    @@Module:
+      @@@Name: DOMBoot
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOMLatest
+    @@DefaultFor:
+      ManakaiDOM:ManakaiDOMLatest
 
 Namespace:
   @dis:
@@ -326,6 +340,10 @@ PropDef:
 DataTypeDef:
   @QName:
     ManakaiDOM:ManakaiDOMObject
+
+DataTypeDef:
+  @QName:
+    DOMMain:DOMObject
 
 DataTypeDef:
   @QName: 

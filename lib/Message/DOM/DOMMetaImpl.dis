@@ -20,7 +20,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/20 12:28:07 $
+      $Date: 2005/02/21 08:06:19 $
     @@ContentType:
       dis:Date.RCS
   
@@ -37,6 +37,10 @@ Module:
       @@@Name: DOMException
       @@@WithFor:
         ManakaiDOM:all
+    @@Module:
+      @@@Name: ManakaiNode
+      @@@WithFor:
+        ManakaiDOM:Perl
     @@Module:
       @@@Name: DOMMetaImpl
       @@@WithFor:
@@ -374,6 +378,29 @@ PropDef:
   @dataType:
     dis:TypeForQNames
 
+## -- The bootstrap object
+
+ResourceDef:
+  @QName: 
+    DOMMain:ManakaiDOMImplementationRegistryVar
+  @rdf:type:
+    DISPerl:ScalarVariable
+  @AppName:
+    @@@:
+      Message::DOM::DOMImplementationRegistry
+    @@ContentType:
+      lang:Perl
+  @DefaultValue:
+    @@@:
+      <ClassName::DOMMain:ManakaiDOMImplementationRegistry
+                                  ::ManakaiDOM:ManakaiDOMLatest>
+    @@ContentType:
+      lang:Perl
+  @Type:
+    DOMMain:DOMString
+  @For:
+    ManakaiDOM:ManakaiDOMLatest
+
 ## -- The implementation registry object
 
 ResourceDef:
@@ -478,6 +505,11 @@ ResourceDef:
             A list of desired features that must be implemented.
      @@Return:
        @@@Type:  
+         @@@@@:
+           DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM
+         @@@@For:
+           ManakaiDOM:ManakaiDOM
+       @@@Type:
          DOMCore:DOMImplementation
        @@@Description:
          @@@@lang:en
@@ -485,9 +517,18 @@ ResourceDef:
            The first implementation that has the derired features. 
            \
            {NOTE:: DOM implementations returned by this method 
-                   might not be manakai DOM objects.
+                   might not be manakai DOM objects. 
            \
            }
+       @@@Description:
+         @@@@lang:en
+         @@@@@:
+           {NOTE:: The DOM implementation returned might not implement 
+                   Level 3 <IF::DOMCore:DOMImplementation> interface. 
+           \
+           }
+         @@@@For:
+           ManakaiDOM:ManakaiDOM
        @@@InCase:
          @@@@Value:
            @@@@@is-null:1
@@ -509,8 +550,9 @@ ResourceDef:
       @@@ImplNote:
         @@@@lang:en
         @@@@@:
-          Stringify of <P::features> is required to support non-manakai 
-          <IF::DOMCore:DOMImplementationSource>s. 
+          Converting <P::features> into a string is necessary since 
+          a <IF::DOMCore:DOMImplementationSource> might not be part 
+          of manakai so that it does not support the hash representation. 
   @Method:
      @@Name:  getDOMImplementationList
      @@ManakaiDOM:isStatic: 1
@@ -584,6 +626,11 @@ ResourceDef:
       ManakaiDOM:ManakaiDOM
     @@Param:
       @@@Name: s
+      @@@Type:
+        @@@@@:
+          DOMCore:DOMImplementationSource::ManakaiDOM:ManakaiDOM
+        @@@@ForCheck:
+          ManakaiDOM:ManakaiDOM
       @@@Type: 
         DOMCore:DOMImplementationSource
       @@@Description:
@@ -672,6 +719,11 @@ IFClsDef:
           @@@@@: 
             An index of the item to retrieve in this collection.
      @@Return:
+        @@@Type:
+          @@@@@:
+            DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM
+          @@@@For:
+            ManakaiDOM:ManakaiDOM
         @@@Type:  
           DOMCore:DOMImplementation
         @@@Description:
@@ -823,6 +875,11 @@ IFClsDef:
             A string that specifies which features and versions are 
             required.
      @@Return:
+        @@@Type:
+          @@@@@:
+            DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM
+          @@@@For:
+            ManakaiDOM:ManakaiDOM
         @@@Type:  
           DOMCore:DOMImplementation
         @@@Description:
@@ -929,6 +986,196 @@ IFClsDef:
                   ($_->{packageName}->_new);
           }
 ##DOMImplementationSource
+
+## -- Simplified DOMImplementation interface
+
+IFClsDef:
+  @IFQName: ManakaiDOMMinimumImplementationIF
+  @ClsQName: ManakaiDOMMinimumImplementation
+
+  @ISA:
+    @@@:
+      DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM1
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @ISA:
+    @@@:
+      ManakaiDOM:ManakaiDOMNodeReference::ManakaiDOM:Perl
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM ManakaiDOM:ForClass
+  @ISA:
+    @@@:
+      ManakaiDOM:ManakaiDOMObject
+    @@ForCheck:
+      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
+
+  @Role:
+    @@@:
+      DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM
+    @@compat:
+      DOMCore:ManakaiDOMImplementation::ManakaiDOM:ManakaiDOMLatest
+    @@ForCheck:
+      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
+  @DOMMain:implementFeature:
+    DOMCore:CoreFeature10
+
+  @Description:
+    @@lang:en
+    @@@:
+      A small <IF::DOMCore:DOMImplementation> that only supports 
+      <M::.hasFeature> (from DOM Level 1) and <M::.getFeature> 
+      (from DOM Level 3) methods.  This class might be useful
+      for lightweight applications that do not require the full 
+      DOM implementation. 
+  @For:
+    ManakaiDOM:ManakaiDOMLatest
+  @For:
+    =ManakaiDOM:ManakaiDOM
+  
+  @Method:
+    @@Name:  hasFeature
+    @@Description:
+      @@@lang:en
+      @@@@:
+         Tests whether this DOM implementation supports a specific 
+         feature and version or not.
+    @@Param:
+      @@@Name:  feature
+      @@@Type:
+        DOMMain:DOMString
+      @@@actualType:
+        ManakaiDOM:ManakaiDOMFeatureName
+      @@@Description:
+        @@@@lang:en
+        @@@@@: 
+          The name of the feature to test, with or without 
+          <CHAR::PLUS SIGN> prefix.
+    @@Param:
+      @@@Name:  version
+      @@@Type:
+        DOMMain:DOMString
+      @@@actualType:
+        ManakaiDOM:ManakaiDOMFeatureVersion
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The version number of the feature to test. 
+    @@Return:
+      @@@Type:  
+        DOMMain:boolean
+      @@@Description:
+        @@@@lang:en
+        @@@@@: 
+          Whether the feature and version is implemented or not.
+      @@@InCase:
+        @@@@Value: true
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: 
+            The <P::feature> is implemented in the specified <P::version>.
+      @@@InCase:
+        @@@@Value: false
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The feature is not implemented.
+      @@@PerlDef:
+        my $plus = $feature =~ s/^\+// ? 1 : 0;
+        if (${<IF::DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM>::Class}{
+            ref $self}->{$feature}->{$version}) {
+          $r = true;
+        } else {
+          for (values %{<Class::DOMCore:ManakaiDOMImplementation
+                                     ::ManakaiDOM:ManakaiDOMLatest>::Class}) {
+            if ($_->{feature}->{$feature}->{$version}) {
+              $r = true;
+              last;
+            }
+          }
+        } 
+  @Method:
+     @@Name:  getFeature
+     @@Description:
+        @@@lang:en
+        @@@@:
+          Returns a specialized object that implements the specialized 
+          interfaces of the specified feature and version.
+     @@Param:
+        @@@Name:  feature
+        @@@Type:
+          DOMMain:DOMString
+        @@@actualType:
+          ManakaiDOM:ManakaiDOMFeatureName
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A feature name to request.
+     @@Param:
+        @@@Name:  version
+        @@@Type:
+          DOMMain:DOMString
+        @@@actualType:
+          ManakaiDOM:ManakaiDOMFeatureVersion
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A feature version number to request.
+     @@Return:
+        @@@Type:  
+          DOMMain:DOMObject
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An object that implements the specialized APIs of the 
+            <P::feature> and <P::version>.  It might or might not 
+            implements the <IF::DOMImplementation> interface. 
+            In addition, the object might or might not part of 
+            manakai. 
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            If the object implements the <IF::DOMImplementation> interface, 
+            it must delegate to the primary core <IF::DOMImplementation> 
+            and must not result incosistent with the primary core 
+            <IF::DOMImplementation> such as <M::DOMImplementation.hasFeature>, 
+            <M::DOMImplementation.getFeature>, etc.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@@: 
+            There is no object available that implements interfaces 
+            associated with the <P::feature> and <P::version>. 
+        @@@PerlDef:
+          $feature =~ s/^\+//;
+          for (values %{<Class::DOMCore:ManakaiDOMImplementation
+                                     ::ManakaiDOM:ManakaiDOMLatest>::Class}) {
+            if ($_->{feature}->{$feature}->{$version}) {
+              $r = $self->{<Q::TreeCore:node>}
+                        -><M::ManakaiDOM:ManakaiDOMNodeObject
+                                     ::ManakaiDOM:Perl.newReference>
+                                                        ($_->{packageName});
+              last;
+            }
+          }
+  @IntMethod:
+    @@Name:new
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Constructs a new instance of <Class::ManakaiDOMMinimumImplementation> 
+        class. 
+    @@Return:
+      @@@Type: ManakaiDOMMinimumImplementation
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The newly created DOM implementation object.
+      @@@PerlDef:
+        my $node = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
+                          ::ManakaiDOM:Perl.new>;
+        $r = $node-><M::ManakaiDOM:ManakaiDOMNodeObject
+                          ::ManakaiDOM:Perl.newReference> ($self);
+        $node->{<Q::ManakaiDOM:implID>} = $node->{<Q::TreeCore:nodeID>};
+##ManakaiDOMMinimumImplementation
 
 ElementTypeBinding:
   @Name: PerlDef

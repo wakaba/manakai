@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/02/20 12:28:07 $
+      $Date: 2005/02/21 08:06:19 $
     @@ContentType:
       dis:Date.RCS
   
@@ -409,8 +409,8 @@ IFClassDef:
             $self->{<Q::TreeCore:node>}
                  -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
                                      .importTree> ($node->{<Q::TreeCore:node>});
-            for (@{$node->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
-              $_->{<Q::parent>} = $self->{<Q::TreeCore:node>};
+            for my $cn (@{$node->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
+              $cn->{<Q::parent>} = $self->{<Q::TreeCore:node>};
             }
             push @{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}, 
        \         @{$node->{<Q::TreeCore:node>}->{<Q::childNodes>}};
@@ -423,9 +423,9 @@ IFClassDef:
             if ($node->{<Q::TreeCore:node>}->{<Q::parent>}) {
               my @pl = $node->{<Q::TreeCore:node>}->{<Q::parent>}
                                                   ->{<Q::childNodes>};
-              for (0..$#pl) {
-                if ($pl[$_] eq $node->{<Q::TreeCore:node>}) {
-                  splice @pl, $_, 1, ();
+              for my $i (0..$#pl) {
+                if ($pl[$i] eq $node->{<Q::TreeCore:node>}) {
+                  splice @pl, $i, 1, ();
                   last;
                 }
               }
@@ -592,7 +592,8 @@ IFClassDef:
       @@@PerlDef:
         my $n = $node->{<Q::TreeCore:node>};
         $self->{<Q::TreeCore:node>}->{<Q::childNodes>}
-           = [grep {$_ ne $n} @{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}];
+           = [grep {not $_ eq $n} @{$self->{<Q::TreeCore:node>}
+                                         ->{<Q::childNodes>}}];
         $node->{<Q::TreeCore:node>}
              -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl.orphanate>;
   @Method:
@@ -1000,15 +1001,15 @@ IFClassDef:
         }
 
         FIND: {
-          for (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
-            my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
+          for my $cn (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
+            my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($cn);
             if ($c-><AG::SWCFGNode.nodeType> eq '#element' and
                 $c-><AG::SWCFGNode.localName> eq $localName) {
               $r = $c;
               $r->{<Q::TreeCore:node>}->{<Q::value>} = $value;
-              for (@{$r->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
-                CORE::delete $_->{<Q::parent>};
-                $_-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+              for my $rcn (@{$r->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
+                CORE::delete $rcn->{<Q::parent>};
+                $rcn-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
                              .orphanate>;
               }
               $r->{<Q::TreeCore:node>}->{<Q::childNodes>} = [];
@@ -1078,20 +1079,20 @@ IFClassDef:
         }
 
         FIND: {
-          for (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
-            my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
+          for my $cn (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
+            my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($cn);
             my $cnsuri = $c-><AG::SWCFGNode.namespaceURI>;
             if ($c-><AG::SWCFGNode.nodeType> eq '#element' and
                 ((not defined $namespaceURI and 
                   not defined $cnsuri) or
                  (defined $namespaceURI and defined $cnsuri and
                   $namespaceURI eq $cnsuri)) and
-                $_-><AG::SWCFGNode.localName> eq $localName) {
+                $cn-><AG::SWCFGNode.localName> eq $localName) {
               $r = $c;
               $r->{<Q::TreeCore:node>}->{<Q::value>} = $value;
-              for (@{$r->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
-                CORE::delete $_->{<Q::parent>};
-                $_-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+              for my $rcn (@{$r->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
+                CORE::delete $rcn->{<Q::parent>};
+                $rcn-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
                              .orphanate>;
               }
               $r->{<Q::TreeCore:node>}->{<Q::childNodes>} = [];
@@ -1146,8 +1147,8 @@ IFClassDef:
             true;
           }
         } @{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}];
-        for (@removed) {
-          $_-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+        for my $n (@removed) {
+          $n-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
                           .orphanate>;
         }
         true;
@@ -1202,8 +1203,8 @@ IFClassDef:
             true;
           }
         } @{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}];
-        for (@removed) {
-          $_-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+        for my $n (@removed) {
+          $n-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
                           .orphanate>;
         }
         true;
@@ -1642,9 +1643,9 @@ IFClassDef:
               $r = $self-><AG::SWCFGElement.realQualifiedName>
                  . ":\x0A";
             }
-            for (@{$node->{<Q::childNodes>}}) {
-              next unless $_->{<Q::nodeType>} eq '#element';
-              my $rc = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_)
+            for my $cn (@{$node->{<Q::childNodes>}}) {
+              next unless $cn->{<Q::nodeType>} eq '#element';
+              my $rc = <ClassM::ManakaiSWCFGNode.getNodeReference> ($cn)
                          ->stringify;
               $rc =~ s/\x0A  /\x0A     /gs;
               $rc =~ s/(\x0A +\@)/$1\@/gs;
@@ -1665,15 +1666,16 @@ IFClassDef:
             $r = '#?SuikaWikiConfig/' . $node->{<Q::version>} . "\n";
           }
           
-          for (@{$node->{<Q::childNodes>}}) {
+          for my $cn (@{$node->{<Q::childNodes>}}) {
             $r .= "\x0A";
-            $r .= <ClassM::ManakaiSWCFGNode.getNodeReference> ($_)->stringify;
+            $r .= <ClassM::ManakaiSWCFGNode.getNodeReference> ($cn)->stringify;
           }
 
           ## Element Type Binding
           my $eb = '';
-          for (sort keys %{$self->{<Q::TreeCore:node>}->{<Q::etBinding>}}) {
-            my $b = $self->{<Q::TreeCore:node>}->{<Q::etBinding>}->{$_};
+          for my $bk (sort keys %{$self->{<Q::TreeCore:node>}
+                                       ->{<Q::etBinding>}}) {
+            my $b = $self->{<Q::TreeCore:node>}->{<Q::etBinding>}->{$bk};
             next unless $b;
             $eb .= "\x0A" . 'ElementTypeBinding:' . "\x0A"
                           . '  @Name:' . "\x0A"
@@ -1690,10 +1692,10 @@ IFClassDef:
               $eb .= $b->{shadowLocalName};
             }
             $eb .= "\x0A";
-            for (qw/shadowContent shadowSibling/) {
-              next unless $b->{$_};
-              $eb .= '  @' . ucfirst ($_) . ":\x0A";
-              my $rc = <ClassM::ManakaiSWCFGNode.getNodeReference> ($b->{$_});
+            for my $p (qw/shadowContent shadowSibling/) {
+              next unless $b->{$p};
+              $eb .= '  @' . ucfirst ($p) . ":\x0A";
+              my $rc = <ClassM::ManakaiSWCFGNode.getNodeReference> ($b->{$p});
               my $ebc = $rc->stringify;
               $ebc =~ s/\x0A  /\x0A       /gs;
               $ebc =~ s/(\x0A +\@)/$1\@\@/gs;
@@ -1704,7 +1706,7 @@ IFClassDef:
                 $ebc =~ s/(^|\x0A)(?=([\\\@\#\s]|$))?/$1.'      '.
                                                   (defined $2?"\\":"")/ges;
                 $eb .= '    @@@'
-                    . (ref ($b->{$_}->{<Q::value>}) eq 'ARRAY' ? '[list]' : '')
+                    . (ref ($b->{$p}->{<Q::value>}) eq 'ARRAY' ? '[list]' : '')
                     . ":" . ((($ebc !~ /[\x0D\x0A:]/) and (length ($ebc) < 50))
                              ? '' : "\x0A")
                     . (length $ebc ? $ebc : '\\') . "\x0A";
@@ -1715,11 +1717,12 @@ IFClassDef:
 
           ## Namespace bindings
           my $ns = '';
-          for (sort keys %{$self->{<Q::TreeCore:node>}->{<Q::nsBinding>}}) {
-            if ($_ ne 'URI') {
-              $ns .= '  @' . $_ . ':' . "\x0A"
+          for my $pfx (sort keys %{$self->{<Q::TreeCore:node>}
+                                        ->{<Q::nsBinding>}}) {
+            if ($pfx ne 'URI') {
+              $ns .= '  @' . $pfx . ':' . "\x0A"
                   .  '    ';
-              my $uri = $self->{<Q::TreeCore:node>}->{<Q::nsBinding>}->{$_};
+              my $uri = $self->{<Q::TreeCore:node>}->{<Q::nsBinding>}->{$pfx};
               if (defined $uri) {
                 if (length $uri) {
                   if ($uri =~ /^[\\#\s\@]/) {
@@ -1741,8 +1744,8 @@ IFClassDef:
           $r =~ s/\x0A/\x0A#/gs;
           $r = '#' . $r . "\n";
         } elsif ($nt eq '#fragment') {
-          for (@{$node->{<Q::childNodes>}}) {
-            $r .= <ClassM::ManakaiSWCFGNode.getNodeReference> ($_)->stringify;
+          for my $cn (@{$node->{<Q::childNodes>}}) {
+            $r .= <ClassM::ManakaiSWCFGNode.getNodeReference> ($cn)->stringify;
           }
         } else {
           __ASSERT{DISPerl:invariant::
@@ -1815,10 +1818,10 @@ IFClassDef:
         if ($node_type eq '#element') {
           $r .= '/' . $self-><AG::SWCFGElement.qualifiedName>;
           if ($key) {
-            for (ref $key eq 'ARRAY' ? @{$key} : $key) {
-              my $key_val = $self-><M::SWCFGNode.getAttributeValue> ($_);
+            for my $k (ref $key eq 'ARRAY' ? @{$key} : $key) {
+              my $key_val = $self-><M::SWCFGNode.getAttributeValue> ($k);
               if (defined $key_val) {
-                $r .= '[@' . $_ . '=' . $key_val . ']';
+                $r .= '[@' . $k . '=' . $key_val . ']';
               }
             }
           }
@@ -1995,32 +1998,32 @@ IFClassDef:
             $r = $od-><M::SWCFGDocument.createElementNS>
                             ($self-><AG::SWCFGNode.namespaceURI>,
                              $self-><AG::SWCFGNode.localName>);
-            for (<Q::shadowLocalName>, <Q::shadowNamespaceURI>) {
-              $r->{<Q::TreeCore:node>}->{$_} = $self->{<Q::TreeCore:node>}->{$_};
+            for my $p (<Q::shadowLocalName>, <Q::shadowNamespaceURI>) {
+              $r->{<Q::TreeCore:node>}->{$p} = $self->{<Q::TreeCore:node>}->{$p};
             }
             $r->{<Q::TreeCore:node>}->{<Q::value>}
                 = defined $self->{<Q::TreeCore:node>}->{<Q::value>}
                   ? ref $self->{<Q::TreeCore:node>}->{<Q::value>} eq 'ARRAY'
                   ? [@{$self->{<Q::TreeCore:node>}->{<Q::value>}}]
                   : $self->{<Q::TreeCore:node>}->{<Q::value>} : null;
-            for (<Q::shadowContent>, <Q::shadowSibling>) {
-              if ($self->{<Q::TreeCore:node>}->{$_}) {
+            for my $p (<Q::shadowContent>, <Q::shadowSibling>) {
+              if ($self->{<Q::TreeCore:node>}->{$p}) {
                 my $c = <ClassM::ManakaiSWCFGNode.getNodeReference>
-                           ($self->{<Q::TreeCore:node>}->{$_})->clone;
-                $r->{<Q::TreeCore:node>}->{$_} = $c->{<Q::TreeCore:node>};
+                           ($self->{<Q::TreeCore:node>}->{$p})->clone;
+                $r->{<Q::TreeCore:node>}->{$p} = $c->{<Q::TreeCore:node>};
                 $r->{<Q::TreeCore:node>}
                   -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
                           .importTree>
-                           ($r->{<Q::TreeCore:node>}->{$_});
-                $r->{<Q::TreeCore:node>}->{$_}
+                           ($r->{<Q::TreeCore:node>}->{$p});
+                $r->{<Q::TreeCore:node>}->{$p}
                   ->{{
                         <Q::shadowContent> => <Q::shadowParent>,
                         <Q::shadowSibling> => <Q::shadowSiblingOf>,
-                     }->{$_}} = $r->{<Q::TreeCore:node>};
+                     }->{$p}} = $r->{<Q::TreeCore:node>};
               }
             }
-            for (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
-              my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
+            for my $cn (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
+              my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($cn);
               $r-><AG::SWCFGNode.appendNode> ($c->clone);
             }
           } elsif ($nt eq '#comment') {
@@ -2029,8 +2032,8 @@ IFClassDef:
           } elsif ($nt eq '#fragment') {
             $r = $od-><M::SWCFGDocument.createDocumentFragment>;
             ## <Q::isShadowMaster> property is not copied
-            for (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
-              my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
+            for my $cn (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
+              my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($cn);
               $r-><AG::SWCFGNode.appendNode> ($c->clone);
             }
             $r->{<Q::TreeCore:node>}->{<Q::value>}
@@ -2043,47 +2046,51 @@ IFClassDef:
                     -><M::SWCFGImplementation.createSWCFGDocument>;
             $r->{<Q::TreeCore:node>}->{<Q::nsBinding>}
                = {%{$self->{<Q::TreeCore:node>}->{<Q::nsBinding>}}};
-            for (keys %{$self->{<Q::TreeCore:node>}->{<Q::etBinding>}}) {
-              my $b = $self->{<Q::TreeCore:node>}->{<Q::etBinding>}->{$_};
+            for my $bk (keys %{$self->{<Q::TreeCore:node>}->{<Q::etBinding>}}) {
+              my $b = $self->{<Q::TreeCore:node>}->{<Q::etBinding>}->{$bk};
               next unless $b;
-              my $c = $r->{<Q::TreeCore:node>}->{<Q::etBinding>}->{$_} = {
+              my $c = $r->{<Q::TreeCore:node>}->{<Q::etBinding>}->{$bk} = {
                 elementType => $b->{elementType},
                 shadowLocalName => $b->{shadowLocalName},
                 shadowNamespaceURI => $b->{shadowNamespaceURI},
                 namespaceExpanded => $b->{namespaceExpanded},
               };
-              for (qw/shadowContent shadowSibling/) {
-                if ($b->{$_}) {
+              for my $p (qw/shadowContent shadowSibling/) {
+                if ($b->{$p}) {
                   my $cl = <ClassM::ManakaiSWCFGNode.getNodeReference>
-                                 ($b->{$_})->clone;
-                  $c->{$_} = $cl->{<Q::TreeCore:node>};
+                                 ($b->{$p})->clone;
+                  $c->{$p} = $cl->{<Q::TreeCore:node>};
                   $r->{<Q::TreeCore:node>}
                     -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                          .importTree> ($c->{$_});
-                  my @l = $c->{$_};
+                          .importTree> ($c->{$p});
+                  my @l = $c->{$p};
                   while (@l) {
-                    my $l = shift @l; next unless $_;
+                    my $l = shift @l; next unless $l;
                     $l->{<Q::DOMCore:ownerDocument>} = $r->{<Q::TreeCore:node>};
-                    push @l, $_ for @{$l->{<Q::childNodes>}}, 
-                                    $l->{<Q::shadowContent>}, ## Does not allowed
-                                    $l->{<Q::shadowSibling>}; ## but for safe
+                    for my $n (@{$l->{<Q::childNodes>}}, 
+                               $l->{<Q::shadowContent>},   ## Does not allowed
+                               $l->{<Q::shadowSibling>}) { ## but for safe
+                      push @l, $n;
+                    }
                   }
-                  $c->{$_}->{<Q::isShadowMaster>} = true;
+                  $c->{$p}->{<Q::isShadowMaster>} = true;
                 }
               }
             }
-            for (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
-              my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_)->clone;
+            for my $cn (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
+              my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($cn)->clone;
               $r->{<Q::TreeCore:node>}
                 -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
                           .importTree> ($c->{<Q::TreeCore:node>});
               my @l = $c->{<Q::TreeCore:node>};
               while (@l) {
-                my $l = shift @l; next unless $_;
+                my $l = shift @l; next unless $l;
                 $l->{<Q::DOMCore:ownerDocument>} = $r->{<Q::TreeCore:node>};
-                push @l, $_ for @{$l->{<Q::childNodes>}}, 
-                                $l->{<Q::shadowContent>},
-                                $l->{<Q::shadowSibling>};
+                for my $n (@{$l->{<Q::childNodes>}}, 
+                           $l->{<Q::shadowContent>},
+                           $l->{<Q::shadowSibling>}) {
+                  push @l, $n;
+                }
               }
               $r-><AG::SWCFGNode.appendNode> ($c);
             }
@@ -3004,8 +3011,8 @@ IFClassDef:
         @@@@@:
           $r = <ClassM::ManakaiSWCFGNode.newObject>;
           $r->{<Q::nodeType>} = '#element';
-          push @{$r->{<Q::TreeCore:subnode>}}, <Q::shadowContent>,
-                                               <Q::shadowSibling>;
+          push @{$r->{<Q::TreeCore:subnode0>}}, <Q::shadowContent>,
+                                                <Q::shadowSibling>;
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
@@ -3057,17 +3064,17 @@ IFClassDef:
           }
           $node->{<Q::shadowNamespaceURI>} = $b->{shadowNamespaceURI};
           $node->{<Q::shadowLocalName>} = $b->{shadowLocalName};
-          for (qw/shadowContent shadowSibling/) {
-            next unless $b->{$_};
-            my $cl = <ClassM::ManakaiSWCFGNode.getNodeReference> ($b->{$_})
+          for my $__p (qw/shadowContent shadowSibling/) {
+            next unless $b->{$__p};
+            my $cl = <ClassM::ManakaiSWCFGNode.getNodeReference> ($b->{$__p})
                         ->clone;
             my $__n = $node->{{shadowContent => <Q::shadowContent>,
-                               shadowSibling => <Q::shadowSibling>}->{$_}}
+                               shadowSibling => <Q::shadowSibling>}->{$__p}}
                = $cl->{<Q::TreeCore:node>};
             $node-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
                             .importTree> ($__n);
             $__n->{{shadowContent => <Q::shadowParent>,
-                    shadowSibling => <Q::shadowSiblingOf>}->{$_}} = $node;
+                    shadowSibling => <Q::shadowSiblingOf>}->{$__p}} = $node;
           }
         }
         $node->{<Q::etExpanded>} = true;
@@ -3447,11 +3454,21 @@ IFClassDef:
     @@lang:en
     @@@:
       A child node list of a node. 
+  @AppISA:
+    @@ForCheck: ForClass
+    @@ContentType:
+      lang:Perl
+    @@@:
+      Tie::Array
 
   @Attr:
     @@Name:length
     @@Type:
       DOMMain:unsigned-long
+    @@Operator:
+      @@@@:FETCHSIZE
+      @@@ContentType:
+        lang:Perl
     @@Description:
       @@@lang:en
       @@@@:
@@ -3476,6 +3493,10 @@ IFClassDef:
       @@@lang:en
       @@@@:
         Returns a child node. 
+    @@Operator:
+      @@@@:FETCH
+      @@@ContentType:
+        lang:Perl
     @@NewIn21:
     @@Param:
       @@@Name:index
@@ -3526,6 +3547,75 @@ IFClassDef:
           }
         }
         $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($r) if $r;
+
+  @IntMethod:
+    @@Operator:
+      @@@@:TIEARRAY
+      @@@ContentType:
+        lang:Perl
+    @@ManakaiDOM:isStatic:1
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Binds a node list to an array.  This method is intended to 
+        be called by Perl <Perl::tie> function. 
+    @@Param:
+      @@@Name: nodeList
+      @@@Type: SWCFGChildNodeList
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A node list that is tied with an array. 
+    @@Return:
+      @@@Type: SWCFGChildNodeList
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The node list to which the array has bound, 
+          i.e. <P::nodeList>.
+      @@@PerlDef:
+        $r = $nodeList;
+
+  @IntMethod:
+    @@Operator:
+      @@@@:@{}
+      @@@ContentType:
+        lang:Perl
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns an array representation of this node list. 
+        \
+        {NOTE:: It is intended that most operations through the 
+                array is as like ones in DOM Level 0 JavaScript 
+                implementations as possible. 
+        \
+        }
+    @@Return:
+      @@@Type:
+        Perl:ARRAY::ManakaiDOM:all
+      @@@PerlDef:
+        tie my @list, ref $self, $self;
+        $r = \@list;
+
+  @IntMethod:
+    @@Operator:
+      @@@@:DESTROY
+      @@@ContentType:
+        lang:Perl
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Redefines destructor for the class
+        <Class::ManakaiDOM:ManakaiDOMNodeReference>, 
+        since the <PerlModule::Tie::Array> also has its own empty destructor. 
+    @@Return:
+      @@@Def:
+        @@@@ContentType:
+          lang:dis
+        @@@@DISPerl:cloneCode:
+          ManakaiDOM:ManakaiDOMNodeReference::ManakaiDOM:Perl.destroy
+
 ##SWCFGChildNodeList
 
 PropDef:
@@ -4163,44 +4253,44 @@ IFClassDef:
           }
           unless ($no_namespace and $no_binding) {
             my @remove;
-            for (0..$#{$root->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
-              my $n = $root->{<Q::TreeCore:node>}->{<Q::childNodes>}->[$_];
+            for my $i (0..$#{$root->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
+              my $n = $root->{<Q::TreeCore:node>}->{<Q::childNodes>}->[$i];
               next unless $n->{<Q::nodeType>} eq '#element';
               if (not $no_namespace and $n->{<Q::localName>} eq 'Namespace') {
-                for (@{$n->{<Q::childNodes>}}) {
-                  next unless $_->{<Q::nodeType>} eq '#element';
-                  if ($_->{<Q::value>}) {
+                for my $cn (@{$n->{<Q::childNodes>}}) {
+                  next unless $cn->{<Q::nodeType>} eq '#element';
+                  if ($cn->{<Q::value>}) {
                     $root->{<Q::TreeCore:node>}->{<Q::nsBinding>}
-                         ->{$_->{<Q::localName>}} = $_->{<Q::value>};
+                         ->{$cn->{<Q::localName>}} = $cn->{<Q::value>};
                   } else {
                     ISNULL: {
-                      for my $in (@{$_->{<Q::childNodes>}}) {
+                      for my $in (@{$cn->{<Q::childNodes>}}) {
                         if ($in->{<Q::nodeType>} eq '#element' and
                             $in->{<Q::localName>} eq 'is-null' and
                             $in->{<Q::value>}) {
                           $root->{<Q::TreeCore:node>}->{<Q::nsBinding>}
-                               ->{$_->{<Q::localName>}} = undef;
+                               ->{$cn->{<Q::localName>}} = undef;
                           last ISNULL;
                         }
                       }
                       $root->{<Q::TreeCore:node>}->{<Q::nsBinding>}
-                           ->{$_->{<Q::localName>}} = $_->{<Q::value>};
+                           ->{$cn->{<Q::localName>}} = $cn->{<Q::value>};
                     } # ISNULL
                   }
                 }
                 ## TODO: DOM error if unknown node
-                push @remove, $_;
+                push @remove, $i;
               } elsif (not $no_binding and
                        $n->{<Q::localName>} eq 'ElementTypeBinding') {
                 my ($et, $sn, $sc, $ss) = ('', '');
-                for (@{$n->{<Q::childNodes>}}) {
-                  next unless $_->{<Q::nodeType>} eq '#element';
-                  if ($_->{<Q::localName>} eq 'Name') {
-                    $et = $_->{<Q::value>} if defined $_->{<Q::value>};
-                  } elsif ($_->{<Q::localName>} eq 'ElementType') {
-                    $sn = $_->{<Q::value>} if defined $_->{<Q::value>};
-                  } elsif ($_->{<Q::localName>} eq 'ShadowContent') {
-                    $sc = $_;
+                for my $cn (@{$n->{<Q::childNodes>}}) {
+                  next unless $cn->{<Q::nodeType>} eq '#element';
+                  if ($cn->{<Q::localName>} eq 'Name') {
+                    $et = $cn->{<Q::value>} if defined $cn->{<Q::value>};
+                  } elsif ($cn->{<Q::localName>} eq 'ElementType') {
+                    $sn = $cn->{<Q::value>} if defined $cn->{<Q::value>};
+                  } elsif ($cn->{<Q::localName>} eq 'ShadowContent') {
+                    $sc = $cn;
                     $sc->{<Q::nodeType>} = '#fragment';
                     $sc->{<Q::parent>} = null;
                     $sc->{<Q::isShadowMaster>} = true;
@@ -4209,8 +4299,8 @@ IFClassDef:
                     $sc->{<Q::etExpanded>} = true;
                     push @{$sc->{<Q::TreeCore:origin>}}, <Q::shadowOwner>, 
                              <Q::shadowParent>, <Q::shadowSiblingOf>;
-                  } elsif ($_->{<Q::localName>} eq 'ShadowSibling') {
-                    $ss = $_;
+                  } elsif ($cn->{<Q::localName>} eq 'ShadowSibling') {
+                    $ss = $cn;
                     $ss->{<Q::nodeType>} = '#fragment';
                     $ss->{<Q::parent>} = null;
                     $ss->{<Q::isShadowMaster>} = true;
@@ -4234,11 +4324,13 @@ IFClassDef:
                   };
                 }
                 ## TODO: DOM error if unknown node
-                push @remove, $_;
+                push @remove, $i;
               }
+            } # $i
+            for my $i (reverse @remove) {
+              splice @{$root->{<Q::TreeCore:node>}->{<Q::childNodes>}},
+                     $i, 1, ();
             }
-            splice @{$root->{<Q::TreeCore:node>}->{<Q::childNodes>}},
-                   $_, 1, () for reverse @remove;
           }
           $r = $root;
 

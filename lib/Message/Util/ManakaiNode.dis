@@ -21,7 +21,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/18 12:14:19 $
+      $Date: 2005/02/21 08:06:19 $
     @@ContentType:
       dis:Date.RCS
   
@@ -114,12 +114,16 @@ ClassDef:
                                   hash key names of <DFN::origin> 
                                   properties for this node. 
          \
+         - <CODE::TreeCore:subnode0>::: An array reference, containing 
+                                  hash key names of <DFN::subnode> 
+                                  properties for this node. 
+         \
          - <CODE::TreeCore:subnode>::: An array reference, containing 
-                                hash key names of <DFN::subnode> 
+                                hash key names of <DFN::subnode> list 
                                 properties for this node. 
          \
          - <CODE::TreeCore:subnode2>::: An array reference, containing 
-                    hash key names of <DFN::subnode> (two steps) 
+                    hash key names of <DFN::subnode> (two steps) list
                     properties for this node. 
          \
          - <CODE::TreeCore:irefnode>::: An array reference, containing 
@@ -127,10 +131,11 @@ ClassDef:
                     properties for this node. 
          \
          - <CODE::TreeCore:anydata>::: An array reference, containing 
-                    hash key names of <DFN::anydata> properties for this node. 
+                    hash key names of <DFN::anydata> list 
+                    properties for this node. 
          \
          - <CODE::TreeCore:anydata2>::: An array reference, containing 
-                    hash key names of <DFN::anydata> (two steps) properties 
+                    hash key names of <DFN::anydata> (two steps) list properties 
                     for this node. 
          \
        }
@@ -152,6 +157,7 @@ ClassDef:
       @@@PerlDef:
           $r = bless {
             <Q::TreeCore:origin> => [],
+            <Q::TreeCore:subnode0> => [],
             <Q::TreeCore:subnode> => [],
             <Q::TreeCore:subnode2> => [],
             <Q::TreeCore:irefnode> => [],
@@ -230,22 +236,24 @@ ClassDef:
                 next NODES;
               }
               my @n;
-              for (@{$node->{<Q::TreeCore:subnode2>}}) {
-                if (ref $node->{$_} eq 'ARRAY') {
-                  push @n, @{$node->{$_}};
-                } elsif (ref $node->{$_} eq 'HASH') {
-                  push @n, values %{$node->{$_}};
+              for my $p (@{$node->{<Q::TreeCore:subnode2>}}) {
+                if (ref $node->{$p} eq 'ARRAY') {
+                  push @n, @{$node->{$p}};
+                } elsif (ref $node->{$p} eq 'HASH') {
+                  push @n, values %{$node->{$p}};
                 }
               }
-              for (@n, map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}) {
-                if (ref $_ eq 'ARRAY') {
-                  push @node, @$_;
-                } elsif (ref $_ eq 'HASH') {
-                  push @node, values %$_;
+              for my $p (@n,
+                         map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}) {
+                if (ref $p eq 'ARRAY') {
+                  push @node, @$p;
+                } elsif (ref $p eq 'HASH') {
+                  push @node, values %$p;
                 }
               }
-              for (@{$node->{<Q::TreeCore:origin>}}) {
-                push @node, $node->{$_} if $node->{$_};
+              for my $p (@{$node->{<Q::TreeCore:origin>}},
+  \                      @{$node->{<Q::TreeCore:subnode0>}}) {
+                push @node, $node->{$p} if $node->{$p};
               }
               $checked{$node->{<Q::TreeCore:nodeID>}} = 1;
             }
@@ -262,25 +270,27 @@ ClassDef:
         my @node = ($self);
         NODES: while (my $node = shift @node) {
               my @n;
-              for (@{$node->{<Q::TreeCore:subnode2>}}) {
-                if (ref $node->{$_} eq 'ARRAY') {
-                  push @n, @{$node->{$_}};
-                } elsif (ref $node->{$_} eq 'HASH') {
-                  push @n, values %{$node->{$_}};
+              for my $p (@{$node->{<Q::TreeCore:subnode2>}}) {
+                if (ref $node->{$p} eq 'ARRAY') {
+                  push @n, @{$node->{$p}};
+                } elsif (ref $node->{$p} eq 'HASH') {
+                  push @n, values %{$node->{$p}};
                 }
               }
-              for (@n, map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}) {
-                if (ref $_ eq 'ARRAY') {
-                  push @node, grep {defined $_->{<Q::TreeCore:nodeID>}} @$_;
-                } elsif (ref $_ eq 'HASH') {
+              for my $p (@n,
+                         map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}) {
+                if (ref $p eq 'ARRAY') {
+                  push @node, grep {defined $_->{<Q::TreeCore:nodeID>}} @$p;
+                } elsif (ref $p eq 'HASH') {
                   push @node, grep {defined $_->{<Q::TreeCore:nodeID>}}
-                               values %$_;
+                               values %$p;
                 }
               }
-              for (@{$node->{<Q::TreeCore:origin>}}) {
-                push @node, $node->{$_}
-                  if defined $node->{$_} and
-                     defined $node->{$_}->{<Q::TreeCore:nodeID>};
+              for my $p (@{$node->{<Q::TreeCore:origin>}},
+           \             @{$node->{<Q::TreeCore:subnode0>}}) {
+                push @node, $node->{$p}
+                  if defined $node->{$p} and
+                     defined $node->{$p}->{<Q::TreeCore:nodeID>};
               }
           %$node = ();
         }
@@ -315,27 +325,29 @@ ClassDef:
           my @node = ($node);
           NODES: while (my $node = shift @node) {
               my @n;
-              for (@{$node->{<Q::TreeCore:subnode2>}}) {
-                if (ref $node->{$_} eq 'ARRAY') {
-                  push @n, @{$node->{$_}};
-                } elsif (ref $node->{$_} eq 'HASH') {
-                  push @n, values %{$node->{$_}};
+              for my $p (@{$node->{<Q::TreeCore:subnode2>}}) {
+                if (ref $node->{$p} eq 'ARRAY') {
+                  push @n, @{$node->{$p}};
+                } elsif (ref $node->{$p} eq 'HASH') {
+                  push @n, values %{$node->{$p}};
                 }
               }
-              for (@n, map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}) {
-                if (ref $_ eq 'ARRAY') {
+              for my $p (@n,
+                         map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}) {
+                if (ref $p eq 'ARRAY') {
                   push @node, grep {$_->{<Q::TreeCore:treeID>} ne
-                                    $self->{<Q::TreeCore:treeID>}} @$_;
-                } elsif (ref $_ eq 'HASH') {
+                                    $self->{<Q::TreeCore:treeID>}} @$p;
+                } elsif (ref $p eq 'HASH') {
                   push @node, grep {$_->{<Q::TreeCore:treeID>} ne
                                     $self->{<Q::TreeCore:treeID>}}
-                              values %$_;
+                              values %$p;
                 }
               }
-            for (@{$node->{<Q::TreeCore:origin>}}) {
-              push @node, $node->{$_}
-                if defined $node->{$_} and
-                   $node->{$_}->{<Q::TreeCore:treeID>} ne
+            for my $p (@{$node->{<Q::TreeCore:origin>}},
+           \           @{$node->{<Q::TreeCore:subnode0>}}) {
+              push @node, $node->{$p}
+                if defined $node->{$p} and
+                   $node->{$p}->{<Q::TreeCore:treeID>} ne
                    $self->{<Q::TreeCore:treeID>};
             }
             $node->{<Q::TreeCore:treeID>} = $self->{<Q::TreeCore:treeID>};
@@ -362,25 +374,27 @@ ClassDef:
           my @node = ($self);
           NODES: while (my $node = shift @node) {
               my @n;
-              for (@{$node->{<Q::TreeCore:subnode2>}}) {
-                if (ref $node->{$_} eq 'ARRAY') {
-                  push @n, @{$node->{$_}};
-                } elsif (ref $node->{$_} eq 'HASH') {
-                  push @n, values %{$node->{$_}};
+              for my $p (@{$node->{<Q::TreeCore:subnode2>}}) {
+                if (ref $node->{$p} eq 'ARRAY') {
+                  push @n, @{$node->{$p}};
+                } elsif (ref $node->{$p} eq 'HASH') {
+                  push @n, values %{$node->{$p}};
                 }
               }
-              for (@n, map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}) {
-                if (ref $_ eq 'ARRAY') {
-                  push @node, grep {$_->{<Q::TreeCore:treeID>} ne $treeID} @$_;
-                } elsif (ref $_ eq 'HASH') {
+              for my $p (@n,
+                         map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}) {
+                if (ref $p eq 'ARRAY') {
+                  push @node, grep {$_->{<Q::TreeCore:treeID>} ne $treeID} @$p;
+                } elsif (ref $p eq 'HASH') {
                   push @node, grep {$_->{<Q::TreeCore:treeID>} ne $treeID}
-                              values %$_;
+                              values %$p;
                 }
               }
-            for (@{$node->{<Q::TreeCore:origin>}}) {
-              push @node, $node->{$_}
-                if defined $node->{$_} and
-                   $node->{$_}->{<Q::TreeCore:treeID>} ne $treeID;
+            for my $p (@{$node->{<Q::TreeCore:origin>}},
+       \               @{$node->{<Q::TreeCore:subnode0>}}) {
+              push @node, $node->{$p}
+                if defined $node->{$p} and
+                   $node->{$p}->{<Q::TreeCore:treeID>} ne $treeID;
             }
             $node->{<Q::TreeCore:treeID>} = $treeID;
           }
@@ -412,10 +426,10 @@ ClassDef:
         my @node = ($self);
         NODES: while (my $node = shift @node) {
           my $i = 0;
-          ORIGINS: for (@{$node->{<Q::TreeCore:origin>}}) {
-            next ORIGINS unless $node->{$_};
+          ORIGINS: for my $o (@{$node->{<Q::TreeCore:origin>}}) {
+            next ORIGINS unless $node->{$o};
             $i++;
-            push @node, $node->{$_};
+            push @node, $node->{$o};
           }
           if ($i == 0) {
             $result{$node->{<Q::TreeCore:nodeID>}} = $node;
