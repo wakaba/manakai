@@ -31,8 +31,6 @@ our $State ||= {
   ## Namespace   Namespace bindings
   ## Type        Type definitions
 };
-our $ClassDefElementTypes = {qw/ClassDef 1 IFDef 1 DataTypeDef 1
-                                ExceptionDef 1 WarningDef 1/};
 
 =item $uri = dis_nsprefix_to_uri ($prefix, %opt)
 
@@ -215,9 +213,36 @@ sub dis_node_for_match ($$%) {
   my ($node, $for_uri, %opt) = @_;
   $for_uri ||= ExpandedURI q<ManakaiDOM:all>;
   my $has_for = 0;
+  FCs: for (@{$node->child_nodes}) {
+    next FCs unless $_->node_type eq '#element';
+    if (dis_element_type_match ($_->local_name, 'ForCheck', %opt)) {
+      my $for = [split /\s+/, $_->value];
+      for my $f (@$for) {
+        if ($f =~ /^!(.+)$/) {
+          my $uri = dis_qname_to_uri ($1, use_default_namespace => 1, %opt);
+          $State->{def_required}->{For}->{$uri} ||= 1;
+          for my $for_uri ($for_uri, @{$opt{'For+'}||[]}) {
+            if (dis_uri_for_match ($uri, $for_uri, %opt, node => $_)) {
+              return undef;
+            }
+          }
+        } else {
+          my $uri = dis_qname_to_uri ($f, use_default_namespace => 1, %opt,
+                                      node => $_);
+          $State->{def_required}->{For}->{$uri} ||= 1;
+          for my $for_uri ($for_uri, @{$opt{'For+'}||[]}) {
+            if (dis_uri_for_match ($uri, $for_uri, %opt, node => $_)) {
+              next FCs;
+            }
+          }
+          return undef;
+        }
+      }
+    }
+  }
   for (@{$node->child_nodes}) {
     next unless $_->node_type eq '#element';
-    if ($_->local_name eq 'For') {
+    if (dis_element_type_match ($_->local_name, 'For', %opt)) {
       my $for = [split /\s+/, $_->value];
       my $ok = 1;
       $has_for = 1;
@@ -333,7 +358,7 @@ sub dis_node_script_match ($$%) {
   return $script_tag eq 's-default' ? 1 : 0;
 }
 
-=item 1/0 = dis_uri_for_match ($uri $for_uri, %opt)
+=item 1/0 = dis_uri_for_match ($uri, $for_uri, %opt)
 
 Return whether the C<$uri> matches to the C<$for_uri>. 
 
@@ -370,7 +395,7 @@ sub dis_uri_ctype_match ($$%) {
   return 1 if $uri eq $type_uri;
   local $dis_uri_ctype_match_loop = $dis_uri_ctype_match_loop + 1;
   if ($dis_uri_ctype_match_loop == 1024) {
-    valid_err (qq'$0: "ContentType" URI inheritance might be looping');
+    valid_err (qq'"Resource" URI inheritance might be looping');
   }
   for (@{$State->{Type}->{$type_uri}->{ISA}||[]},
        @{$State->{Type}->{$type_uri}->{Implement}||[]}) {
@@ -424,6 +449,7 @@ sub dis_get_attr_node (%) {
   my $en = defined $opt{name} ? $opt{name}
                               : impl_err (q<"name" parameter required>,
                                           node => $opt{parent});
+  impl_err (q<"parent" parameter required>) unless $opt{parent};
   for (@{$opt{parent}->child_nodes}) {
     next unless $_->node_type eq '#element';
     if (dis_element_type_match ($_->local_name, $en, %opt, node => $_)) {
@@ -746,7 +772,6 @@ sub dis_load_fordef_element ($;%) {
     URI => $uri,
     ISA => [],
     Implement => [],
-    parentModule => $State->{module},
     src => $node,
   };
   $State->{def_required}->{For}->{$uri} = -1;
@@ -937,7 +962,7 @@ sub dis_load_classdef_element ($;%) {
       unless ($al) {
         $cls = ($State->{Type}->{$dfuri} ||= {});
         if (defined $cls->{Name}) {
-          valid_err (q<Class <$dfuri> is already defined>, node => $node);
+          valid_err (qq<Class <$dfuri> is already defined>, node => $node);
         }
         $cls->{Name} = $lname;
         $cls->{NameURI} = $uri;
@@ -973,6 +998,7 @@ sub dis_load_classdef_element ($;%) {
         }
         $cls->{Name} = $lname;
         $cls->{parentModule} = $State->{module};
+        $cls->{src} = $node;
       } else {
         valid_err (q<Local class aliasing is not supported>, node => $al);
       }
@@ -997,7 +1023,10 @@ sub dis_load_classdef_element ($;%) {
     $cls->{parentModule} = $State->{module};
     $cls->{src} = $node;
   }
+  push @{$State->{multiple_resource_parent}->{hasResource}||=[]}, $cls;
+  $cls->{multiple_resource_parent} = $State->{multiple_resource_parent};
 
+  my $is_multiresource = 0;
   for (@{$node->child_nodes}) {
     next unless $_->node_type eq '#element';
     next unless dis_node_for_match ($_, $opt{For}, %opt);
@@ -1007,6 +1036,9 @@ sub dis_load_classdef_element ($;%) {
                                           %opt, node => $_);
       $cls->{Type}->{$uri} = 1;
       $State->{def_required}->{Class}->{$uri} ||= 1;
+      $is_multiresource = 1 if dis_uri_ctype_match
+                                   (ExpandedURI q<d:MultipleResource>,
+                                    $uri, %opt);
     } elsif ($ln eq ExpandedURI q<d:ISA>) {
       my $uri = dis_typeforqnames_to_uri ($_->value, use_default_namespace => 1,
                                           %opt, node => $_);
@@ -1021,16 +1053,28 @@ sub dis_load_classdef_element ($;%) {
       valid_err ("Alias class name cannot be able to have this type of elements",
                  node => $_) if $al;
       local $State->{current_class_container} = $cls;
+      local $State->{multiple_resource_parent} = {};
       dis_load_classdef_element ($_, %opt);
     }
   }
   unless (keys %{$cls->{Type}}) {
     valid_err (q<Class type must be specified>, node => $node);
   }
-  push @{$cls->{ISA}}, ExpandedURI q<DOMMain:any>
-    if not @{$cls->{ISA}||=[]} and
-       (not defined $cls->{NameURI} or
-        not $cls->{NameURI} eq ExpandedURI q<DOMMain:any>);
+
+  if ($is_multiresource) {
+    for (@{$node->child_nodes}) {
+      next unless $_->node_type eq '#element';
+      next unless dis_node_for_match ($_, $opt{For}, %opt);
+      if (dis_element_type_match ($_->local_name, 'resourceFor', %opt)) {
+        my $uri = dis_qname_to_uri ($_->value, use_default_namespace => 1,
+                                    %opt, node => $_);
+        $State->{def_required}->{For}->{$uri} ||= 1;
+        local $opt{'For+'} = [@{$opt{'For+'}||[]}, $uri];
+        local $State->{multiple_resource_parent} = $cls;
+        dis_load_classdef_element ($node, %opt);
+      }
+    }
+  }
 }}
 
 =item dis_check_undef_type_and_for (%opt)
@@ -1078,6 +1122,7 @@ sub dis_perl_init ($;%) {
   for my $mod (values %{$State->{Module}}) {
     next if $mod->{ExpandedURI q<dis2pm:done>};
     $opt{For} = [keys %{$mod->{For}}]->[0];
+    ## Perl package name
     my $mg = $State->{Type}->{$mod->{ModuleGroup}};
     my $an = dis_get_attr_node (%opt, parent => $mg->{src}, name => 'AppName');
     if ($an) {
@@ -1088,10 +1133,100 @@ sub dis_perl_init ($;%) {
       $pn .= $suffix->value if $suffix;
       $mod->{ExpandedURI q<dis2pm:packageName>} = $pn;
     }
+    ## Perl interface name
+    my $if = dis_get_attr_node (%opt, parent => $mod->{src}, name => 'AppName',
+                                'For+' => [ExpandedURI q<ManakaiDOM:ForIF>],
+                                ContentType => ExpandedURI q<lang:Java>);
+    if ($if) {
+      my $if_name = $if->value;
+      $if_name =~ s/\./::/g;
+      $mod->{ExpandedURI q<dis2pm:ifPackagePrefix>} = $if_name . '::';
+    }
     $mod->{ExpandedURI q<dis2pm:done>} = 1;
   }  
+
+  for my $res (values %{$State->{Type}}) {
+    next if $res->{ExpandedURI q<dis2pm:done>};
+    next unless defined $res->{Name};
+    dis_perl_init_classdef ($res, %opt);
+  }
 } # dis_perl_init
 
+=item dis_perl_init_classdef ($resource, %opt)
+
+Load Perl-specific properties for class.
+
+=cut
+
+sub dis_perl_init_classdef ($;%);
+sub dis_perl_init_classdef ($;%) {
+  my ($res, %opt) = @_;
+  my $type = '';
+  for (keys %{$res->{Type}}) {
+    if (dis_uri_ctype_match (ExpandedURI q<ManakaiDOM:Class>, $_, %opt)) {
+      $type = 'class';
+      last;
+    } elsif (dis_uri_ctype_match (ExpandedURI q<ManakaiDOM:IF>, $_, %opt)) {
+      $type = 'if';
+      last;
+    }
+  }
+  if ($type eq 'class') {
+    ## Class package name is...
+    my $pack = $State->{Module}->{$res->{parentModule}}
+                     ->{ExpandedURI q<dis2pm:packageName>};
+    valid_err ("Perl package name for <$res->{parentModule}> not defined",
+               node => $res->{src})
+      unless defined $pack;
+    my $an = dis_get_attr_node (%opt, parent => $res->{src}, name => 'AppName');
+    if ($an) {
+      $res->{ExpandedURI q<dis2pm:packageName>} = $pack . '::' . $an->value;
+    } else {
+      valid_err ("Class name required", node => $res->{src})
+        unless $res->{Name};
+      $res->{ExpandedURI q<dis2pm:packageName>} = $pack . '::' . $res->{Name};
+    }
+    ## This class implements...
+    if ($res->{multiple_resource_parent}) {
+      IF: for my $if (@{$res->{multiple_resource_parent}->{hasResource}}) {
+        for (keys %{$if->{Type}}) {
+          if (dis_uri_ctype_match (ExpandedURI q<ManakaiDOM:IF>, $_, %opt)) {
+            push @{$res->{Implement}||=[]}, $if->{URI};
+            last IF;
+          }
+        }
+      }
+    }
+  } elsif ($type eq 'if') {
+    ## Interface package name is...
+    my $pack = $State->{Module}->{$res->{parentModule}}
+                     ->{ExpandedURI q<dis2pm:ifPackagePrefix>};
+    valid_err ("Perl interface package name for <$res->{parentModule}> not ".
+               "defined", node => $res->{src})
+      unless defined $pack;
+    my $an = dis_get_attr_node (%opt, parent => $res->{src}, name => 'AppName',
+                                ContentType => ExpandedURI q<lang:Java>);
+    if ($an) {
+      $an = $an->value;
+      if ($an =~ /\./) {
+        $an =~ s/\./::/g;
+        $res->{ExpandedURI q<dis2pm:packageName>} = $an;
+      } else {
+        $res->{ExpandedURI q<dis2pm:packageName>} = $pack . $an;
+      }
+    } else {
+      valid_err ("Interface name required", node => $res->{src})
+        unless $res->{Name};
+      $res->{ExpandedURI q<dis2pm:packageName>} = $pack . $res->{Name};
+    }    
+  } # $type
+  for my $res (values %{$res->{Resource}}) {
+    next if $res->{ExpandedURI q<dis2pm:done>};
+    next unless defined $res->{Name};
+    dis_perl_init_classdef ($res, %opt);
+  }
+  $res->{ExpandedURI q<dis2pm:done>} = 1;
+} # dis_perl_init_classdef
 
 =head1 FUNCTIONS FOR DISDOC DOCUMENTATION
 
@@ -1407,4 +1542,4 @@ sub disdoc_inline2pod ($;%) {
 
 =cut
 
-1; # $Date: 2004/11/08 07:23:30 $
+1; # $Date: 2004/11/19 14:12:30 $

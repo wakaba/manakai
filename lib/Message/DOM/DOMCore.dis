@@ -39,18 +39,21 @@ Namespace:
 Module:
   @QName:
     MDOM:DOMCore
-  @BindingName:
+  @AppName:
     @@@:  dom
     @@prefix:  w3c.org
     @@ContentType:
       lang:IDL-DOM
     @@For:
       ManakaiDOM:IDL
-  @BindingName:
-    @@prefix:
-      Message::DOM::
+  @AppName:
+    @@@: org.w3c.dom
     @@ContentType:
-      lang:Perl
+      lang:Java
+    @@ForCheck:
+      ManakaiDOM:ForIF
+    @@For:
+      ManakaiDOM:Java
     @@For:
       ManakaiDOM:ManakaiDOM
   @FullName:
@@ -75,22 +78,16 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/11/08 07:23:30 $
+     $Date: 2004/11/19 14:12:30 $
 
-  @ConditionDef:
-    @@Name: DOM1
-  @ConditionDef:
-    @@Name: DOM2
-    @@ISA:DOM1
-  @ConditionDef:
-    @@Name: DOM3
-    @@ISA:DOM2
+  @DefaultFor:
+    ManakaiDOM:ManakaiDOMLatest
   
   @Require:
     @@Module:
+      @@@Name: ManakaiDOMMain
+    @@Module:
       @@@Name: ManakaiDOMCore
-      @@@Namespace:
-        http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
 
   @Feature:
     @@Name: Core
@@ -141,9 +138,26 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
-      ManakaiDOM:IF
+      @@@@:
+        ManakaiDOM:IF
+      @@@ForCheck:
+        ManakaiDOM:ForIF
     @@rdf:type:
-      ManakaiDOM:Class
+      @@@@:
+        ManakaiDOM:Class
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@rdf:type:
+      @@@@:
+        dis:MultipleResource
+      @@@ForCheck:
+        !ManakaiDOM:ForClass !ManakaiDOM:ForIF
+    @@resourceFor:
+      ManakaiDOM:ForIF
+    @@resourceFor:
+      ManakaiDOM:ForClass
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM
 ElementTypeBinding:
   @Name: IFDef
   @ElementType:
@@ -151,6 +165,8 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:IF
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM
 
 ElementTypeBinding:
   @Name: ConfigParam
@@ -860,7 +876,18 @@ Exception:
             type of the parameter associated to the object.
 
 IF:
-  @Name:  DOMStringList
+  @Name:
+    @@@:
+      DOMStringList
+    @@ForCheck: 
+      ManakaiDOM:ForIF
+  @Name:
+    @@@:
+      ManakaiDOMStringList
+    @@ForCheck: 
+      ManakaiDOM:ForClass
+    @@For:
+      ManakaiDOM:ManakaiDOM
   @Level[list]:  3
   @SpecLevel:3
   @Spec:
@@ -980,7 +1007,7 @@ IF:
             }__;
           }
 
-IF:
+IFDef:
   @Name:  NameList
   @Level[list]:  3
   @SpecLevel:3
@@ -1207,7 +1234,18 @@ IF:
           }
 
 IF:
-  @Name:  DOMImplementationList
+  @Name:
+    @@@:
+      DOMImplementationList
+    @@ForCheck: 
+      ManakaiDOM:ForIF
+  @Name:
+    @@@:
+      ManakaiDOMImplementationList
+    @@ForCheck: 
+      ManakaiDOM:ForClass
+    @@For:
+      ManakaiDOM:ManakaiDOM
   @Level[list]:  3
   @SpecLevel:3
   @Spec:
@@ -1367,7 +1405,18 @@ IF:
           }
 
 IF:
-  @Name:  DOMImplementationSource
+  @Name:
+    @@@:
+      DOMImplementationSource
+    @@ForCheck: 
+      ManakaiDOM:ForIF
+  @Name:
+    @@@:
+      ManakaiDOMImplementationSource
+    @@ForCheck: 
+      ManakaiDOM:ForClass
+    @@For:
+      ManakaiDOM:ManakaiDOM
   @Level[list]:  3
   @SpecLevel:3
   @Description:
@@ -1470,7 +1519,18 @@ IF:
     @@SpecLevel:3
 
 IF:
-  @Name:  DOMImplementation
+  @Name:
+    @@@:
+      DOMImplementation
+    @@ForCheck: 
+      ManakaiDOM:ForIF
+  @Name:
+    @@@:
+      ManakaiDOMImplementation
+    @@ForCheck:
+      ManakaiDOM:ForClass
+    @@For:
+      ManakaiDOM:ManakaiDOM
   @Spec:
     @@DOM3:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-102161490
@@ -2126,7 +2186,18 @@ IF:
 ##IF:DOMImplementation
 
 IF:
-  @Name:  Node
+  @Name:
+    @@@:
+      Node
+    @@ForCheck: 
+      ManakaiDOM:ForIF
+  @Name:
+    @@@:
+      ManakaiDOMNode
+    @@ForCheck: 
+      ManakaiDOM:ForClass
+    @@For:
+      ManakaiDOM:ManakaiDOM
   @Description:
     @@lang:en
     @@@:
@@ -4731,7 +4802,7 @@ IFDef:
         @@@Type:  unsigned-long
      @@IsAbstract:1
 
-IF:
+IFDef:
   @Name:  NamedNodeMap
   @Description:
     @@lang:en
@@ -5127,8 +5198,28 @@ IF:
 ## IF:NamedNodeMap
 
 IF:
-  @Name:  CharacterData
-  @ISA: Node
+  @Name:
+    @@@:
+      CharacterData
+    @@ForCheck: 
+      ManakaiDOM:ForIF
+  @Name:
+    @@@:
+      ManakaiDOMCharacterData
+    @@ForCheck: 
+      ManakaiDOM:ForClass
+    @@For:
+      ManakaiDOM:ManakaiDOM
+  @ISA: 
+    @@@: Node
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @ISA:
+    @@@: ManakaiDOMNode
+    @@ForCheck:
+      ManakaiDOM:ForClass
+    @@For:
+      ManakaiDOM:ManakaiDOM
   @ImplNote:
     @@lang:en
     @@@:
@@ -5598,7 +5689,28 @@ IF:
 ## IF: CharacterData
 
 IF:
-  @Name:  Attr
+  @Name:
+    @@@:
+      Attr
+    @@ForCheck: 
+      ManakaiDOM:ForIF
+  @Name:
+    @@@:
+      ManakaiDOMAttr
+    @@ForCheck: 
+      ManakaiDOM:ForClass
+    @@For:
+      ManakaiDOM:ManakaiDOM
+  @ISA:
+    @@@: Node
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @ISA:
+    @@@: ManakaiDOMNode
+    @@ForCheck:
+      ManakaiDOM:ForClass
+    @@For: 
+      ManakaiDOM:ManakaiDOM
   @Description:
     @@lang:en
     @@@:
@@ -5606,7 +5718,6 @@ IF:
     \
       The DOM Core treats the attribute values as a plain string, even if 
       the schema language defines them as having tokenized types.
-  @ISA:  Node
   @Require:
     @@Module:
       @@@Def:
@@ -6300,12 +6411,30 @@ IF:
 ## IF:Attr
 
 IF:
-  @Name:  Element
+  @Name:
+    @@@: Element
+    @@ForCheck: 
+      ManakaiDOM:ForIF
+  @Name:
+    @@@: ManakaiDOMElement
+    @@ForCheck: 
+      ManakaiDOM:ForClass
+    @@For:
+      ManakaiDOM:ManakaiDOM
+  @ISA:
+    @@@: Node
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @ISA:
+    @@@: ManakaiDOMNode
+    @@ForCheck:
+      ManakaiDOM:ForClass
+    @@For: 
+      ManakaiDOM:ManakaiDOM
   @Description:
     @@lang:en
     @@@:
       An element in a document.
-  @ISA:  Node
   @Require:
     @@Module:
       @@@Def:
@@ -8555,8 +8684,26 @@ IF:
 ## IF:Element
 
 IF:
-  @Name:  Text
-  @ISA:  CharacterData
+  @Name:
+    @@@: Text
+    @@ForCheck: 
+      ManakaiDOM:ForIF
+  @Name:
+    @@@: ManakaiDOMText
+    @@ForCheck: 
+      ManakaiDOM:ForClass
+    @@For:
+      ManakaiDOM:ManakaiDOM
+  @ISA:
+    @@@: CharacterData
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @ISA:
+    @@@: ManakaiDOMCharacterData
+    @@ForCheck:
+      ManakaiDOM:ForClass
+    @@For: 
+      ManakaiDOM:ManakaiDOM
   @Description:
     @@lang:en
     @@@:
@@ -8863,8 +9010,26 @@ IF:
 ## IF:Text
 
 IF:
-  @Name:  Comment
-  @ISA:  CharacterData
+  @Name:
+    @@@: Comment
+    @@ForCheck: 
+      ManakaiDOM:ForIF
+  @Name:
+    @@@: ManakaiDOMComment
+    @@ForCheck: 
+      ManakaiDOM:ForClass
+    @@For:
+      ManakaiDOM:ManakaiDOM
+  @ISA:
+    @@@: CharacterData
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @ISA:
+    @@@: ManakaiDOMCharacterData
+    @@ForCheck:
+      ManakaiDOM:ForClass
+    @@For: 
+      ManakaiDOM:ManakaiDOM
   @Description:
     @@lang:en
     @@@:
@@ -8954,7 +9119,16 @@ IF:
 ## IF:Comment
 
 IF:
-  @Name:  TypeInfo
+  @Name:
+    @@@: TypeInfo
+    @@ForCheck: 
+      ManakaiDOM:ForIF
+  @Name:
+    @@@: ManakaiDOMTypeInfo
+    @@ForCheck: 
+      ManakaiDOM:ForClass
+    @@For:
+      ManakaiDOM:ManakaiDOM
   @Description:
     @@lang:en
     @@@:
@@ -9193,7 +9367,7 @@ IF:
               the definition of this type, the schema language 
               is the XML DTD or no schama language is associated.
 
-IF:
+IFDef:
   @Name:  UserDataHandler
   @Description:
     @@lang:en
@@ -9325,7 +9499,7 @@ IF:
             @@@@@lang:en
             @@@@@@: No node is newly created.
 
-IF:
+IFDef:
   @Name:  DOMError
   @Description:
     @@lang:en
@@ -9423,7 +9597,7 @@ IF:
      @@Get:
         @@@Type:  DOMLocator
 
-IF:
+IFDef:
   @Name:  DOMErrorHandler
   @Description:
     @@lang:en
@@ -9493,7 +9667,7 @@ IF:
               ManakaiDOMImplementationException.MDOM_IMPL_BY_APP::
             }__;
 
-IF:
+IFDef:
   @Name:  DOMLocator
   @Level[list]:  3
   @SpecLevel:3
@@ -9605,7 +9779,7 @@ IF:
             @@@@@lang:en
             @@@@@@: There is no URI is available.
 
-IF:
+IFDef:
   @Name:  DOMConfiguration
   @Description:
     @@lang:en
@@ -9766,12 +9940,29 @@ IF:
         @@@Type:  DOMStringList
 
 IF:
-  @Name:  DocumentFragment
+  @Name:
+    @@@: DocumentFragment
+    @@ForCheck: 
+      ManakaiDOM:ForIF
+  @Name:
+    @@@: ManakaiDOMDocumentFragment
+    @@ForCheck: 
+      ManakaiDOM:ForClass
+    @@For:
+      ManakaiDOM:ManakaiDOM
+  @ISA:
+    @@@: Node
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @ISA:
+    @@@: ManakaiDOMNode
+    @@ForCheck:
+      ManakaiDOM:ForClass
+    @@For: 
+      ManakaiDOM:ManakaiDOM
   @Description:
     @@lang:en
     @@@: A "lightweight" or "minimal" "Document" object.
-  @ISA:  Node
-
   @IntMethod:
     @@Name: newObject
     @@Description:
@@ -9903,7 +10094,26 @@ IF:
 ## IF: DocumentFragment
 
 IF:
-  @Name:  Document
+  @Name:
+    @@@: Document
+    @@ForCheck: 
+      ManakaiDOM:ForIF
+  @Name:
+    @@@: ManakaiDOMDocument
+    @@ForCheck: 
+      ManakaiDOM:ForClass
+    @@For:
+      ManakaiDOM:ManakaiDOM
+  @ISA:
+    @@@: Node
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @ISA:
+    @@@: ManakaiDOMNode
+    @@ForCheck:
+      ManakaiDOM:ForClass
+    @@For: 
+      ManakaiDOM:ManakaiDOM
   @Description:
     @@lang:en
     @@@: 
@@ -9911,7 +10121,6 @@ IF:
       document tree and it provides the primary access to the 
       document's data.
 
-  @ISA:  Node
   @Role:
     @@@:
       DOMCore:Document

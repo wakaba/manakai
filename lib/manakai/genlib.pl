@@ -33,7 +33,7 @@ sub valid_warn ($;%) {
 ## Implementation (this script) might be broken
 sub impl_err ($;%) {
   require Carp;
-  Carp::croak (shift);
+  die shift ().Carp::longmess ();
 }
 sub impl_warn ($;%) {
   require Carp;

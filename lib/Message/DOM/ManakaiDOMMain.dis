@@ -28,13 +28,6 @@ Namespace:
 Module:
   @QName: 
     MDOM:ManakaiDOMMain
-  @BindingName:
-    @@prefix:
-      Message::DOM::
-    @@ContentType:
-      lang:Perl
-    @@For:
-      ManakaiDOM:ManakaiDOM
   @FullName:
     @@lang:en
     @@@: Manakai DOM Implementation Main Module
@@ -47,7 +40,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/11/08 07:23:30 $
+     $Date: 2004/11/19 14:12:30 $
   
   @Description:
     @@lang:en
@@ -198,12 +191,31 @@ ForDef:
       ManakaiDOM:DOMLatest
   @ISA:
       ManakaiDOM:ManakaiDOM3
+ForDef:
+  @QName:
+    ManakaiDOM:Java
+  @FullName:
+    @@lang:en
+    @@@: Java
 
-ResourceTypeDef:
+ForDef:
+  @QName:
+    ManakaiDOM:ForIF
+  @Description:
+    @@lang:en
+    @@@: An interface definition.
+ForDef:
+  @QName:
+    ManakaiDOM:ForClass
+  @Description:
+    @@lang:en
+    @@@: A class definition.
+
+ResourceDef:
   @QName:
     rdfs:Resource
-  @AliasFor:
-    DOMMain:any
+  @rdf:type:
+    rdfs:Class
   @Description:
     @@lang:en
     @@@: A RDF resource.
@@ -215,7 +227,29 @@ ResourceDef:
   @Description:
     @@lang:en
     @@@:
-      An <Q:dis:ResourceDef> element defines a resource.
+      A <Q:dis:ResourceDef> element defines a resource.
+
+ResourceTypeDef:
+  @QName: 
+    dis:MultipleResource
+  @Description:
+    @@lang:en
+    @@@:
+      An abstract resource - it has zero or more concrete representations, 
+      that are distinguished by <CODE:For> URI references.
+PropDef:
+  @QName:
+    dis:resourceFor
+  @rdfs:domain:
+    dis:MultipleResource
+  @rdfs:range:
+    dis:For
+  @Description:
+    @@lang:en
+    @@@:
+      A <CODE:For> URI reference that can identity one representation 
+      of the resource.
+
 ResourceTypeDef:
   @QName:
     dis:ElementType
@@ -224,15 +258,16 @@ ResourceTypeDef:
     @@@:
       A dis element type.
 
-ResourceTypeDef:
+ResourceDef:
   @QName:
+    rdfs:Class
+  @rdf:type:
     rdfs:Class
   @ISA:
     rdfs:Resource
   @Description:
     @@lang:en
     @@@: A RDF class.
-
 ElementTypeBinding:
   @Name: ResourceTypeDef
   @ElementType: 
@@ -253,14 +288,14 @@ ResourceTypeDef:
 ResourceTypeDef:
   @QName:
     rdfs:Datatype
-  @AliasFor:
-    ManakaiDOM:DataType
 ResourceTypeDef:
   @Name: DataType
   @Description:
     @@lang:en
     @@@:
-      A abstract data type.
+      A data type.
+  @ISA:
+    rdfs:Datatype
 ElementTypeBinding:
   @Name: DataTypeDef
   @ElementType:
@@ -579,6 +614,12 @@ DataTypeDef:
       <PerlModule:Message::Util::Formatter> template
   @ISA:
     DOMMain:DOMString
+DataTypeDef:
+  @QName:
+    lang:Java
+  @FullName:
+    @@lang:en
+    @@@: Java
 
 DataTypeDef:
   @Name: ManakaiDOMURI

@@ -7,15 +7,16 @@ my %Opt;
 GetOptions (
   'for=s' => \$Opt{For},
   'help' => \$Opt{help},
-  'no-undef-check' => \$Opt{no_undef_check},
+  'undef-check!' => \$Opt{no_undef_check},
+  'output-anon-resource!' => \$Opt{output_anon_resource},
   'output-as-n3' => \$Opt{output_as_n3},
   'output-as-xml' => \$Opt{output_as_xml},
-  'output-for' => \$Opt{output_for},
-  'output-local-resource' => \$Opt{output_local_resource},
-  'output-module' => \$Opt{output_module},
+  'output-for!' => \$Opt{output_for},
+  'output-local-resource!' => \$Opt{output_local_resource},
+  'output-module!' => \$Opt{output_module},
   'output-only-in-module=s' => \$Opt{output_resource_pattern},
-  'output-prop-perl' => \$Opt{output_prop_perl},
-  'output-resource' => \$Opt{output_resource},
+  'output-prop-perl!' => \$Opt{output_prop_perl},
+  'output-resource!' => \$Opt{output_resource},
   'output-resource-uri-pattern=s' => \$Opt{output_resource_uri_pattern},
 ) or pod2usage (2);
 if ($Opt{help}) {
@@ -27,6 +28,9 @@ if ($Opt{output_as_n3} and $Opt{output_as_xml}) {
   exit;
 }
 $Opt{output_as_xml} = 1 unless $Opt{output_as_n3};
+$Opt{output_anon_resource} = 1 unless defined $Opt{output_anon_resource};
+$Opt{output_local_resource} = 1 unless defined $Opt{output_local_resource};
+$Opt{no_undef_check} = $Opt{no_undef_check} ? 0 : 1;
 
 BEGIN {
 require 'manakai/genlib.pl';
@@ -34,6 +38,7 @@ require 'manakai/dis.pl';
 }
 sub n3_literal ($) {
   my $s = shift;
+  impl_err ("Literal value not defined") unless defined $s;
   qq<"$s">;
 }
 our $State;
@@ -102,15 +107,13 @@ for (keys %{$State->{Module}}) {
 if ($Opt{output_for}) {
 for (keys %{$State->{For}}) {
   my $mod = $State->{For}->{$_};
-  next unless $mod->{parentModule} =~ /$Opt{output_resource_pattern}/;
   if ($_ eq $mod->{URI}) {
     $result->add_triple ($mod->{URI} =>ExpandedURI q<rdf:type>=>
                          ExpandedURI q<d:For>);
     $result->add_triple ($mod->{URI} =>ExpandedURI q<d:NameURI>=> $mod->{URI});
     $result->add_triple ($mod->{URI} =>ExpandedURI q<d:FullName>=>
-                         n3_literal $mod->{FullName});
-    $result->add_triple ($mod->{URI} =>ExpandedURI q<d:parentModule>=>
-                         $mod->{parentModule});
+                         n3_literal $mod->{FullName})
+      if defined $mod->{FullName};
     for (@{$mod->{ISA}}) {
       $result->add_triple ($mod->{URI} =>ExpandedURI q<rdfs:subClassOf>=> $_);
     }
@@ -132,9 +135,11 @@ if ($Opt{output_resource}) {
         not defined $mod->{URI}) {
       return if defined $mod->{URI} and
                 $mod->{URI} !~ /$Opt{output_resource_uri_pattern}/;
+      return if not defined $mod->{URI} and not $Opt{output_anon_resource};
       my $uri = defined $mod->{URI}
                        ? $mod->{URI}
-                       : $result->get_new_anon_id (Name => $mod->{Name});
+                       : ($mod->{ExpandedURI q<d:anonID>}
+                            ||= $result->get_new_anon_id (Name => $mod->{Name}));
       $result->add_triple ($uri =>ExpandedURI q<d:Name>=>
                            n3_literal $mod->{Name}) if length $mod->{Name};
       $result->add_triple ($uri =>ExpandedURI q<d:NameURI>=> $mod->{NameURI})
@@ -152,6 +157,23 @@ if ($Opt{output_resource}) {
       }
       for (@{$mod->{Implement}}) {
         $result->add_triple ($uri =>ExpandedURI q<d:Implement>=> $_);
+      }
+      for (keys %{$mod->{For}}) {
+        $result->add_triple ($uri =>ExpandedURI q<d:For>=> $_);
+      }
+      for (@{$mod->{hasResource}||[]}) {
+        my $ruri = defined $_->{URI}
+                      ? $_->{URI}
+                      : ($_->{ExpandedURI q<d:anonID>}
+                              ||= $result->get_new_anon_id (Name => $_->{Name}));
+        $result->add_triple ($uri =>ExpandedURI q<d:hasResource>=> $ruri);
+      }
+      if ($Opt{output_prop_perl}) {
+        for my $prop (ExpandedURI q<dis2pm:packageName>,
+                      ExpandedURI q<dis2pm:ifPackagePrefix>) {
+          $result->add_triple ($mod->{URI} =>$prop=> n3_literal $mod->{$prop})
+            if defined $mod->{$prop};
+        }
       }
       if ($Opt{output_local_resource}) {
         for (keys %{$mod->{Resource}}) {
@@ -189,6 +211,9 @@ sub get_new_anon_id ($;%) {
 
 sub add_triple ($$$$) {
   my ($self, $s =>$p=> $o) = @_;
+  main::impl_err ("Subject undefined") unless defined $s;
+  main::impl_err ("Property undefined") unless defined $p;
+  main::impl_err ("Object undefined") unless defined $o;
   push @{$self->{triple}}, [$s =>$p=> $o];
 }
 
