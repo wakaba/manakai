@@ -13,7 +13,7 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.23 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.24 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::Header;
@@ -36,6 +36,8 @@ use overload '""' => sub { $_[0]->stringify },
     -cte_default	=> '7bit',
     #fill_date	=> 1,
     -fill_date_name	=> 'date',
+    -fill_md5	=> 0,
+    -fill_md5_name	=> 'md5',
     #fill_msgid	=> 1,
     -fill_msgid_name	=> 'message-id',
     -force_mime_entity	=> 0,
@@ -44,6 +46,7 @@ use overload '""' => sub { $_[0]->stringify },
     -header_default_charset_input	=> 'iso-2022-int-1',
     -linebreak_strict	=> 0,	## BUG: not work perfectly
     -parse_all	=> 0,
+    -recalc_md5	=> 1,
     -text_coderange	=> 'binary',
     	## '8bit' (MIME text/*) / 'binary' (HTTP text/*)
     #ua_field_name	=> 'user-agent',
@@ -75,16 +78,16 @@ sub _init ($;%) {
   
   my $format = $self->{option}->{format};
   if ($format =~ /http/) {
-    $self->{option}->{fill_date_ns}       = $Message::Header::NS_phname2uri{http};
-    $self->{option}->{fill_msgid_from_ns} = $Message::Header::NS_phname2uri{http};
-    $self->{option}->{fill_ua_ns}         = $Message::Header::NS_phname2uri{http};
+    $self->{option}->{fill_date_ns}       = $Message::Header::NS_phname2uri{'x-http'};
+    $self->{option}->{fill_msgid_from_ns} = $Message::Header::NS_phname2uri{'x-http'};
+    $self->{option}->{fill_ua_ns}         = $Message::Header::NS_phname2uri{'x-http'};
     $self->{option}->{accept_coderange} = 'binary';
     $self->{option}->{text_coderange} = 'binary';
     $self->{option}->{cte_default} = 'binary';
   } else {
-    $self->{option}->{fill_date_ns}       = $Message::Header::NS_phname2uri{rfc822};
-    $self->{option}->{fill_msgid_from_ns} = $Message::Header::NS_phname2uri{rfc822};
-    $self->{option}->{fill_ua_ns}         = $Message::Header::NS_phname2uri{rfc822};
+    $self->{option}->{fill_date_ns}       = $Message::Header::NS_phname2uri{'x-rfc822'};
+    $self->{option}->{fill_msgid_from_ns} = $Message::Header::NS_phname2uri{'x-rfc822'};
+    $self->{option}->{fill_ua_ns}         = $Message::Header::NS_phname2uri{'x-rfc822'};
     $self->{option}->{text_coderange} = '8bit';
     if ($format =~ /news-usefor|smtp-8bitmime/) {
       $self->{option}->{accept_coderange} = '8bit';
@@ -93,8 +96,8 @@ sub _init ($;%) {
       $self->{option}->{accept_coderange} = '7bit';
     }
   }
-  $self->{option}->{fill_msgid_ns}   = $Message::Header::NS_phname2uri{rfc822};
-  $self->{option}->{fill_mimever_ns} = $Message::Header::NS_phname2uri{rfc822};
+  $self->{option}->{fill_msgid_ns}   = $Message::Header::NS_phname2uri{'x-rfc822'};
+  $self->{option}->{fill_mimever_ns} = $Message::Header::NS_phname2uri{'x-rfc822'};
   unless (defined $self->{option}->{fill_date}) {
     $self->{option}->{fill_date} = $format !~ /mime-entity|cgi|uri-url-mailto/;
   }
@@ -173,6 +176,7 @@ sub parse ($$;%) {
   unless ($self->{option}->{strict_linebreak}) {
     $nl = Message::Util::decide_newline ($message);
   }
+  ## BUG: binary unsafe yet!
   my @header = ();
   my @body = split /$nl/, $message;
   while (1) {
@@ -189,7 +193,7 @@ sub parse ($$;%) {
     -header_default_charset_input	=> $self->{option}->{header_default_charset_input},
     -parse_all => $self->{option}->{parse_all},
     -format => $self->{option}->{format}, %new_field;
-  $self->{body} = join $nl, @body;
+  $self->{body} = join ($nl, @body) . $nl;
   $self->{body} = $self->_parse_value ([$self->content_type] => $self->{body})
     if $self->{option}->{parse_all};
   $self;
@@ -258,6 +262,25 @@ sub entity_header ($;$) {
     $self->{entity_header} = $new_header;
   }
   $self->{entity_header};
+}
+
+## Note: If you once parse body (including parse_all => 1 option),
+##       it might make validation failed.
+sub md5_check ($) {
+  my $self = shift;
+  my $md5f = $self->{header}->field ('content-md5', -new_item_unless_exist => 0);
+  my $md5; $md5 = $md5f->value if ref $md5f;
+  unless ($md5) {
+    Carp::carp "md5_check: MD5 checksum not found";
+    return undef;
+  }
+  my $MD5;
+  eval q{
+        require Digest::MD5;  require MIME::Base64;
+        $MD5 = MIME::Base64::encode (Digest::MD5::md5 ($self->{body}));
+        $MD5 =~ tr/\x09\x0A\x0D\x20//d;
+  } or Carp::croak $@;
+  return $MD5 eq $md5? 1 : 0;
 }
 
 ## $self->_parse_value ($type, $value);
@@ -480,10 +503,24 @@ sub stringify ($;%) {
         ->generate (addr_spec => $from)
         if $from;
     }	# fill_msgid
+    if (($option{fill_md5} && !$exist{ $option{fill_md5_name} .':'. $ns_content})
+     || ($option{recalc_md5} && $exist{ $option{fill_md5_name} .':'. $ns_content})) {
+      my $md5;
+      eval q{
+        require Digest::MD5;  require MIME::Base64;
+        $md5 = MIME::Base64::encode (Digest::MD5::md5 ($body0));
+        $md5 =~ tr/\x09\x0A\x0D\x20//d;
+      } or Carp::carp $@;
+      if ($md5) {
+        my $md5f = $self->{header}->field ($option{fill_md5_name}, -ns => $ns_content);
+        $md5f->value ($md5);
+      }
+    }
     my $ismime = 0;
     for (keys %exist) {if (/:$ns_content$/) { $ismime = 1; last }}
     unless ($ismime) {
       $ismime = 1 if $option{force_mime_entity};
+      $ismime = 1 if $option{fill_md5};
       $ismime = 1 if $option{body_default_media_type} ne 'text';
       $ismime = 1 if $option{body_default_media_subtype} ne 'plain';
     }
@@ -873,7 +910,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/02 06:37:56 $
+$Date: 2002/07/07 00:46:07 $
 
 =cut
 

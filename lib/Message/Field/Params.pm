@@ -11,7 +11,7 @@ use strict;
 require 5.6.0;
 use re 'eval';
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::MIME::Charset;
 require Message::Field::Structured;
@@ -29,6 +29,7 @@ $REG{S_parameter_separator} = qr/;/;
 $REG{S_comma_parameter} = qr/(?:[^\x22\x28\x2C\x3C]|$REG{comment}|$REG{quoted_string}|$REG{angle_quoted})+/;
 $REG{S_comma_parameter_separator} = qr/,/;
 $REG{MS_parameter_avpair} = qr/([^\x22\x3C\x3D]+)=([\x00-\xFF]*)/;
+$REG{M_parameter_avpair} = qr/([^\x22\x3C\x3D]+)=([^\x3D]*)/;
 
 %DEFAULT = (
 	-_HASH_NAME	=> 'params',
@@ -634,7 +635,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/06 10:30:43 $
+$Date: 2002/07/07 00:46:07 $
 
 =cut
 

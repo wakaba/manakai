@@ -11,7 +11,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -99,7 +99,7 @@ sub _init ($;%) {
     $self->{option}->{is_quoted_string} = 0;
     $self->{option}->{remove_comment} = 0;
     $self->{option}->{value_type}->{'*default'} = ['Message::Field::ValueParams'];
-  } elsif ($self->{option}->{field_ns} eq $Message::Header::NS_phname2uri{list}) {
+  } elsif ($self->{option}->{field_ns} eq $Message::Header::NS_phname2uri{'x-rfc822-list'}) {
     $self->{option}->{is_quoted_string} = 0;
     $self->{option}->{remove_comment} = 0;
     $self->{option}->{value_type}->{'*default'} = ['Message::Field::URI'];
@@ -338,7 +338,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/06 10:30:43 $
+$Date: 2002/07/07 00:46:07 $
 
 =cut
 

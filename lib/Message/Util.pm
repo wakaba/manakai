@@ -16,7 +16,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%FMT2STR %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 use Carp ();
 require Message::MIME::EncodedWord;
@@ -88,6 +88,8 @@ require Message::MIME::Charset;
 	$REG{NON_http_attribute_char} = qr/[^\x21\x23-\x24\x26\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\x7C\x7E]/;
 	$REG{NON_http_attribute_char_wsp} = qr/[^\x09\x20\x21\x23-\x24\x26\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\x7C\x7E]/;
 		## Yes, C<attribute-char> does not appear in HTTP spec.
+	
+	$REG{NON_base64alphabet} = qr#[^A-Za-z0-9+/=]#;
 	
 	$REG{dot_atom} = qr/$REG{atext}(?:$REG{FWS}\x2E$REG{FWS}$REG{atext})*/;
 	$REG{dot_atom_dot} = qr/$REG{atext_dot}(?:$REG{FWS}\x2E$REG{FWS}$REG{atext_dot})*/;
@@ -715,7 +717,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/04 06:38:21 $
+$Date: 2002/07/07 00:46:07 $
 
 =cut
 

@@ -9,7 +9,7 @@ for RFC822 Namespaces of Header Fields
 package Message::Header::RFC822;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Header::Default;
 
 our %OPTION = %Message::Header::Default::OPTION;
@@ -229,13 +229,16 @@ $OPTION{value_type} = {
 	language	=> ['Message::Field::CSV'],
 	length	=> ['Message::Field::Numval'],
 	location	=> ['Message::Field::URI'],
-	md5	=> ['Message::Field::Structured'],
+	md5	=> ['Message::Field::ValueParams',{
+		-parameter_av_Mrule	=> 'M_parameter_avpair',
+		-value_unsafe_rule	=> 'NON_base64alphabet',
+	}],
 	range	=> ['Message::Field::Structured'],
 	'script-type'	=> ['Message::Field::ContentType'],
 	'style-type'	=> ['Message::Field::ContentType'],
 	'transfer-encoding'	=> ['Message::Field::ValueParams'],
 	type	=> ['Message::Field::ContentType'],
-	version	=> ['Message::Field::Structured'],
+	version	=> ['Message::Field::ValueParams'],
 	'x-properties'	=> ['Message::Field::Params'],
 };
 
@@ -301,7 +304,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/06 10:29:31 $
+$Date: 2002/07/07 00:46:07 $
 
 =cut
 

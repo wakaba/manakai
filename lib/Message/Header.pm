@@ -8,7 +8,7 @@ Message::Header --- A Perl Module for Internet Message Headers
 package Message::Header;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.32 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.33 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;	## This may seem silly:-)
 push @ISA, qw(Message::Field::Structured);
 
@@ -484,9 +484,9 @@ sub _value_to_arrayitem ($$$\%) {
       $self->{ns}->{number2uri}->{ $prefix } = 'urn:x-suika-fam-cx:msgpm:header:x-temp:'.$prefix;
       $nsuri = $self->{ns}->{number2uri}->{ $prefix };
     }
-  } elsif (($name =~ s/^([Xx]-[A-Za-z]+|[A-YZa-yz][A-Za-z]*)-
-                       ([Xx]-[A-Za-z]+|[A-YZa-yz][A-Za-z]*)-//x)
-    || $name =~ s/^([Xx]-[A-Za-z]+|[A-Za-z]+)-//) {
+  } elsif (($name =~ s/^([Xx]-[A-Za-z0-9]+|[A-Za-z]*[A-WYZa-wyz0-9][A-Za-z0-9]*)-
+                   ([Xx]-[A-Za-z0-9]+|[A-Za-z0-9]*[A-WYZa-wyz0-9][A-Za-z0-9]*)-//x)
+    || $name =~ s/^([Xx]-[A-Za-z0-9]+|[A-Za-z0-9]*[A-WYZa-wyz0-9][A-Za-z0-9]*)-//) {
     my ($prefix1, $prefix2) = ($1, $2);
     my $original_prefix = $&;  my $one_prefix = 0;
     unless ($prefix2) {
@@ -950,7 +950,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/06 11:37:01 $
+$Date: 2002/07/07 00:46:07 $
 
 =cut
 

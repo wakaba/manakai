@@ -9,7 +9,7 @@ Message::Partial --- Perl module for partial message defined by MIME
 package Message::Partial;
 use strict;
 use vars qw(%OPTION $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Entity;
 require Message::Header;
@@ -50,7 +50,7 @@ sub fragmentate ($;%) {
   $msg->stringify;	## Make fill_* work
   $msg->header->scan (sub {
     my $i = $_[1];
-    my $rfc822 = $Message::Header::NS_phname2uri{rfc822};
+    my $rfc822 = $Message::Header::NS_phname2uri{'x-rfc822'};
     if ($i->{ns} eq $Message::Header::NS_phname2uri{content}) {
       push @copy_field, {%$i};
       $i->{name} = undef;
@@ -155,7 +155,7 @@ sub reassembly (@) {
   }
   $inner_header->scan (sub {
     my $i = $_[1];
-    my $rfc822 = $Message::Header::NS_phname2uri{rfc822};
+    my $rfc822 = $Message::Header::NS_phname2uri{'x-rfc822'};
     if ($i->{ns} eq $Message::Header::NS_phname2uri{content}
      || $i->{ns} eq $rfc822 && $ENCLOSED_FIELD{ $i->{name} }) {
       $msg->header->replace ($i->{name} => [ $i->{body} , ns => $i->{ns} ] );
@@ -197,7 +197,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/03 23:39:15 $
+$Date: 2002/07/07 00:46:07 $
 
 =cut
 
