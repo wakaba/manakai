@@ -17,7 +17,7 @@ markup constructures.  (SuikaWiki is not "tiny"?  Oh, yes, I see:-))
 
 package Message::Markup::XML;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.24 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.25 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload '""' => \&outer_xml,
              fallback => 1;
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXML_NCNameStartChar InXMLNCNameChar!;
@@ -430,6 +430,7 @@ sub defined_namespace_prefix ($$;%) {
   my $result = Message::Markup::XML::QName::prefix_to_name 
     ($self->_get_ns_decls_node, $prefix,
      use_prefix_default => 1, use_name_null => 1, 
+     use_xml => 1, use_xmlns => 1,
      ask_parent_node => 1, %opt);
   $result->{name};
 }
@@ -449,6 +450,7 @@ sub qname ($;%) {
                    ($self, $self->{namespace_uri}, $self->{local_name},
                     make_new_prefix => 1, check_local_name => 1,
                     use_prefix_default => 1, use_name_null => 1,
+                    use_xml => 1, use_xmlns => 1,
                     ask_parent_node => 1, %opt);
     Carp::carp $result->{reason} if $result->{reason};
     return $result->{qname};
@@ -459,6 +461,7 @@ sub qname ($;%) {
                        $self->_get_ns_decls_node : undef),
                     $self->{namespace_uri}, $self->{local_name},
                     make_new_prefix => 1, check_local_name => 1,
+                    use_xml => 1, use_xmlns => 1,
                     ask_parent_node => 1, %opt);
     Carp::carp $result->{reason} if $result->{reason};
     return $result->{qname};
@@ -559,21 +562,26 @@ sub remove_references ($) {
 }
 
 sub resolve_relative_uri ($;$%) {
+  my ($self, $rel, %o) = @_;  
   require URI;
-  my ($self, $rel, %o) = @_;
-  my $base = $self->get_attribute ('base', namespace_uri => $NS{xml});
-  $base = ref ($base) ? $base->inner_text : $NS{default_base_uri};
-  if ($base !~ /^[0-9A-Za-z.%+-]+:/) {	# $base is relative
-    $base = $self->_resolve_relative_uri_by_parent ($base, \%o);
+  if ($rel =~ /^[0-9A-Za-z.%+-]+:/) {
+    return URI->new ($rel);
+  } else {
+    my $base = $self->get_attribute_value ('base', namespace_uri => $NS{xml},
+                                           default => '');
+    if ($base !~ /^[0-9A-Za-z.%+-]+:/) {	# $base is relative
+      $base = $self->_resolve_relative_uri_by_parent ($base, \%o);
+    }
+    eval {
+      URI->new ($rel)->abs ($base || '.');
+    } or return $rel;
   }
-  eval q{	## Catch error such as $base is 'data:,foo' (non hierarchic scheme,...)
-    return URI->new ($rel)->abs ($base || '.');	## BUG (or spec) of URI: $base == false
-  } or return $rel;
 }
 sub _resolve_relative_uri_by_parent ($$$) {
   my ($self, $rel, $o) = @_;
   if (ref $self->{parent}) {
-    if (!$o->{use_references_base_uri} && $self->{parent}->{type} eq '#reference') {
+    if (not $o->{use_references_base_uri}
+        and $self->{parent}->{type} eq '#reference') {
       ## This case is necessary to work with
       ## <element>	<!-- element can have base URI -->
       ## text		<!-- text cannot have base URI -->
@@ -587,7 +595,7 @@ sub _resolve_relative_uri_by_parent ($$$) {
       return $self->{parent}->resolve_relative_uri ($rel, %$o);
     }
   } else {
-    return $rel;
+    return length $rel ? $rel : $NS{default_base_uri};
   }
 }
 sub base_uri ($;$) {
@@ -1429,4 +1437,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/11/01 06:11:13 $
+1; # $Date: 2003/11/09 01:48:15 $
