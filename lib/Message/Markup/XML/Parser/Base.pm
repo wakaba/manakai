@@ -16,9 +16,10 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::Base;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML
-    qw[InXML_NameStartChar InXMLNameChar
+    qw[InXML_NameStartChar10 InXMLNameChar10
+       InXMLNameStartChar11 InXMLNameChar11
        InXMLChar10 InXMLChar11
        InXML_UnrestrictedChar11 InXMLRestrictedChar11];
 require Message::Markup::XML::Parser::Error;
@@ -35,6 +36,10 @@ use Message::Util::QName::General [qw/ExpandedURI/],
     };
 my $REG_S = qr/[\x09\x0A\x0D\x20]/; 
         # S := 1*(U+0020 / U+0009 / U+000D / U+000A) ;; [3]
+my %XML_NAME = ('1.0' => qr/\p{InXML_NameStartChar10}\p{InXMLNameChar10}*/,
+                '1.1' => qr/\p{InXMLNameStartChar11}\p{InXMLNameChar11}*/);
+my %XML_NAMESTART = ('1.0' => qr/\p{InXML_NameStartChar10}/,
+                     '1.1' => qr/\p{InXMLNameStartChar11}/);
 
 sub new ($;%) {
   my $class = shift;
@@ -58,7 +63,7 @@ sub parse_document_entity ($$$%) {
            ($src, $p, %opt,
             ExpandedURI q<see-xml-declaration> => 1);
   $self->document_start ($src, $p, my $pp = {}, %opt);
-  if ($$src =~ /\G(?=<\?xml\P{InXMLNameChar})/gc) {
+  if ($$src =~ /\G(?=<\?xml\P{InXMLNameChar11})/gc) {
     $self->parse_xml_declaration
       ($src, $pp, %opt,
        ExpandedURI q<allow-xml-declaration> => 1,
@@ -69,7 +74,7 @@ sub parse_document_entity ($$$%) {
   my $docelem = 0;
   while (pos $$src < length $$src) {
     if ($$src =~ /\G</gc) {
-      if ($$src =~ /\G\p{InXML_NameStartChar}/gc) {
+      if ($$src =~ /\G$XML_NAMESTART{$self->{ExpandedURI q<xml-version>}||'1.0'}/gc) {
         pos ($$src) -= 2;
         if ($docelem++) {
           $self->report
@@ -146,14 +151,37 @@ sub parse_document_entity ($$$%) {
   $self->document_end ($src, $p, $pp, %opt);
 }
 
+sub parse_external_parsed_entity ($$$%) {
+  my ($self, $src, $p, %opt) = @_;
+  $self->____normalize_entity
+           ($src, $p, %opt,
+            ExpandedURI q<see-xml-declaration> => 1);
+  $self->external_parsed_entity_start ($src, $p, my $pp = {}, %opt);
+  if ($$src =~ /\G(?=<\?xml\P{InXMLNameChar11})/gc) {
+    $self->parse_xml_declaration
+      ($src, $pp, %opt,
+       ExpandedURI q<allow-xml-declaration> => 0,
+       ExpandedURI q<allow-text-declaration> => 1);
+  }
+  
+  my $s = substr $$src, pos ($$src) ||= 0;
+  pos $s = 0;
+  $self->{error}->set_position ($src, moved => 1);
+  $self->{error}->fork_position ($src => \$s);
+  $pp->{ExpandedURI q<CDATA>} = \$s;
+  $self->external_parsed_entity_content ($src, $p, $pp, %opt);
+  $self->external_parsed_entity_end ($src, $p, $pp, %opt);
+} # parse_external_parsed_entity
+
 sub ____normalize_entity ($$$%) {
   my ($self, $src, $p, %opt) = @_;
   unless ($self->{ExpandedURI q<xml-declaration-version>}) {
     if ($opt{ExpandedURI q<see-xml-declaration>}) {
-      if ($$src =~ /^<\?xml\P{InXML_NameStartChar}(.+?)\?>/) {
+      if ($$src =~ /^<\?xml\P{InXMLNameStartChar11}(.+?)\?>/) {
         my $data = $1;
         if ($data =~ /version="([^"]+)"/) {
-          $self->{ExpandedURI q<xml-declaration-version>} = $1;
+          $self->{ExpandedURI q<xml-declaration-version>} ||= $1;
+          $self->{ExpandedURI q<xml-version>} ||= $1 eq '1.0' ? '1.0' : '1.1';
         }
         if ($data =~ /[\x85\x{2028}]/) {
           $self->report
@@ -164,7 +192,7 @@ sub ____normalize_entity ($$$%) {
       }
     }
   }
-  my $xmlver = $self->{ExpandedURI q<xml-declaration-version>} || '1.0';
+  my $xmlver = $self->{ExpandedURI q<xml-version>} || '1.0';
   
   $$src =~ s/\x0D\x0A/\x0A/g;
   $$src =~ s/\x0D\x85/\x0A/g unless $xmlver eq '1.0';
@@ -212,7 +240,7 @@ sub ____normalize_entity ($$$%) {
 
 sub ____check_char ($$$%) {
   my ($self, $src, $p, %opt) = @_;
-  my $xmlver = $self->{ExpandedURI q<xml-declaration-version>} || '1.0';
+  my $xmlver = $self->{ExpandedURI q<xml-version>} || '1.0';
   my $char = chr 0+$opt{ExpandedURI q<_:code>};
   if ($xmlver ne '1.0') {
     $char =~ /\P{InXMLChar11}/ and
@@ -237,7 +265,7 @@ sub parse_element ($$$%) {
   my ($self, $src, $p, %opt) = @_;
   $opt{ExpandedURI q<use-reference>} = 1;
 
-  if ($$src =~ /\G(?=<\p{InXML_NameStartChar})/gc) {
+  if ($$src =~ /\G(?=<$XML_NAMESTART{$self->{ExpandedURI q<xml-version>}||'1.0'})/gc) {
     $self->element_start ($src, $p, my $pp = {}, %opt);
     $self->parse_start_tag
              ($src, $pp, %opt);
@@ -246,15 +274,17 @@ sub parse_element ($$$%) {
     if ($pp->{ExpandedURI q<tag-type>} eq 'start') {
       my $end_tag = 0;
       while (pos $$src < length $$src) {
-        if ($$src =~ /\G([^<&]+)/gc) {
+        my $m = substr $$src, pos ($$src), 1;
+        if ($m ne '<' and $m ne '&') {
+          $$src =~ /\G([^<&]+)/gc;
           my $t = $1;
           local $pp->{ExpandedURI q<CDATA>} = \$t;
           $self->element_content
                    ($src, $p, $pp, %opt);
-        } elsif (substr ($$src, pos $$src, 1) eq '<') {
+        } elsif ($m eq '<') {
           my $n = substr ($$src, 1 + pos $$src, 1);
           if ($n eq '/') {
-            if ($$src =~ m#\G</(\p{InXML_NameStartChar}\p{InXMLNameChar}*)#gc) {
+            if ($$src =~ m#\G</($XML_NAME{$self->{ExpandedURI q<xml-version>}||'1.0'})#gc) {
               my $type = $1;
               if ($type eq $ename) {
                 $$src =~ /\G$REG_S+/gco;
@@ -328,14 +358,15 @@ sub parse_element ($$$%) {
                  $self->element_content
                    ($src, $p, $pp, %opt);
           }
-        } elsif (substr ($$src, pos $$src, 1) eq '&') {
+        } elsif ($m eq '&') {
           $self->parse_reference_in_content
             ($src, $pp,
              %opt,
              ExpandedURI q<match-or-error> => 1,
              ExpandedURI q<content-parser> => 'parse_content');
         } else {
-          Carp::croak "Buggy implementation!";
+          die "$0: parse_element: Buggy implementation: ".
+              substr $$src, pos $$src, 10;
         }
       }
     
@@ -381,7 +412,7 @@ sub parse_content ($$$%) {
         } elsif (substr ($$src, pos $$src, 1) eq '<') {
           my $n = substr ($$src, 1 + pos $$src, 1);
           if ($n eq '/') {
-            if ($$src =~ m#\G</(\p{InXML_NameStartChar}\p{InXMLNameChar}*)#gc) {
+            if ($$src =~ m#\G</($XML_NAME{$self->{ExpandedURI q<xml-version>}||'1.0'})#gc) {
               my $type = $1;
                 $self->report
                   (-type => 'SYNTAX_END_TAG_NOT_ALLOWED',
@@ -448,7 +479,8 @@ sub parse_content ($$$%) {
              ExpandedURI q<match-or-error> => 1,
              ExpandedURI q<content-parser> => 'parse_content');
         } else {
-          Carp::croak "Buggy implementation!";
+          die "$0: parse_content: Buggy implementation: ".
+              substr $$src, pos $$src, 10;
         }
       }
     return 1;
@@ -458,7 +490,7 @@ sub parse_start_tag ($$$%) {
   my ($self, $src, $p, %opt) = @_;
   if ($$src =~ /\G</gc) {
     my $element_type;
-    if ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+    if ($$src =~ /\G($XML_NAME{$self->{ExpandedURI q<xml-version>}||'1.0'})/gc) {
       $element_type = $1;
     } elsif ($$src =~ /\G>/gc) {
       pos ($$src)--;
@@ -531,14 +563,16 @@ sub parse_attribute_specifications ($$$%) {
   my ($self, $src, $p, %opt) = @_;
   my $start_method = $opt{ExpandedURI q<method-start-attr-specs>} ||
                      'attribute_specifications_start';
-    $self->$start_method
-                 ($src, $p, my $pp = {}, %opt);
+  $self->$start_method
+                 ($src, $p,
+                  my $pp = {ExpandedURI q<used-attr-name> => {}},
+                  %opt);
   
     my $sep = $opt{ExpandedURI q<s-before-attribute-specifications>};
     my @sep = ($sep);
     while (pos $$src < length $$src) {
       $self->{error}->set_position ($src, moved => 1);
-      if ($$src =~ /\G(?=\p{InXML_NameStartChar})/gc) {
+      if ($$src =~ /\G(?=$XML_NAMESTART{$self->{ExpandedURI q<xml-version>}||'1.0'})/gc) {
         unless ($sep) {
           $self->report
             (-type => 'SYNTAX_S_REQUIRED_BETWEEN_ATTR_SPEC',
@@ -562,7 +596,7 @@ sub parse_attribute_specifications ($$$%) {
             (-type => 'SYNTAX_ATTR_SPEC_REQUIRED',
              -class => 'WFC',
              source => $src);
-        $$src =~ /\G(?:(?!\p{InXML_NameStartChar})(?!$REG_S).)+/gocs;
+        $$src =~ /\G(?:(?!$XML_NAMESTART{$self->{ExpandedURI q<xml-version>}||'1.0'})(?!$REG_S).)+/gcs;
       } else {
         last;
       }
@@ -580,11 +614,21 @@ sub parse_attribute_specifications ($$$%) {
 sub parse_attribute_specification ($$$%) {
   my ($self, $src, $p, %opt) = @_;
   $self->{error}->set_position ($src, moved => 1);
-  if ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)$REG_S*/ogc) {
+  if ($$src =~ /\G($XML_NAME{$self->{ExpandedURI q<xml-version>}||'1.0'})$REG_S*/gc) {
     my $s = $1;
     pos $s = 0;
     $self->{error}->fork_position ($src => \$s);
     my $pp = {ExpandedURI q<attribute-name> => \$s};
+    if ($p->{ExpandedURI q<used-attr-name>}->{$s} and
+        not $opt{ExpandedURI q<allow-duplicate-attr-name>}) {
+      $self->report
+        (-type => 'WFC_UNIQUE_ATT_SPEC',
+         -class => 'WFC',
+         source => $src, position_diff => length $s,
+         attribute_name => $s);
+    } else {
+      $p->{ExpandedURI q<used-attr-name>}->{$s} = 1;
+    }
     my $start_method = $opt{ExpandedURI q<method-start-attr-spec>} ||
                        'attribute_specification_start';
     $self->$start_method ($src, $p, $pp, %opt);
@@ -651,7 +695,7 @@ sub parse_attribute_value_specification ($$$%) {
                      'attribute_value_specification_end';
     $self->$end_method ($src, $p, $pp, %opt);
     return 1;
-  } elsif ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+  } elsif ($$src =~ /\G($XML_NAME{$self->{ExpandedURI q<xml-version>}||'1.0'})/gc) {
     my $s = $1;
     my $start_method = $opt{ExpandedURI q<method-start-attr-value-spec>} ||
                        'attribute_value_specification_start';
@@ -691,6 +735,8 @@ sub parse_avdata ($$$%) {
       while (pos $$src < length $$src) {
         if ($$src =~ /\G([^&<]+)/gc) {
           my $s = $1;
+          $s =~ s/[\x09\x0A\x0D]/\x20/g
+            if $opt{ExpandedURI q<normalize-attr-val>};
           pos $s = 0;
           $self->{error}->set_position ($src, moved => 1, diff => length $s);
           $self->{error}->fork_position ($src => \$s);
@@ -797,7 +843,7 @@ sub parse_reference_in_attribute_value_literal ($$$%) {
                 position_diff => 1);
         pos ($$src) -= 3;
         return 0;
-      } elsif ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+      } elsif ($$src =~ /\G($XML_NAME{$self->{ExpandedURI q<xml-version>}||'1.0'})/gc) {
         my $name = $1;
         $self->report
                (-type => 'SYNTAX_NAMED_CHARACTER_REFERENCE',
@@ -815,7 +861,7 @@ sub parse_reference_in_attribute_value_literal ($$$%) {
         pos ($$src) -= 2;
         return 0;
       }
-    } elsif ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+    } elsif ($$src =~ /\G($XML_NAME{$self->{ExpandedURI q<xml-version>}||'1.0'})/gc) {
       my $s = $1; pos $s = 0;
       unless ($opt{ExpandedURI q<allow-general-entity-reference>}) {
         $self->report
@@ -957,7 +1003,7 @@ sub parse_reference_in_content ($$$%) {
                 position_diff => 1);
         pos ($$src) -= 3;
         return 0;
-      } elsif ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+      } elsif ($$src =~ /\G($XML_NAME{$self->{ExpandedURI q<xml-version>}||'1.0'})/gc) {
         my $name = $1;
         $self->report
                (-type => 'SYNTAX_NAMED_CHARACTER_REFERENCE',
@@ -975,7 +1021,7 @@ sub parse_reference_in_content ($$$%) {
         pos ($$src) -= 2;
         return 0;
       }
-    } elsif ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+    } elsif ($$src =~ /\G($XML_NAME{$self->{ExpandedURI q<xml-version>}||'1.0'})/gc) {
       my $s = $1; pos $s = 0;
       $self->{error}->set_position ($src, moved => 1, diff => length $s);
       $self->{error}->fork_position ($src => \$s);
@@ -1061,7 +1107,7 @@ sub parse_reference_in_content ($$$%) {
 sub parse_reference_in_rpdata ($$$%) {
   my ($self, $src, $p, %opt) = @_;
   if ($$src =~ /\G%/gc) {
-    if ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+    if ($$src =~ /\G($XML_NAME{$self->{ExpandedURI q<xml-version>}||'1.0'})/gc) {
       my $s = $1; pos $s = 0;
       $self->{error}->set_position ($src, moved => 1, diff => length $s);
       $self->{error}->fork_position ($src => \$s);
@@ -1171,7 +1217,7 @@ sub parse_reference_in_rpdata ($$$%) {
                 position_diff => 1);
         pos ($$src) -= 3;
         return 0;
-      } elsif ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+      } elsif ($$src =~ /\G($XML_NAME{$self->{ExpandedURI q<xml-version>}||'1.0'})/gc) {
         my $name = $1;
         $self->report
                (-type => 'SYNTAX_NAMED_CHARACTER_REFERENCE',
@@ -1189,7 +1235,7 @@ sub parse_reference_in_rpdata ($$$%) {
         pos ($$src) -= 2;
         return 0;
       }
-    } elsif ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+    } elsif ($$src =~ /\G($XML_NAME{$self->{ExpandedURI q<xml-version>}||'1.0'})/gc) {
       my $s = $1; pos $s = 0;
       $self->{error}->set_position ($src, moved => 1, diff => length $s);
       $self->{error}->fork_position ($src => \$s);
@@ -1234,7 +1280,7 @@ sub parse_markup_declaration ($$$%) {
            source => $src);
     }
     $self->parse_comment_declaration ($src, $p, %opt);
-  } elsif ($$src =~ /\G<!(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+  } elsif ($$src =~ /\G<!($XML_NAME{$self->{ExpandedURI q<xml-version>}||'1.0'})/gc) {
     my $keyword = $1;
     my $method = {qw{
       ATTLIST        parse_attlist_declaration
@@ -1805,7 +1851,7 @@ sub parse_element_declaration ($$$%) {
         if ($param->{type} eq 'grpo') {
           $self->parse_model_group
             ($opt{ExpandedURI q<source>}->[-1], $pp, %opt);
-          # exception not implemented
+          # exception (SGML) not implemented
         } elsif ($param->{type} eq 'Name') {
           shift @{$pp->{ExpandedURI q<param>}};
           if ({qw/ANY 1 EMPTY 1/}->{${$param->{value}}}) {
@@ -2099,7 +2145,7 @@ sub parse_attlist_declaration ($$$%) {
         } else {
           die "$0: ".__PACKAGE__.": $param->{type}: Buggy";
         }
-        $self->attlist_declaration_content ($src, $pp, $q, %opt);
+        $self->attribute_definition ($src, $pp, $q, %opt);
         redo ATTRDEF;
       } # ATTRDEF
     } continue {
@@ -2162,7 +2208,7 @@ sub parse_model_group ($$$%) {
               ($src, $p, my $pp = {
                  ExpandedURI q<param> => $p->{ExpandedURI q<param>},
                }, %opt);
-    local $opt{ExpandedURI q<match-or-error>} = 0;
+    $opt{ExpandedURI q<match-or-error>} = 1;
     my $i = 0; # $i'th item currently reading
     my $has_pcdata = 0;
     my $connect;
@@ -2262,7 +2308,6 @@ sub parse_model_group ($$$%) {
              source => $connector->{value},
              connector => ${$connector->{value}});
         }
-        $opt{ExpandedURI q<match-or-error>} = 1;
         $self->model_group_content ($src, $pp, $ppp, %opt);
         redo PARAMS;
       } else {
@@ -2454,7 +2499,7 @@ sub parse_markup_declaration_parameter ($$$%) {
         }
         $has_ps = 1;
       } elsif ($$src =~ /\G%/gc) {
-        if ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+        if ($$src =~ /\G($XML_NAME{$self->{ExpandedURI q<xml-version>}||'1.0'})/gc) {
           $self->report
                   (-type => $opt{ExpandedURI q<error-ps>} ||
                             'SYNTAX_MARKUP_DECLARATION_PS',
@@ -2601,7 +2646,7 @@ sub parse_markup_declaration_parameter ($$$%) {
     }
   }
   if ($allow->{Name} and
-      $$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+      $$src =~ /\G($XML_NAME{$self->{ExpandedURI q<xml-version>}||'1.0'})/gc) {
     my $name = $1;
     $self->{error}->set_position ($src, moved => 1,
                                   diff => length $name);
@@ -2609,7 +2654,7 @@ sub parse_markup_declaration_parameter ($$$%) {
     push @$param, {type => 'Name', value => \$name};
     return 1;
   } elsif ($allow->{rniKeyword} and
-           $$src =~ /\G\#(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+           $$src =~ /\G\#($XML_NAME{$self->{ExpandedURI q<xml-version>}||'1.0'})/gc) {
     ## ISSUE: Should we cause error if RNI not followed by Name occurs?
     my $name = $1;
     $self->{error}->set_position ($src, moved => 1,
@@ -2711,7 +2756,7 @@ sub parse_markup_declaration_parameter ($$$%) {
     push @$param, {type => 'attrValLit'};
   } elsif ($allow->{peroName} and
            $$src =~ /\G%$REG_S+/gco) {
-    if ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+    if ($$src =~ /\G($XML_NAME{$self->{ExpandedURI q<xml-version>}||'1.0'})/gc) {
       my $name = $1;
       $self->{error}->set_position ($src, moved => 1,
                                     diff => length $name);
@@ -2988,9 +3033,10 @@ sub parse_doctype_subset ($$$%) {
         $self->{error}->set_position ($src, moved => 1,
                                       diff => length $cdata);
         $self->{error}->fork_position ($src => \$cdata);
-        $self->doctype_subset_s ($src, $p, {ExpandedURI q<s> => \$cdata}, %opt);
+        $self->doctype_subset_content
+                  ($src, $p, {ExpandedURI q<s> => \$cdata}, %opt);
       } elsif ($$src =~ /\G%/gc) {
-        if ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+        if ($$src =~ /\G($XML_NAME{$self->{ExpandedURI q<xml-version>}||'1.0'})/gc) {
           my $s = $1; pos $s = 0;
           $self->{error}->set_position ($src, moved => 1, diff => length $s);
           $self->{error}->fork_position ($src => \$s);
@@ -3079,12 +3125,18 @@ sub parse_doctype_subset ($$$%) {
                $$src =~ /\G\]/gc) {
         last SUBSET;
       } elsif ($$src =~ /\G(.)/gcs) {
+        my $cdata = $1;
         $self->report
                   (-type => 'SYNTAX_DOCTYPE_SUBSET_INVALID_CHAR',
                    -class => 'WFC',
                    position_diff => 1,
                    source => $src,
-                   char => $1);
+                   char => $cdata);
+        $self->{error}->set_position ($src, moved => 1,
+                                      diff => length $cdata);
+        $self->{error}->fork_position ($src => \$cdata);
+        $self->doctype_subset_content
+                  ($src, $p, {ExpandedURI q<CDATA> => \$cdata}, %opt);
       } else {
         die substr $$src, pos $$src;
       }
@@ -3266,7 +3318,7 @@ sub parse_marked_section ($$$%) {
                                     diff => length $cdata);
       $self->{error}->fork_position ($src => \$cdata);
       $pp->{ExpandedURI q<section-type>} = 'cdata';
-      $pp->{ExpandedURI q<cdata>} = \$cdata;
+      $pp->{ExpandedURI q<CDATA>} = \$cdata;
       $$src =~ /\G\]\]>/gc
         or $self->report
              (-type => 'SYNTAX_MSE_REQUIRED',
@@ -3284,7 +3336,7 @@ sub parse_marked_section ($$$%) {
                                     diff => length $cdata);
       $self->{error}->fork_position ($src => \$cdata);
       $pp->{ExpandedURI q<section-type>} = 'cdata';
-      $pp->{ExpandedURI q<cdata>} = \$cdata;
+      $pp->{ExpandedURI q<CDATA>} = \$cdata;
       $$src =~ /\G\]\]>/gc
         or $self->report
              (-type => 'SYNTAX_MSE_REQUIRED',
@@ -3311,7 +3363,7 @@ sub parse_ignored_section_content ($$$%) {
       $self->{error}->fork_position ($src => \$cdata);
       $self->ignored_section_content
         ($src, $p,
-         {ExpandedURI q<cdata> => $cdata}, %opt);
+         {ExpandedURI q<CDATA> => $cdata}, %opt);
     } elsif ($$src =~ /\G<!\[/gc) {
       $self->parse_ignored_section_content
         ($src, $p, %opt,
@@ -3335,7 +3387,7 @@ sub parse_processing_instruction ($$$%) {
   my ($self, $src, $p, %opt) = @_;
   if ($$src =~ /\G<\?/gc) {
     my $pp = {};
-    if ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+    if ($$src =~ /\G($XML_NAME{$self->{ExpandedURI q<xml-version>}||'1.0'})/gc) {
       my $tn = $1;
       if ($tn eq 'xml') {
         $self->report
@@ -3443,7 +3495,7 @@ sub parse_xml_declaration ($$$%) {
                  => '____xml_declaration_pseudo_attr_value_spec_end');
     my $attr = $pp->{ExpandedURI q<_:attr>};
     my $sep = $pp->{ExpandedURI q<_:attr-s>};
-    my $xmlver = '1.0';
+    my $xmlver;
     if ($attr->[0] and ${$attr->[0]->{name}} eq 'version') {
       $xmlver = ${$attr->[0]->{value}};
       if ($xmlver eq '1.0' or $xmlver eq '1.1') {
@@ -3526,6 +3578,12 @@ sub parse_xml_declaration ($$$%) {
     
     my $q = {};
     $q->{ExpandedURI q<xml-declaration-version>} = $xmlver;
+    $xmlver ||= '1.0';
+    if ($type eq 'xml') {
+      $self->{ExpandedURI q<xml-version>} = $xmlver eq '1.0' ? '1.0' : '1.1';
+    } else {
+      $self->{ExpandedURI q<xml-version>} ||= $xmlver eq '1.0' ? '1.0' : '1.1';
+    }
     $q->{ExpandedURI q<xml-declaration-encoding>} = $encoding;
     $q->{ExpandedURI q<xml-declaration-standalone>} = $standalone;
     $q->{ExpandedURI q<xml-declaration-type>} = $type;
@@ -3593,77 +3651,321 @@ sub report ($@) {
   shift->{error}->report (@_);
 }
 
+=head1 EVENT METHODS
+
+When parser finds some structure in parsing entity,
+it reports what it sees as "call back" event.
+Derived modules are able to receive these message by
+implementing event handler methods listed below.
+
+All event methods will receive five common arguments:
+C<$self>, C<$src>, C<$p>, C<$pp>, C<%opt>.
+
+=over 4
+
+=item $self
+
+Parser object itself, as general manner of Perl object.
+
+=item $p
+
+Hash reference.  This hash has information for "parent" construct,
+for example parent element information for C<element_content> method.
+
+=item $pp
+
+Hash reference.  This hash provides information for "this"
+constructs - about that element if C<element_end>.
+
+In general, not all of information that construct should have
+might be available at stage of C<*_start> or C<*_content> methods,
+since that is not processed.  It is expected to be available from
+C<*_end> method.
+
+In addition, some required information will not available
+if fatal error detected but recovered from it so that
+process it continued.
+
+=item %opt
+
+Options.  Some options are specified by parser and somes are came
+from outside.
+
+=back
+
+Available event methods are:
+
+=over 4
+
+=item document_start, xml_declaration, document_content, document_end
+
+Document entity is processed.
+
+Method C<xml_declaration> is called when document has the XML declaration.
+
+Method C<document_content> is called when document has C<s> or
+(illegally) some character data as direct child (not part of some
+element).
+
+=back
+
+=cut
+
 sub document_start ($$$$%) {}
 sub xml_declaration ($$$$%) {}
 sub document_content ($$$$%) {}
 sub document_end ($$$$%) {}
 
+=item external_parsed_entity_start, external_parsed_entity_content, external_parsed_entity_end
+
+Called when external parsed entity (except document entity) is processed.
+Method C<xml_declaration> is also called just after 
+C<external_parsed_entity_start> in case that entity has a text declaration.
+
+Method C<external_parsed_entity_content> is called once
+with entity content as is.
+
+=cut
+
+sub external_parsed_entity_start ($$$$%) {}
+sub external_parsed_entity_content ($$$$%) {}
+sub external_parsed_entity_end ($$$$%) {}
+
+=item element_start, element_content, element_end
+
+Element occurs.
+
+Method C<element_content> is called when element has
+terminal text node (or might be C<s> separator node, if content model
+is element content; directly or indirectly, as long as not
+part of child element).
+
+=cut
+
 sub element_start ($$$$%) {}
 sub element_content ($$$$%) {}
 sub element_end ($$$$%) {}
 
+=item start_tag_start, start_tag_end
+
+Start tag occurs.
+
+=cut
+
 sub start_tag_start ($$$$%) {}
 sub start_tag_end ($$$$%) {}
+
+=item end_tag_start, end_tag_end
+
+End tag occurs.  These methods called even if empty element tag
+syntax is used.
+
+=cut
 
 sub end_tag_start ($$$$%) {}
 sub end_tag_end ($$$$%) {}
 
+=item attribute_specifications_start, attribute_specifications_end
+
+Attribute specifications occurs.
+
+Note that if you use method C<parse_attribute_value_specifications>
+to parse pseudo-attribute style processing instructions,
+these methods will be called even C<start_tag_start> is not called before.
+
+=cut
+
 sub attribute_specifications_start ($$$$%) {}
 sub attribute_specifications_end ($$$$%) {}
 
+=item attribute_specification_start, attribute_specification_end
+
+Attribute specification occurs.
+
+=cut
+
 sub attribute_specification_start ($$$$%) {}
 sub attribute_specification_end ($$$$%) {}
+
+=item attribute_value_specification_start, attribute_value_specification_content, attribute_value_specification_end
+
+Attribute value specification.
+
+Method C<attribute_value_specification_content> is called
+when terminal character data occurs in attribute value specification.
+
+Note that these methods will be called (1) in start tag
+or (2) in attribute definition list declaration.
+
+=cut
 
 sub attribute_value_specification_start ($$$$%) {}
 sub attribute_value_specification_content ($$$$%) {}
 sub attribute_value_specification_end ($$$$%) {}
 
+=item doctype_declaration_start, doctype_declaration_end
+
+Document type declaration.
+
+=cut
+
 sub doctype_declaration_start ($$$$%) {}
 sub doctype_declaration_end ($$$$%) {}
+
+=item doctype_subset_start, doctype_subset_content, doctype_subset_end
+
+Either document type declaration internal subset, 
+document type declaration external subset or
+external parameter entity referred within C<DeclSep> part of
+document type declaration subset is processed.
+
+Method C<doctype_subset_content> is called when
+C<S> or (illegall) unparsable character data occurs.
+
+=cut
+
+sub doctype_subset_start ($$$$%) {}
+sub doctype_subset_content ($$$$%) {}
+sub doctype_subset_end ($$$$%) {}
+
+=item entity_declaration_start, literal_entity_value_content, entity_declaration_end
+
+Entity declaration.
+
+Method C<literal_entity_value_content> is called if entity declaration
+has parameter literal that defines internal entity.
+
+=cut
 
 sub entity_declaration_start ($$$$%) {}
 sub entity_declaration_end ($$$$%) {}
 sub literal_entity_value_content ($$$$%) {}
 
+=item element_declaration_start, element_declaration_end
+
+Element type declaration.
+
+=cut
+
 sub element_declaration_start ($$$$%) {}
 sub element_declaration_end ($$$$%) {}
 
+=item attlist_declaration_start, attribute_definition, attlist_declaration_end
+
+Attribute definition list declaration.
+
+Method C<attribute_definition> is called with each attribute definition.
+
+=cut
+
 sub attlist_declaration_start ($$$$%) {}
-sub attlist_declaration_content ($$$$%) {}
+sub attribute_definition ($$$$%) {}
 sub attlist_declaration_end ($$$$%) {}
+
+=item notation_declaration_start, notation_declaration_end
+
+Notation declaration.
+
+=cut
 
 sub notation_declaration_start ($$$$%) {}
 sub notation_declaration_end ($$$$%) {}
+
+=item markup_declaration_parameters_start, markup_declaration_parameter, markup_declaration_parameters_end
+
+Parameters part of markup declarations.
+
+Method C<markup_declaration_parameter> is called
+with each markup declaration parameter, such as keyword or parameter
+literal.
+
+=cut
 
 sub markup_declaration_parameters_start ($$$$%) {}
 sub markup_declaration_parameter ($$$$%) {}
 sub markup_declaration_parameters_end ($$$$%) {}
 
+=item model_group_start, model_group_content, model_group_end
+
+Model group, used to describe element content model.
+
+Method C<model_group_content> is called with each occurence
+of terminal token (i.e element type name).
+
+=cut
+
 sub model_group_start ($$$$%) {}
 sub model_group_content ($$$$%) {}
 sub model_group_end ($$$$%) {}
+
+=item attrtype_group_start, attrtype_group_content, attrtype_group_end
+
+Group for enumeration types, used in attribute definition.
+
+Method C<attrtype_group_content> is called with each
+NMTOKEN in group.
+
+=cut
 
 sub attrtype_group_start ($$$$%) {}
 sub attrtype_group_content ($$$$%) {}
 sub attrtype_group_end ($$$$%) {}
 
+=item public_identifier_start, system_identifier_start
+
+Called when public identifier or system identifier
+specified in markup declaration.
+
+=cut
+
 sub public_identifier_start ($$$$%) {}
 sub system_identifier_start ($$$$%) {}
+
+=item parameter_literal_start, parameter_literal_end
+
+Parameter literal.
+
+=cut
+
+sub parameter_literal_start ($$$$%) {}
+sub parameter_literal_end ($$$$%) {}
+
+=item rpdata_start, rpdata_content, rpdata_end
+
+Replaceable parameter data (i.e content of parameter literal).
+
+Method C<rpdata_content> is called with terminal character data.
+
+Remember that methods C<parameter_literal_start> and
+C<parameter_literal_end> are called only onces for a parameter
+literal, while C<rpdata_start> and C<rpdata_end> are also called
+with each expansion of parameter entity references in parameter
+literal.
+
+=cut
 
 sub rpdata_start ($$$$%) {}
 sub rpdata_content ($$$$%) {}
 sub rpdata_end ($$$$%) {}
 
-sub parameter_literal_start ($$$$%) {}
-sub parameter_literal_content ($$$$%) {}
-sub parameter_literal_end ($$$$%) {}
+=item marked_section_start, marked_section_end
 
-sub doctype_subset_start ($$$$%) {}
-sub doctype_subset_s ($$$$%) {}
-sub doctype_subset_end ($$$$%) {}
+Marked section.
 
-sub comment_declaration_start ($$$$%) {}
-sub comment_declaration_end ($$$$%) {}
+=item marked_section_status
+
+Marked section status keyword.  This method is called only once
+if input is well-formed XML document.
+
+=item marked_section_content_start, marked_section_content_end
+
+Content of marked section.
+
+=item ignored_section_content
+
+Content of ignored marked section.
+
+=cut
 
 sub marked_section_start ($$$$%) {}
 sub marked_section_status ($$$$%) {}
@@ -3672,43 +3974,136 @@ sub ignored_section_content ($$$$%) {}
 sub marked_section_content_end ($$$$%) {}
 sub marked_section_end ($$$$%) {}
 
+=item comment_declaration_start, comment_declaration_end
+
+Comment declaration.
+
+=cut
+
+sub comment_declaration_start ($$$$%) {}
+sub comment_declaration_end ($$$$%) {}
+
+=item comment_start, comment_content, comment_end
+
+Comment.  These methods are called only once in comment
+declaration if input is well-formed XML document.
+
+=cut
+
 sub comment_start ($$$$%) {}
 sub comment_content ($$$$%) {}
 sub comment_end ($$$$%) {}
 
+=item processing_instruction_start, processing_instruction_content, processing_instruction_end
+
+Processing instruction.
+
+Note that XML declaration and text declaration are not processing
+instruction in XML sense and these methods are not called.
+
+=cut
+
 sub processing_instruction_start ($$$$%) {}
 sub processing_instruction_content ($$$$%) {}
 sub processing_instruction_end ($$$$%) {}
+
+=item numeric_character_reference_in_attribute_value_literal_start, numeric_character_reference_in_content_start, numeric_character_reference_in_rpdata_start
+
+Numeric character reference.
+
+=cut
 
 sub numeric_character_reference_in_attribute_value_literal_start
     ($$$$%) {}
 sub numeric_character_reference_in_content_start ($$$$%) {}
 sub numeric_character_reference_in_rpdata_start ($$$$%) {}
 
+=item hex_character_reference_in_attribute_value_literal_start, hex_character_reference_in_content_start, hex_character_reference_in_rpdata_start
+
+Hexdecimal character reference.
+
+=cut
+
 sub hex_character_reference_in_attribute_value_literal_start
     ($$$$%) {}
 sub hex_character_reference_in_content_start ($$$$%) {}
 sub hex_character_reference_in_rpdata_start ($$$$%) {}
+
+=pod
+
+NOTE: Methods C<ncr_in_attribute_value_literal_start>
+C<hcr_in_attribute_value_literal_start>
+are required to check C<normalize-attr-val> option
+to normalize attribute value as specified by XML.
+That is: when these method received U+0009, U+000A or
+U+000D as referred character code, and Q<normalize-attr-val>
+option turned on, it MUST be treated as U+0020
+in case I<character reference belongs to some parsed entity>.
+(Character reference directly belong to attribute value literal
+is not concern to this normalization.)
+
+=item general_entity_reference_in_attribute_value_literal_start, general_entity_reference_in_attribute_value_literal_end
+
+General entity reference in attribute value literal.
+
+=cut
 
 sub general_entity_reference_in_attribute_value_literal_start
     ($$$$%) {}
 sub general_entity_reference_in_attribute_value_literal_end
     ($$$$%) {}
 
+=item general_entity_reference_in_content_start, general_entity_reference_in_content_end
+
+General entity reference in content (between start-tag and end-tag).
+
+=cut
+
 sub general_entity_reference_in_content_start ($$$$%) {}
 sub general_entity_reference_in_content_end ($$$$%) {}
+
+=item general_entity_reference_in_rpdata_start, general_entity_reference_in_rpdata_end
+
+General entity reference in parameter literal.
+
+NOTE: General entity reference in parameter literal is syntatically 
+checked but not processed yet in XML.
+
+=cut
 
 sub general_entity_reference_in_rpdata_start ($$$$%) {}
 sub general_entity_reference_in_rpdata_end ($$$$%) {}
 
-sub parameter_entity_reference_in_rpdata_start ($$$$%) {}
-sub parameter_entity_reference_in_rpdata_end ($$$$%) {}
+=item parameter_entity_reference_in_subset_start, parameter_entity_reference_in_subset_end
+
+Parameter entity reference in document type declaration subset
+(out of markup declarations).
+
+=cut
+
+sub parameter_entity_reference_in_subset_start ($$$$%) {}
+sub parameter_entity_reference_in_subset_end ($$$$%) {}
+
+=item parameter_entity_reference_in_parameter_start, parameter_entity_reference_in_parameter_end
+
+Parameter entity reference in markup declaration
+(out of parameter literal).
+
+=cut
 
 sub parameter_entity_reference_in_parameter_start ($$$$%) {}
 sub parameter_entity_reference_in_parameter_end ($$$$%) {}
 
-sub parameter_entity_reference_in_subset_start ($$$$%) {}
-sub parameter_entity_reference_in_subset_end ($$$$%) {}
+=item parameter_entity_reference_in_rpdata_start, parameter_entity_reference_in_rpdata_end
+
+Parameter entity reference in parameter literal.
+
+=cut
+
+sub parameter_entity_reference_in_rpdata_start ($$$$%) {}
+sub parameter_entity_reference_in_rpdata_end ($$$$%) {}
+
+=back
 
 =head1 LICENSE
 
@@ -3719,4 +4114,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/06/06 07:03:54 $
+1; # $Date: 2004/06/21 06:31:04 $

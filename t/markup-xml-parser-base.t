@@ -2894,6 +2894,142 @@ comment -->
   method => 'parse_doctype_subset',
   result => 1,
  },
+
+ {
+  t => qq{<ee>aa</ee>},
+  method => 'parse_element',
+  result => 1,
+ },
+ {
+  t => qq{<ee\x{4E00}>U+4E00</ee\x{4E00}>},
+  method => 'parse_element',
+  result => 1,
+ },
+ {
+  t => qq{<ee\x{4DFF}>U+4DFF</ee\x{4DFF}>},
+  method => 'parse_element',
+  result => '0:3:SYNTAX_STAGC_OR_NESTC_REQUIRED',
+ },
+ {
+  t => qq{<?xml version="1.1"?>
+          <ee\x{4DFF}>U+4DFF</ee\x{4DFF}>},
+  method => 'parse_document_entity',
+  result => 1,
+ },
+ {
+  t => qq{<?xml version="1.0"?>
+          <ee>AA\x{4DFF}</ee>},
+  method => 'parse_document_entity',
+  result => 1,
+ },
+ {
+  t => qq{<?xml version="1.1"?>
+          <ee>AA\x{4DFF}</ee>},
+  method => 'parse_document_entity',
+  result => 1,
+ },
+ {
+  t => qq{<?xml version="1.0"?>
+          <ee \x{4DFF}="a">AA</ee>},
+  method => 'parse_document_entity',
+  result => '1:14:SYNTAX_STAGC_OR_NESTC_REQUIRED',
+ },
+ {
+  t => qq{<?xml version="1.1"?>
+          <ee \x{4DFF}="a">AA</ee>},
+  method => 'parse_document_entity',
+  result => 1,
+ }, 
+ {
+  t => qq{<?xml version="1.0"?>
+          <ee a\x{4DFF}="a">AA</ee>},
+  method => 'parse_document_entity',
+  result => '1:15:SYNTAX_VI_REQUIRED',
+ },
+ {
+  t => qq{<?xml version="1.1"?>
+          <ee a\x{4DFF}="a">AA</ee>},
+  method => 'parse_document_entity',
+  result => 1,
+ },
+ {
+  t => qq{<?xml version="1.0"?>
+          <ee \x{4DFF}a="a">AA</ee>},
+  method => 'parse_document_entity',
+  result => '1:14:SYNTAX_STAGC_OR_NESTC_REQUIRED',
+ },
+ {
+  t => qq{<?xml version="1.1"?>
+          <ee \x{4DFF}a="a">AA</ee>},
+  method => 'parse_document_entity',
+  result => 1,
+ },
+ {
+  t => qq{<?xml version="1.0"?>
+          <!DOCTYPE \x{4DFF}a [
+            <!ELEMENT \x{4DFF}a EMPTY>
+          ]>
+          <\x{4DFF}a/>},
+  method => 'parse_document_entity',
+  result => '1:20:SYNTAX_DOCTYPE_NAME_REQUIRED',
+ },
+ {
+  t => qq{<?xml version="1.1"?>
+          <!DOCTYPE \x{4DFF}a [
+            <!ELEMENT \x{4DFF}a EMPTY>
+          ]>
+          <\x{4DFF}a/>},
+  method => 'parse_document_entity',
+  result => 1,
+ },
+ {
+  t => qq{<?xml version="1.0"?>
+          <!DOCTYPE \x{4EFF}a [
+            <!ELEMENT \x{4EFF}a (\x{4DFF}a)>
+          ]>
+          <\x{4EFF}a/>},
+  method => 'parse_document_entity',
+  result => '2:26:SYNTAX_MODEL_GROUP_ITEM_REQUIRED',
+ },
+
+ {
+  t => qq{<?xml version="1.0" encoding="utf-8"?>
+          <!DOCTYPE \x{4EFF}a [
+            <!ELEMENT \x{4EFF}a (\x{4DFF}a)>
+          ]>
+          <\x{4EFF}a/>},
+  method => 'parse_external_parsed_entity',
+  result => 1,
+ },
+ {
+  t => qq{<?xml version="1.1" encoding="utf-8"?>
+          <!DOCTYPE \x{4EFF}a [
+            <!ELEMENT \x{4EFF}a (\x{4DFF}a)>
+          ]><!--
+          <\x{4EFF}a/>},
+  method => 'parse_external_parsed_entity',
+  result => 1,
+ },
+ {
+  t => qq{<?xml version="1.1"?>
+          <!DOCTYPE \x{4EFF}a [
+            <!ELEMENT \x{4EFF}a (\x{4DFF}a)>
+          ]><!--
+          <\x{4EFF}a/>},
+  method => 'parse_external_parsed_entity',
+  result => '0:19:SYNTAX_XML_ENCODING_REQUIRED',
+ },
+
+ {
+  t => q{<e a="b" a="c"/>},
+  method => 'parse_element',
+  result => '0:9:WFC_UNIQUE_ATT_SPEC',
+ },
+ {
+  t => q{<e ba="b" ba="c"/>},
+  method => 'parse_element',
+  result => '0:10:WFC_UNIQUE_ATT_SPEC',
+ },
 );
 
 plan tests => scalar @a;
