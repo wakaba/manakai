@@ -1,0 +1,4121 @@
+Namespace:
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @TreeCore:\
+Module:
+  @Name:  HTML
+  @Namespace:
+     :: TBD ::
+  @BindingName:
+     @@@:  html
+     @@Type:
+        lang:IDL-DOM
+     @@prefix:  dom.w3c.org
+     @@Condition:DOM1
+  @BindingName:
+     @@@:  html2
+     @@Type:
+        lang:IDL-DOM
+     @@prefix:  dom.w3c.org
+     @@Condition:DOM2
+  @FullName:
+    @@lang:en
+    @@@: DOM HTML Module
+  @Description:
+    @@lang:en
+    @@@:
+      The DOM HTML Module provides objects and methods specific 
+      to HTML 4 documents and XHTML 1.0 documents. THe HTML 
+      DOM exposes a number of convinience methods and attributes 
+      that are more appropriate to script writers.  These 
+      enhancements rely on transitional or frameset DTDs 
+      of HTML 4.0 <SRC:DOM Level 1 HTML> or HTML 4.01 
+      <SRC:DOM Level 2 HTML> and XHTML 1.0 <SRC:DOM Level 2 HTML>.
+
+  @Author:
+     @@FullName: Wakaba
+     @@Mail:  w@suika.fam.cx
+  @License:
+     license:Perl+MPL
+  @Date.RCS:
+     $Date: 2004/10/17 12:48:49 $
+
+  @ConditionDef:
+    @@Name:DOM1
+  @ConditionDef:
+    @@Name:DOM2
+    @@ISA:DOM1
+  @NormalCondition:DOM2
+  
+  @Feature:
+    @@Name:HTML
+    @@Version:1.0
+    @@FullName: DOM Level 1 HTML
+    @@Condition:DOM1
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The DOM Level 2 HTML Specification does not say DOM Level 2 
+        HTML implementations to answer to <M:hasFeature> of 
+        <FeatureVer:1.0> as <DOM:true>.
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The DOM implementation must support 
+        <Module:DOMCore> Module.
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM1
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM2
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM3
+  @Feature:
+    @@Name:HTML
+    @@Version:2.0
+    @@FullName: DOM Level 2 HTML
+    @@Condition:DOM2
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The DOM implementation must support 
+        <Feature:Core>/<FeatureVer:2.0>.
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM2
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM3
+  @Feature:
+    @@Name:XHTML
+    @@Version:2.0
+    @@FullName: DOM Level 2 HTML (with XHTML support)
+    @@Condition:DOM2
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        Equal to <Feature:XML>/<FeatureVer:2.0> and  
+        <Feature:HTML>/<FeatureVer:2.0>.
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM2
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM3
+
+  @Require:
+     @@Module:
+        @@@Name:  DOMCore
+        @@@FileName:
+           @@@@@:  dom.idl
+           @@@@For:
+              lang:IDL-DOM
+        @@@Namespace:
+          http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+
+DataTypeAlias:
+  @Name:  DOMString
+  @Type:
+     DOMCore:DOMString
+DataTypeAlias:
+  @Name:  Node
+  @Type:
+     DOMCore:Node
+DataTypeAlias:
+  @Name:  Document
+  @Type:
+     DOMCore:Document
+DataTypeAlias:
+  @Name:  NodeList
+  @Type:
+     DOMCore:NodeList
+DataTypeAlias:
+  @Name:  Element
+  @Type:
+     DOMCore:Element
+
+ImplNote:
+  @lang:en
+  @@:
+    The DOM Level 2 HTML Specification does not intend to define 
+    exactly how a UA will respond to a change to any 
+    attribute on an element that directly or indirectly refers 
+    external data, such elements are <IF:HTMLAppletElement>, 
+    <IF:HTMLFrameElement>, <IF:HTMLFrameSetElement>, 
+    <IF:HTMLIFrameElement>, <IF:HTMLImageElement>, <IF:HTMLLinkElement>, 
+    <IF:HTMLObjectElement>, <IF:HTMLParamElement> and
+    <IF:HTMLScriptElement>.
+
+IF:
+  @Name:  HTMLCollection
+  @Description:
+    @@lang:en
+    @@@:
+      A list of nodes.  An individual node may be accessed 
+      by either ordinal index or the <HA:name> or <HA:id> 
+      of the node.
+      \
+      <IF:HTMLCollection> objects are <EM:live>; they are 
+      automatically updated when the underlying document 
+      is changed.
+
+  @IsFinal:-1
+  @IsAbstract:1
+
+  @Attr:
+     @@Name:  length
+     @@Description:
+       @@@lang:en
+       @@@@: The length of the list.
+     @@IsAbstract:1
+     @@Get:
+        @@@Type:
+           DOMMain:unsigned-long
+  @Method:
+     @@Name:  item
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Retrieve a node specified by ordinal index. 
+     @@Param:
+        @@@Name:  index
+        @@@Type:
+           DOMMain:unsigned-long
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The index of the node to retrieve, in the document order. 
+            The index origin is <DOM:0>.
+     @@Return:
+        @@@Type:  Node
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The <P:index>th node.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The <P:index> is out of range.
+    @@IsAbstract:1
+  @Method:
+     @@Name:  namedItem
+     @@Description:
+       @@@lang:en
+       @@@@:
+          Retrieve a node using a name.  
+       \
+          With HTML 4 documents, 
+          it first searches for an <IF:Element> with a matching 
+          <HA:name> attribute and if it does not find one, 
+          it searches for an <IF:Element> (that is allowed to specify a 
+          <HA:name> attribute) with a matching <HA:name> attribute. 
+          The matching is case-insensitive.
+       \
+          With XHTML 1.0 documents, it only searches for 
+          an <IF:Element> with a matching <HA:id> attribute. 
+          The matching is case-sensitive.
+     @@IsAbstract:1
+     @@Param:
+        @@@Name:  name
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The name of the <IF:Node> to retrieve.
+     @@Return:
+        @@@Type:  Node
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The <IF:Node> with a <HA:name> or <HA:id> whose 
+            value matches with <P:name>.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              There is no node with such a <P:name>.
+
+
+IF:
+  @Name:  HTMLOptionsCollection
+  @Description:
+    @@lang:en
+    @@@:
+      A list of nodes representing HTML <HE:option> elements.  
+      An individual node may be accessed by either ordinal index 
+      or the <HA:name> or <HA:id> of the node.
+      \
+      <IF:HTMLOptionCollection> objects are <EM:live>; they are 
+      automatically updated when the underlying document 
+      is changed.
+      
+  @Level[list]:  2
+  @SpecLevel[list]:  2
+  @Attr:
+     @@Name:  length
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The length of the list.
+     @@Get:
+        @@@Type:
+           DOMMain:unsigned-long
+     @@Set:
+        @@@Type:
+           DOMMain:unsigned-long
+        @@@Exception:
+           @@@@Name:  NOT_SUPPORTED_ERR
+           @@@@Type:
+              DOMCore:DOMException
+           @@@@SubType:
+             @@@@@QName:
+               ManakaiDOMHTML:MDOMHTML_IMPL_NOSUPPORT_SET_OPTION_LENGTH
+             @@@@@Description:
+               @@@@@@lang:en
+               @@@@@@@:
+                 Setting the length is not allowed by the DOM 
+                 implementation.
+  @Method:
+     @@Name:  item
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Retrieve a node specified by ordinal index.
+     @@Param:
+        @@@Name:  index
+        @@@Type:
+           DOMMain:unsigned-long
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            Ordinal index of the node to retrieve, in the 
+            document order.  The index origin is <DOM:0>.
+     @@Return:
+        @@@Type:  Node
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The <P:index>th node.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The <P:index> is out of range.
+  @Method:
+     @@Name:  namedItem
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Retrieve a node using a name. 
+       \
+         It first searches for a <IF:Node> with a matching <HA:id> 
+         attributes.  If it does not find one, it searches for a 
+         <IF:Node> (that are allowed to specify a <HA:name> attribute).
+         with a matching <HA:name> attribute.
+     @@Param:
+        @@@Name:  name
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The name of the node to retrieve.  The matching is 
+            case-insensitive in HTML documents and case-sensitve 
+            in XHTML documents.
+     @@Return:
+        @@@Type:  Node
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The <IF:Node> with a <HA:name> or <HA:id> whose 
+            value matches with <P:name>.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              There is no node with such a <P:name>.
+##IF:HTMLOptionCollection
+
+IF:
+  @Name:  HTMLDocument
+  @Description:
+    @@lang:en
+    @@@:
+      The root of the HTML document and holds the entire content. 
+
+  @ISA:  Document
+  @Role:
+    @@@:
+      DOMCore:Document
+    @@compat:
+      ManakaiDOMCore:Document
+    @@root-element:
+      xhtml:html
+    @@root-element:
+      null:html
+    @@doctype-public:
+      -//W3C//DTD HTML 4.0//EN
+    @@doctype-public:
+      -//W3C//DTD HTML 4.0 Transitional//EN
+    @@doctype-public:
+      -//W3C//DTD HTML 4.0 Frameset//EN
+    @@doctype-public:
+      -//W3C//DTD HTML 4.01//EN
+    @@doctype-public:
+      -//W3C//DTD HTML 4.01 Transitional//EN
+    @@doctype-public:
+      -//W3C//DTD HTML 4.01 Frameset//EN
+    @@doctype-public:
+      -//W3C//DTD XHTML 1.0 Strict//EN
+    @@doctype-public:
+      -//W3C//DTD XHTML 1.0 Transitional//EN
+    @@doctype-public:
+      -//W3C//DTD XHTML 1.0 Frameset//EN
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        TODO: doctype-system required
+
+  @Attr:
+     @@Name:  title
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The title of a document, as specified by the <HE:tile> element.
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  referrer
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The page that linked to this page.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The RFC 2396 URI of the page.
+        @@@InCase:
+          @@@@Value:\
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The user navigated to the page directly (not through a 
+              link, but for example via bookmark).
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            @@@@@@:
+              DOMHTML:referrer
+            @@@@@uri-format:RFC 2396
+  @Attr:
+     @@Name:  domain
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The domain name of the server that served the document.
+     @@Get:
+        @@@Type:  DOMString
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The server cannot be identified by a domain name.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            ISSUE: What is allowed? FQDNs? Non-FQ domain names? 
+            IPv4 addresses? IPv6 addresses with or without 
+            brackets?
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            $r = null;
+            if (defined $self->{<Q:TreeCore:node>}
+                             ->{<Q:DOMCore:documentURI>}) {
+              require URI;
+              my $uri = URI->new ($self->{<Q:TreeCore:node>}
+                                       ->{<Q:DOMCore:documentURI>});
+              if ($uri->can ('host')) {
+                $r = $uri->host;
+                undef $r if defined $r and
+                            (length $r == 0 or
+                             substr ($r, 0, 1) eq '[');
+              }
+            }
+  @Attr:
+     @@Name:  URL
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The absolute URI <SRC:RFC 2396> of the document.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            @@@@@@:
+              DOMCore:documentURI
+            @@@@@uri-format:RFC 2396
+  @Attr:
+     @@Name:  body
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The element that contains the content for the document. 
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         ISSUE: Is returning <HA:frameset> is DOM Level 0 compatible?
+     @@Get:
+        @@@Type:  HTMLElement
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The <HA:body> element or the outermost <HA:frameset> element.
+     @@Set:
+        @@@Type:  HTMLElement
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            ISSUE: Why this attribute is writable?  No exception?
+  @Attr:
+     @@Name:  images
+     @@Description:
+       @@@lang:en
+       @@@@:
+         A collection of all the <HA:img> elements in a document.
+       \
+         {NOTE:: Only <HA:img> elements are contained for 
+                 backward compatibility.
+       \
+         }
+     @@Get:
+        @@@Type:  HTMLCollection
+  @Attr:
+     @@Name:  applets
+     @@Description:
+       @@@lang:en
+       @@@@:
+         A collection of all <HA:object> elements that include 
+         applets and <HA:applet> elements in the document.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         There might be compatibility problems, since 
+         the two element types has different attribute sets. 
+         Old (DOM Level 0) applications might not take 
+         <HA:object> elements into consideration.
+     @@Get:
+        @@@Type:  HTMLCollection
+  @Attr:
+     @@Name:  links
+     @@Description:
+       @@@lang:en
+       @@@@:
+         A collection of all <HA:a> and <HA:area> elements 
+         in a document with a value for the <HA:href> attribute.
+     @@Get:
+        @@@Type:  HTMLCollection
+  @Attr:
+     @@Name:  forms
+     @@Description:
+       @@@lang:en
+       @@@@:
+         A collection of all the forms of a document.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         It should be restricted for HTML <HA:form> elements. 
+         Neither <HA:isindex> elements nor non-HTML form elements 
+         should be contained.
+     @@Get:
+        @@@Type:  HTMLCollection
+  @Attr:
+     @@Name:  anchors
+     @@Description:
+       @@@lang:en
+       @@@@:
+         A collection of all the <HA:a> elements with a value 
+         for the <HA:name> attribute in the document.
+         \
+         {NOTE:: The collection of this attribute only contains 
+                 those anchors with <HA:name> attributes, 
+                 not with the <HA:id> attributes, for backward 
+                 compatibility.  XHTML 1.0 deprecates the use 
+                 of the <HA:name> attribute.
+         \
+         }
+     @@Get:
+        @@@Type:  HTMLCollection
+  @Attr:
+     @@Name:  cookie
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The cookie, persistent state information associated 
+         with the current frame or document <SRC:RFC 2965>.
+         \
+         {NOTE:: The precise nature of a UA session is not 
+                 defined.
+         \
+         }
+     @@Get:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A single string with each cookie's name-value pair 
+            separated by a <CHAR:SEMICOLON>.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            It is maybe RFC 2965 <CODE:cookies>.
+        @@@InCase:
+          @@@@Value:\
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              No cookie is available for the current frame or document.
+     @@Set:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A single name-value pair followed by zero or more 
+            cookie attribute values (RFC 2965 <CODE:cookie>). 
+            \
+            If no <CODE:domain> attribute is specified, 
+            it defaults to the <CODE:host> portion of an 
+            RFC 2396 absolute URI of the current frame or document.
+            \
+            If no <CODE:path> attribute is specified, it defaults 
+            to the absolute <CODE:path> portion of an 
+            RFC 2396 absolute URI of the current frame or document.
+            \
+            If no <CODE:max-age> attribute is specified, it 
+            defaults to a UA defined value.
+            \
+            If a <CODE:cookie> with the specified name is already 
+            associated, the new value as well as the new attributes 
+            replace the old ones.  If the <CODE:max-age> attribute 
+            value is <CODE:0>, any existing cookies of the specified 
+            name are removed.
+        @@@Exception:
+           @@@@Name:  SYNTAX_ERR
+           @@@@Type:
+              DOMCore:DOMException
+           @@@@SubType:
+             @@@@@QName:
+               ManakaiDOMHTML:MDOMHTML_BAD_COOKIE
+             @@@@@Description:
+               @@@@@@lang:en
+               @@@@@@@:
+                 The new value does not adhere to the 
+                 RFC 2965 <CODE:cookie>.
+  @Method:
+     @@Name:  open
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Open a document stream for writing.  If a document 
+         exists in the target, this method clears it.
+     @@Return:  
+  @Method:
+     @@Name:  close
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Close a document stream opened by the <M:open> method 
+         and force rendering.
+     @@Return:  
+  @Method:
+     @@Name:  write
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Write a string to a document stream opened by <M:open>.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         This method might produce a document that is invalid.
+     @@Param:
+        @@@Name:  text
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The string to be parsed into some structure in 
+            the document structure model.
+     @@Return:  
+  @Method:
+     @@Name:  writeln
+     @@Descripton:
+       @@@lang:en
+       @@@@:
+         Write a string followed by a newline character 
+         to a document stream opened by the <M:open> method.
+     @@Param:
+        @@@Name:  text
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The string to be parsed into some structure in 
+            the document structure model.
+     @@Return:  
+  @Method:
+     @@Name:  getElementsByName
+     @@Description:
+       @@@lang:en
+       @@@@:
+         With HTML 4 documents: return a collection of elements 
+         with matching name.
+       \
+         With XHTML 1 documents: return a collection of form controls 
+         with matching name.
+     @@Param:
+        @@@Name:  elementName
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The <HA:name> of the element.  The matching is 
+            case-sensitive.
+     @@Return:
+        @@@Type:  NodeList
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A collection of the element whose <HA:name> matches 
+            with <P:elementName>.
+  @ImplNote:
+    @@lang:en
+    @@@:
+      TODO: <M:HTMLDocument.getElementById> has moved to 
+            <IF:Document> interface.  Some note and 
+            implementation for DOM Level 1 HTML required.
+##IF:HTMLDocument
+
+ImplNote:
+  @lang:en
+  @@:
+    DOM attributes corresponding to HTML attributes have 
+    the semantic (including case-sensitivity) given in 
+    the HTML 4 and XHTML 1.0 specifications.
+    \
+    Exposing HTML attributes is for compatibility with DOM Level 0; 
+    this usage is deprecated by DOM Level 1 and 2 HTML specitications.
+    \
+    {FIG: HTML Data Types and DOM Data Types
+       \
+       - <SGML:CDATA>:: <TYPE:DOMString>.
+                        (Default of default: an empty string)
+       \
+       - Enumerated values:: <TYPE:DOMString>. 
+                             (Normalized to lowercase in HTML. 
+                              Default of default: an empty string)
+       \
+       - Boolean:: <TYPE:boolean>. (Default of default: <DOM:false>.
+       \
+       - <SGML:NUMBER>:: <TYPE:long>. (Default of default: <DOM:0>.)
+       \
+    }
+    \
+    Element type names in HTML 4 documents (exposed through 
+    such as <A:Element.tagName>) are normalized in 
+    uppercase.  No specification for attribute names - it maybe 
+    should be in lowercase for compatibility.
+
+IF:
+  @Name:  HTMLElement
+  @Description:
+    @@lang:en
+    @@@:
+      An HTML element.  All specific HTML element interfaces 
+      are derived from this interface.
+
+  @ISA:  Element
+  @Role:
+    @@@:
+      DOMCore:Element
+    @@compat:
+      ManakaiDOMCore:Element
+    @@html-element-type:sub
+    @@html-element-type:sup
+    @@html-element-type:span
+    @@html-element-type:bdo
+    @@html-element-type:tt
+    @@html-element-type:i
+    @@html-element-type:b
+    @@html-element-type:u
+    @@html-element-type:s
+    @@html-element-type:strike
+    @@html-element-type:big
+    @@html-element-type:small
+    @@html-element-type:em
+    @@html-element-type:strong
+    @@html-element-type:dfn
+    @@html-element-type:code
+    @@html-element-type:samp
+    @@html-element-type:kbd
+    @@html-element-type:var
+    @@html-element-type:cite
+    @@html-element-type:acronym
+    @@html-element-type:abbr
+    @@html-element-type:dd
+    @@html-element-type:dt
+    @@html-element-type:noframes
+    @@html-element-type:noscript
+    @@html-element-type:address
+    @@html-element-type:center
+    @@element-type:
+      xhtml1:*
+
+  @Attr:
+     @@Name:  id
+     @@DocAttr:
+       @@@QName:id
+       @@@ElementType:
+         xhtml1:*
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        Some element in HTML 4/XHTML 1.0 does not have <HA:class> attribute.
+  @Attr:
+     @@Name:  title
+     @@DocAttr:
+       @@@QName:title
+       @@@ElementType:
+         xhtml1:*
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        Some element in HTML 4/XHTML 1.0 does not have <HA:class> attribute.
+  @Attr:
+     @@Name:  lang
+     @@DocAttr:
+       @@@QName:lang
+       @@@ElementType:
+         xhtml1:*
+       @@@DeprecatedBy:
+         DOMHTML:XHTML1.0
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        Some element in HTML 4/XHTML 1.0 does not have <HA:class> attribute.
+  @Attr:
+     @@Name:  dir
+     @@DocAttr:
+       @@@ElementType:
+         xhtml1:*
+       @@@QName:dir
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        Some element in HTML 4/XHTML 1.0 does not have <HA:class> attribute.
+  @Attr:
+     @@Name:  className
+     @@DocAttr:
+       @@@ElementType:
+         xhtml1:*
+       @@@QName:class
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        Some element in HTML 4/XHTML 1.0 does not have <HA:class> attribute.
+##IF:HTMLElement
+
+IF:
+  @Name:  HTMLHtmlElement
+
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:html
+
+  @Attr:
+     @@Name:  version
+     @@DocAttr:
+       @@@QName:version
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+
+IF:
+  @Name:  HTMLHeadElement
+
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:head
+
+  @Attr:
+     @@Name:  profile
+     @@DocAttr:
+       @@@QName:profile
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+
+IF:
+  @Name:  HTMLLinkElement
+
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:link
+
+  @Attr:
+     @@Name:  disabled
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Whether the link is enabled or not.  This is currently 
+         only used for style sheet links and may be used to 
+         activate or deactivate the style sheet.
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The link is disabled.
+        @@@InCase:
+           @@@@Value:  false
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The link is enabled.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMHTML:disabled
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The link is disabled.
+        @@@InCase:
+           @@@@Value:  false
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The link is enabled.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@SetProp:
+            DOMHTML:disabled
+  @Attr:
+     @@Name:  charset
+     @@DocAttr:
+       @@@QName:charset
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  href
+     @@DocAttr:
+       @@@QName:href
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  hreflang
+     @@DocAttr:
+       @@@QName:hreflang
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  media
+     @@DocAttr:
+       @@@QName:media
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  rel
+     @@DocAttr:
+       @@@QName:rel
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  rev
+     @@DocAttr:
+       @@@QName:rev
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  target
+     @@DocAttr:
+       @@@QName:target
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  type
+     @@DocAttr:
+       @@@QName:type
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+##IF:HTMLLinkElement
+
+IF:
+  @Name:  HTMLTitleElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:title
+  @Attr:
+     @@Name:  text
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The title.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            __SUPER{
+              $r = $self->{<Q:TreeCore:node>}
+                    ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{textContent}__;
+            }__;
+     @@Set:
+        @@@Type:  DOMString
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            __SUPER{  ## Latest version
+              $self->__SUPER{Element::}__::__INT{textContent}__ ($given);
+            }__;
+##IF:HTMLTitleElement
+
+IF:
+  @Name:  HTMLMetaElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:meta
+  @Attr:
+     @@Name:  content
+     @@DocAttr:
+       @@@QName:content
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  httpEquiv
+     @@DocAttr:
+       @@@QName:http-equiv
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  name
+     @@DocAttr:
+       @@@QName:name
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  scheme
+     @@DocAttr:
+       @@@QName:scheme
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+
+IF:
+  @Name:  HTMLBaseElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:base
+  @Attr:
+     @@Name:  href
+     @@DocAttr:
+       @@@QName:href
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  target
+     @@DocAttr:
+       @@@QName:target
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+
+IF:
+  @Name:  HTMLIsIndexElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:isindex
+  @Attr:
+     @@Name:  form
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The <HE:form> element containing this element.
+         \
+         {NOTE:: Although DOM has this attribute, the <HE:isindex> 
+                 is independent from any <HE:form> by definition.
+         \
+         }
+     @@Get:
+        @@@Type:  HTMLFormElement
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This element is not within the context of a form.
+  @Attr:
+     @@Name:  prompt
+     @@DocAttr:
+       @@@Name:prompt
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+
+IF:
+  @Name:  HTMLStyleElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:style
+  @Attr:
+     @@Name:  disabled
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Whether the style sheet is enabled or not.
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:The style sheet is disabled.
+        @@@InCase:
+           @@@@Value:  false
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:The style sheet is enabled.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMHTML:disabled
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:The style sheet is disabled.
+        @@@InCase:
+           @@@@Value:  false
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:The style sheet is enabled.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@SetProp:
+            DOMHTML:disabled
+  @Attr:
+     @@Name:  media
+     @@DocAttr:
+       @@@Name:media
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  type
+     @@DocAttr:
+       @@@Name:type
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+
+IF:
+  @Name:  HTMLBodyElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:body
+  @Attr:
+     @@Name:  aLink
+     @@DocAttr:
+       @@@Name:alink
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  background
+     @@DocAttr:
+       @@@Name:background
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  bgColor
+     @@DocAttr:
+       @@@Name:bgcolor
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  link
+     @@DocAttr:
+       @@@Name:link
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  text
+     @@DocAttr:
+       @@@Name:text
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  vLink
+     @@DocAttr:
+       @@@Name:vlink
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+##IF:HTMLBody
+
+IF:
+  @Name:  HTMLFormElement
+  @Description:
+    @@lang:en
+    @@@:
+      This interface encompasses behavior similar to a collection 
+      and an element.  It provides direct access to the contained 
+      form controls as well as attributes of the form element.
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:form
+  @Attr:
+     @@Name:  elements
+     @@Description:
+       @@@lang:en
+       @@@@:
+         A collection of all form controls in this form.
+     @@Get:
+        @@@Type:  HTMLCollection
+  @Attr:
+     @@Name:  length
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The number of form controls in this form.
+     @@Get:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  name
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The name of the form.
+         \
+         {NOTE:: The DOM HTML Specifications does not mention 
+                 to the HTML 4.01 <HA:name> attribute, which is 
+                 added for backward compatibility with DOM Level 0.
+         \
+         }
+     @@DocAttr:
+       @@@Name:name
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  acceptCharset
+     @@DocAttr:
+       @@@Name:accept-charset
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  action
+     @@DocAttr:
+       @@@Name:action
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  enctype
+     @@DocAttr:
+       @@@Name:enctype
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  method
+     @@DocAttr:
+       @@@Name:method
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  target
+     @@DocAttr:
+       @@@Name:targeet
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Method:
+     @@Name:  submit
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Submit the form, as the activation of submit buttons do.
+         \
+         {NOTE:: The <HA:onsubmit> or <EV:submit> event handler is not 
+         guaranteed to be triggered when invoking this method 
+         for historical reasons.  DOM Level 3 <EV:ev:submit> 
+         event is defined not to triggered on this method.
+         \
+         }
+     @@Return:  
+  @Method:
+     @@Name:  reset
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Restore current values of form controls to initial values, 
+         as the activation of reset buttons do.
+     @@Return:  
+##IF:HTMLFormElement
+
+IF:
+  @Name:  HTMLSelectElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:select
+  @Attr:
+     @@Name:  type
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The type of this form control.
+     @@Get:
+        @@@Type:  DOMString
+        @@@InCase:
+          @@@@Value:select-one
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              <A:HTMLSelectElement.multiple> is <DOM:false>.
+        @@@InCase:
+          @@@@Value:select-multiple
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              <A:HTMLSelectElement.multiple> is <DOM:true>.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            __DEEP{
+              $r = $self->multiple ? "select-multiple" : "select-one";
+            }__;
+  @Attr:
+     @@Name:  selectedIndex
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The ordinal index of the selected option.
+     @@Get:
+        @@@Type:
+           DOMMain:long
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The ordinal index of the selected option, starging 
+            from <DOM:0>.  If multiple options are selected, 
+            the index of the first selected option is returned.
+        @@@InCase:
+          @@@@Value:-1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              No option is selected.
+     @@Set:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  value
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The current control value (i.e. the value of the 
+         currently selected option).  If multiple options are 
+         selected, the value of the first selected option.
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  length
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The number of options in this menu control.
+     @@Get:
+        @@@Type:
+           DOMMain:unsigned-long
+     @@Set:
+        @@@Type:
+           DOMMain:unsigned-long
+        @@@Exception:
+           @@@@Name:  NOT_SUPPORTED_ERR
+           @@@@Type:
+              DOMCore:DOMException
+           @@@@SubType:
+             @@@@@QName:
+               DOMHTML:MDOMHTML_IMPL_NOSUPPORT_SET_SELECT_LENGTH
+             @@@@@Description:
+               @@@@@@lang:en
+               @@@@@@@:
+                 Setting the length is not allowed by the 
+                 DOM implementation.
+     @@Level[list]:
+        1
+        2
+     @@SpecLevel[list]:
+        1
+        2
+  @Attr:
+     @@Name:  form
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The <HE:form> element containing this control.
+     @@Get:
+        @@@Type:  HTMLFormElement
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This control is not within the context of a form.
+  @Attr:
+     @@Name:  options
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The collection of <HE:option> elements contained 
+         by this element.
+     @@Get:
+        @@@Type:  HTMLOptionsCollection
+     @@Level[list]:
+        1
+        2
+     @@SpecLevel[list]:
+        1
+        2
+  @Attr:
+     @@Name:  disabled
+     @@DocAttr:
+       @@@Name:disabled
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  multiple
+     @@DocAttr:
+       @@@Name:multiple
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  name
+     @@DocAttr:
+       @@@Name:name
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  size
+     @@DocAttr:
+       @@@Name:size
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  tabIndex
+     @@DocAttr:
+       @@@Name:tabindex
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+  @Method:
+     @@Name:  add
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Add a new element to the collection of <HE:option> 
+         elements.
+     @@Param:
+        @@@Name:  element
+        @@@Type:  HTMLElement
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The element to add.
+        @@@InCase:
+          @@@@Type:HTMLOptionElement
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The option to add.
+        @@@InCase:
+          @@@@Type:HTMLOptGroupElement
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The option group to add.
+        @@@InCase:
+          @@@@Label:
+            @@@@@lang:en
+            @@@@@@:Otherwise
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This method has no effect.
+     @@Param:
+        @@@Name:  before
+        @@@Type:  HTMLElement
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            This method is the equivalent of the 
+            <M:Node.insertBefore> method on the parent of 
+            <P:before>.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This method is the equivalent of the 
+              <M:Node.appendChild> method.
+     @@Return:
+        @@@Exception:
+           @@@@Name:  NOT_FOUND_ERR
+           @@@@Type:
+              DOMCore:DOMException
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The <P:before> node is not a descendant of this element.
+  @Method:
+     @@Name:  remove
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Remove an element from the collection of <HE:option> elements.
+     @@Param:
+        @@@Name:  index
+        @@@Type:
+           DOMMain:long
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The ordinal index of the item to remove, starting from 
+            <DOM:0>.  If no element has the given index, 
+            this method has no effect.
+     @@Return:  
+  @Method:
+     @@Name:  blur
+     @@Description:
+        @@@lang:en
+        @@@@: Remove forcus from this element.
+     @@Return:  
+  @Method:
+     @@Name:  focus
+     @@Description:
+       @@@lang:en
+       @@@@:Give forcus to this element.
+     @@Return:  
+##IF:HTMLSelectElement
+
+IF:
+  @Name:  HTMLOptGroupElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:optgroup
+  @Attr:
+     @@Name:  disabled
+     @@DocAttr:
+       @@@Name:disabled
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  label
+     @@DocAttr:
+       @@@Name:label
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+##IF:HTMLOptGroupElement
+
+IF:
+  @Name:  HTMLOptionElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:option
+  @Attr:
+     @@Name:  form
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The <HE:form> element containing this control.
+     @@Get:
+        @@@Type:  HTMLFormElement
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This control is not within the context of a form.
+  @Attr:
+     @@Name:  defaultSelected
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Whether the option is initially selected or not.  
+         The value of this attribute does not change 
+         if the state of the corresponding form control changes.
+     @@DocAttr:
+       @@@Name:selected
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Level[list]:
+        :: TBD ::
+        2
+     @@SpecLevel[list]:
+        :: TBD ::
+        2
+  @Attr:
+     @@Name:  text
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The text contained within the <HE:option> element.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+              if ($self->hasAttributeNS (null, 'label')) {
+                $r = $self->getAttributeNS (null, 'label');
+              } elsif ($self->hasAttribute ('label')) {
+                $r = $self->getAttribute ('label');
+              } else {
+                $r = $self->{<Q:TreeCore:node>}
+                          ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{textContent}__;
+              }
+  @Attr:
+     @@Name:  index
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The index of this <HE:option> in its parent 
+         <HE:select>, starting from <DOM:0>.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Should be <QUOTE:ancestor>, not <QUOTE:parent>?
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Level[list]:
+        1
+        2
+     @@SpecLevel[list]:
+        1
+        2
+  @Attr:
+     @@Name:  disabled
+     @@DocAttr:
+       @@@Name:disabled
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  label
+     @@DocAttr:
+       @@@Name:label
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  selected
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The current state of the corresponding form control. 
+         Changing this attribute changes the state of the form 
+         control, but does not change the value of the HTML 
+         <HA:selected> attribute.
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMHTML:selected
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@SetProp:
+            DOMHTML:selected
+  @Attr:
+     @@Name:  value
+     @@DocAttr:
+       @@@Name:value
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+##IF:HTMLOptionElement
+
+IF:
+  @Name:  HTMLInputElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:input
+  @Attr:
+     @@Name:  defaultValue
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The initial value of the <HTML:text>, <HTML:file> or 
+         <HTML:password> control.
+     @@DocAttr:
+       @@@Name:value
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  defaultChecked
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The initial state of the <HTML:checkbox> or <HTML:radio> 
+         button control.
+     @@DocAttr:
+       @@@Name:checked
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  form
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The <HE:form> element containing this control.
+     @@Get:
+        @@@Type:  HTMLFormElement
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This control is not within the context of a form.
+  @Attr:
+     @@Name:  accept
+     @@DocAttr:
+       @@@Name:accept
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  accessKey
+     @@DocAttr:
+       @@@Name:accesskey
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  align
+     @@DocAttr:
+       @@@Name:align
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  alt
+     @@DocAttr:
+       @@@Name:alt
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  checked
+     @@Description:
+       @@@lang:en
+       @@@@:
+          The current state of the form control.  Changes 
+          to this attribute change the state of the control, 
+          but do not change the value of the HTML <HA:checke> 
+          attribute.  (When the <HA:type> is either <HTML:radio> 
+          or <HTML:checkbox>.)
+          \
+          {NOTE:: During the handling of a <EV:ev:click> 
+                  event, some DOM implementations may change 
+                  the <A:checked> status before the event 
+                  is being dispatched.  If the default action 
+                  of the event is canceled, the <A:checked> 
+                  state is changed back to the original value. 
+                  In other word, the value of this attribute 
+                  during the handling of <EV:ev:click> (or 
+                  e.g. <EV:ev:DOMActivate>) events 
+                  is implementation dependent.
+          \
+          }
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  disabled
+     @@DocAttr:
+       @@@Name:disabled
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  maxLength
+     @@DocAttr:
+       @@@Name:maxlength
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  name
+     @@DocAttr:
+       @@@Name:name
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  readOnly
+     @@DocAttr:
+       @@@Name:readonly
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  size
+     @@DocAttr:
+       @@@Name:size
+     @@Get:
+        @@@Type:
+           DOMMain:unsigned-long
+     @@Set:
+        @@@Type:
+           DOMMain:unsigned-long
+     @@Level[list]:
+        :: TBD ::
+        2
+     @@SpecLevel[list]:
+        :: TBD ::
+        2
+  @Attr:
+     @@Name:  src
+     @@DocAttr:
+       @@@Name:src
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  tabIndex
+     @@DocAttr:
+       @@@Name:tabindex
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  type
+     @@DocAttr:
+       @@@Name:type
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+     @@Level[list]:
+        1
+        2
+     @@SpecLevel[list]:
+        1
+        2
+  @Attr:
+     @@Name:  useMap
+     @@DocAttr:
+       @@@Name:usemap
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  value
+     @@Description:
+       @@@lang:en
+       @@@@:
+          The current value of the <HTML:text>, <HTML:file> or 
+          <HTML:password> control.  Changing this attribute 
+          changes the contents of the form control, but does 
+          not change the value of the HTML <HA:value> 
+          attribute.
+          \
+          For the <HTML:button>, <HTML:hidden>, <HTML:submit>, 
+          <HTML:reset>, <HTML:image>, <HTML:checkbox> or 
+          <HTML:radio> control, this attribute represents 
+          the HTML <HA:value> attribute.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            {NOTE:: The actual value may be masked to 
+                    prevent unauthorized use for the <HTML:password> 
+                    input control.
+            \
+            }
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            ISSUE: Some mechanism to mask password required?
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $type;
+            __DEEP{
+              $type = $self->type;
+            }__;
+            if ({text => 1, password => 1, file => 1}->{$type}) {
+              __DISCODE{
+                GetProp:
+              \    DOMHTML:value
+              }__;
+            } else {
+              __DISDODE{
+                get-attribute-value:
+                \ value
+              }__;
+            }
+     @@Set:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            {NOTE:: The <A:value> may be read-only for 
+                    the file upload control.
+            \
+            }
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            TODO: Switch to make file value unchangable required.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $type;
+            __DEEP{
+              $type = $self->type;
+            }__;
+            if ({text => 1, password => 1, file => 1}->{$type}) {
+              __DISCODE{
+                SetProp:
+              \    DOMHTML:value
+              }__;
+            } else {
+              __DISDODE{
+                set-attribute-value:
+                \ value
+              }__;
+            }
+  @Method:
+     @@Name:  blur
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Remove focus from this element.
+     @@Return:  
+  @Method:
+     @@Name:  focus
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Give focus to this element.
+     @@Return:  
+  @Method:
+     @@Name:  select
+     @@Description:
+        @@@lang:en
+        @@@@:
+          Select the contents of the text area.  (For the 
+          <HTML:text>, <HTML:file> or <HTML:password> control).
+     @@Return:  
+  @Method:
+     @@Name:  click
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Simulate a mouse click.  (For the <HTML:button>, 
+         <HTML:checkbox>, <HTML:radio>, <HTML:reset> or 
+         <HTML:submit> control.
+     @@Return:  
+##IF:HTMLInputElement
+
+IF:
+  @Name:  HTMLTextAreaElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:textarea
+  @Attr:
+     @@Name:  defaultValue
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The initial value of the control, i.e. the contents 
+         of the element.  The value of this attribute does 
+         not change if the contents of the corresponding 
+         form control.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            $r = $self->{<Q:TreeCore:node>}
+                      ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{textContent}__;
+     @@Set:
+        @@@Type:  DOMString
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            __DEEP{  ## Latest version
+              $self->__SUPER{Element::}__::textContent ($given);
+            }__;
+     @@Level[list]:
+        1
+        2
+     @@SpecLevel[list]:
+        1
+        2
+  @Attr:
+     @@Name:  form
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The <HE:form> element containing this control.
+     @@Get:
+        @@@Type:  HTMLFormElement
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This control is not within the context of a form.
+  @Attr:
+     @@Name:  accessKey
+     @@DocAttr:
+       @@@Name:accesskey
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  cols
+     @@DocAttr:
+       @@@Name:cols
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  disabled
+     @@DocAttr:
+       @@@Name:disabled
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  name
+     @@DocAttr:
+       @@@Name:name
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  readOnly
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  rows
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  tabIndex
+     @@DocAttr:
+       @@@Name:name
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  type
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The type of this form control.
+     @@Get:
+        @@@Type:  DOMString
+        @@@InCase:
+          @@@@Value:textarea
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Always this value.
+        @@@DefaultValue:textarea
+        @@@Def:\
+  @Attr:
+     @@Name:  value
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The current value of the corresponding form control. 
+         Changing this attribute changes the contents of 
+         the form control, but does not changes the contents 
+         of the element.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The current value.  If the entirely of the data 
+            cannot fit into a single <TYPE:DOMstring>, 
+            the DOM implementation may truncate the data.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMHTML:value
+     @@Set:
+        @@@Type:  DOMString
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@SetProp:
+            DOMHTML:value
+  @Method:
+     @@Name:  blur
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Remove focus from this element.
+     @@Return:  
+  @Method:
+     @@Name:  focus
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Give focus to this element.
+     @@Return:  
+  @Method:
+     @@Name:  select
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Select the contents of the <HE:textarea>.
+     @@Return:  
+##IF:DOMHTMLTextAreaElement
+
+IF:
+  @Name:  HTMLButtonElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:button
+  @Attr:
+     @@Name:  form
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The <HE:form> element containing this control.
+     @@Get:
+        @@@Type:  HTMLFormElement
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This control is not within the context of a form.
+  @Attr:
+     @@Name:  accessKey
+     @@DocAttr:
+       @@@Name:accesskey
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  disabled
+     @@DocAttr:
+       @@@Name:disabled
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  name
+     @@DocAttr:
+       @@@Name:name
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  tabIndex
+     @@DocAttr:
+       @@@Name:tabindex
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  type
+     @@DocAttr:
+       @@@Name:type
+     @@Get:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  value
+     @@DocAttr:
+       @@@Name:value
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+##IF:HTMLButtonElement
+
+IF:
+  @Name:  HTMLLabelElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:label
+  @Attr:
+     @@Name:  form
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The <HE:form> element containing this control.
+     @@Get:
+        @@@Type:  HTMLFormElement
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This control is not within the context of a form.
+  @Attr:
+     @@Name:  accessKey
+     @@DocAttr:
+       @@@Name:accesskey
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  htmlFor
+     @@DocAttr:
+       @@@Name:for
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+##IF:HTMLLabelElement
+
+IF:
+  @Name:  HTMLFieldSetElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:fieldset
+  @Attr:
+     @@Name:  form
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The <HE:form> element containing this control.
+     @@Get:
+        @@@Type:  HTMLFormElement
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This control is not within the context of a form.
+##IF:HTMLFieldSetElement
+
+IF:
+  @Name:  HTMLLegendElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:legend
+  @Attr:
+     @@Name:  form
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The <HE:form> element containing this control.
+     @@Get:
+        @@@Type:  HTMLFormElement
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This control is not within the context of a form.
+  @Attr:
+     @@Name:  accessKey
+     @@DocAttr:
+       @@@Name:
+         accesskey
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  align
+     @@DocAttr:
+       @@@Name:align
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+##IF:HTMLLegendElement
+
+IF:
+  @Name:  HTMLUListElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  compact
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  type
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+IF:
+  @Name:  HTMLOListElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  compact
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  start
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  type
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+IF:
+  @Name:  HTMLDListElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  compact
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+IF:
+  @Name:  HTMLDirectoryElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  compact
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+IF:
+  @Name:  HTMLMenuElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  compact
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+IF:
+  @Name:  HTMLLIElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  type
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  value
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+IF:
+  @Name:  HTMLDivElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  align
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+IF:
+  @Name:  HTMLParagraphElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  align
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+IF:
+  @Name:  HTMLHeadingElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  align
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+IF:
+  @Name:  HTMLQuoteElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  cite
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+IF:
+  @Name:  HTMLPreElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  width
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+IF:
+  @Name:  HTMLBRElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  clear
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+IF:
+  @Name:  HTMLBaseFontElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  color
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  face
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  size
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+     @@Level[list]:
+        :: TBD ::
+        2
+     @@SpecLevel[list]:
+        :: TBD ::
+        2
+IF:
+  @Name:  HTMLFontElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  color
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  face
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  size
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+IF:
+  @Name:  HTMLHRElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  align
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  noShade
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  size
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  width
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+IF:
+  @Name:  HTMLModElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  cite
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  dateTime
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+IF:
+  @Name:  HTMLAnchorElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  accessKey
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  charset
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  coords
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  href
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  hreflang
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  name
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  rel
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  rev
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  shape
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  tabIndex
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  target
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  type
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Method:
+     @@Name:  blur
+     @@Return:  \
+  @Method:
+     @@Name:  focus
+     @@Return:  \
+IF:
+  @Name:  HTMLImageElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  name
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  align
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  alt
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  border
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  height
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+     @@Level[list]:
+        :: TBD ::
+        2
+     @@SpecLevel[list]:
+        :: TBD ::
+        2
+  @Attr:
+     @@Name:  hspace
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+     @@Level[list]:
+        :: TBD ::
+        2
+     @@SpecLevel[list]:
+        :: TBD ::
+        2
+  @Attr:
+     @@Name:  isMap
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  longDesc
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  src
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  useMap
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  vspace
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+     @@Level[list]:
+        :: TBD ::
+        2
+     @@SpecLevel[list]:
+        :: TBD ::
+        2
+  @Attr:
+     @@Name:  width
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+     @@Level[list]:
+        :: TBD ::
+        2
+     @@SpecLevel[list]:
+        :: TBD ::
+        2
+IF:
+  @Name:  HTMLObjectElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  form
+     @@Get:
+        @@@Type:  HTMLFormElement
+  @Attr:
+     @@Name:  code
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  align
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  archive
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  border
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  codeBase
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  codeType
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  data
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  declare
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  height
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  hspace
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  name
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  standby
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  tabIndex
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  type
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  useMap
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  vspace
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  width
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  contentDocument
+     @@Get:
+        @@@Type:  Document
+     @@Level[list]:  2
+     @@SpecLevel[list]:  2
+IF:
+  @Name:  HTMLParamElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  name
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  type
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  value
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  valueType
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+IF:
+  @Name:  HTMLAppletElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  align
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  alt
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  archive
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  code
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  codeBase
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  height
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  hspace
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+     @@Level[list]:
+        :: TBD ::
+        2
+     @@SpecLevel[list]:
+        :: TBD ::
+        2
+  @Attr:
+     @@Name:  name
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  object
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+     @@Level[list]:
+        :: TBD ::
+        2
+     @@SpecLevel[list]:
+        :: TBD ::
+        2
+  @Attr:
+     @@Name:  vspace
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+     @@Level[list]:
+        :: TBD ::
+        2
+     @@SpecLevel[list]:
+        :: TBD ::
+        2
+  @Attr:
+     @@Name:  width
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+IF:
+  @Name:  HTMLMapElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  areas
+     @@Get:
+        @@@Type:  HTMLCollection
+  @Attr:
+     @@Name:  name
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+IF:
+  @Name:  HTMLAreaElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  accessKey
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  alt
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  coords
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  href
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  noHref
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  shape
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  tabIndex
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  target
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+IF:
+  @Name:  HTMLScriptElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  text
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  htmlFor
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  event
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  charset
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  defer
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  src
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  type
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+IF:
+  @Name:  HTMLTableElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  caption
+     @@Get:
+        @@@Type:  HTMLTableCaptionElement
+     @@Set:
+        @@@Type:  HTMLTableCaptionElement
+        @@@Exception:
+           @@@@Name:  ** TBD **
+           @@@@Type:
+              DOMCore:DOMException
+     @@Level[list]:
+        :: TBD ::
+        2
+     @@SpecLevel[list]:
+        :: TBD ::
+        2
+  @Attr:
+     @@Name:  tHead
+     @@Get:
+        @@@Type:  HTMLTableSectionElement
+     @@Set:
+        @@@Type:  HTMLTableSectionElement
+        @@@Exception:
+           @@@@Name:  ** TBD **
+           @@@@Type:
+              DOMCore:DOMException
+     @@Level[list]:
+        1
+        2
+     @@SpecLevel[list]:
+        1
+        2
+  @Attr:
+     @@Name:  tFoot
+     @@Get:
+        @@@Type:  HTMLTableSectionElement
+     @@Set:
+        @@@Type:  HTMLTableSectionElement
+        @@@Exception:
+           @@@@Name:  ** TBD **
+           @@@@Type:
+              DOMCore:DOMException
+     @@Level[list]:
+        1
+        2
+     @@SpecLevel[list]:
+        1
+        2
+  @Attr:
+     @@Name:  rows
+     @@Get:
+        @@@Type:  HTMLCollection
+  @Attr:
+     @@Name:  tBodies
+     @@Get:
+        @@@Type:  HTMLCollection
+  @Attr:
+     @@Name:  align
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  bgColor
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  border
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  cellPadding
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  cellSpacing
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  frame
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  rules
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  summary
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  width
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Method:
+     @@Name:  createTHead
+     @@Return:
+        @@@Type:  HTMLElement
+  @Method:
+     @@Name:  deleteTHead
+     @@Return:  \
+  @Method:
+     @@Name:  createTFoot
+     @@Return:
+        @@@Type:  HTMLElement
+  @Method:
+     @@Name:  deleteTFoot
+     @@Return:  \
+  @Method:
+     @@Name:  createCaption
+     @@Return:
+        @@@Type:  HTMLElement
+  @Method:
+     @@Name:  deleteCaption
+     @@Return:  \
+  @Method:
+     @@Name:  insertRow
+     @@Param:
+        @@@Name:  index
+        @@@Type:
+           DOMMain:long
+     @@Return:
+        @@@Type:  HTMLElement
+        @@@Exception:
+           @@@@Name:  ** TBD **
+           @@@@Type:
+              DOMCore:DOMException
+     @@Level[list]:
+        1
+        2
+     @@SpecLevel[list]:
+        1
+        2
+  @Method:
+     @@Name:  deleteRow
+     @@Param:
+        @@@Name:  index
+        @@@Type:
+           DOMMain:long
+     @@Return:
+        @@@Exception:
+           @@@@Name:  ** TBD **
+           @@@@Type:
+              DOMCore:DOMException
+     @@Level[list]:
+        1
+        2
+     @@SpecLevel[list]:
+        1
+        2
+IF:
+  @Name:  HTMLTableCaptionElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  align
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+IF:
+  @Name:  HTMLTableColElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  align
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  ch
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  chOff
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  span
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  vAlign
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  width
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+IF:
+  @Name:  HTMLTableSectionElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  align
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  ch
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  chOff
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  vAlign
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  rows
+     @@Get:
+        @@@Type:  HTMLCollection
+  @Method:
+     @@Name:  insertRow
+     @@Param:
+        @@@Name:  index
+        @@@Type:
+           DOMMain:long
+     @@Return:
+        @@@Type:  HTMLElement
+        @@@Exception:
+           @@@@Name:  ** TBD **
+           @@@@Type:
+              DOMCore:DOMException
+     @@Level[list]:
+        1
+        2
+     @@SpecLevel[list]:
+        1
+        2
+  @Method:
+     @@Name:  deleteRow
+     @@Param:
+        @@@Name:  index
+        @@@Type:
+           DOMMain:long
+     @@Return:
+        @@@Exception:
+           @@@@Name:  ** TBD **
+           @@@@Type:
+              DOMCore:DOMException
+     @@Level[list]:
+        1
+        2
+     @@SpecLevel[list]:
+        1
+        2
+IF:
+  @Name:  HTMLTableRowElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  rowIndex
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Level[list]:
+        :: TBD ::
+        2
+     @@SpecLevel[list]:
+        :: TBD ::
+        2
+  @Attr:
+     @@Name:  sectionRowIndex
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Level[list]:
+        :: TBD ::
+        2
+     @@SpecLevel[list]:
+        :: TBD ::
+        2
+  @Attr:
+     @@Name:  cells
+     @@Get:
+        @@@Type:  HTMLCollection
+     @@Level[list]:
+        :: TBD ::
+        2
+     @@SpecLevel[list]:
+        :: TBD ::
+        2
+  @Attr:
+     @@Name:  align
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  bgColor
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  ch
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  chOff
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  vAlign
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Method:
+     @@Name:  insertCell
+     @@Param:
+        @@@Name:  index
+        @@@Type:
+           DOMMain:long
+     @@Return:
+        @@@Type:  HTMLElement
+        @@@Exception:
+           @@@@Name:  ** TBD **
+           @@@@Type:
+              DOMCore:DOMException
+     @@Level[list]:
+        1
+        2
+     @@SpecLevel[list]:
+        1
+        2
+  @Method:
+     @@Name:  deleteCell
+     @@Param:
+        @@@Name:  index
+        @@@Type:
+           DOMMain:long
+     @@Return:
+        @@@Exception:
+           @@@@Name:  ** TBD **
+           @@@@Type:
+              DOMCore:DOMException
+     @@Level[list]:
+        1
+        2
+     @@SpecLevel[list]:
+        1
+        2
+IF:
+  @Name:  HTMLTableCellElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  cellIndex
+     @@Get:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  abbr
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  align
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  axis
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  bgColor
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  ch
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  chOff
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  colSpan
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  headers
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  height
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  noWrap
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  rowSpan
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  scope
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  vAlign
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  width
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+IF:
+  @Name:  HTMLFrameSetElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  cols
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  rows
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+IF:
+  @Name:  HTMLFrameElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  frameBorder
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  longDesc
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  marginHeight
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  marginWidth
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  name
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  noResize
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  scrolling
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  src
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  contentDocument
+     @@Get:
+        @@@Type:  Document
+     @@Level[list]:  2
+     @@SpecLevel[list]:  2
+IF:
+  @Name:  HTMLIFrameElement
+  @ISA:  HTMLElement
+  @Attr:
+     @@Name:  align
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  frameBorder
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  height
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  longDesc
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  marginHeight
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  marginWidth
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  name
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  scrolling
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  src
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  width
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  contentDocument
+     @@Get:
+        @@@Type:  Document
+     @@Level[list]:  2
+     @@SpecLevel[list]:  2
+# #endif // _HTML2_IDL_
