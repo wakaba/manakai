@@ -19,7 +19,7 @@ This module is part of manakai.
 
 package Message::Markup::SuikaWikiConfig20::Node;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 =head1 METHODS
 
@@ -138,12 +138,12 @@ sub get_attribute ($$;%) {
   }
 }
 sub get_attribute_value ($$;%) {
-  my ($self, $name) = @_;
+  my ($self, $name, %opt) = @_;
   my $node = $self->get_attribute ($name);
   if (ref $node) {
     return $node->value;
   } else {
-    return undef;
+    return $opt{default};
   }
 }
 
@@ -155,9 +155,9 @@ Set the value of the attribute.  The attribute node is returned.
 
 sub set_attribute ($$$;%) {
   my ($self, $name, $val, %o) = @_;
-  if ({qw/ARRAY 1 HASH 1 CODE 1/}->{ref ($val)}) {
+  if ({qw/HASH 1 CODE 1/}->{ref ($val)}) {
   ## TODO: common error handling
-    die "set_attribute: new attribute value must be string or blessed object";
+    die "set_attribute: @{[ref $val]}: new attribute value must be a string, an array reference or a blessed object";
   }
   for (@{$self->{node}}) {
     if ($_->{type} eq '#element'
@@ -169,6 +169,26 @@ sub set_attribute ($$$;%) {
   }
   return $self->append_new_node (type => '#element', local_name => $name,
                                  value => $val);
+}
+
+=item $x->remove_attribute ($local_name, %options)
+
+Removes an attribute node.
+
+=cut
+
+sub remove_attribute ($$;%) {
+  my ($self, $name, %opt) = @_;
+  $self->{node} = [grep {
+    if ($_->{type} eq '#element' and
+        $_->{local_name} eq $name) {
+      delete $_->{parent};
+      0;
+    } else {
+      1;
+    }
+  } @{$self->{node}}];
+  1;
 }
 
 =item \@children = $x->child_nodes
@@ -361,4 +381,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/04/25 07:15:30 $
+1; # $Date: 2004/07/25 07:17:02 $
