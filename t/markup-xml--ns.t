@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 require Test::Simple; sub ok ($;$);
-use Message::Markup::XML;
+use Message::Markup::XML::Node;
 use Message::Markup::XML::QName qw:DEFAULT_PFX UNDEF_URI NULL_URI:;
                               
 sub OK ($$) {
@@ -13,7 +13,7 @@ sub OK ($$) {
   }
 }
 
-my $e = Message::Markup::XML->new (type => '#element',
+my $e = Message::Markup::XML::Node->new (type => '#element',
 	                           namespace_uri => q<http://e.test/>,
 	                           local_name => 'e');
 
@@ -57,7 +57,7 @@ my @s = (
 my @f = (
          {
           g => sub {
-            my $el = Message::Markup::XML->new
+            my $el = Message::Markup::XML::Node->new
               (type => '#element',
                qname => q<foo:bar>,
                namespace_uri => q<http://foo.test/>);
@@ -66,7 +66,7 @@ my @f = (
          },
          {
           g => sub {
-            my $el = Message::Markup::XML->new
+            my $el = Message::Markup::XML::Node->new
               (type => '#element',
                qname => q<bar>,
                namespace_uri => q<http://foo.test/>);
@@ -75,7 +75,7 @@ my @f = (
          },
          {
           g => sub {
-            my $el = Message::Markup::XML->new
+            my $el = Message::Markup::XML::Node->new
               (type => '#element',
                qname => q<foo:bar>,
                namespace_uri => q<>);
@@ -84,7 +84,7 @@ my @f = (
          },
          {
           g => sub {
-            my $el = Message::Markup::XML->new
+            my $el = Message::Markup::XML::Node->new
               (type => '#element',
                qname => q<bar>,
                namespace_uri => NULL_URI);
@@ -93,7 +93,7 @@ my @f = (
          },
          {
           g => sub {
-            my $el = Message::Markup::XML->new
+            my $el = Message::Markup::XML::Node->new
               (type => '#element',
                qname => q<foo:bar>,
                namespace_uri => q<http://foo.test/>);
@@ -104,7 +104,7 @@ my @f = (
          },
          {
           g => sub {
-            my $el = Message::Markup::XML->new
+            my $el = Message::Markup::XML::Node->new
               (type => '#element',
                qname => q<bar>,
                namespace_uri => q<http://foo.test/>);
@@ -117,7 +117,7 @@ my @f = (
 
          {
           g => sub {
-            my $el = Message::Markup::XML->new
+            my $el = Message::Markup::XML::Node->new
               (type => '#element',
                qname => q<bar>,
                namespace_uri => q<http://foo.test/>);
@@ -126,7 +126,7 @@ my @f = (
          },
          {
           g => sub {
-            my $el = Message::Markup::XML->new
+            my $el = Message::Markup::XML::Node->new
               (type => '#element',
                qname => q<foo:bar>,
                namespace_uri => q<http://foo.test/>);
@@ -135,7 +135,7 @@ my @f = (
          },
          {
           g => sub {
-            my $el = Message::Markup::XML->new
+            my $el = Message::Markup::XML::Node->new
               (type => '#element',
                local_name => q<bar>,
                namespace_uri => q<http://foo.test/>);
@@ -145,7 +145,7 @@ my @f = (
          },
          {
           g => sub {
-            my $el = Message::Markup::XML->new
+            my $el = Message::Markup::XML::Node->new
               (type => '#element',
                local_name => q<bar>,
                namespace_uri => q<http://foo.test/>);
@@ -155,7 +155,7 @@ my @f = (
          },
          {
           g => sub {
-            my $el = Message::Markup::XML->new
+            my $el = Message::Markup::XML::Node->new
               (type => '#element',
                qname => q<foo:bar>,
                namespace_uri => q<http://foo.test/>);
@@ -165,7 +165,7 @@ my @f = (
          },
          {
           g => sub {
-            my $el = Message::Markup::XML->new
+            my $el = Message::Markup::XML::Node->new
               (type => '#element',
                qname => q<foo:bar>,
                namespace_uri => q<http://foo.test/>);
@@ -175,7 +175,7 @@ my @f = (
          },
          {
           g => sub {
-            my $el = Message::Markup::XML->new
+            my $el = Message::Markup::XML::Node->new
               (type => '#element',
                qname => q<foo:bar>,
                namespace_uri => q<http://foo.test/>);
@@ -185,7 +185,7 @@ my @f = (
          },
          {
           g => sub {
-            my $el = Message::Markup::XML->new
+            my $el = Message::Markup::XML::Node->new
               (type => '#element',
                qname => q<foo:bar>,
                namespace_uri => q<http://foo.test/>);
@@ -195,7 +195,7 @@ my @f = (
          },
          {
           g => sub {
-            my $el = Message::Markup::XML->new
+            my $el = Message::Markup::XML::Node->new
               (type => '#element',
                qname => q<foo:bar>,
                namespace_uri => q<http://foo.test/>);
@@ -204,7 +204,7 @@ my @f = (
          },
          {
           g => sub {
-            my $el = Message::Markup::XML->new
+            my $el = Message::Markup::XML::Node->new
               (type => '#element',
                qname => q<bar>);
             OK $el->defined_namespace_prefix (DEFAULT_PFX), NULL_URI;
@@ -212,7 +212,7 @@ my @f = (
          },
          {
           g => sub {
-            my $el = Message::Markup::XML->new
+            my $el = Message::Markup::XML::Node->new
               (type => '#element',
                qname => q<bar>,
                namespace_uri => q<http://foo.test/>);
@@ -222,7 +222,7 @@ my @f = (
 
          {
           g => sub {
-            my $el = Message::Markup::XML->new
+            my $el = Message::Markup::XML::Node->new
               (type => '#element',
                qname => q<bar>,
                namespace_uri => q<http://foo.test/>);
@@ -231,7 +231,7 @@ my @f = (
          },
          {
           g => sub {
-            my $el = Message::Markup::XML->new
+            my $el = Message::Markup::XML::Node->new
               (type => '#element',
                qname => q<foo:bar>,
                namespace_uri => q<http://foo.test/>);
@@ -240,7 +240,7 @@ my @f = (
          },
          {
           g => sub {
-            my $el = Message::Markup::XML->new
+            my $el = Message::Markup::XML::Node->new
               (type => '#element',
                qname => q<bar>,
                namespace_uri => NULL_URI);
@@ -249,7 +249,7 @@ my @f = (
          },
          {
           g => sub {
-            my $el = Message::Markup::XML->new
+            my $el = Message::Markup::XML::Node->new
               (type => '#element',
                qname => q<foo:bar>,
                namespace_uri => q<http://foo.test/>);
@@ -259,7 +259,7 @@ my @f = (
          },
          {
           g => sub {
-            my $el = Message::Markup::XML->new
+            my $el = Message::Markup::XML::Node->new
               (type => '#element',
                qname => q<foo:bar>,
                namespace_uri => q<http://foo.test/>);
@@ -271,7 +271,7 @@ my @f = (
          },
          {
           g => sub {
-            my $el = Message::Markup::XML->new
+            my $el = Message::Markup::XML::Node->new
               (type => '#element',
                qname => q<bar>,
                namespace_uri => q<http://foo.test/>);
@@ -281,7 +281,7 @@ my @f = (
          },
          {
           g => sub {
-            my $el = Message::Markup::XML->new
+            my $el = Message::Markup::XML::Node->new
               (type => '#element',
                qname => q<bar>,
                namespace_uri => NULL_URI);
@@ -293,7 +293,7 @@ my @f = (
          
          {
           g => sub {
-            my $el = Message::Markup::XML->new
+            my $el = Message::Markup::XML::Node->new
               (type => '#element',
                qname => q<bar>,
                namespace_uri => NULL_URI);
@@ -306,7 +306,7 @@ my @f = (
          },
          {
           g => sub {
-            my $el = Message::Markup::XML->new
+            my $el = Message::Markup::XML::Node->new
               (type => '#element',
                qname => q<bar>,
                namespace_uri => q<http://foo.test/>);
