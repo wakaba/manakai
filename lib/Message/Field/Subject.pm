@@ -14,7 +14,8 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%DEFAULT %REG $VERSION);
-$VERSION = '1.00';
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+require Message::Util;
 
 use overload '""' => sub {shift->stringify};
 $REG{FWS} = qr/[\x09\x20]*/;
@@ -27,6 +28,12 @@ $REG{M_control} = qr/^cmsg$REG{FWS}([\x00-\xFF]*)$/;
 $REG{M_was} = qr/\([Ww][Aa][Ss]:? ([\x00-\xFF]+)\)$REG{FWS}$/;
 
 %DEFAULT = (
+  encoding_after_encode	=> '*default',
+  encoding_before_decode	=> '*default',
+  hook_encode_string	=> #sub {shift; (value => shift, @_)},
+  	\&Message::Util::encode_header_string,
+  hook_decode_string	=> #sub {shift; (value => shift, @_)},
+  	\&Message::Util::decode_header_string,
   string_re	=> 'Re: ',
   string_was	=> ' (was: %s)',
 );
@@ -61,6 +68,9 @@ sub parse ($$;%) {
     $self->{control} = $1;
     return $self;
   }
+  my %s = &{$self->{option}->{hook_decode_string}} ($self, $field_body,
+            type => 'text');
+  $field_body = $s{value};
   $field_body =~ s{^$REG{FWS}($REG{prefix})$REG{FWS}}{
     my $prefix = $1;
     $self->{is_reply} = 1 if $prefix =~ /$REG{re}/;
@@ -83,14 +93,21 @@ sub stringify ($;%) {
   my %option = @_;
   $option{string_re} ||= $self->{option}->{string_re};
   $option{string_was} ||= $self->{option}->{string_was};
-  ($self->{is_reply}>0? $option{string_re}: '').
-  $self->{field_body}.
-  (length $self->{was}? sprintf ($option{string_was}, $self->{was}): '');
+  my (%e) = &{$self->{option}->{hook_encode_string}} ($self, 
+          $self->{field_body}, type => 'text');
+  ($self->{is_reply}>0? $option{string_re}: '').$e{value}
+  .(length $self->{was}? sprintf ($option{string_was}, $self->{was}): '');
 }
+sub as_string ($;%) {shift->stringify (@_)}
 
-sub as_plain_string ($) {
+sub as_plain_string ($;%) {
   my $self = shift;
-  $self->stringify (@_);
+  my %option = @_;
+  $option{string_re} ||= $self->{option}->{string_re};
+  $option{string_was} ||= $self->{option}->{string_was};
+  ($self->{is_reply}>0? $option{string_re}: '').$self->{field_body}
+  .(length $self->{was}? 
+    sprintf ($option{string_was}, $self->{was}->as_plain_string): '');
 }
 
 sub is ($$;$) {

@@ -13,72 +13,68 @@ package Message::Field::Unstructured;
 require 5.6.0;
 use strict;
 use re 'eval';
-use vars qw(%REG $VERSION);
-$VERSION = '1.00';
-
+use vars qw(%DEFAULT %REG $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+require Message::Util;
 use overload '""' => sub {shift->stringify};
 
-=head2 Message::Field::Address->new ()
+%DEFAULT = (
+  encoding_after_encode	=> '*default',
+  encoding_before_decode	=> '*default',
+  hook_encode_string	=> #sub {shift; (value => shift, @_)},
+  	\&Message::Util::encode_header_string,
+  hook_decode_string	=> #sub {shift; (value => shift, @_)},
+  	\&Message::Util::decode_header_string,
+);
 
-Return empty address object.
+=head2 Message::Field::Unstructured->new ()
+
+Returns new Unstructured Header Field object.
 
 =cut
 
 sub new ($;%) {
-  bless {}, shift;
+  my $class = shift;
+  my $self = bless {option => {@_}}, $class;
+  for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
+  $self;
 }
 
-=head2 Message::Field::Address->parse ($unfolded_field_body)
+=head2 Message::Field::Unstructured->new ($field_body)
 
-Parse structured C<field-body> contain of C<address-list>.
+Reads and returns Unstructured Header Field object.
 
 =cut
 
 sub parse ($$;%) {
-  my $self = bless {}, shift;
+  my $class = shift;
   my $field_body = shift;
-  $self->{field_body} = $field_body;
+  my $self = bless {option => {@_}}, $class;
+  for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
+  my %s = &{$self->{option}->{hook_decode_string}} ($self, $field_body,
+            type => 'text');
+  $self->{field_body} = $s{value};
   $self;
 }
 
-sub stringify ($) {
+=head2 $self->stringify ([%options])
+
+Returns C<field-body>.
+
+=cut
+
+sub stringify ($;%) {
   my $self = shift;
-  $self->{field_body};
+  my %option = @_;
+  my (%e) = &{$self->{option}->{hook_encode_string}} ($self, 
+          $self->{field_body}, type => 'text');
+  $e{value};
 }
+sub as_string ($;%) {shift->stringify (@_)}
 
-sub as_plain_string ($) {
-  my $self = shift;
-  $self->{field_body};
+sub as_plain_string ($;%) {
+  shift->{field_body};
 }
-
-=head1 EXAMPLE
-
-  ## Compose field-body for To: field.
-  
-  use Message::Field::Address;
-  my $addr = new Message::Field::Address;
-  $addr->add ('foo@example.org', name => 'Mr. foo bar');
-  $addr->add ('webmaster@example.org', group => 'administrators');
-  $addr->add ('postmaster@example.org', group => 'administrators');
-  
-  my $field_body = $addr->stringify ();
-
-
-  ## Output parsed address-list tree.
-  
-  use Message::Field::Address;
-  my $addr = Message::Field::Address->parse ($field_body);
-  
-  for my $i (@$addr) {
-    if ($i->{type} eq 'group') {
-      print "\x40 $i->{display_name}: \n";
-      for my $j (@{$i->{address}}) {
-        print "\t- $j->{display_name} <$j->{route}$j->{addr_spec}>\n";
-      }
-    } else {
-      print "- $i->{display_name} <$i->{route}$i->{addr_spec}>\n";
-    }
-  }
 
 =head1 LICENSE
 

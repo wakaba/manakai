@@ -14,8 +14,8 @@ use strict;
 require 5.6.0;
 use re 'eval';
 use vars qw(%DEFAULT %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
-
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+require Message::Util;
 use Carp;
 use overload '@{}' => sub {shift->_delete_empty()->{param}},
              '""' => sub {shift->stringify};
@@ -30,6 +30,7 @@ $REG{atext} = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2F-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]+
 $REG{atext_dot} = qr/[\x21\x23-\x27\x2A\x2B\x2D-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]+/;
 $REG{token} = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+/;
 $REG{attribute_char} = qr/[\x21\x23-\x24\x26\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+/;
+$REG{S_encoded_word} = qr/=\x3F$REG{atext_dot}\x3F=/;
 
 $REG{param} = qr/(?:$REG{atext_dot}|$REG{quoted_string})(?:$REG{atext_dot}|$REG{quoted_string}|$REG{WSP}|,)*/;
 	## more naive C<parameter>.  (Comma is allowed for RFC 1049)
@@ -46,12 +47,20 @@ $REG{M_parameter_extended_value} = qr/([^']*)'([^']*)'($REG{token}*)/;
 
 $REG{NON_atext} = qr/[^\x21\x23-\x27\x2A\x2B\x2D\x2F\x30-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]/;
 $REG{NON_atext_dot} = qr/[^\x21\x23-\x27\x2A\x2B\x2D-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]/;
+$REG{NON_atext_dot_wsp} = qr/[^\x09\x20\x21\x23-\x27\x2A\x2B\x2D-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]/;
 $REG{NON_token} = qr/[^\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]/;
+$REG{NON_token_wsp} = qr/[^\x09\x20\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]/;
 $REG{NON_attribute_char} = qr/[^\x21\x23-\x24\x26\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]/;
 
 
 %DEFAULT = (
   delete_fws	=> 1,
+  encoding_after_encode	=> '*default',
+  encoding_before_decode	=> '*default',
+  hook_encode_string	=> #sub {shift; (value => shift, @_)},
+  	\&Message::Util::encode_header_string,
+  hook_decode_string	=> #sub {shift; (value => shift, @_)},
+  	\&Message::Util::decode_header_string,
   parameter_value_max	=> 78,
   use_parameter_extension	=> -1,
 );
@@ -138,8 +147,16 @@ sub _restore_param ($@) {
         my $s = $p->{value};
         if ($p->{is_encoded}) {
           $s =~ s/%([0-9A-Fa-f][0-9A-Fa-f])/chr(hex($1))/eg;
+          my %s = &{$self->{option}->{hook_decode_string}} ($self, $s,
+                language => $p->{language}, charset => $p->{charset},
+                type => 'parameter/encoded');
+          ($s, $p->{charset}, $p->{language}) = (@s{qw(value charset language)});
         } else {
-          $s = $self->_unquote_if_quoted_string ($p->{value});
+          my $q = 0;
+          ($s,$q) = $self->_unquote_if_quoted_string ($p->{value});
+          my %s = &{$self->{option}->{hook_decode_string}} ($self, $s,
+                type => ($q?'parameter/quoted':'parameter'));
+          ($s, $p->{charset}, $p->{language}) = (@s{qw(value charset language)});
         }
         push @ret, [$i->[0], {value => $s, language => $p->{language},
                               charset => $p->{charset}, is_parameter => 1}];
@@ -149,7 +166,14 @@ sub _restore_param ($@) {
         language => $p->{language}, charset => $p->{charset},
         is_encoded => $p->{is_encoded}};
       }
-    } else {push @ret, $i}
+    } else {
+      my $q = 0;
+      ($i->[0], $q) = $self->_unquote_if_quoted_string ($i->[0]);
+      my %s = &{$self->{option}->{hook_decode_string}} ($self, $i->[0],
+                type => ($q?'phrase/quoted':'phrase'));
+      ($i->[0]) = ($s{value});
+      push @ret, $i
+    }
   }
   for my $name (keys %part) {
     my $t = join '', map {
@@ -158,6 +182,9 @@ sub _restore_param ($@) {
       $s =~ s/%([0-9A-Fa-f][0-9A-Fa-f])/chr(hex($1))/eg if $v->{is_encoded};
       $s;
     } @{$part{$name}};
+    my %s = &{$self->{option}->{hook_decode_string}} ($self, $t,
+                type => 'parameter/encoded');
+    ($t,@part{$name}->[0]->{qw(charset language)})=(@s{qw(value charset language)});
     push @ret, [$name, {value => $t, charset => $part{$name}->[0]->{charset},
                         language => $part{$name}->[0]->{language}, 
                         is_parameter => 1}];
@@ -269,12 +296,12 @@ sub parameter ($$;$) {
   for my $param (@{$self->{param}}) {
     if ($param->[0] eq $name) {
       unless (wantarray) {
-        $self->{param}->[1]->{value} 
-          = $self->_param_value ($name => $self->{param}->[1]->{value});
+        $param->[1]->{value} 
+          = $self->_param_value ($name => $param->[1]->{value});
         return $param->[1]->{value};
       } else {
-        $self->{param}->[1]->{value} 
-          = $self->_param_value ($name => $self->{param}->[1]->{value});
+        $param->[1]->{value} 
+          = $self->_param_value ($name => $param->[1]->{value});
         push @ret, $param->[1]->{value};
       }
     }
@@ -345,38 +372,41 @@ sub stringify ($;%) {
       my $new = '';
       if ($v->{is_parameter}) {
         my ($encoded, @value) = (0, '');
-        if ($use_xparam>0 && ($v->{charset} || $v->{language} 
-                           || $v->{value} =~ /[\x00\x0D\x0A\x80-\xFF]/)) {
+        my (%e) = &{$self->{option}->{hook_encode_string}} ($self, 
+          $v->{value}, current_charset => $v->{charset}, language => $v->{language},
+          type => 'parameter');
+        if ($use_xparam>0 && ($e{charset} || $e{language} 
+                           || $e{value} =~ /[\x00\x0D\x0A\x80-\xFF]/)) {
           my ($charset, $lang);
           $encoded = 1;
-          ($charset, $lang) = ($v->{charset}, $v->{language});
+          ($charset, $lang) = ($e{charset}, $e{language});
           ## Note: %-quoting for charset and for language is not allowed.
           ## But charset name can be included non-sttribute-char such as "'".
           ## How can we treat this?
           $charset =~ s/($REG{NON_attribute_char})/sprintf('%%%02X', ord $1)/ge;
           $lang =~ s/($REG{NON_attribute_char})/sprintf('%%%02X', ord $1)/ge;
-          if (length $v->{value} > $option{parameter_value_max}) {
-            for my $i (0..length ($v->{value})/$option{parameter_value_max}) {
-              $value[$i] = substr ($v->{value}, $i*$option{parameter_value_max},
+          if (length $e{value} > $option{parameter_value_max}) {
+            for my $i (0..length ($e{value})/$option{parameter_value_max}) {
+              $value[$i] = substr ($e{value}, $i*$option{parameter_value_max},
                                                    $option{parameter_value_max});
             }
-          } else {$value[0] = $v->{value}}
+          } else {$value[0] = $e{value}}
           for my $i (0..$#value) {
             $value[$i] =~ s/($REG{NON_attribute_char})/sprintf('%%%02X', ord $1)/ge;
           }
           $value[0] = "${charset}'${lang}'".$value[0];
-        } elsif (length $v->{value} == 0) {
+        } elsif (length $e{value} == 0) {
           $value[0] = '""';
         } else {
-          if ($use_xparam>0 && length $v->{value} > $option{parameter_value_max}) {
-            for my $i (0..length ($v->{value})/$option{parameter_value_max}) {
+          if ($use_xparam>0 && length $e{value} > $option{parameter_value_max}) {
+            for my $i (0..length ($e{value})/$option{parameter_value_max}) {
               $value[$i] = $self->_quote_unsafe_string 
-                (substr ($v->{value}, $i*$option{parameter_value_max},
+                (substr ($e{value}, $i*$option{parameter_value_max},
                     $option{parameter_value_max}), unsafe => 'NON_attribute_char');
             }
           } else {
             $value[0] = $self->_quote_unsafe_string 
-              ($v->{value}, unsafe => 'NON_attribute_char');
+              ($e{value}, unsafe => 'NON_attribute_char');
           }
         }
         ## Note: quoted-string for parameter name is not allowed.
@@ -395,7 +425,9 @@ sub stringify ($;%) {
           $new = join '; ', @new;
         }
       } else {
-        $new = $self->_quote_unsafe_string ($_->[0], unsafe => 'NON_token');
+        my %e = &{$self->{option}->{hook_encode_string}} ($self, 
+          $_->[0], type => 'phrase');
+        $new = $self->_quote_unsafe_string ($e{value}, unsafe => 'NON_token_wsp');
       }
       $new;
     } @{$self->{param}}
@@ -424,7 +456,7 @@ sub _quote_unsafe_string ($$;%) {
   my %option = @_;
   $option{unsafe} ||= 'NON_atext_dot';
   if ($string =~ /$REG{$option{unsafe}}/ || $string =~ /$REG{WSP}$REG{WSP}+/) {
-    $string =~ s/([\x22\x5C])/\x5C$1/g;
+    $string =~ s/([\x22\x5C])([\x20-\xFF])?/"\x5C$1".($2?"\x5C$2":'')/ge;
     $string = '"'.$string.'"';
   }
   $string;
@@ -451,13 +483,14 @@ sub _unquote_quoted_string ($$) {
 
 sub _unquote_if_quoted_string ($$) {
   my $self = shift;
-  my $quoted_string = shift;
+  my $quoted_string = shift;  my $isq = 0;
   $quoted_string =~ s{^$REG{M_quoted_string}$}{
     my $qtext = $1;
     $qtext =~ s/\x5C([\x00-\xFF])/$1/g;
+    $isq = 1;
     $qtext;
   }goex;
-  $quoted_string;
+  wantarray? ($quoted_string, $isq): $quoted_string;
 }
 
 =head2 $self->_delete_comment ($field_body)
@@ -479,8 +512,11 @@ sub _delete_comment ($$) {
 sub _delete_fws ($$) {
   my $self = shift;
   my $body = shift;
-  $body =~ s{($REG{quoted_string}|$REG{domain_literal}|$REG{attribute_char}$REG{WSP}+$REG{attribute_char})|$REG{WSP}+}{
-    my $o = $1;  $o? $o : '';
+  $body =~ s{($REG{quoted_string}|$REG{domain_literal})|((?:$REG{token}|$REG{S_encoded_word})(?:$REG{WSP}+(?:$REG{token}|$REG{S_encoded_word}))+)|$REG{WSP}+}{
+    my ($o,$p) = ($1,$2);
+    if ($o) {$o}
+    elsif ($p) {$p=~s/$REG{WSP}+/\x20/g;$p}
+    else {''}
   }gex;
   $body;
 }
@@ -507,7 +543,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/23 11:41:36 $
+$Date: 2002/03/25 10:15:26 $
 
 =cut
 

@@ -18,7 +18,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%OPTION %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload '@{}' => sub {[shift->value]},
              '""' => sub {shift->stringify};
 
@@ -34,19 +34,24 @@ $REG{dot_word} = qr/(?:$REG{atext}|$REG{quoted_string})(?:$REG{FWS}\x2E$REG{FWS}
 $REG{phrase} = qr/(?:$REG{atext}|$REG{quoted_string})(?:$REG{atext}|$REG{quoted_string}|\.|$REG{FWS})*/;
 $REG{M_quoted_string} = qr/\x22((?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\xFF])*)\x22/;
 $REG{NON_atom} = qr/[^\x09\x21\x23-\x27\x2A\x2B\x2D\x2F\x30-\x39\x3D\x3F\x41-\x5A\x5E-\x7E\x2E]/;
+$REG{S_encoded_word} = qr/=\x3F$REG{atext_dot}\x3F=/;
 
 ## Keywords: foo, bar, "and so on"
 ## Newsgroups: local.test,local.foo,local.bar
-## Content-Type: text/plain; charset=us-ascii
-## Content-Transfer-Encoding: base64
 ## Accept: text/html; q=1.0, text/plain; q=0.03; *; q=0.01
 
 %OPTION = (
   field_name	=> 'keywords',
+  encoding_after_encode	=> '*default',
+  encoding_before_decode	=> '*default',
+  hook_encode_string	=> #sub {shift; (value => shift, @_)},
+  	\&Message::Util::encode_header_string,
+  hook_decode_string	=> #sub {shift; (value => shift, @_)},
+  	\&Message::Util::decode_header_string,
   is_quoted_string	=> 1,	## Can itself quoted-string?
   separator	=> ', ',
   max	=> -1,
-  value_type	=> ':none:',
+  value_type	=> [':none:'],
 );
 
 sub _init_option ($$) {
@@ -67,6 +72,7 @@ sub _init_option ($$) {
     $self->{option}->{value_type} = ['Message::Field::ValueParams'];
   } elsif ($field_name eq 'accept') {
     $self->{option}->{is_quoted_string} = -1;
+    $self->{option}->{value_type} = ['Message::Field::ValueParams'];
   } elsif ($field_name eq 'encrypted') {
     $self->{option}->{max} = 2;
   }
@@ -113,7 +119,7 @@ sub _parse_list ($$) {
   $fb =~ s{((?:$REG{quoted_string}|$REG{domain_literal}|[^\x22\x2C\x5B])+)}{
     my $s = $1;  $s =~ s/^$REG{WSP}+//;  $s =~ s/$REG{WSP}+$//;
     if ($self->{option}->{is_quoted_string}>0) {
-      push @ids, $self->_value ($self->_unquote_quoted_string ($s));
+      push @ids, $self->_value ($self->_decode_quoted_string ($s));
     } else {
       push @ids, $self->_value ($s);
     }
@@ -174,8 +180,15 @@ sub stringify ($;%) {
   $option{max} = $#{$self->{value}} if $option{max}<0;
   $option{max} = $#{$self->{value}} if $#{$self->{value}}<$option{max};
   join $option{separator}, 
-    map {$option{is_quoted_string}>0?$self->_quote_unsafe_string ($_):$_}
-    @{$self->{value}}[0..$option{max}];
+    map {
+      if ($option{is_quoted_string}>0) {
+        my %s = &{$self->{option}->{hook_encode_string}} ($self, 
+          $_, type => 'phrase');
+        $self->_quote_unsafe_string ($s{value});
+      } else {
+        $_;
+      }
+    } @{$self->{value}}[0..$option{max}];
 }
 
 sub _delete_empty ($) {
@@ -189,7 +202,7 @@ sub _quote_unsafe_string ($$) {
   my $self = shift;
   my $string = shift;
   if ($string =~ /$REG{NON_atom}/ || $string =~ /$REG{WSP}$REG{WSP}+/) {
-    $string =~ s/([\x22\x5C])/\x5C$1/g;
+    $string =~ s/([\x22\x5C])([\x20-\xFF])?/"\x5C$1".($2?"\x5C$2":'')/ge;
     $string = '"'.$string.'"';
   }
   $string;
@@ -211,6 +224,25 @@ sub _unquote_quoted_string ($$) {
     my $qtext = $1;
     $qtext =~ s/\x5C([\x00-\xFF])/$1/g;
     $qtext;
+  }goex;
+  $quoted_string;
+}
+
+sub _decode_quoted_string ($$) {
+  my $self = shift;
+  my $quoted_string = shift;
+  $quoted_string =~ s{$REG{M_quoted_string}|([^\x22]+)}{
+    my ($qtext,$t) = ($1, $2);
+    if ($t) {
+      my %s = &{$self->{option}->{hook_decode_string}} ($self, $t,
+                type => 'phrase');
+      $s{value};
+    } else {
+      $qtext =~ s/\x5C([\x00-\xFF])/$1/g;
+      my %s = &{$self->{option}->{hook_decode_string}} ($self, $qtext,
+                type => 'phrase/quoted');
+      $s{value};
+    }
   }goex;
   $quoted_string;
 }
@@ -256,7 +288,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/23 11:41:36 $
+$Date: 2002/03/25 10:15:26 $
 
 =cut
 

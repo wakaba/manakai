@@ -13,9 +13,9 @@ package Message::Field::Address;
 require 5.6.0;
 use strict;
 use re 'eval';
-use vars qw(%OPTION %REG $VERSION);
+use vars qw(%DEFAULT %REG $VERSION);
 $VERSION = '1.00';
-
+use Message::Util;
 use overload '@{}' => sub {shift->{address}},
              '""' => sub {shift->stringify};
 
@@ -41,7 +41,13 @@ $REG{M_quoted_string} = qr/\x22((?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\
 
 $REG{NON_atom} = qr/[^\x09\x20\x21\x23-\x27\x2A\x2B\x2D\x2F\x30-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]/;
 
-%OPTION = (
+%DEFAULT = (
+  encoding_after_encode	=> '*default',
+  encoding_before_decode	=> '*default',
+  hook_encode_string	=> #sub {shift; (value => shift, @_)},
+  	\&Message::Util::encode_header_string,
+  hook_decode_string	=> #sub {shift; (value => shift, @_)},
+  	\&Message::Util::decode_header_string,
   is_mailbox	=> -1,
   is_return_path	=> -1,
   use_display_name	=> 1,
@@ -70,7 +76,7 @@ Return empty address object.
 sub new ($;%) {
   my $self = bless {type => '_ROOT'}, shift;
   my %option = @_;
-  for (%OPTION) {$option{$_} ||= $OPTION{$_}}
+  for (%DEFAULT) {$option{$_} ||= $DEFAULT{$_}}
   $self->{option} = \%option;
   $self->_init_option ($self->{option}->{field_name});
   $self;
@@ -86,7 +92,7 @@ sub parse ($$;%) {
   my $self = bless {}, shift;
   my $field_body = shift;
   my %option = @_;
-  for (%OPTION) {$option{$_} ||= $OPTION{$_}}
+  for (%DEFAULT) {$option{$_} ||= $DEFAULT{$_}}
   $self->{option} = \%option;
   $self->_init_option ($self->{option}->{field_name});
   $field_body = $self->delete_comment ($field_body);
@@ -104,6 +110,20 @@ L<$self-E<gt>parse_address_list ()>.
 =cut
 
 sub address ($) {@{shift->{address}}}
+
+=head2 $self->addr_spec ([$index])
+
+Returns (C<$index>'th or all) C<addr-spec>.
+
+=cut
+
+sub addr_spec ($;$) {
+  my $self = shift;
+  my $i = shift;
+  return $self->{address}->[$i]->{addr_spec}
+    if defined $i && ref $self->{address}->[$i];
+  map {$_->{addr_spec}} @{$self->{address}};
+}
 
 =head2 $self->add ($addr_spec, [%option])
 
@@ -152,7 +172,9 @@ sub stringify ($;%) {
     my $return = '';
     next if !$address->{addr_spec} && $address->{type} ne 'group';
     if ($address->{display_name} && $option{use_display_name}>0) {
-      $return = $self->quote_unsafe_string ($address->{display_name})
+        my %s = &{$self->{option}->{hook_encode_string}} ($self, 
+          $address->{display_name}, type => 'phrase');
+      $return = $self->quote_unsafe_string ($s{value})
         .($address->{type} eq 'group' && $option{use_group}>0? ': ': ' ');
     }
     if ($address->{type} ne 'group') {
@@ -162,8 +184,11 @@ sub stringify ($;%) {
       for my $mailbox (@{$address->{address}}) {
         next unless $mailbox->{addr_spec};
         my $g_return = '';
-        $g_return = $self->quote_unsafe_string ($mailbox->{display_name}) .' '
-          if $mailbox->{display_name} && $option{use_display_name}>0;
+        if ($mailbox->{display_name} && $option{use_display_name}>0) {
+          my %s = &{$self->{option}->{hook_encode_string}} ($self, 
+            $mailbox->{display_name}, type => 'phrase');
+          $g_return = $self->quote_unsafe_string ($s{value}) .' ';
+        }
         $g_return .= '<'.$mailbox->{route}.$mailbox->{addr_spec}.'>';
         push @g_return, $g_return;
         last if $option{is_mailbox}>0;
@@ -209,6 +234,25 @@ sub unquote_quoted_string ($$) {
   $quoted_string;
 }
 
+sub _decode_quoted_string ($$) {
+  my $self = shift;
+  my $quoted_string = shift;
+  $quoted_string =~ s{$REG{M_quoted_string}|([^\x22]+)}{
+    my ($qtext,$t) = ($1, $2);
+    if ($t) {
+      my %s = &{$self->{option}->{hook_decode_string}} ($self, $t,
+                type => 'value');
+      $s{value};
+    } else {
+      $qtext =~ s/\x5C([\x00-\xFF])/$1/g;
+      my %s = &{$self->{option}->{hook_decode_string}} ($self, $qtext,
+                type => 'value/quoted');
+      $s{value};
+    }
+  }goex;
+  $quoted_string;
+}
+
 =head2 $self->parse_mailbox ($mailbox)
 
 Parse C<mailbox> and return array of C<addr-spec>,
@@ -223,7 +267,7 @@ sub parse_mailbox ($$) {
   if ($mailbox =~ /$REG{M_mailbox}/) {
     my ($display_name, $route, $addr_spec) = ($1, $2, $3 || $4);
     $display_name =~ s/$REG{WSP}+$//;
-    $display_name = $self->unquote_quoted_string ($display_name);
+    $display_name = $self->_decode_quoted_string ($display_name);
     $addr_spec =~ s{($REG{quoted_string}|$REG{domain_literal})|$REG{WSP}}{$1}go;
     $route =~ s{($REG{quoted_string}|$REG{domain_literal})|$REG{WSP}}{$1}go;
     return ($addr_spec, $display_name, $route);
@@ -365,7 +409,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/20 09:56:26 $
+$Date: 2002/03/25 10:15:26 $
 
 =cut
 

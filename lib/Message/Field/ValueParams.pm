@@ -16,15 +16,16 @@ BEGIN {
   use base Message::Field::Params;
   use vars qw(%DEFAULT %REG $VERSION);
 }
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 %REG = %Message::Field::Params::REG;
 
 %DEFAULT = (
   use_parameter_extension	=> 1,
   value_default	=> '',
-  value_no_regex	=> qr/(?:$)(?:^)/,
+  value_no_regex	=> qr/(?!)/,
   value_regex	=> qr/[\x00-\xFF]+/,
+  value_unsafe_rule	=> 'NON_token_wsp',
   value_type	=> {'*DEFAULT'	=> ':none:',
   },
 );
@@ -153,7 +154,7 @@ An alias of C<stringify>.
 sub stringify ($;%) {
   my $self = shift;
   my $param = $self->SUPER::stringify (@_);
-  $self->value ().($param? '; '.$param: '');
+  $self->value_as_string (@_).($param? '; '.$param: '');
 }
 
 =head2 $self->value ([$new_value])
@@ -162,13 +163,33 @@ Returns or set value.
 
 =cut
 
-sub value ($;$) {
+sub value ($;$%) {
   my $self = shift;
   my $new_value = shift;
+  my %option = @_;
   if ($new_value && $new_value !~ m#$self->{option}->{value_no_regex}#) {
     $self->{value} = $new_value;
   }
-  $self->_quote_unsafe_string ($self->{value});
+  #my $unsafe_rule = $option{unsafe_rule} || $self->{option}->{value_unsafe_rule};
+  #$self->_quote_unsafe_string ($self->{value}, unsafe => $unsafe_rule);
+  $self->{value};
+}
+
+=head2 $self->value_as_string ([%options])
+
+Returns value.  If necessary, quoted and encoded in
+message format.  Same as C<stringify> except that
+only first "value" is outputed.
+
+=cut
+
+sub value_as_string ($;%) {
+  my $self = shift;
+  my %option = @_;
+  my (%e) = &{$self->{option}->{hook_encode_string}} ($self, 
+          $self->{value}, type => 'phrase');
+  my $unsafe_rule = $option{unsafe_rule} || $self->{option}->{value_unsafe_rule};
+  $self->_quote_unsafe_string ($e{value}, unsafe => $unsafe_rule);
 }
 
 
@@ -203,7 +224,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/23 11:41:36 $
+$Date: 2002/03/25 10:15:26 $
 
 =cut
 
