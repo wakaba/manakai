@@ -8,7 +8,7 @@ Message::MIME::MediaType --- Media-type definitions
 package Message::MIME::MediaType;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Header;
 require Message::Header::Message;
 
@@ -256,8 +256,14 @@ $type{application}->{'octet-stream'} = {
 };
 $type{application}->{'/default'} = $type{application}->{'octet-stream'};
 
+$type{application}->{'x-batch-smtp'} = {	## RFC 976 BSMTP
+	cte_7bit_preferred	=> 'quoted-printable',
+	text_content	=> 1,
+};
+
 $type{application}->{ecmascript} = {	## Not yet registered in [IANAREG]
 	cte_7bit_preferred	=> 'quoted-printable',
+	text_content	=> 1,
 	mime_charset	=> 1,
 	parameter	=> {
 		version	=> {},
@@ -753,7 +759,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/27 04:44:25 $
+$Date: 2002/08/04 00:16:32 $
 
 =cut
 

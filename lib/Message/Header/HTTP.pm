@@ -10,7 +10,7 @@ require Message::Header::Default;
 package Message::Header::HTTP;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 our %OPTION = %Message::Header::Default::OPTION;
 $OPTION{namespace_uri} = 'urn:x-suika-fam-cx:msgpm:header:http';
@@ -79,6 +79,11 @@ $OPTION{value_type} = {
 	uri	=> ['Message::Field::CSV'],
 	man	=> ['Message::Field::CSV'],
 	opt	=> ['Message::Field::CSV'],
+	warning	=> ['Message::Field::CSV',{
+		-is_quoted_string	=> 0,
+		-use_comment	=> 0,
+		-value_type	=> {'*default' => ['Message::Field::Warning']},
+	}],
 	
 	## A URI
 	base	=> ['Message::Field::URI',{
@@ -163,7 +168,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/08/03 11:42:22 $
+$Date: 2002/08/04 00:16:32 $
 
 =cut
 

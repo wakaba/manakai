@@ -16,7 +16,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%FMT2STR %OPTION %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.21 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.22 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Carp;
 require Message::MIME::EncodedWord;
@@ -88,6 +88,8 @@ require Message::MIME::Charset;
 	$REG{NON_http_attribute_char} = qr/[^\x21\x23-\x24\x26\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\x7C\x7E]/;
 	$REG{NON_http_attribute_char_wsp} = qr/[^\x09\x20\x21\x23-\x24\x26\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\x7C\x7E]/;
 		## Yes, C<attribute-char> does not appear in HTTP spec.
+	
+	$REG{S_uri} = qr#[\x21\x23-\x3B\x3D\x3F-\x5B\x5D\x5F\x61-\x7A\x7E]+#;
 	
 	$REG{NON_base64alphabet} = qr#[^A-Za-z0-9+/=]#;
 	
@@ -809,7 +811,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/08/01 06:43:19 $
+$Date: 2002/08/04 00:16:32 $
 
 =cut
 

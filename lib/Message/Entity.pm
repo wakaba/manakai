@@ -10,10 +10,11 @@ MIME multipart will be also supported (but not implemented yet).
 
 =cut
 
+require 5.6.0;	## (require: v5.6.0 data type)
 package Message::Entity;
 use strict;
-use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.36 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use vars qw(%DEFAULT %REG $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.37 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::Header;
@@ -21,6 +22,7 @@ require Message::MIME::MediaType;
 require Message::MIME::Encoding;
 use overload '""' => sub { $_[0]->stringify },
              fallback => 1;
+*REG = \%Message::Util::REG;
 
 ## Initialize of this class -- called by constructors
   %DEFAULT = (
@@ -54,15 +56,18 @@ use overload '""' => sub { $_[0]->stringify },
     #internal_charset_name
     -header_default_charset	=> 'iso-2022-int-1',
     -header_default_charset_input	=> 'iso-2022-int-1',
-    -hook_init_fill_options	=> sub {},
     -linebreak_strict	=> 0,	## BUG: not work perfectly
+    -output_magic_line	=> 1,
     -parse_all	=> 0,
+    -remove_post_newline	=> 0,
+    -remove_pre_newline	=> 0,
     -text_coderange	=> 'binary',
     	## '8bit' (MIME text/*) / 'binary' (HTTP text/*)
     #ua_field_name	=> 'user-agent',
     -ua_use_Config	=> 1,
     -ua_use_Win32	=> 1,
     -uri_mailto_safe_level	=> 4,
+    -use_magic_line	=> 1,
   );
 sub _init ($;%) {
   my $self = shift;
@@ -87,11 +92,13 @@ sub _init ($;%) {
   }
   
   my $format = $self->{option}->{format};
+  my $ns822 = $Message::Header::NS_phname2uri{'x-rfc822'};
+  my $nshttp = $Message::Header::NS_phname2uri{'x-http'};
   if ($format =~ /http/) {
-    $self->{option}->{fill_date_ns}       = $Message::Header::NS_phname2uri{'x-http'};
-    $self->{option}->{fill_from_ns}       = $Message::Header::NS_phname2uri{'x-http'};
-    $self->{option}->{fill_msgid_from_ns} = $Message::Header::NS_phname2uri{'x-http'};
-    $self->{option}->{fill_ua_ns}         = $Message::Header::NS_phname2uri{'x-http'};
+    $self->{option}->{fill_date_ns} = $nshttp unless defined $options{-fill_date_ns};
+    $self->{option}->{fill_from_ns} = $nshttp unless defined $options{-fill_from_ns};
+    $self->{option}->{fill_ua_ns}   = $nshttp unless defined $options{-fill_ua_ns};
+    $self->{option}->{fill_source} = 0 unless defined $options{-fill_source};
     $self->{option}->{accept_coderange} = 'binary';
     $self->{option}->{text_coderange} = 'binary';
     $self->{option}->{cte_default} = 'binary';
@@ -99,20 +106,18 @@ sub _init ($;%) {
     if ($format =~ /mail-rfc822|mail-rfc2822/) {
       $self->{option}->{fill_destination} = 1;
     }
-    $self->{option}->{fill_date_ns}       = $Message::Header::NS_phname2uri{'x-rfc822'};
-    $self->{option}->{fill_from_ns}       = $Message::Header::NS_phname2uri{'x-rfc822'};
-    $self->{option}->{fill_msgid_from_ns} = $Message::Header::NS_phname2uri{'x-rfc822'};
-    $self->{option}->{fill_ua_ns}         = $Message::Header::NS_phname2uri{'x-rfc822'};
+    $self->{option}->{fill_date_ns} = $ns822 unless defined $options{-fill_date_ns};
+    $self->{option}->{fill_from_ns} = $ns822 unless defined $options{-fill_from_ns};
+    $self->{option}->{fill_ua_ns}   = $ns822 unless defined $options{-fill_ua_ns};
     $self->{option}->{text_coderange} = '8bit';
     if ($format =~ /news-usefor|smtp-8bitmime/) {
       $self->{option}->{accept_coderange} = '8bit';
-      #$self->{option}->{cte_default} = '8bit';
     } else {
       $self->{option}->{accept_coderange} = '7bit';
     }
   }
-  for (qw/fill_msgid_ns fill_mimever_ns fill_destination_ns fill_sender_ns/) {
-    $self->{option}->{$_} = $Message::Header::NS_phname2uri{'x-rfc822'};
+  for (qw/fill_msgid_ns fill_msgid_from fill_mimever_ns fill_destination_ns fill_sender_ns/) {
+    $self->{option}->{$_} = $ns822;
   }
   $self->{option}->{fill_destination_resent_ns} = $Message::Header::NS_phname2uri{'x-rfc822-resent'};
   unless (defined $self->{option}->{fill_date}) {
@@ -134,7 +139,10 @@ sub _init ($;%) {
     $self->{option}->{fill_ua_name} = $format =~ /response|cgi|uri-url-mailto/?
       'server': 'user-agent';
   }
-  &{ $self->{option}->{hook_init_fill_options} } ($self, $self->{option});
+  unless (defined $options{-output_magic_line}) {
+    $self->{option}->{output_magic_line} = 0
+      if $format =~ /mail|news|mime/;
+  }
   @new_fields;
 }
 
@@ -193,25 +201,48 @@ sub parse ($$;%) {
   unless ($self->{option}->{linebreak_strict}) {
     $nl = Message::Util::decide_newline ($message);
   }
-  ## BUG: binary unsafe yet!
-  my @header = ();
-  my @body = split /$nl/, $message;
-  while (1) {
-    my $line = shift @body;
-    unless (length($line)) {
-      last;
-    } else {
-      push @header, $line;
+  my ($hdr, $body);
+  $message =~ s/^(?:$nl)+//s if $self->{option}->{remove_pre_newline};
+  $message =~ s/(?:$nl)+$/$nl/s if $self->{option}->{remove_post_newline};
+  if ($self->{option}->{use_magic_line}) {
+    ## TODO: Reset format option?
+    if ($message =~ s/>?From (.+?)$nl//gs) {	## Mail from line
+      $new_field{'x-rfc822-mail-from'} = $1;
+    } elsif ($message =~ s#^($REG{http_token})\x20($REG{S_uri})\x20($REG{http_token})/([0-9]+)\.([0-9]+)$nl##gs) {
+    ## HTTP Request
+      ($self->{http_method}, $self->{http_request_uri},
+      $self->{http_protocol_name}, $self->{http_protocol_version})
+        = ($1, $2, uc $3, pack ('U2', $4, $5));
+    } elsif ($message =~ s#^($REG{http_token})/([0-9]+)\.([0-9]+)\x20([0-9][0-9][0-9]\x20.*?)$nl##gs) {
+    ## HTTP Response
+      ($self->{http_protocol_name}, $self->{http_protocol_version})
+        = (uc $1, pack ('U2', $2, $3));
+      $new_field{'x-http-status'} = $4;
+    } elsif ($message =~ s#^($REG{http_token})\x20($REG{S_uri})$nl##gs) {
+    ## HTTP/0.9 simple-request
+      ($self->{http_method}, $self->{http_request_uri},
+      $self->{http_protocol_name}, $self->{http_protocol_version})
+        = ($1, $2, 'HTTP', v0.9);
+      $message = $nl . $message;	## Has no header fields
     }
   }
+  if ($message !~ s/^$nl//s) {
+    ($hdr, $body) = split /$nl$nl/, $message, 2;
+  } else {
+    $hdr = ''; $body = $message;
+    $body =~ s/^$nl//s;
+  }
   $new_field{body} = undef if $new_field{body};
-  $self->{header} = parse_array Message::Header \@header,
+  	## Is this implemention good?
+  $self->{header} = parse Message::Header $hdr,
     -header_default_charset	=> $self->{option}->{header_default_charset},
     -header_default_charset_input	=> $self->{option}->{header_default_charset_input},
     -parse_all => $self->{option}->{parse_all},
-    -format => $self->{option}->{format}, %new_field;
-  $self->{body} = join ($nl, @body) . $nl;
-  $self->{body} = $self->_parse_value ([$self->content_type] => $self->{body})
+    -format => $self->{option}->{format},
+    %new_field;	## Additional header fields
+  
+  $self->{body} = $body;
+  $self->{body} = $self->_parse_value ([ $self->content_type ] => $self->{body})
     if $self->{option}->{parse_all};
   $self;
 }
@@ -592,7 +623,7 @@ sub stringify ($;%) {
         $hdr->field ($option{fill_ua_name})->add_our_name (
           -use_Config	=> $option{ua_use_Config},
           -use_Win32	=> $option{ua_use_Win32},
-          -date	=> q$Date: 2002/08/01 09:20:34 $,
+          -date	=> q$Date: 2002/08/04 00:16:32 $,
         );
       }
     } if $option{fill_missing_fields};
@@ -634,8 +665,28 @@ sub stringify ($;%) {
       $to||$header? 'mailto:'.$to.$header: '';
     }
   } else {
+    ## Magic line (<- named by the author of this module:-)
+    my $mline;
+    if ($option{use_magic_line} && $option{output_magic_line}) {
+      if ($option{format} =~ /mail|news/ && ref $self->{header}) {
+        my $mfrom = $self->{header}->field ('mail-from', -new_item_unless_exist=>0);
+        $mline = sprintf 'From %s', $mfrom->value if ref $mfrom;
+      } elsif ($option{format} =~ /http.+?request/) {
+        $mline = sprintf '%s %s %s/%vd', $self->{http_method} || 'GET',
+          $self->{http_request_uri} || '/', $self->{http_protocol_name} || 'HTTP',
+          $self->{http_protocol_version} || v1.0;
+      } elsif ($option{format} =~ /http.+?response/ && ref $self->{header}
+            && $option{format} !~ /cgi/) {
+        my $s = $self->{header}->field ('x-http-status');
+        $mline = sprintf '%s/%vd %s', $self->{http_protocol_name} || 'HTTP',
+          $self->{http_protocol_version} || v1.0, $s->value || '200 OK';
+      }
+    }
+    $mline .= "\x0D\x0A" if $mline;
+    $mline = '' unless $mline;
+    
     $header .= "\x0D\x0A" if $header && $header !~ /\x0D\x0A$/;
-    $header."\x0D\x0A".$body;
+    $mline.$header."\x0D\x0A".$body;
   }
 }
 *as_string = \&stringify;
@@ -674,7 +725,8 @@ sub content_type ($;%) {
       $ct->media_type_major ($mt);
       $ct->media_type_minor ($mst);
     }
-    if ($self->{option}->{guess_media_type} && $self->{body} && !ref $self->{body}) {
+    if ($self->{option}->{guess_media_type} && $self->{body} && !ref $self->{body}
+     && $self->{option}->{format} =~ /mail|news/) {
       if ($self->{body} =~ /^-----BEGIN PGP SIGNED MESSAGE-----\x0D?$/m
         && $self->{body} =~ /^-----BEGIN PGP SIGNATURE-----\x0D?$/m
         && $self->{body} =~ /^-----END PGP SIGNATURE-----\x0D?$/m) {
@@ -701,6 +753,13 @@ sub content_type ($;%) {
         $ct = $self->{header}->field ('content-type') unless ref $ct;
         $mt = $ct->media_type_major ('text');
         $mst = $ct->media_type_minor ('x-message-pem');
+      } elsif ($self->{body} =~ /^#(?:HELO|EHLO)/mi
+            && $self->{body} =~ /^#MAIL FROM:/mi
+            && $self->{body} !~ /^[^#]/m) {
+        ## RFC 976 Batch SMTP (BSMTP) message
+        $ct = $self->{header}->field ('content-type') unless ref $ct;
+        $mt = $ct->media_type_major ('application');
+        $mst = $ct->media_type_minor ('x-batch-smtp');
       }
     }
   } else {
@@ -785,17 +844,17 @@ sub destination ($;%) {
   for (grep {/^-/} keys %params) {$option{substr ($_, 1)} = $params{$_}}
   my $hdr = $self->{header};
   my @to;
-  if ($option{use_x_envelope_to} && $hdr->field_exist ('x-envelope-to')) {
-    @to = $hdr->field ('x-envelope-to')->addr_spec;
-  } elsif ($option{use_resent} && $hdr->field_exist ('resent-from')) {
+  if ($option{use_x_envelope_to} && $hdr->field_exist ('x-rfc822-x-envelope-to')) {
+    @to = $hdr->field ('x-rfc822-x-envelope-to')->addr_spec;
+  } elsif ($option{use_resent} && $hdr->field_exist ('x-rfc822-resent-from')) {
     ## TODO: Resent block support
-    @to = ($hdr->field ('resent-to')->addr_spec,
-           $hdr->field ('resent-cc')->addr_spec,
-           $hdr->field ('resent-bcc')->addr_spec);
+    @to = ($hdr->field ('x-rfc822-resent-to')->addr_spec,
+           $hdr->field ('x-rfc822-resent-cc')->addr_spec,
+           $hdr->field ('x-rfc822-resent-bcc')->addr_spec);
   } elsif ($option{use_normal}) {
-    @to = ($hdr->field ('to')->addr_spec,
-           $hdr->field ('cc')->addr_spec,
-           $hdr->field ('bcc')->addr_spec);
+    @to = ($hdr->field ('x-rfc822-to')->addr_spec,
+           $hdr->field ('x-rfc822-cc')->addr_spec,
+           $hdr->field ('x-rfc822-bcc')->addr_spec);
   }
   @to;
 }
@@ -823,7 +882,8 @@ sub list_name ($) {
     }
   }
   if ($hdr->field_exist ('subject')) {
-    return $hdr->field ('subject')->list_name;
+    my $s = $hdr->field ('subject');
+    return $s->list_name if $s->method_available ('list_name');
   }
   undef;
 }
@@ -849,7 +909,8 @@ sub list_count ($) {
     }
   }
   if ($hdr->field_exist ('subject')) {
-    return $hdr->field ('subject')->list_count;
+    my $s = $hdr->field ('subject');
+    return $s->list_count if $s->method_available ('list_count');
   }
   undef;
 }
@@ -1116,7 +1177,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/08/01 09:20:34 $
+$Date: 2002/08/04 00:16:32 $
 
 =cut
 
