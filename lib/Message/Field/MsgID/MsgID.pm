@@ -14,7 +14,7 @@ draft-ietf-usefor-msg-id-alt-00 is supported.
 package Message::Field::MsgID::MsgID;
 use strict;
 use vars qw(%REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Carp;
 use overload '""' => sub {shift->stringify};
 use autouse Digest::MD2 => qw(md2_hex md2_base64);
@@ -56,13 +56,14 @@ sub new ($;%) {
     $$o{login} = $1; $$o{fqdn} = $2;
   }
   if ($$o{check}>0 
-   && $$o{fqdn} =~ /[.@](?:example\.(?:com|org|net)|example|invalid)$/) {
-      croak 'invalid FQDN';
+   && $$o{fqdn} =~ 
+     /[.@](example\.(?:com|org|net)|localdomain|localhost|example|invalid)$/) {
+      croak "new: invalid TLD of FQDN: .$1";
   }
   if (!$$o{fqdn} && $$o{ip_address}) {
     if ($$o{check}>0 && $$o{ip_address}=~/([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)/){
       my ($c1, $c2, $c3, $c4) = ($1, $2, $3, $4);
-      croak 'invalid IPv4 address' if ($c1 == 10)
+      croak "new: invalid IPv4 address: $c1.$c2.$c3.$c4" if ($c1 == 10)
            || ($c1 == 172 && 16 <= $c2 && $c2 < 32) 
            || ($c1 == 192 && $c2 == 168) || ($c1 >= 224);
     }
@@ -72,7 +73,7 @@ sub new ($;%) {
     $$o{uucp} .= '.uucp' if $$o{check}>0 && $$o{uucp} !~ /\.uucp/i;
     $$o{fqdn} = $$o{uucp};
   }
-  croak 'no fqdn' if $$o{check}>0 && !$$o{fqdn};
+  croak "new: no FQDN" if $$o{check}>0 && !$$o{fqdn};
   
   $self->{id_right} = $$o{fqdn};
   
@@ -254,7 +255,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/20 09:56:26 $
+$Date: 2002/03/21 04:18:38 $
 
 =cut
 
