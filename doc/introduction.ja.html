@@ -4,7 +4,7 @@
    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xml:lang="ja" xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title xml:lang="en">Message::* Perl modules</title>
+<title>manakai (旧称 Message::* Perl modules)</title>
 <link rel="index" href="./" />
 <link rel="stylesheet" href="/s/simpledoc.css" type="text/css" />
 <link rev="made" href="mailto:w@suika.fam.cx" />
@@ -13,7 +13,12 @@
 <meta name="keywords" content="Perl, module, pm, Message, RFC 822, RFC 2822, RFC 1036, son-of-RFC1036, MIME, Usefor, HTTP, CGI, header, field" />
 </head>
 <body>
-<h1>Message::* Perl modules</h1>
+<h1>manakai (旧称 Message::* Perl modules)</h1>
+
+<p>注意: この文書の内容には古い事柄が含まれています。
+最新の情報は
+<a href="/~wakaba/-temp/wiki/wiki?manakai">SuikaWiki:manakai</a>
+をご覧ください。</p>
 
 <h2>はじめのはじめに</h2>
 
@@ -167,22 +172,26 @@ draft-usefor-article (06)</a>) の頭領域の多くに対応しています。</li>
 
 <p>suika.fam.cx の SSH account をお持ちの場合、 CVS から入手出来ます。</p>
 
-<p class="example">$ cvs -d :ext:<var xml:lang="en">username</var>@suika.fam.cx:/home/cvs -d perl/lib/Message/</p>
+<p class="example"><samp>$ </samp><kbd>cvs -d :ext:<var xml:lang="en">username</var>@suika.fam.cx:/home/cvs co messaging/manakai</kbd></p>
 
-<p>Web からも取り出せます。 &lt;<a href="/gate/cvs/perl/lib/Message/">http://suika.fam.cx/gate/cvs/perl/lib/Message/</a>&gt;</p>
+<p>Web からも取り出せます: 
+<code class="uri">&lt;<a href="/gate/cvs/messaging/manakai/">http://suika.fam.cx/gate/cvs/messaging/manakai/</a>&gt;</code></p>
 
-<p><a href="/gate/cvs/perl/lib/Message/Message.tar.gz?tarball=1">最新の tarball を取得</a>。</p>
+<p><a href="/gate/cvs/messaging/manakai/manakai.tar.gz?tarball=1">最新開発版 
+snapshot の tarball を取得</a>することもできます。</p>
 
 <h2>ライセンス</h2>
 
-<p>Message::* Perl modules は自由ソフトウェアです。
-GNU GPL に従って利用出来ます。詳しくは各ファイルを御覧下さい。</p>
+<p>manakai は自由ソフトウェアです。
+<a href="http://www.gnu.org/">GNU</a> 
+<a href="/c/gnu/gpl">GPL</a> に従って利用出来ます。
+詳しくは各構成ファイルを御覧下さい。</p>
 
 <h2>関連文書など</h2>
 
 <ul>
-<li id="code">文字コードの扱い</li>
-<li><a href="spec/">関連する仕様書 (RFC, Internet-Draft 等)</a></li>
+<li id="code"><a href="charset">文字コードの扱い</a></li>
+<li><a href="/~wakaba/-temp/wiki/wiki?manakai">SuikaWiki:manakai</a></li>
 </ul>
 
 <h2>応用</h2>
@@ -225,7 +234,7 @@ draft-usefor-article) の完全実装</li>
        src="http://jigsaw.w3.org/css-validator/images/vcss" 
        alt="Valid CSS!" /></a>
 </div>
-<div class="update">$Date: 2002/07/13 11:51:56 $</div>
+<div class="update">$Date: 2003/08/17 03:37:53 $</div>
 <ul class="myuri">
 <li>&lt;URL:<a href="http://suika.fam.cx/~wakaba/Message-pm/introduction">http://suika.fam.cx/~wakaba/Message-pm/introduction</a>&gt;</li>
 <li>&lt;CVS:<a href="http://suika.fam.cx/gate/cvs/perl/web/Message-pm/">suika.fam.cx:/home/cvs/perl/web/Message-pm/</a>&gt;</li>
