@@ -1,21 +1,21 @@
 
 =head1 NAME
 
-SuikaWiki::Markup::XML::Catalog --- SuikaWiki XML: XML Catalog implementation
+Message::Markup::XML::Catalog --- manakai: XML Catalog implementation
 
 =head1 DESCRIPTION
 
 This module provides support for ths XML Catalog, defined by the OASIS Entity
 Resolution Technical Committee.
 
-This module is part of SuikaWiki XML support.
+This module is part of manakai.
 
 =cut
 
-package SuikaWiki::Markup::XML::Catalog;
+package Message::Markup::XML::Catalog;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
-require SuikaWiki::Markup::XML;
+our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+require Message::Markup::XML;
 require URI;
 our %NS = (
 	catalog	=> 'urn:oasis:names:tc:entity:xmlns:xml:catalog',
@@ -28,17 +28,17 @@ our %Catalog;
 # $catalog_processor
 # ->{checked_catalogs}	Hash reference of URIs of catalog entry files already processed
 # ->{current_catalogs}	Array reference of URIs of current catalog entry files list
-# ->{error}	SuikaWiki::Markup::XML::Error object
+# ->{error}	Message::Markup::XML::Error object
 # ->{parent}	Parent catalog processor if any
 
 # $catalog_entry_file
-# ->{document}	SuikaWiki::Markup::XML object for #document node of object
+# ->{document}	Message::Markup::XML object for #document node of object
 # ->
 
 sub new ($) {
   my $self = bless {}, shift;
-  require SuikaWiki::Markup::XML::Error;
-  $self->{error} = SuikaWiki::Markup::XML::Error->new ({
+  require Message::Markup::XML::Error;
+  $self->{error} = Message::Markup::XML::Error->new ({
     DTD_OF_XC_NOT_READ	=> {
     	description	=> q(DTD of XML Catalog 1.0 (PUBLIC "%s" SYSTEM "%s") is not read),
     	level	=> q(warn),
@@ -348,8 +348,8 @@ sub _open_catalog_file ($$) {
   
   my $p = {uri => $file};
   my $o = {uri => $file, entity_type => 'document_entity'};
-  require SuikaWiki::Markup::XML::Parser;
-  require SuikaWiki::Markup::XML::EntityManager;
+  require Message::Markup::XML::Parser;
+  require Message::Markup::XML::EntityManager;
   my $eh = sub {
   		my ($caller, $o, $error_type, $error_msg) = @_;
   		require Carp;
@@ -363,7 +363,7 @@ sub _open_catalog_file ($$) {
   		}
   		return 0;
   	};
-  my $parser = SuikaWiki::Markup::XML::Parser->new (option => {error_handler => $eh,
+  my $parser = Message::Markup::XML::Parser->new (option => {error_handler => $eh,
   	uri_resolver => sub {
   		my ($himself, $parser, $decl, $p) = @_;
   		my $ures = $self->option ('uri_resolver', undef, -see_parent => 1);
@@ -383,9 +383,9 @@ sub _open_catalog_file ($$) {
   		}
   		return 1;
   	}});
-  my $em = SuikaWiki::Markup::XML::EntityManager->new;
+  my $em = Message::Markup::XML::EntityManager->new;
   $em->option (error_handler => $eh);
-  $em->default_uri_resolver ($parser, 'SuikaWiki::Markup::XML', $p, $o,
+  $em->default_uri_resolver ($parser, 'Message::Markup::XML', $p, $o,
                                dont_parse_text_declaration => 1);
   
   my $doc;
@@ -531,7 +531,7 @@ sub _open_catalog_file ($$) {
   $Catalog{$file};
 }
 
-sub _CLASS_NAME () { 'SuikaWiki::Markup::XML::Catalog' }
+sub _CLASS_NAME () { 'Message::Markup::XML::Catalog' }
 
 sub option ($$;$%) {
   my ($self, $name, $value, %opt) = @_;
@@ -568,4 +568,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/07/06 01:40:36 $
+1; # $Date: 2003/09/07 03:09:18 $

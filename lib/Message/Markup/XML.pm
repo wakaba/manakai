@@ -1,7 +1,7 @@
 
 =head1 NAME
 
-SuikaWiki::Markup::XML --- SuikaWiki: Simple well-formed document fragment generator
+Message::Markup::XML --- manakai: Simple well-formed document fragment generator
 
 =head1 DESCRIPTION
 
@@ -15,9 +15,9 @@ markup constructures.  (SuikaWiki is not "tiny"?  Oh, yes, I see:-))
 
 =cut
 
-package SuikaWiki::Markup::XML;
+package Message::Markup::XML;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload '""' => \&outer_xml,
              fallback => 1;
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXML_NCNameStartChar InXMLNCNameChar!;
@@ -66,7 +66,7 @@ our %NS = (
 
 =over 4
 
-=item $x = SuikaWiki::Markup::XML->new (%options)
+=item $x = Message::Markup::XML->new (%options)
 
 Returns new instance of the module.  It is itself a node.
 
@@ -743,7 +743,7 @@ sub entity_value ($;%) {
   }
 }
 
-## This method should be called only from SuikaWiki::Markup::XML::* family modules,
+## This method should be called only from Message::Markup::XML::* family modules,
 ## since this is NOT a FORMAL interface.
 sub _entity_parameter_literal_value ($;%) {
   my $self = shift;
@@ -1214,7 +1214,7 @@ sub _get_entity_manager ($) {
   my $self = shift;
   if ($self->{type} eq '#document') {
     unless ($self->{flag}->{smx__entity_manager}) {
-      require SuikaWiki::Markup::XML::EntityManager;
+      require Message::Markup::XML::EntityManager;
       $self->{flag}->{smx__entity_manager} = SuikaWiki::Markup::XML::EntityManager->new ($self);
     }
     return $self->{flag}->{smx__entity_manager};
@@ -1222,8 +1222,8 @@ sub _get_entity_manager ($) {
     return $self->{parent}->_get_entity_manager;
   } else {
     unless ($self->{flag}->{smx__entity_manager}) {
-      require SuikaWiki::Markup::XML::EntityManager;
-      $self->{flag}->{smx__entity_manager} = SuikaWiki::Markup::XML::EntityManager->new ($self);
+      require Message::Markup::XML::EntityManager;
+      $self->{flag}->{smx__entity_manager} = Message::Markup::XML::EntityManager->new ($self);
     }
     return $self->{flag}->{smx__entity_manager};
   }
@@ -1364,12 +1364,12 @@ Preformatted XML text.
 
 For example, next code generates invalid (non-well-formed) XML Namespace document.
 
-  my $x = SuikaWiki::Markup::XML->new (local_name => 'elementType');
+  my $x = Message::Markup::XML->new (local_name => 'elementType');
   print $x	# <ns1:elementType xmlns:ns1=""></ns1:elementType>
 
 So you must write like:
 
-  my $x = SuikaWiki::Markup::XML->new (local_name => 'elementType');
+  my $x = Message::Markup::XML->new (local_name => 'elementType');
   $x->define_new_namespace ('' => '');
   print $x;	# <elementType xmlns=""></elementType>
 
@@ -1384,4 +1384,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/07 00:44:05 $
+1; # $Date: 2003/09/07 03:09:18 $

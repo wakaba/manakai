@@ -1,24 +1,24 @@
 
 =head1 NAME
 
-SuikaWiki::Markup::XML::Error --- SuikaWiki XML: Error handling module for SuikaWiki::Markup::XML::*
+Message::Markup::XML::Error --- manakai: Error handling module for Message::Markup::XML::*
 
 =head1 DESCRIPTION
 
 This module provides the common error and/or warning handling interface
-for the SuikaWiki::Markup::XML::* modules.  With this module, proper error
+for the Message::Markup::XML::* modules.  With this module, proper error
 recovering and proper message outputing (eg. output as HTML element,
 localized message, etc.) is easily implementable.
 
-This module is part of SuikaWiki XML support.
+This module is part of manakai.
 
 =cut
 
-package SuikaWiki::Markup::XML::Error;
+package Message::Markup::XML::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 our %NS;
-*NS = \%SuikaWiki::Markup::XML::NS;
+*NS = \%Message::Markup::XML::NS;
 
 ## Prefixes:
 ## - 'SYNTAX_':	don't match with XML 1.0 EBNF rules
@@ -601,7 +601,7 @@ sub _default_error_handler ($$$$) {
 
 =over 4
 
-=item $err = SuikaWiki::Markup::XML::Error->new ({error definitions})
+=item $err = Message::Markup::XML::Error->new ({error definitions})
 
 Constructs new error reporting object.   Hash reference to error definition list (like %_Error
 defined in this module) must be specified as an argument.
@@ -738,4 +738,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/08/06 01:51:43 $
+1; # $Date: 2003/09/07 03:09:18 $

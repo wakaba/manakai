@@ -1,20 +1,20 @@
 
 =head1 NAME
 
-SuikaWiki::Markup::XML::DOM --- SuikaWiki: Simple DOM implementation for SuikaWiki::Markup::XML
+Message::Markup::XML::DOM --- manakai: Simple DOM implementation for Message::Markup::XML
 
 =head1 DESCRIPTION
 
 ...
 
-This module is part of SuikaWiki.
+This module is part of manakai.
 
 =cut
 
-package SuikaWiki::Markup::XML::DOM;
+package Message::Markup::XML::DOM;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
-require SuikaWiki::Markup::XML;
+our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+require Message::Markup::XML;
 require SuikaWIki::Markup::XML::DOM::Core;
 
 our %Feature = (
@@ -36,7 +36,7 @@ WARNING: This module is under construction.  Interface of this module is not yet
 
 =cut
 
-package SuikaWiki::Markup::XML::DOM::DOMString;
+package Message::Markup::XML::DOM::DOMString;
 use overload '""' => \&_get_value,
              '.=' => \&_append_value,
              fallback => 1;
@@ -82,8 +82,8 @@ sub _from_utf16 ($$) {
   }
 }
 
-package SuikaWiki::Markup::XML::DOM::DOMString::utf16;
-push @SuikaWiki::Markup::XML::DOM::DOMString::ISA, __PACKAGE__;
+package Message::Markup::XML::DOM::DOMString::utf16;
+push @Message::Markup::XML::DOM::DOMString::ISA, __PACKAGE__;
 
 sub getValue ($) {
   my $self = shift;
@@ -94,9 +94,9 @@ sub setValue ($$) {
   $self->{value} = $self->_from_utf16 ($value);
 }
 
-package SuikaWiki::Markup::XML::DOM::_util;
-push @SuikaWiki::Markup::XML::DOM::ISA, __PACKAGE__;
-push @SuikaWiki::Markup::XML::DOM::Core::Node::ISA, __PACKAGE__;
+package Message::Markup::XML::DOM::_util;
+push @Message::Markup::XML::DOM::ISA, __PACKAGE__;
+push @Message::Markup::XML::DOM::Core::Node::ISA, __PACKAGE__;
 use Char::Class::XML qw/InXMLNCNameChar InXML_NCNameStartChar/;
 
 sub _check_qname ($$) {
@@ -152,7 +152,7 @@ sub _create_dom_node_from_node_object ($$$;%) {
   my ($self, $nodeObject, %o) = @_;
   my $no = $nodeObject->flag ('dom_node_object');
   return $no if $no;
-  $no = bless {}, 'SuikaWiki::Markup::XML::DOM::Core::'.({
+  $no = bless {}, 'Message::Markup::XML::DOM::Core::'.({
   	'#attribute'	=> 'Attr',
   	'#element'	=> 'Element',
   	'#text'	=> 'Text',
@@ -164,7 +164,7 @@ sub _create_dom_node_from_node_object ($$$;%) {
   $no;
 }
 
-## TODO: SuikaWiki::Markup::XML::Error
+## TODO: Message::Markup::XML::Error
 my %_Error = (
 	## Syntax errors
 	SYNTAX_DATA_OUT_OF_ROOT_ELEMENT	=> {
@@ -305,4 +305,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/06/16 09:58:25 $
+1; # $Date: 2003/09/07 03:09:18 $

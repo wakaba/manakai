@@ -1,24 +1,24 @@
 
 =head1 NAME
 
-SuikaWiki::Markup::XML::Validate --- SuikaWiki XML: XML Validator
+Message::Markup::XML::Validate --- manakai: XML Validator
 
 =head1 DESCRIPTION
 
 This module provides validator facilities for XML document.
-With SuikaWiki::Markup::XML::Parser, it is possible to validate
+With Message::Markup::XML::Parser, it is possible to validate
 an XML document.
 
-This module is part of SuikaWiki XML support.
+This module is part of manakai.
 
 =cut
 
-package SuikaWiki::Markup::XML::Validate;
+package Message::Markup::XML::Validate;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
-require SuikaWiki::Markup::XML::Parser;
+our $VERSION = do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+require Message::Markup::XML::Parser;
 our (%NS);
-*NS = \%SuikaWiki::Markup::XML::NS;
+*NS = \%Message::Markup::XML::NS;
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar!;
 my %xml_re = (
 	Name	=> qr/\p{InXML_NameStartChar}\p{InXMLNameChar}*/,
@@ -28,8 +28,8 @@ my %xml_re = (
 sub new ($;%) {
   my $class = shift;
   my $self = bless {@_}, $class;
-  require SuikaWiki::Markup::XML::Error;
-  $self->{error} = SuikaWiki::Markup::XML::Error->new ({
+  require Message::Markup::XML::Error;
+  $self->{error} = Message::Markup::XML::Error->new ({
     ## Validity error
     VC_ATTR_DEFAULT_LEGAL_VAL_IS_NAME	=> {
     	description	=> 'The declared default value "%s" must meet the lexical constraints of the declared attribute type (%s) : default value must be a valid Name',
@@ -806,7 +806,7 @@ sub _validate_element ($$$) {
   $valid;
 }
 
-#sub _CLASS_NAME () { 'SuikaWiki::Markup::XML::Validate' }
+#sub _CLASS_NAME () { 'Message::Markup::XML::Validate' }
 
 sub option ($$;$%) {
   my ($self, $name, $value, %opt) = @_;
@@ -837,4 +837,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/07/17 23:58:30 $
+1; # $Date: 2003/09/07 03:09:18 $

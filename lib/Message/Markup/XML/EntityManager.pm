@@ -1,7 +1,7 @@
 
 =head1 NAME
 
-SuikaWiki::Markup::XML::EntityManager --- SuikaWiki XML: Entity manager
+Message::Markup::XML::EntityManager --- manakai: XML Entity manager
 
 =head1 DESCRIPTION
 
@@ -15,15 +15,15 @@ Defining the additional or replacing function for the "external identifier(s)
 to entity value convertion", more flexible or secure entity resolving can be
 implemented.  (For detail, see examples below.)
 
-This module is part of SuikaWiki XML support.
+This module is part of XML.
 
 =cut
 
-package SuikaWiki::Markup::XML::EntityManager;
+package Message::Markup::XML::EntityManager;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 our %NS;
-*NS = \%SuikaWiki::Markup::XML::NS;
+*NS = \%Message::Markup::XML::NS;
 
 # $class->new ($yourself)
 sub new ($$) {
@@ -79,7 +79,7 @@ sub get_entity ($$;%) {
     	quot	=> '&#34;',
     }->{$name};
     if ($predec) {
-      for (SuikaWiki::Markup::XML->new (type => '#declaration',
+      for (Message::Markup::XML->new (type => '#declaration',
                                         namespace_uri => $NS{SGML}.'entity')) {
         $_->set_attribute ('value')->append_new_node (type => '#xml', value => $predec);
         return $_;
@@ -232,7 +232,7 @@ sub get_external_entity ($$$$) {
 
 =pod example
 
- my $parser = SuikaWiki::Markup::XML::Parser->new (flag => {smxe__uri_resolver => sub {
+ my $parser = Message::Markup::XML::Parser->new (flag => {smxe__uri_resolver => sub {
  	my ($self, $decl, $p) = @_;
  	@@ $p->{SYSTEM} =~ s///g @@
  	return 1;
@@ -244,7 +244,7 @@ sub default_uri_resolver ($$$$$;%) {
   my ($self, $parser, $decl, $p, $o, %opt) = @_;
   require LWP::UserAgent;
   my $ua = LWP::UserAgent->new;
-  $ua->agent ('"SuikaWiki::Markup::XML::EntityManager"/'.$VERSION);
+  $ua->agent ('"Message::Markup::XML::EntityManager"/'.$VERSION);
   	## TODO: use Message::Field::UA
   my $req = HTTP::Request->new (GET => $p->{uri});
   my $res = $ua->request ($req);
@@ -529,12 +529,12 @@ sub flag ($$;$) {
 }
 
 ## $self->_raise_error: Raising error or warn
-require SuikaWiki::Markup::XML::Error;
-*_raise_error = \&SuikaWiki::Markup::XML::Error::raise;
+require Message::Markup::XML::Error;
+*_raise_error = \&Message::Markup::XML::Error::raise;
 
 =head1 DEVELOPER'S NOTE
 
-This module "knows" how SuikaWiki::Markup::XML works, i.e. this module accesses
+This module "knows" how Message::Markup::XML works, i.e. this module accesses
 internal structure of that module directly.
 
 =head1 LICENSE
@@ -546,4 +546,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/07/16 12:10:22 $
+1; # $Date: 2003/09/07 03:09:18 $

@@ -1,29 +1,29 @@
 
 =head1 NAME
 
-SuikaWiki::Markup::XML::Parser --- SuikaWiki: Simple XML parser
+Message::Markup::XML::Parser --- manakai: Simple XML parser
 
 =head1 DESCRIPTION
 
-This is a simple XML parser intended to be used with SuikaWiki::Markup::XML.
-After parsing of the XML document, this module returns a SuikaWiki::Markup::XML
+This is a simple XML parser intended to be used with Message::Markup::XML.
+After parsing of the XML document, this module returns a Message::Markup::XML
 object so that you can handle XML document with that module (and other modules
 implementing same interface).
 
-This module is part of SuikaWiki.
+This module is part of manakai.
 
 =cut
 
-package SuikaWiki::Markup::XML::Parser;
+package Message::Markup::XML::Parser;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXMLChar
                         InXML_deprecated_noncharacter InXML_unicode_xml_not_suitable!;
-require SuikaWiki::Markup::XML;
-require SuikaWiki::Markup::XML::Error;
-*_raise_error = \&SuikaWiki::Markup::XML::Error::raise;
+require Message::Markup::XML;
+require Message::Markup::XML::Error;
+*_raise_error = \&Message::Markup::XML::Error::raise;
 our %NS;
-*NS = \%SuikaWiki::Markup::XML::NS;
+*NS = \%Message::Markup::XML::NS;
 
 =head1 METHODS
 
@@ -242,7 +242,7 @@ sub parse_text ($$;$%) {
   my ($self, $s, $o, %opt) = @_;
   $o ||= {line => 0, pos => 0, entity_type => 'document_entity',
           uri => $self->{option}->{document_entity_uri}};
-  my $r = SuikaWiki::Markup::XML->new (type => '#document');
+  my $r = Message::Markup::XML->new (type => '#document');
   $r->base_uri ($self->{option}->{document_entity_base_uri})
     if defined $self->{option}->{document_entity_base_uri};
   unless ($opt{entMan}) {
@@ -1863,7 +1863,7 @@ sub flag ($$;$) {
 
 =head1 FLAG NAMES DEFINED BY THIS MODULE
 
-=head2 Flag for SuikaWiki::Markup::XML instance
+=head2 Flag for Message::Markup::XML instance
 
 =over 4
 
@@ -1927,4 +1927,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/07/16 12:10:22 $
+1; # $Date: 2003/09/07 03:09:18 $
