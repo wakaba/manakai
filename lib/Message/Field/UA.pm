@@ -14,7 +14,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%DEFAULT %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::MIME::EncodedWord;
 
@@ -151,7 +151,7 @@ sub stringify ($;%) {
 sub product ($;%) {
   my $self = shift;
   $self->_delete_empty;
-  @{$self->{product}};
+  $self->{product};
 }
 
 sub product_name ($;$%) {

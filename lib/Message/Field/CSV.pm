@@ -18,8 +18,8 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%OPTION %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
-use overload '@{}' => sub {[shift->value]},
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use overload '@{}' => sub {shift->value},
              '""' => sub {shift->stringify};
 require Message::Util;
 $REG{comment} = qr/\x28(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x27\x2A-\x5B\x5D-\xFF]+|(??{$REG{comment}}))*\x29/;
@@ -83,6 +83,7 @@ sub _init_option ($) {
     $self->{option}->{separator_long} = ', ';
     $self->{option}->{long_count} = 5;
     $self->{option}->{value_unsafe_rule} = 'NON_component';
+    $self->{option}->{encoding_after_encode} = 'utf-8';
   } elsif ($field_name eq 'distribution') {
     $self->{option}->{separator} = ',';
     $self->{option}->{separator_long} = ', ';
@@ -159,11 +160,11 @@ sub _parse_list ($$) {
 
 =head2 $self->value ()
 
-Returns value list.
+Returns array reference to value list.
 
 =cut
 
-sub value ($) {@{shift->{value}}}
+sub value ($) {shift->{value}}
 
 =head2 $self->add ($value, [%option])
 
@@ -240,6 +241,15 @@ sub option ($$;$) {
     $self->{option}->{$name} = $value;
   }
   $self->{option}->{$name};
+}
+
+sub value_type ($;$%) {
+  my $self = shift;
+  my $new_value_type = shift;
+  if ($new_value_type) {
+    $self->{option}->{value_type}->[0] = $new_value_type;
+  }
+  $self->{option}->{value_type}->[0] || ':none:';
 }
 
 sub _delete_empty ($) {
@@ -341,7 +351,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/31 13:11:55 $
+$Date: 2002/04/01 05:32:15 $
 
 =cut
 

@@ -14,10 +14,10 @@ use strict;
 require 5.6.0;
 use re 'eval';
 use vars qw(%DEFAULT %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 use Carp;
-use overload '@{}' => sub {shift->_delete_empty()->{param}},
+use overload '@{}' => sub {shift->_delete_empty->{param}},
              '""' => sub {shift->stringify};
 
 $REG{WSP} = qr/[\x09\x20]/;
@@ -84,7 +84,7 @@ Returns new Message::Field::Params.  Some options can be given as hash.
 
 sub new ($;%) {
   my $class = shift;
-  my $self = bless {option => {@_}}, $class;
+  my $self = bless {option => {@_}, param => []}, $class;
   $self->_initialize ();
   $self->_initialize_new ();
   for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
@@ -107,7 +107,7 @@ Some options can be given as hash.
 sub parse ($$;%) {
   my $class = shift;
   my $body = shift;
-  my $self = bless {option => {@_}}, $class;
+  my $self = bless {option => {@_}, param => []}, $class;
   $self->_initialize ();
   $self->_initialize_parse ();
   for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
@@ -184,8 +184,7 @@ sub _restore_param ($@) {
       ($i->[0], $q) = $self->_unquote_if_quoted_string ($i->[0]);
       my %s = &{$self->{option}->{hook_decode_string}} ($self, $i->[0],
                 type => ($q?'phrase/quoted':'phrase'));
-      ($i->[0]) = ($s{value});
-      push @ret, $i
+      push @ret, [$s{value}, {is_parameter => 0}];
     }
   }
   for my $name (keys %part) {
@@ -346,13 +345,31 @@ sub parameter_value ($$;$) {
   $self->{param}->[$i]->[1]->{value};
 }
 
+sub value_type ($;$$%) {
+  my $self = shift;
+  my $name = shift || '*DEFAULT';
+  my $new_value_type = shift;
+  if ($new_value_type) {
+    $self->{option}->{value_type}->{$name} = []
+      unless ref $self->{option}->{value_type}->{$name};
+    $self->{option}->{value_type}->{$name}->[0] = $new_value_type;
+  }
+  if (ref $self->{option}->{value_type}->{$name}) {
+    $self->{option}->{value_type}->{$name}->[0]
+      || $self->{option}->{value_type}->{'*DEFAULT'}->[0];
+  } else {
+    $self->{option}->{value_type}->{'*DEFAULT'}->[0];
+  }
+}
+
 ## Hook called before returning C<value>.
 ## $self->_param_value ($name, $value);
 sub _param_value ($$$) {
   my $self = shift;
   my $name = shift || '*DEFAULT';
   my $value = shift;
-  my $vtype = $self->{option}->{value_type}->{$name}->[0];
+  my $vtype = $self->{option}->{value_type}->{$name}->[0]
+      || $self->{option}->{value_type}->{'*DEFAULT'}->[0];
   my %vopt; %vopt = %{$self->{option}->{value_type}->{$name}->[1]} 
     if ref $self->{option}->{value_type}->{$name}->[1];
   if (ref $value) {
@@ -372,7 +389,7 @@ sub _delete_empty ($) {
   my $self = shift;
   my @ret;
   for my $param (@{$self->{param}}) {
-    push @ret, $param if $param->[0];
+    push @ret, $param if ref $param;
   }
   $self->{param} = \@ret;
   $self;
@@ -581,7 +598,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/31 13:11:55 $
+$Date: 2002/04/01 05:32:15 $
 
 =cut
 

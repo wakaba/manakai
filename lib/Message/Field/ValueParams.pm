@@ -16,7 +16,7 @@ BEGIN {
   use base Message::Field::Params;
   use vars qw(%DEFAULT %REG $VERSION);
 }
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 %REG = %Message::Field::Params::REG;
 
@@ -84,7 +84,8 @@ sub _save_param ($@) {
     }
   }
   $self->{value} ||= $self->{option}->{value_default};
-  $self->{param} = \@p;
+  #$self->{param} = \@p;
+  $self->SUPER::_save_param (@p);
   $self;
 }
 
@@ -218,7 +219,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/31 13:11:55 $
+$Date: 2002/04/01 05:32:15 $
 
 =cut
 
