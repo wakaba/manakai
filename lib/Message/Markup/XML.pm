@@ -17,7 +17,7 @@ markup constructures.  (SuikaWiki is not "tiny"?  Oh, yes, I see:-))
 
 package SuikaWiki::Markup::XML;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload '""' => \&outer_xml,
              fallback => 1;
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXML_NCNameStartChar InXMLNCNameChar!;
@@ -810,32 +810,6 @@ sub external_id ($;%) {
   $r;
 }
 
-=item $s = $x->content_spec
-
-Generates contentspec of element type declaration (ex. C<(E1 | E2 | E3)>)
-or AttDef of attribute declaration (ex. C<name CDATA #REQUIRED>).
-
-=cut
-
-sub content_spec ($) {
-  my $self = shift;
-  if ($self->{type} eq '#element') {
-    my $text = 0;
-    my $contentspec = join ' | ', map {$_->qname} grep {$text = 1 if $_->{type} eq '#text'; $_->{type} eq '#element'} @{$self->{node}};
-        $contentspec = '#PCDATA' . ($contentspec ? ' | ' . $contentspec : '') if $text;
-        
-    return $contentspec ? '(' . $contentspec . ')' : 'EMPTY';
-  } elsif ($self->{type} eq '#attribute') {
-    my $attdef = $self->qname . "\t" . ($self->{data_type} || 'CDATA') . "\t";
-    my $default = $self->{default_decl};
-    $default .= ' ' . $self->attribute_value if $default eq '#FIXED';
-    unless ($default) {
-      $default = defined $self->{value} ? $self->attribute_value : '#IMPLIED';
-    }
-    return $attdef . $default;
-  }
-}
-
 =item $tag = $x->inner_xml
 
 Returns the content of the node in XML syntax.  (In case of the C<#element> nodes,
@@ -968,7 +942,8 @@ sub inner_xml ($;%) {
                      . ($_->get_attribute ('occurence', make_new_node => 1)->inner_text)
                     if $tt;
                 } elsif ($_->local_name eq 'element') {
-                  push @tt, $_->get_attribute ('qname', make_new_node => 1)->inner_text;
+                  push @tt, $_->get_attribute ('qname', make_new_node => 1)->inner_text
+                     . ($_->get_attribute ('occurence', make_new_node => 1)->inner_text);
                 }
               }
             }
@@ -991,7 +966,7 @@ sub inner_xml ($;%) {
               $r .= '(#PCDATA|' . $tt . ')*';
             } else {
               $r .= '(#PCDATA)'
-                  . ($grp_node->get_attribute ('connector', make_new_node => 1)->inner_text eq '*'
+                  . ($grp_node->get_attribute ('occurence', make_new_node => 1)->inner_text eq '*'
                      ? '*' : '');
             }
           } else {	## element content
@@ -1185,7 +1160,7 @@ sub inner_text ($;%) {
     $r = $self->set_attribute ('value')->inner_text;
   } else {	# not #reference nor #declaration(ENTITY)
     my $isc = $self->_is_same_class ($self->{value});
-    $r = $self->{value} unless $isc;
+    $r = $self->{value} if !$isc && defined $self->{value};
     if ($o{output_ref_as_is}) {	## output as if RCDATA
       $r =~ s/&/&amp;/g;
       for my $node (($isc?$self->{value}:()), @{$self->{node}}) {
@@ -1396,4 +1371,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/07/13 02:32:24 $
+1; # $Date: 2003/07/16 12:10:22 $

@@ -16,7 +16,7 @@ This module is part of SuikaWiki.
 
 package SuikaWiki::Markup::XML::Parser;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXMLChar
                         InXML_deprecated_noncharacter InXML_unicode_xml_not_suitable!;
 require SuikaWiki::Markup::XML;
@@ -591,10 +591,17 @@ sub _parse_start_tag ($$\$$;%) {
           $self->_clp (_ => $o);
           
           if ($attr_pfx eq 'xmlns') {
+            $c->{ns_specified}->{$attr_lname} = $attr_node;
+            $attr_node->namespace_uri ($NS{xmlns});
+            $attr_node->{parent} = $c;	## Note: This code might be dangerous.
             my $ns_name = $attr_node->inner_text;
             $opt{entMan}->check_ns_uri ($o, $attr_lname => $ns_name) if length $ns_name;
+            ## TODO: XML Names 1.1 support
+            $ns_name = $c->resolve_relative_uri ($ns_name) if length ($ns_name) == 0;
             $c->define_new_namespace ($attr_lname => $ns_name);
           } elsif (!$attr_pfx && $attr_lname eq 'xmlns') {
+            $c->{ns_specified}->{''} = $attr_node;
+            $attr_node->{parent} = $c;	## Note: This code might be dangerous.
             my $ns_name = $attr_node->inner_text;
             if (length ($ns_name) || lc (substr ($ns_name, 0, 3)) eq 'xml') {
               $opt{entMan}->check_ns_uri ($o, '' => $ns_name);
@@ -632,8 +639,8 @@ sub _parse_start_tag ($$\$$;%) {
       my $defval = $defattr->{attr}->{$_}->get_attribute ('default_value');
       if ($defval) {
         my ($attr_pfx, $attr_lname) = $self->_ns_parse_qname ($_);
-        ## TODO: keep default-declared namespace information
         if ($attr_pfx eq 'xmlns') {
+          $c->{ns_specified}->{$attr_lname} = 0;
           my $ns_name = $defval->inner_text;
           $opt{entMan}->check_ns_uri ($o, $attr_lname => $ns_name) if length $ns_name;
           if ($defattr->{attr_may_not_be_read}->{$_}
@@ -641,8 +648,11 @@ sub _parse_start_tag ($$\$$;%) {
             $self->_raise_error ($o, type => 'WARN_XMLNAMES_EXTERNAL_NS_ATTR',
                                  t => [$attr_lname => $ns_name]);
           }
+          ## TODO: XML Names 1.1 support
+          $ns_name = $c->resolve_relative_uri ($ns_name) if length ($ns_name) == 0;
           $c->define_new_namespace ($attr_lname => $ns_name);
         } elsif (!$attr_pfx && $attr_lname eq 'xmlns') {
+          $c->{ns_specified}->{''} = 0;
           my $ns_name = $defval->inner_text;
           if (length ($ns_name) || lc (substr ($ns_name, 0, 3)) eq 'xml') {
             $opt{entMan}->check_ns_uri ($o, '' => $ns_name);
@@ -784,7 +794,7 @@ sub _parse_dtd ($$\$$;%) {
         my ($status, @params);
           my $t = $self->_parse_md_params ($ms->set_attribute ('status_list'), \$skl, $o,
                                            entMan => $opt{entMan});
-          if ($t =~ /^(?:$xml_re{s})(IGNORE|INCLUDE)(?:$xml_re{s})?$/s) {
+          if ($t =~ /^(?:$xml_re{s})?(IGNORE|INCLUDE)(?:$xml_re{s})?$/s) {
             $status = $1;
           } else {
             $self->_raise_error ($o, c => $ms, type => 'SYNTAX_MS_INVALID_STATUS_STRING', t => $t);
@@ -1442,14 +1452,12 @@ sub _parse_element_declaration ($$$$;%) {
       $type_qname =~ tr/:/_/;
     }
     if ($opt{entMan}->is_declared_entity ($type_qname, namespace_uri => $NS{SGML}.'element',
-                                          dont_use_predefined_entities => 1,
                                           seek => 0)) {
       $self->_raise_error ($o, c => $c,
                            type => 'VC_UNIQUE_ELEMENT_TYPE_NAME', t => $type_qname);
     } else {	## Regist to entMan
       $opt{entMan}->is_declared_entity ($type_qname, namespace_uri => $NS{SGML}.'element',
-                                        dont_use_predefined_entities => 1,
-                                        set_value => 1, seek => 0)
+                                        set_value => $c, seek => 0);
     }
     $c->set_attribute (qname => $type_qname);
   } else {
@@ -1479,11 +1487,11 @@ sub _parse_element_declaration ($$$$;%) {
           $self->_raise_error ($o, c => $c, type => 'NS_SYNTAX_NAME_IS_QNNAME', t => $name);
           $name =~ tr/:/_/;
         }
-        $c->append_new_node (type => '#element', namespace_uri => $NS{SGML}.'element',
-                             local_name => 'element')
-          ->set_attribute (qname => $name);
+        my $enode = $c->append_new_node (type => '#element', namespace_uri => $NS{SGML}.'element',
+                                         local_name => 'element');
+        $enode->set_attribute (qname => $name);
         if ($t =~ s/^([+*?])//) {
-          $c->set_attribute (occurence => $1);
+          $enode->set_attribute (occurence => $1);
         }
       } else {
         if ({qw/EMPTY 1 ANY 1/}->{$name}) {
@@ -1649,8 +1657,12 @@ sub _parse_attlist_declaration ($$$$;%) {
                                            local_name => 'AttDef');
         $attr{node}->set_attribute (qname => $attr{name});
         if ($t =~ s/^$xml_re{s}//s) {
-          if ($t =~ s/^NOTATION$xml_re{s}//s) {
+          if ($t =~ s/^NOTATION//) {
             $attr{type} = 'NOTATION';
+            unless ($t =~ s/^$xml_re{s}//s) {
+              $self->_raise_error ($o, type => 'SYNTAX_INVALID_MD', c => $c,
+                                   t => substr ($t, 0, 10));
+            }
           }
           if (!$attr{type} && $t =~ s/^([A-Za-z]+)//) {	# attname type
             $attr{type} = $1;
@@ -1701,9 +1713,9 @@ sub _parse_attlist_declaration ($$$$;%) {
                            ->append_text ($_);
               }
             }
-          } else {	# attname #somewhat
+          } else {	# attname #somewhat or attname NOTATION non-group
             $self->_raise_error ($o, type => 'SYNTAX_INVALID_MD', c => $c, t => substr ($t, 0, 10));
-            $attr{type} = 'CDATA';
+            $attr{type} ||= 'CDATA';
             next;
           }
           $attr{node}->set_attribute (type => $attr{type});
@@ -1915,4 +1927,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/07/14 07:36:55 $
+1; # $Date: 2003/07/16 12:10:22 $

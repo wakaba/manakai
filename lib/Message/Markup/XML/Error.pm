@@ -16,7 +16,7 @@ This module is part of SuikaWiki XML support.
 
 package SuikaWiki::Markup::XML::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 our %NS;
 *NS = \%SuikaWiki::Markup::XML::NS;
 
@@ -665,9 +665,9 @@ sub _get_node_path ($$) {
   } elsif ($nt eq '#attribute') {
     $nn = '@' . $node->qname;
   } elsif ($nt eq '#text' || $nt eq '#comment') {
-    $nn = 'smxe:'.substr ($nt, 1) . '()' . $self->_get_node_position ($node, type => $nt);
+    $nn = substr ($nt, 1) . '()' . $self->_get_node_position ($node, type => $nt);
   } elsif ($nt eq '#pi') {
-    $nn = 'smxe:pi("' . $nlname . '")'
+    $nn = 'process-instruction("' . $nlname . '")'
         . $self->_get_node_position ($node, local_name => $nlname, type => $nt);
   } elsif ($nt eq '#section') {
     my $nstatus = $node->get_attribute ('status', make_new_node => 1)->inner_text||'INCLUDE';
@@ -738,4 +738,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/07/14 07:36:55 $
+1; # $Date: 2003/07/16 12:10:22 $

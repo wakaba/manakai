@@ -21,7 +21,7 @@ This module is part of SuikaWiki XML support.
 
 package SuikaWiki::Markup::XML::EntityManager;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 our %NS;
 *NS = \%SuikaWiki::Markup::XML::NS;
 
@@ -176,12 +176,16 @@ sub get_attr_definitions ($%) {
           $_->{local_name} eq 'AttDef') {
         my $aname = $_->get_attribute ('qname', make_new_node => 1)->inner_text;
         if ($r{attr}->{$aname}) {
-          $self->raise_error ($o{o}, type => 'WARN_XML_ATTLIST_AT_MOST_ONE_ATTR_DEF',
-                              c => $_, t => $aname)
-            if $o{o};
+          # 
         } else {
           $r{attr}->{$aname} = $_;
           $r{attr_may_not_be_read}->{$aname} = $decl->{flag}->{smxp__declaration_may_not_be_read};
+          for (@{$_->{node}}) {
+            if ($_->{type} eq '#element' && $_->{namespace_uri} eq $NS{XML}.'attlist'
+             && $_->{local_name} eq 'enum') {
+              $r{enum}->{$aname}->{$_->inner_text} = 1;
+            }
+          }
         }
       }
     }
@@ -542,4 +546,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/07/14 07:36:55 $
+1; # $Date: 2003/07/16 12:10:22 $
