@@ -13,7 +13,7 @@ This module is part of manakai XML.
 
 package Message::Markup::XML::Node;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload
   '""'     => \&outer_xml,
   fallback => 1;
@@ -22,11 +22,27 @@ use Char::Class::XML
 use Message::Markup::XML::QName
   qw/NULL_URI NS_xml_URI/;
 require Carp;
+use Exporter;
+BEGIN {our @ISA = qw(Exporter);
+our @EXPORT_OK = qw(NS_SGML NS_XML
+                    SGML_ATTLIST SGML_DOCTYPE SGML_ELEMENT SGML_GENERAL_ENTITY
+                    SGML_PARAM_ENTITY SGML_NOTATION
+                    SGML_GROUP SGML_HEX_CHAR_REF SGML_NCR
+                    XML_ATTLIST);
+}
 
-our %NS = (
-	SGML	=> 'urn:x-suika-fam-cx:markup:sgml:',
-	XML	=> 'urn:x-suika-fam-cx:markup:xml:',
-);
+sub NS_SGML () { q<urn:x-suika-fam-cx:markup:sgml:> }
+sub NS_XML  () { q<urn:x-suika-fam-cx:markup:xml:> }
+sub SGML_ATTLIST () { q<urn:x-suika-fam-cx:markup:sgml:attlist> }
+sub XML_ATTLIST  () { q<urn:x-suika-fam-cx:markup:xml:attlist> }
+sub SGML_DOCTYPE () { q<urn:x-suika-fam-cx:markup:sgml:doctype> }
+sub SGML_ELEMENT () { q<urn:x-suika-fam-cx:markup:sgml:element> }
+sub SGML_GENERAL_ENTITY () { q<urn:x-suika-fam-cx:markup:sgml:entity> }
+sub SGML_PARAM_ENTITY () { q<urn:x-suika-fam-cx:markup:sgml:entity:param> }
+sub SGML_NOTATION () { q<urn:x-suika-fam-cx:markup:sgml:notation> }
+sub SGML_GROUP   () { q<urn:x-suika-fam-cx:markup:sgml:group> } 
+sub SGML_HEX_CHAR_REF () { q<urn:x-suika-fam-cx:markup:sgml:char:ref:hex> }
+sub SGML_NCR     () { q<urn:x-suika-fam-cx:markup:sgml:char:ref> }
 
 =head1 METHODS
 
@@ -398,6 +414,7 @@ sub defined_namespace_prefix ($$;%) {
   my $result = Message::Markup::XML::QName::prefix_to_name 
     ($self->_get_ns_decls_node, $prefix,
      use_prefix_default => 1, use_name_null => 1, 
+     use_xml => 1, use_xmlns => 1,
      ask_parent_node => 1, %opt);
   $result->{name};
 }
@@ -649,6 +666,7 @@ package Message::Markup::XML::Node::attribute;
 our @ISA = 'Message::Markup::XML::Node';
 use Char::Class::XML qw/InXML_NameStartChar InXMLNameChar/;
 use Message::Markup::XML::QName qw/NULL_URI/;
+BEGIN {Message::Markup::XML::Node->import (qw(SGML_GENERAL_ENTITY))}
 
 sub qname ($;%) {
   my ($self, %opt) = @_;
@@ -660,6 +678,7 @@ sub qname ($;%) {
      ),
      $self->{namespace_uri}, $self->{local_name},
      make_new_prefix => 1, check_local_name => 1,
+     use_xml => 1, use_xmlns => 1,
      ask_parent_node => 1, %opt);
   Carp::carp $result->{reason} if $result->{reason};
   return $result->{qname};
@@ -733,7 +752,7 @@ sub _entity_parameter_literal_value ($;%) {
     my $nt = $_->{type};
     ## Bare node and general entity reference node
     if ($nt eq '#xml'
-    or ($nt eq '#reference' and $_->{namespace_uri} eq $NS{SGML}.'entity')) {
+    or ($nt eq '#reference' and $_->{namespace_uri} eq SGML_GENERAL_ENTITY)) {
       $r .= $_->outer_xml;
     ## Text node and parameter entity reference node
     } elsif ($nt ne '#attribute') {
@@ -767,8 +786,12 @@ sub inner_xml ($;%) {
 
 package Message::Markup::XML::Node::declaration;
 our @ISA = 'Message::Markup::XML::Node';
-*NS = \%Message::Markup::XML::Node::NS;
 use Message::Markup::XML::QName qw/NULL_URI/;
+BEGIN {Message::Markup::XML::Node->import 
+         (qw(SGML_ATTLIST SGML_ELEMENT
+             SGML_GENERAL_ENTITY SGML_PARAM_ENTITY
+             SGML_NOTATION SGML_DOCTYPE
+             SGML_GROUP XML_ATTLIST))}
 
 sub qname ($;%) {
   my ($self) = @_;
@@ -777,17 +800,17 @@ sub qname ($;%) {
 
 sub start_tag ($;%) {
   my $self = shift;
-  if ($self->{namespace_uri} eq $NS{SGML}.'entity:parameter'
+  if ($self->{namespace_uri} eq SGML_PARAM_ENTITY
       and $self->{flag}->{smxp__defined_with_param_ref}) {
     '<!ENTITY ';
   } else {
     '<!' . {
-            $NS{SGML}.'attlist'          => 'ATTLIST',
-            $NS{SGML}.'doctype'          => 'DOCTYPE',
-            $NS{SGML}.'element'          => 'ELEMENT',
-            $NS{SGML}.'entity'           => 'ENTITY',
-            $NS{SGML}.'entity:parameter' => 'ENTITY %',
-            $NS{SGML}.'notation'         => 'NOTATION',
+            (SGML_ATTLIST)          => 'ATTLIST',
+            (SGML_DOCTYPE)          => 'DOCTYPE',
+            (SGML_ELEMENT)          => 'ELEMENT',
+            (SGML_GENERAL_ENTITY)   => 'ENTITY',
+            (SGML_PARAM_ENTITY)     => 'ENTITY %',
+            (SGML_NOTATION)         => 'NOTATION',
            }->{$self->{namespace_uri}} . ' ';
   }
 }
@@ -844,7 +867,7 @@ sub external_id ($;%) {
 sub inner_xml ($;%) {
   my $self = shift;
   ## DOCTYPE declaration
-  if ($self->{namespace_uri} eq $NS{SGML}.'doctype') {
+  if ($self->{namespace_uri} eq SGML_DOCTYPE) {
     my $root = $self->get_attribute_value ('qname', default => undef);
     if (not $root and ref $self->{parent}) {
       for (@{$self->{parent}->{node}}) {
@@ -870,17 +893,17 @@ sub inner_xml ($;%) {
     return $root . ' ' . $r;
   } else { # ATTLIST / ELEMENT / ENTITY / NOTATION
     my $r = '';
-    if ($self->{namespace_uri} eq $NS{SGML}.'entity'
-          || $self->{namespace_uri} eq $NS{SGML}.'entity:parameter'
-          || $self->{namespace_uri} eq $NS{SGML}.'notation') {
+    if ($self->{namespace_uri} eq SGML_GENERAL_ENTITY
+          || $self->{namespace_uri} eq SGML_PARAM_ENTITY
+          || $self->{namespace_uri} eq SGML_NOTATION) {
       my %xid_opt;
       $r = $self->{local_name} . ' ' if !$self->{flag}->{smxp__defined_with_param_ref}
                                         && $self->_check_ncname ($self->{local_name});
-      if ($self->{namespace_uri} eq $NS{SGML}.'entity:parameter') {
+      if ($self->{namespace_uri} eq SGML_PARAM_ENTITY) {
         #$r = '% ' . $r;
-      } elsif ($self->{namespace_uri} eq $NS{SGML}.'entity') {
+      } elsif ($self->{namespace_uri} eq SGML_GENERAL_ENTITY) {
         $xid_opt{use_ndata} = 1;
-      } elsif ($self->{namespace_uri} eq $NS{SGML}.'notation') {
+      } elsif ($self->{namespace_uri} eq SGML_NOTATION) {
         $xid_opt{allow_pubid_only} = 1;
       }
       
@@ -905,7 +928,7 @@ sub inner_xml ($;%) {
           $r .= length $params ? $params : '""';
         }
       }
-    } elsif ($self->{namespace_uri} eq $NS{SGML}.'element') {
+    } elsif ($self->{namespace_uri} eq SGML_ELEMENT) {
       $r = $self->get_attribute_value ('qname')
         unless $self->{flag}->{smxp__defined_with_param_ref};
       if ($r) {
@@ -926,7 +949,7 @@ sub inner_xml ($;%) {
             my @tt;
             for (@{$c->child_nodes}) {
               if ($_->node_type eq '#element'
-              and $_->namespace_uri eq $NS{SGML}.'element') {
+              and $_->namespace_uri eq SGML_ELEMENT) {
                 if ($_->local_name eq 'group') {
                   my $tt = &$make_cmodel ($_);
                   push @tt, '(' . $tt . ')'
@@ -946,7 +969,7 @@ sub inner_xml ($;%) {
           my $grp_node;
           for (@{$self->{node}}) {
             if ($_->node_type eq '#element'
-            and $_->namespace_uri eq $NS{SGML}.'element'
+            and $_->namespace_uri eq SGML_ELEMENT
             and $_->local_name eq 'group') {
               $grp_node = $_;
               $tt = &$make_cmodel ($grp_node);
@@ -977,12 +1000,12 @@ sub inner_xml ($;%) {
             unless ($_->{type} eq '#attribute' || $_->{type} eq '#element') {
               $r .= $_->outer_xml;
             } elsif ($_->{type} eq '#element'
-                 and $_->{namespace_uri} eq $NS{SGML}.'group') {
+                 and $_->{namespace_uri} eq SGML_GROUP) {
               $r .= $_->outer_xml;
             }
           }
       }
-    } elsif ($self->{namespace_uri} eq $NS{SGML}.'attlist') {
+    } elsif ($self->{namespace_uri} eq SGML_ATTLIST) {
       $r = $self->get_attribute_value ('qname')
         unless $self->{flag}->{smxp__defined_with_param_ref};
       if ($r) {
@@ -992,7 +1015,7 @@ sub inner_xml ($;%) {
         }
         for (@{$self->{node}}) {
           if ($_->{type} eq '#element'
-          and $_->{namespace_uri} eq $NS{XML}.'attlist'
+          and $_->{namespace_uri} eq XML_ATTLIST
           and $_->{local_name} eq 'AttDef') {
             $r .= "\n\t" . $_->get_attribute_value ('qname');
             my $attr_type = $_->get_attribute_value ('type', default => 'CDATA');
@@ -1003,7 +1026,7 @@ sub inner_xml ($;%) {
               my @l;
               for my $item (@{$_->{node}}) {
                 if ($item->{type} eq '#element'
-                and $item->{namespace_uri} eq $NS{XML}.'attlist'
+                and $item->{namespace_uri} eq XML_ATTLIST
                 and $item->{local_name} eq 'enum') {
                   push @l, $item->inner_text;
                 }
@@ -1029,7 +1052,7 @@ sub inner_xml ($;%) {
           unless ($_->{type} eq '#attribute' || $_->{type} eq '#element') {
             $r .= $_->outer_xml;
           } elsif ($_->{type} eq '#element'
-               and $_->{namespace_uri} eq $NS{SGML}.'group') {
+               and $_->{namespace_uri} eq SGML_GROUP) {
             $r .= $_->outer_xml;
           }
         }
@@ -1046,11 +1069,11 @@ sub inner_xml ($;%) {
 
 sub inner_text ($;%) {
   my ($self, %opt) = @_;
-  if (   $self->{namespace_uri} eq $NS{SGML}.'entity'
-      or $self->{namespace_uri} eq $NS{SGML}.'entity:parameter') {
+  if (   $self->{namespace_uri} eq SGML_GENERAL_ENTITY
+      or $self->{namespace_uri} eq SGML_PARAM_ENTITY) {
     return $self->get_attribute_value ('value', default => '');
     ## Note: If parameter reference is not resolved, empty string is returned.
-  } elsif ($self->{namespace_uri} eq $NS{SGML}.'doctype') {
+  } elsif ($self->{namespace_uri} eq SGML_DOCTYPE) {
     return $self->SUPER::inner_text (%opt);
   } else {
     return '';
@@ -1070,6 +1093,7 @@ sub qname ($;%) {
     ($self, $self->{namespace_uri}, $self->{local_name},
      make_new_prefix => 1, check_local_name => 1,
      use_prefix_default => 1, use_name_null => 1,
+     use_xml => 1, use_xmlns => 1,
      ask_parent_node => 1, %opt);
   Carp::carp $result->{reason} if $result->{reason};
   return $result->{qname};
@@ -1157,22 +1181,23 @@ sub inner_xml ($;%) {
 
 package Message::Markup::XML::Node::reference;
 our @ISA = 'Message::Markup::XML::Node';
-*NS = \%Message::Markup::XML::Node::NS;
+BEGIN {Message::Markup::XML::Node->import
+        (qw(SGML_HEX_CHAR_REF SGML_NCR SGML_PARAM_ENTITY))}
 
 sub start_tag ($;%) {
   my $self = shift;
-  if ($self->{namespace_uri} eq $NS{SGML}.'char:ref:hex') {
+  if ($self->{namespace_uri} eq SGML_HEX_CHAR_REF) {
     '&#x';
-  } elsif ($self->{namespace_uri} eq $NS{SGML}.'char:ref') {
+  } elsif ($self->{namespace_uri} eq SGML_NCR) {
     '&#';
   } elsif ($self->_check_ncname ($self->{local_name})) {
-    if ($self->{namespace_uri} eq $NS{SGML}.'entity:parameter') {
+    if ($self->{namespace_uri} eq SGML_PARAM_ENTITY) {
       '%';
     } else {
       '&';
     }
   } else {
-    Carp::carp 'start_tag: <@{[$self->{namespace_uri}]}>: Unsupported type of #reference';
+    Carp::carp qq'start_tag: <@{[$self->{namespace_uri}]}>: Unsupported type of #reference';
     '';
   }
 }
@@ -1181,9 +1206,9 @@ sub end_tag ($;%) { ';' }
 
 sub inner_xml ($;%) {
   my $self = shift;
-  if ($self->{namespace_uri} eq $NS{SGML}.'char:ref:hex') {
+  if ($self->{namespace_uri} eq SGML_HEX_CHAR_REF) {
     return sprintf '%02X', $self->{value};
-  } elsif ($self->{namespace_uri} eq $NS{SGML}.'char:ref') {
+  } elsif ($self->{namespace_uri} eq SGML_NCR) {
     return sprintf '%02d', $self->{value};
   } else {  ## Entity reference
     return $self->{local_name};
@@ -1192,8 +1217,8 @@ sub inner_xml ($;%) {
 
 sub inner_text ($;%) {
   my ($self, %opt) = @_;
-  if (   $self->{namespace_uri} eq $NS{SGML}.'char:ref'
-      or $self->{namespace_uri} eq $NS{SGML}.'char:ref:hex') {
+  if (   $self->{namespace_uri} eq SGML_NCR
+      or $self->{namespace_uri} eq SGML_HEX_CHAR_REF) {
     return chr $self->{value};
   } else { # Entity reference
     return $self->SUPER::inner_text (%opt);
@@ -1352,4 +1377,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/11/01 12:20:57 $
+1; # $Date: 2003/11/09 01:47:17 $
