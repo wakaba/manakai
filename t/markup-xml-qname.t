@@ -295,6 +295,18 @@ my @gen_pfx = (
                 n2p    => q:h:,
                },
                {
+                name   => q<http://uri.example/b>,
+                prefix => q:b:,
+               },
+               {
+                name   => q<http://uri.example/bc>,
+                prefix => q:bc:,
+               },
+               {
+                name   => q<http://uri.example/01w>,
+                prefix => q:w:,
+               },
+               {
                 name   => q<test/0name/xmlns>,
                 prefix => q:name:,
                },
