@@ -209,6 +209,21 @@ sub parse ($$;%) {
   $self;
 }
 
+=head2 $self->unix_time ([$new_time])
+
+Returns or set the unix-time (seconds from the Epoch).
+
+=cut
+
+sub unix_time ($;$) {
+  my $self = shift;
+  my $new_time = shift;
+  if (defined $new_time) {
+    $self->{date_time} = $new_time unless $new_time =~ /[^0-9]/;
+  }
+  $self->{date_time};
+}
+
 =head2 $self->second_fraction ([$new_fraction])
 
 Returns or set the decimal fraction of a second.

@@ -18,7 +18,7 @@ $VERSION = '1.00';
 
 use overload '""' => sub {shift->stringify};
 $REG{FWS} = qr/[\x09\x20]*/;
-$REG{re} = qr/[Rr][Ee]\^?\[?[0-9]*\]?:/;
+$REG{re} = qr/(?:[Rr][Ee]|[Ss][Vv])\^?\[?[0-9]*\]?:/;
 $REG{fwd} = qr/[Ff][Ww][Dd]?:/;
 $REG{ml} = qr/[(\[][A-Za-z0-9._-]+[\x20:-][0-9]+[)\]]/;
 $REG{M_ml} = qr/[(\[]([A-Za-z0-9._-]+)[\x20:-]([0-9]+)[)\]]/;
