@@ -319,7 +319,7 @@ sub as_rfc2822_time ($;%) {
   my ($sec,$min,$hour,$day,$month,$year,$day_of_week) = gmtime ($time);
   $month = (qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec))[$month];
   $year += 1900 if $year < 1900;
-  $day_of_week = (qw(Sun Mon Tue Wed Thr Fri Sat))[$day_of_week] .', ';
+  $day_of_week = (qw(Sun Mon Tue Wed Thu Fri Sat))[$day_of_week] .', ';
   
   ($option{output_day_of_week}>0? $day_of_week: '').
   sprintf('%02d %s %s %02d:%02d:%02d %s',
@@ -384,6 +384,21 @@ sub as_iso8601_time ($;%) {
    ($option{output_zone_string}>0 && $zone[0]>0 && $zone[1]+$zone[2]==0? 
     'Z': sprintf('%s%02d:%02d',$zone[0]>0?'+':'-',@zone[1,2]))
   );
+}
+
+=head2 $self->option ($option_name, [$option_value])
+
+Set/gets new value of the option.
+
+=cut
+
+sub option ($$;$) {
+  my $self = shift;
+  my ($name, $value) = @_;
+  if (defined $value) {
+    $self->{option}->{$name} = $value;
+  }
+  $self->{option}->{$name};
 }
 
 =head2 $self->delete_comment ($field_body)

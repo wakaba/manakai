@@ -16,19 +16,31 @@ BEGIN {
   use base Message::Field::Params;
   use vars qw(%DEFAULT %REG $VERSION);
 }
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 %REG = %Message::Field::Params::REG;
 
 %DEFAULT = (
   use_parameter_extension	=> 1,
   value_default	=> '',
-  value_no_regex	=> qr/(?!)/,
+  value_no_regex	=> qr/(?!)/,	## default = (none)
   value_regex	=> qr/[\x00-\xFF]+/,
   value_unsafe_rule	=> 'NON_http_token_wsp',
-  value_type	=> {'*DEFAULT'	=> ':none:',
-  },
 );
+
+## Initialization for both C<new ()> and C<parse ()> methods.
+sub _initialize ($;%) {
+  my $self = shift;
+  my $fname = lc $self->{option}->{field_name};
+  if ($fname eq 'link') {
+    $REG{r_nomatch} = qr/(?!)/;
+    $self->{option}->{value_unsafe_rule} = 'r_nomatch';
+    $self->{option}->{value_type}->{'*value'} = ['Message::Field::URI',
+      {field_name => $self->{option}->{field_name},
+      format => $self->{option}->{format}}];
+  }
+  $self;
+}
 
 =head2 Message::Field::ValueParams->new ([%option])
 
@@ -122,24 +134,7 @@ is a reference to the object.
 
 ## Hook called before returning C<value>.
 ## $self->_param_value ($name, $value);
-sub _param_value ($$$) {
-  my $self = shift;
-  my $name = shift;
-  my $value = shift;
-  my $vtype = $self->{option}->{value_type}->{$name}
-           || $self->{option}->{value_type}->{'*DEFAULT'};
-  if (ref $value) {
-    return $value;
-  } elsif ($vtype eq ':none:') {
-    return $value;
-  } elsif ($value) {
-    eval "require $vtype";
-    return $vtype->parse ($value);
-  } else {
-    eval "require $vtype";
-    return $vtype->new ();
-  }
-}
+## -- Inherited.
 
 =head2 $self->stringify ([%option])
 
@@ -170,8 +165,7 @@ sub value ($;$%) {
   if ($new_value && $new_value !~ m#$self->{option}->{value_no_regex}#) {
     $self->{value} = $new_value;
   }
-  #my $unsafe_rule = $option{unsafe_rule} || $self->{option}->{value_unsafe_rule};
-  #$self->_quote_unsafe_string ($self->{value}, unsafe => $unsafe_rule);
+  $self->{value} = $self->_param_value ('*value', $self->{value});
   $self->{value};
 }
 
@@ -189,7 +183,7 @@ sub value_as_string ($;%) {
   my (%e) = &{$self->{option}->{hook_encode_string}} ($self, 
           $self->{value}, type => 'phrase');
   my $unsafe_rule = $option{unsafe_rule} || $self->{option}->{value_unsafe_rule};
-  $self->_quote_unsafe_string ($e{value}, unsafe => $unsafe_rule);
+  $self->_quote_unsafe_string ($e{value}, unsafe_regex => $REG{$unsafe_rule});
 }
 
 
@@ -224,7 +218,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/26 05:31:56 $
+$Date: 2002/03/31 13:11:55 $
 
 =cut
 

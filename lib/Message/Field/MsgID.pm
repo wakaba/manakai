@@ -19,7 +19,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%OPTION %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload '@{}' => sub {shift->{id}},
              '""' => sub {shift->stringify};
 
@@ -46,7 +46,7 @@ $REG{NON_atom} = qr/[^\x09\x20\x21\x23-\x27\x2A\x2B\x2D\x2F\x30-\x39\x3D\x3F\x41
   field_name	=> 'message-id',
   reduce_first	=> 1,
   reduce_last	=> 3,
-  reduce_max	=> 10,
+  reduce_max	=> 21,
 );
 
 sub _init_option ($$) {
@@ -170,6 +170,21 @@ sub stringify ($;%) {
   }
 }
 
+=head2 $self->option ($option_name, [$option_value])
+
+Set/gets new value of the option.
+
+=cut
+
+sub option ($$;$) {
+  my $self = shift;
+  my ($name, $value) = @_;
+  if (defined $value) {
+    $self->{option}->{$name} = $value;
+  }
+  $self->{option}->{$name};
+}
+
 sub _delete_empty ($) {
   my $self = shift;
   my @nid;
@@ -264,7 +279,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/26 05:31:55 $
+$Date: 2002/03/31 13:11:55 $
 
 =cut
 

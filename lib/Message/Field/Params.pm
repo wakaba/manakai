@@ -14,7 +14,7 @@ use strict;
 require 5.6.0;
 use re 'eval';
 use vars qw(%DEFAULT %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 use Carp;
 use overload '@{}' => sub {shift->_delete_empty()->{param}},
@@ -26,6 +26,8 @@ $REG{FWS} = qr/[\x09\x20]*/;
 $REG{comment} = qr/\x28(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x27\x2A-\x5B\x5D-\xFF]+|(??{$REG{comment}}))*\x29/;
 $REG{quoted_string} = qr/\x22(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\xFF])*\x22/;
 $REG{domain_literal} = qr/\x5B(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x5A\x5E-\xFF])*\x5D/;
+$REG{uri_literal} = qr/\x3C[\x09\x20\x21\x23-\x3B\x3D\x3F-\x5B\x5D\x5F\x61-\x7A\x7E]*\x3E/;
+
 $REG{atext} = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2F-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]+/;
 $REG{atext_dot} = qr/[\x21\x23-\x27\x2A\x2B\x2D-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]+/;
 $REG{token} = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+/;
@@ -33,7 +35,7 @@ $REG{http_token} = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\
 $REG{attribute_char} = qr/[\x21\x23-\x24\x26\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+/;
 $REG{S_encoded_word} = qr/=\x3F$REG{atext_dot}\x3F=/;
 
-$REG{param} = qr/(?:$REG{atext_dot}|$REG{quoted_string})(?:$REG{atext_dot}|$REG{quoted_string}|$REG{WSP}|,)*/;
+$REG{param} = qr/(?:$REG{atext_dot}|$REG{quoted_string}|$REG{uri_literal})(?:$REG{atext_dot}|$REG{quoted_string}|$REG{WSP}|,)*/;
 	## more naive C<parameter>.  (Comma is allowed for RFC 1049)
 $REG{parameter} = qr/$REG{token}=(?:$REG{token}|$REG{quoted_string})?/;
 	## as defined by RFC 2045, not RFC 2231.
@@ -68,7 +70,11 @@ $REG{NON_http_attribute_char} = qr/[^\x21\x23-\x24\x26\x2B\x2D\x2E\x30-\x39\x41-
   	\&Message::Util::decode_header_string,
   parameter_value_max	=> 78,
   use_parameter_extension	=> -1,
+  value_type	=> {'*DEFAULT'	=> [':none:']},
 );
+
+## Initialization for both C<new ()> and C<parse ()> methods.
+sub _initialize ($;%) {$_[0]}
 
 =head2 Message::Field::Params->new ([%option])
 
@@ -79,6 +85,7 @@ Returns new Message::Field::Params.  Some options can be given as hash.
 sub new ($;%) {
   my $class = shift;
   my $self = bless {option => {@_}}, $class;
+  $self->_initialize ();
   $self->_initialize_new ();
   for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
   $self;
@@ -101,6 +108,7 @@ sub parse ($$;%) {
   my $class = shift;
   my $body = shift;
   my $self = bless {option => {@_}}, $class;
+  $self->_initialize ();
   $self->_initialize_parse ();
   for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
   $body = $self->_delete_comment ($body);
@@ -340,7 +348,25 @@ sub parameter_value ($$;$) {
 
 ## Hook called before returning C<value>.
 ## $self->_param_value ($name, $value);
-sub _param_value ($$$) {$_[2]}
+sub _param_value ($$$) {
+  my $self = shift;
+  my $name = shift || '*DEFAULT';
+  my $value = shift;
+  my $vtype = $self->{option}->{value_type}->{$name}->[0];
+  my %vopt; %vopt = %{$self->{option}->{value_type}->{$name}->[1]} 
+    if ref $self->{option}->{value_type}->{$name}->[1];
+  if (ref $value) {
+    return $value;
+  } elsif ($vtype eq ':none:') {
+    return $value;
+  } elsif ($value) {
+    eval "require $vtype";
+    return $vtype->parse ($value, %vopt);
+  } else {
+    eval "require $vtype";
+    return $vtype->new (%vopt);
+  }
+}
 
 sub _delete_empty ($) {
   my $self = shift;
@@ -463,7 +489,8 @@ sub _quote_unsafe_string ($$;%) {
   my $string = shift;
   my %option = @_;
   $option{unsafe} ||= 'NON_atext_dot';
-  if ($string =~ /$REG{$option{unsafe}}/ || $string =~ /$REG{WSP}$REG{WSP}+/) {
+  $option{unsafe_regex} ||= $REG{$option{unsafe}};
+  if ($string =~ /$option{unsafe_regex}/ || $string =~ /$REG{WSP}$REG{WSP}+/) {
     $string =~ s/([\x22\x5C])([\x21-\x7E])?/"\x5C$1".(defined $2?"\x5C$2":'')/ge;
     $string = '"'.$string.'"';
   }
@@ -514,7 +541,7 @@ This method is intended for internal use.
 sub _delete_comment ($$) {
   my $self = shift;
   my $body = shift;
-  $body =~ s{($REG{quoted_string}|$REG{domain_literal})|$REG{comment}}{
+  $body =~ s{($REG{quoted_string}|$REG{uri_literal}|$REG{domain_literal})|$REG{comment}}{
     my $o = $1;  $o? $o : ' ';
   }gex;
   $body;
@@ -554,7 +581,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/26 05:31:55 $
+$Date: 2002/03/31 13:11:55 $
 
 =cut
 

@@ -14,7 +14,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%DEFAULT %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 
 use overload '""' => sub {shift->stringify};
@@ -159,9 +159,6 @@ sub set_new ($$) {
   $self->{is_reply} = -1;
   $self;
 }
-
-=head1 EXAMPLE
-
 
 =head1 LICENSE
 

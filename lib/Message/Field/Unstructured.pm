@@ -14,7 +14,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%DEFAULT %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 use overload '""' => sub {shift->stringify};
 
@@ -74,6 +74,20 @@ sub as_string ($;%) {shift->stringify (@_)}
 
 sub as_plain_string ($;%) {
   shift->{field_body};
+}
+=head2 $self->option ($option_name, [$option_value])
+
+Set/gets new value of the option.
+
+=cut
+
+sub option ($$;$) {
+  my $self = shift;
+  my ($name, $value) = @_;
+  if (defined $value) {
+    $self->{option}->{$name} = $value;
+  }
+  $self->{option}->{$name};
 }
 
 =head1 LICENSE

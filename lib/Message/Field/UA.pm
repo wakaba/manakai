@@ -14,8 +14,9 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%DEFAULT %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
+require Message::MIME::EncodedWord;
 
 use overload '""' => sub {shift->stringify},
              '@{}' => sub {shift->product};
@@ -77,6 +78,7 @@ sub parse ($$;%) {
       my $comment = $self->_decode_ccontent ($1);
       push @ua, {comment => [$comment]} if $comment;
     }goex;
+    '';
   }goex;
   $field_body =~ s{$REG{M_product}((?:$REG{FWS}$REG{comment})*)}{
     my ($product, $product_version, $comments) = ($1, $2, $3);
@@ -104,24 +106,36 @@ Returns C<field-body> as a string.
 
 =cut
 
-sub stringify ($) {
+sub stringify ($;%) {
   my $self = shift;
+  my %option = @_;
+  $option{format} ||= $self->{option}->{format};
   my @r = ();
   for my $p (@{$self->{product}}) {
     if ($p->{product}) {
-      my %e = &{$self->{option}->{hook_encode_string}} ($self, 
-         $p->{product}, type => 'token');
-      my %f = &{$self->{option}->{hook_encode_string}} ($self, 
-         $p->{product_version}, type => 'token');
-      push @r, $self->_quote_unsafe_string ($e{value}, unsafe => 'NON_http_token')
-        .($f{value}?'/'
-         .$self->_quote_unsafe_string ($f{value}, unsafe => 'NON_http_token')
-         :'');
+      if ($option{format} eq 'http'
+        && (  $p->{product} =~ /$REG{NON_http_token}/
+           || $p->{product_version} =~ /$REG{NON_http_token}/)) {
+        my %f = (value => $p->{product});
+        $f{value} .= '/'.$p->{product_version} if $p->{product_version};
+        %f = &{$self->{option}->{hook_encode_string}} ($self, 
+          $f{value}, type => 'ccontent');
+        $f{value} =~ s/([\x28\x29\x5C])([\x21-\x7E])?/"\x5C$1".(defined $2?"\x5C$2":'')/ge;
+        push @r, '('.$f{value}.')';
+      } else {
+        my %e = &{$self->{option}->{hook_encode_string}} ($self, 
+           $p->{product}, type => 'token');
+        my %f = &{$self->{option}->{hook_encode_string}} ($self, 
+           $p->{product_version}, type => 'token');
+        push @r, $self->_quote_unsafe_string ($e{value}, unsafe => 'NON_http_token')
+          .($f{value}?'/'
+           .$self->_quote_unsafe_string ($f{value}, unsafe => 'NON_http_token')
+           :'');
+      }
     } elsif ($p->{product_version}) {	## Error!
       my %f = &{$self->{option}->{hook_encode_string}} ($self, 
          $p->{product_version}, type => 'ccontent');
       $f{value} =~ s/([\x28\x29\x5C])([\x21-\x7E])?/"\x5C$1".(defined $2?"\x5C$2":'')/ge;
-
       push @r, '('.$f{value}.')';
     }
     for (@{$p->{comment}}) {
@@ -188,7 +202,7 @@ sub replace ($;%) {
       }
     }
   }
-  if ($option{add_prepend}||$self->{option}->{add_prepend}>0) {
+  if (($option{add_prepend}||$self->{option}->{add_prepend})>0) {
     unshift @{$self->{product}}, \%a;
   } else {
     push @{$self->{product}}, \%a;
@@ -215,29 +229,6 @@ sub _quote_unsafe_string ($$;%) {
   $string;
 }
 
-sub _decode_ccontent ($$) {
-  my $self = shift;
-  my $ccontent = shift;
-  $ccontent =~ s{((?:\G|$REG{WSP})$REG{S_encoded_word_comment}(?:$REG{WSP}|$))|((?:\x5C[\x00-\xFF]|[\x00-\x08\x0A-\x0C\x0E\x0F\x21-\x27\x2A-\x5B\x5D-\xFF])+)|$REG{M_comment}}{
-    my ($eword, $ccont, $comment) = ($1, $2, $3);
-    my $r = '';
-    if ($comment) {
-      $r = '('.$self->_decode_ccontent ($comment).')';
-    } elsif ($eword) {
-      my %s = &{$self->{option}->{hook_decode_string}} ($self, $eword,
-                type => 'ccontent');
-      $r = $s{value};
-    } else {
-      $ccont =~ s/\x5C([\x00-\xFF])/$1/g;
-      my %s = &{$self->{option}->{hook_decode_string}} ($self, $ccont,
-                type => 'ccontent/quoted');
-      $r = $s{value};
-    }
-    $r;
-  }goex;
-  $ccontent;
-}
-
 ## Unquote C<DQOUTE> and C<quoted-pair> if it is itself a
 ## C<quoted-string>.  (Do nothing if it is MULTIPLE
 ## C<quoted-string>"S".)
@@ -251,6 +242,10 @@ sub _unquote_if_quoted_string ($$) {
     $qtext;
   }goex;
   wantarray? ($quoted_string, $isq): $quoted_string;
+}
+
+sub _decode_ccontent ($$) {
+  &Message::MIME::EncodedWord::decode_ccontent (@_[1,0]);
 }
 
 =head1 LICENSE

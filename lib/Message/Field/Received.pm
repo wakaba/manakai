@@ -237,6 +237,20 @@ sub stringify ($;%) {
 }
 
 sub as_string ($;%) {shift->stringify (@_)}
+=head2 $self->option ($option_name, [$option_value])
+
+Set/gets new value of the option.
+
+=cut
+
+sub option ($$;$) {
+  my $self = shift;
+  my ($name, $value) = @_;
+  if (defined $value) {
+    $self->{option}->{$name} = $value;
+  }
+  $self->{option}->{$name};
+}
 
 =head2 $self->delete_comment ($field_body)
 
@@ -305,7 +319,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/20 09:56:26 $
+$Date: 2002/03/31 13:11:55 $
 
 =cut
 
