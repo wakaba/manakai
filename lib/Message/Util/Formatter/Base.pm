@@ -14,9 +14,9 @@ This module is part of manakai.
 
 package Message::Util::Formatter::Base;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
-our %DefaultRules = (
+sub ___rule_def () {+{
   -bare_text => {
                  
   },
@@ -31,7 +31,21 @@ our %DefaultRules = (
   -entire    => {
     
   },
-);
+}}
+
+sub ___get_rule_def ($$) {
+  my ($self, $name) = @_;
+  my $def = $self->___rule_def->{$name};
+  return $def if $def;
+  no strict 'refs';
+  for my $SUPER (@{(ref ($self) || $self).'::ISA'}) {
+    if ($SUPER->can ('___get_rule_def')) {
+      $def = $SUPER->___get_rule_def ($name);
+      return $def if $def;
+    }
+  }  
+  return undef;
+}
 
 sub new ($;%) {
   my ($class, %opt) = @_;
@@ -42,7 +56,7 @@ sub new ($;%) {
       $self->{rule} = sub { $rules->{$_[1]} };
     }
   } else {
-    $self->{rule} = sub { $DefaultRules{$_[1]} };
+    $self->{rule} = sub { $_[0]->___get_rule_def ($_[1]) };
   }
   $self;
 }
@@ -113,13 +127,13 @@ sub replace ($$;%) {
             last;
           } else {
             throw Message::Util::Formatter::Base::error
-              type => 'ATTR_SEPARATOR_NOT_FOUND',
-              -context_before => (pos ($format) > 20 ?
-                                  substr ($format, pos ($format) - 20, 20):
-                                  substr ($format, 0, pos ($format))),
-              -context_after => substr ($format, pos ($format), 20),
-              -formatter => $self,
-              -option => \%opt;
+              -type => 'ATTR_SEPARATOR_NOT_FOUND',
+              context_before => (pos ($format) > 20 ?
+                                 substr ($format, pos ($format) - 20, 20):
+                                 substr ($format, 0, pos ($format))),
+              context_after => substr ($format, pos ($format), 20),
+              -object => $self, method => 'replace',
+              option => \%opt;
           }
         } # Attributes
       } # Attribute specification list
@@ -130,13 +144,13 @@ sub replace ($$;%) {
                                             option => \%opt);
       } else {
         throw Message::Util::Formatter::Base::error
-          type => 'SEMICOLON_NOT_FOUND',
-          -context_before => (pos ($format) > 20 ?
-                              substr ($format, pos ($format) - 20, 20):
-                              substr ($format, 0, pos ($format))),
-          -context_after => substr ($format, pos ($format), 20),
-          -formatter => $self,
-          -option => \%opt;
+          -type => 'SEMICOLON_NOT_FOUND',
+          context_before => (pos ($format) > 20 ?
+                             substr ($format, pos ($format) - 20, 20):
+                             substr ($format, 0, pos ($format))),
+          context_after => substr ($format, pos ($format), 20),
+          -object => $self, method => 'replace',
+          option => \%opt;
       }
       ($entirerule->{attr}||=$defrule->{attr})->($self, '-entire',
                                                 $opt{param}, $opt{param},
@@ -177,10 +191,11 @@ sub call ($$;@) {
 
 package Message::Util::Formatter::error;
 require Message::Util::Error;
-our @ISA = 'Message::Util::Error';
+push our @ISA, 'Message::Util::Error';
+
 package Message::Util::Formatter::Base::error;
-our @ISA = 'Message::Util::Formatter::error';
-sub ___errors () {+{
+push our @ISA, 'Message::Util::Formatter::error';
+sub ___error_def () {+{
   ATTR_SEPARATOR_NOT_FOUND => {
     description => q[Separator ("," or ")") expected at "%t(name=>context-before);"**here**"%t(name=>context-after);"],  
   },
@@ -198,4 +213,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/12/01 07:50:58 $
+1; # $Date: 2003/12/06 05:09:39 $

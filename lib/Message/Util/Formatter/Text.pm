@@ -15,11 +15,11 @@ This module is part of manakai.
 
 package Message::Util::Formatter::Text;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util::Formatter::Base;
 our @ISA = 'Message::Util::Formatter::Base';
 
-sub rule_def () {+{
+sub ___rule_def () {+{
     -bare_text => {
       after => sub {
         my ($self, $name, $p, $o, $key => $val) = @_;
@@ -80,17 +80,6 @@ sub rule_def () {+{
     },
 }}
 
-sub new ($;%) {
-  my ($class, %opt) = @_;
-  my $rule = $opt{rule};
-  $opt{rule} = sub {
-    $_[0]->rule_def->{$_[1]}
-      or
-    __PACKAGE__->rule_def->{$_[1]}
-  };
-  $class->SUPER::new (%opt);
-}
-
 =head1 LICENSE
 
 Copyright 2003 Wakaba <w@suika.fam.cx>
@@ -100,4 +89,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/12/01 07:50:14 $
+1; # $Date: 2003/12/06 05:09:39 $
