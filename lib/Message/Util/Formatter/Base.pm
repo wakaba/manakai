@@ -14,7 +14,7 @@ This module is part of manakai.
 
 package Message::Util::Formatter::Base;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 sub ___rule_def () {+{
   -bare_text => {
@@ -35,7 +35,8 @@ sub ___rule_def () {+{
 
 sub ___get_rule_def ($$) {
   my ($self, $name) = @_;
-  my $def = $self->___rule_def->{$name};
+  my $def;
+  $def = $self->___rule_def->{$name} if $self->can ('___rule_def');
   return $def if $def;
   no strict 'refs';
   for my $SUPER (@{(ref ($self) || $self).'::ISA'}) {
@@ -64,8 +65,9 @@ sub new ($;%) {
 {
 our $__QuoteBlockContent;
 $__QuoteBlockContent = qr/[^{}]*(?>[^{}]+|{(??{$__QuoteBlockContent})})*/;
+our $Token ||= qr/[\w_.+-]+/;
 my $WordM = qr(
-                          ([\w-]+)                    ## Bare
+                          ($Token)                    ## Bare
                        | {($__QuoteBlockContent)}     ## {Quoted}
                        | "([^"\\]*(?>[^"\\]+|\\.)*)"  ## "Quoted"
 )x;
@@ -78,6 +80,7 @@ sub replace ($$;%) {
   my $defrule = $self->{rule}->($self, '-default');
   my $textrule = $self->{rule}->($self, '-bare_text');
   my $entirerule = $self->{rule}->($self, '-entire');
+  local $opt{param}->{-formatter};
   local $opt{param}->{-result};
   ($entirerule->{pre}||=$defrule->{pre})->($self, '-entire',
                                           $opt{param}, $opt{param},
@@ -213,4 +216,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/12/06 05:09:39 $
+1; # $Date: 2004/01/17 08:28:25 $
