@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.20 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.21 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXMLChar
                         InXML_deprecated_noncharacter InXML_unicode_xml_not_suitable!;
 require Message::Markup::XML;
@@ -931,7 +931,7 @@ sub _parse_comment_declaration ($$$$;%) {
 sub _parse_attr_value_literal_data ($$$$;%) {
   my ($self, $c, $s, $o, %opt) = @_;
   my $rt = '';
-  while ($$s) {
+  while (length $$s) {
     if ($$s =~ s/^&#(?:x([0-9A-Fa-f]+)|([0-9]+));//) {
       my $char = chr (defined $1 ? hex $1 : 0 + $2);
       $self->_warn_char_val ($o, $char, ref => 1);
@@ -2008,4 +2008,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/11/09 01:47:31 $
+1; # $Date: 2004/10/10 06:12:11 $
