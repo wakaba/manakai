@@ -9,7 +9,7 @@ message header C<Subject:> field body
 package Message::Field::Subject;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, q(Message::Field::Structured);
 
@@ -20,7 +20,7 @@ push @ISA, q(Message::Field::Structured);
 	$REG{M_prefix_list} = qr/[(\[]([A-Za-z0-9._-]+)[\x20:-](\d+)[)\]]/;
 	$REG{M_was_subject} = qr/\([Ww][Aa][Ss][:\x09\x20]$REG{FWS}(.+?)$REG{FWS}\)$REG{FWS}$/;
 	$REG{message_from_subject} = qr/^$REG{FWS}(?i)Message from \S+$REG{FWS}$/;
-	if (defined $^V) {
+	if ($^V gt v5.7.2) {
 	  $REG{prefix_re} = qr/(?i)Re|Sv|Odp
 	    |\x{8FD4}	## Hen
 	  /x;
@@ -354,7 +354,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/08/01 09:19:46 $
+$Date: 2002/08/29 12:30:46 $
 
 =cut
 

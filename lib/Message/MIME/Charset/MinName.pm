@@ -8,7 +8,7 @@ Message::MIME::Charset::MinName --- IANA charset name minumumizers
 package Message::MIME::Charset::MinName;
 use strict;
 use vars qw(%MIN $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::MIME::Charset;
 
@@ -40,12 +40,15 @@ $MIN{'utf-16be'} = sub {
              (?=(?:[\x00-\xFF][\x00-\xFF])*\z)/sx) {
     if ($_[1] =~ /([^\x00\x03\x04\x23\x25\x30\xFE\xFF]
                      [\x00-\xFF]	# ^\x20\x22\x4E-\x9F\xF9\xFA
+        ## Note that since RFC 1815 specifies the column
+        ## applied for CJK Unified Ideographs (It's "J" column),
+        ## we can't always call UCS-2BE string including U+4E00-U+9FFF.
                   |\x03[^\x00-\x6F\xD0-\xFF]
                   #|\x20[^\x00-\x6F]
                   |\x25[^\x00-\x7F]
                   |\xFE[^\x30-\x4F]
                   |\xFF[^\x00-\xEF]
-                  ## note 1 of RFC 1816 is ambitious, so block entire
+                  ## note 1 of RFC 1815 is ambitious, so block entire
                   ## is excepted
                     |\x30[\x00-\x3F]
                   )
@@ -103,5 +106,5 @@ Boston, MA 02111-1307, USA.
 
 =cut
 
-1; ## $Date: 2002/08/18 06:21:24 $
+1; ## $Date: 2002/08/29 12:30:46 $
 ### MinName.pm ends here

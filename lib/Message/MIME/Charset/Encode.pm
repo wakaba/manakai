@@ -18,7 +18,7 @@ This module provides such macros for Encode modules.
 package Message::MIME::Charset::Encode;
 use strict;
 use vars qw(%CODE $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::MIME::Charset;
 require Encode;
@@ -142,6 +142,7 @@ sub _encoder ($@) {
   my $p1 = shift;
   my $p2 = shift;
   if (!${'Encode::'.$p2.'::VERSION'} && !eval qq{use Encode::$p1}) {
+    my $s = shift;
     Message::MIME::Charset::_utf8_off ($s);
     return ($s, success => 0);
   }
@@ -198,7 +199,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/08/18 06:21:24 $
+$Date: 2002/08/29 12:30:46 $
 
 =cut
 
