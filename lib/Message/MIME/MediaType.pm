@@ -8,7 +8,7 @@ Message::MIME::MediaType --- Media-type definitions
 package Message::MIME::MediaType;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 our %type;
 
@@ -432,6 +432,7 @@ $type{message}->{'delivery-status'} = {
 	mime_alternate	=> [qw/message delivery-status/],
 	accept_cte	=> [qw/7bit/],
 	cte_7bit_preferred	=> 'quoted-printable',
+	handler	=> ['Message::Body::MessageDeliveryStatus'],
 };
 
 $type{message}->{'external-body'} = {
@@ -624,7 +625,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/06 10:30:10 $
+$Date: 2002/07/08 11:49:18 $
 
 =cut
 

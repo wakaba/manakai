@@ -13,7 +13,7 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.24 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.25 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::Header;
@@ -173,7 +173,7 @@ sub parse ($$;%) {
   my $self = bless {}, $class;
   my %new_field = $self->_init (@_);
   my $nl = "\x0D\x0A";
-  unless ($self->{option}->{strict_linebreak}) {
+  unless ($self->{option}->{linebreak_strict}) {
     $nl = Message::Util::decide_newline ($message);
   }
   ## BUG: binary unsafe yet!
@@ -307,6 +307,7 @@ sub _parse_value ($$$) {
   my $vtype = $handler->[0];
   my %vopt = (
     -format	=> $self->{option}->{format},
+    -linebreak_strict	=> $self->{option}->{linebreak_strict},
     -media_type	=> $mt,
     -media_subtype	=> $mst,
     -parse_all	=> $self->{option}->{parse_all},
@@ -910,7 +911,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/07 00:46:07 $
+$Date: 2002/07/08 11:49:18 $
 
 =cut
 

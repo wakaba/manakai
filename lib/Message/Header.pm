@@ -8,7 +8,7 @@ Message::Header --- A Perl Module for Internet Message Headers
 package Message::Header;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.33 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.34 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;	## This may seem silly:-)
 push @ISA, qw(Message::Field::Structured);
 
@@ -131,6 +131,7 @@ sub _init ($;%) {
 sub _init_by_format ($$\%) {
   my $self = shift;
   my ($format, $option) = @_;
+  return if $format eq $option->{format};
   if ($format =~ /http/) {
     $option->{ns_default_phuri} = $self->{ns}->{phname2uri}->{'x-http'};
     if ($format =~ /cgi/) {
@@ -140,7 +141,7 @@ sub _init_by_format ($$\%) {
     } else {
       $option->{field_sort} = 'good-practice';
     }
-  } else {	## RFC 822
+  } elsif ($format =~ /mail|news/) {	## RFC 822
     $option->{ns_default_phuri} = $self->{ns}->{phname2uri}->{'x-rfc822'};
   }
   if ($format =~ /uri-url-mailto/) {
@@ -298,7 +299,7 @@ sub _item_match ($$\$\%\%) {
     my %o = %$option; #$o{parse} = 0;
     my %l;
     for (keys %$list) {
-      my ($s, undef, $v) = $self->_value_to_arrayitem ($_, '', %o);
+      my ($s, undef, $v) = $self->_value_to_arrayitem ($_, '', \%o);
       if ($s) {
         $l{$v->{name} . ':' . ( $option->{ns} || $v->{ns} ) } = 1;
       } else {
@@ -467,7 +468,8 @@ sub _value_to_arrayitem ($$$\%) {
   if (ref $value eq 'ARRAY') {
     ($value, %$value_option) = @$value;
   }
-  my $nsuri = $self->{option}->{ns_default_phuri};
+  my $default_ns = $option->{ns_default_phuri};
+  my $nsuri = $default_ns;
   $name =~ s/^$REG{WSP}+//;  $name =~ s/$REG{WSP}+$//;
   
   no strict 'refs';
@@ -475,7 +477,7 @@ sub _value_to_arrayitem ($$$\%) {
     $nsuri = $value_option->{ns};
   } elsif ($option->{ns}) {
     $nsuri = $option->{ns};
-  } elsif (($option->{ns_default_phuri} eq $self->{ns}->{uri2phname}->{'x-http'}
+  } elsif (($default_ns eq $self->{ns}->{uri2phname}->{'x-http'}
        && $name =~ s/^([0-9]+)-//)
     || ($name =~ s/^x-http-([0-9]+)-//i)) {	## Numric namespace prefix, RFC 2774
     my $prefix = 0+$1;
@@ -484,14 +486,18 @@ sub _value_to_arrayitem ($$$\%) {
       $self->{ns}->{number2uri}->{ $prefix } = 'urn:x-suika-fam-cx:msgpm:header:x-temp:'.$prefix;
       $nsuri = $self->{ns}->{number2uri}->{ $prefix };
     }
-  } elsif (($name =~ s/^([Xx]-[A-Za-z0-9]+|[A-Za-z]*[A-WYZa-wyz0-9][A-Za-z0-9]*)-
-                   ([Xx]-[A-Za-z0-9]+|[A-Za-z0-9]*[A-WYZa-wyz0-9][A-Za-z0-9]*)-//x)
-    || $name =~ s/^([Xx]-[A-Za-z0-9]+|[A-Za-z0-9]*[A-WYZa-wyz0-9][A-Za-z0-9]*)-//) {
+  } elsif (
+    ${ &_NS_uri2package ($default_ns).'::OPTION' }{use_ph_namespace}
+    && (
+       ($name =~ s/^([Xx]-[A-Za-z0-9]+|[A-Za-z]*[A-WYZa-wyz0-9][A-Za-z0-9]*)-
+                    ([Xx]-[A-Za-z0-9]+|[A-Za-z0-9]*[A-WYZa-wyz0-9][A-Za-z0-9]*)-//x)
+     || $name =~ s/^([Xx]-[A-Za-z0-9]+|[A-Za-z0-9]*[A-WYZa-wyz0-9][A-Za-z0-9]*)-//
+    )) {
     my ($prefix1, $prefix2) = ($1, $2);
     my $original_prefix = $&;  my $one_prefix = 0;
     unless ($prefix2) {
       $prefix2 = $prefix1;
-      $prefix1 = $self->{ns}->{uri2phname}->{ $option->{ns_default_phuri} };
+      $prefix1 = $self->{ns}->{uri2phname}->{ $default_ns };
       $one_prefix = 1;
     }
     my $prefix
@@ -500,7 +506,7 @@ sub _value_to_arrayitem ($$$\%) {
     $self->_ns_load_ph ($prefix);
     $nsuri = $self->{ns}->{phname2uri}->{ $prefix };
     unless ($nsuri) {
-      $nsuri = $self->{option}->{ns_default_phuri};
+      $nsuri = $default_ns;
       $prefix
         = &{ ${ &_NS_uri2package ($nsuri).'::OPTION' }{n11n_prefix} }
           ($self, &_NS_uri2package ($nsuri), $one_prefix? $prefix2: $prefix1);
@@ -510,19 +516,19 @@ sub _value_to_arrayitem ($$$\%) {
         $name = $prefix2 . '-' . $name unless $one_prefix;
       } else {
         $name = $original_prefix . $name;
-        $nsuri = $self->{option}->{ns_default_phuri};
+        $nsuri = $default_ns;
       }
     }
   }
   $name
-    = &{${&_NS_uri2package ($nsuri).'::OPTION'}{n11n_name}}
+    = &{ ${ &_NS_uri2package ($nsuri).'::OPTION' }{n11n_name} }
       ($self, &_NS_uri2package ($nsuri), $name);
   Carp::croak "$name: invalid field-name"
     if $option->{field_name_validation}
-      && $name =~ /$REG{$option->{field_name_unsafe_rule}}/;
+      && $name =~ /$REG{ $option->{field_name_unsafe_rule} }/;
   $value = $self->_parse_value ($name => $value, ns => $nsuri)
-    if $$option{parse} || $$option{parse_all};
-  $$option{parse} = 0;
+    if $option->{parse} || $option->{parse_all};
+  $option->{parse} = 0;
   (1, $name.':'.$nsuri => {name => $name, body => $value, ns => $nsuri});
 }
 *_add_hash_check = \&_value_to_arrayitem;
@@ -950,7 +956,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/07 00:46:07 $
+$Date: 2002/07/08 11:49:18 $
 
 =cut
 
