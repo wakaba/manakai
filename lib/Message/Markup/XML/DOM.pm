@@ -13,86 +13,16 @@ This module is part of manakai.
 
 package Message::Markup::XML::DOM;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
-require Message::Markup::XML;
-require SuikaWIki::Markup::XML::DOM::Core;
+our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+require Message::Markup::XML::Node;
+require Message::Markup::XML::DOM::Core;
 
-our %Feature = (
-	core	=> {
-		'2.0'	=> {
-			implemented	=> 0,
-		},
-	},
-	'cx.fam.suika.wiki.markup.xml.dom'	=> {
-		'1.0'	=> {
-			implemented	=> 1,
-		},
-	},
-);
 
 =head1 METHODS
 
 WARNING: This module is under construction.  Interface of this module is not yet fixed.
 
 =cut
-
-package Message::Markup::XML::DOM::DOMString;
-use overload '""' => \&_get_value,
-             '.=' => \&_append_value,
-             fallback => 1;
-our $UseEncode = 1;
-if ($^V <= v5.7.3) {
-  $UseEncode = 0;	## Use of Encode is strongly recommended!
-} else {
-  require Encode;
-}
-
-sub _new ($) {
-  bless {}, shift;
-}
-
-sub _set_value ($$) {
-  $_[0]->{value} = $_[1];
-  $_[0];
-}
-sub _append_value ($$) {
-  $_[0]->{value} .= $_[1];
-  $_[0];
-}
-sub _get_value ($) {
-  $_[0]->{value};
-}
-
-sub _to_utf16 ($$) {
-  my ($self, $s) = @_;
-  if ($UseEncode) {
-    return Encode::encode ('UTF-16BE', $s);
-  } else {
-    $s =~ s/(.)/\x00$1/gs;
-    return $s;
-  }
-}
-sub _from_utf16 ($$) {
-  my ($self, $s) = @_;
-  if ($UseEncode) {
-    return Encode::decode ('UTF-16BE', $s);
-  } else {
-    $s =~ s/\x00(.)/$1/gs;
-    return $s;
-  }
-}
-
-package Message::Markup::XML::DOM::DOMString::utf16;
-push @Message::Markup::XML::DOM::DOMString::ISA, __PACKAGE__;
-
-sub getValue ($) {
-  my $self = shift;
-  $self->_to_utf16 ($self->{value});
-}
-sub setValue ($$) {
-  my ($self, $value) = @_;
-  $self->{value} = $self->_from_utf16 ($value);
-}
 
 package Message::Markup::XML::DOM::_util;
 push @Message::Markup::XML::DOM::ISA, __PACKAGE__;
@@ -305,4 +235,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/07 03:09:18 $
+1; # $Date: 2004/07/25 07:20:34 $

@@ -1,20 +1,119 @@
 
 =head1 NAME
 
-SuikaWiki::Markup::XML::DOM::Core --- SuikaWiki: Simple DOM implementation for SuikaWiki::Markup::XML
+Message::Markup::XML::DOM::Core
 
 =head1 DESCRIPTION
 
-...
 
-This module is part of SuikaWiki.
 
 =cut
 
-package SuikaWiki::Markup::XML::DOM::Core;
+package Message::Markup::XML::DOM::Core;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
-require SuikaWiki::Markup::XML::DOM;
+our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+
+our %_Feature = (
+	core	=> {
+		'2.0'	=> {
+			implemented	=> 0,
+		},
+	},
+	'cx.fam.suika.wiki.markup.xml.dom'	=> {
+		'1.0'	=> {
+			implemented	=> 1,
+		},
+	},
+);
+
+package Message::Markup::XML::DOM::DOMString;
+use overload '""' => '___get_value',
+             '.=' => '___append_value',
+             fallback => 1;
+our $UseEncode = 1;
+if ($^V lte pack 'UUU', 5,7,3) {
+  $UseEncode = 0;	## Use of Encode is strongly recommended!
+} else {
+  require Encode;
+}
+
+sub ___new ($) {
+  bless {}, shift;
+}
+
+sub ___set_value ($$) {
+  $_[0]->{value} = $_[1];
+  $_[0];
+}
+sub ___append_value ($$) {
+  $_[0]->{value} .= $_[1];
+  $_[0];
+}
+sub ___get_value ($) {
+  $_[0]->{value};
+}
+
+sub ___to_utf16 ($$) {
+  my ($self, $s) = @_;
+  if ($UseEncode) {
+    return Encode::encode ('UTF-16BE', $s);
+  } else {
+    $s =~ s/(.)/\x00$1/gs;
+    return $s;
+  }
+}
+sub ___from_utf16 ($$) {
+  my ($self, $s) = @_;
+  if ($UseEncode) {
+    return Encode::decode ('UTF-16BE', $s);
+  } else {
+    $s =~ s/\x00(.)/$1/gs;
+    return $s;
+  }
+}
+
+sub getValue ($) {
+  my $self = shift;
+  $self->___to_utf16 ($self->{value});
+}
+
+sub setValue ($$) {
+  my ($self, $value) = @_;
+  $self->{value} = $self->___from_utf16 ($value);
+}
+
+package Message::Markup::XML::DOM::DOMTimeStamp;
+
+package Message::Markup::XML::DOM::DOMException;
+use Message::Util::Error;
+
+sub code ($) {
+  shift->{-def}->{code};
+}
+
+BEGIN {
+our %_Exception =
+(
+ INDEX_SIZE_ERR => {
+  type => 'INDEX_SIZE_ERR',
+  code => 1,
+ },
+);
+
+our @EXPORT_OK = map {$_Exception{$_}->{type}} keys %_Exception;
+}
+
+use Exporter;
+
+sub ___error_def () { %_Exception }
+
+sub AUTOLOAD ($) {
+  if (exists $_Exception{our $AUTOLOAD}) {
+    eval q{sub $AUTOLOAD { $_Exception{$AUTOLOAD}->{code} }};
+  } else {
+    die "$AUTOLOAD: Method or constant not found";
+  }
+}
 
 =head1 METHODS
 
@@ -22,13 +121,12 @@ WARNING: This module is under construction.  Interface of this module is not yet
 
 =cut
 
-package SuikaWiki::Markup::XML::DOM::Core::DOMImplementation;
-push @SuikaWiki::Markup::XML::DOM::ISA, __PACKAGE__;
-our @ISA;
+package Message::Markup::XML::DOM::Core::DOMImplementation;
+push @Message::Markup::XML::DOM::ISA, __PACKAGE__;
 
 sub hasFeature ($$;$) {
   my ($self, $feature, $version) = @_;
-  my $f = $SuikaWiki::Markup::XML::DOM::Feature{lc $feature};
+  my $f = $_Feature{lc $feature};
   if (ref $f && defined $version && $f->{$version}->{implemented}) {
     return 1;
   } elsif (ref $f && !defined $version) {	## When at least one of versions is implemented
@@ -286,4 +384,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/06/16 09:58:26 $
+1; # $Date: 2004/07/25 07:20:34 $
