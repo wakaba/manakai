@@ -33,7 +33,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/20 13:58:44 $
+     $Date: 2004/09/24 12:19:46 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -678,7 +678,7 @@ IF:
       DOMCore:NamedNodeMap
 ## IF:ManakaiDOMAttributes
 
-DataType:
+ConfigParam:
   @Name: ManakaiDOMConfigurationParameter
   @ISA:
     DOMMain:DOMString
@@ -987,6 +987,21 @@ DataType:
         @@@@lang:en
         @@@@@:
           Setting <DOM:infoset> to <DOM:false> has no effect.
+    @@Get:
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = !$cfg->{<Q:DOMCoreParam:validate-if-schema>} &&
+               !$cfg->{<Q:DOMCoreParam:entities>} &&
+               !$cfg->{<Q:DOMCoreParam:datatype-normalization>} &&
+               !$cfg->{<Q:DOMCoreParam:cdata-sections>} && 
+               $cfg->{<Q:DOMCoreParam:namespace-declarations>} &&
+               $cfg->{<Q:DOMCoreParam:well-formed>} &&
+               $cfg->{<Q:DOMCoreParam:element-content-whitespace>} &&
+               $cfg->{<Q:DOMCoreParam:comment>} && 
+               $cfg->{<Q:DOMCoreParam:namespaces>}
+             ? true : false;
   @Param:
     @@Name: namespaces
     @@Type:boolean

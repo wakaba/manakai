@@ -62,7 +62,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/20 05:53:13 $
+     $Date: 2004/09/24 12:19:46 $
   @Require:
     @@Module:
       @@@Def:
@@ -425,14 +425,14 @@ DataType:
               if ($offset < 0) {
                 __EXCEPTION{
                   ManakaiDOMImplementationException.
-                    MDOM_DOMSTRING_INDEX_IN_SURROGATE_PAIR:
+                    MDOM_DOMSTRING_INDEX_IN_SURROGATE_PAIR::
                   <Q:ManakaiDOMImplementationException:param-name>
                     => 'offset',
                 }__;
               }
             } else {
               __EXCEPTION{
-                ManakaiDOMImplementationException.MDOM_DEBUG_BUG:
+                ManakaiDOMImplementationException.MDOM_DEBUG_BUG::
                 <Q:ManakaiDOMImplementationException:values> => {
                   count => $offset,
                   position => 1,
@@ -534,7 +534,7 @@ DataType:
         @@@@@:
           if ($offset < 0 or $offset > CORE::length $self->{value} or
               $offset > $self->__INT{length}__) {
-            __EXCEPTION{DOMException.INDEX_SIZE_ERR:
+            __EXCEPTION{DOMException.INDEX_SIZE_ERR::
               <Q:ManakaiDOMImplementationException:param-name> => 'offset',
             }__;
           }
@@ -612,12 +612,12 @@ DataType:
         @@@@@:
           if ($offset < 0 or $offset > CORE::length $self->{value} or
               $offset > $self->__INT{length}__) {
-            __EXCEPTION{DOMException.INDEX_SIZE_ERR:
+            __EXCEPTION{DOMException.INDEX_SIZE_ERR::
               <Q:ManakaiDOMImplementationException:param-name> => 'offset',
             }__;
           }
           if ($count < 0) {
-            __EXCEPTION{DOMException.INDEX_SIZE_ERR:
+            __EXCEPTION{DOMException.INDEX_SIZE_ERR::
               <Q:ManakaiDOMImplementationException:param-name> => 'count',
             }__;
           }
@@ -660,14 +660,14 @@ DataType:
               if ($count < 0) {
                 __EXCEPTION{
                   ManakaiDOMImplementationException.
-                          MDOM_DOMSTRING_INDEX_IN_SURROGATE_PAIR:
+                          MDOM_DOMSTRING_INDEX_IN_SURROGATE_PAIR::
                   <Q:ManakaiDOMImplementationException:param-name>
                           => 'count',
                 }__;
               }
             } else {
               __EXCEPTION{
-                ManakaiDOMImplementationException.MDOM_DEBUG_BUG:
+                ManakaiDOMImplementationException.MDOM_DEBUG_BUG::
                 <Q:ManakaiDOMImplementationException:values> => {
                         count => $count,
                         position => 1,
@@ -735,12 +735,12 @@ DataType:
         @@@@@:
           if ($offset < 0 or $offset > CORE::length $self->{value} or
               $offset > $self->__INT{length}__) {
-            __EXCEPTION{DOMException.INDEX_SIZE_ERR:
+            __EXCEPTION{DOMException.INDEX_SIZE_ERR::
               <Q:ManakaiDOMImplementationException:param-name> => 'offset',
             }__;
           }
           if ($count < 0) {
-            __EXCEPTION{DOMException.INDEX_SIZE_ERR:
+            __EXCEPTION{DOMException.INDEX_SIZE_ERR::
               <Q:ManakaiDOMImplementationException:param-name> => 'count',
             }__;
           }
@@ -926,7 +926,7 @@ DataType:
         @@@@@:
           if (not defined $offset32 or $offset32 < 0 or
               CORE::length ($self->{value}) < $offset32) {
-            __EXCEPTION{DOMException.INDEX_SIZE_ERR:
+            __EXCEPTION{DOMException.INDEX_SIZE_ERR::
               <Q:MDOM_EXCEPTION:param-name> => 'offset32',
             }__;
           }
@@ -981,7 +981,7 @@ DataType:
         @@@@@:
           if (not defined $offset16 or $offset16 < 0 or
               CORE::length ($self->{value}) * 2 < $offset16) {
-            __EXCEPTION{DOMException.INDEX_SIZE_ERR:
+            __EXCEPTION{DOMException.INDEX_SIZE_ERR::
               <Q:MDOM_EXCEPTION:param-name> => 'offset16',
             }__;
           }
@@ -997,7 +997,7 @@ DataType:
               last if $offset16 < 0;
             } else {
               __EXCEPTION{
-                ManakaiDOMImplementationException.MDOM_DEBUG_BUG:
+                ManakaiDOMImplementationException.MDOM_DEBUG_BUG::
                 <Q:ManakaiDOMImplementationException:values> => {
                   count => $offset16,
                   position => 1,
@@ -1006,7 +1006,7 @@ DataType:
             }
           }
           if ($offset16 > 0) {
-            __EXCEPTION{DOMException.INDEX_SIZE_ERR:
+            __EXCEPTION{DOMException.INDEX_SIZE_ERR::
               <Q:MDOM_EXCEPTION:param-name> => 'offset16',
             }__;
           }
@@ -1187,7 +1187,7 @@ IF:
           lang:Perl
         @@@@@:
           unless (defined $s) {
-            __EXCEPTION{ManakaiDOMImplementationException.PARAM_NULL_POINTER:
+            __EXCEPTION{ManakaiDOMImplementationException.PARAM_NULL_POINTER::
               <Q:ManakaiDOMImplementationException:param-name> => 's',
             }__;
           }

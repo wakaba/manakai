@@ -1,3 +1,18 @@
+2004-09-24  Wakaba  <wakaba@suika.fam.cx>
+
+	* dis2pm.pl (perl_exception): New 'subtype' parameter added.
+	(param2poditem): New.
+	(MAIN): Write 'NAMESPACE BINDINGS' pod section if necessary.
+	(perl_builtin_code): More developer-friendly error report.
+	(perl_code): New 'REQUIRE' statement added.
+	(disdoc2text, disdoc2pod): New 'QUOTE' element type added.
+	(get_value_literal): Default for unknown type is now 'undef'.
+
+2004-09-22  Wakaba  <wakaba@suika.fam.cx>
+
+	* dis2pm.pl (perl_builtin_code): New 'CheckName' and 
+	'XMLVersion' added.
+
 2004-09-20  Wakaba  <wakaba@suika.fam.cx>
 
 	* dis2pm.pl (get_redef_description): See 'RedefinedBy' elements 

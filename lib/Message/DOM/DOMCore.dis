@@ -1,6 +1,4 @@
 Namespace:
-  @DocTree:
-    http://suika.fam.cx/~wakaba/archive/2004/9/10/dom#
   @DOMCore:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @DOMXML:
@@ -11,12 +9,12 @@ Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
-  @DOM3Core:
-     http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/
   @ManakaiDOMXML:
     http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
   @MDOM_EXCEPTION:
      http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @null:
+    http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
   @TreeCore: \
   @xml:
     http://www.w3.org/XML/1998/namespace
@@ -48,7 +46,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/20 13:58:44 $
+     $Date: 2004/09/24 12:19:46 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -124,12 +122,11 @@ Exception:
         @@@Description:
           @@@@lang:en
           @@@@@: Index or size is negative, or greater than the allowed value.
-        @@@Def:
+        @@@Description:
+          @@@@lang:en
           @@@@Type:
-            lang:Perl
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: 
+            lang:muf
+          @@@@@: 
               Index or size specified as parameter%t (
                 name => {<Q:MDOM_EXCEPTION:param-name>},
                 prefix => { "}, suffix => {"}); is negative, or 
@@ -149,6 +146,74 @@ Exception:
           @@@@lang:en
           @@@@@:
             An attempt is made to insert a node somewhere it does not belong.
+        @@@SubType:
+          @@@@QName:
+            MDOM_EXCEPTION:HIERARCHY_ANCHESTOR_OR_SELF
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              An attempt is made to insert a node that is one of 
+              ancestor of this node or that is this node itself.
+          @@@@Param:
+            @@@@@QName:
+              MDOM_EXCEPTION:param-name
+            @@@@@Type:DOMString
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@: The name of the parameter that specifies the node.
+        @@@SubType:
+          @@@@QName:
+            MDOM_EXCEPTION:HIERARCHY_BAD_TYPE
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              An attempt is made to insert a node whose type is not allowed.
+          @@@@Param:
+            @@@@@QName:
+              infoset:nodeType
+            @@@@@Type:
+              ManakaiDOM:ManakaiDOMURI
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@: The type of the node being tried to insert.
+          @@@@Param:
+            @@@@@QName:
+              MDOM_EXCEPTION:param-name
+            @@@@@Type:DOMString
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The name of the parameter that specifies the node.
+        @@@SubType:
+          @@@@QName:
+            MDOM_EXCEPTION:MDOM_SECOND_DOC_ELEMENT
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              An attempt is made to insert a second document element node.
+          @@@@Param:
+            @@@@@QName:
+              MDOM_EXCEPTION:param-name
+            @@@@@Type: DOMString
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The name of the parameter the node is specified.
+        @@@SubType:
+          @@@@QName:
+            MDOM_EXCEPTION:MDOM_SECOND_DOCTYPE
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              An attempt is made to insert a second document type node.
+          @@@@Param:
+            @@@@@QName:
+              MDOM_EXCEPTION:param-name
+            @@@@@Type: DOMString
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The name of the parameter the node is specified.
      @@Const:
         @@@Name:  WRONG_DOCUMENT_ERR
         @@@Type:  unsigned-short
@@ -165,6 +230,22 @@ Exception:
         @@@Description:
           @@@@lang:en
           @@@@@: An invalid or illegal character is specified.
+        @@@SubType:
+          @@@@QName:
+            MDOM_EXCEPTION:MDOM_BAD_NAME
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The specified name is not a SGML or XML <XML:Name>.
+          @@@@Param:
+            @@@@@QName:
+              DOMCore:name
+            @@@@@Type:
+              DOMMain:DOMString
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@: 
+                The <XML:Name> specified.
      @@Const:
         @@@Name:  NO_DATA_ALLOWED_ERR
         @@@Type:  unsigned-short
@@ -181,6 +262,31 @@ Exception:
           @@@@@:
             An attempt is made to modify an object where 
             modifications are not allowed. 
+        @@@SubType:
+          @@@@QName:
+            MDOM_EXCEPTION:NOMOD_PARENT
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The parent node of this node is read-only.
+        @@@SubType:
+          @@@@QName:
+            MDOM_EXCEPTION:NOMOD_SRC_PARENT
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The parent node of the source node is read-only.
+          @@@@Param:
+            @@@@@QName:
+              MDOM_EXCEPTION:param-name
+            @@@@@Type:DOMString
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@: The parameter by which the source node is specified.
+        @@@SubType:
+          @@@@QName:
+            MDOM_EXCEPTION:NOMOD_THIS
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: This node is read-only.
      @@Const:
         @@@Name:  NOT_FOUND_ERR
         @@@Type:  unsigned-short
@@ -194,48 +300,51 @@ Exception:
         @@@Name:  NOT_SUPPORTED_ERR
         @@@Type:  unsigned-short
         @@@Value:  9
-        @@@Param:
-          @@@@QName:
-            MDOM_EXCEPTION:if
-          @@@@Type: DOMString
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: The interface name.
-        @@@Param:
-          @@@@QName:
-            MDOM_EXCEPTION:method
-          @@@@Type: DOMString
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: The method name.
-        @@@Param:
-          @@@@QName:
-            MDOM_EXCEPTION:attr
-          @@@@Type: DOMString
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: The attribute name.
-        @@@Param:
-          @@@@QName:
-            MDOM_EXCEPTION:on
-          @@@@Type: DOMString
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: Type of the attribute procedure.
-          @@@@InCase:
-            @@@@@Value: get
-            @@@@@Description:
-              @@@@@@lang:en
-              @@@@@@@: On getting.
-          @@@@InCase:
-            @@@@@Value: set
-            @@@@@Description:
-              @@@@@@lang:en
-              @@@@@@@: On setting.
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The implementation does not support the type of object requested.
+            The DOM implementation does not support the type of object requested.
+        @@@SubType:
+          @@@@QName:
+            MDOM_EXCEPTION:MDOM_IMPL_NOSUPPORT_XML
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The DOM implementation does not support the <DOM:XML> feature.
+        @@@SubType:
+          @@@@QName:
+            MDOM_EXCEPTION:MDOM_DOC_NOSUPPORT_XML
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The document does not support the <DOM:XML> feature.
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              XML-specific operations were specified as HTML-only 
+              DOM implementations does not have to implement them 
+              in the DOM Level 2 Specification.  The DOM Level 2 
+              Errata and the DOM Level 3 Specification define as 
+              the DOM implementation raise an exception of code 
+              <X:DOMException.NOT_SUPPORTED_ERR>.
+           \
+              This DOM implementation throws the exception in 
+              both levels.
+        @@@SubType:
+          @@@@QName:
+            MDOM_EXCEPTION:MDOM_IMPL_NOSUPPORT_XMLVER
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The DOM implementation does not support the XML 
+              version specified.
+          @@@@Param:
+            @@@@@QName:
+              infoset:version
+            @@@@@Type:DOMString
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@: The XML version
      @@Const:
         @@@Name:  INUSE_ATTRIBUTE_ERR
         @@@Type:  unsigned-short
@@ -285,6 +394,183 @@ Exception:
           @@@@@:
             An attempt is made to create or change an object in 
             a way that is incorrect with regard to namespaces.
+        @@@SubType:
+          @@@@QName:
+            MDOM_EXCEPTION:MDOM_NS_BAD_NCNAME
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The specified <XML:NCName> is illegal according to 
+              the XML version in use.
+          @@@@Param:
+            @@@@@QName:
+              infoset:name
+            @@@@@Type:
+              DOMMain:DOMString
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <XML:NCName> specified.
+        @@@SubType:
+          @@@@QName:
+            MDOM_EXCEPTION:MDOM_NS_MALFORMED_QNAME
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The specified qualified name is malformed according 
+              to the XML version in use.
+          @@@@Param:
+            @@@@@QName:
+              DOMCore:qualifiedName
+            @@@@@Type:
+              DOMMain:DOMString
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@: The qualified name specified.
+        @@@SubType:
+          @@@@QName:
+            MDOM_EXCEPTION:MDOM_NS_NULL_QNAME_WITH_NON_NULL_URI
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The qualified name specified is not <DOM:null> but 
+              the namespace URI that is not <DOM:null> is specified.
+          @@@@Param:
+            @@@@@QName:
+              infoset:namespaceName
+            @@@@@Type:
+              ManakaiDOM:ManakaiDOMNamespaceURI
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@: The namespace URI specified.
+        @@@SubType:
+          @@@@QName:
+            MDOM_EXCEPTION:MDOM_NS_OTHER_WITH_XML_URI
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The namespace prefix specified is not equal to <XML:xml> 
+              while the namespace URI is 
+              <URI:http://www.w3.org/XML/1998/namespace>.
+          @@@@Param:
+            @@@@@QName:
+              infoset:prefix
+            @@@@@Type: DOMString
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@: The namespace prefix.
+          @@@@Param:
+            @@@@@QName:
+              DOMCore:qualifiedName
+            @@@@@Type: DOMString
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@: The qualified name.
+        @@@SubType:
+          @@@@QName:
+            MDOM_EXCEPTION:MDOM_NS_OTHER_WITH_XMLNS_URI
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The namespace prefix specified is not equal to <XML:xmlns> 
+              while the namespace URI is 
+              <URI:http://www.w3.org/2000/xmlns>.
+          @@@@Param:
+            @@@@@QName:
+              infoset:prefix
+            @@@@@Type: DOMString
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@: The namespace prefix.
+          @@@@Param:
+            @@@@@QName:
+              DOMCore:qualifiedName
+            @@@@@Type: DOMString
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@: The qualified name.
+        @@@SubType:
+          @@@@QName:
+            MDOM_EXCEPTION:MDOM_NS_PREFIX_WITH_NULL_URI
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The namespace prefix is specified but the namespace URI 
+              is <DOM:null>.
+          @@@@Param:
+            @@@@@QName:
+              infoset:prefix
+            @@@@@Type:
+              DOMMain:DOMString
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@: The namespace prefix specified.
+        @@@SubType:
+          @@@@QName:
+            MDOM_EXCEPTION:MDOM_NS_QNAME_IS_XMLNS
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The qualified name specified equals to <XML:xmlns>.
+        @@@SubType:
+          @@@@QName:
+            MDOM_EXCEPTION:MDOM_NS_XML_WITH_OTHER_URI
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The namespace prefix specified is <XML:xml> and 
+              the namespace URI is other than 
+              <URI:http://www.w3.org/XML/1998/namespace>.
+          @@@@Param:
+            @@@@@QName:
+              infoset:namespaceName
+            @@@@@Type:
+              ManakaiDOM:ManakaiDOMNamespaceURI
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@: The namespace URI.
+        @@@SubType:
+          @@@@QName:
+            MDOM_EXCEPTION:MDOM_NS_XMLNS_WITH_OTHER_URI
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The namespace prefix specified is <XML:xmlns> and 
+              the namespace URI is other than 
+              <URI:http://www.w3.org/2000/xmlns>.
+          @@@@Param:
+            @@@@@QName:
+              infoset:namespaceName
+            @@@@@Type:
+              ManakaiDOM:ManakaiDOMNamespaceURI
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@: The namespace URI.
+        @@@SubType:
+          @@@@QName:
+            MDOM_EXCEPTION:MDOM_NS_XMLNSQ_WITH_OTHER_URI
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The qualified name is <XML:xmlns> and 
+              the namespace URI is other than 
+              <URI:http://www.w3.org/2000/xmlns>.
+          @@@@Param:
+            @@@@@QName:
+              infoset:namespaceName
+            @@@@@Type:
+              ManakaiDOM:ManakaiDOMNamespaceURI
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@: The namespace URI.
+       @@@SubType:
+         @@@@QName:
+           MDOM_EXCEPTION:MDOM_NS_XMLNS_XMLNS
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             The qualified name is <XML:xmlns:xmlns>.  It is prohibited 
+             by the XML Namespace Specifications.
      @@Const:
         @@@Name:  INVALID_ACCESS_ERR
         @@@Type:  unsigned-short
@@ -817,7 +1103,7 @@ IF:
               push @$self, $_;
             } else {
               __EXCEPTION{ManakaiDOMImplementationException.
-                          MDOM_TYPE_MISMATCH_ERR:
+                          MDOM_TYPE_MISMATCH_ERR::
                 <Q:MDOM_EXCEPTION:param-name> => 'list',
                 <Q:MDOM_EXCEPTION:class> => ref $_,
               }__;
@@ -1121,11 +1407,14 @@ IF:
         @@@Exception:
           @@@@Type: DOMException
           @@@@Name: NOT_SUPPORTED_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The DOM implementation does not support the "XML" feature and 
-              the language exposed through the "Document" does not support 
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_IMPL_NOSUPPORT_XML
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+              The DOM implementation does not support the <DOM:XML> feature and 
+              the language exposed through the <IF:Document> does not support 
               XML Namespaces.
         @@@Exception:
           @@@@Type: 
@@ -1143,9 +1432,8 @@ IF:
                                qname => qualifiedName}__; # [DOM 2,3]
             ## If namespace not supported: # [DOM 3]
             #__EXCEPTION{
-            #  DOMException.NOT_SUPPORTED_ERR:
-            #    <Q:MDOM_EXCEPTION:subtype> 
-            #       => <Q:MDOM_EXCEPTION:NS_NOT_SUPPORTED>,
+            #  DOMException.NOT_SUPPORTED_ERR.
+            #  MDOM_EXCEPTION:MDOM_IMPL_NOSUPPORT_XML::
             #}__;
             my ($prefix, $lname);
             if (($lname = $qualifiedName) =~ s/^([^:]+)://) {
@@ -1233,10 +1521,6 @@ IF:
           @@@@@:
             "doctype"."ownerDocument" is set to the document being 
             created unless "doctype" is "null".
-     @@SpecLevel:2
-     @@Level[list]:
-       2
-       3
      @@Return:
         @@@Type:  Document
         @@@Description:
@@ -1301,12 +1585,15 @@ IF:
         @@@Exception:
           @@@@Type: DOMException
           @@@@Name: NOT_SUPPORTED_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The DOM implementation does not support the "XML" feature 
-              and the language exposed through the "Document" does 
-              not support XML Namespaces.
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_IMPL_NOSUPPORT_XML
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+              The DOM implementation does not support the <DOM:XML> feature and 
+              the language exposed through the <IF:Document> does not support 
+              XML Namespaces.
         @@@Exception:
           @@@@Type: 
             ManakaiDOM:ManakaiDOMImplementationException
@@ -1322,6 +1609,7 @@ IF:
           @@@@@:
             my ($prefix, $lname);
             if (defined $qualifiedName) {     
+                     ## Condition sensitive
               __CODE{CheckQName: version => 1.0,
                                  qname => qualifiedName}__; # [DOM 2,3]
               if (($lname = $qualifiedName) =~ s/^([^:]+)://) {
@@ -1330,26 +1618,22 @@ IF:
               if (defined $namespaceURI) {    # ($uri, $qname, $doctype)
                 ## If namespace not supported: # [DOM 3]
                 #__EXCEPTION{
-                ##  DOMException.NAMESPACE_ERR:
-                #  DOMException.NOT_SUPPORTED_ERR:
-                #    <Q:MDOM_EXCEPTION:subtype> 
-                #       => <Q:MDOM_EXCEPTION:NS_NOT_SUPPORTED>,
+                #  DOMException.NOT_SUPPORTED_ERR.
+                #  MDOM_EXCEPTION:MDOM_IMPL_NOSUPPORT_XML::
                 #}__;
               } else {                        # (null, $qname, $doctype)
                 if ($prefix) {
                   __EXCEPTION{
-                    DOMException.NAMESPACE_ERR:
-                      <Q:MDOM_EXCEPTION:subtype>
-                         => <Q:MDOM_EXCEPTION:NS_PREFIX_WITH_NULL_URI>,
+                    DOMException.NAMESPACE_ERR.
+                    MDOM_EXCEPTION:MDOM_NS_PREFIX_WITH_NULL_URI::
                       <Q:infoset:prefix> => $prefix,
                   }__;                        # [DOM 2,3]
                 }
               }
             } elsif (defined $namespaceURI) { # ($uri, null, $doctype)
               __EXCEPTION{
-                DOMException.NAMESPACE_ERR:
-                  <Q:MDOM_EXCEPTION:subtype>
-                     => <Q:MDOM_EXCEPTION:NS_NULL_QNAME_NON_NULL_URI>,
+                DOMException.NAMESPACE_ERR.
+                MDOM_EXCEPTION:MDOM_NS_NULL_QNAME_WITH_NON_NULL_URI::
                   <Q:infoset:namespaceName> => $namespaceURI,
               }__;                            # [DOM 3]
             }
@@ -1358,18 +1642,16 @@ IF:
                   (not $namespaceURI or
                    $namespaceURI ne q<http://www.w3.org/XML/1998/namespace>)) {
                 __EXCEPTION{
-                  DOMException.NAMESPACE_ERR:
-                    <Q:MDOM_EXCEPTION:subtype>
-                       => <Q:MDOM_EXCEPTION:NS_XML_WITH_OTHER_URI>,
+                  DOMException.NAMESPACE_ERR.
+                  MDOM_EXCEPTION:MDOM_NS_XML_WITH_OTHER_URI::
                     <Q:infoset:namespaceName> => $namespaceURI,
                 }__;                          # [DOM 2,3]
               } elsif ($prefix eq 'xmlns' and
                   (not $namespaceURI or
                    $namespaceURI ne q<http://www.w3.org/2000/xmlns/>)) {
                 __WARNING{
-                  ManakaiDOMImplementationWarning.MDOM_WARN_NAMESPACE_ERR:
-                    <Q:MDOM_EXCEPTION:subtype>
-                       => <Q:MDOM_EXCEPTION:NS_XMLNS_WITH_OTHER_URI>,
+                  ManakaiDOMImplementationWarning.MDOM_WARN_NAMESPACE_ERR.
+                  MDOM_EXCEPTION:MDOM_NS_XMLNS_WITH_OTHER_URI::
                     <Q:infoset:namespaceName> => $namespaceURI,
                 }__;                          # DOM doesn't specify this
               }
@@ -1378,21 +1660,21 @@ IF:
               if ($namespaceURI eq q<http://www.w3.org/XML/1998/namespace> and
                   (not $prefix or $prefix ne 'xml')) {
                 __WARNING{
-                  ManakaiDOMImplementationWarning.MDOM_WARN_NAMESPACE_ERR:
-                    <Q:MDOM_EXCEPTION:subtype>
-                       => <Q:MDOM_EXCEPTION:NS_XML_URI_WITH_OTHER_PREFIX>,
+                  ManakaiDOMImplementationWarning.MDOM_WARN_NAMESPACE_ERR.
+                  MDOM_EXCEPTION:MDOM_NS_OTHER_WITH_XML_URI::
                     <Q:infoset:prefix> => $prefix,
                 }__;                          # DOM doesn't specify this
               } elsif ($namespaceURI eq q<http://www.w3.org/2000/xmlns/> and
                   (not $prefix or $prefix ne 'xmlns')) {
                 __WARNING{
-                  ManakaiDOMImplementationWarning.MDOM_WARN_NAMESPACE_ERR:
-                    <Q:MDOM_EXCEPTION:subtype>
-                       => <Q:MDOM_EXCEPTION:NS_XMLNS_URI_WITH_OTHER_PREFIX>,
+                  ManakaiDOMImplementationWarning.MDOM_WARN_NAMESPACE_ERR.
+                  MDOM_EXCEPTION:MDOM_NS_OTHER_WITH_XMLNS_URI::
                     <Q:infoset:prefix> => $prefix,
                 }__;                          # DOM doesn't specify this
               }
             }
+## ISSUE: Should be exception not warning ("malformed"!)
+## ISSUE: Should be "xmlns" and "xmlns:xmlns" checked
                        ## Condition sensitive
             my $node = __CLASS{Document}__->__INT{newObject}__; 
             $node->{<Q:DOMCore:implementation>} = $self;
@@ -1401,7 +1683,8 @@ IF:
             if ($doctype) {
               if (not $doctype->isa ('__IIF{DocumentType::}__')) {
                 __EXCEPTION{
-                  ManakaiDOMImplementationException.MDOM_TYPE_MISMATCH_ERR:
+                  ManakaiDOMImplementationException.MDOM_TYPE_MISMATCH_ERR::
+## TODO: Should be HIERARCHY error?
                     <Q:MDOM_EXCEPTION:param-name> => q<doctype>,
                     <Q:MDOM_EXCEPTION:class> => ref $doctype,
                 }__;
@@ -1413,7 +1696,7 @@ IF:
                   $doctypeNode->{<Q:ManakaiDOM:implID>} ne 
                     $node->{<Q:ManakaiDOM:implID>}) {
                 __EXCEPTION{
-                  DOMException.WRONG_DOCUMENT_ERR:
+                  DOMException.WRONG_DOCUMENT_ERR::
                 }__;                          # [DOM 2,3]
               }
               $doctypeNode
@@ -1435,7 +1718,11 @@ IF:
               push @{$node->{<Q:infoset:children>}}, $docNode;
             }
                  ## Condition sensitive
-            $r = __CLASS{Node}__::__INT{getNodeReference}__ ($node);
+            $r = __CLASS{Node}__->__INT{getNodeReference}__ ($node);
+     @@SpecLevel:2
+     @@Level[list]:
+       2
+       3
         
   @Method:
      @@Name:  getFeature
@@ -2069,7 +2356,7 @@ IF:
                 }
               }
               __EXCEPTION{
-                DOMException.WRONG_DOCUMENT_ERR:
+                DOMException.WRONG_DOCUMENT_ERR::
                   <Q:MDOM_EXCEPTION:param-name> => 'newChild',
               }__;
             } # CHKDOC
@@ -2085,16 +2372,14 @@ IF:
               if ($node->{<Q:DOMCore:read-only>}) {
                 ## This node is read-only.
                 __EXCEPTION{
-                  DOMException.NO_MODIFICATION_ALLOWED_ERR:
-                    <Q:MDOM_EXCEPTION:subtype>
-                                    => <Q:MDOM_EXCEPTION:NOMOD_THIS>,
+                  DOMException.NO_MODIFICATION_ALLOWED_ERR.
+                  MDOM_EXCEPTION:NOMOD_THIS::
                 }__;
               } elsif ($parentNode and $parentNode->{<Q:DOMCore:read-only>}) {
                 ## Parent of new node(s) is read-only
                 __EXCEPTION{
-                  DOMException.NO_MODIFICATION_ALLOWED_ERR:
-                    <Q:MDOM_EXCEPTION:subtype>
-                                     => <Q:MDOM_EXCEPTION:NOMOD_SRC_PARENT>,
+                  DOMException.NO_MODIFICATION_ALLOWED_ERR.
+                  MDOM_EXCEPTION:NOMOD_SRC_PARENT::
                     <Q:MDOM_EXCEPTION:param-name> => 'newChild',
                 }__;
               }
@@ -2144,14 +2429,20 @@ IF:
                           $has{$newNode->{<Q:DOMCore:nodeType>}} = 1;
                           next EACHNEWNODE;
                         }
-                        __EXCEPTION{
-                          DOMException.HIERARCHY_REQUEST_ERR:
-                            <Q:MDOM_EXCEPTION:subtype>
-                                 => <Q:MDOM_EXCEPTION:HIERARCHY_TOO_MANY_NODES>,
-                            <Q:DOMCore:nodeType>
-                                 => $newNode->{<Q:DOMCore:nodeType>},
-                            <Q:MDOM_EXCEPTION:param-name> => 'newChild',
-                        }__;
+                        if ($newNode->{<Q:DOMCore:nodeType>} eq
+                            <Q:infoset:Element>) {
+                          __EXCEPTION{
+                            DOMException.HIERARCHY_REQUEST_ERR.
+                            MDOM_EXCEPTION:MDOM_SECOND_DOC_ELEMENT::
+                              <Q:MDOM_EXCEPTION:param-name> => 'newChild',
+                          }__;
+                        } else { # <Q:infoset:DocumentTypeDeclaration>
+                          __EXCEPTION{
+                            DOMException.HIERARCHY_REQUEST_ERR.
+                            MDOM_EXCEPTION:MDOM_SECOND_DOCTYPE::
+                              <Q:MDOM_EXCEPTION:param-name> => 'newChild',
+                          }__;
+                        }
                       } elsif (not {
                                  <Q:infoset:Comment> => 1,
                                  <Q:infoset:ProcessingInstruction> => 1,
@@ -2176,9 +2467,8 @@ IF:
                   }
                 } # $node->{<Q:DOMCore:nodeType>}
                 __EXCEPTION{
-                  DOMException.HIERARCHY_REQUEST_ERR:
-                    <Q:MDOM_EXCEPTION:subtype>
-                         => <Q:MDOM_EXCEPTION:HIERARCHY_BAD_TYPE>,
+                  DOMException.HIERARCHY_REQUEST_ERR.
+                  MDOM_EXCEPTION:HIERARCHY_BAD_TYPE::
                     <Q:infoset:nodeType> => $newNode->{<Q:infoset:nodeType>},
                     <Q:MDOM_EXCEPTION:param-name> => 'newChild',
                 }__;
@@ -2192,9 +2482,8 @@ IF:
                   if ($newNode->{<Q:TreeCore:nodeID>} eq
                       $n->{<Q:TreeCore:nodeID>}) {
                     __EXCEPTION{
-                      DOMException.HIERARCHY_REQUEST_ERR:
-                        <Q:MDOM_EXCEPTION:subtype>
-                             => <Q:MDOM_EXCEPTION:HIERARCHY_ANCESTOR_OR_SELF>,
+                      DOMException.HIERARCHY_REQUEST_ERR.
+                      MDOM_EXCEPTION:HIERARCHY_ANCESTOR_OR_SELF::
                         <Q:MDOM_EXCEPTION:param-name> => 'newChild',
                     }__;
                   }
@@ -2219,7 +2508,7 @@ IF:
                     }
                   }
                   __EXCEPTION{
-                    DOMException.NOT_FOUND_ERR:
+                    DOMException.NOT_FOUND_ERR::
                       <Q:MDOM_EXCEPTION:param-name> => 'refChild',
                   }__;
                 }
@@ -2229,13 +2518,13 @@ IF:
                   $node->{<Q:TreeCore:nodeID>}) {
                 if (@newNode > 1) {
                   __EXCEPTION{
-                    ManakaiDOMImplementationException.MDOM_DEBUG_BUG:
+                    ManakaiDOMImplementationException.MDOM_DEBUG_BUG::
                   }__;
                 } elsif (ref $refChild and
                          $newNode[0]->{<Q:TreeCore:nodeID>} eq
                          $refChild->{<Q:TreeCore:node>}->{<Q:TreeCore:nodeID>}) {
                   __WARNING{
-                    ManakaiDOMImplementationWarning.MDOM_NEWCHILD_IS_REFCHILD: 
+                    ManakaiDOMImplementationWarning.MDOM_NEWCHILD_IS_REFCHILD::
                       <Q:MDOM_EXCEPTION:newChild-param-name> => 'newChild',
                       <Q:MDOM_EXCEPTION:refChild-param-name> => 'refChild',
                   }__;
@@ -2404,7 +2693,7 @@ IF:
                 }
               }
               __EXCEPTION{
-                DOMException.WRONG_DOCUMENT_ERR:
+                DOMException.WRONG_DOCUMENT_ERR::
                   <Q:MDOM_EXCEPTION:param-name> => 'newChild',
               }__;
             } # CHKDOC
@@ -2420,15 +2709,14 @@ IF:
               if ($node->{<Q:DOMCore:read-only>}) {
                 ## This node is read-only.
                 __EXCEPTION{
-                  DOMException.NO_MODIFICATION_ALLOWED_ERR:
-                    <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_THIS>,
+                  DOMException.NO_MODIFICATION_ALLOWED_ERR.
+                    MDOM_EXCEPTION:NOMOD_THIS::
                 }__;
               } elsif ($parentNode and $parentNode->{<Q:DOMCore:read-only>}) {
                 ## Parent of new node(s) is read-only
                 __EXCEPTION{
-                  DOMException.NO_MODIFICATION_ALLOWED_ERR:
-                    <Q:MDOM_EXCEPTION:subtype>
-                                          => <Q:MDOM_EXCEPTION:NOMOD_SRC_PARENT>,
+                  DOMException.NO_MODIFICATION_ALLOWED_ERR.
+                  MDOM_EXCEPTION:NOMOD_SRC_PARENT::
                     <Q:MDOM_EXCEPTION:param-name> => 'newChild',
                 }__;
               }
@@ -2478,14 +2766,20 @@ IF:
                           $has{$newNode->{<Q:DOMCore:nodeType>}} = 1;
                           next EACHNEWNODE;
                         }
-                        __EXCEPTION{
-                          DOMException.HIERARCHY_REQUEST_ERR:
-                            <Q:MDOM_EXCEPTION:subtype>
-                                 => <Q:MDOM_EXCEPTION:HIERARCHY_TOO_MANY_NODES>,
-                            <Q:DOMCore:nodeType>
-                                 => $newNode->{<Q:DOMCore:nodeType>},
-                            <Q:MDOM_EXCEPTION:param-name> => 'newChild',
-                        }__;
+                        if ($newNode->{<Q:DOMCore:nodeType>} eq
+                            <Q:infoset:Element>) {
+                          __EXCEPTION{
+                            DOMException.HIERARCHY_REQUEST_ERR.
+                            MDOM_EXCEPTION:MDOM_SECOND_DOC_ELEMENT::
+                              <Q:MDOM_EXCEPTION:param-name> => 'newChild',
+                          }__;
+                        } else { # <Q:infoset:DocumentTypeDeclaration>
+                          __EXCEPTION{
+                            DOMException.HIERARCHY_REQUEST_ERR.
+                            MDOM_EXCEPTION:MDOM_SECOND_DOCTYPE::
+                              <Q:MDOM_EXCEPTION:param-name> => 'newChild',
+                          }__;
+                        }
                       } elsif (not {
                                  <Q:infoset:Comment> => 1,
                                  <Q:infoset:ProcessingInstruction> => 1,
@@ -2510,9 +2804,8 @@ IF:
                   }
                 } # $node->{<Q:DOMCore:nodeType>}
                 __EXCEPTION{
-                  DOMException.HIERARCHY_REQUEST_ERR:
-                    <Q:MDOM_EXCEPTION:subtype>
-                         => <Q:MDOM_EXCEPTION:HIERARCHY_BAD_TYPE>,
+                  DOMException.HIERARCHY_REQUEST_ERR.
+                  MDOM_EXCEPTION::HIERARCHY_BAD_TYPE::
                     <Q:infoset:nodeType> => $newNode->{<Q:infoset:nodeType>},
                     <Q:MDOM_EXCEPTION:param-name> => 'newChild',
                 }__;
@@ -2526,9 +2819,8 @@ IF:
                   if ($newNode->{<Q:TreeCore:nodeID>} eq
                       $n->{<Q:TreeCore:nodeID>}) {
                     __EXCEPTION{
-                      DOMException.HIERARCHY_REQUEST_ERR:
-                        <Q:MDOM_EXCEPTION:subtype>
-                             => <Q:MDOM_EXCEPTION:HIERARCHY_ANCESTOR_OR_SELF>,
+                      DOMException.HIERARCHY_REQUEST_ERR.
+                      MDOM_EXCEPTION:HIERARCHY_ANCESTOR_OR_SELF::
                         <Q:MDOM_EXCEPTION:param-name> => 'newChild',
                     }__;
                   }
@@ -2553,7 +2845,7 @@ IF:
                     }
                   }
                   __EXCEPTION{
-                    DOMException.NOT_FOUND_ERR:
+                    DOMException.NOT_FOUND_ERR::
                       <Q:MDOM_EXCEPTION:param-name> => 'oldChild',
                   }__;
                 }
@@ -2563,13 +2855,13 @@ IF:
                   $node->{<Q:TreeCore:nodeID>}) {
                 if (@newNode > 1) {
                   __EXCEPTION{
-                    ManakaiDOMImplementationException.MDOM_DEBUG_BUG:
+                    ManakaiDOMImplementationException.MDOM_DEBUG_BUG::
                   }__;
                 } elsif (ref $oldChild and
                          $newNode[0]->{<Q:TreeCore:nodeID>} eq
                          $oldChild->{<Q:TreeCore:node>}->{<Q:TreeCore:nodeID>}) {
                   __WARNING{
-                    ManakaiDOMImplementationWarning.MDOM_NEWCHILD_IS_REFCHILD: 
+                    ManakaiDOMImplementationWarning.MDOM_NEWCHILD_IS_REFCHILD:: 
                       <Q:MDOM_EXCEPTION:newChild-param-name> => 'newChild',
                       <Q:MDOM_EXCEPTION:refChild-param-name> => 'oldChild',
                   }__;
@@ -2673,8 +2965,8 @@ IF:
             my $node = $self->{<Q:TreeCore:node>};
             if ($node->{<Q:DOMCore:read-only>}) {
               __EXCEPTION{
-                DOMException.NO_MODIFICATION_ALLOWED_ERR:
-                  <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_THIS>,
+                DOMException.NO_MODIFICATION_ALLOWED_ERR.
+                MDOM_EXCEPTION:NOMOD_THIS::
               }__;
             }
             my $oldChildID = ref $oldChild ?
@@ -2689,7 +2981,7 @@ IF:
                 }
               }
               __EXCEPTION{
-                DOMException.NOT_FOUND_ERR:
+                DOMException.NOT_FOUND_ERR::
               }__;
             }
             if (ref $oldChild) {
@@ -2804,7 +3096,7 @@ IF:
                 }
               }
               __EXCEPTION{
-                DOMException.WRONG_DOCUMENT_ERR:
+                DOMException.WRONG_DOCUMENT_ERR::
                   <Q:MDOM_EXCEPTION:param-name> => 'newChild',
               }__;
             } # CHKDOC
@@ -2820,15 +3112,14 @@ IF:
               if ($node->{<Q:DOMCore:read-only>}) {
                 ## This node is read-only.
                 __EXCEPTION{
-                  DOMException.NO_MODIFICATION_ALLOWED_ERR:
-                    <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_THIS>,
+                  DOMException.NO_MODIFICATION_ALLOWED_ERR.
+                  MDOM_EXCEPTION:NOMOD_THIS::
                 }__;
               } elsif ($parentNode and $parentNode->{<Q:DOMCore:read-only>}) {
                 ## Parent of new node(s) is read-only
                 __EXCEPTION{
-                  DOMException.NO_MODIFICATION_ALLOWED_ERR:
-                    <Q:MDOM_EXCEPTION:subtype>
-                                       => <Q:MDOM_EXCEPTION:NOMOD_SRC_PARENT>,
+                  DOMException.NO_MODIFICATION_ALLOWED_ERR.
+                  MDOM_EXCEPTION:NOMOD_SRC_PARENT::
                     <Q:MDOM_EXCEPTION:param-name> => 'newChild',
                 }__;
               }
@@ -2878,14 +3169,20 @@ IF:
                           $has{$newNode->{<Q:DOMCore:nodeType>}} = 1;
                           next EACHNEWNODE;
                         }
-                        __EXCEPTION{
-                          DOMException.HIERARCHY_REQUEST_ERR:
-                            <Q:MDOM_EXCEPTION:subtype>
-                                 => <Q:MDOM_EXCEPTION:HIERARCHY_TOO_MANY_NODES>,
-                            <Q:DOMCore:nodeType>
-                                 => $newNode->{<Q:DOMCore:nodeType>},
-                            <Q:MDOM_EXCEPTION:param-name> => 'newChild',
-                        }__;
+                        if ($newNode->{<Q:DOMCore:nodeType>} eq
+                            <Q:infoset:Element>) {
+                          __EXCEPTION{
+                            DOMException.HIERARCHY_REQUEST_ERR.
+                            MDOM_EXCEPTION:MDOM_SECOND_DOC_ELEMENT::
+                              <Q:MDOM_EXCEPTION:param-name> => 'newChild',
+                          }__;
+                        } else { # <Q:infoset:DocumentTypeDeclaration>
+                          __EXCEPTION{
+                            DOMException.HIERARCHY_REQUEST_ERR.
+                            MDOM_EXCEPTION:MDOM_SECOND_DOCTYPE::
+                              <Q:MDOM_EXCEPTION:param-name> => 'newChild',
+                          }__;
+                        }
                       } elsif (not {
                                  <Q:infoset:Comment> => 1,
                                  <Q:infoset:ProcessingInstruction> => 1,
@@ -2910,9 +3207,8 @@ IF:
                   }
                 } # $node->{<Q:DOMCore:nodeType>}
                 __EXCEPTION{
-                  DOMException.HIERARCHY_REQUEST_ERR:
-                    <Q:MDOM_EXCEPTION:subtype>
-                         => <Q:MDOM_EXCEPTION:HIERARCHY_BAD_TYPE>,
+                  DOMException.HIERARCHY_REQUEST_ERR.
+                  MDOM_EXCEPTION:HIERARCHY_BAD_TYPE::
                     <Q:infoset:nodeType> => $newNode->{<Q:infoset:nodeType>},
                     <Q:MDOM_EXCEPTION:param-name> => 'newChild',
                 }__;
@@ -2926,9 +3222,8 @@ IF:
                   if ($newNode->{<Q:TreeCore:nodeID>} eq
                       $n->{<Q:TreeCore:nodeID>}) {
                     __EXCEPTION{
-                      DOMException.HIERARCHY_REQUEST_ERR:
-                        <Q:MDOM_EXCEPTION:subtype>
-                             => <Q:MDOM_EXCEPTION:HIERARCHY_ANCESTOR_OR_SELF>,
+                      DOMException.HIERARCHY_REQUEST_ERR.
+                      MDOM_EXCEPTION:HIERARCHY_ANCESTOR_OR_SELF::
                         <Q:MDOM_EXCEPTION:param-name> => 'newChild',
                     }__;
                   }
@@ -3371,7 +3666,7 @@ IF:
         @@@Exception:
           @@@@Type: DOMException
           @@@@Name: NO_MODIFICATION_ALLOWED_ERR
-          @@@@Descriptin:
+          @@@@Description:
             @@@@@lang:en
             @@@@@@: This node is read-only.
         @@@Def:
@@ -3381,8 +3676,8 @@ IF:
             my $node = $self->{<Q:TreeCore:node>};
             if ($node->{<Q:DOMCore:read-only>}) {
               __EXCEPTION{
-                DOMException.NO_MODIFICATION_ALLOWED_ERR:
-                  <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:THIS>,
+                DOMException.NO_MODIFICATION_ALLOWED_ERR.
+                MDOM_EXCEPTION:NOMOD_THIS::
               }__;
             }
             my @oldChild = @{$node->{<Q:infoset:children>}};
@@ -3635,7 +3930,7 @@ IF:
             $class = q<__CLASS{Notation}__>;
           } else {
             __EXCEPTION{
-              ManakaiDOMImplementationException.MDOM_DEBUG_BUG: 
+              ManakaiDOMImplementationException.MDOM_DEBUG_BUG::
                 <Q:MDOM_EXCEPTION:values> => {
                   <Q:DOMCore:nodeType> => $nt,
                 },
@@ -3747,13 +4042,13 @@ IF:
      @@Name:  getNamedItem
      @@Description:
        @@@lang:en
-       @@@@: Retrive a node specified by name.
+       @@@@: Retrieve a node specified by name.
      @@Param:
         @@@Name:  name
         @@@Type:  DOMString
         @@@Description:
           @@@@lang:en
-          @@@@@: The "nodeName" of a node to retrive.
+          @@@@@: The "nodeName" of a node to retrieve.
      @@Return:
         @@@Type:  Node
         @@@Description:
@@ -3846,7 +4141,7 @@ IF:
        @@@lang:en
        @@@@:
          Is it possible to add the node that has namespace URI and local 
-         name?  If it is, can that node be retrived via the "NS" methods? 
+         name?  If it is, can that node be retrieved via the "NS" methods? 
          Is it possible to add the node that has "nodeName" crushing 
          with existing "NS" node?
     @@RedefinedBy:
@@ -3961,26 +4256,27 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Retrive a node specified by local name and namespace URI.
+         Retrieve a node specified by local name and namespace URI.
      @@Param:
         @@@Name:  namespaceURI
-        @@@Type:  DOMString
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The namespace URI of the node to retrive.
+            The namespace URI of the node to retrieve.
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
           @@@@Description:
             @@@@@lang:en
-            @@@@@@: The node to retrive has no namespace.
+            @@@@@@: The node to retrieve has no namespace.
      @@Param:
         @@@Name:  localName
         @@@Type:  DOMString
         @@@Description:
           @@@@lang:en
-          @@@@@: The local name of the node to retrive.
+          @@@@@: The local name of the node to retrieve.
      @@Return:
         @@@Type:  Node
         @@@Description:
@@ -4368,8 +4664,8 @@ IF:
             my $node = $self->{<Q:TreeCore:node>};
             if ($node->{<Q:DOMCore:read-only>}) {
               __EXCEPTION{
-                DOMException.NO_MODIFICATION_ALLOWED_ERR:
-                  <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_THIS>,
+                DOMException.NO_MODIFICATION_ALLOWED_ERR.
+                MDOM_EXCEPTION:NOMOD_THIS::
               }__;
             }
             $node->{<Q:infoset:content>} .= $arg;
@@ -4418,8 +4714,8 @@ IF:
           @@@@@:
           if ($self->{<Q:TreeCore:node>}->{<Q:DOMCore:read-only>}) {
             __EXCEPTION{
-              DOMException.NO_MODIFICATION_ALLOWED_ERR:
-                <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_THIS>,
+              DOMException.NO_MODIFICATION_ALLOWED_ERR.
+              MDOM_EXCEPTION:NOMOD_THIS::
             }__;
           }
           my $r;
@@ -4479,8 +4775,8 @@ IF:
         @@@@@:
           if ($self->{<Q:TreeCore:node>}->{<Q:DOMCore:read-only>}) {
             __EXCEPTION{
-              DOMException.NO_MODIFICATION_ALLOWED_ERR:
-                <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_THIS>,
+              DOMException.NO_MODIFICATION_ALLOWED_ERR.
+              MDOM_EXCEPTION:NOMOD_THIS::
             }__;
           }
           my $r;
@@ -4546,8 +4842,8 @@ IF:
         @@@@@:
           if ($self->{<Q:TreeCore:node>}->{<Q:DOMCore:read-only>}) {
             __EXCEPTION{
-              DOMException.NO_MODIFICATION_ALLOWED_ERR:
-                <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_THIS>,
+              DOMException.NO_MODIFICATION_ALLOWED_ERR.
+              MDOM_EXCEPTION:NOMOD_THIS::
             }__;
           }
           my $r;
@@ -4644,7 +4940,7 @@ IF:
         @@@Exception:
           @@@@Type: DOMException
           @@@@Name: NO_MODIFICATION_ALLOWED_ERR
-          @@@@Descriptin:
+          @@@@Description:
             @@@@@lang:en
             @@@@@@: This node is read-only.
         @@@Def:
@@ -4683,6 +4979,7 @@ IF:
             InXMLNameStartChar11
             InXMLNameChar11
       @@@Condition[list]:
+        DOM1
         DOM2
         DOM3
   @ImplNote:
@@ -5163,33 +5460,30 @@ IF:
             lang:Perl
           @@@@@:
             my $node = $self->{<Q:TreeCore:node>};
-            my $version = $node->{<Q:DOMCore:ownerDocument>}
-                      ->__SUPER{Document::}__::__INT{getDocumentXMLVersion}__;
+            my $docnode = $node->{<Q:DOMCore:ownerDocument>};
+            my $version;
+            __CODE{XMLVersion: out => version, docNode => docnode}__;
             if (not defined $version) {
               __WARNING{
-                ManakaiDOMImplementationWarning.ATTR_SET_NO_EFFECT:
-                  <Q:MDOM_EXCEPTION:subtype>
-                              => <Q:MDOM_EXCEPTION:XML_NOT_SUPPORTED>,
+                ManakaiDOMImplementationWarning.ATTR_SET_NO_EFFECT.
+                MDOM_EXCEPTION:MDOM_DOC_NOSUPPORT_XML::
               }__;
             } elsif (not defined $node->{<Q:infoset:localName>}) {
               __WARNING{
-                ManakaiDOMImplementationWarning.ATTR_SET_NO_EFFECT:
-                  <Q:MDOM_EXCEPTION:subtype>
-                              => <Q:MDOM_EXCEPTION:NS_NOT_SUPPORTED>,
+                ManakaiDOMImplementationWarning.ATTR_SET_NO_EFFECT.
+                MDOM_EXCEPTION:MDOM_NODE_NOSUPPORT_XMLNS::
               }__;
             } elsif ($node->{<Q:DOMCore:read-only>}) {
               __WARNING{
-                DOMException.NO_MODIFICATION_ALLOWED_ERR:
-                  <Q:MDOM_EXCEPTION:subtype>
-                              => <Q:MDOM_EXCEPTION:NOMOD_THIS>,
+                DOMException.NO_MODIFICATION_ALLOWED_ERR.
+                MDOM_EXCEPTION:NOMOD_THIS::
               }__;
             } elsif (not defined $node->{<Q:infoset:prefix>} and
                      $node->{<Q:infoset:localName>} and
                      $node->{<Q:infoset:localName>} eq 'xmlns') {
               __EXCEPTION{
-                DOMException.NAMESPACE_ERR:
-                  <Q:MDOM_EXCEPTION:subtype>
-                       => <Q:MDOM_EXCEPTION:NS_QNAME_IS_XMLNS>,
+                DOMException.NAMESPACE_ERR.
+                MDOM_EXCEPTION:MDOM_NS_QNAME_IS_XMLNS::
               }__;
             } else {
               __CODE{CheckNCName: ncname => given, version => version,
@@ -5199,18 +5493,16 @@ IF:
               } else {
                 if (not defined $node->{<Q:infoset:namespaceName>}) {
                   __EXCEPTION{
-                    DOMException.NAMESPACE_ERR:
-                      <Q:MDOM_EXCEPTION:subtype>
-                           => <Q:MDOM_EXCEPTION:NS_PREFIX_WITH_NULL_URI>,
-                      <Q:MDOM_EXCEPTION:prefix> => $given,
+                    DOMException.NAMESPACE_ERR.
+                    MDOM_NS_PREFIX_WITH_NULL_URI::
+                      <Q:infoset:prefix> => $given,
                   }__;
                 } elsif ($given eq 'xml' and
                          (not $node->{<Q:infoset:namespaceName>} or
                           $node->{<Q:infoset:namespaceName>} ne <Q:xml:>)) {
                   __EXCEPTION{
-                    DOMException.NAMESPACE_ERR:
-                      <Q:MDOM_EXCEPTION:subtype>
-                           => <Q:MDOM_EXCEPTION:NS_XML_WITH_OTHER_URI>,
+                    DOMException.NAMESPACE_ERR.
+                    MDOM_EXCEPTION:MDOM_NS_XML_WITH_OTHER_URI::
                       <Q:infoset:namespaceName>
                            => $node->{<Q:infoset:namespaceName>},
                   }__;
@@ -5218,9 +5510,8 @@ IF:
                          (not $node->{<Q:infoset:namespaceName>} or
                           $node->{<Q:infoset:nanespaceName>} eq <Q:xmlns:>)) {
                   __EXCEPTION{
-                    DOMException.NAMESPACE_ERR:
-                      <Q:MDOM_EXCEPTION:subtype>
-                           => <Q:MDOM_EXCEPTION:NS_XMLNS_WITH_OTHER_URI>,
+                    DOMException.NAMESPACE_ERR.
+                    MDOM_EXCEPTION:MDOM_NS_XMLNS_WITH_OTHER_URI::
                       <Q:infoset:namespaceName>
                            => $node->{<Q:infoset:namespaceName>},
                   }__;
@@ -5330,11 +5621,71 @@ IF:
  ## ISSUE: What to do if XHTML?       
   @Method:
      @@Name:  getAttribute
-     @@Return:
-        @@@Type:  DOMString
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Retrieve an attribute value by name.
+     @@NSVersion:getAttribute
      @@Param:
         @@@Name:  name
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The name of the attribute to retrieve.
+     @@Return:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The <IF:Attr> value as a string.
+        @@@InCase:
+          @@@@Value:\
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              That attribute does not have a specified or default value.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $attr = $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>};
+            if ($attr->{<Q:ManakaiDOM:noNS>}->{$name}) {
+                          ## Condition insensitive
+              $r = $attr->{<Q:ManakaiDOM:noNS>}->{$name};
+            } elsif ($name eq 'xmlns') {
+              for my $a (%{$attr->{<Q:xmlns:>}||{}}) {
+                if ($a->{<Q:infoset:localName>}) {
+                  $r = $a;
+                  last;
+                }
+              }
+            } elsif ($name eq 'xmlns:xmlns') {
+              # 
+            } else {
+              for my $ns (keys %$attr) {
+                if ($ns eq <Q:ManakaiDOM:noNS>) {
+                  # 
+                } else {
+                  for my $a (%{$attr->{$ns}||{}}) {
+                    if (defined $a->{<Q:infoset:prefix>} and
+                        $a->{<Q:infoset:prefix>}.':'.
+                        $a->{<Q:infoset:localName>} eq $name) {
+                      $r = $a;
+                      last;
+                    } elsif ($a->{<Q:infoset:localName>} eq $name) {
+                      $r = $a;
+                      last;
+                    }
+                  }
+                }
+              }
+            }
+            if ($r) {
+                         ## Condition insensitive
+              $r = $r->__SUPER{ManakaiDOMNodeObjectNode}__::__INT{textContent}__;
+            }
+    @@SpecLevel:1
   @Method:
      @@Name:  setAttribute
      @@Param:
@@ -5354,11 +5705,74 @@ IF:
         @@@Exception[list]:  DOMException
   @Method:
      @@Name:  getAttributeNode
-     @@Return:
-        @@@Type:  Attr
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Retrieve an attribute node by name.
+     @@NSVersion:getAttributeNodeNS
      @@Param:
         @@@Name:  name
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The name (<A:nodeName>) of the attribute to retrieve.
+     @@Return:
+        @@@Type:  Attr
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The <IF:Attr> node with the specified name.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: There is no such attribute.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $attr = $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>};
+            if ($attr->{<Q:ManakaiDOM:noNS>}->{$name}) {
+              $r = $attr->{<Q:ManakaiDOM:noNS>}->{$name};
+            } elsif ($name eq 'xmlns') {
+              for my $a (%{$attr->{<Q:xmlns:>}||{}}) {
+                if ($a->{<Q:infoset:localName>}) {
+                  $r = $a;
+                  last;
+                }
+              }
+            } elsif ($name eq 'xmlns:xmlns') {
+              # 
+            } else {
+              for my $ns (keys %$attr) {
+                if ($ns eq <Q:ManakaiDOM:noNS>) {
+                  # 
+                } else {
+                  for my $a (%{$attr->{$ns}||{}}) {
+                    if (defined $a->{<Q:infoset:prefix>} and
+                        $a->{<Q:infoset:prefix>}.':'.
+                        $a->{<Q:infoset:localName>} eq $name) {
+                      $r = $a;
+                      last;
+                    } elsif ($a->{<Q:infoset:localName>} eq $name) {
+                      $r = $a;
+                      last;
+                    }
+                  }
+                }
+              }
+            }
+            if ($r) {
+                         ## Condition sensitive
+              $r = __CLASS{Node}__->__INT{getNodeReference}__ ($r, $self);
+            }
+    @SpecLevel:1
+    @Level[list]:
+     1
+     2
+     3
   @Method:
      @@Name:  setAttributeNode
      @@Return:
@@ -5377,22 +5791,73 @@ IF:
         @@@Type:  Attr
   @Method:
      @@Name:  getElementsByTagName
-     @@Return:
-        @@@Type:  NodeList
      @@Param:
         @@@Name:  name
         @@@Type:  DOMString
+     @@Return:
+        @@@Type:  NodeList
   @Method:
      @@Name:  getAttributeNS
-     @@Return:
-        @@@Type:  DOMString
-        @@@Exception[list]:  DOMException
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Retrieve an attribute value by local name and namespace URI.
+     @@NoNSVersion:getAttribute
      @@Param:
         @@@Name:  namespaceURI
-        @@@Type:  DOMString
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The namespace URI of the attribute to retrieve.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The attribute to retrieve has no namespace.
      @@Param:
         @@@Name:  localName
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The local name of the attribute to retrieve.
+     @@Return:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The <IF:Attr> value as a string.
+        @@@InCase:
+          @@@@Value:\
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: That attribute does not have a specified or default value.
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:NOT_SUPPORTED_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_IMPL_NOSUPPORT_XML
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The DOM implementation does not support the feature 
+                <Feature:XML> and the language exposed through the 
+                <IF:Document> does not support XML Namespaces.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $attr = $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>};
+            $namespaceURI = <Q:null:> unless defined $namespaceURI;
+            $r = $attr->{$namespaceURI}->{$localName};
+            if ($r) {
+                         ## Condition insensitive
+              $r = $r->__SUPER{ManakaiDOMNodeObjectNode}__::__INT{textContent}__;
+            }
      @@Level[list]:  2
      @@SpecLevel:2
   @Method:
@@ -5424,16 +5889,66 @@ IF:
      @@SpecLevel:2
   @Method:
      @@Name:  getAttributeNodeNS
-     @@Return:
-        @@@Type:  Attr
-        @@@Exception[list]:  DOMException
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Retrieve an <IF:Attr> node by local name and namespace URI.
+     @@NoNSVersion:getAttributeNode
      @@Param:
         @@@Name:  namespaceURI
-        @@@Type:  DOMString
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace URI of the attribute to retrieve.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The attribute to retrieve have no namespace.
      @@Param:
         @@@Name:  localName
         @@@Type:  DOMString
-     @@Level[list]:  2
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The local name of the attribute to retrieve.
+     @@Return:
+        @@@Type:  Attr
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The <IF:Attr> node.
+        @@@@InCase:
+          @@@@@Value:
+            @@@@@@is-null:1
+          @@@@@Description:
+            @@@@@@lang:en
+            @@@@@@@: There is no such attribute.
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:NOT_SUPPORTED_ERR
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The DOM implementation does not support the feature 
+                <Feature:XML> and the language exposed through the 
+                <IF:Document> does not support XML Namespaces.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $attr = $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>};
+            $namespaceURI = <Q:null:> unless defined $namespaceURI;
+            $r = $attr->{$namespaceURI}->{$localName};
+            if ($r) {
+                         ## Condition sensitive
+              $r = __CLASS{Node}__->__INT{getNodeReference}__ ($r, $self);
+            }
+     @@Level[list]:
+        2
+        3
      @@SpecLevel:2
   @Method:
      @@Name:  setAttributeNodeNS
@@ -5447,37 +5962,145 @@ IF:
      @@SpecLevel:2
   @Method:
      @@Name:  getElementsByTagNameNS
-     @@Return:
-        @@@Type:  NodeList
-        @@@Exception[list]:  DOMException
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:  DOMString
      @@Param:
         @@@Name:  localName
         @@@Type:  DOMString
+     @@Return:
+        @@@Type:  NodeList
+        @@@Exception[list]:  DOMException
      @@Level[list]:  2
      @@SpecLevel:2
   @Method:
      @@Name:  hasAttribute
-     @@Return:
-        @@@Type:  boolean
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Whether an attribute with the given name is specified on 
+         this element or has a default value.
+     @@NSVersion:hasAttributeNS
      @@Param:
         @@@Name:  name
         @@@Type:  DOMString
+        @@Description:
+          @@@lang:en
+          @@@@: The name of the attribute to look for.
+     @@Return:
+        @@@Type:  boolean
+        @@@InCase:
+          @@@@Value:true
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              An attribute with the given name is specified on 
+              this element or has a default value.
+        @@@InCase:
+          @@@@Value:false
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              There is no such attribute.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $attr = $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>};
+            if ($attr->{<Q:ManakaiDOM:noNS>}->{$name}) {
+              $r = $attr->{<Q:ManakaiDOM:noNS>}->{$name};
+            } elsif ($name eq 'xmlns') {
+              for my $a (%{$attr->{<Q:xmlns:>}||{}}) {
+                if ($a->{<Q:infoset:localName>}) {
+                  $r = $a;
+                  last;
+                }
+              }
+            } elsif ($name eq 'xmlns:xmlns') {
+              # 
+            } else {
+              for my $ns (keys %$attr) {
+                if ($ns eq <Q:ManakaiDOM:noNS>) {
+                  # 
+                } else {
+                  for my $a (%{$attr->{$ns}||{}}) {
+                    if (defined $a->{<Q:infoset:prefix>} and
+                        $a->{<Q:infoset:prefix>}.':'.
+                        $a->{<Q:infoset:localName>} eq $name) {
+                      $r = $a;
+                      last;
+                    } elsif ($a->{<Q:infoset:localName>} eq $name) {
+                      $r = $a;
+                      last;
+                    }
+                  }
+                }
+              }
+            }
+            $r = true if $r;
      @@Level[list]:  2
      @@SpecLevel:2
   @Method:
      @@Name:  hasAttributeNS
-     @@Return:
-        @@@Type:  boolean
-        @@@Exception[list]:  DOMException
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Whether an attribute with a given local name and namespace URI 
+         is specified on this element or has a default value.
+     @@NoNSVersion:hasAttribute
      @@Param:
         @@@Name:  namespaceURI
-        @@@Type:  DOMString
+        @@@Type: 
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace URI of the attribute to look for.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The attribute to look for has no namespace.
      @@Param:
         @@@Name:  localName
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The local name of the attribute to look for.
+     @@Return:
+        @@@Type:  boolean
+        @@@InCase:
+          @@@@Value:true
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              An attribute with given local name and namespace URI is 
+              specified or has a default value on this element.
+        @@@InCase:
+          @@@@Value:false
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: There is no such attribute.
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:NOT_SUPPORTED_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_IMPL_NOSUPPORT_XML
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The DOM implementation does not support the feature 
+                <Feature:XML> and the language exposed through the 
+                <IF:Document> does not support XML Namespaces.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $attr = $self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>};
+            $namespaceURI = <Q:null:> unless defined $namespaceURI;
+            $r = $attr->{$namespaceURI}->{$localName} ? true : false;
      @@Level[list]:  2
      @@SpecLevel:2
   @Attr:
@@ -5726,25 +6349,23 @@ IF:
             lang:Perl
           @@@@@:
             my $node = $self->{<Q:TreeCore:node>};
-            my $version = $node->{<Q:DOMCore:ownerDocument>}
-                      ->__SUPER{Document::}__::__INT{getDocumentXMLVersion}__;
+            my $version;
+            my $docNode = $node->{<Q:DOMCore:ownerDocument>};
+            __CODE{XMLVersion: out => version, docNode => node}__;
             if (not defined $version) {
               __WARNING{
-                ManakaiDOMImplementationWarning.ATTR_SET_NO_EFFECT:
-                  <Q:MDOM_EXCEPTION:subtype>
-                              => <Q:MDOM_EXCEPTION:XML_NOT_SUPPORTED>,
+                ManakaiDOMImplementationWarning.ATTR_SET_NO_EFFECT.
+                MDOM_EXCEPTION:MDOM_DOC_NOSUPPORT_XML::
               }__;
             } elsif (not defined $node->{<Q:infoset:localName>}) {
               __WARNING{
-                ManakaiDOMImplementationWarning.ATTR_SET_NO_EFFECT:
-                  <Q:MDOM_EXCEPTION:subtype>
-                              => <Q:MDOM_EXCEPTION:NS_NOT_SUPPORTED>,
+                ManakaiDOMImplementationWarning.ATTR_SET_NO_EFFECT.
+                MDOM_EXCEPTION:MDOM_NODE_NOSUPPORT_XMLNS::
               }__;
             } elsif ($node->{<Q:DOMCore:read-only>}) {
               __WARNING{
-                DOMException.NO_MODIFICATION_ALLOWED_ERR:
-                  <Q:MDOM_EXCEPTION:subtype>
-                              => <Q:MDOM_EXCEPTION:NOMOD_THIS>,
+                DOMException.NO_MODIFICATION_ALLOWED_ERR.
+                MDOM_EXCEPTION:NOMOD_THIS::
               }__;
             } else {
               __CODE{CheckNCName: ncname => given, version => version,
@@ -5754,18 +6375,16 @@ IF:
               } else {
                 if (not defined $node->{<Q:infoset:namespaceName>}) {
                   __EXCEPTION{
-                    DOMException.NAMESPACE_ERR:
-                      <Q:MDOM_EXCEPTION:subtype>
-                           => <Q:MDOM_EXCEPTION:NS_PREFIX_WITH_NULL_URI>,
-                      <Q:MDOM_EXCEPTION:prefix> => $given,
+                    DOMException.NAMESPACE_ERR.
+                    MDOM_EXCEPTION:MDOM_NS_PREFIX_WITH_NULL_URI::
+                      <Q:infoset:prefix> => $given,
                   }__;
                 } elsif ($given eq 'xml' and
                          (not $node->{<Q:infoset:namespaceName>} or
                           $node->{<Q:infoset:namespaceName>} ne <Q:xml:>)) {
                   __EXCEPTION{
-                    DOMException.NAMESPACE_ERR:
-                      <Q:MDOM_EXCEPTION:subtype>
-                           => <Q:MDOM_EXCEPTION:NS_XML_WITH_OTHER_URI>,
+                    DOMException.NAMESPACE_ERR.
+                    MDOM_EXCEPTION:MDOM_NS_XML_WITH_OTHER_URI::
                       <Q:infoset:namespaceName>
                            => $node->{<Q:infoset:namespaceName>},
                   }__;
@@ -5889,13 +6508,13 @@ IF:
           my $parentNode = $node->{<Q:infoset:parent>};
           if ($node->{<Q:DOMCore:read-only>}) {
             __EXCEPTION{
-              DOMException.NO_MODIFICATION_ALLOWED_ERR:
-                <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_THIS>,
+              DOMException.NO_MODIFICATION_ALLOWED_ERR.
+              MDOM_EXCEPTION:NOMOD_THIS::
             }__;
           } elsif ($parentNode and $parentNode->{<Q:DOMCore:read-only>}) {
             __EXCEPTION{
-              DOMException.NO_MODIFICATION_ALLOWED_ERR:
-                <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_PARENT>,
+              DOMException.NO_MODIFICATION_ALLOWED_ERR.
+              MDOM_EXCEPTION:NOMOD_PARENT::
             }__;
           }
                           ## Condition sensitive
@@ -5915,7 +6534,7 @@ IF:
             $newNode = __CLASS{CDATASection}__->__INT{newObject}__;
           } else {
             __EXCEPTION{
-              ManakaiDOMImplementationException.MDOM_DEBUG_BUG:
+              ManakaiDOMImplementationException.MDOM_DEBUG_BUG::
                 <Q:MDOM_EXCEPTION:values> => {
                   <Q:DOMCore:nodeType> => $node->{<Q:DOMCore:nodeType>},
                 },
@@ -6052,6 +6671,9 @@ IF:
      @@ImplNote:
        @@@lang:en
        @@@@:
+         Other properties requires to be a legal <IF:Text>:
+         <Q:DOMCore:ownerDocument>.
+         \
          Other available properties: <Q:infoset:ElementContentWhitespace>, 
          <Q:infoset:parent>, <Q:infoset:content>, <Q:DOMCore:read-only>.
 ## IF:Text
@@ -6137,6 +6759,9 @@ IF:
      @@ImplNote:
        @@@lang:en
        @@@@:
+         Other properties required to be a legal <IF:Comment> object:
+         <Q:DOMCore:ownerDocument>.
+        \
          Other available properties: <Q:infoset:parent>, <Q:infoset:content>, 
          <Q:DOMCore:read-only>.
 ## IF:Comment
@@ -6678,7 +7303,7 @@ IF:
             lang:Perl
           @@@@@:
             __EXCEPTION{
-              ManakaiDOMImplementationException.MDOM_IMPL_BY_APP:
+              ManakaiDOMImplementationException.MDOM_IMPL_BY_APP::
             }__;
 
 IF:
@@ -6987,7 +7612,7 @@ IF:
          @@@@lang:en
          @@@@@:
            Other properties required to be a legal <IF:DocumentFragment> 
-           object: <Q:ownerDocument>. 
+           object: <Q:DOMCore:ownerDocument>. 
          \
            Other available properties: <Q:infoset:children>, 
            <Q:DOMCore:read-only>.
@@ -7044,6 +7669,26 @@ IF:
       document's data.
 
   @ISA:  Node
+  @Require:
+    @@Module:
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@use:
+          @@@@@@:
+            Char::Class::XML
+          @@@@@Import[list]:
+            InXMLNameChar10
+            InXMLNCNameChar10
+            InXML_NameStartChar10
+            InXML_NCNameStartChar10
+            InXMLNameChar11
+            InXMLNameStartChar11
+    @@Condition[list]:
+      DOM1
+      DOM2
+      DOM3
+    
   @Attr:
      @@Name:  doctype
      @@Description:
@@ -7146,132 +7791,1010 @@ IF:
     @@SpecLevel:1
   @Method:
      @@Name:  createElement
-     @@Return:
-        @@@Type:  Element
-        @@@Exception[list]:  DOMException
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Create an element.
+       \
+         If there are known attributes with default values, 
+         <IF:Attr> nodes representing them are automatically 
+         created and attached to the element created.
+     @@NSVersion:createElementNS
      @@Param:
         @@@Name:  tagName
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The name of the element type to instantiate.
+          \
+            The case-sensitivity depends on that of the markup language 
+            in use.  If it is case-insensitive, the <P:tagName> is 
+            mapped to the canonical form of that markup language 
+            by the DOM implementation.
+     @@Return:
+        @@@Type:  Element
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A new <IF:Element> object.
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:INVALID_CHARACTER_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_BAD_NAME
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:tagName> is not a SGML or XML <XML:Name>.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $version;
+            my $docNode = $self->{<Q:TreeCore:node>};
+            __CODE{XMLVersion: out => version, docNode => docNode}__;
+            __CODE{CheckName: name => tagName, version => version}__;
+                       ## Condition sensitive
+            my $node = __CLASS{Element}__->__INT{newObject}__;
+            $node->{<Q:DOMCore:ownerDocument>} = $docNode;
+            $node->{<Q:DOMCore:name>} = $tagName;
+                 ## Condition sensitive
+            $r = __CLASS{Node}__->__INT{getNodeReference}__ ($node, $self);
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              TODO: <P:tagName> should be normalized to uppercases if HTML.
+            \
+              TODO: Default attribute should be implemented.
+    @@SpecLevel:1
+    @@Level[list]:
+      1
+      2
+      3
   @Method:
      @@Name:  createDocumentFragment
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Create an empty <IF:DocumentFragment> object.
      @@Return:
-        @@@Type:  DocumentFragment
+        @@@Type:  DocumentFragment 
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The new <IF:DocumentFragment> object.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $docNode = $self->{<Q:TreeCore:node>};
+                       ## Condition sensitive
+            my $node = __CLASS{DocumentFragment}__->__INT{newObject}__;
+            $node->{<Q:DOMCore:ownerDocument>} = $docNode;
+                 ## Condition sensitive
+            $r = __CLASS{Node}__->__INT{getNodeReference}__ ($node, $self);
+    @@SpecLevel:1
+    @@Level[list]:
+      1
+      2
+      3
   @Method:
      @@Name:  createTextNode
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Create a <IF:Text> node.
+     @@Param:
+        @@@Name:  data
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The data for the node.
      @@Return:
         @@@Type:  Text
-     @@Param:
-        @@@Name:  data
-        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The new <IF:Text> object.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $docNode = $self->{<Q:TreeCore:node>};
+                       ## Condition sensitive
+            my $node = __CLASS{Text}__->__INT{newObject}__;
+            $node->{<Q:DOMCore:ownerDocument>} = $docNode;
+            $node->{<Q:infoset:content>} = defined $data ? $data : '';
+                 ## Condition sensitive
+            $r = __CLASS{Node}__->__INT{getNodeReference}__ ($node, $self);
+    @@SpecLevel:1
+    @@Level[list]:
+      1
+      2
+      3
   @Method:
      @@Name:  createComment
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Create a <IF:Comment> node.
+     @@Param:
+        @@@Name:  data
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The data for the node.
      @@Return:
         @@@Type:  Comment
-     @@Param:
-        @@@Name:  data
-        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The new <IF:Comment> object.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $docNode = $self->{<Q:TreeCore:node>};
+                       ## Condition sensitive
+            my $node = __CLASS{Comment}__->__INT{newObject}__;
+            $node->{<Q:DOMCore:ownerDocument>} = $docNode;
+            $node->{<Q:infoset:content>} = defined $data ? $data : '';
+                 ## Condition sensitive
+            $r = __CLASS{Node}__->__INT{getNodeReference}__ ($node, $self);
+    @@SpecLevel:1
+    @@Level[list]:
+      1
+      2
+      3
   @Method:
      @@Name:  createCDATASection
-     @@Return:
-        @@@Type:  CDATASection
-        @@@Exception[list]:  DOMException
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Create a <IF:CDATASection> node.
      @@Param:
         @@@Name:  data
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The data for the <XML:CDATA> section.
+     @@Return:
+        @@@Type:  CDATASection
+        @@@Description:
+          @@@@lang:en
+          @@@@@: 
+            The new <IF:CDATASection> object.
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:NOT_SUPPORTED_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_DOC_NOSUPPORT_XML
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                This document does not support the <Feature:XML> feature. 
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              HTML-only DOM implementations must also implement this method. 
+              The DOM Level 3 Core Specification should have changed 
+              the description from <QUOTE:if this document is an HTML document> 
+              to <QUOTE:if this document does not support the <Feature:XML> 
+              feature> for consistency with other non-HTML methods.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $version;
+            my $docNode = $self->{<Q:TreeCore:node>};
+            __CODE{XMLVersion: out => version, docNode => docNode}__;
+            unless (defined $version) {
+              __EXCEPTION{
+                DOMException.NOT_SUPPORTED_ERR.
+                MDOM_EXCEPTION:MDOM_DOC_NOSUPPORT_XML::
+              }__;
+            }
+            __REQUIRE{DOMXML}__;
+                       ## Condition sensitive
+            my $node = __CLASS{CDATASection}__->__INT{newObject}__;
+            $node->{<Q:DOMCore:ownerDocument>} = $docNode;
+            $node->{<Q:infoset:content>} = defined $data ? $data : '';
+                 ## Condition sensitive
+            $r = __CLASS{Node}__->__INT{getNodeReference}__ ($node, $self);
+    @@SpecLevel:1
+    @@Level[list]:
+      1
+      2
+      3
   @Method:
      @@Name:  createProcessingInstruction
-     @@Return:
-        @@@Type:  ProcessingInstruction
-        @@@Exception[list]:  DOMException
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Create a <IF:ProcessingInstruction> node.
      @@Param:
         @@@Name:  target
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The target name of the processing instruction to create.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            This is an XML <XML:Name>, not an XML Names <XML:NCName>.
      @@Param:
         @@@Name:  data
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The data for the node.
+     @@Return:
+        @@@Type:  ProcessingInstruction
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The new <IF:ProcessingInstruction> object.
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:INVALID_CHARACTER_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_BAD_NAME
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:name> is not an XML <XML:Name>.
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:NOT_SUPPORTED_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_DOC_NOSUPPORT_XML
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                This document does not support the <Feature:XML> feature.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $version;
+            my $docNode = $self->{<Q:TreeCore:node>};
+            __CODE{XMLVersion: out => version, docNode => docNode}__;
+            unless (defined $version) {
+              __EXCEPTION{
+                DOMException.NOT_SUPPORTED_ERR.
+                MDOM_EXCEPTION:MDOM_DOC_NOSUPPORT_XML::
+              }__;
+            }
+            __CODE{CheckName: name => target, version => version}__;
+            __REQUIRE{DOMXML}__;
+                       ## Condition sensitive
+            my $node = __CLASS{ProcessingInstruction}__->__INT{newObject}__;
+            $node->{<Q:DOMCore:ownerDocument>} = $docNode;
+            $node->{<Q:infoset:target>} = $target;
+            $node->{<Q:infoset:content>} = defined $data ? $data : '';
+                 ## Condition sensitive
+            $r = __CLASS{Node}__->__INT{getNodeReference}__ ($node, $self);
+    @@SpecLevel:1
+    @@Level[list]:
+      1
+      2
+      3
   @Method:
      @@Name:  createAttribute
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Create an <IF:Attr> node.
+     @@NSVersion: createAttributeNS
+     @@Param:
+        @@@Name:  name
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The name of the attribute.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            There is no case-sensitivility consideration of the <P:name> 
+            in the DOM Specifications.  Maybe attribute names are 
+            lower-cased if it is an HTML document.
      @@Return:
         @@@Type:  Attr
-        @@@Exception[list]:  DOMException
-     @@Param:
-        @@@Name:  name
-        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A new <IF:Attr> object.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            <A:Node.nodeName> := <P:name>, <A:Node.localName> := <DOM:null>, 
+            <A:Node.prefix> := <DOM:null>, <A:Node.namespaceURI> := <DOM:null>, 
+            value := empty.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: INVALID_CHARACTER_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_BAD_NAME
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:name> is not a SGML or XML <XML:Name>.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $version;
+            my $docNode = $self->{<Q:TreeCore:node>};
+            __CODE{XMLVersion: out => version, docNode => docNode}__;
+            __CODE{CheckName: name => name, version => version}__;
+                       ## Condition sensitive
+            my $node = __CLASS{Attr}__->__INT{newObject}__;
+            $node->{<Q:DOMCore:ownerDocument>} = $docNode;
+            $node->{<Q:DOMCore:name>} = $name;
+                 ## Condition sensitive
+            $r = __CLASS{Node}__->__INT{getNodeReference}__ ($node, $self);
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              TODO: The name should be case-normalized by the definition 
+              of the markup language in use.
+    @@SpecLevel:1
+    @@Level[list]:
+      1
+      2
+      3
   @Method:
      @@Name:  createEntityReference
-     @@Return:
-        @@@Type:  EntityReference
-        @@@Exception[list]:  DOMException
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Create an <IF:EntityReference> object.  If the entity referred 
+         is known, the child list of the <IF:EntityReference> is 
+         made the same as that of the corresponding <IF:Entity> node.
+       \
+         NOTE: If any descendant of the <IF:Entity> node has an 
+         unbound namespace prefix, the corresponding descendant of 
+         the <IF:EntityReference> node created is also unbound.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         In this NOTEd case, that node might have <Q:infoset:prefix> 
+         but will not have <Q:infoset:namespaceName>.
      @@Param:
         @@@Name:  name
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The name of the entity to refer.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            This is an XML <XML:Name>, not an XML Names <XML:NCName>.
+     @@Return:
+        @@@Type:  EntityReference
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The new <IF:EntityReference> object.
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:INVALID_CHARACTER_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_BAD_NAME
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:name> is not an XML <XML:Name>.
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:NOT_SUPPORTED_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_DOC_NOSUPPORT_XML
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                This document does not support the <Feature:XML> feature.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $version;
+            my $docNode = $self->{<Q:TreeCore:node>};
+            __CODE{XMLVersion: out => version, docNode => docNode}__;
+            unless (defined $version) {
+              __EXCEPTION{
+                DOMException.NOT_SUPPORTED_ERR.
+                MDOM_EXCEPTION:MDOM_DOC_NOSUPPORT_XML::
+              }__;
+            }
+            __CODE{CheckName: name => name, version => version}__;
+            __REQUIRE{DOMXML}__;
+                       ## Condition sensitive
+            my $node = __CLASS{EntityReference}__->__INT{newObject}__;
+            $node->{<Q:DOMCore:ownerDocument>} = $docNode;
+            $node->{<Q:DOMCore:name>} = $name;
+            #$node->{<Q:??:expanded>} = false;
+                 ## Condition sensitive
+            $r = __CLASS{Node}__->__INT{getNodeReference}__ ($node, $self);
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              TODO: Expand the reference.
+    @@SpecLevel:1
+    @@Level[list]:
+      1
+      2
+      3
   @Method:
      @@Name:  getElementsByTagName
-     @@Return:
-        @@@Type:  NodeList
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Return a <IF:NodeList> of all the <IF:Element> in document 
+         order with a given element type name and are contained in the document.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Does <QUOTE:contained> mean that an <IF:Element> node 
+         which is not a descendant of the <IF:Document> does not match?
+       \
+         The DOM Level 2 Specification specifies as <QUOTE:pre-order 
+         traversal>.  The DOM Level 3 Specifies it by 
+         <QUOTE:in document order> and this makes the ambigiousness.
      @@Param:
         @@@Name:  tagname
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The name of the element type to match on.
+          \
+            The case-sensitivility depends on the markup language in use.
+        @@@InCase:
+          @@@@Value:*
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Match all element type names.
+     @@Return:
+        @@@Type:  
+          ManakaiDOM:ManakaiDOMGetElementsNodeList
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A new <IF:NodeList> object containing all the matched 
+            <IF:Element> objects.
   @Method:
      @@Name:  importNode
-     @@Return:
-        @@@Type:  Node
-        @@@Exception[list]:  DOMException
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Import a node from another document to this document, 
+         without altering or removing the source node from 
+         the original document (i.e. create a new copy of 
+         the source node in this document).
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Copied: <A:nodeName>, <A:nodeType>, <A:prefix>, 
+         <A:localName>, <A:namespaceURI>, <A:Entity.publicId>, 
+         <A:Entity.systemId>, <A:Entity.notationName>, 
+         <A:Notation.publicId>, <A:Notation.systemId>, 
+         <A:ProcessingInstruction.target>, <A:ProcessingInstruction.data>, 
+         <A:CharacterData.data>, <A:CharacterData.length>.
+       \
+         User data is not carried over.  However, if any 
+         <IF:UserDataHandler>s has specified, these handlers will 
+         be called with the appropriate parameters before this method 
+         returns.
+       \
+         <A:parentNode> := <DOM:null>.  <A:Attr.ownerElement> := <DOM:null>. 
+         <A:Attr.specified> := <DOM:true>.
+         Specified attribute nodes attached to the <IF:Element> node 
+         are imported.  Default attributes are created if exists.
      @@Param:
         @@@Name:  importedNode
         @@@Type:  Node
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The node to import.
+            \
+            <IF:Document> or <IF:DocumentType> nodes cannot be imported.
      @@Param:
         @@@Name:  deep
         @@@Type:  boolean
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            Whether the subtree under the <P:importedNode> 
+            is recursively imported or not.
+            \
+            This parameter has no effect on <IF:Attr>, <IF:EntityReference>, 
+            <IF:Notation>, <IF:ProcessingInstruction>, <IF:Text>, 
+            <IF:CDATASection> and <IF:Comment> nodes.  The descendants of 
+            the <IF:Attr> node are 
+            always imported.  The descendants of the <IF:EntityReference> 
+            node are always not imported.
+        @@@InCase:
+          @@@@Value:true
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The descendants are recursively imported if the 
+              <P:importedNode> is of <IF:DocumentFragment>, <IF:Element> or 
+              <IF:Entity>.
+        @@@InCase:
+          @@@@Value:false
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Import only the node itself.
+     @@Return:
+        @@@Type:  Node
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The imported node.
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:NOT_SUPPORTED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The type of node being imported is not supported.
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              Maybe, if this document is not <Feature:XML> and 
+              the node type is either <IF:ProcessingInstruction>, 
+              <IF:Notation>, <IF:EntityReference>, <IF:Entity> or 
+              <IF:CDATASection>.  And if namespaced nodes are imported?
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:INVALID_CHARACTER_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_BAD_NAME
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                One of the imported names is not a SGML or XML <XML:Name>.
      @@Level[list]:  2
      @@SpecLevel:2
   @Method:
      @@Name:  createElementNS
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Create an element.
+       \
+         If there are known attributes with default values, 
+         <IF:Attr> nodes representing them are automatically 
+         created and attached to the element created.
+     @@NoNSVersion:createElement
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The namespace URI of the element to create.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The element to create will have no namespace.
+     @@Param:
+        @@@Name:  qualifiedName
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The qualified name of the type of the element to create.
      @@Return:
         @@@Type:  Element
-        @@@Exception[list]:  DOMException
-     @@Param:
-        @@@Name:  namespaceURI
-        @@@Type:  DOMString
-     @@Param:
-        @@@Name:  qualifiedName
-        @@@Type:  DOMString
-     @@Level[list]:  2
-     @@SpecLevel:2
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A new <IF:Element> object.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: INVALID_CHARACTER_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_BAD_NAME
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:qualifiedName> is not an XML <XML:Name>.
+            @@@@@SpecLevel:2
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NAMESPACE_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_NS_MALFORMED_QNAME
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@: 
+                The <P:qualifiedName> is malformed as a qualified name.
+            @@@@@SpecLevel:2
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_NS_PREFIX_WITH_NULL_URI
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:qualifiedName> has a prefix and the
+                <P:namespaceURI> is <DOM:null>.
+            @@@@@SpecLevel:2
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_NS_XML_WITH_OTHER_URI
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:qualifiedName> has a prefix that is <XML:xml> and the
+                <P:namespaceURI> is different from
+                <URI:http://www.w3.org/XML/1998/namespace>.
+            @@@@@SpecLevel:2
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_NS_XMLNS_WITH_OTHER_URI
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:qualifiedName> has a prefix that is <XML:xmlns> and
+                the <P:namespaceURI> is different from the
+                <URI:http://www.w3.org/2000/xmlns>.
+            @@@@@SpecLevel:3
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_NS_XMLNSQ_WITH_OTHER_URI
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:qualifiedName> is <XML:xmlns> and
+                the <P:namespaceURI> is different from the
+                <URI:http://www.w3.org/2000/xmlns>.
+            @@@@@SpecLevel:3
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_NS_OTHER_WITH_XML_URI
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:namespaceURI> is 
+                <URI:http://www.w3.org/XML/1998/namespace> and the 
+                prefix of the <P:qualifiedName> is different from 
+                <XML:xml>.
+            @@@@@SpecLevel[list]:
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_NS_OTHER_WITH_XMLNS_URI
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:namespaceURI> is <URI:http://www.w3.org/2000/xmlns> and 
+                neither the <P:qualifiedName> nor its prefix is <XML:xmlns>.
+            @@@@@SpecLevel:3
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_NS_XMLNS_XMLNS
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:qualifiedName> is <XML:xmlns:xmlns>.
+            @@@@@SpecLevel[list]:
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:NOT_SUPPORTED_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_DOC_NOSUPPORT_XML
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                This document does not support the <Feature:XML> 
+                feature.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my ($version, $prefix, $localName);
+            my $docNode = $self->{<Q:TreeCore:node>};
+            __CODE{XMLNS: docNode => docNode,
+                          qualifiedName => qualifiedName,
+                          namespaceURI => namespaceURI,
+                          out-version => version,
+                          out-localName => localName,
+                          out-prefix => prefix}__;
+
+                       ## Condition sensitive
+            my $node = __CLASS{Element}__->__INT{newObject}__;
+            $node->{<Q:DOMCore:ownerDocument>} = $docNode;
+            $node->{<Q:infoset:namespaceName>} = $namespaceURI;
+            $node->{<Q:infoset:prefix>} = $prefix;
+            $node->{<Q:infoset:localName>} = $localName;
+                 ## Condition sensitive
+            $r = __CLASS{Node}__->__INT{getNodeReference}__ ($node, $self);
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              TODO: Default attribute should be implemented.
+    @@SpecLevel:2
+    @@Level[list]:
+      2
+      3
   @Method:
      @@Name:  createAttributeNS
-     @@Return:
-        @@@Type:  Attr
-        @@@Exception[list]:  DOMException
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Create an attribute of the given qualified name and namespace URI.
+     @@NoNSVersion: createAttribute
      @@Param:
         @@@Name:  namespaceURI
-        @@@Type:  DOMString
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace URI of the attribute to create.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The attribute has no namespace.
      @@Param:
         @@@Name:  qualifiedName
         @@@Type:  DOMString
-     @@Level[list]:  2
-     @@SpecLevel:2
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The qualified name of the attribute to create.
+     @@Return:
+        @@@Type:  Attr
+        @@@Description:
+          @@@@lang:en
+          @@@@@: A new attribute object.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: INVALID_CHARACTER_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_BAD_NAME
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:qualifiedName> is not an XML <XML:Name>.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NAMESPACE_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_NS_MALFORMED_QNAME
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@: 
+                The <P:qualifiedName> is malformed as a qualified name.
+            @@@@@SpecLevel:2
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_NS_PREFIX_WITH_NULL_URI
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:qualifiedName> has a prefix and the
+                <P:namespaceURI> is <DOM:null>.
+            @@@@@SpecLevel:2
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_NS_XML_WITH_OTHER_URI
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:qualifiedName> has a prefix that is <XML:xml> and the
+                <P:namespaceURI> is different from
+                <URI:http://www.w3.org/XML/1998/namespace>.
+            @@@@@SpecLevel:2
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_NS_XMLNS_WITH_OTHER_URI
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:qualifiedName> has a prefix that is <XML:xmlns> and
+                the <P:namespaceURI> is different from the
+                <URI:http://www.w3.org/2000/xmlns>.
+            @@@@@SpecLevel:3
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_NS_XMLNSQ_WITH_OTHER_URI
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:qualifiedName> is <XML:xmlns> and
+                the <P:namespaceURI> is different from the
+                <URI:http://www.w3.org/2000/xmlns>.
+            @@@@@SpecLevel:2
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_NS_OTHER_WITH_XML_URI
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:namespaceURI> is 
+                <URI:http://www.w3.org/XML/1998/namespace> and the 
+                prefix of the <P:qualifiedName> is different from 
+                <XML:xml>.
+            @@@@@SpecLevel[list]:
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_NS_OTHER_WITH_XMLNS_URI
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:namespaceURI> is <URI:http://www.w3.org/2000/xmlns> and 
+                neither the <P:qualifiedName> nor its prefix is <XML:xmlns>.
+            @@@@@SpecLevel:3
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_NS_XMLNS_XMLNS
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:qualifiedName> is <XML:xmlns:xmlns>.
+            @@@@@SpecLevel[list]:
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@: Is no-prefix with URI is OK?
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:NOT_SUPPORTED_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_DOC_NOSUPPORT_XML
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                This document does not support the <Feature:XML> 
+                feature.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my ($version, $prefix, $localName);
+            my $docNode = $self->{<Q:TreeCore:node>};
+            __CODE{XMLNS: docNode => docNode,
+                          qualifiedName => qualifiedName,
+                          namespaceURI => namespaceURI,
+                          out-version => version,
+                          out-localName => localName,
+                          out-prefix => prefix}__;
+
+                       ## Condition sensitive
+            my $node = __CLASS{Attr}__->__INT{newObject}__;
+            $node->{<Q:DOMCore:ownerDocument>} = $docNode;
+            $node->{<Q:infoset:localName>} = $localName;
+            $node->{<Q:infoset:namespaceName>} = $namespaceURI;
+            $node->{<Q:infoset:prefix>} = $prefix;
+            $node->{<Q:infoset:specified>} = true;
+                 ## Condition sensitive
+            $r = __CLASS{Node}__->__INT{getNodeReference}__ ($node, $self);
+    @@SpecLevel:2
+    @@Level[list]:
+      2
+      3
   @Method:
      @@Name:  getElementsByTagNameNS
-     @@Return:
-        @@@Type:  NodeList
+     @@Description:
+        @@@lang:en
+        @@@@:
+          Return a <IF:NodeList> of all the <IF:Element> nodes 
+          with a given local name and namespace URI in document order.
      @@Param:
         @@@Name:  namespaceURI
-        @@@Type:  DOMString
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The namespace URI of the elements to match on.
+        @@@InCase:
+          @@@@Value:*
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Match all namespaces.
      @@Param:
         @@@Name:  localName
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The local name of the elements to match on.
+        @@@InCase:
+          @@@@Value:*
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: Match all local names.
+     @@Return:
+        @@@Type:
+          ManakaiDOM:ManakaiDOMGetElementsNodeList
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A new <IF:NodeList> object containing all the 
+            matched <IF:Element> objects.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            In <M:Element.getElementsByTagName>, HTML-only implementations 
+            may raise an exception.
      @@Level[list]:  2
      @@SpecLevel:2
   @Method:
      @@Name:  getElementById
-     @@Return:
-        @@@Type:  Element
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Return the <IF:Element> that has an <SGML:ID> attribute 
+         with the given value.
+       \
+         If more than one element has an <SGML:ID> attribute 
+         with that value, what is returned is undefined.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         DOM implementations are expected to use the <A:Attr.isId> 
+         to detect an <SGML:ID> attribute.
+       \
+         <XML:ID> ATTRIBUTES, not <XML:ID> ELEMENTS.
+       \
+         Can an <IF:Element> that is not a descendant of the <IF:Document> 
+         be returned?
      @@Param:
         @@@Name:  elementId
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The unique identifier for an element.
      @@Level[list]:  2
      @@SpecLevel:2
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         This method is defined in the interface <IF:HTMLDocument> 
+         in the DOM Level 1.
+     @@Return:
+        @@@Type:  Element
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The matching element.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              No element with the specified <SGML:ID> exists.
   @Attr:
      @@Name:  inputEncoding
      @@Description:
@@ -7374,24 +8897,26 @@ IF:
             @@@@@lang:en
             @@@@@@: Standalone "no".
         @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: NOT_SUPPORTED_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: The document does not support the "XML" feature.
+          @@@@Type:DOMException
+          @@@@Name:NOT_SUPPORTED_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_DOC_NOSUPPORT_XML
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The current document does not support the <Feature:XML> 
+                feature.
         @@@Def:
           @@@@Type:
-            lang:Perl
+            lang:dis
+          @@@@SetProp:
+            infoset:standalone
+        @@@ImplNote:
+          @@@@lang:en
           @@@@@:
-            my $node = $self->{<Q:TreeCore:node>};
-            if ($node->{<Q:DOMCore:hasFeature>}->{XML}) {
-              __EXCEPTION{
-                DOMException.NOT_SUPPORTED_ERR:
-                  <Q:MDOM_EXCEPTION:subtype>
-                     => <Q:MDOM_EXCEPTION:MDOM_NOT_SUPPORTED_DOC_XML>,
-              }__;
-            }
-            $node->{<Q:infoset:standalone>} = $given;
+            Isn't <X:DOMException.NO_MODIFICATION_ALLOWED_ERR> raised?
+            (Since DOM Level 1-3 does not have read-only <IF:Document> node?)
      @@Level[list]:  3
      @@SpecLevel:3
   @Attr:
@@ -7428,7 +8953,8 @@ IF:
           @@@@Type:
             lang:Perl
           @@@@@:
-            __INT{{getDocumentXMLVersion}}__;
+            my $node = $self->{<Q:TreeCore:node>};
+            __CODE{XMLVersion: out => r, docNode => node}__;
      @@Set:
         @@@Type:  DOMString
         @@@Description:
@@ -7454,39 +8980,19 @@ IF:
                 $node->{<Q:infoset:version>} = $given;
               } else {
                 __EXCEPTION{
-                  DOMException.NOT_SUPPORTED_ERR:
-                    <Q:MDOM_EXCEPTION:subtype>
-                       => <Q:MDOM_EXCEPTION:MDOM_NOT_SUPPORTED_XMLVER>,
+                  DOMException.NOT_SUPPORTED_ERR.
+                  MDOM_EXCEPTION:MDOM_IMPL_NOSUPPORT_XMLVER::
                     <Q:infoset:version> => $given,
                 }__;
               }
             } else {
               __EXCEPTION{
-                DOMException.NOT_SUPPORTED_ERR:
-                  <Q:MDOM_EXCEPTION:subtype>
-                     => <Q:MDOM_EXCEPTION:MDOM_NOT_SUPPORTED_DOC_XML>,
+                DOMException.NOT_SUPPORTED_ERR.
+                MDOM_EXCEPTION:MDOM_DOC_NOSUPPORT_XML::
               }__;
             }
      @@Level[list]:  3
      @@SpecLevel:3
-  @IntMethod:
-    @@Name: getDocumentXMLVersion
-    @@Description:
-      @@@lang:en
-      @@@@:
-        Return the XML version of the document.  This method is 
-        same as the getting of the attribute "xmlVersion" but 
-        introduced for the internal use.
-    @@Return:
-      @@@Type: DOMString
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          my $node = $self->{<Q:TreeCore:node>};
-          $r = defined $node->{<Q:DOMCore:hasFeature>}->{XML} ?
-                 defined $node->{<Q:infoset:version>} ?
-                   $node->{<Q:infoset:version>} : '1.0' : null;
   @Attr:
      @@Name:  strictErrorChecking
      @@Description:
@@ -7621,18 +9127,124 @@ IF:
      @@SpecLevel:3
   @Method:
      @@Name:  renameNode
-     @@Return:
-        @@@Type:  Node
-        @@@Exception[list]:  DOMException
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Rename an <IF:Element> or <IF:Attr> node. 
+      \
+         When possible, this simply changes the name of the 
+         given node.  Otherwise, this creates a new node 
+         with the specified name and replaces the existing node 
+         with the new node.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Non-simple way:
+       \
+         = Create a node.
+       \
+         = Any registered event listener is registered on the new node. 
+       \
+         = Any user data is removed from the old node.
+       \
+         = The old node is removed from its parent if any.
+       \
+         = The children are moved to the new node.
+       \
+         = The specified attributes are moved to the new node.
+       \
+         = The new node is inserted at the position the old node 
+           used to have in its parent's child nodes list.
+       \
+         = The user data is attached to the new node.
+       \
+         Default attributes from the DTD are updated according to 
+         the new element type name.  The implementation may 
+         update from other schemas.
+       \ 
+         <IF:Attr> attached to an <IF:Element> is first removed from 
+         the <IF:Element>.  Then either modifying the existing node 
+         or creating a new node and put is back.
+       \
+         A user data event <DOM:NODE_RENAMED> is fired and if 
+         the implementation supports the <Feature:MutationNameEvents>, 
+         each mutation operation involved fires the appropriate event 
+         and in the end 
+         <Q:ev:DOMElementNameChanged> or <Q:ev:DOMAttributeNameChanged> 
+         is fired.
      @@Param:
         @@@Name:  n
         @@@Type:  Node
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The node to rename.
      @@Param:
         @@@Name:  namespaceURI
-        @@@Type:  DOMString
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The new namespace URI.
      @@Param:
         @@@Name:  qualifiedName
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The new qualified name.
+     @@Return:
+        @@@Type:  Node
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The renamed node.
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:NOT_SUPPORTED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The type of the specified node is neither 
+              <IF:Element> nor <IF:Attr>, or the DOM implementation 
+              does not support the renaming of the document element.
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:INVALID_CHARACTER_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_BAD_NAME
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:qualifiedName> is not an XML <XML:Name>.
+       @@@Exception:
+         @@@@Type:DOMException
+         @@@@Name:WRONG_DOCUMENT_ERR
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             The <P:n> was created from a different document.
+       @@@Exception:
+         @@@@Type:DOMException
+         @@@@Name:NAMESPACE_ERR
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             Either the <P:qualifiedName> is malformed, 
+             the <P:qualifiedName> has a prefix and the <P:namespaceURI> 
+             is <DOM:null>, the <P:qualifiedName> has a prefix that 
+             is <XML:xml> and the <P:namespaceURI> is different 
+             from <URI:http://www.w3.org/XML/1998/namespace>, 
+             the <P:n> is an attribute and <P:qualifiedName> or its 
+             prefix is <XML:xmlns> and the <P:namespaceURI> is 
+             different from <URI:http://www.w3.org/2000/xmlns/>.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         What should be happen if non-XML or non-namespace node 
+         is tried to rename?
      @@Level[list]:  3
      @@SpecLevel:3
   
@@ -7714,7 +9326,7 @@ IF:
           @@@@Type:
             ManakaiDOM:ManakaiDOMImplementationWarning
           @@@@Name: ATTR_SET_NO_EFFECT
-          @@@@Descriptin:
+          @@@@Description:
             @@@@@lang:en
             @@@@@@: Setting this attribute has no effect.
         @@@Def: \
@@ -7754,7 +9366,7 @@ IF:
          @@@@lang:en
          @@@@@:
            Other properties required to be a legal <IF:Document> object:
-           <Q:DOMCore:implementation>.
+           <Q:DOMCore:implementation>, <Q:ManakaiDOM:implID>.
          \
            Other available properties: <Q:DOMCore:read-only>,
            <Q:infoset:characterEncodingScheme>, <Q:DOMCore:xmlEncoding>,

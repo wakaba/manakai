@@ -43,7 +43,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/20 13:58:44 $
+     $Date: 2004/09/24 12:19:46 $
   @Require:
     @@Module:
       @@@Name: DOMCore
@@ -219,6 +219,9 @@ IF:
      @@ImplNote:
        @@@lang:en
        @@@@:
+         Other properties required to be a legal <IF:CDATASection> object:
+         <Q:DOMCore:ownerDocument>.
+         \
          Other available properties: <Q:infoset:parent>, 
          <Q:infoset:content>.
 ## IF:CDATASection
@@ -420,7 +423,7 @@ IF:
           @@@@Type:
             ManakaiDOM:ManakaiDOMImplementationWarning
           @@@@Name: ATTR_SET_NO_EFFECT
-          @@@@Descriptin:
+          @@@@Description:
             @@@@@lang:en
             @@@@@@: Setting this attribute has no effect.
         @@@Def: \
@@ -457,11 +460,12 @@ IF:
        @@@@:
          Properties required for a <IF:Node> to be a legal 
          <IF:DocumentType>: either <Q:infoset:localName> or 
-         <Q:DOMCore:name>.
+         <Q:DOMCore:name>, <Q:DOMCore:implementation>, 
+         <Q:ManakaiDOM:implID>.
          \
          Other available properties: <Q:infoset:parent>, 
          <Q:infoset:publicIdentifier>, <Q:infoset:systemIdentifier>, 
-         <Q:infoset:prefix>, <Q:DOMCore:read-only>.
+         <Q:infoset:prefix>, <Q:DOMCore:read-only>, <Q:DOMCore:ownerDocument>.
 ## IF:DocumentType
 
 IF:
@@ -588,7 +592,7 @@ IF:
           @@@@Type:
             ManakaiDOM:ManakaiDOMImplementationWarning
           @@@@Name: ATTR_SET_NO_EFFECT
-          @@@@Descriptin:
+          @@@@Description:
             @@@@@lang:en
             @@@@@@: Setting this attribute has no effect.
         @@@Def: \
@@ -624,7 +628,7 @@ IF:
        @@@lang:en
        @@@@:
          Properties required for a <IF:Node> to be a legal 
-         <IF:Notation>: <Q:DOMCore:name>.
+         <IF:Notation>: <Q:DOMCore:name>, <Q:DOMCore:ownerDocument>.
          \
          Other available properties: <Q:infoset:declarationBaseURI>, 
          <Q:infoset:publicIdentifier>, <Q:infoset:systemIdentifier>, 
@@ -884,7 +888,7 @@ IF:
        @@@lang:en
        @@@@:
          Properties required for a <IF:Node> to be a legal 
-         <IF:Entity>: <Q:DOMCore:name>.
+         <IF:Entity>: <Q:DOMCore:name>, <Q:DOMCore:ownerDocument>.
          \
          Other available properties: <Q:infoset:declarationBaseURI>, 
          <Q:infoset:publicIdentifier>, <Q:infoset:systemIdentifier>, 
@@ -999,7 +1003,7 @@ IF:
        @@@lang:en
        @@@@:
          Properties required for a <IF:Node> to be a legal 
-         <IF:EntityReference>: <Q:DOMCore:name>.
+         <IF:EntityReference>: <Q:DOMCore:name>, <Q:DOMCore:ownerDocument>.
          \
          Other available properties: <Q:infoset:declarationBaseURI>, 
          <Q:DOMCore:read-only>, <Q:infoset:parent>, <Q:infoset:children>, 
@@ -1174,7 +1178,7 @@ IF:
             @@@@@lang:en
             @@@@@@:
               The attribute would return more characters than 
-              fit in a <Type:DOMString> variable on the implementation 
+              fit in a <TYPE:DOMString> variable on the implementation 
               platform.
         @@@Def:
           @@@@Type: 
@@ -1189,7 +1193,7 @@ IF:
         @@@Exception:
           @@@@Type: DOMException
           @@@@Name: NO_MODIFICATION_ALLOWED_ERR
-          @@@@Descriptin:
+          @@@@Description:
             @@@@@lang:en
             @@@@@@: This node is read-only.
         @@@Def:
@@ -1233,7 +1237,8 @@ IF:
        @@@lang:en
        @@@@:
          Properties required for a <IF:Node> to be a legal 
-         <IF:ProcessingInstruction>: <Q:infoset:target>.
+         <IF:ProcessingInstruction>: <Q:infoset:target>, 
+         <Q:DOMCore:ownerDocument>.
          \
          Other available properties: <Q:infoset:baseURI>, 
          <Q:DOMCore:read-only>, <Q:infoset:parent>, <Q:infoset:content>.
