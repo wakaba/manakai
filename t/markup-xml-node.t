@@ -1,12 +1,14 @@
 #!/usr/bin/perl -w
 use strict;
 require Test::Simple;
-use Message::Markup::XML;
-use Message::Markup::XML::QName qw:DEFAULT_PFX UNDEF_URI NULL_URI:;
-my $NODEMOD = 'Message::Markup::XML';
-my $NS_SGML = $Message::Markup::XML::NS{SGML};
-my $NS_XML = $Message::Markup::XML::NS{XML};
-                              
+use Message::Markup::XML::Node qw(SGML_NCR SGML_HEX_CHAR_REF
+                                  SGML_ATTLIST SGML_ELEMENT
+                                  SGML_GENERAL_ENTITY SGML_PARAM_ENTITY
+                                  SGML_NOTATION SGML_DOCTYPE
+                                  XML_ATTLIST);
+use Message::Markup::XML::QName qw:DEFAULT_PFX NS_xml_URI NULL_URI:;
+my $NODEMOD = 'Message::Markup::XML::Node';
+
 sub OK ($$;$) {
   my ($result, $expect, $testname) = @_;
   my @expect = ref $expect ?@ $expect : ($expect);
@@ -33,6 +35,14 @@ my @s = (
           main => sub {
             my $n = $NODEMOD->new (type => '#element',
                                    namespace_uri => NULL_URI,
+                                   local_name => 'foo');
+            OK $n->outer_xml, q<<foo xmlns=""></foo>>,
+               'Simple default-null-ns element';
+          },
+         },
+         {
+          main => sub {
+            my $n = $NODEMOD->new (type => '#element',
                                    local_name => 'foo');
             OK $n->outer_xml, q<<foo xmlns=""></foo>>,
                'Simple default-null-ns element';
@@ -621,7 +631,7 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#reference',
-                                   namespace_uri => $NS_SGML.'entity',
+                                   namespace_uri => SGML_GENERAL_ENTITY,
                                    local_name => 'ent');
             OK $n->outer_xml,
                [q<&ent;>],
@@ -631,7 +641,7 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#reference',
-                                   namespace_uri => $NS_SGML.'entity:parameter',
+                                   namespace_uri => SGML_PARAM_ENTITY,
                                    local_name => 'ent');
             OK $n->outer_xml,
                [q<%ent;>],
@@ -641,7 +651,7 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#reference',
-                                   namespace_uri => $NS_SGML.'char:ref',
+                                   namespace_uri => SGML_NCR,
                                    value => 0x0020);
             OK $n->outer_xml,
                [q<&#32;>],
@@ -651,7 +661,7 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#reference',
-                                   namespace_uri => $NS_SGML.'char:ref',
+                                   namespace_uri => SGML_NCR,
                                    value => 0x0000);
             OK $n->outer_xml,
                [q<&#0;>, q<&#00;>],
@@ -661,7 +671,7 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#reference',
-                                   namespace_uri => $NS_SGML.'char:ref:hex',
+                                   namespace_uri => SGML_HEX_CHAR_REF,
                                    value => 0x0020);
             OK $n->outer_xml,
                [q<&#x20;>, q<&#x0020;>, q<&#x000020;>, q<&#x00000020;>],
@@ -671,7 +681,7 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#reference',
-                                   namespace_uri => $NS_SGML.'char:ref:hex',
+                                   namespace_uri => SGML_HEX_CHAR_REF,
                                    value => 0x0000);
             OK $n->outer_xml,
                [q<&#x0;>, q<&#x00;>, q<&#x0000;>, q<&#x000000;>,
@@ -683,7 +693,7 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'entity',
+                                   namespace_uri => SGML_GENERAL_ENTITY,
                                    local_name => 'foo');
             OK $n->outer_xml,
                [q<<!ENTITY foo "">>],
@@ -693,7 +703,7 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'entity',
+                                   namespace_uri => SGML_GENERAL_ENTITY,
                                    local_name => 'foo');
             $n->set_attribute (value => '<Entity&Value>');
             OK $n->outer_xml,
@@ -704,10 +714,10 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'entity',
+                                   namespace_uri => SGML_GENERAL_ENTITY,
                                    local_name => 'foo');
             $n->append_new_node (type => '#reference',
-                                 namespace_uri => $NS_SGML.'entity:parameter',
+                                 namespace_uri => SGML_PARAM_ENTITY,
                                  local_name => 'foo.val');
             OK $n->outer_xml,
                [q<<!ENTITY foo %foo.val;>>],
@@ -717,9 +727,9 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'entity');
+                                   namespace_uri => SGML_GENERAL_ENTITY);
             $n->append_new_node (type => '#reference',
-                                 namespace_uri => $NS_SGML.'entity:parameter',
+                                 namespace_uri => SGML_PARAM_ENTITY,
                                  local_name => 'foo.val');
             OK $n->outer_xml,
                [q<<!ENTITY %foo.val;>>],
@@ -729,9 +739,9 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'entity:parameter');
+                                   namespace_uri => SGML_PARAM_ENTITY);
             $n->append_new_node (type => '#reference',
-                                 namespace_uri => $NS_SGML.'entity:parameter',
+                                 namespace_uri => SGML_PARAM_ENTITY,
                                  local_name => 'foo.val');
             OK $n->outer_xml,
                [q<<!ENTITY % %foo.val;>>],
@@ -741,7 +751,7 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'entity',
+                                   namespace_uri => SGML_GENERAL_ENTITY,
                                    local_name => 'foo');
             $n->set_attribute (SYSTEM => q<http://foo.example/xml>);
             OK $n->outer_xml,
@@ -752,7 +762,7 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'entity',
+                                   namespace_uri => SGML_GENERAL_ENTITY,
                                    local_name => 'foo');
             $n->set_attribute (PUBLIC => q"+//IDN foo.example//DTD foo//EN");
             $n->set_attribute (SYSTEM => q<http://foo.example/xml>);
@@ -765,7 +775,7 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'notation',
+                                   namespace_uri => SGML_NOTATION,
                                    local_name => 'f');
             $n->set_attribute (PUBLIC => q"+//IDN f.example//NOTATION f//EN");
             OK $n->outer_xml,
@@ -776,7 +786,7 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'notation',
+                                   namespace_uri => SGML_NOTATION,
                                    local_name => 'f');
             $n->set_attribute (SYSTEM => q<http://f.example/>);
             OK $n->outer_xml,
@@ -787,7 +797,7 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'notation',
+                                   namespace_uri => SGML_NOTATION,
                                    local_name => 'f');
             $n->set_attribute (PUBLIC => q"+//IDN f.example//NOTATION f//EN");
             $n->set_attribute (SYSTEM => q<http://f.example/>);
@@ -800,7 +810,7 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'attlist');
+                                   namespace_uri => SGML_ATTLIST);
             $n->set_attribute (qname => 'foo');
             OK $n->outer_xml,
                [q<<!ATTLIST foo>>, q<<!ATTLIST foo >>],
@@ -810,7 +820,7 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'attlist');
+                                   namespace_uri => SGML_ATTLIST);
             $n->set_attribute (qname => 'foo:bar');
             OK $n->outer_xml,
                [q<<!ATTLIST foo:bar>>, q<<!ATTLIST foo:bar >>],
@@ -820,10 +830,10 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'attlist');
+                                   namespace_uri => SGML_ATTLIST);
             $n->set_attribute (qname => 'foo');
             my $attr = $n->append_new_node (type => '#element',
-                                            namespace_uri => $NS_XML.'attlist',
+                                            namespace_uri => XML_ATTLIST,
                                             local_name => 'AttDef');
             $attr->set_attribute (qname => 'bar');
             $attr->set_attribute (type => 'CDATA');
@@ -835,14 +845,14 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'attlist');
+                                   namespace_uri => SGML_ATTLIST);
             $n->set_attribute (qname => 'foo');
             my $attr = $n->append_new_node (type => '#element',
-                                            namespace_uri => $NS_XML.'attlist',
+                                            namespace_uri => XML_ATTLIST,
                                             local_name => 'AttDef');
             $attr->set_attribute (qname => 'bar');
             my $att2 = $n->append_new_node (type => '#element',
-                                            namespace_uri => $NS_XML.'attlist',
+                                            namespace_uri => XML_ATTLIST,
                                             local_name => 'AttDef');
             $att2->set_attribute (qname => 'ba2');
             OK $n->outer_xml,
@@ -852,19 +862,19 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'attlist');
+                                   namespace_uri => SGML_ATTLIST);
             $n->set_attribute (qname => 'foo');
             my $attr = $n->append_new_node (type => '#element',
-                                            namespace_uri => $NS_XML.'attlist',
+                                            namespace_uri => XML_ATTLIST,
                                             local_name => 'AttDef');
             $attr->set_attribute (qname => 'bar');
             $attr->set_attribute (type => 'enum');
             $attr->append_new_node (type => '#element',
-                                    namespace_uri => $NS_XML.'attlist',
+                                    namespace_uri => XML_ATTLIST,
                                     local_name => 'enum')
                  ->append_text ('enum1');
             $attr->append_new_node (type => '#element',
-                                    namespace_uri => $NS_XML.'attlist',
+                                    namespace_uri => XML_ATTLIST,
                                     local_name => 'enum')
                  ->append_text ('enum2');
             $attr->set_attribute (default_value => 'enum2');
@@ -875,15 +885,15 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'attlist');
+                                   namespace_uri => SGML_ATTLIST);
             $n->set_attribute (qname => 'foo');
             my $attr = $n->append_new_node (type => '#element',
-                                            namespace_uri => $NS_XML.'attlist',
+                                            namespace_uri => XML_ATTLIST,
                                             local_name => 'AttDef');
             $attr->set_attribute (qname => 'bar');
             $attr->set_attribute (type => 'NOTATION');
             $attr->append_new_node (type => '#element',
-                                    namespace_uri => $NS_XML.'attlist',
+                                    namespace_uri => XML_ATTLIST,
                                     local_name => 'enum')
                  ->append_text ('enum1');
             $attr->set_attribute (default_type => 'FIXED');
@@ -895,9 +905,9 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'attlist');
+                                   namespace_uri => SGML_ATTLIST);
             $n->append_new_node (type => '#reference',
-                                 namespace_uri => $NS_SGML.'entity:parameter',
+                                 namespace_uri => SGML_PARAM_ENTITY,
                                  local_name => 'bar');
             OK $n->outer_xml,
               [qq<<!ATTLIST %bar;>>];
@@ -907,7 +917,7 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'element');
+                                   namespace_uri => SGML_ELEMENT);
             $n->set_attribute (qname => 'foo');
             OK $n->outer_xml,
               [qq<<!ELEMENT foo EMPTY>>];
@@ -916,7 +926,7 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'element');
+                                   namespace_uri => SGML_ELEMENT);
             $n->set_attribute (qname => 'foo:bar');
             OK $n->outer_xml,
               [qq<<!ELEMENT foo:bar EMPTY>>];
@@ -925,9 +935,9 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'element');
+                                   namespace_uri => SGML_ELEMENT);
             $n->append_new_node (type => '#reference',
-                                 namespace_uri => $NS_SGML.'entity:parameter',
+                                 namespace_uri => SGML_PARAM_ENTITY,
                                  local_name => 'bar');
             OK $n->outer_xml,
               [qq<<!ELEMENT %bar;>>];
@@ -936,14 +946,14 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'element');
+                                   namespace_uri => SGML_ELEMENT);
             $n->set_attribute (qname => 'foo');
             $n->set_attribute (content => 'element');
             my $g = $n->append_new_node (type => '#element',
-                                         namespace_uri => $NS_SGML.'element',
+                                         namespace_uri => SGML_ELEMENT,
                                          local_name => 'group');
             $g->append_new_node (type => '#element',
-                                 namespace_uri => $NS_SGML.'element',
+                                 namespace_uri => SGML_ELEMENT,
                                  local_name => 'element')
               ->set_attribute (qname => 'e');
             OK $n->outer_xml,
@@ -953,14 +963,14 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'element');
+                                   namespace_uri => SGML_ELEMENT);
             $n->set_attribute (qname => 'foo');
             $n->set_attribute (content => 'element');
             my $g = $n->append_new_node (type => '#element',
-                                         namespace_uri => $NS_SGML.'element',
+                                         namespace_uri => SGML_ELEMENT,
                                          local_name => 'group');
             my $e = $g->append_new_node (type => '#element',
-                                         namespace_uri => $NS_SGML.'element',
+                                         namespace_uri => SGML_ELEMENT,
                                          local_name => 'element');
             $e->set_attribute (qname => 'e');
             $e->set_attribute (occurence => '?');
@@ -972,18 +982,18 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'element');
+                                   namespace_uri => SGML_ELEMENT);
             $n->set_attribute (qname => 'foo');
             $n->set_attribute (content => 'element');
             my $g = $n->append_new_node (type => '#element',
-                                         namespace_uri => $NS_SGML.'element',
+                                         namespace_uri => SGML_ELEMENT,
                                          local_name => 'group');
             my $e = $g->append_new_node (type => '#element',
-                                         namespace_uri => $NS_SGML.'element',
+                                         namespace_uri => SGML_ELEMENT,
                                          local_name => 'element');
             $e->set_attribute (qname => 'e');
             my $f = $g->append_new_node (type => '#element',
-                                         namespace_uri => $NS_SGML.'element',
+                                         namespace_uri => SGML_ELEMENT,
                                          local_name => 'element');
             $f->set_attribute (qname => 'f');
             $g->set_attribute (connector => ',');
@@ -994,14 +1004,14 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'element');
+                                   namespace_uri => SGML_ELEMENT);
             $n->set_attribute (qname => 'foo');
             $n->set_attribute (content => 'mixed');
             my $g = $n->append_new_node (type => '#element',
-                                         namespace_uri => $NS_SGML.'element',
+                                         namespace_uri => SGML_ELEMENT,
                                          local_name => 'group');
             my $e = $g->append_new_node (type => '#element',
-                                         namespace_uri => $NS_SGML.'element',
+                                         namespace_uri => SGML_ELEMENT,
                                          local_name => 'element');
             $e->set_attribute (qname => 'e');
             $g->set_attribute (occurence => '+'); # Oops!
@@ -1013,7 +1023,7 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'doctype');
+                                   namespace_uri => SGML_DOCTYPE);
             $n->set_attribute (qname => 'foo');
             OK $n->outer_xml,
               [q<<!DOCTYPE foo>>, q<<!DOCTYPE foo []>>];
@@ -1022,7 +1032,7 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'doctype');
+                                   namespace_uri => SGML_DOCTYPE);
             $n->set_attribute (qname => 'foo:bar');
             OK $n->outer_xml,
               [q<<!DOCTYPE foo:bar>>, q<<!DOCTYPE foo:bar []>>];
@@ -1031,7 +1041,7 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'doctype');
+                                   namespace_uri => SGML_DOCTYPE);
             $n->set_attribute (qname => 'foo');
             $n->append_new_node (type => '#comment');
             OK $n->outer_xml,
@@ -1041,7 +1051,7 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'doctype');
+                                   namespace_uri => SGML_DOCTYPE);
             $n->set_attribute (qname => 'foo');
             $n->set_attribute (SYSTEM => q<http://dtd.example/>);
             OK $n->outer_xml,
@@ -1051,7 +1061,7 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'doctype');
+                                   namespace_uri => SGML_DOCTYPE);
             $n->set_attribute (qname => 'foo');
             $n->set_attribute (PUBLIC => q<+//IDN dtd.example//DTD ex//EN>);
             $n->set_attribute (SYSTEM => q<http://dtd.example/>);
@@ -1062,7 +1072,7 @@ my @s = (
          {
           main => sub {
             my $n = $NODEMOD->new (type => '#declaration',
-                                   namespace_uri => $NS_SGML.'doctype');
+                                   namespace_uri => SGML_DOCTYPE);
             $n->set_attribute (qname => 'foo');
             $n->set_attribute (SYSTEM => q<http://dtd.example/>);
             $n->append_new_node (type => '#comment');
@@ -1090,7 +1100,7 @@ my @s = (
           main => sub {
             my $n = $NODEMOD->new (type => '#document');
             my $d = $n->append_new_node (type => '#declaration',
-                                         namespace_uri => $NS_SGML.'doctype');
+                                         namespace_uri => SGML_DOCTYPE);
             $d->set_attribute (qname => 'foo');
             $d->append_new_node (type => '#comment');
             OK $n->outer_xml,
@@ -1101,7 +1111,7 @@ my @s = (
           main => sub {
             my $n = $NODEMOD->new (type => '#document');
             my $d = $n->append_new_node (type => '#declaration',
-                                         namespace_uri => $NS_SGML.'doctype');
+                                         namespace_uri => SGML_DOCTYPE);
             $d->append_new_node (type => '#comment');
             $n->append_new_node (type => '#element',
                                  namespace_uri => NULL_URI,
@@ -1186,6 +1196,20 @@ my @s = (
                                    value => "\x0Dabc\x0Ddef\x0D");
             OK $n->outer_xml,
               [qq<a="&#13;abc&#13;def&#13;">];
+          },
+         },
+
+         {
+          main => sub {
+            my $n = $NODEMOD->new (type => '#element',
+                                   local_name => 'ex',
+                                   namespace_uri => NS_xml_URI);
+            $n->append_new_node (type => '#attribute',
+                                   local_name => 'lang',
+                                   namespace_uri => NS_xml_URI,
+                                   value => 'ja');
+            OK $n->outer_xml,
+              [qq<<xml:ex xml:lang="ja"></xml:ex>>];
           },
          },
 );
