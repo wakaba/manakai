@@ -1,16 +1,19 @@
 Namespace:
+  @infoset:
+     http://www.w3.org/2001/04/infoset#
   @lang:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
   @ManakaiDOMImplementationException:
      http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @TreeCore:\
 Module:
   @Name:  dom
     @@Prefix:  w3c.org
   @FullName:
     @@lang:en
-    @@@: XML Module
+    @@@: DOM XML Module
   @Spec:
     @@DOM3:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-BBACDC08
@@ -24,44 +27,31 @@ Module:
   @Description:
     @@lang:en
     @@@:
-      DOM XML Module, as defined in DOM Core specifications.
+      The DOM XML Module (known as Extended Interface in DOM Level 1). 
+      The interfaces defined in this module form 
+      part of the DOM Core specification but objects that expose 
+      these interfaces will never be encounted in an HTML-only 
+      DOM implementation.
+  @ImplNote:
+    @@lang:en
+    @@@:
+      The DOM Core Module ("Core" feature) and the feature "XMLVersion" 
+      with version "1.0" must be supported.
   
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/18 11:51:16 $
+     $Date: 2004/09/19 07:14:42 $
   @Require:
     @@Module:
-      @@@Name: ManakaiDOM
-      @@@Namespace:
-        http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
-    @@Module:
-      @@@Name: DOMMain
-      @@@Namepsace:
-        http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@use:
-          @@@@@@: __CLASS{DOMMain}__
-          @@@@@Import[list]:
-            :boolean
-            null
-    @@Module:
       @@@Name: DOMCore
-      @@@Namepsace:
+      @@@Namespace:
         http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+    @@Module:
+      @@@Name: ManakaiDOMXML
+      @@@Namespace:
+        http://suika.fam.cx/~wakaba/archive/2004/mdom-xml#
 
-  @Feature:
-    @@Name: XML
-    @@Version: 
-    @@Condition[list]:
-      DOM1
-      DOM2
-      DOM3
-    @@Spec:
-      @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-E067D597
   @Feature:
     @@Name: XML
     @@Version: 1.0
@@ -71,7 +61,11 @@ Module:
       DOM3
     @@Spec:
       @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-E067D597
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-E067D597 
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The DOM XML Module, Level 1.
   @Feature:
     @@Name: XML
     @@Version: 2.0
@@ -81,6 +75,10 @@ Module:
     @@Spec:
       @@@DOM3[list]:
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-E067D597
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The DOM XML Module, Level 2.
   @Feature:
     @@Name: XML
     @@Version: 3.0
@@ -89,6 +87,10 @@ Module:
     @@Spec:
       @@@DOM3[list]:
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-E067D597
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The DOM XML Module, Level 3.
   
   @Feature:
     @@Name: XMLVersion
@@ -115,17 +117,15 @@ IF:
   @Spec:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-667469212
+  @Description:
+    @@lang:en
+    @@@:
+      The CDATA section, i.e. the marked section with its effective status 
+      of "CDATA".
+  @ImplNote:
+    @@lang:en
+    @@@: "CDATASection" is a "Text" is a "CharacterData" is a "Node".
   
-  @ReAttr:
-    @@Name: attributes
-    @@Spec:
-      @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-84CF096
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
-    @@Get:
-      @@@Type: NamedNodeMap
-      @@@Def:
-        $r = null;
   @ReAttr:
     @@Name: nodeName
     @@Description:
@@ -162,6 +162,7 @@ IF:
           lang:Perl
         @@@@@: $r = __CLASS{Node}__->CDATA_SECTION_NODE;
     @@Redefine: Node
+## IF:CDATASection
 
 IF:
   @Name:  DocumentType
@@ -169,48 +170,132 @@ IF:
   @Spec:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-412266927
-  
+  @Description:
+    @@lang:en
+    @@@:
+      A "Node" corresponding to a document type declaration in the XML 
+      document entity or the document type declaration information 
+      item of the XML Infoset.
+    \
+      DOM Levels 1 to 3 do not support editing "DocumentType" nodes so 
+      that all "DocumentType" nodes are read-only.
+    \
+      A "DocumentType" node can be a child of the "Document" node. 
+      DOM Levels 2 or higher allows a "DocumentType" node without 
+      any parent.  "DocumentType" nodes are not able to have 
+      their child nodes ("Entity"s and "Notation"s are defined not 
+      to have any parent node).
   @Attr:
      @@Name:  name
+     @@Description:
+       @@@lang:en
+       @@@@: The document type name.
      @@Get:
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The document type name.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $node = $self->{<Q:TreeCore:node>};
+            if (defined $node->{<Q:infoset:localName>}) {
+              $r = (defined $node->{<Q:infoset:prefix>} ?
+                   $node->{<Q:infoset:prefix>} . ':' : '') . 
+                   $node->{<Q:infoset:localName>};
+            } else {
+              $r = $node->{<Q:DOMCore:name>};
+            }
+            
   @Attr:
      @@Name:  entities
+     @@Description:
+       @@@lang:en
+       @@@@:
+         A collection containing the general entities, both external 
+         and internal, declared in the DTD.  Parameter entities and 
+         duplicating declarations are not contained.
      @@Get:
-        @@@Type:  NamedNodeMap
+        @@@Type:
+          ManakaiDOMXML:ManakaiDOMEntities
+        @@@Description:
+          @@@@lang:en
+          @@@@@: A "NamedNodeMap" containing "Entity"s.
   @Attr:
      @@Name:  notations
+     @@Description:
+       @@@lang:en
+       @@@@:
+         A collection containing the notations declared in the DTD.
      @@Get:
-        @@@Type:  NamedNodeMap
+        @@@Type:
+          ManakaiDOMXML:ManakaiDOMNotations
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A "NamedNodeMap" containing "Notation"s.
   @Attr:
      @@Name:  publicId
+     @@Description:
+        @@@lang:en
+        @@@@: The public identifier of the external subset.
      @@Get:
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The public identifier.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            infoset:publicIdentifier
      @@Level[list]:  2
+     @@SpecLevel:2
   @Attr:
      @@Name:  systemId
+     @@Description:
+       @@@lang:en
+       @@@@: The system identifier of the external subset.
      @@Get:
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The system identifier.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            infoset:systemIdentifier
      @@Level[list]:  2
+     @@SpecLevel:2
   @Attr:
      @@Name:  internalSubset
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The internal subset as a string, without delimiting square brackets.
      @@Get:
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The internal subset as a string.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: There is no internal subset.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            The actual content returned depends on how much information
+            is available to the DOM implementation.  This may vary 
+            depending on various parameters, including the XML 
+            processor used to build the document.
      @@Level[list]:  2
+     @@SpecLevel:2
   
-  @ReAttr:
-    @@Name: attributes
-    @@Spec:
-      @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-84CF096
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
-    @@Get:
-      @@@Type: NamedNodeMap
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          $r = null;
   @ReAttr:
     @@Name: nodeName
     @@Description:
@@ -287,29 +372,59 @@ IF:
   @Spec:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-5431D1B9
-  
+  @Description:
+    @@lang:en
+    @@@:
+      A notation declaration in the DTD or 
+      the notation information item in the XML Infoset.
+    \
+      DOM Levels 1 to 3 do not support editing "Notation" nodes so that 
+      all "Notation" nodes are read-only.
+    \
+      A "Notation" node does not have any parent.
   @Attr:
      @@Name:  publicId
+     @@Description:
+        @@@lang:en
+        @@@@: The public identifier of this notation.
      @@Get:
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The public identifier.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The public identifier was not specified.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            infoset:publicIdentifier
   @Attr:
      @@Name:  systemId
+     @@Description:
+       @@@lang:en
+       @@@@: The system identifier of this notation.
      @@Get:
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The system identifier.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The system identifier was not specified.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            infoset:systemIdentifier
   
-  @ReAttr:
-    @@Name: attributes
-    @@Spec:
-      @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-84CF096
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
-    @@Get:
-      @@@Type: NamedNodeMap
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          $r = null;
   @ReAttr:
     @@Name: nodeName
     @@Description:
@@ -387,48 +502,184 @@ IF:
   @Spec:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-527DCFF2
-  
+  @Description:
+    @@lang:en
+    @@@:
+      A general entity, not entity declaration, either parsed or unparsed, 
+      or either internal or external.
+    \
+      When the replacement text of the entity is available, 
+      the child list of the "Entity" node represents the structure 
+      of that replacement value (assuming that the replacement text would be 
+      parsed in context of "content").  Otherwise, the child list is empty.
+      Note that if the entity contains an unbound namespace prefix, 
+      the "namespaceURI" of the corresponding node in the "Entity" 
+      node subtree is "null".
+    \
+      DOM Levels 1 to 3 do not support editing "Entity" nodes, so that 
+      all "Entity" nodes and their descendants are read-only.
+    \
+      An "Entity" node does not have any parent.
   @Attr:
      @@Name:  publicId
+     @@Description:
+       @@@lang:en
+       @@@@: The public identifier associated with the entity.
      @@Get:
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The public identifier.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The public identifier is not specified.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            infoset:publicIdentifier
   @Attr:
      @@Name:  systemId
+     @@Description:
+        @@@lang:en
+        @@@@: The system identifier associated with the entity.
      @@Get:
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The system identifier.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The system identifier is not specified.
   @Attr:
      @@Name:  notationName
+     @@Description:
+       @@@lang:en
+       @@@@: The name of the notation for the entity.
      @@Get:
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The notation name.
+        @@@ImplNote:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: This entity is a parsed entity.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            infoset:notationName
   @Attr:
      @@Name:  inputEncoding
+     @@Description:
+       @@@lang:en
+       @@@@: The encoding used for this entity at the time of parsing.
      @@Get:
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The encoding used for this entity.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either the entity is from the internal subset or 
+              the input encoding is not known.
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              Is it mean that even the internal entity declared in the external 
+              entity might have the input encoding!?
+         @@@Def:
+           @@@@Type:
+             lang:dis
+           @@@@GetProp:
+             DOMXML:inputEncoding
      @@Level[list]:  3
+     @@SpecLevel:3
   @Attr:
      @@Name:  xmlEncoding
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The encoding of this entity, as specified in the text declaration.
      @@Get:
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The encoding name.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This is not an external parsed entity.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@: 
+            The encoding declaration is required if the text declaration 
+            is used, but the text declaration itself is not required. 
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMCore:xmlVersion
      @@Level[list]:  3
+     @@SpecLevel:3
   @Attr:
      @@Name:  xmlVersion
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The XML version number of this entity, as specified in the 
+         text declaration.
+     @@ImplNote:
+        @@@lang:en
+        @@@@:
+          XML 1.0 documents cannot include the external parsed entities 
+          other than those versioned as XML 1.0.  XML 1.1 document 
+          can use both XML 1.0 and XML 1.1 entities, but both interpreted 
+          as XML 1.1 entities.
      @@Get:
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The version number.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              This is not an external parsed entity.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            The XML Specifications allows the text declaration omitted. 
+            Does the DOM implementation need to provide the default value? 
+            What's the default value?
      @@Level[list]:  3
+     @@SpecLevel:1
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Need consideration for the internal structure of the 
+         XML and text declarations.  See "xmlEncoding" and 
+         "xmlVersion" attributes defined in the "DOMCore" module.
   
-  @ReAttr:
-    @@Name: attributes
-    @@Spec:
-      @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-84CF096
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
-    @@Get:
-      @@@Type: NamedNodeMap
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          $r = null;
   @ReAttr:
     @@Name: nodeName
     @@Description:
@@ -469,20 +720,43 @@ IF:
   @Spec:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-11C98490
+  @Description:
+    @@lang:en
+    @@@:
+      An entity reference.
+    \
+      When an "EntityReference" node represents a reference to an "Entity" 
+      node, the subtree of the "EntityReference" node is a copy of 
+      the "Entity" node subtree, except that when an entity contains 
+      an unbound namespace prefix, the descendants of the 
+      "EntityReference" node may be bound to different namespace URIs.
+    \
+      When an "EntityReference" node represents a reference to an 
+      known entity, the node has no child node.
+    \
+      In DOM Levels 1 to 3, an "EntityReference" node and all 
+      descendants are read-only.
+    \
+      Note that "EntitiReference" nodes may cause normalization 
+      problems when the normalization is performed after 
+      entity references are expanded.
+  @ImplNote:
+    @@lang:en
+    @@@:
+      Note that the character references and references to predefined 
+      entities are considered to be expanded by the HTML or XML 
+      processor.  Moreover, the XML processor may completely expand 
+      references to entities.  (Does this clause in the DOM specification 
+      mean that the character entity references in HTML document 
+      should be expanded before the DOM tree constructed?)
+  @ImplNote:
+    @@lang:en
+    @@@:
+      The DOM Level 1 Specifications allow the lazy 
+      evaluation of the children of the "EntityReference".
+      For example, calling the "childNodes" method might trigger the 
+      evaluation.
   
-  @ReAttr:
-    @@Name: attributes
-    @@Spec:
-      @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-84CF096
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
-    @@Get:
-      @@@Type: NamedNodeMap
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          $r = null;
   @ReAttr:
     @@Name: nodeName
     @@Description:
@@ -523,32 +797,71 @@ IF:
   @Spec:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1004215813
+  @Description:
+    @@lang:en
+    @@@:
+      A processing instruction.  Note that the XML declaration and 
+      text declarations are not considered as processing instructions.
   
   @Attr:
      @@Name:  target
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The target of this processing instruction.
      @@Get:
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The target name.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            infoset:target
   @Attr:
      @@Name:  data
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The content of this processing instruction.
+       \
+         The content does not contain the whitespaces 
+         delimiting with the target name.
      @@Get:
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The content.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            infoset:data
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@: Can "null" be returned (to represent "<?name?>")?
      @@Set:
         @@@Type:  DOMString
-        @@@Exception[list]:  DOMException
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The content.  It may contain the PIC ("?>") but such 
+            data result the document in unserializable.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: This node is read-only.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@SetProp:
+            @@@@@@:
+              infoset:content
+            @@@@@CheckReadOnly:1
   
-  @ReAttr:
-    @@Name: attributes
-    @@Spec:
-      @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-84CF096
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
-    @@Get:
-      @@@Type: NamedNodeMap
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          $r = null;
   @ReAttr:
     @@Name: nodeName
     @@Description:

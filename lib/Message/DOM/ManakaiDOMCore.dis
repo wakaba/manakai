@@ -1,0 +1,580 @@
+Namespace:
+  @DOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @infoset:
+     http://www.w3.org/2001/04/infoset#
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @MDOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
+  @MDOM_EXCEPTION:
+     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @TreeCore: \
+  @xml:
+    http://www.w3.org/XML/1998/namespace
+  @xmlns:
+    http://www.w3.org/2000/xmlns/
+Module:
+  @Name: ManakaiDOMCore
+  @FullName:
+    @@lang:en
+    @@@: Manakai DOM Core Module
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
+  
+  @Description:
+    @@lang:en
+    @@@:
+      The Manakai DOM Core Module provides supplemental interfaces 
+      that should be used with the DOM Core Module.
+  
+  @License:
+     license:Perl
+  @Date.RCS:
+     $Date: 2004/09/19 07:14:42 $
+
+  @ConditionDef:
+    @@Name: DOM1
+  @ConditionDef:
+    @@Name: DOM2
+  @ConditionDef:
+    @@Name: DOM3
+  
+  @Feature:
+    @@QName: 
+      ManakaiDOM:ManakaiDOMCore
+    @@Version: 1.0
+    @@Condition[list]:
+      DOM1
+      DOM2
+      DOM3
+    @@Description:
+      @@@lang:en
+      @@@@: The Manakai DOM Core Module, Level 1.
+  @Feature:
+    @@QName:
+      ManakaiDOM:ManakaiDOMCore
+    @@Version: 2.0
+    @@Condition[list]:
+      DOM2
+      DOM3
+    @@Description:
+      @@@lang:en
+      @@@@: The Manakai DOM Core Module, Level 2.
+  @Feature:
+    @@QName:
+      ManakaiDOM:ManakaiDOMCore
+    @@Version: 3.0
+    @@Condition[list]:
+      DOM3
+    @@Description:
+      @@@lang:en
+      @@@@: The Manakai DOM Core Module, Level 3.
+
+IF:
+  @Name:  ManakaiDOMChildNodeList
+  @ISA:
+    ManakaiDOM:ManakaiDOMNodeReference
+  @ISA: 
+    DOMCore:NodeList
+  @Description:
+    @@lang:en
+    @@@:
+      An ordered collection of child nodes.
+  @Method:
+     @@Name:  item
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Return a child node.
+     @@Param:
+        @@@Name:  index
+        @@@Type:  unsigned-long
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The index of the node into the child node list.
+     @@Return:
+        @@@Type:  Node
+        @@@Description:
+          @@@@lang:en
+          @@@@@: 
+            The child node at the "index"th position.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The "index" is invalid, i.e. it is greater than or 
+              equal to the number of nodes in the list.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            $r = $self->{<Q:TreeCore:node>}->{<Q:infoset:children>}->[$index];
+            if (defined $r) {
+                   ## Condition sensitive
+              $r = __CLASS{Node}__->__INT{getNodeReference}__ ($r);
+            }
+    @@SpecLevel:1
+    @@Level[list]:
+      1
+      2
+      3
+  @Attr:
+     @@Name:  length
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The number of nodes in the list.
+     @@Get:
+        @@@Type:  unsigned-long
+        @@@Def:
+          @@@@Type:
+             lang:dis
+          @@@@@:
+            $r = @{$self->{<Q:TreeCore:node>}->{<Q:infoset:children>}};
+## IF:ManakaiDOMChildNodeList
+
+IF:
+  @Name: ManakaiDOMGetElementsNodeList
+  @ISA:
+    DOMCore:NodeList
+  @Description:
+    @@lang:en
+    @@@:
+      An ordered collection of nodes, returned by "getElementsBy"-methods.
+  @Method:
+     @@Name:  item
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Return an item in the collection.
+     @@Param:
+        @@@Name:  index
+        @@@Type:  unsigned-long
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The index of the item into the collection.
+     @@Return:
+        @@@Type:  Node
+        @@@Description:
+          @@@@lang:en
+          @@@@@: 
+            The node at the "index"th position in the collection.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The "index" is invalid, i.e. it is greater than or 
+              equal to the number of nodes in the list.
+
+  @Attr:
+     @@Name:  length
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The number of nodes in the list.
+     @@Get:
+        @@@Type:  unsigned-long
+## IF:ManakaiDOMGetElementsNodeList
+
+IF:
+  @Name: ManakaiDOMAttributes
+  @ISA:
+    ManakaiDOM:ManakaiDOMNodeReference
+  @ISA:
+    DOMCore:NamedNodeMap
+  @Description:
+    @@lang:en
+    @@@:
+      A list of attributes attached to an "Element" node.
+  @Method:
+     @@Name:  getNamedItem
+     @@Description:
+       @@@lang:en
+       @@@@: Retrive an attribute node specified by name.
+     @@Param:
+        @@@Name:  name
+        @@@Type:  
+           DOMMain:DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The "nodeName" of a node to retrive.
+     @@Return:
+        @@@Type:  Attr
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An attribute node with the specified "nodeName".
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The "name" does not identify any node in this map.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@Overridden:1
+  @Method:
+     @@Name:  setNamedItem
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Add a node using its "nodeName" attribute.  If a node with 
+         that name is already present in this map, it is replaced 
+         by the new one.  Replacing a node by itself has no effect.
+     @@ImplNote:
+       @@@lang:en
+       @@@@: "Replacing ... no effect" is clarified by the DOM Level 2 Errata. 
+     @@Param:
+        @@@Name:  arg
+        @@@Type:  
+          DOMCore:Attr
+        @@@Description:
+          @@@@lang:en
+          @@@@@: A node to store in this map.
+     @@Return:
+        @@@Type:  
+          DOMCore:Attr
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            If the "arg" node replaces an existing node, the replaced node.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The "arg" node does not replace any node in the map.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: WRONG_DOCUMENT_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The "arg" node was created from a different document.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: This map is read-only.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: INUSE_ATTRIBUTE_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The "arg" node is already an 
+              attribute of another "Element" object.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: HIERARCHY_REQUEST_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              An attempt is made to add a node that is unable to 
+              belong to this map.
+          @@@@SpecLevel:2
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@: This exception has added by the DOM Level 2 Errata.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@Overridden:1
+  @Method:
+     @@Name:  removeNamedItem
+     @@Description:
+        @@@lang:en
+        @@@@:
+          Remove an attribute node specified by name.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         New non-"specified" attribute will be generated if the schema 
+         defines some default value for the attribute removed.
+     @@Param:
+        @@@Name:  name
+        @@@Type:  
+           DOMMain:DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The "nodeName" of the node to remove.
+     @@Return:
+        @@@Type:  
+            DOMCore:Attr
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The attribute node removed from this map.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NOT_FOUND_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: There is no node named "name" in this map.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: This map is read-only.
+          @@@@SpecLevel:1
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              This exception is added by the DOM Level 1 First Edition Errata.
+  @Method:
+     @@Name:  item
+     @@Description:
+       @@@lang:en
+       @@@@: Return an attribute attached to the element.
+     @@Param:
+        @@@Name:  index
+        @@@Type:  unsigned-long
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The index of the item into this map.
+     @@Return:
+        @@@Type: 
+           DOMCore:Attr
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node at the "index"th position in the map.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              The "index" is invalid, i.e. it is greater than or 
+              equal to the number of nodes in this map.
+  @Attr:
+     @@Name:  length
+     @@Description:
+       @@@lang:en
+       @@@@: The number of attribute nodes attached to the element.
+     @@Get:
+        @@@Type:  unsigned-long
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@Overridden:1
+  @Method:
+     @@Name:  getNamedItemNS
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Retrive an attribute node specified by local name and namespace URI.
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The namespace URI of the node to retrive.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The node to retrive has no namespace.
+     @@Param:
+        @@@Name:  localName
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The local name of the node to retrive.
+     @@Return:
+        @@@Type:
+          DOMCore:Attr
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An attribute node with the specified local name and 
+            namespace URI.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The "namespaceURI" and "localName" does not identify 
+              any node in this map.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NOT_SUPPORTED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The DOM implementation does not support the feature "XML" and 
+              the language exposed through the "Document" does not 
+              support XML Namespaces.
+     @@Level[list]:  2
+     @@SpecLevel:2
+  @Method:
+     @@Name:  setNamedItemNS
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Add a node using its "namespaceURI" and "localName". 
+         If a node with that namespace URI and that local name 
+         is already present in this map, it is replaced by the new one. 
+         Replacing a node by itself has no effect.
+     @@Param:
+        @@@Name:  arg
+        @@@Type:
+          DOMCore:Attr
+        @@@Description:
+          @@@@lang:en
+          @@@@@: An attribute node to set to this attribute.
+     @@Return:
+        @@@Type:
+          DOMCore:Attr
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            If the "arg" node replaces an existing node, the replaced node.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The "arg" node replaces no existing node in this map.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: WRONG_DOCUMENT_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The "arg" node was created from a different document.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: This map is read-only.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: INUSE_ATTRIBUTE_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The "arg" node is already an 
+              attribute of another "Element" object.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: HIERARCHY_REQUEST_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              An attempt is made to add a node that is unable to 
+              belong to this map.
+          @@@@SpecLevel:2
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@: This exception has added by the DOM Level 2 Errata.
+         @@@Exception:
+           @@@@Type: DOMException
+           @@@@Name: NOT_SUPPORTED_ERR
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+             The DOM implementation does not support the feature "XML" and 
+             the language exposed through the "Document" does not 
+             support XML Namespaces
+           @@@@SpecLevel:2
+         @@@Def:
+           @@@@Type:
+             lang:dis
+           @@@@Overridden:1
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         The DOM Level 2 Specification said that the HTML-only DOM 
+         implenentations do not need to implement this method. 
+         The DOM Level 2 Errata and the DOM Level 3 Specification 
+         says that the NOT_SUPPORTED_ERR should be raised.
+     @@Level[list]:  2
+     @@SpecLevel:2
+  @Method:
+     @@Name:  removeNamedItemNS
+     @@Description:
+        @@@lang:en
+        @@@@:
+          Remove a node specified by local name and namespace URI.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         New non-"specified" attribute will be generated if the schema 
+         defines some default value for the attribute removed.
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace URI of the node to remove.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The node to remove has no namespace.
+     @@Param:
+        @@@Name:  localName
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The local name of the node to remove.
+     @@Return:
+        @@@Type: 
+          DOMCore:Attr
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node removed from this map.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NOT_FOUND_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              There is no node with the specified "namespaceURI" and 
+              "localName" in the map.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: This map is read-only.
+         @@@Exception:
+           @@@@Type: DOMException
+           @@@@Name: NOT_SUPPORTED_ERR
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+             The DOM implementation does not support the feature "XML" and 
+             the language exposed through the "Document" does not 
+             support XML Namespaces
+         @@@Def:
+           @@@@Type:
+             lang:dis
+           @@@@Overridden:1
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         The DOM Level 2 Specification said that the HTML-only DOM 
+         implenentations do not need to implement this method. 
+         The DOM Level 2 Errata and the DOM Level 3 Specification 
+         says that the NOT_SUPPORTED_ERR should be raised.
+     @@Level[list]:  2
+     @@SpecLevel:2
+## IF:ManakaiDOMAttributes
+
+## ManakaiDOMCore.dis ends here

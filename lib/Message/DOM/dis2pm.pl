@@ -219,6 +219,7 @@ $RegBlockContent = qr/(?>[^{}\\]*)(?>(?>[^{}\\]+|\\.|\{(??{$RegBlockContent})\})
 sub perl_code ($;%);
 sub perl_code ($;%) {
   my ($s, %opt) = @_;
+  valid_err q<Uninitialized value in perl_code> unless defined $s;
   $s =~ s/\bnull\b/undef/g;
   $s =~ s/\btrue\b/1/g;
   $s =~ s/\bfalse\b/0/g;
@@ -744,6 +745,8 @@ sub type_isa ($$) {
 sub type_label ($) {
   my $uri = type_normalize shift;
   my $r = {
+    ExpandedURI q<DOMMain:unsigned-long> => q<Unsigned Long Integer>,
+    ExpandedURI q<DOMMain:unsigned-short> => q<Unsigned Short Integer>,
     ExpandedURI q<ManakaiDOM:ManakaiDOMURI>
       => q<DOMString (DOM URI)>,
     ExpandedURI q<ManakaiDOM:ManakaiDOMNamespaceURI>
@@ -936,6 +939,15 @@ sub dis2perl ($) {
       } else {
         $r .= $t;
       }
+    } elsif ($_->local_name eq 'Overridden') {
+      $r = perl_statement perl_exception
+                     class => 'ManakaiDOMImplementationException',
+                     type => 'MDOM_DEBUG_BUG',
+                     param => {
+                       ExpandedURI q<MDOM_EXCEPTION:values> => {
+                         msg => q<Should be overriddenly defined>,
+                       },
+                     };
     } elsif ($_->local_name eq 'Type') {
       #
     } else {
@@ -1186,7 +1198,31 @@ sub is_implemented (%) {
   $nest--;
   $r;
 }
-}
+sub is_all_implemented (%);
+sub is_all_implemented (%) {
+  my (%opt) = @_;
+  $nest++ == 100 and valid_err q<Condition loop detected>;
+  $opt{not_implemented} ||= [];
+    IF: for my $if (keys %{$Info->{is_implemented}}) {
+      for my $mem (keys %{$Info->{is_implemented}->{$if}}) {
+        ## Note: In fact, this checks whether the method is NOT implemented
+        ##       rather than the method IS implemented.
+        if (exists $Info->{is_implemented}->{$if}->{$mem}->{$opt{condition}} and
+            not $Info->{is_implemented}->{$if}->{$mem}->{$opt{condition}}) {
+          @{$opt{not_implemented}} = ($if, $mem, $opt{condition} || '');
+          last IF;
+        }
+      }
+    }
+  if (not @{$opt{not_implemented}}) {
+    for (@{$Info->{Condition}->{$opt{condition} || ''}->{ISA} || []}) {
+      if (not is_all_implemented (%opt, condition => $_)) {
+        last;
+      }
+    }
+  }
+  @{$opt{not_implemented}} ? 0 : 1;
+}}
 
 sub condition_match ($%) {
   my ($node, %opt) = @_;
@@ -1881,7 +1917,7 @@ sub attr2perl ($;%) {
   if ($set_code_node) {
     is_implemented if => $Status->{IF}, attr => $Status->{Method},
                    condition => $opt{condition}, set => 1, on => 'set';
-    if ($code_node->get_attribute_value ('cast-input',
+    if ($set_code_node->get_attribute_value ('cast-input',
                                          default => $set_code eq '' ? 0 : 1)) {
       my $type = type_normalize
               type_expanded_uri $set->get_attribute_value
@@ -2420,7 +2456,7 @@ sub req2perl ($) {
     if ($_->local_name eq 'Module') {
       my $m_name = $_->get_attribute_value ('Name', default => '<anon>');
       my $ns_uri = $_->get_attribute_value ('Namespace');
-      $Info->{Namespace}->{$m_name} = $ns_uri;
+      $Info->{Namespace}->{$m_name} = $ns_uri if defined $ns_uri;
       $m_name = perl_name $m_name, ucfirst => 1;
       my $desc = get_description $_;
       $result .= perl_comment (($m_name ne '<anon>' ? $m_name : '') .
@@ -2554,7 +2590,8 @@ register_namespace_declaration ($source);
 my $Module = $source->get_attribute ('Module', make_new_node => 1);
 $Info->{Name} = perl_name $Module->get_attribute_value ('Name'), ucfirst => 1
   or valid_err q<Module name (/Module/Name) MUST be specified>;
-$Info->{Package} = perl_code (get_perl_definition $Module, name => 'Package')
+$Info->{Package} = perl_code (get_perl_definition $Module, name => 'Package',
+                                                           default => '')
                 || perl_package_name name => $Info->{Name};
 $Info->{Namespace}->{(DEFAULT_PFX)}
   = $Module->get_attribute_value ('Namespace')
@@ -2689,18 +2726,8 @@ for my $condition (sort keys %{$Info->{Condition}}, '') {
     next unless $Feature->node_type eq '#element' and
                 $Feature->local_name eq 'Feature' and
                 condition_match $Feature, condition => $condition;
-    my $not_implemented;
-    IF: for my $if (keys %{$Info->{is_implemented}}) {
-      for my $mem (keys %{$Info->{is_implemented}->{$if}}) {
-        ## Note: In fact, this checks whether the method is NOT implemented
-        ##       rather than the method IS implemented.
-        if (exists $Info->{is_implemented}->{$if}->{$mem}->{$condition} and
-            not $Info->{is_implemented}->{$if}->{$mem}->{$condition}) {
-          $not_implemented = [$if, $mem, $condition];
-          last IF;
-        }
-      }
-    }
+    is_all_implemented condition => $condition,
+                       not_implemented => (my $not_implemented = []);
     
     my $f_name = $Feature->get_attribute_value ('Name', default => '');
     unless (length $f_name) {
@@ -2715,7 +2742,7 @@ for my $condition (sort keys %{$Info->{Condition}}, '') {
                                               ->{FullName} . ']' : '')),
                         pod_paras (get_description $Feature);
 
-    if ($not_implemented) {
+    if (@$not_implemented) {
       push @feature_desc, pod_para ('This module supports the interfaces '.
                                     'in this feature but not yet fully ' .
                                     'implemented.');
@@ -2800,6 +2827,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/09/18 11:51:16 $
+# $Date: 2004/09/19 07:14:42 $
 
 
