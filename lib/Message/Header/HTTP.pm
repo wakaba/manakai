@@ -10,7 +10,7 @@ require Message::Header::Default;
 package Message::Header::HTTP;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 our %OPTION = %Message::Header::Default::OPTION;
 $OPTION{namespace_uri} = 'urn:x-suika-fam-cx:msgpm:header:http';
@@ -28,15 +28,15 @@ $OPTION{field_sort_good_practice_order} = {};
     qw/status/,	## CGI header
     qw/man c-man opt c-opt ext c-ext
        cache-control connection date pragma transfer-encoding upgrade trailer via
-       /,	## General-Headers
+       keep-alive/,	## General-Headers
     qw/accept accept-charset accept-encoding accept-language
        authorization expect from host
        if-modified-since if-match if-none-match if-range if-unmodified-since
        max-forwards proxy-authorization range referer te user-agent/,	## Request-Headers
     qw/accept-ranges age location proxy-authenticate retry-after server vary
-       warning www-authenticate/,	## Response-Headers
-    qw/allow etag expires last-modified link
-       mime-version content-/,	## Entity-Headers
+       warning www-authenticate alternates/,	## Response-Headers
+    qw/allow etag expires last-modified link window-target
+       mime-version derived-from base content-/,	## Entity-Headers
   ) {
       $OPTION{field_sort_good_practice_order}->{$_} = $i++;
   }
@@ -56,29 +56,49 @@ $OPTION{goodcase} = {
 
 $OPTION{value_type} = {
 	':default'	=> ['Message::Field::Unstructured'],
+	status	=> ['Message::Field::Status'],
 	
+	## HTTP-Date / delta-second
 	date	=> ['Message::Field::Date'],
 	expires	=> ['Message::Field::Date'],
 	'if-modified-since'	=> ['Message::Field::Date'],
+	'if-unmodified-since'	=> ['Message::Field::Date'],
 	'last-modified'	=> ['Message::Field::Date'],
 	
-	man	=> ['Message::Field::CSV'],
-	opt	=> ['Message::Field::CSV'],
 	p3p	=> ['Message::Field::Params'],
-	
-	## Numeric value
+	'window-target'	=> ['Message::Field::ValueParams'],
 	'mime-version'	=> ['Message::Field::Numval'],
+	from	=> ['Message::Field::Addresses'],
 	
+	## product
 	server	=> ['Message::Field::UA'],
 	'user-agent'	=> ['Message::Field::UA'],
-	'from'	=> ['Message::Field::Addresses'],
 	
+	## Comma Separated List
 	link	=> ['Message::Field::CSV'],
 	uri	=> ['Message::Field::CSV'],
+	man	=> ['Message::Field::CSV'],
+	opt	=> ['Message::Field::CSV'],
 	
+	## A URI
+	base	=> ['Message::Field::URI',{
+		-output_comment	=> 0,
+		-output_display_name	=> 0,
+		-value_pattern	=> 'URL:%s',
+	}],
 	location	=> ['Message::Field::URI'],
-	referer	=> ['Message::Field::URI'],
-	referrer	=> ['Message::Field::URI'],
+	referer	=> ['Message::Field::URI',{
+		-allow_fragment	=> 0,
+		-output_angle_bracket	=> 0,
+		-use_comment	=> 0,
+		-use_display_name	=> 0,
+	}],
+	referrer	=> ['Message::Field::URI',{
+		-allow_fragment	=> 0,
+		-output_angle_bracket	=> 0,
+		-use_comment	=> 0,
+		-use_display_name	=> 0,
+	}],
 };
 
 $OPTION{uri_mailto_safe}	= {
@@ -143,7 +163,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/27 04:43:03 $
+$Date: 2002/08/03 11:42:22 $
 
 =cut
 

@@ -9,7 +9,7 @@ for RFC822 Namespaces of Header Fields
 package Message::Header::RFC822;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Header::Default;
 
 our %OPTION = %Message::Header::Default::OPTION;
@@ -95,13 +95,28 @@ $OPTION{value_type} = {
 	'x-priority'	=> ['Message::Field::Numval'],
 	
 	path	=> ['Message::Field::Path'],
+	
+	## product
 	'user-agent'	=> ['Message::Field::UA'],
 	'x-shimbun-agent'	=> ['Message::Field::UA'],
 	
+	## Subject
 	subject	=> ['Message::Field::Subject'],
 	'x-nsubject'	=> ['Message::Field::Subject'],
 	
+	## X-Face
 	'x-face'	=> ['Message::Field::XFace'],
+	'x-face-1'	=> ['Message::Field::XFace'],
+	'x-face-2'	=> ['Message::Field::XFace'],
+	'x-face-3'	=> ['Message::Field::XFace'],
+	#...
+	
+	## A URI
+	base	=> ['Message::Field::URI',{
+		-output_comment	=> 0,
+		-output_display_name	=> 0,
+		-value_pattern	=> 'URL:%s',
+	}],
 };
 for (qw(cancel-lock disposition-notification-options encoding 
   importance pics-label  precedence message-type 
@@ -337,7 +352,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/28 00:31:38 $
+$Date: 2002/08/03 11:42:22 $
 
 =cut
 
