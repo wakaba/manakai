@@ -17,7 +17,7 @@ markup constructures.  (SuikaWiki is not "tiny"?  Oh, yes, I see:-))
 
 package SuikaWiki::Markup::XML;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload '""' => \&outer_xml,
              fallback => 1;
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXML_NCNameStartChar InXMLNCNameChar!;
@@ -255,6 +255,13 @@ Returns or set namespace prefix of the element or the attribute.
 You may give C<$new_prefix> in form either 'foo' or 'foo:'.
 To indicate "default" prefix, use '' (length == 0 string).
 
+=item $uri or ($uri, $name) = $x->expanded_name
+
+Returns expanded name of the node (element or attribute).
+In array context, array of namespace name (URI) and local part
+is returned; otherwise, a URI which identify name of the node
+(in RDF or WebDAV) is returned.
+
 =item $type = $x->node_type
 
 Returns the node type.
@@ -291,6 +298,12 @@ sub namespace_prefix ($;$) {
     $self->{ns}->{$new_pfx} = $self->{namespace_uri};
   }
   $self->_get_namespace_prefix ($self->{namespace_uri});
+}
+
+sub expanded_name ($) {
+  my $self = shift;
+  wantarray ? ($self->{namespace_uri}, $self->{local_name})
+            : $self->{namespace_uri} . $self->{local_name};
 }
 
 =item $i = $x->count
@@ -1371,4 +1384,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/07/16 12:10:22 $
+1; # $Date: 2003/09/07 00:44:05 $
