@@ -8,7 +8,7 @@ Message::Body::TextPlain --- Perl Module for Internet Media Type "text/plain"
 package Message::Body::TextPlain;
 use strict;
 use vars qw(%DEFAULT @ISA $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Body::Text;
 push @ISA, qw(Message::Body::Text);
@@ -93,6 +93,8 @@ sub parse ($$;%) {
     type => 'body', charset => $charset);
   $self->{value} = $s{value};
   $self->{_charset} = $s{charset};	## When convertion failed
+  $self->{_charset} = $self->{option}->{body_default_charset_input}
+    if !$s{charset} && !$s{success};
   $self;
 }
 
@@ -198,7 +200,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/21 03:23:50 $
+$Date: 2002/07/22 02:36:53 $
 
 =cut
 

@@ -8,7 +8,7 @@ Message::Body::Text --- Perl Module for Internet Media Types "text/*"
 package Message::Body::Text;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -131,6 +131,8 @@ sub _parse ($$) {
     type => 'body', charset => $charset);
   $self->{value} = $s{value};
   $self->{_charset} = $s{charset};	## In case convertion failed
+  $self->{_charset} = $self->{option}->{body_default_charset_input}
+    if !$s{charset} && !$s{success};
 }
 
 =back
@@ -261,7 +263,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/21 03:23:50 $
+$Date: 2002/07/22 02:36:53 $
 
 =cut
 

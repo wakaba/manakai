@@ -1,3 +1,9 @@
+2002-07-22  Wakaba <w@suika.fam.cx>
+
+	* Text.pm, TextPlain.pm (parse): If returned 'failed' value
+	of decode is failed and 'charset' is false, set
+	body_default_charset_input to _charset.
+
 2002-07-20  Wakaba <w@suika.fam.cx>
 
 	* TextMessageRFC1153.pm: New module.
