@@ -1051,6 +1051,56 @@ my @a =
   method => 'parse_entity_declaration',
   result => q(1),
  },
+ {
+  t => q{<!ENTITY a SYSTEM "sys" NDATA notation     >},
+  method => 'parse_entity_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!ENTITY a SYSTEM "sys"NDATA notation>},
+  method => 'parse_entity_declaration',
+  result => q(0:23:SYNTAX_ENTITY_PS_REQUIRED),
+ },
+ {
+  t => q{<!ENTITY a SYSTEM "sys" NDATAnotation>},
+  method => 'parse_entity_declaration',
+  result => q(0:24:SYNTAX_ENTITY_DATA_TYPE_UNKNOWN_KEYWORD),
+ },
+ {
+  t => q{<!ENTITY a SYSTEM "sys" NDATA notation  aa   >},
+  method => 'parse_entity_declaration',
+  result => q(0:40:SYNTAX_MDC_REQUIRED),
+ },
+ {
+  t => q{<!ENTITY a SYSTEM "sys" NDATA >},
+  method => 'parse_entity_declaration',
+  result => q(0:30:SYNTAX_ENTITY_DATA_TYPE_NOTATION_NAME_REQUIRED),
+ },
+ {
+  t => q{<!ENTITY a SYSTEM "sys" NDATA #>},
+  method => 'parse_entity_declaration',
+  result => q(0:30:SYNTAX_ENTITY_DATA_TYPE_NOTATION_NAME_REQUIRED),
+ },
+ {
+  t => q{<!ENTITY a SYSTEM "sys" CDATA a>},
+  method => 'parse_entity_declaration',
+  result => q(0:24:SYNTAX_ENTITY_DATA_TYPE_SGML_KEYWORD),
+ },
+ {
+  t => q{<!ENTITY a SYSTEM "sys" SDATA a>},
+  method => 'parse_entity_declaration',
+  result => q(0:24:SYNTAX_ENTITY_DATA_TYPE_SGML_KEYWORD),
+ },
+ {
+  t => q{<!ENTITY a SYSTEM "sys" SUBDOC a>},
+  method => 'parse_entity_declaration',
+  result => q(0:24:SYNTAX_ENTITY_DATA_TYPE_SGML_KEYWORD),
+ },
+ {
+  t => q{<!ENTITY a SYSTEM "sys" NDATA b [ attr=val ]>},
+  method => 'parse_entity_declaration',
+  result => q(0:32:SYNTAX_MDC_REQUIRED),
+ },
 );
 
 plan tests => scalar @a;

@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::Base;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXMLChar
                         InXML_deprecated_noncharacter InXML_unicode_xml_not_suitable!;
 require Message::Markup::XML::Parser::Error;
@@ -966,6 +966,8 @@ sub parse_entity_declaration ($$$%) {
                {ExpandedURI q<literal-entity-value> => $enttext->{value}},
                %opt);
             shift @{$pp->{ExpandedURI q<param>}};
+
+          ## External Entity Specification
           } elsif ($enttext->{type} eq 'Name') {
             if (${$enttext->{value}} eq 'PUBLIC' or
                 ${$enttext->{value}} eq 'SYSTEM') {
@@ -977,6 +979,62 @@ sub parse_entity_declaration ($$$%) {
                  ExpandedURI q<allow-system-id> => 1,
                  ExpandedURI q<system-id-required> => 1,
                  ExpandedURI q<end-with-mdc> => 1);
+              
+              ## Data Type
+              $self->parse_markup_declaration_parameter
+                ($src, $pp,
+                 %opt,
+                 ExpandedURI q<match-or-error> => 0,
+                 ExpandedURI q<ps-required> => 1,
+                 ExpandedURI q<end-with-mdc> => 1,
+                 ExpandedURI q<param-type> => {
+                   Name => 1,
+                   ps => 1,
+                 });
+              if ($pp->{ExpandedURI q<param>}->[0] and
+                  $pp->{ExpandedURI q<param>}->[0]->{type} eq 'Name') {
+                my $kwd = shift @{$pp->{ExpandedURI q<param>}};
+                if (${$kwd->{value}} eq 'NDATA') {
+                  #
+                } elsif (${$kwd->{value}} eq 'CDATA' or
+                         ${$kwd->{value}} eq 'SDATA') {
+                  $self->report
+                    (-type => 'SYNTAX_ENTITY_DATA_TYPE_SGML_KEYWORD',
+                     -class => 'WFC',
+                     source => $kwd->{value},
+                     keyword => ${$kwd->{value}});
+                } elsif (${$kwd->{value}} eq 'SUBDOC') {
+                  $self->report
+                    (-type => 'SYNTAX_ENTITY_DATA_TYPE_SGML_KEYWORD',
+                     -class => 'WFC',
+                     source => $kwd->{value},
+                     keyword => ${$kwd->{value}});
+                  last ENTTEXT;
+                } else {
+                  $self->report
+                    (-type => 'SYNTAX_ENTITY_DATA_TYPE_UNKNOWN_KEYWORD',
+                     -class => 'WFC',
+                     source => $kwd->{value},
+                     keyword => ${$kwd->{value}});
+                  last ENTTEXT;
+                }
+                ## Notation Name
+                $self->parse_markup_declaration_parameter
+                  ($src, $pp,
+                   %opt,
+                   ExpandedURI q<error-no-match>
+                     => 'SYNTAX_ENTITY_DATA_TYPE_NOTATION_NAME_REQUIRED',
+                   ExpandedURI q<ps-required> => 1,
+                   ExpandedURI q<param-type> => {
+                     Name => 1,
+                     ps => 1,
+                   });
+                if ($pp->{ExpandedURI q<param>}->[0] and
+                    $pp->{ExpandedURI q<param>}->[0]->{type} eq 'Name') {
+                  $pp->{ExpandedURI q<entity-data-notation>}
+                    = shift (@{$pp->{ExpandedURI q<param>}})->{value};
+                }
+              }
             } elsif ({qw/CDATA 1 SDATA 1 STARTTAG 1
                          ENDTAG 1 MD 1 MS 1 PI 1/}->{${$enttext->{value}}}) {
               $self->report
@@ -1647,4 +1705,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/05/08 07:37:04 $
+1; # $Date: 2004/05/17 23:59:33 $

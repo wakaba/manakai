@@ -14,7 +14,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Message::Markup::XML::Parser::Error;
 require Message::Util::Error::TextParser;
@@ -111,6 +111,18 @@ sub ___error_def () {+{
   },
   SYNTAX_END_TAG_REQUIRED => {
     description => q(End tag for element "%t (name => element-type-name);" required),
+    level => 'ebnf',
+  },
+  SYNTAX_ENTITY_DATA_TYPE_NOTATION_NAME_REQUIRED => {
+    description => q(Notation name shall follow data type keyword),
+    level => 'ebnf',
+  },
+  SYNTAX_ENTITY_DATA_TYPE_SGML_KEYWORD => {
+    description => q(Keyword "%t (name => keyword);" not allowed),
+    level => 'ebnf',
+  },
+  SYNTAX_ENTITY_DATA_TYPE_UNKNOWN_KEYWORD => {
+    description => q("%t (name => keyword);": Unknown keyword),
     level => 'ebnf',
   },
   SYNTAX_ENTITY_DEFAULT => {
@@ -502,4 +514,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/05/08 07:37:04 $
+1; # $Date: 2004/05/17 23:59:33 $
