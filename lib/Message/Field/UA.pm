@@ -9,7 +9,7 @@ header field body consist of C<product> tokens
 package Message::Field::UA;
 use strict;
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -369,7 +369,9 @@ sub add_our_name ($;%) {
   my $ua = shift;
   my %o = @_;  my %option = %{$ua->{option}};
   for (grep {/^-/} keys %o) {$option{substr ($_, 1)} = $o{$_}}
-    $ua->replace ('Message-pm' => $Message::Entity::VERSION, -prepend => 0);
+  $option{date} =~ s/^Date:\x20//;  $option{date} =~ s/\x20$//;
+  
+    $ua->replace ('Message-pm' => [$Message::Entity::VERSION, $option{date}], -prepend => 0);
     my (@os, @os_comment);
     my @perl_comment;
     if ($option{use_Config}) {
@@ -446,7 +448,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/06 10:30:43 $
+$Date: 2002/07/13 09:27:35 $
 
 =cut
 

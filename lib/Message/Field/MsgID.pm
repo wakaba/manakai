@@ -15,7 +15,7 @@ draft-ietf-usefor-msg-id-alt-00 is also supported.
 package Message::Field::MsgID;
 use strict;
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -87,12 +87,12 @@ sub parse ($;$%) {
   
   $body = Message::Util::remove_wsp ($body);
   if ($body =~ /$REG{M_addr_spec}/) {
+  ## BUG: <foo . bar@foo.example> is treated as <"foo . bar"@foo.example>
     my %s = &{$self->{option}->{hook_decode_string}} ($self,
               Message::Util::unquote_quoted_string ($1), type => 'quoted-string');
     $self->{id_left} = $s{value};
-    #my %s = &{$self->{option}->{hook_decode_string}} ($self,
-    #          Message::Util::unquote_if_domain_literal ($2), type => 'domain');
-    #$self->{id_right} = $s{value};
+  ## Should we use Message::Field::Domain?
+  ## BUG: <foo@foo . example> will broken... (M_addr_spec should be fixed)
     $self->{id_right} = $2;
   }
   
@@ -297,7 +297,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/16 10:42:06 $
+$Date: 2002/07/13 09:27:35 $
 
 =cut
 

@@ -11,7 +11,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 
@@ -39,7 +39,7 @@ The following methods construct new objects:
     #field_name
     #format
     -format_ipv4	=> '[%vd]',
-    -format_ipv6	=> '[%s]',
+    -format_ipv6	=> '[IPv6:%s]',
     -format_name	=> '%s',
     -format_name_literal	=> '[%s]',
     #hook_encode_string
@@ -48,6 +48,8 @@ The following methods construct new objects:
     -separator	=> '.',
     -use_comment	=> 0,
     -use_domain_literal	=> 1,
+    -use_ipv4_address	=> 1,
+    -use_ipv6_address	=> 1,
   );
 sub _init ($;%) {
   my $self = shift;
@@ -88,12 +90,14 @@ sub parse ($$;%) {
         ($self, $d, type => 'domain'.($isd?'/literal':''));
     push @d, $s{value};
   }gex;
-  if (@d == 1 && $d[0] =~ /^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/) {
+  if ($self->{option}->{use_ipv4_address} && @d == 1 && $d[0] =~ /^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/) {
     $d[0] = pack 'C4', $1, $2, $3, $4;
     $self->{type} = 'ipv4';
-  } elsif (@d == 1 && $d[0] !~ /[^0-9:.]/) {
+  } elsif ($self->{option}->{use_ipv6_address} && @d == 1 && $d[0] =~ s/^IPv6://i) {
     $self->{type} = 'ipv6';
-  } elsif (@d == 4) {
+  } elsif ($self->{option}->{use_ipv6_address} && @d == 1 && $d[0] !~ /[^0-9:.]/) {
+    $self->{type} = 'ipv6';
+  } elsif ($self->{option}->{use_ipv4_address} && @d == 4) {
     if  ($d[0] !~ /[^0-9]/ && 0 <= $d[0] && $d[0] < 256
      &&  $d[1] !~ /[^0-9]/ && 0 <= $d[1] && $d[1] < 256
      &&  $d[2] !~ /[^0-9]/ && 0 <= $d[2] && $d[2] < 256
@@ -122,9 +126,9 @@ sub stringify ($;%) {
   my %o = @_;  my %option = %{$self->{option}};
   for (grep {/^-/} keys %o) {$option{substr ($_, 1)} = $o{$_}}
   my $s = '';
-  if ($self->{type} eq 'ipv6') {
+  if ($option{use_ipv6_address} && $self->{type} eq 'ipv6') {
     $s = sprintf $option{format_ipv6}, $self->{value}->[0];
-  } elsif ($self->{type} eq 'ipv4') {
+  } elsif ($option{use_ipv4_address} && $self->{type} eq 'ipv4') {
     $s = sprintf $option{format_ipv4}, $self->{value}->[0];
   } else {
     my $dl = 0;
@@ -139,8 +143,9 @@ sub stringify ($;%) {
     } @{$self->{value}};
     $s = sprintf $option{format_name}, $d;
   }
-  if ($option{output_comment} && @{$self->{comment}} > 0) {
-    $s .= ' ' . $self->_comment_stringify;
+  if ($option{use_comment} && $option{output_comment}) {
+    my $c = $self->_comment_stringify;
+    $s .= ' ' . $c if $c;
   }
   $s;
 }
@@ -167,7 +172,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/16 11:43:40 $
+$Date: 2002/07/13 09:27:35 $
 
 =cut
 
