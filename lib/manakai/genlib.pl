@@ -219,13 +219,7 @@ sub perl_inherit ($;$) {
   my ($isa, $mod) = @_;
   return '' unless @$isa;
   $isa = array_uniq $isa;
-if ((join "\t", @$isa) =~ /ExceptionIF/) {
-use Carp;
-  print STDERR "aa".Carp::longmess();
-print STDERR "\n";
-  Carp::carp ("a".join "\t!",@$isa);
-die;
-} 
+
   if ($mod) {
     perl_statement 'push ' . perl_var (type => '@',
                                        local_name => 'ISA',
@@ -534,4 +528,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/04/01 07:58:46 $
+1; # $Date: 2005/04/04 15:21:32 $

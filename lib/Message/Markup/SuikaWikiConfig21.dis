@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/03/06 11:12:42 $
+      $Date: 2005/04/04 15:21:31 $
     @@ContentType:
       dis:Date.RCS
   
@@ -370,7 +370,10 @@ IFClassDef:
             The <P::node> does not belong to the same document 
             as the owner of this node. 
       @@@PerlDef:
-        unless (UNIVERSAL::isa ($node, <IFName::SWCFGNode>)) {
+        unless (UNIVERSAL::isa ($node, <IFName::SWCFGNode>) or
+                UNIVERSAL::isa ($node, <ClassName::ManakaiSWCFGNode>)) {
+                  ## NOTE: dis.pl and cdis2pm.pl does not support
+                  ##       interface "implement"ing in this case
           if ($nodeOrText) {
             __DEEP{
               $r = $self-><M::ManakaiSWCFGNode.appendText> ($node);
@@ -2025,10 +2028,12 @@ IFClassDef:
           my $od = $self-><AG::SWCFGNode.ownerDocument> || $self;
           my $nt = $self-><AG::SWCFGNode.nodeType>;
           if ($nt eq '#element') {
-            $r = $od-><M::SWCFGDocument.createElementNS>
-                            ($self-><AG::SWCFGNode.namespaceURI>,
-                             $self-><AG::SWCFGNode.localName>);
-            for my $p (<Q::shadowLocalName>, <Q::shadowNamespaceURI>) {
+            $r = <ClassM::ManakaiSWCFGNode.getNodeReference>
+                      (<ClassM::ManakaiSWCFGElement.newObject>);
+            for my $p (<Q::shadowLocalName>, <Q::shadowNamespaceURI>,
+                       <Q::localName>, <Q::namespaceURI>,
+                       <Q::namespaceExpanded>, <Q::etExpanded>,
+                       <Q::DOMCore:ownerDocument>) {
               $r->{<Q::TreeCore:node>}->{$p} = $self->{<Q::TreeCore:node>}->{$p};
             }
             $r->{<Q::TreeCore:node>}->{<Q::value>}
@@ -2412,6 +2417,13 @@ IFClassDef:
       @@@lang:en
       @@@@:
         Returns a new reference to the node object. 
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        Calling this method to get node reference
+        might be dangerous when <M::SWCFGNode.lookupNamespaceURI>
+        is overridden; it might lead a node having different namespace 
+        URI from the correct one.
     @@ManakaiDOM:isStatic:1
     @@Param:
       @@@Name:object
