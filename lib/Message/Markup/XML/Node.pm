@@ -13,7 +13,7 @@ This module is part of manakai XML.
 
 package Message::Markup::XML::Node;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload
   '""'     => \&outer_xml,
   bool     => sub { 
@@ -24,7 +24,7 @@ use overload
 use Char::Class::XML
   qw/InXML_NameStartChar InXMLNameChar InXML_NCNameStartChar InXMLNCNameChar/;
 use Message::Markup::XML::QName
-  qw/NULL_URI NS_xml_URI/;
+  qw/NULL_URI NS_xml_URI EMPTY_URI ZERO_URI/;
 require Carp;
 use Exporter;
 BEGIN {our @ISA = qw(Exporter);
@@ -65,13 +65,10 @@ Available options: C<data_type>, C<default_decl>, C<type> (default: C<#element>)
 =cut
 
 sub new ($;%) {
-  my $class = shift;
+  shift;
   my $self = {@_};
-  unless ($self->{type}) {
-    Carp::carp '{type} should be specified explicitly';
-    $self->{type} = '#element';
-  }
-  $self = bless $self, __PACKAGE__ . '::' . substr ($self->{type}, 1);
+  bless $self, __PACKAGE__ . '::' . substr ($self->{type}, 1);
+
   if ($self->{qname}) {
     my $q = Message::Markup::XML::QName::split_qname 
       ($self->{qname},
@@ -94,11 +91,14 @@ sub new ($;%) {
       if $result->{reason};
   }
   if ($self->{type} eq '#element' or $self->{type} eq '#attribute') {
-    $self->{namespace_uri} = NULL_URI
-      unless defined $self->{namespace_uri} and length $self->{namespace_uri};
+    unless ($self->{namespace_uri}) {
+      $self->{namespace_uri} = defined $self->{namespace_uri} ?
+                               $self->{namespace_uri} eq '0' ?
+                                 ZERO_URI : EMPTY_URI : NULL_URI;
+    }
   }
   if (ref $self->{value} and index (ref $self->{value}, 'Markup::XML') > -1) {
-    Carp::carp qq'new: Using type "@{[ref $self->{value}]}" object as {value} is deprecated';
+    Carp::carp qq'new: Use of type "@{[ref $self->{value}]}" object as {value} is deprecated';
   }
   $self->{node} = [];
   $self;
@@ -172,8 +172,7 @@ Available options: C<type>, C<namespace_uri>, C<local_name>, C<value>.
 
 sub append_new_node ($;%) {
   my $self = shift;
-  my $new_node = ref ($self)->new (@_, parent => $self);
-  push @{$self->{node}}, $new_node;
+  push @{$self->{node}}, my $new_node = ref ($self)->new (@_, parent => $self);
   $new_node;
 }
 
@@ -1388,4 +1387,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/02/14 11:08:14 $
+1; # $Date: 2004/07/25 07:18:58 $
