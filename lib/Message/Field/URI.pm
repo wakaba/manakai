@@ -11,25 +11,12 @@ use strict;
 require 5.6.0;
 use re 'eval';
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
-require Message::Field::Structured;
-push @ISA, qw(Message::Field::Structured);
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+require Message::Header;
+require Message::Field::AngleQuoted;
+push @ISA, qw(Message::Field::AngleQuoted);
 
 %REG = %Message::Util::REG;
-	$REG{SCM_angle_quoted} = qr/<([^\x3E]*)>/;
-
-	## Simple version of URI regex  See RFC 2396, RFC 2732, RFC 2324.
-	#$REG{escaped} = qr/%[0-9A-Fa-f][0-9A-Fa-f]/;
-	#$REG{scheme} = qr/(?:[A-Za-z]|$REG{escaped})(?:[0-9A-Za-z+.-]|$REG{escaped})*/;
-		## RFC 2324 defines escaped UTF-8 scheme names:-)
-	#$REG{fragment} = qr/\x23(?:[\x21\x24\x26-\x3B\x3D\x3F-\x5A\x5F\x61-\x7A\x7E]|$REG{escaped})*/;
-	#$REG{S_uri_body} = qr/(?:[\x21\x24\x26-\x3B\x3D\x3F-\x5A\x5B\x5D\x5F\x61-\x7A\x7E]|$REG{escaped})+/;
-	#$REG{S_absoluteURI} = qr/$REG{scheme}:$REG{S_uri_body}/;
-	#$REG{S_relativeURI} = qr/$REG{S_uri_body}/;
-	#$REG{S_URI_reference} = qr/(?:$REG{S_absoluteURI}|$REG{S_relativeURI})(?:$REG{fragment})?|(?:$REG{fragment})/;
-		## RFC 2396 allows <> (empty URI), but this regex doesn't.
-	
-	#$REG{uri_phrase} = qr/[\x21\x23-\x3B\x3D\x3F-\x5B\x5D\x5F\x61-\x7A\x7E]+(?:$REG{WSP}+[\x21\x23-\x27\x29-\x3B\x3D\x3F-\x5B\x5D\x5F\x61-\x7A\x7E][\x21\x23-\x3B\x3D\x3F-\x5B\x5D\x5F\x61-\x7A\x7E]*)*/;
 
 =head1 CONSTRUCTORS
 
@@ -48,19 +35,23 @@ The following methods construct new objects:
     -allow_empty	=> 1,
     -allow_fragment	=> 1,	## TODO: not implemented
     -allow_relative	=> 1,	## TODO: not implemented
+    #comment_to_display_name	=> 0,
     #encoding_after_encode
     #encoding_before_decode
     #field_param_name
     #field_name
     #hook_encode_string
     #hook_decode_string
-    -output_angle_bracket	=> 1,
-    -output_comment	=> 1,
-    -output_display_name	=> 1,
+    #output_angle_bracket	=> 1,
+    #output_comment	=> 1,
+    #output_display_name	=> 1,
+    #output_keyword	=> 0,
     #parse_all
-    -unsafe_rule_display_name	=> 'NON_http_attribute_char_wsp',
-    -use_comment	=> 1,
-    -use_display_name	=> 1,
+    #unsafe_rule_of_display_name	=> 'NON_http_attribute_char_wsp',
+    #unsafe_rule_of_keyword
+    #use_comment	=> 1,
+    #use_display_name	=> 1,
+    #use_keyword	=> 0,
 );
 
 sub _init ($;%) {
@@ -130,31 +121,17 @@ some options as parameters to the constructor.
 
 =cut
 
-sub parse ($$;%) {
-  my $class = shift;
-  my $self = bless {}, $class;
-  my $body = shift;
-  $self->_init (@_);
-  ($body, @{$self->{comment}})
-    = $self->Message::Util::delete_comment_to_array ($body, -use_angle_quoted)
-    if $self->{option}->{use_comment};
-  if ($body =~ /([^\x3C]*)$REG{SCM_angle_quoted}/) {
-    my ($dn, $as) = ($1, $2);
-    $dn =~ s/^$REG{WSP}+//;  $dn =~ s/$REG{WSP}+$//;
-    $self->{display_name} = $self->Message::Util::decode_quoted_string ($dn);
-    #$as =~ s/^$REG{WSP}+//;  $as =~ s/$REG{WSP}+$//;
-    $as =~ tr/\x09\x20//d;
-    $self->{value} = $as;
-  } else {
-    #$body =~ s/^$REG{WSP}+//;  $body =~ s/$REG{WSP}+$//;
-    $body =~ tr/\x09\x20//d;
-    $self->{value} = $body;
-  }
-  $self->{value} = $self->_parse_value (uri => $self->{value})
-    if $self->{option}->{parse_all};
-  $self;
+## $self->_save_value ($value, $display_name, \@comment)
+sub _save_value ($$\@%) {
+  my $self = shift;
+  my ($v, $dn, $comment, %misc) = @_;
+  $v =~ tr/\x09\x0A\x0D\x20//d;
+  $v = $self->_parse_value (uri => $v) if $self->{option}->{parse_all};
+  $self->{value} = $v;
+  $self->{display_name} = $dn;
+  $self->{comment} = $comment;
+  $self->{keyword} = $misc{keyword};
 }
-
 
 =head2 $URI = $uri->uri ([$newURI])
 
@@ -162,64 +139,27 @@ Set/gets C<URI>.  See also L<NOTE>.
 
 =cut
 
-sub uri ($;$%) {
+sub uri ($;$%) { shift->value (@_) }
+
+## display_name: Inherited
+
+## stringify: Inherited
+
+## $self->_stringify_value (\%option)
+sub _stringify_value ($\%) {
   my $self = shift;
-  my $dname = shift;
-  if (defined $dname) {
-    $self->{value} = $dname;
+  my $option = shift;
+  my %r;
+  my $v = $self->{value};
+  unless (ref $v) {
+    $v =~ s/([\x00-\x20\x22\x3C\x3E\x5C\x7F-\xFF])/sprintf('%%%02X', ord $1)/ge;
   }
-  $self->{value};
+  $r{value} = ''.$v;
+  $r{display_name} = $self->{display_name};
+  $r{comment} = $self->{comment};
+  $r{keyword} = $self->{keyword};
+  %r;
 }
-
-
-sub display_name ($;$%) {
-  my $self = shift;
-  my $dname = shift;
-  if (defined $dname) {
-    $self->{display_name} = $dname;
-  }
-  $self->{display_name};
-}
-
-
-sub stringify ($;%) {
-  my $self = shift;
-  my %o = @_;  my %option = %{$self->{option}};
-  for (grep {/^-/} keys %o) {$option{substr ($_, 1)} = $o{$_}}
-  my $uri = ''.$self->{value};
-  if ((!$option{allow_relative} || !$option{allow_empty})
-    && length $uri == 0) {
-    return '';
-  }
-  my ($dn, $as, $cm) = ('', '', '');
-  if (length $self->{display_name}) {
-    if ($option{use_display_name} && $option{output_display_name}) {
-        my %s = &{$option{hook_encode_string}} ($self, 
-            $self->{display_name}, type => 'phrase');
-        $dn = Message::Util::quote_unsafe_string
-            ($s{value}, unsafe => $option{unsafe_rule_display_name}) . ' ';
-    } elsif ($option{use_comment} && $option{output_comment}) {
-      $dn = ' ('. $self->Message::Util::encode_ccontent ($self->{display_name}) .')';
-    }
-  }
-  
-  if ($option{output_angle_bracket}) {
-    $as = '<'.$uri.'>';
-  } else {
-    $as = $uri;
-  }
-  
-  if ($option{use_comment} && $option{output_comment}) {
-    $cm = $self->_comment_stringify (\%option);
-    $cm = ' ' . $cm if $cm;
-    if ($dn && !($option{use_display_name} && $option{output_display_name})) {
-      $cm = $dn . $cm;  $dn = '';
-    }
-  }
-  $dn . $as . $cm;
-}
-*as_string = \&stringify;
-
 
 =head1 NOTE
 
@@ -258,7 +198,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/09 11:08:28 $
+$Date: 2002/06/15 07:15:59 $
 
 =cut
 

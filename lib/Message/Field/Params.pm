@@ -11,7 +11,7 @@ use strict;
 require 5.6.0;
 use re 'eval';
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -67,7 +67,7 @@ sub _init ($;%) {
     #hook_decode_string
     -parameter_rule	=> 'param',
     -parameter_name_case_sensible	=> 0,
-    -parameter_value_max_length	=> 78,
+    -parameter_value_max_length	=> 35, #78,
     -parameter_value_unsafe_rule	=> {'*default'	=> 'NON_http_attribute_char'},
     -parse_all	=> 0,
     -separator	=> '; ',
@@ -302,7 +302,7 @@ sub replace ($%) {
   my $p;
   for (grep {/^[^-]/} keys %gp) {
     my ($name, $value, %po) = ($self->_n11n_param_name ($_));
-    if (ref $gp{$_}) {($value, %po) = @{$gp{$_}}} else {$value = $gp{$_}}
+    if (ref $gp{$_} eq 'ARRAY') {($value, %po) = @{$gp{$_}}} else {$value = $gp{$_}}
     $p = [$name, {value => $value, charset => $po{charset},
                   is_parameter => 1, language => $po{language}}];
     $p->[1]->{is_parameter} = 0 if !defined ($value) && $po{value};
@@ -612,7 +612,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/09 11:08:28 $
+$Date: 2002/06/15 07:15:59 $
 
 =cut
 

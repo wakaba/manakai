@@ -15,7 +15,7 @@ draft-ietf-usefor-msg-id-alt-00 is also supported.
 package Message::Field::MsgID;
 use strict;
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -223,6 +223,7 @@ sub content ($) {
   my ($l, $r) = ($self->id_left, $self->id_right);
   sprintf '%s@%s', $l, $r if $l && $r;
 }
+*id = \&content;
 
 sub stringify ($;%) {
   my $self = shift;
@@ -296,7 +297,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/09 11:08:28 $
+$Date: 2002/06/15 07:15:59 $
 
 =cut
 

@@ -11,15 +11,14 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
-require Message::Field::Structured;
-push @ISA, qw(Message::Field::Structured);
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+require Message::Field::AngleQuoted;
+push @ISA, qw(Message::Field::AngleQuoted);
 
 %REG = %Message::Util::REG;
 	$REG{sub_domain} = qr/$REG{atext}|$REG{domain_literal}/;
 	$REG{domain} = qr/$REG{sub_domain}(?:$REG{FWS}\.$REG{FWS}$REG{sub_domain})*/;
 	$REG{route} = qr/\x40$REG{FWS}$REG{domain}(?:[\x09\x20,]*\x40$REG{FWS}$REG{domain})*$REG{FWS}:/;
-	$REG{SCM_angle_addr} = qr/<((?:$REG{quoted_string}|$REG{domain_literal}|$REG{comment}|[^\x22\x28\x5B\x3E])+)>|<>/;
 
 =head1 CONSTRUCTORS
 
@@ -38,7 +37,7 @@ The following methods construct new objects:
                        have_group comment_add comment_delete comment_item
                        comment_count route_add route_count route_delete
                        route_item|],
-    -allow_empty_addr_spec	=> 0,
+    -allow_empty	=> 0,
     -by	=> 'domain',
     -comment_to_display_name	=> 1,
     -default_domain	=> 'localhost',
@@ -55,19 +54,21 @@ The following methods construct new objects:
     #hook_encode_string
     #hook_decode_string
     -must_have_addr_spec	=> 1,
-    -output_angle_bracket	=> 1,
-    -output_comment	=> 1,
-    -output_display_name	=> 1,
-    -output_keyword	=> 0,
+    #output_angle_bracket	=> 1,
+    #output_comment	=> 1,
+    #output_display_name	=> 1,
+    #output_keyword	=> 0,
     -output_route	=> 0,
-    -parse_all	=> 1,	## = parse_domain + parse_local_part
-    -parse_domain	=> 1,
-    -parse_local_part	=> 1,	## not implemented.
-    -unsafe_rule_display_name	=> 'NON_http_attribute_char_wsp',
-    -unsafe_rule_local_part	=> 'NON_atext_dot',
-    -unsafe_rule_keyword	=> 'NON_atext_dot',
-    -use_keyword	=> 0,
+    #parse_all	=> 0,	## = parse_domain + parse_local_part
+    -parse_domain	=> 0,
+    -parse_local_part	=> 0,	## not implemented.
+    #unsafe_rule_of_display_name	=> 'NON_http_attribute_char_wsp',
+    -unsafe_rule_of_local_part	=> 'NON_http_attribute_char_wsp',
+    #unsafe_rule_of_keyword	=> 'NON_atext',
+    -use_comment_in_angle	=> 1,
+    #use_keyword	=> 0,
   );
+
 sub _init ($;%) {
   my $self = shift;
   my %options = @_;
@@ -94,14 +95,17 @@ sub _init ($;%) {
     $self->{option}->{output_keyword} = 1;
   }
   if ($field eq 'return-path') {
-    $self->{option}->{allow_empty_addr_spec} = 1;
+    $self->{option}->{allow_empty} = 1;
+    $self->{option}->{allow_empty} = 0
+      if $format =~ /rfc822/ && $format !~ /rfc1123/;
     $self->{option}->{output_display_name} = 0;
-    $self->{option}->{output_comment} = 0;
+    $self->{option}->{output_comment} = 0
+      if $format =~ /smtp/;
     	## RFC [2]822 allows CFWS, but [2]821 does NOT.
   }
-  if ($format =~ /http/) {
-    $self->{option}->{unsafe_rule_local_part} = 'NON_http_attribute_char_wsp';
-  }
+  #if ($format =~ /http/) {
+  #  $self->{option}->{unsafe_rule_local_part} = 'NON_http_attribute_char_wsp';
+  #}
 }
 
 =item $m = Message::Field::Mailbox->new ([%options])
@@ -120,58 +124,38 @@ some options as parameters to the constructor.
 
 =cut
 
-sub parse ($$;%) {
-  my $class = shift;
-  my $self = bless {}, $class;
-  my $body = shift;
-  $self->_init (@_);
-  ($body, @{$self->{comment}})
-    = $self->Message::Util::delete_comment_to_array ($body);
+## $self->_save_value ($value, $display_name, \@comment)
+sub _save_value ($$\@%) {
+  my $self = shift;
+  my ($v, $dn, $comment, %misc) = @_;
   my $parse_lp = $self->{option}->{parse_local_part}
               || $self->{option}->{parse_all};
   my $parse_dm = $self->{option}->{parse_domain}
               || $self->{option}->{parse_all};
-  my $addr_spec = '';
-  if ($body =~ /([^\x3C]*)$REG{SCM_angle_addr}/) {
-    my ($dn, $as) = ($1, $2);
-    $dn =~ s/^$REG{WSP}+//;  $dn =~ s/$REG{WSP}+$//;
-    $self->{display_name} = $self->Message::Util::decode_quoted_string ($dn);
-    $addr_spec = Message::Util::remove_meaningless_wsp ($as);
-  } elsif ($self->{option}->{use_keyword}
-    && $body =~ /^$REG{FWS}($REG{atext_dot})$REG{FWS}$/) {
-    #$self->{keyword} = Message::Util::remove_meaningless_wsp ($1);
-    $self->{keyword} = $1;
-    $self->{keyword} =~ tr/\x09\x20//d;
-  } else {
-    $addr_spec = Message::Util::remove_meaningless_wsp ($body);
-  }
-  if ($addr_spec =~ /^($REG{route})?((?:$REG{quoted_string}|[^\x22])+?)\x40((?:$REG{domain_literal}|[^\x5B\x40])+)$/) {
+  $v = Message::Util::remove_meaningless_wsp ($v);
+  if ($v =~ /^($REG{route})?((?:$REG{quoted_string}|[^\x22])+?)\x40((?:$REG{domain_literal}|[^\x5B\x40])+)$/) {
     my $route = $1;
     $self->{local_part} = $2; $self->{domain} = $3;
     $self->{domain} = $self->_parse_value ('domain' => $self->{domain})
       if $parse_dm;
     $route =~ s{\x40$REG{FWS}($REG{domain})}{
       my $d = $1;
-      $d = $self->_parse_value ('domain' => $d) if $parse_dm;
+      $d = $self->_parse_value (domain => $d) if $parse_dm;
       push @{$self->{route}}, $d;
     }gex;
-  } elsif (length $addr_spec) {
-    $self->{local_part} = $addr_spec;
+  } elsif (length $v) {
+    $self->{local_part} = $v;
   }
-  #if ($parse_lp && $self->{local_part}) {}
   $self->{local_part}
     = $self->Message::Util::decode_quoted_string ($self->{local_part}, 
       type => 'word',
       charset => $self->{option}->{encoding_before_decode_local_part});
-  $self;
+  $self->{comment} = $comment;
+  $self->{display_name} = $dn;
+  $self->{keyword} = $misc{keyword};
 }
 
-sub display_name ($;$) {
-  my $self = shift;
-  my $newdn = shift;
-  $self->{display_name} = $newdn if defined $newdn;
-  $self->{display_name};
-}
+## display_name: Inherited
 
 sub local_part ($;$) {
   my $self = shift;
@@ -184,7 +168,7 @@ sub domain ($;$) {
   my $self = shift;
   my $newdomain = shift;
   if (defined $newdomain) {
-    $newdomain = $self->_parse_value ('domain' => $newdomain)
+    $newdomain = $self->_parse_value (domain => $newdomain)
       if $self->{option}->{parse_domain} || $self->{option}->{parse_all};
     $self->{domain} = $newdomain;
   }
@@ -199,18 +183,18 @@ sub keyword ($;$) {
   $self->{keyword};
 }
 
-sub route_add ($@) {shift->SUPER::add (@_)}
-sub route_count ($@) {shift->SUPER::count (@_)}
-sub route_delete ($@) {shift->SUPER::delete (@_)}
-sub route_item ($@) {shift->SUPER::item (@_)}
+sub route_add ($@) { shift->SUPER::add (@_) }
+sub route_count ($@) { shift->SUPER::count (@_) }
+sub route_delete ($@) { shift->SUPER::delete (@_) }
+sub route_item ($@) { shift->SUPER::item (@_) }
 
 sub _delete_match ($$$\%\%) {
   my $self = shift;
   my ($by, $i, $list, $option) = @_;
-  return 0 unless ref $$i;  ## Already removed
+  return 0 unless ref $$i;	## Already removed
   return 0 if $$option{type} && $$i->{type} ne $$option{type};
   if ($by eq 'domain') {
-    $$i = $self->_parse_value ('domain' => $$i);
+    $$i = $self->_parse_value (domain => $$i);
     return 1 if $list->{$$i};
   }
   0;
@@ -227,10 +211,10 @@ sub _item_return_value ($\$\%) {
   }
 }
 sub _item_new_value ($$\%) {
-  $_[0]->_parse_value (domain => $_[2]->{by} eq 'domain'?$_[1]:'');
+  $_[0]->_parse_value (domain => ($_[2]->{by} eq 'domain'? $_[1]: ''));
 }
 
-sub have_group ($) {0}
+sub have_group ($) { 0 }
 
 sub addr_spec ($;%) {
   my $self = shift;
@@ -243,74 +227,45 @@ sub addr_spec ($;%) {
   );
   $self->stringify (%o, @_);
 }
+*value = \&addr_spec;
 
-sub stringify ($;%) {
+## $self->_stringify_value (\%option)
+sub _stringify_value ($\%) {
   my $self = shift;
-  my %o = @_;  my %option = %{$self->{option}};
-  for (grep {/^-/} keys %o) {$option{substr ($_, 1)} = $o{$_}}
-  my ($dn, $as, $cm) = ('', '', '');
-  if (length $self->{keyword}) {
-    if ($option{output_keyword}) {
-      my %s = &{$option{hook_encode_string}} ($self, 
-              $self->{keyword}, type => 'phrase');
-      $as = Message::Util::quote_unsafe_string
-          ($s{value}, unsafe => $option{unsafe_rule_keyword});
-    } else {
-      $as = '('. $self->Message::Util::encode_ccontent ($self->{keyword}) .')';
-    }
-  } else {
-    if ($option{output_display_name}) {
-      if (length $self->{display_name}) {
-        my %s = &{$option{hook_encode_string}} ($self, 
-            $self->{display_name}, type => 'phrase');
-        $dn = Message::Util::quote_unsafe_string
-            ($s{value}, unsafe => $option{unsafe_rule_display_name}) . ' ';
-      } elsif ($option{comment_to_display_name}) {
-        my $fullname = shift (@{$self->{comment}});
-        if (length $fullname) {
-          my %s = &{$option{hook_encode_string}} ($self, 
-            $fullname, type => 'phrase');
-          $dn = Message::Util::quote_unsafe_string
-            ($s{value}, unsafe => $option{unsafe_rule_display_name}) . ' ';
-        }
-      }
-    } elsif ($option{output_comment} && length $self->{display_name}) {
-      $dn = ' ('. $self->Message::Util::encode_ccontent ($self->{display_name}) .')';
-    }
-    my %s = &{$option{hook_encode_string}} ($self, 
+  my $option = shift;
+  my %r;
+    my %s = &{$option->{hook_encode_string}} ($self, 
           $self->{local_part}, type => 'word',
-          charset => $option{encoding_after_encode_local_part});
-    $as = Message::Util::quote_unsafe_string ($s{value}, 
-            unsafe => $option{unsafe_rule_local_part});
+          charset => $option->{encoding_after_encode_local_part});
+    my $as = Message::Util::quote_unsafe_string ($s{value}, 
+            unsafe => $option->{unsafe_rule_local_part});
     my $d = '' . $self->{domain};
-    $d ||= $option{default_domain} if $option{fill_domain};
+    $d ||= $option->{default_domain} if $option->{fill_domain};
     $as .= '@' . $d if length $d && length $as;
-    if ($as) {
-      if ($option{output_angle_bracket}) {
-        if ($option{output_route}) {
+      if ($option->{output_angle_bracket}) {
+        if ($option->{output_route}) {
           my $route = join ',', grep {$_ ne '@'}
             map {'@'.$_} @{$self->{route}};
           $as = $route . ':' . $as if $route;
         }
-        $as = '<' . $as . '>';
       }
-    } else {
-      $as = '<>' if $option{allow_empty_addr_spec}
-                 && $option{output_angle_bracket};
-      return '' if !$option{allow_empty_addr_spec}
-                 && $option{must_have_addr_spec};
-    }
-  }
-  if ($option{output_comment}) {
-    $cm = $self->_comment_stringify (\%option);
-    $cm = ' ' . $cm if $cm;
-    if ($dn && !$option{output_display_name}) {
-      $cm = $dn . $cm;  $dn = '';
-    }
-  }
-  $dn . $as . $cm;
+  $r{value} = $as;
+  $r{display_name} = $self->{display_name};
+  $r{comment} = $self->{comment};
+  $r{keyword} = $self->{keyword};
+  %r;
 }
-*as_string = \&stringify;
+
+## $self->_option_recursive (\%argv)
+sub _option_recursive ($\%) {
+  my $self = shift;
+  my $o = shift;
+  for (@{$self->{route}}) {
+    $_->option (%$o) if ref $_;
+  }
+  $self->{local_part}->option (%$o) if ref $self->{local_part};
+  $self->{domain}->option (%$o) if ref $self->{domain};
+}
 
 =head1 LICENSE
 
@@ -334,7 +289,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/09 11:08:28 $
+$Date: 2002/06/15 07:15:59 $
 
 =cut
 

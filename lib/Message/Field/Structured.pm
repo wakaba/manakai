@@ -9,7 +9,7 @@ Message Structured Header Field Bodies
 package Message::Field::Structured;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 use overload '""' => sub { $_[0]->stringify },
              '.=' => sub { $_[0]->value_append ($_[1]) },
@@ -563,9 +563,11 @@ sub _comment_cleaning ($) {
 
 sub _comment_stringify ($\%) {
   my $self = shift;
-  #my $option = shift;
+  my $option = shift;
+  $option->{_comment_min} ||= 0;
+  $option->{_comment_max} = $#{$self->{comment}} unless defined $option->{_comment_max};
   my @v;
-  for (@{$self->{comment}}) {
+  for (@{$self->{comment}}[$option->{_comment_min}..$option->{_comment_max}]) {
     push @v, '('. $self->Message::Util::encode_ccontent ($_) .')';
   }
   join ' ', @v;
@@ -750,7 +752,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/09 11:08:28 $
+$Date: 2002/06/15 07:15:59 $
 
 =cut
 
