@@ -9,17 +9,24 @@ Message::Partial --- Perl module for partial message defined by MIME
 package Message::Partial;
 use strict;
 use vars qw(%OPTION $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Entity;
 require Message::Header;
 require Message::Field::MsgID;
 
 %OPTION = (
-  -part_length	=> 1024,
+  -part_length	=> 60 * 1024,
   -subject_format_pattern	=> '%s (%d/%d)',
 );
 
+my %ENCLOSED_FIELD = (
+	encrypted	=> 2,	## RFC 1521
+	'message-id'	=> 2,	## RFC 1341
+	'mime-version'	=> 2,	## RFC 1521
+	subject	=> 2,	## RFC 2046
+	'user-agent'	=> 1,	## non-standard extension
+);
 sub fragmentate ($;%) {
   my $msg = shift;
   my %params = @_;
@@ -32,20 +39,19 @@ sub fragmentate ($;%) {
     $msg = parse Message::Entity $msg;
   }
   my @copy_field;
-  my %cf = (subject => 1, encrypted => 1, 'mime-version' => 1, 'message-id' => 1);
   $msg->option (force_mime_entity => 1);
   $msg->stringify;	## Make fill_* work
   $msg->header->scan (sub {
     my $i = $_[1];
     my $rfc822 = $Message::Header::NS_phname2uri{rfc822};
-    if ($_[1]->{ns} eq $Message::Header::NS_phname2uri{content}) {
-      push @copy_field, {%{$_[1]}};
-      $_[1]->{name} = undef;
-    } elsif ($_[1]->{ns} eq $rfc822 && $cf{$_[1]->{name}}) {
-      #push @copy_field, Message::Util::make_clone ($_[1]);
-      ##$_[1]->{name} = undef;	## Don't remove to keep compatible w/ RFC 1341/1521
-      push @copy_field, {%{$_[1]}};
-      $_[1]->{name} = undef;
+    if ($i->{ns} eq $Message::Header::NS_phname2uri{content}) {
+      push @copy_field, {%$i};
+      $i->{name} = undef;
+    } elsif ($i->{ns} eq $rfc822 && $ENCLOSED_FIELD{ $i->{name} }) {
+      #push @copy_field, Message::Util::make_clone ($i);
+      ##$i->{name} = undef;	## Don't remove to keep compatible w/ RFC 1341/1521
+      push @copy_field, {%$i};
+      $i->{name} = undef;
     }
   });
   my $outer_header = $msg->header;
@@ -72,11 +78,16 @@ sub fragmentate ($;%) {
     $ct->parameter (id => $pid->content);
   my $first_mid;
   for my $i (0..$#pbody) {
-    $pmsg[$i] = new Message::Entity;
+    my %eo;  %eo = (
+    	-add_ua	=> 0,
+    #	-fill_date	=> 0,
+    ) if $i == 0;
+    $pmsg[$i] = new Message::Entity %eo;
     $pmsg[$i]->header ($outer_header->clone);
     my $hdr = $pmsg[$i]->header;
     $hdr->replace (subject
-      => sprintf ($option{-subject_format_pattern}, $subject, $i+1, $#pbody+1));
+      => $i == 0? $subject:
+         sprintf ($option{-subject_format_pattern}, $subject, $i+1, $#pbody+1));
     my $ct = $hdr->field ('content-type');
     $ct->parameter (number => $i +1);
     $ct->parameter (total => $#pbody +1);
@@ -86,9 +97,64 @@ sub fragmentate ($;%) {
       $first_mid = $hdr->field ('message-id');
     } else {
       $hdr->field ('references')->add ($first_mid);
+      $hdr->field ('user-agent')->add ('Message-Partial-pm' => $VERSION);
     }
   }
   @pmsg;
+}
+
+sub reassembly (@) {
+  my @msg = @_;
+  my ($id, @part);
+  for my $msg (@msg) {
+    unless (ref $msg) {
+      $msg = parse Message::Entity $msg;
+    }
+    my $ct = $msg->header->field ('content-type', -new_item_unless_exist => 0) if ref $msg;
+    if (ref $ct && $ct->media_type eq 'message/partial') {
+      unless (length $id) {
+        $id = $ct->parameter ('id');
+      } elsif ($id ne $ct->parameter ('id')) {
+        next;
+      }
+      $part[ $ct->parameter ('number') ] = $msg;
+      my $total = $ct->parameter ('total');
+      $#part = $total if $total && $#part < $total;
+    }
+  }
+  my $msg = '';
+  for my $i (1..$#part) {
+    if (ref $part[$i]) {
+      $msg .= $part[$i]->body;
+    } else {
+      Carp::carp "reassembly: part $i of $#part is missing";
+    }
+  };
+  $msg = parse Message::Entity $msg,
+  	-add_ua	=> 0,
+  	-fill_ct	=> 0,
+  	-fill_date	=> 0,
+  	-fill_mimever	=> 0,
+  	-fill_msgid	=> 0,
+  ;
+  my $inner_header = $msg->header;
+  my $hdr;
+  if (ref $part[1]) {
+    $hdr = $msg->header ($part[1]->header);
+    $hdr->delete ({-by => 'ns'}, $Message::Header::NS_phname2uri{content});
+    $hdr->delete (grep {$ENCLOSED_FIELD{$_} > 1} keys %ENCLOSED_FIELD);
+  } else {
+    $hdr = $msg->header ('');
+  }
+  $inner_header->scan (sub {
+    my $i = $_[1];
+    my $rfc822 = $Message::Header::NS_phname2uri{rfc822};
+    if ($i->{ns} eq $Message::Header::NS_phname2uri{content}
+     || $i->{ns} eq $rfc822 && $ENCLOSED_FIELD{ $i->{name} }) {
+      $msg->header->replace ($i->{name} => [ $i->{body} , ns => $i->{ns} ] );
+    }
+  });
+  $msg;
 }
 
 =head1 SEE ALSO
@@ -124,7 +190,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/11 13:01:21 $
+$Date: 2002/06/12 11:38:56 $
 
 =cut
 

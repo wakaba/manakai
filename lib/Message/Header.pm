@@ -8,7 +8,7 @@ Message::Header --- A Perl Module for Internet Message Headers
 package Message::Header;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.24 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.25 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;	## This may seem silly:-)
 push @ISA, qw(Message::Field::Structured);
 
@@ -308,17 +308,7 @@ sub _item_match ($$\$\%\%) {
     }
     return 1 if $l{$$i->{name} . ':' . $$i->{ns}};
   } elsif ($by eq 'ns') {
-    my %o = %$option; $o{parse} = 0;
-    my %l;
-    for (keys %$list) {
-      my ($s, undef, $v) = $self->_value_to_arrayitem ($_, '', %o);
-      if ($s) {
-        $l{ $v->{ns} } = 1;
-      } else {
-        $l{ $self->{ns}->{default_phuri} } = 1;
-      }
-    }
-    return 1 if $l{ $$i->{ns} };
+    return 1 if $list->{ $$i->{ns} };
   }
   0;
 }
@@ -443,7 +433,9 @@ sub _value_to_arrayitem ($$$\%) {
   }
   my $nsuri = $self->{ns}->{default_phuri};
   no strict 'refs';
-  if ($option->{ns}) {
+  if ($value_option->{ns}) {
+    $nsuri = $value_option->{ns};
+  } elsif ($option->{ns}) {
     $nsuri = $option->{ns};
   } elsif ($name =~ s/^([Xx]-[A-Za-z]+|[A-Za-z]+)-//) {
     my $oprefix = $1;
@@ -827,7 +819,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/11 13:01:21 $
+$Date: 2002/06/12 11:38:56 $
 
 =cut
 
