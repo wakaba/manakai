@@ -16,7 +16,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%FMT2STR %OPTION %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.22 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.23 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Carp;
 require Message::MIME::EncodedWord;
@@ -46,7 +46,7 @@ require Message::MIME::Charset;
 	$REG{M_comment} = qr/\x28((?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x27\x2A-\x5B\x5D-\xFF]|(??{$REG{comment}}))*)\x29/;
 	
 	$REG{quoted_string} = qr/\x22(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\xFF])*\x22/;
-	$REG{M_quoted_string} = qr/\x22((?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\xFF])*)\x22/;
+	$REG{M_quoted_string} = qr/\x22((?:\x5C[\x00-\xFF]|[^\x0D\x22\x5C])*)\x22/;
 	
 	$REG{domain_literal} = qr/\x5B(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x5A\x5E-\xFF])*\x5D/;
 	$REG{M_domain_literal} = qr/\x5B((?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x5A\x5E-\xFF])*)\x5D/;
@@ -239,7 +239,7 @@ sub unquote_if_quoted_string ($) {
   my $quoted_string = shift;  my $isq = 0;
   $quoted_string =~ s{^$REG{M_quoted_string}$}{
     my $qtext = $1;
-    $qtext =~ s/\x5C([\x00-\xFF])/$1/g;
+    $qtext =~ s/\x5C([\x00-\xFF])/$1/gs;
     $isq = 1;
     $qtext;
   }goex;
@@ -684,9 +684,9 @@ sub sprintxf ($;\%) {
       my %a;
       for (split /[\x09\x20]*,[\x09\x20]*/, $a) {
         if (/^([^=]*[^\x09\x20=])[\x09\x20]*=>[\x09\x20]*([^\x09\x20].*)$/) {
-          $a{ unquote_if_quoted_string ($1) } = unquote_if_quoted_string ($2);
+          $a{ Message::Util::Wide::unquote_if_quoted_string ($1) } = Message::Util::Wide::unquote_if_quoted_string ($2);
         } else {
-          $a{ unquote_if_quoted_string ($_) } = 1;
+          $a{ Message::Util::Wide::unquote_if_quoted_string ($_) } = 1;
         }
       }
       my $r = &$function (\%a, $gparam);
@@ -789,6 +789,23 @@ sub is_utf8 ($) {
   0;
 }
 
+package Message::Util::Wide;
+use vars qw(%REG);
+
+	$REG{M_quoted_string} = qr/\x22((?:\x5C.|[^\x0D\x22\x5C])*)\x22/;
+
+sub unquote_if_quoted_string ($) {
+  my $quoted_string = shift;  my $isq = 0;
+  $quoted_string =~ s{^$REG{M_quoted_string}$}{
+    my $qtext = $1;
+    $qtext =~ s/\x5C(.)/$1/gs;
+    $isq = 1;
+    $qtext;
+  }goex;
+  wantarray? ($quoted_string, $isq): $quoted_string;
+}
+
+
 =head1 LICENSE
 
 Copyright 2002 wakaba E<lt>w@suika.fam.cxE<gt>.
@@ -811,7 +828,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/08/04 00:16:32 $
+$Date: 2002/08/05 09:40:54 $
 
 =cut
 

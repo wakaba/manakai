@@ -10,7 +10,7 @@ require Message::Header::Default;
 package Message::Header::HTTP;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 our %OPTION = %Message::Header::Default::OPTION;
 $OPTION{namespace_uri} = 'urn:x-suika-fam-cx:msgpm:header:http';
@@ -25,7 +25,7 @@ $OPTION{field_sort_good_practice_order} = {};
 {
   my $i = 1;
   for (
-    qw/status/,	## CGI header
+    qw/status x-cgi-/,	## CGI header
     qw/man c-man opt c-opt ext c-ext
        cache-control connection date pragma transfer-encoding upgrade trailer via
        keep-alive/,	## General-Headers
@@ -35,14 +35,9 @@ $OPTION{field_sort_good_practice_order} = {};
        max-forwards proxy-authorization range referer te user-agent/,	## Request-Headers
     qw/accept-ranges age location proxy-authenticate retry-after server vary
        warning www-authenticate alternates/,	## Response-Headers
-    qw/allow etag expires last-modified link window-target
-       mime-version derived-from base content-/,	## Entity-Headers
+    qw/allow etag expires last-modified base link window-target
+       derived-from mime-version content-/,	## Entity-Headers
   ) {
-      $OPTION{field_sort_good_practice_order}->{$_} = $i++;
-  }
-  ## default = 999
-  $i = 1000;
-  for (qw/list- mime-version content- xref/) {
       $OPTION{field_sort_good_practice_order}->{$_} = $i++;
   }
 }
@@ -58,27 +53,102 @@ $OPTION{value_type} = {
 	':default'	=> ['Message::Field::Unstructured'],
 	status	=> ['Message::Field::Status'],
 	
-	## HTTP-Date / delta-second
-	date	=> ['Message::Field::Date'],
-	expires	=> ['Message::Field::Date'],
+	## HTTP-Date / delta-econd
+	age	=> ['Message::Field::Date'],	## ds
+	date	=> ['Message::Field::Date'],	## hd
+	expires	=> ['Message::Field::Date'],	## hd / ds
 	'if-modified-since'	=> ['Message::Field::Date'],
 	'if-unmodified-since'	=> ['Message::Field::Date'],
-	'last-modified'	=> ['Message::Field::Date'],
+	'last-modified'	=> ['Message::Field::Date'],	## hd
 	
 	p3p	=> ['Message::Field::Params'],
+	refresh	=> ['Message::Field::ValueParams'],
 	'window-target'	=> ['Message::Field::ValueParams'],
 	'mime-version'	=> ['Message::Field::Numval'],
 	from	=> ['Message::Field::Addresses'],
+	host	=> ['Message::Field::Domain',{
+		-format_ipv4	=> '%vd',
+		-format_ipv6	=> '[%s]',
+		-output_port	=> 1,
+		-use_comment	=> 0,
+		-use_port	=> 1,
+	}],
 	
 	## product
 	server	=> ['Message::Field::UA'],
 	'user-agent'	=> ['Message::Field::UA'],
 	
 	## Comma Separated List
+	accept	=> ['Message::Field::CSV',{
+		-is_quoted_string	=> 0,
+		-use_comment	=> 0,
+		-value_type	=> {'*default' => ['Message::Field::ValueParams']},
+	}],
+	'accept-charset'	=> ['Message::Field::CSV',{
+		-is_quoted_string	=> 0,
+		-use_comment	=> 0,
+		-value_type	=> {'*default' => ['Message::Field::ValueParams']},
+	}],
+	'accept-encoding'	=> ['Message::Field::CSV',{
+		-is_quoted_string	=> 0,
+		-use_comment	=> 0,
+		-value_type	=> {'*default' => ['Message::Field::ValueParams']},
+	}],
+	'accept-language'	=> ['Message::Field::CSV',{
+		-is_quoted_string	=> 0,
+		-use_comment	=> 0,
+		-value_type	=> {'*default' => ['Message::Field::ValueParams']},
+	}],
+	'accept-range'	=> ['Message::Field::CSV',{
+		-is_quoted_string	=> 0,
+		-use_comment	=> 0,
+		-value_type	=> {'*default' => ['Message::Field::ValueParams']},
+	}],
+	'cache-control'	=> ['Message::Field::CSV',{
+		-is_quoted_string	=> 0,
+		-use_comment	=> 0,
+		-value_type	=> {'*default' => ['Message::Field::ValueParams']},
+	}],
 	link	=> ['Message::Field::CSV'],
+	man	=> ['Message::Field::CSV',{
+		-is_quoted_string	=> 0,
+		-use_comment	=> 0,
+		-value_type	=> {'*default' => ['Message::Field::ValueParams']},
+	}],
+	'c-man'	=> ['Message::Field::CSV',{
+		-is_quoted_string	=> 0,
+		-use_comment	=> 0,
+		-value_type	=> {'*default' => ['Message::Field::ValueParams']},
+	}],
+	opt	=> ['Message::Field::CSV',{
+		-is_quoted_string	=> 0,
+		-use_comment	=> 0,
+		-value_type	=> {'*default' => ['Message::Field::ValueParams']},
+	}],
+	'c-opt'	=> ['Message::Field::CSV',{
+		-is_quoted_string	=> 0,
+		-use_comment	=> 0,
+		-value_type	=> {'*default' => ['Message::Field::ValueParams']},
+	}],
+	te	=> ['Message::Field::CSV',{
+		-is_quoted_string	=> 0,
+		-use_comment	=> 0,
+		-value_type	=> {'*default' => ['Message::Field::ValueParams']},
+	}],
+	trailer	=> ['Message::Field::CSV',{
+		-output_comment	=> 0,
+		-value_case_sensible	=> 1,
+	}],
+	'transfer-encoding'	=> ['Message::Field::CSV',{
+		-output_comment	=> 0,
+		-value_case_sensible	=> 1,
+	}],
+	upgrade	=> ['Message::Field::CSV'],	## 1#product
 	uri	=> ['Message::Field::CSV'],
-	man	=> ['Message::Field::CSV'],
-	opt	=> ['Message::Field::CSV'],
+	vary	=> ['Message::Field::CSV',{
+		-output_comment	=> 0,
+		-value_case_sensible	=> 1,
+	}],
 	warning	=> ['Message::Field::CSV',{
 		-is_quoted_string	=> 0,
 		-use_comment	=> 0,
@@ -117,14 +187,14 @@ $OPTION{field}->{ext} = {	## RFC 2774
 $Message::Header::NS_phname2uri{$OPTION{namespace_phname}} = $OPTION{namespace_uri};
 $Message::Header::NS_uri2phpackage{$OPTION{namespace_uri}} = __PACKAGE__;
 
-package Message::Header::HTTP::C;
-our %OPTION = %Message::Header::HTTP::OPTION;
-$OPTION{namespace_uri} = 'urn:x-suika-fam-cx:msgpm:header:http:c';
-$OPTION{namespace_phname} = 'x-http-c';
-$OPTION{namespace_phname_goodcase} = 'X-HTTP-C';
-
-$Message::Header::NS_phname2uri{$OPTION{namespace_phname}} = $OPTION{namespace_uri};
-$Message::Header::NS_uri2phpackage{$OPTION{namespace_uri}} = __PACKAGE__;
+#package Message::Header::HTTP::C;
+#our %OPTION = %Message::Header::HTTP::OPTION;
+#$OPTION{namespace_uri} = 'urn:x-suika-fam-cx:msgpm:header:http:c';
+#$OPTION{namespace_phname} = 'x-http-c';
+#$OPTION{namespace_phname_goodcase} = 'X-HTTP-C';
+#
+#$Message::Header::NS_phname2uri{$OPTION{namespace_phname}} = $OPTION{namespace_uri};
+#$Message::Header::NS_uri2phpackage{$OPTION{namespace_uri}} = __PACKAGE__;
 
 package Message::Header::HTTP::CCPP;
 ## CC/PP exchange protocol <http://www.w3.org/TR/NOTE-CCPPexchange>
@@ -168,7 +238,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/08/04 00:16:32 $
+$Date: 2002/08/05 09:40:54 $
 
 =cut
 

@@ -1,3 +1,19 @@
+2002-08-05  Wakaba <w@suika.fam.cx>
+
+	* Util.pm:
+	- (sprintxf): Use Message::Util::Wide::unquote_if_quoted_string
+	instead of Message::Util::unquote_if_quoted_string.
+	- (Message::Util::Wide): New package.
+	- (%Message::Util::Wide::REG): New hash.
+	- (Message::Util::unquote_if_quoted_string): New function.
+	- NOTE: "Wide" package is created to support utf8 string
+	of perl 5.7.3 or later.  Utf8 string does not work
+	only for [\x00-\xFF] regex of current functions,
+	and this regex is used as (?:.|\x0D|\x0A).  (Without
+	's' option, "." does not match with newline character.)
+	When we can do away problematic code from all
+	Message::* modules, we can also do away "Wide" package.
+
 2002-08-04  Wakaba <w@suika.fam.cx>
 
 	* Entity.pm: Don't fill_source by default if format =~ http.
