@@ -27,10 +27,14 @@ $REG{FWS} = qr/[\x20\x09]*/;
 $REG{M_quoted_string} = qr/\x22((?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\xFF])*)\x22/;
 $REG{M_rfc2822_date_time} = qr/([0-9]+)$REG{FWS}([A-Za-z]+)$REG{FWS}([0-9]+)$REG{WSP}+([0-9]+)$REG{FWS}:$REG{FWS}([0-9]+)(?:$REG{FWS}:$REG{FWS}([0-9]+))?$REG{FWS}([A-Za-z]+|[+-]$REG{WSP}*[0-9]+)/;
 $REG{M_rfc733_date_time} = qr/([0-9]{1,2})$REG{FWS}(?:-$REG{FWS})?([A-Za-z]+)$REG{FWS}(?:-$REG{FWS})?([0-9]+)$REG{WSP}+([0-9][0-9])$REG{FWS}(?::$REG{FWS})?([0-9][0-9])(?:$REG{FWS}(?::$REG{FWS})?([0-9][0-9]))?$REG{FWS}((?:-$REG{FWS})?[A-Za-z]+|[+-]$REG{WSP}*[0-9]+)/;
+$REG{M_rfc724_slash_date} = qr#([0-9]+)$REG{FWS}/$REG{FWS}([0-9]+)$REG{FWS}/$REG{FWS}([0-9]+)$REG{WSP}+([0-9][0-9])$REG{FWS}(?::$REG{FWS})?([0-9][0-9])(?:$REG{FWS}(?::$REG{FWS})?([0-9][0-9]))?$REG{FWS}((?:-$REG{FWS})?[A-Za-z]+|[+-]$REG{WSP}*[0-9]+)#;
+$REG{M_asctime} = qr/[A-Za-z]+$REG{FWS}([A-Za-z]+)$REG{FWS}([0-9]+)$REG{WSP}+([0-9]+)$REG{FWS}:$REG{FWS}([0-9]+)$REG{FWS}:$REG{FWS}([0-9]+)$REG{WSP}+([0-9]+)/;
+$REG{M_iso8601_date_time} = qr/([0-9]+)-([0-9]+)-([0-9]+)[Tt]([0-9]+):([0-9]+):([0-9]+)(?:.([0-9]+))?(?:[Zz]|([+-])([0-9]+):([0-9]+))/;
 
 %DEFAULT = (
   format	=> 'rfc2822',
   output_day_of_week	=> 1,
+  output_zone_string	=> 0,
   zone	=> [+1, 0, 0],
   zone_letter	=> +1,
 );
@@ -58,15 +62,25 @@ $REG{M_rfc733_date_time} = qr/([0-9]{1,2})$REG{FWS}(?:-$REG{FWS})?([A-Za-z]+)$RE
   AST	=> [-1,  4,  0],	## 733
   BDT	=> [-1, 10,  0],	## 733
   BST	=> [-1, 11,  0],	## 733
+  #BST	=> [+1,  1,  0],
   CDT	=> [-1,  5,  0],	## 733, 822, 2822
+  CET	=> [+1,  1,  0],
   CST	=> [-1,  6,  0],	## 733, 822, 2822
   EDT	=> [-1,  4,  0],	## 733, 822, 2822
+  EET	=> [+1,  2,  0],	## 1947
   EST	=> [-1,  5,  0],	## 733, 822, 2822
-  ## GDT 724
+  GDT	=> [+1,  1,  0],	## 724
   GMT	=> [+1,  0,  0],	## 733, 822, 2822
   HDT	=> [-1,  9,  0],	## 733
+  HKT	=> [+1,  8,  0],
   HST	=> [-1, 10,  0],	## 733
+  IDT	=> [+1,  3,  0],
+  IST	=> [+1,  2,  0],	## Israel standard time
+  #IST	=> [+1,  5, 30],	## Indian standard time
+  JST	=> [+1,  9,  0],
   MDT	=> [-1,  6,  0],	## 733, 822, 2822
+  MET	=> [+1,  0,  0],
+  METDST	=> [+2,  0,  0],
   MST	=> [-1,  7,  0],	## 733, 822, 2822
   NST	=> [-1,  3, 30],	## 733
   PDT	=> [-1,  7,  0],	## 733, 822, 2822
@@ -143,6 +157,16 @@ sub parse ($$;%) {
     eval '$self->{date_time} = timegm_nocheck 
       ($second, $minute-($zone_sign*$zone_minute), $hour-($zone_sign*$zone_hour), 
        $day, $month-1, $year);';
+    $self->{secfrac} = '';
+    $self->{option}->{zone} = [$zone_sign, $zone_hour, $zone_minute];
+  } elsif ($field_body =~ /$REG{M_iso8601_date_time}/) {
+    my ($year,$month,$day,$hour,$minute,$second,$secfrac,
+        $zone_sign,$zone_hour,$zone_minute)
+     = ($1, $2, $3, $4, $5, $6, $7, "${8}1", $9, $10);
+    eval '$self->{date_time} = timegm_nocheck 
+      ($second, $minute-($zone_sign*$zone_minute), $hour-($zone_sign*$zone_hour), 
+       $day, $month-1, $year);';
+    $self->{secfrac} = $secfrac;
     $self->{option}->{zone} = [$zone_sign, $zone_hour, $zone_minute];
   } elsif ($field_body =~ /$REG{M_rfc733_date_time}/) {
     my ($day, $month, $year, $hour, $minute, $second, $zone)
@@ -154,11 +178,50 @@ sub parse ($$;%) {
     eval '$self->{date_time} = timegm_nocheck 
       ($second, $minute-($zone_sign*$zone_minute), $hour-($zone_sign*$zone_hour), 
        $day, $month-1, $year);';
+    $self->{secfrac} = '';
+    $self->{option}->{zone} = [$zone_sign, $zone_hour, $zone_minute];
+  } elsif ($field_body =~ /$REG{M_asctime}/) {
+    my ($month, $day, $hour, $minute, $second, $year) = (uc $1, $2, $3, $4, $5, $6);
+    $month = $MONTH{$month} || 1;
+    if    ( 0 < $year && $year <   49) {$year += 2000}
+    elsif (50 < $year && $year < 1000) {$year += 1900}
+    eval '$self->{date_time} = timegm_nocheck 
+      ($second, $minute, $hour, $day, $month-1, $year);';
+    $self->{secfrac} = '';
+    $self->{option}->{zone} = [-1, 0, 0];
+  } elsif ($field_body =~ /$REG{M_rfc724_slash_date}/) {
+    my ($month, $day, $year, $hour, $minute, $second, $zone)
+     = ($1, $2, $3, $4, $5, $6, uc $7);
+    if    ( 0 < $year && $year <   49) {$year += 2000}
+    elsif (50 < $year && $year < 1000) {$year += 1900}
+    my ($zone_sign, $zone_hour, $zone_minute) = $self->_zone_string_to_array ($zone);
+    eval '$self->{date_time} = timegm_nocheck 
+      ($second, $minute-($zone_sign*$zone_minute), $hour-($zone_sign*$zone_hour), 
+       $day, $month-1, $year);';
+    $self->{secfrac} = '';
     $self->{option}->{zone} = [$zone_sign, $zone_hour, $zone_minute];
   } else {
     $self->{date_time} = 0;
+    $self->{secfrac} = '';
   }
   $self;
+}
+
+=head2 $self->second_fraction ([$new_fraction])
+
+Returns or set the decimal fraction of a second.
+Value is a string containing of only [0-9]
+or empty string.
+
+=cut
+
+sub second_fraction ($;$) {
+  my $self = shift;
+  my $new_fraction = shift;
+  if (defined $new_fraction) {
+    $self->{secfrac} = $new_fraction unless $new_fraction =~ /[^0-9]/;
+  }
+  $self->{secfrac};
 }
 
 =head2 $self->stringify ()
@@ -167,22 +230,58 @@ Returns C<field-body> as a string.
 
 =cut
 
-sub stringify ($) {
+sub stringify ($;%) {
   my $self = shift;
-  #} else { #if ($self->{option}->{format} eq 'rfc2822') {
-    $self->as_rfc2822_time ();
-  #}
+  my %option = @_;
+  $option{format} ||= $self->{option}->{format} || $DEFAULT{format};
+  if ($option{format} eq 'iso8601') {
+    $self->as_iso8601_time (%option);
+  } elsif ($option{format} eq 'http') {
+    $self->as_http_time (%option);
+  } elsif ($option{format} eq 'unix') {
+    $self->as_unix_time (%option);
+  } else { #if ($option{format} eq 'rfc2822') {
+    $self->as_rfc2822_time (%option);
+  }
 }
 
-sub as_plain_string ($) {
+sub as_plain_string ($;%) {
   my $self = shift;
   $self->stringify (@_);
 }
 
-sub as_unix_time ($) {
+=head2 $self->as_unix_time ([%options])
+
+Returns date-time value as the unixtime format
+(seconds counted from the Epoch, 1970-01-01 00:00:00).
+
+=cut
+
+sub as_unix_time ($;%) {
   my $self = shift;
   $self->{date_time};
 }
+
+=head2 $self->as_rfc2822_time ([%options])
+
+Returns C<date-time> value as RFC 2822 format.
+(It is also known as RFC 822 format modified by RFC 1123)
+
+Option C<output_day_of_week> enables to output
+C<day-of-week> string.  (Default C<+1>)
+
+If option C<output_zone_string> > 0, use timezone
+name C<GMT> instead of numeric representation.
+This option is intended to be used for C<HTTP-date>
+with option C<zone>.  (Default C<-1>)
+
+Option C<zone> specifies output time zone with
+RFC 2822 numeric representation such as C<+0000>.
+Unless this option, time zone of input data 
+(when C<parsed> method is used) or default value
+C<+0000> is used.
+
+=cut
 
 sub as_rfc2822_time ($;%) {
   my $self = shift;
@@ -192,8 +291,12 @@ sub as_rfc2822_time ($;%) {
   if (ref $option{zone}) {@zone = @{$option{zone}}}
   elsif ($option{zone}) {@zone = $self->_zone_string_to_array ($option{zone})}
   elsif (ref $self->{option}->{zone}) {@zone = @{$self->{option}->{zone}}}
-  elsif ($self->{option}->{zone}) {@zone = $self->{option}->_zone_string_to_array ($self->{option}->{zone})}
-  $option{output_day_of_week} ||= $DEFAULT{output_day_of_week};
+  elsif ($self->{option}->{zone}) 
+    {@zone = $self->{option}->_zone_string_to_array ($self->{option}->{zone})}
+  $option{output_day_of_week} ||= $self->{option}->{output_day_of_week} 
+                              || $DEFAULT{output_day_of_week};
+  $option{output_zone_string} ||= $self->{option}->{output_zone_string} 
+                              || $DEFAULT{output_zone_string};
   
   $time += $zone[0] * ($zone[1] * 60 + $zone[2]) * 60;
   my ($sec,$min,$hour,$day,$month,$year,$day_of_week) = gmtime ($time);
@@ -201,9 +304,69 @@ sub as_rfc2822_time ($;%) {
   $year += 1900 if $year < 1900;
   $day_of_week = (qw(Sun Mon Tue Wed Thr Fri Sat))[$day_of_week] .', ';
   
-  ($option{output_day_of_week}? $day_of_week: '').
-  sprintf('%02d %s %s %02d:%02d:%02d %s%02d%02d',
-   $day,$month,$year,$hour,$min,$sec,$zone[0]>0?'+':'-',@zone[1,2]);
+  ($option{output_day_of_week}>0? $day_of_week: '').
+  sprintf('%02d %s %s %02d:%02d:%02d %s',
+   $day,$month,$year,$hour,$min,$sec,
+   ($option{output_zone_string}>0 && $zone[0]>0 && $zone[1]+$zone[2]==0? 
+    'GMT': sprintf('%s%02d%02d',$zone[0]>0?'+':'-',@zone[1,2]))
+  );
+}
+
+=head2 $self->as_http_time ([%options])
+
+Returns C<date-time> value as HTTP preferred format.
+This method is same as 
+C<$self->as_rfc2822_time (output_zone_string => 1, zone => '+0000')>.
+
+=cut
+
+sub as_http_time ($;%) {
+  my $self = shift;
+  my %option = @_;
+  $option{output_zone_string} = 1;
+  $option{zone} = [+1, 0, 0];
+  $self->as_rfc2822_time (%option);
+}
+
+=head2 $self->as_iso8601_time ([%options])
+
+Returns C<date-time> value as ISO 8601 format.
+
+If option C<output_zone_string> > 0, use timezone
+name C<Z> instead of numeric representation.
+This option is intended to be used for C<HTTP-date>
+with option C<zone>.  (Default C<-1>)
+
+Option C<zone> specifies output time zone with
+RFC 2822 numeric representation such as C<+0000>.
+Unless this option, time zone of input data 
+(when C<parsed> method is used) or default value
+C<+0000> is used.
+
+=cut
+
+sub as_iso8601_time ($;%) {
+  my $self = shift;
+  my %option = @_;
+  my $time = $self->{date_time};
+  $option{output_zone_string} ||= $self->{option}->{output_zone_string} 
+                              || $DEFAULT{output_zone_string};
+  my @zone = [+1, 0, 0];
+  if (ref $option{zone}) {@zone = @{$option{zone}}}
+  elsif ($option{zone}) {@zone = $self->_zone_string_to_array ($option{zone})}
+  elsif (ref $self->{option}->{zone}) {@zone = @{$self->{option}->{zone}}}
+  elsif ($self->{option}->{zone}) {@zone = $self->{option}->_zone_string_to_array ($self->{option}->{zone})}
+  
+  $time += $zone[0] * ($zone[1] * 60 + $zone[2]) * 60;
+  my ($sec,$min,$hour,$day,$month,$year,$day_of_week) = gmtime ($time);
+  $year += 1900 if $year < 1900;
+  
+  sprintf('%04d-%02d-%02dT%02d:%02d:%02d%s%s',
+   $year,$month,$day,$hour,$min,$sec,
+   ($self->{secfrac}? '.'.$self->{secfrac}: ''),
+   ($option{output_zone_string}>0 && $zone[0]>0 && $zone[1]+$zone[2]==0? 
+    'Z': sprintf('%s%02d:%02d',$zone[0]>0?'+':'-',@zone[1,2]))
+  );
 }
 
 =head2 $self->delete_comment ($field_body)
@@ -240,13 +403,15 @@ sub _zone_string_to_array ($$;$) {
 
 =head1 EXAMPLE
 
-  use Message::Field::Structured;
+  use Message::Field::Date;
   
-  my $field_body = '"This is an example of <\"> (quotation mark)."
-                    (Comment within \q\u\o\t\e\d\-\p\a\i\r\(\s\))';
-  my $field = Message::Field::Structured->parse ($field_body);
+  my $field_body = '04 Feb 2002 00:12:33 CST';
+  my $field = Message::Field::Date->parse ($field_body);
   
-  print $field->as_plain_string;
+  print "Un*xtime:\t", $field->as_unix_time, "\n";
+  print "RFC 2822:\t", $field->as_rfc2822_time, "\n";
+  print "HTTP preferred:\t", $field->as_http_time, "\n";
+  print "ISO 8601:\t", $field->as_iso8601_time, "\n";
 
 =head1 LICENSE
 
