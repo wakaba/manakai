@@ -17,7 +17,7 @@ markup constructures.  (SuikaWiki is not "tiny"?  Oh, yes, I see:-))
 
 package SuikaWiki::Markup::XML;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload '""' => \&stringify,
              fallback => 1;
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXML_NCNameStartChar InXMLNCNameChar!;
@@ -68,6 +68,15 @@ sub new ($;%) {
   my $class = shift;
   my $self = bless {@_}, $class;
   $self->{type} ||= '#element';
+  if ($self->{qname}) {
+    ($self->{namespace_prefix}, $self->{local_name}) = $self->_ns_parse_qname ($self->{qname});
+    $self->{_qname} = $self->{qname};
+  }
+  if (defined $self->{namespace_prefix}) {
+    $self->{namespace_prefix} .= ':' if $self->{namespace_prefix}
+                                     && substr ($self->{namespace_prefix}, -1) ne ':';
+    $self->{ns}->{$self->{namespace_prefix}||''} = $self->{namespace_uri} if defined $self->{namespace_uri};
+  }
   for (qw/local_name value/) {
     if (ref $self->{$_}) {
       $self->{$_}->{parent} = $self;
@@ -77,6 +86,15 @@ sub new ($;%) {
   $self;
 }
 
+sub _ns_parse_qname ($$) {
+  shift;
+  my $qname = shift;
+  if ($qname =~ /:/) {
+    return split /:/, $qname, 2;
+  } else {
+    return (undef, $qname);
+  }
+}
 
 =item $x->append_node ($node)
 
@@ -210,6 +228,12 @@ Returns or set the local-name.
 
 Returns or set namespace name (URI) of the element or the attribute
 
+=item $uri = $x->namespace_prefix ([$new_prefix])
+
+Returns or set namespace prefix of the element or the attribute.
+You may give C<$new_prefix> in form either 'foo' or 'foo:'.
+To indicate "default" prefix, use '' (length == 0 string).
+
 =item $type = $x->node_type
 
 Returns the node type.
@@ -250,6 +274,15 @@ sub namespace_uri ($;$) {
     $self->{namespace_uri} = $new_uri;
   }
   $self->{namespace_uri};
+}
+sub namespace_prefix ($;$) {
+  my ($self, $new_pfx) = @_;
+  if (defined $new_pfx && $self->{namespace_uri}) {
+    $new_pfx .= ':' if $new_pfx;
+    $self->{namespace_prefix} = $new_pfx;
+    $self->{ns}->{$new_pfx} = $self->{namespace_uri};
+  }
+  $self->_get_namespace_prefix ($self->{namespace_uri});
 }
 
 =item $i = $x->count
@@ -555,7 +588,13 @@ sub attribute_value ($;%) {
   my $self = shift;
   my %o = @_;
   if ($self->{type} eq '#attribute' && $self->_check_ncname ($self->{local_name})) {
-    my $r = '"' . $self->_entitize ($self->{value}, percent => $o{escape_percent});
+    my $r = '"';
+    if (ref ($self->{value}) && $self->{value}->_CLASS_NAME eq $self->_CLASS_NAME) {
+      unshift @{$self->{node}}, $self->{value};
+      undef $self->{value};
+    } else {
+      $r .= $self->_entitize ($self->{value});
+    }
     for (@{$self->{node}}) {
       my $nt = $_->node_type;
       if ($nt eq '#reference' || $nt eq '#xml') {
@@ -915,7 +954,13 @@ Available options: C<output_ref_as_is>.
 sub inner_text ($;%) {
   my $self = shift;
   my %o = @_;
-  my $r = $self->{value};
+  my $r = '';
+  if (ref ($self->{value}) && $self->{value}->_CLASS_NAME eq $self->_CLASS_NAME) {
+    unshift @{$self->{node}}, $self->{value};
+    undef $self->{value};
+  } else {
+    $r = $self->{value};
+  }
   if ($o{output_ref_as_is}) {	## output as if RCDATA
     $r =~ s/&/&amp;/g;
     for my $node (@{$self->{node}}) {
@@ -936,6 +981,10 @@ sub inner_text ($;%) {
 
 {no warnings;	# prototype mismatch
 *stringify = \&outer_xml;
+}
+
+sub _CLASS_NAME ($) {
+  'SuikaWiki::Markup::XML';
 }
 
 # $s = $x->_entitize ($s)
@@ -1091,4 +1140,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/05/24 04:52:19 $
+1; # $Date: 2003/05/25 10:55:14 $
