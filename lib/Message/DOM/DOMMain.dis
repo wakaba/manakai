@@ -18,7 +18,7 @@ Module:
   @Package:
     @@Type:
       lang:Perl
-    @@@: DOMMain
+    @@@: __CLASS{DOMMain}__
   
   @Description:
     @@lang:en
@@ -29,7 +29,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/08/21 05:42:50 $
+     $Date: 2004/08/22 07:44:24 $
   @Require:
     @@Module:
       @@@Def:
@@ -264,21 +264,27 @@ IF:
       @@@Def:
         @@@@Type:
           lang:Perl
-        @@@@preprocess: none
         @@@@@:
-          bless [@org::w3c::dom::DOMImplementationSourceList], shift;
+          $r = bless [@org::w3c::dom::DOMImplementationSourceList], $self;
   @Method:
      @@Name:  getDOMImplementation
      @@Param:
         @@@Name:  features
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The desired features that must be implemented.
      @@Return:
        @@@Type:  DOMImplementation
        @@@Description:
          @@@@lang:en
          @@@@@:
-           The first implementation that has the derired features,
-           or null if none is found.
+           The first implementation that has the derired features.
+       @@@Result:
+         @@@@Value: null
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@: No implementation found.
        @@@Def:
          @@@@Type:
            lang:Perl
@@ -321,6 +327,13 @@ IF:
         @@@@lang:en
         @@@@@: The DOMImplementationSource to be registered.
     @@Return:
+      @@@Exception:
+        @@@@Type:
+          ManakaiDOM:ManakaiDOMImplementationException
+        @@@@Name: PARAM_NULL_POINTER
+        @@@@Description:
+          @@@@lang:en
+          @@@@@: Given parameter is null.
       @@@Def:
         @@@@Type:
           lang:Perl

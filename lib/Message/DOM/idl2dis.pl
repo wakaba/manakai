@@ -175,20 +175,20 @@ sub raises ($$$) {
   my ($s, $n, $nm) = @_;
   $$s =~ /\G\(/gc;
   fws $s;
-  my $p = $n->get_attribute ($nm, make_new_node => 1)
-            ->get_attribute_value ('Exception', default => []);
+  my $p = $n->get_attribute ($nm, make_new_node => 1);
   while ($$s =~ /\G($NAME)/gc) {
     my $name = $1;
     $name =~ s/::/:/g;
     if ($name =~ /^([^:]+):/) {
       register_required_module (Name => $1);
     }
-    push @$p, $name;
+    $p->append_new_node (type => '#element',
+                         local_name => 'Exception')
+      ->set_attribute (Type => $name);
     fws $s;
     $$s =~ /\G,/gc;
     fws $s;
   }
-  $n->get_attribute ($nm)->set_attribute (Exception => $p);
   $$s =~ /\G\)/gc;
   return 1;
 }
@@ -247,7 +247,7 @@ for my $module ($tree->append_new_node (type => '#element',
   $module->set_attribute (Name => q<## TBD ##>);
   $module->set_attribute (Namespace => q<:: TBD ::>);
   $module->set_attribute (License => q<license:Perl>);
-  $module->set_attribute ('Date.RCS' => q<$Date: 2004/08/21 05:42:50 $>);
+  $module->set_attribute ('Date.RCS' => q<$Date: 2004/08/22 07:44:24 $>);
 }
 
 fws $s;

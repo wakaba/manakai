@@ -1,4 +1,23 @@
 #!/usr/bin/perl -w 
+
+=head1 NAME
+
+dis2pm.pl - Manakai DOM Perl Module Generator
+
+=head1 SYNOPSIS
+
+  perl dis2pm.pl Foo.dis > Foo.pm
+
+=head1 DESCRIPTION
+
+B<dis2pm> generates a Perl module file (*.pm) that implements
+DOM (Document Object Model) interfaces from a "dis" 
+(DOM implementation source) file.
+
+This script is part of manakai.
+
+=cut
+
 use strict;
 use Message::Markup::SuikaWikiConfig20::Parser;
 use Message::Markup::XML::QName qw/DEFAULT_PFX/;
@@ -6,6 +25,7 @@ use Message::Util::QName::General [qw/ExpandedURI/], {
   lang => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#>,
   license => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/license#>,
 };
+my $ManakaiDOMModulePrefix = q<Message::DOM>;
 
 my $s;
 {
@@ -14,7 +34,7 @@ my $s;
 }
 my $source = Message::Markup::SuikaWikiConfig20::Parser->parse_text ($s);
 my $Info = {};
-my $Status = {package => 'main', depth => 0};
+my $Status = {package => 'main', depth => 0, generated_fragment => 0};
 my $result = '';
 
 ## Source file might be broken
@@ -60,10 +80,10 @@ sub perl_internal_name ($) {
 sub perl_package_name (%) {
   my %opt = @_;
   if ($opt{if}) {
-    return q<Message::Markup::XML::DOM::IF::> . $opt{if};
+    return $ManakaiDOMModulePrefix . q<::IF::> . $opt{if};
   } else {
     $opt{name} = $opt{prefix} . '::' . $opt{name} if $opt{prefix};
-    return $opt{full_name} || q<Message::Markup::XML::DOM::> . $opt{name};
+    return $opt{full_name} || $ManakaiDOMModulePrefix . q<::> . $opt{name};
   }
 }
 
@@ -143,6 +163,15 @@ sub perl_code ($) {
 }
 }
 
+sub perl_code_source ($%) {
+  my ($s, %opt) = @_;
+  sprintf qq<#line %d "File <%s> Node <%s>"\n%s\n> .
+          qq<#line 1 "File <%s> Generated fragment #%d"\n>,
+    $opt{line} || 1, $opt{file} || $Info->{source_filename},
+    $opt{path} || 'x:unknown ()', $s, 
+    $opt{file} || $Info->{source_filename}, ++$Status->{generated_fragment};
+}
+
 sub perl_literal ($) {
   my $s = shift;
   if (ref $s eq 'ARRAY') {
@@ -177,6 +206,10 @@ sub perl_exception (@) {
                             -type => $opt{type}) . ', ' . $opt{param};
 }
 
+
+sub pod_comment (@) {
+  (q<=begin comment>, @_, q<=end comment>);
+}
 
 sub pod_block (@) {
   my @v = grep ((defined and length), @_);
@@ -220,6 +253,7 @@ sub pod_code ($) {
   }
 }
 
+
 sub section (@) {
   my @r;
   while (my ($t, $s) = splice @_, 0, 2) {
@@ -244,6 +278,15 @@ sub version_date ($) {
           $time[5] + 1900, $time[4] + 1, @time[3,2,1];
 }
 
+sub type_label ($) {
+  my $uri = shift;
+  if ($uri =~ /([\w_-]+)$/) {
+    return $1;
+  } else {
+    return "<$uri>";
+  }
+}
+
 sub expanded_uri ($) {
   my $lname = shift || '';
   my $pfx = '#default';
@@ -256,6 +299,7 @@ sub expanded_uri ($) {
     valid_err qq<Namespace "$pfx" not declared>;
   }
 }
+
 
 sub get_perl_definition_node ($%) {
   my ($node, %opt) = @_;
@@ -308,6 +352,7 @@ sub get_level_description ($%) {
   $r;
 }
 
+
 sub register_namespace_declaration ($) {
   my $node = shift;
   for (@{$node->child_nodes}) {
@@ -320,7 +365,51 @@ sub register_namespace_declaration ($) {
   }
 }
 
+=head1 SOURCE FORMAT
 
+"Dis" (DOM implementation source) file is written in
+SuikaWikiConfig/2.0 text format.
+
+=head2 IF element
+
+C<IF> element defines a DOM interface with its descriptions
+and implementations.
+
+Children elements:
+
+=over 4
+
+=item IF/Name = name (1 - 1)
+
+Interface name.  It should be taken from DOM specification.
+
+=item IF/Description = text (0 - infinite)
+
+Description for the interface.
+
+=item IF/ISA[list] = list of names (0 - 1)
+
+Names of interfaces that this interface inherits.
+
+=item IF/Method, IF/IntMethod, IF/ReMethod
+
+Method definition.
+
+=item IF/Attr, IF/IntAttr, IF/ReAttr
+
+Attribute definition.
+
+=item IF/ConstGroup
+
+Constant value group definition.
+
+=item IF/Const
+
+Constant value definition.
+
+=back
+
+=cut
 
 sub if2perl ($) {
   my $node = shift;
@@ -364,11 +453,48 @@ sub if2perl ($) {
   $result;
 }
 
-## DOM method definition -> Perl code
+=head2 Method, IntMethod and ReMethod elements
+
+C<Method>, C<IntMethod> and C<ReMethod> element defines a method.
+Methods defined by C<Method> are ones as defined in the DOM
+specification.  Methods defined by C<IntMethod> are only for
+internal use and usually not defined by the specifications.
+Methods defined by C<ReMethod> do actually not belong
+to this interface but to ancestor interface in the specification
+but overriddenly re-defined for this type of descendant interfaces
+(for example, some methods defined in Node interface of the DOM
+Core Module are re-defined in Element, Attr or other node-type
+interfaces, since those methods work differently by type of
+the node).
+
+Children elements:
+
+=over 4
+
+=item Name = name (1 - 1)
+
+Method name.  It should be taken from DOM specification
+if element type is C<Method> or C<ReMethod>.  Method name
+for C<ReMethod> must be used as the name of the C<Method>
+defined in ancestor interface.  Method name for C<IntMethod>
+must be different with any other C<Method>, C<IntMethod>
+or C<ReMethod> (including those defined by ancestor interfaces).
+
+=item Description = text (0 - infinite)
+
+Description for the method.
+
+=back
+
+=cut
+
 sub method2perl ($) {
   my $node = shift;
   local $Status->{depth} = $Status->{depth} + 1;
   my $m_name = $node->get_attribute_value ('Name');
+  if ($node->local_name eq 'IntMethod') {
+    $m_name = perl_internal_name $m_name;
+  }
   local $Status->{Method} = $m_name;
   my $result = '';
   my $level = get_level_description $node;
@@ -387,8 +513,9 @@ sub method2perl ($) {
       }
     }
   }
-  my $has_return = $node->get_attribute ('Return') ? 1 : 0;
   
+  my $return = $node->get_attribute ('Return', make_new_node => 1);
+  my $has_return = $return->get_attribute_value ('Type', default => 0) ? 1 : 0;
   push my @desc,
                pod_head ($Status->{depth}, 'Method ' . 
                          pod_code (($has_return ? '$return = ' : '') .
@@ -409,20 +536,43 @@ sub method2perl ($) {
   }
 
   my @return;
-  my $return = $node->get_attribute ('Return', make_new_node => 1);
-
   my $code_node = get_perl_definition_node $return;
   my $code = '';
   if ($code_node) {
-    $code = perl_code $code_node->value;
+    $code = perl_code_source (perl_code ($code_node->value),
+                              path => $code_node->node_path (key => 'Name'));
     $code = perl_statement (perl_assign 'my $r' => perl_literal '') .
-            $code . 
+            $code .
             perl_statement ('$r')
       if $has_return;
     $code = perl_statement (perl_assign 'my (' .
                                         join (', ', '$self', @param_list) .
                                         ')' => '@_') .
             $code;
+
+    if ($has_return) {
+      push @return, pod_item ('Returned Value: ' .
+                              type_label expanded_uri
+                                           $return->get_attribute_value
+                                                      ('Type', default => '')),
+                    pod_para (get_description $return);
+    }
+    for (@{$return->child_nodes}) {
+      next unless $_->local_name eq 'Result';
+      my $label = $_->get_attribute_value ('Label', default => '');
+      unless (length $label) {
+        $label = $_->get_attribute_value ('Value', default => '');
+        if (length $label) {
+          $label = pod_code $label;
+        } else {
+          $label = type_label expanded_uri $_->get_attribute_value
+                                                 ('Type', default => '');
+        }
+      }
+      push @return, pod_item ('Returned Value: ' . $label),
+                    pod_para (get_description $_);
+      $has_return++;
+    }
   } else {
     $code = perl_exception
               level => 'EXCEPTION',
@@ -438,26 +588,31 @@ sub method2perl ($) {
                   pod_para ('Call of this method allways result in
                              this exception raisen, since this
                              method is not implemented yet.');
+    $has_return = 1;
   }
   if (@return) {
     if ($has_return) {
-      push @desc, pod_para q<This method results in > . 
-                           (@return == 1 ? q<the value:>
-                                         : q<either:>);
+      push @desc, pod_para q<This method results in > .
+                           ($has_return == 1 ? q<the value:>
+                                             : q<either:>);
     } else {
       push @desc, pod_para q<This method does not return value,
                              but it might raise > .
-                           (@return == 1 ? q<an exception:>
-                                         : q<one of exceptions from:>);
+                           ($has_return == 1 ? q<an exception:>
+                                             : q<one of exceptions from:>);
     }
     push @desc, pod_list 4, @return;
   } else {
-    push @desc, pod_para q<This method returns neither returned value
+    push @desc, pod_para q<This method results in neither value returned
                            nor exceptions.>;
   }
 
-  $result .= pod_block @desc;
-
+  if ($node->local_name eq 'IntMethod') {
+    $result .= pod_block pod_comment @desc;
+  } else {
+    $result .= pod_block @desc;
+  }
+  
   $result .= perl_sub name => $m_name,
                       prototype => $param_prototype,
                       code => $code;
@@ -495,14 +650,86 @@ sub req2perl ($) {
   }
 }
 
+=head2 Module element
+
+A "dis" file requires one (and only one) C<Module> top-level element.
+Other elements, such as C<Require>, may include C<Module> elements
+as their children.
+
+Children:
+
+=over 4
+
+=item Module/Name = name (0 - 1)
+
+The module name.  Usually DOM IDL module name is used.
+
+This attribute is required when C<Module> element is used as
+a top-level element.  It is optional if C<Module> is a child
+of other element.
+
+=item Module/Package = Type-dependent (0 - infinite)
+
+The module package name.  For example,
+
+  Module:
+    @Name: module1
+    @Package:
+      @@@: Module1
+      @@Type:
+        lang:Perl
+
+means that general module name is C<module1> and Perl-specific
+module name is C<Module1>.
+
+=item Module/Namespace = namespace (1 - 1)
+
+The namespace URI (an absolute URI with optional fragment identifier)
+that is assigned to this module.  Datatypes defined by this module
+(such as C<Type> or C<Interface>) are considered to belong to
+this namespace.
+
+In addition, the default namespace is binding to this namespace name
+(in other word, special namespace prefix C<#default> is associated
+with the URI reference).
+
+=item Module/FullName = text (0 - infinite)
+
+A human-readable module name.
+
+=item Module/Description = text (0 - infinite)
+
+A human-readable module description.
+
+=item Module/License = qname (1 - 1)
+
+A qname that identify the license term.
+
+=item Module/Date.RCS = <rcs date> (1 - 1)
+
+The last-modified date-time of this module,
+represented in RCS format (text C<Date:> with date and time, 
+enclosed by C<$>s).
+
+=item Module/Require (0 - infinite)
+
+A list of modules (DOM modules or other liburary modules)
+that is required by entire module.
+
+=back
+
+=cut
+
 ## Get general information
 $Info->{source_filename} = $ARGV;
 
 register_namespace_declaration ($source);
 
 my $Module = $source->get_attribute ('Module', make_new_node => 1);
-$Info->{Name} = get_perl_definition $Module, name => 'Package',
-                  default => $Module->get_attribute_value ('Name');
+$Info->{Name} = $Module->get_attribute_value ('Name')
+  or valid_err q<Module name (/Module/Name) MUST be specified>;
+$Info->{Package} = perl_code (get_perl_definition $Module, name => 'Package')
+                || perl_package_name name => $Info->{Name};
 $Info->{Namespace}->{(DEFAULT_PFX)}
   = $Module->get_attribute_value ('Namespace')
   or valid_err q<Module namespace URI (/Module/Namespace) MUST be specified>;
@@ -516,12 +743,12 @@ $result .= perl_comment q<This file is automatically generated from> . "\n" .
 $result .= perl_statement q<use strict>;
 
 local $Status->{depth} = $Status->{depth} + 1;
-$result .= perl_package name => $Info->{Name};
+$result .= perl_package full_name => $Info->{Package};
 $result .= perl_statement perl_assign 'our $VERSION' => version_date time;
 
 $result .= pod_block
              pod_head (1, 'NAME'),
-             pod_para (perl_package_name (name => $Info->{Name}) .
+             pod_para ($Info->{Package} .
                        ' - ' . get_description ($Module, name => 'FullName')),
              section (
                opt => pod_head (1, 'DESCRIPTION'),
@@ -560,3 +787,34 @@ $result .= pod_block @desc;
 $result .= perl_statement 1;
 
 print $result;
+
+
+__END__
+
+=head1 SEE ALSO
+
+W3C DOM Specifications <http://www.w3.org/DOM/DOMTR>
+
+SuikaWiki:DOM <http://suika.fam.cx/~wakaba/-temp/wiki/wiki?DOM>
+
+C<idl2dis.pl>: This script generates "dis" files,
+that can be used as a template for the DOM implementation,
+from DOM IDL files.
+
+=head1 LICENSE
+
+Copyright 2004 Wakaba <w@suika.fam.cx>.  All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+Note that copyright holder(s) of this script does not claim 
+any rights for materials outputed by this script, although it will
+contain some fragments from this script.  License terms for them should be 
+defined by the copyright holder of the source document.
+
+=cut
+
+# $Date: 2004/08/22 07:44:24 $
+
+
