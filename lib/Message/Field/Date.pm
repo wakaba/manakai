@@ -9,7 +9,7 @@ date-time used in Internet messages and so on
 package Message::Field::Date;
 use strict;
 use vars qw(%DEFAULT @ISA %MONTH %REG $VERSION %ZONE);
-$VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 use Time::Local 'timegm_nocheck';
@@ -584,6 +584,9 @@ Returns or set the decimal fraction of a second.
 Value is a string containing of only [0-9]
 or empty string.
 
+Note that this implemention is temporary and in the near future
+it can be changed.
+
 =cut
 
 sub second_fraction ($;$) {
@@ -761,7 +764,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/30 08:50:36 $
+$Date: 2002/08/01 06:42:38 $
 
 =cut
 

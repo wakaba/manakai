@@ -9,21 +9,13 @@ Message Structured Header Field Bodies
 package Message::Field::Structured;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.20 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 use overload '""' => sub { $_[0]->stringify },
              '.=' => sub { $_[0]->value_append ($_[1]) },
              #'eq' => sub { $_[0]->{field_body} eq $_[1] },
              #'ne' => sub { $_[0]->{field_body} ne $_[1] },
              fallback => 1;
-
-=head1 CONSTRUCTORS
-
-The following methods construct new C<Message::Field::Structured> objects:
-
-=over 4
-
-=cut
 
 ## Initialize of this class -- called by constructors
   %DEFAULT = (
@@ -64,12 +56,18 @@ sub _init ($;%) {
   for my $name (keys %options) {
     if (substr ($name, 0, 1) eq '-') {
       $self->{option}->{substr ($name, 1)} = $options{$name};
-    } elsif (lc $name eq 'body') {
+    } elsif ($name eq 'body') {
       $self->{field_body} = $options{$name};
     }
   }
   $self->{comment} = [];
 }
+
+=head1 CONSTRUCTORS
+
+The following methods construct new C<Message::Field::Unstructured> objects:
+
+=over 4
 
 =item Message::Field::Structured->new ([%options])
 
@@ -830,7 +828,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/21 03:25:00 $
+$Date: 2002/08/01 06:42:38 $
 
 =cut
 

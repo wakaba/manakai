@@ -11,7 +11,7 @@ use strict;
 require 5.6.0;
 use re 'eval';
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.20 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::MIME::Charset;
 require Message::Field::Structured;
@@ -493,7 +493,7 @@ sub stringify ($;%) {
           %e = &{$self->{option}->{hook_encode_string}}
             ($self, $value,
              charset => $item->{output_charset} || $option->{encoding_after_encode},
-             current_charset => $option->{header_default_charset}, 
+             current_charset => $option->{internal_charset}, 
              language => $item->{language},
              type => 'parameter/value');
         }
@@ -639,7 +639,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/22 02:42:17 $
+$Date: 2002/08/01 06:42:38 $
 
 =cut
 

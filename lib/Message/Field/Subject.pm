@@ -8,25 +8,73 @@ message header C<Subject:> field body
 
 package Message::Field::Subject;
 use strict;
-use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
-require Message::Util;
-require Message::Field::Unstructured;
-push @ISA, q(Message::Field::Unstructured);
-use overload '""' => sub {shift->stringify};
+use vars qw(%DEFAULT @ISA %REG $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+require Message::Field::Structured;
+push @ISA, q(Message::Field::Structured);
 
-*REG = \%Message::Util::REG;
-$REG{re} = qr/(?:[Rr][Ee]|[Ss][Vv])\^?\[?[0-9]*\]?[:>]/;
-$REG{fwd} = qr/[Ff][Ww][Dd]?:/;
-$REG{ml} = qr/[(\[][A-Za-z0-9._-]+[\x20:-][0-9]+[)\]]/;
-$REG{M_ml} = qr/[(\[]([A-Za-z0-9._-]+)[\x20:-]([0-9]+)[)\]]/;
-$REG{prefix} = qr/(?:$REG{re}|$REG{fwd}|$REG{ml})(?:$REG{FWS}(?:$REG{re}|$REG{fwd}|$REG{ml}))*/;
-$REG{M_control} = qr/^cmsg$REG{FWS}([\x00-\xFF]*)$/;
-$REG{M_was} = qr/\([Ww][Aa][Ss]:? ([\x00-\xFF]+)\)$REG{FWS}$/;
+%REG = %Message::Util::REG;
+	$REG{news_control} = qr/^cmsg$REG{WSP}+/;
+	$REG{prefix_fwd} = qr/(?i)Fwd?/;
+	$REG{prefix_list} = qr/[(\[][A-Za-z0-9._-]+[\x20:-]\d+[)\]]/;
+	$REG{M_prefix_list} = qr/[(\[]([A-Za-z0-9._-]+)[\x20:-](\d+)[)\]]/;
+	$REG{M_was_subject} = qr/\([Ww][Aa][Ss][:\x09\x20]$REG{FWS}(.+?)$REG{FWS}\)$REG{FWS}$/;
+	$REG{message_from_subject} = qr/^$REG{FWS}(?i)Message from \S+$REG{FWS}$/;
+	if (defined $^V) {
+	  $REG{prefix_re} = qr/(?i)Re|Sv|Odp
+	    |\x{8FD4}	## Hen
+	  /x;
+	  $REG{prefix_advertisement} = qr/
+	    (?i)ADV?:
+	    |[!\x{FF01}] $REG{FWS} \x{5E83}[\x{543F}\x{544A}] $REG{FWS} [!\x{FF01}]
+	    	## ! kou koku !
+	    |[!\x{FF01}] $REG{FWS} [\x{9023}\x{F99A}]\x{7D61}\x{65B9}\x{6CD5}\x{7121}\x{3057}? $REG{FWS} [!\x{FF01}]
+	    	## ! ren raku hou hou nashi !
+	    |\x{672A}\x{627F}\x{8AFE}\x{5E83}[\x{543F}\x{544A}][\x{203B}\x{0FBF}]
+	    	## mi shou daku kou koku *
+	  /x;
+	} else {
+	  $REG{prefix_re} = qr/(?i)Re|Sv/;
+	  $REG{prefix_advertisement} = qr/(?i)ADV?:/;
+	}
+	$REG{prefix_general} = qr/((?:$REG{prefix_re}|$REG{prefix_fwd})\^?[\[\(]?\d*[\]\)]?[:>]$REG{FWS})+/x;
+	$REG{prefix_general_list} = qr/($REG{prefix_general}|$REG{FWS}$REG{prefix_list}$REG{FWS})+/x;
+
+## Initialize of this class -- called by constructors
+%DEFAULT = (
+	-_MEMBERS	=> [qw/is list_count list_name news_control was_subject/],
+	-_METHODS	=> [qw/as_plain_string is list_count list_name news_control was_subject value value_type/],
+	#encoding_after_encode
+	#encoding_before_decode
+	-format_news_control	=> 'cmsg %s',
+	-format_prefix_fwd	=> 'Fwd: %s',
+	-format_prefix_re	=> 'Re: %s',
+	-format_was_subject	=> '%s (was: %s)',
+	#field_param_name
+	#field_name
+	#field_ns
+	#format
+	#header_default_charset
+	#header_default_charset_input
+	#hook_encode_string
+	#hook_decode_string
+	-output_general_prefix	=> 1,
+	-output_list_prefix	=> 1,
+	-output_news_control	=> 1,
+	-output_was_subject	=> 1,	## ["-"] 1*DIGIT
+	#parse_all
+	-parse_was_subject	=> 1,
+	-use_general_prefix	=> 1,
+	-use_list_prefix	=> 0,
+	-use_message_from_subject	=> 0,
+	-use_news_control	=> 1,
+	-use_was_subject	=> 1,
+	#value_type
+);
 
 =head1 CONSTRUCTORS
 
-The following methods construct new C<Message::Field::Subject> objects:
+The following methods construct new objects:
 
 =over 4
 
@@ -36,25 +84,14 @@ The following methods construct new C<Message::Field::Subject> objects:
 sub _init ($;%) {
   my $self = shift;
   my %options = @_;
-  my %DEFAULT = (
-    #encoding_after_encode	## Inherited
-    #encoding_before_decode	## Inherited
-    -format_adv	=> 'ADV: %s',
-    -format_fwd	=> 'Fwd: %s',
-    -format_re	=> 'Re: %s',
-    -format_was	=> '%s (was: %s)',
-    #hook_encode_string	## Inherited
-    #hook_decode_string	## Inherited
-    -prefix_cmsg	=> 'cmsg ',
-    -regex_adv	=> qr/(?i)ADV:/,
-    -regex_adv_check	=> qr/^ADV:/,
-    -remove_ml_prefix	=> 1,
-  );
   $self->SUPER::_init (%DEFAULT, %options);
   
-  unless ($self->{option}->{remove_ml_prefix}) {
-    $REG{prefix} = qr/(?:$REG{re}|$REG{fwd})(?:$REG{FWS}(?:$REG{re}|$REG{fwd}))*/;
-  }
+  #$self->{option}->{value_type}->{news_control} = ['Message::Field::UsenetControl',{}, [qw//]];
+  $self->{option}->{value_type}->{was_subject} = ['Message::Field::Subject',{},
+    [qw/format_news_control format_prefix_fwd format_prefix_re
+    format_was_subject output_general_prefix output_list_prefix
+    output_news_control output_was_subject parse_was_subject
+    use_general_prefix use_list_prefix use_news_control use_was_subject/]];
 }
 
 =item $subject = Message::Field::Subject->new ([%options])
@@ -76,38 +113,66 @@ given field body.  You might pass some options as parameters to the constructor.
 sub parse ($$;%) {
   my $class = shift;
   my $self = bless {}, $class;
-  my $field_body = shift;
+  my $body = shift;
   $self->_init (@_);
-  if ($field_body =~ /$REG{M_control}/) {
-    $self->{is_control} = 1;	## Obsoleted control message
-    $self->{field_body} = $1;	## TODO: passes to Message::Field::Control
+  my $option = $self->{option};
+  if ($option->{use_news_control} && $body =~ s/$REG{news_control}//) {
+    $self->{news_control} = $body;
     return $self;
   }
-  my %s = &{$self->{option}->{hook_decode_string}} ($self, $field_body,
-    type => 'text'); $field_body = $s{value};
-  $field_body =~ s{^$REG{FWS}($REG{prefix})$REG{FWS}}{
-    my $prefix = $1;
-    $self->{is_reply} = 1 if $prefix =~ /$REG{re}/;
-    $self->{is_foward} = 1 if $prefix =~ /$REG{fwd}/;
-    if ($prefix =~ /$REG{M_ml}/) {
-      ($self->{ml_name}, $self->{ml_count}) = ($1, $2);
+  my $value = '';
+    my %s = &{$self->{option}->{hook_decode_string}} ($self,
+      $body,
+      type => 'text',
+      charset	=> $option->{encoding_before_decode},
+    );
+    if ($s{charset}) {	## Convertion failed
+      $self->{_charset} = $s{charset};
+      $self->{value} = $s{value};
+      return $self;
+    } elsif (!$s{success}) {
+      $self->{_charset} = $self->{option}->{header_default_charset_input};
+      $self->{value} = $s{value};
+      return $self;
     }
-    ''
-  }ex;
-  $self->{is_adv} = 1 if $field_body =~ /$self->{option}->{regex_adv}/;
-  $field_body =~ s{$REG{FWS}$REG{M_was}}{
+    $value = $s{value};
+  #if (!$option->{parse_all}) {
+  #  $self->{value} = $value;
+  #  return $self;
+  #}
+  if ($option->{use_general_prefix}) {
+    if ($option->{use_list_prefix} && $value =~ s/^($REG{prefix_general_list})//x) {
+      my $prefix = $1;
+      $self->{is}->{reply} = 1 if $prefix =~ /$REG{prefix_re}/x;
+      $self->{is}->{foward} = 1 if $prefix =~ /$REG{prefix_fwd}/x;
+      ($self->{list_name}, $self->{list_count}) = ($1, $2)
+        if $prefix =~ /$REG{M_prefix_list}/x;
+    } elsif ($value =~ s/^($REG{prefix_general})//x) {
+      my $prefix = $1;
+      $self->{is}->{reply} = 1 if $prefix =~ /$REG{prefix_re}/x;
+      $self->{is}->{foward} = 1 if $prefix =~ /$REG{prefix_fwd}/x;
+    }
+  } elsif ($option->{use_list_prefix} && $value =~ s/^$REG{FWS}$REG{M_prefix_list}(?:$REG{FWS}$REG{prefix_list})*$REG{FWS}//x) {
+    ($self->{list_name}, $self->{list_count}) = ($1, $2);
+  }
+  if ($option->{use_was_subject} && $value =~ s/$REG{M_was_subject}//) {
     my $was = $1;
-    if ($self->{option}->{parse_was}) {
-      $self->{was} = Message::Field::Subject->parse ($was);
-      $self->{was}->{option} = {%{$self->{option}}};
-      	## WARNING: this does not support the cases that some of option
-      	## values are reference to something.
+    if ($option->{parse_was_subject}) {
+      my %option;
+      for (keys %$option) {
+        $option{ '-'.$_ } = Message::Util::make_clone ($option->{ $_ });
+      }
+      $self->{was_subject} = ref ($self)->parse ($was, 
+        -hook_decode_string => sub { shift; (value => shift, @_) },
+        %option);
     } else {
-      $self->{was} = $was;
+      $self->{was_subject} = $was;
     }
-    ''
-  }ex;
-  $self->{field_body} = $field_body;
+  }
+  if ($option->{use_message_from_subject} && $value =~ s/$REG{message_from_subject}//) {
+    $self->{is}->{message_from_subject} = 1;
+  }
+  $self->{value} = $value;
   $self;
 }
 
@@ -117,6 +182,20 @@ sub parse ($$;%) {
 
 =over 4
 
+=cut
+
+sub value ($;$) {
+  my $self = shift;
+  my $v = shift;
+  if (defined $v) {
+    $self->{value} = $v;
+  }
+  $self->{value};
+}
+
+sub list_name ($) { $_[0]->{list_name} }
+sub list_count ($) { $_[0]->{list_count} }
+
 =item $body = $subject->stringify
 
 Retruns subject field body as string.  String is encoded
@@ -125,31 +204,44 @@ for message if necessary.
 =cut
 
 sub stringify ($;%) {
-  my $self = shift;  my %o = @_;
-  my %option = %{$self->{option}};
+  my $self = shift;
+  my %o = @_; my %option = %{$self->{option}};
   for (grep {/^-/} keys %o) {$option{substr ($_, 1)} = $o{$_}}
-  if ($self->{is_control}) {
-    my $s = $self->{field_body};
-    $s = $option{prefix_cmsg}.$s if $s;
-    return $s;
+  if ($option{use_news_control} && $option{output_news_control}
+      && $self->{news_control}) {
+    my $c = $self->{news_control};
+    return '' unless length $c;
+    return sprintf $option{format_news_control}, $c;
   }
-  my %e = (value => $self->{field_body});
-  my $was = (ref $self->{was}? $self->{was}->as_plain_string: $self->{was});
-  if ($self->{is_reply}) {
-    $e{value} = sprintf $option{format_re}, $e{value};
+  if ($self->{_charset}) {
+    return $self->{value};
+  } else {
+    my $value = $self->{value};
+    if ($option{use_general_prefix} && $option{output_general_prefix}) {
+      $value = sprintf $option{format_prefix_re}, $value if $self->{is}->{reply};
+      $value = sprintf $option{format_prefix_fwd}, $value if $self->{is}->{foward};
+    }
+    if ($option{use_was_subject} && $option{output_was_subject} > 0) {
+      my $was;
+      if (ref $self->{was_subject}) {
+        my %opt = @_;
+        $opt{-output_was_subject} = $opt{output_was_subject}
+          unless defined $opt{-output_was_subject};
+        $opt{-output_was_subject}--;
+        $was = $self->{was_subject}->as_plain_string (%opt);
+      } elsif (length $self->{was_subject}) {
+        $was = $self->{was_subject};
+      }
+      $value = sprintf $option{format_was_subject}, $value, $was if defined $was;
+    }
+      my (%e) = &{$option{hook_encode_string}} ($self,
+        $value,
+        charset => $option{encoding_after_encode},
+        current_charset => $option{internal_charset},
+        type => 'text',
+      );
+      return $e{value};
   }
-  if ($self->{is_foward}) {
-    $e{value} = sprintf $option{format_fwd}, $e{value};
-  }
-  if (length $was) {
-    $e{value} = sprintf $option{format_was}, $e{value} => $was;
-  }
-  if ($self->{is_adv}
-   && $self->{field_body} !~ /$option{regex_adv_check}/) {
-    $e{value} = sprintf $option{format_adv}, $e{value};
-  }
-  %e = &{$option{hook_encode_string}} ($self, $e{value}, type => 'text');
-  $e{value};
 }
 *as_string = \&stringify;
 
@@ -163,49 +255,13 @@ in internal code).
 
 sub as_plain_string ($;%) {
   my $self = shift;
-  $self->stringify (-hook_encode_string => sub {shift; (value => shift, @_)}, @_);
+  $self->stringify (
+    -hook_encode_string => sub { shift; (value => shift, @_) },
+    @_,
+  );
 }
 
-=item $text = $subject->text ([$new-text])
 
-Returns or set subject text (without prefixes such as "Re: ").
-
-=item $text = $subject->value
-
-An alias for C<text> method.
-
-=cut
-
-sub value ($$;$) {
-  my $self = shift;
-  my $ns = shift;
-  if (defined $ns) {
-    $self->{field_body} = $ns;
-  }
-  $self->{field_body};
-}
-*text = \&value;
-
-=item $subject->change ($new-subject)
-
-Changes subject to new text.  Current subject is
-moved to I<was: >, and current I<was: > subject, if any,
-is removed.
-
-=cut
-
-sub change ($$;%) {
-  my $self = shift;
-  my $new_string = shift;
-  my %option = @_;  $option{-no_was} = 1 unless defined $option{-no_was};
-  $self->{was} = $self->clone (%option);
-  $self->{field_body} = $new_string;
-  $self->{is_adv} = 0;
-  $self->{is_control} = 0;
-  $self->{is_foward} = 0;
-  $self->{is_reply} = 0;
-  $self;
-}
 
 =item $bool = $subject->is ($attribute [=> $bool])
 
@@ -223,31 +279,36 @@ Example:
 sub is ($@) {
   my $self = shift;
   if (@_ == 1) {
-    return $self->{ 'is_' . $_[0] };
+    my $query = shift;
+    if ($query eq 'advertisement') {
+      return $self->{value} =~ /$REG{prefix_advertisement}/x? 1:0;
+    } else {
+      return $self->{is}->{ $_[0] };
+    }
   }
   while (my ($name, $value) = splice (@_, 0, 2)) {
-    $self->{ 'is_' . $name } = $value;
+    $self->{is}->{ $name } = $value;
   }
 }
 
-=item $old_subject = $subject->was
+=item $old_subject = $subject->was_subject
 
 Returns I<was: > subject.
 
 =cut
 
-sub was ($) {
+sub was_subject ($) {
   my $self = shift;
-  if (ref $self->{was}) {
-    #
-  } elsif ($self->{was}) {
-    $self->{was} = Message::Field::Subject->parse ($self->{was});
-    $self->{was}->{option} = {%{$self->{option}}};
-  } else {
-    $self->{was} = new Message::Field::Subject;
-    $self->{was}->{option} = {%{$self->{option}}};
-  }
-  $self->{was};
+  $self->{was_subject} = $self->_parse_all (was => $self->{was_subject})
+    if $self->{option}->{parse_all};
+  $self->{was_subject};
+}
+
+sub news_control ($) {
+  my $self = shift;
+  $self->{news_control} = $self->_parse_all (was => $self->{news_control})
+    if $self->{option}->{parse_all};
+  $self->{news_control};
 }
 
 =item $clone = $subject->clone ()
@@ -256,27 +317,7 @@ Returns a copy of the object.
 
 =cut
 
-sub clone ($;%) {
-  my $self = shift;  my %option = @_;
-  my $clone = $self->SUPER::clone;
-  for (grep {/^is_/} keys %{$self}) {
-    $clone->{$_} = $self->{$_};
-  }
-  if (!$option{-no_was} && $self->{was}) {
-    if (ref $self->{was}) {
-      $clone->{was} = $self->{was}->clone;
-    } else {
-      $clone->{was} = $self->{was};
-    }
-  }
-  $clone;
-}
-
-=head1 EXAMPLE
-
-  my $subject = parse Message::Field::Subject 'Re: cool message';
-  $subject->change (q{What's "cool"?});
-  print $subject;	# What's "cool"? (was: Re: cool message)
+## Inherited
 
 =head1 LICENSE
 
@@ -300,7 +341,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/17 00:33:29 $
+$Date: 2002/08/01 06:42:38 $
 
 =cut
 

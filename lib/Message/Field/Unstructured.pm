@@ -8,34 +8,46 @@ unstructured header field bodies of the Internet message
 
 package Message::Field::Unstructured;
 use strict;
-use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use vars qw(%DEFAULT $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 use overload '""' => sub { $_[0]->stringify },
              '.=' => sub { $_[0]->value_append ($_[1]) },
-             'eq' => sub { $_[0]->{field_body} eq $_[1] },
-             'ne' => sub { $_[0]->{field_body} ne $_[1] },
+             #'eq' => sub { $_[0]->{field_body} eq $_[1] },
+             #'ne' => sub { $_[0]->{field_body} ne $_[1] },
              fallback => 1;
 
+
 ## Initialize of this class -- called by constructors
-sub _init ($;%) {
-  my $self = shift;
-  my %options = @_;
-  $self->{option} = Message::Util::make_clone ({
+  %DEFAULT = (
+    _METHODS	=> [qw|value value_append|],
+    _MEMBERS	=> [qw|_charset|],
     encoding_after_encode	=> '*default',
     encoding_before_decode	=> '*default',
+    field_param_name	=> '',
+    field_name	=> 'x-structured',
+    #field_ns	=> '',
+    format	=> 'mail-rfc2822',
+    ## MIME charset name of '*default' charset
+      header_default_charset	=> 'iso-2022-int-1',
+      header_default_charset_input	=> 'iso-2022-int-1',
     hook_encode_string	=> #sub {shift; (value => shift, @_)},
     	\&Message::Util::encode_header_string,
     hook_decode_string	=> #sub {shift; (value => shift, @_)},
     	\&Message::Util::decode_header_string,
-  });
-  $self->{field_body} = '';
+    internal_charset_name	=> 'utf-8',
+  );
+sub _init ($;%) {
+  my $self = shift;
+  my %options = @_;
+  $self->{option} = Message::Util::make_clone (\%DEFAULT);
+  $self->{value} = '';
   
   for my $name (keys %options) {
     if (substr ($name, 0, 1) eq '-') {
       $self->{option}->{substr ($name, 1)} = $options{$name};
-    } elsif (lc $name eq 'body') {
-      $self->{field_body} = $options{$name};
+    } elsif ($name eq 'body') {
+      $self->{value} = $options{$name};
     }
   }
 }
@@ -75,9 +87,17 @@ sub parse ($$;%) {
   my $field_body = shift;
   my $self = bless {}, $class;
   $self->_init (@_);
-  my %s = &{$self->{option}->{hook_decode_string}} ($self, $field_body,
-            type => 'text');
-  $self->{field_body} = $s{value};
+  my %s = &{$self->{option}->{hook_decode_string}} ($self,
+    $field_body,
+    type => 'text',
+    charset	=> $option->{encoding_before_decode},
+  );
+  if ($s{charset}) {	## Convertion failed
+    $self->{_charset} = $s{charset};
+  } elsif (!$s{success}) {
+    $self->{_charset} = $self->{option}->{header_default_charset_input};
+  }
+  $self->{value} = $s{value};
   $self;
 }
 
@@ -96,17 +116,21 @@ if necessary (by C<hook_encode_string>).
 
 sub stringify ($;%) {
   my $self = shift;
-  my %option = @_;
-  my (%e) = &{$self->{option}->{hook_encode_string}}
-             ($self, $self->{field_body}, -type => 'text');
-  $e{value};
+  my %o = @_; my %option = %{$self->{option}};
+  for (grep {/^-/} keys %o) {$option{substr ($_, 1)} = $o{$_}}
+  if ($self->{_charset}) {
+    $self->{value};
+  } else {
+    my (%e) = &{$option{hook_encode_string}} ($self,
+      $self->{value},
+      charset => $option{encoding_after_encode},
+      current_charset => $option{internal_charset},
+      type => 'text',
+    );
+    $e{value};
+  }
 }
 *as_string = \&stringify;
-
-=item $self->as_plain_string
-
-Returns field body as a string.  Returned string is not encoded,
-i.e. internal coded string.
 
 =item $self->value ([$new-value])
 
@@ -119,14 +143,14 @@ sub value ($;$) {
   my $self = shift;
   my $v = shift;
   if (defined $v) {
-    $self->{field_body} = $v;
+    $self->{value} = $v;
   }
-  $self->{field_body};
+  $self->{value};
 }
 *as_plain_string = \&value;
 
 sub value_append ($$) {
-  shift->{field_body} .= shift;
+  $_[0]->{field_body} .= $_[1];
 }
 
 =item $self->option ( $option-name / $option-name, $option-value, ...)
@@ -154,11 +178,18 @@ sub option ($@) {
   if (@_ == 1) {
     return $self->{option}->{ $_[0] };
   }
+  my %option = @_;
   while (my ($name, $value) = splice (@_, 0, 2)) {
-    $name =~ s/^-//;
     $self->{option}->{$name} = $value;
   }
+  if ($option{-recursive}) {
+    $self->_option_recursive (\%option);
+  }
+  $self;
 }
+
+## $self->_option_recursive (\%argv)
+sub _option_recursive ($\%) {}
 
 =item $self->clone ()
 
@@ -168,10 +199,24 @@ Returns a copy of Message::Field::Unstructured object.
 
 sub clone ($) {
   my $self = shift;
-  my $clone = ref($self)->new;
+  my $clone = ref ($self)->new;
   $clone->{option} = Message::Util::make_clone ($self->{option});
-  $clone->{field_body} = Message::Util::make_clone ($self->{field_body});
+  $clone->{value} = Message::Util::make_clone ($self->{value});
+  for (@{$self->{option}->{_MEMBERS}}) {
+    $clone->{$_} = Message::Util::make_clone ($self->{$_});
+  }
   $clone;
+}
+
+my %_method_default_list = qw(new 1 parse 1 stringify 1 option 1 clone 1 method_available 1);
+sub method_available ($$) {
+  my $self = shift;
+  my $name = shift;
+  return 1 if $_method_default_list{$name};
+  for (@{$self->{option}->{_METHODS}}) {
+    return 1 if $_ eq $name;
+  }
+  0;
 }
 
 =head1 SEE ALSO
@@ -208,7 +253,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/04 06:03:58 $
+$Date: 2002/08/01 06:42:38 $
 
 =cut
 
