@@ -8,7 +8,7 @@ Message::Util::Formatter --- General format text to composed text converter
 package Message::Util::Formatter;
 use strict;
 use vars qw(%FMT2STR $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 
 ## Embeded formatting rules (default)
@@ -35,26 +35,26 @@ sub replace ($$;\%) {
   my $self = shift;
   my $format = shift;
   my $gparam = shift;
-  $format =~ s{%([A-Za-z0-9_]+)(?:\(([^\x29]*)\))?;}{
-    my ($f, $a) = ($1, $2);
-    my $function = $gparam->{fmt2str}->{$f} || $self->{$f};
-    if (ref $function) {
-      my %a;
-      for (split /[\x09\x20]*,[\x09\x20]*/, $a) {
-        if (/^([^=]*[^\x09\x20=])[\x09\x20]*=>[\x09\x20]*([^\x09\x20].*)$/) {
-          $a{ Message::Util::Wide::unquote_if_quoted_string ($1) } = Message::Util::Wide::unquote_if_quoted_string ($2);
-        } else {
-          $a{ Message::Util::Wide::unquote_if_quoted_string ($_) } = 1;
-        }
+  $format =~ s{%([A-Za-z0-9_]+)(?:\(((?:[^"\)]|"(?:[^"\\]|\\.)*")*)\))?;}{
+      my ($f, $a) = ($1, $2);
+      my $function = $gparam->{fmt2str}->{$f} || $self->{$f};
+      if (ref $function) {
+	  my %a;
+	  for (split /[\x09\x20]*,[\x09\x20]*/, $a) {
+	      if (/^([^=]*[^\x09\x20=])[\x09\x20]*=>[\x09\x20]*([^\x09\x20].*)$/) {
+		  $a{ Message::Util::Wide::unquote_if_quoted_string ($1) } = Message::Util::Wide::unquote_if_quoted_string ($2);
+	      } else {print &main::encode("$_")."! ";
+		  $a{ Message::Util::Wide::unquote_if_quoted_string ($_) } = 1;
+	      }
+	  }
+	  my $r = &$function (\%a, $gparam);
+	  length $r? $a{prefix}.$r.$a{suffix}: '';
+      } elsif (length $function) {
+	  $function;
+      } else {
+	  qq([$f: undef]);
       }
-      my $r = &$function (\%a, $gparam);
-      length $r? $a{prefix}.$r.$a{suffix}: '';
-    } elsif (length $function) {
-      $function;
-    } else {
-      qq([$f: undef]);
-    }
-  }gex;
+  }gex;  
   $format;
 }
 
@@ -80,4 +80,4 @@ Boston, MA 02111-1307, USA.
 =cut
 
 1;
-# $Date: 2002/11/13 10:59:11 $
+# $Date: 2002/12/04 09:29:32 $
