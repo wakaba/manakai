@@ -16,7 +16,7 @@ This module is part of SuikaWiki XML support.
 
 package SuikaWiki::Markup::XML::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## Prefixes:
 ## - 'SYNTAX_':	don't match with XML 1.0 EBNF rules
@@ -43,6 +43,14 @@ my %_Error = (
 		level	=> 'wfc',
 	},
 	## Syntax errors
+	SYNTAX_ATTR_LITERAL_NOT_FOUND	=> {
+		description	=> 'Attribute value literal of the attribute (name = %s) is expected',
+		level	=> 'wfc',
+	},
+	SYNTAX_ATTR_NAME_OMITTED	=> {
+		description	=> 'Attribute name corresponding to the value (%s) must be specified in XML',
+		level	=> 'wfc',
+	},
 	SYNTAX_DATA_OUT_OF_ROOT_ELEMENT	=> {
 		description	=> 'Invalid data or markup out of root element',
 		level	=> 'wfc',
@@ -174,6 +182,10 @@ my %_Error = (
 		description	=> 'There is no root element (type = %s) in this document entity',
 		level	=> 'wfc',
 	},
+	SYNTAX_TAG_NOT_CLOSED	=> {
+		description	=> 'Tag must be closed in XML',
+		level	=> 'wfc',
+	},
 	SYNTAX_XML_DECLARE	=> {
 		description	=> 'Syntax of XML (or text) declaration is invalid',
 		level	=> 'wfc',
@@ -270,13 +282,25 @@ my %_Error = (
 		level	=> 'warn',
 	},
 	## Namespace well-formedness error
+	NS_SYNTAX_LNAME_IS_NCNAME	=> {
+		description	=> 'Character just after the colon (:) in QName (%s) must be one of NameStartChar in namespaced XML document',
+		level	=> 'nswfc',
+	},
 	NC_PREFIX_NOT_DEFINED	=> {
 		description	=> 'Undeclared namespace prefix (%s) is used',
 		level	=> 'nswfc',
 	},
 	NS_SYNTAX_NAME_IS_NCNAME	=> {
-		description	=> 'Name with colon (%s) cannot be used within namespaced XML document',
+		description	=> 'Name with colon (%s) cannot be used here in namespaced XML document',
 		level	=> 'nswfc',
+	},
+	NS_SYNTAX_NAME_IS_QNAME	=> {
+		description	=> 'Name with colon (%s) must match with QName in namespaced XML document',
+		level	=> 'nswfc',
+	},
+	NC_UNIQUE_ATT_SPEC	=> {
+		description	=> 'Dupulicate attribute specification (%s == <%s>:%s)',
+		level	=> 'wfc',
 	},
 	## Namespace validity error
 	## XML (non-fatal) error
@@ -332,6 +356,11 @@ my %_Error = (
 		description	=> 'Parameter entity %s is already declared',
 		level	=> 'warn',
 	},
+	## XMLName recommendation
+	WARN_XML_NS_URI_IS_RELATIVE	=> {
+		description	=> 'URI of XML Namespace name is a relative URI',
+		level	=> 'warn',
+	},
 	## RFC 3023 'SHOULD'
 	WARN_MT_DTD_EXTERNAL_SUBSET	=> {
 		description	=> q(Media type "application/xml-dtd" SHOULD be used for the external subset of the DTD or the external parameter entity),
@@ -360,6 +389,10 @@ my %_Error = (
 	},
 	WARN_GUESS_ENCODING_IMPL_ERR	=> {
 		description	=> 'Guessing encoding procedure cause some error (%s)',
+		level	=> 'warn',
+	},
+	WARN_INVALID_URI_CHAR_IN_NS_NAME	=> {
+		description	=> 'URI of XML Namespace name contains at least one non-URI character',
 		level	=> 'warn',
 	},
 	WARN_INVALID_URI_CHAR_IN_SYSID	=> {
@@ -451,4 +484,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/06/29 08:34:37 $
+1; # $Date: 2003/06/30 11:06:28 $

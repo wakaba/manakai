@@ -17,7 +17,7 @@ markup constructures.  (SuikaWiki is not "tiny"?  Oh, yes, I see:-))
 
 package SuikaWiki::Markup::XML;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload '""' => \&outer_xml,
              fallback => 1;
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXML_NCNameStartChar InXMLNCNameChar!;
@@ -52,8 +52,11 @@ our %Namespace_URI_to_prefix = (
 	'urn:x-suika-fam-cx:markup:ietf:rfc:2629'	=> ['', qw/rfc rfc2629/],
 );
 my %Cache;
-my %NS = (
+our %NS = (
 	SGML	=> 'urn:x-suika-fam-cx:markup:sgml:',
+	internal_attr_duplicate	=> 'http://suika.fam.cx/~wakaba/-temp/2003/05/17/invalid-attr#',
+	internal_invalid_sysid	=> 'http://system.identifier.invalid/',
+	internal_ns_invalid	=> 'http://suika.fam.cx/~wakaba/-temp/2003/05/17/unknown-namespace#',
 	xml	=> 'http://www.w3.org/XML/1998/namespace',
 	xmlns	=> 'http://www.w3.org/2000/xmlns/',
 );
@@ -81,10 +84,11 @@ sub new ($;%) {
   if (defined $self->{namespace_prefix}) {
     $self->{namespace_prefix} .= ':' if $self->{namespace_prefix}
                                      && substr ($self->{namespace_prefix}, -1) ne ':';
-    $self->{ns}->{$self->{namespace_prefix}||''} = $self->{namespace_uri} if defined $self->{namespace_uri};
+    $self->{ns}->{$self->{namespace_prefix}||''} = $self->{namespace_uri}
+      if defined $self->{namespace_uri};
   }
   for (qw/local_name value/) {
-    if (ref ($self->{$_}) && eval q($self->{$_}->_CLASS_NAME eq $self->_CLASS_NAME)) {
+    if ($self->_is_same_class ($self->{$_})) {
       $self->{$_}->{parent} = $self;
     }
   }
@@ -93,8 +97,7 @@ sub new ($;%) {
 }
 
 sub _ns_parse_qname ($$) {
-  shift;
-  my $qname = shift;
+  my $qname = $_[1];
   if ($qname =~ /:/) {
     return split /:/, $qname, 2;
   } else {
@@ -122,7 +125,7 @@ sub append_node ($$;%) {
     if ($o{node_or_text}) {
       return $self->append_text ($new_node);
     } else {
-      die "append_node: Invalid node" unless ref $new_node;
+      die "append_node: Invalid node";
     }
   }
   if ($new_node->{type} eq '#fragment') {
@@ -148,8 +151,7 @@ Available options: C<type>, C<namespace_uri>, C<local_name>, C<value>.
 
 sub append_new_node ($;%) {
   my $self = shift;
-  my %o = @_;
-  my $new_node = __PACKAGE__->new (%o);
+  my $new_node = __PACKAGE__->new (@_);
   push @{$self->{node}}, $new_node;
   $new_node->{parent} = $self;
   $new_node;
@@ -164,11 +166,7 @@ Appending given text as a new text node.  The new text node is returned.
 sub append_text ($$;%) {
   my $self = shift;
   my $s = shift;
-  #if (@{$self->{node}}[-1]->{type} eq '#text') {
-  #  $self->{node}}[-1]->append_new_node (type => '#text', value => $s);
-  #} else {
-    $self->append_new_node (type => '#text', value => $s);
-  #}
+  $self->append_new_node (type => '#text', value => $s);
 }
 
 sub append_baretext ($$;%) {
@@ -193,16 +191,18 @@ Available options: C<namespace_uri>, C<make_new_node>.
 =cut
 
 sub get_attribute ($$;%) {
-  my $self = shift;
-  my ($name, %o) = @_;
+  my ($self, $name, %o) = @_;
   for (@{$self->{node}}) {
-    if ($_->{type} eq '#attribute' && $_->{local_name} eq $name && $o{namespace_uri} eq $_->{namespace_uri}) {
+    if ($_->{type} eq '#attribute'
+     && $_->{local_name} eq $name
+     && $o{namespace_uri} eq $_->{namespace_uri}) {
       return $_;
     }
   }
   ## Node is not exist
   if ($o{make_new_node}) {
-    return $self->append_new_node (type => '#attribute', local_name => $name, namespace_uri => $o{namespace_uri});
+    return $self->append_new_node (type => '#attribute', local_name => $name,
+                                   namespace_uri => $o{namespace_uri});
   } else {
     return undef;
   }
@@ -217,21 +217,23 @@ Available options: C<namespace_uri>.
 =cut
 
 sub set_attribute ($$$;%) {
-  my $self = shift;
-  my ($name, $val, %o) = @_;
-  if (ref ($val) eq 'ARRAY' || ref ($val) eq 'HASH' || ref ($val) eq 'CODE') {
+  my ($self, $name, $val, %o) = @_;
+  if ({qw/ARRAY 1 HASH 1 CODE 1/}->{ref ($val)}) {
   ## TODO: common error handling
     require Carp;
     Carp::croak "set_attribute: new attribute value must be string or blessed object";
   }
   for (@{$self->{node}}) {
-    if ($_->{type} eq '#attribute' && $_->{local_name} eq $name && $o{namespace_uri} eq $_->{namespace_uri}) {
+    if ($_->{type} eq '#attribute'
+     && $_->{local_name} eq $name
+     && $o{namespace_uri} eq $_->{namespace_uri}) {
       $_->{value} = $val;
       $_->{node} = [];
       return $_;
     }
   }
-  return $self->append_new_node (type => '#attribute', local_name => $name, value => $val, namespace_uri => $o{namespace_uri});
+  return $self->append_new_node (type => '#attribute', local_name => $name,
+                                 value => $val, namespace_uri => $o{namespace_uri});
 }
 
 =item \@children = $x->child_nodes
@@ -262,35 +264,29 @@ Returns the parent node.  If there is no parent node, undef is returned.
 
 =cut
 
-sub child_nodes ($) { shift->{node} }
+sub child_nodes ($) { $_[0]->{node} }
 sub local_name ($;$) {
   my ($self, $newname) = @_;
-  if ($newname) {
-    $self->{local_name} = $newname;
-  }
+  $self->{local_name} = $newname if $newname;
   if (ref $self->{local_name} && $self->{local_name}->{type} eq '#declaration') {
     $self->{local_name}->{local_name};
   } else {
     $self->{local_name}
   }
 }
-sub node_type ($) { shift->{type} }
-sub parent_node ($) { shift->{parent} }
+sub node_type ($) { $_[0]->{type} }
+sub parent_node ($) { $_[0]->{parent} }
 
 ## TODO: obsolete
 sub target_name ($;$) {
   my ($self, $new) = @_;
-  if (defined $new) {
-    $self->{target_name} = $new;
-  }
+  $self->{target_name} = $new if defined $new;
   $self->{target_name};
 }
 
 sub namespace_uri ($;$) {
   my ($self, $new_uri) = @_;
-  if (defined $new_uri) {
-    $self->{namespace_uri} = $new_uri;
-  }
+  $self->{namespace_uri} = $new_uri if defined $new_uri;
   $self->{namespace_uri};
 }
 sub namespace_prefix ($;$) {
@@ -311,14 +307,12 @@ Returns the number of child nodes.
 
 # TODO: support counting by type
 sub count ($;@) {
-  my $self = shift;
-  (defined $self->{value} ? 1 : 0) + scalar @{$self->{node}};
+  (defined $_[0]->{value} ? 1 : 0) + scalar @{$_[0]->{node}};
 }
 
 # $prefix = $x->_get_namespace_prefix ($namespace_uri)
 sub _get_namespace_prefix ($$;%) {
-  my ($self, $uri) = (shift, shift);
-  my %o = @_;
+  my ($self, $uri, %o) = @_;
   if (defined (my $p = $self->_uri_to_prefix ($uri, undef, %o))) {
     return $p if $self->_prefix_to_uri ($p) eq $uri;
   } if ($Namespace_URI_to_prefix{$uri}) {
@@ -433,7 +427,7 @@ If defined, return namespace name (URI).
 
 sub defined_namespace_prefix ($$) {
   my ($self, $prefix) = @_;
-  $prefix .= ':' if $prefix;#Carp::carp join ",", ';',@_;
+  $prefix .= ':' if $prefix;
   $self->_prefix_to_uri ($prefix);
 }
 
@@ -612,18 +606,12 @@ sub start_tag ($) {
   } elsif ($self->{type} eq '#pi' && $self->_check_ncname ($self->{local_name})) {
     '<?' . ($self->{local_name});
   } elsif ($self->{type} eq '#reference') {
-    if ($self->{namespace_uri} eq 'urn:x-suika-fam-cx:markup:sgml:char:ref:hex') {
+    if ($self->{namespace_uri} eq $NS{SGML}.'char:ref:hex') {
       '&#x';
-    } elsif ($self->{namespace_uri} eq 'urn:x-suika-fam-cx:markup:sgml:char:ref') {
+    } elsif ($self->{namespace_uri} eq $NS{SGML}.'char:ref') {
       '&#';
-    } elsif (ref $self->{local_name} && $self->{local_name}->{type} eq '#declaration') {
-      if ($self->{local_name}->{namespace_uri} eq 'urn:x-suika-fam-cx:markup:sgml:entity:parameter') {
-        '%';
-      } else {
-        '&';
-      }
     } elsif ($self->_check_ncname ($self->{local_name})) {
-      if ($self->{namespace_uri} eq 'urn:x-suika-fam-cx:markup:sgml:entity:parameter') {
+      if ($self->{namespace_uri} eq $NS{SGML}.'entity:parameter') {
         '%';
       } else {
         '&';
@@ -639,21 +627,9 @@ sub start_tag ($) {
     	$NS{SGML}.'entity'	=> 'ENTITY',
     	$NS{SGML}.'entity:parameter'	=> 'ENTITY',
     	$NS{SGML}.'notation'	=> 'NOTATION',
-    }->{$self->{namespace_uri}} . ' ' . ($self->{namespace_uri} eq $NS{SGML}.'entity:parameter' ?
+    }->{$self->{namespace_uri}} . ' ' .
+    ($self->{namespace_uri} eq $NS{SGML}.'entity:parameter' ?
     ($self->{flag}->{smxp__defined_with_param_ref}?'':'% '):'');
-  } elsif ($self->{type} eq '#declaration' && $self->_check_ncname ($self->{local_name})) {
-    my $r = '<!' . $self->{local_name} . ' ';
-    if ($self->{local_name} eq 'DOCTYPE' && ref $self->{parent}) {
-      my $qname;
-      for (@{$self->{parent}->{node}}) {
-        if ($_->{type} eq '#element') {
-          $qname = $_->qname;
-          last if $qname;
-        }
-      }
-      $r .= ($qname ? $qname : '#IMPLIED') . ' ';
-    }
-    $r;
   } elsif ($self->{type} eq '#section') {
     '<![';
   } else {
@@ -714,22 +690,17 @@ Returns the attribute value.
 =cut
 
 sub attribute_value ($;%) {
-  my $self = shift;
-  my %o = @_;
+  my ($self, %o) = @_;
   if ($self->{type} eq '#attribute' && $self->_check_ncname ($self->{local_name})) {
     my $r = '"';
-    if (ref ($self->{value}) && eval q($self->{value}->_CLASS_NAME eq $self->_CLASS_NAME)) {
-      unshift @{$self->{node}}, $self->{value};
-      undef $self->{value};
-    } else {
-      $r .= $self->_entitize ($self->{value});
-    }
-    for (@{$self->{node}}) {
-      my $nt = $_->node_type;
+    my $isc = $self->_is_same_class ($self->{value});
+    $r .= $self->_entitize ($self->{value}) unless $isc;
+    for (($isc?$self->{value}:()), @{$self->{node}}) {
+      my $nt = $_->{type};
       if ($nt eq '#reference' || $nt eq '#xml') {
         $r .= $_->outer_xml;
       } elsif ($nt ne '#attribute') {
-        $r .= $self->_entitize ($_->inner_text, percent => $o{escape_percent});
+        $r .= $self->_entitize ($_->inner_text);
       }
     }
     return $r . '"';
@@ -739,8 +710,7 @@ sub attribute_value ($;%) {
 }
 
 sub entity_value ($;%) {
-  my $self = shift;
-  my %o = @_;
+  my ($self, %o) = @_;
   my $_entitize = sub {
     my $s = shift;
     $s =~ s/&/&#x26;/g;
@@ -752,7 +722,7 @@ sub entity_value ($;%) {
   if ($self->{type} eq '#attribute' && $self->_check_ncname ($self->{local_name})) {
     my $r = '"' . &$_entitize ($self->{value});
     for (@{$self->{node}}) {
-      my $nt = $_->node_type;
+      my $nt = $_->{type};
       if ($nt eq '#reference' || $nt eq '#xml') {
         $r .= $_->outer_xml;
       } elsif ($nt ne '#attribute') {
@@ -769,17 +739,18 @@ sub entity_value ($;%) {
 ## since this is NOT a FORMAL interface.
 sub _entity_parameter_literal_value ($;%) {
   my $self = shift;
-    my $r = $self->{value};
-    for (@{$self->{node}}) {
-      my $nt = $_->node_type;
-      #if ($nt eq '#reference' || $nt eq '#xml') {
-      if ($nt eq '#xml') {
-        $r .= $_->outer_xml;
-      } elsif ($nt ne '#attribute') {
-        $r .= $_->inner_text;
-      }
+  my $r = '';
+  my $isc = $self->_is_same_class ($self->{value});
+  $r = $self->{value} unless $isc;
+  for (($isc?$self->{value}:()), @{$self->{node}}) {
+    my $nt = $_->{type};
+    if ($nt eq '#xml') {
+      $r .= $_->outer_xml;
+    } elsif ($nt ne '#attribute') {
+      $r .= $_->inner_text;
     }
-    return $r;
+  }
+  $r;
 }
 
 =item $tag = $x->attribute
@@ -819,9 +790,9 @@ sub external_id ($;%) {
         $pubid = '"' . $pubid . '"';
       }
       if (defined $sysid) {
-        if ($sysid =~ /"/) {
-          if ($sysid =~ /'/) {
-            $sysid =~ s/"/&quot;/; $sysid = '"' . $sysid . '"';
+        if (index ($sysid, '"') > -1) {
+          if (index ($sysid, "'") > -1) {
+            $sysid =~ s/"/%22/; $sysid = '"' . $sysid . '"';
           } else {
             $sysid = "'" . $sysid . "'";
           }
@@ -852,8 +823,8 @@ or AttDef of attribute declaration (ex. C<name CDATA #REQUIRED>).
 sub content_spec ($) {
   my $self = shift;
   if ($self->{type} eq '#element') {
-        my $text = 0;
-        my $contentspec = join ' | ', map {$_->qname} grep {$text = 1 if $_->{type} eq '#text'; $_->{type} eq '#element'} @{$self->{node}};
+    my $text = 0;
+    my $contentspec = join ' | ', map {$_->qname} grep {$text = 1 if $_->{type} eq '#text'; $_->{type} eq '#element'} @{$self->{node}};
         $contentspec = '#PCDATA' . ($contentspec ? ' | ' . $contentspec : '') if $text;
         
     return $contentspec ? '(' . $contentspec . ')' : 'EMPTY';
@@ -880,32 +851,34 @@ in this version of this module.
 =cut
 
 sub inner_xml ($;%) {
-  my $self = shift;
-  my %o = @_;
+  my ($self, %o) = @_;
   my $r = '';
   if ($self->{type} eq '#comment') {
     $r = $self->inner_text;
     $r =~ s/--/-&#x45;/g;
   } elsif ($self->{type} eq '#pi') {
-    if (length $self->{value}) {
+    my $isc = $self->_is_same_class ($self->{value});
+    if (!$isc && length ($self->{value})) {
       $r = ' ' . $self->{value};
       $r =~ s/\?>/? >/g;	# Same replacement as of the recommendation of XSLT:p.i.
     }
-    for (@{$self->{node}}) {
+    for (($isc?$self->{value}:()), @{$self->{node}}) {
       if ($_->node_type eq '#attribute') {
         $r .= ' ' . $_->attribute;
       } else {
         my $s = $_->inner_text;
-        $s =~ s/\?>/?&gt;/g;
-        $r .= ' ' . $s if length $s;
+        if (length $s) {
+          $s =~ s/\?>/? >/g;
+          $r .= ' ' . $s;
+        }
       }
     }
   } elsif ($self->{type} eq '#reference') {
-    if ($self->{namespace_uri} eq 'urn:x-suika-fam-cx:markup:sgml:char:ref:hex') {
+    if ($self->{namespace_uri} eq $NS{SGML}.'char:ref:hex') {
       $r = sprintf '%02X', $self->{value};
-    } elsif ($self->{namespace_uri} eq 'urn:x-suika-fam-cx:markup:sgml:char:ref') {
+    } elsif ($self->{namespace_uri} eq $NS{SGML}.'char:ref') {
       $r = sprintf '%02d', $self->{value};
-    } elsif (ref $self->{local_name} && $self->{local_name}->{type} eq '#declaration') {
+    } elsif (ref ($self->{local_name}) && $self->{local_name}->{type} eq '#declaration') {
       $r = $self->{local_name}->{local_name};
     } elsif ($self->_check_ncname ($self->{local_name})) {
       $r = ($self->{local_name});
@@ -955,8 +928,8 @@ sub inner_xml ($;%) {
         $xid_opt{allow_pubid_only} = 1;
       }
       
-      my ($v, $xid) = ($self->{value}, $self->external_id (%xid_opt));
-      undef $xid if $self->{flag}->{smxp__defined_with_param_ref};
+      my ($v, $xid) = ($self->{value});
+      $xid = $self->external_id (%xid_opt) unless $self->{flag}->{smxp__defined_with_param_ref};
       if ($xid) {	## External ID
         $r .= $xid;
       } else {	## EntityValue
@@ -977,12 +950,8 @@ sub inner_xml ($;%) {
       ref $qname ? $qname = $qname->inner_text : undef;
       if ($qname && $self->_check_name ($qname)) {
       ## Element type name is defined
+      ## TODO: fix
         $r = $qname . ' ';
-        if ($o{output_tag_omit_declaration}) {
-          $r .= ($self->{flag}->{element_tag_start_omitable} ? 'o ' : '- ')
-                .
-                ($self->{flag}->{element_tag_end_omitable} ? 'o ' : '- ');
-        }
         my $rs = $self->inner_text (output_ref_as_is => 1);
         $r .= $rs || 'ANY';
       } else {
@@ -1048,14 +1017,18 @@ sub inner_xml ($;%) {
       }
     }
   } else {
-    if ($self->{type} ne '#xml') {
-      $r = $self->_entitize ($self->{value});
-    } else {
-      $r = $self->{value};
+    my $isc = $self->_is_same_class ($self->{value});
+    unless ($isc) {
+      if ($self->{type} ne '#xml') {
+        $r = $self->_entitize ($self->{value});
+      } else {
+        $r = $self->{value};
+      }
     }
-    for (@{$self->{node}}) {
-      my $nt = $_->node_type;
-      if (($self->{option}->{indent}) && ($nt eq '#element' || $nt eq '#comment' || $nt eq '#pi' || $nt eq '#declaration')) {
+    for (($isc?$self->{value}:()), @{$self->{node}}) {
+      my $nt = $_->{type};
+      if (($self->{option}->{indent})
+       && ($nt eq '#element' || $nt eq '#comment' || $nt eq '#pi' || $nt eq '#declaration')) {
         $r .= "\n";
       }
       $r .= $_->outer_xml unless $_->node_type eq '#attribute';
@@ -1074,12 +1047,12 @@ Returns the node in XML syntax.
 sub outer_xml ($) {
   my $self = shift;
   if ($self->{type} eq '#attribute') {
-    $self->attribute;
+    return $self->attribute;
   } else {
     if ($self->{option}->{indent} && $self->{type} eq '#element') {
       my $r = $self->start_tag;
       my $c = $self->inner_xml;
-      if (!length $c && $self->{option}->{use_EmptyElemTag}) {
+      if (!length ($c) && $self->{option}->{use_EmptyElemTag}) {
         substr ($r, -1) = ' />';
       } else {
         if ($c) {
@@ -1088,7 +1061,7 @@ sub outer_xml ($) {
         }
         $r .= $self->end_tag;
       }
-      $r;
+      return $r;
     } else {
       my $r = $self->start_tag;
       my $c = $self->inner_xml;
@@ -1096,10 +1069,9 @@ sub outer_xml ($) {
         substr ($r, -1) = ' />';
       } else {
         $r .= $c . $self->end_tag;
-        #$r .= "\n" if $self->{type} eq '#declaration';
       }
-      $r;
-      #'{'.$self->{type}.': '.$r.'}';	# for debug
+      return $r;
+      #'{'.$self->{type}.': '.$r.'}';	## DEBUG: show structure
     }
   }
 }
@@ -1119,31 +1091,21 @@ sub inner_text ($;%) {
   my $self = shift;
   my %o = @_;
   my $r = '';
-  if ($self->{type} eq '#reference' && #) {
-    #if (
-   ($self->{namespace_uri} eq $NS{SGML}.'char:ref' ||
-    $self->{namespace_uri} eq $NS{SGML}.'char:ref:hex')) {
-      $r = chr $self->{value};
-    #} else {	# general entity ref. or parameter entity ref.
-    #  ## TODO: how implement? is this ok?
-    #  my $em = $self->_get_entity_manager;
-    #  $r = $em->get_entity_value ($self->{local_name}, namespace_uri => $self->{namespace_uri});
-    #}
+  if ($self->{type} eq '#reference'
+      && ($self->{namespace_uri} eq $NS{SGML}.'char:ref'
+       || $self->{namespace_uri} eq $NS{SGML}.'char:ref:hex')) {
+    $r = chr $self->{value};
   } elsif ($self->{type} eq '#declaration'
        && ($self->{namespace_uri} eq $NS{SGML}.'entity'
         || $self->{namespace_uri} eq $NS{SGML}.'entity:parameter')) {
-    ## TODO:
-    $r = $self->get_attribute ('value')->inner_text;
+    ## TODO: 
+    $r = $self->set_attribute ('value')->inner_text;
   } else {	# not #reference nor #declaration(ENTITY)
-    if (ref ($self->{value}) && eval q($self->{value}->_CLASS_NAME eq $self->_CLASS_NAME)) {
-      unshift @{$self->{node}}, $self->{value};
-      undef $self->{value};
-    } else {
-      $r = $self->{value};
-    }
+    my $isc = $self->_is_same_class ($self->{value});
+    $r = $self->{value} unless $isc;
     if ($o{output_ref_as_is}) {	## output as if RCDATA
       $r =~ s/&/&amp;/g;
-      for my $node (@{$self->{node}}) {
+      for my $node (($isc?$self->{value}:()), @{$self->{node}}) {
         my $nt = $node->node_type;
         if ($nt eq '#reference' || $nt eq '#xml') {
           $r .= $node->outer_xml;
@@ -1152,8 +1114,8 @@ sub inner_text ($;%) {
         }
       }
     } else {
-      for (@{$self->{node}}) {
-        $r .= $_->inner_text unless $_->node_type eq '#attribute';
+      for (($isc?$self->{value}:()), @{$self->{node}}) {
+        $r .= $_->inner_text unless $_->{type} eq '#attribute';
       }
     }
   }
@@ -1162,15 +1124,8 @@ sub inner_text ($;%) {
 
 sub _is_same_class ($$) {
   my ($self, $something) = @_;
-  return 0 if !ref $something
-           || ref ($something) eq 'ARRAY'
-           || ref ($something) eq 'HASH'
-           || ref ($something) eq 'CODE';
-  if (eval q{$self->_CLASS_NAME eq $something->_CLASS_NAME}) {
-    return 1;
-  } else {
-    return 0;
-  }
+  return 0 if {qw/ARRAY 1 HASH 1 CODE 1 :nonref: 1/}->{ref ($something) || ':nonref:'};
+  eval q{$self->_CLASS_NAME eq $something->_CLASS_NAME} ? 1 : 0;
 }
 
 sub root_node ($) {
@@ -1203,9 +1158,7 @@ sub _get_entity_manager ($) {
   }
 }
 
-sub _CLASS_NAME ($) {
-  'SuikaWiki::Markup::XML';
-}
+sub _CLASS_NAME ($) { 'SuikaWiki::Markup::XML' }
 
 # $s = $x->_entitize ($s)
 sub _entitize ($$;%) {
@@ -1214,8 +1167,6 @@ sub _entitize ($$;%) {
   $s =~ s/</&lt;/g;
   $s =~ s/>/&gt;/g;
   $s =~ s/"/&quot;/g;
-  $s =~ s/%/&#x25;/g if $o{percent};
-  $s =~ s/'/&#x27;/g if $o{apos};
   $s =~ s/([\x00-\x08\x0B\x0C\x0E-\x1F])/sprintf '&amp;#%d;', ord $1/ge;
   $s;
 }
@@ -1361,4 +1312,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/06/29 08:34:36 $
+1; # $Date: 2003/06/30 11:06:28 $

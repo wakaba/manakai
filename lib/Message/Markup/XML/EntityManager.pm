@@ -21,16 +21,14 @@ This module is part of SuikaWiki XML support.
 
 package SuikaWiki::Markup::XML::EntityManager;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our %NS;
+*NS = \%SuikaWiki::Markup::XML::NS;
 
-my %NS = (
-	SGML	=> 'urn:x-suika-fam-cx:markup:sgml:',
-);
-
+# $class->new ($yourself)
 sub new ($$) {
-  my ($class, $yourself) = @_;
-  my $self = bless {node => $yourself}, $class;
-  for (@{$yourself->{node}}) {
+  my $self = bless {node => $_[1]}, $_[0];
+  for (@{$self->{node}->{node}}) {
     if ($_->{type} eq '#declaration' && $_->{namespace_uri} eq $NS{SGML}.'doctype') {
       $self->{doctype} = $_;
       last;
@@ -39,9 +37,7 @@ sub new ($$) {
   $self;
 }
 
-sub set_doctype_node ($$) {
-  $_[0]->{doctype} = $_[1];
-}
+sub set_doctype_node ($$) { $_[0]->{doctype} = $_[1] }
 
 sub is_declared_entity ($$;%) {
   my ($self, $name, %o) = @_;
@@ -90,13 +86,13 @@ sub get_entity ($$;%) {
   }
   $self->{cache}->{entity_declaration}->{$o{namespace_uri}} = {} if $o{clear_cache};
   my $e = $self->{cache}->{entity_declaration}->{$o{namespace_uri}}->{$name};
-  return $e if ref $e;print qq#$name\n#;
+  return $e if ref $e;
+  return undef unless ref $self->{doctype};
   $e = $self->_get_entity ($name, $self->{doctype}->{node}, \%o);
   if (ref $e) {
     $self->{cache}->{entity_declaration}->{$o{namespace_uri}}->{$name} = $e;
     return $e;
   }
-  return undef unless ref $self->{doctype};
   my $xsub = $self->{doctype}->get_attribute ('external-subset');
   if (ref $xsub) {
     $e = $self->_get_entity ($name, $xsub->{node}, \%o);
@@ -337,6 +333,16 @@ sub check_system_id ($$$) {
   $sysid;
 }
 
+sub check_ns_uri ($$$$) {	## TODO: check predefined NS
+  my ($self, $o, $ns_pfx => $ns_name) = @_;
+  if ($ns_name =~ m"([0-9A-Za-z_.!~*'();/?:\@&=+\$,%[]#-])"s) {
+    $self->_raise_error ($o, type => 'WARN_INVALID_URI_CHAR_IN_NS_NAME', t => $1);
+  }
+  if ($ns_name !~ /^[0-9A-Za-z.+-]+:/) {
+    $self->_raise_error ($o, type => 'WARN_XML_NS_URI_IS_RELATIVE', t => $ns_name);
+  }
+}
+
 ## Guess encoding of the entity by BOM and '<?' and Encode::Guess --- Used by default resolver
 sub _guess_entity_encoding ($$) {
   my ($self, $entity, $o) = @_;
@@ -472,4 +478,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/06/29 08:34:37 $
+1; # $Date: 2003/06/30 11:06:28 $
