@@ -2623,6 +2623,94 @@ comment -->
              ExpandedURI q<test:standalone> => 0},
   result => 1,
  },
+
+ {
+  t => q{<?xml version="1.0"?> <doc/>},
+  method => 'parse_document_entity',
+  result => 1,
+ },
+ {
+  t => q{<?xml version="1.1"?> <doc/>},
+  method => 'parse_document_entity',
+  result => 1,
+ },
+ {
+  t => qq{<?xml version="1.1"?> \x85 <doc/>},
+  method => 'parse_document_entity',
+  result => 1,
+ },
+ {
+  t => qq{<?xml version="1.0"?> \x85 <doc/>},
+  method => 'parse_document_entity',
+  result => q<0:22:SYNTAX_CDATA_OUTSIDE_DOCUMENT_ELEMENT>,
+ },
+ {
+  t => qq{<?xml version="1.1"?> \x{2028} <doc/>},
+  method => 'parse_document_entity',
+  result => 1,
+ },
+ {
+  t => qq{<?xml version="1.0"?> \x{2028} <doc/>},
+  method => 'parse_document_entity',
+  result => q<0:22:SYNTAX_CDATA_OUTSIDE_DOCUMENT_ELEMENT>,
+ },
+ {
+  t => qq{<?xml version="1.0" \x85 ?>  <doc/>},
+  method => 'parse_document_entity',
+  result => q<0:0:FATAL_NEW_NL_IN_XML_DECLARATION>,
+ },
+
+ {
+  t => qq{<?xml version="1.1"?>\x00  <doc/>},
+  method => 'parse_document_entity',
+  result => q<0:21:SYNTAX_NOT_IN_CHAR>,
+ },
+ {
+  t => qq{<?xml version="1.1"?>\x01  <doc/>},
+  method => 'parse_document_entity',
+  result => q<0:21:SYNTAX_RESTRICTED_CHAR>,
+ },
+ {
+  t => qq{<?xml version="1.1"?>\x81  <doc/>},
+  method => 'parse_document_entity',
+  result => q<0:21:SYNTAX_RESTRICTED_CHAR>,
+ },
+ {
+  t => qq{<?xml version="1.0"?>\x01  <doc/>},
+  method => 'parse_document_entity',
+  result => q<0:21:SYNTAX_NOT_IN_CHAR>,
+ },
+
+ {
+  t => qq{<e a="&#x0000;"/>},
+  method => 'parse_element',
+  result => q<0:6:WFC_LEGAL_CHARACTER>,
+ },
+ {
+  t => qq{<e a="&#0000;"/>},
+  method => 'parse_element',
+  result => q<0:6:WFC_LEGAL_CHARACTER>,
+ },
+ {
+  t => qq{<e>a="&#x0000;"</e>},
+  method => 'parse_element',
+  result => q<0:6:WFC_LEGAL_CHARACTER>,
+ },
+ {
+  t => qq{<e>a="&#0000;"</e>},
+  method => 'parse_element',
+  result => q<0:6:WFC_LEGAL_CHARACTER>,
+ },
+ {
+  t => qq{<!ENTITY e "&#x0000;">},
+  method => 'parse_entity_declaration',
+  result => q<0:12:WFC_LEGAL_CHARACTER>,
+ },
+ {
+  t => qq{<!ENTITY e "&#0000;">},
+  method => 'parse_entity_declaration',
+  result => q<0:12:WFC_LEGAL_CHARACTER>,
+ },
 );
 
 plan tests => scalar @a;

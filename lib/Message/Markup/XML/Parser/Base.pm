@@ -16,9 +16,11 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::Base;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
-use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXMLChar
-                        InXML_deprecated_noncharacter InXML_unicode_xml_not_suitable!;
+our $VERSION = do{my @r=(q$Revision: 1.1.2.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use Char::Class::XML
+    qw[InXML_NameStartChar InXMLNameChar
+       InXMLChar10 InXMLChar11
+       InXML_UnrestrictedChar11 InXMLRestrictedChar11];
 require Message::Markup::XML::Parser::Error;
 require overload;
 
@@ -52,6 +54,9 @@ sub reset ($;%) {
 
 sub parse_document_entity ($$$%) {
   my ($self, $src, $p, %opt) = @_;
+  $self->____normalize_entity
+           ($src, $p, %opt,
+            ExpandedURI q<see-xml-declaration> => 1);
   $self->document_start ($src, $p, my $pp = {}, %opt);
   if ($$src =~ /\G(?=<\?xml\P{InXMLNameChar})/gc) {
     $self->parse_xml_declaration
@@ -139,6 +144,93 @@ sub parse_document_entity ($$$%) {
        source => $src);
   }
   $self->document_end ($src, $p, $pp, %opt);
+}
+
+sub ____normalize_entity ($$$%) {
+  my ($self, $src, $p, %opt) = @_;
+  unless ($self->{ExpandedURI q<xml-declaration-version>}) {
+    if ($opt{ExpandedURI q<see-xml-declaration>}) {
+      if ($$src =~ /^<\?xml\P{InXML_NameStartChar}(.+?)\?>/) {
+        my $data = $1;
+        if ($data =~ /version="([^"]+)"/) {
+          $self->{ExpandedURI q<xml-declaration-version>} = $1;
+        }
+        if ($data =~ /[\x85\x{2028}]/) {
+          $self->report
+                   (-type => 'FATAL_NEW_NL_IN_XML_DECLARATION',
+                    -class => 'W3C',
+                    source => $src);
+        }
+      }
+    }
+  }
+  my $xmlver = $self->{ExpandedURI q<xml-declaration-version>} || '1.0';
+  
+  $$src =~ s/\x0D\x0A/\x0A/g;
+  $$src =~ s/\x0D\x85/\x0A/g unless $xmlver eq '1.0';
+  $$src =~ s/\x0D/\x0A/g;
+  
+  unless ($xmlver eq '1.0') {
+  ## XML 1.1
+    $$src =~ s/\x85/\x0A/g;
+    $$src =~ s/\x{2028}/\x0A/g;
+    
+    while ($$src =~ /(\P{InXML_UnrestrictedChar11})/g) {
+      my $char = $1;
+      if ($char =~ /\p{InXMLRestrictedChar11}/) {
+        $self->report
+                 (-type => 'SYNTAX_RESTRICTED_CHAR',
+                  -class => 'WFC',
+                  source => $src,
+                  position_diff => 1,
+                  char => $char);
+      } else {
+        $self->report
+                 (-type => 'SYNTAX_NOT_IN_CHAR',
+                  -class => 'WFC',
+                  source => $src,
+                  position_diff => 1,
+                  char => $char);
+      }
+    }
+  } else {
+  ## XML 1.0
+    while ($$src =~ /(\P{InXMLChar10})/g) {
+      my $char = $1;
+      $self->report
+                 (-type => 'SYNTAX_NOT_IN_CHAR',
+                  -class => 'WFC',
+                  source => $src,
+                  position_diff => 1,
+                  char => $char);
+    }
+  }
+
+  pos $$src = 0;
+  $self->{error}->reset_position ($src);
+}
+
+sub ____check_char ($$$%) {
+  my ($self, $src, $p, %opt) = @_;
+  my $xmlver = $self->{ExpandedURI q<xml-declaration-version>} || '1.0';
+  my $char = chr 0+$opt{ExpandedURI q<_:code>};
+  if ($xmlver ne '1.0') {
+    $char =~ /\P{InXMLChar11}/ and
+      $self->report
+               (-type => 'WFC_LEGAL_CHARACTER',
+                -class => 'WFC',
+                source => $src,
+                position_diff => $opt{ExpandedURI q<_:position-diff>},
+                char => $char);
+  } else {
+    $char =~ /\P{InXMLChar10}/ and
+      $self->report
+               (-type => 'WFC_LEGAL_CHARACTER',
+                -class => 'WFC',
+                source => $src,
+                position_diff => $opt{ExpandedURI q<_:position-diff>},
+                char => $char);
+  }
 }
 
 sub parse_element ($$$%) {
@@ -655,6 +747,7 @@ sub parse_reference_in_attribute_value_literal ($$$%) {
     if ($$src =~ /\G\#/gc) {
       if ($$src =~ /\Gx/gc) {
         if ($$src =~ /\G([0-9A-Fa-f]+)/gc) {
+          my $code = hex $1;
           unless ($opt{ExpandedURI q<allow-hex-character-reference>}) {
             $self->report
               (-type => 'SYNTAX_HEX_CHAR_REF',
@@ -662,10 +755,14 @@ sub parse_reference_in_attribute_value_literal ($$$%) {
                source => $src,
                position_diff => 3 + length $1);
           }
+          $self->____check_char
+                    ($src, $p, %opt,
+                     ExpandedURI q<_:code> => $code,
+                     ExpandedURI q<_:position-diff> => 3 + length $1);
           $self->hex_character_reference_in_attribute_value_literal_start
                ($src,
                 $p,
-                {ExpandedURI q<character-number> => hex $1},
+                {ExpandedURI q<character-number> => $code},
                 %opt);
         } else {
           $self->report
@@ -683,6 +780,10 @@ sub parse_reference_in_attribute_value_literal ($$$%) {
              source => $src,
              position_diff => 2 + length $1);
         }
+        $self->____check_char
+                    ($src, $p, %opt,
+                     ExpandedURI q<_:code> => 0 + $1,
+                     ExpandedURI q<_:position-diff> => 2 + length $1);
         $self->numeric_character_reference_in_attribute_value_literal_start
                ($src,
                 $p,
@@ -821,6 +922,10 @@ sub parse_reference_in_content ($$$%) {
     if ($$src =~ /\G\#/gc) {
       if ($$src =~ /\Gx/gc) {
         if ($$src =~ /\G([0-9A-Fa-f]+)/gc) {
+          $self->____check_char
+                    ($src, $p, %opt,
+                     ExpandedURI q<_:code> => hex $1,
+                     ExpandedURI q<_:position-diff> => 3 + length $1);
           $self->hex_character_reference_in_content_start
                ($src,
                 $p,
@@ -835,6 +940,10 @@ sub parse_reference_in_content ($$$%) {
           return 0;
         }
       } elsif ($$src =~ /\G([0-9]+)/gc) {
+        $self->____check_char
+                    ($src, $p, %opt,
+                     ExpandedURI q<_:code> => 0 + $1,
+                     ExpandedURI q<_:position-diff> => 2 + length $1);
         $self->numeric_character_reference_in_content_start
                ($src,
                 $p,
@@ -976,6 +1085,10 @@ sub parse_reference_in_rpdata ($$$%) {
     if ($$src =~ /\G\#/gc) {
       if ($$src =~ /\Gx/gc) {
         if ($$src =~ /\G([0-9A-Fa-f]+)/gc) {
+          $self->____check_char
+                    ($src, $p, %opt,
+                     ExpandedURI q<_:code> => hex $1,
+                     ExpandedURI q<_:position-diff> => 3 + length $1);
           $self->hex_character_reference_in_rpdata_start
                ($src,
                 $p,
@@ -990,6 +1103,10 @@ sub parse_reference_in_rpdata ($$$%) {
           return 0;
         }
       } elsif ($$src =~ /\G([0-9]+)/gc) {
+        $self->____check_char
+                    ($src, $p, %opt,
+                     ExpandedURI q<_:code> => 0 + $1,
+                     ExpandedURI q<_:position-diff> => 2 + length $1);
         $self->numeric_character_reference_in_rpdata_start
                ($src,
                 $p,
@@ -3445,4 +3562,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/06/01 09:11:22 $
+1; # $Date: 2004/06/04 08:29:14 $

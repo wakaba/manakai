@@ -14,7 +14,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Message::Markup::XML::Parser::Error;
 require Message::Util::Error::TextParser;
@@ -36,6 +36,13 @@ package Message::Markup::XML::Parser::Error::formatter;
 push our @ISA, 'Message::Util::Error::TextParser::formatter';
 
 sub ___rule_def () {+{
+  code_ucs => {
+    after => sub {
+      my ($self, $name, $p, $o) = @_;
+      my $code = ord $o->{$p->{source} || 'char'};
+      $p->{-result} .= sprintf $code > 0xFFFF ? 'U-%08X' : 'U+%04X', $code;
+    },
+  },
   markup_declaration_parameters => {
     after => sub {
       my ($self, $name, $p, $o) = @_;
@@ -457,6 +464,10 @@ sub ___error_def () {+{
     description => q(LESS-THAN SIGN (<) not allowed in attribute value literal),
     level => 'ebnf',
   },
+  SYNTAX_NOT_IN_CHAR => {
+    description => q(Character %code-ucs (source => char); not included in document character set),
+    level => 'ebnf',
+  },
   SYNTAX_NOTATION_EXTERNAL_IDENTIFIER_REQUIRED => {
     description => q(External (public and/or system) identifier required),
     level => 'ebnf',
@@ -535,6 +546,10 @@ sub ___error_def () {+{
   },
   SYNTAX_REFERENCE_AMP_REQUIRED => {
     description => q(ero (&), cro (&#) or hcro (&#x) expected),
+    level => 'ebnf',
+  },
+  SYNTAX_RESTRICTED_CHAR => {
+    description => q(Character %code-ucs (source => char); cannot appear as is; it must be in character reference form),
     level => 'ebnf',
   },
   SYNTAX_S_IN_COMMENT_DECLARATION => {
@@ -669,7 +684,7 @@ sub ___error_def () {+{
   # WFC_EXTERNAL_SUBSET
   # WFC_IN_DTD
   WFC_LEGAL_CHARACTER => {
-    description => q(Character %%%% is not in document character set),
+    description => q(Character %code-ucs (source => char); is not in document character set),
     level => 'wfc',
   },
   WFC_NO_EXTERNAL_ENTITY_REFERENCES => {
@@ -721,6 +736,11 @@ package Message::Markup::XML::Parser::Error::W3C;
 push our @ISA, 'Message::Markup::XML::Parser::Error';
 
 sub ___error_def () {+{
+  FATAL_NEW_NL_IN_XML_DECLARATION => {
+    description => q(U+0085 (NEW LINE) or U+2028 (LINE SEPARATOR) cannot be used in XML or text declaration),
+    level => 'fatal',
+  },
+
   RESERVED_ATTRIBUTE_NAME => {
     description => q(Attribute name "%t (name => attribute-name);" is reserved by W3C),
     level => 'reserved',
@@ -802,4 +822,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/06/01 09:11:22 $
+1; # $Date: 2004/06/04 08:29:14 $
