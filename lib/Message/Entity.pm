@@ -13,7 +13,7 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Header;
 require Message::Util;
@@ -213,7 +213,7 @@ sub stringify ($;%) {
       $self->{header}->field ('date')->unix_time (time);
     }
     if ($option{fill_msgid} && !$exist{'message-id'}) {
-      my $from = $self->{header}->field ('from')->addr_spec (1);
+      my $from = $self->{header}->field ('from')->addr_spec;
       $self->{header}->field ('message-id')->generate (addr_spec => $from)
         if $from;
     }
@@ -600,7 +600,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/14 13:50:11 $
+$Date: 2002/05/15 07:31:28 $
 
 =cut
 

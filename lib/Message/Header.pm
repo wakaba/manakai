@@ -123,6 +123,7 @@ $DEFAULT{field_type} = {
 	
 	'list-software'	=> 'Message::Field::UA',
 	'user-agent'	=> 'Message::Field::UA',
+	'resent-user-agent'	=> 'Message::Field::UA',
 	server	=> 'Message::Field::UA',
 	
 	## A message id
@@ -158,13 +159,11 @@ for (qw(abuse-reports-to apparently-to approved approved-by bcc cc complaints-to
   reply-to resent-bcc
   resent-cc resent-to resent-from resent-sender return-path
   return-receipt-to return-receipt-requested-to sender to x-abuse-reports-to 
-  x-admin x-approved 
-  x-beenthere
-  x-confirm-reading-to
+  x-admin x-approved x-beenthere x-confirm-reading-to
   x-complaints-to x-envelope-from x-envelope-sender
   x-envelope-to x-ml-address x-ml-command x-ml-to x-nfrom x-nto
   x-rcpt-to x-sender x-x-sender))
-  {$DEFAULT{field_type}->{$_} = 'Message::Field::Address'}
+  {$DEFAULT{field_type}->{$_} = 'Message::Field::Addresses'}
 for (qw(client-date date date-received delivery-date expires
   expire-date nntp-posting-date posted posted-date received-date 
   reply-by resent-date 
@@ -484,13 +483,11 @@ sub _field_body ($$$) {
     unless ($body) {
       $body = $type->new (-field_name => $name,
         -format => $self->{option}->{format},
-        -parse_all => $self->{option}->{parse_all},
-        field_name => $name, format => $self->{option}->{format});
+        -parse_all => $self->{option}->{parse_all});
     } else {
       $body = $type->parse ($body, -field_name => $name,
         -format => $self->{option}->{format},
-        -parse_all => $self->{option}->{parse_all},
-         field_name => $name,format => $self->{option}->{format});
+        -parse_all => $self->{option}->{parse_all});
     }
   }
   $body;
@@ -946,7 +943,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/14 13:50:11 $
+$Date: 2002/05/15 07:31:28 $
 
 =cut
 
