@@ -16,7 +16,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 use Carp ();
 
@@ -268,7 +268,7 @@ sub make_clone ($) {
     $s = [map {make_clone ($_)} @$s];
   } elsif (ref $s eq 'HASH') {
     $s = {map {make_clone ($_)} (%$s)};
-  } elsif (ref $s && ref $s ne 'CODE') {
+  } elsif (ref $s && ref $s ne 'CODE' && ref $s ne 'Regexp') {
     $s = $s->clone;
   }
   $s;
@@ -484,7 +484,7 @@ sub encode_ccontent ($$) {
   my $ccontent = shift;
   my %f = &{$yourself->{option}->{hook_encode_string}} ($yourself, 
             $ccontent, type => 'ccontent');
-  $f{value} =~ s/([\x28\x29\x5C])([\x21-\x7E])?/"\x5C$1".(defined $2?"\x5C$2":'')/ge;
+  $f{value} =~ s/([\x28\x29\x5C]|\x3D\x3F)([\x21-\x7E])?/"\x5C$1".(defined $2?"\x5C$2":'')/ge;
   $f{value};
 }
 
@@ -521,7 +521,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/17 05:46:25 $
+$Date: 2002/05/25 09:53:24 $
 
 =cut
 

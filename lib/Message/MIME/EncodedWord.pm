@@ -14,7 +14,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%ENCODER %DECODER %OPTION %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::MIME::Charset;
 
 $REG{WSP} = qr/[\x09\x20]/;
@@ -32,7 +32,7 @@ $REG{S_encoded_word} = qr/=\x3F$REG{atext_dot}\x3F=/;
 =cut
 
 %OPTION = (
-	forcedecode	=> 1,
+	forcedecode	=> 0,
 );
 
 =over 4
@@ -93,6 +93,7 @@ sub decode ($) {
   my (@s, @r) = ();
   $s =~ s{\G([\x09\x20]*[^\x09\x20]+)}{push @s, $1}goex;
   for my $i (0..$#s) {
+    $r[$i] = 0;
     if ($s[$i] =~ /^($REG{FWS})$REG{M_encoded_word}$/) {
       my ($t, $w) = ('', $1);
       ($t, $r[$i]) = (_decode_eword ($2, $3, $4, $5));
@@ -110,16 +111,15 @@ sub decode ($) {
 sub decode_ccontent ($$) {
   my $s = shift;  my $yourself = shift;
   my (@s, @r) = ();
-  #$s =~ s{\G(?:($REG{FWS}(?:\x5C[\x00-\xFF]|[\x00-\x08\x0A-\x0C\x0E-\x1F\x21-\x27\x2A-\x5B\x5D-\xFF])+)|($REG{FWS}$REG{comment}))}
-  #  {push @s, $1||$2; '\1'}gex;
   my ($i, @t) = (-1);
   $s =~ s{$REG{FWS}$REG{comment}}{$i++; $t[$i] = $&; "\x28${i}\x29"}gex;
   $s =~ s{($REG{FWS}(?:\x5C[\x00-\xFF]
-                     |[\x00-\x08\x0A-\x0C\x0E-\x1F\x21-\x27\x2A-\x5B\x5D-\xFF])+)
+                     |[\x00-\x08\x0A-\x1F\x21-\x27\x2A-\x5B\x5D-\xFF])+)
          |(\x28[0-9]+\x29)}{my ($t,$c) = ($1, $2);
      if ($t) {$i++; $t[$i] = $t; "\x28${i}\x29"}
      else {$c}}gex;
-  $s =~ s{\x28([0-9]+)\x29}{push @s, $t[$1]}gex;
+  $s =~ s{\x28([0-9]+)\x29}{push @s, $t[$1]; ''}gex;
+  push @s, $s if length $s;
   for my $i (0..$#s) {
     if ($s[$i] =~ /^($REG{FWS})$REG{M_encoded_word}$/) {
       my ($t, $w) = ('', $1);
@@ -131,7 +131,7 @@ sub decode_ccontent ($$) {
         }
       }
     } elsif ($s[$i] =~ /^($REG{FWS})$REG{M_comment}$/) {
-      $s[$i] = $1.'('.decode_ccontent ($2, $yourself).')';
+      $s[$i] = $1.'('.&decode_ccontent ($2, $yourself).')';
     } else {
       $s[$i] =~ s/\x5C([\x00-\xFF])/$1/g;
       my %s = &{$yourself->{option}->{hook_decode_string}} ($yourself, $s[$i],
@@ -146,7 +146,7 @@ sub _decode_eword ($$$$) {
   my ($charset, $lang, $encoding, $etext) = (shift, shift, lc shift, shift);
   $charset = Message::MIME::Charset::name_normalize ($charset);
   my ($r,$s) = ('', 0);
-  if (ref $DECODER{$encoding}) {
+  if (ref $DECODER{$encoding}) {	## decode TE
     $r = &{$DECODER{$encoding}} ($encoding, $etext);
     ($r,$s) = Message::MIME::Charset::decode ($charset, $r);
     if (!$s && $OPTION{forcedecode} && $charset =~ /^iso-8859-([0-9]+(?:-[ie])?)$/) {
@@ -186,7 +186,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/17 05:46:25 $
+$Date: 2002/05/25 09:53:24 $
 
 =cut
 

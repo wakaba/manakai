@@ -1,78 +1,64 @@
 
 =head1 NAME
 
-Message::Header Perl module
-
-=head1 DESCRIPTION
-
-Perl module for RFC 822/2822 message C<header>.
+Message::Header --- A Perl Module for Internet Message Headers
 
 =cut
 
 package Message::Header;
 use strict;
-use vars qw($VERSION %REG);
-$VERSION = '1.00';
-use Carp ();
-use overload '@{}' => sub { shift->_delete_empty_field->{field} },
-             '""' => sub { shift->stringify },
-             fallback => 1;
+use vars qw(%DEFAULT @ISA %REG $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.20 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+require Message::Field::Structured;	## This may seem silly:-)
+push @ISA, qw(Message::Field::Structured);
 
-$REG{WSP}     = qr/[\x09\x20]/;
-$REG{FWS}     = qr/[\x09\x20]*/;
-$REG{M_field} = qr/^([^\x3A]+):$REG{FWS}([\x00-\xFF]*)$/;
-$REG{M_fromline} = qr/^\x3E?From$REG{WSP}+([\x00-\xFF]*)$/;
-$REG{UNSAFE_field_name} = qr/[\x00-\x20\x3A\x7F-\xFF]/;
+%REG = %Message::Util::REG;
+	$REG{M_field} = qr/^([^\x3A]+):$REG{FWS}([\x00-\xFF]*)$/;
+	$REG{M_fromline} = qr/^\x3E?From$REG{WSP}+([\x00-\xFF]*)$/;
+	$REG{ftext} = qr/[\x21-\x39\x3B-\x7E]+/;	## [2]822
+	$REG{NON_ftext} = qr/[^\x21-\x39\x3B-\x7E]/;	## [2]822
+	$REG{NON_ftext_usefor} = qr/[^0-9A-Za-z-]/;	## name-character
+	$REG{NON_ftext_http} = $REG{NON_http_token};
 
-=head2 options
+## Namespace support
+	our %NS_phname2uri;	## PH-namespace name -> namespace URI
+	our %NS_uri2phpackage;	## namespace URI -> PH-package name
+	require Message::Header::Default;	## Default namespace
 
-These options can be getten/set by C<get_option>/C<set_option>
-method.
-
-=head3 capitalize = 0/1
-
-(First character of) C<field-name> is capitalized
-when C<stringify>.  (Default = 1)
-
-=head3 fold_length = numeric value
-
-Length of line used to fold.  (Default = 70)
-
-=head3 mail_from = 0/1
-
-Outputs "From " line (known as Un*x From, Mail-From, and so on)
-when C<stringify>.  (Default = 0)
-
-=cut
-
-=head1 CONSTRUCTORS
-
-The following methods construct new C<Message::Header> objects:
-
-=over 4
-
-=cut
-
-## Initialize
-my %DEFAULT = (
-  capitalize	=> 1,
-  fold	=> 1,
-  fold_length	=> 70,
-  field_format_pattern	=> '%s: %s',
-  #field_type	=> {},
-  format	=> 'mail-rfc2822',
-  linebreak_strict	=> 0,
-  mail_from	=> 0,
-  output_bcc	=> 0,
-  parse_all	=> 0,
-  sort	=> 'none',
-  translate_underscore	=> 1,
-  uri_mailto_safe	=> {
+## Initialize of this class -- called by constructors
+%DEFAULT = (
+    -_HASH_NAME	=> 'value',
+    -_METHODS	=> [qw|field field_exist field_type add replace count delete subject id is|],
+    -_MEMBERS	=> [qw|value|],
+    -M_namsepace_prefix_regex => qr/(?!)/,
+    -_VALTYPE_DEFAULT	=> ':default',
+    -by	=> 'name',	## (Reserved for method level option)
+    -field_format_pattern	=> '%s: %s',
+    -field_name_capitalize	=> 1,
+    -field_name_case_sensible	=> 0,
+    -field_name_unsafe_rule	=> 'NON_ftext',
+    -field_name_validation	=> 1,	## Method level option.
+    -field_sort	=> 0,
+    #-format	=> 'mail-rfc2822',
+    -linebreak_strict	=> 0,	## Not implemented completely
+    -line_length_max	=> 60,	## For folding
+    -ns_default_uri	=> $Message::Header::Default::OPTION{namespace_uri},
+    -output_bcc	=> 0,
+    -output_folding	=> 1,
+    -output_mail_from	=> 0,
+    #-parse_all	=> 0,
+    -translate_underscore	=> 1,
+    #-uri_mailto_safe
+    -uri_mailto_safe_level	=> 4,
+    -use_folding	=> 1,
+    #-value_type
+);
+  $DEFAULT{-uri_mailto_safe}	= {
   	## 1 all (no check)	2 no trace & bcc & from
   	## 3 no sender's info	4 (default) (currently not used)
   	## 5 only a few
   	':default'	=> 4,
-  	'cc'	=> 4,
+  	'cc'	=> 5,
   	'bcc'	=> 1,
   	'body'	=> 1,
   	'comment'	=> 5,
@@ -92,64 +78,58 @@ my %DEFAULT = (
   	'sender'	=> 1,
   	'subject'	=> 5,
   	'summary'	=> 5,
-  	'to'	=> 4,
+  	'to'	=> 5,
   	'user-agent'	=> 3,
   	'x-face'	=> 2,
   	'x-mailer'	=> 3,
   	'x-nsubject'	=> 5,
   	'x-received'	=> 1,
   	'x400-received'	=> 1,
-  	},
-  uri_mailto_safe_level	=> 4,
-  validate	=> 1,
-);
-$DEFAULT{field_type} = {
-	':DEFAULT'	=> 'Message::Field::Unstructured',
+  	};
+
+$DEFAULT{-value_type} = {
+	':default'	=> ['Message::Field::Unstructured'],
 	
-	received	=> 'Message::Field::Received',
-	'x-received'	=> 'Message::Field::Received',
+	received	=> ['Message::Field::Received'],
+	'x-received'	=> ['Message::Field::Received'],
 	
-	'content-type'	=> 'Message::Field::ContentType',
-	p3p	=> 'Message::Field::Params',
-	'auto-submitted'	=> 'Message::Field::ValueParams',
-	'content-disposition'	=> 'Message::Field::ValueParams',
-	link	=> 'Message::Field::ValueParams',
-	archive	=> 'Message::Field::ValueParams',
-	'x-face-type'	=> 'Message::Field::ValueParams',
-	'x-mozilla-draft-info'	=> 'Message::Field::ValueParams',
+	p3p	=> ['Message::Field::Params'],
+	'auto-submitted'	=> ['Message::Field::ValueParams'],
+	link	=> ['Message::Field::ValueParams'],
+	archive	=> ['Message::Field::ValueParams'],
+	'x-face-type'	=> ['Message::Field::ValueParams'],
+	'x-mozilla-draft-info'	=> ['Message::Field::ValueParams'],
 	
-	subject	=> 'Message::Field::Subject',
-	'x-nsubject'	=> 'Message::Field::Subject',
+	subject	=> ['Message::Field::Subject'],
+	'x-nsubject'	=> ['Message::Field::Subject'],
 	
-	'list-software'	=> 'Message::Field::UA',
-	'user-agent'	=> 'Message::Field::UA',
-	'resent-user-agent'	=> 'Message::Field::UA',
-	server	=> 'Message::Field::UA',
+	'list-software'	=> ['Message::Field::UA'],
+	'user-agent'	=> ['Message::Field::UA'],
+	'resent-user-agent'	=> ['Message::Field::UA'],
+	server	=> ['Message::Field::UA'],
 	
 	## A message id
-	'content-id'	=> 'Message::Field::MsgID',
-	'message-id'	=> 'Message::Field::MsgID',
-	'resent-message-id'	=> 'Message::Field::MsgID',
+	'message-id'	=> ['Message::Field::MsgID'],
+	'resent-message-id'	=> ['Message::Field::MsgID'],
 	
 	## Numeric value
-	'content-length'	=> 'Message::Field::Numval',
-	lines	=> 'Message::Field::Numval',
-	'max-forwards'	=> 'Message::Field::Numval',
-	'mime-version'	=> 'Message::Field::Numval',
-	'x-jsmail-priority'	=> 'Message::Field::Numval',
-	'x-mail-count'	=> 'Message::Field::Numval',
-	'x-ml-count'	=> 'Message::Field::Numval',
-	'x-priority'	=> 'Message::Field::Numval',
+	lines	=> ['Message::Field::Numval'],
+	'max-forwards'	=> ['Message::Field::Numval'],
+	'mime-version'	=> ['Message::Field::Numval'],
+	'x-jsmail-priority'	=> ['Message::Field::Numval'],
+	'x-mail-count'	=> ['Message::Field::Numval'],
+	'x-ml-count'	=> ['Message::Field::Numval'],
+	'x-priority'	=> ['Message::Field::Numval'],
 	
-	path	=> 'Message::Field::Path',
+	path	=> ['Message::Field::Path'],
 };
-for (qw(archive cancel-lock content-features content-md5
+for (qw(archive cancel-lock 
   disposition-notification-options encoding 
   importance injector-info 
   pics-label posted-and-mailed precedence list-id message-type 
   original-recipient priority x-list-id
   sensitivity status x-face x-msmail-priority xref))
-  {$DEFAULT{field_type}->{$_} = 'Message::Field::Structured'}
+  {$DEFAULT{-value_type}->{$_} = ['Message::Field::Structured']}
   	## Not supported yet, but to be supported...
   	# x-list: unstructured, ml name
 for (qw(abuse-reports-to apparently-to approved approved-by bcc cc complaints-to
@@ -163,59 +143,40 @@ for (qw(abuse-reports-to apparently-to approved approved-by bcc cc complaints-to
   x-complaints-to x-envelope-from x-envelope-sender
   x-envelope-to x-ml-address x-ml-command x-ml-to x-nfrom x-nto
   x-rcpt-to x-sender x-x-sender))
-  {$DEFAULT{field_type}->{$_} = 'Message::Field::Addresses'}
+  {$DEFAULT{-value_type}->{$_} = ['Message::Field::Addresses']}
 for (qw(client-date date date-received delivery-date expires
   expire-date nntp-posting-date posted posted-date received-date 
   reply-by resent-date 
   x-originalarrivaltime x-tcup-date))
-  {$DEFAULT{field_type}->{$_} = 'Message::Field::Date'}
+  {$DEFAULT{-value_type}->{$_} = ['Message::Field::Date']}
 for (qw(article-updates in-reply-to
   obsoletes references replaces see-also supersedes))
-  {$DEFAULT{field_type}->{$_} = 'Message::Field::MsgIDs'}
+  {$DEFAULT{-value_type}->{$_} = ['Message::Field::MsgIDs']}
 for (qw(accept accept-charset accept-encoding accept-language
   content-language 
-  content-transfer-encoding encrypted followup-to keywords 
+  encrypted followup-to keywords 
   list-archive list-digest list-help list-owner
   list-post list-subscribe list-unsubscribe list-url uri newsgroups
   posted-to))
-  {$DEFAULT{field_type}->{$_} = 'Message::Field::CSV'}
+  {$DEFAULT{-value_type}->{$_} = ['Message::Field::CSV']}
 for (qw(x-brother x-boss x-classmate x-daughter x-dearfriend x-favoritesong 
   x-friend x-me 
   x-moe x-respect 
   x-sublimate x-son x-sister x-wife))
-  {$DEFAULT{field_type}->{$_} = 'Message::Field::CSV'}	## NOT M::F::XMOE!
-for (qw(content-alias content-base content-location location referer
-  url x-home-page x-http_referer
+  {$DEFAULT{-value_type}->{$_} =[ 'Message::Field::CSV']}	## NOT M::F::XMOE!
+for (qw(location referer url x-home-page x-http_referer
   x-info x-pgp-key x-ml-url x-uri x-url x-web))
-  {$DEFAULT{field_type}->{$_} = 'Message::Field::URI'}
+  {$DEFAULT{-value_type}->{$_} = ['Message::Field::URI']}
 
 my %header_goodcase = (
 	'article-i.d.'	=> 'Article-I.D.',
-	'content-id'	=> 'Content-ID',
-	'content-md5'	=> 'Content-MD5',
-	'content-sgml-entity'	=> 'Content-SGML-Entity',
 	etag	=> 'ETag',
-	fax	=> 'FAX',
 	'pics-label'	=> 'PICS-Label',
-	'list-url'	=> 'List-URL',
-	'list-id'	=> 'List-ID',
-	'message-id'	=> 'Message-ID',
-	'mime-version'	=> 'MIME-Version',
-	'nic'	=> 'NIC',
-	'nntp-posting-date'	=> 'NNTP-Posting-Date',
-	'nntp-posting-host'	=> 'NNTP-Posting-Host',
-	'resent-message-id'	=> 'Resent-Message-ID',
 	te	=> 'TE',
 	url	=> 'URL',
 	'www-authenticate'	=> 'WWW-Authenticate',
-	'x-dearfriend'	=> 'X-DearFriend',
-	'x-mime-autoconverted'	=> 'X-MIME-Autoconverted',
-	'x-nntp-posting-date'	=> 'X-NNTP-Posting-Date',
-	'x-nntp-posting-host'	=> 'X-NNTP-Posting-Host',
-	'x-uri'	=> 'X-URI',
-	'x-url'	=> 'X-URL',
 );
-$DEFAULT{capitalize} = sub {
+$DEFAULT{-field_name_capitalize} = sub {
   my $self = shift;
   my $name = shift;
   if ($header_goodcase{$name}) {
@@ -256,16 +217,28 @@ my @header_order = qw(
 );
 my %header_order;
 
+=head1 CONSTRUCTORS
+
+The following methods construct new C<Message::Header> objects:
+
+=over 4
+
+=cut
+
 sub _init ($;%) {
   my $self = shift;
   my %options = @_;
-  $self->{field} = [];
-  $self->{option} = \%DEFAULT;
+  my $DEFAULT = Message::Util::make_clone (\%DEFAULT);
+  $self->SUPER::_init (%$DEFAULT, %options);
+  $self->{value} = [];
+  $self->_ns_load_ph ('default');
+  $self->{ns}->{default_phuri} = $self->{ns}->{phname2uri}->{'default'};
+  $self->_ns_load_ph ('rfc822');
+  $self->{ns}->{default_phuri} = $self->{ns}->{phname2uri}->{'rfc822'};
+  
   my @new_fields = ();
   for my $name (keys %options) {
-    if (substr ($name, 0, 1) eq '-') {
-      $self->{option}->{substr ($name, 1)} = $options{$name};
-    } else {
+    unless (substr ($name, 0, 1) eq '-') {
       push @new_fields, ($name => $options{$name});
     }
   }
@@ -291,23 +264,23 @@ sub _init_by_format ($$\%) {
     $header_goodcase{'resent-cc'} = 'Resent-cc';
   } elsif ($format =~ /cgi/) {
     unshift @header_order, qw(content-type location);
-    $option->{sort} = 'good-practice';
-    $option->{fold} = 0;
+    $option->{field_sort} = 'good-practice';
+    $option->{use_folding} = 0;
   } elsif ($format =~ /http/) {
-    $option->{sort} = 'good-practice';
+    $option->{field_sort} = 'good-practice';
   }
   if ($format =~ /uri-url-mailto/) {
     $option->{output_bcc} = 0;
-    $option->{capitalize} = 0;
+    $option->{field_name_capitalize} = 0;
     $option->{field_format_pattern} = '%s=%s';
-    $option->{fold} = sub {
+    $option->{output_folding} = sub {
       $_[1] =~ s/([^:@+\$A-Za-z0-9\-_.!~*])/sprintf('%%%02X', ord $1)/ge;
       $_[1];
-    };
+    };	## Yes, this is not folding!
   }
 }
 
-=item Message::Header->new ([%initial-fields/options])
+=item $msg = Message::Header->new ([%initial-fields/options])
 
 Constructs a new C<Message::Headers> object.  You might pass some initial
 C<field-name>-C<field-body> pairs and/or options as parameters to the constructor.
@@ -323,14 +296,9 @@ Example:
 
 =cut
 
-sub new ($;%) {
-  my $class = shift;
-  my $self = bless {}, $class;
-  $self->_init (@_);
-  $self;
-}
+## Inherited
 
-=item Message::Header->parse ($header, [%initial-fields/options])
+=item $msg = Message::Header->parse ($header, [%initial-fields/options])
 
 Parses given C<header> and constructs a new C<Message::Headers> 
 object.  You might pass some additional C<field-name>-C<field-body> pairs 
@@ -343,25 +311,24 @@ sub parse ($$;%) {
   my $header = shift;
   my $self = bless {}, $class;
   $self->_init (@_);	## BUG: don't check linebreak_strict
-  $header =~ s/\x0D?\x0A$REG{WSP}/\x20/gos;	## unfold
+  $header =~ s/\x0D?\x0A$REG{WSP}/\x20/gos if $self->{option}->{use_folding};
   for my $field (split /\x0D?\x0A/, $header) {
     if ($field =~ /$REG{M_fromline}/) {
-      my $body = $1;
-      $body = $self->_field_body ($body, 'mail-from')
-        if $self->{option}->{parse_all};
-      push @{$self->{field}}, {name => 'mail-from', body => $body};
+      my ($s,undef,$value) = $self->_value_to_arrayitem
+        ('mail-from' => $1, $self->{option});
+      push @{$self->{value}}, $value if $s;
     } elsif ($field =~ /$REG{M_field}/) {
-      my ($name, $body) = (lc $1, $2);
-      $name =~ s/$REG{WSP}+$//;
+      my ($name, $body) = ($1, $2);
       $body =~ s/$REG{WSP}+$//;
-      $body = $self->_field_body ($body, $name) if $self->{option}->{parse_all};
-      push @{$self->{field}}, {name => $name, body => $body};
+      my ($s,undef,$value) = $self->_value_to_arrayitem
+        ($name => $body, $self->{option});
+      push @{$self->{value}}, $value if $s;
     }
   }
   $self;
 }
 
-=item Message::Header->parse_array (\@header, [%initial-fields/options])
+=item $msg = Message::Header->parse_array (\@header, [%initial-fields/options])
 
 Parses given C<header> and constructs a new C<Message::Headers> 
 object.  Same as C<Message::Header-E<lt>parse> but this method
@@ -380,27 +347,29 @@ sub parse_array ($\@;%) {
   $self->_init (@_);
   while (1) {
     my $field = shift @$header;
-    while (1) {
-      if ($$header[0] =~ /^$REG{WSP}/) {
-        $field .= shift @$header;
-      } else {last}
+    if ($self->{option}->{use_folding}) {
+      while (1) {
+        if ($$header[0] =~ /^$REG{WSP}/) {
+          $field .= shift @$header;
+        } else {last}
+      }
     }
     if ($self->{option}->{linebreak_strict}) {
       $field =~ s/\x0D\x0A//g;
     } else {
       $field =~ tr/\x0D\x0A//d;
     }
+    local $self->{option}->{parse} = $self->{option}->{parse_all};
     if ($field =~ /$REG{M_fromline}/) {
-      my $body = $1;
-      $body = $self->_field_body ($body, 'mail-from')
-        if $self->{option}->{parse_all};
-      push @{$self->{field}}, {name => 'mail-from', body => $body};
+      my ($s,undef,$value) = $self->_value_to_arrayitem
+        ('mail-from' => $1, $self->{option});
+      push @{$self->{value}}, $value if $s;
     } elsif ($field =~ /$REG{M_field}/) {
-      my ($name, $body) = (lc $1, $2);
-      $name =~ s/$REG{WSP}+$//;
+      my ($name, $body) = ($self->_n11n_field_name ($1), $2);
       $body =~ s/$REG{WSP}+$//;
-      $body = $self->_field_body ($body, $name) if $self->{option}->{parse_all};
-      push @{$self->{field}}, {name => $name, body => $body};
+      my ($s,undef,$value) = $self->_value_to_arrayitem
+        ($name => $body, $self->{option});
+      push @{$self->{value}}, $value if $s;
     }
     last if $#$header < 0;
   }
@@ -420,77 +389,84 @@ context, only first one is returned.)
 
 =cut
 
-sub field ($$) {
+sub field ($@) {shift->SUPER::item (@_)}
+sub field_exist ($@) {shift->SUPER::item_exist (@_)}
+
+## item-by?, \$checked-item, {item-key => 1}, \%option
+sub _item_match ($$\$\%\%) {
   my $self = shift;
-  my $name = lc shift;
-  my @ret;
-  for my $field (@{$self->{field}}) {
-    if ($field->{name} eq $name) {
-      unless (wantarray) {
-        $field->{body} = $self->_field_body ($field->{body}, $name);
-        return $field->{body};
+  my ($by, $i, $list, $option) = @_;
+  return 0 unless ref $$i;  ## Already removed
+  if ($by eq 'name') {
+    my %o = %$option; $o{parse} = 0;
+    my %l;
+    for (keys %$list) {
+      my ($s, undef, $v) = $self->_value_to_arrayitem ($_, '', %o);
+      if ($s) {
+        $l{$v->{name} . ':' . ( $option->{ns} || $v->{ns} ) } = 1;
       } else {
-        $field->{body} = $self->_field_body ($field->{body}, $name);
-        push @ret, $field->{body};
+        $l{$v->{name} .':'. ( $option->{ns} || $self->{ns}->{default_phuri} ) } = 1;
       }
     }
-  }
-  if ($#ret < 0) {
-    return $self->add ($name);
-  }
-  @ret;
-}
-
-sub field_exist ($$) {
-  my $self = shift;
-  my $name = lc shift;
-  my @ret;
-  for my $field (@{$self->{field}}) {
-    return 1 if ($field->{name} eq $name);
+    return 1 if $l{$$i->{name} . ':' . $$i->{ns}};
   }
   0;
 }
+*_delete_match = \&_item_match;
 
-=head2 $self->field_name ($index)
-
-Returns C<field-name> of $index'th C<field>.
-
-=head2 $self->field_body ($index)
-
-Returns C<field-body> of $index'th C<field>.
-
-=cut
-
-sub field_name ($$) {
-  my $self = shift;
-  $self->{field}->[shift]->{name};
-}
-sub field_body ($$) {
-  my $self = shift;
-  my $i = shift;
-  $self->{field}->[$i]->{body}
-   = $self->_field_body ($self->{field}->[$i]->{body}, $self->{field}->[$i]->{name});
-  $self->{field}->[$i]->{body};
-}
-
-sub _field_body ($$$) {
-  my $self = shift;
-  my ($body, $name) = @_;
-  unless (ref $body) {
-    my $type = $self->{option}->{field_type}->{$name}
-            || $self->{option}->{field_type}->{':DEFAULT'};
-    eval "require $type" or Carp::croak ("_field_body: $type: $@");
-    unless ($body) {
-      $body = $type->new (-field_name => $name,
-        -format => $self->{option}->{format},
-        -parse_all => $self->{option}->{parse_all});
-    } else {
-      $body = $type->parse ($body, -field_name => $name,
-        -format => $self->{option}->{format},
-        -parse_all => $self->{option}->{parse_all});
-    }
+## Returns returned item value    \$item-value, \%option
+sub _item_return_value ($\$\%) {
+  if (ref ${$_[1]}->{body}) {
+    ${$_[1]}->{body};
+  } else {
+    ${$_[1]}->{body} = $_[0]->_parse_value (${$_[1]}->{name} => ${$_[1]}->{body},
+      ns => ${$_[1]}->{ns});
+    ${$_[1]}->{body};
   }
-  $body;
+}
+
+## Returns returned (new created) item value    $name, \%option
+sub _item_new_value ($$\%) {
+    my ($s,undef,$value) = $_[0]->_value_to_arrayitem
+        ($_[1] => '', $_[2]);
+    $s? $value: undef;
+}
+
+
+
+## $self->_parse_value ($type, $value, %options);
+sub _parse_value ($$$;%) {
+  my $self = shift;
+  my $name = shift ;#|| $self->{option}->{_VALTYPE_DEFAULT};
+  my $value = shift;  return $value if ref $value;
+  my %option = @_;
+  my $vtype; { no strict 'refs';
+    $vtype = ${&_NS_uri2phpackage ($option{ns}).'::OPTION'}{value_type};
+    if (ref $vtype) { $vtype = $vtype->{$name} }
+    unless (ref $vtype) { $vtype = $vtype->{$self->{option}->{_VALTYPE_DEFAULT}} }
+    ## For compatiblity.
+    unless (ref $vtype) { $vtype = $self->{option}->{value_type}->{$name}
+      || $self->{option}->{value_type}->{$self->{option}->{_VALTYPE_DEFAULT}} }
+  }
+  my $vpackage = $vtype->[0];
+  my %vopt = %{$vtype->[1]} if ref $vtype->[1];
+  if ($vpackage eq ':none:') {
+    return $value;
+  } elsif (defined $value) {
+    eval "require $vpackage" or Carp::croak qq{<parse>: $vpackage: Can't load package: $@};
+    return $vpackage->parse ($value,
+      -format	=> $self->{option}->{format},
+      -field_name	=> $name,
+      -parse_all	=> $self->{option}->{parse_all},
+    %vopt);
+  } else {
+    eval "require $vpackage" or Carp::croak qq{<parse>: $vpackage: Can't load package: $@};
+    return $vpackage->new (
+      -format	=> $self->{option}->{format},
+      -field_name	=> $name,
+      -parse_all	=> $self->{option}->{parse_all},
+    %vopt);
+  }
 }
 
 =head2 $self->field_name_list ()
@@ -503,8 +479,18 @@ returns ALL names.)
 
 sub field_name_list ($) {
   my $self = shift;
-  $self->_delete_empty_field ();
-  map {$_->{name}} @{$self->{field}};
+  $self->_delete_empty ();
+  map { $_->{name} . ':' . $_->{ns} } @{$self->{value}};
+}
+
+sub namespace_ph_default ($;$) {
+  my $self = shift;
+  if (defined $_[0]) {
+    no strict 'refs';
+    $self->{ns}->{default_phuri} = $_[0];
+    $self->_ns_load_ph (${&_NS_uri2phpackage ($self->{ns}->{default_phuri}).'::OPTION'}{namespace_phname});
+  }
+  $self->{ns}->{default_phuri};
 }
 
 =item $hdr->add ($field-name, $field-body, [$name, $body, ...])
@@ -530,27 +516,47 @@ C<-validate>: Checks whether C<field-name> is valid or not.
 
 =cut
 
-sub add ($%) {
+## [Name: Value] pair -> internal array item
+## $self->_value_to_arrayitem ($name => $value, {%options})
+## or
+## $self->_value_to_arrayitem ($name => [$value, %value_options], {%options})
+## 
+## Return: ((1 = success / 0 = failue), $full_name, $arrayitem)
+sub _value_to_arrayitem ($$$\%) {
   my $self = shift;
-  my %fields = @_;
-  my %option = %{$self->{option}};
-  $option{parse} = 1 if defined wantarray;
-  for (grep {/^-/} keys %fields) {$option{substr ($_, 1)} = $fields{$_}}
-  my $body;
-  for (grep {/^[^-]/} keys %fields) {
-    my $name = lc $_;  $body = $fields{$_};
-    $name =~ tr/_/-/ if $option{translate_underscore};
-    Carp::croak "add: $name: invalid field-name"
-      if $option{validate} && $name =~ /$REG{UNSAFE_field_name}/;
-    $body = $self->_field_body ($body, $name) if $option{parse};
-    if ($option{prepend}) {
-      unshift @{$self->{field}}, {name => $name, body => $body};
-    } else {
-      push @{$self->{field}}, {name => $name, body => $body};
+  my ($name, $value, $option) = @_;
+  my $value_option = {};
+  if (ref $value eq 'ARRAY') {
+    ($value, %$value_option) = @$value;
+  }
+  my $nsuri = $self->{ns}->{default_phuri};
+  no strict 'refs';
+  if ($option->{ns}) {
+    $nsuri = $option->{ns};
+  } elsif ($name =~ s/^([Xx]-[A-Za-z]+|[A-Za-z]+)-//) {
+    my $oprefix = $1;
+    my $prefix
+      = &{${&_NS_uri2phpackage ($nsuri).'::OPTION'}{n11n_prefix}}
+        ($self, &_NS_uri2phpackage ($nsuri), $oprefix);
+    $self->_ns_load_ph ($prefix);
+    $nsuri = $self->{ns}->{phname2uri}->{$prefix};
+    unless ($nsuri) {
+      $name = $oprefix . '-' . $name;
+      $nsuri = $self->{ns}->{default_phuri};
     }
   }
-  $body if $option{parse};
+  $name
+    = &{${&_NS_uri2phpackage ($nsuri).'::OPTION'}{n11n_name}}
+      ($self, &_NS_uri2phpackage ($nsuri), $name);
+  Carp::croak "$name: invalid field-name"
+    if $option->{field_name_validation}
+      && $name =~ /$REG{$option->{field_name_unsafe_rule}}/;
+  $value = $self->_parse_value ($name => $value, ns => $nsuri) if $$option{parse};
+  $$option{parse} = 0;
+  (1, $name.':'.$nsuri => {name => $name, body => $value, ns => $nsuri});
 }
+*_add_hash_check = \&_value_to_arrayitem;
+*_replace_hash_check = \&_value_to_arrayitem;
 
 =head2 $self->relace ($field_name, $field_body)
 
@@ -562,32 +568,14 @@ first one is used and the others are not changed.)
 
 =cut
 
-sub replace ($%) {
-  my $self = shift;
-  my %params = @_;
-  my %option = %{$self->{option}};
-  $option{parse} = defined wantarray unless defined $option{parse};
-  for (grep {/^-/} keys %params) {$option{substr ($_, 1)} = $params{$_}}
-  my (%new_field);
-  for (grep {/^[^-]/} keys %params) {
-    my $name = lc $_;
-    $name =~ tr/_/-/ if $option{translate_underscore};
-    Carp::croak "replace: $name: invalid field-name"
-      if $option{validate} && $name =~ /$REG{UNSAFE_field_name}/;
-    $params{$_} = $self->_field_body ($params{$_}, $name) if $option{parse};
-    $new_field{$name} = $params{$_};
+sub _replace_hash_shift ($\%$\%) {
+  shift; my $r = shift;  my $n = $_[0]->{name};
+  if ($$r{$n}) {
+    my $d = $$r{$n};
+    delete $$r{$n};
+    return $d;
   }
-  my $body = (%new_field)[-1];
-  for my $field (@{$self->{field}}) {
-    if (defined $new_field{$field->{name}}) {
-      $field->{body} = $new_field {$field->{name}};
-      $new_field{$field->{name}} = undef;
-    }
-  }
-  for (keys %new_field) {
-    push @{$self->{field}}, {name => $_, body => $new_field{$_}};
-  }
-  $body if $option{parse};
+  undef;
 }
 
 =head2 $self->delete ($field-name, [$name, ...])
@@ -596,13 +584,6 @@ Deletes C<field> named as $field_name.
 
 =cut
 
-sub delete ($@) {
-  my $self = shift;
-  my %delete;  for (@_) {$delete{lc $_} = 1}
-  for my $field (@{$self->{field}}) {
-    undef $field if $delete{$field->{name}};
-  }
-}
 
 =head2 $self->count ([$field_name])
 
@@ -612,20 +593,19 @@ of fields.  (Same as $#$self+1)
 
 =cut
 
-sub count ($;$) {
+sub _count_by_name ($$\%) {
   my $self = shift;
-  my ($name) = (lc shift);
-  unless ($name) {
-    $self->_delete_empty_field ();
-    return $#{$self->{field}}+1;
-  }
-  my $count = 0;
-  for my $field (@{$self->{field}}) {
-    if ($field->{name} eq $name) {
-      $count++;
-    }
-  }
-  $count;
+  my ($array, $option) = @_;
+  my $name = $self->_n11n_field_name ($$option{-name});
+  my @a = grep {$_->{name} eq $name} @{$self->{$array}};
+  $#a + 1;
+}
+
+## Delete empty items
+sub _delete_empty ($) {
+  my $self = shift;
+  my $array = $self->{option}->{_HASH_NAME};
+  $self->{$array} = [grep {ref $_ && length $_->{name}} @{$self->{$array}}];
 }
 
 =head2 $self->rename ($field-name, $new-name, [$old, $new,...])
@@ -641,13 +621,16 @@ sub rename ($%) {
   for (grep {/^-/} keys %params) {$option{substr ($_, 1)} = $params{$_}}
   my %new_name;
   for (grep {/^[^-]/} keys %params) {
-    my ($old => $new) = (lc $_ => lc $params{$_});
+    my ($old => $new)
+      = ($self->_n11n_field_name ($_) => $self->_n11n_field_name ($params{$_}));
+    $old =~ tr/_/-/ if $option{translate_underscore};
     $new =~ tr/_/-/ if $option{translate_underscore};
     Carp::croak "rename: $new: invalid field-name"
-      if $option{validate} && $new =~ /$REG{UNSAFE_field_name}/;
+      if $option{field_name_validation}
+        && $new =~ /$REG{$option{field_name_unsafe_rule}}/;
     $new_name{$old} = $new;
   }
-  for my $field (@{$self->{field}}) {
+  for my $field (@{$self->{value}}) {
     if (length $new_name{$field->{name}}) {
       $field->{name} = $new_name{$field->{name}};
     }
@@ -665,19 +648,22 @@ for each value.
 
 =cut
 
-sub scan ($&) {
-  my ($self, $sub) = @_;
+sub _scan_sort ($\@\%) {
+  my $self = shift;
+  my ($array, $option) = @_;
   my $sort;
-  $sort = \&_header_cmp if $self->{option}->{sort} eq 'good-practice';
-  $sort = {$a cmp $b} if $self->{option}->{sort} eq 'alphabetic';
-  my @field = @{$self->{field}};
-  if (ref $sort) {
-    @field = sort $sort @{$self->{field}};
-  }
-  for my $field (@field) {
-    next if $field->{name} =~ /^_/;
-    &$sub($field->{name} => $field->{body});
-  }
+  $sort = \&_header_cmp if $option->{field_sort} eq 'good-practice';
+  $sort = {$a cmp $b} if $option->{field_sort} eq 'alphabetic';
+  return ( sort $sort @$array ) if ref $sort;
+  @$array;
+}
+
+sub _n11n_field_name ($$) {
+  my $self = shift;
+  my $s = shift;
+  $s =~ s/^$REG{WSP}+//; $s =~ s/$REG{WSP}+$//;
+  $s = lc $s ;#unless $self->{option}->{field_name_case_sensible};
+  $s;
 }
 
 # Compare function which makes it easy to sort headers in the
@@ -710,17 +696,32 @@ sub stringify ($;%) {
   for (grep {/^-/} keys %params) {$option{substr ($_, 1)} = $params{$_}}
   my @ret;
   my $_stringify = sub {
-      my ($name, $body) = (@_);
+    no strict 'refs';
+      my ($name, $body, $nsuri) = ($_[1]->{name}, $_[1]->{body}, $_[1]->{ns});
       return unless length $name;
-      return if $option{mail_from} && $name eq 'mail-from';
+      return if $option{output_mail_from} && $name eq 'mail-from';
       return if !$option{output_bcc} && ($name eq 'bcc' || $name eq 'resent-bcc');
+      my $nspackage = &_NS_uri2phpackage ($nsuri);
+      my $oname;	## Outputed field-name
+      my $prefix = ${$nspackage.'::OPTION'} {namespace_phname_goodcase}
+                || $self->{ns}->{uri2phname}->{$nsuri};
+      $prefix = undef if $nsuri eq $self->{ns}->{default_phuri};
+      my $gc = ${$nspackage.'::OPTION'} {to_be_goodcase};
+      if (ref $gc) { $oname = &$gc ($self, $nspackage, $name) }
+      else { $oname = $name }
+      if ($prefix) { $oname = $prefix . '-' . $oname }
       if ($option{format} =~ /uri-url-mailto/) {
         return if ((   $option{uri_mailto_safe}->{$name}
              || $option{uri_mailto_safe}->{':default'})
               < $option{uri_mailto_safe_level});
         if ($name eq 'to') {
-          $body = $self->field ('to');
-          return unless ref $body && $body->have_group;
+          $body = $self->field ('to', -new_item_unless_exist => 0);
+          if (ref $body && $body->have_group) {
+            # 
+          } elsif (ref $body && $body->count > 1) {
+            $body = $body->clone;
+            $body->delete ({-by => 'index'}, 0);
+          }
         }
       }
       my $fbody;
@@ -737,39 +738,46 @@ sub stringify ($;%) {
       } else {
         $fbody =~ s/\x0D\x0A(?=[^\x09\x20])/\x0D\x0A\x20/g;
       }
-      if (ref $option{capitalize}) {
-        $name = &{$option{capitalize}} ($self, $name);
-      } elsif ($option{capitalize}) {
-        $name =~ s/((?:^|-)[a-z])/uc($1)/ge;
+      if ($option{use_folding}) {
+        if (ref $option{output_folding}) {
+          $fbody = &{$option{output_folding}} ($self, $fbody,
+            -initial_length => length ($oname) +2);
+        } elsif ($option{output_folding}) {
+          $fbody = $self->_fold ($fbody, -initial_length => length ($oname) +2);
+        }
       }
-      if (ref $option{fold}) {
-        $fbody = &{$option{fold}} ($self, $fbody);
-      } elsif ($option{fold}) {
-        $fbody = $self->_fold ($fbody);
-      }
-      push @ret, sprintf $option{field_format_pattern}, $name, $fbody;
+      push @ret, sprintf $option{field_format_pattern}, $oname, $fbody;
     };
-  if ($option{format} =~ /uri-url-mailto-to/) {
-    if ($self->field_exist ('to')) {
-      my $to = $self->field ('to');
-      unless ($to->have_group) {
-        my $fbody = $to->stringify (-format => $option{format});
-        return &{$option{fold}} ($self, $fbody);
+  if ($option{format} =~ /uri-url-mailto/) {
+    if ($option{format} =~ /uri-url-mailto-to/) {
+      my $to = $self->field ('to', -new_item_unless_exist => 0);
+      if ($to) {
+        unless ($to->have_group) {
+          my $fbody = $to->stringify (-format => $option{format}, -max => 1);
+          return &{$option{output_folding}} ($self, $fbody);
+        }
       }
+      '';
+    } elsif ($option{format} =~ /uri-url-mailto-rfc1738/) {
+      my $to = $self->field ('to', -new_item_unless_exist => 0);
+      if ($to) {
+        my $fbody = $to->addr_spec (-format => $option{format});
+        return &{$option{output_folding}} ($self, $fbody);
+      }
+      '';
+    } else {
+      $self->scan ($_stringify);
+      my $ret = join ('&', @ret);
+      $ret;
     }
-    '';
-  } elsif ($option{format} =~ /uri-url-mailto/) {
-    $self->scan ($_stringify);
-    my $ret = join ('&', @ret);
-    $ret;
   } else {
-    if ($option{mail_from}) {
-      my $fromline = $self->field ('mail-from');
+    if ($option{output_mail_from}) {
+      my $fromline = $self->field ('mail-from', -new_item_unless_exist => 0);
       push @ret, 'From '.$fromline if $fromline;
     }
     $self->scan ($_stringify);
-    my $ret = join ("\n", @ret);
-    $ret? $ret."\n": '';
+    my $ret = join ("\x0D\x0A", @ret);
+    $ret? $ret."\x0D\x0A": '';
   }
 }
 *as_string = \&stringify;
@@ -786,7 +794,6 @@ sub option ($@) {
     return $self->{option}->{ shift (@_) };
   }
   while (my ($name, $value) = splice (@_, 0, 2)) {
-    $name =~ s/^-//;
     $self->{option}->{$name} = $value;
     if ($name eq 'format') {
       for my $f (@{$self->{field}}) {
@@ -798,59 +805,40 @@ sub option ($@) {
   }
 }
 
-sub field_type ($$;$) {
-  my $self = shift;
-  my $field_name = shift;
-  my $new_field_type = shift;
-  if ($new_field_type) {
-    $self->{option}->{field_type}->{$field_name} = $new_field_type;
-  }
-  $self->{option}->{field_type}->{$field_name}
-  || $self->{option}->{field_type}->{':DEFAULT'};
-}
+sub field_type ($@) {shift->SUPER::value_type (@_)}
 
-sub _delete_empty_field ($) {
-  my $self = shift;
-  my @ret;
-  for my $field (@{$self->{field}}) {
-    push @ret, $field if $field->{name};
-  }
-  $self->{field} = \@ret;
-  $self;
-}
-
-sub _fold ($$;$) {
+## $self->_fold ($string, %option = (-max, -initial_length(for field-name)) )
+sub _fold ($$;%) {
   my $self = shift;
   my $string = shift;
-  my $len = shift || $self->{option}->{fold_length};
-  $len = 60 if $len < 60;
+  my %option = @_;
+  my $max = $self->{option}->{line_length_max};
+  $max = 20 if $max < 20;
   
-  ## This code is taken from Mail::Header 1.43 in MailTools,
-  ## by Graham Barr (Maintained by Mark Overmeer <mailtools@overmeer.net>).
-  my $max = int($len - 5);         # 4 for leading spcs + 1 for [\,\;]
-  my $min = int($len * 4 / 5) - 4;
-  my $ml = $len;
-  
-  if (length($string) > $ml) {
-     #Split the line up
-     # first bias towards splitting at a , or a ; >4/5 along the line
-     # next split a whitespace
-     # else we are looking at a single word and probably don't want to split
-     my $x = "";
-     $x .= "$1\n "
-       while($string =~ s/^$REG{WSP}*(
-                          [^"]{$min,$max}?[\,\;]
-                          |[^"]{1,$max}$REG{WSP}
-                          |[^\s"]*(?:"[^"]*"[^\s"]*)+$REG{WSP}
-                          |[^\s"]+$REG{WSP}
-                          )
-                        //x);
-     $x .= $string;
-     $string = $x;
-     $string =~ s/(\A$REG{WSP}+|$REG{WSP}+\Z)//sog;
-     $string =~ s/\s+\n/\n/sog;
-  }
+  my $l = $option{-initial_length} || 0;
+  $string =~ s{([\x09\x20][^\x09\x20]+)}{
+    my $s = $1;
+    if ($l + length $s > $max) {
+      $s = "\x0D\x0A\x20" . $s;
+      $l = length ($s) - 2;
+    } else { $l += length $s }
+    $s;
+  }gex;
   $string;
+}
+
+sub _ns_load_ph ($$) {
+  my $self = shift;
+  my $name = shift;	## normalized prefix (without HYPHEN-MINUS)
+  return if $self->{ns}->{phname2uri}->{$name};
+  $self->{ns}->{phname2uri}->{$name} = $NS_phname2uri{$name};
+  return unless $self->{ns}->{phname2uri}->{$name};
+  $self->{ns}->{uri2phname}->{$self->{ns}->{phname2uri}->{$name}} = $name;
+}
+
+sub _NS_uri2phpackage ($) {
+  $NS_uri2phpackage{$_[0]}
+  || $NS_uri2phpackage{$Message::Header::Default::OPTION{namespace_uri}};
 }
 
 =head2 $self->clone ()
@@ -859,23 +847,7 @@ Returns a copy of Message::Header object.
 
 =cut
 
-sub clone ($) {
-  my $self = shift;
-  my $clone = new Message::Header;
-  for my $name (%{$self->{option}}) {
-    if (ref $self->{option}->{$name} eq 'HASH') {
-      $clone->{option}->{$name} = {%{$self->{option}->{$name}}};
-    } elsif (ref $self->{option}->{$name} eq 'ARRAY') {
-      $clone->{option}->{$name} = [@{$self->{option}->{$name}}];
-    } else {
-      $clone->{option}->{$name} = $self->{option}->{$name};
-    }
-  }
-  for (@{$self->{field}}) {
-    $clone->add ($_->{name}, scalar $_->{body});
-  }
-  $clone;
-}
+## Inhreited
 
 =head1 NOTE
 
@@ -943,7 +915,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/15 07:31:28 $
+$Date: 2002/05/25 09:53:24 $
 
 =cut
 

@@ -12,29 +12,61 @@ MIME multipart will be also supported (but not implemented yet).
 
 package Message::Entity;
 use strict;
-use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use vars qw(%DECODER %DEFAULT %ENCODER $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Header;
 require Message::Util;
 use overload '""' => sub { $_[0]->stringify },
              fallback => 1;
 
-sub _init ($;%) {
-  my $self = shift;
-  my %options = @_;
-  $self->{option} = {
+%ENCODER = (
+	'7bit'	=> sub { $_[1] },
+	'8bit'	=> sub { $_[1] },
+	binary	=> sub { $_[1] },
+	base64	=> sub { require MIME::Base64; 
+		         MIME::Base64::encode ($_[1]) },
+	'quoted-printable'
+		=> sub { require MIME::QuotedPrint; 
+		         MIME::QuotedPrint::encode ($_[1]) },
+);
+%DECODER = (
+	'7bit'	=> sub { ($_[1], '7bit') },
+	'8bit'	=> sub { ($_[1], '8bit') },
+	binary	=> sub { ($_[1], 'binary') },
+	base64	=> sub { require MIME::Base64; 
+		         (MIME::Base64::decode ($_[1]), 'binary') },
+	'quoted-printable'
+		=> sub { require MIME::QuotedPrint; 
+		         (MIME::QuotedPrint::decode ($_[1]), 'binary') },
+);
+
+## Initialize of this class -- called by constructors
+  %DEFAULT = (
+    _METHODS	=> [qw|header body content_type id|],
+    _MEMBERS	=> [qw|header body|],
     add_ua	=> 1,
-    body_class	=> {'/DEFAULT' => 'Message::Body::TextPlain'},
     #fill_date	=> 1,
+    fill_date_name	=> 'date',
     #fill_msgid	=> 1,
+    fill_msgid_name	=> 'message-id',
     format	=> 'mail-rfc2822',
     linebreak_strict	=> 0,	## BUG: not work perfectly
     parse_all	=> 0,
     #ua_field_name	=> 'user-agent',
     ua_use_config	=> 1,
     uri_mailto_safe_level	=> 4,
-  };
+    value_type	=> {
+    	'*default'	=> ['Message::Body::TextPlain'],
+    	'text/*'	=> ['Message::Body::TextPlain'],
+    	#'*/*+xml'	=> ['Message::Body::TextPlain'],
+    },
+  );
+sub _init ($;%) {
+  my $self = shift;
+  my %options = @_;
+  $self->{option} = Message::Util::make_clone (\%DEFAULT);
+  
   my @new_fields = ();
   for my $name (keys %options) {
     if (substr ($name, 0, 1) eq '-') {
@@ -43,7 +75,19 @@ sub _init ($;%) {
       push @new_fields, (lc $name => $options{$name});
     }
   }
+  require Message::Header::Default;
   my $format = $self->{option}->{format};
+  if ($format =~ /http/) {
+    $self->{option}->{fill_date_ns} = $Message::Header::HTTP::OPTION{namespace_uri};
+    $self->{option}->{fill_msgid_from_ns} = $Message::Header::HTTP::OPTION{namespace_uri};
+    $self->{option}->{fill_ua_ns} = $Message::Header::HTTP::OPTION{namespace_uri};
+  } else {
+    $self->{option}->{fill_date_ns} = $Message::Header::RFC822::OPTION{namespace_uri};
+    $self->{option}->{fill_msgid_from_ns} = $Message::Header::RFC822::OPTION{namespace_uri};
+    $self->{option}->{fill_ua_ns} = $Message::Header::RFC822::OPTION{namespace_uri};
+  }
+  $self->{option}->{fill_msgid_ns} = $Message::Header::RFC822::OPTION{namespace_uri};
+  $self->{option}->{fill_mimever_ns} = $Message::Header::RFC822::OPTION{namespace_uri};
   unless (defined $self->{option}->{fill_date}) {
     $self->{option}->{fill_date} = $format !~ /cgi|uri-url-mailto/;
   }
@@ -53,8 +97,8 @@ sub _init ($;%) {
   unless (defined $self->{option}->{fill_mimever}) {
     $self->{option}->{fill_mimever} = $format !~ /http/;
   }
-  unless (length $self->{option}->{ua_field_name}) {
-    $self->{option}->{ua_field_name} = $format =~ /response|cgi|uri-url-mailto/?
+  unless (length $self->{option}->{fill_ua_name}) {
+    $self->{option}->{fill_ua_name} = $format =~ /response|cgi|uri-url-mailto/?
       'server': 'user-agent';
   }
   @new_fields;
@@ -88,10 +132,11 @@ sub new ($;%) {
   my %new_field = $self->_init (@_);
   if (length $new_field{body}) {
     $self->{body} = $new_field{body};  $new_field{body} = undef;
-    $self->{body} = $self->_body ($self->{body}, $self->content_type)
+    $self->{body} = $self->_parse_value ($self->content_type, $self->{body})
       if $self->{option}->{parse_all};
   }
-  $self->{header} = new Message::Header -format => $self->{option}->{format},
+  $self->{header} = new Message::Header
+    -format => $self->{option}->{format},
     -parse_all => $self->{option}->{parse_all}, %new_field;
   $self;
 }
@@ -109,8 +154,8 @@ sub parse ($$;%) {
   my $message = shift;
   my $self = bless {}, $class;
   my %new_field = $self->_init (@_);
-  my @header = ();	## BUG: don't check linebreak_strict
-  my @body = split /\x0D?\x0A/, $message;	## BUG: not binary-clean...
+  my @header = ();	## BUG: This doesn't see linebreak_strict
+  my @body = split /\x0D?\x0A/, $message;	## BUG: not binary-safe
   while (1) {
     my $line = shift @body;
     unless (length($line)) {
@@ -124,7 +169,7 @@ sub parse ($$;%) {
     -parse_all => $self->{option}->{parse_all},
     -format => $self->{option}->{format}, %new_field;
   $self->{body} = join "\n", @body;	## BUG: binary-unsafe
-  $self->{body} = $self->_body ($self->{body}, $self->content_type)
+  $self->{body} = $self->_parse_value ($self->content_type => $self->{body})
     if $self->{option}->{parse_all};
   $self;
 }
@@ -153,8 +198,10 @@ sub header ($;$) {
       -parse_all => $self->{option}->{parse_all},
       -format => $self->{option}->{format});
   }
-  unless ($self->{header}) {
-    $self->{header} = new Message::Header (-format => $self->{option}->{format});
+  unless (ref $self->{header} || length $self->{header}) {
+    $self->{header} = new Message::Header (
+      -parse_all => $self->{option}->{parse_all},
+      -format => $self->{option}->{format});
   }
   $self->{header};
 }
@@ -172,26 +219,78 @@ sub body ($;$) {
   if ($new_body) {
     $self->{body} = $new_body;
   }
-  $self->{body} = $self->_body ($self->{body}, $self->content_type)
+  $self->{body} = $self->_parse_value ($self->content_type => $self->{body})
     unless ref $self->{body};
   $self->{body};
 }
 
-sub _body ($;$$) {
+## $self->_parse_value ($type, $value);
+sub _parse_value ($$$) {
   my $self = shift;
-  my $body = shift;
-  my $ct = shift;
-  $ct = $self->{option}->{body_class}->{$ct}
-     || $self->{option}->{body_class}->{'/DEFAULT'};
-  eval "require $ct";
-  if (ref $body) {
-    return $body;
-  } elsif ($body) {
-    return $ct->parse ($body,
-      -parse_all => $self->{option}->{parse_all});
+  my $name = shift || '*default';
+  my $value = shift;
+  return $value if ref $value;
+  
+  ## decode
+  $value = $self->_decode_body ($value);
+  
+  my $vtype = $self->{option}->{value_type}->{$name}->[0]
+      || $self->{option}->{value_type}->{'*default'}->[0];
+  my %vopt; %vopt = %{$self->{option}->{value_type}->{$name}->[1]} 
+    if ref $self->{option}->{value_type}->{$name}->[1];
+  if ($vtype eq ':none:') {
+    return $value;
+  } elsif (defined $value) {
+    eval "require $vtype" or Carp::croak qq{<parse>: $vtype: Can't load package: $@};
+    return $vtype->parse ($value,
+      -format	=> $self->{option}->{format},
+      -parent_type	=> $name,
+      -parse_all	=> $self->{option}->{parse_all},
+    %vopt);
   } else {
-    return $ct->new ($body);
+    eval "require $vtype" or Carp::croak qq{<parse>: $vtype: Can't load package: $@};
+    return $vtype->new (
+      -format	=> $self->{option}->{format},
+      -parent_type	=> $name,
+      -parse_all	=> $self->{option}->{parse_all},
+    %vopt);
   }
+}
+
+sub _decode_body ($$) {
+  my $self = shift;
+  my $value = shift;
+  ## MIME CTE
+  	my $cte = $self->{_cte};
+  	my $ctef = $self->header->field ('content-transfer-encoding',
+  	                              -new_item_unless_exist => 0);
+  	$cte = $ctef->value if ref $ctef;
+  	my $f = $DECODER{$cte};
+  	if (ref $f) {
+  	  ($value, $cte) = &$f ($self, $value);
+  	}
+  	$self->{_cte} = $cte;
+  $value;
+}
+
+sub _encode_body ($$) {
+  my $self = shift;
+  my $value = shift;
+  ## MIME CTE
+  	my $current_cte = $self->{_cte};
+  	my $ctef = $self->header->field ('content-transfer-encoding',
+  	                              -new_item_unless_exist => 0);
+  	my $cte; $cte = lc $ctef->value if ref $ctef;
+  	if ($current_cte && $current_cte ne $cte) {
+  	  #my $de = $DECODER{$current_cte};
+  	  my $en = $ENCODER{$cte};
+  	  if (ref $en) {
+  	    $value = &$en ($self, $value);
+  	  } else {	## Can't encode by given CTE
+  	    $ctef->value ($current_cte);
+  	  }
+  	}
+  $value;
 }
 
 =head2 $self->stringify ([%option])
@@ -206,26 +305,47 @@ sub stringify ($;%) {
   my %option = %{$self->{option}};
   for (grep {/^-/} keys %params) {$option{substr ($_, 1)} = $params{$_}}
   my ($header, $body);
+  my %exist;
   if (ref $self->{header}) {
-    my %exist;
     for ($self->{header}->field_name_list) {$exist{$_} = 1}
-    if ($option{fill_date} && !$exist{'date'}) {
-      $self->{header}->field ('date')->unix_time (time);
+  }
+  if (ref $self->{body}) {
+    $body = $self->{body}->stringify (-format => $option{format},
+      -linebreak_strict => $option{linebreak_strict});
+  } else {
+    $body = $self->{body};
+  }
+    #if ($exist{'content-transfer-encoding'}) {
+     # $body = $self->_encode_body ($body);
+    #}
+  if (ref $self->{header}) {
+    my $ns_content = $Message::Header::Content::OPTION{namespace_uri};
+    if ($option{fill_date}
+       && !$exist{$option{fill_date_name}.':'.$option{fill_date_ns}}) {
+      #die  $option{fill_date_ns};
+      $self->{header}->field
+        ($option{fill_date_name}, -ns => $option{fill_date_ns})->unix_time (time);
     }
-    if ($option{fill_msgid} && !$exist{'message-id'}) {
-      my $from = $self->{header}->field ('from')->addr_spec;
-      $self->{header}->field ('message-id')->generate (addr_spec => $from)
+    if ($option{fill_msgid}
+       && !$exist{$option{fill_msgid_name}.':'.$option{fill_msgid_ns}}) {
+      my $from = $self->{header}->field
+        ('from', -ns => $option{fill_msgid_from_ns}, -new_item_unless_exist => 0);
+      $from = $from->addr_spec if ref $from;
+      $self->{header}->field
+        ($option{fill_msgid_name}, -ns => $option{fill_msgid_ns})
+        ->generate (addr_spec => $from)
         if $from;
     }
-    if ($option{fill_mimever} && !$exist{'mime-version'}) {
+    if ($option{fill_mimever} && !$exist{'mime-version:'.$option{fill_mimever_ns}}) {
       ## BUG: rfc1049...
       my $ismime = 0;
-      for (keys %exist) {if (/^content-/) {$ismime = 1; last}}
+      for (keys %exist) {if (/:$ns_content$/) { $ismime = 1; last }}
       if ($ismime) {
-        $self->{header}->add ('mime-version' => '1.0', -parse => 0);
+        $self->{header}->add ('mime-version' => '1.0', 
+          -parse => 0, -ns => $option{fill_mimever_ns});
       }
     }
-    if ($option{format} =~ /uri-url-mailto/ && $exist{'content-type'}
+    if ($option{format} =~ /uri-url-mailto/ && $exist{'type:$ns_content'}
      && $option{uri_mailto_safe_level} > 1) {
       $self->{header}->field ('content-type')->media_type ('text/plain');
     }
@@ -241,23 +361,23 @@ sub stringify ($;%) {
       $header =~ s/\x0A(?=[^\x09\x20])/\x0A\x20/g;
     }
   }
-  if (ref $self->{body}) {
-    $body = $self->{body}->stringify (-format => $option{format},
-      -linebreak_strict => $option{linebreak_strict});
-  } else {
-    $body = $self->{body};
-  }
   if ($option{format} =~ /uri-url-mailto/) {
-    my $f = $option{format};  $f =~ s/-mailto/-mailto-to/;
-    my $to = $self->{header}->stringify (-format => $f,
-      -uri_mailto_safe_level => $option{uri_mailto_safe_level});
-    $body =~ s/([^:@+\$A-Za-z0-9\-_.!~*])/sprintf('%%%02X', ord $1)/ge;
-    if (length $body) {
-      $header .= '&' if $header;
-      $header .= 'body='.$body;
+    if ($option{format} =~ /rfc1738/) {
+      my $to = $self->{header}->stringify (-format => $option{format},
+        -uri_mailto_safe_level => $option{uri_mailto_safe_level});
+      $to? 'mailto:'.$to: '';
+    } else {
+      my $f = $option{format};  $f =~ s/-mailto/-mailto-to/;
+      my $to = $self->{header}->stringify (-format => $f,
+        -uri_mailto_safe_level => $option{uri_mailto_safe_level});
+      $body =~ s/([^:@+\$A-Za-z0-9\-_.!~*])/sprintf('%%%02X', ord $1)/ge;
+      if (length $body) {
+        $header .= '&' if $header;
+        $header .= 'body='.$body;
+      }
+      $header = '?'.$header if $header;
+      $to||$header? 'mailto:'.$to.$header: '';
     }
-    $header = '?'.$header if $header;
-    'mailto:'.$to.$header;
   } else {
     $header .= "\n" if $header && $header !~ /\n$/;
     $header."\n".$body;
@@ -312,11 +432,12 @@ sub id ($) {
   '';
 }
 
-## Internal function for addition of User-Agent: C<product>.
+## Internal function to add of User-Agent: C<product>.
 sub _add_ua_field ($) {
   my $self = shift;
   if ($self->{option}->{add_ua}) {
-    my $ua = $self->{header}->field ($self->{option}->{ua_field_name});
+    my $ua = $self->{header}->field ($self->{option}->{fill_ua_name},
+      -ns => $self->{option}->{fill_ua_ns});
     $ua->replace ('Message-pm' => $VERSION, -prepend => 0);
     my @os;
     my @perl_comment;
@@ -351,13 +472,6 @@ If @_ == 1, returns option value.  Else...
 Set option value.  You can pass multiple option name-value pair
 as parameter.  Example:
 
-  $msg->option (-format => 'mail-rfc822',
-                -capitalize => 0);
-  print $msg->option ('-format');	## mail-rfc822
-
-Note that introduction character, i.e. C<-> (HYPHEN-MINUS)
-is optional.  You can also write as this:
-
   $msg->option (format => 'mail-rfc822',
                 capitalize => 0);
   print $msg->option ('format');	## mail-rfc822
@@ -370,13 +484,14 @@ sub option ($@) {
     return $self->{option}->{ $_[0] };
   }
   while (my ($name, $value) = splice (@_, 0, 2)) {
-    $name =~ s/^-//;
     $self->{option}->{$name} = $value;
     if ($name eq 'format') {
       $self->header->option (-format => $value);
     }
   }
 }
+
+## TODO: value_type()
 
 =item $self->clone ()
 
@@ -387,18 +502,22 @@ Returns a copy of Message::Entity object.
 sub clone ($) {
   my $self = shift;
   my $clone = new Message::Entity;
-  for my $name (%{$self->{option}}) {
-    if (ref $self->{option}->{$name} eq 'HASH') {
-      $clone->{option}->{$name} = {%{$self->{option}->{$name}}};
-    } elsif (ref $self->{option}->{$name} eq 'ARRAY') {
-      $clone->{option}->{$name} = [@{$self->{option}->{$name}}];
-    } else {
-      $clone->{option}->{$name} = $self->{option}->{$name};
-    }
+  $clone->{option} = Message::Util::make_clone ($self->{option});
+  for (@{$self->{option}->{_MEMBERS}}) {
+    $clone->{$_} = Message::Util::make_clone ($self->{$_});
   }
-  $clone->{header} = ref $self->{header}? $self->{header}->clone: $self->{header};
-  $clone->{body} = ref $self->{body}? $self->{body}->clone: $self->{body};
   $clone;
+}
+
+my %_method_default_list = qw(new 1 parse 1 stringify 1 option 1 clone 1 method_available 1);
+sub method_available ($$) {
+  my $self = shift;
+  my $name = shift;
+  return 1 if $_method_default_list{$name};
+  for (@{$self->{option}->{_METHODS}}) {
+    return 1 if $_ eq $name;
+  }
+  0;
 }
 
 =back
@@ -600,7 +719,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/15 07:31:28 $
+$Date: 2002/05/25 09:53:24 $
 
 =cut
 
