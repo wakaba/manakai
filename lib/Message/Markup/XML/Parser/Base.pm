@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::Base;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML
     qw[InXML_NameStartChar10 InXMLNameChar10
        InXMLNameStartChar11 InXMLNameChar11
@@ -273,7 +273,7 @@ sub ____normalize_entity ($$$%) {
   }
 
   pos $$src = 0;
-  $self->{error}->reset_position ($src);
+  $self->{error}->reset_position ($src, preserve_flag => 1);
 }
 
 sub ____check_char ($$$%) {
@@ -413,7 +413,12 @@ sub parse_element ($$$%) {
             ($src, $pp,
              %opt,
              ExpandedURI q<match-or-error> => 1,
-             ExpandedURI q<content-parser> => 'parse_content');
+             ExpandedURI q<content-parser> => 'parse_content')
+              or do {
+                local $pp->{ExpandedURI q<CDATA>} = \'&';
+                pos ($$src)++;
+                $self->element_content ($src, $p, $pp, %opt);
+              };
         } else {
           die "$0: parse_element: Buggy implementation: ".
               substr $$src, pos $$src, 10;
@@ -456,7 +461,10 @@ sub parse_content ($$$%) {
 
       while (pos $$src < length $$src) {
         if ($$src =~ /\G([^<&]+)/gc) {
-          local $pp->{ExpandedURI q<CDATA>} = $1;
+          my $s = $1;
+          $self->{error}->set_position ($src, diff => length $s);
+          $self->{error}->fork_position ($src => \$s);
+          local $pp->{ExpandedURI q<CDATA>} = \$s;
           $self->element_content
                    ($src, $p, $pp, %opt);
         } elsif (substr ($$src, pos $$src, 1) eq '<') {
@@ -527,7 +535,12 @@ sub parse_content ($$$%) {
             ($src, $pp,
              %opt,
              ExpandedURI q<match-or-error> => 1,
-             ExpandedURI q<content-parser> => 'parse_content');
+             ExpandedURI q<content-parser> => 'parse_content')
+              or do {
+                local $pp->{ExpandedURI q<CDATA>} = \'&';
+                pos ($$src)++;
+                $self->element_content ($src, $p, $pp, %opt);
+              };
         } else {
           die "$0: parse_content: Buggy implementation: ".
               substr $$src, pos $$src, 10;
@@ -796,8 +809,8 @@ sub parse_avdata ($$$%) {
         } elsif ($$src =~ /\G(?=&)/gc) {
           if (not $opt{ExpandedURI q<use-reference>} or
               not $self->parse_reference_in_attribute_value_literal
-                   ($src, $pp,
-                    %opt,
+                   ($src, $p,
+                    %opt, pp => $pp,
                     ExpandedURI q<match-or-error> => 1,
                     ExpandedURI q<error-avdata-lt>
                       => 'WFC_NO_LESS_THAN_IN_ATTR_VAL',
@@ -841,6 +854,7 @@ sub parse_avdata ($$$%) {
 
 sub parse_reference_in_attribute_value_literal ($$$%) {
   my ($self, $src, $p, %opt) = @_;
+  my $pp = $opt{pp};
   if ($$src =~ /\G&/gc) {
     if ($$src =~ /\G\#/gc) {
       if ($$src =~ /\Gx/gc) {
@@ -854,12 +868,12 @@ sub parse_reference_in_attribute_value_literal ($$$%) {
                position_diff => 3 + length $1);
           }
           $self->____check_char
-                    ($src, $p, %opt,
+                    ($src, $pp, %opt,
                      ExpandedURI q<_:code> => $code,
                      ExpandedURI q<_:position-diff> => 3 + length $1);
           $self->hex_character_reference_in_attribute_value_literal_start
                ($src,
-                $p,
+                $pp,
                 {ExpandedURI q<character-number> => $code},
                 %opt);
         } else {
@@ -879,12 +893,12 @@ sub parse_reference_in_attribute_value_literal ($$$%) {
              position_diff => 2 + length $1);
         }
         $self->____check_char
-                    ($src, $p, %opt,
+                    ($src, $pp, %opt,
                      ExpandedURI q<_:code> => 0 + $1,
                      ExpandedURI q<_:position-diff> => 2 + length $1);
         $self->numeric_character_reference_in_attribute_value_literal_start
                ($src,
-                $p,
+                $pp,
                 {ExpandedURI q<character-number> => 0 + $1},
                 %opt);
       } elsif ($$src =~ /\GX/gc) {
@@ -924,7 +938,7 @@ sub parse_reference_in_attribute_value_literal ($$$%) {
       }
       $self->{error}->set_position ($src, moved => 1, diff => length $s);
       $self->{error}->fork_position ($src => \$s);
-      my $pp = {ExpandedURI q<entity-name> => \$s};
+      my $ppp = {ExpandedURI q<entity-name> => \$s};
       if ($self->{ExpandedURI q<_:opened-general-entity>}->{$s}) {
         $self->report
           (-type => 'WFC_NO_RECURSION',
@@ -932,13 +946,13 @@ sub parse_reference_in_attribute_value_literal ($$$%) {
            source => $src,
            position_diff => length $s,
            entity_name => $s);
-        $pp->{ExpandedURI q<entity-opened>} = 1;
+        $ppp->{ExpandedURI q<entity-opened>} = 1;
       }
       $opt{ExpandedURI q<source>} = [$src];
       $self->general_entity_reference_in_attribute_value_literal_start
-               ($src, $p, $pp, %opt);
+               ($src, $pp, $ppp, %opt);
       EXPAND: {
-        last EXPAND if $pp->{ExpandedURI q<entity-opened>};
+        last EXPAND if $ppp->{ExpandedURI q<entity-opened>};
         if (overload::StrVal ($src) ne
             overload::StrVal ($opt{ExpandedURI q<source>}->[-1])) {
           if ($self->{error}->get_flag
@@ -977,7 +991,7 @@ sub parse_reference_in_attribute_value_literal ($$$%) {
           }
           local $self->{ExpandedURI q<_:opened-general-entity>}->{$s} = 1;
           $self->parse_avdata
-               ($opt{ExpandedURI q<source>}->[-1], $p, %opt, pp => $pp);
+               ($opt{ExpandedURI q<source>}->[-1], $pp, %opt, pp => $ppp);
           $pp->{ExpandedURI q<reference-expanded>} = 1;
         } elsif ($self->{ExpandedURI q<is-standalone>}) {
           $self->report
@@ -989,7 +1003,7 @@ sub parse_reference_in_attribute_value_literal ($$$%) {
         }
       }
       $self->general_entity_reference_in_attribute_value_literal_end
-               ($src, $p, $pp, %opt);
+               ($src, $pp, $ppp, %opt);
     } else {
       $self->report
                (-type => 'SYNTAX_HASH_OR_NAME_REQUIRED',
@@ -1088,13 +1102,12 @@ sub parse_reference_in_content ($$$%) {
            entity_name => $s);
         $pp->{ExpandedURI q<entity-opened>} = 1;
       }
-      $opt{ExpandedURI q<source>} = [$src];
+      $opt{ExpandedURI q<source>} = [];
       $self->general_entity_reference_in_content_start
                ($src, $p, $pp, %opt);
       EXPAND: {
         last EXPAND if $pp->{ExpandedURI q<entity-opened>};
-        if (overload::StrVal ($src) ne
-            overload::StrVal ($opt{ExpandedURI q<source>}->[-1])) {
+        if (@{$opt{ExpandedURI q<source>}}) {
           if ($self->{ExpandedURI q<is-standalone>} and
                    $self->{error}->get_flag
                ($opt{ExpandedURI q<source>}->[-1],
@@ -1483,38 +1496,41 @@ sub parse_doctype_declaration ($$$%) {
       next PARAMS unless $dso;
       if ($dso->{type} eq 'dso') {
         $has_internal_subset = 1;
-        $self->doctype_internal_subset_start ($src, $p, $pp, %opt);
+        $self->doctype_internal_subset_start ($src, $p, $pp, %opt,
+                                              ppp => my $ppp = {});
         $self->parse_doctype_subset
               ($src, $pp,
-               %opt,
+               %opt, pp => $ppp,
                ExpandedURI q<subset-type> => 'internal',
                ExpandedURI q<end-with-dsc> => 1,
                ExpandedURI q<allow-declaration>
                  => {qw/ENTITY 1 ELEMENT 1 ATTLIST 1 NOTATION 1
                         comment 1 section 0/});
-        $self->doctype_internal_subset_end ($src, $p, $pp, %opt);
+        $self->doctype_internal_subset_end ($src, $p, $pp, %opt, ppp => $ppp);
       }
     } continue {
       unless ($has_internal_subset) {
         local $opt{ExpandedURI q<doctype-internal-subset-null>} = 1;
-        $self->doctype_internal_subset_start ($src, $p, $pp, %opt);
-        $self->doctype_internal_subset_end ($src, $p, $pp, %opt);
+        $self->doctype_internal_subset_start ($src, $p, $pp, %opt,
+                                              ppp => my $ppp = {});
+        $self->doctype_internal_subset_end ($src, $p, $pp, %opt, ppp => $ppp);
       }
       ## External subset
       if ($pp->{ExpandedURI q<has-external-id>}) {
-        $self->doctype_external_subset_start ($src, $p, $pp, %opt);
-        if ($pp->{ExpandedURI q<external-entity-source>}) {
+        $self->doctype_external_subset_start ($src, $p, $pp, %opt,
+                                              ppp => my $ppp = {});
+        if ($pp->{ExpandedURI q<external-subset-source>}) {
           local $opt{ExpandedURI q<source>}
-            = [$pp->{ExpandedURI q<external-entity-source>}];
+            = [$pp->{ExpandedURI q<external-subset-source>}];
           $self->parse_doctype_subset
               ($opt{ExpandedURI q<source>}->[-1],
-               $pp, %opt,
+               $pp, %opt, pp => $ppp,
                ExpandedURI q<subset-type> => 'external',
                ExpandedURI q<allow-declaration>
                  => {qw/ENTITY 1 ELEMENT 1 ATTLIST 1 NOTATION 1
                         comment 1 section 1/});
         }
-        $self->doctype_external_subset_end ($src, $p, $pp, %opt);
+        $self->doctype_external_subset_end ($src, $p, $pp, %opt, ppp => $ppp);
       }
 
       $self->parse_markup_declaration_parameter
@@ -2807,7 +2823,8 @@ sub parse_markup_declaration_parameter ($$$%) {
     $self->{error}->reset_position
                (\$pubid,
                 line => $pos->[0],
-                char => $pos->[1]);
+                char => $pos->[1],
+                preserve_flag => 1);
     if ($pubid =~ m{([^-'()+,./:=?;!*\#\@\$_%A-Za-z0-9\x0A\x0D\x20])}g) {
       my $s = $1;
       $self->report
@@ -2820,7 +2837,8 @@ sub parse_markup_declaration_parameter ($$$%) {
       $self->{error}->reset_position
                (\$pubid,
                 line => $pos->[0],
-                char => $pos->[1]);
+                char => $pos->[1],
+                preserve_flag => 1);
     }
     push @$param, {type => 'publit', value => \$pubid, delimiter => $lit};
     $self->markup_declaration_parameter
@@ -3114,7 +3132,7 @@ sub parse_external_identifiers ($$$%) {
 sub parse_doctype_subset ($$$%) {
   my ($self, $src, $p, %opt) = @_;
   $self->doctype_subset_start
-                  ($src, $p, my $pp = {}, %opt); 
+                  ($src, $p, my $pp = $opt{pp} || {}, %opt); 
   SUBSET: {
     $opt{ExpandedURI q<allow-declaration>} ||= {
                      ENTITY => 1, NOTATION => 1,
@@ -4248,4 +4266,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/07/04 07:05:54 $
+1; # $Date: 2004/07/30 05:01:03 $

@@ -14,20 +14,21 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+require Message::Markup::XML::Parser::Base;
 
 package Message::Markup::XML::Parser::Error;
 require Message::Util::Error::TextParser;
 push our @ISA, 'Message::Util::Error::TextParser::error';
 
 sub ___error_def () {+{
-  
+
 }}
 
 sub text {
   my $self = shift;
   $self->_FORMATTER_PACKAGE_->new
-       ->replace ('%err-line;.%err-char;: '.$self->{-def}->{description}.' %err-at (prefix => {at "}, suffix => {"}, before => 20, after => 20);', param => $self);
+       ->replace ('%err-uri (prefix => {<}, suffix => {> });%err-entity (suffix => { });%err-line;.%err-char;: '.$self->{-def}->{description}.' %err-at (prefix => {at "}, suffix => {"}, before => 20, after => 20);', param => $self);
 }
 
 sub _FORMATTER_PACKAGE_ () { 'Message::Markup::XML::Parser::Error::formatter' }
@@ -35,12 +36,42 @@ sub _FORMATTER_PACKAGE_ () { 'Message::Markup::XML::Parser::Error::formatter' }
 package Message::Markup::XML::Parser::Error::formatter;
 push our @ISA, 'Message::Util::Error::TextParser::formatter';
 
+use Message::Util::QName::General [qw/ExpandedURI/],
+  {
+   'parser' => Message::Markup::XML::Parser::Base::URI_CONFIG (),
+  };
+
 sub ___rule_def () {+{
   code_ucs => {
     after => sub {
       my ($self, $name, $p, $o) = @_;
       my $code = ord $o->{$p->{source} || 'char'};
       $p->{-result} .= sprintf $code > 0xFFFF ? 'U-%08X' : 'U+%04X', $code;
+    },
+  },
+  err_entity => {
+    after => sub {
+      my ($self, $name, $p, $o) = @_;
+      my $name = $o->{-object}->get_flag ($o->{source},
+                                          ExpandedURI q<parser:entity-name>);
+      if (ref $name) {
+        my $type = $o->{-object}->get_flag ($o->{source},
+                                            ExpandedURI q<parser:entity-type>);
+        if ($type) {
+          $p->{-result} .= $type eq 'general' ? ('&' . $$name) :
+                           $type eq 'parameter' ? ('%' . $$name) : $$name;
+        } else {
+          $p->{-result} .= $$name;
+        }
+      }
+    },
+  },
+  err_uri => {
+    after => sub {
+      my ($self, $name, $p, $o) = @_;
+      my $uri = $o->{-object}->get_flag ($o->{source},
+                                         ExpandedURI q<parser:uri>);
+      $p->{-result} .= $uri if defined $uri;
     },
   },
   markup_declaration_parameters => {
@@ -764,6 +795,10 @@ package Message::Markup::XML::Parser::Error::VC;
 push our @ISA, 'Message::Markup::XML::Parser::Error';
 
 sub ___error_def () {+{
+  VC_ENTITY_DECLARED__GENERAL => {
+    description => q(General entity "%t (name => entity-name);" must be declared before it is referred),
+    level => 'vc',
+  },
   VC_ENTITY_DECLARED__PARAM => {
     description => q(Parameter entity "%t (name => entity-name);" must be declared before it is referred),
     level => 'vc',
@@ -1044,6 +1079,10 @@ sub ___error_def () {+{
     level => 'not_declared',
   },
 
+  EXTERNAL_GENERAL_ENTITY_NOT_READ => {
+    description => q(External general entity "%t (name => entity-name);" not read),
+    level => 'skipped',
+  },
   EXTERNAL_PARAM_ENTITY_NOT_READ => {
     description => q(External parameter entity "%t (name => entity-name);" not read),
     level => 'skipped',
@@ -1082,4 +1121,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/07/04 07:05:54 $
+1; # $Date: 2004/07/30 05:01:03 $

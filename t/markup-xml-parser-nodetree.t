@@ -158,13 +158,13 @@ my @a = (
          },
          {
           method => q(parse_attribute_specification),
-          t => q(<r href="http://&host;/"></r>),
-          result => [q(href="http://&host;/")],
+          t => q(<r href="http://test&#x2F;"></r>),
+          result => [q(href="http://test&#x2F;")],
          },
          {
           method => q(parse_attribute_specification),
-          t => q(<r href="http://test&#x2F;"></r>),
-          result => [q(href="http://test&#x2F;")],
+          t => q(<r href="&#x2F;"></r>),
+          result => [q(href="&#x2F;")],
          },
          {
           method => q(parse_attribute_specification),
@@ -179,29 +179,8 @@ my @a = (
 
          {
           method => q(parse_in_con_mode),
-          t => q(<r>&a;</r>),
-          result => [q(&a;)],
-         },
-         {
-          method => q(parse_in_con_mode),
-          t => q(<r>bb&aa;cc</r>),
-          result => [q(bb&aa;cc)],
-         },
-         {
-          method => q(parse_in_con_mode),
-          t => q(<r>bb&aa;c&#x70;d&#120;c</r>),
-          result => [q(bb&aa;c&#x70;d&#120;c)],
-         },
-         {
-          method => q(parse_in_con_mode),
-          t => q(<r><dd>bb&aa;cc</dd>&ee;</r>),
-          result => [q(<dd>bb&aa;cc</dd>&ee;),
-                     q(<dd xmlns="">bb&aa;cc</dd>&ee;)],
-         },
-         {
-          method => q(parse_element),
-          t => q(<b>&a</b>),
-          error => q(0:5:SYNTAX_REFC_REQUIRED),
+          t => q(<r>bbaa;c&#x70;d&#120;c</r>),
+          result => [q(bbaa;c&#x70;d&#120;c)],
          },
 
          {
@@ -593,11 +572,29 @@ my @a = (
                     },
               },
  },
+ 
+ {
+  t => q{<!DOCTYPE e [<!ENTITY a ""><!ENTITY % a "">]><e></e>},
+  method => q(parse_document_entity),
+  result
+   => [q{<!DOCTYPE e [<!ENTITY a ""><!ENTITY % a "">]><e xmlns=""></e>}],
+ },
+ {
+  t => q{<!DOCTYPE e [<!ENTITY a ""><!ENTITY a "">]><e></e>},
+  method => q(parse_document_entity),
+  error => q<0:36:GENERAL_ENTITY_NAME_USED>,
+ },
+ {
+  t => q{<!DOCTYPE e [<!ENTITY % a ""><!ENTITY % a "">]><e></e>},
+  method => q(parse_document_entity),
+  error => q<0:40:PARAM_ENTITY_NAME_USED>,
+ },
+
  {
   t => q{<!DOCTYPE e SYSTEM "foo/doctype"><e>&hoge;</e>},
   method => q(parse_document_entity),
   flag => {
-    ExpandedURI q<base-uri> => URI->new (q<http://foo.example/bar.dtd>),
+    ExpandedURI q<uri> => URI->new (q<http://foo.example/bar.dtd>),
   },
   result
    => [q{<!DOCTYPE e SYSTEM "foo/doctype"><e xmlns="">&hoge;</e>},
@@ -613,6 +610,55 @@ my @a = (
                        => q{<!ENTITY hoge "-- bar --">},
                     },
               },
+ },
+ {
+  t => q{<!DOCTYPE e SYSTEM "foo/doctype"><e>&hoge;</e>},
+  method => q(parse_document_entity),
+  flag => {
+    ExpandedURI q<uri> => URI->new (q<http://foo.example/bar.xml>),
+  },
+  error => q<0:8:SYNTAX_HASH_OR_NAME_REQUIRED>,
+  resource => {q<http://foo.example/foo/doctype>
+                 => {ExpandedURI q<rrx:literal-entity-value>
+                       => q{<!ENTITY % baz SYSTEM "baz.ent">
+                      %baz;},
+                    },
+               q<http://foo.example/foo/baz.ent>
+                 => {ExpandedURI q<rrx:literal-entity-value>
+                       => q{<!ENTITY hoge "-- bar &#x26; --">},
+                    },
+              },
+ },
+ {
+  method => q(parse_document_entity),
+  t => q(<!DOCTYPE r SYSTEM "a">
+         <r href="http://&host;/"></r>),
+  result => [q(<!DOCTYPE r SYSTEM "a">
+         <r href="http://&host;/" xmlns=""></r>)],
+  flag => {
+    ExpandedURI q<uri> => URI->new (q<http://foo.example/bar.xml>),
+  },
+  resource => {
+    q<http://foo.example/a>
+      => {ExpandedURI q<rrx:literal-entity-value>
+            => q{<!ENTITY host "foo.bar.example:8080">},
+         },
+  },
+ },
+ {
+  method => q(parse_document_entity),
+  t => q(<!DOCTYPE r SYSTEM "a">
+         <r href="http://&host;/"></r>),
+  error => q<0:16:SYNTAX_HASH_OR_NAME_REQUIRED>,
+  flag => {
+    ExpandedURI q<uri> => URI->new (q<http://foo.example/bar.xml>),
+  },
+  resource => {
+    q<http://foo.example/a>
+      => {ExpandedURI q<rrx:literal-entity-value>
+            => q{<!ENTITY host "foo.bar.example&#x26; :8080">},
+         },
+  },
  },
 );
 
@@ -714,3 +760,4 @@ for (@a) {
     ok $result, join ' / ', @{$_->{result}} unless $ok;
   }
 }
+

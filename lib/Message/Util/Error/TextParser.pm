@@ -19,7 +19,7 @@ This module is part of manakai.
 package Message::Util::Error::TextParser;
 require Message::Util::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.3.2.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.3.2.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 sub new ($;%) {
   my $self = bless {}, shift;
@@ -63,10 +63,18 @@ sub get_position ($$;%) {
 
 sub reset_position ($$;%) {
   my ($self, $s, %opt) = @_;
-  $self->{pos}->{$s} = {
-    pos => pos $$s, line => 0, char => 0,
-    %opt,
-  };
+  if ($opt{preserve_flag}) {
+    $self->{pos}->{$s} = {
+      %{$self->{pos}->{$s}||{}},
+      pos => pos $$s, line => 0, char => 0,
+      %opt,
+    };
+  } else {
+    $self->{pos}->{$s} = {
+      pos => pos $$s, line => 0, char => 0,
+      %opt,
+    };
+  }
 }
 
 sub fork_position ($$$;%) {
@@ -77,15 +85,15 @@ sub fork_position ($$$;%) {
     %opt,
   };
   ## ISSUE: Should references be recursively forked?
-  $self->{flag}->{$t} = {%{$self->{flag}->{$s}||{}}};
+#  $self->{flag}->{$t} = {%{$self->{flag}->{$s}||{}}};
 }
 
 sub set_flag ($$$$;%) {
   my ($self, $s, $name => $value, %opt) = @_;
   unless (defined $value) {
-    delete $self->{flag}->{$s}->{$name};
+    delete $self->{pos}->{$s}->{$name};
   } else {
-    $self->{flag}->{$s}->{$name} = $value;
+    $self->{pos}->{$s}->{$name} = $value;
   }
 }
 
@@ -97,14 +105,14 @@ Set new value iif that flag has no value.
 
 sub default_flag ($$$$;%) {
   my ($self, $s, $name => $value, %opt) = @_;
-  unless (exists $self->{flag}->{$s}->{$name}) {
-    $self->{flag}->{$s}->{$name} = $value;
+  unless (exists $self->{pos}->{$s}->{$name}) {
+    $self->{pos}->{$s}->{$name} = $value;
   }
 }
 
 sub get_flag ($$$;%) {
   my ($self, $s, $name, %opt) = @_;
-  $self->{flag}->{$s}->{$name};
+  $self->{pos}->{$s}->{$name};
 }
 
 sub report ($%) {
@@ -197,4 +205,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/07/04 07:05:54 $
+1; # $Date: 2004/07/30 05:01:03 $

@@ -14,7 +14,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::NodeTree;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Message::Markup::XML::Parser::NodeTree;
 push our @ISA, 'Message::Markup::XML::Parser::Base';
@@ -47,7 +47,15 @@ sub document_start ($$$$%) {
   $node->base_uri ($p->{ExpandedURI q<base-uri>});
 }
 
-sub document_end ($$$$%) {
+sub document_content ($$$$%) {
+  my ($self, $src, $p, $pp, %opt) = @_;
+  if ($pp->{ExpandedURI q<s>}) {
+    $p->{ExpandedURI q<tree:current>}
+      ->append_text (${$pp->{ExpandedURI q<s>}});
+  } else {
+    $p->{ExpandedURI q<tree:current>}
+      ->append_text (${$pp->{ExpandedURI q<CDATA>}});
+  }
 }
 
 sub element_start ($$$$%) {
@@ -69,30 +77,11 @@ sub start_tag_end ($$$$%) {
                    local_name => $pp->{ExpandedURI q<element-type-name>});  
   
   ## Attributes
-  for my $attrspec (@{$pp->{ExpandedURI q<tree:attr>}}) {
-    my $attrnode = $el->get_attribute (${$attrspec->{name}}, make_new_node => 1);
-    for (@{$attrspec->{value}}) {
-      if ($_->{type} eq 'CDATA') {
-        $attrnode->append_text (${$_->{value}});
-      } elsif ($_->{type} eq 'entref') {
-        $attrnode->append_new_node
-                     (type => '#reference',
-                      namespace_uri => SGML_GENERAL_ENTITY,
-                      local_name => ${$_->{value}});
-      } elsif ($_->{type} eq 'ncref') {
-        $attrnode->append_new_node
-                     (type => '#reference',
-                      namespace_uri => SGML_NCR,
-                      value => $_->{value});
-      } elsif ($_->{type} eq 'hcref') {
-        $attrnode->append_new_node
-                     (type => '#reference',
-                      namespace_uri => SGML_HEX_CHAR_REF,
-                      value => $_->{value});
-      } else {
-        die "$0: start_tag: bug: $_->{type}";
-      }
-    }
+  for (@{$pp->{ExpandedURI q<tree:attr>}}) {
+    $self->____generate_attrnode (
+      list => $_->{value},
+      parent => $el->get_attribute (${$_->{name}}, make_new_node => 1),
+    );
   }
   
   ## Null End Tag
@@ -102,6 +91,37 @@ sub start_tag_end ($$$$%) {
     $el->option (use_EmptyElemTag => 1);
   }
 }
+
+sub ____generate_attrnode ($%) {
+  my ($self, %opt) = @_;
+  my $attrnode = $opt{parent};
+  for (@{$opt{list}}) {
+    if ($_->{type} eq 'CDATA') {
+      $attrnode->append_text (${$_->{value}});
+    } elsif ($_->{type} eq 'entref') {
+      my $ref = $attrnode->append_new_node
+                     (type => '#reference',
+                      namespace_uri => SGML_GENERAL_ENTITY,
+                      local_name => ${$_->{value}});
+      if ($_->{entval}) {
+        $self->____generate_attrnode (list => $_->{entval}, parent => $ref);
+        $ref->flag (ExpandedURI q<tree:expanded> => 1);
+      }
+    } elsif ($_->{type} eq 'ncref') {
+      $attrnode->append_new_node
+                     (type => '#reference',
+                      namespace_uri => SGML_NCR,
+                      value => $_->{value});
+    } elsif ($_->{type} eq 'hcref') {
+      $attrnode->append_new_node
+                     (type => '#reference',
+                      namespace_uri => SGML_HEX_CHAR_REF,
+                      value => $_->{value});
+    } else {
+      die "$0: start_tag: bug: $_->{type}";
+    }
+  }  
+} # ____generate_attrnode
 
 sub element_content ($$$$%) {
   my ($self, $src, $p, $pp, %opt) = @_;
@@ -129,13 +149,13 @@ sub attribute_specification_end ($$$$%) {
 sub attribute_value_specification_start ($$$$%) {
   my ($self, $src, $p, $pp, %opt) = @_;
   $p->{ExpandedURI q<tree:attr-val>} = [];
+  $pp->{ExpandedURI q<tree:attr-val>}
+    = $p->{ExpandedURI q<tree:attr-val>};
 }
 sub attribute_value_specification_content ($$$$%) {
   my ($self, $src, $p, $pp, %opt) = @_;
-  push @{$p->{ExpandedURI q<tree:attr-val>}},
+  push @{$pp->{ExpandedURI q<tree:attr-val>}},
        {type => 'CDATA', value => $pp->{ExpandedURI q<CDATA>}};
-  $pp->{ExpandedURI q<tree:attr-val>}
-    = $p->{ExpandedURI q<tree:attr-val>};
 }
 sub attribute_value_specification_end ($$$$%) {
   
@@ -143,9 +163,39 @@ sub attribute_value_specification_end ($$$$%) {
 
 sub general_entity_reference_in_attribute_value_literal_start ($$$$%) {
   my ($self, $src, $p, $pp, %opt) = @_;
+  my $entname = $pp->{ExpandedURI q<entity-name>};
+  my $entval;
+  if ($pp->{ExpandedURI q<entity-opened>}) {
+    #
+  } elsif (my $ent = $self->{ExpandedURI q<tree:general-entity>}->{$$entname}) {
+    ## TODO: Isdeclaredexternally
+    if ($ent->{entity_data_notation}) {
+      $self->{error}->set_flag (\(my $dummy = ''),
+                                ExpandedURI q<is-unparsed-entity> => 1);
+      push @{$opt{ExpandedURI q<source>}}, \$dummy;
+    } else {
+      $self->____read_entity ($ent) if not $ent->{is_read} and $ent->{can_read};
+      if ($ent->{is_read}) {
+        push @{$opt{ExpandedURI q<source>}}, $ent->{replacement_text};
+        $pp->{ExpandedURI q<tree:attr-val>} = $entval = [];
+      } else {
+        $self->{error}->report
+          (-type => 'EXTERNAL_GENERAL_ENTITY_NOT_READ',
+           -class => 'Misc',
+           source => $entname,
+           entity_name => $$entname);
+      }
+    }
+  } else {
+    $self->{error}->report
+        (-type => 'VC_ENTITY_DECLARED__GENERAL',
+         -class => 'VC',
+         source => $entname,
+         entity_name => $$entname);
+  }
   push @{$p->{ExpandedURI q<tree:attr-val>}},
-    {type => 'entref', value => $pp->{ExpandedURI q<entity-name>}};
-}
+    {type => 'entref', value => $entname, entval => $entval};
+} # general_entity_reference_in_attribute_value_literal_start
 
 sub numeric_character_reference_in_attribute_value_literal_start ($$$$%) {
   my ($self, $src, $p, $pp, %opt) = @_;
@@ -161,12 +211,43 @@ sub hex_character_reference_in_attribute_value_literal_start ($$$$%) {
 
 sub general_entity_reference_in_content_start ($$$$%) {
   my ($self, $src, $p, $pp, %opt) = @_;
-  $p->{ExpandedURI q<tree:current>}
-    ->append_new_node
-               (type => '#reference',
-                namespace_uri => SGML_GENERAL_ENTITY,
-                local_name => ${$pp->{ExpandedURI q<entity-name>}});
-}
+  my $entname = $pp->{ExpandedURI q<entity-name>};
+  my $ref = $pp->{ExpandedURI q<tree:current>}
+          = $p->{ExpandedURI q<tree:current>}
+              ->append_new_node
+                  (type => '#reference',
+                   namespace_uri => SGML_GENERAL_ENTITY,
+                   local_name => $$entname);
+  if ($pp->{ExpandedURI q<entity-opened>}) {
+    return;
+  } elsif (my $ent = $self->{ExpandedURI q<tree:general-entity>}->{$$entname}) {
+    ## TODO: Isdeclaredexternally
+    if ($ent->{entity_data_notation}) {
+      $self->{error}->set_flag (\(my $dummy = ''),
+                                ExpandedURI q<is-unparsed-entity> => 1);
+      push @{$opt{ExpandedURI q<source>}}, \$dummy;
+      return;
+    }
+    $self->____read_entity ($ent) if not $ent->{is_read} and $ent->{can_read};
+    if ($ent->{is_read}) {
+      push @{$opt{ExpandedURI q<source>}}, $ent->{replacement_text};
+      $ref->flag (ExpandedURI q<tree:expanded> => 1);
+    } else {
+      $self->{error}->report
+        (-type => 'EXTERNAL_GENERAL_ENTITY_NOT_READ',
+         -class => 'Misc',
+         source => $entname,
+         entity_name => $$entname);
+    }
+  } else {
+    $self->{error}->report
+        (-type => 'VC_ENTITY_DECLARED__GENERAL',
+         -class => 'VC',
+         source => $entname,
+         entity_name => $$entname);
+  }
+} # general_entity_reference_in_content_start
+
 
 sub numeric_character_reference_in_content_start ($$$$%) {
   my ($self, $src, $p, $pp, %opt) = @_;
@@ -195,6 +276,16 @@ sub doctype_declaration_start ($$$$%) {
             (type => '#declaration',
              namespace_uri => SGML_DOCTYPE);
 }
+
+sub doctype_internal_subset_start ($$$$%) {
+  my ($self, $src, $p, $pp, %opt) = @_;
+  $opt{ppp}->{ExpandedURI q<tree:current>}
+      = $pp->{ExpandedURI q<tree:current>}
+          ->append_new_node
+              (type => '#element',
+               namespace_uri => SGML_DOCTYPE,
+               local_name => 'subset');
+} # doctype_internal_subset_start
 
 sub doctype_external_subset_start ($$$$%) {
   my ($self, $src, $p, $pp, %opt) = @_;
@@ -232,15 +323,7 @@ sub doctype_declaration_end ($$$$%) {
 sub doctype_subset_start ($$$$%) {
   my ($self, $src, $p, $pp, %opt) = @_;
   my $type = $opt{ExpandedURI q<subset-type>} || '';
-  $pp->{ExpandedURI q<tree:current>} = $p->{ExpandedURI q<tree:current>};
-  if ($type eq 'internal' or $type eq 'external') {
-    $pp->{ExpandedURI q<tree:current>}
-      = $pp->{ExpandedURI q<tree:current>}
-           ->append_new_node
-              (type => '#element',
-               namespace_uri => SGML_DOCTYPE,
-               local_name => 'subset');
-  }
+  $pp->{ExpandedURI q<tree:current>} ||= $p->{ExpandedURI q<tree:current>};
 }
 
 sub doctype_subset_content ($$$$%) {
@@ -318,7 +401,12 @@ sub entity_declaration_end ($$$$%) {
       }
     }
     pos ($entval) = 0;
-    $self->{error}->fork_position ($src => \$entval);
+    $self->{error}->fork_position
+                      ($src => \$entval,
+                       line => 0, char => 0,
+                       ExpandedURI q<entity-type> => $parament ? 'parameter' :
+                                                                 'general',
+                       ExpandedURI q<entity-name> => $entname);
     $entman->{$$entname} ||= {name => $$entname,
                               type => $parament ? 'parameter' : 'general',
                               replacement_text => \$entval,
@@ -674,10 +762,13 @@ sub ____read_entity ($$;%) {
                                               => $ent->{entity_data_notation},
                        ExpandedURI q<infoset:name> => $ent->{name});
     if ($result->{ExpandedURI q<rr:success>}) {
+      my $litval = \($result->{ExpandedURI q<rrx:literal-entity-value>});
+      $self->{error}->reset_position
+                        ($litval,
+                         ExpandedURI q<uri>
+                                => $result->{ExpandedURI q<uri>});
       $self->parse_external_parsed_entity
-               (\ $result->{ExpandedURI q<rrx:literal-entity-value>},
-                $result,
-                %opt);
+               ($litval, $result, %opt);
       if ($result->{ExpandedURI q<tree:replacement-text>}) {
         $ent->{replacement_text}
             = $result->{ExpandedURI q<tree:replacement-text>};
@@ -718,4 +809,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/07/04 07:05:54 $
+1; # $Date: 2004/07/30 05:01:03 $
