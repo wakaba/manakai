@@ -7,11 +7,9 @@ mail address (mailbox) which is part of Internet Messages
 =cut
 
 package Message::Field::Mailbox;
-require 5.6.0;
 use strict;
-use re 'eval';
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::AngleQuoted;
 push @ISA, qw(Message::Field::AngleQuoted);
 
@@ -20,16 +18,7 @@ push @ISA, qw(Message::Field::AngleQuoted);
 	$REG{domain} = qr/$REG{sub_domain}(?:$REG{FWS}\.$REG{FWS}$REG{sub_domain})*/;
 	$REG{route} = qr/\x40$REG{FWS}$REG{domain}(?:[\x09\x20,]*\x40$REG{FWS}$REG{domain})*$REG{FWS}:/;
 
-=head1 CONSTRUCTORS
-
-The following methods construct new objects:
-
-=over 4
-
-=cut
-
-## Initialize of this class -- called by constructors
-  %DEFAULT = (
+%DEFAULT = (
     -_ARRAY_NAME	=> 'route',
     -_ARRAY_VALTYPE	=> 'domain',
     -_MEMBERS	=> [qw|display_name route local_part domain keyword|],
@@ -67,8 +56,17 @@ The following methods construct new objects:
     #unsafe_rule_of_keyword	=> 'NON_atext',
     -use_comment_in_angle	=> 1,
     #use_keyword	=> 0,
-  );
+);
 
+=head1 CONSTRUCTORS
+
+The following methods construct new objects:
+
+=over 4
+
+=cut
+
+## $self->_init (%options); Initialize of this class -- called by constructors
 sub _init ($;%) {
   my $self = shift;
   my %options = @_;
@@ -289,7 +287,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/15 07:15:59 $
+$Date: 2002/06/16 10:42:06 $
 
 =cut
 

@@ -11,7 +11,7 @@ use strict;
 require 5.6.0;
 use re 'eval';
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -67,7 +67,8 @@ sub _init ($;%) {
     #hook_decode_string
     -parameter_rule	=> 'param',
     -parameter_name_case_sensible	=> 0,
-    -parameter_value_max_length	=> 35, #78,
+    -parameter_value_max_length	=> 60,
+    -parameter_value_split_length	=> 35,
     -parameter_value_unsafe_rule	=> {'*default'	=> 'NON_http_attribute_char'},
     -parse_all	=> 0,
     -separator	=> '; ',
@@ -442,9 +443,10 @@ sub stringify ($;%) {
           $charset =~ s/($REG{NON_http_attribute_char})/sprintf('%%%02X', ord $1)/ge;
           $lang =~ s/($REG{NON_http_attribute_char})/sprintf('%%%02X', ord $1)/ge;
           if (length $e{value} > $option{parameter_value_max_length}) {
-            for my $i (0..length ($e{value})/$option{parameter_value_max_length}) {
-              $value[$i] = substr ($e{value}, $i*$option{parameter_value_max_length},
-                                     $option{parameter_value_max_length});
+            for my $i (0..length ($e{value})/$option{parameter_value_split_length}) {
+              $value[$i] = substr ($e{value},
+                                     $i*$option{parameter_value_split_length},
+                                     $option{parameter_value_split_length});
             }
           } else {$value[0] = $e{value}}
           for my $i (0..$#value) {
@@ -457,10 +459,10 @@ sub stringify ($;%) {
         } else {
           if ($option{use_parameter_extension} 
               && length $e{value} > $option{parameter_value_max_length}) {
-            for my $i (0..length ($e{value})/$option{parameter_value_max_length}) {
+            for my $i (0..length ($e{value})/$option{parameter_value_split_length}) {
               $value[$i] = Message::Util::quote_unsafe_string 
-                (substr ($e{value}, $i*$option{parameter_value_max_length},
-                    $option{parameter_value_max_length}), 
+                (substr ($e{value}, $i*$option{parameter_value_split_length},
+                    $option{parameter_value_split_length}), 
                     unsafe => 'NON_http_attribute_char');
             }
           } else {
@@ -612,7 +614,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/15 07:15:59 $
+$Date: 2002/06/16 10:42:06 $
 
 =cut
 

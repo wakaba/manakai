@@ -15,7 +15,7 @@ draft-ietf-usefor-msg-id-alt-00 is also supported.
 package Message::Field::MsgID;
 use strict;
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -107,7 +107,7 @@ sub _newid ($\%) {
     $$o{login} = $1; $$o{fqdn} = $2;
   }
   if ($self->{option}->{validate} && $$o{fqdn} =~ 
-     /[.@](example\.(?:com|org|net)|localdomain|localhost|example|invalid|arpa)$/) {
+     /[.@](example\.(?:com|org|net)|localdomain|localhost|example|invalid|test|arpa)$/) {
       Carp::croak "Msg-ID generation: invalid TLD of FQDN: .$1";
   }
   if (!$$o{fqdn} && $$o{ip_address}) {
@@ -297,7 +297,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/15 07:15:59 $
+$Date: 2002/06/16 10:42:06 $
 
 =cut
 

@@ -9,7 +9,7 @@ date-time used in Internet messages and so on
 package Message::Field::Date;
 use strict;
 use vars qw(%DEFAULT @ISA %MONTH %REG $VERSION %ZONE);
-$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 use Time::Local 'timegm_nocheck';
@@ -74,7 +74,7 @@ The following methods construct new objects:
     #hook_encode_string
     #hook_decode_string
     -output_comment	=> 1,
-    -str2time	=> {
+    -fmt2str	=> {
     	CC	=> sub { sprintf $_[2]->{_fmt}, 	## Support AD only
     	  	         (($_[1]->{$_[2]->{_prefix}.'tm'}->[5] + 1899) / 100) + 1 },
     	YYYY	=> sub { $_[2]->{_fmt} =~ tr/2/4/;
@@ -617,9 +617,10 @@ sub as_rfc2822_time ($@) {
 sub _date2str ($\%) {
   my $self = shift;
   my $option = shift;
-  my $template = $option->{format_template};
-  my $time    = $self->{date_time};
-  my $zone    = $option->{zone};
+  my $template	= $option->{format_template};
+  my $time	= $self->{date_time};
+  $time	= $option->{date_time} if defined $option->{date_time};
+  my $zone	= $option->{zone};
   if (ref $zone) {}
   elsif (length $zone) {$zone = [$self->_zone_string_to_array ($zone)]}
   my $l_time  = $time + $zone->[0] * ($zone->[1] * 60 + $zone->[2]) * 60;
@@ -630,7 +631,7 @@ sub _date2str ($\%) {
               zone	=> $zone);
   $template =~ s{%([A-Za-z0-9_]+)(?:\(([A-Za-z0-9,.:\x09\x20=>_-]*)\))?;}{
     my ($f, $a) = ($1, $2);
-    my $function = $option->{str2time}->{$f};
+    my $function = $option->{fmt2str}->{$f};
     if (ref $function) {
       my %a;
       for (split /[\x09\x20]*,[\x09\x20]*/, $a) {
@@ -731,7 +732,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/09 11:08:28 $
+$Date: 2002/06/16 10:42:06 $
 
 =cut
 

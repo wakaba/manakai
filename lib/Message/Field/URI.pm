@@ -8,10 +8,8 @@ Header Field Bodies filled with a URI
 
 package Message::Field::URI;
 use strict;
-require 5.6.0;
-use re 'eval';
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Header;
 require Message::Field::AngleQuoted;
 push @ISA, qw(Message::Field::AngleQuoted);
@@ -198,7 +196,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/15 07:15:59 $
+$Date: 2002/06/16 10:42:06 $
 
 =cut
 

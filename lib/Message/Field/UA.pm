@@ -9,7 +9,7 @@ header field body consist of C<product> tokens
 package Message::Field::UA;
 use strict;
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -51,6 +51,8 @@ sub _init ($;%) {
     #hook_encode_string	## Inherited
     #hook_decode_string	## Inherited
     -prepend	=> 1,
+    -use_Config	=> 1,
+    -use_Win32	=> 1,
   );
   $self->SUPER::_init (%DEFAULT, %options);
   my @a = ();
@@ -362,6 +364,64 @@ sub clone ($) {
   $clone;
 }
 
+sub add_our_name ($;%) {
+  require Message::Entity;
+  my $ua = shift;
+  my %o = @_;  my %option = %{$ua->{option}};
+  for (grep {/^-/} keys %o) {$option{substr ($_, 1)} = $o{$_}}
+    $ua->replace ('Message-pm' => $Message::Entity::VERSION, -prepend => 0);
+    my (@os, @os_comment);
+    my @perl_comment;
+    if ($option{use_Config}) {
+      @os_comment = ('');
+      @os = ($^O => \@os_comment);
+      eval q{use Config;
+        @os_comment = ($Config{osvers});
+        push @perl_comment, $Config{archname};
+      };
+      eval q{use Win32;
+        my $build = Win32::BuildNumber;
+        push @perl_comment, "ActivePerl build $build" if $build;
+        my @osv = Win32::GetOSVersion;
+        @os = (
+            $osv[4] == 0? 'Win32s':
+            $osv[4] == 1? 'Windows':
+            $osv[4] == 2? 'WindowsNT':
+                          'Win32',       \@os_comment);
+        @os_comment = (sprintf ('%d.%02d.%d', @osv[1,2], $osv[3] & 0xFFFF));
+        push @os_comment, $osv[0] if $osv[0] =~ /[^\x09\x20]/;
+        if ($osv[4] == 1) {
+          if ($osv[1] == 4) {
+            if ($osv[2] == 0) {
+              if    ($osv[0] =~ /[Aa]/) { push @os_comment, 'Windows 95 OSR1' }
+              elsif ($osv[0] =~ /[Bb]/) { push @os_comment, 'Windows 95 OSR2' }
+              elsif ($osv[0] =~ /[Cc]/) { push @os_comment, 'Windows 95 OSR2.5' }
+              else                      { push @os_comment, 'Windows 95' }
+            } elsif ($osv[2] == 10) {
+              if    ($osv[0] =~ /[Aa]/) { push @os_comment, 'Windows 98 SE' }
+              else                      { push @os_comment, 'Windows 98' }
+            } elsif ($osv[2] == 90) {
+              push @os_comment, 'Windows Me';
+            }
+          }
+        } elsif ($osv[4] == 2) {
+          push @os_comment, 'Windows 2000' if $osv[1] == 5 && $osv[2] == 0;
+          push @os_comment, 'Windows XP' if $osv[1] == 5 && $osv[2] == 1;
+        }
+        push @os_comment, Win32::GetChipName;
+      } if $option{use_Win32};
+    } else {
+      push @perl_comment, $^O;
+    }
+    if ($^V) {	## 5.6 or later
+      $ua->replace (Perl => [sprintf ('%vd', $^V), @perl_comment], -prepend => 0);
+    } elsif ($]) {	## Before 5.005
+      $ua->replace (Perl => [ $], @perl_comment], -prepend => 0);
+    }
+    $ua->replace (@os, -prepend => 0) if $option{use_Config};
+  $ua;
+}
+
 =back
 
 =head1 LICENSE
@@ -386,7 +446,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/13 01:33:54 $
+$Date: 2002/06/16 10:42:06 $
 
 =cut
 
