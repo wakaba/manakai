@@ -1,13 +1,9 @@
 use Test;
-use Message::DOM::ManakaiDOM;
+use Message::DOM::DOMMain;
 use Data::Dumper;
-use Message::Util::QName::General [qw/ExpandedURI/], {
+plan tests => 24;
 
-};
-
-plan tests => 1;
-
-my $node = Message::DOM::ManakaiDOMNodeObject->_new;
+my $node = Message::DOM::DOMMain::ManakaiDOMNodeObject->_new;
 
 ok $node->{rc}, 0;
 
@@ -68,9 +64,13 @@ $node3->{parent} = $node;
 push @{$node->{child2}}, $node3;
 ok @{$node2->_getRootNodes}, 1, "There is ONE root node";
 
+ok $node->_isExternallyReferred, 1, "Tree is externally referred";
+ok $node2->_isExternallyReferred, 1, "Tree is externally referred";
 ok $node3->_isExternallyReferred, 1, "Tree is externally referred";
 {
 local $node->{rc} = 0;
+ok $node->_isExternallyReferred, 0, "Tree is not externally referred";
+ok $node2->_isExternallyReferred, 0, "Tree is not externally referred";
 ok $node3->_isExternallyReferred, 0, "Tree is not externally referred";
 }
 

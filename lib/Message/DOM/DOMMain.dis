@@ -28,15 +28,19 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/31 12:03:40 $
+      $Date: 2005/01/05 12:19:39 $
     @@ContentType:
       dis:Date.RCS
   
   @Require:
     @@Module:
       @@@Name: DISCore
+      @@@WithFor:
+        ManakaiDOM:all
     @@Module:
       @@@Name: DISPerl
+      @@@WithFor:
+        ManakaiDOM:all
     @@Module:
       @@@Name: DOMMain
       @@@WithFor:
@@ -378,8 +382,10 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       rdfs:Class
-    @@ISA:
-      rdfs:Class
+    @@rdfs:subClassOf:
+      rdfs:Class::ManakaiDOM:all
+    @@subsetOf:
+      rdfs:Class::ManakaiDOM:all
 
 ElementTypeBinding:
   @Name: PropDef
@@ -387,7 +393,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
-      rdfs:Property
+      rdf:Property
 
 ElementTypeBinding:
   @Name: TreeElementType
@@ -724,6 +730,38 @@ ElementTypeBinding:
     @@rdf:type:
       ManakaiDOM:DOMMethodParameter
 
+ElementTypeBinding:
+  @Name: noVariant
+  @ElementType:
+    dis:AliasFor
+  @ShadowContent:
+    @@@:
+      ::ManakaiDOM:all
+    @@For:
+      !=ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: FormatDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISCore:StringDataType
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+    @@rdfs:subClassOf:
+      DISCore:String
+
+FormatDef:
+  @QName: DOMMethodParameterName
+  @Description:
+    @@lang:en
+    @@@:
+      A DOM method parameter name. 
+
 ResourceTypeDef:
   @QName:
     ManakaiDOM:DOMMethodReturn
@@ -829,8 +867,7 @@ ResourceTypeDef:
       A data type.
   @rdf:type:
     rdfs:Class
-  @ISA:
-    rdfs:Datatype
+
 ElementTypeBinding:
   @Name: DataTypeDef
   @ElementType:
@@ -967,12 +1004,8 @@ PropDef:
       is of a class to which the subject resource belongs.
   @rdfs:range: Operator
 
-ResourceDef:
+ResourceTypeDef:
   @QName: Operator
-  @rdf:type:
-    rdfs:Class
-  @ISA:
-    rdfs:Class
   @Description:
     @@lang:en
     @@@:
@@ -985,7 +1018,7 @@ ResourceDef:
   @Description:
     @@lang:en
     @@@:
-      A Perl <Perl::___error_handler> subroutine called by 
+      A Perl <Perl::___report_error> subroutine called by 
       <PerlModule::Message::Util::Error> exception reporting. 
 
 ## -- lang:dis vocabulary
@@ -996,7 +1029,7 @@ TreeElementType:
   @dataType:
     dis:TypeQName
   @rdfs:range:
-    rdfs:Property
+    rdf:Property
   @Description:
     @@lang:en
     @@@:
@@ -1009,7 +1042,7 @@ TreeElementType:
   @dataType:
     dis:TypeQName
   @rdfs:range:
-    rdfs:Property
+    rdf:Property
   @Description:
     @@lang:en
     @@@:
@@ -1035,7 +1068,7 @@ TreeElementType:
   @dataType:
     dis:TypeQName
   @rdfs:range:
-    rdfs:Property
+    rdf:Property
   @Description:
     @@lang:en
     @@@:
@@ -1259,6 +1292,31 @@ PropDef:
       no code is inserted. 
   @dataType:
     dis:Boolean
+
+FormatDef:
+  @QName: XCodeRef
+  @Description:
+    @@lang:en
+    @@@:
+      A reference to an exception or warning code or subcode. 
+      \
+      - XCodeRef := FQXCodeRef / coderef / subcoderef
+      \
+      - FQXCodeRef := xref "." coderef ["." subcoderef]
+      \
+      - xref := <A dis:TFQNames referring an exception or 
+                 warning interface or class>
+      \
+      - coderef := codeq / codenc
+      \
+      - codeq := <A dis:TFQNames with a prefixed "Type" QName,
+                  referring an exception or warning code>
+      \
+      - codenc := <An unprefixed dis:TypeQName identifying a code 
+                   in the null namespace>
+      \
+      - subcoderef := <A dis:TFQNames referring an exception or warning subcode;
+                       it should be prefixed>
 
 ## -- Other
 
@@ -1484,15 +1542,12 @@ ResourceDef:
   @PerlDef:
     ($DOCOBJ->{<Q::DOMCore:hasFeature>}->{XML})
 
-ResourceDef:
+ResourceTypeDef:
   @QName: DOMFeature
   @FullName:
     @@lang:en
     @@@: DOM feature
-  @rdf:type:
-    rdfs:Class
-  @ISA:
-    rdfs:Class
+
 ElementTypeBinding:
   @Name: FeatureDef
   @ElementType:
@@ -1505,6 +1560,7 @@ ElementTypeBinding:
         ::ManakaiDOM:all
       @@@For:
         !=ManakaiDOM:all
+
 ElementTypeBinding:
   @Name: FeatureVerDef
   @ElementType:
@@ -1646,7 +1702,7 @@ ResourceDef:
       A CORBA IDL data type.
   @rdf:type:
     rdfs:Class
-  @ISA:
+  @rdfs:subClassOf:
     ManakaiDOM:DataType
 ElementTypeBinding:
   @Name: IDLDataTypeDef
@@ -1771,7 +1827,7 @@ ResourceDef:
       A DOM data type.
   @rdf:type:
     rdfs:Class
-  @ISA:
+  @rdfs:subClassOf:
     ManakaiDOM:DataType
 ElementTypeBinding:
   @Name: DOMDataTypeDef
@@ -2918,10 +2974,10 @@ StringDataTypeDef:
         if (defined $INPUT) {
           __FOR{ManakaiDOM:DOM3::
             if (($XMLVERSION eq '1.0' and
-                 <Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
+                 not <Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
                             infoset:version = '1.0'>) or
                 ($XMLVERSION eq '1.1' and
-                 <Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
+                 not <Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
                             infoset:version = '1.1'>)) {
               __EXCEPTION{MDOMX:MDOM_BAD_NAME::
                 DOMCore:name => {$INPUT},
@@ -3017,10 +3073,10 @@ StringDataTypeDef:
         if (defined $INPUT) {
           __FOR{ManakaiDOM:DOM3::
             if (($XMLVERSION eq '1.0' and
-                 <Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
+                 not <Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
                             infoset:version = '1.0'>) or
                 ($XMLVERSION eq '1.1' and
-                 <Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
+                 not <Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
                             infoset:version = '1.1'>)) {
               __EXCEPTION{MDOMX:MDOM_BAD_NAME::
                 DOMCore:name => {$INPUT},
@@ -3417,7 +3473,8 @@ ResourceDef:
       @@@ImplNote:
         @@@@lang:en
         @@@@@:
-          Stringify of <P::features> is required for non-manakai impl. sources.
+          Stringify of <P::features> is required to support non-manakai 
+          <IF::DOMCore:DOMImplementationSource>s. 
   @Method:
      @@Name:  getDOMImplementationList
      @@ManakaiDOM:isStatic: 1
@@ -3641,6 +3698,35 @@ ClassDef:
           $r = $self->_FORMATTER_PACKAGE_->new
                     ->replace ($template, param => $self);
 
+  @Method:
+    @@Name:stringify
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Stringifies this error object, i.e. generates a simple 
+        error message written in the <CODE::i-default> language. 
+        \
+        {NOTE:: The <M::stringify> method is defined in the 
+                <PerlModule::Message::Util::Error> and redefined here. 
+    @@Return:
+      @@@Type:DOMString
+      @@@PerlDef:
+        $r = $self->SUPER::stringify;
+        if (defined $self->{<Q::MDOMX:class>}) {
+          if (defined $self->{<Q::MDOMX:method>}) {
+            $r = $self->{<Q::MDOMX:class>} . '->' .
+                 $self->{<Q::MDOMX:method>} . ': ' . $r;
+          } elsif (defined $self->{<Q::MDOMX:attr>}) {
+            $r = $self->{<Q::MDOMX:class>} . '->' .
+                 $self->{<Q::MDOMX:attr>} . ' (' .
+                 $self->{<Q::MDOMX:on>} . '): ' . $r;
+          } else {
+            $r = $self->{<Q::MDOMX:class>} . ': ' . $r;
+          }
+        }
+        if (defined $self->{<Q::MDOMX:param-name>}) {
+          $r = 'Parameter "' . $self->{<Q::MDOMX:param-name>} . '": ' . $r;
+        }
   @ResourceDef:
     @@QName:
       ManakaiDOM:getExceptionCode
@@ -3708,6 +3794,7 @@ ClassDef:
     @@@:
       An internal node object that is able to be accessed via 
       <Class::ManakaiDOM:ManakaiDOMNodeReference>.
+
   @ImplNote:
     @@lang:en
     @@@:
@@ -3715,6 +3802,53 @@ ClassDef:
       <IF::DOMCore:Element> and <IF::DOMCore:Document> instances 
       are implemented as a reference, i.e. 
       <Class::ManakaiDOM:ManakaiDOMNodeReference>, to node object.
+
+  @ImplNote:
+    @@lang:en
+    @@@:
+      A <Class::ManakaiDOM:ManakaiDOMNodeObject> is a blessed hash 
+      reference.  Each hash key and value pair is called as a 
+      <DFN::property>.  Currently, several core properties  
+      are defined as listed below.  Applications for this class, 
+      including <Class::DOMCore:ManakaiDOMNode>, defines additional 
+      properties for their purpose and scope. 
+      \
+      {FIG:: Core node properties
+         \
+         - <CODE::TreeCore:nodeID>::: The global-unique identifier for 
+                                      this node object. 
+         \
+         - <CODE::TreeCore:treeID>::: The global-unique identifier for the 
+                                      tree containing this node object. 
+         \
+         - <CODE::TreeCore:rc>::: The number that denotes how many reference 
+                                  to this node there are. 
+         \
+         - <CODE::TreeCore:origin>::: An array reference, containing 
+                                  hash key names of <DFN::origin> 
+                                  properties for this node. 
+         \
+         - <CODE::TreeCore:subnode>::: An array reference, containing 
+                                hash key names of <DFN::subnode> 
+                                properties for this node. 
+         \
+         - <CODE::TreeCore:subnode2>::: An array reference, containing 
+                    hash key names of <DFN::subnode> (two steps) 
+                    properties for this node. 
+         \
+         - <CODE::TreeCore:irefnode>::: An array reference, containing 
+                    hash key names of <DFN::irefnode> 
+                    properties for this node. 
+         \
+         - <CODE::TreeCore:anydata>::: An array reference, containing 
+                    hash key names of <DFN::anydata> properties for this node. 
+         \
+         - <CODE::TreeCore:anydata2>::: An array reference, containing 
+                    hash key names of <DFN::anydata> (two steps) properties 
+                    for this node. 
+         \
+       }
+
   @IntMethod:
     @@Name: new
     @@Description:
@@ -3735,13 +3869,11 @@ ClassDef:
             <Q::TreeCore:subnode> => [],
             <Q::TreeCore:subnode2> => [],
             <Q::TreeCore:irefnode> => [],
-            <Q::TreeCore:urefnode> => [],
             <Q::TreeCore:anydata> => [],
             <Q::TreeCore:anydata2> => [],
             <Q::TreeCore:rc> => 0,
             <Q::TreeCore:treeID> => <Code::ManakaiDOM:generateUniqueID>,
             <Q::TreeCore:nodeID> => <Code::ManakaiDOM:generateUniqueID>,
-            <Q::DOMCore:hasFeature> => {},
           }, ref $self || $self;
   @IntMethod:
     @@Name: newReference
@@ -3752,7 +3884,7 @@ ClassDef:
     @@Param:
       @@@Name: class
       @@@Type:
-        DOMMain:any
+        perl:package-name
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -3777,8 +3909,8 @@ ClassDef:
     @@Description:
       @@@lang:en
       @@@@:
-        Tests and returns whether the tree that contains this node 
-        is externally referred or not.
+        Checks whether the tree containing this node has been referred 
+        from the outside of the tree or not. 
     @@Return:
       @@@Type: 
         DOMMain:boolean
@@ -3787,131 +3919,143 @@ ClassDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: 
-            There is one or more nodes that has been 
-            referred from <Class::ManakaiDOM:ManakaiDOMNodeReference> objects.
+            There is one or more nodes in the tree that has been 
+            referred via <Class::ManakaiDOM:ManakaiDOMNodeReference> objects.
       @@@InCase:
         @@@@Value: false
         @@@@Description:
           @@@@@lang:en
-          @@@@@@: No external reference to the node in this tree found.
+          @@@@@@: No external reference found.
       @@@PerlDef:
           if ($self->{<Q::TreeCore:rc>}) {
             $r = true;
           } else {
-            for (@{$self-><M::ManakaiDOM:ManakaiDOMNodeObject.getRootNodes>}) {
-              if ($_-><M::ManakaiDOM:ManakaiDOMNodeObject
-                                       .isExternallyReferredDownward>) {
+            my @node = ($self);
+            my %checked;
+            NODES: while (my $node = shift @node) {
+              if ($node->{<Q::TreeCore:rc>}) {
                 $r = true;
-                last;
+                last NODES;
+              } elsif ($checked{$node->{<Q::TreeCore:nodeID>}}) {
+                next NODES;
               }
-            }
-          }
-  @IntMethod:
-    @@Name: isExternallyReferredDownward
-    @@Description:
-      @@@lang:en
-      @@@@: Check whether the node or any of subnodes is externally referred.
-    @@Return:
-      @@@Type: 
-        DOMMain:boolean
-      @@@PerlDef:
-          if ($self->{<Q::TreeCore:rc>}) {
-            $r = true;
-          } else {
-            DW:{
-            SUBNODES:
-            for my $key (@{$self->{<Q::TreeCore:subnode>}}) {
-              for (ref $self->{$key} eq 'ARRAY' ? @{$self->{$key}}
-                                                : values %{$self->{$key}||{}}) {
-                if ($_-><M::ManakaiDOM:ManakaiDOMNodeObject
-                                        .isExternallyReferredDownward>) {
-                  $r = true;
-                  last DW;
+              my @n;
+              for (@{$node->{<Q::TreeCore:subnode2>}}) {
+                if (ref $node->{$_} eq 'ARRAY') {
+                  push @n, @{$node->{$_}};
+                } elsif (ref $node->{$_} eq 'HASH') {
+                  push @n, values %{$node->{$_}};
                 }
               }
-            }
-            SUBNODES2:
-            for my $key (@{$self->{<Q::TreeCore:subnode2>}}) {
-              for (ref $self->{$key} eq 'ARRAY' ? @{$self->{$key}}
-                                                : values %{$self->{$key}||{}}) {
-                for (ref $_ eq 'ARRAY' ? @$_ : values %$_) {
-                  if ($_-><M::ManakaiDOM:ManakaiDOMNodeObject
-                                       .isExternallyReferredDownward>) {
-                    $r = true;
-                    last DW;
-                  }
+              for (@n, @{$node->{<Q::TreeCore:subnode>}}) {
+                if (ref $node->{$_} eq 'ARRAY') {
+                  push @node, @{$node->{$_}};
+                } elsif (ref $node->{$_} eq 'HASH') {
+                  push @node, values %{$node->{$_}};
                 }
               }
-            }}
+              for (@{$node->{<Q::TreeCore:origin>}}) {
+                push @node, $node->{$_} if $node->{$_};
+              }
+              $checked{$node->{<Q::TreeCore:nodeID>}} = 1;
+            }
           }
+
   @IntMethod:
     @@Name: destroy
     @@Description:
       @@@lang:en
-      @@@@: Destroy this tree.
+      @@@@:
+        Destructs the tree containing this node. 
     @@Return:
       @@@PerlDef:
-          $_-><M::ManakaiDOM:ManakaiDOMNodeObject.destroyDownward>
-          for @{$self-><M::ManakaiDOM:ManakaiDOMNodeObject.getRootNodes>};
+        my @node = ($self);
+        NODES: while (my $node = shift @node) {
+              my @n;
+              for (@{$node->{<Q::TreeCore:subnode2>}}) {
+                if (ref $node->{$_} eq 'ARRAY') {
+                  push @n, @{$node->{$_}};
+                } elsif (ref $node->{$_} eq 'HASH') {
+                  push @n, values %{$node->{$_}};
+                }
+              }
+              for (@n, @{$node->{<Q::TreeCore:subnode>}}) {
+                if (ref $node->{$_} eq 'ARRAY') {
+                  push @node, grep {defined $_->{<Q::TreeCore:nodeID>}}
+  \                            @{$node->{$_}}
+                } elsif (ref $node->{$_} eq 'HASH') {
+                  push @node, grep {defined $_->{<Q::TreeCore:nodeID>}}
+                               values %{$node->{$_}};
+                }
+              }
+              for (@{$node->{<Q::TreeCore:origin>}}) {
+                push @node, $node->{$_}
+                  if defined $node->{$_} and
+                     defined $node->{$_}->{<Q::TreeCore:nodeID>};
+              }
+          CORE::delete $node->{$_} for keys %{$node};
+        }
     @@ImplNote:
       @@@lang:en
       @@@@:
-        This method is different from Perl <Perl:DESTROY> special method.
-  @IntMethod:
-    @@Name: destroyDownward
-    @@Description:
-      @@@lang:en
-      @@@@: Destroy this node and subnodes.
-    @@Return:
-      @@@PerlDef:
-          CORE::delete $self->{$_} for @{$self->{<Q::TreeCore:origin>}};
-          for my $key (@{$self->{<Q::TreeCore:subnode>}}) {
-            my @node = ref $self->{$key} eq 'ARRAY' ? @{$self->{$key}}
-                                         : values %{$self->{$key}||{}};
-            CORE::delete $self->{$key};
-            $_-><M::ManakaiDOM:ManakaiDOMNodeObject.destroyDownward> for @node;
-          }
-          for my $key (@{$self->{<Q::TreeCore:subnode2>}}) {
-            my @node = map {ref $_ eq 'ARRAY' ? @$_ : values %$_}
-                       ref $self->{$key} eq 'ARRAY' ? @{$self->{$key}}
-                                         : values %{$self->{$key}||{}};
-            CORE::delete $self->{$key};
-            $_-><M::ManakaiDOM:ManakaiDOMNodeObject.destroyDownward> for @node;
-          }
-   \       for my $key (@{$self->{<Q::TreeCore:irefnode>}},
-   \                    @{$self->{<Q::TreeCore:urefnode>}},
-   \                    @{$self->{<Q::TreeCore:anydata>}},
-   \                    @{$self->{<Q::TreeCore:anydata2>}}) {
-            CORE::delete $self->{$key};
-          }
+        This method is different from Perl <Perl::DESTROY> special method.
+
   @IntMethod:
     @@Name: importTree
     @@Description:
       @@@lang:en
-      @@@@: Change internal tree identifier to be same as this node.
+      @@@@:
+        Changes the tree identifier of the nodes belong to another tree 
+        to be same as this node's tree identifier. 
     @@Param:
       @@@Name: node
       @@@Type: 
         ManakaiDOM:ManakaiDOMNodeObject
       @@@Description:
         @@@@lang:en
-        @@@@@: The node that belongs to the tree the identifier is changed.
+        @@@@@:
+          Any node from the tree to change its identifier. 
     @@Return:
       @@@PerlDef:
-          unless ($node->{<Q::TreeCore:treeID>} eq
-                  $self->{<Q::TreeCore:treeID>}) {
-            $_-><M::ManakaiDOM:ManakaiDOMNodeObject.changeTreeIDDownward>
-                                                  ($self->{<Q::TreeCore:treeID>})
-              for @{$node-><M::ManakaiDOM:ManakaiDOMNodeObject.getRootNodes>};
+        unless ($node->{<Q::TreeCore:treeID>} eq
+                $self->{<Q::TreeCore:treeID>}) {
+          my @node = ($node);
+          NODES: while (my $node = shift @node) {
+              my @n;
+              for (@{$node->{<Q::TreeCore:subnode2>}}) {
+                if (ref $node->{$_} eq 'ARRAY') {
+                  push @n, @{$node->{$_}};
+                } elsif (ref $node->{$_} eq 'HASH') {
+                  push @n, values %{$node->{$_}};
+                }
+              }
+  \           for (@n, @{$node->{<Q::TreeCore:subnode>}}) {
+  \             if (ref $node->{$_} eq 'ARRAY') {
+  \               push @node, grep {$_->{<Q::TreeCore:treeID>} ne
+  \                                 $self->{<Q::TreeCore:treeID>}}
+  \                           @{$node->{$_}}
+                } elsif (ref $node->{$_} eq 'HASH') {
+                  push @node, grep {$_->{<Q::TreeCore:treeID>} ne
+                                    $self->{<Q::TreeCore:treeID>}}
+                              values %{$node->{$_}};
+                }
+              }
+            for (@{$node->{<Q::TreeCore:origin>}}) {
+              push @node, $node->{$_}
+                if defined $node->{$_} and
+                   $node->{$_}->{<Q::TreeCore:treeID>} ne
+                   $self->{<Q::TreeCore:treeID>};
+            }
+            $node->{<Q::TreeCore:treeID>} = $self->{<Q::TreeCore:treeID>};
           }
+        }
+
   @IntMethod:
-    @@Name: changeTreeIDDownward
+    @@Name: changeTreeID
     @@Description:
       @@@lang:en
       @@@@:
-        Change internal tree identifier of the node and subnodes.
-        This method is intended to be used by the internal method 
-        importTree.
+        Changes tree identifier of all nodes traversable from this node. 
     @@Param:
       @@@Name: treeID
       @@@Type: 
@@ -3919,54 +4063,86 @@ ClassDef:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The new tree identifier to which the tree identifier of this node
-          is changed.
+          The new tree identifier. 
     @@Return:
       @@@PerlDef:
-          $self->{<Q::TreeCore:treeID>} = ''.$treeID;
-          for my $key (@{$self->{<Q::TreeCore:subnode>}}) {
-            for (ref $self->{$key} eq 'ARRAY' ? @{$self->{$key}}
-                                              : values %{$self->{$key}||{}}) {
-              $_-><M::ManakaiDOM:ManakaiDOMNodeObject
-                                     .changeTreeIDDownward> ($treeID);
-            }
-          }
-          for my $key (@{$self->{<Q::TreeCore:subnode2>}}) {
-            for (ref $self->{$key} eq 'ARRAY' ? @{$self->{$key}}
-                                              : values %{$self->{$key}||{}}) {
-              for (ref $_ eq 'ARRAY' ? @$_ : values %$_) {
-                $_-><M::ManakaiDOM:ManakaiDOMNodeObject
-                                      .changeTreeIDDownward> ($treeID);
+        unless ($self->{<Q::TreeCore:treeID>} eq $treeID) {
+          my @node = ($self);
+          NODES: while (my $node = shift @node) {
+              my @n;
+              for (@{$node->{<Q::TreeCore:subnode2>}}) {
+                if (ref $node->{$_} eq 'ARRAY') {
+                  push @n, @{$node->{$_}};
+                } elsif (ref $node->{$_} eq 'HASH') {
+                  push @n, values %{$node->{$_}};
+                }
               }
+  \           for (@n, @{$node->{<Q::TreeCore:subnode>}}) {
+  \             if (ref $node->{$_} eq 'ARRAY') {
+  \               push @node, grep {$_->{<Q::TreeCore:treeID>} ne $treeID}
+  \                           @{$node->{$_}}
+                } elsif (ref $node->{$_} eq 'HASH') {
+                  push @node, grep {$_->{<Q::TreeCore:treeID>} ne $treeID}
+                              values %{$node->{$_}};
+                }
+              }
+            for (@{$node->{<Q::TreeCore:origin>}}) {
+              push @node, $node->{$_}
+                if defined $node->{$_} and
+                   $node->{$_}->{<Q::TreeCore:treeID>} ne $treeID;
             }
+            $node->{<Q::TreeCore:treeID>} = $treeID;
           }
+        }
+
   @IntMethod:
     @@Name: getRootNodes
     @@Description:
       @@@lang:en
       @@@@:
-        Get all root nodes (i.e. nodes that does not have the origin) in 
-        the tree. 
+        Gets root nodes in the tree to which this node belongs,
+        at <QUOTE::higher> level than this node. 
+        \
+        {NOTE:: The manakai internal tree structure may have more than 
+                one tree root node - it is a set of tree sharing their 
+                nodes rather than a single tree.  In this method 
+                <DFN::root nodes> is defined as the nodes that 
+                have no their <QUOTE::origin> node.  There is at least 
+                one such node by definition of the manakai tree structure. 
+                <QUOTE::Higher> in this context means that the node is reachable
+                by only traversing <QUOTE::origin> relationships from this node. 
+        \
+        }
     @@Return:
       @@@Type:
         perl:ARRAY
       @@@PerlDef:
-          for (@{$self->{<Q::TreeCore:origin>}}) {
-            next unless $self->{$_};
-            NEW: for my $new (@{$self->{$_}
-                -><M::ManakaiDOM:ManakaiDOMNodeObject.getRootNodes>}) {
-              for my $old (@$r) {
-                next NEW if $old eq $new;
-              }
-              push @$r, $new;
-            }
+        my %result;
+        my @node = ($self);
+        NODES: while (my $node = shift @node) {
+          my $i = 0;
+          ORIGINS: for (@{$node->{<Q::TreeCore:origin>}}) {
+            next ORIGINS unless $node->{$_};
+            $i++;
+            push @node, $node->{$_};
           }
-          push @$r, $self if @$r == 0;
+          if ($i == 0) {
+            $result{$node->{<Q::TreeCore:nodeID>}} = $node;
+          }
+        }
+   \    @$r = (grep {defined $_->{<Q::TreeCore:nodeID>}} values %result);
+
   @IntMethod:
     @@Name: isSameNode
     @@Description:
       @@@lang:en
-      @@@@: Check whether the two nodes are same or not.
+      @@@@:
+        Returns whether a node is the same as this node or not. 
+        \
+        {NOTE:: The sameness is different from the equality; 
+                two nodes are same iff they are same hash reference. 
+        \
+        }
     @@Operator:
       @@@ContentType:
         lang:Perl
@@ -3977,7 +4153,8 @@ ClassDef:
         ManakaiDOM:ManakaiDOMNodeObject
       @@@Description:
         @@@@lang:en
-        @@@@@: The node to be compared.
+        @@@@@:
+          A node to compare with. 
     @@Return:
       @@@Type: 
         DOMMain:boolean
@@ -3996,34 +4173,31 @@ ClassDef:
     @@Description:
       @@@lang:en
       @@@@:
-        This method should be called when this node is orphanated, i.e. 
-        all references from <QUOTE:origin> nodes (and all references 
-        from this node to <QUOTE:origin> nodes corresponding to them) 
-        are deleted.  This methods destoroies the tree rooted by this 
-        node if the tree is no longer externally referred; otherwise, 
-        the tree identifier associated to each node is rewritten to 
-        newly generated one.
+        Notifies that this node (and its neibors if any) is no longer 
+        part of the main tree.  If the new tree containing this node 
+        has been referred yet, then the tree is preserved except its 
+        tree identifier has changed.  Otherwise, i.e. the tree is 
+        useless any more, then it is destructed. 
         \
         {NOTE:: Interaction on deleting a relationship from multiply 
-                organized <QUOTE:trees> (such as DOM tree and 
+                organized <QUOTE::trees> (such as DOM tree and 
                 styled displaying tree) is less studied.  This 
-                method might be revisited or another method might 
-                be necessary when style sheet, XBL, or other 
-                technologies are implemented.
+                method might be modified or addition of another method(s) 
+                might be required when style sheet, XBL, or other 
+                technologies has been implemented.
         \
         }
     @@Return:
       @@@PerlDef:
-          if ($self-><M::ManakaiDOM:ManakaiDOMNodeObject.isExternallyReferred>) {
-            my $id = <Code::ManakaiDOM:generateUniqueID>;
-            $_-><M::ManakaiDOM:ManakaiDOMNodeObject.changeTreeIDDownward> ($id)
-              for @{$self-><M::ManakaiDOM:ManakaiDOMNodeObject.getRootNodes>};
-            ## NOTE:: "Root nodes" should be this node itself
-            ##        by (current) definition of this method.
-          } else {
-            $self-><M::ManakaiDOM:ManakaiDOMNodeObject.destroy>;
-          }
+        if ($self-><M::ManakaiDOM:ManakaiDOMNodeObject.isExternallyReferred>) {
+          $self-><M::ManakaiDOM:ManakaiDOMNodeObject.changeTreeID>
+                                 (<Code::ManakaiDOM:generateUniqueID>);
+        } else {
+          $self-><M::ManakaiDOM:ManakaiDOMNodeObject.destroy>;
+        }
 ##Class:ManakaiDOMNodeObject
+
+
 
 ClassDef:
   @QName: 
@@ -4038,6 +4212,16 @@ ClassDef:
       A reference to node object.  From the DOM application's view, 
       it seems as if the node object itself.
 
+  @ImplNote:
+    @@lang:en
+    @@@:
+      A <Class::ManakaiDOM:ManakaiDOMNodeReference> is a blessed hash 
+      reference; currently there is a hash key defined:
+        \
+        - <CODE::TreeCore:node>::: A node object 
+             (<Class::ManakaiDOM:ManakaiDOMNodeObject>) to which 
+             this is referring. 
+
   @IntMethod:
     @@Name: destroy
     @@Description:
@@ -4051,7 +4235,7 @@ ClassDef:
       @@@PerlDef:
           my $node = $self->{<Q::TreeCore:node>};
           if ($node) {
-            delete $self->{<Q::TreeCore:node>};
+            CORE::delete $self->{<Q::TreeCore:node>};
             $node->{<Q::TreeCore:rc>}--;
             unless ($node-><M::ManakaiDOM:ManakaiDOMNodeObject
                                               .isExternallyReferred>) {
@@ -4063,19 +4247,6 @@ ClassDef:
                  "to be destroied; there might be a memory-leak code";
           }
 ##Class:ManakaiDOMNodeReference
-
-## - For ManakaiDOMNodeObject
-## TreeCore:nodeID  - The world-unique identifier of the node object.
-## TreeCore:origin  - Hash key names of the origin properties.
-## TreeCore:rc      - The number that denotes how many external references 
-##                    ("ManakaiDOMNodeReference"s) there are.
-## TreeCore:subnode - Hash key names of subnode properties.
-## TreeCore:subnode2 - Hash key names of two-step subnode properties.
-## TreeCore:treeID  - The world-unique identifier of the grove.
-## - For ManakaiDOMNodeReference
-## TreeCore:node    - The node object ("ManakaiDOMNodeObject") to which
-##                    this is referring.
-
 
 ## -- Manakai implementation-specific exception and warning
 
@@ -4143,6 +4314,7 @@ ExceptionDef:
       @@@XParam:
         @@@@QName:
           MDOMX:param-name
+        @@@@Type: DOMMethodParameterName
         @@@@Description:
           @@@@@lang:en
           @@@@@@: The parameter name.
@@ -4214,6 +4386,12 @@ ExceptionDef:
           DOM application MUST NOT try to catch this exception. 
           If this exception is raised, please report to the 
           author of that module.
+          \
+          {NOTE:: New assertion mechanism and subtype <X::ASSERTION_ERR> 
+                  has been introduced; it should be used instead of 
+                  throwing <X::MDOMX:MDOM_DEBUG_BUG> directly. 
+          \
+          }
       @@@XParam:
         @@@@QName:
           MDOMX:values
@@ -4222,6 +4400,51 @@ ExceptionDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: Arbitrary values for debugging.
+
+      @@@SubTypeDef:
+        @@@@QName: ASSERTION_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Failure to pass an assertion. 
+        @@@@XParam:
+          @@@@@QName:assertionType
+          @@@@@Description:
+            @@@@@@lang:en
+            @@@@@@@:Type of the assertion.
+        @@@@XParam:
+          @@@@@QName:actualValue
+          @@@@@Description:
+            @@@@@@lang:en
+            @@@@@@@: The actual value.
+        @@@@XParam:
+          @@@@@QName:expectedValue
+          @@@@@Description:
+            @@@@@@lang:en
+            @@@@@@@@: The expected value.
+        @@@@XParam:
+          @@@@@QName:expectedLabel
+          @@@@@Description:
+            @@@@@@lang:en
+            @@@@@@@:
+              A simple explaination for expected value. 
+        @@@@XParam:
+          @@@@@QName:traceText
+          @@@@@Description:
+            @@@@@@lang:en
+            @@@@@@@:
+              Perl's stack trace string (return value of <Perl::Carp::longmess>
+              is assumed). 
+        @@@@Def:
+          @@@@@lang:en
+          @@@@@ContentType:
+            lang:muf
+          @@@@@@:
+            ASSERTION ERROR: got "%p (name => {<Q::DOMMain:actualValue>});" 
+            while %p (name => {<Q::DOMMain:expectedValue>}, prefix => {"},
+            suffix => {"});%p (name => {<Q::DOMMain:expectedLabel>},
+            prefix => { (}, suffix => {)}); is expected %p (
+            name => {<Q::DOMMain:traceText>}); 
   
     @@XConst:
       @@@QName: 
@@ -4233,6 +4456,8 @@ ExceptionDef:
         @@@@@:
           The callee method or attribute is expected to be implemented, 
           by the DOM application, by overriding it in the inheritting class. 
+
+    
 
 WarningDef:
   @QName: 
@@ -4423,6 +4648,47 @@ WarningDef:
           @@@@@@:
             The specified URI reference.
 
+ResourceTypeDef:
+  @QName: XWParameter
+  @noVariant:
+  @Description:
+    @@lang:en
+    @@@:
+      A parameter that is used to describe exceptions and warnings. 
+
+ElementTypeBinding:
+  @Name: XWParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: XWParameter
+    @@AliasFor:
+      @@@For:
+        !=ManakaiDOM:all
+      @@@@:
+        ::ManakaiDOM:all
+
+XWParam:
+  @QName:
+    MDOMX:param-name
+  @Type: DOMParameterName
+  @Description:
+    @@lang:en
+    @@@:
+      A name of DOM method parameter that is related to the exception 
+      or warning issued. 
+
+XWParam:
+  @QName:
+    MDOMX:class
+  @Type:
+    perl:package-name
+  @Description:
+    @@lang:en
+    @@@:
+      The name of class in whose method or attribute an exception 
+      or warning is thrown. 
+
 ## -- Frequently used code fragments
 
 ResourceDef:
@@ -4447,7 +4713,7 @@ ResourceDef:
       !=ManakaiDOM:ManakaiDOMCommon
   @PerlDef:
       (
-        sprintf 'mid:%d.%d.%s.dom.manakai@suika.fam.cx',
+        sprintf 'mid:%d.%d.%s.dom.manakai@suika.fam.cx#',
                 time, $$,
                 ['A'..'Z', 'a'..'z', '0'..'9']->[rand 62] .
                 ['A'..'Z', 'a'..'z', '0'..'9']->[rand 62] .

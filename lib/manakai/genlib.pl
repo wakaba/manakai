@@ -1,14 +1,67 @@
 #!/usr/bin/perl -w
 use strict;
 
+=head1 NAME
+
+genlib.pl - Source code generation utilities
+
+=head1 DESCRIPTION
+
+This Perl library provides a number of functions useful to 
+generate source code fragment, including Perl code, in the 
+C<main> namespace.
+
+This library is part of manakai. 
+
+=head1 FUNCTIONS
+
+This library provides a lot of utility functions, most of 
+their names are prefixed to identity their functionality. 
+
+=over 4
+
+=item Global Variable C<$result>
+
+If the global variable C<$result> has its value, 
+it is printed when a C<valid_err> is reported. 
+
+=cut
+
 our $result;
+
+=item output_result ($s)
+
+Outputs the argument as an output to the default output (usually 
+the standard output).  Applications of this library can redefine 
+this function in their own code so that they customize the output 
+if they want.  Otherwise, it is simply C<print>ed. 
+
+=cut
 
 sub output_result ($) {
   print shift;
 }
 
+=item Global Variable C<$NodePathKey> = [I<name1>, I<name2>,,,,]
+
+This variable contains zero or more SuikaWikiConfig/2.0 element type 
+name that should be considered as "element identifier" - when 
+a C<valid_err> is reported with a node, its node path is also 
+reported with values of these element if exists. 
+
+=cut
+
 our $NodePathKey = [qw/Name QName Label/];
-## Source file might be broken
+
+=item valid_err $msg, node => $node
+
+Reports that the source data is something wrong (validness error) 
+and that the script is unable to continue the operation, and dies. 
+If the optional C<$node> argument is specified, its node path 
+is outputed as the position at which the error occurs. 
+
+=cut
+
 sub valid_err ($;%) {
   my ($s, %opt) = @_;
   require Carp;
@@ -22,6 +75,13 @@ sub valid_err ($;%) {
   }
   Carp::croak ($s);
 }
+
+=item valid_warn $msg, node => $node
+
+Warns a non-fatal validness problem, as C<valid_err> does, but dying. 
+
+=cut
+
 sub valid_warn ($;%) {
   my ($s, %opt) = @_;
   require Carp;
@@ -31,15 +91,37 @@ sub valid_warn ($;%) {
   Carp::carp ($s);
 }
 
-## Implementation (this script) might be broken
+=item impl_err $msg
+
+Reports an implementation error and dies.  It is intended to be 
+called when something unbelivale has happened.
+
+=cut
+
 sub impl_err ($;%) {
   require Carp;
+  output_result $result;
   die shift ().Carp::longmess ();
 }
+
+=item impl_warn $msg
+
+Warns some non-fatal implementation matter. 
+
+=cut
+
 sub impl_warn ($;%) {
   require Carp;
   Carp::carp (shift);
 }
+
+=item impl_msg $msg
+
+Shows a message from the implementation.  Unlike C<impl_err> and 
+C<impl_warn> it does not mean something broken. 
+
+=cut
+
 sub impl_msg ($;%) {
   require Carp;
   Carp::carp (shift);
@@ -170,6 +252,8 @@ sub perl_var (%) {
   my $r = $opt{type} || '';                   # $, @, *, &, $# or empty
   $r = $opt{scope} . ' ' . $r if $opt{scope}; # my, our or local
   $r .= $opt{package} . '::' if $opt{package};
+  impl_err q<Local name of variable must be specified>, %opt
+    unless defined $opt{local_name};
   $r .= $opt{local_name};
   $r;
 }
@@ -426,6 +510,15 @@ sub version_date ($) {
           $time[5] + 1900, $time[4] + 1, @time[3,2,1];
 }
 
+=back
 
+=head1 LICENSE
 
-1;
+Copyright 2004-2005 Wakaba <w@suika.fam.cx>.  All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+
+1; # $Date: 2005/01/05 12:19:39 $

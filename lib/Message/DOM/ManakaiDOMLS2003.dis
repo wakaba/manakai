@@ -33,7 +33,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2004/12/31 12:03:40 $
+      $Date: 2005/01/05 12:19:39 $
     @@ContentType:
       dis:Date.RCS
 
@@ -529,6 +529,7 @@ ResourceDef:
            $node->{<Q::ManakaiDOM:implID>}
                 = $self->flag (<Q::ManakaiDOM:implID>);
            $node->{<Q::infoset:version>} = '1.0';
+           $node->{<Q::DOMCore:hasFeature>}->{XML} = 1;
            if ($doc->node_type eq '#document') {
              __DEEP{
              for my $src (@{$doc->child_nodes}) {

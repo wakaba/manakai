@@ -15,7 +15,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/31 12:03:40 $
+      $Date: 2005/01/05 12:19:39 $
     @@ContentType:
       dis:Date.RCS
   
@@ -56,7 +56,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
-      rdfs:Datatype
+      DISCore:AbstractDataType
     @@AliasFor:
       @@@@:
         ::ManakaiDOM:all
@@ -64,12 +64,27 @@ ElementTypeBinding:
         !=ManakaiDOM:all
 
 ElementTypeBinding:
+  @Name: FormatDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISCore:StringDataType
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+    @@rdfs:subClassOf:
+      DISCore:String
+
+ElementTypeBinding:
   @Name: PropDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
-      rdfs:Property
+      rdf:Property
     @@AliasFor:
       @@@@:
         ::ManakaiDOM:all
@@ -78,12 +93,20 @@ ElementTypeBinding:
 
 ## -- Perl datatypes
 
-DataTypeDef:
+FormatDef:
   @QName:
     lang:Perl
   @FullName:
     @@lang:en
     @@@: Perl 5 code
+
+FormatDef:
+  @QName:
+    Perl:package-name
+  @Description:
+    @@lang:en
+    @@@:
+      A fully qualified Perl package name. 
 
 DataTypeDef:
   @QName:
@@ -93,11 +116,20 @@ DataTypeDef:
     @@@: Perl Scalar Value
 
 DataTypeDef:
+  @QName: Reference
+  @FullName:
+    @@lang:en
+    @@@: Perl reference
+  @rdfs:subClassOf: 
+    Perl:Scalar
+
+DataTypeDef:
   @QName:
     Perl:SCALAR
   @FullName:
     @@lang:en
     @@@: Perl reference to scalar
+  @rdfs:subClassOf: Reference
 
 DataTypeDef:
   @QName:
@@ -112,6 +144,7 @@ DataTypeDef:
   @FullName:
     @@lang:en
     @@@: Perl array reference
+  @rdfs:subClassOf: Reference
 
 DataTypeDef:
   @QName:
@@ -126,6 +159,7 @@ DataTypeDef:
   @FullName:
     @@lang:en
     @@@: Perl hash reference
+  @rdfs:subClassOf: Reference
 
 DataTypeDef:
   @QName:
@@ -133,6 +167,7 @@ DataTypeDef:
   @FullName:
     @@lang:en
     @@@: Perl code reference
+  @rdfs:subClassOf: Reference
 
 ## -- Perl constructs
 
@@ -140,7 +175,7 @@ ResourceDef:
   @QName: ScalarVariable
   @rdf:type:
     rdfs:Class
-  @ISA:
+  @rdfs:subClassOf:
     rdfs:Class
   @FullName:
     @@lang:en
@@ -174,7 +209,7 @@ PropDef:
     @@@:
       A string suffixing module names.
 
-DataTypeDef:
+FormatDef:
   @QName: MemRef
   @Description:
     @@lang:en
@@ -204,7 +239,7 @@ ResourceDef:
   @Name: TreeElementType
   @rdf:type:
     rdfs:Class
-  @ISA:
+  @rdfs:subClassOf:
     DISLang:TreeElementType
   @Description:
     @@lang:en
@@ -234,6 +269,7 @@ TreeElementType:
     @@lang:en
     @@@:
       Copies definition from other resource.
+  @dataType: MemRef
 
 ## -- The dis:Perl block preprocessing vocabulary
 
@@ -241,7 +277,7 @@ ResourceDef:
   @Name: BlockElementType
   @rdf:type:
     rdfs:Class
-  @ISA:
+  @rdfs:subClassOf:
     rdfs:Class
   @Description:
     @@lang:en
@@ -267,19 +303,51 @@ ElementTypeBinding:
 
 BlockElementType:
   @QName:
+    disPerl:ASSERT
+  @Description:
+    @@lang:en
+    @@@:
+      An assertion. 
+
+BlockElementType:
+  @QName:
     disPerl:CODE
+  @Description:
+    @@lang:en
+    @@@:
+      A block code fragment. 
+  @dataType:
+    dis:TypeQName
 
 BlockElementType:
   @QName:
     disPerl:DEEP
 
+FormatDef:
+  @QName: XWSpecification
+  @Description:
+    @@lang:en
+    @@@:
+      A reference to an exception or warning code and 
+      optional parameter specification list. 
+
 BlockElementType:
   @QName:
     disPerl:EXCEPTION
+  @Description:
+    @@lang:en
+    @@@:
+      Throws an exception. 
+  @dataType: XWSpecification
 
 BlockElementType:
   @QName:
     disPerl:WARNING
+  @Description:
+    @@lang:en
+    @@@:
+      Reports a warning. 
+  @dataType: XWSpecification
 
 BlockElementType:
   @QName:
@@ -319,7 +387,7 @@ ResourceDef:
   @Name: InlineElementType
   @rdf:type:
     rdfs:Class
-  @ISA:
+  @rdfs:subClassOf:
     rdfs:Class
   @Description:
     @@lang:en
@@ -357,10 +425,20 @@ InlineElementType:
 InlineElementType:
   @QName:
     disPerl:M
+  @dataType: MemRef
+  @Description:
+    @@lang:en
+    @@@:
+      A method (object method) call. 
 
 InlineElementType:
   @QName:
     disPerl:ClassM
+  @dataType: MemRef
+  @Description:
+    @@lang:en
+    @@@:
+      A class method call. 
 
 InlineElementType:
   @QName:
@@ -369,6 +447,7 @@ InlineElementType:
     @@lang:en
     @@@:
       An attribute getting.
+  @dataType: MemRef
 
 InlineElementType:
   @QName:
@@ -377,24 +456,124 @@ InlineElementType:
     @@lang:en
     @@@:
       An attribute setting.
+  @dataType: MemRef
+
+InlineElementType:
+  @QName:
+    disPerl:Class
+  @dataType:
+    dis:TFQNames
+  @Description:
+    @@lang:en
+    @@@:
+      A class package specification. 
 
 InlineElementType:
   @QName:
     disPerl:ClassName
+  @dataType:
+    dis:TFQNames
+  @Description:
+    @@lang:en
+    @@@:
+      A class package name string. 
+
+InlineElementType:
+  @QName:
+    disPerl:IF
+  @dataType:
+    dis:TFQNames
+  @Description:
+    @@lang:en
+    @@@:
+      An interface package specification. 
 
 InlineElementType:
   @QName:
     disPerl:IFName
+  @dataType:
+    dis:TFQNames
+  @Description:
+    @@lang:en
+    @@@:
+      An interface package name. 
 
 InlineElementType:
   @QName:
     disPerl:C
+  @dataType: MemRef
   @Description:
     @@lang:en
-    @@@: A constant value.
+    @@@: 
+      A constant value (not a constant itself - replaced by its value).
 
 InlineElementType:
   @QName:
     disPerl:Code
+  @dataType:
+    dis:TypeQName
+  @Description:
+    @@lang:en
+    @@@:
+      An inline code fragment (<Q::dis2pm:InlineCode>).
+
+## -- Assertion types for disPerl:ASSERT
+
+ResourceDef:
+  @Name: AssertionType
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf:
+    rdfs:Class
+  @Description:
+    @@lang:en
+    @@@:
+      Assertion types.
+  @AliasFor:
+    @@@:
+      ::ManakaiDOM:all
+    @@For:
+      !=ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: AType
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: AssertionType
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+AType:
+  @QName:isPositive
+  @Description:
+    @@lang:en
+    @@@:
+      Ensures the value is a positive. 
+      \
+      {NOTE:: Whether the value is a valid number or not is not a matter; 
+              this type ensures that the value is assumed as a positive 
+              value by Perl. 
+      \
+      }
+
+AType:
+  @QName:invariant
+  @Description:
+    @@lang:en
+    @@@:
+      The assertion is always fails.  It is intended to be used 
+      for flow invariant, e.g.: 
+      \
+      if ($mode) {
+        # ...
+      } else {
+        __ASSERT{DISPerl:invariant::
+          msg => {qq{Mode "$mode" should be a true value}},
+        }__;
+      } 
 
 ## DISPerl.dis ends here

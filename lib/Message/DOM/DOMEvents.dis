@@ -19,7 +19,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/31 12:03:39 $
+      $Date: 2005/01/05 12:19:39 $
     @@ContentType:
       dis:Date.RCS
 
@@ -473,7 +473,7 @@ ExceptionDef:
           @@@@lang:en
           @@@@@:
             The event type was not specified or the event type 
-            is <DOM:null> or an empty string.
+            is <DOM::null> or an empty string.
      @@XConst:
         @@@Name:  DISPATCH_REQUEST_ERR
         @@@Type:
@@ -484,7 +484,7 @@ ExceptionDef:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The <IF:Event> object is already dispatched in the tree.
+            The <IF::Event> object is already dispatched in the tree.
 
 ElementTypeBinding:
   @Name: PerlDef
@@ -1285,7 +1285,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
-      rdfs:Property
+      rdf:Property
 
 PropDef:
   @QName: isNSAware
@@ -2109,7 +2109,7 @@ IF:
       ManakaiDOM:ForClass
   @ISA:
     @@@:
-      Perl:CODE
+      Perl:CODE::ManakaiDOM:all
     @@ForCheck:
       ManakaiDOM:ForClass
 
@@ -2285,7 +2285,7 @@ IF:
     @@Param:
       @@@Name:code
       @@@Type:
-        Perl:CODE
+        Perl:CODE::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:

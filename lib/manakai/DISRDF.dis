@@ -4,9 +4,21 @@ Module:
   @FullName:
     @@lang:en
     @@@: 
-      <QUOTE:dis> RDF Module
+      <QUOTE::dis> RDF and OWL Module
   @Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/RDF#
+
+  @Description:
+    @@lang:en
+    @@@:
+      This module defines a number of vocabulary from RDF and OWL which 
+      is considered useful in the <QUOTE::dis> contexts. 
+      \
+      {NOTE:: For the formal definition of properties and classes 
+              defined in this module, see RDF and OWL specifications 
+              published by the W3C. 
+      \
+      }
   
   @Author:
     @@FullName:Wakaba
@@ -15,7 +27,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/18 11:09:28 $
+      $Date: 2005/01/05 12:19:39 $
     @@ContentType:
       dis:Date.RCS
   
@@ -64,14 +76,80 @@ ResourceDef:
 
 ResourceDef:
   @QName:
+    owl:Thing
+  @rdf:type:
+    owl:Class
+  @Description:
+    @@lang:en
+    @@@:
+      All individuals.  Every OWL class is a subclass of <Q::owl:Thing>. 
+  @noVariant:
+
+ResourceDef:
+  @QName:
+    owl:Nothing
+  @rdf:type:
+    owl:Class
+  @Description:
+    @@lang;en
+    @@@:
+      The empty set.  Note that <Q::owl:Nothing> is a subclass of every 
+      class. 
+  @noVariant:
+
+ResourceDef:
+  @QName:
     rdfs:Class
   @rdf:type:
     rdfs:Class
-  @ISA:
+  @subsetOf:
+    rdfs:Resource
+  @rdfs:subClassOf:
     rdfs:Resource
   @Description:
     @@lang:en
     @@@: A RDF class.
+  @noVariant:
+
+ResourceDef:
+  @QName:
+    owl:Class
+  @rdf:type:
+    owl:Class
+  @subsetOf:
+    rdfs:Class
+  @rdfs:subClassOf:
+    rdfs:Class
+  @Description:
+    @@lang:en
+    @@@:
+      OWL classes.
+  @noVariant:
+
+ResourceDef:
+  @QName:
+    owl:DeprecatedClass
+  @rdf:type:
+    rdfs:Class
+  @subsetOf:
+    rdfs:Class
+  @rdfs:subClassOf:
+    rdfs:Class
+  @Description:
+    @@lang:en
+    @@@:
+      A deprecated class. 
+  @noVariant:
+
+ResourceDef:
+  @QName:
+    rdfs:Literal
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf:
+    rdfs:Class
+  @subsetOf:
+    rdfs:Class
   @noVariant:
 
 ResourceDef:
@@ -85,27 +163,45 @@ ResourceDef:
 
 ResourceDef:
   @QName:
-    rdfs:Property
+    rdf:Property
   @Description:
     @@lang:en
     @@@: An RDF property.
   @rdf:type:
     rdfs:Class
-  @ISA:
+  @subsetOf:
+    rdfs:Class
+  @rdfs:subClassOf:
     rdfs:Class
   @noVariant:
+
 ElementTypeBinding:
   @Name: PropDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
-      rdfs:Property
+      rdf:Property
     @@AliasFor:
       @@@@:
         ::ManakaiDOM:all
       @@@For:
         !=ManakaiDOM:all
+
+ResourceDef:
+  @QName:
+    owl:DeprecatedProperty
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf:
+    rdf:Property
+  @subsetOf:
+    rdf:Property
+  @Description:
+    @@lang:en
+    @@@:
+      Deperecated properties. 
+  @noVariant:
 
 PropDef:
   @QName:
@@ -129,6 +225,18 @@ PropDef:
 
 PropDef:
   @QName:
+    rdfs:subPropertyOf
+  @Description:
+    @@lang:en
+    @@@:
+      The subject is a subproperty of a property.
+  @rdfs:domain:
+    rdf:Property
+  @rdfs:range:
+    rdf:Property
+
+PropDef:
+  @QName:
     owl:sameAs
   @Description:
     @@lang:en
@@ -139,16 +247,27 @@ PropDef:
   @QName:
     rdfs:domain
   @rdfs:domain:
-    rdfs:Property
+    rdf:Property
   @rdfs:range:
     rdfs:Class
 PropDef:
   @QName:
     rdfs:range
   @rdfs:domain:
-    rdfs:Property
+    rdf:Property
   @rdfs:range:
     rdfs:Class
+
+PropDef:
+  @QName:
+    rdfs:label
+  @Description:
+    @@lang:en
+    @@@: A human-readable name of the subject resource.
+  @rdfs:domain:
+    rdfs:Resource
+  @rdfs:range:
+    rdfs:Literal
 
 PropDef:
   @QName:
@@ -156,5 +275,148 @@ PropDef:
   @Description:
     @@lang:en
     @@@: A description of the subject resource.
+  @rdfs:domain:
+    rdfs:Resource
+  @rdfs:range:
+    rdfs:Literal
 
-## RDF.dis ends here
+ResourceDef:
+  @QName:
+    rdf:Statement
+  @Description:
+    @@lang:en
+    @@@:
+      RDF statements.
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf:
+    rdfs:subClassOf
+  @subsetOf:
+    rdfs:subClassOf
+  @noVariant:
+
+PropDef:
+  @QName:
+    rdfs:subject
+  @Description:
+    @@lang:en
+    @@@:
+      The subject of an RDF statement. 
+  @rdfs:domain:
+    rdf:Statement
+  @rdfs:range:
+    rdfs:Resource
+
+PropDef:
+  @QName:
+    rdfs:predicate
+  @Description:
+    @@lang:en
+    @@@:
+      The predicate of an RDF statement. 
+  @rdfs:domain:
+    rdf:Statement
+  @rdfs:range:
+    rdfs:Resource
+
+PropDef:
+  @QName:
+    rdfs:object
+  @Description:
+    @@lang:en
+    @@@:
+      The object of an RDF statement. 
+  @rdfs:domain:
+    rdf:Statement
+  @rdfs:range:
+    rdfs:Resource
+
+PropDef:
+  @QName:
+    rdfs:seeAlso
+  @Description:
+    @@lang:en
+    @@@:
+      An additional information on the subject. 
+  @rdfs:domain:
+    rdfs:Resource
+  @rdfs:range:
+    rdfs:Resource
+
+PropDef:
+  @QName:
+    rdfs:isDefinedBy
+  @Description:
+    @@lang:en
+    @@@:
+      An RDF vocabulary in which the subject is described. 
+  @rdfs:domain:
+    rdfs:Resource
+  @rdfs:range:
+    rdfs:Resource
+
+PropDef:
+  @QName:
+    rdf:value
+  @Description:
+    @@lang:en
+    @@@:
+      The primary value of a structured resource. 
+  @rdfs:domain:
+    rdfs:Resource
+  @rdfs:range:
+    rdfs:Resource
+
+ElementTypeBinding:
+  @Name: PropType
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdfs:Class
+    @@rdfs:subClassOf:
+      rdf:Property
+    @@subsetOf:
+      rdf:Property
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+PropType:
+  @QName:
+    owl:FunctionalProperty
+  @Description:
+    @@lang:en
+    @@@:
+      Functional (<VAR::n> to one) properties. 
+
+PropType:
+  @QName:
+    owl:InverseFunctionalProperty
+  @Description:
+    @@lang:en
+    @@@:
+      Inverse-functional properties. 
+
+PropType:
+  @QName:
+    owl:SymmetricProperty
+  @Description:
+    @@lang:en
+    @@@:
+      Symmetric properties.  A property <VAR::P> is symmetric iff 
+      <MATH::<VAR::x> <VAR::P> <VAR::y> =<gt> <VAR::y> <VAR::P> <VAR::x>>. 
+
+PropType:
+  @QName:
+    owl:TransitiveProperty
+  @Description:
+    @@lang:en
+    @@@:
+      Transitive properties.  A property <VAR::P> is transitive iff 
+      <MATH::<VAR::x> <VAR::P> <VAR::y> and <VAR::y> <VAR::P> <VAR::z> 
+             =<gt> <VAR::x> <VAR::P> <VAR::z>>. 
+
+## DISRDF.dis ends here

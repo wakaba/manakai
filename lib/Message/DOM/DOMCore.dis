@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/31 12:03:39 $
+      $Date: 2005/01/05 12:19:38 $
     @@ContentType:
       dis:Date.RCS
 
@@ -812,6 +812,25 @@ FeatureDef:
 
 ## -- Exception
 
+ElementTypeBinding:
+  @Name:enMufDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@lang:en
+    @@ContentType:
+      lang:muf
+
+ElementTypeBinding:
+  @Name:XParamParamName
+  @ElementType:
+    ManakaiDOM:exceptionOrWarningParameter
+  @ShadowContent:
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM
+    @@QName:
+      MDOMX:param-name
+
 ExceptionDef:
   @Name:
     @@@: DOMException
@@ -869,27 +888,54 @@ ExceptionDef:
      @@XConst:
         @@@Name:  INDEX_SIZE_ERR
         @@@Value:  1
-        @@@XParam:
-          @@@@QName:
-            MDOMX:param-name
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: 
-              The name of parameter to which invalid value is specified.
         @@@Description:
           @@@@lang:en
           @@@@@: 
             The specified index or size value is less than or greater 
             than the allowed value. 
-        @@@Def:
-          @@@@lang:en
-          @@@@ContentType:
-            lang:muf
-          @@@@@: 
+        @@@enMufDef:
               The index or size%t (
                 name => {<Q::MDOMX:param-name>},
                 prefix => {, as specified by the parameter "}, suffix => {",}); 
               is negative or greater than the allowed value.
+        @@@XParamParamName:
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              The name of parameter to which invalid value is specified.
+       @@@XParam:
+         @@@@QName:index
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@: The specified index or size. 
+       @@@SubTypeDef:
+         @@@@QName: NEGATIVE_INDEX_ERR
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             The specified index or size is negative. 
+         @@@@enMufDef:
+           The specified index or size (%p (
+             name => {<Q::MDOMX:param-name>},
+             prefix => {"},
+             suffix => {" = },
+           );%p (
+             name => {<Q::DOMCore:index>},
+           );) is negative. 
+       @@@SubTypeDef:
+         @@@@QName: OUT_OF_UPPER_BOUND_ERR
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             The specified index or size is greater than an upper bound. 
+         @@@@enMufDef:
+           The specified index or size (%p (
+             name => {<Q::MDOMX:param-name>},
+             prefix => {"},
+             suffix => {" = },
+           );%p (
+             name => {<Q::DOMCore:index>},
+           );) is greater than an upper bound. 
      @@XConst:
         @@@Name:  DOMSTRING_SIZE_ERR
         @@@Value:  2
@@ -947,7 +993,8 @@ ExceptionDef:
           @@@@XParam:
             @@@@@QName:
               MDOMX:param-name
-            @@@@@Type:DOMString
+            @@@@@Type:
+              DOMMain:DOMParameterName
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
@@ -969,7 +1016,8 @@ ExceptionDef:
           @@@@XParam:
             @@@@@QName:
               MDOMX:param-name
-            @@@@@Type: DOMString
+            @@@@@Type:
+              DOMMain:DOMMethodParameterName
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
@@ -984,7 +1032,8 @@ ExceptionDef:
           @@@@XParam:
             @@@@@QName:
               MDOMX:param-name
-            @@@@@Type: DOMString
+            @@@@@Type:
+              DOMMain:DOMMethodParameterName
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
@@ -1014,7 +1063,8 @@ ExceptionDef:
               A specified node was created from a different DOM implementation.
      @@XConst:
         @@@Name:  INVALID_CHARACTER_ERR
-        @@@Type:  unsigned-short
+        @@@Type:  
+          DOMMain:unsigned-short
         @@@Value:  5
         @@@Description:
           @@@@lang:en
@@ -1025,16 +1075,20 @@ ExceptionDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The specified name is not a SGML or XML <XML:Name>.
+              The specified name is not a SGML or XML <XML::Name>.
+          @@@@enMufDef:
+            The name%p (name => {<Q::DOMCore:name>}, prefix => { "}, 
+            suffix => {"}); is illegal%p (name => {<Q::infoset:version>}, 
+            prefix => { according to XML });
           @@@@XParam:
             @@@@@QName:
               DOMCore:name
             @@@@@Type:
-              DOMMain:DOMString
+              DOMMain:ManakaiDOMXMLName
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: 
-                The <XML:Name> specified.
+                The <XML::Name> specified.
           @@@@XParam:
             @@@@@QName:
               infoset:version
@@ -1045,11 +1099,15 @@ ExceptionDef:
               @@@@@@@: The version of XML.
      @@XConst:
         @@@Name:  NO_DATA_ALLOWED_ERR
-        @@@Type:  unsigned-short
+        @@@Type:  
+          DOMMain:unsigned-short
         @@@Value:  6
         @@@Description:
           @@@@lang:en
           @@@@@: Data is specified for a node that does not support data.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@: How is this exception code used?
      @@XConst:
         @@@Name:  NO_MODIFICATION_ALLOWED_ERR
         @@@Type:  
@@ -1075,6 +1133,18 @@ ExceptionDef:
             @@@@@@:
               One of child nodes is read-only. 
         @@@SubTypeDef:
+          @@@@QName:NOMOD_NAMEDNODEMAP_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              An attempt is made to modify an uneditable <IF::NamedNodeMap>. 
+        @@@SubTypeDef:
+          @@@@QName:NOMOD_NODELIST_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              An attempt is made to modify an uneditable <IF::NodeList>. 
+        @@@SubTypeDef:
           @@@@QName:
             MDOMX:NOMOD_PARENT
           @@@@Description:
@@ -1099,17 +1169,36 @@ ExceptionDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              An attempt is made to modify this node but 
-              this node is read-only.
+              This node is read-only so that it is impossible to edit. 
+          @@@@enMufDef:
+            This node is read-only
      @@XConst:
         @@@Name:  NOT_FOUND_ERR
-        @@@Type:  unsigned-short
+        @@@Type:  
+          DOMMain:unsigned-short
         @@@Value:  8
         @@@Description:
           @@@@lang:en
           @@@@@:
             An attempt is made to refer a node in a context where 
             it does not exist.
+       @@@SubTypeDef:
+         @@@@QName: NOT_ATTR_ERR
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             The specified node is not an attribute node attached 
+             to the target node. 
+         @@@@enMufDef:
+           The specified node is not an attribute of this node
+       @@@SubTypeDef:
+         @@@@QName: NOT_CHILD_ERR
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             The specified node is not a child node of the target node. 
+         @@@@enMufDef:
+           The specified node is not a direct child of this node
      @@XConst:
         @@@Name:  NOT_SUPPORTED_ERR
         @@@Type:  
@@ -1125,7 +1214,11 @@ ExceptionDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The event object was created by other DOM implementation. 
+              The event object was created by other DOM implementation and 
+              it does not support the <IF::DOMEvents:CustomEvent> interface. 
+          @@@@enMufDef:
+            This is not a supported event object; use createEvent method 
+            or implement the CustomEvent interface
           @@@@For:
             ManakaiDOM:DOMEventsFeature
         @@@SubTypeDef:
@@ -1134,7 +1227,7 @@ ExceptionDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The document does not support the <DOM:XML> feature.
+              The document does not support the <DOM::XML> feature.
           @@@@ImplNote:
             @@@@@lang:en
             @@@@@@:
@@ -1147,6 +1240,9 @@ ExceptionDef:
            \
               This DOM implementation throws the exception in 
               both levels.
+          @@@@enMufDef:
+            The document is not an XML document while the operation 
+            is for XML documents 
         @@@SubTypeDef:
           @@@@QName:
             MDOMX:MDOM_DOC_NOSUPPORT_XMLNS
@@ -1154,6 +1250,9 @@ ExceptionDef:
             @@@@@lang:en
             @@@@@@:
               This document does not support XML Namespaces.
+          @@@@enMufDef:
+            The document is not a namespaced XML document while the 
+            operation is for XML Namespace documents 
         @@@SubTypeDef:
           @@@@QName:
             MDOMX:MDOM_IMPL_ATTR_NOT_IMPLEMENTED
@@ -1194,15 +1293,11 @@ ExceptionDef:
               @@@@@@Description:
                 @@@@@@@lang:en
                 @@@@@@@@: Setting this attribute is not implemented.
-          @@@@Def:
-            @@@@@lang:en
-            @@@@@ContentType:
-              lang:muf
-            @@@@@@:
+          @@@@enMufDef:
               The attribute "%p (name => {<Q::MDOMX:class>}, suffix => {.}
               );%p (name => {<Q::MDOMX:attr>});"
               %p (name => {<Q::MDOMX:on>},
-                  prefix => {(}, suffix => {)}); not implemented
+                  prefix => {(}, suffix => {)}); has not been implemented yet 
         @@@SubTypeDef:
           @@@@QName:
             MDOMX:MDOM_IMPL_METHOD_NOT_IMPLEMENTED
@@ -1228,13 +1323,9 @@ ExceptionDef:
               @@@@@@lang:en
               @@@@@@@:
                 The name of method that is not implemented.
-          @@@@Def:
-            @@@@@lang:en
-            @@@@@ContentType:
-              lang:muf
-            @@@@@@:
+          @@@@enMufDef:
               The method "%p (name => {<Q::MDOMX:class>}, suffix => {.}
-              );%p (name => {<Q::MDOMX:method>});" not implemented
+              );%p (name => {<Q::MDOMX:method>});" has not been implemented yet
         @@@SubTypeDef:
           @@@@QName:
             ManakaiDOMEvents:MDOM_IMPL_NOSUPPORT_EVENT
@@ -1267,11 +1358,7 @@ ExceptionDef:
               @@@@@@lang:en
               @@@@@@@:
                 The absolute URI representing the schema language requested.
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@Type:
-              lang:muf
-            @@@@@@:
+          @@@@enMufDef:
               The schema language specified %p (prefix => {<},
               suffix => {>}, name => {<Q::DOMCore:schemaType>}); 
               is not supported
@@ -1289,16 +1376,20 @@ ExceptionDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The DOM implementation does not support the <DOM:XML> feature.
+              The DOM implementation does not support the <DOM::XML> feature.
+          @@@@enMufDef:
+            This operation requires the support for the XML documents
         @@@SubTypeDef:
           @@@@QName:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The DOM implementation does not support the <DOM:XML> feature 
+              The DOM implementation does not support the <DOM::XML> feature 
               and the language exposed through the <IF::Document> 
               object does not support XML Namespaces.
+          @@@@enMufDef:
+            This operation requires the support for the XML Namespaces 
         @@@SubTypeDef:
           @@@@QName:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLVER
@@ -1314,6 +1405,9 @@ ExceptionDef:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: The XML version
+          @@@@enMufDef:
+            XML version%p (name => {<Q::infoset:version>}, 
+            prefix => { "}, suffix => {"}); is not supported
         @@@SubTypeDef:
           @@@@QName:
             MDOMX:MDOM_NODE_NOSUPPORT_XMLNS
@@ -1334,6 +1428,11 @@ ExceptionDef:
               @@@@@@@:
                 The name of the parameter that provides the node 
                 that does not support XML Namespaces.
+          @@@@enMufDef:
+            The node does not support XML Namespaces while the operation 
+            requires the node to support namespaces; the node is not 
+            of an XML document or the node has been created by DOM 
+            Level 1 method
         @@@SubTypeDef:
           @@@@QName:
             ManakaiDOMLS:MDOMLS_IMPL_NOSUPPORT_MODE
@@ -1348,11 +1447,7 @@ ExceptionDef:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: The requested mode.
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@Type:
-              lang:muf
-            @@@@@@:
+          @@@@enMufDef:
               The requested mode "%p (name => {<Q::DOMLS:mode>});" 
               is not supported
      @@XConst:
@@ -1364,12 +1459,17 @@ ExceptionDef:
           @@@@@: 
             An attempt is made to add an attribute that is already inuse 
             elsewhere.
+       @@@enMufDef:
+         The attribure node is already in use elsewhere
      @@XConst:
         @@@Name:  INVALID_STATE_ERR
-        @@@Type:  unsigned-short
+        @@@Type:  
+          DOMMain:unsigned-short
         @@@Value:  11
         @@@Level[list]:  2
         @@@SpecLevel: 2
+        @@@For:
+          ManakaiDOM:DOM2
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -1383,10 +1483,13 @@ ExceptionDef:
             @@@@@@: The parser is busy.
      @@XConst:
         @@@Name:  SYNTAX_ERR
-        @@@Type:  unsigned-short
+        @@@Type:  
+          DOMMain:unsigned-short
         @@@Value:  12
         @@@Level[list]:  2
         @@@SpecLevel: 2
+        @@@For:
+          ManakaiDOM:DOM2
         @@@Description:
           @@@@lang:en
           @@@@@: An invalid or illegal string is specified.
@@ -1400,10 +1503,13 @@ ExceptionDef:
               cookie value syntax.
      @@XConst:
         @@@Name:  INVALID_MODIFICATION_ERR
-        @@@Type:  unsigned-short
+        @@@Type:  
+          DOMMain:unsigned-short
         @@@Value:  13
         @@@Level[list]:  2
         @@@SpecLevel: 2
+        @@@For:
+          ManakaiDOM:DOM2
         @@@Description:
           @@@@lang:en
           @@@@@: An attempt is made to modify the type of underlying object.
@@ -1414,6 +1520,8 @@ ExceptionDef:
         @@@Value:  14
         @@@SpecLevel: 2
         @@@Level[list]:  2
+        @@@For:
+          ManakaiDOM:DOM2
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -1425,8 +1533,12 @@ ExceptionDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The specified <XML:NCName> is illegal according to 
+              The specified <XML::NCName> is illegal according to 
               the XML version in use.
+          @@@@enMufDef:
+            The NCName%p (name => {<Q::infoset:name>}, prefix => { "},
+            suffix => {"}); is illegal%p (name => {<Q::infoset:version>}, 
+            prefix => { according to the XML });
           @@@@XParam:
             @@@@@QName:
               infoset:name
@@ -1435,7 +1547,14 @@ ExceptionDef:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <XML:NCName> specified.
+                The <XML::NCName> specified.
+          @@@@XParam:
+            @@@@@QName:
+              infoset:version
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The version of XML according to which the name is illegal. 
         @@@SubTypeDef:
           @@@@QName:
             MDOMX:MDOM_NS_MALFORMED_QNAME
@@ -1452,6 +1571,17 @@ ExceptionDef:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: The qualified name specified.
+          @@@@XParam:
+            @@@@@QName:
+              infoset:version
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The version of XML used to check the name. 
+          @@@@enMufDef:
+            The QName%p (name => {<Q::DOMCore:qualifiedName>}, prefix => { "}, 
+            suffix => {"}); is illegal%p (name => {<Q::infoset:version>}, 
+            prefix => { according to XML });
         @@@SubTypeDef:
           @@@@QName:
             MDOMX:MDOM_NS_NOPREFIX_WITH_NON_NULL_URI
@@ -1460,14 +1590,34 @@ ExceptionDef:
             @@@@@@:
               There is no namespace prefix but there is a 
               non-namespace URI specified.
+          @@@@XParam:
+            @@@@@QName:
+              infoset:namespaceName
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The namespace URI. 
+          @@@@XParam:
+            @@@@@QName:
+              DOMCore:qualifiedName
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The qualified name. 
+          @@@@enMufDef:
+            %p (name => {<Q::DOMCore:qualifiedName>}, prefix => {QName "}, 
+            suffix => {": });
+            A non-null namespace prefix is required for a non-null 
+            namespace URI%p (name => {<Q::infoset:namespaceName>},
+            prefix => { <}, suffix => {>});
         @@@SubTypeDef:
           @@@@QName:
             MDOMX:MDOM_NS_NULL_QNAME_WITH_NON_NULL_URI
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The qualified name specified is not <DOM:null> but 
-              the namespace URI that is not <DOM:null> is specified.
+              The qualified name specified is not <DOM::null> but 
+              the namespace URI that is not <DOM::null> is specified.
           @@@@XParam:
             @@@@@QName:
               infoset:namespaceName
@@ -1476,15 +1626,33 @@ ExceptionDef:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: The namespace URI specified.
+          @@@@XParam:
+            @@@@@QName:
+              DOMCore:qualifiedName
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The qualified name. 
+          @@@@enMufDef:
+            %p (name => {<Q::DOMCore:qualifiedName>}, prefix => {QName "}, 
+            suffix => {": });
+            A non-null namespace prefix is required for a non-null 
+            namespace URI%p (name => {<Q::infoset:namespaceName>},
+            prefix => { <}, suffix => {>});
         @@@SubTypeDef:
           @@@@QName:
             MDOMX:MDOM_NS_OTHER_WITH_XML_URI
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The namespace prefix specified is not equal to <XML:xml> 
+              The namespace prefix specified is not equal to <XML::xml> 
               while the namespace URI is 
-              <URI:http://www.w3.org/XML/1998/namespace>.
+              <URI::http://www.w3.org/XML/1998/namespace>.
+          @@@@enMufDef:
+            The namespace prefix for namespace URI 
+            <http://www.w3.org/XML/1998/namespace> must be a "xml"%p
+            (name => {<Q::infoset:prefix>}, prefix => {, not "}, 
+             suffix => {"});
           @@@@XParam:
             @@@@@QName:
               infoset:prefix
@@ -1505,9 +1673,14 @@ ExceptionDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The namespace prefix specified is not equal to <XML:xmlns> 
+              The namespace prefix specified is not equal to <XML::xmlns> 
               while the namespace URI is 
-              <URI:http://www.w3.org/2000/xmlns>.
+              <URI::http://www.w3.org/2000/xmlns/>.
+          @@@@enMufDef:
+            The namespace prefix for namespace URI 
+            <http://www.w3.org/2000/xmlns/> must be a "xmlns"%p
+            (name => {<Q::infoset:prefix>}, prefix => {, not "}, 
+             suffix => {"});
           @@@@XParam:
             @@@@@QName:
               infoset:prefix
@@ -1515,13 +1688,6 @@ ExceptionDef:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: The namespace prefix.
-          @@@@XParam:
-            @@@@@QName:
-              DOMCore:qualifiedName
-            @@@@@Type: DOMString
-            @@@@@Description:
-              @@@@@@lang:en
-              @@@@@@@: The qualified name.
         @@@SubTypeDef:
           @@@@QName:
             MDOMX:MDOM_NS_PREFIX_WITH_NULL_URI
@@ -1529,7 +1695,7 @@ ExceptionDef:
             @@@@@lang:en
             @@@@@@:
               The namespace prefix is specified but the namespace URI 
-              is <DOM:null>.
+              is <DOM::null>.
           @@@@XParam:
             @@@@@QName:
               infoset:prefix
@@ -1544,16 +1710,16 @@ ExceptionDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The qualified name specified equals to <XML:xmlns>.
+              The qualified name specified equals to <XML::xmlns>.
         @@@SubTypeDef:
           @@@@QName:
             MDOMX:MDOM_NS_XML_WITH_OTHER_URI
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The namespace prefix specified is <XML:xml> and 
+              The namespace prefix specified is <XML::xml> and 
               the namespace URI is other than 
-              <URI:http://www.w3.org/XML/1998/namespace>.
+              <URI::http://www.w3.org/XML/1998/namespace>.
           @@@@XParam:
             @@@@@QName:
               infoset:namespaceName
@@ -1568,9 +1734,9 @@ ExceptionDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The namespace prefix specified is <XML:xmlns> and 
+              The namespace prefix specified is <XML::xmlns> and 
               the namespace URI is other than 
-              <URI:http://www.w3.org/2000/xmlns>.
+              <URI::http://www.w3.org/2000/xmlns>.
           @@@@XParam:
             @@@@@QName:
               infoset:namespaceName
@@ -1585,9 +1751,9 @@ ExceptionDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The qualified name is <XML:xmlns> and 
+              The qualified name is <XML::xmlns> and 
               the namespace URI is other than 
-              <URI:http://www.w3.org/2000/xmlns>.
+              <URI::http://www.w3.org/2000/xmlns>.
           @@@@XParam:
             @@@@@QName:
               infoset:namespaceName
@@ -1602,7 +1768,7 @@ ExceptionDef:
          @@@@Description:
            @@@@@lang:en
            @@@@@@:
-             The qualified name is <XML:xmlns:xmlns>.  It is prohibited 
+             The qualified name is <XML::xmlns:xmlns>.  It is prohibited 
              by the XML Namespace Specifications.
         @@@SubTypeDef:
           @@@@QName: MDOMX_HTML_NSURI
@@ -1611,9 +1777,12 @@ ExceptionDef:
             @@@@@@:
               An attempt is made to set a namespace URI to 
               an HTML node. 
+          @@@@For:
+            ManakaiDOM:DOMHTMLFeature
      @@XConst:
         @@@Name:  INVALID_ACCESS_ERR
-        @@@Type:  unsigned-short
+        @@@Type:  
+          DOMMain:unsigned-short
         @@@Value:  15
         @@@Level[list]:  2
         @@@SpecLevel: 2
@@ -1624,10 +1793,13 @@ ExceptionDef:
             underlying object.
      @@XConst:
         @@@Name:  VALIDATION_ERR
-        @@@Type:  unsigned-short
+        @@@Type:  
+          DOMMain:unsigned-short
         @@@Value:  16
         @@@Level[list]:  3
         @@@SpecLevel:3
+        @@@For:
+          ManakaiDOM:DOM3
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -1639,6 +1811,8 @@ ExceptionDef:
         @@@Value:  17
         @@@Level[list]:  3
         @@@SpecLevel:3
+        @@@For:
+          ManakaiDOM:DOM3
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -2142,7 +2316,7 @@ IF:
     @@Param:
       @@@Name: list
       @@@Type: 
-        perl:Array
+        perl:Array::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -2731,6 +2905,14 @@ IF:
           }
        @@@For:
          ManakaiDOM:ManakaiDOMLatest
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The manakai <M::DOMImplementation.createDocument> method always 
+         creates an XML <IF::Document>, i.e. a <IF::Document> that supports 
+         the <Feature::XML> feature. 
+       @@@For:
+         ManakaiDOM:ManakaiDOM
      @@XML2Feature:
      @@ImplNote:
        @@@lang:en
@@ -2928,12 +3110,21 @@ IF:
                   }__;
                 }
               }
-            } # $qualifiedName
+            } elsif (defined $namespaceURI) {
+              __EXCEPTION{MDOMX:MDOM_NS_NULL_QNAME_WITH_NON_NULL_URI::
+                MDOMX:param-name => 'qualifiedName',
+                infoset:namespaceName => {$namespaceURI},
+              }__;
+            }
 
             my $node = <ClassM::ManakaiDOMDocument.newObject>;
             $node->{<Q::DOMCore:implementation>} = $self;
             $node->{<Q::ManakaiDOM:implID>}
                 = $self->{<Q::TreeCore:node>}->{<Q::ManakaiDOM:implID>};
+            $node->{<Q::DOMCore:hasFeature>}->{XML} = 1;
+            $node->{<Q::DOMCore:hasFeature>}->{HTML} = 1
+              if (defined $namespaceURI and $namespaceURI eq <Q::xhtml1:>) or
+                 (defined $qualifiedName and $qualifiedName eq 'html');
             if ($doctype) {
               if (not UNIVERSAL::isa
                         ($doctype, <ClassName::DOMXML:ManakaiDOMDocumentType>)) {
@@ -3017,6 +3208,7 @@ IF:
             $node->{<Q::DOMCore:implementation>} = $self;
             $node->{<Q::ManakaiDOM:implID>}
                 = $self->{<Q::TreeCore:node>}->{<Q::ManakaiDOM:implID>};
+            $node->{<Q::DOMCore:hasFeature>}->{HTML} = 1;
             if ($doctype) {
               if (not UNIVERSAL::isa
                         ($doctype, <ClassName::DOMXML:ManakaiDOMDocumentType>)) {
@@ -4324,18 +4516,18 @@ IF:
                     }
                   }
                   if ($newIndex < $currentIndex) {
-                    delete $node->{<Q::infoset:children>}->[$currentIndex];
+                    CORE::delete $node->{<Q::infoset:children>}->[$currentIndex];
                     splice @{$node->{<Q::infoset:children>}},
                            $newIndex, 1, @newNode;
                   } else {
                     splice @{$node->{<Q::infoset:children>}},
                            $newIndex, 1, @newNode;
-                    delete $node->{<Q::infoset:children>}->[$currentIndex];
+                    CORE::delete $node->{<Q::infoset:children>}->[$currentIndex];
                   }
                 }
               } else { ## $newChild->parentNode ne $self
                 for my $newNode (@newNode) {
-                  delete $newNode->{<Q::infoset:parent>};
+                  CORE::delete $newNode->{<Q::infoset:parent>};
                   $node-><M::ManakaiDOM:ManakaiDOMNodeObject.importTree>
                                                                    ($newNode);
                   $newNode->{<Q::infoset:parent>} = $node;
@@ -4357,7 +4549,8 @@ IF:
                   }
                 }
               }
-              delete $oldChild->{<Q::TreeCore:node>}->{<Q::infoset:parent>};
+              CORE::delete $oldChild->{<Q::TreeCore:node>}
+                                    ->{<Q::infoset:parent>};
               $oldChild->{<Q::TreeCore:node>}
                        -><M::ManakaiDOM:ManakaiDOMNodeObject.orphanate>;
             } # @newNode
@@ -5026,7 +5219,8 @@ IF:
               The DOM implementation was not able to obtain 
               an absolute URI.
         @@@PerlDef:
-            if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:hasFeature>}->{HTML}) {
+            if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:ownerDocument>}
+                     ->{<Q::DOMCore:hasFeature>}->{HTML}) {
               $r = $self->{<Q::TreeCore:node>}
                      -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode.htmlBaseURI>;
             } else {
@@ -5037,13 +5231,13 @@ IF:
        @@@@:
          = If the <IF:Document> support the feature <Feature:HTML>,
        \
-         == If there is a <HTML:base> element with the <HTML:base> attribute, 
+         == If there is a <HE::base> element with the <HA:href> attribute, 
             the base URI is its value.
        \
-         == Otherwise, the base URI is the value of <A:Document.documentURI>.
+         == Otherwise, the base URI is the value of <A::Document.documentURI>.
        \
-         = Elsif the <IF:Document> support the feature <Feature:XML>, 
-           compute the base URI accodint to the XML Base Specification.
+         = Elsif the <IF::Document> support the feature <Feature::XML>, 
+           compute the base URI accoding to the XML Base Specification.
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -5721,8 +5915,6 @@ IF:
           push @{$node->{<Q::TreeCore:anydata2>}}, <Q::DOMEvents:eventListener>;
           $node->{<Q::infoset:children>} = [];
           $node->{<Q::infoset:attributes>} = {};
-          $node->{<Q::DOMCore:hasFeature>}->{XML} = true;
-              \## ISSUE: More consideration required for the feature
        @@@ImplNote:
          @@@@lang:en
          @@@@@:
@@ -5788,30 +5980,30 @@ IF:
           my $class;
           if ($nt eq <Q::infoset:Element>) {
             ## TODO: Find class by namespace URI and local name
-            $class = <ClassName::Element>;
+            $class = <ClassName::ManakaiDOMElement>;
           } elsif ($nt eq <Q::infoset:Attribute>) {
             ## TODO: Find class by namespace URI and local name
-            $class = <ClassName::Attr>;
+            $class = <ClassName::ManakaiDOMAttr>;
           } elsif ($nt eq <Q::DOMCore:Text>) {
-            $class = <ClassName::Text>;
+            $class = <ClassName::ManakaiDOMText>;
           } elsif ($nt eq <Q::infoset:Comment>) {
-            $class = <ClassName::Comment>;
+            $class = <ClassName::ManakaiDOMComment>;
           } elsif ($nt eq <Q::infoset:Document>) {
             ## TODO: Find class by doctype
-            $class = <ClassName::Document>;
+            $class = <ClassName::ManakaiDOMDocument>;
           } elsif ($nt eq <Q::DOMCore:DocumentFragment>) {
-            $class = <ClassName::DocumentFragment>;
+            $class = <ClassName::ManakaiDOMDocumentFragment>;
           } elsif ($nt eq <Q::DOMXML:EntityReference>) {
-            $class = <ClassName::DOMXML:EntityReference>;
+            $class = <ClassName::DOMXML:ManakaiDOMEntityReference>;
           } elsif ($nt eq <Q::infoset:ProcessingInstruction>) {
             ## TODO: Find class by namespace URI and local name
-            $class = <ClassName::DOMXML:ProcessingInstruction>;
+            $class = <ClassName::DOMXML:ManakaiDOMProcessingInstruction>;
           } elsif ($nt eq <Q::DOMXML:Entity>) {
-            $class = <ClassName::DOMXML:Entity>;
+            $class = <ClassName::DOMXML:ManakaiDOMEntity>;
           } elsif ($nt eq <Q::DOMXML:CDATASection>) {
-            $class = <ClassName::DOMXML:CDATASection>;
+            $class = <ClassName::DOMXML:ManakaiDOMCDATASection>;
           } elsif ($nt eq <Q::infoset:Notation>) {
-            $class = <ClassName::DOMXML:Notation>;
+            $class = <ClassName::DOMXML:ManakaiDOMNotation>;
           } else {
             __EXCEPTION{
               MDOMX:MDOM_DEBUG_BUG::
@@ -5886,6 +6078,9 @@ ClassDef:
                    }->{$self->{<Q::DOMCore:nodeType>}}) {
             $r = $self->{<Q::infoset:content>};
           } else {
+            __ASSERT{DISPerl:invariant::
+              msg => {qq{Node type: "$self->{<Q::DOMCore:nodeType>}"}}
+            }__;
             $r = null;
           }
         @@@ImplNote:
@@ -6521,7 +6716,7 @@ ClassDef:
     @@Param:
       @@@Name:check
       @@@Type:
-        perl:CODE
+        perl:CODE::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -6533,7 +6728,7 @@ ClassDef:
     @@Param:
       @@@Name:index
       @@@Type:
-        perl:SCALAR
+        perl:SCALAR::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -6604,7 +6799,7 @@ ClassDef:
     @@Param:
       @@@Name:check
       @@@Type:
-        perl:CODE
+        perl:CODE::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -6615,7 +6810,7 @@ ClassDef:
           <DOM:false>.
     @@Return:
       @@@Type:
-        perl:ARRAY
+        perl:ARRAY::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -6652,7 +6847,7 @@ ClassDef:
           does not support the <Feature::XML> feature, 
           <DOM::null> is returned.
       @@PerlDef:
-        (CORE::defined $DOCOBJ->{<Q::DOMCore:hasFeature>}->{XML}
+        ($DOCOBJ->{<Q::DOMCore:hasFeature>}->{XML}
              ? CORE::defined $DOCOBJ->{<Q::infoset:version>}
                    ? $DOCOBJ->{<Q::infoset:version>}
                    : '1.0'
@@ -6797,6 +6992,13 @@ ResourceDef:
     @@@: MDOMCoreFeature30
     @@ForCheck:
       ForChildNodeList ManakaiDOM:ManakaiDOM3
+  @AppISA:
+    @@ForCheck:
+      ForChildNodeList
+    @@ContentType:
+      lang:Perl
+    @@@:
+      Tie::Array
 
   @resourceFor:
     @@@: ForGetNodeList
@@ -6832,6 +7034,13 @@ ResourceDef:
     @@@: MDOMCoreFeature30
     @@ForCheck:
       ForGetNodeList ManakaiDOM:ManakaiDOM3
+  @AppISA:
+    @@ForCheck:
+      ForGetNodeList
+    @@ContentType:
+      lang:Perl
+    @@@:
+      Tie::Array
 
   @Description:
     @@lang:en
@@ -6849,6 +7058,7 @@ ResourceDef:
 
   @Method:
      @@Name:  item
+     @@Perlop:FETCH
      @@Description:
        @@@lang:en
        @@@@:
@@ -6860,6 +7070,13 @@ ResourceDef:
         @@@Description:
           @@@@lang:en
           @@@@@: The index of the item into the collection.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            A negative index is automatically translated to 
+            a positive index when <Perl::FETCH>ed. 
+          @@@@For:
+            ManakaiDOM:ManakaiDOM
      @@Return:
         @@@Type:  Node
         @@@actualType: ManakaiDOMNode
@@ -6897,8 +7114,191 @@ ResourceDef:
            @@@@@lang:en
            @@@@@@:
              TODO: Cache mechanism required.
+
+  @IntMethod:
+    @@Perlop: STORE
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Sets an item. 
+    @@Param:
+      @@@Name:index
+      @@@Type:
+        DOMMain:unsigned-long
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          An ordinal index in the list.  If the <P::index> is greater 
+          than the number of items, then it is appended to the end of 
+          the list.  A negative index is converted into a positive 
+          index by Perl. 
+    @@Param:
+      @@@Name:value
+      @@@Type: Node
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The node to set at the <P::index>th position in the list. 
+    @@Return:
+      @@@Type:Node
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The old node that has been replaced to the new <P::value>. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            No node has been removed from this list. 
+      @@@Exception:
+        @@@@@:NOMOD_NODELIST_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            A <IF::NodeList> returned by <M::Document.getElementsByTagNameNS> 
+            or like is unable to be edited. 
+        @@@@ForCheck:ForGetNodeList
+      @@@Def:
+        @@@@ContentType:
+          lang:dis
+        @@@@DOMMain:raiseException:NOMOD_NODELIST_ERR
+      @@@Exception:
+        @@@@ForCheck:ForChildNodeList
+          @@@@Type: DOMException
+          @@@@Name: HIERARCHY_REQUEST_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either this node is of a type that does not allow 
+              children of the type of the "newChild" node [DOM 1, 2, 3],
+              the node to put in is one of ancestors of this node 
+              [DOM 1, 2, 3], the node to put in is this node itself
+              [DOM 2 Errata, 3], or this 
+              node is of type "Document" and the result of the 
+              replacement would add a second "DocumentType" or "Element" node.
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              Special treatment required for the "DocumentFragment" node.
+        @@@Exception:
+        @@@@ForCheck:ForChildNodeList
+          @@@@Type: DOMException
+          @@@@Name: WRONG_DOCUMENT_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The new node was created from a different document.
+        @@@Exception:
+        @@@@ForCheck:ForChildNodeList
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either this node is read-only [DOM 1, 2, 3] or the parent of the 
+              new node is read-only [DOM 1 SE, 2, 3].
+      @@@PerlDef:
+        @@@@ForCheck:ForChildNodeList
+        @@@@@:
+          if (CORE::exists $self->{<Q::TreeCore:node>}
+                                ->{<Q::infoset:children>}->[$index]) {
+            __DEEP{
+              $r = $self-><M::ManakaiDOMNode.replaceChild>
+                     ($value, $self-><M::ManakaiDOMCore:ManakaiDOMChildNodeList
+                                               .item> ($index));
+            }__;
+          } else {
+            __DEEP{
+              $self-><M::ManakaiDOMNode.appendChild> ($value);
+            }__;
+          }
+
+  @IntMethod:
+    @@Perlop: DELETE
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Removes an item from this list. 
+    @@Param:
+      @@@Name:index
+      @@@Type:
+        DOMMain:unsigned-long
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          An ordinal index in the list.  If the <P::index> is greater 
+          than the number of items, then no item is removed.
+          A negative index is converted into a positive 
+          index by Perl. 
+    @@Return:
+      @@@Type:Node
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The node removed from this list. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            No node has removed from this list. 
+      @@@Exception:
+        @@@@@:NOMOD_NODELIST_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            A <IF::NodeList> returned by <M::Document.getElementsByTagNameNS> 
+            or like is unable to be edited. 
+        @@@@ForCheck:ForGetNodeList
+      @@@Def:
+        @@@@ContentType:
+          lang:dis
+        @@@@DOMMain:raiseException:NOMOD_NODELIST_ERR
+      @@@Exception:
+        @@@@ForCheck:ForChildNodeList
+          @@@@Type: DOMException
+          @@@@Name: HIERARCHY_REQUEST_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either this node is of a type that does not allow 
+              children of the type of the "newChild" node [DOM 1, 2, 3],
+              the node to put in is one of ancestors of this node 
+              [DOM 1, 2, 3], the node to put in is this node itself
+              [DOM 2 Errata, 3], or this 
+              node is of type "Document" and the result of the 
+              replacement would add a second "DocumentType" or "Element" node.
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              Special treatment required for the "DocumentFragment" node.
+      @@@Exception:
+        @@@@ForCheck:ForChildNodeList
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either this node is read-only [DOM 1, 2, 3] or the parent of the 
+              new node is read-only [DOM 1 SE, 2, 3].
+      @@@PerlDef:
+        @@@@ForCheck:ForChildNodeList
+        @@@@@:
+          if (CORE::exists $self->{<Q::TreeCore:node>}
+                                ->{<Q::infoset:children>}->[$index]) {
+            __DEEP{
+              $r = $self-><M::ManakaiDOMNode.removeChild>
+                          ($self-><M::ManakaiDOMCore:ManakaiDOMChildNodeList
+                                         .item> ($index));
+            }__;
+          }
+
   @Attr:
      @@Name:  length
+     @@Perlop: FETCHSIZE
      @@Description:
        @@@lang:en
        @@@@:
@@ -6918,13 +7318,104 @@ ResourceDef:
                                   .getElementsBy>
                              ($self->{<Q::ManakaiDOMCore:nodeMatch>});
             $r = @$l;
+
+  @IntMethod:
+    @@Perlop: STORESIZE
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Changes the size of this node list.
+    @@Param:
+      @@@Name:count
+      @@@Type:
+        DOMMain:unsigned-long
+      @@@Description:
+        @@@@lang:en
+        @@@@@: 
+          The new length of this list.  If the <P::count> 
+          is smaller than the current <A::length>, <P::count>th or 
+          greater index'th items are removed from this list.  Otherwise, 
+          no action.
+    @@Return:
+      @@@NoModGetNodeList:
+      @@@Exception:
+        @@@@ForCheck:ForChildNodeList
+          @@@@Type: DOMException
+          @@@@Name: HIERARCHY_REQUEST_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either this node is of a type that does not allow 
+              children of the type of the "newChild" node [DOM 1, 2, 3],
+              the node to put in is one of ancestors of this node 
+              [DOM 1, 2, 3], the node to put in is this node itself
+              [DOM 2 Errata, 3], or this 
+              node is of type "Document" and the result of the 
+              replacement would add a second "DocumentType" or "Element" node.
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              Special treatment required for the "DocumentFragment" node.
+      @@@Exception:
+        @@@@ForCheck:ForChildNodeList
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either this node is read-only [DOM 1, 2, 3] or the parent of the 
+              new node is read-only [DOM 1 SE, 2, 3]. 
+     @@@PerlDef:
+        @@@@ForCheck:ForChildNodeList
+        @@@@@:
+          my $len = @{$self->{<Q::TreeCore:node>}->{<Q::infoset:children>}};
+          if ($len < $count) {
+            __DEEP{
+              my $node = <ClassM::ManakaiDOMNode.getNodeReference>
+                               ($self-><Q::TreeCore:node>, true);
+              for (my $i = $count - 1; $i >= $len; $i--) {
+                my $cnode = <ClassM::ManakaiDOMNode.getNodeReference>
+                               ($self->{<Q::TreeCore:node>}
+                                     ->{<Q::infoset:children>}->[$i],
+                                true);
+                $node->removeChild ($node);
+              }
+            }__;
+          }
+
+  @IntMethod:
+     @@Perlop: EXISTS
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Returns whether an item exists in this list or not. 
+     @@Param:
+       @@@Name:index
+       @@@Type:
+         DOMMain:unsigned-long
+       @@@Description:
+         @@@@lang:en
+         @@@@@:
+           The ordinal index of the item to test. 
+     @@Return:
+        @@@Type:  
+          DOMMain:boolean
+        @@@PerlDef:
+          @@@@ForCheck: ForChildNodeList
+          @@@@@:
+            $r = CORE::exists $self->{<Q::TreeCore:node>}
+                                   ->{<Q::infoset:children>}->[$index];
+        @@@PerlDef:
+          @@@@ForCheck: ForGetNodeList
+          @@@@@:
+            __DEEP{
+              $r = $self-><M::ManakaiDOMCore:ManakaiDOMGetElementsNodeList.item>
+                               ($index) ? 1 : 0;
+            }__;
   @IntMethod:
     @@Name: isEqualNodeList
     @@ForCheck: ForChildNodeList
-    @@Operator:
-      @@@ContentType:
-        lang:Perl
-      @@@@:==
+    @@Perlop: ==
     @@Description:
       @@@lang:en
       @@@@:
@@ -6956,13 +7447,263 @@ ResourceDef:
                          (<ClassM::ManakaiDOMNode.getNodeReference>
                                 ($self->{<Q::TreeCore:node>}
                                       ->{<Q::infoset:children>}->[$i]),
-                          $arg->item ($i))) {
+                                 $arg->item ($i))) {
                 last EQ;
               }
             }
             $r = true;
           }
+
+  @IntMethod:
+    @@Perlop:TIEARRAY
+    @@ManakaiDOM:isStatic:1
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Binds a node list to an array.  This method is intended to 
+        be called by Perl <Perl::tie> function. 
+    @@Param:
+      @@@Name: nodeList
+      @@@Type: NodeList
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A node list that is tied with an array. 
+    @@Return:
+      @@@Type: NodeList
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The node list to which the array has bound, 
+          i.e. <P::nodeList>.
+      @@@PerlDef:
+        $r = $nodeList;
+
+  @IntMethod:
+    @@Perlop:PUSH
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Pushes an item to the last of this list. 
+    @@Param:
+      @@@Name:value
+      @@@Type:Node
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The node to push. 
+    @@Return:
+      @@@Exception:
+        @@@@@:NOMOD_NODELIST_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            A <IF::NodeList> returned by <M::Document.getElementsByTagNameNS> 
+            or like is unable to be edited. 
+        @@@@ForCheck:ForGetNodeList
+      @@@Def:
+        @@@@ContentType:
+          lang:dis
+        @@@@DOMMain:raiseException:NOMOD_NODELIST_ERR
+      @@@Exception:
+        @@@@ForCheck:ForChildNodeList
+          @@@@Type: DOMException
+          @@@@Name: HIERARCHY_REQUEST_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either this node is of a type that does not allow 
+              children of the type of the "newChild" node [DOM 1, 2, 3],
+              the node to put in is one of ancestors of this node 
+              [DOM 1, 2, 3], the node to put in is this node itself
+              [DOM 2 Errata, 3], or this 
+              node is of type "Document" and the result of the 
+              replacement would add a second "DocumentType" or "Element" node.
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              Special treatment required for the "DocumentFragment" node.
+      @@@Exception:
+        @@@@ForCheck:ForChildNodeList
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either this node is read-only [DOM 1, 2, 3] or the parent of the 
+              new node is read-only [DOM 1 SE, 2, 3].
+      @@@PerlDef:
+        @@@@ForCheck:ForChildNodeList
+        @@@@@:
+          __DEEP{
+            $self-><M::ManakaiDOMNode.insertBefore>
+                           ($value,
+                            $self-><M::ManakaiDOMCore:ManakaiDOMChildNodeList
+                                            .item> (0));
+          }__;
+
+  @IntMethod:
+    @@Perlop:POP
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Pops an item from the last of this list. 
+    @@Return:
+      @@@Type:Node
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The node removed from the last of this list. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The list has been empty and no item is poped. 
+      @@@NoModGetNodeList:
+      @@@Exception:
+        @@@@ForCheck:ForChildNodeList
+          @@@@Type: DOMException
+          @@@@Name: HIERARCHY_REQUEST_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either this node is of a type that does not allow 
+              children of the type of the "newChild" node [DOM 1, 2, 3],
+              the node to put in is one of ancestors of this node 
+              [DOM 1, 2, 3], the node to put in is this node itself
+              [DOM 2 Errata, 3], or this 
+              node is of type "Document" and the result of the 
+              replacement would add a second "DocumentType" or "Element" node.
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              Special treatment required for the "DocumentFragment" node.
+      @@@Exception:
+        @@@@ForCheck:ForChildNodeList
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either this node is read-only [DOM 1, 2, 3] or the parent of the 
+              new node is read-only [DOM 1 SE, 2, 3].
+      @@@PerlDef:
+        @@@@ForCheck:ForChildNodeList
+        @@@@@:
+          __DEEP{
+            $self-><M::ManakaiDOMNode.removeChild>
+                     ($self-><M::ManakaiDOMCore:ManakaiDOMChildNodeList.item>
+                        ($self-><AG::ManakaiDOMCore:ManakaiDOMChildNodeList
+                                       .length> - 1));
+          }__;
+
+  @IntMethod:
+    @@Perlop:CLEAR
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Removes all items from this list. 
+    @@Return:
+      @@@NoModGetNodeList:
+      @@@Exception:
+        @@@@ForCheck:ForChildNodeList
+          @@@@Type: DOMException
+          @@@@Name: HIERARCHY_REQUEST_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either this node is of a type that does not allow 
+              children of the type of the "newChild" node [DOM 1, 2, 3],
+              the node to put in is one of ancestors of this node 
+              [DOM 1, 2, 3], the node to put in is this node itself
+              [DOM 2 Errata, 3], or this 
+              node is of type "Document" and the result of the 
+              replacement would add a second "DocumentType" or "Element" node.
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              Special treatment required for the "DocumentFragment" node.
+      @@@Exception:
+        @@@@ForCheck:ForChildNodeList
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either this node is read-only [DOM 1, 2, 3] or the parent of the 
+              new node is read-only [DOM 1 SE, 2, 3].
+      @@@PerlDef:
+        @@@@ForCheck:ForChildNodeList
+        @@@@@:
+          __DEEP{
+            my $length = $self-><AG::ManakaiDOMCore:ManakaiDOMChildNodeList
+                                       .length> - 1;
+            for (reverse $length..0) {
+              $self-><M::ManakaiDOMNode.removeChild>
+                 ($self-><M::ManakaiDOMCore:ManakaiDOMChildNodeList.item> ($_);
+            }
+          }__;
+
+  @ImplNote:
+    @@lang:en
+    @@@:
+      {TODO:: Optimize PUSH, POP, SHIFT, UNSHIFT, SPLICE. 
+      \
+      }
+
+  @IntMethod:
+    @@Perlop:@{}
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns an array representation of this node list. 
+        \
+        {NOTE:: It is intended that most operations through the 
+                array is as like ones in DOM Level 0 JavaScript 
+                implementations as possible. 
+        \
+        }
+    @@Return:
+      @@@Type:
+        perl:ARRAY::ManakaiDOM:all
+      @@@PerlDef:
+        tie my @list, ref $self, $self;
+        $r = \@list;
+
 ##NodeList
+
+ElementTypeBinding:
+  @Name:NoModGetNodeList
+  @ElementType:
+    rdf:type
+  @ShadowContent:
+    rdfs:Resource
+  @ShadowSibling:
+    @@ManakaiDOM:raises:
+      @@@@:NOMOD_NODELIST_ERR
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A <IF::NodeList> returned by <M::Document.getElementsByTagNameNS> 
+          or like is unable to be edited. 
+      @@@ForCheck:ForGetNodeList
+    @@Def:
+      @@@ContentType:
+        lang:dis
+      @@@DOMMain:raiseException:NOMOD_NODELIST_ERR
+
+
+ElementTypeBinding:
+  @Name: Perlop
+  @ElementType:
+    dis:Operator
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
+    @@For:
+      ManakaiDOM:ManakaiDOM
 
 ForDef:
   @QName:
@@ -8580,7 +9321,7 @@ IF:
           @@@@ContentType:
             lang:dis
           @@@@DISPerl:cloneCode: 
-            ManakaiDOMCore:ManakaiDOMNodeObjectNode.getTextContent
+            DOMCore:ManakaiDOMNode.getTextContent
           @@@@ImplNote:
             @@@@@lang:en
             @@@@@@:
@@ -9072,6 +9813,7 @@ IF:
                   __EXCEPTION{MDOMX:MDOM_NS_NOPREFIX_WITH_NON_NULL_URI::
                     infoset:namespaceName
                         => {$node->{<Q::infoset:namespaceName>}},
+                    DOMCore:qualifiedName => {$node->{<Q::infoset:localName>}},
                   }__;
                 }
               } else {  ## Non-null prefix
@@ -9119,6 +9861,7 @@ IF:
       @@@lang:en
       @@@@:
         Construct an object for a new instance of the <IF:Attr> node.
+    @@ManakaiDOM:isStatic:1
     @@Return:
       @@@Type:
         ManakaiDOM:ManakaiDOMNodeObject
@@ -10110,14 +10853,15 @@ IF:
                 MDOMX:NOMOD_THIS::
               }__;
             }
-            my $docNode = $self->{<Q::TreeCore:node>};
+            my $docNode = $self->{<Q::TreeCore:node>}
+                               ->{<Q::DOMCore:ownerDocument>};
             my $version = <Code::getDocumentXMLVersion:: $DOCOBJ = $docNode>;
             unless (defined $version) {
               __EXCEPTION{MDOMX:MDOM_DOC_NOSUPPORT_XMLNS}__;
             }
             __CODE{DOMMain:ensureXMLQName::
                      $INPUT = $qualifiedName, 
-                     $INPUT_NAME = 'qualifiedName',
+                     $INPUT_PARAM_NAME = 'qualifiedName',
                      $XMLVERSION = $version,
             }__;
             my ($prefix, $localName) = split /:/, $qualifiedName, 2;
@@ -13182,11 +13926,12 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The <P:tagName> is not a legal SGML or XML Name.
+              The <P::tagName> is not a legal SGML or XML Name.
         @@@PerlDef:
             my $docNode = $self->{<Q::TreeCore:node>};
             my $version = <Code::getDocumentXMLVersion:: $DOCOBJ = $docNode>;
             __CODE{DOMMain:ensureXMLName:: $INPUT => $tagName,
+                                           $INPUT_PARAM_NAME => 'tagName',
                                            $XMLVERSION => $version}__;
             my $node = <ClassM::ManakaiDOMElement.newObject>;
             $node->{<Q::DOMCore:ownerDocument>} = $docNode;
@@ -13405,6 +14150,7 @@ IF:
               }__;
             }
             __CODE{DOMMain:ensureXMLName:: $INPUT => $target,
+                                           $INPUT_PARAM_NAME => 'target',
                                            $XMLVERSION => $version}__;
             my $node = <ClassM::DOMXML:ManakaiDOMProcessingInstruction
                                                .newObject>;
@@ -13464,6 +14210,7 @@ IF:
             my $version = <Code::getDocumentXMLVersion::
                                    $DOCOBJ = $docNode>;
             __CODE{DOMMain:ensureXMLName:: $INPUT => $name,
+                                           $INPUT_PARAM_NAME => 'name',
                                            $XMLVERSION => $version}__;
             my $node = <ClassM::ManakaiDOMAttr.newObject>;
             $node->{<Q::DOMCore:ownerDocument>} = $docNode;
@@ -13541,7 +14288,8 @@ IF:
               }__;
             }
             __CODE{DOMMain:ensureXMLName::
-                        $INPUT => $name, $XMLVERSION => $version}__;
+                        $INPUT => $name, $XMLVERSION => $version,
+                        $INPUT_PARAM_NAME => 'name'}__;
             my $node = <ClassM::DOMXML:ManakaiDOMEntityReference.newObject>;
             $node->{<Q::DOMCore:ownerDocument>} = $docNode;
             $node->{<Q::DOMCore:name>} = $name;
@@ -13896,7 +14644,7 @@ IF:
             }
             __CODE{DOMMain:ensureXMLQName::
                      $INPUT = $qualifiedName, 
-                     $INPUT_NAME = 'qualifiedName',
+                     $INPUT_PARAM_NAME = 'qualifiedName',
                      $XMLVERSION = $version,
             }__;
             my ($prefix, $lname) = split /:/, $qualifiedName, 2;
@@ -14082,7 +14830,7 @@ IF:
             }
             __CODE{DOMMain:ensureXMLQName::
                      $INPUT = $qualifiedName, 
-                     $INPUT_NAME = 'qualifiedName',
+                     $INPUT_PARAM_NAME = 'qualifiedName',
                      $XMLVERSION = $version,
             }__;
             my ($prefix, $lname) = split /:/, $qualifiedName, 2;
@@ -15029,13 +15777,14 @@ IF:
           $r->{<Q::DOMCore:nodeType>} = <Q::infoset:Document>;
           $r->{<Q::infoset:version>} = '1.0';
           $r->{<Q::DOMCore:strictErrorChecking>} = true;
-          push @{$r->{<Q::TreeCore:subnode>}}, <Q::DOMViews:view>;
+          push @{$r->{<Q::TreeCore:subnode2>}}, <Q::DOMViews:view>;
           $r->{<Q::DOMViews:view>} = [];
        @@@ImplNote:
          @@@@lang:en
          @@@@@:
            Other properties required to be a legal <IF:Document> object:
-           <Q::DOMCore:implementation>, <Q::ManakaiDOM:implID>.
+           <Q::DOMCore:implementation>, <Q::ManakaiDOM:implID>, 
+           <Q::DOMCore:hasFeature>.
          \
            Other available properties: <Q::DOMCore:read-only>,
            <Q::infoset:characterEncodingScheme>, <Q::DOMCore:xmlEncoding>,
@@ -15761,7 +16510,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
-      rdfs:Property
+      rdf:Property
 
 PropDef:
   @QName: severity
@@ -15848,7 +16597,7 @@ ErrorSet:
     @@Description:
       @@@lang:en
       @@@@:
-        <CP:well-formed> is <DOM:true> and the text inside an 
+        <CP::well-formed> is <DOM::true> and the text inside an 
         <IF:Attr>, <IF:Element>, <IF:Comment>, <IF:Text> or 
         <IF:CDATASection> node or the data inside 
         <IF:ProcessingInstruction> node contains an invalid character.

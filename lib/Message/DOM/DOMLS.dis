@@ -28,7 +28,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/31 12:03:40 $
+      $Date: 2005/01/05 12:19:39 $
     @@ContentType:
       dis:Date.RCS
 
@@ -486,7 +486,7 @@ ExceptionDef:
           @@@@lang:en
           @@@@@:
             An attempt was made to load a document or an XML fragment 
-            using <IF:LSParser> and the processing has been stopped.
+            using <IF::LSParser> and the processing has been stopped.
      @@Const:
         @@@Name:  SERIALIZE_ERR
         @@@Type:
@@ -495,8 +495,8 @@ ExceptionDef:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            An attempt was made to serialize a <IF:Node> using 
-            <IF:LSSerializer> and the processing has been stop.
+            An attempt was made to serialize a <IF::DOMCore:Node> using 
+            <IF::LSSerializer> and the processing has been stop.
 
 ElementTypeBinding:
   @Name: IF
@@ -1490,24 +1490,39 @@ IF:
       @@@PerlDef:
         $r = bless {}, $self;
 
+  @Description:
+    @@lang:en
+    @@@:
+      In the manakai DOM implementation, an unblessed hash reference 
+      is also able to be passed as a <IF::LSInput> method parameter. 
+      The reference can have eight keys: <A::characterStream>, 
+      <A::byteStream>, <A::stringData>, <A::encoding>, <A::certifiedText>, 
+      <A::baseURI>, <A::publicId>, <A::systemId>. They can have the 
+      same type of data as the methods in the <IF::LSInput> interface, 
+      with an exception of <A::stringData>, whose value should be 
+      a reference to a scalar string value (it is not just a string
+      value for efficient). 
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM
+
   @ManakaiDOM:inputNormalizer:
     @@ForCheck:
-      ManakaiDOM:ManakaiDOM3 ManakaiDOM:ForClass
+      ManakaiDOM:ManakaiDOM3
     @@ContentType:
       lang:Perl
     @@@:
       if (ref $INPUT eq 'HASH') {
-        $INPUT = bless $INPUT, <ClassName::ManakaiDOMLSInput>;
+        $INPUT = bless $INPUT, <ClassName::DOMLS:ManakaiDOMLSInput>;
       }
   @ManakaiDOM:inputNormalizer:
     @@ForCheck:
-      ManakaiDOM:ManakaiDOM !ManakaiDOM:ManakaiDOM3 ManakaiDOM:ForClass
+      ManakaiDOM:ManakaiDOM !ManakaiDOM:ManakaiDOM3
     @@ContentType:
       lang:Perl
     @@@:
       if (ref $INPUT eq 'HASH') {
         $INPUT = bless $INPUT, 
-                 <ClassName::ManakaiDOMLSInput::ManakaiDOM:ManakaiDOMLatest>;
+              <ClassName::DOMLS:ManakaiDOMLSInput::ManakaiDOM:ManakaiDOMLatest>;
       }
 ##IF:LSInput
 

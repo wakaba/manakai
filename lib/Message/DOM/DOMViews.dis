@@ -26,7 +26,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/31 12:03:40 $
+      $Date: 2005/01/05 12:19:39 $
     @@ContentType:
       dis:Date.RCS
 
@@ -293,6 +293,14 @@ ElementTypeBinding:
       ManakaiDOM:DOM2
 
 
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdf:Property
+
 IF:
   @Name:
     @@@: AbstractView
@@ -405,6 +413,13 @@ IF:
                                                    (<ClassName::AbstractView>);
 ##IF:AbstractView
 
+PropDef:
+  @QName: document
+  @Description:
+    @@lang:en
+    @@@:
+      The document that is associated with the subject. 
+
 IF:
   @Name:
     @@@: DocumentView
@@ -454,6 +469,21 @@ IF:
             }
 
 ##IF:DocumentView
+
+PropDef:
+  @QName: view
+  @Description:
+    @@lang:en
+    @@@:
+      A view that is associated to the subject. 
+      \
+      In the manakai DOM implementation, the <IF::Document> 
+      internal node object has an optional <CODE::subnode2> property named as 
+      <Q::DOMViews:view> and its value is an array reference, which 
+      in turn contains zero or more internal node object for 
+      <IF::AbstractView>.  The first item, if any, is the default view 
+      for that document.  Note that internal view node objects have 
+      a <CODE::origin> property of <Q::DOMViews:document>. 
 
 ## DOMViews.dis ends here
 

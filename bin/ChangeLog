@@ -1,3 +1,29 @@
+2005-01-05  Wakaba  <wakaba@suika.fam.cx>
+
+	* cdis2pm.pl (pod): Documentation added.
+	(dispm_get_value): Set default value of "0" if type is number or boolean.
+	(perl_code): Assertion support added.
+	(--output-assert): New option.
+
+	* domtest2perl.pl (pod): Documentation added.
+	(node2code): Exception package name is changed.
+	(implementationAttribute, hasFeature): Output a function call to check
+	implementation attribute.
+
+	* domts2perl.pl: Message simplified.
+	(pod): Documentation added.
+
+2005-01-04  Wakaba  <wakaba@suika.fam.cx>
+
+	* cdis2pm.pl (disperl_to_perl): Tree code element type 
+	"DOMMain:raiseException" implemented.
+
+2005-01-03  Wakaba  <wakaba@suika.fam.cx>
+
+	* idl2dis.pl: Generates new "dis" format.
+	
+	* cdis2pm.pl (dispm_muf_description): New function.
+
 2004-12-31  Wakaba  <wakaba@suika.fam.cx>
 
 	* cdis2pm.pl: Constant exporting support.

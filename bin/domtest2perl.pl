@@ -236,7 +236,17 @@ sub node2code ($) {
                    => 'load (' . 
                       perl_literal ($node->getAttributeNS (undef, 'href')).
                       ')';
-    } elsif ($Method->{$ln}) {
+  } elsif ($ln eq 'hasFeature' and
+           not $node->hasAttributeNS (undef, 'var')) {
+    ## If there is a "hasFeature" element in "body" and 
+    ## it does not have "var" attribute, then it is part of the
+    ## implementation condition. 
+    $result .= perl_statement 'hasFeature ('.
+                       to_perl_value ($node->getAttributeNS (undef, 'feature'),
+                                      default => 'undef') . ', '.
+                       to_perl_value ($node->getAttributeNS (undef, 'version'),
+                                      default => 'undef') . ')';
+  } elsif ($Method->{$ln}) {
       $result .= perl_var (type => '$',
                            local_name => $node->getAttributeNS (undef, 'var')).
                  ' = '
@@ -447,7 +457,7 @@ sub node2code ($) {
       $result .= body2code ($child);
     }
     $result .= q[
-        } catch Message::DOM::DOMException with {
+        } catch Message::DOM::IF::DOMException with {
           my $err = shift;
           $success = 1 if $err->{-type} eq ].perl_literal ($errname).q[;
         };
@@ -511,7 +521,7 @@ sub node2code ($) {
     }
     $result = "try {
                  $true
-               } catch Message::DOM::ManakaiDOMException with {
+               } catch Message::DOM::DOMMain::ManakaiDOMException with {
                  my \$err = shift;
                  $false
                };";
@@ -738,10 +748,10 @@ for (my $i = 0; $i < $child->length; $i++) {
         }
       }
     } elsif ($ln eq 'implementationAttribute') {
-      $result .= perl_comment
-                     sprintf 'Implementation attribute: @name=%s, @value=%s',
-                             $node->getAttributeNS (undef, 'name'),
-                             $node->getAttributeNS (undef, 'value');
+      $result .= perl_statement 'impl_attr ('.
+                         perl_list
+                             ($node->getAttributeNS (undef, 'name'),
+                              $node->getAttributeNS (undef, 'value')).')';
     } else {
       $result .= node2code ($node);
     } 
@@ -771,4 +781,48 @@ for (keys %{$Status->{our}}) {
 $pre .= perl_statement q<plan (>.(0+$Status->{Number}).q<)>;
 
 output_result $pre.$result;
+
+1;
+
+__END__
+
+=head1 NAME
+
+domtest2perl - DOM Test Suite XML Test File to Perl Test Code Converter
+
+=head1 SYNOPSIS
+
+  perl path/to/domtest2perl.pl input.xml > output.pl
+  perl path/to/domtest2perl.pl input.xml --output-file=output.pl
+
+=over 4
+
+=item I<input.xml>
+
+The name of file to input.  It should be an XML document 
+in the DOM Test Suite. 
+
+=item I<output.pl>
+
+The name of file to output.  It is overwritten if already exists. 
+
+=back
+
+=head1 SEE ALSO
+
+I<Document Object Model (DOM) Conformance Test Suites>,
+<http://www.w3.org/DOM/Test/>.
+
+F<domts2perl.pl>
+
+F<mkdommemlist.pl>
+
+=head1 LICENSE
+
+Copyright 2004-2005 Wakaba <w@suika.fam.cx>.  All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
 

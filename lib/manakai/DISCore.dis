@@ -4,9 +4,15 @@ Module:
   @FullName:
     @@lang:en
     @@@: 
-      <QUOTE:dis> Format Core Module
+      <QUOTE::dis> Format Core Module
   @Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Core#
+
+  @Description:
+    @@lang:en
+    @@@:
+      This module introduces the basic <QUOTE::dis> language 
+      vocabulary that is common to <QUOTE::dis> format. 
   
   @Author:
     @@FullName:Wakaba
@@ -15,7 +21,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/27 13:41:54 $
+      $Date: 2005/01/05 12:19:39 $
     @@ContentType:
       dis:Date.RCS
   
@@ -131,7 +137,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
-      rdfs:Property
+      rdf:Property
     @@AliasFor:
       @@@@:
         ::ManakaiDOM:all
@@ -288,12 +294,7 @@ PropDef:
   @Description:
     @@lang:en
     @@@: An application (binding) dependent name of a resource.
-PropDef:
-  @QName:
-    rdfs:label
-  @Description:
-    @@lang:en
-    @@@: A human-readable name of the subject resource.
+
 PropDef:
   @QName:
     dis:FullName
@@ -363,16 +364,43 @@ PropDef:
 ## -- Resource-to-resource relationships
 
 PropDef:
+  @QName: derivedFrom
+  @Description:
+    @@lang:en
+    @@@:
+      A subject resource is in some way derived from an object resource. 
+  @rdfs:domain:
+    rdfs:Resource
+  @rdfs:range:
+    rdfs:Resource
+
+PropDef:
+  @QName:
+    dis:subsetOf
+  @Description:
+    @@lang:en
+    @@@:
+      A subject resource is a subset of an object resource. 
+  @rdfs:domain:
+    rdfs:Resource
+  @rdfs:range:
+    rdfs:Resource
+  @subsetOf: derivedFrom
+  @rdfs:subPropertyOf:derivedFrom
+  @dataType:
+    dis:TFQNames
+
+PropDef:
   @QName:
     dis:ISA
   @Description:
     @@lang:en
     @@@:
       Inheritance relationship of a resource.
-  @ISA:
-    rdfs:subClassOf
+  @subsetOf: derivedFrom
+  @rdfs:subPropertyOf:derivedFrom
   @dataType:
-    dis:TypeQName
+    dis:TFQNames
 
 PropDef:
   @QName:
@@ -381,8 +409,10 @@ PropDef:
     @@lang:en
     @@@:
       Application dependent is-a relationship.
-  @ISA:
-     rdfs:subClassOf
+  @subsetOf: derivedFrom
+  @rdfs:subPropertyOf:derivedFrom
+  @dataType:
+    dis:TFQNames
 
 PropDef:
   @QName:
@@ -391,6 +421,10 @@ PropDef:
     @@lang:en
     @@@:
       <QUOTE:Implementing> relationship of a resource.
+  @subsetOf:derivedFrom
+  @rdfs:subPropertyOf:derivedFrom
+  @dataType:
+    dis:TFQNames
 
 PropDef:
   @QName:
@@ -398,8 +432,17 @@ PropDef:
   @Description:
     @@lang:en
     @@@:
-      Make a resource as alias for another resource.
-  @ISA:
+      Makes the subject an alias for another resource. 
+      \
+      {NOTE:: Although its semantics is almost same as 
+              <Q::owl:sameAs>, this property carries 
+              an additional meaning that the object has 
+              a <QUOTE::superior> or canonical name to the subject's. 
+      \
+      }
+  @rdfs:subClassOf:
+    owl:sameAs
+  @subsetOf:
     owl:sameAs
   @rdfs:domain:
     rdfs:Resource
@@ -435,11 +478,42 @@ PropDef:
     @@@:
       Lexical data type of the property object.
   @rdfs:domain:
-    rdfs:Property
+    rdf:Property
   @rdfs:range:
-    rdfs:Property
+    rdf:Property
   @dataType:
     dis:TypeQName
+
+ResourceDef:
+  @QName: AbstractDataType
+  @rdf:type:
+    rdfs:Class
+  @subsetOf:
+    rdfs:Class
+  @rdfs:subClassOf:
+    rdfs:Class
+  @Description:
+    @@lang:en
+    @@@:
+      A data type, including programming language data types, 
+      programming language classes, markup language data types, 
+      string formats, and so on. 
+  @noVariant: 
+
+ResourceDef:
+  @QName: StringDataType
+  @rdf:type:
+    rdfs:Class
+  @subsetOf:
+    AbstractDataType
+  @rdfs:subClassOf:
+    AbstractDataType
+  @Description:
+    @@lang:en
+    @@@:
+      A string data format. 
+  @noVariant:
+
 ElementTypeBinding:
   @Name: DataTypeDef
   @ElementType:
@@ -498,7 +572,19 @@ DataTypeDef:
     dis:TypeQName
   @FullName:
     @@lang:en
-    @@@: dis QName
+    @@@: 
+      <QUOTE::dis> QName
+  @Description:
+    @@lang:en
+    @@@:
+      <QUOTE::dis> QName (qualified name).
+      \
+      <Q::dis:TypeQName> := [prefix ":"] local-name
+      \
+      prefix := *(<any character> - ":")
+      \
+      local-name := *(<any character> - ":")
+
 DataTypeDef:
   @QName: 
     dis:TFQNames

@@ -1,5 +1,27 @@
 #!/usr/bin/perl -w 
 use strict;
+
+=head1 NAME
+
+cdis2pm - Generating Perl Module from a Compiled "dis"
+
+=head1 SYNOPSIS
+
+  perl path/to/cdis2pm.pl input.cdis \
+            {--module-name=ModuleName | --module-uri=module-uri} \
+            [--for=for-uri] [options] > ModuleName.pm
+  perl path/to/cdis2pm.pl --help
+
+=head1 DESCRIPTION
+
+The C<cdis2pm> script generates a Perl module from a compiled "dis"
+("cdis") file.  It is intended to be used to generate a manakai 
+DOM Perl module files, although it might be useful for other purpose. 
+
+This script is part of manakai. 
+
+=cut
+
 use Message::Util::QName::Filter {
   d => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis-->,
   dis2pm => q<http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#>,
@@ -22,21 +44,65 @@ use Message::Util::QName::Filter {
   TreeCore => q<>,
 };
 
+=head1 OPTIONS
+
+=over 4
+
+=item --enable-assertion / --noenable-assertion (default)
+
+Whether assertion codes should be outputed or not. 
+
+=item --for=I<for-uri> (Optional)
+
+Specifies the "For" URI reference for which the outputed module is. 
+If this parameter is ommitted, the default "For" URI reference 
+for the module, if any, or the C<ManakaiDOM:all> is assumed. 
+
+=item --help
+
+Shows the help message. 
+
+=item --module-name=I<ModuleName>
+
+The name of module to output.  It is the local name part of 
+the C<Module> C<QName> in the source "dis" file.  Either 
+C<--module-name> or C<--module-uri> is required. 
+
+=item --module-uri=I<module-uri>
+
+A URI reference that identifies a module to output.  Either 
+C<--module-name> or C<--module-uri> is required. 
+
+=item --output-module-version (default) / --nooutput-module-version
+
+Whether the C<$VERSION> special variable should be generated or not. 
+
+=item --verbose / --noverbose (default)
+
+Whether a verbose message mode should be selected or not. 
+
+=back
+
+=cut
+
 use Getopt::Long;
 use Pod::Usage;
 use Storable;
 my %Opt;
 GetOptions (
+  'enable-assertion!' => \$Opt{outputAssertion},
   'for=s' => \$Opt{For},
   'help' => \$Opt{help},
   'module-name=s' => \$Opt{module_name},
   'module-uri=s' => \$Opt{module_uri},
+  'output-module-version!' => \$Opt{outputModuleVersion},
   'verbose!' => $Opt{verbose},
 ) or pod2usage (2);
 pod2usage ({-exitval => 0, -verbose => 1}) if $Opt{help};
 $Opt{file_name} = shift;
 pod2usage ({-exitval => 2, -verbose => 0}) unless $Opt{file_name};
 pod2usage (2) if not $Opt{module_uri} and not $Opt{module_name};
+$Opt{outputModuleVersion} = 1 unless defined $Opt{outputModuleVersion};
 
 BEGIN {
 require 'manakai/genlib.pl';
@@ -50,6 +116,20 @@ eval q{
     warn shift () . "\n";
   }
 } unless $Opt{verbose};
+
+=head1 FUNCTIONS
+
+This section describes utility functions defined in this script
+for the sake of developer. 
+
+=over 4
+
+=item $result = perl_change_package (full_name => I<fully qualified Perl package name>)
+
+Changes the current Perl package in the output Perl code. 
+C<dispm_package_declarations> is also called in this function. 
+
+=cut
 
 sub perl_change_package (%) {
   my %opt = @_;
@@ -142,16 +222,36 @@ sub dispm_perl_throws (%) {
   return $r;
 } # dispm_perl_throw
 
+=item Lexical Variable $RegQNameChar
+
+The regular expression pattern for a QName character. 
+
+=item Lexical Variable $RegBlockContent
+
+The regular expression pattern for a "block", i.e. a nestable section
+of "{" ... "}". 
+
+=cut
+
 my $RegQNameChar = qr/[^\s<>"'\\\[\]\{\},=]/;
-{
 use re 'eval';
 my $RegBlockContent;
 $RegBlockContent = qr/(?>[^{}\\]*)(?>(?>[^{}\\]+|\\.|\{(??{$RegBlockContent})\})*)/s;
-## Defined by genlib.pl but overridden.
+
+=item $result = perl_code ($code, %opt)
+
+Converts preprocessing instructions in the <$code> and returns it. 
+
+Note that this function is also defined in F<genlib.pl> but 
+redefined here for the purpose of this script. 
+
+=cut
+
 sub perl_code ($;%) {
   my ($s, %opt) = @_;
   valid_err q<Uninitialized value in perl_code>,
     node => $opt{node} unless defined $s;
+  $s = $$s if ref $s eq '__code';
   local $State->{Namespace}
     = $State->{Module}->{$opt{resource}->{parentModule}}->{nsBinding};
   $s =~ s[(?<![qwr])<($RegQNameChar[^<>]+)>|\b(null|true|false)\b][
@@ -276,7 +376,7 @@ sub perl_code ($;%) {
                                  ExpandedURI q<dis2pm:DefKeyName>
                                    => ExpandedURI q<d:Def>);
             for (grep {/^\$/} keys %$param) {
-              $r =~ s/\Q$_\E\b/ $param->{$_} /g;
+              $r =~ s/\Q$_\E\b/$param->{$_}/g;
             }
           } else {
             valid_err qq<Inline code constant <$uri> must be defined>,
@@ -345,92 +445,9 @@ sub perl_code ($;%) {
                      )?
                      (?: ::\s* | $)//ox) {
         my ($q, $constq, $subtypeq) = ($1, $2, $3);
-        $q =~ s/\|\|/::/g;
-        my $clsuri;
-        my $cls;
-        my $consturi;
-        my $const;
-        my $subtypeuri;
-        my $subtype;
-        if (defined $constq and not defined $subtypeq) {
-          $clsuri = dis_typeforqnames_to_uri ($q, 
-                                              use_default_namespace => 1,
-                                              %opt);
-          $cls = $State->{Type}->{$clsuri};
-          valid_err qq{Exception/warning class definition for }.
-                    qq{<$clsuri> is required}, node => $opt{node}
-                      unless defined $cls->{Name};
-          my ($consttq, $constfq) = split /\|\|/, $constq, 2;
-          if (defined $constfq) {
-            if ($consttq !~ /:/) {
-              valid_err qq<"$constq": Unprefixed exception code QName must >.
-                        q<not be followed by a "For" QName>,
-                        node => $opt{node};
-            } else {
-              $consturi = dis_typeforqnames_to_uri ($consttq.'::'.$constfq,
-                                                    use_default_namespace => 1,
-                                                    %opt);
-            }
-          } else {
-            if ($consttq !~ /:/) {
-              $consturi = $consttq;
-              CONSTCLS: {
-                for (values %{$cls->{ExpandedURI q<dis2pm:xConst>}}) {
-                  if (defined $_->{Name} and $_->{Name} eq $consturi) {
-                    $const = $_;
-                    last CONSTCLS;
-                  }
-                }
-                valid_err qq{Exception/warning code "$consturi" must be }.
-                          qq{defined in the exception/warning class }.
-                          qq{<$clsuri>}, node => $opt{node};
-              }
-            } else {
-              $consturi = dis_typeforqnames_to_uri ($consttq.'::'.$constfq,
-                                                    use_default_namespace => 1,
-                                                    %opt);
-            }
-          }
-          unless ($const) {
-            CONSTCLS: {
-              for (values %{$cls->{ExpandedURI q<dis2pm:xConst>}}) {
-                if (defined $_->{Name} and $_->{URI} and
-                    $_->{URI} eq $consturi) {
-                  $const = $_;
-                  last CONSTCLS;
-                }
-              }
-              valid_err qq{Exception/warning code <$consturi> must be }.
-                        qq{defined in the exception/warning class }.
-                        qq{<$clsuri>}, node => $opt{node};
-            }
-          }
-        } else { ## By code/subtype QName
-          $subtypeq = $q unless defined $constq;
-          $subtypeuri = dis_typeforqnames_to_uri ($subtypeq,
-                                                  use_default_namespace => 1,
-                                                  %opt);
-          $subtype = $State->{Type}->{$subtypeuri};
-          valid_err qq{Exception/warning code/subtype <$subtypeuri> must }.
-                    qq{be defined}, node => $opt{node}
-                  unless defined $subtype->{Name} and
-                         defined $subtype->{ExpandedURI q<dis2pm:type>};
-          if ($subtype->{ExpandedURI q<dis2pm:type>} eq
-                ExpandedURI q<ManakaiDOM:ExceptionOrWarningSubType>) {
-            $const = $subtype->{ExpandedURI q<dis2pm:parentResource>};
-            $cls = $subtype->{ExpandedURI q<dis2pm:grandGrandParentResource>};
-          } elsif ($subtype->{ExpandedURI q<dis2pm:type>} eq
-                     ExpandedURI q<ManakaiDOM:Const>) {
-            $const = $subtype;
-            $subtype = undef;
-            $cls = $const->{ExpandedURI q<dis2pm:grandParentResource>};
-          } else {
-            valid_err qq{Type of <$subtypeuri> must be either }.
-                      q{"ManakaiDOM:Const" or }.
-                      q{"ManakaiDOM:ExceptionOrWarningSubType"},
-                      node => $opt{node};
-          }
-        }
+        s/\|/:/g for $q, $constq, $subtypeq;
+        my ($cls, $const, $subtype) = dispm_xcref_to_resources
+                                         ([$q, $constq, $subtypeq], %opt);
 
         ## Parameter
         my %xparam;
@@ -466,7 +483,6 @@ sub perl_code ($;%) {
         $r = dispm_perl_throws
                 (%opt, 
                  class_resource => $cls,
-                 class_for => $opt{For},
                  type_resource => $const,
                  subtype_resource => $subtype,
                  xparam => \%xparam);
@@ -482,7 +498,7 @@ sub perl_code ($;%) {
       } else {
         valid_err q<Code name required>, node => $opt{node};
       }
-      $data =~ s/^::\s*//;
+      $data =~ s/^::\s*//; 
       my $param = dispm_parse_param (\$data, %opt,
                                      use_default_namespace => '',
                                      ExpandedURI q<dis2pm:endOrErr> => 1);      
@@ -502,7 +518,7 @@ sub perl_code ($;%) {
                              ExpandedURI q<dis2pm:DefKeyName>
                                => ExpandedURI q<d:Def>);
         for (grep {/^\$/} keys %$param) {
-          $r =~ s/\Q$_\E\b/ $param->{$_} /g;
+          $r =~ s/\Q$_\E\b/$param->{$_}/g;
         }
         valid_err qq<Block code <$uri> is empty>, node => $opt{node}
           unless length $r;
@@ -566,6 +582,78 @@ sub perl_code ($;%) {
       } else {
         valid_err (qq<Broken <$et> block: "$data">, node => $opt{node});
       }
+    } elsif ($et eq ExpandedURI q<disPerl:ASSERT>) {
+      my $atype;
+      if ($data =~ s/^\s*($RegQNameChar+)\s*::\s*//) {
+        $atype = dis_qname_to_uri ($1, %opt, use_default_namespace => 1);
+      } else {
+        valid_err (qq<"$data": Assertion type QName is required>,
+                   node => $opt{node});
+      }
+      my $param = dispm_parse_param (\$data, %opt,
+                                     use_default_namespace => '',
+                                     ExpandedURI q<dis2pm:endOrErr> => 1);      
+      my %xparam;
+      my $cond;
+      my $pre = '';
+      my $post = '';
+      if ($atype eq ExpandedURI q<DISPerl:isPositive>) {
+        $pre = perl_statement
+                 perl_assign
+                   'my $asActual' =>
+                          '('.perl_code ($param->{actual}, %opt).')';
+        $cond = '$asActual > 0';
+        $xparam{ExpandedURI q<DOMMain:expectedLabel>} = 'a positive value';
+        $xparam{ExpandedURI q<DOMMain:actualValue>}
+                                 = perl_code_literal q<$asActual>;
+      } elsif ($atype eq ExpandedURI q<DISPerl:invariant>) {
+        $cond = '0';
+        $xparam{ExpandedURI q<DOMMain:expectedLabel>} = $param->{msg};
+        $xparam{ExpandedURI q<DOMMain:actualValue>} = '(invariant)';
+      } else {
+        valid_err (qq<Assertion type <$atype> is not supported>,
+                   node => $opt{node});
+      }
+      if (defined $param->{pre}) {
+        $pre = perl_code ($param->{pre}, %opt) . $pre;
+      }
+      if (defined $param->{post}) {
+        $post .= perl_code ($param->{post}, %opt);
+      }
+
+        for (
+          ExpandedURI q<MDOMX:class>,
+          ExpandedURI q<MDOMX:method>,
+          ExpandedURI q<MDOMX:attr>,
+          ExpandedURI q<MDOMX:on>,
+        ) {
+          $xparam{$_} = $opt{$_} if defined $opt{$_};
+        }
+      if ($Opt{outputAssertion}) {
+        $r = $pre . perl_if
+               $cond,
+               undef,
+               perl_statement
+                 dispm_perl_throws
+                   class =>
+                     ExpandedURI q<ManakaiDOM:ManakaiDOMImplementationException>,
+                   class_for => ExpandedURI q<ManakaiDOM:ManakaiDOMCommon>,
+                   type => 'MDOM_DEBUG_BUG',
+                   subtype => ExpandedURI q<DOMMain:ASSERTION_ERR>,
+                   xparam => {
+                      ExpandedURI q<DOMMain:assertionType> => $atype,
+                      ExpandedURI q<DOMMain:traceText>
+                                 => perl_code_literal
+                                      q<(sprintf 'at %s line %s%s%s',
+                                               __FILE__, __LINE__, "\n\t",
+                                               Carp::longmess ())>,
+                      %xparam,
+                   };
+        $r .= $post;
+        $r = "{$r}";
+      } else {
+        $r = '';
+      }
     } elsif ({
               ExpandedURI q<disPerl:FILE> => 1,
               ExpandedURI q<disPerl:LINE> => 1,
@@ -592,7 +680,6 @@ sub perl_code ($;%) {
 
   $s;
 }
-}
 
 =item {%param} = dispm_parse_param (\$paramspec, %opt)
 
@@ -613,10 +700,13 @@ sub dispm_parse_param ($%) {
     ## Parameter value
       (
          ## Bare string
-           $RegQNameChar+ |
-
+           $RegQNameChar+
+         |
          ## Quoted string
            '(?>[^'\\]*)' ## ISSUE: escape mechanism required?
+         |
+         ## Code
+           \{$RegBlockContent\}
 
       )
 
@@ -627,6 +717,8 @@ sub dispm_parse_param ($%) {
     if (defined $v) {
       if ($v =~ /^'/) {
         $v = substr ($v, 1, length ($v) - 2);
+      } elsif ($v =~ /^\{/) {
+        $v = perl_code_literal substr ($v, 1, length ($v) - 2);
       } else {
         # 
       }
@@ -646,7 +738,18 @@ sub dispm_parse_param ($%) {
   \%param;
 } # dispm_parse_param
 
-## Defined in genlib.pl but overridden.
+=item $result = perl_code_source ($code, %opt)
+
+Attaches the source file information to a Perl code fragment. 
+
+Note that the same name function is defined in F<genlib.pl> 
+but redefined here for the purpose of this script. 
+
+TODO: Non-debug purpose output should remove source information; otherwise 
+it is too verbose. 
+
+=cut
+
 sub perl_code_source ($%) {
   my ($s, %opt) = @_;
   my $npk = [qw/Name QName Label/];
@@ -663,7 +766,7 @@ sub perl_code_source ($%) {
   $f1 =~ s/"/\"/g; $f2 =~ s/"/\"/g;
   sprintf qq<\n#line %d "%s"\n%s\n#line 1 "%s"\n>,
                  $opt{line} || 1, $f1, $s, $f2;
-}
+} # perl_code_source
 
 
 
@@ -759,8 +862,8 @@ sub dispm_get_value (%) {
     my $type;
     if ($t) {
       $type = dis_qname_to_uri ($t->value, %opt, node => $t);
-    } elsif ($opt{resource}->{ExpandedURI q<dis2pm:actualType>}) {
-      $type = $opt{resource}->{ExpandedURI q<dis2pm:actualType>};
+    } elsif ($opt{resource}->{ExpandedURI q<d:actualType>}) {
+      $type = $opt{resource}->{ExpandedURI q<d:actualType>};
     } else {
       $type = ExpandedURI q<lang:dis>;
     }
@@ -777,6 +880,10 @@ sub dispm_get_value (%) {
              dis_uri_ctype_match (ExpandedURI q<DOMMain:short>, $type, %opt) or
              dis_uri_ctype_match (ExpandedURI q<DOMMain:long>, $type, %opt)) {
       return $n->value;
+    } elsif (dis_uri_ctype_match (ExpandedURI q<DOMMain:boolean>, $type, %opt)) {
+      return ($n->value and ($n->value eq 'true' or $n->value eq '1')) ? 1 : 0;
+    } elsif (dis_uri_ctype_match (ExpandedURI q<d:Boolean>, $type, %opt)) {
+      return $n->value ? 1 : 0;
     } elsif (dis_uri_ctype_match (ExpandedURI q<lang:dis>, $type, %opt)) {
       return perl_literal $n->value;
     }
@@ -786,6 +893,16 @@ sub dispm_get_value (%) {
   if ($opt{ExpandedURI q<dis2pm:useDefaultValue>}) {
     if (dis_uri_ctype_match (ExpandedURI q<DOMMain:DOMString>, $vt, %opt)) {
       return q<"">;
+    } elsif (dis_uri_ctype_match (ExpandedURI q<DOMMain:unsigned-short>, $vt, %opt) or
+             dis_uri_ctype_match (ExpandedURI q<DOMMain:unsigned-long>, $vt, %opt) or
+             dis_uri_ctype_match (ExpandedURI q<DOMMain:short>, $vt, %opt) or
+             dis_uri_ctype_match (ExpandedURI q<DOMMain:long>, $vt, %opt) or
+             dis_uri_ctype_match (ExpandedURI q<DOMMain:boolean>, $vt, %opt)) {
+      return q<0>;
+    } elsif (dis_uri_ctype_match (ExpandedURI q<Perl:ARRAY>, $vt, %opt)) {
+      return q<[]>;
+    } elsif (dis_uri_ctype_match (ExpandedURI q<Perl:hash>, $vt, %opt)) {
+      return q<{}>;
     }
   }
   return undef;
@@ -889,6 +1006,52 @@ sub dispm_const_group (%) {
   return $result;
 } # dispm_const_group
 
+=item $desc = dispm_muf_description (%opt, resource => $res)
+
+Gets a <IF::Message::Util::Formatter> template for a resource.
+
+=cut
+
+sub dispm_muf_description (%) {
+  my %opt = @_;
+  my $key = $opt{ExpandedURI q<dis2pm:DefKeyName>} || ExpandedURI q<d:Def>;
+
+  local $State->{Namespace}
+      = $State->{Module}->{$opt{resource}->{parentModule}}->{nsBinding};
+  local $opt{For} = [keys %{$opt{resource}->{For}}]->[0];
+  local $opt{'For+'} = [keys %{$opt{resource}->{'For+'}||{}}];
+  
+  my $def = dis_get_attr_node (%opt, parent => $opt{resource}->{src},
+                               name => {uri => $key}, 
+                               ContentType => ExpandedURI q<lang:muf>);
+  if ($def) {
+    my $template = $def->value;
+    $template =~ s/<Q::([^<>]+)>/dis_qname_to_uri ($1, %opt,
+                                                   node => $opt{resource}
+                                                             ->{src})/ge;
+    $template =~ s/\s+/ /g;
+    $template =~ s/^ //;
+    $template =~ s/ $//;
+    return $template;
+  }
+
+  $key = $opt{ExpandedURI q<dis2pm:DescriptionKeyName>} ||
+         ExpandedURI q<d:Description>;
+
+  my $template = '';
+  for $def (@{dis_get_elements_nodes
+                (%opt, parent => $opt{resource}->{src},
+                 name => {uri => $key},
+                 ContentType => ExpandedURI q<lang:disdoc>,
+                 defaultContentType => ExpandedURI q<lang:disdoc>)}) {
+    $template .= disdoc2text ($def->value, %opt, node => $def);
+  }
+  $template =~ s/\s+/ /g;
+  $template =~ s/^ //;
+  $template =~ s/ $//;
+  return $template;
+} # dispm_muf_description
+
 =item $code = disperl_to_perl (node => $node, %opt)
 
 Converts a C<d:Perl> node to a Perl code fragment.
@@ -947,7 +1110,7 @@ sub disperl_to_perl (%) {
       if ($et eq ExpandedURI q<d:GetPropNode>) {
         $code .= perl_if
                    'defined $r',
-                   perl_code (q{<ClassM::DOMCore:ManakaiDOMNode
+                   perl_code (q{$r = <ClassM::DOMCore:ManakaiDOMNode
                                                    .getNodeReference> ($r)},
                               %opt, node => $_);
       }
@@ -994,6 +1157,27 @@ sub disperl_to_perl (%) {
                                'For+' => [keys %{$mem->{'For+'}||{}}],
                                ExpandedURI q<dis2pm:DefKeyName>
                                  => ExpandedURI q<d:Def>);
+    } elsif ($et eq ExpandedURI q<DOMMain:raiseException>) {
+      my ($cls, $type, $subtype) = dispm_xcref_to_resources
+                                     ($_->value, %opt, node => $_);
+      ## TODO: Parameter
+      my %xparam;
+      
+      for (
+           ExpandedURI q<MDOMX:class>,
+           ExpandedURI q<MDOMX:method>,
+           ExpandedURI q<MDOMX:attr>,
+           ExpandedURI q<MDOMX:on>,
+          ) {
+        $xparam{$_} = $opt{$_} if defined $opt{$_};
+      }
+
+      $code .= perl_statement dispm_perl_throws
+                (%opt, 
+                 class_resource => $cls,
+                 type_resource => $type,
+                 subtype_resource => $subtype,
+                 xparam => \%xparam);
     } elsif ($et eq ExpandedURI q<DISPerl:selectByProp>) {
       my $cprop = dis_get_attr_node
                        (%opt, parent => $_,
@@ -1185,6 +1369,131 @@ sub dispm_memref_to_resource ($%) {
   return $mem;
 } # dispm_memref_to_resource
 
+=item ($clsres, $coderef, $subcoderef) = dispm_xcref_to_resources ($xcref, %opt)
+
+Converts a "DOMMain:XCodeRef" (exception or warning code reference) 
+to its "resource" objects. 
+
+=over 4
+
+=item $clsres
+
+The resource object for the exception or warning class or interface identified 
+by the XCodeRef.
+
+=item $coderef
+
+The resource object for the exception or warning code identified 
+by the XCodeRef.
+
+=item $subcoderef
+
+The resource object for the exception or warning code idnetified by 
+the XCodeRef, if any.  If the XCodeRef identifies no subtype resource, 
+an C<undef> is returned as C<$subcodref>. 
+
+=back
+
+=cut
+
+sub dispm_xcref_to_resources ($%) {
+  my ($xcref, %opt) = @_;
+  my $q;
+  my $constq;
+  my $subtypeq;
+  if (ref $xcref) {
+    ($q, $constq, $subtypeq) = @$xcref;
+  } else {
+    ($q, $constq, $subtypeq) = split /\./, $xcref, 3;
+  }
+        my $clsuri;
+        my $cls;
+        my $consturi;
+        my $const;
+        my $subtypeuri;
+        my $subtype;
+        if (defined $constq and not defined $subtypeq) {
+          $clsuri = dis_typeforqnames_to_uri ($q, 
+                                              use_default_namespace => 1,
+                                              %opt);
+          $cls = $State->{Type}->{$clsuri};
+          valid_err qq{Exception/warning class definition for }.
+                    qq{<$clsuri> is required}, node => $opt{node}
+                      unless defined $cls->{Name};
+          my ($consttq, $constfq) = split /\|\|/, $constq, 2;
+          if (defined $constfq) {
+            if ($consttq !~ /:/) {
+              valid_err qq<"$constq": Unprefixed exception code QName must >.
+                        q<not be followed by a "For" QName>,
+                        node => $opt{node};
+            } else {
+              $consturi = dis_typeforqnames_to_uri ($consttq.'::'.$constfq,
+                                                    use_default_namespace => 1,
+                                                    %opt);
+            }
+          } else {
+            if ($consttq !~ /:/) {
+              $consturi = $consttq;
+              CONSTCLS: {
+                for (values %{$cls->{ExpandedURI q<dis2pm:xConst>}}) {
+                  if (defined $_->{Name} and $_->{Name} eq $consturi) {
+                    $const = $_;
+                    last CONSTCLS;
+                  }
+                }
+                valid_err qq{Exception/warning code "$consturi" must be }.
+                          qq{defined in the exception/warning class }.
+                          qq{<$clsuri>}, node => $opt{node};
+              }
+            } else {
+              $consturi = dis_typeforqnames_to_uri ($consttq.'::'.$constfq,
+                                                    use_default_namespace => 1,
+                                                    %opt);
+            }
+          }
+          unless ($const) {
+            CONSTCLS: {
+              for (values %{$cls->{ExpandedURI q<dis2pm:xConst>}}) {
+                if (defined $_->{Name} and $_->{URI} and
+                    $_->{URI} eq $consturi) {
+                  $const = $_;
+                  last CONSTCLS;
+                }
+              }
+              valid_err qq{Exception/warning code <$consturi> must be }.
+                        qq{defined in the exception/warning class }.
+                        qq{<$clsuri>}, node => $opt{node};
+            }
+          }
+        } else { ## By code/subtype QName
+          $subtypeq = $q unless defined $constq;
+          $subtypeuri = dis_typeforqnames_to_uri ($subtypeq,
+                                                  use_default_namespace => 1,
+                                                  %opt);
+          $subtype = $State->{Type}->{$subtypeuri};
+          valid_err qq{Exception/warning code/subtype <$subtypeuri> must }.
+                    qq{be defined}, node => $opt{node}
+                  unless defined $subtype->{Name} and
+                         defined $subtype->{ExpandedURI q<dis2pm:type>};
+          if ($subtype->{ExpandedURI q<dis2pm:type>} eq
+                ExpandedURI q<ManakaiDOM:ExceptionOrWarningSubType>) {
+            $const = $subtype->{ExpandedURI q<dis2pm:parentResource>};
+            $cls = $subtype->{ExpandedURI q<dis2pm:grandGrandParentResource>};
+          } elsif ($subtype->{ExpandedURI q<dis2pm:type>} eq
+                     ExpandedURI q<ManakaiDOM:Const>) {
+            $const = $subtype;
+            $subtype = undef;
+            $cls = $const->{ExpandedURI q<dis2pm:grandParentResource>};
+          } else {
+            valid_err qq{Type of <$subtypeuri> must be either }.
+                      q{"ManakaiDOM:Const" or }.
+                      q{"ManakaiDOM:ExceptionOrWarningSubType"},
+                      node => $opt{node};
+          }
+        }
+  return ($cls, $const, $subtype);
+} # dispm_xcref_to_resources
+
 =item $hash = dispm_collect_hash_prop_value ($resource, $propuri, %opt)
 
 Get property values from a resource and its superclasses 
@@ -1203,6 +1512,10 @@ sub dispm_collect_hash_prop_value ($$%) {
   %r = (%r, %{$res->{$propu}||{}});
   \%r;
 } # dispm_collect_hash_prop_value
+
+=back
+
+=cut
 
 ## Outputed module and "For"
 my $mf = dis_get_module_uri (module_name => $Opt{module_name},
@@ -1234,7 +1547,8 @@ $header .= perl_statement
                  perl_assign
                       perl_var (type => '$', local_name => 'VERSION',
                                 scope => 'our')
-                   => perl_literal version_date time;
+                   => perl_literal version_date time
+  if $Opt{outputModuleVersion};
 
 ## -- Classes
 my %opt;
@@ -1263,7 +1577,8 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
       $State->{Module}->{$State->{module}}
             ->{ExpandedURI q<dis2pm:requiredModule>}->{$_} ||= 1;
     }
-    for my $uri (@{$pack->{ISA}||[]}, @{$pack->{Implement}||[]}) {
+    for my $uri (@{$pack->{ISA}||[]}, 
+                 @{$pack->{Implement}||[]}) {
       my $pack = $State->{Type}->{$uri};
       if (defined $pack->{ExpandedURI q<dis2pm:packageName>}) {
         push @$isa, $pack->{ExpandedURI q<dis2pm:packageName>};
@@ -1493,7 +1808,7 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
                          ExpandedURI q<dis2pm:selParent>
                              => $param->{ExpandedURI q<dis2pm:actualTypeNode>});
               if (defined $nm) {
-                $nm =~ s/\$INPUT\b/$param[-1] /g;
+                $nm =~ s/\$INPUT\b/$param[-1]/g;
                 ## NOTE: "Perl:Array" or "Perl:Hash" is not supported.
                 $param_norm .= $nm;
               }
@@ -1618,7 +1933,7 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
                          For => $for,
                          ExpandedURI q<dis2pm:getCodeNoTypeCheck> => 1);
               if (defined $nm) {
-                $nm =~ s/\$INPUT\b/\$given /g;
+                $nm =~ s/\$INPUT\b/\$given/g;
               } else {
                 $nm = '';
               }
@@ -1672,8 +1987,40 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
         $result .= dispm_const_value_sub (resource => $cv);
       } # package const value
 
+      ## -- Error codes
+      if ({
+           ExpandedURI q<ManakaiDOM:ExceptionClass> => 1,
+           ExpandedURI q<ManakaiDOM:WarningClass> => 1,
+          }->{$pack->{ExpandedURI q<dis2pm:type>}}) {
+        $result .= perl_sub
+                     name => '___error_def',
+                     prototype => '',
+                     code => perl_list {
+                       map {
+                         $_->{Name} => {
+                           ExpandedURI q<DOMCore:code>
+                                => perl_code_literal
+                                      dispm_const_value (%opt, resource => $_),
+                           description => dispm_muf_description
+                                                     (%opt, resource => $_),
+                           ExpandedURI q<MDOMX:subtype> => {
+                             map {
+                               $_->{NameURI} => {
+                                 description => dispm_muf_description
+                                                     (%opt, resource => $_),
+                               },
+                             } grep {defined $_->{Name}}
+                             values %{$_->{ExpandedURI q<dis2pm:xSubType>}||{}}
+                           },
+                         },
+                       } grep {defined $_->{Name}}
+                         values %{$pack->{ExpandedURI q<dis2pm:xConst>}||{}}
+                     };
+      }
+
       ## -- Operators
       my %ol;
+      my %mtd;
       for (values %{$pack->{ExpandedURI q<dis2pm:overload>}||{}}) {
         next unless defined $_->{resource}->{Name};
         if ($_->{resource}->{ExpandedURI q<dis2pm:methodName+>} =~ /^\#/) {
@@ -1681,12 +2028,14 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
             my $code = $_->{resource}->{ExpandedURI q<dis2pm:methodCodeRef>};
             $code =~ s/\bsub /sub $_->{operator} /;
             $result .= $code;
+            $mtd{$_->{operator}} = 1;
           } else {
             $ol{$_->{operator}} = perl_code_literal $_->{resource}
                                     ->{ExpandedURI q<dis2pm:methodCodeRef>};
           }
         } else {
           if ($_->{operator} =~ /^[A-Z]+$/) {
+            $mtd{$_->{operator}} = 1;
             $result .= perl_statement
                          perl_assign
                               perl_var (type => '*',
@@ -1798,7 +2147,7 @@ for my $var (values %{$State->{Module}->{$State->{module}}
     my $ARGS = '@_';
     my $IT = '$_';
     my $REF = '\\';
-    my $NONAME = '\w';
+    my $NONAME = '\W';
     $xr .= qq{
       sub AUTOLOAD {
         my $AL = our $ALD;
@@ -1876,4 +2225,32 @@ $result = $header . $result . perl_statement 1;
 
 output_result $result;
 
-1;
+=head1 BUGS
+
+Dynamic change for namespace binding, current "For", ... is poorly 
+supported - it a code or element refers another code or element 
+in the same or different source file, then their own bindings, not the former 
+code or element's, should be used for resolution.  The current 
+implementation does not do so perfectly.  So authors of 
+"dis" files are encouraged not to bind the same namespace prefix
+to different namespace URIs and to prefer prefixed QName. 
+
+=head1 SEE ALSO
+
+L<lib/manakai/dis.pl> - "dis" common utility. 
+
+L<lib/manakai/DISCore.dis> - The definition for the "dis" format. 
+
+L<lib/manakai/DISPerl.dis> - The definition for the "dis" Perl-specific 
+vocabulary. 
+
+=head1 LICENSE
+
+Copyright 2004-2005 Wakaba <w@suika.fam.cx>.  All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+
+1; # $Date: 2005/01/05 12:19:38 $

@@ -1,5 +1,18 @@
 #!/usr/bin/perl -w
 
+=head1 NAME
+
+dis.pl - The "dis" format interpreting utility
+
+=head1 DESCRIPTION
+
+This Perl library provides a lot of functions that 
+is used to interprete the "dis" format source files. 
+
+This library is part of manakai. 
+
+=cut
+
 use strict;
 use Message::Util::QName::Filter {
   d => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis-->,
@@ -36,6 +49,13 @@ our $State ||= {
 ## For error reporting
 our $NodePathKey = [qw/Name QName Label rdf:type Type/,
                     ExpandedURI q<d:QName>];
+
+=head1 FUNCTIONS
+
+This library provides a number of functions in the C<main> namespace 
+with the C<dis_> prefix:
+
+=over 4
 
 =item $uri = dis_nsprefix_to_uri ($prefix, %opt)
 
@@ -250,6 +270,7 @@ sub dis_typeforqnames_to_type_uri ($;%) {
       return $State->{Type}->{$uri}->{URI} || $uri;
     }
     unshift @for, @{$State->{For}->{$for}->{ISA}},
+                  @{$State->{For}->{$for}->{subsetOf}},
                   @{$State->{For}->{$for}->{Implement}};
   }
   valid_err (qq<Type <$type> for <$for> must be defined>, node => $opt{node});
@@ -490,6 +511,7 @@ sub dis_uri_for_match ($$%) {
     valid_err (qq'$0: "For" URI inheritance might be looping');
   }
   for (@{$State->{For}->{$for_uri}->{ISA}||[]},
+       @{$State->{For}->{$for_uri}->{subsetOf}||[]},
        @{$State->{For}->{$for_uri}->{Implement}||[]}) {
     if (dis_uri_for_match ($uri, $_, %opt)) {
       $State->{ExpandedURI q<dis2pm:forCache>}->{$uri}->{$for_uri} = 1;
@@ -516,6 +538,7 @@ sub dis_uri_ctype_match ($$%) {
     valid_err (qq'"Resource" URI inheritance might be looping');
   }
   for (@{$State->{Type}->{$type_uri}->{ISA}||[]},
+       @{$State->{Type}->{$type_uri}->{subsetOf}||[]},
        @{$State->{Type}->{$type_uri}->{Implement}||[]}) {
     if (dis_uri_ctype_match ($uri, $_, %opt)) {
       return 1;
@@ -997,6 +1020,7 @@ sub dis_load_fordef_element ($;%) {
     URI => $uri,
     ISA => [],
     Implement => [],
+    subsetOf => [],
     src => $node,
   };
   $State->{def_required}->{For}->{$uri} = -1;
@@ -1014,6 +1038,11 @@ sub dis_load_fordef_element ($;%) {
       my $uri = dis_qname_to_uri ($_->value, use_default_namespace => 1,
                                   %opt, node => $_);
       push @{$for->{ISA}}, $uri;
+      $State->{def_required}->{For}->{$uri} ||= 1;
+    } elsif ($ln eq ExpandedURI q<d:subsetOf>) {
+      my $uri = dis_qname_to_uri ($_->value, use_default_namespace => 1,
+                                  %opt, node => $_);
+      push @{$for->{ExpandedURI q<d:subsetOf>}}, $uri;
       $State->{def_required}->{For}->{$uri} ||= 1;
     } elsif ($ln eq ExpandedURI q<d:Implement>) {
       my $uri = dis_qname_to_uri ($_->value, use_default_namespace => 1,
@@ -1033,7 +1062,7 @@ sub dis_load_fordef_element ($;%) {
   push @{$for->{ISA}}, ExpandedURI q<ManakaiDOM:all>
     if not @{$for->{ISA}} and
        not $for->{URI} eq ExpandedURI q<ManakaiDOM:all>;
-}
+} # dis_load_fordef_element
 
 =item dis_load_namespace_element ($node, %opt)
 
@@ -1134,6 +1163,7 @@ markup language element type, etc.) definition.
 
 {
 our $dis_load_classdef_element_loop = 0;
+our $dis_load_classdef_seq = 0;
 sub dis_load_classdef_element ($;%);
 sub dis_load_classdef_element ($;%) {
   my ($node, %opt) = @_;
@@ -1158,6 +1188,7 @@ sub dis_load_classdef_element ($;%) {
       if (defined $cls->{Name}) {
         valid_err (qq<Class <$dfuri> is already defined>, node => $node);
       }
+      $cls->{seq} = ++$dis_load_classdef_seq;
       $cls->{Name} = $lname;
       $cls->{NameURI} = $uri;
       $cls->{URI} = $dfuri;
@@ -1210,6 +1241,7 @@ sub dis_load_classdef_element ($;%) {
         if (defined $cls->{Name}) {
           valid_err (qq<Class <$dfuri> is already defined>, node => $node);
         }
+        $cls->{seq} = ++$dis_load_classdef_seq;
         $State->{Resource}->{$dfuri} = $cls;
         $cls->{Name} = $lname;
         $cls->{NameURI} = $uri;
@@ -1247,6 +1279,7 @@ sub dis_load_classdef_element ($;%) {
         if (defined $cls->{Name}) {
           valid_err (q<Local class <$dfuri> is already defined>, node => $node);
         }
+        $cls->{seq} = ++$dis_load_classdef_seq;
         $cls->{Name} = $lname;
         $cls->{parentModule} = $State->{module};
         $cls->{src} = $node;
@@ -1273,7 +1306,10 @@ sub dis_load_classdef_element ($;%) {
     if (defined $cls->{Name}) {
       impl_err (qq<Anonymous class <$dfuri> already defined>, node => $node);
     }
+    $cls->{seq} = ++$dis_load_classdef_seq;
     $cls->{Name} = '';
+      ## Note: To know whether a resource is defined or not, check
+      ##       whether its Name is defined or not. 
     $cls->{For}->{$opt{For} || ExpandedURI q<ManakaiDOM:all>} = 1;
     $cls->{'For+'}->{$_} = 1 for @{$opt{'For+'}||[]};
     $cls->{parentModule} = $State->{module};
@@ -1287,7 +1323,7 @@ sub dis_load_classdef_element ($;%) {
     next unless $_->node_type eq '#element';
     next unless dis_node_for_match ($_, $opt{For}, %opt);
     my $ln = dis_element_type_to_uri ($_->local_name, %opt, node => $_);
-    if ($ln eq ExpandedURI q<rdf:type>) {
+    if (dis_uri_ctype_match (ExpandedURI q<rdf:type>, $ln, %opt)) {
       my $uri = dis_qname_to_uri ($_->value, use_default_namespace => 1,
                                   %opt, node => $_);
       $cls->{Type}->{$uri} = 1;
@@ -1295,7 +1331,7 @@ sub dis_load_classdef_element ($;%) {
       $is_multiresource = 1 if dis_uri_ctype_match
                                    (ExpandedURI q<d:MultipleResource>,
                                     $uri, %opt);
-    } elsif ($ln eq ExpandedURI q<d:ISA>) {
+    } elsif (dis_uri_ctype_match (ExpandedURI q<d:ISA>, $ln, %opt)) {
       my $uri = dis_typeforqnames_to_uri ($_->value, use_default_namespace => 1,
                                           %opt, node => $_,
                                           use_default_type => $cls->{NameURI});
@@ -1303,7 +1339,15 @@ sub dis_load_classdef_element ($;%) {
         push @{$cls->{ISA}||=[]}, $uri;
         $State->{def_required}->{Class}->{$uri} ||= $_;
       }
-    } elsif ($ln eq ExpandedURI q<d:Implement>) {
+    } elsif (dis_uri_ctype_match (ExpandedURI q<d:subsetOf>, $ln, %opt)) {
+      my $uri = dis_typeforqnames_to_uri ($_->value, use_default_namespace => 1,
+                                          %opt, node => $_,
+                                          use_default_type => $cls->{NameURI});
+      if (not defined $cls->{URI} or $uri ne $cls->{URI}) {
+        push @{$cls->{subsetOf}||=[]}, $uri;
+        $State->{def_required}->{Class}->{$uri} ||= $_;
+      }
+    } elsif (dis_uri_ctype_match (ExpandedURI q<d:Implement>, $ln, %opt)) {
       my $uri = dis_typeforqnames_to_uri ($_->value, use_default_namespace => 1,
                                           %opt, node => $_,
                                           use_default_type => $cls->{NameURI});
@@ -1311,7 +1355,8 @@ sub dis_load_classdef_element ($;%) {
         push @{$cls->{Implement}||=[]}, $uri;
         $State->{def_required}->{Class}->{$uri} ||= $_;
       }
-    } elsif ($ln eq ExpandedURI q<d:ResourceDef> and not $is_multiresource) {
+    } elsif (not $is_multiresource and
+             dis_uri_ctype_match (ExpandedURI q<d:ResourceDef>, $ln, %opt)) {
       my $p = $al ? 0 : 1;
       if ($al) {
         my $ac = dis_get_attr_node (%opt, parent => $_, 
@@ -1373,13 +1418,13 @@ sub dis_check_undef_type_and_for (%) {
 
 =cut
 
-=head1 APPLICATION-SPECIFIC FUNCTIONS
+=head2 APPLICATION-SPECIFIC FUNCTIONS
 
 Application-specific initializations and operations. 
 These functions should be used after C<dis_check_undef_type_and_for> 
 is done.
 
-=head2 Perl-specific Functions
+=head3 Perl-specific Functions
 
 =over 4
 
@@ -1519,7 +1564,10 @@ sub dis_perl_init_classdef ($;%) {
                 ExpandedURI q<ManakaiDOM:ExceptionClass>
                                      => ExpandedURI q<ManakaiDOM:ExceptionIF>,
                 ExpandedURI q<ManakaiDOM:WarningClass> => 'dummy',
-                                   }->{$type}, $_, %opt)) {
+                                   }->{$type}, $_, %opt) or
+              ($type eq ExpandedURI q<ManakaiDOM:Class> and
+               dis_uri_ctype_match (ExpandedURI q<ManakaiDOM:DataType>,
+                                    $_, %opt))) {
             push @{$res->{Implement}||=[]}, $if->{URI};
             last IF;
           }
@@ -1557,6 +1605,11 @@ sub dis_perl_init_classdef ($;%) {
            }->{$type}) {
     ## Method or attribute name
     my $name = $res->{Name};
+    if ($name =~ /^[A-Z]+$/ and $name ne 'URL') {
+      valid_err (q<All upper-case Perl method name is not allowed>,
+                 node => $res->{src});
+      ## except HTMLDocument.URL attribute
+    }
     my $int = dis_get_attr_node
                  (%opt, name => {uri => ExpandedURI q<ManakaiDOM:isForInternal>},
                   parent => $res->{src});
@@ -1681,7 +1734,7 @@ sub dis_perl_init_classdef ($;%) {
           ->{$p->{$type}} = $res;
   } elsif ({ExpandedURI q<ManakaiDOM:DOMMethodParameter> => 1}->{$type}) {
     ## Parameter name
-    valid_err (qq<Parameter name required>, node => $res->{node})
+    valid_err (qq<Parameter name required>, node => $res->{src})
       unless $res->{Name};
     my $name = $res->{Name};
     $res->{ExpandedURI q<dis2pm:paramName>} = $name;
@@ -2136,16 +2189,23 @@ sub dis_perl_init_classdef ($;%) {
                     += 1 -= 1 *= 1 /= 1 %= 1 **= 1 <<= 1 >>= 1 x= 1 .= 1
                     <  1 <= 1 >  1 >= 1 == 1 != 1 <=> 1
                     lt 1 le 1 gt 1 ge 1 eq 1 ne 1 cmp 1
-                    & 1 | 1 ^ 1
-                    neg 1 ! 1 ~ 1
-                    ++ 1 -- 1
+                    & 1 | 1 ^ 1 neg 1 ! 1 ~ 1
+                    ++ 1 -- 1 = 1
                     atan2 1 cos 1 sin 1 exp 1 abs 1 log 1 sqrt 1
-                    bool 1 "" 1 0+ 1
-                    <> 1
-                    ${} 1 @{} 1 %{} 1 &{} 1 *{} 1
+                    bool 1 "" 1 0+ 1 ${} 1 @{} 1 %{} 1 &{} 1 *{} 1 <> 1
+                    nomethod 1
                     DESTROY 1
+                    TIESCALAR 1 TIEARRAY 1 TIEHASH 1 TIEHANDLE 1 CLOSE 1 UNTIE 1
+                    FETCH 1 STORE 1 FIRSTKEY 1 NEXTKEY 1
+                    EXISTS 1 DELETE 1 CLEAR 1
+                    PUSH 1 POP 1 SHIFT 1 UNSHIFT 1 SPLICE 1
+                    FETCHSIZE 1 STORESIZE 1 EXTEND 1 SCALAR 1
+                    WRITE 1 PRINT 1 PRINTF 1 READ 1 READLINE 1 GETC 1
+                    PUSHED 1 POPED 1 OPEN 1 UTF8 1 BINMODE 1 FDOPEN 1 SYSOPEN 1
+                    FILENO 1 FILL 1 SEEK 1 TELL 1UNREAD 1 FLUSH 1
+                    SETLINEBUF 1 CLEARERR 1 ERROR 1 EOF 1
                   ]}->{$op}) {
-            valid_err qq<Operator "op" is not supported>, node => $_;
+            valid_err qq<Operator "$op" is not supported>, node => $_;
           }
           valid_err qq<Overloading for operator "$op" is already declared>,
             node => $_
@@ -2194,7 +2254,7 @@ sub dis_perl_init_classdef ($;%) {
       valid_err q<Unsupported <dis:AppISA> description>, node => $_;
     } elsif (defined $State->{Type}->{$ln}->{Name}) {
       for (%{$State->{Type}->{$ln}->{Type}}) {
-        if (dis_uri_ctype_match (ExpandedURI q<rdfs:Property>, $_, %opt)) {
+        if (dis_uri_ctype_match (ExpandedURI q<rdf:Property>, $_, %opt)) {
           next N;
         }
       }
@@ -2234,10 +2294,18 @@ sub dis_perl_init_classdef ($;%) {
     }
   }
 
+  for (ExpandedURI q<dis2pm:param>, ExpandedURI q<dis2pm:inCase>) {
+    if ($res->{$_}) {
+      $res->{$_} = [sort {$a->{seq} <=> $b->{seq}} @{$res->{$_}}];
+    }
+  }
+
   $res->{ExpandedURI q<dis2pm:done>} = 1;
 } # dis_perl_init_classdef
 
-=head1 FUNCTIONS FOR DISDOC DOCUMENTATION
+=back
+
+=head3 Functions for "disdoc" Documentation
 
 =over 4
 
@@ -2246,8 +2314,8 @@ sub dis_perl_init_classdef ($;%) {
 {
 use re 'eval';
 our $Element;
-$Element = qr/[A-Za-z0-9]+(?>:(?>[^<>]*)(?>(?>[^<>]+|<(??{$Element})>)*))?/;
-my $MElement = qr/([A-Za-z0-9]+)(?>:((?>[^<>]*)(?>(?>[^<>]+|<(??{$Element})>)*)))?/;
+$Element = qr/[A-Za-z0-9]+(?>::(?>[^<>]*)(?>(?>[^<>]+|<(??{$Element})>)*))?/;
+my $MElement = qr/([A-Za-z0-9]+)(?>::((?>[^<>]*)(?>(?>[^<>]+|<(??{$Element})>)*)))?/;
 
 =item $text = disdoc2text ($disdoc, %opt)
 
@@ -2295,7 +2363,7 @@ sub disdoc2text ($;%) {
       } elsif ($marker eq '-') {
         $marker = '* ';
       }
-      if ($s =~ s/^(.+?)::\s*//) {
+      if ($s =~ s/^(.+?):::\s*//) {
         $marker = disdoc_inline2text ($1, %opt) . ': ';
       }
       push @r, $marker . (disdoc_inline2pod ($s, %opt));
@@ -2343,11 +2411,10 @@ sub disdoc_inline2text ($;%) {
       $r = q<"> . $data . q<">;
     } elsif ({Feature => 1, CP => 1, ERR => 1,
               HA => 1, HE => 1, XA => 1, SA => 1, SE => 1}->{$type}) {
-      $r = qname_label (undef, qname => $data,
-                        no_default_ns => 1);
+      $r = q<"> . $data . q<">;
     } elsif ({Q => 1, EV => 1, 
               XE => 1}->{$type}) {
-      $r = qname_label (undef, qname => $data);
+      $r = q<"> . $data . q<">;
     } elsif ({M => 1, A => 1, X => 1, WARN => 1}->{$type}) {
       if ($data =~ /^([^.]+)\.([^.]+)$/) {
         $r = q<"> . $1 . '->' . $2 . q<">;
@@ -2549,6 +2616,25 @@ sub disdoc_inline2pod ($;%) {
 
 =back
 
+=head1 SEE ALSO
+
+=over 4
+
+=item F<lib/manakai/DISCore.dis> - The "dis" language core module
+
+=item F<bin/disc.pl> - The "dis" compiler
+
+=item F<bin/cdis2pm.pl> - Compiled "dis" to Perl module converter
+
+=back
+
+=head1 LICENSE
+
+Copyright 2004-2005 Wakaba <w@suika.fam.cx>.  All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
 =cut
 
-1; # $Date: 2004/12/31 12:03:40 $
+1; # $Date: 2005/01/05 12:19:39 $

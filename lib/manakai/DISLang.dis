@@ -15,7 +15,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/31 12:03:40 $
+      $Date: 2005/01/05 12:19:39 $
     @@ContentType:
       dis:Date.RCS
   
@@ -54,7 +54,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
-      rdfs:Datatype
+      DISCore:AbstractDataType
     @@AliasFor:
       @@@@:
         ::ManakaiDOM:all
@@ -67,12 +67,27 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
-      rdfs:Property
+      rdf:Property
     @@AliasFor:
       @@@@:
         ::ManakaiDOM:all
       @@@For:
         !=ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: FormatDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISCore:StringDataType
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+    @@rdfs:subClassOf:
+      DISCore:String
 
 ## -- The lang:dis tree language vocabulary
 
@@ -88,7 +103,7 @@ ResourceDef:
   @Name: TreeElementType
   @rdf:type:
     rdfs:Class
-  @ISA:
+  @rdfs:subClassOf:
     dis:ElementType
   @Description:
     @@lang:en
@@ -129,15 +144,17 @@ TreeElementType:
 TreeElementType:
   @Name: dataTypeAliasFor
   @rdf:type:
-    rdfs:Property
+    rdf:Property
   @Description:
     @@lang:en
     @@@:
       Declares the subject resource is an alias for the object resource.
   @rdfs:range:
-    ManakaiDOM:DataType
+    DISCore:AbstractDataType
   @rdfs:domain:
-    ManakaiDOM:DataType
+    DISCore:AbstractDataType
+  @dataType: 
+    dis:TFQNames
 
 TreeElementType:
   @Name: value
@@ -165,6 +182,8 @@ TreeElementType:
     dis:TypeQName
   @rdfs:domain: 
     DISPerl:selectByProp
+  @rdf:type:
+    rdf:Property
 
 TreeElementType:
   @QName: 
@@ -173,5 +192,17 @@ TreeElementType:
     @@lang:en
     @@@:
       A <QUOTE::case>. 
+  @rdfs:domain:
+    DISPerl:selectByProp
+
+TreeElementType:
+  @QName:
+    DISPerl:else
+  @Description:
+    @@lang:en
+    @@@:
+      An <QUOTE::otherwise> case.
+  @rdfs:domain:
+    DISPerl:selectByProp
 
 ## DISLang.dis ends here

@@ -15,7 +15,7 @@ This module is part of manakai.
 
 package Message::Util::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error;
 push our @ISA, 'Error';
 
@@ -189,7 +189,7 @@ sub ___rule_def () {+{
         } else {
           $p->{-result} = defined $p->{empty} ? $p->{empty} : '<empty>';
         }
-      } else {
+      } elsif (exists $o->{$p->{name}}) {
         $p->{-result} = defined $p->{undef} ? $p->{undef} : '<undef>';
       }
     },
@@ -272,11 +272,11 @@ If you implements an object-oriented class:
 
 =head1 LICENSE
 
-Copyright 2003 Wakaba <w@suika.fam.cx>
+Copyright 2003-2005 Wakaba <w@suika.fam.cx>
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/10/09 05:33:41 $
+1; # $Date: 2005/01/05 12:19:39 $

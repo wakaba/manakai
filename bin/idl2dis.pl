@@ -12,6 +12,7 @@ sub level ($);
 sub raises ($$$);
 
 my $tree = Message::Markup::SuikaWikiConfig20::Node->new (type => '#document');
+my $etUsed;
 
 sub fws ($) {
   my $s = shift;
@@ -26,22 +27,19 @@ sub fws ($) {
         my $c = $m->get_attribute ('Require', make_new_node => 1)
                   ->append_new_node (type => '#element',
                                      local_name => 'Module');
-        $c->set_attribute (Name => undef);
-        $c->set_attribute (FileName => $f)
-          ->set_attribute (For => 'lang:IDL-DOM');
         $f =~ s/\.idl$//;
         $c->set_attribute (Name => $f);
-        $c->set_attribute (Namespace => q<:: TBD ::>);
       } elsif ($l =~ /^pragma\s+prefix\s+"([^"]+)"/) {
         $m->get_element_by (sub {
                               my ($me, $you) = @_;
-                              $you->local_name eq 'BindingName' and
-                              $you->get_attribute_value ('Type', default => '')
+                              $you->local_name eq 'AppName' and
+                              $you->get_attribute_value ('ContentType',
+                                                         default => '')
                                 eq 'lang:IDL-DOM'
                             }, make_new_node => sub {
                               my ($me, $you) = @_;
-                              $you->local_name ('BindingName');
-                              $you->set_attribute (Type => 'lang:IDL-DOM');
+                              $you->local_name ('AppName');
+                              $you->set_attribute (ContentType =>'lang:IDL-DOM');
                             })
           ->set_attribute (prefix => $1);
       } else {
@@ -114,7 +112,7 @@ sub const ($$) {
   if ($LastCategory or $LastComment =~ /$CONST/) {
     if ($parent->child_nodes->[-1] and
         $parent->child_nodes->[-1]->local_name eq 'ConstGroup' and
-       ($parent->child_nodes->[-1]->get_attribute_value ('Name', default => ' ')
+       ($parent->child_nodes->[-1]->get_attribute_value ('QName', default => ' ')
           eq $LastCategory or
         $parent->child_nodes->[-1]->get_attribute_value ('FullName',
                                                          default => ' ')
@@ -125,25 +123,38 @@ sub const ($$) {
       $parent = $parent->child_nodes->[-1];
       if ($parent->child_nodes->[-1] and
           $parent->child_nodes->[-1]->local_name eq 'ConstGroup' and
-         ($parent->child_nodes->[-1]->get_attribute_value ('Name', default => ' ')
+         ($parent->child_nodes->[-1]->get_attribute_value ('QName',
+                                                           default => ' ')
             eq $LastCategory or
           $parent->child_nodes->[-1]->get_attribute_value ('FullName',
                                                            default => ' ')
             eq $LastComment)) {
         $parent = $parent->child_nodes->[-1];
       } else {
-        $parent = $parent->append_new_node (type => '#element', local_name => 'ConstGroup');
+        $parent = $parent->append_new_node (type => '#element',
+                                            local_name => 'ConstGroup');
         if ($LastCategory) {
-          $parent->set_attribute (Name => $LastCategory);
+          $parent->append_new_node (type => '#element', local_name => 'QName',
+                                    value => $LastCategory)
+                 ->set_attribute (ForCheck => q<ManakaiDOM:ForIF>);
+          $parent->append_new_node (type => '#element', local_name => 'QName',
+                                    value => "** $LastCategory")
+                 ->set_attribute (ForCheck => q<ManakaiDOM:ForClass>);
         } else {
           $parent->set_attribute (FullName => $LastComment)
                  ->set_attribute (lang => 'en');
         }
       }
     } else {
-      $parent = $parent->append_new_node (type => '#element', local_name => 'ConstGroup');
+      $parent = $parent->append_new_node (type => '#element',
+                                          local_name => 'ConstGroup');
       if ($LastCategory) {
-        $parent->set_attribute (Name => $LastCategory);
+        $parent->append_new_node (type => '#element', local_name => 'QName',
+                                  value => $LastCategory)
+               ->set_attribute (ForCheck => q<ManakaiDOM:ForIF>);
+        $parent->append_new_node (type => '#element', local_name => 'QName',
+                                  value => "** $LastCategory")
+               ->set_attribute (ForCheck => q<ManakaiDOM:ForClass>);
       } else {
         $parent->set_attribute (FullName => $LastComment)
                ->set_attribute (lang => 'en');
@@ -151,15 +162,19 @@ sub const ($$) {
     }
   }
 
-    fws $s;
-    my $type = type $s or err $s;
-    fws $s;
+  fws $s;
+  my $type = type $s or err $s;
+  fws $s;
   if ($parent->node_type eq '#element' and
       $parent->local_name eq 'ConstGroup' and
       not $parent->get_attribute ('Type')) {
     $parent->set_attribute (Type => $type);
+    $parent->set_attribute (ISA => $type)
+           ->set_attribute (ForCheck => q<ManakaiDOM:ForClass>);
   }
-    my $const = $parent->append_new_node (type => '#element', local_name => 'Const');
+  
+  my $const = $parent->append_new_node (type => '#element',
+                                        local_name => 'Const');
     $$s =~ /\G($NAME)/gc or err $s;
     $const->set_attribute (Name => $1);
     $const->set_attribute (Type => $type);
@@ -195,13 +210,12 @@ sub level ($) {
     my $l = $1;
     my $p = $n->get_attribute_value ('Level', default => [], as_array => 1);
     $n->set_attribute (Level => [@$p, $l]);
-    $n->set_attribute (SpecLevel => [@$p, $l]);
+    $n->set_attribute (For => q<ManakaiDOM:DOM>.$l);
   } elsif ($LastComment =~ /Modified in DOM Level (\d+)/) {
     my $l = $1;
     my $p = $n->get_attribute_value ('Level', default => [':: TBD ::'],
                                      as_array => 1);
     $n->set_attribute (Level => [@$p, $l]);
-    $n->set_attribute (SpecLevel => [@$p, $l]);
   }
 }
 
@@ -213,7 +227,7 @@ sub raises ($$$) {
   while ($$s =~ /\G($NAME)/gc) {
     my $name = $1;
     $name =~ s/::/:/g;
-    $name = 'DOMCore:'.$name if $name eq 'DOMException' and
+    $name = 'DOMMain:'.$name if $name eq 'DOMException' and
                                 not $Status->{datatype_defined}->{$name};
     if ($name =~ /^([^:]+):/) {
       register_required_module (Name => $1);
@@ -252,19 +266,6 @@ sub register_required_module (%) {
                $you->local_name ('Module');
                $you->set_attribute (Name => $opt{Name});
              });
-  $mod->set_attribute (Namespace => $opt{Namespace} || q<:: TBD ::>);
-  if ($opt{PerlRequire}) {
-    unless ($mod->get_element_by (sub {
-               my ($me, $you) = @_;
-               $you->local_name eq 'Def' and
-               $you->get_attribute_value ('Type', default => '') eq q<lang:Perl>;
-             })) {
-      for ($mod->append_new_node (type => '#element', local_name => 'Def')) {
-        $_->set_attribute (Type => q<lang:Perl>);
-        $_->set_attribute (require => $opt{PerlRequire});
-      }
-    }
-  }
 }
 
 sub supply_incase ($$) {
@@ -276,6 +277,7 @@ sub supply_incase ($$) {
         $_->set_attribute (Value => $b);
       }
     }
+    $etUsed->{InCase} = 1;
   }
 } # supply_incase
 
@@ -287,39 +289,100 @@ $s = \(<> or die "$0: $ARGV: $!");
 
 pos $$s = 0;
 
-for my $ns ($tree->get_attribute ('Namespace', make_new_node => 1)) {
-  $ns->set_attribute (lang => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#>);
-  $ns->set_attribute (license => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/license#>);
-}
-
+## -- Module attribute
 for my $module ($tree->append_new_node (type => '#element',
                                         local_name => 'Module')) {
-  $module->set_attribute (Name => q<## TBD ##>);
+  $module->set_attribute (QName => q<:: TBD:TBD ::>);
+  for ($module->set_attribute (AppName => q<** TBD **>)) {
+    $_->set_attribute (ContentType => q<lang:IDL-DOM>);
+    $_->set_attribute (For => q<ManakaiDOM:IDL>);
+  }
+  for ($module->set_attribute (FullName => q<:: TBD Module ::>)) {
+    $_->set_attribute (lang => q<en>);
+  }
   $module->set_attribute (Namespace => q<:: TBD ::>);
-  $module->set_attribute (BindingName => q<** TBD **>)
-         ->set_attribute (Type => q<lang:IDL-DOM>);
+
+  $module->set_attribute (Description => q<This module is :::>)
+         ->set_attribute (lang => q<en>);
+
   for ($module->set_attribute (Author => undef)) {
     $_->set_attribute (FullName => q<** TBD **>);
-    $_->set_attribute (Mail => q<** TBD **>);
+    $_->set_attribute (Mail => q<** TBD@TBD **>);
   }
   $module->set_attribute (License => q<license:Perl+MPL>);
-  $module->set_attribute ('Date.RCS' => q<$Date: 2004/10/10 00:01:08 $>);
+  $module->set_attribute (Date => q<$Date: 2005/01/05 12:19:38 $>)
+         ->set_attribute (ContentType => 'dis:Date.RCS');
+
+  $module->set_attribute (DefaultFor => q<ManakaiDOM:ManakaiDOMLatest>);
+  
+  for ($module->set_attribute (Require => undef)) {
+    $_->append_new_node (type => '#element',
+                         local_name => 'Module')
+      ->set_attribute (Name => 'DOMCore');
+    for ($_->append_new_node (type => '#element',
+                              local_name => 'Module')) {
+      $_->set_attribute (Name => '** MYSELF **');
+      $_->set_attribute (WithFor => q<ManakaiDOM:ManakaiDOM>);
+    }
+    for ($_->append_new_node (type => '#element',
+                              local_name => 'Module')) {
+      $_->set_attribute (Name => '** MYSELF **');
+      $_->set_attribute (WithFor => q<ManakaiDOM:ManakaiDOM1>);
+    }
+    for ($_->append_new_node (type => '#element',
+                              local_name => 'Module')) {
+      $_->set_attribute (Name => '** MYSELF **');
+      $_->set_attribute (WithFor => q<ManakaiDOM:ManakaiDOM2>);
+    }
+    for ($_->append_new_node (type => '#element',
+                              local_name => 'Module')) {
+      $_->set_attribute (Name => '** MYSELF **');
+      $_->set_attribute (WithFor => q<ManakaiDOM:ManakaiDOM3>);
+    }
+    for ($_->append_new_node (type => '#element',
+                              local_name => 'Module')) {
+      $_->set_attribute (Name => '** MYSELF **');
+      $_->set_attribute (WithFor => q<ManakaiDOM:ManakaiDOMLatest>);
+    }
+  }
 }
+
+## -- Namespace attribute
+for my $ns ($tree->get_attribute ('Namespace', make_new_node => 1)) {
+  for (
+       [dis => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis-->],
+       [DOMMain => q<http://suika.fam.cx/~wakaba/archive/2004/dom/main#>],
+       [infoset => q<http://www.w3.org/2001/04/infoset#>],
+       [lang => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#>],
+       [license => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/license#>],
+       [ManakaiDOM => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#>],
+       [MDOM => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.>],
+       [MDOMX => q<http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#>],
+       [Perl => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl-->],
+       [rdf => q<http://www.w3.org/1999/02/22-rdf-syntax-ns#>],
+       [rdfs => q<http://www.w3.org/2000/01/rdf-schema#>],
+       [TreeCore => q<>],
+      ) {
+    $ns->set_attribute ($_->[0] => $_->[1]);
+  }
+}
+
 
 fws $s;
 if ($$s =~ /\Gpragma\s+prefix\s+"([^"]+)"\s*/gc) {
   for ($tree->get_attribute ('Module')
             ->get_element_by (sub {
            my ($me, $you) = @_;
-           $you->local_name eq 'BindingName' and
-           $you->get_attribute_value ('Type', default => '') eq 'lang:IDL-DOM';
+           $you->local_name eq 'AppName' and
+           $you->get_attribute_value ('ContentType', default => '') eq
+             'lang:IDL-DOM';
          }, make_new_node => sub {
            my ($me, $you) = @_;
-           $you->local_name ('BindingName');
-           $you->set_attribute (Type => 'lang:IDL-DOM');
+           $you->local_name ('AppName');
+           $you->set_attribute (ContentType => 'lang:IDL-DOM');
+           $you->set_attribute (For => 'ManakaiDOM:IDL');
          })) {
     $_->set_attribute (prefix => $1);
-    $_->set_attribute (Type => 'lang:IDL-DOM');
   }
 }
 if ($$s =~ /\Gmodule\b/gc) {
@@ -328,12 +391,14 @@ if ($$s =~ /\Gmodule\b/gc) {
   for ($tree->get_attribute ('Module')) {
     $_->get_element_by (sub {
            my ($me, $you) = @_;
-           $you->local_name eq 'BindingName' and
-           $you->get_attribute_value ('Type', default => '') eq 'lang:IDL-DOM';
+           $you->local_name eq 'AppName' and
+           $you->get_attribute_value ('ContentType', default => '') eq
+             'lang:IDL-DOM';
          }, make_new_node => sub {
            my ($me, $you) = @_;
-           $you->local_name ('BindingName');
-           $you->set_attribute (Type => 'lang:IDL-DOM');
+           $you->local_name ('AppName');
+           $you->set_attribute (ContentType => 'lang:IDL-DOM');
+           $you->set_attribute (For => 'ManakaiDOM:IDL');
          })->inner_text (new_value => $1);
     $_->set_attribute (Name => $1);
   }
@@ -367,11 +432,24 @@ while (pos $$s < length $$s) {
     }
     if ($$s =~ /\G\{/gc) {
       my $if = $r->append_new_node (type => '#element', local_name => 'IF');
-      $if->set_attribute (Name => $name);
+      $etUsed->{IF} = 1;
+      $if->append_new_node (type => '#element', local_name => 'QName',
+                            value => $name)
+         ->set_attribute (ForCheck => q<ManakaiDOM:ForIF>);
       for (@isa) {
         $if->append_new_node (type => '#element',
                               local_name => 'ISA',
-                              value => $_);
+                              value => $_)
+           ->set_attribute (ForCheck => q<ManakaiDOM:ForIF>);
+      }
+      $if->append_new_node (type => '#element', local_name => 'QName',
+                            value => "** $name")
+         ->set_attribute (ForCheck => q<ManakaiDOM:ForClass>);
+      for (@isa) {
+        $if->append_new_node (type => '#element',
+                              local_name => 'ISA',
+                              value => ":: $_")
+           ->set_attribute (ForCheck => q<ManakaiDOM:ForClass>);
       }
       level $if;
       clear_comment;
@@ -379,7 +457,9 @@ while (pos $$s < length $$s) {
       while (my $type = type $s) {
         fws $s;
         if ($type eq 'attribute' or $type eq 'readonly') {
-          my $attr = $LastAttr = $if->append_new_node (type => '#element', local_name => 'Attr');
+          my $attr = $LastAttr = $if->append_new_node (type => '#element',
+                                                       local_name => 'Attr');
+          $etUsed->{Attr} = 1;
           my $readonly;
           if ($type eq 'readonly') {
             $$s =~ /\Gattribute\b/gc or err $s;
@@ -405,6 +485,7 @@ while (pos $$s < length $$s) {
         } else {
           my $method = $if->append_new_node (type => '#element',
                                              local_name => 'Method');
+          $etUsed->{Method} = 1;
           if ($$s =~ /\G($NAME)/gc) {
             $method->set_attribute (Name => idlname2name $1);
           } else {
@@ -418,16 +499,27 @@ while (pos $$s < length $$s) {
             my $type = type $s or last;
             fws $s;
             my $in;
+            my $out;
             if ($type eq 'in') {
               $in = 1;
               $type = type $s or err $s;
               fws $s;
+            } elsif ($type eq 'out') {
+              $out = 1;
+              $type = type $s or err $s;
+              fws $s;
+            } elsif ($type eq 'inout') {
+              $in = 1; $out = 1;
+              $type = type $s or err $s;
+              fws $s;
             }
-            my $p = $method->append_new_node (type => '#element', local_name => 'Param');
+            my $p = $method->append_new_node (type => '#element',
+                                              local_name => 'Param');
             $$s =~ /\G($NAME)/gc or err $s;
             $p->set_attribute (Name => idlname2name $1);
             $p->set_attribute (Type => $type);
             $p->set_attribute (Write => 0) unless $in; 
+            $p->set_attribute (Read => 1) if $out;
             supply_incase ($type => $p);
             fws $s;
             $$s =~ /\G,/gc or last;
@@ -457,10 +549,17 @@ while (pos $$s < length $$s) {
     const $s => $r;
     fws $s;
   } elsif ($$s =~ /\Gexception\b/gc) {
-    my $except = $r->append_new_node (type => '#element', local_name => 'Exception');
+    my $except = $r->append_new_node (type => '#element',
+                                      local_name => 'ExceptionDef');
+    $etUsed->{ExceptionDef} = 1;
     fws $s;
     $$s =~ /\G($NAME)/gc or err $s;
-    $except->set_attribute (Name => $1);
+    $except->append_new_node (type => '#element', local_name => 'QName',
+                              value => $1)
+           ->set_attribute (For => q<ManakaiDOM:ForIF>);
+    $except->append_new_node (type => '#element', local_name => 'QName',
+                              value => "** $1")
+           ->set_attribute (For => q<ManakaiDOM:ForClass>);
     level $except;
     fws $s;
     $$s =~ /\G\{/gc or err $s;
@@ -468,11 +567,14 @@ while (pos $$s < length $$s) {
     fws $s;
     while (my $type = type $s) {
       fws $s;
-      my $attr = $except->append_new_node (type => '#element', local_name => 'Attr');
+      my $attr = $except->append_new_node
+                             (type => '#element', local_name => 'Attr');
+      $etUsed->{Attr} = 1;
       $$s =~ /\G($NAME)/gc or err $s;
       $attr->set_attribute (Name => idlname2name $1);
       $attr->get_attribute ('Get', make_new_node => 1)
            ->set_attribute (Type => $type);
+      $etUsed->{Get} = 1;
       fws $s;
       semicolon $s or err $s;
       fws $s;
@@ -482,23 +584,30 @@ while (pos $$s < length $$s) {
   } elsif ($$s =~ /\Gvaluetype\b/gc) {
     fws $s;
     my $valtype = $r->append_new_node (type => '#element',
-                                       local_name => 'DataType');
+                                       local_name => 'DataTypeDef');
+    $etUsed->{DataTypeDef} = 1;
     my $type = type $s or err $s;
-    $valtype->set_attribute (Name => $type);
+    $valtype->set_attribute (QName => $type);
     fws $s;
     $$s =~ /\G([^;]+)/gc or err $s;
     $valtype->set_attribute (Def => $1)
-            ->set_attribute (Type => q<lang:IDL-DOM>);
+            ->set_attribute (ContentType => q<lang:IDL-DOM>);
     fws $s;
   } elsif ($$s =~ /\Gtypedef\b/gc) {
     fws $s;
     my $type = type $s or err $s;
     fws $s;
     my $valtype = $r->append_new_node (type => '#element', 
-                                       local_name => 'DataTypeAlias');
+                                       local_name => 'DataTypeDef');
+    $etUsed->{DataTypeDef} = 1;
     my $name = $$s =~ /\G($NAME)/gc ? $1 : err $s;
-    $valtype->set_attribute (Name => $name);
-    $valtype->set_attribute (Type => $type);
+    $valtype->set_attribute (QName => $name);
+    $valtype->set_attribute (AliasFor => $type)
+            ->set_attribute (For => q<!ManakaiDOM:IDL>);
+    for ($valtype->set_attribute (Def => undef)) {
+      $_->set_attribute ('DISLang:dataTypeAliasFor' => $type);
+      $_->set_attribute (For => q<ManakaiDOM:IDL>);
+    }
     $Status->{datatype_defined}->{$name} = 1;
     fws $s;
   } else {
@@ -514,5 +623,208 @@ semicolon $s;
 fws $s;
 
 $$s =~ /\G./gc and err $s;
+
+if ($etUsed->{IF}) {
+  my $etb = $tree->append_new_node (type => '#element',
+                                    local_name => 'ElementTypeBinding');
+  $etb->set_attribute (Name => 'IF');
+  $etb->set_attribute (ElementType => 'dis:ResourceDef');
+  my $sc = $etb->set_attribute (ShadowContent => undef);
+  $sc->append_new_node (type => '#element',
+                        local_name => 'rdf:type',
+                        value => q<dis:MultipleResource>)
+     ->set_attribute (ForCheck => q<!ManakaiDOM:ForIF !ManakaiDOM:ForClass>);
+  $sc->set_attribute (ForCheck => q<ManakaiDOM:DOM>);
+  
+  $sc->append_new_node (type => '#element',
+                        local_name => 'resourceFor',
+                        value => q<ManakaiDOM:ForIF>);
+  $sc->append_new_node (type => '#element',
+                        local_name => 'rdf:type',
+                        value => 'ManakaiDOM:IF')
+     ->set_attribute (ForCheck => 'ManakaiDOM:ForIF');
+  $sc->append_new_node (type => '#element',
+                        local_name => 'ISA',
+                        value => '::ManakaiDOM:ManakaiDOM')
+     ->set_attribute (ForCheck => 'ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM '.
+                                  '!=ManakaiDOM:ManakaiDOM');
+  
+  $sc->append_new_node (type => '#element',
+                        local_name => 'resourceFor',
+                        value => q<ManakaiDOM:ForClass>)
+     ->set_attribute (FprCheck => q<ManakaiDOM:ManakaiDOM >.
+                                  q<!=ManakaiDOM:ManakaiDOM>);
+  $sc->append_new_node (type => '#element',
+                        local_name => 'rdf:type',
+                        value => 'ManakaiDOM:Class')
+     ->set_attribute (ForCheck => 'ManakaiDOM:ForClass');
+  $sc->append_new_node (type => '#element',
+                        local_name => 'ISA',
+                        value => 'ManakaiDOM:ManakaiDOMObject')
+     ->set_attribute (ForCheck => 'ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM '.
+                                  '!=ManakaiDOM:ManakaiDOM');
+}
+
+if ($etUsed->{ExceptionDef}) {
+  my $etb = $tree->append_new_node (type => '#element',
+                                    local_name => 'ElementTypeBinding');
+  $etb->set_attribute (Name => 'ExceptionDef');
+  $etb->set_attribute (ElementType => 'dis:ResourceDef');
+  my $sc = $etb->set_attribute (ShadowContent => undef);
+  $sc->append_new_node (type => '#element',
+                        local_name => 'rdf:type',
+                        value => q<dis:MultipleResource>)
+     ->set_attribute (ForCheck => q<!ManakaiDOM:ForIF !ManakaiDOM:ForClass>);
+  $sc->set_attribute (ForCheck => q<ManakaiDOM:DOM>);
+  
+  $sc->append_new_node (type => '#element',
+                        local_name => 'resourceFor',
+                        value => q<ManakaiDOM:ForIF>);
+  $sc->append_new_node (type => '#element',
+                        local_name => 'rdf:type',
+                        value => 'ManakaiDOM:ExceptionIF')
+     ->set_attribute (ForCheck => 'ManakaiDOM:ForIF');
+  $sc->append_new_node (type => '#element',
+                        local_name => 'ISA',
+                        value => '::ManakaiDOM:ManakaiDOM')
+     ->set_attribute (ForCheck => 'ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM '.
+                                  '!=ManakaiDOM:ManakaiDOM');
+  
+  $sc->append_new_node (type => '#element',
+                        local_name => 'resourceFor',
+                        value => q<ManakaiDOM:ForClass>)
+     ->set_attribute (FprCheck => q<ManakaiDOM:ManakaiDOM >.
+                                  q<!=ManakaiDOM:ManakaiDOM>);
+  $sc->append_new_node (type => '#element',
+                        local_name => 'rdf:type',
+                        value => 'ManakaiDOM:ExceptionClass')
+     ->set_attribute (ForCheck => 'ManakaiDOM:ForClass');
+  $sc->append_new_node (type => '#element',
+                        local_name => 'ISA',
+                        value => 'ManakaiDOM:ManakaiDOMException')
+     ->set_attribute (ForCheck => 'ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM '.
+                                  '!=ManakaiDOM:ManakaiDOM');
+}
+
+if ($etUsed->{Method}) {
+  my $etb = $tree->append_new_node (type => '#element',
+                                    local_name => 'ElementTypeBinding');
+  $etb->set_attribute (Name => 'Method');
+  $etb->set_attribute (ElementType => 'dis:ResourceDef');
+  my $sc = $etb->set_attribute (ShadowContent => undef);
+  $sc->set_attribute ('rdf:type' => q<ManakaiDOM:DOMMethod>);
+  $sc->set_attribute (ForCheck => q<ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM>);
+
+  {
+    my $etb = $tree->append_new_node (type => '#element',
+                                      local_name => 'ElementTypeBinding');
+    $etb->set_attribute (Name => 'Param');
+    $etb->set_attribute (ElementType => 'dis:ResourceDef');
+    my $sc = $etb->set_attribute (ShadowContent => undef);
+    $sc->set_attribute ('rdf:type' => q<ManakaiDOM:DOMMethodParameter>);
+  }
+
+  {
+    my $etb = $tree->append_new_node (type => '#element',
+                                      local_name => 'ElementTypeBinding');
+    $etb->set_attribute (Name => 'Return');
+    $etb->set_attribute (ElementType => 'dis:ResourceDef');
+    my $sc = $etb->set_attribute (ShadowContent => undef);
+    $sc->set_attribute ('rdf:type' => q<ManakaiDOM:DOMMethodReturn>);
+  }
+}
+
+if ($etUsed->{Attr}) {
+  my $etb = $tree->append_new_node (type => '#element',
+                                    local_name => 'ElementTypeBinding');
+  $etb->set_attribute (Name => 'Attr');
+  $etb->set_attribute (ElementType => 'dis:ResourceDef');
+  my $sc = $etb->set_attribute (ShadowContent => undef);
+  $sc->set_attribute ('rdf:type' => q<ManakaiDOM:DOMAttribute>);
+  $sc->set_attribute (ForCheck => q<ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM>);
+
+  {
+    my $etb = $tree->append_new_node (type => '#element',
+                                      local_name => 'ElementTypeBinding');
+    $etb->set_attribute (Name => 'Get');
+    $etb->set_attribute (ElementType => 'dis:ResourceDef');
+    my $sc = $etb->set_attribute (ShadowContent => undef);
+    $sc->set_attribute ('rdf:type' => q<ManakaiDOM:DOMAttrGet>);
+  }
+
+  {
+    my $etb = $tree->append_new_node (type => '#element',
+                                      local_name => 'ElementTypeBinding');
+    $etb->set_attribute (Name => 'Set');
+    $etb->set_attribute (ElementType => 'dis:ResourceDef');
+    my $sc = $etb->set_attribute (ShadowContent => undef);
+    $sc->set_attribute ('rdf:type' => q<ManakaiDOM:DOMAttrSet>);
+  }
+}
+
+if ($etUsed->{Exception}) {
+  my $etb = $tree->append_new_node (type => '#element',
+                                    local_name => 'ElementTypeBinding');
+  $etb->set_attribute (Name => 'Exception');
+  $etb->set_attribute (ElementType => 'ManakaiDOM:raises');
+}
+
+if ($etUsed->{Exception} or $etUsed->{ConstGroup}) {
+  my $etb = $tree->append_new_node (type => '#element',
+                                    local_name => 'ElementTypeBinding');
+  $etb->set_attribute (Name => 'ConstGroup');
+  $etb->set_attribute (ElementType => 'dis:ResourceDef');
+  my $sc = $etb->set_attribute (ShadowContent => undef);
+  $sc->set_attribute ('rdf:type' => q<ManakaiDOM:ConstGroup>);
+  $sc->set_attribute (ForCheck => q<ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM>);
+  $etb->clone->set_attribute (Name => 'XConstGroup')
+    if $etUsed->{Exception};
+
+  {
+    my $etb = $tree->append_new_node (type => '#element',
+                                      local_name => 'ElementTypeBinding');
+    $etb->set_attribute (Name => 'Const');
+    $etb->set_attribute (ElementType => 'dis:ResourceDef');
+    my $sc = $etb->set_attribute (ShadowContent => undef);
+    $sc->set_attribute ('rdf:type' => q<ManakaiDOM:Const>);
+  }
+
+  {
+    my $etb = $tree->append_new_node (type => '#element',
+                                      local_name => 'ElementTypeBinding');
+    $etb->set_attribute (Name => 'XParam');
+    $etb->set_attribute (ElementType =>
+                           'ManakaiDOM:exceptionOrWarningParameter');
+    my $sc = $etb->set_attribute (ShadowContent => undef);
+    $sc->set_attribute (ForCheck => q<ManakaiDOM:ManakaiDOM>);
+  }
+}
+
+{
+  my $etb = $tree->append_new_node (type => '#element',
+                                    local_name => 'ElementTypeBinding');
+  $etb->set_attribute (Name => 'PerlDef');
+  $etb->set_attribute (ElementType => 'dis:Def');
+  my $sc = $etb->set_attribute (ShadowContent => undef);
+  $sc->set_attribute (ContentType => q<lang:Perl>);
+}
+
+if ($etUsed->{InCase}) {
+  my $etb = $tree->append_new_node (type => '#element',
+                                    local_name => 'ElementTypeBinding');
+  $etb->set_attribute (Name => 'InCase');
+  $etb->set_attribute (ElementType => 'dis:ResourceDef');
+  my $sc = $etb->set_attribute (ShadowContent => undef);
+  $sc->set_attribute ('rdf:type' => q<ManakaiDOM:InCase>);
+}
+
+if ($etUsed->{DataTypeDef}) {
+  my $etb = $tree->append_new_node (type => '#element',
+                                    local_name => 'ElementTypeBinding');
+  $etb->set_attribute (Name => 'DataTypeDef');
+  $etb->set_attribute (ElementType => 'dis:ResourceDef');
+  my $sc = $etb->set_attribute (ShadowContent => undef);
+  $sc->set_attribute ('rdf:type' => q<ManakaiDOM:DataType>);
+}
 
 print $tree->stringify;

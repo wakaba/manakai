@@ -39,7 +39,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/31 12:03:40 $
+      $Date: 2005/01/05 12:19:39 $
     @@ContentType:
       dis:Date.RCS
 
@@ -979,6 +979,110 @@ ImplNote:
 
 IF:
   @Name:
+    @@@: HTMLDOMImplementation
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @ISA:
+    @@@: 
+      DOMCore:DOMImplementation
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  
+  @Name:
+    @@@: ManakaiDOMHTMLDOMImplementation
+    @@ForCheck:
+      ManakaiDOM:ForClass
+  @ISA:
+    @@@: 
+      DOMCore:ManakaiDOMImplementation
+    @@ForCheck:
+      ManakaiDOM:ForClass
+
+  @For:
+    ManakaiDOM:ManakaiDOMLatest
+  @For:
+    =ManakaiDOM:ManakaiDOM
+  @DOMMain:implementFeature: HTMLFeature20
+
+  @Description:
+    @@lang:en
+    @@@:
+      A DOM implementation with HTML-specific methods. 
+      \
+      {NOTE:: The <IF::HTMLDOMImplementation> was part of 
+              the W3C's DOM Level 2 HTML Candicate Recommendation 
+              but later removed.  The manakai DOM implementation 
+              has been decided to include this interface since 
+              there are a number of implementations supporting 
+              the <M::HTMLDOMImplementation.createHTMLDocument> method 
+              and the DOM Level 3 Core Specification belives:-) that 
+              there is a <M::createHTMLDocument> method. 
+      \
+      }
+
+  @Method:
+    @@Name: createHTMLDocument
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates an <IF::HTMLDocument> object with the minimal tree 
+        made of <HE::html>, <HE::head>, <HE::title> and <HE::body> elements. 
+        \
+        {NOTE:: This method creates a (non-XML) HTML document.  To create 
+                a XHTML document, use <M::DOMCore:DOMImplementation.
+                createDocument> with a root element type 
+                <Q::xhtml1:html> or with an appropriate document type 
+                node. 
+        \
+        }
+    
+    @@For:
+      ManakaiDOM:ManakaiDOMLatest
+    
+    @@Param:
+      @@@Name:title
+      @@@Type:
+        DOMMain:DOMString
+      @@@actualType:
+        DOMMain:ManakaiDOMString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The title of the document to create.  It is set as the content of 
+          the <HE::title> element, through a child <IF::DOMCore:Text> node. 
+    @@Return:
+      @@@Type: HTMLDocument
+      @@@actualType: ManakaiDOMHTMLDocument
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A newly created HTML document.
+      @@@PerlDef:
+          my $node = $r-><M::DOMCore:ManakaiDOMDocument.newObject>;
+          $node->{<Q::DOMCore:implementation>} = $self;
+          $node->{<Q::ManakaiDOM:implID>}
+                = $self->{<Q::TreeCore:node>}->{<Q::ManakaiDOM:implID>};
+          $node->{<Q::DOMCore:hasFeature>}->{HTML} = 1;
+          $r = <ClassM::DOMCore:ManakaiDOMNode.getNodeReference> ($node);
+          $r-><M::DOMCore:Node.appendChild>
+                  (my $html = $r-><M::DOMCore:Document.createElement>
+                                    ('HTML'));
+          $html-><M::DOMCore:Node.appendChild>
+                     (my $head = $r-><M::DOMCore:Document.createElement>
+                                           ('HEAD'));
+          $head-><M::DOMCore:Node.appendChild>
+                     (my $titleEl = $r-><M::DOMCore:Document.createElement>
+                                           ('TITLE'));
+          if (length $title) {
+            $titleEl-><M::DOMCore:Node.appendChild>
+                         ($r-><M::DOMCore:Document.createTextNode> ($title));
+          }
+          $html-><M::DOMCore:Node.appendChild>
+                     ($r-><M::DOMCore:Document.createElement>
+                                           ('BODY'));
+
+IF:
+  @Name:
     @@@: HTMLDocument
     @@ForCheck:
       ManakaiDOM:ForIF
@@ -1636,7 +1740,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
-      rdfs:Property
+      rdf:Property
     @@AliasFor: 
       @@@@:
         ::ManakaiDOM:all

@@ -14,8 +14,10 @@ PERL_CHK = $(PERL) -c -w
 
 DISC_PL = $(MANAKAI_BIN_DIR)disc.pl
 DISC = $(PERL) $(DISC_PL) -I=$(MANAKAI_LIB_MANAKAI_DIR)
+CDIS2PM_OPTIONS = --enable-assert
+                  ## TODO: Official release should remove this option.
 CDIS2PM_PL = ../../../bin/cdis2pm.pl
-CDIS2PM = $(PERL) $(CDIS2PM_PL)
+CDIS2PM = $(PERL) $(CDIS2PM_PL) $(CDIS2PM_OPTIONS)
 DIS2POD_PL = ../../../bin/dis2pm.pl
 DIS2POD = $(PERL) $(DIS2POD_PL) --output-pod=only
 
@@ -66,7 +68,7 @@ html.cdis: ls.cdis DOMHTML.dis DOMWebForms.dis $(DISC_PL)
 
 DOMMain.pm: core.cdis $(CDIS2PM_PL)
 	$(CDIS2PM) $< --for="$(NS_MANAKAIDOM)ManakaiDOMCommon" \
-	  --module-name=DOMMain > $@
+	  --module-name=DOMMain --nooutput-module-version > $@
 	$(CDIS2PM) $< --for="$(NS_MANAKAIDOM)ManakaiDOMLatest" \
 	  --module-name=DOMMain >> $@
 	$(PERL_CHK) $@
