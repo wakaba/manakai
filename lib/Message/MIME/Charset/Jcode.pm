@@ -9,19 +9,70 @@ with jcode.pl and/or Jcode.pm for Message::* Perl Modules
 Message::* therselves don't convert coding systems of parts of
 messages, but have mechanism to define to call external functions.
 This module provides such macros for Japanese coding systems,
-supported by jcode.pl and/or Jcode.pm.
+supported by jcode.pl, Jcode.pm and/or other modules.
+
+=head1 USAGE
+
+  use Message::MIME::Charset::Jcode $module_name;
+
+where $module_name is name of module.  List of it is shown below:
+
+=over 4
+
+=item 'jcode.pl'
+
+jcode.pl L<lt>http://srekcah.org/jcode/>
+
+=item 'Jcode' or 'Jcode.pm'
+
+Jcode.pm L<lt>http://openlab.ring.gr.jp/Jcode/index-j.html>
+
+=item 'NKF' or 'NKF.pm'
+
+Network Kanji Filter (Perl module version)
+L<lt>http://bw-www.ie.u-ryukyu.ac.jp/~kono/software.html>
+
+=item 'Unicode::Japanese' or 'Unicode::Japanese.pm'
+
+Unicode::Japanese L<lt>http://tech.ymirlink.co.jp/>
+
+=back
+
+When this module is C<use>d multiple times with different
+conversion module name, latest one is used.  For example,
+
+  use Message::MIME::Charset::Jcode 'jcode.pl';
+  use Message::MIME::Charset::Jcode 'Jcode';
+
+results to instruct to use Jcode.pm.
+
+  use Message::MIME::Charset::Jcode 'Jcode';
+  use Message::MIME::Charset::Jcode 'jcode.pl';
+
+This example code leads a bit different result.  Jcode.pm can 
+treat UTF-8, but jcode.pl cann't.  So convertion from/to UTF-8
+is done by Jcode.pm.  But between other coding systems such as EUC-JP
+E<lt>-E<gt> Shift JIS, jcode.pl is used.
+
+Note that this module does not support Encode modules available
+with Perl 5.7 or later.  It will be supported by
+Message::MIME::Charset::Encode.
 
 =cut
 
 package Message::MIME::Charset::Jcode;
 use strict;
 use vars qw(%CODE $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::MIME::Charset;
 
-=head1 CODING SYSTEMS
+=head1 CODING SYSTEMS NAMES
+
+These names can be used as the value of L</VARIABLES>.
+(These name are NOT same as MIME charset name, which is acutually
+written down in message header fields.)
 
 =over 4
 
@@ -42,12 +93,14 @@ Shift JIS.  (MIME: Shift_JIS)
 
 =item C<utf8>
 
-UTF-8.  (MIME: UTF-8)  This coding system is not supported by jcode.pl.
+UTF-8.  (MIME: UTF-8)  This coding system is not supported by jcode.pl
+and NKF.pm.
 
 =item C<ucs2>
 
 UCS-2 (or Unicode without surrogate pairs) big endian (network
-byte order).  This coding system is not supported by jcode.pl.
+byte order).  This coding system is not supported by jcode.pl
+and NKF.pm.
 
 =back
 
@@ -72,9 +125,9 @@ Coding system of output string.  (Default: C<jis>)
 
 =cut
 
-$CODE{internal} = 'euc';
-$CODE{input} = '';
-$CODE{output} = 'jis';
+$CODE{internal} = 'euc';	## default: 'euc' / 'utf8' (Unicode::Japanese)
+$CODE{input} = '';	## default: auto-detect
+$CODE{output} = 'jis';	## default: 'jis'
 
 sub import ($;%) {
   shift;
@@ -89,21 +142,7 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset ('iso-2022-jp' =>
         encoder	=> sub {
           my $s = jcode::jis ($_[1], $CODE{internal});
-          if ($s =~ /\x1B\x28[^BJ]|\x1B\x24\x28[^D]|\x1B\x24[^\x28\x40B]/) {
-            if ($s =~ /\x1B\x28[^B]|\x1B\x24[^\x28]|\x1B\x24\x28[^OP]/) {
-              ($s, charset => 'junet');
-            } elsif ($s =~ /\x1B\x24\x28P/) {
-              ($s, charset => 'iso-2022-jp-3');
-            } else {
-              ($s, charset => 'iso-2022-jp-3-plane1');
-            }
-          } elsif ($s =~ /\x1B\x24\x28D/) {
-            ($s, charset => 'iso-2022-jp-1');
-          } elsif ($s =~ /\x1B\x28[BJ]|\x1B\x24[\x40B]/) {
-            ($s, charset => 'iso-2022-jp');
-          } else {
-            ($s, charset => 'us-ascii');
-          }
+          ($s, iso_2022_mime_charset_name ($s));
         },
         decoder	=> sub { jcode::to ($CODE{internal}, $_[1], 'jis') },
         mime_text	=> 1,
@@ -145,22 +184,8 @@ sub import ($;%) {
       );
       Message::MIME::Charset::make_charset ('iso-2022-jp' =>
         encoder	=> sub {
-          my $s = Jcode->new ($_[1], $CODE{internal})->iso_2022_jp;
-          if ($s =~ /\x1B\x28[^BJ]|\x1B\x24\x28[^D]|\x1B\x24[^\x28\x40B]/) {
-            if ($s =~ /\x1B\x28[^B]|\x1B\x24[^\x28]|\x1B\x24\x28[^OP]/) {
-              ($s, charset => 'junet');
-            } elsif ($s =~ /\x1B\x24\x28P/) {
-              ($s, charset => 'iso-2022-jp-3');
-            } else {
-              ($s, charset => 'iso-2022-jp-3-plane1');
-            }
-          } elsif ($s =~ /\x1B\x24\x28D/) {
-            ($s, charset => 'iso-2022-jp-1');
-          } elsif ($s =~ /\x1B\x28[BJ]|\x1B\x24[\x40B]/) {
-            ($s, charset => 'iso-2022-jp');
-          } else {
-            ($s, charset => 'us-ascii');
-          }
+          my $s = Jcode->new ($_[1], $CODE{internal})->jis; ## ->iso_2022_jp;
+          ($s, iso_2022_mime_charset_name ($s));
         },
         decoder	=> sub { my $s = $_[1]; Jcode::convert (\$s, $CODE{internal}, 'jis'); $s },
         mime_text	=> 1,
@@ -204,9 +229,147 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset ('ucs-2' => alias_of => 'ucs-2be');
       Message::MIME::Charset::make_charset ('utf-16' => alias_of => 'ucs-2');
       Message::MIME::Charset::make_charset ('utf-16be' => alias_of => 'ucs-2be');
+    } elsif ($_ eq 'NKF' || $_ eq 'NKF.pm') {
+      unless ($NKF::VERSION) {
+        eval { use NKF } or Carp::croak ("Message::MIME::Charset::Jcode: NKF: $@");
+      }
+      Message::MIME::Charset::make_charset ('*default' =>
+        encoder	=> sub { nkf ( "-".    substr ($CODE{output},   0, 1)
+                            . " -".uc (substr ($CODE{internal}, 0, 1)), $_[1] ) },
+        decoder	=> sub { nkf ( "-".    substr ($CODE{internal}, 0, 1)
+                            . " -".uc (substr ($CODE{input},    0, 1)), $_[1] ) },
+        mime_text	=> 1,
+      );
+      Message::MIME::Charset::make_charset ('iso-2022-jp' =>
+        encoder	=> sub {
+          my $s = nkf ( "-j -".uc (substr ($CODE{internal}, 0, 1)), $_[1] );
+          ($s, iso_2022_mime_charset_name ($s));
+        },
+        decoder	=> sub { nkf ( "-". substr ($CODE{internal}, 0, 1) . " -J", $_[1] ) },
+        mime_text	=> 1,
+        cte_7bit_preferred	=> 'base64',
+      );
+      Message::MIME::Charset::make_charset ('euc-jp' =>
+        encoder	=> sub {
+          my $s = nkf ( "-e -".uc (substr ($CODE{internal}, 0, 1)), $_[1] );
+          if ($s =~ /[\x80-\xFF]/) {
+            ($s, charset => 'euc-jp');
+          } else {
+            ($s, charset => 'us-ascii');
+          }
+        },
+        decoder	=> sub { nkf ( "-". substr ($CODE{internal}, 0, 1) . " -E", $_[1] ) },
+        mime_text	=> 1,
+      );
+      Message::MIME::Charset::make_charset (shift_jis =>
+        encoder	=> sub {
+          my $s = nkf ( "-s -".uc (substr ($CODE{internal}, 0, 1)), $_[1] );
+          if ($s =~ /[\x80-\xFF]/) {
+            ($s, charset => 'shift_jis');
+          } elsif ($s =~ /[\x5C\x7E]/) {
+            ($s, charset => 'jis_x0201');
+          } else {
+            ($s, charset => 'us-ascii');
+          }
+        },
+        decoder	=> sub { nkf ( "-". substr ($CODE{internal}, 0, 1) . " -S", $_[1] ) },
+        mime_text	=> 1,
+      );
+    } elsif ($_ eq 'Unicode::Japanese' || $_ eq 'Unicode::Japanese.pm') {
+      require Unicode::Japanese;
+      $CODE{internal} = 'utf8';
+      Message::MIME::Charset::make_charset ('*default' =>
+        ## Very tricky:-)
+        encoder	=> sub { Unicode::Japanese->new ($_[1], $CODE{internal})->conv ($CODE{output}) },
+        decoder	=> sub { Unicode::Japanese->new ($_[1], $CODE{input} || 'auto')->conv ($CODE{internal}) },
+        mime_text	=> 1,
+      );
+      Message::MIME::Charset::make_charset ('iso-2022-jp' =>
+        encoder	=> sub {
+          my $s = Unicode::Japanese->new ($_[1], $CODE{internal})->jis;
+          ($s, iso_2022_mime_charset_name ($s));
+        },
+        decoder	=> sub { Unicode::Japanese->new ($_[1], 'jis')->conv ($CODE{internal}) },
+        mime_text	=> 1,
+        cte_7bit_preferred	=> 'base64',
+      );
+      Message::MIME::Charset::make_charset ('euc-jp' =>
+        encoder	=> sub {
+          my $s = Unicode::Japanese->new ($_[1], $CODE{internal})->euc;
+          if ($s =~ /[\x80-\xFF]/) {
+            ($s, charset => 'euc-jp');
+          } else {
+            ($s, charset => 'us-ascii');
+          }
+        },
+        decoder	=> sub { Unicode::Japanese->new ($_[1], 'euc')->conv ($CODE{internal}) },
+        mime_text	=> 1,
+      );
+      Message::MIME::Charset::make_charset (shift_jis =>
+        encoder	=> sub {
+          my $s = Unicode::Japanese->new ($_[1], $CODE{internal})->sjis;
+          if ($s =~ /[\x80-\xFF]/) {
+            ($s, charset => 'shift_jis');
+          } elsif ($s =~ /[\x5C\x7E]/) {
+            ($s, charset => 'jis_x0201');
+          } else {
+            ($s, charset => 'us-ascii');
+          }
+        },
+        decoder	=> sub { Unicode::Japanese->new ($_[1], 'sjis')->conv ($CODE{internal}) },
+        mime_text	=> 1,
+      );
+      Message::MIME::Charset::make_charset ('utf-8' =>
+        encoder	=> sub { Unicode::Japanese->new ($_[1], $CODE{internal})->utf8 },
+        decoder	=> sub { Unicode::Japanese->new ($_[1], 'utf8')->conv ($CODE{internal}) },
+        mime_text	=> 1,
+      );
+      Message::MIME::Charset::make_charset ('ucs-2' =>
+        encoder	=> sub { "\xFF\xFE".Unicode::Japanese->new ($_[1], $CODE{internal})->ucs2 },
+        decoder	=> sub { Unicode::Japanese->new ($_[1], 'ucs2')->conv ($CODE{internal}) },
+      );
+      Message::MIME::Charset::make_charset ('ucs-2be' =>
+        encoder	=> sub { Unicode::Japanese->new ($_[1], $CODE{internal})->ucs2 },
+        decoder	=> sub { Unicode::Japanese->new ($_[1], 'ucs2')->conv ($CODE{internal}) },
+      );
+      Message::MIME::Charset::make_charset ('utf-16' =>
+        encoder	=> sub { "\xFF\xFE".Unicode::Japanese->new ($_[1], $CODE{internal})->utf16 },
+        decoder	=> sub { Unicode::Japanese->new ($_[1], 'utf16')->conv ($CODE{internal}) },
+      );
+      Message::MIME::Charset::make_charset ('utf-16be' =>
+        encoder	=> sub { Unicode::Japanese->new ($_[1], $CODE{internal})->utf16 },
+        decoder	=> sub { Unicode::Japanese->new ($_[1], 'utf16-ge')->conv ($CODE{internal}) },
+      );
+      Message::MIME::Charset::make_charset ('utf-16le' =>
+        #encoder	=> sub { Unicode::Japanese->new ($_[1], $CODE{internal})->utf16 },
+        decoder	=> sub { Unicode::Japanese->new ($_[1], 'utf16-le')->conv ($CODE{internal}) },
+      );
+      Message::MIME::Charset::make_charset ('ucs-2le' => alias_of => 'utf-16le');
+      Message::MIME::Charset::make_charset ('utf-32' =>
+        encoder	=> sub { "\x00\x00\xFF\xFE".Unicode::Japanese->new ($_[1], $CODE{internal})->ucs4 },
+        decoder	=> sub { Unicode::Japanese->new ($_[1], 'utf32')->conv ($CODE{internal}) },
+      );
+      Message::MIME::Charset::make_charset ('ucs-4' =>
+        encoder	=> sub { "\x00\x00\xFF\xFE".Unicode::Japanese->new ($_[1], $CODE{internal})->ucs4 },
+        decoder	=> sub { Unicode::Japanese->new ($_[1], 'ucs4')->conv ($CODE{internal}) },
+      );
+      Message::MIME::Charset::make_charset ('utf-32be' =>
+        encoder	=> sub { Unicode::Japanese->new ($_[1], $CODE{internal})->ucs4 },
+        decoder	=> sub { Unicode::Japanese->new ($_[1], 'utf32-ge')->conv ($CODE{internal}) },
+      );
+      Message::MIME::Charset::make_charset ('ucs-4be' =>
+        encoder	=> sub { Unicode::Japanese->new ($_[1], $CODE{internal})->ucs4 },
+        decoder	=> sub { Unicode::Japanese->new ($_[1], 'ucs4')->conv ($CODE{internal}) },
+      );
+      Message::MIME::Charset::make_charset ('utf-32le' =>
+        #encoder	=> sub { Unicode::Japanese->new ($_[1], $CODE{internal})->utf32 },
+        decoder	=> sub { Unicode::Japanese->new ($_[1], 'utf32-le')->conv ($CODE{internal}) },
+      );
+      Message::MIME::Charset::make_charset ('ucs-4le' => alias_of => 'utf-32le');
     } else {
       Carp::croak "Jcode: $_: Module not supported";
     }
+    ## Defines common alias names
     Message::MIME::Charset::make_charset (jis => alias_of => 'iso-2022-jp');
     Message::MIME::Charset::make_charset (junet => alias_of => 'iso-2022-jp');
     Message::MIME::Charset::make_charset ('iso-2022-jp-1' => alias_of => 'iso-2022-jp');
@@ -231,6 +394,26 @@ sub import ($;%) {
     Message::MIME::Charset::make_charset (jis_x0201 => alias_of => 'shift_jis');
     Message::MIME::Charset::make_charset (x0201 => alias_of => 'jis_x0201');
   }
+}
+
+## Returns MIME charset of 7bit ISO 2022 (*junet* family)
+sub iso_2022_mime_charset_name ($) {
+  my $s = shift;
+          if ($s =~ /\x1B\x28[^BJ]|\x1B\x24\x28[^D]|\x1B\x24[^\x28\x40B]/) {
+            if ($s =~ /\x1B\x28[^B]|\x1B\x24[^\x28]|\x1B\x24\x28[^OP]/) {
+              (charset => 'junet');
+            } elsif ($s =~ /\x1B\x24\x28P/) {
+              (charset => 'iso-2022-jp-3');
+            } else {
+              (charset => 'iso-2022-jp-3-plane1');
+            }
+          } elsif ($s =~ /\x1B\x24\x28D/) {
+            (charset => 'iso-2022-jp-1');
+          } elsif ($s =~ /\x1B\x28[BJ]|\x1B\x24[\x40B]/) {
+            (charset => 'iso-2022-jp');
+          } else {
+            (charset => 'us-ascii');
+          }
 }
 
 =head1 EXAMPLE
@@ -288,7 +471,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/01 05:33:52 $
+$Date: 2002/06/06 09:37:42 $
 
 =cut
 
