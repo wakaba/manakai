@@ -29,7 +29,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/08/29 13:34:38 $
+     $Date: 2004/08/31 10:00:51 $
   @Require:
     @@Module:
       @@@Def:
@@ -276,7 +276,7 @@ DataTypeAlias:
 
 IF:
   @Name:  DOMImplementationRegistry
-  @Level[list]:    3
+  @Level[list]: 3
   @Spec:
     @@DOM3[list]:
       DOM3Core:core.html#Bootstrap
@@ -292,13 +292,14 @@ IF:
         \
         The DOMImplementationRegistry
         is initialized by application or implementation, depenging on
-        the context, by first checking the value of the 
+        the context, by first checking the values of the 
         array @org::w3c::dom::DOMImplementationSourceList,
-        names of classes implementing the DOMImplementationSource
+        i.e. names of classes implementing the DOMImplementationSource
         interface.
         \
         DOMImplementationSource classes are not
-        instantiated at this stage, while in Java Binding they are.
+        instanciated at this stage, while in Java Binding they are
+        instanciated.
     @@Return:
       @@@Type: DOMImplementationRegistry
       @@@Def:
@@ -313,14 +314,14 @@ IF:
         @@@Type:  DOMString
         @@@Description:
           @@@@lang:en
-          @@@@@: The desired features that must be implemented.
+          @@@@@: A list of desired features that must be implemented.
      @@Return:
        @@@Type:  DOMImplementation
        @@@Description:
          @@@@lang:en
          @@@@@:
            The first implementation that has the derired features.
-       @@@Result:
+       @@@InCase:
          @@@@Value: null
          @@@@Description:
            @@@@@lang:en
@@ -338,6 +339,9 @@ IF:
      @@Param:
         @@@Name:  features
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: A list of desired features that must be implemented.
      @@Return:
        @@@Type:  DOMImplementationList
        @@@Description:
@@ -358,14 +362,14 @@ IF:
     @@Description:
       @@@lang:en
       @@@@:
-        Add a DOMImplementationSource object to the list.
+        Add a DOMImplementationSource to the list.
         (Taken from DOM Java Binding.)
     @@Param:
       @@@Name: s
       @@@Type: DOMImplementationSource
       @@@Description:
         @@@@lang:en
-        @@@@@: The DOMImplementationSource to be registered.
+        @@@@@: A DOMImplementationSource to be registered.
     @@Return:
       @@@Exception:
         @@@@Type:

@@ -32,7 +32,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/08/30 07:53:48 $
+     $Date: 2004/08/31 10:00:51 $
   @Require:
     @@Module:
       @@@Name: ManakaiDOM
@@ -194,7 +194,7 @@ IF:
         @@@Type:  unsigned-long
         @@@Description:
           @@@@lang:en
-          @@@@@: An integral index, starting from 0.
+          @@@@@: An integral index, starting from zero.
      @@Return:
         @@@Type:  DOMString
         @@@Def:
@@ -393,7 +393,7 @@ IF:
       @@@Type: DOMImplementationList
       @@@Description:
         @@@@lang:en
-        @@@@@: Construct a new instance of DOMImplementationList.
+        @@@@@: Construct a new instance of the DOMImplementationList.
       @@@Def:
         @@@@Type:
           lang:Perl
@@ -407,17 +407,21 @@ IF:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          A list of DOMImplementation objects.  Instead of a DOMImplementationList
-          object, one or more DOMImplementation and/or DOMImplementationList
-          objects can be specified.
+          A list of DOMImplementations.
+      @@@InCase:
+        @@@@Label: One or more DOMImplementations and/or DOMImplementationLists
+        @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             DOMImplementations and/or lists of them to be added.
     @@Return:
       @@@Description:
         @@@@lang: en
-        @@@@@: Append one or more DOMImplementation objects to the list.
+        @@@@@: Append one or more DOMImplementations to the list.
       @@@Def:
         @@@@Type:
           lang:Perl
-        @@@@preprocess: none
+        @@@@auto-argument: 0
         @@@@@:
           my $self = shift;
           for (@_) {

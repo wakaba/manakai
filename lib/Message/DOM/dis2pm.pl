@@ -100,6 +100,7 @@ sub perl_name ($;%) {
   my ($s, %opt) = @_;
   $s =~ s/[- ](.|$)/uc $1/ge;
   $s = ucfirst $s if $opt{ucfirst};
+  $s = uc $s if $opt{uc};
   $s;
 }
 
@@ -423,11 +424,24 @@ sub get_perl_definition_node ($%) {
     my ($me, $you) = @_;
     $you->local_name eq $ln and
     expanded_uri $you->get_attribute_value ('Type', default => '')
-      eq ExpandedURI q<lang:Perl>;
+      eq ExpandedURI q<lang:Perl> and
+    condition_match ($you, %opt);
   }) || $node->get_element_by (sub {
     my ($me, $you) = @_;
     $you->local_name eq $ln and
-    not $you->get_attribute_value ('Type', default => '');
+    not $you->get_attribute_value ('Type', default => '') and
+    condition_match ($you, %opt);
+  }) || $node->get_element_by (sub {
+    my ($me, $you) = @_;
+    $you->local_name eq $ln and
+    expanded_uri $you->get_attribute_value ('Type', default => '')
+      eq ExpandedURI q<lang:Perl> and
+    condition_match ($you); # no condition specified
+  }) || $node->get_element_by (sub {
+    my ($me, $you) = @_;
+    $you->local_name eq $ln and
+    not $you->get_attribute_value ('Type', default => '') and
+    condition_match ($you); # no condition specified
   });
   $def;
 }
@@ -481,6 +495,20 @@ sub get_level_description ($%) {
   $r;
 }
 
+sub get_incase_label ($;%) {
+  my ($node, %opt) = @_;
+  my $label = $node->get_attribute_value ('Label', default => '');
+  unless (length $label) {
+    $label = $node->get_attribute_value ('Value', default => '');
+    if (length $label) {
+      $label = $opt{is_pod} ? pod_code $label : $label;
+    } else {
+      $label = type_label expanded_uri $node->get_attribute_value
+                                              ('Type', default => '');
+    }
+  }
+  $label;
+}
 
 sub register_namespace_declaration ($) {
   my $node = shift;
@@ -646,21 +674,35 @@ sub if2perl ($) {
     $result .= $version;
 
     for (@{$node->child_nodes}) {
-      next unless condition_match $_, level_default => \@level,
-                                  condition => $condition;
+      my $gt = 0;
+      unless (condition_match $_, level_default => \@level,
+                                  condition => $condition) {
+        if (condition_match $_, level_default => \@level,
+                                condition => $condition, ge => 1) {
+          $gt = 1;
+        } else {
+          next;
+        }
+      }
       
       if ($_->local_name eq 'Method' or
           $_->local_name eq 'IntMethod' or
           $_->local_name eq 'ReMethod') {
-        $result .= method2perl ($_, level => \@level, condition => $condition);
+        $result .= method2perl ($_, level => \@level, condition => $condition)
+          unless $gt;
       } elsif ($_->local_name eq 'Attr' or
                $_->local_name eq 'IntAttr' or
                $_->local_name eq 'ReAttr') {
-        
+        # unless $gt
       } elsif ($_->local_name eq 'ConstGroup') {
-        
+        $result .= constgroup2perl ($_, level => \@level,
+                                    condition => $condition,
+                                    without_document => $gt,
+                                    package => $cond_int_pack_name);
       } elsif ($_->local_name eq 'Const') {
-
+        $result .= const2perl ($_, level => \@level, condition => $condition,
+                               package => $cond_int_pack_name)
+          unless $gt;
       } elsif ({qw/Name 1 Spec 1 ISA 1 Description 1
                    Level 1/}->{$_->local_name}) {
         #
@@ -734,6 +776,16 @@ sub method2perl ($;%) {
         push @param_desc, pod_item (pod_code '$' . $name),
                           pod_para get_description $_;
         $param_prototype .= '$';
+        my @param_desc_val;
+        for (@{$_->child_nodes}) {
+          next unless $_->local_name eq 'InCase';
+          push @param_desc_val, pod_item ('Value: ' .
+                                          get_incase_label $_, is_pod => 1),
+                                pod_para (get_description $_);
+        }
+        if (@param_desc_val) {
+          push @param_desc, pod_list 4, @param_desc_val;
+        }
       }
     }
   }
@@ -760,8 +812,12 @@ sub method2perl ($;%) {
   }
 
   my @return;
-  my $code_node = get_perl_definition_node $return;
-  my $int_code_node = get_perl_definition_node $return, name => 'IntDef';
+  my $code_node = get_perl_definition_node $return,
+                              condition => $opt{condition},
+                              level_default => $opt{level_default};
+  my $int_code_node = get_perl_definition_node $return, name => 'IntDef',
+                              condition => $opt{condition},
+                              level_default => $opt{level_default};
   my $code = '';
   my $int_code = '';
   if ($code_node) {
@@ -782,7 +838,8 @@ sub method2perl ($;%) {
     $code = perl_statement (perl_assign 'my (' .
                                         join (', ', '$self', @param_list) .
                                         ')' => '@_') .
-            $code;
+            $code
+       if $code_node->get_attribute_value ('auto-argument', default => 1);
     if ($int_code_node) {
       $int_code = perl_code_source (perl_code ($int_code_node->value),
                                     path => $int_code_node->node_path
@@ -794,7 +851,8 @@ sub method2perl ($;%) {
       $int_code = perl_statement (perl_assign 'my (' .
                                         join (', ', '$self', @param_list) .
                                         ')' => '@_') .
-                  $int_code;
+                  $int_code
+         if $code_node->get_attribute_value ('auto-argument', default => 1);
     }
 
     if ($has_return) {
@@ -805,7 +863,7 @@ sub method2perl ($;%) {
                     pod_para (get_description $return);
     }
     for (@{$return->child_nodes}) {
-      next unless $_->local_name eq 'Result';
+      next unless $_->local_name eq 'InCase';
       my $label = $_->get_attribute_value ('Label', default => '');
       unless (length $label) {
         $label = $_->get_attribute_value ('Value', default => '');
@@ -844,15 +902,15 @@ sub method2perl ($;%) {
                            ($has_return == 1 ? q<the value:>
                                              : q<either:>);
     } else {
-      push @desc, pod_para q<This method does not return value,
+      push @desc, pod_para q<This method does not return any value,
                              but it might raise > .
                            ($has_return == 1 ? q<an exception:>
                                              : q<one of exceptions from:>);
     }
     push @desc, pod_list 4, @return;
   } else {
-    push @desc, pod_para q<This method results in neither value returned
-                           nor exceptions.>;
+    push @desc, pod_para q<This method does not return any value
+                           nor does raise any exceptions.>;
   }
 
   if ($node->local_name eq 'IntMethod' or
@@ -877,8 +935,8 @@ sub method2perl ($;%) {
 
 =cut
 
-sub datatype2perl ($) {
-  my $node = shift;
+sub datatype2perl ($;%) {
+  my ($node, %opt) = @_;
   local $Status->{depth} = $Status->{depth} + 1;
   my $pack_name = perl_package_name
                     name => my $if_name
@@ -889,31 +947,131 @@ sub datatype2perl ($) {
   $result .= perl_statement perl_assign 'our $VERSION', version_date time;
   $result .= perl_statement 'push our @ISA, ' .
                             perl_list perl_package_name (if => $if_name);
-  my @level;
+  my @level = @{$opt{level} || []};
   my $mod = get_level_description $node, level => \@level;
   $mod = ', that has been ' . $mod if $mod;
   $result .= pod_block
                pod_head ($Status->{depth}, 'Type ' . pod_code $if_name),
                pod_paras (get_description ($node));
 
+## TODO: Def
+
   for (@{$node->child_nodes}) {
-    if ($_->local_name eq 'Method' or
-        $_->local_name eq 'IntMethod' or
-        $_->local_name eq 'ReMethod') {
-      $result .= method2perl ($_, level => \@level);
-    } elsif ($_->local_name eq 'Attr' or
-             $_->local_name eq 'IntAttr' or
-             $_->local_name eq 'ReAttr') {
+    if ($_->local_name eq 'IntMethod') {
+      $result .= method2perl ($_, level => \@level, 
+                              condition => $opt{condition});
+    } elsif ($_->local_name eq 'IntAttr') {
       
     } elsif ($_->local_name eq 'ConstGroup') {
-      
+      $result .= constgroup2perl ($_, level => \@level, 
+                                  condition => $opt{condition},
+                                  package => $pack_name);
     } elsif ($_->local_name eq 'Const') {
-
+      $result .= const2perl ($_, level => \@level,
+                             condition => $opt{condition},
+                             package => $pack_name);
+    } elsif ({qw/Name 1 Spec 1 ISA 1 Description 1
+                 Level 1 Def 1/}->{$_->local_name}) {
+      #
+    } else {
+      valid_warn qq{Element @{[$_->local_name]} not supported};
     }
   }
 
   $result;
 } # datatype2perl
+
+sub constgroup2perl ($;%);
+sub constgroup2perl ($;%) {
+  my ($node, %opt) = @_;
+  local $Status->{depth} = $Status->{depth} + 1;
+  my $name = perl_name $node->get_attribute_value ('Name');
+  local $Status->{IF} = $name;
+  my @level = @{$opt{level} || []};
+  my $mod = get_level_description $node, level => \@level;
+  my $result = '';
+
+  my $i = 0;
+  for (@{$node->child_nodes}) {
+    my $only_document = $opt{only_document} || 0;
+    unless ($_->node_type eq '#element' and
+            condition_match $_, level_default => \@level,
+                                condition => $opt{condition}) {
+      $only_document = 1;
+    }
+
+    if ($_->local_name eq 'ConstGroup') {
+      $result .= constgroup2perl ($_, level => \@level, 
+                                  condition => $opt{condition},
+                                  without_document => $opt{without_document},
+                                  only_document => $only_document,
+                                  package => $opt{package});
+      $i++;
+    } elsif ($_->local_name eq 'Const') {
+      $result .= const2perl ($_, level => \@level, condition => $opt{condition},
+                             without_document => $opt{without_document},
+                             only_document => $only_document,
+                             package => $opt{package});
+      $i++;
+    } elsif ({qw/Name 1 Spec 1 ISA 1 Description 1
+                 Level 1 Def 1/}->{$_->local_name}) {
+      #
+    } else {
+      valid_warn qq{Element @{[$_->local_name]} not supported};
+    }
+  }
+
+  return $result if $opt{without_document};
+
+  $result = pod_block
+              (pod_head ($Status->{depth}, 'Constant Group ' . pod_code $name),
+               pod_paras (get_description ($node)),
+               ($mod ? pod_para ('This constant group has been ' . $mod . '.')
+                    : ()),
+               pod_para ('This constant group has ' .
+                         english_number $i, singular => q<value.>,
+                                            plural => q<values.>)) .
+            $result;
+
+  $result;
+} # constgroup2perl
+
+sub const2perl ($;%) {
+  my ($node, %opt) = @_;
+  local $Status->{depth} = $Status->{depth} + 1;
+  my $name = perl_name $node->get_attribute_value ('Name');
+  my $longname = perl_var local_name => $name,
+                          package => {full_name => $opt{package} ||
+                                                   $Info->{Package}};
+  local $Status->{IF} = $name;
+  my @level = @{$opt{level} || []};
+  my $mod = get_level_description $node, level => \@level;
+  my @desc =  (pod_head ($Status->{depth}, 'Constant Value ' . pod_code $name),
+               pod_paras (get_description ($node)),
+               ($mod ? pod_para ('This constant value has been ' . $mod . '.')
+                     : ()));
+## TODO:   push @desc,  'To export...
+  
+  my $result = '';
+  unless ($opt{only_document}) {
+    $result = perl_sub name => $longname, prototype => '',
+                       code => get_perl_definition $node, name => 'Value';
+## TODO: Value should be Type sensible (DOMString should be quoted)
+    $result .= perl_statement
+                 perl_assign
+                      perl_var (type => '*',
+                                package => {full_name => $Info->{Package}},
+                                local_name => $name)
+                   => '\&' . $longname
+       if $opt{package} and $Info->{Package} ne $opt{package};
+  }
+
+  unless ($opt{without_document}) {
+    $result = pod_block (@desc) . $result;
+  }
+
+  $result;
+} # const2perl
 
 =head2 Require element
 
@@ -1169,9 +1327,9 @@ for my $node (@{$source->child_nodes}) {
   } elsif ($node->local_name eq 'DataTypeAlias') {
     
   } elsif ($node->local_name eq 'ConstGroup') {
-
+    $result .= constgroup2perl $node;
   } elsif ($node->local_name eq 'Const') {
-
+    $result .= const2perl $node;
   } elsif ($node->local_name eq 'Module' or $node->local_name eq 'Namespace') {
     #
   } else {
@@ -1228,6 +1386,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/08/30 07:53:48 $
+# $Date: 2004/08/31 10:00:51 $
 
 

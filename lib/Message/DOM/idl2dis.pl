@@ -144,6 +144,12 @@ sub const ($$) {
   level $const;
 }
 
+sub idlname2name ($) {
+  my $s = shift;
+  $s =~ s/^_//;
+  $s;
+}
+
 sub semicolon ($) {
   my $s = shift;
   $$s =~ /\G;/gc or return 0;
@@ -247,7 +253,7 @@ for my $module ($tree->append_new_node (type => '#element',
   $module->set_attribute (Name => q<## TBD ##>);
   $module->set_attribute (Namespace => q<:: TBD ::>);
   $module->set_attribute (License => q<license:Perl>);
-  $module->set_attribute ('Date.RCS' => q<$Date: 2004/08/30 07:53:48 $>);
+  $module->set_attribute ('Date.RCS' => q<$Date: 2004/08/31 10:00:51 $>);
 }
 
 fws $s;
@@ -307,7 +313,7 @@ while (pos $$s < length $$s) {
           $type = type $s or err $s;
           fws $s;
           $$s =~ /\G($NAME)/gc or err $s;
-          $attr->set_attribute (Name => $1);
+          $attr->set_attribute (Name => idlname2name $1);
           fws $s;
           $attr->get_attribute ('Get', make_new_node => 1)
                ->set_attribute (Type => $type);
@@ -320,13 +326,13 @@ while (pos $$s < length $$s) {
         } else {
           my $method = $if->append_new_node (type => '#element', local_name => 'Method');
           if ($$s =~ /\G($NAME)/gc) {
-            $method->set_attribute (Name => $1);
+            $method->set_attribute (Name => idlname2name $1);
             unless ($type eq 'void') {
               $method->get_attribute ('Return', make_new_node => 1)
                      ->set_attribute (Type => $type);
             }
           } else {
-            $method->set_attribute (Name => $type);
+            $method->set_attribute (Name => idlname2name $type);
           }
           fws $s;
           $$s =~ /\G\(/gc or err $s;
@@ -342,7 +348,7 @@ while (pos $$s < length $$s) {
             }
             my $p = $method->append_new_node (type => '#element', local_name => 'Param');
             $$s =~ /\G($NAME)/gc or err $s;
-            $p->set_attribute (Name => $1);
+            $p->set_attribute (Name => idlname2name $1);
             $p->set_attribute (Type => $type);
             $p->set_attribute (Write => 0) unless $in;
             fws $s;
@@ -381,7 +387,7 @@ while (pos $$s < length $$s) {
       fws $s;
       my $attr = $except->append_new_node (type => '#element', local_name => 'Attr');
       $$s =~ /\G($NAME)/gc or err $s;
-      $attr->set_attribute (Name => $1);
+      $attr->set_attribute (Name => idlname2name $1);
       $attr->get_attribute ('Get', make_new_node => 1)
            ->set_attribute (Type => $type);
       fws $s;
