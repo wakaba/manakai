@@ -16,7 +16,13 @@ GetOptions (
   'help' => \$Opt{help},
   'input-cdis-file-name=s' => \$Opt{input_file_name},
   'output-file-name=s' => \$Opt{output_file_name},
-  'search-path|I=s' => ($Opt{module_file_search_path} = []),
+  'search-path|I=s' => sub {
+    shift;
+    my @value = split /\s+/, shift;
+    while (my ($ns, $path) = splice @value, 0, 2, ()) {
+      push @{$Opt{input_search_path}->{$ns} ||= []}, $path;
+    }
+  },
   'undef-check!' => \$Opt{no_undef_check},
   'verbose!' => $Opt{verbose},
 ) or pod2usage (2);
@@ -54,22 +60,33 @@ $doc->dis_database ($db);
 
 my $for = $Opt{for};
 $for = $doc->module_element->default_for_uri unless length $for;
+print STDERR qq<Loading definition of "$file_name" for <$for>...\n>;
 
 $db->load_module ($doc, sub ($$$$$$) {
   my ($self, $db, $uri, $ns, $ln, $for) = @_;
+  print STDERR qq<Loading definition of "$ln" for <$for>...\n>;
+
+  ## -- Already in database
   my $doc = $db->get_source_file ($ns.$ln);
-  return $doc if $doc; ## Already in database
+  return $doc if $doc;
   
+  ## -- Finds the source file
+  require File::Spec;
+  for my $dir ('.', @{$Opt{input_search_path}->{$ns}||[]}) {
+    my $name = Cwd::abs_path
+                  (File::Spec->canonpath
+                       (File::Spec->catfile ($dir, $ln.'.dis')));
+    if (-f $name) {
+      my $doc = dac_load_module_file ($db, $parser, $name, $base_path);
+      $doc->dis_database ($db);
+      return $doc;
+    }
+  }
+
+  ## -- Not found
+  return undef;
 }, for_arg => $for);
 
-use Data::Dumper;
-print Dumper $db;
-
-#my $source = dis_load_module_file 
-#                 (module_file_name => $Opt{file_name},
-#                  For => $Opt{For},
-#                  use_default_for => 1,
-#                  module_file_search_path => $Opt{module_file_search_path});
 #$State->{def_required}->{For}->{$State->{DefaultFor}} ||= 1;
 #dis_check_undef_type_and_for () unless $Opt{no_undef_check};
 #if (dis_uri_for_match (ExpandedURI q<ManakaiDOM:Perl>, $State->{DefaultFor})) {
@@ -88,9 +105,11 @@ sub dac_load_module_file ($$$;$) {
   my $file_uri = URI::file->new ($file_name)->rel ($base_uri);
   my $dis = $db->get_source_file ($file_uri);
   unless ($dis) {
+    print STDERR qq<Opening file "$file_name"...>;
     open my $file, '<', $file_name or die "$0: $file_name: $!";
     $dis = $parser->parse ({character_stream => $file});
     $db->set_source_file ($file_uri => $dis);
+    print STDERR qq<done\n>;
   }
   $dis;
 }
@@ -104,3 +123,5 @@ __END__
 =head1 OPTIONS
 
 ...
+
+=cut

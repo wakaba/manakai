@@ -28,25 +28,33 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/21 08:06:19 $
+      $Date: 2005/02/27 14:27:56 $
     @@ContentType:
       dis:Date.RCS
   
   @Require:
     @@Module:
       @@@Name: DISIDL
+      @@@QName:
+        DISlib:DISIDL
       @@@WithFor:
         ManakaiDOM:all
     @@Module:
       @@@Name: DISPerl
+      @@@QName:
+        DISlib:DISPerl
       @@@WithFor:
         ManakaiDOM:all
     @@Module:
       @@@Name:ManakaiNode
+      @@@QName:
+        Util:ManakaiNode
       @@@WithFor:
         ManakaiDOM:all
     @@Module:
       @@@Name: DOMException
+      @@@QName:
+        UtilError:DOMException
       @@@WithFor:
         ManakaiDOM:all
     @@Module:
@@ -89,6 +97,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @dis2pm:
     http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
+  @DISlib:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
   @DOMEvents:
     http://suika.fam.cx/~wakaba/archive/2004/dom/events#
   @DOMMain:
@@ -114,6 +124,10 @@ Namespace:
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
   @TreeCore:\
+  @Util:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
+  @UtilError:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/
   @xml:
     http://www.w3.org/XML/1998/namespace
   @xmlns:

@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/02/26 11:35:51 $
+      $Date: 2005/02/27 14:27:56 $
     @@ContentType:
       dis:Date.RCS
   
@@ -40,18 +40,26 @@ Module:
         ManakaiDOM:all
     @@Module:
       @@@Name: DISIDL
+      @@@QName:
+        DISlib:DISIDL
       @@@WithFor:
         ManakaiDOM:all
     @@Module:
       @@@Name: DOMException
+      @@@QName:
+        UtilError:DOMException
       @@@WithFor:
         ManakaiDOM:all
     @@Module:
       @@@Name: DOMBoot
+      @@@QName:
+        MDOM:DOMBoot
       @@@WithFor:
         ManakaiDOM:ManakaiDOM
     @@Module:
       @@@Name: DOMBoot
+      @@@QName:
+        MDOM:DOMBoot
       @@@WithFor:
         ManakaiDOM:ManakaiDOMLatest
     @@Module:
@@ -73,6 +81,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
   @DISLang:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Lang#
+  @DISlib:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
   @DOMCore:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @DOMLS:
@@ -87,6 +97,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @Markup:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup#
+  @MDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @owl:
@@ -100,6 +112,8 @@ Namespace:
   @swcfg21:
     http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
   @TreeCore:\
+  @UtilError:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/
 
 ResourceDef:
   @QName:
@@ -402,7 +416,7 @@ IFClassDef:
                 MDOMX:param-name => 'node',
               }__;
             }
-            redo ANCESTOR if $this_node = $self-><AG::SWCFGNode.parentNode>;
+            redo ANCESTOR if $this_node = $this_node-><AG::SWCFGNode.parentNode>;
           }
 
           if ($node-><M::SWCFGNode.nodeType> eq '#fragment') {
@@ -2623,8 +2637,14 @@ IFClassDef:
       @@@PerlDef:
         __CODE{expandNamespace}__;
         if (defined $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>}) {
-          $r = $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>} .
-               $self->{<Q::TreeCore:node>}->{<Q::localName>};
+          if ($self->{<Q::TreeCore:node>}
+                   ->{<Q::namespaceURI>} eq <Q::RealName>) {
+            $r = $self->{<Q::TreeCore:node>}->{<Q::shadowNamespaceURI>} .
+                 $self->{<Q::TreeCore:node>}->{<Q::shadowLocalName>};
+          } else {
+            $r = $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>} .
+                 $self->{<Q::TreeCore:node>}->{<Q::localName>};
+          }
         } else {
           $r = $self->{<Q::TreeCore:node>}->{<Q::localName>};
         }
@@ -3047,11 +3067,14 @@ IFClassDef:
         my $__od = $node->{<Q::DOMCore:ownerDocument>};
         if ($__od->{<Q::etBinding>}->{$__qn}) {
           my $b = $__od->{<Q::etBinding>}->{$__qn};
-          unless ($node->{<Q::namespaceExpanded>}) {
-            $node->{<Q::namespaceURI>} = <Q::RealName>;
+          $node->{<Q::namespaceURI>} = <Q::RealName>;
+          if ($node->{<Q::namespaceExpanded>}) {
+            $node->{<Q::localName>} = $__qn;
+          } else {
+            $node->{<Q::namespaceExpanded>} = true;
           }
           unless ($b->{namespaceExpanded}) {
-            if ($b->{shadowLocalName} =~ s/^([^:]*)://g) {
+            if ($b->{shadowLocalName} =~ s/^([^:]*)://) {
               my $__prefix = $1;
               __DEEP{
                 $b->{shadowNamespaceURI}

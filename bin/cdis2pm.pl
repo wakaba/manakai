@@ -356,8 +356,9 @@ sub perl_code ($;%) {
         } elsif ($et eq ExpandedURI q<disPerl:Code>) {  ## CODE constant
           my ($nm);
           $q =~ s/^\s+//;
-          if ($q =~ s/^((?>(?!::).)+)//) {
+          if ($q =~ s/^((?>(?!::).)+)//s) {
             $nm = $1;
+            $nm =~ tr/|/:/;
           } else {
             valid_err qq<"$q": Code name required>, node => $opt{node};
           }
@@ -2358,4 +2359,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/02/26 11:35:50 $
+1; # $Date: 2005/02/27 14:27:56 $
