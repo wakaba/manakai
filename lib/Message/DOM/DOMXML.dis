@@ -1,0 +1,529 @@
+Namespace:
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOMImplementationException:
+     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+Module:
+  @Name:  dom
+    @@Prefix:  w3c.org
+  @FullName:
+    @@lang:en
+    @@@: XML Module
+  @Spec:
+    @@DOM3:
+      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-BBACDC08
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @Package:
+    @@Type:
+      lang:Perl
+    @@@: DOMXML
+  
+  @Description:
+    @@lang:en
+    @@@:
+      DOM XML Module, as defined in DOM Core specifications.
+  
+  @License:
+     license:Perl
+  @Date.RCS:
+     $Date: 2004/08/21 05:42:50 $
+  @Require:
+    @@Module:
+      @@@Name: ManakaiDOM
+      @@@Namespace:
+        http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+    @@Module:
+      @@@Name: DOMMain
+      @@@Namepsace:
+        http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@use:
+          @@@@@@: __CLASS{DOMMain}__
+          @@@@@Import[list]:
+            :boolean
+            null
+    @@Module:
+      @@@Name: DOMCore
+      @@@Namepsace:
+        http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+
+  @Feature:
+    @@Name: XML
+    @@Version: 
+    @@Condition[list]:
+      DOM1
+      DOM2
+      DOM3
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-E067D597
+  @Feature:
+    @@Name: XML
+    @@Version: 1.0
+    @@Condition[list]:
+      DOM1
+      DOM2
+      DOM3
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-E067D597
+  @Feature:
+    @@Name: XML
+    @@Version: 2.0
+    @@Condition[list]:
+      DOM2
+      DOM3
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-E067D597
+  @Feature:
+    @@Name: XML
+    @@Version: 3.0
+    @@Condition[list]:
+      DOM3
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-E067D597
+  
+  @Feature:
+    @@Name: XMLVersion
+    @@Version: 1.0
+    @@Condition[list]:
+      DOM3
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#Document3-version
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-E067D597
+  @Feature:
+    @@Name: XMLVersion
+    @@Version: 1.1
+    @@Condition[list]:
+      DOM3
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#Document3-version
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-E067D597
+
+IF:
+  @Name:  CDATASection
+  @ISA[list]:  Text
+  @Spec:
+    @@DOM3[list]:
+      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-667469212
+  
+  @ReAttr:
+    @@Name: attributes
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-84CF096
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Get:
+      @@@Type: NamedNodeMap
+      @@@Def:
+        $r = null;
+  @ReAttr:
+    @@Name: nodeName
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Get:
+      @@@Type: DOMString
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = q<#cdata-section>;
+
+IF:
+  @Name:  DocumentType
+  @ISA[list]:  Node
+  @Spec:
+    @@DOM3[list]:
+      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-412266927
+  
+  @Attr:
+     @@Name:  name
+     @@Get:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  entities
+     @@Get:
+        @@@Type:  NamedNodeMap
+  @Attr:
+     @@Name:  notations
+     @@Get:
+        @@@Type:  NamedNodeMap
+  @Attr:
+     @@Name:  publicId
+     @@Get:
+        @@@Type:  DOMString
+     @@Level[list]:  2
+  @Attr:
+     @@Name:  systemId
+     @@Get:
+        @@@Type:  DOMString
+     @@Level[list]:  2
+  @Attr:
+     @@Name:  internalSubset
+     @@Get:
+        @@@Type:  DOMString
+     @@Level[list]:  2
+  
+  @ReAttr:
+    @@Name: attributes
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-84CF096
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Get:
+      @@@Type: NamedNodeMap
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = null;
+  @ReAttr:
+    @@Name: nodeValue
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D080
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Get:
+      @@@Type: DOMString
+      @@@Exception[list]: DOMException
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = null;
+    @@Set:
+      @@@Type: DOMString
+      @@@Exception[list]: DOMException
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          __EXCEPTION{ManakaiDOMImplementationException}{
+            -class => 'warn',
+            -type => 'ATTR_SET_NO_EFFECT',
+          }__;
+  @ReAttr:
+    @@Name: textContent
+    @@Spec:
+      @@@DOM3:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#Node3-textContent
+    @@Get:
+      @@@Type: DOMString
+      @@@Exception[list]: DOMException
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = null;
+    @@Set:
+      @@@Type: DOMString
+      @@@Exception[list]: DOMException
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          __EXCEPTION{ManakaiDOMImplementationException}{
+            -class => 'warn',
+            -type => 'ATTR_SET_NO_EFFECT',
+          }__;
+
+IF:
+  @Name:  Notation
+  @ISA[list]:  Node
+  @Spec:
+    @@DOM3[list]:
+      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-5431D1B9
+  
+  @Attr:
+     @@Name:  publicId
+     @@Get:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  systemId
+     @@Get:
+        @@@Type:  DOMString
+  
+  @ReAttr:
+    @@Name: attributes
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-84CF096
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Get:
+      @@@Type: NamedNodeMap
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = null;
+  @ReAttr:
+    @@Name: nodeValue
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D080
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Get:
+      @@@Type: DOMString
+      @@@Exception[list]: DOMException
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = null;
+    @@Set:
+      @@@Type: DOMString
+      @@@Exception[list]: DOMException
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          __EXCEPTION{ManakaiDOMImplementationException}{
+            -class => 'warn',
+            -type => 'ATTR_SET_NO_EFFECT',
+          }__;
+  @ReAttr:
+    @@Name: textContent
+    @@Spec:
+      @@@DOM3:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#Node3-textContent
+    @@Get:
+      @@@Type: DOMString
+      @@@Exception[list]: DOMException
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = null;
+    @@Set:
+      @@@Type: DOMString
+      @@@Exception[list]: DOMException
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          __EXCEPTION{ManakaiDOMImplementationException}{
+            -class => 'warn',
+            -type => 'ATTR_SET_NO_EFFECT',
+          }__;
+
+IF:
+  @Name:  Entity
+  @ISA[list]:  Node
+  @Spec:
+    @@DOM3[list]:
+      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-527DCFF2
+  
+  @Attr:
+     @@Name:  publicId
+     @@Get:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  systemId
+     @@Get:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  notationName
+     @@Get:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  inputEncoding
+     @@Get:
+        @@@Type:  DOMString
+     @@Level[list]:  3
+  @Attr:
+     @@Name:  xmlEncoding
+     @@Get:
+        @@@Type:  DOMString
+     @@Level[list]:  3
+  @Attr:
+     @@Name:  xmlVersion
+     @@Get:
+        @@@Type:  DOMString
+     @@Level[list]:  3
+  
+  @ReAttr:
+    @@Name: attributes
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-84CF096
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Get:
+      @@@Type: NamedNodeMap
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = null;
+  @ReAttr:
+    @@Name: nodeValue
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D080
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Get:
+      @@@Type: DOMString
+      @@@Exception[list]: DOMException
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = null;
+    @@Set:
+      @@@Type: DOMString
+      @@@Exception[list]: DOMException
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          __EXCEPTION{ManakaiDOMImplementationException}{
+            -class => 'warn',
+            -type => 'ATTR_SET_NO_EFFECT',
+          }__;
+
+IF:
+  @Name:  EntityReference
+  @ISA[list]:  Node
+  @Spec:
+    @@DOM3[list]:
+      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-11C98490
+  
+  @ReAttr:
+    @@Name: attributes
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-84CF096
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Get:
+      @@@Type: NamedNodeMap
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = null;
+  @ReAttr:
+    @@Name: nodeValue
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D080
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Get:
+      @@@Type: DOMString
+      @@@Exception[list]: DOMException
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = null;
+    @@Set:
+      @@@Type: DOMString
+      @@@Exception[list]: DOMException
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          __EXCEPTION{ManakaiDOMImplementationException}{
+            -class => 'warn',
+            -type => 'ATTR_SET_NO_EFFECT',
+          }__;
+
+IF:
+  @Name:  ProcessingInstruction
+  @ISA[list]:  Node
+  @Spec:
+    @@DOM3[list]:
+      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1004215813
+  
+  @Attr:
+     @@Name:  target
+     @@Get:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  data
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+        @@@Exception[list]:  DOMException
+  
+  @ReAttr:
+    @@Name: attributes
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-84CF096
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Get:
+      @@@Type: NamedNodeMap
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = null;
+
+IF:
+  @Name:  DocumentFragment
+  @ISA[list]:  Node
+  
+  @ReAttr:
+    @@Name: attributes
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-84CF096
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Get:
+      @@@Type: NamedNodeMap
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = null;
+  @ReAttr:
+    @@Name: nodeName
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Get:
+      @@@Type: DOMString
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = q<#document-fragment>;
+  @ReAttr:
+    @@Name: nodeValue
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D080
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Get:
+      @@@Type: DOMString
+      @@@Exception[list]: DOMException
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = null;
+    @@Set:
+      @@@Type: DOMString
+      @@@Exception[list]: DOMException
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          __EXCEPTION{ManakaiDOMImplementationException}{
+            -class => 'warn',
+            -type => 'ATTR_SET_NO_EFFECT',
+          }__;
+
+## DOMXML.dis ends here
