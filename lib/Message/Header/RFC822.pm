@@ -9,7 +9,7 @@ for RFC822 Namespaces of Header Fields
 package Message::Header::RFC822;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Header::Default;
 
 our %OPTION = %Message::Header::Default::OPTION;
@@ -18,6 +18,24 @@ $OPTION{namespace_phname} = 'x-rfc822';
 $OPTION{namespace_phname_goodcase} = 'X-RFC822';
 
 $OPTION{case_sensible} = 0;
+
+$OPTION{field_sort} = {qw/alphabetic 1 good-practice 1/};
+$OPTION{field_sort_good_practice_order} = {};
+{
+  my $i = 1;
+  for (
+    qw/mail-from x-envelope-from x-envelope-to resent- path/,
+    qw/return-path received date from subject sender to cc bcc/,	## Recommended by RFC 822
+    qw/message-id in-reply-to references keywords comments encrypted/,	## RFC 822 BNF order
+  ) {
+      $OPTION{field_sort_good_practice_order}->{$_} = $i++;
+  }
+  ## default = 999
+  $i = 1000;
+  for (qw/list- mime-version content- xref/) {
+      $OPTION{field_sort_good_practice_order}->{$_} = $i++;
+  }
+}
 
 $OPTION{goodcase} = {
 	fax	=> 'FAX',
@@ -215,6 +233,17 @@ $OPTION{namespace_phname} = 'content';
 $OPTION{namespace_phname_goodcase} = 'Content';
 $OPTION{namespace_phname_regex} = 'content';
 
+$OPTION{field_sort} = {qw/alphabetic 1 good-practice 1/};
+$OPTION{field_sort_good_practice_order} = {};
+{
+  my $i = 1;
+  for (
+    qw/type transfer-encoding id description/,	## RFC 2045 BNF order
+  ) {
+      $OPTION{field_sort_good_practice_order}->{$_} = $i++;
+  }
+}
+
 $OPTION{goodcase} = {
 	'id'	=> 'ID',
 	'md5'	=> 'MD5',
@@ -308,7 +337,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/19 11:49:46 $
+$Date: 2002/07/27 04:43:03 $
 
 =cut
 

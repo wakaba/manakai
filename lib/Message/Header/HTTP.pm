@@ -10,7 +10,7 @@ require Message::Header::Default;
 package Message::Header::HTTP;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 our %OPTION = %Message::Header::Default::OPTION;
 $OPTION{namespace_uri} = 'urn:x-suika-fam-cx:msgpm:header:http';
@@ -19,6 +19,33 @@ $OPTION{namespace_phname_goodcase} = 'X-HTTP';
 
 $OPTION{case_sensible} = 0;
 $OPTION{to_be_goodcase} = \&Message::Header::Default::_goodcase;
+
+$OPTION{field_sort} = {qw/alphabetic 1 good-practice 1/};
+$OPTION{field_sort_good_practice_order} = {};
+{
+  my $i = 1;
+  for (
+    qw/status/,	## CGI header
+    qw/man c-man opt c-opt ext c-ext
+       cache-control connection date pragma transfer-encoding upgrade trailer via
+       /,	## General-Headers
+    qw/accept accept-charset accept-encoding accept-language
+       authorization expect from host
+       if-modified-since if-match if-none-match if-range if-unmodified-since
+       max-forwards proxy-authorization range referer te user-agent/,	## Request-Headers
+    qw/accept-ranges age location proxy-authenticate retry-after server vary
+       warning www-authenticate/,	## Response-Headers
+    qw/allow etag expires last-modified link
+       mime-version content-/,	## Entity-Headers
+  ) {
+      $OPTION{field_sort_good_practice_order}->{$_} = $i++;
+  }
+  ## default = 999
+  $i = 1000;
+  for (qw/list- mime-version content- xref/) {
+      $OPTION{field_sort_good_practice_order}->{$_} = $i++;
+  }
+}
 
 $OPTION{goodcase} = {
 	'pics-label'	=> 'PICS-Label',
@@ -116,7 +143,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/08 11:47:20 $
+$Date: 2002/07/27 04:43:03 $
 
 =cut
 

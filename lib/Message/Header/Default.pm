@@ -9,7 +9,7 @@ for Default Namespace of Header Fields
 package Message::Header::Default;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Header;
 
 our %OPTION;
@@ -30,6 +30,9 @@ $OPTION{namespace_phname_goodcase} = 'default';
 
 ## `Good' & dotted prefix name of this namespace (ex. "prefix.name", "prefix2.name")
 $OPTION{namespace_good_prefix} = 'DEFAULT';
+
+## Sort fields (0 / 'alphabetic' / ref(CODE)
+$OPTION{field_sort} = 0;
 
 ## Field body data type (specified by package name)
 $OPTION{value_type} = {
@@ -73,6 +76,72 @@ sub _name_n11n ($$$) {
   }
 }
 
+sub sort_good_practice ($$\@\%) {
+  my ($hdr, $array, $nspack, $option) = @_;
+  if ($option->{field_sort} eq 'good-practice') {
+    no strict 'refs';
+    my $order = ${ $nspack.'::OPTION' }{field_sort_good_practice_order};
+    my $mynsuri = ${ $nspack.'::OPTION' }{namespace_uri};
+    my $mynsprefix = ${ $nspack.'::OPTION' }{namespace_phname};
+    return sort {
+      if ($a->{ns} eq $b->{ns}) {
+        if ($a->{ns} eq $mynsuri) {
+          $order->{ $a->{name} } ||= 999;
+          $order->{ $b->{name} } ||= 999;
+          
+          $order->{ $a->{name} } <=> $order->{ $b->{name} }
+          || $a->{name} cmp $b->{name};
+        } else { #($a->{ns} eq $b->{ns})
+          my $nspack = Message::Header::_NS_uri2package ($a->{ns});
+          my $sort = ${ $nspack.'::OPTION' }{field_sort};
+          if ($sort->{'good-practice'}) {
+            my $order = ${ $nspack.'::OPTION' }{field_sort_good_practice_order};
+            $order->{ $a->{name} } ||= 999;
+            $order->{ $b->{name} } ||= 999;
+            
+            $order->{ $a->{name} } <=> $order->{ $b->{name} }
+            || $a->{name} cmp $b->{name};
+          } elsif ($sort->{alphabetic}) {
+            $a->{name} cmp $b->{name};
+          } else {
+            1;	## Isn't supported
+          }
+        }
+      } else {	## $a->{ns} ne $b->{ns}
+        if ($a->{ns} eq $mynsuri) {
+          my $bp = ($hdr->{ns}->{uri2phname}->{ $b->{ns} } || $b->{ns}).'-';
+          $bp =~ s/^\Q$mynsprefix\E-//;
+          $order->{ $a->{name} } ||= 999;
+          $order->{ $bp } ||= 999;
+          
+          $order->{ $a->{name} } <=> $order->{ $bp }
+          || $a->{name} cmp $bp;
+        } elsif ($b->{ns} eq $mynsuri) {
+          my $ap = ($hdr->{ns}->{uri2phname}->{ $a->{ns} } || $a->{ns}).'-';
+          $ap =~ s/^\Q$mynsprefix\E-//;
+          $order->{ $ap } ||= 999;
+          $order->{ $b->{name} } ||= 999;
+          
+          $order->{ $ap } <=> $order->{ $b->{name} }
+          || $ap cmp $b->{name};
+        } else {
+          my $ap = ($hdr->{ns}->{uri2phname}->{ $a->{ns} } || $a->{ns}).'-';
+          my $bp = ($hdr->{ns}->{uri2phname}->{ $b->{ns} } || $b->{ns}).'-';
+          $ap =~ s/^\Q$mynsprefix\E-//;
+          $bp =~ s/^\Q$mynsprefix\E-//;
+          
+          $order->{ $ap } ||= 999;
+          $order->{ $bp } ||= 999;
+          
+          $order->{ $ap } <=> $order->{ $bp }
+          || $ap cmp $bp;
+        }
+      }
+    } @$array;
+  }
+  @$array;
+}
+
 package Message::Header::XCGI;
 our %OPTION = %Message::Header::Default::OPTION;
 $OPTION{namespace_uri} = 'urn:x-suika-fam-cx:msgpm:header:http:cgi:x';
@@ -114,7 +183,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/13 09:29:12 $
+$Date: 2002/07/27 04:43:03 $
 
 =cut
 
