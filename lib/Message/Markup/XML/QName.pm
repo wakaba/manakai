@@ -16,7 +16,7 @@ This module is part of manakai XML.
 
 package Message::Markup::XML::QName;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NCNameStartChar InXMLNCNameChar!;
 use Exporter;
 our @ISA = qw/Exporter/;
@@ -179,7 +179,11 @@ sub __check_name ($$$) {
 sub prefix_to_name ($$;%);
 sub prefix_to_name ($$;%) {
   my ($decls, $prefix, %opt) = @_;
-  if ($opt{check_prefix}) {
+  if ($opt{use_xml} and $prefix eq 'xml') {
+    return {success => 1, prefix => $prefix, name => NS_xml_URI};
+  } elsif ($opt{use_xmlns} and $prefix eq 'xmlns') {
+    return {success => 1, prefix => $prefix, name => NS_xmlns_URI};
+  } elsif ($opt{check_prefix}) {
     my $chk = __check_prefix ($decls, $prefix, \%opt);
     return $chk unless $chk->{success};
     $prefix = $chk->{prefix};
@@ -217,8 +221,12 @@ sub prefix_to_name ($$;%) {
 
 sub name_to_prefix ($$;%);
 sub name_to_prefix ($$;%) {
-  my ($decls, $name, %opt) = @_;
-  if ($opt{check_name}) {
+  my ($decls, $name, %opt) = @_;Carp::croak if not defined $name;
+  if ($opt{use_xml} and $name eq NS_xml_URI) {
+    return {success => 1, prefix => 'xml', name => $name};
+  } elsif ($opt{use_xmlns} and $name eq NS_xmlns_URI) {
+    return {success => 1, prefix => 'xmlns', name => $name};
+  } elsif ($opt{check_name}) {
     my $chk = __check_name ($decls, $name, \%opt);
     return $chk unless $chk->{success};
     $name = $chk->{name};
@@ -399,4 +407,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/11/01 12:20:57 $
+1; # $Date: 2003/11/09 01:46:42 $
