@@ -37,6 +37,22 @@ use Message::Util::QName::General [qw/ExpandedURI/], {
 my $ManakaiDOMModulePrefix = q<Message::DOM>;
 my $MAX_DOM_LEVEL = 3;
 
+use Getopt::Long;
+my %Opt;
+GetOptions (
+  'help' => \$Opt{help},
+  'output-pod=s' => \$Opt{output_pod},
+  'output-pod-file=s' => \$Opt{output_pod_file},
+) or pod2usage (2);
+if ($Opt{help}) {
+  pod2usage (0);
+  exit;
+} elsif (($Opt{output_pod} ||= 'no') eq 'file' and
+         not defined $Opt{output_pod_file}) {
+  pod2usage (2);
+  exit 2;
+}
+
 my $s;
 {
   local $/ = undef;
@@ -46,9 +62,28 @@ my $source = Message::Markup::SuikaWikiConfig20::Parser->parse_text ($s);
 my $Info = {};
 my $Status = {package => 'main', depth => 0, generated_fragment => 0};
 our $result = '';
+my $result_pod;
 
 BEGIN {
   require 'manakai/genlib.pl';
+}
+
+if ($Opt{output_pod} eq 'no') {
+  eval q{
+    sub pod_block (@) {
+      return '';
+    }
+  };
+} elsif ($Opt{output_pod} eq 'only' or
+         $Opt{output_pod} eq 'file') {
+  eval q{
+    sub pod_block (@) {
+      my @v = grep ((defined and length), @_);
+      $result_pod .= join "\n\n", '', ($v[0] =~ /^=/ ? () : '=pod'), @v,
+                                  '=cut', '';
+      return '';
+    }
+  };
 }
 
 sub perl_package_name (%) {
@@ -906,8 +941,8 @@ sub qname_label ($;%) {
           $Status->{ns_in_doc}->{$prefix} = $uri;
         }
       } else {
-        valid_err q<Namespace prefix "$prefix" not defined>,
-          node => $node->get_attribute ('QName');
+        valid_err qq<Namespace prefix "$prefix" not defined>,
+          node => defined $opt{qname} ? undef : $node->get_attribute ('QName');
       } 
   }
 
@@ -2188,11 +2223,7 @@ sub if2perl ($) {
     for my $pack ($cond_pack_name, $cond_int_pack_name,
                   $cond_iif_pack_name, $cond_if_pack_name,
                   $cond_iint_pack_name) {
-      $result .= perl_statement perl_assign
-                   perl_var (type => '$',
-                             package => {full_name => $pack},
-                             local_name => 'VERSION')
-                   => version_date time;
+      $Status->{def_pack}->{$pack} = 1;
     }
 
     my @feature;
@@ -3099,13 +3130,8 @@ sub datatype2perl ($;%) {
   }
   $result .= perl_inherit [@isa, perl_package_name (name => 'ManakaiDOMObject'),
                            perl_package_name (if => $if_name)];
-  for my $pack ({full_name => $pack_name}, {if => $if_name}) {
-    $result .= perl_statement perl_assign
-                 perl_var (type => '$',
-                           package => $pack,
-                           local_name => 'VERSION')
-                 => version_date time;
-  }
+  $Status->{def_pack}->{$pack_name} = 1;
+  $Status->{def_pack}->{perl_package_name if => $if_name} = 1;
   
   my @level = @{$opt{level} || []};
   my $mod = get_level_description $node, level => \@level;
@@ -3174,13 +3200,7 @@ sub datatypealias2perl ($;%) {
   my $result = perl_package full_name => $pack_name;
   $result .= perl_inherit [perl_package_name (full_name => $real_name),
                            perl_package_name (if => $if_name)];
-  for my $pack ({if => $if_name}) {
-    $result .= perl_statement perl_assign
-                 perl_var (type => '$',
-                           package => $pack,
-                           local_name => 'VERSION')
-                 => version_date time;
-  }
+  $Status->{def_pack}->{perl_package_name if => $if_name} = 1;
   
   my @level = @{$opt{level} || []};
   my $mod = get_level_description $node, level => \@level;
@@ -3226,7 +3246,7 @@ sub exception2perl ($;%) {
   my $type = $node->local_name eq 'Exception' ? 'Exception' : 'Warning';
   local $Status->{IF} = $if_name;
   my $result = perl_package full_name => $pack_name;
-  $result .= perl_statement perl_assign 'our $VERSION', version_date time;
+  $Status->{def_pack}->{$pack_name} = 1;
   my @isa = perl_package_name (if => $if_name);
   if ($if_name eq 'ManakaiDOM'.$type) {
     push @isa, perl_package_name name => 'ManakaiDOMExceptionOrWarning';
@@ -3236,11 +3256,7 @@ sub exception2perl ($;%) {
     push @isa, perl_package_name name => 'ManakaiDOM'.$type
   }
   $result .= perl_inherit [@isa];
-  $result .= perl_statement perl_assign
-                   perl_var (type => '$',
-                             package => {if => $if_name},
-                             local_name => 'VERSION')
-                   => version_date time;
+  $Status->{def_pack}->{perl_package_name if => $if_name} = 1;
   my @level = @{$opt{level} || []};
   my $mod = get_level_description $node, level => \@level;
   $result .= pod_block
@@ -3806,7 +3822,7 @@ $result .= perl_statement q<use strict>;
 
 local $Status->{depth} = $Status->{depth} + 1;
 $result .= perl_package full_name => $Info->{Package};
-$result .= perl_statement perl_assign 'our $VERSION' => version_date time;
+$Status->{def_pack}->{$Info->{Package}} = 1;
 
 $result .= pod_block
              pod_head (1, 'NAME'),
@@ -3911,6 +3927,18 @@ if (keys %{$Status->{EXPORT_OK}||{}}) {
                          $_ => [keys %{$Status->{EXPORT_TAGS}->{$_}}]
                       } keys %{$Status->{EXPORT_TAGS}}) . ')';
   }
+}
+
+## Packages
+{
+  my $list = join ', ', map {'$'.$_.'::VERSION'}
+                        sort keys %{$Status->{def_pack}};
+  my $date = perl_literal version_date time;
+  $result .= qq{
+               for ($list) {
+                 \$_ = $date;
+               }
+  };
 }
 
 ## Feature
@@ -4221,6 +4249,14 @@ $result .= pod_block @desc;
 
 $result .= perl_statement 1;
 
+if ($Opt{output_pod} eq 'file') {
+  open my $pod, '>', $Opt{output_pod_file}
+    or die "$0: $Opt{output_pod_file}: $!";
+  print $pod $result_pod;
+} elsif ($Opt{output_pod} eq 'only') {
+  $result = $result_pod;
+}
+
 output_result $result;
 
 
@@ -4250,6 +4286,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/10/16 13:34:55 $
+# $Date: 2004/11/01 07:58:34 $
 
 
