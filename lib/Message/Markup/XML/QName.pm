@@ -16,27 +16,22 @@ This module is part of manakai XML.
 
 package Message::Markup::XML::QName;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NCNameStartChar InXMLNCNameChar!;
 use Exporter;
 our @ISA = qw/Exporter/;
 
-our %NS = (
-           internal_ns_invalid	=> q<http://suika.fam.cx/~wakaba/-temp/2003/05/17/unknown-namespace#>,
-           xml	=> q<http://www.w3.org/XML/1998/namespace>,
-           xmlns	=> q<http://www.w3.org/2000/xmlns/>,
-           xpath => q<urn:x-suika-fam-cx:markup:xpath:>,
-           xslt => q<urn:x-suika-fam-cx:markup:xslt:>,
-);
-
-our @EXPORT_OK = qw/DEFAULT_PFX NULL_URI UNDEF_URI/;
+our @EXPORT_OK = qw/DEFAULT_PFX NULL_URI UNDEF_URI NS_xml_URI NS_xmlns_URI/;
 sub DEFAULT_PFX () { q:#default: }
 sub NULL_URI    () { q<http://suika.fam.cx/~wakaba/-temp/2003/09/27/null> }
 sub UNDEF_URI   () { q<http://suika.fam.cx/~wakaba/-temp/2003/09/27/undef> }
+sub NS_xml_URI  () { q<http://www.w3.org/XML/1998/namespace> }
+sub NS_xmlns_URI() { q<http://www.w3.org/2000/xmlns/> }
+#sub NS_INVALID_URI(){q<http://suika.fam.cx/~wakaba/-temp/2003/05/17/unknown-namespace#> }
 
 our %Namespace_URI_to_prefix 
   = (
-     q<DAV:>	=> [qw:dav webdav:],
+     q<DAV:>	=> [qw:DAV dav webdav:],
 	'http://members.jcom.home.ne.jp/jintrick/2003/02/site-concept.xml#'	=> [DEFAULT_PFX, qw/sitemap/],
 	'http://purl.org/dc/elements/1.1/'	=> [qw/dc dc11/],
 	'http://purl.org/rss/1.0/'	=> [DEFAULT_PFX, qw/rss rss10/],
@@ -78,13 +73,13 @@ sub register_prefix_to_name ($$$;%) {
   }
   if ($opt{check_xml}) {
     return {success => 0, name => $name, prefix => $prefix, reason => 'XML'}
-      if ($prefix eq 'xml' && $name ne $NS{xml})
-      || ($name eq $NS{xml} && $prefix ne 'xml');
+      if ($prefix eq 'xml' && $name ne NS_xml_URI)
+      || ($name eq NS_xml_URI && $prefix ne 'xml');
   }
   if ($opt{check_xmlns}) {
     return {success => 0, name => $name, prefix => $prefix, reason => 'XMLNS'}
-      if ($prefix eq 'xmlns' && $name ne $NS{xmlns})
-      || ($name eq $NS{xmlns} && $prefix ne 'xmlns');
+      if ($prefix eq 'xmlns' && $name ne NS_xmlns_URI)
+      || ($name eq NS_xmlns_URI && $prefix ne 'xmlns');
   }
   if ($name eq NULL_URI && $prefix ne DEFAULT_PFX) {
     return {success => 0, prefix => $prefix, reason => '__NON_DEFAULT_NULL_NS'};
@@ -166,9 +161,9 @@ sub __check_name ($$$) {
         unless $name =~ /^[0-9A-Za-z.%+-]+:/;
     }
     return {success => 0, name => $name, reason => 'NAME_XML'}
-      if $opt->{check_name_xml} && ($name eq $NS{xml});
+      if $opt->{check_name_xml} && ($name eq NS_xml_URI);
     return {success => 0, name => $name, reason => 'NAME_XMLNS'}
-      if $opt->{check_name_xmlns} && ($name eq $NS{xmlns});
+      if $opt->{check_name_xmlns} && ($name eq NS_xmlns_URI);
   }
   
   if ($opt->{check_name_registered}) {
@@ -404,4 +399,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/11/01 06:11:37 $
+1; # $Date: 2003/11/01 12:20:57 $
