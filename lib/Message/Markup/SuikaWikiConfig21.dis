@@ -21,7 +21,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/18 11:40:52 $
+      $Date: 2005/02/18 12:14:19 $
     @@ContentType:
       dis:Date.RCS
   
@@ -348,21 +348,6 @@ IFClassDef:
             }__;
           }
         } else {
-          if ($self-><AG::SWCFGNode.ownerDocument> ne
-              $node-><AG::SWCFGNode.ownerDocument>) {
-            __EXCEPTION{EXTERNAL_NODE_ERR::
-              MDOMX:param-name => 'node',
-            }__;
-          }
-          my $this_node = $self;
-          ANCESTOR: {
-            if ($this_node eq $self) {
-              __EXCEPTION{HIERARCHY_ANCESTOR_OR_SELF_ERR::
-                MDOMX:param-name => 'node',
-              }__;
-            }
-            redo ANCESTOR if $this_node = $self-><AG::SWCFGNode.parentNode>;
-          }
           my $this_node_type = $self-><M::SWCFGNode.nodeType>;
           my $that_node_type = $node-><M::SWCFGNode.nodeType>;
           if ($this_node_type eq '#comment') {
@@ -383,10 +368,25 @@ IFClassDef:
               }__;
             }
           }
+          if (($self-><AG::SWCFGNode.ownerDocument> || $self) ne
+              $node-><AG::SWCFGNode.ownerDocument>) {
+            __EXCEPTION{EXTERNAL_NODE_ERR::
+              MDOMX:param-name => 'node',
+            }__;
+          }
+          my $this_node = $self;
+          ANCESTOR: {
+            if ($this_node eq $self) {
+              __EXCEPTION{HIERARCHY_ANCESTOR_OR_SELF_ERR::
+                MDOMX:param-name => 'node',
+              }__;
+            }
+            redo ANCESTOR if $this_node = $self-><AG::SWCFGNode.parentNode>;
+          }
 
           if ($node-><M::SWCFGNode.nodeType> eq '#fragment') {
             $self->{<Q::TreeCore:node>}
-                 -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+                 -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
                                      .importTree> ($node->{<Q::TreeCore:node>});
             for (@{$node->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
               $_->{<Q::parent>} = $self->{<Q::TreeCore:node>};
@@ -395,7 +395,7 @@ IFClassDef:
        \         @{$node->{<Q::TreeCore:node>}->{<Q::childNodes>}};
             $node->{<Q::TreeCore:node>}->{<Q::childNodes>} = [];
             $node->{<Q::TreeCore:node>}
-                 -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+                 -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
                                                .orphanate>;
             $r = $self;
           } else {
@@ -410,7 +410,7 @@ IFClassDef:
               }
             }
             $self->{<Q::TreeCore:node>}
-                 -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+                 -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
                           .importTree> ($node->{<Q::TreeCore:node>});
             push @{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}},
                  $node->{<Q::TreeCore:node>};
@@ -468,7 +468,7 @@ IFClassDef:
         }
         if ($type eq '#element') {
           __DEEP{
-            $r = $self-><AG::SWCFGNode.ownerDocument>
+            $r = ($self-><AG::SWCFGNode.ownerDocument> || $self)
                       -><M::SWCFGDocument.createElementNS>
                                   ($namespaceURI, $localName);
           }__;
@@ -481,7 +481,7 @@ IFClassDef:
             }__;
           }
           __DEEP{
-            $r = $self-><AG::SWCFGNode.ownerDocument>
+            $r = ($self-><AG::SWCFGNode.ownerDocument> || $self)
                              -><M::SWCFGDocument.createComment> ($value);
           }__;
         } else {
@@ -490,7 +490,7 @@ IFClassDef:
           }__;
         }
         $self->{<Q::TreeCore:node>}
-             -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+             -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
                           .importTree> ($r->{<Q::TreeCore:node>});
         push @{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}},
              $r->{<Q::TreeCore:node>};
@@ -554,7 +554,7 @@ IFClassDef:
         $self->{<Q::TreeCore:node>}->{<Q::childNodes>}
            = [grep {$_ ne $n} @{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}];
         $node->{<Q::TreeCore:node>}
-             -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all.orphanate>;
+             -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl.orphanate>;
   @Method:
     @@Name:getAttribute
     @@Description:
@@ -598,7 +598,7 @@ IFClassDef:
           ## Not found
           if ($makeNewNode) {
             __DEEP{
-              $r = $self-><AG::SWCFGNode.ownerDocument>
+              $r = ($self-><AG::SWCFGNode.ownerDocument> || $self)
                         -><AG::SWCFGDocument.createElementNS> (null, $localName);
               $self-><M::SWCFGNode.appendNode> ($r);
             }__;
@@ -668,7 +668,7 @@ IFClassDef:
           ## Not found
           if ($makeNewNode) {
             __DEEP{
-              $r = $self-><AG::SWCFGNode.ownerDocument>
+              $r = ($self-><AG::SWCFGNode.ownerDocument> || $self)
                         -><AG::SWCFGDocument.createElementNS>
                                  ($namespaceURI, $localName);
               $self-><M::SWCFGNode.appendNode> ($r);
@@ -867,7 +867,8 @@ IFClassDef:
               $r = $self-><M::SWCFGNode.appendNewNode>
                                 (type => '#element',
                                  namespace_uri =>
-                                     $self-><AG::SWCFGNode.ownerDocument>
+                                     ($self-><AG::SWCFGNode.ownerDocument> ||
+                                      $self)
                                           -><AG::SWCFGDocument
                                                 .defaultElementTypeNamespaceURI>,
                                  local_name => 'Node');
@@ -927,7 +928,7 @@ IFClassDef:
               $r->{<Q::TreeCore:node>}->{<Q::value>} = $value;
               for (@{$r->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
                 CORE::delete $_->{<Q::parent>};
-                $_-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+                $_-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
                              .orphanate>;
               }
               $r->{<Q::TreeCore:node>}->{<Q::childNodes>} = [];
@@ -936,7 +937,7 @@ IFClassDef:
           }
           ## Not found
           __DEEP{
-            $r = $self-><AG::SWCFGNode.ownerDocument>
+            $r = ($self-><AG::SWCFGNode.ownerDocument> || $self)
                       -><AG::SWCFGDocument.createElementNS> (null, $localName);
             $self-><M::SWCFGNode.appendNode> ($r);
             $r->{<Q::TreeCore:node>}->{<Q::value>} = $value;
@@ -1005,7 +1006,7 @@ IFClassDef:
               $r->{<Q::TreeCore:node>}->{<Q::value>} = $value;
               for (@{$r->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
                 CORE::delete $_->{<Q::parent>};
-                $_-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+                $_-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
                              .orphanate>;
               }
               $r->{<Q::TreeCore:node>}->{<Q::childNodes>} = [];
@@ -1014,7 +1015,7 @@ IFClassDef:
           }
           ## Not found
           __DEEP{
-            $r = $self-><AG::SWCFGNode.ownerDocument>
+            $r = ($self-><AG::SWCFGNode.ownerDocument> || $self)
                       -><AG::SWCFGDocument.createElementNS>
                                         ($namespaceURI, $localName);
             $self-><M::SWCFGNode.appendNode> ($r);
@@ -1056,7 +1057,7 @@ IFClassDef:
           }
         } @{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}];
         for (@removed) {
-          $_-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+          $_-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
                           .orphanate>;
         }
         true;
@@ -1108,7 +1109,7 @@ IFClassDef:
           }
         } @{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}];
         for (@removed) {
-          $_-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+          $_-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
                           .orphanate>;
         }
         true;
@@ -1125,7 +1126,7 @@ IFClassDef:
     @@Get:
       @@@PerlDef:
         $r = $self->{<Q::TreeCore:node>}
-                  -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+                  -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
                             .newReference>
                         (<ClassName::ManakaiSWCFGChildNodeList>);
 
@@ -1405,7 +1406,7 @@ IFClassDef:
             $r .= "\x0A" if $ptype eq '#comment' and
                             $_->{<Q::nodeType>} eq '#comment';
             $ptype = $_->{<Q::nodeType>};
-            $r .= $_->stringify;
+            $r .= <ClassM::ManakaiSWCFGNode.getNodeReference> ($_)->stringify;
           }
         } elsif ($nt eq '#element') {
           $r = $self-><M::SWCFGNode.innerText>;
@@ -1804,7 +1805,7 @@ IFClassDef:
     @@Param:
       @@@Name:object
       @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1831,7 +1832,7 @@ IFClassDef:
             msg => {qq[Node type: "$object->{<Q::nodeType>}"]},
           }__;
         }
-        $r = $object-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+        $r = $object-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
                                   .newReference> ($class);
   
   @Method:
@@ -1874,7 +1875,7 @@ IFClassDef:
         @@@PerlDef:
             if (UNIVERSAL::isa ($other,
                                 <ClassName::ManakaiDOM:ManakaiDOMNodeReference
-                                          ::ManakaiDOM:all>)
+                                          ::ManakaiDOM:Perl>)
                 and $other->{<Q::TreeCore:node>}->{<Q::TreeCore:nodeID>}
                   eq $self->{<Q::TreeCore:node>}->{<Q::TreeCore:nodeID>}) {
               $r = true;
@@ -1889,7 +1890,7 @@ IFClassDef:
         Creates a new instance object for <IF::SWCFGNode>. 
     @@Return:
       @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1897,7 +1898,7 @@ IFClassDef:
       @@@PerlDef:
         @@@@@:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
-                                        ::ManakaiDOM:all.new>;
+                                        ::ManakaiDOM:Perl.new>;
           push @{$node->{<Q::TreeCore:origin>}}, <Q::parent>;
           push @{$node->{<Q::TreeCore:subnode>}}, <Q::childNodes>;
           push @{$node->{<Q::TreeCore:irefnode>}}, <Q::DOMCore:ownerDocument>;
@@ -1910,6 +1911,56 @@ IFClassDef:
             \
             Optional properties: <Q::value>, <Q::parent>, 
                   <Q::childNodes>, <Q::flag>, <Q::option>. 
+
+  @IntMethod:
+    @@Operator:
+      @@@@:
+        ManakaiDOM:MUErrorHandler
+      @@@ContentType:
+        dis:TypeQName
+    @@Description:
+      @@@lang:en
+      @@@@:
+        This method is a generic error handler; all manakai exceptions 
+        and warnings associated to an object are once reported to this method 
+        and then delivered to appropriate entities. 
+        \
+        If the error is an exception (such as <X::DOMCore:DOMException> or 
+        <X::ManakaiDOM:ManakaiDOMImplementationException>), it is 
+        simply thrown.  If the error is only a warning, it is reported 
+        via the <IF::DOMCore:DOMError> interface. 
+        \
+        See <PerlModule::Message::Util::Error> documentation for more 
+        information on the error reporting mechanism.
+        \
+        {NOTE:: This kind of methods are named as <Perl::___report_error> 
+                in the convention of <PerlModule::Message::Util::Error>. 
+        \
+        }
+    @@Param:
+      @@@Name:err
+      @@@Type: 
+        ManakaiDOM:ManakaiDOMExceptionOrWarning::ManakaiDOM:all
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          An exception object that describes what kind of error it is 
+          and how it should be recovered. 
+          \
+          {NOTE:: Exception objects in manakai implementation 
+                  inherit the class <PerlModule::Message::Util::Error>, 
+                  that in turn inherits <PerlModule::Error>.
+          \
+          }
+    @@Return:
+      @@@PerlDef:
+          if ($err->isa (<ClassName::ManakaiDOM:ManakaiDOMException
+                                   ::ManakaiDOM:all>)) {
+            $err->throw;
+          } else {
+            \## TODO: Implement warning reporting
+            warn $err->stringify;
+          }
 ##SWCFGNode
 
 IFClassDef:
@@ -1955,7 +2006,7 @@ IFClassDef:
         Creates a new instance object for <IF::SWCFGComment>. 
     @@Return:
       @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -2106,7 +2157,7 @@ IFClassDef:
         Creates a new instance object for <IF::SWCFGElement>. 
     @@Return:
       @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -2347,7 +2398,7 @@ IFClassDef:
         Creates a new instance object for <IF::SWCFGDocument>. 
     @@Return:
       @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -2439,7 +2490,7 @@ IFClassDef:
         Creates a new instance object for <IF::SWCFGDocumentFragment>. 
     @@Return:
       @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
       @@@Description:
         @@@@lang:en
         @@@@@:

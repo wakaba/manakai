@@ -21,7 +21,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/18 06:13:52 $
+      $Date: 2005/02/18 12:14:19 $
     @@ContentType:
       dis:Date.RCS
   
@@ -30,10 +30,13 @@ Module:
       @@@Name: DISPerl
       @@@WithFor:
         ManakaiDOM:all
-#    @@Module:
-#      @@@Name: ManakaiNode
-#      @@@WithFor:
-#        ManakaiDOM:Perl
+    @@Module:
+      @@@Name: ManakaiNode
+      @@@WithFor:
+        ManakaiDOM:Perl
+
+  @DefaultFor:
+    ManakaiDOM:Perl
 
 Namespace:
   @dis:
@@ -644,9 +647,11 @@ ElementTypeBinding:
       ManakaiDOM:Class
     @@AliasFor:
       @@@@:
-        ::ManakaiDOM:all
+        ::ManakaiDOM:Perl
       @@@For:
-        !=ManakaiDOM:all
+        !=ManakaiDOM:Perl
+    @@ForCheck:
+      ManakaiDOM:Perl
 
 ElementTypeBinding:
   @Name: IntMethod

@@ -22,7 +22,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/18 06:13:52 $
+      $Date: 2005/02/18 12:14:19 $
     @@ContentType:
       dis:Date.RCS
   
@@ -158,6 +158,17 @@ ElementTypeBinding:
         ::ManakaiDOM:all
       @@@For:
         !=ManakaiDOM:all
+
+ResourceDef:
+  @QName:
+    ManakaiDOM:MUErrorHandler
+  @rdf:type: 
+    DOMMain:Operator
+  @Description:
+    @@lang:en
+    @@@:
+      A Perl <Perl::___report_error> subroutine called by 
+      <PerlModule::Message::Util::Error> exception reporting. 
 
 ## -- Throwing of exceptions
 

@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/18 11:40:51 $
+      $Date: 2005/02/18 12:14:19 $
     @@ContentType:
       dis:Date.RCS
 
@@ -3365,8 +3365,9 @@ IF:
           for (values %{<Class::DOMCore:ManakaiDOMImplementation
                                      ::ManakaiDOM:ManakaiDOMLatest>::Class}) {
             if ($_->{feature}->{$feature}->{$version}) {
-              $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject.newReference>
-                      ($self->{<Q::TreeCore:node>}, $_->{packageName});
+              $r = $self->{<Q::TreeCore:node>}
+                        -><M::ManakaiDOM:ManakaiDOMNodeObject.newReference>
+                                                        ($_->{packageName});
               last;
             }
           }
@@ -5920,8 +5921,9 @@ IF:
           for (values %{<Class::DOMCore:ManakaiDOMNode
                                      ::ManakaiDOM:ManakaiDOMLatest>::Class}) {
             if ($_->{feature}->{$feature}->{$version}) {
-              $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject.newReference>
-                      ($self->{<Q::TreeCore:node>}, $_->{packageName});
+              $r = $self->{<Q::TreeCore:node>}
+                        -><M::ManakaiDOM:ManakaiDOMNodeObject.newReference>
+                                             ($_->{packageName});
               last;
             }
           }
