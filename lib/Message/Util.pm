@@ -16,7 +16,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%FMT2STR %OPTION %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.20 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.21 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Carp;
 require Message::MIME::EncodedWord;
@@ -173,6 +173,23 @@ sub wsps_to_sp ($) {
     $1 || ' ';
   }gex;
   $body;
+}
+
+=item Message::Util::quote_ccontent ($yourself, $ccontent)
+
+Quotes C<ccontent> (to be).
+
+=cut
+
+sub quote_ccontent ($;%) {
+  my $ccontent = shift;
+  my %option = @_;
+  if ($option{strict_quoted_pair}) {
+    $ccontent =~ s/([\x28\x29\x5C]|\x3D\x3F)/\x5C$1/g;
+  } else {
+    $ccontent =~ s/([\x28\x29\x5C]|\x3D\x3F)([\x21-\x7E])?/"\x5C$1".(defined $2?"\x5C$2":'')/ge;
+  }
+  $ccontent;
 }
 
 =item $unquoted = Message::Util::unquote_ccontent ($string)
@@ -764,6 +781,12 @@ sub get_host_fqdn () {
   undef;
 }
 
+sub is_utf8 ($) {
+  my $s = shift;
+  return Encode::is_utf8 ($s) if $Encode::VERSION;
+  0;
+}
+
 =head1 LICENSE
 
 Copyright 2002 wakaba E<lt>w@suika.fam.cxE<gt>.
@@ -786,7 +809,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/26 12:42:00 $
+$Date: 2002/08/01 06:43:19 $
 
 =cut
 
