@@ -12,7 +12,7 @@ Perl module for text/plain media type.
 package Message::Body::TextPlain;
 use strict;
 use vars qw($VERSION %DEFAULT);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Header;
 use overload '""' => sub {shift->stringify};
@@ -124,6 +124,13 @@ sub option ($$;$) {
   $self->{option}->{$name};
 }
 
+sub clone ($) {
+  my $self = shift;
+  my $clone = new Message::Entity;
+  $clone->{body} = Message::Util::make_clone ($self->{body});
+  $clone;
+}
+
 =head1 SEE ALSO
 
 RFC 822 <urn:ietf:rfc:822>,
@@ -151,7 +158,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/25 10:18:35 $
+$Date: 2002/05/14 13:50:11 $
 
 =cut
 

@@ -16,7 +16,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 use Carp ();
 
@@ -38,7 +38,7 @@ use Carp ();
 	$REG{MATCH_ALL} = qr/[\x00-\xFF]/;
 ## Whitespace
 	$REG{WSP} = qr/[\x09\x20]/;
-	$REG{FWS} = qr/[\x09\x20]*/;
+	$REG{FWS} = qr/[\x09\x20]*/;	## not same as 2822's
 ## Basic structure
 	$REG{comment} = qr/\x28(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x27\x2A-\x5B\x5D-\xFF]|(??{$REG{comment}}))*\x29/;
 	$REG{quoted_string} = qr/\x22(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\xFF])*\x22/;
@@ -47,6 +47,7 @@ use Carp ();
 	
 	$REG{M_quoted_string} = qr/\x22((?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\xFF])*)\x22/;
 	$REG{M_comment} = qr/\x28((?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x27\x2A-\x5B\x5D-\xFF]|(??{$REG{comment}}))*)\x29/;
+	$REG{M_domain_literal} = qr/\x5B((?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x5A\x5E-\xFF])*)\x5D/;
 
 =head2 tokens
 
@@ -62,11 +63,14 @@ use Carp ();
 
 	$REG{atext} = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2F\x30-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]+/;
 	$REG{atext_dot} = qr/[\x21\x23-\x27\x2A\x2B\x2D-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]+/;
+	$REG{atext_dot_wsp} = qr/[\x09\x20\x21\x23-\x27\x2A\x2B\x2D-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]+/;
+	$REG{atext_dot8} = qr/[\x21\x23-\x27\x2A\x2B\x2D-\x39\x3D\x3F\x41-\x5A\x5E-\x7E\x80-\xFF]+/;
 	$REG{token} = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+/;
 	$REG{http_token} = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\x7C\x7E]+/;
 	$REG{attribute_char} = qr/[\x21\x23-\x24\x26\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+/;
 	
-	$REG{NON_atext} = qr/[^\x09\x20\x21\x23-\x27\x2A\x2B\x2D\x2F\x30-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]/;
+	$REG{NON_atext} = qr/[^\x21\x23-\x27\x2A\x2B\x2D\x2F\x30-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]/;
+	$REG{NON_atext_wsp} = qr/[^\x09\x20\x21\x23-\x27\x2A\x2B\x2D\x2F\x30-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]/;
 	$REG{NON_atext_dot} = qr/[^\x21\x23-\x27\x2A\x2B\x2D-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]/;
 	$REG{NON_atext_dot_wsp} = qr/[^\x09\x20\x21\x23-\x27\x2A\x2B\x2D-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]/;
 	$REG{NON_token} = qr/[^\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]/;
@@ -77,9 +81,22 @@ use Carp ();
 		## Yes, C<attribute-char> does not appear in HTTP spec.
 	
 	$REG{dot_atom} = qr/$REG{atext}(?:$REG{FWS}\x2E$REG{FWS}$REG{atext})*/;
+	$REG{dot_atom_dot} = qr/$REG{atext_dot}(?:$REG{FWS}\x2E$REG{FWS}$REG{atext_dot})*/;
 	$REG{dot_word} = qr/(?:$REG{atext}|$REG{quoted_string})(?:$REG{FWS}\x2E$REG{FWS}(?:$REG{atext}|$REG{quoted_string}))*/;
+	$REG{dot_word_dot} = qr/(?:$REG{atext_dot}|$REG{quoted_string})(?:$REG{FWS}\x2E$REG{FWS}(?:$REG{atext_dot}|$REG{quoted_string}))*/;
 	$REG{phrase} = qr/(?:$REG{atext}|$REG{quoted_string})(?:$REG{atext}|$REG{quoted_string}|\.|$REG{FWS})*/;
 		## RFC 822 phrase (not strict)
+
+	#$REG{domain} = qr/(?:$REG{dot_atom}|$REG{domain_literal})/;
+	$REG{domain} = qr/(?:$REG{dot_atom_dot}|$REG{domain_literal})/;
+	#$REG{addr_spec} = qr/$REG{dot_word}$REG{FWS}\x40$REG{FWS}$REG{domain}/;
+	$REG{addr_spec} = qr/$REG{dot_word_dot}$REG{FWS}\x40$REG{FWS}$REG{domain}/;
+	$REG{msg_id} = qr/<$REG{FWS}$REG{addr_spec}$REG{FWS}>/;
+	
+	$REG{M_addr_spec} = qr/($REG{dot_word_dot})$REG{FWS}\x40$REG{FWS}($REG{domain})/;
+	
+	$REG{date_time} = qr/(?:[A-Za-z]+$REG{FWS},$REG{FWS})?[0-9]+$REG{WSP}*[A-Za-z]+$REG{WSP}*[0-9]+$REG{WSP}+[0-9]+$REG{FWS}:$REG{WSP}*[0-9]+(?:$REG{FWS}:$REG{WSP}*[0-9]+)?$REG{FWS}(?:[A-Za-z]+|[+-]$REG{WSP}*[0-9]+)/;
+	$REG{asctime} = qr/[A-Za-z]+$REG{WSP}*[A-Za-z]+$REG{WSP}*[0-9]+$REG{WSP}+[0-9]+$REG{FWS}:$REG{WSP}*[0-9]+$REG{FWS}:$REG{WSP}*[0-9]+$REG{WSP}+[0-9]+/;
 
 ## MIME encoded-word
 	$REG{M_encoded_word} = qr/=\x3F($REG{attribute_char})(?:\x2A($REG{attribute_char}))?\x3F($REG{attribute_char})\x3F([\x21-\x3E\x40-\x7E]+)\x3F=/;
@@ -101,6 +118,25 @@ sub delete_comment ($) {
   my $body = shift;
   $body =~ s{($REG{quoted_string}|$REG{domain_literal}|$REG{angle_quoted})|$REG{comment}}{
     my $o = $1;  $o? $o : ' ';
+  }gex;
+  $body;
+}
+
+sub delete_wsp ($) {
+  my $body = shift;
+  $body =~ s{($REG{quoted_string}|$REG{domain_literal})|((?:$REG{token}|$REG{S_encoded_word})(?:$REG{WSP}+(?:$REG{token}|$REG{S_encoded_word}))+)|$REG{WSP}+}{
+    my ($o,$p) = ($1,$2);
+    if ($o) {$o}
+    elsif ($p) {$p=~s/$REG{WSP}+/\x20/g;$p}
+    else {''}
+  }gex;
+  $body;
+}
+
+sub remove_meaningless_wsp ($) {
+  my $body = shift;
+  $body =~ s{($REG{quoted_string}|$REG{domain_literal})|$REG{WSP}+}{
+    $1 || '';
   }gex;
   $body;
 }
@@ -157,6 +193,17 @@ sub unquote_if_quoted_string ($) {
   wantarray? ($quoted_string, $isq): $quoted_string;
 }
 
+sub unquote_if_domain_literal ($) {
+  my $quoted_string = shift;  my $isq = 0;
+  $quoted_string =~ s{^$REG{M_domain_literal}$}{
+    my $qtext = $1;
+    $qtext =~ s/\x5C([\x00-\xFF])/$1/g;
+    $isq = 1;
+    $qtext;
+  }goex;
+  wantarray? ($quoted_string, $isq): $quoted_string;
+}
+
 =item $quoted = Message::Util::quote_unsafe_string ($string)
 
 Quotes string itself by C<DQUOTES> if it contains of
@@ -171,12 +218,33 @@ sub quote_unsafe_string ($;%) {
   my %option = @_;
   $option{unsafe} ||= 'NON_atext_dot';
   $option{unsafe_regex} = $option{unsafe} if $option{unsafe} =~ /^\(\?-xism:/;
-  $option{unsafe_regex} ||= qr/$REG{$option{unsafe}}|$REG{WSP}$REG{WSP}/;
+  $option{unsafe_regex} ||= qr/$REG{$option{unsafe}}|$REG{WSP}$REG{WSP}|^$REG{WSP}|$REG{WSP}$/;
+  my $r = qr/([\x22\x5C])([\x21-\x7E])?/;
+  $r = qr/([\x22\x5C])/ if $option{strict};	## usefor-article
   if ($string =~ /$option{unsafe_regex}/) {
-    $string =~ s/([\x22\x5C])([\x21-\x7E])?/"\x5C$1".(defined $2?"\x5C$2":'')/ge;
+    $string =~ s/$r/"\x5C$1".(defined $2?"\x5C$2":'')/ge;
     $string = '"'.$string.'"';
   }
   $string;
+}
+
+sub quote_unsafe_domain ($) {
+  my $string = shift;
+  if ($string =~ /^\[[^\[\]]+\]$/) {
+    # 
+  } elsif ($string =~ /$REG{NON_atext_dot}/ || $string =~ /^\.|\.$/) {
+    $string =~ s/([\x5B-\x5D])/\x5C$1/g;
+    $string = '['.$string.']';
+  }
+  $string;
+}
+
+sub remove_wsp ($) {
+  my $s = shift;
+  $s =~ s{($REG{quoted_string}|$REG{domain_literal}|$REG{angle_quoted})|$REG{WSP}+}{
+    $1
+  }gex;
+  $s;
 }
 
 =item $Message::Util::make_clone ($parent)
@@ -187,9 +255,11 @@ Returns clone.
 
 sub make_clone ($) {
   my $s = shift;
-  if (ref $s eq 'ARRAY' || ref $s eq 'HASH') {
-    $s = map {make_clone ($_)} @$s;
-  } elsif (ref $s) {
+  if (ref $s eq 'ARRAY') {
+    $s = [map {make_clone ($_)} @$s];
+  } elsif (ref $s eq 'HASH') {
+    $s = {map {make_clone ($_)} (%$s)};
+  } elsif (ref $s && ref $s ne 'CODE') {
     $s = $s->clone;
   }
   $s;
@@ -225,7 +295,7 @@ sub decode_header_string ($$;%) {
   $o{charset} ||= $yourself->{option}->{encoding_before_decode};
   $o{charset} = Message::MIME::Charset::name_normalize ($o{charset});
   my ($t, $r);	## decoded-text, success?
-  if ($o{type} !~ /quoted/ && $o{type} !~ /encoded/) {
+  if ($o{type} !~ /quoted|encoded|domain|word/) {
     my (@s, @r);
     $s =~ s{\G(?:($REG{FWS}(?:\x5C[\x00-\xFF]
       |[\x00-\x08\x0A-\x0C\x0E\x0F\x21-\x5B\x5D-\xFF])+))}
@@ -272,7 +342,6 @@ sub encode_body_string {
 }
 
 sub decode_body_string {
-  require Message::MIME::EncodedWord;
   require Message::MIME::Charset;
   my $yourself = shift; my $s = shift; my %o = @_;
   $o{charset} ||= $yourself->{option}->{encoding_before_decode};
@@ -290,19 +359,23 @@ or a string containing one or multiple C<quoted-string>s.
 
 =cut
 
-sub decode_quoted_string ($$) {
+sub decode_quoted_string ($$;%) {
   my $yourself = shift;
   my $quoted_string = shift;
+  my %option = @_;
+  $option{type} ||= 'phrase';
   $quoted_string =~ s{$REG{M_quoted_string}|([^\x22]+)}{
     my ($qtext, $t) = ($1, $2);
     if (length $t) {
       my %s = &{$yourself->{option}->{hook_decode_string}}
-        ($yourself, $t, type => 'phrase');
+        ($yourself, $t, type => $option{type},
+        charset => $option{charset});
       $s{value};
     } else {
       $qtext =~ s/\x5C([\x00-\xFF])/$1/g;
       my %s = &{$yourself->{option}->{hook_decode_string}}
-        ($yourself, $qtext, type => 'phrase/quoted');
+        ($yourself, $qtext, type => $option{type}.'/quoted',
+        charset => $option{charset});
       $s{value};
     }
   }goex;
@@ -373,6 +446,21 @@ sub comment_to_array ($$) {
   @r;
 }
 
+sub delete_comment_to_array ($$) {
+  my $yourself = shift;
+  my $body = shift;
+  my @r = ();
+  $body =~ s{($REG{quoted_string}|$REG{domain_literal})|$REG{M_comment}}{
+    my ($o, $c) = ($1, $2);
+    if ($o) {$o}
+    else {
+      push @r, decode_ccontent ($yourself, $c);
+      ' ';
+    }
+  }gex;
+  ($body, @r);
+}
+
 =item Message::Util::encode_ccontent ($yourself, $ccontent)
 
 Encodes C<ccontent> (content of C<comment>).
@@ -421,7 +509,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/21 04:28:46 $
+$Date: 2002/05/14 13:50:11 $
 
 =cut
 

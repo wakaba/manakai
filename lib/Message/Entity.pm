@@ -13,7 +13,7 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Header;
 require Message::Util;
@@ -29,9 +29,11 @@ sub _init ($;%) {
     #fill_date	=> 1,
     #fill_msgid	=> 1,
     format	=> 'mail-rfc2822',
+    linebreak_strict	=> 0,	## BUG: not work perfectly
     parse_all	=> 0,
     #ua_field_name	=> 'user-agent',
     ua_use_config	=> 1,
+    uri_mailto_safe_level	=> 4,
   };
   my @new_fields = ();
   for my $name (keys %options) {
@@ -43,16 +45,16 @@ sub _init ($;%) {
   }
   my $format = $self->{option}->{format};
   unless (defined $self->{option}->{fill_date}) {
-    $self->{option}->{fill_date} = $format !~ /^cgi/;
+    $self->{option}->{fill_date} = $format !~ /cgi|uri-url-mailto/;
   }
   unless (defined $self->{option}->{fill_msgid}) {
-    $self->{option}->{fill_msgid} = $format !~ /^(?:cgi|http)/;
+    $self->{option}->{fill_msgid} = $format !~ /http|uri-url-mailto/;
   }
   unless (defined $self->{option}->{fill_mimever}) {
-    $self->{option}->{fill_mimever} = $format !~ /^(?:cgi|http)/;
+    $self->{option}->{fill_mimever} = $format !~ /http/;
   }
   unless (length $self->{option}->{ua_field_name}) {
-    $self->{option}->{ua_field_name} = $format =~ /^(?:http-response|cgi)/?
+    $self->{option}->{ua_field_name} = $format =~ /response|cgi|uri-url-mailto/?
       'server': 'user-agent';
   }
   @new_fields;
@@ -107,7 +109,7 @@ sub parse ($$;%) {
   my $message = shift;
   my $self = bless {}, $class;
   my %new_field = $self->_init (@_);
-  my @header = ();
+  my @header = ();	## BUG: don't check linebreak_strict
   my @body = split /\x0D?\x0A/, $message;	## BUG: not binary-clean...
   while (1) {
     my $line = shift @body;
@@ -121,7 +123,7 @@ sub parse ($$;%) {
   $self->{header} = parse_array Message::Header \@header,
     -parse_all => $self->{option}->{parse_all},
     -format => $self->{option}->{format}, %new_field;
-  $self->{body} = join "\n", @body;
+  $self->{body} = join "\n", @body;	## BUG: binary-unsafe
   $self->{body} = $self->_body ($self->{body}, $self->content_type)
     if $self->{option}->{parse_all};
   $self;
@@ -203,16 +205,16 @@ sub stringify ($;%) {
   my %params = @_;
   my %option = %{$self->{option}};
   for (grep {/^-/} keys %params) {$option{substr ($_, 1)} = $params{$_}}
-    my ($header, $body);
-    if (ref $self->{header}) {
-      my %exist;
-      for ($self->{header}->field_name_list) {$exist{$_} = 1}
-      if ($option{fill_date} && !$exist{'date'}) {
-        $self->{header}->field ('date')->unix_time (time);
-      }
+  my ($header, $body);
+  if (ref $self->{header}) {
+    my %exist;
+    for ($self->{header}->field_name_list) {$exist{$_} = 1}
+    if ($option{fill_date} && !$exist{'date'}) {
+      $self->{header}->field ('date')->unix_time (time);
+    }
     if ($option{fill_msgid} && !$exist{'message-id'}) {
       my $from = $self->{header}->field ('from')->addr_spec (1);
-      $self->{header}->field ('message-id')->add_new (addr_spec => $from)
+      $self->{header}->field ('message-id')->generate (addr_spec => $from)
         if $from;
     }
     if ($option{fill_mimever} && !$exist{'mime-version'}) {
@@ -223,20 +225,43 @@ sub stringify ($;%) {
         $self->{header}->add ('mime-version' => '1.0', -parse => 0);
       }
     }
+    if ($option{format} =~ /uri-url-mailto/ && $exist{'content-type'}
+     && $option{uri_mailto_safe_level} > 1) {
+      $self->{header}->field ('content-type')->media_type ('text/plain');
+    }
     $self->_add_ua_field;
-    $header = $self->{header}->stringify (-format => $option{format});
+    $header = $self->{header}->stringify (-format => $option{format},
+      -linebreak_strict => $option{linebreak_strict},
+      -uri_mailto_safe_level => $option{uri_mailto_safe_level});
   } else {
     $header = $self->{header};
-    $header =~ s/\x0D(?=[^\x09\x0A\x20])/\x0D\x20-/g;
-    $header =~ s/\x0A(?=[^\x09\x20])/\x0A\x20-/g;
+    unless ($option{linebreak_strict}) {
+      ## bare \x0D and bare \x0A are unsafe
+      $header =~ s/\x0D(?=[^\x09\x0A\x20])/\x0D\x20/g;
+      $header =~ s/\x0A(?=[^\x09\x20])/\x0A\x20/g;
+    }
   }
   if (ref $self->{body}) {
-    $body = $self->{body}->stringify (-format => $option{format});
+    $body = $self->{body}->stringify (-format => $option{format},
+      -linebreak_strict => $option{linebreak_strict});
   } else {
     $body = $self->{body};
   }
-  $header .= "\n" if $header && $header !~ /\n$/;
-  $header."\n".$body;
+  if ($option{format} =~ /uri-url-mailto/) {
+    my $f = $option{format};  $f =~ s/-mailto/-mailto-to/;
+    my $to = $self->{header}->stringify (-format => $f,
+      -uri_mailto_safe_level => $option{uri_mailto_safe_level});
+    $body =~ s/([^:@+\$A-Za-z0-9\-_.!~*])/sprintf('%%%02X', ord $1)/ge;
+    if (length $body) {
+      $header .= '&' if $header;
+      $header .= 'body='.$body;
+    }
+    $header = '?'.$header if $header;
+    'mailto:'.$to.$header;
+  } else {
+    $header .= "\n" if $header && $header !~ /\n$/;
+    $header."\n".$body;
+  }
 }
 *as_string = \&stringify;
 
@@ -518,6 +543,22 @@ SIP/2.0 CGI (IETF Internet Draft)
 
 CPIM/1.0 (IETF Internet Draft)
 
+=item uri-url-mailto-mail-rfc822, uri-url-mailto-mail-rfc2822
+
+mailto: URL scheme
+
+=item uri-url-mailto-rfc1738
+
+mailto: URL scheme (defined by RFC 1738)
+
+=item uri-url-mailto-rfc2368, uri-url-mailto-rfc2822
+
+mailto: URL scheme (defined by RFC 2368)
+
+=item uri-url-mailto-to-mail-rfc822, uri-url-mailto-to-mail-rfc2822
+
+C<to> part of mailto: URL scheme (for internal use only)
+
 =back
 
 =head1 EXAMPLE
@@ -559,7 +600,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/21 04:28:46 $
+$Date: 2002/05/14 13:50:11 $
 
 =cut
 

@@ -12,16 +12,18 @@ Perl module for MIME charset.
 package Message::MIME::Charset;
 use strict;
 use vars qw(%ENCODER %DECODER %N11NTABLE %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 %ENCODER = (
   '*DEFAULT'	=> sub {$_[1]},
   'us-ascii'	=> sub {$_[1]},
+  'unknown-8bit'	=> sub {$_[1]},
 );
 
 %DECODER = (
   '*DEFAULT'	=> sub {$_[1]},
   'us-ascii'	=> sub {$_[1]},
+  'unknown-8bit'	=> sub {$_[1]},
 );
 
 ## Charset name normalization
@@ -83,7 +85,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/19 12:00:36 $
+$Date: 2002/05/14 13:50:11 $
 
 =cut
 

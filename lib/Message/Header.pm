@@ -61,11 +61,46 @@ my %DEFAULT = (
   field_format_pattern	=> '%s: %s',
   #field_type	=> {},
   format	=> 'mail-rfc2822',
+  linebreak_strict	=> 0,
   mail_from	=> 0,
   output_bcc	=> 0,
   parse_all	=> 0,
   sort	=> 'none',
   translate_underscore	=> 1,
+  uri_mailto_safe	=> {
+  	## 1 all (no check)	2 no trace & bcc & from
+  	## 3 no sender's info	4 (default) (currently not used)
+  	## 5 only a few
+  	':default'	=> 4,
+  	'cc'	=> 4,
+  	'bcc'	=> 1,
+  	'body'	=> 1,
+  	'comment'	=> 5,
+  	'content-id'	=> 1,
+  	'date'	=> 1,
+  	'from'	=> 1,
+  	'keywords'	=> 5,
+  	'list-id'	=> 1,
+  	'mail-from'	=> 1,
+  	'message-id'	=> 1,
+  	'received'	=> 1,
+  	'resent-bcc'	=> 1,
+  	'resent-date'	=> 1,
+  	'resent-from'	=> 1,
+  	'resent-sender'	=> 1,
+  	'return-path'	=> 1,
+  	'sender'	=> 1,
+  	'subject'	=> 5,
+  	'summary'	=> 5,
+  	'to'	=> 4,
+  	'user-agent'	=> 3,
+  	'x-face'	=> 2,
+  	'x-mailer'	=> 3,
+  	'x-nsubject'	=> 5,
+  	'x-received'	=> 1,
+  	'x400-received'	=> 1,
+  	},
+  uri_mailto_safe_level	=> 4,
   validate	=> 1,
 );
 $DEFAULT{field_type} = {
@@ -75,11 +110,13 @@ $DEFAULT{field_type} = {
 	'x-received'	=> 'Message::Field::Received',
 	
 	'content-type'	=> 'Message::Field::ContentType',
+	p3p	=> 'Message::Field::Params',
 	'auto-submitted'	=> 'Message::Field::ValueParams',
 	'content-disposition'	=> 'Message::Field::ValueParams',
 	link	=> 'Message::Field::ValueParams',
 	archive	=> 'Message::Field::ValueParams',
 	'x-face-type'	=> 'Message::Field::ValueParams',
+	'x-mozilla-draft-info'	=> 'Message::Field::ValueParams',
 	
 	subject	=> 'Message::Field::Subject',
 	'x-nsubject'	=> 'Message::Field::Subject',
@@ -87,6 +124,11 @@ $DEFAULT{field_type} = {
 	'list-software'	=> 'Message::Field::UA',
 	'user-agent'	=> 'Message::Field::UA',
 	server	=> 'Message::Field::UA',
+	
+	## A message id
+	'content-id'	=> 'Message::Field::MsgID',
+	'message-id'	=> 'Message::Field::MsgID',
+	'resent-message-id'	=> 'Message::Field::MsgID',
 	
 	## Numeric value
 	'content-length'	=> 'Message::Field::Numval',
@@ -104,10 +146,11 @@ for (qw(archive cancel-lock content-features content-md5
   disposition-notification-options encoding 
   importance injector-info 
   pics-label posted-and-mailed precedence list-id message-type 
-  original-recipient priority
+  original-recipient priority x-list-id
   sensitivity status x-face x-msmail-priority xref))
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Structured'}
   	## Not supported yet, but to be supported...
+  	# x-list: unstructured, ml name
 for (qw(abuse-reports-to apparently-to approved approved-by bcc cc complaints-to
   delivered-to disposition-notification-to envelope-to
   errors-to  from mail-copies-to mail-followup-to mail-reply-to
@@ -122,25 +165,67 @@ for (qw(abuse-reports-to apparently-to approved approved-by bcc cc complaints-to
   x-envelope-to x-ml-address x-ml-command x-ml-to x-nfrom x-nto
   x-rcpt-to x-sender x-x-sender))
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Address'}
-for (qw(date date-received delivery-date expires
-  expire-date nntp-posting-date posted posted-date reply-by resent-date 
+for (qw(client-date date date-received delivery-date expires
+  expire-date nntp-posting-date posted posted-date received-date 
+  reply-by resent-date 
   x-originalarrivaltime x-tcup-date))
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Date'}
-for (qw(article-updates client-date content-id in-reply-to message-id
-  obsoletes references replaces resent-message-id see-also supersedes))
-  {$DEFAULT{field_type}->{$_} = 'Message::Field::MsgID'}
+for (qw(article-updates in-reply-to
+  obsoletes references replaces see-also supersedes))
+  {$DEFAULT{field_type}->{$_} = 'Message::Field::MsgIDs'}
 for (qw(accept accept-charset accept-encoding accept-language
   content-language 
   content-transfer-encoding encrypted followup-to keywords 
   list-archive list-digest list-help list-owner
   list-post list-subscribe list-unsubscribe list-url uri newsgroups
-  posted-to
-  x-brother x-daughter x-respect x-moe x-syster x-wife))
+  posted-to))
   {$DEFAULT{field_type}->{$_} = 'Message::Field::CSV'}
+for (qw(x-brother x-boss x-classmate x-daughter x-dearfriend x-favoritesong 
+  x-friend x-me 
+  x-moe x-respect 
+  x-sublimate x-son x-sister x-wife))
+  {$DEFAULT{field_type}->{$_} = 'Message::Field::CSV'}	## NOT M::F::XMOE!
 for (qw(content-alias content-base content-location location referer
   url x-home-page x-http_referer
   x-info x-pgp-key x-ml-url x-uri x-url x-web))
   {$DEFAULT{field_type}->{$_} = 'Message::Field::URI'}
+
+my %header_goodcase = (
+	'article-i.d.'	=> 'Article-I.D.',
+	'content-id'	=> 'Content-ID',
+	'content-md5'	=> 'Content-MD5',
+	'content-sgml-entity'	=> 'Content-SGML-Entity',
+	etag	=> 'ETag',
+	fax	=> 'FAX',
+	'pics-label'	=> 'PICS-Label',
+	'list-url'	=> 'List-URL',
+	'list-id'	=> 'List-ID',
+	'message-id'	=> 'Message-ID',
+	'mime-version'	=> 'MIME-Version',
+	'nic'	=> 'NIC',
+	'nntp-posting-date'	=> 'NNTP-Posting-Date',
+	'nntp-posting-host'	=> 'NNTP-Posting-Host',
+	'resent-message-id'	=> 'Resent-Message-ID',
+	te	=> 'TE',
+	url	=> 'URL',
+	'www-authenticate'	=> 'WWW-Authenticate',
+	'x-dearfriend'	=> 'X-DearFriend',
+	'x-mime-autoconverted'	=> 'X-MIME-Autoconverted',
+	'x-nntp-posting-date'	=> 'X-NNTP-Posting-Date',
+	'x-nntp-posting-host'	=> 'X-NNTP-Posting-Host',
+	'x-uri'	=> 'X-URI',
+	'x-url'	=> 'X-URL',
+);
+$DEFAULT{capitalize} = sub {
+  my $self = shift;
+  my $name = shift;
+  if ($header_goodcase{$name}) {
+    return $header_goodcase{$name};
+  }
+  $name =~ s/(?:^|-)cgi-/uc $&/ge;
+  $name =~ s/(?:^|-)[a-z]/uc $&/ge;
+  $name;
+};
 
 ## taken from L<HTTP::Header>
 # "Good Practice" order of HTTP message headers:
@@ -185,23 +270,41 @@ sub _init ($;%) {
       push @new_fields, ($name => $options{$name});
     }
   }
-  $self->add (@new_fields, -parse => $self->{option}->{parse_all})
-    if $#new_fields > -1;
-  
-  my $format = $self->{option}->{format};
-  if ($format =~ /cgi/) {
-    unshift @header_order, qw(content-type location);
-    $self->{option}->{sort} = 'good-practice';
-    $self->{option}->{fold} = 0;
-  } elsif ($format =~ /^http/) {
-    $self->{option}->{sort} = 'good-practice';
-  }
-  
+  $self->_init_by_format ($self->{option}->{format}, $self->{option});
   # Make alternative representations of @header_order.  This is used
   # for sorting.
   my $i = 1;
   for (@header_order) {
       $header_order{$_} = $i++ unless $header_order{$_};
+  }
+  
+  $self->add (@new_fields, -parse => $self->{option}->{parse_all})
+    if $#new_fields > -1;
+}
+
+sub _init_by_format ($$\%) {
+  my $self = shift;
+  my ($format, $option) = @_;
+  if ($format =~ /rfc822/) {
+    $header_goodcase{bcc} = 'bcc';
+    $header_goodcase{cc} = 'cc';
+    $header_goodcase{'resent-bcc'} = 'Resent-bcc';
+    $header_goodcase{'resent-cc'} = 'Resent-cc';
+  } elsif ($format =~ /cgi/) {
+    unshift @header_order, qw(content-type location);
+    $option->{sort} = 'good-practice';
+    $option->{fold} = 0;
+  } elsif ($format =~ /http/) {
+    $option->{sort} = 'good-practice';
+  }
+  if ($format =~ /uri-url-mailto/) {
+    $option->{output_bcc} = 0;
+    $option->{capitalize} = 0;
+    $option->{field_format_pattern} = '%s=%s';
+    $option->{fold} = sub {
+      $_[1] =~ s/([^:@+\$A-Za-z0-9\-_.!~*])/sprintf('%%%02X', ord $1)/ge;
+      $_[1];
+    };
   }
 }
 
@@ -240,7 +343,7 @@ sub parse ($$;%) {
   my $class = shift;
   my $header = shift;
   my $self = bless {}, $class;
-  $self->_init (@_);
+  $self->_init (@_);	## BUG: don't check linebreak_strict
   $header =~ s/\x0D?\x0A$REG{WSP}/\x20/gos;	## unfold
   for my $field (split /\x0D?\x0A/, $header) {
     if ($field =~ /$REG{M_fromline}/) {
@@ -283,7 +386,11 @@ sub parse_array ($\@;%) {
         $field .= shift @$header;
       } else {last}
     }
-    $field =~ tr/\x0D\x0A//d;	## BUG: not safe for bar CR/LF
+    if ($self->{option}->{linebreak_strict}) {
+      $field =~ s/\x0D\x0A//g;
+    } else {
+      $field =~ tr/\x0D\x0A//d;
+    }
     if ($field =~ /$REG{M_fromline}/) {
       my $body = $1;
       $body = $self->_field_body ($body, 'mail-from')
@@ -376,11 +483,13 @@ sub _field_body ($$$) {
     eval "require $type" or Carp::croak ("_field_body: $type: $@");
     unless ($body) {
       $body = $type->new (-field_name => $name,
-        -format => $self->{option}->{format}
-        , field_name => $name, format => $self->{option}->{format});
+        -format => $self->{option}->{format},
+        -parse_all => $self->{option}->{parse_all},
+        field_name => $name, format => $self->{option}->{format});
     } else {
       $body = $type->parse ($body, -field_name => $name,
         -format => $self->{option}->{format},
+        -parse_all => $self->{option}->{parse_all},
          field_name => $name,format => $self->{option}->{format});
     }
   }
@@ -428,7 +537,7 @@ sub add ($%) {
   my $self = shift;
   my %fields = @_;
   my %option = %{$self->{option}};
-  $option{parse} = defined wantarray unless defined $option{parse};
+  $option{parse} = 1 if defined wantarray;
   for (grep {/^-/} keys %fields) {$option{substr ($_, 1)} = $fields{$_}}
   my $body;
   for (grep {/^[^-]/} keys %fields) {
@@ -599,32 +708,72 @@ sub stringify ($;%) {
   my $self = shift;
   my %params = @_;
   my %option = %{$self->{option}};
+  $option{format} = $params{-format} if $params{-format};
+  $self->_init_by_format ($option{format}, \%option);
   for (grep {/^-/} keys %params) {$option{substr ($_, 1)} = $params{$_}}
   my @ret;
-  if ($option{mail_from}) {
-    my $fromline = $self->field ('mail-from');
-    push @ret, 'From '.$fromline if $fromline;
-  }
-  $self->scan (sub {
-    my ($name, $body) = (@_);
-    return unless length $name;
-    return if $option{mail_from} && $name eq 'mail-from';
-    return if !$option{output_bcc} && ($name eq 'bcc' || $name eq 'resent-bcc');
-    my $fbody;
-    if (ref $body) {
-      $fbody = $body->stringify (-format => $option{format});
-    } else {
-      $fbody = $body;
+  my $_stringify = sub {
+      my ($name, $body) = (@_);
+      return unless length $name;
+      return if $option{mail_from} && $name eq 'mail-from';
+      return if !$option{output_bcc} && ($name eq 'bcc' || $name eq 'resent-bcc');
+      if ($option{format} =~ /uri-url-mailto/) {
+        return if ((   $option{uri_mailto_safe}->{$name}
+             || $option{uri_mailto_safe}->{':default'})
+              < $option{uri_mailto_safe_level});
+        if ($name eq 'to') {
+          $body = $self->field ('to');
+          return unless ref $body && $body->have_group;
+        }
+      }
+      my $fbody;
+      if (ref $body) {
+        $fbody = $body->stringify (-format => $option{format});
+      } else {
+        $fbody = $body;
+      }
+      return unless length $fbody;
+      unless ($option{linebreak_strict}) {
+        ## bare \x0D and bare \x0A are unsafe
+        $fbody =~ s/\x0D(?=[^\x09\x0A\x20])/\x0D\x20/g;
+        $fbody =~ s/\x0A(?=[^\x09\x20])/\x0A\x20/g;
+      } else {
+        $fbody =~ s/\x0D\x0A(?=[^\x09\x20])/\x0D\x0A\x20/g;
+      }
+      if (ref $option{capitalize}) {
+        $name = &{$option{capitalize}} ($self, $name);
+      } elsif ($option{capitalize}) {
+        $name =~ s/((?:^|-)[a-z])/uc($1)/ge;
+      }
+      if (ref $option{fold}) {
+        $fbody = &{$option{fold}} ($self, $fbody);
+      } elsif ($option{fold}) {
+        $fbody = $self->_fold ($fbody);
+      }
+      push @ret, sprintf $option{field_format_pattern}, $name, $fbody;
+    };
+  if ($option{format} =~ /uri-url-mailto-to/) {
+    if ($self->field_exist ('to')) {
+      my $to = $self->field ('to');
+      unless ($to->have_group) {
+        my $fbody = $to->stringify (-format => $option{format});
+        return &{$option{fold}} ($self, $fbody);
+      }
     }
-    return unless length $fbody;
-    $fbody =~ s/\x0D(?=[^\x09\x0A\x20])/\x0D\x20/g;
-    $fbody =~ s/\x0A(?=[^\x09\x20])/\x0A\x20/g;
-    $name =~ s/((?:^|-)[a-z])/uc($1)/ge if $option{capitalize};
-    $fbody = $self->_fold ($fbody) if $self->{option}->{fold};
-    push @ret, sprintf $self->{option}->{field_format_pattern}, $name, $fbody;
-  });
-  my $ret = join ("\n", @ret);
-  $ret? $ret."\n": '';
+    '';
+  } elsif ($option{format} =~ /uri-url-mailto/) {
+    $self->scan ($_stringify);
+    my $ret = join ('&', @ret);
+    $ret;
+  } else {
+    if ($option{mail_from}) {
+      my $fromline = $self->field ('mail-from');
+      push @ret, 'From '.$fromline if $fromline;
+    }
+    $self->scan ($_stringify);
+    my $ret = join ("\n", @ret);
+    $ret? $ret."\n": '';
+  }
 }
 *as_string = \&stringify;
 
@@ -797,7 +946,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/21 04:28:46 $
+$Date: 2002/05/14 13:50:11 $
 
 =cut
 
