@@ -14,7 +14,7 @@ use strict;
 require 5.6.0;
 use re 'eval';
 use vars qw(%DEFAULT %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 use Carp;
 use overload '@{}' => sub {shift->_delete_empty()->{param}},
@@ -51,6 +51,7 @@ $REG{NON_attribute_char} = qr/[^\x21\x23-\x24\x26\x2B\x2D\x2E\x30-\x39\x41-\x5A\
 
 
 %DEFAULT = (
+  delete_fws	=> 1,
   parameter_value_max	=> 78,
   use_parameter_extension	=> -1,
 );
@@ -88,7 +89,8 @@ sub parse ($$;%) {
   my $self = bless {option => {@_}}, $class;
   $self->_initialize_parse ();
   for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
-  $body = $self->_delete_fws ($self->_delete_comment ($body));
+  $body = $self->_delete_comment ($body);
+  $body = $self->_delete_fws ($body) if $self->{option}->{delete_fws}>0;
   my @b = ();
   $body =~ s{$REG{FWS}($REG{param})$REG{FWS}(?:;$REG{FWS}|$)}{
     my $param = $1;
@@ -343,7 +345,8 @@ sub stringify ($;%) {
       my $new = '';
       if ($v->{is_parameter}) {
         my ($encoded, @value) = (0, '');
-        if ($use_xparam>0 && ($v->{charset} || $v->{language})) {
+        if ($use_xparam>0 && ($v->{charset} || $v->{language} 
+                           || $v->{value} =~ /[\x00\x0D\x0A\x80-\xFF]/)) {
           my ($charset, $lang);
           $encoded = 1;
           ($charset, $lang) = ($v->{charset}, $v->{language});
@@ -476,7 +479,7 @@ sub _delete_comment ($$) {
 sub _delete_fws ($$) {
   my $self = shift;
   my $body = shift;
-  $body =~ s{($REG{quoted_string}|$REG{domain_literal})|$REG{WSP}+}{
+  $body =~ s{($REG{quoted_string}|$REG{domain_literal}|$REG{attribute_char}$REG{WSP}+$REG{attribute_char})|$REG{WSP}+}{
     my $o = $1;  $o? $o : '';
   }gex;
   $body;
@@ -504,7 +507,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/23 10:41:33 $
+$Date: 2002/03/23 11:41:36 $
 
 =cut
 

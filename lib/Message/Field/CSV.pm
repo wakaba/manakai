@@ -9,8 +9,7 @@ Perl module for comma separated C<field>.
 
 This module supports a number of fields that contains
 (or does not contain:-)) of comma separated values,
-such as C<Keywords:>, C<Newsgroups:>, C<Content-Type>,
-C<Content-Transfer-Encoding:>, and so on.
+such as C<Keywords:>, C<Newsgroups:> and so on.
 
 =cut
 
@@ -19,7 +18,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%OPTION %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload '@{}' => sub {[shift->value]},
              '""' => sub {shift->stringify};
 
@@ -44,28 +43,28 @@ $REG{NON_atom} = qr/[^\x09\x21\x23-\x27\x2A\x2B\x2D\x2F\x30-\x39\x3D\x3F\x41-\x5
 
 %OPTION = (
   field_name	=> 'keywords',
-  is_quoted_string	=> 1,
+  is_quoted_string	=> 1,	## Can itself quoted-string?
   separator	=> ', ',
   max	=> -1,
+  value_type	=> ':none:',
 );
 
 sub _init_option ($$) {
   my $self = shift;
   my %field_type = qw(accept-charset accept accept-encoding accept 
      accept-language accept
-     content-disposition content-type
-     content-language keywords content-transfer-encoding content-type
+     content-language keywords
      followup-to newsgroups
-     x-brother accept x-daughter accept x-face-type content-type x-moe accept 
-     x-respect accept x-syster accept x-wife accept);
+     x-brother x-moe x-daughter x-moe
+     x-respect x-moe x-syster x-moe x-wife x-moe);
   my $field_name = lc shift;
   $field_name = $field_type{$field_name} || $field_name;
-  if ($field_name eq 'content-type') {
-    $self->{option}->{is_quoted_string} = -1;
-    $self->{option}->{max} = 1;
-  } elsif ($field_name eq 'newsgroups') {
+  if ($field_name eq 'newsgroups') {
     $self->{option}->{is_quoted_string} = -1;
     $self->{option}->{separator} = ',';
+  } elsif ($field_name eq 'x-moe') {
+    $self->{option}->{is_quoted_string} = -1;
+    $self->{option}->{value_type} = ['Message::Field::ValueParams'];
   } elsif ($field_name eq 'accept') {
     $self->{option}->{is_quoted_string} = -1;
   } elsif ($field_name eq 'encrypted') {
@@ -114,9 +113,9 @@ sub _parse_list ($$) {
   $fb =~ s{((?:$REG{quoted_string}|$REG{domain_literal}|[^\x22\x2C\x5B])+)}{
     my $s = $1;  $s =~ s/^$REG{WSP}+//;  $s =~ s/$REG{WSP}+$//;
     if ($self->{option}->{is_quoted_string}>0) {
-      push @ids, $self->_unquote_quoted_string ($s);
+      push @ids, $self->_value ($self->_unquote_quoted_string ($s));
     } else {
-      push @ids, $s;
+      push @ids, $self->_value ($s);
     }
   }goex;
   @ids;
@@ -139,8 +138,29 @@ Adds new value.
 sub add ($;$%) {
   my $self = shift;
   my ($value, %option) = @_;
-  push @{$self->{value}}, $value;
-  $self;
+  push @{$self->{value}}, $self->_value ($value);
+  $value;
+}
+
+## Hook called before returning C<value>.
+## $self->_param_value ($name, $value);
+sub _value ($$) {
+  my $self = shift;
+  my $value = shift;
+  my $vtype = $self->{option}->{value_type}->[0];
+  my %vopt; %vopt = %{$self->{option}->{value_type}->[1]} 
+    if ref $self->{option}->{value_type}->[1];
+  if (ref $value) {
+    return $value;
+  } elsif ($vtype eq ':none:') {
+    return $value;
+  } elsif ($value) {
+    eval "require $vtype";
+    return $vtype->parse ($value, %vopt);
+  } else {
+    eval "require $vtype";
+    return $vtype->new (%vopt);
+  }
 }
 
 sub stringify ($;%) {
@@ -236,7 +256,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/21 04:18:38 $
+$Date: 2002/03/23 11:41:36 $
 
 =cut
 
