@@ -21,7 +21,7 @@ This module is part of XML.
 
 package Message::Markup::XML::EntityManager;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 our %NS;
 *NS = \%Message::Markup::XML::NS;
 
@@ -240,8 +240,10 @@ sub get_external_entity ($$$$;%) {
       $self->default_uri_resolver ($parser, $decl, $p, $o, %opt);
     }
     ## Line-break normalization
-    $p->{text} =~ s/\x0D\x0A/\x0A/gs;
-    $p->{text} =~ tr/\x0D/\x0A/;
+    if (defined $p->{text}) {
+      $p->{text} =~ s/\x0D\x0A/\x0A/gs;
+      $p->{text} =~ tr/\x0D/\x0A/;
+    }
     $p->{__flag} = 1;
   }
   $p;
@@ -563,4 +565,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/10/31 08:41:35 $
+1; # $Date: 2004/10/31 12:29:53 $

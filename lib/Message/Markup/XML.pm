@@ -17,7 +17,7 @@ markup constructures.  (SuikaWiki is not "tiny"?  Oh, yes, I see:-))
 
 package Message::Markup::XML;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.27 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.28 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload '""' => \&outer_xml,
              fallback => 1;
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXML_NCNameStartChar InXMLNCNameChar!;
@@ -498,8 +498,9 @@ sub remove_marked_section ($) {
   my $self = shift;
   my @node;
   for (@{$self->{node}}) {
-    if ({qw/#declaration 1 #element 1 #section 1 #reference 1 #attribute 1
-            #document 1 #fragment 1/}->{$_->{type}}) {
+    if ({'#declaration' => 1, '#element' => 1, '#section' => 1,
+         '#reference' => 1, '#attribute' => 1,
+         '#document' => 1, '#fragment' => 1}->{$_->{type}}) {
       $_->remove_marked_section;
     }
   }
@@ -530,8 +531,9 @@ sub remove_references ($) {
   my $self = shift;
   my @node;
   for (@{$self->{node}}) {
-    if ({qw/#declaration 1 #element 1 #section 1 #reference 1 #attribute 1
-            #document 1 #fragment 1/}->{$_->{type}}) {
+    if ({'#declaration' => 1, '#element' => 1, '#section' => 1,
+         '#reference' => 1, '#attribute' => 1,
+         '#document' => 1, '#fragment' => 1}->{$_->{type}}) {
       $_->remove_references;
     }
   }
@@ -1439,4 +1441,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/02/14 11:25:16 $
+1; # $Date: 2004/10/31 12:29:59 $

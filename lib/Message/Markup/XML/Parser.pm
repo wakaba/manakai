@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.21 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.22 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXMLChar
                         InXML_deprecated_noncharacter InXML_unicode_xml_not_suitable!;
 require Message::Markup::XML;
@@ -1371,7 +1371,7 @@ sub _parse_xml_declaration ($$$$) {
 
 sub _parse_entity_declaration ($$$$;%) {
     my ($self, $s, $c, $o, %opt) = @_;
-    my $p;	## notation ? 'n' : parameter entity ? '%' : undef;
+    my $p = '';	## notation ? 'n' : parameter entity ? '%' : '';
     my $root_node = $c->root_node;
     my $e = $c->append_new_node (type => '#declaration');
       $e->flag (smxp__uri_in_which_declaration_is => $o->{uri});
@@ -1480,10 +1480,14 @@ sub _parse_entity_declaration ($$$$;%) {
                 ## TODO: check when external entity too
                 $self->_raise_error ($o, c => $e,
                                      type => 'FATAL_ERR_PREDEFINED_ENTITY', t => [$ename, $ev])
-                  unless {qw/lt|&#60;  1 gt|&#62;  1 amp|&#38;  1 apos|&#39;  1 quot|&#34;  1
-                             lt|&#x3c; 1 gt|&#x3e; 1 amp|&#x26; 1 apos|&#x27; 1 quot|&#x22; 1
-                                         gt|>      1              apos|'      1 quot|"      1
-                            /}->{$ename.'|'.lc ($ev)};
+                  unless {'lt|&#60;' => 1, 'gt|&#62;' => 1,
+                          'amp|&#38;' => 1, 'apos|&#39;' => 1,
+                          'quot|&#34;' => 1,
+                          'lt|&#x3c;' => 1, 'gt|&#x3e;' => 1,
+                          'amp|&#x26;' => 1, 'apos|&#x27;' => 1,
+                          'quot|&#x22;' => 1,
+                          'gt|>' => 1, "apos|'" => 1, 'quot|"' => 1,
+                         }->{$ename.'|'.lc ($ev)};
               }
       }
       if ($t =~ s/^$xml_re{s}NDATA//s) {
@@ -2008,4 +2012,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/10/10 06:12:11 $
+1; # $Date: 2004/10/31 12:29:53 $

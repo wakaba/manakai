@@ -1,3 +1,11 @@
+2004-10-31  Wakaba  <wakaba@suika.fam.cx>
+
+	* EntityManager.pm (get_external_entity): Normalize line-break
+	only if it is defined, not to be warned.
+
+	* Parser.pm (_parse_entity_declaration): $p is initialized 
+	with empty string not to be warned.
+
 2004-10-10  Wakaba  <wakaba@suika.fam.cx>
 
 	* Parser.pm (_parse_attr_value_literal_data): Check length,
