@@ -49,7 +49,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/10/18 12:23:51 $
+     $Date: 2004/10/19 08:53:22 $
 
   @ConditionDef:
     @@Name:DOM1
@@ -92,6 +92,11 @@ IF:
       <IF:HTMLOptionCollection> objects are <EM:live>; they are 
       automatically updated when the underlying document 
       is changed.
+      \
+      {NOTE:: In DOM Level 1, <IF:HTMLCollection> interface 
+              was used in place of <IF:HTMLOptionsCollection>.
+      \
+      }
       
   @Level[list]:  2
   @SpecLevel[list]:  2
@@ -324,6 +329,11 @@ IF:
             @@@@@lang:en
             @@@@@@:
               <A:HTMLSelectElement.multiple> is <DOM:true>.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            Values were not defined in DOM Level 1 First Edition; 
+            they were added in the DOM Level 1 Errata.
         @@@Def:
           @@@@Type:
             lang:Perl
@@ -375,7 +385,12 @@ IF:
          The number of options in this menu control.
      @@Get:
         @@@Type:
-           DOMMain:unsigned-long
+          @@@@@:
+             DOMMain:unsigned-long
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              The type was <TYPE:long> in DOM Level 1.
      @@Set:
         @@@Type:
            DOMMain:unsigned-long
@@ -391,6 +406,8 @@ IF:
                @@@@@@@:
                  Setting the length is not allowed by the 
                  DOM implementation.
+        @@@SpecLevel:2
+        @@@Level:2
      @@Level[list]:
         1
         2
@@ -420,10 +437,14 @@ IF:
          The collection of <HE:option> elements contained 
          by this element.
      @@Get:
-        @@@Type:  HTMLOptionsCollection
+        @@@Type:  
+          @@@@@:HTMLOptionsCollection
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              The type was <IF:HTMLCollection> in DOM Level 1.
      @@Level[list]:
         1
-        2
      @@SpecLevel[list]:
         1
         2
@@ -544,6 +565,11 @@ IF:
             @@@@@@:
               This method is the equivalent of the 
               <M:Node.appendChild> method.
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              It was defined to prepend in DOM Level 1 First Edition - 
+              fixed in DOM Level 1 Errata.
      @@Return:
         @@@Exception:
            @@@@Name:  NOT_FOUND_ERR
@@ -667,7 +693,6 @@ IF:
            @@@@Value:  false
      @@Level[list]:
         1
-        2
      @@SpecLevel[list]:
         1
         2
@@ -705,9 +730,13 @@ IF:
      @@Get:
         @@@Type:
            DOMMain:long
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         It was writable in DOM Level 1, without description. 
+         It was ammended in DOM Level 1 Errata.
      @@Level[list]:
         1
-        2
      @@SpecLevel[list]:
         1
         2
@@ -770,6 +799,11 @@ IF:
             lang:dis
           @@@@SetProp:
             DOMHTML:selected
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            Marked as read-only attribute in DOM Level 1 First Edition. 
+            It was ammended in DOM Level 1 Errata.
   @Attr:
      @@Name:  value
      @@DocAttr:
@@ -973,9 +1007,12 @@ IF:
      @@Set:
         @@@Type:
            DOMMain:unsigned-long
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The type was <TYPE:DOMString> in DOM Level 1.
      @@Level[list]:
         1
-        2
      @@SpecLevel[list]:
         1
         2
@@ -1005,6 +1042,8 @@ IF:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
+        @@@SpecLevel:2
+        @@@Level:2
      @@Level[list]:
         1
         2
@@ -1040,6 +1079,13 @@ IF:
           <HTML:reset>, <HTML:image>, <HTML:checkbox> or 
           <HTML:radio> control, this attribute represents 
           the HTML <HA:value> attribute.
+          \
+          {NOTE:: The DOM Level 1 First Edition described that 
+                  this attribute is applied to <HTML:checkbox> 
+                  or <HTML:radio> controls.  It is ammended 
+                  by the DOM Level 1 First Edition Errata.
+          \
+          }
      @@Get:
         @@@Type:  DOMString
         @@@Description:
@@ -1173,7 +1219,6 @@ IF:
             }__;
      @@Level[list]:
         1
-        2
      @@SpecLevel[list]:
         1
         2
@@ -1284,6 +1329,10 @@ IF:
             @@@@@lang:en
             @@@@@@:
               Always this value.
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              Not defined in DOM Level 1 FE - added in Errata.
         @@@DefaultValue:textarea
         @@@Def:\
   @Attr:

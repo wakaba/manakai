@@ -46,7 +46,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/10/18 12:23:51 $
+     $Date: 2004/10/19 08:53:22 $
 
   @ConditionDef:
     @@Name:DOM1
@@ -246,6 +246,9 @@ IF:
             @@@@@lang:en
             @@@@@@:
               There is no node with such a <P:name>.
+    @@SpecLeve[list]:
+      1
+      2
 
 ImplNote:
   @@lang:en
@@ -614,12 +617,56 @@ IF:
           @@@@@:
             A collection of the element whose <HA:name> matches 
             with <P:elementName>.
+  @Method:
+    @@Name:getElementById
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Return the <IF:Element> whose <A:id> is given by 
+        <P:elementId>.  Behavior is not defined if more than 
+        one elements has this <P:elementId>.
+        \
+        {NOTE:: This method was first defined in the <IF:HTMLDocument> 
+                interface of DOM Level 1 but it has moved to 
+                the <Module:DOMCore> module in DOM Level 2.
+        \
+        }
+    @@Param:
+      @@@Name:elementId
+      @@@Type:
+        DOMMain:DOMString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The unique identifier of the element to retrieve.
+    @@Return:
+      @@@Type:
+        DOMCore:Element
+      @@@Description:
+        @@@@lang:en
+        @@@@@:The matching element.
+    @@SpecLevel:1
+    @@Condition:DOM1
   @ImplNote:
     @@lang:en
     @@@:
-      TODO: <M:HTMLDocument.getElementById> has moved to 
-            <IF:Document> interface.  Some note and 
-            implementation for DOM Level 1 HTML required.
+      {P:: The following properties in DOM Level 0 have been deprecated 
+      by DOM HTML Specifications in favor of the corresponding 
+      attributes in <IF:HTMLBodyElement> interface:
+      \
+        - <A:alinkColor>
+        \
+        - <A:background>
+        \
+        - <A:bgColor>
+        \
+        - <A:fgColor>
+        \
+        - <A:linkColor>
+        \
+        - <A:vlinkColor>
+      \
+      }
 ##IF:HTMLDocument
 
 ImplNote:
@@ -661,12 +708,10 @@ IF:
       are derived from this interface.
 
   @ISA:  Element
-  @Role:
-    @@@:
-      DOMCore:Element
-    @@compat:
-      ManakaiDOMCore:Element
-    @@html-element-type:sub
+  @ElementType:
+    @@QName:
+      xhtml1:sub
+  \##TODO: rewrite this
     @@html-element-type:sup
     @@html-element-type:span
     @@html-element-type:bdo
@@ -694,8 +739,15 @@ IF:
     @@html-element-type:noscript
     @@html-element-type:address
     @@html-element-type:center
-    @@element-type:
+  @ElementType:
+    @@QName:
       xhtml1:*
+  @ImplNote:
+    @@lang:en
+    @@@:
+      The DOM Level 1 First and Second Editions said that the <HE:head> 
+      element belongs to this category - it is considered as 
+      an error, since there is the <IF:HTMLHeadElement>.
 
   @Attr:
      @@Name:  id
@@ -769,6 +821,12 @@ IF:
       @@@lang:en
       @@@@:
         Some element in HTML 4/XHTML 1.0 does not have <HA:class> attribute.
+
+  @ImplNote:
+    @@lang:en
+    @@@:
+      The <A:HTMLElement.style> is reserved by DOM Level 1 First Edition 
+      for future use.  It is used later in DOM Level 2 CSS Module.
 ##IF:HTMLElement
 
 IF:
@@ -1471,6 +1529,31 @@ IF:
         @@@Type:  DOMString
 
 IF:
+  @Name:HTMLBlockquoteElement
+  @ISA:HTMLElement
+  #@ElementType:
+  #  @@QName:
+  #    xhtml1:blockquote
+  @Description:
+    @@lang:en
+    @@@:
+      The <IF:HTMLBlockquoteElement> interface was contained 
+      in the DOM Level 1 First Edition by error.  The 
+      <IF:HTMLQuoteElement> interface should must used instead. 
+      <SRC:DOM Level 1 Errata>
+  @Attr:
+    @@Name:cite
+    @@DocAttr:
+      @@@Name:cite
+    @@Get:
+      @@@Type:
+        DOMMain:DOMString
+    @@Set:
+      @@@Type:
+        DOMMain:DOMString
+  @Condition:DOM1
+
+IF:
   @Name:  HTMLQuoteElement
   @ISA:  HTMLElement
   @ElementType:
@@ -1567,7 +1650,9 @@ IF:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         TODO: Computed value should be returned.
+         TODO: Computed value should be returned. 
+         In DOM Level 1, it was <EM:not> the computed value 
+         and the type was <TYPE:DOMString>.
      @@Set:
         @@@Type:
            DOMMain:long
@@ -2127,7 +2212,7 @@ IF:
   @Attr:
      @@Name:  hspace
      @@DocAttr:
-       @@@Name:gspace
+       @@@Name:hspace
        @@@DeprecatedBy:
          DOMHTML:HTML4
      @@Get:
@@ -2343,6 +2428,10 @@ IF:
      @@Set:
         @@@Type:
            DOMMain:long
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         The type was <TYPE:DOMString> in DOM Level 1.
      @@Level[list]:
         1
         2
@@ -2371,7 +2460,6 @@ IF:
         @@@Type:  DOMString
      @@Level[list]:
         1
-        2
      @@SpecLevel[list]:
         1
         2
@@ -2387,6 +2475,10 @@ IF:
      @@Set:
         @@@Type:
            DOMMain:long
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         The type was <TYPE:DOMString> in DOM Level 1.
      @@Level[list]:
         1
         2
@@ -2646,7 +2738,6 @@ IF:
                  The given element is not a <HE:caption>.
      @@Level[list]:
         1
-        2
      @@SpecLevel[list]:
         1
         2
@@ -2679,7 +2770,6 @@ IF:
                The given element is not a <HE:thead>.
      @@Level[list]:
         1
-        2
      @@SpecLevel[list]:
         1
         2
@@ -2713,7 +2803,6 @@ IF:
                  The given element is not a <HE:tfoot>.
      @@Level[list]:
         1
-        2
      @@SpecLevel[list]:
         1
         2
@@ -2909,6 +2998,7 @@ IF:
             @@@@@lang:en
             @@@@@@:
               The new row is appended.
+          @@@@SpecLevel:2
         @@@InCase:
           @@@@Label:
             @@@@@lang:en
@@ -2918,6 +3008,7 @@ IF:
             @@@@@lang:en
             @@@@@@:
               The new row is appended.
+          @@@@SpecLevel:2
      @@Return:
         @@@Type:  HTMLElement
         @@@Description:
@@ -2935,6 +3026,12 @@ IF:
                @@@@@@@:
                  The <P:index> is greater than the number of rows 
                  or less than <DOM:-1>.
+            @@@@SpecLevel:2
+           @@@@ImplNote:
+             @@@@@lang:en
+             @@@@@@:
+               <SRC:DOM Level 1 Second Edition HTML, DOM Level 2 HTML> 
+               (<P:index> cannot <DOM:-1> in DOM Level 1.)
      @@Level[list]:
         1
         2
@@ -2961,6 +3058,7 @@ IF:
             @@@@@lang:en
             @@@@@@:
               The last row in the table is deleted.
+          @@@@SpecLevel:2
         @@@ImplNote:
           @@@@lang:en
           @@@@@:
@@ -2979,6 +3077,12 @@ IF:
                  The <P:index> is greater than or equal to 
                  the number of rows or the <P:index> is 
                  less than <DOM:-1>.
+           @@@@SpecLevel:2
+           @@@@ImplNote:
+             @@@@@lang:en
+             @@@@@@:
+               <SRC:DOM Level 1 Second Edition HTML, DOM Level 2 HTML> 
+               (<P:index> cannot <DOM:-1> in DOM Level 1.)
      @@Level[list]:
         1
         2
@@ -3139,6 +3243,7 @@ IF:
             @@@@@lang:en
             @@@@@@:
               The new row is appended.
+          @@@@SpecLevel:2
         @@@InCase:
           @@@@Label:
             @@@@@lang:en
@@ -3147,6 +3252,7 @@ IF:
             @@@@@lang:en
             @@@@@@:
               The new row is appended.
+          @@@@SpecLevel:2
      @@Return:
         @@@Type:  HTMLElement
         @@@Description:
@@ -3164,6 +3270,12 @@ IF:
                @@@@@@@:
                  The <P:index> is greater than the number 
                  of rows or less than <DOM:-1>.
+           @@@@SpecLevel:2
+           @@@@ImplNote:
+             @@@@@lang:en
+             @@@@@@:
+               <SRC:DOM Level 1 Second Edition HTML, DOM Level 2 HTML> 
+               (<P:index> cannot <DOM:-1> in DOM Level 1.)
      @@Level[list]:
         1
         2
@@ -3192,6 +3304,7 @@ IF:
             @@@@@lang:en
             @@@@@@:
               Delete the last row.
+          @@@@SpecLevel:2
      @@Return:
         @@@Exception:
            @@@@Name:  INDEX_SIZE_ERR
@@ -3206,6 +3319,12 @@ IF:
                  The <P:index> is greater than or equal to 
                  the number of rows or the <P:index> is less 
                  than <DOM:-1>.
+           @@@@SpecLevel:2
+           @@@@ImplNote:
+             @@@@@lang:en
+             @@@@@@:
+               <SRC:DOM Level 1 Second Edition HTML, DOM Level 2 HTML> 
+               (<P:index> cannot <DOM:-1> in DOM Level 1.)
      @@Level[list]:
         1
         2
@@ -3236,9 +3355,13 @@ IF:
      @@Get:
         @@@Type:
            DOMMain:long
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Writable in DOM Level 1 FE, with no description - 
+         fixed in the Errata.
      @@Level[list]:
         1
-        2
      @@SpecLevel[list]:
         1
         2
@@ -3252,9 +3375,12 @@ IF:
      @@Get:
         @@@Type:
            DOMMain:long
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Writable in DOM Level 1 FE, with no description.
      @@Level[list]:
         1
-        2
      @@SpecLevel[list]:
         1
         2
@@ -3265,9 +3391,12 @@ IF:
        @@@@:The collection of cells in this row.
      @@Get:
         @@@Type:  HTMLCollection
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Writable in DOM Level 1 FE, with no description.
      @@Level[list]:
         1
-        2
      @@SpecLevel[list]:
         1
         2
@@ -3333,6 +3462,7 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:The new cell is appended.
+          @@@@SpecLevel:2
         @@@InCase:
           @@@@Label:
             @@@@@lang:en
@@ -3340,6 +3470,7 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:The new cell is appended.
+          @@@@SpecLevel:2
      @@Return:
         @@@Type:  HTMLElement
         @@@Description:
@@ -3357,6 +3488,12 @@ IF:
                @@@@@@@:
                  The <P:index> is greater than the number of 
                  cells or less than <DOM:-1>.
+           @@@@SpecLevel:2
+           @@@@ImplNote:
+             @@@@@lang:en
+             @@@@@@:
+               <SRC:DOM Level 1 Second Edition HTML, DOM Level 2 HTML> 
+               (<P:index> cannot <DOM:-1> in DOM Level 1.)
      @@Level[list]:
         1
         2
@@ -3383,6 +3520,7 @@ IF:
             @@@@@lang:en
             @@@@@@:
               The last cell is deleted.
+          @@@@SpecLevel:2
      @@Return:
         @@@Exception:
            @@@@Name:  INDEX_SIZE_ERR
@@ -3396,6 +3534,12 @@ IF:
                @@@@@@@:
                  THe <P:index> is greater than or equal to the number 
                  of the cells or less than <DOM:-1>.
+            @@@@SpecLevel:2
+           @@@@ImplNote:
+             @@@@@lang:en
+             @@@@@@:
+               <SRC:DOM Level 1 Second Edition HTML, DOM Level 2 HTML> 
+               (<P:index> cannot <DOM:-1> in DOM Level 1.)
      @@Level[list]:
         1
         2
@@ -3424,6 +3568,10 @@ IF:
      @@Get:
         @@@Type:
            DOMMain:long
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Writable in DOM Level 1 FE - fixed in the Errata.
   @Attr:
      @@Name:  abbr
      @@DocAttr:
