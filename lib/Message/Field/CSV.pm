@@ -10,7 +10,7 @@ package Message::Field::CSV;
 require 5.6.0;	## eval 're'
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 
@@ -194,7 +194,7 @@ Returns number of values.
 
 ## Inherited
 
-=iterm $csv->add ($value1, [$value2, $value3,...])
+=item $csv->add ($value1, [$value2, $value3,...])
 
 Adds (appends) new value(s).
 
@@ -312,7 +312,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/08/03 23:32:04 $
+$Date: 2004/02/14 11:26:34 $
 
 =cut
 
