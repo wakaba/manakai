@@ -1,14 +1,15 @@
 
 =head1 NAME
 
-Message::Markup::XML::Parser --- manakai: Simple XML parser
+Message::Markup::XML::Parser::Base --- Manakai Simple XML Parser (Base Module)
 
 =head1 DESCRIPTION
 
-This is a simple XML parser intended to be used with Message::Markup::XML.
-After parsing of the XML document, this module returns a Message::Markup::XML
-object so that you can handle XML document with that module (and other modules
-implementing same interface).
+This is a simple XML parser.  This module is a "base" class module.
+Parsing XML entities causes parsing-events (as SAX parser does,
+while events of this parser is more "physical").  Derived class
+modules implements those events to construct some graph structure
+such as DOM tree (or converts into other event model like SAX).
 
 This module is part of manakai.
 
@@ -16,7 +17,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::Base;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML
     qw[InXML_NameStartChar10 InXMLNameChar10
        InXMLNameStartChar11 InXMLNameChar11
@@ -43,6 +44,12 @@ my %XML_NAME = ('1.0' => qr/\p{InXML_NameStartChar10}\p{InXMLNameChar10}*/,
                 '1.1' => qr/\p{InXMLNameStartChar11}\p{InXMLNameChar11}*/);
 my %XML_NAMESTART = ('1.0' => qr/\p{InXML_NameStartChar10}/,
                      '1.1' => qr/\p{InXMLNameStartChar11}/);
+
+=head1 METHODS
+
+This module implements these common methods:
+
+=cut
 
 sub new ($;%) {
   my $class = shift;
@@ -2161,6 +2168,7 @@ sub parse_attlist_declaration ($$$%) {
                keyword => ${$param->{value}});
           }
         } elsif ($param->{type} eq 'grpo') {
+          $q->{ExpandedURI q<attribute-type>} = \'group';
           $self->parse_attrtype_group
             ($opt{ExpandedURI q<source>}->[-1], $pp, %opt);
         } else {
@@ -4269,4 +4277,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/07/30 09:37:50 $
+1; # $Date: 2004/08/03 04:19:53 $

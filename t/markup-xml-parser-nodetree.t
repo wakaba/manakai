@@ -723,6 +723,26 @@ my @a = (
   ],
  },
 
+ {
+  method => q<parse_document_entity>,
+  t => q(<!DOCTYPE r [<!ATTLIST ab tr CDATA #IMPLIED>]><r></r>),
+  result => [
+    q<<!DOCTYPE r [<!ATTLIST ab tr CDATA #IMPLIED>]><r xmlns=""></r>>,
+    q<<!DOCTYPE r [<!ATTLIST ab tr CDATA #IMPLIED>]><r xmlns=""></r>>,
+  ],
+ },
+ {
+  method => q<parse_document_entity>,
+  t => q(<!DOCTYPE r [<!ATTLIST ab tr CDATA #IMPLIED
+                                   ef ID #REQUIRED>]><r></r>),
+  result => [
+    q<<!DOCTYPE r [<!ATTLIST ab tr CDATA #IMPLIED
+                                   ef ID #REQUIRED>]><r xmlns=""></r>>,
+    q<<!DOCTYPE r [<!ATTLIST ab tr CDATA #IMPLIED
+                                   ef ID #REQUIRED>]><r xmlns=""></r>>,
+  ],
+ },
+
  # LAST TEST
 );
 

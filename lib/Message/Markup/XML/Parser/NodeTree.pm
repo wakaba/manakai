@@ -14,13 +14,13 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::NodeTree;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Message::Markup::XML::Parser::NodeTree;
 push our @ISA, 'Message::Markup::XML::Parser::Base';
 use Message::Markup::XML::Parser::Base;
 use Message::Markup::XML::QName qw/:prefix/;
-use Message::Markup::XML::Node qw/:charref :declaration :entity/;
+use Message::Markup::XML::Node qw/:charref :declaration :entity XML_ATTLIST/;
 use Message::Util::ResourceResolver::XML;
 use URI;
 
@@ -526,6 +526,43 @@ sub attlist_declaration_start ($$$$%) {
                       namespace_uri => SGML_ATTLIST);
 }
 
+sub attribute_definition ($$$$%) {
+  my ($self, $src, $p, $pp, %opt) = @_;
+  my $attrdef = $pp->{ExpandedURI q<tree:current>}
+              = $p->{ExpandedURI q<tree:current>}
+                  ->append_new_node
+                     (type => '#element',
+                      namespace_uri => XML_ATTLIST,
+                      local_name => 'AttDef');
+  $attrdef->set_attribute (qname => ${$pp->{ExpandedURI q<attribute-name>}})
+    if $pp->{ExpandedURI q<attribute-name>};
+  if ($pp->{ExpandedURI q<attribute-type>}) {
+    if (${$pp->{ExpandedURI q<attribute-type>}} eq 'group') {
+      $attrdef->set_attribute (type => 'enum');
+    } else {
+      $attrdef->set_attribute (type => ${$pp->{ExpandedURI q<attribute-type>}});
+    }
+# TODO: enum & NOTATION
+  }
+  if ($pp->{ExpandedURI q<attribute-default>}) {
+    if (${$pp->{ExpandedURI q<attribute-default>}} eq 'specific') {
+      
+    } else {
+      $attrdef->set_attribute
+                  (default_type => ${$pp->{ExpandedURI q<attribute-default>}});
+    }
+# TODO: specific & FIXED
+  }
+} # attribute_definition
+
+sub attlist_declaration_end ($$$$%) {
+  my ($self, $src, $p, $pp, %opt) = @_;
+  for my $ELEMENT ($pp->{ExpandedURI q<tree:current>}) {
+    $ELEMENT->set_attribute (qname => ${$pp->{ExpandedURI q<element-type-name>}})
+      if $pp->{ExpandedURI q<element-type-name>};
+  }
+}
+
 sub markup_declaration_parameters_start ($$$$%) {
   my ($self, $src, $p, $pp, %opt) = @_;
   $pp->{ExpandedURI q<tree:physical>}
@@ -538,11 +575,14 @@ sub markup_declaration_parameter ($$$$%) {
   my $param = $pp->{ExpandedURI q<parameter>};
   if ($param->{type} eq 'ps' or
       $param->{type} eq 'Name' or
-      $param->{type} eq 'peroName' or
-      $param->{type} eq 'rniKeyword') {
+      $param->{type} eq 'peroName') {
     $p->{ExpandedURI q<tree:physical>}
       ->{$opt{ExpandedURI q<source>}->[-1]}
       ->append_text (${$param->{value}});
+  } elsif ($param->{type} eq 'rniKeyword') {
+    $p->{ExpandedURI q<tree:physical>}
+      ->{$opt{ExpandedURI q<source>}->[-1]}
+      ->append_text ('#'.${$param->{value}});
   } elsif ($param->{type} eq 'syslit' or $param->{type} eq 'publit') {
     $p->{ExpandedURI q<tree:physical>}
       ->{$opt{ExpandedURI q<source>}->[-1]}
@@ -893,4 +933,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/07/30 09:37:51 $
+1; # $Date: 2004/08/03 04:19:53 $
