@@ -1637,11 +1637,12 @@ sub dis_perl_init_classdef ($;%) {
            }->{$type}) {
     ## Method or attribute name
     my $name = $res->{Name};
-    if ($name =~ /^[A-Z]+$/ and $name ne 'URL') {
-      valid_err (q<All upper-case Perl method name is not allowed>,
-                 node => $res->{src});
-      ## except HTMLDocument.URL attribute
-    }
+    $name =~ s/^([A-Z0-9]+)$/lc $1/ge;
+    $name =~ s/([A-Z][A-Z0-9]*)$/"_".lc $1/ge;
+    $name =~ s/([A-Z0-9])([A-Z0-9]*)([A-Z0-9])/$1.lc ($2)."_".lc $3/ge;
+    $name =~ s/([A-Z])/"_".lc $1/ge;
+    $name =~ s/(?=[0-9](?!$))/_/g;
+    
     my $int = dis_get_attr_node
                  (%opt, name => {uri => ExpandedURI q<ManakaiDOM:isForInternal>},
                   parent => $res->{src});
@@ -2732,4 +2733,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/02/16 04:25:00 $
+1; # $Date: 2005/02/16 08:42:41 $
