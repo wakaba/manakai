@@ -7,6 +7,8 @@ Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @MDOM_EXCEPTION:
      http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @null:
@@ -20,6 +22,13 @@ Namespace:
     http://www.w3.org/2000/xmlns/
 Module:
   @Name: ManakaiDOMCore
+  @BindingName:
+    @@prefix:
+      Message::DOM::
+    @@ContentType:
+      lang:Perl
+    @@For:
+      ManakaiDOM:ManakaiDOM
   @FullName:
     @@lang:en
     @@@: Manakai DOM Core Module
@@ -38,31 +47,22 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/10/31 12:30:28 $
+     $Date: 2004/11/03 11:50:14 $
 
-  @ConditionDef:
-    @@Name: DOM1
-  @ConditionDef:
-    @@Name: DOM2
-    @@ISA:DOM1
-  @ConditionDef:
-    @@Name: DOM3
-    @@ISA:DOM2
-  
   @Require:
     @@Module:
+      @@@Name:ManakaiDOMMain
+    @@Module:
       @@@Name: DOMCore
-      @@@Namespace:
-        http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @DefaultFor:
+    ManakaiDOM:ManakaiDOMLatest
 
   @Feature:
     @@QName: 
       ManakaiDOM:ManakaiDOMCore
     @@Version: 1.0
-    @@Condition[list]:
-      DOM1
-      DOM2
-      DOM3
+    @@For:
+      ManakaiDOM:DOM1
     @@Description:
       @@@lang:en
       @@@@: The Manakai DOM Core Module, Level 1.
@@ -76,9 +76,8 @@ Module:
     @@QName:
       ManakaiDOM:ManakaiDOMCore
     @@Version: 2.0
-    @@Condition[list]:
-      DOM2
-      DOM3
+    @@For:
+      ManakaiDOM:DOM2
     @@Description:
       @@@lang:en
       @@@@: The Manakai DOM Core Module, Level 2.
@@ -90,23 +89,29 @@ Module:
     @@QName:
       ManakaiDOM:ManakaiDOMCore
     @@Version: 3.0
-    @@Condition[list]:
-      DOM3
+    @@For:
+      ManakaiDOM:DOM3
     @@Description:
       @@@lang:en
       @@@@: The Manakai DOM Core Module, Level 3.
     @@Contrib:
       DOMCore:DOMImplementation::DOM3
 
-IF:
+ClassDef:
   @Name: ManakaiDOMNodeObjectNode
+  @Type:
+    ManakaiDOM:Class
+  @For:
+    ManakaiDOM:ManakaiDOM
+
   @Description:
     @@lang:en
     @@@:
       The extended internal interface for the "ManakaiDOMNodeObject" 
       object used as a "Node".
+
   @ISA:
-    ManakaiDOM:ManakaiDOMNodeObject::
+    ManakaiDOM:ManakaiDOMNodeObject
   @IntAttr:
     @@Name: textContent
     @@Description:
@@ -938,12 +943,17 @@ IF:
             }
           }
 
-## IF:ManakaiDOMNodeObjectNode
+## ClassDef:ManakaiDOMNodeObjectNode
 
-IF:
+ClassDef:
   @Name:  ManakaiDOMChildNodeList
+  @For:
+    ManakaiDOM:ManakaiDOM
+  @Type:
+    ManakaiDOM:Class
+
   @ISA:
-    ManakaiDOM:ManakaiDOMNodeReference::
+    ManakaiDOM:ManakaiDOMNodeReference
   @Implement: 
     DOMCore:NodeList
   @Description:
@@ -1050,10 +1060,14 @@ IF:
     @@SpecLevel:3
 ## IF:ManakaiDOMChildNodeList
 
-IF:
+ClassDef:
   @Name: ManakaiDOMGetElementsNodeList
+  @Type: 
+    ManakaiDOM:Class
+  @For:
+    ManakaiDOM:ManakaiDOM
   @ISA:
-    ManakaiDOM:ManakaiDOMNodeReference::
+    ManakaiDOM:ManakaiDOMNodeReference
   @Implement:
     DOMCore:NodeList
   @Description:

@@ -1,4 +1,6 @@
 Namespace:
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @DOMCore:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @lang:
@@ -7,6 +9,8 @@ Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
   @license:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @ManakaiDOMImplementationException:
      http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @MDOM_EXCEPTION:
@@ -18,9 +22,12 @@ Namespace:
 Module:
   @Name: ManakaiDOMMain
   @BindingName:
-    @@@: mdommain
-    @@Type:
-      lang:IDL-DOM
+    @@prefix:
+      Message::DOM::
+    @@ContentType:
+      lang:Perl
+    @@For:
+      ManakaiDOM:ManakaiDOM
   @FullName:
     @@lang:en
     @@@: Manakai DOM Implementation Main Module
@@ -33,7 +40,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/10/31 12:30:29 $
+     $Date: 2004/11/03 11:50:14 $
   
   @Description:
     @@lang:en
@@ -41,6 +48,115 @@ Module:
       The Manakai DOM Implementation Main Module defines 
       the fundemental interfaces that is used commonly by the 
       manakai DOM implementation.
+
+  @ForDef:
+    @@QName:
+      ManakaiDOM:all
+    @@FullName:
+      @@@lang:en
+      @@@@: For all
+  @ForDef:
+    @@QName:
+      ManakaiDOM:IDL
+    @@FullName:
+      @@@lang:en
+      @@@@: DOM IDL
+  @ForDef:
+    @@QName:
+      ManakaiDOM:Perl
+    @@FullName:
+      @@@lang:en
+      @@@@: Perl 5
+  @ForDef:
+    @@QName:
+      ManakaiDOM:DOM
+    @@FullName:
+      @@@lang:en
+      @@@@:DOM
+  @ForDef:
+    @@QName:
+      ManakaiDOM:DOM1
+    @@FullName:
+      @@@lang:en
+      @@@@:DOM Level 1
+    @@ISA:
+      ManakaiDOM:DOM
+  @ForDef:
+    @@QName:
+      ManakaiDOM:DOM2
+    @@FullName:
+      @@@lang:en
+      @@@@:DOM Level 2
+    @@ISA:
+      ManakaiDOM:DOM1
+  @ForDef:
+    @@QName:
+      ManakaiDOM:DOM3
+    @@FullName:
+      @@@lang:en
+      @@@@:DOM Level 3
+    @@ISA:
+      ManakaiDOM:DOM2
+  @ForDef:
+    @@QName:
+      ManakaiDOM:DOMLatest
+    @@FullName:
+      @@@lang:en
+      @@@@:The latest level of DOM
+    @@ISA:
+      ManakaiDOM:DOM3
+  @ForDef:
+    @@QName:
+      ManakaiDOM:ManakaiDOM
+    @@FullName:
+      @@@lang:en
+      @@@@: The manakai DOM implementation
+    @@Implement:
+      ManakaiDOM:DOM
+    @@ISA:
+      ManakaiDOM:Perl
+  @ForDef:
+    @@QName:
+      ManakaiDOM:ManakaiDOM1
+    @@FullName:
+      @@@lang:en
+      @@@@:The manakai DOM Level 1 implementation
+    @@Implement:
+      ManakaiDOM:DOM1
+    @@ISA:
+      ManakaiDOM:ManakaiDOM
+  @ForDef:
+    @@QName:
+      ManakaiDOM:ManakaiDOM2
+    @@FullName:
+      @@@lang:en
+      @@@@:The manakai DOM Level 2 implementation
+    @@Implement:
+      ManakaiDOM:DOM2
+    @@ISA:
+      ManakaiDOM:ManakaiDOM1
+  @ForDef:
+    @@QName:
+      ManakaiDOM:ManakaiDOM3
+    @@FullName:
+      @@@lang:en
+      @@@@:The manakai DOM Level 3 implementation
+    @@Implement:
+      ManakaiDOM:DOM3
+    @@ISA:
+      ManakaiDOM:ManakaiDOM2
+  @ForDef:
+    @@QName:
+      ManakaiDOM:ManakaiDOMLatest
+    @@FullName:
+      @@@lang:en
+      @@@@:The manakai implementation of the latest level of DOM
+    @@Implement:
+      ManakaiDOM:DOMLatest
+    @@ISA:
+      ManakaiDOM:ManakaiDOM3
+  @DefaultFor:
+    ManakaiDOM:ManakaiDOMLatest
 
   @Feature:
     @@QName: 
@@ -58,44 +174,123 @@ Module:
       DOMCore:DOMImplementation::DOM3
 
   @Require:
-    @@Module:
+    @@BindingModule:
+      @@@For:
+        ManakaiDOM:ManakaiDOM
       @@@Def:
-        @@@@Type:
-          lang:Perl
+        @@@@ContentType:
+          dis:Perl
         @@@@require:
           Message::Util::Error
     @@Module:
-      @@@Name: ManakaiDOMMain
-      @@@Namespace:
-        http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@: 0;
-      @@@Def:\
-      @@@Description:
-        @@@@lang:en
-        @@@@@: Dummy.
-    @@Module:
-      @@@Name: DOMCore
-      @@@Namespace:
-        http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@: 0;
-      @@@Def:\
-      @@@Description:
-        @@@@lang:en
-        @@@@@: Dummy.
+      @@@Name: DOMMain
 
-DataType:
+ClassDef:
+  @QName: 
+    dis:ClassType
+  @Type:
+    dis:ClassType
+  @Description:
+    @@lang:en
+    @@@:
+      A dis class type.  It can be specified as a value of a 
+      <CODE:Type> attribute of a <CODE:ClassDef> element.
+ClassDef:
+  @Name: IF
+  @Type:
+    dis:ClassType
+  @Description:
+    @@lang:en
+    @@@:
+      An interface.
+ClassDef:
+  @Name: DataType
+  @Type:
+    dis:ClassType
+  @Description:
+    @@lang:en
+    @@@:
+      A abstract data type.
+ClassDef:
+  @Name: Exception
+  @Type:
+    dis:ClassType
+  @Description:
+    @@lang:en
+    @@@:
+      An exception type.
+ClassDef:
+  @Name: Warning
+  @Type:
+    dis:ClassType
+  @Description:
+    @@lang:en
+    @@@:
+      A warning type.
+ClassDef:
+  @Name: ConstGroup
+  @Type:
+    dis:ClassType
+  @Description:
+    @@lang:en
+    @@@:
+      A set of constant values.
+ClassDef:
+  @Name: Class
+  @Type:
+    dis:ClassType
+  @Description:
+    @@lang:en
+    @@@:
+      A programming language class.
+
+DataTypeDef:
+  @QName:
+    lang:dis
+  @FullName:
+    @@lang:en
+    @@@: dis grove
+DataTypeDef:
+  @QName:
+    lang:Perl
+  @ISA:
+    DOMMain:DOMString
+  @FullName:
+    @@lang:en
+    @@@: Perl 5 code
+DataTypeDef:
+  @QName:
+    dis:Perl
+  @FullName:
+    @@lang:en
+    @@@: dis grove for Perl
+  @ISA: 
+    lang:dis
+DataTypeDef:
+  @QName:
+    lang:disdoc
+  @FullName:
+    @@lang:en
+    @@@: disdoc text format
+  @ISA:
+    DOMMain:DOMString
+DataTypeDef:
+  @QName:
+    lang:muf
+  @FullName:
+    @@lang:en
+    @@@: 
+      <PerlModule:Message::Util::Formatter> template
+  @ISA:
+    DOMMain:DOMString
+
+DataTypeDef:
   @Name: ManakaiDOMURI
   @ISA: 
     DOMMain:DOMString
   @FullName: 
     @@lang:en
-    @@@: DOMString (DOM URI)
+    @@@: DOM URI
   @Description:
     @@lang:en
     @@@:
@@ -116,16 +311,16 @@ DataType:
   @ImplNote:
     @@lang:en
     @@@:
-      Examples of the DOM URIs include the URI references and 
-      the IRI references.
+      Examples of the DOM URI include RFC 2396/2773 URI reference and 
+      IRI reference.
 
-DataType:
+DataTypeDef:
   @Name: ManakaiDOMNamespaceURI
   @ISA: 
     DOMMain:DOMString
   @FullName:
     @@lang:en
-    @@@: DOMString (Namespace URI)
+    @@@: DOM Namespace URI
   @Description:
     @@lang:en
     @@@:
@@ -152,36 +347,36 @@ DataType:
       "ManakaiDOMNamespaceURI", the Perl code to check the empty 
       string is outputed as part of the implementation.
 
-DataType:
+DataTypeDef:
   @Name: ManakaiDOMFeatureName
   @ISA: 
     DOMMain:DOMString
   @FullName:
     @@lang:en
-    @@@: DOMString (feature name)
+    @@@: feature name
   @Description:
     @@lang:en
     @@@:
       The DOM feature name.
 
-DataType:
+DataTypeDef:
   @Name: ManakaiDOMFeatureVersion
   @ISA: 
     DOMMain:DOMString
   @FullName:
     @@lang:en
-    @@@: DOMString (feature version)
+    @@@: feature version
   @Description:
     @@lang:en
     @@@: The DOM feature version.
 
-DataType:
+DataTypeDef:
   @Name: ManakaiDOMFeatures
   @ISA: 
     DOMMain:DOMString
   @FullName:
     @@lang:en
-    @@@: DOMString (features)
+    @@@: features
   @Description:
     @@lang:en
     @@@:
@@ -189,38 +384,40 @@ DataType:
       and an optional <TYPE:ManakaiDOM:ManakaiDOMFeatureVersion>, 
       separated by white space.
 
-DataType:
+DataTypeDef:
   @Name:ManakaiDOMKeyIdentifier
   @ISA:
     DOMMain:DOMString
   @FullName:
     @@lang:en
-    @@@: DOMString (key identifier)
+    @@@: key identifier
   @Description:
     @@lang:en
     @@@:
       A key identifier.
     \
       {NOTE:: A set of key identifiers are defined in the Appendix A 
-              of the DOM Level 3 Events Specification.
+              of the <CITE:DOM Level 3 Events> Specification.
     \
       }
 
-DataType:
+DataTypeDef:
   @Name:ManakaiDOMKeyIdentifiers
   @ISA:
     DOMMain:DOMString
   @FullName:
     @@lang:en
-    @@@:DOMString (list of key identifiers)
+    @@@:list of key identifiers
   @Description:
     @@lang:en
     @@@:
       Zero or more <TYPE:ManakaiDOM:ManakaiDOMKeyIdentifier> separated 
       by white space (XML 1.0 <CODE:S>).
 
-Exception:
+ExceptionDef:
   @Name: ManakaiDOMImplementationException
+  @ISA: ManakaiDOMException
+  @For: ManakaiDOM
   @Description:
     @@lang:en
     @@@:
@@ -237,8 +434,12 @@ Exception:
            The error code from the constant value group
            "ManakaiDOMImplementationExceptionCode".
 
-  @ConstGroup:
+  @ClassDef:
     @@Name: ManakaiDOMImplementationExceptionCode
+    @@Type:
+      ManakaiDOM:ConstGroup
+    @@ISA:
+      DOMMain:unsigned-short
 
     @@Const:
       @@@Name: MDOM_TYPE_MISMATCH_ERR
@@ -349,8 +550,10 @@ Exception:
         The method or attribute called is part of the callback 
         interface so that the DOM application must implement it.
 
-Warning:
+WarningDef:
   @Name: ManakaiDOMImplementationWarning
+  @ISA: ManakaiDOMWarning
+  @For: ManakaiDOM
   @Description:
     @@lang:en
     @@@:
@@ -367,8 +570,12 @@ Warning:
            The warning code from the constant value group
            ManakaiDOMImplementationWarningCode.
 
-  @ConstGroup:
+  @ClassDef:
     @@Name: ManakaiDOMImplementationWarningCode
+    @@Type:
+      ManakaiDOM:ConstGroup
+    @@ISA: 
+      DOMMain:unsigned-short
     
     @@Const:
       @@@Name: ATTR_SET_NO_EFFECT
@@ -430,8 +637,13 @@ Warning:
           @@@@@lang:en
           @@@@@@: The parameter to which inappropriate value is specified.
 
-IF:
+ClassDef:
   @Name: ManakaiDOMObject
+  @Type:
+    ManakaiDOM:Class
+  @For: ManakaiDOM
+  @ISA:
+    DOMMain:DOMObject
   @Description:
     @@lang:en
     @@@:
@@ -476,8 +688,10 @@ IF:
             warn $err->stringify;
           }
 
-Exception:
+ClassDef:
   @Name: ManakaiDOMExceptionOrWarning
+  @Type: Class
+  @For: ManakaiDOM
   @Description:
     @@lang:en
     @@@:
@@ -526,23 +740,30 @@ Exception:
           $r = $self->_FORMATTER_PACKAGE_->new
                     ->replace ($template, param => $self);
 
-Exception:
+ExceptionDef:
   @Name: ManakaiDOMException
+  @ISA: ManakaiDOMExceptionOrWarning
+  @For: ManakaiDOM
   @Description:
     @@lang:en
     @@@:
       The common interface that is implemented by all Manakai DOM 
       exceptions.
-Warning:
+WarningDef:
   @Name: ManakaiDOMWarning
+  @ISA: ManakaiDOMExceptionOrWarning
+  @For: ManakaiDOM
   @Description:
     @@lang:en
     @@@:
       The common interface that is implemented by all Manakai DOM 
       warnings.
 
-IF:
+ClassDef:
   @Name: ManakaiDOMNodeObject
+  @Type: Class
+  @ISA: ManakaiDOMObject
+  @For: ManakaiDOM
   @Description:
     @@lang:en
     @@@:
@@ -854,8 +1075,11 @@ IF:
             $self->__SUPER{ManakaiDOMNodeObject::}__::__INT{destroy}__;
           }
 
-IF:
+ClassDef:
   @Name: ManakaiDOMNodeReference
+  @For: ManakaiDOM
+  @Type: Class
+  @ISA: ManakaiDOMObject
   @IntMethod:
     @@Name: destroy
     @@Description:

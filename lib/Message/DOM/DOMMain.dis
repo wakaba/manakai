@@ -7,6 +7,8 @@ Namespace:
      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/
   @ManakaiDOMImplementationException:
      http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @MDOM_EXCEPTION:
      http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
 Module:
@@ -14,13 +16,22 @@ Module:
   @BindingName:
     @@@: dom
     @@prefix:  w3c.org
-    @@Type:
+    @@ContentType:
       lang:IDL-DOM
+    @@For:
+      ManakaiDOM:IDL
+  @BindingName:
+    @@prefix:
+      Message::DOM::
+    @@ContentType:
+      lang:Perl
+    @@For:
+      ManakaiDOM:ManakaiDOM
   @FullName:
     @@lang: en
     @@@: DOM Core DataTypes and Objects
   @Namespace:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   
   @Description:
     @@lang:en
@@ -35,7 +46,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/10/31 12:30:28 $
+     $Date: 2004/11/03 11:50:14 $
   
   @Feature:
     @@QName:
@@ -80,7 +91,7 @@ Module:
       DOMCore:DOMImplementation::DOM3
   
   @Require:
-    @@Module:
+    @@BindingModule:
       @@@Def:
         @@@@require: overload
         @@@@Type:
@@ -88,7 +99,7 @@ Module:
       @@@Description:
         @@@@lang:en
         @@@@@: Perl operator overloading pragma.
-    @@Module:
+    @@BindingModule:
       @@@Def:
         @@@@require: Encode
         @@@@Type: 
@@ -98,51 +109,31 @@ Module:
         @@@@@:
           The Perl modules to convert character encoding.
     @@Module:
-      @@@Name: DOMMain
-      @@@Namespace:
-        http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
-      @@@Def:\
-      @@@Def:
-        @@@@Type: 
-          lang:Perl
-        @@@@@: 0;
-      @@@Description:
-        @@@@lang:en
-        @@@@@: Dummy.
-    @@Module:
       @@@Name: DOMCore
-      @@@Namespace:
-        http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
       @@@Description:
         @@@@lang:en
         @@@@@:
-          DOM Core module.  Note that "DOMCore" module in turn
-          requires this ("DOMMain") module.
+          The DOM Core module.  Note that <Module:DOMCore> module in turn
+          requires this (<Module:DOMMain>) module.
+  @DefaultFor:
+    ManakaiDOM:ManakaiDOMLatest
 
-  @ConditionDef:
-    @@Name: DOM1
-  @ConditionDef:
-    @@Name: DOM2
-    @@ISA:DOM1
-  @ConditionDef:
-    @@Name: DOM3
-    @@ISA:DOM2
 
 ## Definition for built-in IDL types
 
-DataType:
+DataTypeDef:
   @Name: any
   @Description:
     @@lang:en
     @@@: Any data.
 
-DataType: 
+DataTypeDef: 
   @Name: Object
   @Description:
     @@lang:en
     @@@: An object.
 
-DataType:
+DataTypeDef:
   @Name: unsigned-long-long
   @Def:
     @@Type: 
@@ -155,7 +146,7 @@ DataType:
     @@lang:en
     @@@: A unsigned long long integer.
 
-DataType:
+DataTypeDef:
   @Name: unsigned-long
   @Def:
     @@Type: 
@@ -168,7 +159,7 @@ DataType:
     @@lang:en
     @@@: A unsigned long integer.
 
-DataType:
+DataTypeDef:
   @Name: long
   @FullName:
     @@lang:en
@@ -177,7 +168,7 @@ DataType:
     @@lang:en
     @@@: A signed long integer.
 
-DataType:
+DataTypeDef:
   @Name: unsigned-short
   @Def:
     @@Type: 
@@ -190,7 +181,7 @@ DataType:
     @@lang:en
     @@@: An unsigned short integer.
 
-DataType:
+DataTypeDef:
   @Name: float
   @FullName:
     @@lang:en
@@ -199,16 +190,18 @@ DataType:
     @@lang:en
     @@@: A floating point number.
 
-ConstGroup:
+ClassDef:
   @Name: boolean
+  @Type:
+    ManakaiDOM:ConstGroup
   @Description:
     @@lang:en
-    @@@: A boolean value.
+    @@@: A boolean (truth) value.
   @Const:
     @@Name: true
     @@Value:
       @@@@: 1
-      @@@Type:
+      @@@ContentType:
         lang:Perl
     @@Description:
       @@@lang:en
@@ -217,7 +210,7 @@ ConstGroup:
     @@Name: false
     @@Value:
       @@@@: 0
-      @@@Type:
+      @@@ContentType:
         lang:Perl
     @@Description:
       @@@lang:en
@@ -229,7 +222,7 @@ Const:
   @Name: null
   @Type: any
   @Value:
-    @@Type: 
+    @@ContentType: 
       lang:Perl
     @@@: undef
   @Description:
@@ -240,10 +233,12 @@ Const:
 
 ## Definition from DOM Core IDL
 
-DataType:
+DataTypeDef:
   @Name:  DOMString
   @Def:
-    @@Type:
+    @@For:
+      ManakaiDOM:IDL
+    @@ContentType:
       lang:IDL-DOM
     @@@: sequence<unsigned short>
   @Spec:
@@ -1031,38 +1026,30 @@ DataType:
           $r = pos ($self->{value});
 ## DataType:DOMString
 
-DataType:
+DataTypeDef:
   @Name:  DOMTimeStamp
   @Description:
     @@lang:en
     @@@: An absolute or relative time.  A number of milliseconds.
-  @Def:
-    @@@:
-      unsigned-long-long
-    @@Description:
-      @@@lang:en
-      @@@@:
-        An alias to the type "unsigned-long-long".
-  @Def:
-    @@Type:
-      lang:Perl
-    @@Description:
-      @@@lang:en
-      @@@@:
-        Defined as a reference in the Perl binding.
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        ISSUE: Need considerations for the interface of this type of objects.
+  @AliasOf:
+    @@For:
+      *
+    @@@: unsigned-long-long
   @SpecLevel: 2
   @Level: 2
   @Spec:
     @@DOM3[list]:
       DOM3Core:core.html#Core-DOMTimeStamp
 
-DataTypeAlias:
+DataTypeDef:
   @Name:  DOMUserData
-  @Type:  any
+  @For:
+    ManakaiDOM:DOM3
+  @AliasOf:
+    @@For:
+      *
+    @@@: any
+
   @SpecLevel: 3
   @Level: 3
   @Spec:
@@ -1072,9 +1059,12 @@ DataTypeAlias:
     @@lang:en
     @@@: A reference to application data.
 
-DataTypeAlias:
+DataTypeDef:
   @Name:  DOMObject
-  @Type:  Object
+  @For:
+    ManakaiDOM:DOM3
+  @AliasOf: Object
+
   @SpecLevel: 3
   @Level: 3
   @Spec:
@@ -1084,8 +1074,18 @@ DataTypeAlias:
     @@lang:en
     @@@: An object reference.
 
-IF:
+ClassDef:
   @Name:  DOMImplementationRegistry
+  @Type:
+    ManakaiDOM:Class
+  @For:
+    ManakaiDOM:DOM3
+  @ISA:
+    @@@:
+      ManakaiDOM:ManakaiDOMObject
+    @@For:
+      ManakaiDOM:ManakaiDOM
+
   @SpecLevel: 3
   @Level[list]: 3
   @Spec:

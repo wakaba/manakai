@@ -13,6 +13,8 @@ Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @ManakaiDOMLS:
     http://suika.fam.cx/~wakaba/archive/2004/mdom-ls#
   @ManakaiDOMXML:
@@ -31,8 +33,17 @@ Module:
   @BindingName:
     @@@:  dom
     @@prefix:  w3c.org
-    @@Type:
+    @@ContentType:
       lang:IDL-DOM
+    @@For:
+      ManakaiDOM:IDL
+  @BindingName:
+    @@prefix:
+      Message::DOM::
+    @@ContentType:
+      lang:Perl
+    @@For:
+      ManakaiDOM:ManakaiDOM
   @FullName:
     @@lang:en
     @@@: DOM Core Module
@@ -55,7 +66,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/10/31 12:30:28 $
+     $Date: 2004/11/03 11:50:14 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -1261,7 +1272,7 @@ IF:
            @@@@@@:
            \  <IF:DOMImplementation> objects to add.
          @@@@For:
-           lang:Perl
+           ManakaiDOM:Perl
     @@Return:
       @@@Exception:
         @@@@Type:
@@ -4606,7 +4617,7 @@ IF:
 
 ## IF: Node
 
-IF:
+IFDef:
   @Name:  NodeList
   @Description:
     @@lang:en
