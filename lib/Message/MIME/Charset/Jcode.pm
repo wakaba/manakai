@@ -67,7 +67,7 @@ Message::MIME::Charset::Encode.
 package Message::MIME::Charset::Jcode;
 use strict;
 use vars qw(%CODE $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::MIME::Charset;
 
@@ -205,11 +205,12 @@ sub import ($;%) {
         decoder	=> sub { my $s = $_[1]; Jcode::convert (\$s, $CODE{internal}, 'utf8'); $s },
         mime_text	=> 1,
       );
-      Message::MIME::Charset::make_charset ('ucs-2be' =>
+      Message::MIME::Charset::make_charset ('iso-10646-ucs-2' =>
         encoder	=> sub { Jcode->new ($_[1], $CODE{internal})->ucs2 },
         decoder	=> sub { my $s = $_[1]; Jcode::convert (\$s, $CODE{internal}, 'ucs2'); $s },
         cte_7bit_preferred	=> 'base64',
       );
+      Message::MIME::Charset::make_charset ('ucs-2be' => alias_of => 'iso-10646-ucs-2');
       Message::MIME::Charset::make_charset ('ucs-2' => alias_of => 'ucs-2be');
       Message::MIME::Charset::make_charset ('utf-16' => alias_of => 'ucs-2');
       Message::MIME::Charset::make_charset ('utf-16be' => alias_of => 'ucs-2be');
@@ -293,11 +294,12 @@ sub import ($;%) {
         decoder	=> sub { Unicode::Japanese->new ($_[1], 'ucs2')->conv ($CODE{internal}) },
         cte_7bit_preferred	=> 'base64',
       );
-      Message::MIME::Charset::make_charset ('ucs-2be' =>
+      Message::MIME::Charset::make_charset ('iso-10646-ucs-2' =>
         encoder	=> sub { Unicode::Japanese->new ($_[1], $CODE{internal})->ucs2 },
         decoder	=> sub { Unicode::Japanese->new ($_[1], 'ucs2')->conv ($CODE{internal}) },
         cte_7bit_preferred	=> 'base64',
       );
+      Message::MIME::Charset::make_charset ('ucs-2be' => alias_of => 'iso-10646-ucs-2');
       Message::MIME::Charset::make_charset ('utf-16' =>
         encoder	=> sub { "\xFF\xFE".Unicode::Japanese->new ($_[1], $CODE{internal})->utf16 },
         decoder	=> sub { Unicode::Japanese->new ($_[1], 'utf16')->conv ($CODE{internal}) },
@@ -319,11 +321,12 @@ sub import ($;%) {
         decoder	=> sub { Unicode::Japanese->new ($_[1], 'utf32')->conv ($CODE{internal}) },
         cte_7bit_preferred	=> 'base64',
       );
-      Message::MIME::Charset::make_charset ('ucs-4' =>
+      Message::MIME::Charset::make_charset ('iso-10646-ucs-4' =>
         encoder	=> sub { "\x00\x00\xFF\xFE".Unicode::Japanese->new ($_[1], $CODE{internal})->ucs4 },
         decoder	=> sub { Unicode::Japanese->new ($_[1], 'ucs4')->conv ($CODE{internal}) },
         cte_7bit_preferred	=> 'base64',
       );
+      Message::MIME::Charset::make_charset ('ucs-4' => alias_of => 'iso-10646-ucs-4');
       Message::MIME::Charset::make_charset ('utf-32be' =>
         encoder	=> sub { Unicode::Japanese->new ($_[1], $CODE{internal})->ucs4 },
         decoder	=> sub { Unicode::Japanese->new ($_[1], 'utf32-ge')->conv ($CODE{internal}) },
@@ -383,7 +386,7 @@ sub import ($;%) {
     Message::MIME::Charset::make_charset (jis => alias_of => 'iso-2022-jp');
     Message::MIME::Charset::make_charset (junet => alias_of => 'iso-2022-jp');
     Message::MIME::Charset::make_charset ('junet-code' => alias_of => 'iso-2022-jp');
-    Message::MIME::Charset::make_charset ('x-iso2022jp-cp932' => alias_of => 'iso-2022-jp');	## TODO: support pseudo ISO-2022-JP of Microsoft CP932
+    Message::MIME::Charset::make_charset ('x-iso2022jp-cp932' => alias_of => 'iso-2022-jp');	## pseudo ISO-2022-JP of Microsoft CP932
     Message::MIME::Charset::make_charset ('iso-2022-jp-1' => alias_of => 'iso-2022-jp');
     Message::MIME::Charset::make_charset ('iso-2022-jp-3' => alias_of => 'iso-2022-jp');
     Message::MIME::Charset::make_charset ('x-iso-2022-jp-3' => alias_of => 'iso-2022-jp-3');
@@ -410,7 +413,7 @@ sub import ($;%) {
 }
 
 sub unimport ($) {
-  for (qw/euc euc-jisx0213 euc-jisx0213-plane1 euc-jp euc_jp iso-2022-jp iso-2022-jp-1 iso-2022-jp-3 iso-2022-jp-3-plane1 jis jis_x0201 junet junet-code shift-jis shift_jis shift-jisx0213 shift_jisx0213 shift_jisx0213-plane1 sjis ucs-2 ucs-2be ucs-2le ucs-4 ucs-4be ucs-4le utf-8 utf-16 utf-16be utf-16le utf-32 utf-32be utf-32le x0201 x-euc x-euc-jisx0213 x-euc-jisx0213-packed x-euc-jisx0213-plane1 x-euc-jp x-iso-2022-jp-3 x-shift-jisx0213 x-shift_jisx0213 x-sjis/) {
+  for (qw/euc euc-jisx0213 euc-jisx0213-plane1 euc-jp euc_jp iso-2022-jp iso-2022-jp-1 iso-2022-jp-3 iso-2022-jp-3-plane1 iso-10646-ucs-2 iso-10646-ucs-4 jis jis_x0201 junet junet-code shift-jis shift_jis shift-jisx0213 shift_jisx0213 shift_jisx0213-plane1 sjis ucs-2 ucs-2be ucs-2le ucs-4 ucs-4be ucs-4le utf-8 utf-16 utf-16be utf-16le utf-32 utf-32be utf-32le x0201 x-euc x-euc-jisx0213 x-euc-jisx0213-packed x-euc-jisx0213-plane1 x-euc-jp x-iso-2022-jp-3 x-shift-jisx0213 x-shift_jisx0213 x-sjis/) {
     delete $Message::MIME::Charset::CHARSET{$_};
   }
   Message::MIME::Charset::make_charset ('*default' =>
@@ -440,6 +443,8 @@ sub __kconv_code_name ($) {
   $c eq 'jis' ? &_JIS:
   &_AUTO;
 }
+
+## TODO: UCS support is very confusual, especially its charset name
 
 =head1 EXAMPLE
 
@@ -496,7 +501,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/21 03:25:23 $
+$Date: 2002/08/18 06:21:24 $
 
 =cut
 

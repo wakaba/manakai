@@ -18,7 +18,7 @@ This module provides such macros for Encode modules.
 package Message::MIME::Charset::Encode;
 use strict;
 use vars qw(%CODE $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::MIME::Charset;
 require Encode;
@@ -40,6 +40,21 @@ require Encode::Alias;
 Encode::Alias::define_alias( qr/^(?:x-)?mac[-_]?(\w+)$/i => '"mac$1"' );
 Encode::Alias::define_alias( qr/^macintosh$/i => '"macroman"' );
 Encode::Alias::define_alias( qr/^windows[-_]?31j$/i => '"cp932"' );
+unless ($Encode::EUCFixed::VERSION) {
+  Encode::Alias::define_alias( qr/^cseucfixwidjapanese$/i => '"extended_unix_code_fixed_width_for_japanese"' );
+}
+unless ($Encode::HZ::VERSION) {
+  Encode::Alias::define_alias( qr/^hz-gb-2312$/i => '"hz"' );
+}
+unless ($Encode::UTF1::VERSION) {
+  Encode::Alias::define_alias( qr/^csiso10646utf1$/i => '"iso-10646-utf-1"' );
+  Encode::Alias::define_alias( qr/^utf-?1$/i => '"iso-10646-utf-1"' );
+}
+unless ($Encode::UTF7::VERSION) {
+  Encode::Alias::define_alias( qr/^(?:x-)?unicode-.-.-utf-?7$/i => '"utf-7"' );
+  Encode::Alias::define_alias( qr/^csunicode11utf7$/i => '"utf-7"' );
+  Encode::Alias::define_alias( qr/^cp65000$/i => '"utf-7"' );
+}
 
 my %_PerlName2IanaName = qw(
 	7bit-jis	iso-2022-jp-1
@@ -97,15 +112,53 @@ sub import ($;%) {
       return ($s, success => 0) unless Encode::find_encoding ($name);
       return (Encode::decode ($name, $s), success => 1);
     },
-    preferred_name	=> sub {
+    preferred_name	=> \&_preferred_name,
+  );
+  Message::MIME::Charset::make_charset ('*default' => alias_of => '*undef');
+  Message::MIME::Charset::make_charset (extended_unix_code_fixed_width_for_japanese =>
+    encoder	=> sub { &_encoder ('EUCFixed', 'EUCFixed', @_) },
+    decoder	=> sub { &_decoder ('EUCFixed', 'EUCFixed', @_) },
+  );
+  Message::MIME::Charset::make_charset ('x-iso2022jp-cp932' =>
+    encoder	=> sub { &_encoder ('ISO2022::CP932', 'ISO2022::CP932', @_) },
+    decoder	=> sub { &_decoder ('ISO2022::CP932', 'ISO2022::CP932', @_) },
+  );
+  Message::MIME::Charset::make_charset ('iso-10646-utf-1' =>
+    encoder	=> sub { &_encoder ('Unicode::UTF1', 'Unicode::UTF1', @_) },
+    decoder	=> sub { &_decoder ('Unicode::UTF1', 'Unicode::UTF1', @_) },
+  );
+  Message::MIME::Charset::make_charset ('utf-7' =>
+    encoder	=> sub { &_encoder ('Unicode::UTF7', 'Unicode::UTF7', @_) },
+    decoder	=> sub { &_decoder ('Unicode::UTF7', 'Unicode::UTF7', @_) },
+  );
+  Message::MIME::Charset::make_charset ('x-imap4-modified-utf7' =>
+    encoder	=> sub { &_encoder ('Unicode::UTF7', 'Unicode::UTF7::IMAP', @_) },
+    decoder	=> sub { &_decoder ('Unicode::UTF7', 'Unicode::UTF7::IMAP', @_) },
+  );
+}
+
+sub _encoder ($@) {
+  no strict 'refs';
+  my $p1 = shift;
+  my $p2 = shift;
+  if (!${'Encode::'.$p2.'::VERSION'} && !eval qq{use Encode::$p1}) {
+    Message::MIME::Charset::_utf8_off ($s);
+    return ($s, success => 0);
+  }
+  return (Encode::encode (@_), success => 1);
+}
+sub _decoder ($@) {
+  no strict 'refs';
+  my $p = shift;
+  return ($_[1], success => 0)
+    if !${'Encode::'.$p.'::VERSION'} && !eval qq{use Encode::$p};
+  return (Encode::decode (@_), success => 1);
+}
+sub _preferred_name ($) {
       my $name = shift;
       my $perlname = lc Encode::resolve_alias ($name);
       $_PerlName2IanaName{$perlname} || $perlname || $name;
-    },
-  );
-  Message::MIME::Charset::make_charset ('*default' => alias_of => '*undef');
 }
-
 
 =head1 EXAMPLE
 
@@ -145,7 +198,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/22 07:47:15 $
+$Date: 2002/08/18 06:21:24 $
 
 =cut
 
