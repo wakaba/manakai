@@ -9,7 +9,7 @@ for "message/delivery-status" Internet Media Types
 package Message::Body::MessageDeliveryStatus;
 use strict;
 use vars qw(%DEFAULT @ISA $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Body::Text;
 push @ISA, qw(Message::Body::Text);
@@ -45,10 +45,14 @@ sub _init ($;%) {
   $self->{option}->{value_type}->{per_message} = ['Message::Header',{
   	-format => 'message-delivery-status-per-message',
   	-ns_default_phuri	=> $Message::Header::Message::DeliveryStatus::OPTION{namespace_uri},
+  	-hook_init_fill_options	=> \&_fill_init_pm,
+  	-hook_stringify_fill_fields	=> \&_fill_fields_pm,
   }];
   $self->{option}->{value_type}->{per_recipient} = ['Message::Header',{
   	-format => 'message-delivery-status-per-recipient',
   	-ns_default_phuri	=> $Message::Header::Message::DeliveryStatus::OPTION{namespace_uri},
+  	-hook_init_fill_options	=> \&_fill_init_pr,
+  	-hook_stringify_fill_fields	=> \&_fill_fields_pr,
   }];
 }
 
@@ -178,9 +182,57 @@ sub stringify ($;%) {
   my %o = @_;  my %option = %{$self->{option}};
   for (grep {/^-/} keys %o) {$option{substr ($_, 1)} = $o{$_}}
   $self->_delete_empty;
+  $self->add ({-parse => 1}, '') unless $#{ $self->{value} } + 1;
   join ("\x0D\x0A", $self->{per_message}, @{ $self->{value} }) . "\x0D\x0A";
 }
 *as_string = \&stringify;
+
+sub _fill_init_pm ($\%) {
+  my ($hdr, $option) = @_;
+  unless (defined $option->{fill_reporting_mta}) {
+    $option->{fill_reporting_mta} = 1;
+    $option->{fill_reporting_mta_name} = 'reporting-mta';
+  }
+}
+sub _fill_init_pr ($\%) {
+  my ($hdr, $option) = @_;
+  unless (defined $option->{fill_action}) {
+    $option->{fill_action} = 1;
+  }
+  unless (defined $option->{fill_final_recipient}) {
+    $option->{fill_final_recipient} = 1;
+  }
+  unless (defined $option->{fill_status}) {
+    $option->{fill_status} = 1;
+  }
+}
+
+sub _fill_fields_pm ($\%\%) {
+  my ($hdr, $exist, $option) = @_;
+  my $ns = ':'.$option->{ns_default_phuri};
+  if ($option->{fill_reporting_mta}
+    && !$exist->{ $option->{fill_reporting_mta_name}.$ns  }) {
+    my $rmta = $hdr->field ($option->{fill_reporting_mta_name});
+    $rmta->type ('dns');
+    $rmta->value ('localhost');
+  }
+}
+sub _fill_fields_pr ($\%\%) {
+  my ($hdr, $exist, $option) = @_;
+  my $ns = ':'.$option->{ns_default_phuri};
+  if ($option->{fill_action} && !$exist->{ 'action'.$ns }) {
+    my $act = $hdr->field ('action');
+    $act->value ('failed');
+  }
+  if ($option->{fill_final_recipient} && !$exist->{ 'final-recipient'.$ns }) {
+    my $fr = $hdr->field ('final-recipient');
+    $fr->type ('rfc822');
+    $fr->value ('foo@bar.invalid');
+  }
+  if ($option->{fill_status} && !$exist->{ 'status'.$ns }) {
+    my $fr = $hdr->add (status => '4.0.0');
+  }
+}
 
 ## Inherited: option, clone
 
@@ -220,7 +272,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/08 11:48:12 $
+$Date: 2002/07/08 12:39:39 $
 
 =cut
 

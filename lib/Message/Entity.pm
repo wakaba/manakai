@@ -13,7 +13,7 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.25 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.26 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::Header;
@@ -44,6 +44,8 @@ use overload '""' => sub { $_[0]->stringify },
     -format	=> 'mail-rfc2822',
     -header_default_charset	=> 'iso-2022-int-1',
     -header_default_charset_input	=> 'iso-2022-int-1',
+    -hook_init_fill_options	=> sub {},
+    -hook_stringify_fill_fields	=> sub {},
     -linebreak_strict	=> 0,	## BUG: not work perfectly
     -parse_all	=> 0,
     -recalc_md5	=> 1,
@@ -117,6 +119,7 @@ sub _init ($;%) {
     $self->{option}->{fill_ua_name} = $format =~ /response|cgi|uri-url-mailto/?
       'server': 'user-agent';
   }
+  &{ $self->{option}->{hook_init_fill_options} } ($self, $self->{option});
   @new_fields;
 }
 
@@ -488,6 +491,7 @@ sub stringify ($;%) {
   if (ref $self->{header}) {
     my %exist;
     for ($self->{header}->field_name_list) {$exist{$_} = 1}
+    &{ $option{hook_stringify_fill_fields} } ($self, \%exist, \%option);
     my $ns_content = $Message::Header::NS_phname2uri{content};
     if ($option{fill_date}
        && !$exist{$option{fill_date_name}.':'.$option{fill_date_ns}}) {
@@ -911,7 +915,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/08 11:49:18 $
+$Date: 2002/07/08 12:39:39 $
 
 =cut
 

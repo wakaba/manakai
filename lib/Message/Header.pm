@@ -8,7 +8,7 @@ Message::Header --- A Perl Module for Internet Message Headers
 package Message::Header;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.34 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.35 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;	## This may seem silly:-)
 push @ISA, qw(Message::Field::Structured);
 
@@ -41,6 +41,8 @@ push @ISA, qw(Message::Field::Structured);
     -format	=> 'mail-rfc2822',
     -header_default_charset	=> 'iso-2022-int-1',
     -header_default_charset_input	=> 'iso-2022-int-1',
+    -hook_init_fill_options	=> sub {},
+    -hook_stringify_fill_fields	=> sub {},
     -linebreak_strict	=> 0,
     -line_length_max	=> 60,	## For folding
     #ns_default_phuri
@@ -116,6 +118,7 @@ sub _init ($;%) {
       push @new_fields, ($name => $options{$name});
     }
   }
+  &{ $self->{option}->{hook_init_fill_options} } ($self, $self->{option});
   $self->_init_by_format ($self->{option}->{format}, $self->{option});
   # Make alternative representations of @header_order.  This is used
   # for sorting.
@@ -671,6 +674,10 @@ sub stringify ($;%) {
   $option{format} = $params{-format} if $params{-format};
   $self->_init_by_format ($option{format}, \%option);
   for (grep {/^-/} keys %params) {$option{substr ($_, 1)} = $params{$_}}
+  ## Fill required fields
+    my %exist;
+    for ($self->field_name_list) {$exist{$_} = 1}
+    &{ $option{hook_stringify_fill_fields} } ($self, \%exist, \%option);
   my @ret;
   ## RFC 2774 numerical field name prefix
   my %nprefix;
@@ -956,7 +963,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/08 11:49:18 $
+$Date: 2002/07/08 12:39:39 $
 
 =cut
 
