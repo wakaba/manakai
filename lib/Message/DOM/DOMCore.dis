@@ -51,7 +51,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/09/29 12:39:32 $
+     $Date: 2004/09/30 05:28:49 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -370,6 +370,14 @@ Exception:
               @@@@@@lang:en
               @@@@@@@:
                 The absolute URI representing the schema language requested.
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@Type:
+              lang:muf
+            @@@@@@:
+              The schema language specified %p (prefix => {<},
+              suffix => {>}, name => {<Q:DOMCore:schemaType>}); 
+              is not supported
         @@@SubType:
           @@@@QName:
             MDOM_EXCEPTION:MDOM_IMPL_NOSUPPORT_XML
@@ -426,6 +434,13 @@ Exception:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: The requested mode.
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@Type:
+              lang:muf
+            @@@@@@:
+              The requested mode "%p (name => {<Q:DOMLS:mode>});" 
+              is not supported
      @@Const:
         @@@Name:  INUSE_ATTRIBUTE_ERR
         @@@Type:  unsigned-short
@@ -1256,18 +1271,13 @@ IF:
             my %features;
             __CODE{ParseFeatures: in => features, out => features}__;
             for my $class (reverse @{$__PACKAGE{Global}__::Role{<Q:DOMCore:DOMImplementation>}||{}}) {
-              if ($class->{class}->__INT{SP:classHasFeature}__ (%features)) {
-                if (my $new = $class->{class}->can ('new')) {
+              if (my $new = $class->{class}->can ('new')) {
+                if ($class->{class}->__INT{SP:classHasFeature}__ (%features)) {
                   $r = $new->($class->{class});
                 }
                 last;
               }
             }
-          @@@@ImplNote:
-            @@@@@lang:en
-            @@@@@@:
-              This implementation is insufficient; it does not 
-              support <DOM:+>.
   @Method:
      @@Name:  getDOMImplementationList
      @@Description:
@@ -1275,14 +1285,6 @@ IF:
        @@@@:
          Return a list of DOM implementations that support the specified 
          features and versions.
-     @@Return:
-        @@@Type:  DOMImplementationList
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A list of DOM implementations that support the desired 
-            features and versions.
-## TODO: implement this
      @@Param:
         @@@Name:  features
         @@@Type:
@@ -1291,6 +1293,30 @@ IF:
           @@@@lang:en
           @@@@@:
             A string that specifies which features and versions are required.
+     @@Return:
+        @@@Type:  DOMImplementationList
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A list of DOM implementations that support the desired 
+            features and versions.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my %features;
+            __CODE{ParseFeatures: in => features, out => features}__;
+                 ## Condition sensitive
+            $r = __CLASS{DOMImplementationList}__->__INT{new}__;
+            for my $class (reverse @{$__PACKAGE{Global}__::Role{<Q:DOMCore:DOMImplementation>}||{}}) {
+              if (my $new = $class->{class}->can ('new')) {
+                if ($class->{class}->__INT{SP:classHasFeature}__ (%features)) {
+                  $r->__INT{add}__ ($new->($class->{class}));
+                }
+              }
+            }
+    @@Level:3
+    @@SpecLevel:3
 
 IF:
   @Name:  DOMImplementation
@@ -1323,7 +1349,10 @@ IF:
   @ISA:
     ManakaiDOM:ManakaiDOMNodeReference::
   @Role:
-    DOMCore:DOMImplementation
+    @@@:
+      DOMCore:DOMImplementation
+    @@compat:
+      ManakaiDOMCore:DOMImplementation
 
   @Method:
      @@Name:  hasFeature
@@ -1452,7 +1481,10 @@ IF:
           @@@@@:
             if (defined $feature) {
               undef $version if defined $version and not length $version;
-              $r = $self->__INT{SP:classHasFeature}__ (lc $feature => $version);
+              my $plus = 1 if $feature =~ s/^\+//;
+              $r = $self->__INT{SP:classHasFeature}__
+                             (lc $feature => {version => $version,
+                                              plus => $plus});
             }
   @Method:
      @@Name:  createDocumentType
@@ -1780,8 +1812,8 @@ IF:
                 }__;                          # DOM doesn't specify this
               }
             }
-## ISSUE: Should be exception not warning ("malformed"!)
-## ISSUE: Should be "xmlns" and "xmlns:xmlns" checked
+ \## ISSUE: Should be exception not warning ("malformed"!)
+ \## ISSUE: Should be "xmlns" and "xmlns:xmlns" checked
                        ## Condition sensitive
             my $node = __CLASS{Document}__->__INT{newObject}__; 
             $node->{<Q:DOMCore:implementation>} = $self;
@@ -1791,7 +1823,7 @@ IF:
               if (not $doctype->isa ('__IIF{DocumentType::}__')) {
                 __EXCEPTION{
                   ManakaiDOMImplementationException.MDOM_TYPE_MISMATCH_ERR::
-## TODO: Should be HIERARCHY error?
+ \## TODO: Should be HIERARCHY error?
                     <Q:MDOM_EXCEPTION:param-name> => q<doctype>,
                     <Q:MDOM_EXCEPTION:class> => ref $doctype,
                 }__;
@@ -1848,10 +1880,11 @@ IF:
             The name of the feature requested.
         @@@InCase: 
           @@@@Label: 
-            The feature name prepended by the PLUS SIGN ("+")
+            The feature name prepended by the <CHAR:PLUS SIGN> (<DOM:+>)
           @@@@Description:
             @@@@@lang:en
-            @@@@@@: The PLUS SIGN is ignored.
+            @@@@@@:
+              An <CHAR:PLUS SIGN> before the feature name is ignored.
      @@Param:
         @@@Name:  version
         @@@Type:
@@ -1869,27 +1902,48 @@ IF:
           @@@@@:
             An object that implements the specialized APIs of the 
             specified feature and version.  That might or might not 
-            implements the "DOMImplementation" interface.
+            implements the <IF:DOMImplementation> interface.
         @@@InCase:
           @@@@Type: DOMImplementation
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
               An object that implements both the specialized APIs 
-              and the "DOMImplementation" interface.
+              and the <IF:DOMImplementation> interface.
           @@@@ImplNote:
             @@@@@lang:en
             @@@@@@:
               This kind of object must delegate to the primary core 
-              "DOMImplementation" and not return results inconsistent 
-              with the primary core "DOMImplementation" such as 
-              "hasFeature", "getFeature", etc.
+              <IF:DOMImplementation> and not return results inconsistent 
+              with the primary core <IF:DOMImplementation> such as 
+              <M:hasFeature>, <M:getFeature>, etc.
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
           @@@@@: 
             There is no object that implements interfaces associated 
             with the feature and version.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            if (defined $feature) {
+              undef $version if defined $version and not length $version;
+              my $plus = 1 if $feature =~ s/^\+//;
+              $feature = lc $feature;
+              for (reverse @{$__PACKAGE{Global}__::Role{
+                     <Q:DOMCore:DOMImplementation>}||[]}) {
+                if ($_->{compat} eq <Q:ManakaiDOMCore:DOMImplementation>) {
+                  if ($_->{class}->__INT{SP:classHasFeature}__
+                                     ($feature => {version => $version})) {
+                    $r = $self->{<Q:TreeCore:node>}
+                              ->__SUPER{ManakaiDOMNodeObject::}__::__INT{newReference}__
+                                     ($_->{class});
+                    last;
+                  }
+                }
+              }
+            }
 
   @IntMethod:
     @@Name:new
@@ -1913,7 +1967,7 @@ IF:
             my $node = __CLASS{ManakaiDOMNodeObject::}__->__INT{new}__;
             $r = $node->__SUPER{ManakaiDOMNodeObject::}__::__INT{newReference}__
                                                                    ($self);
-            $node->{<Q:ManakaiDOM:implID>} = $node->{<Q:ManakaiDOM:implID>};
+            $node->{<Q:ManakaiDOM:implID>} = $node->{<Q:TreeCore:nodeID>};
       
 ##IF:DOMImplementation
 

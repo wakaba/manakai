@@ -7,6 +7,8 @@ Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
   @LSEV:
     http://www.w3.org/2002/DOMLS
+  @ManakaiDOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
   @ManakaiDOMLS:
     http://suika.fam.cx/~wakaba/archive/2004/mdom-ls#
 Module:
@@ -36,7 +38,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/09/29 12:39:32 $
+     $Date: 2004/09/30 05:28:50 $
 
   @ConditionDef:
     @@Name:DOM3
@@ -271,7 +273,10 @@ IF:
       <Feature:LS-Async> version <FeatureVer:3.0>.
   
   @Role:
-    DOMCore:DOMImplementation
+    @@@:
+      DOMCore:DOMImplementation
+    @@compat:
+      ManakaiDOMCore:DOMImplementation
    
   @ConstGroup:
      @@Name:  DOMImplementationLSMode
@@ -589,10 +594,15 @@ IF:
           @@@@@:
             The location of the XML document to be read, 
             as a URI reference <SRC:<CITE:RFC 2396>>.
-          \
-            If the URI reference contains a fragment identifier, 
-            the behavior is undefined; it may be defined in future 
-            version of the DOM specification.
+        @@@InCase:
+          @@@@Label:
+            @@@@@lang:en
+            @@@@@@: URI reference with a fragemnt identifier
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The behavior is undefined; it may be defined in future 
+              version of the DOM specification.
      @@Return:
         @@@Type:  Document
         @@@Description:

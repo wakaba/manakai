@@ -35,7 +35,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/09/29 12:39:32 $
+     $Date: 2004/09/30 05:28:50 $
   
   @Feature:
     @@QName:
@@ -1179,7 +1179,7 @@ IF:
              $r = __CLASS{DOMImplementationList}__->__INT{new}__;
              for (@{ref $self ? $self
                               : @org::w3c::dom::DOMImplementationSourceList}) {
-               $r->__INT{append}__ ($_->getDOMImplementationList ($features));
+               $r->__INT{add}__ ($_->getDOMImplementationList ($features));
              }
            }__;
   @Method:

@@ -7,10 +7,14 @@ Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
   @LSEV:
     http://www.w3.org/2002/DOMLS
+  @ManakaiDOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
   @ManakaiDOMLS:
     http://suika.fam.cx/~wakaba/archive/2004/mdom-ls#
   @MDOM_EXCEPTION:
      http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @null:
+    http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
   @TreeCore:\
   @xmlns:
     http://www.w3.org/2000/xmlns/
@@ -27,7 +31,7 @@ Module:
       A set of interfaces for loading document objects. 
     \
       This module instantiate XML documents using the module 
-      <Perl:Message::Markup::XML::Parser>, a simple XML parser 
+      <PerlModule:Message::Markup::XML::Parser>, a simple XML parser 
       written in Perl.  Note that module is known to having 
       numbers of problems and its successor is now under development. 
       This DOM module is intended to be used for only the 
@@ -37,9 +41,17 @@ Module:
      @@FullName: Wakaba
      @@Mail: w@suika.fam.cx
   @License:
-     license:Perl+MPL
+    @@@:
+      license:Perl+MPL
+    @@Original:
+      @@@FullName:
+        manakai <FILE:xml-validator.pl>
+      @@@Year:2003
+      @@@Author:
+        @@@@FullName:Wakaba
+        @@@@Mail:w@suika.fam.cx
   @Date.RCS:
-     $Date: 2004/09/29 12:39:32 $
+     $Date: 2004/09/30 05:28:50 $
 
   @Feature:
     @@QName:
@@ -119,7 +131,10 @@ IF:
   @ISA:
     DOMCore:DOMImplementation
   @Role:
-    DOMCore:DOMImplementation
+    @@@:
+      DOMCore:DOMImplementation
+    @@compat:
+      ManakaiDOMCore:DOMImplementation
 
   @Method:
      @@Name:  createLSParser
@@ -200,8 +215,8 @@ IF:
                <Q:DOMLS:mode> => $mode,
            }__;
          }
-         if (defined $mode and
-             $mode ne q<http://www.w3.org/TR/REC-xml>) {
+         if (defined $schemaType and
+             $schemaType ne q<http://www.w3.org/TR/REC-xml>) {
            __EXCEPTION{
              DOMException.NOT_SUPPORTED_ERR.
              MDOM_EXCEPTION:MDOM_IMPL_NOSUPPORT_SCHEMA::
@@ -209,6 +224,44 @@ IF:
            }__;
          }
 
+         ## ** Code from bin/xml-validator.pl **
+         my $eh = sub {
+		my ($caller, $o, $error_type, $error_msg, $err) = @_;
+		#require Carp;
+		if ($err->{raiser_type} eq 'Message::Markup::XML::Validator') {
+		  $error_msg = $err->{node_path} . ': ' . $error_msg if $err->{node_path};
+		  $error_msg = 'Document <'.$err->{uri}.'>: ' . $error_msg if $err->{uri};
+		}
+		#if (($src{stop_with_fatal}
+		# && {qw/fatal 1 wfc 1 nswfc 1/}->{$error_type->{level}})
+		# || ($src{stop_with_vc}
+		# && {qw/vc 1 nsvc 1/}->{$error_type->{level}})) {
+		#  local $Carp::CarpLevel = 1;
+		#  Carp::croak ('{'.$error_type->{level}.'} '.$error_msg);
+		#} else {
+		#  local $Carp::CarpLevel = 1;
+		#  Carp::carp ('{'.$error_type->{level}.'} '.$error_msg);
+		#}
+                ## TODO: Report error by DOMError
+                if ({fatal=>1, wfc=>1, nswfc=>1}->{$error_type->{level}}) {
+                  warn "{$error_type->{level}} $error_msg";
+                  __EXCEPTION{
+                    LSException.PARSE_ERR::
+                  }__;
+                } else {
+                  warn "{$error_type->{level}} $error_msg";
+                }
+		
+		#if ($error_type->{level} eq 'wfc') { $wf = 0 ; $valid = 0 }
+		#elsif ($error_type->{level} eq 'vc') { $valid = 0 }
+		#elsif ($error_type->{level} eq 'nswfc') { $nswf = 0 ; $nswf = 0 }
+		#elsif ($error_type->{level} eq 'nsvc') { $nsvalid = 0 }
+		
+	   return 0;
+         };
+
+
+                                               ## Method from MMXParser
          $r = __CLASS{ManakaiXMLParser2003}__->new (option => {
            uri_resolver => sub {
 		my ($self, $parser, $decl, $p) = @_;
@@ -229,45 +282,16 @@ IF:
 		#print STDERR "Retriving external entity <$p->{uri}>...\n";
 		return 1;
 	   },
-	   #error_handler => $eh,
+	   error_handler => $eh,
          });
+         ## ** End Code from bin/xml-validator.pl **
 
-         ## TODO: Better casting mechanism should be provided
-         my $impl = $self->{<Q:TreeCore:node>}
-                         ->__SUPER{ManakaiDOMNodeObject}__::__INT{newReference}__
-                              ('__CLASS{DOMImplementation}__');
-         $r->flag (<Q:DOMCore:implementation> => $impl);
-         $r->flag (<Q:ManakaiDOM:impl> => $impl->{<Q:TreeCore:node>}
-                                               ->{<Q:ManakaiDOM:implID>});
+         $r->flag (<Q:DOMCore:implementation> => $self);
+         $r->flag (<Q:ManakaiDOM:implID> => $self->{<Q:TreeCore:node>}
+                                                 ->{<Q:ManakaiDOM:implID>});
 
-         ## TODO:
-         #$r->flag (<Q:DOMCore:domConfig> => $config);
-  @@Def:
- my $eh = sub {
-		my ($caller, $o, $error_type, $error_msg, $err) = @_;
-		require Carp;
-		if ($err->{raiser_type} eq 'Message::Markup::XML::Validator') {
-		  $error_msg = $err->{node_path} . ': ' . $error_msg if $err->{node_path};
-		  $error_msg = 'Document <'.$err->{uri}.'>: ' . $error_msg if $err->{uri};
-		}
-		if (($src{stop_with_fatal}
-		 && {qw/fatal 1 wfc 1 nswfc 1/}->{$error_type->{level}})
-		 || ($src{stop_with_vc}
-		 && {qw/vc 1 nsvc 1/}->{$error_type->{level}})) {
-		  local $Carp::CarpLevel = 1;
-		  Carp::croak ('{'.$error_type->{level}.'} '.$error_msg);
-		} else {
-		  local $Carp::CarpLevel = 1;
-		  Carp::carp ('{'.$error_type->{level}.'} '.$error_msg);
-		}
-		
-		if ($error_type->{level} eq 'wfc') { $wf = 0 ; $valid = 0 }
-		elsif ($error_type->{level} eq 'vc') { $valid = 0 }
-		elsif ($error_type->{level} eq 'nswfc') { $nswf = 0 ; $nswf = 0 }
-		elsif ($error_type->{level} eq 'nsvc') { $nsvalid = 0 }
-		
-		return 0;
-	};
+         $r->flag (<Q:DOMCore:domConfig> => $self->{<Q:TreeCore:node>}
+                                                 ->{<Q:DOMCore:domConfig>});
 
 
   @Method:
@@ -279,7 +303,7 @@ IF:
      @@Return:
         @@@Type:  
           DOMLS:LSInput
-        @@@Description:c
+        @@@Description:
           @@@@lang:en
           @@@@@: The newly created input object.
         @@@Def:
@@ -389,6 +413,7 @@ IF:
            lang:Perl
          @@@@@:
            my $text;
+           my $uri;
            ## 1. characterStream
            ## 2. byteStream
            ## 3. stringData
@@ -399,12 +424,20 @@ IF:
            ## 5. publicId
            elsif (defined (my $sysId = $input->systemId) or
                   defined (my $pubId = $input->publicId)) {
+             $uri = $sysId;
              __EXCEPTION{
                DOMException.NOT_SUPPORTED_ERR::
              }__;
            }
-           my $doc = $self->parse_text ($$text);
-           ## TODO: error & uri handler
+
+           $self->option (document_entity_base_uri => $input->baseURI);
+
+           my $doc = $self->parse_text ($$text,
+                                        {uri => $uri,
+                                         entity_type => 'document_entity'});
+           \## TODO: error & uri handler
+           \## TODO: support of domConfig
+
            my $n;
            $n = sub {
              my ($src, $parent) = @_;
@@ -416,14 +449,19 @@ IF:
                  = $parent->{<Q:DOMCore:ownerDocument>} || $parent;
                $newNode->{<Q:infoset:prefix>}
                  = $src->{namespace_prefix} eq DEFAULT_PFX
-                     ? null : $src->{namespace_prefix};
-               $newNode->{<Q:infoset:namespaceName>}
-                 = $src->{namespace_uri} eq NULL_URI
-                     ? null : $src->{namespace_uri};
+                     ? null : length $src->{namespace_prefix}
+                                ? $src->{namespace_prefix} : null;
+               if (defined $src->{namespace_uri} and
+                   $src->{namespace_uri} ne '' and
+                   $src->{namespace_uri} ne NULL_URI) {
+                 $newNode->{<Q:infoset:namespaceName>} = $src->{namespace_uri};
+               } else {
+                 $newNode->{<Q:infoset:namespaceName>} = null;
+               }
                $newNode->{<Q:infoset:localName>} = $src->{local_name};
                $newNode->{<Q:infoset:parent>} = $parent;
                push @{$parent->{<Q:infoset:children>}}, $newNode;
-               for (@{$self->{node}}) {
+               for (@{$src->{node}}) {
                  $n->($_ => $newNode);
                }
                for my $prefix (keys %{$src->{ns}||{}}) {
@@ -461,14 +499,23 @@ IF:
                  = $parent->{<Q:DOMCore:ownerDocument>};
                $newNode->{<Q:infoset:prefix>}
                  = $src->{namespace_prefix} eq DEFAULT_PFX
-                     ? null : $src->{namespace_prefix};
-               $newNode->{<Q:infoset:namespaceName>}
-                 = $src->{namespace_uri} eq NULL_URI
-                     ? null : $src->{namespace_uri};
+                     ? null : length $src->{namespace_prefix}
+                                ? $src->{namespace_prefix} : null;
                $newNode->{<Q:infoset:localName>} = $src->{local_name};
                $newNode->{<Q:infoset:ownerElement>} = $parent;
-               $parent->{$newNode->{<Q:infoset:namespaceName>}}
-                      ->{$newNode->{<Q:infoset:localName>}} = $newNode;
+               if (defined $src->{namespace_uri} and
+                   $src->{namespace_uri} ne '' and
+                   $src->{namespace_uri} ne NULL_URI) {
+                 $newNode->{<Q:infoset:namespaceName>} = $src->{namespace_uri};
+                 $parent->{<Q:infoset:attributes>}
+                        ->{$src->{namespace_uri}}
+                        ->{$newNode->{<Q:infoset:localName>}} = $newNode;
+               } else {
+                 $newNode->{<Q:infoset:namespaceName>} = null;
+                 $parent->{<Q:infoset:attributes>}
+                        ->{<Q:null:>}
+                        ->{$newNode->{<Q:infoset:localName>}} = $newNode;
+               }
                if (defined $src->{value} and length $src->{value}) {
                  my $text = __CLASS{Text}__->__INT{newObject}__;
                  $newNode->__SUPER{ManakaiDOMNodeObject::}__::__INT{importTree}__
@@ -479,7 +526,7 @@ IF:
                  $text->{<Q:infoset:parent>} = $newNode;
                  push @{$newNode->{<Q:infoset:children>}}, $text;
                }
-               for (@{$self->{node}}) {
+               for (@{$src->{node}}) {
                  $n->($_ => $newNode);
                }
              } elsif ($src->node_type eq '#text') {
@@ -508,7 +555,7 @@ IF:
                       ## Condition insensitive
            my $node = __CLASS{Document}__->__INT{newObject}__; 
            $node->{<Q:DOMCore:implementation>}
-                = $self->flag ({<Q:DOMCore:implementation>});
+                = $self->flag (<Q:DOMCore:implementation>);
            $node->{<Q:ManakaiDOM:implID>}
                 = $self->flag (<Q:ManakaiDOM:implID>);
            $node->{<Q:infoset:version>} = '1.0';
@@ -555,13 +602,19 @@ IF:
           @@@@lang:en
           @@@@@:
             The location of the XML document to be read, 
-            as a URI reference <SRC:<CITE:RFC 2396>>.
-          \
-            If the URI reference contains a fragment identifier, 
-            the behavior is undefined; it may be defined in future 
-            version of the DOM specification.
+            as a URI reference <SRC:<CITE:RFC 2396>>. 
+        @@@InCase:
+          @@@@Label:
+            @@@@@lang:en
+            @@@@@@: URI reference with a fragemnt identifier
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The behavior is undefined; it may be defined in future 
+              version of the DOM specification.
      @@Return:
-        @@@Type:  Document
+        @@@Type:  
+          DOMCore:Document
         @@@Description:
           @@@@lang:en
           @@@@@:

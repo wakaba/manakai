@@ -859,10 +859,12 @@ sub perl_builtin_code ($;%) {
       {
         my @f = grep {length} split /\s+/, $in;
         for (my $i = 0; $i < @f; $i++) {
+          my ($name, $plus) = (lc $f[$i]);
+          $plus = 1 if $name =~ s/^\+//;
           if ($i + 1 < @f and $f[$i + 1] =~ /^\d/) {
-            $out{lc $f[$i]} = $f[$i + 1]; $i++;
+            $out{$name} = {version => $f[$i + 1], plus => $plus}; $i++;
           } else {
-            $out{lc $f[$i]} = undef;
+            $out{$name} = {version => undef, plus => $plus};
           }
         }
       }
@@ -978,6 +980,13 @@ sub ops2perl () {
       $result .= perl_statement
                  perl_assign
                       perl_var (type => '*', local_name => 'new')
+                   => $Status->{Operator}->{$_};
+      delete $Status->{Operator}->{$_};
+    } elsif ($_ eq 'object-error-handler') {
+      $result .= perl_statement q<sub ___report_error ($$)>;
+      $result .= perl_statement
+                 perl_assign
+                      perl_var (type => '*', local_name => '___report_error')
                    => $Status->{Operator}->{$_};
       delete $Status->{Operator}->{$_};
     } elsif ({qw[
@@ -1107,10 +1116,15 @@ sub pod_mail ($) {
 
 sub pod_link (%) {
   my %opt = @_;
+  if ($opt{label}) {
+    $opt{label} .= '|';
+  } else {
+    $opt{label} = '';
+  }
   if ($opt{section}) {
-    qq<L</"$opt{section}">>;
+    qq<L<$opt{label}/"$opt{section}">>;
   } elsif ($opt{module}) {
-    qq<L<$opt{module}>>;
+    qq<L<$opt{label}$opt{module}>>;
   } else {
     impl_err q<Bad parameter for "pod_link">;
   }
@@ -1525,7 +1539,8 @@ sub disdoc_inline2text ($;%) {
       $r = q<"> . disdoc_inline2text ($data) . q<">;
     } elsif ({IF => 1, TYPE => 1, P => 1, XML => 1, SGML => 1, DOM => 1,
               FeatureVer => 1, CHAR => 1, HTML => 1, Prefix => 1,
-              Module => 1, QUOTE => 1}->{$type}) {
+              Module => 1, QUOTE => 1, PerlModule => 1,
+              FILE => 1}->{$type}) {
       $r = q<"> . $data . q<">;
     } elsif ({Feature => 1, CP => 1, ERR => 1,
               HA => 1, HE => 1, XA => 1, SA => 1, SE => 1}->{$type}) {
@@ -1665,7 +1680,7 @@ sub disdoc_inline2pod ($;%) {
     } elsif ({
               IF => 1, TYPE => 1, P => 1, DOM => 1, XML => 1, HTML => 1,
               SGML => 1, FeatureVer => 1, CHAR => 1, Prefix => 1,
-              Module => 1, Perl => 1,
+              Perl => 1, FILE => 1,
              }->{$type}) {
       $r = pod_code $data;
     } elsif ({Feature => 1, CP => 1, ERR => 1,
@@ -1695,6 +1710,11 @@ sub disdoc_inline2pod ($;%) {
       $r = q<[> . $data . q<]>;
     } elsif ({QUOTE => 1}->{$type}) {
       $r = q<"> . $data . q<">;
+    } elsif ({PerlModule => 1}->{$type}) {
+      $r = pod_link label => pod_code ($data), module => $data;
+    } elsif ({Module => 1}->{$type}) {
+      $r = pod_link label => pod_code ($data),
+                    module => perl_package_name (name => $data);
     } elsif ($type eq 'lt' or $type eq 'gt') {
       $r = qq<E<$type>>;
     } else {
@@ -1712,7 +1732,7 @@ sub get_description ($;%) {
   my $ln = $opt{name} || 'Description';
   my $lang = $opt{lang} || q<en> || q<i-default>;
   my $textplain = ExpandedURI q<DOMMain:any>;
-  my $default = ExpandedURI q<lang:disdoc>;
+  my $default = q<lang:disdoc>;
   $opt{type} ||= ExpandedURI q<lang:pod>;
   my $script = $opt{script} || q<>;
   my $def;
@@ -1723,20 +1743,23 @@ sub get_description ($;%) {
       my ($me, $you) = @_;
       $you->local_name eq $ln and
       $you->get_attribute_value ('lang', default => 'i-default') eq $lang and
-      $you->get_attribute_value ('Type', default => $default) eq $type;
+      type_expanded_uri ($you->get_attribute_value ('Type', default => $default))
+        eq $type;
     }) || $node->get_element_by (sub {
       my ($me, $you) = @_;
       $you->local_name eq $ln and
       $you->get_attribute_value ('lang', default => 'i-default')
                                  eq 'i-default' and
-      $you->get_attribute_value ('Type', default => $default) eq $type;
+      type_expanded_uri ($you->get_attribute_value ('Type', default => $default))
+        eq $type;
     });
     last if $def;
   }
   unless ($def) {
     $opt{default};
   } else {
-    my $srctype = $def->get_attribute_value ('Type', default => $default);
+    my $srctype = type_expanded_uri 
+                    $def->get_attribute_value ('Type', default => $default);
     my $value = $def->value;
     valid_err q<Description undefined>, node => $def
       unless defined $value;
@@ -1749,10 +1772,14 @@ sub get_description ($;%) {
         $value = $opt{is_inline} ?
                    disdoc_inline2text ($value, node => $def):
                    disdoc2text ($value, node => $def); 
+        if ($opt{type} eq ExpandedURI q<lang:muf>) {
+          $value =~ s/\s+/ /g;
+        }
       }
     } elsif ($srctype eq ExpandedURI q<lang:muf>) {
       if ($opt{type} eq ExpandedURI q<lang:muf>) {
         $value = muf_template $value;
+        $value =~ s/\s+/ /g;
       } else {
         impl_err q<Can't convert MUF tempalte to >.$opt{type};
       }
@@ -1763,6 +1790,7 @@ sub get_description ($;%) {
         $value = pod_paras $def->value;
       } elsif ($opt{type} eq ExpandedURI q<lang:muf>) {
         $value =~ s/%/%percent;/g;
+        $value =~ s/\s+/ /g;
       }
     }
     $value;
@@ -2329,9 +2357,19 @@ sub if2perl ($) {
                   condition_match $_, condition => $condition,
                                       default_any => 1, ge => 1;
       if ($_->local_name eq 'ISA') {
-        push @isa, perl_package_name qname_with_condition => $_->value,
-                                     condition => $condition,
-                                     is_internal => 1;
+        if (type_expanded_uri ($_->get_attribute_value ('Type',
+                                     default => ExpandedURI q<DOMMain:any>))
+            eq ExpandedURI q<lang:Perl>) {
+          my $v = $_->value;
+          if ($v =~ /[^\w:]|(?<!:):(?!:)/) {
+            valid_err q<Invalid package name "$v">, node => $_;
+          }
+          push @isa, $v;
+        } else {
+          push @isa, perl_package_name qname_with_condition => $_->value,
+                                       condition => $condition,
+                                       is_internal => 1;
+        }
       } elsif ($_->local_name eq 'Implement') {
         push @isa, perl_package_name if_qname_with_condition => $_->value,
                                      condition => $condition;
@@ -2428,11 +2466,19 @@ sub if2perl ($) {
         my $var = q<@{>.perl_var (type => '$',
                             local_name => $ManakaiDOMModulePrefix.'::Role').
                   q<{>.perl_literal ($role).q<}}>;
+        my %prop;
+        if ($has_role->get_attribute ('compat')) {
+          $prop{compat} = type_expanded_uri
+                            $has_role->get_attribute_value ('compat');
+        } else {
+          $prop{compat} = '';
+        }
         $result .= perl_statement
                      'push '.$var.q<, >.
                      perl_list {
                        class => $cond_pack_name,
                        constructor => 'new',
+                       %prop,
                      };
       }
     }
@@ -2459,8 +2505,9 @@ sub if2perl ($) {
                      q[
                        for (keys %f) {
                          if ($Feature->{$_}) {
-                           if (defined $f{$_}) {
-                             delete $f{$_} if $Feature->{$_}->{$f{$_}};
+                           if (defined $f{$_}->{version}) {
+                             delete $f{$_}
+                               if $Feature->{$_}->{$f{$_}->{version}};
                            } else {
                              delete $f{$_} if keys %{$Feature->{$_}};
                            }
@@ -2475,6 +2522,28 @@ sub if2perl ($) {
                          }
                        }
                      }].
+                     (($has_role and $has_role->get_attribute ('compat'))?
+                     q[
+                       my %g;
+                       for (keys %f) {
+                         unless ($f{$_}->{plus}) {
+                           return 0;
+                         } else {
+                           $g{$_} = {version => $f{$_}->{version}};
+                         }
+                       }
+                       for (reverse @{$].$ManakaiDOMModulePrefix.'::Role{'.
+                            perl_literal (type_expanded_uri
+                                            $has_role->value).'}'.q[||[]}) {
+                         if ($_->{compat} eq ].
+                             perl_literal ($has_role->get_attribute_value
+                                               ('compat')).q[) {
+                           if ($_->{class}->___classHasFeature (%g)) {
+                             return 1;
+                           }
+                         }
+                       }
+                     ]:'').
                      perl_statement (q<return 0>);
       $result .= '}';
     } 
@@ -3367,10 +3436,20 @@ sub exception2perl ($;%) {
   local $Status->{IF} = $if_name;
   my $result = perl_package full_name => $pack_name;
   $result .= perl_statement perl_assign 'our $VERSION', version_date time;
-  $result .= perl_statement 'push our @ISA, ' .
-                            perl_list 'Message::Util::Error',
-                                      perl_package_name (if => $if_name),
-                                      $ManakaiDOMModulePrefix . '::' . $type;
+  my @isa = perl_package_name (if => $if_name);
+  if ($if_name eq 'ManakaiDOM'.$type) {
+    push @isa, perl_package_name name => 'ManakaiDOMExceptionOrWarning';
+  } elsif ($if_name eq 'ManakaiDOMExceptionOrWarning') {
+    push @isa, 'Message::Util::Error';
+  } else {
+    push @isa, perl_package_name name => 'ManakaiDOM'.$type
+  }
+  $result .= perl_inherit [@isa];
+  $result .= perl_statement perl_assign
+                   perl_var (type => '$',
+                             package => {if => $if_name},
+                             local_name => 'VERSION')
+                   => version_date time;
   my @level = @{$opt{level} || []};
   my $mod = get_level_description $node, level => \@level;
   $result .= pod_block
@@ -3395,12 +3474,14 @@ sub exception2perl ($;%) {
 
   for (@{$node->child_nodes}) {
     if ($_->local_name eq 'Method' or
-        $_->local_name eq 'IntMethod') {
+        $_->local_name eq 'IntMethod' or
+        $_->local_name eq 'ReMethod') {
       $result .= method2perl ($_, level => \@level, 
                               condition => $opt{condition},
                               any_unless_condition => 1);
     } elsif ($_->local_name eq 'Attr' or
-             $_->local_name eq 'IntAttr') {
+             $_->local_name eq 'IntAttr' or
+             $_->local_name eq 'ReAttr') {
       my $get;
       if ($_->local_name eq 'Attr' and
           $_->get_attribute_value ('Name') eq 'code' and
@@ -3440,10 +3521,12 @@ sub exception2perl ($;%) {
                code => perl_list {
                  map {
                    $_ => {
-                     ExpandedURI q<ManakaiDOM:code> => perl_code_literal
+                     ExpandedURI q<DOMCore:code> => perl_code_literal
                                ($Status->{const}->{$_}->{code_literal}),
-                     ExpandedURI q<ManakaiDOM:description>
+                     description
                             => $Status->{const}->{$_}->{description},
+                     ExpandedURI q<MDOM_EXCEPTION:subtype>
+                            => $Status->{const}->{$_}->{subtype},
                    }
                  } sort keys %{$Status->{const}}
                };
@@ -3550,6 +3633,7 @@ sub const2perl ($;%) {
                           package => {full_name => $opt{package} ||
                                                    $Info->{Package}};
   local $Status->{IF} = $name;
+  local $Status->{const_subtype} = {};
   my @level = @{$opt{level} || []};
   my $mod = get_level_description $node, level => \@level;
   my @desc;
@@ -3613,6 +3697,7 @@ sub const2perl ($;%) {
     $Status->{const}->{$name} = {
       description => $desc_template,
       code_literal => $code,
+      subtype => $Status->{const_subtype} || {},
     };
   }
 
@@ -3672,9 +3757,11 @@ sub subtype2poditem ($;%) {
   my ($node, %opt) = @_;
   my @desc;
   $opt{name_prefix} = 'SubType: ' unless defined $opt{name_prefix};
-  if ($node->get_attribute ('QName')) {
+  my $qname = $node->get_attribute_value ('QName');
+  if (defined $qname) {
     push @desc, pod_item $opt{name_prefix} .
-                qname_label ($node, out_type => ExpandedURI q<lang:pod>);
+                qname_label ($node, qname => $qname,
+                             out_type => ExpandedURI q<lang:pod>);
   } else {
     valid_err q<Attribute "QName" required>,
       node => $node;
@@ -3698,6 +3785,14 @@ sub subtype2poditem ($;%) {
   if (@param) {
     push @desc, pod_list 4, @param;
   }
+
+  my $desc_template = get_description $node,
+                                      type => ExpandedURI q<lang:muf>,
+                                      default => $qname;
+  $Status->{const_subtype}->{type_expanded_uri $qname} = {
+    description => $desc_template,
+  };
+
 
   @desc;
 } # subtype2poditem
@@ -4279,7 +4374,7 @@ q<License. >);
                           get_description ($orig, name => 'FullName').'.');
     push @desc, pod_para ('The Initial Developer of the Original Code is '.
                           get_description ($orig->get_attribute ('Author'),
-                                           name => 'FullName').'.'.
+                                           name => 'FullName').'. '.
                           q<Portions created by the Initial Developer are >.
                           q<Copyright >.pod_char (name => 'copy').' '.
                           $orig->get_attribute_value ('Year',
@@ -4363,6 +4458,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/09/29 12:39:32 $
+# $Date: 2004/09/30 05:28:50 $
 
 
