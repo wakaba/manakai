@@ -3019,7 +3019,7 @@ sub constgroup2perl ($;%);
 sub constgroup2perl ($;%) {
   my ($node, %opt) = @_;
   local $Status->{depth} = $Status->{depth} + 1;
-  my $name = perl_name $node->get_attribute_value ('Name');
+  my $name = perl_name $node->get_attribute_value ('Name'), ucfirst => 1;
   local $Status->{IF} = $name;
   my @level = @{$opt{level} || []};
   my $mod = get_level_description $node, level => \@level;
@@ -3758,6 +3758,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/09/26 11:43:06 $
+# $Date: 2004/09/26 15:09:00 $
 
 

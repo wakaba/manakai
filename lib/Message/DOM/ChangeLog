@@ -1,5 +1,17 @@
 2004-09-26  Wakaba  <wakaba@suika.fam.cx>
 
+	* dis2pm.pl (constgroup2perl): Capitalize name.
+
+	* idl2dis.pl (type, raise): Prepend namespace prefix if 
+	type is 'DOMString' or 'DOMException' and it is not defined.
+	(MAIN): Make empty 'Return' element even if return
+	value is void.
+	(supply_incase): New.
+	(const): Use 'FullName' in favor of 'Description' if the name of
+	the const group is not a machine-friendly name.
+
+2004-09-26  Wakaba  <wakaba@suika.fam.cx>
+	
 	* dis2pm.pl (get_incase_label): Error if label is undef.
 
 2004-09-25  Wakaba  <wakaba@suika.fam.cx>

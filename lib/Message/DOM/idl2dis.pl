@@ -5,7 +5,8 @@ use Message::Markup::SuikaWikiConfig20::Node;
 my $LastCategory = '';
 my $LastComment = '';
 my $LastAttr;
-my $NAME = qr/[\w:]+/;
+my $NAME = qr/[\w:.]+/;
+my $Status;
 sub err ($);
 sub level ($);
 sub raises ($$$);
@@ -14,7 +15,7 @@ my $tree = Message::Markup::SuikaWikiConfig20::Node->new (type => '#document');
 
 sub fws ($) {
   my $s = shift;
-  while ($$s =~ m{\G(?=[#\s]|//)}gc) {
+  while ($$s =~ m{\G(?=[#\s]|/[/\*])}gc) {
     if ($$s =~ /\G\s+/gc) {
       #
     } elsif ($$s =~ /\G\#(.+)(?:\n|$)/gc) {
@@ -25,10 +26,12 @@ sub fws ($) {
         my $c = $m->get_attribute ('Require', make_new_node => 1)
                   ->append_new_node (type => '#element',
                                      local_name => 'Module');
-        $c->set_attribute ('Name' => $f);
+        $c->set_attribute (Name => $f);
       } elsif ($l =~ /^pragma\s+prefix\s+"([^"]+)"/) {
         $m->get_attribute ('Name', make_new_node => 1)
           ->set_attribute (Prefix => $1);
+      } else {
+        $tree->append_new_node (type => '#comment', value => ' #'.$l);
       }
     } elsif ($$s =~ m#\G//\s*(\w+)\s*\n#gc) {
       $LastComment = $LastCategory = $1;
@@ -53,6 +56,8 @@ sub fws ($) {
           warn "Unassociated attribute exception comment found: $LastComment";
         }
       }
+    } elsif ($$s =~ m#\G(/\*(?>(?!\*/).)*\*/)#gcs) {
+      $tree->append_new_node (type => '#comment', value => $1);
     } else {
       err $s;
     }
@@ -80,11 +85,15 @@ sub type ($) {
   if ($type !~ /[^a-z-]/ and
       not {qw/attribute 1 readonly 1 in 1 const 1 void 1/}->{$type}) {
     $type = 'DOMMain:' . $type;
+  } elsif ({DOMString => 1, Object => 1}->{$type}) {
+    unless ($Status->{datatype_defined}->{$type}) {
+      $type = 'DOMMain:' . $type;
+    }
   }
   return $type;
 }
 
-my $CONST = qr/^Constants|Types$|[oe]rs$|Values$|Options$/;
+my $CONST = qr/^Constants|Types$|[oe]rs$|Values$|Options$|^Exception/;
 
 sub const ($$) {
   my ($s, $parent) = @_;
@@ -93,7 +102,8 @@ sub const ($$) {
         $parent->child_nodes->[-1]->local_name eq 'ConstGroup' and
        ($parent->child_nodes->[-1]->get_attribute_value ('Name', default => ' ')
           eq $LastCategory or
-        $parent->child_nodes->[-1]->get_attribute_value ('Description', default => ' ')
+        $parent->child_nodes->[-1]->get_attribute_value ('FullName',
+                                                         default => ' ')
           eq $LastComment)) {
       $parent = $parent->child_nodes->[-1];
     } elsif ($parent->child_nodes->[-1] and
@@ -103,7 +113,8 @@ sub const ($$) {
           $parent->child_nodes->[-1]->local_name eq 'ConstGroup' and
          ($parent->child_nodes->[-1]->get_attribute_value ('Name', default => ' ')
             eq $LastCategory or
-          $parent->child_nodes->[-1]->get_attribute_value ('Description', default => ' ')
+          $parent->child_nodes->[-1]->get_attribute_value ('FullName',
+                                                           default => ' ')
             eq $LastComment)) {
         $parent = $parent->child_nodes->[-1];
       } else {
@@ -111,7 +122,7 @@ sub const ($$) {
         if ($LastCategory) {
           $parent->set_attribute (Name => $LastCategory);
         } else {
-          $parent->set_attribute (Description => $LastComment)
+          $parent->set_attribute (FullName => $LastComment)
                  ->set_attribute (lang => 'en');
         }
       }
@@ -120,15 +131,21 @@ sub const ($$) {
       if ($LastCategory) {
         $parent->set_attribute (Name => $LastCategory);
       } else {
-        $parent->set_attribute (Description => $LastComment)
+        $parent->set_attribute (FullName => $LastComment)
                ->set_attribute (lang => 'en');
       }
     }
   }
-    my $const = $parent->append_new_node (type => '#element', local_name => 'Const');
+
     fws $s;
     my $type = type $s or err $s;
     fws $s;
+  if ($parent->node_type eq '#element' and
+      $parent->local_name eq 'ConstGroup' and
+      not $parent->get_attribute ('Type')) {
+    $parent->set_attribute (Type => $type);
+  }
+    my $const = $parent->append_new_node (type => '#element', local_name => 'Const');
     $$s =~ /\G($NAME)/gc or err $s;
     $const->set_attribute (Name => $1);
     $const->set_attribute (Type => $type);
@@ -182,12 +199,16 @@ sub raises ($$$) {
   while ($$s =~ /\G($NAME)/gc) {
     my $name = $1;
     $name =~ s/::/:/g;
+    $name = 'DOMCore:'.$name if $name eq 'DOMException' and
+                                not $Status->{datatype_defined}->{$name};
     if ($name =~ /^([^:]+):/) {
       register_required_module (Name => $1);
     }
-    $p->append_new_node (type => '#element',
-                         local_name => 'Exception')
-      ->set_attribute (Type => $name);
+    for my $except ($p->append_new_node (type => '#element',
+                                         local_name => 'Exception')) {
+      $except->set_attribute (Name => '** TBD **');
+      $except->set_attribute (Type => $name);
+    }
     fws $s;
     $$s =~ /\G,/gc;
     fws $s;
@@ -232,10 +253,22 @@ sub register_required_module (%) {
   }
 }
 
+sub supply_incase ($$) {
+  my ($type, $node) = @_;
+  if ($type eq 'DOMMain:boolean') {
+    for my $b ('true', 'false') {
+      for ($node->append_new_node (type => '#element',
+                                   local_name => 'InCase')) {
+        $_->set_attribute (Value => $b);
+      }
+    }
+  }
+} # supply_incase
+
 my $s;
 {
 local $/ = undef;
-$s = \<>;
+$s = \(<> or die "$0: $ARGV: $!");
 }
 
 pos $$s = 0;
@@ -250,10 +283,15 @@ for my $module ($tree->append_new_node (type => '#element',
   $module->set_attribute (Name => q<## TBD ##>);
   $module->set_attribute (Namespace => q<:: TBD ::>);
   $module->set_attribute (License => q<license:Perl>);
-  $module->set_attribute ('Date.RCS' => q<$Date: 2004/09/17 07:44:11 $>);
+  $module->set_attribute ('Date.RCS' => q<$Date: 2004/09/26 15:09:00 $>);
 }
 
 fws $s;
+if ($$s =~ /\Gpragma\s+prefix\s+"([^"]+)"\s*/gc) {
+  $tree->get_attribute ('Module')
+       ->get_attribute ('Name', make_new_node => 1)
+       ->set_attribute (Prefix => $1);
+}
 if ($$s =~ /\Gmodule\b/gc) {
   fws $s;
   $$s =~ /\G($NAME)/gc or err $s;
@@ -316,20 +354,21 @@ while (pos $$s < length $$s) {
                ->set_attribute (Type => $type);
           $attr->get_attribute ('Set', make_new_node => 1)
                ->set_attribute (Type => $type) unless $readonly;
+          supply_incase ($type => $attr->get_attribute ('Get'));
+          supply_incase ($type => $attr->get_attribute ('Set'))
+              unless $readonly;
           level $attr;
         } elsif ($type eq 'const') {
           const $s => $if;
           fws $s;
         } else {
-          my $method = $if->append_new_node (type => '#element', local_name => 'Method');
+          my $method = $if->append_new_node (type => '#element',
+                                             local_name => 'Method');
           if ($$s =~ /\G($NAME)/gc) {
             $method->set_attribute (Name => idlname2name $1);
-            unless ($type eq 'void') {
-              $method->get_attribute ('Return', make_new_node => 1)
-                     ->set_attribute (Type => $type);
-            }
           } else {
             $method->set_attribute (Name => idlname2name $type);
+            undef $type;
           }
           fws $s;
           $$s =~ /\G\(/gc or err $s;
@@ -347,14 +386,20 @@ while (pos $$s < length $$s) {
             $$s =~ /\G($NAME)/gc or err $s;
             $p->set_attribute (Name => idlname2name $1);
             $p->set_attribute (Type => $type);
-            $p->set_attribute (Write => 0) unless $in;
+            $p->set_attribute (Write => 0) unless $in; 
+            supply_incase ($type => $p);
             fws $s;
             $$s =~ /\G,/gc or last;
             redo;
           }
           $$s =~ /\G\)/gc or err $s;
           fws $s;
-          
+           
+          my $return = $method->get_attribute ('Return', make_new_node => 1);
+          if ($type and $type ne 'void') {
+            $return->set_attribute (Type => $type);
+            supply_incase ($type => $return);
+          }
           if ($$s =~ /\Graises\b/gc) {
             raises $s => $method, 'Return' or err $s;
             fws $s;
@@ -410,14 +455,15 @@ while (pos $$s < length $$s) {
     fws $s;
     my $valtype = $r->append_new_node (type => '#element', 
                                        local_name => 'DataTypeAlias');
-    my $name = type $s or err $s;
+    my $name = $$s =~ /\G($NAME)/gc ? $1 : err $s;
     $valtype->set_attribute (Name => $name);
     $valtype->set_attribute (Type => $type);
+    $Status->{datatype_defined}->{$name} = 1;
     fws $s;
   } else {
     last;
   }
-  semicolon $s or err $s;
+  semicolon $s ;#or err $s;
   fws $s;
 }
 

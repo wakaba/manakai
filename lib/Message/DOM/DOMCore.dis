@@ -46,7 +46,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/26 11:43:06 $
+     $Date: 2004/09/26 15:08:59 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -8300,8 +8300,67 @@ IF:
      @@SpecLevel:3
   @Attr:
      @@Name:  wholeText
+     @@Description:
+       @@@lang:en
+       @@@@:
+         All text of logically-adjacent text nodes.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         The DOM Level 3 Core Specification is unclear about <IF:CDATASection>s.
+         They should also be included (c.f. the definition for 
+         <A:Text.replaceWholeText>).
      @@Get:
         @@@Type:  DOMString
+        @@@ImplNote:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+   TODO: Implement this.
+            my $node = $self->{<Q:TreeCore:node>};
+            if ($node->{<Q:infoset:parent>}) {
+              my $parentNode = $node->{<Q:infoset:parent>};
+              my (@t, @tr1, @tr2);
+              my ($found, $first, $last);
+              for my $i (0..$#{$parentNode->{<Q:infoset:children>}}) {
+                if ({
+                      <Q:DOMCore:Text> => 1,
+                      <Q:DOMXML:CDATASection> => 1,
+                    }->{$parentNode->{<Q:infoset:children>}->[$i]
+                                   ->{<Q:DOMCore:nodeType>}}) {
+                  push @t, $parentNode->{<Q:infoset:children>}->[$i];
+                  $first = ($i == 0);
+                  $last = ($i == $#{$parentNode->{<Q:infoset:children>}});
+                  $found = 1 if $parentNode->{<Q:infoset:children>}->[$i]
+                                           ->{<Q:TreeCore:nodeID>} eq
+                                $parentNode->{<Q:TreeCore:nodeID>};
+                } elsif ($parentNode->{<Q:infoset:children>}->[$i]
+                                   ->{<Q:DOMCore:nodeType>} eq
+                         <Q:DOMXML:EntityReference>) {
+                  if ($found) {
+                    push @tr2, $parentNode->{<Q:infoset:children>}->[$i];
+                    $last = ($i == $#{$parentNode->{<Q:infoset:children>}});
+                  } else {
+                    push @tr1, $parentNode->{<Q:infoset:children>}->[$i];
+                  }
+                } else {
+                  if ($found) {
+                    last;
+                  } else {
+                    $first = 0;
+                    $last = 0;
+                    @t = ();
+                  }
+                }
+              }
+              if ($parentNode->{<Q:DOMCore:nodeType>} eq
+                  <Q:DOMXML:EntityReference> and 
+                  $parentNode->{<Q:infoset:parent>}) {
+                
+              }
+            } else {
+              $r = $node->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{textContent}__;
+            }
      @@Level[list]:  3
      @@SpecLevel:3
   @Method:
