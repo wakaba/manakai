@@ -12,10 +12,19 @@ Perl module for text/plain media type.
 package Message::Body::TextPlain;
 use strict;
 use vars qw($VERSION %DEFAULT);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Header;
 use overload '""' => sub {shift->stringify};
+
+%DEFAULT = (
+  encoding_after_encode	=> '*default',
+  encoding_before_decode	=> '*default',
+  hook_encode_string	=> #sub {shift; (value => shift, @_)},
+  	\&Message::Util::encode_body_string,
+  hook_decode_string	=> #sub {shift; (value => shift, @_)},
+  	\&Message::Util::decode_body_string,
+);
 
 =head2 Message::Body::TextPlain->new ([%option])
 
@@ -44,7 +53,8 @@ sub parse ($$;%) {
   my $self = bless {option => {@_}}, $class;
   for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
   $self->header ($self->{option}->{header});
-  $self->{body} = $body;
+  my %s = &{$self->{option}->{hook_decode_string}} ($self, $body, type => 'body');
+  $self->{body} = $s{value};
   $self;
 }
 
@@ -92,9 +102,10 @@ Returns the C<body> as a string.
 sub stringify ($;%) {
   my $self = shift;
   my %OPT = @_;
-  my ($body) = (scalar $self->{body});
-  $body .= "\n" unless $body =~ /\n$/;
-  $body;
+  my (%e) = &{$self->{option}->{hook_encode_string}} ($self, 
+          $self->{body}, type => 'body');
+  $e{value} .= "\n" unless $e{value} =~ /\n$/;
+  $e{value};
 }
 sub as_string ($;%) {shift->stringify (@_)}
 
@@ -140,7 +151,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/21 04:20:17 $
+$Date: 2002/03/25 10:18:35 $
 
 =cut
 

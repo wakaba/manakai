@@ -13,13 +13,14 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw($VERSION %DEFAULT);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 use Message::Header;
 use overload '""' => sub {shift->stringify};
 
 %DEFAULT = (
   body_class	=> {'/DEFAULT' => 'Message::Body::TextPlain'},
+  parse_all	=> -1,
 );
 
 =head2 Message::Entity->new ([%option])
@@ -58,8 +59,11 @@ sub parse ($$;%) {
       push @body, $line;
     }
   }
-  $self->{header} = Message::Header->parse (join "\n", @header);
+  $self->{header} = Message::Header->parse (join ("\n", @header),
+    parse_all => $self->{option}->{parse_all});
   $self->{body} = join "\n", @body;
+  $self->{body} = $self->_body ($self->{body}, $self->content_type)
+    if $self->{option}->{parse_all}>0;
   $self;
 }
 
@@ -78,10 +82,11 @@ sub header ($;$) {
   if (ref $new_header) {
     $self->{header} = $new_header;
   } elsif ($new_header) {
-    $self->{header} = Message::Header->parse ($new_header);
+    $self->{header} = Message::Header->parse ($new_header,
+      parse_all => $self->{option}->{parse_all});
   }
   unless ($self->{header}) {
-    $self->{header} = new Message::Header;
+    $self->{header} = new Message::Header ();
   }
   $self->{header};
 }
@@ -114,7 +119,8 @@ sub _body ($;$$) {
   if (ref $body) {
     return $body;
   } elsif ($body) {
-    return $ct->parse ($body);
+    return $ct->parse ($body,
+      parse_all => $self->{option}->{parse_all});
   } else {
     return $ct->new ($body);
   }
@@ -133,6 +139,7 @@ sub stringify ($;%) {
   $header .= "\n" if $header && $header !~ /\n$/;
   $header."\n".$body;
 }
+sub as_string ($;%) {shift->stringify}
 
 =head2 $self->option ($option_name)
 
@@ -196,7 +203,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/21 04:21:28 $
+$Date: 2002/03/25 10:18:35 $
 
 =cut
 

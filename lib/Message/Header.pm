@@ -47,8 +47,9 @@ when C<stringify>.  (Default = 0)
 %DEFAULT = (
   capitalize	=> 1,
   fold_length	=> 70,
-  mail_from	=> 0,
   field_type	=> {':DEFAULT' => 'Message::Field::Unstructured'},
+  mail_from	=> -1,
+  parse_all	=> -1,
 );
 my @field_type_Structured = qw(cancel-lock
   importance mime-version path precedence user-agent x-cite
@@ -122,12 +123,16 @@ sub parse ($$;%) {
   $header =~ s/\x0D?\x0A$REG{WSP}+/\x20/gos;	## unfold
   for my $field (split /\x0D?\x0A/, $header) {
     if ($field =~ /$REG{M_fromline}/) {
-      push @{$self->{field}}, {name => 'mail-from', body => $1};
+      my $body = $1;
+      $body = $self->_field_body ($body, 'mail-from')
+        if $self->{option}->{parse_all}>0;
+      push @{$self->{field}}, {name => 'mail-from', body => $body};
     } elsif ($field =~ /$REG{M_field}/) {
-      my ($name, $body) = ($1, $2);
+      my ($name, $body) = (lc $1, $2);
       $name =~ s/$REG{WSP}+$//;
       $body =~ s/$REG{WSP}+$//;
-      push @{$self->{field}}, {name => lc $name, body => $body};
+      $body = $self->_field_body ($body, $name) if $self->{option}->{parse_all}>0;
+      push @{$self->{field}}, {name => $name, body => $body};
     }
   }
   $self;
@@ -157,7 +162,20 @@ sub field ($$) {
       }
     }
   }
+  if ($#ret < 0) {
+    return $self->add ($name);
+  }
   @ret;
+}
+
+sub field_exist ($$) {
+  my $self = shift;
+  my $name = lc shift;
+  my @ret;
+  for my $field (@{$self->{field}}) {
+    return 1 if ($field->{name} eq $name);
+  }
+  0;
 }
 
 =head2 $self->field_name ($index)
@@ -220,14 +238,14 @@ If you don't want duplicated C<field>s, use C<replace> method.
 
 =cut
 
-sub add ($$$;%) {
+sub add ($$;$%) {
   my $self = shift;
   my ($name, $body) = (lc shift, shift);
   my %option = @_;
   return 0 if $name =~ /$REG{UNSAFE_field_name}/;
   $body = $self->_field_body ($body, $name);
   if ($option{prepend}) {
-   unshift @{$self->{field}}, {name => $name, body => $body};
+    unshift @{$self->{field}}, {name => $name, body => $body};
   } else {
     push @{$self->{field}}, {name => $name, body => $body};
   }
@@ -248,6 +266,7 @@ sub replace ($$$) {
   my $self = shift;
   my ($name, $body) = (lc shift, shift);
   return 0 if $name =~ /$REG{UNSAFE_field_name}/;
+  $body = $self->_field_body ($body, $name);
   for my $field (@{$self->{field}}) {
     if ($field->{name} eq $name) {
       $field->{body} = $body;
@@ -255,7 +274,7 @@ sub replace ($$$) {
     }
   }
   push @{$self->{field}}, {name => $name, body => $body};
-  $self;
+  $body;
 }
 
 =head2 $self->delete ($field_name, [$index])
@@ -319,13 +338,15 @@ sub stringify ($;%) {
   my @ret;
   $OPT{capitalize} ||= $self->{option}->{capitalize};
   $OPT{mail_from} ||= $self->{option}->{mail_from};
-  push @ret, 'From '.$self->field ('mail-from') if $OPT{mail_from};
+  push @ret, 'From '.$self->field ('mail-from') if $OPT{mail_from}>0;
   for my $field (@{$self->{field}}) {
     my $name = $field->{name};
     next unless $field->{name};
-    next if !$OPT{mail_from} && $name eq 'mail-from';
+    next if $OPT{mail_from}<0 && $name eq 'mail-from';
     my $fbody = scalar $field->{body};
     next unless $fbody;
+    $fbody =~ s/\x0D([^\x09\x0A\x20])/\x0D\x20$1/g;
+    $fbody =~ s/\x0A([^\x09\x20])/\x0A\x20$1/g;
     $name =~ s/((?:^|-)[a-z])/uc($1)/ge if $OPT{capitalize};
     push @ret, $name.': '.$self->fold ($fbody);
   }
@@ -466,7 +487,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/23 11:43:06 $
+$Date: 2002/03/25 10:18:35 $
 
 =cut
 
