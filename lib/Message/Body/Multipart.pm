@@ -9,7 +9,7 @@ for "multipart/*" Internet Media Types
 package Message::Body::Multipart;
 use strict;
 use vars qw(%DEFAULT @ISA $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Body::Text;
 push @ISA, qw(Message::Body::Text);
@@ -35,6 +35,8 @@ $REG{NON_bchars} = qr#[^0-9A-Za-z'()+_,-./:=?\x20]#;
   -media_subtype	=> 'mixed',
   #output_epilogue
   -parse_all	=> 0,
+  -parts_min	=> 1,
+  -parts_max	=> 0,
   #i text_coderange
   #use_normalization	=> 0,
   #use_param_charset	=> 0,
@@ -78,6 +80,17 @@ sub _init ($;%) {
   if (!length $self->{boundary} && ref $self->{header}) {
     my $ct = $self->{header}->field ('content-type', -new_item_unless_exist => 0);
     $self->{boundary} = $ct->parameter ('boundary') if ref $ct;
+  }
+  
+  my $mst = $self->{option}->{media_subtype};
+  if ($mst eq 'report') {
+    $self->{option}->{parts_min} = 2;
+    $self->{option}->{parts_max} = 3;
+  } elsif ($mst eq 'signed' || $mst eq 'encrypted' || $mst eq 'appledouble') {
+    $self->{option}->{parts_min} = 2;
+    $self->{option}->{parts_max} = 2;
+  } elsif ($mst eq 'headerset') {
+    $self->{option}->{parts_min} = 2;
   }
 }
 
@@ -254,35 +267,48 @@ sub stringify ($;%) {
   my $self = shift;
   my %o = @_;  my %option = %{$self->{option}};
   for (grep {/^-/} keys %o) {$option{substr ($_, 1)} = $o{$_}}
-  my $max = $option{max} || $#{$self->{value}}+1;  $max--;
-  $max = $#{$self->{value}} if $max > $#{$self->{value}};
-  my @parts = map { ''. $_ } @{$self->{value}}[0..$max];
-  my $b = $self->{boundary};
-  if ($b =~ $REG{NON_bchars} || length ($b) > 70) {
-    undef $b;
-  } elsif (substr ($b, -1, 1) eq "\x20") {
-    $b .= 'B';
-  }
-  my $blength = 35;
-  $b ||= $self->_generate_boundary ($blength);
-  my $i = 1; while ($i++) {
-    my @t = grep {/\Q--$b\E/} @parts;
-    last if @t == 0;
-    $b = $self->_generate_boundary ($blength);
-    if ($i > @BCHARS ** $blength) {
-      $blength++; $i = 1;
+  $self->_delete_empty;
+  ## Check the number of parts
+    my $min = $option{parts_min} || 1;  $min--;
+    $#{ $self->{value} } = $min unless $min <= $#{ $self->{value} };
+    my $max = $option{parts_max} || $#{$self->{value}}+1;  $max--;
+    $max = $#{$self->{value}} if $max > $#{$self->{value}};
+  ## Media type parameters
+    my $ct;	## Content-Type field of parent entity
+    if (ref $self->{header}) {
+      $ct = $self->{header}->field ('content-type');
+      my $mt = $ct->media_type;
+      if ($mt eq 'multipart/signed') {
+        $ct->replace (protocol => scalar $self->item (1, -by => 'index')->content_type);
+      } elsif ($mt eq 'multipart/encrypted') {
+        $ct->replace (protocol => scalar $self->item (0, -by => 'index')->content_type);
+      } elsif ($mt eq 'multipart/report') {
+        $ct->replace ('report-type' => ($self->item (1, -by => 'index')->content_type) [1]);
+      }
     }
-  }
-  if (ref $self->{header}) {
-    my $ct = $self->{header}->field ('content-type');
-    my $mt = $ct->media_type;
-    $ct->replace (boundary => $b);
-    if ($mt eq 'multipart/signed') {
-      $ct->replace (protocol => scalar $self->{value}->[1]->content_type);
-    } elsif ($mt eq 'multipart/encrypted') {
-      $ct->replace (protocol => scalar $self->{value}->[0]->content_type);
+  ## Preparates parts
+    my @parts = map { ''. $_ } @{$self->{value}}[0..$max];
+  ## Boundary
+    my $b = $self->{boundary};
+    if ($b =~ $REG{NON_bchars} || length ($b) > 70) {
+      undef $b;
+    } elsif (substr ($b, -1, 1) eq "\x20") {
+      $b .= 'B';
     }
-  }
+    my $blength = 35;
+    $b ||= $self->_generate_boundary ($blength);
+    my $i = 1; while ($i++) {
+      my @t = grep {/\Q--$b\E/} (@parts, $self->{preamble}, $self->{epilogue});
+      last if @t == 0;
+      $b = $self->_generate_boundary ($blength);
+      if ($i > @BCHARS ** $blength) {
+        $blength++; $i = 1;
+      }
+    }
+    if (ref $ct) {
+      $ct->replace (boundary => $b);
+    }
+  
   $self->{preamble}."\x0D\x0A--".$b."\x0D\x0A".
   join ("\x0D\x0A--".$b."\x0D\x0A", @parts)
   ."\x0D\x0A--$b--\x0D\x0A".
@@ -335,7 +361,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/02 06:30:49 $
+$Date: 2002/07/04 06:38:21 $
 
 =cut
 

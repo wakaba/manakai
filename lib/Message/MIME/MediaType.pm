@@ -8,7 +8,7 @@ Message::MIME::MediaType --- Media-type definitions
 package Message::MIME::MediaType;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 our %type;
 
@@ -128,7 +128,7 @@ $type{text}->{'prs.lines.tag'} = {
 $type{text}->{'rfc822-headers'} = {
 	mime_charset	=> 0,
 	handler	=> ['Message::Header',{
-		format => 'mail-rfc822',
+		-format => 'mail-rfc822',
 	}],
 };
 
@@ -622,7 +622,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/03 23:39:15 $
+$Date: 2002/07/04 06:38:21 $
 
 =cut
 

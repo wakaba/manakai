@@ -67,7 +67,7 @@ Message::MIME::Charset::Encode.
 package Message::MIME::Charset::Jcode;
 use strict;
 use vars qw(%CODE $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::MIME::Charset;
 
@@ -215,7 +215,7 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset ('utf-16be' => alias_of => 'ucs-2be');
     } elsif ($_ eq 'NKF' || $_ eq 'NKF.pm') {
       unless ($NKF::VERSION) {
-        eval { use NKF } or Carp::croak ("Message::MIME::Charset::Jcode: NKF: $@");
+        eval q{ use NKF } or Carp::croak ("Message::MIME::Charset::Jcode: NKF: $@");
       }
       Message::MIME::Charset::make_charset ('*default' =>
         encoder	=> sub { nkf ( "-".    substr ($CODE{output},   0, 1)
@@ -342,7 +342,7 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset ('ucs-4le' => alias_of => 'utf-32le');
     } elsif ($_ eq 'Kconv' || $_ eq 'Kconv.pm') {
       unless ($Kconv::VERSION) {
-        eval { require Kconv } or Carp::croak ("Message::MIME::Charset::Jcode: Kconv: $@");
+        eval q{ require Kconv } or Carp::croak ("Message::MIME::Charset::Jcode: Kconv: $@");
       }
       Message::MIME::Charset::make_charset ('*default' =>
         encoder	=> sub { kconv ($_[1], __kconv_code_name ($CODE{output}), 
@@ -495,7 +495,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/02 06:36:26 $
+$Date: 2002/07/04 06:38:21 $
 
 =cut
 

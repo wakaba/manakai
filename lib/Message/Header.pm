@@ -8,7 +8,7 @@ Message::Header --- A Perl Module for Internet Message Headers
 package Message::Header;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.29 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.30 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;	## This may seem silly:-)
 push @ISA, qw(Message::Field::Structured);
 
@@ -31,52 +31,27 @@ push @ISA, qw(Message::Field::Structured);
     -_METHODS	=> [qw|field field_exist field_type add replace count delete subject id is|],
     -_MEMBERS	=> [qw|value|],
     -_VALTYPE_DEFAULT	=> ':default',
-    -by	=> 'name',	## (Reserved for method level option)
+    -by	=> 'name',
     -field_format_pattern	=> '%s: %s',
     -field_name_case_sensible	=> 0,
     -field_name_unsafe_rule	=> 'NON_ftext',
     -field_name_validation	=> 0,
     -field_sort	=> 0,
-    #-format	=> 'mail-rfc2822',
+    -format	=> 'mail-rfc2822',
     -header_default_charset	=> 'iso-2022-int-1',
     -header_default_charset_input	=> 'iso-2022-int-1',
-    -linebreak_strict	=> 0,	## Not implemented completely
+    -linebreak_strict	=> 0,
     -line_length_max	=> 60,	## For folding
     #ns_default_phuri
     -output_bcc	=> 0,
     -output_folding	=> 1,
     -output_mail_from	=> 0,
-    #-parse_all	=> 0,
+    #parse_all
     -translate_underscore	=> 1,
-    #-uri_mailto_safe
+    #uri_mailto_safe
     -uri_mailto_safe_level	=> 4,
     -use_folding	=> 1,
-    #-value_type
-);
-
-$DEFAULT{-value_type} = {
-	':default'	=> ['Message::Field::Unstructured'],
-	
-	p3p	=> ['Message::Field::Params'],
-	link	=> ['Message::Field::ValueParams'],
-	
-	'user-agent'	=> ['Message::Field::UA'],
-	server	=> ['Message::Field::UA'],
-};
-for (qw(date expires))
-  {$DEFAULT{-value_type}->{$_} = ['Message::Field::Date']}
-for (qw(accept accept-charset accept-encoding accept-language uri))
-  {$DEFAULT{-value_type}->{$_} = ['Message::Field::CSV']}
-for (qw(location referer))
-  {$DEFAULT{-value_type}->{$_} = ['Message::Field::URI']}
-
-my %header_goodcase = (
-	'article-i.d.'	=> 'Article-I.D.',
-	etag	=> 'ETag',
-	'pics-label'	=> 'PICS-Label',
-	te	=> 'TE',
-	url	=> 'URL',
-	'www-authenticate'	=> 'WWW-Authenticate',
+    #value_type
 );
 
 ## taken from L<HTTP::Header>
@@ -629,7 +604,7 @@ sub stringify ($;%) {
       my ($name, $body, $nsuri) = ($_[1]->{name}, $_[1]->{body}, $_[1]->{ns});
       return unless length $name;
       return if $option{output_mail_from} && $name eq 'mail-from';
-      return if !$option{output_bcc} && ($name eq 'bcc' || $name eq 'resent-bcc');
+      $body = '' if !$option{output_bcc} && $name eq 'bcc';
       my $nspackage = &_NS_uri2phpackage ($nsuri);
       my $oname;	## Outputed field-name
       my $prefix = ${$nspackage.'::OPTION'} {namespace_phname_goodcase}
@@ -659,7 +634,9 @@ sub stringify ($;%) {
       } else {
         $fbody = $body;
       }
-      return unless length $fbody;
+      unless (${$nspackage.'::OPTION'} {field}->{$name}->{empty_body}) {
+        return unless length $fbody;
+      }
       unless ($option{linebreak_strict}) {
         ## bare \x0D and bare \x0A are unsafe
         $fbody =~ s/\x0D(?=[^\x09\x0A\x20])/\x0D\x20/g;
@@ -845,7 +822,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/03 23:39:15 $
+$Date: 2002/07/04 06:38:21 $
 
 =cut
 

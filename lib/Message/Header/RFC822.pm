@@ -9,7 +9,7 @@ for RFC822 Namespaces of Header Fields
 package Message::Header::RFC822;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Header::Default;
 
 our %OPTION = %Message::Header::Default::OPTION;
@@ -147,6 +147,13 @@ $OPTION{uri_mailto_safe}	= {
   	'x400-received'	=> 1,
 };
 
+$OPTION{field}->{bcc} = {
+	empty_body	=> 1,
+};
+$OPTION{field}->{'incomplete-copy'} = {	## RFC 2156
+	empty_body	=> 1,
+};
+
 $Message::Header::NS_phname2uri{$OPTION{namespace_phname}} = $OPTION{namespace_uri};
 $Message::Header::NS_uri2phpackage{$OPTION{namespace_uri}} = __PACKAGE__;
 
@@ -188,6 +195,7 @@ $OPTION{namespace_uri} = 'urn:x-suika-fam-cx:msgpm:header:mail:rfc822:original';
 $OPTION{namespace_phname} = 'original';
 $OPTION{namespace_phname_goodcase} = 'Original';
 
+$OPTION{value_type} = { %{ $OPTION{value_type} } };
 $OPTION{value_type}->{recipient} = ['Message::Header::Structured'];
 
 $OPTION{uri_mailto_safe}	= {
@@ -294,7 +302,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/03 23:39:15 $
+$Date: 2002/07/04 06:38:21 $
 
 =cut
 

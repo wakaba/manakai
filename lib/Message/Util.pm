@@ -16,7 +16,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%FMT2STR %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 use Carp ();
 require Message::MIME::EncodedWord;
@@ -286,6 +286,124 @@ sub remove_wsp ($) {
   my $s = shift;
   $s =~ s{($REG{quoted_string}|$REG{domain_literal}|$REG{angle_quoted})|$REG{WSP}+}{
     $1
+  }gex;
+  $s;
+}
+
+=item $encoded = Message::Util::encode_printable_string ($string)
+=item $decoded = Message::Util::decode_printable_string ($string)
+
+Encodes or decodes string in PrintableString, described in 
+RFC 1327, RFC 2156.  These functions supports 8bit octets encoded
+as '(ddd)' format, although RFC 2156 allows it for only 7bit
+octets.
+
+=cut
+
+my %To_Printable_String = (
+	'@'	=> '(a)',
+	'%'	=> '(p)',
+	'!'	=> '(b)',
+	'"'	=> '(q)',
+	'_'	=> '(u)',
+	'('	=> '(l)',
+	')'	=> '(r)',
+);
+my %From_Printable_String = reverse %To_Printable_String;
+sub encode_printable_string ($) {
+  my $s = shift;
+  $s =~ s{ ([^0-9A-Za-z\x20'+,./:=?-]) }{
+    my $c = $1;
+    unless ($To_Printable_String{$c}) {
+      $To_Printable_String{$c} = sprintf '(%03d)', ord $c;
+    }
+    $To_Printable_String{$c};
+  }gex;
+  $s;
+}
+sub decode_printable_string ($) {
+  my $s = shift;
+  $s =~ s{ \( ([0-9A-Za-z]+) \) }{
+    my $c = lc $1;  my $p = "($c)";
+    if ($c !~ /[^0-9]/) {
+      $From_Printable_String{$p} = pack 'C', 0+$c;
+    } elsif (!defined $From_Printable_String{$p}) {
+      $From_Printable_String{$p} = $p;	## Invalid!
+    }
+    $From_Printable_String{$p};
+  }gex;
+  $s;
+}
+
+=item $encoded = Message::Util::encode_t61_string ($string)
+=item $decoded = Message::Util::decode_t61_string ($string)
+
+Encodes or decodes string in T.61String described in RFC 1327,
+RFC 2056.
+
+=cut
+
+sub encode_t61_string ($) {
+  my $s = shift;
+  $s =~ s{ ([^0-9A-Za-z\x20'+,./:=?-]) }{
+    sprintf '{%03d}', ord $1;
+  }gex;
+  $s;
+}
+sub decode_t61_string ($) {
+  my $s = shift;
+  $s =~ s{ \{ ([0-9]+) \} }{
+    my $c = $1;  my $i = 0;
+    my $r = '';
+    while (my $d = substr ($c, $i * 3, 3)) {
+      $r .= pack 'C', 0+$d;  $i++;
+    }
+    $r;
+  }gex;
+  $s;
+}
+=item $encoded = Message::Util::encode_printable_string ($string)
+=item $decoded = Message::Util::decode_printable_string ($string)
+
+Encodes or decodes string in RFC 822 with restricted encoding,
+defined by RFC 1137.
+
+=cut
+
+my %To_Encoded_Atom = (
+	"\x20"	=> '_',
+	'_'	=> '#u#',
+	'('	=> '#l#',
+	')'	=> '#r#',
+	','	=> '#m#',
+	':'	=> '#c#',
+	"\x5C"	=> '#b#',
+	'#'	=> '#h#',
+	'='	=> '#e#',
+	'/'	=> '#s#',
+);
+my %From_Encoded_Atom = reverse %To_Encoded_Atom;
+sub encode_restricted_rfc822 ($) {
+  my $s = shift;
+  $s =~ s{ ([^\x21\x24-\x27\x2A\x2B\x2D\x2F\x30-\x39\x3D\x3F\x41-\x5A\x5E\x60-\x7E]) }{
+    my $c = $1;	## \x2E \x40
+    unless ($To_Encoded_Atom{$c}) {
+      $To_Encoded_Atom{$c} = sprintf '#%03d#', ord $c;
+    }
+    $To_Encoded_Atom{$c};
+  }gex;
+  $s;
+}
+sub decode_restricted_rfc822 ($) {
+  my $s = shift;
+  $s =~ s{ \# ([0-9A-Za-z]+) \# | _ }{
+    my $c = lc $1;  my $p = "#$c#";
+    if ($c !~ /[^0-9]/) {
+      $From_Encoded_Atom{$p} = pack 'C', 0+$c;
+    } elsif (!defined $From_Encoded_Atom{$p}) {
+      $From_Encoded_Atom{$p} = $p;	## Invalid!
+    }
+    $From_Encoded_Atom{$p};
   }gex;
   $s;
 }
@@ -597,7 +715,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/02 06:37:56 $
+$Date: 2002/07/04 06:38:21 $
 
 =cut
 
