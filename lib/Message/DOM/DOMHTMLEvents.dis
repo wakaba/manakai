@@ -1,0 +1,205 @@
+Namespace:
+  @DOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @DOMEvents:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/events#
+  @DOMViews:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/views#
+  @ev:
+    http://www.w3.org/2001/xml-events
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOMEvents:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-ev#
+  @TreeCore:\
+Module:
+  @Name:  DOMHTMLEvents
+  @Namespace:
+     http://suika.fam.cx/~wakaba/archive/2004/dom/events#
+  @BindingName:
+     @@@:  events
+     @@Type:
+        lang:IDL-DOM
+     @@prefix:  dom.w3c.org
+  @FullName:
+    @@lang:en
+    @@@: DOM HTML Events Module
+  @Description:
+    @@lang:en
+    @@@:
+      Events listed in the HTML 4.01 Specification and 
+      additional events that are supported in DOM Level 0 
+      browsers.  This event module is only applicable if 
+      the <IF:Document> supports the DOM Level 2 HTML 
+      (<Feature:HTML>/<FeatureVer:2.0>).
+      \
+      {NOTE:: This module refines semantics and scope of 
+              the basic event types.  See <Module:DOMBasicEvents> module.
+      \
+      }
+
+  @Author:
+     @@FullName:  Wakaba
+     @@Mail:  w@suika.fam.cx
+  @License:
+     license:Perl+MPL
+  @Date.RCS:
+     $Date: 2004/10/17 04:46:43 $
+
+  @ConditionDef:
+    @@Name:DOM2
+  @ConditionDef:
+    @@Name:DOM3
+    @@ISA:DOM2
+  @NormalCondition:DOM3
+
+  @Feature:
+    @@Name:HTMLEvents
+    @@Version:2.0
+    @@FullName: DOM Level 2 HTML Events
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The support for <Feature:Events>/<FeatureVer:2.0> is required.
+    @@Condition[list]:
+      DOM2
+      DOM3
+    @@Contrib:
+      DOMCore:DOMImplementation::
+  @Feature:
+    @@Name:HTMLEvents
+    @@Version:3.0
+    @@FullName: DOM Level 3 HTML Events
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The support for <Feature:BasicEvents>/<FeatureVer:3.0> and 
+        <Feature:HTML>/<FeatureVer:2.0> is required.
+    @@Condition[list]:
+      DOM3
+    @@Contrib:
+      DOMCore:DOMImplementation::
+
+  @Require:
+     @@Module:
+        @@@Name:  DOMBasicEvents
+        @@@FileName:
+           @@@@@:  events.idl
+           @@@@For:
+              lang:IDL-DOM
+        @@@Namespace:
+           http://suika.fam.cx/~wakaba/archive/2004/dom/events#
+     @@Module: 
+       @@@Name:DOMHTML
+       @@@Namespace:
+         ::TBD::
+
+  @ImplNote:
+    @@lang:en
+    @@@:
+      In DOM Level 2, the call of <M:DocumentEvent.createEvent> 
+      with the parameter <Feature:HTMLEvents> will make a new 
+      instance of the <IF:Event> interface for the HTML event module.
+
+EventSet:
+  @ImplNote:
+    @@lang:en
+    @@@:
+      <EV:ev:load>, <EV:ev:unload>, <EV:ev:abort>, <EV:ev:error>, 
+      <EV:ev:select>, <EV:ev:change>, <EV:ev:submit>, <EV:ev:reset>, 
+      <EV:ev:resize>, <EV:ev:scroll>: See <Module:DOMBasicEvents>.
+  @Event:
+    @@Name:focus
+    @@QName:
+      ev:focus
+    @@SpecLevel:2
+    @@Description:
+      @@@lang:en
+      @@@@:
+        An element receives focus either via a pointing device, 
+        the <M:focus> method (DOM Level 2 HTML) or by tabbing navigation.
+        This event is only valid for <HE:a>, <HE:area>, <HE:label>, 
+        <HE:input>, <HE:select>, <HE:textarea> and <HE:button> elements.
+    @@ActionBefore:
+      @@@Event:
+        @@@@QName:
+          ev:DOMFocusIn
+    @@IsBubbling:0
+    @@IsCancelable:0
+    @@Type:
+      DOMEvents:Event
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The event object also implements the <IF:UIEvent> interface 
+        if the event is generated from a user interface.
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Node
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Either <IF:HTMLAnchorElement>, <IF:HTMLAreaElement>, 
+          <IF:HTMLLabelElement>, <IF:HTMLInputElement>, 
+          <IF:HTMLSelectElement>, <IF:HTMLTextAreaElement> or 
+          <IF:HTMLButtonElement>.
+    @@ContextInfo:
+       @@@Attr:
+         @@@@IF:
+           DOMUIEvents:UIEvent
+         @@@@Name:view
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             The view, if any, from which the event is generated.
+         @@@@SpecLevel:3
+  @Event:
+    @@Name:blur
+    @@QName:
+      ev:blur
+    @@SpecLevel:2
+    @@Description:
+      @@@lang:en
+      @@@@:
+        An element loses focus either via a pointing device, 
+        the <M:blur> method (DOM Level 2 HTML) or by tabbing navigation. 
+        This event is only valid for <HE:a>, <HE:area>, <HE:label>, 
+        <HE:input>, <HE:select>, <HE:textarea> and <HE:button> elements.
+    @@ActionBefore:
+      @@@Event:
+        @@@@QName:
+          ev:DOMFocusOut
+    @@IsBubbling:0
+    @@IsCancelable:0
+    @@Type:
+      DOMEvents:Event
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The event object also implements the <IF:UIEvent> interface 
+        if the event is generated from a user interface.
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Node
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Either <IF:HTMLAnchorElement>, <IF:HTMLAreaElement>, 
+          <IF:HTMLLabelElement>, <IF:HTMLInputElement>, 
+          <IF:HTMLSelectElement>, <IF:HTMLTextAreaElement> or 
+          <IF:HTMLButtonElement>.
+    @@ContextInfo:
+       @@@Attr:
+         @@@@IF:
+           DOMUIEvents:UIEvent
+         @@@@Name:view
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             The view, if any, from which the event is generated.
+         @@@@SpecLevel:3
+##EventSet
+
+## DOMHTMLEvents.dis ends here

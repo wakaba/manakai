@@ -31,6 +31,10 @@ Module:
     @@@:
       This event module is specifically designed for use with 
       pointing input devices, such as a mouse or a track ball. 
+      \
+      The mouse event module is composed of events listed in 
+      HTML 4.0 and additional events that are supported in 
+      DOM Level 0 browsers.
 
   @Author:
      @@FullName:  Wakaba
@@ -38,7 +42,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/10/16 13:34:17 $
+     $Date: 2004/10/17 04:46:43 $
 
   @ConditionDef:
     @@Name:DOM2
@@ -507,6 +511,12 @@ EventSet:
          = <ev:mouseclick> with <A:UIEvent.detail> that equals <DOM:2>.
          \
       }
+  @ImplNote:
+    @@lang:en
+    @@@:
+      The <A:UIEvent.detail> will be <DOM:0> if the user moves 
+      the mouse between the mousedown and mouseup. 
+      <SRC:DOM Level 2 Events>
 ##EventSet
 
 IF:
@@ -694,6 +704,7 @@ IF:
                       on the Macintosh mouse. 
             \
               }
+          @@@@SpecLevel:2
         @@@InCase:
           @@@@Value:1
           @@@@Description:
@@ -705,6 +716,7 @@ IF:
                       combined with the mouse wheel.
             \
               }
+          @@@@SpecLevel:2
         @@@InCase:
           @@@@Value:2
           @@@@Description:
@@ -715,6 +727,7 @@ IF:
               {NOTE:: In general, it is the right button.
             \
               }
+          @@@@SpecLevel:2
         @@@InCase:
           @@@@Label:
             @@@@@lang:en
@@ -724,6 +737,7 @@ IF:
             @@@@@lang:en
             @@@@@@:
               Other button.
+          @@@@SpecLevel:3
         @@@Def:
           @@@@Type:
             lang:dis

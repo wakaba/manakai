@@ -1,0 +1,157 @@
+Namespace:
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOMCore:
+     http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
+  @TreeCore:\
+Module:
+  @Name:  DOMViews
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/views#
+  @BindingName:
+     @@@:  views
+     @@Type:
+        lang:IDL-DOM
+     @@prefix:  dom.w3c.org
+  @Description:
+    @@lang:en
+    @@@:
+      A document may have one or more <DFN:view>s associated 
+      with it.  That is, a view is a presentation of a source document.
+      \
+      A view may be static or dynamic, or may has other characteristics. 
+      All such views are derived from the <IF:AbstractView> 
+      interface defined in this module.
+
+  @Author:
+     @@FullName:  Wakaba
+     @@Mail:  w@suika.fam.cx
+  @License:
+     license:Perl+MPL
+  @Date.RCS:
+     $Date: 2004/10/17 04:46:43 $
+
+  @ConditionDef:
+    @@Name:DOM2
+  @NormalCondition:DOM2
+
+  @Feature:
+    @@Name:Views
+    @@Version:2.0
+    @@FullName:
+      @@@lang:en
+      @@@@: DOM Level 2 Views
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The support for the <Feature:Core>/<FeatureVer:2.0> 
+        feature is required.
+
+  @Require:
+     @@Module:
+        @@@Name:  DOMCore
+        @@@FileName:
+           @@@@@:  dom.idl
+           @@@@For:
+              lang:IDL-DOM
+        @@@Namespace:
+          http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+
+IF:
+  @Name:  AbstractView
+  @Description:
+    @@lang:en
+    @@@:
+       A base interface from which all views shall derived.
+
+  @Level[list]:  2
+  @SpecLevel[list]:  2
+  @Attr:
+     @@Name:  document
+     @@Description:
+        @@@lang:en
+        @@@@:
+          The source <IF:DocumentView> of which this is an 
+          <IF:AbstractView>.
+     @@Get:
+        @@@Type:  DocumentView
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetPropNode:
+            DOMViews:document
+
+  @IntMethod:
+    @@Name: newObject
+    @@Description:
+      @@@lang:en
+      @@@@: 
+        Construct an object for a new instance of the <IF:AbstractView>.
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The object for the <IF:AbstractView> to be created.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          my $node = $r = __CLASS{ManakaiDOMNodeObject::}__->__INT{new}__;
+          push @{$node->{<Q:TreeCore:origin>}}, <Q:DOMViews:document>;
+       @@@ImplNote:
+         @@@@lang:en
+         @@@@@:
+           Properties required to be a legal <IF:AbstractView> object:
+           <Q:DOMViews:document>.
+         \
+           Optional properties: none.
+##IF:AbstractView
+
+IF:
+  @Name:  DocumentView
+  @Description:
+    @@lang:en
+    @@@:
+      The interface implemented by <IF:Document> object in 
+      DOM Views implementation.
+
+  @Level[list]:  2
+  @SpecLevel[list]:  2
+
+  @Role:
+    @@@:
+      DOMCore:Document
+    @@compat:
+      ManakaiDOMCore:Document
+
+  @Attr:
+     @@Name:  defaultView
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The default <IF:AbstractView> for this document.
+     @@Get:
+        @@@Type:  AbstractView
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              No <IF:AbstractView> available.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            $r = $self->{<Q:TreeCore:node>}->{<Q:DOMViews:view>}->[0];
+##IF:DocumentView
+
+## DOMViews.dis ends here
+
+
+
+

@@ -1,0 +1,581 @@
+Namespace:
+  @DOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @DOMEvents:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/events#
+  @DOMViews:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/views#
+  @ev:
+    http://www.w3.org/2001/xml-events
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOMEvents:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-ev#
+  @TreeCore:\
+Module:
+  @Name:  DOMBasicEvents
+  @Namespace:
+     http://suika.fam.cx/~wakaba/archive/2004/dom/events#
+  @BindingName:
+     @@@:  events
+     @@Type:
+        lang:IDL-DOM
+     @@prefix:  dom.w3c.org
+  @FullName:
+    @@lang:en
+    @@@: DOM Basic Events Module
+  @Description:
+    @@lang:en
+    @@@:
+      Basic event types associated with document manipulation.
+      \
+      {NOTE:: In DOM Level 2, these event types were part of 
+              the <Module:DOMHTMLEvents> module.
+      \
+      }
+
+  @Author:
+     @@FullName:  Wakaba
+     @@Mail:  w@suika.fam.cx
+  @License:
+     license:Perl+MPL
+  @Date.RCS:
+     $Date: 2004/10/17 04:46:43 $
+
+  @ConditionDef:
+    @@Name:DOM2
+  @ConditionDef:
+    @@Name:DOM3
+    @@ISA:DOM2
+  @NormalCondition:DOM3
+
+  @Feature:
+    @@Name:BasicEvents
+    @@Version:3.0
+    @@FullName: DOM Level 3 Basic Events
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The support for <Feature:Events>/<FeatureVer:3.0> is required.
+      \
+        Maybe <Feature:UIEvents> is also required.
+    @@Condition[list]:
+      DOM3
+    @@Contrib:
+      DOMCore:DOMImplementation::
+
+  @Require:
+     @@Module:
+        @@@Name:  DOMUIEvents
+        @@@FileName:
+           @@@@@:  events.idl
+           @@@@For:
+              lang:IDL-DOM
+        @@@Namespace:
+           http://suika.fam.cx/~wakaba/archive/2004/dom/events#
+
+EventSet:
+  @Event:
+    @@Name:load
+    @@QName:
+      ev:load
+    @@SpecLevel:2
+    @@Description:
+      @@@lang:en
+      @@@@@:
+        The DOM implementation finishes loading the resource (such as 
+        document) and any dependent resources (such as images, 
+        style sheets).
+      \
+        {NOTE:: Dependent resources that fail to load will not 
+                prevent this event from firing if the resoure that 
+                loaded them is still accessible via the DOM interfaces.
+     \
+        }
+     \
+        If the document supports the <Feature:HTML>/<FeatureVer:2.0>, 
+        this event is generated when the DOM implementation 
+        finishes loading all content within the <HE:body> element, 
+        all frames within a <HE:frameset> element, or any resource 
+        linked from the document.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         The DOM implementation is required to dispatch this event 
+         at least on the <IF:Document> node if this event is dispatched.
+    @@Type:
+      DOMEvents:Event
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The event object also implements the <IF:UIEvent> interface 
+        if the event is generated from a user interface.
+    @@IsBubbling:0
+    @@IsCancalable:0
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Node
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          <IF:Document> or <IF:Element> node.
+      \
+          If the document supports the <Feature:HTML>/<FeatureVer:2.0> 
+          feature, the event target type is either <IF:HTMLDocument>, 
+          <IF:HTMLBodyElement>, <IF:HTMLFrameSetElement>, 
+          <IF:HTMLObjectElement>, <IF:HTMLLinkElement>, 
+          <IF:HTMLMetaElement>, <IF:HTMLScriptElement>, 
+          <IF:HTMLFrameElement>, <IF:HTMLIFrameElement>, 
+          <IF:HTMLImageElement>.
+    @@ContextInfo:
+       @@@Attr:
+         @@@@IF:
+           DOMUIEvents:UIEvent
+         @@@@Name:view
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             The view, if any, from which the event is generated.
+         @@@@SpecLevel:3
+  @Event:
+    @@Name:unload
+    @@QName:
+      ev:unload
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The DOM implementation removes from the environment 
+        the resource (such as document) or any dependent resources 
+        (such as images, style sheets).
+      \
+        If the document supports the <Feature:HTML>/<FeatureVer:2.0> 
+        feature, this event is generated when the DOM implementation 
+        removes a document from a window or frame.  This event is 
+        valid for <HE:body> or <HE:frameset> elements.
+    @@ActionAfter:
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The document is unloaded.
+    @@ImplNote:
+      @@@lang:en
+       @@@@:
+         The DOM implementation is required to dispatch this event
+         at least on the <IF:Document> node if this event is dispatched.
+    @@Type:
+      DOMEvents:Event
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The event object also implements the <IF:UIEvent> interface 
+        if the event is generated from a user interface.
+    @@IsBubbling:0
+    @@IsCancalable:0
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Node
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          <IF:Document> or <IF:Element> node.
+      \
+          If the document supports the <Feature:HTML>/<FeatureVer:2.0> 
+          feature, the event target type is either <IF:HTMLDocument>, 
+          <IF:HTMLBodyElement> or <IF:HTMLFrameSetElement>.
+    @@ContextInfo:
+       @@@Attr:
+         @@@@IF:
+           DOMUIEvents:UIEvent
+         @@@@Name:view
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             The view, if any, from which the event is generated.
+         @@@@SpecLevel:3
+    @@SpecLevel:2
+  @Event:
+    @@Name:abort
+    @@QName:
+      ev:abort
+    @@SpecLevel:2
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The loading of the document, or a resource linked from it, 
+        is stopped before being entirely loaded.
+      \
+        If the document supports the <Feature:HTML>/<FeatureVer:2.0> 
+        feature, this event is generated when the page loading 
+        is stopped before an image has been allowed to completely 
+        load.  This event applies to <HE:object> elements.
+    @@Type:
+      DOMEvents:Event
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The event object also implements the <IF:UIEvent> interface 
+        if the event is generated from a user interface.
+    @@IsBubbling:1
+    @@IsCancalable:0
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          If the document supports the <Feature:HTML>/<FeatureVer:2.0> 
+          feature, the event target type is <IF:HTMLObjectElement>.
+    @@ContextInfo:
+       @@@Attr:
+         @@@@IF:
+           DOMUIEvents:UIEvent
+         @@@@Name:view
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             The view, if any, from which the event is generated.
+         @@@@SpecLevel:3
+  @Event:
+    @@Name:error
+    @@QName:
+      ev:error
+    @@SpecLevel:2
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The document, or a resource linked from it, 
+        has been loaded but cannot be interpreted accordint to 
+        its semantic.
+        \
+        {eg:
+        \
+          - A resource is invalid as an image.
+        \
+          - A script execution error occured.
+        \
+          - An XML document is not well-formed.
+        \
+        }
+      \
+        If the document supports the <Feature:HTML>/<FeatureVer:2.0> 
+        feature, this event is generated when an image does not 
+        load properly or when an error occurs during script 
+        execution.  This event is valid for <HE:object>, 
+        <HE:body> and <HE:frameset> elements.
+    @@Type:
+      DOMEvents:Event
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The event object also implements the <IF:UIEvent> interface 
+        if the event is generated from a user interface.
+    @@IsBubbling:1
+    @@IsCancalable:0
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          If the document supports the <Feature:HTML>/<FeatureVer:2.0> 
+          feature, the event target type is either <IF:HTMLObjectElement>, 
+          <IF:HTMLBodyElement> or <IF:HTMLFrameSetElement>.
+    @@ContextInfo:
+       @@@Attr:
+         @@@@IF:
+           DOMUIEvents:UIEvent
+         @@@@Name:view
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             The view, if any, from which the event is generated.
+         @@@@SpecLevel:3
+  @Event:
+    @@Name:select
+    @@QName:
+      ev:select
+    @@SpecLevel:2
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A user selects some text.
+      \
+        {NOTE:: DOM Level 3 Events does not provides contextual information 
+                to access the selected text.
+      \
+        }
+      \
+        If the document supports the <Feature:HTML>/<FeatureVer:2.0> 
+        feature, this event is generated when the user selects text 
+        in a text field either via the user interface or via 
+        DOM Level 2 HTML attributes.  This event is valid for 
+        <HE:input> and <HE:textarea> elements.
+    @@ActionBefore:
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The selection occured.
+    @@Type:
+      DOMEvents:Event
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The event object also implements the <IF:UIEvent> interface 
+        if the event is generated from a user interface.
+    @@IsBubbling:1
+    @@IsCancalable:0
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          If the document supports the <Feature:HTML>/<FeatureVer:2.0> 
+          feature, the event target type is either <IF:HTMLInputElement> 
+          or <IF:HTMLTextAreaElement>.
+    @@ContextInfo:
+       @@@Attr:
+         @@@@IF:
+           DOMUIEvents:UIEvent
+         @@@@Name:view
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             The view, if any, from which the event is generated.
+         @@@@SpecLevel:3
+  @Event:
+    @@Name:change
+    @@QName:
+      ev:change
+    @@SpecLevel:2
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A control loses the input focus and its value has been 
+        modified since gaining focus.
+      \
+        If the document supports the <Feature:HTML>/<FeatureVer:2.0> 
+        feature, this event can occur either via a user interface 
+        manipulation or the <M:focus> method and other DOM Level 2 
+        HTML attributes.  This event is valid for <HE:input>, 
+        <HE:select> and <HE:textarea> elements.
+    @@Type:
+      DOMEvents:Event
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The event object also implements the <IF:UIEvent> interface 
+        if the event is generated from a user interface.
+    @@IsBubbling:1
+    @@IsCancalable:0
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          If the document supports the <Feature:HTML>/<FeatureVer:2.0> 
+          feature, the event target type is either <IF:HTMLInputElement>, 
+          <IF:HTMLSelectElement> or <IF:HTMLTextAreaElement>.
+    @@ContextInfo:
+       @@@Attr:
+         @@@@IF:
+           DOMUIEvents:UIEvent
+         @@@@Name:view
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             The view, if any, from which the event is generated.
+         @@@@SpecLevel:3
+  @Event:
+    @@Name:submit
+    @@QName:
+      ev:submit
+    @@SpecLevel:2
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A form is submitted.
+      \
+        If the document supports the <Feature:HTML>/<FeatureVer:2.0> 
+        feature, this event is generated when a form is submitted 
+        via a button.  This event only applies the <HE:form> element. 
+      \
+        {NOTE:: The <M:HTMLFormEelement.submit> method does not
+                fire this event type.
+      \
+        }
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        Some HTML UA fires the HTML <HTML:onsubmit> event not only 
+        via the button but also any other user action including 
+        a push of <KEY:Enter> key during the focus being in the 
+        single-line text field.
+    @@Type:
+      DOMEvents:Event
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The event object also implements the <IF:UIEvent> interface 
+        if the event is generated from a user interface.
+    @@IsBubbling:1
+    @@IsCancalable:1
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          If the document supports the <Feature:HTML>/<FeatureVer:2.0> 
+          feature, the event target type is <IF:HTMLFormElement>.
+    @@ContextInfo:
+       @@@Attr:
+         @@@@IF:
+           DOMUIEvents:UIEvent
+         @@@@Name:view
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             The view, if any, from which the event is generated.
+         @@@@SpecLevel:3
+  @Event:
+    @@Name:reset
+    @@QName:
+      ev:reset
+    @@SpecLevel:2
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A form is reset.
+      \
+        If the document supports the <Feature:HTML>/<FeatureVer:2.0> 
+        feature, this event is generated when a form is reset via 
+        a button or the <M:HTMLFormElement.reset> method is called. 
+        This event only applies to <HE:form> elements.
+    @@Type:
+      DOMEvents:Event
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The event object also implements the <IF:UIEvent> interface 
+        if the event is generated from a user interface.
+    @@IsBubbling:1
+    @@IsCancalable:1
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          If the document supports the <Feature:HTML>/<FeatureVer:2.0> 
+          feature, the event target type is <IF:HTMLFormElement>.
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          <HE:fieldset> elements are also able to be reset in HTML 4.
+    @@ContextInfo:
+       @@@Attr:
+         @@@@IF:
+           DOMUIEvents:UIEvent
+         @@@@Name:view
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             The view, if any, from which the event is generated.
+         @@@@SpecLevel:3
+  @Event:
+    @@Name:resize
+    @@QName:
+      ev:resize
+    @@SpecLevel:
+      2
+      3
+    @@Description:
+      @@@lang:en
+      @@@@@:
+        A document view or an element has been resized.
+    @@ActionBefore:
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The resize occurred.
+    @@Type:
+      DOMUIEvents:UIEvent
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The type was <IF:Event> in DOM Level 2.
+    @@IsBubbling:1
+    @@IsCancalable:0
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Node
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          <IF:Document> or <IF:Element> node.
+      \
+          If the document supports the <Feature:HTML>/<FeatureVer:2.0> 
+          feature, the event target type is either <IF:HTMLDocument> 
+          or <IF:HTMLElement>.
+    @@ContextInfo:
+       @@@Attr:
+         @@@@IF:
+           DOMUIEvents:UIEvent
+         @@@@Name:view
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             The view from which the event is generated.
+         @@@@SpecLevel:3
+  @Event:
+    @@Name:scroll
+    @@QName:
+      ev:scroll
+    @@SpecLevel:
+      2
+      3
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A document view or an element has been scrolled.
+    @@ActionBefore:
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The scroll occurred.
+    @@Type:
+      DOMUIEvents:UIEvent
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The type was <IF:Event> in DOM Level 2.
+    @@IsBubbling:1
+    @@IsCancalable:0
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Node
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          <IF:Document> or <IF:Element> node.
+      \
+          If the document supports the <Feature:HTML>/<FeatureVer:2.0> 
+          feature, the event target type is either <IF:HTMLDocument> 
+          or <IF:HTMLElement>.
+    @@ContextInfo:
+       @@@Attr:
+         @@@@IF:
+           DOMUIEvents:UIEvent
+         @@@@Name:view
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             The view from which the event is generated.
+         @@@@SpecLevel:3
+##EventSet
+
+## DOMBasicEvents.dis ends here

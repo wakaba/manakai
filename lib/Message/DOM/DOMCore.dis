@@ -3,6 +3,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/events#
   @DOMLS:
     http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
+  @DOMViews:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/views#
   @DOMXML:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @infoset:
@@ -53,7 +55,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/10/11 10:37:12 $
+     $Date: 2004/10/17 04:46:43 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -4460,13 +4462,15 @@ IF:
     @@Name: newObject
     @@Description:
       @@@lang:en
-      @@@@: Construct an object for a new instance of the "Node".
+      @@@@: 
+        Construct an object for a new instance of the <IF:Node>.
     @@Return:
       @@@Type:
         ManakaiDOM:ManakaiDOMNodeObject
       @@@Description:
         @@@@lang:en
-        @@@@@: The object for the "Node" to be created.
+        @@@@@:
+          The object for the <IF:Node> to be created.
       @@@Def:
         @@@@Type:
           lang:Perl
@@ -4481,11 +4485,11 @@ IF:
           $node->{<Q:infoset:children>} = [];
           $node->{<Q:infoset:attributes>} = {};
           $node->{<Q:DOMCore:hasFeature>}->{XML} = true;
-              ## More consideration required for the feature
+              \## ISSUE: More consideration required for the feature
        @@@ImplNote:
          @@@@lang:en
          @@@@@:
-           Other properties required to be a legal "Node" object:
+           Other properties required to be a legal <IF:Node> object:
            <Q:DOMCore:nodeType>.
          \
            Optional properties: <Q:infoset:localName>, <Q:infoset:prefix>,
@@ -11440,6 +11444,8 @@ IF:
           $r->{<Q:DOMCore:nodeType>} = <Q:infoset:Document>;
           $r->{<Q:infoset:version>} = '1.0';
           $r->{<Q:DOMCore:strictErrorChecking>} = true;
+          push @{$r->{<Q:TreeCore:subnode>}}, <Q:DOMViews:view>;
+          $r->{<Q:DOMViews:view>} = [];
        @@@ImplNote:
          @@@@lang:en
          @@@@@:
@@ -11450,7 +11456,7 @@ IF:
            <Q:infoset:characterEncodingScheme>, <Q:DOMCore:xmlEncoding>,
            <Q:infoset:standalone>, <Q:infoset:version>,
            <Q:DOMCore:documentURI>, <Q:DOMCore:strictErrorChecking>, 
-           <Q:infoset:children>.
+           <Q:infoset:children>, <Q:DOMViews:view>.
     @@Level[list]:
       1
       2
