@@ -9,7 +9,7 @@ structured header field bodies of the Internet message
 package Message::Field::Structured;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 use overload '""' => sub { $_[0]->stringify },
              '.=' => sub { $_[0]->value_append ($_[1]) },
@@ -32,6 +32,8 @@ sub _init ($;%) {
   $self->{option} = Message::Util::make_clone ({
     _ARRAY_NAME	=> '',
     _HASH_NAME	=> '',
+    _MATHODS	=> [qw(as_plain_string)],
+    by	=> 'index',	## (Reserved for method level option)
     dont_croak	=> 0,	## Don't die unless very very fatal error
     encoding_after_encode	=> '*default',
     encoding_before_decode	=> '*default',
@@ -110,6 +112,7 @@ sub add ($$$%) {
     if (ref $_[0] eq 'HASH') {
       my $option = shift (@_);
       for (keys %$option) {my $n = $_; $n =~ s/^-//; $option{$n} = $$option{$_}}
+      $option{parse} = 1 if defined wantarray && !defined $option{parse};
     }
     
     ## Additional items
@@ -117,6 +120,7 @@ sub add ($$$%) {
     for (@_) {
       my ($ok, undef, $avalue) = $self->_add_array_check ($_, \%option);
       if ($ok) {
+        $avalue = $self->_parse_value ('*default' => $avalue) if $option{parse};
         if ($option{prepend}) {
           unshift @{$self->{$array}}, $avalue;
         } else {
@@ -150,8 +154,9 @@ sub add ($$$%) {
       next if $name =~ /^-/; $name =~ s/^\\//;
       
       my $ok;
-      ($ok, undef, $avalue) = $self->_add_hash_check ($name => $value, \%option);
+      ($ok, $name, $avalue) = $self->_add_hash_check ($name => $value, \%option);
       if ($ok) {
+        $avalue = $self->_parse_value ($name => $avalue) if $option{parse};
         if ($option{prepend}) {
           unshift @{$self->{$array}}, $avalue;
         } else {
@@ -259,7 +264,7 @@ sub replace ($$$%) {
 }
 
 sub _replace_cleaning ($) {
-  # $_[0]->_delete_empty;
+  $_[0]->_delete_empty;
 }
 sub _replace_array_check ($$\%) {
   shift; 1, $_[0] => $_[0];
@@ -299,7 +304,7 @@ sub count ($;%) {
   $#{$self->{$array}} + 1;
 }
 sub _count_cleaning ($) {
-  # $_[0]->_delete_empty;
+  $_[0]->_delete_empty;
 }
 sub _count_by_name ($$\%) {
   # my $self = shift;
@@ -309,11 +314,86 @@ sub _count_by_name ($$\%) {
   # $#a + 1;
 }
 
+sub delete ($@) {
+  my $self = shift;
+  my %p; %p = %{shift (@_)} if ref $_[0] eq 'HASH';
+  my %option = %{$self->{option}};
+  for (grep {/^-/} keys %p) {$option{substr ($_, 1)} = $p{$_}}
+  my $array = $option{_ARRAY_NAME} || $option{_HASH_NAME};
+  unless ($array) {
+    return if $option{dont_croak};
+    Carp::croak q{delete: Method not available for this module};
+  }
+  if ($option{by} && $option{by} ne 'index') {
+    my %name; for (@_) {$name{$_} = 1}
+    for (@{$self->{$array}}) {
+      if ($self->_delete_match ($option{by}, \$_, \%name, \%option)) {
+        $_ = undef;
+      }
+    }
+  } else {	## by index
+    for (@_) {
+      $self->{$array}->[$_] = undef;
+    }
+  }
+  $self->_delete_cleaning;
+}
+
+## delete-by?, \$checked-item, \%delete-list, \%option
+sub _delete_match ($$\$\%\%) {
+  0 #return 1 / 0
+}
+
+sub _delete_cleaning ($) {
+  $_[0]->_delete_empty;
+}
+
 ## Delete empty items
 sub _delete_empty ($) {
   # my $self = shift;
   # $self->{*$array*} = [grep {ref $_ && length $_->[0]} @{$self->{*$array*}}];
   # $self;
+}
+
+sub item ($$;%) {
+  my $self = shift;
+  my ($name, %p) = (shift, @_);
+  return $self->replace ($name => $p{-value}, @_) if defined $p{-value};
+  my %option = %{$self->{option}};
+  for (grep {/^-/} keys %p) {$option{substr ($_, 1)} = $p{$_}}
+  my $array = $option{_ARRAY_NAME} || $option{_HASH_NAME};
+  unless ($array) {
+    return if $option{dont_croak};
+    Carp::croak q{item: Method not available for this module};
+  }
+  if ($option{by} eq 'index') {
+    for ($self->{$array}->[$name]) {
+      return $self->_item_return_value (\$_, \%option);
+    }
+  } else {
+    my @r;
+    for (@{$self->{$array}}) {
+      if ($self->_item_match ($option{by}, \$_, {$name => 1}, \%option)) {
+        if (wantarray) {
+          push @r, $self->_item_return_value (\$_, \%option);
+        } else {
+          return $self->_item_return_value (\$_, \%option);
+        }
+      }
+    }
+    return undef unless wantarray;
+    (@r);
+  }
+}
+
+## item-by?, \$checked-item, {item-key => 1}, \%option
+sub _item_match ($$\$\%\%) {
+  0 #return 1 / 0
+}
+
+## Returns returned item value    \$item-value, \%option
+sub _item_return_value ($\$\%) {
+  $_[1]
 }
 
 ## $self->_parse_value ($type, $value);
@@ -344,6 +424,20 @@ sub _parse_value ($$$) {
       -field_param_name	=> $name,
       -parse_all	=> $self->{option}->{parse_all},
     %vopt);
+  }
+}
+
+sub scan ($&) {
+  my ($self, $sub) = @_;
+  my %p = @_; my %option = %{$self->{option}};
+  for (grep {/^-/} keys %p) {$option{substr ($_, 1)} = $p{$_}}
+  my $array = $self->{option}->{_ARRAY_NAME}
+           || $self->{option}->{_HASH_NAME};
+  my @param = @{$self->{$array}};
+  my $sort = $option{sort};
+  @param = sort $sort @param if ref $sort;
+  for my $param (@param) {
+    &$sub($self, $param);
   }
 }
 
@@ -454,6 +548,16 @@ sub _n11n_field_name ($$) {
   $s;
 }
 
+my %_method_default_list = qw(new 1 parse 1 stringify 1 option 1 clone 1 method_available 1);
+sub method_available ($$) {
+  my $self = shift;
+  my $name = shift;
+  return 1 if $_method_default_list{$name};
+  for (@{$self->{option}->{_METHODS}}) {
+    return 1 if $_ eq $name;
+  }
+  0;
+}
 
 =head1 EXAMPLE
 
@@ -499,7 +603,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/04 06:03:58 $
+$Date: 2002/05/08 09:11:31 $
 
 =cut
 

@@ -11,7 +11,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -43,6 +43,7 @@ sub _init ($;%) {
   my $self = shift;
   my %options = @_;
   my %DEFAULT = (
+    -_ARRAY_NAME	=> 'value',
     #encoding_after_encode
     #encoding_before_decode
     -field_name	=> 'keywords',
@@ -74,7 +75,8 @@ sub _init ($;%) {
      list-owner list- list-post list- list-subscribe list- 
      list-unsubscribe list- list-url list- uri list-
      posted-to newsgroups
-     x-brother x-moe x-boss x-moe x-daughter x-moe x-dearfriend x-moe
+     x-brother x-moe x-boss x-moe x-classmate x-moe x-daughter x-moe 
+     x-dearfriend x-moe
      x-favoritesong x-moe 
      x-friend x-moe x-me x-moe
      x-respect x-moe x-sister x-moe x-son x-moe x-sublimate x-moe x-wife x-moe);
@@ -202,20 +204,16 @@ sub count ($) {
 
 Adds (appends) new value(s).
 
-=iterm $csv->prepend ($value1, [$value2, $value3,...])
-
-Prepends new value(s).
-
 =cut
 
-sub add ($@) {
+sub _add_array_check ($$\%) {
   my $self = shift;
-  push @{$self->{value}}, @_;
-}
-
-sub prepend ($@) {
-  my $self = shift;
-  unshift @{$self->{value}}, @_;
+  my ($value, $option) = @_;
+  my $value_option = {};
+  if (ref $value eq 'ARRAY') {
+    ($value, %$value_option) = @$value;
+  }
+  (1, value => $value);
 }
 
 =item $field-body = $csv->stringify ()
@@ -236,18 +234,23 @@ sub stringify ($;%) {
   $option{separator} = $option{separator_long}
     if $option{max} >= $option{long_count};
   join $option{separator}, 
-    map {
-      if ($option{is_quoted_string}) {
-        my %s = &{$self->{option}->{hook_encode_string}} ($self, 
-          $_, type => 'phrase');
-        Message::Util::quote_unsafe_string ($s{value}, 
-          unsafe => $option{value_unsafe_rule});
-      } else {
-        $_;
-      }
-    } @{$self->{value}}[0..$option{max}];
+    map {$self->_stringify_item ($_, \%option)} @{$self->{value}}[0..$option{max}];
 }
 *as_string = \&stringify;
+
+sub _stringify_item ($$\%) {
+  my $self = shift;
+  my $item = shift;
+  my $option = shift;
+      if ($$option{is_quoted_string}) {
+        my %s = &{$$option{hook_encode_string}} ($self, 
+          $item, type => 'phrase');
+        Message::Util::quote_unsafe_string ($s{value}, 
+          unsafe => $$option{value_unsafe_rule});
+      } else {
+        $item;
+      }
+}
 
 =item $option-value = $ua->option ($option-name)
 
@@ -333,7 +336,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/04 06:03:58 $
+$Date: 2002/05/08 09:11:31 $
 
 =cut
 
