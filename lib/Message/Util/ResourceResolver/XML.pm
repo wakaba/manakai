@@ -12,7 +12,7 @@ This module is part of manakai.
 
 package Message::Util::ResourceResolver::XML;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Message::Util::ResourceResolver::Base;
 push our @ISA, 'Message::Util::ResourceResolver::Base';
 
@@ -23,6 +23,7 @@ use Message::Util::QName::General [qw/ExpandedURI/],
   {
    rr => Message::Util::ResourceResolver::Base::URI_CONFIG (),
    rrx => URI_CONFIG,
+   infoset => q<http://www.w3.org/2001/04/infoset#>,
   };
 
 =head1 METHODS
@@ -64,4 +65,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/06/27 06:34:07 $
+1; # $Date: 2004/07/04 07:05:54 $

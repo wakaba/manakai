@@ -19,7 +19,7 @@ This module is part of manakai.
 package Message::Util::Error::TextParser;
 require Message::Util::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.3.2.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.3.2.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 sub new ($;%) {
   my $self = bless {}, shift;
@@ -76,8 +76,8 @@ sub fork_position ($$$;%) {
     pos => pos $$t,
     %opt,
   };
-  ## ISSUE: Should reference be recursively forked?
-  $self->{flag}->{$t} = {%{$self->{flag}->{$t}||{}}};
+  ## ISSUE: Should references be recursively forked?
+  $self->{flag}->{$t} = {%{$self->{flag}->{$s}||{}}};
 }
 
 sub set_flag ($$$$;%) {
@@ -85,6 +85,19 @@ sub set_flag ($$$$;%) {
   unless (defined $value) {
     delete $self->{flag}->{$s}->{$name};
   } else {
+    $self->{flag}->{$s}->{$name} = $value;
+  }
+}
+
+=item $err->default_flag ($src, $name => $value, %option)
+
+Set new value iif that flag has no value.
+
+=cut
+
+sub default_flag ($$$$;%) {
+  my ($self, $s, $name => $value, %opt) = @_;
+  unless (exists $self->{flag}->{$s}->{$name}) {
     $self->{flag}->{$s}->{$name} = $value;
   }
 }
@@ -163,13 +176,25 @@ sub ___rule_def () {+{
   },
 }}
 
+=head1 WARNING
+
+This module uses stringified value of scalar reference (e.g. C<SCALAR(0xI<...>)>)
+to distinglish variables each other.  This might cause difficult
+situation when Perl reallocate memory area to another variable
+(once after first variable is to be unreferred from anywhere).
+
+In most case, refreshing states and flags before variable is in use
+with TextParser (by C<< ->reset_position >> or C<< ->fork_position >>)
+removes this possible confliction.  That is, correct use of
+this module will not cause any problem.
+
 =head1 LICENSE
 
-Copyright 2003 Wakaba <w@suika.fam.cx>
+Copyright 2003-2004 Wakaba <w@suika.fam.cx>
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/06/21 06:31:04 $
+1; # $Date: 2004/07/04 07:05:54 $

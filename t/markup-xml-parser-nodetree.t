@@ -12,21 +12,33 @@ use Message::Util::QName::General [qw/ExpandedURI/],
    test => q<http://suika.fam.cx/~wakaba/-temp/2004/2/22/test/>,
    rr => Message::Util::ResourceResolver::Base::URI_CONFIG (),
    rrx => Message::Util::ResourceResolver::XML::URI_CONFIG (),
+   Content => q<urn:x-suika-fam-cx:msgpm:header:mail:rfc822:content>,
+   infoset => q<http://www.w3.org/2001/04/infoset#>,
   };
 use Test;
+use URI;
 
 push @mytest::resresolver::ISA, 'Message::Util::ResourceResolver::XML';
 
 sub mytest::resresolver::get_resource ($;%) {
   my ($self, %opt) = @_;
   my $res = $self->{ExpandedURI q<test:resource>};
-  my $uri = $opt{ExpandedURI q<SYSTEM>};
+  my $uri = URI->new ($opt{ExpandedURI q<infoset:systemIdentifier>});
+  $uri = $uri->abs ($opt{ExpandedURI q<infoset:declarationBaseURI>})
+    if $opt{ExpandedURI q<infoset:declarationBaseURI>};
+  my $r;
   if ($res->{$uri}) {
-    return {%{$res->{$uri}},
-            ExpandedURI q<rr:success> => 1};
+    $r = {%{$res->{$uri}},
+          ExpandedURI q<rr:success> => 1};
   } else {
-    return {ExpandedURI q<rr:success> => 0};
+    $r = {ExpandedURI q<rr:success> => 0};
+    warn qq<Resource <$uri> not defined>
+      unless exists $res->{$uri};
   }
+  $r->{ExpandedURI q<original-uri>} = $uri;
+  $r->{ExpandedURI q<uri>} ||= $uri;
+  $r->{ExpandedURI q<base-uri>} ||= $uri;
+  $r;
 }
 
 package main;
@@ -287,17 +299,40 @@ my @a = (
  {
   t => q{<!DOCTYPE root SYSTEM "sys">},
   method => q(parse_doctype_declaration),
+  error => q(0:27:EXTERNAL_SUBSET_NOT_READ),
+  flag => {ExpandedURI q<base-uri> => URI->new (q<http://foo.example/>)},
+  resource => {q<http://foo.example/sys>=>undef},
+ },
+ {
+  t => q{<!DOCTYPE root PUBLIC "pbu" "sys">},
+  method => q(parse_doctype_declaration),
+  error => q(0:33:EXTERNAL_SUBSET_NOT_READ),
+  flag => {ExpandedURI q<base-uri> => URI->new (q<http://foo.example/>)},
+  resource => {q<http://foo.example/sys>=>undef},
+ },
+ {
+  t => q{<!DOCTYPE root SYSTEM "sys">},
+  method => q(parse_doctype_declaration),
   result => [q{<!DOCTYPE root SYSTEM "sys">}],
+  flag => {ExpandedURI q<base-uri> => URI->new (q<http://foo.example/>)},
+  resource => {q<http://foo.example/sys>
+                 =>{ExpandedURI q<rrx:literal-entity-value>=>q<>}},
  },
  {
   t => q{<!DOCTYPE root PUBLIC "pub" "sys">},
   method => q(parse_doctype_declaration),
   result => [q{<!DOCTYPE root PUBLIC "pub" "sys">}],
+  flag => {ExpandedURI q<base-uri> => URI->new (q<http://foo.example/>)},
+  resource => {q<http://foo.example/sys>
+                 =>{ExpandedURI q<rrx:literal-entity-value>=>q<>}},
  },
  {
   t => q{<!DOCTYPE root PUBLIC "pub  " "sys"[<!---->]>},
   method => q(parse_doctype_declaration),
   result => [q{<!DOCTYPE root PUBLIC "pub" "sys" [<!---->]>}],
+  flag => {ExpandedURI q<base-uri> => URI->new (q<http://foo.example/>)},
+  resource => {q<http://foo.example/sys>
+                 =>{ExpandedURI q<rrx:literal-entity-value>=>q<>}},
  },
 
  {
@@ -370,6 +405,7 @@ my @a = (
          <!ENTITY % bar %foo; >},
   method => q(parse_doctype_external_subset),
   error => q<1:25:EXTERNAL_PARAM_ENTITY_NOT_READ>,
+  resource => {q<about:ent1>=>undef},
  },
  {
   t => q{<!NOTATION n1 SYSTEM "n1">
@@ -426,6 +462,158 @@ my @a = (
                     },
               },
  },
+ {
+  t => q{<!ENTITY % foo SYSTEM "about:ent1">
+         <!ENTITY % bar "%foo; ">},
+  method => q(parse_doctype_external_subset),
+  result
+   => [q{<!ENTITY % foo SYSTEM "about:ent1">
+         <!ENTITY % bar "%foo; ">},
+       q{<!ENTITY  % foo SYSTEM "about:ent1">
+         <!ENTITY  % bar "%foo; ">},
+       q{<!ENTITY % foo SYSTEM "about:ent1">
+         <!ENTITY % bar '" text " '>},
+       q{<!ENTITY % foo SYSTEM "about:ent1">
+         <!ENTITY % bar "
+                            &#x22; text &#x22; ">}],
+  resource => {q<about:ent1>
+                 => {ExpandedURI q<rrx:literal-entity-value>
+                       => q{<?xml version="1.0" encoding="us-ascii"?>
+                            " text "},
+                    },
+              },
+ },
+
+ {
+  t => q{<!ENTITY % foo "<!ENTITY &#x25; baz 'baz.'>">
+         %foo;
+         <!ENTITY % bar "%baz; ">},
+  method => q(parse_doctype_external_subset),
+  result
+   => [q{<!ENTITY % foo "<!ENTITY &#x25; baz 'baz.'>">
+         %foo;
+         <!ENTITY % bar "%baz; ">},
+       q{<!ENTITY  % foo "<!ENTITY &#x25; baz 'baz.'>">
+         %foo;
+         <!ENTITY  % bar "%baz; ">},
+       q{<!ENTITY % foo "<!ENTITY &#x25; baz 'baz.'>">
+         <!ENTITY % baz 'baz.'>
+         <!ENTITY % bar "baz. ">},
+       q{<!ENTITY % foo "<!ENTITY &#x25; baz 'baz.'>">
+         %foo;
+         <!ENTITY % bar "baz. ">}],
+  resource => {q<about:ent1>
+                 => {ExpandedURI q<rrx:literal-entity-value>
+                       => q{<?xml version="1.0" encoding="us-ascii"?>
+                            " text "},
+                    },
+              },
+ },
+ {
+  t => q{<!ENTITY % foo SYSTEM "foo/foo.ent">
+         %foo;
+         <!ENTITY % bar "%hoge; ">},
+  method => q(parse_doctype_external_subset),
+  flag => {
+    ExpandedURI q<base-uri> => URI->new (q<http://foo.example/bar.dtd>),
+  },
+  result
+   => [q{<!ENTITY % foo SYSTEM "foo/foo.ent">
+         %foo;
+         <!ENTITY % bar "%hoge; ">},
+       q{<!ENTITY  % foo SYSTEM "foo/foo.ent">
+         %foo;
+         <!ENTITY  % bar "%hoge; ">},
+       q{<!ENTITY % foo SYSTEM "foo/foo.ent">
+         %foo;
+         <!ENTITY % bar "-- bar -- ">}],
+  resource => {q<http://foo.example/foo/foo.ent>
+                 => {ExpandedURI q<rrx:literal-entity-value>
+                       => q{<!ENTITY % baz SYSTEM "baz.ent">%baz;},
+                    },
+               q<http://foo.example/foo/baz.ent>
+                 => {ExpandedURI q<rrx:literal-entity-value>
+                       => q{<!ENTITY % hoge "-- bar --">},
+                    },
+              },
+ },
+ {
+  t => q{<!ENTITY % foo SYSTEM "foo/foo.ent">
+         %foo;%baz;
+         <!ENTITY % bar "%hoge; ">},
+  method => q(parse_doctype_external_subset),
+  flag => {
+    ExpandedURI q<base-uri> => URI->new (q<http://foo.example/bar.dtd>),
+  },
+  result
+   => [q{<!ENTITY % foo SYSTEM "foo/foo.ent">
+         %foo;%baz;
+         <!ENTITY % bar "%hoge; ">},
+       q{<!ENTITY  % foo SYSTEM "foo/foo.ent">
+         %foo;%baz;
+         <!ENTITY  % bar "%hoge; ">},
+       q{<!ENTITY % foo SYSTEM "foo/foo.ent">
+         %foo;%baz;
+         <!ENTITY % bar "-- bar -- ">}],
+  resource => {q<http://foo.example/foo/foo.ent>
+                 => {ExpandedURI q<rrx:literal-entity-value>
+                       => q{<!ENTITY % baz SYSTEM "baz.ent">},
+                    },
+               q<http://foo.example/foo/baz.ent>
+                 => {ExpandedURI q<rrx:literal-entity-value>
+                       => q{<!ENTITY % hoge "-- bar --">},
+                    },
+              },
+ },
+ {
+  t => q{<!ENTITY % foo SYSTEM "foo/foo.ent">
+         <!ENTITY % abaz "%foo;">%abaz;%baz;
+         <!ENTITY % bar "%hoge; ">},
+  method => q(parse_doctype_external_subset),
+  flag => {
+    ExpandedURI q<base-uri> => URI->new (q<http://foo.example/bar.dtd>),
+  },
+  result
+   => [q{<!ENTITY % foo SYSTEM "foo/foo.ent">
+         <!ENTITY % abaz "%baz;">%abaz;%baz;
+         <!ENTITY % bar "%hoge; ">},
+       q{<!ENTITY  % foo SYSTEM "foo/foo.ent">
+         <!ENTITY % abaz "%baz;">%abaz;%baz;
+         <!ENTITY  % bar "%hoge; ">},
+       q{<!ENTITY % foo SYSTEM "foo/foo.ent">
+         <!ENTITY % abaz "<!ENTITY &#x25; baz SYSTEM &#x22;baz.ent&#x22;>">%abaz;%baz;
+         <!ENTITY % bar "-- bar -- ">}],
+  resource => {q<http://foo.example/foo/foo.ent>
+                 => {ExpandedURI q<rrx:literal-entity-value>
+                       => q{<!ENTITY % baz SYSTEM "baz.ent">},
+                    },
+               q<http://foo.example/baz.ent>
+                 => {ExpandedURI q<rrx:literal-entity-value>
+                       => q{<!ENTITY % hoge "-- bar --">},
+                    },
+              },
+ },
+ {
+  t => q{<!DOCTYPE e SYSTEM "foo/doctype"><e>&hoge;</e>},
+  method => q(parse_document_entity),
+  flag => {
+    ExpandedURI q<base-uri> => URI->new (q<http://foo.example/bar.dtd>),
+  },
+  result
+   => [q{<!DOCTYPE e SYSTEM "foo/doctype"><e xmlns="">&hoge;</e>},
+       q{<!DOCTYPE e [<!ENTITY % baz SYSTEM "baz.ent">
+                      <!ENTITY hoge "-- bar --">]><e xmlns="">-- bar --</e>}],
+  resource => {q<http://foo.example/foo/doctype>
+                 => {ExpandedURI q<rrx:literal-entity-value>
+                       => q{<!ENTITY % baz SYSTEM "baz.ent">
+                      %baz;},
+                    },
+               q<http://foo.example/foo/baz.ent>
+                 => {ExpandedURI q<rrx:literal-entity-value>
+                       => q{<!ENTITY hoge "-- bar --">},
+                    },
+              },
+ },
 );
 
 plan tests => scalar @a;
@@ -433,11 +621,13 @@ plan tests => scalar @a;
 my $parser = new Message::Markup::XML::Parser::NodeTree;
 
 my $first_error;
+my $first_error_desc;
 $parser->{error}->{option}->{report} = sub {
   my $err = shift;
   $err->{-object}->set_position ($err->{source}, diff => $err->{position_diff});
   $first_error ||= join ':', $err->{-object}->get_position ($err->{source}),
                           $err->{-type};
+  $first_error_desc ||= $err->stringify;
 };
 
 
@@ -460,31 +650,10 @@ my %current = (
       ExpandedURI q<test:method> => 'parse_element',
     };
   },
-  parse_doctype_subset => sub {
-    +{
-      ExpandedURI q<tree:current>
-      => do {
-           my $doctype = Message::Markup::XML::Node->new
-                                         (type => '#declaration',
-                                          namespace_uri => SGML_DOCTYPE);
-           $doctype->set_attribute (qname => 'test');
-           $doctype;
-      },
-      ExpandedURI q<test:result-prefix>
-        => q(<!DOCTYPE test [),
-      ExpandedURI q<test:result-suffix>
-        => q(]>),
-      ExpandedURI q<test:method> => 'parse_doctype_subset',
-    };
-  },
   parse_doctype_external_subset => sub {
     +{
       ExpandedURI q<tree:current>
         => Message::Markup::XML::Node->new (type => '#fragment'),
-      ExpandedURI q<test:result-prefix>
-        => q(<doctype:subset xmlns:doctype="urn:x-suika-fam-cx:markup:sgml:doctype">),
-      ExpandedURI q<test:result-suffix>
-        => q(</doctype:subset>),
       ExpandedURI q<test:method> => 'parse_doctype_subset',
       ExpandedURI q<test:option> => {ExpandedURI q<allow-param-entref> => 1},
     };
@@ -506,6 +675,7 @@ my $rr = new mytest::resresolver;
 
 for (@a) {
   undef $first_error;
+  undef $first_error_desc;
   $parser->reset;
   $rr->reset;
   $parser->{ExpandedURI q<tree:resource-resolver>} = $rr;
@@ -515,6 +685,12 @@ for (@a) {
   my $current = ($current{$method} || $current{-default})->();
   my $node = $current->{ExpandedURI q<tree:current>};
   my $METHOD = $current->{ExpandedURI q<test:method>} || $method;
+  for my $name (keys %{$_->{p}}) {
+    $current->{$name} = $_->{p}->{$name};
+  }
+  for my $name (keys %{$_->{flag}}) {
+    $parser->{error}->set_flag (\$_->{t}, $name => $_->{flag}->{$name});
+  }
   $parser->$METHOD (
     \$_->{t},
     $current,
@@ -522,7 +698,7 @@ for (@a) {
     %{$current->{ExpandedURI q<test:option>}||{}},
   );
   if ($first_error) {
-    ok $first_error, $_->{error};
+    ok $first_error, $_->{error}, $first_error_desc;
   } else {
     my $ok = 0;
     my $result = $node->stringify;

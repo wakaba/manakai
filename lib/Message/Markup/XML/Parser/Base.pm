@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::Base;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML
     qw[InXML_NameStartChar10 InXMLNameChar10
        InXMLNameStartChar11 InXMLNameChar11
@@ -24,6 +24,7 @@ use Char::Class::XML
        InXML_UnrestrictedChar11 InXMLRestrictedChar11];
 require Message::Markup::XML::Parser::Error;
 require overload;
+use URI;
 
 sub URI_CONFIG () {
   q<http://suika.fam.cx/~wakaba/-temp/2004/2/22/Parser/>
@@ -33,6 +34,8 @@ use Message::Util::QName::General [qw/ExpandedURI/],
     {
      (DEFAULT_PFX) => URI_CONFIG,
      _ => q<http://suika.fam.cx/~wakaba/-temp/2004/5/30/parser-internal#>,
+     Content => q<urn:x-suika-fam-cx:msgpm:header:mail:rfc822:content>,
+     infoset => q<http://www.w3.org/2001/04/infoset#>,
     };
 my $REG_S = qr/[\x09\x0A\x0D\x20]/; 
         # S := 1*(U+0020 / U+0009 / U+000D / U+000A) ;; [3]
@@ -57,8 +60,42 @@ sub reset ($;%) {
   $self->{error}->reset;
 }
 
+sub ____set_base_uri ($$$%) {
+  my ($self, $src, $p, %opt) = @_;
+  for (ExpandedURI q<base-uri>,
+       ExpandedURI q<uri>,
+       ExpandedURI q<original-uri>) {
+    $p->{$_} ||= $self->{error}->get_flag ($src, $_)
+  }
+  unless ($p->{ExpandedURI q<base-uri>} ||= $p->{ExpandedURI q<uri>}
+                                        ||= $p->{ExpandedURI q<original-uri>}) {
+    my $base_uri;
+    $base_uri = URI->new (q<data:>);
+    my $mt = $p->{ExpandedURI q<Content:Type>} ||
+             q<application/xml;charset=utf-8>;
+    ## BUG: This replacing cause problem if media type
+    ##      has quoted-string which contains string that
+    ##      seems a charset parameter.
+    $mt =~ s{;\s*[Cc][Hh][Aa][Rr][Ss][Ee][Tt]\s*=\s*
+                        (?>
+                            [^";\s]+ |
+                            "(?>[^"\\]*)(?>(?>[^"\\]*|\\.)*)"
+                        )}
+            {;charset=utf-8}sx or do {
+      $mt .= q<;charset=utf-8> if $mt =~ m#^text/#i;
+    };
+    $base_uri->media_type ($mt);
+    require Encode;
+    $base_uri->data (Encode::encode ('utf8', $$src));
+    $p->{ExpandedURI q<base-uri>} = $base_uri;
+  }
+  $self->{error}->default_flag ($src, ExpandedURI q<base-uri>
+                                      => $p->{ExpandedURI q<base-uri>});
+}
+
 sub parse_document_entity ($$$%) {
   my ($self, $src, $p, %opt) = @_;
+  $self->____set_base_uri ($src, $p, %opt);
   $self->____normalize_entity
            ($src, $p, %opt,
             ExpandedURI q<see-xml-declaration> => 1);
@@ -153,6 +190,7 @@ sub parse_document_entity ($$$%) {
 
 sub parse_external_parsed_entity ($$$%) {
   my ($self, $src, $p, %opt) = @_;
+  $self->____set_base_uri ($src, $p, %opt);
   $self->____normalize_entity
            ($src, $p, %opt,
             ExpandedURI q<see-xml-declaration> => 1);
@@ -1167,8 +1205,9 @@ sub parse_reference_in_rpdata ($$$%) {
             last EXPAND;
           }
           local $self->{ExpandedURI q<_:opened-parameter-entity>}->{$s} = 1;
-          $self->parse_rpdata
-               ($opt{ExpandedURI q<source>}->[-1], $p, %opt, pp => $pp);
+          local $pp->{ExpandedURI q<CDATA>} = $opt{ExpandedURI q<source>}->[-1];
+          #$self->rpdata_content
+          #     ($opt{ExpandedURI q<source>}->[-1], $p, $pp, %opt);
           $pp->{ExpandedURI q<reference-expanded>} = 1;
         } elsif ($self->{ExpandedURI q<is-standalone>}) {
           $self->report
@@ -1383,6 +1422,7 @@ sub parse_doctype_declaration ($$$%) {
         = 'SYNTAX_DOCTYPE_PS_REQUIRED';
     local $opt{ExpandedURI q<source>} = [$src];
     $opt{ExpandedURI q<allow-ps>} = 1;
+    my $has_internal_subset;
     PARAMS: {
       $self->markup_declaration_parameters_start
               ($src, $p, $pp, %opt);
@@ -1401,7 +1441,7 @@ sub parse_doctype_declaration ($$$%) {
                });
       my $doctype = shift @{$pp->{ExpandedURI q<param>}};
       unless ($doctype) {
-        last PARAMS;
+        next PARAMS;
       } elsif ($doctype->{type} eq 'rniKeyword') {
         if (${$doctype->{value}} eq 'IMPLIED') {
           $self->report
@@ -1440,18 +1480,43 @@ sub parse_doctype_declaration ($$$%) {
                  ps => 1,
                });
       my $dso = shift @{$pp->{ExpandedURI q<param>}};
-      last PARAMS unless $dso;
+      next PARAMS unless $dso;
       if ($dso->{type} eq 'dso') {
+        $has_internal_subset = 1;
+        $self->doctype_internal_subset_start ($src, $p, $pp, %opt);
         $self->parse_doctype_subset
               ($src, $pp,
                %opt,
+               ExpandedURI q<subset-type> => 'internal',
                ExpandedURI q<end-with-dsc> => 1,
                ExpandedURI q<allow-declaration>
                  => {qw/ENTITY 1 ELEMENT 1 ATTLIST 1 NOTATION 1
                         comment 1 section 0/});
+        $self->doctype_internal_subset_end ($src, $p, $pp, %opt);
       }
-      
     } continue {
+      unless ($has_internal_subset) {
+        local $opt{ExpandedURI q<doctype-internal-subset-null>} = 1;
+        $self->doctype_internal_subset_start ($src, $p, $pp, %opt);
+        $self->doctype_internal_subset_end ($src, $p, $pp, %opt);
+      }
+      ## External subset
+      if ($pp->{ExpandedURI q<has-external-id>}) {
+        $self->doctype_external_subset_start ($src, $p, $pp, %opt);
+        if ($pp->{ExpandedURI q<external-entity-source>}) {
+          local $opt{ExpandedURI q<source>}
+            = [$pp->{ExpandedURI q<external-entity-source>}];
+          $self->parse_doctype_subset
+              ($opt{ExpandedURI q<source>}->[-1],
+               $pp, %opt,
+               ExpandedURI q<subset-type> => 'external',
+               ExpandedURI q<allow-declaration>
+                 => {qw/ENTITY 1 ELEMENT 1 ATTLIST 1 NOTATION 1
+                        comment 1 section 1/});
+        }
+        $self->doctype_external_subset_end ($src, $p, $pp, %opt);
+      }
+
       $self->parse_markup_declaration_parameter
               ($src, $pp,
                %opt,
@@ -1471,9 +1536,10 @@ sub parse_doctype_declaration ($$$%) {
                param => $pp->{ExpandedURI q<param>},
                sources => $opt{ExpandedURI q<source>});
       }
-      $self->markup_declaration_parameters_end
+    }
+    $self->markup_declaration_parameters_end
               ($src, $p, $pp, %opt);
-    }} # PARAMS
+    } # PARAMS
     
     unless ($$src =~ /\G>/gc) {
       $self->report
@@ -1499,7 +1565,11 @@ sub parse_entity_declaration ($$$%) {
   my ($self, $src, $p, %opt) = @_;
   if ($$src =~ /\G<!ENTITY/gc) {
     $self->entity_declaration_start
-              ($src, $p, my $pp = {}, %opt);
+              ($src, $p,
+               my $pp = {ExpandedURI q<infoset:baseURI>
+                           => $self->{error}
+                                   ->get_flag ($src, ExpandedURI q<base-uri>)},
+               %opt);
     {
     local $opt{ExpandedURI q<match-or-error>} = 1;
     local $opt{ExpandedURI q<allow-comment>} = 0;
@@ -1702,9 +1772,10 @@ sub parse_entity_declaration ($$$%) {
                param => $pp->{ExpandedURI q<param>},
                sources => $opt{ExpandedURI q<source>});
       }
-      $self->markup_declaration_parameters_end
+    }
+    $self->markup_declaration_parameters_end
               ($src, $p, $pp, %opt);
-    }}
+    }
     unless ($$src =~ /\G>/gc) {
       $self->report
               (-type => 'SYNTAX_MDC_REQUIRED',
@@ -1786,9 +1857,10 @@ sub parse_notation_declaration ($$$%) {
                param => $pp->{ExpandedURI q<param>},
                sources => $opt{ExpandedURI q<source>});
       }
-      $self->markup_declaration_parameters_end
+    }
+    $self->markup_declaration_parameters_end
               ($src, $p, $pp, %opt);
-    }}
+    }
     unless ($$src =~ /\G>/gc) {
       $self->report
               (-type => 'SYNTAX_MDC_REQUIRED',
@@ -1930,9 +2002,9 @@ sub parse_element_declaration ($$$%) {
                param => $pp->{ExpandedURI q<param>},
                sources => $opt{ExpandedURI q<source>});
       }
-      $self->markup_declaration_parameters_end
-              ($src, $p, $pp, %opt);
-    }}
+    }
+    $self->markup_declaration_parameters_end
+              ($src, $p, $pp, %opt)}
     unless ($$src =~ /\G>/gc) {
       $self->report
               (-type => 'SYNTAX_MDC_REQUIRED',
@@ -1980,7 +2052,7 @@ sub parse_attlist_declaration ($$$%) {
                });
         my $entname = shift @{$pp->{ExpandedURI q<param>}};
         unless ($entname) {
-          last PARAMS;
+          next PARAMS;
         } elsif ($entname->{type} eq 'Name') {
           $pp->{ExpandedURI q<element-type-name>} = $entname->{value};
         } elsif ($entname->{type} eq 'rniKeyword') {
@@ -2184,9 +2256,10 @@ sub parse_attlist_declaration ($$$%) {
                param => $pp->{ExpandedURI q<param>},
                sources => $opt{ExpandedURI q<source>});
       }
-      $self->markup_declaration_parameters_end
+    }
+    $self->markup_declaration_parameters_end
               ($src, $p, $pp, %opt);
-    }}
+    }
     unless ($$src =~ /\G>/gc) {
       $self->report
               (-type => 'SYNTAX_MDC_REQUIRED',
@@ -2958,6 +3031,7 @@ sub parse_external_identifiers ($$$%) {
     $pubid =~ s/$REG_S+/\x20/go;
     $pubid =~ s/^\x20//; $pubid =~ s/\x20$//;
     $pp->{ExpandedURI q<public-id>} = \$pubid;
+    $p->{ExpandedURI q<has-external-id>} = 1;
     $self->public_identifier_start 
             ($src, $p, $pp, %opt);
     
@@ -3012,6 +3086,7 @@ sub parse_external_identifiers ($$$%) {
     my $sysid = shift @{$p->{ExpandedURI q<param>}};
     return 1 unless $sysid;
     my $pp = {ExpandedURI q<system-id> => $sysid->{value}};
+    $p->{ExpandedURI q<has-external-id>} = 1;
     $self->system_identifier_start 
             ($src, $p, $pp, %opt);
     return 1;
@@ -3083,8 +3158,8 @@ sub parse_doctype_subset ($$$%) {
           my $s = $1; pos $s = 0;
           $self->{error}->set_position ($src, moved => 1, diff => length $s);
           $self->{error}->fork_position ($src => \$s);
-          my $pp = {ExpandedURI q<entity-name> => \$s,
-                    ExpandedURI q<param> => []};
+          my $ppp = {ExpandedURI q<entity-name> => \$s,
+                     ExpandedURI q<param> => []};
           if ($self->{ExpandedURI q<_:opened-parameter-entity>}->{$s}) {
             $self->report
                      (-type => 'WFC_NO_RECURSION',
@@ -3092,11 +3167,11 @@ sub parse_doctype_subset ($$$%) {
                       source => $src,
                       position_diff => length $s,
                       entity_name => $s);
-            $pp->{ExpandedURI q<entity-opened>} = 1;
+            $ppp->{ExpandedURI q<entity-opened>} = 1;
           }
           $opt{ExpandedURI q<source>} = [$src];
           $self->parameter_entity_reference_in_subset_start
-            ($src, $p, $pp, %opt);
+            ($src, $pp, $ppp, %opt);
           EXPAND: {
             last EXPAND if $pp->{ExpandedURI q<entity-opened>};
             if (overload::StrVal ($src) ne
@@ -3132,10 +3207,10 @@ sub parse_doctype_subset ($$$%) {
               local $Error::Depth = $Error::Depth + 1;
               $self->parse_doctype_subset
                   ($opt{ExpandedURI q<source>}->[-1],
-                   $p, %opt,
+                   $ppp, %opt,
                    ExpandedURI q<end-with-dsc> => 0,
                    ExpandedURI q<end-with-mse> => 0);
-              $pp->{ExpandedURI q<reference-expanded>} = 1;
+              $ppp->{ExpandedURI q<reference-expanded>} = 1;
             } elsif ($self->{ExpandedURI q<is-standalone>}) {
               $self->report
                (-type => 'WFC_ENTITY_DECLARED',
@@ -3852,9 +3927,23 @@ sub attribute_value_specification_end ($$$$%) {}
 
 Document type declaration.
 
+=item doctype_internal_subset_start, doctype_internal_subset_end, doctype_external_subset_start, doctype_external_subset_end
+
+Document type declaration internal subset and external subset.
+These methods are called before/after C<doctype_subset_start>
+or C<doctype_subset_end> is called.
+
+Note that C<doctype_internal_subset_start> and
+C<doctype_internal_subset_end> are called even if doctype declaration
+does not have dso ([) and dsc (]).
+
 =cut
 
 sub doctype_declaration_start ($$$$%) {}
+sub doctype_internal_subset_start ($$$$%) {}
+sub doctype_internal_subset_end ($$$$%) {}
+sub doctype_external_subset_start ($$$$%) {}
+sub doctype_external_subset_end ($$$$%) {}
 sub doctype_declaration_end ($$$$%) {}
 
 =item doctype_subset_start, doctype_subset_content, doctype_subset_end
@@ -4159,4 +4248,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/06/27 06:34:07 $
+1; # $Date: 2004/07/04 07:05:54 $

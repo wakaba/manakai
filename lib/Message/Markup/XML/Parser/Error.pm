@@ -14,7 +14,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Message::Markup::XML::Parser::Error;
 require Message::Util::Error::TextParser;
@@ -765,7 +765,7 @@ push our @ISA, 'Message::Markup::XML::Parser::Error';
 
 sub ___error_def () {+{
   VC_ENTITY_DECLARED__PARAM => {
-    description => q(Parameter "%t (name => entity-name);" must be declared before it is referred),
+    description => q(Parameter entity "%t (name => entity-name);" must be declared before it is referred),
     level => 'vc',
   },
 }}
@@ -1045,8 +1045,22 @@ sub ___error_def () {+{
   },
 
   EXTERNAL_PARAM_ENTITY_NOT_READ => {
-    description => q(External parameter entity "%t (name => entity-name);" is not read),
+    description => q(External parameter entity "%t (name => entity-name);" not read),
     level => 'skipped',
+  },
+  EXTERNAL_SUBSET_NOT_READ => {
+    description => q(External doctype subset entity not read),
+    level => 'skipped',
+  },
+}}
+
+package Message::Markup::XML::Parser::Error::URI;
+push our @ISA, 'Message::Markup::XML::Parser::Error';
+
+sub ___error_def () {+{
+  FAIL_TO_RESOLVE_RELATIVE => {
+    description => q(Cannot resolve relative URI reference <%t (name => relative-uri);> with base URI reference <%t (name => base-uri);>),
+    level => 'error',
   },
 }}
 
@@ -1068,4 +1082,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/06/27 06:34:07 $
+1; # $Date: 2004/07/04 07:05:54 $

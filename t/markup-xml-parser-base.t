@@ -10,6 +10,7 @@ BEGIN {
    (DEFAULT_PFX) => Message::Markup::XML::Parser::Base::URI_CONFIG,
    tree => q<http://suika.fam.cx/~wakaba/-temp/2004/2/22/Parser/TreeConstruct/>,
    test => q<mid:t.markup-xml-parser-base.t+2004.5.20@manakai.suika.fam.cx#>,
+   Content => q<urn:x-suika-fam-cx:msgpm:header:mail:rfc822:content>,
   };
 }
 use Message::Util::QName::General [qw/ExpandedURI/], our $NS;
@@ -2743,7 +2744,7 @@ comment -->
   t => qq{<!ENTITY e "%f;">},
   method => 'parse_entity_declaration',
   option => {ExpandedURI q<test:standalone> => 1},
-  result => '0:1:WFC_ENTITY_DECLARED',
+  result => 1,
  },
  {
   entity => {f => {replace => q<%bar;>}, bar => {replace => q<>,
@@ -2751,21 +2752,21 @@ comment -->
   t => qq{<!ENTITY e "%f;">},
   method => 'parse_entity_declaration',
   option => {ExpandedURI q<test:standalone> => 1},
-  result => '0:1:WFC_ENTITY_DECLARED__INTERNAL',
+  result => 1,
  },
  {
   entity => {f => {replace => q<%f;>}},
   t => qq{<!ENTITY e "%f;">},
   method => 'parse_entity_declaration',
   option => {ExpandedURI q<test:standalone> => 1},
-  result => '0:1:WFC_NO_RECURSION',
+  result => 1,
  },
  {
   entity => {f => {replace => q<%g;>}, g => {replace => q<%f;>}},
   t => qq{<!ENTITY e "%f;">},
   method => 'parse_entity_declaration',
   option => {ExpandedURI q<test:standalone> => 1},
-  result => '0:1:WFC_NO_RECURSION',
+  result => 1,
  },
  {
   entity => {f => {replace => q<g;>, unparsed => 1}},
@@ -3085,13 +3086,13 @@ sub general_entity_reference_in_attribute_value_literal_start ($$$$%) {
       pos $reptxt->{replace} = 0 if defined $reptxt->{replace};
       push @{$opt{ExpandedURI q<source>}}, \($reptxt->{replace});
       $self->{error}->set_flag
-        ((\$reptxt->{replace}),
+        (\($reptxt->{replace}),
          ExpandedURI q<is-external-entity> => $reptxt->{external});
       $self->{error}->set_flag
-        ((\$reptxt->{replace}),
+        (\($reptxt->{replace}),
          ExpandedURI q<is-unparsed-entity> => $reptxt->{unparsed});
       $self->{error}->set_flag
-        ((\$reptxt->{replace}),
+        (\($reptxt->{replace}),
          ExpandedURI q<is-declared-externally> => $reptxt->{externally});
     } elsif (ref $reptxt) {
       next;
