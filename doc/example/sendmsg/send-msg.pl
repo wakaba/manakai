@@ -1,7 +1,9 @@
+# $Header: /tmp/h9kweAZAh1/cvs/manakai/doc/example/sendmsg/send-msg.pl,v 1.4 2002/07/28 00:11:50 wakaba Exp $
+# $RCSfile: send-msg.pl,v $ $Source: /tmp/h9kweAZAh1/cvs/manakai/doc/example/sendmsg/send-msg.pl,v $
 use strict;
 use vars qw($MYNAME $MYVERSION $VERSION);
-$MYNAME = 'send.pl';
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$MYNAME = $0;
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 $MYVERSION = qq{2.5.$VERSION};
 use lib qw(/home/wakaba/temp/msg/);
 use Message::Entity;
@@ -53,23 +55,11 @@ for my $file (@files) {
   my $header = $msg->header;
   
     ## Envelope From, To
-    my $eFrom = $header->field ('x-envelope-from')->addr_spec;
-    my $resent = $header->field ('resent-from')->addr_spec;
-    if ($resent) {
-      $eFrom ||= $resent;
-    } else {
-      $eFrom ||= $header->field ('from')->addr_spec;
-    }
-    my @eTo = $header->field ('x-envelope-to')->addr_spec;
+    my $eFrom = $msg->sender;
+    my $resent = $header->field_exist ('resent-from');
+    my @eTo = $msg->destination;
     my ($send_mail,$post_news) = (0, 0);
-    if ($resent) {
-      @eTo =($header->field ('resent-to')->addr_spec,
-             $header->field ('resent-cc')->addr_spec,
-             $header->field ('resent-bcc')->addr_spec) if $#eTo < 0;
-    } else {
-      @eTo =($header->field ('to')->addr_spec,
-             $header->field ('cc')->addr_spec,
-             $header->field ('bcc')->addr_spec) if $#eTo < 0;
+    unless ($resent) {
       $post_news = 1 if $header->field_exist ('newsgroups');
     }
     $send_mail = 1 if @eTo > 0;
@@ -121,9 +111,10 @@ for my $file (@files) {
   if ($Jcode::VERSION) {
     $ua->add ('Jcode.pm' => $Jcode::VERSION);
   }
-  #my $jv=do{my @r=($jcode::rcsid=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
-  $ua->add ('jcode.pl' => ['',$jcode::rcsid]);
-  $ua->add ($MYNAME => $MYVERSION);
+  if ($jcode::rcsid) {
+    $ua->add_rcs ($jcode::rcsid);
+  }
+  $ua->add_rcs (q$Date: 2002/07/28 00:11:50 $, name => $MYNAME, version => $MYVERSION, -prepend => 1);
   
   $header->delete (qw(date-received relay-version status x-envelope-from x-envelope-to xref));
   $header->option (field_sort => 'good-practice') unless $resent;
@@ -135,23 +126,20 @@ for my $file (@files) {
   my ($msg_mail, $msg_news);
   if ($send_mail) {
     $msg_mail =  $msg->stringify (-format => 'mail-rfc2822', %sopt);
-    #$msg_mail =~ s/\x0D\x0A|\x0D|\x0A/\x0D\x0A/gs;
     $msg_mail =~ s/\x0D\x0A\./\x0D\x0A../gs;
-    #$msg_mail =~ s/^(?:\x0D\x0A)+//;
-    #$msg_mail =~ s/(?:\x0D\x0A)*$/\x0D\x0A/;
     $msg_mail .= "\x0D\x0A.\x0D\x0A";
   }
   if ($post_news) {
     my %rename;
-    for (qw(cc complaints-to nntp-posting-date injector-info nntp-posting-host posting-version received to x-complaints-to x-trace)) {
+    for (qw(cc complaints-to injector-info received to x-complaints-to x-trace)) {
+      $rename{$_} = 'original-'.$_;
+    }
+    for (qw(nntp-posting-date nntp-posting-host posting-version)) {
       $rename{$_} = 'x-'.$_;
     }
     $header->rename (%rename);
     $msg_news =  $msg->stringify (-format => 'news-usefor', %sopt);
-    #$msg_news =~ s/\x0D\x0A|\x0D|\x0A/\x0D\x0A/gs;
     $msg_news =~ s/\x0D\x0A\./\x0D\x0A../gs;
-    #$msg_news =~ s/^(?:\x0D\x0A)+//;
-    #$msg_news =~ s/(?:\x0D\x0A)*$/\x0D\x0A/;
     $msg_news .= "\x0D\x0A.\x0D\x0A";
   }
   
@@ -339,18 +327,6 @@ sub Send::NNTP::Connect {
   $Send::NNTP::connected = 1;
 }
 
-sub __fw2hw ($) {
-  my $s = shift;
-  jcode::tr(\$s, "\xa3\xb0-\xa3\xb9\xa3\xc1-\xa3\xda\xa3\xe1-\xa3\xfa\xa1\xf5".
-                 "\xa1\xa4\xa1\xa5\xa1\xa7\xa1\xa8\xa1\xa9\xa1\xaa\xa1\xae".
-                 "\xa1\xb0\xa1\xb2\xa1\xbf\xa1\xc3\xa1\xca\xa1\xcb\xa1\xce".
-                 "\xa1\xcf\xa1\xd0\xa1\xd1\xa1\xdc\xa1\xf0\xa1\xf3\xa1\xf4".
-                 "\xa1\xf6\xa1\xf7\xa1\xe1\xa2\xaf\xa2\xb0\xa2\xb2\xa2\xb1".
-                 "\xa1\xe4\xa1\xe3\xA1\xC0\xA1\xA1" =>
-            '0-9A-Za-z&,.:;?!`^_/|()[]{}+$%#*@=\'"~-><\\ ');
-  $s;
-}
-
 END {
       Send::SMTP::Close() if $Send::SMTP::connected;
       Send::NNTP::Close() if $Send::NNTP::connected;
@@ -378,7 +354,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/27 04:56:38 $
+$Date: 2002/07/28 00:11:50 $
 
 =cut
 
