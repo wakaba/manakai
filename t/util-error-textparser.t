@@ -1,5 +1,4 @@
 use strict;
-require 'test.pl';
 
 require Test::Simple;
 my $case = 0;
@@ -111,4 +110,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/08/05 11:34:53 $
+1; # $Date: 2003/08/05 12:20:00 $
