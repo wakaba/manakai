@@ -10,7 +10,7 @@ package Message::Field::CSV;
 require 5.6.0;	## eval 're'
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 
@@ -19,7 +19,11 @@ use overload '""' => sub { $_[0]->stringify },
              '.=' => sub { $_[0]->add ($_[1]); $_[0] },
              fallback => 1;
 
-%REG = %Message::Util::REG;
+*REG = \%Message::Util::REG;
+	## We need this is Msg::Util::REG itself (not copy of it)
+	## to carry out $self->stringify correctly.  (This bad
+	## implemention should be done away by making new module
+	## for Newsgroups: and Distribution:.
 ## Inherited: comment, quoted_string, domain_literal, angle_quoted
 	## WSP, FWS, atext
 	
@@ -308,7 +312,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/08/01 09:19:46 $
+$Date: 2002/08/03 04:57:58 $
 
 =cut
 

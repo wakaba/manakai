@@ -9,7 +9,7 @@ Internet message field bodies
 package Message::Field::ValueParams;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Params;
 push @ISA, qw(Message::Field::Params);
 
@@ -105,6 +105,8 @@ sub _init ($;%) {
   } elsif ($fname eq 'auto-submitted') {
     $self->{option}->{value_type}->{increment} = ['Message::Field::Numval'];
   } elsif ($fname eq 'opt' || $fname eq 'man') {
+    $self->{option}->{value_unsafe_rule} = 'MATCH_ALL';
+  } elsif ($fname eq 'version') {	## Content-Version [RFC 2068]
     $self->{option}->{value_unsafe_rule} = 'MATCH_ALL';
   }
   $self->{value} = $self->{option}->{value_default};
@@ -318,7 +320,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/06 10:30:43 $
+$Date: 2002/08/03 04:57:59 $
 
 =cut
 

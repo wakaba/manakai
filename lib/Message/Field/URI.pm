@@ -9,7 +9,7 @@ Header Field Bodies filled with a URI
 package Message::Field::URI;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Header;
 require Message::Field::AngleQuoted;
 push @ISA, qw(Message::Field::AngleQuoted);
@@ -45,6 +45,7 @@ The following methods construct new objects:
     #output_display_name	=> 1,
     #output_keyword	=> 0,
     #parse_all
+    -value_pattern	=> '%s',
     #unsafe_rule_of_display_name	=> 'NON_http_attribute_char_wsp',
     #unsafe_rule_of_keyword
     #use_comment	=> 1,
@@ -63,17 +64,17 @@ sub _init ($;%) {
   my $field = $self->{option}->{field_name};
   my $fieldns = $self->{option}->{field_ns};
   $format = 'mhtml' if $format =~ /mail|news/;
-  if ($fieldns eq $Message::Header::NS_phname2uri{list}) {
+  if ($fieldns eq $Message::Header::NS_phname2uri{list}) {	## List-*
     $self->{option}->{output_display_name} = 0;
     $self->{option}->{allow_empty} = 0;
   } elsif ($fieldns eq $Message::Header::NS_phname2uri{content}) {
-    if ($field eq 'location') {
+    if ($field eq 'location') {	## Content-Location
       $self->{option}->{output_angle_bracket} = 0;
       $self->{option}->{output_display_name} = 0;
       $self->{option}->{output_comment} = 0;
       $self->{option}->{use_display_name} = 0;
       $self->{option}->{allow_fragment} = 0;
-    } elsif ($field eq 'content-base') {
+    } elsif ($field eq 'base') {	## Content-Base
       $self->{option}->{output_angle_bracket} = 0;
       $self->{option}->{output_comment} = 0;
       $self->{option}->{use_display_name} = 0;
@@ -92,11 +93,6 @@ sub _init ($;%) {
       $self->{option}->{allow_relative} = 0;
       $self->{option}->{allow_fragment} = 0;
     }
-  } elsif ($field eq 'referer') {	## HTTP
-    $self->{option}->{output_angle_bracket} = 0;
-    $self->{option}->{use_comment} = 0;
-    $self->{option}->{use_display_name} = 0;
-    $self->{option}->{allow_fragment} = 0;
   } elsif ($field eq 'uri') {	## HTTP
     $self->{option}->{output_comment} = 0;
     $self->{option}->{output_display_name} = 0;
@@ -124,6 +120,7 @@ sub _save_value ($$\@%) {
   my $self = shift;
   my ($v, $dn, $comment, %misc) = @_;
   $v =~ tr/\x09\x0A\x0D\x20//d;
+  $v =~ s/^[Uu][Rr][LlIi]://;
   $v = $self->_parse_value (uri => $v) if $self->{option}->{parse_all};
   $self->{value} = $v;
   $self->{display_name} = $dn;
@@ -152,7 +149,7 @@ sub _stringify_value ($\%) {
   unless (ref $v) {
     $v =~ s/([\x00-\x20\x22\x3C\x3E\x5C\x7F-\xFF])/sprintf('%%%02X', ord $1)/ge;
   }
-  $r{value} = ''.$v;
+  $r{value} = sprintf $option->{value_pattern}, $v;
   $r{display_name} = $self->{display_name};
   $r{comment} = $self->{comment};
   $r{keyword} = $self->{keyword};
@@ -196,7 +193,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/16 10:42:06 $
+$Date: 2002/08/03 04:57:59 $
 
 =cut
 
