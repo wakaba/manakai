@@ -67,7 +67,7 @@ Message::MIME::Charset::Encode.
 package Message::MIME::Charset::Jcode;
 use strict;
 use vars qw(%CODE $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::MIME::Charset;
 
@@ -147,7 +147,12 @@ sub import ($;%) {
           my $s = jcode::jis (__jcode_pl_fw_to_hw ($_[1]), $CODE{internal});
           ($s, Message::MIME::Charset::_name_8bit_iso2022 ('iso-2022-jp', $s));
         },
-        decoder	=> sub { jcode::to ($CODE{internal}, $_[1], 'jis') },
+        decoder	=> sub {
+          $CODE{internal} eq 'euc' ?
+            __jcode_pl_fw_to_hw (jcode::to ('euc', $_[1], 'jis'))
+          :
+            jcode::to ($CODE{internal}, $_[1], 'jis')
+        },
         mime_text	=> 1,
         cte_7bit_preferred	=> 'base64',
       );
@@ -157,7 +162,12 @@ sub import ($;%) {
           (__jcode_pl_fw_to_hw ($s),
            Message::MIME::Charset::_name_euc_japan ('euc-jp' => $s));
         },
-        decoder	=> sub { jcode::to ($CODE{internal}, $_[1], 'euc') },
+        decoder	=> sub {
+          $CODE{internal} eq 'euc' ?
+            __jcode_pl_fw_to_hw (jcode::to ('euc', $_[1], 'euc'))
+          :
+            jcode::to ($CODE{internal}, $_[1], 'euc')
+        },
         mime_text	=> 1,
       );
       Message::MIME::Charset::make_charset (shift_jis =>
@@ -165,7 +175,12 @@ sub import ($;%) {
           my $s = jcode::sjis (__jcode_pl_fw_to_hw ($_[1]), $CODE{internal});
           ($s, Message::MIME::Charset::_name_shift_jis (shift_jis => $s));
         },
-        decoder	=> sub { jcode::to ($CODE{internal}, $_[1], 'sjis') },
+        decoder	=> sub {
+          $CODE{internal} eq 'euc' ?
+            __jcode_pl_fw_to_hw (jcode::to ('euc', $_[1], 'sjis'))
+          :
+            jcode::to ($CODE{internal}, $_[1], 'sjis')
+        },
         mime_text	=> 1,
       );
     } elsif ($_ eq 'Jcode' || $_ eq 'Jcode.pm') {
@@ -501,7 +516,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/08/18 06:21:24 $
+$Date: 2002/09/10 23:40:21 $
 
 =cut
 
