@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.20 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXMLChar
                         InXML_deprecated_noncharacter InXML_unicode_xml_not_suitable!;
 require Message::Markup::XML;
@@ -736,7 +736,7 @@ sub _parse_start_tag ($$\$$;%) {
         }
       } else {
         $self->_raise_error ($o, c => $_->[2], type => 'NC_PREFIX_NOT_DEFINED', t => $_->[0]);
-        $_->[1]->namespace_uri ($NS{internal_ns_invalid}.$self->_uri_escape ($_->[0]));
+        $_->[2]->namespace_uri ($NS{internal_ns_invalid}.$self->_uri_escape ($_->[0]));
       }
     }	# have prefix
   }
@@ -2008,4 +2008,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/10/31 08:41:35 $
+1; # $Date: 2003/11/09 01:47:31 $
