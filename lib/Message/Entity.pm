@@ -13,7 +13,7 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.27 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.28 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::Header;
@@ -42,6 +42,7 @@ use overload '""' => sub { $_[0]->stringify },
     -fill_msgid_name	=> 'message-id',
     -force_mime_entity	=> 0,
     -format	=> 'mail-rfc2822',
+    -guess_media_type	=> 1,
     -header_default_charset	=> 'iso-2022-int-1',
     -header_default_charset_input	=> 'iso-2022-int-1',
     -hook_init_fill_options	=> sub {},
@@ -552,7 +553,7 @@ sub stringify ($;%) {
       $self->{header}->field ($option{fill_ua_name})->add_our_name (
         -use_Config	=> $option{ua_use_Config},
         -use_Win32	=> $option{ua_use_Win32},
-        -date	=> q$Date: 2002/07/13 09:34:50 $,
+        -date	=> q$Date: 2002/07/19 11:49:46 $,
       );
     }
     $header = $self->{header}->stringify (-format => $option{format},
@@ -615,20 +616,38 @@ Example:
 sub content_type ($;%) {
   my $self = shift;
   my $ct = $self->{header}->field ('content-type', -new_item_unless_exist => 0);
+  my ($mt, $mst);
   unless (ref $ct) {
-    if ($self->{option}->{body_default_media_type} ne 'text'
-     || $self->{option}->{body_default_media_subtype} ne 'plain') {
+    $mt = $self->{option}->{body_default_media_type};
+    $mst = $self->{option}->{body_default_media_subtype};
+    if ($mt ne 'text' || $mst ne 'plain') {
       $ct = $self->{header}->field ('content-type');
-      $ct->media_type_major ($self->{option}->{body_default_media_type});
-      $ct->media_type_minor ($self->{option}->{body_default_media_subtype});
+      $ct->media_type_major ($mt);
+      $ct->media_type_minor ($mst);
     }
-    return wantarray? ($self->{option}->{body_default_media_type},
-                       $self->{option}->{body_default_media_subtype}):
-                      $self->{option}->{body_default_media_type}.'/'
-                      .$self->{option}->{body_default_media_subtype};
+    if ($self->{option}->{guess_media_type}) {
+      
+    }
+  } else {
+    ($mt, $mst) = ($ct->media_type_major, $ct->media_type_minor);
+  }
+  if ($self->{option}->{guess_media_type}) {
+    if ($mt eq 'text' && $mst eq 'plain') {
+      my $mls = $self->{header}->field ('x-mlserver', -new_item_unless_exist => 0);
+      if (ref $mls && $mls =~ /fml/) {
+        my $s = $self->{header}->field ('subject', -new_item_unless_exist => 0);
+        if (index ($s, 'RFC934(mh-burst)') >= 0) {
+          $mt = 'text';  $mst = 'x-message-rfc934';
+          $ct = $self->{header}->field ('content-type') unless ref $ct;
+          $ct->media_type_major ($mt);
+          $ct->media_type_minor ($mst);
+          $ct->delete ('charset');
+        }
+      }
+    }
   }
   if (wantarray) {
-    ($ct->media_type_major, $ct->media_type_minor);
+    ($mt, $mst);
   } else {
     $ct->media_type;
   }
@@ -916,7 +935,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/13 09:34:50 $
+$Date: 2002/07/19 11:49:46 $
 
 =cut
 

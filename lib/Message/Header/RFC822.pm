@@ -9,7 +9,7 @@ for RFC822 Namespaces of Header Fields
 package Message::Header::RFC822;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Header::Default;
 
 our %OPTION = %Message::Header::Default::OPTION;
@@ -30,6 +30,7 @@ $OPTION{goodcase} = {
 	'nntp-posting-date'	=> 'NNTP-Posting-Date',
 	'nntp-posting-host'	=> 'NNTP-Posting-Host',
 	url	=> 'URL',
+	'x-cc-sender'	=> 'X-CC-Sender',
 	'x-dearfriend'	=> 'X-DearFriend',
 	'x-jsmail-priority'	=> 'X-JsMail-Priority',
 	'x-mime-autoconverted'	=> 'X-MIME-Autoconverted',
@@ -37,6 +38,7 @@ $OPTION{goodcase} = {
 	'x-ml-count'	=> 'X-ML-Count',
 	'x-ml-info'	=> 'X-ML-Info',
 	'x-ml-name'	=> 'X-ML-Name',
+	'x-mlserver'	=> 'X-MLServer',
 	'x-msmail-priority'	=> 'X-MSMail-Priority',
 	'x-nntp-posting-date'	=> 'X-NNTP-Posting-Date',
 	'x-nntp-posting-host'	=> 'X-NNTP-Posting-Host',
@@ -93,7 +95,7 @@ for (qw(abuse-reports-to apparently-to approved approved-by bcc cc complaints-to
   notice-requested-upon-delivery-to read-receipt-to register-mail-reply-requested-by 
   reply-to return-path
   return-receipt-to return-receipt-requested-to sender to x-abuse-reports-to 
-  x-admin x-approved x-beenthere x-biglobe-sender x-confirm-reading-to
+  x-admin x-approved x-beenthere x-biglobe-sender x-cc-sender x-confirm-reading-to
   x-complaints-to x-envelope-from x-envelope-sender
   x-envelope-to x-ml-address x-ml-command x-ml-to x-nfrom x-nto
   x-rcpt-to x-sender x-x-sender))
@@ -306,7 +308,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/08 11:47:20 $
+$Date: 2002/07/19 11:49:46 $
 
 =cut
 

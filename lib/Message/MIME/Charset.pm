@@ -17,7 +17,7 @@ Perl module for MIME charset.
 package Message::MIME::Charset;
 use strict;
 use vars qw(%CHARSET %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 &_builtin_charset;
 sub _builtin_charset () {
@@ -70,24 +70,24 @@ my %_MINIMUMIZER = (
 	'euc-jisx0213'	=> \&_name_euc_japan,
 	'euc-jisx0213-plane1'	=> \&_name_euc_japan,
 	'x-euc-jisx0213-packed'	=> \&_name_euc_japan,
-	'x-iso-2022'	=> \&_name_8bit_iso_2022,
-	'iso-2022-cn'	=> \&_name_8bit_iso_2022,
-	'iso-2022-cn-ext'	=> \&_name_8bit_iso_2022,
+	'x-iso-2022'	=> \&_name_8bit_iso2022,
+	'iso-2022-cn'	=> \&_name_8bit_iso2022,
+	'iso-2022-cn-ext'	=> \&_name_8bit_iso2022,
 	'iso-2022-int-1'	=> \&_name_net_ascii_8bit,
-	'iso-2022-jp'	=> \&_name_8bit_iso_2022,
-	'iso-2022-jp-1'	=> \&_name_8bit_iso_2022,
-	'iso-2022-jp-2'	=> \&_name_8bit_iso_2022,
-	'iso-2022-jp-3'	=> \&_name_8bit_iso_2022,
-	'iso-2022-jp-3-plane1'	=> \&_name_8bit_iso_2022,
-	'iso-2022-kr'	=> \&_name_8bit_iso_2022,
-	'iso-8859-1'	=> \&_name_8bit_iso_2022,
+	'iso-2022-jp'	=> \&_name_8bit_iso2022,
+	'iso-2022-jp-1'	=> \&_name_8bit_iso2022,
+	'iso-2022-jp-2'	=> \&_name_8bit_iso2022,
+	'iso-2022-jp-3'	=> \&_name_8bit_iso2022,
+	'iso-2022-jp-3-plane1'	=> \&_name_8bit_iso2022,
+	'iso-2022-kr'	=> \&_name_8bit_iso2022,
+	'iso-8859-1'	=> \&_name_8bit_iso2022,
 	'iso-10646-j-1'	=> \&_name_utf16be,
 	'iso-10646-ucs-2'	=> \&_name_utf16be,
 	'iso-10646-ucs-4'	=> \&_name_utf32be,
 	'iso-10646-ucs-basic'	=> \&_name_utf16be,
 	'iso-10646-unicode-latin1'	=> \&_name_utf16be,
 	jis_x0201	=> \&_name_shift_jis,
-	junet	=> \&_name_8bit_iso_2022,
+	junet	=> \&_name_8bit_iso2022,
 	'x-junet8'	=> \&_name_net_ascii_8bit,
 	shift_jis	=> \&_name_shift_jis,
 	shift_jisx0213	=> \&_name_shift_jis,
@@ -245,7 +245,7 @@ sub _name_net_ascii_8bit ($) {
   }
 }
 
-sub _name_8bit_iso_2022 ($$) {
+sub _name_8bit_iso2022 ($$) {
   my $name = shift; my $s = shift;
   return (charset => 'us-ascii') unless $s =~ /[\x1B\x0E\x0F\x80-\xFF]/;
   if ($s =~ /[\x80-\xFF]/) {
@@ -301,7 +301,7 @@ sub _name_euc_gb ($$) {
   } elsif ($s =~ /[\x0E\x0F]/) {
     (charset => 'gb2312');	## Actually, this is not "gb2312"
   } else {
-    _name_7bit_iso_2022 ($name, $s);
+    _name_7bit_iso2022 ($name, $s);
   }
 }
 
@@ -336,7 +336,7 @@ sub _name_euc_japan ($$) {
   } elsif ($s =~ /\x0E|\x0F|\x1B[\x4E\x4F]/) {
     (charset => 'euc-jisx0213');	## Actually, this is not euc-japan
   } else {
-    _name_7bit_iso_2022 ($name, $s);
+    _name_7bit_iso2022 ($name, $s);
   }
 }
 
@@ -377,7 +377,7 @@ sub _name_shift_jis ($$) {
       (charset => 'jis_x0201');
     }
   } else {
-    _name_7bit_iso_2022 ($name, $s);
+    _name_7bit_iso2022 ($name, $s);
   }
 }
 
@@ -446,7 +446,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/17 00:33:29 $
+$Date: 2002/07/19 11:49:46 $
 
 =cut
 

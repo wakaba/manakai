@@ -8,7 +8,7 @@ Message::MIME::MediaType --- Media-type definitions
 package Message::MIME::MediaType;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Header;
 require Message::Header::Message;
 
@@ -117,6 +117,11 @@ $type{text}->{javascript} = {	## Not yet registered in [IANAREG]
 	},
 	extension	=> [qw/js/],
 	mac_type	=> [qw/TEXT/],
+};
+
+$type{text}->{'x-message-rfc934'} = {
+	mime_charset	=> 0,
+	handler	=> ['Message::Body::TextMessageRFC934'],
 };
 
 $type{text}->{parityfec} = {
@@ -731,7 +736,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/17 00:33:29 $
+$Date: 2002/07/19 11:49:46 $
 
 =cut
 
