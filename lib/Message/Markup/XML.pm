@@ -17,12 +17,13 @@ markup constructures.  (SuikaWiki is not "tiny"?  Oh, yes, I see:-))
 
 package Message::Markup::XML;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.26 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.27 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload '""' => \&outer_xml,
              fallback => 1;
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXML_NCNameStartChar InXMLNCNameChar!;
 use Message::Markup::XML::QName qw:NULL_URI UNDEF_URI DEFAULT_PFX:;
 require Carp;
+Carp::carp "Obsoleted module Message::Markup::XML loaded";
 
 our %Namespace_URI_to_prefix = (
 	'DAV:'	=> [qw/dav webdav/],
@@ -1438,4 +1439,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/11/15 07:42:34 $
+1; # $Date: 2004/02/14 11:25:16 $
