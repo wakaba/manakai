@@ -9,7 +9,7 @@ message header C<Subject:> field body
 package Message::Field::Subject;
 use strict;
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Unstructured;
 push @ISA, q(Message::Field::Unstructured);
@@ -176,7 +176,14 @@ An alias for C<text> method.
 
 =cut
 
-## value: Inherited
+sub value ($$;$) {
+  my $self = shift;
+  my $ns = shift;
+  if (defined $ns) {
+    $self->{field_body} = $ns;
+  }
+  $self->{field_body};
+}
 *text = \&value;
 
 =item $subject->change ($new-subject)
@@ -293,7 +300,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/06 10:30:43 $
+$Date: 2002/07/17 00:33:29 $
 
 =cut
 

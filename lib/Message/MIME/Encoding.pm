@@ -8,7 +8,7 @@ Message::MIME::Encoding --- Encoding (MIME CTE, HTTP encodings, etc) definitions
 package Message::MIME::Encoding;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 our %ENCODER = (
 	'7bit'	=> sub { ($_[1], decide_coderange (@_[0,1,2])) },
@@ -73,10 +73,15 @@ sub decide_coderange ($$\%) {
     $option->{mt_is_text} = 1
       if $mt eq 'text' || $mt eq 'multipart' || $mt eq 'message';
   }
+  if (!defined $option->{linebreak_strict}) {
+    $option->{linebreak_strict} = $yourself->{option}->{linebreak_strict};
+  }
   return 'binary' if $s =~ /\x00/;
   if ($option->{mt_is_text}) {
-    return 'binary' if $s =~ /\x0D(?!\x0A)/s;
-    return 'binary' if $s =~ /(?<!\x0D)\x0A/s;
+    if ($option->{linebreak_strict}) {
+      return 'binary' if $s =~ /\x0D(?!\x0A)/s;
+      return 'binary' if $s =~ /(?<!\x0D)\x0A/s;
+    }
   } else {
     return 'binary';
     #return 'binary' if $s =~ /\x0D|\x0A/s;
@@ -94,6 +99,11 @@ sub encode_qp ($$) {
   my $yourself = shift;
   my $s = shift;
   my $nl = "\x0D\x0A";
+  my $enl = "=0D=0A";
+  unless ($yourself->{option}->{linebreak_strict}) {
+    $nl = Message::Util::decide_newline ($s);
+    $enl = $nl; $enl =~ s/\x0D/=0D/s; $enl =~ s/\x0A/=0A/s;
+  }
   my $mt_is_text = 0;
   my $mt; $mt = ($yourself->content_type)[0] if ref $yourself;
   $mt_is_text = 1 if $mt eq 'text' || $mt eq 'multipart' || $mt eq 'message';
@@ -101,12 +111,12 @@ sub encode_qp ($$) {
   ## - RFC 2049 "mail-safe"	[^\x09\x20\x25-\x3C\x3E\x3F\x41-\x5A\x5F\x61-\x7A]
   $s =~ s/([^\x09\x20\x25-\x3C\x3E\x3F\x41-\x5A\x5F\x61-\x7A])/sprintf('=%02X', ord($1))/eg;  # rule #2,#3
   if ($mt_is_text) {
-    $s =~ s/([\x09\x20])(?==0D=0A|$)/
+    $s =~ s/([\x09\x20])(?=$enl|$)/
       sprintf '=%02X', ord($1)
       #join('', map { sprintf('=%02X', ord($_)) } split('', $1) )
     /egm;                        # rule #3 (encode whitespace at eol)
-    $s =~ s/=0D=0AFrom/\x0D\x0A=46rom/g;
-    $s =~ s/=0D=0A/\x0D\x0A/g;
+    $s =~ s/${enl}From/$nl=46rom/g;
+    $s =~ s/$enl/$nl/g;
   } else {
     $s =~ s/([\x09\x20])$/
       sprintf '=%02X', ord($1)
@@ -257,7 +267,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/03 23:39:15 $
+$Date: 2002/07/17 00:33:29 $
 
 =cut
 

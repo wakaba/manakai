@@ -8,7 +8,7 @@ Message::Header --- A Perl Module for Internet Message Headers
 package Message::Header;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.36 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.37 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;	## This may seem silly:-)
 push @ISA, qw(Message::Field::Structured);
 
@@ -377,7 +377,7 @@ sub _parse_value ($$$;%) {
   my %vopt = %{$vtype->[1]} if ref $vtype->[1];
   if ($vpackage eq ':none:') {
     return $value;
-  } elsif (defined $value) {
+  } elsif (length $value) {
     eval "require $vpackage" or Carp::croak qq{<parse>: $vpackage: Can't load package: $@};
     return $vpackage->parse ($value,
       -format	=> $self->{option}->{format},
@@ -963,7 +963,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/13 09:34:50 $
+$Date: 2002/07/17 00:33:29 $
 
 =cut
 

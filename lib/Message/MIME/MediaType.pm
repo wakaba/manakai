@@ -8,8 +8,9 @@ Message::MIME::MediaType --- Media-type definitions
 package Message::MIME::MediaType;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Header;
+require Message::Header::Message;
 
 our %type;
 
@@ -350,6 +351,14 @@ $type{application}->{'x-tex'} = {
 	extension	=> [qw/tex/],
 };
 
+$type{application}->{'x-text'} = {
+	## Dummy sub type for text/* sub types with non-MIME-text-suitable
+	## charset (on MIME entity)
+	mime_charset	=> 1,
+	text_content	=> 1,
+	cte_7bit_preferred	=> 'quoted-printable',
+};
+
 $type{application}->{'x-lirs+csv'} = {
 	mime_charset	=> 1,
 	cte_7bit_preferred	=> 'quoted-printable',
@@ -424,10 +433,37 @@ $type{application}->{'xml-dtd'} = {
 
 ## --- Image types
 
+$type{image}->{naplps} = {
+	text_content	=> 1,
+	cte_7bit_preferred	=> 'quoted-printable',
+	parameter	=> {
+		version	=> {
+			handler	=> ['Message::Field::Numval'],
+			## 4*DIGIT optional
+		},
+	},
+};
+
 $type{image}->{'svg+xml'} = {	## Not in [IANAREG]
+	preferred_name	=> ['image', 'svg+xml'],
 	mime_charset	=> 1,
+	text_content	=> 1,
 	cte_7bit_preferred	=> 'quoted-printable',
 	extension	=> [qw/svg/],
+	mac_type	=> [qw/svg /],
+		## NOTE: .svgz / svgz -> gzipped SVG
+};
+$type{image}->{'svg-xml'} = $type{image}->{'svg+xml'};
+$type{image}->{'vnd.adobe.svg+xml'} = $type{image}->{'svg+xml'};
+
+$type{image}->{'x-windows-bitmap'} = {
+	preferred_name	=> ['image', 'x-windows-bitmap'],
+	extension	=> [qw/bmp dib/],
+};
+$type{image}->{'x-bmp'} = $type{image}->{'x-windows-bitmap'};
+
+$type{image}->{'x-windows-icon'} = {
+	extension	=> [qw/ico/],
 };
 
 $type{image}->{'x-xbitmap'} = {
@@ -463,7 +499,7 @@ $type{message}->{'delivery-status'} = {
 	cte_7bit_preferred	=> 'quoted-printable',
 	handler	=> ['Message::Body::MessageDeliveryStatus'],
 };
-require Message::Header::Message;
+
 $type{message}->{'disposition-notification'} = {
 	mime_alternate	=> [qw/message disposition-notification/],
 	accept_cte	=> [qw/7bit/],
@@ -695,7 +731,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/13 09:30:42 $
+$Date: 2002/07/17 00:33:29 $
 
 =cut
 

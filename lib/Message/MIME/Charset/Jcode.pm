@@ -25,7 +25,7 @@ jcode.pl L<lt>http://srekcah.org/jcode/>
 
 =item 'Jcode' or 'Jcode.pm'
 
-Jcode.pm L<lt>http://openlab.ring.gr.jp/Jcode/index-j.html>
+Jcode.pm L<lt>http://openlab.ring.gr.jp/Jcode/>
 
 =item 'Kconv' or 'Kconv.pm'
 
@@ -67,7 +67,7 @@ Message::MIME::Charset::Encode.
 package Message::MIME::Charset::Jcode;
 use strict;
 use vars qw(%CODE $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::MIME::Charset;
 
@@ -495,7 +495,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/04 06:38:21 $
+$Date: 2002/07/17 00:33:29 $
 
 =cut
 

@@ -9,10 +9,15 @@ Perl module for MIME charset.
 
 =cut
 
+## NOTE: You should not require/use other module (even it
+##       is part of Message::* Perl Modules) as far as possible,
+##       to be able to use this module (M::M::Charset) from
+##       other (non-Message::*) modules.
+
 package Message::MIME::Charset;
 use strict;
 use vars qw(%CHARSET %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 &_builtin_charset;
 sub _builtin_charset () {
@@ -441,7 +446,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/23 12:16:10 $
+$Date: 2002/07/17 00:33:29 $
 
 =cut
 
