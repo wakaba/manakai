@@ -15,69 +15,82 @@ This module is part of manakai.
 
 package Message::Util::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use Error;
+our @ISA = 'Error';
 
-=head1 METHODS
+sub import {
+  shift;
+  local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
+  if (@_) {
+    Error::subs->import(@_);
+  } else {
+    Error::subs->import (':try');
+  }
+}
 
-=over 4
+sub ___errors ($) {{
+ UNKNOWN => {
+             description => '"%name;": Unknown error',
+             level       => 'fatal',
+            },
+}}
 
-=item $err = Message::Util::Error->new ({error definitions})
+sub ___get_error_def ($$) {
+  my ($self, $name) = @_;
+  return $self->___errors->{$name}
+    or 
+  $self->SUPER::can ('___get_error_def') ?
+    return $self->SUPER::___get_error_def ($name)
+      :
+    return undef
+  ;
+}
 
-Constructs new error reporting object.   Hash reference to error definition list must be specified as an argument.
-
-=cut
-
-sub new ($$) {
+sub new ($;%) {
+  local $Error::Depth = $Error::Depth + 1;
   my $class = shift;
-  my $self = bless shift, $class;
-  $self->{UNKNOWN} ||= {
-    description => 'Unknown error',
-    level => 'fatal',
-  };
-  $self;
+  my %opt = @_;
+  $opt{def} = $class->___get_error_def ($opt{type})
+           || $class->___get_error_def ('UNKNOWN')
+           or die qq(Error definition for "$opt{type}" not found);
+  $class->SUPER::new (%opt);
 }
 
-=item $err->raise (%detail)
-
-Raises an error (or a warning, if defined so)
-
-=cut
-
-sub raise ($%) {
-  my ($self, %err) = @_;
-  my $error_type = $self->{$err{type}} || $self->{UNKNOWN};
-  my $error_msg = ref ($error_type->{description})
-    ? &{$error_type->{description}} (\%err)
-    : $error_type->{description};
-  my @err_msg;
-  ref ($err{t}) eq 'ARRAY'
-    ? @err_msg = @{$err{t}}
-    : defined $err{t} ? (@err_msg = $err{t}) : undef;
-  $error_msg .= ' (%s)' if scalar (@err_msg) && ($error_msg !~ /%s/);
-  $error_msg = sprintf $error_msg, @err_msg;
-  
-  my $resolver = $self->{-error_handler};
-  if (ref $resolver) {
-    $resolver = &$resolver ($self, $error_type, $error_msg, \%err);
-                        ## If returned false,
-    $self->_default_error_handler ($error_type, $error_msg, \%err)
-      if $resolver;	## don't call this.
-  } else {
-    $self->_default_error_handler ($error_type, $error_msg, \%err);
-  }
+sub text {
+  my $self = shift;
+  $self->_FORMATTER_PACKAGE_->new
+       ->replace ($self->{def}->{description}, param => $self);
 }
 
-sub _default_error_handler ($$$$) {
-  my ($self, $error_type, $error_msg, $err) = @_;
-  require Carp;
-  if ({qw/fatal 1/}->{$error_type->{level}}) {
-    Carp::croak ($error_msg);
-  } else {
-    Carp::carp ($error_msg);
-  }
+sub stringify {
+  my $self = shift;
+  my $text = $self->text;
+  $text .= sprintf " at %s line %d.\n", $self->file, $self->line
+    unless $text =~ /\n$/s;
+  $text;
 }
 
-=back
+sub _FORMATTER_PACKAGE_ () { 'Message::Util::Error::formatter' }
+
+package Message::Util::Error::formatter;
+use Message::Util::Formatter::Text;
+our @ISA = q(Message::Util::Formatter::Text);
+sub rule_def () {+{
+  name => {
+    after => sub {
+      my ($f, $name, $p, $o) = @_;
+      ${$p->{-result}} = $o->{type};
+    },
+  },
+  t => {
+    after => sub {
+      my ($f, $name, $p, $o) = @_;
+      $p->{name} =~ tr/-/_/;
+      ${$p->{-result}} = $o->{'-' . $p->{name}};
+    },
+  },
+}}
 
 =head1 EXAMPLE
 
@@ -116,4 +129,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/08/05 07:30:14 $
+1; # $Date: 2003/11/15 12:31:17 $
