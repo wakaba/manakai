@@ -1,15 +1,18 @@
 
 =head1 NAME
 
-Message::Body::TextMessageRFC934 --- Perl module
-for encapsulated message format defined by RFC 934
+Message::Body::TextMessageRFC1153 --- Perl module
+for digest message format defined by RFC 1153
 
 =cut
 
-package Message::Body::TextMessageRFC934;
+## TODO: 
+##   - Select and sort enclosed message header fields (See RFC 1153)
+
+package Message::Body::TextMessageRFC1153;
 use strict;
 use vars qw(%DEFAULT @ISA $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Body::Multipart;
 push @ISA, qw(Message::Body::Multipart);
@@ -17,22 +20,19 @@ push @ISA, qw(Message::Body::Multipart);
 %DEFAULT = (
 	## "#i" : only inherited from parent Entity and inherits to child Entity
   -_ARRAY_NAME	=> 'value',
-  -_METHODS	=> [qw|entity_header add delete count item preamble epilogue|],
-  -_MEMBERS	=> [qw|preamble epilogue|],
+  -_METHODS	=> [qw|entity_header add delete count item preamble list_name digest_info|],
+  -_MEMBERS	=> [qw|preamble list_name digest_info|],
   #i accept_cte
   #i body_default_charset
   #i body_default_charset_input
   #i cte_default
   #linebreak_strict	=> 0,
   -media_type	=> 'text',
-  -media_subtype	=> 'x-message-rfc934',
-  -no_final_text	=> 0,
-  -output_epilogue	=> 1,
+  -media_subtype	=> 'x-message-rfc1153',
   #parse_all	=> 0,
   #parts_min	=> 1,
   #parts_max	=> 0,
   #i text_coderange
-  -output_souround_blank_line	=> 1,
   #use_normalization	=> 0,
   -use_param_charset	=> 0,
   -value_type	=> {},
@@ -53,14 +53,7 @@ sub _init ($;%) {
   my %option = @_;
   $self->SUPER::_init (%$DEFAULT, %option);
   $self->{option}->{value_type}->{body_part}
-    = $Message::MIME::MediaType::type{message}->{rfc822}->{handler};
-  
-  if (ref $self->{header}) {
-    my $s = $self->{header}->field ('x-mlserver', -new_item_unless_exist => 0);
-    if (ref $s && $s =~ /fml/) {
-      $self->{option}->{no_final_text} = 1;
-    }
-  }
+    = [@{ $Message::MIME::MediaType::type{message}->{rfc822}->{handler} }];
 }
 
 =item $body = Message::Body::Multipart->new ([%options])
@@ -89,20 +82,22 @@ sub parse ($$;%) {
     $nl = Message::Util::decide_newline ($body);
   }
   ## Split the body
-    $body = $nl . $body if $body =~ /^-(?!\x20)/;
-    $body =~ s/(?<=$nl)-[^\x20$nl][^$nl]*(?=$nl)/-/gs;
-    $self->{value} = [ split /(?<=$nl)(?:$nl)?-$nl(?:$nl)?/s, $body ];
-    $self->{preamble} = shift (@{ $self->{value} });
-    $self->{epilogue} = pop (@{ $self->{value} })
-      if !$self->{option}->{no_final_text} && $body !~ /$nl-$nl(?:$nl)?$/s;
-    @{ $self->{value} } = grep {length} map { s/^-\x20//gm; $_ } @{ $self->{value} };
+    $body = $nl . $body if $body =~ /^-{70,70}$nl/s;
+    ($self->{preamble}, $body) = split /(?<=$nl)-{70,70}$nl$nl/s, $body, 2;
+    $body = $nl . $body if $body =~ /^-{30,30}$nl/s;
+    $self->{value} = [ split /(?!=$nl)$nl-{30,30}$nl$nl/, $body ];
+    if ($self->{value}->[-1] =~ /^End of(.+?)Digest(.*?)$nl\*+(?:$nl)*$/is) {
+      ($self->{list_name}, $self->{digest_info}) = ($1, $2);
+      $self->{list_name} =~ s/^\s+//;  $self->{list_name} =~ s/\s+$//;
+      $self->{digest_info} =~ s/^\s+//;  $self->{digest_info} =~ s/\s+$//;
+      pop @{ $self->{value} };
+    }
   
   if ($self->{option}->{parse_all}) {
     $self->{value} = [ map {
       $self->_parse_value (body_part => $_);
     } @{ $self->{value} } ];
     $self->{preamble} = $self->_parse_value (preamble => $self->{preamble});
-    $self->{epilogue} = $self->_parse_value (epilogue => $self->{epilogue});
   }
   $self;
 }
@@ -124,14 +119,21 @@ sub preamble ($;$) {
   }
   $self->{preamble};
 }
-sub epilogue ($;$) {
+sub list_name ($;$) {
   my $self = shift;
   my $np = shift;
   if (defined $np) {
-    $np = $self->_parse_value (epilogue => $np) if $self->{option}->{parse_all};
-    $self->{epilogue} = $np;
+    $self->{list_name} = $np;
   }
-  $self->{epilogue};
+  $self->{list_name};
+}
+sub digest_info ($;$) {
+  my $self = shift;
+  my $np = shift;
+  if (defined $np) {
+    $self->{digest_info} = $np;
+  }
+  $self->{digest_info};
 }
 
 =head2 $self->stringify ([%option])
@@ -150,11 +152,14 @@ sub stringify ($;%) {
     $#{ $self->{value} } = $min unless $min <= $#{ $self->{value} };
     my $max = $option{parts_max} || $#{$self->{value}}+1;  $max--;
     $max = $#{$self->{value}} if $max > $#{$self->{value}};
+  ## Make trailer
+    my $trailer = sprintf 'End of %s Digest%s',
+      (length $self->{list_name}? $self->{list_name}: 'list'),
+      (length $self->{digest_info}? ' '.$self->{digest_info}:'');
+    $trailer .= "\x0D\x0A" . ('*' x length $trailer) . "\x0D\x0A";
   ## Preparates parts
     my @parts = map { ''. $_ } @{ $self->{value} }[0..$max];
-    #unshift @parts, $self->{preamble}.'';
-    push @parts, ( $option{output_epilogue}? '' . $self->{epilogue} :'' );
-    #$parts[-1] .= "\x0D\x0A" unless $parts[-1] =~ /\x0D\x0A$/s;
+    push @parts, $trailer;
     my $preamble = ''.$self->{preamble};
   
     if (ref $self->{header}) {
@@ -167,24 +172,17 @@ sub stringify ($;%) {
         $ct->replace ('x-preamble-type' => $pct)
           if $pct && $pct ne 'text/plain; charset=us-ascii';
       }
-      if (ref $self->{epilogue} && $option{output_epilogue}) {
-        unless (ref $self->{epilogue}->entity_header) {
-          $self->{epilogue}->entity_header (new Message::Header -format => 'mail-rfc822');
-        }
-        my $ect = $self->{epilogue}->entity_header->field ('content-type', -new_item_unless_exist => 0);
-        $ct->replace ('x-epilogue-type' => $ect)
-          if $ect && $ect ne 'text/plain; charset=us-ascii';
-      }
     }
   
-  $preamble =~ s/^-/-\x20-/gm;
+  $preamble =~ s/^-{70,70}\x0D?$/"\x20".('-' x 69)/gem;
+  $preamble .= "\x0D\x0A" unless $preamble =~ /\x0D\x0A$/s;
   
-  $preamble . "\x0D\x0A"
+  $preamble
   ."----------------------------------------------------------------------\x0D\x0A"
-  .($option{output_souround_blank_line}? "\x0D\x0A":'')
-  .join "\x0D\x0A------------------------------\x0D\x0A"
-  .($option{output_souround_blank_line}? "\x0D\x0A":''),
-    map { s/^-/-\x20-/gm; $_ } @parts;
+  ."\x0D\x0A"
+  .join "\x0D\x0A------------------------------\x0D\x0A\x0D\x0A",
+    map { s/^-{30,30}\x0D?$/"\x20".('-' x 29)/gem; 
+          $_ .= "\x0D\x0A" unless /\x0D\x0A$/s; $_ } @parts;
 }
 *as_string = \&stringify;
 
@@ -193,7 +191,7 @@ sub stringify ($;%) {
 
 =head1 SEE ALSO
 
-RFC 934 E<lt>urn:ietf:rfc:934>
+RFC 1153 E<lt>urn:ietf:rfc:1153>
 
 =head1 LICENSE
 
