@@ -3,15 +3,65 @@
 
 Message::Util::Formatter --- General format text to composed text converter
 
+=head1 DESCRIPTION
+
+This module can be used to convert small template text to
+complted one with filling variables with embeded formatting
+text.  It is similar to C<printf>, but syntax is different.
+
+Formatting rule is extensible.  Application program can
+define its local formatting rule by only writing simple
+perl code.
+
+This module requires L<Message::Util::Formatter>.
+
 =cut
 
 package Message::Util::Formatter;
 use strict;
 use vars qw(%FMT2STR $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 
-## Embeded formatting rules (default)
+=head1 INITIAL FORMATTING RULES
+
+For convinience, some formatting rules are already defined.
+These are only examples and you can override these rule in
+your script.
+
+=over 4
+
+=item %char(ucs=>0xHHHH);
+
+Replaced to a character with given perl's internal representation.
+With pre-utfized perl (before 5.6), 0x00-0xFF can be specified.
+
+Code position value in coding system other than perl internal is
+currently not supported.
+
+=item %percent;
+
+Represents C<%> itself.  Note that in Message::Util::Formatter's
+format rule, not all bare C<%> are required to be escaped, but
+only unambigious ones are.
+
+Example:
+
+  qq(%percent;hash; %another_hash)
+
+=item -bare_text
+
+This rule is special and is not able to be embeded in template text.
+This rule is used to "format" bare text (ie. out-of-%-format).
+
+You can override this rule, for example, to escape C<&> and other
+special letters in (to-be-) fragment of HTML document.
+
+=back
+
+=cut
+
+## Initial formatting rules
 %FMT2STR = (
 	char	=> sub {
 	  my $p = $_[0];
@@ -24,26 +74,52 @@ require Message::Util;
 	  }
 	},
 	percent	=> '%',
+	    -bare_text => sub { $_[0]->{-bare_text} },
 );
+
+=head1 METHODS
+
+=over 4
+
+=item $fmt = Message::Util::Formatter->new
+
+Returns new instance of Message::Util::Formatter.
+
+=cut
 
 sub new ($) {
   my $self = bless Message::Util::make_clone (\%FMT2STR), shift;
   $self;
 }
 
+=item $replaced_text = $fmt->replace ($source_text, [$parameter])
+
+Replaces $source_text with given (= $fmt) format rules
+and returns as $replaced_text.
+
+An optional argument $parameter is passed to format rules
+as the second argument of those.  (Its type is usually, but not limited
+to hash reference. C<replace> method itself does not check this
+value so you can give any data.)
+
+=cut
+
 sub replace ($$;\%) {
   my $self = shift;
   my $format = shift;
   my $gparam = shift;
-  $format =~ s{%([A-Za-z0-9_]+)(?:\(((?:[^"\)]|"(?:[^"\\]|\\.)*")*)\))?;}{
-      my ($f, $a) = ($1, $2);
+  $format =~ s{%([A-Za-z0-9_]+)(?:\(((?:[^"\)]|"(?:[^"\\]|\\.)*")*)\))?;|(%|[^%]+)}{
+      my ($f, $a, $t) = ($1, $2, $3);
+      if (length $t) {
+	  $f = '-bare_text';
+      }
       my $function = $gparam->{fmt2str}->{$f} || $self->{$f};
       if (ref $function) {
-	  my %a;
+	  my %a = (-bare_text => $a || $t);
 	  for (split /[\x09\x20]*,[\x09\x20]*/, $a) {
 	      if (/^([^=]*[^\x09\x20=])[\x09\x20]*=>[\x09\x20]*([^\x09\x20].*)$/) {
 		  $a{ Message::Util::Wide::unquote_if_quoted_string ($1) } = Message::Util::Wide::unquote_if_quoted_string ($2);
-	      } else {print &main::encode("$_")."! ";
+	      } else {
 		  $a{ Message::Util::Wide::unquote_if_quoted_string ($_) } = 1;
 	      }
 	  }
@@ -57,6 +133,25 @@ sub replace ($$;\%) {
   }gex;  
   $format;
 }
+
+=back
+
+=head1 EXAMPLE
+
+  require Message::Util::Formatter;
+  my $fmt = new Message::Util::Formatter;
+  $fmt->{rule1} = sub {
+      my ($attribute, $parameter) = @_;
+      $parameter->{param1} = $attribute->{attr2};
+      $attribute->{attr1};
+  };
+  
+  my ($t, $param) = (q/Attr1: %rule1(attr1=>Value1,attr2=>Value2);/, {});
+  print $fmt->replace ($t, $param), "\n";
+  print "Attr2: ", $param->{param1}, "\n";
+
+For more practical examples, see L<Message::Field::Date> and
+SuikaWiki <http://suika.fam.cx/~wakaba/-temp/wiki/wiki?SuikaWiki>.
 
 =head1 LICENSE
 
@@ -80,4 +175,4 @@ Boston, MA 02111-1307, USA.
 =cut
 
 1;
-# $Date: 2002/12/04 09:29:32 $
+# $Date: 2002/12/05 00:25:33 $
