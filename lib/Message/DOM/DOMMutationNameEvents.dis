@@ -35,7 +35,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/10/11 10:37:13 $
+     $Date: 2004/10/11 12:02:00 $
 
   @ConditionDef:
     @@Name:DOM2
@@ -259,9 +259,12 @@ IF:
          @@@@Type:
            lang:Perl
          @@@@@:
-                  ## Conditional
-           $self->__SUPER{MutationEvent}__::initEvent
-                     ($typeArg, $canBubbleArg, $cancelableArg);
+           __DEEP{
+                    ## Conditional
+             $self->__SUPER{MutationEvent}__::initEvent
+                       ($typeArg, $canBubbleArg, $cancelableArg,
+                        $relatedNodeArg);
+           }__;
            for ($self->{<Q:TreeCore:node>}) {
              $_->{<Q:DOMMutationNameEvents:prevNamespaceURI>}
                                             = $prevNamespaceURIArg;
@@ -318,9 +321,12 @@ IF:
          @@@@Type:
            lang:Perl
          @@@@@:
-                  ## Conditional
-           $self->__SUPER{MutationEvent}__::initEventNS
-                     ($namespaceURI, $typeArg, $canBubbleArg, $cancelableArg);
+           __DEEP{
+                    ## Conditional
+             $self->__SUPER{MutationEvent}__::initEventNS
+                       ($namespaceURI, $typeArg, $canBubbleArg, $cancelableArg,
+                        $relatedNodeArg);
+           }__;
            for ($self->{<Q:TreeCore:node>}) {
              $_->{<Q:DOMMutationNameEvents:prevNamespaceURI>}
                                             = $prevNamespaceURIArg;

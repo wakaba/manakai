@@ -1,0 +1,623 @@
+Namespace:
+  @DOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @DOMEvents:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/events#
+  @DOMViews:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/views#
+  @ev:
+    http://www.w3.org/2001/xml-events
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOMEvents:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-ev#
+  @TreeCore:\
+Module:
+  @Name:  DOMKeyboardEvents
+  @Namespace:
+     http://suika.fam.cx/~wakaba/archive/2004/dom/events#
+  @BindingName:
+     @@@:  events
+     @@Type:
+        lang:IDL-DOM
+     @@prefix:  dom.w3c.org
+  @FullName:
+    @@lang:en
+    @@@: DOM Keyboard Events Module
+  @Description:
+    @@lang:en
+    @@@:
+      Keyboard events are device dependent, i.e. they rely on 
+      the capabilities of the input devices and how they are 
+      mapped in the operating systems.  Depending on the character 
+      generation device, keyboard events may or may not be generated.
+    \
+      {NOTE:: It is highly recommended to rely on <Module:DOMTextEvents> 
+              when dealing with character input.
+    \
+      }
+
+  @Author:
+     @@FullName:  Wakaba
+     @@Mail:  w@suika.fam.cx
+  @License:
+     license:Perl+MPL
+  @Date.RCS:
+     $Date: 2004/10/11 12:02:00 $
+
+  @ConditionDef:
+    @@Name:DOM3
+  @NormalCondition:DOM3
+
+  @Feature:
+    @@Name:KeyboardEvents
+    @@Version:3.0
+    @@FullName: DOM Level 3 Keyboard Events
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The support for <Feature:UIEvents>/<FeatureVer:3.0> is required.
+    @@Condition[list]:
+      DOM3
+    @@Contrib:
+      DOMCore:DOMImplementation::
+
+  @Require:
+     @@Module:
+        @@@Name:  DOMUIEvents
+        @@@FileName:
+           @@@@@:  events.idl
+           @@@@For:
+              lang:IDL-DOM
+        @@@Namespace:
+           http://suika.fam.cx/~wakaba/archive/2004/dom/events#
+
+EventSet:
+  @Event:
+    @@QName:
+      ev:keydown
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A key is pressed down. 
+      \
+        This event type is device dependent and relies on the 
+        capabilities of the input devices and how they are mapped 
+        in the operating system.
+      \
+        This event type is generated after the keyboard mapping 
+        but before the processing of an input method editor.
+      \
+        This event should logically happen before the event 
+        <EV:ev:keyup> is produced.  Whether a keydown 
+        contributes to the generation of a text event is 
+        implementation dependent.
+    @@Type:KeyboardEvent
+    @@IsBubbling:1
+    @@IsCancelable:1
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+    @@SpecLevel:3
+    @@UIEvent.view:
+      @@@Type:
+        DOMViews:AbstractView
+    @@KeyboardEvent.keyIdentifier:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMKeyIdentifier
+    @@KeyboardEvent.keyLocation:
+      @@@Type:KeyLocationCode
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          <A:KeyboardEvent.location> in the DOM Level 3 Events Specification 
+          is maybe an error.
+    @@KeyboardEvent.altKey:
+      @@@Type:
+        DOMMain:boolean
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        <A:KeyboardEvent.altGraphKey>: Maybe error of the DOM Level 3 Events 
+        specification.
+    @@KeyboardEvent.shiftKey:
+      @@@Type:
+        DOMMain:boolean
+    @@KeyboardEvent.ctrlKey:
+      @@@Type:
+        DOMMain:boolean
+    @@KeyboardEvent.metaKey:
+      @@@Type:
+        DOMMain:boolean
+  @Event:
+    @@QName:
+      ev:keyup
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A key is released.
+       \
+        This event type is device dependent and relies on the 
+        capabilities of the input devices and how they are mapped in 
+        the operating system.
+       \
+        This event type is generated after the keyboard mapping but 
+        before the process of an input method editor.
+       \
+        This event should logically happen after the event 
+        <EV:ev:keydown> is produced.
+       \
+        Whether a keyup contributes to the generation of a text 
+        event is implementation dependent.
+    @@Type:KeyboardEvent
+    @@IsBubbling:1
+    @@IsCancelable:1
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+    @@SpecLevel:3
+    @@UIEvent.view:
+      @@@Type:
+        DOMViews:AbstractView
+    @@KeyboardEvent.keyIdentifier:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMKeyIdentifier
+    @@KeyboardEvent.keyLocation:
+      @@@Type:KeyLocationCode
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          <A:KeyboardEvent.location> in the DOM Level 3 Events Specification 
+          is maybe an error.
+    @@KeyboardEvent.altKey:
+      @@@Type:
+        DOMMain:boolean
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Set unless the <A:KeyboardEvent.keyIdentifier> corresponding 
+          to the key modifier itself.
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        <A:KeyboardEvent.altGraphKey>: Maybe error of the DOM Level 3 Events 
+        specification.
+        \
+          Set unless the <A:KeyboardEvent.keyIdentifier> corresponding 
+          to the key modifier itself.
+    @@KeyboardEvent.shiftKey:
+      @@@Type:
+        DOMMain:boolean
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Set unless the <A:KeyboardEvent.keyIdentifier> corresponding 
+          to the key modifier itself.
+    @@KeyboardEvent.ctrlKey:
+      @@@Type:
+        DOMMain:boolean
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Set unless the <A:KeyboardEvent.keyIdentifier> corresponding 
+          to the key modifier itself.
+    @@KeyboardEvent.metaKey:
+      @@@Type:
+        DOMMain:boolean
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Set unless the <A:KeyboardEvent.keyIdentifier> corresponding 
+          to the key modifier itself.
+##ErrorSet
+
+IF:
+  @Name:  KeyboardEvent
+  @Description:
+    @@lang:en
+    @@@:
+      Provide specific contextual information associated with 
+      keyboard devices.  Each keyboard event refers a key using 
+      an identifier.  
+      \
+      {NOTE:: Keyboard events are commonly directed at 
+      the element that has the focus.
+      \
+      }
+  @Example:
+    @@For:
+      lang:Perl
+    @@FullName:
+      @@@lang:en
+      @@@@:
+        Create an instance of the <IF:KeyboardEvent> interface
+    @@Code:
+      @@@Type:
+        lang:Perl
+      @@@@:
+        my $keyev = $DocumentEvent->createEvent ('KeyboardEvent');
+
+  @ISA:  
+      DOMUIEvents:UIEvent
+  @Role:
+    @@@:
+      DOMEvents:Event
+    @@compat:
+      ManakaiDOMEvents:Events
+
+  @Level[list]:  3
+  @SpecLevel[list]:  3
+
+  @ConstGroup:
+     @@Name:  KeyLocationCode
+     @@Type:
+        DOMMain:unsigned-long
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The location of a key on the device.
+     @@Const:
+        @@@Name:  DOM_KEY_LOCATION_STANDARD
+        @@@Type:
+           DOMMain:unsigned-long
+        @@@Value:  0x00
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The key is not distinguished as the left or right version and 
+            did not originate from the numeric keyboard.
+     @@Const:
+        @@@Name:  DOM_KEY_LOCATION_LEFT
+        @@@Type:
+           DOMMain:unsigned-long
+        @@@Value:  0x01
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            In the left location. 
+          \
+            {eg:: 
+              \
+              - The left <KEY:Shift> key on a PC 101 Key US keyboard.
+              \
+            }
+     @@Const:
+        @@@Name:  DOM_KEY_LOCATION_RIGHT
+        @@@Type:
+           DOMMain:unsigned-long
+        @@@Value:  0x02
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            In the right location. 
+          \
+            {eg:: 
+              \
+              - The right <KEY:Shift> key on a PC 101 Key US keyboard.
+              \
+            }
+     @@Const:
+        @@@Name:  DOM_KEY_LOCATION_NUMPAD
+        @@@Type:
+           DOMMain:unsigned-long
+        @@@Value:  0x03
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            On the numeric keypad or with a virtual key corresponding 
+            to the numeric keyboard.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         If the DOM implementation wishes to provide a new location 
+         information, a value different from the constant values 
+         defined in the specification must be used.
+
+  @Attr:
+     @@Name:  keyIdentifier
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The identifier of the key.
+     @@Get:
+        @@@Type:
+          ManakaiDOM:ManakaiDOMKeyIdentifier
+        @@@InCase:
+          @@@@Value:Unidentified
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The DOM implementation is unable to identify the key.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMKeyboardEvents:keyIdentifier
+  @Attr:
+     @@Name:  keyLocation
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The location of the key on the device.
+     @@Get:
+        @@@Type:KeyLocationCode
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMKeyboardEvents:keyLocation
+  @Attr:
+     @@Name:  ctrlKey
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Whether the <KEY:Control> (<CODE:Ctrl>) key modifier is activated 
+         or not.
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  shiftKey
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Whether the shift (<KEY:Shift>) key modifier is activated or not.
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  altKey
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Whether the alternative (<KEY:Alt>) key modifier is activated.
+       \
+         {eg:: 
+         \
+           {P:: Examples of the alternative key include:
+           \
+           - The <KEY:Alt> key.
+           \
+           - The <CODE:Option> key on Macinrosh systems.
+           \
+           - The <CODE:Menu> key.
+           \
+           }
+         \
+         }
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  metaKey
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Whether the <KEY:Meta> key modifier is activated or not.
+         \
+         {eg:: 
+         \
+           {P:: Examples of the <KEY:Meta> key include:
+           \
+           - The <KEY:Meta> key.
+           \
+           - The <CODE:Command> key on Macintosh systems.
+           \
+           }
+         \
+         }
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Method:
+     @@Name:  getModifierState
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Return the state of a modifier using a key identifier.
+         \
+         {NOTE:: To distinguish between right and left modifiers, 
+                 use the <A:KeyboardEvent.KeyLocation> attribute.
+         \
+         }
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Can DOM applications know left <KEY:Control> and right <KEY:Shift> 
+         are activated in the same time?
+     @@Param:
+        @@@Name:  keyIdentifierArg
+        @@@Type:  
+          ManakaiDOM:ManakaiDOMKeyIdentifier
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+             An modifier key identifier.
+           \
+             {NOTE:: 
+             \
+               {P:: Common modifier keys include:
+             \
+               - <KEY:Alt>
+             \
+               - <KEY:AltGraph>
+             \
+               - <KEY:CapsLock>
+             \
+               - <KEY:Control>
+             \
+               - <KEY:Meta>
+             \
+               - <KEY:NumLock>
+             \
+               - <KEY:Shift>
+             \
+               }
+             \
+             }
+     @@Return:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The <P:keyIdentifierArg> key is a modifier key and 
+               the modifier is activated.
+        @@@InCase:
+           @@@@Value:  false
+  @Method:
+     @@Name:  initKeyboardEvent
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Initialize the value of <IF:KeyboardEvent> object.  It has 
+         the same behavior as <M:UIEvent.initUIEvent>.
+     @@NSVersion:initKeyboardEvent
+     @@Param:
+        @@@Name:  typeArg
+        @@@Type:  
+          DOMMain:DOMString
+     @@Param:
+        @@@Name:  canBubbleArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  cancelableArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  viewArg
+        @@@Type:
+           DOMViews:AbstractView
+     @@Param:
+        @@@Name:  keyIdentifierArg
+        @@@Type:  
+          ManakaiDOM:ManakaiDOMKeyIdentifier
+     @@Param:
+        @@@Name:  keyLocationArg
+        @@@Type:
+           DOMMain:unsigned-long
+     @@Param:
+        @@@Name:  modifiersList
+        @@@Type:  
+          ManakaiDOM:ManakaiDOMKeyIdentifiers
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A white space (XML 1.0 <CODE:S>) separated list 
+            of modifier key identifiers to be activated.
+     @@Return: 
+       @@@Def:
+         @@@@Type:
+           lang:Perl
+         @@@@@:
+           __DEEP{
+                    ## Conditional
+             $self->__SUPER{UIEvent}__::initEvent
+                       ($typeArg, $canBubbleArg, $cancelableArg,
+                        $viewArg, null);
+           }__;    ## NOTE: $detailArg not used
+           for ($self->{<Q:TreeCore:node>}) {
+             $_->{<Q:DOMKeyboardEvents:keyIdentifier>} = $keyIdentifierArg;
+             $_->{<Q:DOMKeyboardEvents:keyLocation>} = $keyLocationArg;
+             $_->{<Q:DOMKeyboardEvents:modifiersList>} = $modifiersList;
+           }
+    @@SpecLevel:3
+    @@Level[list]:
+      3
+
+  @Method:
+     @@Name:  initKeyboardEventNS
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Initialize the value of a <IF:KeyboardEvent> object.  It has 
+         the same behavior as <M:UIEvent.initUIEventNS>.
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  
+          ManakaiDOM:ManakaiDOMNamespaceURI
+     @@Param:
+        @@@Name:  typeArg
+        @@@Type:  
+          DOMMain:DOMString
+     @@Param:
+        @@@Name:  canBubbleArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  cancelableArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  viewArg
+        @@@Type:
+           DOMViews:AbstractView
+     @@Param:
+        @@@Name:  keyIdentifierArg
+        @@@Type:  
+          ManakaiDOM:ManakaiDOMKeyIdentifier
+     @@Param:
+        @@@Name:  keyLocationArg
+        @@@Type:
+           DOMMain:unsigned-long
+     @@Param:
+        @@@Name:  modifiersList
+        @@@Type:  
+          ManakaiDOM:ManakaiDOMKeyIdentifiers
+     @@Return:  
+       @@@Def:
+         @@@@Type:
+           lang:Perl
+         @@@@@:
+           __DEEP{
+                    ## Conditional
+             $self->__SUPER{UIEvent}__::initEventNS
+                       ($namespaceURI, $typeArg, $canBubbleArg, $cancelableArg,
+                        $viewArg, null);
+           }__;    ## NOTE: $detailArg not used
+           for ($self->{<Q:TreeCore:node>}) {
+             $_->{<Q:DOMKeyboardEvents:keyIdentifier>} = $keyIdentifierArg;
+             $_->{<Q:DOMKeyboardEvents:keyLocation>} = $keyLocationArg;
+             $_->{<Q:DOMKeyboardEvents:modifiersList>} = $modifiersList;
+           }
+##IF:KeyboardEvent
+
+
+## DOMUIEvents.dis ends here

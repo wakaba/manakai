@@ -33,7 +33,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/10/11 10:37:13 $
+     $Date: 2004/10/11 12:02:00 $
   
   @Description:
     @@lang:en
@@ -184,7 +184,40 @@ DataType:
     @@@: DOMString (features)
   @Description:
     @@lang:en
-    @@@: The DOM features and versions.
+    @@@:
+      A list of zero or more pairs of a <TYPE:ManakaiDOM:ManakaiDOMFeature> 
+      and an optional <TYPE:ManakaiDOM:ManakaiDOMFeatureVersion>, 
+      separated by white space.
+
+DataType:
+  @Name:ManakaiDOMKeyIdentifier
+  @ISA:
+    DOMMain:DOMString
+  @FullName:
+    @@lang:en
+    @@@: DOMString (key identifier)
+  @Description:
+    @@lang:en
+    @@@:
+      A key identifier.
+    \
+      {NOTE:: A set of key identifiers are defined in the Appendix A 
+              of the DOM Level 3 Events Specification.
+    \
+      }
+
+DataType:
+  @Name:ManakaiDOMKeyIdentifiers
+  @ISA:
+    DOMMain:DOMString
+  @FullName:
+    @@lang:en
+    @@@:DOMString (list of key identifiers)
+  @Description:
+    @@lang:en
+    @@@:
+      Zero or more <TYPE:ManakaiDOM:ManakaiDOMKeyIdentifier> separated 
+      by white space (XML 1.0 <CODE:S>).
 
 Exception:
   @Name: ManakaiDOMImplementationException
