@@ -9,7 +9,7 @@ date-time used in Internet messages and so on
 package Message::Field::Date;
 use strict;
 use vars qw(%DEFAULT @ISA %MONTH %REG $VERSION %ZONE);
-$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 use Time::Local 'timegm_nocheck';
@@ -17,6 +17,7 @@ use overload '0+' => sub { $_[0]->{date_time} },
              fallback => 1;
 
 %REG = %Message::Util::REG;
+	## RFC 822/2822 Internet Message Format
 	$REG{M_dt_rfc822} = qr!(?:[A-Za-z]+	## Day of week
 		[\x09\x20,]*)?	([0-9]+)	## Day
 		[\x09\x20/-]*	([A-Za-z]+)	## Month
@@ -25,7 +26,8 @@ use overload '0+' => sub { $_[0]->{date_time} },
 		[\x09\x20:]+	([0-9]+)	## Minute
 		[\x09\x20:]*	([0-9]+)?	## Second
 		([\x09\x20 0-9A-Za-z+-]+)!x;	## Zone
-	$REG{M_dt_iso8601} = qr!	([0-9]{4,})	## Year
+	## RFC 3339 Internet Date/Time Format (A profile of ISO 8601)
+	$REG{M_dt_rfc3339} = qr!	([0-9]{4,})	## Year
 		   [\x09\x20.:/-]+	([0-9]+)	## Month
 		   [\x09\x20.:/-]+	([0-9]+)	## Day
 		(?:[\x09\x20.:Tt-]+	([0-9]+)	## Hour
@@ -33,6 +35,7 @@ use overload '0+' => sub { $_[0]->{date_time} },
 		(?:[\x09\x20.:]+	([0-9]+)	## Second
 		(?:[\x09\x20.:]+	([0-9]+))?)?)?	## frac.
 		([\x09\x20 0-9A-Za-z:.+-]*)	!x;	## Zone.
+	## RFC 733 ARPA Internet Message Format
 	$REG{M_dt_rfc733} = qr!(?:[A-Za-z]+	## Day of week
 		[\x09\x20,]*)?	([0-9]+)	## Day
 		[\x09\x20/-]*	([A-Za-z]+)	## Month
@@ -41,6 +44,7 @@ use overload '0+' => sub { $_[0]->{date_time} },
 		[\x09\x20:]*	([0-9][0-9])	## Minute
 		[\x09\x20:]*	([0-9][0-9])?	## Second
 		([\x09\x20 0-9A-Za-z+-]+)!x;	## Zone
+	## RFC 724 ARPA Internet Message Format (slash-date)
 	$REG{M_dt_rfc724} = qr!(?:[A-Za-z]+	## Day of week
 		[\x09\x20,]*)?	([0-9][0-9]?)	## Month
 		[\x09\x20/]+	([0-9][0-9]?)	## Day
@@ -49,10 +53,6 @@ use overload '0+' => sub { $_[0]->{date_time} },
 		[\x09\x20:]*	([0-9][0-9])	## Minute
 		[\x09\x20:]*	([0-9][0-9])?	## Second
 		([\x09\x20 0-9A-Za-z+-]+)!x;	## Zone
-	
-$REG{M_rfc724_slash_date} = qr#([0-9]+)$REG{FWS}/$REG{FWS}([0-9]+)$REG{FWS}/$REG{FWS}([0-9]+)$REG{WSP}+([0-9][0-9])$REG{FWS}(?::$REG{FWS})?([0-9][0-9])(?:$REG{FWS}(?::$REG{FWS})?([0-9][0-9]))?$REG{FWS}((?:-$REG{FWS})?[A-Za-z]+|[+-]$REG{WSP}*[0-9]+)#;
-$REG{M_asctime} = qr/[A-Za-z]+$REG{FWS}([A-Za-z]+)$REG{FWS}([0-9]+)$REG{WSP}+([0-9]+)$REG{FWS}:$REG{FWS}([0-9]+)$REG{FWS}:$REG{FWS}([0-9]+)$REG{WSP}+([0-9]+)/;
-$REG{M_iso8601_date_time} = qr/([0-9]+)-([0-9]+)-([0-9]+)[Tt]([0-9]+):([0-9]+):([0-9]+)(?:.([0-9]+))?(?:[Zz]|([+-])([0-9]+):([0-9]+))/;
 
 =head1 CONSTRUCTORS
 
@@ -176,7 +176,9 @@ The following methods construct new objects:
   JT	=> [+1,  7, 30],	## Java
   KDT	=> [+1, 10,  0],	## Korean Daylight
   KST	=> [+1,  9,  0],	## Korean Standard
-  LOCAL	=> [-1,  0,  0],
+  LCL	=> [-1,  0,  0],	## (unknown zone used by LSMTP)
+  LOCAL	=> [-1,  0,  0],	## local time zone
+  LT	=> [-1,  0,  0],	## Luna Time [RFC 1607]
   MDT	=> [-1,  6,  0],	## (NA)Mountain Daylight	733, 822
   MET	=> [+1,  0,  0],	## Middle European
   METDST	=> [+1,  2,  0],
@@ -184,6 +186,7 @@ The following methods construct new objects:
   MEWT	=> [+1,  0,  0],	## Middle European Winter
   MEZ	=> [+1,  0,  0],	## Central European (German)
   MST	=> [-1,  7,  0],	## (NA)Mountain Standard	733, 822
+  MT	=> [-1,  0,  0],	## Mars Time [RFC 1607]
   NDT	=> [-1,  2, 30],	## Newfoundland Daylight
   NFT	=> [-1,  3, 30],	## Newfoundland Standard
   NST	=> [-1,  3, 30],	## Newfoundland Standard	733
@@ -200,8 +203,8 @@ The following methods construct new objects:
   #SST	=> [+1,  7,  0],	## South Sumatra
   SWT	=> [+1,  1,  0],	## Swedish Winter
   UKR	=> [+1,  2,  0],	## Ukraine
-  UT	=> [+1,  0,  0],	## 	822
-  UTC	=> [+1,  0,  0],
+  UT	=> [+1,  0,  0],	## Universal Time	822
+  UTC	=> [+1,  0,  0],	## Coordinated Universal Time
   WADT	=> [+1,  8,  0],	## West Australian Daylight
   WAT	=> [-1,  0,  0],	## West Africa
   WET	=> [+1,  0,  0],	## Western European
@@ -267,7 +270,7 @@ sub _init ($;%) {
   }
   
   my $format = $self->{option}->{format};
-  if ($format =~ /rfc2822/) {
+  if ($format =~ /mail-rfc2822/) {
     $self->{option}->{use_military_zone} = 0;
   }
   
@@ -314,7 +317,7 @@ sub parse ($$;%) {
        $day, $month-1, $year);';
     $self->{secfrac} = '';
     $self->{option}->{zone} = [$zone_sign, $zone_hour, $zone_minute];
-  } elsif ($body =~ /^$REG{M_dt_iso8601}$/x) {
+  } elsif ($body =~ /^$REG{M_dt_rfc3339}$/x) {
     my ($year,$month,$day,$hour,$minute,$second,$secfrac,$zone)
      = ($1, $2, $3, $4, $5, $6, $7, $8);
     my ($zone_sign, $zone_hour, $zone_minute) = $self->_zone_string_to_array ($zone);
@@ -604,21 +607,21 @@ sub stringify ($;%) {
   my %option = %{$self->{option}};
   for (grep {/^-/} keys %o) {$option{substr ($_, 1)} = $o{$_}}
   unless ($option{format_template}) {
-    if ($option{format} =~ /rfc2822|rfc1123|son-of-rfc1036|usefor|mime/) {
+    if ($option{format} =~ /mail-rfc2822|news-usefor|mail-rfc822\+rfc1123|news-son-of-rfc1036|mime/) {
       $option{format_template} = '%Wdy(local);, %DD(local); %Mon(local); %YYYY(local); %HH(local);:%TT(local);:%SS(local); %zsign;%zHH;%zTT;';
     } elsif ($option{format} =~ /http/) {
       $option{format_template} = '%Wdy;, %DD; %Mon; %YYYY; %HH;:%TT;:%SS; GMT';
-    } elsif ($option{format} =~ /rfc822|rfc1036/) {
+    } elsif ($option{format} =~ /mail-rfc822|news-rfc1036/) {
       $option{format_template} = '%Wdy(local);, %DD(local); %Mon(local); %YY(local); (%YYYY(local);) %HH(local);:%TT(local);:%SS(local); %zsign;%zHH;%zTT;';
-    } elsif ($option{format} =~ /rfc850/) {
+    } elsif ($option{format} =~ /news-rfc850/) {
       $option{format_template} = '%Weekday;, %DD;-%Mon;-%YY; %HH;:%TT;:%SS; GMT';
     } elsif ($option{format} =~ /asctime/) {
       $option{format_template} = '%Wdy; %Mon; %DD(pad=>SP); %HH;:%MM;:%SS; %YYYY;';
     #} elsif ($option{format} =~ /date\(1\)/) {
     #  $option{format_template} = '%Wdy; %Mon; %DD(pad=>SP); %HH;:%MM;:%SS; GMT %YYYY;';
-    } elsif ($option{format} =~ /un[i*]x/) {	## :-)
+    } elsif ($option{format} =~ /un[i*]x/) {	## ;-)
       $option{format_template} = '%unix;';
-    } else {	## ISO 8601 (IETF)
+    } else {	## RFC 3339 (IETF's ISO 8601)
       $option{format_template} = '%YYYY(local);-%MM(local);-%DD(local);T%HH(local);:%TT(local);:%SS(local);%frac(prefix=>.);%zsign;%zHH;:%zTT;';
     }
   }
@@ -758,7 +761,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/06 10:30:43 $
+$Date: 2002/07/30 08:50:36 $
 
 =cut
 

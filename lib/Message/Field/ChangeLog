@@ -1,3 +1,14 @@
+2002-07-30  Wakaba <w@suika.fam.cx>
+
+	* UA.pm:
+	- (add, replace, item, delete): Reimplemented (or newly
+	implemented) by standard Message::Field::Structured method.
+	- (product, product_name, product_version, product_comment):
+	Removed. (Use item method instead.)
+	- (parse): Use robust regex instead of strict usefor
+	format regex.  (Accept bare non-token characters
+	as far as possible.)
+
 2002-07-28  Wakaba <w@suika.fam.cx>
 
 	* UA.pm (add_rcs, replace_rcs): New methods.
