@@ -1,64 +1,98 @@
 
 =head1 NAME
 
-Message::Body::TextPlain Perl module
-
-=head1 DESCRIPTION
-
-Perl module for text/plain media type.
+Message::Body::TextPlain --- Perl Module for Internet Media Type "text/plain"
 
 =cut
 
 package Message::Body::TextPlain;
 use strict;
-use vars qw($VERSION %DEFAULT);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use vars qw(%DEFAULT @ISA $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
+require Message::Field::Structured;
+push @ISA, qw(Message::Field::Structured);
 require Message::Header;
-use overload '""' => sub {shift->stringify};
+require Message::MIME::Charset;
+use overload '""' => sub { $_[0]->stringify },
+             fallback => 1;
 
-%DEFAULT = (
-  encoding_after_encode	=> '*default',
-  encoding_before_decode	=> '*default',
-  hook_encode_string	=> #sub {shift; (value => shift, @_)},
-  	\&Message::Util::encode_body_string,
-  hook_decode_string	=> #sub {shift; (value => shift, @_)},
-  	\&Message::Util::decode_body_string,
-);
+  %DEFAULT = (
+    -_METHODS	=> [qw|value|],
+    -_MEDIA_TYPE	=> 'text/plain',
+    -_MEMBERS	=> [qw|_charset|],
+    -body_default_charset	=> 'us-ascii',
+    -body_default_charset_input	=> 'iso-2022-int-1',
+    #encoding_after_encode
+    #encoding_before_decode
+    -hook_encode_string	=> \&Message::Util::encode_body_string,
+    -hook_decode_string	=> \&Message::Util::decode_body_string,
+    -parse_all	=> 0,
+    -use_normalization	=> 1,
+    -use_param_charset	=> 1,
+  );
 
-=head2 Message::Body::TextPlain->new ([%option])
+=head1 CONSTRUCTORS
 
-Returns new Message::Body::TextPlain instance.  Some options can be
-specified as hash.
+The following methods construct new C<Message::Field::Structured> objects:
+
+=over 4
 
 =cut
 
-sub new ($;%) {
-  my $class = shift;
-  my $self = bless {option => {@_}}, $class;
-  for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
-  $self;
+## Initialize of this class -- called by constructors
+sub _init ($;%) {
+  my $self = shift;
+  my $DEFAULT = Message::Util::make_clone (\%DEFAULT);
+  my %option = @_;
+  $self->SUPER::_init (%$DEFAULT, %option);
+  
+  if (ref $option{header}) {
+    $self->{header} = $option{header};
+  }
+  if ($self->{option}->{format} =~ /http/) {
+    $self->{option}->{use_normalization} = 0;
+  }
 }
 
-=head2 Message::Body::TextPlain->parse ($body, [%option])
+=item $body = Message::Body::TextPlain->new ([%options])
 
-Returns a new Message::Body::TextPlain with given body
-object.  Some options can be specified as hash.
+Constructs a new object.  You might pass some options as parameters 
+to the constructor.
+
+=cut
+
+## Inherited
+
+=item $body = Message::Body::TextPlain->parse ($body, [%options])
+
+Constructs a new object with given field body.  You might pass 
+some options as parameters to the constructor.
 
 =cut
 
 sub parse ($$;%) {
   my $class = shift;
+  my $self = bless {}, $class;
   my $body = shift;
-  my $self = bless {option => {@_}}, $class;
-  for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
-  $self->header ($self->{option}->{header});
-  my %s = &{$self->{option}->{hook_decode_string}} ($self, $body, type => 'body');
-  $self->{body} = $s{value};
+  $self->_init (@_);
+  my $charset;
+  my $ct; $ct = $self->{header}->field ('content-type', -new_item_unless_exist => 0) 
+    if ref $self->{header};
+  $charset = $ct->parameter ('charset') if ref $ct;
+  $charset ||= $self->{option}->{encoding_before_decode};
+  my %s = &{$self->{option}->{hook_decode_string}} ($self, $body,
+    type => 'body', charset => $charset);
+  $self->{value} = $s{value};
+  $self->{_charset} = $s{charset};	## When convertion failed
   $self;
 }
 
-=head2 $self->header ([$new_header])
+=back
+
+=cut
+
+=item $body->header ([$new_header])
 
 
 =cut
@@ -68,29 +102,29 @@ sub header ($;$) {
   my $new_header = shift;
   if (ref $new_header) {
     $self->{header} = $new_header;
-  } elsif ($new_header) {
-    $self->{header} = Message::Header->parse ($new_header);
+  #} elsif ($new_header) {
+  #  $self->{header} = Message::Header->parse ($new_header);
   }
-  unless ($self->{header}) {
-    $self->{header} = new Message::Header;
-  }
+  #unless ($self->{header}) {
+  #  $self->{header} = new Message::Header;
+  #}
   $self->{header};
 }
 
-=head2 $self->body ([$new_body])
+=item $body->value ([$new_body])
 
 Returns C<body> as string unless $new_body.
 Set $new_body instead of current C<body>.
 
 =cut
 
-sub body ($;$) {
+sub value ($;$) {
   my $self = shift;
   my $new_body = shift;
   if ($new_body) {
-    $self->{body} = $new_body;
+    $self->{value} = $new_body;
   }
-  $self->{body};
+  $self->{value};
 }
 
 =head2 $self->stringify ([%option])
@@ -101,13 +135,45 @@ Returns the C<body> as a string.
 
 sub stringify ($;%) {
   my $self = shift;
-  my %OPT = @_;
-  my (%e) = &{$self->{option}->{hook_encode_string}} ($self, 
-          $self->{body}, type => 'body');
-  $e{value} .= "\x0D\x0A" unless $e{value} =~ /\x0D\x0A$/;
+  my %o = @_;  my %option = %{$self->{option}};
+  for (grep {/^-/} keys %o) {$option{substr ($_, 1)} = $o{$_}}
+  my $ct = $self->{header}->field ('content-type', -new_item_unless_exist => 0)
+    if ref $self->{header};
+  my %e;
+  unless ($self->{_charset}) {
+    my $charset; $charset = $ct->parameter ('charset') if ref $ct;
+    $charset ||= $self->{option}->{encoding_after_encode};
+    (%e) = &{$self->{option}->{hook_encode_string}} ($self, 
+          $self->{value}, type => 'body',
+          charset => $charset);
+    #$e{charset} ||= $self->{option}->{body_default_charset}
+    #  if $self->{option}->{body_default_charset_input}
+    #     ne $self->{option}->{body_default_charset};
+    ## Normalize
+    if ($option{use_normalization}) {
+      if ($Message::MIME::Charset::CHARSET{$charset || '*default'}->{mime_text}) {
+        $e{value} =~ s/\x0D(?!\x0A)/\x0D\x0A/gs;
+        $e{value} =~ s/(?<!\x0D)\x0A/\x0D\x0A/gs;
+        $e{value} .= "\x0D\x0A" unless $e{value} =~ /\x0D\x0A$/s;
+      }
+    }
+  } else {
+    %e = (value => $self->{value}, charset => $self->{_charset});
+  }
+  if (ref $self->{header}) {
+    if ($e{charset}) {
+      unless (ref $ct) {
+        $ct = $self->{header}->field ('content-type');
+        $ct->value ($option{_MEDIA_TYPE});
+      }
+      $ct->replace (charset => $e{charset});
+    } elsif (ref $ct) {
+      $ct->replace (charset => $self->{option}->{body_default_charset});
+    }
+  }
   $e{value};
 }
-sub as_string ($;%) {shift->stringify (@_)}
+*as_string = \&stringify;
 
 =head2 $self->option ($option_name)
 
@@ -115,21 +181,7 @@ Returns/set (new) value of the option.
 
 =cut
 
-sub option ($$;$) {
-  my $self = shift;
-  my ($name, $newval) = @_;
-  if ($newval) {
-    $self->{option}->{$name} = $newval;
-  }
-  $self->{option}->{$name};
-}
-
-sub clone ($) {
-  my $self = shift;
-  my $clone = new Message::Entity;
-  $clone->{body} = Message::Util::make_clone ($self->{body});
-  $clone;
-}
+## Inherited: option, clone
 
 =head1 SEE ALSO
 
@@ -158,7 +210,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/29 11:05:53 $
+$Date: 2002/06/01 05:30:59 $
 
 =cut
 
