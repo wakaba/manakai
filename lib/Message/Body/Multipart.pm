@@ -9,7 +9,7 @@ for "multipart/*" Internet Media Types
 package Message::Body::Multipart;
 use strict;
 use vars qw(%DEFAULT @ISA $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Body::Text;
 push @ISA, qw(Message::Body::Text);
@@ -22,8 +22,8 @@ $REG{NON_bchars} = qr#[^0-9A-Za-z'()+_,-./:=?\x20]#;
 %DEFAULT = (
 	## "#i" : only inherited from parent Entity and inherits to child Entity
   -_ARRAY_NAME	=> 'value',
-  -_METHODS	=> [qw|entity_header|],
-  -_MEMBERS	=> [qw|boundary|],
+  -_METHODS	=> [qw|entity_header add delete count item preamble epilogue|],
+  -_MEMBERS	=> [qw|boundary preamble epilogue|],
   #i accept_cte
   #i body_default_charset
   #i body_default_charset_input
@@ -133,7 +133,77 @@ sub parse ($$;%) {
 
 =cut
 
+## add, item, delete, count
+
+## item-by?, \$checked-item, {item-key => 1}, \%option
+sub _item_match ($$\$\%\%) {
+  my $self = shift;
+  my ($by, $i, $list, $option) = @_;
+  return 0 unless ref $$i;  ## Already removed
+  if ($by eq 'content-type') {
+    $$i = $self->_parse_value (body_part => $$i);
+    return 1 if ref $$i && $$list{$$i->content_type};
+  } elsif ($by eq 'content-id') {
+    $$i = $self->_parse_value (body_part => $$i);
+    return 1 if ref $$i && ( $$list{$$i->id} || $$list{'<'.$$i->id.'>'} );
+  }
+  0;
+}
+*_delete_match = \&_item_match;
+
+## Returns returned item value    \$item-value, \%option
+sub _item_return_value ($\$\%) {
+  unless (ref ${$_[1]}) {
+    ${$_[1]} = $_[0]->_parse_value (body_part => ${$_[1]});
+  }
+  ${$_[1]};
+}
+*_add_return_value = \&_item_return_value;
+
+## Returns returned (new created) item value    $name, \%option
+sub _item_new_value ($$\%) {
+  my $v = shift->_parse_value (body_part => '');
+  my ($key, $option) = @_;
+  if ($option->{by} eq 'content-type') {
+    $v->header->field ('content-type')->media_type ($key);
+  } elsif ($option->{by} eq 'content-id') {
+    $v->header->add ('content-id' => $key);
+  }
+  $v;
+}
+
+sub _add_array_check ($$\%) {
+  my $self = shift;
+  my ($value, $option) = @_;
+  my $value_option = {};
+  if (ref $value eq 'ARRAY') {
+    ($value, %$value_option) = @$value;
+  }
+  $value = $self->_parse_value (body_part => $value) if $$option{parse};
+  $$option{parse} = 0;
+  (1, value => $value);
+}
+
 ## entity_header: Inherited
+
+sub preamble ($;$) {
+  my $self = shift;
+  my $np = shift;
+  if (defined $np) {
+    $np = $self->_parse_value (preamble => $np) if $self->{option}->{parse_all};
+    $self->{preamble} = $np;
+  }
+  $self->{preamble};
+}
+sub epilogue ($;$) {
+  my $self = shift;
+  my $np = shift;
+  if (defined $np) {
+    $np = $self->_parse_value (epilogue => $np) if $self->{option}->{parse_all};
+    $self->{epilogue} = $np;
+  }
+  $self->{epilogue};
+}
 
 =head2 $self->stringify ([%option])
 
@@ -219,7 +289,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/09 10:57:16 $
+$Date: 2002/06/11 12:58:06 $
 
 =cut
 
