@@ -39,7 +39,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/09/27 12:12:12 $
+     $Date: 2004/09/29 12:39:32 $
 
   @Feature:
     @@QName:
@@ -52,9 +52,12 @@ Module:
     @@ImplNote:
       @@@lang:en
       @@@@:
-        Features <Feature:Core>/<FeatureVer:3.0>, 
-        <Feature:XML>/<FeatureVer:3.0> and <Feature:LS>/<FeatureVer:3.0> are 
+        Features <Feature:Core>/<FeatureVer:3.0> and 
+        <Feature:XML>/<FeatureVer:3.0> are required and 
+        part of the feature <Feature:LS>/<FeatureVer:3.0> is 
         required.
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM3
 
   @Require:
      @@Module:
@@ -112,6 +115,12 @@ IF:
       methods on an instance of the <IF:DOMImplementation> interface 
       or <M:DOMImplementation.getFeature> with parameters 
       <Feature:ManakaiDOMLS2003:LS> and <FeatureVer:1.0>.
+
+  @ISA:
+    DOMCore:DOMImplementation
+  @Role:
+    DOMCore:DOMImplementation
+
   @Method:
      @@Name:  createLSParser
      @@Description:

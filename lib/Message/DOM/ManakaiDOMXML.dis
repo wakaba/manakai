@@ -36,7 +36,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/09/27 12:11:53 $
+     $Date: 2004/09/29 12:39:32 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -56,6 +56,12 @@ Module:
     @@Description:
       @@@lang:en
       @@@@: The Manakai DOM XML Module, Level 1.
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM1
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM2
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM3
   @Feature:
     @@QName:
       ManakaiDOM:ManakaiDOMXML
@@ -66,6 +72,10 @@ Module:
     @@Description:
       @@@lang:en
       @@@@: The Manakai DOM XML Module, Level 2.
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM2 
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM3
   @Feature:
     @@QName:
       ManakaiDOM:ManakaiDOMXML
@@ -75,10 +85,12 @@ Module:
     @@Description:
       @@@lang:en
       @@@@: The Manakai DOM XML Module, Level 3.
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM3
 
 IF:
   @Name: ManakaiDOMEntities
-  @ISA:
+  @Implement:
     DOMCore:NamedNodeMap
   @Description:
     @@lang:en
@@ -90,7 +102,7 @@ IF:
     @@lang:en
     @@@:
       This interface is used by the attribute "DocumentType.entities". 
-  @ReMethod:
+  @Method:
      @@Name:  getNamedItem
      @@Description:
        @@@lang:en
@@ -115,9 +127,7 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: The "name" does not identify any node in this map.
-    @@Redefine:
-      DOMCore:NamedNodeMap
-  @ReMethod:
+  @Method:
      @@Name:  setNamedItem
      @@Description:
        @@@lang:en
@@ -176,9 +186,7 @@ IF:
           @@@@ImplNote:
             @@@@@lang:en
             @@@@@@: This exception has added by the DOM Level 2 Errata.
-    @@Redefine:
-      DOMCore:NamedNodeMap
-  @ReMethod:
+  @Method:
      @@Name:  removeNamedItem
      @@Description:
         @@@lang:en
@@ -222,9 +230,7 @@ IF:
             @@@@@lang:en
             @@@@@@:
               This exception is added by the DOM Level 1 First Edition Errata.
-    @@Redefine:
-      DOMCore:NamedNodeMap
-  @ReMethod:
+  @Method:
      @@Name:  item
      @@Description:
        @@@lang:en
@@ -249,18 +255,14 @@ IF:
             @@@@@@: 
               The "index" is invalid, i.e. it is greater than or 
               equal to the number of nodes in this map.
-    @@Redefine:
-      DOMCore:NamedNodeMap
-  @ReAttr:
+  @Attr:
      @@Name:  length
      @@Description:
        @@@lang:en
        @@@@: The number of nodes in this map.
      @@Get:
         @@@Type:  unsigned-long
-    @@Redefine:
-      DOMCore:NamedNodeMap
-  @ReMethod:
+  @Method:
      @@Name:  getNamedItemNS
      @@Description:
        @@@lang:en
@@ -308,9 +310,7 @@ IF:
               any node in this map.
      @@Level[list]:  2
      @@SpecLevel:2
-    @@Redefine:
-      DOMCore:NamedNodeMap
-  @ReMethod:
+  @Method:
      @@Name:  setNamedItemNS
      @@Description:
        @@@lang:en
@@ -371,9 +371,7 @@ IF:
             @@@@@@: This exception has added by the DOM Level 2 Errata.
      @@Level[list]:  2
      @@SpecLevel:2
-    @@Redefine:
-      DOMCore:NamedNodeMap
-  @ReMethod:
+  @Method:
      @@Name:  removeNamedItemNS
      @@Description:
         @@@lang:en
@@ -426,8 +424,6 @@ IF:
             @@@@@@: This map is read-only.
      @@Level[list]:  2
      @@SpecLevel:2
-     @@Redefine: 
-       DOMCore:NamedNodeMap
 
   @IntMethod:
     @@Name: isEqualNamedNodeMap
@@ -465,7 +461,9 @@ IF:
     @@lang:en
     @@@:
       This interface is used by the attribute "DocumentType.notations".
-  @ReMethod:
+  @Implement:
+    DOMCore:NamedNodeMap
+  @Method:
      @@Name:  getNamedItem
      @@Description:
        @@@lang:en
@@ -490,9 +488,7 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: The "name" does not identify any node in this map.
-    @@Redefine:
-      DOMCore:NamedNodeMap
-  @ReMethod:
+  @Method:
      @@Name:  setNamedItem
      @@Description:
        @@@lang:en
@@ -551,9 +547,7 @@ IF:
           @@@@ImplNote:
             @@@@@lang:en
             @@@@@@: This exception has added by the DOM Level 2 Errata.
-    @@Redefine:
-      DOMCore:NamedNodeMap
-  @ReMethod:
+  @Method:
      @@Name:  removeNamedItem
      @@Description:
         @@@lang:en
@@ -597,9 +591,7 @@ IF:
             @@@@@lang:en
             @@@@@@:
               This exception is added by the DOM Level 1 First Edition Errata.
-    @@Redefine:
-      DOMCore:NamedNodeMap
-  @ReMethod:
+  @Method:
      @@Name:  item
      @@Description:
        @@@lang:en
@@ -624,18 +616,14 @@ IF:
             @@@@@@: 
               The "index" is invalid, i.e. it is greater than or 
               equal to the number of nodes in this map.
-    @@Redefine:
-      DOMCore:NamedNodeMap
-  @ReAttr:
+  @Attr:
      @@Name:  length
      @@Description:
        @@@lang:en
        @@@@: The number of nodes in this map.
      @@Get:
         @@@Type:  unsigned-long
-    @@Redefine:
-      DOMCore:NamedNodeMap
-  @ReMethod:
+  @Method:
      @@Name:  getNamedItemNS
      @@Description:
        @@@lang:en
@@ -680,9 +668,7 @@ IF:
               any node in this map.
      @@Level[list]:  2
      @@SpecLevel:2
-    @@Redefine: 
-      DOMCore:NamedNodeMap
-  @ReMethod:
+  @Method:
      @@Name:  setNamedItemNS
      @@Description:
        @@@lang:en
@@ -743,9 +729,7 @@ IF:
             @@@@@@: This exception has added by the DOM Level 2 Errata.
      @@Level[list]:  2
      @@SpecLevel:2
-    @@Redefine:
-      DOMCore:NamedNodeMap
-  @ReMethod:
+  @Method:
      @@Name:  removeNamedItemNS
      @@Description:
         @@@lang:en
@@ -795,8 +779,6 @@ IF:
             @@@@@@: This map is read-only.
      @@Level[list]:  2
      @@SpecLevel:2
-    @@Redefine:
-      DOMCore:NamedNodeMap
 
   @IntMethod:
     @@Name: isEqualNamedNodeMap

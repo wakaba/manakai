@@ -51,7 +51,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/09/27 12:11:53 $
+     $Date: 2004/09/29 12:39:32 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -78,6 +78,14 @@ Module:
     @@Description:
       @@@lang:en
       @@@@: The DOM Core Module, Level 2.
+    @@Contrib:
+      DOMImplementation::DOM2
+    @@Contrib:
+      DOMImplementation::DOM3
+    @@Contrib:
+      Node::DOM2
+    @@Condition:
+      Node::DOM3
   @Feature:
     @@Name: Core
     @@Version: 3.0
@@ -89,6 +97,10 @@ Module:
     @@Description:
       @@@lang:en
       @@@@: The DOM Core Module, Level 3.
+    @@Contrib:
+      DOMImplementation::DOM3
+    @@Contrib:
+      Node::DOM3
 
 Exception:
   @Name:  DOMException
@@ -1199,6 +1211,10 @@ IF:
   @Spec:
     @@DOM3:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DOMImplementationSource
+
+  @Role:
+    DOMCore:DOMImplementationSource
+
   @Method:
      @@Name:  getDOMImplementation
      @@Spec:
@@ -1233,7 +1249,25 @@ IF:
             @@@@@@: 
               This source has no DOM implementation that supports the 
               desired features and versions.
-## TODO: Implement this.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my %features;
+            __CODE{ParseFeatures: in => features, out => features}__;
+            for my $class (reverse @{$__PACKAGE{Global}__::Role{<Q:DOMCore:DOMImplementation>}||{}}) {
+              if ($class->{class}->__INT{SP:classHasFeature}__ (%features)) {
+                if (my $new = $class->{class}->can ('new')) {
+                  $r = $new->($class->{class});
+                }
+                last;
+              }
+            }
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              This implementation is insufficient; it does not 
+              support <DOM:+>.
   @Method:
      @@Name:  getDOMImplementationList
      @@Description:
@@ -1285,8 +1319,12 @@ IF:
     @@Condition[list]:
       DOM2
       DOM3
+
   @ISA:
     ManakaiDOM:ManakaiDOMNodeReference::
+  @Role:
+    DOMCore:DOMImplementation
+
   @Method:
      @@Name:  hasFeature
      @@Spec:
@@ -1412,20 +1450,9 @@ IF:
           @@@@Type:
             lang:Perl
           @@@@@:
-            __CODE{CheckNull: s => feature}__;
-## TODO: feature and version checking
-            $feature = lc $feature;
-            if (defined $version and $version ne '') {
-              $r = $__PACKAGE{Global}__::FeatureImplemented{$feature}
-                                                           ->{$version} ?
-                   true : false;
-            } else {
-              for (keys %{$__PACKAGE{Global}__::FeatureImplemented{$feature}}) {
-                if ($__PACKAGE{Global}__::FeatureImplemented{$feature}->{$_}) {
-                  $r = true;
-                  last;
-                }
-              }
+            if (defined $feature) {
+              undef $version if defined $version and not length $version;
+              $r = $self->__INT{SP:classHasFeature}__ (lc $feature => $version);
             }
   @Method:
      @@Name:  createDocumentType
@@ -1863,25 +1890,32 @@ IF:
           @@@@@: 
             There is no object that implements interfaces associated 
             with the feature and version.
-## TODO: implement this
-    @@IntMethod:
-      @@@Name: new
+
+  @IntMethod:
+    @@Name:new
+    @@Operator:
+      @@@@:new
+      @@@Type:
+        lang:Perl
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Construct a new instance of the <IF:DOMImplementation>.
+    @@Return:
+      @@@Type: DOMImplementation
       @@@Description:
         @@@@lang:en
-        @@@@@: Construct a new instance of the "DOMImplementation".
-      @@@Return:
-        @@@@Type: DOMImplementation
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@: The "DOMImplementation" created.
-        @@@@Def:
-          @@@@@Type:
+        @@@@@:The new DOM implementation object.
+      @@@Def:
+        @@@@Type:
             lang:Perl
-          @@@@@@:
+        @@@@@:
             my $node = __CLASS{ManakaiDOMNodeObject::}__->__INT{new}__;
             $r = $node->__SUPER{ManakaiDOMNodeObject::}__::__INT{newReference}__
                                                                    ($self);
             $node->{<Q:ManakaiDOM:implID>} = $node->{<Q:ManakaiDOM:implID>};
+      
+##IF:DOMImplementation
 
 IF:
   @Name:  Node
@@ -1899,6 +1933,7 @@ IF:
       "Entity", "EntityReference", "Notation", "ProcessingInstriction" 
       and "CharacterData" are "Node".  "Comment" and "Text" are 
       "CharacterData".  "CDATASection" is a "Text".
+  @IsFinal:-1
   @ConstGroup:
      @@Name:  NodeType
      @@Description:
@@ -4435,14 +4470,7 @@ IF:
     @@lang:en
     @@@:
       How this collection is implemented is not defined or constrained.
-  @ImplNote:
-    @@lang:en
-    @@@:
-      The actual process of the method and the attribute in this 
-      interface is not defined here, since each use of this interface 
-      requires different treatment of it to be <QUOTE:live> object. 
-    \
-      See also <Module:ManakaiDOMCore> module.
+  @IsAbstract:1
   @Method:
      @@Name:  item
      @@Description:
@@ -4469,14 +4497,7 @@ IF:
             @@@@@@:
               The "index" is invalid, i.e. it is greater than or 
               equal to the number of nodes in the list.
-        @@@Def:
-          @@@@Type:
-             lang:dis
-          @@@@Overridden:1
-    @@RedefinedBy:
-      ManakaiDOMCore:ManakaiDOMChildNodeList
-    @@RedefinedBy:
-      ManakaiDOMCore:ManakaiDOMGetElementsNodeList
+     @@IsAbstract:1
   @Attr:
      @@Name:  length
      @@Description:
@@ -4485,14 +4506,7 @@ IF:
          The number of nodes in the list.
      @@Get:
         @@@Type:  unsigned-long
-        @@@Def:
-          @@@@Type:
-             lang:dis
-          @@@@Overridden:1
-    @@RedefinedBy:
-      ManakaiDOMCore:ManakaiDOMChildNodeList
-    @@RedefinedBy:
-      ManakaiDOMCore:ManakaiDOMGetElementsNodeList
+     @@IsAbstract:1
 
 IF:
   @Name:  NamedNodeMap
@@ -4507,14 +4521,7 @@ IF:
       a <IF:NamedNodeMap>.
     \
     \ <IF:NamedNodeMap> objects are <QUOTE:live>.
-  @ImplNote:
-    @@lang:en
-    @@@:
-      The actual process of methods and the attribute in this 
-      interface is not defined here, since each use of this interface 
-      requires different treatment of it to be live object. 
-    \
-      See also <Module:ManakaiDOMCore> and <Module:ManakaiDOMXML> modules.
+  @IsAbstract:1
   @Method:
      @@Name:  getNamedItem
      @@Description:
@@ -4539,16 +4546,7 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: The "name" does not identify any node in this map.
-        @@@Def:
-          @@@@Type:
-            lang:dis
-          @@@@Overridden:1
-    @@RedefinedBy:
-      ManakaiDOMCore:ManakaiDOMAttributes 
-    @@RedefinedBy:
-      ManakaiDOMXML:ManakaiDOMEntities
-    @@RedefinedBy:
-      ManakaiDOMXML:ManakaiDOMNotations
+      @@IsAbstract:1
   @Method:
      @@Name:  setNamedItem
      @@Description:
@@ -4612,10 +4610,6 @@ IF:
           @@@@ImplNote:
             @@@@@lang:en
             @@@@@@: This exception has added by the DOM Level 2 Errata.
-        @@@Def:
-          @@@@Type:
-            lang:dis
-          @@@@Overridden:1
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -4623,12 +4617,7 @@ IF:
          name?  If it is, can that node be retrieved via the "NS" methods? 
          Is it possible to add the node that has "nodeName" crushing 
          with existing "NS" node?
-    @@RedefinedBy:
-      ManakaiDOMCore:ManakaiDOMAttributes 
-    @@RedefinedBy:
-      ManakaiDOMXML:ManakaiDOMEntities
-    @@RedefinedBy:
-      ManakaiDOMXML:ManakaiDOMNotations
+    @@IsAbstract:1
   @Method:
      @@Name:  removeNamedItem
      @@Description:
@@ -4670,16 +4659,7 @@ IF:
             @@@@@lang:en
             @@@@@@:
               This exception is added by the DOM Level 1 First Edition Errata.
-        @@@Def:
-          @@@@Type:
-             lang:dis
-          @@@@Overridden:1
-    @@RedefinedBy:
-      ManakaiDOMCore:ManakaiDOMAttributes 
-    @@RedefinedBy:
-      ManakaiDOMXML:ManakaiDOMEntities
-    @@RedefinedBy:
-      ManakaiDOMXML:ManakaiDOMNotations
+    @@IsAbstract:1
   @Method:
      @@Name:  item
      @@Description:
@@ -4704,16 +4684,7 @@ IF:
             @@@@@@: 
               The "index" is invalid, i.e. it is greater than or 
               equal to the number of nodes in this map.
-        @@@Def:
-          @@@@Type:
-            lang:dis
-          @@@@Overridden:1
-    @@RedefinedBy:
-      ManakaiDOMCore:ManakaiDOMAttributes 
-    @@RedefinedBy:
-      ManakaiDOMXML:ManakaiDOMEntities
-    @@RedefinedBy:
-      ManakaiDOMXML:ManakaiDOMNotations
+      @@IsAbstract:1
   @Attr:
      @@Name:  length
      @@Description:
@@ -4721,16 +4692,7 @@ IF:
        @@@@: The number of nodes in this map.
      @@Get:
         @@@Type:  unsigned-long
-        @@@Def:
-          @@@@Type:
-            lang:dis
-          @@@@Overridden:1
-    @@RedefinedBy:
-      ManakaiDOMCore:ManakaiDOMAttributes 
-    @@RedefinedBy:
-      ManakaiDOMXML:ManakaiDOMEntities
-    @@RedefinedBy:
-      ManakaiDOMXML:ManakaiDOMNotations
+    @@IsAbstract:1
   @Method:
      @@Name:  getNamedItemNS
      @@Description:
@@ -4782,10 +4744,7 @@ IF:
               The DOM implementation does not support the feature "XML" and 
               the language exposed through the "Document" does not 
               support XML Namespaces.
-         @@@Def:
-           @@@@Type:
-             lang:dis
-           @@@@Overridden:1
+     @@IsAbstract:1
      @@Level[list]:  2
      @@SpecLevel:2
      @@ImplNote:
@@ -4794,13 +4753,7 @@ IF:
          The DOM Level 2 Specification said that the HTML-only DOM 
          implenentations do not need to implement this method. 
          The DOM Level 2 Errata and the DOM Level 3 Specification 
-         says that the NOT_SUPPORTED_ERR should be raised.
-    @@RedefinedBy:
-      ManakaiDOMCore:ManakaiDOMAttributes 
-    @@RedefinedBy:
-      ManakaiDOMXML:ManakaiDOMEntities
-    @@RedefinedBy:
-      ManakaiDOMXML:ManakaiDOMNotations
+         says that the <Q:NOT_SUPPORTED_ERR> should be raised.
   @Method:
      @@Name:  setNamedItemNS
      @@Description:
@@ -4874,10 +4827,7 @@ IF:
              the language exposed through the "Document" does not 
              support XML Namespaces
            @@@@SpecLevel:2
-         @@@Def:
-           @@@@Type:
-             lang:dis
-           @@@@Overridden:1
+     @@IsAbstract:1
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -4887,12 +4837,6 @@ IF:
          says that the NOT_SUPPORTED_ERR should be raised.
      @@Level[list]:  2
      @@SpecLevel:2
-    @@RedefinedBy:
-      ManakaiDOMCore:ManakaiDOMAttributes 
-    @@RedefinedBy:
-      ManakaiDOMXML:ManakaiDOMEntities
-    @@RedefinedBy:
-      ManakaiDOMXML:ManakaiDOMNotations
   @Method:
      @@Name:  removeNamedItemNS
      @@Description:
@@ -4947,10 +4891,7 @@ IF:
              The DOM implementation does not support the feature "XML" and 
              the language exposed through the "Document" does not 
              support XML Namespaces
-         @@@Def:
-           @@@@Type:
-             lang:dis
-           @@@@Overridden:1
+     @@IsAbstract:1
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -4960,12 +4901,6 @@ IF:
          says that the NOT_SUPPORTED_ERR should be raised.
      @@Level[list]:  2
      @@SpecLevel:2
-    @@RedefinedBy:
-      ManakaiDOMCore:ManakaiDOMAttributes 
-    @@RedefinedBy:
-      ManakaiDOMXML:ManakaiDOMEntities
-    @@RedefinedBy:
-      ManakaiDOMXML:ManakaiDOMNotations
 ## IF:NamedNodeMap
 
 IF:

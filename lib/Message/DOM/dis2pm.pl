@@ -182,6 +182,26 @@ sub perl_package_name (%) {
     #$r = ns_uri_to_perl_package_name (ns_prefix_to_uri ($opt{ns_prefix})) .
     #     '::' . $opt{name};
     $r = $ManakaiDOMModulePrefix . '::' . $opt{name};
+  } elsif ($opt{if_qname} or $opt{if_qname_with_condition}) {
+    if ($opt{if_qname_with_condition}) {
+      if ($opt{if_qname_with_condition} =~ /^(.+)::([^:]*)$/) {
+        $opt{if_qname} = $1;
+        $opt{condition} = $2;
+      } else {
+        $opt{if_qname} = $opt{if_qname_with_condition};
+      }
+    }
+    if ($opt{if_qname} =~ /^([^:]*):(.*)$/) {
+      $opt{ns_prefix} = $1;
+      $opt{name} = $2;
+    } else {
+      $opt{ns_prefix} = DEFAULT_PFX;
+      $opt{name} = $opt{if_qname};
+    }
+    ## ISSUE: Prefix to ...
+    #$r = ns_uri_to_perl_package_name (ns_prefix_to_uri ($opt{ns_prefix})) .
+    #     '::' . $opt{name};
+    $r = $ManakaiDOMModulePrefix . '::IF::' . $opt{name};
   } elsif ($opt{full_name}) {
     $r = $opt{full_name};
   } else {
@@ -309,6 +329,8 @@ sub perl_code ($;%) {
             unless $opt{internal};
           $r = perl_comment ("INT: $name").
                $opt{internal}->($name);
+        } elsif ($data =~ s/^SP://) {
+          $r = '___'.$data;
         } else {
           $r = perl_internal_name $data;
         }
@@ -832,6 +854,27 @@ sub perl_builtin_code ($;%) {
                     node => $opt{node};
       $r =~ s/\$$_/\$$opt{$_}/g;
     }
+  } elsif ($name eq 'ParseFeatures') {
+    $r = q{
+      {
+        my @f = grep {length} split /\s+/, $in;
+        for (my $i = 0; $i < @f; $i++) {
+          if ($i + 1 < @f and $f[$i + 1] =~ /^\d/) {
+            $out{lc $f[$i]} = $f[$i + 1]; $i++;
+          } else {
+            $out{lc $f[$i]} = undef;
+          }
+        }
+      }
+    };           ## NOTE: Feature name is case-insensitive.
+    ## NOTE: This code does not work if a feature appears more than
+    ##       one versions.  DOM specification does not specify how 
+    ##       implementations should cope with such case.
+    for (qw/in out/) {
+      $opt{$_} or valid_err qq<Built-in code parameter "$_" required>,
+                    node => $opt{node};
+      $r =~ s/\$$_/\$$opt{$_}/g;
+    }
   } else {
     valid_err qq<Built-in code "$name" not defined>;
   }
@@ -922,13 +965,38 @@ sub perl_if ($$;$) {
 
 sub ops2perl () {
   my $result = '';
-  if ($Status->{Operator}->{DESTROY}) {
-    $result .= perl_statement q<sub DESTROY ($)>;
-    $result .= perl_statement
+  for (keys %{$Status->{Operator}}) {
+    if ($_ eq 'DESTROY') {
+      $result .= perl_statement q<sub DESTROY ($)>;
+      $result .= perl_statement
                  perl_assign
                       perl_var (type => '*', local_name => 'DESTROY')
                    => $Status->{Operator}->{DESTROY};
-    delete $Status->{Operator}->{DESTROY};
+      delete $Status->{Operator}->{DESTROY};
+    } elsif ($_ eq 'new') {
+      $result .= perl_statement q<sub new ($)>;
+      $result .= perl_statement
+                 perl_assign
+                      perl_var (type => '*', local_name => 'new')
+                   => $Status->{Operator}->{$_};
+      delete $Status->{Operator}->{$_};
+    } elsif ({qw[
+                  +  1 -  1 *  1 /  1 %  1 **  1 <<  1 >>  1 x  1 .  1
+                  += 1 -= 1 *= 1 /= 1 %= 1 **= 1 <<= 1 >>= 1 x= 1 .= 1
+                  <  1 <= 1 >  1 >= 1 == 1 != 1 <=> 1
+                  lt 1 le 1 gt 1 ge 1 eq 1 ne 1 cmp 1
+                  & 1 | 1 ^ 1
+                  neg 1 ! 1 ~ 1
+                  ++ 1 -- 1
+                  atan2 1 cos 1 sin 1 exp 1 abs 1 log 1 sqrt 1
+                  bool 1 "" 1 0+ 1
+                  <> 1
+                  ${} 1 @{} 1 %{} 1 &{} 1 *{} 1
+                ]}->{$_}) {
+      # 
+    } else {
+      valid_err qq[$Status->{if}: Operator "$_" not supported];
+    }
   }
   if (keys %{$Status->{Operator}}) {
     $result .= perl_statement 'use overload ' .
@@ -1802,6 +1870,10 @@ sub get_redef_description ($;%) {
                                  : qq<super-$opt{if} of this $opt{if}>).
                          q< but that definition has been overridden here.>;
   }
+  if ($node->get_attribute_value ('IsAbstract', default => 0)) {
+    push @desc, pod_para (qq<This $opt{method} is defined abstractly; >.
+                          qq<it must be overridden by cocrete implementation. >);
+  }
     my @redefBy;
     for (@{$node->child_nodes}) {
       next unless $_->node_type eq '#element' and
@@ -1819,25 +1891,43 @@ sub get_redef_description ($;%) {
 
 sub get_isa_description ($;%) {
   my ($node, %opt) = @_;
-  $opt{if} ||= 'interface';
+  $opt{if} ||= $node->get_attribute_value ('IsAbstract', default => 0)
+                          ? 'interface' : 'class';
   my @desc;
   my @isa;
+  my @impl;
   for (@{$node->child_nodes}) {
-    next unless $_->node_type eq '#element' and
-                $_->local_name eq 'ISA';
-    my $v = $_->value;
-    if (type_expanded_uri $_->get_attribute_value ('Type',
-                                                   default => 'DOMMain:any') eq
-        ExpandedURI q<lang:Perl>) {
-      push @isa, pod_link (module => $v);
-    } else {
+    next unless $_->node_type eq '#element';
+    if ($_->local_name eq 'ISA') {
+      my $v = $_->value;
+      if (type_expanded_uri $_->get_attribute_value ('Type',
+                                                     default => 'DOMMain:any') eq
+          ExpandedURI q<lang:Perl>) {
+        push @isa, pod_link (module => $v);
+      } else {
+        $v =~ s/::[^:]*$//g;
+        push @isa, type_label (type_expanded_uri ($v), is_pod => 1);
+      }
+    } elsif ($_->local_name eq 'Implement') {
+      my $v = $_->value;
       $v =~ s/::[^:]*$//g;
-      push @isa, type_label (type_expanded_uri ($v), is_pod => 1);
+      push @impl, type_label (type_expanded_uri ($v), is_pod => 1);
     }
   }
-  push @desc, pod_para (qq<This $opt{if} inherits >.
-                        english_list (\@isa, connector => 'and').q<.>)
-    if @isa;
+  if (@isa and @impl) {
+    push @desc, pod_para (qq<This $opt{if} inherits >.
+                          english_list (\@isa, connector => 'and').
+                          qq< and implements >.
+                          (@impl>1?q<interfaces >:q<the interface >).
+                          english_list (\@impl, connector => 'and').q<.>);
+  } elsif (@isa) {
+    push @desc, pod_para (qq<This $opt{if} inherits >.
+                          english_list (\@isa, connector => 'and').q<.>);
+  } elsif (@impl) {
+    push @desc, pod_para (qq<This $opt{if} implements >.
+                          (@impl>1?q<interfaces >:q<the interface >).
+                          english_list (\@impl, connector => 'and').q<.>);
+  }
   @desc;
 } # get_isa_description
 
@@ -2187,17 +2277,35 @@ sub if2perl ($) {
   local $Info->{Require_perl_package} = {%{$Info->{Require_perl_package}}};
   local $Info->{Require_perl_package_use} = {};
   local $Status->{is_implemented} = 1;
+  my $is_abs = $node->get_attribute ('IsAbstract', default => 0);
+  my $is_fin = $node->get_attribute ('IsFinal', default => 0);
+  $is_fin = -1 if $is_abs;           # 1=no subclass, 0=free, -1=must be subclass
+  my $impl_by_app = $node->get_attribute ('ImplByApp', default => 0);
 
   my @level;
   my $mod = get_level_description $node, level => \@level;
-  $mod = ', that has been ' . $mod if $mod;
-  my $result = pod_block
-               pod_head ($Status->{depth}, 'Interface ' . pod_code $if_name),
-               pod_paras (get_description ($node)),
-               pod_para ('The package ' . pod_code ($pack_name) .
-                         q< implements the DOM interface > .
-                         pod_code ($if_name) . $mod . q<.>),
-               get_isa_description ($node);
+
+  push my @desc,
+               pod_head ($Status->{depth}, 'Interface ' . pod_code ($if_name).
+                         ($is_abs?'':', Class '.pod_code ($pack_name)));
+
+  push @desc, pod_paras (get_description ($node));
+  push @desc, pod_para ('This interface is ' . $mod . q<.>) if $mod;
+
+  if ($impl_by_app) {
+    push @desc, pod_para ('This interface is intended to be implemented '.
+                          'by DOM applications.  To implement this '.
+                          'interface, put the statement '),
+                pod_pre ('push our @ISA, q<'.($is_abs?$if_name:$pack_name).'>;'),
+                pod_para ('on your package and define methods and '.
+                          'attributes.');
+  }
+
+  push @desc, get_isa_description ($node);
+
+  my $result = pod_block @desc;
+
+  my $has_role = $node->get_attribute ('Role');
   
   for my $condition ((sort keys %{$Info->{Condition}}), '') {
     if ($condition =~ /^DOM(\d+)$/) {
@@ -2218,18 +2326,22 @@ sub if2perl ($) {
     my @isa;
     for (@{$node->child_nodes}) {
       next unless $_->node_type eq '#element' and
-                  $_->local_name eq 'ISA' and
                   condition_match $_, condition => $condition,
                                       default_any => 1, ge => 1;
-      push @isa, perl_package_name qname_with_condition => $_->value,
-                                   condition => $condition,
-                                   is_internal => 1;
+      if ($_->local_name eq 'ISA') {
+        push @isa, perl_package_name qname_with_condition => $_->value,
+                                     condition => $condition,
+                                     is_internal => 1;
+      } elsif ($_->local_name eq 'Implement') {
+        push @isa, perl_package_name if_qname_with_condition => $_->value,
+                                     condition => $condition;
+      }
     }
     push @isa, perl_package_name (name => 'ManakaiDOMObject')
       unless $if_name eq 'ManakaiDOMObject';
     $result .= perl_inherit [$cond_int_pack_name, @isa] => $cond_pack_name;
+    my @isaa;
     if ($condition) {
-      my @isaa;
       for (@{$Info->{Condition}->{$condition}->{ISA}}) {
         push @isaa, perl_package_name name => $if_name,
                                      condition => $_,
@@ -2242,9 +2354,10 @@ sub if2perl ($) {
       $result .= perl_inherit [$if_pack_name] => $cond_if_pack_name;
     } else { ## No condition specified
       if ($Info->{NormalCondition}) {
-        $result .= perl_inherit [perl_package_name name => $if_name,
+        push @isaa, perl_package_name name => $if_name,
                                      condition => $Info->{NormalCondition},
-                                     is_internal => 1]
+                                     is_internal => 1;
+        $result .= perl_inherit [@isaa]
                               => $cond_int_pack_name;
       } else {  ## Condition not used
         $result .= perl_inherit [$iif_pack_name] => $cond_int_pack_name;
@@ -2260,6 +2373,7 @@ sub if2perl ($) {
                    => version_date time;
     }
 
+    my @feature;
     for (@{$node->child_nodes}) {
       my $gt = 0;
       unless (condition_match $_, level_default => \@level,
@@ -2293,13 +2407,77 @@ sub if2perl ($) {
           unless $gt;
       } elsif ($_->local_name eq 'Require') {
         $result .= req2perl ($_, level => \@level, condition => $condition);
-      } elsif ({qw/Name 1 Spec 1 ISA 1 Description 1
-                   Level 1 SpecLevel 1 ImplNote 1/}->{$_->local_name}) {
+      } elsif ($_->local_name eq 'Feature') {
+        push @feature, $_;
+      } elsif ({qw/Name 1 Spec 1 ISA 1 Description 1 Implement 1
+                   Level 1 SpecLevel 1 ImplNote 1 Role 1
+                   IsAbstract 1 IsFinal 1 ImplByApp 1/}->{$_->local_name}) {
         #
       } else {
         valid_warn qq{Element @{[$_->local_name]} not supported};
       }
     }
+
+    if ($has_role) {
+      my $role = type_expanded_uri $has_role->value;
+      if ($role eq ExpandedURI q<DOMCore:DOMImplementationSource>) {
+        $result .= perl_statement
+                     q<push @org::w3c::dom::DOMImplementationSourceList, >.
+                     perl_literal $cond_pack_name;
+      } else {
+        my $var = q<@{>.perl_var (type => '$',
+                            local_name => $ManakaiDOMModulePrefix.'::Role').
+                  q<{>.perl_literal ($role).q<}}>;
+        $result .= perl_statement
+                     'push '.$var.q<, >.
+                     perl_list {
+                       class => $cond_pack_name,
+                       constructor => 'new',
+                     };
+      }
+    }
+
+    if (@feature or $has_role) {
+      $result .= '{' . perl_statement 'our $Feature';
+      for (@feature) {
+        my $name = $_->get_attribute ('QName');
+                              if ($name) {
+                                $name = type_expanded_uri ($name->value);
+                              } else {
+                                $name = $_->get_attribute_value ('Name');
+                              }
+        $result .= perl_statement '$Feature->{'.perl_literal ($name).'}->{'.
+                   perl_literal ($_->get_attribute_value ('Version')).
+                   '} = 1';
+      }
+
+      $result .= perl_sub
+                   name => '___classHasFeature',
+                   prototype => '$%',
+                   code => 
+                     perl_statement ('my ($self, %f) = @_').
+                     q[
+                       for (keys %f) {
+                         if ($Feature->{$_}) {
+                           if (defined $f{$_}) {
+                             delete $f{$_} if $Feature->{$_}->{$f{$_}};
+                           } else {
+                             delete $f{$_} if keys %{$Feature->{$_}};
+                           }
+                           return 1 if keys (%f) == 0;
+                         }
+                       }
+                     ].
+                     q[for (].perl_list (@isa, @isaa).q[) {
+                       if (my $c = $_->can ('___classHasFeature')) {
+                         if ($c->($self, %f)) {
+                           return 1;
+                         }
+                       }
+                     }].
+                     perl_statement (q<return 0>);
+      $result .= '}';
+    } 
     
     $result .= ops2perl;
   }
@@ -2415,6 +2593,20 @@ sub method2perl ($;%) {
     push @desc, pod_para (q<This method has no parameter.>);
   }
 
+  my $is_abs = $node->get_attribute_value ('IsAbstract', default => 0);
+  if ($is_abs) {
+    unless (get_perl_definition_node $return, 
+                              condition => $opt{condition},
+                              level_default => $opt{level_default},
+                              use_dis => 1) {
+      for ($return->append_new_node (type => '#element',
+                                     local_name => 'Def')) {
+        $_->set_attribute ('Type' => ExpandedURI q<lang:dis>);
+        $_->set_attribute ('Overridden' => 1);
+      }
+    }
+  }
+
   my @return;
   my @exception;
   my $has_exception = 0;
@@ -2426,8 +2618,8 @@ sub method2perl ($;%) {
                               condition => $opt{condition},
                               level_default => $opt{level_default},
                               use_dis => 1;
-  my $code = '';
-  my $int_code = '';
+  my $code;
+  my $int_code;
   for ({code => \$code, code_node => $code_node,
         internal => sub {
           return get_internal_code $node, $_[0] if $_[0];
@@ -2657,6 +2849,20 @@ sub attr2perl ($;%) {
                $level ? pod_para ('The method ' . pod_code ($m_name) .
                            q< has been > . $level . '.') : ();
 
+  my $is_abs = $node->get_attribute_value ('IsAbstract', default => 0);
+  if ($is_abs) {
+    unless (get_perl_definition_node $return, 
+                              condition => $opt{condition},
+                              level_default => $opt{level_default},
+                              use_dis => 1) {
+      for ($return->append_new_node (type => '#element',
+                                     local_name => 'Def')) {
+        $_->set_attribute ('Type' => ExpandedURI q<lang:dis>);
+        $_->set_attribute ('Overridden' => 1);
+      }
+    }
+  }  
+
   my $code_node = get_perl_definition_node $return,
                               condition => $opt{condition},
                               level_default => $opt{level_default},
@@ -2667,6 +2873,18 @@ sub attr2perl ($;%) {
                               use_dis => 1;
   my ($set_code_node, $int_set_code_node);
   if ($has_set) {
+    if ($is_abs) {
+      unless (get_perl_definition_node $set, 
+                                condition => $opt{condition},
+                                level_default => $opt{level_default},
+                                use_dis => 1) {
+        for ($return->append_new_node (type => '#element',
+                                       local_name => 'Def')) {
+          $_->set_attribute ('Type' => ExpandedURI q<lang:dis>);
+          $_->set_attribute ('Overridden' => 1);
+        }
+      }
+    }  
     $set_code_node = get_perl_definition_node $set,
                               condition => $opt{condition},
                               level_default => $opt{level_default},
@@ -3654,7 +3872,8 @@ that is required by entire module.
 $Info->{source_filename} = $ARGV;
 
 ## Initial Namespace bindings
-for ([ManakaiDOM => ExpandedURI q<ManakaiDOM:>]) {
+for ([ManakaiDOM => ExpandedURI q<ManakaiDOM:>],
+     [http => q<http:>]) {
   $Info->{Namespace}->{$_->[0]} = $_->[1];
 }
 
@@ -3851,14 +4070,42 @@ for my $condition (sort keys %{$Info->{Condition}}, '') {
                                               perl_literal ($f_name) .
                                               ', null)') .
                                     ' will return ' . pod_code ('true') . '.');
-      $result .= perl_statement 
-                   perl_assign 
-                     '$' . $ManakaiDOMModulePrefix.'::FeatureImplemented{' .
-                       perl_literal (lc $f_name) . '}->{' .
-                                    ## Feature name is case-insensitive.
-                       perl_literal ($f_ver) . '}'
-                     => 1;
     }
+
+    for (@{$Feature->child_nodes}) {
+      next unless $_->node_type eq '#element';
+      if ($_->local_name eq 'Contrib') {
+        my $n = $_->value;
+        my $ccondition;
+        if ($n =~ s/::([^:]*)$//) {
+          $ccondition = $1;
+        }
+        if ($n =~ s/^[^:]*://) {
+          # currently prefix is not used
+        }
+        $result .= perl_statement
+                   perl_assign
+                     perl_var (type => '$',
+                               package => {
+                                 name => $n,
+                                 condition => $ccondition,
+                                 is_internal => 1,
+                               },
+                               local_name => 'Feature').
+                           ## Feature name is case-insensitive
+                     '->{'.perl_literal (lc $f_name).'}->{'.
+                     perl_literal (@$not_implemented ? '+dummy+' : $f_ver) . '}'
+                     => 1;
+      } elsif ({
+                  qw/Name 1 QName 1 FullName 1 Version 1 
+                     Description 1 ImplNote 1 Spec 1
+                     Condition 1 /
+               }->{$_->local_name}) {
+      } else {
+        valid_err q<Unknown element type>, node => $_;
+      }
+    }
+
     $features++;
   }
 }
@@ -4116,6 +4363,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/09/27 12:11:53 $
+# $Date: 2004/09/29 12:39:32 $
 
 

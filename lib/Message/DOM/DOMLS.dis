@@ -36,7 +36,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/09/27 12:11:53 $
+     $Date: 2004/09/29 12:39:32 $
 
   @ConditionDef:
     @@Name:DOM3
@@ -52,6 +52,9 @@ Module:
       @@@lang:en
       @@@@:
         Support of <Feature:Core>/<FeatureVer:2.0> is required.
+    @@Condition:DOM3
+    @@Contrib:
+      DOMImplementationLS::DOM3
 
   @Feature:
     @@Name:LS-Async
@@ -65,6 +68,9 @@ Module:
       @@@lang:en
       @@@@:
         Support of <Feature:LS>/<FeatureVer:3.0> is required.
+    @@Condition:DOM3
+    #@@Contribute:
+    #  DOMImplementationLS::DOM3
 
   @Require:
      @@Module:
@@ -263,6 +269,10 @@ IF:
       methods on an instance of the <IF:DOMImplementation> interface 
       or <M:DOMImplementation.getFeature> with parameters <Feature:LS> or 
       <Feature:LS-Async> version <FeatureVer:3.0>.
+  
+  @Role:
+    DOMCore:DOMImplementation
+   
   @ConstGroup:
      @@Name:  DOMImplementationLSMode
      @@Type:

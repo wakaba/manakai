@@ -38,7 +38,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/09/27 03:54:23 $
+     $Date: 2004/09/29 12:39:32 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -64,6 +64,12 @@ Module:
     @@Description:
       @@@lang:en
       @@@@: The Manakai DOM Core Module, Level 1.
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM1
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM2
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM3
   @Feature:
     @@QName:
       ManakaiDOM:ManakaiDOMCore
@@ -74,6 +80,10 @@ Module:
     @@Description:
       @@@lang:en
       @@@@: The Manakai DOM Core Module, Level 2.
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM2
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM3
   @Feature:
     @@QName:
       ManakaiDOM:ManakaiDOMCore
@@ -83,6 +93,8 @@ Module:
     @@Description:
       @@@lang:en
       @@@@: The Manakai DOM Core Module, Level 3.
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM3
 
 IF:
   @Name: ManakaiDOMNodeObjectNode
@@ -797,13 +809,13 @@ IF:
   @Name:  ManakaiDOMChildNodeList
   @ISA:
     ManakaiDOM:ManakaiDOMNodeReference
-  @ISA: 
+  @Implement: 
     DOMCore:NodeList
   @Description:
     @@lang:en
     @@@:
       An ordered collection of child nodes.
-  @ReMethod:
+  @Method:
      @@Name:  item
      @@Description:
        @@@lang:en
@@ -843,9 +855,7 @@ IF:
       1
       2
       3
-    @@Redefine:
-      DOMCore:NodeList
-  @ReAttr:
+  @Attr:
      @@Name:  length
      @@Description:
        @@@lang:en
@@ -858,8 +868,6 @@ IF:
              lang:dis
           @@@@@:
             $r = @{$self->{<Q:TreeCore:node>}->{<Q:infoset:children>}};
-    @@Redefine:
-       DOMCore:NodeList
 
   @IntMethod:
     @@Name: isEqualNodeList
@@ -910,12 +918,14 @@ IF:
 IF:
   @Name: ManakaiDOMGetElementsNodeList
   @ISA:
+    ManakaiDOM:ManakaiDOMNodeReference
+  @Implement:
     DOMCore:NodeList
   @Description:
     @@lang:en
     @@@:
       An ordered collection of nodes, returned by "getElementsBy"-methods.
-  @ReMethod:
+  @Method:
      @@Name:  item
      @@Description:
        @@@lang:en
@@ -942,9 +952,7 @@ IF:
               The "index" is invalid, i.e. it is greater than or 
               equal to the number of nodes in the list.
 
-    @@Redefine:
-      DOMCore:NodeList
-  @ReAttr:
+  @Attr:
      @@Name:  length
      @@Description:
        @@@lang:en
@@ -952,15 +960,13 @@ IF:
          The number of nodes in the list.
      @@Get:
         @@@Type:  unsigned-long
-    @@Redefine:
-      DOMCore:NodeList
 ## IF:ManakaiDOMGetElementsNodeList
 
 IF:
   @Name: ManakaiDOMAttributes
   @ISA:
     ManakaiDOM:ManakaiDOMNodeReference
-  @ISA:
+  @Implement:
     DOMCore:NamedNodeMap
   @Description:
     @@lang:en
@@ -1063,7 +1069,7 @@ IF:
       @@@@:
         The same internal method is defined in <IF:Element>.
 
-  @ReMethod:
+  @Method:
      @@Name:  getNamedItem
      @@Description:
        @@@lang:en
@@ -1110,9 +1116,7 @@ IF:
       1
       2
       3
-    @@Redefine:
-      DOMCore:NamedNodeMap
-  @ReMethod:
+  @Method:
      @@Name:  setNamedItem
      @@Description:
        @@@lang:en
@@ -1266,9 +1270,7 @@ IF:
       1
       2
       3
-    @@Redefine:
-      DOMCore:NamedNodeMap
-  @ReMethod:
+  @Method:
      @@Name:  removeNamedItem
      @@Description:
         @@@lang:en
@@ -1345,9 +1347,7 @@ IF:
       1
       2
       3
-    @@Redefine:
-      DOMCore:NamedNodeMap
-  @ReMethod:
+  @Method:
      @@Name:  item
      @@Description:
        @@@lang:en
@@ -1394,9 +1394,7 @@ IF:
       @@@lang:en
       @@@@:
         How ordering attributes is not specified.
-    @@Redefine:
-      DOMCore:NamedNodeMap
-  @ReAttr:
+  @Attr:
      @@Name:  length
      @@Description:
        @@@lang:en
@@ -1410,8 +1408,6 @@ IF:
             for (values %{$self->{<Q:TreeCore:node>}->{<Q:infoset:attributes>}}) {
               $r += keys %$_;
             }
-    @@Redefine:
-      DOMCore:NamedNodeMap
 
   @IntMethod:
      @@Name: selectAttrNodeObjectNS
@@ -1470,7 +1466,7 @@ IF:
       @@@@:
         The same internal method is defined in <IF:Element>.
 
-  @ReMethod:
+  @Method:
      @@Name:  getNamedItemNS
      @@Description:
        @@@lang:en
@@ -1539,9 +1535,7 @@ IF:
         2
         3
      @@SpecLevel:2
-    @@Redefine:
-      DOMCore:NamedNodeMap
-  @ReMethod:
+  @Method:
      @@Name:  setNamedItemNS
      @@Description:
        @@@lang:en
@@ -1721,9 +1715,7 @@ IF:
          The DOM Level 2 Errata and the DOM Level 3 Specification 
          says that the NOT_SUPPORTED_ERR should be raised.
      @@SpecLevel:2
-    @@Redefine:
-      DOMCore:NamedNodeMap
-  @ReMethod:
+  @Method:
      @@Name:  removeNamedItemNS
      @@Description:
         @@@lang:en
@@ -1829,8 +1821,6 @@ IF:
         2
         3
      @@SpecLevel:2
-    @@Redefine:
-      DOMCore:NamedNodeMap
 
   @IntMethod:
     @@Name: isEqualNamedNodeMap

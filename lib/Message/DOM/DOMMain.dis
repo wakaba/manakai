@@ -35,7 +35,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/09/27 12:11:53 $
+     $Date: 2004/09/29 12:39:32 $
   
   @Feature:
     @@QName:
@@ -48,6 +48,12 @@ Module:
     @@Description:
       @@@lang:en
       @@@@: The manakai DOM implementation DOMMain Module, Level 1.
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM1
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM2
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM3
   @Feature:
     @@QName:
       ManakaiDOM:DOMMain
@@ -58,6 +64,10 @@ Module:
     @@Description:
       @@@lang:en
       @@@@: The manakai DOM implementation DOMMain Module, Level 2.
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM2
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM3
   @Feature:
     @@QName: 
       ManakaiDOM:DOMMain
@@ -66,6 +76,8 @@ Module:
     @@Description:
       @@@lang:en
       @@@@: The manakai DOM implementation DOMMain Module, DOM Level 3.
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM3
   
   @Require:
     @@Module:
@@ -1140,7 +1152,8 @@ IF:
            lang:Perl
          @@@@@:
            __DEEP{
-             for (@$self) {
+             for (@{ref $self ? $self
+                              : @org::w3c::dom::DOMImplementationSourceList}) {
                $r = $_->getDOMImplementation ($features);
                last if defined $r;
              }
@@ -1164,7 +1177,8 @@ IF:
          @@@@@:
            __DEEP{
              $r = __CLASS{DOMImplementationList}__->__INT{new}__;
-             for (@$self) {
+             for (@{ref $self ? $self
+                              : @org::w3c::dom::DOMImplementationSourceList}) {
                $r->__INT{append}__ ($_->getDOMImplementationList ($features));
              }
            }__;
