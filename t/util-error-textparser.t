@@ -52,6 +52,7 @@ my @test = (
     ok (1);
   },
   sub {
+    $err->reset_position (1);
     eval q{$err->raise (type => 'ERR_1', position => 1)};
     ok ($@ =~ /Line 0 position 0/);
   },
@@ -110,4 +111,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/08/05 12:20:00 $
+1; # $Date: 2003/10/31 08:39:27 $

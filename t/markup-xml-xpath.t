@@ -3,6 +3,7 @@ use strict;
 require Test::Simple; sub ok ($;$);
 use Message::Markup::XML::XPath;
 use Message::Markup::XML;
+use Message::Markup::XML::QName qw/NULL_URI DEFAULT_PFX UNDEF_URI/;
 
 my $e = Message::Markup::XML->new (type => '#element',
 	                           namespace_uri => q<http://e.test/>,
@@ -49,12 +50,12 @@ my @s = (
             ok $expr eq $xpr, $expr;
             
             $e->{ns} = {};
-            $e->define_new_namespace ('' => q<http://e.test/>);
+            $e->define_new_namespace ((DEFAULT_PFX) => q<http://e.test/>);
             $e->set_attribute (expr => $p);
             my $el = $e . '';
             ok $el eq qq<<e expr="$xpr" xmlns="http://e.test/" xmlns:xpath.test="http://xpath.test/"></e>>, $el;
-          },1,
-         },
+          },
+         },1,
         );
 
 
@@ -101,5 +102,5 @@ Test::Simple->import (tests => scalar @s);
 
                               
 for (@s) {
-  &{$_->{g}};
+  $_->{g}->() if ref $_;
 }

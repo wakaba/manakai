@@ -1,6 +1,6 @@
 use strict;
 require Test::Simple;
-
+no warnings 'deprecated'; # v-string is deprecated
 require Message::Util::HostPermit;
 sub ok ($;$);
 sub new_checker () {
@@ -36,8 +36,8 @@ my @test = (
             sub {
               my $checker = new_checker;
               ok $checker->match_ipv4 ('1.1.1.1', '1.1.1.1');
-              ok $checker->match_ipv4 ('1.1.1.1', v1.1.1.1);
-              ok $checker->match_ipv4 (v1.1.1.1, v1.1.1.1);
+              ok $checker->match_ipv4 ('1.1.1.1', 1.1.1.1);
+              ok $checker->match_ipv4 (1.1.1.1, 1.1.1.1);
               
               ok $checker->match_ipv4 ('1.1.1.1/29', '1.1.1.1');
               ok !$checker->match_ipv4 ('1.1.1.1/29', '1.1.1.45');
@@ -76,9 +76,9 @@ my @test = (
               ok $checker->match_ipv4 ('1.1.1.1/0', '1.1.1.0');
               ok $checker->match_ipv4 ('1.1.1.1/0', '123.43.56.23');
               
-              ok do {$checker->match_ipv4 (v1.1.1.1, v1.1.1455.1); 1}, 'invalid addr';
-              ok do {$checker->match_ipv4 (v1.1.1.1, '1.1.1455.1'); 1}, 'invalid addr';
-              ok do {$checker->match_ipv4 (v1.1.1455.1, v1.1.1.1); 1}, 'invalid pattern';
+              ok do {$checker->match_ipv4 (1.1.1.1, 1.1.1455.1); 1}, 'invalid addr';
+              ok do {$checker->match_ipv4 (1.1.1.1, '1.1.1455.1'); 1}, 'invalid addr';
+              ok do {$checker->match_ipv4 (1.1.1455.1, v1.1.1.1); 1}, 'invalid pattern';
               ok do {$checker->match_ipv4 ('1.1.1455.1', v1.1.1.1); 1}, 'invalid pattern';
               ok do {$checker->match_ipv4 ('123', '44.44.3.2'); 1}, 'invalid pattern';
               ok do {$checker->match_ipv4 ('*.12.3.1', '5.4.3.2'); 1}, 'invalid pattern';
@@ -137,6 +137,6 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/27 07:59:11 $
+1; # $Date: 2003/10/31 08:39:27 $
 
 

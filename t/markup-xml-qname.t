@@ -6,7 +6,7 @@ use Message::Markup::XML::QName qw/UNDEF_URI NULL_URI DEFAULT_PFX/;
 sub ok ($;$);
 my $e = new Message::Markup::XML (type => '#element', local_name => 'test',
 	                          namespace_uri => 'http://something.test/');
-
+use Carp q(verbose);
 my @reg_p2n = (
                {
                 prefix => q(test1),
@@ -196,9 +196,11 @@ my @qname = (
              },
              {
               qname  => q":bar",
+              join_qname => q"bar",
               prefix => q"",
               lname  => q"bar",
               result => 0,
+              join_result => 1,
               opt    => {check_qname => 1, check_prefix => 1,
                          check_local_name => 1},
              },
@@ -351,11 +353,20 @@ Test::Simple->import (tests => scalar (@reg_p2n)
                              + scalar (@qname) * 2
                              + scalar (@gen_pfx) * 2
                              + scalar (@expand) * 2);
+eval q{
+sub ok ($;$) {
+  my ($cond, $desc) = @_;
+  if ($cond) {
+    Test::Simple::ok (1);
+  } else {
+    Test::Simple::ok (0, $desc);
+  }
+}};
 
 for (@reg_p2n) {
   my $chk = Message::Markup::XML::QName::register_prefix_to_name
     ($e, $_->{prefix} => $_->{name}, %{$_->{opt}||{}});
-  ok ($chk->{success} == $_->{result}, $chk->{reason});
+  ok ($chk->{success} == $_->{result}, 'Register pfx->URI: '.$chk->{reason});
 }
                
 for (@get_p2n) {
@@ -382,18 +393,19 @@ for (@qname) {
   if ($_->{result}) {
     ok $chk->{prefix}.':'.($chk->{local_name_star} ? '*' : $chk->{local_name})
     eq $_->{prefix} . ':' . $_->{lname},
-      "$chk->{prefix}:$chk->{local_name}($chk->{local_name_star})";
+      "Split 1: $_->{qname} => $chk->{prefix}:$chk->{local_name}($chk->{local_name_star})";
   } else {
     ok $chk->{success} == $_->{result},
-      "$chk->{prefix}:$chk->{local_name}($chk->{local_name_star})";
+      "Split 0: $_->{qname} => $chk->{prefix}:$chk->{local_name}($chk->{local_name_star})";
   }
   
   $chk = Message::Markup::XML::QName::join_qname
     ($_->{prefix}, $_->{lname}, %{$_->{opt}||{}});
-  if ($_->{result}) {
-    ok $chk->{qname} eq $_->{qname}, $chk->{qname};
+  if ((defined $_->{join_result} and $_->{join_result}) or $_->{result}) {
+    ok $chk->{qname} eq ($_->{join_qname} || $_->{qname}), "Join 1: $_->{prefix}, $_->{lname} => $chk->{qname}";
   } else {
-    ok $chk->{success} == $_->{result}, $chk->{qname};
+    ok $chk->{success} == ((defined $_->{join_result} and $_->{join_result}) or $_->{result}),
+       "Join 0: $chk->{success}; $_->{prefix}, $_->{lname} => $chk->{qname}";
   }
 }
 
@@ -404,9 +416,9 @@ for (@gen_pfx) {
   if ($pfx eq $_->{prefix}) {
     my $chk = Message::Markup::XML::QName::register_prefix_to_name
                 ($e, $pfx => $_->{name});
-    ok $chk->{success}, $chk->{reason};
+    ok $chk->{success}, 'Generate pfx: '.$chk->{reason};
   } else {
-    ok $pfx eq $_->{prefix}, ":$pfx: (expected :$_->{prefix}:";
+    ok $pfx eq $_->{prefix}, "Generate pfx: :$pfx: (expected :$_->{prefix}:";
   }
 }
 
@@ -416,7 +428,7 @@ for (@gen_pfx) {
                                                          %{$_->{opt}||{}},
                                                          make_new_prefix => 1);
   ok $chk->{success} && ($chk->{prefix} eq ($_->{n2p} || $_->{prefix})),
-     "$chk->{prefix} (@{[$_->{n2p} || $_->{prefix}]} is expected; $chk->{reason})";
+     "URI->Pfx: $chk->{prefix} (@{[$_->{n2p} || $_->{prefix}]} is expected; $chk->{reason})";
 }
 
 for (@expand) {
@@ -429,7 +441,7 @@ for (@expand) {
               ($e, $_->{qname}, %{$_->{opt}||{}});
   ok $chk->{success} && ($_->{xname}->[0] eq $chk->{name}
                      && $_->{xname}->[1] eq $chk->{local_name}),
-     qq(<$chk->{name}> (should be <$_->{xname}->[0]>), "$chk->{local_name}" (should be "$_->{xname}->[1]") (prefix "$chk->{prefix}"; $chk->{reason}));
+     qq(QName->expand: <$chk->{name}> (should be <$_->{xname}->[0]>), "$chk->{local_name}" (should be "$_->{xname}->[1]") (prefix "$chk->{prefix}"; $chk->{reason}));
 }
 
 for (@expand) {
@@ -440,7 +452,7 @@ for (@expand) {
   }
   my $chk = Message::Markup::XML::QName::expanded_name_to_qname
               ($e, $_->{xname}->[0], $_->{xname}->[1], %{$_->{opt}||{}});
-  ok $chk->{success} && ($_->{qname} eq $chk->{qname}), $chk->{reason};
+  ok $chk->{success} && ($_->{qname} eq $chk->{qname}), 'Expand->QName: '.$chk->{reason};
 }
 
 print $e;
