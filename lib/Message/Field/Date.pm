@@ -6,10 +6,12 @@ date-time used in Internet messages and so on
 
 =cut
 
+## This file is written in UTF-8
+
 package Message::Field::Date;
 use strict;
-use vars qw(%DEFAULT @ISA %MONTH %REG $VERSION %ZONE);
-$VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use vars qw(%DEFAULT %FMT2STR @ISA %MONTH %REG $VERSION %ZONE);
+$VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 use Time::Local 'timegm_nocheck';
@@ -19,11 +21,14 @@ use overload '==' => sub { $_[0]->{date_time} == $_[1] },
              '0+' => sub { $_[0]->{date_time} },
              fallback => 1;
 
+{
 %REG = %Message::Util::REG;
+	my $_ALPHA = q{[A-Za-z]};
+	$_ALPHA = q{[A-Za-z\x{0080}-\x{7FFFFFFF}]} if defined $^V && $^V gt v5.7;
 	## RFC 822/2822 Internet Message Format
 	$REG{M_dt_rfc822} = qr!(?:[A-Za-z]+	## Day of week
 		[\x09\x20,]*)?	([0-9]+)	## Day
-		[\x09\x20/-]*	([A-Za-z]+)	## Month
+		[\x09\x20/-]*	($_ALPHA+)	## Month
 		[\x09\x20/-]*	([0-9]+)	## Year
 		[\x09\x20:Tt-]+	([0-9]+)	## Hour
 		[\x09\x20:]+	([0-9]+)	## Minute
@@ -56,6 +61,7 @@ use overload '==' => sub { $_[0]->{date_time} == $_[1] },
 		[\x09\x20:]*	([0-9][0-9])	## Minute
 		[\x09\x20:]*	([0-9][0-9])?	## Second
 		([\x09\x20 0-9A-Za-z+-]+)!x;	## Zone
+}
 
 =head1 CONSTRUCTORS
 
@@ -77,42 +83,6 @@ The following methods construct new objects:
     #hook_encode_string
     #hook_decode_string
     -output_comment	=> 1,
-    -fmt2str	=> {
-    	CC	=> sub { sprintf $_[2]->{_fmt}, 	## Support AD only
-    	  	         (($_[1]->{$_[2]->{_prefix}.'tm'}->[5] + 1899) / 100) + 1 },
-    	YYYY	=> sub { $_[2]->{_fmt} =~ tr/2/4/;
-    	                 sprintf $_[2]->{_fmt}, 
-    	                         $_[1]->{$_[2]->{_prefix}.'tm'}->[5] + 1900 },
-    	YY	=> sub { sprintf $_[2]->{_fmt}, 
-    	  	         substr ($_[1]->{$_[2]->{_prefix}.'tm'}->[5], -2) },
-    	MM	=> sub { sprintf $_[2]->{_fmt},
-    	                         $_[1]->{$_[2]->{_prefix}.'tm'}->[4] + 1 },
-    	Mon	=> sub { qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec)
-    	   	           [$_[1]->{$_[2]->{_prefix}.'tm'}->[4]] },
-    	Month	=> sub { qw(January February March April May June
-    	   	            July August September October November December)
-    	   	           [$_[1]->{$_[2]->{_prefix}.'tm'}->[4]] },
-    	DD	=> sub { sprintf $_[2]->{_fmt}, $_[1]->{$_[2]->{_prefix}.'tm'}->[3] },
-    	Wdy	=> sub { qw(Sun Mon Tue Wed Thu Fri Sat)
-    	   	           [$_[1]->{$_[2]->{_prefix}.'tm'}->[6]] },
-    	Weekday	=> sub { qw(Sunday Monday Tuesday Wednesday Thursday Friday Saturday)
-    	   	           [$_[1]->{$_[2]->{_prefix}.'tm'}->[6]] },
-    	shun	=> sub {
-    	  my @alphabet = split /:/, $_[2]->{alphabet} || 'abcc';
-    	  my $day = $_[1]->{$_[2]->{_prefix}.'tm'}->[3];
-    	  $day <= 10? $alphabet[0]:	##  1 - 10 joujun
-    	  $day <= 20? $alphabet[1]:	## 11 - 20 chuujun
-    	              $alphabet[2];	## 21 - 31 gejun
-    	},
-    	HH	=> sub { sprintf $_[2]->{_fmt}, $_[1]->{$_[2]->{_prefix}.'tm'}->[2] },
-    	TT	=> sub { sprintf $_[2]->{_fmt}, $_[1]->{$_[2]->{_prefix}.'tm'}->[1] },
-    	SS	=> sub { sprintf $_[2]->{_fmt}, $_[1]->{$_[2]->{_prefix}.'tm'}->[0] },
-    	unix	=> sub { $_[1]->{$_[2]->{_prefix}.'unix'} },
-    	frac	=> sub { $_[0]->{secfrac} },
-    	zsign	=> sub { $_[1]->{zone}->[0] > 0 ? '+' : '-' },
-    	zHH	=> sub { sprintf $_[2]->{_fmt}, $_[1]->{zone}->[1] },
-    	zTT	=> sub { sprintf $_[2]->{_fmt}, $_[1]->{zone}->[2] },
-    },
     -use_comment	=> 1,
     -use_military_zone	=> +1,	## +1 / -1 / 0
     #zone	=> [+1, 0, 0],
@@ -133,6 +103,100 @@ The following methods construct new objects:
   NOV	=> 11,	NOVEMBER	=> 11,
   DEC	=> 12,	DECEMBER	=> 12,
 );
+
+if (defined $^V) {
+  use utf8;
+  %MONTH = (%MONTH,
+    qw(睦月 1 霞初月 1 暮新月 1 太郎月 1 子日月 1 初春月 1
+       初空月 1 早緑月 1 年端月 1 年初月 1 孟春 1 祝月 1
+       元月 1 端月 1
+       
+       如月 2 初花月 2 梅月 2 梅見月 2 雪消月 2 小草生月 2
+       仲春 2 令月 2 仲陽 2
+       
+       弥生 3 桜月 3 晩春 3 早花咲月 3 染色月 3 花見月 3
+       春惜月 3 雛月 3 夢見月 3 季春 3 暮春 3
+       
+       卯月 4 卯花月 4 得鳥羽月 4 夏初月 4 花残月 4 孟夏 4
+       麦秋 4 初夏 4 首夏 4
+       
+       五月 5 皐月 5 早月 5 菖蒲月 5 五色月 5 狭雲月 5 早苗月 5
+       田草月 5 橘月 5 雨月 5 仲夏 5 星月 5 鶉月 5 早稲月 5
+       
+       水無月 6 弥涼暮月 6 風待月 6 涼暮月 6 蝉羽月 6 常夏月 6
+       鳴神月 6 松風月 6 季夏 6 晩夏 6 林鐘 6
+       
+       文月 7 秋初月 7 七夕月 7 親月 7 文披月 7 書披月 7
+       愛合月 7 女郎花月 7 初秋 7 孟秋 7 新秋 7
+       
+       葉月 8 初月 8 秋風月 8 草津月 8 木染月 8 月見月 8 萩月 8
+       紅染月 8 仲秋 8 清秋 8
+       
+       長月 9 玄月 9 色どり月 9 菊咲月 9 菊月 9 寝覚月 9 暮秋 9
+       紅葉月 9 季秋 9 晩秋 9
+       
+       神無月 10 神有月 10 神去月 10 小春 10 時雨月 10 初霜月 10
+       孟冬 10 初冬 10
+       
+       霜月 11 神楽月 11 神帰月 11 霜降月 11 子月 11 雪待月 11
+       仲冬 11 朔月 11 露ごもりの葉月 11
+       
+       師走 12 除月 12 弟月 12 親子月 12 限月 12 暮来月 12 年積月 12
+       春待月 12 梅初月 12 季冬 12 晩冬 12 極月 12 臘月 12 蠟月 12 蝋月 12
+     )
+  );
+}
+
+{
+my $_p2f = sub { my ($s, $n) = @_; $s eq 'none'? q(%d): $s eq 'SP'? qq(%${n}d): qq(%0${n}d) };
+my $_tm = sub { $_[0]->{local}?'tm_local':'tm' };
+## &$function ({format's parameters}, {caller's parameters})
+%FMT2STR = (
+	CC	=> sub { sprintf &$_p2f ($_[0]->{pad}, 2),	## BUG: Support AD only
+	  	         (($_[1]->{ &$_tm ($_[0]) }->[5] + 1899) / 100) + 1 },
+	YYYY	=> sub { sprintf &$_p2f ($_[0]->{pad}, 4),
+	                 $_[1]->{ &$_tm ($_[0]) }->[5] + 1900 },
+	YY	=> sub { sprintf &$_p2f ($_[0]->{pad}, 2),
+	                 $_[1]->{ &$_tm ($_[0]) }->[5] % 100 },
+	MM	=> sub { sprintf &$_p2f ($_[0]->{pad}, 2),
+	                 $_[1]->{ &$_tm ($_[0]) }->[4] + 1 },
+	Mon	=> sub { qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec)
+	   	           [ $_[1]->{ &$_tm ($_[0]) }->[4] ] },
+	Month	=> sub { qw(January February March April May June
+	   	            July August September October November December)
+	   	           [ $_[1]->{ &$_tm ($_[0]) }->[4] ] },
+	DD	=> sub { sprintf &$_p2f ($_[0]->{pad}, 2),
+	                 $_[1]->{ &$_tm ($_[0]) }->[3] },
+	Wdy	=> sub { qw(Sun Mon Tue Wed Thu Fri Sat)
+	   	           [ $_[1]->{ &$_tm ($_[0]) }->[6] ] },
+	Weekday	=> sub {
+	  (split /:/, $_[0]->{name}
+	    || q(Sunday:Monday:Tuesday:Wednesday:Thursday:Friday:Saturday))
+	   	           [ $_[1]->{ &$_tm ($_[0]) }->[6] ] },
+	shun	=> sub {
+	  my @alphabet = split /:/, $_[0]->{alphabet} || 'a:b:c:c';
+	  my $day = $_[1]->{ &$_tm ($_[0]) }->[3];
+	  $day < 10? $alphabet[0]:	##  1 -  9 joujun
+	  $day < 20? $alphabet[1]:	## 10 - 19 chuujun
+	  $day < 30? $alphabet[2]:	## 20 - 29 gejun
+	  defined $alphabet[3] ?
+	  $alphabet[3]: $alphabet[2];	## 30 - 31 gejun
+	},
+	HH	=> sub { sprintf &$_p2f ($_[0]->{pad}, 2),
+	                 $_[1]->{ &$_tm ($_[0]) }->[2] },
+	TT	=> sub { sprintf &$_p2f ($_[0]->{pad}, 2),
+	                 $_[1]->{ &$_tm ($_[0]) }->[1] },
+	SS	=> sub { sprintf &$_p2f ($_[0]->{pad}, 2),
+	                 $_[1]->{ &$_tm ($_[0]) }->[0] },
+	unix	=> sub { sprintf &$_p2f ($_[0]->{pad}, 10),
+	                 $_[1]->{ $_[0]->{local}?'time_local':'time' } },
+	frac	=> sub { $_[1]->{ $_[0]->{local}?'secfrac_local':'secfrac' } },
+	zsign	=> sub { $_[1]->{option}->{zone}->[0] > 0 ? '+' : '-' },
+	zHH	=> sub { sprintf &$_p2f ($_[0]->{pad}, 2), $_[1]->{option}->{zone}->[1] },
+	zTT	=> sub { sprintf &$_p2f ($_[0]->{pad}, 2), $_[1]->{option}->{zone}->[2] },
+	comment	=> sub { $_[1]->{comment} },
+);
+}
 
 %ZONE = (	## NA = Northern America
   ADT	=> [-1,  3,  0],	## (NA)Atlantic Daylight	733
@@ -614,11 +678,11 @@ sub stringify ($;%) {
   for (grep {/^-/} keys %o) {$option{substr ($_, 1)} = $o{$_}}
   unless ($option{format_template}) {
     if ($option{format} =~ /mail-rfc2822|news-usefor|mail-rfc822\+rfc1123|news-son-of-rfc1036|mime/) {
-      $option{format_template} = '%Wdy(local);, %DD(local); %Mon(local); %YYYY(local); %HH(local);:%TT(local);:%SS(local); %zsign;%zHH;%zTT;';
+      $option{format_template} = '%Wdy(local);, %DD(local); %Mon(local); %YYYY(local); %HH(local);:%TT(local);:%SS(local); %zsign;%zHH;%zTT;%comment(prefix=>" ");';
     } elsif ($option{format} =~ /http/) {
       $option{format_template} = '%Wdy;, %DD; %Mon; %YYYY; %HH;:%TT;:%SS; GMT';
     } elsif ($option{format} =~ /mail-rfc822|news-rfc1036/) {
-      $option{format_template} = '%Wdy(local);, %DD(local); %Mon(local); %YY(local); (%YYYY(local);) %HH(local);:%TT(local);:%SS(local); %zsign;%zHH;%zTT;';
+      $option{format_template} = '%Wdy(local);, %DD(local); %Mon(local); %YY(local); (%YYYY(local);) %HH(local);:%TT(local);:%SS(local); %zsign;%zHH;%zTT;%comment(prefix=>" ");';
     } elsif ($option{format} =~ /news-rfc850/) {
       $option{format_template} = '%Weekday;, %DD;-%Mon;-%YY; %HH;:%TT;:%SS; GMT';
     } elsif ($option{format} =~ /asctime/) {
@@ -628,12 +692,27 @@ sub stringify ($;%) {
     } elsif ($option{format} =~ /un[i*]x/) {	## ;-)
       $option{format_template} = '%unix;';
     } else {	## RFC 3339 (IETF's ISO 8601)
-      $option{format_template} = '%YYYY(local);-%MM(local);-%DD(local);T%HH(local);:%TT(local);:%SS(local);%frac(prefix=>.);%zsign;%zHH;:%zTT;';
+      $option{format_template} = '%YYYY(local);-%MM(local);-%DD(local);T%HH(local);:%TT(local);:%SS(local);%frac(prefix=>.);%zsign;%zHH;:%zTT;%comment(prefix=>" ");';
     }
   }
-  $self->_date2str (\%option)
-    . (($option{output_comment} && @{$self->{comment}} > 0)?
-        ' ' . $self->_comment_stringify: '');
+  my $zone = $option{zone};
+  $zone = [ $self->_zone_string_to_array ($zone) ] if not ref $zone && length $zone;
+  $zone = [+0, 0, 0] unless ref $zone;
+  my $l_time  = $self->{date_time} + $zone->[0] * ($zone->[1] * 60 + $zone->[2]) * 60;
+  my $c = '';
+  $c = $self->_comment_stringify
+    if $option{output_comment} && @{ $self->{comment} } > 0;
+  Message::Util::sprintxf ($option{format_template}, {
+  	comment	=> $c,
+  	fmt2str	=> \%FMT2STR,
+  	option	=> \%option,
+  	time	=> $self->{date_time},
+  	time_local	=> $l_time,
+  	tm	=> [ gmtime $self->{date_time} ],
+  	tm_local	=> [ gmtime $l_time ],
+  	secfrac	=> $self->{secfrac},
+  	secfrac_local	=> $self->{secfrac},	## Not supported yet
+  });
 }
 *as_string = \&stringify;
 *as_plain_string = \&stringify;
@@ -641,48 +720,6 @@ sub stringify ($;%) {
 sub as_rfc2822_time ($@) {
   shift->stringify (-format => 'mail-rfc2822', @_);
 }
-
-sub _date2str ($\%\%) {
-  my $self = shift;
-  my $option = shift;
-  my $gparam = shift;
-  my $template	= $option->{format_template};
-  my $time	= $self->{date_time};
-  $time	= $option->{date_time} if defined $option->{date_time};
-  my $zone	= $option->{zone};
-  if (ref $zone) { }
-  elsif (length $zone) {$zone = [$self->_zone_string_to_array ($zone)]}
-  my $l_time  = $time + $zone->[0] * ($zone->[1] * 60 + $zone->[2]) * 60;
-  my %time = (unix	=> $time,
-              tm	=> [gmtime ($time)],
-              l_unix	=> $l_time,
-              l_tm	=> [gmtime ($l_time)],
-              zone	=> $zone);
-  $template =~ s{%([A-Za-z0-9_]+)(?:\(([A-Za-z0-9,.:\x09\x20=>_-]*)\))?;}{
-    my ($f, $a) = ($1, $2);
-    my $function = $option->{fmt2str}->{$f};
-    if (ref $function) {
-      my %a;
-      for (split /[\x09\x20]*,[\x09\x20]*/, $a) {
-        if (/^([^=]+)=>(.+)$/) {$a{$1} = $2}
-        else {$a{$_} = 1}
-      }
-      $a{_prefix} = $a{local}? 'l_': '';
-      $a{_fmt} = $a{pad} eq 'SP'?   '%2d':
-                 $a{pad} eq 'none'? '%d':
-                                    '%02d';
-      my $r = &$function ($self, \%time, \%a, $gparam);
-      length $r? $a{prefix}.$r.$a{suffix}: '';
-    } elsif (length $function) {
-      $function;
-    } else {
-      "[$f: undef]";
-    }
-  }gex;
-  $template;
-}
-
-
 
 sub _zone_string_to_array ($$;$) {
   my $self = shift;
@@ -767,7 +804,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/08/03 23:32:04 $
+$Date: 2002/08/05 09:33:18 $
 
 =cut
 

@@ -11,7 +11,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 
@@ -87,7 +87,7 @@ sub parse ($$;%) {
     = $self->Message::Util::delete_comment_to_array ($body)
     if $self->{option}->{use_comment};
   my @d;
-  $body =~ s{ : ([0-9]+) $ }{
+  $body =~ s{ $REG{FWS} : $REG{FWS} ([0-9]+) $ $REG{FWS} }{
     $self->{port} = $1;
   ''}ex if $self->{option}->{use_port};
   $body =~ s{($REG{domain_literal}|[^\x5B\x2E])+}{
@@ -192,7 +192,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/08/03 23:32:04 $
+$Date: 2002/08/05 09:33:18 $
 
 =cut
 
