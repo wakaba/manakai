@@ -3,10 +3,10 @@ use strict;
 use Test;
 use Message::Markup::XML::QName qw/NULL_URI DEFAULT_PFX/;
 use Message::Markup::XML::Node;
-use Message::Markup::XML::Parser;
+use Message::Markup::XML::Parser::Base;
 use Message::Util::QName::General [qw/ExpandedURI/],
   {
-   (DEFAULT_PFX) => Message::Markup::XML::Parser::URI_CONFIG,
+   (DEFAULT_PFX) => Message::Markup::XML::Parser::Base::URI_CONFIG,
    tree => q<http://suika.fam.cx/~wakaba/-temp/2004/2/22/Parser/TreeConstruct/>,
   };
 
@@ -32,43 +32,43 @@ my @a =
  {
   t => q{"foo"},
   method => 'parse_attribute_value_specification',
-  option => {ExpandedURI q<match_or_error> => 1},
+  option => {ExpandedURI q<match-or-error> => 1},
   result => q(1),
  },
  {
   t => q{'foo'},
   method => 'parse_attribute_value_specification',
-  option => {ExpandedURI q<match_or_error> => 1},
+  option => {ExpandedURI q<match-or-error> => 1},
   result => q(1),
  },
  {
   t => q{"foo},
   method => 'parse_attribute_value_specification',
-  option => {ExpandedURI q<match_or_error> => 1},
+  option => {ExpandedURI q<match-or-error> => 1},
   result => q(0:4:SYNTAX_ALITC_REQUIRED),
  },
  {
   t => q{'foo},
   method => 'parse_attribute_value_specification',
-  option => {ExpandedURI q<match_or_error> => 1},
+  option => {ExpandedURI q<match-or-error> => 1},
   result => q(0:4:SYNTAX_ALITAC_REQUIRED),
  },
  {
   t => q{foo},
   method => 'parse_attribute_value_specification',
-  option => {ExpandedURI q<match_or_error> => 1},
+  option => {ExpandedURI q<match-or-error> => 1},
   result => q(0:0:SYNTAX_ATTRIBUTE_VALUE),
  },
  {
   t => q{foo},
   method => 'parse_attribute_value_specification',
-  option => {ExpandedURI q<match_or_error> => 0},
+  option => {ExpandedURI q<match-or-error> => 0},
   result => q(0:0:SYNTAX_ATTRIBUTE_VALUE),
  },
  {
   t => q{>},
   method => 'parse_attribute_value_specification',
-  option => {ExpandedURI q<match_or_error> => 0},
+  option => {ExpandedURI q<match-or-error> => 0},
   result => q(1),
  },
  {
@@ -214,13 +214,13 @@ my @a =
  {
   t => q{"bar"},
   method => 'parse_attribute_specification',
-  option => {ExpandedURI q<match_or_error> => 1},
+  option => {ExpandedURI q<match-or-error> => 1},
   result => q(0:0:SYNTAX_ATTR_NAME_REQUIRED),
  },
  {
   t => q{"bar"},
   method => 'parse_attribute_specification',
-  option => {ExpandedURI q<match_or_error> => 0},
+  option => {ExpandedURI q<match-or-error> => 0},
   result => q(1),
   output => q(),
  },
@@ -732,6 +732,16 @@ my @a =
   result => q(1),
  },
  {
+  t => q{<!DOCTYPE name[ ]   >},
+  method => 'parse_markup_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!DOCTYPE name []    >},
+  method => 'parse_markup_declaration',
+  result => q(1),
+ },
+ {
   t => q{<!DOCTYPE name PUBLIC "pubid" "sysid"[]>},
   method => 'parse_markup_declaration',
   result => q(1),
@@ -757,7 +767,7 @@ my @a =
   result => q(1),
  },
  {
-  t => q{<!DOCTYPE name PUBLIC "pubid" 'sysid' [] >},
+  t => q{<!DOCTYPE name PUBLIC "pubid" 'sysid' []>},
   method => 'parse_markup_declaration',
   result => q(1),
  },
@@ -769,6 +779,11 @@ my @a =
 
  {
   t => q{<!DOCTYPE name SYSTEM ""[ <!-- --> ]>},
+  method => 'parse_markup_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!DOCTYPE name SYSTEM ""[ <!-- --> ]   >},
   method => 'parse_markup_declaration',
   result => q(1),
  },
@@ -787,12 +802,261 @@ my @a =
   method => 'parse_markup_declaration',
   result => q(0:38:SYNTAX_MDC_REQUIRED),
  },
+ {
+  t => q{<!DOCTYPE name []aaa>},
+  method => 'parse_markup_declaration',
+  result => q(0:17:SYNTAX_MDC_REQUIRED),
+ },
+ {
+  t => q{<!DOCTYPE name PUBLIC "pub" "sys"aaa>},
+  method => 'parse_markup_declaration',
+  result => q(0:33:SYNTAX_MDC_REQUIRED),
+ },
+ {
+  t => q{<!DOCTYPE name SYSTEM "sys"aaa>},
+  method => 'parse_markup_declaration',
+  result => q(0:27:SYNTAX_MDC_REQUIRED),
+ },
+ {
+  t => q{<!DOCTYPE name []      >},
+  method => 'parse_markup_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!DOCTYPE name SYSTEM "sys"    >},
+  method => 'parse_markup_declaration',
+  result => q(1),
+ },
+
+ {
+  t => q{abcdefg},
+  method => 'parse_rpdata',
+  result => q(1),
+ },
+ {
+  t => q{abcd&#125;efg},
+  method => 'parse_rpdata',
+  result => q(1),
+ },
+ {
+  t => q{abcd&#x125;efg},
+  method => 'parse_rpdata',
+  result => q(1),
+ },
+ {
+  t => q{abcd&e5;efg},
+  method => 'parse_rpdata',
+  result => q(1),
+ },
+ {
+  t => q{abcd%e5;efg},
+  method => 'parse_rpdata',
+  result => q(1),
+ },
+ {
+  t => q{abcd&e5efg},
+  method => 'parse_rpdata',
+  result => q(0:10:SYNTAX_REFC_REQUIRED),
+ },
+ {
+  t => q{abcd&#xe5e a},
+  method => 'parse_rpdata',
+  result => q(0:10:SYNTAX_REFC_REQUIRED),
+ },
+ {
+  t => q{abcd%e5efg},
+  method => 'parse_rpdata',
+  result => q(0:10:SYNTAX_REFC_REQUIRED),
+ },
+ {
+  t => q{abcd% e5efg},
+  method => 'parse_rpdata',
+  result => q(0:5:SYNTAX_PARAENT_NAME_REQUIRED),
+ },
+
+ {
+  t => q{<!ENTITY "a">},
+  method => 'parse_entity_declaration',
+  result => q(0:9:SYNTAX_ENTITY_NAME_REQUIRED),
+ },
+ {
+  t => q{<!ENTITY a "a">},
+  method => 'parse_entity_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!ENTITY % "a">},
+  method => 'parse_entity_declaration',
+  result => q(0:11:SYNTAX_ENTITY_PARAM_NAME_REQUIRED),
+ },
+ {
+  t => q{<!ENTITY % a "a">},
+  method => 'parse_entity_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!ENTITY #DEFAULT "a">},
+  method => 'parse_entity_declaration',
+  result => q(0:10:SYNTAX_ENTITY_DEFAULT),
+ },
+ {
+  t => q{<!ENTITY #ALL "a">},
+  method => 'parse_entity_declaration',
+  result => q(0:10:SYNTAX_ENTITY_RNI_KEYWORD),
+ },
+ {
+  t => q{<!ENTITY % #DEFAULT "a">},
+  method => 'parse_entity_declaration',
+  result => q(0:11:SYNTAX_ENTITY_PARAM_NAME_REQUIRED),
+ },
+
+ {
+  t => q{<!ENTITY a "abcde">},
+  method => 'parse_entity_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!ENTITY a "ab&a;cde">},
+  method => 'parse_entity_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!ENTITY a "ab%a;cde">},
+  method => 'parse_entity_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!ENTITY a "ab<c'de">},
+  method => 'parse_entity_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!ENTITY a 'ab<c"de'>},
+  method => 'parse_entity_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!ENTITY a "abcde>},
+  method => 'parse_entity_declaration',
+  result => q(0:18:SYNTAX_PLITC_REQUIRED),
+ },
+ {
+  t => q{<!ENTITY a 'abcde>},
+  method => 'parse_entity_declaration',
+  result => q(0:18:SYNTAX_PLITAC_REQUIRED),
+ },
+ {
+  t => q{<!ENTITY a "abcde"    >},
+  method => 'parse_entity_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!ENTITY a "abcde"aa>},
+  method => 'parse_entity_declaration',
+  result => q(0:18:SYNTAX_MDC_REQUIRED),
+ },
+ {
+  t => q{<!ENTITY a "abcde" aa>},
+  method => 'parse_entity_declaration',
+  result => q(0:19:SYNTAX_MDC_REQUIRED),
+ },
+ {
+  t => q{<!ENTITY % pa "abcde" >},
+  method => 'parse_entity_declaration',
+  result => q(1),
+ },
+
+ {
+  t => q{<!ENTITY a SYSTEM "sys">},
+  method => 'parse_entity_declaration',
+  result => q(1),
+ }, 
+ {
+  t => q{<!ENTITY a SYSTEM "sys"  >},
+  method => 'parse_entity_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!ENTITY a PUBLIC "pub" "sys">},
+  method => 'parse_entity_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!ENTITY a PUBLIC "pub" "sys"  >},
+  method => 'parse_entity_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!ENTITY %    a PUBLIC "pub" "sys"  >},
+  method => 'parse_entity_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!ENTITY a PUBLIC "pub" >},
+  method => 'parse_entity_declaration',
+  result => q(0:24:SYNTAX_SYSTEM_LITERAL_REQUIRED),
+ },
+ {
+  t => q{<!ENTITY a PUBLIC >},
+  method => 'parse_entity_declaration',
+  result => q(0:18:SYNTAX_PUBID_LITERAL_REQUIRED),
+ },
+ {
+  t => q{<!ENTITY a SYSTEM >},
+  method => 'parse_entity_declaration',
+  result => q(0:18:SYNTAX_SYSTEM_LITERAL_REQUIRED),
+ },
+ {
+  t => q{<!ENTITY a SYSTEM "sys" "what?">},
+  method => 'parse_entity_declaration',
+  result => q(0:24:SYNTAX_MDC_REQUIRED),
+ },
+ {
+  t => q{<!ENTITY a PUBLIC "pub" "sys" "what?">},
+  method => 'parse_entity_declaration',
+  result => q(0:30:SYNTAX_MDC_REQUIRED),
+ },
+ {
+  t => q{<!ENTITY a PUBLIC "pub""sys">},
+  method => 'parse_entity_declaration',
+  result => q(0:23:SYNTAX_ENTITY_PS_REQUIRED),
+ },
+ {
+  t => q{<!ENTITY a PUBLIC"pub" "sys">},
+  method => 'parse_entity_declaration',
+  result => q(0:17:SYNTAX_ENTITY_PS_REQUIRED),
+ },
+ {
+  t => q{<!ENTITY a SYSTEM"sys">},
+  method => 'parse_entity_declaration',
+  result => q(0:17:SYNTAX_ENTITY_PS_REQUIRED),
+ },
+ {
+  t => q{<!ENTITY a KEYWORD>},
+  method => 'parse_entity_declaration',
+  result => q(0:11:SYNTAX_ENTITY_TEXT_KEYWORD),
+ },
+ {
+  t => q{<!ENTITY a CDATA "cdata">},
+  method => 'parse_entity_declaration',
+  result => q(0:11:SYNTAX_ENTITY_TEXT_PRE_KEYWORD),
+ },
+ {
+  t => q{<!ENTITY a "cdata" CDATA>},
+  method => 'parse_entity_declaration',
+  result => q(0:19:SYNTAX_MDC_REQUIRED),
+ },
+ {
+  t => q{<!ENTITY a SYSTEM "sys" NDATA notation>},
+  method => 'parse_entity_declaration',
+  result => q(1),
+ },
 );
 
 plan tests => scalar @a;
 
 my $first_error;
-my $parser = Message::Markup::XML::Parser->new;
+my $parser = Message::Markup::XML::Parser::Base->new;
 $parser->{error}->{option}->{report} = sub {
   my $err = shift;
   $err->{-object}->set_position ($err->{source}, diff => $err->{position_diff});

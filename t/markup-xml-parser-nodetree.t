@@ -6,7 +6,7 @@ use Message::Markup::XML::Parser::NodeTree;
 use Message::Markup::XML::QName qw/:prefix :special-uri/;
 use Message::Util::QName::General [qw/ExpandedURI/],
   {
-   (DEFAULT_PFX) => Message::Markup::XML::Parser::URI_CONFIG (),
+   (DEFAULT_PFX) => Message::Markup::XML::Parser::Base::URI_CONFIG (),
    tree => Message::Markup::XML::Parser::NodeTree::URI_CONFIG (),
    test => q<http://suika.fam.cx/~wakaba/-temp/2004/2/22/test/>,
   };

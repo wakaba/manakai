@@ -14,11 +14,11 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::NodeTree;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Message::Markup::XML::Parser::NodeTree;
-push our @ISA, 'Message::Markup::XML::Parser';
-use Message::Markup::XML::Parser;
+push our @ISA, 'Message::Markup::XML::Parser::Base';
+use Message::Markup::XML::Parser::Base;
 use Message::Markup::XML::QName qw/:prefix/;
 use Message::Markup::XML::Node qw/:charref :declaration :entity/;
 
@@ -27,7 +27,7 @@ sub URI_CONFIG () {
 }
 use Message::Util::QName::General [qw/ExpandedURI/],
   {
-   (DEFAULT_PFX) => Message::Markup::XML::Parser::URI_CONFIG (),
+   (DEFAULT_PFX) => Message::Markup::XML::Parser::Base::URI_CONFIG (),
    tree => URI_CONFIG,
   };
 
@@ -271,7 +271,7 @@ sub processing_instruction_content ($$$$%) {
                ExpandedURI q<allow-numeric-character-reference> => 0,
                ExpandedURI q<allow-hex-character-reference> => 0,
                ExpandedURI q<allow-general-entity-reference> => 0,
-               ExpandedURI q<match_or_error> => 1,
+               ExpandedURI q<match-or-error> => 1,
                ExpandedURI q<attr-specs-only> => 1);
     my $attr = $pp->{ExpandedURI q<tree:attribute>};
     my $sep = $pp->{ExpandedURI q<tree:s-between-attribute-specifications>};
@@ -414,7 +414,7 @@ sub processing_instruction_end ($$$$%) {
 
 =head1 SEE ALSO
 
-C<Message::Markup::XML::Parser>,
+C<Message::Markup::XML::Parser::Base>,
 C<Message::Markup::XML::Node>
 
 =head1 LICENSE
@@ -426,4 +426,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/02/26 09:02:12 $
+1; # $Date: 2004/05/08 07:37:04 $
