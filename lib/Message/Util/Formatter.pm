@@ -5,6 +5,9 @@ Message::Util::Formatter --- Manakai: General format text to composed text conve
 
 =head1 DESCRIPTION
 
+CAUTION: This module is OBSOLETE.  Use Message::Util::Formatter::* instead.
+This module will be removed.
+
 This module can be used to convert small template text to
 complted one with filling variables with embeded formatting
 text.  It is similar to C<printf>, but syntax is different.
@@ -22,7 +25,7 @@ This module is part of Manakai.
 package Message::Util::Formatter;
 use strict;
 use vars qw(%FMT2STR $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 
 =head1 INITIAL FORMATTING RULES
@@ -295,4 +298,4 @@ Boston, MA 02111-1307, USA.
 =cut
 
 1;
-# $Date: 2003/10/31 04:57:32 $
+# $Date: 2003/11/16 11:44:44 $

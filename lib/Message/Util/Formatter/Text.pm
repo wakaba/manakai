@@ -15,35 +15,35 @@ This module is part of manakai.
 
 package Message::Util::Formatter::Text;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util::Formatter::Base;
 our @ISA = 'Message::Util::Formatter::Base';
 
 sub rule_def () {+{
     -bare_text => {
-      post => sub {
+      after => sub {
         my ($self, $name, $p, $o, $key => $val) = @_;
-        ${$p->{-result}} .= $p->{-bare_text};
+        $p->{-result} .= $p->{-bare_text};
       },
     },
     -undef     => {
       post => sub {
         my ($self, $name, $p, $o) = @_;
-        ${$p->{-result}} = qq([undef: $name]);
+        $p->{-result} = qq([undef: $name]);
       },             
     },
     -default   => {
       pre => sub { 
         my ($self, $name, $p, $o, %opt) = @_;
-        ${$p->{-result}} = '';
+        $p->{-result} = '';
         $self->call ($name, 'before', $p, $o, %opt);
       },
       post => sub { 
         my ($self, $name, $p, $o, %opt) = @_;
         $self->call ($name, 'after', $p, $o, %opt);
-        if (length ${$p->{-result}} and 
+        if (length $p->{-result} and 
           (defined $p->{prefix} or defined $p->{suffix})) {
-          ${$p->{-result}} = $p->{prefix} . ${$p->{-result}} . $p->{suffix};
+          $p->{-result} = $p->{prefix} . $p->{-result} . $p->{suffix};
         }
       },
       attr => sub {
@@ -61,17 +61,17 @@ sub rule_def () {+{
     -entire    => {
       pre => sub {
         my ($self, $name, $p, $o) = @_;
-        ${$p->{-result}} = '';
+        $p->{-result} = '';
       },
       attr => sub {
         my ($self, $name, $p, $o, $key => $val) = @_;
-        ${$p->{-result}} .= $val;
+        $p->{-result} .= $val->{-result};
       },
     },
     percent => {
       after => sub {
         my ($self, $name, $p, $o) = @_;
-        ${$p->{-result}} = '%';
+        $p->{-result} = '%';
       },
     },
 }}
@@ -96,4 +96,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/11/15 12:30:42 $
+1; # $Date: 2003/11/16 11:44:16 $
