@@ -13,7 +13,7 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.21 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.22 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::Header;
@@ -40,6 +40,8 @@ use overload '""' => sub { $_[0]->stringify },
     -fill_msgid_name	=> 'message-id',
     -force_mime_entity	=> 0,
     -format	=> 'mail-rfc2822',
+    -header_default_charset	=> 'iso-2022-int-1',
+    -header_default_charset_input	=> 'iso-2022-int-1',
     -linebreak_strict	=> 0,	## BUG: not work perfectly
     -parse_all	=> 0,
     -text_coderange	=> 'binary',
@@ -108,7 +110,7 @@ sub _init ($;%) {
   unless (defined $self->{option}->{add_ua}) {
     $self->{option}->{add_ua} = $format !~ /mime-entity/;
   }
-  unless (length $self->{option}->{fill_ua_name}) {
+  unless ($self->{option}->{fill_ua_name}) {
     $self->{option}->{fill_ua_name} = $format =~ /response|cgi|uri-url-mailto/?
       'server': 'user-agent';
   }
@@ -141,13 +143,15 @@ sub new ($;%) {
   my $class = shift;
   my $self = bless {}, $class;
   my %new_field = $self->_init (@_);
-  if (length $new_field{body}) {
+  if (defined $new_field{body}) {
     $self->{body} = $new_field{body};  $new_field{body} = undef;
     $self->{body} = $self->_parse_value ([$self->content_type] => $self->{body})
       if $self->{option}->{parse_all};
   }
   $self->{header} = new Message::Header
     -format => $self->{option}->{format},
+    -header_default_charset	=> $self->{option}->{header_default_charset},
+    -header_default_charset_input	=> $self->{option}->{header_default_charset_input},
     -parse_all => $self->{option}->{parse_all}, %new_field;
   $self;
 }
@@ -188,6 +192,8 @@ sub parse ($$;%) {
   }
   $new_field{body} = undef if $new_field{body};
   $self->{header} = parse_array Message::Header \@header,
+    -header_default_charset	=> $self->{option}->{header_default_charset},
+    -header_default_charset_input	=> $self->{option}->{header_default_charset_input},
     -parse_all => $self->{option}->{parse_all},
     -format => $self->{option}->{format}, %new_field;
   $self->{body} = join $nl, @body;
@@ -217,11 +223,15 @@ sub header ($;$) {
     $self->{header} = $new_header;
   } elsif ($new_header) {
     $self->{header} = Message::Header->parse ($new_header,
+    -header_default_charset	=> $self->{option}->{header_default_charset},
+    -header_default_charset_input	=> $self->{option}->{header_default_charset_input},
       -parse_all => $self->{option}->{parse_all},
       -format => $self->{option}->{format});
   }
   unless (ref $self->{header} || length $self->{header}) {
     $self->{header} = new Message::Header (
+    -header_default_charset	=> $self->{option}->{header_default_charset},
+    -header_default_charset_input	=> $self->{option}->{header_default_charset_input},
       -parse_all => $self->{option}->{parse_all},
       -format => $self->{option}->{format});
   }
@@ -316,7 +326,7 @@ sub _decode_body ($$) {
   my $self = shift;
   my $value = shift;
   ## MIME CTE
-  	my $cte = $self->{_cte};
+  	my $cte = $self->{_cte} || '';
   	my $ctef = $self->header->field ('content-transfer-encoding',
   	                              -new_item_unless_exist => 0);
   	$cte = $ctef->value if ref $ctef;
@@ -869,7 +879,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/16 10:45:54 $
+$Date: 2002/06/23 12:20:11 $
 
 =cut
 

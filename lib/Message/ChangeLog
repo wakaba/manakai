@@ -1,3 +1,15 @@
+2002-06-23  Wakaba <w@suika.fam.cx>
+
+	* Entity.pm (header_default_charset, header_default_charset_input):
+	New options.
+	* Header.pm (ditto): Likewise.
+	* Util.pm
+	- (angle_quoted, angle_qcontent, M_angle_quoted): New regexs
+	(Moved from Message::Field::AngleQuoted).
+	- (decode_ccontent): Order of arguments of 
+	Message::MIME::EncodedWord::decode_ccontent is changed.
+	- (unquote_if_angle_quoted): New function.
+
 2002-06-16  wakaba <w@suika.fam.cx>
 
 	* Header.pm (_n11n_field_name): Check namespace definition's

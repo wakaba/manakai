@@ -15,8 +15,8 @@ package Message::Util;
 require 5.6.0;
 use strict;
 use re 'eval';
-use vars qw(%REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use vars qw(%FMT2STR %REG $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 use Carp ();
 require Message::MIME::EncodedWord;
@@ -43,13 +43,19 @@ require Message::MIME::Charset;
 	$REG{FWS} = qr/[\x09\x20]*/;	## not same as 2822's
 ## Basic structure
 	$REG{comment} = qr/\x28(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x27\x2A-\x5B\x5D-\xFF]|(??{$REG{comment}}))*\x29/;
-	$REG{quoted_string} = qr/\x22(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\xFF])*\x22/;
-	$REG{domain_literal} = qr/\x5B(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x5A\x5E-\xFF])*\x5D/;
-	$REG{angle_quoted} = qr/\x3C[\x09\x20\x21\x23-\x3B\x3D\x3F-\x5B\x5D\x5F\x61-\x7A\x7E]*\x3E/;
-	
-	$REG{M_quoted_string} = qr/\x22((?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\xFF])*)\x22/;
 	$REG{M_comment} = qr/\x28((?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x27\x2A-\x5B\x5D-\xFF]|(??{$REG{comment}}))*)\x29/;
+	
+	$REG{quoted_string} = qr/\x22(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\xFF])*\x22/;
+	$REG{M_quoted_string} = qr/\x22((?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\xFF])*)\x22/;
+	
+	$REG{domain_literal} = qr/\x5B(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x5A\x5E-\xFF])*\x5D/;
 	$REG{M_domain_literal} = qr/\x5B((?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x5A\x5E-\xFF])*)\x5D/;
+	
+	#$REG{angle_quoted} = qr/\x3C[\x09\x20\x21\x23-\x3B\x3D\x3F-\x5B\x5D\x5F\x61-\x7A\x7E]*\x3E/;
+	$REG{angle_qcontent} = qr/(?:$REG{quoted_string}|$REG{domain_literal}|[^\x3C\x3E\x22\x5B])+/;
+	$REG{angle_quoted} = qr/<$REG{angle_qcontent}>|<>/;
+	$REG{M_angle_quoted} = qr/<($REG{angle_qcontent})>|<>/;
+	
 
 =head2 tokens
 
@@ -106,6 +112,21 @@ require Message::MIME::Charset;
 	$REG{S_encoded_word} = qr/=\x3F$REG{atext_dot}\x3F=/;
 	#$REG{S_encoded_word_comment} = qr/=\x3F[\x21-\x27\x2A-\x5B\x5D-\x7E]+\x3F=/;
 		## not used anywhere
+
+## See also 'sprintxf'
+%FMT2STR = (
+	char	=> sub {
+	  my $p = $_[0];
+	  if ($p->{ucs} =~ /^0[xob][0-9A-Fa-f]+$/) {
+	    return pack 'U', oct $p->{ucs};
+	  } elsif (defined $p->{ucs}) {
+	    return pack 'U', $p->{ucs};
+	  } else {
+	    return "\x{FFFD}";
+	  }
+	},
+	percent	=> '%',
+);
 
 =head1 STRUCTURED FIELD FUNCTIONS
 
@@ -204,6 +225,17 @@ sub unquote_if_quoted_string ($) {
   wantarray? ($quoted_string, $isq): $quoted_string;
 }
 
+sub unquote_if_angle_quoted ($) {
+  my $quoted_string = shift;  my $isq = 0;
+  $quoted_string =~ s{^$REG{M_angle_quoted}$}{
+    my $qtext = $1;
+    $qtext =~ s/\x5C([\x00-\xFF])/$1/g;
+    $isq = 1;
+    $qtext;
+  }goex;
+  wantarray? ($quoted_string, $isq): $quoted_string;
+}
+
 sub unquote_if_domain_literal ($) {
   my $quoted_string = shift;  my $isq = 0;
   $quoted_string =~ s{^$REG{M_domain_literal}$}{
@@ -293,9 +325,12 @@ sub encode_header_string ($$;%) {
   my @o = (language => $o{language});
   if ($r{success}) {	## Convertion succeed
     $o{charset} = $r{charset} if $r{charset};
-    (value => $t, @o, charset => ($o{charset}=~/\*/?'':$o{charset}));
+    $o{charset} = '' if $o{charset} =~ /\*/;
+    (value => $t, @o, Message::MIME::Charset::name_minimumize ($o{charset}, $t));
   } else {	## Fault
-    (value => $s, @o, charset => ($o{current_charset}=~/\*/?'':$o{current_charset}));
+    $o{current_charset} = '' if $o{current_charset} =~ /\*/;
+    (value => $t, @o, 
+     Message::MIME::Charset::name_minimumize ($o{current_charset}, $t));
   }
 }
 
@@ -306,9 +341,9 @@ sub decode_header_string ($$;%) {
   my ($t, $r);	## decoded-text, success?
   if ($o{type} !~ /quoted|encoded|domain|word/) {
     my (@s, @r);
-    $s =~ s{\G($REG{FWS}(?:\x5C[\x00-\xFF]
-      |[\x00-\x08\x0A-\x0C\x0E\x0F\x21-\x5B\x5D-\xFF])+|$REG{WSP}+$)}
-      { push @s, $& }goex;
+    $s =~ s{(([\x09\x20]*(?:\x5C[\x00-\xFF]
+      |[\x00-\x08\x0A-\x1F\x21-\x5B\x5D-\xFF])+|[\x09\x20]+$))}
+      { push @s, $1; '' }goesx;
     for my $i (0..$#s) {
       if ($s[$i] =~ /^($REG{FWS})$REG{M_encoded_word}$/) {
         my ($t, $w) = ('', $1);
@@ -321,7 +356,7 @@ sub decode_header_string ($$;%) {
         }
       } else {
         my ($u, $q) = ($s[$i], 0);
-        $u =~ s/\x5C([\x00-\xFF])/$1/g;
+        $u =~ s/\x5C([\x00-\xFF])/$1/g unless $o{type} =~ /text/;
         ($u,$q) = Message::MIME::Charset::decode ($o{charset}, $u);
         $s[$i] = $u if $q;
       }
@@ -344,9 +379,12 @@ sub encode_body_string {
   my @o = ();
   if ($r{success}) {	## Convertion successed
     $o{charset} = $r{charset} if $r{charset};
-    (value => $t, @o, charset => ($o{charset} =~ /\*/? '': $o{charset}));
-  } else {	## fault
-    (value => $s, @o, charset => ($o{current_charset}=~/\*/?'':$o{current_charset}));
+    $o{charset} = '' if $o{charset} =~ /\*/;
+    (value => $t, @o, Message::MIME::Charset::name_minimumize ($o{charset}, $t));
+  } else {	## Fault
+    $o{current_charset} = '' if $o{current_charset} =~ /\*/;
+    (value => $t, @o, 
+     Message::MIME::Charset::name_minimumize ($o{current_charset}, $t));
   }
 }
 
@@ -497,6 +535,31 @@ sub decode_ccontent ($$) {
   Message::MIME::EncodedWord::decode_ccontent (@_);
 }
 
+sub sprintxf ($;\%) {
+  my $format = shift;
+  my $gparam = shift;
+  $format =~ s{%([A-Za-z0-9_]+)(?:\(([^\x29]*)\))?;}{
+    my ($f, $a) = ($1, $2);
+    my $function = $gparam->{fmt2str}->{$f} || $FMT2STR{$f};
+    if (ref $function) {
+      my %a;
+      for (split /[\x09\x20]*,[\x09\x20]*/, $a) {
+        if (/^([^=]*[^\x09\x20=])[\x09\x20]*=>[\x09\x20]*([^\x09\x20].*)$/) {
+          $a{ unquote_if_quoted_string ($1) } = unquote_if_quoted_string ($2);
+        } else {
+          $a{ unquote_if_quoted_string ($_) } = 1;
+        }
+      }
+      my $r = &$function (\%a, $gparam);
+      length $r? $a{prefix}.$r.$a{suffix}: '';
+    } elsif (length $function) {
+      $function;
+    } else {
+      "[$f: undef]";
+    }
+  }gex;
+  $format;
+}
 
 =head1 LICENSE
 
@@ -520,7 +583,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/16 10:45:54 $
+$Date: 2002/06/23 12:20:11 $
 
 =cut
 

@@ -8,7 +8,7 @@ Message::Header --- A Perl Module for Internet Message Headers
 package Message::Header;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.26 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.27 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;	## This may seem silly:-)
 push @ISA, qw(Message::Field::Structured);
 
@@ -38,6 +38,8 @@ push @ISA, qw(Message::Field::Structured);
     -field_name_validation	=> 1,	## Method level option.
     -field_sort	=> 0,
     #-format	=> 'mail-rfc2822',
+    -header_default_charset	=> 'iso-2022-int-1',
+    -header_default_charset_input	=> 'iso-2022-int-1',
     -linebreak_strict	=> 0,	## Not implemented completely
     -line_length_max	=> 60,	## For folding
     #ns_default_phuri
@@ -355,6 +357,8 @@ sub _parse_value ($$$;%) {
       -format	=> $self->{option}->{format},
       -field_ns	=> $option{ns},
       -field_name	=> $name,
+    -header_default_charset	=> $self->{option}->{header_default_charset},
+    -header_default_charset_input	=> $self->{option}->{header_default_charset_input},
       -parse_all	=> $self->{option}->{parse_all},
     %vopt);
   } else {
@@ -363,6 +367,8 @@ sub _parse_value ($$$;%) {
       -format	=> $self->{option}->{format},
       -field_ns	=> $option{ns},
       -field_name	=> $name,
+    -header_default_charset	=> $self->{option}->{header_default_charset},
+    -header_default_charset_input	=> $self->{option}->{header_default_charset_input},
       -parse_all	=> $self->{option}->{parse_all},
     %vopt);
   }
@@ -562,6 +568,7 @@ sub _scan_sort ($\@\%) {
 }
 
 sub _n11n_field_name ($$) {
+  no strict 'refs';
   my $self = shift;
   my $s = shift;
   $s =~ s/^$REG{WSP}+//; $s =~ s/$REG{WSP}+$//;
@@ -719,11 +726,12 @@ sub _fold ($$;%) {
   $max = 20 if $max < 20;
   
   my $l = $option{-initial_length} || 0;
-  $string =~ s{((?:^|[\x09\x20])[^\x09\x20]+)}{
+  $l += length $1 if $string =~ /^([^\x09\x20]+)/;
+  $string =~ s{([\x09\x20][^\x09\x20]+)}{
     my $s = $1;
-    if ($l + length $s > $max) {
+    if (($l + length $s) > $max) {
       $s = "\x0D\x0A\x20" . $s;
-      $l = length ($s) - 2;
+      $l = 1 + length $s;
     } else { $l += length $s }
     $s;
   }gex;
@@ -818,7 +826,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/16 10:45:54 $
+$Date: 2002/06/23 12:20:11 $
 
 =cut
 
