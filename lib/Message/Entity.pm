@@ -12,51 +12,35 @@ MIME multipart will be also supported (but not implemented yet).
 
 package Message::Entity;
 use strict;
-use vars qw(%DECODER %DEFAULT %ENCODER $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use vars qw(%DEFAULT $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
-require Message::Header;
 require Message::Util;
+require Message::Header;
+require Message::MIME::MediaType;
+require Message::MIME::Encoding;
 use overload '""' => sub { $_[0]->stringify },
              fallback => 1;
 
-%ENCODER = (
-	'7bit'	=> sub { $_[1] },
-	'8bit'	=> sub { $_[1] },
-	binary	=> sub { $_[1] },
-	base64	=> sub { require MIME::Base64; 
-		         MIME::Base64::encode ($_[1]) },
-	'quoted-printable'
-		=> sub { require MIME::QuotedPrint; 
-		         MIME::QuotedPrint::encode ($_[1]) },
-);
-%DECODER = (
-	'7bit'	=> sub { ($_[1], '7bit') },
-	'8bit'	=> sub { ($_[1], '8bit') },
-	binary	=> sub { ($_[1], 'binary') },
-	base64	=> sub { require MIME::Base64; 
-		         (MIME::Base64::decode ($_[1]), 'binary') },
-	'quoted-printable'
-		=> sub { require MIME::QuotedPrint; 
-		         (MIME::QuotedPrint::decode ($_[1]), 'binary') },
-);
-
 ## Initialize of this class -- called by constructors
   %DEFAULT = (
-    _METHODS	=> [qw|header body content_type id|],
-    _MEMBERS	=> [qw|header body|],
-    add_ua	=> 1,
+    -_METHODS	=> [qw|header body content_type id|],
+    -_MEMBERS	=> [qw|header body|],
+    -accept_coderange	=> '7bit',	## 7bit / 8bit / binary
+    -add_ua	=> 1,
+    -body_default_charset	=> 'iso-2022-int-1',
+    -body_default_media_type	=> 'text/plain',
     #fill_date	=> 1,
-    fill_date_name	=> 'date',
+    -fill_date_name	=> 'date',
     #fill_msgid	=> 1,
-    fill_msgid_name	=> 'message-id',
-    format	=> 'mail-rfc2822',
-    linebreak_strict	=> 0,	## BUG: not work perfectly
-    parse_all	=> 0,
+    -fill_msgid_name	=> 'message-id',
+    -format	=> 'mail-rfc2822',
+    -linebreak_strict	=> 0,	## BUG: not work perfectly
+    -parse_all	=> 0,
     #ua_field_name	=> 'user-agent',
-    ua_use_config	=> 1,
-    uri_mailto_safe_level	=> 4,
-    value_type	=> {
+    -ua_use_config	=> 1,
+    -uri_mailto_safe_level	=> 4,
+    -value_type	=> {
     	'*default'	=> ['Message::Body::TextPlain'],
     	'text/*'	=> ['Message::Body::TextPlain'],
     	#'*/*+xml'	=> ['Message::Body::TextPlain'],
@@ -65,7 +49,13 @@ use overload '""' => sub { $_[0]->stringify },
 sub _init ($;%) {
   my $self = shift;
   my %options = @_;
-  $self->{option} = Message::Util::make_clone (\%DEFAULT);
+  $self->{option} = {};
+  my $o = Message::Util::make_clone (\%DEFAULT);
+  for my $name (keys %$o) {
+    if (substr ($name, 0, 1) eq '-') {
+      $self->{option}->{substr ($name, 1)} = $$o{$name};
+    }
+  }
   
   my @new_fields = ();
   for my $name (keys %options) {
@@ -75,24 +65,32 @@ sub _init ($;%) {
       push @new_fields, (lc $name => $options{$name});
     }
   }
-  require Message::Header::Default;
   my $format = $self->{option}->{format};
   if ($format =~ /http/) {
-    $self->{option}->{fill_date_ns} = $Message::Header::HTTP::OPTION{namespace_uri};
-    $self->{option}->{fill_msgid_from_ns} = $Message::Header::HTTP::OPTION{namespace_uri};
-    $self->{option}->{fill_ua_ns} = $Message::Header::HTTP::OPTION{namespace_uri};
+    $self->{option}->{fill_date_ns}       = $Message::Header::NS_phname2uri{http};
+    $self->{option}->{fill_msgid_from_ns} = $Message::Header::NS_phname2uri{http};
+    $self->{option}->{fill_ua_ns}         = $Message::Header::NS_phname2uri{http};
+    $self->{option}->{accept_coderange} = 'binary';
   } else {
-    $self->{option}->{fill_date_ns} = $Message::Header::RFC822::OPTION{namespace_uri};
-    $self->{option}->{fill_msgid_from_ns} = $Message::Header::RFC822::OPTION{namespace_uri};
-    $self->{option}->{fill_ua_ns} = $Message::Header::RFC822::OPTION{namespace_uri};
+    $self->{option}->{fill_date_ns}       = $Message::Header::NS_phname2uri{rfc822};
+    $self->{option}->{fill_msgid_from_ns} = $Message::Header::NS_phname2uri{rfc822};
+    $self->{option}->{fill_ua_ns}         = $Message::Header::NS_phname2uri{rfc822};
+    if ($format =~ /news-usefor|smtp-8bitmime/) {
+      $self->{option}->{accept_coderange} = '8bit';
+    } else {
+      $self->{option}->{accept_coderange} = '7bit';
+    }
   }
-  $self->{option}->{fill_msgid_ns} = $Message::Header::RFC822::OPTION{namespace_uri};
-  $self->{option}->{fill_mimever_ns} = $Message::Header::RFC822::OPTION{namespace_uri};
+  $self->{option}->{fill_msgid_ns}   = $Message::Header::NS_phname2uri{rfc822};
+  $self->{option}->{fill_mimever_ns} = $Message::Header::NS_phname2uri{rfc822};
   unless (defined $self->{option}->{fill_date}) {
     $self->{option}->{fill_date} = $format !~ /cgi|uri-url-mailto/;
   }
   unless (defined $self->{option}->{fill_msgid}) {
     $self->{option}->{fill_msgid} = $format !~ /http|uri-url-mailto/;
+  }
+  unless (defined $self->{option}->{fill_ct}) {
+    $self->{option}->{fill_ct} = $format !~ /http/;
   }
   unless (defined $self->{option}->{fill_mimever}) {
     $self->{option}->{fill_mimever} = $format !~ /http/;
@@ -168,8 +166,8 @@ sub parse ($$;%) {
   $self->{header} = parse_array Message::Header \@header,
     -parse_all => $self->{option}->{parse_all},
     -format => $self->{option}->{format}, %new_field;
-  $self->{body} = join "\n", @body;	## BUG: binary-unsafe
-  $self->{body} = $self->_parse_value ($self->content_type => $self->{body})
+  $self->{body} = join "\x0D\x0A", @body;	## BUG: binary-unsafe
+  $self->{body} = $self->_parse_value (scalar $self->content_type => $self->{body})
     if $self->{option}->{parse_all};
   $self;
 }
@@ -265,7 +263,7 @@ sub _decode_body ($$) {
   	my $ctef = $self->header->field ('content-transfer-encoding',
   	                              -new_item_unless_exist => 0);
   	$cte = $ctef->value if ref $ctef;
-  	my $f = $DECODER{$cte};
+  	my $f = $Message::MIME::Encoding::DECODER{$cte};
   	if (ref $f) {
   	  ($value, $cte) = &$f ($self, $value);
   	}
@@ -273,20 +271,63 @@ sub _decode_body ($$) {
   $value;
 }
 
-sub _encode_body ($$) {
+sub _encode_body ($$\%) {
   my $self = shift;
   my $value = shift;
+  my $option = shift;
   ## MIME CTE
   	my $current_cte = $self->{_cte};
   	my $ctef = $self->header->field ('content-transfer-encoding',
   	                              -new_item_unless_exist => 0);
-  	my $cte; $cte = lc $ctef->value if ref $ctef;
-  	if ($current_cte && $current_cte ne $cte) {
-  	  #my $de = $DECODER{$current_cte};
-  	  my $en = $ENCODER{$cte};
-  	  if (ref $en) {
-  	    $value = &$en ($self, $value);
+  	my $cte = ''; $cte = lc $ctef->value if ref $ctef;
+  	## Get media type of entity body and its accept CTE list
+  	  my ($mt,$mst) = $self->content_type;
+  	  my $mt_def = $Message::MIME::MediaType::type{$mt}->{$mst};
+  	  $mt_def = $Message::MIME::MediaType::type{$mt}->{'/default'}
+  	    ;#unless ref $mt_def;
+  	  $mt_def = $Message::MIME::MediaType::type{'/default'}->{'/default'}
+  	    unless ref $mt_def;
+  	## If accept CTE list is defined,
+  	if (ref $mt_def->{accept_cte} eq 'ARRAY') {
+  	  my $f = 1; for (@{$mt_def->{accept_cte}}) {
+  	    if ($cte eq $_) {$f = 0; last}
+  	  }
+  	  if ($f) {	## If CTE is not accepted,
+  	    $cte = $mt_def->{accept_cte}->[0];
+  	  }
+  	}
+  	if ($current_cte eq 'binary' || ($current_cte && $current_cte ne $cte)) {
+  	  my $de = $Message::MIME::Encoding::DECODER{$current_cte};
+  	  my $en = $Message::MIME::Encoding::ENCODER{$cte || 'binary'};
+  	  if (ref $de && ref $en) {
+  	    my ($e, $decoded);
+  	    ($decoded, $e) = &$de ($self, $value);
+  	    ## Check transparent coderange
+  	      my $cr = $self->Message::MIME::Encoding::decide_coderange ($decoded);
+  	      if ($option->{accept_coderange} eq '8bit') {
+  	        if ($cr eq 'binary') {
+  	          $cte = $mt_def->{cte_7bit_preferred} || 'base64';
+  	          $en = $Message::MIME::Encoding::ENCODER{$cte};
+  	        }
+  	      } elsif ($option->{accept_coderange} eq '7bit') {
+  	        if ($cr eq 'binary' || $cr eq '8bit') {
+  	          $cte = $mt_def->{cte_7bit_preferred} || 'base64';
+  	          $en = $Message::MIME::Encoding::ENCODER{$cte};
+  	        }
+  	      }
+  	    if ($e eq 'binary') {
+  	      ($value, $e) = &$en ($self, $decoded);
+  	        $ctef = $self->header->field ('content-transfer-encoding')
+  	           unless ref $ctef;
+  	        $ctef->value ($e);
+  	    } else {
+  	      $ctef = $self->header->field ('content-transfer-encoding')
+  	         unless ref $ctef;
+  	      $ctef->value ($current_cte);
+  	    }
   	  } else {	## Can't encode by given CTE
+  	    $ctef = $self->header->field ('content-transfer-encoding')
+  	       unless ref $ctef;
   	    $ctef->value ($current_cte);
   	  }
   	}
@@ -305,21 +346,17 @@ sub stringify ($;%) {
   my %option = %{$self->{option}};
   for (grep {/^-/} keys %params) {$option{substr ($_, 1)} = $params{$_}}
   my ($header, $body);
-  my %exist;
-  if (ref $self->{header}) {
-    for ($self->{header}->field_name_list) {$exist{$_} = 1}
-  }
   if (ref $self->{body}) {
     $body = $self->{body}->stringify (-format => $option{format},
       -linebreak_strict => $option{linebreak_strict});
   } else {
     $body = $self->{body};
   }
-    #if ($exist{'content-transfer-encoding'}) {
-     # $body = $self->_encode_body ($body);
-    #}
+  $body = $self->_encode_body ($body, \%option);
   if (ref $self->{header}) {
-    my $ns_content = $Message::Header::Content::OPTION{namespace_uri};
+    my %exist;
+    for ($self->{header}->field_name_list) {$exist{$_} = 1}
+    my $ns_content = $Message::Header::NS_phname2uri{content};
     if ($option{fill_date}
        && !$exist{$option{fill_date_name}.':'.$option{fill_date_ns}}) {
       #die  $option{fill_date_ns};
@@ -335,16 +372,23 @@ sub stringify ($;%) {
         ($option{fill_msgid_name}, -ns => $option{fill_msgid_ns})
         ->generate (addr_spec => $from)
         if $from;
-    }
-    if ($option{fill_mimever} && !$exist{'mime-version:'.$option{fill_mimever_ns}}) {
-      ## BUG: rfc1049...
-      my $ismime = 0;
-      for (keys %exist) {if (/:$ns_content$/) { $ismime = 1; last }}
-      if ($ismime) {
+    }	# fill_msgid
+    my $ismime = 0;
+    for (keys %exist) {if (/:$ns_content$/) { $ismime = 1; last }}
+    if ($ismime) {
+      if ($option{fill_ct} && !$exist{'type:'.$ns_content}) {
+          my $ct = $self->{header}->field ('type',
+            -parse => 1, -ns => $ns_content);
+          $ct->media_type ($option{body_default_media_type});
+          $ct->replace (charset => $option{body_default_charset});
+      }
+      if ($option{fill_mimever}
+          && !$exist{'mime-version:'.$option{fill_mimever_ns}}) {
+        ## BUG: doesn't support rfc10]49, HTTP (ie. non-MIME) content-*: fields
         $self->{header}->add ('mime-version' => '1.0', 
           -parse => 0, -ns => $option{fill_mimever_ns});
       }
-    }
+    }	# $ismime
     if ($option{format} =~ /uri-url-mailto/ && $exist{'type:$ns_content'}
      && $option{uri_mailto_safe_level} > 1) {
       $self->{header}->field ('content-type')->media_type ('text/plain');
@@ -379,8 +423,8 @@ sub stringify ($;%) {
       $to||$header? 'mailto:'.$to.$header: '';
     }
   } else {
-    $header .= "\n" if $header && $header !~ /\n$/;
-    $header."\n".$body;
+    $header .= "\x0D\x0A" if $header && $header !~ /\x0D\x0A$/;
+    $header."\x0D\x0A".$body;
   }
 }
 *as_string = \&stringify;
@@ -409,10 +453,17 @@ Example:
 
 sub content_type ($;%) {
   my $self = shift;
-  return scalar $self->{header}->field ('content-type')->media_type
-    if $self->{header}->field_exist ('content-type');
-  'text/plain';
+  my $ct = $self->{header}->field ('content-type', -new_item_unless_exist => 0);
+  unless (ref $ct) {
+    return wantarray? qw/text plain/: 'text/plain';
+  }
+  if (wantarray) {
+    ($ct->media_type_major, $ct->media_type_minor);
+  } else {
+    $ct->media_type;
+  }
 }
+*media_type = \&content_type;
 
 =item $self->id
 
@@ -439,12 +490,45 @@ sub _add_ua_field ($) {
     my $ua = $self->{header}->field ($self->{option}->{fill_ua_name},
       -ns => $self->{option}->{fill_ua_ns});
     $ua->replace ('Message-pm' => $VERSION, -prepend => 0);
-    my @os;
+    my (@os, @os_comment);
     my @perl_comment;
     if ($self->{option}->{ua_use_config}) {
+      @os_comment = ('');
+      @os = ($^O => \@os_comment);
       eval q{use Config;
-        @os = ($^O => $Config{osvers}, -prepend => 0);
+        @os_comment = ($Config{osvers});
         push @perl_comment, $Config{archname};
+      };
+      eval q{use Win32;
+        my $build = Win32::BuildNumber;
+        push @perl_comment, "ActivePerl build $build" if $build;
+        my @osv = Win32::GetOSVersion;
+        @os = (
+            $osv[4] == 0? 'Win32s':
+            $osv[4] == 1? 'Windows':
+            $osv[4] == 2? 'WindowsNT':
+                          'Win32',       \@os_comment);
+        @os_comment = (sprintf ('%d.%02d.%d', @osv[1,2], $osv[3] & 0xFFFF));
+        push @os_comment, $osv[0] if $osv[0] =~ /[^\x09\x20]/;
+        if ($osv[4] == 1) {
+          if ($osv[1] == 4) {
+            if ($osv[2] == 0) {
+              if    ($osv[0] =~ /[Aa]/) { push @os_comment, 'Windows 95 OSR1' }
+              elsif ($osv[0] =~ /[Bb]/) { push @os_comment, 'Windows 95 OSR2' }
+              elsif ($osv[0] =~ /[Cc]/) { push @os_comment, 'Windows 95 OSR2.5' }
+              else                      { push @os_comment, 'Windows 95' }
+            } elsif ($osv[2] == 10) {
+              if    ($osv[0] =~ /[Aa]/) { push @os_comment, 'Windows 98 SE' }
+              else                      { push @os_comment, 'Windows 98' }
+            } elsif ($osv[2] == 90) {
+              push @os_comment, 'Windows Me';
+            }
+          }
+        } elsif ($osv[4] == 2) {
+          push @os_comment, 'Windows 2000' if $osv[1] == 5 && $osv[2] == 0;
+          push @os_comment, 'Windows XP' if $osv[1] == 5 && $osv[2] == 1;
+        }
+        push @os_comment, Win32::GetChipName;
       };
     } else {
       push @perl_comment, $^O;
@@ -454,7 +538,7 @@ sub _add_ua_field ($) {
     } elsif ($]) {	## Before 5.005
       $ua->replace (Perl => [ $], @perl_comment], -prepend => 0);
     }
-    $ua->replace (@os) if $self->{option}->{ua_use_config};
+    $ua->replace (@os, -prepend => 0) if $self->{option}->{ua_use_config};
   }
   $self;
 }
@@ -490,8 +574,6 @@ sub option ($@) {
     }
   }
 }
-
-## TODO: value_type()
 
 =item $self->clone ()
 
@@ -719,7 +801,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/25 09:53:24 $
+$Date: 2002/05/29 11:05:53 $
 
 =cut
 

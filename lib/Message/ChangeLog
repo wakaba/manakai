@@ -1,9 +1,28 @@
+2002-05-29  wakaba <w@suika.fam.cx>
+
+	* Entity.pm:
+	- (%ENCODE, %DECODE): Removed.  (Moved to Message::MIME::Encoding)
+	- Uses \x0D\x0A instead of \n.  (Temporary.  `linebreak-strict'
+	and related options should be implemented /strictly/.)
+	- (_encode_body): Checks media type to choose CTE.
+	- (accept_coderange): New option.
+	- (body_default_media_type, body_default_charset): Likewise.
+	- (fill_ct): Likewise.
+	- Uses %Message::Header::NS_phname2uri instead of direct
+	access to namespace definition package.
+	- (content_type): Returns (type, subtype) list when wantarray'ed.
+	- (media_type): New method.  (Alias of content_type)
+	* Header.pm (_replace_hash_shift): Checks namespace of field name.
+
 2002-05-26  wakaba <w@suika.fam.cx>
 
 	* Header.pm (url_mailto_safe): Removed.
 	(Moved to Message::Header::RFC822.)
 	
 	* Makefile: New file.
+	
+	* Entity.pm: Uses Win32 if use_config and $^O eq
+	MSWin32.
 
 2002-05-25  wakaba <w@suika.fam.cx>
 

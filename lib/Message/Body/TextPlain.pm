@@ -12,7 +12,7 @@ Perl module for text/plain media type.
 package Message::Body::TextPlain;
 use strict;
 use vars qw($VERSION %DEFAULT);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Header;
 use overload '""' => sub {shift->stringify};
@@ -104,7 +104,7 @@ sub stringify ($;%) {
   my %OPT = @_;
   my (%e) = &{$self->{option}->{hook_encode_string}} ($self, 
           $self->{body}, type => 'body');
-  $e{value} .= "\n" unless $e{value} =~ /\n$/;
+  $e{value} .= "\x0D\x0A" unless $e{value} =~ /\x0D\x0A$/;
   $e{value};
 }
 sub as_string ($;%) {shift->stringify (@_)}
@@ -158,7 +158,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/14 13:50:11 $
+$Date: 2002/05/29 11:05:53 $
 
 =cut
 

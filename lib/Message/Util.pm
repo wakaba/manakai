@@ -16,7 +16,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 use Carp ();
 
@@ -499,6 +499,7 @@ sub decode_ccontent ($$) {
   &Message::MIME::EncodedWord::decode_ccontent (@_[1,0]);
 }
 
+
 =head1 LICENSE
 
 Copyright 2002 wakaba E<lt>w@suika.fam.cxE<gt>.
@@ -521,7 +522,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/25 09:53:24 $
+$Date: 2002/05/29 11:05:53 $
 
 =cut
 
