@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/03/05 08:09:29 $
+      $Date: 2005/03/05 12:00:44 $
     @@ContentType:
       dis:Date.RCS
   
@@ -385,7 +385,7 @@ ClsDef:
       DOMMain:unsigned-long
     @@Get:
       @@@PerlDef:
-        $r = @{$self->{<Q::TreeCore:childNodes>}->{<Q::pc:childNodes>}};
+        $r = @{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}};
 
   @Attr:
     @@Name: sourceFile
@@ -581,15 +581,13 @@ ClsDef:
         @@@@@:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:subnode2>}}, <Q::pc:sub>;
+          push @{$node->{<Q::TreeCore:subnode2>}}, <Q::pc:sub>,
+                                                 <Q::dis2pm:overload>;
           push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
           $node->{<Q::pc:sub>} = {};
           $node->{<Q::dis:ISA>} = [];
           $node->{<Q::dis:Implement>} = {};
-        @@@@ImplNote:
-          @@@@@lang:en
-          @@@@@@:
-            Optional properties: none.
+          $node->{<Q::dis2pm:overload>} = {};
 
   @Method:
     @@Name: getSub
@@ -612,9 +610,15 @@ ClsDef:
       @@@Type: ManakaiPerlSub
       @@@enDesc:
         The subroutine object. 
+      @@@nullCase:
+        @@@@enDesc:
+          Either the specified subroutine is not found and 
+          the <P::makeNewNode> parameter is set to <DOM::false> or
+          the subroutine is defined as an alias. 
       @@@PerlDef:
         if ($self->{<Q::TreeCore:node>}->{<Q::pc:sub>}->{$subName}) {
-          $r = $self->{<Q::TreeCore:node>}->{<Q::pc:sub>}->{$subName};
+          $r = ref $self->{<Q::TreeCore:node>}->{<Q::pc:sub>}->{$subName}
+             ? $self->{<Q::TreeCore:node>}->{<Q::pc:sub>}->{$subName} : null;
         } elsif ($makeNewNode) {
           $r = $self->{<Q::TreeCore:node>}->{<Q::pc:sub>}->{$subName}
              = <ClassM::ManakaiPerlSub.newObject>;
@@ -628,6 +632,179 @@ ClsDef:
                    ::ManakaiDOM:Perl.newReference>
                          (<ClassName::ManakaiPerlSub>) if $r;
 
+  @Method:
+    @@Name: getSubAliasName
+    @@enDesc:
+      Gets the real name of a subroutine. 
+    @@Param:
+      @@@Name: subName
+      @@@Type:
+        DISLang:String::ManakaiDOM:all
+      @@@enDesc:
+        The name of the alias subroutine. 
+    @@Return:
+      @@@Type: 
+        DISLang:String::ManakaiDOM:all
+      @@@enDesc:
+        The real name. 
+      @@@nullCase:
+        @@@@enDesc:
+          The specified name is used. 
+      @@@InCase:
+        @@@@Value:\#CODE
+        @@@@enDesc:
+          The specified name is not an alias. 
+      @@@PerlDef:
+        if ($self->{<Q::TreeCore:node>}->{<Q::sub>}->{$subName}) {
+          $r = ref $self->{<Q::TreeCore:node>}
+                        ->{<Q::sub>}->{$subName}
+             ? q<#CODE> : $self->{<Q::TreeCore:node>}
+                           ->{<Q::sub>}->{$subName};
+        }
+
+  @Method:
+    @@Name: setSubAliasName
+    @@enDesc:
+      Sets a subroutine name as an alias of another subroutine. 
+    @@Param:
+      @@@Name: aliasName
+      @@@Type:
+        DISLang:String::ManakaiDOM:all
+      @@@enDesc:
+        The alias name. 
+    @@Param:
+      @@@Name: realName
+      @@@Type:
+        DISLang:String::ManakaiDOM:all
+      @@@enDesc:
+        The real name. 
+    @@Return:
+      @@@UnknownOperatorException:
+      @@@PerlDef:
+        my $ops = $self->{<Q::TreeCore:node>}->{<Q::sub>};
+        if (ref $ops->{$aliasName}) {
+          CORE::delete $ops->{<Q::pc:parent>};
+          $ops->{$aliasName}
+              -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl.orphanate>;
+        }
+        $ops->{$aliasName} = $realName;
+
+  @Method:
+    @@Name: getOverloadSub
+    @@enDesc:
+      Gets an overloading subroutine. 
+    @@Param:
+      @@@Name: opName
+      @@@Type:
+        DISLang:String::ManakaiDOM:all
+      @@@enDesc:
+        The name of the overloaded operator. 
+    @@NamedParam:
+      @@@Name: makeNewNode
+      @@@Type:
+        DOMMain:boolean
+      @@@enDesc:
+        Whether a new subroutine object should be created, 
+        if it is not exist, or not. 
+    @@Return:
+      @@@Type: ManakaiPerlSub
+      @@@enDesc:
+        The subroutine object. 
+      @@@nullCase:
+        @@@@enDesc:
+          Either the specified subroutine is not found and 
+          the <P::makeNewNode> parameter is set to <DOM::false> or
+          the specified operator is overloaded by specifying method name. 
+      @@@UnknownOperatorException:
+      @@@PerlDef:
+        unless (<Code::operatorNameList>->{$opName}) {
+          __EXCEPTION{UNSUPPORTED_OPERATOR_ERR::
+            pc:operator => {$opName},
+          }__;
+        }
+        if ($self->{<Q::TreeCore:node>}->{<Q::dis2pm:operator>}->{$opName}) {
+          $r = ref $self->{<Q::TreeCore:node>}
+                        ->{<Q::dis2pm:operator>}->{$opName}
+             ? $self->{<Q::TreeCore:node>}
+                        ->{<Q::dis2pm:operator>}->{$opName} : null;
+        } elsif ($makeNewNode) {
+          $r = $self->{<Q::TreeCore:node>}->{<Q::dis2pm:operator>}->{$opName}
+             = <ClassM::ManakaiPerlSub.newObject>;
+          $self->{<Q::TreeCore:node>}
+               -><M::ManakaiDOM:ManakaiDOMNodeObject
+                   ::ManakaiDOM:Perl.importTree> ($r);
+          $r->{<Q::pc:parent>} = $self->{<Q::TreeCore:node>};
+        }
+        $r = $r-><M::ManakaiDOM:ManakaiDOMNodeObject
+                   ::ManakaiDOM:Perl.newReference>
+                         (<ClassName::ManakaiPerlSub>) if $r;
+
+  @Method:
+    @@Name: getOverloadMethodName
+    @@enDesc:
+      Gets an overloading method name. 
+    @@Param:
+      @@@Name: opName
+      @@@Type:
+        DISLang:String::ManakaiDOM:all
+      @@@enDesc:
+        The name of the overloaded operator. 
+    @@Return:
+      @@@Type: 
+        DISLang:String::ManakaiDOM:all
+      @@@enDesc:
+        The method name. 
+      @@@nullCase:
+        @@@@enDesc:
+          The specified operator is not overloaded.
+      @@@InCase:
+        @@@@Value:\#CODE
+        @@@@enDesc:
+          The operator is overloaded by an anonymous subroutine. 
+      @@@PerlDef:
+        if ($self->{<Q::TreeCore:node>}->{<Q::dis2pm:operator>}->{$opName}) {
+          $r = ref $self->{<Q::TreeCore:node>}
+                        ->{<Q::dis2pm:operator>}->{$opName}
+             ? q<#CODE> : $self->{<Q::TreeCore:node>}
+                           ->{<Q::dis2pm:operator>}->{$opName};
+        }
+
+  @Method:
+    @@Name: setOverloadMethodName
+    @@enDesc:
+      Sets an overloading method name. 
+    @@Param:
+      @@@Name: opName
+      @@@Type:
+        DISLang:String::ManakaiDOM:all
+      @@@enDesc:
+        The name of the overloaded operator. 
+    @@Param:
+      @@@Name: methodName
+      @@@Type:
+        DISLang:String::ManakaiDOM:all
+      @@@enDesc:
+        The name of the method by which overloads an operator. 
+        \
+        {NOTE:: The method may or may not belong to this package. 
+        \
+        }
+    @@Return:
+      @@@UnknownOperatorException:
+      @@@PerlDef:
+        unless (<Code::operatorNameList>->{$opName}) {
+          __EXCEPTION{UNSUPPORTED_OPERATOR_ERR::
+            pc:operator => {$opName},
+          }__;
+        }
+        my $ops = $self->{<Q::TreeCore:node>}->{<Q::dis2pm:operator>};
+        if (ref $ops->{$opName}) {
+          CORE::delete $ops->{<Q::pc:parent>};
+          $ops->{$opName}
+              -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl.orphanate>;
+        }
+        $ops->{$opName} = $methodName;
+
   @Attr:
     @@Name: length
     @@enDesc:
@@ -636,7 +813,8 @@ ClsDef:
       DOMMain:unsigned-long
     @@Get:
       @@@PerlDef:
-        $r = keys %{$self->{<Q::TreeCore:childNodes>}->{<Q::pc:sub>}};
+        $r = keys (%{$self->{<Q::TreeCore:node>}->{<Q::pc:sub>}})
+           + keys (%{$self->{<Q::TreeCore:node>}->{<Q::dis2pm:operator>}});
 
   @Method:
     @@Name: addIsaPackage
@@ -690,7 +868,73 @@ ClsDef:
                 <ClassM::ManakaiPerlCodeImplementation.perlList> (\@isa) .
                 ";\n";
         }
+        for my $cnk (keys %{$node->{<Q::pc:sub>}}) {
+          my $cno = $node->{<Q::pc:sub>}->{$cnk};
+          if (ref $cno) {
+            my $cn = $cno-><M::ManakaiDOM:ManakaiDOMNodeObject
+                               ::ManakaiDOM:Perl.newReference>
+                                     (<ClassName::ManakaiPerlSub>);
+            $r .= $cn->stringify;
+          } else {
+            $r .= qq<*$cnk = \&$cno;\n>;
+          }
+        }
+        my $op = '';
+        for my $cnk (keys %{$node->{<Q::dis2pm:operator>}}) {
+          my $cno = $node->{<Q::dis2pm:operator>}->{$cnk};
+          if (ref $cno) {
+            my $cn = $cno-><M::ManakaiDOM:ManakaiDOMNodeObject
+                             ::ManakaiDOM:Perl.newReference>
+                                   (<ClassName::ManakaiPerlSub>);
+            $op .= <ClassM::ManakaiPerlCodeImplementation.perlLiteral> ($cnk)
+                .  ' => ' . $cn->stringify . ', ';
+          } elsif (defined $cno) {
+            $op .= <ClassM::ManakaiPerlCodeImplementation.perlList>
+                                                        ([$cnk => $cno]) . ', ';
+          }
+        }
+        $r .= 'use overload ' . $op . qq[fallback => 1;\n] if $op;
 ##PerlPackageScope
+
+PropDef:
+  @QName:
+    dis2pm:operator
+  @enDesc:
+    Overloaded operators.
+
+ElementTypeBinding:
+  @Name: UnknownOperatorException
+  @ElementType:
+    ManakaiDOM:raises
+  @ShadowContent:
+    @@@:UNSUPPORTED_OPERATOR_ERR
+    @@enDesc:
+      An attempt is made to overload an unknown operator. 
+
+XParamDef:
+  @QName:
+    pc:operator
+  @enDesc:
+    An operator to overload. 
+
+ResourceDef:
+  @QName: operatorNameList
+  @enDesc:
+    The list of valid operators for <PerlModule::operator> pragma. 
+  @rdf:type:
+    dis2pm:InlineCode
+  @PerlDef:
+    {qw[
+                    +  1 -  1 *  1 /  1 %  1 **  1 <<  1 >>  1 x  1 .  1
+                    += 1 -= 1 *= 1 /= 1 %= 1 **= 1 <<= 1 >>= 1 x= 1 .= 1
+                    <  1 <= 1 >  1 >= 1 == 1 != 1 <=> 1
+                    lt 1 le 1 gt 1 ge 1 eq 1 ne 1 cmp 1
+                    & 1 | 1 ^ 1 neg 1 ! 1 ~ 1
+                    ++ 1 -- 1 = 1
+                    atan2 1 cos 1 sin 1 exp 1 abs 1 log 1 sqrt 1
+                    bool 1 "" 1 0+ 1 ${} 1 @{} 1 %{} 1 &{} 1 *{} 1 <> 1
+                    nomethod 1
+    ]}
 
 ClsDef:
   @ClsQName: ManakaiPerlSub
@@ -734,7 +978,7 @@ ClsDef:
       DOMMain:unsigned-long
     @@Get:
       @@@PerlDef:
-        $r = @{$self->{<Q::TreeCore:childNodes>}->{<Q::pc:childNodes>}};
+        $r = @{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}};
 
   @Attr:
     @@Name: name
@@ -836,6 +1080,23 @@ ClsDef:
       @@@PerlDef:
         $self->{<Q::TreeCore:node>}->{<Q::sourceLine>}
                             += ($codeArg =~ tr/\x0A/\x0A/);
+
+  @ToStringMethod:
+    @@Return:
+      @@@Type:
+        DISLang:String
+      @@@enDesc:
+        Perl code. 
+      @@@PerlDef:
+        my $node = $self->{<Q::TreeCore:node>};
+        $r = q<sub>;
+        $r .= ' ' . $node->{<Q::pc:localName>}
+                if defined $node->{<Q::pc:localName>};
+        $r .= ' (' . $node->{<Q::pc:prototype>} . ')'
+                if defined $node->{<Q::pc:prototype>};
+        $r .= " {\n";
+
+        $r .= "}\n";
 ##PerlSub
 
 ClsDef:
@@ -1059,6 +1320,106 @@ PropDef:
   @QName: localName
   @enDesc:
     Scoped names.
+
+## -- Exceptions
+
+ExceptionDef:
+  @ClsQName: ManakaiPerlCodeException
+  @enDesc:
+    Exceptions for the <Module::PerlCode> module.
+  @ClsISA:
+    ManakaiDOM:ManakaiDOMException::ManakaiDOM:Perl
+  @XConstGroupDef:
+    @@ClsQName: ManakaiPerlCodeExceptionCode
+    @@enDesc:
+      Exception codes for <Class::ManakaiPerlCodeException>. 
+    @@XConstDef:
+      @@@Name: NOT_SUPPORTED_ERR
+      @@@Value:9
+      @@@enDesc:
+        An attempt is made to do something the implementation does not support. 
+      @@@XSubTypeDef:
+        @@@@QName: UNSUPPORTED_OPERATOR_ERR
+        @@@@enDesc:
+          The implementation does not support the specified operator. 
+        @@@@XParam:
+          @@@@@QName: operator
+          @@@@@enDesc:
+            The operator that is not supported. 
+        @@@@enMufDef:
+          Operator "%p (name => {<Q::pc:operator>});" is not supported
+
+ElementTypeBinding:
+  @Name: ExceptionDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:ExceptionClass
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:Perl
+      @@@For:
+        !=ManakaiDOM:Perl
+    @@ForCheck:
+      ManakaiDOM:Perl
+    @@DOMMain:implementFeature: CoreFeature10
+
+ElementTypeBinding:
+  @Name: XConstGroupDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:ConstGroup
+    @@Type:
+      DOMMain:unsigned-short::ManakaiDOM:all
+    @@rdfs:subClassOf:
+      DOMMain:unsigned-short::ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: XConstDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:Const
+
+ElementTypeBinding:
+  @Name: XSubTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:ExceptionOrWarningSubType
+
+ElementTypeBinding:
+  @Name: XParam
+  @ElementType:
+    ManakaiDOM:exceptionOrWarningParameter
+
+ElementTypeBinding:
+  @Name: XParamDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: 
+      DOMMain:XWParameter
+    @@AliasFor:
+      @@@For:
+        !=ManakaiDOM:all
+      @@@@:
+        ::ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: enMufDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:muf
+    @@lang:en
+
 
 ElementTypeBinding:
   @Name: ClsDef

@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/03/05 08:09:29 $
+      $Date: 2005/03/05 12:00:44 $
     @@ContentType:
       dis:Date.RCS
   
@@ -907,7 +907,7 @@ ClsDef:
 
             my $has_for = false;
             for my $ce (@ce) {
-              if ($self-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
+              if ($ce-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
                                                      .expandedURI> eq
                   <Q::dis:For>) {
                 my $fors = [split /\s+/, $ce-><AG::swcfg21:SWCFGNode
@@ -2155,7 +2155,7 @@ ClsDef:
             $root_elements = $doc-><M::ManakaiDISDocument.disChildElements>
                                          (for_arg => $forArg);
             for my $el (@$root_elements) {
-              if ($el-><M::ManakaiDISElement.isResourceElement>) {
+              if ($el-><AG::ManakaiDISElement.isResourceElement>) {
                 $self-><M::ManakaiDISDatabase.loadResource>
                                          ($mod, null, null, $el,
                                           for_arg => $forArg);
@@ -2351,7 +2351,8 @@ ClsDef:
               if ($parentResource) {
                 my $puri = $parentResource->{uri};
                 my $ru;
-                my $ln = $res->{localName};
+                my $ln = $n_node-><AG::swcfg21:SWCFGNode
+                                     ::swcfg21:ForLatest.value>;
                 __CODE{getChildResourceURI:: $parentURI => $puri,
                                              $localName => $ln,
                                              $result => $ru}__;
@@ -2361,8 +2362,6 @@ ClsDef:
                 $res->{localName} = $n_node-><AG::swcfg21:SWCFGNode
                                                 ::swcfg21:ForLatest.value>;
                 $res->{<Q::isAnon>} = true;
-                $res->{aliasURI}->{$node_uri} = true;
-                $self->{resDef}->{$node_uri} = $res;
               } else {  ## Root local name resource
                 my $ln = $n_node-><AG::swcfg21:SWCFGNode
                                                 ::swcfg21:ForLatest.value>;
@@ -2417,9 +2416,20 @@ ClsDef:
             my $canon_res = $self-><M::ManakaiDISDatabase.getResource>
                                                            ($canon_uri);
             $canon_res-><M::ManakaiDISResourceDefinition.isReferred> ($al_node);
-            $canon_res-><M::ManakaiDISResourceDefinition.mergeAsAlias> ($res);
+            $canon_res-><M::ManakaiDISResourceDefinition.mergeAsAlias>
+                                      ($res, node => $al_node);
             $res = $canon_res;
           }
+
+          ## -- Registers as child
+          $parentResource-><M::ManakaiDISPropertyAccessor
+                                    .addPropertyResourceList>
+                                      (<Q::DIS:childResource>, $res)
+             if $parentResource;
+          $dynParent-><M::ManakaiDISPropertyAccessor
+                                    .addPropertyResourceList>
+                                      (<Q::DIS:dynamicChildResource>, $res)
+             if $dynParent;
 
           my $is_multires = false;
           my @props;
@@ -2443,7 +2453,7 @@ ClsDef:
                                   ($ce-><M::ManakaiDISElement.tfqnamesValueURI>
                                                     ($node_id, $forArg));
               $res-><M::ManakaiDISResourceDefinition.addSuperResource> ($sres);
-            } elsif ($ce-><M::ManakaiDISElement.isResourceElement>) {
+            } elsif ($ce-><AG::ManakaiDISElement.isResourceElement>) {
               push @cres, $ce;
             } else {
               ## Property and invalid element is not checked, since not
@@ -2569,6 +2579,16 @@ PropDef:
   @QName: dynamicParentResource
   @enDesc:
     Dynamic parent resource.   No parent for root resources. 
+
+PropDef:
+  @QName: childResource
+  @enDesc:
+    Static child resources.
+
+PropDef:
+  @QName: dynamicChildResource
+  @enDesc:
+    Dynamic child resources.
 
 ElementTypeBinding:
   @Name: ForDefDupException
@@ -3258,8 +3278,19 @@ ClsDef:
                 should be discarded.
         \
         }
+    @@NodeParam:
     @@Return:
+      @@@RaiseException:
+        @@@@@:MERGE_ITSELF_ERR
+        @@@@@@enDesc:
+          An attempt is made to merge this resource itself. 
       @@@PerlDef:
+        if ($self eq $aliasResource) {
+          __EXCEPTION{MERGE_ITSELF_ERR::
+            DIS:uri => {$self->{uri}},
+            DIS:sourceNode => {$node},
+          }__;
+        }
         for my $uri ($aliasResource->{uri}, 
                      grep {$aliasResource->{aliasURI}->{$_}}
                           keys %{$aliasResource->{aliasURI}}) {
@@ -3398,7 +3429,8 @@ ClsDef:
                     DIS:generatedName => {$r},
                   }__;
                 }__;
-              } elsif (my $op_uri = $self-><AG::ManakaiDISResourceDefinition
+              }
+            } elsif (my $op_uri = $self-><AG::ManakaiDISResourceDefinition
                                                   .plMethodOperator>) {
                 $r = {
                        <Q::ManakaiDOM:MUErrorHandler> => '___report_error',
@@ -3407,7 +3439,6 @@ ClsDef:
                        <Q::DISPerl:AsCloneMethod> => 'clone',
                      }->{$op_uri};
                 $r = $op_uri if $op_uri =~ /^[A-Z]+$/;
-              }
             } else {
               $r = null;
             }
@@ -4136,6 +4167,23 @@ ExceptionDef:
     @@enDesc:
       Exception codes for <Class::ManakaiDISException>. 
     @@XConstDef:
+      @@@Name: HIERARCHY_REQUEST_ERR
+      @@@Value:3
+      @@@enDesc:
+        An attempt is made to break the hierarchy. 
+      @@@XSubTypeDef:
+        @@@@QName: MERGE_ITSELF_ERR
+        @@@@enDesc:
+          An attempt is made to merge the resource to itself. 
+        @@@@XSourceNodeParam:
+        @@@@XParam:
+          @@@@@QName:uri
+          @@@@@enDesc:
+            The URI reference of the resource to merge. 
+        @@@@enMufDef:
+          An attempt is made to merge the resource <%p (name => {<Q::DIS:uri>}
+          );> to itself
+    @@XConstDef:
       @@@Name: NOT_SUPPORTED_ERR
       @@@Value:9
       @@@enDesc:
@@ -4466,9 +4514,9 @@ ElementTypeBinding:
       ManakaiDOM:Class
     @@AliasFor:
       @@@@:
-        ::ForLatest
+        ::DIS:ForLatest
       @@@For:
-        !=ForLatest
+        !=DIS:ForLatest
     @@ForCheck:
       ManakaiDOM:Perl
     @@DOMMain:implementFeature: CoreFeature10
