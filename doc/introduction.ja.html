@@ -9,16 +9,16 @@
 <link rel="stylesheet" href="/s/simpledoc" />
 <link rev="made" href="mailto:w@suika.fam.cx" />
 <link rel="copyright" href="/c/pd" title="Public Domain." />
-<meta name="author" content="á—t" />
+<meta name="author" content="$B<cMU(B" />
 <meta name="keywords" content="Perl, module, pm, Message, RFC 822, RFC 2822, RFC 1036, son-of-RFC 1036, MIME, Usefor, HTTP, CGI, header, field" />
 </head>
 <body>
 <h1>Message::* Perl modules</h1>
 
-<h2>‚Í‚¶‚ß‚Ì‚Í‚¶‚ß‚É</h2>
+<h2>$B$O$8$a$N$O$8$a$K(B</h2>
 
-<p>‚½‚Æ‚¦‚Î Perl ‚Å‘‚©‚ê‚½ CGI script, ‚»‚ê‚àŒf¦”Â‚È‚ñ‚©‚É‚ÍA
-‚±‚ñ‚È‚­‚¾‚ç‚È‚¢ code ‚ªÚ‚Á‚Ä‚¢‚½‚è‚µ‚Ü‚·B</p>
+<p>$B$?$H$($P(B Perl $B$G=q$+$l$?(B CGI script, $B$=$l$b7G<(HD$J$s$+$K$O!"(B
+$B$3$s$J$/$@$i$J$$(B code $B$,:\$C$F$$$?$j$7$^$9!#(B</p>
 
 <pre class="application-x-perl">
 jcode'convert(*from, "jis");
@@ -34,15 +34,15 @@ print MAIL "\n";
 close (MAIL);
 </pre>
 
-<p>‚±‚ê‚Å‚Í‹”F«‚à—Ç‚­‚È‚¢‚Å‚·‚µA‚¤‚Á‚©‚èC³‚µŠÔˆá‚¦‚é‚Æ
-•Ï‚ÈƒƒbƒZ[ƒW‚ğ‘—M‚µ‚Ä‚µ‚Ü‚¢‚Ü‚·B
-(•MÒ‚Í‚µ‚å‚Á‚¿‚ã‚¤‚Í‚Ü‚Á‚Ä‚Ü‚µ‚½:-)
-(‚»‚ê‚É‘½‚­‚Ì code ‚Å‚ÍA
-HTML ‚Å‚ÌƒNƒƒXƒTƒCƒgƒXƒNƒŠƒvƒeƒBƒ“ƒO (CSS) –â‘è‚Æ
-—Ş—‚Ì–â‘è‚Ö‚Ì‘Îˆ‚ğ‚µ‚Ä‚¢‚Ü‚¹‚ñB)</p>
+<p>$B$3$l$G$O;kG'@-$bNI$/$J$$$G$9$7!"$&$C$+$j=$@5$74V0c$($k$H(B
+$BJQ$J%a%C%;!<%8$rAw?.$7$F$7$^$$$^$9!#(B
+($BI.<T$O$7$g$C$A$e$&$O$^$C$F$^$7$?(B:-)
+($B$=$l$KB?$/$N(B code $B$G$O!"(B
+HTML $B$G$N%/%m%9%5%$%H%9%/%j%W%F%#%s%0(B (CSS) $BLdBj$H(B
+$BN`;w$NLdBj$X$NBP=h$r$7$F$$$^$;$s!#(B)</p>
 
-<p>ƒIƒuƒWƒFƒNƒgwŒü‚ğæ‚è“ü‚ê‚ÄŸ‚Ì‚æ‚¤‚ÈŠ´‚¶‚ÅƒƒbƒZ[ƒW‚ğ
-\¬‚µ‚½‚¢‚Æ‚±‚ë‚Å‚·B</p>
+<p>$B%*%V%8%'%/%H;X8~$r<h$jF~$l$F<!$N$h$&$J46$8$G%a%C%;!<%8$r(B
+$B9=@.$7$?$$$H$3$m$G$9!#(B</p>
 
 <pre class="application-x-perl">
 use Message::Entity;
@@ -53,173 +53,174 @@ $hdr-&gt;add ('To')-&gt;add ('foo@bar.example', display_name =&gt; 'Mr. foo');
 $hdr-&gt;add ('Subject' =&gt; $subject);
 $msg-&gt;body ($body);
 
-# $smtp-&gt;send ‚Í SMTP ‚Å‘—M‚·‚é method ‚Æ‰¼’èB
+# $smtp-&gt;send $B$O(B SMTP $B$GAw?.$9$k(B method $B$H2>Dj!#(B
 $smtp-&gt;send ($msg);
 </pre>
 
-<p><a href="http://www.cpan.org/" xml:lang="en">CPAN</a> ‚ğ’T‚·‚ÆA
-‚±‚ê‚É—‚½‚æ‚¤‚È‚±‚Æ‚ª‚Å‚«‚»‚¤‚Èƒ‚ƒWƒ…[ƒ‹‚Í‚ ‚é‚æ‚¤‚Å‚·‚ªA
-ÀÛ‚Ég‚Á‚Ä‚İ‚é‚ÆA—^‚¦‚é’l‚É‚æ‚Á‚Ä‚Í <a href="urn:ietf:rfc:822">RFC 822</a>/<a href="urn:ietf:rfc:2822">2822</a> ‚Éˆá”½‚·‚é
-Œ‹‰Ê‚ğo—Í‚·‚é‚È‚Ç‚Ì•s–‚ª‚ ‚è‚Ü‚·B (—á‚¦‚Î¡‚Ì—á‚Å
-<code xml:lang="en">To:</code> —Ìˆæ‚Ég‚Á‚Ä‚¢‚é
-<code xml:lang="en">display_name</code> ‚Åu.v‚ªŠÜ‚Ü‚ê‚Ü‚·‚ªA
-RFC 2822 “I‚É‚ÍV‚µ‚¢ƒƒbƒZ[ƒW‚Å‚ÍŒİŠ·«‚Ì‚½‚ß
+<p><a href="http://www.cpan.org/" xml:lang="en">CPAN</a> $B$rC5$9$H!"(B
+$B$3$l$K;w$?$h$&$J$3$H$,$G$-$=$&$J%b%8%e!<%k$O$"$k$h$&$G$9$,!"(B
+$B<B:]$K;H$C$F$_$k$H!"M?$($kCM$K$h$C$F$O(B <a href="urn:ietf:rfc:822">RFC 822</a>/<a href="urn:ietf:rfc:2822">2822</a> $B$K0cH?$9$k(B
+$B7k2L$r=PNO$9$k$J$I$NITK~$,$"$j$^$9!#(B ($BNc$($P:#$NNc$G(B
+<code xml:lang="en">To:</code> $BNN0h$K;H$C$F$$$k(B
+<code xml:lang="en">display_name</code> $B$G!V(B.$B!W$,4^$^$l$^$9$,!"(B
+RFC 2822 $BE*$K$O?7$7$$%a%C%;!<%8$G$O8_49@-$N$?$a(B
 <code xml:lang="en" class="bnf rfc2822">quoted-string</code>
-‚É‚·‚é•K—v‚ª‚ ‚è‚Ü‚·B‚µ‚©‚µ‚»‚Ì‚Ü‚Üo—Í‚³‚ê‚Ü‚·B)</p>
+$B$K$9$kI,MW$,$"$j$^$9!#$7$+$7$=$N$^$^=PNO$5$l$^$9!#(B)</p>
 
-<p class="note">Ql: u.v‚Ìê‡‚Í RFC 2822 “I‚É‚Í³‚µ‚­‰ğß
-‚³‚ê‚È‚¯‚ê‚Î‚È‚è‚Ü‚¹‚ñ‚ª (o—Í‚Í‚·‚×‚«‚Å‚È‚¢)A
-‚±‚êˆÈŠO‚Ì•¶šA—á‚¦‚Î§Œä•¶š <code class="character">ESCAPE</code> ‚Å‚à“¯‚¶‚æ‚¤‚É‚È‚è‚Ü‚·B
-‚±‚¿‚ç‚ÍŠ®‘S‚ÉŠÔˆá‚¢‚Å‚·B</p>
-<p class="note">Ql: À‘••ûj‚Æ‚µ‚Ä‚Í•s³‚È’l‚Íƒ‚ƒWƒ…[ƒ‹‚É
-“n‚·‘O‚É’e‚­‚×‚«‚Æ‚¢‚¤l‚¦•û‚à‚ ‚é‚Å‚µ‚å‚¤B
-‚Å‚à‚»‚ñ‚È‚Ì‚Í•s•Ö‚Å‚·B</p>
+<p class="note">$B;29M(B: $B!V(B.$B!W$N>l9g$O(B RFC 2822 $BE*$K$O@5$7$/2r<a(B
+$B$5$l$J$1$l$P$J$j$^$;$s$,(B ($B=PNO$O$9$Y$-$G$J$$(B)$B!"(B
+$B$3$l0J30$NJ8;z!"Nc$($P@)8fJ8;z(B <code class="character">ESCAPE</code> $B$G$bF1$8$h$&$K$J$j$^$9!#(B
+$B$3$A$i$O40A4$K4V0c$$$G$9!#(B</p>
+<p class="note">$B;29M(B: $B<BAuJ}?K$H$7$F$OIT@5$JCM$O%b%8%e!<%k$K(B
+$BEO$9A0$KCF$/$Y$-$H$$$&9M$(J}$b$"$k$G$7$g$&!#(B
+$B$G$b$=$s$J$N$OITJX$G$9!#(B</p>
 
-<p>‚Æ‚¢‚¤‚±‚Æ‚ÅA‚Í‚¶‚ß‚ÍŠù‘¶‚Ìƒ‚ƒWƒ…[ƒ‹‚Ì wrapper (‚ ‚é‚¢‚Í•âŠ®) 
-‚ğ‘‚­‚Â‚à‚è‚Å‚µ‚½‚ªA‚È‚ñ‚¾‚©‚²‚¿‚á‚²‚¿‚á‚µ‚Ä‚¢‚ÄA
-‚»‚ê‚È‚çÔ—Ö‚ÌÄ”­–¾‚É‚È‚Á‚Ä‚àˆê‚©‚ç‘‚¢‚Ä‚İ‚æ‚¤‚Æl‚¦‚Ü‚µ‚½B</p>
+<p>$B$H$$$&$3$H$G!"$O$8$a$O4{B8$N%b%8%e!<%k$N(B wrapper ($B$"$k$$$OJd40(B) 
+$B$r=q$/$D$b$j$G$7$?$,!"$J$s$@$+$4$A$c$4$A$c$7$F$$$F!"(B
+$B$=$l$J$i<VNX$N:FH/L@$K$J$C$F$b0l$+$i=q$$$F$_$h$&$H9M$($^$7$?!#(B</p>
 
-<h2>“ÁF (‚Æ‚¢‚¤’ö‚Ì‚à‚Ì‚Å‚à‚È‚¢B)</h2>
+<h2>$BFC?'(B ($B$H$$$&Dx$N$b$N$G$b$J$$!#(B)</h2>
 
 <ol>
-<li>Œ‹\(“ä)ƒIƒuƒWƒFƒNƒgwŒü‚Å‚·B</li>
-<li>RFC 822/2822 ‚Ì <code class="bnf rfc2822">group</code> ‚ğ‰ğßo—ˆ‚Ü‚·B</li>
-<li><a href="urn:ietf:id:draft-ietf-usefor-msg-id-alt-00">draft-ietf-usefor-msg-id-alt-00</a> ‚ÉŠî‚Ã‚¢‚½‘—MƒAƒhƒŒƒX‚È‚Ç‚É‚æ‚é <code class="rfc2822">Message-ID</code> ‚ğ¶¬o—ˆ‚Ü‚·B</li>
-<li>•¶šƒR[ƒh“Æ—§ (CSI) ‚Å‚·B (’A‚µ RFC 822 ‚Å‚ ‚é“s‡ã(“ä)A
-ASCII ŒİŠ·‚Å‚ ‚é•K—v‚Í‚ ‚è‚Ü‚·B EBCDIC ‚Æ‚©‚Í–³—‚Å‚·:-&lt;)</li>
+<li>$B7k9=(B($BFf(B)$B%*%V%8%'%/%H;X8~$G$9!#(B</li>
+<li>RFC 822/2822 $B$N(B <code class="bnf rfc2822">group</code> $B$r2r<a=PMh$^$9!#(B</li>
+<li><a href="urn:ietf:id:draft-ietf-usefor-msg-id-alt-00">draft-ietf-usefor-msg-id-alt-00</a> $B$K4p$E$$$?Aw?.%"%I%l%9$J$I$K$h$k(B <code class="rfc2822">Message-ID</code> $B$r@8@.=PMh$^$9!#(B</li>
+<li>$BJ8;z%3!<%IFHN)(B (CSI) $B$G$9!#(B ($BC"$7(B RFC 822 $B$G$"$kET9g>e(B($BFf(B)$B!"(B
+ASCII $B8_49$G$"$kI,MW$O$"$j$^$9!#(B EBCDIC $B$H$+$OL5M}$G$9(B:-&lt;)</li>
 </ol>
 
-<h2>Šed—l‚Ö‚Ì‘Î‰ó‹µ</h2>
+<h2>$B3F;EMM$X$NBP1~>u67(B</h2>
 
 <ol>
-<li>“dqƒƒCƒ‹‚ÌƒƒbƒZ[ƒW (RFC 822, RFC 2822) 
-‚Ì‘S‹@”\‚É (”²‚¯‚ª–³‚¯‚ê‚Î) ‘Î‰‚µ‚Ä‚¢‚Ü‚·B
-’A‚µ’·‚³§ŒÀ‚È‚Ç‚Íƒ`ƒFƒbƒN‚µ‚Ä‚¢‚Ü‚¹‚ñB (MIME ‚Ì
+<li>$BEE;R%a%$%k$N%a%C%;!<%8(B (RFC 822, RFC 2822) 
+$B$NA45!G=$K(B ($BH4$1$,L5$1$l$P(B) $BBP1~$7$F$$$^$9!#(B
+$BC"$7D9$5@)8B$J$I$O%A%'%C%/$7$F$$$^$;$s!#(B (MIME $B$N(B
 <code class="mime">Content-Transfer-Encoding</code>
-‚Æˆê‚ÉÀ‘•—\’è)</li>
-<li>“dqƒjƒ…[ƒX‹L– (<a href="/uri-res/N2L?urn:ietf:rfc:1036">RFC 1036</a>,
+$B$H0l=o$K<BAuM=Dj(B)</li>
+<li>$BEE;R%K%e!<%95-;v(B (<a href="/uri-res/N2L?urn:ietf:rfc:1036">RFC 1036</a>,
 <a href="spec/son-of-RFC1036">son-of-RFC1036</a>,
 <a href="/uri-res/N2L?urn:ietf:id:draft-usefor-article-06">
-draft-usefor-article (06)</a>) ‚Ì“ª—Ìˆæ‚Ì‘½‚­‚É‘Î‰‚µ‚Ä‚¢‚Ü‚·B</li>
-<li>MIME ‚Ì–{‘Ì•”•ª (body part) ‚É‚Í‚Ü‚¾‘Î‰‚µ‚Ä‚¢‚Ü‚¹‚ñB</li>
-<li>MIME ‚Ì’Ç‰Á“ª—Ìˆæ 
+draft-usefor-article (06)</a>) $B$NF,NN0h$NB?$/$KBP1~$7$F$$$^$9!#(B</li>
+<li>MIME $B$NK\BNItJ,(B (body part) $B$K$O$^$@BP1~$7$F$$$^$;$s!#(B</li>
+<li>MIME $B$NDI2CF,NN0h(B 
 (<a href="/uri-res/N2L?urn:ietf:rfc:2045">RFC 2045</a>,
-<code class="mime">Content-Disposition</code>) ‚É‘Î‰‚µ‚Ä‚¢‚Ü‚·B
-ƒpƒ‰ƒ[ƒ^[’lŠg’£ (<a href="/uri-res/N2L?urn:ietf:rfc:2231">RFC 2231</a>)
-‚à“üo—Í‚Æ‚à‚ÉÀ‘•‚µ‚Ü‚µ‚½B</li>
-<li>MIME •„†‰»Œê (<code class="mime bnf">encoded-word</code>)
-‚Ì‰ğ“Ç‚É‘Î‰‚µ‚Ä‚¢‚Ü‚·:-) ’A‚µ•Ê“r•ÏŠ·ˆ—‚ğw’è‚·‚é•K—v‚ª‚ ‚è‚Ü‚·B
-(<a href="#code">•¶šƒR[ƒh‚Ìˆµ‚¢</a>QÆ)</li>
-<li>HTTP/1.0, HTTP/1.1, CGI/1.1, CGI/1.2 ‚Ì“ª—Ìˆæ‚Ì‚¤‚¿A
-‚²‚­ˆê•”‚É‘Î‰‚µ‚Ä‚¢‚Ü‚·B MHTML ‚Ì 
-<code class="mime">Content-Location</code> ‚É‚à‘Î‰‚µ‚Ä‚¢‚Ü‚·B</li>
-<li>“ú•tŒ`®‚Å‚Í RFC 822/<a href="urn:ietf:rfc:1123">1123</a>, 
+<code class="mime">Content-Disposition</code>) $B$KBP1~$7$F$$$^$9!#(B
+$B%Q%i%a!<%?!<CM3HD%(B (<a href="/uri-res/N2L?urn:ietf:rfc:2231">RFC 2231</a>)
+$B$bF~=PNO$H$b$K<BAu$7$^$7$?!#(B</li>
+<li>MIME $BId9f2=8l(B (<code class="mime bnf">encoded-word</code>)
+$B$N2rFI$KBP1~$7$F$$$^$9(B:-) $BC"$7JLESJQ49=hM}$r;XDj$9$kI,MW$,$"$j$^$9!#(B
+(<a href="#code">$BJ8;z%3!<%I$N07$$(B</a>$B;2>H(B)</li>
+<li>HTTP/1.0, HTTP/1.1, CGI/1.1, CGI/1.2 $B$NF,NN0h$N$&$A!"(B
+$B$4$/0lIt$KBP1~$7$F$$$^$9!#(B MHTML $B$N(B 
+<code class="mime">Content-Location</code> $B$K$bBP1~$7$F$$$^$9!#(B</li>
+<li>$BF|IU7A<0$G$O(B RFC 822/<a href="urn:ietf:rfc:1123">1123</a>, 
 <a href="urn:ietf:rfc:733">RFC 733</a>, asctime, ISO 8601 (HTML) 
-‚È‚Ç‚É‘Î‰‚µ‚Ä‚¢‚Ü‚·B</li>
+$B$J$I$KBP1~$7$F$$$^$9!#(B</li>
 </ol>
 
-<h2>§ŒÀ–€</h2>
+<h2>$B@)8B;v9`(B</h2>
 
 <ol>
-<li>—Ş—ƒ‚ƒWƒ…[ƒ‹(“ä)‚Ì‚æ‚¤‚ÉAƒtƒ@ƒCƒ‹–¼‚âƒtƒ@ƒCƒ‹Eƒnƒ“ƒhƒ‹‚ğ
-“n‚µ‚Ä“Ç‚İ‚Ü‚¹‚é‚±‚Æ‚ªo—ˆ‚Ü‚¹‚ñB</li>
-<li>‘å‚«‚ÈƒƒbƒZ[ƒW‚Å‚àˆê‹C‚É“Ç‚İ‚İA‘S‚Äå‹L‰¯—Ìˆæ‚Å
-•Û‚µ‚Ä‚¢‚Ü‚·B‚Å‚·‚©‚ç‚ ‚Ü‚è‘å‚«‚ÈƒƒbƒZ[ƒW‚Ìˆ—‚É‚Í
-Œü‚¢‚Ä‚¢‚È‚¢‚Å‚µ‚å‚¤B</li>
-<li><code>CR</code> ‚â <code>LF</code> ‚ª’P‘Ì‚ÅoŒ»‚·‚éê‡A
-³‚µ‚­ˆ—o—ˆ‚Ü‚¹‚ñB (<code>CRLF</code> ‚Æ“™‰¿‚Æ‚İ‚È‚µ‚Ü‚·B)
-«—ˆ‚Ì”Å‚Å‚ÍƒIƒvƒVƒ‡ƒ“‚Å§Œä‰Â”\‚É‚È‚é‚©‚à‚µ‚ê‚Ü‚¹‚ñB</li>
-<li>‚ ‚Á‚½‚ç—Ç‚³‚»‚¤‚È‹@”\‚ª–¢À‘•‚©‚à‚µ‚ê‚Ü‚¹‚ñB
-(<a href="mailto:w@suika.fam.cx">“dqƒƒCƒ‹</a>‚È‚Ç‚Å‹³‚¦‚Ä‰º‚³‚¢B)</li>
-<li>Šeƒ‚ƒWƒ…[ƒ‹‚ÌƒIƒvƒVƒ‡ƒ“‘ÌŒn‚ª‚ ‚Ü‚è®”õ‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB
-(‚»‚ê‚Å‚à‹C‚¿ˆ«‚­‚È‚¢’ö“x‚É‚Í‘ÌŒn“I‚¾‚Æv‚¢‚Ü‚·B)</li>
-<li>à–¾•¶ (document) ‚ª—Ç‚¢‰ÁŒ¸‚Å‚·B</li>
+<li>$BN`;w%b%8%e!<%k(B($BFf(B)$B$N$h$&$K!"%U%!%$%kL>$d%U%!%$%k!&%O%s%I%k$r(B
+$BEO$7$FFI$_9~$^$;$k$3$H$,=PMh$^$;$s!#(B</li>
+<li>$BBg$-$J%a%C%;!<%8$G$b0l5$$KFI$_9~$_!"A4$F<g5-21NN0h$G(B
+$BJ];}$7$F$$$^$9!#$G$9$+$i$"$^$jBg$-$J%a%C%;!<%8$N=hM}$K$O(B
+$B8~$$$F$$$J$$$G$7$g$&!#(B</li>
+<li><code>CR</code> $B$d(B <code>LF</code> $B$,C1BN$G=P8=$9$k>l9g!"(B
+$B@5$7$/=hM}=PMh$^$;$s!#(B (<code>CRLF</code> $B$HEy2A$H$_$J$7$^$9!#(B)
+$B>-Mh$NHG$G$O%*%W%7%g%s$G@)8f2DG=$K$J$k$+$b$7$l$^$;$s!#(B</li>
+<li>$B$"$C$?$iNI$5$=$&$J5!G=$,L$<BAu$+$b$7$l$^$;$s!#(B
+($BM_$7$$5!G=$,L$<BAu$@$C$?$i!"(B
+<a href="mailto:w@suika.fam.cx">$BEE;R%a%$%k(B</a>$B$J$I$G65$($F2<$5$$!#(B)</li>
+<li>$B3F%b%8%e!<%k$N%*%W%7%g%sBN7O$,$"$^$j@0Hw$5$l$F$$$^$;$s!#(B
+($B$=$l$G$b5$;}$A0-$/$J$$DxEY$K$OBN7OE*$@$H;W$$$^$9!#(B)</li>
+<li>$B@bL@J8(B (document) $B$,NI$$2C8:$G$9!#(B</li>
 </ol>
 
-<h2>¡Œã‚Ì—\’è</h2>
+<h2>$B:#8e$NM=Dj(B</h2>
 
 <ol>
-<li>“dqƒjƒ…[ƒX‚Ì“ª—Ìˆæ (RFC 1036, 
+<li>$BEE;R%K%e!<%9$NF,NN0h(B (RFC 1036, 
 <a href="spec/son-of-RFC1036">son-of-RFC1036</a>, 
-draft-usefor-article) ‚ÌŠ®‘SÀ‘•</li>
-<li><del>MIME ‚Ì“ª—Ìˆæ‚ÌÀ‘•B</del></li>
-<li>’Ç‰Á/”ñ•W€‚Ì“ª—Ìˆæ‚ÌÀ‘•B</li>
-<li>MIME –{‘Ì (<code class="bnf rfc822">body</code>) ‚ÌÀ‘•B</li>
-<li><del>•¶š•„†•ÏŠ·‚Ì‚½‚ß‚Ì hook ‚ÌÀ‘•?</del></li>
-<li>documentationB</li>
-<li>g—p—á‚Ìì¬B</li>
+draft-usefor-article) $B$N40A4<BAu(B</li>
+<li><del>MIME $B$NF,NN0h$N<BAu!#(B</del></li>
+<li>$BDI2C(B/$BHsI8=`$NF,NN0h$N<BAu!#(B</li>
+<li>MIME $BK\BN(B (<code class="bnf rfc822">body</code>) $B$N<BAu!#(B</li>
+<li><del>$BJ8;zId9fJQ49$N$?$a$N(B hook $B$N<BAu(B?</del></li>
+<li>documentation$B!#(B</li>
+<li>$B;HMQNc$N:n@.!#(B</li>
 </ol>
 
-<h2>•K—vŠÂ‹«</h2>
+<h2>$BI,MW4D6-(B</h2>
 
 <ol>
-<li>Perl (perl 5.6 ˆÈ~‚Ü‚½‚Í<span title="human parser">lŠÔ‰ğÍÒ</span>:-))
+<li>Perl (perl 5.6 $B0J9_$^$?$O(B<span title="human parser">$B?M4V2r@O<T(B</span>:-))
 	<p class="note"><code class="bnf rfc822">comment</code>
-	‚ğ•\‚·‚Ì‚É³‹K•\Œ» <code class="regex">(??{ <var>code</var> })</code> 
-	‚ğg‚Á‚Ä‚¢‚é‚Ì‚ÅA‚±‚ê‚ğ‰ğßo—ˆ‚éA 
-	5.6 ˆÈ~‚Ì”Å‚Å‚ ‚é•K—v‚ª‚ ‚è‚Ü‚·B</p>
+	$B$rI=$9$N$K@55,I=8=(B <code class="regex">(??{ <var>code</var> })</code> 
+	$B$r;H$C$F$$$k$N$G!"$3$l$r2r<a=PMh$k!"(B 
+	5.6 $B0J9_$NHG$G$"$kI,MW$,$"$j$^$9!#(B</p>
 </li>
 <li>Digest::MD2, Digest::MD5, Digest::SHA1
-	<p>Message-ID ‚Ì¶¬‚É‚±‚ê‚ç‚ğg—p‚·‚éê‡‚Ì‚İA
-	<code>Message::Field::MsgID::MsgID</code> ‚ªg‚¢‚Ü‚·B</p>
-	<p>‚±‚ê‚ç‚ª—pˆÓ‚³‚ê‚Ä‚¢‚È‚¢ŠÂ‹«‚Å‚ÍƒGƒ‰[‚É‚È‚é‚Ì‚ÅA
-	(Œ»ó‚Å‚Í) ã‹Lƒ‚ƒWƒ…[ƒ‹‚ÌŠY“–•”•ª‚ğ‘‚«Š·‚¦‚Ä‘Îˆ‚µ‚Ä‰º‚³‚¢B</p>
+	<p>Message-ID $B$N@8@.$K$3$l$i$r;HMQ$9$k>l9g$N$_!"(B
+	<code>Message::Field::MsgID::MsgID</code> $B$,;H$$$^$9!#(B</p>
+	<p>$B$3$l$i$,MQ0U$5$l$F$$$J$$4D6-$G$O%(%i!<$K$J$k$N$G!"(B
+	($B8=>u$G$O(B) $B>e5-%b%8%e!<%k$N3:EvItJ,$r=q$-49$($FBP=h$7$F2<$5$$!#(B</p>
 </li>
-<li>•¶šƒR[ƒh•ÏŠ·ˆ—
-	<p>“ú–{ŒêƒƒbƒZ[ƒW‚ğˆµ‚¤‚È‚ç•K{‚Å‚µ‚å‚¤B
-	Ú‚µ‚­‚Í<a href="#code">•¶šƒR[ƒh‚Ìˆµ‚¢</a>
-	‚ÌÍ‚ğ‚²QÆ‰º‚³‚¢B</p>
+<li>$BJ8;z%3!<%IJQ49=hM}(B
+	<p>$BF|K\8l%a%C%;!<%8$r07$&$J$iI,?\$G$7$g$&!#(B
+	$B>\$7$/$O(B<a href="#code">$BJ8;z%3!<%I$N07$$(B</a>
+	$B$N>O$r$4;2>H2<$5$$!#(B</p>
 </li>
 </ol>
 
-<h2>“üè</h2>
+<h2>$BF~<j(B</h2>
 
-<p>suika.fam.cx ‚Ì SSH account ‚ğ‚¨‚¿‚Ìê‡A CVS ‚©‚ç“üèo—ˆ‚Ü‚·B</p>
+<p>suika.fam.cx $B$N(B SSH account $B$r$*;}$A$N>l9g!"(B CVS $B$+$iF~<j=PMh$^$9!#(B</p>
 
 <p class="example">$ cvs -d :ext:<var xml:lang="en">username</var>@suika.fam.cx:/home/cvs -d perl/lib/Message/</p>
 
-<p>Web ‚©‚ç‚àæ‚èo‚¹‚Ü‚·B &lt;<a href="/gate/cvs/perl/lib/Message/">http://suika.fam.cx/gate/cvs/perl/lib/Message/</a>&gt; (tarball ‚ÅˆêŠ‡æ“¾‚ào—ˆ‚Ü‚·B)</p>
+<p>Web $B$+$i$b<h$j=P$;$^$9!#(B &lt;<a href="/gate/cvs/perl/lib/Message/">http://suika.fam.cx/gate/cvs/perl/lib/Message/</a>&gt; (tarball $B$G0l3g<hF@$b=PMh$^$9!#(B)</p>
 
-<h2>ƒ‰ƒCƒZƒ“ƒX</h2>
+<h2>$B%i%$%;%s%9(B</h2>
 
-<p>Message::* Perl modules ‚Í©—Rƒ\ƒtƒgƒEƒFƒA‚Å‚·B
-GNU GPL ‚É]‚Á‚Ä—˜—po—ˆ‚Ü‚·BÚ‚µ‚­‚ÍŠeƒtƒ@ƒCƒ‹‚ğŒä——‰º‚³‚¢B</p>
+<p>Message::* Perl modules $B$O<+M3%=%U%H%&%'%"$G$9!#(B
+GNU GPL $B$K=>$C$FMxMQ=PMh$^$9!#>\$7$/$O3F%U%!%$%k$r8fMw2<$5$$!#(B</p>
 
-<h2>Ql•¶Œ£</h2>
+<h2>$B;29MJ88%(B</h2>
 
 <ul>
-<li><a href="spec/">ŠÖ˜A‚·‚éd—l‘ (RFC, Internet-Draft “™)</a></li>
+<li><a href="spec/">$B4XO"$9$k;EMM=q(B (RFC, Internet-Draft $BEy(B)</a></li>
 </ul>
 
-<h2 id="code">•¶šƒR[ƒh‚Ìˆµ‚¢</h2>
+<h2 id="code">$BJ8;z%3!<%I$N07$$(B</h2>
 
-<p>”Ú‚µ‚¢‚±‚Æ‚Å“ª‚ğ”Y‚Ü‚·‚Ì‚ÍŒ™‚È‚Ì‚Å(˜m)A
-Message::* ‚Í•„†‰»•û–@“Æ—§ (CSI) ‚ğ–Úw‚µ‚ÄÀ‘•‚µ‚Ä‚¢‚Ü‚·B
-(’A‚µ ASCII ‚Ì‚µ‚ª‚ç‚İ‚¾‚¯‚Í’f‚¿Ø‚Á‚Ä‚¢‚Ü‚¹‚ñ:-))
-0x00 ` 0x7F ‚ª ASCII (‚Ü‚½‚Í ASCII ‚ÆŒ©‚È‚µ‚Ä—Ç‚¢‚à‚Ì) ‚Å‚ ‚é
-ê‡‚ÍA Message::* ‚ğ’Ê‚µ‚½‚±‚Æ‚Åƒf[ƒ^‚ª‰ó‚ê‚é‚±‚Æ‚Í
-–³‚¢‚Æv‚¢‚Ü‚·B</p>
+<p>$BH\$7$$$3$H$GF,$rG:$^$9$N$O7y$J$N$G(B($BON(B)$B!"(B
+Message::* $B$OId9f2=J}K!FHN)(B (CSI) $B$rL\;X$7$F<BAu$7$F$$$^$9!#(B
+($BC"$7(B ASCII $B$N$7$,$i$_$@$1$OCG$A@Z$C$F$$$^$;$s(B:-))
+0x00 $B!A(B 0x7F $B$,(B ASCII ($B$^$?$O(B ASCII $B$H8+$J$7$FNI$$$b$N(B) $B$G$"$k(B
+$B>l9g$O!"(B Message::* $B$rDL$7$?$3$H$G%G!<%?$,2u$l$k$3$H$O(B
+$BL5$$$H;W$$$^$9!#(B</p>
 
-<p>(‚à‚¿‚ë‚ñA RFC 822 ‚È‚ÇŠed—l‚ÉÆ‚ç‚µ‚Ä³“(“I)‚Å
-‚ ‚é•K—v‚ª‚ ‚è‚Ü‚·B <code class="bnf rfc822">atom</code>
-‚É8ƒrƒbƒgEƒR[ƒh‚ªŠÜ‚Ü‚ê‚Ä‚¢‚é‚Æ³‚µ‚­ˆµ‚¦‚Ü‚¹‚ñB)
-(‘‚¢˜b‚ªA <code class="bnf rfc822">quoted-string</code> 
-‚È‚Ç‚Å‚Í8ƒrƒbƒg“§‰ß‚¾‚Æ‚¢‚¤‚±‚Æ‚Å‚·B‰ñ‚è‚­‚Ç‚­‚Ä‚²‚ß‚ñ‚È‚³‚¢B)</p>
+<p>($B$b$A$m$s!"(B RFC 822 $B$J$I3F;EMM$K>H$i$7$F@5E}(B($BE*(B)$B$G(B
+$B$"$kI,MW$,$"$j$^$9!#(B <code class="bnf rfc822">atom</code>
+$B$K(B8$B%S%C%H!&%3!<%I$,4^$^$l$F$$$k$H@5$7$/07$($^$;$s!#(B)
+($BAa$$OC$,!"(B <code class="bnf rfc822">quoted-string</code> 
+$B$J$I$G$O(B8$B%S%C%HF)2a$@$H$$$&$3$H$G$9!#2s$j$/$I$/$F$4$a$s$J$5$$!#(B)</p>
 
-<p>Šù’è‚Ìó‘Ô‚Å‚Í•¶šƒR[ƒh‚ÉŠÖŒW‚·‚é•ÏŠ·ˆ—‚Ís‚í‚ê‚Ü‚¹‚ñB
-‚µ‚©‚µAƒtƒbƒNŠÖ”‚Á‚Û‚¢‚à‚Ì(“ä)‚ğw’è‚·‚é‚±‚Æ‚ÅA
-•ÏŠ·ˆ—‚ğ‚³‚¹‚ç‚ê‚Ü‚·B</p>
+<p>$B4{Dj$N>uBV$G$OJ8;z%3!<%I$K4X78$9$kJQ49=hM}$O9T$o$l$^$;$s!#(B
+$B$7$+$7!"%U%C%/4X?t$C$]$$$b$N(B($BFf(B)$B$r;XDj$9$k$3$H$G!"(B
+$BJQ49=hM}$r$5$;$i$l$^$9!#(B</p>
 
-<p>w’èo—ˆ‚éƒtƒbƒNŠÖ”‚Á‚Û‚¢‚à‚Ì‚Í2í—Ş‚Å‚·B
-<code>DECODER</code> ‚ÍAŒ³‚ÌƒƒbƒZ[ƒW‚ğ‰ğÍ‚·‚é
-(<code class="perl">parse ()</code>) ‚É“K‹XŒÄ‚Ño‚³‚ê‚Ü‚·B
-<code>ENCODER</code> ‚ÍAƒƒbƒZ[ƒW‚Æ‚µ‚Ä•¶š—ñ‰»‚·‚éÛ
-(<code class="perl">stringify ()</code> ‚È‚Ç) ‚É“K‹XŒÄ‚Ño‚³‚ê‚Ü‚·B</p>
+<p>$B;XDj=PMh$k%U%C%/4X?t$C$]$$$b$N$O(B2$B<oN`$G$9!#(B
+<code>DECODER</code> $B$O!"85$N%a%C%;!<%8$r2r@O$9$k;~(B
+(<code class="perl">parse ()</code>) $B$KE,598F$S=P$5$l$^$9!#(B
+<code>ENCODER</code> $B$O!"%a%C%;!<%8$H$7$FJ8;zNs2=$9$k:](B
+(<code class="perl">stringify ()</code> $B$J$I(B) $B$KE,598F$S=P$5$l$^$9!#(B</p>
 
-<p>‚±‚ê‚ç‚ÌŠÖ”‚ÍA“–‘RA“–ŠYˆ—‚ªŒÄ‚Ño‚³‚ê‚é‘O‚Éw’è‚µ‚Ä‚¨‚­
-•K—v‚ª‚ ‚è‚Ü‚·B
-<samp class="perl">Message::Entity-&gt;parse</samp> ‚È‚Ç‚·‚é‘O‚É
-’è‹`‚µ‚Ä‚¨‚­‚Æ—Ç‚¢‚Å‚µ‚å‚¤B</p>
+<p>$B$3$l$i$N4X?t$O!"EvA3!"Ev3:=hM}$,8F$S=P$5$l$kA0$K;XDj$7$F$*$/(B
+$BI,MW$,$"$j$^$9!#(B
+<samp class="perl">Message::Entity-&gt;parse</samp> $B$J$I$9$kA0$K(B
+$BDj5A$7$F$*$/$HNI$$$G$7$g$&!#(B</p>
 
 <pre class="example perl">
 require Message::MIME::Charset;
@@ -227,52 +228,52 @@ $Message::MIME::Charset::DECODER{'*default'} = sub {jcode::euc ($_[1])};
 $Message::MIME::Charset::ENCODER{'*default'} = sub {jcode::jis ($_[1], 'euc')};
 </pre>
 
-<p>‚±‚Ì—á‚Å‚ÍA jcode.pl ‚ğ•ÏŠ·ˆ—‚Ég‚¢‚Ü‚·B
-(‚à‚¿‚ë‚ñAŠù‚É <code class="perl">require</code> 
-‚³‚ê‚Ä‚¢‚é‚Æ‰¼’è‚µ‚Ä‚¢‚Ü‚·B)</p>
-<p>Å‰‚Ì <code class="perl">require</code> ‚ÅA•ÏŠ·ˆ—‚ğ’S“–‚µ‚Ä‚¢‚é
-<code class="perl">Message::MIME::Charset</code> ‚ğ“Ç‚İ‚İ‚Ü‚·B
-(‚±‚¤‚µ‚Ä‚¨‚©‚È‚¢‚ÆAŒã‚©‚çŠù’è’l (= –³•ÏŠ·) ‚Å
-<code class="perl">*default</code> ‚ªã‘‚«‚³‚ê‚Ä‚µ‚Ü‚¢‚Ü‚·B)</p>
+<p>$B$3$NNc$G$O!"(B jcode.pl $B$rJQ49=hM}$K;H$$$^$9!#(B
+($B$b$A$m$s!"4{$K(B <code class="perl">require</code> 
+$B$5$l$F$$$k$H2>Dj$7$F$$$^$9!#(B)</p>
+<p>$B:G=i$N(B <code class="perl">require</code> $B$G!"JQ49=hM}$rC4Ev$7$F$$$k(B
+<code class="perl">Message::MIME::Charset</code> $B$rFI$_9~$_$^$9!#(B
+($B$3$&$7$F$*$+$J$$$H!"8e$+$i4{DjCM(B (= $BL5JQ49(B) $B$G(B
+<code class="perl">*default</code> $B$,>e=q$-$5$l$F$7$^$$$^$9!#(B)</p>
 
-<p>‚±‚Ì code ‚ğg‚Á‚½ƒXƒNƒŠƒvƒg‚Í“à•”ˆ—‚ğ“ú–{Œê EUC 
-‚Ås‚¤‚Æ‰¼’è‚µ‚Ä‚¢‚Ü‚·B‚Å‚·‚©‚çA <code class="perl">DECODER</code>
-‚Å“ú–{Œê EUC ‚É•ÏŠ·‚µ‚Ü‚·B</p>
-<p>‚Ü‚½A“ú–{ŒêƒƒbƒZ[ƒW‚Å‚Í <code>ISO-2022-JP</code>
-‚ğg‚¤‚Ì‚ªŠµK‚Å‚·‚©‚çA <code class="perl">ENCODER</code>
-‚Å‚Í 7ƒrƒbƒg JIS ‚É•ÏŠ·‚µ‚Ä‚¢‚Ü‚·B</p>
-<p>ˆ—‚ğs‚¤ŠÖ”‚ÍAˆø”‚ª2‚ÂˆÈã—^‚¦‚ç‚ê‚Ü‚·B
-1‚Â–Ú‚Ìˆø”‚ÍŒÄ‚Ño‚µ‚½ class module, ‚¢‚í‚ä‚é 
-<code class="perl">$self</code> ‚Å‚·B(‚±‚Ìê‡ self ‚Å‚Í‚ ‚è‚Ü‚¹‚ñ‚ª:-)
-‚Å‚à•’Ê‚Í•K—v‚È‚¢‚Å‚µ‚å‚¤B</p>
-<p>2‚Â–Ú‚Ìˆø”‚Íˆ—‘ÎÛ‚Ì•¶š—ñ‚Å‚·B</p>
-<p>3‚Â–ÚˆÈ~‚Ìˆø”‚ÍA’Ç‰ÁƒIƒvƒVƒ‡ƒ“‚ÌƒnƒbƒVƒ…‚Å‚·B
-‚½‚¾‚µAŒ»İ’Ç‰ÁƒIƒvƒVƒ‡ƒ“‚Í’è‹`‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB</p>
-<p>ŠÖ”‚ª•Ô‚·’l‚Í(¡‚Ì‚Æ‚±‚ë)ˆê‚Â‚¾‚¯‚Å‚·B
-ˆ—‚ªI‚í‚Á‚½•¶š—ñ‚Å‚·B•ÏŠ·Œ‹‰Ê‚Æ‚µ‚Ä‰½‚à‚È‚­‚È‚Á‚Ä‚µ‚Ü‚Á‚½‚çA
-‚à‚¿‚ë‚ñ‹ó•¶š—ñ‚ğ•Ô‚µ‚Ä\‚¢‚Ü‚¹‚ñB (<code class="perl">undef</code>
-‚æ‚è‚à‹ó•¶š—ñ‚Ì•û‚ª–]‚Ü‚µ‚¢‚Å‚µ‚å‚¤B)</p>
+<p>$B$3$N(B code $B$r;H$C$?%9%/%j%W%H$OFbIt=hM}$rF|K\8l(B EUC 
+$B$G9T$&$H2>Dj$7$F$$$^$9!#$G$9$+$i!"(B <code class="perl">DECODER</code>
+$B$GF|K\8l(B EUC $B$KJQ49$7$^$9!#(B</p>
+<p>$B$^$?!"F|K\8l%a%C%;!<%8$G$O(B <code>ISO-2022-JP</code>
+$B$r;H$&$N$,47=,$G$9$+$i!"(B <code class="perl">ENCODER</code>
+$B$G$O(B 7$B%S%C%H(B JIS $B$KJQ49$7$F$$$^$9!#(B</p>
+<p>$B=hM}$r9T$&4X?t$O!"0z?t$,(B2$B$D0J>eM?$($i$l$^$9!#(B
+1$B$DL\$N0z?t$O8F$S=P$7$?(B class module, $B$$$o$f$k(B 
+<code class="perl">$self</code> $B$G$9!#(B($B$3$N>l9g(B self $B$G$O$"$j$^$;$s$,(B:-)
+$B$G$bIaDL$OI,MW$J$$$G$7$g$&!#(B</p>
+<p>2$B$DL\$N0z?t$O=hM}BP>]$NJ8;zNs$G$9!#(B</p>
+<p>3$B$DL\0J9_$N0z?t$O!"DI2C%*%W%7%g%s$N%O%C%7%e$G$9!#(B
+$B$?$@$7!"8=:_DI2C%*%W%7%g%s$ODj5A$5$l$F$$$^$;$s!#(B</p>
+<p>$B4X?t$,JV$9CM$O(B($B:#$N$H$3$m(B)$B0l$D$@$1$G$9!#(B
+$B=hM}$,=*$o$C$?J8;zNs$G$9!#JQ497k2L$H$7$F2?$b$J$/$J$C$F$7$^$C$?$i!"(B
+$B$b$A$m$s6uJ8;zNs$rJV$7$F9=$$$^$;$s!#(B (<code class="perl">undef</code>
+$B$h$j$b6uJ8;zNs$NJ}$,K>$^$7$$$G$7$g$&!#(B)</p>
 
-<p>‚³‚ÄAã‹L‚Ì—á‚Å‚Íu<code>*default</code>v‚Ì EN/DECODER 
-‚ğw’è‚µ‚Ü‚µ‚½‚ªA‚±‚±‚É‚Í‘ã‚í‚è‚É charset –¼‚ğw’èo—ˆ‚Ü‚·B</p>
+<p>$B$5$F!">e5-$NNc$G$O!V(B<code>*default</code>$B!W$N(B EN/DECODER 
+$B$r;XDj$7$^$7$?$,!"$3$3$K$OBe$o$j$K(B charset $BL>$r;XDj=PMh$^$9!#(B</p>
 
 <pre class="perl example">
 $Message::MIME::Charset::DECODER{'iso-2022-jp'} = sub {jcode::euc ($_[1], 'jis')};
 </pre>
 
-<p>‚±‚±‚Å‚ÍA <code>ISO-2022-JP</code> ‚ğ“à•”ƒR[ƒh‚É•ÏŠ·‚·‚é
-•û–@‚ğ’è‹`‚µ‚Ä‚¢‚Ü‚·B charset –¼ (‚¨‚æ‚Ñu<code>*default</code>v
-‚Í•K‚¸¬•¶š‚Å‘‚¢‚Ä‰º‚³‚¢!)</p>
-<p>MIME body ‚âA encoded-word, RFC 2231 ‚ÌŠg’£ƒpƒ‰ƒ[ƒ^[’l
-‚È‚ÇA charset ‚ªw’è‚³‚ê‚Ä‚¢‚é‚Í‚»‚Ì charset –¼‚Ì•ÏŠ·ŠÖ”‚ª
-ŒÄ‚Ño‚³‚ê‚Ü‚·B (w’è‚³‚ê‚½ charset –¼‚Ì•ÏŠ·ŠÖ”‚ª–¢’è‹`‚Ì‚ÍA
-‰½‚àˆ—‚µ‚Ü‚¹‚ñB) ‚±‚êˆÈŠO‚Ìê–Ê‚Å‚ÍA <code>*default</code>
-‚Å’è‹`‚³‚ê‚½ŠÖ”‚ªg‚í‚ê‚Ü‚·B</p>
+<p>$B$3$3$G$O!"(B <code>ISO-2022-JP</code> $B$rFbIt%3!<%I$KJQ49$9$k(B
+$BJ}K!$rDj5A$7$F$$$^$9!#(B charset $BL>(B ($B$*$h$S!V(B<code>*default</code>$B!W(B
+$B$OI,$:>.J8;z$G=q$$$F2<$5$$(B!)</p>
+<p>MIME body $B$d!"(B encoded-word, RFC 2231 $B$N3HD%%Q%i%a!<%?!<CM(B
+$B$J$I!"(B charset $B$,;XDj$5$l$F$$$k;~$O$=$N(B charset $BL>$NJQ494X?t$,(B
+$B8F$S=P$5$l$^$9!#(B ($B;XDj$5$l$?(B charset $BL>$NJQ494X?t$,L$Dj5A$N;~$O!"(B
+$B2?$b=hM}$7$^$;$s!#(B) $B$3$l0J30$N>lLL$G$O!"(B <code>*default</code>
+$B$GDj5A$5$l$?4X?t$,;H$o$l$^$9!#(B</p>
 
-<p>ÅŒã‚ÉA“ú–{ŒêƒƒbƒZ[ƒW‚ğˆµ‚¤Û‚Ì—á‚ğ‹“‚°‚Ä‚¨‚«‚Ü‚·B</p>
+<p>$B:G8e$K!"F|K\8l%a%C%;!<%8$r07$&:]$NNc$r5s$2$F$*$-$^$9!#(B</p>
 
 <pre class="example perl">
-<span class="comment">## jcode.pl ‚ğg—p</span>
+<span class="comment">## jcode.pl $B$r;HMQ(B</span>
 require 'jcode.pl';
 require Message::MIME::Charset;
 $Message::MIME::Charset::DECODER{'*default'} = sub {jcode::euc ($_[1])};
@@ -281,7 +282,7 @@ $Message::MIME::Charset::DECODER{'euc-jp'} = sub {$_[1]};
 $Message::MIME::Charset::DECODER{'shift_jis'} = sub {jcode::euc ($_[1], 'sjis')};
 $Message::MIME::Charset::ENCODER{'*default'} = sub {
   my $s = $_[1];
-  <span class="comment">## ³‹K‰»</span>
+  <span class="comment">## $B@55,2=(B</span>
   jcode::tr(\$s,
       "\xa3\xb0-\xa3\xb9\xa3\xc1-\xa3\xda\xa3\xe1-\xa3\xfa\xa1\xf5".
       "\xa1\xa4\xa1\xa5\xa1\xa7\xa1\xa8\xa1\xa9\xa1\xaa\xa1\xae".
@@ -295,7 +296,7 @@ $Message::MIME::Charset::ENCODER{'*default'} = sub {
 </pre>
 
 <pre class="example perl">
-<span class="comment">## Jcode.pm ‚ğg—p</span>
+<span class="comment">## Jcode.pm $B$r;HMQ(B</span>
 use Jcode;
 require Message::MIME::Charset;
 $Message::MIME::Charset::DECODER{'*default'} = sub {jcode::euc ($_[1])};
@@ -307,13 +308,13 @@ $Message::MIME::Charset::ENCODER{'*default'} = sub {Jcode-&gt;new ($_[1], 'euc')
 $Message::MIME::Charset::ENCODER{'utf-8'} = sub {Jcode-&gt;new ($_[1], 'euc')-&gt;utf8};
 </pre>
 
-<p>Perl 5.8 ‚Å Encode ƒ‚ƒWƒ…[ƒ‹‚ªg‚¦‚é‚æ‚¤‚É‚È‚ê‚ÎA
-‚à‚Á‚ÆŠy‚É‚È‚é‚ÆŠú‘Ò‚µ‚Ä‚¢‚Ü‚·B</p>
+<p>Perl 5.8 $B$G(B Encode $B%b%8%e!<%k$,;H$($k$h$&$K$J$l$P!"(B
+$B$b$C$H3Z$K$J$k$H4|BT$7$F$$$^$9!#(B</p>
 
 <div class="navigation">
-[<a href="/" title="‚±‚ÌƒT[ƒo[‚Ìñ•Å">/</a>
-<a href="/map" title="‚±‚ÌƒT[ƒo[‚ÌˆÄ“à" rel="index">’n}</a>
-<a href="/search/" title="‚±‚ÌƒT[ƒo[‚ÌŒŸõ">ŒŸõ</a>]
+[<a href="/" title="$B$3$N%5!<%P!<$N<sJG(B">/</a>
+<a href="/map" title="$B$3$N%5!<%P!<$N0FFb(B" rel="index">$BCO?^(B</a>
+<a href="/search/" title="$B$3$N%5!<%P!<$N8!:w(B">$B8!:w(B</a>]
 <a href="http://validator.w3.org/check/referer" xml:lang="en"><img
         src="http://www.w3.org/Icons/valid-xhtml11" id="w3c-html"
         alt="Valid XHTML 1.1!" style="height: 31px; width: 88px" /></a>
@@ -322,7 +323,7 @@ $Message::MIME::Charset::ENCODER{'utf-8'} = sub {Jcode-&gt;new ($_[1], 'euc')-&g
        src="http://jigsaw.w3.org/css-validator/images/vcss" 
        alt="Valid CSS!" /></a>
 </div>
-<div class="update">$Date: 2002/04/01 09:21:23 $</div>
+<div class="update">$Date: 2002/04/01 09:22:42 $</div>
 <ul class="myuri">
 <li>&lt;URL:<a href="http://suika.fam.cx/~wakaba/Message-pm/introduction">http://suika.fam.cx/~wakaba/Message-pm/introduction</a>&gt;</li>
 <li>&lt;CVS:<a href="http://suika.fam.cx/gate/cvs/perl/web/Message-pm/">suika.fam.cx:/home/cvs/perl/web/Message-pm/</a>&gt;</li>
