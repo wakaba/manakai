@@ -16,10 +16,11 @@ This module is part of manakai XML.
 
 package Message::Markup::XML::QName;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NCNameStartChar InXMLNCNameChar!;
 use Exporter;
 our @ISA = qw/Exporter/;
+require Carp;
 
 our @EXPORT_OK = qw/DEFAULT_PFX NULL_URI UNDEF_URI NS_xml_URI NS_xmlns_URI/;
 sub DEFAULT_PFX () { q:#default: }
@@ -221,7 +222,9 @@ sub prefix_to_name ($$;%) {
 
 sub name_to_prefix ($$;%);
 sub name_to_prefix ($$;%) {
-  my ($decls, $name, %opt) = @_;Carp::croak if not defined $name;
+  my ($decls, $name, %opt) = @_;
+  Carp::croak 'Use NULL_URI instead of empty string or undef'
+      unless defined $name;
   if ($opt{use_xml} and $name eq NS_xml_URI) {
     return {success => 1, prefix => 'xml', name => $name};
   } elsif ($opt{use_xmlns} and $name eq NS_xmlns_URI) {
@@ -407,4 +410,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/11/09 01:46:42 $
+1; # $Date: 2003/11/15 07:42:34 $

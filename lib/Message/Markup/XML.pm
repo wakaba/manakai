@@ -17,7 +17,7 @@ markup constructures.  (SuikaWiki is not "tiny"?  Oh, yes, I see:-))
 
 package Message::Markup::XML;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.25 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.26 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload '""' => \&outer_xml,
              fallback => 1;
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXML_NCNameStartChar InXMLNCNameChar!;
@@ -447,7 +447,8 @@ sub qname ($;%) {
   my ($self, %opt) = @_;
   if ($self->{type} eq '#element') {
     my $result = Message::Markup::XML::QName::expanded_name_to_qname
-                   ($self, $self->{namespace_uri}, $self->{local_name},
+                   ($self, $self->{namespace_uri} || NULL_URI,
+                    $self->{local_name},
                     make_new_prefix => 1, check_local_name => 1,
                     use_prefix_default => 1, use_name_null => 1,
                     use_xml => 1, use_xmlns => 1,
@@ -459,7 +460,7 @@ sub qname ($;%) {
                    (((defined $self->{namespace_uri}
                       and $self->{namespace_uri} ne NULL_URI) ?
                        $self->_get_ns_decls_node : undef),
-                    $self->{namespace_uri}, $self->{local_name},
+                    $self->{namespace_uri} || NULL_URI, $self->{local_name},
                     make_new_prefix => 1, check_local_name => 1,
                     use_xml => 1, use_xmlns => 1,
                     ask_parent_node => 1, %opt);
@@ -1437,4 +1438,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/11/09 01:48:15 $
+1; # $Date: 2003/11/15 07:42:34 $

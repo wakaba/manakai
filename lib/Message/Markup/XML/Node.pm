@@ -13,7 +13,7 @@ This module is part of manakai XML.
 
 package Message::Markup::XML::Node;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload
   '""'     => \&outer_xml,
   fallback => 1;
@@ -38,7 +38,7 @@ sub XML_ATTLIST  () { q<urn:x-suika-fam-cx:markup:xml:attlist> }
 sub SGML_DOCTYPE () { q<urn:x-suika-fam-cx:markup:sgml:doctype> }
 sub SGML_ELEMENT () { q<urn:x-suika-fam-cx:markup:sgml:element> }
 sub SGML_GENERAL_ENTITY () { q<urn:x-suika-fam-cx:markup:sgml:entity> }
-sub SGML_PARAM_ENTITY () { q<urn:x-suika-fam-cx:markup:sgml:entity:param> }
+sub SGML_PARAM_ENTITY () { q<urn:x-suika-fam-cx:markup:sgml:entity:parameter> }
 sub SGML_NOTATION () { q<urn:x-suika-fam-cx:markup:sgml:notation> }
 sub SGML_GROUP   () { q<urn:x-suika-fam-cx:markup:sgml:group> } 
 sub SGML_HEX_CHAR_REF () { q<urn:x-suika-fam-cx:markup:sgml:char:ref:hex> }
@@ -1377,4 +1377,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/11/09 01:47:17 $
+1; # $Date: 2003/11/15 07:42:34 $
