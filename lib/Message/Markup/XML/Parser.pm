@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.20 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.20.2.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXMLChar
                         InXML_deprecated_noncharacter InXML_unicode_xml_not_suitable!;
 require Message::Markup::XML;
@@ -1997,7 +1997,429 @@ or not.
 
 =item smxp__uri_in_which_declaration_is = uri (Entity #declaration node)
 
+=back
+
 =cut
+
+my $REG_S = qr/[\x09\x0A\x0D\x20]/; 
+        # S := 1*(U+0020 / U+0009 / U+000D / U+000A) ;; [3]
+
+sub parse_con_mode ($$%) {
+  my ($self, $src, %opt) = @_;
+  while (pos $$src < length $$src) {
+    if ($$src =~ /\G([^<&]+)/gc) {
+      $self->got_text_in_con_mode ($src, $1, \%opt);
+    } elsif ($$src =~ /\G(?=<)/gc) {
+      if ($src =~ /\G(?=<!)/gc) {
+        
+      } elsif ($$src =~ /\G(?=<\?)/gc) {
+        
+      } else {
+        $self->parse_tag ($src, %opt, match_or_error => 1,
+                          allow_start_tag => 1, allow_end_tag => 1);
+        return if $opt{end_of_con_mode};
+      }
+    } elsif ($$src =~ /\G(?=&)/gc) {
+      $self->parse_reference ($src, %opt, match_or_error => 1,
+                              use_character_reference => 1,
+                              use_general_entity_reference => 1,
+                              context => 'con_mode');
+    } else {
+      die "Buggy implementation: @{[substr ($$src, pos $$src)]}";
+    }
+  }
+}
+
+sub parse_tag ($$%) {
+  my ($self, $src, %opt) = (shift || __PACKAGE__, @_);
+  if ($$src =~ /\G</gc) {
+    my $tag_type = 'start';
+    if ($$src =~ m#\G/#gc) {
+      $tag_type = 'end';
+      unless ($opt{allow_end_tag}) {
+        $self->error (\%opt)->report
+             (-type => 'SYNTAX_END_TAG_NOT_ALLOWED',
+              -class => 'WFC',
+              source => $src, position_diff => 2);
+      }
+    } elsif (not $opt{allow_start_tag}) {
+      $self->error (\%opt)->report
+               (-type => 'SYNTAX_START_TAG_NOT_ALLOWED',
+                -class => 'WFC',
+                source => $src, position_diff => 1);
+    }
+    if ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+      $self->got_element_type_name ($src, $1, \%opt);
+      if ($tag_type eq 'end') {
+        $$src =~ /\G$REG_S*/ogc;
+        $$src =~ /\G>/gc or $self->error (\%opt)->report
+                              (-type => 'SYNTAX_END_TAG_TAGC_REQUIRED',
+                               -class => 'WFC',
+                               source => $src);
+        $self->got_end_tag ($src, undef, \%opt);
+        return;
+      } else { # start tag
+        $$src =~ /\G$REG_S*/ogc or undef $tag_type;
+        while (pos $$src < length $$src) {
+          if ($$src =~ m#\G(?=[^/>])#gc) {
+            $self->error (\%opt)->report
+                     (-type => 'SYNTAX_S_REQUIRED_BETWEEN_ATTR_SPEC',
+                      -class => 'WFC',
+                      source => $src), $tag_type = 'start' unless $tag_type;
+            $self->parse_attribute_specification ($src, %opt,
+                                                  match_or_error => 1);
+            $$src =~ /\G$REG_S/ogc or undef $tag_type;
+          } elsif ($$src =~ /\G>/gc) {
+            $self->got_start_tag ($src, undef, \%opt);
+            return;
+          } elsif ($$src =~ m#\G/#gc) {
+            $$src =~ /\G>/gc or $self->error (\%opt)->report
+                              (-type => 'SYNTAX_NET_REQUIRED',
+                               -class => 'WFC',
+                               source => $src);
+            $self->got_s_before_nestc ($src, undef, \%opt) if $tag_type;
+            $self->got_empty_element_tag ($src, undef, \%opt);
+            return;
+          } else {
+            last;
+            #die "Buggy implementation: ".substr ($$src, pos ($$src), 20);
+          }
+        }
+        $self->error (\%opt)->report
+                 (-type => 'SYNTAX_START_TAG_TAGC_OR_NESTC_REQUIRED',
+                  -class => 'WFC',
+                  source => $src);
+      }
+    } elsif ($tag_type eq 'end') {
+      if ($opt{allow_end_tag}) {
+        $self->error (\%opt)->report
+                   (-type => 'SYNTAX_ELEMENT_TYPE_NAME_REQUIRED',
+                    -class => 'WFC',
+                    source => $src);
+      } else {
+        $self->error (\%opt)->report
+                   (-type => 'SYNTAX_END_TAG_NOT_ALLOWED',
+                    -class => 'WFC',
+                    source => $src, position_diff => 2);
+      }
+    } else {
+      if ($opt{allow_start_tag}) {
+        if ($opt{allow_end_tag}) {
+          $self->error (\%opt)->report
+                   (-type => 'SYNTAX_SLASH_OR_ELEMENT_TYPE_NAME_REQUIRED',
+                    -class => 'WFC',
+                    source => $src);
+        } else {
+          $self->error (\%opt)->report
+                   (-type => 'SYNTAX_ELEMENT_TYPE_NAME_REQUIRED',
+                    -class => 'WFC',
+                    source => $src);
+        }
+      } else {
+        $self->error (\%opt)->report
+                   (-type => 'SYNTAX_SLASH_REQUIRED',
+                    -class => 'WFC',
+                    source => $src);
+      }
+    }
+  } elsif ($opt{match_or_error}) {
+    $self->error (\%opt)->report
+             (-type => 'SYNTAX_TAG_REQUIRED',
+              -class => 'WFC',
+              source => $src);
+  }
+}
+
+sub parse_attribute_specification ($$%) {
+  my ($self, $src, %opt) = (shift || __PACKAGE__, @_);
+  if ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)$REG_S*/ogc) {
+    $self->got_attribute_name ($src, $1, \%opt);
+    if ($$src =~ /\G=$REG_S*/ogc) {
+      $self->parse_attribute_value_specification ($src, %opt,
+                                                  match_or_error => 1);
+    } else {
+      $self->error (\%opt)->report
+        (-type => 'SYNTAX_VI_REQUIRED',
+         -class => 'WFC',
+         source => $src);
+    }
+    $self->got_attribute ($src, undef, \%opt);
+  } elsif ($opt{match_or_error}) {
+    $self->error (\%opt)->report
+      (-type => 'SYNTAX_ATTR_NAME_REQUIRED',
+       -class => 'WFC',
+       source => $src);
+  }
+}
+
+sub parse_attribute_value_specification ($$%) {
+  my ($self, $src, %opt) = (shift || __PACKAGE__, @_);
+  if ($$src =~ /\G(["'])/gc) {
+    $self->parse_lit_mode
+      ($src, %opt, literal_delimiter => $1, match_or_error => 1,
+       terminated_or_error => 1);
+  } elsif ($opt{match_or_error}) {
+    $self->error (\%opt)->report
+      (-type => 'SYNTAX_OPEN_LIT_OR_LITA_REQUIRED',
+      -class => 'WFC',
+      source => $src);
+  }
+}
+
+sub parse_lit_mode ($$%) {
+  my ($self, $src, %opt) = (shift || __PACKAGE__, @_);
+  while (pos $$src < length $$src) {
+    if ($$src =~ /\G([^<&$opt{literal_delimiter}]+)/gc) {
+      $self->got_attribute_value_fragment ($src, $1, \%opt);
+    } elsif ($$src =~ /\G(?=&)/gc) {
+      $self->parse_reference ($src, %opt, match_or_error => 1,
+                              use_character_reference => 1,
+                              use_general_entity_reference => 1,
+                              context => 'attribute_value_literal');
+    } elsif ($$src =~ /\G$opt{literal_delimiter}/gc) { 
+      return;
+    } elsif ($$src =~ /\G</gc) {
+      $self->error (\%opt)->report (-type => 'WFC_NO_LESS_THAN_IN_ATTR_VAL',
+                                    -class => 'WFC',
+                                    source => $src,
+                                    position_diff => 1);
+    }
+  }
+  if ($opt{terminated_or_error}) {
+    $self->error (\%opt)->report
+      (-type => 'SYNTAX_CLOSE_LIT'.($opt{literal_delimiter} eq '"'?'':'A')
+               .'_REQUIRED',
+       -class => 'WFC',
+       source => $src);
+  }
+}
+
+sub parse_reference ($$%) {
+  my ($self, $src, %opt) = (shift || __PACKAGE__, @_);
+  if ($opt{use_character_reference} and 
+      $$src =~ /\G&\#/gc) {
+    if ($$src =~ /\Gx/gc) {
+      if ($$src =~ /\G([0-9A-Fa-f]+)/gc) {
+        $self->got_hex_character_reference ($src, $1, \%opt);
+        $$src =~ /\G;/gc or $self->error (\%opt)->report
+                              (-type => 'SYNTAX_REFERENCE_END_REQUIRED',
+                               -class => 'WFC', source => $src);
+      } else {
+        $self->error (\%opt)->report (-type => 'SYNTAX_HEXDIGIT_REQUIRED',
+                               -class => 'WFC', source => $src);
+      }
+    } elsif ($$src =~ /\G([0-9]+)/gc) {
+      $self->got_numeric_character_reference ($src, $1, \%opt);
+      $$src =~ /\G;/gc or $self->error (\%opt)->report
+                              (-type => 'SYNTAX_REFERENCE_END_REQUIRED',
+                               -class => 'WFC', source => $src);
+    } else {
+      $self->error (\%opt)->report (-type => 'SYNTAX_X_OR_DIGIT_REQUIRED',
+                             -class => 'WFC', source => $src);
+    }
+  } elsif ($opt{use_general_entity_reference} and
+           $$src =~ /\G&(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+    my $method = 'got_general_entity_reference_in_'.$opt{context};
+    $self->$method ($src, $1, \%opt);
+    $$src =~ /\G;/gc or $self->error (\%opt)->report
+                              (-type => 'SYNTAX_REFERENCE_END_REQUIRED',
+                               -class => 'WFC', source => $src);
+  } elsif ($$src =~ /\G&/gc) {
+    $self->error (\%opt)->report (-type => 'SYNTAX_HASH_OR_NAME_REQUIRED',
+                                  -class => 'WFC', source => $src);
+  } else {
+    die "Buggy implementation";
+  }
+}
+
+sub got_text_in_con_mode ($$$$) {
+  my ($self, $src, $s, $opt) = @_;
+  $opt->{parent}->append_text ($s);
+}
+
+sub got_start_tag ($$$$) {
+  my ($self, $src, undef, $opt) = @_;
+
+}
+
+sub got_empty_element_tag ($$$$) {
+  my ($self, $src, undef, $opt) = @_;
+
+}
+
+sub got_s_before_nestc ($$$$) {
+  my ($self, $src, undef, $opt) = @_;
+
+}
+
+sub got_end_tag ($$$$) {
+  my ($self, $src, undef, $opt) = @_;
+
+}
+
+sub got_element_type_name ($$$$) {
+  my ($self, $src, undef, $opt) = @_;
+
+}
+
+sub got_attribute ($$$$) {
+  my ($self, $src, undef, $opt) = @_;
+  
+}
+
+sub got_attribute_name ($$$$) {
+  my ($self, $src, $s, $opt) = @_;
+  $opt->{parent} = $opt->{parent}->append_new_node
+                                     (type => '#attribute',
+                                      local_name => $s);
+}
+
+sub got_attribute_value_fragment ($$$$) {
+  my ($self, $src, $s, $opt) = @_;
+  $opt->{parent}->append_text ($s);
+}
+
+use Message::Markup::XML::Node qw/:charref :entity/;
+sub got_hex_character_reference ($$$$) {
+  my ($self, $src, $s, $opt) = @_;
+  $opt->{parent}->append_new_node (type => '#reference',
+                                   namespace_uri => SGML_HEX_CHAR_REF,
+                                   value => hex $s);
+}
+
+sub got_numeric_character_reference ($$$$) {
+  my ($self, $src, $s, $opt) = @_;
+  $opt->{parent}->append_new_node (type => '#reference',
+                                   namespace_uri => SGML_NCR,
+                                   value => 0+$s);
+}
+
+sub got_general_entity_reference ($$$$) {
+  my ($self, $src, $s, $opt) = @_;
+  $opt->{parent}->append_new_node (type => '#reference',
+                                   namespace_uri => SGML_GENERAL_ENTITY,
+                                   local_name => $s);
+}
+
+sub got_general_entity_reference_in_attribute_value_literal ($$$$) {
+  my ($self, $src, $s, $opt) = @_;
+  $opt->{parent}->append_new_node (type => '#reference',
+                                   namespace_uri => SGML_GENERAL_ENTITY,
+                                   local_name => $s);
+}
+
+sub got_general_entity_reference_in_con_mode ($$$$) {
+  my ($self, $src, $s, $opt) = @_;
+  $opt->{parent}->append_new_node (type => '#reference',
+                                   namespace_uri => SGML_GENERAL_ENTITY,
+                                   local_name => $s);
+}
+
+sub error ($$) {
+  my ($self, $opt) = @_;
+  $opt->{-error} ||= Message::Util::Error::TextParser->new
+                       (package => 'Message::Markup::XML::Parser::Error');
+}
+
+package Message::Markup::XML::Parser::Error;
+require Message::Util::Error::TextParser;
+push our @ISA, 'Message::Util::Error::TextParser::error';
+
+sub ___error_def () {+{
+  
+}}
+
+sub text {
+  my $self = shift;
+  $self->_FORMATTER_PACKAGE_->new
+       ->replace ('%err-line;.%err-char;: '.$self->{-def}->{description}.' %err-at (prefix => {at "}, suffix => {"}, before => 20, after => 20);', param => $self);
+}
+
+package Message::Markup::XML::Parser::Error::WFC;
+push our @ISA, 'Message::Markup::XML::Parser::Error';
+
+sub ___error_def () {+{
+  SYNTAX_ATTR_NAME_REQUIRED => {
+    description => q(Attribute name expected),
+    level => 'ebnf',
+  },
+  SYNTAX_CLOSE_LIT_REQUIRED => {
+    description => q(lit (") closing attribute value literal expected),
+    level => 'ebnf',
+  },
+  SYNTAX_CLOSE_LITA_REQUIRED => {
+    description => q(lita (') closing attribute value literal expected),
+    level => 'ebnf',
+  },
+  SYNTAX_ELEMENT_TYPE_NAME_REQUIRED => {
+    description => q(Element type name expected),
+    level => 'ebnf',
+  },
+  SYNTAX_END_TAG_NOT_ALLOWED => {
+    description => q(End tag not allowed),
+    level => 'ebnf',
+  },
+  SYNTAX_END_TAG_TAGC_REQUIRED => {
+    description => q(tagc (>) terminating end tag is required),
+    level => 'ebnf',
+  },
+  SYNTAX_HASH_OR_NAME_REQUIRED => {
+    description => q("#" or Name expected after "&"),
+    level => 'ebnf',
+  },
+  SYNTAX_HEXDIGIT_REQUIRED => {
+    description => q(HEXDIGIT ([0-9A-Fa-f]) required after "&#x"),
+    level => 'ebnf',
+  },
+  SYNTAX_NET_REQUIRED => {
+    description => q(net (>) required just after nestc (/)),
+    level => 'ebnf',
+  },
+  SYNTAX_OPEN_LIT_OR_LITA_REQUIRED => {
+    description => q(lit (") or lita (') opening attribute value literal expected),
+    level => 'ebnf',
+  },
+  SYNTAX_REFERENCE_END_REQUIRED => {
+    description => q(refc (;) expected),
+    level => 'ebnf',
+  },
+  SYNTAX_S_REQUIRED_BETWEEN_ATTR_SPEC => {
+    description => q(Whitespace required between attribute specification),
+    level => 'ebnf',
+  },
+  SYNTAX_SLASH_OR_ELEMENT_TYPE_NAME_REQUIRED => {
+    description => q(Element type name or SOLIDUS (/) expected),
+    level => 'ebnf',
+  },
+  SYNTAX_SLASH_REQUIRED => {
+    description => q(SOLIDUS (/) expected),
+    level => 'ebnf',
+  },
+  SYNTAX_START_TAG_NOT_ALLOWED => {
+    description => q(Start tag not allowed),
+    level => 'ebnf',
+  },
+  SYNTAX_START_TAG_TAGC_OR_NESTC_REQUIRED => {
+    description => q(tagc (>) or nestc (/) expected),
+    level => 'ebnf',
+  },
+  SYNTAX_TAG_REQUIRED => {
+    description => q(Tag expected),
+    level => 'ebnf',
+  },
+  SYNTAX_VI_REQUIRED => {
+    description => q(vi (=) expected),
+    level => 'ebnf',
+  },
+  SYNTAX_X_OR_DIGIT_REQUIRED => {
+    description => q("x" (for hex character reference) or DIGIT ([0-9]) required after "&#"),
+    level => 'ebnf',
+  },
+  WFC_NO_LESS_THAN_IN_ATTR_VAL => {
+    description => q(LESS-THAN SIGN (<) not allowed in attribute value literal),
+    level => 'wfc',
+  },
+}}
 
 =head1 LICENSE
 
@@ -2008,4 +2430,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/11/09 01:47:31 $
+1; # $Date: 2004/02/14 11:20:58 $
