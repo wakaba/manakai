@@ -16,7 +16,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 use Carp ();
 
@@ -288,9 +288,10 @@ sub encode_header_string ($$;%) {
   $o{charset} ||= $yourself->{option}->{encoding_after_encode};
   $o{charset} = Message::MIME::Charset::name_normalize ($o{charset});
   $o{current_charset} = Message::MIME::Charset::name_normalize ($o{current_charset});
-  my ($t,$r) = Message::MIME::Charset::encode ($o{charset}, $s);
+  my ($t,%r) = Message::MIME::Charset::encode ($o{charset}, $s);
   my @o = (language => $o{language});
-  if ($r>0) {	## Convertion successed
+  if ($r{success}) {	## Convertion successed
+    $o{charset} = $r{charset} if $r{charset};
     (value => $t, @o, charset => ($o{charset}=~/\*/?'':$o{charset}));
   } else {	## Fault
     (value => $s, @o, charset => ($o{current_charset}=~/\*/?'':$o{current_charset}));
@@ -341,11 +342,12 @@ sub encode_body_string {
   $o{charset} ||= $yourself->{option}->{encoding_after_encode};
   $o{charset} = Message::MIME::Charset::name_normalize ($o{charset});
   $o{current_charset} = Message::MIME::Charset::name_normalize ($o{current_charset});
-  my ($t,$r) = Message::MIME::Charset::encode ($o{charset}, $s);
+  my ($t,%r) = Message::MIME::Charset::encode ($o{charset}, $s);
   my @o = ();
-  if ($r>0) {	## Convertion successed
-    (value => $t, @o, charset => ($o{charset}=~/\*/?'':$o{charset}));
-  } else {	## Fault
+  if ($r{success}) {	## Convertion successed
+    $o{charset} = $r{charset} if $r{charset};
+    (value => $t, @o, charset => ($o{charset} =~ /\*/? '': $o{charset}));
+  } else {	## fault
     (value => $s, @o, charset => ($o{current_charset}=~/\*/?'':$o{current_charset}));
   }
 }
@@ -522,7 +524,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/29 11:05:53 $
+$Date: 2002/06/01 05:40:55 $
 
 =cut
 

@@ -1,3 +1,13 @@
+2002-06-01  wakaba <w@suika.fam.cx>
+
+	* Entity.pm (_encode_body): Some bug fixes and
+	better support of CT/CTE/charset.
+	(_parse_value): Passes options 'body_default_charset'
+	and 'body_default_charset_input' and parameter
+	'header' to body class.
+	* Util.pm (encode_body_string, encode_header_string):
+	Returns minimum charset name if available.
+
 2002-05-30  wakaba <w@suika.fam.cx>
 
 	* Entity.pm (_encode_body): Checks charset name

@@ -13,7 +13,7 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::Header;
@@ -25,11 +25,12 @@ use overload '""' => sub { $_[0]->stringify },
 ## Initialize of this class -- called by constructors
   %DEFAULT = (
     -_METHODS	=> [qw|header body content_type id|],
-    -_MEMBERS	=> [qw|header body|],
+    -_MEMBERS	=> [qw|header body _cte|],
     -accept_coderange	=> '7bit',	## 7bit / 8bit / binary
     -add_ua	=> 1,
     -body_default_charset	=> 'iso-2022-int-1',
     -body_default_media_type	=> 'text/plain',
+    -cte_default	=> '7bit',
     #fill_date	=> 1,
     -fill_date_name	=> 'date',
     #fill_msgid	=> 1,
@@ -37,6 +38,8 @@ use overload '""' => sub { $_[0]->stringify },
     -format	=> 'mail-rfc2822',
     -linebreak_strict	=> 0,	## BUG: not work perfectly
     -parse_all	=> 0,
+    -text_coderange	=> 'binary',
+    	## '8bit' (MIME text/*) / 'binary' (HTTP text/*)
     #ua_field_name	=> 'user-agent',
     -ua_use_config	=> 1,
     -uri_mailto_safe_level	=> 4,
@@ -71,12 +74,16 @@ sub _init ($;%) {
     $self->{option}->{fill_msgid_from_ns} = $Message::Header::NS_phname2uri{http};
     $self->{option}->{fill_ua_ns}         = $Message::Header::NS_phname2uri{http};
     $self->{option}->{accept_coderange} = 'binary';
+    $self->{option}->{text_coderange} = 'binary';
+    $self->{option}->{cte_default} = 'binary';
   } else {
     $self->{option}->{fill_date_ns}       = $Message::Header::NS_phname2uri{rfc822};
     $self->{option}->{fill_msgid_from_ns} = $Message::Header::NS_phname2uri{rfc822};
     $self->{option}->{fill_ua_ns}         = $Message::Header::NS_phname2uri{rfc822};
+    $self->{option}->{text_coderange} = '8bit';
     if ($format =~ /news-usefor|smtp-8bitmime/) {
       $self->{option}->{accept_coderange} = '8bit';
+      $self->{option}->{cte_default} = '8bit';
     } else {
       $self->{option}->{accept_coderange} = '7bit';
     }
@@ -217,7 +224,7 @@ sub body ($;$) {
   if ($new_body) {
     $self->{body} = $new_body;
   }
-  $self->{body} = $self->_parse_value ($self->content_type => $self->{body})
+  $self->{body} = $self->_parse_value (scalar $self->content_type => $self->{body})
     unless ref $self->{body};
   $self->{body};
 }
@@ -244,6 +251,10 @@ sub _parse_value ($$$) {
       -format	=> $self->{option}->{format},
       -parent_type	=> $name,
       -parse_all	=> $self->{option}->{parse_all},
+      -body_default_charset	=> $self->{option}->{body_default_charset},
+      -body_default_charset_input
+      	=> $self->{option}->{body_default_charset_input},
+      header	=> $self->{header},
     %vopt);
   } else {
     eval "require $vtype" or Carp::croak qq{<parse>: $vtype: Can't load package: $@};
@@ -251,6 +262,10 @@ sub _parse_value ($$$) {
       -format	=> $self->{option}->{format},
       -parent_type	=> $name,
       -parse_all	=> $self->{option}->{parse_all},
+      -body_default_charset	=> $self->{option}->{body_default_charset},
+      -body_default_charset_input
+      	=> $self->{option}->{body_default_charset_input},
+      header	=> $self->{header},
     %vopt);
   }
 }
@@ -276,8 +291,8 @@ sub _encode_body ($$\%) {
   my $value = shift;
   my $option = shift;
   ## MIME CTE
-  	my $current_cte = $self->{_cte};
-  	my $ctef = $self->header->field ('content-transfer-encoding',
+  	my $current_cte = $self->{_cte} || 'binary';
+  	my $ctef = $self->{header}->field ('content-transfer-encoding',
   	                              -new_item_unless_exist => 0);
   	my $cte = ''; $cte = lc $ctef->value if ref $ctef;
   	my %enoption;
@@ -293,7 +308,7 @@ sub _encode_body ($$\%) {
   	  my ($charset, $charset_def) = '';
   	  if ($mt_def->{mime_charset}) {
   	  ## If CT is able to have its charset parameter,
-  	    my $ct = $self->header->field ('content-type', 
+  	    my $ct = $self->{header}->field ('content-type', 
   	                                   -new_item_unless_exist => 0);
   	    $charset = $ct->parameter ('charset') if ref $ct;
   	    if ($charset) {
@@ -305,7 +320,11 @@ sub _encode_body ($$\%) {
   	    }
   	  }
   	  $charset_def = {} unless ref $charset_def;	## dummy
-  	  $enoption{mt_is_text} = 0 if $charset_def->{mime_text} != 1;
+  	  if ($charset_def->{mime_text} != 1) {
+  	    $enoption{mt_is_text} = 0;
+  	    my $ct = $self->{header}->field ('content-type');
+  	    $ct->not_mime_text ($option->{text_coderange} eq 'binary'? 0:1);
+  	  }
   	## If accept CTE list is defined,
   	for my $def ($charset_def, $mt_def) {
   	  if (ref $def->{accept_cte} eq 'ARRAY') {
@@ -341,19 +360,31 @@ sub _encode_body ($$\%) {
   	      }
   	    if ($e eq 'binary') {
   	      ($value, $e) = &$en ($self, $decoded, \%enoption);
-  	        $ctef = $self->header->field ('content-transfer-encoding')
+  	      $e = '' if ($e eq $option->{cte_default});
+  	      $e = '' if    $e eq '7bit'
+  	                 && (   $option->{cte_default} eq '8bit'
+  	                     || $option->{cte_default} eq 'binary');
+  	      $e = '' if $e eq '8bit' && $option->{cte_default} eq 'binary';
+  	      if ($e) {
+  	        $ctef = $self->{header}->field ('content-transfer-encoding')
   	           unless ref $ctef;
   	        $ctef->value ($e);
+  	      } elsif (ref $ctef) {
+  	        $ctef->value ('');
+  	      }
   	    } else {
-  	      $ctef = $self->header->field ('content-transfer-encoding')
+  	      $ctef = $self->{header}->field ('content-transfer-encoding')
   	         unless ref $ctef;
   	      $ctef->value ($current_cte);
   	    }
   	  } else {	## Can't encode by given CTE
-  	    $ctef = $self->header->field ('content-transfer-encoding')
+  	    $ctef = $self->{header}->field ('content-transfer-encoding')
   	       unless ref $ctef;
   	    $ctef->value ($current_cte);
   	  }
+  	}
+  	if (ref $ctef && $ctef->value eq '') {
+  	  $self->{header}->delete ('content-transfer-encoding');
   	}
   $value;
 }
@@ -825,7 +856,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/30 12:53:26 $
+$Date: 2002/06/01 05:40:55 $
 
 =cut
 
