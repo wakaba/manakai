@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 our %NS;
 *NS = \%Message::Markup::XML::NS;
 
@@ -607,7 +607,8 @@ sub raise ($$%) {
                      || {document_entity	=> '#document',
                          dtd_external_subset	=> '<!DOCTYPE>'}->{$o->{entity_type}}
                      || '##unknown'),
-                       $o->{uri}, $o->{line}, $o->{pos}, @err_msg;
+                       defined $o->{uri} ? $o->{uri} : '',
+                       $o->{line}, $o->{pos}, @err_msg;
     my $resolver = $caller->option ('error_handler');
     if (ref $resolver) {
       $resolver = &$resolver ($caller, $o, $error_type, $error_msg, {});	## If returned false,
@@ -772,4 +773,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/14 01:09:36 $
+1; # $Date: 2004/10/09 05:33:21 $
