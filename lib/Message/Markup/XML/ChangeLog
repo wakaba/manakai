@@ -1,3 +1,10 @@
+2003-12-31  Wakaba  <wakaba@suika.fam.cx>
+
+	* QName.pm (prefix_to_name): Don't call prefix2name w/ parent node's
+	decls node when parent node does not have ns decls node.
+
+	* Node.pm (_get_ns_decls_node): Returns default value if specified so.
+
 2003-12-05  Wakaba  <wakaba@suika.fam.cx>
 
 	* NodeTree.pm (construct_xml_tree): New function.

@@ -13,7 +13,7 @@ This module is part of manakai XML.
 
 package Message::Markup::XML::Node;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload
   '""'     => \&outer_xml,
   bool     => sub { 
@@ -581,7 +581,7 @@ sub _get_ns_decls_node ($;%) {
     return $opt{default};
   } else {
     Carp::carp qq(There is no namespace declarations node (type $self->{type}));
-    return {};
+    return $opt{default} || {};
   }
 }
 
@@ -1388,4 +1388,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/12/26 07:13:21 $
+1; # $Date: 2004/02/14 11:08:14 $
