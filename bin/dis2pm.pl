@@ -1806,7 +1806,9 @@ sub get_internal_code ($$;%) {
     return perl_statement perl_exception
                   level => 'EXCEPTION',
                   class => 'DOMException',
-                  type => 'NOT_SUPPORTED_ERR',
+                  type => 'NOT_SUPPORTED_ERR', 
+                  subtype_uri
+               => ExpandedURI q<MDOM_EXCEPTION:MDOM_IMPL_METHOD_NOT_IMPLEMENTED>,
                   param => {
                     ExpandedURI q<MDOM_EXCEPTION:if> => $Status->{IF},
                     ExpandedURI q<MDOM_EXCEPTION:method> => $name,
@@ -2528,6 +2530,8 @@ sub method2perl ($;%) {
                   level => 'EXCEPTION',
                   class => 'DOMException',
                   type => 'NOT_SUPPORTED_ERR',
+                  subtype_uri
+               => ExpandedURI q<MDOM_EXCEPTION:MDOM_IMPL_METHOD_NOT_IMPLEMENTED>,
                   param => {
                     ExpandedURI q<MDOM_EXCEPTION:if> => $Status->{IF},
                     ExpandedURI q<MDOM_EXCEPTION:method> => $Status->{Method},
@@ -2812,6 +2816,8 @@ sub attr2perl ($;%) {
                   level => 'EXCEPTION',
                   class => 'DOMException',
                   type => 'NOT_SUPPORTED_ERR',
+                  subtype_uri
+                => ExpandedURI q<MDOM_EXCEPTION:MDOM_IMPL_ATTR_NOT_IMPLEMENTED>,
                   param => {
                     ExpandedURI q<MDOM_EXCEPTION:if> => $Status->{IF},
                     ExpandedURI q<MDOM_EXCEPTION:attr> => $Status->{Method},
@@ -2898,6 +2904,8 @@ sub attr2perl ($;%) {
                   level => 'EXCEPTION',
                   class => 'DOMException',
                   type => 'NOT_SUPPORTED_ERR',
+                  subtype_uri
+                => ExpandedURI q<MDOM_EXCEPTION:MDOM_IMPL_ATTR_NOT_IMPLEMENTED>,
                   param => {
                     ExpandedURI q<MDOM_EXCEPTION:if> => $Status->{IF},
                     ExpandedURI q<MDOM_EXCEPTION:attr> => $Status->{Method},
@@ -4161,6 +4169,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/10/10 00:01:08 $
+# $Date: 2004/10/10 06:09:47 $
 
 
