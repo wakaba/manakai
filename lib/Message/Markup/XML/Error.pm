@@ -16,7 +16,7 @@ This module is part of SuikaWiki XML support.
 
 package SuikaWiki::Markup::XML::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 our %NS;
 *NS = \%SuikaWiki::Markup::XML::NS;
 
@@ -45,6 +45,38 @@ my %_Error = (
 		level	=> 'wfc',
 	},
 	## Syntax errors
+	SYNTAX_ATTLIST_ATTDEF_FIXED_NO_LITERAL	=> {
+		description	=> 'Fixed default value for the attribute (%s) is expected (%s)',
+		level	=> 'wfc',
+	},
+	SYNTAX_ATTLIST_ATTDEF_GROUP_INVALID_CHAR	=> {
+		description	=> 'Character "%s" cannot be used in group',
+		level	=> 'wfc',
+	},
+	SYNTAX_ATTLIST_ATTDEF_GROUP_INVALID_CONNECTOR	=> {
+		description	=> 'Invalid use of connector',
+		level	=> 'wfc',
+	},
+	SYNTAX_ATTLIST_ATTDEF_GROUP_NOTATION_NAME	=> {
+		description	=> 'Group element must be a notation Name (%s)',
+		level	=> 'wfc',
+	},
+	SYNTAX_ATTLIST_ATTDEF_NESTED_GROUP	=> {
+		description	=> 'Group cannot nest here',
+		level	=> 'wfc',
+	},
+	SYNTAX_ATTLIST_ATTDEF_NON_BAR_CONNECTOR	=> {
+		description	=> 'Connector of group elements in AttDef must be a VERTICAL BAR (|) in XML',
+		level	=> 'wfc',
+	},
+	SYNTAX_ATTLIST_ATTDEF_UNKNOWN_DEFAULT	=> {
+		description	=> 'Unknown attribute default type (#%s)',
+		level	=> 'wfc',
+	},
+	SYNTAX_ATTLIST_ATTDEF_UNKNOWN_TYPE	=> {
+		description	=> 'Unknown attribute type (%s)',
+		level	=> 'wfc',
+	},
 	SYNTAX_ATTR_LITERAL_NOT_FOUND	=> {
 		description	=> 'Attribute value literal of the attribute (name = %s) is expected',
 		level	=> 'wfc',
@@ -67,6 +99,50 @@ my %_Error = (
 	},
 	SYNTAX_DOCTYPE_SYSID_LITERAL_NOT_FOUND	=> {
 		description	=> 'Literal of the system identifier must follow the keyword SYSTEM or the minimum literal of the public identifier in XML',
+		level	=> 'wfc',
+	},
+	SYNTAX_ELEMENT_CMODEL_GROUP_NOT_CLOSED	=> {
+		description	=> 'Content model group must be closed',
+		level	=> 'wfc',
+	},
+	SYNTAX_ELEMENT_CMODEL_INVALID_CONNECTOR	=> {
+		description	=> 'Invalid connector use (%s)',
+		level	=> 'wfc',
+	},
+	SYNTAX_ELEMENT_CMODEL_KWD_POSITION	=> {
+		description	=> 'Keyword (%s) cannot be wirtten here in XML',
+		level	=> 'wfc',
+	},
+	SYNTAX_ELEMENT_CMODEL_MIXED_NESTED	=> {
+		description	=> 'In mixed content model, group cannot nest',
+		level	=> 'wfc',
+	},
+	SYNTAX_ELEMENT_CMODEL_MIXED_OCCURENCE	=> {
+		description	=> 'In mixed content model (with one or more element), group must have occurence of "*"',
+		level	=> 'wfc',
+	},
+	SYNTAX_ELEMENT_CMODEL_NO_DELIMITER	=> {
+		description	=> 'Some kind of connector ("," / "|") is expected',
+		level	=> 'wfc',
+	},
+	SYNTAX_ELEMENT_CMODEL_PCDATA_CONNECTOR	=> {
+		description	=> 'Connector of mixed content model must be "|"',
+		level	=> 'wfc',
+	},
+	SYNTAX_ELEMENT_CMODEL_SAME_CONNECTOR	=> {
+		description	=> 'Connectors in a group must be all same one ("%s" rather than "%s" expected)',
+		level	=> 'wfc',
+	},
+	SYNTAX_ELEMENT_CMODEL_SGML_CONNECTOR	=> {
+		description	=> 'Connector "%s" cannot be used in XML',
+		level	=> 'wfc',
+	},
+	SYNTAX_ELEMENT_CMODEL_SGML_KWD	=> {
+		description	=> 'Content keyword "%s" cannot be used in XML',
+		level	=> 'wfc',
+	},
+	SYNTAX_ELEMENT_CMODEL_UNKNOWN_KWD	=> {
+		description	=> 'Unknown content keyword: "%s"',
 		level	=> 'wfc',
 	},
 	SYNTAX_END_OF_MARKUP_NOT_FOUND	=> {
@@ -271,6 +347,10 @@ my %_Error = (
 		description	=> 'Entity %s should (or must to be valid) be declared before it is referred',
 		level	=> 'vc',
 	},
+	VC_NO_DUPLICATE_TOKENS	=> {
+		description	=> 'Group element (%s) must be unique in the group',
+		level	=> 'vc',
+	},
 	VC_NOTATION_DECLARED	=> {
 		description	=> 'Notation %s should (or must to be valid) be declared',
 		level	=> 'vc',
@@ -325,7 +405,7 @@ my %_Error = (
 	},
 	WARN_UNICODE_COMPAT_CHARACTER	=> {
 		description	=> sub {
-			my $r = sprintf 'Use of the character U+%04X is deprecated, since it is classified as compatible character in the Unicode Standard',
+			my $r = sprintf 'Use of the character U+%04X is deprecated, since it is classified to compatible character in the Unicode Standard',
 			        $_[1]->{t};
 			$_[1]->{t} = undef;
 			$r;
@@ -341,21 +421,16 @@ my %_Error = (
 		},
 		level	=> 'warn',
 	},
-	WARN_UNICODE_XML_NOT_SUITABLE_CHARACTER	=> {
-		description	=> sub {
-			my $r = sprintf 'Use of the character U+%04X is deprecated by W3C Note unicode-xml',
-			        $_[1]->{t};
-			$_[1]->{t} = undef;
-			$r;
-		},
-		level	=> 'warn',
-	},
 	WARN_UNIQUE_ENTITY_NAME	=> {
 		description	=> 'General entity %s is already declared',
 		level	=> 'warn',
 	},
 	WARN_UNIQUE_PARAMETER_ENTITY_NAME	=> {
 		description	=> 'Parameter entity %s is already declared',
+		level	=> 'warn',
+	},
+	WARN_XML_ATTLIST_AT_MOST_ONE_ATTR_DEF	=> {
+		description	=> 'For interoperability, at most one definition for given attribute (%s) should be provided',
 		level	=> 'warn',
 	},
 	## XMLName recommendation
@@ -374,6 +449,16 @@ my %_Error = (
 	},
 	WARN_MT_XML_FOR_EXT_GENERAL_ENTITY	=> {
 		description	=> 'Using media type %s for external general parsed entity is now forbidden unless the entity is also well-formed as a document entity',
+		level	=> 'warn',
+	},
+	## Misc. XML related spec's warning
+	WARN_UNICODE_XML_NOT_SUITABLE_CHARACTER	=> {
+		description	=> sub {
+			my $r = sprintf 'Use of the character U+%04X is deprecated by W3C Note unicode-xml',
+			        $_[1]->{t};
+			$_[1]->{t} = undef;
+			$r;
+		},
 		level	=> 'warn',
 	},
 	## Implementation's warning
@@ -469,7 +554,10 @@ sub raise ($$%) {
   ref $err{t} eq 'ARRAY' ? @err_msg = @{$err{t}} : defined $err{t} ? @err_msg = $err{t} : undef;
   $error_msg .= ' (%s)' if scalar (@err_msg) && ($error_msg !~ /%s/);
   $error_msg = sprintf 'Entity %s <%s>: line %d position %d: '.$error_msg,
-                       ($err{entity}||$o->{entity}||'#document'),
+                       ($err{entity} || $o->{entity}
+                     || {document_entity	=> '#document',
+                         dtd_external_subset	=> '<!DOCTYPE>'}->{$o->{entity_type}}
+                     || '##unknown'),
                        $o->{uri}, $o->{line}, $o->{pos}, @err_msg;
     my $resolver = $caller->option ('error_handler');
     if (ref $resolver) {
@@ -484,11 +572,13 @@ sub raise ($$%) {
 sub _default_error_handler ($$$$) {
   my ($caller, $o, $error_type, $error_msg) = @_;
   require Carp;
+  $Carp::CarpLevel = 1;
   if ({qw/fatal 1 wfc 1 nswfc 1/}->{$error_type->{level}}) {
     Carp::croak ($error_msg);
   } else {
     Carp::carp ($error_msg);
   }
+  $Carp::CarpLevel = 0;
 }
 
 =head1 ERROR REPORTING WITH NODE INFORMATION
@@ -632,4 +722,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/07/05 07:25:50 $
+1; # $Date: 2003/07/12 06:12:00 $

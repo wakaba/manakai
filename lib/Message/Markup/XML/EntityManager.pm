@@ -21,7 +21,7 @@ This module is part of SuikaWiki XML support.
 
 package SuikaWiki::Markup::XML::EntityManager;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 our %NS;
 *NS = \%SuikaWiki::Markup::XML::NS;
 
@@ -181,6 +181,9 @@ sub get_external_entity ($$$$) {
     } else {
       $self->default_uri_resolver ($parser, $decl, $p, $o);
     }
+    ## Line-break normalization
+    $p->{text} =~ s/\x0D\x0A/\x0A/gs;
+    $p->{text} =~ tr/\x0D/\x0A/;
     $p->{__flag} = 1;
   }
   $p;
@@ -499,4 +502,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/07/05 07:25:50 $
+1; # $Date: 2003/07/12 06:12:00 $

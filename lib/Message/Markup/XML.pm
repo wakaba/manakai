@@ -17,7 +17,7 @@ markup constructures.  (SuikaWiki is not "tiny"?  Oh, yes, I see:-))
 
 package SuikaWiki::Markup::XML;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload '""' => \&outer_xml,
              fallback => 1;
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXML_NCNameStartChar InXMLNCNameChar!;
@@ -54,6 +54,7 @@ our %Namespace_URI_to_prefix = (
 my %Cache;
 our %NS = (
 	SGML	=> 'urn:x-suika-fam-cx:markup:sgml:',
+	XML	=> 'urn:x-suika-fam-cx:markup:xml:',
 	internal_attr_duplicate	=> 'http://suika.fam.cx/~wakaba/-temp/2003/05/17/invalid-attr#',
 	internal_invalid_sysid	=> 'http://system.identifier.invalid/',
 	internal_ns_invalid	=> 'http://suika.fam.cx/~wakaba/-temp/2003/05/17/unknown-namespace#',
@@ -276,13 +277,6 @@ sub local_name ($;$) {
 }
 sub node_type ($) { $_[0]->{type} }
 sub parent_node ($) { $_[0]->{parent} }
-
-## TODO: obsolete
-sub target_name ($;$) {
-  my ($self, $new) = @_;
-  $self->{target_name} = $new if defined $new;
-  $self->{target_name};
-}
 
 sub namespace_uri ($;$) {
   my ($self, $new_uri) = @_;
@@ -694,13 +688,13 @@ sub attribute_value ($;%) {
   if ($self->{type} eq '#attribute' && $self->_check_ncname ($self->{local_name})) {
     my $r = '"';
     my $isc = $self->_is_same_class ($self->{value});
-    $r .= $self->_entitize ($self->{value}) unless $isc;
+    $r .= $self->_entitize ($self->{value}, keep_wsp => 1) unless $isc;
     for (($isc?$self->{value}:()), @{$self->{node}}) {
       my $nt = $_->{type};
       if ($nt eq '#reference' || $nt eq '#xml') {
         $r .= $_->outer_xml;
       } elsif ($nt ne '#attribute') {
-        $r .= $self->_entitize ($_->inner_text);
+        $r .= $self->_entitize ($_->inner_text, keep_wsp => 1);
       }
     }
     return $r . '"';
@@ -715,8 +709,8 @@ sub entity_value ($;%) {
     my $s = shift;
     $s =~ s/&/&#x26;/g;
     $s =~ s/&#x26;(\p{InXML_NameStartChar}\p{InXMLNameChar}*);/&$1;/g;
-    $s =~ s/%/&#x25;/g;
-    $s =~ s/"/&#x22;/g;
+    $s =~ s/([\x0D%"])/sprintf '&#x%02X;', ord $1/ge;
+    $s =~ s/([\x00-\x08\x0B\x0C\x0E-\x1F\x7F])/sprintf '&amp;#x%02X;', ord $1/ge;
     $s;
   };
   if ($self->{type} eq '#attribute' && $self->_check_ncname ($self->{local_name})) {
@@ -744,8 +738,10 @@ sub _entity_parameter_literal_value ($;%) {
   $r = $self->{value} unless $isc;
   for (($isc?$self->{value}:()), @{$self->{node}}) {
     my $nt = $_->{type};
-    if ($nt eq '#xml') {
+    ## Bare node and general entity reference node
+    if ($nt eq '#xml' || ($nt eq '#reference' && $_->{namespace_uri} eq $NS{SGML}.'entity')) {
       $r .= $_->outer_xml;
+    ## Text node and parameter entity reference node
     } elsif ($nt ne '#attribute') {
       $r .= $_->inner_text;
     }
@@ -946,39 +942,125 @@ sub inner_xml ($;%) {
         }
       }
     } elsif ($self->{namespace_uri} eq $NS{SGML}.'element') {
-      my $qname = $self->get_attribute ('qname');
-      ref $qname ? $qname = $qname->inner_text : undef;
-      if ($qname && $self->_check_name ($qname)) {
-      ## Element type name is defined
-      ## TODO: fix
-        $r = $qname . ' ';
-        my $rs = $self->inner_text (output_ref_as_is => 1);
-        $r .= $rs || 'ANY';
-      } else {
-      #if (ref $self->{node}->[0] && $self->{node}->[0]->{type} eq '#element') {
-      ### Element prototype is given
-      #  $r = $self->{node}->[0]->qname . ' ' . &$to . $self->{node}->[0]->content_spec;
-      #} elsif () {
-      ### Element type name and contentspec is given
-      #  $r = $self->{target_name} . ' ' . &$to . ($self->inner_text || 'ANY');
-      #} else {
-      ## (Element type name and contetnspac) is given
-        $r .= $self->inner_text (output_ref_as_is => 1);
-      #    || 'Name ANY';	# error
-      #}
-      }
-    ## TODO: reform
-    } elsif ($self->{namespace_uri} eq $NS{SGML}.'attlist') {
-      if ($self->_check_name ($self->{local_name})) {
-        $r = $self->{local_name};
-      }
-      my $t = $self->inner_text (output_ref_as_is => 1);
-      $r .= "\n\t" . $t if $t;
-      $r ||= 'Name';	# error!
-      for (@{$self->{node}}) {
-        if ($_->{type} eq '#attribute') {
-          $r .= "\n\t" . $_->content_spec;
+      if (!$self->{flag}->{smxp__defined_with_param_ref}) {
+        $r = $self->get_attribute ('qname');
+        $r = $r->inner_text if $r;
+        unless ($self->_check_ncname ($r)) {
+          $r = undef;
+        } else {
+          $r .= ' ';
         }
+        
+        my $cmodel = $self->get_attribute ('content', make_new_node => 1)->inner_text;
+        if ($cmodel && $cmodel ne 'mixed') {
+          $r .= $cmodel;
+        } else {
+          my $make_cmodel;
+          $make_cmodel = sub {
+            my $c = shift;
+            my @tt;
+            for (@{$c->child_nodes}) {
+              if ($_->node_type eq '#element' && $_->namespace_uri eq $NS{SGML}.'element') {
+                if ($_->local_name eq 'group') {
+                  my $tt = &$make_cmodel ($_);
+                  push @tt, '(' . $tt . ')'
+                     . ($_->get_attribute ('occurence', make_new_node => 1)->inner_text)
+                    if $tt;
+                } elsif ($_->local_name eq 'element') {
+                  push @tt, $_->get_attribute ('qname', make_new_node => 1)->inner_text;
+                }
+              }
+            }
+            return join scalar ($c->get_attribute ('connector', make_new_node => 1)->inner_text
+                                || '|'),
+                   grep {$_} @tt;
+          };
+          my $tt;
+          my $grp_node;
+          for (@{$self->child_nodes}) {
+            if ($_->node_type eq '#element' && $_->namespace_uri eq $NS{SGML}.'element'
+             && $_->local_name eq 'group') {
+              $grp_node = $_;
+              $tt = &$make_cmodel ($grp_node);
+              last;
+            }
+          }
+          if ($cmodel eq 'mixed') {	## mixed content
+            if ($tt) {
+              $r .= '(#PCDATA|' . $tt . ')*';
+            } else {
+              $r .= '(#PCDATA)'
+                  . ($grp_node->get_attribute ('connector', make_new_node => 1)->inner_text eq '*'
+                     ? '*' : '');
+            }
+          } else {	## element content
+            if ($tt) {
+              $r .= '(' . $tt . ')'
+                  . ($grp_node->get_attribute ('occurence', make_new_node => 1)->inner_text);
+            } else {
+              $r .= 'EMPTY';
+            }
+          }	# mixed or element content
+        }	# content model group
+      } else {	## Save source doc's description as far as possible
+          my $isc = $self->_is_same_class ($self->{value});
+          $r .= $self->{value} unless $isc;
+          for (($isc?$self->{value}:()), @{$self->{node}}) {
+            unless ($_->{type} eq '#attribute' || $_->{type} eq '#element') {
+              $r .= $_->outer_xml;
+            } elsif ($_->{type} eq '#element' && $_->{namespace_uri} eq $NS{SGML}.'group') {
+              $r .= $_->outer_xml;
+            }
+          }
+      }
+    } elsif ($self->{namespace_uri} eq $NS{SGML}.'attlist') {
+      if (!$self->{flag}->{smxp__defined_with_param_ref}) {
+        $r = $self->get_attribute ('qname');
+        $r = $r->inner_text if $r;
+        unless ($self->_check_ncname ($r)) {
+          $r = undef;
+        } else {
+          $r .= ' ';
+        }
+        for (@{$self->{node}}) {
+          if ($_->{type} eq '#element' && $_->{namespace_uri} eq $NS{XML}.'attlist'
+           && $_->{local_name} eq 'AttDef') {
+            $r .= "\n\t" . $_->get_attribute ('qname', make_new_node => 1)->inner_text;
+            my $attr_type = $_->get_attribute ('type', make_new_node => 1)->inner_text;
+            if ($attr_type ne 'enum') {
+              $r .= "\t" . $attr_type;
+            }
+            if ($attr_type eq 'enum' || $attr_type eq 'NOTATION') {
+              my @l;
+              for my $item (@{$_->{node}}) {
+                if ($item->{type} eq '#element' && $item->{namespace_uri} eq $NS{XML}.'attlist'
+                 && $item->{local_name} eq 'enum') {
+                  push @l, $item->inner_text;
+                }
+              }
+              $r .= "\t(" . join ('|', @l) . ')';
+            }
+            ## DefaultDecl
+            my $deftype = $_->get_attribute ('default_type', make_new_node => 1)->inner_text;
+            if ($deftype) {
+              $r .= "\t#" . $deftype;
+            }
+            if (!$deftype || $deftype eq 'FIXED') {
+              $r .= "\t" . $_->get_attribute ('default_value', make_new_node => 1)
+                             ->attribute_value;
+            }
+          }	# AttDef
+        }
+      } else {	## Save source doc's description as far as possible
+          my $isc = $self->_is_same_class ($self->{value});
+          $r .= $self->{value} unless $isc;
+          for (($isc?$self->{value}:()), @{$self->{node}}) {
+            unless ($_->{type} eq '#attribute' || $_->{type} eq '#element') {
+              $r .= $_->outer_xml;
+            } elsif ($_->{type} eq '#element' && $_->{namespace_uri} eq $NS{SGML}.'group') {
+              $r .= $_->outer_xml;
+            }
+          }
       }
     } else {	# unknown
         for (@{$self->{node}}) {
@@ -1168,6 +1250,7 @@ sub _entitize ($$;%) {
   $s =~ s/>/&gt;/g;
   $s =~ s/"/&quot;/g;
   $s =~ s/([\x00-\x08\x0B\x0C\x0E-\x1F])/sprintf '&amp;#%d;', ord $1/ge;
+  $s =~ s/([\x09\x0A\x0D])/sprintf '&#%d;', ord $1/ge if $o{keep_wsp};
   $s;
 }
 
@@ -1312,4 +1395,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/07/05 07:26:05 $
+1; # $Date: 2003/07/12 06:12:00 $
