@@ -10,7 +10,7 @@ C<In-Reply-To:> field bodies
 package Message::Field::MsgIDs;
 use strict;
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -142,7 +142,7 @@ sub _add_array_check ($$\%) {
     }
     $value = $self->_parse_value ('*msg-id' => $value) if $$option{parse};
   }
-  (1, value => {value => $value, type => $value_option->{type}});
+  (1, $value => {value => $value, type => $value_option->{type}});
 }
 
 ## count: Inherited
@@ -282,7 +282,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/08 09:11:31 $
+$Date: 2002/06/23 12:10:16 $
 
 =cut
 

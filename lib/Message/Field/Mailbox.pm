@@ -9,7 +9,7 @@ mail address (mailbox) which is part of Internet Messages
 package Message::Field::Mailbox;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::AngleQuoted;
 push @ISA, qw(Message::Field::AngleQuoted);
 
@@ -181,6 +181,21 @@ sub keyword ($;$) {
   $self->{keyword};
 }
 
+sub value ($;$) {
+  my $self = shift;
+  my $v = shift;
+  if ($v =~ /^((?:$REG{quoted_string}|[^\x22])+?)\x40((?:$REG{domain_literal}|[^\x5B\x40])+)$/) {
+    $self->{local_part} = $1; $self->{domain} = $2;
+    $self->{domain} = $self->_parse_value (domain => $self->{domain})
+      if $self->{option}->{parse_domain} || $self->{option}->{parse_all};
+    $self->{local_part}
+      = $self->Message::Util::decode_quoted_string ($self->{local_part}, 
+        type => 'word',
+        charset => $self->{option}->{encoding_before_decode_local_part});
+  }
+  defined wantarray? $self->addr_spec:'';
+}
+
 sub route_add ($@) { shift->SUPER::add (@_) }
 sub route_count ($@) { shift->SUPER::count (@_) }
 sub route_delete ($@) { shift->SUPER::delete (@_) }
@@ -225,7 +240,7 @@ sub addr_spec ($;%) {
   );
   $self->stringify (%o, @_);
 }
-*value = \&addr_spec;
+#*value = \&addr_spec;
 
 ## $self->_stringify_value (\%option)
 sub _stringify_value ($\%) {
@@ -287,7 +302,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/16 10:42:06 $
+$Date: 2002/06/23 12:10:16 $
 
 =cut
 

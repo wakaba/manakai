@@ -9,7 +9,7 @@ Internet message field bodies
 package Message::Field::ValueParams;
 use strict;
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Params;
 push @ISA, qw(Message::Field::Params);
 
@@ -129,7 +129,7 @@ sub _save_param ($@) {
   my $self = shift;
   my @p = @_;
   $self->{value} = $self->{option}->{value_default};
-  if ($p[0]->[1]->{is_parameter} == 0) {
+  if (@p > 0 && $p[0]->[1]->{is_parameter} == 0) {
     my $type = shift (@p)->[0];
     if ($type && $type !~ /$self->{option}->{value_no_regex}/) {
       $self->{value} = $type;
@@ -315,7 +315,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/09 11:08:28 $
+$Date: 2002/06/23 12:10:16 $
 
 =cut
 

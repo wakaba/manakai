@@ -10,8 +10,8 @@ package Message::Field::Params;
 use strict;
 require 5.6.0;
 use re 'eval';
-use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use vars qw(%DEFAULT @ISA %REG $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -21,7 +21,7 @@ use overload '""' => sub { $_[0]->stringify },
              '.=' => sub { $_[0]->add ($_[1], ['', value => 1]); $_[0] },
              fallback => 1;
 
-*REG = \%Message::Util::REG;
+%REG = %Message::Util::REG;
 ## Inherited: comment, quoted_string, domain_literal, angle_quoted
 	## WSP, FWS, atext, atext_dot, token, attribute_char
 	## S_encoded_word
@@ -42,20 +42,8 @@ $REG{M_parameter_name} = qr/($REG{attribute_char}+)(?:\*([0-9]+)(\*)?|(\*))/;
 $REG{M_parameter_extended_value} = qr/([^']*)'([^']*)'($REG{token}*)/;
 	## as defined by RFC 2231, but more naive.
 
-
-=head1 CONSTRUCTORS
-
-The following methods construct new objects:
-
-=over 4
-
-=cut
-
-## Initialize of this class -- called by constructors
-sub _init ($;%) {
-  my $self = shift;
-  my %options = @_;
-  my %DEFAULT = (
+%DEFAULT = (
+	-_HASH_NAME	=> 'param',
     -delete_fws	=> 1,## BUG: this option MUST be '1'.
     	## parameter parser cannot procede CFWS.
     #encoding_after_encode
@@ -73,9 +61,23 @@ sub _init ($;%) {
     -parse_all	=> 0,
     -separator	=> '; ',
     -separator_regex	=> qr/$REG{FWS};$REG{FWS}/,
+    -use_comment	=> 1,
     -use_parameter_extension	=> 0,
     #value_type
-  );
+);
+
+=head1 CONSTRUCTORS
+
+The following methods construct new objects:
+
+=over 4
+
+=cut
+
+## Initialize of this class -- called by constructors
+sub _init ($;%) {
+  my $self = shift;
+  my %options = @_;
   $self->SUPER::_init (%DEFAULT, %options);
   $self->{param} = [];
   my $fname = $self->{option}->{field_name};
@@ -90,17 +92,7 @@ sub _init ($;%) {
   } elsif ($self->{option}->{format} =~ /^http/) {
     $self->{option}->{encoding_before_decode} = 'iso-8859-1';
     $self->{option}->{encoding_after_decode} = 'iso-8859-1';
-  }
-}
-
-## Initialization for new () method.
-sub _initialize_new ($;%) {
-  ## Nothing to do
-}
-
-## Initialization for parse () method.
-sub _initialize_parse ($;%) {
-  ## Nothing to do
+  }	## TODO: news-usefor -> x-junet8
 }
 
 =item $p = Message::Field::Params->new ([%options])
@@ -110,11 +102,7 @@ to the constructor.
 
 =cut
 
-sub new ($;%) {
-  my $self = shift->SUPER::new (@_);
-  $self->_initialize_new (@_);
-  $self;
-}
+## Inherited
 
 =item $p = Message::Field::Params->parse ($field-body, [%options])
 
@@ -128,8 +116,8 @@ sub parse ($$;%) {
   my $self = bless {}, $class;
   my $body = shift;
   $self->_init (@_);
-  $self->_initialize_parse (@_);
-  $body = Message::Util::delete_comment ($body);
+  $body = Message::Util::delete_comment ($body)
+    if $self->{option}->{use_comment};
   $body = $self->_delete_fws ($body) if $self->{option}->{delete_fws};
   my @b = ();
   $body =~ s{$REG{FWS}($REG{$self->{option}->{parameter_rule}})
@@ -176,6 +164,9 @@ sub _restore_param ($@) {
           my %s = &{$self->{option}->{hook_decode_string}} ($self, $s,
                 language => $p->{language}, charset => $p->{charset},
                 type => 'parameter/encoded');
+          if ($p->{charset} && !$s{charset}) {
+            $p->{charset_to_be} = $p->{charset};	## Original charset
+          }
           ($s, $p->{charset}, $p->{language}) = (@s{qw(value charset language)});
         } elsif ($p->{is_internal}) {
           $s = $p->{value};
@@ -187,7 +178,9 @@ sub _restore_param ($@) {
           ($s, $p->{charset}, $p->{language}) = (@s{qw(value charset language)});
         }
         push @ret, [$i->[0], {value => $s, language => $p->{language},
-                              charset => $p->{charset}, is_parameter => 1}];
+                              charset => $p->{charset}, 
+                              charset_to_be => $p->{charset_to_be},
+                              is_parameter => 1}];
       } else {
         $part{$i->[0]}->[$p->{seq}] = {
         value => scalar Message::Util::unquote_if_quoted_string ($p->{value}),
@@ -212,8 +205,12 @@ sub _restore_param ($@) {
     } @{$part{$name}};
     my %s = &{$self->{option}->{hook_decode_string}} ($self, $t,
                 type => 'parameter/encoded');
-    ($t,@part{$name}->[0]->{qw(charset language)})=(@s{qw(value charset language)});
+          if ($part{$name}->[0]->{charset} && !$s{charset}) {	## Original charset
+            $part{$name}->[0]->{charset_to_be} = $part{$name}->[0]->{charset};
+          }
+    ($t,@{$part{$name}->[0]}{qw(charset language)})=(@s{qw(value charset language)});
     push @ret, [$name, {value => $t, charset => $part{$name}->[0]->{charset},
+                        charset_to_be => $part{$name}->[0]->{charset_to_be},
                         language => $part{$name}->[0]->{language}, 
                         is_parameter => 1}];
   }
@@ -268,7 +265,34 @@ value (1/0, see example above).
 
 =cut
 
-sub add ($$;$%) {
+sub _add_hash_check ($$$\%) {
+  my $self = shift;
+  my ($name, $value, $option) = @_;
+  my $value_option = {};
+  if (ref $value eq 'ARRAY') {
+    ($value, %$value_option) = @$value;
+  }
+  if ($value_option->{value}) {	## Non-value parameter
+    $name = $self->_parse_value ('*novalue' => $name) if $$option{parse};
+    return (1, $name => [$name, {is_parameter => 0}]);
+  }
+    if ($$option{validate} && !$value_option->{value}
+     && $name =~ /^$REG{NON_http_attribute_char}$/) {
+      if ($$option{dont_croak}) {
+        return (0);
+      } else {
+        Carp::croak qq{add: $name: Invalid parameter name};
+      }
+    $value = $self->_parse_value ($name => $value) if $$option{parse};
+  }
+  (1, $name => [$name => {value => $value, is_parameter => 1,
+                charset_to_be => $value_option->{charset},
+                language => $value_option->{language},
+                }]);
+}
+
+
+sub Xadd ($$;$%) {
   my $self = shift;
   my %gp = @_;
   my %option = %{$self->{option}};
@@ -373,7 +397,7 @@ sub parameter ($$;$%) {
       }
     }
   }
-  @ret;
+  wantarray? @ret: undef;
 }
 
 sub parameter_name ($$;$) {
@@ -428,7 +452,8 @@ sub stringify ($;%) {
       if ($v->{is_parameter}) {
         my ($encoded, @value) = (0, '');
         my (%e) = &{$self->{option}->{hook_encode_string}} ($self, 
-          $v->{value}, current_charset => $v->{charset}, language => $v->{language},
+          $v->{value}, charset => $v->{charset_to_be},
+          current_charset => $v->{charset}, language => $v->{language},
           type => 'parameter');
         if (!defined $e{value}) {
           $value[0] = undef;
@@ -614,7 +639,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/16 10:42:06 $
+$Date: 2002/06/23 12:10:16 $
 
 =cut
 

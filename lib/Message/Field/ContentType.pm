@@ -9,7 +9,7 @@ Internet message C<Content-Type:> field body
 package Message::Field::ContentType;
 use strict;
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::ValueParams;
 push @ISA, qw(Message::Field::ValueParams);
 require Message::MIME::MediaType;
@@ -99,10 +99,14 @@ some options as parameters to the constructor.
 sub _save_param ($@) {
   my $self = shift;
   my @p = @_;
-  my $media_type = $self->{option}->{media_type_default}
-              .'/'.$self->{option}->{media_subtype_default};
+  if (@p == 0) {
+    $self->{media_type} = $self->{option}->{media_type_default};
+    $self->{media_subtype} = $self->{option}->{media_subtype_default};
+    return;
+  }
+  my $media_type;
   if ($p[0]->[1]->{is_parameter} == 0) {
-    $media_type = shift (@p)->[0];
+    $media_type = shift (@p)->[0] || '';
     if ($media_type =~ m#^($REG{token})/($REG{token})$#) {
       $self->{media_type} = lc $1;
       $self->{media_subtype} = lc $2;
@@ -122,6 +126,12 @@ sub _save_param ($@) {
       $self->{media_type} = 'application';
       $self->{media_subtype} = 'octet-stream';
     }
+  }
+  unless ($media_type) {
+    $media_type  = $self->{option}->{media_type_default}
+              .'/'.$self->{option}->{media_subtype_default};
+    $self->{media_type} = $self->{option}->{media_type_default};
+    $self->{media_subtype} = $self->{option}->{media_subtype_default};
   }
   if ($media_type =~ m#^application/x-(?:text|message)#) {
     my $mt = $1;
@@ -232,7 +242,7 @@ Returns or set right part of Internet media type.
 
 sub media_type ($;$) {
   my $self = shift;
-  my $new_value = shift;
+  my $new_value = shift || '';
   if ($new_value =~ m#^($REG{token})/($REG{token})$#) {
     $self->{media_type} = $1;
     $self->{media_subtype} = $2;
@@ -405,7 +415,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/09 11:08:28 $
+$Date: 2002/06/23 12:10:16 $
 
 =cut
 

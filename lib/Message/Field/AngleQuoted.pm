@@ -11,13 +11,11 @@ use strict;
 require 5.6.0;
 use re 'eval';
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 
 %REG = %Message::Util::REG;
-	$REG{angle_qcontent} = qr/(?:$REG{quoted_string}|$REG{domain_literal}|[^\x3C\x3E\x22\x5B])+/;
-	$REG{M_angle_quoted} = qr/<($REG{angle_qcontent})>|<>/;
 
 =head1 CONSTRUCTORS
 
@@ -226,7 +224,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/15 07:15:59 $
+$Date: 2002/06/23 12:10:15 $
 
 =cut
 

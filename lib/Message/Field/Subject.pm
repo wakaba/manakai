@@ -9,7 +9,7 @@ message header C<Subject:> field body
 package Message::Field::Subject;
 use strict;
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Unstructured;
 push @ISA, q(Message::Field::Unstructured);
@@ -84,7 +84,7 @@ sub parse ($$;%) {
     return $self;
   }
   my %s = &{$self->{option}->{hook_decode_string}} ($self, $field_body,
-    type => 'text');  $field_body = $s{value};
+    type => 'text'); $field_body = $s{value};
   $field_body =~ s{^$REG{FWS}($REG{prefix})$REG{FWS}}{
     my $prefix = $1;
     $self->{is_reply} = 1 if $prefix =~ /$REG{re}/;
@@ -293,7 +293,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/13 01:33:54 $
+$Date: 2002/06/23 12:10:16 $
 
 =cut
 

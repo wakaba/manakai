@@ -9,7 +9,7 @@ date-time used in Internet messages and so on
 package Message::Field::Date;
 use strict;
 use vars qw(%DEFAULT @ISA %MONTH %REG $VERSION %ZONE);
-$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 use Time::Local 'timegm_nocheck';
@@ -109,7 +109,6 @@ The following methods construct new objects:
     	zsign	=> sub { $_[1]->{zone}->[0] > 0 ? '+' : '-' },
     	zHH	=> sub { sprintf $_[2]->{_fmt}, $_[1]->{zone}->[1] },
     	zTT	=> sub { sprintf $_[2]->{_fmt}, $_[1]->{zone}->[2] },
-    	percent	=> '%',
     },
     -use_comment	=> 1,
     -use_military_zone	=> +1,	## +1 / -1 / 0
@@ -177,6 +176,7 @@ The following methods construct new objects:
   JT	=> [+1,  7, 30],	## Java
   KDT	=> [+1, 10,  0],	## Korean Daylight
   KST	=> [+1,  9,  0],	## Korean Standard
+  LOCAL	=> [-1,  0,  0],
   MDT	=> [-1,  6,  0],	## (NA)Mountain Daylight	733, 822
   MET	=> [+1,  0,  0],	## Middle European
   METDST	=> [+1,  2,  0],
@@ -452,10 +452,9 @@ sub parse ($$;%) {
     
     $day ||= 1;
     # Translate month name to number
+    $month ||= 1;
     $month = $MONTH{uc $month}
-             ##|| ($mon >= 1 && $mon <= 12 && int($mon))
-             || int ($month)
-             || 1;
+             || int ($month);
     
     # If the year is missing, we assume first date before the current,
     # because of the formats we support such dates are mostly present
@@ -494,10 +493,10 @@ sub parse ($$;%) {
 sub zone ($;$) {
   my $self = shift;
   my $newzone = shift;
-  unless (ref $newzone) {
-    $self->{option}->{zone} = [$self->_zone_string_to_array ($newzone)];
-  } elsif (defined $newzone) {
+  if (ref $newzone) {
     $self->{option}->{zone} = $newzone;
+  } elsif (length $newzone) {
+    $self->{option}->{zone} = [$self->_zone_string_to_array ($newzone)];
   }
   $self->{option}->{zone};
 }
@@ -614,14 +613,15 @@ sub as_rfc2822_time ($@) {
   shift->stringify (-format => 'mail-rfc2822', @_);
 }
 
-sub _date2str ($\%) {
+sub _date2str ($\%\%) {
   my $self = shift;
   my $option = shift;
+  my $gparam = shift;
   my $template	= $option->{format_template};
   my $time	= $self->{date_time};
   $time	= $option->{date_time} if defined $option->{date_time};
   my $zone	= $option->{zone};
-  if (ref $zone) {}
+  if (ref $zone) { }
   elsif (length $zone) {$zone = [$self->_zone_string_to_array ($zone)]}
   my $l_time  = $time + $zone->[0] * ($zone->[1] * 60 + $zone->[2]) * 60;
   my %time = (unix	=> $time,
@@ -642,7 +642,7 @@ sub _date2str ($\%) {
       $a{_fmt} = $a{pad} eq 'SP'?   '%2d':
                  $a{pad} eq 'none'? '%d':
                                     '%02d';
-      my $r = &$function ($self, \%time, \%a);
+      my $r = &$function ($self, \%time, \%a, $gparam);
       length $r? $a{prefix}.$r.$a{suffix}: '';
     } elsif (length $function) {
       $function;
@@ -658,6 +658,7 @@ sub _date2str ($\%) {
 sub _zone_string_to_array ($$;$) {
   my $self = shift;
   my $zone = shift;
+  return (+1, 0, 0) unless defined $zone;
   my $format = shift;
   my @azone = [+1, 0, 0];
   $zone =~ tr/\x09\x20//d;
@@ -732,7 +733,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/16 10:42:06 $
+$Date: 2002/06/23 12:10:16 $
 
 =cut
 

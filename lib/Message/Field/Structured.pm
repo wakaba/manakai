@@ -9,7 +9,7 @@ Message Structured Header Field Bodies
 package Message::Field::Structured;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 use overload '""' => sub { $_[0]->stringify },
              '.=' => sub { $_[0]->value_append ($_[1]) },
@@ -41,6 +41,9 @@ The following methods construct new C<Message::Field::Structured> objects:
     field_name	=> 'x-structured',
     #field_ns	=> '',
     format	=> 'mail-rfc2822',
+    ## MIME charset name of '*default' charset
+      header_default_charset	=> 'iso-2022-int-1',
+      header_default_charset_input	=> 'iso-2022-int-1',
     hook_encode_string	=> #sub {shift; (value => shift, @_)},
     	\&Message::Util::encode_header_string,
     hook_decode_string	=> #sub {shift; (value => shift, @_)},
@@ -576,15 +579,19 @@ sub _comment_stringify ($\%) {
 sub scan ($&;%) {
   my $self = shift;
   my $sub = shift;
-  my %p = @_; my %option = %{$self->{option}};
-  for (grep {/^-/} keys %p) {$option{substr ($_, 1)} = $p{$_}}
-  my $array = $self->{option}->{_ARRAY_NAME}
-           || $self->{option}->{_HASH_NAME};
-  my @param = $self->_scan_sort (\@{$self->{$array}});
+  my %p = @_;  my %option;
+  if (ref $p{options} eq 'HASH') {
+    %option = %{$p{options}};
+  } else {
+    %option = %{$self->{option}};
+    for (grep {/^-/} keys %p) {$option{substr ($_, 1)} = $p{$_}}
+  }
+  my $array = $option{_ARRAY_NAME} || $option{_HASH_NAME};
+  my @param = $self->_scan_sort (\@{$self->{$array}}, \%option);
   #my $sort = $option{sort};
   #@param = sort $sort @param if ref $sort;
   for my $param (@param) {
-    &$sub($self, $param);
+    &$sub($self, $param, \%option);
   }
 }
 
@@ -752,7 +759,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/15 07:15:59 $
+$Date: 2002/06/23 12:10:16 $
 
 =cut
 

@@ -9,7 +9,7 @@ header field body consist of C<product> tokens
 package Message::Field::UA;
 use strict;
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -296,7 +296,7 @@ sub replace ($%) {
     $new_product{$name} = {name => $name, version => $ver, comment => $comment};
   }
   for my $product (@{$self->{product}}) {
-    if (defined $new_product{$product->{name}}) {
+    if ($product->{name} && defined $new_product{$product->{name}}) {
       $product = $new_product {$product->{name}};
       $new_product{$product->{name}} = undef;
     }
@@ -446,7 +446,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/16 10:42:06 $
+$Date: 2002/06/23 12:10:16 $
 
 =cut
 

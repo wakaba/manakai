@@ -9,7 +9,7 @@ Internet message header field body that takes numeric values
 package Message::Field::Numval;
 use strict;
 use vars qw(@ISA $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -82,7 +82,11 @@ sub _init ($;%) {
   $self->{value} = $self->{options}->{value_default};
   $self->{value} = $options{value} if defined $options{value};
   $self->{comment} = [];
-  push @{$self->{comment}}, $options{comment} if length $options{comment};
+  if (ref $options{comment} eq 'ARRAY') {
+    push @{$self->{comment}}, @{$options{comment}};
+  } elsif (defined $options{comment}) {
+    push @{$self->{comment}}, $options{comment};
+  }
   
   my $fname = lc $self->{option}->{field_name};
   my $pname = lc $self->{option}->{field_param_name};
@@ -281,7 +285,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/09 11:08:28 $
+$Date: 2002/06/23 12:10:16 $
 
 =cut
 

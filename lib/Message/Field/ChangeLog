@@ -1,3 +1,14 @@
+2002-06-23  Wakaba <w@suika.fam.cx>
+
+	* AngleQuoted.pm (%REG): Don't define regex locally.
+	(Moved to Message::Util).
+	* ContentType.pm, Date.pm, UA.pm,
+	ValueParams.pm: Fix some codes not to be warned
+	as 'Use of uninitialized value'.
+	* Structured.pm 
+	(header_default_charset, header_default_charset_input):
+	New options.
+
 2002-06-16  wakaba <w@suika.fam.cx>
 
 	* MsgID.pm: Check '.test' reserved TLD if '-validate'.
