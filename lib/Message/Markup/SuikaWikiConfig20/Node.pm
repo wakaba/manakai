@@ -19,7 +19,7 @@ This module is part of manakai.
 
 package Message::Markup::SuikaWikiConfig20::Node;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 =head1 METHODS
 
@@ -253,7 +253,7 @@ sub stringify ($;%) {
       $r = $self->{local_name}
          . ":\x0A  \@\@"
          . (ref ($self->{value}) eq 'ARRAY' ? '[list]' : '')
-         . ":" . (($r !~ /[\x0D\x0A]/) && (length ($r) < 50) ? '' : "\x0A")
+         . ":" . (($r !~ /[\x0D\x0A:]/) && (length ($r) < 50) ? '' : "\x0A")
          . $r . "\x0A";
       for (@{$self->{node}}) {
         next unless $_->{type} eq '#element';
@@ -265,7 +265,7 @@ sub stringify ($;%) {
     } else {
       $r = $self->{local_name}
          . (ref ($self->{value}) eq 'ARRAY' ? '[list]' : '')
-         . ":" . ((($r !~ /[\x0D\x0A]/) && (length ($r) < 50)) ? '' : "\x0A")
+         . ":" . ((($r !~ /[\x0D\x0A:]/) && (length ($r) < 50)) ? '' : "\x0A")
          . $r . "\x0A";
     }
     $r = "\\" . $r if substr ($r, 0, 1) =~ /[\\\@\#\s]/;
@@ -302,6 +302,22 @@ sub option ($$;$) {
     $self->{option}->{$name} = $value;
   }
   $self->{option}->{$name};
+}
+
+sub clone ($;%) {
+  my $self = shift;
+  my $clone = bless {node => []}, ref $self;
+  ## TODO: Cloning recursively
+  $clone->{flag} = {%{$self->{flag}||{}}};
+  $clone->{option} = {%{$self->{option}||{}}};
+  for (qw/local_name value type/) {
+    $clone->{$_} = $self->{$_};
+  }
+  for (@{$self->{node}}) {
+    push @{$clone->{node}}, $_->clone;
+  }
+  $_->{parent} = $clone for @{$clone->{node}};
+  $clone;
 }
 
 =back
@@ -345,4 +361,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/11/15 07:42:34 $
+1; # $Date: 2004/04/25 07:15:30 $
