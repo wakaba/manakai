@@ -847,6 +847,7 @@ my @a =
   result => q(1),
  },
  {
+  entity => {param => 'aa'},
   t => q{<!DOCTYPE %param;  >},
   method => 'parse_markup_declaration',
   result => q(0:10:SYNTAX_PARAENT_REF_NOT_ALLOWED),
@@ -873,16 +874,19 @@ my @a =
   result => q(1),
  },
  {
+  entity => {e5 => 'bb',},
   t => q{abcd&e5;efg},
   method => 'parse_rpdata',
   result => q(1),
  },
  {
+  entity => {e5 => 'aa'},
   t => q{abcd%e5;efg},
   method => 'parse_rpdata',
   result => q(1),
  },
  {
+  entity => {e5efg => 'aa'},
   t => q{abcd&e5efg},
   method => 'parse_rpdata',
   result => q(0:10:SYNTAX_REFC_REQUIRED),
@@ -893,6 +897,7 @@ my @a =
   result => q(0:10:SYNTAX_REFC_REQUIRED),
  },
  {
+  entity => {e5efg => 'aa'},
   t => q{abcd%e5efg},
   method => 'parse_rpdata',
   result => q(0:10:SYNTAX_REFC_REQUIRED),
@@ -945,11 +950,13 @@ my @a =
   result => q(1),
  },
  {
+#  entity => {a => q<b>},
   t => q{<!ENTITY a "ab&a;cde">},
   method => 'parse_entity_declaration',
   result => q(1),
  },
  {
+  entity => {a => 'aa'},
   t => q{<!ENTITY a "ab%a;cde">},
   method => 'parse_entity_declaration',
   result => q(1),
@@ -1407,6 +1414,7 @@ my @a =
   result => 1,
  },
  {
+  entity => {ry => 'aa'},
   t => q<( a , ([b, %ry; ], (c, d)+)* )>,
   method => 'parse_model_group',
   result => '0:7:SYNTAX_DATA_TAG_GROUP',
@@ -2711,6 +2719,181 @@ comment -->
   method => 'parse_entity_declaration',
   result => q<0:12:WFC_LEGAL_CHARACTER>,
  },
+
+ {
+  entity => {f => {replace => q<bar>}},
+  t => qq{<!ENTITY e "%f;">},
+  method => 'parse_entity_declaration',
+  result => 1,
+ },
+ {
+  entity => {f => {replace => q<%bar;>}, bar => {replace => q<bar>}},
+  t => qq{<!ENTITY e "%f;">},
+  method => 'parse_entity_declaration',
+  result => 1,
+ },
+ {
+  entity => {f => {replace => q<%bar;>}, bar => [undef]},
+  t => qq{<!ENTITY e "%f;">},
+  method => 'parse_entity_declaration',
+  result => 1,
+ },
+ {
+  entity => {f => {replace => q<%bar;>}, bar => [undef]},
+  t => qq{<!ENTITY e "%f;">},
+  method => 'parse_entity_declaration',
+  option => {ExpandedURI q<test:standalone> => 1},
+  result => '0:1:WFC_ENTITY_DECLARED',
+ },
+ {
+  entity => {f => {replace => q<%bar;>}, bar => {replace => q<>,
+                                                 externally => 1}},
+  t => qq{<!ENTITY e "%f;">},
+  method => 'parse_entity_declaration',
+  option => {ExpandedURI q<test:standalone> => 1},
+  result => '0:1:WFC_ENTITY_DECLARED__INTERNAL',
+ },
+ {
+  entity => {f => {replace => q<%f;>}},
+  t => qq{<!ENTITY e "%f;">},
+  method => 'parse_entity_declaration',
+  option => {ExpandedURI q<test:standalone> => 1},
+  result => '0:1:WFC_NO_RECURSION',
+ },
+ {
+  entity => {f => {replace => q<%g;>}, g => {replace => q<%f;>}},
+  t => qq{<!ENTITY e "%f;">},
+  method => 'parse_entity_declaration',
+  option => {ExpandedURI q<test:standalone> => 1},
+  result => '0:1:WFC_NO_RECURSION',
+ },
+ {
+  entity => {f => {replace => q<g;>, unparsed => 1}},
+  t => qq{<!ENTITY e "%f;">},
+  method => 'parse_entity_declaration',
+  option => {ExpandedURI q<test:standalone> => 1},
+  result => '0:13:WFC_PARSED_ENTITY',
+ },
+
+ {
+  entity => {g => {replace => q<<!-- comment -->>}},
+  t => qq{<!ENTITY e "f"> %g;},
+  method => 'parse_doctype_subset',
+  result => 1,
+ },
+ {
+  entity => {g => {replace => q<<!-- comment -->>, unparsed => 1}},
+  t => qq{<!ENTITY e "f"> %g;},
+  method => 'parse_doctype_subset',
+  result => '0:17:WFC_PARSED_ENTITY',
+ },
+ {
+  entity => {g => {replace => q<<!-- comment --> %g;>}},
+  t => qq{<!ENTITY e "f"> %g;},
+  method => 'parse_doctype_subset',
+  result => '0:18:WFC_NO_RECURSION',
+ },
+ {
+  entity => {g => {replace => q<<!-- comment --> %h;>}, h => q<<!-- --> %g;>},
+  t => qq{<!ENTITY e "f"> %g;},
+  method => 'parse_doctype_subset',
+  result => '0:10:WFC_NO_RECURSION',
+ },
+ {
+  entity => {g => {replace => q<<!-- comment -->>, externally => 1}},
+  t => qq{<!ENTITY e "f"> %g;},
+  method => 'parse_doctype_subset',
+  result => 1,
+ },
+ {
+  entity => {g => {replace => q<<!-- comment -->>, externally => 1}},
+  t => qq{<!ENTITY e "f"> %g;},
+  method => 'parse_doctype_subset',
+  option => {ExpandedURI q<test:standalone> => 1},
+  result => '0:17:WFC_ENTITY_DECLARED__INTERNAL',
+ },
+
+ {
+  entity => {g => {replace => q<"!-- comment --">}},
+  t => qq{<!ENTITY e %g;>},
+  method => 'parse_doctype_subset',
+  result => 1,
+ },
+ {
+  entity => {g => {replace => q<"!-- comment --">, unparsed => 1}},
+  t => qq{<!ENTITY e %g;>},
+  method => 'parse_doctype_subset',
+  result => '0:12:WFC_PARSED_ENTITY',
+ },
+ {
+  entity => {g => {replace => q<%g;>}},
+  t => qq{<!ENTITY e %g;>},
+  method => 'parse_doctype_subset',
+  result => '0:1:WFC_NO_RECURSION',
+ },
+ {
+  entity => {g => {replace => q<%h;>}, h => q<%g;>},
+  t => qq{<!ENTITY e %g;>},
+  method => 'parse_doctype_subset',
+  result => '0:1:WFC_NO_RECURSION',
+ },
+ {
+  entity => {g => {replace => q<%h;>}, h => q<"%g;">},
+  t => qq{<!ENTITY e %g;>},
+  method => 'parse_doctype_subset',
+  result => '0:2:WFC_NO_RECURSION',
+ },
+ {
+  entity => {g => {replace => q<"!-- comment --">, externally => 1}},
+  t => qq{<!ENTITY e %g;>},
+  method => 'parse_doctype_subset',
+  result => 1,
+ },
+ {
+  entity => {g => {replace => q<"!-- comment --">, externally => 1}},
+  t => qq{<!ENTITY e %g;>},
+  method => 'parse_doctype_subset',
+  option => {ExpandedURI q<test:standalone> => 1,
+             ExpandedURI q<allow-param-entref> => 1},
+  result => '0:12:WFC_ENTITY_DECLARED__INTERNAL',
+ },
+ {
+  entity => {g => {replace => q<%g>}},
+  t => qq{<!ENTITY e %g;>},
+  method => 'parse_doctype_subset',
+  result => '0:1:WFC_NO_RECURSION',
+ },
+ {
+  entity => {g => {replace => q<%h>}, h => {replace => q<>, unparsed => 1}},
+  t => qq{<!ENTITY e %g;>},
+  method => 'parse_doctype_subset',
+  result => '0:2:SYNTAX_REFC_REQUIRED',
+ },
+
+ {
+  entity => {g => {replace => q<>}},
+  t => qq{<!ENTITY e %g; "text">},
+  method => 'parse_doctype_subset',
+  result => 1,
+ },
+ {
+  entity => {g => {replace => q<%h;>}, h => {replace => q<>}},
+  t => qq{<!ENTITY e %g; "text">},
+  method => 'parse_doctype_subset',
+  result => 1,
+ },
+ {
+  entity => {g => {replace => q<>}},
+  t => qq{%g; <!ENTITY e  "text">},
+  method => 'parse_doctype_subset',
+  result => 1,
+ },
+ {
+  entity => {g => {replace => q<%h;>}, h => {replace => q<>}},
+  t => qq{%g; <!ENTITY e "text">},
+  method => 'parse_doctype_subset',
+  result => 1,
+ },
 );
 
 plan tests => scalar @a;
@@ -2751,31 +2934,6 @@ BEGIN {
   use Message::Util::QName::General [qw/ExpandedURI/], $main::NS;
 }
 
-sub parameter_entity_reference_in_parameter_start ($$$$%) {
-  my ($self, $src, $p, $pp, %opt) = @_;
-  for my $reptxt ($self->{ExpandedURI q<test:entity>}
-                       ->{$pp->{ExpandedURI q<entity-name>}}) {
-    push @{$opt{ExpandedURI q<source>}}, \$reptxt if $reptxt;
-  }
-}
-
-sub parameter_entity_reference_in_subset_start ($$$$%) {
-  my ($self, $src, $p, $pp, %opt) = @_;
-  for my $reptxt ($self->{ExpandedURI q<test:entity>}
-                       ->{$pp->{ExpandedURI q<entity-name>}}) {
-    if (ref $reptxt eq 'HASH') {
-      pos $reptxt->{replace} = 0;
-      push @{$opt{ExpandedURI q<source>}}, \($reptxt->{replace});
-      $self->{error}->set_flag
-        ((\$reptxt->{replace}),
-         ExpandedURI q<is-external-entity> => $reptxt->{external});
-    } else {
-      pos $reptxt = 0;
-      push @{$opt{ExpandedURI q<source>}}, \$reptxt if $reptxt;
-    }
-  }
-}
-
 sub general_entity_reference_in_attribute_value_literal_start ($$$$%) {
   my ($self, $src, $p, $pp, %opt) = @_;
   return if $pp->{ExpandedURI q<entity-opened>};
@@ -2793,15 +2951,23 @@ sub general_entity_reference_in_attribute_value_literal_start ($$$$%) {
       $self->{error}->set_flag
         ((\$reptxt->{replace}),
          ExpandedURI q<is-declared-externally> => $reptxt->{externally});
+    } elsif (ref $reptxt) {
+      next;
     } elsif (not defined $reptxt) {
       warn "Entity ${$pp->{ExpandedURI q<entity-name>}} not defined";
     } else {
       pos $reptxt = 0;
-      push @{$opt{ExpandedURI q<source>}}, \$reptxt if $reptxt;
+      push @{$opt{ExpandedURI q<source>}}, \$reptxt;
     }
   }
 }
 BEGIN {
 *general_entity_reference_in_content_start
+ = \&general_entity_reference_in_attribute_value_literal_start;
+*parameter_entity_reference_in_rpdata_start
+ = \&general_entity_reference_in_attribute_value_literal_start;
+*parameter_entity_reference_in_subset_start
+ = \&general_entity_reference_in_attribute_value_literal_start;
+*parameter_entity_reference_in_parameter_start
  = \&general_entity_reference_in_attribute_value_literal_start;
 }

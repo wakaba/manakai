@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::Base;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML
     qw[InXML_NameStartChar InXMLNameChar
        InXMLChar10 InXMLChar11
@@ -1062,11 +1062,62 @@ sub parse_reference_in_rpdata ($$$%) {
   my ($self, $src, $p, %opt) = @_;
   if ($$src =~ /\G%/gc) {
     if ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+      my $s = $1; pos $s = 0;
+      $self->{error}->set_position ($src, moved => 1, diff => length $s);
+      $self->{error}->fork_position ($src => \$s);
+      my $pp = {ExpandedURI q<entity-name> => \$s};
+      if ($self->{ExpandedURI q<_:opened-parameter-entity>}->{$s}) {
+        $self->report
+          (-type => 'WFC_NO_RECURSION',
+           -class => 'WFC',
+           source => $src,
+           position_diff => length $s,
+           entity_name => $s);
+        $pp->{ExpandedURI q<entity-opened>} = 1;
+      }
+      $opt{ExpandedURI q<source>} = [$src];
       $self->parameter_entity_reference_in_rpdata_start
-               ($src,
-                $p,
-                {ExpandedURI q<entity-name> => $1},
-                %opt);
+               ($src, $p, $pp, %opt);
+      EXPAND: {
+        last EXPAND if $pp->{ExpandedURI q<entity-opened>};
+        if (overload::StrVal ($src) ne
+            overload::StrVal ($opt{ExpandedURI q<source>}->[-1])) {
+          if ($self->{ExpandedURI q<is-standalone>} and
+                   $self->{error}->get_flag
+               ($opt{ExpandedURI q<source>}->[-1],
+                ExpandedURI q<is-declared-externally>)) {
+            $self->report
+               (-type => 'WFC_ENTITY_DECLARED__INTERNAL',
+                -class => 'WFC',
+                source => $src,
+                position_diff => length $s,
+                entity_name => $s);
+          } elsif ($self->{error}->get_flag
+               ($opt{ExpandedURI q<source>}->[-1],
+                ExpandedURI q<is-unparsed-entity>)) {
+            $self->report
+               (-type => 'WFC_PARSED_ENTITY',
+                -class => 'WFC',
+                source => $src,
+                position_diff => length $s,
+                entity_name => $s);
+            last EXPAND;
+          }
+          local $self->{ExpandedURI q<_:opened-parameter-entity>}->{$s} = 1;
+          $self->parse_rpdata
+               ($opt{ExpandedURI q<source>}->[-1], $p, %opt, pp => $pp);
+          $pp->{ExpandedURI q<reference-expanded>} = 1;
+        } elsif ($self->{ExpandedURI q<is-standalone>}) {
+          $self->report
+               (-type => 'WFC_ENTITY_DECLARED',
+                -class => 'WFC',
+                source => $src,
+                position_diff => length $s,
+                entity_name => $s);
+        }
+      }
+      $self->parameter_entity_reference_in_rpdata_end
+               ($src, $p, $pp, %opt);
       
       $$src =~ /\G;/gc or $self->report
                (-type => 'SYNTAX_REFC_REQUIRED',
@@ -1139,11 +1190,14 @@ sub parse_reference_in_rpdata ($$$%) {
         return 0;
       }
     } elsif ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+      my $s = $1; pos $s = 0;
+      $self->{error}->set_position ($src, moved => 1, diff => length $s);
+      $self->{error}->fork_position ($src => \$s);
+      my $pp = {ExpandedURI q<entity-name> => \$s};
       $self->general_entity_reference_in_rpdata_start
-               ($src,
-                $p,
-                {ExpandedURI q<entity-name> => $1},
-                %opt);
+               ($src, $p, $pp, %opt);
+      $self->general_entity_reference_in_rpdata_end
+               ($src, $p, $pp, %opt);
     } else {
       $self->report
                (-type => 'SYNTAX_HASH_OR_NAME_REQUIRED',
@@ -2402,50 +2456,102 @@ sub parse_markup_declaration_parameter ($$$%) {
       } elsif ($$src =~ /\G%/gc) {
         if ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
           $self->report
-            (-type => $opt{ExpandedURI q<error-param-entref>} ||
-                      'SYNTAX_PARAENT_REF_NOT_ALLOWED',
-             -class => 'WFC',
-             position_diff => $+[0] - $-[0] + 1,
-             source => $src)
-            if not $opt{ExpandedURI q<allow-param-entref>};
+                  (-type => $opt{ExpandedURI q<error-ps>} ||
+                            'SYNTAX_MARKUP_DECLARATION_PS',
+                   -class => 'WFC',
+                   position_diff => $+[0] - $-[0] + 1,
+                   source => $src)
+                if not $opt{ExpandedURI q<allow-ps>};
+          $self->report
+                  (-type => $opt{ExpandedURI q<error-param-entref>} ||
+                            'SYNTAX_PARAENT_REF_NOT_ALLOWED',
+                   -class => 'WFC',
+                   position_diff => $+[0] - $-[0] + 1,
+                   source => $src)
+                if not $opt{ExpandedURI q<allow-param-entref>};
+          
+          my $s = $1; pos $s = 0;
+          $self->{error}->set_position ($src, moved => 1, diff => length $s);
+          $self->{error}->fork_position ($src => \$s);
+          my $pp = {ExpandedURI q<entity-name> => \$s,
+                    ExpandedURI q<param> => []};
+          if ($self->{ExpandedURI q<_:opened-parameter-entity>}->{$s}) {
+            $self->report
+                     (-type => 'WFC_NO_RECURSION',
+                      -class => 'WFC',
+                      source => $src,
+                      position_diff => length $s,
+                      entity_name => $s);
+            $pp->{ExpandedURI q<entity-opened>} = 1;
+          }
           $self->parameter_entity_reference_in_parameter_start
-            ($src, $p,
-             my $pp = {ExpandedURI q<entity-name> => $1,
-             ExpandedURI q<param> => []},
-             %opt);
+            ($src, $p, $pp, %opt);
+
           $$src =~ /\G;/gc or
             $self->report
               (-type => 'SYNTAX_REFC_REQUIRED',
                -class => 'WFC',
                source => $src,
                entity_name => $pp->{ExpandedURI q<entity-name>});
-          $has_ps = 1;
 
-          ## Entity replacement text prepared (in param...start method above)
-          ## NOTE: Removing $src from @{$opt{<source>}} in param...start
-          ##       is not expected.  Only either push'ing new text or do
-          ## no operation is allowed in param...start method.
-          if (overload::StrVal ($src) ne
-              overload::StrVal ($opt{ExpandedURI q<source>}->[-1])) {
-            local $Error::Depth = $Error::Depth + 1;
-            $self->parse_markup_declaration_parameter
+          EXPAND: {
+            last EXPAND if $pp->{ExpandedURI q<entity-opened>};
+            ## Entity replacement text prepared (in param...start method above)
+            ## NOTE: Removing $src from @{$opt{<source>}} in param...start
+            ##       is not expected.  Only either push'ing new text or do
+            ##       no operation is allowed in param...start method.
+            if (overload::StrVal ($src) ne
+                overload::StrVal ($opt{ExpandedURI q<source>}->[-1])) {
+              if ($self->{ExpandedURI q<is-standalone>} and
+                  $self->{error}->get_flag
+                  ($opt{ExpandedURI q<source>}->[-1],
+                   ExpandedURI q<is-declared-externally>)) {
+                $self->report
+                         (-type => 'WFC_ENTITY_DECLARED__INTERNAL',
+                          -class => 'WFC',
+                          source => $src,
+                          position_diff => 1 + length $s,
+                          entity_name => $s);
+              } elsif ($self->{error}->get_flag
+                         ($opt{ExpandedURI q<source>}->[-1],
+                          ExpandedURI q<is-unparsed-entity>)) {
+                $self->report
+                         (-type => 'WFC_PARSED_ENTITY',
+                          -class => 'WFC',
+                          source => $src,
+                          position_diff => 1 + length $s,
+                          entity_name => $s);
+                last EXPAND;
+              }
+
+              local $self->{ExpandedURI q<_:opened-parameter-entity>}->{$s} = 1;
+              local $Error::Depth = $Error::Depth + 1;
+              $self->parse_markup_declaration_parameter
                   ($src, $p,
                    %opt,
                    ExpandedURI q<ps-required> => 0,
                    ExpandedURI q<end-with-mdc> => 0);
-            ## Found
-            if (@$param) {
-              if (not $opt{ExpandedURI q<allow-ps>}) {
-                $self->report
-                  (-type => $opt{ExpandedURI q<error-ps>}
-                         || 'SYNTAX_MARKUP_DECLARATION_PS',
-                   -class => 'WFC',
-                   position_diff => pos ($$src) - $pos,
-                   source => $src);
+              $pp->{ExpandedURI q<reference-expanded>} = 1;
+              
+              ## Requested Parameter Found
+              if (@$param) {
+                $self->parameter_entity_reference_in_parameter_end
+                  ($src, $p, $pp, %opt);
+                return 1;
               }
-              return 1;
+            } elsif ($self->{ExpandedURI q<is-standalone>}) {
+              $self->report
+               (-type => 'WFC_ENTITY_DECLARED',
+                -class => 'WFC',
+                source => $src,
+                position_diff => 1 + length $s,
+                entity_name => $s);
             }
           }
+
+          $self->parameter_entity_reference_in_parameter_end
+               ($src, $p, $pp, %opt);
+          $has_ps = 1;
         } else { # pero not followed by Name
           pos ($$src)--;
           last EATPS;
@@ -2457,7 +2563,7 @@ sub parse_markup_declaration_parameter ($$$%) {
            source => $src);
         $self->parse_comment ($src, $p, %opt);
       ## Reach to end of source text
-      } elsif (pos $$src and length $$src == pos $$src) {
+      } elsif (defined pos $$src and length $$src == pos $$src) {
         if (@{$opt{ExpandedURI q<source>}} > 1) {
           pop @{$opt{ExpandedURI q<source>}};
           $src = $opt{ExpandedURI q<source>}->[-1];
@@ -2691,7 +2797,7 @@ sub parse_markup_declaration_parameter ($$$%) {
 
 sub parse_rpdata ($$$%) {
   my ($self, $src, $p, %opt) = @_;
-  my $pp = {};
+  my $pp = $opt{pp} || {};
   my $litdelim = $p->{ExpandedURI q<literal-delimiter>};
   my $datachar = $litdelim ?
                    $litdelim eq '"' ? qr/[^"&%]/ :
@@ -2877,7 +2983,7 @@ sub parse_doctype_subset ($$$%) {
                    -class => 'WFC',
                    source => $src);
         }
-      } elsif ($$src =~ /\G($REG_S+)/gc) {
+      } elsif ($$src =~ /\G($REG_S+)/gco) {
         my $cdata = $1;
         $self->{error}->set_position ($src, moved => 1,
                                       diff => length $cdata);
@@ -2885,33 +2991,79 @@ sub parse_doctype_subset ($$$%) {
         $self->doctype_subset_s ($src, $p, {ExpandedURI q<s> => \$cdata}, %opt);
       } elsif ($$src =~ /\G%/gc) {
         if ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+          my $s = $1; pos $s = 0;
+          $self->{error}->set_position ($src, moved => 1, diff => length $s);
+          $self->{error}->fork_position ($src => \$s);
+          my $pp = {ExpandedURI q<entity-name> => \$s,
+                    ExpandedURI q<param> => []};
+          if ($self->{ExpandedURI q<_:opened-parameter-entity>}->{$s}) {
+            $self->report
+                     (-type => 'WFC_NO_RECURSION',
+                      -class => 'WFC',
+                      source => $src,
+                      position_diff => length $s,
+                      entity_name => $s);
+            $pp->{ExpandedURI q<entity-opened>} = 1;
+          }
+          $opt{ExpandedURI q<source>} = [$src];
           $self->parameter_entity_reference_in_subset_start
-            ($src, $p,
-             my $pp = {ExpandedURI q<entity-name> => $1,
-             ExpandedURI q<param> => []},
-             %opt);
+            ($src, $p, $pp, %opt);
+          EXPAND: {
+            last EXPAND if $pp->{ExpandedURI q<entity-opened>};
+            if (overload::StrVal ($src) ne
+                overload::StrVal ($opt{ExpandedURI q<source>}->[-1])) {
+              if ($self->{ExpandedURI q<is-standalone>} and
+                  $self->{error}->get_flag
+                  ($opt{ExpandedURI q<source>}->[-1],
+                   ExpandedURI q<is-declared-externally>)) {
+                $self->report
+                         (-type => 'WFC_ENTITY_DECLARED__INTERNAL',
+                          -class => 'WFC',
+                          source => $src,
+                          position_diff => length $s,
+                          entity_name => $s);
+              } elsif ($self->{error}->get_flag
+                         ($opt{ExpandedURI q<source>}->[-1],
+                          ExpandedURI q<is-unparsed-entity>)) {
+                $self->report
+                         (-type => 'WFC_PARSED_ENTITY',
+                          -class => 'WFC',
+                          source => $src,
+                          position_diff => length $s,
+                          entity_name => $s);
+                last EXPAND;
+              }
+              local $self->{ExpandedURI q<_:opened-parameter-entity>}->{$s} = 1;
+              local $opt{ExpandedURI q<allow-declaration>}->{section} = 1,
+              local $opt{ExpandedURI q<allow-param-entref>} = 1
+                  if $self->{error}->get_flag
+                   ($opt{ExpandedURI q<source>}->[-1], 
+                    ExpandedURI q<is-external-entity>);
+              local $Error::Depth = $Error::Depth + 1;
+              $self->parse_doctype_subset
+                  ($opt{ExpandedURI q<source>}->[-1],
+                   $p, %opt,
+                   ExpandedURI q<end-with-dsc> => 0,
+                   ExpandedURI q<end-with-mse> => 0);
+              $pp->{ExpandedURI q<reference-expanded>} = 1;
+            } elsif ($self->{ExpandedURI q<is-standalone>}) {
+              $self->report
+               (-type => 'WFC_ENTITY_DECLARED',
+                -class => 'WFC',
+                source => $src,
+                position_diff => length $s,
+                entity_name => $s);
+            }
+          }
+          $self->parameter_entity_reference_in_subset_end
+               ($src, $p, $pp, %opt);
+
           $$src =~ /\G;/gc or
             $self->report
               (-type => 'SYNTAX_REFC_REQUIRED',
                -class => 'WFC',
                source => $src,
                entity_name => $pp->{ExpandedURI q<entity-name>});
-          
-          ## Entity Text found
-          if (overload::StrVal ($src) ne
-              overload::StrVal ($opt{ExpandedURI q<source>}->[-1])) {
-            local $Error::Depth = $Error::Depth + 1;
-            local $opt{ExpandedURI q<allow-declaration>}->{section} = 1,
-            local $opt{ExpandedURI q<allow-param-entref>} = 1
-              if $self->{error}->get_flag
-                   ($opt{ExpandedURI q<source>}->[-1], 
-                    ExpandedURI q<is-external-entity>);
-            $self->parse_doctype_subset
-                  ($opt{ExpandedURI q<source>}->[-1],
-                   $p, %opt,
-                   ExpandedURI q<end-with-dsc> => 0,
-                   ExpandedURI q<end-with-mse> => 0);
-          }
         } else { # pero not followed by Name
           $self->report
                   (-type => 'SYNTAX_DOCTYPE_SUBSET_INVALID_CHAR',
@@ -3546,12 +3698,17 @@ sub general_entity_reference_in_attribute_value_literal_end
 sub general_entity_reference_in_content_start ($$$$%) {}
 sub general_entity_reference_in_content_end ($$$$%) {}
 
-sub general_entity_reference_in_rpdata_start
-  ($$$$%) {}
+sub general_entity_reference_in_rpdata_start ($$$$%) {}
+sub general_entity_reference_in_rpdata_end ($$$$%) {}
 
 sub parameter_entity_reference_in_rpdata_start ($$$$%) {}
+sub parameter_entity_reference_in_rpdata_end ($$$$%) {}
+
 sub parameter_entity_reference_in_parameter_start ($$$$%) {}
+sub parameter_entity_reference_in_parameter_end ($$$$%) {}
+
 sub parameter_entity_reference_in_subset_start ($$$$%) {}
+sub parameter_entity_reference_in_subset_end ($$$$%) {}
 
 =head1 LICENSE
 
@@ -3562,4 +3719,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/06/04 08:29:14 $
+1; # $Date: 2004/06/06 07:03:54 $
