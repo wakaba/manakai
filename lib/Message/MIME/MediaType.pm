@@ -8,7 +8,7 @@ Message::MIME::MediaType --- Media-type definitions
 package Message::MIME::MediaType;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Header;
 require Message::Header::Message;
 
@@ -271,7 +271,7 @@ $type{application}->{http} = {
 	handler	=> ['Message::Entity', {
 		-add_ua	=> 0,
 		-format	=> 'http',
-		-fill_date	=> 0,
+		-fill_missing_fields	=> 0,
 	}],
 	parameter	=> {
 		msgtype	=> {case_sensible => 0},	# "request" / "response"
@@ -314,9 +314,7 @@ $type{application}->{msword} = {
 $type{application}->{'news-transmission'} = {
 	cte_7bit_preferred	=> 'base64',
 	handler	=> ['Message::Entity', {
-		-add_ua	=> 0,
-		-fill_date	=> 0,
-		-fill_msgid	=> 0,
+		-fill_missing_fields	=> 0,
 		#-format	=> 'news-son-of-rfc1036',
 		-format	=> 'news-usefor',
 	}],
@@ -414,9 +412,7 @@ $type{application}->{'x-mail-message'} = {
 	  $o{-header_charset} = $p{hc} if $p{hc};
 	  $o{-body_charset} = $p{bc} if $p{bc};
 	  ['Message::Entity', {
-	  	-add_ua	=> 0,
-	  	-fill_date	=> 0,
-	  	-fill_msgid	=> 0,
+	  	-fill_missing_fields	=> 0,
 	  	-format	=> $p{format},
 	  	%o,
 	  }]
@@ -622,7 +618,7 @@ $type{message}->{http} = {
 	handler	=> ['Message::Entity', {
 		-add_ua	=> 0,
 		-format	=> 'http',
-		-fill_date	=> 0,
+		-fill_missing_fields	=> 0,
 	}],
 	parameter	=> {
 		msgtype	=> {case_sensible => 0},	# "request" / "response"
@@ -640,9 +636,7 @@ $type{message}->{news} = {	## Obsoleted by usefor
 	accept_cte	=> [qw/7bit 8bit binary/],
 	cte_7bit_preferred	=> 'quoted-printable',
 	handler	=> ['Message::Entity', {
-		-add_ua	=> 0,
-		-fill_date	=> 0,
-		-fill_msgid	=> 0,
+		-fill_missing_fields	=> 0,
 		-format	=> 'news-son-of-rfc1036',
 	}],
 };
@@ -659,9 +653,7 @@ $type{message}->{rfc822} = {
 	accept_cte	=> [qw/7bit 8bit binary/],
 	cte_7bit_preferred	=> 'quoted-printable',
 	handler	=> ['Message::Entity', {
-		-add_ua	=> 0,
-		-fill_date	=> 0,
-		-fill_msgid	=> 0,
+		-fill_missing_fields	=> 0,
 		-format	=> 'mail-rfc822+rfc1123',
 	}],
 };
@@ -673,7 +665,7 @@ $type{message}->{'s-http'} = {
 	handler	=> ['Message::Entity', {
 		-add_ua	=> 0,
 		-format	=> 'http-shttp-rfc2660',
-		-fill_date	=> 0,
+		-fill_missing_fields	=> 0,
 	}],
 	parameter	=> {
 		msgtype	=> {case_sensible => 0},	# "request" / "response"
@@ -761,7 +753,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/20 03:11:47 $
+$Date: 2002/07/27 04:44:25 $
 
 =cut
 

@@ -9,7 +9,7 @@ Message::Partial --- Perl module for partial message defined by MIME
 package Message::Partial;
 use strict;
 use vars qw(%OPTION $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Entity;
 require Message::Header;
@@ -138,11 +138,7 @@ sub reassembly (@) {
     }
   };
   $msg = parse Message::Entity $msg,
-  	-add_ua	=> 0,
-  	-fill_ct	=> 0,
-  	-fill_date	=> 0,
-  	-fill_mimever	=> 0,
-  	-fill_msgid	=> 0,
+  	-fill_missing_fields	=> 0,
   ;
   my $inner_header = $msg->header;
   my $hdr;
@@ -197,7 +193,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/07 00:46:07 $
+$Date: 2002/07/27 04:44:25 $
 
 =cut
 

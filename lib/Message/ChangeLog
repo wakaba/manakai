@@ -3,6 +3,11 @@
 	* Entity.pm:
 	- (fill_missing_fields): New option.
 	- (fill_source, fill_destination): New options.
+	- (hook_stringify_fill_fields): Option removed.
+	* Header.pm:
+	- (_header_cmp): Removed.
+	- (@header_order, %header_order): Removed.
+	- (_scan_sort): Use Message::Header::* namespace packages to sort.
 
 2002-07-25  Wakaba <w@suika.fam.cx>
 

@@ -8,7 +8,7 @@ Message::Header --- A Perl Module for Internet Message Headers
 package Message::Header;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.39 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.40 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;	## This may seem silly:-)
 push @ISA, qw(Message::Field::Structured);
 
@@ -57,36 +57,6 @@ push @ISA, qw(Message::Field::Structured);
     #value_type
 );
 
-## taken from L<HTTP::Header>
-# "Good Practice" order of HTTP message headers:
-#    - General-Headers
-#    - Request-Headers
-#    - Response-Headers
-#    - Entity-Headers
-# (From draft-ietf-http-v11-spec-rev-01, Nov 21, 1997)
-my @header_order = qw(
-  mail-from x-envelope-from relay-version path status
-
-   cache-control connection date pragma transfer-encoding upgrade trailer via
-
-   accept accept-charset accept-encoding accept-language
-   authorization expect from host
-   if-modified-since if-match if-none-match if-range if-unmodified-since
-   max-forwards proxy-authorization range referer te user-agent
-
-   accept-ranges age location proxy-authenticate retry-after server vary
-   warning www-authenticate
-
-   mime-version
-   allow content-base content-encoding content-language content-length
-   content-location content-md5 content-range content-type
-   etag expires last-modified content-style-type content-script-type
-   link
-
-  xref
-);
-my %header_order;
-
 =head1 CONSTRUCTORS
 
 The following methods construct new C<Message::Header> objects:
@@ -120,13 +90,6 @@ sub _init ($;%) {
   }
   &{ $self->{option}->{hook_init_fill_options} } ($self, $self->{option});
   $self->_init_by_format ($self->{option}->{format}, $self->{option});
-  # Make alternative representations of @header_order.  This is used
-  # for sorting.
-  my $i = 1;
-  for (@header_order) {
-      $header_order{$_} = $i++ unless $header_order{$_};
-  }
-  
   $self->add (@new_fields, -parse => $self->{option}->{parse_all})
     if $#new_fields > -1;
 }
@@ -137,7 +100,7 @@ sub _init_by_format ($$\%) {
   if ($format =~ /http/) {
     $option->{ns_default_phuri} = $self->{ns}->{phname2uri}->{'x-http'};
     if ($format =~ /cgi/) {
-      unshift @header_order, qw(content-type location);
+      #unshift @header_order, qw(content-type location);
       $option->{field_sort} = 'good-practice';
       $option->{use_folding} = 0;
     } else {
@@ -481,7 +444,7 @@ sub _value_to_arrayitem ($$$\%) {
     $nsuri = $value_option->{ns};
   } elsif ($option->{ns}) {
     $nsuri = $option->{ns};
-  } elsif (($default_ns eq $self->{ns}->{uri2phname}->{'x-http'}
+  } elsif (($default_ns eq $self->{ns}->{phname2uri}->{'x-http'}
        && $name =~ s/^([0-9]+)-//)
     || ($name =~ s/^x-http-([0-9]+)-//i)) {	## Numric namespace prefix, RFC 2774
     my $prefix = 0+$1;
@@ -513,14 +476,28 @@ sub _value_to_arrayitem ($$$\%) {
       $nsuri = $default_ns;
       $prefix
         = &{ ${ &_NS_uri2package ($nsuri).'::OPTION' }{n11n_prefix} }
-          ($self, &_NS_uri2package ($nsuri), $one_prefix? $prefix2: $prefix1);
+          ($self, &_NS_uri2package ($nsuri), $one_prefix? $prefix2:
+           $prefix1);
       $self->_ns_load_ph ($prefix);
       $nsuri = $self->{ns}->{phname2uri}->{ $prefix };
       if ($nsuri) {
         $name = $prefix2 . '-' . $name unless $one_prefix;
       } else {
-        $name = $original_prefix . $name;
-        $nsuri = $default_ns;
+        unless ($one_prefix) {
+          $prefix
+            = &{ ${ &_NS_uri2package ($nsuri).'::OPTION' }{n11n_prefix} }
+              ($self, &_NS_uri2package ($nsuri), 
+               $self->{ns}->{uri2phname}->{ $default_ns } . '-' . $prefix1);
+          $self->_ns_load_ph ($prefix);
+          $nsuri = $self->{ns}->{phname2uri}->{ $prefix };
+          if ($nsuri) {
+            $name = $prefix2 . '-' . $name;
+          }
+        }
+        unless ($nsuri) {
+          $name = $original_prefix . $name;
+          $nsuri = $default_ns;
+        }
       }
     }
   }
@@ -629,12 +606,17 @@ for each value.
 =cut
 
 sub _scan_sort ($\@\%) {
+  no strict 'refs';
   my $self = shift;
   my ($array, $option) = @_;
-  my $sort;
-  $sort = \&_header_cmp if $option->{field_sort} eq 'good-practice';
-  $sort = {$a cmp $b} if $option->{field_sort} eq 'alphabetic';
-  return ( sort $sort @$array ) if ref $sort;
+  my $nspack = &_NS_uri2package ($self->{option}->{ns_default_phuri});
+  my $sort = ${ $nspack.'::OPTION' }{field_sort};
+  if ($option->{field_sort} eq 'good-practice' && $sort->{'good-practice'}) {
+    return $self->Message::Header::Default::sort_good_practice ($array, $nspack, $option);
+  } elsif ($option->{field_sort} eq 'alphabetic' && $sort->{'alphabetic'}) {
+    ## TODO: How treat namespace prefix?
+    return sort {$a->{name} cmp $b->{name}} @$array;
+  }
   @$array;
 }
 
@@ -647,20 +629,6 @@ sub _n11n_field_name ($$) {
   $s;
 }
 
-# Compare function which makes it easy to sort headers in the
-# recommended "Good Practice" order.
-## taken from HTTP::Header
-sub _header_cmp
-{
-  my ($na, $nb) = ($a->{name}, $b->{name});
-    # Unknown headers are assign a large value so that they are
-    # sorted last.  This also helps avoiding a warning from -w
-    # about comparing undefined values.
-    $header_order{$na} = 999 unless defined $header_order{$na};
-    $header_order{$nb} = 999 unless defined $header_order{$nb};
-
-    $header_order{$na} <=> $header_order{$nb} || $na cmp $nb;
-}
 
 =head2 $self->stringify ([%option])
 
@@ -849,8 +817,7 @@ sub _ns_load_ph ($$) {
   my $name = shift;	## normalized prefix (without HYPHEN-MINUS)
   return if $self->{ns}->{phname2uri}->{$name};
   $self->{ns}->{phname2uri}->{$name} = $NS_phname2uri{$name};
-  return unless $self->{ns}->{phname2uri}->{$name};
-  $self->{ns}->{uri2phname}->{$self->{ns}->{phname2uri}->{$name}} = $name;
+  $self->{ns}->{uri2phname}->{ $self->{ns}->{phname2uri}->{$name} } = $name;
 }
 
 sub _ns_associate_numerical_prefix ($) {
@@ -965,7 +932,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/26 12:42:00 $
+$Date: 2002/07/27 04:44:25 $
 
 =cut
 

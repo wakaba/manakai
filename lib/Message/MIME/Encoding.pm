@@ -8,30 +8,17 @@ Message::MIME::Encoding --- Encoding (MIME CTE, HTTP encodings, etc) definitions
 package Message::MIME::Encoding;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 our %ENCODER = (
-	'7bit'	=> sub { ($_[1], decide_coderange (@_[0,1,2])) },
-	'8bit'	=> sub { ($_[1], decide_coderange (@_[0,1,2])) },
-	binary	=> sub { ($_[1], decide_coderange (@_[0,1,2])) },
-	base64	=> sub {
-		require MIME::Base64;
-		my $s = MIME::Base64::encode ($_[1]);
-		$s =~ s/\x0D(?!\x0A)/\x0D\x0A/gs;
-		$s =~ s/(?<!\x0D)\x0A/\x0D\x0A/gs;
-		($s, 'base64');
-	},
+	'7bit'	=> sub { ($_[1], decide_coderange (@_)) },
+	'8bit'	=> sub { ($_[1], decide_coderange (@_)) },
+	binary	=> sub { ($_[1], decide_coderange (@_)) },
+	base64	=> \&encode_base64,
 	'quoted-printable'	=> \&encode_qp,
-	#	=> sub { require MIME::QuotedPrint; 
-	#	         (MIME::QuotedPrint::encode ($_[1]), 'quoted-printable') },
 	'x-gzip64' => sub {
 		if (eval {require Compress::Zlib}) {
-		  require MIME::Base64;
-		  my $s = Compress::Zlib::memGzip ($_[1]);
-		  $s = MIME::Base64::encode ($s);
-		  $s =~ s/\x0D(?!\x0A)/\x0D\x0A/gs;
-		  $s =~ s/(?<!\x0D)\x0A/\x0D\x0A/gs;
-		  ($s, 'x-gzip64');
+		  ((encode_base64 (Compress::Zlib::memGzip ($_[1])))[0], 'x-gzip64');
 		} else {
 		  Carp::carp "gzip64 encode: $@";
 		  ($_[1], 'binary');
@@ -46,15 +33,10 @@ our %DECODER = (
 	'7bit'	=> sub { ($_[1], 'binary') },
 	'8bit'	=> sub { ($_[1], 'binary') },
 	binary	=> sub { ($_[1], 'binary') },
-	base64	=> sub { require MIME::Base64; 
-		         (MIME::Base64::decode ($_[1]), 'binary') },
+	base64	=> \&decode_base64,
 	'quoted-printable'	=> \&decode_qp,
-	#	=> sub { require MIME::QuotedPrint; 
-	#	         (MIME::QuotedPrint::decode ($_[1]), 'binary') },
 	'x-gzip64'	=> sub {
-		require MIME::Base64;
-		my $s = MIME::Base64::decode ($_[1]);
-		my ($t, $e) = uncompress_gzip ($_[0], $s);
+		my ($t, $e) = uncompress_gzip ($_[0], (decode_base64 ($_[0], $_[1]))[0]);
 		if ($e eq 'identity') { return ($t, 'binary') }
 		else { return ($_[1], 'x-gzip64') }
 	},
@@ -151,6 +133,21 @@ sub decode_qp ($$) {
   ($s, 'binary');
 }
 
+sub encode_base64 ($$;%) {
+  require MIME::Base64;
+  my ($yourself, $s, %option) = @_;
+  $s = MIME::Base64::encode ($s);
+  $s =~ s/\x0D(?!\x0A)/\x0D\x0A/gs;
+  $s =~ s/(?<!\x0D)\x0A/\x0D\x0A/gs;
+  ($s, 'base64');
+}
+
+sub decode_base64 ($$;%) {
+  require MIME::Base64;
+  my ($yourself, $s, %option) = @_;
+  $s = MIME::Base64::decode ($s);
+  ($s, 'binary');
+}
 
 sub uuencode ($$;%) {
   my $yourself = shift;
@@ -268,7 +265,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/20 03:11:47 $
+$Date: 2002/07/27 04:44:25 $
 
 =cut
 

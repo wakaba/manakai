@@ -13,7 +13,7 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.33 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.34 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::Header;
@@ -55,7 +55,6 @@ use overload '""' => sub { $_[0]->stringify },
     -header_default_charset	=> 'iso-2022-int-1',
     -header_default_charset_input	=> 'iso-2022-int-1',
     -hook_init_fill_options	=> sub {},
-    -hook_stringify_fill_fields	=> sub {},
     -linebreak_strict	=> 0,	## BUG: not work perfectly
     -parse_all	=> 0,
     -text_coderange	=> 'binary',
@@ -295,10 +294,10 @@ sub md5_check ($) {
   }
   my $MD5;
   eval q{
-        require Digest::MD5;  require MIME::Base64;
-        $MD5 = MIME::Base64::encode (Digest::MD5::md5 ($self->{body}));
-        $MD5 =~ tr/\x09\x0A\x0D\x20//d;
-  } or Carp::croak $@;
+    require Digest::MD5;
+    $MD5 = ($self->Message::MIME::Encoding::encode_base64 (Digest::MD5::md5 ($self->{body})))[0];
+    $MD5 =~ tr/\x09\x0A\x0D\x20//d;
+  1} or Carp::croak $@;
   return $MD5 eq $md5? 1 : 0;
 }
 
@@ -506,49 +505,44 @@ sub stringify ($;%) {
   }
   $body = $self->_encode_body ($body0, \%option);
   if (ref $self->{header}) {
-    my %exist;
     my $ns_content = $Message::Header::NS_phname2uri{content};
     my $filler;
     $filler = sub {
       my ($hdr, $exist, $hdr_option) = @_;
-      for ($self->{header}->field_name_list) {$exist{$_} = 1}
-      &{ $option{hook_stringify_fill_fields} } ($self, \%exist, \%option);
       ## Date: (RFC 822, HTTP)
       if ($option{fill_date}
-         && !$exist{$option{fill_date_name}.':'.$option{fill_date_ns}}) {
-        $self->{header}->field
+         && !$exist->{$option{fill_date_name}.':'.$option{fill_date_ns}}) {
+        $hdr->field
           ($option{fill_date_name}, -ns => $option{fill_date_ns})->unix_time (time);
       }
       ## Message-ID: (RFC 822)
       if ($option{fill_msgid}
-         && !$exist{$option{fill_msgid_name}.':'.$option{fill_msgid_ns}}) {
-        my $from = $self->{header}->field
+         && !$exist->{$option{fill_msgid_name}.':'.$option{fill_msgid_ns}}) {
+        my $from = $hdr->field
           ('from', -ns => $option{fill_msgid_from_ns}, -new_item_unless_exist => 0);
         $from = $from->addr_spec if ref $from;
-        $self->{header}->field
-          ($option{fill_msgid_name}, -ns => $option{fill_msgid_ns})
-          ->generate (addr_spec => $from)
-          if $from;
+        $hdr->field ($option{fill_msgid_name}, -ns => $option{fill_msgid_ns})
+            ->generate (addr_spec => $from) if $from;
       }	# fill_msgid
       ## To:, CC:, BCC:, Resent-To:, Resent-Cc:, Resent-Bcc: (RFC 822)
       if ($option{fill_destination}) {
-        if ( !$exist{ 'to:'.$option{fill_destination_ns} }
-          && !$exist{ 'cc:'.$option{fill_destination_ns} }
-          && !$exist{ 'bcc:'.$option{fill_destination_ns} }
-          && !$exist{ 'to:'.$option{fill_destination_resent_ns} }
-          && !$exist{ 'cc:'.$option{fill_destination_resent_ns} }
-          && !$exist{ 'bcc:'.$option{fill_destination_resent_ns} } ) {
+        if ( !$exist->{ 'to:'.$option{fill_destination_ns} }
+          && !$exist->{ 'cc:'.$option{fill_destination_ns} }
+          && !$exist->{ 'bcc:'.$option{fill_destination_ns} }
+          && !$exist->{ 'to:'.$option{fill_destination_resent_ns} }
+          && !$exist->{ 'cc:'.$option{fill_destination_resent_ns} }
+          && !$exist->{ 'bcc:'.$option{fill_destination_resent_ns} } ) {
           $hdr->add (bcc => '');
         }
       }
       ## From:, Sender:
       if ($option{fill_source}) {
         ## From:
-        if (!$exist{ 'from:'.$option{fill_from_ns} }) {
+        if (!$exist->{ 'from:'.$option{fill_from_ns} }) {
           $hdr->add (from => 'Unknown source <foo@bar.invalid>',
                      -ns => $option{fill_from_ns});
         ## From: exists, Sender: not exist
-        } elsif (!$exist{ 'sender:'.$option{fill_sender_ns} }) {
+        } elsif (!$exist->{ 'sender:'.$option{fill_sender_ns} }) {
           my $from = $hdr->field ('from', -ns => $option{fill_from_ns});
           if ($from->count > 1) {
             $hdr->field ('sender', -ns => $option{fill_sender_ns})
@@ -557,50 +551,49 @@ sub stringify ($;%) {
         }
       }
       ## Content-MD5:
-      if (($option{fill_md5} && !$exist{ $option{fill_md5_name} .':'. $ns_content})
-        || ($option{recalc_md5} && $exist{ $option{fill_md5_name} .':'. $ns_content})) {
+      if (($option{fill_md5} && !$exist->{ $option{fill_md5_name} .':'. $ns_content})
+        || ($option{recalc_md5} && $exist->{ $option{fill_md5_name} .':'. $ns_content})) {
         my $md5;
         eval q{
-          require Digest::MD5;  require MIME::Base64;
-          $md5 = MIME::Base64::encode (Digest::MD5::md5 ($body0));
+          require Digest::MD5;
+          $md5 = ($self->Message::MIME::Encoding::encode_base64 (Digest::MD5::md5 ($body0)))[0];
           $md5 =~ tr/\x09\x0A\x0D\x20//d;
-        } or Carp::carp $@;
+        1} or Carp::carp $@;
         if ($md5) {
-          my $md5f = $self->{header}->field ($option{fill_md5_name}, -ns => $ns_content);
+          my $md5f = $hdr->field ($option{fill_md5_name}, -ns => $ns_content);
           $md5f->value ($md5);
         }
       }
       my $ismime = 0;
-      for (keys %exist) {if (/:$ns_content$/) { $ismime = 1; last }}
+      for (keys %$exist) {if (/:$ns_content$/) { $ismime = 1; last }}
       unless ($ismime) {
-        $ismime = 1 if $option{force_mime_entity};
-        $ismime = 1 if $option{fill_md5};
-        $ismime = 1 if $option{body_default_media_type} ne 'text';
-        $ismime = 1 if $option{body_default_media_subtype} ne 'plain';
+        $ismime = 1 if $option{force_mime_entity}
+                    || $option{fill_md5}
+                    || $option{body_default_media_type} ne 'text'
+                    || $option{body_default_media_subtype} ne 'plain';
       }
       if ($ismime) {
         ## Content-Type: (MIME, HTTP)
-        if ($option{fill_ct} && !$exist{'type:'.$ns_content}) {
-            my $ct = $self->{header}->field ('type',
-              -parse => 1, -ns => $ns_content);
+        if ($option{fill_ct} && !$exist->{'type:'.$ns_content}) {
+            my $ct = $hdr->field ('type', -ns => $ns_content);
             $ct->media_type ($option{body_default_media_type}.'/'
                             .$option{body_default_media_subtype});
             $ct->replace (Message::MIME::Charset::name_minimumize ($option{body_default_charset} => $body0));
         }
         ## MIME-Version: (MIME)
         if ($option{fill_mimever}
-            && !$exist{'mime-version:'.$option{fill_mimever_ns}}) {
-          ## BUG: doesn't support rfc10]49, HTTP (ie. non-MIME) content-*: fields
-          $self->{header}->add ('mime-version' => '1.0', 
+            && !$exist->{'mime-version:'.$option{fill_mimever_ns}}) {
+          ## BUG: doesn't support rfc1049, HTTP (ie. non-MIME) content-*: fields
+          $hdr->add ('mime-version' => '1.0', 
             -parse => 0, -ns => $option{fill_mimever_ns});
         }
       }	# $ismime
       ## User-Agent: (USEFOR, HTTP)
       if ($option{add_ua}) {
-        $self->{header}->field ($option{fill_ua_name})->add_our_name (
+        $hdr->field ($option{fill_ua_name})->add_our_name (
           -use_Config	=> $option{ua_use_Config},
           -use_Win32	=> $option{ua_use_Win32},
-          -date	=> q$Date: 2002/07/27 00:39:54 $,
+          -date	=> q$Date: 2002/07/27 04:44:25 $,
         );
       }
     } if $option{fill_missing_fields};
@@ -1033,7 +1026,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/27 00:39:54 $
+$Date: 2002/07/27 04:44:25 $
 
 =cut
 
