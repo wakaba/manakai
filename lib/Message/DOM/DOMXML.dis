@@ -1,6 +1,4 @@
 Namespace:
-  @DOMXML:  
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @infoset:
      http://www.w3.org/2001/04/infoset#
   @lang:
@@ -11,8 +9,12 @@ Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @TreeCore:\
 Module:
-  @Name:  dom
-    @@Prefix:  w3c.org
+  @Name:DOMXML
+  @BindingName:
+    @@@: dom
+    @@prefix:  w3c.org
+    @@Type:
+      lang:IDL-DOM
   @FullName:
     @@lang:en
     @@@: DOM XML Module
@@ -21,10 +23,6 @@ Module:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-BBACDC08
   @Namespace:     
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
-  @Package:
-    @@Type:
-      lang:Perl
-    @@@: __CLASS{DOMXML}__
   
   @Description:
     @@lang:en
@@ -40,10 +38,14 @@ Module:
       The DOM Core Module (<Feature:Core> feature) and the feature 
       <Feature:XMLVersion> with version <FeatureVer:1.0> must be supported.
   
+  @Author:
+    @@FullName:Wakaba
+    @@Mail:w@suika.fam.cx
   @License:
-     license:Perl
+     license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/09/26 11:43:06 $
+     $Date: 2004/09/27 03:54:23 $
+
   @Require:
     @@Module:
       @@@Name: DOMCore

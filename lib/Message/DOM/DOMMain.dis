@@ -10,25 +10,33 @@ Namespace:
   @MDOM_EXCEPTION:
      http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
 Module:
-  @Name:  dom
-    @@Prefix:  w3c.org
+  @Name:DOMMain
+  @BindingName:
+    @@@: dom
+    @@prefix:  w3c.org
+    @@Type:
+      lang:IDL-DOM
   @FullName:
     @@lang: en
     @@@: DOM Core DataTypes and Objects
   @Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
-  @Package:
-    @@Type:
-      lang:Perl
-    @@@: __CLASS{DOMMain}__
   
   @Description:
     @@lang:en
     @@@:
       This module implements IDL/DOM core datatypes (such as
-      "DOMString" and "DOMTimestamp") and objects (such as 
-      "DOMImplementationRegistry").
+      <TYPE:DOMString> and <TYPE:DOMTimestamp>) and objects (such as 
+      <IF:DOMImplementationRegistry>).
 
+  @Author:
+    @@FullName: Wakaba
+    @@Mail: w@suika.fam.cx
+  @License:
+     license:Perl+MPL
+  @Date.RCS:
+     $Date: 2004/09/27 03:54:23 $
+  
   @Feature:
     @@QName:
       ManakaiDOM:DOMMain
@@ -59,10 +67,6 @@ Module:
       @@@lang:en
       @@@@: The manakai DOM implementation DOMMain Module, DOM Level 3.
   
-  @License:
-     license:Perl
-  @Date.RCS:
-     $Date: 2004/09/25 12:58:20 $
   @Require:
     @@Module:
       @@@Def:

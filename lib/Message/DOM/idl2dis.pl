@@ -22,14 +22,28 @@ sub fws ($) {
       my $l = $1;
       my $m = $tree->get_attribute ('Module');
       if ($l =~ /^include\s+"([^"]+)"/) {
-        my $f = $1; $f =~ s/\.idl$//;
+        my $f = $1;
         my $c = $m->get_attribute ('Require', make_new_node => 1)
                   ->append_new_node (type => '#element',
                                      local_name => 'Module');
+        $c->set_attribute (Name => undef);
+        $c->set_attribute (FileName => $f)
+          ->set_attribute (Type => 'lang:IDL-DOM');
+        $f =~ s/\.idl$//;
         $c->set_attribute (Name => $f);
+        $c->set_attribute (Namespace => q<:: TBD ::>);
       } elsif ($l =~ /^pragma\s+prefix\s+"([^"]+)"/) {
-        $m->get_attribute ('Name', make_new_node => 1)
-          ->set_attribute (Prefix => $1);
+        $m->get_element_by (sub {
+                              my ($me, $you) = @_;
+                              $you->local_name eq 'BindingName' and
+                              $you->get_attribute_value ('Type', default => '')
+                                eq 'lang:IDL-DOM'
+                            }, make_new_node => sub {
+                              my ($me, $you) = @_;
+                              $you->local_name ('BindingName');
+                              $you->set_attribute (Type => 'lang:IDL-DOM');
+                            })
+          ->set_attribute (prefix => $1);
       } else {
         $tree->append_new_node (type => '#comment', value => ' #'.$l);
       }
@@ -282,20 +296,47 @@ for my $module ($tree->append_new_node (type => '#element',
                                         local_name => 'Module')) {
   $module->set_attribute (Name => q<## TBD ##>);
   $module->set_attribute (Namespace => q<:: TBD ::>);
-  $module->set_attribute (License => q<license:Perl>);
-  $module->set_attribute ('Date.RCS' => q<$Date: 2004/09/26 15:09:00 $>);
+  $module->set_attribute (BindingName => q<** TBD **>)
+         ->set_attribute (Type => q<lang:IDL-DOM>);
+  for ($module->set_attribute (Author => undef)) {
+    $_->set_attribute (Name => q<** TBD **>);
+    $_->set_attribute (Mail => q<** TBD **>);
+  }
+  $module->set_attribute (License => q<license:Perl+MPL>);
+  $module->set_attribute ('Date.RCS' => q<$Date: 2004/09/27 03:54:24 $>);
 }
 
 fws $s;
 if ($$s =~ /\Gpragma\s+prefix\s+"([^"]+)"\s*/gc) {
-  $tree->get_attribute ('Module')
-       ->get_attribute ('Name', make_new_node => 1)
-       ->set_attribute (Prefix => $1);
+  for ($tree->get_attribute ('Module')
+            ->get_element_by (sub {
+           my ($me, $you) = @_;
+           $you->local_name eq 'BindingName' and
+           $you->get_attribute_value ('Type', default => '') eq 'lang:IDL-DOM';
+         }, make_new_node => sub {
+           my ($me, $you) = @_;
+           $you->local_name ('BindingName');
+           $you->set_attribute (Type => 'lang:IDL-DOM');
+         })) {
+    $_->set_attribute (prefix => $1);
+    $_->set_attribute (Type => 'lang:IDL-DOM');
+  }
 }
 if ($$s =~ /\Gmodule\b/gc) {
   fws $s;
   $$s =~ /\G($NAME)/gc or err $s;
-  $tree->get_attribute ('Module')->set_attribute (Name => $1);
+  for ($tree->get_attribute ('Module')) {
+    $_->get_element_by (sub {
+           my ($me, $you) = @_;
+           $you->local_name eq 'BindingName' and
+           $you->get_attribute_value ('Type', default => '') eq 'lang:IDL-DOM';
+         }, make_new_node => sub {
+           my ($me, $you) = @_;
+           $you->local_name ('BindingName');
+           $you->set_attribute (Type => 'lang:IDL-DOM');
+         })->inner_text (new_value => $1);
+    $_->set_attribute (Name => $1);
+  }
   fws $s;
   $$s =~ /\G\{/gc;
   fws $s;

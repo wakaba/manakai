@@ -998,6 +998,50 @@ sub pod_code ($) {
   qq<C<$s>>;
 }
 
+sub pod_em ($) {
+  my $s = shift;
+  $s =~ s/([<>])/{'<' => 'E<lt>', '>' => 'E<gt>'}->{$1}/ge;
+  qq<I<$s>>;
+}
+
+sub pod_dfn ($) {
+  my $s = shift;
+  $s =~ s/([<>])/{'<' => 'E<lt>', '>' => 'E<gt>'}->{$1}/ge;
+  qq<I<$s>X<$s>>;
+}
+
+sub pod_char (%) {
+  my %opt = @_;
+  if ($opt{name}) {
+    if ($opt{name} eq 'copy') {
+      qq<E<169>>;
+    } else {
+      qq<E<$opt{name}>>;
+    }
+  } else {
+    impl_err q<Bad parameter for "pod_char">;
+  }
+} # pod_char
+
+sub pod_uri ($) {
+  my $uri = shift;
+  qq<E<lt>${uri}E<gt>>;
+} # pod_uri
+
+sub pod_mail ($) {
+  my $mail = shift;
+  qq<E<lt>${mail}E<gt>>;
+} # pod_mail
+
+sub pod_link (%) {
+  my %opt = @_;
+  if ($opt{section}) {
+    qq<L</"$opt{section}">>;
+  } else {
+    impl_err q<Bad parameter for "pod_link">;
+  }
+}
+
 
 sub muf_template ($) {
   my $s = shift;
@@ -3441,14 +3485,17 @@ register_namespace_declaration ($source);
 my $Module = $source->get_attribute ('Module', make_new_node => 1);
 $Info->{Name} = perl_name $Module->get_attribute_value ('Name'), ucfirst => 1
   or valid_err q<Module name (/Module/Name) MUST be specified>;
-$Info->{Package} = perl_code (get_perl_definition $Module, name => 'Package',
-                                                           default => '')
-                || perl_package_name name => $Info->{Name};
 $Info->{Namespace}->{(DEFAULT_PFX)}
   = $Module->get_attribute_value ('Namespace')
   or valid_err q<Module namespace URI (/Module/Namespace) MUST be specified>;
 $Info->{Namespace}->{$Module->get_attribute_value ('Name')}
   = $Info->{Namespace}->{(DEFAULT_PFX)};
+my $pack_node = get_perl_definition_node $Module, name => 'BindingName';
+if ($pack_node) {
+  $Info->{Package} = perl_code $pack_node->value;
+} else {
+  $Info->{Package} = perl_package_name name => $Info->{Name};
+}
 $Info->{uri_to_perl_package}->{$Info->{Namespace}->{(DEFAULT_PFX)}}
   = $Info->{Package};
 $Info->{Require_perl_package} = {};
@@ -3691,7 +3738,7 @@ my @todo;
   if (@todo) {
     $result .= pod_block
                  pod_head (1, 'TO DO'),
-                 @todo;
+                 pod_list 4, @todo;
   }
 
 
@@ -3709,20 +3756,143 @@ if (my $n = keys %{$Status->{ns_in_doc}}) {
   $result .= pod_block @desc;
 }
 
-my @desc = pod_head (1, 'LICENSE');
+## See also
+  ## TODO: implement this.
+
+## Author
+my @desc;
+my @author;
+my $author;
+my $authors = 0;
+for (@{$Module->child_nodes}) {
+  if ($_->node_type eq '#element' and $_->local_name eq 'Author') {
+    my $n = get_description ($_, name => 'FullName');
+    push @author, pod_item $n;
+    my @d;
+    $author = defined $author ? $authors ? $author
+                                         : ($authors++, $author . ', et al.')
+                              : $n;
+    for (@{$_->child_nodes}) {
+      next unless $_->node_type eq '#element';
+      if ($_->local_name eq 'Mail') {
+        push @d, pod_item ('Mail'), pod_para (pod_mail $_->value);
+      } elsif ({qw/FullName 1/}->{$_->local_name}) {
+        # 
+      } else {
+        valid_err q<Unknown element type>, node => $_;
+      }
+    }
+    push @author, pod_list 6, @d if @d;
+  }
+}
+$author = 'AUTHORS' unless defined $author;
+if (@author) {
+  push @desc, pod_head (1, 'AUTHOR'.($authors?'S':'')),
+              pod_list (4, @author);
+}
+
+## License
+push @desc, pod_head (1, 'LICENSE');
+my $year = (gmtime)[5]+1900;
 my $license = expanded_uri
                 $Module->get_attribute_value ('License', default => '');
 if ($license eq ExpandedURI q<license:Perl>) {
   push @desc, 
-    pod_para (q<Copyright 2004 AUTHORS.  All rights reserved.>),
+    pod_para (qq<Copyright $year $author.  All rights reserved.>),
     pod_para q<This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.>;
+} elsif ($license eq ExpandedURI q<license:Perl+MPL>) {
+  push @desc, 
+    pod_para (qq<Copyright $year $author.  All rights reserved.>),
+    pod_para (q<This program is free software; you can redistribute it and/or >.
+             q<modify it under the same terms as Perl itself.>),
+
+    pod_para (q<Alternatively, the contents of this file may be used >.
+              q<under the following terms (the >.pod_dfn (q<MPL/GPL/LGPL>).
+q<, in which case the provisions of the MPL/GPL/LGPL are applicable instead >.
+q<of those above. If you wish to allow use of your version of this file only >.
+q<under the terms of the MPL/GPL/LGPL, and not to allow others to >.
+q<use your version of this file under the terms of the Perl, indicate your >.
+q<decision by deleting the provisions above and replace them with the notice >.
+q<and other provisions required by the MPL/GPL/LGPL. If you do not delete >.
+q<the provisions above, a recipient may use your version of this file under >.
+q<the terms of any one of the Perl or the MPL/GPL/LGPL. >),
+
+    pod_head (2, 'MPL/GPL/LGPL'),
+
+    # q<***** BEGIN LICENSE BLOCK *****>
+    pod_para (q<Version: MPL 1.1/GPL 2.0/LGPL 2.1>),
+
+    pod_para
+(q<The contents of this file are subject to the Mozilla Public License Version >.
+q<1.1 (the >.pod_dfn (q<License>).q<); you may not use this file except in >.
+q<compliance with >.
+q<the License. You may obtain a copy of the License at >.
+pod_uri (q<http://www.mozilla.org/MPL/>).q<.>),
+
+    pod_para
+(q<Software distributed under the License is distributed on an ">.
+pod_em (q<AS IS>).q<" basis, >.
+pod_em (q<WITHOUT WARRANTY OF ANY KIND>).
+q<, either express or implied. See the License >.
+q<for the specific language governing rights and limitations under the >.
+q<License. >);
+
+  my $orig = $Module->get_attribute ('License')->get_attribute ('Original');
+  if ($orig) {
+    push @desc, pod_para ('The Original Code is the '.
+                          get_description ($orig, name => 'FullName').'.');
+    push @desc, pod_para ('The Initial Developer of the Original Code is '.
+                          get_description ($orig->get_attribute ('Author'),
+                                           name => 'FullName').'.'.
+                          q<Portions created by the Initial Developer are >.
+                          q<Copyright >.pod_char (name => 'copy').' '.
+                          $orig->get_attribute_value ('Year',
+                                                      default => $year).
+                          q< the Initial Developer. All Rights Reserved.>);
+  } else {
+    my $a = $author;
+    $a =~ /, et al\.$/ if $authors;
+
+    push @desc, pod_para
+      (q<The Original Code is the manakai DOM module.>),
+
+      pod_para (qq<The Initial Developer of the Original Code is $a. >.
+        q<Portions created by the Initial Developer are Copyright >.
+        pod_char (name => 'copy').qq< $year >.
+                ## ISSUE: Should first created year provided from some source?
+        q<the Initial Developer. All Rights Reserved.>);
+  }
+  
+  push @desc, pod_list 4,
+                pod_item (q<Contributor(s):>),
+                pod_para (q<See >.
+                          pod_link (section => 'AUTHOR'.($authors?'S':'')).
+                          q<.>);
+
+  push @desc, pod_para
+q<Alternatively, the contents of this file may be used under the terms of >.
+q<either the GNU General Public License Version 2 or later (the ">.
+pod_dfn (q<GPL>).q<"), or >.
+q<the GNU Lesser General Public License Version 2.1 or later (the ">.
+pod_dfn (q<LGPL>).q<"), >.
+q<in which case the provisions of the GPL or the LGPL are applicable instead >.
+q<of those above. If you wish to allow use of your version of this file only >.
+q<under the terms of either the GPL or the LGPL, and not to allow others to >.
+q<use your version of this file under the terms of the MPL, indicate your >.
+q<decision by deleting the provisions above and replace them with the notice >.
+q<and other provisions required by the GPL or the LGPL. If you do not delete >.
+q<the provisions above, a recipient may use your version of this file under >.
+q<the terms of any one of the MPL, the GPL or the LGPL. >;
+  
+  # ***** END LICENSE BLOCK *****
 } elsif ($license) {
+  valid_warn q<Unknown license: <$license>>;
   push @desc,
-    pod_para (q<Copyright 2004 AUTHORS.  All rights reserved.>),
-    pod_para (qq<License: <$license>.>);
+    pod_para (qq<Copyright $year $author.  All rights reserved.>),
+    pod_para (qq<License: >.pod_uri ($license).q<.>);
 } else {
-  valid_err q<License specification required>;
+  valid_err q<Required attribute "/Module/License" not specified>;
 }
 $result .= pod_block @desc;
              
@@ -3758,6 +3928,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/09/26 15:09:00 $
+# $Date: 2004/09/27 03:54:24 $
 
 
