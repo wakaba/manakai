@@ -14,7 +14,7 @@ use strict;
 require 5.6.0;
 use re 'eval';
 use vars qw(%DEFAULT %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::MIME::EncodedWord;
 use Carp;
@@ -178,6 +178,21 @@ sub parse ($$;%) {
 sub _initialize_parse ($;%) {
   my $self = shift;
   $self->_initialize ();
+}
+
+=head2 $self->uri ([$newURI])
+
+Set/gets C<URI>.  See also L<NOTE>.
+
+=cut
+
+sub uri ($;$%) {
+  my $self = shift;
+  my $dname = shift;
+  if (defined $dname) {
+    $self->{uri} = $dname;
+  }
+  $self->{uri};
 }
 
 =head2 $self->display_name ([$newname])
@@ -391,7 +406,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/31 13:11:55 $
+$Date: 2002/04/01 06:27:32 $
 
 =cut
 
