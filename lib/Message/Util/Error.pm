@@ -15,7 +15,7 @@ This module is part of manakai.
 
 package Message::Util::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error;
 push our @ISA, 'Error';
 
@@ -77,10 +77,10 @@ sub stringify {
 sub report ($;%) {
   my ($self, %opt) = @_;
   if (ref $opt{-object}) {
-    local $Error::Depth = $Error::Depth + 2;
-      # => {-object}->{method}
-      # => ->report
-      # => {-object}->___report_error
+    local $Error::Depth = $Error::Depth + 3;
+      # => obj->{method}
+      # => mue->report
+      # => err->new
     my $err;
     {
       local $@;
@@ -166,7 +166,16 @@ sub ___rule_def () {+{
     after => sub {
       my ($f, $name, $p, $o) = @_;
       $p->{name} =~ tr/-/_/;
-      $p->{-result} = $o->{$p->{name}};
+      my $val = $o->{$p->{name}};
+      if (defined $val) {
+        if (length $val) {
+          $p->{-result} = $val;
+        } else {
+          $p->{-result} = defined $p->{empty} ? $p->{empty} : '<empty>';
+        }
+      } else {
+        $p->{-result} = defined $p->{undef} ? $p->{undef} : '<undef>';
+      }
     },
   },
 }}
@@ -254,4 +263,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/01/17 08:29:45 $
+1; # $Date: 2004/04/25 07:15:49 $

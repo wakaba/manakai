@@ -1,12 +1,12 @@
 
 =head1 NAME
 
-Message::Util::Formatter::Base --- Manakai : Format text replacer
+Message::Util::Formatter::Base - Formatting Template Text Replacement Engine
 
 =head1 DESCRIPTION
 
-This module is a base class to implement specific application
-of "formatting".
+C<Message::Util::Formatter::Base> is a base class to implement specific
+application of "formatting."
 
 This module is part of manakai.
 
@@ -14,7 +14,7 @@ This module is part of manakai.
 
 package Message::Util::Formatter::Base;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 sub ___rule_def () {+{
   -bare_text => {
@@ -64,7 +64,7 @@ sub new ($;%) {
 
 {
 our $__QuoteBlockContent;
-$__QuoteBlockContent = qr/[^{}]*(?>[^{}]+|{(??{$__QuoteBlockContent})})*/;
+$__QuoteBlockContent = qr/(?>[^{}]*)(?>(?>[^{}]+|{(??{$__QuoteBlockContent})})*)/;
 our $Token ||= qr/[\w_.+-]+/;
 my $WordM = qr(
                           ($Token)                    ## Bare
@@ -216,4 +216,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/02/14 11:05:57 $
+1; # $Date: 2004/04/25 07:15:49 $
