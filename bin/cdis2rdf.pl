@@ -178,6 +178,10 @@ if ($Opt{output_resource}) {
         $result->add_triple ($uri =>ExpandedURI q<rdfs:subClassOf>=>
                              res_canon $_);
       }
+      for (grep {$mod->{subsetOf}->{$_}} keys %{$mod->{subsetOf}}) {
+        $result->add_triple ($uri =>ExpandedURI q<d:subsetOf>=>
+                             res_canon $_);
+      }
       for (@{$mod->{Implement}}) {
         $result->add_triple ($uri =>ExpandedURI q<d:Implement>=> res_canon $_);
       }
@@ -214,9 +218,11 @@ if ($Opt{output_resource}) {
             if defined $mod->{$prop->[0]};
         }
         for my $prop ([ExpandedURI q<d:Type>],
-                      [ExpandedURI q<d:actualType>]) {
+                      [ExpandedURI q<d:actualType>],
+                      [ExpandedURI q<dis2pm:type>]) {
           $result->add_triple ($uri =>$prop->[0]=> res_canon $mod->{$prop->[0]})
-            if defined $mod->{$prop->[0]};
+            if defined $mod->{$prop->[0]} and
+               length $mod->{$prop->[0]};
         }
         for my $prop ([ExpandedURI q<dis2pm:getter>],
                       [ExpandedURI q<dis2pm:setter>],

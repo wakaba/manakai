@@ -28,7 +28,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/01/07 13:07:14 $
+      $Date: 2005/02/16 04:25:00 $
     @@ContentType:
       dis:Date.RCS
   
@@ -454,7 +454,7 @@ ResourceTypeDef:
       \
       <Q:PrimitiveTypeClass> may or may not have its instance object; 
       it is typically accessed via class method, not via object method.
-  @ISA: 
+  @rdfs:subClassOf: 
     ManakaiDOM:Class
 
 ResourceTypeDef:
@@ -764,7 +764,7 @@ ElementTypeBinding:
       @@@For:
         !=ManakaiDOM:all
     @@rdfs:subClassOf:
-      DISCore:String
+      DISCore:String::ManakaiDOM:all
 
 FormatDef:
   @QName: DOMMethodParameterName
@@ -2702,7 +2702,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DataType
-    @@ISA:
+    @@rdfs:subClassOf:
       @@@@:
         DOMMain:ManakaiDOMString
       @@@For:
@@ -2768,7 +2768,7 @@ StringDataTypeDef:
     @@lang:en
     @@@:
       RFC 2396 + RFC 2732 URI reference
-  @ISA:
+  @rdfs:subClassOf:
     ManakaiDOM:ManakaiDOMURI
 
 StringDataTypeDef:
@@ -2777,7 +2777,7 @@ StringDataTypeDef:
     @@lang:en
     @@@:
       RFC 2396 URI reference
-  @ISA: RFC2732URIReference
+  @rdfs:subClassOf: RFC2732URIReference
 
 StringDataTypeDef:
   @QName: RFC2396URI
@@ -2785,7 +2785,7 @@ StringDataTypeDef:
     @@lang:en
     @@@:
       RFC 2396 URI
-  @ISA: RFC2396URIReference
+  @rdfs:subClassOf: RFC2396URIReference
 
 StringDataTypeDef:
   @QName: RFC2396AbsoluteURI
@@ -2793,7 +2793,7 @@ StringDataTypeDef:
     @@lang:en
      @@@:
        RFC 2396 Absolute URI
-  @ISA: RFC2396URI
+  @rdfs:subClassOf: RFC2396URI
 
 ## TODO: Output escape
 
@@ -2803,7 +2803,7 @@ StringDataTypeDef:
   @FullName:
     @@lang:en
     @@@: DOM Namespace URI
-  @ISA:
+  @rdfs:subClassOf:
     ManakaiDOM:ManakaiDOMURI
   @Description:
     @@lang:en
@@ -2864,7 +2864,7 @@ StringDataTypeDef:
                     <M::DOMLS:DOMImplementationLS.createLSParser>>.
       \
       }
-  @ISA:
+  @rdfs:subClassOf:
     ManakaiDOM:ManakaiDOMURI
   @InCase:
     @@Value:
@@ -2900,9 +2900,9 @@ StringDataTypeDef:
     @@@lang:en
     @@@@:
       XML system identifier
-  @@ISA:
+  @@rdfs:subClassOf:
     ManakaiDOM:DOMURI
-  @@ISA: SystemID
+  @@rdfs:subClassOf: SystemID
 
 StringDataTypeDef:
   @@QName: PublicID
@@ -2917,7 +2917,7 @@ StringDataTypeDef:
     @@@lang:en
     @@@@:
       Classic SGML public identifier
-  @@ISA: PublicID
+  @@rdfs:subClassOf: PublicID
 
 StringDataTypeDef:
   @@QName: XMLPublicID
@@ -2925,7 +2925,7 @@ StringDataTypeDef:
     @@@lang:en
     @@@@:
       XML public identifier
-  @@ISA: PublicID
+  @@rdfs:subClassOf: PublicID
 
 ImplNote:
   @lang:en
@@ -3063,7 +3063,7 @@ StringDataTypeDef:
 
 StringDataTypeDef:
   @QName: ManakaiDOMXMLNCName
-  @ISA: ManakaiDOMXMLName
+  @rdfs:subClassOf: ManakaiDOMXMLName
   @FullName:
     @@lang:en
     @@@: XML NCName
@@ -3099,7 +3099,7 @@ StringDataTypeDef:
 
 StringDataTypeDef:
   @QName: ManakaiDOMNamespacePrefix
-  @ISA: ManakaiDOMXMLNCName
+  @rdfs:subClassOf: ManakaiDOMXMLNCName
   @FullName:
     @@lang:en
     @@@: XML Namespace Prefix
@@ -3174,14 +3174,14 @@ StringDataTypeDef:
 
 StringDataTypeDef:
   @QName: ManakaiDOMXMLLocalName
-  @ISA: ManakaiDOMXMLNCName
+  @rdfs:subClassOf: ManakaiDOMXMLNCName
   @FullName:
     @@lang:en
     @@@: XML local name
 
 StringDataTypeDef:
   @Name: ManakaiDOMXMLQName
-  @ISA: ManakaiDOMXMLName
+  @rdfs:subClassOf: ManakaiDOMXMLName
   @FullName:
     @@lang:en
     @@@:
@@ -4402,7 +4402,7 @@ ExceptionDef:
       ManakaiDOM:ManakaiDOMImplementationExceptionCode
     @@rdf:type:
       ManakaiDOM:ConstGroup
-    @@ISA:
+    @@rdfs:subClassOf:
       DOMMain:unsigned-short
     @@aliasChild: 1
     @@AliasFor:
@@ -4612,7 +4612,7 @@ WarningDef:
       ManakaiDOM:ManakaiDOMImplementationWarningCode
     @@rdf:type:
       ManakaiDOM:ConstGroup
-    @@ISA: 
+    @@rdfs:subClassOf: 
       DOMMain:unsigned-short
     @@Type: unsigned-short
     @@aliasChild:1

@@ -528,24 +528,11 @@ Return whether the C<$uri> matches to the C<$type_uri>.
 
 =cut
 
-{our $dis_uri_ctype_match_loop = 0;
-sub dis_uri_ctype_match ($$%);
 sub dis_uri_ctype_match ($$%) {
   my ($uri, $type_uri, %opt) = @_;
   return 1 if $uri eq $type_uri;
-  local $dis_uri_ctype_match_loop = $dis_uri_ctype_match_loop + 1;
-  if ($dis_uri_ctype_match_loop == 1024) {
-    valid_err (qq'"Resource" URI inheritance might be looping');
-  }
-  for (@{$State->{Type}->{$type_uri}->{ISA}||[]},
-       @{$State->{Type}->{$type_uri}->{subsetOf}||[]},
-       @{$State->{Type}->{$type_uri}->{Implement}||[]}) {
-    if (dis_uri_ctype_match ($uri, $_, %opt)) {
-      return 1;
-    }
-  }
-  return 0;
-}}
+  return $State->{Type}->{$type_uri}->{subsetOf}->{$uri};
+}
 
 =item 1/0 = dis_resource_ctype_match ($type_uri, $resource, %opt)
 
@@ -1212,6 +1199,22 @@ sub dis_load_classdef_element ($;%) {
       }
       $State->{def_required}->{Class}->{$dfuri} = -1;
       $State->{def_required}->{Class}->{$canon} ||= 1;
+
+      $cls->{subsetOf}->{$_} = 1 if grep {$oldcls->{subsetOf}->{$_}}
+                                    keys %{$oldcls->{subsetOf}};
+      $cls->{ExpandedURI q<d:supersetOf>}->{$_} = 1
+                          if grep {$oldcls->{ExpandedURI q<d:supersetOf>}->{$_}}
+                             keys %{$oldcls->{ExpandedURI q<d:supersetOf>}};
+      my @from = $canon, $dfuri, grep {$cls->{ExpandedURI q<d:supersetOf>}->{$_}}
+                         keys %{$cls->{ExpandedURI q<d:supersetOf>}};
+      my @to = $canon, $dfuri, grep {$cls->{subsetOf}->{$_}}
+                       keys %{$cls->{subsetOf}};
+      for my $from (@from) {
+        for my $to (@to) {
+          $State->{Type}->{$from}->{subsetOf}->{$to} = 1;
+          $State->{Type}->{$to}->{ExpandedURI q<d:supersetOf>}->{$from} = 1;
+        }
+      }
     }
     $cls->{For}->{$opt{For} ||= ExpandedURI q<ManakaiDOM:all>} = 1;
     $cls->{'For+'}->{$_} = 1 for @{$opt{'For+'}||[]};
@@ -1261,6 +1264,23 @@ sub dis_load_classdef_element ($;%) {
         }
         $State->{def_required}->{Class}->{$dfuri} ||= -1;
         $State->{def_required}->{Class}->{$canon} ||= 1;
+
+        $cls->{subsetOf}->{$_} = 1 if grep {$oldcls->{subsetOf}->{$_}}
+                                      keys %{$oldcls->{subsetOf}};
+        $cls->{ExpandedURI q<d:supersetOf>}->{$_} = 1
+                          if grep {$oldcls->{ExpandedURI q<d:supersetOf>}->{$_}}
+                             keys %{$oldcls->{ExpandedURI q<d:supersetOf>}};
+        my @from = $canon, $dfuri,
+                           grep {$cls->{ExpandedURI q<d:supersetOf>}->{$_}}
+                           keys %{$cls->{ExpandedURI q<d:supersetOf>}};
+        my @to = $canon, $dfuri, grep {$cls->{subsetOf}->{$_}}
+                         keys %{$cls->{subsetOf}};
+        for my $from (@from) {
+          for my $to (@to) {
+            $State->{Type}->{$from}->{subsetOf}->{$to} = 1;
+            $State->{Type}->{$to}->{ExpandedURI q<d:supersetOf>}->{$from} = 1;
+          }
+        }
       }
       $cls->{For}->{$opt{For} || ExpandedURI q<ManakaiDOM:all>} = 1;
       $cls->{'For+'}->{$_} = 1 for @{$opt{'For+'}||[]};
@@ -1344,8 +1364,18 @@ sub dis_load_classdef_element ($;%) {
                                           %opt, node => $_,
                                           use_default_type => $cls->{NameURI});
       if (not defined $cls->{URI} or $uri ne $cls->{URI}) {
-        push @{$cls->{subsetOf}||=[]}, $uri;
         $State->{def_required}->{Class}->{$uri} ||= $_;
+        my @from = grep {$cls->{ExpandedURI q<d:supersetOf>}->{$_}}
+                   keys %{$cls->{ExpandedURI q<d:supersetOf>}};
+        push @from, $cls->{URI} if defined $cls->{URI};
+        my @to = $uri, grep {$State->{Type}->{$uri}->{subsetOf}->{$_}}
+                       keys %{$State->{Type}->{$uri}->{subsetOf}};
+        for my $from (@from) {
+          for my $to (@to) {
+            $State->{Type}->{$from}->{subsetOf}->{$to} = 1;
+            $State->{Type}->{$to}->{ExpandedURI q<d:supersetOf>}->{$from} = 1;
+          }
+        }
       }
     } elsif (dis_uri_ctype_match (ExpandedURI q<d:Implement>, $ln, %opt)) {
       my $uri = dis_typeforqnames_to_uri ($_->value, use_default_namespace => 1,
@@ -2702,4 +2732,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/01/07 13:07:14 $
+1; # $Date: 2005/02/16 04:25:00 $
