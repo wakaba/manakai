@@ -9,7 +9,7 @@ Message Structured Header Field Bodies
 package Message::Field::Structured;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 use overload '""' => sub { $_[0]->stringify },
              '.=' => sub { $_[0]->value_append ($_[1]) },
@@ -449,6 +449,8 @@ sub item ($$;%) {
     return if $option{dont_croak};
     Carp::croak q{item: Method not available for this module};
   }
+  $option{parse} = 1 unless defined $option{parse};
+  $option{parse} = 1 if $option{parse_all} && !defined $option{parse};
   my @r;
   if ($option{by} eq 'index') {
     for ($self->{$array}->[$name]) {
@@ -822,7 +824,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/29 09:31:46 $
+$Date: 2002/07/06 10:30:43 $
 
 =cut
 

@@ -9,14 +9,14 @@ message header C<Subject:> field body
 package Message::Field::Subject;
 use strict;
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Unstructured;
 push @ISA, q(Message::Field::Unstructured);
 use overload '""' => sub {shift->stringify};
 
 *REG = \%Message::Util::REG;
-$REG{re} = qr/(?:[Rr][Ee]|[Ss][Vv])\^?\[?[0-9]*\]?:/;
+$REG{re} = qr/(?:[Rr][Ee]|[Ss][Vv])\^?\[?[0-9]*\]?[:>]/;
 $REG{fwd} = qr/[Ff][Ww][Dd]?:/;
 $REG{ml} = qr/[(\[][A-Za-z0-9._-]+[\x20:-][0-9]+[)\]]/;
 $REG{M_ml} = qr/[(\[]([A-Za-z0-9._-]+)[\x20:-]([0-9]+)[)\]]/;
@@ -293,7 +293,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/23 12:10:16 $
+$Date: 2002/07/06 10:30:43 $
 
 =cut
 

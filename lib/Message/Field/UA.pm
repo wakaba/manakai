@@ -9,7 +9,7 @@ header field body consist of C<product> tokens
 package Message::Field::UA;
 use strict;
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -27,7 +27,7 @@ use overload '""'	=> sub { $_[0]->stringify },
              },
              fallback	=> 1;
 
-*REG = \%Message::Util::REG;
+%REG = %Message::Util::REG;
 $REG{product} = qr#(?:$REG{http_token}|$REG{quoted_string})(?:$REG{FWS}/$REG{FWS}(?:$REG{http_token}|$REG{quoted_string}))?#;
 $REG{M_product} = qr#($REG{http_token}|$REG{quoted_string})(?:$REG{FWS}/$REG{FWS}($REG{http_token}|$REG{quoted_string}))?#;
 
@@ -446,7 +446,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/23 12:10:16 $
+$Date: 2002/07/06 10:30:43 $
 
 =cut
 

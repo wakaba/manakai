@@ -11,7 +11,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -97,11 +97,16 @@ sub _init ($;%) {
     $self->{option}->{value_type}->{'*default'} = ['Message::Field::XMoe'];
   } elsif ($field_name eq 'accept') {
     $self->{option}->{is_quoted_string} = 0;
+    $self->{option}->{remove_comment} = 0;
     $self->{option}->{value_type}->{'*default'} = ['Message::Field::ValueParams'];
   } elsif ($self->{option}->{field_ns} eq $Message::Header::NS_phname2uri{list}) {
     $self->{option}->{is_quoted_string} = 0;
     $self->{option}->{remove_comment} = 0;
     $self->{option}->{value_type}->{'*default'} = ['Message::Field::URI'];
+  } elsif ($field_name eq 'man' || $field_name eq 'opt') {
+    $self->{option}->{is_quoted_string} = 0;
+    $self->{option}->{remove_comment} = 0;
+    $self->{option}->{value_type}->{'*default'} = ['Message::Field::ValueParams'];
   } elsif ($field_name eq 'uri') {
     $self->{option}->{is_quoted_string} = 0;
     $self->{option}->{remove_comment} = 0;
@@ -333,7 +338,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/09 11:08:27 $
+$Date: 2002/07/06 10:30:43 $
 
 =cut
 

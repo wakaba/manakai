@@ -9,7 +9,7 @@ Internet message C<Content-Type:> field body
 package Message::Field::ContentType;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::ValueParams;
 push @ISA, qw(Message::Field::ValueParams);
 require Message::MIME::MediaType;
@@ -115,7 +115,7 @@ sub _save_parameters ($\@\%) {
   my ($param, $option) = @_;
   if ($param->[0]->{no_value}) {
     my $type = shift (@$param)->{attribute};
-    if ($type =~ m#^application/x-(text|message)#) {
+    if ($type =~ m#^application$REG{FWS}/$REG{FWS}x-(text|message)#) {
       my $mt = $1;
       for (@$param) {
         if ($_->{attribute} eq 'media-subtype') {
@@ -125,7 +125,7 @@ sub _save_parameters ($\@\%) {
           undef $_; last;
         }
       }
-    } elsif ($type =~ m#^($REG{token})/($REG{token})$#) {
+    } elsif ($type =~ m#^($REG{token})$REG{FWS}/$REG{FWS}($REG{token})$#) {
       $self->{media_type} = lc $1;
       $self->{media_subtype} = lc $2;
     } elsif ($self->{option}->{rfc1049_vs_mime}->{ lc $type }
@@ -214,7 +214,7 @@ sub stringify_value ($) {
       my $st = $1;
       my $at = $Message::MIME::MediaType::type{message}->{$st}->{mime_alternate};
       return sprintf ('%s/%s', @$at) if ref $at eq 'ARRAY';
-      return 'application/x-message; media-subtype='.$st;
+      #return 'application/x-message; media-subtype='.$st;
     }
   }
   $media_type;
@@ -408,7 +408,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/29 09:31:45 $
+$Date: 2002/07/06 10:30:43 $
 
 =cut
 

@@ -11,7 +11,7 @@ use strict;
 require 5.6.0;
 use re 'eval';
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::MIME::Charset;
 require Message::Field::Structured;
@@ -496,6 +496,7 @@ sub stringify ($;%) {
                     || $e{charset}
                     || $e{language}
                     || $e{value} =~ /\x0D|\x0A/s
+                    || $e{value} =~ /$REG{WSP}$REG{WSP}+/s
                     || ($option->{accept_coderange} eq '7bit'
                         && $e{value} =~ /[\x80-\xFF]/)
                     || ($option->{accept_coderange} ne 'binary'
@@ -633,7 +634,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/29 09:31:45 $
+$Date: 2002/07/06 10:30:43 $
 
 =cut
 

@@ -9,7 +9,7 @@ date-time used in Internet messages and so on
 package Message::Field::Date;
 use strict;
 use vars qw(%DEFAULT @ISA %MONTH %REG $VERSION %ZONE);
-$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 use Time::Local 'timegm_nocheck';
@@ -112,7 +112,7 @@ The following methods construct new objects:
     },
     -use_comment	=> 1,
     -use_military_zone	=> +1,	## +1 / -1 / 0
-    -zone	=> [+1, 0, 0],
+    #zone	=> [+1, 0, 0],
     -zone_default_string	=> '-0000',
 );
 
@@ -247,6 +247,24 @@ sub _init ($;%) {
   $self->SUPER::_init (%$DEFAULT, %option);
   $self->{date_time} = $option{unix} if defined $option{unix};
   $self->{secfrac} = $option{frac} if defined $option{frac};
+  unless (ref $self->{option}->{zone}) {
+    my $zone = $self->{option}->{zone} || ''; #$main::ENV{TZ} || '';
+    	## Since _zone_string_to_array does not provide full support
+    	## of parsing TZ format (eg. daytime), not seeing it might be
+    	## better way.
+    if (length $zone) {
+      $self->{option}->{zone} = [ $self->_zone_string_to_array ($zone) ];
+    } else {
+      my $time = time;
+      my $ltime = timegm_nocheck (localtime ($time));
+      my $o = int ( ($ltime - $time) / 60);
+      my @zone;
+      $zone[2] = $o % 60;  $o = int ( $o / 60 );
+      $zone[1] = $o % 24;
+      $zone[0] = $o >= 0 ? +1 : -1;
+      $self->{option}->{zone} = \@zone;
+    }
+  }
   
   my $format = $self->{option}->{format};
   if ($format =~ /rfc2822/) {
@@ -283,6 +301,8 @@ sub parse ($$;%) {
   $body =~ s/^$REG{WSP}+//;  $body =~ s/$REG{WSP}+$//;
   if ($self->{option}->{date_format} eq 'unix') {
     $self->{date_time} = int ($body);
+  } elsif (!$body) {
+    return $self;
   } elsif ($body =~ /^$REG{M_dt_rfc822}$/x) {
     my ($day, $month, $year, $hour, $minute, $second, $zone)
      = ($1, uc $2, $3, $4, $5, $6, uc $7);
@@ -662,10 +682,15 @@ sub _zone_string_to_array ($$;$) {
   my $format = shift;
   my @azone = [+1, 0, 0];
   $zone =~ tr/\x09\x20//d;
-    if ($zone =~ /([+-])([0-9][0-9])([0-9][0-9])/) {
+    if ($zone =~ /^[^0-9+-]+(?:([+-]?)([0-9]{1,2}))(?::([0-9]{1,2}))?/) {
+    ## $ENV{TZ} format, but is not fully supported
+      my ($s, $h, $m) = ($1, $2, $3);
+      $s ||= '+';  $s =~ tr/+-/-+/;
+      @azone = ("${s}1", 0+$h, 0+$m);
+    } elsif ($zone =~ /([+-])([0-9][0-9])([0-9][0-9])/) {
       @azone = ("${1}1", $2, $3);
     } elsif ($zone =~ /([+-]?)([0-9]+)(?:[:.-]([0-9]+))?/) {
-      @azone = ("${1}1", $2, $3);
+      @azone = ("${1}1", $2, 0+$3);
     } else { $zone =~ tr/-//d;
       if (ref $ZONE{$zone}) {@azone = @{$ZONE{$zone}}}
       elsif ($zone) {@azone = (-1, 0, 0)}
@@ -733,7 +758,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/23 12:10:16 $
+$Date: 2002/07/06 10:30:43 $
 
 =cut
 
