@@ -15,7 +15,7 @@ package Message::Util;
 #require 5.6.0;
 use strict;
 use vars qw(%FMT2STR %OPTION %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.26 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.27 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Carp;
 
@@ -801,7 +801,7 @@ sub unquote_if_quoted_string ($) {
     $qtext =~ s/\x5C(.)/$1/gs;
     $isq = 1;
     $qtext;
-  }goex;
+  }esx;
   wantarray? ($quoted_string, $isq): $quoted_string;
 }
 
@@ -827,4 +827,4 @@ Boston, MA 02111-1307, USA.
 =cut
 
 1;
-# $Date: 2002/11/13 10:59:11 $
+# $Date: 2003/01/04 03:14:14 $

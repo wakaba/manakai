@@ -20,7 +20,7 @@ This module requires L<Message::Util::Formatter>.
 package Message::Util::Formatter;
 use strict;
 use vars qw(%FMT2STR $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 
 =head1 INITIAL FORMATTING RULES
@@ -112,21 +112,21 @@ sub replace ($$;\%) {
   my $self = shift;
   my $format = shift;
   my $gparam = shift;
-  $format =~ s{%([A-Za-z0-9_]+)(?:\(((?:[^"\)]|"(?:[^"\\]|\\.)*")*)\))?;|(%|[^%]+)}{
+  $format =~ s{%([A-Za-z0-9_-]+)(?:\(((?:[^"\)]|"(?:[^"\\]|\\.)*")*)\))?;|(%|[^%]+)}{
       my ($f, $a, $t) = ($1, $2, $3);
-      if (length $t) {
-	  $f = '-bare_text';
-      }
+      $f =~ tr/-/_/;
+      $f = '-bare_text' if length $t;
       my $function = $gparam->{fmt2str}->{$f} || $self->{$f};
       if (ref $function) {
-	  my %a = (-bare_text => $a || $t);
-	  for (split /[\x09\x20]*,[\x09\x20]*/, $a) {
-	      if (/^([^=]*[^\x09\x20=])[\x09\x20]*=>[\x09\x20]*([^\x09\x20].*)$/) {
+	  my %a = (-bare_text => ($a || $t));
+	  $a =~ s(((?:[^",]|"(?:[^"\\]|\\.)*")+)){
+	      my $s = $1;
+	      if ($s =~ /^([^=]*[^\x09\x0A\x0D\x20=])[\x09\x0A\x0D\x20]*=>[\x09\x0A\x0D\x20]*([^\x09\x0A\x0D\x20].*)$/s) {
 		  $a{ Message::Util::Wide::unquote_if_quoted_string ($1) } = Message::Util::Wide::unquote_if_quoted_string ($2);
 	      } else {
-		  $a{ Message::Util::Wide::unquote_if_quoted_string ($_) } = 1;
+		  $a{ Message::Util::Wide::unquote_if_quoted_string ($s) } = 1;
 	      }
-	  }
+	  }ges;
 	  my $r = &$function (\%a, $gparam);
 	  length $r? $a{prefix}.$r.$a{suffix}: '';
       } elsif (length $function) {
@@ -134,7 +134,7 @@ sub replace ($$;\%) {
       } else {
 	  qq([$f: undef]);
       }
-  }gex;  
+  }gesx;  
   $format;
 }
 
@@ -179,4 +179,4 @@ Boston, MA 02111-1307, USA.
 =cut
 
 1;
-# $Date: 2002/12/15 05:58:11 $
+# $Date: 2003/01/04 03:14:14 $
