@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Util::QName::General;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Carp;
 use Message::Markup::XML::QName;
 
@@ -148,4 +148,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/02/22 01:45:32 $
+1; # $Date: 2004/02/22 01:48:09 $
