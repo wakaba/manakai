@@ -17,7 +17,7 @@ markup constructures.  (SuikaWiki is not "tiny"?  Oh, yes, I see:-))
 
 package SuikaWiki::Markup::XML;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload '""' => \&stringify,
              fallback => 1;
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXML_NCNameStartChar InXMLNCNameChar!;
@@ -49,9 +49,13 @@ our %Namespace_URI_to_prefix = (
 	'urn:schemas-microsoft-com:vml'	=> [qw/v vml/],
 	'urn:schemas-microsoft-com:xslt'	=> [qw/ms msxsl msxslt/],
 	'urn:x-suika-fam-cx:markup:ietf:html:3:draft:00'	=> ['', qw/H HTML HTML3/],
+	'urn:x-suika-fam-cx:markup:ietf:rfc:2629'	=> ['', qw/rfc rfc2629/],
 );
 my %Cache;
-my $NS_SGML = 'urn:x-suika-fam-cx:markup:sgml:';
+my $NS_SGML = 'urn:x-suika-fam-cx:markup:sgml:';	# obsolete
+my %NS = (
+	SGML	=> 'urn:x-suika-fam-cx:markup:sgml:',
+);
 
 =head1 METHODS
 
@@ -79,7 +83,7 @@ sub new ($;%) {
     $self->{ns}->{$self->{namespace_prefix}||''} = $self->{namespace_uri} if defined $self->{namespace_uri};
   }
   for (qw/local_name value/) {
-    if (ref $self->{$_}) {
+    if (ref ($self->{$_}) && (ref ($self->{$_}->_CLASS_NAME) eq $self->_CLASS_NAME)) {
       $self->{$_}->{parent} = $self;
     }
   }
@@ -207,6 +211,11 @@ Available options: C<namespace_uri>.
 sub set_attribute ($$$;%) {
   my $self = shift;
   my ($name, $val, %o) = @_;
+  if (ref ($val) eq 'ARRAY' || ref ($val) eq 'HASH' || ref ($val) eq 'CODE') {
+  ## TODO: common error handling
+    require Carp;
+    Carp::croak "set_attribute: new attribute value must be string or blessed object";
+  }
   for (@{$self->{node}}) {
     if ($_->{type} eq '#attribute' && $_->{local_name} eq $name && $o{namespace_uri} eq $_->{namespace_uri}) {
       $_->{value} = $val;
@@ -442,6 +451,34 @@ sub qname ($) {
   undef;
 }
 
+sub remove_references ($) {
+  my $self = shift;
+  my @node;
+    for (@{$self->{node}}) {
+      $_->remove_references;
+    }
+  for (@{$self->{node}}) {
+    if ($_->{type} ne '#reference'
+    || ($self->{type} eq '#declaration' && $_->{namespace_uri} eq $NS{SGML}.'entity')) {
+      push @node, $_;
+    } else {
+      if ($_->{namespace_uri} =~ /char/) {
+        my $e = ref ($_)->new (type => '#text', value => chr $_->{value});
+        $e->{parent} = $self;
+        push @node, $e;
+      } elsif ($_->{flag}->{smxp__ref_expanded}) {
+        for my $e (@{$_->{node}}) {
+          $e->{parent} = $self;
+          push @node, $e;
+        }
+      } else {	## reference is not expanded
+        push @node, $_;
+      }
+    }
+  }
+  $self->{node} = \@node;
+}
+
 =item $tag = $x->start_tag
 
 Returns the start tag (or something that marks the start of something, such as '<!--'
@@ -497,10 +534,11 @@ sub start_tag ($) {
     	$NS_SGML.'doctype'	=> 'DOCTYPE',
     	$NS_SGML.'element'	=> 'ELEMENT',
     	$NS_SGML.'entity'	=> 'ENTITY',
-    	$NS_SGML.'entity:parameter'	=> 'ENTITY %',
+    	$NS_SGML.'entity:parameter'	=> 'ENTITY',
     	$NS_SGML.'notation'	=> 'NOTATION',
     	$NS_SGML.'sgml'	=> 'SGML',
-    }->{$self->{namespace_uri}} . ' ';
+    }->{$self->{namespace_uri}} . ' ' . ($self->{namespace_uri} eq $NS{SGML}.'entity:parameter' ?
+    ($self->{flag}->{smxp__defined_with_param_ref}?'':'% '):'');
   } elsif ($self->{type} eq '#declaration' && $self->_check_ncname ($self->{local_name})) {
     my $r = '<!' . $self->{local_name} . ' ';
     if ($self->{local_name} eq 'DOCTYPE' && ref $self->{parent}) {
@@ -590,7 +628,7 @@ sub attribute_value ($;%) {
   my %o = @_;
   if ($self->{type} eq '#attribute' && $self->_check_ncname ($self->{local_name})) {
     my $r = '"';
-    if (ref ($self->{value}) && $self->{value}->_CLASS_NAME eq $self->_CLASS_NAME) {
+    if (ref ($self->{value}) && ($self->{value}->_CLASS_NAME eq $self->_CLASS_NAME)) {
       unshift @{$self->{node}}, $self->{value};
       undef $self->{value};
     } else {
@@ -615,9 +653,10 @@ sub entity_value ($;%) {
   my %o = @_;
   my $_entitize = sub {
     my $s = shift;
-    $s =~ s/&/&amp;/g;
+    $s =~ s/&/&#x26;/g;
+    $s =~ s/&#x26;(\p{InXML_NameStartChar}\p{InXMLNameChar}*);/&$1;/g;
     $s =~ s/%/&#x25;/g;
-    $s =~ s/"/&quot;/g;
+    $s =~ s/"/&#x22;/g;
     $s;
   };
   if ($self->{type} eq '#attribute' && $self->_check_ncname ($self->{local_name})) {
@@ -634,6 +673,22 @@ sub entity_value ($;%) {
   } else {
     '';
   }
+}
+
+## This method should be called only from SuikaWiki::Markup::XML::* family modules,
+## since this is NOT a FORMAL interface.
+sub _entity_parameter_literal_value ($;%) {
+  my $self = shift;
+    my $r = $self->{value};
+    for (@{$self->{node}}) {
+      my $nt = $_->node_type;
+      if ($nt eq '#reference' || $nt eq '#xml') {
+        $r .= $_->outer_xml;
+      } elsif ($nt ne '#attribute') {
+        $r .= $_->inner_text;
+      }
+    }
+    return $r;
 }
 
 =item $tag = $x->attribute
@@ -766,24 +821,7 @@ sub inner_xml ($;%) {
       $r = '';
     }
   } elsif ($self->{type} eq '#declaration') {
-    if ($self->{local_name} eq 'DOCTYPE') {
-      my ($isub, $xid) = ('', $self->external_id);
-      for (@{$self->{node}}) {
-        $isub .= $_->outer_xml if $_->{type} ne '#attribute';
-      }
-      if ($xid) {
-        $r = $xid;
-        if ($isub) {
-          $r .= " [\n" . $isub . "]";
-        }
-      } else {
-        if ($isub) {
-          $r = "[\n" . $isub . "]";
-        } else {
-          $r = "[]";
-        }
-      }
-    } elsif ($self->{namespace_uri} eq $NS_SGML.'doctype') {
+    if ($self->{namespace_uri} eq $NS_SGML.'doctype') {
       my $root = $self->get_attribute ('qname');
       ref $root ? ($root = $root->inner_text) : (ref $self->{parent} ? (do {
         for (@{$self->{parent}->{node}}) {
@@ -801,11 +839,11 @@ sub inner_xml ($;%) {
       if ($xid) {
         $r = $xid;
         if ($isub) {
-          $r .= " [\n" . $isub . "]";
+          $r .= " [" . $isub . "]";
         }
       } else {
         if ($isub) {
-          $r = "[\n" . $isub . "]";
+          $r = "[" . $isub . "]";
         } else {
           $r = "[]";
         }
@@ -815,7 +853,8 @@ sub inner_xml ($;%) {
           || $self->{namespace_uri} eq 'urn:x-suika-fam-cx:markup:sgml:entity:parameter'
           || $self->{namespace_uri} eq 'urn:x-suika-fam-cx:markup:sgml:notation') {
       my %xid_opt;
-      $r = $self->{local_name} . ' ' if $self->_check_ncname ($self->{local_name});
+      $r = $self->{local_name} . ' ' if !$self->{flag}->{smxp__defined_with_param_ref}
+                                        && $self->_check_ncname ($self->{local_name});
       if ($self->{namespace_uri} eq $NS_SGML.'entity:parameter') {
         #$r = '% ' . $r;
       } elsif ($self->{namespace_uri} eq $NS_SGML.'entity') {
@@ -825,16 +864,18 @@ sub inner_xml ($;%) {
       }
       
       my ($v, $xid) = ($self->{value}, $self->external_id (%xid_opt));
+      undef $xid if $self->{flag}->{smxp__defined_with_param_ref};
       if ($xid) {	## External ID
         $r .= $xid;
       } else {	## EntityValue
         my $entity_value = $self->get_attribute ('value');
+        undef $entity_value if $self->{flag}->{smxp__defined_with_param_ref};
         if ($entity_value) {	# <!ENTITY foo "bar">
           $r .= $entity_value->entity_value;
         } else {	## Parameter entity reference
           $r .= $self->{value};
           for (@{$self->{node}}) {
-            $r .= $_->outer_xml;
+            $r .= $_->outer_xml unless $_->{type} eq '#attribute';
           }
         }
       }
@@ -864,6 +905,7 @@ sub inner_xml ($;%) {
       #    || 'Name ANY';	# error
       #}
       }
+    ## TODO: reform
     } elsif ($self->{local_name} eq 'ATTLIST') {
       if ($self->_check_name ($self->{target_name})) {
         $r = $self->{target_name};
@@ -956,25 +998,42 @@ sub inner_text ($;%) {
   my $self = shift;
   my %o = @_;
   my $r = '';
-  if (ref ($self->{value}) && $self->{value}->_CLASS_NAME eq $self->_CLASS_NAME) {
-    unshift @{$self->{node}}, $self->{value};
-    undef $self->{value};
-  } else {
-    $r = $self->{value};
-  }
-  if ($o{output_ref_as_is}) {	## output as if RCDATA
-    $r =~ s/&/&amp;/g;
-    for my $node (@{$self->{node}}) {
-      my $nt = $node->node_type;
-      if ($nt eq '#reference' || $nt eq '#xml') {
-        $r .= $node->outer_xml;
-      } elsif ($nt ne '#attribute') {
-        $r .= map {s/&/&amp;/g; $_} $node->inner_text;
-      }
+  if ($self->{type} eq '#reference' && #) {
+    #if (
+    $self->{namespace_uri} eq $NS{SGML}.'char:ref' ||
+    $self->{namespace_uri} eq $NS{SGML}.'char:ref:hex') {
+      $r = chr $self->{value};
+    #} else {	# general entity ref. or parameter entity ref.
+    #  ## TODO: how implement? is this ok?
+    #  my $em = $self->_get_entity_manager;
+    #  $r = $em->get_entity_value ($self->{local_name}, namespace_uri => $self->{namespace_uri});
+    #}
+  } elsif ($self->{type} eq '#declaration'
+       && ($self->{namespace_uri} eq $NS{SGML}.'entity'
+        || $self->{namespace_uri} eq $NS{SGML}.'entity:parameter')) {
+    ## TODO:
+    $r = $self->get_attribute ('value')->inner_text;
+  } else {	# not #reference nor #declaration(ENTITY)
+    if (ref ($self->{value}) && $self->{value}->_CLASS_NAME eq $self->_CLASS_NAME) {
+      unshift @{$self->{node}}, $self->{value};
+      undef $self->{value};
+    } else {
+      $r = $self->{value};
     }
-  } else {
-    for (@{$self->{node}}) {
-      $r .= $_->inner_text unless $_->node_type eq '#attribute';
+    if ($o{output_ref_as_is}) {	## output as if RCDATA
+      $r =~ s/&/&amp;/g;
+      for my $node (@{$self->{node}}) {
+        my $nt = $node->node_type;
+        if ($nt eq '#reference' || $nt eq '#xml') {
+          $r .= $node->outer_xml;
+        } elsif ($nt ne '#attribute') {
+          $r .= map {s/&/&amp;/g; $_} $node->inner_text;
+        }
+      }
+    } else {
+      for (@{$self->{node}}) {
+        $r .= $_->inner_text unless $_->node_type eq '#attribute';
+      }
     }
   }
   $r;
@@ -982,6 +1041,25 @@ sub inner_text ($;%) {
 
 {no warnings;	# prototype mismatch
 *stringify = \&outer_xml;
+}
+
+sub _get_entity_manager ($) {
+  my $self = shift;
+  if ($self->{type} eq '#document') {
+    unless ($self->{flag}->{smx__entity_manager}) {
+      require SuikaWiki::Markup::XML::EntityManager;
+      $self->{flag}->{smx__entity_manager} = SuikaWiki::Markup::XML::EntityManager->new ($self);
+    }
+    return $self->{flag}->{smx__entity_manager};
+  } elsif (ref $self->{parent}) {
+    return $self->{parent}->_get_entity_manager;
+  } else {
+    unless ($self->{flag}->{smx__entity_manager}) {
+      require SuikaWiki::Markup::XML::EntityManager;
+      $self->{flag}->{smx__entity_manager} = SuikaWiki::Markup::XML::EntityManager->new ($self);
+    }
+    return $self->{flag}->{smx__entity_manager};
+  }
 }
 
 sub _CLASS_NAME ($) {
@@ -997,7 +1075,7 @@ sub _entitize ($$;%) {
   $s =~ s/"/&quot;/g;
   $s =~ s/%/&#x25;/g if $o{percent};
   $s =~ s/'/&#x27;/g if $o{apos};
-  $s =~ s/([\x00-\x08\x0B\x0C\x0E-\x1F])/sprintf '&amp;#%d;', ord $1/g;
+  $s =~ s/([\x00-\x08\x0B\x0C\x0E-\x1F])/sprintf '&amp;#%d;', ord $1/ge;
   $s;
 }
 
@@ -1142,4 +1220,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/05/31 07:01:46 $
+1; # $Date: 2003/06/16 09:59:49 $
