@@ -28,10 +28,24 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/11/27 10:59:09 $
+      $Date: 2004/12/01 11:49:46 $
     @@ContentType:
       dis:Date.RCS
   
+  @Feature:
+    @@QName: 
+      ManakaiDOM:ManakaiDOM
+    @@Version: 1.0
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The Manakai DOM Implementation Main Module, version 1.0.
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM1
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM2
+    @@Contrib:
+      DOMCore:DOMImplementation::DOM3
   @Feature:
     @@QName: 
       ManakaiDOM:DOMMain
@@ -85,6 +99,16 @@ Module:
       DOMCore:DOMImplementation::DOM3
   
   @Require:
+    @@Module:
+      @@@Name: DISCore
+    @@Module:
+      @@@Name: DOMMain
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOMCommon
+    @@Module:
+      @@@Name: DOMMain
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOMLatest
     @@AppModule:
       @@@For:
         ManakaiDOM:ManakaiDOM
@@ -111,21 +135,523 @@ Module:
 Namespace:
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @dis2pm:
+    http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
   @lang:
-     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
-     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
   @ManakaiDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @MDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
-  @MDOM_EXCEPTION:
-     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @MDOMX:
+    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @MUError:\
+  @MUErrorCore:-
+  @owl:
+    http://www.w3.org/2002/07/owl#
+  @perl:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
+  @TreeCore:\
 
+ResourceDef:
+  @QName:
+    MDOM:
+  @rdf:type:
+    dis:ModuleGroup
+  @FullName:
+    @@lang:en
+    @@@:
+      The manakai DOM modules
+  @AppName:
+    @@@:
+      Message::DOM::IFLatest::
+    @@ContentType:
+      lang:Perl
+    @@For:
+      ManakaiDOM:ManakaiDOMLatest
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @AppName:
+    @@@:
+      Message::DOM::IFLevel3::
+    @@ContentType:
+      lang:Perl
+    @@For:
+      ManakaiDOM:ManakaiDOM3
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @AppName:
+    @@@:
+      Message::DOM::IFLevel2::
+    @@ContentType:
+      lang:Perl
+    @@For:
+      ManakaiDOM:ManakaiDOM2
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @AppName:
+    @@@:
+      Message::DOM::IFLevel1::
+    @@ContentType:
+      lang:Perl
+    @@For:
+      ManakaiDOM:ManakaiDOM1
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @AppName:
+    @@@:
+      Message::DOM::IF::
+    @@ContentType:
+      lang:Perl
+    @@For:
+      ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @AppName:
+    @@@:
+      Message::DOM::
+    @@For:
+      ManakaiDOM:ManakaiDOMLatest
+  @AppName:
+    @@@:
+      Message::DOM::
+    @@ManakaiDOM:moduleSuffix: Level3
+    @@For: 
+      ManakaiDOM:ManakaiDOM3
+  @AppName:
+    @@@:
+      Message::DOM::
+    @@ManakaiDOM:moduleSuffix: Level2
+    @@For: 
+      ManakaiDOM:ManakaiDOM2
+  @AppName:
+    @@@:
+      Message::DOM::
+    @@ManakaiDOM:moduleSuffix: Level1
+    @@For: 
+      ManakaiDOM:ManakaiDOM1
+  @AppName:
+    @@@:
+      Message::DOM::
+    @@For:
+      ManakaiDOM:ManakaiDOMCommon
+
+## -- "For" definitions
+
+## For a language
+
+ForDef:
+  @QName:
+    ManakaiDOM:IDL
+  @FullName:
+    @@lang:en
+    @@@: For DOM IDL definition
+ForDef:
+  @QName:
+    ManakaiDOM:Perl
+  @FullName:
+    @@lang:en
+    @@@: For Perl 5 binding
+ForDef:
+  @QName:
+    ManakaiDOM:Java
+  @FullName:
+    @@lang:en
+    @@@: For Java binding
+
+## For the Document Object Model
+
+ForDef:
+  @QName:
+    ManakaiDOM:DOM
+  @FullName:
+    @@lang:en
+    @@@: For DOM
+ForDef:
+  @QName:
+    ManakaiDOM:DOM1
+  @FullName:
+    @@lang:en
+    @@@: For DOM Level 1
+  @ISA:
+    ManakaiDOM:DOM
+ForDef:
+  @QName:
+    ManakaiDOM:DOM2
+  @FullName:
+    @@lang:en
+    @@@: For DOM Level 2
+  @ISA:
+    ManakaiDOM:DOM1
+ForDef:
+  @QName:
+    ManakaiDOM:DOM3
+  @FullName:
+    @@lang:en
+    @@@: For DOM Level 3
+  @ISA:
+    ManakaiDOM:DOM2
+ForDef:
+  @QName:
+    ManakaiDOM:DOMLatest
+  @FullName:
+    @@lang:en
+    @@@: For the latest level of DOM
+  @ISA:
+    ManakaiDOM:DOM3
+
+## For the manakai DOM implementation
+
+ForDef:
+  @QName:
+    ManakaiDOM:ManakaiDOM
+  @FullName:
+    @@lang:en
+    @@@: For the manakai DOM implementation
+  @Implement:
+    ManakaiDOM:DOM
+  @ISA:
+    ManakaiDOM:Perl
+ForDef:
+  @QName:
+    ManakaiDOM:ManakaiDOM1
+  @FullName:
+    @@lang:en
+    @@@: For the manakai DOM Level 1 implementation
+  @Implement:
+    ManakaiDOM:DOM1
+  @ISA:
+    ManakaiDOM:ManakaiDOM
+ForDef:
+  @QName:
+    ManakaiDOM:ManakaiDOM2
+  @FullName:
+    @@lang:en
+    @@@: For the manakai DOM Level 2 implementation
+  @Implement:
+    ManakaiDOM:DOM2
+  @ISA:
+    ManakaiDOM:ManakaiDOM1
+ForDef:
+  @QName:
+    ManakaiDOM:ManakaiDOM3
+  @FullName:
+    @@lang:en
+    @@@: For the manakai DOM Level 3 implementation
+  @Implement:
+    ManakaiDOM:DOM3
+  @ISA:
+    ManakaiDOM:ManakaiDOM2
+ForDef:
+  @QName:
+    ManakaiDOM:ManakaiDOMLatest
+  @FullName:
+    @@lang:en
+    @@@: For the manakai implementation of the latest level of DOM
+  @Implement:
+    ManakaiDOM:DOMLatest
+  @ISA:
+    ManakaiDOM:ManakaiDOM3
+ForDef:
+  @QName:
+    ManakaiDOM:ManakaiDOMCommon
+  @FullName:
+    @@lang:en
+    @@@: For the manakai implementation of DOM, level independent
+  @Implement:
+    ManakaiDOM:DOM
+  @ISA:
+    ManakaiDOM:ManakaiDOM
+
+## "For" for "multiple resource" definition
+
+ForDef:
+  @QName:
+    ManakaiDOM:ForIF
+  @FullName:
+    @@lang:en
+    @@@: For an interface definition
+ForDef:
+  @QName:
+    ManakaiDOM:ForClass
+  @FullName:
+    @@lang:en
+    @@@: For a class definition
+
+## -- Abstract programming language "object" types
+
+ElementTypeBinding:
+  @Name: ResourceTypeDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdfs:Class
+    @@ISA:
+      rdfs:Class
+
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdfs:Property
+
+ResourceTypeDef:
+  @QName: 
+    ManakaiDOM:IF
+  @FullName:
+    @@lang:en
+    @@@: Interface
+  @Description:
+    @@lang:en
+    @@@:
+      An programming interface.
+
+ResourceTypeDef:
+  @QName: 
+    ManakaiDOM:Class
+  @FullName:
+    @@lang:en
+    @@@: Class
+  @Description:
+    @@lang:en
+    @@@:
+      A programming language class.
+ElementTypeBinding:
+  @Name: ClassDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:Class
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOMCommon
+      @@@For:
+        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOMCommon
+
+ResourceTypeDef:
+  @QName: 
+    ManakaiDOM:PrimitiveTypeClass
+  @Description:
+    @@lang:en
+    @@@:
+      A programing language primitive type class (aka wrapper class). 
+      \
+      <Q:PrimitiveTypeClass> may or may not have its instance object; 
+      it is typically accessed via class method, not via object method.
+  @ISA: 
+    ManakaiDOM:Class
+
+ResourceTypeDef:
+  @QName: 
+    ManakaiDOM:ExceptionIF
+  @FullName:
+    @@lang:en
+    @@@: Exception interface
+  @Description:
+    @@lang:en
+    @@@:
+      An exception type.
+
+ResourceTypeDef:
+  @QName: 
+    ManakaiDOM:ExceptionClass
+  @FullName:
+    @@lang:en
+    @@@: Exception class
+  @Description:
+    @@lang:en
+    @@@:
+      A concrete implementation of an exception type.
+ElementTypeBinding:
+  @Name: ExceptionDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:ExceptionClass
+    @@ISA: 
+      ManakaiDOM:ManakaiDOMException
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOMCommon
+      @@@For:
+        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOMCommon
+
+ResourceTypeDef:
+  @QName: 
+    ManakaiDOM:WarningClass
+  @FullName:
+    @@lang:en
+    @@@: Warning class
+  @Description:
+    @@lang:en
+    @@@:
+      A warning type (including its implementation).
+ElementTypeBinding:
+  @Name: WarningDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:WarningClass
+    @@ISA: 
+      ManakaiDOM:ManakaiDOMWarning
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOMCommon
+      @@@For:
+        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOMCommon
+
+ResourceTypeDef:
+  @QName: 
+    ManakaiDOM:ExceptionOrWarningSubType
+  @FullName:
+    @@lang:en
+    @@@: Exception/warning subtype
+  @Description:
+    @@lang:en
+    @@@:
+      A subtype of an exception or warning.
+
+PropDef:
+  @QName: 
+    ManakaiDOM:exceptionOrWarningParameter
+  @FullName:
+    @@lang:en
+    @@@: Parameter (for an exception or warning)
+  @rdfs:domain: 
+    ManakaiDOM:Const
+  @Description:
+    @@lang:en
+    @@@:
+      Declares the existence of an additional information about the exception.
+ElementTypeBinding:
+  @Name: XParam
+  @ElementType:
+    ManakaiDOM:exceptionOrWarningParameter
+  @ShadowContent:
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM
+
+ResourceTypeDef:
+  @QName: 
+    ManakaiDOM:ConstGroup
+  @FullName:
+    @@lang:en
+    @@@: Constant group
+  @Description:
+    @@lang:en
+    @@@:
+      A set of constant values.
+
+ResourceTypeDef:
+  @QName: 
+    ManakaiDOM:Const
+  @FullName:
+    @@lang:en
+    @@@: Constant value
+  @Description:
+    @@lang:en
+    @@@: A constant value.
+ElementTypeBinding:
+  @Name: Const
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: 
+      ManakaiDOM:Const
+
+PropDef:
+  @QName: 
+    dis:IsBitMask
+  @dataType:
+    DOMMain:boolean
+  @Description:
+    @@lang:en
+    @@@:
+      Whether the constant group is defined as bitmask values or not.
+
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMAttribute
+  @FullName:
+    @@lang:en
+    @@@: DOM attribute
+  @Description:
+    @@lang:en
+    @@@: A DOM attribute.
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttribute
+    @@ForCheck:
+      ManakaiDOM:DOM
+ElementTypeBinding:
+  @Name: IntClsAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttribute
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isForInternal: 1
+    @@ForCheck:
+      ManakaiDOM:ForClass
+
+ResourceTypeDef:
+  @QName: 
+    ManakaiDOM:DOMAttrGet
+  @Description:
+    @@lang:en
+    @@@: A DOM attribute getter.
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttrGet
+
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMAttrSet
+  @Description:
+    @@lang:en
+    @@@: A DOM attribute setter.
+ElementTypeBinding:
+  @Name: Set
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttrSet
+
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMMethod
+  @Description:
+    @@lang:en
+    @@@: A DOM method.
 ElementTypeBinding:
   @Name: Method
   @ElementType:
@@ -148,12 +674,36 @@ ElementTypeBinding:
     @@ForCheck:
       ManakaiDOM:ForClass
 ElementTypeBinding:
+  @Name: IntMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isForInternal: 1
+
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMMethodParameter
+  @Description:
+    @@lang:en
+    @@@: A DOM method parameter.
+ElementTypeBinding:
   @Name: Param
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMMethodParameter
+
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMMethodReturn
+  @Description:
+    @@lang:en
+    @@@: A DOM method return value.
 ElementTypeBinding:
   @Name: Return
   @ElementType:
@@ -161,45 +711,37 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMMethodReturn
-ElementTypeBinding:
-  @Name: Attr
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttribute
-    @@ForCheck:
-      ManakaiDOM:DOM
-ElementTypeBinding:
-  @Name: IntClsAttr
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttribute
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM
-    @@ManakaiDOM:isForInternal: 1
-    @@ForCheck:
-      ManakaiDOM:ForClass
-ElementTypeBinding:
-  @Name: Get
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttrGet
-ElementTypeBinding:
-  @Name: Set
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttrSet
-ElementTypeBinding:
-  @Name: Exception
-  @ElementType:
-    ManakaiDOM:raises
+
+PropDef:
+  @QName:
+    dis:Read
+  @FullName:
+    @@lang:en
+    @@@: Is readable
+  @Description:
+    @@lang:en
+    @@@: Whether the subject resource is readable or not.
+  @dataType:
+    dis:Boolean
+PropDef:
+  @QName:
+    dis:Write
+  @FullName:
+    @@lang:en
+    @@@: Is writable
+  @Description:
+    @@lang:en
+    @@@: Whether the subject resource is writable or not.
+  @dataType: 
+    dis:Boolean
+
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:InCase
+  @Description:
+    @@lang:en
+    @@@: 
+      <QUOTE:In case> description.
 ElementTypeBinding:
   @Name: InCase
   @ElementType:
@@ -207,6 +749,329 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:InCase
+
+PropDef:
+  @QName: 
+    ManakaiDOM:raises
+  @Description:
+    @@lang:en
+    @@@:
+      An exception the method or attribute might raise.
+ElementTypeBinding:
+  @Name: Exception
+  @ElementType:
+    ManakaiDOM:raises
+
+PropDef:
+  @QName: 
+    ManakaiDOM:alwaysWarns
+  @Description:
+    @@lang:en
+    @@@:
+      A warning that is reported everytime the method or attribute is called. 
+      \
+      {NOTE:: By the configuration for warning level, it might not be 
+              reported.
+      \
+      }
+
+PropDef:
+  @QName:
+    dis:Operator
+  @Description:
+    @@lang:en
+    @@@:
+      An operator the subject resource (either method or attribute) 
+      is to be used to evaluate an expression whose at least one operand object 
+      is of a class to which the subject resource belongs.
+
+PropDef:
+  @QName:
+    ManakaiDOM:isRedefining
+  @dataType:
+    DOMMain:boolean
+  @Description:
+    @@lang:en
+    @@@:
+      Whether the subject resource (either method or attribute) 
+      redefines another resource defined in one of ancestor inheriting 
+      class or not.
+
+ResourceTypeDef:
+  @QName: 
+    ManakaiDOM:DataType
+  @Description:
+    @@lang:en
+    @@@:
+      A data type.
+  @rdf:type:
+    rdfs:Class
+  @ISA:
+    rdfs:Datatype
+ElementTypeBinding:
+  @Name: DataTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DataType
+
+PropDef:
+  @QName:
+    dis:Type
+  @rdfs:domain:
+    rdfs:Resource
+  @rdfs:range:
+    rdfs:Resource
+  @Description:
+    @@lang:en
+    @@@:
+      The data type of the resource defined, including 
+      class attribute type and method return value type.
+PropDef:
+  @QName:
+    dis:actualType
+  @rdfs:domain:
+    rdfs:Resource
+  @rdfs:range:
+    rdfs:Resource
+  @Description:
+    @@lang:en
+    @@@:
+      The actual data type of the resource defined, including 
+      class attribute type and method return value type. 
+PropDef:
+  @QName:
+    dis:Value
+  @Description:
+    @@lang:en
+    @@@:
+      A value of the resource.
+PropDef:
+  @QName:
+    dis:DefaultValue
+  @Description:
+    @@lang:en
+    @@@: The default value of the resource.
+PropDef:
+  @QName:
+    dis:Def
+  @Description:
+    @@lang:en
+    @@@:
+      A definition of the resource.
+PropDef:
+  @QName:
+    dis:IntDef
+  @Description:
+    @@lang:en
+    @@@:
+      A definition of the resource (for internal use).
+PropDef:
+  @QName:
+    dis:IsAbstract
+  @Description:
+    @@lang:en
+    @@@:
+      Whether the resource is defined abstractly or concretly. 
+      Abstractly defined resource must be concretly overloaded 
+      by inheriting class.
+PropDef:
+  @QName:
+    dis:IsFinal
+  @Description: 
+    @@lang:en
+    @@@:
+      Whether the resource is overloadable or not.
+
+PropDef:
+  @QName:
+    ManakaiDOM:isForInternal
+  @dataType:
+    DOMMain:boolean
+  @Description:
+    @@lang:en
+    @@@:
+      Whether the subject resource is prepared for the internal use.  
+      In other word, the subject resource is a public member or 
+      a private member.
+
+## -- DOM specific properties and types
+
+Const:
+  @Name: null
+  @Type: any
+  @AliasFor:
+    @@@:
+      ::ManakaiDOM:all
+    @@For:
+      !=ManakaiDOM:all
+  @Value:
+    @@ContentType: 
+      lang:Perl
+    @@@: undef
+  @Description:
+    @@lang:en
+    @@@:
+       The null value.  Note that <DOM:null> is different from 
+       empty string and number zero.
+
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMConfigParameter
+  @Description:
+    @@lang:en
+    @@@: A DOM configuration parameter.
+
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMEvent
+  @Description:
+    @@lang:en
+    @@@: A DOM event definition.
+
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMError
+  @Description:
+    @@lang:en
+    @@@: A DOM error definition.
+
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMConfigParameterSet
+  @Description:
+    @@lang:en
+    @@@: A set of DOM configuration parameters.
+
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMEventSet
+  @Description:
+    @@lang:en
+    @@@: A set of DOM event definitions.
+
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMErrorSet
+  @Description:
+    @@lang:en
+    @@@: A set of DOM error definitions.
+
+PropDef:
+  @QName:
+    dis:NSVersion
+  @Description:
+    @@lang:en
+    @@@:
+      A namespace-aware variant of the method or attribute.
+PropDef:
+  @QName:
+    dis:NoNSVersion
+  @Description:
+    @@lang:en
+    @@@: A namespace-unaware variant of the method or attribute.
+
+## -- Perl binding specific properties and datatypes
+
+PropDef:
+  @QName:
+    ManakaiDOM:moduleSuffix
+  @dataType:
+    DOMMain:DOMString
+
+DataTypeDef:
+  @QName:
+    lang:Perl
+  @FullName:
+    @@lang:en
+    @@@: Perl 5 code
+
+DataTypeDef:
+  @QName:
+    perl:ARRAY
+  @FullName:
+    @@lang:en
+    @@@: Perl array reference
+
+DataTypeDef:
+  @QName:
+    perl:hash
+  @FullName:
+    @@lang:en
+    @@@: Perl hash reference
+
+DataTypeDef:
+  @QName:
+    dis:Perl
+  @FullName:
+    @@lang:en
+    @@@: 
+     <QUOTE::dis> tree fragment generating Perl code
+  @ISA: 
+    lang:dis
+
+## -- Manakai specific properties and datatypes
+
+DataTypeDef:
+  @QName:
+    lang:muf
+  @FullName:
+    @@lang:en
+    @@@: 
+      <PerlModule:Message::Util::Formatter> template
+
+PropDef:
+  @QName:
+    dis:Role
+  @Description:
+    @@lang:en
+    @@@:
+      A role of the class in the DOM system.
+
+ElementTypeBinding:
+  @Name: ImplementLevel3
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@@:
+      ::ManakaiDOM:ManakaiDOM3
+    @@ForCheck:
+      ManakaiDOM:ForIF
+    @@For:
+      ManakaiDOM:ManakaiDOMLatest
+
+## -- Other
+
+DataTypeDef:
+  @QName:
+    lang:Java
+  @FullName:
+    @@lang:en
+    @@@: Java code
+
+## -- Obsolete properties
+
+PropDef:
+  @QName:
+    dis:Redefine
+  @Description:
+    @@lang:en
+    @@@: Declares redefining (obsolete)
+PropDef:
+  @QName:
+    dis:RedefinedBy
+  @Description:
+    @@lang:en
+    @@@: Declares redefined in elsewhere (obsolete)
+PropDef:
+  @QName:
+    dis:Redefined
+  @Description:
+    @@lang:en
+    @@@: Declares redefined in elsewhere (obsolete)
+
+## -- Sugar
 
 ElementTypeBinding:
   @Name: PerlDef
@@ -216,7 +1081,7 @@ ElementTypeBinding:
     @@ContentType:
       lang:Perl
 
-## Definition for built-in IDL types
+## -- IDL datatypes
 
 ResourceDef:
   @Name: IDLDataType
@@ -239,7 +1104,6 @@ ElementTypeBinding:
         ::ManakaiDOM:all
       @@@For: 
         ManakaiDOM:all !=ManakaiDOM:all
-
 
 IDLDataTypeDef:
   @Name: any
@@ -298,14 +1162,6 @@ IDLDataTypeDef:
     @@lang:en
     @@@: Floating point number
 
-ElementTypeBinding:
-  @Name: Const
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:Const
-
 ResourceDef:
   @Name: boolean
   @rdf:type:
@@ -321,6 +1177,7 @@ ResourceDef:
       ManakaiDOM:all !=ManakaiDOM:all
   @Const:
     @@Name: true
+    @@Type: boolean
     @@Value:
       @@@@: 1
       @@@ContentType:
@@ -330,6 +1187,7 @@ ResourceDef:
       @@@@: The boolean true value.
   @Const:
     @@Name: false
+    @@Type: boolean
     @@Value:
       @@@@: 0
       @@@ContentType:
@@ -338,28 +1196,7 @@ ResourceDef:
       @@@lang:en
       @@@@: The boolean false value.
 
-## Null value
-
-Const:
-  @Name: null
-  @Type: any
-  @AliasFor:
-    @@@:
-      ::ManakaiDOM:all
-    @@For:
-      !=ManakaiDOM:all
-  @Value:
-    @@ContentType: 
-      lang:Perl
-    @@@: undef
-  @Description:
-    @@lang:en
-    @@@:
-       The null value.  Note that <DOM:null> is different from 
-       empty string and number zero.
-
-
-## DataType Definitions from DOM Core Specification IDL
+## -- DOM Core Specification datatypes
 
 ResourceDef:
   @Name: DOMDataType
@@ -382,6 +1219,72 @@ ElementTypeBinding:
         ::ManakaiDOM:all
       @@@For: 
         !=ManakaiDOM:all
+
+ResourceDef:
+  @For:
+    ManakaiDOM:DOM2
+  @rdf:type:
+    @@@:
+      dis:MultipleResource
+    @@ForCheck:
+      !ManakaiDOM:ForIF !ManakaiDOM:ForClass
+  @resourceFor:
+    ManakaiDOM:ForIF
+  @resourceFor:
+    @@@:
+      ManakaiDOM:ForClass
+    @@For:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+  @Name:
+    @@@:  DOMTimeStamp
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @Name:
+    @@@: ManakaiDOMTimeStamp
+    @@ForCheck:
+      ManakaiDOM:ForClass
+  @rdf:type:
+    @@@: DOMDataType
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @rdf:type:
+    @@@: 
+      ManakaiDOM:PrimitiveTypeClass
+    @@ForCheck:
+      ManakaiDOM:ForClass
+  @Description:
+    @@lang:en
+    @@@: 
+      An absolute or relative time.  It is represented 
+      as a number of milliseconds.
+  @AliasFor:
+    @@@: unsigned-long-long
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @ImplNote:
+    @@lang:en
+    @@@:
+      TODO: How implements this type is not yet decided.
+    @@ForCheck:
+      ManakaiDOM:ForClass
+
+DOMDataTypeDef:
+  @Name:  DOMUserData
+  @For:
+    ManakaiDOM:DOM3
+  @AliasFor: any
+  @Description:
+    @@lang:en
+    @@@: A reference to application data.
+
+DOMDataTypeDef:
+  @Name:  DOMObject
+  @For:
+    ManakaiDOM:DOM3
+  @AliasFor: Object
+  @Description:
+    @@lang:en
+    @@@: An object reference.
 
 ResourceDef:
   @For:
@@ -421,6 +1324,7 @@ ResourceDef:
     @@@: sequence<unsigned short>
     @@ForCheck:
       ManakaiDOM:ForIF
+  @ImplementLevel3: 
   @ISA:
     @@For:
       ManakaiDOM:ManakaiDOMLatest
@@ -492,9 +1396,10 @@ ResourceDef:
     @@Set:
       @@@Type: any
       @@@PerlDef:
+        \## TODO: Check required
           if (ref $given and
-              $given->isa ('__CLASS{DOMString}__')) {
-            for ('value', <Q:ManakaiDOM:isFullyNormalized>) {
+              $given->isa (<ClassName::ManakaiDOMString>)) {
+            for ('value', <Q::ManakaiDOM:isFullyNormalized>) {
               $self->{$_} = $given->{$_};
             }
           } else {
@@ -629,13 +1534,13 @@ ResourceDef:
                 __EXCEPTION{
                   ManakaiDOMImplementationException.
                     MDOM_DOMSTRING_INDEX_IN_SURROGATE_PAIR::
-                  <Q:MDOM_EXCEPTION:param-name> => 'offset',
+                  <Q::MDOMX:param-name> => 'offset',
                 }__;
               }
             } else {
               __EXCEPTION{
                 ManakaiDOMImplementationException.MDOM_DEBUG_BUG::
-                <Q:MDOM_EXCEPTION:values> => {
+                <Q::MDOMX:values> => {
                   count => $offset,
                   position => 1,
                 },
@@ -688,7 +1593,7 @@ ResourceDef:
             An attempt is made to break a surrogate pair.
       @@@PerlDef:
           __DEEP{
-            $self->__INT{replace}__ ($offset, $count, '');
+            <M::ManakaiDOMString.replace> ($self, $offset, $count, '');
           }__;
   @IntClsMethod:
     @@Name: insert
@@ -698,7 +1603,7 @@ ResourceDef:
         Inserts another string at specified 16-bit unit offset in string.
         \
         {NOTE:: This method is copied from the 
-                <M:DOMCore:CharacterData.insertData> method.
+                <M::DOMCore:CharacterData.insertData> method.
         \
         }
     @@Param:
@@ -717,7 +1622,8 @@ ResourceDef:
           Another string to insert.
     @@Return:
       @@@Exception:
-        @@@@Type: DOMException
+        @@@@Type: 
+          DOMCore:DOMException
         @@@@Name: INDEX_SIZE_ERR
         @@@@Description:
           @@@@@lang:en
@@ -738,7 +1644,7 @@ ResourceDef:
           if ($offset < 0 or $offset > CORE::length $self->{value} or
               $offset > $self->length) {
             __EXCEPTION{DOMException.INDEX_SIZE_ERR::
-              <Q:MDOM_EXCEPTION:param-name> => 'offset',
+              <Q::MDOMX:param-name> => 'offset',
             }__;
           }
           __INT__;
@@ -797,7 +1703,8 @@ ResourceDef:
           Another string with which the range is replaced.
     @@Return:
       @@@Exception:
-        @@@@Type: DOMException
+        @@@@Type: 
+          DOMCore:DOMException
         @@@@Name: INDEX_SIZE_ERR
         @@@@Description:
           @@@@@lang:en
@@ -819,12 +1726,12 @@ ResourceDef:
           if ($offset < 0 or $offset > CORE::length $self->{value} or
               $offset > $self->length) {
             __EXCEPTION{DOMException.INDEX_SIZE_ERR::
-              <Q:MDOM_EXCEPTION:param-name> => 'offset',
+              <Q::MDOMX:param-name> => 'offset',
             }__;
           }
           if ($count < 0) {
             __EXCEPTION{DOMException.INDEX_SIZE_ERR::
-              <Q:MDOM_EXCEPTION:param-name> => 'count',
+              <Q::MDOMX:param-name> => 'count',
             }__;
           }
           __INT__;
@@ -867,13 +1774,13 @@ ResourceDef:
                 __EXCEPTION{
                   ManakaiDOMImplementationException.
                           MDOM_DOMSTRING_INDEX_IN_SURROGATE_PAIR::
-                  <Q:MDOM_EXCEPTION:param-name> => 'count',
+                  <Q::MDOMX:param-name> => 'count',
                 }__;
               }
             } else {
               __EXCEPTION{
                 ManakaiDOMImplementationException.MDOM_DEBUG_BUG::
-                <Q:MDOM_EXCEPTION:values> => {
+                <Q::MDOMX:values> => {
                         count => $count,
                         position => 1,
                 },
@@ -913,7 +1820,8 @@ ResourceDef:
         @@@@lang:en
         @@@@@: The specified substring.
       @@@Exception:
-        @@@@Type: DOMException
+        @@@@Type: 
+          DOMCore:DOMException
         @@@@Name: INDEX_SIZE_ERR
         @@@@Description:
           @@@@@lang:en
@@ -922,7 +1830,8 @@ ResourceDef:
             the number of 16-bit units in the DOMString, or the specified
             "count" is negative.
       @@@Exception:
-        @@@@Type: DOMException
+        @@@@Type: 
+          DOMCore:DOMException
         @@@@Name: DOMSTRING_SIZE_ERR
         @@@@Description:
           @@@@@lang:en
@@ -934,19 +1843,16 @@ ResourceDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: An attempt is made to break surrogate pair.
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
+      @@@PerlDef:
           if ($offset < 0 or $offset > CORE::length $self->{value} or
               $offset > $self->length) {
             __EXCEPTION{DOMException.INDEX_SIZE_ERR::
-              <Q:MDOM_EXCEPTION:param-name> => 'offset',
+              <Q::MDOMX:param-name> => 'offset',
             }__;
           }
           if ($count < 0) {
             __EXCEPTION{DOMException.INDEX_SIZE_ERR::
-              <Q:MDOM_EXCEPTION:param-name> => 'count',
+              <Q::MDOMX:param-name> => 'count',
             }__;
           }
           __INT__;
@@ -1016,7 +1922,7 @@ ResourceDef:
           @@@@@lang:en
           @@@@@@: The string is not known to be certified as fully normalized.
       @@@PerlDef:
-        #$r = $self->{<Q:ManakaiDOM:isFullyNormalized>} ? true : false;
+        \$r = $self->{<Q::ManakaiDOM:isFullyNormalized>} ? true : false;
     @@ImplNote:
       @@@lang:en
       @@@@:
@@ -1071,13 +1977,19 @@ ResourceDef:
       @@@PerlDef:
         @@@@cast-input: 0
         @@@@@:
-          if (UNIVERSAL::isa ($str, '__IIF{DOMString}__')) {
+          my $str1;
+          if (UNIVERSAL::isa ($self, <ClassName::ManakaiDOMString>)) {
+            $str1 = $self->{value};
+          } else {
+            $str1 = ''.$self;
+          }
+          if (UNIVERSAL::isa ($str, <ClassName::ManakaiDOMString>)) {
             $str = $str->{value};
           }
           if ($caseInsensitive) {
-            $r = lc ($str) eq lc ($self->{value});
+            $r = lc ($str1) eq lc ($str) ? true : false;
           } else {
-            $r = $str eq $self->{value};
+            $r = $self eq $str ? true : false;
           }
   @IntClsMethod:
     @@Name: initOnChange
@@ -1087,7 +1999,7 @@ ResourceDef:
     @@Return:
       @@@PerlDef:
         @@@@@:
-          delete $self->{<Q:ManakaiDOM:isFullyNormalized>};
+          delete $self->{<Q::ManakaiDOM:isFullyNormalized>};
     @@ImplNote:
       @@@lang:en
       @@@@:
@@ -1125,9 +2037,10 @@ ResourceDef:
       ManakaiDOM:ForIF
   @rdf:type:
     @@@:
-      ManakaiDOM:Class
+      ManakaiDOM:PrimitiveTypeClass
     @@ForCheck:
       ManakaiDOM:ForClass
+  @ImplementLevel3: 
   @Description:
     @@lang:en
     @@@:
@@ -1169,7 +2082,7 @@ ResourceDef:
           if (not defined $offset32 or $offset32 < 0 or
               CORE::length ($self->{value}) < $offset32) {
             __EXCEPTION{DOMException.INDEX_SIZE_ERR::
-              <Q:MDOM_EXCEPTION:param-name> => 'offset32',
+              <Q::MDOMX:param-name> => 'offset32',
             }__;
           }
           my $ss = substr $self->{value}, 0, $offset32;
@@ -1219,7 +2132,7 @@ ResourceDef:
           if (not defined $offset16 or $offset16 < 0 or
               CORE::length ($self->{value}) * 2 < $offset16) {
             __EXCEPTION{DOMException.INDEX_SIZE_ERR::
-              <Q:MDOM_EXCEPTION:param-name> => 'offset16',
+              <Q::MDOMX:param-name> => 'offset16',
             }__;
           }
           pos ($self->{value}) = 0;
@@ -1235,7 +2148,7 @@ ResourceDef:
             } else {
               __EXCEPTION{
                 ManakaiDOMImplementationException.MDOM_DEBUG_BUG::
-                <Q:MDOM_EXCEPTION:values> => {
+                <Q::MDOMX:values> => {
                   count => $offset16,
                   position => 1,
                 },
@@ -1244,77 +2157,164 @@ ResourceDef:
           }
           if ($offset16 > 0) {
             __EXCEPTION{DOMException.INDEX_SIZE_ERR::
-              <Q:MDOM_EXCEPTION:param-name> => 'offset16',
+              <Q::MDOMX:param-name> => 'offset16',
             }__;
           }
           $r = pos ($self->{value});
 ##IF: StringExtended
 
-ResourceDef:
-  @For:
-    ManakaiDOM:DOM2
-  @rdf:type:
-    @@@:
-      dis:MultipleResource
+## -- DOM specialized string types
+
+ElementTypeBinding:
+  @Name: StringDataTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DataType
+    @@ISA:
+      @@@@:
+        DOMMain:ManakaiDOMString
+      @@@For:
+        !=ManakaiDOM:ManakaiDOMCommon
+    @@AliasFor: 
+      @@@@:
+        ::ManakaiDOM:ManakaiDOMLatest
+      @@@For:
+        ManakaiDOM:ManakaiDOMCommon
     @@ForCheck:
-      !ManakaiDOM:ForIF !ManakaiDOM:ForClass
-  @resourceFor:
-    ManakaiDOM:ForIF
-  @resourceFor:
-    @@@:
-      ManakaiDOM:ForClass
-    @@For:
       ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
-  @Name:
-    @@@:  DOMTimeStamp
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @Name:
-    @@@: ManakaiDOMTimeStamp
-    @@ForCheck:
-      ManakaiDOM:ForClass
-  @rdf:type:
-    @@@: DOMDataType
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @rdf:type:
-    @@@: 
-      ManakaiDOM:PrimitiveTypeClass
-    @@ForCheck:
-      ManakaiDOM:ForClass
+
+StringDataTypeDef:
+  @QName: 
+    ManakaiDOM:ManakaiDOMURI
+  @FullName: 
+    @@lang:en
+    @@@: DOM URI
   @Description:
     @@lang:en
-    @@@: 
-      An absolute or relative time.  It is represented 
-      as a number of milliseconds.
-  @AliasFor:
-    @@@: unsigned-long-long
-    @@ForCheck:
-      ManakaiDOM:ForIF
+    @@@:
+      A DOM URI.  It is a specialized case of the <TYPE:DOMString> and 
+      that met the conditions:
+    \
+      1. An absolute identifier absolutely identifies a resource on the Web.
+    \
+      2. Simple string equality of absolute resource identifiers. 
+      No other equaivalence is considered significant to the 
+      DOM specification.
+    \
+      3. A relative identifier is easily detected and made absolute 
+      relative to an absolute identifier.
+    \
+      4. Retrieval of content of a resource may be accomplished 
+      where required.
   @ImplNote:
     @@lang:en
     @@@:
-      TODO: How implements this type is not yet decided.
-    @@ForCheck:
-      ManakaiDOM:ForClass
+      Examples of DOM URI include RFC 2396/2773 URI reference and 
+      IRI reference.
 
-DOMDataTypeDef:
-  @Name:  DOMUserData
-  @For:
-    ManakaiDOM:DOM3
-  @AliasFor: any
+StringDataTypeDef:
+  @QName: 
+    ManakaiDOM:ManakaiDOMNamespaceURI
+  @FullName:
+    @@lang:en
+    @@@: DOM Namespace URI
   @Description:
     @@lang:en
-    @@@: A reference to application data.
+    @@@:
+      A namespace URI.  In general, DOM implementations does not 
+      perform any URI normalization or canonicalization.  The URIs 
+      given to the DOM are assumed to be valid and no lexical 
+      checking is performed.
+      
+      Absolute URI references are treated 
+      as strings and compared literally.  How relative namespace URI 
+      references are treated is undefined.  DOM applications should 
+      use "null" if they wish to have no namespace.
+      
+      Some programing languages can differentiate empty strings 
+      from "null".  Empty strings were specified as a legal namespace 
+      URI in the DOM Level 2 Specification but the DOM Level 2 Errata 
+      refines this as the implementaton dependent matter.  The 
+      DOM Level 3 Specification again refines to be converted to "null".
+  @ImplNote:
+    @@lang:en
+    @@@: 
+      The "dis2pm.pl" is coded so that if the input (the parameter of 
+      a method or the given value of an attribute) is typed as 
+      "ManakaiDOMNamespaceURI", the Perl code to check the empty 
+      string is outputed as part of the implementation.
 
-DOMDataTypeDef:
-  @Name:  DOMObject
-  @For:
-    ManakaiDOM:DOM3
-  @AliasFor: Object
+StringDataTypeDef:
+  @QName: 
+    ManakaiDOM:ManakaiDOMFeatureName
+  @FullName:
+    @@lang:en
+    @@@: DOM feature name
   @Description:
     @@lang:en
-    @@@: An object reference.
+    @@@:
+      A DOM feature name.
+
+StringDataTypeDef:
+  @QName: 
+    ManakaiDOM:ManakaiDOMFeatureVersion
+  @FullName:
+    @@lang:en
+    @@@: DOM feature version
+  @Description:
+    @@lang:en
+    @@@: A DOM feature version number.
+
+StringDataTypeDef:
+  @QName: 
+    ManakaiDOM:ManakaiDOMFeatures
+  @For:
+    ManakaiDOM:ManakaiDOM3
+  @FullName:
+    @@lang:en
+    @@@: 
+      A DOM <P:features>
+  @Description:
+    @@lang:en
+    @@@:
+      A list of zero or more pairs of a <TYPE:ManakaiDOM:ManakaiDOMFeature> 
+      and an optional <TYPE:ManakaiDOM:ManakaiDOMFeatureVersion>, 
+      separated by white space.
+
+StringDataTypeDef:
+  @QName:
+    ManakaiDOM:ManakaiDOMKeyIdentifier
+  @For:
+    ManakaiDOM:ManakaiDOM3
+  @FullName:
+    @@lang:en
+    @@@: DOM key identifier
+  @Description:
+    @@lang:en
+    @@@:
+      A key identifier.
+    \
+      {NOTE:: A set of key identifiers are defined in the Appendix A 
+              of the <CITE:DOM Level 3 Events> Specification.
+    \
+      }
+
+StringDataTypeDef:
+  @Name:ManakaiDOMKeyIdentifiers
+  @For:
+    ManakaiDOM:ManakaiDOM3
+  @FullName:
+    @@lang:en
+    @@@: List of DOM key identifiers
+  @Description:
+    @@lang:en
+    @@@:
+      Zero or more <TYPE:ManakaiDOM:ManakaiDOMKeyIdentifier> separated 
+      by white space (XML 1.0 <CODE:S>).
+
+## -- The bootstrap object
 
 ResourceDef:
   @Name:
@@ -1468,7 +2468,7 @@ ResourceDef:
       @@@PerlDef:
           unless (defined $s) {
             __EXCEPTION{ManakaiDOMImplementationException.PARAM_NULL_POINTER::
-              <Q:MDOM_EXCEPTION:param-name> => 's',
+              <Q::MDOMX:param-name> => 's',
             }__;
           }
           PUSH: {
@@ -1477,6 +2477,817 @@ ResourceDef:
             }
             push @$self, $s;
           }
-## IF:DOMImplementationRegistry
+## Object:DOMImplementationRegistry
+
+## -- Manakai object
+
+ClassDef:
+  @QName: 
+    ManakaiDOM:ManakaiDOMObject
+  @For: 
+    ManakaiDOM:ManakaiDOM
+  @Description:
+    @@lang:en
+    @@@:
+      The common class that is inherited by all manakai DOM object classes.
+  
+  @IntMethod:
+    @@Name:reportError
+    @@Operator:
+      @@@@:object-error-handler
+      @@@Type:
+        lang:Perl
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          TODO: Operator name required.
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The generic error handler; throw an exception if it is 
+        an exception; raise an event if it is a warning.
+      \
+        See also <PerlModule:Message::Util::Error>.
+    @@Param:
+      @@@Name:err
+      @@@Type: 
+        ManakaiDOM:ManakaiDOMExceptionOrWarning
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The exception object that inherits <PerlModule:Message::Util::Error>.
+    @@Return:
+      @@@PerlDef:
+          if ($err->isa (<ClassName::ManakaiDOM:ManakaiDOMException>)) {
+            $err->throw;
+          } else {
+            \## TODO: Implement warning reporting
+            warn $err->stringify;
+          }
+
+ClassDef:
+  @QName: 
+    ManakaiDOM:ManakaiDOMExceptionOrWarning
+  @For: 
+    ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+  @ISA: 
+    ManakaiDOM:ManakaiDOMObject
+  @Description:
+    @@lang:en
+    @@@:
+      A common class that is inherited by all manakai DOM 
+      exception or warning classes.  DOM applications are 
+      able to test whether a object is an instance of 
+      manakai exception/warning or not. 
+  @Attr:
+    @@Name:text
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns a short plain-text message, written in the 
+        <CODE:i-default> language, that describes 
+        what is happened. 
+        \
+        {NOTE:: This attribute is also defined in the class 
+                <PerlModule::Message::Util::Error> and it is 
+                overridden here for the purpose of manakai 
+                exception and warning reporting. 
+        \
+        }
+        \
+        {NOTE:: This attribute only provides a mechanism for programer 
+                to know what is occuring; for reporting error to end 
+                user, DOM application should implement its own 
+                mechanism with localized message.
+        \
+        }
+    @@Get:
+      @@@Type:
+        DOMMain:DOMString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          An error message written in <CODE:i-default> language.
+      @@@PerlDef:
+          my $template;
+          if (defined $self->{<Q::MDOMX:subtype>} and
+              defined $self->{<Q::MUErrorCore:def>}->{<Q::MDOMX:subtype>}
+                   ->{$self->{<Q::MDOMX:subtype>}}
+                   ->{<Q::MUError:description>}) {
+            $template = $self->{<Q::MUErrorCore:def>}
+                   ->{<Q::MDOMX:subtype>}
+                   ->{$self->{<Q::MDOMX:subtype>}}
+                   ->{<Q::MUError:description>};
+          } elsif (defined $self->{<Q::MUErrorCore:def>}
+                   ->{<Q::MUError:description>}) {
+            $template = $self->{<Q::MUErrorCore:def>}
+                   ->{<Q::MUError:description>};
+          } else {
+            $template = $self->{<Q::MUErrorCore:type>};
+          }
+          $r = $self->_FORMATTER_PACKAGE_->new
+                    ->replace ($template, param => $self);
+
+ResourceDef:
+  @QName: 
+    ManakaiDOM:ManakaiDOMException
+  @rdf:type:
+    ManakaiDOM:ExceptionClass
+  @ISA: 
+    ManakaiDOM:ManakaiDOMExceptionOrWarning
+  @For: 
+    ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+  @AliasFor:
+    @@@:
+      ::ManakaiDOM:ManakaiDOMCommon
+    @@For: 
+      !=ManakaiDOM:ManakaiDOMCommon
+  @Description:
+    @@lang:en
+    @@@:
+      An abstract class that is inherited by all manakai DOM exception classes.
+
+ResourceDef:
+  @QName: 
+    ManakaiDOM:ManakaiDOMWarning
+  @rdf:type:
+    ManakaiDOM:WarningClass
+  @ISA: 
+    ManakaiDOM:ManakaiDOMExceptionOrWarning
+  @For: 
+    ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+  @AliasFor:
+    @@@:
+      ::ManakaiDOM:ManakaiDOMCommon
+    @@For: 
+      !=ManakaiDOM:ManakaiDOMCommon
+  @Description:
+    @@lang:en
+    @@@:
+      An abstract class that is inherited by all manakai DOM warning classes.
+
+ClassDef:
+  @QName: 
+    ManakaiDOM:ManakaiDOMNodeObject
+  @ISA: 
+    ManakaiDOM:ManakaiDOMObject
+  @Description:
+    @@lang:en
+    @@@:
+      An internal node object that is able to be accessed via 
+      <Class::ManakaiDOM:ManakaiDOMNodeReference>.
+  @ImplNote:
+    @@lang:en
+    @@@:
+      In manakai DOM implementation, most of DOM objects including 
+      <IF::DOMCore:Element> and <IF::DOMCore:Document> instances 
+      are implemented as a reference, i.e. 
+      <Class::ManakaiDOM:ManakaiDOMNodeReference>, to node object.
+  @IntMethod:
+    @@Name: new
+    @@Description:
+      @@@lang:en
+      @@@@: 
+        Constructs a new instance of 
+        <Class::ManakaiDOM:ManakaiDOMNodeObject> and returns it.
+    @@Return:
+      @@@Type: 
+        ManakaiDOM:ManakaiDOMNodeObject
+      @@@Description:
+        @@@@lang:en
+        @@@@@: 
+          The newly created <Class::ManakaiDOM:ManakaiDOMNodeObject> instance.
+      @@@PerlDef:
+          $r = bless {
+            <Q::TreeCore:origin> => [],
+            <Q::TreeCore:subnode> => [],
+            <Q::TreeCore:subnode2> => [],
+            <Q::TreeCore:irefnode> => [],
+            <Q::TreeCore:urefnode> => [],
+            <Q::TreeCore:anydata> => [],
+            <Q::TreeCore:anydata2> => [],
+            <Q::TreeCore:rc> => 0,
+            <Q::TreeCore:treeID> => <CODE::ManakaiDOM:generateUniqueID>,
+            <Q::TreeCore:nodeID> => <CODE::ManakaiDOM:generateUniqueID>,
+            <Q::DOMCore:hasFeature> => {},
+          }, ref $self || $self;
+  @IntMethod:
+    @@Name: newReference
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates a new reference to this node and returns it.
+    @@Param:
+      @@@Name: class
+      @@@Type:
+        DOMMain:any
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A Perl class package name with which the newly created 
+          reference is blessed.  The <P:class> class must be a 
+          subclass of <Class::ManakaiDOM:ManakaiDOM:ManakaiDOMNodeReference>.
+    @@Return:
+      @@@Type: 
+        ManakaiDOM:ManakaiDOMNodeReference
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The newly created node reference.
+      @@@PerlDef:
+          $r = bless {
+            <Q::TreeCore:node> => $self,
+          }, ref $class ? ref $class : $class ? $class :
+             <ClassName::ManakaiDOM:ManakaiDOMNodeReference>;
+          $self->{<Q::TreeCore:rc>}++;
+  @IntMethod:
+    @@Name: isExternallyReferred
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Tests and returns whether the tree that contains this node 
+        is externally referred or not.
+    @@Return:
+      @@@Type: 
+        DOMMain:boolean
+      @@@InCase:
+        @@@@Value: true
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: 
+            There is one or more nodes that has been 
+            referred from <Class::ManakaiDOM:ManakaiDOMNodeReference> objects.
+      @@@InCase:
+        @@@@Value: false
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: No external reference to the node in this tree found.
+      @@@PerlDef:
+          if ($self->{<Q::TreeCore:rc>}) {
+            $r = true;
+          } else {
+            for (@{$self-><M::ManakaiDOM:ManakaiDOMNodeObject.getRootNodes>}) {
+              if ($_-><M::ManakaiDOM:ManakaiDOMNodeObject
+                                       .isExternallyReferredDownward>) {
+                $r = true;
+                last;
+              }
+            }
+          }
+  @IntMethod:
+    @@Name: isExternallyReferredDownward
+    @@Description:
+      @@@lang:en
+      @@@@: Check whether the node or any of subnodes is externally referred.
+    @@Return:
+      @@@Type: 
+        DOMMain:boolean
+      @@@PerlDef:
+          if ($self->{<Q::TreeCore:rc>}) {
+            $r = true;
+          } else {
+            DW:{
+            SUBNODES:
+            for my $key (@{$self->{<Q::TreeCore:subnode>}}) {
+              for (ref $self->{$key} eq 'ARRAY' ? @{$self->{$key}}
+                                                : values %{$self->{$key}||{}}) {
+                if ($_-><M::ManakaiDOM:ManakaiDOMNodeObject
+                                        .isExternallyReferredDownward>) {
+                  $r = true;
+                  last DW;
+                }
+              }
+            }
+            SUBNODES2:
+            for my $key (@{$self->{<Q::TreeCore:subnode2>}}) {
+              for (ref $self->{$key} eq 'ARRAY' ? @{$self->{$key}}
+                                                : values %{$self->{$key}||{}}) {
+                for (ref $_ eq 'ARRAY' ? @$_ : values %$_) {
+                  if ($_-><M::ManakaiDOM:ManakaiDOMNodeObject
+                                       .isExternallyReferredDownward>) {
+                    $r = true;
+                    last DW;
+                  }
+                }
+              }
+            }}
+          }
+  @IntMethod:
+    @@Name: destroy
+    @@Description:
+      @@@lang:en
+      @@@@: Destroy this tree.
+    @@Return:
+      @@@PerlDef:
+          $_-><M::ManakaiDOM:ManakaiDOMNodeObject.destroyDownward>
+          for @{$self-><M::ManakaiDOM:ManakaiDOMNodeObject.getRootNodes>};
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        This method is different from Perl <Perl:DESTROY> special method.
+  @IntMethod:
+    @@Name: destroyDownward
+    @@Description:
+      @@@lang:en
+      @@@@: Destroy this node and subnodes.
+    @@Return:
+      @@@PerlDef:
+          CORE::delete $self->{$_} for @{$self->{<Q::TreeCore:origin>}};
+          for my $key (@{$self->{<Q::TreeCore:subnode>}}) {
+            my @node = ref $self->{$key} eq 'ARRAY' ? @{$self->{$key}}
+                                         : values %{$self->{$key}||{}};
+            CORE::delete $self->{$key};
+            $_-><M::ManakaiDOM:ManakaiDOMNodeObject.destroyDownward> for @node;
+          }
+          for my $key (@{$self->{<Q::TreeCore:subnode2>}}) {
+            my @node = map {ref $_ eq 'ARRAY' ? @$_ : values %$_}
+                       ref $self->{$key} eq 'ARRAY' ? @{$self->{$key}}
+                                         : values %{$self->{$key}||{}};
+            CORE::delete $self->{$key};
+            $_-><M::ManakaiDOM:ManakaiDOMNodeObject.destroyDownward> for @node;
+          }
+   \       for my $key (@{$self->{<Q::TreeCore:irefnode>}},
+   \                    @{$self->{<Q::TreeCore:urefnode>}},
+   \                    @{$self->{<Q::TreeCore:anydata>}},
+   \                    @{$self->{<Q::TreeCore:anydata2>}}) {
+            CORE::delete $self->{$key};
+          }
+  @IntMethod:
+    @@Name: importTree
+    @@Description:
+      @@@lang:en
+      @@@@: Change internal tree identifier to be same as this node.
+    @@Param:
+      @@@Name: node
+      @@@Type: 
+        ManakaiDOM:ManakaiDOMNodeObject
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The node that belongs to the tree the identifier is changed.
+    @@Return:
+      @@@PerlDef:
+          unless ($node->{<Q::TreeCore:treeID>} eq
+                  $self->{<Q::TreeCore:treeID>}) {
+            $_-><M::ManakaiDOM:ManakaiDOMNodeObject.changeTreeIDDownward>
+                                                  ($self->{<Q::TreeCore:treeID>})
+              for @{$node-><M::ManakaiDOM:ManakaiDOMNodeObject.getRootNodes>};
+          }
+  @IntMethod:
+    @@Name: changeTreeIDDownward
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Change internal tree identifier of the node and subnodes.
+        This method is intended to be used by the internal method 
+        importTree.
+    @@Param:
+      @@@Name: treeID
+      @@@Type: 
+        DOMMain:DOMString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The new tree identifier to which the tree identifier of this node
+          is changed.
+    @@Return:
+      @@@PerlDef:
+          $self->{<Q::TreeCore:treeID>} = ''.$treeID;
+          for my $key (@{$self->{<Q::TreeCore:subnode>}}) {
+            for (ref $self->{$key} eq 'ARRAY' ? @{$self->{$key}}
+                                              : values %{$self->{$key}||{}}) {
+              $_-><M::ManakaiDOM:ManakaiDOMNodeObject
+                                     .changeTreeIDDownward> ($treeID);
+            }
+          }
+          for my $key (@{$self->{<Q::TreeCore:subnode2>}}) {
+            for (ref $self->{$key} eq 'ARRAY' ? @{$self->{$key}}
+                                              : values %{$self->{$key}||{}}) {
+              for (ref $_ eq 'ARRAY' ? @$_ : values %$_) {
+                $_-><M::ManakaiDOM:ManakaiDOMNodeObject
+                                      .changeTreeIDDownward> ($treeID);
+              }
+            }
+          }
+  @IntMethod:
+    @@Name: getRootNodes
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Get all root nodes (i.e. nodes that does not have the origin) in 
+        the tree. 
+    @@Return:
+      @@@Type:
+        perl:ARRAY
+      @@@PerlDef:
+          for (@{$self->{<Q::TreeCore:origin>}}) {
+            next unless $self->{$_};
+            NEW: for my $new (@{$self->{$_}
+                -><M::ManakaiDOM:ManakaiDOMNodeObject.getRootNodes>}) {
+              for my $old (@$r) {
+                next NEW if $old eq $new;
+              }
+              push @$r, $new;
+            }
+          }
+          push @$r, $self if @$r == 0;
+  @IntMethod:
+    @@Name: isSameNode
+    @@Description:
+      @@@lang:en
+      @@@@: Check whether the two nodes are same or not.
+    @@Operator:
+      @@@ContentType:
+        lang:Perl
+      @@@@: eq
+    @@Param:
+      @@@Name: node
+      @@@Type: 
+        ManakaiDOM:ManakaiDOMNodeObject
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The node to be compared.
+    @@Return:
+      @@@Type: 
+        DOMMain:boolean
+      @@@Description:
+        @@@@lang:en
+        @@@@@: Whether the two nodes are same or not.
+      @@@PerlDef:
+          if (ref $node and
+              UNIVERSAL::isa ($node,
+                              <ClassName::ManakaiDOM:ManakaiDOMNodeObject>) and
+              $node->{<Q::TreeCore:nodeID>} eq $self->{<Q::TreeCore:nodeID>}) {
+            $r = true;
+          }
+  @IntMethod:
+    @@Name: orphanate
+    @@Description:
+      @@@lang:en
+      @@@@:
+        This method should be called when this node is orphanated, i.e. 
+        all references from <QUOTE:origin> nodes (and all references 
+        from this node to <QUOTE:origin> nodes corresponding to them) 
+        are deleted.  This methods destoroies the tree rooted by this 
+        node if the tree is no longer externally referred; otherwise, 
+        the tree identifier associated to each node is rewritten to 
+        newly generated one.
+        \
+        {NOTE:: Interaction on deleting a relationship from multiply 
+                organized <QUOTE:trees> (such as DOM tree and 
+                styled displaying tree) is less studied.  This 
+                method might be revisited or another method might 
+                be necessary when style sheet, XBL, or other 
+                technologies are implemented.
+        \
+        }
+    @@Return:
+      @@@PerlDef:
+          if ($self-><M::ManakaiDOM:ManakaiDOMNodeObject.isExternallyReferred>) {
+            my $id = <CODE::ManakaiDOM:generateUniqueID>;
+            $_-><M::ManakaiDOM:ManakaiDOMNodeObject.changeTreeIDDownward> ($id)
+              for @{$self-><M::ManakaiDOM:ManakaiDOMNodeObject.getRootNodes>};
+            ## NOTE:: "Root nodes" should be this node itself
+            ##        by (current) definition of this method.
+          } else {
+            $self-><M::ManakaiDOM:ManakaiDOMNodeObject.destroy>;
+          }
+##Class:ManakaiDOMNodeObject
+
+ClassDef:
+  @QName: 
+    ManakaiDOM:ManakaiDOMNodeReference
+  @ISA: 
+    ManakaiDOM:ManakaiDOMObject
+  @IntMethod:
+    @@Name: destroy
+    @@Description:
+      @@@lang:en
+      @@@@: Destroy this reference object.
+    @@Operator:
+      @@@Type:
+        lang:Perl
+      @@@@: DESTROY
+    @@Return:
+      @@@PerlDef:
+          my $node = $self->{<Q::TreeCore:node>};
+          if ($node) {
+            delete $self->{<Q::TreeCore:node>};
+            $node->{<Q::TreeCore:rc>}--;
+            unless ($node-><M::ManakaiDOM:ManakaiDOMNodeObject
+                                              .isExternallyReferred>) {
+              $node-><M::ManakaiDOM:ManakaiDOMNodeObject.destroy>;
+            }
+          } else {
+            warn "An object of type ".ref ($self).
+                 " that does not have associated node object is ".
+                 "to be destroied; there might be a memory-leak code";
+          }
+##Class:ManakaiDOMNodeReference
+
+## - For ManakaiDOMNodeObject
+## TreeCore:nodeID  - The world-unique identifier of the node object.
+## TreeCore:origin  - Hash key names of the origin properties.
+## TreeCore:rc      - The number that denotes how many external references 
+##                    ("ManakaiDOMNodeReference"s) there are.
+## TreeCore:subnode - Hash key names of subnode properties.
+## TreeCore:subnode2 - Hash key names of two-step subnode properties.
+## TreeCore:treeID  - The world-unique identifier of the grove.
+## - For ManakaiDOMNodeReference
+## TreeCore:node    - The node object ("ManakaiDOMNodeObject") to which
+##                    this is referring.
+
+
+## -- Manakai implementation-specific exception and warning
+
+ExceptionDef
+  @QName: 
+    ManakaiDOM:ManakaiDOMImplementationException
+  @ISA: 
+    ManakaiDOM:ManakaiDOMException
+  @For: 
+    ManakaiDOM:ManakaiDOM
+  @Description:
+    @@lang:en
+    @@@:
+      A set of manakai DOM implementation-dependent exceptions.
+
+  @Attr:
+     @@Name:  code
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The error code that denotes what kind of exception occures.
+     @@Get:
+       @@@Type:  
+         DOMMain:unsigned-short
+       @@@actualType: 
+         ManakaiDOM:ManakaiDOMImplementationExceptionCode
+
+  @ResourceDef:
+    @@QName: 
+      ManakaiDOM:ManakaiDOMImplementationExceptionCode
+    @@rdf:type:
+      ManakaiDOM:ConstGroup
+    @@ISA:
+      DOMMain:unsigned-short
+
+    @@Const:
+      @@@Name: MDOM_TYPE_MISMATCH_ERR
+      @@@Type: unsigned-short
+      @@@Value: 0
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The type of an object is incompatible with the expected 
+          type of the parameter.
+      @@@Def:
+        @@@@lang:en
+        @@@@ContentType:
+          lang:muf
+        @@@@@:
+            The type of an object specified as the value of parameter
+            %t (name => {<Q::MDOMX:param-name>},
+            prefix => { "}, suffix => {"}); is incompatible with the
+            expected type%t (name => {<Q::MDOMX:class>}, 
+            prefix => {: "}, suffix => {"}).
+      @@@XParam:
+        @@@@QName:
+          MDOMX:param-name
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The parameter name.
+          
+      @@@XParam:
+        @@@@QName:
+          MDOMX:class
+        @@@@Type:
+          perl:package-name
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: Class name to which given value belongs.
+          
+
+    @@Const:
+      @@@Name: PARAM_NULL_POINTER
+      @@@Type: unsigned-short
+      @@@Value: 1
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The null value is passed as a parameter.
+      @@@Def:
+        @@@@lang:en
+        @@@@ContentType:
+          lang:muf
+        @@@@@:
+            The null value is passed to the parameter%t (
+            name => {<Q::MDOMX:param-name>},
+            prefix => { "}, suffix => {"});.
+      @@@XParam:
+        @@@@QName:
+          MDOMX:param-name
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The name of the parameter to which the null value is given.
+
+    @@Const:
+      @@@Name: MDOM_DOMSTRING_INDEX_IN_SURROGATE_PAIR
+      @@@Type: unsigned-long
+      @@@Value: 2
+      @@@Description:
+        @@@@lang:en
+        @@@@@: 
+          An attempt to break surrogate pair, i.e. the first character of 
+          the range is the low-surrogate (the second 16-bit unit of the surrogate
+          pair) or the last character of the range is the high-surrogate 
+          (the first 16-bit unit of the surrogate pair).
+      @@@XParam:
+        @@@@QName:
+          MDOMX:param-name
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The parameter to which inappropriate value is specified.
+
+    @@Const:
+      @@@Name: MDOM_DEBUG_BUG
+      @@@Type: unsigned-short
+      @@@Value: 3
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Unexpected case occurs.  In general, this exception is not 
+          reported.  If the DOM implementation has a bug and 
+          something unexpected is occur, this exception is raised. 
+        \
+          DOM application MUST NOT try to catch this exception. 
+          If this exception is raised, please report to the 
+          author of that module.
+      @@@XParam:
+        @@@@QName:
+          MDOMX:values
+        @@@@Type: 
+          perl:hash
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: Arbitrary values for debugging.
+  
+  @Const:
+    @@Name: MDOM_IMPL_BY_APP
+    @@Type: unsigned-short
+    @@Value: 4
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The method or attribute called is part of the callback 
+        interface so that the DOM application must implement it.
+
+WarningDef:
+  @QName: 
+    ManakaiDOM:ManakaiDOMImplementationWarning
+  @ISA: 
+    ManakaiDOM:ManakaiDOMWarning
+  @Description:
+    @@lang:en
+    @@@:
+      Warnings for the implementation dependent matters and 
+      "no effect" actions.
+  
+  @Attr:
+     @@Name:  code
+     @@Get:
+       @@@Type:  
+         DOMMain:unsigned-short
+       @@@actualType:
+         ManakaiDOM:ManakaiDOMImplementationWarningCode
+       @@@Description:
+         @@@@lang:en
+         @@@@@:
+           The warning code from the constant value group
+           ManakaiDOMImplementationWarningCode.
+
+  @ResourceDef:
+    @@QName: 
+      ManakaiDOM:ManakaiDOMImplementationWarningCode
+    @@rdf:type:
+      ManakaiDOM:ConstGroup
+    @@ISA: 
+      DOMMain:unsigned-short
+    
+    @@Const:
+      @@@Name: ATTR_SET_NO_EFFECT
+      @@@Type: unsigned-short
+      @@@Value: 0
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Setting an attribute value has no effect by definition.
+
+    @@Const:
+      @@@Name: MDOM_NEWCHILD_IS_REFCHILD
+      @@@Type: unsigned-short
+      @@@Value: 1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The node to be inserted is same as the reference node.
+      @@@XParam:
+        @@@@QName:
+          MDOMX:newChild-param-name
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The parameter name for "newChild" node.
+      @@@XParam:
+        @@@@QName:
+          MDOMX:refChild-param-name
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The parameter name for "refChild" node.
+
+    @@Const:
+      @@@Name: MDOM_REPLACE_BY_ITSELF_NO_EFFECT
+      @@@Type:unsigned-short
+      @@@Value:2
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          An attempt to replace a node by itself is made. 
+          It is no effect by definition.
+    
+    @@Const:
+      @@@Name: MDOM_NS_EMPTY_URI
+      @@@Type: unsigned-short
+      @@@Value: 4
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The DOM Level 2 Core Specification defines that even the empty 
+          string is treated as a real namespace URI.  The Errata for 
+          the DOM Level 2 Specifications says that it is an error and 
+          the way empty strings are treated is implementation dependent. 
+          The DOM Level 3 Core Specification defines that empty strings 
+          are converted to "null".
+      @@@XParam:
+        @@@@QName:
+          MDOMX:param-name
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The parameter to which inappropriate value is specified.
+
+## -- Frequently used code fragments
+
+ResourceTypeDef:
+  @QName:
+    dis2pm:InlineCode
+  @Description:
+    @@lang:en
+    @@@:
+      An inline code fragment referred by <CODE::<lt>CODE::<VAR::qname><gt>> 
+      preprocessed token.
+      \
+      {NOTE:: If a code fragment is written in Perl (i.e. typed as 
+              <Q::dis:Perl> or its subtypes), line breaks are 
+              replaced by a <CHAR::SPACE>.  Use escape (<Perl::\n>) if 
+              it is significant.
+      \
+      }
+
+ResourceTypeDef:
+  @QName:
+    dis2pm:BlockCode
+  @Description:
+    @@lang:en
+    @@@:
+      A block code fragment referred by <CODE::__CODE{<VAR::qname>}__> 
+      preprocessed block.
+
+ResourceDef:
+  @QName:
+    ManakaiDOM:generateUniqueID
+  @rdf:type:
+    dis2pm:InlineCode
+  @Description:
+    @@lang:en
+    @@@:
+      Generates a global-unique opaque string. 
+      \
+      {NOTE:: A URI reference is generated by this code. 
+      \
+      }
+  @For:
+    ManakaiDOM:ManakaiDOM
+  @AliasFor:
+    @@@:
+      ::ManakaiDOM:ManakaiDOMCommon
+    @@For:
+      !=ManakaiDOM:ManakaiDOMCommon
+  @PerlDef:
+      (
+        sprintf 'mid:%d.%d.%s.dom.manakai@suika.fam.cx',
+                time, $$,
+                ['A'..'Z', 'a'..'z', '0'..'9']->[rand 62] .
+                ['A'..'Z', 'a'..'z', '0'..'9']->[rand 62] .
+                ['A'..'Z', 'a'..'z', '0'..'9']->[rand 62] .
+                ['A'..'Z', 'a'..'z', '0'..'9']->[rand 62] .
+                ['A'..'Z', 'a'..'z', '0'..'9']->[rand 62]
+      )
 
 ## DOMMain.dis ends here

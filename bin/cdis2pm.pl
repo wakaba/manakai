@@ -103,7 +103,7 @@ sub perl_code ($;%) {
     node => $opt{node} unless defined $s;
   local $State->{Namespace}
     = $State->{Module}->{$opt{resource}->{parentModule}}->{nsBinding};
-  $s =~ s[<([^<>]+)>|\b(null|true|false)\b][
+  $s =~ s[<(\w[^<>]+)>|\b(null|true|false)\b][
     my ($q, $l) = ($1, $2);
     my $r;
     if (defined $q) {
@@ -162,6 +162,7 @@ sub perl_code ($;%) {
           if (defined $State->{Type}->{$uri}->{Name} and
               dis_resource_ctype_match (ExpandedURI q<dis2pm:InlineCode>,
                                         $State->{Type}->{$uri}, %opt)) {
+            ## ISSUE: It might be required to check loop referring
             $r = dispm_get_code (%opt, resource => $State->{Type}->{$uri},
                                  For => [keys %{$State->{Type}->{$uri}
                                                       ->{For}}]->[0],
@@ -190,19 +191,7 @@ sub perl_code ($;%) {
   }{
     my ($name, $data) = ($1, $2);
     my $r;
-    if ($name eq 'XCLASS' or      ## Manakai DOM Class
-        $name eq 'XSUPER' or      ## Manakai DOM Class (internal)
-        $name eq 'XIIF' or        ## DOM Interface + Internal interface & prop
-        $name eq 'XIF') {         ## DOM Interface
-      #local $Status->{condition} = $Status->{condition};
-      if ($data =~ s/::([^:]*)$//) {
-        #$Status->{condition} = $1;
-      }
-      #$r = perl_package_name {qw/CLASS name SUPER name IIF iif IF if/}->{$name}
-      #                                   => $data,
-      #                       is_internal => {qw/SUPER 1/}->{$name},
-                             #condition => $Status->{condition};
-    } elsif ($name eq 'XINT') {    ## Internal Method / Attr Name
+    if ($name eq 'XINT') {    ## Inserting point of the for-internal code
       if (defined $data) {
         if ($data =~ /^{($RegBlockContent)}$/o) {
           $data = $1;
@@ -251,7 +240,7 @@ sub perl_code ($;%) {
       my ($nm, %param);
       if ($data =~ s/^(\w+)\s*(?::\s*|$)//) {
         $nm = $1;
-      } elsif ($data =~ s/^<([^<>]+)>\s*(?::\s*|$)//) {
+      } elsif ($data =~ s/^<(\w[^<>]+)>\s*(?::\s*|$)//) {
         $nm = $1;
       } else {
         valid_err q<Built-in code name required>;
@@ -379,7 +368,7 @@ sub dispm_get_value (%) {
     if ($t) {
       $type = dis_qname_to_uri ($t->value, %opt, node => $t);
     } else {
-      $type = ExpandedURI q<DOMMain:any>;  ## ISSUE: Is this appropriate type?
+      $type = ExpandedURI q<lang:dis>;
     }
     valid_err (qq<Type <$type> is not defined>, node => $t || $n)
       unless defined $State->{Type}->{$type}->{Name};
@@ -387,7 +376,10 @@ sub dispm_get_value (%) {
     if (dis_uri_ctype_match (ExpandedURI q<lang:Perl>, $type, %opt)) {
       ## ISSUE: Is some pre-process required?
       return $n->value;
-    } 
+    } elsif (dis_uri_ctype_match (ExpandedURI q<lang:dis>, $type, %opt)) {
+      ## NOTE: This might not be a valid Perl code fragment.
+      return $n->value;
+    }
   }
 
   ## No explicit value specified
@@ -398,6 +390,67 @@ sub dispm_get_value (%) {
   }
   return undef;
 } # dispm_get_value
+
+
+
+=item $code = dispm_const_value (resource => $const, %opt)
+
+Returns a code fragment to declare and define a constant function 
+corresponding to the definition of C<$const>.
+
+=cut
+
+sub dispm_const_value (%) {
+  my %opt = @_;
+  my $for = [keys %{$opt{resource}->{For}}]->[0];
+  my $value = dispm_get_value
+                        (%opt,
+                         ExpandedURI q<dis2pm:ValueKeyName>
+                                 => ExpandedURI q<d:Value>,
+                         ExpandedURI q<dis2pm:valueType>
+                                 => $opt{resource}
+                                        ->{ExpandedURI q<dis2pm:actualType>},
+                         For => $for);
+  valid_err q<Constant value must be specified>, node => $opt{resource}->{src}
+    unless defined $value;
+  return perl_sub
+            (name => $opt{resource}->{ExpandedURI q<dis2pm:constName>},
+             prototype => '',
+             code => $value);
+} # dispm_const_value
+
+=item $code = dispm_const_group (resource => $const_group, %opt)
+
+Returns a code fragment to define a constant value group.
+
+=cut
+
+sub dispm_const_group (%) {
+  my %opt = @_;
+  my $name = $opt{resource}->{ExpandedURI q<dis2pm:constGroupName>};
+  for my $cg (values %{$opt{resource}->{ExpandedURI q<dis2pm:constGroup>}}) {
+    if (defined $cg->{ExpandedURI q<dis2pm:constGroupName>}) {
+      valid_err (qq{"$name"."$cg->{ExpandedURI q<dis2pm:constGroupName>}": }.
+                 qq{Nesting constant group not supported}, 
+                 node => $cg->{src});
+    }
+  }
+  my $result = '';
+  my @cname;
+  if (length $name) {
+    if (defined $opt{ExpandedURI q<dis2pm:constGroupParentPackage>}->{$name}) {
+      valid_err qq<Const group "$name" is already defined>, 
+                node => $opt{resource}->{src};
+    }
+    $opt{ExpandedURI q<dis2pm:constGroupParentPackage>}->{$name} = \@cname;
+  }
+  for my $cv (values %{$opt{resource}->{ExpandedURI q<dis2pm:const>}}) {
+    next unless defined $cv->{ExpandedURI q<dis2pm:constName>};
+    $result .= dispm_const_value (%opt, resource => $cv);
+    push @cname, $cv->{ExpandedURI q<dis2pm:constName>};
+  }
+  return $result;
+} # dispm_const_group
 
 
 ## Outputed module and "For"
@@ -431,6 +484,7 @@ $result .= perl_statement
                                 scope => 'our')
                    => perl_literal version_date time;
 
+## -- Classes
 for my $pack (values %{$State->{Module}->{$State->{module}}
                              ->{ExpandedURI q<dis2pm:package>}||{}}) {
   next unless defined $pack->{Name};
@@ -439,7 +493,7 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
        ExpandedURI q<ManakaiDOM:IF> => 1,
        ExpandedURI q<ManakaiDOM:ExceptionClass> => 1,
        ExpandedURI q<ManakaiDOM:ExceptionIF> => 1,
-       ExpandedURI q<ManakaiDOM:WarningIF> => 1,
+       ExpandedURI q<ManakaiDOM:WarningClass> => 1,
       }->{$pack->{ExpandedURI q<dis2pm:type>}}) {
     ## Package name and version
     $result .= perl_change_package
@@ -450,6 +504,7 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
                                 scope => 'our')
                    => perl_literal version_date time;
     ## Inheritance
+    ## TODO: IF "isa" should be expanded
     my $isa = [];
     for my $uri (@{$pack->{ISA}||[]}, @{$pack->{Implement}||[]}) {
       my $pack = $State->{Type}->{$uri};
@@ -535,6 +590,8 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
         } elsif ($method->{ExpandedURI q<dis2pm:type>} eq
                  ExpandedURI q<ManakaiDOM:DOMAttribute>) {
           my $getter = $method->{ExpandedURI q<dis2pm:getter>};
+          valid_err qq{Getter for attribute "$method->{Name}" must be }.
+                    q{defined}, node => $method->{src} unless $getter;
           my $setter = defined $method->{ExpandedURI q<dis2pm:setter>}->{Name}
                          ? $method->{ExpandedURI q<dis2pm:setter>} : undef;
           my $for = [keys %{$method->{For}}]->[0];
@@ -617,35 +674,16 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
                         code => $get_code);
         }
       } # package method
-      ## TODO: Const
-    }    
-  ## TODO: Const
+      for my $cg (values %{$pack->{ExpandedURI q<dis2pm:constGroup>}}) {
+        next unless defined $cg->{Name};
+        $result .= dispm_const_group (resource => $cg);
+      } # package const group
+      for my $cv (values %{$pack->{ExpandedURI q<dis2pm:const>}}) {
+        next unless defined $cv->{Name};
+        $result .= dispm_const_value (resource => $cv);
+      } # package const value
+    }
   } # root object
-}
-
-## Export
-if (keys %{$State->{perl_primary_module}->{perl_export_ok}||{}}) {
-  $result .= perl_change_package
-               full_name => $State->{perl_primary_module}->{perl_package_name};
-  $result .= perl_statement 'require Exporter';
-  $result .= perl_inherit ['Exporter'];
-  $result .= perl_statement
-               perl_assign
-                    perl_var (type => '@', scope => 'our',
-                              local_name => 'EXPORT_OK')
-                 => '(' . perl_list (keys %{$State->{perl_primary_module}
-                                                  ->{perl_export_ok}}) . ')';
-  if (keys %{$State->{perl_primary_module}->{perl_export_tags}||{}}) {
-    $result .= perl_statement
-                 perl_assign
-                       perl_var (type => '%', scope => 'our',
-                                 local_name => 'EXPORT_TAGS')
-                   => '(' . perl_list (map {
-                         $_ => [keys %{$State->{perl_primary_module}
-                                             ->{perl_export_tags}->{$_}}]
-                      } keys %{$State->{perl_primary_module}
-                                     ->{perl_export_tags}}) . ')';
-  }
 }
 
 $result .= perl_statement 1;

@@ -1380,6 +1380,8 @@ sub dis_perl_init ($;%) {
   for my $res (values %{$State->{Type}}) {
     next if $res->{ExpandedURI q<dis2pm:done>};
     next unless defined $res->{Name};
+    local $State->{ExpandedURI q<dis2pm:parentResource>}
+             = $State->{Module}->{$res->{parentModule}};
     dis_perl_init_classdef ($res, %opt);
   }
 } # dis_perl_init
@@ -1414,6 +1416,8 @@ sub dis_perl_init_classdef ($;%) {
          (defined $mod->{ExpandedURI q<dis2pm:ifPackagePrefix>} ?
            (ExpandedURI q<ManakaiDOM:IF>,
             ExpandedURI q<ManakaiDOM:ExceptionIF>) : ()),
+         ExpandedURI q<ManakaiDOM:ConstGroup>,
+         ExpandedURI q<ManakaiDOM:Const>,
          ExpandedURI q<ManakaiDOM:InCase>) {
       if (dis_uri_ctype_match ($_, $t, %opt)) {
         $type = $_;
@@ -1651,7 +1655,7 @@ sub dis_perl_init_classdef ($;%) {
             dis_get_attr_node
                (%opt, name => 'Type',
                 parent => $State->{ExpandedURI q<dis2pm:parentResource>}->{src});
-    valid_err (q<InCase value type required>, node => $res->{src}) unless $t;
+    valid_err (q<Const value type required>, node => $res->{src}) unless $t;
     $res->{ExpandedURI q<d:Type>}
       = dis_typeforqnames_to_type_uri ($t->value, use_default_namespace => 1,
                                        %opt, node => $t);
@@ -2069,4 +2073,4 @@ sub disdoc_inline2pod ($;%) {
 
 =cut
 
-1; # $Date: 2004/11/30 11:05:06 $
+1; # $Date: 2004/12/01 11:49:46 $
