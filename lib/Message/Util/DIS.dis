@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/02/21 08:06:19 $
+      $Date: 2005/02/22 08:21:00 $
     @@ContentType:
       dis:Date.RCS
   
@@ -153,89 +153,45 @@ ClsDef:
                     (<Q::dis:>);
 
   @Method:
-    @Name: createDISParser
-    @Description:
-      @@lang:en
-      @@@:
+    @@Name: createDISParser
+    @@Description:
+      @@@lang:en
+      @@@@:
         Creates a <Class::ManakaiDISParser> object. 
-    @Return:
-      @@Type: ManakaiDISParser
-      @@Description:
-        @@@lang:en
-        @@@@: 
+    @@Return:
+      @@@Type: ManakaiDISParser
+      @@@Description:
+        @@@@lang:en
+        @@@@@: 
           A newly created <QUOTE::dis> parser. 
-      @@PerlDef:
+      @@@PerlDef:
         $r = bless $self-><M::swcfg21:SWCFGImplementation.createParser>,
                    <ClassName::ManakaiDISParser>;
 
   @Method:
-    @@Name: typeforurisToURI
+    @@Name: createDISDatabase
     @@Description:
       @@@lang:en
       @@@@:
-        Converts a pair of name URI reference and <QUOTE::for> URI reference 
-        into a <TYPE::dis:TypeForQNames>-expanded URI reference. 
-    @@Param:
-      @@@Name: typeURI
-      @@@Type: NameURI
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          A URI reference to identify a resource. 
-      @@@InCase:
-        @@@@Value:
-          @@@@@is-null:1
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            Equivalent to <Q::DOMMain:any> (for historical reason). 
-    @@Param:
-      @@@Name: forURI
-      @@@Type: ForURI
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          A <QUOTE::for> URI reference. 
-      @@@InCase:
-        @@@@Value:
-          @@@@@is-null:1
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            Equivalent to <QUOTE::for all>, i.e. <Q::ManakaiDOM:all>. 
+        Creates a new <QUOTE::dis> database.
     @@Return:
-      @@@Type: 
-        DISCore:TypeForURI
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The <TYPE::dis:TypeForQNames>-expanded URI references.  
-          If it is canonicalizable, this method does canonicalize it. 
-      @@@PerlDef:
-        $typeURI = <Q::DOMMain:any> unless defined $typeURI;
-        $forURI = <Q::ManakaiDOM:all> unless defined $forURI;
-        if ($forURI eq <Q::ManakaiDOM:all>) {
-               ## TODO:
-          $r = dis_type_canon_uri ($typeURI);
-        } else {
-          ## NOTE: [RFC 3986]
-          ##       fragment    := *(pchar / "/" / "?")
-          ##       pchar       := unreserved / pct-encoded / sub-delims / [:@]
-          ##       unreserved  := ALPHA / DIGIT / [._~-]
-          ##       sub-delims  := [!$&'()*+,;=]
-          ## NOTE: [XPointer Framework]
-          ##       SchemeData  := *EscapedData
-          ##       EscapedData := NormalChar / "^(" / "^)" / "^^"
-          ##                    / "(" SchemeData ")"
-          ##       NormalChar  := UnicodeChar - [()^]
-          for my $uri ($typeURI, $forURI) {
-            $uri =~ s{([^0-9A-Za-z:;?=_./-])}{sprintf '%%%02X', ord $1}ge;
-          }
-               ## TODO:
-          $r = dis_type_canon_uri
-                  (qq<data:,200411tf#xmlns(t=data:,200411tf%23)>.
-                   qq<t:tf($typeURI,$forURI)>);
-        }
+      @@@Type:ManakaiDISDatabase
+      @@Description:
+        @@@lang:en
+        @@@@:
+          A newly created <QUOTE::dis> parser.
+      @@PerlDef:
+        $r = bless {
+          forDef => {
+            <Q::ManakaiDOM:all> => {
+              uri => <Q::ManakaiDOM:all>,
+              isa => {<Q::ManakaiDOM:all> => 1},
+              revISA => {},
+            },
+          },
+          resDef => {},
+        }, <CassName::ManakaiDISDatabase>;
+
 ##DISImplementation
 
 ClsDef:
@@ -520,6 +476,31 @@ ClsDef:
         $r = $object-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
                                   .newReference> ($class);
   
+  @Attr:
+    @@Name:ownerDISDocument
+    @@NewIn21:
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The <QUOTE::dis> document object associated with this node. 
+    @@Get:
+      @@@Type:DISDocument
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The document object associated with this node. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:DISDocument
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            This node is a document node. 
+      @@@PerlDef:
+        $r = <ClassM::ManakaiDISNode.getNodeReference>
+                ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:ownerDocument>})
+          if $self->{<Q::TreeCore:node>}->{<Q::DOMCore:ownerDocument>};
 ##DISNode
 
 ClsDef:
@@ -566,6 +547,134 @@ ClsDef:
         @@@@lang:en
         @@@@@:
           Whether this element is for <P::forArg> and <P::forpArg> or not. 
+      @@@UndeclaredPrefixException:
+      @@@NoDBException:
+      @@@PerlDef:
+        $for_arg = <Q::ManakaiDOM:all> unless defined $for_arg;
+        $forp_arg ||= [];
+
+        FORMATCH: {
+          __DEEP{
+            my @ce = @{$self-><AG::ManakaiDISElement.disChildElements>};
+            for my $ce (@ce) {
+              my $et = $ce-><AG::swcfg21:SWCFGElement.expandedURI>;
+              if ($et eq <Q::dis:ForCheck>) {
+                my $for = [split /\s+/, $ce-><AG::swcfg21:SWCFGNode.value>];
+                FCs: for my $f (@$for) {
+                  if ($f =~ /^!=(.+)$/) {        ## -- NOT EQUAL TO
+                    my $uri = $self-><AG::ManakaiDISElement.qnameToURI> ($1);
+                    my $f = $self-><AG::ManakaiDISNode.ownerDISDocument>
+                                 -><AG::ManakaiDISDocument.disDatabase>
+                                 -><M::ManakaiDISDatabase.getFor> ($uri);
+                    $f-><AG::ManakaiDISForDefinition.isReferred> ($ce);
+                    for my $arg_uri ($for_arg, @{$forp_arg}) {
+                      if ($uri eq $arg_uri) {
+                        $r = false;
+                        last FORMATCH;
+                      }
+                    }
+                  } elsif ($f =~ /^!(.+)$/) {    ## -- NOT ISA
+                    my $uri = $self-><AG::ManakaiDISElement.qnameToURI> ($1);
+                    my $f = $self-><AG::ManakaiDISNode.ownerDISDocument>
+                                 -><AG::ManakaiDISDocument.disDatabase>
+                                 -><M::ManakaiDISDatabase.getFor> ($uri);
+                    $f-><AG::ManakaiDISForDefinition.isReferred> ($ce);
+                    for my $arg_uri ($for_arg, @{$forp_arg}) {
+                      if ($f-><M::ManakaiDISForDefinition.isaURI> ($arg_uri)) {
+                        $r = false;
+                        last FORMATCH;
+                      }
+                    }
+                  } elsif ($f =~ /^=(.+)$/) {    ## -- EQUAL TO
+                    my $uri = $self-><AG::ManakaiDISElement.qnameToURI> ($1);
+                    my $f = $self-><AG::ManakaiDISNode.ownerDISDocument>
+                                 -><AG::ManakaiDISDocument.disDatabase>
+                                 -><M::ManakaiDISDatabase.getFor> ($uri);
+                    $f-><AG::ManakaiDISForDefinition.isReferred> ($ce);
+                    for my $arg_uri ($for_arg, @{$forp_arg}) {
+                      if ($arg_uri eq $uri) {
+                        next FCs;
+                      }
+                    }
+                    $r = false;
+                    last FORMATCH;
+                  } else {                       ## -- ISA
+                    my $uri = $self-><AG::ManakaiDISElement.qnameToURI> ($1);
+                    my $f = $self-><AG::ManakaiDISNode.ownerDISDocument>
+                                 -><AG::ManakaiDISDocument.disDatabase>
+                                 -><M::ManakaiDISDatabase.getFor> ($uri);
+                    $f-><AG::ManakaiDISForDefinition.isReferred> ($ce);
+                    for my $arg_uri ($for_arg, @{$forp_arg}) {
+                      if ($f-><M::ManakaiDISForDefinition.isaURI> ($arg_uri)) {
+                        next FCs;
+                      }
+                    }
+                    $r = false;
+                    last FORMATCH;
+                  }
+                } # FCs
+              } # dis:ForCheck
+            } # children
+
+            my $has_for = false;
+            for my $ce (@ce) {
+              if ($self-><AG::swcfg21:SWCFGElement.expandedURI> eq
+                  <Q::dis:For>) {
+                my $for = [split /\s+/, $ce-><AG::swcfg21:SWCFGNode.value>];
+                my $ok = true;
+                $has_for = true;
+                AFOR: for my $f (@$for) {
+                  if ($f =~ /^!=(.+)$/) {         ## -- NOT EQUAL TO
+                    my $uri = $self-><AG::ManakaiDISElement.qnameToURI> ($1);
+                    my $f = $self-><AG::ManakaiDISNode.ownerDISDocument>
+                                 -><AG::ManakaiDISDocument.disDatabase>
+                                 -><M::ManakaiDISDatabase.getFor> ($uri);
+                    $f-><AG::ManakaiDISForDefinition.isReferred> ($ce);
+                    if ($uri eq $for_arg) {
+                      $ok = false;
+                      last AFOR;
+                    }
+                  } elsif ($f =~ /^!(.+)$/) {     ## -- NOT ISA
+                    my $uri = $self-><AG::ManakaiDISElement.qnameToURI> ($1);
+                    my $f = $self-><AG::ManakaiDISNode.ownerDISDocument>
+                                 -><AG::ManakaiDISDocument.disDatabase>
+                                 -><M::ManakaiDISDatabase.getFor> ($uri);
+                    $f-><AG::ManakaiDISForDefinition.isReferred> ($ce);
+                    if ($f-><M::ManakaiDISForDefinition.isaURI> ($for_arg)) {
+                      $ok = false;
+                      last AFOR;
+                    }
+                  } elsif ($f =~ /^=(.+)$/) {     ## -- EQUAL TO
+                    my $uri = $self-><AG::ManakaiDISElement.qnameToURI> ($1);
+                    my $f = $self-><AG::ManakaiDISNode.ownerDISDocument>
+                                 -><AG::ManakaiDISDocument.disDatabase>
+                                 -><M::ManakaiDISDatabase.getFor> ($uri);
+                    $f-><AG::ManakaiDISForDefinition.isReferred> ($ce);
+                    unless ($uri eq $for_arg) {
+                      $ok = false;
+                      last AFOR;
+                    }
+                  } else {                        ## -- ISA
+                    my $uri = $self-><AG::ManakaiDISElement.qnameToURI> ($1);
+                    my $f = $self-><AG::ManakaiDISNode.ownerDISDocument>
+                                 -><AG::ManakaiDISDocument.disDatabase>
+                                 -><M::ManakaiDISDatabase.getFor> ($uri);
+                    $f-><AG::ManakaiDISForDefinition.isReferred> ($ce);
+                    unless ($f-><M::ManakaiDISForDefinition.isaURI> ($for_arg)) {
+                      $ok = false;
+                      last AFOR;
+                    }
+                  }
+                } # AFOR
+              } # dis:For
+              if ($ok) {
+                $r = true;
+                last FORMATCH;
+              }
+            } # $ce
+            $r = $has_for ? false : true;
+          }__;
+        } # FORMATCH
 
   @Method:
     @@Name: mediaTypeMatch
@@ -602,6 +711,27 @@ ClsDef:
         @@@@lang:en
         @@@@@:
           Whether this element is of <P::mediaType> or not. 
+      @@@PerlDef:
+        if (defined $mediaType) {
+          __DEEP{
+            my $ctn = $self-><M::ManakaiDISElement.disGetAttribute>
+                                               (<Q::dis:ContentType>);
+            my $ct;
+            $ct = $ctn-><AG::ManakaiDISElement.qnameValueURI> if $ctn;
+            $ct = $defaultMediaType unless defined $ct;
+            my $res = $self-><AG::ManakaiDISNode.ownerDISDocument>
+                                 -><AG::ManakaiDISDocument.disDatabase>
+                                 -><M::ManakaiDISDatabase.getResource> ($ct);
+            $res-><AS::ManakaiDISResourceDefinition.isReferred> ($ctn or $self);
+            unless ($res-><M::ManakaiDISResourceDefinition.subsetOfURI> ($ct)) {
+              $r = false;
+            } else {
+              $r = true;
+            }
+          }__;
+        } else {
+          $r = true;
+        }
 
   @Method:
     @@Name: prefixToURI
@@ -770,7 +900,6 @@ ClsDef:
         @@@@lang:en
         @@@@@:
           The <TYPE::dis:TypeForQNames>-expanded URI references.  
-          If it is canonicalizable, this method does canonicalize it. 
       @@@UndeclaredPrefixException:
       @@@PerlDef:
         my ($typeq, $forq) = split /\s*::\s*/, $tfqnames, 2;
@@ -802,7 +931,136 @@ ClsDef:
                     -><M::DISImplementation.typeforqnamesToURI>
                                                   ($typeURI, $forURI);
         }__;
+
+  @Method:
+    @@Name: disGetAttribute
+    @@enDesc:
+      Gets an attribute node. 
+    @@Param:
+      @@@Name: attrName
+      @@@Type: AnyURI
+      @@@enDesc:
+        The name expanded URI of the node to retrieve. 
+    @@ForParam:
+    @@ForpParam:
+    @@MediaTypeParam:
+    @@MediaTypeDefaultParam:
+    @@Return:
+      @@@Type: ManakaiDISElement
+      @@@enDesc:
+        The attribute (property) element node. 
+      @@@nullCase:
+        @@@@enDesc:
+          No attribute node found. 
+      @@@PerlDef:
+        for my $c (@{$self->{src}-><AG::ManakaiDISElement.disChildElements>}) {
+          if ($c-><AG::DISElement.expandedURI> eq $attrName and
+              $c-><AG::ManakaiDISElement.forMatch> ($forArg, $forpArg) and
+              $c-><AG::ManakaiDISElement.mediaTypeMatch>
+                                         ($mediaType, $mediaTypeDefault)) {
+            $r = $c;
+            last;
+          }
+        }
+
+  @Method:
+    @@Name: disGetAttributeList
+    @@enDesc:
+      Gets attribute nodes. 
+    @@AttrNameParam:
+    @@ForParam:
+    @@ForpParam:
+    @@MediaTypeParam:
+    @@MediaTypeDefaultParam:
+    @@Return:
+      @@@Type: ManakaiDISElementList
+      @@@enDesc:
+        The attribute (property) element nodes. 
+      @@@PerlDef:
+        $r = bless [], <ClassName::ManakaiDISElementList>;
+        for my $c (@{$self->{src}-><AG::ManakaiDISElement.disChildElements>}) {
+          if ($c-><AG::DISElement.expandedURI> eq $attrName and
+              $c-><AG::ManakaiDISElement.forMatch> ($forArg, $forpArg) and
+              $c-><AG::ManakaiDISElement.mediaTypeMatch>
+                                         ($mediaType, $mediaTypeDefault)) {
+            push @$r, $c;
+          }
+        }
+
+  @Attr:
+    @@Name: disChildElements
+    @@Type: ManakaiDISElementList
+    @@enDesc:
+      A list of child elements.  
+    @@Get:
+      @@@enDesc:
+        The current snapshot of child nodes. 
+      @@@PerlDef:
+        $r = bless [@{$self-><AG::swcfg21:SWCFGElement.childNodes>}],
+                   <ClassName::ManakaiDISElementList>;    
+
+  @Attr:
+    @@Name: qnameValueURI
+    @@enDesc:
+      The element value (written as <TYPE::dis:TypeQName>), as URI reference. 
+      \
+      {NOTE:: What should be if list value?
+      \
+      }
+    @@Get:
+      @@@Type:AnyURI
+      @@@nullCase:
+        @@@@enDesc:
+          No value. 
+      @@@UndeclaredPrefixException:
+      @@@GetProp:
+        my $v = $self-><AG::swcfg21:SWCFGNode.value>;
+        if (defined $v and not ref $v eq 'ARRAY') {
+          __DEEP{
+            $r = $self-><AG::ManakaiDISElement.qnameToURI> ($v);
+          }__;
+        } else {
+          $r = null;
+        }
+
+  @Attr:
+    @@Name: typeforqnamesValueURI
+    @@enDesc:
+      The element value (written as <TYPE::dis:TypeForQNames>),
+      as URI reference. 
+      \
+      {NOTE:: What should be if list value?
+      \
+      }
+    @@Get:
+      @@@Type:ResourceURI
+      @@@nullCase:
+        @@@@enDesc:
+          No value. 
+      @@@UndeclaredPrefixException:
+      @@@GetProp:
+        my $v = $self-><AG::swcfg21:SWCFGNode.value>;
+        if (defined $v and not ref $v eq 'ARRAY') {
+          __DEEP{
+            $r = $self-><AG::ManakaiDISElement.typeforqnamesToURI> ($v);
+          }__;
+        } else {
+          $r = null;
+        }
 ##DISElement
+
+ClsDef:
+  @ClsQName: ManakaiDISElementList
+  @enDesc:
+    @@lang:en
+    @@@:
+      Lists of elements. 
+      \
+      {NOTE:: <Class::ManakaiDISElementList> is <QUOTE::dead>; 
+              later changes to the tree does not affect this type of objects. 
+      \
+      }
+##DISElementList
 
 ClsDef:
   @ClsQName: ManakaiDISComment
@@ -835,7 +1093,741 @@ ClsDef:
     @@lang:en
     @@@:
       <QUOTE::dis> document node objects. 
+
+  @Attr:
+    @@Name: disDatabase
+    @@enDesc:
+      Associated <QUOTE::dis> database. 
+
+    @@Type: ManakaiDISDatabase
+    @@Get:
+      @@@NoDBException:
+      @@@PerlDef:
+        if ($self->{<Q::TreeCore:node>}->{<Q::db>}) {
+          $self = $self->{<Q::TreeCore:node>}->{<Q::db>};
+        } else {
+          __EXCEPTION{NO_ASSOCIATED_DB_ERR}__;
+        }
+    @@Set:
+      @@@PerlDef:
+        $self->{<Q::TreeCore:node>}->{<Q::db>} = $given;
+        require Scalar::Util;
+        Scalar::Util::weaken ($self->{<Q::TreeCore:node>}->{<Q::db>});
 ##DISDocument
+
+PropDef:
+  @QName: db
+  @enDesc:
+    Associated <QUOTE::dis> database. 
+  @rdfs:domain: ManakaiDISDocument
+  @rdfs:range: ManakaiDISDatabase
+
+## -- Definition object database
+
+ClsDef:
+  @ClsQName: ManakaiDISDatabase
+  @enDesc:
+    Resource database created from <QUOTE::dis> source data. 
+
+  @Method:
+    @@Name: typeforurisToURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Converts a pair of name URI reference and <QUOTE::for> URI reference 
+        into a <TYPE::dis:TypeForQNames>-expanded URI reference. 
+    @@Param:
+      @@@Name: typeURI
+      @@@Type: NameURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A URI reference to identify a resource. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Equivalent to <Q::DOMMain:any> (for historical reason). 
+    @@Param:
+      @@@Name: forURI
+      @@@Type: ForURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A <QUOTE::for> URI reference. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Equivalent to <QUOTE::for all>, i.e. <Q::ManakaiDOM:all>. 
+    @@Return:
+      @@@Type: 
+        DISCore:TypeForURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The <TYPE::dis:TypeForQNames>-expanded URI references.  
+      @@@PerlDef:
+        $typeURI = <Q::DOMMain:any> unless defined $typeURI;
+        $forURI = <Q::ManakaiDOM:all> unless defined $forURI;
+        if ($forURI eq <Q::ManakaiDOM:all>) {
+          $r = $typeURI;
+        } else {
+          ## NOTE: [RFC 3986]
+          ##       fragment    := *(pchar / "/" / "?")
+          ##       pchar       := unreserved / pct-encoded / sub-delims / [:@]
+          ##       unreserved  := ALPHA / DIGIT / [._~-]
+          ##       sub-delims  := [!$&'()*+,;=]
+          ## NOTE: [XPointer Framework]
+          ##       SchemeData  := *EscapedData
+          ##       EscapedData := NormalChar / "^(" / "^)" / "^^"
+          ##                    / "(" SchemeData ")"
+          ##       NormalChar  := UnicodeChar - [()^]
+          for my $uri ($typeURI, $forURI) {
+            $uri =~ s{([^0-9A-Za-z:;?=_./-])}{sprintf '%%%02X', ord $1}ge;
+          }
+          $r =qq<data:,200411tf#xmlns(t=data:,200411tf%23)>.
+                             qq<t:tf($typeURI,$forURI)>;
+        }
+
+  @Method:
+    @@Name: getModule
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns a <QUOTE::dis> module definition. 
+    @@Param:
+      @@@Name: modURI
+      @@@Type: ModuleURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A <QUOTE::dis> module URI reference. 
+    @@Return:
+      @@@Type: ManakaiDISModuleDefinition
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The module definition. 
+      @@@PerlDef:
+        if (defined $self->{modDef}->{$modURI}) {
+          $r = $self->{modDef}->{$modURI};
+        } else {
+          $r = $self->{modDef}->{$modURI}
+             = bless {
+                 uri => $modURI,
+                 db => $self,
+                 for => <Q::ManakaiDOM:all>,
+                 forp => [],
+               }, <ClassName::ManakaiDISModuleDefinition>;
+          require Scalar::Util;
+          Scalar::Util::weaken ($r->{db});
+        }
+
+  @Method:
+    @@Name: getFor
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns a <QUOTE::for> definition object. 
+    @@Param:
+      @@@Name: forURI
+      @@@Type: ForURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A <QUOTE::for> URI reference. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Defaulted to <Q::ManakaiDOM:all>. 
+    @@Return:
+      @@@Type: ManakaiDISForDefinition
+      @@@PerlDef:
+        $forURI = <Q::ManakaiDOM:all> unless defined $forURI;
+        if (defined $self->{forDef}->{$forURI}) {
+          $r = $self->{forDef}->{$forURI};
+        } else {
+          $r = $self->{forDef}->{$forURI}
+             = bless {
+                 uri => $forURI,
+                 isa => {<Q::ManakaiDOM:all> => true},
+                 revISA => {},
+                 db => $self,
+               }, <ClassName::ManakaiDISForDefinition>;
+          $self->{forDef}->{<Q::ManakaiDOM:all>}->{revISA}->{$forURI} = true;
+          require Scalar::Util;
+          Scalar::Util::weaken ($r->{db});
+        }
+
+  @Method:
+    @@Name: getResource
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns a <QUOTE::dis> resource definition. 
+    @@Param:
+      @@@Name: resURI
+      @@@Type: ResourceURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A <QUOTE::dis> resource URI reference. 
+      @@@InCase:
+        @@@@nullValue:
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Defaulted to <Q::DOMMain:any>. 
+    @@Return:
+      @@@Type: ManakaiDISResourceDefinition
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The resource definition. 
+      @@@PerlDef:
+        $resURI = <Q::DOMMain:any> unless defined $resURI;
+        if (defined $self->{resDef}->{$resURI}) {
+          $r = $self->{resDef}->{$resURI};
+        } else {
+          $r = $self->{resDef}->{$resURI}
+             = bless {
+                 uri => $resURI,
+                 subOf => {},
+                 supOf => {},
+                 db => $self,
+                 for => <Q::ManakaiDOM:all>,
+                 forp => [],
+               }, <ClassName::ManakaiDISResourceDefinition>;
+          require Scalar::Util;
+          Scalar::Util::weaken ($r->{db});
+        }
+##DISDatabase
+
+ClsDef:
+  @ClsQName: ManakaiDISModuleDefinition
+  @enDesc:
+    <QUOTE::dis> module definitions. 
+  @ClsISA: ManakaiDISPropertyAccessor
+  
+  @Attr:
+    @@Name: uri
+    @@Type: ModuleURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The URI reference of this <QUOTE::dis> module. 
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{uri};
+
+  @Attr:
+    @@Name: nameURI
+    @@Type: NameURI
+    @@enDesc:
+      The URI reference of this module, without 
+      <QUOTE::for> identifier. 
+    @@Get:
+      @@@PropDef:
+        $r = $self->{uri};
+
+  @Attr:
+    @@Name: localName
+    @@enDesc:
+      The local name of this module. 
+    @@Type:
+      DISCore:localName
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{localName};
+
+  @Attr:
+    @@Name: namespaceURI
+    @@Type: AnyURI
+    @@enDesc:
+      The namespace URI of the name of this resource. 
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{namespaceURI};
+
+  @Attr:
+    @@Name: forURI
+    @@Type: ForURI
+    @@enDesc:
+      The <QUOTE::for> URI reference for which this module is defined. 
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{for};
+
+  @Attr:
+    @@Name: isDefined
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Whether this module is defined or not. 
+    @@Type:
+      DOMMain:boolean
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{<Q::isDefined>};
+
+  ## TODO: exception handler
+##DISModuleDefinition
+
+ClsDef:
+  @ClsQName: ManakaiDISForDefinition
+  @Description:
+    @@lang:en
+    @@@:
+      <QUOTE::dis> <QUOTE::for> definitions. 
+  
+  @Attr:
+    @@Name: uri
+    @@Type: ForURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The URI reference of this <QUOTE::for>. 
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{uri};
+  
+  @Method:
+    @@Name: isaURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Whether this <QUOTE::for> is-a another <QUOTE::for> or not. 
+    @@Param:
+      @@@Name: superURI
+      @@@Type: ForURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Another <QUOTE::for> URI reference to test. 
+    @@Return:
+      @@@Type: 
+        DOMMain:boolean
+      @@@TrueCase:
+        @@@@enDesc:
+          <P::superURI> is a super-<QUOTE::for> of this <QUOTE::for>. 
+      @@@FalseCase:
+        @@@@enDesc:
+          <P::superURI> is not a super-<QUOTE::for> of this <QUOTE::for>. 
+      @@@PerlDef:
+        $r = $self->{uri} eq $superURI ? true : $self->{isa}->{$superURI};
+
+  @Attr:
+    @@Name: isDefined
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Whether this <QUOTE::for> is already defined or not. 
+    @@Type:
+      DOMMain:boolean
+    @@Get:
+      @@@TrueCase:
+        This <QUOTE::for> is already defined. 
+      @@@FalseCase:
+        This <QUOTE::for> is not defined. 
+      @@@PerlDef:
+        $r = $self->{<Q::isDefined>};
+
+  @Attr:
+    @@Name: isReferred
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Whether this <QUOTE::for> is referred somewhere or not. 
+    @@Type:
+      DOMMain:any
+    @@Get:
+      @@@InCase:
+        @@@@Type:ManakaiDISElement
+        @@@@enDesc:
+          This <QUOTE::for> is referred by the element. 
+      @@@nullCase:
+        This <QUOTE::for> is not referred. 
+      @@@PerlDef:
+        $r = $self->{<Q::isReferred>};
+    @@Set:
+      @@@InCase:
+        @@@@Type:ManakaiDISElement
+        @@@@enDesc:
+          This <QUOTE::for> is referred by the element. 
+      @@@PerlDef:
+        $self->{<Q::isReferred>} = true if $given;
+
+  @Attr:
+    @@Name: definingModule
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The <QUOTE::dis> module in which this <QUOTE::for> is defined.
+    @@Type: ManakaiDISModuleDefinition
+    @@Get:
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The module object. 
+      @@@NullCase:
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            This <QUOTE::for> is not associated to any module. 
+      @@@PerlDef:
+        $r = $self->{db}
+                  -><M::ManakaiDISDatabase.getResource>
+                           ($self->{<Q::definingModule>})
+           if defined $self->{<Q::definingModule>};
+  
+  @Method:
+    @@Name: readDefinition
+    @@enDesc:
+      Reads <QUOTE::for> definition and sets attributes. 
+    @@Param:
+      @@@Name: forDefElement
+      @@@Type: ManakaiDISElement
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A <CODE::ForDef> element containing definition of this <QUOTE::for>. 
+    @@Return:
+      @@@RaiseException:
+        @@@@@:FOR_ALREADY_DEFINED_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: 
+            The <QUOTE::for> definition for this <QUOTE::for> is already read. 
+      @@@PerlDef:
+        if ($self->{<Q::isDefined>}) {
+          __EXCEPTION{FOR_ALREADY_DEFINED_ERR}__;
+        }
+        ## TODO: 
+        $self->{<Q::isDefined>} = true;
+
+  ## TODO: exception handler
+##DISForDefinition
+
+ClsDef:
+  @ClsQName: ManakaiDISResourceDefinition
+  @enDesc:
+    <QUOTE::dis> resource definitions. 
+  @ClsISA: ManakaiDISPropertyAccessor
+  
+  @Attr:
+    @@Name: uri
+    @@Type: ResourceURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The URI reference of this <QUOTE::dis> resource. 
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{uri};
+
+  @Attr:
+    @@Name: nameURI
+    @@Type: NameURI
+    @@enDesc:
+      The URI reference of this <QUOTE::dis> resource, without 
+      <QUOTE::for> identifier. 
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          This resource does not have its name URI reference. 
+      @@@PropDef:
+        $r = $self->{uri};
+
+  @Attr:
+    @@Name: localName
+    @@enDesc:
+      The local name of this resource. 
+    @@Type:
+      DISCore:localName
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          This resource does not have its local name. 
+      @@@PerlDef:
+        $r = $self->{localName};
+
+  @Attr:
+    @@Name: namespaceURI
+    @@Type: AnyURI
+    @@enDesc:
+      The namespace URI of the name of this resource. 
+    @@Get:
+      @@@nullCase:
+        The name of this resource does not have its namespace 
+        or this resource does not have its name. 
+      @@@PerlDef:
+        $r = $self->{namespaceURI};
+
+  @Attr:
+    @@Name: isAnonymous
+    @@enDesc:
+      Whether this <QUOTE::dis> resource has name or not. 
+    @@Type: 
+      DOMMain:boolean
+    @@Get:
+      @@@TrueCase:
+        This resource does not have any global unique name. 
+        <A::ManakaiDISResourceDefinition.uri> is a temporary URI reference. 
+      @@@FalseCase:
+        This resource does have its formal name. 
+        <A::ManakaiDISResourceDefinition.uri> is a URI reference 
+        generated from the name and the <QUOTE::for> URI reference 
+        of this resource. 
+      @@@PerlDef:
+        $r = $self->{<Q::isAnon>};
+
+  @Attr:
+    @@Name: forURI
+    @@enDesc:
+      The <QUOTE::for> URI reference for which this resource is defined. 
+    @@Type:ForURI
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{for};
+
+  @Attr:
+    @@Name: forpURI
+    @@enDesc:
+      The <QUOTE::for+> URI references for which this resource is defined. 
+    @@Type: ForURIList
+    @@Get:
+      @@@PropDef:
+        $r = $self->{forp};
+  
+  @Method:
+    @@Name: subsetOfURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Whether this resource is a subset of another resource or not. 
+    @@Param:
+      @@@Name: superURI
+      @@@Type: ResourceURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Another resource URI reference to test. 
+    @@Return:
+      @@@Type: 
+        DOMMain:boolean
+      @@@TrueCase:
+        @@@@enDesc:
+          <P::superURI> is a super-resource of this resource. 
+      @@@FalseCase:
+        @@@@enDesc:
+          <P::superURI> is not a super-resource of this resource. 
+      @@@PerlDef:
+        $r = $superURI eq $self->{uri} ? true : $self->{subOf}->{$superURI};
+
+  @Attr:
+    @@Name: isDefined
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Whether this resource is already defined or not. 
+    @@Type:
+      DOMMain:boolean
+    @@Get:
+      @@@TrueCase:
+        This resource is already defined. 
+      @@@FalseCase:
+        This resource is not defined. 
+      @@@PerlDef:
+        $r = $self->{<Q::isDefined>};
+
+  @Attr:
+    @@Name: isReferred
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Whether this resource is referred or not. 
+    @@Type:
+      DOMMain:any
+    @@Get:
+      @@@InCase:
+        @@@@Type:ManakaiDISElement
+        @@@@enDesc:
+          This resource is referred by the element. 
+      @@@nullCase:
+        This resource is not referred. 
+      @@@PerlDef:
+        $r = $self->{<Q::isReferred>};
+    @@Set:
+      @@@InCase:
+        @@@@Type:ManakaiDISElement
+        @@@@enDesc:
+          This resource is referred by this element. 
+      @@@PerlDef:
+        $self->{<Q::isReferred>} = $given if $given;
+
+  @Attr:
+    @@Name: definingModule
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The <QUOTE::dis> module in which this resource is defined.
+    @@Type: ManakaiDISModuleDefinition
+    @@Get:
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The module object. 
+      @@@NullCase:
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            This resource is not associated to any module. 
+      @@@PerlDef:
+        $r = $self->{db}
+                  -><M::ManakaiDISDatabase.getModule>
+                           ($self->{<Q::definingModule>})
+           if defined $self->{<Q::definingModule>};
+   @@Set:
+     @@@Description:
+       @@@@lang:en
+       @@@@@:
+         The module object to which the <QUOTE::defining module> is set. 
+     @@@PerlDef:
+       $self->{<Q::defininingModule>}
+                 = $given-><AG::ManakaiDISModuleDefinition.uri>;
+   
+
+  ## TODO: exception handler
+##DISResourceDefinition
+
+ClsDef:
+  @ClsQName: ManakaiDISPropertyAccessor
+  @enDescription:
+    Accessor methods for resource or module properties. 
+  
+  @Method:
+    @@Name: getPropertyText
+    @@enDesc:
+      Gets property value text. 
+    @@PropNameParam:
+    @@Param:
+      @@@Name:default
+      @@@Type:
+        swcfg21:SWCFGString
+      @@@enDesc:
+        The default value that is returned if no explicit property 
+        value specification found for this resource. 
+      @@@nullCase:
+        @@@@enDesc:
+          No default value supplied; <DOM::null> is returned if 
+          no value specified. 
+    @@Return:
+      @@@Type:
+        swcfg21:SWCFGString
+      @@@enDesc:
+        The property value string. 
+      @@@nullCase:
+        @@@@enDesc:
+          No value nor default value has specified. 
+      @@@PerlDef:
+        if (exists $self->{$propName}) {
+          $r = defined $self->{$propName} ? $self->{$propName} : $default;
+        } elsif ($self->{src}) {
+          $r = $self->{src}-><M::ManakaiDISElement.disGetAttribute>
+                                ($propName, for_arg => $self->{for},
+                                 forp_arg => $self->{forp});
+          $self->{$propName} = $r;
+          $r = $default unless defined $r;
+        } else {
+          $r = $default;
+        }
+        
+  @Method:
+    @@Name: getPropertyResource
+    @@enDesc:
+      Gets property value resource. 
+    @@PropNameParam:
+    @@Return:
+      @@@Type: ManakaiDISResourceDefinition
+      @@@enDesc:
+        The property value resource. 
+      @@@nullCase:
+        @@@@enDesc:
+          No value has specified. 
+      @@@PerlDef:
+        if (defined $self->{$propName}) {
+          $r = $self->{db}-><M::ManakaiDISDatabase.getResource>
+                                             ($self->{$propName});
+        } else {
+          $r = null;
+        }
+
+  @Method:
+    @@Name: addPropertyResourceList
+    @@enDesc:
+      Adds a resource to a resource-list property value. 
+      \
+      {ISSUE:: Should an exception be thrown if the property is 
+               not of list?
+      \
+      }
+    @@PropNameParam:
+    @@Param:
+      @@@Name: res
+      @@@Type: ManakaiDISResourceDefinition
+      @@@enDesc:
+        A resource to add. 
+    @@Return:
+      @@@PerlDef:
+        if (ref $self->{$propName} eq 'ARRAY') {
+          push @{$self->{$propName}}, $res->{uri};
+        } elsif (not defined $self->{$propName}) {
+          $self->{$propName} = [$res->{uri}];
+        }
+
+##DISPropertyAccessor
+
+PropDef:
+  @QName:isAnon
+  @Description:
+    @@lang:en
+    @@@:
+      Whether the subject resource is anonymous or not. 
+  @Type:
+    DOMMain:boolean
+
+PropDef:
+  @QName:isDefined
+  @Description:
+    @@lang:en
+    @@@:
+      Whether the subject resource is defined or not. 
+
+PropDef:
+  @Qname:isReferred
+  @Description:
+    @@lang:en
+    @@@:
+      Whether the subject resource is referred or not. 
+  @Type:
+    DOMMain:any
+
+PropDef:
+  @QName:definingModule
+  @Description:
+    @@lang:en
+    @@@:
+      The <QUOTE::dis> module in which the subject resource is defined. 
+  @rdfs:domain:
+    DISCore:Module
 
 ## -- Datatypes
 
