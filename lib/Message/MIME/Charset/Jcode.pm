@@ -63,7 +63,7 @@ Message::MIME::Charset::Encode.
 package Message::MIME::Charset::Jcode;
 use strict;
 use vars qw(%CODE $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::MIME::Charset;
@@ -151,11 +151,7 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset ('euc-jp' =>
         encoder	=> sub {
           my $s = jcode::euc ($_[1], $CODE{internal});
-          if ($s =~ /[\x80-\xFF]/) {
-            ($s, charset => 'euc-jp');
-          } else {
-            ($s, charset => 'us-ascii');
-          }
+          ($s, euc_japan_mime_charset_name ($s));
         },
         decoder	=> sub { jcode::to ($CODE{internal}, $_[1], 'euc') },
         mime_text	=> 1,
@@ -163,13 +159,7 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset (shift_jis =>
         encoder	=> sub {
           my $s = jcode::sjis ($_[1], $CODE{internal});
-          if ($s =~ /[\x80-\xFF]/) {
-            ($s, charset => 'shift_jis');
-          } elsif ($s =~ /[\x5C\x7E]/) {
-            ($s, charset => 'jis_x0201');
-          } else {
-            ($s, charset => 'us-ascii');
-          }
+          ($s, shift_jis_mime_charset_name ($s));
         },
         decoder	=> sub { jcode::to ($CODE{internal}, $_[1], 'sjis') },
         mime_text	=> 1,
@@ -177,7 +167,6 @@ sub import ($;%) {
     } elsif ($_ eq 'Jcode' || $_ eq 'Jcode.pm') {
       require Jcode;
       Message::MIME::Charset::make_charset ('*default' =>
-        ## Very tricky:-)
         encoder	=> sub { my $s = $_[1]; Jcode::convert (\$s, $CODE{output}, $CODE{internal}); $s },
         decoder	=> sub { my $s = $_[1]; Jcode::convert (\$s, $CODE{internal}, $CODE{input}); $s },
         mime_text	=> 1,
@@ -194,11 +183,7 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset ('euc-jp' =>
         encoder	=> sub {
           my $s = Jcode->new ($_[1], $CODE{internal})->euc;
-          if ($s =~ /[\x80-\xFF]/) {
-            ($s, charset => 'euc-jp');
-          } else {
-            ($s, charset => 'us-ascii');
-          }
+          ($s, euc_japan_mime_charset_name ($s));
         },
         decoder	=> sub { my $s = $_[1]; Jcode::convert (\$s, $CODE{internal}, 'euc'); $s },
         mime_text	=> 1,
@@ -206,13 +191,7 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset (shift_jis =>
         encoder	=> sub {
           my $s = Jcode->new ($_[1], $CODE{internal})->sjis;
-          if ($s =~ /[\x80-\xFF]/) {
-            ($s, charset => 'shift_jis');
-          } elsif ($s =~ /[\x5C\x7E]/) {
-            ($s, charset => 'jis_x0201');
-          } else {
-            ($s, charset => 'us-ascii');
-          }
+          ($s, shift_jis_mime_charset_name ($s));
         },
         decoder	=> sub { my $s = $_[1]; Jcode::convert (\$s, $CODE{internal}, 'sjis'); $s },
         mime_text	=> 1,
@@ -252,11 +231,7 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset ('euc-jp' =>
         encoder	=> sub {
           my $s = nkf ( "-e -".uc (substr ($CODE{internal}, 0, 1)), $_[1] );
-          if ($s =~ /[\x80-\xFF]/) {
-            ($s, charset => 'euc-jp');
-          } else {
-            ($s, charset => 'us-ascii');
-          }
+          ($s, euc_japan_mime_charset_name ($s));
         },
         decoder	=> sub { nkf ( "-". substr ($CODE{internal}, 0, 1) . " -E", $_[1] ) },
         mime_text	=> 1,
@@ -264,13 +239,7 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset (shift_jis =>
         encoder	=> sub {
           my $s = nkf ( "-s -".uc (substr ($CODE{internal}, 0, 1)), $_[1] );
-          if ($s =~ /[\x80-\xFF]/) {
-            ($s, charset => 'shift_jis');
-          } elsif ($s =~ /[\x5C\x7E]/) {
-            ($s, charset => 'jis_x0201');
-          } else {
-            ($s, charset => 'us-ascii');
-          }
+          ($s, shift_jis_mime_charset_name ($s));
         },
         decoder	=> sub { nkf ( "-". substr ($CODE{internal}, 0, 1) . " -S", $_[1] ) },
         mime_text	=> 1,
@@ -296,11 +265,7 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset ('euc-jp' =>
         encoder	=> sub {
           my $s = Unicode::Japanese->new ($_[1], $CODE{internal})->euc;
-          if ($s =~ /[\x80-\xFF]/) {
-            ($s, charset => 'euc-jp');
-          } else {
-            ($s, charset => 'us-ascii');
-          }
+          ($s, euc_japan_mime_charset_name ($s));
         },
         decoder	=> sub { Unicode::Japanese->new ($_[1], 'euc')->conv ($CODE{internal}) },
         mime_text	=> 1,
@@ -308,13 +273,7 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset (shift_jis =>
         encoder	=> sub {
           my $s = Unicode::Japanese->new ($_[1], $CODE{internal})->sjis;
-          if ($s =~ /[\x80-\xFF]/) {
-            ($s, charset => 'shift_jis');
-          } elsif ($s =~ /[\x5C\x7E]/) {
-            ($s, charset => 'jis_x0201');
-          } else {
-            ($s, charset => 'us-ascii');
-          }
+          ($s, shift_jis_mime_charset_name ($s));
         },
         decoder	=> sub { Unicode::Japanese->new ($_[1], 'sjis')->conv ($CODE{internal}) },
         mime_text	=> 1,
@@ -372,6 +331,7 @@ sub import ($;%) {
     ## Defines common alias names
     Message::MIME::Charset::make_charset (jis => alias_of => 'iso-2022-jp');
     Message::MIME::Charset::make_charset (junet => alias_of => 'iso-2022-jp');
+    Message::MIME::Charset::make_charset ('junet-code' => alias_of => 'iso-2022-jp');
     Message::MIME::Charset::make_charset ('iso-2022-jp-1' => alias_of => 'iso-2022-jp');
     Message::MIME::Charset::make_charset ('iso-2022-jp-3' => alias_of => 'iso-2022-jp');
     Message::MIME::Charset::make_charset ('x-iso-2022-jp-3' => alias_of => 'iso-2022-jp-3');
@@ -383,6 +343,7 @@ sub import ($;%) {
     Message::MIME::Charset::make_charset ('euc-jisx0213' => alias_of => 'euc-jp');
     Message::MIME::Charset::make_charset ('x-euc-jisx0213' => alias_of => 'euc-jisx0213');
     Message::MIME::Charset::make_charset ('euc-jisx0213-plane1' => alias_of => 'euc-jisx0213');
+    Message::MIME::Charset::make_charset ('x-euc-jisx0213-packed' => alias_of => 'euc-jisx0213');
     Message::MIME::Charset::make_charset (sjis => alias_of => 'shift_jis');
     Message::MIME::Charset::make_charset ('shift-jis' => alias_of => 'shift_jis');
     Message::MIME::Charset::make_charset ('x-sjis' => alias_of => 'shift_jis');
@@ -414,6 +375,75 @@ sub iso_2022_mime_charset_name ($) {
           } else {
             (charset => 'us-ascii');
           }
+}
+
+## Returns MIME charset of 8bit ISO 2022 (EUC-Japan)
+sub euc_japan_mime_charset_name ($) {
+  my $s = shift;
+  if ($s =~ /[\x80-\xFF]/) {
+    if ($s =~ /\x8F[\xA1\xA3-\xA5\xA8\xAC-\xAF\xEE-\xFE][\xA1-\xFE]/) {
+      if ($s =~ /\x8F[\xA2\xA6\xA7\xA9-\xAB\xB0-\xED][\xA1-\xFE]/) {
+      ## JIS X 0213 plane 2 + JIS X 0212
+        (charset => 'x-euc-jisx0213-packed');
+      } else {
+        (charset => 'euc-jisx0213');
+      }
+    } elsif ($s =~ /(?<!\x8F)	## Not G3 character
+                    (?:	## JIS X 0213:2000
+                       [\xA9-\xAF\xF5-\xFE][\xA1-\xFE]
+                      |\xA2[\xAF-\xB9\xC2-\xC9\xD1-\xDB\xE9-\xF1\xFA-\xFD]
+                      |\xA3[\xA1-\xAF\xBA-\xC0\xDB-\xE0\xFB-\xFE]
+                      |\xA4[\xF4-\xFE]|\xA5[\xF7-\xFE]
+                      |\xA6[\xB9-\xC0\xD9-\xFE]|\xA7[\xC2-\xD0\xF2-\xFE]
+                      |\xA8[\xC1-\xFE]|\xCF[\xD4-\xFE]|\xF4[\xA7-\xFE]
+                    )
+                    (?=(?:[\xA1-\xFE][\xA1-\xFE])*(?:[\x00-\xA0FF]|\z))/x) {
+      if ($s =~ /\x8F/) {	## JIS X 0213 plane 1 + JIS X 0212
+        (charset => 'x-euc-jisx0213-packed');
+      } else {
+        (charset => 'euc-jisx0213-plane1');
+      }
+    } else {
+      (charset => 'euc-jp');
+    }
+  } else {
+    (charset => 'us-ascii');
+  }
+}
+
+## Returns MIME charset of 8bit ISO 2022 (EUC-Japan)
+sub shift_jis_mime_charset_name ($) {
+  my $s = shift;
+  if ($s =~ /[\x80-\xFF]/) {
+    if ($s =~ /
+                  (?:\G|[\x00-\x3F\x7F])
+                  (?:[\x81-\x9F\xE0-\xFC][\x40-\x7E\x80-\xFC]
+                    |[\x40-\x7E\xA1-\xDF])*
+               [\xF0-\xFC][\x40-\x7E\x80-\xFC]
+    /x) {
+      (charset => 'shift_jisx0213');
+    } elsif ($s =~ /
+                  (?:\G|[\x00-\x3F\x7F])
+                  (?:[\x81-\x9F\xE0-\xFC][\x40-\x7E\x80-\xFC]
+                    |[\x40-\x7E\xA1-\xDF])*
+              (?:
+               [\x85-\x87\xEB-\xEF][\x40-\x7E\x80-\xFC]
+              |\x81[\xAD-\xB7\xC0-\xC7\xCF-\xD9\xE9-\xEF\xF8-\xFB]
+              |\x82[\x40-\x4E\x59-\x5F\x7A-\x80\x9B-\x9E\xF2-\xFC]
+              |\x83[\x97-\x9E\xB7-\xBE\xD7-\xFC]
+              |\x84[\x61-\x6F\x72-\x9E\xBF-\xFC]
+              |\x88[\x40-\x9E]|\x98[\x73-\x9E]|\xEA[\xA5-\xFC]
+              )
+    /x) {
+      (charset => 'shift_jisx0213-plane1');
+    } else {
+      (charset => 'shift_jis');
+    }
+  } elsif ($s =~ /[\x5C\x7E]/) {
+    (charset => 'jis_x0201');
+  } else {
+    (charset => 'us-ascii');
+  }
 }
 
 =head1 EXAMPLE
@@ -471,7 +501,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/06 09:37:42 $
+$Date: 2002/06/06 11:24:10 $
 
 =cut
 
