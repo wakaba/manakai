@@ -8,7 +8,7 @@ Message::Body::TextPlain --- Perl Module for Internet Media Type "text/plain"
 package Message::Body::TextPlain;
 use strict;
 use vars qw(%DEFAULT @ISA $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Body::Text;
 push @ISA, qw(Message::Body::Text);
@@ -18,11 +18,13 @@ push @ISA, qw(Message::Body::Text);
   -_MEMBERS	=> [qw|_charset|],
   -body_default_charset	=> 'iso-2022-int-1',
   -body_default_charset_input	=> 'iso-2022-int-1',
+  -check_msmime	=> 1,
   #encoding_after_encode
   #encoding_before_decode
   #fill_ct	=> 0,
   #hook_encode_string
   #hook_decode_string
+  #internal_charset_name
   -media_type	=> 'text',
   -media_subtype	=> 'plain',
   -use_normalization	=> 1,
@@ -79,6 +81,13 @@ sub parse ($$;%) {
   my $ct; $ct = $self->{header}->field ('content-type', -new_item_unless_exist => 0) 
     if ref $self->{header};
   $charset = $ct->parameter ('charset') if ref $ct;
+    if ($charset && $self->{option}->{check_msmime}) {
+      my $msmime;
+      $msmime = $self->{header}->field ('x-mimeole', -new_item_unless_exist => 0) 
+        if ref $self->{header};
+      $msmime = $msmime =~ /Microsoft MimeOLE/i;
+      $charset = Message::MIME::Charset::msname2iananame ($charset) if $msmime;
+    }
   $charset ||= $self->{option}->{encoding_before_decode};
   my %s = &{$self->{option}->{hook_decode_string}} ($self, $body,
     type => 'body', charset => $charset);
@@ -121,14 +130,14 @@ sub stringify ($;%) {
     if ref $self->{header};
   my %e;
   unless ($self->{_charset}) {
-    my $charset; $charset = $ct->parameter ('charset') if ref $ct;
+    my $charset;
+    $charset = $ct->parameter ('*charset-to-be', -new_item_unless_exist => 0) if ref $ct;
+    $charset = $ct->parameter ('charset', -new_item_unless_exist => 0) if !$charset && ref $ct;
     $charset ||= $self->{option}->{encoding_after_encode};
     (%e) = &{$self->{option}->{hook_encode_string}} ($self, 
           $self->{value}, type => 'body',
           charset => $charset);
-    #$e{charset} ||= $self->{option}->{body_default_charset}
-    #  if $self->{option}->{body_default_charset_input}
-    #     ne $self->{option}->{body_default_charset};
+    $e{charset} ||= $self->{option}->{internal_charset_name} if $e{failed};
     ## Normalize
     if ($option{use_normalization}) {
       if ($Message::MIME::Charset::CHARSET{$charset || '*default'}->{mime_text}) {
@@ -189,7 +198,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/19 11:49:23 $
+$Date: 2002/07/21 03:23:50 $
 
 =cut
 

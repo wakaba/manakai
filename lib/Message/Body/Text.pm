@@ -8,7 +8,7 @@ Message::Body::Text --- Perl Module for Internet Media Types "text/*"
 package Message::Body::Text;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -24,8 +24,10 @@ use overload '""' => sub { $_[0]->stringify },
   	## header -- Don't clone
   -body_default_charset	=> 'iso-2022-int-1',
   -body_default_charset_input	=> 'iso-2022-int-1',
+  -check_msmime	=> 1,
   -hook_encode_string	=> \&Message::Util::encode_body_string,
   -hook_decode_string	=> \&Message::Util::decode_body_string,
+  #internal_charset_name
   -media_type	=> 'text',
   -media_subtype	=> 'plain',
   -parse_all	=> 0,
@@ -114,6 +116,13 @@ sub _parse ($$) {
     $ct = $self->{header}->field ('content-type', -new_item_unless_exist => 0) 
       if ref $self->{header};
     $charset = $ct->parameter ('charset', -new_item_unless_exist => 0) if ref $ct;
+    if ($charset && $self->{option}->{check_msmime}) {
+      my $msmime;
+      $msmime = $self->{header}->field ('x-mimeole', -new_item_unless_exist => 0) 
+        if ref $self->{header};
+      $msmime = $msmime =~ /Microsoft MimeOLE/i;
+      $charset = Message::MIME::Charset::msname2iananame ($charset) if $msmime;
+    }
   }
   unless ($charset) {
     $charset = $self->{option}->{encoding_before_decode};
@@ -183,11 +192,13 @@ sub stringify ($;%) {
   unless ($self->{_charset}) {
     my $charset;
     if ($option{use_param_charset}) {
-      $charset = $ct->parameter ('charset', -new_item_unless_exist => 0) if ref $ct;
+      $charset = $ct->parameter ('*charset-to-be', -new_item_unless_exist => 0) if ref $ct;
+      $charset = $ct->parameter ('charset', -new_item_unless_exist => 0) if !$charset && ref $ct;
     }
     $charset ||= $option{encoding_after_encode};
     (%e) = &{$option{hook_encode_string}} ($self, $v,
       type => 'body', charset => $charset);
+    $e{charset} ||= $self->{option}->{internal_charset_name} if $e{failed};
     ## Normalize
     if ($option{use_normalization}) {
       if ($Message::MIME::Charset::CHARSET{ $charset }->{mime_text}) {
@@ -250,7 +261,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/19 11:49:22 $
+$Date: 2002/07/21 03:23:50 $
 
 =cut
 
