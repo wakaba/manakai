@@ -16,7 +16,7 @@ This module is part of manakai XML.
 
 package Message::Markup::XML::QName;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NCNameStartChar InXMLNCNameChar!;
 use Exporter;
 our @ISA = qw/Exporter/;
@@ -34,7 +34,30 @@ sub DEFAULT_PFX () { q:#default: }
 sub NULL_URI    () { q<http://suika.fam.cx/~wakaba/-temp/2003/09/27/null> }
 sub UNDEF_URI   () { q<http://suika.fam.cx/~wakaba/-temp/2003/09/27/undef> }
 
-## TODO: auto register
+our %Namespace_URI_to_prefix 
+  = (
+     q<DAV:>	=> [qw:dav webdav:],
+	'http://members.jcom.home.ne.jp/jintrick/2003/02/site-concept.xml#'	=> [DEFAULT_PFX, qw/sitemap/],
+	'http://purl.org/dc/elements/1.1/'	=> [qw/dc dc11/],
+	'http://purl.org/rss/1.0/'	=> [DEFAULT_PFX, qw/rss rss10/],
+	'http://www.mozilla.org/xbl'	=> [DEFAULT_PFX, qw/xbl/],
+	'http://www.w3.org/1999/02/22-rdf-syntax-ns#'	=> [qw/rdf/],
+     q<http://www.w3.org/1999/xhtml>	=> [DEFAULT_PFX, qw:h h1 xhtml xhtml1:],
+	'http://www.w3.org/1999/xlink'	=> [qw/l xlink/],
+	'http://www.w3.org/1999/XSL/Format'	=> [qw/fo xslfo xsl-fo xsl/],
+	'http://www.w3.org/1999/XSL/Transform'	=> [qw/t s xslt xsl/],
+	'http://www.w3.org/1999/XSL/TransformAlias'	=> [qw/axslt axsl xslt xsl/],
+	'http://www.w3.org/2000/01/rdf-schema#'	=> [qw/rdfs/],
+	'http://www.w3.org/2000/svg'	=> [DEFAULT_PFX, qw/s svg/],
+	'http://www.w3.org/2002/06/hlink'	=> [qw/h hlink/],
+	'http://www.w3.org/2002/06/xhtml2'	=> [DEFAULT_PFX, qw/h h2 xhtml xhtml2/],
+	'http://www.w3.org/2002/07/owl'	=> [qw/owl/],
+	'http://www.w3.org/TR/REC-smil'	=> [DEFAULT_PFX, qw/smil smil1/],
+	'http://www.wapforum.org/2001/wml'	=> [qw/wap/],
+	'urn:schemas-microsoft-com:xslt'	=> [qw/ms msxsl msxslt/],
+	'urn:x-suika-fam-cx:markup:ietf:html:3:draft:00:'	=> [DEFAULT_PFX, qw/H3 H HTML HTML3/],
+	'urn:x-suika-fam-cx:markup:ietf:rfc:2629:'	=> [DEFAULT_PFX, qw/rfc rfc2629/],
+);
 
 sub register_prefix_to_name ($$$;%) {
   my ($decls, $prefix => $name, %opt) = @_;
@@ -187,7 +210,7 @@ sub name_to_prefix ($$;%) {
   for my $prefix (%{$decls->{ns}||{}}) {
     if ($decls->{ns}->{$prefix} eq $name) {
       if (!$opt{use_prefix_default} && ($prefix eq DEFAULT_PFX)) {
-        return {success => 0, name => $name, reason => '__NOT_FOUND'};
+        #return {success => 0, name => $name, reason => '__NOT_FOUND'};
       } else {
         return {success => 1, prefix => $prefix, name => $name};
       }
@@ -195,31 +218,77 @@ sub name_to_prefix ($$;%) {
   }
   if ($opt{use_prefix_default} && ($name eq NULL_URI)) {
     return {success => 1, name => $name, prefix => DEFAULT_PFX};
+  } elsif ($opt{make_new_prefix}) {
+    return register_prefix_to_name ($decls,
+                                    generate_prefix ($decls, $name, %opt)
+                                    => $name, 
+                                    %opt);
   } else {
     return {success => 0, name => $name, reason => '__NOT_FOUND'};
   }
+}
+
+sub generate_prefix ($;$%) {
+  my ($decls, $name, %opt) = @_;
+  return DEFAULT_PFX #if $opt{use_prefix_default} && ($name eq NULL_URI);
+    if $name eq NULL_URI;
+  if ($Namespace_URI_to_prefix{$name}) {
+    for (@{$Namespace_URI_to_prefix{$name}}) {
+      my $pfx = $_;
+      next if !$opt{use_prefix_default} && ($pfx eq DEFAULT_PFX);
+      unless (prefix_to_name ($decls, $pfx, %opt, check_prefix => 0)
+              ->{success}) {
+        return $pfx;
+      }
+    }
+  }
+    my ($uri, $pfx) = ($name);
+    $uri =~ s/[^0-9A-Za-z._-]+/ /g;
+    my @uri = split / /, $uri;
+    for (reverse @uri) {
+      if (s/([A-Za-z][0-9A-Za-z._-]+)//) {
+        next if lc (substr ($1, 0, 3)) eq 'xml';
+        unless (prefix_to_name ($decls, $1, %opt, check_prefix => 0)
+                ->{success}) {
+          return $1;
+        }
+      }
+    }
+    my $i = 0;
+    while (1) {
+      $pfx = 'ns'.$i++;
+      unless (prefix_to_name ($decls, $pfx, %opt, check_prefix => 0)
+              ->{success}) {
+        return $pfx;
+      }
+    }
 }
 
 sub qname_to_expanded_name ($$;%) {
   my ($decls, $qname, %opt) = @_;
   my $chk = split_qname ($qname, %opt);
   return $chk unless $chk->{success};
-  my $chk2 = prefix_to_name ($decls, $chk->{prefix});
+  my $chk2 = prefix_to_name ($decls, $chk->{prefix}, %opt);
   return $chk2 unless $chk2->{success};
   $chk->{name} = $chk2->{name};
   return $chk;
 }
 
-## TODO: exp.name to qname
-## TODO: exp.uri
+sub expanded_name_to_qname ($$$;%) {
+  my ($decls, $name => $ln, %opt) = @_;
+  my $chk = name_to_prefix ($decls, $name, %opt);
+  return $chk unless $chk->{success};
+  return join_qname ($chk->{prefix}, $ln, %opt);
+}
 
 sub split_qname ($;%) {
   my ($qname, %opt) = @_;
-  my ($pfx, $ln) = split /:/, $qname, 2;
+  $opt{qname_separator} ||= ':';
+  my ($pfx, $ln) = split $opt{qname_separator}, $qname, 2;
   
   if ($opt{check_qname}) {
-    if ((substr ($qname, 0,  1) eq ':')
-     || (substr ($qname, 0, -1) eq ':')) {
+    if ((substr ($qname, 0,  1) eq $opt{qname_separator})
+     || (substr ($qname, 0, -1) eq $opt{qname_separator})) {
       return {success => 0, reason => 'QNAME__INVALID_COLON'};
     }
   }
@@ -250,6 +319,7 @@ sub split_qname ($;%) {
 sub join_qname ($$;%) {
   my ($pfx, $ln, %opt) = @_;
   $pfx = DEFAULT_PFX unless defined $pfx;
+  $opt{qname_separator} ||= ':';
   if ($opt{check_qname} || $opt{check_prefix}) {
     if ($pfx ne DEFAULT_PFX) {
       return {success => 0, reason => 'PREFIX__INVALID'}
@@ -257,12 +327,32 @@ sub join_qname ($$;%) {
     }
   }
   if ($opt{check_qname} || $opt{check_local_name}) {
-    return {success => 1, qname => ($pfx eq DEFAULT_PFX ? '*' : $pfx.':*')}
+    return {success => 1, qname => ($pfx eq DEFAULT_PFX ? '*' :
+                                    $pfx.$opt{qname_separator}.'*')}
       if $opt{use_local_name_star} && ($ln eq '*');
     return {success => 0, reason => 'LOCAL_NAME__INVALID'}
       unless $ln =~ /^\p{InXML_NCNameStartChar}\p{InXMLNCNameChar}*$/;
   }
-  return {success => 1, qname => ($pfx eq DEFAULT_PFX ? $ln : $pfx.':'.$ln)};
+  return {success => 1, qname => ($pfx eq DEFAULT_PFX ? $ln :
+                                  $pfx.$opt{qname_separator}.$ln)};
+}
+
+sub split_expanded_uri ($) {
+  my $uri = shift;
+  if ($uri =~ s<([A-Za-z_][A-Za-z0-9_.-]*)$><>) {
+    return {success => 1, name => $uri, local_name => $1};
+  } else {
+    return {success => 0};
+  }
+}
+
+sub split_expanded_iri ($) {
+  my $iri = shift;
+  if ($iri =~ s<(\p{InXML_NCNameStartChar}\p{InXMLNCNameChar}*)$><>) {
+    return {success => 1, name => $iri, local_name => $1};
+  } else {
+    return {success => 0};
+  }
 }
 
 =head1 LICENSE
@@ -274,4 +364,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/27 07:59:11 $
+1; # $Date: 2003/09/28 01:05:04 $

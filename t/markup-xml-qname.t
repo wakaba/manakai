@@ -218,11 +218,139 @@ my @qname = (
               opt    => {check_qname => 1, check_prefix => 1,
                          check_local_name => 1, use_local_name_star => 1},
              },
+             {
+              qname  => q"foo|bar",
+              prefix => q:foo:,
+              lname  => q:bar:,
+              result => 1,
+              opt    => {check_qname => 1, check_prefix => 1,
+                         check_local_name => 1, qname_separator => '|'},
+             },
+             {
+              qname  => q"foo|*",
+              prefix => q:foo:,
+              lname  => q:*:,
+              result => 1,
+              opt    => {check_qname => 1, check_prefix => 1,
+                         check_local_name => 1, qname_separator => '|',
+                         use_local_name_star => 1},
+             },
+);
+
+my @gen_pfx = (
+	       {
+                reset  => 1,
+                name   => q<http://www.w3.org/1999/xhtml>,
+                prefix => DEFAULT_PFX,
+                opt    => {use_prefix_default => 1},
+	       },
+               {
+                reset  => 0,
+                name   => q<http://www.w3.org/1999/xhtml>,
+                prefix => q:h:,
+                n2p    => DEFAULT_PFX,
+                opt    => {use_prefix_default => 1},
+               },
+               {
+                reset  => 1,
+                name   => q<http://www.w3.org/1999/xhtml>,
+                prefix => q:h:,
+                opt    => {use_prefix_default => 0},
+               },
+               {
+                name   => q<http://www.w3.org/1999/xhtml>,
+                prefix => q:h1:,
+                n2p    => q:h:,
+               },
+               {
+                name   => q<http://www.w3.org/1999/xhtml>,
+                prefix => q:xhtml:,
+                n2p    => q:h:,
+               },
+               {
+                name   => q<http://www.w3.org/1999/xhtml>,
+                prefix => q:xhtml1:,
+                n2p    => q:h:,
+               },
+               {
+                name   => q<http://www.w3.org/1999/xhtml>,
+                prefix => q:www.w3.org:,
+                n2p    => q:h:,
+               },
+               {
+                name   => q<http://www.w3.org/1999/xhtml>,
+                prefix => q:http:,
+                n2p    => q:h:,
+               },
+               {
+                name   => q<http://www.w3.org/1999/xhtml>,
+                prefix => q:ns0:,
+                n2p    => q:h:,
+               },
+               {
+                name   => q<http://www.w3.org/1999/xhtml>,
+                prefix => q:ns1:,
+                n2p    => q:h:,
+               },
+               {
+                name   => q<test/0name/xmlns>,
+                prefix => q:name:,
+               },
+               {
+                name   => q<test/0name/xmlns>,
+                prefix => q:test:,
+                n2p    => q:name:,
+               },
+               {
+                reset  => 1,
+                name   => q<:///:04465612@&>,
+                prefix => q:ns0:,
+               },
+               {
+                reset  => 1,
+                name   => NULL_URI,
+                prefix => DEFAULT_PFX,
+                opt    => {use_prefix_default => 1},
+               },
+               {
+                reset  => 0,
+                name   => NULL_URI,
+                prefix => DEFAULT_PFX,
+                opt    => {use_prefix_default => 1},
+               },
+               {
+                reset  => 1,
+                name   => NULL_URI,
+                prefix => DEFAULT_PFX,
+                opt    => {use_prefix_default => 0},
+               },
+              );
+
+my @expand = (
+              {
+               reset   => 1,
+               ns      => {foo => q<http://foo.test/>},
+               qname   => q"foo:bar",
+               xname   => [q<http://foo.test/> => q:bar:],
+              },
+              {
+               reset   => 0,
+               qname   => q"foo:bar",
+               xname   => [q<http://foo.test/> => q:bar:],
+              },
+              {
+               reset   => 0,
+               qname   => q"bar",
+               xname   => [NULL_URI, q:bar:],
+               opt     => {use_prefix_default => 1, use_name_null => 1},
+              },
 );
 
 Test::Simple->import (tests => scalar (@reg_p2n)
                              + scalar (@get_p2n) * 2
-                             + scalar (@qname) * 2);
+                             + scalar (@qname) * 2
+                             + scalar (@gen_pfx) * 2
+                             + scalar (@expand) * 2);
 
 for (@reg_p2n) {
   my $chk = Message::Markup::XML::QName::register_prefix_to_name
@@ -267,6 +395,52 @@ for (@qname) {
   } else {
     ok $chk->{success} == $_->{result}, $chk->{qname};
   }
+}
+
+for (@gen_pfx) {
+  $e->{ns} = {} if $_->{reset};
+  my $pfx = Message::Markup::XML::QName::generate_prefix ($e, $_->{name},
+                                                          %{$_->{opt}||{}});
+  if ($pfx eq $_->{prefix}) {
+    my $chk = Message::Markup::XML::QName::register_prefix_to_name
+                ($e, $pfx => $_->{name});
+    ok $chk->{success}, $chk->{reason};
+  } else {
+    ok $pfx eq $_->{prefix}, ":$pfx: (expected :$_->{prefix}:";
+  }
+}
+
+for (@gen_pfx) {
+  $e->{ns} = {} if $_->{reset};
+  my $chk = Message::Markup::XML::QName::name_to_prefix ($e, $_->{name},
+                                                         %{$_->{opt}||{}},
+                                                         make_new_prefix => 1);
+  ok $chk->{success} && ($chk->{prefix} eq ($_->{n2p} || $_->{prefix})),
+     "$chk->{prefix} (@{[$_->{n2p} || $_->{prefix}]} is expected; $chk->{reason})";
+}
+
+for (@expand) {
+  $e->{ns} = {} if $_->{reset};
+  for my $pfx (keys %{$_->{ns}||{}}) {
+    Message::Markup::XML::QName::register_prefix_to_name
+        ($e, $pfx => $_->{ns}->{$pfx}, %{$_->{opt}||{}});
+  }
+  my $chk = Message::Markup::XML::QName::qname_to_expanded_name 
+              ($e, $_->{qname}, %{$_->{opt}||{}});
+  ok $chk->{success} && ($_->{xname}->[0] eq $chk->{name}
+                     && $_->{xname}->[1] eq $chk->{local_name}),
+     qq(<$chk->{name}> (should be <$_->{xname}->[0]>), "$chk->{local_name}" (should be "$_->{xname}->[1]") (prefix "$chk->{prefix}"; $chk->{reason}));
+}
+
+for (@expand) {
+  $e->{ns} = {} if $_->{reset};
+  for my $pfx (keys %{$_->{ns}||{}}) {
+    Message::Markup::XML::QName::register_prefix_to_name
+        ($e, $pfx => $_->{ns}->{$pfx}, %{$_->{opt}||{}});
+  }
+  my $chk = Message::Markup::XML::QName::expanded_name_to_qname
+              ($e, $_->{xname}->[0], $_->{xname}->[1], %{$_->{opt}||{}});
+  ok $chk->{success} && ($_->{qname} eq $chk->{qname}), $chk->{reason};
 }
 
 print $e;
