@@ -19,7 +19,7 @@ This module is part of manakai.
 
 package Message::Markup::SuikaWikiConfig20::Node;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 =head1 METHODS
 
@@ -100,8 +100,10 @@ sub append_text ($$;%) {
   my $s = shift;
   if (ref ($self->{value}) eq 'ARRAY') {
     push @{$self->{value}}, $s;
-  } else {
+  } elsif (defined $self->{value}) {
     $self->{value} .= $s;
+  } else {
+    $self->{value} = $s;
   }
 }
 
@@ -147,6 +149,24 @@ sub get_attribute_value ($$;%) {
   }
 }
 
+sub get_element_by ($$;%) {
+  my ($self, $code, %opt) = @_;
+  for (@{$self->{node}}) {
+    if ($_->{type} eq '#element' and
+        $code->($self, $_, %opt)) {
+      return $_;
+    }
+  }
+  ## Node is not exist
+  if ($opt{make_new_node}) {
+    my $n = $self->append_new_node (type => '#element', local_name => 'Node');
+    $opt{make_new_node}->($self, $n, %opt)
+      if ref $opt{make_new_node} eq 'CODE';
+    return $n;
+  } else {
+    return undef;
+  }
+}
 =item $attr_node = $x->set_attribute ($local_name => $value, %options)
 
 Set the value of the attribute.  The attribute node is returned.
@@ -157,7 +177,8 @@ sub set_attribute ($$$;%) {
   my ($self, $name, $val, %o) = @_;
   if ({qw/HASH 1 CODE 1/}->{ref ($val)}) {
   ## TODO: common error handling
-    die "set_attribute: @{[ref $val]}: new attribute value must be a string, an array reference or a blessed object";
+    require Carp;
+    Carp::croak ("set_attribute: @{[ref $val]}: new attribute value must be a string, an array reference or a blessed object");
   }
   for (@{$self->{node}}) {
     if ($_->{type} eq '#element'
@@ -258,7 +279,7 @@ sub stringify ($;%) {
   my $r = '';
   if ($self->{type} eq '#document') {
     if ($opt{output_header}) {
-      $r = "#?SuikaWiki/0.9\x0A";
+      $r = "#?SuikaWikiConst/2.0\x0A";
     }
     my $ptype = '#';
     for (@{$self->{node}}) {
@@ -268,13 +289,18 @@ sub stringify ($;%) {
     }
   } elsif ($self->{type} eq '#element') {
     $r = $self->inner_text;
-    $r =~ s/(^|\x0A)(?=([\\\@\#\s]))?/$1."  ".($2?"\\":"")/ges;
     if (scalar @{$self->{node}}) {
-      $r = $self->{local_name}
-         . ":\x0A  \@\@"
-         . (ref ($self->{value}) eq 'ARRAY' ? '[list]' : '')
-         . ":" . (($r !~ /[\x0D\x0A:]/) && (length ($r) < 50) ? '' : "\x0A")
-         . $r . "\x0A";
+      if (defined $r) {
+        $r =~ s/(^|\x0A)(?=([\\\@\#\s]))?/$1."  ".($2?"\\":"")/ges;
+        $r = $self->{local_name}
+           . ":\x0A  \@\@"
+           . (ref ($self->{value}) eq 'ARRAY' ? '[list]' : '')
+           . ":" . (($r !~ /[\x0D\x0A:]/) && (length ($r) < 50) ? '' : "\x0A")
+           . $r . "\x0A";
+      } else {
+        $r = $self->{local_name}
+           . ":\x0A";
+      }
       for (@{$self->{node}}) {
         next unless $_->{type} eq '#element';
         my $rc = $_->stringify;
@@ -283,6 +309,8 @@ sub stringify ($;%) {
         $r .= '  @' . $rc;
       }
     } else {
+      $r = '' unless defined $r;
+      $r =~ s/(^|\x0A)(?=([\\\@\#\s]))?/$1."  ".($2?"\\":"")/ges;
       $r = $self->{local_name}
          . (ref ($self->{value}) eq 'ARRAY' ? '[list]' : '')
          . ":" . ((($r !~ /[\x0D\x0A:]/) && (length ($r) < 50)) ? '' : "\x0A")
@@ -308,12 +336,13 @@ sub root_node ($) {
   }
 }
 
-sub flag ($$;$) {
-  my ($self, $name, $value) = @_;
+sub flag ($$;$%) {
+  my ($self, $name, $value, %opt) = @_;
   if (defined $value) {
     $self->{flag}->{$name} = $value;
   }
-  $self->{flag}->{$name};
+  defined $self->{flag}->{$name} ?
+    $self->{flag}->{$name} : $opt{default};
 }
 
 sub option ($$;$) {
@@ -344,16 +373,37 @@ sub clone ($;%) {
 
 =head1 NODE TYPES
 
+This module uses three types of node.
+
 =over 4 
 
 =item #comment
 
-Comment declarement. <!-- -->
+Comment.  Only #document (root) node and #fragment node
+in well-formed tree can contain this type of node as children.
+
+Comment has a value, but no child.
+
+=item #document
+
+Document.  This type of node must be the root node.
+
+Document can have any number of #element and #comment, in any order,
+but no value.
 
 =item #element
 
-Element.  Its XML representation consists of start tag, content and end tag,
-like <TYPE>content</TYPE>.
+Element.
+
+Element can have any number of children.  Children must also be #element's.
+Element has a value, which can be C<undef> (that is different from
+empty) in case the element has one or more children (cannot be
+C<undef> if it does not have child).
+
+A value is either a scalar or a list.  List is represented as a reference
+to an array in this module.  Note that list with some multiple-line strings
+cannot be serialized, since SuikaWikiConfig/2.0 text format
+does not allow it.
 
 =item #fragment
 
@@ -363,22 +413,35 @@ Fragment of nodes.  It's similar to DOM's fragment node.
 
 =head1 SEE ALSO
 
-Message::Markup::SuikaWikiConfig20::Parser,
+C<Message::Markup::SuikaWikiConfig20::Parser>:
+Perl module that parses SuikaWikiConfig/2.0 text format
+document and constructs C<Message::Markup::SuikaWikiConfig20::Node>
+tree instance.
+
 SuikaWikiConfig/2.0 
-<http://suika.fam.cx/~wakaba/-temp/wiki/wiki?SuikaWikiConfig/2.0>
+<http://suika.fam.cx/~wakaba/-temp/wiki/wiki?SuikaWikiConfig/2.0>:
+Formal specification and informal descriptions of 
+the SuikaWikiConfig/2.0 format.
+
+Latest version of this module is available at the
+manakai CVS repository
+<http://suika.fam.cx/gate/cvs/messaging/manakai/lib/Message/Markup/SuikaWikiConfig20/Parser.pm>.
 
 =head1 HISTORY
 
-This module was part of SuikaWiki 2, with name of 
-C<SuikaWiki::Markup::SuikaWikiConfig20>.
+SuikaWikiConfig/2.0 format was originally defined
+for SuikaWiki <http://suika.fam.cx/~wakaba/-temp/wiki?SuikaWiki>.
+
+This module, formally known as C<SuikaWiki::Markup::SuikaWikiConfig20>,
+was part of SuikaWiki distribution.
 
 =head1 LICENSE
 
-Copyright 2003 Wakaba <w@suika.fam.cx>
+Copyright 2003-2004 Wakaba <w@suika.fam.cx>
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/07/25 07:17:02 $
+1; # $Date: 2004/08/21 05:39:03 $

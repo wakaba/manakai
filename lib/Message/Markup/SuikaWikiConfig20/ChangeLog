@@ -1,3 +1,18 @@
+2004-08-19  Wakaba  <wakaba@suika.fam.cx>
+
+	* Parser.pm (parse_text): Constructs correct tree even if "at" value
+	occurs after non-at attributes.
+	(parse_text): Do defined check not to be warned even if -w.
+	* Node.pm: Do defined check not to be warned even if -w.
+
+2004-08-18  Wakaba  <wakaba@suika.fam.cx>
+
+	* Node.pm (set_attribute): Call Carp::croak, rather than bare die,
+	is called if value is invalid.
+	(stringify): Don't output "at" value if the node has children
+	but does not have value.
+	(stringify): Optional magic header line was incorrect.
+
 2004-07-25  Wakaba  <wakaba@suika.fam.cx>
 
 	* Node.pm (set_attribute): Allow array reference as value.

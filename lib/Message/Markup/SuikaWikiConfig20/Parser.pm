@@ -15,7 +15,7 @@ This module is part of manakai.
 
 package Message::Markup::SuikaWikiConfig20::Parser;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Markup::SuikaWikiConfig20::Node;
 
 =head1 METHODS
@@ -45,8 +45,10 @@ sub parse_text ($$) {
   for my $line (split /\x0D?\x0A/, $s) {
     if ($line =~ /^([^#\s].*):\s*([^\s:][^:]*)?$/) {
       my ($name, $val) = ($1, $2);
-      substr ($name, 0, 1) = '' if substr ($name, 0, 1) eq '\\';
-      substr ($val, 0, 1) = '' if substr ($val, 0, 1) eq '\\';
+      substr ($name, 0, 1) = '' if defined $name and 
+                                   substr ($name, 0, 1) eq '\\';
+      substr ($val, 0, 1) = '' if defined $val and
+                                  substr ($val, 0, 1) eq '\\';
       if (substr ($name, -6) eq '[list]') {
         substr ($name, -6) = '';
         $val = length ($val) ? [$val] : [];
@@ -66,32 +68,37 @@ sub parse_text ($$) {
       }
     } elsif ($line =~ /^\s+(\@+)(.*):\s*([^\s:][^:]*)?$/) {
       my ($nest, $name, $val) = (length $1, $2, $3);
-      substr ($name, 0, 1) = '' if substr ($name, 0, 1) eq '\\';
-      substr ($val, 0, 1) = '' if substr ($val, 0, 1) eq '\\';
+      substr ($name, 0, 1) = '' if defined $name and 
+                                   substr ($name, 0, 1) eq '\\';
+      substr ($val, 0, 1) = '' if defined $val and
+                                  substr ($val, 0, 1) eq '\\';
       if (substr ($name, -6) eq '[list]') {
         substr ($name, -6) = '';
-        $val = length ($val) ? [$val] : [];
+        $val = (defined ($val) and length ($val)) ? [$val] : [];
         $is_list_element = 1;
       } else {
         $is_list_element = 0;
       }
       my $ce;
       if (length ($name)) {
-        while ($current_element->flag ('p__nest_level') >= $nest) {
+        while ($current_element->flag ('p__nest_level', undef,
+                                       default => 0) >= $nest) {
           $current_element = $current_element->parent_node;
         }
         $ce = $current_element->append_new_node (type => '#element',
                                                  local_name => $name,
                                                  value => $val);
         $ce->flag (p__nest_level
-                   => $current_element->flag ('p__nest_level') + 1);
+                   => $current_element->flag ('p__nest_level', undef,
+                                              default => 0) + 1);
         unless (defined $3) {  ##  @foo: \nbar
           $current_element = $ce;
           $current = $ce;
           $is_new_element = 1;
         }
       } else {
-        while ($current_element->flag ('p__nest_level') > $nest - 1) {
+        while ($current_element->flag ('p__nest_level', undef,
+                                       default => 0) >= $nest - 1) {
           $current_element = $current_element->parent_node;
         }
         $current_element->append_text ($val);
@@ -171,4 +178,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/11/15 07:56:10 $
+1; # $Date: 2004/08/21 05:39:03 $
