@@ -13,7 +13,7 @@ This module is part of manakai XML.
 
 package Message::Markup::XML::Node;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload
   '""'     => \&outer_xml,
   bool     => sub { 
@@ -33,6 +33,10 @@ our @EXPORT_OK = qw(NS_SGML NS_XML
                     SGML_PARAM_ENTITY SGML_NOTATION
                     SGML_GROUP SGML_HEX_CHAR_REF SGML_NCR
                     XML_ATTLIST);
+our %EXPORT_TAGS = (
+  charref => [qw(SGML_NCR SGML_HEX_CHAR_REF)],
+  entity  => [qw(SGML_GENERAL_ENTITY SGML_PARAM_ENTITY)],
+);
 }
 
 sub NS_SGML () { q<urn:x-suika-fam-cx:markup:sgml:> }
@@ -150,6 +154,8 @@ sub append_node ($$;%) {
     $new_node->{node} = [];
     $self;
   } else {
+    ## Does not check whether $new_node has other parent node.
+    ## Such check should be done by caller.
     push @{$self->{node}}, $new_node;
     $new_node->{parent} = $self;
     $new_node;
@@ -268,6 +274,9 @@ sub set_attribute ($$$;%) {
     and $opt{namespace_uri} eq $_->{namespace_uri}) {
       $_->{value} = $val;
       $self->__set_parent_node ($val);
+      for (@{$_->{node}}) {
+        delete $_->{parent};
+      }
       $_->{node} = [];
       return $_;
     }
@@ -292,6 +301,7 @@ sub remove_attribute ($$;%) {
     if ($_->{type} eq '#attribute'
     and $_->{local_name} eq $name
     and $opt{namespace_uri} eq $_->{namespace_uri}) {
+      delete $_->{parent};
       0;
     } else {
       1;
@@ -1189,24 +1199,18 @@ sub inner_xml ($;%) {
 package Message::Markup::XML::Node::reference;
 our @ISA = 'Message::Markup::XML::Node';
 BEGIN {Message::Markup::XML::Node->import
-        (qw(SGML_HEX_CHAR_REF SGML_NCR SGML_PARAM_ENTITY))}
+        (qw(:charref :entity))}
 
 sub start_tag ($;%) {
   my $self = shift;
-  if ($self->{namespace_uri} eq SGML_HEX_CHAR_REF) {
-    '&#x';
-  } elsif ($self->{namespace_uri} eq SGML_NCR) {
-    '&#';
-  } elsif ($self->_check_ncname ($self->{local_name})) {
-    if ($self->{namespace_uri} eq SGML_PARAM_ENTITY) {
-      '%';
-    } else {
-      '&';
-    }
-  } else {
-    Carp::carp qq'start_tag: <@{[$self->{namespace_uri}]}>: Unsupported type of #reference';
-    '';
-  }
+  +{
+    (SGML_GENERAL_ENTITY) => '&',
+    (SGML_PARAM_ENTITY)   => '%',
+    (SGML_NCR)            => '&#',
+    (SGML_HEX_CHAR_REF)   => '&#x',
+  }->{$self->{namespace_uri}}
+    or
+  Carp::carp qq'start_tag: <@{[$self->{namespace_uri}]}>: Unsupported type of #reference';
 }
 
 sub end_tag ($;%) { ';' }
@@ -1384,4 +1388,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/12/01 07:52:08 $
+1; # $Date: 2003/12/26 07:13:21 $
