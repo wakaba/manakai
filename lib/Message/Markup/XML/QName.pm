@@ -16,7 +16,7 @@ This module is part of manakai XML.
 
 package Message::Markup::XML::QName;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NCNameStartChar InXMLNCNameChar!;
 use Exporter;
 our @ISA = qw/Exporter/;
@@ -244,12 +244,15 @@ sub name_to_prefix ($$;%) {
     ## Document element node will not have parent decls node
     my $decl_node = $decls->{parent}->_get_ns_decls_node (default => 0);
     if (ref $decl_node) {  
-      return name_to_prefix ($decls->{parent}->_get_ns_decls_node, $name, %opt,
-                             check_name => 0);
+      my $p = name_to_prefix ($decls->{parent}->_get_ns_decls_node, $name, %opt,
+                              check_name => 0, make_new_prefix => 0,
+                              preserve_prefix_default => 1);
+      return $p if $p->{success};
     }
   }
 
-    if ($opt{use_prefix_default} && ($name eq NULL_URI)) {
+    if ($opt{use_prefix_default} and $name eq NULL_URI
+        and not $opt{preserve_prefix_default}) {
       $decls->{ns}->{(DEFAULT_PFX)} = NULL_URI
         if (not $decls->{ns}->{(DEFAULT_PFX)}
         or $decls->{ns}->{(DEFAULT_PFX)} ne NULL_URI);
@@ -283,7 +286,7 @@ sub generate_prefix ($;$%) {
     $uri =~ s/[^0-9A-Za-z._-]+/ /g;
     my @uri = split / /, $uri;
     for (reverse @uri) {
-      if (s/([A-Za-z][0-9A-Za-z._-]+)//) {
+      if (s/([A-Za-z][0-9A-Za-z._-]*)//) {
         next if lc (substr ($1, 0, 3)) eq 'xml';
         unless (prefix_to_name ($decls, $1, %opt, check_prefix => 0)
                 ->{success}) {
@@ -401,4 +404,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/10/31 08:41:35 $
+1; # $Date: 2003/11/01 06:11:37 $
