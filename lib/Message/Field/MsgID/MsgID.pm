@@ -13,20 +13,21 @@ draft-ietf-usefor-msg-id-alt-00 is supported.
 
 package Message::Field::MsgID::MsgID;
 use strict;
-BEGIN {
 use vars qw(%REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Carp;
 use overload '""' => sub {shift->stringify};
-use autouse Digest::MD2 => qw(md2_hex md2_base64);
-use autouse Digest::MD5 => qw(md5_hex md5_base64);
-use autouse Digest::SHA1 => qw(sha1_hex sha1_base64);
-1}
+#use autouse Digest::MD2 => qw(md2_hex md2_base64);
+#use autouse Digest::MD5 => qw(md5_hex md5_base64);
+#use autouse Digest::SHA1 => qw(sha1_hex sha1_base64);
+use Digest::MD2;
+use Digest::MD5;
+use Digest::SHA1;
 
 $REG{quoted_string} = qr/\x22(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\xFF])*\x22/;
 $REG{domain_literal} = qr/\x5B(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x5A\x5E-\xFF])*\x5D/;
 
-$REG{WSP} = qr/[\x20\x09]+/;
+$REG{WSP} = qr/[\x20\x09]/;
 $REG{FWS} = qr/[\x20\x09]*/;
 $REG{atext} = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2F\x30-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]+/;
 $REG{dot_atom} = qr/$REG{atext}(?:$REG{FWS}\x2E$REG{FWS}$REG{atext})*/;
@@ -257,7 +258,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/01 05:50:01 $
+$Date: 2002/04/01 06:05:38 $
 
 =cut
 
