@@ -13,7 +13,7 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::Header;
@@ -26,10 +26,13 @@ use overload '""' => sub { $_[0]->stringify },
   %DEFAULT = (
     -_METHODS	=> [qw|header body content_type id|],
     -_MEMBERS	=> [qw|header body _cte|],
+    	## entity_header -- Don't clone.
     -accept_coderange	=> '7bit',	## 7bit / 8bit / binary
-    -add_ua	=> 1,
+    #add_ua	=> 1,
     -body_default_charset	=> 'iso-2022-int-1',
-    -body_default_media_type	=> 'text/plain',
+    -body_default_charset_input	=> 'iso-2022-int-1',
+    -body_default_media_type	=> 'text',
+    -body_default_media_subtype	=> 'plain',
     -cte_default	=> '7bit',
     #fill_date	=> 1,
     -fill_date_name	=> 'date',
@@ -43,11 +46,6 @@ use overload '""' => sub { $_[0]->stringify },
     #ua_field_name	=> 'user-agent',
     -ua_use_config	=> 1,
     -uri_mailto_safe_level	=> 4,
-    -value_type	=> {
-    	'*default'	=> ['Message::Body::TextPlain'],
-    	'text/*'	=> ['Message::Body::TextPlain'],
-    	#'*/*+xml'	=> ['Message::Body::TextPlain'],
-    },
   );
 sub _init ($;%) {
   my $self = shift;
@@ -64,10 +62,13 @@ sub _init ($;%) {
   for my $name (keys %options) {
     if (substr ($name, 0, 1) eq '-') {
       $self->{option}->{substr ($name, 1)} = $options{$name};
+    } elsif ($name eq 'entity_header') {
+      $self->{entity_header} = $options{entity_header};
     } else {
-      push @new_fields, (lc $name => $options{$name});
+      push @new_fields, ($name => $options{$name});
     }
   }
+  
   my $format = $self->{option}->{format};
   if ($format =~ /http/) {
     $self->{option}->{fill_date_ns}       = $Message::Header::NS_phname2uri{http};
@@ -83,7 +84,7 @@ sub _init ($;%) {
     $self->{option}->{text_coderange} = '8bit';
     if ($format =~ /news-usefor|smtp-8bitmime/) {
       $self->{option}->{accept_coderange} = '8bit';
-      $self->{option}->{cte_default} = '8bit';
+      #$self->{option}->{cte_default} = '8bit';
     } else {
       $self->{option}->{accept_coderange} = '7bit';
     }
@@ -91,16 +92,19 @@ sub _init ($;%) {
   $self->{option}->{fill_msgid_ns}   = $Message::Header::NS_phname2uri{rfc822};
   $self->{option}->{fill_mimever_ns} = $Message::Header::NS_phname2uri{rfc822};
   unless (defined $self->{option}->{fill_date}) {
-    $self->{option}->{fill_date} = $format !~ /cgi|uri-url-mailto/;
+    $self->{option}->{fill_date} = $format !~ /mime-entity|cgi|uri-url-mailto/;
   }
   unless (defined $self->{option}->{fill_msgid}) {
-    $self->{option}->{fill_msgid} = $format !~ /http|uri-url-mailto/;
+    $self->{option}->{fill_msgid} = $format !~ /mime-entity|http|uri-url-mailto/;
   }
   unless (defined $self->{option}->{fill_ct}) {
     $self->{option}->{fill_ct} = $format !~ /http/;
   }
   unless (defined $self->{option}->{fill_mimever}) {
-    $self->{option}->{fill_mimever} = $format !~ /http/;
+    $self->{option}->{fill_mimever} = $format !~ /http|mime-entity/;
+  }
+  unless (defined $self->{option}->{add_ua}) {
+    $self->{option}->{add_ua} = $format !~ /mime-entity/;
   }
   unless (length $self->{option}->{fill_ua_name}) {
     $self->{option}->{fill_ua_name} = $format =~ /response|cgi|uri-url-mailto/?
@@ -137,7 +141,7 @@ sub new ($;%) {
   my %new_field = $self->_init (@_);
   if (length $new_field{body}) {
     $self->{body} = $new_field{body};  $new_field{body} = undef;
-    $self->{body} = $self->_parse_value ($self->content_type, $self->{body})
+    $self->{body} = $self->_parse_value ([$self->content_type] => $self->{body})
       if $self->{option}->{parse_all};
   }
   $self->{header} = new Message::Header
@@ -174,7 +178,7 @@ sub parse ($$;%) {
     -parse_all => $self->{option}->{parse_all},
     -format => $self->{option}->{format}, %new_field;
   $self->{body} = join "\x0D\x0A", @body;	## BUG: binary-unsafe
-  $self->{body} = $self->_parse_value (scalar $self->content_type => $self->{body})
+  $self->{body} = $self->_parse_value ([$self->content_type] => $self->{body})
     if $self->{option}->{parse_all};
   $self;
 }
@@ -224,49 +228,74 @@ sub body ($;$) {
   if ($new_body) {
     $self->{body} = $new_body;
   }
-  $self->{body} = $self->_parse_value (scalar $self->content_type => $self->{body})
+  $self->{body} = $self->_parse_value ([$self->content_type] => $self->{body})
     unless ref $self->{body};
   $self->{body};
+}
+
+## [SG]et its entity header.  This method is or can be used
+## when Message::Entity is used as a body (such as message/rfc822).
+sub entity_header ($;$) {
+  my $self = shift;
+  my $new_header = shift;
+  if (ref $new_header) {
+    $self->{entity_header} = $new_header;
+  }
+  $self->{entity_header};
 }
 
 ## $self->_parse_value ($type, $value);
 sub _parse_value ($$$) {
   my $self = shift;
-  my $name = shift || '*default';
+  my ($mt,$mst) = @{ shift(@_) };
   my $value = shift;
   return $value if ref $value;
   
   ## decode
   $value = $self->_decode_body ($value);
   
-  my $vtype = $self->{option}->{value_type}->{$name}->[0]
-      || $self->{option}->{value_type}->{'*default'}->[0];
-  my %vopt; %vopt = %{$self->{option}->{value_type}->{$name}->[1]} 
-    if ref $self->{option}->{value_type}->{$name}->[1];
+  my $mt_def = $Message::MIME::MediaType::type{$mt}->{$mst};
+  $mt_def = $Message::MIME::MediaType::type{$mt}->{'/default'} unless ref $mt_def;
+  $mt_def = $Message::MIME::MediaType::type{'/default'}->{'/default'}
+    unless ref $mt_def;
+  my $handler = $mt_def->{handler}
+    || $Message::MIME::MediaType::type{$mt}->{'/default'}->{handler}
+    || $Message::MIME::MediaType::type{'/default'}->{'/default'}->{handler};
+    ## Ummmmmm....
+  if (ref $handler eq 'CODE') {
+    $handler = &$handler ($self, $mt, $mst);
+  }
+  my $vtype = $handler->[0];
+  my %vopt = (
+    -format	=> $self->{option}->{format},
+    -media_type	=> $mt,
+    -media_subtype	=> $mst,
+    -parse_all	=> $self->{option}->{parse_all},
+    -body_default_charset	=> $self->{option}->{body_default_charset},
+    -body_default_charset_input	=> $self->{option}->{body_default_charset_input},
+    entity_header	=> $self->{header},
+  );
+  ## Media type specified option/parameters
+  if (ref $handler->[1] eq 'HASH') {
+    for (keys %{$handler->[1]}) {
+      $vopt{$_} = ${$handler->[1]}{$_};
+    }
+  }
+  ## Inherited options
+  if (ref $handler->[2] eq 'ARRAY') {
+    for (@{$handler->[2]}) {
+      $vopt{'-'.$_} = $self->{option}->{$_};
+    }
+  }
+  
   if ($vtype eq ':none:') {
     return $value;
   } elsif (defined $value) {
     eval "require $vtype" or Carp::croak qq{<parse>: $vtype: Can't load package: $@};
-    return $vtype->parse ($value,
-      -format	=> $self->{option}->{format},
-      -parent_type	=> $name,
-      -parse_all	=> $self->{option}->{parse_all},
-      -body_default_charset	=> $self->{option}->{body_default_charset},
-      -body_default_charset_input
-      	=> $self->{option}->{body_default_charset_input},
-      header	=> $self->{header},
-    %vopt);
+    return $vtype->parse ($value, %vopt);
   } else {
     eval "require $vtype" or Carp::croak qq{<parse>: $vtype: Can't load package: $@};
-    return $vtype->new (
-      -format	=> $self->{option}->{format},
-      -parent_type	=> $name,
-      -parse_all	=> $self->{option}->{parse_all},
-      -body_default_charset	=> $self->{option}->{body_default_charset},
-      -body_default_charset_input
-      	=> $self->{option}->{body_default_charset_input},
-      header	=> $self->{header},
-    %vopt);
+    return $vtype->new (%vopt);
   }
 }
 
@@ -300,7 +329,7 @@ sub _encode_body ($$\%) {
   	  my ($mt,$mst) = $self->content_type;
   	  my $mt_def = $Message::MIME::MediaType::type{$mt}->{$mst};
   	  $mt_def = $Message::MIME::MediaType::type{$mt}->{'/default'}
-  	    ;#unless ref $mt_def;
+  	    unless ref $mt_def;
   	  $mt_def = $Message::MIME::MediaType::type{'/default'}->{'/default'}
   	    unless ref $mt_def;
   	  $enoption{mt_is_text} = 1
@@ -318,10 +347,12 @@ sub _encode_body ($$\%) {
   	      ## Note: 'encoding_after_encode' option (available for header
   	      ## field, but not for message body) is hardcoded.
   	    }
+  	  } else {	## Don't have mime style "charset" parameter
+  	    $charset_def = {mime_text => 1};
   	  }
   	  $charset_def = {} unless ref $charset_def;	## dummy
   	  if ($charset_def->{mime_text} != 1) {
-  	    $enoption{mt_is_text} = 0;
+  	    $enoption{mt_is_text} = 0 if $mt eq 'text';
   	    my $ct = $self->{header}->field ('content-type');
   	    $ct->not_mime_text ($option->{text_coderange} eq 'binary'? 0:1);
   	  }
@@ -356,6 +387,10 @@ sub _encode_body ($$\%) {
   	          $cte = $charset_def->{cte_7bit_preferred}
   	              || $mt_def->{cte_7bit_preferred} || 'base64';
   	          $en = $Message::MIME::Encoding::ENCODER{$cte};
+  	          if ($mt eq 'message') {
+  	            my $ct = $self->{header}->field ('content-type');
+  	            $ct->not_mime_text ($option->{text_coderange} eq 'binary'? 0:1);
+  	          }
   	        }
   	      }
   	    if ($e eq 'binary') {
@@ -400,21 +435,21 @@ sub stringify ($;%) {
   my %params = @_;
   my %option = %{$self->{option}};
   for (grep {/^-/} keys %params) {$option{substr ($_, 1)} = $params{$_}}
-  my ($header, $body);
+  my ($header, $body, $body0);
   if (ref $self->{body}) {
-    $body = $self->{body}->stringify (-format => $option{format},
+    $self->{body}->entity_header ($self->{header});
+    $body0 = $self->{body}->stringify (-format => $option{format},
       -linebreak_strict => $option{linebreak_strict});
   } else {
-    $body = $self->{body};
+    $body0 = $self->{body};
   }
-  $body = $self->_encode_body ($body, \%option);
+  $body = $self->_encode_body ($body0, \%option);
   if (ref $self->{header}) {
     my %exist;
     for ($self->{header}->field_name_list) {$exist{$_} = 1}
     my $ns_content = $Message::Header::NS_phname2uri{content};
     if ($option{fill_date}
        && !$exist{$option{fill_date_name}.':'.$option{fill_date_ns}}) {
-      #die  $option{fill_date_ns};
       $self->{header}->field
         ($option{fill_date_name}, -ns => $option{fill_date_ns})->unix_time (time);
     }
@@ -430,12 +465,17 @@ sub stringify ($;%) {
     }	# fill_msgid
     my $ismime = 0;
     for (keys %exist) {if (/:$ns_content$/) { $ismime = 1; last }}
+    unless ($ismime) {
+      $ismime = 1 if $option{body_default_media_type} ne 'text';
+      $ismime = 1 if $option{body_default_media_subtype} ne 'plain';
+    }
     if ($ismime) {
       if ($option{fill_ct} && !$exist{'type:'.$ns_content}) {
           my $ct = $self->{header}->field ('type',
             -parse => 1, -ns => $ns_content);
-          $ct->media_type ($option{body_default_media_type});
-          $ct->replace (charset => $option{body_default_charset});
+          $ct->media_type ($option{body_default_media_type}.'/'
+                          .$option{body_default_media_subtype});
+          $ct->replace (Message::MIME::Charset::name_minimumize ($option{body_default_charset} => $body0));
       }
       if ($option{fill_mimever}
           && !$exist{'mime-version:'.$option{fill_mimever_ns}}) {
@@ -510,7 +550,16 @@ sub content_type ($;%) {
   my $self = shift;
   my $ct = $self->{header}->field ('content-type', -new_item_unless_exist => 0);
   unless (ref $ct) {
-    return wantarray? qw/text plain/: 'text/plain';
+    if ($self->{option}->{body_default_media_type} ne 'text'
+     || $self->{option}->{body_default_media_subtype} ne 'plain') {
+      $ct = $self->{header}->field ('content-type');
+      $ct->media_type_major ($self->{option}->{body_default_media_type});
+      $ct->media_type_minor ($self->{option}->{body_default_media_subtype});
+    }
+    return wantarray? ($self->{option}->{body_default_media_type},
+                       $self->{option}->{body_default_media_subtype}):
+                      $self->{option}->{body_default_media_type}.'/'
+                      .$self->{option}->{body_default_media_subtype};
   }
   if (wantarray) {
     ($ct->media_type_major, $ct->media_type_minor);
@@ -622,11 +671,16 @@ sub option ($@) {
   if (@_ == 1) {
     return $self->{option}->{ $_[0] };
   }
+  my %option = @_;
   while (my ($name, $value) = splice (@_, 0, 2)) {
     $self->{option}->{$name} = $value;
     if ($name eq 'format') {
       $self->header->option (-format => $value);
     }
+  }
+  if ($option{-recursive}) {
+    $self->{header}->option (%option);
+    $self->{body}->option (%option) if ref $self->{body};
   }
 }
 
@@ -856,7 +910,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/01 05:40:55 $
+$Date: 2002/06/09 11:20:24 $
 
 =cut
 

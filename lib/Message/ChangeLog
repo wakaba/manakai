@@ -1,3 +1,16 @@
+2002-06-09  wakaba <w@suika.fam.cx>
+
+	* Entity.pm:
+	- (stringify): Minimumize MIME charset name when MIME'izing.
+	- (mime-entity): New 'format' type.
+	- (default_media_subtype): New option.  Now 'default_media_type'
+	is used for only (narrower meaning of) media type.
+	- (content_type): See 'default_media_type' and
+	'default_media_subtype'.  (Was hardcoded as 'text/plain'.)
+	- (option): '-resucrive': new option.
+	* Header.pm (parse, parse_array): Don't discard invalid
+	line (non-'field' line).  (Treat as "X-Unknown" field.)
+
 2002-06-01  wakaba <w@suika.fam.cx>
 
 	* Entity.pm (_encode_body): Some bug fixes and

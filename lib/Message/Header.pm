@@ -8,7 +8,7 @@ Message::Header --- A Perl Module for Internet Message Headers
 package Message::Header;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.22 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.23 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;	## This may seem silly:-)
 push @ISA, qw(Message::Field::Structured);
 
@@ -213,6 +213,10 @@ sub parse ($$;%) {
       my ($s,undef,$value) = $self->_value_to_arrayitem
         ($name => $body, $self->{option});
       push @{$self->{value}}, $value if $s;
+    } elsif (length $field) {
+      my ($s,undef,$value) = $self->_value_to_arrayitem
+        ('x-unknown' => $field, $self->{option});
+      push @{$self->{value}}, $value if $s;
     }
   }
   $self;
@@ -259,6 +263,10 @@ sub parse_array ($\@;%) {
       $body =~ s/$REG{WSP}+$//;
       my ($s,undef,$value) = $self->_value_to_arrayitem
         ($name => $body, $self->{option});
+      push @{$self->{value}}, $value if $s;
+    } elsif (length $field) {
+      my ($s,undef,$value) = $self->_value_to_arrayitem
+        ('x-unknown' => $field, $self->{option});
       push @{$self->{value}}, $value if $s;
     }
     last if $#$header < 0;
@@ -807,7 +815,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/29 11:05:53 $
+$Date: 2002/06/09 11:20:24 $
 
 =cut
 

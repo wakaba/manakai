@@ -9,7 +9,7 @@ for RFC822 Namespaces of Header Fields
 package Message::Header::RFC822;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Header::Default;
 
 our %OPTION = %Message::Header::Default::OPTION;
@@ -34,6 +34,9 @@ $OPTION{goodcase} = {
 	'x-jsmail-priority'	=> 'X-JsMail-Priority',
 	'x-mime-autoconverted'	=> 'X-MIME-Autoconverted',
 	'x-mimeole'	=> 'X-MimeOLE',
+	'x-ml-count'	=> 'X-ML-Count',
+	'x-ml-info'	=> 'X-ML-Info',
+	'x-ml-name'	=> 'X-ML-Name',
 	'x-msmail-priority'	=> 'X-MSMail-Priority',
 	'x-nntp-posting-date'	=> 'X-NNTP-Posting-Date',
 	'x-nntp-posting-host'	=> 'X-NNTP-Posting-Host',
@@ -74,6 +77,7 @@ $OPTION{value_type} = {
 	
 	path	=> ['Message::Field::Path'],
 	'user-agent'	=> ['Message::Field::UA'],
+	'x-shimbun-agent'	=> ['Message::Field::UA'],
 	
 	subject	=> ['Message::Field::Subject'],
 	'x-nsubject'	=> ['Message::Field::Subject'],
@@ -224,6 +228,7 @@ $OPTION{value_type} = {
 	'transfer-encoding'	=> ['Message::Field::ValueParams'],
 	type	=> ['Message::Field::ContentType'],
 	version	=> ['Message::Field::Structured'],
+	'x-properties'	=> ['Message::Field::Params'],
 };
 
 $OPTION{uri_mailto_safe}	= {
@@ -288,7 +293,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/29 11:05:53 $
+$Date: 2002/06/09 11:20:24 $
 
 =cut
 
