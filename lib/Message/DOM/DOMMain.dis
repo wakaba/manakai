@@ -26,7 +26,8 @@ Module:
     @@lang:en
     @@@:
       This module implements IDL/DOM core datatypes (such as
-      DOMString) and objects (such as DOMImplementationRegistry).
+      "DOMString" and "DOMTimestamp") and objects (such as 
+      "DOMImplementationRegistry").
 
   @Feature:
     @@QName:
@@ -38,7 +39,7 @@ Module:
       DOM3
     @@Description:
       @@@lang:en
-      @@@@: The manakai DOM implementation DOMMain module for DOM Level 1.
+      @@@@: The manakai DOM implementation DOMMain Module, Level 1.
   @Feature:
     @@QName:
       ManakaiDOM:DOMMain
@@ -48,7 +49,7 @@ Module:
       DOM3
     @@Description:
       @@@lang:en
-      @@@@: The manakai DOM implementation DOMMain module for DOM Level 2.
+      @@@@: The manakai DOM implementation DOMMain Module, Level 2.
   @Feature:
     @@QName: 
       ManakaiDOM:DOMMain
@@ -56,13 +57,12 @@ Module:
     @@Condition: DOM3
     @@Description:
       @@@lang:en
-      @@@@:
-        The manakai DOM implementation DOMMain module for DOM Level 3.
+      @@@@: The manakai DOM implementation DOMMain Module, DOM Level 3.
   
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/17 07:44:11 $
+     $Date: 2004/09/19 07:57:43 $
   @Require:
     @@Module:
       @@@Def:
@@ -85,7 +85,7 @@ Module:
       @@@Name: DOMMain
       @@@Namespace:
         http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
-      @@@Def:
+      @@@Def:\
       @@@Def:
         @@@@Type: 
           lang:Perl
@@ -100,8 +100,8 @@ Module:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          DOM Core module.  Note that DOMCore module in turn
-          requires this (DOMMain) module.
+          DOM Core module.  Note that "DOMCore" module in turn
+          requires this ("DOMMain") module.
 
   @ConditionDef:
     @@Name: DOM1
@@ -122,7 +122,7 @@ DataType:
   @Name: Object
   @Description:
     @@lang:en
-    @@@: Any object.
+    @@@: An object.
 
 DataType:
   @Name: unsigned-long-long
@@ -130,9 +130,12 @@ DataType:
     @@Type: 
       lang:IDL-DOM
     @@@: unsigned long long
+  @FullName:
+    @@lang:en
+    @@@: Unsigned long long integer
   @Description:
     @@lang:en
-    @@@: Unsigned long long integer.
+    @@@: A unsigned long long integer.
 
 DataType:
   @Name: unsigned-long
@@ -140,15 +143,21 @@ DataType:
     @@Type: 
       lang:IDL-DOM
     @@@: unsigned long
+  @FullName:
+    @@lang:en
+    @@@: Unsigned long integer
   @Description: 
     @@lang:en
-    @@@: Unsigned long integer.
+    @@@: A unsigned long integer.
 
 DataType:
   @Name: long
+  @FullName:
+    @@lang:en
+    @@@: Long integer
   @Description:
     @@lang:en
-    @@@: Signed long integer.
+    @@@: A signed long integer.
 
 DataType:
   @Name: unsigned-short
@@ -156,21 +165,27 @@ DataType:
     @@Type: 
       lang:IDL-DOM
     @@@: unsigned short
+  @FullName:
+    @@lang:en
+    @@@: Unsigned short integer
   @Description:
     @@lang:en
-    @@@: Unsigned short integer.
+    @@@: An unsigned short integer.
 
 DataType:
   @Name: float
+  @FullName:
+    @@lang:en
+    @@@: Floating point number
   @Description:
     @@lang:en
-    @@@: Floating point number.
+    @@@: A floating point number.
 
 ConstGroup:
   @Name: boolean
   @Description:
     @@lang:en
-    @@@: Boolean value.
+    @@@: A boolean value.
   @Const:
     @@Name: true
     @@Value:
@@ -179,7 +194,7 @@ ConstGroup:
         lang:Perl
     @@Description:
       @@@lang:en
-      @@@@: Boolean true value.
+      @@@@: The boolean true value.
   @Const:
     @@Name: false
     @@Value:
@@ -188,7 +203,7 @@ ConstGroup:
         lang:Perl
     @@Description:
       @@@lang:en
-      @@@@: Boolean false value.
+      @@@@: The boolean false value.
 
 ## Null value
 
@@ -202,8 +217,8 @@ Const:
   @Description:
     @@lang:en
     @@@:
-       The null value.  Note that the null value is different from
-       the empty string or the zero number.
+       The null value.  Note that "null" is different from
+       empty strings or zero numbers.
 
 ## Definition from DOM Core IDL
 
@@ -219,30 +234,31 @@ DataType:
       DOM3Core:core.html#ID-5DFED1F0-h3
   @Description:
     @@lang:en
-    @@@: The DOMString type is used to store Unicode characters.
+    @@@: 
+      A string.  It is used to store Unicode characters.
   @IntMethod:
     @@Name: new
     @@Description:
       @@@lang:en
-      @@@@: Return a new instance of the DOMString.
+      @@@@: Return a new instance of the "DOMString".
     @@Param:
       @@@Name: arg
       @@@Type: any
       @@@Description:
         @@@@lang:en
-        @@@@@: The initial value of the DOMString.
+        @@@@@: The initial value of the "DOMString".
       @@@InCase:
         @@@@Value:
           @@@@@is-null:1
         @@@@Description:
           @@@@@lang:en
-          @@@@@@: The initial value is the empty string.
+          @@@@@@: The initial value is empty.
       @@@InCase:
         @@@@Type: DOMString
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
-            The same DOMString is returned.  To copy DOMString,
+            The same "DOMString" is returned.  To copy "DOMString",
             use the internal method clone.
       @@@InCase:
         @@@@Label: reference to the scalar value
@@ -995,6 +1011,7 @@ DataType:
             }__;
           }
           $r = pos ($self->{value});
+## DataType:DOMString
 
 DataType:
   @Name:  DOMTimeStamp
@@ -1007,7 +1024,7 @@ DataType:
     @@Description:
       @@@lang:en
       @@@@:
-        An alias to the type DOMMain:unsigned-long-long.
+        An alias to the type "unsigned-long-long".
   @Def:
     @@Type:
       lang:Perl
@@ -1015,7 +1032,9 @@ DataType:
       @@@lang:en
       @@@@:
         Defined as a reference in the Perl binding.
-      \
+    @@ImplNote:
+      @@lang:en
+      @@@:
         ISSUE: Need considerations for the interface of this type of objects.
   @SpecLevel: 2
   @Level: 2
@@ -1060,30 +1079,30 @@ IF:
     @@lang:en
     @@@:
       A language binding dependent bootstrap object for
-      DOMImplementations.
+      "DOMImplementation" objects.
   @Method:
     @@Name: newInstance
     @@Description:
       @@@lang:en
       @@@@:
-        Construct a new instance of DOMImplementationRegistry
+        Construct a new instance of "DOMImplementationRegistry" 
         (Taken from the DOM Java Binding).
         \
-        The DOMImplementationRegistry
+        The "DOMImplementationRegistry"
         is initialized by application or implementation, depenging on
         the context, by first checking the values of the 
-        array @org::w3c::dom::DOMImplementationSourceList,
-        i.e. names of classes implementing the DOMImplementationSource
+        array "@org::w3c::dom::DOMImplementationSourceList",
+        i.e. names of classes implementing the "DOMImplementationSource" 
         interface.
         \
-        DOMImplementationSource classes are not
+        "DOMImplementationSource" classes are not
         instanciated at this stage, while in Java Binding they are
         instanciated.
     @@Return:
       @@@Type: DOMImplementationRegistry
       @@@Description:
         @@@@lang:en
-        @@@@@: An instance of the DOMImplementationRegistry.
+        @@@@@: An instance of the "DOMImplementationRegistry".
       @@@Def:
         @@@@Type:
           lang:Perl
@@ -1178,5 +1197,6 @@ IF:
             }
             push @$self, $s;
           }
+## IF:DOMImplementationRegistry
 
 ## DOMMain.dis ends here

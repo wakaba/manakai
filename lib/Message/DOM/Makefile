@@ -15,7 +15,7 @@ IDL2DIS = $(PERL) $(IDL2DIS_PL)
 
 all: dom-modules
 
-dom-modules: ManakaiDOM.pm DOMMain.pm DOMCore.pm
+dom-modules: ManakaiDOMMain.pm DOMMain.pm DOMCore.pm ManakaiDOMCore.pm
 	$(LS) *.dis | $(SED) s/\.dis/.pm/ | $(XARGS) $(MAKE)
 
 %.pm: %.dis $(DIS2PM_PL)

@@ -14,21 +14,24 @@ Namespace:
   @TreeCore:
      \
 Module:
-  @Name: ManakaiDOM
+  @Name: ManakaiDOMMain
   @FullName:
     @@lang:en
-    @@@: Manakai DOM Implementation Core Module
+    @@@: Manakai DOM Implementation Main Module
   @Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
-  @Package:
-    @@Type:
-      lang:Perl
-    @@@: __CLASS{ManakaiDOM}__
   
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/18 11:51:16 $
+     $Date: 2004/09/19 07:57:43 $
+  
+  @Description:
+    @@lang:en
+    @@@:
+      The Manakai DOM Implementation Main Module defines 
+      the fundemental interfaces that is used commonly by the 
+      manakai DOM implementation.
 
   @Feature:
     @@QName: 
@@ -37,7 +40,7 @@ Module:
     @@Description:
       @@@lang:en
       @@@@:
-        The manakai DOM implementation Core module, version 1.0.
+        The Manakai DOM Implementation Main Module, version 1.0.
 
   @Require:
     @@Module:
@@ -47,14 +50,14 @@ Module:
         @@@@require:
           Message::Util::Error
     @@Module:
-      @@@Name: ManakaiDOM
+      @@@Name: ManakaiDOMMain
       @@@Namespace:
         http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
       @@@Def:
         @@@@Type:
           lang:Perl
         @@@@@: 0;
-      @@@Def:
+      @@@Def:\
       @@@Description:
         @@@@lang:en
         @@@@@: Dummy.
@@ -66,71 +69,115 @@ Module:
         @@@@Type:
           lang:Perl
         @@@@@: 0;
-      @@@Def:
+      @@@Def:\
       @@@Description:
         @@@@lang:en
         @@@@@: Dummy.
 
-DataTypeAlias:
-  @Name: DOMString
-  @Type: 
-    DOMMain:DOMString
-
 DataType:
   @Name: ManakaiDOMURI
-  @ISA: DOMString
+  @ISA: 
+    DOMMain:DOMString
+  @FullName: 
+    @@lang:en
+    @@@: DOMString (DOM URI)
   @Description:
     @@lang:en
     @@@:
-      The DOM URI.
+      A DOM URI.  It is a specialized case of the "DOMString" and 
+      that met the conditions:
+    \
+      1. An absolute identifier absolutely identifies a resource on the Web.
+    \
+      2. Simple string equality of absolute resource identifiers. 
+      No other equaivalence is considered significant to the 
+      DOM specification.
+    \
+      3. A relative identifier is easily detected and made absolute 
+      relative to an absolute identifier.
+    \
+      4. Retrieval of content of a resource may be accomplished 
+      where required.
   @ImplNote:
     @@lang:en
-    @@@: Check also "dis2pm.pl" when edit this definition.
+    @@@:
+      Examples of the DOM URIs include the URI references and 
+      the IRI references.
 
 DataType:
   @Name: ManakaiDOMNamespaceURI
-  @ISA: DOMString
+  @ISA: 
+    DOMMain:DOMString
+  @FullName:
+    @@lang:en
+    @@@: DOMString (Namespace URI)
   @Description:
     @@lang:en
     @@@:
-      The namespace URI.
+      A namespace URI.  In general, the DOM implementation does not 
+      perform any URI normalization or canonicalization.  The URIs 
+      given to the DOM are assumed to be valid and no lexical 
+      checking is performed.
+      
+      Absolute URI references are treated 
+      as strings and compared literally.  How relative namespace URI 
+      references are treated is undefined.  DOM applications should 
+      use "null" if they wish to have no namespace.
+      
+      Some programing languages can differentiate empty strings 
+      from "null".  Empty strings were specified as a legal namespace 
+      URI in the DOM Level 2 Specification but the DOM Level 2 Errata 
+      refines this as the implementaton dependent matter.  The 
+      DOM Level 3 Specification again refines to be converted to "null".
   @ImplNote:
     @@lang:en
-    @@@: Check also "dis2pm.pl" when edit this definition.
+    @@@: 
+      The "dis2pm.pl" is coded so that if the input (the parameter of 
+      a method or the given value of an attribute) is typed as 
+      "ManakaiDOMNamespaceURI", the Perl code to check the empty 
+      string is outputed as part of the implementation.
 
 DataType:
   @Name: ManakaiDOMFeatureName
-  @ISA: DOMString
+  @ISA: 
+    DOMMain:DOMString
+  @FullName:
+    @@lang:en
+    @@@: DOMString (feature name)
   @Description:
     @@lang:en
     @@@:
       The DOM feature name.
-  @ImplNote:
-    @@lang:en
-    @@@: Check also "dis2pm.pl" when edit this definition.
 
 DataType:
   @Name: ManakaiDOMFeatureVersion
-  @ISA: DOMString
+  @ISA: 
+    DOMMain:DOMString
+  @FullName:
+    @@lang:en
+    @@@: DOMString (feature version)
   @Description:
     @@lang:en
     @@@: The DOM feature version.
-  @ImplNote:
-    @@lang:en
-    @@@: Check also "dis2pm.pl" when edit this definition.
 
 DataType:
   @Name: ManakaiDOMFeatures
-  @ISA: DOMString
+  @ISA: 
+    DOMMain:DOMString
+  @FullName:
+    @@lang:en
+    @@@: DOMString (features)
   @Description:
     @@lang:en
     @@@: The DOM features and versions.
-  @ImplNote:
-    @@lang:en
-    @@@: Check also "dis2pm.pl" when edit this definition.
 
 Exception:
   @Name: ManakaiDOMImplementationException
+  @Description:
+    @@lang:en
+    @@@:
+      Exceptions not covered by the language- and platform-independent 
+      official DOM specifications.
 
   @Attr:
      @@Name:  code
@@ -140,7 +187,7 @@ Exception:
          @@@@lang:en
          @@@@@:
            The error code from the constant value group
-           ManakaiDOMImplementationExceptionCode.
+           "ManakaiDOMImplementationExceptionCode".
 
   @ConstGroup:
     @@Name: ManakaiDOMImplementationExceptionCode
@@ -242,6 +289,11 @@ Exception:
 
 Warning:
   @Name: ManakaiDOMImplementationWarning
+  @Description:
+    @@lang:en
+    @@@:
+      Warnings for the implementation dependent matters and 
+      "no effect" actions.
   
   @Attr:
      @@Name:  code
@@ -311,22 +363,32 @@ IF:
   @Description:
     @@lang:en
     @@@:
-      The ManakaiDOMObject interface is the common interface that is 
-      implemented by all Manakai DOM objects.
+      The common interface that is implemented by all Manakai DOM objects.
+  @ImplNote:
+    @@lang:en
+    @@@:
+      "ISA" attribute whose value is "ManakaiDOMObject" MUST NOT 
+      be written in the "dis" files.  It will be generated by 
+      converters such as "dis2pm.pl".
+  
 
-# ___report_error
+## TODO:  ___report_error
 
 IF:
   @Name: ManakaiDOMNodeObject
   @Description:
     @@lang:en
     @@@:
-      The ManakaiDOMNodeObject interface defines a number of basic 
-      operations to the node or the grove.  It is intended to be 
-      implemented by the (actual) node objects.  (Note that in the 
-      manakai DOM implementation, most of DOM objects such as of the
-      DOM Node interface are implemented as a reference to the node 
-      in fact.)
+      An internal node object.  This interface defines a number of basic 
+      operations to the node or the grove. 
+  \
+  @ImplNote:
+    @@lang:en
+    @@@:
+      In manakai DOM implementation, most of DOM objects such as 
+      "Element" or "Document" are implemented as a reference 
+      (implementing the "ManakaiDOMNodeReference" interface) to 
+      the node object.
   @IntMethod:
     @@Name: new
     @@Description:
@@ -523,7 +585,8 @@ IF:
         importTree.
     @@Param:
       @@@Name: treeID
-      @@@Type: DOMString
+      @@@Type: 
+        DOMMain:DOMString
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -646,4 +709,4 @@ IF:
 ## - For ManakaiDOMNodeReference
 ## TreeCore:node    - The node to which referring.
 
-## ManakaiDOM.dis ends here
+## ManakaiDOMMain.dis ends here

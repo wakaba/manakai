@@ -2108,7 +2108,7 @@ sub datatype2perl ($;%) {
       push @{$Info->{DataTypeAlias}->{type_expanded_uri $if_name}
                   ->{isa_uri}||=[]},
            type_expanded_uri $_->value;
-    } elsif ({qw/Name 1 Spec 1 Description 1
+    } elsif ({qw/Name 1 FullName 1 Spec 1 Description 1
                  Level 1 SpecLevel 1 Def 1 ImplNote 1/}->{$_->local_name}) {
       #
     } else {
@@ -2166,7 +2166,7 @@ sub datatypealias2perl ($;%) {
                ($mod ? pod_para ('This type is ' . $mod) : ());
 
   for (@{$node->child_nodes}) {
-    if ({qw/Name 1 Spec 1 Type 1 Description 1
+    if ({qw/Name 1 FullName 1 Spec 1 Type 1 Description 1
             Level 1 SpecLevel 1 Condition 1 ImplNote 1/}->{$_->local_name}) {
       #
     } else {
@@ -2575,6 +2575,11 @@ that is required by entire module.
 ## Get general information
 $Info->{source_filename} = $ARGV;
 
+## Initial Namespace bindings
+for ([ManakaiDOM => ExpandedURI q<ManakaiDOM:>]) {
+  $Info->{Namespace}->{$_->[0]} = $_->[1];
+}
+
 ## Initial DataType aliasing and inheritance
 for (ExpandedURI q<ManakaiDOM:ManakaiDOMURI>,
      ExpandedURI q<ManakaiDOM:ManakaiDOMNamespaceURI>,
@@ -2658,10 +2663,10 @@ $result .= pod_block
       return 0;
     }
   };
-  if (not $req->get_element_by (sub {$reqModule->('ManakaiDOM', @_)})) {
+  if (not $req->get_element_by (sub {$reqModule->('ManakaiDOMMain', @_)})) {
     for ($req->append_new_node (type => '#element',
                                 local_name => 'Module')) {
-      $_->set_attribute (Name => 'ManakaiDOM');
+      $_->set_attribute (Name => 'ManakaiDOMMain');
       $_->set_attribute (Namespace => ExpandedURI q<ManakaiDOM:>);
     }
   }
@@ -2827,6 +2832,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/09/19 07:14:42 $
+# $Date: 2004/09/19 07:57:43 $
 
 
