@@ -13,7 +13,7 @@ This module is part of manakai XML.
 
 package Message::Markup::XML::NodeTree;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Message::Markup::XML::Node;
 use Message::Markup::XML::QName qw/:prefix :special-uri/;
 use Exporter;
@@ -27,6 +27,7 @@ our @EXPORT_OK = qw/construct_xml_tree/;
 
 =cut
 
+sub construct_xml_tree (%);
 sub construct_xml_tree (%) {
   my %opt = @_;
   my $parent = $opt{parent} || 'Message::Markup::XML::Node';
@@ -215,4 +216,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/12/05 08:25:08 $
+1; # $Date: 2004/02/14 11:08:45 $
