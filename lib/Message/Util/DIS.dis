@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/04/02 07:43:15 $
+      $Date: 2005/04/03 04:23:06 $
     @@ContentType:
       dis:Date.RCS
   
@@ -4049,7 +4049,8 @@ ClsDef:
                                         ::swcfg21:ForLatest.value>; 
               $r = $self->{<Q::plCodeFragment>}
                  = $self-><M::ManakaiDISResourceDefinition
-                             .plPreprocessPerlCode> ($source_code);
+                             .plPreprocessPerlCode> ($source_code,
+                                                     node => $def);
             } elsif ($def-><M::ManakaiDISElement.mediaTypeMatch>
                                                          (<Q::lang:dis>)) {
               $r = $self->{<Q::plCodeFragment>}
@@ -4280,6 +4281,25 @@ ClsDef:
       @@@nullCase:
         @@@@enDesc:
           The <P::codeArg> does not belong to any method.
+    @@NamedParam:
+      @@@Name:sourceFile
+      @@@Type:
+        DISLang:String::ManakaiDOM:all
+      @@@enDesc:
+        The source file name of the <P::codeArg>.
+      @@@nullCase:
+        @@@@enDesc:
+          No source file information available.
+    @@NamedParam:
+      @@@Name:sourceLine
+      @@@Type:
+        DOMMain:unsigned-long::ManakaiDOM:all
+      @@@enDesc:
+        The line number in the <P::sourceFile> from which
+        the <P::codeArg> begins.
+      @@@nullCase:
+        @@@@enDesc:
+          No source file information available.
     @@Return:
       @@@Type: 
         lang:Perl::ManakaiDOM:all
@@ -4300,6 +4320,19 @@ ClsDef:
           my $plimpl = $self-><AG::ManakaiDISResourceDefinition
                                   .plImplementation>;
           $r = $plimpl-><M::MPLImpl.createPerlBlock>;
+          if (defined $sourceLine) {
+            $r-><AS::PLBlockCon.sourceFile> ($sourceFile);
+            $r-><AS::PLBlockCon.sourceLine> ($sourceLine);
+            $r-><AS::PLBlockCon.currentSourceFile> ($sourceFile);
+            $r-><AS::PLBlockCon.currentSourceLine> ($sourceLine);
+          } elsif ($node) {
+            my $np = $node-><M::swcfg21:SWCFGNode::swcfg21:ForLatest.nodePath>
+                      (key => [qw/Name QName Type type/]);
+            $r-><AS::PLBlockCon.currentSourceFile> ($np);
+            $r-><AS::PLBlockCon.currentSourceLine> (1);
+            $r-><AS::PLBlockCon.sourceFile> ($np);
+            $r-><AS::PLBlockCon.sourceLine> (1);
+          }
           
           for my $source_code (split /\b(_ _(?:(?!_ _)$RegQNameChar)+
                                            (?:\{$RegBlockContent\})?
@@ -4330,14 +4363,20 @@ ClsDef:
                                ($et eq <Q::disPerl:DEEP> ? '+' : '-').
                                ' 1');
                 $block-><M::PLBlockCon.appendCodeFragment>
-                              ($self-><M::ManakaiDISResourceDefinition
-                                        .plPreprocessPerlCode>
-                                           ($source_code, node => $node,
-                                            method_resource => $methodResource));
+                          ($self-><M::ManakaiDISResourceDefinition
+                                    .plPreprocessPerlCode>
+                                       ($source_code, node => $node,
+                                        method_resource => $methodResource,
+                                        source_file => $r-><AG::PLBlockCon
+                                                          .currentSourceFile>,
+                                        source_line => $r-><AG::PLBlockCon
+                                                          .currentSourceLine>));
+                $r-><M::PLBlockCon.skipLines> ($source_code);
               } elsif ({
                 <Q::disPerl:EXCEPTION> => 1,
                 <Q::disPerl:WARNING> => 1,
               }->{$et}) {
+                $r-><M::PLBlockCon.skipLines> ($source_code);
                 if ($source_code =~ s/^((?:(?!::).)+)(::\s*)?//s) {
                   my ($cls, $const, $subtype)
                     = @{$self->{db}-><M::ManakaiDISDatabase.xcrefToResource>
@@ -4363,6 +4402,7 @@ ClsDef:
                   }__}__;
                 }
               } elsif ($et eq <Q::disPerl:CODE>) {
+                $r-><M::PLBlockCon.skipLines> ($source_code);
                   my $code_name;
                   $source_code =~ s/^\s+//;
                   if ($source_code =~ s/^((?>(?!::).)+)//s) {
@@ -4423,6 +4463,7 @@ ClsDef:
                   }
                   $r-><M::PLBlockCon.appendCodeFragment> ($pc);
                 } elsif ($et eq <Q::ManakaiDOM:InputNormalize>) {
+                  $r-><M::PLBlockCon.skipLines> ($source_code);
                   unless ($methodResource) {
                     __UNDEEP{__EXCEPTION{PERL_PREPROCESS_NO_METHOD_ERR::
                       DIS:sourceNode => {$node},
@@ -4454,21 +4495,27 @@ ClsDef:
                     $r-><M::PLBlockCon.appendCodeFragment> ($norm_code);
                   }
                 } elsif ($et eq <Q::disPerl:FOR>) {
-                  if ($source_code =~ s/^((?>(?!::).)*)::\s*//) {
-                    V: for (split /\s*\|\s*/, $1) {
+                  if ($source_code =~ s/^(((?>(?!::).)*)::\s*)//) {
+                    $r-><M::PLBlockCon.skipLines> ($1);
+                    V: for (split /\s*\|\s*/, $2) {
                       my $for_uri = $self->{src}
                                          -><M::ManakaiDISElement.qnameToURI>
                                               ($_, node => $node);
                       if ($self-><M::ManakaiDISResourceDefinition
                                     .isForURI> ($for_uri)) {
                         $r-><M::PLBlockCon.appendCodeFragment>
-                              ($self-><M::ManakaiDISResourceDefinition
-                                        .plPreprocessPerlCode>
-                                           ($source_code, node => $node,
-                                            method_resource => $methodResource));
+                            ($self-><M::ManakaiDISResourceDefinition
+                                  .plPreprocessPerlCode>
+                                     ($source_code, node => $node,
+                                      method_resource => $methodResource,
+                                      source_file => $r-><AG::PLBlockCon.
+                                                       currentSourceFile>,
+                                      source_line => $r-><AG::PLBlockCon.
+                                                       currentSourceLine>));
                         last V;
                       }
                     } # V
+                    $r-><M::PLBlockCon.skipLines> ($source_code);
                   } else {
                     __UNDEEP{__EXCEPTION{PERL_PREPROCESS_NO_FOR_ERR::
                       DIS:sourceNode => {$node},
@@ -4477,6 +4524,7 @@ ClsDef:
                     }__}__;
                   }
                 } elsif ($et eq <Q::disPerl:ASSERT>) {
+                  $r-><M::PLBlockCon.skipLines> ($source_code);
                   my $assert_type;
                   if ($source_code =~ s/^\s*($RegQNameChar+)\s*::\s*//o) {
                     $assert_type = $self->{src}
@@ -4577,7 +4625,12 @@ ClsDef:
                 $r-><M::PLBlockCon.appendCodeFragment>
                        ($self-><M::ManakaiDISResourceDefinition
                              .plPreprocessPerlStatement>
-                                 ($source_code, contains_statements => true));
+                                 ($source_code, contains_statements => true,
+                                  source_file => $r-><AG::PLBlockCon
+                                                        .currentSourceFile>,
+                                  source_line => $r-><AG::PLBlockCon
+                                                        .currentSourceLine>));
+                $r-><M::PLBlockCon.skipLines> ($source_code);
               }
             } # for
           }__; # DEEP
@@ -4612,6 +4665,25 @@ ClsDef:
       @@@enDesc:
         Whether one or more statements might be contained
         in <P::codeArg> or not.
+    @@NamedParam:
+      @@@Name:sourceFile
+      @@@Type:
+        DISLang:String::ManakaiDOM:all
+      @@@enDesc:
+        The source file name of the <P::codeArg>.
+      @@@nullCase:
+        @@@@enDesc:
+          No source file information available.
+    @@NamedParam:
+      @@@Name:sourceLine
+      @@@Type:
+        DOMMain:unsigned-long::ManakaiDOM:all
+      @@@enDesc:
+        The line number in the <P::sourceFile> from which
+        the <P::codeArg> begins.
+      @@@nullCase:
+        @@@@enDesc:
+          No source file information available.
     @@Return:
       @@@Type:MPLCodeFragment
       @@@enDesc:
@@ -4639,6 +4711,19 @@ ClsDef:
                                   .plImplementation>;
           if ($containsStatements) {
             $r = $plimpl-><M::MPLImpl.createPerlBlockContainer>;
+            if (defined $sourceLine) {
+              $r-><AS::PLBlockCon.sourceFile> ($sourceFile);
+              $r-><AS::PLBlockCon.sourceLine> ($sourceLine);
+              $r-><AS::PLBlockCon.currentSourceFile> ($sourceFile);
+              $r-><AS::PLBlockCon.currentSourceLine> ($sourceLine);
+            } elsif ($node) {
+              my $np = $node-><M::swcfg21:SWCFGNode::swcfg21:ForLatest.nodePath>
+                        (key => [qw/Name QName Type type/]);
+              $r-><AS::PLBlockCon.sourceFile> ($np);
+              $r-><AS::PLBlockCon.sourceLine> (1);
+              $r-><AS::PLBlockCon.currentSourceFile> ($np);
+              $r-><AS::PLBlockCon.currentSourceLine> (1);
+            }
           } else {
             $r = $plimpl-><M::MPLImpl.createPerlInlineContainer>;
           }

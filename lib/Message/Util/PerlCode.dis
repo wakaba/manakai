@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/04/02 07:43:15 $
+      $Date: 2005/04/03 04:23:07 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1224,13 +1224,14 @@ ClsDef:
     statements and/or blocks.
 
   @Attr:
-    @@Name: currentSourceFile
+    @@Name: sourceFile
     @@enDesc:
-      The current source file name that is referred when 
-      a code fragment is added. 
+      The source file name of this fragment. 
     @@Type:
       DISLang:String
     @@Get:
+      @@@enDesc:
+        Any string identifying the source. 
       @@@nullCase:
         @@@@enDesc: No source file name is set. 
       @@@disDef:
@@ -1242,6 +1243,37 @@ ClsDef:
         @@@@SetProp: sourceFile
 
   @Attr:
+    @@Name: sourceLine
+    @@enDesc:
+      Source file line number of the first line of this fragment. 
+    @@Type:
+      DOMMain:unsigned-long
+    @@Get:
+      @@@disDef:
+        @@@@GetProp: sourceLine
+    @@Set:
+      @@@disDef:
+        @@@@SetProp: sourceLine
+
+  @Attr:
+    @@Name: currentSourceFile
+    @@enDesc:
+      The current source file name that is referred when 
+      a code fragment is added. 
+    @@Type:
+      DISLang:String
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc: No source file name is set. 
+      @@@disDef:
+        @@@@GetProp:currentSourceFile
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc: No (or unknown) source file. 
+      @@@disDef:
+        @@@@SetProp:currentSourceFile
+
+  @Attr:
     @@Name: currentSourceLine
     @@enDesc:
       The current line number in source file that is referred when 
@@ -1250,10 +1282,10 @@ ClsDef:
       DOMMain:unsigned-long::ManakaiDOM:all
     @@Get:
       @@@disDef:
-        @@@@GetProp: sourceLine
+        @@@@GetProp:currentSourceLine
     @@Set:
       @@@disDef:
-        @@@@SetProp: sourceLine
+        @@@@SetProp:currentSourceLine
 
   @Method:
     @@Name: appendCodeFragment
@@ -1319,10 +1351,10 @@ ClsDef:
       @@@PerlDef:
         $r = <ClassM::ManakaiPerlUnparsedCode.newObject>;
         my $node = $self->{<Q::TreeCore:node>};
-        $r->{<Q::sourceFile>} = $node->{<Q::sourceFile>};
-        $r->{<Q::sourceLine>} = $node->{<Q::sourceLine>};
+        $r->{<Q::sourceFile>} = $node->{<Q::pc:currentSourceFile>};
+        $r->{<Q::sourceLine>} = $node->{<Q::pc:currentSourceLine>};
         $r->{<Q::code>} = $codeArg;
-        $node->{<Q::sourceLine>} += ($codeArg =~ tr/\x0A/\x0A/);
+        $node->{<Q::pc:currentSourceLine>} += ($codeArg =~ tr/\x0A/\x0A/);
         $node-><M::ManakaiDOM:ManakaiDOMNodeObject
                  ::ManakaiDOM:Perl.importTree> ($r);
         push @{$node->{<Q::pc:childNodes>}}, $r;
@@ -1344,7 +1376,7 @@ ClsDef:
         A code fragment, which is counted lines. 
     @@Return:
       @@@PerlDef:
-        $self->{<Q::TreeCore:node>}->{<Q::sourceLine>}
+        $self->{<Q::TreeCore:node>}->{<Q::pc:currentSourceLine>}
                             += ($codeArg =~ tr/\x0A/\x0A/);
 
   @ImplNote:
@@ -1647,8 +1679,9 @@ ClsDef:
         __DEEP{
           my $file = $self-><AG::ManakaiPerlCodeFragment.fileNode>;
           $r = sprintf (qq<\n#line %d "%s (Chunk #%d)"\n>,
-                        $node->{<Q::pc:sourceLine>},
-                        $node->{<Q::pc:sourceFile>},
+                        $node->{<Q::pc:sourceLine>} || 1,
+                        $node->{<Q::pc:sourceFile>} ||
+                          $file-><AG::ManakaiPerlFile.sourceFile>,
                         $file-><M::ManakaiPerlFile.getNextChunkNumber>)
              . $node->{<Q::pc:code>}
              . sprintf (qq<\n#line 1 "%s (Chunk #%d)"\n>,
@@ -2461,7 +2494,8 @@ ClsDef:
           @@@@@lang:en
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:childNodes>, <Q::pc:label>,
-                <Q::pc:parent>.
+                <Q::pc:parent>, <Q::pc:sourceFile>, <Q::pc:sourceLine>,
+                <Q::pc:currentSoruceFile>, <Q::pc:currentSourceLine>.
 
   @IntCloneMethod:
     @@Return:
@@ -2484,7 +2518,10 @@ ClsDef:
             $cno_clone->{<Q::pc:parent>} = $node;
             ## NOTE: Tree ID is not updated yet.
           }
-          $node->{<Q::pc:label>} = $nodeObject->{<Q::pc:label>};
+          for my $prop (<Q::pc:label>, <Q::pc:sourceFile>, <Q::pc:sourceLine>,
+                        <Q::pc:currentSourceFile>, <Q::pc:currentSourceLine>) {
+            $node->{$prop} = $nodeObject->{$prop};
+          }
 
   @ToStringMethod:
     @@Return:
@@ -2515,8 +2552,9 @@ ClsDef:
           __DEEP{
             my $file = $self-><AG::ManakaiPerlCodeFragment.fileNode>;
             $r = sprintf (qq<\n{\n#line %d "%s (Chunk #%d)"\n>,
-                          $node->{<Q::pc:sourceLine>},
-                          $node->{<Q::pc:sourceFile>},
+                          $node->{<Q::pc:sourceLine>} || 1,
+                          $node->{<Q::pc:sourceFile>} ||
+                            $file-><AG::ManakaiPerlFile.sourceFile>,
                           $file-><M::ManakaiPerlFile.getNextChunkNumber>)
                . $r
                . sprintf (qq<\n#line 1 "%s (Chunk #%d)"\n}\n>,
@@ -2559,8 +2597,9 @@ ClsDef:
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
-            Properties: <Q::pc:nodeType>, <Q::pc:childNodes>, <Q::pc:label>,
-                <Q::pc:parent>.
+            Properties: <Q::pc:nodeType>, <Q::pc:childNodes>,
+                <Q::pc:parent>, <Q::pc:sourceFile>, <Q::pc:sourceLine>,
+                <Q::pc:currentSourceFile>, <Q::pc:currentSourceLine>.
 
   @IntCloneMethod:
     @@Return:
@@ -2583,7 +2622,10 @@ ClsDef:
             $cno_clone->{<Q::pc:parent>} = $node;
             ## NOTE: Tree ID is not updated yet.
           }
-          $node->{<Q::pc:label>} = $nodeObject->{<Q::pc:label>};
+          for my $prop (<Q::pc:sourceFile>, <Q::pc:sourceLine>,
+                        <Q::pc:currentSourceFile>, <Q::pc:currentSourceLine>) {
+            $node->{$prop} = $nodeObject->{$prop};
+          }
 
   @ToStringMethod:
     @@Return:
@@ -2616,8 +2658,9 @@ ClsDef:
           __DEEP{
             my $file = $self-><AG::ManakaiPerlCodeFragment.fileNode>;
             $r = sprintf (qq<\n#line %d "%s (Chunk #%d)"\n>,
-                          $node->{<Q::pc:sourceLine>},
-                          $node->{<Q::pc:sourceFile>},
+                          $node->{<Q::pc:sourceLine>} || 1,
+                          $node->{<Q::pc:sourceFile>} ||
+                            $file-><AG::ManakaiPerlFile.sourceFile>,
                           $file-><M::ManakaiPerlFile.getNextChunkNumber>)
                . $r
                . sprintf (qq<\n#line 1 "%s (Chunk #%d)"\n>,
@@ -3038,6 +3081,16 @@ PropDef:
   @QName: sourceLine
   @enDesc:
     Source line number. 
+
+PropDef:
+  @QName: currentSourceFile
+  @enDesc:
+    <QUOTE::Current> source file. 
+
+PropDef:
+  @QName: currentSourceLine
+  @enDesc:
+    <QUOTE::Current> source line number. 
 
 PropDef:
   @QName: prototype
