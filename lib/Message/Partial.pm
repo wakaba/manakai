@@ -9,7 +9,7 @@ Message::Partial --- Perl module for partial message defined by MIME
 package Message::Partial;
 use strict;
 use vars qw(%OPTION $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Entity;
 require Message::Header;
@@ -21,11 +21,18 @@ require Message::Field::MsgID;
 );
 
 my %ENCLOSED_FIELD = (
+	'disposition-notification-to'	=> 1,	## RFC 2298
+	'disposition-notification-options'	=> 1,	## RFC 2298
 	encrypted	=> 1,	## RFC 1521
 	'message-id'	=> 2,	## RFC 1341
-	'mime-version'	=> 1,	## RFC 1521
+	'mime-version'	=> 2,	## RFC 1521
+	'original-recipient'	=> 1,	## RFC 2298
 	subject	=> 1,	## RFC 2046
 	'user-agent'	=> 1,	## non-standard extension
+## Note: If value is 2, that header field from the first fragment
+##       is removed.  1 or 0, not removed.  Usually, 1-valued fields
+##       are encapsulated and does not occur in fragments.  Such
+##       context, 1 and 2 have no difference.
 );
 sub fragmentate ($;%) {
   my $msg = shift;
@@ -190,7 +197,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/14 12:07:16 $
+$Date: 2002/07/03 23:39:15 $
 
 =cut
 

@@ -8,7 +8,7 @@ Message::Header --- A Perl Module for Internet Message Headers
 package Message::Header;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.28 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.29 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;	## This may seem silly:-)
 push @ISA, qw(Message::Field::Structured);
 
@@ -128,6 +128,11 @@ sub _init ($;%) {
   $self->{option}->{ns_default_phuri} = $self->{ns}->{phname2uri}->{'rfc822'}
     unless $self->{option}->{ns_default_phuri};
   
+  ## For text/rfc822-headers
+  if (ref $options{entity_header}) {
+    $self->{entity_header} = $options{entity_header};
+    delete $options{entity_header};
+  }
   my @new_fields = ();
   for my $name (keys %options) {
     unless (substr ($name, 0, 1) eq '-') {
@@ -376,6 +381,16 @@ sub _parse_value ($$$;%) {
       -parse_all	=> $self->{option}->{parse_all},
     %vopt);
   }
+}
+
+## Defined for text/rfc822-headers
+sub entity_header ($;$) {
+  my $self = shift;
+  my $new_header = shift;
+  if (ref $new_header) {
+    $self->{header} = $new_header;
+  }
+  $self->{header};
 }
 
 =head2 $self->field_name_list ()
@@ -830,7 +845,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/02 06:37:56 $
+$Date: 2002/07/03 23:39:15 $
 
 =cut
 

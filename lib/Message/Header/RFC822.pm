@@ -9,7 +9,7 @@ for RFC822 Namespaces of Header Fields
 package Message::Header::RFC822;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Header::Default;
 
 our %OPTION = %Message::Header::Default::OPTION;
@@ -101,7 +101,7 @@ for (qw(abuse-reports-to apparently-to approved approved-by bcc cc complaints-to
   {$OPTION{value_type}->{$_} = ['Message::Field::Addresses']}
 for (qw(client-date date date-received delivery-date expires
   expire-date nntp-posting-date posted posted-date received-date 
-  reply-by resent-date x-originalarrivaltime x-tcup-date))
+  reply-by resent-date x-originalarrivaltime x-original-date x-tcup-date))
   {$OPTION{value_type}->{$_} = ['Message::Field::Date']}
 for (qw(article-updates in-reply-to
   obsoletes references replaces see-also supersedes))
@@ -294,7 +294,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/16 10:45:54 $
+$Date: 2002/07/03 23:39:15 $
 
 =cut
 

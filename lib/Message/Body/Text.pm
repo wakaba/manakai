@@ -8,7 +8,7 @@ Message::Body::Text --- Perl Module for Internet Media Types "text/*"
 package Message::Body::Text;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -65,6 +65,8 @@ sub _init ($;%) {
     $self->{option}->{use_param_charset} = 1;
     if ($self->{option}->{format} =~ /http/) {
       $self->{option}->{default_charset} = 'iso-8859-1';
+    } elsif ($self->{option}->{format} =~ /news-usefor|sip/) {
+      $self->{option}->{default_charset} = 'utf-8';
     } else {
       $self->{option}->{default_charset} = 'us-ascii';
     }
@@ -236,7 +238,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/16 10:44:08 $
+$Date: 2002/07/03 23:39:15 $
 
 =cut
 
