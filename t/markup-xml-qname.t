@@ -197,7 +197,7 @@ my @qname = (
              {
               qname  => q":bar",
               join_qname => q"bar",
-              prefix => q"",
+              prefix => DEFAULT_PFX,
               lname  => q"bar",
               result => 0,
               join_result => 1,
@@ -413,8 +413,8 @@ for (@qname) {
   
   $chk = Message::Markup::XML::QName::join_qname
     ($_->{prefix}, $_->{lname}, %{$_->{opt}||{}});
-  if ((defined $_->{join_result} and $_->{join_result}) or $_->{result}) {
-    ok $chk->{qname} eq ($_->{join_qname} || $_->{qname}), "Join 1: $_->{prefix}, $_->{lname} => $chk->{qname}";
+  if (defined $_->{join_result} ? $_->{join_result} : $_->{result}) {
+    ok $chk->{qname} eq ($_->{join_qname} || $_->{qname}), qq(Join 1: "$_->{prefix}":"$_->{lname}" => "$chk->{qname}" ("@{[$_->{join_qname} || $_->{qname}]}" expected));
   } else {
     ok $chk->{success} == ((defined $_->{join_result} and $_->{join_result}) or $_->{result}),
        "Join 0: $chk->{success}; $_->{prefix}, $_->{lname} => $chk->{qname}";
