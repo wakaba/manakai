@@ -20,7 +20,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/27 14:27:56 $
+      $Date: 2005/03/03 06:26:13 $
     @@ContentType:
       dis:Date.RCS
   
@@ -189,8 +189,8 @@ StringDataTypeDef:
                 $new->{$lfname}->{$fver} = $INPUT->{$fname}->{$fver};
               }
             } else {
-              $new->{lc $fname} = {(CORE::defined $new->{$fname}
-                                      ? $new->{$fname} : '') => 1};
+              $new->{lc $fname} = {(CORE::defined $INPUT->{$fname}
+                                      ? $INPUT->{$fname} : '') => 1};
             }
           }
           $INPUT = $new;
@@ -245,12 +245,21 @@ StringDataTypeDef:
       }
       $OUT = join ' ', @out;
 
-ResourceTypeDef:
+ResourceDef:
   @QName: 
     DOMMain:DOMFeature
   @FullName:
     @@lang:en
     @@@: DOM feature
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf:
+    rdfs:Class::ManakaiDOM:all
+  @AliasFor:
+    @@@:
+      ::ManakaiDOM:all
+    @@For:
+      !=ManakaiDOM:all
 
 ## -- The feature system (manakai)
 
@@ -926,23 +935,23 @@ IFClsDef:
         @@@PerlDef:
           $features->{'core'}->{''} = 1;
               ## NOTE: This method must return a DOMImplementation object. 
-          CLS: for (values %{<IF::DOMCore:DOMImplementation
+          CLS: for my $fcls (values %{<IF::DOMCore:DOMImplementation
                                      ::ManakaiDOM:ManakaiDOM>::Class}) {
             for my $fname (keys %$features) {
+              my $fkey = $fname;
               my $plus = $fname =~ s/^\+// ? 1 : 0;
-              F: for my $fver (ref $features->{$fname} eq 'HASH'
-                                 ? grep {$features->{$fname}->{$_}}
-                                     keys %{$features->{$fname}}
-                                 : $features->{$fname}) {
-                unless ($_->{feature}->{$fname}->{$fver}) {
+              F: for my $fver (grep {$features->{$fkey}->{$_}}
+                                     keys %{$features->{$fkey}}) {
+                unless ($fcls->{feature}->{$fkey}->{$fver}) {
                   ## Accessible via getFeature
                   if ($plus and
                       ${<Class::DOMCore:ManakaiDOMImplementation
                                      ::ManakaiDOM:ManakaiDOMLatest>::Class}{
-                        $_->{packageName}}->{packageName}) {
-                    for (values %{<Class::DOMCore:ManakaiDOMImplementation
+                        $fcls->{packageName}}->{packageName}) {
+                    for my $pfcls (values
+                                     %{<Class::DOMCore:ManakaiDOMImplementation
                                      ::ManakaiDOM:ManakaiDOMLatest>::Class}) {
-                      if ($_->{feature}->{$fname}->{$fver}) {
+                      if ($pfcls->{feature}->{$fname}->{$fver}) {
                         next F;
                       }
                     }
@@ -951,7 +960,7 @@ IFClsDef:
                 }
               }
             }
-            $r = $_->{packageName}->_new;
+            $r = $fcls->{packageName}->_new;
             last CLS;
           }
   @Method:
@@ -1245,23 +1254,6 @@ ElementTypeBinding:
         ManakaiDOM:DOM3
 
 ElementTypeBinding:
-  @Name: ResourceTypeDef
-  @ElementType: 
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      rdfs:Class
-    @@rdfs:subClassOf:
-      rdfs:Class::ManakaiDOM:all
-    @@subsetOf:
-      rdfs:Class::ManakaiDOM:all
-    @@AliasFor:
-      @@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
-
-ElementTypeBinding:
   @Name: PropDef
   @ElementType:
     dis:ResourceDef
@@ -1269,7 +1261,7 @@ ElementTypeBinding:
     @@rdf:type:
       rdf:Property
     @@AliasFor:
-      @@@:
+      @@@@:
         ::ManakaiDOM:all
       @@@For:
         !=ManakaiDOM:all

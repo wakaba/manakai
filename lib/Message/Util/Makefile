@@ -21,7 +21,8 @@ CDIS2PM = $(PERL) $(CDIS2PM_PL) $(CDIS2PM_OPTIONS)
 DIS_FILES = ManakaiNode.dis
 GENERATED_FILES = mnode.cdis ManakaiNode.pm \
                   dis.cdis DIS.pm \
-                  Error/err.cdis Error/DOMException.pm
+                  Error/err.cdis Error/DOMException.pm \
+                  pc.cdis PerlCode.pm
 
 NS_MANAKAIDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#
 NS_DIS = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS\#
@@ -49,6 +50,14 @@ Error/err.cdis: Error/DOMException.dis $(DISC_PL)
 Error/DOMException.pm: Error/err.cdis $(CDIS2PM_PL)
 	$(CDIS2PM) $< \
 	  --module-name=DOMException > $@
+	$(PERL_CHK) $@
+
+pc.cdis: PerlCode.dis $(DISC_PL)
+	$(DISC) $< --output-file-name=$@
+
+PerlCode.pm: pc.cdis $(CDIS2PM_PL)
+	$(CDIS2PM) $< \
+	  --module-name=PerlCode > $@
 	$(PERL_CHK) $@
 
 clean:

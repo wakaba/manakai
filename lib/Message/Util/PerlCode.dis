@@ -1,0 +1,1233 @@
+Module:
+  @QName:
+    Util:PerlCode
+  @FullName:
+    @@lang: en
+    @@@:
+      Perl Code Constructor
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/PerlCode#
+  
+  @Description:
+    @@lang:en
+    @@@:
+      This module provides an object-oriented interface to construct 
+      Perl code. 
+
+  @Author:
+    @@FullName: Wakaba
+    @@Mail: w@suika.fam.cx
+  @License:
+    @@@:
+      license:Perl+MPL
+    @@Original:
+      @@@FullName:
+        manakai <CODE::lib/manakai/genlib.pl>
+      @@@Year:2004
+      @@@Author:
+        @@@@FullName:Wakaba
+        @@@@Mail:w@suika.fam.cx
+  @Date:
+    @@@:
+      $Date: 2005/03/03 06:26:16 $
+    @@ContentType:
+      dis:Date.RCS
+  
+  @Require:
+    @@Module:
+      @@@Name: ManakaiNode
+      @@@WithFor:
+        ManakaiDOM:Perl
+    @@Module:
+      @@@Name: DOMBoot
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOMLatest
+    @@Module:
+      @@@Name: DOMMetaImpl
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOMLatest
+
+  @DefaultFor: 
+    ManakaiDOM:Perl
+
+Namespace:
+  @DIS:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @dis2pm:
+    http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
+  @DISlib:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @DOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @DOMLS:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
+  @DOMMain:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @infoset:
+    http://www.w3.org/2001/04/infoset#
+  @lang:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @Markup:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup#
+  @MDOMX:
+    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @owl:
+    http://www.w3.org/2002/07/owl#
+  @pc:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/PerlCode#
+  @Perl:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @swcfg21:
+    http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
+  @TreeCore:\
+  @Util:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
+
+## -- Features
+
+ElementTypeBinding:
+  @Name: FeatureDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DOMMain:DOMFeature
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: FeatureVerDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DOMMain:DOMFeature
+
+ElementTypeBinding:
+  @Name: featureQName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ContentType:
+      dis:TypeQName
+
+FeatureDef:
+  @QName: CoreFeature
+  @featureQName:
+    Util:PerlCode
+  @FeatureVerDef:
+    @@QName: CoreFeature10
+    @@Version: 1.0
+    @@ISA: CoreFeature
+    @@FullName:
+      @@@lang:en
+      @@@@:
+        Perl Code Constructor, version 1.0
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Perl Code Constructor, version 1.0.
+
+## -- Classes
+
+ClsDef:
+  @ClsQName: ManakaiPerlCodeFragment
+  @ClsISA:
+    ManakaiDOM:ManakaiDOMNodeReference::ManakaiDOM:Perl
+  @enDesc:
+    A class on which another Perl code classes are constructed based. 
+
+  @IntMethod:
+    @@Operator:
+      @@@@:
+        ManakaiDOM:MUErrorHandler
+      @@@ContentType:
+        dis:TypeQName
+    @@Description:
+      @@@lang:en
+      @@@@:
+        This method is a generic error handler; all manakai exceptions 
+        and warnings associated to an object are once reported to this method 
+        and then delivered to appropriate entities. 
+        \
+        If the error is an exception (such as <X::DOMCore:DOMException> or 
+        <X::ManakaiDOM:ManakaiDOMImplementationException>), it is 
+        simply thrown.  If the error is only a warning, it is reported 
+        via the <IF::DOMCore:DOMError> interface. 
+        \
+        See <PerlModule::Message::Util::Error> documentation for more 
+        information on the error reporting mechanism.
+        \
+        {NOTE:: This kind of methods are named as <Perl::___report_error> 
+                in the convention of <PerlModule::Message::Util::Error>. 
+        \
+        }
+    @@Param:
+      @@@Name:err
+      @@@Type: 
+        ManakaiDOM:ManakaiDOMExceptionOrWarning::ManakaiDOM:Perl
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          An exception object that describes what kind of error it is 
+          and how it should be recovered. 
+          \
+          {NOTE:: Exception objects in manakai implementation 
+                  inherit the class <PerlModule::Message::Util::Error>, 
+                  that in turn inherits <PerlModule::Error>.
+          \
+          }
+    @@Return:
+      @@@PerlDef:
+          if ($err->isa (<ClassName::ManakaiDOM:ManakaiDOMException
+                                   ::ManakaiDOM:Perl>)) {
+            $err->throw;
+          } else {
+            \## TODO: Implement warning reporting
+            warn $err->stringify;
+          }
+
+  @Attr:
+    @@Name: parentNode
+    @@enDesc:
+      The parent construction of this object. 
+    @@Get:
+      @@@Type: ManakaiPerlCodeFragment
+      @@@PerlDef:
+        $r = $self->{<Q::TreeCore:node>}->{<Q::pc:parent>};
+        $r = $r-><M::ManakaiDOM:ManakaiDOMNodeObject
+                   ::ManakaiDOM:Perl.newReference>
+                         (<ClassName::ManakaiPerlSub>) if $r;        
+##PerlCodeFragment
+
+ClsDef:
+  @ClsQName: ManakaiPerlFile
+  @ClsISA: ManakaiPerlCodeFragment
+  @enDesc:
+    Perl source code files.
+
+  @IntMethod:
+    @@Name:newObject
+    @@ManakaiDOM:isStatic:1
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates a new instance object for <Class::ManakaiPerlFile>. 
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The newly created node object.
+      @@@PerlDef:
+        @@@@@:
+          my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
+                                        ::ManakaiDOM:Perl.new>;
+          push @{$node->{<Q::TreeCore:subnode>}}, <Q::pc:childNodes>;
+          $node->{<Q::pc:childNodes>} = [];
+          $node->{<Q::pc:sourceFile>} = '';
+          $node->{<Q::pc:sourceModule>} = '';
+          $node->{<Q::pc:sourceFor>} = '';
+          $node->{<Q::pc:currentPackage>} = 'main';
+          $node->{<Q::pc:currentChunk>} = 0;
+        @@@@ImplNote:
+          @@@@@lang:en
+          @@@@@@:
+            Properties: <Q::pc:sourceFile>,
+               <Q::pc:sourceModule>, <Q::pc:sourceFor>, <Q::childNodes>, 
+               <Q::pc:currentPackage>, <Q::pc:currentChunk>.
+
+  @Method:
+    @@Name: appendNewPackage
+    @@enDesc:
+      Appends a new package scope block. 
+    @@Param:
+      @@@Name: packageName
+      @@@Type:
+        Perl:package-name::ManakaiDOM:all
+      @@@enDesc:
+        The fully-qualified name of the package to create. 
+    @@Return:
+      @@@Type: ManakaiPerlPackageScope
+      @@@enDesc:
+        The newly created package scope object. 
+      @@@PerlDef:
+        $r = <ClassM::ManakaiPerlPackageScope.newObject>;
+        $r->{<Q::pc:packageName>} = $packageName;
+        $self->{<Q::TreeCore:node>}
+             -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+                            .importTree> ($r);
+        push @{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}}, $r;
+        $r->{<Q::pc:parent>} = $self->{<Q::TreeCore:node>};
+        $r = $r-><M::ManakaiDOM:ManakaiDOMNodeObject
+                   ::ManakaiDOM:Perl.newReference>
+                         (<ClassName::ManakaiPerlPackageScope>);
+        
+
+  @Method:
+    @@Name: getFirstPackage
+    @@enDesc:
+      Gets the first package scope block of a name. 
+    @@Param:
+      @@@Name: packageName
+      @@@@Type:
+        Perl:package-name::ManakaiDOM:all
+      @@@@enDesc:
+        The fully-qualified name of the package to get. 
+    @@NamedParam:
+      @@@Name: makeNewPackage
+      @@@Type:
+        DOMMain:boolean
+      @@@enDesc:
+        Whether a new package scope object should be created if 
+        no package of <P::packageName> found. 
+      @@@TrueCase:
+        @@@@enDesc:
+          Makes a new object if not found. 
+      @@@FalseCase:
+        @@@@enDesc:
+          Don't make a new object. 
+    @@Return:
+      @@@Type: ManakaiPerlPackageScope
+      @@@enDesc:
+        The first package scope object whose name is equal to 
+        <P::packageName>.
+      @@@nullCase:
+        @@@@enDesc:
+          There is no <P::packageName> package object and 
+          the <P::makeNewPackage> parameter is set to <DOM::false>. 
+      @@@PerlDef:
+        for my $cn (@{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}}) {
+          if ($cn->{<Q::pc:packageName>} eq $packageName) {
+            $r = $cn;
+            last;
+          }
+        }
+        if ($r) {
+          $r = $r-><M::ManakaiDOM:ManakaiDOMNodeObject
+                   ::ManakaiDOM:Perl.newReference>
+                         (<ClassName::ManakaiPerlPackageScope>);
+        } elsif ($makeNewPackage) {
+          __DEEP{
+            $r = $self-><M::ManakaiPerlFile.appendNewPackage> ($packageName);
+          }__;
+        }
+
+  @Method:
+    @@Name: getLastPackage
+    @@enDesc:
+      Gets the last package scope block of a name. 
+    @@Param:
+      @@@Name: packageName
+      @@@@Type:
+        Perl:package-name::ManakaiDOM:all
+      @@@@enDesc:
+        The fully-qualified name of the package to get. 
+    @@NamedParam:
+      @@@Name: makeNewPackage
+      @@@Type:
+        DOMMain:boolean
+      @@@enDesc:
+        Whether a new package scope object should be created if 
+        no package of <P::packageName> found. 
+      @@@TrueCase:
+        @@@@enDesc:
+          Makes a new object if not found. 
+      @@@FalseCase:
+        @@@@enDesc:
+          Don't make a new object. 
+    @@Return:
+      @@@Type: ManakaiPerlPackageScope
+      @@@enDesc:
+        The last package scope object whose name is equal to 
+        <P::packageName>.
+      @@@nullCase:
+        @@@@enDesc:
+          There is no <P::packageName> package object and 
+          the <P::makeNewPackage> parameter is set to <DOM::false>. 
+      @@@PerlDef:
+        for my $cn (reverse @{$self->{<Q::TreeCore:node>}
+                                   ->{<Q::pc:childNodes>}}) {
+          if ($cn->{<Q::pc:packageName>} eq $packageName) {
+            $r = $cn;
+            last;
+          }
+        }
+        if ($r) {
+          $r = $r-><M::ManakaiDOM:ManakaiDOMNodeObject
+                   ::ManakaiDOM:Perl.newReference>
+                         (<ClassName::ManakaiPerlPackageScope>);
+        } elsif ($makeNewPackage) {
+          __DEEP{
+            $r = $self-><M::ManakaiPerlFile.appendNewPackage> ($packageName);
+          }__;
+        }
+
+  @Attr:
+    @@Name: length
+    @@enDesc:
+      The number of child code fragments. 
+    @@Type:
+      DOMMain:unsigned-long
+    @@Get:
+      @@@PerlDef:
+        $r = @{$self->{<Q::TreeCore:childNodes>}->{<Q::pc:childNodes>}};
+
+  @Attr:
+    @@Name: sourceFile
+    @@enDesc:
+      The file name of the source file from which this 
+      Perl code is primary generated. 
+    @@Get:
+      @@@Type:
+        DISLang:String
+      @@@disDef:
+        @@@@GetProp: sourceFile
+    @@Set:
+      @@@Type:
+        DISLang:String
+      @@@disDef:
+        @@@@SetProp: sourceFile
+
+  @Attr:
+    @@Name: sourceModule
+    @@enDesc:
+      The name URI reference of the source module that this package defines.
+    @@Get:
+      @@@Type:
+        DISLang:String
+      @@@disDef:
+        @@@@GetProp: sourceModule
+    @@Set:
+      @@@Type:
+        DISLang:String
+      @@@disDef:
+        @@@@SetProp: sourceModule
+
+  @Attr:
+    @@Name: sourceFor
+    @@enDesc:
+      The URI reference of the source module <QUOTE::for> for which this 
+      package is. 
+    @@Get:
+      @@@Type:
+        DISLang:String
+      @@@disDef:
+        @@@@GetProp: sourceFor
+    @@Set:
+      @@@Type:
+        DISLang:String
+      @@@disDef:
+        @@@@SetProp: sourceFor
+
+  @ToStringMethod:
+    @@Return:
+      @@@Type:
+        DISLang:String
+      @@@enDesc:
+        The Perl code generated. 
+      @@@PerlDef:
+        __DEEP{
+          my $node = $self->{<Q::TreeCore:node>};
+          ## -- Header
+          $r = qq<#!/usr/bin/perl \n>;
+          $r .= <ClassM::ManakaiPerlCodeImplementation.perlComment>
+                  (q<This file is automatically generated>);
+          $r .= <ClassM::ManakaiPerlCodeImplementation.perlComment>
+                 (q<	at >.<ClassM::ManakaiPerlCodeImplementation
+                                           .rfc3339DateTime> (time).q<,>);
+          $r .= <ClassM::ManakaiPerlCodeImplementation.perlComment>
+                  (q<	from file ">.$node->{<Q::sourceFile>}.q<",>);
+          $r .= <ClassM::ManakaiPerlCodeImplementation.perlComment>
+                  (q[	module <].$node->{<Q::sourceModule>}.q[>,]);
+          $r .= <ClassM::ManakaiPerlCodeImplementation.perlComment>
+                  (q[	for <].$node->{<Q::sourceFor>}.q[>.]);
+          $r .= <ClassM::ManakaiPerlCodeImplementation.perlComment>
+                  (q<Don't edit by hand!>);
+          $r .= qq<use strict;\n>;
+          $self-><AS::ManakaiPerlFile.currentPackage> ('main');
+          $self-><AS::ManakaiPerlFile.currentChunk> (0);
+
+          ## -- Packages
+          my $pack = {};
+          for my $sp (@{$node->{<Q::pc:childNodes>}}) {
+            my $spe = $sp-><M::ManakaiDOM:ManakaiDOMNodeObject
+                             ::ManakaiDOM:Perl.newReference>
+                                 (<ClassName::ManakaiPerlPackageScope>);
+            $r .= $spe->stringify;
+            for my $ipack (keys %{$sp->{<Q::dis:Implement>}}) {
+              $pack->{$ipack} ||= true; # not defined
+            }
+            $pack->{$sp->{<Q::pc:packageName>}} = []; # defined
+          }
+
+          ## -- Enables interface packages
+          $r .= q<for (>. join (', ',
+                                map {'$' . $_ . '::'}
+                                grep {not ref $pack->{$_} and
+                                           $pack->{$_}} keys %$pack) . qq<){}\n>;
+
+          ## -- Footer
+          $r .= <ClassM::ManakaiPerlCodeImplementation.perlComment>
+                  (q[License: <].$node->{<Q::license>}.qq[>\n]);
+          $r .= qq<1;\n>;
+        }__;
+
+  @Attr:
+    @@Name: currentPackage
+    @@enDesc:
+      The current Perl package (used in stringify method).
+    @@Type:
+      Perl:package-name::ManakaiDOM:all
+    @@Get:
+      @@@disDef:
+        @@@@GetProp: currentPackage
+    @@Set:
+      @@@disDef:
+        @@@@SetProp: currentPackage
+
+  @Attr:
+    @@Name: currentChunk
+    @@enDesc:
+      The current code chunk (used in stringify method). 
+    @@Type:
+      DOMMain:unsigned-long::ManakaiDOM:all
+    @@Get:
+      @@@disDef:
+        @@@@GetProp: currentChunk
+    @@Set:
+      @@@disDef:
+        @@@@SetProp: currentChunk
+##PerlFile
+
+PropDef:
+  @QName: sourceModule
+  @enDesc:
+    The soruce module name URI reference. 
+
+PropDef:
+  @QName: sourceFor
+  @enDesc:
+    The source module <QUOTE::for> URI reference. 
+
+PropDef:
+  @QName: currentPackage
+  @enDesc:
+    The current Perl package name (used for stringify).
+
+PropDef:
+  @QName: currentChunk
+  @enDesc:
+    The current code chunk (used for stringify). 
+
+ClsDef:
+  @ClsQName: ManakaiPerlPackageScope
+  @ClsISA: ManakaiPerlCodeFragment
+
+  @Attr:
+    @@Name: packageName
+    @@Type:
+      Perl:package-name
+    @@enDesc:
+      The fully-qualified package name. 
+    @@Get: 
+      @@@disDef:
+        @@@@GetProp: packageName
+
+  @IntMethod:
+    @@Name:newObject
+    @@ManakaiDOM:isStatic:1
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates a new instance object for <Class::ManakaiPerlPackageScope>. 
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The newly created node object.
+      @@@PerlDef:
+        @@@@@:
+          my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
+                                        ::ManakaiDOM:Perl.new>;
+          push @{$node->{<Q::TreeCore:subnode2>}}, <Q::pc:sub>;
+          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
+          $node->{<Q::pc:sub>} = {};
+          $node->{<Q::dis:ISA>} = [];
+          $node->{<Q::dis:Implement>} = {};
+        @@@@ImplNote:
+          @@@@@lang:en
+          @@@@@@:
+            Optional properties: none.
+
+  @Method:
+    @@Name: getSub
+    @@enDesc:
+      Gets a subroutine. 
+    @@Param:
+      @@@Name: subName
+      @@@Type:
+        DISPerl:SubName::ManakaiDOM:all
+      @@@enDesc:
+        The name of subroutine to get. 
+    @@NamedParam:
+      @@@Name: makeNewNode
+      @@@Type:
+        DOMMain:boolean
+      @@@enDesc:
+        Whether a new subroutine object should be created, 
+        if it is not exist, or not. 
+    @@Return:
+      @@@Type: ManakaiPerlSub
+      @@@enDesc:
+        The subroutine object. 
+      @@@PerlDef:
+        if ($self->{<Q::TreeCore:node>}->{<Q::pc:sub>}->{$subName}) {
+          $r = $self->{<Q::TreeCore:node>}->{<Q::pc:sub>}->{$subName};
+        } elsif ($makeNewNode) {
+          $r = $self->{<Q::TreeCore:node>}->{<Q::pc:sub>}->{$subName}
+             = <ClassM::ManakaiPerlSub.newObject>;
+          $self->{<Q::TreeCore:node>}
+               -><M::ManakaiDOM:ManakaiDOMNodeObject
+                   ::ManakaiDOM:Perl.importTree> ($r);
+          $r->{<Q::pc:parent>} = $self->{<Q::TreeCore:node>};
+          $r->{<Q::pc:localName>} = $subName;
+        }
+        $r = $r-><M::ManakaiDOM:ManakaiDOMNodeObject
+                   ::ManakaiDOM:Perl.newReference>
+                         (<ClassName::ManakaiPerlSub>) if $r;
+
+  @Attr:
+    @@Name: length
+    @@enDesc:
+      The number of child code fragments. 
+    @@Type:
+      DOMMain:unsigned-long
+    @@Get:
+      @@@PerlDef:
+        $r = keys %{$self->{<Q::TreeCore:childNodes>}->{<Q::pc:sub>}};
+
+  @Method:
+    @@Name: addIsaPackage
+    @@enDesc:
+      Adds a class package that this class inherits. 
+    @@Param:
+      @@@Name: packageName
+      @@@Type:
+        Perl:package-name::ManakaiDOM:all
+      @@@enDesc:
+        The name of package to add. 
+    @@Return:
+      @@@PerlDef:
+        push @{$self->{<Q::TreeCore:node>}->{<Q::dis:ISA>}}, $packageName;
+
+  @Method:
+    @@Name: addImplementPackage
+    @@enDesc:
+      Adds a interface package that this class implements. 
+    @@Param:
+      @@@Name: packageName
+      @@@Type:
+        Perl:package-name::ManakaiDOM:all
+      @@@enDesc:
+        The name of package to add.
+    @@Return:
+      @@@PerlDef:
+        $self->{<Q::TreeCore:node>}->{<Q::dis:Implement>}->{$packageName} = true;
+
+  @ToStringMethod:
+    @@Return:
+      @@@Type:
+        DISLang:String
+      @@@enDesc:
+        Perl code. 
+      @@@PerlDef:
+        my $file = $self-><AG::ManakaiPerlCodeFragment.parentNode>;
+        my $node = $self->{<Q::TreeCore:node>};
+        my $pn = $node->{<Q::pc:packageName>};
+        $r .= q<package > . $pn . ";\n";
+        __DEEP{
+          $file-><AS::ManakaiPerlFile.currentPackage> ($pn);
+          $r .= 'our $VERSION = '.
+                <ClassM::ManakaiPerlCodeImplementation.versionDateTime> (time).
+                ";\n";
+        }__;
+        my @isa = (@{$node->{<Q::dis:ISA>}},
+                   sort keys %{$node->{<Q::dis:Implement>}});
+        if (@isa) {
+          $r .= 'push our @ISA, ' .
+                <ClassM::ManakaiPerlCodeImplementation.perlList> (\@isa) .
+                ";\n";
+        }
+##PerlPackageScope
+
+ClsDef:
+  @ClsQName: ManakaiPerlSub
+  @ClsISA: ManakaiPerlCodeFragment
+  @enDesc:
+    Perl subroutines. 
+  
+  @IntMethod:
+    @@Name:newObject
+    @@ManakaiDOM:isStatic:1
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates a new instance object for <Class::ManakaiPerlSub>. 
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The newly created node object.
+      @@@PerlDef:
+        @@@@@:
+          my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
+                                        ::ManakaiDOM:Perl.new>;
+          push @{$node->{<Q::TreeCore:subnode>}}, <Q::pc:childNodes>;
+          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
+          $node->{<Q::pc:childNodes>} = [];
+          $node->{<Q::pc:sourceLine>} = 0;
+        @@@@ImplNote:
+          @@@@@lang:en
+          @@@@@@:
+            Optional properties: <Q::pc:localName>,
+               <Q::pc:sourceFile>, <Q::pc:sourceLine>.
+  
+  @Attr:
+    @@Name: length
+    @@enDesc:
+      The number of child code fragments. 
+    @@Type:
+      DOMMain:unsigned-long
+    @@Get:
+      @@@PerlDef:
+        $r = @{$self->{<Q::TreeCore:childNodes>}->{<Q::pc:childNodes>}};
+
+  @Attr:
+    @@Name: name
+    @@enDesc:
+      The name of this subroutine. 
+    @@Type:
+      DISPerl:SubName
+    @@Get: 
+      @@@disDef:
+        @@@@GetProp: localName
+
+  @Attr:
+    @@Name: prototype
+    @@enDesc:
+      The prototype of this subroutine. 
+    @@Type:
+      DISPerl:SubPrototype
+    @@Get:
+      @@@disDef:
+        @@@@GetProp: prototype
+      @@@nullCase:
+        @@@@enDesc:
+          No prototype is set. 
+    @@Set:
+      @@@disDef:
+        @@@@SetProp: prototype
+      @@@nullCase:
+        @@@@enDesc:
+          No prototype declaration. 
+  
+  @Attr:
+    @@Name: currentSourceFile
+    @@enDesc:
+      The current source file name that is referred when 
+      a code fragment is added. 
+    @@Type:
+      DISLang:String
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc: No source file name is set. 
+      @@@disDef:
+        @@@@GetProp: sourceFile
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc: No (or unknown) source file. 
+      @@@disDef:
+        @@@@SetProp: sourceFile
+
+  @Attr:
+    @@Name: currentSourceLine
+    @@enDesc:
+      The current line number in source file that is referred when 
+      a code fragment is added. 
+    @@Type:
+      DOMMain:unsigned-long
+    @@Get:
+      @@@disDef:
+        @@@@GetProp: sourceLine
+    @@Set:
+      @@@disDef:
+        @@@@SetProp: sourceLine
+
+  @Method:
+    @@Name: appendCode
+    @@enDesc:
+      Appends an unparsed Perl code fragment. 
+    @@Param:
+      @@@Name: codeArg
+      @@@Type: 
+        lang:Perl::ManakaiDOM:all
+      @@@enDesc:
+        An unparsed Perl code fragment. 
+    @@Return:
+      @@@Type: ManakaiPerlUnparsedCode
+      @@@enDesc:
+        The newly created Perl code object. 
+      @@@PerlDef:
+        $r = <ClassM::ManakaiPerlUnparsedCode.newObject>;
+        my $node = $self->{<Q::TreeCore:node>};
+        $r->{<Q::sourceFile>} = $node->{<Q::sourceFile>};
+        $r->{<Q::sourceLine>} = $node->{<Q::sourceLine>};
+        $r->{<Q::code>} = $codeArg;
+        $node->{<Q::sourceLine>} += ($codeArg =~ tr/\x0A/\x0A/);
+        $r = $r-><M::ManakaiDOM:ManakaiDOMNodeObject
+                   ::ManakaiDOM:Perl.newReference>
+                           (<ClassName::ManakaiPerlUnparsedCode>);
+
+  @Method:
+    @@Name: skipLines
+    @@enDesc:
+      Skips lines in a code. 
+    @@Param:
+      @@@Name: codeArg
+      @@@Type: 
+        lang:Perl::ManakaiDOM:all
+      @@@enDesc:
+        A code fragment, which is counted lines. 
+    @@Return:
+      @@@PerlDef:
+        $self->{<Q::TreeCore:node>}->{<Q::sourceLine>}
+                            += ($codeArg =~ tr/\x0A/\x0A/);
+##PerlSub
+
+ClsDef:
+  @ClsQName: ManakaiPerlUnparsedCode
+  @ClsISA: ManakaiPerlCodeFragment
+  @enDesc:
+    Unparsed Perl code fragments. 
+  
+  @IntMethod:
+    @@Name:newObject
+    @@ManakaiDOM:isStatic:1
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates a new instance object for <Class::ManakaiPerlUnparsedCode>. 
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The newly created node object.
+      @@@PerlDef:
+        @@@@@:
+          my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
+                                        ::ManakaiDOM:Perl.new>;
+          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
+          $node->{<Q::pc:code>} = '';
+        @@@@ImplNote:
+          @@@@@lang:en
+          @@@@@@:
+            Optional properties: <Q::pc:cide>.
+##PerlUnparsedCode
+
+ClsDef:
+  @ClsQName: ManakaiPerlCodeImplementation
+  @enDesc:
+    The class that provides factory methods. 
+
+  @Role:
+    @@@:
+      DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM
+    @@compat:
+      DOMCore:ManakaiDOMImplementation::ManakaiDOM:ManakaiDOMLatest
+
+  @Method:
+    @@Name: createPerlFile
+    @@enDesc:
+      Creates a Perl code file. 
+    @@Return:
+      @@@Type: ManakaiPerlFile
+      @@@enDesc: A newly created Perl source file object. 
+      @@@PerlDef:
+        $r = <ClassM::ManakaiPerlFile.newObject>;
+        $r = $r-><M::ManakaiDOM:ManakaiDOMNodeObject
+                   ::ManakaiDOM:Perl.newReference>
+                           (<ClassName::ManakaiPerlFile>);        
+
+  @IntMethod:
+    @@Name: perlComment
+    @@ManakaiDOM:isStatic:1
+    @@enDesc:
+      Generates a Perl comment string. 
+    @@Param:
+      @@@Name: str
+      @@@Type: 
+        DISLang:String
+      @@@enDesc:
+        A comment text. 
+    @@Return:
+      @@@Type:
+        DISLang:String
+      @@@enDesc:
+        A Perl comment string.
+      @@@PerlDef:
+        $r = $str;
+        $r =~ s/\n/\n## /g;
+        $r =~ s/\n## $/\n/s;
+        $r .= "\n" unless $r =~ /\n$/;
+        $r = q<## > . $r;
+
+  @IntMethod:
+    @@Name: rfc3339DateTime
+    @@ManakaiDOM:isStatic:1
+    @@enDesc:
+      Returns RFC 3339 <CODE::date-time> representation of a date. 
+    @@Param:
+      @@@Name: perlDate
+      @@@Type:
+        DOMMain:unsigned-long
+      @@@enDesc:
+        A Perl representation of date. 
+    @@Return:
+      @@@Type:
+        DISLang:String
+      @@@enDesc:
+        RFC 3339 date string. 
+      @@@PerlDef:
+        my @time = gmtime $perlDate;
+        $r = sprintf q<%04d-%02d-%02dT%02d:%02d:%02d+00:00>,
+                     $time[5] + 1900, $time[4] + 1, @time[3,2,1,0];
+
+  @IntMethod:
+    @@Name: versionDateTime
+    @@ManakaiDOM:isStatic:1
+    @@enDesc:
+      Returns date for version. 
+    @@Param:
+      @@@Name: perlDate
+      @@@Type:
+        DOMMain:unsigned-long
+      @@@enDesc:
+        A Perl representation of date. 
+    @@Return:
+      @@@Type:
+        DISLang:String
+      @@@enDesc:
+        A Perl number literal. 
+      @@@PerlDef:
+        my @time = gmtime $perlDate;
+        $r = sprintf q<%04d%02d%02d.%02d%02d>,
+                     $time[5] + 1900, $time[4] + 1, @time[3,2,1];
+  
+  @Method:
+    @@Name: perlLiteral
+    @@enDesc:
+      Perl code representation. 
+    @@Param:
+      @@@Name: val
+      @@@Type: 
+        DOMMain:any
+      @@@enDesc:
+        A Perl value. 
+    @@Return:
+      @@@Type:
+        DISLang:String
+      @@@enDesc:
+        A Perl lexical representation of <P::val>. 
+      @@@PerlDef:
+        unless (defined $val) {
+          $r = q<undef>;
+        } elsif (ref $val eq 'ARRAY') {
+          __DEEP{
+            $r = q<[> . <ClassM::ManakaiPerlCodeImplementation
+                                            .perlLiteral> ($val) . q<]>;
+          }__;
+        } elsif (ref $val eq 'HASH') {
+          __DEEP{
+            $r = q<{> . <ClassM::ManakaiPerlCodeImplementation
+                                            .perlLiteral> ([%$val]) . q<}>;
+          }__;
+        } else {
+          $val =~ s/(['\\])/\\$1/g;
+          $r = q<'> . $val . q<'>;
+        }
+
+  @Method:
+    @@Name: perlList
+    @@enDesc:
+      Perl code representation of a list. 
+    @@Param:
+      @@@Name: val
+      @@@Type: 
+        Perl:ARRAY
+      @@@enDesc:
+        A Perl array reference. 
+    @@Return:
+      @@@Type:
+        DISLang:String
+      @@@enDesc:
+        A Perl lexical representation of <CODE::@$val>. 
+      @@@PerlDef:
+        __DEEP{
+          $r = join (q<, >, map {<ClassM::ManakaiPerlCodeImplementation
+                                              .perlLiteral> ($_)} @{$val});
+        }__;
+##PerlCodeImplementation
+
+PropDef:
+  @QName: code
+  @enDesc: Perl code. 
+
+PropDef:
+  @QName: sourceFile
+  @enDesc:
+    Source file. 
+
+PropDef:
+  @QName: sourceLine
+  @enDesc:
+    Source line number. 
+
+PropDef:
+  @QName: prototype
+  @enDesc:
+    Prototype of subroutine.
+
+PropDef:
+  @QName: parent
+  @enDesc:
+    Higher-level object. 
+
+PropDef:
+  @QName: sub
+  @enDesc:
+    Perl subroutines. 
+
+PropDef:
+  @QName: packageName
+  @Type:
+    Perl:package-name
+  @enDesc:
+    The fully qualified names of packages. 
+
+PropDef:
+  @QName: childNodes
+  @enDesc:
+    Child code fragments. 
+
+PropDef:
+  @QName: localName
+  @enDesc:
+    Scoped names.
+
+ElementTypeBinding:
+  @Name: ClsDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:Class
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:Perl
+      @@@For:
+        !=ManakaiDOM:Perl
+    @@ForCheck:
+      ManakaiDOM:Perl
+    @@DOMMain:implementFeature: CoreFeature10
+
+ElementTypeBinding:
+  @Name: ClsQName
+  @ElementType:
+    dis:QName
+
+ElementTypeBinding:
+  @Name: ClsISA
+  @ElementType:
+    dis:ISA
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Method
+
+ElementTypeBinding:
+  @Name: ToStringMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Method
+    @@Operator:
+      @@@@:
+        DISPerl:AsStringMethod
+      @@@ContentType:
+        dis:TypeQName
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns the textual Perl source code representation of this object. 
+
+ElementTypeBinding:
+  @Name: IntMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Method
+    @@ManakaiDOM:isForInternal:1
+
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Attribute
+
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodReturn
+
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:AttributeGet
+
+ElementTypeBinding:
+  @Name: Set
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:AttributeSet
+
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+
+ElementTypeBinding:
+  @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
+
+ElementTypeBinding:
+  @Name: disDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:dis
+
+ElementTypeBinding:
+  @Name: InCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+
+ElementTypeBinding:
+  @Name: nullCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@is-null:1
+
+ElementTypeBinding:
+  @Name: TrueCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:true
+    @@Type:
+      DOMMain:boolean
+
+
+ElementTypeBinding:
+  @Name: FalseCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:false
+    @@Type:
+      DOMMain:boolean
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdf:Property
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: NamedParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1
+
