@@ -1,7 +1,11 @@
 use strict;
 use Message::Util::Error;
 
-my $src = q{Some Parsed Text};
+my $src = q{Some Parsed Text
+Other Another
+
+   Foo   Bar  
+ Baz};
 
 my $err = new Message::Util::Error::TextParser
             package => 'test_error';
@@ -20,13 +24,29 @@ $src =~ /Text/gc;
 
 report $err -type => 'ERROR_1', source => \$src;
 
+$src =~ /Other/gc;
+
+report $err -type => 'ERROR_1', source => \$src;
+
+$src =~ /Another/gc;
+
+report $err -type => 'ERROR_1', source => \$src;
+
+$src =~ /Foo/gc;
+
+report $err -type => 'ERROR_1', source => \$src;
+
+$src =~ /Baz/gc;
+
+report $err -type => 'ERROR_1', source => \$src;
+
 BEGIN {
 package test_error;
 require Message::Util::Error::TextParser;
 push our @ISA, 'Message::Util::Error::TextParser::error';
 
 use Test;
-my @result = qw/1-1 1-5 1-5 1-17/;
+my @result = qw/1-1 1-5 1-5 1-17 2-6 2-14 4-7 5-5/;
 my $i = 0;
 plan tests => scalar @result;
 
@@ -51,4 +71,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/12/26 07:09:42 $
+1; # $Date: 2004/05/31 00:48:44 $

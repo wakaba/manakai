@@ -14,7 +14,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Message::Markup::XML::Parser::Error;
 require Message::Util::Error::TextParser;
@@ -145,12 +145,20 @@ sub ___error_def () {+{
     description => q(Attribute value specification must be an attribute value literal),
     level => 'ebnf',
   },
+  SYNTAX_CDATA_OUTSIDE_DOCUMENT_ELEMENT => {
+    description => q(Character data must be in document element (between explicit start and end tags)),
+    level => 'ebnf',
+  },
   SYNTAX_COMC_REQUIRED => {
     description => q(com (--) closing comment required),
     level => 'ebnf',
   },
   SYNTAX_COMO_REQUIRED => {
     description => q(com (--) opening comment required),
+    level => 'ebnf',
+  },
+  SYNTAX_COMMENT_DECLARATION_NOT_ALLOWED => {
+    description => q(Comment declaration not allowed here),
     level => 'ebnf',
   },
   SYNTAX_COMMENT_DECLARATION_REQUIRED => {
@@ -325,12 +333,20 @@ sub ___error_def () {+{
     description => q(Multiple status keywords not allowed),
     level => 'ebnf',
   },
+  SYNTAX_MARKED_SECTION_NOT_ALLOWED => {
+    description => q(Marked section declaration not allowed here),
+    level => 'ebnf',
+  },
   SYNTAX_MARKED_SECTION_PS_REQUIRED => {
     description => q(One or more ps (whitespaces) required between parameters),
     level => 'ebnf',
   },
   SYNTAX_MARKED_SECTION_STATUS_PS => {
     description => q(ps not allowed),
+    level => 'ebnf',
+  },
+  SYNTAX_MARKUP_DECLARATION_NOT_ALLOWED => {
+    description => q(%t (name => keyword); declaration not allowed here),
     level => 'ebnf',
   },
   SYNTAX_MARKUP_DECLARATION_PS => {
@@ -417,6 +433,10 @@ sub ___error_def () {+{
     description => q(Multiple comment in one comment declaration not allowed),
     level => 'ebnf',
   },
+  SYNTAX_MULTIPLE_DOCUMENT_ELEMENTS => {
+    description => q(Multiple element cannot be the document (root) element),
+    level => 'ebnf',
+  },
   SYNTAX_NAMED_CHARACTER_REFERENCE => {
     description => q(Named character reference not allowed),
     level => 'ebnf',
@@ -427,6 +447,10 @@ sub ___error_def () {+{
   },
   SYNTAX_NET_REQUIRED => {
     description => q(NET (>) required just after NESTC (/)),
+    level => 'ebnf',
+  },
+  SYNTAX_NO_DOCUMENT_ELEMENT => {
+    description => q(No document (root) element found),
     level => 'ebnf',
   },
   SYNTAX_NO_LESS_THAN_IN_ATTR_VAL => {
@@ -451,6 +475,10 @@ sub ___error_def () {+{
   },
   SYNTAX_PARAENT_NAME_REQUIRED => {
     description => q(Parameter entity name required),
+    level => 'ebnf',
+  },
+  SYNTAX_PARAENT_REF_NOT_ALLOWED => {
+    description => q(Parameter entity reference not allowed),
     level => 'ebnf',
   },
   SYNTAX_PARAMETER_REQUIRED => {
@@ -753,4 +781,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/05/29 08:12:11 $
+1; # $Date: 2004/05/31 00:48:44 $

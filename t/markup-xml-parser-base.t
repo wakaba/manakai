@@ -89,6 +89,7 @@ my @a =
   t => q{"foo&amp;bar"},
   method => 'parse_attribute_value_specification',
   option => {
+             ExpandedURI q<use-reference> => 1,
              ExpandedURI q<allow-general-entity-reference> => 1,
              ExpandedURI q<allow-numeric-character-reference> => 1,
              ExpandedURI q<allow-hex-character-reference> => 1,
@@ -99,6 +100,7 @@ my @a =
   t => q{'foo&amp;bar'},
   method => 'parse_attribute_value_specification',
   option => {
+             ExpandedURI q<use-reference> => 1,
              ExpandedURI q<allow-general-entity-reference> => 1,
              ExpandedURI q<allow-numeric-character-reference> => 1,
              ExpandedURI q<allow-hex-character-reference> => 1,
@@ -109,6 +111,7 @@ my @a =
   t => q{"foo&#1234;bar"},
   method => 'parse_attribute_value_specification',
   option => {
+             ExpandedURI q<use-reference> => 1,
              ExpandedURI q<allow-general-entity-reference> => 1,
              ExpandedURI q<allow-numeric-character-reference> => 1,
              ExpandedURI q<allow-hex-character-reference> => 1,
@@ -120,6 +123,7 @@ my @a =
   method => 'parse_attribute_value_specification',
   result => q(1),
   option => {
+             ExpandedURI q<use-reference> => 1,
              ExpandedURI q<allow-general-entity-reference> => 1,
              ExpandedURI q<allow-numeric-character-reference> => 1,
              ExpandedURI q<allow-hex-character-reference> => 1,
@@ -129,6 +133,7 @@ my @a =
   t => q{"foo&#xE234;bar"},
   method => 'parse_attribute_value_specification',
   option => {
+             ExpandedURI q<use-reference> => 1,
              ExpandedURI q<allow-general-entity-reference> => 1,
              ExpandedURI q<allow-numeric-character-reference> => 1,
              ExpandedURI q<allow-hex-character-reference> => 1,
@@ -139,6 +144,7 @@ my @a =
   t => q{'foo&#xE234;bar'},
   method => 'parse_attribute_value_specification',
   option => {
+             ExpandedURI q<use-reference> => 1,
              ExpandedURI q<allow-general-entity-reference> => 1,
              ExpandedURI q<allow-numeric-character-reference> => 1,
              ExpandedURI q<allow-hex-character-reference> => 1,
@@ -149,6 +155,7 @@ my @a =
   t => q{"foo&#SPACE;bar"},
   method => 'parse_attribute_value_specification',
   option => {
+             ExpandedURI q<use-reference> => 1,
              ExpandedURI q<allow-general-entity-reference> => 1,
              ExpandedURI q<allow-numeric-character-reference> => 1,
              ExpandedURI q<allow-hex-character-reference> => 1,
@@ -159,6 +166,7 @@ my @a =
   t => q{"foo&#XE234;bar"},
   method => 'parse_attribute_value_specification',
   option => {
+             ExpandedURI q<use-reference> => 1,
              ExpandedURI q<allow-general-entity-reference> => 1,
              ExpandedURI q<allow-numeric-character-reference> => 1,
              ExpandedURI q<allow-hex-character-reference> => 1,
@@ -184,6 +192,7 @@ my @a =
   t => q{"foo&#x0120 bar"},
   method => 'parse_attribute_value_specification',
   option => {
+             ExpandedURI q<use-reference> => 1,
              ExpandedURI q<allow-general-entity-reference> => 1,
              ExpandedURI q<allow-numeric-character-reference> => 1,
              ExpandedURI q<allow-hex-character-reference> => 1,
@@ -194,6 +203,7 @@ my @a =
   t => q{"foo&#0120 bar"},
   method => 'parse_attribute_value_specification',
   option => {
+             ExpandedURI q<use-reference> => 1,
              ExpandedURI q<allow-general-entity-reference> => 1,
              ExpandedURI q<allow-numeric-character-reference> => 1,
              ExpandedURI q<allow-hex-character-reference> => 1,
@@ -204,6 +214,7 @@ my @a =
   t => q{"foo&amp bar"},
   method => 'parse_attribute_value_specification',
   option => {
+             ExpandedURI q<use-reference> => 1,
              ExpandedURI q<allow-general-entity-reference> => 1,
              ExpandedURI q<allow-numeric-character-reference> => 1,
              ExpandedURI q<allow-hex-character-reference> => 1,
@@ -830,6 +841,16 @@ my @a =
   t => q{<!DOCTYPE name SYSTEM "sys"    >},
   method => 'parse_markup_declaration',
   result => q(1),
+ },
+ {
+  t => q{<!DOCTYPE %param;  >},
+  method => 'parse_markup_declaration',
+  result => q(0:10:SYNTAX_PARAENT_REF_NOT_ALLOWED),
+ },
+ {
+  t => q{<!DOCTYPE --%param; -- >},
+  method => 'parse_markup_declaration',
+  result => q(0:10:SYNTAX_PS_COMMENT),
  },
 
  {
@@ -1903,6 +1924,7 @@ my @a =
   option => {
     ExpandedURI q<allow-section> => {INCLUDE => 1, IGNORE => 1},
     ExpandedURI q<allow-section-ps> => 1,
+    ExpandedURI q<allow-param-entref> => 1,
   },
   result => 1,
  },
@@ -1913,6 +1935,7 @@ my @a =
   option => {
     ExpandedURI q<allow-section> => {INCLUDE => 1, IGNORE => 1},
     ExpandedURI q<allow-section-ps> => 1,
+    ExpandedURI q<allow-param-entref> => 1,
   },
   result => 1,
  },
@@ -1923,6 +1946,7 @@ my @a =
   option => {
     ExpandedURI q<allow-section> => {INCLUDE => 1, IGNORE => 1},
     ExpandedURI q<allow-section-ps> => 1,
+    ExpandedURI q<allow-param-entref> => 1,
   },
   result => '0:1:SYNTAX_PS_COMMENT',
  },
@@ -1975,8 +1999,444 @@ my @a =
   method => 'parse_marked_section',
   option => {
     ExpandedURI q<allow-section> => {CDATA => 1},
+    ExpandedURI q<allow-param-entref> => 1,
   },
   result => '0:3:SYNTAX_MARKED_SECTION_STATUS_PS',
+ },
+
+ {
+  t => q{<!----> <!ENTITY e "entity text">
+         <!ELEMENT el ANY> <!ATTLIST el foo CDATA "bar">
+         <?pi ?> <![ INCLUDE
+         [ <!ATTLIST el bar ID #IMPLIED> ]]>
+        <!NOTATION n SYSTEM "not">},
+  method => 'parse_doctype_subset',
+  option => {
+    ExpandedURI q<allow-section> => {INCLUDE => 1},
+    ExpandedURI q<allow-param-entref> => 1,
+  },
+  result => 1,
+ },
+ {
+  t => q{<!----> <!ENTITY e "entity text">
+         <!DOCTYPE doc []>},
+  method => 'parse_doctype_subset',
+  option => {
+    ExpandedURI q<allow-section> => {CDATA => 1},
+  },
+  result => '1:9:SYNTAX_MARKUP_DECLARATION_NOT_ALLOWED',
+ },
+ {
+  t => q{<!----> <!ENTITY e "entity text"> ]>},
+  method => 'parse_doctype_subset',
+  option => {
+    ExpandedURI q<allow-section> => {CDATA => 1},
+  },
+  result => '0:34:SYNTAX_DOCTYPE_SUBSET_INVALID_CHAR',
+ },
+ 
+ {
+  t => q{<!DOCTYPE d [<!----> <!ENTITY e "entity text"> ]>},
+  method => 'parse_doctype_declaration',
+  result => 1,
+ },
+ {
+  t => q{<!DOCTYPE d [<!----> <![INCLUDE[<!ENTITY e "entity text">]]> ]>},
+  method => 'parse_doctype_declaration',
+  result => '0:21:SYNTAX_MARKED_SECTION_NOT_ALLOWED',
+ },
+ {
+  entity => {d => {replace => q<  <![INCLUDE[<!ENTITY e "entity text">]]>>,
+                   external => 0}},
+  t => q{<!DOCTYPE d [<!----> %d; <!-- --> ]>},
+  method => 'parse_doctype_declaration',
+  result => '0:2:SYNTAX_MARKED_SECTION_NOT_ALLOWED',
+ },
+ {
+  entity => {d => {replace => q{  <![INCLUDE[<!ENTITY e "entity text">]]>},
+                   external => 1}},
+  t => q{<!DOCTYPE d [<!----> %d; <!-- --> ]>},
+  method => 'parse_doctype_declaration',
+  result => 1,
+ },
+ {
+  entity => {d => {replace
+                     => q{<![INCLUDE[<!ENTITY e -- SYSTEM -- "entity text">]]>},
+                   external => 1}},
+  t => q{<!DOCTYPE d [<!----> %d; ]>},
+  method => 'parse_doctype_declaration',
+  result => '0:22:SYNTAX_PS_COMMENT',
+ },
+
+         {
+          t => q{<?xml?>},
+          method => 'parse_processing_instruction',
+          result => q(0:0:SYNTAX_XML_DECLARATION_IN_MIDDLE),
+         },
+         {
+          t => q{<?XML?>},
+          method => 'parse_processing_instruction',
+          result => q(0:2:SYNTAX_PI_TARGET_XML),
+         },
+         {
+          t => q{<?XmL?>},
+          method => 'parse_processing_instruction',
+          result => q(0:2:SYNTAX_PI_TARGET_XML),
+         },
+         {
+          t => q{<?XmL1?>},
+          method => 'parse_processing_instruction',
+          result => 1,
+         },
+
+         {
+          t => q{<?xml?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-xml-declaration> => 1},
+          result => q(0:5:SYNTAX_XML_VERSION_REQUIRED),
+         },
+         {
+          t => q{<?xml ?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-xml-declaration> => 1},
+          result => q(0:6:SYNTAX_XML_VERSION_REQUIRED),
+         },
+         {
+          t => q{<?xml ?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-text-declaration> => 1},
+          result => q(0:6:SYNTAX_XML_ENCODING_REQUIRED),
+         },
+         {
+          t => q{<?xml ?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-xml-declaration> => 1,
+                     ExpandedURI q<allow-text-declaration> => 1},
+          result => q(0:6:SYNTAX_XML_ENCODING_REQUIRED),
+         },
+ {
+  t => q{<?xml version="1.0"?>},
+  method => 'parse_xml_declaration',
+  option => {ExpandedURI q<allow-xml-declaration> => 1},
+  result => 1,
+ }, 
+ {
+  t => q{<?xml version="1.0" ?>},
+  method => 'parse_xml_declaration',
+  option => {ExpandedURI q<allow-xml-declaration> => 1},
+  result => 1,
+ },
+ {
+  t => qq{<?xml \tversion  =  "1.0"?>},
+  method => 'parse_xml_declaration',
+  option => {ExpandedURI q<allow-xml-declaration> => 1},
+  result => 1,
+ },
+ {
+  t => q{<?xml version='1.0' ?>},
+  method => 'parse_xml_declaration',
+  option => {ExpandedURI q<allow-xml-declaration> => 1},
+  result => 1,
+ },
+ {
+  t => q{<?xml version="1.0"encoding="iso-2022-jp"?>},
+  method => 'parse_xml_declaration',
+  option => {ExpandedURI q<allow-xml-declaration> => 1},
+  result => q(0:19:SYNTAX_S_REQUIRED_BETWEEN_ATTR_SPEC),
+ },
+ {
+  t => q{<?xml version="1.0?>},
+  method => 'parse_xml_declaration',
+  option => {ExpandedURI q<allow-xml-declaration> => 1},
+  result => q(0:18:SYNTAX_ALITC_REQUIRED),
+ },
+         {
+          t => q{<?xml version=1.0?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-xml-declaration> => 1},
+          result => q(0:14:SYNTAX_ALITO_OR_ALITAO_REQUIRED),
+         },
+         {
+          t => q{<?xml version="1.1"?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-xml-declaration> => 1},
+          result => 1,
+         },
+         {
+          t => q{<?xml version="1.2"?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-xml-declaration> => 1},
+          result => q(0:15:SYNTAX_XML_VERSION_UNSUPPORTED),
+         },
+         {
+          t => q{<?xml version="1+2"?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-xml-declaration> => 1},
+          result => q(0:15:SYNTAX_XML_VERSION_INVALID),
+         },
+         {
+          t => q{<?xml version=""?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-xml-declaration> => 1},
+          result => q(0:15:SYNTAX_XML_VERSION_INVALID),
+         },
+         
+         {
+          t => q{<?xml encoding=""?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-text-declaration> => 1},
+          result => q(0:16:SYNTAX_XML_ENCODING_INVALID),
+         },
+         {
+          t => q{<?xml  encoding = 'iso-2022-jp'?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-text-declaration> => 1},
+          result => 1,
+         },
+         {
+          t => q{<?xml  encoding = 'iso-2022-jp'?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-xml-declaration> => 1},
+          result => q(0:7:SYNTAX_XML_VERSION_REQUIRED),
+         },
+         {
+          t => q{<?xml  encoding = 'iso+2022+jp'?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-text-declaration> => 1},
+          result => q(0:19:SYNTAX_XML_ENCODING_INVALID),
+         },
+         {
+          t => q{<?xml encoding = ""?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-text-declaration> => 1},
+          result => q(0:18:SYNTAX_XML_ENCODING_INVALID),
+         },
+         {
+          t => q{<?xml  encoding = 'iso-2022-jp' version="1.0"?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-xml-declaration> => 1},
+          result => q(0:7:SYNTAX_XML_VERSION_REQUIRED),
+         },
+         {
+          t => q{<?xml version="1.0" encoding = 'iso-2022-jp'?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-xml-declaration> => 1},
+          result => 1,
+         },
+         {
+          t => q{<?xml version="1.0" encoding = 'iso-2022-jp'?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-text-declaration> => 1},
+          result => 1,
+         },
+         {
+          t => q{<?xml version="1.0" encoding = 'iso-2022-jp'?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-xml-declaration> => 1,
+                     ExpandedURI q<allow-text-declaration> => 1},
+          result => 1,
+         },
+         
+         {
+          t => q{<?xml version="1.0" encoding = 'UTF-8' standalone="yes" ?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-xml-declaration> => 1,
+                     ExpandedURI q<allow-text-declaration> => 1},
+          result => 1,
+         },
+         {
+          t => q{<?xml version="1.0" encoding = 'UTF-8' standalone="no" ?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-xml-declaration> => 1,
+                     ExpandedURI q<allow-text-declaration> => 1},
+          result => 1,
+         },
+         {
+          t => q{<?xml version="1.0" encoding = 'UTF-8' standalone="no" ?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-text-declaration> => 1},
+          result => q(0:39:SYNTAX_XML_STANDALONE),
+         },
+         {
+          t => q{<?xml version="1.0" encoding = 'UTF-8' standalone="unknown" ?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-xml-declaration> => 1},
+          result => q(0:51:SYNTAX_XML_STANDALONE_INVALID),
+         },
+         {
+          t => qq{<?xml version="1.1" encoding = 'UTF-8' \tstandalone="no" ?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-xml-declaration> => 1},
+          result => q(0:38:SYNTAX_XML_STANDALONE_S),
+         },
+         {
+          t => qq{<?xml standalone = "yes" ?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-xml-declaration> => 1},
+          result => q(0:6:SYNTAX_XML_VERSION_REQUIRED),
+         },
+         {
+          t => qq{<?xml standalone = "yes" ?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-text-declaration> => 1},
+          result => q(0:6:SYNTAX_XML_ENCODING_REQUIRED),
+         },
+         {
+          t => qq{<?xml encoding="iso-2022-jp" standalone = "yes" ?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-text-declaration> => 1},
+          result => q(0:29:SYNTAX_XML_STANDALONE),
+         },
+         {
+          t => qq{<?xml version="1.1" encode="iso-2022-jp" ?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-xml-declaration> => 1},
+          result => q(0:20:SYNTAX_XML_UNKNOWN_ATTR),
+         },
+         {
+          t => q{<?xml <#version="1.&#x31;" ?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-xml-declaration> => 1},
+          result => q(0:6:SYNTAX_ATTR_SPEC_REQUIRED),
+         },
+         {
+          t => qq{<?xml version="&version;" ?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-xml-declaration> => 1},
+          result => q(0:15:SYNTAX_XML_VERSION_INVALID),
+         },
+         {
+          t => q{<?xml version="  1.&#x31;" ?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-xml-declaration> => 1},
+          result => q(0:15:SYNTAX_XML_VERSION_INVALID),
+         },
+         {
+          t => qq{<?xml version="-&#31;-" ?>},
+          method => 'parse_xml_declaration',
+          option => {ExpandedURI q<allow-xml-declaration> => 1},
+          result => q(0:15:SYNTAX_XML_VERSION_INVALID),
+         },
+
+ {
+  t => q{<el>data</el>},
+  method => 'parse_document_entity',
+  result => 1,
+ },
+ {
+  t => q{
+
+<el>data</el>
+
+},
+  method => 'parse_document_entity',
+  result => 1,
+ },
+ {
+  t => q{<?xml version="1.0"?>
+
+<el>data</el>
+
+},
+  method => 'parse_document_entity',
+  result => 1,
+ },
+ {
+  t => q{<?xml version="1.0"?>
+
+<el>data</el>
+<!--
+comment -->
+},
+  method => 'parse_document_entity',
+  result => 1,
+ },
+ {
+  t => q{<?xml-stylesheet href="1.0"?>
+
+<el>data</el>
+<!--
+comment -->
+},
+  method => 'parse_document_entity',
+  result => 1,
+ },
+ {
+  t => q{<!DOCTYPE el []>
+<el>data</el>
+<!--
+comment -->
+},
+  method => 'parse_document_entity',
+  result => 1,
+ },
+ {
+  t => q{<el>a</el>
+<el>data</el>
+<!--
+comment -->
+},
+  method => 'parse_document_entity',
+  result => '1:0:SYNTAX_MULTIPLE_DOCUMENT_ELEMENTS',
+ },
+ {
+  t => q{a<el>a</el>},
+  method => 'parse_document_entity',
+  result => '0:0:SYNTAX_CDATA_OUTSIDE_DOCUMENT_ELEMENT',
+ },
+ {
+  t => q{<el>a</el> 
+  b},
+  method => 'parse_document_entity',
+  result => '1:2:SYNTAX_CDATA_OUTSIDE_DOCUMENT_ELEMENT',
+ },
+ {
+  t => q{<el>a</el>
+  <?xml version="1.0"?>},
+  method => 'parse_document_entity',
+  result => '1:2:SYNTAX_XML_DECLARATION_IN_MIDDLE',
+ },
+ {
+  t => q{
+  <?xml version="1.0"?> <el/>},
+  method => 'parse_document_entity',
+  result => '1:2:SYNTAX_XML_DECLARATION_IN_MIDDLE',
+ },
+ {
+  t => q{<!DOCTYPE el []>
+  <?xml version="1.0"?> <el/>},
+  method => 'parse_document_entity',
+  result => '1:2:SYNTAX_XML_DECLARATION_IN_MIDDLE',
+ },
+ {
+  t => q{<el/><!DOCTYPE el []>},
+  method => 'parse_document_entity',
+  result => '0:5:SYNTAX_MARKUP_DECLARATION_NOT_ALLOWED',
+ },
+ {
+  t => q{<el/><![IGNORE[]]>},
+  method => 'parse_document_entity',
+  result => '0:5:SYNTAX_MARKED_SECTION_NOT_ALLOWED',
+ },
+ {
+  t => q{<el/>< },
+  method => 'parse_document_entity',
+  result => '0:5:SYNTAX_CDATA_OUTSIDE_DOCUMENT_ELEMENT',
+ },
+ {
+  t => q{<!-- -->},
+  method => 'parse_document_entity',
+  result => '0:8:SYNTAX_NO_DOCUMENT_ELEMENT',
+ },
+ {
+  t => q{<el><!-- -->},
+  method => 'parse_document_entity',
+  result => '0:12:SYNTAX_END_TAG_REQUIRED',
+ },
+ {
+  t => q{<?xml?><el><!-- --></el>},
+  method => 'parse_document_entity',
+  result => '0:5:SYNTAX_XML_VERSION_REQUIRED',
  },
 );
 
@@ -2002,7 +2462,9 @@ for (@a) {
   $parser->{ExpandedURI q<test:entity>} = $_->{entity} || {};
   $parser->$method (
     \$_->{t}, {},
-    %{$_->{option}||{}},
+    %{$_->{option}||{ExpandedURI q<allow-declaration>=>{qw/DOCTYPE 1 ENTITY 1 ELEMENT 1 NOTATION 1 ATTLIST 1 comment 1 section 1/},
+                     ExpandedURI q<allow-param-entref> => 1,
+                     ExpandedURI q<use-reference> => 1}},
   );
   ok $first_error || 1, $_->{result}, $first_error_detail;
 }
@@ -2018,6 +2480,23 @@ sub parameter_entity_reference_in_parameter_start ($$$$%) {
   for my $reptxt ($self->{ExpandedURI q<test:entity>}
                        ->{$pp->{ExpandedURI q<entity-name>}}) {
     push @{$opt{ExpandedURI q<source>}}, \$reptxt if $reptxt;
+  }
+}
+
+sub parameter_entity_reference_in_subset_start ($$$$%) {
+  my ($self, $src, $p, $pp, %opt) = @_;
+  for my $reptxt ($self->{ExpandedURI q<test:entity>}
+                       ->{$pp->{ExpandedURI q<entity-name>}}) {
+    if (ref $reptxt eq 'HASH') {
+      pos $reptxt->{replace} = 0;
+      push @{$opt{ExpandedURI q<source>}}, \($reptxt->{replace});
+      $self->{error}->set_flag
+        ((\$reptxt->{replace}),
+         ExpandedURI q<is-external-entity> => $reptxt->{external});
+    } else {
+      pos $reptxt = 0;
+      push @{$opt{ExpandedURI q<source>}}, \$reptxt if $reptxt;
+    }
   }
 }
 

@@ -19,7 +19,7 @@ This module is part of manakai.
 package Message::Util::Error::TextParser;
 require Message::Util::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.3.2.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.3.2.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 sub new ($;%) {
   my $self = bless {}, shift;
@@ -40,7 +40,7 @@ sub set_position ($$;%) {
   }
   my $t = substr ($$s, $pos->{pos}, $length > 0 ? $length : 0);
   ++$pos->{line} and $pos->{char} = 0 
-    while $t =~ s/^.+?$self->{option}->{newline}//os;
+    while $t =~ s/^.*?$self->{option}->{newline}//os;
   $pos->{char} += length $t;
   $pos->{pos} += $length;
   $self->{__set_position} = 1;
@@ -67,6 +67,22 @@ sub fork_position ($$$;%) {
     pos => pos $$t,
     %opt,
   };
+  ## ISSUE: Should reference be recursively forked?
+  $self->{flag}->{$t} = {%{$self->{flag}->{$t}||{}}};
+}
+
+sub set_flag ($$$$;%) {
+  my ($self, $s, $name => $value, %opt) = @_;
+  unless (defined $value) {
+    delete $self->{flag}->{$s}->{$name};
+  } else {
+    $self->{flag}->{$s}->{$name} = $value;
+  }
+}
+
+sub get_flag ($$$;%) {
+  my ($self, $s, $name, %opt) = @_;
+  $self->{flag}->{$s}->{$name};
 }
 
 sub report ($%) {
@@ -116,16 +132,20 @@ sub ___rule_def () {+{
     after => sub {
       my ($self, $name, $p, $o) = @_;
       my $pos = pos ${$o->{source}} || 0;
-      if ($pos == length ${$o->{source}}) {
-        $p->{-result} .= $p->{end_of} || '** end of string **';
-        return;
-      } elsif ($pos == 0) {
-        $p->{-result} .= $p->{beginning_of} || '** beginning of string **';
-        return;
-      }
+      $o->{position_diff} ||= 0;
+      $pos = $pos - $o->{position_diff} > 0 ? $pos - $o->{position_diff} : 0;
       my $before = $p->{before};
       if ($before) {
         $before = $pos if $pos < $before;
+      }
+      if ($pos == length ${$o->{source}}) {
+        $p->{-result} .= substr (${$o->{source}}, $pos - $before, $before)
+                       . ($p->{end_of} || ' ** end of string **');
+        return;
+      } elsif ($pos == 0) {
+        $p->{-result} .= ($p->{beginning_of} || '** beginning of string ** ')
+                       . substr (${$o->{source}}, $pos, $p->{after});
+        return;
       }
       $p->{-result} .= substr (${$o->{source}}, $pos - $before, $before)
                      . ($p->{here} || ' ** here ** ')
@@ -143,4 +163,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/05/23 04:02:48 $
+1; # $Date: 2004/05/31 00:48:44 $

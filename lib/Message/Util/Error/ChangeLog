@@ -1,3 +1,11 @@
+2004-05-30  Wakaba  <wakaba@suika.fam.cx>
+
+	* TextParser.pm (set_position): New line counting bug fixed.
+	(___rule_def[err_at]): Show context even if beginning of or 
+	end of string at which error occurs.
+	(set_flag, get_flag): New methods.
+	(___rule_def[err_at]): position_diff option supported.
+
 2004-02-24  Wakaba  <wakaba@suika.fam.cx>
 
 	* TextParser.pm (set_position): New option "moved" implemented.
