@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+use strict;
 use Message::Util::Error;
 use Test::Simple tests => 4;
 sub OK ($$) {
@@ -14,6 +15,7 @@ try {
   throw Message::Util::Error -type => 'SOMETHING_UNKNOWN';
 } catch Message::Util::Error with {
   my $err = shift;
+  warn $err->stringify if $^W;
   OK $err->text, qq("SOMETHING_UNKNOWN": Unknown error);
 } except {
   OK 1, 0;
