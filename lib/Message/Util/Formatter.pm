@@ -22,7 +22,7 @@ This module is part of Manakai.
 package Message::Util::Formatter;
 use strict;
 use vars qw(%FMT2STR $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 
 =head1 INITIAL FORMATTING RULES
@@ -114,11 +114,12 @@ value so you can give any data.)
 sub replace ($$;$$) {
   my ($self, $format, $gparam, $option) = @_;
   my $R = $self->{-option}->{return_class}->new (type => '#fragment');
-  $format = $format->inner_text if ref ($format) && ref ($format) eq $self->{-option}->{return_class};
-  use re 'eval';
+  $format = $format->inner_text
+    if ref ($format) && (ref ($format) eq $self->{-option}->{return_class});
+  #use re 'eval';
   our $BLOCK = qr/\{(?:[^\{\}]|(??{$BLOCK}))*\}/;
                                         #[\x09\x0A\x0D\x200-9A-Za-z._=>,-]
-  $format =~ s{%([A-Za-z0-9_-]+)(?:\(((?:[^{}"()]|$BLOCK|"(?:[^"\\]|\\.)*")*)\))?;|(%|[^%]+)}{
+  $format =~ s{%([A-Za-z0-9_-]+)[\x09\x0A\x0D\x20]*(?:\(((?:[^{}"()]|$BLOCK|"(?:[^"\\]|\\.)*")*)\))?[\x09\x0A\x0D\x20]*;|(%|[^%]+)}{
       my ($f, $a, $t) = ($1, $2, $3);
       $f =~ tr/-/_/;
       $f = '-bare_text' if length $t;
@@ -294,4 +295,4 @@ Boston, MA 02111-1307, USA.
 =cut
 
 1;
-# $Date: 2003/07/17 23:57:32 $
+# $Date: 2003/10/31 04:57:32 $
