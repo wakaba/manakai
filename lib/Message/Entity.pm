@@ -14,7 +14,7 @@ require 5.6.0;	## (require: v5.6.0 data type)
 package Message::Entity;
 use strict;
 use vars qw(%DEFAULT %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.38 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.39 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::Header;
@@ -48,7 +48,7 @@ use overload '""' => sub { $_[0]->stringify },
     	#fill_msgid	=> 1,
     	-fill_msgid_name	=> 'message-id',
     	#fill_sender_ns
-    	-fill_source	=> 1,
+    	-fill_source	=> 0,
     	-recalc_md5	=> 1,
     -force_mime_entity	=> 0,
     -format	=> 'mail-rfc2822',
@@ -105,6 +105,7 @@ sub _init ($;%) {
   } else {
     if ($format =~ /mail-rfc822|mail-rfc2822/ && $format !~ /mime-entity/) {
       $self->{option}->{fill_destination} = 1;
+      $self->{option}->{fill_source} = 1 unless defined $options{-fill_source};
     }
     $self->{option}->{fill_date_ns} = $ns822 unless defined $options{-fill_date_ns};
     $self->{option}->{fill_from_ns} = $ns822 unless defined $options{-fill_from_ns};
@@ -623,7 +624,7 @@ sub stringify ($;%) {
         $hdr->field ($option{fill_ua_name})->add_our_name (
           -use_Config	=> $option{ua_use_Config},
           -use_Win32	=> $option{ua_use_Win32},
-          -date	=> q$Date: 2002/11/13 08:08:51 $,
+          -date	=> q$Date: 2002/12/28 09:10:16 $,
         );
       }
     } if $option{fill_missing_fields};
@@ -1160,7 +1161,7 @@ Message::* Perl modules
 
 =head1 LICENSE
 
-Copyright 2002 wakaba E<lt>w@suika.fam.cxE<gt>.
+Copyright 2002 Wakaba <w@suika.fam.cx>.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -1180,7 +1181,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/11/13 08:08:51 $
+$Date: 2002/12/28 09:10:16 $
 
 =cut
 
