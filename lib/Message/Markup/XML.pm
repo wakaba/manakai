@@ -17,7 +17,7 @@ markup constructures.  (SuikaWiki is not "tiny"?  Oh, yes, I see:-))
 
 package SuikaWiki::Markup::XML;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload '""' => \&stringify,
              fallback => 1;
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXML_NCNameStartChar InXMLNCNameChar!;
@@ -52,9 +52,10 @@ our %Namespace_URI_to_prefix = (
 	'urn:x-suika-fam-cx:markup:ietf:rfc:2629'	=> ['', qw/rfc rfc2629/],
 );
 my %Cache;
-my $NS_SGML = 'urn:x-suika-fam-cx:markup:sgml:';	# obsolete
 my %NS = (
 	SGML	=> 'urn:x-suika-fam-cx:markup:sgml:',
+	xml	=> 'http://www.w3.org/XML/1998/namespace',
+	xmlns	=> 'http://www.w3.org/2000/xmlns/',
 );
 
 =head1 METHODS
@@ -83,7 +84,7 @@ sub new ($;%) {
     $self->{ns}->{$self->{namespace_prefix}||''} = $self->{namespace_uri} if defined $self->{namespace_uri};
   }
   for (qw/local_name value/) {
-    if (ref ($self->{$_}) && (ref ($self->{$_}->_CLASS_NAME) eq $self->_CLASS_NAME)) {
+    if (ref ($self->{$_}) && eval q($self->{$_}->_CLASS_NAME eq $self->_CLASS_NAME)) {
       $self->{$_}->{parent} = $self;
     }
   }
@@ -360,8 +361,8 @@ sub _prefix_to_uri ($$;$%) {
   my ($self, $prefix, %o) = @_;
   return undef unless $self->_check_namespace_prefix ($prefix);
   if (uc (substr $prefix, 0, 3) eq 'XML') {
-    return 'http://www.w3.org/XML/1998/namespace' if $prefix eq 'xml:';
-    return 'http://www.w3.org/2000/xmlns/' if $prefix eq 'xmlns:';
+    return $NS{xml} if $prefix eq 'xml:';
+    return $NS{xmlns} if $prefix eq 'xmlns:';
   }
   if (defined $self->{ns}->{$prefix}) {
     $self->{ns}->{$prefix};
@@ -381,8 +382,8 @@ sub _uri_to_prefix ($$;$%) {
     $self->{ns}->{$new_prefix} = $uri;
     $new_prefix;
   } else {
-    return 'xml:' if $uri eq 'http://www.w3.org/XML/1998/namespace';
-    return 'xmlns:' if $uri eq 'http://www.w3.org/2000/xmlns/';
+    return 'xml:' if $uri eq $NS{xml};
+    return 'xmlns:' if $uri eq $NS{xmlns};
     for (keys %{$self->{ns}||{}}) {
       next if ($_ eq '') && !(!defined $o{use_no_prefix} || $o{use_no_prefix});
       return $_ if $self->{ns}->{$_} eq $uri;
@@ -454,9 +455,9 @@ sub qname ($) {
 sub remove_references ($) {
   my $self = shift;
   my @node;
-    for (@{$self->{node}}) {
-      $_->remove_references;
-    }
+  for (@{$self->{node}}) {
+    $_->remove_references;
+  }
   for (@{$self->{node}}) {
     if ($_->{type} ne '#reference'
     || ($self->{type} eq '#declaration' && $_->{namespace_uri} eq $NS{SGML}.'entity')) {
@@ -468,15 +469,61 @@ sub remove_references ($) {
         push @node, $e;
       } elsif ($_->{flag}->{smxp__ref_expanded}) {
         for my $e (@{$_->{node}}) {
-          $e->{parent} = $self;
-          push @node, $e;
+          if ($e->{type} ne '#attribute') {
+            $e->{parent} = $self;
+            push @node, $e;
+          }
         }
       } else {	## reference is not expanded
         push @node, $_;
       }
     }
+    $_->{flag}->{smxp__defined_with_param_ref} = 0
+      if $_->{flag}->{smxp__defined_with_param_ref};
   }
   $self->{node} = \@node;
+}
+
+sub resolve_relative_uri ($;$%) {
+  require URI;
+  my ($self, $rel, %o) = @_;
+  my $base = $self->get_attribute ('base', namespace_uri => $NS{xml});
+  $base = ref ($base) ? $base->inner_text : undef;
+  if ($base !~ /^(?:[0-9A-Za-z.+-]|%[0-9A-Fa-f]{2})+:/) {	# $base is relative
+    $base = $self->_resolve_relative_uri_by_parent ($base, \%o);
+  }
+  eval q{	## Catch error such as $base is 'data:,foo' (non hierarchic scheme,...)
+    return URI->new ($rel)->abs ($base || '.');	## BUG (or spec) of URI: $base == false
+  } or return $rel;
+}
+sub _resolve_relative_uri_by_parent ($$$) {
+  my ($self, $rel, $o) = @_;
+  if (ref $self->{parent}) {
+    if (!$o->{use_references_base_uri} && $self->{parent}->{type} eq '#reference') {
+      ## This case is necessary to work with
+      ## <element>	<!-- element can have base URI -->
+      ## text		<!-- text cannot have base URI -->
+      ##   &ent;	<!-- ref's base URI is referred entity's one (in this module) -->
+      ##     <!-- expantion of ent -->
+      ##     entity's text	<!-- text cannot have base URI, so use <element>'s one -->
+      ##     <entitys-element/>	<!-- element can have base URI, otherwise ENTITY's one -->
+      ## </element>
+      return $self->{parent}->_resolve_relative_uri_by_parent ($rel, $o);
+    } else {
+      return $self->{parent}->resolve_relative_uri ($rel, %$o);
+    }
+  } else {
+    return $rel;
+  }
+}
+sub base_uri ($;$) {
+  my ($self, $new_uri) = @_;
+  my $base;
+  if (defined $new_uri) {
+    $base = $self->set_attribute (base => $new_uri, namespace_uri => $NS{xml});
+  }
+  $base ||= $self->get_attribute ('base', namespace_uri => $NS{xml});
+  ref ($base) ? $base->inner_text : undef;
 }
 
 =item $tag = $x->start_tag
@@ -530,13 +577,12 @@ sub start_tag ($) {
     }
   } elsif ($self->{type} eq '#declaration' && $self->{namespace_uri}) {
     '<!' . {
-    	$NS_SGML.'attlist'	=> 'ATTLIST',
-    	$NS_SGML.'doctype'	=> 'DOCTYPE',
-    	$NS_SGML.'element'	=> 'ELEMENT',
-    	$NS_SGML.'entity'	=> 'ENTITY',
-    	$NS_SGML.'entity:parameter'	=> 'ENTITY',
-    	$NS_SGML.'notation'	=> 'NOTATION',
-    	$NS_SGML.'sgml'	=> 'SGML',
+    	$NS{SGML}.'attlist'	=> 'ATTLIST',
+    	$NS{SGML}.'doctype'	=> 'DOCTYPE',
+    	$NS{SGML}.'element'	=> 'ELEMENT',
+    	$NS{SGML}.'entity'	=> 'ENTITY',
+    	$NS{SGML}.'entity:parameter'	=> 'ENTITY',
+    	$NS{SGML}.'notation'	=> 'NOTATION',
     }->{$self->{namespace_uri}} . ' ' . ($self->{namespace_uri} eq $NS{SGML}.'entity:parameter' ?
     ($self->{flag}->{smxp__defined_with_param_ref}?'':'% '):'');
   } elsif ($self->{type} eq '#declaration' && $self->_check_ncname ($self->{local_name})) {
@@ -628,7 +674,7 @@ sub attribute_value ($;%) {
   my %o = @_;
   if ($self->{type} eq '#attribute' && $self->_check_ncname ($self->{local_name})) {
     my $r = '"';
-    if (ref ($self->{value}) && ($self->{value}->_CLASS_NAME eq $self->_CLASS_NAME)) {
+    if (ref ($self->{value}) && eval q($self->{value}->_CLASS_NAME eq $self->_CLASS_NAME)) {
       unshift @{$self->{node}}, $self->{value};
       undef $self->{value};
     } else {
@@ -682,7 +728,8 @@ sub _entity_parameter_literal_value ($;%) {
     my $r = $self->{value};
     for (@{$self->{node}}) {
       my $nt = $_->node_type;
-      if ($nt eq '#reference' || $nt eq '#xml') {
+      #if ($nt eq '#reference' || $nt eq '#xml') {
+      if ($nt eq '#xml') {
         $r .= $_->outer_xml;
       } elsif ($nt ne '#attribute') {
         $r .= $_->inner_text;
@@ -821,7 +868,7 @@ sub inner_xml ($;%) {
       $r = '';
     }
   } elsif ($self->{type} eq '#declaration') {
-    if ($self->{namespace_uri} eq $NS_SGML.'doctype') {
+    if ($self->{namespace_uri} eq $NS{SGML}.'doctype') {
       my $root = $self->get_attribute ('qname');
       ref $root ? ($root = $root->inner_text) : (ref $self->{parent} ? (do {
         for (@{$self->{parent}->{node}}) {
@@ -855,11 +902,11 @@ sub inner_xml ($;%) {
       my %xid_opt;
       $r = $self->{local_name} . ' ' if !$self->{flag}->{smxp__defined_with_param_ref}
                                         && $self->_check_ncname ($self->{local_name});
-      if ($self->{namespace_uri} eq $NS_SGML.'entity:parameter') {
+      if ($self->{namespace_uri} eq $NS{SGML}.'entity:parameter') {
         #$r = '% ' . $r;
-      } elsif ($self->{namespace_uri} eq $NS_SGML.'entity') {
+      } elsif ($self->{namespace_uri} eq $NS{SGML}.'entity') {
         $xid_opt{use_ndata} = 1;
-      } elsif ($self->{namespace_uri} eq $NS_SGML.'notation') {
+      } elsif ($self->{namespace_uri} eq $NS{SGML}.'notation') {
         $xid_opt{allow_pubid_only} = 1;
       }
       
@@ -879,7 +926,7 @@ sub inner_xml ($;%) {
           }
         }
       }
-    } elsif ($self->{namespace_uri} eq $NS_SGML.'element') {
+    } elsif ($self->{namespace_uri} eq $NS{SGML}.'element') {
       my $qname = $self->get_attribute ('qname');
       ref $qname ? $qname = $qname->inner_text : undef;
       if ($qname && $self->_check_name ($qname)) {
@@ -971,7 +1018,7 @@ sub outer_xml ($) {
     } else {
       my $r = $self->start_tag;
       my $c = $self->inner_xml;
-      if ($self->{type} eq '#element' && !length $c && $self->{option}->{use_EmptyElemTag}) {
+      if ($self->{type} eq '#element' && !length ($c) && $self->{option}->{use_EmptyElemTag}) {
         substr ($r, -1) = ' />';
       } else {
         $r .= $c . $self->end_tag;
@@ -1000,8 +1047,8 @@ sub inner_text ($;%) {
   my $r = '';
   if ($self->{type} eq '#reference' && #) {
     #if (
-    $self->{namespace_uri} eq $NS{SGML}.'char:ref' ||
-    $self->{namespace_uri} eq $NS{SGML}.'char:ref:hex') {
+   ($self->{namespace_uri} eq $NS{SGML}.'char:ref' ||
+    $self->{namespace_uri} eq $NS{SGML}.'char:ref:hex')) {
       $r = chr $self->{value};
     #} else {	# general entity ref. or parameter entity ref.
     #  ## TODO: how implement? is this ok?
@@ -1014,7 +1061,7 @@ sub inner_text ($;%) {
     ## TODO:
     $r = $self->get_attribute ('value')->inner_text;
   } else {	# not #reference nor #declaration(ENTITY)
-    if (ref ($self->{value}) && $self->{value}->_CLASS_NAME eq $self->_CLASS_NAME) {
+    if (ref ($self->{value}) && eval q($self->{value}->_CLASS_NAME eq $self->_CLASS_NAME)) {
       unshift @{$self->{node}}, $self->{value};
       undef $self->{value};
     } else {
@@ -1220,4 +1267,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/06/16 09:59:49 $
+1; # $Date: 2003/06/27 13:07:44 $
