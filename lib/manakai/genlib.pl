@@ -31,13 +31,17 @@ sub valid_warn ($;%) {
 }
 
 ## Implementation (this script) might be broken
-sub impl_err (@) {
+sub impl_err ($;%) {
   require Carp;
-  Carp::croak (@_);
+  Carp::croak (shift);
 }
-sub impl_warn (@) {
+sub impl_warn ($;%) {
   require Carp;
-  Carp::carp (@_);
+  Carp::carp (shift);
+}
+sub impl_msg ($;%) {
+  require Carp;
+  Carp::carp (shift);
 }
 
 
