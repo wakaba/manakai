@@ -17,10 +17,12 @@ markup constructures.  (SuikaWiki is not "tiny"?  Oh, yes, I see:-))
 
 package Message::Markup::XML;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.21 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.22 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload '""' => \&outer_xml,
              fallback => 1;
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXML_NCNameStartChar InXMLNCNameChar!;
+use Message::Markup::XML::QName qw:NULL_URI UNDEF_URI DEFAULT_PFX:;
+
 our %Namespace_URI_to_prefix = (
 	'DAV:'	=> [qw/dav webdav/],
 	'http://greenbytes.de/2002/rfcedit'	=> [qw/ed/],
@@ -81,14 +83,24 @@ sub new ($;%) {
   $self->{type} ||= '#element';
   ## Use of "qname" parameter is deprecated
   if ($self->{qname}) {
-    ($self->{namespace_prefix}, $self->{local_name}) = $self->_ns_parse_qname ($self->{qname});
-    $self->{_qname} = $self->{qname};
+    my $q = Message::Markup::XML::QName::split_qname 
+      ($self->{qname},
+       check_qname => 1,
+       check_local_name => 1,
+       use_prefix_default => 1);
+    if ($q->{success}) {
+      $self->{namespace_prefix} = $q->{prefix};
+      $self->{local_name} = $q->{local_name};
+    }
   }
   if (defined $self->{namespace_prefix}) {
-    $self->{namespace_prefix} .= ':' if $self->{namespace_prefix}
-                                     && substr ($self->{namespace_prefix}, -1) ne ':';
-    $self->{ns}->{$self->{namespace_prefix}||''} = $self->{namespace_uri}
-      if defined $self->{namespace_uri};
+    my $result = Message::Markup::XML::QName::register_prefix_to_name
+        ($self->_get_ns_decls_node,
+         $self->{namespace_prefix} => $self->{namespace_uri},
+         use_prefix_default => 1, use_name_null => 1,
+         check_xml => 1, check_xmlns => 1,
+         check_registered_as_is => 1, ask_parent_node => 1);
+    warn $result->{reason} if $result->{reason};
   }
   for (qw/local_name value/) {
     $self->__set_parent_node ($self->{$_});
@@ -105,15 +117,6 @@ sub __set_parent_node ($$) {
     $child->{parent} = $parent;
   } elsif (ref ($child) && $parent->_is_same_class ($child)) {
     $child->{parent} = $parent;
-  }
-}
-
-sub _ns_parse_qname ($$) {
-  my $qname = $_[1];
-  if (index ($qname, ':') > -1) {
-    return split /:/, $qname, 2;
-  } else {
-    return (undef, $qname);
   }
 }
 
@@ -227,9 +230,8 @@ Available options: C<namespace_uri>.
 sub set_attribute ($$$;%) {
   my ($self, $name, $val, %o) = @_;
   if ({qw/ARRAY 1 HASH 1 CODE 1/}->{ref ($val)}) {
-  ## TODO: common error handling
-    require Carp;
-    Carp::croak "set_attribute: new attribute value must be string or blessed object";
+    die "set_attribute: new attribute value must be string or blessed object";
+    #return undef;
   }
   for (@{$self->{node}}) {
     if ($_->{type} eq '#attribute'
@@ -320,14 +322,26 @@ sub namespace_uri ($;$) {
   $self->{namespace_uri} = $new_uri if defined $new_uri;
   $self->{namespace_uri};
 }
-sub namespace_prefix ($;$) {
-  my ($self, $new_pfx) = @_;
-  if (defined $new_pfx && $self->{namespace_uri}) {
-    $new_pfx .= ':' if $new_pfx;
-    $self->{namespace_prefix} = $new_pfx;
-    $self->{ns}->{$new_pfx} = $self->{namespace_uri};
+sub namespace_prefix ($;$%) {
+  my ($self, $new_pfx, %opt) = @_;
+  my $decls = $self->_get_ns_decls_node;
+  if (defined ($new_pfx)) {
+    my $result = Message::Markup::XML::QName::register_prefix_to_name
+      ($decls, $new_pfx => $self->{namespace_uri}, ask_parent_node => 1,
+       check_prefix => 1, check_xml => 1, check_xmlns => 1,
+       check_prefix_xml_ => 1, check_registered_as_is => 1,
+       use_prefix_default => 1, use_name_null => 1, %opt);
+    warn $result->{reason} if $result->{reason};
   }
-  $self->_get_namespace_prefix ($self->{namespace_uri});
+  my $result = Message::Markup::XML::QName::name_to_prefix
+    ($decls, $self->{namespace_uri}, make_new_prefix => 1, 
+     use_prefix_default => 1, use_name_null => 1,
+     check_registered_as_is => 1, %opt);
+  if ($result->{success}) {
+    return $result->{prefix};
+  } else {
+    return undef;
+  }
 }
 
 sub expanded_name ($) {
@@ -349,90 +363,19 @@ sub count ($;@) {
 
 # $prefix = $x->_get_namespace_prefix ($namespace_uri)
 sub _get_namespace_prefix ($$;%) {
-  my ($self, $uri, %o) = @_;
-  if (defined (my $p = $self->_uri_to_prefix ($uri, undef, %o))) {
-    return $p if $self->_prefix_to_uri ($p) eq $uri;
-  } if ($Namespace_URI_to_prefix{$uri}) {
-    for (@{$Namespace_URI_to_prefix{$uri}}) {
-      my $pfx = $_; $pfx .= ':' if $pfx;
-      if ($self->_check_namespace_prefix ($pfx) && !$self->_prefix_to_uri ($pfx)) {
-        return $self->_uri_to_prefix ($uri => $pfx, %o);
-      }
-    }
-  } else {
-    my ($u_r_i, $pfx) = ($uri);
-    $u_r_i =~ s/[^0-9A-Za-z._-]+/ /g;
-    my @u_r_i = split / /, $u_r_i;
-    for (reverse @u_r_i) {
-      if (s/([A-Za-z][0-9A-Za-z._-]+)//) {
-        my $p_f_x = $1 . ':';
-        next if lc (substr ($p_f_x, 0, 3)) eq 'xml';
-        unless ($self->_prefix_to_uri ($p_f_x)) {
-          $pfx = $p_f_x;
-          last;
-        }
-      }
-    }
-    if ($pfx) {
-      return $self->_uri_to_prefix ($uri => $pfx, %o);
-    } else {
-      while (1) {
-        my $pfx = 'ns'.(++$self->{ns}->{-anonymous}).':';
-        unless ($self->_prefix_to_uri ($pfx)) {
-          return $self->_uri_to_prefix ($uri => $pfx, %o);
-        }
-      }
-    }
-  }
 }
 
 sub _set_prefix_to_uri ($$$;%) {
-  my ($self, $prefix => $uri, %o) = @_;
-  return undef unless $self->_check_namespace_prefix ($prefix);
-  $self->{ns}->{$prefix} = $uri;
-  $self->_prefix_to_uri ($prefix);
 }
 
 ## TODO: removing ns declare (1.1) support
 # $uri or undef = $x->_prefix_to_uri ($prefix)
 sub _prefix_to_uri ($$;$%) {
-  my ($self, $prefix, %o) = @_;
-  return undef unless $self->_check_namespace_prefix ($prefix);
-  if (uc (substr $prefix, 0, 3) eq 'XML') {
-    return $NS{xml} if $prefix eq 'xml:';
-    return $NS{xmlns} if $prefix eq 'xmlns:';
-  }
-  if (defined $self->{ns}->{$prefix}) {
-    $self->{ns}->{$prefix};
-  } elsif (ref $self->{parent}) {
-    shift;	# $self
-    $self->{parent}->_prefix_to_uri (@_);
-  } else {
-    undef;
-  }
 }
 
 # $prefix or undef = $x->_uri_to_prefix ($uri => [$new_prefix], %options)
 # use_no_prefix (default: 1): Allow default namespace (no prefix).
 sub _uri_to_prefix ($$;$%) {
-  my ($self, $uri, $new_prefix, %o) = @_;
-  if (defined $new_prefix && $self->_check_namespace_prefix ($new_prefix)) {
-    $self->{ns}->{$new_prefix} = $uri;
-    $new_prefix;
-  } else {
-    return 'xml:' if $uri eq $NS{xml};
-    return 'xmlns:' if $uri eq $NS{xmlns};
-    for (keys %{$self->{ns}||{}}) {
-      next if ($_ eq '') && !(!defined $o{use_no_prefix} || $o{use_no_prefix});
-      return $_ if $self->{ns}->{$_} eq $uri;
-    }
-    if (ref ($self->{parent}) && $self->{parent}->{type} ne '#declaration') {
-      shift;	# $self
-      $self->{parent}->_uri_to_prefix (@_);
-    } else {
-      undef;
-    }
-  }
 }
 
 =item $x->define_new_namespace ($prefix => $uri)
@@ -444,15 +387,16 @@ Returned value is unspecified in this version of this module.
 
 =cut
 
-## TODO: structured URI (such as http://&server;/) support
-sub define_new_namespace ($$$) {
-  my ($self, $prefix, $uri) = @_;
-  if ($prefix eq '' || $self->_check_ncname ($prefix)) {
-    $prefix .= ':' if $prefix && substr ($prefix, -1) ne ':';
-    $self->_set_prefix_to_uri ($prefix => $uri);
-  } else {
-    undef;
-  }
+sub define_new_namespace ($$$;%) {
+  my ($self, $prefix, $uri, %opt) = @_;
+  my $result = Message::Markup::XML::QName::register_prefix_to_name 
+    ($self->_get_ns_decls_node, $prefix => $uri,
+     check_name => 1, check_prefix => 1, check_xml => 1,
+     check_xmlns => 1, check_prefix_xml_ => 1,
+     use_prefix_default => 1, use_name_null => 1,
+     %opt);
+  warn $result->{reason} if $result->{reason};
+  $result->{success};
 }
 
 =item $uri = $x->defined_namespace_prefix ($prefix)
@@ -462,10 +406,13 @@ If defined, return namespace name (URI).
 
 =cut
 
-sub defined_namespace_prefix ($$) {
-  my ($self, $prefix) = @_;
-  $prefix .= ':' if $prefix;
-  $self->_prefix_to_uri ($prefix);
+sub defined_namespace_prefix ($$;%) {
+  my ($self, $prefix, %opt) = @_;
+  my $result = Message::Markup::XML::QName::prefix_to_name 
+    ($self->_get_ns_decls_node, $prefix,
+     use_prefix_default => 1, use_name_null => 1, 
+     ask_parent_node => 1, %opt);
+  $result->{name};
 }
 
 =item $qname = $x->qname
@@ -476,23 +423,33 @@ Undef is retuened when the type does not have its QName
 
 =cut
 
-sub qname ($) {
-  my $self = shift;
-  if ($self->_check_ncname ($self->{local_name})) {
-    if ($self->{type} eq '#element') {
-      $self->{_qname} = $self->_get_namespace_prefix ($self->{namespace_uri}) . $self->{local_name}
-        unless $self->{_qname};
-      return $self->{_qname};
-    } elsif ($self->{type} eq '#attribute') {
-      return $self->attribute_name;
-    }
+sub qname ($;%) {
+  my ($self, %opt) = @_;
+  if ($self->{type} eq '#element') {
+    my $result = Message::Markup::XML::QName::expanded_name_to_qname
+                   ($self, $self->{namespace_uri}, $self->{local_name},
+                    make_new_prefix => 1, check_local_name => 1,
+                    use_prefix_default => 1, use_name_null => 1,
+                    ask_parent_node => 1, %opt);
+    warn $result->{reason} if $result->{reason};
+    return $result->{qname};
+  } elsif ($self->{type} eq '#attribute') {
+    my $result = Message::Markup::XML::QName::expanded_name_to_qname
+                   ($self->_get_ns_decls_node,
+                    $self->{namespace_uri}, $self->{local_name},
+                    make_new_prefix => 1, check_local_name => 1,
+                    ask_parent_node => 1, %opt);
+    warn $result->{reason} if $result->{reason};
+    return $result->{qname};
+  } else {
+    return $self->{qname};
   }
-  undef;
 }
 
 sub merge_external_subset ($) {
   my $self = shift;
-  unless ($self->{type} eq '#declaration' && $self->{namespace_uri} eq $NS{SGML}.'doctype') {
+  unless ($self->{type} eq '#declaration'
+       && $self->{namespace_uri} eq $NS{SGML}.'doctype') {
     return unless $self->{type} eq '#document' || $self->{type} eq '#fragment';
     for (@{$self->{node}}) {
       $_->merge_external_subset;
@@ -554,7 +511,8 @@ sub remove_references ($) {
   }
   for (@{$self->{node}}) {
     if ($_->{type} ne '#reference'
-    || ($self->{type} eq '#declaration' && $_->{namespace_uri} eq $NS{SGML}.'entity')) {
+    || ($self->{type} eq '#declaration'
+     && $_->{namespace_uri} eq $NS{SGML}.'entity')) {
       push @node, $_;
     } else {
       if (index ($_->{namespace_uri}, 'char') > -1) {
@@ -584,7 +542,7 @@ sub resolve_relative_uri ($;$%) {
   my ($self, $rel, %o) = @_;
   my $base = $self->get_attribute ('base', namespace_uri => $NS{xml});
   $base = ref ($base) ? $base->inner_text : $NS{default_base_uri};
-  if ($base !~ /^(?:[0-9A-Za-z.+-]|%[0-9A-Fa-f]{2})+:/) {	# $base is relative
+  if ($base !~ /^[0-9A-Za-z.%+-]+:/) {	# $base is relative
     $base = $self->_resolve_relative_uri_by_parent ($base, \%o);
   }
   eval q{	## Catch error such as $base is 'data:,foo' (non hierarchic scheme,...)
@@ -636,13 +594,17 @@ sub start_tag ($) {
     for (@{$self->{node}}) {
       $r .= ' ' . $_->outer_xml if $_->node_type eq '#attribute';
     }
-    for my $prefix (grep !/^-/, keys %{$self->{ns}||{}}) {
-      if ($prefix) {
-        $r .= ' xmlns:'.substr ($prefix, 0, length ($prefix)-1);
+    for my $prefix (sort grep !/^-/, keys %{$self->{ns}||{}}) {
+      if ($prefix ne DEFAULT_PFX) {
+        $r .= ' xmlns:'.$prefix;
       } else {
         $r .= ' xmlns';
       }
-      $r .= '="'.$self->_entitize ($self->{ns}->{$prefix}).'"';
+      $r .= '="';
+      $r .= $self->_entitize ($self->{ns}->{$prefix})
+        if $self->{ns}->{$prefix} ne NULL_URI
+        && $self->{ns}->{$prefix} ne NULL_URI;
+      $r .= '"';
     }
     $r .= '>';
     $r;
@@ -718,14 +680,7 @@ Returns the attribute name.
 
 sub attribute_name ($) {
   my $self = shift;
-  if ($self->{type} eq '#attribute' && $self->_check_ncname ($self->{local_name})) {
-    ($self->{namespace_uri} ?
-      (ref $self->{parent} ? $self->{parent} : $self)
-      ->_get_namespace_prefix ($self->{namespace_uri}, use_no_prefix => 0) : '')
-    .$self->{local_name};
-  } else {
-    '';
-  }
+  $self->qname;
 }
 
 =item $tag = $x->attribute_value
@@ -1172,9 +1127,11 @@ sub outer_xml ($) {
       }
       return $r;
     } else {
-      my $r = $self->start_tag;
+      $self->qname;
       my $c = $self->inner_xml;
-      if ($self->{type} eq '#element' && !length ($c) && $self->{option}->{use_EmptyElemTag}) {
+      my $r = $self->start_tag;
+      if (($self->{type} eq '#element')
+       && $self->{option}->{use_EmptyElemTag} && !length ($c)) {
         substr ($r, -1) = ' />';
       } else {
         $r .= $c . $self->end_tag;
@@ -1230,6 +1187,8 @@ sub inner_text ($;%) {
   }
   $r;
 }
+
+sub stringify ($;%) { shift->outer_xml (@_) }
 
 sub _is_same_class ($$) {
   my ($self, $something) = @_;
@@ -1288,7 +1247,11 @@ sub _entitize ($$;%) {
   $s =~ s/</&lt;/g;
   $s =~ s/>/&gt;/g;
   $s =~ s/"/&quot;/g;
+  ## XML 1.0
   $s =~ s/([\x00-\x08\x0B\x0C\x0E-\x1F])/sprintf '&amp;#%d;', ord $1/ge;
+  ## XML 1.1
+  #$s =~ s/(\x00)/sprintf '&amp;#%d;', ord $1/ge;
+  #$s =~ s/([\x00-\x08\x0B\x0C\x0E-\x1F])/sprintf '&#x%02X;', ord $1/ge;
   $s =~ s/([\x09\x0A\x0D])/sprintf '&#%d;', ord $1/ge if $o{keep_wsp};
   $s;
 }
@@ -1434,4 +1397,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/30 01:58:17 $
+1; # $Date: 2003/10/31 05:00:49 $
