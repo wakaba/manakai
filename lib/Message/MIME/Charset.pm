@@ -17,7 +17,7 @@ Perl module for MIME charset.
 package Message::MIME::Charset;
 use strict;
 use vars qw(%CHARSET %MSNAME2IANANAME %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 &_builtin_charset;
 sub _builtin_charset () {
@@ -132,6 +132,7 @@ for (qw(
 	iso-2022-cn	iso-2022-cn-ext
 	iso-2022-int-1
 	iso-2022-jp	iso-2022-jp-1	iso-2022-jp-2	iso-2022-jp-3
+	x-iso2022jp-cp932
 	iso-2022-kr
 	iso-8859-1	iso-8859-2	iso-8859-3
 	iso-8859-4	iso-8859-5	iso-8859-6
@@ -551,7 +552,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/22 07:48:01 $
+$Date: 2002/07/26 12:42:00 $
 
 =cut
 

@@ -9,7 +9,7 @@ mail address (mailbox) which is part of Internet Messages
 package Message::Field::Mailbox;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::AngleQuoted;
 push @ISA, qw(Message::Field::AngleQuoted);
 
@@ -43,7 +43,7 @@ push @ISA, qw(Message::Field::AngleQuoted);
     #hook_encode_string
     #hook_decode_string
     -must_have_addr_spec	=> 1,
-    #output_angle_bracket	=> 1,
+    -output_angle_bracket	=> 1,
     #output_comment	=> 1,
     #output_display_name	=> 1,
     #output_keyword	=> 0,
@@ -302,7 +302,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/23 12:10:16 $
+$Date: 2002/07/26 12:42:00 $
 
 =cut
 

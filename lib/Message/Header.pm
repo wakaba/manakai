@@ -8,7 +8,7 @@ Message::Header --- A Perl Module for Internet Message Headers
 package Message::Header;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.38 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.39 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;	## This may seem silly:-)
 push @ISA, qw(Message::Field::Structured);
 
@@ -143,7 +143,7 @@ sub _init_by_format ($$\%) {
     } else {
       $option->{field_sort} = 'good-practice';
     }
-  } elsif ($format =~ /mail|news/) {	## RFC 822
+  } elsif ($format =~ /mail|news|mime/) {	## RFC 822
     $option->{ns_default_phuri} = $self->{ns}->{phname2uri}->{'x-rfc822'};
   }
   if ($format =~ /uri-url-mailto/) {
@@ -965,7 +965,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/21 03:26:02 $
+$Date: 2002/07/26 12:42:00 $
 
 =cut
 

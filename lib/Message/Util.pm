@@ -7,7 +7,7 @@ Message::Util -- Utilities for Message::* Perl modules.
 
 Useful functions for Message::* Perl modules.
 This module is only intended for internal use.
-But some can be useful for general use.
+Note that there is another module, Message::Tool.
 
 =cut
 
@@ -16,9 +16,9 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%FMT2STR %OPTION %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.20 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
-use Carp ();
+require Carp;
 require Message::MIME::EncodedWord;
 require Message::MIME::Charset;
 
@@ -786,7 +786,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/22 02:49:45 $
+$Date: 2002/07/26 12:42:00 $
 
 =cut
 

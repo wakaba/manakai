@@ -13,7 +13,7 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.31 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.32 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::Header;
@@ -555,7 +555,7 @@ sub stringify ($;%) {
       $self->{header}->field ($option{fill_ua_name})->add_our_name (
         -use_Config	=> $option{ua_use_Config},
         -use_Win32	=> $option{ua_use_Win32},
-        -date	=> q$Date: 2002/07/22 07:48:28 $,
+        -date	=> q$Date: 2002/07/26 12:42:00 $,
       );
     }
     $header = $self->{header}->stringify (-format => $option{format},
@@ -731,11 +731,8 @@ sub option ($@) {
   my %option = @_;
   while (my ($name, $value) = splice (@_, 0, 2)) {
     $self->{option}->{$name} = $value;
-    if ($name eq 'format') {
-      $self->header->option (-format => $value);
-    }
   }
-  if ($option{-recursive}) {
+  if ($option{-recursive} && ($self->content_type)[0] ne 'message') {
     $self->{header}->option (%option);
     $self->{body}->option (%option) if ref $self->{body};
   }
@@ -981,7 +978,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/22 07:48:28 $
+$Date: 2002/07/26 12:42:00 $
 
 =cut
 
