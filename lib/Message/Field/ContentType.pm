@@ -9,7 +9,7 @@ Internet message C<Content-Type:> field body
 package Message::Field::ContentType;
 use strict;
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::ValueParams;
 push @ISA, qw(Message::Field::ValueParams);
 
@@ -172,7 +172,7 @@ Returns C<field-body> as a string.
 sub stringify ($;%) {
   my $self = shift;
   my $param = $self->SUPER::stringify_params (@_);
-  $self->media_type ().(defined $param? '; '.$param: '');
+  $self->media_type ().(length $param? '; '.$param: '');
 }
 
 =head2 $self->media_type ([$new_value])
@@ -311,7 +311,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/21 04:27:42 $
+$Date: 2002/05/14 13:42:40 $
 
 =cut
 

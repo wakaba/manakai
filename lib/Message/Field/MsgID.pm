@@ -15,7 +15,7 @@ draft-ietf-usefor-msg-id-alt-00 is also supported.
 package Message::Field::MsgID;
 use strict;
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -106,7 +106,7 @@ sub _newid ($\%) {
     $$o{login} = $1; $$o{fqdn} = $2;
   }
   if ($self->{option}->{validate} && $$o{fqdn} =~ 
-     /[.@](example\.(?:com|org|net)|localdomain|localhost|example|invalid)$/) {
+     /[.@](example\.(?:com|org|net)|localdomain|localhost|example|invalid|arpa)$/) {
       Carp::croak "Msg-ID generation: invalid TLD of FQDN: .$1";
   }
   if (!$$o{fqdn} && $$o{ip_address}) {
@@ -142,7 +142,8 @@ sub _newid ($\%) {
   $$o{login} = $self->_hash ($$o{login}, $self->{option}->{hash_name});
   
   my @s = ('0'..'9','a'..'z','-','=','_');
-  my $unique = $s[rand @s].$s[rand @s].$s[rand @s].'.';
+  my @t = ('0'..'9','a'..'z');
+  my $unique = $t[rand @t].$s[rand @s].$s[rand @s].$s[rand @s].'.';
   $unique .= join ('.', $self->_base39 (time), $self->_base39 ($$), 
     $self->_hash ($self->{option}->{software_name},
                   $self->{option}->{software_name_hash}));
@@ -294,7 +295,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/04 06:03:58 $
+$Date: 2002/05/14 13:42:40 $
 
 =cut
 

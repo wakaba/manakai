@@ -51,7 +51,7 @@ $REG{M_iso8601_date_time} = qr/([0-9]+)-([0-9]+)-([0-9]+)[Tt]([0-9]+):([0-9]+):(
   JUN	=> 6,	JUNE	=> 6,
   JUL	=> 7,	JULY	=> 7,
   AUG	=> 8,	AUGUST	=> 8,
-  SEP	=> 9,	SEPTEMBER	=> 9,
+  SEP	=> 9,	SEPTEMBER	=> 9,	SEPT	=> 9,
   OCT	=> 10,	OCTOBER	=> 10,
   NOV	=> 11,	NOVEMBER	=> 11,
   DEC	=> 12,	DECEMBER	=> 12,

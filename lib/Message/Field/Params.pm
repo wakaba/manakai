@@ -11,7 +11,7 @@ use strict;
 require 5.6.0;
 use re 'eval';
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -58,13 +58,13 @@ sub _init ($;%) {
   my %DEFAULT = (
     -delete_fws	=> 1,## BUG: this option MUST be '1'.
     	## parameter parser cannot procede CFWS.
-    #encoding_after_encode	## Inherited
-    #encoding_before_decode	## Inherited
-    #field_param_name	## Inherited
-    #field_name	## Inherited
-    #format	## Inherited
-    #hook_encode_string	## Inherited
-    #hook_decode_string	## Inherited
+    #encoding_after_encode
+    #encoding_before_decode
+    #field_param_name
+    #field_name
+    #format
+    #hook_encode_string
+    #hook_decode_string
     -parameter_rule	=> 'param',
     -parameter_name_case_sensible	=> 0,
     -parameter_value_max_length	=> 78,
@@ -73,7 +73,7 @@ sub _init ($;%) {
     -separator	=> '; ',
     -separator_regex	=> qr/$REG{FWS};$REG{FWS}/,
     -use_parameter_extension	=> 0,
-    #value_type	## Inherited
+    #value_type
   );
   $self->SUPER::_init (%DEFAULT, %options);
   $self->{param} = [];
@@ -600,7 +600,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/04 06:03:58 $
+$Date: 2002/05/14 13:42:40 $
 
 =cut
 

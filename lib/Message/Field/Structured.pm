@@ -8,8 +8,8 @@ structured header field bodies of the Internet message
 
 package Message::Field::Structured;
 use strict;
-use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use vars qw(%DEFAULT $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 use overload '""' => sub { $_[0]->stringify },
              '.=' => sub { $_[0]->value_append ($_[1]) },
@@ -26,13 +26,12 @@ The following methods construct new C<Message::Field::Structured> objects:
 =cut
 
 ## Initialize of this class -- called by constructors
-sub _init ($;%) {
-  my $self = shift;
-  my %options = @_;
-  $self->{option} = Message::Util::make_clone ({
+  %DEFAULT = (
     _ARRAY_NAME	=> '',
+    _ARRAY_VALTYPE	=> '*default',
     _HASH_NAME	=> '',
-    _MATHODS	=> [qw(as_plain_string)],
+    _MATHODS	=> [qw|as_plain_string value_append|],
+    _MEMBERS	=> [qw|field_body|],
     by	=> 'index',	## (Reserved for method level option)
     dont_croak	=> 0,	## Don't die unless very very fatal error
     encoding_after_encode	=> '*default',
@@ -49,7 +48,11 @@ sub _init ($;%) {
     parse_all	=> 0,
     prepend	=> 0,	## (Reserved for method level option)
     value_type	=> {'*default'	=> [':none:']},
-  });
+  );
+sub _init ($;%) {
+  my $self = shift;
+  my %options = @_;
+  $self->{option} = Message::Util::make_clone (\%DEFAULT);
   $self->{field_body} = '';
   
   for my $name (keys %options) {
@@ -112,15 +115,18 @@ sub add ($$$%) {
     if (ref $_[0] eq 'HASH') {
       my $option = shift (@_);
       for (keys %$option) {my $n = $_; $n =~ s/^-//; $option{$n} = $$option{$_}}
-      $option{parse} = 1 if defined wantarray && !defined $option{parse};
     }
+    $option{parse} = 1 if defined wantarray && !defined $option{parse};
+    $option{parse} = 1 if $option{parse_all} && !defined $option{parse};
     
     ## Additional items
     my $avalue;
     for (@_) {
+      local $option{parse} = $option{parse};
       my ($ok, undef, $avalue) = $self->_add_array_check ($_, \%option);
       if ($ok) {
-        $avalue = $self->_parse_value ('*default' => $avalue) if $option{parse};
+        $avalue = $self->_parse_value
+          ($option{_ARRAY_VALTYPE} => $avalue) if $option{parse};
         if ($option{prepend}) {
           unshift @{$self->{$array}}, $avalue;
         } else {
@@ -147,6 +153,7 @@ sub add ($$$%) {
     my %p = @_; my %option = %{$self->{option}};
     for (grep {/^-/} keys %p) {$option{substr ($_, 1)} = $p{$_}}
     $option{parse} = 1 if defined wantarray && !defined $option{parse};
+    $option{parse} = 1 if $option{parse_all} && !defined $option{parse};
     
     ## Additional items
     my $avalue;
@@ -154,6 +161,7 @@ sub add ($$$%) {
       next if $name =~ /^-/; $name =~ s/^\\//;
       
       my $ok;
+      local $option{parse} = $option{parse};
       ($ok, $name, $avalue) = $self->_add_hash_check ($name => $value, \%option);
       if ($ok) {
         $avalue = $self->_parse_value ($name => $avalue) if $option{parse};
@@ -190,14 +198,19 @@ sub replace ($$$%) {
       my $option = shift (@_);
       for (keys %$option) {my $n = $_; $n =~ s/^-//; $option{$n} = $$option{$_}}
     }
+    $option{parse} = 1 if defined wantarray && !defined $option{parse};
+    $option{parse} = 1 if $option{parse_all} && !defined $option{parse};
     
     ## Additional items
     my ($avalue, %replace);
     for (@_) {
+      local $option{parse} = $option{parse};
       my ($ok, $aname);
       ($ok, $aname => $avalue)
         = $self->_replace_array_check ($_, \%option);
       if ($ok) {
+        $avalue = $self->_parse_value
+          ($option{_ARRAY_VALTYPE} => $avalue) if $option{parse};
         $replace{$aname} = $avalue;
       }
     }
@@ -233,6 +246,7 @@ sub replace ($$$%) {
     my %p = @_; my %option = %{$self->{option}};
     for (grep {/^-/} keys %p) {$option{substr ($_, 1)} = $p{$_}}
     $option{parse} = 1 if defined wantarray && !defined $option{parse};
+    $option{parse} = 1 if $option{parse_all} && !defined $option{parse};
     
     ## Additional items
     my ($avalue, %replace);
@@ -240,9 +254,11 @@ sub replace ($$$%) {
       next if $name =~ /^-/; $name =~ s/^\\//;
       
       my ($ok, $aname);
+      local $option{parse} = $option{parse};
       ($ok, $aname => $avalue)
         = $self->_replace_hash_check ($name => $value, \%option);
       if ($ok) {
+        $avalue = $self->_parse_value ($name => $avalue) if $option{parse};
         $replace{$aname} = $avalue;
       }
     }
@@ -350,28 +366,29 @@ sub _delete_cleaning ($) {
 
 ## Delete empty items
 sub _delete_empty ($) {
-  # my $self = shift;
-  # $self->{*$array*} = [grep {ref $_ && length $_->[0]} @{$self->{*$array*}}];
-  # $self;
+  my $self = shift;
+  my $array = $self->{option}->{_ARRAY_NAME} || $self->{option}->{_HASH_NAME};
+  $self->{$array} = [grep {length $_} @{$self->{$array}}] if $array;
 }
 
 sub item ($$;%) {
   my $self = shift;
-  my ($name, %p) = (shift, @_);
+  my ($name, %p) = (shift, @_);	## BUG: don't support -by
   return $self->replace ($name => $p{-value}, @_) if defined $p{-value};
   my %option = %{$self->{option}};
+  $option{new_item_unless_exist} = 1;
   for (grep {/^-/} keys %p) {$option{substr ($_, 1)} = $p{$_}}
   my $array = $option{_ARRAY_NAME} || $option{_HASH_NAME};
   unless ($array) {
     return if $option{dont_croak};
     Carp::croak q{item: Method not available for this module};
   }
+  my @r;
   if ($option{by} eq 'index') {
     for ($self->{$array}->[$name]) {
       return $self->_item_return_value (\$_, \%option);
     }
   } else {
-    my @r;
     for (@{$self->{$array}}) {
       if ($self->_item_match ($option{by}, \$_, {$name => 1}, \%option)) {
         if (wantarray) {
@@ -381,9 +398,20 @@ sub item ($$;%) {
         }
       }
     }
-    return undef unless wantarray;
-    (@r);
   }
+  if (@r == 0 && $option{new_item_unless_exist}) {
+    my $v = $self->_item_new_value ($name, \%option);
+    if (defined $v) {
+      if ($option{prepend}) {
+        unshift @{$self->{$array}}, $v;
+      } else {
+        push @{$self->{$array}}, $v;
+      }
+      return $self->_item_return_value (\$v, \%option);
+    }
+  }
+  return undef unless wantarray;
+  @r;
 }
 
 ## item-by?, \$checked-item, {item-key => 1}, \%option
@@ -393,7 +421,12 @@ sub _item_match ($$\$\%\%) {
 
 ## Returns returned item value    \$item-value, \%option
 sub _item_return_value ($\$\%) {
-  $_[1]
+  $_[1];
+}
+
+## Returns returned (new created) item value    $name, \%option
+sub _item_new_value ($$\%) {
+  $_[1];
 }
 
 ## $self->_parse_value ($type, $value);
@@ -425,6 +458,63 @@ sub _parse_value ($$$) {
       -parse_all	=> $self->{option}->{parse_all},
     %vopt);
   }
+}
+
+## comments
+
+
+sub comment_add ($@) {
+  my $self = shift;
+  my $array = 'comment';
+    ## Options
+    my %option = %{$self->{option}};
+    if (ref $_[0] eq 'HASH') {
+      my $option = shift (@_);
+      for (keys %$option) {my $n = $_; $n =~ s/^-//; $option{$n} = $$option{$_}}
+    }
+    
+    ## Additional items
+        if ($option{prepend}) {
+          unshift @{$self->{$array}}, reverse @_;
+        } else {
+          push @{$self->{$array}}, @_;
+        }
+}
+
+sub comment_count ($) {
+  my $self = shift;
+  $self->_comment_cleaning;
+  $#{$self->{comment}} + 1;
+}
+
+sub comment_delete ($@) {
+  my $self = shift;
+  #my %p; %p = %{shift (@_)} if ref $_[0] eq 'HASH';
+  #my %option = %{$self->{option}};
+  #for (grep {/^-/} keys %p) {$option{substr ($_, 1)} = $p{$_}}
+    for (@_) {
+      $self->{comment}->[$_] = undef;
+    }
+  $self->_comment_cleaning;
+}
+
+sub comment_item ($$) {
+  $_[0]->{comment}->[$_[1]];
+}
+
+sub _comment_cleaning ($) {
+  my $self = shift;
+  $self->{comment} = [grep {length $_} @{$self->{comment}}];
+}
+
+sub _comment_stringify ($\%) {
+  my $self = shift;
+  #my $option = shift;
+  my @v;
+  for (@{$self->{comment}}) {
+    push @v, '('. $self->Message::Util::encode_ccontent ($_) .')';
+  }
+  join ' ', @v;
 }
 
 sub scan ($&) {
@@ -532,12 +622,15 @@ Returns a copy of Message::Field::Structured object.
 sub clone ($) {
   my $self = shift;
   my $clone = ref($self)->new;
-  $clone->_delete_empty;
   $clone->{option} = Message::Util::make_clone ($self->{option});
-  $clone->{field_body} = Message::Util::make_clone ($self->{field_body});
   ## Common hash value (not used in this module)
-  $clone->{value} = Message::Util::make_clone ($self->{value});
-  $clone->{comment} = Message::Util::make_clone ($self->{comment});
+    $self->_delete_empty;
+    $self->_comment_cleaning;
+    $clone->{value} = Message::Util::make_clone ($self->{value});
+    $clone->{comment} = Message::Util::make_clone ($self->{comment});
+  for (@{$self->{option}->{_MEMBERS}}) {
+    $clone->{$_} = Message::Util::make_clone ($self->{$_});
+  }
   $clone;
 }
 
@@ -603,7 +696,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/08 09:11:31 $
+$Date: 2002/05/14 13:42:40 $
 
 =cut
 

@@ -1,8 +1,8 @@
 
 =head1 NAME
 
-Message::Field::CSV --- Perl module for Internet message
-field body consist of comma separated values
+Message::Field::Addresses --- Perl module for comma separated
+Internet mail address list
 
 =cut
 
@@ -10,11 +10,11 @@ package Message::Field::Addresses;
 require 5.6.0;
 use strict;
 use re 'eval';
-use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use vars qw(%DEFAULT @ISA %REG $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::CSV;
 push @ISA, qw(Message::Field::CSV);
-*REG = \%Message::Field::CSV::REG;
+%REG = %Message::Field::CSV::REG;
 	$REG{SC_angle_addr} = qr/<(?:$REG{quoted_string}|$REG{domain_literal}|$REG{comment}|[^\x22\x28\x5B\x3E])+>|<>/;
 	$REG{SC_group} = qr/:(?:$REG{comment}|$REG{quoted_string}|(??{$REG{SC_group}})|$REG{domain_literal}|$REG{SC_angle_addr}|[^\x22\x28\x5B\x3A\x3E\x3B])+;/;
 
@@ -27,11 +27,10 @@ The following methods construct new objects:
 =cut
 
 ## Initialize of this class -- called by constructors
-sub _init ($;%) {
-  my $self = shift;
-  my %options = @_;
-  my %DEFAULT = (
-    -_METHODS => [qw(add count delete item display_name is_group value_type scan)],
+  %DEFAULT = (
+    -_METHODS	=> [qw|add count delete item display_name is_group value_type scan
+                       comment_add comment_count comment_delete comment_item|],
+    -_MEMBERS	=> [qw|group_name group_name_comment|],
     -by	=> 'display-name',	## Default key for item, delete,...
     -can_have_group	=> 1,
     #encoding_after_encode
@@ -42,20 +41,62 @@ sub _init ($;%) {
     #hook_encode_string
     #hook_decode_string
     -is_group	=> 0,
+    #max
     -output_comment	=> 1,
     -output_group_name_comment	=> 1,
     #parse_all
     -remove_comment	=> 0,	## This option works for PARENT class
     #value_type
   );
-  $self->SUPER::_init (%DEFAULT, %options);
+sub _init ($;%) {
+  my $self = shift;
+  my %options = @_;
+  my $DEFAULT = Message::Util::make_clone (\%DEFAULT);
+  $self->SUPER::_init (%$DEFAULT, %options);
+  my (%mailbox, %group);
   
-  $self->{option}->{value_type}->{'*group'} = ['Message::Field::Addresses',
-    {-is_group => 1}];
-  $self->{option}->{can_have_group} = 0 if $self->{option}->{field_param_name} eq '*group';
+  $self->{option}->{can_have_group} = 0
+    if $self->{option}->{field_param_name} eq 'group';
+  
+  my $field = $self->{option}->{field_name};
+  my $format = $self->{option}->{format};
+  	## rfc1036 = RFC 1036 + son-of-RFC1036
+  if ($field eq 'from' || $field eq 'resent-from') {
+    $self->{option}->{can_have_group} = 0;
+    $self->{option}->{max} = 1 if $format =~ /rfc1036|http/;
+  } elsif ($field eq 'mail-copies-to') {
+    $mailbox{-use_keyword} = 1;
+  } elsif ($field eq 'reply-to') {
+    $self->{option}->{can_have_group} = 0;
+    $self->{option}->{max} = 1 if $format =~ /rfc1036/;
+  } elsif ($field eq 'approved' || $field eq 'x-approved') {
+    $self->{option}->{can_have_group} = 0;
+    $self->{option}->{max} = 1 if $format =~ /news-rfc1036/;
+  }
+  
+  $self->{option}->{value_type}->{mailbox} = ['Message::Field::Mailbox',
+    {%mailbox}];
+  $self->{option}->{value_type}->{group} = ['Message::Field::Addresses',
+    {-is_group => 1, %group}];
 }
 
-## new, parse: Inherited
+=item $addrs = Message::Field::Addresses->new ([%options])
+
+Constructs a new object.  You might pass some options as parameters 
+to the constructor.
+
+=cut
+
+## Inherited
+
+=item $addrs = Message::Field::Addresses->parse ($field-body, [%options])
+
+Constructs a new object with given field body.  You might pass 
+some options as parameters to the constructor.
+
+=cut
+
+## Inherited
 
 sub _parse_list ($$) {
   my $self = shift;
@@ -75,11 +116,11 @@ sub _parse_list ($$) {
   $fb =~ s{(?:$REG{quoted_string}|$REG{comment}|[^\x22\x28\x2C\x3A\x3C\x5B]|$REG{SC_group}|$REG{SC_angle_addr}|$REG{domain_literal})+}{
     my $s = $&;  $s =~ s/^$REG{WSP}+//;  $s =~ s/$REG{WSP}+$//;
     if ($s =~ /^(?:$REG{quoted_string}|$REG{comment}|[^\x22\x28\x2C\x3A\x3C\x5B])*:/) {
-      $s = $self->_parse_value ('*group' => $s) if $self->{option}->{parse_all};
-      $s = {type => '*group', value => $s};
+      $s = $self->_parse_value (group => $s) if $self->{option}->{parse_all};
+      $s = {type => 'group', value => $s};
     } else {	## address or keyword
-      $s = $self->_parse_value ('*mailbox' => $s) if $self->{option}->{parse_all};
-      $s = {type => '*mailbox', value => $s};
+      $s = $self->_parse_value (mailbox => $s) if $self->{option}->{parse_all};
+      $s = {type => 'mailbox', value => $s};
     }
     push @ids, $s;
   }goex;
@@ -91,6 +132,54 @@ sub _parse_list ($$) {
 =head1 METHODS
 
 =over 4
+
+=item $addrs->add ({-name => $value}, $addr1, $addr2, $addr3,...)
+
+Adds mail address(es).
+
+First argument is hash reference to name/value pairs
+of options.  This is optional.
+
+Following is list of additional items.  Each item
+can be given as array reference.  An array reference
+is interpreted as [$item-body, $item-option-name => 
+$item-option-value, $name => $value,...].
+Available item-options are:
+
+=over 2
+
+=item C<group>
+
+Group name which C<$item-body> belongs to.  If there
+is no such name of group, new group is created.
+
+=item C<type> = 'mailbox' / 'group' (default 'group')
+
+Format of C<$item-body>.  If 'group' is specified,
+<$item-body> is treated as RFC 2822 group.  Otherwise,
+it is added as a mailbox.
+
+=back
+
+=item $count = $addrs->count ([%options])
+
+Returns the number of items.  A 'type' option is available.
+For example, C<$addrs-E<gt>count (-type =E<gt> 'group')>
+returns the number of groups.
+
+=item $addrs->delete ({%options}, $item-key, $key,...)
+
+Deletes items that are matched with (one of) given key.
+C<{%options}> is optional.
+
+C<by> option is used to specify what sort of value given keys are.
+C<display-name>, the default value, indicates
+keys are display-name of items to be removed.
+
+For C<by> option, value C<index> is also available.
+
+C<type> option is also available.  Its value is 'mailbox'
+and 'group'.  Default is both of them.
 
 =cut
 
@@ -104,10 +193,16 @@ sub _add_array_check ($$\%) {
     ($value, %$value_option) = @$value;
   }
   if (length $value_option->{group}) {
-    ## TODO:
+    my $g = $self->item ($value_option->{group}, -type => 'group');
+    delete $value_option->{group};
+    $g->add (Message::Util::make_clone ($option), [$value, %$value_option]);
+    (0);
+  } else {
+    my $type = $value_option->{type} || 'mailbox';
+    $value = $self->_parse_value ($type => $value) if $$option{parse};
+    $$option{parse} = 0;
+    (1, value => {type => $type, value => $value});
   }
-  $$option{parse} = 0;
-  (1, value => {type => 'address', value => $value});
 }
 
 sub _delete_match ($$$\%\%) {
@@ -115,10 +210,9 @@ sub _delete_match ($$$\%\%) {
   my ($by, $i, $list, $option) = @_;
   return 0 unless ref $$i;  ## Already removed
   return 0 if $$option{type} && $$i->{type} ne $$option{type};
-  my $item = $$i->{value};
   if ($by eq 'display-name') {
-    $item = $self->_parse_value ($$i->{type}, $item);
-    return 1 if ref $item && $$list{$item->display_name};
+    $$i->{value} = $self->_parse_value ($$i->{type}, $$i->{value});
+    return 1 if ref $$i->{value} && $$list{$$i->{value}->display_name};
   }
   0;
 }
@@ -129,9 +223,17 @@ sub _item_return_value ($\$\%) {
   if (ref ${$_[1]}) {
     ${$_[1]}->{value};
   } else {
-    ${$_[1]} = $_[0]->_parse_value (${$_[1]});
-    ${$_[1]};
+    ${$_[1]}->{value} = $_[0]->_parse_value (${$_[1]}->{type}, ${$_[1]}->{value});
+    ${$_[1]}->{value};
   }
+}
+
+## Returns returned (new created) item value    $name, \%option
+sub _item_new_value ($$\%) {
+  my $type = $_[2]->{type} || 'mailbox';
+  my $v = $_[0]->_parse_value ($type, '');
+  $v->display_name ($_[1]) if ref $v && length $_[1] && $_[2]->{by} eq 'display-name';
+  {type => $type, value => $v};
 }
 
 sub is_group ($;$) {
@@ -141,12 +243,22 @@ sub is_group ($;$) {
   $_[0]->{option}->{is_group};
 }
 
+sub have_group ($) {
+  my $self = shift;
+  for (@{$self->{$self->{option}->{_ARRAY_NAME}}}) {
+    return 1 if $_->{type} eq 'group';
+  }
+  0;
+}
+
 sub display_name ($;$) {
   if (defined $_[1]) {
     $_[0]->{group_name} = $_[1];
   }
   $_[0]->{group_name};
 }
+
+##TODO: addr_spec
 
 ## stringify: Inherited
 #*as_string = \&stringify;
@@ -175,7 +287,7 @@ sub stringify ($;%) {
   if ($option{is_group}) {
     $m = $g . (length $m? ': ': ':') . $m . ';';
   } else {
-    $m = $g . (length $m? ' ': '') . $m;
+    $m = $g . (length $g? ' ': '') . $m;
   }
     if ($option{output_comment} && !$option{output_group_name_comment}) {
       for (@{$self->{group_name_comment}}) {
@@ -225,7 +337,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/08 09:11:31 $
+$Date: 2002/05/14 13:42:40 $
 
 =cut
 

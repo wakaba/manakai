@@ -175,6 +175,14 @@ sub addr_spec ($;$) {
   @r;
 }
 
+sub have_group ($) {
+  my $self = shift;
+  for (@{$self->{address}}) {
+    return 1 if $_->{type} eq 'group';
+  }
+  0;
+}
+
 =head2 $self->add ($addr_spec, [%option])
 
 Add an mail address to C<$self> (address object).
@@ -574,7 +582,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/05 14:55:28 $
+$Date: 2002/05/14 13:42:40 $
 
 =cut
 

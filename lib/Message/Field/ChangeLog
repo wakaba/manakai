@@ -1,3 +1,19 @@
+2002-05-15  wakaba <w@suika.fam.cx>
+
+	* Addresses.pm, Mailbox.pm, Domain.pm
+	(son-of-Address.pm's): New modules.
+	* Structured.pm:
+	- (method_available): New method.
+	- (clone): Checks _MEMBERS option.
+	- (comment_add, comment_count, comment_delete, comment_item):
+	New methods.
+	- (item): Implemented.
+	- (_delete_empty): Commentout default action.
+	- (add, replace): Fix bug (parse option didn't work).
+	* MsgID.pm: Don't use non-(ALPHA / DIGIT) as the first
+	character of id-left.
+	* Date.pm: Understands month name "Sept".
+
 2002-05-08  wakaba <w@suika.fam.cx>
 
 	* Structured.pm (item, method_available): New methods.
