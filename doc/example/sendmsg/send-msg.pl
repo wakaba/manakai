@@ -13,8 +13,6 @@ $server{smtp} ||= 'suika.fam.cx';
 $server{nntp} ||= 'suika.fam.cx';
 my $debug_msg_log = 0;
 
-my $myhostname = 'send-msg';
-
 open LOG, '>> send.slog';  binmode LOG;
 my $date = Message::Field::Date->new (zone => [+1, 9, 0]);
 $date->unix_time (time);
@@ -299,7 +297,7 @@ sub smsg119 {pmsg('S119: '.shift,@_)}
 
 sub Send::SMTP::Connect (;%) {
   my %o = @_;
-  my $myname = $o{myname} || 'send.pl.'.$server{smtp};
+  my $myname = $o{myname} || &Message::Util::get_host_fqdn || 'send.pl.'.$server{smtp};
   pmsg('connecting to '.$server{smtp}.':25...');
     socket (SMTP, PF_INET, SOCK_STREAM, (getprotobyname('tcp'))[2]);
     my $aton = inet_aton($server{smtp});
@@ -377,7 +375,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/26 06:25:30 $
+$Date: 2002/07/26 06:38:53 $
 
 =cut
 
