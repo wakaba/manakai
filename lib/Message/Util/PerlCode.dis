@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/03/03 11:19:08 $
+      $Date: 2005/03/05 08:09:29 $
     @@ContentType:
       dis:Date.RCS
   
@@ -476,10 +476,10 @@ ClsDef:
           }
 
           ## -- Enables interface packages
-          $r .= q<for (>. join (', ',
-                                map {'$' . $_ . '::'}
-                                grep {not ref $pack->{$_} and
-                                           $pack->{$_}} keys %$pack) . qq<){}\n>;
+          my @packs = map {'$' . $_ . '::'}
+                      grep {not ref $pack->{$_} and $pack->{$_}}
+                      keys %$pack;
+          $r .= q<for (>. join (', ', @packs) . qq<){}\n> if @packs;
 
           ## -- Footer
           $r .= <ClassM::ManakaiPerlCodeImplementation.perlComment>

@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/03/04 12:18:52 $
+      $Date: 2005/03/05 08:09:29 $
     @@ContentType:
       dis:Date.RCS
   
@@ -833,7 +833,16 @@ ClsDef:
 
         FORMATCH: {
           __DEEP{
-            my @ce = @{$self-><M::ManakaiDISElement.disChildElements>};
+            my $for_res = $self-><AG::ManakaiDISNode.ownerDISDocument>
+                                   -><AG::ManakaiDISDocument.disDatabase>
+                                   -><M::ManakaiDISDatabase.getFor> ($forArg);
+            my $forp_res = [map {
+                                  $self-><AG::ManakaiDISNode.ownerDISDocument>
+                                       -><AG::ManakaiDISDocument.disDatabase>
+                                       -><M::ManakaiDISDatabase.getFor> ($_)
+                                } @{$forpArg}];
+
+            my @ce = @{$self-><M::ManakaiDISElement.disAllChildElements>};
             for my $ce (@ce) {
               my $et = $ce-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
                                                       .expandedURI>;
@@ -847,8 +856,8 @@ ClsDef:
                                    -><AG::ManakaiDISDocument.disDatabase>
                                    -><M::ManakaiDISDatabase.getFor> ($uri);
                     $for-><AG::ManakaiDISForDefinition.isReferred> ($ce);
-                    for my $arg_uri ($forArg, @{$forpArg}) {
-                      if ($uri eq $arg_uri) {
+                    for my $arg_res ($for_res, @{$forp_res}) {
+                      if ($arg_res eq $for) {
                         $r = false;
                         last FORMATCH;
                       }
@@ -859,8 +868,8 @@ ClsDef:
                                    -><AG::ManakaiDISDocument.disDatabase>
                                    -><M::ManakaiDISDatabase.getFor> ($uri);
                     $for-><AG::ManakaiDISForDefinition.isReferred> ($ce);
-                    for my $arg_uri ($forArg, @{$forpArg}) {
-                      if ($for-><M::ManakaiDISForDefinition.isaURI> ($arg_uri)) {
+                    for my $arg_res ($for_res, @{$forp_res}) {
+                      if ($arg_res-><M::ManakaiDISForDefinition.isaURI> ($uri)) {
                         $r = false;
                         last FORMATCH;
                       }
@@ -871,8 +880,8 @@ ClsDef:
                                    -><AG::ManakaiDISDocument.disDatabase>
                                    -><M::ManakaiDISDatabase.getFor> ($uri);
                     $for-><AG::ManakaiDISForDefinition.isReferred> ($ce);
-                    for my $arg_uri ($forArg, @{$forpArg}) {
-                      if ($arg_uri eq $uri) {
+                    for my $arg_res ($for_res, @{$forp_res}) {
+                      if ($arg_res eq $for) {
                         next FCs;
                       }
                     }
@@ -884,8 +893,8 @@ ClsDef:
                                    -><AG::ManakaiDISDocument.disDatabase>
                                    -><M::ManakaiDISDatabase.getFor> ($uri);
                     $for-><AG::ManakaiDISForDefinition.isReferred> ($ce);
-                    for my $arg_uri ($forArg, @{$forpArg}) {
-                      if ($for-><M::ManakaiDISForDefinition.isaURI> ($arg_uri)) {
+                    for my $arg_res ($for_res, @{$forp_res}) {
+                      if ($arg_res-><M::ManakaiDISForDefinition.isaURI> ($uri)) {
                         next FCs;
                       }
                     }
@@ -912,7 +921,7 @@ ClsDef:
                                    -><AG::ManakaiDISDocument.disDatabase>
                                    -><M::ManakaiDISDatabase.getFor> ($uri);
                     $for-><AG::ManakaiDISForDefinition.isReferred> ($ce);
-                    if ($uri eq $forArg) {
+                    if ($for eq $for_res) {
                       $ok = false;
                       last AFOR;
                     }
@@ -922,7 +931,7 @@ ClsDef:
                                    -><AG::ManakaiDISDocument.disDatabase>
                                    -><M::ManakaiDISDatabase.getFor> ($uri);
                     $for-><AG::ManakaiDISForDefinition.isReferred> ($ce);
-                    if ($for-><M::ManakaiDISForDefinition.isaURI> ($forArg)) {
+                    if ($for_res-><M::ManakaiDISForDefinition.isaURI> ($uri)) {
                       $ok = false;
                       last AFOR;
                     }
@@ -932,7 +941,7 @@ ClsDef:
                                    -><AG::ManakaiDISDocument.disDatabase>
                                    -><M::ManakaiDISDatabase.getFor> ($uri);
                     $for-><AG::ManakaiDISForDefinition.isReferred> ($ce);
-                    unless ($uri eq $forArg) {
+                    unless ($for eq $for_res) {
                       $ok = false;
                       last AFOR;
                     }
@@ -942,7 +951,7 @@ ClsDef:
                                    -><AG::ManakaiDISDocument.disDatabase>
                                    -><M::ManakaiDISDatabase.getFor> ($uri);
                     $for-><AG::ManakaiDISForDefinition.isReferred> ($ce);
-                    unless ($for-><M::ManakaiDISForDefinition.isaURI>($forArg)) {
+                    unless ($for_res-><M::ManakaiDISForDefinition.isaURI>($uri)){
                       $ok = false;
                       last AFOR;
                     }
@@ -1006,7 +1015,7 @@ ClsDef:
                                  -><M::ManakaiDISDatabase.getResource> ($ct);
             $res-><AS::ManakaiDISResourceDefinition.isReferred> ($ctn or $self);
             unless ($res-><M::ManakaiDISResourceDefinition
-                                               .isSubsetOfURI> ($ct)) {
+                                               .isSubsetOfURI> ($mediaType)) {
               $r = false;
             } else {
               $r = true;
@@ -1015,6 +1024,37 @@ ClsDef:
         } else {
           $r = true;
         }
+
+  @Method:
+    @@Name:mediaTypeURI
+    @@enDesc:
+      The URI reference of the media type of this element. 
+    @@Type: MediaTypeURI
+    @@NamedParam:
+      @@@Name:defaultMediaType
+      @@@Type:MediaTypeURI
+      @@@enDesc:
+        The default media type URI reference. 
+      @@@nullCase:
+        @@@@enDesc:
+          No default is specified. 
+    @@ForParam:
+    @@ForpParam:
+    @@Return:
+      @@@enDesc:
+        The media type URI reference of this element. 
+      @@@nullCase:
+        @@@@enDesc:
+          This element has no media type information and 
+          <P::defaultMediaType> parameter is not provided. 
+      @@@UndeclaredPrefixException:
+      @@@PerlDef:
+          __DEEP{
+            my $ctn = $self-><M::ManakaiDISElement.disGetAttribute>
+                                (<Q::dis:ContentType>, for_arg => $forArg,
+                                 forp_arg => $forpArg);
+            $r = $ctn-><AG::ManakaiDISElement.qnameValueURI> if $ctn;
+          }__;
 
   @Method:
     @@Name: prefixToURI
@@ -1236,10 +1276,10 @@ ClsDef:
         @@@@enDesc:
           No attribute node found. 
       @@@PerlDef:
-        for my $c (@{$self-><M::ManakaiDISElement.disChildElements>}) {
+        for my $c (@{$self-><M::ManakaiDISElement.disChildElements>
+                                  (for_arg => $forArg, forp_arg => $forpArg)}) {
           if ($c-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
                                     .expandedURI> eq $attrName and
-              $c-><AG::ManakaiDISElement.forMatch> ($forArg, $forpArg) and
               $c-><AG::ManakaiDISElement.mediaTypeMatch>
                                          ($mediaType, $defaultMediaType)) {
             $r = $c;
@@ -1266,10 +1306,10 @@ ClsDef:
         The attribute (property) element nodes. 
       @@@PerlDef:
         $r = bless [], <ClassName::ManakaiDISElementList>;
-        for my $c (@{$self-><M::ManakaiDISElement.disChildElements>}) {
+        for my $c (@{$self-><M::ManakaiDISElement.disChildElements>
+                                  (for_arg => $forArg, forp_arg => $forpArg)}) {
           if ($c-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
                                           .expandedURI> eq $attrName and
-              $c-><AG::ManakaiDISElement.forMatch> ($forArg, $forpArg) and
               $c-><AG::ManakaiDISElement.mediaTypeMatch>
                                          ($mediaType, $defaultMediaType)) {
             push @$r, $c;
@@ -1279,7 +1319,7 @@ ClsDef:
   @Method:
     @@Name: disChildElements
     @@enDesc:
-      A list of child elements.  
+      A list of child elements, with <QUOTE::for> check.  
     @@ForParam:
     @@ForpParam:
     @@Return:
@@ -1297,6 +1337,28 @@ ClsDef:
                             ::ManakaiDOM:Perl.newReference>
                                       (<ClassName::ManakaiDISElement>);
             next unless $dn-><M::ManakaiDISElement.forMatch> ($forArg, $forpArg);
+            push @$r, $dn;
+          }
+        }__;
+
+  @Method:
+    @@Name: disAllChildElements
+    @@enDesc:
+      A list of child elements, without <QUOTE::for> check.  
+    @@Return:
+      @@@Type: ManakaiDISElementList
+      @@@enDesc:
+        The current snapshot of child nodes. 
+      @@@PerlDef:
+        $r = bless [], <ClassName::ManakaiDISElementList>;    
+        __DEEP{
+          for my $cn (@{$self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
+                                                       .childNodes>}) {
+            ## $cn is an #element.
+            my $dn = $cn->{<Q::TreeCore:node>}
+                        -><M::ManakaiDOM:ManakaiDOMNodeObject
+                            ::ManakaiDOM:Perl.newReference>
+                                      (<ClassName::ManakaiDISElement>);
             push @$r, $dn;
           }
         }__;
@@ -1692,7 +1754,7 @@ ClsDef:
   @Method:
     @@Name: disChildElements
     @@enDesc:
-      A list of child elements.  
+      A list of child elements, with <QUOTE::for> checks.  
     @@ForParam:
     @@ForpParam:
     @@Return:
@@ -1711,6 +1773,29 @@ ClsDef:
                             ::ManakaiDOM:Perl.newReference>
                                       (<ClassName::ManakaiDISElement>);
             next unless $dn-><M::ManakaiDISElement.forMatch> ($forArg, $forpArg);
+            push @$r, $dn;
+          }
+        }__;
+
+  @Method:
+    @@Name: disAllChildElements
+    @@enDesc:
+      A list of child elements, without <QUOTE::for> checks.  
+    @@Return:
+      @@@Type: ManakaiDISElementList
+      @@@enDesc:
+        The current snapshot of child nodes. 
+      @@@PerlDef:
+        $r = bless [], <ClassName::ManakaiDISElementList>;    
+        __DEEP{
+          for my $cn (@{$self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
+                                                       .childNodes>}) {
+            next unless $cn-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
+                                              .nodeType> eq '#element';
+            my $dn = $cn->{<Q::TreeCore:node>}
+                        -><M::ManakaiDOM:ManakaiDOMNodeObject
+                            ::ManakaiDOM:Perl.newReference>
+                                      (<ClassName::ManakaiDISElement>);
             push @$r, $dn;
           }
         }__;
@@ -2001,9 +2086,11 @@ ClsDef:
             } # Unless "for all" loaded
 
             ## -- Loads Required Modules
+            ##    NOTE:: "dis:For" is not allowed since "dis:ForDef" is not read
             my $req_node = $mod_node-><AG::ManakaiDISModuleElement
                                                           .requireElement>;
-            for my $rm (@{$req_node-><M::ManakaiDISElement.disChildElements>}) {
+            for my $rm (@{$req_node-><M::ManakaiDISElement
+                                                    .disAllChildElements>}) {
               next unless $rm-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
                                                .expandedURI> eq <Q::dis:Module>;
               my ($uri, $nuri, $ln, $for);
@@ -2054,7 +2141,8 @@ ClsDef:
               }
             } # Child Module elements
             
-            my $root_elements = $doc-><M::ManakaiDISDocument.disChildElements>;
+            my $root_elements
+                       = $doc-><M::ManakaiDISDocument.disAllChildElements>;
             if ($mod->{for} eq <Q::ManakaiDOM:all>) {
               ## -- Loads "for" definitions
               for my $el (@$root_elements) {
@@ -2064,6 +2152,8 @@ ClsDef:
               }
             }
 
+            $root_elements = $doc-><M::ManakaiDISDocument.disChildElements>
+                                         (for_arg => $forArg);
             for my $el (@$root_elements) {
               if ($el-><M::ManakaiDISElement.isResourceElement>) {
                 $self-><M::ManakaiDISDatabase.loadResource>
@@ -2139,12 +2229,12 @@ ClsDef:
           my $for = $self-><M::ManakaiDISDatabase.getFor> ($qn_uri);
         
           unless ($for-><M::ManakaiDISForDefinition.isDefined>) {
-            ## -- Initializes For Definition Object
+            ## -- Initializes "For" Definition Object
             $for->{src} = $el;
             $for->{<Q::isDefined>} = true;
             $for->{<Q::definingModule>} = $mod->{uri};
 
-            for my $ce (@{$el-><M::ManakaiDISElement.disChildElements>}) {
+            for my $ce (@{$el-><M::ManakaiDISElement.disAllChildElements>}) {
               my $xn = $ce-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
                                                        .expandedURI>;
               if ($xn eq <Q::dis:ISA> or $xn eq <Q::dis:Implement>) {
@@ -2334,7 +2424,8 @@ ClsDef:
           my $is_multires = false;
           my @props;
           my @cres;
-          my @ce0 = @{$el-><M::ManakaiDISElement.disChildElements>};
+          my @ce0 = @{$el-><M::ManakaiDISElement.disChildElements>
+                                    (for_arg => $forArg, forp_arg => $forpArg)};
           while (@ce0) {
             my $ce = shift @ce0;
             if ($ce-><M::ManakaiDISElement.elementTypeMatch> (<Q::rdf:type>)) {
@@ -2386,7 +2477,7 @@ ClsDef:
           if ($is_multires) {
             for my $pe (@props) {
               if ($pe-><M::ManakaiDISElement.elementTypeMatch>
-                                               (<Q::dis:ResourceFor>)) {
+                                               (<Q::dis:resourceFor>)) {
                 my $for_uri = $pe-><M::ManakaiDISElement.qnameValueURI>;
                 my $for = $self-><M::ManakaiDISDatabase.getFor> ($for_uri);
                 $for-><M::ManakaiDISForDefinition.isReferred> ($pe);
@@ -2693,7 +2784,8 @@ ClsDef:
           }
           my $an = $mg->{src}-><M::ManakaiDISElement.disGetAttribute>
                                      (<Q::dis:AppName>, for_arg => $self->{for},
-                                      media_type => <Q::lang:Perl>);
+                                      media_type => <Q::lang:Perl>,
+                                      default_media_type => <Q::lang:Perl>);
           if ($an) {
             $r = $an-><M::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
             $r =~ s/::$//g;
@@ -2707,7 +2799,7 @@ ClsDef:
               $r .= $sf-><M::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
             }
           } else {
-            $r = $mg->{localName} . '::' . $self->{localName};
+            $r = ($mg->{localName} || 'main') . '::' . $self->{localName};
           }
         }__;
 
@@ -2734,11 +2826,11 @@ ClsDef:
           my $an = $mg->{src}-><M::ManakaiDISElement.disGetAttribute>
                                      (<Q::dis:AppName>, for_arg => $self->{for},
                                       forp_arg => [<Q::ManakaiDOM:ForIF>],
-                                      media_type => <Q::lang:Perl>);
+                                      media_type => <Q::lang:Perl>,
+                                      default_media_type => <Q::lang:Perl>);
           if ($an) {
             $r = $an-><M::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
             $r =~ s/::$//g;
-            $r .= '::' . $self->{localName};
             my $sf = $an-><M::ManakaiDISElement.disGetAttribute>
                                  (<Q::ManakaiDOM:moduleSuffix>,
                                   for_arg => $self->{for},
@@ -2784,6 +2876,41 @@ ClsDef:
     @@Get:
       @@@PerlDef:
         $r = $self->{uri};
+
+  @IntMethod:
+    @@Operator:
+      @@@@:eq
+      @@@ContentType:
+        lang:Perl
+    @@enDesc:
+      Whether two <QUOTE::for> definitions are equal or not. 
+      Two <QUOTE::for> definitions are equal iff one's URI reference 
+      is one of another's URI reference. 
+      \
+      {NOTE:: Aliases for <QUOTE::for> is not allowed.
+      \
+      }
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        In the current implementation, two are equal iff two are 
+        equal as reference. 
+    @@Param:
+      @@@Name: anotherFor
+      @@@Type: ManakaiDISForDefinition
+      @@@enDesc:
+        Another <QUOTE::for> definition to compare.
+    @@Return:
+      @@@Type:
+        DOMMain:boolean
+      @@@enDesc:
+        Whether two resources are equal or not. 
+      @@@PerlDef:
+        if (UNIVERSAL::isa ($anotherFor, <ClassName::ManakaiDISForDefinition>)) {
+          $r = $self->{uri} eq $anotherFor->{uri};
+        } else {
+          $r = false;
+        }
   
   @Method:
     @@Name: isaURI
@@ -3332,6 +3459,13 @@ ClsDef:
               ## NOTE: "lang:Perl" is fully-qualified name by definition
               $r = $an_node-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
             } else {
+              unless (defined $self->{localName}) {
+                __UNDEEP{
+                  __EXCEPTION{NO_LOCAL_NAME_ERR::
+                    DIS:sourceNode => {$self->{src}},
+                  }__;
+                }__;
+              }
               if ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
                               (<Q::ManakaiDOM:IF>)) {
                 $r = $self-><AG::ManakaiDISResourceDefinition.definingModule>
@@ -3341,13 +3475,6 @@ ClsDef:
                 $r = $self-><AG::ManakaiDISResourceDefinition.definingModule>
                           -><M::ManakaiDISModuleDefinition.plFullyQualifiedName>
                    . '::' . $self->{localName};
-              }
-              unless (defined $r) {
-                __UNDEEP{
-                  __EXCEPTION{NO_LOCAL_NAME_ERR::
-                    DIS:sourceNode => {$self->{src}},
-                  }__;
-                }__;
               }
             }
           } else {
@@ -3391,14 +3518,13 @@ ClsDef:
                                   (<Q::dis:TypeQName>)) {
                 $r = $op_node-><AG::ManakaiDISElement.qnameValueURI>;
               } else {
-                my $ct = $op_node-><M::ManakaiDISElement.disGetAttribute>
-                             (<Q::dis:ContentType>, for_arg => $self->{for},
-                              forp_arg => $self->{forp});
-                my $ct_uri = $ct-><AG::ManakaiDISElement.qnameValueURI> if $ct;
+                my $ct_uri = $op_node-><M::ManakaiDISElement.mediaTypeURI>
+                                     (for_arg => $self->{for},
+                                      forp_arg => $self->{forp});
                 __UNDEEP{
                   __EXCEPTION{UNSUPPORTED_MEDIA_TYPE_ERR::
                     DIS:uri => {$ct_uri},
-                    DIS:sourceNode => {$ct || $self->{src}},
+                    DIS:sourceNode => {$op_node},
                   }__;
                 }__;
               }
@@ -3666,6 +3792,17 @@ ClsDef:
     @@enDesc:
       Gets property value resource. 
     @@PropNameParam:
+    @@NamedParam:
+      @@@Name: defaultMediaType
+      @@@Type: ResourceURI
+      @@@enDesc:
+        The URI reference of the default media type which is used 
+        when the property value is retrieved from the source tree 
+        and the source tree element does not have its <Q::dis:ContentType>
+        attribute specified. 
+      @@@nullCase:
+        @@@@enDesc:
+          Defaulted to <Q::dis:TypeQName>.
     @@Return:
       @@@Type: ManakaiDISResourceDefinition
       @@@enDesc:
@@ -3684,11 +3821,128 @@ ClsDef:
                                   ($propName, for_arg => $self->{for},
                                    forp_arg => $self->{forp});
             if ($r) {
-              $self->{$propName}
-                 = $r-><AG::ManakaiDISElement.qnameValueURI>;
+              $defaultMediaType = <Q::dis:TypeQName>
+                                           unless defined $defaultMediaType;
+              if ($r-><M::ManakaiDISElement.mediaTypeMatch>
+                                   (<Q::dis:TypeQName>, $defaultMediaType)) {
+                $self->{$propName}
+                   = $r-><AG::ManakaiDISElement.qnameValueURI>;
+              } elsif ($r-><M::ManakaiDISElement.mediaTypeMatch>
+                                   (<Q::dis:TFQNames>, $defaultMediaType)) {
+                $self->{$propName}
+                   = $r-><M::ManakaiDISElement.tfqnamesValueURI>
+                             ($self->{src}-><AG::swcfg21:SWCFGNode
+                                               ::swcfg21:ForLatest.nodeID>,
+                              $self->{for});
+              } else {
+                my $mt = $r-><M::ManakaiDISElement.mediaTypeURI>
+                                   (for_arg => $self->{for},
+                                    forp_arg => $self->{forp});
+                __UNDEEP{
+                  __EXCEPTION{UNSUPPORTED_MEDIA_TYPE_ERR::
+                    DIS:uri => {$mt},
+                    DIS:sourceNode => {$r},
+                  }__;
+                }__;
+              }
               $r = $self->{db}-><M::ManakaiDISDatabase.getResource>
                                                     ($self->{$propName});
               $r-><M::ManakaiDISResourceDefinition.isReferred> ($self->{src});
+            }
+          }__;
+        }
+
+  @Method:
+    @@Name: getPropertyResourceList
+    @@enDesc:
+      Gets property value resource list. 
+    @@PropNameParam:
+    @@NamedParam:
+      @@@Name: recursiveISA
+      @@@Type:
+        DOMMain:boolean
+      @@@enDesc:
+        Whether property resource values of <Q::dis:ISA> resources 
+        of this resource should also be included to the returned list or not. 
+    @@NamedParam:
+      @@@Name: defaultMediaType
+      @@@Type: ResourceURI
+      @@@enDesc:
+        The URI reference of the default media type which is used 
+        when the property value is retrieved from the source tree 
+        and the source tree element does not have its <Q::dis:ContentType>
+        attribute specified. 
+      @@@nullCase:
+        @@@@enDesc:
+          Defaulted to <Q::dis:TypeQName>.
+    @@Return:
+      @@@Type: ResourceList
+      @@@enDesc:
+        An array reference of the property value resources. 
+        \
+        {NOTE:: This list is <QUOTE::dead>.
+        \
+        }
+      @@@UndeclaredPrefixException:
+      @@@PerlDef:
+        $r = [];
+        if (defined $self->{$propName}) {
+          for my $res_uri (@{ref $self->{$propName} eq 'ARRAY'
+                                         ? $self->{$propName} : []}) {
+            push @$r,
+                 $self->{db}-><M::ManakaiDISDatabase.getResource> ($res_uri);
+          }
+        } elsif ($self->{src}) {
+          __DEEP{
+            $self->{$propName} = [];
+            $defaultMediaType = <Q::dis:TypeQName>
+                                           unless defined $defaultMediaType;
+            for my $res_name_node
+                    (@{$self->{src}-><M::ManakaiDISElement.disGetAttributeList>
+                                  ($propName, for_arg => $self->{for},
+                                   forp_arg => $self->{forp})}) {
+              my $res_uri;
+              if ($res_name_node-><M::ManakaiDISElement.mediaTypeMatch>
+                                   (<Q::dis:TypeQName>, $defaultMediaType)) {
+                $res_uri = $res_name_node-><AG::ManakaiDISElement.qnameValueURI>;
+              } elsif ($res_name_node-><M::ManakaiDISElement.mediaTypeMatch>
+                                   (<Q::dis:TFQNames>, $defaultMediaType)) {
+                $res_uri =$res_name_node-><M::ManakaiDISElement.tfqnamesValueURI>
+                             ($self->{src}-><AG::swcfg21:SWCFGNode
+                                               ::swcfg21:ForLatest.nodeID>,
+                              $self->{for});
+              } else {
+                my $mt = $res_name_node-><M::ManakaiDISElement.mediaTypeURI>
+                                   (for_arg => $self->{for},
+                                    forp_arg => $self->{forp});
+                __UNDEEP{
+                  __EXCEPTION{UNSUPPORTED_MEDIA_TYPE_ERR::
+                    DIS:uri => {$mt},
+                    DIS:sourceNode => {$res_name_node},
+                  }__;
+                }__;
+              }
+              push @{$self->{$propName}}, $res_uri;
+              my $res = $self->{db}-><M::ManakaiDISDatabase.getResource>
+                                                                ($res_uri);
+              push @$r, $res;
+              $res-><M::ManakaiDISResourceDefinition.isReferred>
+                                                         ($res_name_node);
+            }
+          }__;
+        }
+        if ($recursiveISA) {
+          __DEEP{
+            $opt{___recursive_isa_done} ||= {$self->{uri} => true};
+            my @p_res = @$r;
+            for my $p_res (@p_res) {
+              next if $opt{___recursive_isa_done}->{$p_res->{uri}};
+              $opt{___recursive_isa_done}->{$p_res->{uri}} = true;
+              push @$r, @{$p_res-><M::ManakaiDISPropertyAccessor
+                                     .getPropertyResourceList>
+                                          (<Q::dis:ISA>, recursive_isa => true,
+                         ___recursive_isa_done => $opt{___recursive_isa_done},
+                         default_media_type => $defaultMediaType)};
             }
           }__;
         }
@@ -3700,6 +3954,14 @@ ClsDef:
       \
       {ISSUE:: Should an exception be thrown if the property is 
                not of list?
+      \
+      }
+      \
+      {NOTE:: If the property is not <QUOTE::get>ten ever, adding 
+              an item clears the list --- i.e. the property values 
+              in the source tree will be ignored.  Call
+              <M::ManakaiDISPropertyAccessor.getPropertyResourceList>
+              before adding to avoid this behavior. 
       \
       }
     @@PropNameParam:
@@ -3820,6 +4082,13 @@ URITypeDef:
   @enDesc:
     URI references identifying a resource. 
   @rdfs:subClassOf: ResourceURI
+
+DataTypeDef:
+  @QName: ResourceList
+  @enDesc:
+    References to array containing resource definition objects.
+  @rdfs:subClassOf:
+    Perl:ARRAY::ManakaiDOM:all
 
 ElementTypeBinding:
   @Name: DataTypeDef
