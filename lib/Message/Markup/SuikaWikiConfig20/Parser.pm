@@ -15,7 +15,7 @@ This module is part of manakai.
 
 package Message::Markup::SuikaWikiConfig20::Parser;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Markup::SuikaWikiConfig20::Node;
 
 =head1 METHODS
@@ -102,7 +102,7 @@ sub parse_text ($$) {
                                        default => 0) >= $nest - 1) {
           $current_element = $current_element->parent_node;
         }
-        $current_element->append_text ($val);
+        $current_element->append_text ($val) if defined $val;
         $current = $current_element;
         unless (defined $3) {  ##  @@: \nbar
           $is_new_element = 1;
@@ -179,4 +179,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/09/09 03:29:39 $
+1; # $Date: 2004/09/18 11:51:37 $

@@ -19,7 +19,7 @@ This module is part of manakai.
 
 package Message::Markup::SuikaWikiConfig20::Node;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 =head1 METHODS
 
@@ -98,7 +98,10 @@ Appending given text as a new text node.  The new text node is returned.
 sub append_text ($$;%) {
   my $self = shift;
   my $s = shift;
-  if (ref ($self->{value}) eq 'ARRAY') {
+  unless (defined $s) {
+    require Carp;
+    Carp::carp (q<Use of uninitialized value in "append_text">);
+  } elsif (ref ($self->{value}) eq 'ARRAY') {
     push @{$self->{value}}, $s;
   } elsif (defined $self->{value}) {
     $self->{value} .= $s;
@@ -491,4 +494,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/09/09 03:29:39 $
+1; # $Date: 2004/09/18 11:51:37 $
