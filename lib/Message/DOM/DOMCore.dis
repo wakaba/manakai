@@ -1,4 +1,6 @@
 Namespace:
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @DOMEvents:
     http://suika.fam.cx/~wakaba/archive/2004/dom/events#
   @DOMLS:
@@ -69,7 +71,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/11/07 07:22:16 $
+     $Date: 2004/11/07 13:07:53 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -121,6 +123,52 @@ Module:
       DOMImplementation::DOM3
     @@Contrib:
       Node::DOM3
+
+ElementTypeBinding:
+  @Name: Exception
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@Type:
+      ManakaiDOM:Exception
+ElementTypeBinding:
+  @Name: IF
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@Type:
+      ManakaiDOM:IF
+    @@Type:
+      ManakaiDOM:Class
+ElementTypeBinding:
+  @Name: IFDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@Type:
+      ManakaiDOM:IF
+
+ElementTypeBinding:
+  @Name: ConfigParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@Type:
+      ManakaiDOM:DOMConfigParameterSet
+ElementTypeBinding:
+  @Name: ErrorSet
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@Type:
+      ManakaiDOM:DOMErrorSet
+ElementTypeBinding:
+  @Name: EventSet
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@Type:
+      ManakaiDOM:DOMEventSet
 
 Exception:
   @Name:  DOMException
@@ -1446,7 +1494,10 @@ IF:
       DOM3
 
   @ISA:
-    ManakaiDOM:ManakaiDOMNodeReference::
+    @@@:
+      ManakaiDOM:ManakaiDOMNodeReference
+    @@For:
+      ManakaiDOM:ManakaiDOM
   @Role:
     @@@:
       DOMCore:DOMImplementation
@@ -2078,7 +2129,10 @@ IF:
       The primary datatype for the entire Document Object Model, 
       that represents a single node in the document tree.
   @ISA:
-    ManakaiDOM:ManakaiDOMNodeReference::
+    @@@:
+      ManakaiDOM:ManakaiDOMNodeReference
+    @@For:
+      ManakaiDOM:ManakaiDOM
   @ImplNote:
     @@lang:en
     @@@:

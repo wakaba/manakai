@@ -1,4 +1,6 @@
 Namespace:
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @lang:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
@@ -49,7 +51,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/11/07 07:22:16 $
+     $Date: 2004/11/07 13:07:54 $
   
   @Feature:
     @@QName:
@@ -121,12 +123,39 @@ Module:
   @DefaultFor:
     ManakaiDOM:ManakaiDOMLatest
 
+ElementTypeBinding:
+  @Name: DataTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@Type:
+      ManakaiDOM:DataType
+ElementTypeBinding:
+  @Name: ConstGroup
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@Type:
+      ManakaiDOM:ConstGroup
+ElementTypeBinding:
+  @Name: Const
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@Type:
+      ManakaiDOM:Const
+ElementTypeBinding:
+  @Name: ObjectDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@Type:
+      ManakaiDOM:Class
 
 ## Definition for built-in IDL types
 
 DataTypeDef:
   @Name: any
-  @IName:any
   @Description:
     @@lang:en
     @@@: Any data.
@@ -206,7 +235,7 @@ DataTypeDef:
     @@lang:en
     @@@: A floating point number.
 
-ClassDef:
+ConstGroup:
   @Name: boolean
   @IName:boolean
   @Type:
@@ -1046,9 +1075,7 @@ DataTypeDef:
   @Description:
     @@lang:en
     @@@: An absolute or relative time.  A number of milliseconds.
-  @AliasOf:
-    @@For:
-      *
+  @AliasFor:
     @@@: unsigned-long-long
 
 DataTypeDef:
@@ -1056,9 +1083,7 @@ DataTypeDef:
   @IName: DOMUserData
   @For:
     ManakaiDOM:DOM3
-  @AliasOf:
-    @@For:
-      *
+  @AliasFor:
     @@@: any
 
   @Description:
@@ -1070,13 +1095,13 @@ DataTypeDef:
   @IName: DOMObject
   @For:
     ManakaiDOM:DOM3
-  @AliasOf: Object
+  @AliasFor: Object
 
   @Description:
     @@lang:en
     @@@: An object reference.
 
-ClassDef:
+ObjectDef:
   @Name:  DOMImplementationRegistry
   @Type:
     ManakaiDOM:Class

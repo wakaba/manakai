@@ -19,6 +19,8 @@ Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @MUError:\
   @MUErrorCore:-
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
   @TreeCore:
      \
 Module:
@@ -43,7 +45,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/11/07 07:22:16 $
+     $Date: 2004/11/07 13:07:54 $
   
   @Description:
     @@lang:en
@@ -189,75 +191,207 @@ ForDef:
   @ISA:
       ManakaiDOM:ManakaiDOM3
 
-ClassDef:
-  @QName: 
-    dis:ClassType
-  @IQName:
-    dis:ClassType
+ResourceTypeDef:
+  @QName:
+    rdfs:Resource
+  @AliasFor:
+    DOMMain:any
+  @Description:
+    @@lang:en
+    @@@: A RDF resource.
+ResourceDef:
+  @QName:
+    dis:ResourceDef
   @Type:
-    dis:ClassType
+    dis:ElementType
   @Description:
     @@lang:en
     @@@:
-      A dis class type.  It can be specified as a value of a 
-      <CODE:Type> attribute of a <CODE:ClassDef> element.
-ClassDef:
+      An <Q:dis:ResourceDef> element defines a resource.
+ResourceTypeDef:
+  @QName:
+    dis:ElementType
+  @Description:
+    @@lang:en
+    @@@:
+      A dis element type.
+
+ResourceTypeDef:
+  @QName:
+    rdfs:Class
+  @ISA:
+    rdfs:Resource
+  @Description:
+    @@lang:en
+    @@@: A RDF class.
+
+ElementTypeBinding:
+  @Name: ResourceTypeDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@Type:
+      rdfs:Class
+    @@ISA:
+      rdfs:Class
+
+ResourceTypeDef:
   @Name: IF
-  @IName:IF
-  @Type:
-    dis:ClassType
   @Description:
     @@lang:en
     @@@:
       An interface.
-ClassDef:
+
+ResourceTypeDef:
+  @QName:
+    rdfs:Datatype
+  @AliasFor:
+    ManakaiDOM:DataType
+ResourceTypeDef:
   @Name: DataType
-  @IName:DataType
-  @Type:
-    dis:ClassType
   @Description:
     @@lang:en
     @@@:
       A abstract data type.
-ClassDef:
+ElementTypeBinding:
+  @Name: DataTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@Type:
+      ManakaiDOM:DataType
+
+ResourceTypeDef:
   @Name: Exception
-  @IName:Exception
-  @Type:
-    dis:ClassType
   @Description:
     @@lang:en
     @@@:
       An exception type.
-ClassDef:
+ElementTypeBinding:
+  @Name: ExceptionDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@Type:
+      ManakaiDOM:Exception
+
+ResourceTypeDef:
   @Name: Warning
-  @IName:Warning
-  @Type:
-    dis:ClassType
   @Description:
     @@lang:en
     @@@:
       A warning type.
-ClassDef:
+ElementTypeBinding:
+  @Name: WarningDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@Type:
+      ManakaiDOM:Warning
+
+ResourceTypeDef:
   @Name: ConstGroup
-  @IName:ConstGroup
-  @Type:
-    dis:ClassType
   @Description:
     @@lang:en
     @@@:
       A set of constant values.
-ClassDef:
+ResourceTypeDef:
+  @Name: Const
+  @Description:
+    @@lang:en
+    @@@: A constant value.
+
+ResourceTypeDef:
   @Name: Class
-  @IName:Class
-  @Type:
-    dis:ClassType
   @Description:
     @@lang:en
     @@@:
       A programming language class.
+ElementTypeBinding:
+  @Name: ClassDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@Type:
+      ManakaiDOM:Class
 
-ClassTypeBinding:
-  @Name:
+ResourceTypeDef:
+  @QName: 
+    dis:ModuleGroup
+  @Description:
+    @@lang:en
+    @@@: A set of modules
+
+ResourceDef:
+  @QName:
+    MDOM:
+  @Type:
+    dis:ModuleGroup
+  @Description:
+    @@lang:en
+    @@@:
+      The manakai DOM modules
+
+ResourceTypeDef:
+  @QName:
+    rdfs:Property
+  @Description:
+    @@lang:en
+    @@@: An RDF property.
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMAttribute
+  @Description:
+    @@lang:en
+    @@@: A DOM attribute.
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMMethod
+  @Description:
+    @@lang:en
+    @@@: A DOM method.
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMMethodParameter
+  @Description:
+    @@lang:en
+    @@@: A DOM method parameter.
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMConfigParameter
+  @Description:
+    @@lang:en
+    @@@: A DOM configuration parameter.
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMEvent
+  @Description:
+    @@lang:en
+    @@@: A DOM event definition.
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMError
+  @Description:
+    @@lang:en
+    @@@: A DOM error definition.
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMConfigParameterSet
+  @Description:
+    @@lang:en
+    @@@: A set of DOM configuration parameters.
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMEventSet
+  @Description:
+    @@lang:en
+    @@@: A set of DOM event definitions.
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMErrorSet
+  @Description:
+    @@lang:en
+    @@@: A set of DOM error definitions.
 
 DataTypeDef:
   @QName:
@@ -311,7 +445,6 @@ DataTypeDef:
 
 DataTypeDef:
   @Name: ManakaiDOMURI
-  @IName:ManakaiDOMURI
   @ISA: 
     DOMMain:DOMString
   @FullName: 

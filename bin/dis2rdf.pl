@@ -8,10 +8,10 @@ GetOptions (
   'for=s' => \$Opt{For},
   'help' => \$Opt{help},
   'no-undef-check' => \$Opt{no_undef_check},
-  'output-class' => \$Opt{output_class},
   'output-for' => \$Opt{output_for},
-  'output-local-class' => \$Opt{output_local_class},
+  'output-local-resource' => \$Opt{output_local_resource},
   'output-module' => \$Opt{output_module},
+  'output-resource' => \$Opt{output_resource},
 ) or pod2usage (2);
 if ($Opt{help}) {
   pod2usage (0);
@@ -98,7 +98,7 @@ for (keys %{$State->{For}}) {
   }
 }}
 
-if ($Opt{output_class}) {
+if ($Opt{output_resource}) {
   sub class_to_rdf ($;%);
   sub class_to_rdf ($;%) {
     my ($mod, %opt) = @_;
@@ -110,7 +110,7 @@ if ($Opt{output_class}) {
                            n3_literal $mod->{Name}) if length $mod->{Name};
       $result->add_triple ($uri =>ExpandedURI q<d:NameURI>=> $mod->{NameURI})
         if defined $mod->{NameURI};
-      $result->add_triple ($uri =>ExpandedURI q<d:parentClass>=>
+      $result->add_triple ($uri =>ExpandedURI q<d:parentResource>=>
                            $opt{parent_class_uri})
         if defined $opt{parent_class_uri};
       for (keys %{$mod->{Type}}) {
@@ -122,7 +122,7 @@ if ($Opt{output_class}) {
       for (keys %{$mod->{Implement}}) {
         $result->add_triple ($uri =>ExpandedURI q<d:Implement>=> $_);
       }
-      if ($Opt{output_local_class}) {
+      if ($Opt{output_local_resource}) {
         for (keys %{$mod->{Class}}) {
           class_to_rdf ($mod->{Class}->{$_}, parent_class => $mod,
                         parent_class_uri => $uri,

@@ -1,4 +1,6 @@
 Namespace:
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @DOMXML:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @infoset:
@@ -50,7 +52,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/11/07 07:22:16 $
+     $Date: 2004/11/07 13:07:54 $
 
   @Require:
     @@Module:
@@ -99,6 +101,23 @@ Module:
       @@@@: The Manakai DOM Core Module, Level 3.
     @@Contrib:
       DOMCore:DOMImplementation::DOM3
+
+ElementTypeBinding:
+  @Name: IF
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@Type:
+      ManakaiDOM:IF
+    @@Type:
+      ManakaiDOM:Class
+ElementTypeBinding:
+  @Name: ClassDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@Type:
+      ManakaiDOM:Class
 
 ClassDef:
   @Name: ManakaiDOMNodeObjectNode
@@ -1145,7 +1164,9 @@ ClassDef:
 IF:
   @Name: ManakaiDOMAttributes
   @ISA:
-    ManakaiDOM:ManakaiDOMNodeReference::
+    ManakaiDOM:ManakaiDOMNodeReference
+  @For:
+    ManakaiDOM:ManakaiDOM
   @Implement:
     DOMCore:NamedNodeMap
   @Description:

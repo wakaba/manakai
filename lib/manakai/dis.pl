@@ -3,7 +3,7 @@
 use strict;
 
 use Message::Util::QName::General [qw/ExpandedURI/], {
-  d => q<http://suika.fam.cx/~wakaba/archive/2004/11/3/dis-pl#>,
+  d => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis-->,
   DOMCore => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#>,
   DOMMain => q<http://suika.fam.cx/~wakaba/archive/2004/dom/main#>,
   infoset => q<http://www.w3.org/2001/04/infoset#>,
@@ -221,9 +221,7 @@ sub dis_node_for_match ($$%) {
       my $ok = 1;
       $has_for = 1;
       for my $f (@$for) {
-        if ($f eq '*') {
-          # 
-        } elsif ($f =~ /^!(.+)$/) {
+        if ($f =~ /^!(.+)$/) {
           my $uri = dis_qname_to_uri ($1, use_default_namespace => 1, %opt);
           $State->{def_required}->{For}->{$uri} ||= 1;
           if (dis_uri_for_match ($uri, $for_uri, %opt, node => $_)) {
@@ -382,6 +380,36 @@ sub dis_uri_ctype_match ($$%) {
   return 0;
 }}
 
+=item $uri = dis_element_type_to_uri ($element_type, %opt)
+
+Convert a dis element type into a URI reference.
+
+=cut
+
+sub dis_element_type_to_uri ($;%) {
+  my ($et, %opt) = @_;
+  return dis_qname_to_uri ($et, %opt,
+                           use_default_namespace => ExpandedURI q<d:>);
+}
+
+=item 1/0 = dis_element_type_match ($type1, $type2, %opt)
+
+Test whether element type names match or not.
+
+=cut
+
+sub dis_element_type_match ($$;%) {
+  my ($t1, $t2, %opt) = @_;
+  for ($t1, $t2) {
+    if (ref $_) {
+      $_ = $_->{uri};
+    } else {
+      $_ = dis_element_type_to_uri ($_, %opt);
+    }
+  }
+  $t1 eq $t2;
+}
+
 =item $node/0/undef = dis_get_attr_node (%opt)
 
 Get attribute node if any.  If there is an C<$opt{name}> attribute but 
@@ -397,7 +425,7 @@ sub dis_get_attr_node (%) {
                                           node => $opt{parent});
   for (@{$opt{parent}->child_nodes}) {
     next unless $_->node_type eq '#element';
-    if ($_->local_name eq $en) {
+    if (dis_element_type_match ($_->local_name, $en, %opt)) {
       if (defined $opt{For}) {
         unless (dis_node_for_match ($_, $opt{For}, %opt)) {
           next;
@@ -437,7 +465,7 @@ sub dis_get_elements_nodes (%) {
   my @r;
   for (@{$opt{parent}->child_nodes}) {
     next unless $_->node_type eq '#element';
-    if ($_->local_name eq $en) {
+    if (dis_element_type_match ($_->local_name, $en, %opt)) {
       if (defined $opt{For}) {
         unless (dis_node_for_match ($_, $opt{For}, %opt)) {
           next;
@@ -537,12 +565,14 @@ sub dis_load_module_file (%) {
   my $source; ## Root node
   my $mod;    ## Module element
   if ($State->{module_file_loaded}->{$file_name}) {
-    $mod = ($source = $State->{module_file_loaded}->{$file_name})
-           ->get_attribute ('Module');
+    $mod = dis_get_attr_node
+             (%opt, name => 'Module',
+              parent => ($source = $State->{module_file_loaded}->{$file_name}));
     ## Load Namespace Bindings
     for (@{$source->child_nodes}) {
       next unless $_->node_type eq '#element';
-      if ($_->local_name eq 'Namespace') {
+      if (dis_element_type_match ($_->local_name, 'Namespace',
+                                  %opt, node => $_)) {
         dis_load_namespace_element ($_, %opt);
       }
     }
@@ -555,31 +585,34 @@ sub dis_load_module_file (%) {
     $State->{module_file_loaded}->{$file_name} = $source
       = Message::Markup::SuikaWikiConfig20::Parser
                                         ->parse_text (<$file>);
-    $mod = $source->get_attribute ('Module');
+    $mod = dis_get_attr_node (%opt, parent => $source,
+                              name => 'Module');
     unless ($mod) {
       valid_err q<"Module" element required>, node => $source;
     }
     ## Load Namespace Bindings
     for (@{$source->child_nodes}) {
       next unless $_->node_type eq '#element';
-      if ($_->local_name eq 'Namespace') {
+      if (dis_element_type_match ($_->local_name, 'Namespace',
+                                  %opt, node => $_)) {
         dis_load_namespace_element ($_, %opt);
+      } elsif (dis_element_type_match ($_->local_name, 'ElementTypeBinding',
+                                       %opt, node => $_)) {
+        dis_load_etbinding_element ($_, %opt);
       }
     }
+    dis_apply_etbindings ($source, %opt);
     ## Load For Definitions
     for (@{$source->child_nodes}) {
       next unless $_->node_type eq '#element';
-      if ($_->local_name eq 'ForDef') {
+      if (dis_element_type_match ($_->local_name, 'ForDef',
+                                  %opt, node => $_)) {
         dis_load_fordef_element ($_, %opt);
       }
     }
-    unless ($opt{For} eq ExpandedURI q<ManakaiDOM:all>) {
-      dis_load_module_file (%opt, use_default_for => 0,
-                            For => ExpandedURI q<ManakaiDOM:all>);
-    }
   }
   if (not defined $opt{For} and $opt{use_default_for}) {
-    my $df = $mod->get_attribute ('DefaultFor');
+    my $df = dis_get_attr_node (%opt, parent => $mod, name => 'DefaultFor');
     if ($df) {
       $State->{DefaultFor} = dis_qname_to_uri ($df->value, %opt, node => $df);
     } else {
@@ -588,6 +621,11 @@ sub dis_load_module_file (%) {
     $opt{For} = $State->{DefaultFor};
     $State->{def_required}->{For}->{$State->{DefaultFor}} ||= 1;
   }
+  if (defined $opt{For} and
+      not $opt{For} eq ExpandedURI q<ManakaiDOM:all>) {
+    dis_load_module_file (%opt, use_default_for => 0,
+                          For => ExpandedURI q<ManakaiDOM:all>);
+  }
   ## Load Module Definition
   if (dis_load_module_element ($mod, %opt,
                                module_file_name => $file_name)) {
@@ -595,8 +633,18 @@ sub dis_load_module_file (%) {
     for (@{$source->child_nodes}) {
       next unless $_->node_type eq '#element';
       next unless dis_node_for_match ($_, $opt{For}, %opt);
-      if ($ClassDefElementTypes->{$_->local_name}) {
+      my $et = dis_element_type_to_uri ($_->local_name, %opt, node => $_);
+      if ($et eq ExpandedURI q<d:ResourceDef>) {
         dis_load_classdef_element ($_, %opt);
+      } elsif ({
+                 ExpandedURI q<d:ElementTypeBinding> => 1,
+                 ExpandedURI q<d:ForDef> => 1,
+                 ExpandedURI q<d:Module> => 1,
+                 ExpandedURI q<d:Namespace> => 1,
+               }->{$et}) {
+        # 
+      } else {
+        valid_err (q<Unknown element type>, node => $_);
       }
     }
   } else {
@@ -646,11 +694,13 @@ sub dis_load_module_element ($;%) {
     next unless $_->node_type eq '#element';
     next unless dis_node_for_match ($_, $opt{For}, %opt);
     my $ln = $_->local_name;
-    if ($ln eq 'Require') {
+    if (dis_element_type_match ($ln, 'Require', %opt, node => $_)) {
       for (@{$_->child_nodes}) {
         next unless $_->node_type eq '#element';
-        if ($_->local_name eq 'Module') {
+        if (dis_element_type_match ($_->local_name, 'Module',
+                                    %opt, node => $_)) {
           local $State->{Namespace} = {};
+          local $State->{ETBinding} = {};
           local $State->{module};
           dis_load_module_file (%opt, module_node => $_,
                                 module_file_name => undef,
@@ -696,7 +746,9 @@ Load C<For> definitions from a node.
 
 sub dis_load_fordef_element ($;%) {
   my ($node, %opt) = @_;
-  my $uri = dis_qname_to_uri ($node->get_attribute_value ('QName'),
+  my $qn = dis_get_attr_node (%opt, parent => $node, name => 'QName');
+  valid_err (q<"QName" attribute required>, node => $node) unless $qn;
+  my $uri = dis_qname_to_uri ($qn->value,
                               use_default_namespace => 1, %opt,
                               node => $node);
   if (defined $State->{For}->{$uri}->{URI}) {
@@ -718,13 +770,22 @@ sub dis_load_fordef_element ($;%) {
   
   for (@{$_->child_nodes}) {
     next unless $_->node_type eq '#element';
-    my $ln = $_->local_name;
-    if ($ln eq 'ISA' or $ln eq 'Implement') {
+    my $ln = dis_element_type_to_uri ($_->local_name, %opt, node => $_);
+    if ($ln eq ExpandedURI q<d:ISA>) {
       my $uri = dis_qname_to_uri ($_->value, use_default_namespace => 1,
                                   %opt, node => $_);
       $for->{$ln}->{$uri} = 1;
       $State->{def_required}->{For}->{$uri} ||= 1;
-    } elsif ({qw/QName 1 FullName 1 Description 1/}->{$ln}) {
+    } elsif ($ln eq ExpandedURI q<d:Implement>) {
+      my $uri = dis_qname_to_uri ($_->value, use_default_namespace => 1,
+                                  %opt, node => $_);
+      $for->{$ln}->{$uri} = 1;
+      $State->{def_required}->{For}->{$uri} ||= 1;
+    } elsif ({
+               ExpandedURI q<d:QName> => 1,
+               ExpandedURI q<d:FullName> => 1,
+               ExpandedURI q<d:Description> => 1,
+             }->{$ln}) {
       # 
     } else {
       valid_err (q<Unsupported element type>, node => $_);
@@ -754,6 +815,64 @@ sub dis_load_namespace_element ($;%) {
   }
 }
 
+=item dis_load_etbinding_element ($node, %opt)
+
+Load element type binding.
+
+=cut
+
+sub dis_load_etbinding_element ($;%) {
+  my ($node, %opt) = @_;
+  my $etb = {src => $node};
+  for (@{$node->child_nodes}) {
+    next unless $_->node_type eq '#element';
+    my $et = dis_element_type_to_uri ($_->local_name, %opt, node => $_);
+    if ($et eq ExpandedURI q<d:Name>) {
+      $etb->{Name} = $_->value;
+      if (defined $State->{ETBinding}->{$etb->{Name}}->{Name}) {
+        valid_err (qq{Binding "$etb->{Name}" is already defined}, node => $node);
+      } else {
+        $State->{ETBinding}->{$etb->{Name}} = $etb;
+      }
+    } elsif ($et eq ExpandedURI q<d:ElementType>) {
+      $etb->{ElementType} = dis_qname_to_uri ($_->value, %opt, node => $_);
+    } elsif ($et eq ExpandedURI q<d:ShadowContent>) {
+      $etb->{ShadowContent} = $_;
+    } else {
+      valid_err (q<Unknown element type>, node => $_);
+    }
+  }
+  valid_err (q<Binding element type is not specified>, node => $node)
+    unless defined $etb->{Name};
+  valid_err (q<Binded element type is not specified>, node => $node)
+    unless defined $etb->{ElementType};
+}
+
+=item dis_apply_etbinding ($node, %opt)
+
+Apply element type bindings.
+
+=cut
+
+sub dis_apply_etbindings ($;%);
+sub dis_apply_etbindings ($;%) {
+  my ($src, %opt) = @_;
+  for (@{$src->child_nodes}) {
+    next unless $_->node_type eq '#element';
+    dis_apply_etbindings ($_, %opt);
+  }
+  return unless $src->node_type eq '#element';
+  if (defined $State->{ETBinding}->{$src->local_name}->{Name}) {
+    my $etb = $State->{ETBinding}->{$src->local_name};
+    $src->local_name ('URI:'.$etb->{ElementType}) if defined $etb->{ElementType};
+    if ($etb->{ShadowContent}) {
+      for (@{$etb->{ShadowContent}->child_nodes}) {
+        $src->append_node ($_->clone);
+      }
+    }
+  }
+}
+
 =item dis_load_classdef_element ($node, %opt)
 
 Load a class (programming language class, interface, datatype, 
@@ -772,8 +891,8 @@ sub dis_load_classdef_element ($;%) {
     valid_err (q<Class definition nests too deep>, node => $node);
   }
   my $cls;
-  my $qn = $node->get_attribute ('QName');
-  my $ln = $node->get_attribute ('Name');
+  my $qn = dis_get_attr_node (%opt, parent => $node, name => 'QName');
+  my $ln = dis_get_attr_node (%opt, parent => $node, name => 'Name');
   my $al = dis_get_attr_node (%opt, parent => $node, name => 'AliasFor');
   if ($qn) { ## Global class
     my ($nuri, $lname) = dis_qname_to_pair ($qn->value, 
@@ -873,42 +992,26 @@ sub dis_load_classdef_element ($;%) {
     $cls->{For}->{$opt{For} || ExpandedURI q<ManakaiDOM:all>} = 1;
   }
 
-  my $et = $node->local_name;
-  if ($et eq 'IFDef') {
-    $node->append_new_node (type => '#element',
-                            local_name => 'Type')
-         ->inner_text (new_value => 'URI:'.ExpandedURI q<ManakaiDOM:IF>);
-  } elsif ($et eq 'DataTypeDef') {
-    $node->append_new_node (type => '#element',
-                            local_name => 'Type')
-         ->inner_text (new_value => 'URI:'.ExpandedURI q<ManakaiDOM:DataType>);
-  } elsif ($et eq 'ExceptionDef') {
-    $node->append_new_node (type => '#element',
-                            local_name => 'Type')
-         ->inner_text (new_value => 'URI:'.ExpandedURI q<ManakaiDOM:Exception>);
-  } elsif ($et eq 'WarningDef') {
-    $node->append_new_node (type => '#element',
-                            local_name => 'Type')
-         ->inner_text (new_value => 'URI:'.ExpandedURI q<ManakaiDOM:Warning>);
-  }
-
   for (@{$node->child_nodes}) {
     next unless $_->node_type eq '#element';
-    next unless dis_node_for_match ($node, $opt{For}, %opt);
-    my $ln = $_->local_name;
-    if ($ln eq 'Type') {
+    next unless dis_node_for_match ($_, $opt{For}, %opt);
+    my $ln = dis_element_type_to_uri ($_->local_name, %opt, node => $_);
+    if ($ln eq ExpandedURI q<d:Type>) {
       my $uri = dis_typeforqnames_to_uri ($_->value, use_default_namespace => 1,
                                           %opt, node => $_);
       $cls->{Type}->{$uri} = 1;
       $State->{def_required}->{Class}->{$uri} ||= 1;
-    } elsif ($ln eq 'ISA' or $ln eq 'Implement') {
-      valid_err ("Alias class name cannot be able to have this type of elements",
-                 node => $_) if $al;
+    } elsif ($ln eq ExpandedURI q<d:ISA>) {
       my $uri = dis_typeforqnames_to_uri ($_->value, use_default_namespace => 1,
                                           %opt, node => $_);
       $cls->{$ln}->{$uri} = 1;
       $State->{def_required}->{Class}->{$uri} ||= 1;
-    } elsif ($ClassDefElementTypes->{$ln}) {
+    } elsif ($ln eq ExpandedURI q<d:Implement>) {
+      my $uri = dis_typeforqnames_to_uri ($_->value, use_default_namespace => 1,
+                                          %opt, node => $_);
+      $cls->{Implement}->{$uri} = 1;
+      $State->{def_required}->{Class}->{$uri} ||= 1;
+    } elsif ($ln eq ExpandedURI q<d:ResourceDef>) {
       valid_err ("Alias class name cannot be able to have this type of elements",
                  node => $_) if $al;
       local $State->{current_class_container} = $cls;
@@ -1256,4 +1359,4 @@ sub disdoc_inline2pod ($;%) {
 
 =cut
 
-1; # $Date: 2004/11/07 07:22:16 $
+1; # $Date: 2004/11/07 13:07:54 $
