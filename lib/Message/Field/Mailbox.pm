@@ -11,7 +11,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 
@@ -63,6 +63,9 @@ The following methods construct new objects:
     -parse_all	=> 1,	## = parse_domain + parse_local_part
     -parse_domain	=> 1,
     -parse_local_part	=> 1,	## not implemented.
+    -unsafe_rule_display_name	=> 'NON_http_attribute_char_wsp',
+    -unsafe_rule_local_part	=> 'NON_atext_dot',
+    -unsafe_rule_keyword	=> 'NON_atext_dot',
     -use_keyword	=> 0,
   );
 sub _init ($;%) {
@@ -70,13 +73,13 @@ sub _init ($;%) {
   my %options = @_;
   my $DEFAULT = Message::Util::make_clone (\%DEFAULT);
   $self->SUPER::_init (%$DEFAULT, %options);
-  $self->{option}->{value_type}->{'domain'} = ['Message::Field::Domain', {
+  $self->{option}->{value_type}->{domain} = ['Message::Field::Domain', {
       #-encoding_after_encode => $self->{option}->{encoding_after_encode_domain},
       #-encoding_before_decode => $self->{option}->{encoding_before_decode_domain},
   },];
   
   my $format = $self->{option}->{format};
-  my $field = $self->{option}->{field};
+  my $field = $self->{option}->{field_name};
   if ($format =~ /mail-rfc822/) {
     $self->{option}->{output_route} = 1
       if $field eq 'from' || $field eq 'resent-from'
@@ -86,19 +89,22 @@ sub _init ($;%) {
       || $field eq 'resent-bcc' || $field eq 'reply-to'
       || $field eq 'resent-reply-to' || $field eq 'return-path';
   }
-  if ($self->{option}->{field_name} eq 'mail-copies-to') {
+  if ($field eq 'mail-copies-to') {
     $self->{option}->{use_keyword} = 1;
     $self->{option}->{output_keyword} = 1;
   }
-  if ($self->{option}->{field_name} eq 'return-path') {
+  if ($field eq 'return-path') {
     $self->{option}->{allow_empty_addr_spec} = 1;
     $self->{option}->{output_display_name} = 0;
     $self->{option}->{output_comment} = 0;
     	## RFC [2]822 allows CFWS, but [2]821 does NOT.
   }
+  if ($format =~ /http/) {
+    $self->{option}->{unsafe_rule_local_part} = 'NON_http_attribute_char_wsp';
+  }
 }
 
-=item $addr = Message::Field::Address->new ([%options])
+=item $m = Message::Field::Mailbox->new ([%options])
 
 Constructs a new object.  You might pass some options as parameters 
 to the constructor.
@@ -107,7 +113,7 @@ to the constructor.
 
 ## Inherited
 
-=item $addr = Message::Field::Address->parse ($field-body, [%options])
+=item $m = Message::Field::Mailbox->parse ($field-body, [%options])
 
 Constructs a new object with given field body.  You might pass 
 some options as parameters to the constructor.
@@ -128,6 +134,7 @@ sub parse ($$;%) {
   my $addr_spec = '';
   if ($body =~ /([^\x3C]*)$REG{SCM_angle_addr}/) {
     my ($dn, $as) = ($1, $2);
+    $dn =~ s/^$REG{WSP}+//;  $dn =~ s/$REG{WSP}+$//;
     $self->{display_name} = $self->Message::Util::decode_quoted_string ($dn);
     $addr_spec = Message::Util::remove_meaningless_wsp ($as);
   } elsif ($self->{option}->{use_keyword}
@@ -240,7 +247,7 @@ sub stringify ($;%) {
       my %s = &{$option{hook_encode_string}} ($self, 
               $self->{keyword}, type => 'phrase');
       $as = Message::Util::quote_unsafe_string
-          ($s{value}, unsafe => 'NON_atext_dot');
+          ($s{value}, unsafe => $option{unsafe_rule_keyword});
     } else {
       $as = '('. $self->Message::Util::encode_ccontent ($self->{keyword}) .')';
     }
@@ -250,14 +257,14 @@ sub stringify ($;%) {
         my %s = &{$option{hook_encode_string}} ($self, 
             $self->{display_name}, type => 'phrase');
         $dn = Message::Util::quote_unsafe_string
-            ($s{value}, unsafe => 'NON_atext_wsp') . ' ';
+            ($s{value}, unsafe => $option{unsafe_rule_display_name}) . ' ';
       } elsif ($option{comment_to_display_name}) {
         my $fullname = shift (@{$self->{comment}});
         if (length $fullname) {
           my %s = &{$option{hook_encode_string}} ($self, 
             $fullname, type => 'phrase');
           $dn = Message::Util::quote_unsafe_string
-            ($s{value}, unsafe => 'NON_atext_wsp') . ' ';
+            ($s{value}, unsafe => $option{unsafe_rule_display_name}) . ' ';
         }
       }
     } elsif ($option{output_comment} && length $self->{display_name}) {
@@ -267,7 +274,7 @@ sub stringify ($;%) {
           $self->{local_part}, type => 'word',
           charset => $option{encoding_after_encode_local_part});
     $as = Message::Util::quote_unsafe_string ($s{value}, 
-            unsafe => $REG{NON_atext_dot});
+            unsafe => $option{unsafe_rule_local_part});
     my $d = '' . $self->{domain};
     $d ||= $option{default_domain} if $option{fill_domain};
     $as .= '@' . $d if length $d && length $as;
@@ -296,6 +303,7 @@ sub stringify ($;%) {
   }
   $dn . $as . $cm;
 }
+*as_string = \&stringify;
 
 =head1 LICENSE
 
@@ -319,7 +327,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/15 07:29:09 $
+$Date: 2002/05/17 05:42:27 $
 
 =cut
 
