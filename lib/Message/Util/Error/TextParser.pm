@@ -17,68 +17,122 @@ This module is part of manakai.
 =cut
 
 package Message::Util::Error::TextParser;
-use base Message::Util::Error;
+require Message::Util::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
-=head1 METHODS
+sub new ($;%) {
+  my $self = bless {}, shift;
+  $self->{option} = {@_, newline => qr/\x0A|\x0D\x0A?/};
+  $self;
+}
 
-=over 4
-
-=item $err = Message::Util::Error::TextParser->new ({error definitions})
-
-Constructs new error reporting object.   Hash reference to error definition list must be specified as an argument.
-
-=cut
-
-# Inherited
-
-=item $err->raise (%detail)
-
-Raises an error (or a warning, if defined so)
-
-=cut
-
-sub raise ($%) {
-  my ($self, %err) = @_;
-  if ($err{position}) {
-    $err{position_data} = $self->{pos}->{$err{position}};
-    unless (defined $err{position_data}->{line}) {
-      warn qq'raise: position data "$err{position}" not initialized';
-    }
-    $err{position_msg} = sprintf 'Line %d position %d',
-      $err{position_data}->{line}, $err{position_data}->{pos};
+sub set_position ($$;%) {
+  no warnings 'uninitialized';
+  my ($self, $s, %opt) = @_;
+  return if $self->{__set_position};
+  my $pos = $self->{pos}->{$s} ||= {};
+  my $length = pos ($$s) - $pos->{pos};
+  if ($opt{diff}) {
+    $length < $opt{diff} ?
+      $length  = 0:
+      $length -= $opt{diff};
   }
-  $self->SUPER::raise (%err);
+  my $t = substr ($$s, $pos->{pos}, $length > 0 ? $length : 0);
+  ++$pos->{line} and $pos->{char} = 0 
+    while $t =~ /^.+?$self->{option}->{newline}/os;
+  $pos->{char} += length $t;
+  $pos->{pos} += $length;
+  $self->{__set_position} = 1;
 }
 
-=item $self->count_position ($position_set, $text)
-
-Counts lines/characters and adds to current position of C<$position_set>.
-
-=cut
-
-sub count_position ($$$) {
-  my ($self, $set, $text) = @_;
-  $text =~ s/[^\x0A\x0D]*(?:\x0D\x0A?|\x0A)/$self->{pos}->{$set}->{line}++;
-                                            $self->{pos}->{$set}->{pos} = 0; 
-                                            ''/ges;
-  $self->{pos}->{$set}->{pos} += length $text;
+sub get_position ($$;%) {
+  no warnings 'uninitialized';
+  my ($self, $s, %opt) = @_;
+  (0 + $self->{pos}->{$s}->{line}, 0 + $self->{pos}->{$s}->{char});
 }
 
-=item $self->reset_position ($position_set)
+sub reset_position ($$;%) {
+  my ($self, $s, %opt) = @_;
+  $self->{pos}->{$s} = {
+    pos => pos $$s, line => 0, char => 0,
+    %opt,
+  };
+}
 
-Resets current position of C<$position_set> to "Line 0 position 0".
+sub fork_position ($$$;%) {
+  my ($self, $s => $t, %opt) = @_;
+  $self->{pos}->{$t} = {
+    %{$self->{pos}->{$s}||{}},
+    pos => pos $$t,
+    %opt,
+  };
+}
 
-=cut
+sub report ($%) {
+  my ($self, %opt) = @_;
+  local $Error::Depth = $Error::Depth + 1;
+  local $self->{__set_position} = 0;
+  ($self->{option}->{package}.($opt{-class}?'::'.$opt{-class}:''))
+        ->report (%opt, -object => $self);
+}
 
-sub reset_position ($$) {
-  my ($self, $set) = @_;
-  $self->{pos}->{$set}->{line} = 0;
-  $self->{pos}->{$set}->{pos} = 0;
-}                 
+sub ___report_error ($$) {
+  my ($self, $err) = @_;
+  local $Error::Depth = $Error::Depth + 1;
+  $self->{option}->{report} ?
+    $self->{option}->{report}->($err):
+    $self->{option}->{package}->___report_error ($err);
+}
 
-=back
+package Message::Util::Error::TextParser::error;
+push our @ISA, 'Message::Util::Error';
+
+sub _FORMATTER_PACKAGE_ () { 'Message::Util::Error::TextParser::formatter' }
+
+sub ___report_error ($$) {
+  $_[1]->throw;
+}
+
+package Message::Util::Error::TextParser::formatter;
+push our @ISA, 'Message::Util::Error::formatter';
+
+sub ___rule_def () {+{
+  err_line => {
+    after => sub {
+      my ($self, $name, $p, $o) = @_;
+      $o->{-object}->set_position ($o->{source}, diff => $o->{position_diff});
+      $p->{-result} .= 1 + ($o->{-object}->get_position ($o->{source}))[0];
+    },
+  },
+  err_char => {
+    after => sub {
+      my ($self, $name, $p, $o) = @_;
+      $o->{-object}->set_position ($o->{source}, diff => $o->{position_diff});
+      $p->{-result} .= 1 + ($o->{-object}->get_position ($o->{source}))[1];
+    },
+  },
+  err_at => {
+    after => sub {
+      my ($self, $name, $p, $o) = @_;
+      my $pos = pos ${$o->{source}};
+      if ($pos == length ${$o->{source}}) {
+        $p->{-result} .= $p->{end_of} || '** end of string **';
+        return;
+      } elsif ($pos == 0) {
+        $p->{-result} .= $p->{beginning_of} || '** beginning of string **';
+        return;
+      }
+      my $before = $p->{before};
+      if ($before) {
+        $before = $pos if $pos < $before;
+      }
+      $p->{-result} .= substr (${$o->{source}}, $pos - $before, $before)
+                     . ($p->{here} || ' ** here ** ')
+                     . substr (${$o->{source}}, $pos, $p->{after});
+    },
+  },
+}}
 
 =head1 LICENSE
 
@@ -89,4 +143,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/10/31 08:39:50 $
+1; # $Date: 2003/12/26 07:12:03 $
