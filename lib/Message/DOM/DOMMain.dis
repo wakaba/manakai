@@ -35,7 +35,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/09/27 03:54:23 $
+     $Date: 2004/09/27 12:11:53 $
   
   @Feature:
     @@QName:
@@ -1082,31 +1082,34 @@ IF:
   @Description:
     @@lang:en
     @@@:
-      A language binding dependent bootstrap object for
-      "DOMImplementation" objects.
+      A binding dependent bootstrap for <IF:DOMImplementation> objects.
   @Method:
     @@Name: newInstance
     @@Description:
       @@@lang:en
       @@@@:
-        Construct a new instance of "DOMImplementationRegistry" 
-        (Taken from the DOM Java Binding).
+        Construct a new instance of <IF:DOMImplementationRegistry> object.
         \
-        The "DOMImplementationRegistry"
-        is initialized by application or implementation, depenging on
-        the context, by first checking the values of the 
-        array "@org::w3c::dom::DOMImplementationSourceList",
-        i.e. names of classes implementing the "DOMImplementationSource" 
+        The <IF:DOMImplementationRegistry> object 
+        is initialized by DOM applications or the DOM implementation, 
+        depenging on the context, by first checking the values of the 
+        array <Perl:@org::w3c::dom::DOMImplementationSourceList>, 
+        i.e. names of classes implementing the <IF:DOMImplementationSource> 
         interface.
-        \
-        "DOMImplementationSource" classes are not
-        instanciated at this stage, while in Java Binding they are
-        instanciated.
+    @@ImplNote;
+      @@@lang:en
+      @@@@:
+        This method is taken from the normative Java binding.
+      \
+        Note that in this implementation, unlike the Java binding, 
+        <IF:DOMImplementationSource> classes available are not 
+        instantiated at this stage.
     @@Return:
       @@@Type: DOMImplementationRegistry
       @@@Description:
         @@@@lang:en
-        @@@@@: An instance of the "DOMImplementationRegistry".
+        @@@@@:
+          A new instance of the <IF:DOMImplementationRegistry>.
       @@@Def:
         @@@@Type:
           lang:Perl
@@ -1170,14 +1173,18 @@ IF:
     @@Description:
       @@@lang:en
       @@@@:
-        Add a DOMImplementationSource to the list.
-        (Taken from the DOM Java Binding.)
+        Add a <IF:DOMImplementationSource> object to the list.
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        This method is taken from the normative Java binding.
     @@Param:
       @@@Name: s
       @@@Type: DOMImplementationSource
       @@@Description:
         @@@@lang:en
-        @@@@@: A DOMImplementationSource to be registered.
+        @@@@@: 
+          A <IF:DOMImplementationSource> object to be registered.
     @@Return:
       @@@Exception:
         @@@@Type:
@@ -1185,7 +1192,8 @@ IF:
         @@@@Name: PARAM_NULL_POINTER
         @@@@Description:
           @@@@@lang:en
-          @@@@@@: The parameter "list" is the null value.
+          @@@@@@:
+            The parameter <P:list> is <DOM:null>.
       @@@Def:
         @@@@Type:
           lang:Perl

@@ -36,7 +36,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/09/27 03:54:24 $
+     $Date: 2004/09/27 12:11:53 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -280,8 +280,9 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              "null" must be specified to this parmeter, since 
-              no general entity has the namespace URI.
+              The value for this parameter should always be 
+              <DOM:null>, since general entities are defined 
+              not to have any namespace.
      @@Param:
         @@@Name:  localName
         @@@Type:
@@ -391,8 +392,9 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              "null" must be specified to this parameter, since 
-              no general entity has the namespace URI.
+              The value for this parameter should always be 
+              <DOM:null>, since general entities are defined 
+              not to have any namespace.
      @@Param:
         @@@Name:  localName
         @@@Type:  

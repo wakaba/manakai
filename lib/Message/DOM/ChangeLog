@@ -1,7 +1,15 @@
 2004-09-27  Wakaba  <wakaba@suika.fam.cx>
 
+	* DOMLS.dis, ManakaiDOMLS2003: New file.
+
 	* dis2pm.pl (MAIN): Output "AUTHOR" pod section; support Perl+MPL
 	license.
+	(disdoc2pod, disdoc2text): New 'DFN', 'SA', 'SE', 'HA', 'HE',
+	'XA', 'XE', 'Prefix', 'ERR', 'EV' and 'CP' element types supported.
+	(perl_name): Die if uninitialized value.
+	(constgroup2perl): Support constant group without machine-name.
+	(pod_item): Die if uninitialized value.
+	(qname_label): Don't output default prefix.
 
 	* idl2dis.pl: Output module name and prefix as 'BindingName'
 	and 'FileName'.

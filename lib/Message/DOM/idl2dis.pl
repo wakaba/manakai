@@ -28,7 +28,7 @@ sub fws ($) {
                                      local_name => 'Module');
         $c->set_attribute (Name => undef);
         $c->set_attribute (FileName => $f)
-          ->set_attribute (Type => 'lang:IDL-DOM');
+          ->set_attribute (For => 'lang:IDL-DOM');
         $f =~ s/\.idl$//;
         $c->set_attribute (Name => $f);
         $c->set_attribute (Namespace => q<:: TBD ::>);
@@ -299,11 +299,11 @@ for my $module ($tree->append_new_node (type => '#element',
   $module->set_attribute (BindingName => q<** TBD **>)
          ->set_attribute (Type => q<lang:IDL-DOM>);
   for ($module->set_attribute (Author => undef)) {
-    $_->set_attribute (Name => q<** TBD **>);
+    $_->set_attribute (FullName => q<** TBD **>);
     $_->set_attribute (Mail => q<** TBD **>);
   }
   $module->set_attribute (License => q<license:Perl+MPL>);
-  $module->set_attribute ('Date.RCS' => q<$Date: 2004/09/27 03:54:24 $>);
+  $module->set_attribute ('Date.RCS' => q<$Date: 2004/09/27 12:11:53 $>);
 }
 
 fws $s;

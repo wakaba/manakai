@@ -1,0 +1,1203 @@
+Namespace:
+  @infoset:
+     http://www.w3.org/2001/04/infoset#
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @LSEV:
+    http://www.w3.org/2002/DOMLS
+  @ManakaiDOMLS:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-ls#
+Module:
+  @Name: DOMLS
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
+  @BindingName:
+     @@@:  ls
+     @@Type:
+        lang:IDL-DOM
+     @@prefix:  dom.w3c.org
+  @FullName:
+    @@@: DOM Load and Save Module
+    @@@@lang:en
+  @Description:
+    @@lang:en
+    @@@:
+      A set of interfaces for loading and saving document objects. 
+      The functionality defined in this module (the <DFN:Load and Save>
+      functionality) is sufficient to allow DOM applications to 
+      load and save XML content.  The API also allows filtering 
+      of XML content using only DOM API calls.
+
+  @Author:
+     @@FullName: Wakaba
+     @@Mail: w@suika.fam.cx
+  @License:
+     license:Perl+MPL
+  @Date.RCS:
+     $Date: 2004/09/27 12:11:53 $
+
+  @ConditionDef:
+    @@Name:DOM3
+  
+  @Feature:
+    @@Name:LS
+    @@Version:3.0
+    @@FullName:
+      @@@lang:en
+      @@@@:
+        DOM Load and Save Module Fundamental Interfaces, Level 3.
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        Support of <Feature:Core>/<FeatureVer:2.0> is required.
+
+  @Feature:
+    @@Name:LS-Async
+    @@Version:3.0
+    @@FullName:
+      @@@lang:en
+      @@@@:
+        DOM Load and Save Module Fundamental Interfaces, Level 3 
+        (asynchronous mode).
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        Support of <Feature:LS>/<FeatureVer:3.0> is required.
+
+  @Require:
+     @@Module:
+        @@@Name:  DOMCore
+        @@@FileName:
+           @@@@@:  dom.idl
+           @@@@Type:
+              lang:IDL-DOM
+        @@@Namespace:
+           http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+     @@Module:
+        @@@Name:  DOMEvents
+        @@@FileName:
+           @@@@@:  events.idl
+           @@@@Type:
+              lang:IDL-DOM
+        @@@Namespace:
+           :: TBD ::
+     @@Module:
+        @@@Name:  DOMTraversal
+        @@@FileName:
+           @@@@@:  traversal.idl
+           @@@@Type:
+              lang:IDL-DOM
+        @@@Namespace:
+           :: TBD ::
+
+## Basic Types
+
+ImplNote:
+  @lang:en
+  @@:
+    Basic types are specified to ensure interoperability.  Bindings 
+    may use different types.
+
+DataTypeAlias:
+  @Name:  LSInputStream
+  @Description:
+    @@lang:en
+    @@@:
+      A reference to a byte stream source of an XML input.
+  @Type:
+     DOMMain:Object
+  @Def:
+    @@Type:
+      lang:Java
+    @@@:
+      java.io.InputStream
+  @Def:
+    @@Type:
+      lang:ECMAScript
+    @@@: Object
+
+DataTypeAlias:
+  @Name:  LSOutputStream
+  @Type:
+     DOMMain:Object
+  @Description:
+    @@lang:en
+    @@@:
+      A byte stream destination for the XML output.
+  @Def:
+    @@Type:
+      lang:Java
+    @@@: java.io.OutputStream
+  @Def:
+    @@Type:
+      lang:ECMAScript
+    @@@: Object
+
+DataTypeAlias:
+  @Name:  LSReader
+  @Type:
+     DOMMain:Object
+  @Description:
+    @@lang:en
+    @@@:
+      A character stream, i.e. a sequence of input characters 
+      in 16-bit units, for the XML input.
+  @Def:
+    @@Type:
+      lang:Java
+    @@@:java.io.Reader
+  @Def:
+    @@Type:
+      lang:ECMAScript
+    @@@:\
+    @@Description: 
+      @@@lang:en
+      @@@@:
+        Not bound; <TYPE:LSReader> has no recommended meaning in ECMAScript.
+
+DataTypeAlias:
+  @Name:  LSWriter
+  @Type:
+     DOMMain:Object
+  @Description:
+    @@lang:en
+    @@@:
+      A character stream, i.e. a sequence of characters in 16-bit units, 
+      for the XML output.
+  @Def:
+    @@Type:
+      lang:Java
+    @@@:java.io.Writer
+  @Def:
+    @@Type:
+      lang:ECMAScript
+    @@@:\
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Not bound; <TYPE:LSWriter> has no recommended meaning in ECMAScript.
+
+DataTypeAlias:
+  @Name:  DOMString
+  @Type:
+     DOMMain:DOMString
+DataTypeAlias:
+  @Name:  DOMConfiguration
+  @Type:
+     DOMCore:DOMConfiguration
+DataTypeAlias:
+  @Name:  Node
+  @Type:
+     DOMCore:Node
+DataTypeAlias:
+  @Name:  Document
+  @Type:
+     DOMCore:Document
+DataTypeAlias:
+  @Name:  Element
+  @Type:
+     DOMCore:Element
+
+## Fundamental Interfaces
+
+ImplNote:
+  @lang:en
+  @@:
+    The fundamental interfaces must be fully implemented by all 
+    conforming implementations.
+
+Exception:
+  @Name:  LSException
+  @ImplNote:
+    @@lang:en
+    @@@:
+      Parser or writer may throw an <X:LSException> if the processing 
+      is stopped.  The processing can be stopped due to a <IF:DOMError>.
+  @Attr:
+     @@Name:  code
+     @@Get:
+        @@@Type:
+           DOMMain:unsigned-short
+  @ConstGroup:
+     @@Name:  LSExceptionCode
+     @@Type:
+        DOMMain:unsigned-short
+     @@Description:
+        @@@lang:en
+        @@@@: The type of error generated.
+     @@Const:
+        @@@Name:  PARSE_ERR
+        @@@Type:
+           DOMMain:unsigned-short
+        @@@Value:  81
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An attempt was made to load a document or an XML fragment 
+            using <IF:LSParser> and the processing has been stopped.
+     @@Const:
+        @@@Name:  SERIALIZE_ERR
+        @@@Type:
+           DOMMain:unsigned-short
+        @@@Value:  82
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An attempt was made to serialize a <IF:Node> using 
+            <IF:LSSerializer> and the processing has been stop.
+
+IF:
+  @Name:  DOMImplementationLS
+  @Description:
+    @@lang:en
+    @@@:
+      The factory methods for creating the objects 
+      required for loading and saving.
+  @ImplNote:
+    @@lang:en
+    @@@:
+      It is expected that an instance of the <IF:DOMImplementationLS> 
+      interface can be obtained by binding-specific casting 
+      methods on an instance of the <IF:DOMImplementation> interface 
+      or <M:DOMImplementation.getFeature> with parameters <Feature:LS> or 
+      <Feature:LS-Async> version <FeatureVer:3.0>.
+  @ConstGroup:
+     @@Name:  DOMImplementationLSMode
+     @@Type:
+        DOMMain:unsigned-short
+     @@Description:
+       @@@lang:en
+       @@@@:The mode of the parser.
+     @@Const:
+        @@@Name:  MODE_SYNCHRONOUS
+        @@@Type:
+           DOMMain:unsigned-short
+        @@@Value:  1
+        @@@Description:
+          @@@@lang:en
+          @@@@@: 
+            Create an synchronous <IF:LSParser>.
+     @@Const:
+        @@@Name:  MODE_ASYNCHRONOUS
+        @@@Type:
+           DOMMain:unsigned-short
+        @@@Value:  2
+        @@@Description:
+          @@@@lang:en
+          @@@@@: 
+            Create an asynchronous <IF:LSParser>.
+  @Method:
+     @@Name:  createLSParser
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Create a new parser object.
+     @@Param:
+        @@@Name:  mode
+        @@@Type: DOMImplementationLSMode
+        @@@InCase:
+          @@@@Label:
+            <DOM:MODE_SYNCHRONOUS>
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The <IF:LSParser> created will operate in synchronous mode.
+        @@@InCase:
+          @@@@Label:
+            <DOM:MODE_ASYNCHRONOUS>
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The <IF:LSParser> created will operate in asynchronous mode.
+     @@Param:
+        @@@Name:  schemaType
+        @@@Type: 
+          ManakaiDOM:ManakaiDOMURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An absolute URI representing the type of the schema language 
+            used during the load of a <IF:Document> using the newly 
+            created <IF:LSParser>.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The <IF:LSParser> will be free to use any schema found.
+        @@@InCase:
+          @@@@Value:
+            http://www.w3.org/2001/XMLSchema
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The XML Schema.
+        @@@InCase:
+          @@@@Value:
+            http://www.w3.org/TR/REC-xml
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The XML 1.0 DTD.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            Other schema languages are outside of the scope of the W3C 
+            and should recommend its absolute URI.
+     @@Return:
+        @@@Type:  LSParser
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The newly created parser object.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            By default, the parameter <DOM:error-handler> of the 
+            <A:LSParser.domConfig> is <DOM:null>.  However, 
+            the DOM implementation may provide a default error handler instead.
+        @@@Exception:
+           @@@@Name:  NOT_SUPPORTED_ERR
+           @@@@Type:
+              DOMCore:DOMException
+           @@@@SubType:
+             @@@@@QName:
+               ManakaiDOMLS:MDOMLS_IMPL_NOSUPPORT_MODE
+             @@@@@Description:
+               @@@@@@lang:en
+               @@@@@@@: The requested mode is not supported.
+           @@@@SubType:
+             @@@@@QName:
+               MDOM_EXCEPTION:MDOM_IMPL_NOSUPPORT_SCHEMA
+             @@@@@Description:
+               @@@@@@lang:en
+               @@@@@@@: The requested schema language is not supported.
+  @Method:
+     @@Name:  createLSSerializer
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Create a new serializer object.
+     @@Return:
+        @@@Type:  LSSerializer
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The newly created serializer object.
+  @Method:
+     @@Name:  createLSInput
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Create a new empty input source object.
+     @@Return:
+        @@@Type:  LSInput
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The newly created input object.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            $r = __CLASS{LSInput}__->__INT{new}__;
+  @Method:
+     @@Name:  createLSOutput
+     @@Description:
+       @@@lang:en
+       @@@@: Create a new empty output destination object.
+     @@Return:
+        @@@Type:  LSOutput
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The newly created output object.
+##IF:DOMImplementationLS
+
+IF:
+  @Name:  LSParser
+  @Description:
+    @@lang:en
+    @@@:
+      An interface to an object that is able to build or augment 
+      a DOM tree from various input sources.
+  @ImplNote:
+    @@lang:en
+    @@@:
+      {P:: When a document is first made available via the <IF:LSParser>, 
+      \
+      - there will never be two adjacent <IF:Text> nodes.
+      \
+      - there will never be empty text nodes.
+      \
+      {LI:: it is expected that <A:Attr.value> initially return XML 1.0 
+            normalized value.
+      \
+        - If the parameter <CP:validate-if-schema> and 
+          <CP:datatype-normalization> are set to <DOM:true>, 
+          depending on the attribute normalization used, the 
+          attribute values may differ from the ones by XML 1.0.
+      \
+        - If the parameter <CP:datatype-normalization> is set to <DOM:false>, 
+          the XML 1.0 attribute normalization is guaranteed to occur.
+      \
+      }
+      \
+      }
+  @ImplNote:
+    @@lang:en
+    @@@:
+      Asynchronous <IF:LSParser> are expected to also implement 
+      <IF:EventTarget> so that event listeners can be registered.
+      \
+      {FIG:: Events supported by asyncronous <IF:LSParser> objects
+      \
+        - <EV:LSEV:load>:: The <IF:LSParser> finishes to load the document.
+                      (<IF:LSLoadEvent>)
+      \
+        - <EV:LSEV:progress>:: The <IF:LSParser> signals progress as 
+                          data is parsed.  When <EV:LSEV:progress> should be 
+                          dispatched is implementation dependent. 
+                          The DOM implementation can choose not to 
+                          dispatch at all. (<IF:LSProgressEvent>)
+      }
+  @Attr:
+     @@Name:  domConfig
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The configuration object used when parsing an input source. 
+       \
+         Note that this configuration is specific to the parse 
+         operation.  No parameter values from this 
+         configuration object are passed automatically to the 
+         configuration object on the <IF:Document> that is created, or 
+         used, by the parse operation.
+     @@Get:
+        @@@Type:  DOMConfiguration
+  @Attr:
+     @@Name:  filter
+     @@Get:
+        @@@Type:  LSParserFilter
+     @@Set:
+        @@@Type:  LSParserFilter
+  @Attr:
+     @@Name:  async
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               This <IF:LSParser> is in asynchronous mode.
+        @@@InCase:
+           @@@@Value:  false
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               This <IF:LSParser> is in synchronous mode.
+  @Attr:
+     @@Name:  busy
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               This <IF:LSParser> is currently busy loading a document.
+        @@@InCase:
+           @@@@Value:  false
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@: Otherwise.
+  @Method:
+     @@Name:  parse
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Parse an XML document from a resource identified by a 
+         <IF:LSInput>.
+     @@Param:
+        @@@Name:  input
+        @@@Type:  LSInput
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The <IF:LSInput> object from which the source of 
+            the document is to be read.
+     @@Return:
+        @@@Type:  Document
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The newly created and populated <IF:Document>.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The <IF:LSParser> is asynchronous.
+        @@@Exception:
+           @@@@Name:  INVALID_STATE_ERR
+           @@@@Type:
+              DOMCore:DOMException
+           @@@@SubType:
+             @@@@@QName:
+               ManakaiDOMLS:MDOMLS_BUSY
+             @@@@@Description:
+               @@@@@@lang:en
+               @@@@@@@:
+                 <A:LSParser.busy> is <DOM:true>.
+        @@@Exception:
+           @@@@Name:  PARSE_ERR
+           @@@@Type:  LSException
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The <IF:LSParser> was unable to load the XML document. 
+           @@@@ImplNote:
+             @@@@@lang:en
+             @@@@@@:
+               DOM applications should use an error handler to get 
+               details on the error.
+  @Method:
+     @@Name:  parseURI
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Parse an XML document from a location identified by a 
+         URI reference <SRC:<CITE:RFC 2396>>.
+     @@Param:
+        @@@Name:  uri
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The location of the XML document to be read, 
+            as a URI reference <SRC:<CITE:RFC 2396>>.
+          \
+            If the URI reference contains a fragment identifier, 
+            the behavior is undefined; it may be defined in future 
+            version of the DOM specification.
+     @@Return:
+        @@@Type:  Document
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The newly created and populated <IF:Document>.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The <IF:LSParser> is asynchronous.
+        @@@Exception:
+           @@@@Name:  INVALID_STATE_ERR
+           @@@@Type:
+              DOMCore:DOMException
+           @@@@SubType:
+             @@@@@QName:
+               ManakaiDOMLS:MDOMLS_BUSY
+             @@@@@Description:
+               @@@@@@lang:en
+               @@@@@@@:
+                 <A:LSParser.busy> is <DOM:true>.
+        @@@Exception:
+           @@@@Name:  PARSE_ERR
+           @@@@Type:  LSException
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The <IF:LSParser> was unable to load the XML document. 
+           @@@@ImplNote:
+             @@@@@lang:en
+             @@@@@@:
+               DOM applications should use an error handler to get 
+               details on the error.
+  @ConstGroup:
+     @@Name:  ACTION_TYPES
+     @@Type:
+        DOMMain:unsigned-short
+     @@Description:
+       @@@lang:en
+       @@@@:
+         A set of possible actions for the <M:LSParser.parseWithContext>.
+     @@Const:
+        @@@Name:  ACTION_APPEND_AS_CHILDREN
+        @@@Type:
+           DOMMain:unsigned-short
+        @@@Value:  1
+     @@Const:
+        @@@Name:  ACTION_REPLACE_CHILDREN
+        @@@Type:
+           DOMMain:unsigned-short
+        @@@Value:  2
+     @@Const:
+        @@@Name:  ACTION_INSERT_BEFORE
+        @@@Type:
+           DOMMain:unsigned-short
+        @@@Value:  3
+     @@Const:
+        @@@Name:  ACTION_INSERT_AFTER
+        @@@Type:
+           DOMMain:unsigned-short
+        @@@Value:  4
+     @@Const:
+        @@@Name:  ACTION_REPLACE
+        @@@Type:
+           DOMMain:unsigned-short
+        @@@Value:  5
+  @Method:
+     @@Name:  parseWithContext
+     @@Param:
+        @@@Name:  input
+        @@@Type:  LSInput
+     @@Param:
+        @@@Name:  contextArg
+        @@@Type:  Node
+     @@Param:
+        @@@Name:  action
+        @@@Type:
+           DOMMain:unsigned-short
+     @@Return:
+        @@@Type:  Node
+        @@@Exception:
+           @@@@Name:  ** TBD **
+           @@@@Type:
+              DOMCore:DOMException
+        @@@Exception:
+           @@@@Name:  ** TBD **
+           @@@@Type:  LSException
+  @Method:
+     @@Name:  abort
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Abort the loading of the document that is currently being 
+         loaded by this <IF:LSParser>.
+       \
+         If the <IF:LSParser> is currently not busy, this method does nothing.
+     @@Return: 
+
+IF:
+  @Name:  LSInput
+  @Description:
+    @@lang:en
+    @@@:
+      An input source for data.
+      \
+    \  <IF:LSInput> objects belong to DOM applications and the 
+      DOM implementation will never modify them.
+    \
+      With this interface, a DOM application is able to encapsulate 
+      information about an input source in a single document, which 
+      may include a public identifier, a system identifier, 
+      a byte stream, a base URI and/or a character stream.
+    \
+      The DOM application can either provide its own objects that 
+      implement this interface or it can use the generic factor 
+      method <M:DOMImplementationLS.createLSInput> to create 
+      objects that implement this interface.
+    \
+      {P:: The <IF:LSParser> will use the <IF:LSInput> object to 
+      determine how to read data.  The first one, in the following 
+      order, that is not <DOM:null> and not an empty string will be used:
+      \
+      = <A:LSInput.characterStream>
+      \
+      = <A:LSInput.byteStream>
+      \
+      = <A:LSInput.stringData>
+      \
+      = <A:LSInput.systemId>
+      \
+      = <A:LSInput.publicId>
+      \
+      }
+      \
+      If all inputs are <DOM:null>, the <IF:LSParser> will report a 
+      <IF:DOMError> (<ERR:no-input-specified>).
+  @ImplNote:
+    @@lang:en
+    @@@: The DOM implementation may make copies and modify it if necessary.
+  @ImplNote:
+    @@lang:en
+    @@@:
+      The exact definitions of a byte stream and a character stream
+      are binding dependent.
+  @ImplNote:
+    @@lang:en
+    @@@:
+      Properties available:
+      <Q:infoset:publicIdentifier>, <Q:infoset:systemIdentifier>, 
+      <Q:infoset:baseURI>, <Q:infoset:characterEncodingScheme>, 
+      <Q:DOMLS:certifiedText>, <Q:DOMLS:stringData>.
+      
+  @Attr:
+     @@Name:  characterStream
+     @@Description:
+       @@@lang:en
+       @@@@:
+         A sream of 16-bit units.
+       \
+         The document in the stream need not have an XML declaration. 
+         If an XML declaration is present, the <XML:encoding> 
+         declaration will be ignored.
+       \
+         Depending on the binding in use, this attribute may not be
+         available.
+     @@Get:
+        @@@Type:  LSReader
+     @@Set:
+        @@@Type:  LSReader
+  @Attr:
+     @@Name:  byteStream
+     @@Description:
+       @@@lang:en
+       @@@@:
+         A stream of bytes.
+     @@Get:
+        @@@Type:  LSInputStream
+     @@Set:
+        @@@Type:  LSInputStream
+  @Attr:
+     @@Name:  stringData
+     @@Description:
+       @@@lang:en
+       @@@@:
+         String data to parse.
+       \
+         The document in the data need not have an XML declaration. 
+         If an XML declaration is present, the <XML:encoding> 
+         declaration will be ignored.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMLS:stringData
+     @@Set:
+        @@@Type:  DOMString
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@SetProp:
+            DOMLS:stringData
+  @Attr:
+     @@Name:  systemId
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The system identifier or a URI reference <SRC:<CITE:RFC 2396>> 
+         for this input source.
+       \
+         Even if other input source is specified, this is still 
+         useful to resolve any relative URIs or to include it 
+         in error messages and warnings.
+       \
+         If the specified system identifier is a relative URI reference, 
+         the DOM implementation will attempt to resolve the relative URI 
+         with the <A:baseURI>.  If that fails, the behavior is 
+         implementation dependent.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            infoset:systemIdentifier
+     @@Set:
+        @@@Type:  DOMString
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@SetProp:
+            infoset:systemIdentifier
+  @Attr:
+     @@Name:  publicId
+     @@Description:
+        @@@lang:en
+        @@@@:
+          The public identifier for this input source.
+         \
+          This may be mapped to an input source using a DOM implementation 
+          dependent mechanism.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            infoset:publicIdentifier
+     @@Set:
+        @@@Type:  DOMString
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@SetProp:
+            infoset:publicIdentifier
+  @Attr:
+     @@Name:  baseURI
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The base URI to be used for resolving a relative 
+         <P:systemId> to an absolute URI.
+        \
+         If, when used, the base URI is a relative URI, including 
+         empty string, or <DOM:null>, the behavior is implementation 
+         dependent.
+     @@Get:
+        @@@Type:
+          ManakaiDOM:ManakaiDOMURI
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            infoset:baseURI
+     @@Set:
+        @@@Type:
+          ManakaiDOM:ManakaiDOMURI
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@SetProp:
+            @@@@@@:
+              infoset:baseURI
+            @@@@@warn-if:
+              ManakaiDOM:isNull
+            @@@@@warn-if: 
+              ManakaiDOM:isRelativeURI
+  @Attr:
+     @@Name:  encoding
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The character encoding, if known.
+        \
+         This attribute has no effect when the DOM application provides 
+         a character stream or string data.  For other sources, 
+         the <A:encoding> will override any encoding specified in the 
+         XML or text declaration or higher level protocol.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            infoset:characterEncodingScheme
+     @@Set:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The encoding name acceptable for an XML 1.0 <XML:encoding> 
+            declaration <SRC:<CITE:XML 1.0> 4.3.3 Character Encoding in 
+            Entities>.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@SetProp:
+            infoset:characterEncodingScheme
+  @Attr:
+     @@Name:  certifiedText
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMLS:certifiedText
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               Assume that the input is certified 
+               <SRC:<CITE:XML 1.1> 2.13 Normalization Checking> when 
+               parsing an XML 1.1 document.
+        @@@InCase:
+           @@@@Value:  false
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@SetProp:
+            DOMLS:certifiedText
+
+  @IntMethod:
+    @@Name:new
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Construct a new instance of the <IF:LSInput>.
+    @@Operator:
+      @@@Type:
+        lang:Perl
+      @@@@:new
+    @@Return:
+      @@@Type:LSInput
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The newly created <IF:LSInput> object.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = __CLASS{ManakaiDOMNodeObject::}__->__INT{new}__
+                                           ## Condition sensitive
+                 ->__INT{newReference}__ ('__CLASS{LSInput}__');
+   @@Level[list]:3
+##IF:LSInput
+
+IF:
+  @Name:  LSResourceResolver
+  @Description:
+    @@lang:en
+    @@@:
+      Resolve references to external resources when parsing.
+  @Method:
+     @@Name:  resolveResource
+     @@Param:
+        @@@Name:  type
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  publicId
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  systemId
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  baseURI
+        @@@Type:  DOMString
+     @@Return:
+        @@@Type:  LSInput
+
+IF:
+  @Name:  LSParserFilter
+  @Description:
+    @@lang:en
+    @@@:
+      Examine and remove nodes as they are being processed while parsing.
+  @ConstGroup:
+     @@FullName:
+        @@@@:
+        Constants returned by startElement and acceptNode
+        @@@lang:  en
+     @@Type:
+        DOMMain:short
+     @@Const:
+        @@@Name:  FILTER_ACCEPT
+        @@@Type:
+           DOMMain:short
+        @@@Value:  1
+     @@Const:
+        @@@Name:  FILTER_REJECT
+        @@@Type:
+           DOMMain:short
+        @@@Value:  2
+     @@Const:
+        @@@Name:  FILTER_SKIP
+        @@@Type:
+           DOMMain:short
+        @@@Value:  3
+     @@Const:
+        @@@Name:  FILTER_INTERRUPT
+        @@@Type:
+           DOMMain:short
+        @@@Value:  4
+  @Method:
+     @@Name:  startElement
+     @@Param:
+        @@@Name:  elementArg
+        @@@Type:  Element
+     @@Return:
+        @@@Type:
+           DOMMain:unsigned-short
+  @Method:
+     @@Name:  acceptNode
+     @@Param:
+        @@@Name:  nodeArg
+        @@@Type:  Node
+     @@Return:
+        @@@Type:
+           DOMMain:unsigned-short
+  @Attr:
+     @@Name:  whatToShow
+     @@Get:
+        @@@Type:
+           DOMMain:unsigned-long
+
+IF:
+  @Name:  LSSerializer
+  @Description:
+    @@lang:en
+    @@@:
+      Serialize DOM documents or nodes.
+  @Attr:
+     @@Name:  domConfig
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The configuration object used when serializing a DOM node. 
+     @@Get:
+        @@@Type:  DOMConfiguration
+  @Attr:
+     @@Name:  newLine
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  filter
+     @@Get:
+        @@@Type:  LSSerializerFilter
+     @@Set:
+        @@@Type:  LSSerializerFilter
+  @Method:
+     @@Name:  write
+     @@Param:
+        @@@Name:  nodeArg
+        @@@Type:  Node
+     @@Param:
+        @@@Name:  destination
+        @@@Type:  LSOutput
+     @@Return:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+        @@@Exception:
+           @@@@Name:  ** TBD **
+           @@@@Type:  LSException
+  @Method:
+     @@Name:  writeToURI
+     @@Param:
+        @@@Name:  nodeArg
+        @@@Type:  Node
+     @@Param:
+        @@@Name:  uri
+        @@@Type:  DOMString
+     @@Return:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+        @@@Exception:
+           @@@@Name:  ** TBD **
+           @@@@Type:  LSException
+  @Method:
+     @@Name:  writeToString
+     @@Param:
+        @@@Name:  nodeArg
+        @@@Type:  Node
+     @@Return:
+        @@@Type:  DOMString
+        @@@Exception:
+           @@@@Name:  ** TBD **
+           @@@@Type:
+              DOMCore:DOMException
+        @@@Exception:
+           @@@@Name:  ** TBD **
+           @@@@Type:  LSException
+
+IF:
+  @Name:  LSOutput
+  @Description:
+    @@lang:en
+    @@@:
+      Information about the destination for the data to be output.
+  @Attr:
+     @@Name:  characterStream
+     @@Get:
+        @@@Type:  LSWriter
+     @@Set:
+        @@@Type:  LSWriter
+  @Attr:
+     @@Name:  byteStream
+     @@Get:
+        @@@Type:  LSOutputStream
+     @@Set:
+        @@@Type:  LSOutputStream
+  @Attr:
+     @@Name:  systemId
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  encoding
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+IF:
+  @Name:  LSProgressEvent
+  @ISA:
+     DOMEvents:Event
+  @Attr:
+     @@Name:  input
+     @@Get:
+        @@@Type:  LSInput
+  @Attr:
+     @@Name:  position
+     @@Get:
+        @@@Type:
+           DOMMain:unsigned-long
+  @Attr:
+     @@Name:  totalSize
+     @@Get:
+        @@@Type:
+           DOMMain:unsigned-long
+IF:
+  @Name:  LSLoadEvent
+  @ISA:
+     DOMEvents:Event
+  @Attr:
+     @@Name:  newDocument
+     @@Get:
+        @@@Type:  Document
+  @Attr:
+     @@Name:  input
+     @@Get:
+        @@@Type:  LSInput
+
+IF:
+  @Name:  LSSerializerFilter
+  @Description:
+    @@lang:en
+    @@@:
+      Examine and filter DOM nodes as they are being processed for 
+      the serialization.
+  @ISA:
+     DOMTraversal:NodeFilter
+  @Attr:
+     @@Name:  whatToShow
+     @@Get:
+        @@@Type:
+           DOMMain:unsigned-long
+
+
+## DOMLS.dis ends here
+

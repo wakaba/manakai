@@ -1,4 +1,6 @@
 Namespace:
+  @DOMLS:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
   @DOMXML:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @infoset:
@@ -7,6 +9,8 @@ Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOMLS:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-ls#
   @ManakaiDOMXML:
     http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
   @MDOM_EXCEPTION:
@@ -47,7 +51,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/09/27 03:54:23 $
+     $Date: 2004/09/27 12:11:53 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -340,6 +344,22 @@ Exception:
               both levels.
         @@@SubType:
           @@@@QName:
+            MDOM_EXCEPTION:MDOM_IMPL_NOSUPPORT_SCHEMA
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The DOM implementation does not support the schema language.
+          @@@@Param:
+            @@@@@QName:
+              DOMCore:schemaType
+            @@@@@Type:
+              ManakaiDOM:ManakaiDOMNamespaceURI
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The absolute URI representing the schema language requested.
+        @@@SubType:
+          @@@@QName:
             MDOM_EXCEPTION:MDOM_IMPL_NOSUPPORT_XML
           @@@@Description:
             @@@@@lang:en
@@ -373,11 +393,27 @@ Exception:
           @@@@Param:
             @@@@@QName:
               MDOM_EXCEPTION:param-name
+            @@@@@Type: 
+              DOMMain:DOMString
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
                 The name of the parameter that provides the node 
                 that does not support XML Namespaces.
+        @@@SubType:
+          @@@@QName:
+            ManakaiDOMLS:MDOMLS_IMPL_NOSUPPORT_MODE
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The DOM implementation does not support the requested mode.
+          @@@@Param: 
+            @@@@@QName:
+              DOMLS:mode
+            @@@@@Type:
+              DOMLS:DOMImplementationLSMode
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@: The requested mode.
      @@Const:
         @@@Name:  INUSE_ATTRIBUTE_ERR
         @@@Type:  unsigned-short
@@ -398,6 +434,12 @@ Exception:
           @@@@@:
             An attempt is made to use an object that is not (or no longer) 
             usable.
+        @@@SubType:
+          @@@@QName:
+            ManakaiDOMLS:MDOMLS_BUSY
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The parser is busy.
      @@Const:
         @@@Name:  SYNTAX_ERR
         @@@Type:  unsigned-short
@@ -1089,21 +1131,25 @@ IF:
     @@Name: add
     @@Description:
       @@@lang: en
-      @@@@: Add one or more "DOMImplementation"s to the list.
+      @@@@:
+        Add one or more <IF:DOMImplementation> objects to this list.
     @@Param:
       @@@Name: list
       @@@Type: DOMImplementationList
       @@@Description:
         @@@@lang:en
         @@@@@:
-          A list of "DOMImplementation"s to be added.
+          A list of <IF:DOMImplementation> objects to add.
       @@@InCase:
         @@@@Label:
-          One or more "DOMImplementation"s and/or "DOMImplementationList"s
+          One or more <IF:DOMImplementation> and/or 
+          <IF:DOMImplementationList> objects
         @@@@Description:
            @@@@@lang:en
            @@@@@@:
-             "DOMImplementation"s and/or lists of them to be added.
+           \  <IF:DOMImplementation> objects to add.
+         @@@@For:
+           lang:Perl
     @@Return:
       @@@Exception:
         @@@@Type:
@@ -1112,8 +1158,7 @@ IF:
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
-            The parameter specified is neither a DOMImplementation object 
-            or a DOMImplementationList object.
+            The <P:list> or its item is not a <IF:DOMImplementation> object.
       @@@Def:
         @@@@Type:
           lang:Perl
@@ -4380,10 +4425,12 @@ IF:
   @Description:
     @@lang:en
     @@@:
-      An ordered collection of nodes.  Objects contained in 
-      a "NodeList" may be accessed by an ordinal index, starting from zero.
+      An ordered collection of nodes.
     \
-      "NodeList" objects are live.
+      Node objects contained in a <IF:NodeList> may be accessed 
+      by an ordinal index, starting from zero.
+    \
+    \ <IF:NodeList> objects are <QUOTE:live>.
   @ImplNote:
     @@lang:en
     @@@:
@@ -4393,9 +4440,9 @@ IF:
     @@@:
       The actual process of the method and the attribute in this 
       interface is not defined here, since each use of this interface 
-      requires different treatment of it to be live object. 
+      requires different treatment of it to be <QUOTE:live> object. 
     \
-      See also "ManakaiDOMCore" module.
+      See also <Module:ManakaiDOMCore> module.
   @Method:
      @@Name:  item
      @@Description:
@@ -4452,14 +4499,14 @@ IF:
   @Description:
     @@lang:en
     @@@:
-      A collection of nodes that can be accessed by name.  The 
-      "NamedNodeMap" is not maintained in any particular order.  
-      Objects contained in a "NamedNodeMap" may also be accessed 
-      by an ordinal index, starting from zero, but this is simply 
-      to allow convenient enumeration of the contents of a "NamedNodeMap" 
-      and does not imply that the DOM specifies an order to these objects.
-   \
-      "NamedNodeMap" objects are live.
+      A unordered collection of nodes that can be accessed by name. 
+    \
+      Node objects contained in a <IF:NamedNodeMap> may also 
+      be accessed by an ordinal index, starting from zero. 
+      However, this is simply to allow convenient enumeration of 
+      a <IF:NamedNodeMap>.
+    \
+    \ <IF:NamedNodeMap> objects are <QUOTE:live>.
   @ImplNote:
     @@lang:en
     @@@:
@@ -4467,7 +4514,7 @@ IF:
       interface is not defined here, since each use of this interface 
       requires different treatment of it to be live object. 
     \
-      See also "ManakaiDOMCore" and "ManakaiDOMXML" modules.
+      See also <Module:ManakaiDOMCore> and <Module:ManakaiDOMXML> modules.
   @Method:
      @@Name:  getNamedItem
      @@Description:
@@ -9320,7 +9367,7 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: 
-              <DOM:true> will be returned.
+              \ <DOM:true> will be returned.
      @@Return:
         @@@Type:  boolean
         @@@InCase:
@@ -9860,6 +9907,12 @@ IF:
           @@@@lang:en
           @@@@@:
             This is an XML <XML:Name>, not an XML Names <XML:NCName>.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            The XML Specifications prohibit target names 
+            matching to <XML:xml> in any lower/upper-case. 
+            The DOM Specifications does not.
      @@Param:
         @@@Name:  data
         @@@Type:  DOMString
@@ -10146,7 +10199,8 @@ IF:
           @@@@@:
             The node to import.
             \
-            <IF:Document> or <IF:DocumentType> nodes cannot be imported.
+            Note that <IF:Document> or <IF:DocumentType> nodes cannot 
+            be imported.
      @@Param:
         @@@Name:  deep
         @@@Type:  boolean

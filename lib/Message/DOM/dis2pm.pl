@@ -130,6 +130,8 @@ sub perl_assign ($@) {
 
 sub perl_name ($;%) {
   my ($s, %opt) = @_;
+  valid_err q<Uninitialized value in name>, node => $opt{node}
+    unless defined $s;
   $s =~ s/[- ](.|$)/uc $1/ge;
   $s = ucfirst $s if $opt{ucfirst};
   $s = uc $s if $opt{uc};
@@ -253,7 +255,8 @@ $RegBlockContent = qr/(?>[^{}\\]*)(?>(?>[^{}\\]+|\\.|\{(??{$RegBlockContent})\})
 sub perl_code ($;%);
 sub perl_code ($;%) {
   my ($s, %opt) = @_;
-  valid_err q<Uninitialized value in perl_code> unless defined $s;
+  valid_err q<Uninitialized value in perl_code>,
+    node => $opt{node} unless defined $s;
   $s =~ s[<Q:([^<>]+)>|\b(null|true|false)\b][
     my ($q, $l) = ($1, $2);
     if (defined $q) {
@@ -964,6 +967,7 @@ sub pod_list ($@) {
 
 sub pod_item ($) {
   my ($s) = @_;
+  valid_err q<Uninitialized value in pod_item> unless defined $s;
   $s =~ s/\s+/ /g;
   '=item ' . $s;
 }
@@ -1037,6 +1041,8 @@ sub pod_link (%) {
   my %opt = @_;
   if ($opt{section}) {
     qq<L</"$opt{section}">>;
+  } elsif ($opt{module}) {
+    qq<L<$opt{module}>>;
   } else {
     impl_err q<Bad parameter for "pod_link">;
   }
@@ -1085,6 +1091,8 @@ sub qname_label ($;%) {
   if ($q =~ s/^([^:]*)://) {
     $prefix = $1;
   }
+
+  if ($prefix ne DEFAULT_PFX or not $opt{no_default_ns}) {
       if (defined $Info->{Namespace}->{$prefix}) {
         my $uri = $Info->{Namespace}->{$prefix};
         if (defined $Status->{ns_in_doc}->{$prefix}) {
@@ -1110,12 +1118,13 @@ sub qname_label ($;%) {
         valid_err q<Namespace prefix "$prefix" not defined>,
           node => $node->get_attribute ('QName');
       } 
+  }
 
   $opt{out_type} ||= ExpandedURI q<DOMMain:any>;
   if ($opt{out_type} eq ExpandedURI q<lang:pod>) {
-    pod_code qq<$prefix:$q>;
+    pod_code ($prefix eq DEFAULT_PFX ? $q : qq<$prefix:$q>);
   } else {
-    qq<"$prefix:$q">;
+    $prefix eq DEFAULT_PFX ? qq<"$q"> : qq<"$prefix:$q">;
   }
 }
 
@@ -1383,6 +1392,53 @@ my $MElement = qr/([A-Za-z0-9]+)(?>:((?>[^<>]*)(?>(?>[^<>]+|<(??{$Element})>)*))
 sub disdoc2text ($;%);
 sub disdoc2text ($;%) {
   my ($s, %opt) = @_;
+  $s =~ s/\x0D\x0A/\x0A/g;
+  $s =~ tr/\x0D/\x0A/;
+  my @s = split /\x0A\x0A+/, $s;
+  my @r;
+  for my $s (@s) {
+    if ($s =~ s/^\{([0-9A-Za-z-]+)::\s*//) { ## Start tag'ed element
+      my $et = $1;
+      if ($et eq 'P') { ## Paragraph
+        push @r, (disdoc_inline2text ($s, %opt));
+      } elsif ($et eq 'LI' or $et eq 'OLI') { ## List
+        my $marker = '* ';
+        if ($et eq 'OLI') {
+          $marker = '# ';
+        }
+        if ($s =~ s/^(.+?)::\s*//) {
+          $marker = disdoc_inline2text ($1, %opt) . ': ';
+        }
+        push @r, $marker . (disdoc_inline2text ($s, %opt));
+      } else {
+        valid_err qq<Unknown DISDOC element type "$et">, node => $opt{node};
+      }
+    } elsif ($s =~ /^\}\s*$/) { ## End tag
+      #
+    } elsif ($s =~ s/^([-=])\s*//) { ## List
+      my $marker = $1;
+      if ($marker eq '=') {
+        $marker = '# ';
+      } elsif ($marker eq '-') {
+        $marker = '* ';
+      }
+      if ($s =~ s/^(.+?)::\s*//) {
+        $marker = disdoc_inline2text ($1, %opt) . ': ';
+      }
+      push @r, $marker . (disdoc_inline2pod ($s, %opt));
+    } elsif ($s =~ /^[^\w\s]/) { ## Reserved for future extension
+      valid_err qq<Broken DISDOC: "$s">, node => $opt{node};
+    } else {
+      $s =~ s/^\s+//;
+      push @r, disdoc_inline2text ($s, %opt);
+    }
+  }
+  join "\n\n", @r;
+} # disdoc2text
+
+sub disdoc_inline2text ($;%);
+sub disdoc_inline2text ($;%) {
+  my ($s, %opt) = @_;
   $s =~ s{\G(?:([^<>]+)|<$MElement>|(.))}{
     my ($cdata, $type, $data, $err) = ($1, $2, defined $3 ? $3 : '', $4);
     my $r = '';
@@ -1391,17 +1447,24 @@ sub disdoc2text ($;%) {
         node => $opt{node};
     } elsif (defined $cdata) {
       $r = $cdata;
-    } elsif ({CODE => 1}->{$type}) {
-      $r = disdoc2text $data;
+    } elsif ({DFN => 1, CITE => 1}->{$type}) {
+      $r = disdoc_inline2text $data;
     } elsif ({SRC => 1}->{$type}) {
-      $r = q<[>. disdoc2text ($data) . q<]>;
+      $r = q<[>. disdoc_inline2text ($data) . q<]>;
     } elsif ({URI => 1}->{$type}) {
       $r = q{<} . $data . q{>};
+    } elsif ({CODE => 1, Perl => 1}->{$type}) {
+      $r = q<"> . disdoc_inline2text ($data) . q<">;
     } elsif ({IF => 1, TYPE => 1, P => 1, XML => 1, SGML => 1, DOM => 1,
-              Feature => 1, FeatureVer => 1, CHAR => 1, HTML => 1,
+              FeatureVer => 1, CHAR => 1, HTML => 1, Prefix => 1,
               Module => 1, QUOTE => 1}->{$type}) {
       $r = q<"> . $data . q<">;
-    } elsif ({Q => 1}->{$type}) {
+    } elsif ({Feature => 1, CP => 1, ERR => 1,
+              HA => 1, HE => 1, XA => 1, SA => 1, SE => 1}->{$type}) {
+      $r = qname_label (undef, qname => $data,
+                        no_default_ns => 1);
+    } elsif ({Q => 1, EV => 1, 
+              XE => 1}->{$type}) {
       $r = qname_label (undef, qname => $data);
     } elsif ({M => 1, A => 1, X => 1, WARN => 1}->{$type}) {
       if ($data =~ /^([^.]+)\.([^.]+)$/) {
@@ -1422,10 +1485,96 @@ sub disdoc2text ($;%) {
     $r;
   }ges;
   $s;
-}
+} # disdoc_inline2text
 
 sub disdoc2pod ($;%);
 sub disdoc2pod ($;%) {
+  my ($s, %opt) = @_;
+  $s =~ s/\x0D\x0A/\x0A/g;
+  $s =~ tr/\x0D/\x0A/;
+  my @s = split /\x0A\x0A+/, $s;
+  my @el = ({type => '#document'});
+  my @r;
+  for my $s (@s) {
+    if ($s =~ s/^\{([0-9A-Za-z-]+)::\s*//) { ## Start tag'ed element
+      my $et = $1;
+      if ($el[-1]->{type} eq '#list' and
+          not {qw/LI 1 OLI 1/}->{$et}) {
+        push @r, '=back';
+        pop @el;
+      }
+      push @el, {type => $et};
+      if ($et eq 'P') { ## Paragraph
+        push @r, pod_para (disdoc_inline2pod ($s, %opt));
+      } elsif ($et eq 'LI' or $et eq 'OLI') { ## List
+        my $marker = '*';
+        unless ($el[-1]->{type} eq '#list') {
+          push @el, {type => '#list', n => 0};
+          push @r, '=over 4';
+        }
+        if ($et eq 'OLI') {
+          $marker = ++($el[-1]->{n}) . '. ';
+        }
+        if ($s =~ s/^(.+?)::\s*//) {
+          $marker = disdoc_inline2pod ($1, %opt);
+        }
+        push @r, pod_item ($marker), pod_para (disdoc_inline2pod ($s, %opt));
+      } else {
+        valid_err qq<Unknown DISDOC element type "$et">, node => $opt{node};
+      }
+    } elsif ($s =~ /^\}\s*$/) { ## End tag
+      while (@el > 1 and $el[-1]->{type} =~ /^\#/) {
+        if ($el[-1]->{type} eq '#list') {
+          push @r, '=back';
+        }
+        pop @el;
+      }
+      if ($el[-1]->{type} eq '#document') {
+        valid_err qq<Unmatched DISDOC end tag>, node => $opt{node};
+      } else {
+        pop @el;
+      }
+    } elsif ($s =~ s/^([-=])\s*//) { ## List
+      my $marker = $1;
+      unless ($el[-1]->{type} eq '#list') {
+        push @el, {type => '#list', n => 0};
+        push @r, '=over 4';
+      }
+      if ($marker eq '=') {
+        $marker = ++($el[-1]->{n}) . '. ';
+      } elsif ($marker eq '-') {
+        $marker = '*';
+      }
+      if ($s =~ s/^(.+?)::\s*//) {
+        $marker = disdoc_inline2pod ($1, %opt);
+      }
+      push @r, pod_item ($marker), pod_para (disdoc_inline2pod ($s, %opt));
+    } elsif ($s =~ /^[^\w\s]/) { ## Reserved for future extension
+      valid_err qq<Broken DISDOC: "$s">, node => $opt{node};
+    } else {
+      if ($el[-1]->{type} eq '#list') {
+        push @r, '=back';
+        pop @el;
+      }
+      $s =~ s/^\s+//;
+      push @r, pod_para disdoc_inline2pod ($s, %opt);
+    }
+  }
+  while (@el and $el[-1]->{type} =~ /^\#/) {
+    if ($el[-1]->{type} eq '#list') {
+      push @r, '=back';
+    }
+    pop @el;
+  }
+  if (@el) {
+    valid_err qq[DISDOC end tag required for "$el[-1]->{type}"],
+        node => $opt{node};
+  }
+  wantarray ? @r : join "\n\n", @r;
+} # disdoc2pod
+
+sub disdoc_inline2pod ($;%);
+sub disdoc_inline2pod ($;%) {
   my ($s, %opt) = @_;
   $s =~ s{\G(?:([^<>]+)|<$MElement>|(.))}{
     my ($cdata, $type, $data, $err) = ($1, $2, defined $3 ? $3 : '', $4);
@@ -1436,18 +1585,28 @@ sub disdoc2pod ($;%) {
     } elsif (defined $cdata) {
       $r = pod_cdata $cdata; 
     } elsif ({CODE => 1}->{$type}) {
-      $r = pod_code disdoc2pod $data;
+      $r = pod_code disdoc_inline2pod $data;
+    } elsif ({DFN => 1}->{$type}) {
+      $r = pod_dfn disdoc_inline2pod $data;
+    } elsif ({CITE => 1}->{$type}) {
+      $r = q[I<] . disdoc_inline2pod ($data) . q[>];
     } elsif ({SRC => 1}->{$type}) {
-      $r = q<[>. disdoc2pod ($data) . q<]>;
+      $r = q<[>. disdoc_inline2pod ($data) . q<]>;
     } elsif ({URI => 1}->{$type}) {
-      $r = q{L<} . $data . q{>};
+      $r = pod_uri $data;
     } elsif ({
               IF => 1, TYPE => 1, P => 1, DOM => 1, XML => 1, HTML => 1,
-              SGML => 1, Feature => 1, FeatureVer => 1, CHAR => 1,
-              Module => 1,
+              SGML => 1, FeatureVer => 1, CHAR => 1, Prefix => 1,
+              Module => 1, Perl => 1,
              }->{$type}) {
       $r = pod_code $data;
-    } elsif ({Q => 1}->{$type}) {
+    } elsif ({Feature => 1, CP => 1, ERR => 1,
+              HA => 1, HE => 1, XA => 1, SA => 1, SE => 1}->{$type}) {
+      $r = qname_label (undef, qname => $data,
+                        out_type => ExpandedURI q<lang:pod>,
+                        no_default_ns => 1);
+    } elsif ({Q => 1, EV => 1, 
+              XE => 1}->{$type}) {
       $r = qname_label (undef, qname => $data,
                         out_type => ExpandedURI q<lang:pod>);
     } elsif ({
@@ -1515,9 +1674,13 @@ sub get_description ($;%) {
       unless defined $value;
     if ($srctype eq ExpandedURI q<lang:disdoc>) {
       if ($opt{type} eq ExpandedURI q<lang:pod>) {
-        $value = disdoc2pod ($value, node => $def);
+        $value = $opt{is_inline} ?
+                   disdoc_inline2pod ($value, node => $def):
+                   disdoc2pod ($value, node => $def);
       } else {
-        $value = disdoc2text ($value, node => $def); 
+        $value = $opt{is_inline} ?
+                   disdoc_inline2text ($value, node => $def):
+                   disdoc2text ($value, node => $def); 
       }
     } elsif ($srctype eq ExpandedURI q<lang:muf>) {
       if ($opt{type} eq ExpandedURI q<lang:muf>) {
@@ -1663,8 +1826,14 @@ sub get_isa_description ($;%) {
     next unless $_->node_type eq '#element' and
                 $_->local_name eq 'ISA';
     my $v = $_->value;
-    $v =~ s/::[^:]*$//g;
-    push @isa, type_label (type_expanded_uri ($v), is_pod => 1);
+    if (type_expanded_uri $_->get_attribute_value ('Type',
+                                                   default => 'DOMMain:any') eq
+        ExpandedURI q<lang:Perl>) {
+      push @isa, pod_link (module => $v);
+    } else {
+      $v =~ s/::[^:]*$//g;
+      push @isa, type_label (type_expanded_uri ($v), is_pod => 1);
+    }
   }
   push @desc, pod_para (qq<This $opt{if} inherits >.
                         english_list (\@isa, connector => 'and').q<.>)
@@ -1700,6 +1869,8 @@ sub get_incase_label ($;%) {
     } else {
       $label = type_label $type, is_pod => $opt{is_pod};
     }
+  } else {
+    $label = get_description $node, name => 'Label', is_inline => 1;
   }
   $label;
 }
@@ -2553,7 +2724,8 @@ sub attr2perl ($;%) {
         $mcode = dis2perl $_->{code_node};
       } else {
         $mcode = perl_code $_->{code_node}->value,
-                           internal => $_->{internal};
+                           internal => $_->{internal},
+                           node => $_->{code_node};
       }
       if ($mcode =~ /^\s*$/) {
         ${$_->{code}} = '';
@@ -2740,6 +2912,7 @@ sub attr2perl ($;%) {
                     ExpandedURI q<MDOM_EXCEPTION:attr> => $Status->{Method},
                     ExpandedURI q<MDOM_EXCEPTION:on> => 'set',
                   };
+    @set_desc = pod_item '(Not implemented yet)';
     @set_xcept = ();
     push @set_xcept, pod_item ('Exception: ' . pod_code ('DOMException') . '.' .
                             pod_code ('NOT_SUPPORTED_ERR')),
@@ -2750,9 +2923,9 @@ sub attr2perl ($;%) {
   
   if ($has_set) {
     push @desc, pod_para ('DOM applications can set the value by:'),
-                pod_pre (qq{\$obj->$m_name (\$given)}),
+                pod_pre (qq{\$obj->$m_name (\$newValue)}),
                 pod_list 4, 
-                  pod_item (pod_code q<$given>),
+                  pod_item (pod_code q<$newValue>),
                   pod_list 4, @set_desc;
     push @desc, (@set_xcept ?
                     (pod_para (q<Setting this attribute may raise exception:>),
@@ -2907,8 +3080,8 @@ sub datatypealias2perl ($;%) {
   if (type_label ($real_long_name) eq type_label ($long_name)) {
     $Info->{DataTypeAlias}->{$long_name}->{canon_uri} = $real_long_name;
     return perl_comment sprintf '%s <%s> := %s <%s>',
-                                type_label $long_name, $long_name,
-                                type_label $real_long_name, $real_long_name;
+                                type_label ($long_name), $long_name,
+                                type_label ($real_long_name), $real_long_name;
   }
   $Info->{DataTypeAlias}->{$long_name}->{canon_uri} = $real_long_name;
   
@@ -2942,7 +3115,8 @@ sub datatypealias2perl ($;%) {
 
   for (@{$node->child_nodes}) {
     if ({qw/Name 1 FullName 1 Spec 1 Type 1 Description 1
-            Level 1 SpecLevel 1 Condition 1 ImplNote 1/}->{$_->local_name}) {
+            Level 1 SpecLevel 1 Condition 1 ImplNote 1
+            Def 1/}->{$_->local_name}) {
       #
     } else {
       valid_warn qq{Element @{[$_->local_name]} not supported};
@@ -3062,16 +3236,20 @@ sub exception2perl ($;%) {
 sub constgroup2perl ($;%);
 sub constgroup2perl ($;%) {
   my ($node, %opt) = @_;
-  local $Status->{depth} = $Status->{depth} + 1;
-  my $name = perl_name $node->get_attribute_value ('Name'), ucfirst => 1;
-  local $Status->{IF} = $name;
+  local $Status->{depth} = $Status->{depth} + 1; 
+  my $name = $node->get_attribute ('Name');
+  if (defined $name) {
+    $name = perl_name $name->value, ucfirst => 1;
+  }
+  local $Status->{IF} = $name || q<[anonymous constant group]>;
   my @level = @{$opt{level} || []};
   my $mod = get_level_description $node, level => \@level;
   my $result = '';
   my $consts = {};
   $Info->{DataTypeAlias}->{expanded_uri $node->get_attribute_value ('Name')}
        ->{isa_uri} = [type_expanded_uri $node->get_attribute_value
-                                         ('Type', default => q<DOMMain:any>)];
+                                         ('Type', default => q<DOMMain:any>)]
+         if defined $name;
 
   my $i = 0;
   {
@@ -3105,7 +3283,8 @@ sub constgroup2perl ($;%) {
                                        => $opt{any_unless_condition});
         $i++;
       } elsif ({qw/Name 1 Spec 1 ISA 1 Description 1 Type 1 IsBitMask 1
-                   Level 1 SpecLevel 1 Def 1 ImplNote 1/}->{$_->local_name}) {
+                   Level 1 SpecLevel 1 Def 1 ImplNote 1
+                   FullName 1/}->{$_->local_name}) {
         #
       } else {
         valid_warn qq{Element @{[$_->local_name]} not supported};
@@ -3115,23 +3294,32 @@ sub constgroup2perl ($;%) {
   
   for (keys %$consts) {
     $Status->{EXPORT_OK}->{$_} = 1;
-    $Status->{EXPORT_TAGS}->{$name}->{$_} = 1;
+    $Status->{EXPORT_TAGS}->{$name}->{$_} = 1 if defined $name;
   }
     
   return $result if $opt{without_document};
 
-  $result = pod_block
-              (pod_head ($Status->{depth}, 'Constant Group ' . pod_code $name),
-               pod_paras (get_description ($node)),
+  my @desc;
+  if (defined $name) {
+    push @desc, pod_head $Status->{depth}, 'Constant Group ' . pod_code $name;
+  } else {
+    push @desc, pod_head $Status->{depth}, 'Constant Group: ' .
+                                get_description ($node,
+                                                 name => 'FullName');
+  }
+
+  push @desc,  pod_paras (get_description ($node)),
                ($mod ? pod_para ('This constant group has been ' . $mod . '.')
                     : ()),
                pod_para ('This constant group has ' .
                          english_number $i, singular => q<value.>,
-                                            plural => q<values.>),
-               pod_para ('To export all constant values in this group:'),
+                                            plural => q<values.>);
+
+  push @desc,  pod_para ('To export all constant values in this group:'),
                pod_pre (perl_statement "use $Info->{Package} qw/:$name/")
-              ) .
-            $result;
+                 if defined $name;
+  
+  $result = pod_block (@desc) . $result;
 
   $result;
 } # constgroup2perl
@@ -3591,7 +3779,7 @@ for my $node (@{$source->child_nodes}) {
     $result .= constgroup2perl $node;
   } elsif ($node->local_name eq 'Const') {
     $result .= const2perl $node;
-  } elsif ($node->local_name eq 'Module' or $node->local_name eq 'Namespace') {
+  } elsif ({qw/Module 1 Namespace 1 ImplNote 1/}->{$node->local_name}) {
     #
   } else {
     valid_warn qq{Top-level element type "@{[$node->local_name]}" not supported};
@@ -3928,6 +4116,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/09/27 03:54:24 $
+# $Date: 2004/09/27 12:11:53 $
 
 
