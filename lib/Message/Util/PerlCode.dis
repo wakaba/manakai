@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/03/16 09:08:14 $
+      $Date: 2005/03/30 03:16:43 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1434,11 +1434,7 @@ ClsDef:
                 if defined $node->{<Q::pc:prototype>};
         $r .= " {\n";
         for my $cno (@{$node->{<Q::pc:childNodes>}}) {
-          my $cn;
-          __CODE{ManakaiNode:getNewReference::
-            $object => $cno, $ref => $cn,
-            $class => {<ClassName::ManakaiPerlUnparsedCode>},
-          }__;
+          my $cn = <ClassM::ManakaiPerlCodeFragment.getNodeReference> ($cno);
           $r .= $cn->stringify;
         }
         $r .= "}\n";
@@ -2001,7 +1997,7 @@ ClsDef:
       @@@PerlDef:
         $r = <ClassM::ManakaiPerlAtom.newObject>;
         my $node = $self->{<Q::TreeCore:node>};
-        $r->{<Q::infoset:code>} = $codeArg;
+        $r->{<Q::pc:code>} = $codeArg;
         $node-><M::ManakaiDOM:ManakaiDOMNodeObject
                  ::ManakaiDOM:Perl.importTree> ($r);
         push @{$node->{<Q::pc:childNodes>}}, $r;
@@ -2023,7 +2019,7 @@ ClsDef:
       @@@Type: 
         lang:Perl::ManakaiDOM:all
       @@@enDesc:
-        An atom.
+        An bare code.
     @@Return:
       @@@Type: ManakaiPerlBare
       @@@enDesc:
@@ -2031,7 +2027,7 @@ ClsDef:
       @@@PerlDef:
         $r = <ClassM::ManakaiPerlBare.newObject>;
         my $node = $self->{<Q::TreeCore:node>};
-        $r->{<Q::infoset:code>} = $codeArg;
+        $r->{<Q::pc:code>} = $codeArg;
         $node-><M::ManakaiDOM:ManakaiDOMNodeObject
                  ::ManakaiDOM:Perl.importTree> ($r);
         push @{$node->{<Q::pc:childNodes>}}, $r;
@@ -2160,7 +2156,7 @@ ClsDef:
         Perl code. 
       @@@PerlDef:
         for my $cno (@{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}}) {
-          my $cn = $cno-><M::ManakaiPerlCodeFragment.getNodeReference> ($cno);
+          my $cn = <ClassM::ManakaiPerlCodeFragment.getNodeReference> ($cno);
           if ($cno->{<Q::pc:nodeType>} eq 'incontainer' and
    \          @{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}} == 1) {
             $r .= '(' . $cn->stringify . ')';
@@ -2367,7 +2363,7 @@ ClsDef:
           __CODE{ManakaiNode:getNewReference::
                    $object => $r, $ref => $r,
                    $class => {<ClassName::ManakaiPerlUnparsedCode>}}__;
-          $r-><M::ManakaiPerlUnparsedCode.code> ($codeArg) if defined $codeArg;
+          $r-><AS::ManakaiPerlUnparsedCode.code> ($codeArg) if defined $codeArg;
         }__;
 
   @Method:
@@ -2409,7 +2405,7 @@ ClsDef:
           __CODE{ManakaiNode:getNewReference::
                    $object => $r, $ref => $r,
                    $class => {<ClassName::ManakaiPerlInlineUnparsedCode>}}__;
-          $r-><M::ManakaiPerlInlineUnparsedCode.code> ($codeArg)
+          $r-><AS::ManakaiPerlInlineUnparsedCode.code> ($codeArg)
             if defined $codeArg;
         }__;
 
@@ -2433,7 +2429,7 @@ ClsDef:
           __CODE{ManakaiNode:getNewReference::
                    $object => $r, $ref => $r,
                    $class => {<ClassName::ManakaiPerlBare>}}__;
-          $r-><M::ManakaiPerlBare.code> ($codeArg);
+          $r-><AS::ManakaiPerlBare.code> ($codeArg);
         }__;
 
   @Method:
@@ -2456,7 +2452,7 @@ ClsDef:
           __CODE{ManakaiNode:getNewReference::
                    $object => $r, $ref => $r,
                    $class => {<ClassName::ManakaiPerlAtom>}}__;
-          $r-><M::ManakaiPerlBare.code> ($codeArg);
+          $r-><AS::ManakaiPerlBare.code> ($codeArg);
         }__;
 
   @Method:
@@ -2478,7 +2474,7 @@ ClsDef:
           __CODE{ManakaiNode:getNewReference::
                    $object => $r, $ref => $r,
                    $class => {<ClassName::ManakaiPerlStringLiteral>}}__;
-          $r-><M::ManakaiPerlStringLiteral.data> ($stringArg);
+          $r-><AS::ManakaiPerlStringLiteral.data> ($stringArg);
         }__;
 
   @Method:
@@ -2517,9 +2513,9 @@ ClsDef:
           __CODE{ManakaiNode:getNewReference::
                    $object => $r, $ref => $r,
                    $class => {<ClassName::ManakaiPerlVariable>}}__;
-          $r-><M::ManakaiPerlVariable.variableType> ($variableType);
-          $r-><M::ManakaiPerlVariable.packageName> ($packageName);
-          $r-><M::ManakaiPerlVariable.localName> ($localName);
+          $r-><AS::ManakaiPerlVariable.variableType> ($variableType);
+          $r-><AS::ManakaiPerlVariable.packageName> ($packageName);
+          $r-><AS::ManakaiPerlVariable.localName> ($localName);
         }__;
 ##PerlCodeImplementation
 
