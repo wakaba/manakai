@@ -71,9 +71,9 @@ my @field_type_Date = qw(date date-received delivery-date expires
 for (@field_type_Date)
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Date'}
 my @field_type_MsgID = qw(content-id in-reply-to message-id
-  references resent-message-id supersedes);
+  references resent-message-id see-also supersedes);
 for (@field_type_MsgID)
-  {$DEFAULT{field_type}->{$_} = 'Message::Field::Structured'}
+  {$DEFAULT{field_type}->{$_} = 'Message::Field::MsgID'}
 my @field_type_Received = qw(received x-received);
 for (@field_type_Received)
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Received'}
@@ -462,7 +462,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/20 09:56:52 $
+$Date: 2002/03/20 11:41:58 $
 
 =cut
 
