@@ -1,3 +1,15 @@
+2004-09-15  Wakaba  <wakaba@suika.fam.cx>
+
+	* dis2pm.pl (perl_builtin_code): __CODE{CheckNCName}__ implemented.
+	(perl_if): Don't indent if preprocessing direction found.
+	(perl_code_source): Add \n before the #line directive.
+
+2004-09-14  Wakaba  <wakaba@suika.fam.cx>
+
+	* dis2pm.pl (get_internal_code): __INT{{name}}__ syntax now support
+	attribute.
+	(perl_code): __SUPER{name}__ syntax implemented.
+
 2004-09-13  Wakaba  <wakaba@suika.fam.cx>
 
 	* dis2pm.pl (dis2perl): New.

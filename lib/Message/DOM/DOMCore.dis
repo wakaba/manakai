@@ -16,6 +16,10 @@ Namespace:
   @MDOM_EXCEPTION:
      http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @TreeCore: \
+  @xml:
+    http://www.w3.org/XML/1998/namespace
+  @xmlns:
+    http://www.w3.org/2000/xmlns/
 Module:
   @Name:  dom
     @@Prefix:  w3c.org
@@ -41,7 +45,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/13 03:06:34 $
+     $Date: 2004/09/15 04:05:39 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -886,10 +890,10 @@ IF:
           @@@@@@:
             Char::Class::XML
           @@@@@Import[list]:
-            InXMLNameChar
-            InXMLNameStartChar
-            InXMLNCNameChar
-            InXMLNCNameStartChar
+            InXMLNameChar10
+            InXML_NameStartChar10
+            InXMLNCNameChar10
+            InXML_NCNameStartChar10
     @@Condition[list]:
       DOM2
       DOM3
@@ -963,6 +967,7 @@ IF:
           @@@@lang:en
           @@@@@:
             The version number of the feature to test.
+        @@@IsOptional:1
         @@@InCase:
           @@@@Value: 1.0
           @@@@Description:
@@ -1104,7 +1109,8 @@ IF:
             lang:Perl
           @@@@@:
             __CODE{CheckNull: s => qualifiedName}__;
-            __CODE{CheckQName: qname => qualifiedName}__; # [DOM 2,3]
+            __CODE{CheckQName: version => 1.0,
+                               qname => qualifiedName}__; # [DOM 2,3]
             ## If namespace not supported: # [DOM 3]
             #__EXCEPTION{
             #  DOMException.NOT_SUPPORTED_ERR:
@@ -1131,8 +1137,13 @@ IF:
      @@ImplNote:
        @@@lang:en
        @@@@: 
-         HTML-only DOM Level 2 implementations do not need to implement 
-         this method.
+         The DOM Level 2 specification said that the HTML-only 
+         implementations do not need to implement this method.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Document creation is an operation specific to an 
+         implementation in the DOM Level 1.
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
@@ -1226,15 +1237,20 @@ IF:
               different from "http://www.w3.org/XML/1998/namespace" or
               the DOM implementation does not support the "XML" feature 
               but a non-null "namespaceURI" is provided.
-            \
-              In addition, if the "qualifiedName" has a prefix that is 
+         @@@ImplNote:
+           @@@@lang:en
+           @@@@@:
+              In addition, it is possible to raise an exception 
+              either if the "qualifiedName" has a prefix that is 
               "xmlns" and the "namespaceURI" is different from 
               "http://www.w3.org/2000/xmlns/", if the "namespaceURI" 
               is "http://www.w3.org/XML/1998/namespace" and the 
               "qualifiedName" has a prefix is different from "xml" or 
               if the "namespaceURI" is "http://www.w3.org/2000/xmlns/" 
-              and the "qualifiedName" has a prefix is different from "xmlns",
-              this DOM implementation raises this exception.
+              and the "qualifiedName" has a prefix is different from "xmlns".
+              But this DOM implementation only report a warning on 
+              these cases since the specification does not mention 
+              to raise any exception.
         @@@Exception:
           @@@@Type: DOMException
           @@@@Name: WRONG_DOCUMENT_ERR
@@ -1266,7 +1282,8 @@ IF:
           @@@@@:
             my ($prefix, $lname);
             if (defined $qualifiedName) {     
-              __CODE{CheckQName: qname => qualifiedName}__; # [DOM 2,3]
+              __CODE{CheckQName: version => 1.0,
+                                 qname => qualifiedName}__; # [DOM 2,3]
               if (($lname = $qualifiedName) =~ s/^([^:]+)://) {
                 $prefix = $1;
               }
@@ -1309,8 +1326,8 @@ IF:
               } elsif ($prefix eq 'xmlns' and
                   (not $namespaceURI or
                    $namespaceURI ne q<http://www.w3.org/2000/xmlns/>)) {
-                __EXCEPTION{
-                  DOMException.NAMESPACE_ERR:
+                __WARNING{
+                  ManakaiDOMImplementationWarning.MDOM_WARN_NAMESPACE_ERR:
                     <Q:MDOM_EXCEPTION:subtype>
                        => <Q:MDOM_EXCEPTION:NS_XMLNS_WITH_OTHER_URI>,
                     <Q:infoset:namespaceName> => $namespaceURI,
@@ -1320,16 +1337,16 @@ IF:
             if (defined $namespaceURI) {
               if ($namespaceURI eq q<http://www.w3.org/XML/1998/namespace> and
                   (not $prefix or $prefix ne 'xml')) {
-                __EXCEPTION{
-                  DOMException.NAMESPACE_ERR:
+                __WARNING{
+                  ManakaiDOMImplementationWarning.MDOM_WARN_NAMESPACE_ERR:
                     <Q:MDOM_EXCEPTION:subtype>
                        => <Q:MDOM_EXCEPTION:NS_XML_URI_WITH_OTHER_PREFIX>,
                     <Q:infoset:prefix> => $prefix,
                 }__;                          # DOM doesn't specify this
               } elsif ($namespaceURI eq q<http://www.w3.org/2000/xmlns/> and
                   (not $prefix or $prefix ne 'xmlns')) {
-                __EXCEPTION{
-                  DOMException.NAMESPACE_ERR:
+                __WARNING{
+                  ManakaiDOMImplementationWarning.MDOM_WARN_NAMESPACE_ERR:
                     <Q:MDOM_EXCEPTION:subtype>
                        => <Q:MDOM_EXCEPTION:NS_XMLNS_URI_WITH_OTHER_PREFIX>,
                     <Q:infoset:prefix> => $prefix,
@@ -1438,105 +1455,386 @@ IF:
 
 IF:
   @Name:  Node
+  @Description:
+    @@lang:en
+    @@@:
+      The primary datatype for the entire Document Object Model, 
+      that represents a single node in the document tree.
   @ConstGroup:
      @@Name:  NodeType
+     @@Description:
+       @@@lang:en
+       @@@@: An integer indicating which type of node this is.
+     @@ImplNote:
+       @@@lang:en
+       @@@@: Codes <= 200 are reserved to W3C for possible future use.
      @@Const:
         @@@Name:  ELEMENT_NODE
         @@@Type:  unsigned-short
         @@@Value:  1
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node is an "Element".
      @@Const:
         @@@Name:  ATTRIBUTE_NODE
         @@@Type:  unsigned-short
         @@@Value:  2
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node is an "Attr".
      @@Const:
         @@@Name:  TEXT_NODE
         @@@Type:  unsigned-short
         @@@Value:  3
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node is a "Text".
      @@Const:
         @@@Name:  CDATA_SECTION_NODE
         @@@Type:  unsigned-short
         @@@Value:  4
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node is a "CDATASection".
      @@Const:
         @@@Name:  ENTITY_REFERENCE_NODE
         @@@Type:  unsigned-short
         @@@Value:  5
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node is an "EntityReference".
      @@Const:
         @@@Name:  ENTITY_NODE
         @@@Type:  unsigned-short
         @@@Value:  6
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node is an "Entity".
      @@Const:
         @@@Name:  PROCESSING_INSTRUCTION_NODE
         @@@Type:  unsigned-short
         @@@Value:  7
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node is a "ProcessingInstruction".
      @@Const:
         @@@Name:  COMMENT_NODE
         @@@Type:  unsigned-short
         @@@Value:  8
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node is a "Comment".
      @@Const:
         @@@Name:  DOCUMENT_NODE
         @@@Type:  unsigned-short
         @@@Value:  9
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node is a "Document".
      @@Const:
         @@@Name:  DOCUMENT_TYPE_NODE
         @@@Type:  unsigned-short
         @@@Value:  10
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node is a "DocumentType".
      @@Const:
         @@@Name:  DOCUMENT_FRAGMENT_NODE
         @@@Type:  unsigned-short
         @@@Value:  11
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node is a "DocumentFragment".
      @@Const:
         @@@Name:  NOTATION_NODE
         @@@Type:  unsigned-short
         @@@Value:  12
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node is a "Notation".
   @Attr:
      @@Name:  nodeName
+     @@Description:
+        @@@lang:en
+        @@@@: The node name.
      @@Get:
         @@@Type:  DOMString
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@: $r = null;
+     @@RedefinedBy: Attr
+     @@RedefinedBy: CDATASection
+     @@RedefinedBy: Comment
+     @@RedefinedBy: Document
+     @@RedefinedBy: DocumentFragment
+     @@RedefinedBy: DocumentType
+     @@RedefinedBy: Element
+     @@RedefinedBy: Entity
+     @@RedefinedBy: EntityReference
+     @@RedefinedBy: Notation
+     @@RedefinedBy: ProcessingInstruction
+     @@RedefinedBy: Text
   @Attr:
      @@Name:  nodeValue
+     @@Description:
+       @@@lang:en
+       @@@@: The value of this node.
      @@Get:
         @@@Type:  DOMString
-        @@@Exception[list]:  DOMException
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: DOMSTRING_SIZE_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              The attribute would return more characters than fit in 
+              a DOMString variable on the implementation platform.
+        @@@Def:
+          @@@@Type: 
+            lang:Perl
+          @@@@@: $r = null;
      @@Set:
         @@@Type:  DOMString
-        @@@Exception[list]:  DOMException
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              The node is read-only and the node is not defined to be "null".
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            New node value.
+            Note that setting this attribute has no effect if 
+            the node value is defined to be "null".
+        @@@Warning:
+          @@@@Type: 
+            ManakaiDOM:ManakaiDOMImplementationWarning
+          @@@@Name: ATTR_SET_NO_EFFECT
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Setting this attribute has no effect since the node 
+              value is defined to be "null".
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            Don't raise an exception even if the node is read-only when 
+            the node value is defined to be "null".
+        @@@Def: \
+    @@RedefinedBy: Attr
+    @@RedefinedBy: CharacterData
+    @@RedefinedBy: ProcessingInstruction
   @Attr:
      @@Name:  nodeType
+     @@Description:
+       @@@lang:en
+       @@@@: The type of this node.
      @@Get:
         @@@Type:  unsigned-short
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The code representing the type of the underlying object.
+        @@@Def: \
+     @@RedefinedBy: Attr
+     @@RedefinedBy: CDATASection
+     @@RedefinedBy: Comment
+     @@RedefinedBy: Document
+     @@RedefinedBy: DocumentFragment
+     @@RedefinedBy: DocumentType
+     @@RedefinedBy: Element
+     @@RedefinedBy: Entity
+     @@RedefinedBy: EntityReference
+     @@RedefinedBy: Notation
+     @@RedefinedBy: ProcessingInstruction
+     @@RedefinedBy: Text
   @Attr:
      @@Name:  parentNode
+     @@Description:
+       @@@lang:en
+       @@@@: The parent of this node.
      @@Get:
         @@@Type:  Node
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The parent node.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The node does not have a parent since its type is either 
+              "Attr", "Document", "DocumentFragment", "Entity", 
+              or "Notation", since it has just been created 
+              and not yet added, or since it has been removed from the tree.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetPropNode:
+            DOMCore:parentNode
   @Attr:
      @@Name:  childNodes
      @@Get:
         @@@Type:  NodeList
   @Attr:
      @@Name:  firstChild
+     @@Description:
+       @@@lang:en
+       @@@@: The first child of this node.
      @@Get:
         @@@Type:  Node
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The first child node.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: There is no child node.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            $r = $self->{<Q:TreeCore:node>}->{<Q:infoset:children>}->[0];
+            $r = $r ? $r->__CLASS{ManakaiDOMNodeObject}__::__INT{newReference}__
+                    : null;
   @Attr:
      @@Name:  lastChild
+     @@Description:
+        @@@lang:en
+        @@@@: The last child of this node.
      @@Get:
         @@@Type:  Node
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The last child node.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: There is no child node.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            $r = $self->{<Q:TreeCore:node>}->{<Q:infoset:children>}->[-1];
+            $r = $r ? $r->__CLASS{ManakaiDOMNodeObject}__::__INT{newReference}__
+                    : null;
   @Attr:
      @@Name:  previousSibling
+     @@Description:
+        @@@lang:en
+        @@@@:
+          The node immediately preceding this node.
      @@Get:
         @@@Type:  Node
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node immediately preceding this node.
+        @@@InCase:
+          @@@@Value:
+             @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: There is no such node.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            if (my $parent = $self->{<Q:TreeCore:node>}->{<Q:infoset:parent>}) {
+              for (@{$parent->{<Q:infoset:children>}}) {
+                if ($_->{<Q:TreeCore:nodeID>} eq
+                         $self->{<Q:TreeCore:node>}->{<Q:TreeCore:nodeID>}) {
+                  last;
+                } else {
+                  $r = $_;
+                }
+              }
+            }
+            if ($r) {
+              $r = $r->__CLASS{ManakaiDOMNodeObject}__::__INT{newReference}__;
+            }
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              This code will return incorrect answer if the infoset:children 
+              of the infoset:parent does not have "this" node 
+              (i.e. the tree is broken).
   @Attr:
      @@Name:  nextSibling
+     @@Description:
+        @@@lang:en
+        @@@@: The node immediately following this node.
      @@Get:
         @@@Type:  Node
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node immediately following this node.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: There is no such node.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            if (my $parent = $self->{<Q:TreeCore:node>}->{<Q:infoset:parent>}) {
+              my $next = 0;
+              for (@{$parent->{<Q:infoset:children>}}) {
+                if ($next) {
+                  $r = $_->__CLASS{ManakaiDOMNodeObject}__::__INT{newReference}__;
+                  last;
+                } elsif ($_->{<Q:TreeCore:nodeID>} eq
+                         $self->{<Q:TreeCore:node>}->{<Q:TreeCore:nodeID>}) {
+                  $next = 1;
+                }
+              }
+            }
   @Attr:
      @@Name:  attributes
      @@Get:
         @@@Type:  NamedNodeMap
   @Attr:
      @@Name:  ownerDocument
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The "Document" object associated with this node.
      @@Get:
         @@@Type:  Document
-     @@ModifiedLevel[list]:  2
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The "Document" object associated with this node.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The node is a "Document" or the node is a "DocumentType" 
+              that is not used with any "Document" yet.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetPropNode:
+            DOMCore:ownerDocument
+     @@Level[list]:
+        1
+        2
+     @@ImplNote:
+        @@@lang:en
+        @@@@:
+          The DOM Level 1 specification does not take the "DocumentType" 
+          without any "Document" into account since DOM Level 1 
+          does not have "createDocumentType" so that no "DocumentType" 
+          object can be exist without its parent of the "Document".
   @Method:
      @@Name:  insertBefore
      @@Return:
@@ -1609,22 +1907,158 @@ IF:
      @@Level[list]:  2
   @Attr:
      @@Name:  namespaceURI
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The namespace URI of this node.
+       \
+         Note that this is not a computed value that is the result 
+         of a namespace lookup based on an examination of the 
+         namespace declarations in scope, but is merely the 
+         namespace URI given at creation time.
      @@Get:
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace URI.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The namespace URI is unspecified (the "null" namespace or 
+              the attribute in a per-element-type partition),
+              the type of the node is other than "ELEMENT_NODE" or 
+              "ATTRIBUTE_NODE", or 
+              the node is created with a DOM Level 1 methods.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@: $r = null;
      @@Level[list]:  2
+     @@RedefinedBy: Element
+     @@RedefinedBy: Attr
   @Attr:
      @@Name:  prefix
+     @@Description:
+       @@@lang:en
+       @@@@: The namespace prefix of this node.
      @@Get:
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace prefix.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either the namespace prefix is unspecified, the node 
+              is created with a DOM Level 1 method, or the type 
+              of the node is other than "ELEMENT_NODE" and 
+              "ATTRIBUTE_NODE".
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@: $r = null;
      @@Set:
         @@@Type:  DOMString
-        @@@Exception[list]:  DOMException
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The namespace prefix.
+            Note that setting this attribute has no effect if 
+            the namespace prefix is defined to be "null".
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The namespace prefix is unspecified.
+        @@@InCase:
+          @@@@Value: \
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The result is implementation dependent.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: INVALID_CHARACTER_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The specified prefix contains an illegal character 
+              accoding to the XML version in use in the document.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: This node is read-only.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NAMESPACE_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either the specified prefix is malformed per the 
+              XML Namespace specification, non-"null" prefix is 
+              specified but the "namespaceURI" of this node is "null", 
+              the specified prefix is "xml" and the "namespaceURI" 
+              of this node is different from 
+              "http://www.w3.org/XML/1998/namespace", if this 
+              node is an attribute and the specified prefix is "xmlns" 
+              and the "namespaceURI" of this node is different from 
+              "http://www.w3.org/2000/xmlns/", or if this node is 
+              an attribute and the "qualifiedName" of this node is 
+              "xmlns".
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            Which of INVALID_CHAR_ERR and NAMESPACE_ERR should be 
+            raisen in case the new prefix has a COLON (":") in 
+            unclear.  In this implementation, the later is chosen 
+            since it is related to the XML Namespace but not to the XML.
+        @@@Warning:
+          @@@@Type:
+            ManakaiDOM:ManakaiDOMImplementationWarning
+          @@@@Name: ATTR_SET_NO_EFFECT
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Setting this attribute has no effect.
+        @@@Def: \
      @@Level[list]:  2
+     @@RedefinedBy: Attr
+     @@RedefinedBy: Element
   @Attr:
      @@Name:  localName
+     @@Description:
+       @@@lang:en
+       @@@@: The local part of the qualified name of this node.
      @@Get:
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The local name.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The type of the node is other than "ELEMENT_NODE" or 
+              "ATTRIBUTE_NODE", or the node is created with a DOM Level 1 
+              methods.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@: $r = null;
      @@Level[list]:  2
+     @@RedefinedBy: Element
+     @@RedefinedBy: Attr
   @Method:
      @@Name:  hasAttributes
      @@Return:
@@ -1640,30 +2074,63 @@ IF:
          http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#baseURIs-Considerations
   @ConstGroup:
      @@Name:  DocumentPosition
+     @@Description:
+       @@@lang:en
+       @@@@:
+         A bitmask indicating the relative document position of a node 
+         with respect to another node.
+     @@Level: 3
      @@Const:
         @@@Name:  DOCUMENT_POSITION_DISCONNECTED
         @@@Type:  unsigned-short
         @@@Value:  0x01
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The two nodes are disconnected.  Order between disconnected nodes 
+            is always implementation-specific.
      @@Const:
         @@@Name:  DOCUMENT_POSITION_PRECEDING
         @@@Type:  unsigned-short
         @@@Value:  0x02
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The node precedes the reference node.
      @@Const:
         @@@Name:  DOCUMENT_POSITION_FOLLOWING
         @@@Type:  unsigned-short
         @@@Value:  0x04
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node fllows the reference node.
      @@Const:
         @@@Name:  DOCUMENT_POSITION_CONTAINS
         @@@Type:  unsigned-short
         @@@Value:  0x08
+        @@@Description: 
+          @@@@lang:en
+          @@@@@:
+            The node contains the reference node.  A node that 
+            contains is always preceding, too.
      @@Const:
         @@@Name:  DOCUMENT_POSITION_CONTAINED_BY
         @@@Type:  unsigned-short
         @@@Value:  0x10
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The node is contained by the reference node. 
+            A node that is contained is always following, too.
      @@Const:
         @@@Name:  DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC
         @@@Type:  unsigned-short
         @@@Value:  0x20
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The determination of preceding versus following is 
+            implementation-specific.
   @Method:
      @@Name:  compareDocumentPosition
      @@Return:
@@ -1684,6 +2151,10 @@ IF:
      @@Level[list]:  3
   @Method:
      @@Name:  isSameNode
+     @@Operator:
+        @@@@: eq
+        @@@Type:
+          lang:Perl
      @@Return:
         @@@Type:  boolean
      @@Param:
@@ -1716,6 +2187,10 @@ IF:
      @@Level[list]:  3
   @Method:
      @@Name:  isEqualNode
+     @@Operator:
+       @@@: ==
+       @@Type:
+          lang:Perl
      @@Return:
         @@@Type:  boolean
      @@Param:
@@ -1837,6 +2312,7 @@ IF:
         @@@Name:  localName
         @@@Type:  DOMString
      @@Level[list]:  2
+
 IF:
   @Name:  CharacterData
   @ISA: Node
@@ -1845,6 +2321,7 @@ IF:
      @@Get:
         @@@Type:  DOMString
         @@@Exception[list]:  DOMException
+  @@@Def: ##TBD
      @@Set:
         @@@Type:  DOMString
         @@@Exception[list]:  DOMException
@@ -1903,13 +2380,77 @@ IF:
         @@@Type:  DOMString
      @@Return:
         @@@Exception[list]:  DOMException
+  @ReAttr:
+     @@Name:  nodeValue
+     @@Description:
+       @@@lang:en
+       @@@@: The value of this node.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: DOMSTRING_SIZE_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              The node value, i.e. same as "data".
+        @@@Def:
+          @@@@Type: 
+            lang:Perl
+          @@@@@: __INT{{data}}__;
+     @@Set:
+        @@@Type:  DOMString
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              The node is read-only.
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            New node value.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            __DEEP{ $self->__SUPER{CharacterData}__::data ($given) }__;
+    @@Redefine: Node
+
 IF:
   @Name:  Attr
   @ISA:  Node
+  @Require:
+    @@Module:
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@use: 
+          @@@@@@:
+            Char::Class::XML
+          @@@@@Import[list]:
+            InXML_NameStartChar10
+            InXMLNameChar10
+            InXMLNameStartChar11
+            InXMLNameChar11
+      @@@Condition: DOM2
   @Attr:
      @@Name:  name
      @@Get:
         @@@Type:  DOMString
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $node = $self->{<Q:TreeCore:node>};
+            if (defined $node->{<Q:infoset:localName>}) {
+              $r = (defined $node->{<Q:infoset:prefix>} ?
+                   $node->{<Q:infoset:prefix>} . ':' : '') . 
+                   $node->{<Q:infoset:localName>};
+            } else {
+              $r = $node->{<Q:DOMCore:name>};
+            }
   @Attr:
      @@Name:  specified
      @@Get:
@@ -1918,6 +2459,7 @@ IF:
      @@Name:  value
      @@Get:
         @@@Type:  DOMString
+  @@@Def:##TBD
      @@Set:
         @@@Type:  DOMString
         @@@Exception[list]:  DOMException
@@ -1950,6 +2492,287 @@ IF:
           lang:Perl
         @@@@@:
           $r = null;
+  @ReAttr:
+     @@Name:  localName
+     @@Description:
+       @@@lang:en
+       @@@@: The local part of the qualified name of this "Attr" node.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The local name of the attribute.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The node is created with a DOM Level 1 methods.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            infoset:localName
+     @@Level[list]:  2
+     @@Redefine: Node
+  @Attr:
+     @@Name:  namespaceURI
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The namespace URI of this node.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace URI.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The namespace URI is unspecified (the attribute in a 
+              per-element-type partition) or 
+              the node is created with a DOM Level 1 methods.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            infoset:namespaceName
+     @@Level[list]:  2
+     @@Redefined: Node
+  @ReAttr:
+    @@Name: nodeName
+    @@Description:
+      @@@lang:en
+      @@@@: The node name.
+    @@Get:
+      @@@Type: DOMString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The attribute name.  It is same as the value of the "name" 
+          attribute.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@: __INT{{name}}__;
+    @@Redefine: Node
+  @ReAttr:
+    @@Name: nodeType
+    @@Description:
+      @@@lang:en
+      @@@@: The type of this node.
+    @@Get:
+      @@@Type: unsigned-short
+      @@@InCase:
+        @@@@Label: ATTRIBUTE_NODE
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The node is an "Attr".
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@: $r = __CLASS{Node}__->ATTRIBUTE_NODE;
+    @@Redefine: Node
+  @ReAttr:
+     @@Name:  nodeValue
+     @@Description:
+       @@@lang:en
+       @@@@: The value of this node.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: DOMSTRING_SIZE_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              The attribute value, i.e. same as "value".
+        @@@Def:
+          @@@@Type: 
+            lang:Perl
+          @@@@@: __INT{{value}}__;
+     @@Set:
+        @@@Type:  DOMString
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              The node is read-only.
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            New node value.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            __DEEP{ $self->__SUPER{Attr}__::name ($given) }__;
+    @@Redefine: Node
+  @ReAttr:
+     @@Name:  prefix
+     @@Description:
+       @@@lang:en
+       @@@@: The namespace prefix of this node.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace prefix.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either the namespace prefix is unspecified or the node 
+              is created with a DOM Level 1 method.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            infoset:prefix
+     @@Set:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The namespace prefix.
+            Note that setting this attribute has no effect if 
+            the namespace prefix is defined to be "null".
+          \
+            Note also that changing the prefix of an attribute that 
+            is known to have a default value does not make a 
+            new attribute with the default value and the original 
+            prefix appear, since the "namespaceURI" and "localName" 
+            do not change.  This is different from the defaulting 
+            mechanism of the DTD, which is namespace-unaware.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The namespace prefix is unspecified.
+        @@@InCase:
+          @@@@Value: \
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The result is implementation dependent in DOM Level 3.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: INVALID_CHARACTER_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The specified prefix contains an illegal character 
+              accoding to the XML version in use in the document.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: This node is read-only.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NAMESPACE_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either the specified prefix is malformed per the 
+              XML Namespace specification, non-"null" prefix is 
+              specified but the "namespaceURI" of this node is "null", 
+              the specified prefix is "xml" and the "namespaceURI" 
+              of this node is different from 
+              "http://www.w3.org/XML/1998/namespace", the specified 
+              prefix is "xmlns" and the "namespaceURI" of this node 
+              is different from "http://www.w3.org/2000/xmlns/", or 
+              the "qualifiedName" of this node is "xmlns".
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            Which of INVALID_CHAR_ERR and NAMESPACE_ERR should be 
+            raisen in case the new prefix has a COLON (":") in 
+            unclear.  In this implementation, the later is chosen 
+            since it is related to the XML Namespace but not to the XML.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $node = $self->{<Q:TreeCore:node>};
+            my $version = $node->{<Q:DOMCore:ownerDocument>}
+                      ->__SUPER{Document}__::__INT{getDocumentXMLVersion}__;
+            if (not defined $version) {
+              __WARNING{
+                ManakaiDOMImplementationWarning.ATTR_SET_NO_EFFECT:
+                  <Q:MDOM_EXCEPTION:subtype>
+                              => <Q:MDOM_EXCEPTION:XML_NOT_SUPPORTED>,
+              }__;
+            } elsif (not defined $node->{<Q:infoset:localName>}) {
+              __WARNING{
+                ManakaiDOMImplementationWarning.ATTR_SET_NO_EFFECT:
+                  <Q:MDOM_EXCEPTION:subtype>
+                              => <Q:MDOM_EXCEPTION:NS_NOT_SUPPORTED>,
+              }__;
+            } elsif ($node->{<Q:DOMCore:read-only>}) {
+              __WARNING{
+                DOMException.NO_MODIFICATION_ALLOWED_ERR:
+                  <Q:MDOM_EXCEPTION:subtype> => <MDOM_EXCEPTION:NODE_READ_ONLY>,
+              }__;
+            } elsif (not defined $node->{<Q:prefix>} and
+                     $node->{<Q:infoset:localName>} and
+                     $node->{<Q:infoset:localName>} eq 'xmlns') {
+              __EXCEPTION{
+                DOMException.NAMESPACE_ERR:
+                  <Q:MDOM_EXCEPTION:subtype>
+                       => <Q:MDOM_EXCEPTION:NS_QNAME_IS_XMLNS>,
+              }__;
+            } else {
+              __CODE{CheckNCName: ncname => given, version => version,
+                                  empty => warn3}__;
+              if (not defined $given) {
+                #
+              } else {
+                if (not defined $node->{<Q:infoset:namespaceName>}) {
+                  __EXCEPTION{
+                    DOMException.NAMESPACE_ERR:
+                      <Q:MDOM_EXCEPTION:subtype>
+                           => <Q:MDOM_EXCEPTION:NS_PREFIX_WITH_NULL_URI>,
+                      <Q:MDOM_EXCEPTION:prefix> => $given,
+                  }__;
+                } elsif ($given eq 'xml' and
+                         (not $node->{<Q:infoset:namespaceName>} or
+                          $node->{<Q:infoset:namespaceName>} ne <Q:xml:>)) {
+                  __EXCEPTION{
+                    DOMException.NAMESPACE_ERR:
+                      <Q:MDOM_EXCEPTION:subtype>
+                           => <Q:MDOM_EXCEPTION:NS_XML_WITH_OTHER_URI>,
+                      <Q:infoset:namespaceName>
+                           => $node->{<Q:infoset:namespaceName>},
+                  }__;
+                } elsif ($given eq 'xmlns' and
+                         (not $node->{<Q:infoset:namespaceName>} or
+                          $node->{<Q:infoset:nanespaceName>} eq <Q:xmlns:>)) {
+                  __EXCEPTION{
+                    DOMException.NAMESPACE_ERR:
+                      <Q:MDOM_EXCEPTION:subtype>
+                           => <Q:MDOM_EXCEPTION:NS_XMLNS_WITH_OTHER_URI>,
+                      <Q:infoset:namespaceName>
+                           => $node->{<Q:infoset:namespaceName>},
+                  }__;
+                }
+              }
+              $node->{<Q:infoset:prefix>} = $given;
+            }
+     @@Level[list]:
+       2
+       3
+     @@Redefine: Node
 
 IF:
   @Name:  Element
@@ -1958,6 +2781,7 @@ IF:
      @@Name:  tagName
      @@Get:
         @@@Type:  DOMString
+        @@@Def:#TBD
   @Method:
      @@Name:  getAttribute
      @@Return:
@@ -2145,27 +2969,227 @@ IF:
      @@Level[list]:  3
   
   @ReAttr:
-    @@Name: nodeValue
-    @@Spec:
-      @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D080
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+     @@Name:  localName
+     @@Description:
+       @@@lang:en
+       @@@@: The local part of the qualified name of this "Element" node.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The local name of the element type.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The node is created with a DOM Level 1 methods.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            infoset:localName
+     @@Level[list]:  2
+     @@Redefine: Node
+  @Attr:
+     @@Name:  namespaceURI
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The namespace URI of this node.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace URI.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The namespace URI is unspecified (the "null" namespace) or 
+              the node is created with a DOM Level 1 methods.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            infoset:namespaceName
+     @@Level[list]:  2
+     @@Redefined: Node
+  @ReAttr:
+    @@Name: nodeName
+    @@Description:
+      @@@lang:en
+      @@@@: The node name.
     @@Get:
       @@@Type: DOMString
-      @@@Exception[list]: DOMException
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The element type name, i.e. same as "tagName" attribute.
       @@@Def:
         @@@@Type:
           lang:Perl
-        @@@@@:
-          $r = null;
-    @@Set:
-      @@@Type: DOMString
-      @@@Exception[list]: DOMException
+        @@@@@: __INT{{tagName}}__;
+    @@Redefine: Node
+  @ReAttr:
+    @@Name: nodeType
+    @@Description:
+      @@@lang:en
+      @@@@: The type of this node.
+    @@Get:
+      @@@Type: unsigned-short
+      @@@InCase:
+        @@@@Label: ELEMENT_NODE
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The node is an "Element".
       @@@Def:
         @@@@Type:
           lang:Perl
-        @@@@@:
-          __WARNING{ManakaiDOMImplementationException.ATTR_SET_NO_EFFECT}__;
+        @@@@@: $r = __CLASS{Node}__->ELEMENT_NODE;
+    @@Redefine: Node
+  @ReAttr:
+     @@Name:  prefix
+     @@Description:
+       @@@lang:en
+       @@@@: The namespace prefix of this node.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace prefix.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either the namespace prefix is unspecified or the node 
+              is created with a DOM Level 1 method.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            infoset:prefix
+     @@Set:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The namespace prefix.
+            Note that setting this attribute has no effect if 
+            the namespace prefix is defined to be "null".
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            It is unclear whether the default attribute should be 
+            added or deleted as the DTD declares.  The DOM Level 2 
+            and 3 specifications mentions that changing of the 
+            attribute name prefix does not make the default 
+            attribute supplied, since the namespace URI does not change.
+            This logic might be applied to the element node.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The namespace prefix is unspecified.
+        @@@InCase:
+          @@@@Value: \
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The result is implementation dependent in DOM Level 3.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: INVALID_CHARACTER_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The specified prefix contains an illegal character 
+              accoding to the XML version in use in the document.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: This node is read-only.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NAMESPACE_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either the specified prefix is malformed per the 
+              XML Namespace specification, non-"null" prefix is 
+              specified but the "namespaceURI" of this node is "null" or 
+              the specified prefix is "xml" and the "namespaceURI" 
+              of this node is different from 
+              "http://www.w3.org/XML/1998/namespace".
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            Which of INVALID_CHAR_ERR and NAMESPACE_ERR should be 
+            raisen in case the new prefix has a COLON (":") in 
+            unclear.  In this implementation, the later is chosen 
+            since it is related to the XML Namespace but not to the XML.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $node = $self->{<Q:TreeCore:node>};
+            my $version = $node->{<Q:DOMCore:ownerDocument>}
+                      ->__SUPER{Document}__::__INT{getDocumentXMLVersion}__;
+            if (not defined $version) {
+              __WARNING{
+                ManakaiDOMImplementationWarning.ATTR_SET_NO_EFFECT:
+                  <Q:MDOM_EXCEPTION:subtype>
+                              => <Q:MDOM_EXCEPTION:XML_NOT_SUPPORTED>,
+              }__;
+            } elsif (not defined $node->{<Q:infoset:localName>}) {
+              __WARNING{
+                ManakaiDOMImplementationWarning.ATTR_SET_NO_EFFECT:
+                  <Q:MDOM_EXCEPTION:subtype>
+                              => <Q:MDOM_EXCEPTION:NS_NOT_SUPPORTED>,
+              }__;
+            } elsif ($node->{<Q:DOMCore:read-only>}) {
+              __WARNING{
+                DOMException.NO_MODIFICATION_ALLOWED_ERR:
+                  <Q:MDOM_EXCEPTION:subtype> => <MDOM_EXCEPTION:NODE_READ_ONLY>,
+              }__;
+            } else {
+              __CODE{CheckNCName: ncname => given, version => version,
+                                  empty => warn3}__;
+              if (not defined $given) {
+                #
+              } else {
+                if (not defined $node->{<Q:infoset:namespaceName>}) {
+                  __EXCEPTION{
+                    DOMException.NAMESPACE_ERR:
+                      <Q:MDOM_EXCEPTION:subtype>
+                           => <Q:MDOM_EXCEPTION:NS_PREFIX_WITH_NULL_URI>,
+                      <Q:MDOM_EXCEPTION:prefix> => $given,
+                  }__;
+                } elsif ($given eq 'xml' and
+                         (not $node->{<Q:infoset:namespaceName>} or
+                          $node->{<Q:infoset:namespaceName>} ne <Q:xml:>)) {
+                  __EXCEPTION{
+                    DOMException.NAMESPACE_ERR:
+                      <Q:MDOM_EXCEPTION:subtype>
+                           => <Q:MDOM_EXCEPTION:NS_XML_WITH_OTHER_URI>,
+                      <Q:infoset:namespaceName>
+                           => $node->{<Q:infoset:namespaceName>},
+                  }__;
+                }
+              }
+              $node->{<Q:infoset:prefix>} = $given;
+            }
+     @@Level[list]:
+       2
+       3
+     @@Redefine: Node
 
 IF:
   @Name:  Text
@@ -2213,17 +3237,39 @@ IF:
           $r = null;
   @ReAttr:
     @@Name: nodeName
+    @@Description:
+      @@@lang:en
+      @@@@: The node name.
     @@Spec:
       @@@DOM3[list]:
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
     @@Get:
       @@@Type: DOMString
+      @@@InCase:
+        @@@@Value:\#text
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: Always this value for the "Text" node.
+      @@@DefaultValue: \#text
+      @@@Def: \
+  @ReAttr:
+    @@Name: nodeType
+    @@Description:
+      @@@lang:en
+      @@@@: The type of this node.
+    @@Get:
+      @@@Type: unsigned-short
+      @@@InCase:
+        @@@@Label: TEXT_NODE
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The node is a "Text".
       @@@Def:
         @@@@Type:
           lang:Perl
-        @@@@@:
-          $r = q<#text>;
+        @@@@@: $r = __CLASS{Node}__->TEXT_NODE;
+    @@Redefine: Node
 
 IF:
   @Name:  Comment
@@ -2248,13 +3294,35 @@ IF:
       @@@DOM3[list]:
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Description:
+      @@@lang:en
+      @@@@: The node name.
     @@Get:
       @@@Type: DOMString
+      @@@InCase:
+        @@@@Value: \#comment
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: Always this value for the "Comment" node.
+      @@@DefaultValue: \#comment
+      @@@Def: \
+  @ReAttr:
+    @@Name: nodeType
+    @@Description:
+      @@@lang:en
+      @@@@: The type of this node.
+    @@Get:
+      @@@Type: unsigned-short
+      @@@InCase:
+        @@@@Label: COMMENT_NODE
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The node is a "Comment".
       @@@Def:
         @@@@Type:
           lang:Perl
-        @@@@@:
-          $r = q<#comment>;
+        @@@@@: $r = __CLASS{Node}__->COMMENT_NODE;
+    @@Redefine: Node
 
 IF:
   @Name:  TypeInfo
@@ -2500,32 +3568,39 @@ IF:
       @@@Def: \
   @ReAttr:
     @@Name: nodeName
+    @@Description:
+      @@@lang:en
+      @@@@: The node name.
     @@Spec:
       @@@DOM3[list]:
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
     @@Get:
       @@@Type: DOMString
+      @@@InCase:
+        @@@@Value:\#document-fragment
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: Always this value for the "DocumentFragment" node.
       @@@DefaultValue: \#document-fragment
       @@@Def: \
   @ReAttr:
-    @@Name: nodeValue
-    @@Spec:
-      @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D080
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Name: nodeType
+    @@Description:
+      @@@lang:en
+      @@@@: The type of this node.
     @@Get:
-      @@@Type: DOMString
-      @@@DefaultValue:
-        @@@@is-null: 1
-      @@@Def: \
-    @@Set:
-      @@@Type: DOMString
-      @@@Warning:
+      @@@Type: unsigned-short
+      @@@InCase:
+        @@@@Label: DOCUMENT_FRAGMENT_NODE
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The node is a "DocumentFragment".
+      @@@Def:
         @@@@Type:
-          ManakaiDOM:ManakaiDOMImplementationWarning
-        @@@@Name: ATTR_SET_NO_EFFECT
-      @@@Def: \
+          lang:Perl
+        @@@@@: $r = __CLASS{Node}__->DOCUMENT_FRAGMENT_NODE;
+    @@Redefine: Node
 
 IF:
   @Name:  Document
@@ -2575,7 +3650,7 @@ IF:
           @@@@@:
             for (@{$self->{<Q:TreeCore:node>}->{<Q:infoset:children>}}) {
               if ($_->{<Q:DOMCore:nodeType>} eq <Q:DOMCore:DocumentType>) {
-                $r = $_->__CLASS{ManakaiDOMNodeObject}__->__INT{newReference}__;
+                $r = $_->__CLASS{ManakaiDOMNodeObject}__::__INT{newReference}__;
                 last;
               } elsif ($_->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
                 last;
@@ -2610,16 +3685,19 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: The document element not found.
-          ## The DOM specifications don't mention this case but for example 
-          ## the DOMImplementation.createDocument (null, null, null) can 
-          ## create a Document that does not have the document element.
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              The DOM specifications don't mention this case but for example 
+              the DOMImplementation.createDocument (null, null, null) can 
+              create a Document that does not have the document element.
         @@@Def:
           @@@@Type:
             lang:Perl
           @@@@@:
             for (@{$self->{<Q:TreeCore:node>}->{<Q:infoset:children>}}) {
               if ($_->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
-                $r = $_->__CLASS{ManakaiDOMNodeObject}__->__INT{newReference}__;
+                $r = $_->__CLASS{ManakaiDOMNodeObject}__::__INT{newReference}__;
                 last;
               }
             }
@@ -2756,9 +3834,14 @@ IF:
        \
          This attribute is corresponding to the [character encoding scheme] 
          property of the document infomation item.
+     @@ImplNote:
+        @@@lang:en
+        @@@@:
+          It is unclear what type of values are permitted. 
+          IANA-registered charset names? XML encoding declaration 
+          names?  Or, any names passed from the upper-level protocols?
      @@Get:
         @@@Type:  DOMString
-        ## ISSUE: Is this IANA charset?
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
@@ -2894,11 +3977,7 @@ IF:
           @@@@Type:
             lang:Perl
           @@@@@:
-            my $node = $self->{<Q:TreeCore:node>};
-            if ($node->{<Q:DOMCore:hasFeature>}->{XML}) {
-              $r = defined $node->{<Q:infoset:version>} ? 
-                   $node->{<Q:infoset:version>} : '1.0';
-            }
+            __INT{{getDocumentXMLVersion}}__;
      @@Set:
         @@@Type:  DOMString
         @@@Description:
@@ -2918,7 +3997,7 @@ IF:
             lang:Perl
           @@@@@:
             my $node = $self->{<Q:TreeCore:node>};
-            if ($node->{<Q:DOMCore:hasFeature>}->{XML}) {
+            if (defined $node->{<Q:DOMCore:hasFeature>}->{XML}) {
               if ($given and
                   ($given eq '1.0' or $given eq '1.1')) {
                 $node->{<Q:infoset:version>} = $given;
@@ -2938,6 +4017,24 @@ IF:
               }__;
             }
      @@Level[list]:  3
+  @IntMethod:
+    @@Name: getDocumentXMLVersion
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Return the XML version of the document.  This method is 
+        same as the getting of the attribute "xmlVersion" but 
+        introduced for the internal use.
+    @@Return:
+      @@@Type: DOMString
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          my $node = $self->{<Q:TreeCore:node>};
+          $r = defined $node->{<Q:DOMCore:hasFeature>}->{XML} ?
+                 defined $node->{<Q:infoset:version>} ?
+                   $node->{<Q:infoset:version>} : '1.0' : null;
   @Attr:
      @@Name:  strictErrorChecking
      @@Description:
@@ -3076,39 +4173,39 @@ IF:
           $r = null;
   @ReAttr:
     @@Name: nodeName
+    @@Description:
+      @@@lang:en
+      @@@@: The node name.
     @@Spec:
       @@@DOM3[list]:
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
     @@Get:
       @@@Type: DOMString
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          $r = q<#document>;
+      @@@InCase:
+        @@@@Value:\#document
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: Always this value for the "Document" node.
+      @@@DefaultValue: \#document
+      @@@Def: \
   @ReAttr:
-    @@Name: nodeValue
-    @@Spec:
-      @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D080
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Name: nodeType
+    @@Description:
+      @@@lang:en
+      @@@@: The type of this node.
     @@Get:
-      @@@Type: DOMString
-      @@@Exception[list]: DOMException
+      @@@Type: unsigned-short
+      @@@InCase:
+        @@@@Label: DOCUMENT_NODE
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The node is a "Document".
       @@@Def:
         @@@@Type:
           lang:Perl
-        @@@@@:
-          $r = null;
-    @@Set:
-      @@@Type: DOMString
-      @@@Exception[list]: DOMException
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          __WARNING{ManakaiDOMImplementationException.ATTR_SET_NO_EFFECT}__;
+        @@@@@: $r = __CLASS{Node}__->DOCUMENT_NODE;
+    @@Redefine: Node
   @ReAttr:
     @@Name: textContent
     @@Spec:
@@ -3163,5 +4260,32 @@ IF:
           }
           $node->{<Q:DOMCore:strictErrorChecking>} = true;
           $node->{<Q:DOMCore:hasFeature>}->{XML} = true;
+  @IntMethod:
+    @@Name: newByDocumentType
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Construct a new "Document".
+    @@Param:
+      @@@Name: doctype
+      @@@Type: DocumentType
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A document type object that is used to determine the 
+          markup-language-specific class (interfaces) for the new 
+          "Document" object.
+        \
+          Note that the "doctype" is remain unchanged (and not used 
+          as a child of the new "Document").  Constructing desired 
+          internal structure is up to the caller of this method. 
+          (See the method "createDocument" of the "DOMImplementation",
+          for example.)
+   @@Def:
+     @@@Type:
+       lang:Perl
+     @@@@:
+## TODO: see $doctype
+       __INT{{new}}__;
 
 ## DOMCore.dis ends here

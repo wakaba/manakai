@@ -233,6 +233,14 @@ sub perl_code ($;%) {
     my $r;
     if ($name eq 'CLASS') {       ## Manakai DOM Class Name
       $r = perl_package_name name => $data;
+    } elsif ($name eq 'SUPER') {  ## Manakai DOM Class Name
+      local $Status->{condition} = $Status->{condition};
+      if ($data =~ s/::([^:]+)$//) {
+        $Status->{condition} = $1;
+      }
+      $r = perl_package_name name => $data,
+                             is_internal => 1,
+                             condition => $Status->{condition};
     } elsif ($name eq 'IF') {     ## DOM Interface Name
       $r = perl_package_name if => $data;
     } elsif ($name eq 'INT') {    ## Internal Method / Attr Name
@@ -271,7 +279,7 @@ sub perl_code ($;%) {
       } else {
         valid_err q<Built-in code name required>;
       }
-      while ($data =~ /\G(\w+)\s*=>\s*(\w+)\s*(,\s*|$)/g) {
+      while ($data =~ /\G(\S+)\s*=>\s*(\S+)\s*(,\s*|$)/g) {
         $param{$1} = $2;
       }
       $r = perl_builtin_code ($nm, condition => $opt{condition}, %param);
@@ -351,25 +359,145 @@ sub perl_builtin_code ($%) {
               ['A'..'Z', 'a'..'z', '0'..'9']->[rand 62]
     )};
   } elsif ($name eq 'CheckQName') {
-    $r = perl_code q{
-      __EXCEPTION{
-        DOMException.INVALID_CHARACTER_ERR:
-        <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:CHAR_INVALID_NAME>,
-        <Q:MDOM_EXCEPTION:name> => $qname,
-      }__ if $qname =~ /^\p{InXMLNameStartChar}\p{InXMLNameChar}*$/;
-      __EXCEPTION{
-        DOMException.NAMESPACE_ERR:
-        <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NS_INVALID_QNAME>,
-        <Q:MDOM_EXCEPTION:qname> => $qname,
-      }__ if $qname =~ /^\p{InXMLNCNameStartChar}\p{InXMLNCNameChar}*(?:\p{InXMLNCNameStartChar}\p{InXMLNCNameChar}*)?/;
-      ## ISSUE: ns prefix association
-    };
+    $opt{version} = '1.0' if $opt{condition} and $opt{condition} eq 'DOM2';
+    my $chk = perl_if
+                (qq<##CHKNAME##>, undef,
+                  (perl_statement
+                    perl_exception 
+                      (class => 'DOMException',
+                       type => 'INVALID_CHARACTER_ERR',
+                       param => {
+                         ExpandedURI q<MDOM_EXCEPTION:subtype>
+                             => ExpandedURI q<MDOM_EXCEPTION:CHAR_INVALID_NAME>,
+                         ExpandedURI q<MDOM_EXCEPTION:name>
+                             => perl_code_literal
+                                  (perl_var type => '$', local_name => 'qname'),
+                       }))) .
+              perl_if
+                (qq<##CHKQNAME##>, undef,
+                  (perl_statement
+                    perl_exception
+                      (class => 'DOMException',
+                       type => 'NAMESPACE_ERR',
+                       param => {
+                         ExpandedURI q<MDOM_EXCEPTION:subtype>
+                             => ExpandedURI q<MDOM_EXCEPTION:NS_INVALID_QNAME>,
+                         ExpandedURI q<MDOM_EXCEPTION:name>
+                             => perl_code_literal
+                                  (perl_var type => '$', local_name => 'qname'),
+                       })));
+    my $chk10 = $chk;
+    $chk10 =~ s{##CHKNAME##}
+               {q<$qname =~ /\A\p{InXML_NameStartChar10}>.
+                q<\p{InXMLNameChar10}*\z/>}ge;
+    $chk10 =~ s{##CHKQNAME##}
+               {q<$qname =~ /\A\p{InXML_NCNameStartChar10}>.
+                q<\p{InXMLNCNameChar10}*>.
+                q<(?::\p{InXML_NCNameStartChar10}>.
+                q<\p{InXMLNCNameChar10}*)?\z/>}ge;
+    my $chk11 = $chk;
+    $chk11 =~ s{##CHKNAME##}
+               {q<$qname =~ /\A\p{InXMLNameStartChar11}>.
+                q<\p{InXMLNameChar11}*\z/>}ge;
+    $chk11 =~ s{##CHKQNAME##}
+               {q<$qname =~ /\A\p{InXMLNCNameStartChar11}>.
+                q<\p{InXMLNCNameChar11}*>.
+                q<(?::\p{InXMLNCNameStartChar11}>.
+                q<\p{InXMLNCNameChar11}*)?\z/>}ge;
+    my %class;
+    if ($opt{version} and $opt{version} eq '1.0') {
+      $r = $chk10;
+      %class = (qw/InXML_NameStartChar10 InXMLNameChar10
+                   InXML_NCNameStartChar10 InXMLNameChar10/);
+    } elsif ($opt{version} and $opt{version} eq '1.1') {
+      $r = $chk11;
+      %class = (qw/InXMLNameStartChar11 InXMLNameChar11
+                   InXMLNCNameStartChar11 InXMLNameChar11/);
+    } elsif ($opt{version}) {
+      $r = perl_if (perl_var (type => '$', local_name => $opt{version}) .
+                    q< eq '1.1'>, $chk11, $chk10);
+    } else {
+      valid_err q<Built-in code parameter "version" required>;
+    }
     $opt{qname} or valid_err q<Built-in code parameter "qname" required>;
     $r =~ s/\$qname\b/\$$opt{qname}/g;
     $Info->{Require_perl_package_use}->{'Char::Class::XML'} or
       valid_err q<"Char::Class::XML" must be "Require"d>;
-    for (qw/InXMLNameStartChar InXMLNameChar InXMLNCNameStartChar
-            InXMLNCNameChar/) {
+    for (%class) {
+      $Info->{Require_perl_package_use}->{'Char::Class::XML::::Import'}->{$_} or
+        valid_err qq<"$_" must be exported from "Char::Class::XML">;
+    }
+  } elsif ($name eq 'CheckNCName') {
+    $opt{version} = '1.0' if $opt{condition} and $opt{condition} eq 'DOM2';
+    my $chk = perl_if
+                (qq<##CHKNAME##>, undef,
+                  (perl_statement
+                    perl_exception 
+                      (class => 'DOMException',
+                       type => 'INVALID_CHARACTER_ERR',
+                       param => {
+                         ExpandedURI q<MDOM_EXCEPTION:subtype>
+                             => ExpandedURI q<MDOM_EXCEPTION:CHAR_INVALID_NAME>,
+                         ExpandedURI q<MDOM_EXCEPTION:name>
+                             => perl_code_literal
+                                  (perl_var type => '$', local_name => 'qname'),
+                       }))) .
+              perl_if
+                (qq<##CHKNCNAME##>, undef,
+                  (perl_statement
+                    perl_exception
+                      (class => 'DOMException',
+                       type => 'NAMESPACE_ERR',
+                       param => {
+                         ExpandedURI q<MDOM_EXCEPTION:subtype>
+                             => ExpandedURI q<MDOM_EXCEPTION:NS_INVALID_NCNAME>,
+                         ExpandedURI q<MDOM_EXCEPTION:name>
+                             => perl_code_literal
+                                  (perl_var type => '$', local_name => 'qname'),
+                       })));
+    my $chk10 = $chk;
+    $chk10 =~ s{##CHKNAME##}
+               {q<$qname =~ /\A\p{InXML_NameStartChar10}>.
+                q<\p{InXMLNameChar10}*\z/>}ge;
+    $chk10 =~ s{##CHKNCNAME##}
+               {q<$qname =~ /:/>}ge;
+    my $chk11 = $chk;
+    $chk11 =~ s{##CHKNAME##}
+               {q<$qname =~ /\A\p{InXMLNameStartChar11}>.
+                q<\p{InXMLNameChar11}*\z/>}ge;
+    $chk11 =~ s{##CHKNCNAME##}
+               {q<$qname =~ /:/>}ge;
+    my $t = ($opt{empty} and $opt{empty} eq 'warn3' and
+             (not $opt{condition} or $opt{condition} ne 'DOM2')) ?
+            perl_if 
+              (q<defined $qname and $qname eq q<>>,
+               perl_statement (perl_exception
+                 (level => 'WARNING',
+                  class => 'ManakaiDOMImplementationWarning',
+                  type => 'MDOM_NS_EMPTY_PREFIX',
+                  param => {
+                    ExpandedURI q<MDOM_EXCEPTION:param-name> => $opt{ncname},
+                  })).
+               perl_statement (q<$qname = undef>)) : '';
+    my %class;
+    if ($opt{version} and $opt{version} eq '1.0') {
+      $r = $chk10;
+      %class = (qw/InXML_NameStartChar10 InXMLNameChar10/);
+    } elsif ($opt{version} and $opt{version} eq '1.1') {
+      $r = $chk11;
+      %class = (qw/InXMLNameStartChar11 InXMLNameChar11/);
+    } elsif ($opt{version}) {
+      $r = perl_if (perl_var (type => '$', local_name => $opt{version}) .
+                    q< eq '1.1'>, $chk11, $chk10);
+    } else {
+      valid_err q<Built-in code parameter "version" required>;
+    }
+    $r = $t . $r;
+    $opt{ncname} or valid_err q<Built-in code parameter "ncname" required>;
+    $r =~ s/\$qname\b/\$$opt{ncname}/g;
+    $Info->{Require_perl_package_use}->{'Char::Class::XML'} or
+      valid_err q<"Char::Class::XML" must be "Require"d>;
+    for (%class) {
       $Info->{Require_perl_package_use}->{'Char::Class::XML::::Import'}->{$_} or
         valid_err qq<"$_" must be exported from "Char::Class::XML">;
     }
@@ -391,7 +519,7 @@ sub perl_builtin_code ($%) {
 
 sub perl_code_source ($%) {
   my ($s, %opt) = @_;
-  sprintf qq<#line %d "File <%s> Node <%s>"\n%s\n> .
+  sprintf qq<\n#line %d "File <%s> Node <%s>"\n%s\n> .
           qq<#line 1 "File <%s> Chunk #%d"\n>,
     $opt{line} || 1, $opt{file} || $Info->{source_filename},
     $opt{path} || 'x:unknown ()', $s, 
@@ -452,14 +580,18 @@ sub perl_if ($$;$) {
     $true = $false;
     $false = undef;
   }
-  my $r = qq<if ($condition) {\n>.
+  for ($true, $false) {
+    $_ = "\n" . $_ if $_ and /\A#\w+/;
+  }
+  my $r = qq<$if ($condition) {\n>.
           qq<  $true>.
           qq<}>;
   if (defined $false) {
      $r .=  qq< else {\n>.
            qq<  $false>.
-           qq<}\n>;
+           qq<}>;
   }
+  $r .= qq<\n>;
   $r;
 } # perl_if
 
@@ -655,7 +787,11 @@ sub ns_uri_to_perl_package_name ($) {
 sub ns_prefix_to_uri ($) {
   my $pfx = shift;
   if (exists $Info->{Namespace}->{$pfx}) {
-    return $Info->{Namespace}->{$pfx};
+    if (not defined $Info->{Namespace}->{$pfx}) {
+      valid_err qq<Namespace name for "$pfx" not defined>;
+    } else {
+      return $Info->{Namespace}->{$pfx};
+    }
   } else {
     valid_err qq<Namespace prefix "$pfx" not declared>;
   }  
@@ -779,7 +915,7 @@ sub dis2perl ($) {
               perl_var (type => '$', local_name => 'r')
               => '$self->{node}->{' .
                  perl_literal (expanded_uri ($_->value)) . '}->'.
-                 perl_code q{__CLASS{ManakaiDOMObject}__->__INT{newReference}__};
+                 perl_code q{__CLASS{ManakaiDOMNodeObject}__->__INT{newReference}__};
     } elsif ($_->local_name eq 'SetProp') {
       $r .= perl_statement perl_assign
               '$self->{node}->{' .
@@ -944,7 +1080,18 @@ sub get_internal_code ($$;%) {
     $you->get_attribute_value ('Name') eq $name
   })) {
     $def = $m->get_attribute ('Return');
-    $def = get_perl_definition_node $def, name => 'IntDef' if $def;
+    $def = (get_perl_definition_node $def, name => 'IntDef' or
+            get_perl_definition_node $def, name => 'Def') if $def;
+  } elsif ($m = $node->get_element_by (sub {
+    my ($me, $you) = @_;
+    $you->node_type eq '#element' and
+    ($you->local_name eq 'Attr' or
+     $you->local_name eq 'ReAttr') and
+    $you->get_attribute_value ('Name') eq $name
+  })) {
+    $def = $m->get_attribute ('Get');
+    $def = (get_perl_definition_node $def, name => 'IntDef' or
+            get_perl_definition_node $def, name => 'Def') if $def;
   } elsif ($m = $node->get_element_by (sub {
     my ($me, $you) = @_;
     $you->node_type eq '#element' and
@@ -952,6 +1099,14 @@ sub get_internal_code ($$;%) {
     $you->get_attribute_value ('Name') eq $name
   })) {
     $def = $m->get_attribute ('Return');
+    $def = get_perl_definition_node $def, name => 'Def' if $def;
+  } elsif ($m = $node->get_element_by (sub {
+    my ($me, $you) = @_;
+    $you->node_type eq '#element' and
+    $you->local_name eq 'IntAttr' and
+    $you->get_attribute_value ('Name') eq $name
+  })) {
+    $def = $m->get_attribute ('Get');
     $def = get_perl_definition_node $def, name => 'Def' if $def;
   }
   if ($def) {
@@ -2614,6 +2769,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/09/13 03:06:34 $
+# $Date: 2004/09/15 04:05:39 $
 
 

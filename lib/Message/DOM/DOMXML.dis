@@ -29,7 +29,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/13 03:06:34 $
+     $Date: 2004/09/15 04:05:39 $
   @Require:
     @@Module:
       @@@Name: ManakaiDOM
@@ -128,17 +128,40 @@ IF:
         $r = null;
   @ReAttr:
     @@Name: nodeName
+    @@Description:
+       @@@lang:en
+       @@@@: The node name.
     @@Spec:
       @@@DOM3[list]:
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
     @@Get:
       @@@Type: DOMString
+      @@@InCase:
+        @@@@Value:\#cdata-section
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: Always this value for the "CDATASection" node.
+      @@@DefaultValue: \#cdata-section
+      @@@Def: \
+    @@Redefine: Node
+  @ReAttr:
+    @@Name: nodeType
+    @@Description:
+      @@@lang:en
+      @@@@: The type of this node.
+    @@Get:
+      @@@Type: unsigned-short
+      @@@InCase:
+        @@@@Label: CDATA_SECTION_NODE
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The node is a "CDATASection".
       @@@Def:
         @@@@Type:
           lang:Perl
-        @@@@@:
-          $r = q<#cdata-section>;
+        @@@@@: $r = __CLASS{Node}__->CDATA_SECTION_NODE;
+    @@Redefine: Node
 
 IF:
   @Name:  DocumentType
@@ -189,30 +212,37 @@ IF:
         @@@@@:
           $r = null;
   @ReAttr:
-    @@Name: nodeValue
-    @@Spec:
-      @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D080
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Name: nodeName
+    @@Description:
+      @@@lang:en
+      @@@@: The node name.
     @@Get:
       @@@Type: DOMString
-      @@@Exception[list]: DOMException
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The document type name.
       @@@Def:
         @@@@Type:
           lang:Perl
-        @@@@@:
-          $r = null;
-    @@Set:
-      @@@Type: DOMString
-      @@@Exception[list]: DOMException
+        @@@@@: __INT{{name}}__;
+    @@Redefine: Node
+  @ReAttr:
+    @@Name: nodeType
+    @@Description:
+      @@@lang:en
+      @@@@: The type of this node.
+    @@Get:
+      @@@Type: unsigned-short
+      @@@InCase:
+        @@@@Label: DOCUMENT_TYPE_NODE
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The node is a "DocumentType".
       @@@Def:
         @@@@Type:
           lang:Perl
-        @@@@@:
-          __EXCEPTION{ManakaiDOMImplementationException}{
-            -class => 'warn',
-            -type => 'ATTR_SET_NO_EFFECT',
-          }__;
+        @@@@@: $r = __CLASS{Node}__->DOCUMENT_TYPE_NODE;
+    @@Redefine: Node
   @ReAttr:
     @@Name: textContent
     @@Spec:
@@ -268,30 +298,38 @@ IF:
         @@@@@:
           $r = null;
   @ReAttr:
-    @@Name: nodeValue
-    @@Spec:
-      @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D080
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Name: nodeName
+    @@Description:
+      @@@lang:en
+      @@@@: The node name.
     @@Get:
       @@@Type: DOMString
-      @@@Exception[list]: DOMException
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The notation name.
+      @@@Def:
+        @@@@Type:
+          lang:dis
+        @@@@GetProp:
+          DOMCore:name
+    @@Redefine: Node
+  @ReAttr:
+    @@Name: nodeType
+    @@Description:
+      @@@lang:en
+      @@@@: The type of this node.
+    @@Get:
+      @@@Type: unsigned-short
+      @@@InCase:
+        @@@@Label: NOTATION_NODE
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The node is a "Notation".
       @@@Def:
         @@@@Type:
           lang:Perl
-        @@@@@:
-          $r = null;
-    @@Set:
-      @@@Type: DOMString
-      @@@Exception[list]: DOMException
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          __EXCEPTION{ManakaiDOMImplementationException}{
-            -class => 'warn',
-            -type => 'ATTR_SET_NO_EFFECT',
-          }__;
+        @@@@@: $r = __CLASS{Node}__->NOTATION_NODE;
+    @@Redefine: Node
   @ReAttr:
     @@Name: textContent
     @@Spec:
@@ -366,30 +404,38 @@ IF:
         @@@@@:
           $r = null;
   @ReAttr:
-    @@Name: nodeValue
-    @@Spec:
-      @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D080
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Name: nodeName
+    @@Description:
+      @@@lang:en
+      @@@@: The node name.
     @@Get:
       @@@Type: DOMString
-      @@@Exception[list]: DOMException
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The entity name.
+      @@@Def:
+        @@@@Type:
+          lang:dis
+        @@@@GetProp:
+          DOMCore:name
+    @@Redefine: Node
+  @ReAttr:
+    @@Name: nodeType
+    @@Description:
+      @@@lang:en
+      @@@@: The type of this node.
+    @@Get:
+      @@@Type: unsigned-short
+      @@@InCase:
+        @@@@Label: ENTITY_NODE
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The node is an "Entity".
       @@@Def:
         @@@@Type:
           lang:Perl
-        @@@@@:
-          $r = null;
-    @@Set:
-      @@@Type: DOMString
-      @@@Exception[list]: DOMException
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          __EXCEPTION{ManakaiDOMImplementationException}{
-            -class => 'warn',
-            -type => 'ATTR_SET_NO_EFFECT',
-          }__;
+        @@@@@: $r = __CLASS{Node}__->ENTITY_NODE;
+    @@Redefine: Node
 
 IF:
   @Name:  EntityReference
@@ -412,30 +458,38 @@ IF:
         @@@@@:
           $r = null;
   @ReAttr:
-    @@Name: nodeValue
-    @@Spec:
-      @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D080
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Name: nodeName
+    @@Description:
+      @@@lang:en
+      @@@@: The node name.
     @@Get:
       @@@Type: DOMString
-      @@@Exception[list]: DOMException
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The name of the entity referred.
+      @@@Def:
+        @@@@Type:
+          lang:dis
+        @@@@GetProp:
+          DOMCore:name
+    @@Redefine: Node
+  @ReAttr:
+    @@Name: nodeType
+    @@Description:
+      @@@lang:en
+      @@@@: The type of this node.
+    @@Get:
+      @@@Type: unsigned-short
+      @@@InCase:
+        @@@@Label: ENTITY_REFERENCE_NODE
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The node is an "EntityReference".
       @@@Def:
         @@@@Type:
           lang:Perl
-        @@@@@:
-          $r = null;
-    @@Set:
-      @@@Type: DOMString
-      @@@Exception[list]: DOMException
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          __EXCEPTION{ManakaiDOMImplementationException}{
-            -class => 'warn',
-            -type => 'ATTR_SET_NO_EFFECT',
-          }__;
+        @@@@@: $r = __SUPER{Node}__->ENTITY_REFERENCE_NODE;
+    @@Redefine: Node
 
 IF:
   @Name:  ProcessingInstruction
@@ -469,5 +523,74 @@ IF:
           lang:Perl
         @@@@@:
           $r = null;
+  @ReAttr:
+    @@Name: nodeName
+    @@Description:
+      @@@lang:en
+      @@@@: The node name.
+    @@Get:
+      @@@Type: DOMString
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The target name, i.e. same as "target".
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@: __INT{{target}}__;
+    @@Redefine: Node
+  @ReAttr:
+    @@Name: nodeType
+    @@Description:
+      @@@lang:en
+      @@@@: The type of this node.
+    @@Get:
+      @@@Type: unsigned-short
+      @@@InCase:
+        @@@@Label: PROCESSING_INSTRUCTION_NODE
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The node is a "ProcessingInstruction".
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@: $r = __SUPER{Node}__->PROCESSING_INSTRUCTION_NODE;
+    @@Redefine: Node
+  @ReAttr:
+     @@Name:  nodeValue
+     @@Description:
+       @@@lang:en
+       @@@@: The value of this node.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: DOMSTRING_SIZE_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              The target data, i.e. same as "data".
+        @@@Def:
+          @@@@Type: 
+            lang:Perl
+          @@@@@: __INT{{data}}__;
+     @@Set:
+        @@@Type:  DOMString
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              The node is read-only.
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            New node value.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            __DEEP{ $self->__SUPER{Attr}__::data ($given) }__;
+    @@Redefine: Node
 
 ## DOMXML.dis ends here
