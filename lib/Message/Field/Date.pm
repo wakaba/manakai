@@ -130,7 +130,7 @@ Return empty Message::Field::Date object.
 sub new ($;%) {
   my $class = shift;
   my %option = @_;
-  $option{date_time} ||= time; $option{date_time} = 0 if $option{unknown};
+  $option{date_time} ||= time; $option{date_time} = 0 if $option{-time_is_unknown};
   my $self = bless {option => {@_}, date_time => $option{date_time}}, $class;
   for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
   $self->_option_zone_letter ($self->{option}->{zone_letter});

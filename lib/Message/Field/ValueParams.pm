@@ -9,7 +9,7 @@ Internet message field bodies
 package Message::Field::ValueParams;
 use strict;
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Params;
 push @ISA, qw(Message::Field::Params);
 
@@ -75,6 +75,9 @@ sub _init ($;%) {
   } elsif ($fname eq 'link') {
     $self->{option}->{parameter_value_unsafe_rule}->{'*value'} = 'MATCH_NONE';
     $self->{option}->{value_type}->{'*value'} = ['Message::Field::URI'];
+  } elsif ($fname eq 'auto-submitted') {
+    $self->{option}->{parameter_value_unsafe_rule}->{'*value'} = 'NON_token';
+    $self->{option}->{value_type}->{increment} = ['Message::Field::Numval'];
   } else {
     $self->{option}->{parameter_value_unsafe_rule}->{'*value'}
       = 'NON_http_token_wsp';
@@ -191,7 +194,7 @@ Returns C<field-body> as a string.
 sub stringify ($;%) {
   my $self = shift;
   my $param = $self->SUPER::stringify (@_);
-  $self->value_as_string (@_).(defined $param? '; '.$param: '');
+  $self->value_as_string (@_).(length $param? '; '.$param: '');
 }
 *as_string = \&stringify;
 
@@ -300,7 +303,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/21 04:27:42 $
+$Date: 2002/04/22 08:28:20 $
 
 =cut
 

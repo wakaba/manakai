@@ -1,85 +1,108 @@
 
 =head1 NAME
 
-Message::Field::Received Perl module
-
-=head1 DESCRIPTION
-
-Perl module for RFC 821/822/2821/2822 Received C<field>.
+Message::Field::Received --- Perl module for C<Received:>
+Internet message header field body
 
 =cut
 
+## TODO: reimplemention by using Message::Field::Params
+
 package Message::Field::Received;
-require 5.6.0;
 use strict;
-use re 'eval';
-use vars qw(%OPTION %REG $VERSION);
-$VERSION = '1.00';
+use vars qw(@ISA %REG $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+require Message::Util;
+require Message::Field::Structured;
+push @ISA, qw(Message::Field::Structured);
 
-use Message::Field::Date;
+require Message::Field::Date;
 use overload '@{}' => sub {shift->_delete_empty_item->{item}},
-             '""' => sub {shift->stringify};
+             '""' => sub { $_[0]->stringify };
 
-$REG{comment} = qr/\x28(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x27\x2A-\x5B\x5D-\xFF]+|(??{$REG{comment}}))*\x29/;
-$REG{quoted_string} = qr/\x22(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\xFF])*\x22/;
-$REG{domain_literal} = qr/\x5B(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x5A\x5E-\xFF])*\x5D/;
+*REG = \%Message::Util::REG;
+## Inherited: comment, quoted_string, domain_literal
+	## WSP, FWS, atext
+	## domain, addr_spec, msg_id
+	## date_time, asctime
 
-$REG{WSP} = qr/[\x20\x09]+/;
-$REG{FWS} = qr/[\x20\x09]*/;
-$REG{atext} = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2F\x30-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]+/;
-$REG{dot_atom} = qr/$REG{atext}(?:$REG{FWS}\x2E$REG{FWS}$REG{atext})*/;
-$REG{dot_word} = qr/(?:$REG{atext}|$REG{quoted_string})(?:$REG{FWS}\x2E$REG{FWS}(?:$REG{atext}|$REG{quoted_string}))*/;
-$REG{domain} = qr/(?:$REG{dot_atom}|$REG{domain_literal})/;
-$REG{addr_spec} = qr/$REG{dot_word}$REG{FWS}\x40$REG{FWS}$REG{domain}/;
-$REG{msg_id} = qr/<$REG{FWS}$REG{addr_spec}$REG{FWS}>/;
-$REG{item_name} = qr/[A-Za-z][0-9A-Za-z-]*[0-9A-Za-z]/;
-	## strictly, item-name = ALPHA *(["-"] (ALPHA / DIGIT))
-$REG{M_name_val_pair} = qr/($REG{item_name})$REG{FWS}($REG{msg_id}|$REG{addr_spec}|$REG{domain}|$REG{atext})/;
-$REG{date_time} = qr/(?:[A-Za-z]+$REG{FWS},$REG{FWS})?[0-9]+$REG{WSP}*[A-Za-z]+$REG{WSP}*[0-9]+$REG{WSP}+[0-9]+$REG{FWS}:$REG{WSP}*[0-9]+(?:$REG{FWS}:$REG{WSP}*[0-9]+)?$REG{FWS}(?:[A-Za-z]+|[+-]$REG{WSP}*[0-9]+)/;
-$REG{asctime} = qr/[A-Za-z]+$REG{WSP}*[A-Za-z]+$REG{WSP}*[0-9]+$REG{WSP}+[0-9]+$REG{FWS}:$REG{WSP}*[0-9]+$REG{FWS}:$REG{WSP}*[0-9]+$REG{WSP}+[0-9]+/;
+	$REG{item_name} = qr/[A-Za-z][0-9A-Za-z-]*[0-9A-Za-z]/;
+		## strictly, item-name = ALPHA *(["-"] (ALPHA / DIGIT))
+	$REG{M_name_val_pair} = qr/($REG{item_name})$REG{FWS}($REG{msg_id}|$REG{addr_spec}|$REG{domain}|$REG{atext})/;
 
-%OPTION = (
-);
 
-=head2 Message::Field::Received->new ()
+=head1 CONSTRUCTORS
 
-Return empty received object.
+The following methods construct new objects:
+
+=over 4
+
+=cut
+
+## Initialize of this class -- called by constructors
+sub _init ($;%) {
+  my $self = shift;
+  my %options = @_;
+  my %DEFAULT = (
+    -field_name	=> 'received',
+    #format	## Inherited
+    -parse_all	=> 0,
+    -value_type	=> {'*default'	=> [':none:']},
+  );
+  $self->SUPER::_init (%DEFAULT, %options);
+}
+
+
+=item $r = Message::Field::Received->new ([%options])
+
+Constructs a new object.  You might pass some options as parameters 
+to the constructor.
 
 =cut
 
 sub new ($;%) {
-  my $self = bless {}, shift;
-  my %option = @_;
-  for (%OPTION) {$option{$_} ||= $OPTION{$_}}
-  $self->{option} = \%option;
-  $self->{date_time} = new Message::Field::Date;
+  my $self = shift->SUPER::new (@_);
+  $self->{date_time} = new Message::Field::Date
+      -field_name => $self->{option}->{field_name},
+      -field_param_name => 'date-time',
+      -format => $self->{option}->{format};
   $self;
 }
 
-=head2 Message::Field::Received->parse ($unfolded_field_body)
+=item $r = Message::Field::Received->parse ($field-body, [%options])
 
-Parse Received: C<field-body>.
+Constructs a new object with given field body.  You might pass 
+some options as parameters to the constructor.
 
 =cut
 
 sub parse ($$;%) {
-  my $self = bless {}, shift;
+  my $class = shift;
+  my $self = bless {}, $class;
   my $field_body = shift;
-  my %option = @_;
-  for (%OPTION) {$option{$_} ||= $OPTION{$_}}
-  $self->{option} = \%option;
-  $field_body = $self->delete_comment ($field_body);
+  $self->_init (@_);
+  $field_body = Message::Util::delete_comment ($field_body);
   $field_body =~ s{;$REG{FWS}($REG{date_time})$REG{FWS}$}{
-    $self->{date_time} = Message::Field::Date->parse ($1);
+    $self->{date_time} = parse Message::Field::Date $1,
+      -field_name => $self->{option}->{field_name},
+      -field_param_name => 'date-time',
+      -format => $self->{option}->{format};
     '';
   }ex;
   unless ($self->{date_time}) {
     if ($field_body =~ /($REG{asctime})/) {	## old USENET format
-      $self->{date_time} = Message::Field::Date->parse ($1);
+      $self->{date_time} = parse Message::Field::Date $1,
+        -field_name => $self->{option}->{field_name},
+        -field_param_name => 'date-time',
+        -format => $self->{option}->{format};
       return $self;
     } else {	## broken!
       $field_body =~ s/;[^;]+$//;
-      $self->{date_time} = new Message::Field::Date (unknown => 1);
+      $self->{date_time} = new Message::Field::Date
+        -time_is_unknown => 1,
+        -field_name => $self->{option}->{field_name},
+        -field_param_name => 'date-time',
+        -format => $self->{option}->{format};
     }
   }
   $field_body =~ s{$REG{M_name_val_pair}$REG{FWS}}{
@@ -90,6 +113,12 @@ sub parse ($$;%) {
   }goex;
   $self;
 }
+
+=back
+
+=head1 METHODS
+
+=over 4
 
 =head2 $self->items ()
 
@@ -143,49 +172,46 @@ C<item-val-pair> is valid as RFC (2)82[12] definition or not.
 
 =cut
 
-sub add ($$$) {
+sub add ($%) {
   my $self = shift;
-  my ($name, $value) = @_;
-  push @{$self->{item}}, [$name, $value];
-  $self;
-}
-
-sub replace ($$$) {
-  my $self = shift;
-  my ($name => $value) = (lc shift => shift);
-  for my $item (@{$self->{item}}) {
-    if ($item->[0] eq $name) {
-      $item->[1] = $value;
-      return $self;
+  my %gp = @_; my %option = %{$self->{option}};
+  for (grep {/^-/} keys %gp) {$option{substr ($_, 1)} = $gp{$_}}
+  $option{parse} = 1 if defined wantarray;
+  my $p;
+  for (grep {/^[^-]/} keys %gp) {
+    my ($name => $value) = (lc $_ => $gp{$_});
+    $value = $self->_item_value ($name => $value) if $option{parse};
+    if ($option{prepend}) {
+      unshift @{$self->{item}}, [$name => $value];
+    } else {
+      push @{$self->{item}}, [$name => $value];
     }
   }
-  push @{$self->{item}}, [$name => $value];
-  $self;
+  $p;
 }
 
-=head2 $self->delete ($item_name, [$index])
-
-Deletes C<name-val-pair> named as $item_name.
-If $index is specified, only $index'th C<name-val-pair> is deleted.
-If not, ($index == 0), all C<name-val-pair>s that have the C<item-name>
-$item_name are deleted.
-
-=cut
-
-sub delete ($$;$) {
+sub replace ($%) {
   my $self = shift;
-  my ($name, $index) = (lc shift, shift);
-  my $i = 0;
-  for my $item (@{$self->{item}}) {
-    if ($item->[0] eq $name) {
-      $i++;
-      if ($index == 0 || $i == $index) {
-        undef $item;
-        return $self if $i == $index;
-      }
+  my %gp = @_; my %option = %{$self->{option}};
+  for (grep {/^-/} keys %gp) {$option{substr ($_, 1)} = $gp{$_}}
+  $option{parse} = 1 if defined wantarray;
+  my $p;
+  for (grep {/^[^-]/} keys %gp) {
+    my ($name => $value) = (lc $_ => $gp{$_});
+    my $f = 0;
+    for my $item (@{$self->{item}}) {
+      if ($item->[0] eq $name) {$item = [$name => $value]; $f = 1}
     }
+    push @{$self->{item}}, [$name => $value] unless $f == 1;
   }
-  $self;
+  $p;
+}
+
+sub delete ($@) {
+  my $self = shift;
+  my %delete;
+  for (@_) {$delete{lc $_} = 1}
+  $self->{item} = [grep {!$delete{$_->[0]}} @{$self->{item}}];
 }
 
 =head2 $self->count ([$item_name])
@@ -201,101 +227,62 @@ sub count ($;$) {
   my $self = shift;
   my ($name) = (lc shift);
   unless ($name) {
-    $self->_delete_empty_item ();
+    $self->_delete_empty;
     return $#{$self->{item}}+1;
   }
-  my $count = 0;
-  for my $item (@{$self->{item}}) {
-    if ($item->[0] eq $name) {
-      $count++;
-    }
-  }
-  $count;
+  my @c = grep {$_->[0] eq $name} @{$self->{item}};
+  scalar @c;
 }
 
-sub _delete_empty_item ($) {
+sub _delete_empty ($) {
   my $self = shift;
-  my @ret;
-  for my $item (@{$self->{item}}) {
-    push @ret, $item if $item->[0];
-  }
-  $self->{item} = \@ret;
+  $self->{item} = [grep {ref $_ && length $_->[0]} @{$self->{item}}];
   $self;
 }
-
 
 
 sub stringify ($;%) {
   my $self = shift;
   my %option = @_;
   my @return;
-  $self->_delete_empty_item;
+  $self->_delete_empty;
   for my $item (@{$self->{item}}) {
     push @return, $item->[0], $item->[1] if $item->[0] =~ /^$REG{item_name}$/;
   }
   join (' ', @return).'; '.$self->{date_time}->as_rfc2822_time;
 }
+*as_string = \&stringify;
 
-sub as_string ($;%) {shift->stringify (@_)}
-=head2 $self->option ($option_name, [$option_value])
+=item $option-value = $r->option ($option-name)
 
-Set/gets new value of the option.
+Gets option value.
 
-=cut
+=item $r->option ($option-name, $option-value, ...)
 
-sub option ($$;$) {
-  my $self = shift;
-  my ($name, $value) = @_;
-  if (defined $value) {
-    $self->{option}->{$name} = $value;
-  }
-  $self->{option}->{$name};
-}
-
-=head2 $self->delete_comment ($field_body)
-
-Remove all C<comment> in given strictured C<field-body>.
-This method is intended for internal use.
+Set option value(s).  You can pass multiple option name-value pair
+as parameter when setting.
 
 =cut
 
-sub delete_comment ($$) {
+## Inherited
+
+## TODO: $r->value_type
+
+=item $clone = $r->clone ()
+
+Returns a copy of the object.
+
+=cut
+
+sub clone ($) {
   my $self = shift;
-  my $body = shift;
-  $body =~ s{($REG{quoted_string}|$REG{domain_literal})|$REG{comment}}{
-    my $o = $1;  $o? $o : ' ';
-  }gex;
-  $body;
+  $self->_delete_empty;
+  my $clone = $self->SUPER::clone;
+  $clone->{item} = Message::Util::make_clone ($self->{item});
+  $clone->{value_type} = Message::Util::make_clone ($self->{value_type});
+  $clone;
 }
 
-=head1 EXAMPLE
-
-  ## Compose field-body for To: field.
-  
-  use Message::Field::Address;
-  my $addr = new Message::Field::Address;
-  $addr->add ('foo@example.org', name => 'Mr. foo bar');
-  $addr->add ('webmaster@example.org', group => 'administrators');
-  $addr->add ('postmaster@example.org', group => 'administrators');
-  
-  my $field_body = $addr->stringify ();
-
-
-  ## Output parsed address-list tree.
-  
-  use Message::Field::Address;
-  my $addr = Message::Field::Address->parse ($field_body);
-  
-  for my $i (@$addr) {
-    if ($i->{type} eq 'group') {
-      print "\x40 $i->{display_name}: \n";
-      for my $j (@{$i->{address}}) {
-        print "\t- $j->{display_name} <$j->{route}$j->{addr_spec}>\n";
-      }
-    } else {
-      print "- $i->{display_name} <$i->{route}$i->{addr_spec}>\n";
-    }
-  }
 
 =head1 LICENSE
 
@@ -319,7 +306,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/31 13:11:55 $
+$Date: 2002/04/22 08:28:20 $
 
 =cut
 

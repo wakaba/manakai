@@ -11,7 +11,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -102,6 +102,9 @@ sub _init ($;%) {
     $self->{option}->{value_type} = ['Message::Field::URI', 
       {-field_name => $self->{option}->{field_name},
       -format => $self->{option}->{format}}];
+  #} elsif ($field_name eq 'p3p') {
+  #  $self->{option}->{is_quoted_string} = 0;
+  #  $self->{option}->{value_type} = ['Message::Field::Params'];
   } elsif ($field_name eq 'encrypted') {
     $self->{option}->{max} = 2;
   }
@@ -351,7 +354,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/21 04:27:42 $
+$Date: 2002/04/22 08:28:20 $
 
 =cut
 

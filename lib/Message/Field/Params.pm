@@ -11,7 +11,7 @@ use strict;
 require 5.6.0;
 use re 'eval';
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -28,6 +28,7 @@ use overload '""' => sub { $_[0]->stringify },
 	## M_quoted_string
 
 $REG{param} = qr/(?:$REG{atext_dot}|$REG{quoted_string}|$REG{angle_quoted})(?:$REG{atext_dot}|$REG{quoted_string}|$REG{WSP}|,)*/;
+$REG{param_nocomma} = qr/(?:$REG{atext_dot}|$REG{quoted_string}|$REG{angle_quoted})(?:$REG{atext_dot}|$REG{quoted_string}|$REG{WSP})*/;
 	## more naive C<parameter>.  (Comma is allowed for RFC 1049)
 $REG{parameter} = qr/$REG{token}=(?:$REG{token}|$REG{quoted_string})?/;
 	## as defined by RFC 2045, not RFC 2231.
@@ -59,15 +60,24 @@ sub _init ($;%) {
     #format	## Inherited
     #hook_encode_string	## Inherited
     #hook_decode_string	## Inherited
+    -parameter_rule	=> 'param',
     -parameter_name_case_sensible	=> 0,
     -parameter_value_max_length	=> 78,
     -parameter_value_unsafe_rule	=> {'*default'	=> 'NON_http_attribute_char'},
     -parse_all	=> 0,
+    -separator	=> '; ',
+    -separator_regex	=> qr/$REG{FWS};$REG{FWS}/,
     -use_parameter_extension	=> 0,
     -value_type	=> {'*default'	=> [':none:']},
   );
   $self->SUPER::_init (%DEFAULT, %options);
   $self->{param} = [];
+  my $fname = $self->_n11n_field_name ($self->{option}->{field_name});
+  if ($fname eq 'p3p') {
+    $self->{option}->{parameter_rule} = 'param_nocomma';
+    $self->{option}->{separator} = ', ';
+    $self->{option}->{separator_regex} = qr/$REG{FWS},$REG{FWS}/;
+  }
   if ($self->{option}->{format} =~ /^http-sip/) {
     $self->{option}->{encoding_before_decode} = 'utf-8';
     $self->{option}->{encoding_after_decode} = 'utf-8';
@@ -116,7 +126,8 @@ sub parse ($$;%) {
   $body = Message::Util::delete_comment ($body);
   $body = $self->_delete_fws ($body) if $self->{option}->{delete_fws};
   my @b = ();
-  $body =~ s{$REG{FWS}($REG{param})$REG{FWS}(?:;$REG{FWS}|$)}{
+  $body =~ s{$REG{FWS}($REG{$self->{option}->{parameter_rule}})
+             (?:$self->{option}->{separator_regex}|$)}{
     my $param = $1;
     push @b, $self->_parse_param ($param);
   }goex;
@@ -268,7 +279,7 @@ sub replace ($%) {
     if (ref $gp{$_}) {($value, %po) = @{$gp{$_}}} else {$value = $gp{$_}}
     $p = [$name, {value => $value, charset => $po{charset},
                   is_parameter => 1, language => $po{language}}];
-    $p->[1]->{is_parameter} = 0 if !$value && $po{value};
+    $p->[1]->{is_parameter} = 0 if !defined ($value) && $po{value};
     Carp::croak "replace: \$name contains of non-attribute-char: $name"
       if $p->[1]->{is_parameter} && $name =~ /$REG{NON_http_attribute_char}/;
     $p->[1]->{value} = $self->_param_value ($name => $p->[1]->{value})
@@ -282,6 +293,7 @@ sub replace ($%) {
   $p->[1]->{is_parameter}? $p->[1]->{value}: $p->[0];
 }
 
+## TODO: multiple parameters support
 sub delete ($$;%) {
   my $self = shift;
   my ($name, $index) = ($self->_n11n_param_name (shift), shift);
@@ -367,21 +379,24 @@ sub _param_value ($$$) {
   my $self = shift;
   my $name = shift || '*default';
   my $value = shift;
+  return $value if ref $value;
   my $vtype = $self->{option}->{value_type}->{$name}->[0]
       || $self->{option}->{value_type}->{'*default'}->[0];
   my %vopt; %vopt = %{$self->{option}->{value_type}->{$name}->[1]} 
     if ref $self->{option}->{value_type}->{$name}->[1];
-  if (ref $value) {
+  if ($vtype eq ':none:') {
     return $value;
-  } elsif ($vtype eq ':none:') {
-    return $value;
-  } elsif ($value) {
+  } elsif (defined $value) {
     eval "require $vtype";
     return $vtype->parse ($value, -format => $self->{option}->{format},
+      -field_name => $self->{option}->{field_name},
+      -field_param_name => $name,
       -field_body => $self->{option}->{field_body}, %vopt);
   } else {
     eval "require $vtype";
     return $vtype->new (-format => $self->{option}->{format},
+      -field_name => $self->{option}->{field_name},
+      -field_param_name => $name,
       -field_body => $self->{option}->{field_body}, %vopt);
   }
 }
@@ -404,7 +419,7 @@ sub stringify ($;%) {
   my %option = %{$self->{option}};
   for (grep {/^-/} keys %o) {$option{substr ($_, 1)} = $o{$_}}
   $self->_delete_empty;
-  join '; ',
+  join $self->{option}->{separator},
     map {
       my $v = $_->[1];
       my $new = '';
@@ -413,7 +428,9 @@ sub stringify ($;%) {
         my (%e) = &{$self->{option}->{hook_encode_string}} ($self, 
           $v->{value}, current_charset => $v->{charset}, language => $v->{language},
           type => 'parameter');
-        if ($option{use_parameter_extension} && ($e{charset} || $e{language} 
+        if ($e{value} eq undef) {
+          $value[0] = undef;
+        } elsif ($option{use_parameter_extension} && ($e{charset} || $e{language} 
                            || $e{value} =~ /[\x00\x0D\x0A\x80-\xFF]/)) {
           my ($charset, $lang);
           $encoded = 1;
@@ -458,7 +475,8 @@ sub stringify ($;%) {
           $new = 
             Message::Util::quote_unsafe_string ($_->[0], 
               unsafe => 'NON_attribute_char')
-            .($encoded?'*':'').'='.$value[0];
+            .($encoded?'*':'').'='.$value[0]
+              if defined $value[0];
         } else {
           my @new;
           my $name = Message::Util::quote_unsafe_string 
@@ -494,11 +512,11 @@ sub scan ($&) {
   }
 }
 
-=item $option-value = $ua->option ($option-name)
+=item $option-value = $p->option ($option-name)
 
 Gets option value.
 
-=item $csv->option ($option-name, $option-value, ...)
+=item $p->option ($option-name, $option-value, ...)
 
 Set option value(s).  You can pass multiple option name-value pair
 as parameter when setting.
@@ -518,6 +536,7 @@ sub option ($;$%) {
   }
 }
 
+## TODO: multiple value-type support
 sub value_type ($;$$%) {
   my $self = shift;
   my $name = shift || '*default';
@@ -546,7 +565,7 @@ sub value_unsafe_rule ($$;$%) {
   }
 }
 
-=item $clone = $ua->clone ()
+=item $clone = $p->clone ()
 
 Returns a copy of the object.
 
@@ -602,7 +621,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/21 04:27:42 $
+$Date: 2002/04/22 08:28:20 $
 
 =cut
 

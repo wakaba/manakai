@@ -1,7 +1,7 @@
 
 =head1 NAME
 
-Message::Field::Numval -- Perl module for
+Message::Field::Numval --- Perl module for
 Internet message header field body that takes numeric values
 
 =cut
@@ -9,14 +9,14 @@ Internet message header field body that takes numeric values
 package Message::Field::Numval;
 use strict;
 use vars qw(@ISA $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 use overload '.=' => sub { $_[0]->comment_add ($_[1]); $_[0] },
              '0+' => sub { $_[0]->{value} || $_[0]->{option}->{value_default} },
              '+=' => sub {
-               my $n = $_[0]->{value} + $_[1];
+               my $n = 0;#$_[0]->{value} + $_[1];
                $_[0]->{value} = $n if $n <= $_[0]->{option}->{value_max};
                $_[0]
              },
@@ -49,7 +49,6 @@ use overload '.=' => sub { $_[0]->comment_add ($_[1]); $_[0] },
              'ne' => sub { $_[0]->stringify eq $_[1] },
              fallback => 1;
 
-
 =head1 CONSTRUCTORS
 
 The following methods construct new C<Message::Field::Numval> objects:
@@ -68,6 +67,7 @@ sub _init ($;%) {
     #encoding_after_encode	## Inherited
     #encoding_before_decode	## Inherited
     -field_name	=> 'lines',
+    -field_param_name	=> '',
     -format_pattern	=> '%d',
     #hook_encode_string	## Inherited
     #hook_decode_string	## Inherited
@@ -84,6 +84,7 @@ sub _init ($;%) {
   push @{$self->{comment}}, $options{comment} if length $options{comment};
   
   my $fname = lc $self->{option}->{field_name};
+  my $pname = lc $self->{option}->{field_param_name};
   if ($fname eq 'mime-version') {
     $self->{option}->{output_comment} = 1;
     $self->{option}->{format_pattern} = '%1.1f';
@@ -94,6 +95,11 @@ sub _init ($;%) {
     $self->{option}->{check_min} = 1;
     $self->{option}->{value_min} = 1;	## Highest
     $self->{option}->{value_max} = 5;	## some implemention uses larger number...
+  } elsif ($fname eq 'auto-submitted' && $pname eq 'increment') {
+    $self->{option}->{output_comment} = 0;
+    $self->{option}->{check_min} = 1;
+    $self->{option}->{value_min} = 0;
+    $self->{option}->{value_if_invalid} = undef;
   }
 }
 
@@ -275,7 +281,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/13 01:33:54 $
+$Date: 2002/04/22 08:28:20 $
 
 =cut
 
