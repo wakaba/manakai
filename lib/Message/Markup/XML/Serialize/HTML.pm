@@ -15,7 +15,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Serialize::HTML;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 =head1 METHODS
 
@@ -97,6 +97,8 @@ sub html_simple ($;%) {
     } elsif ($node_type eq '#reference') {
       $r .= $node->stringify;
     } elsif ($node_type eq '#declaration') {
+    } elsif ($node_type eq '#xml') {
+      $r .= $node->outer_xml;
     } else {
       for (@{$node->child_nodes}) {
         $r .= html_simple ($_, %opt) unless $_->node_type eq '#attribute';
@@ -139,4 +141,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/06/03 06:41:18 $
+1; # $Date: 2004/07/25 07:17:33 $
