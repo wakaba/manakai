@@ -1,5 +1,11 @@
 2004-10-10  Wakaba  <wakaba@suika.fam.cx>
 
+	* ManakaiDOMCore.dis (ManakaiDOMAttributes.item): Return 
+	node reference.
+
+	* ManakaiDOMLS2003.dis (error_handler): '$caller' changed
+	to '$self' for correct error reporting and not to leak memory.
+
 	* Makefile (DIS2PM_PL): Path to dis2pm.pl changed.
 	* dis2pm.pl, idl2dis.pl: Removed (moved to ../../bin/).
 

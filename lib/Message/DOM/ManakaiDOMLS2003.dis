@@ -16,6 +16,8 @@ Namespace:
   @null:
     http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
   @TreeCore:\
+  @xml:
+    http://www.w3.org/XML/1998/namespace
   @xmlns:
     http://www.w3.org/2000/xmlns/
 Module:
@@ -51,7 +53,7 @@ Module:
         @@@@FullName:Wakaba
         @@@@Mail:w@suika.fam.cx
   @Date.RCS:
-     $Date: 2004/10/09 05:32:30 $
+     $Date: 2004/10/10 06:11:57 $
 
   @Feature:
     @@QName:
@@ -223,11 +225,11 @@ IF:
                <Q:DOMCore:schemaType> => $schemaType,
            }__;
          }
-
+         
          ## ** Code from bin/xml-validator.pl **
          my $eh = sub {
            \#line 1 "Error handler code from bin/xml-validator.pl"
-		my ($caller, $o, $error_type, $error_msg, $err) = @_;
+		my ($self, $o, $error_type, $error_msg, $err) = @_;
 		if ($err->{raiser_type} and
                     $err->{raiser_type} eq 'Message::Markup::XML::Validator') {
 		  $error_msg = $err->{node_path} . ': ' . $error_msg
@@ -258,7 +260,6 @@ IF:
            \#line 1 "ManakaiDOMImplementationLS2003.createLSParser #2"
          };
 
-
                                                ## Method from MMXParser
          $r = __CLASS{ManakaiXMLParser2003}__->new (option => {
            uri_resolver => sub {
@@ -281,7 +282,7 @@ IF:
 		#print STDERR "Retriving external entity <$p->{uri}>...\n";
 		return 1;
            \#line 1 "ManakaiDOMImplementationLS2003.createLSParser #3"
-	   },
+          },
 	   error_handler => $eh,
          });
          ## ** End Code from bin/xml-validator.pl **
@@ -292,7 +293,6 @@ IF:
 
          $r->flag (<Q:DOMCore:domConfig> => $self->{<Q:TreeCore:node>}
                                                  ->{<Q:DOMCore:domConfig>});
-
 
   @Method:
      @@Name:  createLSInput
@@ -623,7 +623,7 @@ IF:
                                                            ($text);
                  $text->{<Q:DOMCore:ownerDocument>}
                    = $parent->{<Q:DOMCore:ownerDocument>};
-                 $text->{<Q:infoset:content>} = $src->{value};
+                 $text->{<Q:infoset:content>} = $src->inner_text;
                  $text->{<Q:infoset:parent>} = $parent;
                  push @{$parent->{<Q:infoset:children>}}, $text;
                }
@@ -634,7 +634,7 @@ IF:
                                                            ($text);
                  $text->{<Q:DOMCore:ownerDocument>}
                    = $parent->{<Q:DOMCore:ownerDocument>} || $parent;
-                 $text->{<Q:infoset:content>} = $src->{value};
+                 $text->{<Q:infoset:content>} = $src->inner_text;
                  $text->{<Q:infoset:parent>} = $parent;
                  push @{$parent->{<Q:infoset:children>}}, $text;
                }
@@ -653,7 +653,7 @@ IF:
                  my $lc = $parent->{<Q:infoset:children>}->[-1];
                  if ($lc and $lc->{<Q:DOMCore:nodeType>} eq <Q:DOMCore:Text>) {
                    $lc->{<Q:infoset:content>} .= $val;
-                 } elsif (defined $src->{value} and length $src->{value}) {
+                 } else {
                    my $text = __CLASS{Text}__->__INT{newObject}__;
                    $parent->__SUPER{ManakaiDOMNodeObject::}__::__INT{importTree}__
                                                            ($text);
@@ -663,6 +663,21 @@ IF:
                    $text->{<Q:infoset:parent>} = $parent;
                    push @{$parent->{<Q:infoset:children>}}, $text;
                  }
+               } elsif ($src->namespace_uri eq SGML_GENERAL_ENTITY) {
+                 my $text = __CLASS{EntityReference}__->__INT{newObject}__;
+                 $parent->__SUPER{ManakaiDOMNodeObject::}__::__INT{importTree}__
+                                                           ($text);
+                 $text->{<Q:DOMCore:ownerDocument>}
+                   = $parent->{<Q:DOMCore:ownerDocument>} || $parent;
+                 $text->{<Q:DOMCore:name>} = $src->{local_name};
+                 $text->{<Q:ManakaiDOM:isExpanded>} = false;
+                    ## TODO: Expansion
+                 $text->{<Q:infoset:parent>} = $parent;
+                 push @{$parent->{<Q:infoset:children>}}, $text;
+                 if ($src->get_attribute ('base', namespace_uri => <Q:xml:>)) {
+                   $text->{<Q:infoset:baseURI>} = $src->get_attribute_value
+                                         ('base', namespace_uri => <Q:xml:>);
+                 }
                } else {
                  warn "{Impl} References not supported.\n";
                  __EXCEPTION{
@@ -670,6 +685,26 @@ IF:
                     ## Not supported err
                  }__;
                }
+             } elsif ($src->node_type eq '#pi') {
+               my $text = __CLASS{ProcessingInstruction}__->__INT{newObject}__;
+               $parent->__SUPER{ManakaiDOMNodeObject::}__::__INT{importTree}__
+                                                           ($text);
+               $text->{<Q:DOMCore:ownerDocument>}
+                   = $parent->{<Q:DOMCore:ownerDocument>} || $parent;
+               $text->{<Q:infoset:target>} = $src->{local_name};
+               $text->{<Q:infoset:data>} = $src->inner_text;
+               $text->{<Q:infoset:parent>} = $parent;
+               push @{$parent->{<Q:infoset:children>}}, $text;
+             } elsif ($src->node_type eq '#section') {
+               \## TODO: Include/Ignore sections
+               my $text = __CLASS{CDATASection}__->__INT{newObject}__;
+               $parent->__SUPER{ManakaiDOMNodeObject::}__::__INT{importTree}__
+                                                           ($text);
+               $text->{<Q:DOMCore:ownerDocument>}
+                   = $parent->{<Q:DOMCore:ownerDocument>};
+               $text->{<Q:infoset:content>} = $src->inner_text;
+               $text->{<Q:infoset:parent>} = $parent;
+               push @{$parent->{<Q:infoset:children>}}, $text;
              } else {
                warn "{Impl} Node of type ".$src->node_type." not supported.\n";
                __EXCEPTION{

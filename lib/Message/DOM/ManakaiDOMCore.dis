@@ -38,7 +38,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/10/10 00:01:09 $
+     $Date: 2004/10/10 06:11:57 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -1392,10 +1392,19 @@ IF:
                 }
               }
             }
+            if ($r) {
+                         ## Condition sensitive
+              $r = __CLASS{Node}__->__INT{getNodeReference}__ ($r, $self);
+            }
     @@ImplNote:
       @@@lang:en
       @@@@:
         How ordering attributes is not specified.
+    @@Level[list]:
+      1
+      2
+      3
+    @@SpecLevel:1
   @Attr:
      @@Name:  length
      @@Description:

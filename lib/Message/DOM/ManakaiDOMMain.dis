@@ -33,7 +33,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/10/09 05:32:30 $
+     $Date: 2004/10/10 06:11:57 $
   
   @Description:
     @@lang:en
@@ -853,7 +853,7 @@ IF:
               $node->__SUPER{ManakaiDOMNodeObject::}__::__INT{destroy}__;
             }
           } else {
-            warn "Object of ".ref ($self)." without corresponding node object is to be destroied; there might be a memory leaking code";
+            warn "An object of type ".ref ($self)." that does not have associated node object is to be destroied; there might be a memory leaking code";
           }
 
 ## - For ManakaiDOMNodeObject

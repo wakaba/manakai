@@ -51,7 +51,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/10/10 00:01:08 $
+     $Date: 2004/10/10 06:11:56 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -402,6 +402,85 @@ Exception:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: The XML version
+        @@@SubType:
+          @@@@QName:
+            MDOM_EXCEPTION:MDOM_IMPL_ATTR_NOT_IMPLEMENTED
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The DOM implementation does not implement the 
+              attribute.
+          @@@@Param:
+            @@@@@Name:attr
+            @@@@@Type:
+              DOMMain:DOMString
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The name of the attribute that is not implemented.
+          @@@@Param:
+            @@@@@Name:if
+            @@@@@Type:
+              DOMMain:DOMString
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The interface name.
+          @@@@Param:
+            @@@@@Name:on
+            @@@@@Type:
+              DOMMain:DOMString
+            @@@@@InCase:
+              @@@@@@Value:get
+              @@@@@@Description:
+                @@@@@@@lang:en
+                @@@@@@@@:
+                  Getting the value from the attribute is not implemented.
+            @@@@@InCase:
+              @@@@@@Value:set
+              @@@@@@Description:
+                @@@@@@@lang:en
+                @@@@@@@@:
+                  Setting a value to the attribute is not implemented.
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@Type:
+              lang:muf
+            @@@@@@:
+              The attribute "%p (name => {<Q:MDOM_EXCEPTION:if>}, suffix => {.}
+              );%p (name => {<Q:MDOM_EXCEPTION:attr>});"
+              %p (name => {<Q:MDOM_EXCEPTION:on>},
+                  prefix => {(}, suffix => {)}); not implemented
+        @@@SubType:
+          @@@@QName:
+            MDOM_EXCEPTION:MDOM_IMPL_METHOD_NOT_IMPLEMENTED
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The DOM implementation does not implement the method.
+          @@@@Param:
+            @@@@@Name:if
+            @@@@@Type:
+              DOMMain:DOMString
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The interface name.
+          @@@@Param:
+            @@@@@Name:method
+            @@@@@Type:
+              DOMMain:DOMString
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The name of the method that is not implemented.
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@Type:
+              lang:muf
+            @@@@@@:
+              The method "%p (name => {<Q:MDOM_EXCEPTION:if>}, suffix => {.}
+              );%p (name => {<Q:MDOM_EXCEPTION:method>});" not implemented
         @@@SubType:
           @@@@QName:
             MDOM_EXCEPTION:MDOM_NODE_NOSUPPORT_XMLNS
