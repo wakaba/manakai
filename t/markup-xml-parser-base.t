@@ -78,12 +78,12 @@ my @a =
  {
   t => q{"foo<bar"},
   method => 'parse_attribute_value_specification',
-  result => q(0:4:WFC_NO_LESS_THAN_IN_ATTR_VAL),
+  result => q(0:4:SYNTAX_NO_LESS_THAN_IN_ATTR_VAL),
  },
  {
   t => q{'foo<bar'},
   method => 'parse_attribute_value_specification',
-  result => q(0:4:WFC_NO_LESS_THAN_IN_ATTR_VAL),
+  result => q(0:4:SYNTAX_NO_LESS_THAN_IN_ATTR_VAL),
  },
  {
   t => q{"foo&amp;bar"},
@@ -1515,6 +1515,468 @@ my @a =
   t => q[<!ELEMENT e %b; ],
   method => 'parse_element_declaration',
   result => '0:7:SYNTAX_MARKUP_DECLARATION_TOO_MANY_PARAM',
+ },
+
+ {
+  t => q<<!NOTATION n PUBLIC "pub">>,
+  method => 'parse_notation_declaration',
+  result => 1,
+ },
+ {
+  t => q<<!NOTATION n PUBLIC "pub" "sys"  >>,
+  method => 'parse_notation_declaration',
+  result => 1,
+ },
+ {
+  t => q<<!NOTATION n SYSTEM "sys">>,
+  method => 'parse_notation_declaration',
+  result => 1,
+ },
+ {
+  t => q[<!NOTATION n SYSTEM "sys"],
+  method => 'parse_notation_declaration',
+  result => '0:25:SYNTAX_MDC_REQUIRED',
+ },
+ {
+  t => q[<!NOTATION n SYSTEM "sys>],
+  method => 'parse_notation_declaration',
+  result => '0:25:SYNTAX_SLITC_REQUIRED',
+ },
+ {
+  t => q[<!NOTATION n ],
+  method => 'parse_notation_declaration',
+  result => '0:13:SYNTAX_NOTATION_EXTERNAL_IDENTIFIER_REQUIRED',
+ },
+ {
+  t => q[<!NOTATION>],
+  method => 'parse_notation_declaration',
+  result => '0:10:SYNTAX_NOTATION_PS_REQUIRED',
+ },
+ {
+  t => q[<!NOTATION >],
+  method => 'parse_notation_declaration',
+  result => '0:11:SYNTAX_NOTATION_NAME_REQUIRED',
+ },
+ {
+  t => q[<!NOTATION n>],
+  method => 'parse_notation_declaration',
+  result => '0:12:SYNTAX_NOTATION_PS_REQUIRED',
+ },
+ {
+  t => q[<!NOTATION n SYSTEM >],
+  method => 'parse_notation_declaration',
+  result => '0:20:SYNTAX_SYSTEM_LITERAL_REQUIRED',
+ },
+ {
+  entity => {n => q<not SYSTEM %sys;>, sys => q< "sys" >},
+  t => q[<!NOTATION %n;>],
+  method => 'parse_notation_declaration',
+  result => 1,
+ },
+
+ {
+  t => q[<!ATTLIST a>],
+  method => 'parse_attlist_declaration',
+  result => 1,
+ },
+ {
+  t => q[<!ATTLIST attr  >],
+  method => 'parse_attlist_declaration',
+  result => 1,
+ },
+ {
+  t => q[<!ATTLIST el <],
+  method => 'parse_attlist_declaration',
+  result => '0:13:SYNTAX_MDC_REQUIRED',
+ },
+ {
+  t => q[<!ATTLIST >],
+  method => 'parse_attlist_declaration',
+  result => '0:10:SYNTAX_ATTLIST_ASSOCIATED_NAME_REQUIRED',
+ },
+ {
+  t => q[<!ATTLIST>],
+  method => 'parse_attlist_declaration',
+  result => '0:9:SYNTAX_ATTLIST_PS_REQUIRED',
+ },
+
+ {
+  t => q[<!ATTLIST foo a CDATA #IMPLIED>],
+  method => 'parse_attlist_declaration',
+  result => 1,
+ },
+ {
+  t => q[<!ATTLIST foo a CDATA #REQUIRED>],
+  method => 'parse_attlist_declaration',
+  result => 1,
+ },
+ {
+  t => q[<!ATTLIST foo a NMTOKEN #IMPLIED>],
+  method => 'parse_attlist_declaration',
+  result => 1,
+ },
+ {
+  t => q[<!ATTLIST foo a ID #IMPLIED>],
+  method => 'parse_attlist_declaration',
+  result => 1,
+ },
+ {
+  t => q[<!ATTLIST foo a IDREF #IMPLIED>],
+  method => 'parse_attlist_declaration',
+  result => 1,
+ },
+ {
+  t => q[<!ATTLIST foo a IDREFS #IMPLIED>],
+  method => 'parse_attlist_declaration',
+  result => 1,
+ },
+ {
+  t => q[<!ATTLIST foo a NMTOKENS #IMPLIED>],
+  method => 'parse_attlist_declaration',
+  result => 1,
+ },
+ {
+  t => q[<!ATTLIST foo a NMTOKENS #IMPLIED b CDATA #REQUIRED>],
+  method => 'parse_attlist_declaration',
+  result => 1,
+ },
+ {
+  t => q[<!ATTLIST foo a NMTOKENS #IMPLIED a NMTOKENS #IMPLIED
+                       b CDATA #REQUIRED id ID #IMPLIED>],
+  method => 'parse_attlist_declaration',
+  result => 1,
+ },
+ {
+  t => q[<!ATTLIST foo a NMTOKENS #CURRENT>],
+  method => 'parse_attlist_declaration',
+  result => '0:26:SYNTAX_ATTRDEF_DEFAULT_SGML_KEYWORD',
+ },
+ {
+  t => q[<!ATTLIST foo a NMTOKENS #NEW>],
+  method => 'parse_attlist_declaration',
+  result => '0:26:SYNTAX_ATTRDEF_DEFAULT_UNKNOWN_KEYWORD',
+ },
+ {
+  t => q[<!ATTLIST foo a NMTOKENS >],
+  method => 'parse_attlist_declaration',
+  result => '0:25:SYNTAX_ATTRDEF_DEFAULT_REQUIRED',
+ },
+ {
+  t => q[<!ATTLIST foo a NMTOKENS#IMPLIED>],
+  method => 'parse_attlist_declaration',
+  result => '0:24:SYNTAX_ATTLIST_PS_REQUIRED',
+ },
+ {
+  t => q[<!ATTLIST foo a NAME #IMPLIED>],
+  method => 'parse_attlist_declaration',
+  result => '0:16:SYNTAX_ATTRDEF_TYPE_SGML_KEYWORD',
+ },
+ {
+  t => q[<!ATTLIST foo a URI #IMPLIED>],
+  method => 'parse_attlist_declaration',
+  result => '0:16:SYNTAX_ATTRDEF_TYPE_UNKNOWN_KEYWORD',
+ },
+ {
+  t => q[<!ATTLIST foo a #IMPLIED>],
+  method => 'parse_attlist_declaration',
+  result => '0:16:SYNTAX_ATTRDEF_TYPE_REQUIRED',
+ },
+ {
+  t => q[<!ATTLIST foo a#IMPLIED>],
+  method => 'parse_attlist_declaration',
+  result => '0:15:SYNTAX_ATTLIST_PS_REQUIRED',
+ },
+ {
+  t => q[<!ATTLIST foo a CDATA #IMPLIED ab>],
+  method => 'parse_attlist_declaration',
+  result => '0:33:SYNTAX_ATTLIST_PS_REQUIRED',
+ },
+ {
+  t => q[<!ATTLIST foo a CDATA "def">],
+  method => 'parse_attlist_declaration',
+  result => 1,
+ },
+ {
+  t => q[<!ATTLIST foo a CDATA #FIXED "def">],
+  method => 'parse_attlist_declaration',
+  result => 1,
+ },
+ {
+  t => q[<!ATTLIST foo a (a) #IMPLIED>],
+  method => 'parse_attlist_declaration',
+  result => 1,
+ },
+ {
+  t => q[<!ATTLIST foo a (a|b) #IMPLIED>],
+  method => 'parse_attlist_declaration',
+  result => 1,
+ },
+ {
+  t => q[<!ATTLIST foo a  (a|b|c) #IMPLIED>],
+  method => 'parse_attlist_declaration',
+  result => 1,
+ },
+ {
+  t => q[<!ATTLIST foo a  (a|b|c #IMPLIED>],
+  method => 'parse_attlist_declaration',
+  result => '0:24:SYNTAX_ATTRDEF_TYPE_GROUP_GRPC_REQUIRED',
+ },
+ {
+  t => q[<!ATTLIST foo a  (a,b) #IMPLIED>],
+  method => 'parse_attlist_declaration',
+  result => '0:19:SYNTAX_CONNECTOR',
+ },
+ {
+  t => q[<!ATTLIST foo a  (a+|b) #IMPLIED>],
+  method => 'parse_attlist_declaration',
+  result => '0:19:SYNTAX_ATTRDEF_TYPE_GROUP_GRPC_REQUIRED',
+ },
+ {
+  t => q[<!ATTLIST foo a  (a|(b)) #IMPLIED>],
+  method => 'parse_attlist_declaration',
+  result => '0:20:SYNTAX_ATTRDEF_TYPE_GROUP_NMTOKEN_REQUIRED',
+ },
+ {
+  t => q[<!ATTLIST foo a  (a|b)* #IMPLIED>],
+  method => 'parse_attlist_declaration',
+  result => '0:22:SYNTAX_ATTLIST_PS_REQUIRED',
+ },
+ {
+  t => q[<!ATTLIST foo a  (a|b|c ) "c">],
+  method => 'parse_attlist_declaration',
+  result => 1,
+ },
+ {
+  t => q[<!ATTLIST foo a NOTATION ( a|b|c ) "c">],
+  method => 'parse_attlist_declaration',
+  result => 1,
+ },
+ {
+  t => q[<!ATTLIST foo a NOTATION ( a|b|c ) 'c&lt;b&#33;!&#x4a;b'>],
+  method => 'parse_attlist_declaration',
+  result => 1,
+ },
+ {
+  t => q[<!ATTLIST foo a NOTATION ( a|b|c ) 'c<b'>],
+  method => 'parse_attlist_declaration',
+  result => '0:37:SYNTAX_NO_LESS_THAN_IN_ATTR_VAL',
+ },
+
+ {
+  t => q{<![INCLUDE[<!---->]]>},
+  method => 'parse_marked_section',
+  option => {
+    ExpandedURI q<allow-section> => {INCLUDE => 1,},
+  },
+  result => 1,
+ },
+ {
+  t => q{<![  INCLUDE  [<!---->]]>},
+  method => 'parse_marked_section',
+  option => {
+    ExpandedURI q<allow-section> => {INCLUDE => 1,},
+    ExpandedURI q<allow-section-ps> => 1,
+  },
+  result => 1,
+ },
+ {
+  t => q{<![  INCLUDE  [<!---->]>},
+  method => 'parse_marked_section',
+  option => {
+    ExpandedURI q<allow-section> => {INCLUDE => 1,},
+    ExpandedURI q<allow-section-ps> => 1,
+  },
+  result => '0:24:SYNTAX_MSE_REQUIRED',
+ },
+ {
+  t => q{<![  INCLUDE  <!---->]>},
+  method => 'parse_marked_section',
+  option => {
+    ExpandedURI q<allow-section> => {INCLUDE => 1,},
+    ExpandedURI q<allow-section-ps> => 1,
+  },
+  result => '0:14:SYNTAX_MSO_REQUIRED',
+ },
+ {
+  t => q{<![  INCLUDE  IGNORE[<!---->]]>},
+  method => 'parse_marked_section',
+  option => {
+    ExpandedURI q<allow-section> => {INCLUDE => 1, IGNORE => 1},
+    ExpandedURI q<allow-section-ps> => 1,
+  },
+  result => '0:14:SYNTAX_MARKED_SECTION_KEYWORDS',
+ },
+ {
+  t => q{<![RCDATA[<!---->]]>},
+  method => 'parse_marked_section',
+  option => {
+    ExpandedURI q<allow-section> => {INCLUDE => 1, IGNORE => 1},
+    ExpandedURI q<allow-section-ps> => 1,
+  },
+  result => '0:3:SYNTAX_MARKED_SECTION_KEYWORD',
+ },
+ {
+  t => q{<![DATA[<!---->]]>},
+  method => 'parse_marked_section',
+  option => {
+    ExpandedURI q<allow-section> => {INCLUDE => 1, IGNORE => 1},
+    ExpandedURI q<allow-section-ps> => 1,
+  },
+  result => '0:3:SYNTAX_MARKED_SECTION_KEYWORD',
+ },
+ {
+  t => q{<![IGNORE[<!---->]]>},
+  method => 'parse_marked_section',
+  option => {
+    ExpandedURI q<allow-section> => {INCLUDE => 1, IGNORE => 1},
+    ExpandedURI q<allow-section-ps> => 1,
+  },
+  result => 1,
+ },
+ {
+  t => q{<![IGNORE[<!---->},
+  method => 'parse_marked_section',
+  option => {
+    ExpandedURI q<allow-section> => {INCLUDE => 1, IGNORE => 1},
+    ExpandedURI q<allow-section-ps> => 1,
+  },
+  result => '0:17:SYNTAX_MSE_REQUIRED',
+ },
+ {
+  t => q{<![IGNORE[<!----><![IGNORE[ ]]>...]]>},
+  method => 'parse_marked_section',
+  option => {
+    ExpandedURI q<allow-section> => {INCLUDE => 1, IGNORE => 1},
+    ExpandedURI q<allow-section-ps> => 1,
+  },
+  result => 1,
+ },
+ {
+  t => q{<![IGNORE[<!----><![IGNORE[ <e><![CDATA[a&b ]]></e> ]]>...]]>},
+  method => 'parse_marked_section',
+  option => {
+    ExpandedURI q<allow-section> => {INCLUDE => 1, IGNORE => 1},
+    ExpandedURI q<allow-section-ps> => 1,
+  },
+  result => 1,
+ },
+ {
+  t => q{<![IGNORE[<!----><![IGNORE[ <e><![CDATA[a&b ]]></e> ]>...]]>},
+  method => 'parse_marked_section',
+  option => {
+    ExpandedURI q<allow-section> => {INCLUDE => 1, IGNORE => 1},
+    ExpandedURI q<allow-section-ps> => 1,
+  },
+  result => '0:60:SYNTAX_MSE_REQUIRED',
+ },
+ {
+  t => q{<![IGNORE[<!----><![ <e]]>.]]>},
+  method => 'parse_marked_section',
+  option => {
+    ExpandedURI q<allow-section> => {INCLUDE => 1, IGNORE => 1},
+    ExpandedURI q<allow-section-ps> => 1,
+  },
+  result => 1,
+ },
+ {
+  t => q{<![  [<!----><![ <e]]>.]]>},
+  method => 'parse_marked_section',
+  option => {
+    ExpandedURI q<allow-section> => {INCLUDE => 1, IGNORE => 1},
+    ExpandedURI q<allow-section-ps> => 1,
+  },
+  result => '0:5:SYNTAX_MARKED_SECTION_KEYWORD_REQUIRED',
+ },
+ {
+  t => q{<![[<!----><![ <e]]>.]]>},
+  method => 'parse_marked_section',
+  option => {
+    ExpandedURI q<allow-section> => {INCLUDE => 1, IGNORE => 1},
+    ExpandedURI q<allow-section-ps> => 1,
+  },
+  result => '0:3:SYNTAX_MARKED_SECTION_KEYWORD_REQUIRED',
+ },
+ {
+  entity => {kwd => ' INCLUDE '},
+  t => q{<![%kwd; [ <!-- --> ]]>},
+  method => 'parse_marked_section',
+  option => {
+    ExpandedURI q<allow-section> => {INCLUDE => 1, IGNORE => 1},
+    ExpandedURI q<allow-section-ps> => 1,
+  },
+  result => 1,
+ },
+ {
+  entity => {kwd => ' INCLUDE ', kwd2 => '%kwd3;', kwd3 => ''},
+  t => q{<![%kwd; %kwd2; [ <!-- --> ]]>},
+  method => 'parse_marked_section',
+  option => {
+    ExpandedURI q<allow-section> => {INCLUDE => 1, IGNORE => 1},
+    ExpandedURI q<allow-section-ps> => 1,
+  },
+  result => 1,
+ },
+ {
+  entity => {kwd => ' INCLUDE ', kwd2 => ' -- comment --'},
+  t => q{<![%kwd; %kwd2; [ <!-- --> ]]>},
+  method => 'parse_marked_section',
+  option => {
+    ExpandedURI q<allow-section> => {INCLUDE => 1, IGNORE => 1},
+    ExpandedURI q<allow-section-ps> => 1,
+  },
+  result => '0:1:SYNTAX_PS_COMMENT',
+ },
+ {
+  t => q{<![INCLUDE[ <!-- -- ]]>},
+  method => 'parse_marked_section',
+  option => {
+    ExpandedURI q<allow-section> => {INCLUDE => 1, IGNORE => 1},
+    ExpandedURI q<allow-section-ps> => 1,
+    ExpandedURI q<section-content-parser> => 'parse_doctype_subset',
+  },
+  result => '0:19:SYNTAX_S_IN_COMMENT_DECLARATION',
+ },
+
+ {
+  t => q{<![CDATA[ <!-- -- ]]>},
+  method => 'parse_marked_section',
+  option => {
+    ExpandedURI q<allow-section> => {CDATA => 1},
+  },
+  result => 1,
+ },
+ {
+  t => q{<![CDATA [ <!-- -- ]]>},
+  method => 'parse_marked_section',
+  option => {
+    ExpandedURI q<allow-section> => {CDATA => 1},
+  },
+  result => '0:8:SYNTAX_MARKED_SECTION_STATUS_PS',
+ },
+ {
+  t => q{<![ CDATA[ <!-- -- ]]>},
+  method => 'parse_marked_section',
+  option => {
+    ExpandedURI q<allow-section> => {CDATA => 1},
+  },
+  result => '0:3:SYNTAX_MARKED_SECTION_STATUS_PS',
+ },
+ {
+  t => q{<![CDATA[ <!-- ]]-]>- ]]>},
+  method => 'parse_marked_section',
+  option => {
+    ExpandedURI q<allow-section> => {CDATA => 1},
+  },
+  result => 1,
+ },
+ {
+  entity => {kwd => 'CDATA'},
+  t => q{<![%kwd;[ <!-- ]]-]>- ]]>},
+  method => 'parse_marked_section',
+  option => {
+    ExpandedURI q<allow-section> => {CDATA => 1},
+  },
+  result => '0:3:SYNTAX_MARKED_SECTION_STATUS_PS',
  },
 );
 

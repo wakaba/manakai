@@ -14,7 +14,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Message::Markup::XML::Parser::Error;
 require Message::Util::Error::TextParser;
@@ -77,8 +77,68 @@ sub ___error_def () {+{
     description => q(lit (") or lita (') opening attribute value literal expected),
     level => 'ebnf',
   },
+  SYNTAX_ATTLIST_ASSOCIATED_NAME_REQUIRED => {
+    description => q(Element type name required),
+    level => 'ebnf',
+  },
+  SYNTAX_ATTLIST_PS_REQUIRED => {
+    description => q(One or more ps (whitespaces) required between parameters),
+    level => 'ebnf',
+  },
+  SYNTAX_ATTLIST_SGML_KEYWORD => {
+    description => q(Keyword "%t (name => keyword);" cannot be used),
+    level => 'ebnf',
+  },
+  SYNTAX_ATTLIST_UNKNOWN_KEYWORD => {
+    description => q(Unknown keyword "%t (name => keyword);" used),
+    level => 'ebnf',
+  },
   SYNTAX_ATTR_SPEC_REQUIRED => {
     description => q(Attribute specification expected),
+    level => 'ebnf',
+  },
+  SYNTAX_ATTRDEF_DEFAULT_NAME => {
+    description => q(Attribute default value specification must be an attribute value literal, not an attribute value),
+    level => 'ebnf',
+  },
+  SYNTAX_ATTRDEF_DEFAULT_REQUIRED => {
+    description => q(Attribute default value specification (rni (#) + keyword or attribute value specification) required),
+    level => 'ebnf',
+  },
+  SYNTAX_ATTRDEF_DEFAULT_SGML_KEYWORD => {
+    description => q(Keyword "%t (name => keyword);" cannot be used),
+    level => 'ebnf',
+  },
+  SYNTAX_ATTRDEF_DEFAULT_UNKNOWN_KEYWORD => {
+    description => q(Unknown keyword "%t (name => keyword);" used),
+    level => 'ebnf',
+  },
+  SYNTAX_ATTRDEF_FIXED_LITERAL_REQUIRED => {
+    description => q(Attribute value literal required),
+    level => 'ebnf',
+  },
+  SYNTAX_ATTRDEF_NOTATION_GROUP_REQUIRED => {
+    description => q(Group for notation options required),
+    level => 'ebnf',
+  },
+  SYNTAX_ATTRDEF_TYPE_GROUP_GRPC_REQUIRED => {
+    description => q[grpc [)] required],
+    level => 'ebnf',
+  },
+  SYNTAX_ATTRDEF_TYPE_GROUP_NMTOKEN_REQUIRED => {
+    description => q(Nmtoken required),
+    level => 'ebnf',
+  },
+  SYNTAX_ATTRDEF_TYPE_REQUIRED => {
+    description => q(Attribute value type specification (keyword or group) required),
+    level => 'ebnf',
+  },
+  SYNTAX_ATTRDEF_TYPE_SGML_KEYWORD => {
+    description => q(Keyword "%t (name => keyword);" cannot be used),
+    level => 'ebnf',
+  },
+  SYNTAX_ATTRDEF_TYPE_UNKNOWN_KEYWORD => {
+    description => q(Unknown keyword "%t (name => keyword);" used),
     level => 'ebnf',
   },
   SYNTAX_ATTRIBUTE_VALUE => {
@@ -122,7 +182,7 @@ sub ___error_def () {+{
     level => 'ebnf',
   },
   SYNTAX_DOCTYPE_RNI_KEYWORD => {
-    description => q(Reserved name "%t (name => keyword);" cannot be used as document type name),
+    description => q(Keyword "%t (name => keyword);" cannot be used as document type name),
     level => 'ebnf',
   },
   SYNTAX_DOCTYPE_SUBSET_INVALID_CHAR => {
@@ -158,11 +218,11 @@ sub ___error_def () {+{
     level => 'ebnf',
   },
   SYNTAX_ELEMENT_TYPE_NAME_FOLLOWING_ETAGO_REQUIRED => {
-    description => q(Element type name (generic identifier) required just after etago (</)),
+    description => q(Element type name (generic identifier) required),
     level => 'ebnf',
   },
   SYNTAX_ELEMENT_TYPE_NAME_FOLLOWING_STAGO_REQUIRED => {
-    description => q(Element type name (generic identifier) required just after stago (<)),
+    description => q(Element type name (generic identifier) required),
     level => 'ebnf',
   },
   SYNTAX_ELEMENT_UNKNOWN_CONTENT_KEYWORD => {
@@ -174,7 +234,7 @@ sub ___error_def () {+{
     level => 'ebnf',
   },
   SYNTAX_END_TAG_NOT_ALLOWED => {
-    description => q(End tag not allowed),
+    description => q(End tag not allowed here),
     level => 'ebnf',
   },
   SYNTAX_END_TAG_REQUIRED => {
@@ -182,7 +242,7 @@ sub ___error_def () {+{
     level => 'ebnf',
   },
   SYNTAX_ENTITY_DATA_TYPE_NOTATION_NAME_REQUIRED => {
-    description => q(Notation name shall follow data type keyword),
+    description => q(Data type keyword must be followed by notation name),
     level => 'ebnf',
   },
   SYNTAX_ENTITY_DATA_TYPE_SGML_KEYWORD => {
@@ -190,15 +250,15 @@ sub ___error_def () {+{
     level => 'ebnf',
   },
   SYNTAX_ENTITY_DATA_TYPE_UNKNOWN_KEYWORD => {
-    description => q("%t (name => keyword);": Unknown keyword),
+    description => q(Unknown keyword "%t (name => keyword);" used),
     level => 'ebnf',
   },
   SYNTAX_ENTITY_DEFAULT => {
-    description => q(Default entity cannot be used),
+    description => q(Default entity not allowed),
     level => 'ebnf',
   },
   SYNTAX_ENTITY_NAME_REQUIRED => {
-    description => q(Entity name (a name, for general entity, or a pero (%) followed by one or more ps (whitespaces) and a name, for parameter entity) required),
+    description => q(Entity name (either Name, for general entity, or pero (%) followed by one or more ps (whitespaces) and Name, for parameter entity) required),
     level => 'ebnf',
   },
   SYNTAX_ENTITY_PARAM_NAME_REQUIRED => {
@@ -210,11 +270,11 @@ sub ___error_def () {+{
     level => 'ebnf',
   },
   SYNTAX_ENTITY_RNI_KEYWORD => {
-    description => q(Reserved name "%t (name => keyword);" cannot be used as entity name),
+    description => q(Unknown keyword "%t (name => keyword);" used),
     level => 'ebnf',
   },
   SYNTAX_ENTITY_TEXT_KEYWORD => {
-    description => q(Unknown keyword "%t (name => keyword);"),
+    description => q(Unknown keyword "%t (name => keyword);" used),
     level => 'ebnf',
   },
   SYNTAX_ENTITY_TEXT_PRE_KEYWORD => {
@@ -222,15 +282,15 @@ sub ___error_def () {+{
     level => 'ebnf',
   },
   SYNTAX_ENTITY_TEXT_REQUIRED => {
-    description => q(Entity text (a parameter literal containing entity value or an external entity specification) required),
+    description => q(Entity text (either parameter literal containing entity value or external entity specification) required),
     level => 'ebnf',
   },
   SYNTAX_ETAGC_REQUIRED => {
-    description => q(tagc (>) terminating end tag required),
+    description => q(tagc (>) required),
     level => 'ebnf',
   },
   SYNTAX_EXCLAMATION_OR_QUESTION_REQUIRED => {
-    description => q(EXCLAMATION MARK (!) for mdo (<!) or QUESTION MARK (?) for pio (<?) expected just after LESS-THAN SIGN (<)),
+    description => q(EXCLAMATION MARK (!) for mdo (<!) or QUESTION MARK (?) for pio (<?) expected),
     level => 'ebnf',
   },
   SYNTAX_GENERAL_ENTREF => {
@@ -238,11 +298,11 @@ sub ___error_def () {+{
     level => 'ebnf',
   },
   SYNTAX_HASH_OR_NAME_REQUIRED => {
-    description => q("#" or Name expected after "&"),
+    description => q(Either "#" (for cro (&#), character reference open, or hcro (&#x), hexdecimal character reference open) or Name (for general entity reference) expected),
     level => 'ebnf',
   },
   SYNTAX_HCRO_CASE => {
-    description => q(Third character of hcro (&#x) must be a LATIN SMALL LETTER X (x)),
+    description => q(Third character of hcro (&#x) must be LATIN SMALL LETTER X (x), not LATIN CAPITAL LETTER X (X)),
     level => 'ebnf',
   },
   SYNTAX_HEX_CHAR_REF => {
@@ -250,7 +310,35 @@ sub ___error_def () {+{
     level => 'ebnf',
   },
   SYNTAX_HEXDIGIT_REQUIRED => {
-    description => q(HEXDIGIT ([0-9A-Fa-f]) required after hcro (&#x)),
+    description => q(HEXDIGIT ([0-9A-Fa-f]) required),
+    level => 'ebnf',
+  },
+  SYNTAX_MARKED_SECTION_KEYWORD => {
+    description => q(Status keyword "%t (name => keyword);" not allowed),
+    level => 'ebnf',
+  },
+  SYNTAX_MARKED_SECTION_KEYWORD_REQUIRED => {
+    description => q(Status keyword required),
+    level => 'ebnf',
+  },
+  SYNTAX_MARKED_SECTION_KEYWORDS => {
+    description => q(Multiple status keywords not allowed),
+    level => 'ebnf',
+  },
+  SYNTAX_MARKED_SECTION_PS_REQUIRED => {
+    description => q(One or more ps (whitespaces) required between parameters),
+    level => 'ebnf',
+  },
+  SYNTAX_MARKED_SECTION_STATUS_PS => {
+    description => q(ps not allowed),
+    level => 'ebnf',
+  },
+  SYNTAX_MARKUP_DECLARATION_PS => {
+    description => q(ps not allowed),
+    level => 'ebnf',
+  },
+  SYNTAX_MARKUP_DECLARATION_PS_REQUIRED => {
+    description => q(One or more ps (whitespaces) required between parameters),
     level => 'ebnf',
   },
   SYNTAX_MARKUP_DECLARATION_REQUIRED => {
@@ -262,15 +350,15 @@ sub ___error_def () {+{
     level => 'ebnf',
   },
   SYNTAX_MARKUP_DECLARATION_UNKNOWN_KEYWORD => {
-    description => q(Unknown markup declaration parameter "%t (name => keyword);" specified),
+    description => q(Unknown markup declaration keyword "%t (name => keyword);" used),
     level => 'ebnf',
   },
   SYNTAX_MDC_FOR_COMMENT_REQUIRED => {
-    description => q(mdc (>) closing comment declaration required),
+    description => q(mdc (>) required),
     level => 'ebnf',
   },
   SYNTAX_MDC_REQUIRED => {
-    description => q(mdc (>) closing markup declaration required),
+    description => q(mdc (>) required),
     level => 'ebnf',
   },
   SYNTAX_MODEL_GROUP_CONNECTOR_MATCH => {
@@ -278,7 +366,7 @@ sub ___error_def () {+{
     level => 'ebnf',
   },
   SYNTAX_MODEL_GROUP_GRPC_REQUIRED => {
-    description => q[grpc [)] closing model group required],
+    description => q[grpc [)] required],
     level => 'ebnf',
   },
   SYNTAX_MODEL_GROUP_ITEM_REQUIRED => {
@@ -310,11 +398,19 @@ sub ___error_def () {+{
     level => 'ebnf',
   },
   SYNTAX_MODEL_GROUP_REQUIRED => {
-    description => q[grpo [(] for model group required],
+    description => q[GRPO [(] for model group required],
     level => 'ebnf',
   },
   SYNTAX_MODEL_GROUP_UNKNOWN_KEYWORD => {
     description => q(Unknown keyword "%t (name => keyword);"),
+    level => 'ebnf',
+  },
+  SYNTAX_MSE_REQUIRED => {
+    description => q(MSE (]]>) required),
+    level => 'ebnf',
+  },
+  SYNTAX_MSO_REQUIRED => {
+    description => q(DSO ([) opening marked section content required),
     level => 'ebnf',
   },
   SYNTAX_MULTIPLE_COMMENT => {
@@ -326,11 +422,27 @@ sub ___error_def () {+{
     level => 'ebnf',
   },
   SYNTAX_NAME_OR_DSO_OR_COM_REQUIRED => {
-    description => q(Keyword or dso ([) or com (--) required),
+    description => q(Keyword or DSO ([) or COM (--) required),
     level => 'ebnf',
   },
   SYNTAX_NET_REQUIRED => {
-    description => q(net (>) required just after nestc (/)),
+    description => q(NET (>) required just after NESTC (/)),
+    level => 'ebnf',
+  },
+  SYNTAX_NO_LESS_THAN_IN_ATTR_VAL => {
+    description => q(LESS-THAN SIGN (<) not allowed in attribute value literal),
+    level => 'ebnf',
+  },
+  SYNTAX_NOTATION_EXTERNAL_IDENTIFIER_REQUIRED => {
+    description => q(External (public and/or system) identifier required),
+    level => 'ebnf',
+  },
+  SYNTAX_NOTATION_NAME_REQUIRED => {
+    description => q(Notation name required),
+    level => 'ebnf',
+  },
+  SYNTAX_NOTATION_PS_REQUIRED => {
+    description => q(One or more ps (whitespaces) required between parameters),
     level => 'ebnf',
   },
   SYNTAX_NUMERIC_CHAR_REF => {
@@ -518,8 +630,18 @@ sub ___error_def () {+{
     description => q(Element type name in end tag (%t (name => end-tag-type-name);) MUST match with that in start tag (%t (name => start-tag-type-name);)),
     level => 'wfc',
   },
+  # WFC_EXTERNAL_SUBSET
+  WFC_NO_EXTERNAL_ENTITY_REFERENCES => {
+    description => q(External entity (%t (name => entity-name);) cannot be referred in attribute value literal),
+    level => 'wfc',
+  },
   WFC_NO_LESS_THAN_IN_ATTR_VAL => {
-    description => q(LESS-THAN SIGN (<) not allowed in attribute value literal),
+    description => q(LESS-THAN SIGN (<) not allowed in replacement text of entity referred in attribute value literal),
+    level => 'wfc',
+  },
+  # WFC_PE_BETWEEN_DECLARATIONS
+  WFC_PES_IN_INTERNAL_SUBSET => {
+    description => q(Parameter entity reference must not occur with in markup declaration in internal subset within document entity),
     level => 'wfc',
   },
   WFC_UNIQUE_ATT_SPEC => {
@@ -631,4 +753,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/05/27 09:01:54 $
+1; # $Date: 2004/05/29 08:12:11 $

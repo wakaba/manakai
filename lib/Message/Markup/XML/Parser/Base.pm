@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::Base;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXMLChar
                         InXML_deprecated_noncharacter InXML_unicode_xml_not_suitable!;
 require Message::Markup::XML::Parser::Error;
@@ -108,7 +108,14 @@ sub parse_element ($$$%) {
             }
           } elsif ($n eq '!') {
             $self->parse_markup_declaration
-                   ($src, $pp, %opt)
+                   ($src, $pp, %opt,
+                    ExpandedURI q<allow-declaration> => {
+                      comment => 1,
+                      section => 1,
+                    }, ExpandedURI q<allow-section> => {
+                      CDATA => 1,
+                      ps => 0,
+                    })
               or local $pp->{ExpandedURI q<CDATA>} = '<',
                  pos ($$src)++,
                  $self->element_content
@@ -342,7 +349,7 @@ sub parse_attribute_value_specification ($$$%) {
           }
         } elsif ($$src =~ /\G</gc) {
           $self->report
-                   (-type => 'WFC_NO_LESS_THAN_IN_ATTR_VAL',
+                   (-type => 'SYNTAX_NO_LESS_THAN_IN_ATTR_VAL',
                     -class => 'WFC',
                     source => $src,
                     position_diff => 1);
@@ -388,7 +395,7 @@ sub parse_attribute_value_specification ($$$%) {
           }
         } elsif ($$src =~ /\G</gc) {
           $self->report
-                   (-type => 'WFC_NO_LESS_THAN_IN_ATTR_VAL',
+                   (-type => 'SYNTAX_NO_LESS_THAN_IN_ATTR_VAL',
                     -class => 'WFC',
                     source => $src,
                     position_diff => 1);
@@ -795,6 +802,7 @@ sub parse_doctype_declaration ($$$%) {
     local $opt{ExpandedURI q<error-ps-required>}
         = 'SYNTAX_DOCTYPE_PS_REQUIRED';
     local $opt{ExpandedURI q<source>} = [$src];
+    $opt{ExpandedURI q<allow-ps>} = 1;
     PARAMS: {
       $self->markup_declaration_parameters_start
               ($src, $p, $pp, %opt);
@@ -913,6 +921,7 @@ sub parse_entity_declaration ($$$%) {
     local $opt{ExpandedURI q<error-ps-required>}
         = 'SYNTAX_ENTITY_PS_REQUIRED';
     local $opt{ExpandedURI q<source>} = [$src];
+    $opt{ExpandedURI q<allow-ps>} = 1;
     PARAMS: {
       $self->markup_declaration_parameters_start
               ($src, $p, $pp, %opt);
@@ -1125,6 +1134,91 @@ sub parse_entity_declaration ($$$%) {
   }
 } # parse_entity_declaration
 
+sub parse_notation_declaration ($$$%) {
+  my ($self, $src, $p, %opt) = @_;
+  if ($$src =~ /\G<!NOTATION/gc) {
+    $self->notation_declaration_start
+              ($src, $p, my $pp = {}, %opt);
+    {
+    local $opt{ExpandedURI q<match-or-error>} = 1;
+    local $opt{ExpandedURI q<allow-comment>} = 0;
+    local $opt{ExpandedURI q<allow-param-entref>} = 1;
+    local $opt{ExpandedURI q<ps-required>} = 1;
+    local $opt{ExpandedURI q<error-ps-required>}
+        = 'SYNTAX_NOTATION_PS_REQUIRED';
+    local $opt{ExpandedURI q<source>} = [$src];
+    $opt{ExpandedURI q<allow-ps>} = 1;
+    PARAMS: {
+      $self->markup_declaration_parameters_start
+              ($src, $p, $pp, %opt);
+      $pp->{ExpandedURI q<param>} = [];
+      
+      ## Notation Name
+      $self->parse_markup_declaration_parameter
+              ($src, $pp,
+               %opt,
+               ExpandedURI q<error-no-match> => 'SYNTAX_NOTATION_NAME_REQUIRED',
+               ExpandedURI q<end-with-mdc> => 0,
+               ExpandedURI q<param-type> => {
+                 Name => 1,
+                 ps => 1,
+               });
+      my $entname = shift @{$pp->{ExpandedURI q<param>}};
+      unless ($entname) {
+        last PARAMS;
+      } elsif ($entname->{type} eq 'Name') {
+        $pp->{ExpandedURI q<notation-name>} = $entname->{value};
+      } else {
+        die "$0: ".__PACKAGE__.": $entname->{type}: Buggy";
+      }
+      
+      ## External Identifiers
+      $self->parse_external_identifiers
+                ($src, $pp, %opt,
+                 ExpandedURI q<ps-required> => 1,
+                 ExpandedURI q<error-no-match>
+                   => 'SYNTAX_NOTATION_EXTERNAL_IDENTIFIER_REQUIRED',
+                 ExpandedURI q<allow-public-id> => 1,
+                 ExpandedURI q<allow-system-id> => 1,
+                 ExpandedURI q<system-id-required> => 0,
+                 ExpandedURI q<end-with-mdc> => 0);
+    } continue {
+      $self->parse_markup_declaration_parameter
+              ($src, $pp,
+               %opt,
+               ExpandedURI q<match-or-error> => 0,
+               ExpandedURI q<ps-required> => 0,
+               ExpandedURI q<param-type> => {
+                 ps => 1,
+               });
+      if (@{$pp->{ExpandedURI q<param>}} or
+          @{$opt{ExpandedURI q<source>}} > 1) {
+        $self->report
+              (-type => 'SYNTAX_MARKUP_DECLARATION_TOO_MANY_PARAM',
+               -class => 'WFC',
+               source => ($pp->{ExpandedURI q<param>}->[0] ?
+                            $pp->{ExpandedURI q<param>}->[0]->{value} :
+                            $opt{ExpandedURI q<source>}->[-1]),
+               param => $pp->{ExpandedURI q<param>},
+               sources => $opt{ExpandedURI q<source>});
+      }
+      $self->markup_declaration_parameters_end
+              ($src, $p, $pp, %opt);
+    }}
+    unless ($$src =~ /\G>/gc) {
+      $self->report
+              (-type => 'SYNTAX_MDC_REQUIRED',
+               -class => 'WFC',
+               source => $src);
+    }
+    $self->entity_declaration_end
+              ($src, $p, $pp, %opt);
+    return 1;
+  } else {
+    return 0;
+  }
+} # parse_notation_declaration
+
 sub parse_element_declaration ($$$%) {
   my ($self, $src, $p, %opt) = @_;
   if ($$src =~ /\G<!ELEMENT/gc) {
@@ -1138,6 +1232,7 @@ sub parse_element_declaration ($$$%) {
     local $opt{ExpandedURI q<error-ps-required>}
         = 'SYNTAX_ELEMENT_PS_REQUIRED';
     local $opt{ExpandedURI q<source>} = [$src];
+    $opt{ExpandedURI q<allow-ps>} = 1;
     PARAMS: {
       $self->markup_declaration_parameters_start
               ($src, $p, $pp, %opt);
@@ -1269,6 +1364,261 @@ sub parse_element_declaration ($$$%) {
   }
 } # parse_element_declaration
 
+sub parse_attlist_declaration ($$$%) {
+  my ($self, $src, $p, %opt) = @_;
+  if ($$src =~ /\G<!ATTLIST/gc) {
+    $self->attlist_declaration_start
+              ($src, $p, my $pp = {}, %opt);
+    {
+    local $opt{ExpandedURI q<match-or-error>} = 1;
+    local $opt{ExpandedURI q<allow-comment>} = 0;
+    local $opt{ExpandedURI q<allow-param-entref>} = 1;
+    local $opt{ExpandedURI q<ps-required>} = 1;
+    local $opt{ExpandedURI q<error-ps-required>}
+        = 'SYNTAX_ATTLIST_PS_REQUIRED';
+    local $opt{ExpandedURI q<source>} = [$src];
+    $opt{ExpandedURI q<allow-ps>} = 1;
+    PARAMS: {
+      $self->markup_declaration_parameters_start
+              ($src, $p, $pp, %opt);
+      $pp->{ExpandedURI q<param>} = [];
+      
+      ## Element Type Name
+      NAME: {
+        $self->parse_markup_declaration_parameter
+              ($src, $pp,
+               %opt,
+               ExpandedURI q<error-no-match>
+                 => 'SYNTAX_ATTLIST_ASSOCIATED_NAME_REQUIRED',
+               ExpandedURI q<end-with-mdc> => 0,
+               ExpandedURI q<param-type> => {
+                 Name => 1,
+                 rniKeyword => 1,
+                 ps => 1,
+               });
+        my $entname = shift @{$pp->{ExpandedURI q<param>}};
+        unless ($entname) {
+          last PARAMS;
+        } elsif ($entname->{type} eq 'Name') {
+          $pp->{ExpandedURI q<element-type-name>} = $entname->{value};
+        } elsif ($entname->{type} eq 'rniKeyword') {
+          if ({qw/ALL 1 IMPLICIT 1 NOTATION 1/}->{${$entname->{value}}}) {
+            $self->report
+              (-type => 'SYNTAX_ATTLIST_SGML_KEYWORD',
+               -class => 'WFC',
+               source => $entname->{value},
+               keyword => ${$entname->{value}});
+            last NAME unless ${$entname->{value}} eq 'NOTATION';
+          } else {
+            $self->report
+              (-type => 'SYNTAX_ATTLIST_UNKNOWN_KEYWORD',
+               -class => 'WFC',
+               source => $entname->{value},
+               keyword => ${$entname->{value}});
+          }
+          redo NAME;
+        } else {
+          die "$0: ".__PACKAGE__.": $entname->{type}: Buggy";
+        }
+      }
+      
+      ATTRDEF: {
+        ## Attribute Name
+        $self->parse_markup_declaration_parameter
+              ($src, $pp,
+               %opt,
+               ExpandedURI q<match-or-error> => 0,
+               ExpandedURI q<ps-required> => 1,
+               ExpandedURI q<end-with-mdc> => 1,
+               ExpandedURI q<param-type> => {
+                 ps => 1,
+                 Name => 1,
+               });
+        my $param = $pp->{ExpandedURI q<param>}->[-1];
+        last ATTRDEF unless $param and $param->{type} eq 'Name';
+        shift @{$pp->{ExpandedURI q<param>}};
+        my $q = {ExpandedURI q<attribute-name> => $param->{value}};
+        
+        ## Attribute Type
+        $self->parse_markup_declaration_parameter
+              ($src, $pp,
+               %opt,
+               ExpandedURI q<match-or-error> => 1,
+               ExpandedURI q<ps-required> => 1,
+               ExpandedURI q<error-no-match> => 'SYNTAX_ATTRDEF_TYPE_REQUIRED',
+               ExpandedURI q<param-type> => {
+                 ps => 1,
+                 Name => 1, # Keyword
+                 grpo => 1, # Enum type
+               });
+        $param = $pp->{ExpandedURI q<param>}->[-1];
+        redo ATTRDEF unless $param;
+        if ($param->{type} eq 'Name') {
+          shift @{$pp->{ExpandedURI q<param>}};
+          $q->{ExpandedURI q<attribute-type>} = $param->{value};
+          if ({qw/CDATA 1 ENTITY 1 ENTITIES 1 ID 1 IDREF 1 IDREFS 1
+                  NOTATION 1 NMTOKEN 1 NMTOKENS 1/}->{${$param->{value}}}) {
+            if (${$param->{value}} eq 'NOTATION') {
+              $self->parse_markup_declaration_parameter
+                ($src, $pp,
+                 %opt,
+                 ExpandedURI q<match-or-error> => 1,
+                 ExpandedURI q<ps-required> => 1,
+                 ExpandedURI q<error-no-match>
+                   => 'SYNTAX_ATTRDEF_NOTATION_GROUP_REQUIRED',
+                 ExpandedURI q<param-type> => {
+                   ps => 1,
+                   grpo => 1, # Enum type
+                 });
+              $param = $pp->{ExpandedURI q<param>}->[-1];
+              redo ATTRDEF unless $param and $param->{type} eq 'grpo';
+
+              $self->parse_attrtype_group
+                ($opt{ExpandedURI q<source>}->[-1], $pp, %opt);
+            }
+          } elsif ({qw/NAME 1 NAMES 1 NUTOKEN 1 NUTOKENS 1
+                       NUMBER 1 NUMBERS 1 DATA 1/}->{${$param->{value}}}) {
+            $self->report
+              (-type => 'SYNTAX_ATTRDEF_TYPE_SGML_KEYWORD',
+               -class => 'WFC',
+               source => $param->{value},
+               keyword => ${$param->{value}});
+          } else {
+            $self->report
+              (-type => 'SYNTAX_ATTRDEF_TYPE_UNKNOWN_KEYWORD',
+               -class => 'WFC',
+               source => $param->{value},
+               keyword => ${$param->{value}});
+          }
+        } elsif ($param->{type} eq 'grpo') {
+          $self->parse_attrtype_group
+            ($opt{ExpandedURI q<source>}->[-1], $pp, %opt);
+        } else {
+          die "$0: ".__PACKAGE__.": $param->{type}: Buggy";
+        }
+
+        ## Attribute Default
+        $self->parse_markup_declaration_parameter
+              ($src, $pp,
+               %opt,
+               ExpandedURI q<match-or-error> => 1,
+               ExpandedURI q<ps-required> => 1,
+               ExpandedURI q<error-no-match>
+                 => 'SYNTAX_ATTRDEF_DEFAULT_REQUIRED',
+               ExpandedURI q<param-type> => {
+                 ps => 1,
+                 Name => 1, # Attribute value
+                 rniKeyword => 1, # Type keyword
+                 attrValLit => 1, # Attribute value literal
+               });
+        $param = shift @{$pp->{ExpandedURI q<param>}};
+        redo ATTRDEF unless $param;
+        if ($param->{type} eq 'rniKeyword') {
+          $q->{ExpandedURI q<attribute-default>} = $param->{value};
+          if ({qw/IMPLIED 1 REQUIRED 1 FIXED 1/}->{${$param->{value}}}) {
+            if (${$param->{value}} eq 'FIXED') {
+              $self->parse_markup_declaration_parameter
+                ($src, $pp,
+                 %opt,
+                 ExpandedURI q<match-or-error> => 1,
+                 ExpandedURI q<ps-required> => 1,
+                 ExpandedURI q<error-no-match>
+                   => 'SYNTAX_ATTRDEF_FIXED_DEFAULT_REQUIRED',
+                 ExpandedURI q<param-type> => {
+                   ps => 1,
+                   Name => 1,
+                   attrValLit => 1,
+                 });
+              $param = shift @{$pp->{ExpandedURI q<param>}};
+              redo ATTRDEF unless $param;
+              if ($param->{type} eq 'attrValLit') {
+                $self->parse_attribute_value_specification
+                  ($opt{ExpandedURI q<source>}->[-1], $q, %opt,
+                   ExpandedURI q<allow-general-entity-reference> => 1,
+                   ExpandedURI q<allow-numeric-character-reference> => 1,
+                   ExpandedURI q<allow-hex-character-reference> => 1)
+                  or die "$0: ".__PACKAGE__.": attrValLit: Buggy";
+              } elsif ($param->{type} eq 'Name') {
+                $self->report
+                  (-type => 'SYNTAX_ATTRDEF_DEFAULT_NAME',
+                   -class => 'WFC',
+                   source => $param->{value});
+                $q->{ExpandedURI q<attribute-default-value>} = $param->{value};
+              } else {
+                die "$0: ".__PACKAGE__.": $param->{type}: Buggy";
+              }
+            }
+          } elsif ({qw/CURRENT 1 CONREF 1/}->{${$param->{value}}}) {
+            $self->report
+              (-type => 'SYNTAX_ATTRDEF_DEFAULT_SGML_KEYWORD',
+               -class => 'WFC',
+               source => $param->{value},
+               keyword => ${$param->{value}});
+          } else {
+            $self->report
+              (-type => 'SYNTAX_ATTRDEF_DEFAULT_UNKNOWN_KEYWORD',
+               -class => 'WFC',
+               source => $param->{value},
+               keyword => ${$param->{value}});
+          }
+        } elsif ($param->{type} eq 'attrValLit') {
+          $q->{ExpandedURI q<attribute-default>} = \'specific';
+          $self->parse_attribute_value_specification
+            ($opt{ExpandedURI q<source>}->[-1], $q, %opt,
+             ExpandedURI q<allow-general-entity-reference> => 1,
+             ExpandedURI q<allow-numeric-character-reference> => 1,
+             ExpandedURI q<allow-hex-character-reference> => 1)
+            or die "$0: ".__PACKAGE__.": attrValLit: Buggy";
+        } elsif ($param->{type} eq 'Name') {
+          $self->report
+            (-type => 'SYNTAX_ATTRDEF_DEFAULT_NAME',
+             -class => 'WFC',
+             source => $param->{value});
+          $q->{ExpandedURI q<attribute-default>} = \'specific';
+          $q->{ExpandedURI q<attribute-default-value>} = $param->{value};
+        } else {
+          die "$0: ".__PACKAGE__.": $param->{type}: Buggy";
+        }
+        $self->attlist_declaration_content ($src, $pp, $q, %opt);
+        redo ATTRDEF;
+      } # ATTRDEF
+    } continue {
+      $self->parse_markup_declaration_parameter
+              ($src, $pp,
+               %opt,
+               ExpandedURI q<match-or-error> => 0,
+               ExpandedURI q<ps-required> => 0,
+               ExpandedURI q<param-type> => {
+                 ps => 1,
+               });
+      if (@{$pp->{ExpandedURI q<param>}} or
+          @{$opt{ExpandedURI q<source>}} > 1) {
+        $self->report
+              (-type => 'SYNTAX_MARKUP_DECLARATION_TOO_MANY_PARAM',
+               -class => 'WFC',
+               source => ($pp->{ExpandedURI q<param>}->[0] ?
+                            $pp->{ExpandedURI q<param>}->[0]->{value} :
+                            $opt{ExpandedURI q<source>}->[-1]),
+               param => $pp->{ExpandedURI q<param>},
+               sources => $opt{ExpandedURI q<source>});
+      }
+      $self->markup_declaration_parameters_end
+              ($src, $p, $pp, %opt);
+    }}
+    unless ($$src =~ /\G>/gc) {
+      $self->report
+              (-type => 'SYNTAX_MDC_REQUIRED',
+               -class => 'WFC',
+               source => $src);
+    }
+    $self->entity_declaration_end
+              ($src, $p, $pp, %opt);
+    return 1;
+  } else {
+    return 0;
+  }
+} # parse_attlist_declaration
+
 sub parse_model_group ($$$%) {
   my ($self, $src, $p, %opt) = @_;
   $p->{ExpandedURI q<param>} ||= [];
@@ -1278,6 +1628,7 @@ sub parse_model_group ($$$%) {
   local $opt{ExpandedURI q<error-ps-required>}
         = 'SYNTAX_MODEL_GROUP_PS_REQUIRED';
   local $opt{ExpandedURI q<source>} = [$src];
+  $opt{ExpandedURI q<allow-ps>} = 1;
   $self->parse_markup_declaration_parameter
               ($src, $p,
                %opt,
@@ -1453,6 +1804,105 @@ sub parse_model_group ($$$%) {
   }
 } # parse_model_group
 
+sub parse_attrtype_group ($$$%) {
+  my ($self, $src, $p, %opt) = @_;
+  $p->{ExpandedURI q<param>} ||= [];
+  $opt{ExpandedURI q<allow-ps>} = 1;
+  local $opt{ExpandedURI q<allow-comment>} = 0;
+  local $opt{ExpandedURI q<allow-param-entref>} = 1;
+  local $opt{ExpandedURI q<ps-required>} = 0;
+  local $opt{ExpandedURI q<error-ps-required>}
+        = 'SYNTAX_ATTRDEF_PS_REQUIRED';
+  local $opt{ExpandedURI q<source>} = [$src];
+  $self->parse_markup_declaration_parameter
+              ($src, $p,
+               %opt,
+               ExpandedURI q<param-type> => {
+                 grpo => 1,
+                 ps => 1,
+               });
+  if ($p->{ExpandedURI q<param>}->[0] and
+      $p->{ExpandedURI q<param>}->[0]->{type} eq 'grpo') {
+    shift @{$p->{ExpandedURI q<param>}};
+    $self->attrtype_group_start
+              ($src, $p, my $pp = {
+                 ExpandedURI q<param> => $p->{ExpandedURI q<param>},
+               }, %opt);
+    local $opt{ExpandedURI q<match-or-error>} = 0;
+    PARAMS: {
+      $self->parse_markup_declaration_parameter
+              ($src, $pp, %opt,
+               ExpandedURI q<error-no-match>
+                 => 'SYNTAX_ATTRDEF_TYPE_GROUP_NMTOKEN_REQUIRED',
+               ExpandedURI q<param-type> => {
+                 Name => 1,
+                 ps => 1,
+               });
+      my $param = $pp->{ExpandedURI q<param>}->[0];
+      my $ppp = {ExpandedURI q<param> => $pp->{ExpandedURI q<param>}};
+      unless ($param) {
+        last PARAMS;
+      } elsif ($param->{type} eq 'Name') {
+        $ppp->{ExpandedURI q<nmtoken>} = $param->{value};
+        shift @{$pp->{ExpandedURI q<param>}};
+      } else {
+        die "$0: ".__PACKAGE__.": $param->{type}: Buggy";
+      }
+      
+      $self->parse_markup_declaration_parameter
+              ($src, $pp, %opt,
+               ExpandedURI q<match-or-error> => 0,
+               ExpandedURI q<param-type> => {
+                 connector => 1,
+                 ps => 1,
+               },
+               ExpandedURI q<allow-connector> => {
+                 ',' => 0, '|' => 1, '&' => 0,
+               });
+      my $connector = $pp->{ExpandedURI q<param>}->[0];
+      if ($connector and $connector->{type} eq 'connector') {
+        shift @{$pp->{ExpandedURI q<param>}};
+        $ppp->{ExpandedURI q<connector>} = $connector->{value};
+        $opt{ExpandedURI q<match-or-error>} = 1;
+        $self->attrtype_group_content ($src, $pp, $ppp, %opt);
+        redo PARAMS;
+      } else {
+        $self->attrtype_group_content ($src, $pp, $ppp, %opt);
+      }
+    } continue {
+      $self->parse_markup_declaration_parameter
+              ($src, $pp,
+               %opt,
+               ExpandedURI q<match-or-error> => 0,
+               ExpandedURI q<ps-required> => 0,
+               ExpandedURI q<param-type> => {
+                 ps => 1,
+               });
+      if (@{$pp->{ExpandedURI q<param>}} or
+          @{$opt{ExpandedURI q<source>}} > 1) {
+        $self->report
+              (-type => 'SYNTAX_MARKUP_DECLARATION_TOO_MANY_PARAM',
+               -class => 'WFC',
+               source => ($pp->{ExpandedURI q<param>}->[0] ?
+                            $pp->{ExpandedURI q<param>}->[0]->{value} :
+                            $opt{ExpandedURI q<source>}->[-1]),
+               param => $pp->{ExpandedURI q<param>},
+               sources => $opt{ExpandedURI q<source>});
+      }
+      $$src =~ /\G\)/gc
+        or $self->report
+              (-type => 'SYNTAX_ATTRDEF_TYPE_GROUP_GRPC_REQUIRED',
+               -class => 'WFC',
+               source => $src);
+    }
+    $self->attrtype_group_end
+              ($src, $p, $pp, %opt);
+    return 1;
+  } else {
+    return 0;
+  }
+} # parse_attrtype_group
+
 sub parse_markup_declaration_parameter ($$$%) {
   my ($self, undef, $p, %opt) = @_;
   my $allow = $opt{ExpandedURI q<param-type>};
@@ -1476,12 +1926,13 @@ sub parse_markup_declaration_parameter ($$$%) {
 
   if ($allow->{ps}) {
     my $has_ps = 0;
+    my $pos = pos $$src;
     EATPS: while (1) {
       if ($$src =~ /\G$REG_S+/gco) {
         if ($opt{ExpandedURI q<end-with-mdc>} and
             $$src =~ /\G>/gc) {
           pos ($$src)--;
-          return 1;
+          return 1; ## Note: <allow-ps> don't work in this case
         }
         $has_ps = 1;
       } elsif ($$src =~ /\G%/gc) {
@@ -1513,6 +1964,14 @@ sub parse_markup_declaration_parameter ($$$%) {
                    ExpandedURI q<end-with-mdc> => 0);
             ## Found
             if (@$param) {
+              if (not $opt{ExpandedURI q<allow-ps>}) {
+                $self->report
+                  (-type => $opt{ExpandedURI q<error-ps>}
+                         || 'SYNTAX_MARKUP_DECLARATION_PS',
+                   -class => 'WFC',
+                   position_diff => pos ($$src) - $pos,
+                   source => $src);
+              }
               return 1;
             }
           }
@@ -1538,12 +1997,15 @@ sub parse_markup_declaration_parameter ($$$%) {
       } else { # neither s, pero nor comment
         last EATPS;
       }
-    }
+    } # EATPS
       
     unless ($has_ps) {
       if ($opt{ExpandedURI q<end-with-mdc>} and
           $$src =~ /\G>/gc) {
         pos ($$src)--;
+        return 1;
+      } elsif ($opt{ExpandedURI q<end-with-mso>} and
+               $$src =~ /\G(?=\[)/gc) {
         return 1;
       } elsif ($opt{ExpandedURI q<ps-required>}) {
         $self->report
@@ -1552,6 +2014,13 @@ sub parse_markup_declaration_parameter ($$$%) {
                -class => 'WFC',
                source => $src);
       }
+    } elsif (not $opt{ExpandedURI q<allow-ps>}) {
+      $self->report
+              (-type => $opt{ExpandedURI q<error-ps>}
+                        || 'SYNTAX_MARKUP_DECLARATION_PS',
+               -class => 'WFC',
+               position_diff => pos ($$src) - $pos,
+               source => $src);
     }
   }
   if ($allow->{Name} and
@@ -1564,6 +2033,7 @@ sub parse_markup_declaration_parameter ($$$%) {
     return 1;
   } elsif ($allow->{rniKeyword} and
            $$src =~ /\G\#(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+    ## ISSUE: Should we cause error if RNI not followed by Name occurs?
     my $name = $1;
     $self->{error}->set_position ($src, moved => 1,
                                   diff => length $name);
@@ -1659,6 +2129,9 @@ sub parse_markup_declaration_parameter ($$$%) {
                 line => $pos->[0],
                 char => $pos->[1]);
     push @$param, {type => 'syslit', value => \$sysid};
+  } elsif ($allow->{attrValLit} and
+           $$src =~ /\G(?=["'])/gc) {
+    push @$param, {type => 'attrValLit'};
   } elsif ($allow->{peroName} and
            $$src =~ /\G%$REG_S+/gco) {
     if ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
@@ -1826,16 +2299,17 @@ sub parse_external_identifiers ($$$%) {
     
     local $opt{ExpandedURI q<match-or-error>} = 0;
     local $opt{ExpandedURI q<error-no-match>} = 'SYNTAX_SYSTEM_LITERAL_REQUIRED';
+    local $opt{ExpandedURI q<end-with-mdc>} = 0;
     if ($opt{ExpandedURI q<allow-system-id>}) {
-      if ($opt{ExpandedURI q<system-id-required>}) {
-        $opt{ExpandedURI q<match-or-error>} = 1;
-      }
+      $opt{ExpandedURI q<match-or-error>}
+        = $opt{ExpandedURI q<system-id-required>};
+      $opt{ExpandedURI q<end-with-mdc>}
+        = not $opt{ExpandedURI q<system-id-required>};
     }
     $self->parse_markup_declaration_parameter
             ($src, $p,
              %opt,
              ExpandedURI q<ps-required> => 1,
-             ExpandedURI q<end-with-mdc> => 0,
              ExpandedURI q<param-type> => {
                ps => 1,
                syslit => 1,
@@ -1908,7 +2382,17 @@ sub parse_doctype_subset ($$$%) {
         my $n = substr ($$src, 1 + pos $$src, 1);
         if ($n eq '!') {
           $self->parse_markup_declaration
-                  ($src, $pp, %opt)
+                  ($src, $pp, %opt,
+                   ExpandedURI q<allow-declaration> => {
+                     ENTITY => 1, NOTATION => 1,
+                     ELEMENT => 1, ATTLIST => 1,
+                     comment => 1, section => 1,
+                   }, ExpandedURI q<allow-section> => {
+                     INCLUDE => 1, IGNORE => 1,
+                   }, ExpandedURI q<allow-section-ps> => 1,
+                   ExpandedURI q<section-content-parser>
+                     => 'parse_doctype_subset',
+                  )
             or pos ($$src)++;
         } elsif ($n eq '?') {
           $self->parse_processing_instruction
@@ -1925,6 +2409,9 @@ sub parse_doctype_subset ($$$%) {
         
       } elsif (substr ($$src, pos $$src, 0) eq '%') {
         ## TODO: 
+      } elsif ($opt{ExpandedURI q<end-with-mse>} and
+               $$src =~ /\G\]\]>/gc) {
+        last SUBSET;
       } elsif ($opt{ExpandedURI q<end-with-dsc>} and
                $$src =~ /\G\]/gc) {
         last SUBSET;
@@ -1936,7 +2423,12 @@ sub parse_doctype_subset ($$$%) {
                    source => $src);
       }
     }
-    if ($opt{ExpandedURI q<end-with-dsc>}) {
+    if ($opt{ExpandedURI q<end-with-mse>}) {
+      $self->report
+                  (-type => 'SYNTAX_MSE_REQUIRED',
+                   -class => 'WFC',
+                   source => $src);
+    } elsif ($opt{ExpandedURI q<end-with-dsc>}) {
       $self->report
                   (-type => 'SYNTAX_ISC_REQUIRED',
                    -class => 'WFC',
@@ -2012,6 +2504,167 @@ sub parse_comment ($$$$%) {
   return 1;
 }
 
+
+sub parse_marked_section ($$$%) {
+  my ($self, $src, $p, %opt) = @_;
+  if ($$src =~ /\G<!\[/gc) {
+    $self->marked_section_start
+              ($src, $p, my $pp = {}, %opt);
+    $opt{ExpandedURI q<end-with-mdc>} = 0;
+    $opt{ExpandedURI q<match-or-error>} = 1;
+    $opt{ExpandedURI q<allow-comment>} = 0;
+    $opt{ExpandedURI q<allow-param-entref>} = 0;
+    $opt{ExpandedURI q<ps-required>} = 0;
+    $opt{ExpandedURI q<error-ps-required>}
+        = 'SYNTAX_MARKED_SECTION_PS_REQUIRED';
+    $opt{ExpandedURI q<source>} = [$src];
+    $opt{ExpandedURI q<end-with-mso>} = 0;
+    $opt{ExpandedURI q<error-ps>} = 'SYNTAX_MARKED_SECTION_STATUS_PS';
+    my %kwd;
+    PARAMS: {
+      $self->markup_declaration_parameters_start
+              ($src, $p, $pp, %opt);
+      $pp->{ExpandedURI q<param>} = [];
+      
+      ## Status Keyword
+      KEYWORD: {
+        $self->parse_markup_declaration_parameter
+              ($src, $pp,
+               %opt,
+               ExpandedURI q<error-no-match>
+                 => 'SYNTAX_MARKED_SECTION_KEYWORD_REQUIRED',
+               ExpandedURI q<param-type> => {
+                 Name => 1,
+                 ps => 1,
+               },
+               ExpandedURI q<allow-ps> => $opt{ExpandedURI q<allow-section-ps>});
+        my $entname = shift @{$pp->{ExpandedURI q<param>}};
+        unless ($entname) {
+          last PARAMS;
+        } elsif ($entname->{type} eq 'Name') {
+          $kwd{${$entname->{value}}}++;
+          $self->report
+            (-type => 'SYNTAX_MARKED_SECTION_KEYWORDS',
+             -class => 'WFC',
+             source => $entname->{value})
+            if $opt{ExpandedURI q<ps-required>};
+          if ($opt{ExpandedURI q<allow-section>}->{${$entname->{value}}}) {
+            # 
+          } else {
+            $self->report
+              (-type => 'SYNTAX_MARKED_SECTION_KEYWORD',
+               -class => 'WFC',
+               source => $entname->{value},
+               keyword => ${$entname->{value}});
+          }
+        } else {
+          die "$0: ".__PACKAGE__.": $entname->{type}: Buggy";
+        }
+        $opt{ExpandedURI q<ps-required>} = 1;
+        $opt{ExpandedURI q<match-or-error>} = 0;
+        $opt{ExpandedURI q<end-with-mso>} = 1;
+        redo KEYWORD;
+      }
+    } continue {
+      if (@{$pp->{ExpandedURI q<param>}} or
+          @{$opt{ExpandedURI q<source>}} > 1) {
+        $self->report
+              (-type => 'SYNTAX_MARKUP_DECLARATION_TOO_MANY_PARAM',
+               -class => 'WFC',
+               source => ($pp->{ExpandedURI q<param>}->[0] ?
+                            $pp->{ExpandedURI q<param>}->[0]->{value} :
+                            $opt{ExpandedURI q<source>}->[-1]),
+               param => $pp->{ExpandedURI q<param>},
+               sources => $opt{ExpandedURI q<source>});
+      }
+      $self->markup_declaration_parameters_end
+              ($src, $p, $pp, %opt);
+    }
+    unless ($$src =~ /\G\[/gc) {
+      $self->report
+              (-type => 'SYNTAX_MSO_REQUIRED',
+               -class => 'WFC',
+               source => $src);
+    }
+    $pp->{ExpandedURI q<section-status>} = \%kwd;
+    $self->marked_section_content_start
+             ($src, $p, $pp, %opt);
+    if ($kwd{IGNORE}) {
+      $pp->{ExpandedURI q<section-type>} = 'ignore';
+      $self->parse_ignored_section_content
+             ($src, $pp, %opt, 
+              ExpandedURI q<end-with-mse> => 1);
+    } elsif ($kwd{CDATA} || $kwd{RCDATA}) { ## RCDATA not implemented
+      $$src =~ /\G((?>(?!\]\]>).)*)/gcs;
+      my $cdata = $1;
+      $self->{error}->set_position ($src, moved => 1,
+                                    diff => length $cdata);
+      $self->{error}->fork_position ($src => \$cdata);
+      $pp->{ExpandedURI q<section-type>} = 'cdata';
+      $pp->{ExpandedURI q<cdata>} = \$cdata;
+      $$src =~ /\G\]\]>/gc
+        or $self->report
+             (-type => 'SYNTAX_MSE_REQUIRED',
+              -class => 'WFC',
+              source => $src);
+    } elsif (my $parser = $opt{ExpandedURI q<section-content-parser>}) {
+      $pp->{ExpandedURI q<section-type>} = 'include';
+      $self->$parser
+             ($src, $pp, %opt,
+              ExpandedURI q<end-with-mse> => 1);
+    } else { ## Error: parse as if CDATA section
+      $$src =~ /\G((?>(?!\]\]>).)*)/gcs;
+      my $cdata = $1;
+      $self->{error}->set_position ($src, moved => 1,
+                                    diff => length $cdata);
+      $self->{error}->fork_position ($src => \$cdata);
+      $pp->{ExpandedURI q<section-type>} = 'cdata';
+      $pp->{ExpandedURI q<cdata>} = \$cdata;
+      $$src =~ /\G\]\]>/gc
+        or $self->report
+             (-type => 'SYNTAX_MSE_REQUIRED',
+              -class => 'WFC',
+              source => $src);
+    }
+    $self->marked_section_content_end
+              ($src, $p, $pp, %opt);
+    $self->marked_section_end
+              ($src, $p, $pp, %opt);
+    return 1;
+  } else {
+    return 0;
+  }
+} # parse_marked_section
+
+sub parse_ignored_section_content ($$$%) {
+  my ($self, $src, $p, %opt) = @_;
+  while (pos $$src < length $$src) {
+    if ($$src =~ /\G((?>(?!<!\[|\]\]>).)+)/gco) {
+      my $cdata = $1;
+      $self->{error}->set_position ($src, moved => 1,
+                                    diff => length $cdata);
+      $self->{error}->fork_position ($src => \$cdata);
+      $self->ignored_section_content
+        ($src, $p,
+         {ExpandedURI q<cdata> => $cdata}, %opt);
+    } elsif ($$src =~ /\G<!\[/gc) {
+      $self->parse_ignored_section_content
+        ($src, $p, %opt,
+         ExpandedURI q<end-with-mse> => 1);
+    } elsif ($$src =~ /\G\]\]>/gc) {
+      return 1;
+    } else {
+      die "$0: ".__PACKAGE__.": ignored_section: Buggy";
+    }
+  }
+  if ($opt{ExpandedURI q<end-with-mse>}) {
+    $self->report
+      (-type => 'SYNTAX_MSE_REQUIRED',
+       -class => 'WFC',
+       source => $src);
+  }
+  return 1;
+} # parse_ignored_section_content
 
 sub parse_processing_instruction ($$$%) {
   my ($self, $src, $p, %opt) = @_;
@@ -2098,6 +2751,7 @@ sub element_declaration_start ($$$$%) {}
 sub element_declaration_end ($$$$%) {}
 
 sub attlist_declaration_start ($$$$%) {}
+sub attlist_declaration_content ($$$$%) {}
 sub attlist_declaration_end ($$$$%) {}
 
 sub notation_declaration_start ($$$$%) {}
@@ -2109,6 +2763,10 @@ sub markup_declaration_parameters_end ($$$$%) {}
 sub model_group_start ($$$$%) {}
 sub model_group_content ($$$$%) {}
 sub model_group_end ($$$$%) {}
+
+sub attrtype_group_start ($$$$%) {}
+sub attrtype_group_content ($$$$%) {}
+sub attrtype_group_end ($$$$%) {}
 
 sub public_identifier_start ($$$$%) {}
 sub system_identifier_start ($$$$%) {}
@@ -2126,6 +2784,13 @@ sub doctype_subset_end ($$$$%) {}
 
 sub comment_declaration_start ($$$$%) {}
 sub comment_declaration_end ($$$$%) {}
+
+sub marked_section_start ($$$$%) {}
+sub marked_section_status ($$$$%) {}
+sub marked_section_content_start ($$$$%) {}
+sub ignored_section_content ($$$$%) {}
+sub marked_section_content_end ($$$$%) {}
+sub marked_section_end ($$$$%) {}
 
 sub comment_start ($$$$%) {}
 sub comment_content ($$$$%) {}
@@ -2164,4 +2829,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/05/27 09:01:54 $
+1; # $Date: 2004/05/29 08:12:11 $
