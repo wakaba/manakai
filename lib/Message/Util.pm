@@ -15,7 +15,7 @@ package Message::Util;
 #require 5.6.0;
 use strict;
 use vars qw(%FMT2STR %OPTION %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.24 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.25 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Carp;
 
@@ -119,20 +119,8 @@ require Carp;
 	#$REG{S_encoded_word_comment} = qr/=\x3F[\x21-\x27\x2A-\x5B\x5D-\x7E]+\x3F=/;
 		## not used anywhere
 
-## See also 'sprintxf'
-%FMT2STR = (
-	char	=> sub {
-	  my $p = $_[0];
-	  if ($p->{ucs} =~ /^0[xob][0-9A-Fa-f]+$/) {
-	    return pack 'U', oct $p->{ucs};
-	  } elsif (defined $p->{ucs}) {
-	    return pack 'U', $p->{ucs};
-	  } else {
-	    return "\x{FFFD}";
-	  }
-	},
-	percent	=> '%',
-);
+## obsoleted
+*FMT2STR = \%Message::Util::Formatter::FMT2STR;
 
 =head1 STRUCTURED FIELD FUNCTIONS
 
@@ -688,30 +676,10 @@ sub decode_ccontent ($$) {
   Message::MIME::EncodedWord::decode_ccontent ($_[0], $_[1]);
 }
 
+## obsoleted
 sub sprintxf ($;\%) {
-  my $format = shift;
-  my $gparam = shift;
-  $format =~ s{%([A-Za-z0-9_]+)(?:\(([^\x29]*)\))?;}{
-    my ($f, $a) = ($1, $2);
-    my $function = $gparam->{fmt2str}->{$f} || $FMT2STR{$f};
-    if (ref $function) {
-      my %a;
-      for (split /[\x09\x20]*,[\x09\x20]*/, $a) {
-        if (/^([^=]*[^\x09\x20=])[\x09\x20]*=>[\x09\x20]*([^\x09\x20].*)$/) {
-          $a{ Message::Util::Wide::unquote_if_quoted_string ($1) } = Message::Util::Wide::unquote_if_quoted_string ($2);
-        } else {
-          $a{ Message::Util::Wide::unquote_if_quoted_string ($_) } = 1;
-        }
-      }
-      my $r = &$function (\%a, $gparam);
-      length $r? $a{prefix}.$r.$a{suffix}: '';
-    } elsif (length $function) {
-      $function;
-    } else {
-      "[$f: undef]";
-    }
-  }gex;
-  $format;
+  require Message::Util::Formatter;
+  Message::Util::Formatter::replace (@_);
 }
 
 sub decide_newline ($) {
@@ -859,4 +827,4 @@ Boston, MA 02111-1307, USA.
 =cut
 
 1;
-# $Date: 2002/11/13 08:08:51 $
+# $Date: 2002/11/13 08:26:45 $
