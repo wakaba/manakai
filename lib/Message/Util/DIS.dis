@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/02/28 04:32:40 $
+      $Date: 2005/03/02 07:46:31 $
     @@ContentType:
       dis:Date.RCS
   
@@ -400,12 +400,17 @@ ClsDef:
 
 ClsDef:
   @ClsQName: ManakaiDISNode
-  @ClsISA:
-    swcfg21:ManakaiSWCFGNode::swcfg21:ForLatest
   @Description:
     @@lang:en
     @@@:
       <QUOTE::dis> node objects. 
+  @ImplNote:
+    @@lang:en
+    @@@:
+      This class does not inherit 
+      <Class::swcfg21:ManakaiSWCFGNode::swcfg21:ForLatest>, since 
+      inheriting classes such as <Class::ManakaiDISElement> indirectly 
+      inherit it. 
 
   @MethodRedef:
     @@Name:lookupNamespacePrefix
@@ -469,7 +474,7 @@ ClsDef:
         $r = null;
         my $od = $self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
                                           .ownerDocument> || $self;
-        my $binds = $od->{<Q::TreeCore:node>}->{<Q::nsBinding>};
+        my $binds = $od->{<Q::TreeCore:node>}->{<Q::swcfg21:nsBinding>};
         if (defined $namespaceURI) {
           FIND: {
             for my $prefix (keys %$binds) {
@@ -479,6 +484,29 @@ ClsDef:
                 last FIND;
               }
             }
+
+            ## From module list
+            try {
+              my $db = $self-><AG::ManakaiDISNode.ownerDISDocument>
+                            -><AG::ManakaiDISDocument.disDatabase>;
+              for my $mod_uri (keys %{$db->{modDef}}) {
+                my $mod = $db-><M::ManakaiDISDatabase.getModule> ($mod_uri);
+                my $mod_ln = $mod-><AG::ManakaiDISModuleDefinition.localName>;
+                next if exists $binds->{$mod_ln};
+                my $ns_uri = $mod-><M::ManakaiDISPropertyAccessor
+                                            .getPropertyText>
+                                                 (<Q::dis:Namespace>, '');
+                if ($ns_uri eq $namespaceURI) {
+                  $r = $mod_ln;
+                  last FIND;
+                }
+              }
+            } catch <Class::ManakaiDISException> with {
+              my $err = shift;
+              $err->throw
+                unless $err->{<Q::MDOMX:subtype>} eq <Q::NO_DB_ASSOCIATED_ERR>;
+            };
+
             last FIND unless $makeNewBinding;
             ## Not found
             if ($namespaceURI =~ /(\w+)$/) {
@@ -524,7 +552,6 @@ ClsDef:
             }
           }
         }
-        ## TODO: Module ns support
 
   @MethodRedef:
     @@Name:lookupNamespaceURI
@@ -581,15 +608,37 @@ ClsDef:
       @@@PerlDef:
         my $od = $self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
                                                .ownerDocument> || $self;
-        my $binds = $od->{<Q::TreeCore:node>}->{<Q::nsBinding>};
+        my $binds = $od->{<Q::TreeCore:node>}->{<Q::swcfg21:nsBinding>};
         if (exists $binds->{$prefix}) {
           $r = $binds->{$prefix};
-        } elsif ($makeNewBinding) {
-          $r = $binds->{$prefix} = $prefix;
         } else {
-          $r = null;
+          ## From module list
+          FIND: {
+            try {
+              my $db = $self-><AG::ManakaiDISNode.ownerDISDocument>
+                            -><AG::ManakaiDISDocument.disDatabase>;
+              for my $mod_uri (keys %{$db->{modDef}}) {
+                my $mod = $db-><M::ManakaiDISDatabase.getModule> ($mod_uri);
+                if ($mod-><AG::ManakaiDISModuleDefinition.localName>
+                      eq $prefix) {
+                  $r = $mod-><M::ManakaiDISPropertyAccessor
+                                              .getPropertyText>
+                                                   (<Q::dis:Namespace>, null);
+                  last FIND;
+                }            
+              }
+            } catch <Class::ManakaiDISException> with {
+              my $err = shift;
+              $err->throw
+                unless $err->{<Q::MDOMX:subtype>} eq <Q::NO_DB_ASSOCIATED_ERR>;
+            };
+            if ($makeNewBinding) {
+              $r = $binds->{$prefix} = $prefix;
+            } else {
+              $r = null;
+            }
+          } # FIND
         }
-        ## TODO: Module ns support
 
   @IntMethod:
     @@Name:getNodeReference
@@ -658,9 +707,9 @@ ClsDef:
 
 ClsDef:
   @ClsQName: ManakaiDISElement
+  @ClsISA: ManakaiDISNode
   @ClsISA:
     swcfg21:ManakaiSWCFGElement::swcfg21:ForLatest
-  @ClsISA: ManakaiDISNode
   @Description:
     @@lang:en
     @@@:
@@ -881,7 +930,8 @@ ClsDef:
                                  -><AG::ManakaiDISDocument.disDatabase>
                                  -><M::ManakaiDISDatabase.getResource> ($ct);
             $res-><AS::ManakaiDISResourceDefinition.isReferred> ($ctn or $self);
-            unless ($res-><M::ManakaiDISResourceDefinition.subsetOfURI> ($ct)) {
+            unless ($res-><M::ManakaiDISResourceDefinition
+                                               .isSubsetOfURI> ($ct)) {
               $r = false;
             } else {
               $r = true;
@@ -932,8 +982,12 @@ ClsDef:
               DIS:sourceNode => {$node},
             }__;
           }
-        } else {
-          ## TODO: default namespace
+        } else {  ## Default namespace
+          __DEEP{
+            $r = ($self-><AG::ManakaiDISNode.ownerDISDocument> || $self)
+                       -><AG::ManakaiDISDocument.moduleElement>
+                       -><AG::ManakaiDISModuleElement.definingNamespaceURI>;
+          }__;
         }
 
   @Method:
@@ -1304,6 +1358,99 @@ ClsDef:
         } else {
           $r = null;
         }
+
+  @Method:
+    @@Name: elementTypeMatch
+    @@enDesc:
+      Returns whether the element type of this element matches 
+      with another element type (either the same element type or
+      this type is a subtype of another type). 
+    @@Param:
+      @@@Name: etype
+      @@@Type: ResourceURI
+      @@@enDesc:
+        An element type name URI reference to test. 
+    @@Return:
+      @@@Type:
+        DOMMain:boolean
+      @@@TrueCase:
+        @@@@enDesc:
+          Either the element type expanded URI reference of this element is 
+          same as <P::etype> or it is a sub-element type of <P::etype>. 
+      @@@FalseCase:
+        @@@@enDesc:
+          This element is not of <P::etype>. 
+      @@@NoDBException:
+      @@@PerlDef:
+        __DEEP{
+          my $et = $self-><M::swcfg21:SWCFGElement::swcfg21:ForLatest
+                                                          .expandedURI>;
+          my $rdef = $self-><AG::ManakaiDISNode.ownerDISDocument>
+                                   -><AG::ManakaiDISDocument.disDatabase>
+                                   -><M::ManakaiDISDatabase.getResource> ($et);
+          $r = $rdef-><M::ManakaiDISResourceDefinition.isSubsetOfURI> ($etype);
+        }__;
+
+  @Attr:
+    @@Name: isResourceElement
+    @@enDesc:
+      Whether this element defines a resource or not. 
+      \
+      {NOTE:: An element defines a resource if its element type is 
+              <Q::dis:ResourceDef> or its subtype.
+      \
+      }
+    @@Get:
+      @@@Type:
+        DOMMain:boolean
+      @@@TrueCase:
+        @@@@enDesc:
+          This element defines a resource. 
+      @@@FalseCase:
+        @@@@enDesc:
+          This element does not define any resource.
+      @@@NoDBException:
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::ManakaiDISElement.elementTypeMatch>
+                                                (<Q::dis:ResourceDef>);
+        }__;
+
+  @Attr:
+    @@Name: isPropertyElement
+    @@enDesc:
+      Whether this element is a property or not. 
+      \
+      {NOTE:: An element is a property if its element type is
+              <Q::rdf:type> or if its element type's <Q::rdf:type> 
+              property is <Q::rdf:Property> or is <Q::dis:subsetOf> 
+              <Q::rdf:Property>. 
+      \
+      }
+    @@Get:
+      @@@Type:
+        DOMMain:boolean
+      @@@TrueCase:
+        @@@@enDesc:
+          This element is a property.
+      @@@FalseCase:
+        @@@@enDesc:
+          This element is not a property. 
+      @@@NoDBException:
+      @@@PerlDef:
+        __DEEP{
+          my $xn = $self-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
+                                                            .expandedURI>;
+          if ($xn eq <Q::rdf:type>) {
+            $r = true;
+          } else {
+            my $rdef = $self-><AG::ManakaiDISNode.ownerDISDocument>
+                                   -><AG::ManakaiDISDocument.disDatabase>
+                                   -><M::ManakaiDISDatabase.getResource> ($xn);
+            $r = $rdef-><M::ManakaiDISResourceDefinition.isTypeURI>
+                                                           (<Q::rdf:Resource>);
+          }
+        }__;
 ##DISElement
 
 ClsDef:
@@ -1353,6 +1500,38 @@ ClsDef:
           $self-><M::swcfg21:SWCFGNode::swcfg21:ForLatest.setAttributeNS>
                                      (<Q::dis:>, 'DefaultFor' => $given);
         }__;
+
+  @Attr:
+    @@Name: definingNamespaceURI
+    @@enDesc:
+      The value of <Q::dis:NamespaceURI> attribute, i.e. 
+      the URI reference of the namespace that this module primary 
+      defines.
+      \
+      {NOTE:: Defining namespace URI is <QUOTE::for> independent. 
+      \
+      }
+    @@Type: AnyURI
+    @@Get:
+      @@@PerlDef:
+        __DEEP{
+          my $df = $self-><M::swcfg21:SWCFGNode::swcfg21:ForLatest
+                                .getAttributeNS>
+                                         (<Q::dis:>, 'Namespace');
+          if ($df) {
+            $r = $df-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
+          } else {
+            __ASSERT{DISPerl:invariant::
+              msg => {qq["dis:Namespace" attribute not found]},
+            }__;
+          }
+        }__;
+    @@Set:
+      @@@PerlDef:
+        __DEEP{
+          $self-><M::swcfg21:SWCFGNode::swcfg21:ForLatest.setAttributeNS>
+                                     (<Q::dis:>, 'Namespace' => $given);
+        }__;
 ##DISModuleElement
 
 ClsDef:
@@ -1370,9 +1549,9 @@ ClsDef:
 
 ClsDef:
   @ClsQName: ManakaiDISComment
+  @ClsISA: ManakaiDISNode
   @ClsISA:
     swcfg21:ManakaiSWCFGComment::swcfg21:ForLatest
-  @ClsISA: ManakaiDISNode
   @Description:
     @@lang:en
     @@@:
@@ -1381,9 +1560,9 @@ ClsDef:
 
 ClsDef:
   @ClsQName: ManakaiDISDocumentFragment
+  @ClsISA: ManakaiDISNode
   @ClsISA:
     swcfg21:ManakaiSWCFGDocumentFragment::swcfg21:ForLatest
-  @ClsISA: ManakaiDISNode
   @Description:
     @@lang:en
     @@@:
@@ -1392,9 +1571,9 @@ ClsDef:
 
 ClsDef:
   @ClsQName: ManakaiDISDocument
+  @ClsISA: ManakaiDISNode
   @ClsISA:
     swcfg21:ManakaiSWCFGDocument::swcfg21:ForLatest
-  @ClsISA: ManakaiDISNode
   @Description:
     @@lang:en
     @@@:
@@ -1659,6 +1838,11 @@ ClsDef:
       @@@ForDefNoQNameException:
       @@@ResDefDupException:
       @@@ElementNotAllowedException:
+      @@@RaiseException:
+        @@@@@:NO_REQUIRED_ATTR_ERR
+        @@@@enDesc:
+          The <Q::dis:Module> element does not have 
+          <Q::dis:Namespace> attribute. 
       @@@PerlDef:
         $resolver = bless $resolver, <ClassName::ManakaiDISModuleResolver>
                       if ref $resolver eq 'CODE'; 
@@ -1792,25 +1976,42 @@ ClsDef:
             }
 
             for my $el (@$root_elements) {
-              my $et = $el-><M::swcfg21:SWCFGElement::swcfg21:ForLatest
-                                          .expandedURI>;
-              if ($et eq <Q::dis:ResourceDef>) {
-                $self-><M::ManakaiDISDatabase.loadResource> ($mod, null, $el);
-              } elsif ({
+              if ($el-><M::ManakaiDISElement.isResourceElement>) {
+                $self-><M::ManakaiDISDatabase.loadResource>
+                                         ($mod, null, $mod, $el,
+                                          for_arg => $forArg);
+              } else {
+                my $et = $el-><M::swcfg21:SWCFGElement::swcfg21:ForLatest
+                                                               .expandedURI>;
+                if ({
                          <Q::dis:ForDef> => 1,
                          <Q::dis:Module> => 1,
                          <Q::dis:ImplNote> => 1,
-                       }->{$et}) {
-                # 
-              } else {
-                __UNDEEP{
-                  __EXCEPTION{ELEMENT_NOT_ALLOWED_ERR::
-                    DIS:elementType => {$et},
-                    DIS:sourceNode => {$el},
-                    DIS:uri => {$mod->{uri}},
+                    }->{$et}) {
+                  # 
+                } else {
+                  __UNDEEP{
+                    __EXCEPTION{ELEMENT_NOT_ALLOWED_ERR::
+                      DIS:elementType => {$et},
+                      DIS:sourceNode => {$el},
+                      DIS:uri => {$mod->{uri}},
+                    }__;
                   }__;
+                }
+              } # element types
+            }
+            
+            my $dn = $mod_node-><M::swcfg21:SWCFGNode::swcfg21:ForLatest
+                                .getAttributeNS>
+                                         (<Q::dis:>, 'Namespace');
+            unless ($dn and defined $dn-><AG::swcfg21:SWCFGNode
+                                            ::swcfg21:ForLatest.value>) {
+              __UNDEEP{
+                __EXCEPTION{NO_REQUIRED_ATTR_ERR::
+                  DIS:elementType => {<Q::dis:Namespace>},
+                  DIS:sourceNode => {$mod_node},
                 }__;
-              }
+              }__;
             }
           } # Unless this module loaded
         }__; # Deep
@@ -1859,8 +2060,9 @@ ClsDef:
                                                        .expandedURI>;
               if ($xn eq <Q::dis:ISA> or $xn eq <Q::dis:Implement>) {
                 my $sfor = $self-><M::ManakaiDISDatabase.getFor>
-                            ($ce-><M::ManakaiDISElement.qnameValueURI>);
+                            ($ce-><AG::ManakaiDISElement.qnameValueURI>);
                 $for-><M::ManakaiDISForDefinition.addISA> ($sfor);
+                $sfor-><M::ManakaiDISForDefinition.isReferred> ($ce);
                 ## TODO: warn if dis:Implement
               } elsif ({
                          <Q::dis:Description> => 1,
@@ -1903,11 +2105,29 @@ ClsDef:
       @@@Name: parentResource
       @@@Type: ManakaiDISResourceDefinition
       @@@enDesc:
-        The parent resource in which the resource to load is defined. 
+        The (static) parent resource in which the resource to load is defined. 
       @@@nullCase:
         @@@@enDesc:
           The resource to load is a root resource, i.e. <P::el> is 
           a direct child of the document node. 
+    @@Param:
+      @@@Name: dynParent
+      @@@Type:
+        DOMMain:Object
+      @@@enDesc:
+        The dynamic parent resource of the resource to load. 
+      @@@InCase:
+        @@@@Type: ManakaiDISResourceDefinition
+        @@@@enDesc:
+          If this resource is one of representations of 
+          <Q::dis:MultileResource>, then <P::dynParent> is that <QUOTE::multiple>
+          resource definition.  Otherwise, same as <P::parentResource>. 
+      @@@InCase:
+        @@@@Type: ManakaiDISModuleDefinition
+        @@@@enDesc:
+          If this resource is a root resource, then <P::dynParent> is 
+          the module in which the resource is defined, i.e. same
+          as <P::mod>. 
     @@Param:
       @@@Name: el
       @@@Type:ManakaiDISElement
@@ -1978,7 +2198,12 @@ ClsDef:
                 $res->{aliasURI}->{$node_uri} = true;
                 $self->{resDef}->{$node_uri} = $res;
               } else {  ## Root local name resource
-                my $qn_uri = $res->{namespaceURI} . $res->{localName};
+                my $ln = $n_node-><AG::swcfg21:SWCFGNode
+                                                ::swcfg21:ForLatest.value>;
+                my $ns_uri = $mod-><M::ManakaiDISPropertyAccessor
+                                            .getPropertyText>
+                                                 (<Q::dis:Namespace>, null);
+                my $qn_uri = $ns_uri . $ln;
                 my $uri;
                 __CODE{tfurisToURI:: $turi => $qn_uri, $furi => $forArg,
                                      $uri => $uri}__;
@@ -1993,11 +2218,8 @@ ClsDef:
                  }__;
                 }
                 $res->{nameURI} = $qn_uri;
-                $res->{namespaceURI}
-                   = $mod-><M::ManakaiDISPropertyAccessor.getPropertyText>
-                                                 (<Q::dis:Namespace>, null);
-                $res->{localName} = $n_node-><AG::swcfg21:SWCFGNode
-                                                ::swcfg21:ForLatest.value>;
+                $res->{namespaceURI} = $ns_uri;
+                $res->{localName} = $ln;
               }
             } else {
               $res = $self-><M::ManakaiDISDatabase.getResource> ($node_uri);
@@ -2012,6 +2234,7 @@ ClsDef:
              if $parentResource;
           $res->{aliasURI}->{$node_uri} = true;
           $self->{resDef}->{$node_uri} = $res;
+          $res->{<Q::isDefined>} = true;
 
           ## -- Alias
           my $al_node = $el-><M::ManakaiDISElement.disGetAttribute>
@@ -2027,36 +2250,72 @@ ClsDef:
             $res = $canon_res;
           }
 
- =pod
-
-            for my $ce (@{$el-><M::ManakaiDISElement.disChildElements>}) {
-              my $xn = $ce-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
-                                                       .expandedURI>;
-              if ($xn eq <Q::dis:ISA> or $xn eq <Q::dis:Implement>) {
-                my $sfor = $self-><M::ManakaiDISDatabase.getFor>
-                            ($ce-><M::ManakaiDISElement.qnameValueURI>);
-                $for-><M::ManakaiDISForDefinition.addISA> ($sfor);
-                ## TODO: warn if dis:Implement
-              } elsif ({
-                         <Q::dis:Description> => 1,
-                         <Q::dis:ImplNote> => 1,
-                         <Q::dis:FullName> => 1,
-                         <Q::dis:QName> => 1,
-                       }->{$xn}) {
-                # 
+          my $is_multires = false;
+          my @props;
+          my @cres;
+          my @ce0 = @{$el-><M::ManakaiDISElement.disChildElements>};
+          while (@ce0) {
+            my $ce = shift @ce0;
+            if ($ce-><M::ManakaiDISElement.elementTypeMatch> (<Q::rdf:type>)) {
+              my $type_uri = $ce-><AG::ManakaiDISElement.qnameValueURI>;
+              $res->{<Q::rdf:type>}->{$type_uri} = true;
+              my $type = $self-><M::ManakaiDISDatabase.getResource> ($type_uri);
+              $type-><M::ManakaiDISResourceDefinition.isReferred> ($ce);
+              if ($type-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
+                                               (<Q::dis:MultipleResource>)) {
+                $is_multires = true;
+              }
+            } elsif ($ce-><M::ManakaiDISElement.elementTypeMatch>
+                                                   (<Q::dis:subsetOf>)) {
+              my $sres = $self-><M::ManakaiDISDatabase.getResource>
+                                  ($ce-><M::ManakaiDISElement.tfqnamesValueURI>
+                                                    ($node_id, $forArg));
+              $res-><M::ManakaiDISResourceDefinition.addSuperResource> ($sres);
+            } elsif ($ce-><M::ManakaiDISElement.isResourceElement>) {
+              push @cres, $ce;
+            } else {
+              ## Property and invalid element is not checked, since not
+              ## all property definitions has loaded at this stage. 
+              push @props, $ce;
+            }
+          } # @ce0
+   
+          ## -- Child resources
+          unless ($is_multires) {
+            for my $re (@cres) {
+              unless ($al_node) {
+                $self-><M::ManakaiDISDatabase.loadResource>
+                                     ($mod, $res, $res, $re,
+                                      for_arg => $forArg, forp_arg => $forpArg);
               } else {
-                __UNDEEP{
-                  __EXCEPTION{ELEMENT_NOT_ALLOWED_ERR::
-                    DIS:uri => {$mod->{uri}},
-                    DIS:sourceNode => {$ce},
-                    DIS:elementType => {$xn},
-                  }__;
-                }__;
+                my $ac = $re-><M::ManakaiDISElement.disGetAttribute>
+                                    (<Q::dis:aliasChild>, for_arg => $forArg,
+                                     forp_arg => $forpArg);
+                if ($ac and $ac-><M::swcfg21:SWCFGNode
+                                   ::swcfg21:ForLatest.value>) {
+                  $self-><M::ManakaiDISDatabase.loadResource>
+                                     ($mod, $res, $res, $re,
+                                      for_arg => $forArg, forp_arg => $forpArg);
+                }
               }
             }
+          }
 
- =cut
-          
+          ## -- Multiple representations
+          if ($is_multires) {
+            for my $pe (@props) {
+              if ($pe-><M::ManakaiDISElement.elementTypeMatch>
+                                               (<Q::dis:ResourceFor>)) {
+                my $for_uri = $pe-><M::ManakaiDISElement.qnameValueURI>;
+                my $for = $self-><M::ManakaiDISDatabase.getFor> ($for_uri);
+                $for-><M::ManakaiDISForDefinition.isReferred> ($pe);
+                $self-><M::ManakaiDISDatabase.loadResource>
+                                ($mod, $parentResource, $res, $el,
+                                 for_arg => $forArg,
+                                 forp_arg => [@{$forpArg}, $for_uri]);
+              }
+            }
+          }
         }__; # DEEP
         
 ##DISDatabase
@@ -2374,17 +2633,20 @@ ClsDef:
         A <QUOTE::for> definition object. 
     @@Return:
       @@@PerlDef:
-        $superFor->{<Q::isReferred>} = true;
         my @from = ($self->{uri},
                     grep {$self->{revISA}->{$_}} keys %{$self->{revISA}});
         my @to = ($superFor->{uri},
                   grep {$superFor->{isa}->{$_}} keys %{$superFor->{isa}});
-        for my $from (@from) {
-          for my $to (@to) {
-            $self->{isa}->{$to} = true;
-            $superFor->{revISA}->{$from} = true;
+        __DEEP{
+          for my $from (@from) {
+            for my $to (@to) {
+              $self->{db}-><M::ManakaiDISDatabase.getFor>
+                                      ($from)->{isa}->{$to} = true;
+              $self->{db}-><M::ManakaiDISDatabase.getFor>
+                                      ($to)->{revISA}->{$from} = true;
+            }
           }
-        }
+        }__;
 
 ##DISForDefinition
 
@@ -2481,7 +2743,7 @@ ClsDef:
         $r = $self->{forp};
   
   @Method:
-    @@Name: subsetOfURI
+    @@Name: isSubsetOfURI
     @@Description:
       @@@lang:en
       @@@@:
@@ -2505,6 +2767,33 @@ ClsDef:
       @@@PerlDef:
         $r = $self->{aliasURI}->{$superURI} || $self->{subOf}->{$superURI};
 
+  @Method:
+    @@Name: addSuperResource
+    @@enDesc:
+      Adds a <QUOTE::dis> resource to the list of super-resource 
+      of this <QUOTE::dis> resource. 
+    @@Param:
+      @@@Name: superRes
+      @@@Type: ManakaiDISResourceDefinition
+      @@@enDesc:
+        A <QUOTE::dis> resource definition object. 
+    @@Return:
+      @@@PerlDef:
+        my @from = ($self->{uri},
+                    grep {$self->{supOf}->{$_}} keys %{$self->{supOf}});
+        my @to = ($superRes->{uri},
+                  grep {$superRes->{subOf}->{$_}} keys %{$superRes->{subOf}});
+        __DEEP{
+          for my $from (@from) {
+            for my $to (@to) {
+              $self->{db}-><M::ManakaiDISDatabase.getResource>
+                                      ($from)->{subOf}->{$to} = true;
+              $self->{db}-><M::ManakaiDISDatabase.getResource>
+                                      ($to)->{supOf}->{$from} = true;
+            }
+          }
+        }__;
+
   @Attr:
     @@Name: isDefined
     @@Description:
@@ -2527,24 +2816,19 @@ ClsDef:
       @@@lang:en
       @@@@:
         Whether this resource is referred or not. 
-    @@Type:
-      DOMMain:any
+    @@Type: ManakaiDISElement
     @@Get:
-      @@@InCase:
-        @@@@Type:ManakaiDISElement
-        @@@@enDesc:
-          This resource is referred by the element. 
+      @@@enDesc:
+        This resource is referred by the element. 
       @@@nullCase:
         This resource is not referred. 
       @@@PerlDef:
         $r = $self->{<Q::isReferred>};
     @@Set:
-      @@@InCase:
-        @@@@Type:ManakaiDISElement
-        @@@@enDesc:
-          This resource is referred by this element. 
+      @@@enDesc:
+        This resource is referred by this element. 
       @@@PerlDef:
-        $self->{<Q::isReferred>} = $given if $given;
+        $self->{<Q::isReferred>} = true if $given;
 
   @Attr:
     @@Name: definingModule
@@ -2621,6 +2905,36 @@ ClsDef:
             }
           }
         }__;
+
+  @Method:
+    @@Name: isTypeURI
+    @@enDesc:
+      Tests whether this resource is of a type or not. 
+    @@Param:
+      @@@Name: typeURI
+      @@@Type: ResourceURI
+      @@@enDesc:
+        A type URI reference to test. 
+    @@Return:
+      @@@Type:
+        DOMMain:boolean 
+      @@@TrueCase:
+        @@@@enDesc:
+          This is a <P::typeURI> resource. 
+      @@@FalseCase:
+        @@@@enDesc:
+          This is not a <P::typeURI> resource. 
+      @@@PerlDef:
+        for my $t_type_uri (grep {$self->{<Q::rdf:type>}->{$_}}
+                                 keys %{$self->{<Q::rdf:type>}}) {
+          my $t_type = $self->{db}-><M::ManakaiDISDatabase.getResource>
+                                                            ($t_type_uri);
+          if ($t_type-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
+                                                            ($typeURI)) {
+            $r = true;
+            last;
+          }
+        }
 ##DISResourceDefinition
 
 ClsDef:
@@ -2868,6 +3182,14 @@ ExceptionDef:
         @@@@enDesc:
           The implementation has encounted an undeclared namespace 
           prefix. 
+        @@@@XParam:
+          @@@@@QName: 
+            infoset:prefix
+          @@@@@enDesc:
+            The namespace prefix. 
+        @@@@enMufDef:
+          Namespace prefix "%p (name => {<Q::infoset:prefix>});" is 
+          not declared
     @@XConstDef:
       @@@Name: INVALID_STATE_ERR
       @@@Value:11
@@ -2928,6 +3250,12 @@ ExceptionDef:
           @@@@@QName: anotherSourceNode
           @@@@@enDesc:
             The node that defines the <QUOTE::for> URI reference before. 
+        @@@@XParam:
+          @@@@@Name: uri
+          @@@@@enDesc:
+            The URI reference of the <QUOTE::for> attempted to define. 
+        @@@@enMufDef:
+          <QUOTE::For> <%p (name => {<Q::DIS:uri>});> is already defined
       @@@XSubTypeDef:
         @@@@QName: RESOURCE_ALREADY_DEFINED_ERR
         @@@@enDesc:
@@ -2938,6 +3266,12 @@ ExceptionDef:
           @@@@@QName: anotherSourceNode
           @@@@@enDesc:
             The node that defines the <QUOTE::for> URI reference before. 
+        @@@@XParam:
+          @@@@@Name: uri
+          @@@@@enDesc:
+            The URI reference of the resource attempted to define. 
+        @@@@enMufDef:
+          Resource <%p (name => {<Q::DIS:uri>});> is already defined
       @@@XSubTypeDef:
         @@@@QName: ELEMENT_NOT_ALLOWED_ERR
         @@@@enDesc:
@@ -2955,6 +3289,17 @@ ExceptionDef:
           @@@@@QName: uri
           @@@@@enDesc:
             The URI reference of the module. 
+      @@@XSubTypeDef:
+        @@@@QName: NO_REQUIRED_ATTR_ERR
+        @@@@enDesc:
+          A required attribute is not specified.
+        @@@@XSourceNodeParam:
+        @@@@XParam:
+          @@@@@QName: elementType
+          @@@@@enDesc:
+            The expanded URI reference of the attribute name. 
+        @@@@enMufDef:
+          Attribute <%p (name => {<Q::DIS:elementType>});> must be specified
 ##DISException
 
 XParamDef:

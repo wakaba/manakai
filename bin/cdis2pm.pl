@@ -425,7 +425,9 @@ sub perl_code ($;%) {
     }
     $r;
   ]ge;
-  ## TODO: Ensure Message::Util::Error imported if "try"ing.
+  if ($s =~ /\btry\b/) {
+    $s = q<use Message::Util::Error;>.$s;
+  }
   ## ISSUE: __FILE__ & __LINE__ will break if multiline substition happens.
   $s =~ s{
     \b__($RegQNameChar+)
@@ -2359,4 +2361,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/02/27 14:27:56 $
+1; # $Date: 2005/03/02 07:46:31 $

@@ -30,7 +30,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/27 14:27:56 $
+      $Date: 2005/03/02 07:46:31 $
     @@ContentType:
       dis:Date.RCS
   
@@ -294,52 +294,6 @@ ResourceDef:
       Message::DOM::
     @@For:
       ManakaiDOM:ManakaiDOMCommon
-
-## -- DOM Feature (from DOMMain)
-
-ResourceTypeDef:
-  @QName: 
-    DOMMain:DOMFeature
-  @FullName:
-    @@lang:en
-    @@@: DOM feature
-
-PropDef:
-  @QName: 
-    DOMMain:implementFeature
-  @Description:
-    @@lang:en
-    @@@:
-      A subject resource implements a object feature. 
-  @rdfs:range: 
-    DOMMain:DOMFeature
-  @dataType: 
-    dis:TypeQName
-
-PropDef:
-  @QName: 
-    DOMMain:requireFeature
-  @Description:
-    @@lang:en
-    @@@:
-      A subject resource requires a object feature. 
-  @rdfs:range: 
-    DOMMain:DOMFeature
-  @dataType:
-    dis:TypeQName
-
-PropDef:
-  @QName:
-    dis:Version
-  @FullName:
-    @@lang:en
-    @@@: Feature version
-  @Description:
-    @@lang:en
-    @@@:
-      A version number of a feature to define.
-  @rdfs:domain: 
-    DOMMain:DOMFeature
 
 ## -- DOM data types and construct types (from DOMMain)
 
