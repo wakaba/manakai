@@ -1,3 +1,15 @@
+2002-06-23  Wakaba <w@suika.fam.cx>
+
+	* Charset.pm
+	- New name_minimumizers. (Some are moved from 
+	Message::MIME::Charset::Jcode.)
+	- (%_MINIMUMIZER): New internal hash.
+	- Use internal name-minimumizer (with %_MINIMUMIZER)
+	if minimumizer is not defined in charset's definition.
+	* EncodedWord.pm (decode_ccontent): Order of arguments
+	is changed.
+	* MediaType.pm: Typo fix.
+
 2002-06-11  wakaba <w@suika.fam.cx>
 
 	* Charset.pm (US-ASCII name-minimumizer): Returns "unknown-8bit"

@@ -8,7 +8,7 @@ Message::MIME::MediaType --- Media-type definitions
 package Message::MIME::MediaType;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 our %type;
 
@@ -105,7 +105,7 @@ $type{text}->{html} = {
 };
 
 $type{text}->{javascript} = {	## Not yet registered in [IANAREG]
-	mime_alternate	=> qw[/application javascript/],
+	mime_alternate	=> [qw/application javascript/],
 	cte_7bit_preferred	=> 'quoted-printable',
 	mime_charset	=> 1,
 	parameter	=> {
@@ -612,7 +612,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/14 12:07:16 $
+$Date: 2002/06/23 12:16:10 $
 
 =cut
 
