@@ -8,7 +8,7 @@ Message::MIME::MediaType --- Media-type definitions
 package Message::MIME::MediaType;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 our %type;
 
@@ -299,7 +299,13 @@ $type{application}->{'news-transmission'} = {
 	},
 };
 
+$type{application}->{'pgp-signature'} = {
+	text_content	=> 1,
+	cte_7bit_preferred	=> 'quoted-printable',
+};
+
 $type{application}->{'rdf+xml'} = {	## Not in [IANAREG]
+	text_content	=> 1,
 	mime_charset	=> 1,
 	default_charset	=> 'us-ascii',	# See RFC 3023
 	cte_7bit_preferred	=> 'quoted-printable',
@@ -345,6 +351,7 @@ $type{application}->{'x-lirs+csv'} = {
 };
 
 $type{application}->{xml} = {
+	text_content	=> 1,
 	mime_charset	=> 1,
 	default_charset	=> 'us-ascii',	# See RFC 3023
 	cte_7bit_preferred	=> 'quoted-printable',
@@ -612,7 +619,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/23 12:16:10 $
+$Date: 2002/07/02 06:36:26 $
 
 =cut
 

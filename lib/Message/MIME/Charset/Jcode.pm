@@ -67,7 +67,7 @@ Message::MIME::Charset::Encode.
 package Message::MIME::Charset::Jcode;
 use strict;
 use vars qw(%CODE $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::MIME::Charset;
 
@@ -154,7 +154,8 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset ('euc-jp' =>
         encoder	=> sub {
           my $s = jcode::euc ($_[1], $CODE{internal});
-          (__jcode_pl_fw_to_hw ($s), euc_japan_mime_charset_name ('euc-jp' => $s));
+          (__jcode_pl_fw_to_hw ($s),
+           Message::MIME::Charset::_name_euc_japan ('euc-jp' => $s));
         },
         decoder	=> sub { jcode::to ($CODE{internal}, $_[1], 'euc') },
         mime_text	=> 1,
@@ -162,7 +163,7 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset (shift_jis =>
         encoder	=> sub {
           my $s = jcode::sjis (__jcode_pl_fw_to_hw ($_[1]), $CODE{internal});
-          ($s, shift_jis_mime_charset_name (shift_jis => $s));
+          ($s, Message::MIME::Charset::_name_shift_jis (shift_jis => $s));
         },
         decoder	=> sub { jcode::to ($CODE{internal}, $_[1], 'sjis') },
         mime_text	=> 1,
@@ -186,7 +187,7 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset ('euc-jp' =>
         encoder	=> sub {
           my $s = Jcode->new ($_[1], $CODE{internal})->euc;
-          ($s, euc_japan_mime_charset_name ('euc-jp' => $s));
+          ($s, Message::MIME::Charset::_name_euc_japan ('euc-jp' => $s));
         },
         decoder	=> sub { my $s = $_[1]; Jcode::convert (\$s, $CODE{internal}, 'euc'); $s },
         mime_text	=> 1,
@@ -194,7 +195,7 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset (shift_jis =>
         encoder	=> sub {
           my $s = Jcode->new ($_[1], $CODE{internal})->sjis;
-          ($s, shift_jis_mime_charset_name (shift_jis => $s));
+          ($s, Message::MIME::Charset::_name_shift_jis (shift_jis => $s));
         },
         decoder	=> sub { my $s = $_[1]; Jcode::convert (\$s, $CODE{internal}, 'sjis'); $s },
         mime_text	=> 1,
@@ -235,7 +236,7 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset ('euc-jp' =>
         encoder	=> sub {
           my $s = nkf ( "-e -".uc (substr ($CODE{internal}, 0, 1)), $_[1] );
-          ($s, euc_japan_mime_charset_name ('euc-jp' => $s));
+          ($s, Message::MIME::Charset::_name_euc_japan ('euc-jp' => $s));
         },
         decoder	=> sub { nkf ( "-". substr ($CODE{internal}, 0, 1) . " -E", $_[1] ) },
         mime_text	=> 1,
@@ -243,7 +244,7 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset (shift_jis =>
         encoder	=> sub {
           my $s = nkf ( "-s -".uc (substr ($CODE{internal}, 0, 1)), $_[1] );
-          ($s, shift_jis_mime_charset_name (shift_jis => $s));
+          ($s, Message::MIME::Charset::_name_shift_jis (shift_jis => $s));
         },
         decoder	=> sub { nkf ( "-". substr ($CODE{internal}, 0, 1) . " -S", $_[1] ) },
         mime_text	=> 1,
@@ -269,7 +270,7 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset ('euc-jp' =>
         encoder	=> sub {
           my $s = Unicode::Japanese->new ($_[1], $CODE{internal})->euc;
-          ($s, euc_japan_mime_charset_name ('euc-jp' => $s));
+          ($s, Message::MIME::Charset::_name_euc_japan ('euc-jp' => $s));
         },
         decoder	=> sub { Unicode::Japanese->new ($_[1], 'euc')->conv ($CODE{internal}) },
         mime_text	=> 1,
@@ -277,7 +278,7 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset (shift_jis =>
         encoder	=> sub {
           my $s = Unicode::Japanese->new ($_[1], $CODE{internal})->sjis;
-          ($s, shift_jis_mime_charset_name (shift_jis => $s));
+          ($s, Message::MIME::Charset::_name_shift_jis (shift_jis => $s));
         },
         decoder	=> sub { Unicode::Japanese->new ($_[1], 'sjis')->conv ($CODE{internal}) },
         mime_text	=> 1,
@@ -362,7 +363,7 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset ('euc-jp' =>
         encoder	=> sub {
           my $s = kconv ($_[1], &_EUC, __kconv_code_name ($CODE{internal}));
-          ($s, euc_japan_mime_charset_name ('euc-jp' => $s));
+          ($s, Message::MIME::Charset::_name_euc_japan ('euc-jp' => $s));
         },
         decoder	=> sub { kconv ($_[1], __kconv_code_name ($CODE{internal}), &_EUC) },
         mime_text	=> 1,
@@ -370,7 +371,7 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset (shift_jis =>
         encoder	=> sub {
           my $s = kconv ($_[1], &_SJIS, __kconv_code_name ($CODE{internal}));
-          ($s, shift_jis_mime_charset_name (shift_jis => $s));
+          ($s, Message::MIME::Charset::_name_shift_jis (shift_jis => $s));
         },
         decoder	=> sub { kconv ($_[1], __kconv_code_name ($CODE{internal}), &_SJIS) },
         mime_text	=> 1,
@@ -494,7 +495,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/23 12:12:17 $
+$Date: 2002/07/02 06:36:26 $
 
 =cut
 
