@@ -684,6 +684,7 @@ Get module file path.
 sub dis_get_module_file_path (%) {
   my (%opt) = @_;
   my $file;
+  require File::Spec;
   if (defined $opt{module_file_name}) {
     if (-e $opt{module_file_name}) {
       $file = $opt{module_file_name};
@@ -715,14 +716,18 @@ sub dis_get_module_file_path (%) {
                    node => $opt{module_node});
       }
     }
-    unless (-e $file) {
-      valid_err (qq<Included module file "$file" not found>,
-                 node => $opt{module_node});
+    for my $dir (@{$opt{module_file_search_path} || []}) {
+      my $name = File::Spec->canonpath (File::Spec->catfile ($dir, $file));
+      if (-e $name) {
+        return $name;
+      }
     }
+    valid_err (qq<Included module file "$file" not found>,
+               node => $opt{module_node});
   } else {
     valid_err (q<Included module file name not specified>);
   }
-  return $file;
+  return File::Spec->canonpath ($file);
 }
 
 =item $root = dis_load_module_file (%opt)
@@ -2039,4 +2044,4 @@ sub disdoc_inline2pod ($;%) {
 
 =cut
 
-1; # $Date: 2004/11/24 12:00:13 $
+1; # $Date: 2004/11/26 10:55:11 $

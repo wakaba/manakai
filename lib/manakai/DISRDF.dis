@@ -1,0 +1,160 @@
+Module:
+  @QName: 
+    DIS:RDF
+  @FullName:
+    @@lang:en
+    @@@: 
+      <QUOTE:dis> RDF Module
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/RDF#
+  
+  @Author:
+    @@FullName:Wakaba
+    @@Mail:w@suika.fam.cx
+  @License:
+     license:Perl+MPL
+  @Date:
+    @@@:
+      $Date: 2004/11/26 10:55:11 $
+    @@ContentType:
+      dis:Date.RCS
+  
+  @DefaultFor:
+    ManakaiDOM:all
+
+  @Require:
+    @@Module:
+      @@@Name: DISCore
+
+Namespace:
+  @DIS:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @owl:
+    http://www.w3.org/2002/07/owl#
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+
+ElementTypeBinding:
+  @Name: noVariant
+  @ElementType:
+    dis:AliasFor
+  @ShadowContent:
+    @@@:
+      ::ManakaiDOM:all
+    @@For:
+      !=ManakaiDOM:all
+
+ResourceDef:
+  @QName:
+    rdfs:Resource
+  @rdf:type:
+    rdfs:Class
+  @Description:
+    @@lang:en
+    @@@: An RDF resource.
+  @noVariant:
+
+ResourceDef:
+  @QName:
+    rdfs:Class
+  @rdf:type:
+    rdfs:Class
+  @ISA:
+    rdfs:Resource
+  @Description:
+    @@lang:en
+    @@@: A RDF class.
+  @noVariant:
+
+ResourceDef:
+  @QName:
+    rdfs:Datatype
+  @rdf:type:
+    rdfs:Class
+  @ISA:
+    rdfs:Class
+  @noVariant:
+
+ResourceDef:
+  @QName:
+    rdfs:Property
+  @Description:
+    @@lang:en
+    @@@: An RDF property.
+  @rdf:type:
+    rdfs:Class
+  @ISA:
+    rdfs:Class
+  @noVariant:
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdfs:Property
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+PropDef:
+  @QName:
+    rdf:type
+  @rdfs:domain:
+    rdfs:Resource
+  @rdfs:range:
+    rdfs:Class
+
+PropDef:
+  @QName:
+    rdfs:subClassOf
+  @Description:
+    @@lang:en
+    @@@:
+      The subject is a subclass of a class.
+  @rdfs:domain:
+    rdfs:Class
+  @rdfs:range:
+    rdfs:Class
+
+PropDef:
+  @QName:
+    owl:sameAs
+  @Description:
+    @@lang:en
+    @@@:
+      The subject is same as the object.
+
+PropDef:
+  @QName:
+    rdfs:domain
+  @rdfs:domain:
+    rdfs:Property
+  @rdfs:range:
+    rdfs:Class
+PropDef:
+  @QName:
+    rdfs:range
+  @rdfs:domain:
+    rdfs:Property
+  @rdfs:range:
+    rdfs:Class
+
+PropDef:
+  @QName:
+    rdfs:comment
+  @Description:
+    @@lang:en
+    @@@: A description of the subject resource.
+
+## RDF.dis ends here

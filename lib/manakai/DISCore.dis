@@ -1,0 +1,508 @@
+Module:
+  @QName: 
+    DIS:Core
+  @FullName:
+    @@lang:en
+    @@@: 
+      <QUOTE:dis> Format Core Module
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Core#
+  
+  @Author:
+    @@FullName:Wakaba
+    @@Mail:w@suika.fam.cx
+  @License:
+     license:Perl+MPL
+  @Date:
+    @@@:
+      $Date: 2004/11/26 10:55:11 $
+    @@ContentType:
+      dis:Date.RCS
+  
+  @DefaultFor:
+    ManakaiDOM:all
+
+  @Require:
+    @@Module:
+      @@@Name: DISRDF
+
+Namespace:
+  @DIS:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @owl:
+    http://www.w3.org/2002/07/owl#
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+
+## -- Syntax sugar vocabularies
+
+ResourceTypeDef:
+  @QName: ElementType
+  @Description:
+    @@lang:en
+    @@@:
+      A dis element type.
+
+ResourceDef:
+  @QName:
+    dis:ElementTypeBinding
+  @Description:
+    @@lang:en
+    @@@:
+      Binds a <CODE:NCName> with global element type name and 
+      shadow contents.
+      \
+      {NOTE:: Scope of <Q:dis:ElementTypeBinding> is limited to 
+              the file in which the element occurs.
+      \
+      }
+  @rdf:type: ElementType
+  @noVariant:
+ResourceDef:
+  @QName:
+    dis:ElementType
+  @Description:
+    @@lang:en
+    @@@:
+      A global element type to which a <CODe:NCName> is bound to.  
+      This type of element is used in <Q:dis:ElementTypeBinding> elements.
+  @rdf:type: ElementType
+  @dataType:
+    dis:TypeQName
+  @rdfs:range: ElementType
+  @noVariant:
+ResourceDef:
+  @QName:
+    dis:ShadowContent
+  @Description:
+    @@lang:en
+    @@@:
+      A element content value and/or child elements that is appended 
+      to elements bound to. 
+  @rdf:type: ElementType
+  @dataType:
+    lang:dis
+  @noVariant:
+
+ResourceDef:
+  @QName:
+    dis:Namespace
+  @Description:
+    @@lang:en
+    @@@:
+      Binds <CODE:NCName>s (i.e. namespace prefixes) to namespace URI 
+      references. 
+      \
+      {NOTE:: Scope of namespace bindings is limited to the file 
+              in which the element occurs.
+      \
+      }
+  @rdf:type: ElementType
+  @noVariant:
+
+ElementTypeBinding:
+  @Name: ResourceTypeDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdfs:Class
+    @@ISA:
+      rdfs:Class
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdfs:Property
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+## -- Module group defining
+
+ResourceTypeDef:
+  @QName: 
+    dis:ModuleGroup
+  @Description:
+    @@lang:en
+    @@@: A set of modules
+
+ResourceDef:
+  @QName:
+    DIS:
+  @rdf:type:
+    dis:ModuleGroup
+  @Description:
+    @@lang:en
+    @@@:
+      The <QUOTE:dis> core library.
+  @noVariant:
+
+## -- Module defining
+
+ResourceDef:
+  @QName:
+    dis:Module
+  @rdf:type: ElementType
+  @Description:
+    @@lang:en
+    @@@:
+      An element that contains information about a <QUOTE:dis> module. 
+  @noVariant:
+
+PropDef:
+  @QName:
+    dis:Require
+  @Description:
+    @@lang:en
+    @@@: 
+      References to external modules.
+
+## -- Resource defining
+
+ResourceDef:
+  @QName:
+    dis:ResourceDef
+  @rdf:type: ElementType
+  @Description:
+    @@lang:en
+    @@@:
+      A <Q:dis:ResourceDef> element defines a resource.
+  @noVariant:
+
+ResourceTypeDef:
+  @QName: 
+    dis:MultipleResource
+  @Description:
+    @@lang:en
+    @@@:
+      An abstract resource - it has zero or more concrete representations, 
+      that are distinguished by <CODE:For> URI references.
+  @AliasFor:
+    @@@:
+      ::ManakaiDOM:all
+    @@For:
+      ManakaiDOM:all !=ManakaiDOM:all
+PropDef:
+  @QName:
+    dis:resourceFor
+  @rdfs:domain:
+    dis:MultipleResource
+  @rdfs:range:
+    dis:For
+  @Description:
+    @@lang:en
+    @@@:
+      A <CODE:For> URI reference that can identity one representation 
+      of the resource.
+      \
+      {NOTE:: To test <CODE:For> declared with <Q:dis:resourceFor> 
+              element, use <Q:dis:ForCheck> attribute, rather than
+              <Q:dis:For> attribute.  <Q:dis:For> attribute does 
+              not check additional <CODE:For> URI references 
+              declared with <Q:dis:resourceFor> element.
+      \
+      }
+
+## -- Definition for
+
+PropDef:
+  @QName:
+    dis:For
+  @rdfs:domain:
+    rdfs:Resource
+  @dataType:
+    dis:TypeQName
+  @Description:
+    @@lang:en
+    @@@:
+      A <Q:For> for which the resource is used (<QUOTE:OR> filter).
+PropDef:
+  @QName:
+    dis:ForCheck
+  @rdfs:domain:
+    rdfs:Resource
+  @dataType:
+    dis:TypeQName
+  @Description:
+    @@lang:en
+    @@@:
+      A <Q:For> for which the resource is used (<QUOTE:AND> filter).
+
+ForDef:
+  @QName:
+    ManakaiDOM:all
+  @FullName:
+    @@lang:en
+    @@@: For all
+
+ElementTypeBinding:
+  @Name: noVariant
+  @ElementType:
+    dis:AliasFor
+  @ShadowContent:
+    @@@:
+      ::ManakaiDOM:all
+    @@For:
+      !=ManakaiDOM:all
+
+## -- Resource naming
+
+PropDef:
+  @QName:
+    dis:Name
+  @Description:
+    @@lang:en
+    @@@:
+      A name of a resource.
+PropDef:
+  @QName:
+    dis:QName
+  @Description:
+    @@lang:en
+    @@@:
+      A qualified name of a resource.
+PropDef:
+  @QName:
+    dis:AppName
+  @Description:
+    @@lang:en
+    @@@: An application (binding) dependent name of a resource.
+PropDef:
+  @QName:
+    rdfs:label
+  @Description:
+    @@lang:en
+    @@@: A human-readable name of the subject resource.
+PropDef:
+  @QName:
+    dis:FullName
+  @Description:
+    @@lang:en
+    @@@:
+      A human-readable name of a resource.
+  @ISA:
+    rdfs:label
+PropDef:
+  @QName:
+    dis:Label
+  @Description:
+    @@lang:en
+    @@@:
+      A human-readable simple header of a resource.
+  @ISA:
+    rdfs:label
+
+## -- Resource description
+
+PropDef:
+  @QName:
+    dis:Description
+  @Description:
+    @@lang:en
+    @@@:
+      A human-readable description of a resource.
+  @ISA:
+    rdfs:comment
+PropDef:
+  @QName:
+    dis:ImplNote
+  @Description:
+    @@lang:en
+    @@@:
+      An implementor's node about resource.
+PropDef:
+  @QName:
+    dis:Spec
+  @Description:
+    @@lang:en
+    @@@:
+      A reference to a specification.  (Obsolete)
+PropDef:
+  @QName:
+    dis:Level
+  @Description:
+    @@lang:en
+    @@@:
+      DOM Level (obsolete)
+PropDef:
+  @QName:
+    dis:SpecLevel
+  @Description:
+    @@lang:en
+    @@@:
+      DOM Level of specification (obsolete) - use <CODE:For> instead.
+PropDef:
+  @QName:
+    dis:Condition
+  @Description:
+    @@lang:en
+    @@@:
+      Condition (obsolete) - use <CODE:For> instead.
+
+## -- Resource-to-resource relationships
+
+PropDef:
+  @QName:
+    dis:ISA
+  @Description:
+    @@lang:en
+    @@@:
+      Inheritance relationship of a resource.
+  @ISA:
+    rdfs:subClassOf
+  @rdfs:domain:
+    rdfs:Property
+  @rdfs:range:
+    rdfs:Property
+  @dataType:
+    dis:TypeQName
+PropDef:
+  @QName:
+    dis:Implement
+  @Description:
+    @@lang:en
+    @@@:
+      <QUOTE:Implementing> relationship of a resource.
+
+PropDef:
+  @QName:
+    dis:AliasFor
+  @Description:
+    @@lang:en
+    @@@:
+      Make a resource as alias for another resource.
+  @ISA:
+    owl:sameAs
+  @rdfs:domain:
+    rdfs:Resource
+  @rdfs:range:
+    rdfs:Resource
+  @dataType:
+    dis:TFQNames
+
+## --- Datatype
+
+PropDef:
+  @QName:
+    dis:dataType
+  @Description:
+    @@lang:en
+    @@@:
+      Lexical data type of the property object.
+  @rdfs:domain:
+    rdfs:Property
+  @rdfs:range:
+    rdfs:Property
+  @dataType:
+    dis:TypeQName
+ElementTypeBinding:
+  @Name: DataTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdfs:Datatype
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+PropDef:
+  @QName:
+    dis:ContentType
+  @rdfs:domain:
+    DOMMain:any
+  @rdfs:range:
+    ManakaiDOM:DataType
+  @dataType:
+    dis:TypeQName
+  @Description:
+    @@lang:en
+    @@@:
+      The media type (content type) of the content.
+PropDef:
+  @QName:
+    dis:lang
+  @rdfs:domain:
+    rdfs:Resource
+  @Description:
+    @@lang:en
+    @@@:
+      The natural language in which the content is written.
+PropDef:
+  @QName:
+    dis:script
+  @rdfs:domain:
+    rdfs:Resource
+  @Description:
+    @@lang:en
+    @@@:
+      The writting script in which the content is written.
+
+DataTypeDef:
+  @QName:
+    lang:dis
+  @FullName:
+    @@lang:en
+    @@@:
+      The <QUOTE:dis> format
+DataTypeDef:
+  @QName:
+    lang:disdoc
+  @FullName:
+    @@lang:en
+    @@@: 
+      The <QUOTE:disdoc> text format
+
+DataTypeDef:
+  @QName:
+    dis:TypeQName
+  @FullName:
+    @@lang:en
+    @@@: dis QName
+DataTypeDef:
+  @QName: 
+    dis:TFQNames
+  @Description:
+    @@lang:en
+    @@@:
+      A pair of resource QName and optional <QUOTE:For> QName.
+DataTypeDef:
+  @QName:
+    dis:Boolean
+  @FullName:
+    @@lang:en
+    @@@: 
+      The boolean truth value, i.e. true or false. 
+      \
+      <Q:dis:Boolean> := "1" / "0"
+DataTypeDef:
+  @QName:
+    dis:Date.RCS
+  @FullName:
+    @@lang:en
+    @@@: RCS tag-style date and time specification
+
+## DISCore.dis ends here
