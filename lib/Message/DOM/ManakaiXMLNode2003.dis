@@ -1,0 +1,244 @@
+Namespace:
+  @infoset:
+     http://www.w3.org/2001/04/infoset#
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOMLS:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-ls#
+  @ManakaiDOMLS2003:
+    http://suika.fam.cx/~wakaba/archive/2004/9/27/mdom-old-ls#
+Module:
+  @Name: ManakaiXMLNode2003
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2004/9/27/mdom-old-node#
+  @FullName:
+    @@@: Manakai XML Node Transitional Module
+    @@@@lang:en
+  @Description:
+    @@lang:en
+    @@@:
+      This module provides an interface to manipulate 
+      XML trees that is compatible with the module 
+      <PerlModule:Message::Markup::XML::Node>, 
+      <PerlModule:Message::Markup::XML> and 
+      <PerlModule:SuikaWiki::Markup::XML>.
+
+  @Author:
+     @@FullName: Wakaba
+     @@Mail: w@suika.fam.cx
+  @License:
+     license:Perl+MPL
+  @Date.RCS:
+     $Date: 2004/10/10 00:02:07 $
+
+  @Feature:
+    @@QName:
+      ManakaiXMLNode2003:Node
+    @@Version:1.0
+    @@Description:
+      @@@lang:en
+      @@@@:
+        <PerlModule:Message::Markup::XML::Node> interface.
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        Support of <Feature:Core>/<FeatureVer:3.0> is required.
+
+  @Require:
+     @@Module:
+        @@@Name:  DOMCore
+        @@@FileName:
+           @@@@@:  dom.idl
+           @@@@Type:
+              lang:IDL-DOM
+        @@@Namespace:
+           http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+
+IF:
+  @Name:ManakaiXMLNode2003Node
+  @Description:
+    @@lang:en
+    @@@:
+      An XML node.
+  @IsFinal:-1
+
+  @ConstGroup:
+    @@Name: InternalNamespaceURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Namespace URIs representing internal structures.
+    @@Type:
+      ManakaiDOM:ManakaiDOMNamespaceURI
+
+    @@Const:
+      @@@Name:NS_SGML
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNamespaceURI
+      @@@Value:
+        urn:x-suika-fam-cx:markup:sgml:
+      @@@Description:
+        @@@@lang:en
+        @@@@@: Structures defined in the SGML standard.
+    @@Const:
+      @@@Name:NS_XML
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNamespaceURI
+      @@@Value:
+        urn:x-suika-fam-cx:markup:xml:
+      @@@Description:
+        @@@@lang:en
+        @@@@@: Structures defined in the XML specification.
+    @@Const:
+      @@@Name:SGML_ATTLIST
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNamespaceURI
+      @@@Value:
+        urn:x-suika-fam-cx:markup:sgml:attlist
+      @@@Description:
+        @@@@lang:en
+        @@@@@: 
+          The SGML <SGML:ATTLIST> declarations.
+    @@Const:
+      @@@Name:XML_ATTLIST
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNamespaceURI
+      @@@Value:
+        urn:x-suika-fam-cx:markup:xml:attlist
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The XML <XML:ATTLIST> declarations.
+    @@Const:
+      @@@Name:SGML_DOCTYPE
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNamespaceURI
+      @@@Value:
+        urn:x-suika-fam-cx:markup:sgml:doctype
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The SGML <SGML:DOCTYPE> declarations.
+    @@Const:
+      @@@Name:SGML_ELEMENT
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNamespaceURI
+      @@@Value:
+        urn:x-suika-fam-cx:markup:sgml:element
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The SGML <SGML:ELEMENT> declarations.
+    @@Const:
+      @@@Name:SGML_GENERAL_ENTITY
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNamespaceURI
+      @@@Value:
+        urn:x-suika-fam-cx:markup:sgml:entity
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          SGML general entities and entity references.
+    @@Const:
+      @@@Name:SGML_PARAM_ENTITY
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNamespaceURI
+      @@@Value:
+        urn:x-suika-fam-cx:markup:sgml:entity:parameter
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          SGML parameter entities and entity references.
+    @@Const:
+      @@@Name:SGML_NOTATION
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNamespaceURI
+      @@@Value:
+        urn:x-suika-fam-cx:markup:sgml:notation
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          SGML <SGML:NOTATION> declarations.
+    @@Const:
+      @@@Name:SGML_GROUP
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNamespaceURI
+      @@@Value:
+        urn:x-suika-fam-cx:markup:sgml:group
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          SGML groups.
+    @@Const:
+      @@@Name:SGML_HEX_CHAR_REF
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNamespaceURI
+      @@@Value:
+        urn:x-suika-fam-cx:markup:sgml:char:ref:hex
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          SGML hexadecimal character references.
+    @@Const:
+      @@@Name:SGML_NCR
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNamespaceURI
+      @@@Value:
+        urn:x-suika-fam-cx:markup:sgml:char:ref
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          SGML numeric character references.
+
+  @Method:
+    @@Name:new
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Construct a new instance of the node.
+    @@Return:
+      @@@Type:ManakaiXMLNode2003Node
+      @@@Description:
+        @@@@lang:en
+        @@@@@:The new node.
+
+  @Method:
+    @@Name:append_node
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Add a node as the last child of this node.
+    @@Return:
+      @@@Type:
+
+  @Method:
+    @@Name:outer_xml
+    @@Operator:
+      @@@@:""
+      @@@Type:
+        lang:Perl
+
+  @IntAttr:
+    @@Name:isTrue
+    @@Operator:
+      @@@@:bool
+      @@@Type:
+        lang:Perl
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Whether the object is <DOM:true> or not.
+    @@Get:
+      @@@Type:boolean
+      @@@InCase:
+        @@@@Value:true
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The attribute value is always <DOM:true>.
+
+##IF:ManakaiXMLNode2003
+
+## ManakaiXMLNode2003.dis ends here
