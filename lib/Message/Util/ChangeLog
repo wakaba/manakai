@@ -1,3 +1,12 @@
+2003-04-29  Wakaba  <w@offweb.ddo.jp>
+
+	* Formatter.pm (replace): {...} block is supported.
+	(Message::Util::Formatter::_returned): New package.  It is very very tiny
+	subset of SuikaWiki::Markup::XML.
+	(replace): Return structured string, not bare string.  This function is
+	useful to make tree (such as XML's) from formatting template (and its nested
+	parameters).
+
 2003-03-28  Wakaba  <w@offweb.ddo.jp>
 
 	* Formatter.pm (replace): Treat oo of "str"oo of attr value as option and parse attr value if 'p' option is specified.

@@ -22,7 +22,7 @@ This module is part of Manakai.
 package Message::Util::Formatter;
 use strict;
 use vars qw(%FMT2STR $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 
 =head1 INITIAL FORMATTING RULES
@@ -95,6 +95,7 @@ Returns new instance of Message::Util::Formatter.
 
 sub new ($) {
   my $self = bless Message::Util::make_clone (\%FMT2STR), shift;
+  $self->{-option}->{return_class} ||= 'Message::Util::Formatter::returned';
   $self;
 }
 
@@ -112,46 +113,142 @@ value so you can give any data.)
 
 sub replace ($$;$$) {
   my ($self, $format, $gparam, $option) = @_;
-  $format =~ s{%([A-Za-z0-9_-]+)(?:\(((?:[^"\)]|"(?:[^"\\]|\\.)*")*)\))?;|(%|[^%]+)}{
+  my $R = $self->{-option}->{return_class}->new (type => '#fragment');
+  use re 'eval';
+  our $BLOCK = qr/\{(?:[^\{\}]|(??{$BLOCK}))*\}/;
+  $format =~ s{%([A-Za-z0-9_-]+)(?:\(((?:[\x09\x0A\x0D\x200-9A-Za-z._=>,-]|$BLOCK|"(?:[^"\\]|\\.)*")*)\))?;|(%|[^%]+)}{
       my ($f, $a, $t) = ($1, $2, $3);
       $f =~ tr/-/_/;
       $f = '-bare_text' if length $t;
       my $function = $gparam->{fmt2str}->{$f} || $self->{$f};
       if (ref $function) {
 	  my %a = (-bare_text => ($a || $t));
-	  $a =~ s(((?:[^",]|"(?:[^"\\]|\\.)*")+)){
+	  $a =~ s(((?:[^",\{\}]|$BLOCK|"(?:[^"\\]|\\.)*")+)){
 	      my $s = $1; $s =~ s/^[\x09\x0A\x0D\x20]+//; $s =~ s/[\x09\x0A\x0D\x20]+$//;
 	      if ($s =~ /^([^=]*[^\x09\x0A\x0D\x20=])[\x09\x0A\x0D\x20]*=>[\x09\x0A\x0D\x20]*([^\x09\x0A\x0D\x20].*)$/s) {
 	        my ($n, $v) = ($1, $2);
 	        $n =~ tr/-/_/;
-	        if ($option->{formatter}) {
 	          $n = Message::Util::Wide::unquote_if_quoted_string ($n);
-	          if ($v =~ /^"((?:[^"\\]|\\.)+)"([a-z]+)$/) {
+	          if ($v =~ /^\{((?:[^\{\}]|(??{$BLOCK}))*)\}([a-z]*)$/s) {
+	            $v = $1;
+	            my $p = $2;
+	            if (index ($p, 'p') > -1 && ref $option->{formatter}) {
+	              $v = $option->{formatter}->replace ($v, 
+	                ($option->{formatter_o} || $gparam),
+	                ($option->{formatter_option} || {formatter => $option->{formatter}})
+	              );
+	              $v->flag (parsed => 1);
+	            }
+	          } elsif ($v =~ /^"((?:[^"\\]|\\.)+)"([a-z]*)$/s) {
 	            $v = $1;
 	            my $p = $2;
 	            $v =~ s/\\(.)/$1/g;
-	            $v = $option->{formatter}->replace ($v, ($option->{formatter_o} || $gparam), ($option->{formatter_option} || {formatter => $option->{formatter}}))
-	              if index ($p, 'p') > -1;
+	            if (index ($p, 'p') > -1 && ref $option->{formatter}) {
+	              my $f = (index ($p, 's') > -1 && $option->{formatter_s})
+	                      ? $option->{formatter_s} : $option->{formatter};
+	              $v = $f->replace ($v, ($option->{formatter_o} || $gparam), ($option->{formatter_option} || {formatter => $f}));
+	              $v->flag (parsed => 1);
+	            }
 	            $a{-option}->{$n} = $p;
 	          }
-	          $a{ $n } = Message::Util::Wide::unquote_if_quoted_string ($v);
-	        } else {
-		  $a{ Message::Util::Wide::unquote_if_quoted_string ($n) } = Message::Util::Wide::unquote_if_quoted_string ($v);
-	        }
+	          $a{ $n } = $v;
 	      } else {
 	          $s =~ tr/-/_/;
 		  $a{ Message::Util::Wide::unquote_if_quoted_string ($s) } = 1;
 	      }
+	    '';
 	  }ges;
 	  my $r = &$function (\%a, $gparam);
-	  length $r? $a{prefix}.$r.$a{suffix}: '';
+	  if (ref $r) {
+	    if ($r->count) {
+	      $R->append_text ($a{prefix}) if length $a{prefix};
+	      $R->append_node ($r);
+	      $R->append_text ($a{suffix}) if length $a{suffix};
+	    }
+	  } elsif (length $r) {
+	    $R->append_text ($a{prefix}) if length $a{prefix};
+	    $R->append_baretext ($r);
+	    $R->append_text ($a{suffix}) if length $a{suffix};
+	  }
+	  #$r;
+	  '';
       } elsif (length $function) {
-	  $function;
+	  $R->append_text ($function);
+	  #$function;
+	  '';
       } else {
-	  qq([$f: undef]);
+	  $R->append_text (qq([$f: undef]));
+	  #qq([$f: undef]);
+	  '';
       }
   }gesx;  
-  $format;
+  #$format;
+  $R;
+}
+
+sub option ($$;$) {
+  my ($self, $name, $value) = @_;
+  if (defined $value) {
+    $self->{-option}->{$name} = $value;
+  }
+  $self->{-option}->{$name};
+}
+
+package Message::Util::Formatter::returned;
+our $VERSION = $Message::Util::Formatter::VERSION;
+use overload '""' => \&stringify,
+             fallback => 1;
+
+sub new ($;%) {
+  my $self = bless {
+  	node	=> [],
+  	type	=> '#fragment',
+  }, shift;
+  my %o = @_;
+  $self->{value} = $o{value};
+  $self;
+}
+sub append_node ($$) {
+  my ($self, $node) = @_;
+  if (ref $node && $node->{type}) {
+    push @{$self->{node}}, $node;
+    $node->{parent} = $self;
+    $node;
+  } else {
+    undef;
+  }
+}
+sub append_text ($$) {
+  my ($self, $s) = @_;
+  my $node = __PACKAGE__->new (value => $s);
+  $node->{type} = '#text';
+  push @{$self->{node}}, $node;
+  $node->{parent} = $self;
+  $node;
+}
+sub node_type ($) { shift->{type} }
+sub inner_text ($) {
+  my $self = shift;
+  my $r = $self->{value};
+  for (@{$self->{node}}) {
+    $r .= $_->inner_text;
+  }
+  $r;
+}
+{no warnings;
+  *stringify = \&inner_text;
+  *append_baretext = \&append_text;
+}
+sub flag ($$;$) {
+  my ($self, $name, $value) = @_;
+  if (defined $value) {
+    $self->{flag}->{$name} = $value;
+  }
+  $self->{flag}->{$name};
+}
+sub count ($;%) {
+  my $self = shift;
+  (defined $self->{value} ? 1 : 0) + scalar @{$self->{node}};
 }
 
 =back
@@ -195,4 +292,4 @@ Boston, MA 02111-1307, USA.
 =cut
 
 1;
-# $Date: 2003/03/28 01:26:17 $
+# $Date: 2003/04/29 10:39:37 $
