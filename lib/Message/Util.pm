@@ -16,7 +16,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 use Carp ();
 
@@ -78,6 +78,7 @@ use Carp ();
 	$REG{NON_http_token_wsp} = qr/[^\x09\x20\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\x7C\x7E]/;
 	$REG{NON_attribute_char} = qr/[^\x21\x23-\x24\x26\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]/;
 	$REG{NON_http_attribute_char} = qr/[^\x21\x23-\x24\x26\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\x7C\x7E]/;
+	$REG{NON_http_attribute_char_wsp} = qr/[^\x09\x20\x21\x23-\x24\x26\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\x7C\x7E]/;
 		## Yes, C<attribute-char> does not appear in HTTP spec.
 	
 	$REG{dot_atom} = qr/$REG{atext}(?:$REG{FWS}\x2E$REG{FWS}$REG{atext})*/;
@@ -137,6 +138,14 @@ sub remove_meaningless_wsp ($) {
   my $body = shift;
   $body =~ s{($REG{quoted_string}|$REG{domain_literal})|$REG{WSP}+}{
     $1 || '';
+  }gex;
+  $body;
+}
+
+sub wsps_to_sp ($) {
+  my $body = shift;
+  $body =~ s{($REG{quoted_string}|$REG{domain_literal})|$REG{WSP}+}{
+    $1 || ' ';
   }gex;
   $body;
 }
@@ -297,9 +306,9 @@ sub decode_header_string ($$;%) {
   my ($t, $r);	## decoded-text, success?
   if ($o{type} !~ /quoted|encoded|domain|word/) {
     my (@s, @r);
-    $s =~ s{\G(?:($REG{FWS}(?:\x5C[\x00-\xFF]
-      |[\x00-\x08\x0A-\x0C\x0E\x0F\x21-\x5B\x5D-\xFF])+))}
-      { push @s, $1 || $2 }goex;
+    $s =~ s{\G($REG{FWS}(?:\x5C[\x00-\xFF]
+      |[\x00-\x08\x0A-\x0C\x0E\x0F\x21-\x5B\x5D-\xFF])+|$REG{WSP}+$)}
+      { push @s, $& }goex;
     for my $i (0..$#s) {
       if ($s[$i] =~ /^($REG{FWS})$REG{M_encoded_word}$/) {
         my ($t, $w) = ('', $1);
@@ -367,6 +376,7 @@ sub decode_quoted_string ($$;%) {
   $quoted_string =~ s{$REG{M_quoted_string}|([^\x22]+)}{
     my ($qtext, $t) = ($1, $2);
     if (length $t) {
+      $t =~ s/$REG{WSP}+/\x20/g;
       my %s = &{$yourself->{option}->{hook_decode_string}}
         ($yourself, $t, type => $option{type},
         charset => $option{charset});
@@ -446,11 +456,13 @@ sub comment_to_array ($$) {
   @r;
 }
 
-sub delete_comment_to_array ($$) {
+sub delete_comment_to_array ($$;%) {
   my $yourself = shift;
   my $body = shift;
+  my %option = @_;
+  my $areg = ''; $areg = '|'.$REG{angle_quoted} if $option{-use_angle_quoted};
   my @r = ();
-  $body =~ s{($REG{quoted_string}|$REG{domain_literal})|$REG{M_comment}}{
+  $body =~ s{($REG{quoted_string}|$REG{domain_literal}$areg)|$REG{M_comment}}{
     my ($o, $c) = ($1, $2);
     if ($o) {$o}
     else {
@@ -509,7 +521,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/14 13:50:11 $
+$Date: 2002/05/17 05:46:25 $
 
 =cut
 

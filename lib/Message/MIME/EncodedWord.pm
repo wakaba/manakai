@@ -14,7 +14,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%ENCODER %DECODER %OPTION %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::MIME::Charset;
 
 $REG{WSP} = qr/[\x09\x20]/;
@@ -110,7 +110,16 @@ sub decode ($) {
 sub decode_ccontent ($$) {
   my $s = shift;  my $yourself = shift;
   my (@s, @r) = ();
-  $s =~ s{\G(?:($REG{FWS}(?:\x5C[\x00-\xFF]|[\x00-\x08\x0A-\x0C\x0E\x0F\x21-\x27\x2A-\x5B\x5D-\xFF])+)|($REG{FWS}$REG{comment}))}{push @s, $1||$2}goex;
+  #$s =~ s{\G(?:($REG{FWS}(?:\x5C[\x00-\xFF]|[\x00-\x08\x0A-\x0C\x0E-\x1F\x21-\x27\x2A-\x5B\x5D-\xFF])+)|($REG{FWS}$REG{comment}))}
+  #  {push @s, $1||$2; '\1'}gex;
+  my ($i, @t) = (-1);
+  $s =~ s{$REG{FWS}$REG{comment}}{$i++; $t[$i] = $&; "\x28${i}\x29"}gex;
+  $s =~ s{($REG{FWS}(?:\x5C[\x00-\xFF]
+                     |[\x00-\x08\x0A-\x0C\x0E-\x1F\x21-\x27\x2A-\x5B\x5D-\xFF])+)
+         |(\x28[0-9]+\x29)}{my ($t,$c) = ($1, $2);
+     if ($t) {$i++; $t[$i] = $t; "\x28${i}\x29"}
+     else {$c}}gex;
+  $s =~ s{\x28([0-9]+)\x29}{push @s, $t[$1]}gex;
   for my $i (0..$#s) {
     if ($s[$i] =~ /^($REG{FWS})$REG{M_encoded_word}$/) {
       my ($t, $w) = ('', $1);
@@ -177,7 +186,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/19 12:00:36 $
+$Date: 2002/05/17 05:46:25 $
 
 =cut
 
