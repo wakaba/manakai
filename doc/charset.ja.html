@@ -19,6 +19,7 @@
 <ul>
 	<li><a href="#ja">$B<j$C<h$jAa$/F|K\8l$,;H$($k$h$&$K$9$kJ}K!(B</a></li>
 	<li><a href="#hook">$B%U%C%/4X?t$C$]$$$b$N$N@bL@(B</a></li>
+	<li><a href="#implemention">$BFbIt<BAu$K$D$$$F$N3P=q(B</a></li>
 	<li><a href="#future">$B>-Mh7W2h(B</a></li>
 </ul>
 
@@ -89,6 +90,47 @@ MIME $B$K$h$k$H(B charset $BL>$O!";HMQ$5$l$F$$$kJ8;z$NHO0O$N:G>.8xG\?tE*$J$b$
 <code class="mime-charset">ISO-2022-JP</code> $B$J$I4v$D$+$N(B charset
 $BMQ$K$O(B Message::MIME::Charset $B$GAH$_9~$_Dj5A$5$l$F$$$^$9$N$G!"2~$a$F;XDj$9$kI,MW$O$"$j$^$;$s!#(B</p>
 
+<h2 id="implemention">$BFbIt<BAu$K$D$$$F$N3P=q(B</h2>
+
+<p>$BJ8;z2s$j$O<BAu$7$?K\?M$9$i2?$,$J$s$@$+NI$/$o$+$j$^$;$s!#(B
+$B85!9?'!9$J;EMM$d47=,$,F~$j:.$8$C$F$kItJ,$J$N$G!"e:No$J<BAu$OIT2DG=$+$b$7$l$^$;$s!#(B</p>
+
+<p><code class="perl">encoding_before_decode</code>
+$B$OI|9fA0(B ($B$N@8%a%C%;!<%8(B) $B$N(B charset,
+<code class="perl">encoding_after_encode</code>
+$B$OId9f2=8e(B ($B$N@8%a%C%;!<%8(B) $B$K(B charset$B!#DL>o$OF1$8CM$K$7$^$9$,!"(B
+EUC-JP ($B5<;w(B) RFC 822 $B$+$i(B ISO-2022-JP RFC 822 
+$B$KJQ49$9$k$h$&$J;~$K;H$($^$9(B ($B$+$b(B)$B!#(B ($B$G$b(B *default charset
+$B$NJQ49=hM}B&$G:Y9)$7$?J}$,3Z!#(B)</p>
+
+<p>$BN>(B encoding_* option $B$K$O!"(B *default ($B5<;w(B) charset
+$B$r;XDj$G$-$^$9!#$[$H$s$I$N(B module $B$G$O$3$l$,4{DjCM$G$9!#(B
+HTTP $B$K;H$&$H$-$O$3$l$r(B ISO-8859-1 $B$KJQ$($?$j$7$^$9!#(B</p>
+
+<p><code class="perl">header_default_charset</code>,
+<code class="perl">body_default_charset</code>
+$B$O!"(B *default ($B5<;w(B) charset $B$N(B IANA charset $BL>!#(B
+$B0EL[;XDj(B charset $B$rL@<($9$kI,MW$,=P$?;~(B (Content-Type: $BNN0h$NIUM?(B,
+RFC 2231 $BId9f2=$J$I$N;~(B) $B$K;H$o$l$^$9!#(B</p>
+
+<p>*default charset $B$O(B charset $BL>;%$,$J$$J8;zNs$K2>Dj$5$l$^$9!#(B
+$BG^BN7?$N(B charset $B%Q%i%a!<%?!<$d(B encoded-word $B$d(B RFC 2231
+$B$G(B charset $BL>$,L@<($5$l$F$$$k;~$K$O!"$=$A$i$N(B charset
+$BL>$,;H$o$l$^$9!#(B</p>
+
+<p><code class="perl">header_default_charset_input</code>,
+<code class="perl">body_default_charset_input</code>
+$B$O!"(B <code class="perl">encoding_before_decode</code>
+$B$NCM$,(B *default $B$N;~$N!"$=$N(B IANA charset $BL>$r;XDj$7$^$9!#(B
+$BDL>o$OFI$_9~$_;~$KFbItJ8;z=89g$KJQ49$7$^$9$,!"$3$N(B
+input charset $B$+$iFbItJ8;z=89g$KJQ49=PMh$J$$>l9g!"(B
+$B$=$N$^$^L5JQ49$GJ];}$7$^$9!#$3$l$r=PNO$9$k>l9g$G(B charset
+$BL>$,I,MW$K$J$C$?;~$K!"(B ($BK\Mh$J$i(B 
+<code class="perl">encoding_after_encode</code> $B$r;H$$!"$=$NCM$,(B
+*default $B$N;~$O99$K(B *_default_charset $B$NCM$r;H$&$N$G$9$,!"(B
+$BJQ49ITG=$J(B charset $B$+$i$=$l$X$OJQ49=PMh$J$$$N$G!"(B)
+input charset $B$r$=$N$^$^=PNO$7!"$3$NL>A0$r;H$$$^$9!#(B</p>
+
 <h2 id="future">$B>-Mh7W2h(B</h2>
 
 <ul>
@@ -97,6 +139,15 @@ MIME $B$K$h$k$H(B charset $BL>$O!";HMQ$5$l$F$$$kJ8;z$NHO0O$N:G>.8xG\?tE*$J$b$
 		<li>UTF-8 $B4z$,IU$$$?J8;zNs$r@5$7$/07$($k$h$&$K$9$k!#(B</li>
 		<li>Encode $B%b%8%e!<%kMQ$NDj5A%b%8%e!<%k$N:n@.!#(B</li>
 	</ul>
+</li>
+<li>IANA $BDj5A$KH?$9$k(B charset $BL>;HMQ$X$NBP=h(B
+	<ul>
+		<li>$B%a%C%;!<%8$,(B M$ $B@=IJ$+$iAw?.$5$l$?$b$N$HH=CG=PMh$k>l9g$K!"(B
+		charset $BL>$N2r<a$r0lItJQ99$9$k!#(B</li>
+	</ul>
+</li>
+<li>encoded-word $BId9f2=$X$NBP1~(B
+	<p>encoded-word $B$O7y$$$G$9$,!"I,MW$K$J$k>lLL$,$"$k0J>e!"$$$:$l<BAu$7$^$9!#$@$1$IM%@h=g0L$ODc$a!#(B</p>
 </li>
 </ul>
 
@@ -115,7 +166,7 @@ MIME $B$K$h$k$H(B charset $BL>$O!";HMQ$5$l$F$$$kJ8;z$NHO0O$N:G>.8xG\?tE*$J$b$
        src="http://jigsaw.w3.org/css-validator/images/vcss" 
        alt="Valid CSS!" /></a>
 </div>
-<div class="update">$Date: 2002/07/13 11:51:56 $</div>
+<div class="update">$Date: 2003/09/04 02:19:22 $</div>
 <ul class="myuri">
 <li>&lt;URL:<a href="http://suika.fam.cx/~wakaba/Message-pm/introduction">http://suika.fam.cx/~wakaba/Message-pm/introduction</a>&gt;</li>
 <li>&lt;CVS:<a href="http://suika.fam.cx/gate/cvs/perl/web/Message-pm/">suika.fam.cx:/home/cvs/perl/web/Message-pm/</a>&gt;</li>
