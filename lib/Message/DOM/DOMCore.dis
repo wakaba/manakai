@@ -32,16 +32,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/01 09:15:12 $
-  @Require:
-    @@Module:
-      @@@Name: ManakaiDOM
-      @@@Namespace:
-        http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
-    @@Module:
-      @@@Name: DOMMain
-      @@@Namepsace:
-        http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+     $Date: 2004/09/02 08:55:26 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -50,14 +41,6 @@ Module:
   @ConditionDef:
     @@Name: DOM3
   
-  @Feature:
-    @@Name: Core
-    @@Version: 
-    @@Condition[list]:
-      DOM3
-    @@Spec:
-      @@@DOM3:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-BBACDC08
   @Feature:
     @@Name: Core
     @@Version: 2.0
@@ -475,14 +458,80 @@ IF:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-102161490
   @Method:
      @@Name:  hasFeature
-     @@Return:
-        @@@Type:  boolean
+     @@Spec:
+       @@DOM3[list]:
+         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-5CED94D7
+         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DOMFeatures
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Test if the DOM implementation implements a specific DOM feature.
      @@Param:
         @@@Name:  feature
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The name of the feature.
+        @@@InCase:
+          @@@@Label:
+            @@@@@lang:en
+            @@@@@@:
+              The feature name prepended by the "+"
+          @@@@Type: DOMString
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The specified feature may not be directly castable
+              but would be available through the method getFeature.
      @@Param:
         @@@Name:  version
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The version number of the feature.
+        @@@InCase:
+          @@@@Value: null
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: No particular version is specified.
+        @@@InCase:
+          @@@@Value: \
+          @@@@Type: DOMString
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              No particular version is specified.
+     @@Return:
+        @@@Type:  boolean
+        @@@Description:
+          @@@@lang:en
+          @@@@@: Whether the feature is implemented or not.
+        @@@InCase:
+          @@@@Value: true
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The feature is implemented in the specified version.
+        @@@InCase:
+          @@@@Value: false
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The feature is not implemented.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            if (defined $version and $version ne '') {
+              $r = $__PACKAGE{Global}__::FeatureImplemented{$feature}
+                                                           ->{$version} ?
+                   true : false;
+            } else {
+              for (keys %{$__PACKAGE{Global}__::FeatureImplemented{$feature}}) {
+                if ($__PACKAGE{Global}__::FeatureImplemented{$feature}->{$_}) {
+                  $r = true;
+                  last;
+                }
+              }
+            }
   @Method:
      @@Name:  createDocumentType
      @@Return:

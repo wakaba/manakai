@@ -45,19 +45,23 @@ sub output_result ($) {
 
 ## Source file might be broken
 sub valid_err (@) {
+  require Carp;
   output_result $result;
-  die @_;
+  Carp::croak (@_);
 }
 sub valid_warn (@) {
-  warn @_;
+  require Carp;
+  Carp::carp (@_);
 }
 
 ## Implementation (this script) might be broken
 sub impl_err (@) {
-  die @_;
+  require Carp;
+  Carp::croak (@_);
 }
 sub impl_warn (@) {
-  warn @_;
+  require Carp;
+  Carp::carp (@_);
 }
 
 
@@ -258,10 +262,16 @@ sub perl_code ($;%) {
         $param{$1} = $2;
       }
       $r = perl_builtin_code ($nm, %param);
+    } elsif ($name eq 'PACKAGE' and $data) {
+      if ($data eq 'Global') {
+        $r = $ManakaiDOMModulePrefix;
+      } else {
+        valid_err qq<PACKAGE "$data" not supported>;
+      }
     } elsif ($name eq 'FILE' or $name eq 'LINE' or $name eq 'PACKAGE') {
       $r = qq<__${name}__>;
     } else {
-      valid_err qq<Preprocessing macro $name not supported>;
+      valid_err qq<Preprocessing macro "$name" not supported>;
     }
     $r;
   }goex;
@@ -287,7 +297,7 @@ sub perl_builtin_code ($%) {
               $r = bless {value => $arg}, $self;
             }
           } else {
-            $r = bless {value => ''}, $self;
+            $r = undef; # null
           }
     };
     $opt{s} or valid_err q<Built-in code parameter "s" required>;
@@ -441,7 +451,7 @@ sub type_normalize ($) {
 }
 
 sub type_label ($) {
-  my $uri = shift;
+  my $uri = type_normalize shift;
   if ($uri =~ /([\w_-]+)$/) {
     return $1;
   } else {
@@ -571,15 +581,59 @@ sub get_incase_label ($;%) {
   my ($node, %opt) = @_;
   my $label = $node->get_attribute_value ('Label', default => '');
   unless (length $label) {
-    $label = $node->get_attribute_value ('Value', default => '');
-    if (length $label) {
+    $label = $node->get_attribute_value ('Value', default => undef); 
+    my $type = type_normalize expanded_uri $node->get_attribute_value
+                                              ('Type', default => 'DOMMain:any');
+    if (defined $label) {
+      if ($type eq ExpandedURI q<DOMMain:DOMString>) {
+        $label = qq<"$label">;
+      }
       $label = $opt{is_pod} ? pod_code $label : $label;
     } else {
-      $label = type_label expanded_uri $node->get_attribute_value
-                                              ('Type', default => 'DOMMain:any');
+      $label = type_label $type;
     }
   }
   $label;
+}
+
+sub get_value_literal ($%) {
+  my ($node, %opt) = @_;
+  my $value = get_perl_definition_node $node, %opt;
+  my $type = type_normalize expanded_uri
+               $node->get_attribute_value ($opt{type_name} || 'Type',
+                                           default => q<DOMMain:any>);
+  my $r;
+  if ($type eq ExpandedURI q<DOMMain:boolean>) {
+    if ($value) {
+      $r = $value->value eq 'true' ? 1 : 0;
+    } else {
+      $r = $opt{default} ? 1 : 0;
+    }
+  } elsif ($type eq ExpandedURI q<DOMMain:unsigned-long> or
+           $type eq ExpandedURI q<DOMMain:unsigned-long-long> or
+           $type eq ExpandedURI q<DOMMain:long> or
+           $type eq ExpandedURI q<DOMMain:float> or
+           $type eq ExpandedURI q<DOMMain:unsigned-short>) {
+    if ($value) {
+      $r = 0 + $value->value;
+    } else {
+      $r = 0 + defined $opt{default} ? $opt{default} : 0;
+    }
+  } elsif ($type eq ExpandedURI q<DOMMain:DOMString>) {
+    if ($value) {
+      $r = perl_literal $value->value;
+    } else {
+      $r = perl_literal (defined $opt{default} ? $opt{default} : '');
+    }
+  } else {
+    if ($value) {
+      $r = perl_literal $value->value;
+    } else {
+      $r = defined $opt{default} ? perl_literal $opt{default} : 'undef';
+    }
+  }
+  print STDERR "$type: $r\n";
+  $r;
 }
 
 sub register_namespace_declaration ($) {
@@ -592,6 +646,34 @@ sub register_namespace_declaration ($) {
       }
     }
   }
+}
+
+{
+my $nest = 0;
+sub is_implemented (%);
+sub is_implemented (%) {
+  my (%opt) = @_;
+  my $r = 0;
+  $nest++ == 100 and valid_err q<Condition loop detected>;
+  my $member = $Info->{is_implemented}->{$opt{if}}->{$opt{method} || $opt{attr}}
+            ||= {};
+  if (exists $opt{set}) {
+    $r = $member->{$opt{condition} || ''} = $opt{set};
+  } else {
+    if (defined $member->{$opt{condition} || ''}) {
+      $r = $member->{$opt{condition} || ''};
+    } else {
+      for (@{$Info->{Condition}->{$opt{condition} || ''}->{ISA} || []}) {
+        if (is_implemented (%opt, condition => $_)) {
+          $r = 1;
+          last;
+        }
+      }
+    }
+  }
+  $nest--;
+  $r;
+}
 }
 
 sub condition_match ($%) {
@@ -898,6 +980,8 @@ sub method2perl ($;%) {
   my $code = '';
   my $int_code = '';
   if ($code_node) {
+    is_implemented if => $Status->{IF}, method => $Status->{Method},
+                   condition => $opt{condition}, set => 1;
     $code = perl_code_source (perl_code ($code_node->value,
                                          internal => sub {
                                            if ($int_code_node) {
@@ -909,7 +993,9 @@ sub method2perl ($;%) {
                                          }),
                               path => $code_node->node_path (key => 'Name'));
     if ($has_return) {
-      $code = perl_statement (perl_assign 'my $r' => perl_literal '') .
+      $code = perl_statement (perl_assign 'my $r' => get_value_literal $return,
+                                                        name => 'DefaultValue',
+                                                        type_name => 'Type') .
               $code;
       if ($code_node->get_attribute_value ('cast-output', default => 1)) {
         if (type_normalize
@@ -966,6 +1052,8 @@ sub method2perl ($;%) {
       $has_return++;
     }
   } else {
+    is_implemented if => $Status->{IF}, method => $Status->{Method},
+                   condition => $opt{condition}, set => 0;
     $int_code = $code
               = perl_exception
                   level => 'EXCEPTION',
@@ -1392,12 +1480,15 @@ $result .= pod_block
                 $cond->local_name eq 'ConditionDef';
     my $name = $cond->get_attribute_value ('Name', default => '');
     my $isa = $cond->get_attribute_value ('ISA', default => []);
+    my $fullname = get_description $cond, name => 'FullName';
     $isa = [$isa] unless ref $isa;
     if ($name =~ /^DOM(\d+)$/) {
       $isa = ["DOM" . ($1 - 1)] if not @$isa and $1 > 1;
       $defcond = $1 if $1 > $defcond;
+      $fullname ||= "DOM Level " . (0 + $1);
     }
     $Info->{Condition}->{$name}->{ISA} = $isa;
+    $Info->{Condition}->{$name}->{FullName} = $fullname || $name;
   }
   if (keys %{$Info->{Condition}}) {
     $Info->{NormalCondition} = $Module->get_attribute_value
@@ -1423,7 +1514,8 @@ $result .= pod_block
       $_->set_attribute (Name => 'ManakaiDOM');
       $_->set_attribute (Namespace => ExpandedURI q<ManakaiDOM:>);
     }
-  } elsif (not $req->get_element_by (sub {$reqModule->('DOMMain', @_)})) {
+  }
+  if (not $req->get_element_by (sub {$reqModule->('DOMMain', @_)})) {
     for ($req->append_new_node (type => '#element',
                                 local_name => 'Module')) {
       $_->set_attribute (Name => 'DOMMain');
@@ -1459,7 +1551,7 @@ for my $node (@{$source->child_nodes}) {
   }
 }
 
-## Exporter
+## Export
 if (keys %{$Status->{EXPORT_OK}||{}}) {
   $result .= perl_package full_name => $Info->{Package};
   $result .= perl_statement 'require Exporter';
@@ -1478,6 +1570,66 @@ if (keys %{$Status->{EXPORT_OK}||{}}) {
                          $_ => [keys %{$Status->{EXPORT_TAGS}->{$_}}]
                       } keys %{$Status->{EXPORT_TAGS}}) . ')';
   }
+}
+
+## Feature
+my @feature_desc;
+for my $condition (keys %{$Info->{Condition}}, '') {
+  for my $Feature (@{$Module->child_nodes}) {
+    next unless $Feature->node_type eq '#element' and
+                $Feature->local_name eq 'Feature' and
+                condition_match $Feature, condition => $condition;
+    my $not_implemented;
+    IF: for my $if (keys %{$Info->{is_implemented}}) {
+      for my $mem (keys %{$Info->{is_implemented}->{$if}}) {
+        unless ($Info->{is_implemented}->{$if}->{$mem}->{$condition}) {
+          $not_implemented = [$if, $mem];
+          last IF;
+        }
+      }
+    }
+    
+    my $f_name = $Feature->get_attribute_value ('Name');
+    my $f_ver = $Feature->get_attribute_value ('Version');
+    
+    push @feature_desc, pod_item ('Feature ' . pod_code ($f_name) .
+                                  ' version ' . pod_code ($f_ver) .
+                                  ' [' . $Info->{Condition}->{$condition}
+                                              ->{FullName} . ']'),
+                        pod_paras (get_description $Feature);
+
+    if ($not_implemented) {
+      push @feature_desc, pod_para ('This module supports the interfaces '.
+                                    'in this feature but not yet fully ' .
+                                    'implemented.');
+      $result .= perl_comment "$f_name, $f_ver: $not_implemented->[0]." .
+                              "$not_implemented->[1] not implemented.";
+    } else {
+      push @feature_desc, pod_para ('This module implements this feature, ' .
+                                    'so that the method calls such as ' .
+                                    pod_code ('$DOMImplementation' .
+                                              '->hasFeature (' .
+                                              perl_literal ($f_name) .
+                                              ', ' . perl_literal ($f_ver) .
+                                              ')') . ' and ' .
+                                    pod_code ('$DOMImplementation' .
+                                              '->hasFeature (' .
+                                              perl_literal ($f_name) .
+                                              ', null)') .
+                                    ' returns ' . pod_code ('true') . '.');
+      $result .= perl_statement 
+                   perl_assign 
+                     '$' . $ManakaiDOMModulePrefix.'::FeatureImplemented{' .
+                       perl_literal ($f_name) . '}->{' .
+                       perl_literal ($f_ver) . '}'
+                     => 1;
+    }
+  }
+}
+if (@feature_desc) {
+  $result .= pod_block 
+               pod_head (1, 'DOM FEATURES'),
+               pod_list 4, @feature_desc;
 }
 
 my @desc = pod_head (1, 'LICENSE');
@@ -1529,6 +1681,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/09/01 09:15:12 $
+# $Date: 2004/09/02 08:55:26 $
 
 

@@ -22,7 +22,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/01 09:15:12 $
+     $Date: 2004/09/02 08:55:26 $
 
   @Require:
     @@Module:
@@ -154,5 +154,64 @@ Exception:
         @@@@lang:en
         @@@@@:
           Setting an attribute value has no effect by definition.
+
+IF:
+  @Name: ManakaiDOMTreeNode
+  @Description:
+    @@lang:en
+    @@@:
+      The ManakaiDOMTreeNode interface defines the basic tree-node
+      operations.
+      \
+      Strictly, the ManakaiDOMTreeNode object is not the node itself,
+      rather a reference to the node.
+  @IntMethod:
+    @@Name: new
+    @@Description:
+      @@@lang:en
+      @@@@: Return a reference to the new node.
+    @@Return:
+      @@@Type: ManakaiDOMTreeNode
+      @@@Description:
+        @@@@lang:en
+        @@@@@: A reference to the new node.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = bless {object => {rc => 1}}, $self;
+  @IntMethod:
+    @@Name: newReference
+    @@Description:
+      @@@lang:en
+      @@@@: Return a new reference to the node.
+    @@Return:
+      @@@Type: ManakaiDOMTreeNode
+      @@@Description:
+        @@@@lang:en
+        @@@@@: A new reference to the node.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $self->{object}->{rc}++;
+          $r = bless {object => $self->{object}}, $self;
+  @IntMethod:
+    @@Name: destroy
+    @@Description:
+      @@@lang:en
+      @@@@: Destroy this reference to the node object.
+    @@Operator:
+      @@@Type:
+        lang:Perl
+      @@@@: DESTROY
+    @@Return:
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $self->{object}->{rc}--;
+ ## TODO:
+          delete $self->{object};
        
 ## ManakaiDOM.dis ends here
