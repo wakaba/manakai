@@ -53,7 +53,7 @@ Module:
         @@@@FullName:Wakaba
         @@@@Mail:w@suika.fam.cx
   @Date.RCS:
-     $Date: 2004/10/11 10:37:13 $
+     $Date: 2004/10/31 12:30:29 $
 
   @Feature:
     @@QName:
@@ -254,7 +254,7 @@ IF:
                     LSException.PARSE_ERR::
                   }__;
                 } else {
-                  warn "{$error_type->{level}} $error_msg.\n";
+                  #warn "{$error_type->{level}} $error_msg.\n";
                 }
 	   return 0;
            \#line 1 "ManakaiDOMImplementationLS2003.createLSParser #2"
@@ -555,6 +555,7 @@ IF:
                  $ns->{<Q:infoset:localName>}
                    = $prefix eq DEFAULT_PFX ? 'xmlns' : $prefix;
                  $ns->{<Q:infoset:ownerElement>} = $newNode;
+                 $ns->{<Q:infoset:specified>} = true;
                  $newNode->{<Q:infoset:attributes>}
                          ->{<Q:xmlns:>}
                          ->{$ns->{<Q:infoset:localName>}} = $ns;
@@ -586,6 +587,7 @@ IF:
                      : null;
                $newNode->{<Q:infoset:localName>} = $src->{local_name};
                $newNode->{<Q:infoset:ownerElement>} = $parent;
+               $newNode->{<Q:infoset:specified>} = true;
                if (defined $src->{namespace_uri} and
                    $src->{namespace_uri} ne '' and
                    $src->{namespace_uri} ne NULL_URI) {

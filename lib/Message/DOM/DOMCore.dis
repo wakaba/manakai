@@ -55,7 +55,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/10/17 04:46:43 $
+     $Date: 2004/10/31 12:30:28 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -5120,12 +5120,13 @@ IF:
                    ->isa ('__IIF{DOMString::}__')) {
             $r = $self->{<Q:TreeCore:node>}->{<Q:infoset:content>};
           } else {
-            $r = \$self->{<Q:TreeCore:node>}->{<Q:infoset:content>};
-            if (defined $$r) {
-              __CODE{DOMString: s => r, r => r}__;
+            if (defined $self->{<Q:TreeCore:node>}->{<Q:infoset:content>}) {
+              $r = $self->{<Q:TreeCore:node>}->{<Q:infoset:content>};
             } else {
-              $r = null;
+              $r = '';
             }
+            __CODE{DOMString: s => r, r => r}__;
+            $self->{<Q:TreeCore:node>}->{<Q:infoset:content>} = $r;
           }
   @Attr:
      @@Name:  length
@@ -5704,7 +5705,7 @@ IF:
             lang:Perl
           @@@@@:
             __DEEP{
-              $self->__SUPER{Attr::DOM3}__::textContent ($given);
+              $self->__CLASS{Attr::DOM3}__::textContent ($given);
             }__;
           @@@@ImplNote:
             @@@@@lang:en
@@ -6689,7 +6690,8 @@ IF:
                      ->{$attrNode->{<Q:DOMCore:name>}};
             }
 
-            if ($r->{<Q:TreeCore:nodeID>} eq $attrNode->{<Q:TreeCore:nodeID>}) {
+            if (defined $r and
+                $r->{<Q:TreeCore:nodeID>} eq $attrNode->{<Q:TreeCore:nodeID>}) {
               __WARNING{
                 ManakaiDOMImplementationException.
                 MDOM_REPLACE_BY_ITSELF_NO_EFFECT::
@@ -6803,11 +6805,71 @@ IF:
               TODO: Default attribute
   @Method:
      @@Name:  getElementsByTagName
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Return a <IF:NodeList> of all descendant elements with a 
+         given element type name, in the document order.
      @@Param:
         @@@Name:  name
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The name of the element type to match on.
+        @@@InCase:
+          @@@@Value:*
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Match all element type names.
      @@Return:
         @@@Type:  NodeList
+        @@@ObjectType:
+          ManakaiDOMCore:ManakaiDOMGetElementsNodeList
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A list of matching <IF:Element> nodes.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $node = $self->{<Q:TreeCore:node>};
+            my $chk;
+            if (defined $name and $name eq '*') {
+              $chk = sub { 1 };
+            } else {
+              $name = "$name";
+              $chk = sub {
+                my ($self) = @_;
+                if (defined $self->{<Q:infoset:localName>}) {
+                  if (defined $self->{<Q:infoset:prefix>}) {
+                    return ($self->{<Q:infoset:prefix>} . ':' .
+                            $self->{<Q:infoset:localName>} eq $name)
+                               ? true : false;
+                  } else {
+                    return ($self->{<Q:infoset:localName>} eq $name)
+                               ? true : false;
+                  }
+                } else {
+                  return ($self->{<Q:DOMCore:name>} eq $name)
+                               ? true : false;
+                }
+              };
+            }
+            __DEEP{
+              $r = $node->__SUPER{ManakaiDOMNodeObject::}__::__INT{newReference}__
+                              ## Conditional
+                            ('__CLASS{ManakaiDOMGetElementsNodeList}__');
+            }__;
+            $r->{<Q:ManakaiDOMCore:nodeMatch>} = $chk;
+     @@SpecLevel:1
+     @@Level[list]:
+       1
+       2
+       3
+     @@NSVersion:getElementsByTagNameNS
   @IntMethod:
      @@Name: selectAttrNodeObjectNS
      @@Description:
@@ -7407,7 +7469,8 @@ IF:
               }__;
             }
 
-            if ($r->{<Q:TreeCore:nodeID>} eq $attrNode->{<Q:TreeCore:nodeID>}) {
+            if (defined $r and
+                $r->{<Q:TreeCore:nodeID>} eq $attrNode->{<Q:TreeCore:nodeID>}) {
               __WARNING{
                 ManakaiDOMImplementationException.
                 MDOM_REPLACE_BY_ITSELF_NO_EFFECT::
@@ -7445,17 +7508,158 @@ IF:
      @@SpecLevel:2
   @Method:
      @@Name:  getElementsByTagNameNS
+     @@Description: 
+       @@@lang:en
+       @@@@:
+         Return a <IF:NodeList> of all the descendant <IF:Element> nodes 
+         with a given local name and namespace URI pair in the document 
+         order.
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:  DOMString
+        @@@ObjectType:
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The namespace URI of the elements to match on.
+        @@@InCase:
+          @@@@Value:*
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Mathch all namespaces.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
      @@Param:
         @@@Name:  localName
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The local name of the elements to match on.
+        @@@InCase:
+          @@@@Value:*
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Match all local names.
      @@Return:
         @@@Type:  NodeList
-        @@@Exception[list]:  DOMException
-     @@Level[list]:  2
+        @@@ObjectType:
+          ManakaiDOMCore:ManakaiDOMGetElementsNodeList
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:NOT_SUPPORTED_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_IMPL_NOSUPPORT_XML
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The DOM implementation does not support the 
+                <Feature:XML> feature and the language exposed 
+                through the <IF:Document> does not support XML 
+                Namespaces.
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              The <CITE:DOM Level 2 Core Specification> was stated 
+              that HTML-only DOM implementations were not required 
+              to implement this method.  Its Errata and the 
+              <CITE:DOM Level 3 Core Specification> ammend it to 
+              throw an exception.
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A new <IF:NodeList> object containing all the matched 
+            <IF:Element> nodes.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $node = $self->{<Q:TreeCore:node>};
+            unless ($node->{<Q:DOMCore:hasFeature>}->{XML}) {
+              __EXCEPTION{
+                DOMException.NOT_SUPPORTED_ERR.
+                MDOM_EXCEPTION:MDOM_IMPL_NOSUPPORT_XML::
+              }__;
+            }
+            my $chk;
+            if (defined $namespaceURI) {
+              if ($namespaceURI eq '*') {
+                if (defined $localName and $localName eq '*') {
+                  $chk = sub {
+                    my ($self) = @_;
+                    return defined $self->{<Q:infoset:localName>}
+                             ? true : false;
+                      ## Any element node with local name
+                  };
+                } else {
+                  $localName = "$localName";
+                  $chk = sub {
+                    my ($self) = @_;
+                    return
+                        (defined $self->{<Q:infoset:localName>} and
+                         $self->{<Q:infoset:localName>} eq $localName)
+                           ? true : false;
+                  };
+                }
+              } else { ## Non-null namespace URI
+                $namespaceURI = "$namespaceURI";
+                if (defined $localName and $localName eq '*') {
+                  $chk = sub {
+                    my ($self) = @_;
+                    return (defined $self->{<Q:infoset:namespaceName>} and
+                            $self->{<Q:infoset:namespaceName>} eq $namespaceURI)
+                              ? true : false;
+                  };
+                } else {
+                  $localName = "$localName";
+                  $chk = sub {
+                    my ($self) = @_;
+                    return
+                        (defined $self->{<Q:infoset:localName>} and
+                         defined $self->{<Q:infoset:namespaceName>} and
+                         $self->{<Q:infoset:namespaceName>} eq $namespaceURI and
+                         $self->{<Q:infoset:localName>} eq $localName)
+                           ? true : false;
+                  };
+                }
+              }
+            } else { ## Null namespace
+              if (defined $localName and $localName eq '*') {
+                $chk = sub {
+                  my ($self) = @_;
+                  return (defined $self->{<Q:infoset:localName>} and
+                          not defined $self->{<Q:infoset:namespaceName>})
+                            ? true : false;
+                    ## Any element node with local name but not namespace URI
+                };
+              } else {
+                $localName = "$localName";
+                $chk = sub {
+                  my ($self) = @_;
+                  return
+                      (defined $self->{<Q:infoset:localName>} and
+                       not defined $self->{<Q:infoset:namespaceName>} and
+                       $self->{<Q:infoset:localName>} eq $localName)
+                         ? true : false;
+                };
+              }
+            }
+            __DEEP{
+              $r = $node->__SUPER{ManakaiDOMNodeObject::}__::__INT{newReference}__
+                              ## Conditional
+                            ('__CLASS{ManakaiDOMGetElementsNodeList}__');
+            }__;
+            $r->{<Q:ManakaiDOMCore:nodeMatch>} = $chk;
+     @@Level[list]:  
+       2
+       3
      @@SpecLevel:2
+     @@NoNSVersion:getElementsByTagName
   @Method:
      @@Name:  hasAttribute
      @@Description:
@@ -10226,6 +10430,11 @@ IF:
        @@@@:
          Return a <IF:NodeList> of all the <IF:Element> in document 
          order with a given element type name and are contained in the document.
+         \
+         {NOTE:: <IF:Element> nodes also have the 
+                 <M:Element.getElementsByTagName> method.
+         \
+         }
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -10235,6 +10444,8 @@ IF:
          The DOM Level 2 Specification specifies as <QUOTE:pre-order 
          traversal>.  The DOM Level 3 Specifies it by 
          <QUOTE:in document order> and this makes the ambigiousness.
+       \
+         Should <IF:Element> nodes in <IF:Entity> nodes be matched?
      @@Param:
         @@@Name:  tagname
         @@@Type:  DOMString
@@ -10251,13 +10462,53 @@ IF:
             @@@@@@:
               Match all element type names.
      @@Return:
-        @@@Type:  
+        @@@Type:NodeList
+        @@@ObjectType:  
           ManakaiDOM:ManakaiDOMGetElementsNodeList
         @@@Description:
           @@@@lang:en
           @@@@@:
             A new <IF:NodeList> object containing all the matched 
             <IF:Element> objects.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $node = $self->{<Q:TreeCore:node>};
+            my $chk;
+            if (defined $tagname and $tagname eq '*') {
+              $chk = sub { 1 };
+            } else {
+              my $name = "$tagname";
+              $chk = sub {
+                my ($self) = @_;
+                if (defined $self->{<Q:infoset:localName>}) {
+                  if (defined $self->{<Q:infoset:prefix>}) {
+                    return ($self->{<Q:infoset:prefix>} . ':' .
+                            $self->{<Q:infoset:localName>} eq $name)
+                               ? true : false;
+                  } else {
+                    return ($self->{<Q:infoset:localName>} eq $name)
+                               ? true : false;
+                  }
+                } else {
+                  return ($self->{<Q:DOMCore:name>} eq $name)
+                               ? true : false;
+                }
+              };
+            }
+            __DEEP{
+              $r = $node->__SUPER{ManakaiDOMNodeObject::}__::__INT{newReference}__
+                              ## Conditional
+                            ('__CLASS{ManakaiDOMGetElementsNodeList}__');
+            }__;
+            $r->{<Q:ManakaiDOMCore:nodeMatch>} = $chk;
+    @@SpecLevel:1
+    @@Level[list]:
+      1
+      2
+      3
+    @@NSVersion:getElementsByTagName
   @Method:
      @@Name:  importNode
      @@Description:
@@ -10691,9 +10942,15 @@ IF:
         @@@@:
           Return a <IF:NodeList> of all the <IF:Element> nodes 
           with a given local name and namespace URI in document order.
+          \
+          {NOTE:: <IF:Element> nodes also have the 
+                  <M:Element.getElementsByTagNameNS> method.
+          \
+          }
      @@Param:
         @@@Name:  namespaceURI
-        @@@Type:
+        @@@Type:DOMString
+        @@@ObjectType:
           ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
@@ -10705,6 +10962,9 @@ IF:
             @@@@@lang:en
             @@@@@@:
               Match all namespaces.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
      @@Param:
         @@@Name:  localName
         @@@Type:  DOMString
@@ -10718,20 +10978,121 @@ IF:
             @@@@@lang:en
             @@@@@@: Match all local names.
      @@Return:
-        @@@Type:
+        @@@Type:NodeList
+        @@@ObjectType:
           ManakaiDOM:ManakaiDOMGetElementsNodeList
         @@@Description:
           @@@@lang:en
           @@@@@:
             A new <IF:NodeList> object containing all the 
             matched <IF:Element> objects.
+        @@@Exception:
+          @@@@Type:DOMException
+          @@@@Name:NOT_SUPPORTED_ERR
+          @@@@SubType:
+            @@@@@QName:
+              MDOM_EXCEPTION:MDOM_IMPL_NOSUPPORT_XML
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The DOM implementation does not support the <Feature:XML> 
+                feature and the language exposed through the 
+                <IF:Document> is not support XML Namespaces.
+          @@@@SpecLevel:
         @@@ImplNote:
           @@@@lang:en
           @@@@@:
-            In <M:Element.getElementsByTagName>, HTML-only implementations 
-            may raise an exception.
-     @@Level[list]:  2
+            For <M:Element.getElementsByTagName>, DOM Level 2 allows 
+            HTML-only DOM implementations not to implement that method 
+            and its Errata and DOM Level 3 say to raise 
+            <X:NOT_SUPPORTED_ERROR> if it is called.  
+            <M:Document.getElementsByTagName> should also raise the 
+            exception, shouldn't it?
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $node = $self->{<Q:TreeCore:node>};
+            unless ($node->{<Q:DOMCore:hasFeature>}->{XML}) {
+              __EXCEPTION{
+                DOMException.NOT_SUPPORTED_ERR.
+                MDOM_EXCEPTION:MDOM_IMPL_NOSUPPORT_XML::
+              }__;
+            }
+            my $chk;
+            if (defined $namespaceURI) {
+              if ($namespaceURI eq '*') {
+                if (defined $localName and $localName eq '*') {
+                  $chk = sub {
+                    my ($self) = @_;
+                    return defined $self->{<Q:infoset:localName>}
+                             ? true : false;
+                      ## Any element node with local name
+                  };
+                } else {
+                  $localName = "$localName";
+                  $chk = sub {
+                    my ($self) = @_;
+                    return
+                        (defined $self->{<Q:infoset:localName>} and
+                         $self->{<Q:infoset:localName>} eq $localName)
+                           ? true : false;
+                  };
+                }
+              } else { ## Non-null namespace URI
+                $namespaceURI = "$namespaceURI";
+                if (defined $localName and $localName eq '*') {
+                  $chk = sub {
+                    my ($self) = @_;
+                    return (defined $self->{<Q:infoset:namespaceName>} and
+                            $self->{<Q:infoset:namespaceName>} eq $namespaceURI)
+                              ? true : false;
+                  };
+                } else {
+                  $localName = "$localName";
+                  $chk = sub {
+                    my ($self) = @_;
+                    return
+                        (defined $self->{<Q:infoset:localName>} and
+                         defined $self->{<Q:infoset:namespaceName>} and
+                         $self->{<Q:infoset:namespaceName>} eq $namespaceURI and
+                         $self->{<Q:infoset:localName>} eq $localName)
+                           ? true : false;
+                  };
+                }
+              }
+            } else { ## Null namespace
+              if (defined $localName and $localName eq '*') {
+                $chk = sub {
+                  my ($self) = @_;
+                  return (defined $self->{<Q:infoset:localName>} and
+                          not defined $self->{<Q:infoset:namespaceName>})
+                            ? true : false;
+                    ## Any element node with local name but not namespace URI
+                };
+              } else {
+                $localName = "$localName";
+                $chk = sub {
+                  my ($self) = @_;
+                  return
+                      (defined $self->{<Q:infoset:localName>} and
+                       not defined $self->{<Q:infoset:namespaceName>} and
+                       $self->{<Q:infoset:localName>} eq $localName)
+                         ? true : false;
+                };
+              }
+            }
+            __DEEP{
+              $r = $node->__SUPER{ManakaiDOMNodeObject::}__::__INT{newReference}__
+                              ## Conditional
+                            ('__CLASS{ManakaiDOMGetElementsNodeList}__');
+              $r->{<Q:ManakaiDOMCore:nodeMatch>} = $chk;
+            }__;
+     @@Level[list]:  
+       2
+       3
      @@SpecLevel:2
+     @@NoNSVersion:getElementsByTagName
   @Method:
      @@Name:  getElementById
      @@Description:

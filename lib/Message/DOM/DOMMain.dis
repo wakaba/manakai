@@ -35,7 +35,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/10/09 05:32:30 $
+     $Date: 2004/10/31 12:30:28 $
   
   @Feature:
     @@QName:
@@ -551,7 +551,7 @@ DataType:
         @@@@cast-input: 0
         @@@@@:
           if ($offset < 0 or $offset > CORE::length $self->{value} or
-              $offset > $self->__INT{length}__) {
+              $offset > $self->length) {
             __EXCEPTION{DOMException.INDEX_SIZE_ERR::
               <Q:ManakaiDOMImplementationException:param-name> => 'offset',
             }__;
@@ -629,7 +629,7 @@ DataType:
         @@@@cast-input: 0
         @@@@@:
           if ($offset < 0 or $offset > CORE::length $self->{value} or
-              $offset > $self->__INT{length}__) {
+              $offset > $self->length) {
             __EXCEPTION{DOMException.INDEX_SIZE_ERR::
               <Q:ManakaiDOMImplementationException:param-name> => 'offset',
             }__;
@@ -752,7 +752,7 @@ DataType:
           lang:Perl
         @@@@@:
           if ($offset < 0 or $offset > CORE::length $self->{value} or
-              $offset > $self->__INT{length}__) {
+              $offset > $self->length) {
             __EXCEPTION{DOMException.INDEX_SIZE_ERR::
               <Q:ManakaiDOMImplementationException:param-name> => 'offset',
             }__;
@@ -886,7 +886,7 @@ DataType:
           lang:Perl
         @@@@cast-input: 0
         @@@@@:
-          if ($str->isa ('__CLASS{DOMString}__')) {
+          if (UNIVERSAL::isa ($str, '__IIF{DOMString}__')) {
             $str = $str->{value};
           }
           if ($caseInsensitive) {

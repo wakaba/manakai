@@ -38,7 +38,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/10/10 06:11:57 $
+     $Date: 2004/10/31 12:30:28 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -804,7 +804,140 @@ IF:
         See <M:Node.isEqualNode>.  This internal method might need to 
         be modified if future version of DOM modify the specification.
     @@SpecLevel:3
-    
+
+  @IntMethod:
+    @@Name:getElementBy
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Return an element that met the given condition.
+    @@Param:
+      @@@Name:check
+      @@@Type:
+        DOMMain:Object
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A code reference.  The code referred is called with a 
+          parameter of this <IF:ManakaiDOMNodeObjectNode> object 
+          when an <IF:Element> node is determined whether it could 
+          be returned.  The code should return either <DOM:true> or 
+          <DOM:false>.
+    @@Param:
+      @@@Name:index
+      @@@Type:
+        DOMMain:Object
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A reference to the ordinal index of the element to return.
+      @@@In:1
+      @@@Out:
+        @@@@@:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The number of <IF:Element> nodes with which <P:check> has 
+            returned <DOM:true> is minused from the original value. 
+            \
+            For example, if the original <P:index> is <CODE:4> and 
+            there is three <P:check>-<DOM:true> <IF:Element> nodes, 
+            then <P:index> would result in <CODE:1> and this method 
+            itself would return <DOM:null>.  If there is five (or more)
+            such nodes, 
+            <P:index> would be <CODE:-1> and the return value would be 
+            the fiveth matching node.
+      @@@InCase:
+        @@@@Value:0
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The first <IF:Element> node with which <P:check> has returned 
+            <DOM:true> is returned.
+    @@Return:
+      @@@Type:
+        ManakaiDOMNodeObjectNode
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The <IF:Element> node that met the condition.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:There is no such node.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          for (@{$self->{<Q:infoset:children>}}) {
+            last if $$index < 0;
+            if ($_->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
+              if ($check->($_)) {
+                if ($$index-- == 0) {
+                  $r = $_;
+                  last;
+                }
+              }
+              $r = $_->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{getElementBy}__
+                        ($check, $index);
+              last if $$index == -1;
+            } elsif ({
+                       <Q:DOMXML:EntityReference> => 1,
+                     }->{$_->{<Q:DOMCore:nodeType>}}) {
+              $r = $_->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{getElementBy}__
+                         ($check, $index);
+              last if $$index == -1;
+            }
+          }
+  @IntMethod:
+    @@Name:getElementsBy
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Return descendant elements that met the given condition.
+    @@Param:
+      @@@Name:check
+      @@@Type:
+        DOMMain:Object
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A code reference.  The code referred is called with a 
+          parameter of this <IF:ManakaiDOMNodeObjectNode> object 
+          when an <IF:Element> node is determined whether it could 
+          be returned.  The code should return either <DOM:true> or 
+          <DOM:false>.
+    @@Return:
+      @@@Type:
+        DOMMain:Object
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          An array reference to the <IF:Element> nodes that meet the condition.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = [];
+          for (@{$self->{<Q:infoset:children>}}) {
+            if ($_->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
+              if ($check->($_)) {
+                push @$r, $_;
+              }
+         \    push @$r,
+         \         @{$_->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{getElementsBy}__
+         \               ($check)};
+            } elsif ({
+                       <Q:DOMXML:EntityReference> => 1,
+                     }->{$_->{<Q:DOMCore:nodeType>}}) {
+         \    push @$r,
+         \         @{$_->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{getElementsBy}__
+         \               ($check)};
+            }
+          }
+
 ## IF:ManakaiDOMNodeObjectNode
 
 IF:
@@ -926,7 +1059,7 @@ IF:
   @Description:
     @@lang:en
     @@@:
-      An ordered collection of nodes, returned by "getElementsBy"-methods.
+      An ordered collection of nodes, returned by <CODE:getElementsBy>-methods.
   @Method:
      @@Name:  item
      @@Description:
@@ -940,20 +1073,40 @@ IF:
           @@@@lang:en
           @@@@@: The index of the item into the collection.
      @@Return:
-        @@@Type:  Node
+        @@@Type:  
+          DOMCore:Node
         @@@Description:
           @@@@lang:en
           @@@@@: 
-            The node at the "index"th position in the collection.
+            The node at the <P:index>th position in the collection.
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The "index" is invalid, i.e. it is greater than or 
+              The <P:index> is greater than or 
               equal to the number of nodes in the list.
-
+       @@@Def:
+         @@@@Type:
+           lang:Perl
+         @@@@@:
+           $r = $self->{<Q:TreeCore:node>}
+                     ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{getElementBy}__
+                         ($self->{<Q:ManakaiDOMCore:nodeMatch>}, \$index);
+           if (defined $r) {
+                  ## Conditional
+             $r = __CLASS{Node}__->__INT{getNodeReference}__ ($r, $self);
+           }
+         @@@@ImplNote:
+           @@@@@lang:en
+           @@@@@@:
+             TODO: Cache mechanism required.
+     @@SpecLevel:1
+     @@Level[list]:
+       1
+       2
+       3
   @Attr:
      @@Name:  length
      @@Description:
@@ -962,6 +1115,14 @@ IF:
          The number of nodes in the list.
      @@Get:
         @@@Type:  unsigned-long
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $l = $self->{<Q:TreeCore:node>}
+                         ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{getElementsBy}__
+                             ($self->{<Q:ManakaiDOMCore:nodeMatch>});
+            $r = @$l;
 ## IF:ManakaiDOMGetElementsNodeList
 
 IF:
