@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::Base;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML
     qw[InXML_NameStartChar10 InXMLNameChar10
        InXMLNameStartChar11 InXMLNameChar11
@@ -79,7 +79,7 @@ sub parse_document_entity ($$$%) {
         if ($docelem++) {
           $self->report
             (-type => 'SYNTAX_MULTIPLE_DOCUMENT_ELEMENTS',
-             -class => 'WFC',
+             -class => 'SYNTAX',
              source => $src);
         }
         $self->parse_element
@@ -113,7 +113,7 @@ sub parse_document_entity ($$$%) {
         $self->{error}->fork_position ($src => \$s);
         $self->report
           (-type => 'SYNTAX_CDATA_OUTSIDE_DOCUMENT_ELEMENT',
-           -class => 'WFC',
+           -class => 'SYNTAX',
            source => $src,
            position_diff => 1);
         local $pp->{ExpandedURI q<CDATA>} = \$s;
@@ -133,7 +133,7 @@ sub parse_document_entity ($$$%) {
       $self->{error}->fork_position ($src => \$s);
       $self->report
         (-type => 'SYNTAX_CDATA_OUTSIDE_DOCUMENT_ELEMENT',
-         -class => 'WFC',
+         -class => 'SYNTAX',
          source => $src,
          position_diff => length $s);
       local $pp->{ExpandedURI q<CDATA>} = \$s;
@@ -145,7 +145,7 @@ sub parse_document_entity ($$$%) {
   unless ($docelem) {
     $self->report
       (-type => 'SYNTAX_NO_DOCUMENT_ELEMENT',
-       -class => 'WFC',
+       -class => 'SYNTAX',
        source => $src);
   }
   $self->document_end ($src, $p, $pp, %opt);
@@ -186,7 +186,7 @@ sub ____normalize_entity ($$$%) {
         if ($data =~ /[\x85\x{2028}]/) {
           $self->report
                    (-type => 'FATAL_NEW_NL_IN_XML_DECLARATION',
-                    -class => 'W3C',
+                    -class => 'WFC',
                     source => $src);
         }
       }
@@ -208,14 +208,14 @@ sub ____normalize_entity ($$$%) {
       if ($char =~ /\p{InXMLRestrictedChar11}/) {
         $self->report
                  (-type => 'SYNTAX_RESTRICTED_CHAR',
-                  -class => 'WFC',
+                  -class => 'SYNTAX',
                   source => $src,
                   position_diff => 1,
                   char => $char);
       } else {
         $self->report
                  (-type => 'SYNTAX_NOT_IN_CHAR',
-                  -class => 'WFC',
+                  -class => 'SYNTAX',
                   source => $src,
                   position_diff => 1,
                   char => $char);
@@ -227,7 +227,7 @@ sub ____normalize_entity ($$$%) {
       my $char = $1;
       $self->report
                  (-type => 'SYNTAX_NOT_IN_CHAR',
-                  -class => 'WFC',
+                  -class => 'SYNTAX',
                   source => $src,
                   position_diff => 1,
                   char => $char);
@@ -278,6 +278,18 @@ sub parse_element ($$$%) {
         if ($m ne '<' and $m ne '&') {
           $$src =~ /\G([^<&]+)/gc;
           my $t = $1;
+          if ($t =~ /]]>/) {
+            pos ($t) = 0;
+            $self->{error}->set_position ($src, moved => 1,
+                                          diff => length $t);
+            $self->{error}->fork_position ($src => \$t);
+            while ($t =~ /]]>/g) {
+              $self->report
+                       (-type => 'SYNTAX_MSE',
+                        -class => 'SYNTAX',
+                        source => \$t, position_diff => 1);
+            }
+          }
           local $pp->{ExpandedURI q<CDATA>} = \$t;
           $self->element_content
                    ($src, $p, $pp, %opt);
@@ -291,7 +303,7 @@ sub parse_element ($$$%) {
                 $$src =~ /\G>/gc
                   or $self->report
                     (-type => 'SYNTAX_ETAGC_REQUIRED',
-                     -class => 'WFC',
+                     -class => 'SYNTAX',
                      source => $src);
               } else {
                 $self->report
@@ -308,7 +320,7 @@ sub parse_element ($$$%) {
                 } else {
                   $self->report
                     (-type => 'SYNTAX_ETAGC_REQUIRED',
-                     -class => 'WFC',
+                     -class => 'SYNTAX',
                      source => $src);
                 }
                 local $pp->{ExpandedURI q<CDATA>} = \$tag;
@@ -323,7 +335,7 @@ sub parse_element ($$$%) {
               pos ($$src) += 2;
               $self->report
                  (-type => 'SYNTAX_ELEMENT_TYPE_NAME_FOLLOWING_ETAGO_REQUIRED',
-                  -class => 'WFC',
+                  -class => 'SYNTAX',
                   source => $src);
               local $pp->{ExpandedURI q<CDATA>} = \'</';
               $self->element_content
@@ -373,7 +385,7 @@ sub parse_element ($$$%) {
       unless ($end_tag) {
         $self->report
                  (-type => 'SYNTAX_END_TAG_REQUIRED',
-                  -class => 'WFC',
+                  -class => 'SYNTAX',
                   source => $src,
                   element_type_name => $ename);
       }
@@ -386,13 +398,13 @@ sub parse_element ($$$%) {
       if (substr ($$src, pos $$src, 1) eq '<') {
         $self->report
                  (-type => 'SYNTAX_ELEMENT_TYPE_NAME_FOLLOWING_STAGO_REQUIRED',
-                  -class => 'WFC',
+                  -class => 'SYNTAX',
                   source => $src,
                   position_diff => -1);
       } else {
         $self->report
                  (-type => 'SYNTAX_START_TAG_REQUIRED',
-                  -class => 'WFC',
+                  -class => 'SYNTAX',
                   source => $src);
       }
     }
@@ -416,7 +428,7 @@ sub parse_content ($$$%) {
               my $type = $1;
                 $self->report
                   (-type => 'SYNTAX_END_TAG_NOT_ALLOWED',
-                   -class => 'WFC',
+                   -class => 'SYNTAX',
                    source => $src,
                    position_diff => 2 + length $type);
                 my $tag = '</' . $type;
@@ -426,7 +438,7 @@ sub parse_content ($$$%) {
                 } else {
                   $self->report
                     (-type => 'SYNTAX_ETAGC_REQUIRED',
-                     -class => 'WFC',
+                     -class => 'SYNTAX',
                      source => $src);
                 }
                 pos $tag = 0;
@@ -437,7 +449,7 @@ sub parse_content ($$$%) {
               pos ($$src) += 2;
               $self->report
                  (-type => 'SYNTAX_ELEMENT_TYPE_NAME_FOLLOWING_ETAGO_REQUIRED',
-                  -class => 'WFC',
+                  -class => 'SYNTAX',
                   source => $src);
               local $pp->{ExpandedURI q<CDATA>} = \'</';
               $self->element_content
@@ -496,14 +508,14 @@ sub parse_start_tag ($$$%) {
       pos ($$src)--;
       $self->report
                 (-type => 'SYNTAX_EMPTY_START_TAG',
-                 -class => 'WFC',
+                 -class => 'SYNTAX',
                  source => $src,
                  position_diff => 1);
       return 0;
     } else {
       $self->report
                 (-type => 'SYNTAX_ELEMENT_TYPE_NAME_FOLLOWING_STAGO_REQUIRED',
-                 -class => 'WFC',
+                 -class => 'SYNTAX',
                  source => $src);
       pos ($$src)--;
       return 0;
@@ -531,7 +543,7 @@ sub parse_start_tag ($$$%) {
       unless ($$src =~ /\G>/gc) {
         $self->report
                 (-type => 'SYNTAX_NET_REQUIRED',
-                 -class => 'WFC',
+                 -class => 'SYNTAX',
                  source => $src);
       }
       $self->end_tag_start ($src, $p, $pp, %opt);
@@ -541,7 +553,7 @@ sub parse_start_tag ($$$%) {
       unless ($$src =~ /\G>/gc) {
         $self->report
                  (-type => 'SYNTAX_STAGC_OR_NESTC_REQUIRED',
-                  -class => 'WFC',
+                  -class => 'SYNTAX',
                   source => $src);
       }
       $self->start_tag_end ($src, $p, $pp, %opt);
@@ -552,7 +564,7 @@ sub parse_start_tag ($$$%) {
     if ($opt{ExpandedURI q<match-or-error>}) {
       $self->report
                 (-type => 'SYNTAX_START_TAG_REQUIRED',
-                 -class => 'WFC',
+                 -class => 'SYNTAX',
                  source => $src);
     }
     return 0;
@@ -576,7 +588,7 @@ sub parse_attribute_specifications ($$$%) {
         unless ($sep) {
           $self->report
             (-type => 'SYNTAX_S_REQUIRED_BETWEEN_ATTR_SPEC',
-             -class => 'WFC',
+             -class => 'SYNTAX',
              source => $src);
           my $s = '';
           pos $s = 0;
@@ -594,7 +606,7 @@ sub parse_attribute_specifications ($$$%) {
       } elsif ($opt{ExpandedURI q<attr-specs-only>}) {
         $self->report
             (-type => 'SYNTAX_ATTR_SPEC_REQUIRED',
-             -class => 'WFC',
+             -class => 'SYNTAX',
              source => $src);
         $$src =~ /\G(?:(?!$XML_NAMESTART{$self->{ExpandedURI q<xml-version>}||'1.0'})(?!$REG_S).)+/gcs;
       } else {
@@ -640,7 +652,7 @@ sub parse_attribute_specification ($$$%) {
     } else {
       $self->report
         (-type => 'SYNTAX_VI_REQUIRED',
-         -class => 'WFC',
+         -class => 'SYNTAX',
          source => $src);
     }
     my $end_method = $opt{ExpandedURI q<method-end-attr-spec>} ||
@@ -650,7 +662,7 @@ sub parse_attribute_specification ($$$%) {
   } elsif ($opt{ExpandedURI q<match-or-error>}) {
     $self->report
       (-type => 'SYNTAX_ATTR_NAME_REQUIRED',
-       -class => 'WFC',
+       -class => 'SYNTAX',
        source => $src);
     return 0;
   }
@@ -674,7 +686,7 @@ sub parse_attribute_value_specification ($$$%) {
       }
       unless ($$src =~ /\G"/gc) {
         $self->report (-type => 'SYNTAX_ALITC_REQUIRED',
-                       -class => 'WFC',
+                       -class => 'SYNTAX',
                        source => $src);
       }
     } else { #if ($litdelim eq "'")
@@ -687,7 +699,7 @@ sub parse_attribute_value_specification ($$$%) {
       }
       unless ($$src =~ /\G'/gc) {
         $self->report (-type => 'SYNTAX_ALITAC_REQUIRED',
-                       -class => 'WFC',
+                       -class => 'SYNTAX',
                        source => $src);
       }
     }
@@ -701,7 +713,7 @@ sub parse_attribute_value_specification ($$$%) {
                        'attribute_value_specification_start';
     $self->$start_method ($src, $p, my $pp = {}, %opt);
     $self->report (-type => 'SYNTAX_ATTRIBUTE_VALUE',
-                   -class => 'WFC',
+                   -class => 'SYNTAX',
                    source => $src,
                    position_diff => length $s);
     pos $s = 0;
@@ -720,7 +732,7 @@ sub parse_attribute_value_specification ($$$%) {
     if ($opt{ExpandedURI q<match-or-error>}) {
       $self->report
                   (-type => 'SYNTAX_ALITO_OR_ALITAO_REQUIRED',
-                   -class => 'WFC',
+                   -class => 'SYNTAX',
                    source => $src);
     }
     return 0;
@@ -750,7 +762,8 @@ sub parse_avdata ($$$%) {
                     %opt,
                     ExpandedURI q<match-or-error> => 1,
                     ExpandedURI q<error-avdata-lt>
-                      => 'WFC_NO_LESS_THAN_IN_ATTR_VAL')) {
+                      => 'WFC_NO_LESS_THAN_IN_ATTR_VAL',
+                    ExpandedURI q<error-class-avdata-lt> => 'WFC')) {
             my $s = '&';
             pos $s = 0;
             $self->{error}->fork_position ($src => \$s);
@@ -767,7 +780,8 @@ sub parse_avdata ($$$%) {
           $self->report
                    (-type => $opt{ExpandedURI q<error-avdata-lt>} ||
                              'SYNTAX_NO_LESS_THAN_IN_ATTR_VAL',
-                    -class => 'WFC',
+                    -class => $opt{ExpandedURI q<error-class-avdata-lt>} ||
+                              'SYNTAX',
                     source => $src,
                     position_diff => 1);
           local $pp->{ExpandedURI q<CDATA>} = \$s;
@@ -797,7 +811,7 @@ sub parse_reference_in_attribute_value_literal ($$$%) {
           unless ($opt{ExpandedURI q<allow-hex-character-reference>}) {
             $self->report
               (-type => 'SYNTAX_HEX_CHAR_REF',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $src,
                position_diff => 3 + length $1);
           }
@@ -813,7 +827,7 @@ sub parse_reference_in_attribute_value_literal ($$$%) {
         } else {
           $self->report
             (-type => 'SYNTAX_HEXDIGIT_REQUIRED',
-             -class => 'WFC',
+             -class => 'SYNTAX',
              source => $src);
           pos ($$src) -= 3;
           return 0;
@@ -822,7 +836,7 @@ sub parse_reference_in_attribute_value_literal ($$$%) {
         unless ($opt{ExpandedURI q<allow-numeric-character-reference>}) {
           $self->report
             (-type => 'SYNTAX_NUMERIC_CHAR_REF',
-             -class => 'WFC',
+             -class => 'SYNTAX',
              source => $src,
              position_diff => 2 + length $1);
         }
@@ -838,7 +852,7 @@ sub parse_reference_in_attribute_value_literal ($$$%) {
       } elsif ($$src =~ /\GX/gc) {
         $self->report
                (-type => 'SYNTAX_HCRO_CASE',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src,
                 position_diff => 1);
         pos ($$src) -= 3;
@@ -847,7 +861,7 @@ sub parse_reference_in_attribute_value_literal ($$$%) {
         my $name = $1;
         $self->report
                (-type => 'SYNTAX_NAMED_CHARACTER_REFERENCE',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src,
                 function_name => $name,
                 position_diff => length $name);
@@ -856,7 +870,7 @@ sub parse_reference_in_attribute_value_literal ($$$%) {
       } else {
         $self->report
                (-type => 'SYNTAX_X_OR_DIGIT_REQUIRED',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src);
         pos ($$src) -= 2;
         return 0;
@@ -866,7 +880,7 @@ sub parse_reference_in_attribute_value_literal ($$$%) {
       unless ($opt{ExpandedURI q<allow-general-entity-reference>}) {
         $self->report
                (-type => 'SYNTAX_GENERAL_ENTREF',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src,
                 position_diff => 1 + length $s);
       }
@@ -940,7 +954,7 @@ sub parse_reference_in_attribute_value_literal ($$$%) {
     } else {
       $self->report
                (-type => 'SYNTAX_HASH_OR_NAME_REQUIRED',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src);
       pos ($$src) -= 1;
       return 0;
@@ -948,14 +962,14 @@ sub parse_reference_in_attribute_value_literal ($$$%) {
     
     $$src =~ /\G;/gc or $self->report
                (-type => 'SYNTAX_REFC_REQUIRED',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src);
     return 1;
   } else {
     if ($opt{ExpandedURI q<match-or-error>}) {
       $self->report
                (-type => 'SYNTAX_REFERENCE_AMP_REQUIRED',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src);
     }
     return 0;
@@ -980,7 +994,7 @@ sub parse_reference_in_content ($$$%) {
         } else {
           $self->report
             (-type => 'SYNTAX_HEXDIGIT_REQUIRED',
-             -class => 'WFC',
+             -class => 'SYNTAX',
              source => $src);
           pos ($$src) -= 3;
           return 0;
@@ -998,7 +1012,7 @@ sub parse_reference_in_content ($$$%) {
       } elsif ($$src =~ /\GX/gc) {
         $self->report
                (-type => 'SYNTAX_HCRO_CASE',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src,
                 position_diff => 1);
         pos ($$src) -= 3;
@@ -1007,7 +1021,7 @@ sub parse_reference_in_content ($$$%) {
         my $name = $1;
         $self->report
                (-type => 'SYNTAX_NAMED_CHARACTER_REFERENCE',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src,
                 function_name => $name,
                 position_diff => length $name);
@@ -1016,7 +1030,7 @@ sub parse_reference_in_content ($$$%) {
       } else {
         $self->report
                (-type => 'SYNTAX_X_OR_DIGIT_REQUIRED',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src);
         pos ($$src) -= 2;
         return 0;
@@ -1082,7 +1096,7 @@ sub parse_reference_in_content ($$$%) {
     } else {
       $self->report
                (-type => 'SYNTAX_HASH_OR_NAME_REQUIRED',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src);
       pos ($$src) -= 1;
       return 0;
@@ -1090,14 +1104,14 @@ sub parse_reference_in_content ($$$%) {
     
     $$src =~ /\G;/gc or $self->report
                (-type => 'SYNTAX_REFC_REQUIRED',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src);
     return 1;
   } else {
     if ($opt{ExpandedURI q<match-or-error>}) {
       $self->report
                (-type => 'SYNTAX_REFERENCE_AMP_REQUIRED',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src);
     }
     return 0;
@@ -1167,13 +1181,13 @@ sub parse_reference_in_rpdata ($$$%) {
       
       $$src =~ /\G;/gc or $self->report
                (-type => 'SYNTAX_REFC_REQUIRED',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src);
       return 1;
     } else {
       $self->report
                (-type => 'SYNTAX_PARAENT_NAME_REQUIRED',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src);
       pos ($$src) -= 1;
       return 0;
@@ -1194,7 +1208,7 @@ sub parse_reference_in_rpdata ($$$%) {
         } else {
           $self->report
             (-type => 'SYNTAX_HEXDIGIT_REQUIRED',
-             -class => 'WFC',
+             -class => 'SYNTAX',
              source => $src);
           pos ($$src) -= 3;
           return 0;
@@ -1212,7 +1226,7 @@ sub parse_reference_in_rpdata ($$$%) {
       } elsif ($$src =~ /\GX/gc) {
         $self->report
                (-type => 'SYNTAX_HCRO_CASE',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src,
                 position_diff => 1);
         pos ($$src) -= 3;
@@ -1221,7 +1235,7 @@ sub parse_reference_in_rpdata ($$$%) {
         my $name = $1;
         $self->report
                (-type => 'SYNTAX_NAMED_CHARACTER_REFERENCE',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src,
                 function_name => $name,
                 position_diff => length $name);
@@ -1230,7 +1244,7 @@ sub parse_reference_in_rpdata ($$$%) {
       } else {
         $self->report
                (-type => 'SYNTAX_X_OR_DIGIT_REQUIRED',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src);
         pos ($$src) -= 2;
         return 0;
@@ -1247,7 +1261,7 @@ sub parse_reference_in_rpdata ($$$%) {
     } else {
       $self->report
                (-type => 'SYNTAX_HASH_OR_NAME_REQUIRED',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src);
       pos ($$src) -= 1;
       return 0;
@@ -1255,14 +1269,14 @@ sub parse_reference_in_rpdata ($$$%) {
     
     $$src =~ /\G;/gc or $self->report
                (-type => 'SYNTAX_REFC_REQUIRED',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src);
     return 1;
   } else {
     if ($opt{ExpandedURI q<match-or-error>}) {
       $self->report
                (-type => 'SYNTAX_REFERENCE_AMP_REQUIRED',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src);
     }
     return 0;
@@ -1276,7 +1290,7 @@ sub parse_markup_declaration ($$$%) {
     unless ($opt{ExpandedURI q<allow-declaration>}->{comment}) {
       $self->report
           (-type => 'SYNTAX_COMMENT_DECLARATION_NOT_ALLOWED',
-           -class => 'WFC',
+           -class => 'SYNTAX',
            source => $src);
     }
     $self->parse_comment_declaration ($src, $p, %opt);
@@ -1294,7 +1308,7 @@ sub parse_markup_declaration ($$$%) {
       unless ($opt{ExpandedURI q<allow-declaration>}->{$keyword}) {
         $self->report
           (-type => 'SYNTAX_MARKUP_DECLARATION_NOT_ALLOWED',
-           -class => 'WFC',
+           -class => 'SYNTAX',
            source => $src,
            keyword => $keyword);
       }
@@ -1303,7 +1317,7 @@ sub parse_markup_declaration ($$$%) {
     } else {
       $self->report
              (-type => 'SYNTAX_UNKNOWN_MARKUP_DECLARATION',
-              -class => 'WFC',
+              -class => 'SYNTAX',
               source => $src,
               position_diff => length $keyword,
               keyword => $keyword);
@@ -1314,7 +1328,7 @@ sub parse_markup_declaration ($$$%) {
     unless ($opt{ExpandedURI q<allow-declaration>}->{section}) {
       $self->report
           (-type => 'SYNTAX_MARKED_SECTION_NOT_ALLOWED',
-           -class => 'WFC',
+           -class => 'SYNTAX',
            source => $src);
     }
     $self->parse_marked_section
@@ -1323,12 +1337,12 @@ sub parse_markup_declaration ($$$%) {
     unless ($opt{ExpandedURI q<allow-declaration>}->{comment}) {
       $self->report
           (-type => 'SYNTAX_COMMENT_DECLARATION_NOT_ALLOWED',
-           -class => 'WFC',
+           -class => 'SYNTAX',
            source => $src);
     }
     $self->report
              (-type => 'SYNTAX_EMPTY_COMMENT_DECLARATION',
-              -class => 'WFC',
+              -class => 'SYNTAX',
               source => $src,
               position_diff => 3);
     $self->comment_declaration_start
@@ -1339,12 +1353,12 @@ sub parse_markup_declaration ($$$%) {
     if (substr ($$src, pos $$src, 2) eq '<!') {
       $self->report
              (-type => 'SYNTAX_NAME_OR_DSO_OR_COM_REQUIRED',
-              -class => 'WFC',
+              -class => 'SYNTAX',
               source => $src);
     } else {
       $self->report
              (-type => 'SYNTAX_MARKUP_DECLARATION_REQUIRED',
-              -class => 'WFC',
+              -class => 'SYNTAX',
               source => $src);
     }
     return 0;
@@ -1389,12 +1403,12 @@ sub parse_doctype_declaration ($$$%) {
         if (${$doctype->{value}} eq 'IMPLIED') {
           $self->report
               (-type => 'SYNTAX_DOCTYPE_IMPLIED',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $doctype->{value});
         } else {
           $self->report
               (-type => 'SYNTAX_DOCTYPE_RNI_KEYWORD',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $doctype->{value},
                keyword => ${$doctype->{value}});
         }
@@ -1447,7 +1461,7 @@ sub parse_doctype_declaration ($$$%) {
           @{$opt{ExpandedURI q<source>}} > 1) {
         $self->report
               (-type => 'SYNTAX_MARKUP_DECLARATION_TOO_MANY_PARAM',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => ($pp->{ExpandedURI q<param>}->[0] ?
                             $pp->{ExpandedURI q<param>}->[0]->{value} :
                             $opt{ExpandedURI q<source>}->[-1]),
@@ -1461,7 +1475,7 @@ sub parse_doctype_declaration ($$$%) {
     unless ($$src =~ /\G>/gc) {
       $self->report
               (-type => 'SYNTAX_MDC_REQUIRED',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $src);
     }
     $self->doctype_declaration_end
@@ -1471,7 +1485,7 @@ sub parse_doctype_declaration ($$$%) {
     if ($opt{ExpandedURI q<match-or-error>}) {
       $self->report
               (-type => 'SYNTAX_DOCTYPE_DECLARATION_REQUIRED',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $src);
     }
     return 0;
@@ -1521,12 +1535,12 @@ sub parse_entity_declaration ($$$%) {
         if (${$entname->{value}} eq 'DEFAULT') {
           $self->report
               (-type => 'SYNTAX_ENTITY_DEFAULT',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $entname->{value});
         } else {
           $self->report
               (-type => 'SYNTAX_ENTITY_RNI_KEYWORD',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $entname->{value},
                keyword => ${$entname->{value}});
         }
@@ -1588,14 +1602,14 @@ sub parse_entity_declaration ($$$%) {
                          ${$kwd->{value}} eq 'SDATA') {
                   $self->report
                     (-type => 'SYNTAX_ENTITY_DATA_TYPE_SGML_KEYWORD',
-                     -class => 'WFC',
+                     -class => 'SYNTAX',
                      source => $kwd->{value},
                      keyword => ${$kwd->{value}});
                   $pp->{ExpandedURI q<entity-data-type>} = ${$kwd->{value}};
                 } elsif (${$kwd->{value}} eq 'SUBDOC') {
                   $self->report
                     (-type => 'SYNTAX_ENTITY_DATA_TYPE_SGML_KEYWORD',
-                     -class => 'WFC',
+                     -class => 'SYNTAX',
                      source => $kwd->{value},
                      keyword => ${$kwd->{value}});
                   $pp->{ExpandedURI q<entity-data-type>} = ${$kwd->{value}};
@@ -1603,7 +1617,7 @@ sub parse_entity_declaration ($$$%) {
                 } else {
                   $self->report
                     (-type => 'SYNTAX_ENTITY_DATA_TYPE_UNKNOWN_KEYWORD',
-                     -class => 'WFC',
+                     -class => 'SYNTAX',
                      source => $kwd->{value},
                      keyword => ${$kwd->{value}});
                   last ENTTEXT;
@@ -1629,7 +1643,7 @@ sub parse_entity_declaration ($$$%) {
                          ENDTAG 1 MD 1 MS 1 PI 1/}->{${$enttext->{value}}}) {
               $self->report
                 (-type => 'SYNTAX_ENTITY_TEXT_PRE_KEYWORD',
-                 -class => 'WFC',
+                 -class => 'SYNTAX',
                  source => $enttext->{value},
                  keyword => ${$enttext->{value}});
               shift @{$pp->{ExpandedURI q<param>}};
@@ -1653,7 +1667,7 @@ sub parse_entity_declaration ($$$%) {
             } else {
               $self->report
                 (-type => 'SYNTAX_ENTITY_TEXT_KEYWORD',
-                 -class => 'WFC',
+                 -class => 'SYNTAX',
                  source => $enttext->{value},
                  keyword => ${$enttext->{value}});
               shift @{$pp->{ExpandedURI q<param>}};
@@ -1679,7 +1693,7 @@ sub parse_entity_declaration ($$$%) {
           @{$opt{ExpandedURI q<source>}} > 1) {
         $self->report
               (-type => 'SYNTAX_MARKUP_DECLARATION_TOO_MANY_PARAM',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => ($pp->{ExpandedURI q<param>}->[0] ?
                             $pp->{ExpandedURI q<param>}->[0]->{value} :
                             $opt{ExpandedURI q<source>}->[-1]),
@@ -1692,7 +1706,7 @@ sub parse_entity_declaration ($$$%) {
     unless ($$src =~ /\G>/gc) {
       $self->report
               (-type => 'SYNTAX_MDC_REQUIRED',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $src);
     }
     $self->entity_declaration_end
@@ -1763,7 +1777,7 @@ sub parse_notation_declaration ($$$%) {
           @{$opt{ExpandedURI q<source>}} > 1) {
         $self->report
               (-type => 'SYNTAX_MARKUP_DECLARATION_TOO_MANY_PARAM',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => ($pp->{ExpandedURI q<param>}->[0] ?
                             $pp->{ExpandedURI q<param>}->[0]->{value} :
                             $opt{ExpandedURI q<source>}->[-1]),
@@ -1776,7 +1790,7 @@ sub parse_notation_declaration ($$$%) {
     unless ($$src =~ /\G>/gc) {
       $self->report
               (-type => 'SYNTAX_MDC_REQUIRED',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $src);
     }
     $self->entity_declaration_end
@@ -1825,7 +1839,7 @@ sub parse_element_declaration ($$$%) {
       } elsif ($entname->{type} eq 'grpo') {
         $self->report
               (-type => 'SYNTAX_ELEMENT_DECLARATION_TYPE_NAME_GROUP',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $entname->{value});
       } else {
         die "$0: ".__PACKAGE__.": $entname->{type}: Buggy";
@@ -1859,20 +1873,20 @@ sub parse_element_declaration ($$$%) {
           } elsif ({qw/CDATA 1 RCDATA 1/}->{${$param->{value}}}) {
             $self->report
               (-type => 'SYNTAX_ELEMENT_SGML_CONTENT_KEYWORD',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $param->{value},
                keyword => ${$param->{value}});
             $pp->{ExpandedURI q<element-content-keyword>} = $param->{value};
           } elsif (${$param->{value}} eq 'o') {
             $self->report
               (-type => 'SYNTAX_ELEMENT_TAG_MIN',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $param->{value});
             redo MODEL;
           } else {
             $self->report
               (-type => 'SYNTAX_ELEMENT_UNKNOWN_CONTENT_KEYWORD',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $param->{value},
                keyword => ${$param->{value}});
           }
@@ -1880,14 +1894,14 @@ sub parse_element_declaration ($$$%) {
           shift @{$pp->{ExpandedURI q<param>}};
           $self->report
             (-type => 'SYNTAX_ELEMENT_TAG_MIN',
-             -class => 'WFC',
+             -class => 'SYNTAX',
              source => $param->{value});
           redo MODEL;
         } elsif ($param->{type} eq 'number') {
           shift @{$pp->{ExpandedURI q<param>}};
           $self->report
             (-type => 'SYNTAX_ELEMENT_RANK_SUFFIX',
-             -class => 'WFC',
+             -class => 'SYNTAX',
              source => $param->{value});
           redo MODEL;
         } else {
@@ -1907,7 +1921,7 @@ sub parse_element_declaration ($$$%) {
           @{$opt{ExpandedURI q<source>}} > 1) {
         $self->report
               (-type => 'SYNTAX_MARKUP_DECLARATION_TOO_MANY_PARAM',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => ($pp->{ExpandedURI q<param>}->[0] ?
                             $pp->{ExpandedURI q<param>}->[0]->{value} :
                             $opt{ExpandedURI q<source>}->[-1]),
@@ -1920,7 +1934,7 @@ sub parse_element_declaration ($$$%) {
     unless ($$src =~ /\G>/gc) {
       $self->report
               (-type => 'SYNTAX_MDC_REQUIRED',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $src);
     }
     $self->element_declaration_end
@@ -1971,14 +1985,14 @@ sub parse_attlist_declaration ($$$%) {
           if ({qw/ALL 1 IMPLICIT 1 NOTATION 1/}->{${$entname->{value}}}) {
             $self->report
               (-type => 'SYNTAX_ATTLIST_SGML_KEYWORD',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $entname->{value},
                keyword => ${$entname->{value}});
             last NAME unless ${$entname->{value}} eq 'NOTATION';
           } else {
             $self->report
               (-type => 'SYNTAX_ATTLIST_UNKNOWN_KEYWORD',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $entname->{value},
                keyword => ${$entname->{value}});
           }
@@ -2046,13 +2060,13 @@ sub parse_attlist_declaration ($$$%) {
                        NUMBER 1 NUMBERS 1 DATA 1/}->{${$param->{value}}}) {
             $self->report
               (-type => 'SYNTAX_ATTRDEF_TYPE_SGML_KEYWORD',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $param->{value},
                keyword => ${$param->{value}});
           } else {
             $self->report
               (-type => 'SYNTAX_ATTRDEF_TYPE_UNKNOWN_KEYWORD',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $param->{value},
                keyword => ${$param->{value}});
           }
@@ -2107,7 +2121,7 @@ sub parse_attlist_declaration ($$$%) {
               } elsif ($param->{type} eq 'Name') {
                 $self->report
                   (-type => 'SYNTAX_ATTRDEF_DEFAULT_NAME',
-                   -class => 'WFC',
+                   -class => 'SYNTAX',
                    source => $param->{value});
                 $q->{ExpandedURI q<attribute-default-value>} = $param->{value};
               } else {
@@ -2117,13 +2131,13 @@ sub parse_attlist_declaration ($$$%) {
           } elsif ({qw/CURRENT 1 CONREF 1/}->{${$param->{value}}}) {
             $self->report
               (-type => 'SYNTAX_ATTRDEF_DEFAULT_SGML_KEYWORD',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $param->{value},
                keyword => ${$param->{value}});
           } else {
             $self->report
               (-type => 'SYNTAX_ATTRDEF_DEFAULT_UNKNOWN_KEYWORD',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $param->{value},
                keyword => ${$param->{value}});
           }
@@ -2138,7 +2152,7 @@ sub parse_attlist_declaration ($$$%) {
         } elsif ($param->{type} eq 'Name') {
           $self->report
             (-type => 'SYNTAX_ATTRDEF_DEFAULT_NAME',
-             -class => 'WFC',
+             -class => 'SYNTAX',
              source => $param->{value});
           $q->{ExpandedURI q<attribute-default>} = \'specific';
           $q->{ExpandedURI q<attribute-default-value>} = $param->{value};
@@ -2161,7 +2175,7 @@ sub parse_attlist_declaration ($$$%) {
           @{$opt{ExpandedURI q<source>}} > 1) {
         $self->report
               (-type => 'SYNTAX_MARKUP_DECLARATION_TOO_MANY_PARAM',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => ($pp->{ExpandedURI q<param>}->[0] ?
                             $pp->{ExpandedURI q<param>}->[0]->{value} :
                             $opt{ExpandedURI q<source>}->[-1]),
@@ -2174,7 +2188,7 @@ sub parse_attlist_declaration ($$$%) {
     unless ($$src =~ /\G>/gc) {
       $self->report
               (-type => 'SYNTAX_MDC_REQUIRED',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $src);
     }
     $self->entity_declaration_end
@@ -2244,7 +2258,7 @@ sub parse_model_group ($$$%) {
         if ($has_pcdata) {
           $self->report
             (-type => 'SYNTAX_MODEL_GROUP_MIXED_NESTED',
-             -class => 'WFC',
+             -class => 'SYNTAX',
              source => $param->{value});
         }
         $self->parse_model_group
@@ -2257,13 +2271,13 @@ sub parse_model_group ($$$%) {
           $has_pcdata = 1;
           $self->report
             (-type => 'SYNTAX_MODEL_GROUP_PCDATA_POSITION',
-             -class => 'WFC',
+             -class => 'SYNTAX',
              source => $param->{value})
             if $i != 0;
         } else {
           $self->report
             (-type => 'SYNTAX_MODEL_GROUP_UNKNOWN_KEYWORD',
-             -class => 'WFC',
+             -class => 'SYNTAX',
              source => $param->{value},
              keyword => ${$param->{value}});
         }
@@ -2271,7 +2285,7 @@ sub parse_model_group ($$$%) {
         shift @{$pp->{ExpandedURI q<param>}};
         $self->report
           (-type => 'SYNTAX_DATA_TAG_GROUP',
-           -class => 'WFC',
+           -class => 'SYNTAX',
            source => $param->{value});
         redo PARAMS; # not implemented
       } else {
@@ -2297,14 +2311,14 @@ sub parse_model_group ($$$%) {
         if ($connect ne ${$connector->{value}}) {
           $self->report
             (-type => 'SYNTAX_MODEL_GROUP_CONNECTOR_MATCH',
-             -class => 'WFC',
+             -class => 'SYNTAX',
              source => $connector->{value},
              old => $connect,
              new => ${$connector->{value}});
         } elsif ($has_pcdata and $connect ne '|') {
           $self->report
             (-type => 'SYNTAX_MODEL_GROUP_MIXED_CONNECTOR',
-             -class => 'WFC',
+             -class => 'SYNTAX',
              source => $connector->{value},
              connector => ${$connector->{value}});
         }
@@ -2326,7 +2340,7 @@ sub parse_model_group ($$$%) {
           @{$opt{ExpandedURI q<source>}} > 1) {
         $self->report
               (-type => 'SYNTAX_MARKUP_DECLARATION_TOO_MANY_PARAM',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => ($pp->{ExpandedURI q<param>}->[0] ?
                             $pp->{ExpandedURI q<param>}->[0]->{value} :
                             $opt{ExpandedURI q<source>}->[-1]),
@@ -2336,7 +2350,7 @@ sub parse_model_group ($$$%) {
       $$src =~ /\G\)/gc
         or $self->report
               (-type => 'SYNTAX_MODEL_GROUP_GRPC_REQUIRED',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $src);
       if ($$src =~ /\G([?+*])/gc) {
         my $del = $1;
@@ -2348,14 +2362,14 @@ sub parse_model_group ($$$%) {
           $self->report
             (-type => 'SYNTAX_MODEL_GROUP_'.($i > 1 ? 'MIXED' : 'PCDATA')
                      .'_OCCUR',
-             -class => 'WFC',
+             -class => 'SYNTAX',
              source => $src,
              position_diff => 1);
         }
       } elsif ($has_pcdata and $i > 1) {
         $self->report
           (-type => 'SYNTAX_MODEL_GROUP_PCDATA_OCCUR',
-           -class => 'WFC',
+           -class => 'SYNTAX',
            source => $src,
            position_diff => 1);
       }
@@ -2445,7 +2459,7 @@ sub parse_attrtype_group ($$$%) {
           @{$opt{ExpandedURI q<source>}} > 1) {
         $self->report
               (-type => 'SYNTAX_MARKUP_DECLARATION_TOO_MANY_PARAM',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => ($pp->{ExpandedURI q<param>}->[0] ?
                             $pp->{ExpandedURI q<param>}->[0]->{value} :
                             $opt{ExpandedURI q<source>}->[-1]),
@@ -2455,7 +2469,7 @@ sub parse_attrtype_group ($$$%) {
       $$src =~ /\G\)/gc
         or $self->report
               (-type => 'SYNTAX_ATTRDEF_TYPE_GROUP_GRPC_REQUIRED',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $src);
     }
     $self->attrtype_group_end
@@ -2481,7 +2495,7 @@ sub parse_markup_declaration_parameter ($$$%) {
       $self->report
                (-type => $opt{ExpandedURI q<error-no-match>}
                          || 'SYNTAX_PARAMETER_REQUIRED',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src);
     }
     return 0;
@@ -2503,14 +2517,14 @@ sub parse_markup_declaration_parameter ($$$%) {
           $self->report
                   (-type => $opt{ExpandedURI q<error-ps>} ||
                             'SYNTAX_MARKUP_DECLARATION_PS',
-                   -class => 'WFC',
+                   -class => 'SYNTAX',
                    position_diff => $+[0] - $-[0] + 1,
                    source => $src)
                 if not $opt{ExpandedURI q<allow-ps>};
           $self->report
                   (-type => $opt{ExpandedURI q<error-param-entref>} ||
                             'SYNTAX_PARAENT_REF_NOT_ALLOWED',
-                   -class => 'WFC',
+                   -class => 'SYNTAX',
                    position_diff => $+[0] - $-[0] + 1,
                    source => $src)
                 if not $opt{ExpandedURI q<allow-param-entref>};
@@ -2535,7 +2549,7 @@ sub parse_markup_declaration_parameter ($$$%) {
           $$src =~ /\G;/gc or
             $self->report
               (-type => 'SYNTAX_REFC_REQUIRED',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $src,
                entity_name => $pp->{ExpandedURI q<entity-name>});
 
@@ -2604,7 +2618,7 @@ sub parse_markup_declaration_parameter ($$$%) {
       } elsif ($$src =~ /\G(?=--)/gc) {
         $self->report
           (-type => 'SYNTAX_PS_COMMENT',
-           -class => 'WFC',
+           -class => 'SYNTAX',
            source => $src);
         $self->parse_comment ($src, $p, %opt);
       ## Reach to end of source text
@@ -2633,14 +2647,14 @@ sub parse_markup_declaration_parameter ($$$%) {
         $self->report
               (-type => $opt{ExpandedURI q<error-ps-required>}
                         || 'SYNTAX_MARKUP_DECLARATION_PS_REQUIRED',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $src);
       }
     } elsif (not $opt{ExpandedURI q<allow-ps>}) {
       $self->report
               (-type => $opt{ExpandedURI q<error-ps>}
                         || 'SYNTAX_MARKUP_DECLARATION_PS',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                position_diff => pos ($$src) - $pos,
                source => $src);
     }
@@ -2673,13 +2687,13 @@ sub parse_markup_declaration_parameter ($$$%) {
       $$src =~ /\G"/gc or
         $self->report
                (-type => 'SYNTAX_PLITC_REQUIRED',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src);
     } else {
       $$src =~ /\G'/gc or
         $self->report
                (-type => 'SYNTAX_PLITAC_REQUIRED',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src);
     }
     $self->parameter_literal_end
@@ -2696,14 +2710,14 @@ sub parse_markup_declaration_parameter ($$$%) {
       $$src =~ /\G"/gc or
         $self->report
                (-type => 'SYNTAX_PUBLIT_MLITC_REQUIRED',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src);
     } else {
       ($pubid) = ($$src =~ /\G([^']*)/gc);
       $$src =~ /\G'/gc or
         $self->report
                (-type => 'SYNTAX_PUBLIT_MLITAC_REQUIRED',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src);
     }
     $self->{error}->reset_position
@@ -2714,7 +2728,7 @@ sub parse_markup_declaration_parameter ($$$%) {
       my $s = $1;
       $self->report
                (-type => 'SYNTAX_PUBID_LITERAL_INVALID_CHAR',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => \$pubid,
                 position_diff => 1,
                 char => $s);
@@ -2735,14 +2749,14 @@ sub parse_markup_declaration_parameter ($$$%) {
       $$src =~ /\G"/gc or
         $self->report
                (-type => 'SYNTAX_SLITC_REQUIRED',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src);
     } else {
       ($sysid) = ($$src =~ /\G([^']*)/gc);
       $$src =~ /\G'/gc or
         $self->report
                (-type => 'SYNTAX_SLITAC_REQUIRED',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src);
     }
     pos ($sysid) = 0;
@@ -2766,7 +2780,7 @@ sub parse_markup_declaration_parameter ($$$%) {
     } else {
       $self->report
          (-type => 'SYNTAX_ENTITY_PARAM_NAME_REQUIRED',
-          -class => 'WFC',
+          -class => 'SYNTAX',
           source => $src);
       return 1;
     }
@@ -2782,7 +2796,7 @@ sub parse_markup_declaration_parameter ($$$%) {
     unless ($opt{ExpandedURI q<allow-connector>}->{$del}) {
       $self->report
         (-type => 'SYNTAX_CONNECTOR',
-         -class => 'WFC',
+         -class => 'SYNTAX',
          source => $src,
          position_diff => 1,
          connector => $del);
@@ -2833,7 +2847,7 @@ sub parse_markup_declaration_parameter ($$$%) {
       $self->report
                (-type => $opt{ExpandedURI q<error-no-match>}
                          || 'SYNTAX_PARAMETER_REQUIRED',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src);
     }
     return 0;
@@ -2899,7 +2913,7 @@ sub parse_external_identifiers ($$$%) {
     unless ($opt{ExpandedURI q<allow-public-id>}) {
       $self->report
             (-type => 'SYNTAX_PUBLIC_ID',
-             -class => 'WFC',
+             -class => 'SYNTAX',
              source => $keyword->{value});
     }
     $self->parse_markup_declaration_parameter
@@ -2941,7 +2955,7 @@ sub parse_external_identifiers ($$$%) {
     unless ($opt{ExpandedURI q<allow-system-id>}) {
       $self->report
             (-type => 'SYNTAX_SYSTEM_LITERAL',
-             -class => 'WFC',
+             -class => 'SYNTAX',
              source => $sysid->{value},
              position_diff => 1);
     }
@@ -2953,7 +2967,7 @@ sub parse_external_identifiers ($$$%) {
     unless ($opt{ExpandedURI q<allow-system-id>}) {
       $self->report
             (-type => 'SYNTAX_SYSTEM_ID',
-             -class => 'WFC',
+             -class => 'SYNTAX',
              source => $keyword->{value});
     }
     $self->parse_markup_declaration_parameter
@@ -2977,18 +2991,18 @@ sub parse_external_identifiers ($$$%) {
   
   $self->report
             (-type => 'SYNTAX_MARKUP_DECLARATION_UNKNOWN_KEYWORD',
-             -class => 'WFC',
+             -class => 'SYNTAX',
              source => $keyword->{value},
              keyword => ${$keyword->{value}});
   if ($opt{ExpandedURI q<public-id-required>}) {
     $self->report
             (-type => 'SYNTAX_PUBLIC_ID_REQUIRED'.
-             -class => 'WFC',
+             -class => 'SYNTAX',
              source => $src);
   } elsif ($opt{ExpandedURI q<system-id-required>}) {
     $self->report
             (-type => 'SYNTAX_SYSTEM_ID_REQUIRED',
-             -class => 'WFC',
+             -class => 'SYNTAX',
              source => $src);
   }
   return 1;
@@ -3025,7 +3039,7 @@ sub parse_doctype_subset ($$$%) {
           pos ($$src)++;
           $self->report
                   (-type => 'SYNTAX_EXCLAMATION_OR_QUESTION_REQUIRED',
-                   -class => 'WFC',
+                   -class => 'SYNTAX',
                    source => $src);
         }
       } elsif ($$src =~ /\G($REG_S+)/gco) {
@@ -3107,13 +3121,13 @@ sub parse_doctype_subset ($$$%) {
           $$src =~ /\G;/gc or
             $self->report
               (-type => 'SYNTAX_REFC_REQUIRED',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $src,
                entity_name => $pp->{ExpandedURI q<entity-name>});
         } else { # pero not followed by Name
           $self->report
                   (-type => 'SYNTAX_DOCTYPE_SUBSET_INVALID_CHAR',
-                   -class => 'WFC',
+                   -class => 'SYNTAX',
                    position_diff => 1,
                    source => $src,
                    char => '%');
@@ -3128,7 +3142,7 @@ sub parse_doctype_subset ($$$%) {
         my $cdata = $1;
         $self->report
                   (-type => 'SYNTAX_DOCTYPE_SUBSET_INVALID_CHAR',
-                   -class => 'WFC',
+                   -class => 'SYNTAX',
                    position_diff => 1,
                    source => $src,
                    char => $cdata);
@@ -3144,12 +3158,12 @@ sub parse_doctype_subset ($$$%) {
     if ($opt{ExpandedURI q<end-with-mse>}) {
       $self->report
                   (-type => 'SYNTAX_MSE_REQUIRED',
-                   -class => 'WFC',
+                   -class => 'SYNTAX',
                    source => $src);
     } elsif ($opt{ExpandedURI q<end-with-dsc>}) {
       $self->report
                   (-type => 'SYNTAX_ISC_REQUIRED',
-                   -class => 'WFC',
+                   -class => 'SYNTAX',
                    source => $src);
     }
   };
@@ -3165,19 +3179,19 @@ sub parse_comment_declaration ($$$%) {
     $self->parse_comment ($src, $pp, %opt);
   } elsif ($opt{ExpandedURI q<match-or-error>}) {
     $self->report (-type => 'SYNTAX_COMMENT_DECLARATION_REQUIRED',
-                   -class => 'WFC',
+                   -class => 'SYNTAX',
                    source => $src);
     return 0;
   }
   while (pos $$src < length $$src) {
     if ($$src =~ /\G(?=--)/gc) {
       $self->report (-type => 'SYNTAX_MULTIPLE_COMMENT',
-                     -class => 'WFC',
+                     -class => 'SYNTAX',
                      source => $src);
       $self->parse_comment ($src, $pp, %opt);
     } elsif ($$src =~ /\G$REG_S+/gco) {
       $self->report (-type => 'SYNTAX_S_IN_COMMENT_DECLARATION',
-                     -class => 'WFC',
+                     -class => 'SYNTAX',
                      source => $src,
                      position_diff => $+[0] - $-[0]);
     } else {
@@ -3186,7 +3200,7 @@ sub parse_comment_declaration ($$$%) {
   }
   unless ($$src =~ /\G>/gc) {
     $self->report (-type => 'SYNTAX_MDC_FOR_COMMENT_REQUIRED',
-                   -class => 'WFC',
+                   -class => 'SYNTAX',
                    source => $src);
   }
   $self->comment_declaration_end ($src, $p, $pp, %opt);
@@ -3199,7 +3213,7 @@ sub parse_comment ($$$$%) {
   unless ($$src =~ /\G--/gc) {
     if ($opt{ExpandedURI q<match-or-error>}) {
       $self->report (-type => 'SYNTAX_COMO_REQUIRED',
-                     -class => 'WFC',
+                     -class => 'SYNTAX',
                      source => $src);
     }
     return 0;
@@ -3215,7 +3229,7 @@ sub parse_comment ($$$$%) {
   unless ($$src =~ /\G--/gc) {
     $self->report
              (-type => 'SYNTAX_COMC_REQUIRED',
-              -class => 'WFC',
+              -class => 'SYNTAX',
               source => $src);
   }
   $self->comment_end ($src, $p, $pp, %opt);
@@ -3262,7 +3276,7 @@ sub parse_marked_section ($$$%) {
           $kwd{${$entname->{value}}}++;
           $self->report
             (-type => 'SYNTAX_MARKED_SECTION_KEYWORDS',
-             -class => 'WFC',
+             -class => 'SYNTAX',
              source => $entname->{value})
             if $opt{ExpandedURI q<ps-required>};
           if ($opt{ExpandedURI q<allow-section>}->{${$entname->{value}}}) {
@@ -3270,7 +3284,7 @@ sub parse_marked_section ($$$%) {
           } else {
             $self->report
               (-type => 'SYNTAX_MARKED_SECTION_KEYWORD',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $entname->{value},
                keyword => ${$entname->{value}});
           }
@@ -3287,7 +3301,7 @@ sub parse_marked_section ($$$%) {
           @{$opt{ExpandedURI q<source>}} > 1) {
         $self->report
               (-type => 'SYNTAX_MARKUP_DECLARATION_TOO_MANY_PARAM',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => ($pp->{ExpandedURI q<param>}->[0] ?
                             $pp->{ExpandedURI q<param>}->[0]->{value} :
                             $opt{ExpandedURI q<source>}->[-1]),
@@ -3300,7 +3314,7 @@ sub parse_marked_section ($$$%) {
     unless ($$src =~ /\G\[/gc) {
       $self->report
               (-type => 'SYNTAX_MSO_REQUIRED',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $src);
     }
     $pp->{ExpandedURI q<section-status>} = \%kwd;
@@ -3322,7 +3336,7 @@ sub parse_marked_section ($$$%) {
       $$src =~ /\G\]\]>/gc
         or $self->report
              (-type => 'SYNTAX_MSE_REQUIRED',
-              -class => 'WFC',
+              -class => 'SYNTAX',
               source => $src);
     } elsif (my $parser = $opt{ExpandedURI q<section-content-parser>}) {
       $pp->{ExpandedURI q<section-type>} = 'include';
@@ -3340,7 +3354,7 @@ sub parse_marked_section ($$$%) {
       $$src =~ /\G\]\]>/gc
         or $self->report
              (-type => 'SYNTAX_MSE_REQUIRED',
-              -class => 'WFC',
+              -class => 'SYNTAX',
               source => $src);
     }
     $self->marked_section_content_end
@@ -3377,7 +3391,7 @@ sub parse_ignored_section_content ($$$%) {
   if ($opt{ExpandedURI q<end-with-mse>}) {
     $self->report
       (-type => 'SYNTAX_MSE_REQUIRED',
-       -class => 'WFC',
+       -class => 'SYNTAX',
        source => $src);
   }
   return 1;
@@ -3398,7 +3412,7 @@ sub parse_processing_instruction ($$$%) {
       } elsif (lc $tn eq 'xml') {
         $self->report
                (-type => 'SYNTAX_PI_TARGET_XML',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src,
                 target_name => $tn,
                 position_diff => 3);
@@ -3407,7 +3421,7 @@ sub parse_processing_instruction ($$$%) {
     } else {
       $self->report
                (-type => 'SYNTAX_TARGET_NAME_REQUIRED',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src);
     }
     $self->processing_instruction_start
@@ -3430,7 +3444,7 @@ sub parse_processing_instruction ($$$%) {
     unless ($$src =~ /\G\?>/gc) {
       $self->report
                (-type => 'SYNTAX_PIC_REQUIRED',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src);
     }
     
@@ -3441,7 +3455,7 @@ sub parse_processing_instruction ($$$%) {
     if ($opt{ExpandedURI q<match-or-error>}) {
       $self->report
                (-type => 'SYNTAX_PROCESSING_INSTRUCTION_REQUIRED',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src);
     }
     return 0;
@@ -3504,13 +3518,13 @@ sub parse_xml_declaration ($$$%) {
         unless ($xmlver =~ /^[0-9A-Za-z.:_-]+$/) {
           $self->report
               (-type => 'SYNTAX_XML_VERSION_INVALID',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $attr->[0]->{value},
                version => $xmlver);
         }
         $self->report
               (-type => 'SYNTAX_XML_VERSION_UNSUPPORTED',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $attr->[0]->{value},
                version => $xmlver);
       }
@@ -3519,7 +3533,7 @@ sub parse_xml_declaration ($$$%) {
       if ($type eq 'xml') {
         $self->report
               (-type => 'SYNTAX_XML_VERSION_REQUIRED',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $attr->[0] ? $attr->[0]->{name} : $src);
       } elsif ($type eq 'xml-or-text') {
         $type = 'text';
@@ -3532,7 +3546,7 @@ sub parse_xml_declaration ($$$%) {
       unless ($encoding =~ /^[A-Za-z][A-Za-z0-9._-]*$/) {
         $self->report
               (-type => 'SYNTAX_XML_ENCODING_INVALID',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $attr->[0]->{value},
                encoding => $encoding);
       }
@@ -3541,7 +3555,7 @@ sub parse_xml_declaration ($$$%) {
       if ($type eq 'text') {
         $self->report
               (-type => 'SYNTAX_XML_ENCODING_REQUIRED',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $attr->[0] ? $attr->[0]->{name} : $src);
       }
     }
@@ -3552,7 +3566,7 @@ sub parse_xml_declaration ($$$%) {
       if ($type eq 'text') {
         $self->report
               (-type => 'SYNTAX_XML_STANDALONE',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $attr->[0]->{name});
       } elsif ($type eq 'xml-or-text') {
         $type = 'xml';
@@ -3560,7 +3574,7 @@ sub parse_xml_declaration ($$$%) {
       unless ($standalone eq 'yes' or $standalone eq 'no') {
         $self->report
               (-type => 'SYNTAX_XML_STANDALONE_INVALID',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $attr->[0]->{value},
                standalone => $standalone
 );
@@ -3569,7 +3583,7 @@ sub parse_xml_declaration ($$$%) {
         if ($xmlver ne '1.0') { # 1.1
           $self->report
               (-type => 'SYNTAX_XML_STANDALONE_S',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $sep->[0]);
         }
       }
@@ -3591,7 +3605,7 @@ sub parse_xml_declaration ($$$%) {
     for (@$attr) {
       $self->report
               (-type => 'SYNTAX_XML_UNKNOWN_ATTR',
-               -class => 'WFC',
+               -class => 'SYNTAX',
                source => $_->{name},
                attribute_name => ${$_->{name}});
       $q->{ExpandedURI q<xml-declaration-pseudo-attr-misc>} = $attr;
@@ -3602,7 +3616,7 @@ sub parse_xml_declaration ($$$%) {
     unless ($$src =~ /\G\?>/gc) {
       $self->report
                (-type => 'SYNTAX_PIC_REQUIRED',
-                -class => 'WFC',
+                -class => 'SYNTAX',
                 source => $src);
     }
   }
@@ -4114,4 +4128,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/06/21 06:31:04 $
+1; # $Date: 2004/06/22 07:36:20 $

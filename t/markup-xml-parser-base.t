@@ -3030,6 +3030,12 @@ comment -->
   method => 'parse_element',
   result => '0:10:WFC_UNIQUE_ATT_SPEC',
  },
+
+ {
+  t => q{<e>aa]]>bb</e>},
+  method => 'parse_element',
+  result => '0:7:SYNTAX_MSE',
+ },
 );
 
 plan tests => scalar @a;

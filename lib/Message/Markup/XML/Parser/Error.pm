@@ -14,7 +14,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Message::Markup::XML::Parser::Error;
 require Message::Util::Error::TextParser;
@@ -64,7 +64,7 @@ sub ___rule_def () {+{
   },
 }}
 
-package Message::Markup::XML::Parser::Error::WFC;
+package Message::Markup::XML::Parser::Error::SYNTAX;
 push our @ISA, 'Message::Markup::XML::Parser::Error';
 
 sub ___error_def () {+{
@@ -254,7 +254,7 @@ sub ___error_def () {+{
   },
   SYNTAX_END_TAG_REQUIRED => {
     description => q(End tag for element "%t (name => element-type-name);" required),
-    level => 'ebnf',
+    level => 'MUST',
   },
   SYNTAX_ENTITY_DATA_TYPE_NOTATION_NAME_REQUIRED => {
     description => q(Data type keyword must be followed by notation name),
@@ -306,7 +306,7 @@ sub ___error_def () {+{
   },
   SYNTAX_EXCLAMATION_OR_QUESTION_REQUIRED => {
     description => q(EXCLAMATION MARK (!) for mdo (<!) or QUESTION MARK (?) for pio (<?) expected),
-    level => 'ebnf',
+    level => 'MUST NOT',
   },
   SYNTAX_GENERAL_ENTREF => {
     description => q(General entity reference not allowed),
@@ -314,7 +314,7 @@ sub ___error_def () {+{
   },
   SYNTAX_HASH_OR_NAME_REQUIRED => {
     description => q(Either "#" (for cro (&#), character reference open, or hcro (&#x), hexdecimal character reference open) or Name (for general entity reference) expected),
-    level => 'ebnf',
+    level => 'MUST NOT',
   },
   SYNTAX_HCRO_CASE => {
     description => q(Third character of hcro (&#x) must be LATIN SMALL LETTER X (x), not LATIN CAPITAL LETTER X (X)),
@@ -428,6 +428,10 @@ sub ___error_def () {+{
     description => q(Unknown keyword "%t (name => keyword);"),
     level => 'ebnf',
   },
+  SYNTAX_MSE => {
+    description => q(GREATER-THAN SIGN (>) in "]]>" must be escaoed),
+    level => 'MUST',
+  },
   SYNTAX_MSE_REQUIRED => {
     description => q(MSE (]]>) required),
     level => 'ebnf',
@@ -438,7 +442,7 @@ sub ___error_def () {+{
   },
   SYNTAX_MULTIPLE_COMMENT => {
     description => q(Multiple comment in one comment declaration not allowed),
-    level => 'ebnf',
+    level => 'MUST NOT',
   },
   SYNTAX_MULTIPLE_DOCUMENT_ELEMENTS => {
     description => q(Multiple element cannot be the document (root) element),
@@ -462,7 +466,7 @@ sub ___error_def () {+{
   },
   SYNTAX_NO_LESS_THAN_IN_ATTR_VAL => {
     description => q(LESS-THAN SIGN (<) not allowed in attribute value literal),
-    level => 'ebnf',
+    level => 'MUST NOT',
   },
   SYNTAX_NOT_IN_CHAR => {
     description => q(Character %code-ucs (source => char); not included in document character set),
@@ -542,7 +546,7 @@ sub ___error_def () {+{
   },
   SYNTAX_REFC_REQUIRED => {
     description => q(refc (;) expected),
-    level => 'ebnf',
+    level => 'MUST',
   },
   SYNTAX_REFERENCE_AMP_REQUIRED => {
     description => q(ero (&), cro (&#) or hcro (&#x) expected),
@@ -618,15 +622,11 @@ sub ___error_def () {+{
   },
   SYNTAX_X_OR_DIGIT_REQUIRED => {
     description => q("x" (for hex character reference) or DIGIT ([0-9]) required after "&#"),
-    level => 'ebnf',
-  },
-  SYNTAX_XML_DECLARATION_IN_MIDDLE => {
-    description => q(XML or text declaration must be at exact first of entity),
-    level => 'ebnf',
+    level => 'MUST',
   },
   SYNTAX_XML_DECLARATION_REQUIRED => {
-    declaration => q(XML declaration required in XML 1.1),
-    level => 'ebnf/1.1',
+    declaration => q(XML declaration required),
+    level => 'MUST/1.1',
   },
   SYNTAX_XML_ENCODING_INVALID => {
     description => q(Encoding declaration "%t (name => encoding);" contains invalid character),
@@ -668,7 +668,18 @@ sub ___error_def () {+{
     description => q(XML Version "%t (name => version);" not supported),
     level => 'ebnf',
   },
-  
+}}
+
+=item Message::Markup::XML::Parser::Error::WFC
+
+Well-formedness constraint violations and other fatal errors.
+
+=cut
+
+package Message::Markup::XML::Parser::Error::WFC;
+push our @ISA, 'Message::Markup::XML::Parser::Error';
+
+sub ___error_def () {+{  
   WFC_ELEMENT_TYPE_MATCH => {
     description => q(Element type name in end tag (%t (name => end-tag-type-name);) MUST match with that in start tag (%t (name => start-tag-type-name);)),
     level => 'wfc',
@@ -700,7 +711,7 @@ sub ___error_def () {+{
     level => 'wfc',
   },
   WFC_PARSED_ENTITY => {
-    description => q(Referred entity "%t (name => entity-name);" is unparsed entity),
+    description => q(Entity referred (%t (name => entity-name);) is unparsed entity),
     level => 'wfc',
   },
   # WFC_PE_BETWEEN_DECLARATIONS
@@ -712,12 +723,119 @@ sub ___error_def () {+{
     description => q(Attribute "%t (name => attribute-name);" is already specified in this tag),
     level => 'wfc',
   },
+
+  FATAL_CHARREF_IN_DTD => {
+    description => q(Character reference is not allowed here),
+    level => 'fatal error',
+  },
+  FATAL_GENTREF_IN_DTD => {
+    description => q(General entity reference is not allowed here),
+    level => 'fatal error',
+  },
+  FATAL_ILLEGAL_BYTE_SEQUENCE => {
+    description => q(Illegal byte sequence found%t (name => msg, prefix => {: });),
+    level => 'fatal error',
+  },
+  FATAL_NEW_NL_IN_XML_DECLARATION => {
+    description => q(U+0085 (NEW LINE) or U+2028 (LINE SEPARATOR) cannot be used in XML or text declaration),
+    level => 'fatal error',
+  },
+  FATAL_NO_ENCODING_INFORMATION => {
+    description => q(No character encoding information available),
+    level => 'fatal error',
+  },
+  FATAL_UNKNOWN_ENCODING => {
+    description => q(Character encoding scheme "%t (name => charset);" is not implemented),
+    level => 'fatal error',
+  },
+  SYNTAX_XML_DECLARATION_IN_MIDDLE => {
+    description => q(Text declaration must be at exact first of external parsed entity),
+    level => 'fatal error',
+  },
 }}
+
+=item Message::Markup::XML::Parser::Error::VC
+
+Validity constraint violations.
+
+=cut
 
 package Message::Markup::XML::Parser::Error::VC;
 push our @ISA, 'Message::Markup::XML::Parser::Error';
 
 sub ___error_def () {+{
+}}
+
+=item Message::Markup::XML::Parser::Error::Error
+
+Other (non-fatal) errors described in XML specifications.
+
+=cut
+
+package Message::Markup::XML::Parser::Error::Error;
+push our @ISA, 'Message::Markup::XML::Parser::Error';
+
+sub ___error_def () {+{
+  ATTR_UNREAD_REF => {
+    description => q(Reference to unread general entity found in attribute value literal),
+    level => 'error',
+  },
+  GENTREF_TO_UNPARSED_IN_ENTITYVALUE => {
+    description => q(Reference to unparsed general entity not allowed),
+    level => 'error',
+  },
+  PREDEFINED_AMP => {
+    description => q(General entity declaration for "amp" must have replacement text of a reference to AMPASAND (&)),
+    level => 'MUST',
+  },
+  PREDEFINED_AMP_ESCAPE => {
+    description => q(AMPASAND (&) in general entity declaration for "amp" must be escaped),
+    level => 'REQUIRED',
+  },
+  PREDEFINED_APOS => {
+    description => q(General entity declaration for "apos" must have replacement text of a APOSTROPHE (') or a reference to APOSTROPHE (')),
+    level => 'MUST',
+  },
+  PREDEFINED_EXTERNAL => {
+    description => q(Entity declaration for predefined entity must declare as internal entity),
+    level => 'MUST',
+  },
+  PREDEFINED_GT => {
+    description => q(General entity declaration for "gt" must have replacement text of a GERATER-THAN SIGN (>) or a reference to GREATER-THAN SIGN (>)),
+    level => 'MUST',
+  },
+  PREDEFINED_LT => {
+    description => q(General entity declaration for "lt" must have replacement text of a reference to LESS-THAN SIGN (<)),
+    level => 'MUST',
+  },
+  PREDEFINED_LT_ESCAPE => {
+    description => q(LESS-THAN SIGN (<) in general entity declaration for "lt" must be escaped),
+    level => 'REQUIRED',
+  },
+  PREDEFINED_QUOT => {
+    description => q(General entity declaration for "quot" must have replacement text of a QUOTATION MARK (") or a reference to QUOTATION MARK (")),
+    level => 'MUST',
+  },
+  TEXT_DECLARATION_REQUIRED => {
+    description => q(Text declaration required for external parsed entity that does not have external encoding information and that is not encoded in UTF-8 nor UTF-16),
+    level => 'MUST',
+  },
+  UTF16_BOM => {
+    description => q(External parsed entity encoded in UTF-16 must be begin with BOM),
+    level => 'MUST',
+  },
+  XML_DECLARATION_REQUIRED => {
+    description => q(XML declaration with "encoding" pseudo attribute required for external parsed entity that does not have external encoding information and that is not encoded in UTF-8 nor UTF-16),
+    level => 'MUST',
+  },
+  XML_SPACE_TYPE => {
+    description => q(Attribute type for "xml:space" must be either "(default|preserve)", "(default)" or "(preserve)"),
+    level => 'MUST',
+  },
+  XML_SPACE_VALUE => {
+    description => q(Attribute value of "xml:space" must be either "default" or "preserve"),
+    level => 'error',
+  },
 }}
 
 package Message::Markup::XML::Parser::Error::NSWFC;
@@ -732,21 +850,109 @@ push our @ISA, 'Message::Markup::XML::Parser::Error';
 sub ___error_def () {+{
 }}
 
+=item Message::Markup::XML::Parser::Error::W3C
+
+Other recommendations referred in W3C documents.
+
+=cut
+
 package Message::Markup::XML::Parser::Error::W3C;
 push our @ISA, 'Message::Markup::XML::Parser::Error';
 
 sub ___error_def () {+{
-  FATAL_NEW_NL_IN_XML_DECLARATION => {
-    description => q(U+0085 (NEW LINE) or U+2028 (LINE SEPARATOR) cannot be used in XML or text declaration),
-    level => 'fatal',
+  # DETERMINISTIC_CONTENT_MODEL
+  DUPLICATE_ENUM_NMTOKEN => {
+    description => q(Name token "%t (name => NMTOKEN);" already used in other attribute of element type "%t (name => element-type);"),
+    level => 'SHOULD',
+  },
+  EMPTY_BUT_NOT_EMPTY_TAG => {
+    description => q(Empty element tag syntax should be used for EMPTY element),
+    level => 'SHOULD',
+  },
+  EMPTY_TAG_FOR_NON_EMPTY => {
+    description => q(Empty element tag syntax should not be used for element type "%t (name => element-type);" that has been not declared as EMPTY),
+    level => 'SHOULD',
+  },
+  ENCODING_NAME_UTF8 => {
+    description => q(Encoding name "UTF-8" should be used),
+    level => 'SHOULD',
+  },
+  ENCODING_NAME_UTF16 => {
+    description => q(Encoding name "UTF-16" should be used),
+    level => 'SHOULD',
+  },
+  ENCODING_NAME_UCS2 => {
+    description => q(Encoding name "ISO-10646-UCS-2" should be used),
+    level => 'SHOULD',
+  },
+  ENCODING_NAME_UCS4 => {
+    description => q(Encoding name "ISO-10646-UCS-4" should be used),
+    level => 'SHOULD',
+  },
+  ENCODING_NAME_ISO8859N => {
+    description => q(Encoding name "ISO-8859-%t (name => iso8859-part);" should be used),
+    level => 'SHOULD',
+  },
+  ENCODING_NAME_ISO2022JP => {
+    description => q(Encoding name "ISO-2022-JP" should be used),
+    level => 'SHOULD',
+  },
+  ENCODING_NAME_EUCJP => {
+    description => q(Encoding name "EUC-JP" should be used),
+    level => 'SHOULD',
+  },
+  ENCODING_NAME_SJIS => {
+    description => q(Encoding name "Shift_JIS" should be used),
+    level => 'SHOULD',
+  },
+  ENCODING_X_NAME => {
+    description => q(Encoding name begin with "x-" prefix should be used),
+    level => 'SHOULD',
+  },
+  FULLY_NORMALIZED_DOCUMENT => {
+    description => q(XML 1.1 document should be fully normalized),
+    level => 'SHOULD/1.1',
+  },
+  FULLY_NORMALIZED_PARSED_ENTITY => {
+    description => q(Parsed entity should be fully normalized),
+    level => 'SHOULD/1.1',
+  },
+  PREDEFINED_ENTITY => {
+    description => q(Predefined entity "%t (name => entity-name);" should be declared before it is referred),
+    level => 'SHOULD',
+  },
+  TEXT_DECLARATION_MISSING => {
+    description => q(External parsed entity should begin with text declaration),
+    level => 'SHOULD',
+  },
+  MODEL_GROUP_CONNECTOR_BEGIN => {
+    description => q(Parameter entity referred in model group should not start with connector),
+    level => 'SHOULD',
+  },
+  MODEL_GROUP_CONNECTOR_END => {
+    description => q(Parameter entity referred in model group should not end with connector),
+    level => 'SHOULD',
+  },
+  MODEL_GROUP_EMPTY => {
+    description => q(Parameter entity referred in model group should not be empty),
+    level => 'SHOULD',
+  },
+  XML_DECLARATION_MISSING => {
+    description => q(Document entity should begin with XML declaration),
+    level => 'SHOULD',
+  },
+
+  COLONED_NAME => {
+    description => q(Name (%t (name => name);) should not contain COLON (:)),
+    level => 'should',
   },
 
   RESERVED_ATTRIBUTE_NAME => {
-    description => q(Attribute name "%t (name => attribute-name);" is reserved by W3C),
+    description => q(Attribute name "%t (name => attribute-name);" is reserved for XML specification),
     level => 'reserved',
   },
   RESERVED_ELEMENT_TYPE_NAME => {
-    description => q(Element type name "%t (name => element-type-name);" is reserved by W3C),
+    description => q(Element type name "%t (name => element-type-name);" is reserved for XML specification),
     level => 'reserved',
   },
   RESERVED_ENTITY_NAME => {
@@ -759,6 +965,10 @@ sub ___error_def () {+{
   },
   RESERVED_LOCAL_NAME => {
     description => q(Local name "%t (name => local-name);" should not be used, since it is considered as reserved when used without prefix),
+    level => 'reserved',
+  },
+  RESERVED_NAME => {
+    description => q(Name "%t (name => name);" is reserved by W3C),
     level => 'reserved',
   },
   RESERVED_NAMESPACE_PREFIX => {
@@ -774,10 +984,42 @@ sub ___error_def () {+{
     level => 'reserved',
   },
 
-  TEXT_DECLARATION_MISSING => {
-    description => q(External parsed entity SHOULD begin with text declaration),
-    level => 'SHOULD',
+  # ENCODING_IANAREG_NAME [recommended]
+  AVOID_CONTROL_CHAR => {
+    description => q(Control character %code-ucs (source => char); should not be used),
+    level => 'encouraged',
   },
+  AVOID_NONCHAR => {
+    description => q(Noncharacter %code-ucs (source => char); should not be used),
+    level => 'encouraged',
+  },
+  AVOID_UNICODE_COMPAT_CHAR => {
+    description => q(Compatibility character %code-ucs (source => char); should not be used),
+    level => 'encouraged',
+  },
+  LESS_THAN_ENTITY => {
+    description=> q(General entity replacement text should not have bare LESS-THAN SIGN (<) character),
+    level => 'strongly advised',
+  },
+
+  ATTLIST_ONE_PER_ATTR => {
+    description => q(Multiple attribute definition found for attribute "%t (name => attribute-name);" of element type "%t (name => element-type);"),
+    level => 'warn',
+  },
+  ATTLIST_ONE_PER_ELEMENT => {
+    description => q(Multiple attribute definition list declaration found for element type "%t (name => element-type);"),
+    level => 'warn',
+  },
+  GENERAL_ENTITY_NAME_USED => {
+    description => q(General entity "%t (name => entity-name);" is already declared),
+    level => 'warn',
+  },
+  PARAM_ENTITY_NAME_USED => {
+    description => q(Parameter entity "%t (name => entity-name);" is already declared),
+    level => 'warn',
+  },
+
+  # 1.1 Name suggestion
 }}
 
 package Message::Markup::XML::Parser::Error::Misc;
@@ -796,11 +1038,6 @@ sub ___error_def () {+{
   PI_TARGET_NOT_DECLARED => {
     description => q(Processing instruction target name "%t (name => target-name);" should be declared as notation),
     level => 'not_declared',
-  },
-
-  XML_DECLARATION_MISSING => {
-    description => q(XML declaration missing, so that it is assumed as XML 1.0 document),
-    level => 'message',
   },
 }}
 
@@ -822,4 +1059,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/06/04 08:29:14 $
+1; # $Date: 2004/06/22 07:36:20 $
