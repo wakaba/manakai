@@ -29,24 +29,44 @@ our $IFMethod;
 our $Attr;
 my $Assert = {
   qw/assertDOMException 1
+     assertEquals 1
      assertFalse 1
+     assertInstanceOf 1
      assertNotNull 1
      assertNull 1
+     assertSame 1
      assertSize 1
-     assertTrue 1/
+     assertTrue 1
+     assertURIEquals 1/
 };
 my $Misc = {
-  qw/if 1
+  qw/append 1
+     assign 1
+     decrement 1
+     fail 1
+     if 1
      implementationAttribute 1
-     var 1/
+     increment 1
+     for 1
+     plus 1
+     var 1
+     while 1/
 };
 my $Condition = {
   qw/condition 1
      contains 1
      contentType 1
+     equals 1
+     greater 1
+     greaterOrEquals 1
      hasSize 1
      implementationAttribute 1
+     instanceOf 1
+     isNull 1
+     less 1
+     lessOrEquals 1
      not 1
+     notEquals 1
      notNull 1
      or 1/
 };
@@ -62,7 +82,11 @@ sub to_perl_value ($;%) {
   my ($s, %opt) = @_;
   if (defined $s) {
     if ($s =~ /^(?!\d)\w+$/) {
-      return perl_var (type => '$', local_name => $s);
+      if ({true => 1, false => 1}->{$s}) {
+        return {true => '1', false => '0'}->{$s};
+      } else {
+        return perl_var (type => '$', local_name => $s);
+      }
     } else {
       return $s;
     }
@@ -160,13 +184,48 @@ sub node2code ($) {
 
   if ($ln eq 'var') {
     my $name = $node->getAttributeNS (undef, 'name');
-    $result .= perl_statement
-                   perl_var
+    my $var = perl_var
                      local_name => $name,
                      scope => 'my',
                      type => '$';
-    if ($node->getAttributeNS (undef, 'value')) {
-      valid_err q<Attribute "value" not supported>, node => $node;
+    my $type = $node->getAttributeNS (undef, 'type');
+    $result .= perl_comment $type;
+    if ($node->hasAttributeNS (undef, 'isNull') and
+        $node->getAttributeNS (undef, 'isNull') eq 'true') {
+      $result .= perl_statement perl_assign $var => 'undef';
+    } elsif ($node->hasAttributeNS (undef, 'value')) {
+      $result .= perl_statement
+                   perl_assign
+                        $var
+                     => to_perl_value ($node->getAttributeNS (undef, 'value'));
+    } else {
+      if ($type eq 'List' or $type eq 'Collection') {
+        my @member;
+        my $children = $node->childNodes;
+        for (my $i = 0; $i < $children->length; $i++) {
+          my $child = $children->item ($i);
+          if ($child->nodeType == $child->ELEMENT_NODE) {
+            if ($child->localName eq 'member') {
+              push @member, perl_code_literal 
+                              (to_perl_value ($child->textContent));
+            } else {
+              valid_err q<Unsupported element type>, node => $child;
+            }
+          } elsif ($child->nodeType == $child->COMMENT_NODE) {
+            $result .= perl_comment $child->data;
+          }
+        }
+        $result .= perl_statement
+                     perl_assign
+                          $var
+                       => perl_list \@member;
+      } elsif ($type =~ /Monitor/) {
+        valid_err qq<Type $type not supported>, node => $node;
+      } elsif ($node->hasChildNodes) {
+        valid_err q<Children not supported>, node => $node;
+      } else {
+        $result .= perl_statement $var;
+      }
     }
     $Status->{var}->{$name}->{type} = $node->getAttributeNS (undef, 'type');
   } elsif ($ln eq 'load') {
@@ -185,8 +244,17 @@ sub node2code ($) {
         if $node->hasAttributeNS (undef, 'var');
       my $param;
       if ($node->hasAttributeNS (undef, 'interface')) {
-        $param = $IFMethod->{$node->getAttributeNS (undef, 'interface')}
-                          ->{$ln};
+        my $if = $node->getAttributeNS (undef, 'interface');
+        $param = $IFMethod->{$if}->{$ln};
+        unless ($param) {
+          valid_err "Method $if.$ln not supported", node => $node;
+        }
+        if ($if eq 'Element' and $ln eq 'getElementsByTagName' and
+            not $node->hasAttributeNS (undef, 'name') and
+            $node->hasAttributeNS (undef, 'tagname')) {
+          $node->setAttributeNS (undef, 'name'
+                                 => $node->getAttributeNS (undef, 'tagname'));
+        }
       } else {
         $param = $Method->{$ln};
       }
@@ -209,9 +277,18 @@ sub node2code ($) {
       } else {
         valid_err q<Unknown operation to an attribute>, node => $node;
       }
-      $result .= perl_var (type => '$',
-                           local_name => $node->getAttributeNS (undef, 'obj')).
-              '->'.$ln;
+      my $obj = perl_var (type => '$',
+                          local_name => $node->getAttributeNS (undef, 'obj'));
+      my $if = $node->getAttributeNS (undef, 'interface');
+      if (defined $if and $if eq 'DOMString') {
+        if ($ln eq 'length') {
+          $result .= 'length '.$obj;
+        } else {
+          valid_err q<$if.$ln not supported>, node => $node;
+        }
+      } else {
+        $result .= $obj.'->'.$ln;
+      }
       if ($node->hasAttributeNS (undef, 'var')) {
         $result .= ";\n";
       } elsif ($node->hasAttributeNS (undef, 'value')) {
@@ -248,6 +325,38 @@ sub node2code ($) {
                  );
       $result .= ");\n";
     $Status->{Number}++;
+  } elsif ($ln eq 'assertInstanceOf') {
+    my $obj = perl_code_literal
+                (to_perl_value ($node->getAttributeNS (undef, 'obj')));
+    $result .= perl_statement 'assertInstanceOf ('.
+                 perl_list 
+                   ($node->getAttributeNS (undef, 'id'),
+                    $node->getAttributeNS (undef, 'type'),
+                    $obj).
+               ')';
+    if ($node->hasChildNodes) {
+      $result .= perl_if
+                   'isInstanceOf ('.
+                   perl_list
+                     ($node->getAttributeNS (undef, 'type'),
+                      $obj) . ')',
+                   body2code ($node);
+    }
+    $Status->{Number}++;
+  } elsif ($ln eq 'assertSame') {
+    my $expected = to_perl_value ($node->getAttributeNS (undef, 'expected'));
+    my $actual = to_perl_value ($node->getAttributeNS (undef, 'actual'));
+    $result .= perl_statement 'assertSame ('.
+                 perl_list 
+                   ($node->getAttributeNS (undef, 'id'),
+                    $expected, $actual).
+               ')';
+    if ($node->hasChildNodes) {
+      $result .= perl_if
+                   'same ('.(perl_list $expected, $actual).')',
+                   body2code ($node);
+    }
+    $Status->{Number}++;
   } elsif ($ln eq 'assertSize') {
     my $size = to_perl_value ($node->getAttributeNS (undef, 'size'));
     my $coll = to_perl_value ($node->getAttributeNS (undef, 'collection'));
@@ -259,8 +368,9 @@ sub node2code ($) {
     if ($node->hasChildNodes) {
       $result .= perl_if
                    qq<$size == size ($coll)>,
-                   block2code ($node);
+                   body2code ($node);
     }
+    $Status->{Number}++;
   } elsif ($ln eq 'assertTrue' or $ln eq 'assertFalse') {
       my $condition;
       if ($node->hasAttributeNS (undef, 'actual')) {
@@ -280,16 +390,48 @@ sub node2code ($) {
                      perl_literal ($node->getAttributeNS (undef, 'id')).', '.
                      $condition. ')';
     $Status->{Number}++;
-    } elsif ($ln eq 'assertNotNull' or $ln eq 'assertNull') {
-      $result .= perl_statement $ln . ' (' .
+  } elsif ($ln eq 'assertNotNull' or $ln eq 'assertNull') {
+    $result .= perl_statement $ln . ' (' .
                  perl_literal ($node->getAttributeNS (undef, 'id')).', '.
                  perl_var (type => '$',
                            local_name => $node->getAttributeNS (undef, 'actual')).
                  ')';
-      if ($node->hasChildNodes) {
-        valid_err q<Child of $ln found but not supported>,
+    if ($node->hasChildNodes) {
+      valid_err q<Child of $ln found but not supported>,
           node => $node;
-      }
+    }
+    $Status->{Number}++;
+  } elsif ($ln eq 'assertURIEquals') {
+    $result .= perl_statement 'assertURIEquals ('.
+                 perl_list
+                   ($node->getAttributeNS (undef, 'id'),
+                    perl_code_literal
+                      (to_perl_value ($node->getAttributeNS (undef, 'scheme'),
+                                      default => 'undef')),
+                    perl_code_literal
+                      (to_perl_value ($node->getAttributeNS (undef, 'path'),
+                                      default => 'undef')),
+                    perl_code_literal
+                      (to_perl_value ($node->getAttributeNS (undef, 'host'),
+                                      default => 'undef')),
+                    perl_code_literal
+                      (to_perl_value ($node->getAttributeNS (undef, 'file'),
+                                      default => 'undef')),
+                    perl_code_literal
+                      (to_perl_value ($node->getAttributeNS (undef, 'name'),
+                                      default => 'undef')),
+                    perl_code_literal
+                      (to_perl_value ($node->getAttributeNS (undef, 'query'),
+                                      default => 'undef')),
+                    perl_code_literal
+                      (to_perl_value ($node->getAttributeNS (undef, 'fragment'),
+                                      default => 'undef')),
+                    perl_code_literal
+                      (to_perl_value ($node->getAttributeNS (undef, 'isAbsolute'),
+                                      default => 'undef')),
+                    perl_code_literal
+                      (to_perl_value ($node->getAttributeNS (undef, 'actual')))).
+               ')';
     $Status->{Number}++;
   } elsif ($ln eq 'assertDOMException') {
     $Status->{use}->{'Message::Util::Error'} = 1;
@@ -309,7 +451,7 @@ sub node2code ($) {
         } catch Message::DOM::DOMException with {
           my $err = shift;
           $success = 1 if $err->{-type} eq ].perl_literal ($errname).q[;
-        }
+        };
         assertTrue (].perl_literal ($node->getAttributeNS (undef, 'id')).
         q[, $success);
       }
@@ -319,10 +461,69 @@ sub node2code ($) {
     $result .= '$builder->{contentType} eq '.
                perl_literal ($node->getAttributeNS (undef, 'type'));
     $Status->{our}->{builder} = 1;
+  } elsif ($ln eq 'for-each') {
+    my $collection = $node->getAttributeNS (undef, 'collection');
+    my $collType = $Status->{var}->{$collection}->{type};
+    my $coll = to_perl_value ($collection);
+    $result .= 'for (my $i = 0; $i < '.
+               ({'Collection'=>1,'List'=>1}->{$collType}
+                  ? '@{'.$coll.'}' : $coll.'->length').
+               '; $i++) {'.
+                 perl_statement
+                   (perl_assign
+                       to_perl_value ($node->getAttributeNS (undef, 'member'))
+                    => $coll . ({'Collection'=>1,'List'=>1}->{$collType}
+                                  ? '->[$i]' : '->item ($i)')).
+                 body2code ($node).
+               '}';
+  } elsif ($ln eq 'try') {
+    my $children = $node->childNodes;
+    my $true = '';
+    my $false = '';
+    for (my $i = 0; $i < $children->length; $i++) {
+      my $child = $children->item ($i);
+      if ($child->nodeType == $child->ELEMENT_NODE) {
+        if ($child->localName eq 'catch') {
+          valid_err q<Multiple 'catch'es found>, node => $child
+            if $false;
+          my @case;
+          my $children2 = $child->childNodes;
+          for (my $j = 0; $j < $children2->length; $j++) {
+            my $child2 = $children2->item ($j);
+            if ($child2->nodeType == $child2->ELEMENT_NODE) {
+              if ($child2->localName eq 'ImplementationException') {
+                valid_err q<Element type not supported>, node => $child2;
+              } else {
+                push @case, '$err->{-type} eq '.
+                          perl_literal ($child2->getAttributeNS (undef, 'code'))
+                            => body2code ($child2);
+              }
+            } else {
+              $false .= node2code ($child2);
+            }
+          }
+          $false .= perl_cases @case, else => perl_statement '$err->throw';
+        } else {
+          $true .= node2code ($child);
+        }
+      } else {
+        $true .= node2code ($child);
+      }
+    }
+    $result = "try {
+                 $true
+               } catch Message::DOM::ManakaiDOMException with {
+                 my \$err = shift;
+                 $false
+               };";
+    $Status->{use}->{'Message::Util::Error'} = 1;
   } elsif ($ln eq 'if') {
     my $children = $node->childNodes;
     my $condition;
     my $true = '';
+    my $false = '';
+    my $assert_true = 0;
+    my $assert_false = 0;
     for (my $i = 0; $i < $children->length; $i++) {
       my $child = $children->item ($i);
       if ($child->nodeType == $child->ELEMENT_NODE) {
@@ -330,28 +531,130 @@ sub node2code ($) {
           $condition = node2code ($child);
         } elsif ($child->localName eq 'else') {
           valid_err q<Multiple 'else's found>, node => $child
-            if $true;
-          $true = $result;
-          $result = '';
+            if $false;
+          local $Status->{Number} = 0;
+          $false = body2code ($child);
+          $assert_false = $Status->{Number};
         } else {
-          $result .= node2code ($child);
+          local $Status->{Number} = 0;
+          $true .= node2code ($child);
+          $assert_true += $Status->{Number};
         }
       } else {
-        $result .= node2code ($child);
+        $true .= node2code ($child);
       }
+    }
+    if ($assert_true == $assert_false) {
+      $Status->{Number} += $assert_true;
+    } elsif ($assert_true > $assert_false) {
+      $false .= perl_statement ('is_ok ()') x ($assert_true - $assert_false);
+      $Status->{Number} += $assert_true;
+    } else {
+      $true .= perl_statement ('is_ok ()') x ($assert_false - $assert_true);
+      $Status->{Number} += $assert_false;
     }
     $result = perl_if
                 $condition,
-                $true || $result,
-                $true ? $result : undef;
+                $true,
+                $false ? $false : undef;
+  } elsif ($ln eq 'while') {
+    my $children = $node->childNodes;
+    my $condition;
+    my $true = '';
+    my $assert = 0;
+    {
+      local $Status->{Number} = 0;
+      for (my $i = 0; $i < $children->length; $i++) {
+        my $child = $children->item ($i);
+        if ($child->nodeType == $child->ELEMENT_NODE) {
+          if (not $condition) {
+            $condition = node2code ($child);
+          } else {
+            $true .= node2code ($child);
+          }
+        } else {
+          $true .= node2code ($child);
+        }
+      }
+      $assert = $Status->{Number};
+    }
+    $Status->{Number} += $assert;
+    $result .= "while ($condition) {
+                  $true
+                }";
   } elsif ($ln eq 'or') {
     $result .= condition2code ($node, join => 'or');
   } elsif ($ln eq 'not') {
     $result .= 'not '.condition2code ($node, join => 'nosupport');
-  } elsif ($ln eq 'notNull') {
+  } elsif ($ln eq 'notNull' or $ln eq 'isNull') {
     $result .= 'defined '.
                perl_var (type => '$',
                          local_name => $node->getAttributeNS (undef, 'obj'));
+    $result = 'not ' . $result if $ln eq 'isNull';
+  } elsif ({less => 1, lessOrEquals => 1,
+            greater => 1, greaterOrEquals => 1}->{$ln}) {
+    $result .= to_perl_value ($node->getAttributeNS (undef, 'actual')).
+               {less => '<', lessOrEquals => '<=',
+                greater => '>', greaterOrEquals => '>='}->{$ln}.
+               to_perl_value ($node->getAttributeNS (undef, 'expected'));
+  } elsif ($ln eq 'equals' or $ln eq 'notEquals') {
+    my $case = $node->getAttributeNS (undef, 'ignoreCase');
+    if ($case and $case eq 'auto') {
+      $result .= 'equalsAutoCase (' .
+                   perl_list
+                     ($node->getAttributeNS (undef, 'context') || 'element',
+                      to_perl_value
+                        ($node->getAttributeNS (undef, 'expected')),
+                      to_perl_value
+                        ($node->getAttributeNS (undef, 'actual'))) . ')';
+    } else {
+      my $expected = to_perl_value
+                        ($node->getAttributeNS (undef, 'expected'));
+      my $actual = to_perl_value
+                        ($node->getAttributeNS (undef, 'actual'));
+      if ($case eq 'true') {
+        $result = "(uc ($expected) eq uc ($actual))";
+      } elsif ($node->hasAttributeNS (undef, 'bitmask')) {
+        my $bm = ' & ' . to_perl_value
+                          ($node->getAttributeNS (undef, 'bitmask'));
+        $result = "($expected$bm == $actual$bm)";
+      } else {
+        $result = "($expected eq $actual)";
+      }
+    }
+    $result = "(not $result)" if $ln eq 'notEquals';
+  } elsif ($ln eq 'increment' or $ln eq 'decrement') {
+    $result .= perl_statement
+                 to_perl_value ($node->getAttributeNS (undef, 'var')).
+                 {increment => ' += ', decrement => ' -= '}->{$ln}.
+                 to_perl_value ($node->getAttributeNS (undef, 'value'));
+  } elsif ({qw/plus 1 subtract 1 mult 1 divide 1/}->{$ln}) {
+    $result .= perl_statement
+                 (perl_assign
+                     to_perl_value ($node->getAttributeNS (undef, 'var'))
+                  => to_perl_value ($node->getAttributeNS (undef, 'op1')).
+                     {qw<plus + subtract - mult * divide />}->{$ln}.
+                     to_perl_value ($node->getAttributeNS (undef, 'op2')));
+  } elsif ($ln eq 'append') {
+    $result .= perl_statement
+                 'push @{'.
+                    to_perl_value ($node->getAttributeNS (undef, 'collection')).
+                    '}, '.
+                    to_perl_value ($node->getAttributeNS (undef, 'item'));
+  } elsif ($ln eq 'instanceOf') {
+    $result .= 'isInstanceOf ('.
+               perl_list ($node->getAttributeNS (undef, 'type'),
+                          perl_code_literal to_perl_value
+                            ($node->getAttributeNS (undef, 'obj'))).
+               ')';
+  } elsif ($ln eq 'assign') {
+    $result .= perl_statement
+                 perl_assign
+                      to_perl_value ($node->getAttributeNS (undef, 'var'))
+                   => to_perl_value ($node->getAttributeNS (undef, 'value'));
+  } elsif ($ln eq 'fail') {
+    $result .= perl_statement 'fail ('.
+                 perl_literal ($node->getAttributeNS (undef, 'id')). ')';
   } else {
     valid_err q<Unknown element type: >.$ln;
   }
