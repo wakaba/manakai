@@ -13,7 +13,7 @@ package Message::Header;
 use strict;
 use vars qw($VERSION %REG %DEFAULT);
 $VERSION = '1.00';
-
+use Carp;
 use overload '@{}' => sub {shift->_delete_empty_field()->{field}},
              '""' => sub {shift->stringify};
 
@@ -48,6 +48,7 @@ when C<stringify>.  (Default = 0)
   capitalize	=> 1,
   fold_length	=> 70,
   field_type	=> {':DEFAULT' => 'Message::Field::Unstructured'},
+  format	=> 'rfc2822',	## rfc2822, usefor, http
   mail_from	=> -1,
   output_bcc	=> -1,
   parse_all	=> -1,
@@ -70,7 +71,7 @@ my @field_type_Date = qw(date date-received delivery-date expires
   expire-date nntp-posting-date posted reply-by resent-date x-tcup-date);
 for (@field_type_Date)
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Date'}
-my @field_type_MsgID = qw(content-id in-reply-to message-id
+my @field_type_MsgID = qw(article-updates content-id in-reply-to message-id
   references resent-message-id see-also supersedes);
 for (@field_type_MsgID)
   {$DEFAULT{field_type}->{$_} = 'Message::Field::MsgID'}
@@ -78,18 +79,19 @@ for (qw(received x-received))
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Received'}
 $DEFAULT{field_type}->{'content-type'} = 'Message::Field::ContentType';
 $DEFAULT{field_type}->{'content-disposition'} = 'Message::Field::ContentDisposition';
-for (qw(x-face-type))
+for (qw(archive link x-face-type))
   {$DEFAULT{field_type}->{$_} = 'Message::Field::ValueParams'}
 for (qw(accept accept-charset accept-encoding accept-language
   content-language 
-  content-transfer-encoding encrypted followup-to keywords newsgroups
+  content-transfer-encoding encrypted followup-to keywords 
+  list-archive list-digest list-help list-owner
+  list-post list-subscribe list-unsubscribe list-url uri newsgroups
   x-brother x-daughter x-respect x-moe x-syster x-wife))
   {$DEFAULT{field_type}->{$_} = 'Message::Field::CSV'}
-my @field_type_URI = qw(list-archive list-help list-owner
-  list-post list-subscribe list-unsubscribe uri url x-home-page x-http_referer
-  x-info x-pgp-key x-ml-url x-uri x-url x-web);
-for (@field_type_URI)
-  {$DEFAULT{field_type}->{$_} = 'Message::Field::Structured'}
+for (qw(content-alias content-base content-location location referer
+  url x-home-page x-http_referer
+  x-info x-pgp-key x-ml-url x-uri x-url x-web))
+  {$DEFAULT{field_type}->{$_} = 'Message::Field::URI'}
 for (qw(list-id))
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Structured'}
 for (qw(subject title x-nsubject))
@@ -211,9 +213,10 @@ sub _field_body ($$$) {
             || $self->{option}->{field_type}->{':DEFAULT'};
     eval "require $type";
     unless ($body) {
-      $body = $type->new (field_name => $name);
+      $body = $type->new (field_name => $name, format => $self->{option}->{format});
     } else {
-      $body = $type->parse ($body, field_name => $name);
+      $body = $type->parse ($body, field_name => $name,
+        format => $self->{option}->{format});
     }
   }
   $body;
@@ -284,6 +287,7 @@ sub replace ($$$) {
 
 Deletes C<field> named as $field_name.
 If $index is specified, only $index'th C<field> is deleted.
+($index of first field is C<1>, not C<0>.)
 If not, ($index == 0), all C<field>s that have the C<field-name>
 $field_name are deleted.
 
@@ -329,6 +333,34 @@ sub count ($;$) {
   $count;
 }
 
+=head2 $self->rename ($field_name, [$index])
+
+Renames C<field> named as $field_name.
+If $index is specified, only $index'th C<field> is renamed.
+($index of first field is C<1>, not C<0>.)
+If not, ($index == 0), all C<field>s that have the C<field-name>
+$field_name are renamed.
+
+=cut
+
+sub rename ($$$;$) {
+  my $self = shift;
+  my ($name, $newname, $index) = (lc shift, lc shift, shift);
+  my $i = 0;
+  croak "rename: new field-name contains of unsafe character: $newname"
+    if !$newname || $newname =~ /$REG{UNSAFE_field_name}/;
+  for my $field (@{$self->{field}}) {
+    if ($field->{name} eq $name) {
+      $i++;
+      if ($index == 0 || $i == $index) {
+        $field->{name} = $newname;
+        return $self if $i == $index;
+      }
+    }
+  }
+  $self;
+}
+
 =head2 $self->stringify ([%option])
 
 Returns the C<header> as a string.
@@ -342,13 +374,19 @@ sub stringify ($;%) {
   $OPT{capitalize} ||= $self->{option}->{capitalize};
   $OPT{mail_from} ||= $self->{option}->{mail_from};
   $OPT{output_bcc} ||= $self->{option}->{output_bcc};
+  $OPT{format} ||= $self->{option}->{format};
   push @ret, 'From '.$self->field ('mail-from') if $OPT{mail_from}>0;
   for my $field (@{$self->{field}}) {
     my $name = $field->{name};
     next unless $name;
     next if $OPT{mail_from}<0 && $name eq 'mail-from';
     next if $OPT{output_bcc}<0 && ($name eq 'bcc' || $name eq 'resent-bcc');
-    my $fbody = scalar $field->{body};
+    my $fbody;
+    if (ref $field->{body}) {
+      $fbody = $field->{body}->stringify (format => $OPT{format});
+    } else {
+      $fbody = $field->{body};
+    }
     next unless $fbody;
     $fbody =~ s/\x0D([^\x09\x0A\x20])/\x0D\x20$1/g;
     $fbody =~ s/\x0A([^\x09\x20])/\x0A\x20$1/g;
@@ -359,26 +397,26 @@ sub stringify ($;%) {
   $ret? $ret."\n": "";
 }
 
-=head2 $self->get_option ($option_name)
+=head2 $self->option ($option_name, [$option_value])
 
-Returns value of the option.
-
-=head2 $self->set_option ($option_name, $option_value)
-
-Set new value of the option.
+Set/gets new value of the option.
 
 =cut
 
-sub get_option ($$) {
-  my $self = shift;
-  my ($name) = @_;
-  $self->{option}->{$name};
-}
-sub set_option ($$$) {
+sub option ($$;$) {
   my $self = shift;
   my ($name, $value) = @_;
-  $self->{option}->{$name} = $value;
-  $self;
+  if (defined $value) {
+    $self->{option}->{$name} = $value;
+    if ($name eq 'format') {
+      for my $f (@{$self->{field}}) {
+        if (ref $f) {
+          $f->option (format => $value);
+        }
+      }
+    }
+  }
+  $self->{option}->{$name};
 }
 
 sub field_type ($$;$) {
@@ -492,7 +530,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/26 15:19:53 $
+$Date: 2002/03/31 13:12:41 $
 
 =cut
 

@@ -13,7 +13,7 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw($VERSION %DEFAULT);
-$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 use Message::Header;
 use overload '""' => sub {shift->stringify};
@@ -23,6 +23,7 @@ use overload '""' => sub {shift->stringify};
   body_class	=> {'/DEFAULT' => 'Message::Body::TextPlain'},
   fill_date	=> 1,
   fill_msgid	=> 1,
+  format	=> 'rfc2822',	## rfc2822, usefor, http
   parse_all	=> -1,
   ua_field_name	=> 'user-agent',
   ua_use_config	=> 1,
@@ -39,7 +40,7 @@ sub new ($;%) {
   my $class = shift;
   my $self = bless {option => {@_}}, $class;
   for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
-  $self->{header} = new Message::Header;
+  $self->{header} = new Message::Header (format => $self->{option}->{format});
   #$self->_add_ua_field;
   $self;
 }
@@ -67,7 +68,8 @@ sub parse ($$;%) {
     }
   }
   $self->{header} = Message::Header->parse (join ("\n", @header),
-    parse_all => $self->{option}->{parse_all});
+    parse_all => $self->{option}->{parse_all},
+    format => $self->{option}->{format});
   $self->{body} = join "\n", @body;
   $self->{body} = $self->_body ($self->{body}, $self->content_type)
     if $self->{option}->{parse_all}>0;
@@ -91,10 +93,11 @@ sub header ($;$) {
     $self->{header} = $new_header;
   } elsif ($new_header) {
     $self->{header} = Message::Header->parse ($new_header,
-      parse_all => $self->{option}->{parse_all});
+      parse_all => $self->{option}->{parse_all},
+      format => $self->{option}->{format});
   }
   unless ($self->{header}) {
-    $self->{header} = new Message::Header ();
+    $self->{header} = new Message::Header (format => $self->{option}->{format});
   }
   $self->{header};
 }
@@ -143,18 +146,29 @@ Returns the C<message> as a string.
 sub stringify ($;%) {
   my $self = shift;
   my %OPT = @_;
+  $OPT{format} ||= $self->{option}->{format};
   if (($OPT{fill_date} || $self->{option}->{fill_date})>0
     && !$self->{header}->field_exist ('date')) {
     $self->{header}->field ('date')->unix_time (time);
   }
   if (($OPT{fill_msgid} || $self->{option}->{fill_msgid})>0
     && !$self->{header}->field_exist ('message-id')) {
-    my $from = $self->{header}->field ('from')->addr_spec (0);
+    my $from = $self->{header}->field ('from')->addr_spec (1);
     $self->{header}->field ('message-id')->add_new (addr_spec => $from)
       if $from;
   }
   $self->_add_ua_field;
-  my ($header, $body) = ($self->{header}, $self->{body});
+  my ($header, $body);
+  if (ref $self->{header}) {
+    $header = $self->{header}->stringify (format => $OPT{format});
+  } else {
+    $header = $self->{header};
+  }
+  if (ref $self->{body}) {
+    $body = $self->{body}->stringify (format => $OPT{format});
+  } else {
+    $body = $self->{body};
+  }
   $header .= "\n" if $header && $header !~ /\n$/;
   $header."\n".$body;
 }
@@ -171,6 +185,9 @@ sub option ($$;$) {
   my ($name, $newval) = @_;
   if ($newval) {
     $self->{option}->{$name} = $newval;
+    if ($name eq 'format') {
+      $self->header->option ($name => $newval);
+    }
   }
   $self->{option}->{$name};
 }
@@ -257,7 +274,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/26 15:19:53 $
+$Date: 2002/03/31 13:12:41 $
 
 =cut
 
