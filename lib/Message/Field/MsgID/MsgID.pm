@@ -13,13 +13,15 @@ draft-ietf-usefor-msg-id-alt-00 is supported.
 
 package Message::Field::MsgID::MsgID;
 use strict;
+BEGIN {
 use vars qw(%REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Carp;
 use overload '""' => sub {shift->stringify};
 use autouse Digest::MD2 => qw(md2_hex md2_base64);
 use autouse Digest::MD5 => qw(md5_hex md5_base64);
 use autouse Digest::SHA1 => qw(sha1_hex sha1_base64);
+1}
 
 $REG{quoted_string} = qr/\x22(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\xFF])*\x22/;
 $REG{domain_literal} = qr/\x5B(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x5A\x5E-\xFF])*\x5D/;
@@ -255,7 +257,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/21 04:18:38 $
+$Date: 2002/04/01 05:50:01 $
 
 =cut
 
