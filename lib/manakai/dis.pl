@@ -24,12 +24,11 @@ require Message::Markup::SuikaWikiConfig20::Parser;
 our $State ||= {
   ## DefaultFor
   ## For         For definition
-  ## for_def_required
+  ## def_required
   ## Module      Module definitions
   ## module      Namespace URI of the primary module
   ## Namespace   Namespace bindings
   ## Type        Type definitions
-  ## type_def_required
 };
 our $ClassDefElementTypes = {qw/ClassDef 1 IFDef 1 DataTypeDef 1
                                 ExceptionDef 1 WarningDef 1/};
@@ -68,7 +67,7 @@ sub dis_nsprefix_to_uri ($;%) {
           return $State->{Namespace}->{'#default'}->{uri};
         } else {
           if (defined $State->{module}) {
-            return $State->{module};
+            return $State->{Module}->{$State->{module}}->{Namespace};
           }
           valid_err (qq'Namespace prefix "#default" not defined',
                      node => $opt{node});
@@ -108,6 +107,99 @@ sub dis_qname_to_uri ($;%) {
   }
 }
 
+=item ($uri, $local_name) = dis_qname_to_pair ($qname, %opt)
+
+Split QName into namespace prefix and local name 
+and return pair of namespace URI and local name.
+
+=cut
+
+sub dis_qname_to_pair ($;%) {
+  my ($qname, %opt) = @_;
+  my ($prefix, $lname) = split /:/, $qname, 2;
+  if (defined $lname) {
+    if ($prefix eq 'URI') {
+      return (undef, $lname);
+    } else {
+      my $uri = dis_nsprefix_to_uri ($prefix, %opt);
+      return ($uri, $lname);
+    }
+  } else {
+    my $uri = dis_nsprefix_to_uri (undef, %opt);
+    return ($uri, $prefix);
+  }
+}
+
+=item $uri = dis_typeforuris_to_uri ($type_uri, $for_uri, %opt)
+
+Return the URI reference identifying a pair of "Type" and 
+"For".
+
+If the "For" URI reference equals to C<ManakaiDOM:all>, the 
+result URI reference is the "Type" URI reference itself.  
+Otherwise, a URI reference generated from the two URI references 
+are returned.
+
+=cut
+
+sub dis_typeforuris_to_uri ($$;%) {
+  my ($type, $for, %opt) = @_;
+  $type ||= ExpandedURI q<DOMMain:any>;
+  $for ||= ExpandedURI q<ManakaiDOM:all>;
+  if ($for eq ExpandedURI q<ManakaiDOM:all>) {
+    return dis_type_canon_uri ($type);
+  } else {
+    for ($type, $for) {
+      s{([^0-9A-Za-z:;?=_./-])}{sprintf '%%%02X', ord $1}ge;
+    }
+    return dis_type_canon_uri
+             (qq<data:,200411tf#xmlns(t=data:,200411tf%23)t:tf($type,$for)>);
+  }
+}
+
+=item $uri = dis_typeforqnames_to_uri ($qnameqname, %opt)
+
+Expand a TypeForQNameQName into a URI reference.
+
+=cut
+
+sub dis_typeforqnames_to_uri ($;%) {
+  my ($qq, %opt) = @_;
+  my ($typeq, $forq) = split /::/, $qq, 2;
+  my ($type, $for);
+  if (defined $forq) {
+    $type = dis_qname_to_uri ($typeq, %opt);
+    if (length $forq) {
+      $for = dis_qname_to_uri ($forq, %opt);
+    } else {
+      $for = ExpandedURI q<ManakaiDOM:all>;
+    }
+  } else {
+    $type = dis_qname_to_uri ($typeq, %opt);
+    $for = $opt{For} || ExpandedURI q<ManakaiDOM:all>;
+  }
+  return dis_typeforuris_to_uri ($type, $for, %opt);
+}
+
+=item dis_type_canon_uri ($type_uri, %opt)
+
+Canonicalize "Type" URI reference.
+
+=cut
+
+sub dis_type_canon_uri ($;%) {
+  my ($type_uri, %opt) = @_;
+  if ($opt{dont_canon_uri}) {
+    return $type_uri;
+  } else {
+    if (defined $State->{Type}->{$type_uri}->{Namespace}) {
+      return $State->{Type}->{$type_uri}->{Namespace};
+    } else {
+      return $type_uri;
+    }
+  }
+}
+
 =item $for_node/1/undef = dis_node_for_match ($node, $for_uri, %opt)
 
 Return whether the C<$node> matches to the C<$for_uri>. 
@@ -133,7 +225,7 @@ sub dis_node_for_match ($$%) {
           # 
         } elsif ($f =~ /^!(.+)$/) {
           my $uri = dis_qname_to_uri ($1, use_default_namespace => 1, %opt);
-          $State->{for_def_required}->{$uri} ||= 1;
+          $State->{def_required}->{For}->{$uri} ||= 1;
           if (dis_uri_for_match ($uri, $for_uri, %opt, node => $_)) {
             $ok = 0;
             last;
@@ -141,7 +233,7 @@ sub dis_node_for_match ($$%) {
         } else {
           my $uri = dis_qname_to_uri ($f, use_default_namespace => 1, %opt,
                                       node => $_);
-          $State->{for_def_required}->{$uri} ||= 1;
+          $State->{def_required}->{For}->{$uri} ||= 1;
           unless (dis_uri_for_match ($uri, $for_uri, %opt, node => $_)) {
             $ok = 0;
             last;
@@ -172,7 +264,7 @@ sub dis_node_ctype_match ($$%) {
     next unless $_->node_type eq '#element';
     if ($_->local_name eq 'ContentType') {
       my $uri = dis_qname_to_uri ($_->value, use_default_namespace => 1, %opt);
-      $State->{type_def_required}->{$uri} ||= 1;
+      $State->{def_required}->{Class}->{$uri} ||= 1;
       unless (dis_uri_ctype_match ($uri, $type_uri, %opt)) {
         return undef;
       }
@@ -257,8 +349,8 @@ sub dis_uri_for_match ($$%) {
   if ($dis_uri_for_match_loop == 1024) {
     valid_err (qq'$0: "For" URI inheritance might be looping');
   }
-  for (@{$State->{For}->{$for_uri}->{ISA}||[]},
-       @{$State->{For}->{$for_uri}->{Implement}||[]}) {
+  for (keys %{$State->{For}->{$for_uri}->{ISA}||{}},
+       keys %{$State->{For}->{$for_uri}->{Implement}||{}}) {
     if (dis_uri_for_match ($uri, $_, %opt)) {
       return 1;
     }
@@ -442,20 +534,48 @@ sub dis_load_module_file (%) {
                node => $opt{module_node});
   }
   my $file_name = dis_get_module_file_path (%opt);
-  open my $file, '<', $file_name or impl_err (qq<$file_name: $!>,
-                                              node => $opt{module_node});
-  impl_msg (qq<Opening file "$file_name"...\n>,
-            node => $opt{module_node});
-  local $/ = undef;
-  my $source = Message::Markup::SuikaWikiConfig20::Parser->parse_text (<$file>);
-  my $mod = $source->get_attribute ('Module');
-  unless ($mod) {
-    valid_err q<"Module" element required>, node => $source;
-  }
-  for (@{$source->child_nodes}) {
-    next unless $_->node_type eq '#element';
-    if ($_->local_name eq 'Namespace') {
-      dis_load_namespace_element ($_, %opt);
+  my $source; ## Root node
+  my $mod;    ## Module element
+  if ($State->{module_file_loaded}->{$file_name}) {
+    $mod = ($source = $State->{module_file_loaded}->{$file_name})
+           ->get_attribute ('Module');
+    ## Load Namespace Bindings
+    for (@{$source->child_nodes}) {
+      next unless $_->node_type eq '#element';
+      if ($_->local_name eq 'Namespace') {
+        dis_load_namespace_element ($_, %opt);
+      }
+    }
+  } else {
+    open my $file, '<', $file_name or impl_err (qq<$file_name: $!>,
+                                                node => $opt{module_node});
+    impl_msg (qq<Opening file "$file_name"...\n>,
+              node => $opt{module_node});
+    local $/ = undef;
+    $State->{module_file_loaded}->{$file_name} = $source
+      = Message::Markup::SuikaWikiConfig20::Parser
+                                        ->parse_text (<$file>);
+    $mod = $source->get_attribute ('Module');
+    unless ($mod) {
+      valid_err q<"Module" element required>, node => $source;
+    }
+    ## Load Namespace Bindings
+    for (@{$source->child_nodes}) {
+      next unless $_->node_type eq '#element';
+      if ($_->local_name eq 'Namespace') {
+        dis_load_namespace_element ($_, %opt);
+      }
+    }
+    ## Load For Definitions
+    for (@{$source->child_nodes}) {
+      next unless $_->node_type eq '#element';
+      if ($_->local_name eq 'ForDef') {
+        dis_load_fordef_element ($_, %opt);
+      }
+    }
+    unless ($opt{For} eq ExpandedURI q<ManakaiDOM:all>) {
+      dis_load_module_file (%opt, use_default_for => 0,
+                            For => ExpandedURI q<ManakaiDOM:all>);
     }
   }
   if (not defined $opt{For} and $opt{use_default_for}) {
@@ -466,24 +586,21 @@ sub dis_load_module_file (%) {
       $State->{DefaultFor} = ExpandedURI q<ManakaiDOM:all>;
     }
     $opt{For} = $State->{DefaultFor};
-    $State->{for_def_required}->{$State->{DefaultFor}} ||= 1;
+    $State->{def_required}->{For}->{$State->{DefaultFor}} ||= 1;
   }
-  for (@{$source->child_nodes}) {
-    next unless $_->node_type eq '#element';
-    if ($_->local_name eq 'Module') {
-      unless (dis_load_module_element ($_, %opt,
-                                       module_file_name => $file_name)) {
-        ## Module is already loaded
-        return $source;
+  ## Load Module Definition
+  if (dis_load_module_element ($mod, %opt,
+                               module_file_name => $file_name)) {
+    ## Load Class Definitions
+    for (@{$source->child_nodes}) {
+      next unless $_->node_type eq '#element';
+      next unless dis_node_for_match ($_, $opt{For}, %opt);
+      if ($ClassDefElementTypes->{$_->local_name}) {
+        dis_load_classdef_element ($_, %opt);
       }
     }
-  }
-  for (@{$source->child_nodes}) {
-    next unless $_->node_type eq '#element';
-    next unless dis_node_for_match ($_, $opt{For}, %opt);
-    if ($ClassDefElementTypes->{$_->local_name}) {
-      dis_load_classdef_element ($_, %opt);
-    }
+  } else {
+    ## Module@For already loaded
   }
   return $source;
 }}
@@ -497,30 +614,33 @@ is already loaded, return C<0>.  Otherwise, C<1> is returned.
 
 sub dis_load_module_element ($;%) {
   my ($node, %opt) = @_;
-  my $mod = {FileName => $opt{module_file_name}};
-  for (@{$node->child_nodes}) {
-    next unless $_->node_type eq '#element';
-    my $ln = $_->local_name;
-    if ($ln eq 'Namespace') {
-      my $uri = $_->value;
-      if (not defined $State->{module}) {
-        $State->{module} = $uri;
-      }
-      if (defined $State->{Module}->{$uri}->{Namespace}) {
-        ## Already loaded
-        return 0;
-      } else {
-        $State->{Module}->{$uri} = $mod;
-        $mod->{Namespace} = $uri;
-      }
-    } elsif ($ln eq 'Name') {
-      $mod->{Name} = $_->value;
-    } elsif ($ln eq 'ForDef') {
-      dis_load_fordef_element ($_, %opt);
-    }
+  my $mod = {
+    FileName => $opt{module_file_name},
+    Namespace => $node->get_attribute_value ('Namespace'),
+  };
+  for ($node->get_attribute ('QName')) {
+    valid_err (q<Module "QName" attribute required>, node => $node) unless $_;
+    my ($uri, $lname) = dis_qname_to_pair ($_->value, %opt, node => $_);
+    $mod->{Name} = $lname;
+    $mod->{NameURI} = dis_qname_to_uri ($_->value, %opt, node => $_);
+    $mod->{For}->{$opt{For} || ExpandedURI q<ManakaiDOM:all>} = 1;
+    $mod->{URI} = dis_typeforuris_to_uri ($mod->{NameURI}, $opt{For}, %opt);
+    $mod->{ModuleGroup} = $uri;
+    $mod->{def_required}->{ModuleGroup}->{$uri} ||= 1;
+    $mod->{ISA}->{$mod->{NameURI}} = 1
+      unless $mod->{For}->{ExpandedURI q<ManakaiDOM:all>};
   }
-  unless (defined $mod->{Namespace}) {
+  if (not defined $mod->{Namespace}) {
     valid_err (q<Namespace URI of the module not defined>, node => $node);
+  } elsif (not defined $mod->{NameURI}) {
+    valid_err (q<Module name not defined>, node => $node);
+  } elsif (defined $State->{Module}->{$mod->{URI}}->{URI}) {
+    ## Already loaded
+    $State->{module} = $mod->{URI};
+    return 0;
+  } else {
+    $State->{Module}->{$mod->{URI}} = $mod;
+    $State->{module} = $mod->{URI};
   }
   for (@{$node->child_nodes}) {
     next unless $_->node_type eq '#element';
@@ -576,16 +696,25 @@ Load C<For> definitions from a node.
 
 sub dis_load_fordef_element ($;%) {
   my ($node, %opt) = @_;
-  my $for = {};
   my $uri = dis_qname_to_uri ($node->get_attribute_value ('QName'),
                               use_default_namespace => 1, %opt,
                               node => $node);
-  if (defined $State->{For}->{$uri}->{Namespace}) {
-    valid_err (q<"For" <$uri> already defined>, node => $node);
+  if (defined $State->{For}->{$uri}->{URI}) {
+    valid_err (qq<"For" <$uri> already defined>, node => $node);
   }
-  $for->{Namespace} = $uri;
-  $State->{For}->{$uri} = $for;
-  $State->{for_def_required}->{$uri} = -1;
+  $State->{For}->{$uri} = my $for = {
+    NameURI => $uri,
+    URI => $uri,
+    ISA => {},
+    Implement => {},
+  };
+  $State->{def_required}->{For}->{$uri} = -1;
+
+  ## TODO: Use general documentation converter
+  my $fn = dis_get_attr_node (%opt, name => 'FullName', parent => $node);
+  if ($fn) {
+    $for->{FullName} = disdoc_inline2text ($fn->value, %opt, node => $fn);
+  }
   
   for (@{$_->child_nodes}) {
     next unless $_->node_type eq '#element';
@@ -593,17 +722,17 @@ sub dis_load_fordef_element ($;%) {
     if ($ln eq 'ISA' or $ln eq 'Implement') {
       my $uri = dis_qname_to_uri ($_->value, use_default_namespace => 1,
                                   %opt, node => $_);
-      push @{$for->{$ln}||=[]}, $uri;
-      $State->{for_def_required}->{$uri} ||= 1;
+      $for->{$ln}->{$uri} = 1;
+      $State->{def_required}->{For}->{$uri} ||= 1;
     } elsif ({qw/QName 1 FullName 1 Description 1/}->{$ln}) {
       # 
     } else {
       valid_err (q<Unsupported element type>, node => $_);
     }
   }
-  push @{$for->{ISA}}, ExpandedURI q<ManakaiDOM:all>
-    if not @{$for->{ISA}||=[]} and
-       not $for->{Namespace} eq ExpandedURI q<ManakaiDOM:all>;
+  $for->{ISA}->{ExpandedURI q<ManakaiDOM:all>} = 1
+    if not keys %{$for->{ISA}} and
+       not $for->{URI} eq ExpandedURI q<ManakaiDOM:all>;
 }
 
 =item dis_load_namespace_element ($node, %opt)
@@ -634,6 +763,7 @@ markup language element type, etc.) definition.
 
 {
 our $dis_load_classdef_element_loop = 0;
+our $dis_anon_class_id = 0;
 sub dis_load_classdef_element ($;%);
 sub dis_load_classdef_element ($;%) {
   my ($node, %opt) = @_;
@@ -641,7 +771,108 @@ sub dis_load_classdef_element ($;%) {
   if ($dis_load_classdef_element_loop == 1024) {
     valid_err (q<Class definition nests too deep>, node => $node);
   }
-  my $cls = {Type => [], ISA => [], Implement => []};
+  my $cls;
+  my $qn = $node->get_attribute ('QName');
+  my $ln = $node->get_attribute ('Name');
+  my $al = dis_get_attr_node (%opt, parent => $node, name => 'AliasFor');
+  if ($qn) { ## Global class
+    my ($nuri, $lname) = dis_qname_to_pair ($qn->value, 
+                                            use_default_namespace => 1,
+                                            %opt, node => $node);
+    my $uri = dis_qname_to_uri ($qn->value, use_default_namespace => 1,
+                                %opt, node => $node);
+    my $dfuri = dis_typeforuris_to_uri ($uri, $opt{For}, %opt);
+    unless ($al) {
+      $cls = ($State->{Type}->{$dfuri} ||= {});
+      if (defined $cls->{Name}) {
+        valid_err (qq<Class <$dfuri> already defined>, node => $node);
+      }
+      $cls->{Name} = $lname;
+      $cls->{NameURI} = $uri;
+      $cls->{URI} = $dfuri;
+    } else {
+      my $canon = dis_qname_to_uri ($al->value, %opt, node => $al);
+      $cls = $State->{Type}->{$dfuri} = ($State->{Type}->{$canon} ||= {});
+      $State->{def_required}->{Class}->{$dfuri} ||= 1;
+    }
+    $cls->{For}->{$opt{For} ||= ExpandedURI q<ManakaiDOM:all>} = 1;
+    if ($State->{current_class_container}) {
+      $State->{current_class_container}->{Class}->{$dfuri} = $cls;
+    }
+    $State->{def_required}->{Class}->{$dfuri} = -1;
+    unless ($opt{For} eq ExpandedURI q<ManakaiDOM:all>) {
+      my $alluri = dis_typeforuris_to_uri ($uri, ExpandedURI q<ManakaiDOM:all>,
+                                           %opt);
+      $cls->{ISA}->{$alluri} = 1;
+      #$State->{def_required}->{Class}->{$alluri} ||= 1;
+    }
+  } elsif ($ln) {
+    my $lname = $ln->value;
+    unless ($State->{current_class_container}) {  ## Root class (global)
+      my $uri = $State->{Module}->{$State->{module}}->{Namespace} . $lname;
+      my $dfuri = dis_typeforuris_to_uri ($uri, $opt{For}, %opt);
+      unless ($al) {
+        $cls = ($State->{Type}->{$dfuri} ||= {});
+        if (defined $cls->{Name}) {
+          valid_err (q<Class <$dfuri> is already defined>, node => $node);
+        }
+        $cls->{Name} = $lname;
+        $cls->{NameURI} = $uri;
+        $cls->{URI} = $dfuri;
+      } else {
+        my $canon = dis_qname_to_uri ($al->value, %opt, node => $al);
+        $cls = $State->{Type}->{$dfuri} = ($State->{Type}->{$canon} ||= {});
+        $State->{def_required}->{Class}->{$dfuri} ||= 1;
+      }
+      $cls->{For}->{$opt{For} || ExpandedURI q<ManakaiDOM:all>} = 1;
+      $State->{def_required}->{Class}->{$dfuri} = -1;
+      unless ($opt{For} eq ExpandedURI q<ManakaiDOM:all>) {
+        my $alluri = dis_typeforuris_to_uri ($uri, ExpandedURI q<ManakaiDOM:all>,
+                                             %opt);
+        $cls->{ISA}->{$alluri} = 1;
+        #$State->{def_required}->{Class}->{$alluri} ||= 1;
+      }
+    } else {  ## Local class
+      my $dfuri = dis_typeforuris_to_uri ($lname, $opt{For}, %opt);
+      unless ($al) {
+        $cls = ($State->{current_class_container}->{Class}->{$dfuri} ||= {});
+        if (defined $cls->{Name}) {
+          valid_err (q<Local class <$dfuri> is already defined>, node => $node);
+        }
+        $cls->{Name} = $lname;
+      } else {
+        my $canon = dis_qname_to_uri ($al->value, %opt, node => $al);
+        $cls = $State->{current_class_container}->{Class}->{$dfuri}
+             = ($State->{current_class_contaner}->{Class}->{$canon} ||= {});
+        $State->{def_required}->{Class}->{$dfuri} ||= 1;
+      }
+      $cls->{For}->{$opt{For} || ExpandedURI q<ManakaiDOM:all>} = 1;
+      unless ($opt{For} eq ExpandedURI q<ManakaiDOM:all>) {
+        my $alluri = dis_typeforuris_to_uri ($lname,
+                                             ExpandedURI q<ManakaiDOM:all>,
+                                             %opt);
+        $cls->{ISA}->{$alluri} = 1;
+        #$State->{def_required}->{Class}->{$alluri} ||= 1;
+      }
+    }
+  } else { ## Anon class
+    if ($al) {
+      valid_err (q<Name is required for alias>, node => $node);
+    }
+    my $lname = sprintf '_:dis-class-%d', $dis_anon_class_id++;
+    my $dfuri = dis_typeforuris_to_uri ($lname, $opt{For}, %opt);
+    if ($State->{current_class_container}) {
+      $cls = ($State->{current_class_container}->{Class}->{$dfuri} ||= {});
+    } else {
+      $cls = ($State->{Type}->{$dfuri} ||= {});
+    }
+    if (defined $cls->{Name}) {
+      impl_err (q<Anonymous class <$dfuri> already defined>, node => $node);
+    }
+    $cls->{Name} = '';
+    $cls->{For}->{$opt{For} || ExpandedURI q<ManakaiDOM:all>} = 1;
+  }
+
   my $et = $node->local_name;
   if ($et eq 'IFDef') {
     $node->append_new_node (type => '#element',
@@ -660,64 +891,37 @@ sub dis_load_classdef_element ($;%) {
                             local_name => 'Type')
          ->inner_text (new_value => 'URI:'.ExpandedURI q<ManakaiDOM:Warning>);
   }
-  my $alias = dis_get_attr_node (%opt, parent => $node,
-                                 name => 'AliasOf');
-  if ($alias) {
-    my $uri = dis_qname_to_uri ($alias->value, use_default_namespace => 1,
-                                %opt, node => $_);
-    if (defined $State->{Type}->{$uri}->{Namespace}) {
-      $cls = $State->{Type}->{$uri};
-    } else {
-      $State->{Type}->{$uri} = $cls;
-      $State->{type_def_required}->{$uri} ||= 1;
-    }
-  }
+
   for (@{$node->child_nodes}) {
     next unless $_->node_type eq '#element';
     next unless dis_node_for_match ($node, $opt{For}, %opt);
     my $ln = $_->local_name;
     if ($ln eq 'Type') {
-      my $uri = dis_qname_to_uri ($_->value, use_default_namespace => 1,
-                                  %opt, node => $_);
-      push @{$cls->{Type}}, $uri;
-      $State->{type_def_required}->{$uri} ||= 1;
-    } elsif ($ln eq 'QName' or $ln eq 'Name') {
-      my $uri = dis_qname_to_uri ($_->value, %opt, node => $_,
-                                  use_default_namespace => $State->{module});
-      if (defined $State->{Type}->{$uri}->{Namespace} and
-          not defined $cls->{Namespace}) {
-        valid_err (qq<Type <$uri> is already defined>, node => $_);
-      } else {
-        if ($State->{Type}->{$uri}) {
-          push @{$cls->{ISA}||=[]}, @{$State->{Type}->{$uri}->{ISA}||[]};
-          push @{$cls->{Implement}||=[]}, @{$State->{Type}->{$uri}->{Implement}||[]};
-          push @{$cls->{Type}||=[]}, @{$State->{Type}->{$uri}->{Type}||[]};
-        }
-        $State->{Type}->{$uri} = $cls;
-      }
-      if (not defined $cls->{Namespace}) {
-        $cls->{Namespace} = $uri;
-      }
-      $State->{type_def_required}->{$uri} = -1;
+      my $uri = dis_typeforqnames_to_uri ($_->value, use_default_namespace => 1,
+                                          %opt, node => $_);
+      $cls->{Type}->{$uri} = 1;
+      $State->{def_required}->{Class}->{$uri} ||= 1;
     } elsif ($ln eq 'ISA' or $ln eq 'Implement') {
-      if ($alias) {
-        valid_err ("Type alias cannot add inherit relationship",
-                   node => $_);
-      }
-      my $uri = dis_qname_to_uri ($_->value, use_default_namespace => 1,
-                                  %opt, node => $_);
-      push @{$cls->{$ln}}, $uri;
-      $State->{type_def_required}->{$uri} ||= 1;
+      valid_err ("Alias class name cannot be able to have this type of elements",
+                 node => $_) if $al;
+      my $uri = dis_typeforqnames_to_uri ($_->value, use_default_namespace => 1,
+                                          %opt, node => $_);
+      $cls->{$ln}->{$uri} = 1;
+      $State->{def_required}->{Class}->{$uri} ||= 1;
     } elsif ($ClassDefElementTypes->{$ln}) {
+      valid_err ("Alias class name cannot be able to have this type of elements",
+                 node => $_) if $al;
+      local $State->{current_class_container} = $cls;
       dis_load_classdef_element ($_, %opt);
     }
   }
-  unless (@{$cls->{Type}}) {
-    valid_err (q<The "Type" of this class not specified>, node => $node);
+  unless (keys %{$cls->{Type}}) {
+    valid_err (q<Class type must be specified>, node => $node);
   }
-  push @{$cls->{ISA}}, ExpandedURI q<DOMMain:any>
-    if not @{$cls->{ISA}||=[]} and
-       not $cls->{Namespace} eq ExpandedURI q<DOMMain:any>;
+  $cls->{ISA}->{ExpandedURI q<DOMMain:any>} = 1
+    if not keys %{$cls->{ISA}||{}} and
+       (not defined $cls->{NameURI} or
+        not $cls->{NameURI} eq ExpandedURI q<DOMMain:any>);
 }}
 
 =item dis_check_undef_type_and_for (%opt)
@@ -728,16 +932,328 @@ Report an error if a type or for URI remains undefined.
 
 sub dis_check_undef_type_and_for (%) {
   my %opt = @_;
-  for (keys %{$State->{type_def_required}}) {
-    if ($State->{type_def_required}->{$_} > 0) {
-      valid_err ("Type definition for <$_> not found");
-    }
-  }
-  for (keys %{$State->{for_def_required}}) {
-    if ($State->{for_def_required}->{$_} > 0) {
-      valid_err ("For definition for <$_> not found");
+  for my $type (keys %{$State->{def_required}}) {
+    for (keys %{$State->{def_required}->{$type}}) {
+      if ($State->{def_required}->{$type}->{$_} > 0) {
+        valid_err (qq<Definition for $type <$_> is required>);
+      }
     }
   }
 }
 
-1;
+
+=head1 FUNCTIONS FOR DISDOC DOCUMENTATION
+
+=over 4
+
+=cut
+
+{
+use re 'eval';
+our $Element;
+$Element = qr/[A-Za-z0-9]+(?>:(?>[^<>]*)(?>(?>[^<>]+|<(??{$Element})>)*))?/;
+my $MElement = qr/([A-Za-z0-9]+)(?>:((?>[^<>]*)(?>(?>[^<>]+|<(??{$Element})>)*)))?/;
+
+=item $text = disdoc2text ($disdoc, %opt)
+
+Simple converter from disdoc text (block level) to plain text.
+
+=cut
+  
+sub disdoc2text ($;%);
+sub disdoc2text ($;%) {
+  my ($s, %opt) = @_;
+  $s =~ s/\x0D\x0A/\x0A/g;
+  $s =~ tr/\x0D/\x0A/;
+  my @s = split /\x0A\x0A+/, $s;
+  my @r;
+  for my $s (@s) {
+    if ($s =~ s/^\{([0-9A-Za-z-]+)::\s*//) { ## Start tag'ed element
+      my $et = $1;
+      if ($et eq 'P') { ## Paragraph
+        push @r, (disdoc_inline2text ($s, %opt));
+      } elsif ($et eq 'LI' or $et eq 'OLI') { ## List
+        my $marker = '* ';
+        if ($et eq 'OLI') {
+          $marker = '# ';
+        }
+        if ($s =~ s/^(.+?)::\s*//) {
+          $marker = disdoc_inline2text ($1, %opt) . ': ';
+        }
+        push @r, $marker . (disdoc_inline2text ($s, %opt));
+      } elsif ($et eq 'NOTE') {
+        push @r, "NOTE: ". disdoc_inline2text ($s, %opt);
+      } elsif ($et eq 'eg') {
+        push @r, "Example. ";
+        $s =~ s/^\s+//;
+        valid_err (qq<Invalid content for DISDOC "eg" element: "$s">,
+                   node => $opt{node}) if length $s;
+      } else {
+        valid_err (qq<Unknown DISDOC element type "$et">, node => $opt{node});
+      }
+    } elsif ($s =~ /^\}\s*$/) { ## End tag
+      #
+    } elsif ($s =~ s/^([-=])\s*//) { ## List
+      my $marker = $1;
+      if ($marker eq '=') {
+        $marker = '# ';
+      } elsif ($marker eq '-') {
+        $marker = '* ';
+      }
+      if ($s =~ s/^(.+?)::\s*//) {
+        $marker = disdoc_inline2text ($1, %opt) . ': ';
+      }
+      push @r, $marker . (disdoc_inline2pod ($s, %opt));
+    } elsif ($s =~ /^[^\w\s<]/) { ## Reserved for future extension
+      valid_err (qq<Broken DISDOC: "$s">, node => $opt{node});
+    } else {
+      $s =~ s/^\s+//;
+      push @r, disdoc_inline2text ($s, %opt);
+    }
+  }
+  join "\n\n", @r;
+} # disdoc2text
+
+=item $text = disdoc2text_inline ($disdoc, %opt)
+
+Simple converter from disdoc text (inline) to plain text.
+
+=cut
+
+sub disdoc_inline2text ($;%);
+sub disdoc_inline2text ($;%) {
+  my ($s, %opt) = @_;
+  $s =~ s{\G(?:([^<>]+)|<$MElement>|(.))}{
+    my ($cdata, $type, $data, $err) = ($1, $2, defined $3 ? $3 : '', $4);
+    my $r = '';
+    if (defined $err) {
+      valid_err (qq<Invalid character "$err" in DISDOC>,
+                 node => $opt{node});
+    } elsif (defined $cdata) {
+      $r = $cdata;
+    } elsif ({DFN => 1, CITE => 1, KEY => 1}->{$type}) {
+      $r = disdoc_inline2text $data;
+    } elsif ({SRC => 1}->{$type}) {
+      $r = q<[>. disdoc_inline2text ($data) . q<]>;
+    } elsif ({EM => 1}->{$type}) {
+      $r = q<*>. disdoc_inline2text ($data) . q<*>;
+    } elsif ({URI => 1}->{$type}) {
+      $r = q{<} . $data . q{>};
+    } elsif ({CODE => 1, Perl => 1}->{$type}) {
+      $r = q<"> . disdoc_inline2text ($data) . q<">;
+    } elsif ({IF => 1, TYPE => 1, P => 1, XML => 1, SGML => 1, DOM => 1,
+              FeatureVer => 1, CHAR => 1, HTML => 1, Prefix => 1,
+              Module => 1, QUOTE => 1, PerlModule => 1,
+              FILE => 1}->{$type}) {
+      $r = q<"> . $data . q<">;
+    } elsif ({Feature => 1, CP => 1, ERR => 1,
+              HA => 1, HE => 1, XA => 1, SA => 1, SE => 1}->{$type}) {
+      $r = qname_label (undef, qname => $data,
+                        no_default_ns => 1);
+    } elsif ({Q => 1, EV => 1, 
+              XE => 1}->{$type}) {
+      $r = qname_label (undef, qname => $data);
+    } elsif ({M => 1, A => 1, X => 1, WARN => 1}->{$type}) {
+      if ($data =~ /^([^.]+)\.([^.]+)$/) {
+        $r = q<"> . $1 . '->' . $2 . q<">;
+      } else {
+        $r = q<"> . $data . q<">;
+      }
+    } elsif ({InfosetP => 1}->{$type}) {
+      $r = q<[> . $data . q<]>;
+    } elsif ($type eq 'lt') {
+      $r = '<';
+    } elsif ($type eq 'gt') {
+      $r = '>';
+    } else {
+      valid_err (qq<DISDOC element type "$type" not supported>,
+                 node => $opt{node});
+    }
+    $r;
+  }ges;
+  $s;
+} # disdoc_inline2text
+
+=item $pod = disdoc2pod ($disdoc, %opt)
+
+Converter from disdoc text (block-level) to plain text.
+
+=cut
+
+sub disdoc2pod ($;%);
+sub disdoc2pod ($;%) {
+  my ($s, %opt) = @_;
+  $s =~ s/\x0D\x0A/\x0A/g;
+  $s =~ tr/\x0D/\x0A/;
+  my @s = split /\x0A\x0A+/, $s;
+  my @el = ({type => '#document'});
+  my @r;
+  for my $s (@s) {
+    if ($s =~ s/^\{([0-9A-Za-z-]+)::\s*//) { ## Start tag'ed element
+      my $et = $1;
+      if ($el[-1]->{type} eq '#list' and
+          not {qw/LI 1 OLI 1/}->{$et}) {
+        push @r, '=back';
+        pop @el;
+      }
+      push @el, {type => $et};
+      if ($et eq 'P') { ## Paragraph
+        push @r, pod_para (disdoc_inline2pod ($s, %opt));
+      } elsif ($et eq 'NOTE') {
+        push @r, pod_para (pod_em ('NOTE').": ".disdoc_inline2pod ($s, %opt));
+      } elsif ($et eq 'eg') {
+        push @r, pod_para (pod_em ('Example').". ");
+        $s =~ s/^\s+//;
+        valid_err (qq<Invalid content for DISDOC "eg" element: "$s">,
+                   node => $opt{node}) if length $s;
+      } elsif ($et eq 'LI' or $et eq 'OLI') { ## List
+        my $marker = '*';
+        unless ($el[-1]->{type} eq '#list') {
+          push @el, {type => '#list', n => 0};
+          push @r, '=over 4';
+        }
+        if ($et eq 'OLI') {
+          $marker = ++($el[-1]->{n}) . '. ';
+        }
+        if ($s =~ s/^(.+?)::\s*//) {
+          $marker = disdoc_inline2pod ($1, %opt);
+        }
+        push @r, pod_item ($marker), pod_para (disdoc_inline2pod ($s, %opt));
+      } else {
+        valid_err (qq<Unknown DISDOC element type "$et">, node => $opt{node});
+      }
+    } elsif ($s =~ /^\}\s*$/) { ## End tag
+      while (@el > 1 and $el[-1]->{type} =~ /^\#/) {
+        if ($el[-1]->{type} eq '#list') {
+          push @r, '=back';
+        }
+        pop @el;
+      }
+      if ($el[-1]->{type} eq '#document') {
+        valid_err (qq<Unmatched DISDOC end tag>, node => $opt{node});
+      } else {
+        pop @el;
+      }
+    } elsif ($s =~ s/^([-=])\s*//) { ## List
+      my $marker = $1;
+      unless ($el[-1]->{type} eq '#list') {
+        push @el, {type => '#list', n => 0};
+        push @r, '=over 4';
+      }
+      if ($marker eq '=') {
+        $marker = ++($el[-1]->{n}) . '. ';
+      } elsif ($marker eq '-') {
+        $marker = '*';
+      }
+      if ($s =~ s/^(.+?)::\s*//) {
+        $marker = disdoc_inline2pod ($1, %opt);
+      }
+      push @r, pod_item ($marker), pod_para (disdoc_inline2pod ($s, %opt));
+    } elsif ($s =~ /^[^\w\s<]/) { ## Reserved for future extension
+      valid_err (qq<Broken DISDOC: "$s">, node => $opt{node});
+    } else {
+      if ($el[-1]->{type} eq '#list') {
+        push @r, '=back';
+        pop @el;
+      }
+      $s =~ s/^\s+//;
+      push @r, pod_para disdoc_inline2pod ($s, %opt);
+    }
+  }
+  while (@el and $el[-1]->{type} =~ /^\#/) {
+    if ($el[-1]->{type} eq '#list') {
+      push @r, '=back';
+    }
+    pop @el;
+  }
+  if (@el) {
+    valid_err (qq[DISDOC end tag required for "$el[-1]->{type}"],
+               node => $opt{node});
+  }
+  wantarray ? @r : join "\n\n", @r;
+} # disdoc2pod
+
+=item $pod = disdoc_inline2pod ($disdoc, %opt)
+
+Convert disdoc text (inline) to pod.
+
+=cut
+
+sub disdoc_inline2pod ($;%);
+sub disdoc_inline2pod ($;%) {
+  my ($s, %opt) = @_;
+  $s =~ s{\G(?:([^<>]+)|<$MElement>|(.))}{
+    my ($cdata, $type, $data, $err) = ($1, $2, defined $3 ? $3 : '', $4);
+    my $r = '';
+    if (defined $err) {
+      valid_err (qq<Invalid character "$err" in DISDOC>,
+                 node => $opt{node});
+    } elsif (defined $cdata) {
+      $r = pod_cdata $cdata; 
+    } elsif ({CODE => 1, KEY => 1}->{$type}) {
+      $r = pod_code disdoc_inline2pod $data;
+    } elsif ({EM => 1}->{$type}) {
+      $r = pod_em disdoc_inline2pod $data;
+    } elsif ({DFN => 1}->{$type}) {
+      $r = pod_dfn disdoc_inline2pod $data;
+    } elsif ({CITE => 1}->{$type}) {
+      $r = q[I<] . disdoc_inline2pod ($data) . q[>];
+    } elsif ({SRC => 1}->{$type}) {
+      $r = q<[>. disdoc_inline2pod ($data) . q<]>;
+    } elsif ({URI => 1}->{$type}) {
+      $r = pod_uri $data;
+    } elsif ({
+              IF => 1, TYPE => 1, P => 1, DOM => 1, XML => 1, HTML => 1,
+              SGML => 1, FeatureVer => 1, CHAR => 1, Prefix => 1,
+              Perl => 1, FILE => 1,
+             }->{$type}) {
+      $r = pod_code $data;
+    } elsif ({Feature => 1, CP => 1, ERR => 1,
+              HA => 1, HE => 1, XA => 1, SA => 1, SE => 1}->{$type}) {
+      $r = qname_label (undef, qname => $data,
+                        out_type => ExpandedURI q<lang:pod>,
+                        no_default_ns => 1);
+    } elsif ({Q => 1, EV => 1, 
+              XE => 1}->{$type}) {
+      $r = qname_label (undef, qname => $data,
+                        out_type => ExpandedURI q<lang:pod>);
+    } elsif ({
+              M => 1, A => 1,
+             }->{$type}) {
+      if ($data =~ /^([^.]+)\.([^.]+)$/) {
+        $r = pod_code ($1 . '->' . $2);
+      } else {
+        $r = pod_code $data;
+      }
+    } elsif ({X => 1, WARN => 1}->{$type}) {
+      if ($data =~ /^([^.]+)\.([^.]+)$/) {
+        $r = pod_code ($1) . '.' . pod_code ($2);
+      } else {
+        $r = pod_code $data;
+      }
+    } elsif ({InfosetP => 1}->{$type}) {
+      $r = q<[> . $data . q<]>;
+    } elsif ({QUOTE => 1}->{$type}) {
+      $r = q<"> . $data . q<">;
+    } elsif ({PerlModule => 1}->{$type}) {
+      $r = pod_link label => pod_code ($data), module => $data;
+    } elsif ({Module => 1}->{$type}) {
+      $r = pod_link label => pod_code ($data),
+                    module => perl_package_name (name => $data);
+    } elsif ($type eq 'lt' or $type eq 'gt') {
+      $r = qq<E<$type>>;
+    } else {
+      valid_err (qq<DISDOC element type "$type" not supported>,
+                 node => $opt{node});
+    }
+    $r;
+  }ges;
+  $s;
+}
+}
+
+=back
+
+=cut
+
+1; # $Date: 2004/11/07 07:22:16 $

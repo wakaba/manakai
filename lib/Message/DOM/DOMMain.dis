@@ -9,10 +9,13 @@ Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @ManakaiDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @MDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOM_EXCEPTION:
      http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
 Module:
-  @Name:DOMMain
+  @QName:
+    MDOM:DOMMain
   @BindingName:
     @@@: dom
     @@prefix:  w3c.org
@@ -46,7 +49,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/11/03 11:50:14 $
+     $Date: 2004/11/07 07:22:16 $
   
   @Feature:
     @@QName:
@@ -123,20 +126,25 @@ Module:
 
 DataTypeDef:
   @Name: any
+  @IName:any
   @Description:
     @@lang:en
     @@@: Any data.
 
 DataTypeDef: 
   @Name: Object
+  @IName:Object
   @Description:
     @@lang:en
     @@@: An object.
 
 DataTypeDef:
   @Name: unsigned-long-long
+  @IName:unsigned-long-long
   @Def:
-    @@Type: 
+    @@For:
+      ManakaiDOM:IDL
+    @@ContentType: 
       lang:IDL-DOM
     @@@: unsigned long long
   @FullName:
@@ -148,8 +156,11 @@ DataTypeDef:
 
 DataTypeDef:
   @Name: unsigned-long
+  @IName:unsigned-long
   @Def:
-    @@Type: 
+    @@For:
+      ManakaiDOM:IDL
+    @@ContentType: 
       lang:IDL-DOM
     @@@: unsigned long
   @FullName:
@@ -161,6 +172,7 @@ DataTypeDef:
 
 DataTypeDef:
   @Name: long
+  @IName:long
   @FullName:
     @@lang:en
     @@@: Long integer
@@ -170,8 +182,11 @@ DataTypeDef:
 
 DataTypeDef:
   @Name: unsigned-short
+  @IName:unsigned-short
   @Def:
-    @@Type: 
+    @@For:
+      ManakaiDOM:IDL
+    @@ContentType: 
       lang:IDL-DOM
     @@@: unsigned short
   @FullName:
@@ -183,6 +198,7 @@ DataTypeDef:
 
 DataTypeDef:
   @Name: float
+  @IName:float
   @FullName:
     @@lang:en
     @@@: Floating point number
@@ -192,6 +208,7 @@ DataTypeDef:
 
 ClassDef:
   @Name: boolean
+  @IName:boolean
   @Type:
     ManakaiDOM:ConstGroup
   @Description:
@@ -241,10 +258,6 @@ DataTypeDef:
     @@ContentType:
       lang:IDL-DOM
     @@@: sequence<unsigned short>
-  @Spec:
-    @@DOM3[list]:
-      DOM3Core:core.html#ID-C74D1578
-      DOM3Core:core.html#ID-5DFED1F0-h3
   @Description:
     @@lang:en
     @@@: 
@@ -1028,6 +1041,8 @@ DataTypeDef:
 
 DataTypeDef:
   @Name:  DOMTimeStamp
+  @For:
+    ManakaiDOM:DOM2
   @Description:
     @@lang:en
     @@@: An absolute or relative time.  A number of milliseconds.
@@ -1035,14 +1050,10 @@ DataTypeDef:
     @@For:
       *
     @@@: unsigned-long-long
-  @SpecLevel: 2
-  @Level: 2
-  @Spec:
-    @@DOM3[list]:
-      DOM3Core:core.html#Core-DOMTimeStamp
 
 DataTypeDef:
   @Name:  DOMUserData
+  @IName: DOMUserData
   @For:
     ManakaiDOM:DOM3
   @AliasOf:
@@ -1050,26 +1061,17 @@ DataTypeDef:
       *
     @@@: any
 
-  @SpecLevel: 3
-  @Level: 3
-  @Spec:
-    @@DOM3[list]:
-      DOM3Core:core.html#Core-DOMUserData
   @Description:
     @@lang:en
     @@@: A reference to application data.
 
 DataTypeDef:
   @Name:  DOMObject
+  @IName: DOMObject
   @For:
     ManakaiDOM:DOM3
   @AliasOf: Object
 
-  @SpecLevel: 3
-  @Level: 3
-  @Spec:
-    @@DOM3[list]:
-      DOM3Core:core.html#Core-DOMObject
   @Description:
     @@lang:en
     @@@: An object reference.
@@ -1086,13 +1088,6 @@ ClassDef:
     @@For:
       ManakaiDOM:ManakaiDOM
 
-  @SpecLevel: 3
-  @Level[list]: 3
-  @Spec:
-    @@DOM3[list]:
-      DOM3Core:core.html#Bootstrap
-      DOM3Core:java-binding.html#Level-3-Java-Binding-Extension
-      DOM3Core:ecma-script-binding.html#Level-3-ECMAScript-Binding-Extension
   @Description:
     @@lang:en
     @@@:

@@ -13,6 +13,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @ManakaiDOMImplementationException:
      http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @MDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOM_EXCEPTION:
      http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @MUError:\
@@ -20,7 +22,8 @@ Namespace:
   @TreeCore:
      \
 Module:
-  @Name: ManakaiDOMMain
+  @QName: 
+    MDOM:ManakaiDOMMain
   @BindingName:
     @@prefix:
       Message::DOM::
@@ -40,7 +43,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/11/03 11:50:14 $
+     $Date: 2004/11/07 07:22:16 $
   
   @Description:
     @@lang:en
@@ -49,112 +52,6 @@ Module:
       the fundemental interfaces that is used commonly by the 
       manakai DOM implementation.
 
-  @ForDef:
-    @@QName:
-      ManakaiDOM:all
-    @@FullName:
-      @@@lang:en
-      @@@@: For all
-  @ForDef:
-    @@QName:
-      ManakaiDOM:IDL
-    @@FullName:
-      @@@lang:en
-      @@@@: DOM IDL
-  @ForDef:
-    @@QName:
-      ManakaiDOM:Perl
-    @@FullName:
-      @@@lang:en
-      @@@@: Perl 5
-  @ForDef:
-    @@QName:
-      ManakaiDOM:DOM
-    @@FullName:
-      @@@lang:en
-      @@@@:DOM
-  @ForDef:
-    @@QName:
-      ManakaiDOM:DOM1
-    @@FullName:
-      @@@lang:en
-      @@@@:DOM Level 1
-    @@ISA:
-      ManakaiDOM:DOM
-  @ForDef:
-    @@QName:
-      ManakaiDOM:DOM2
-    @@FullName:
-      @@@lang:en
-      @@@@:DOM Level 2
-    @@ISA:
-      ManakaiDOM:DOM1
-  @ForDef:
-    @@QName:
-      ManakaiDOM:DOM3
-    @@FullName:
-      @@@lang:en
-      @@@@:DOM Level 3
-    @@ISA:
-      ManakaiDOM:DOM2
-  @ForDef:
-    @@QName:
-      ManakaiDOM:DOMLatest
-    @@FullName:
-      @@@lang:en
-      @@@@:The latest level of DOM
-    @@ISA:
-      ManakaiDOM:DOM3
-  @ForDef:
-    @@QName:
-      ManakaiDOM:ManakaiDOM
-    @@FullName:
-      @@@lang:en
-      @@@@: The manakai DOM implementation
-    @@Implement:
-      ManakaiDOM:DOM
-    @@ISA:
-      ManakaiDOM:Perl
-  @ForDef:
-    @@QName:
-      ManakaiDOM:ManakaiDOM1
-    @@FullName:
-      @@@lang:en
-      @@@@:The manakai DOM Level 1 implementation
-    @@Implement:
-      ManakaiDOM:DOM1
-    @@ISA:
-      ManakaiDOM:ManakaiDOM
-  @ForDef:
-    @@QName:
-      ManakaiDOM:ManakaiDOM2
-    @@FullName:
-      @@@lang:en
-      @@@@:The manakai DOM Level 2 implementation
-    @@Implement:
-      ManakaiDOM:DOM2
-    @@ISA:
-      ManakaiDOM:ManakaiDOM1
-  @ForDef:
-    @@QName:
-      ManakaiDOM:ManakaiDOM3
-    @@FullName:
-      @@@lang:en
-      @@@@:The manakai DOM Level 3 implementation
-    @@Implement:
-      ManakaiDOM:DOM3
-    @@ISA:
-      ManakaiDOM:ManakaiDOM2
-  @ForDef:
-    @@QName:
-      ManakaiDOM:ManakaiDOMLatest
-    @@FullName:
-      @@@lang:en
-      @@@@:The manakai implementation of the latest level of DOM
-    @@Implement:
-      ManakaiDOM:DOMLatest
-    @@ISA:
-      ManakaiDOM:ManakaiDOM3
   @DefaultFor:
     ManakaiDOM:ManakaiDOMLatest
 
@@ -185,8 +82,117 @@ Module:
     @@Module:
       @@@Name: DOMMain
 
+ForDef:
+  @QName:
+      ManakaiDOM:all
+  @FullName:
+    @@lang:en
+    @@@: For all
+ForDef:
+  @QName:
+      ManakaiDOM:IDL
+  @FullName:
+    @@lang:en
+    @@@: DOM IDL
+ForDef:
+  @QName:
+      ManakaiDOM:Perl
+  @FullName:
+    @@lang:en
+    @@@: Perl 5
+ForDef:
+  @QName:
+      ManakaiDOM:DOM
+  @FullName:
+    @@lang:en
+    @@@:DOM
+ForDef:
+  @QName:
+      ManakaiDOM:DOM1
+  @FullName:
+    @@lang:en
+    @@@:DOM Level 1
+  @ISA:
+      ManakaiDOM:DOM
+ForDef:
+  @QName:
+      ManakaiDOM:DOM2
+  @FullName:
+    @@lang:en
+    @@@:DOM Level 2
+  @ISA:
+      ManakaiDOM:DOM1
+ForDef:
+  @QName:
+      ManakaiDOM:DOM3
+  @FullName:
+    @@lang:en
+    @@@:DOM Level 3
+  @ISA:
+      ManakaiDOM:DOM2
+ForDef:
+  @QName:
+      ManakaiDOM:DOMLatest
+  @FullName:
+    @@lang:en
+    @@@:The latest level of DOM
+  @ISA:
+      ManakaiDOM:DOM3
+ForDef:
+  @QName:
+      ManakaiDOM:ManakaiDOM
+  @FullName:
+    @@lang:en
+    @@@: The manakai DOM implementation
+  @Implement:
+      ManakaiDOM:DOM
+  @ISA:
+      ManakaiDOM:Perl
+ForDef:
+  @QName:
+      ManakaiDOM:ManakaiDOM1
+  @FullName:
+    @@lang:en
+    @@@:The manakai DOM Level 1 implementation
+  @Implement:
+      ManakaiDOM:DOM1
+  @ISA:
+      ManakaiDOM:ManakaiDOM
+ForDef:
+  @QName:
+      ManakaiDOM:ManakaiDOM2
+  @FullName:
+    @@lang:en
+    @@@:The manakai DOM Level 2 implementation
+  @Implement:
+      ManakaiDOM:DOM2
+  @ISA:
+      ManakaiDOM:ManakaiDOM1
+ForDef:
+  @QName:
+      ManakaiDOM:ManakaiDOM3
+  @FullName:
+    @@lang:en
+    @@@:The manakai DOM Level 3 implementation
+  @Implement:
+      ManakaiDOM:DOM3
+  @ISA:
+      ManakaiDOM:ManakaiDOM2
+ForDef:
+  @QName:
+      ManakaiDOM:ManakaiDOMLatest
+  @FullName:
+    @@lang:en
+    @@@:The manakai implementation of the latest level of DOM
+  @Implement:
+      ManakaiDOM:DOMLatest
+  @ISA:
+      ManakaiDOM:ManakaiDOM3
+
 ClassDef:
   @QName: 
+    dis:ClassType
+  @IQName:
     dis:ClassType
   @Type:
     dis:ClassType
@@ -197,6 +203,7 @@ ClassDef:
       <CODE:Type> attribute of a <CODE:ClassDef> element.
 ClassDef:
   @Name: IF
+  @IName:IF
   @Type:
     dis:ClassType
   @Description:
@@ -205,6 +212,7 @@ ClassDef:
       An interface.
 ClassDef:
   @Name: DataType
+  @IName:DataType
   @Type:
     dis:ClassType
   @Description:
@@ -213,6 +221,7 @@ ClassDef:
       A abstract data type.
 ClassDef:
   @Name: Exception
+  @IName:Exception
   @Type:
     dis:ClassType
   @Description:
@@ -221,6 +230,7 @@ ClassDef:
       An exception type.
 ClassDef:
   @Name: Warning
+  @IName:Warning
   @Type:
     dis:ClassType
   @Description:
@@ -229,6 +239,7 @@ ClassDef:
       A warning type.
 ClassDef:
   @Name: ConstGroup
+  @IName:ConstGroup
   @Type:
     dis:ClassType
   @Description:
@@ -237,6 +248,7 @@ ClassDef:
       A set of constant values.
 ClassDef:
   @Name: Class
+  @IName:Class
   @Type:
     dis:ClassType
   @Description:
@@ -244,14 +256,21 @@ ClassDef:
     @@@:
       A programming language class.
 
+ClassTypeBinding:
+  @Name:
+
 DataTypeDef:
   @QName:
+    lang:dis
+  @IQName:
     lang:dis
   @FullName:
     @@lang:en
     @@@: dis grove
 DataTypeDef:
   @QName:
+    lang:Perl
+  @IQName:
     lang:Perl
   @ISA:
     DOMMain:DOMString
@@ -261,6 +280,8 @@ DataTypeDef:
 DataTypeDef:
   @QName:
     dis:Perl
+  @IQName:
+    dis:Perl
   @FullName:
     @@lang:en
     @@@: dis grove for Perl
@@ -269,6 +290,8 @@ DataTypeDef:
 DataTypeDef:
   @QName:
     lang:disdoc
+  @IQName:
+    lang:disdoc
   @FullName:
     @@lang:en
     @@@: disdoc text format
@@ -276,6 +299,8 @@ DataTypeDef:
     DOMMain:DOMString
 DataTypeDef:
   @QName:
+    lang:muf
+  @IQName:
     lang:muf
   @FullName:
     @@lang:en
@@ -286,6 +311,7 @@ DataTypeDef:
 
 DataTypeDef:
   @Name: ManakaiDOMURI
+  @IName:ManakaiDOMURI
   @ISA: 
     DOMMain:DOMString
   @FullName: 
@@ -316,6 +342,8 @@ DataTypeDef:
 
 DataTypeDef:
   @Name: ManakaiDOMNamespaceURI
+  @For:
+    ManakaiDOM:ManakaiDOM2
   @ISA: 
     DOMMain:DOMString
   @FullName:
@@ -372,6 +400,8 @@ DataTypeDef:
 
 DataTypeDef:
   @Name: ManakaiDOMFeatures
+  @For:
+    ManakaiDOM:ManakaiDOM3
   @ISA: 
     DOMMain:DOMString
   @FullName:
@@ -386,6 +416,8 @@ DataTypeDef:
 
 DataTypeDef:
   @Name:ManakaiDOMKeyIdentifier
+  @For:
+    ManakaiDOM:ManakaiDOM3
   @ISA:
     DOMMain:DOMString
   @FullName:
@@ -403,6 +435,8 @@ DataTypeDef:
 
 DataTypeDef:
   @Name:ManakaiDOMKeyIdentifiers
+  @For:
+    ManakaiDOM:ManakaiDOM3
   @ISA:
     DOMMain:DOMString
   @FullName:
@@ -416,6 +450,7 @@ DataTypeDef:
 
 ExceptionDef:
   @Name: ManakaiDOMImplementationException
+  @IName:ManakaiDOMImplementationException
   @ISA: ManakaiDOMException
   @For: ManakaiDOM
   @Description:
@@ -552,6 +587,7 @@ ExceptionDef:
 
 WarningDef:
   @Name: ManakaiDOMImplementationWarning
+  @IName:ManakaiDOMImplementationWarning
   @ISA: ManakaiDOMWarning
   @For: ManakaiDOM
   @Description:
@@ -639,6 +675,7 @@ WarningDef:
 
 ClassDef:
   @Name: ManakaiDOMObject
+  @IName:ManakaiDOMObject
   @Type:
     ManakaiDOM:Class
   @For: ManakaiDOM
@@ -690,6 +727,7 @@ ClassDef:
 
 ClassDef:
   @Name: ManakaiDOMExceptionOrWarning
+  @IName:ManakaiDOMExceptionOrWarning
   @Type: Class
   @For: ManakaiDOM
   @Description:
@@ -742,6 +780,7 @@ ClassDef:
 
 ExceptionDef:
   @Name: ManakaiDOMException
+  @IName:ManakaiDOMException
   @ISA: ManakaiDOMExceptionOrWarning
   @For: ManakaiDOM
   @Description:
@@ -751,6 +790,7 @@ ExceptionDef:
       exceptions.
 WarningDef:
   @Name: ManakaiDOMWarning
+  @IName:ManakaiDOMWarning
   @ISA: ManakaiDOMExceptionOrWarning
   @For: ManakaiDOM
   @Description:
@@ -761,6 +801,7 @@ WarningDef:
 
 ClassDef:
   @Name: ManakaiDOMNodeObject
+  @IName:ManakaiDOMNodeObject
   @Type: Class
   @ISA: ManakaiDOMObject
   @For: ManakaiDOM
@@ -1077,6 +1118,7 @@ ClassDef:
 
 ClassDef:
   @Name: ManakaiDOMNodeReference
+  @IName:ManakaiDOMNodeReference
   @For: ManakaiDOM
   @Type: Class
   @ISA: ManakaiDOMObject
