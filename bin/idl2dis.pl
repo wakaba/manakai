@@ -303,7 +303,7 @@ for my $module ($tree->append_new_node (type => '#element',
     $_->set_attribute (Mail => q<** TBD **>);
   }
   $module->set_attribute (License => q<license:Perl+MPL>);
-  $module->set_attribute ('Date.RCS' => q<$Date: 2004/09/27 12:11:53 $>);
+  $module->set_attribute ('Date.RCS' => q<$Date: 2004/10/10 00:01:08 $>);
 }
 
 fws $s;

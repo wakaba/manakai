@@ -7,7 +7,7 @@ XARGS = xargs
 PERL = perl -I../../
 PERL_CHK = $(PERL) -c -w
 
-DIS2PM_PL = dis2pm.pl
+DIS2PM_PL = ../../../bin/dis2pm.pl
 DIS2PM = $(PERL) $(DIS2PM_PL)
 
 IDL2DIS_PL = idl2dis.pl

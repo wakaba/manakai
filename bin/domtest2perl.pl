@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w 
 use lib q<../lib>;
 use strict;
-BEGIN { require 'genlib.pl' }
+BEGIN { require 'manakai/genlib.pl' }
 
 use Message::Util::QName::General [qw/ExpandedURI/], {
   ManakaiDOMLS2003

@@ -38,7 +38,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/10/09 05:32:30 $
+     $Date: 2004/10/10 00:01:09 $
 
   @ConditionDef:
     @@Name:DOM3
@@ -1070,7 +1070,108 @@ IF:
   @Description:
     @@lang:en
     @@@:
-      Serialize DOM documents or nodes.
+      Serializing (writing) a DOM document or <IF:Node> out into XML. 
+      \
+      <IF:LSSerializer> accepts any type of node for serialization. 
+      If the node is a <IF:Document> or <IF:Entity>, a well-formed 
+      XML document or external (respectively) entity will be created 
+      when possible.  For all other types, the serialized form 
+      is implementation dependent.
+  @ImplNote:
+    @@lang:en
+    @@@:
+      The XML data is written to a string or an output stream. 
+      Any changes or fixups made during the serialization 
+      affect only the serialized data.
+    \
+      If the <A:Node.namespaceURI> is an empty string, it 
+      will be treated them as <DOM:null>, ignoring <A:Node.prefix>.
+    \
+      XML well-formedness is guaranteed if the document 
+      or entity comes from a parse operation and has been unchanged.
+  @ImplNote:
+    @@lang:en
+    @@@:
+      {P:: Within a <IF:Document>, <IF:DocumentFragment> or <IF:Entity>:
+      \
+      - <IF:Document>:: The entire document is written, including the
+        XML declaration (unless <CP:xml-declaration> is set to <DOM:false>) 
+        and the document type declaration internal subset, if exists. 
+      \
+      - <IF:Entity>:: When written directly by <M:LSSerializer.write>, 
+        the entity expansion is outputed without namespace fixup.
+      \
+      - <IF:EntityReference>:: If <CP:entities> is set to <DOM:true> or 
+        the node is not expanded, the node is serialized as an entity 
+        reference.  Child nodes (the expansion) are ignored.  Otherwise, 
+        child nodes are serialized.
+      \
+      - <IF:CDATASection>:: If the node contains characters 
+        that cannot be represented in the specified output encoding 
+        or contains <SGML:MDE> and <CP:split-cdata-sections> 
+        is set to <DOM:true>, <IF:CDATASection> is split and 
+        the unrepresentable characters are serialized as numeric 
+        character references in ordinary <XML:content>.  The exact 
+        position and number of splits is not specified.  If 
+        <DOM:false> and <CP:well-formed> is set to <DOM:true>, 
+        unrepresented characters are reported as <ERR:wf-invalid-character> 
+        (This error is unrecoverable).
+        (What is happen if <CP:well-formed> is set to <DOM:false>?)
+      \
+      - <IF:DocumentFragment>:: Child nodes are serialized.
+      \
+      - Other types:: The node is serialized to their corresponding XML 
+        form.
+      \
+      }
+      \
+      Within character data, any character that cannot be represented 
+      directly are replaced with a reference.  Characters 
+      <CHAR:LESS-THAN SIGN> and <CHAR:AMPASAND> are replaced by 
+      the predefined entities <XML:&lt;> and <XML:&amp;> reprectively. 
+      The other predefind entities might not be used except where 
+      needed (e.g. <SGML:MSE>).  Any character that cannot be represented 
+      directly in the output character encoding are serialized as 
+      a numeric character reference (hexadecimal representation is 
+      encouraged).
+      \
+      Within an attribute value, characters <CHAR:APOSTROPHE> and 
+      <CHAR:QUOTATION MARK> may be represented by predefined entities 
+      <XML:&apos;> and <XML:&quot> respectively.  New line characters 
+      and other characters that cannot be represented directly in 
+      the output character encoding are serialized as a numeric 
+      character reference.
+      \
+      Within a markup but outside of attributes, any occurence of 
+      a character that cannot be represented in the output character 
+      encoding is reported as a fatal error (e.g. 
+      <ERR:wf-invalid-character-in-node-name>).
+      \
+      When <CP:normalize-characters> on <IF:LSSerializer> is set to 
+      <DOM:true>, character normalization is performed accopding 
+      the XML 1.1 on all data to be serialized, both markups and 
+      character data.
+      \
+      {P:: DOM implementations are required to support::
+      \
+      - <CODE:UTF-8>:: Whether <CHAR:BOM> is generated or not is 
+                       implementation dependent.
+      \
+      - <CODE:UTF-16>:: Whether the output is big endian or little endian 
+                        is implementation dependent.  <CHAR:BOM> is required.
+      \
+      - <CODE:UTF-16BE>:: <CHAR:BOM> is not generated.
+      \
+      - <CODE:UTF-16LE>:: <CHAR:BOM> is not generated.
+      }
+      \
+      If <CHAR:BOM> is not generated, <ERR:byte-order-mark-needed> warning 
+      is reported.
+      \
+      If the <XML:encoding> declaration is generated, it will be the 
+      encoding name used during the serialization.
+      \
+      
   @Attr:
      @@Name:  domConfig
      @@Description:
@@ -1147,31 +1248,155 @@ IF:
   @Description:
     @@lang:en
     @@@:
-      Information about the destination for the data to be output.
+      An output destination for data.
+     \
+      With this interface, DOM applications are able to 
+      encapsulate information about an output destination 
+      in a single object.
+     \
+      The DOM application is expected to provide objects 
+      that implement this interface whenever such object 
+      are needed.  The DOM application can either provide 
+      its own objects that implements this interface, 
+      or it can use the generic factory method 
+      <M:DOMImplementationLS.createLSOutput> to create 
+      objects that implement this interface.
+      \
+      <IF:LSOutput> objects belong to the DOM application and 
+      the DOM implementation will never modify them.
+  @ImplNote:
+    @@lang:en
+    @@@:
+      {P:: The <IF:LSSerializer> will use the <IF:LSOutput> object 
+      in the following order:
+      \
+      = <A:LSOutput.characterStream>
+      \
+      = <A:LSOutput.byteStream>
+      \
+      = <A:LSOutput.systemId>
+      \
+      The first one that is not <DOM:null> and not an empty string 
+      will be used.
+      \
+      }
+  @ImplNote:
+    @@lang:en
+    @@@:
+      The DOM implementation may make copies of the <IF:LSOutput> 
+      objects and modify them, if necessary.
   @Attr:
      @@Name:  characterStream
+     @@Description:
+       @@@lang:en
+       @@@@:
+         A writable stream to which 16-bit units can be output.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         The exact definition of a character stream is language 
+         and binding dependent.  Depending on the binding in use, 
+         this attribute may not be available.
      @@Get:
         @@@Type:  LSWriter
      @@Set:
         @@@Type:  LSWriter
   @Attr:
      @@Name:  byteStream
+     @@Description:
+       @@@lang:en
+       @@@@:
+         A writable stream of bytes.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         The exact definition of a byte stream is language and 
+         binding dependent.
      @@Get:
         @@@Type:  LSOutputStream
      @@Set:
         @@@Type:  LSOutputStream
   @Attr:
      @@Name:  systemId
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The system identifier or an RFC 2396 URI reference 
+         for this output destination.
      @@Get:
         @@@Type:  DOMString
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            infoset:systemIdentifier
      @@Set:
         @@@Type:  DOMString
+        @@@InCase:
+          @@@@Label:
+            @@@@@lang:en
+            @@@@@@:
+              RFC 2396 Relative URI reference
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The behavior is implementation dependent.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@SetProp:
+            infoset:systemIdentifier
   @Attr:
      @@Name:  encoding
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The character encoding to use for the output. 
+         The encoding name must be a string acceptable for 
+         an XML 1.0 <XML:encoding> declaration and it is 
+         recommended that character encodings registered 
+         in IANAREG be referred to using their registered names.
      @@Get:
         @@@Type:  DOMString
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            infoset:characterEncodingScheme
      @@Set:
         @@@Type:  DOMString
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@SetProp:
+            infoset:characterEncodingScheme
+
+  @IntMethod:
+    @@Name:new
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Construct a new instance of the <IF:OutInput>.
+    @@Operator:
+      @@@Type:
+        lang:Perl
+      @@@@:new
+    @@Return:
+      @@@Type:LSOut
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The newly created <IF:LSOutput> object.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = __CLASS{ManakaiDOMNodeObject::}__->__INT{new}__
+                                           ## Conditional
+                 ->__INT{newReference}__ ('__CLASS{LSOutput}__');
+   @@Level[list]:3
+##IF:LSOutput
+
 IF:
   @Name:  LSProgressEvent
   @ISA:
@@ -1345,6 +1570,16 @@ ErrorSet:
   @SpecLevel:3
 
   @Error:
+    @@Name:byte-order-mark-needed
+    @@Severity:Warning
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The <CHAR:BOM> is not generated; it might be prepended 
+        by the DOM application before the serialized data is 
+        written out to some media.
+
+  @Error:
     @@Name:no-output-specified
     @@Severity:Fatal
     @@Description:
@@ -1372,7 +1607,163 @@ ErrorSet:
       See <Module:DOMCore> for the definition of the error 
       <ERR:wf-invalid-character-in-node-name>.
 
+  @Error:
+    @@Name:xml-declaration-needed
+    @@Severity:Warning
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The XML declaration or the text declaration is not outputed 
+        but it was required.
 ##Error:LSSerializer
+
+ConfigParam:
+  @Description:
+    @@lang:en
+    @@@:
+      Additional configuration parameters for <IF:DOMConfiguration> 
+      objects used with <IF:LSSerializer> objects.
+
+  @ImplNote:
+    @@lang:en
+    @@@:
+      Parameters defined in the DOM Level 3 Core specification 
+      is also available.
+  
+  @ImplNote:
+    @@lang:en
+    @@@:
+      <CP:canonical-form>: See <Module:DOMCore>.
+
+  @Param:
+    @@Name:discard-default-content
+    @@Type:boolean
+    @@InCase:
+      @@@Value:true
+      @@@IsSupportRequired:1
+      @@@IsDefault:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Use the <A:Attr.specified> attribute to decide 
+          what XML attributes should be discarded.
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          DOM implementation might use whatever information 
+          available to the implementation (including XML Schema document 
+          or DTD) to determine what attributes and content to discard.
+      @@@SetParam:
+        @@@@Name:canonical-form
+        @@@@Type:boolean
+        @@@@Value:false
+    @@InCase:
+      @@@Value:false
+      @@@IsSupportRequired:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Keep all attributes and all content.
+
+  @Param:
+    @@Name:format-pretty-print
+    @@Type:boolean
+    @@InCase:
+      @@@Value:true
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Formatting the output by adding white spaces to 
+          produce a pretty-printed, intended, human-readable form. 
+          (The exact form is not specified.)
+          \
+          Pretty-printing changes the content of the document and 
+          may affect the validity of the document.
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          Validating implementations should preserve validity.
+      @@@SetParam:
+        @@@@Name:canonical-form
+        @@@@Type:boolean
+        @@@@Value:false
+    @@InCase:
+      @@@Value:false
+      @@@IsSupportRequired:1
+      @@@IsDefault:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@: Don't pretty-print the output.
+
+  @Param:
+    @@Name:ignore-unknown-character-denormalizations
+    @@Type:boolean
+    @@InCase:
+      @@@Value:true
+      @@@IsSupportRequired:1
+      @@@IsDefault:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Report a <ERR:unknown-character-denormalization> <EM:warning> 
+          (not an error) when fully-normalizedness per XML 1.1 is 
+          being verified and a cgaracter is encountered for which 
+          the normalization properties cannot be determined and 
+          ignore any possible denormalizations caused by that character.
+    @@InCase:
+      @@@Value:false
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Report a <ERR:unknown-character-denormalization> fatal error 
+          if the normalization properties cannot be determined.
+
+  @ImplNote:
+    @@lang:en
+    @@@:
+      <CP:normalize-characters>: See <Module:DOMCore>.
+
+  @Param:
+    @@Name:xml-declaration
+    @@InCase:
+      @@@Value:true
+      @@@IsSupportRequired:1
+      @@@IsDefault:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          When <IF:Document>, <IF:Entity> or <IF:DocumentFragment> is 
+          serialized, the XML declaration or the text declaration 
+          should be included.
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          - <XML:version>:: <A:Document.xmlVersion> or <XML:1.0>.
+          \
+          - <XML:encoding>:: the output encoding.
+          \
+          - <XML:standalone>:: <A:Document.xmlStandalone>.
+      @@@SetParam:
+        @@@@Name:canonical-form
+        @@@@Type:boolean
+        @@@@Value:false
+    @@InCase:
+      @@@Value:false
+      @@@IsSupportRequired:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Do not include the XML declaration or text declaration. 
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          If <XML:version> would be other than <XML:1.0> or 
+          <XML:encoding> would be required, the <ERR:xml-declaration-needed> 
+          warning is reported. 
+
+  @Level:3
+  @SpecLevel:3
+##ConfigParam:LSSerializer
 
 ## DOMLS.dis ends here
 

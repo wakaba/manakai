@@ -19,7 +19,7 @@ This script is part of manakai.
 =cut
 
 use strict;
-use lib qw<../../ ../../../bin>;
+use lib qw<lib ../lib>;
 use Message::Markup::SuikaWikiConfig20::Parser;
 use Message::Markup::XML::QName qw/DEFAULT_PFX/;
 use Message::Util::QName::General [qw/ExpandedURI/], { 
@@ -48,7 +48,7 @@ my $Status = {package => 'main', depth => 0, generated_fragment => 0};
 our $result = '';
 
 BEGIN {
-  require 'genlib.pl';
+  require 'manakai/genlib.pl';
 }
 
 sub perl_package_name (%) {
@@ -1198,7 +1198,7 @@ sub disdoc2text ($;%) {
         $marker = disdoc_inline2text ($1, %opt) . ': ';
       }
       push @r, $marker . (disdoc_inline2pod ($s, %opt));
-    } elsif ($s =~ /^[^\w\s]/) { ## Reserved for future extension
+    } elsif ($s =~ /^[^\w\s<]/) { ## Reserved for future extension
       valid_err qq<Broken DISDOC: "$s">, node => $opt{node};
     } else {
       $s =~ s/^\s+//;
@@ -1322,7 +1322,7 @@ sub disdoc2pod ($;%) {
         $marker = disdoc_inline2pod ($1, %opt);
       }
       push @r, pod_item ($marker), pod_para (disdoc_inline2pod ($s, %opt));
-    } elsif ($s =~ /^[^\w\s]/) { ## Reserved for future extension
+    } elsif ($s =~ /^[^\w\s<]/) { ## Reserved for future extension
       valid_err qq<Broken DISDOC: "$s">, node => $opt{node};
     } else {
       if ($el[-1]->{type} eq '#list') {
@@ -4161,6 +4161,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/10/09 07:55:22 $
+# $Date: 2004/10/10 00:01:08 $
 
 

@@ -1,7 +1,17 @@
+2004-10-10  Wakaba  <wakaba@suika.fam.cx>
+
+	* Makefile (DIS2PM_PL): Path to dis2pm.pl changed.
+	* dis2pm.pl, idl2dis.pl: Removed (moved to ../../bin/).
+
 2004-10-09  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMCore.dis (ConfigParam): Moved from ManakaiDOMCore.
+	* ManakaiDOMCore.dis (ConfigParam): Removed.
 
 	* dis2pm.pl: Functions to create perl/pod structures 
 	are moved to ../../bin/genlib.pl.
+	(disdoc2pod, disdoc2text): Allow LESS-THAN SIGN as the first 
+	character of a paragraph.
 
 	* ManakaiDOMLS2003.dis (ManakaiXMLParser2003/parse:#comment): 
 	Set ownerDocument as parent if parent.ownerDocument is null.
