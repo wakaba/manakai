@@ -8,7 +8,7 @@ Message::Body::Text --- Perl Module for Internet Media Types "text/*"
 package Message::Body::Text;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -22,7 +22,7 @@ use overload '""' => sub { $_[0]->stringify },
   -_METHODS	=> [qw|value|],
   -_MEMBERS	=> [qw|_charset|],
   	## header -- Don't clone
-  -body_default_charset	=> 'us-ascii',
+  -body_default_charset	=> 'iso-2022-int-1',
   -body_default_charset_input	=> 'iso-2022-int-1',
   -hook_encode_string	=> \&Message::Util::encode_body_string,
   -hook_decode_string	=> \&Message::Util::decode_body_string,
@@ -71,8 +71,8 @@ sub _init ($;%) {
       $self->{option}->{body_default_charset} = 'utf-8';
       $self->{option}->{body_default_charset_input} = 'utf-8';
     } else {
-      $self->{option}->{body_default_charset} = 'us-ascii';
-      $self->{option}->{body_default_charset_input} = 'iso-2022-int-1';
+      #$self->{option}->{body_default_charset} = 'iso-2022-int-1';
+      #$self->{option}->{body_default_charset_input} = 'iso-2022-int-1';
     }
   }
   if ($mt_def->{default_charset}) {
@@ -113,7 +113,7 @@ sub _parse ($$) {
     my $ct;
     $ct = $self->{header}->field ('content-type', -new_item_unless_exist => 0) 
       if ref $self->{header};
-    $charset = $ct->parameter ('charset') if ref $ct;
+    $charset = $ct->parameter ('charset', -new_item_unless_exist => 0) if ref $ct;
   }
   unless ($charset) {
     $charset = $self->{option}->{encoding_before_decode};
@@ -183,7 +183,7 @@ sub stringify ($;%) {
   unless ($self->{_charset}) {
     my $charset;
     if ($option{use_param_charset}) {
-      $charset = $ct->parameter ('charset') if ref $ct;
+      $charset = $ct->parameter ('charset', -new_item_unless_exist => 0) if ref $ct;
     }
     $charset ||= $option{encoding_after_encode};
     (%e) = &{$option{hook_encode_string}} ($self, $v,
@@ -250,7 +250,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/14 04:26:07 $
+$Date: 2002/07/19 11:49:22 $
 
 =cut
 

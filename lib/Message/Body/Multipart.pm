@@ -9,7 +9,7 @@ for "multipart/*" Internet Media Types
 package Message::Body::Multipart;
 use strict;
 use vars qw(%DEFAULT @ISA $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Body::Text;
 push @ISA, qw(Message::Body::Text);
@@ -64,22 +64,37 @@ sub _init ($;%) {
   $self->{option}->{value_type}->{body_part}->[1]->{-format}
     = 
   my @ilist = qw/accept_coderange body_default_charset body_default_charset_input cte_default text_coderange/;
-  $self->{option}->{value_type}->{preamble} = ['Message::Body::TextPlain',
-    {-media_type => 'text', -media_subtype => '/multipart-preamble'},
-    \@ilist];
+  $self->{option}->{value_type}->{preamble} = sub {
+    my $phdr = new Message::Header -format => 'mail-rfc822';
+    my $ct = '';
+    $ct = $self->{header}->field ('content-type', -new_item_unless_exist => 0) if ref $self->{header};
+    $ct = $ct->item ('x-preamble-type', -new_item_unless_exist => 0) if ref $ct;
+    $phdr->add ('content-type' => $ct) if $ct;
+    ['Message::Body::TextPlain',
+    {-media_type => 'text', -media_subtype => '/multipart-preamble',
+    entity_header => $phdr},
+    \@ilist]};
   $self->{option}->{value_type}->{body_part} = sub {['Message::Entity',
     {-format => $_[0]->{option}->{format} . '/' . 'mime-entity',
     -body_default_media_type => $_[0]->{option}->{default_media_type},
     -body_default_media_subtype => $_[0]->{option}->{default_media_subtype}},
     \@ilist]};
-  $self->{option}->{value_type}->{epilogue} = ['Message::Body::TextPlain',
-    {-media_type => 'text', -media_subtype => '/multipart-epilogue'},
-    \@ilist];
+  $self->{option}->{value_type}->{epilogue} = sub {
+    my $phdr = new Message::Header -format => 'mail-rfc822';
+    my $ct = '';
+    $ct = $self->{header}->field ('content-type', -new_item_unless_exist => 0) if ref $self->{header};
+    $ct = $ct->item ('x-epilogue-type', -new_item_unless_exist => 0) if ref $ct;
+    $phdr->add ('content-type' => $ct) if $ct;
+    ['Message::Body::TextPlain',
+    {-media_type => 'text', -media_subtype => '/multipart-epilogue',
+    entity_header => $phdr},
+    \@ilist]};
   
   $self->{boundary} = $option{boundary};
   if (!length $self->{boundary} && ref $self->{header}) {
     my $ct = $self->{header}->field ('content-type', -new_item_unless_exist => 0);
-    $self->{boundary} = $ct->parameter ('boundary') if ref $ct;
+    $self->{boundary} = $ct->parameter ('boundary', -new_item_unless_exist => 0)
+      if ref $ct;
   }
   
   my $mst = $self->{option}->{media_subtype};
@@ -361,7 +376,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/08 11:48:12 $
+$Date: 2002/07/19 11:49:22 $
 
 =cut
 
