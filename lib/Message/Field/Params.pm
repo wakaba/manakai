@@ -11,7 +11,7 @@ use strict;
 require 5.6.0;
 use re 'eval';
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::MIME::Charset;
 require Message::Field::Structured;
@@ -190,13 +190,15 @@ sub _decode_parameters ($\@\%) {
       my %item;
       $item{no_value} = 1;
       $item{comment} = $parameter->{comment};
-      if ($parameter->{charset} ne '*bare') {
+      if ($parameter->{charset} ne '*bare') {	## non quoted-string
         my %s = &{$self->{option}->{hook_decode_string}}
           ($self, $parameter->{attribute},
            charset	=> $option->{encoding_before_decode},
            type => 'parameter/no-value-attribute');
         if ($s{charset}) {	## Convertion failed
           $item{charset} = $s{charset};
+        } elsif (!$s{success}) {
+          $item{charset} = $option->{header_default_charset_input};
         }
         $item{attribute} = $s{value};
       } else {
@@ -208,13 +210,15 @@ sub _decode_parameters ($\@\%) {
       $item{attribute} = $parameter->{attribute};
       $item{language} = $parameter->{language} if $parameter->{language};
       $item{comment} = $parameter->{comment};
-      if ($parameter->{charset} ne '*bare') {
+      if ($parameter->{charset} ne '*bare') {	## non 2231 encoded
         my %s = &{$self->{option}->{hook_decode_string}}
           ($self, $parameter->{value},
            charset	=> $parameter->{charset} || $option->{encoding_before_decode},
            type => 'parameter/value/quoted-string');
         if ($s{charset}) {	## Convertion failed
           $item{charset} = $s{charset};
+        } elsif (!$s{success}) {
+          $item{charset} = $option->{header_default_charset_input};
         } elsif ($parameter->{charset}) {
           $item{output_charset} = $parameter->{charset};
         }
@@ -635,7 +639,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/21 03:25:00 $
+$Date: 2002/07/22 02:42:17 $
 
 =cut
 

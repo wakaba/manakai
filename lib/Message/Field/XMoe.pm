@@ -9,7 +9,7 @@ Internet message C<X-Moe:> field body items
 package Message::Field::XMoe;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::ValueParams;
 push @ISA, qw(Message::Field::ValueParams);
 *REG = \%Message::Field::ValueParams::REG;
@@ -91,7 +91,9 @@ some options as parameters to the constructor.
 sub _decode_parameters ($\@\%) {
   my $self = shift;
   my ($param, $option) = @_;
+  my @a;
   if ($param->[0]->{no_value} && $param->[0]->{charset} eq '*bare') {
+    ## first item doesn't have value and is not a quoted-string itself,
     my $name = shift (@$param)->{attribute};
     my $from = '';
     if ($name =~ m#^((?:$REG{quoted_string}|[^\x22\x2F])+)/((?:$REG{quoted_string}|[^\x22])+)$#) {
@@ -104,7 +106,7 @@ sub _decode_parameters ($\@\%) {
     $from =~ s/^$REG{WSP}+//; $from =~ s/$REG{WSP}+$//;
     $from = Message::Util::decode_quoted_string ($self, $from) if length $from;
     if (length $from) {
-      push @$param, {attribute => 'of', value => $from};
+      push @a, {attribute => 'of', value => $from};
     }
   } elsif ($param->[0]->{no_value}) {	## was A quoted-string
     my %s = &{$option->{hook_decode_string}}
@@ -112,6 +114,7 @@ sub _decode_parameters ($\@\%) {
     $self->{value} = $s{value};
   }
   $self->SUPER::_decode_parameters ($param, $option);
+  push @$param, @a;
 }
 
 =back
@@ -242,7 +245,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/29 09:31:46 $
+$Date: 2002/07/22 02:42:17 $
 
 =cut
 

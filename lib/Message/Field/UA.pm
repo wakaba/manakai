@@ -9,7 +9,7 @@ header field body consist of C<product> tokens
 package Message::Field::UA;
 use strict;
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -412,6 +412,7 @@ sub add_our_name ($;%) {
         }
         push @os_comment, Win32::GetChipName;
       } if $option{use_Win32};
+      undef $@;
     } else {
       push @perl_comment, $^O;
     }
@@ -448,7 +449,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/13 09:27:35 $
+$Date: 2002/07/22 02:42:17 $
 
 =cut
 
