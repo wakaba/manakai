@@ -9,11 +9,14 @@ date-time used in Internet messages and so on
 package Message::Field::Date;
 use strict;
 use vars qw(%DEFAULT @ISA %MONTH %REG $VERSION %ZONE);
-$VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 use Time::Local 'timegm_nocheck';
-use overload '0+' => sub { $_[0]->{date_time} },
+use overload '==' => sub { $_[0]->{date_time} == $_[1] },
+             '<=' => sub { $_[0]->{date_time} <= $_[1] },
+             '>=' => sub { $_[0]->{date_time} >= $_[1] },
+             '0+' => sub { $_[0]->{date_time} },
              fallback => 1;
 
 %REG = %Message::Util::REG;
@@ -764,7 +767,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/08/01 06:42:38 $
+$Date: 2002/08/03 23:32:04 $
 
 =cut
 

@@ -1,6 +1,15 @@
+2002-08-04  Wakaba <w@suika.fam.cx>
+
+	* Warning.pm: New module.
+	* CSV.pm (_delete_empty): Don't remove reference
+	if the length of its stringified value is zero.
+	* Domain.pm: Parse and output port number if enabled by option.
+	* Date.pm (overload '==', '<=', '>='): Added.
+
 2002-08-03  Wakaba <w@suika.fam.cx>
 
 	* Status.pm: New module.
+	* URI.pm: Support RFC 1808's Base: field.
 
 2002-08-01  Wakaba <w@suika.fam.cx>
 

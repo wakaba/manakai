@@ -11,7 +11,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 
@@ -28,8 +28,8 @@ The following methods construct new objects:
 ## Initialize of this class -- called by constructors
   %DEFAULT = (
     -_ARRAY_NAME	=> 'value',
-    -_MEMBERS	=> [qw|type|],
-    -_METHODS	=> [qw|reverse type|],
+    -_MEMBERS	=> [qw|type port|],
+    -_METHODS	=> [qw|reverse type port value|],
     -allow_special_name	=> 1,	## not implemented yet
     -allow_special_ipv4	=> 1,	##
     -allow_special_ipv6	=> 1,	##
@@ -37,6 +37,9 @@ The following methods construct new objects:
     -encoding_before_decode	=> 'unknown-8bit',
     #field_param_name
     #field_name
+    -fill_default_name	=> 1,	## host / "1" / perl-false
+    -fill_default_port	=> 0,
+    -fill_default_value	=> 0,
     #format
     -format_ipv4	=> '[%vd]',
     -format_ipv6	=> '[IPv6:%s]',
@@ -45,11 +48,13 @@ The following methods construct new objects:
     #hook_encode_string
     #hook_decode_string
     -output_comment	=> 0,
+    -output_port	=> 0,
     -separator	=> '.',
     -use_comment	=> 0,
     -use_domain_literal	=> 1,
     -use_ipv4_address	=> 1,
     -use_ipv6_address	=> 1,
+    -use_port	=> 0,
   );
 sub _init ($;%) {
   my $self = shift;
@@ -82,6 +87,9 @@ sub parse ($$;%) {
     = $self->Message::Util::delete_comment_to_array ($body)
     if $self->{option}->{use_comment};
   my @d;
+  $body =~ s{ : ([0-9]+) $ }{
+    $self->{port} = $1;
+  ''}ex if $self->{option}->{use_port};
   $body =~ s{($REG{domain_literal}|[^\x5B\x2E])+}{
     my ($d, $isd) = ($&, 0);
     $d =~ s/^$REG{WSP}+//;  $d =~ s/$REG{WSP}+$//;
@@ -141,7 +149,19 @@ sub stringify ($;%) {
       }
       $s{value};
     } @{$self->{value}};
+    if ($option{fill_default_value} && !length $d) {
+      if ($option{fill_default_name} == 1) {
+        $d = Message::Util::get_host_fqdn;
+      } else {
+        $d = $option{fill_default_name};
+      }
+    }
     $s = sprintf $option{format_name}, $d;
+  }
+  if ($option{use_port} && $option{output_port}) { 
+    my $port = $self->{port};
+    $port = $option{fill_default_port} if !$port && $option{fill_default_value};
+    $s .= ':' . (0+$self->{port}) if $port;
   }
   if ($option{use_comment} && $option{output_comment}) {
     my $c = $self->_comment_stringify;
@@ -172,7 +192,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/13 09:27:35 $
+$Date: 2002/08/03 23:32:04 $
 
 =cut
 

@@ -10,7 +10,7 @@ package Message::Field::CSV;
 require 5.6.0;	## eval 're'
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 
@@ -287,7 +287,7 @@ Returns a copy of the object.
 
 sub _delete_empty ($) {
   my $self = shift;
-  $self->{value} = [grep {length $_} @{$self->{value}}];
+  $self->{value} = [grep {ref $_ || length $_} @{$self->{value}}];
 }
 
 =head1 LICENSE
@@ -312,7 +312,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/08/03 04:57:58 $
+$Date: 2002/08/03 23:32:04 $
 
 =cut
 
