@@ -54,8 +54,8 @@ when C<stringify>.  (Default = 0)
   parse_all	=> -1,
 );
 my @field_type_Structured = qw(cancel-lock
-  importance mime-version path precedence x-cite
-  x-face x-mail-count x-msmail-priority x-priority x-uidl xref);
+  importance path precedence
+  x-face x-mail-count x-msmail-priority x-priority xref);
 for (@field_type_Structured)
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Structured'}
 my @field_type_Address = qw(approved bcc cc delivered-to disposition-notification-to 
@@ -98,6 +98,8 @@ for (qw(subject title x-nsubject))
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Subject'}
 for (qw(list-software user-agent server))
   {$DEFAULT{field_type}->{$_} = 'Message::Field::UA'}
+for (qw(content-length lines max-forwards mime-version))
+  {$DEFAULT{field_type}->{$_} = 'Message::Field::Numval'}
 
 =head2 Message::Header->new ([%option])
 
@@ -530,7 +532,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/31 13:12:41 $
+$Date: 2002/04/01 05:32:37 $
 
 =cut
 
