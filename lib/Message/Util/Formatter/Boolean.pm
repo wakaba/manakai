@@ -14,7 +14,7 @@ This module is part of manakai.
 
 package Message::Util::Formatter::Boolean;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util::Formatter::Base;
 our @ISA = 'Message::Util::Formatter::Base';
 
@@ -78,6 +78,11 @@ sub ___rule_def () {+{
             $val = $self->replace ($val, param => $o);
           }
           $p->{-result} = defined $val ? $val ? 1 : 0 : undef;
+        } elsif ($key eq 'x') {
+          if ($opt{-value_flag} and index ($opt{-value_flag}, 'p') > -1) {
+            $val = $self->replace ($val, param => $o);
+          }
+          $p->{-result} = defined $val ? $val ? 1 : 0 : undef;
         }
       },
       post => sub {},
@@ -97,6 +102,11 @@ sub ___rule_def () {+{
             $val = $self->replace ($val, param => $o);
           }
           $p->{-result} = defined $val ? $val ? 1 : 0 : undef;
+        } elsif ($key eq 'x') {
+          if ($opt{-value_flag} and index ($opt{-value_flag}, 'p') > -1) {
+            $val = $self->replace ($val, param => $o);
+          }
+          $p->{-result} = defined $val ? $val ? 1 : 0 : undef;
         }
       },
       post => sub {},
@@ -110,6 +120,11 @@ sub ___rule_def () {+{
             $val = $self->replace ($val, param => $o);
           }
           $p->{-result} = defined $val ? $val ? 0 : 1 : undef;
+        } elsif ($key eq 'x') {
+          if ($opt{-value_flag} and index ($opt{-value_flag}, 'p') > -1) {
+            $val = $self->replace ($val, param => $o);
+          }
+          $p->{-result} = defined $val ? $val ? 0 : 1 : undef;
         }
       },
       post => sub {},
@@ -118,11 +133,11 @@ sub ___rule_def () {+{
 
 =head1 LICENSE
 
-Copyright 2004 Wakaba <w@suika.fam.cx>
+Copyright 2004 Wakaba <w@suika.fam.cx>.  All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/01/17 08:28:25 $
+1; # $Date: 2004/03/10 06:58:48 $
