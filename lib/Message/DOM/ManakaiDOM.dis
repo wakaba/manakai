@@ -26,7 +26,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/08 05:38:38 $
+     $Date: 2004/09/09 03:29:39 $
 
   @Require:
     @@Module:
@@ -224,10 +224,13 @@ IF:
           $r = bless {
             <Q:TreeCore:origin> => [],
             <Q:TreeCore:subnode> => [],
+            <Q:TreeCore:irefnode> => [],
+            <Q:TreeCore:urefnode> => [],
+            <Q:TreeCore:anydata> => [],
             <Q:TreeCore:rc> => 0,
             <Q:TreeCore:treeID> => __CODE{UniqueID}__,
             <Q:TreeCore:nodeID> => __CODE{UniqueID}__,
-          }, $self;
+          }, ref $self || $self;
   @IntMethod:
     @@Name: newReference
     @@Description:
@@ -307,7 +310,7 @@ IF:
             $r = true;
           } else {
             for my $key (@{$self->{<Q:TreeCore:subnode>}}) {
-              for (@{$self->{$key}}) {
+              for (@{$self->{$key} || []}) {
                 if ($_->__INT{isExternallyReferredDownward}__) {
                   $r = true;
                   last SUBNODES;
@@ -342,6 +345,21 @@ IF:
             delete $self->{$key};
             $_->__INT{destroyDownward}__ for @node;
           }
+   \       for my $key (@{$self->{<Q:TreeCore:irefnode>}},
+   \                    @{$self->{<Q:TreeCore:urefnode>}},
+   \                    @{$self->{<Q:TreeCore:anydata>}}) {
+            if (ref $self->{$key} eq 'ARRAY') {
+              for (@{$self->{$key}}) {
+                delete $self->{$key}->{$_};
+              }
+            } elsif (ref $self->{$key} eq 'HASH') {
+              for (keys %{$self->{$key}}) {
+                delete $self->{$key}->{$_};
+              }
+            } else {
+              delete $self->{$key};
+            }
+          }
   @IntMethod:
     @@Name: importTree
     @@Description:
@@ -358,7 +376,7 @@ IF:
         @@@@Type:
           lang:Perl
         @@@@@:
-          unless ($node->{<Q:TreeCore:treeID>} ne $self->{<Q:TreeCore:treeID>}) {
+          unless ($node->{<Q:TreeCore:treeID>} eq $self->{<Q:TreeCore:treeID>}) {
             $_->__INT{changeTreeIDDownward}__ ($self->{<Q:TreeCore:treeID>})
               for @{$node->__INT{getRootNodes}__};
           }
@@ -404,13 +422,14 @@ IF:
           lang:Perl
         @@@@@:
           for (@{$self->{<Q:TreeCore:origin>}}) {
-            NEW: for my $new (@{$_->__INT{getRootNodes}__}) {
+            NEW: for my $new (@{$self->{$_}->__INT{getRootNodes}__}) {
               for my $old (@$r) {
                 next NEW if $old eq $new;
               }
               push @$r, $new;
             }
           }
+          push @$r, $self if @$r == 0;
   @IntMethod:
     @@Name: isSameNode
     @@Description:
@@ -439,8 +458,6 @@ IF:
               $node->isa ('__IF{ManakaiDOMNodeObject}__') and
               $node->{<Q:TreeCore:nodeID>} eq $self->{<Q:TreeCore:nodeID>}) {
             $r = true;
-          } else {
-            $r = false;
           }
 
 IF:

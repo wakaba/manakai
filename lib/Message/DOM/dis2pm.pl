@@ -379,6 +379,25 @@ sub perl_exception (@) {
                             -type => $opt{type}) . ', ' . $opt{param};
 }
 
+sub ops2perl () {
+  my $result = '';
+  if ($Status->{Operator}->{DESTROY}) {
+    $result .= perl_statement
+                 perl_assign
+                      perl_var (type => '*', local_name => 'DESTROY')
+                   => $Status->{Operator}->{DESTROY};
+    delete $Status->{Operator}->{DESTROY};
+  }
+  if (keys %{$Status->{Operator}}) {
+    $result .= perl_statement 'use overload ' .
+                   perl_list map ({($_,
+                                   perl_code_literal $Status->{Operator}->{$_})}
+                                  keys %{$Status->{Operator}}),
+                             fallback => 1;
+  }
+  $result;
+}
+
 
 sub pod_comment (@) {
   (q<=begin comment>, @_, q<=end comment>);
@@ -838,6 +857,7 @@ sub if2perl ($) {
   local $Status->{IF} = $if_name;
   local $Status->{if} = {}; ## Temporary data
   local $Info->{Namespace} = {%{$Info->{Namespace}}};
+  local $Status->{Operator} = {};
 
   my @level;
   my $mod = get_level_description $node, level => \@level;
@@ -849,7 +869,6 @@ sub if2perl ($) {
                          q< implements the DOM interface > .
                          pod_code ($if_name) . $mod . q<.>);
   
-  my $version = perl_statement perl_assign 'our $VERSION', version_date time;
   for my $condition ((sort keys %{$Info->{Condition}}), '') {
     if ($condition =~ /^DOM(\d+)$/) {
       next if @level and $level[0] > $1;
@@ -883,13 +902,23 @@ sub if2perl ($) {
       $result .= perl_inherit [@isaa, $cond_if_pack_name] => $cond_int_pack_name;
       $result .= perl_inherit [$if_pack_name] => $cond_if_pack_name;
     } else { ## No condition specified
-      $result .= perl_inherit [perl_package_name name => $if_name,
+      if ($Info->{NormalCondition}) {
+        $result .= perl_inherit [perl_package_name name => $if_name,
                                      condition => $Info->{NormalCondition},
                                      is_internal => 1]
-                              => $cond_int_pack_name
-         if $Info->{NormalCondition};
+                              => $cond_int_pack_name;
+      } else {  ## Condition not used
+        $result .= perl_inherit [$if_pack_name] => $cond_int_pack_name;
+      }
     }
-    $result .= $version;
+    for my $pack ($cond_pack_name, $cond_int_pack_name,
+                  $cond_if_pack_name) {
+      $result .= perl_statement perl_assign
+                   perl_var (type => '$',
+                             package => {full_name => $pack},
+                             local_name => 'VERSION')
+                   => version_date time;
+    }
 
     for (@{$node->child_nodes}) {
       my $gt = 0;
@@ -930,6 +959,8 @@ sub if2perl ($) {
       }
     }
   }
+
+  $result .= ops2perl;
 
   $result;
 } # if2perl
@@ -1418,9 +1449,16 @@ sub datatype2perl ($;%) {
   local $Info->{Namespace} = {%{$Info->{Namespace}}};
   local $Status->{Operator} = {};
   my $result = perl_package full_name => $pack_name;
-  $result .= perl_statement perl_assign 'our $VERSION', version_date time;
   $result .= perl_statement 'push our @ISA, ' .
                             perl_list perl_package_name (if => $if_name);
+  for my $pack ({full_name => $pack_name}, {if => $if_name}) {
+    $result .= perl_statement perl_assign
+                 perl_var (type => '$',
+                           package => $pack,
+                           local_name => 'VERSION')
+                 => version_date time;
+  }
+  
   my @level = @{$opt{level} || []};
   my $mod = get_level_description $node, level => \@level;
   $mod = ', that has been ' . $mod if $mod;
@@ -1452,15 +1490,7 @@ sub datatype2perl ($;%) {
     }
   }
 
-  if (keys %{$Status->{Operator}}) {
-    $result .= perl_statement 'use overload ' .
-                   join (', ', map {(perl_literal ($_),
-                                     $Status->{Operator}->{$_})}
-                               grep {!/^[A-Z]+$/}
-                                   keys %{$Status->{Operator}}) . ', ' .
-                   perl_list fallback => 1;
-## DESTROY
-  }
+  $result .= ops2perl;
 
   $result;
 } # datatype2perl
@@ -2078,6 +2108,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/09/08 05:38:38 $
+# $Date: 2004/09/09 03:29:39 $
 
 

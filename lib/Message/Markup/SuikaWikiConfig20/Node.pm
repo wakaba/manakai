@@ -19,7 +19,7 @@ This module is part of manakai.
 
 package Message::Markup::SuikaWikiConfig20::Node;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 =head1 METHODS
 
@@ -143,9 +143,14 @@ sub get_attribute_value ($$;%) {
   my ($self, $name, %opt) = @_;
   my $node = $self->get_attribute ($name);
   if (ref $node) {
-    return $node->value;
+    my $val = $node->value (%opt);
+    if ($opt{default_list} and ref $val eq 'ARRAY' and @$val == 0) {
+      return $opt{default_list};
+    } else {
+      return $val;
+    }
   } else {
-    return $opt{default};
+    return $opt{default_list} || $opt{default};
   }
 }
 
@@ -270,8 +275,13 @@ sub inner_text ($;%) {
                                     $self->{value};
 }
 
-sub value ($) {
-  shift->{value};
+sub value ($;%) {
+  my ($self, %opt) = @_;
+  if ($opt{as_array} and ref $self->{value} ne 'ARRAY') {
+    defined $self->{value} ? [$self->{value}] : [];
+  } else {
+    $self->{value};
+  }
 }
 
 sub stringify ($;%) {
@@ -291,12 +301,12 @@ sub stringify ($;%) {
     $r = $self->inner_text;
     if (scalar @{$self->{node}}) {
       if (defined $r) {
-        $r =~ s/(^|\x0A)(?=([\\\@\#\s]))?/$1."  ".($2?"\\":"")/ges;
+        $r =~ s/(^|\x0A)(?=([\\\@\#\s]|$))?/$1."  ".(defined $2?"\\":"")/ges;
         $r = $self->{local_name}
            . ":\x0A  \@\@"
            . (ref ($self->{value}) eq 'ARRAY' ? '[list]' : '')
            . ":" . (($r !~ /[\x0D\x0A:]/) && (length ($r) < 50) ? '' : "\x0A")
-           . $r . "\x0A";
+           . (length $r ? $r : '\\') . "\x0A";
       } else {
         $r = $self->{local_name}
            . ":\x0A";
@@ -310,11 +320,11 @@ sub stringify ($;%) {
       }
     } else {
       $r = '' unless defined $r;
-      $r =~ s/(^|\x0A)(?=([\\\@\#\s]))?/$1."  ".($2?"\\":"")/ges;
+      $r =~ s/(^|\x0A)(?=([\\\@\#\s]|$))?/$1."  ".(defined $2?"\\":"")/ges;
       $r = $self->{local_name}
          . (ref ($self->{value}) eq 'ARRAY' ? '[list]' : '')
          . ":" . ((($r !~ /[\x0D\x0A:]/) && (length ($r) < 50)) ? '' : "\x0A")
-         . $r . "\x0A";
+         . (length $r ? $r : '\\') . "\x0A";
     }
     $r = "\\" . $r if substr ($r, 0, 1) =~ /[\\\@\#\s]/;
   } else {
@@ -335,6 +345,43 @@ sub root_node ($) {
     return $self;
   }
 }
+
+=item $node->node_path ([key => attr-name])
+
+Represent position in the tree in informal XPath-like expression.
+
+Note: In current implementation, the format of expressions
+is insufficient to identify a node uniquely and it is
+not XPath compatible.
+
+=cut
+
+sub node_path ($;%) {
+  my ($self, %opt) = @_;
+  my $r;
+  if ($self->{parent}) {
+    $r = $self->{parent}->node_path (%opt);
+  } else {
+    $r = '';
+  }
+  if ($self->node_type eq '#element') {
+    $r .= '/' . $self->local_name;
+    if ($opt{key}) {
+      my $key = $self->get_attribute_value ($opt{key});
+      if (defined $key) {
+        $r .= '[@' . $opt{key} . '=' . $key . ']';
+      }
+    }
+  } elsif ($self->node_type eq '#comment') {
+    $r .= q</comment ()>;
+  } elsif ($self->node_type eq '#document') {
+    $r .= '/document ()';
+  } elsif ($self->node_type eq '#fragment') {
+    $r .= '/fragment ()';
+  }
+  $r;
+}
+
 
 sub flag ($$;$%) {
   my ($self, $name, $value, %opt) = @_;
@@ -444,4 +491,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/08/21 05:39:03 $
+1; # $Date: 2004/09/09 03:29:39 $

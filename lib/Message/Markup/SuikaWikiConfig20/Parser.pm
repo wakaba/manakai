@@ -15,7 +15,7 @@ This module is part of manakai.
 
 package Message::Markup::SuikaWikiConfig20::Parser;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Markup::SuikaWikiConfig20::Node;
 
 =head1 METHODS
@@ -85,9 +85,10 @@ sub parse_text ($$) {
                                        default => 0) >= $nest) {
           $current_element = $current_element->parent_node;
         }
-        $ce = $current_element->append_new_node (type => '#element',
-                                                 local_name => $name,
-                                                 value => $val);
+        $ce = $current_element->append_new_node
+                                       (type => '#element',
+                                        local_name => $name,
+                                        value => $val);
         $ce->flag (p__nest_level
                    => $current_element->flag ('p__nest_level', undef,
                                               default => 0) + 1);
@@ -178,4 +179,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/08/21 05:39:03 $
+1; # $Date: 2004/09/09 03:29:39 $
