@@ -1621,7 +1621,7 @@ sub dis_perl_init_classdef ($;%) {
     ## This class implements...
     if ($res->{multiple_resource_parent}) {
       IF: for my $if (@{$res->{multiple_resource_parent}->{hasResource}}) {
-        for (keys %{$if->{Type}}) {
+        for my $iftypeuri (keys %{$if->{Type}}) {
           if (dis_uri_ctype_match ({
                 ExpandedURI q<ManakaiDOM:Class> => ExpandedURI q<ManakaiDOM:IF>,
                 ExpandedURI q<DOMMain:ErrorClass>
@@ -1629,8 +1629,9 @@ sub dis_perl_init_classdef ($;%) {
                 ExpandedURI q<ManakaiDOM:ExceptionClass>
                                      => ExpandedURI q<ManakaiDOM:ExceptionIF>,
                 ExpandedURI q<ManakaiDOM:WarningClass> => 'dummy',
-                                   }->{$type}, $_, %opt)) {
-            push @{$res->{Implement}||=[]}, $if->{URI};
+                                   }->{$type}, $iftypeuri, %opt)) {
+            ## Commented out because it has bug...
+            #push @{$res->{Implement}||=[]}, $if->{URI};
             last IF;
           }
         }
@@ -2776,4 +2777,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/03/03 11:19:08 $
+1; # $Date: 2005/04/01 07:58:46 $

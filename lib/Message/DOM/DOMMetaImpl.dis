@@ -20,7 +20,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/03/06 11:12:41 $
+      $Date: 2005/04/01 07:58:46 $
     @@ContentType:
       dis:Date.RCS
   
@@ -127,11 +127,24 @@ StringDataTypeDef:
       accessible (including via binding-dependent cast mechanism).
       \
       Note that feature names are case-insensitive.
+
+  @InputProcessor:
+    @@PerlDef:
+      $INPUT = lc $INPUT;
+
   @ManakaiDOM:inputNormalizer:
     @@ContentType:
       lang:Perl
     @@@:
       $INPUT = lc $INPUT;
+
+ElementTypeBinding:
+  @Name: InputProcessor
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:InputProcessor
 
 StringDataTypeDef:
   @QName: 
@@ -147,6 +160,11 @@ StringDataTypeDef:
       In most contexts, an empty string and the <DOM:null> value are 
       also valid values.  Both values indicate that any version of 
       that feature is acceptable.
+
+  @InputProcessor:
+    @@PerlDef:
+      $INPUT = '' unless defined $INPUT;
+
   @ManakaiDOM:inputNormalizer:
     @@ContentType:
       lang:Perl
@@ -175,6 +193,7 @@ StringDataTypeDef:
       a feature version (or an empty string).  Don't forget to quote 
       version number when its fraction part is <CODE:0> (e.g. 
       quote <FeatureVer:2.0> like <Perl:'2.0'>).      
+
   @ManakaiDOM:inputNormalizer:
     @@ContentType:
       lang:Perl
@@ -209,6 +228,40 @@ StringDataTypeDef:
       } else {
         $INPUT = {};
       }
+
+  @InputProcessor:
+    @@PerlDef:
+      if (CORE::defined $INPUT) {
+        if (CORE::ref ($INPUT) eq 'HASH') {
+          my $new = {};
+          for my $fname (keys %{$INPUT}) {
+            if (CORE::ref ($INPUT->{$fname}) eq 'HASH') {
+              my $lfname = lc $fname;
+              for my $fver (keys %{$INPUT->{$fname}}) {
+                $new->{$lfname}->{$fver} = $INPUT->{$fname}->{$fver};
+              }
+            } else {
+              $new->{lc $fname} = {(CORE::defined $INPUT->{$fname}
+                                      ? $INPUT->{$fname} : '') => 1};
+            }
+          }
+          $INPUT = $new;
+        } else {
+          my @f = split /\s+/, $INPUT;
+          $INPUT = {};
+          while (@f) {
+            my $name = lc shift @f;
+            if (@f and $f[0] =~ /^[\d\.]+$/) {
+              $INPUT->{$name}->{shift @f} = 1;
+            } else {
+              $INPUT->{$name}->{''} = 1;
+            }
+          }
+        }
+      } else {
+        $INPUT = {};
+      }
+
     @@ImplNote:
       @@@lang:en
       @@@@:
@@ -222,6 +275,7 @@ StringDataTypeDef:
         This input normalizer creates a copy of feature list even if 
         it is given as a hash reference; it means that <QUOTE::breaking> 
         any parameter does not affect the input source. 
+
   @ResourceDef:
     @@QName:
       DOMMain:stringifyFeatures

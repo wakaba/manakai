@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/03/30 03:16:43 $
+      $Date: 2005/04/01 07:58:46 $
     @@ContentType:
       dis:Date.RCS
   
@@ -279,8 +279,12 @@ ClsDef:
           $pack = <ClassName::ManakaiPerlInlineUnparsedCode>;
         } elsif ($nt eq 'incontainer') {
           $pack = <ClassName::ManakaiPerlInlineContainer>;
+        } elsif ($nt eq 'statement') {
+          $pack = <ClassName::ManakaiPerlStatement>;
         } elsif ($nt eq 'string') {
           $pack = <ClassName::ManakaiPerlStringLiteral>;
+        } elsif ($nt eq 'block') {
+          $pack = <ClassName::ManakaiPerlBlock>;
         } elsif ($nt eq 'sub') {
           $pack = <ClassName::ManakaiPerlSub>;
         } elsif ($nt eq 'package') {
@@ -1335,6 +1339,83 @@ ClsDef:
       A <Class::ManakaiPerlStatementContainer> object must have
       a property:
         <Q::pc:childNodes>.
+
+  @Attr:
+    @@Name: label
+    @@enDesc:
+      Label for this block.
+    @@Type:
+      DISLang:String::ManakaiDOM:all
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          No label.
+      @@@disDef:
+        @@@@GetProp:label
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          No label.
+      @@@disDef:
+        @@@@SetProp:label
+
+  @Method:
+    @@Name: appendBlock
+    @@enDesc:
+      Appends a Perl block code.
+    @@Return:
+      @@@Type: ManakaiPerlBlock
+      @@@enDesc:
+        The newly created Perl code object. 
+      @@@PerlDef:
+        $r = <ClassM::ManakaiPerlBlock.newObject>;
+        my $node = $self->{<Q::TreeCore:node>};
+        $node-><M::ManakaiDOM:ManakaiDOMNodeObject
+                 ::ManakaiDOM:Perl.importTree> ($r);
+        push @{$node->{<Q::pc:childNodes>}}, $r;
+        $r->{<Q::pc:parent>} = $node;
+        if (defined wantarray) {
+          __CODE{ManakaiNode:getNewReference::
+            $object => $r, $ref => $r,
+            $class =>{<ClassName::ManakaiPerlBlock>},
+          }__;
+        }
+
+  @Method:
+    @@Name: appendStatement
+    @@enDesc:
+      Appends a Perl statement.
+    @@Param:
+      @@@Name: codeArg
+      @@@Type:
+        lang:Perl::ManakaiDOM:all
+      @@@enDesc:
+        A Perl statement without terminating <Perl::;>.
+      @@@nullCase:
+        @@@@enDesc:
+          No initial content.
+    @@Return:
+      @@@Type: ManakaiPerlStatement
+      @@@enDesc:
+        The newly created Perl code object. 
+      @@@PerlDef:
+        $r = <ClassM::ManakaiPerlStatement.newObject>;
+        my $node = $self->{<Q::TreeCore:node>};
+        $node-><M::ManakaiDOM:ManakaiDOMNodeObject
+                 ::ManakaiDOM:Perl.importTree> ($r);
+        push @{$node->{<Q::pc:childNodes>}}, $r;
+        $r->{<Q::pc:parent>} = $node;
+        if (defined wantarray or defined $codeArg) {
+          __CODE{ManakaiNode:getNewReference::
+            $object => $r, $ref => $r,
+            $class =>{<ClassName::ManakaiPerlStatement>},
+          }__;
+          if (defined $codeArg) {
+            __DEEP{
+              $r-><M::ManakaiPerlAnyContainer.appendBare> ($codeArg);
+            }__;
+          }
+        }
 ##PerlStatementContainer
 
 ClsDef:
@@ -2038,8 +2119,51 @@ ClsDef:
             $class =>{<ClassName::ManakaiPerlBare>},
           }__;
         }
-
 ##PerlAnyContainer
+
+ClsDef:
+  @ClsQName: ManakaiPerlStatement
+  @ClsISA: ManakaiPerlInlineContainer
+  @enDesc:
+    Perl statements. 
+  
+  @IntMethod:
+    @@Name:newObject
+    @@ManakaiDOM:isStatic:1
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates a new instance object for
+        <Class::ManakaiPerlStatement>. 
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The newly created node object.
+      @@@PerlDef:
+        @@@@@:
+          my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
+                                        ::ManakaiDOM:Perl.new>;
+          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
+          $node->{<Q::pc:childNodes>} = [];
+          $node->{<Q::pc:nodeType>} = 'statement';
+        @@@@ImplNote:
+          @@@@@lang:en
+          @@@@@@:
+            Properties: <Q::pc:nodeType>, <Q::pc:childNodes>.
+
+  @ToStringMethod:
+    @@Return:
+      @@@Type:
+        DISLang:String
+      @@@enDesc:
+        Perl code. 
+      @@@PerlDef:
+        $r = $self->SUPER::stringify;
+        $r .= ';' if length $r;
+##PerlStatement
 
 ClsDef:
   @ClsQName: ManakaiPerlInlineContainer
@@ -2165,6 +2289,64 @@ ClsDef:
           }
         }
 ##PerlInlineContainer
+
+ClsDef:
+  @ClsQName: ManakaiPerlBlock
+  @ClsISA: ManakaiPerlStatementContainer
+  @enDesc:
+    Perl block-level code block. 
+  
+  @IntMethod:
+    @@Name:newObject
+    @@ManakaiDOM:isStatic:1
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates a new instance object for
+        <Class::ManakaiPerlBlock>. 
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The newly created node object.
+      @@@PerlDef:
+        @@@@@:
+          my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
+                                        ::ManakaiDOM:Perl.new>;
+          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
+          $node->{<Q::pc:childNodes>} = [];
+          $node->{<Q::pc:nodeType>} = 'block';
+        @@@@ImplNote:
+          @@@@@lang:en
+          @@@@@@:
+            Properties: <Q::pc:nodeType>, <Q::pc:childNodes>, <Q::pc:label>.
+
+  @ToStringMethod:
+    @@Return:
+      @@@Type:
+        DISLang:String
+      @@@enDesc:
+        Perl code. 
+      @@@PerlDef:
+        for my $cno (@{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}}) {
+          my $cn = <ClassM::ManakaiPerlCodeFragment.getNodeReference> ($cno);
+          if ($cno->{<Q::pc:nodeType>} eq 'incontainer' and
+   \          @{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}} == 1) {
+            $r .= '(' . $cn->stringify . ')';
+          } else {
+            $r .= $cn->stringify;
+          }
+        }
+        $r = '{' . $r . '}';
+
+##PerlBlock
+
+PropDef:
+  @QName:label
+  @enDesc:
+    Perl statement / block label.
 
 ElementTypeBinding:
   @Name: RaiseException
@@ -2516,6 +2698,22 @@ ClsDef:
           $r-><AS::ManakaiPerlVariable.variableType> ($variableType);
           $r-><AS::ManakaiPerlVariable.packageName> ($packageName);
           $r-><AS::ManakaiPerlVariable.localName> ($localName);
+        }__;
+
+  @Method:
+    @@Name: createPerlBlock
+    @@enDesc:
+      Creates a new <Class::ManakaiPerlBlock> object. 
+    @@Return:
+      @@@Type:ManakaiPerlBlock
+      @@@enDesc: 
+        Newly created Perl code object. 
+      @@@PerlDef:
+        __DEEP{
+          $r = <ClassM::ManakaiPerlBlock.newObject>;
+          __CODE{ManakaiNode:getNewReference::
+                   $object => $r, $ref => $r,
+                   $class => {<ClassName::ManakaiPerlBlock>}}__;
         }__;
 ##PerlCodeImplementation
 

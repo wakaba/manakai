@@ -28,7 +28,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/27 14:27:56 $
+      $Date: 2005/04/01 07:58:46 $
     @@ContentType:
       dis:Date.RCS
   
@@ -941,30 +941,6 @@ PropDef:
   @dataType:
     dis:Boolean
 
-FormatDef:
-  @QName: XCodeRef
-  @Description:
-    @@lang:en
-    @@@:
-      A reference to an exception or warning code or subcode. 
-      \
-      - XCodeRef := FQXCodeRef / coderef / subcoderef
-      \
-      - FQXCodeRef := xref "." coderef ["." subcoderef]
-      \
-      - xref := <A dis:TFQNames referring an exception or 
-                 warning interface or class>
-      \
-      - coderef := codeq / codenc
-      \
-      - codeq := <A dis:TFQNames with a prefixed "Type" QName,
-                  referring an exception or warning code>
-      \
-      - codenc := <An unprefixed dis:TypeQName identifying a code 
-                   in the null namespace>
-      \
-      - subcoderef := <A dis:TFQNames referring an exception or warning subcode;
-                       it should be prefixed>
 
 ## -- Other
 

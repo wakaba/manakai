@@ -30,7 +30,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/03/02 07:46:31 $
+      $Date: 2005/04/01 07:58:46 $
     @@ContentType:
       dis:Date.RCS
   
@@ -686,6 +686,13 @@ ResourceDef:
        @@@Type:
          DOMMain:boolean
 
+  @InputProcessor:
+    @@PerlDef:
+      if (ref $INPUT eq 'HASH') {
+        require Message::DOM::DOMLS;
+        $INPUT = bless $INPUT, 'Message::DOM::DOMLS::ManakaiDOMLSInput';
+      }
+
   @ManakaiDOM:inputNormalizer:
     @@ContentType:
       lang:Perl
@@ -695,6 +702,14 @@ ResourceDef:
         $INPUT = bless $INPUT, 'Message::DOM::DOMLS::ManakaiDOMLSInput';
       }
 ##IF:LSInput
+
+ElementTypeBinding:
+  @Name: InputProcessor
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:InputProcessor
 
 DataTypeDef:
   @QName:

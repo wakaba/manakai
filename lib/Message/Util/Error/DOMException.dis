@@ -22,7 +22,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/03/30 03:16:43 $
+      $Date: 2005/04/01 07:58:46 $
     @@ContentType:
       dis:Date.RCS
   
@@ -249,6 +249,46 @@ ElementTypeBinding:
         ::ManakaiDOM:all
       @@@For:
         !=ManakaiDOM:all
+
+## -- References to Exception
+
+FormatDef:
+  @QName: 
+    DOMMain:XCodeRef
+  @Description:
+    @@lang:en
+    @@@:
+      A reference to an exception or warning code or subcode. 
+      \
+      - XCodeRef := FQXCodeRef / coderef / subcoderef
+      \
+      - FQXCodeRef := xref "." coderef ["." subcoderef]
+      \
+      - xref := <A dis:TFQNames referring an exception or 
+                 warning interface or class>
+      \
+      - coderef := codeq / codenc
+      \
+      - codeq := <A dis:TFQNames with a prefixed "Type" QName,
+                  referring an exception or warning code>
+      \
+      - codenc := <An unprefixed dis:TypeQName identifying a code 
+                   in the null namespace>
+      \
+      - subcoderef := <A dis:TFQNames referring an exception or warning subcode;
+                       it should be prefixed>
+
+ElementTypeBinding:
+  @Name: FormatDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISCore:StringDataType
+    @@ForCheck:
+      ManakaiDOM:all
+    @@rdfs:subClassOf:
+      DISCore:String::ManakaiDOM:all
 
 ## -- Exception classes
 
@@ -696,6 +736,15 @@ XWParam:
     @@@:
       The name of class in whose method or attribute an exception 
       or warning is thrown. 
+
+XWParam:
+  @QName: 
+    MDOMX:resourceURI
+  @Description:
+    @@lang:en
+    @@@:
+      The URI reference of the resource in which the source code
+      is defined.
 
 ElementTypeBinding:
   @Name: XWParam
