@@ -1992,14 +1992,6 @@ sub dis_perl_init_classdef ($;%) {
           ->{ExpandedURI q<dis2pm:package>}->{$pack} = $res;
   }
   
-  ## Child resources
-  for my $cres (values %{$res->{Resource}}) {
-    next if $cres->{ExpandedURI q<dis2pm:done>};
-    next unless defined $cres->{Name};
-    local $State->{ExpandedURI q<dis2pm:parentResource>} = $res;
-    dis_perl_init_classdef ($cres, %opt);
-  }
-
   ## Validate children
   my $has_def = 0;
   N: for (@{$res->{src}->child_nodes}) {
@@ -2057,6 +2049,14 @@ sub dis_perl_init_classdef ($;%) {
   $res->{ExpandedURI q<DOMMain:implementFeature>}
     ||= $State->{ExpandedURI q<dis2pm:parentResource>}
               ->{ExpandedURI q<DOMMain:implementFeature>};
+
+  ## Child resources
+  for my $cres (values %{$res->{Resource}}) {
+    next if $cres->{ExpandedURI q<dis2pm:done>};
+    next unless defined $cres->{Name};
+    local $State->{ExpandedURI q<dis2pm:parentResource>} = $res;
+    dis_perl_init_classdef ($cres, %opt);
+  }
 
   if ($type eq ExpandedURI q<ManakaiDOM:DOMMethod>) {
     valid_err (q<Method "dis:Return" element is required>, node => $res->{src})
@@ -2395,4 +2395,4 @@ sub disdoc_inline2pod ($;%) {
 
 =cut
 
-1; # $Date: 2004/12/27 13:41:54 $
+1; # $Date: 2004/12/28 13:10:20 $

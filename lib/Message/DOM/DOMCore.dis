@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/27 13:41:54 $
+      $Date: 2004/12/28 13:10:20 $
     @@ContentType:
       dis:Date.RCS
 
@@ -123,6 +123,8 @@ Namespace:
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
   @TreeCore: \
+  @xhtml1:
+    http://www.w3.org/1999/xhtml
   @xml:
     http://www.w3.org/XML/1998/namespace
   @xmlns:
@@ -235,6 +237,16 @@ ElementTypeBinding:
         ManakaiDOM:ManakaiDOM1
 
 ElementTypeBinding:
+  @Name: ClassDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:Class
+    @@For:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+
+ElementTypeBinding:
   @Name: ImplementLevel3
   @ElementType:
     dis:ISA
@@ -248,6 +260,21 @@ ElementTypeBinding:
   @ShadowSibling:
     @@DOMMain:implementFeature:
       @@@@: CoreFeature30
+      @@@For:
+        ManakaiDOM:DOM3
+    @@DOMMain:implementFeature:
+      @@@@: 
+        DOMXML:XMLFeature30
+      @@@For:
+        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: 
+        DOMXML:XMLVersionFeature10
+      @@@For:
+        ManakaiDOM:DOM3
+    @@DOMMain:implementFeature:
+      @@@@: 
+        DOMXML:XMLVersionFeature11
       @@@For:
         ManakaiDOM:DOM3
 ElementTypeBinding:
@@ -266,6 +293,26 @@ ElementTypeBinding:
       @@@@: CoreFeature20
       @@@For:
         ManakaiDOM:DOM2
+    @@DOMMain:implementFeature:
+      @@@@: 
+        DOMXML:XMLFeature20
+      @@@For:
+        ManakaiDOM:DOM2 ManakaiDOM:DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: 
+        DOMXML:XMLFeature30
+      @@@For:
+        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: 
+        DOMXML:XMLVersionFeature10
+      @@@For:
+        ManakaiDOM:DOM3
+    @@DOMMain:implementFeature:
+      @@@@: 
+        DOMXML:XMLVersionFeature11
+      @@@For:
+        ManakaiDOM:DOM3
 ElementTypeBinding:
   @Name: ImplementLevel1
   @ElementType:
@@ -282,6 +329,131 @@ ElementTypeBinding:
       @@@@: CoreFeature
       @@@For:
         ManakaiDOM:DOM1
+    @@DOMMain:implementFeature:
+      @@@@: 
+        DOMXML:XMLFeature10
+      @@@For:
+        ManakaiDOM:DOM1 ManakaiDOM:DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: 
+        DOMXML:XMLFeature20
+      @@@For:
+        ManakaiDOM:DOM2 ManakaiDOM:DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: 
+        DOMXML:XMLFeature30
+      @@@For:
+        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: 
+        DOMXML:XMLVersionFeature10
+      @@@For:
+        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: 
+        DOMXML:XMLVersionFeature11
+      @@@For:
+        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
+
+ElementTypeBinding:
+  @Name: L1
+  @ElementType:
+    DOMMain:implementFeature
+  @ShadowContent:
+    @@@: CoreFeature
+    @@For:
+      ManakaiDOM:DOM1
+  @ShadowSibling:
+    @@DOMMain:implementFeature:
+      @@@@: CoreFeature20
+      @@@For: 
+        ManakaiDOM:DOM2
+    @@DOMMain:implementFeature:
+      @@@@: CoreFeature30
+      @@@For: 
+        ManakaiDOM:DOM3
+    @@DOMMain:implementFeature:
+      @@@@: 
+        DOMXML:XMLFeature10
+      @@@For:
+        ManakaiDOM:DOM1 ManakaiDOM:DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: 
+        DOMXML:XMLFeature20
+      @@@For:
+        ManakaiDOM:DOM2 ManakaiDOM:DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: 
+        DOMXML:XMLFeature30
+      @@@For:
+        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: 
+        DOMXML:XMLVersionFeature10
+      @@@For:
+        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: 
+        DOMXML:XMLVersionFeature11
+      @@@For:
+        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
+ElementTypeBinding:
+  @Name: L2
+  @ElementType:
+    DOMMain:implementFeature
+  @ShadowContent:
+    @@@: CoreFeature20
+    @@For:
+      ManakaiDOM:DOM2
+  @ShadowSibling:
+    @@DOMMain:implementFeature:
+      @@@@: CoreFeature30
+      @@@For: 
+        ManakaiDOM:DOM3
+    @@DOMMain:implementFeature:
+      @@@@: 
+        DOMXML:XMLFeature20
+      @@@For:
+        ManakaiDOM:DOM2 ManakaiDOM:DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: 
+        DOMXML:XMLFeature30
+      @@@For:
+        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: 
+        DOMXML:XMLVersionFeature10
+      @@@For:
+        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: 
+        DOMXML:XMLVersionFeature11
+      @@@For:
+        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
+ElementTypeBinding:
+  @Name: L3
+  @ElementType:
+    DOMMain:implementFeature
+  @ShadowContent:
+    @@@: CoreFeature30
+    @@For:
+      ManakaiDOM:DOM3
+  @ShadowSibling:
+    @@DOMMain:implementFeature:
+      @@@@: 
+        DOMXML:XMLFeature30
+      @@@For:
+        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: 
+        DOMXML:XMLVersionFeature10
+      @@@For:
+        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: 
+        DOMXML:XMLVersionFeature11
+      @@@For:
+        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
 
 ElementTypeBinding:
   @Name: BlockCode
@@ -553,6 +725,13 @@ ElementTypeBinding:
   @ShadowContent:
     @@ContentType:
       dis:String
+ElementTypeBinding:
+  @Name: featureQName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ContentType:
+      dis:TypeQName
 
 FeatureDef:
   @featureName: Core
@@ -577,6 +756,32 @@ FeatureDef:
     @@Description:
       @@@lang:en
       @@@@: The DOM Core Module, Level 3.
+
+FeatureDef:
+  @featureQName:
+    ManakaiDOM:ManakaiDOMCore
+  @QName: MDOMCoreFeature
+  @FeatureVerDef:
+    @@Version: 1.0
+    @@QName: MDOMCoreFeature10
+    @@ISA: MDOMCoreFeature
+    @@Description:
+      @@@lang:en
+      @@@@: The Manakai DOM Core Module, Level 1.
+  @FeatureVerDef:
+    @@Version: 2.0
+    @@QName: MDOMCoreFeature20
+    @@ISA: MDOMCoreFeature10
+    @@Description:
+      @@@lang:en
+      @@@@: The Manakai DOM Core Module, Level 2.
+  @FeatureVerDef:
+    @@Version: 3.0
+    @@QName: MDOMCoreFeature30
+    @@ISA: MDOMCoreFeature20
+    @@Description:
+      @@@lang:en
+      @@@@: The Manakai DOM Core Module, Level 3.
 
 ## -- Exception
 
@@ -1967,14 +2172,27 @@ IF:
               This source has no DOM implementation that supports the 
               desired features and versions.
         @@@PerlDef:
-          CLS: for (values %{<Class::DOMCore:DOMImplementation
+          CLS: for (values %{<IF::DOMCore:DOMImplementation
                                      ::ManakaiDOM:ManakaiDOM>::Class}) {
             for my $fname (keys %$features) {
-              for my $fver (ref $features->{$fname} eq 'HASH'
-                               ? grep {$features->{$fname}->{$_}}
-                                   keys %{$features->{$fname}}
-                               : $features->{$fname}) {
+              my $plus = $fname =~ s/^\+// ? 1 : 0;
+              F: for my $fver (ref $features->{$fname} eq 'HASH'
+                                 ? grep {$features->{$fname}->{$_}}
+                                     keys %{$features->{$fname}}
+                                 : $features->{$fname}) {
                 unless ($_->{feature}->{$fname}->{$fver}) {
+                  ## Accessible via getFeature
+                  if ($plus and
+                      ${<Class::DOMCore:ManakaiDOMImplementation
+                                     ::ManakaiDOM:ManakaiDOMLatest>::Class}{
+                        $_->{packageName}}->{packageName}) {
+                    for (values %{<Class::DOMCore:ManakaiDOMImplementation
+                                     ::ManakaiDOM:ManakaiDOMLatest>::Class}) {
+                      if ($_->{feature}->{$fname}->{$fver}) {
+                        next F;
+                      }
+                    }
+                  }
                   next CLS;
                 }
               }
@@ -2012,11 +2230,24 @@ IF:
           CLS: for (values %{<Class::DOMCore:DOMImplementation
                                      ::ManakaiDOM:ManakaiDOM>::Class}) {
             for my $fname (keys %$features) {
-              for my $fver (ref $features->{$fname} eq 'HASH'
-                               ? grep {$features->{$fname}->{$_}}
-                                   keys %{$features->{$fname}}
-                               : $features->{$fname}) {
+              my $plus = $fname =~ s/^\+// ? 1 : 0;
+              F: for my $fver (ref $features->{$fname} eq 'HASH'
+                                 ? grep {$features->{$fname}->{$_}}
+                                     keys %{$features->{$fname}}
+                                 : $features->{$fname}) {
                 unless ($_->{feature}->{$fname}->{$fver}) {
+                  ## Accessible via getFeature
+                  if ($plus and
+                      ${<Class::DOMCore:ManakaiDOMImplementation
+                                     ::ManakaiDOM:ManakaiDOMLatest>::Class}{
+                        $_->{packageName}}->{packageName}) {
+                    for (values %{<Class::DOMCore:ManakaiDOMImplementation
+                                     ::ManakaiDOM:ManakaiDOMLatest>::Class}) {
+                      if ($_->{feature}->{$fname}->{$fver}) {
+                        next F;
+                      }
+                    }
+                  }
                   next CLS;
                 }
               }
@@ -2061,6 +2292,36 @@ IF:
       DOMMain:DOMMainFeature30
     @@For:
       ManakaiDOM:ManakaiDOM3
+  @DOMMain:implementFeature:
+    @@@:
+      DOMCore:MDOMCoreFeature10
+    @@For:
+      ManakaiDOM:ManakaiDOM1
+  @DOMMain:implementFeature:
+    @@@:
+      DOMCore:MDOMCoreFeature20
+    @@For:
+      ManakaiDOM:ManakaiDOM2
+  @DOMMain:implementFeature:
+    @@@:
+      DOMCore:MDOMCoreFeature30
+    @@For:
+      ManakaiDOM:ManakaiDOM3
+  @DOMMain:implementFeature:
+    @@@:
+      DOMXML:MDOMXMLFeature10
+    @@For:
+      ManakaiDOM:ManakaiDOM1
+  @DOMMain:implementFeature:
+    @@@:
+      DOMXML:MDOMXMLFeature20
+    @@For:
+      ManakaiDOM:ManakaiDOM2
+  @DOMMain:implementFeature:
+    @@@:
+      DOMXML:MDOMXMLFeature30
+    @@For:
+      ManakaiDOM:ManakaiDOM3
   @Spec:
     @@DOM3:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-102161490
@@ -2098,6 +2359,7 @@ IF:
        @@@@:
          Tests whether this DOM implementation supports a specific 
          feature and version or not.
+     @@L1:
      @@Param:
         @@@Name:  feature
         @@@Type:
@@ -2107,7 +2369,7 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@: 
-            A name of feature to test.
+            A name of feature to test, with an optional <CHAR::PLUS SIGN>.
         
         @@@ImplNote:
           @@@@lang:en
@@ -2223,14 +2485,19 @@ IF:
             @@@@@lang:en
             @@@@@@: The feature is not implemented.
         @@@PerlDef:
-            if (defined $feature) {
-            #  undef $version if defined $version and not length $version;
-            #  my $plus = 1 if $feature =~ s/^\+//;
-            #  $r = $self->__INT{SP:classHasFeature}__
-            #                 (lc $feature => {version => $version,
-            #                                  plus => $plus});
+          my $plus = $feature =~ s/^\+// ? 1 : 0;
+          if (${<IF::DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM>::Class}{
+              ref $self}->{$feature}->{$version}) {
+            $r = true;
+          } else {
+            for (values %{<Class::DOMCore:ManakaiDOMImplementation
+                                     ::ManakaiDOM:ManakaiDOMLatest>::Class}) {
+              if ($_->{feature}->{$feature}->{$version}) {
+                $r = true;
+                last;
+              }
             }
-            \## TODO: New implementation required.
+          } 
   @Method:
      @@Name:  createDocumentType
      @@Description:
@@ -2286,9 +2553,7 @@ IF:
           @@@@lang:en
           @@@@@: The external subset system identifier.
      @@SpecLevel: 2
-     @@Level[list]:  
-        2
-        3
+     @@L2:
      @@For:
        ManakaiDOM:DOM2
      @@Return:
@@ -4428,16 +4693,45 @@ IF:
          DOM Level 2.
   @Method:
      @@Name:  isSupported
-     @@Return:
-        @@@Type:  boolean
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         This method is parallel to the <M::DOMImplementation.hasFeature>. 
      @@Param:
         @@@Name:  feature
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
+        @@@actualType:
+          ManakaiDOM:ManakaiDOMFeatureName
      @@Param:
         @@@Name:  version
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
+        @@@actualType:
+          ManakaiDOM:ManakaiDOMFeatureVersion
      @@Level[list]:  2
      @@SpecLevel:2
+     @@L2:
+     @@Return:
+        @@@Type:  
+          DOMMain:boolean
+        @@@PerlDef:
+          my $plus = $feature =~ s/^\+// ? 1 : 0;
+          if (${<Class::DOMCore:ManakaiDOMNode
+                                     ::ManakaiDOM:ManakaiDOMLatest>::Class}{
+              ref $self}->{$feature}->{$version}) {
+              \## ISSUE: Not work for node type specific classes
+            $r = true;
+          } else {
+            for (values %{<Class::DOMCore:ManakaiDOMNode
+                                     ::ManakaiDOM:ManakaiDOMLatest>::Class}) {
+              if ($_->{feature}->{$feature}->{$version}) {
+                $r = true;
+                last;
+              }
+            }
+          } 
+          \## TODO: Node type specific alternates
   @Attr:
      @@Name:  namespaceURI
      @@Description:
@@ -5270,6 +5564,7 @@ IF:
      @@Param:
         @@@Name:  handler
         @@@Type:  UserDataHandler
+     @@L3:
      @@Level[list]:  3
      @@SpecLevel:3
      @@For:
@@ -5283,6 +5578,7 @@ IF:
         @@@Name:  key
         @@@Type:  
           DOMMain:DOMString
+     @@L3:
      @@Level[list]:  3
      @@SpecLevel:3
      @@For:
@@ -5414,6 +5710,842 @@ IF:
                                                                       ($class);
 
 ## IF: Node
+
+ClassDef:
+  @QName: 
+    ManakaiDOMCore:ManakaiDOMNodeObjectNode
+  @ISA:
+    ManakaiDOM:ManakaiDOMNodeObject
+  @DOMMain:implementFeature: MDOMCoreFeature10
+  @DOMMain:implementFeature: MDOMCoreFeature20
+  @DOMMain:implementFeature: MDOMCoreFeature30
+
+  @Description:
+    @@lang:en
+    @@@:
+      The extended internal interface for the "ManakaiDOMNodeObject" 
+      object used as a "Node".
+
+  @IntAttr:
+    @@Name: textContent
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Text (character data) content of this node (including 
+        its descendants).
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        This attribute is parallel to the attribute "textContent" of 
+        the "Node" interface.
+    @@Type:
+      DOMMain:ManakaiDOMString
+    @@Get:
+      @@@PerlDef:
+          if ({
+                <Q::infoset:Element> => 1,
+                <Q::infoset:Attribute> => 1,
+                <Q::DOMXML:Entity> => 1,
+                <Q::DOMXML:EntityReference> => 1,
+                <Q::DOMCore:DocumentFragment> => 1,
+              }->{$self->{<Q::DOMCore:nodeType>}}) {
+            __DEEP{
+              for (@{$self->{<Q::infoset:children>}}) {
+                if ($_->{<Q::DOMCore:nodeType>} eq <Q::DOMCore:Text>) {
+                  unless ($_->{<Q::infoset:elementContentWhitespace>}) {
+                    $r .= $_-><AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                   .textContent>;
+                  }
+                } elsif ($_->{<Q::DOMCore:nodeType>} ne <Q::infoset:Comment> and
+                   $_->{<Q::DOMCore:nodeType>} ne
+                                       <Q::infoset:ProcessingInstruction>) {
+                  $r .= $_-><AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                 .textContent>;
+                }
+              }
+            }__;
+          } elsif ({
+                     <Q::DOMCore:Text> => 1,
+                     <Q::DOMXML:CDATASection> => 1,
+                     <Q::infoset:Comment> => 1,
+                     <Q::infoset:ProcessingInstruction> => 1,
+                   }->{$self->{<Q::DOMCore:nodeType>}}) {
+            $r = $self->{<Q::infoset:content>};
+          } else {
+            $r = null;
+          }
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            ISSUE: Element content does not allow non-whitespace 
+            character data or CDATA section.  In invalid document, 
+            how this is?
+      @@ImplNote:
+        @@@lang:en
+        @@@@:
+          Setting is not defined - use the attribute "textContent" of 
+          the  "Node" interface.
+  @IntMethod:
+    @@Name: contentBaseURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The base URI by which URI references in the content of 
+        this node should be resolved, as per the XML Base Specification.
+    @@Param:
+      @@@Name:useInfosetProperty
+      @@@Type:boolean
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Whether the <InfosetP:base URI> property of the XML Infoset, 
+          if any, should be used to compute the base URI.
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The base URI.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The DOM implementation is unable to obtain an absolute URI.
+      @@@PerlDef:
+          $r = null;
+          if ($useInfosetProperty and defined $self->{<Q::infoset:baseURI>}) {
+            ## Note: In XML Infoset, <Q::infoset:Document>, 
+            ##       <Q::infoset:Element> and <Q::infoset:ProcessingInstruction>
+            ##       allow <Q::infoset:baseURI>.  In addition, 
+            ##       <Q::DOMCore:Entity> and <Q::DOMCore:EntityReference>
+            ##       may have it, if it is <Q::ManakaiDOM:isExternalEntity>,
+            ##       in this implementation.
+            $r = $self->{<Q::infoset:baseURI>};
+          } else {
+            if ($self->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
+              if ($self->{<Q::infoset:attributes>}
+                       ->{<Q::xml:>}->{'base'}) {
+                $r = $self->{<Q::infoset:attributes>}
+                          ->{<Q::xml:>}->{'base'}
+                          -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                     .contentBaseURI> ($useInfosetProperty);
+              } elsif ($self->{<Q::infoset:attributes>}
+                            ->{<Q::ManakaiDOM:noNS>}->{'xml:base'}) {
+                $r = $self->{<Q::infoset:attributes>}
+                          ->{<Q::ManakaiDOM:noNS>}->{'xml:base'}
+                          -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                     .contentBaseURI> ($useInfosetProperty);
+              }
+              if (not defined $r and $self->{<Q::infoset:parent>}) {
+                $r = $self->{<Q::infoset:parent>}
+                          -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                     .contentBaseURI> ($useInfosetProperty);
+              }
+            } elsif ($self->{<Q::DOMCore:nodeType>} eq <Q::infoset:Attribute>) {
+              if ((defined $self->{<Q::infoset:localName>} and
+                   $self->{<Q::infoset:localName>} eq 'base' and
+                   defined $self->{<Q::infoset:namespaceName>} and
+                   $self->{<Q::infoset:namespaceName>} eq <Q::xml:>) or
+                  (not defined $self->{<Q::infoset:localName>} and
+                   $self->{<Q::DOMCore:name>} eq 'xml:base')) {
+                $r = $self-><AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                         .textContent>;
+                if (defined $r and
+                    <Code::DOMMain:isRelativeDOMURI:: $INPUT = $r>) {
+                  if ($self->{<Q::infoset:ownerElement>} and
+                      $self->{<Q::infoset:ownerElement>}
+                           ->{<Q::infoset:parent>}) {
+                    my $base = $self->{<Q::infoset:ownerElement>}
+                                    ->{<Q::infoset:parent>}
+                                    -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                            .contentBaseURI>
+                                                     ($useInfosetProperty);
+                    if (defined $base) {
+                      require URI;
+                      $r = URI->new_abs ($r, $base)->as_string;
+                    } else {
+                      $r = null;
+                    }
+                  } else {
+                    $r = null;
+                  }
+                }
+              } else { # not xml:base
+                if ($self->{<Q::infoset:ownerElement>}) {
+                  $r = $self->{<Q::infoset:ownerElement>}
+                            -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                    .contentBaseURI> ($useInfosetProperty);
+                }
+              }
+            } elsif ({
+                       <Q::DOMCore:Text> => 1,
+                       <Q::DOMXML:CDATASection> => 1,
+                       <Q::infoset:DocumentTypeDeclaration> => 1,
+                       <Q::infoset:Comment> => 1,
+                       <Q::infoset:ProcessingInstruction> => 1,
+                       <Q::DOMXML:Notation> => 1, ## but does not have content
+                     }->{$self->{<Q::DOMCore:nodeType>}}) {
+              if ($self->{<Q::infoset:parent>}) {
+                $r = $self->{<Q::infoset:parent>}
+                          -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                   .contentBaseURI> ($useInfosetProperty);
+              }
+            } elsif ($self->{<Q::DOMCore:nodeType>} eq <Q::infoset:Document>) {
+              ## 2. The base URI of the protocol entity
+                # <Q::infoset:baseURI>
+              ## 3. The URI to retrieve the protocol entity
+              ## 4. The application defined base URI
+              if (defined $self->{<Q::DOMCore:documentURI>} and
+                  not <Code::DOMMain:isRelativeDOMURI:: $INPUT = $r>) {
+                $r = $self->{<Q::DOMCore:documentURI>};
+              }
+            } elsif ({
+                       <Q::DOMXML:Entity> => 1,
+                       <Q::DOMXML:EntityReference> => 1,
+                     }->{$self->{<Q::DOMCore:nodeType>}}) {
+              if ($self->{<Q::ManakaiDOM:isExpanded>}) {
+                if ($self->{<Q::ManakaiDOM:isExternalEntity>}) {
+                  ## 2. Tge base URI of the protocol entity
+                    # <Q::infoset:baseURI>
+                  ## 3. The URI to retrieve the protocol entity
+                  ## 4. The application defined base URI
+                  if (defined $self->{<Q::DOMCore:documentURI>} and
+                      not <Code::DOMMain:isRelativeDOMURI:: $INPUT = $r>) {
+                    $r = $self->{<Q::DOMCore:documentURI>};
+                  }
+                  ## Should <Q::infoset:systemIdentifier> +
+                  ## <Q::infoset:declarationBaseURI> also be used?
+                }
+              } else {
+                if ($self->{<Q::infoset:parent>}) {
+                  $r = $self->{<Q::infoset:parent>}
+                            -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                    .contentBaseURI> ($useInfosetProperty);
+                }
+              }
+            } else {
+              # <Q::DOMCore:DocumentFragment> or 
+              # unknown node types
+            }
+          }
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        This internal method assumes that the document is an XML 
+        document and the base URI is computed by the XML Base 
+        Specification.
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        ISSUE: More study required for the base URI of document type- 
+        or entity-related node types.
+  @IntMethod:
+    @@Name:htmlBaseURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Return the base URI, as the document is an HTML document.
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          An absolute URI.  Although the HTML 4 Specification 
+          refers the RFC 2396, the return value is a DOM URI 
+          (URI reference, IRI reference or some other identifier), 
+          if the source document is broken (see HTML 4 Appendix) or 
+          the base URI is provided from the source other than 
+          the content of the HTML document (ex. the DOM URI 
+          used to retrieve the document or the value of 
+          the <A:Document.documentURI>).
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The DOM implementation was not able to obtain an 
+            absolute URI.
+      @@@PerlDef:
+          $r = null;
+          my $doc = $self->{<Q::TreeCore:node>}->{<Q::DOMCore:ownerDocument>};
+          if ($doc and $doc->{<Q::DOMCore:hasFeature>}->{HTML}) {
+            HTML: {
+              DOC: for (@{$doc->{<Q::infoset:children>}}) {
+                if ($_->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element> and
+                    (defined $_->{<Q::infoset:localName>} and
+                     $_->{<Q::infoset:localName>} eq 'html' and
+                     ((defined $_->{<Q::infoset:namespaceName>} and
+                       $_->{<Q::infoset:namespaceName>} eq <Q::xhtml1:>) or
+                      not defined $_->{<Q::infoset:namespaceName>})) or
+                    (not defined $_->{<Q::infoset:localName>} and
+                     $_->{<Q::DOMCore:name>} eq 'html')) {
+                  for (@{$_->{<Q::infoset:children>}}) {
+                    if ($_->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element> and
+                        (defined $_->{<Q::infoset:localName>} and
+                         $_->{<Q::infoset:localName>} eq 'head' and
+                         ((defined $_->{<Q::infoset:namespaceName>} and
+                           $_->{<Q::infoset:namespaceName>} eq <Q::xhtml1:>) or
+                          not defined $_->{<Q::infoset:namespaceName>})) or
+                        (not defined $_->{<Q::infoset:localName>} and
+                         $_->{<Q::DOMCore:name>} eq 'head')) {
+                      for (@{$_->{<Q::infoset:children>}}) {
+                        if ($_->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element> and
+                            (defined $_->{<Q::infoset:localName>} and
+                             $_->{<Q::infoset:localName>} eq 'base' and
+                             ((defined $_->{<Q::infoset:namespaceName>} and
+                               $_->{<Q::infoset:namespaceName>} eq <Q::xhtml1:>) or
+                              not defined $_->{<Q::infoset:namespaceName>})) or
+                            (not defined $_->{<Q::infoset:localName>} and
+                             $_->{<Q::DOMCore:name>} eq 'base')) {
+                          my $a = $_->{<Q::infoset:attributes>}
+                                    ->{<Q::null:>}->{href} ||
+                                  $_->{<Q::infoset:attributes>}
+                                    ->{<Q::ManakaiDOM:noNS>}->{href};
+                          if ($a) {
+                            $r = $a-><AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                             .textContent>;
+                            unless (<Code::DOMMain:isRelativeDOMURI::
+                                             $INPUT = $r>) {
+                              $r = null;
+                            } else {
+                              last HTML;
+                            }
+                          }
+                          last DOC;
+                        }
+                      }
+                      last DOC;
+                    }
+                  }
+                  last DOC;
+                }
+              } # DOC
+              if (defined $doc->{<Q::infoset:baseURI>}) {
+                $r = $doc->{<Q::infoset:baseURI>};
+                $r = null if <Code::DOMMain:isRelativeDOMURI:: $INPUT = $r>;
+              } elsif (defined $doc->{<Q::DOMCore:documentURI>}) {
+                $r = $doc->{<Q::DOMCore:documentURI>};
+                $r = null if <Code::DOMMain:isRelativeDOMURI:: $INPUT = $r>;
+              }
+            } # HTML
+          }
+       @@@@ImplNote:
+         @@@@@lang:en
+         @@@@@@:
+           TODO: <HTML:codebase> attribute should be considered by option.
+       @@@@ImplNote:
+         @@@@@lang:en
+         @@@@@@:
+           ISSUE: How treat base URI of <IF:DocumentType>, ...
+  @IntMethod:
+    @@Name:lookupNamespacePrefix
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Lookup the namespace prefix associated to the given namespace URI. 
+        This node must be of type <IF:Element>. 
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        This internal method implements the <DOM:lookupNamespacePrefix> 
+        <SRC:<CITE:DOM Level 3 Core Specification> B.2 Namespace Prefix Lookup>.
+    @@Param:
+      @@@Name:namespaceURI
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNamespaceURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The namespace URI.  <DOM:null> is not allowed; it must be 
+          checked before the call of this internal method.
+    @@Param:
+      @@@Name:originalElement
+      @@@Type:
+        ManakaiDOMCore:ManakaiDOMNodeObjectNode
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The element node object to which the original request to lookup the 
+          <P:namespaceURI> is issued.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The original node the request is issued is not an <IF:Element> node.
+    @@Return:
+      @@@Type: 
+        @@@@@:
+          DOMMain:ManakaiDOMNamespacePrefix
+        @@@@ManakaiDOM:noInputNormalize:
+          @@@@@@:1
+          @@@@@ImplNote:
+            @@@@@@lang:en
+            @@@@@@@: An empty prefix should not be passed.
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The namespace prefix.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The associated namespace prefix does not found.
+      @@@PerlDef:
+          $r = null;
+          FIND: {
+          if ($originalElement) {
+            if (defined $self->{<Q::infoset:namespaceName>} and
+                $self->{<Q::infoset:namespaceName>} eq $namespaceURI and
+                defined $self->{<Q::infoset:prefix>} and
+                $originalElement-><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                         .lookupNamespaceURI>
+                      ($self->{<Q::infoset:prefix>}) eq $namespaceURI) {
+              $r = $self->{<Q::infoset:prefix>};
+              last FIND;
+            }
+            for (values %{$self->{<Q::infoset:attributes>}->{<Q::xmlns:>}||{}}) {
+              if (defined $_->{<Q::infoset:prefix>} and
+                  $_->{<Q::infoset:prefix>} eq 'xmlns' and
+                  $_-><AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode.textContent>
+                    eq $namespaceURI and
+                  $originalElement-><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                            .lookupNamespaceURI>
+                            ($_->{<Q::infoset:localName>}) eq $namespaceURI) {
+                $r = $_->{<Q::infoset:localName>};
+                last FIND;
+              }
+            }
+          }
+            ## If element has ancestor element
+            my $n = $self;
+            ANCESTOR: {
+              if ($n->{<Q::infoset:parent>}) {
+                $n = $n->{<Q::infoset:parent>};
+                if ($n->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
+                  $r = $n-><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                        .lookupNamespacePrefix>
+                                             ($namespaceURI, $originalElement);
+                  last FIND;
+                } else {
+                  redo ANCESTOR;
+                }
+              }
+            }
+          } # FIND
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Before returning found prefix, the algorithm needs to make 
+         sure that the prefix is not redefined.  This is why 
+         <P:originalElement> is required.
+  @IntMethod:
+    @@Name:isDefaultNamespace
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Return whether the given namespace URI is the 
+        default namespace.
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        This internal method implements the <DOM:isDefaultNamespace> 
+        <SRC:<CITE:DOM Level 3 Core Specification> B.3 Default Namespace Lookup>.
+    @@Param:
+      @@@Name:namespaceURI
+      @@@Type:
+        @@@@@:
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@@ManakaiDOM:noInputNormalize:
+          @@@@@@:1
+          @@@@@ImplNote:
+            @@@@@@lang:en
+            @@@@@@@: An empty namespace URI should not be passed in DOM Level 2.
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The namespace URI to look for.
+    @@Return:
+      @@@Type:
+        DOMMain:boolean
+      @@@PerlDef:
+          if ($self->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
+            if (not defined $self->{<Q::infoset:prefix>}) {
+              if (defined $namespaceURI and
+                  defined $self->{<Q::infoset:namespaceName>} and
+                  $namespaceURI eq $self->{<Q::infoset:namespaceName>}) {
+                $r = true;
+              } elsif (not defined $namespaceURI and
+                       not defined $self->{<Q::infoset:namespaceName>}) {
+                $r = true;
+              }
+              # else false
+            } elsif ($self->{<Q::infoset:attributes>}
+                          ->{<Q::infoset:xmlns:>}->{xmlns}) {
+              my $v = $self->{<Q::infoset:attributes>}
+                           ->{<Q::infoset:xmlns:>}->{xmlns}
+                           -><AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                    .textContent>;
+              if (defined $namespaceURI and $namespaceURI eq $v) {
+                $r = true;
+              } elsif (not defined $namespaceURI and not length $v) {
+                $r = true;
+              }
+              # else false
+            } else {
+              ## If element has ancestor element
+              my $n = $self;
+              ANCESTOR: {
+                if ($n->{<Q::infoset:parent>}) {
+                  $n = $n->{<Q::infoset:parent>};
+                  if ($n->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
+                    $r = $n-><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                   .isDefaultNamespace> ($namespaceURI);
+                    last ANCESTOR;
+                  } else {
+                    redo ANCESTOR;
+                  }
+                }
+                # false
+              }
+            }
+          } elsif ($self->{<Q::DOMCore:nodeType>} eq <Q::infoset:Document>) {
+            for (@{$self->{<Q::infoset:children>}}) {
+              if ($_->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
+                $r = $_-><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                .isDefaultNamespace> ($namespaceURI);
+                last;
+              }
+            }
+          } elsif ($self->{<Q::DOMCore:nodeType>} eq <Q::infoset:Attribute>) {
+            if ($self->{<Q::infoset:ownerElement>}) {
+              $r = $self->{<Q::infoset:ownerElement>}
+                        -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                .isDefaultNamespace> ($namespaceURI);
+              last FIND;
+            }
+          } elsif ({
+                     <Q::DOMXML:Entity> => 1,
+                     <Q::DOMXML:Notation> => 1,
+                     <Q::DOMXML:DocumentType> => 1,
+                     <Q::DOMCore:DocumentFragment> => 1,
+                   }->{$self->{<Q::DOMCore:nodeType>}}) {
+            #
+          } else {
+          #} elsif ({
+          #           <Q::DOMCore:Text> => 1,
+          #           <Q::DOMCore:Comment> => 1,
+          #           <Q::DOMXML:EntityReference> => 1,
+          #           <Q::DOMXML:CDATASection> => 1,
+          #           <Q::infoset:ProcessingInstruction> => 1,
+          #         }->{$self->{<Q::DOMCore:nodeType>}}) {
+            ## If node has ancestor element
+            my $n = $self;
+            ANCESTOR: {
+              if ($n->{<Q::infoset:parent>}) {
+                $n = $n->{<Q::infoset:parent>};
+                if ($n->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
+                  $r = $n-><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                .isDefaultNamespace> ($namespaceURI);
+                  last ANCESTOR;
+                } else {
+                  redo ANCESTOR;
+                }
+              }
+              # false
+            }
+          } # nodeType
+  @IntMethod:
+    @@Name:lookupNamespaceURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Lookup the namespace URI associated to the given prefix.
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        This internal method implements the <DOM:lookupNamespaceURI> 
+        <SRC:<CITE:DOM Level 3 Core Specification> B.4 Namespace URI Lookup>.
+    @@Param:
+      @@@Name:prefix
+      @@@Type:
+        @@@@@:
+          DOMMain:ManakaiDOMNamespacePrefix
+        @@@@ManakaiDOM:noInputNormalize:
+          @@@@@@:1
+          @@@@@ImplNote:
+            @@@@@@lang:en
+            @@@@@@@: An empty namespace prefix should not be specified.
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The namespace prefix.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: Look for the default namespace URI.
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNamespaceURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The namespace URI.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: No namespace URI associated.
+      @@@PerlDef:
+          $r = null;
+          FIND: {
+          if ($self->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
+            if (defined $self->{<Q::infoset:localName>} and
+                defined $self->{<Q::infoset:namespaceName>} and
+                ((defined $self->{<Q::infoset:prefix>} and defined $prefix and
+                  $self->{<Q::infoset:prefix>} eq $prefix) or
+                 (not defined $self->{<Q::infoset:prefix>} and
+                  not defined $prefix))) {
+              $r = $self->{<Q::infoset:namespaceName>};
+              last FIND;
+            }
+            for (values %{$self->{<Q::infoset:attributes>}->{<Q::xmlns:>}||{}}) {
+              if (defined $_->{<Q::infoset:prefix>} and defined $prefix and
+                  $_->{<Q::infoset:prefix>} eq 'xmlns' and
+                  $_->{<Q::infoset:localName>} eq $prefix) {
+                ## Non default namespace
+                $r = $_-><AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                           .textContent>;
+                $r = null unless length $r;
+                last FIND;
+              } elsif (not defined $prefix and
+                       $_->{<Q::infoset:localName>} eq 'xmlns') {
+                ## Default namespace
+                $r = $_-><AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                           .textContent>;
+                $r = null unless length $r;
+                last FIND;
+              }
+            }
+            ## If element has ancestor element
+            my $n = $self;
+            ANCESTOR: {
+              if ($n->{<Q::infoset:parent>}) {
+                $n = $n->{<Q::infoset:parent>};
+                if ($n->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
+                  $r = $n-><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                  .lookupNamespaceURI> ($prefix);
+                  last FIND;
+                } else {
+                  redo ANCESTOR;
+                }
+              }
+            }
+          } elsif ($self->{<Q::DOMCore:nodeType>} eq <Q::infoset:Document>) {
+            for (@{$self->{<Q::infoset:children>}}) {
+              if ($_->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
+                $r = $_-><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                               .lookupNamespaceURI> ($prefix);
+                last FIND;
+              }
+            }
+          } elsif ($self->{<Q::DOMCore:nodeType>} eq <Q::infoset:Attribute>) {
+            if ($self->{<Q::infoset:ownerElement>}) {
+              $r = $self->{<Q::infoset:ownerElement>}
+                        -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                 .lookupNamespaceURI> ($prefix);
+              last FIND;
+            }
+          } elsif ({
+                     <Q::DOMXML:Entity> => 1,
+                     <Q::DOMXML:Notation> => 1,
+                     <Q::DOMXML:DocumentType> => 1,
+                     <Q::DOMCore:DocumentFragment> => 1,
+                   }->{$self->{<Q::DOMCore:nodeType>}}) {
+            #
+          } else {
+          #} elsif ({
+          #           <Q::DOMCore:Text> => 1,
+          #           <Q::DOMCore:Comment> => 1,
+          #           <Q::DOMXML:EntityReference> => 1,
+          #           <Q::DOMXML:CDATASection> => 1,
+          #           <Q::infoset:ProcessingInstruction> => 1,
+          #         }->{$self->{<Q::DOMCore:nodeType>}}) {
+            ## If node has ancestor element
+            my $n = $self;
+            ANCESTOR: {
+              if ($n->{<Q::infoset:parent>}) {
+                $n = $n->{<Q::infoset:parent>};
+                if ($n->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
+                  $r = $n-><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                .lookupNamespaceURI> ($prefix);
+                  last FIND;
+                } else {
+                  redo ANCESTOR;
+                }
+              }
+            }
+          } # nodeType
+          } # FIND
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          Non namespace-aware nodes are ignored <SRC:DOM 3>.
+  @IntMethod:
+    @@Name:getElementBy
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Return an element that met the given condition.
+    @@Param:
+      @@@Name:check
+      @@@Type:
+        perl:CODE
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A code reference.  The code referred is called with a 
+          parameter of this <IF:ManakaiDOMNodeObjectNode> object 
+          when an <IF:Element> node is determined whether it could 
+          be returned.  The code should return either <DOM:true> or 
+          <DOM:false>.
+    @@Param:
+      @@@Name:index
+      @@@Type:
+        perl:SCALAR
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A reference to the ordinal index of the element to return.
+      @@@Write:1
+      @@@Read:
+        @@@@@:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The number of <IF:Element> nodes with which <P:check> has 
+            returned <DOM:true> is minused from the original value. 
+            \
+            For example, if the original <P:index> is <CODE:4> and 
+            there is three <P:check>-<DOM:true> <IF:Element> nodes, 
+            then <P:index> would result in <CODE:1> and this method 
+            itself would return <DOM:null>.  If there is five (or more)
+            such nodes, 
+            <P:index> would be <CODE:-1> and the return value would be 
+            the fiveth matching node.
+      @@@InCase:
+        @@@@Value:0
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The first <IF:Element> node with which <P:check> has returned 
+            <DOM:true> is returned.
+    @@Return:
+      @@@Type:
+        ManakaiDOMCore:ManakaiDOMNodeObjectNode
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The <IF:Element> node that met the condition.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:There is no such node.
+      @@@PerlDef:
+          for (@{$self->{<Q::infoset:children>}}) {
+            last if $$index < 0;
+            if ($_->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
+              if ($check->($_)) {
+                if ($$index-- == 0) {
+                  $r = $_;
+                  last;
+                }
+              }
+              $r = $_-><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode.getElementBy>
+                          ($check, $index);
+              last if $$index == -1;
+            } elsif ({
+                       <Q::DOMXML:EntityReference> => 1,
+                     }->{$_->{<Q::DOMCore:nodeType>}}) {
+              $r = $_-><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode.getElementBy>
+                         ($check, $index);
+              last if $$index == -1;
+            }
+          }
+  @IntMethod:
+    @@Name:getElementsBy
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Return descendant elements that met the given condition.
+    @@Param:
+      @@@Name:check
+      @@@Type:
+        perl:CODE
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A code reference.  The code referred is called with a 
+          parameter of this <IF:ManakaiDOMNodeObjectNode> object 
+          when an <IF:Element> node is determined whether it could 
+          be returned.  The code should return either <DOM:true> or 
+          <DOM:false>.
+    @@Return:
+      @@@Type:
+        perl:ARRAY
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          An array reference to the <IF:Element> nodes that meet the condition.
+      @@@PerlDef:
+          $r = [];
+          for (@{$self->{<Q::infoset:children>}}) {
+            if ($_->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
+              if ($check->($_)) {
+                push @$r, $_;
+              }
+         \    push @$r,
+         \         @{$_-><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+         \                        .getElementsBy> ($check)};
+            } elsif ({
+                       <Q::DOMXML:EntityReference> => 1,
+                     }->{$_->{<Q::DOMCore:nodeType>}}) {
+         \    push @$r,
+         \         @{$_-><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+         \                        .getElementsBy> ($check)};
+            }
+          }
+
+
+    @ResourceDef:
+      @@QName:
+        DOMCore:getDocumentXMLVersion
+      @@rdf:type:
+        dis2pm:InlineCode
+      @@Description:
+        @@@lang:en
+        @@@@: 
+          Returns the XML version of a document.  If the document 
+          does not support the <Feature::XML> feature, 
+          <DOM::null> is returned.
+      @@PerlDef:
+        (CORE::defined $DOCOBJ->{<Q::DOMCore:hasFeature>}->{XML}
+             ? CORE::defined $DOCOBJ->{<Q::infoset:version>}
+                   ? $DOCOBJ->{<Q::infoset:version>}
+                   : '1.0'
+             : null)
+## ClassDef:ManakaiDOMNodeObjectNode
+
+
 
 IFDef:
   @Name:  NodeList
@@ -8693,6 +9825,7 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@: The type information.
+     @@L3:
      @@Level[list]:  3
      @@SpecLevel:3
      @@For:
@@ -8791,6 +9924,7 @@ IF:
               }__;
             }
             $r->{<Q::DOMCore:userDeterminedId>} = $isId;
+     @@L3:
      @@Level[list]:  3
      @@SpecLevel:3
      @@For:
@@ -8908,6 +10042,7 @@ IF:
             lang:dis
           @@@@DOMMain:raiseException:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
+     @@L3:
      @@Level[list]:  3
      @@SpecLevel:3
      @@For:
@@ -9003,6 +10138,7 @@ IF:
             }
             $idAttr->{<Q::TreeCore:node>}
                    ->{<Q::DOMCore:userDeterminedId>} = $isId;
+     @@L3:
      @@Level[list]:  3
      @@SpecLevel:3
      @@For:
@@ -9024,6 +10160,7 @@ IF:
         The method "normalize" was defined in the "Element" interface in 
         the DOM Level 1 but has been moved to 
         the "Node" interface in the DOM Level 2 and higher.
+    @@DOMMain:implementFeature: CoreFeature
     @@For:
       ManakaiDOM:DOM1 !ManakaiDOM:DOM2
     @@Return:
@@ -9088,11 +10225,13 @@ IF:
     @@Level[list]:3
     @@For:
       ManakaiDOM:DOM3
+    @@L3:
   @ReAttr:
      @@Name:  localName
      @@Description:
        @@@lang:en
        @@@@: The local part of the qualified name of this "Element" node.
+     @@DOMMain:isNamespaceAware:1
      @@Get:
         @@@Type:  
           DOMMain:DOMString
@@ -9116,6 +10255,7 @@ IF:
      @@SpecLevel:2
      @@For:
        ManakaiDOM:DOM2
+     @@L2:
   @ReMethod:
      @@Name:  lookupPrefix
      @@Description:
@@ -9127,6 +10267,7 @@ IF:
          The default namespace declarations are ignored by this method. 
          To lookup default namespace, use the <M:Node.isDefaultNamespace>
          method.
+     @@DOMMain:isNamespaceAware:1
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
@@ -9183,12 +10324,14 @@ IF:
      @@SpecLevel:3
      @@For:
        ManakaiDOM:DOM3
+     @@L3:
   @ReAttr:
      @@Name:  namespaceURI
      @@Description:
        @@@lang:en
        @@@@:
          The namespace URI of this node.
+     @@DOMMain:isNamespaceAware:1
      @@Get:
         @@@Type:
           DOMMain:DOMString
@@ -9214,12 +10357,14 @@ IF:
      @@SpecLevel:2
      @@For:
        ManakaiDOM:DOM2
+     @@L2:
   @ReAttr:
     @@Name: nodeName
     @@Description:
       @@@lang:en
       @@@@: The node name.
     @@DOMMain:isNamespaceUnaware:1
+    @@L1:
     @@Get:
       @@@Type: 
         DOMMain:DOMString
@@ -9235,6 +10380,7 @@ IF:
     @@Description:
       @@@lang:en
       @@@@: The type of this node.
+    @@L1:
     @@Get:
       @@@Type: 
         DOMMain:unsigned-short
@@ -9253,6 +10399,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@: The namespace prefix of this node.
+     @@DOMMain:isNamespaceAware:1
      @@Get:
         @@@Type:  
           DOMMain:DOMString
@@ -9393,6 +10540,7 @@ IF:
      @@SpecLevel:2
      @@For:
        ManakaiDOM:DOM2
+     @@L2:
   
   @IntMethod:
     @@Name: newObject
@@ -9466,10 +10614,7 @@ IF:
       way to represent the separation between these nodes in 
       XML or HTML so they will not persist between DOM editing sessions 
       in general).
-  @ImplNote:
-    @@lang:en
-    @@@:
-     "Text" is a "CharacterData" is a "Node".  "CDATASection" is a "Text".
+
   @Method:
      @@Name:  splitText
      @@Description:
@@ -9482,6 +10627,7 @@ IF:
       \
          If the original node had a parent node, the new node is 
          inserted as the next sibling of this node.
+     @@L1:
      @@Param:
         @@@Name:  offset
         @@@Type:  
@@ -9600,6 +10746,7 @@ IF:
      @@SpecLevel:3
      @@For:
        ManakaiDOM:DOM3
+     @@L3:
   @Attr:
      @@Name:  wholeText
      @@Description:
@@ -9664,6 +10811,7 @@ IF:
             } else {
               $r = $node->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{textContent}__;
             }
+     @@L3:
      @@Level[list]:  3
      @@SpecLevel:3
      @@For:
@@ -9681,6 +10829,7 @@ IF:
      @@SpecLevel:3
      @@For:
        ManakaiDOM:DOM3
+     @@L3:
   
   @ReAttr:
     @@Name: nodeName
@@ -9692,6 +10841,7 @@ IF:
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
     @@DOMMain:isNamespaceUnaware:1
+    @@L1:
     @@Get:
       @@@Type: 
         DOMMain:DOMString
@@ -9712,6 +10862,7 @@ IF:
     @@Description:
       @@@lang:en
       @@@@: The type of this node.
+    @@L1:
     @@Get:
       @@@Type: 
         DOMMain:unsigned-short
@@ -9792,11 +10943,8 @@ IF:
   @ImplNote:
     @@lang:en
     @@@:
-      "Comment" is a "CharacterData" is a "Node".
-  @ImplNote:
-    @@lang:en
-    @@@:
-      HTML comment declaration might have multiple "comment". 
+      HTML comment declaration might have multiple "comment".  DOM 
+      does not support it.
   
   @ReAttr:
     @@Name: nodeName
@@ -9804,6 +10952,8 @@ IF:
       @@@DOM3[list]:
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@DOMMain:isNamespaceUnaware:1
+    @@L1:
     @@Description:
       @@@lang:en
       @@@@: The node name.
@@ -9828,6 +10978,7 @@ IF:
     @@Description:
       @@@lang:en
       @@@@: The type of this node.
+    @@L1:
     @@Get:
       @@@Type: 
         DOMMain:unsigned-short
@@ -9929,6 +11080,7 @@ IFDef:
       should define how to represent their type systems using "TypeInfo".
   @Level[list]:  3
   @SpecLevel:3
+  @L3:
   @For:
     ManakaiDOM:DOM3
   @For:
@@ -9938,6 +11090,7 @@ IFDef:
      @@Description:
        @@@lang:en
        @@@@: The name of the type.
+     @@L3:
      @@Get:
         @@@Type:  
           DOMMain:DOMString
@@ -9956,6 +11109,7 @@ IFDef:
      @@Description:
        @@@lang:en
        @@@@: The namespace of the type.
+     @@L3:
      @@Get:
         @@@Type:  
           DOMMain:DOMString
@@ -11425,6 +12579,7 @@ IF:
             @@@@@lang:en
             @@@@@@:
               TODO: Expand the reference.
+    @@L1:
     @@SpecLevel:1
     @@Level[list]:
       1
@@ -11606,6 +12761,7 @@ IF:
               @@@@@@lang:en
               @@@@@@@:
                 One of the imported names is not a SGML or XML <XML:Name>.
+     @@L2:
      @@Level[list]:  2
      @@SpecLevel:2
      @@For:
@@ -11795,6 +12951,7 @@ IF:
             lang:dis
           @@@@DOMMain:raiseException:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
+    @@L2:
     @@SpecLevel:2
     @@Level[list]:
       2
@@ -12922,6 +14079,39 @@ PropDef:
     @@lang:en
     @@@:
       A name.
+
+PropDef:
+  @QName: hasFeature
+  @Description:
+    @@lang:en
+    @@@:
+      For <IF::Document> nodes: what features the subject node has. 
+      \
+      Whether a document supports a feature or not is different from 
+      whether a node implementation supports a feature or not; for 
+      example, an <Feature::XML>-aware node implementation might be 
+      instantiated for a pure (non-XML) HTML node object. 
+      \
+      {P:: Whether a document supports the <Feature::HTML> feature or not 
+           is significant for:
+        \
+        - <A::Node.baseURI>.
+        \
+      }
+      \
+      {P:: Whether a document supports the <Feature::XML> feature or not 
+           is significant for:
+        \
+        - <A::Document.xmlVersion>, 
+        \
+        - <A::Document.xmlEncoding>, 
+        \
+        - <M::Document.createAttributeNS> and 
+        \
+        - <M::Document.createElementNS>.
+        \
+       }
+
 
 ConfigParam:
   @Description:

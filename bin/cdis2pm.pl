@@ -1298,13 +1298,25 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
           $feature = {};
           for (keys %{dispm_collect_hash_prop_value
                    ($pack, ExpandedURI q<DOMMain:implementFeature>, %opt)}) {
-            my $f = $State->{Type}->{$_};
-            my $version = $f->{ExpandedURI q<d:Version>};
-            $version = '' unless defined $version;
-            for (keys %{$f->{ExpandedURI q<dis2pm:featureName>}}) {
-              $feature->{$_}->{$version}
-                = length $version
-                    ? $f->{ExpandedURI q<dis2pm:notImplemented>} ? 0 : 1 : 1;
+            my @f = ([$State->{Type}->{$_}, []]);
+            while (defined (my $f = shift @f)) {
+              my $version = $f->[0]->{ExpandedURI q<d:Version>};
+              $version = '' unless defined $version;
+              for (keys %{$f->[0]->{ExpandedURI q<dis2pm:featureName>}}) {
+                $feature->{$_}->{$version}
+                  = length $version
+                      ? $f->[0]->{ExpandedURI q<dis2pm:notImplemented>}
+                        ? 0 : 1
+                      : 1;
+                unless ($feature->{$_}->{$version}) {
+                  $feature->{$_}->{$f->[2]} = 0 for @{$f->[1]};
+                }
+              }
+              push @f,
+                map {[$State->{Type}->{$_},
+                      [keys %{$f->[0]->{ExpandedURI q<dis2pm:featureName>}}],
+                      $version]}
+                    @{$f->[0]->{ISA}||[]};
             }
           }
         }

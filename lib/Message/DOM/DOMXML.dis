@@ -1,22 +1,3 @@
-Namespace:
-  @dis:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
-  @infoset:
-     http://www.w3.org/2001/04/infoset#
-  @lang:
-     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
-  @license:
-     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
-  @ManakaiDOM:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
-  @MDOM:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
-  @rdf:
-    http://www.w3.org/1999/02/22-rdf-syntax-ns#
-  @rdfs:
-    http://www.w3.org/2000/01/rdf-schema#
-  @TreeCore:\
-
 Module:
   @QName: 
     MDOM:DOMXML
@@ -63,115 +44,40 @@ Module:
     @@Mail:w@suika.fam.cx
   @License:
      license:Perl+MPL
-  @Date.RCS:
-     $Date: 2004/11/23 13:20:33 $
+  @Date:
+    @@@:
+      $Date: 2004/12/28 13:10:20 $
+    @@ContentType:
+      dis:Date.RCS
 
-  @Feature:
-    @@Name: XML
-    @@Version: 1.0
-    @@Condition[list]:
-      DOM1
-      DOM2
-      DOM3
-    @@Spec:
-      @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-E067D597 
-    @@Description:
-      @@@lang:en
-      @@@@:
-        The DOM XML Module, Level 1.
-    @@Contrib:
-      DOMCore:DOMImplementation::DOM1
-    @@Contrib:
-      DOMCore:DOMImplementation::DOM2
-    @@Contrib:
-      DOMCore:DOMImplementation::DOM3
-    @@Contrib:
-      DOMCore:Node::DOM1
-    @@Contrib:
-      DOMCore:Node::DOM2
-    @@Contrib:
-      DOMCore:Node::DOM3
-  @Feature:
-    @@Name: XML
-    @@Version: 2.0
-    @@Condition[list]:
-      DOM2
-      DOM3
-    @@Spec:
-      @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-E067D597
-    @@Description:
-      @@@lang:en
-      @@@@:
-        The DOM XML Module, Level 2.
-    @@Contrib:
-      DOMCore:DOMImplementation::DOM2
-    @@Contrib:
-      DOMCore:DOMImplementation::DOM3
-    @@Contrib:
-      DOMCore:Node::DOM2
-    @@Contrib:
-      DOMCore:Node::DOM3
-  @Feature:
-    @@Name: XML
-    @@Version: 3.0
-    @@Condition[list]:
-      DOM3
-    @@Spec:
-      @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-E067D597
-    @@Description:
-      @@@lang:en
-      @@@@:
-        The DOM XML Module, Level 3.
-    @@Contrib:
-      DOMCore:DOMImplementation::DOM3
-    @@Contrib:
-      DOMCore:Node::DOM3
+  @DefaultFor:
+    ManakaiDOM:ManakaiDOMLatest
   
-  @Feature:
-    @@Name: XMLVersion
-    @@Version: 1.0
-    @@Condition[list]:
-      DOM3
-    @@Spec:
-      @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#Document3-version
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-E067D597
-    @@Description:
-      @@@lang:en
-      @@@@: The Extensible Markup Language (XML) 1.0. 
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        The <Feature:XML>/<FeatureVer:3.0> feature must be supported 
-        <SRC:DOM 3>.
-    @@Contrib:
-      DOMCore:DOMImplementation::DOM3
-  @Feature:
-    @@Name: XMLVersion
-    @@Version: 1.1
-    @@Condition[list]:
-      DOM3
-    @@Spec:
-      @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#Document3-version
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-E067D597
-    @@Description:
-      @@@lang:en
-      @@@@: The Extensible Markup Language (XML) 1.1.
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        The <Feature:XML>/<FeatureVer:3.0> feature must be supported 
-        <SRC:DOM 3>.
-    @@Contrib:
-      DOMCore:DOMImplementation::DOM3
-
   @Require:
     @@Module:
       @@@Name: DOMCore
+
+Namespace:
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @infoset:
+     http://www.w3.org/2001/04/infoset#
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @ManakaiDOMXML:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-xml#
+  @MDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @TreeCore:\
+
 
 ElementTypeBinding:
   @Name: IF
@@ -199,16 +105,9 @@ ElementTypeBinding:
       @@@@:
         ManakaiDOM:ForClass
       @@@ForCheck:
-        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM ManakaiDOM:DOMXMLFeature
     @@ForCheck:
       ManakaiDOM:DOM
-    @@ISA:
-      @@@@:
-        ManakaiDOM:ManakaiDOMException
-      @@@ForCheck:
-        ManakaiDOM:ManakaiDOM
-      @@@ForCheck:
-        ManakaiDOM:ForClass
     @@ISA:
       @@@@:
         ::ManakaiDOM:ManakaiDOM3
@@ -237,6 +136,17 @@ ElementTypeBinding:
         ManakaiDOM:ForIF
       @@@For:
         ManakaiDOM:ManakaiDOM1
+
+ElementTypeBinding:
+  @Name: ClassDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:Class
+    @@For:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+
 
 ElementTypeBinding:
   @Name: Method
@@ -350,6 +260,213 @@ ElementTypeBinding:
     @@ForCheck:
       ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
 
+ElementTypeBinding:
+  @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
+
+## -- Feature
+
+ElementTypeBinding:
+  @Name: FeatureDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DOMMain:DOMFeature
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+ElementTypeBinding:
+  @Name: FeatureVerDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DOMMain:DOMFeature
+
+ElementTypeBinding:
+  @Name: featureName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ContentType:
+      dis:String
+ElementTypeBinding:
+  @Name: featureQName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ContentType:
+      dis:TypeQName
+
+FeatureDef:
+  @featureName: XML
+  @QName: XMLFeature
+  @FeatureVerDef:
+    @@Version: 1.0
+    @@QName: XMLFeature10
+    @@ISA: XMLFeature
+    @@ISA:
+      DOMCore:CoreFeature
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-E067D597 
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The DOM XML Module, Level 1.
+  @FeatureVerDef:
+    @@Version: 2.0
+    @@QName: XMLFeature20
+    @@ISA: XMLFeature10
+    @@ISA:
+      DOMCore:CoreFeature20
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-E067D597
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The DOM XML Module, Level 2.
+  @FeatureVerDef:
+    @@Version: 3.0
+    @@QName: XMLFeature30
+    @@ISA: XMLFeature20
+    @@ISA:
+      DOMCore:CoreFeature30
+    @@ISA: XMLVersionFeature10
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-E067D597
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The DOM XML Module, Level 3.
+
+FeatureDef:
+  @featureName: XMLVersion
+  @QName: XMLVersionFeature
+  @FeatureVerDef:
+    @@Version: 1.0
+    @@QName: XMLVersionFeature10
+    @@ISA: XMLVersionFeature
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#Document3-version
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-E067D597
+    @@Description:
+      @@@lang:en
+      @@@@: The Extensible Markup Language (XML) 1.0. 
+  @FeatureVerDef:
+    @@Version: 1.1
+    @@QName: XMLVersionFeature11
+    @@ISA: XMLVersionFeature
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#Document3-version
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-E067D597
+    @@Description:
+      @@@lang:en
+      @@@@: The Extensible Markup Language (XML) 1.1.
+
+FeatureDef:
+  @featureQName:
+    ManakaiDOM:ManakaiDOMXML
+  @QName: MDOMXMLFeature
+  @FeatureVerDef:
+    @@Version: 1.0
+    @@QName: MDOMXMLFeature10
+    @@ISA: MDOMXMLFeature
+    @@Description:
+      @@@lang:en
+      @@@@: The Manakai DOM XML Module, Level 1.
+  @FeatureVerDef:
+    @@Version: 2.0
+    @@QName: MDOMXMLFeature20
+    @@ISA: MDOMXMLFeature10
+    @@Description:
+      @@@lang:en
+      @@@@: The Manakai DOM XML Module, Level 2.
+  @FeatureVerDef:
+    @@Version: 3.0
+    @@QName: MDOMXMLFeature30
+    @@ISA: MDOMXMLFeature20
+    @@Description:
+      @@@lang:en
+      @@@@: The Manakai DOM XML Module, Level 3.
+
+ElementTypeBinding:
+  @Name: L1
+  @ElementType:
+    DOMMain:implementFeature
+  @ShadowContent:
+    @@@: XMLFeature10
+    @@For:
+      ManakaiDOM:DOM1
+  @ShadowSibling:
+    @@DOMMain:implementFeature:
+      @@@@: XMLFeature20
+      @@@For:
+        ManakaiDOM:DOM2
+    @@DOMMain:implementFeature:
+      @@@@: XMLFeature30
+      @@@For:
+        ManakaiDOM:DOM3
+    @@DOMMain:implementFeature:
+      @@@@: XMLVersionFeature10
+      @@@For:
+        ManakaiDOM:DOM3
+    @@DOMMain:implementFeature:
+      @@@@: XMLVersionFeature11
+      @@@For:
+        ManakaiDOM:DOM3
+
+ElementTypeBinding:
+  @Name: L2
+  @ElementType:
+    DOMMain:implementFeature
+  @ShadowContent:
+    @@@: XMLFeature20
+    @@For:
+      ManakaiDOM:DOM2
+  @ShadowSibling:
+    @@DOMMain:implementFeature:
+      @@@@: XMLFeature30
+      @@@For:
+        ManakaiDOM:DOM3
+    @@DOMMain:implementFeature:
+      @@@@: XMLVersionFeature10
+      @@@For:
+        ManakaiDOM:DOM3
+    @@DOMMain:implementFeature:
+      @@@@: XMLVersionFeature11
+      @@@For:
+        ManakaiDOM:DOM3
+
+ElementTypeBinding:
+  @Name: L3
+  @ElementType:
+    DOMMain:implementFeature
+  @ShadowContent:
+    @@@: XMLFeature30
+    @@For:
+      ManakaiDOM:DOM3
+  @ShadowSibling:
+    @@DOMMain:implementFeature:
+      @@@@: XMLVersionFeature10
+      @@@For:
+        ManakaiDOM:DOM3
+    @@DOMMain:implementFeature:
+      @@@@: XMLVersionFeature11
+      @@@For:
+        ManakaiDOM:DOM3
+
 IF:
   @Name:  
     @@@: CDATASection
@@ -374,6 +491,8 @@ IF:
   @Spec:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-667469212
+  @L1:
+
   @Description:
     @@lang:en
     @@@:
@@ -393,27 +512,33 @@ IF:
       @@@DOM3[list]:
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
-    @@NSVersion[list]:
-      DOMCore:Node.prefix
-      DOMCore:Node.localName
+    @@DOMMain:isNamespaceUnaware:1
     @@Get:
-      @@@Type: DOMString
+      @@@Type: 
+        DOMMain:DOMString
+      @@@actualType:
+        DOMMain:ManakaiDOMString
       @@@InCase:
         @@@@Value:\#cdata-section
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
             Always this value for the <IF:CDATASection> node.
-      @@@DefaultValue: \#cdata-section
-      @@@Def: \
-    @@Redefine: Node
+      @@@Def:
+        @@@@ContentType:
+          lang:dis
+        @@@@DISLang:value:
+          @@@@@@: \#cdata-section
+          @@@@@ContentType:
+            DISCore:String
   @ReAttr:
     @@Name: nodeType
     @@Description:
       @@@lang:en
       @@@@: The type of this node.
     @@Get:
-      @@@Type: unsigned-short
+      @@@Type: 
+        DOMMain:unsigned-short
       @@@InCase:
         @@@@Label: CDATA_SECTION_NODE
         @@@@Description:
@@ -421,10 +546,10 @@ IF:
           @@@@@@:
             The node is a <IF:CDATASection>.
       @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@: $r = __CLASS{Node}__->CDATA_SECTION_NODE;
-    @@Redefine: Node
+        @@@@ContentType:
+          lang:dis
+        @@@@DISLang:constValue:
+          DOMCore:Node.CDATA_SECTION_NODE
 
   @IntMethod:
     @@Name: newObject
@@ -439,18 +564,10 @@ IF:
         @@@@lang:en
         @@@@@:
           The new object for the <IF:CDATASection> node.
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-               ## Condition sensitive
-          $r = __CLASS{Node}__->__INT{newObject}__;
-          $r->{<Q:DOMCore:nodeType>} = <Q:DOMXML:CDATASection>;
-          $r->{<Q:infoset:content>} = '';
-     @@Level[list]:
-       1
-       2
-       3
+      @@@PerlDef:
+        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject>;
+        $r->{<Q:DOMCore:nodeType>} = <Q:DOMXML:CDATASection>;
+        $r->{<Q:infoset:content>} = '';
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -485,6 +602,8 @@ IF:
   @Spec:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-412266927
+  @L1:
+
   @Description:
     @@lang:en
     @@@:
@@ -505,16 +624,16 @@ IF:
      @@Description:
        @@@lang:en
        @@@@: The document type name.
-     @@NSVersion[list]:
+     @@DOMMain:isNamespaceUnaware:1
      @@Get:
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
+        @@@actualType:
+          DOMMain:ManakaiDOMXMLName
         @@@Description:
           @@@@lang:en
           @@@@@: The document type name.
-        @@@Def:
-          @@@@Type:
-            lang:Perl
-          @@@@@:
+        @@@PerlDef:
             my $node = $self->{<Q:TreeCore:node>};
             if (defined $node->{<Q:infoset:localName>}) {
               $r = (defined $node->{<Q:infoset:prefix>} ?
@@ -535,7 +654,8 @@ IF:
      @@Get:
         @@@Type:
           DOMCore:NamedNodeMap
-#          ManakaiDOMXML:ManakaiDOMEntities
+        @@@actualType:
+          ManakaiDOMXML:ManakaiDOMEntities
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -549,7 +669,8 @@ IF:
      @@Get:
         @@@Type:
           DOMCore:NamedNodeMap
-#          ManakaiDOMXML:ManakaiDOMNotations
+        @@@actualType:
+          ManakaiDOMXML:ManakaiDOMNotations
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -560,34 +681,38 @@ IF:
         @@@lang:en
         @@@@: The public identifier of the external subset.
      @@Get:
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
         @@@Description:
           @@@@lang:en
           @@@@@: The public identifier.
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetProp:
             infoset:publicIdentifier
      @@Level[list]:  2
      @@SpecLevel:2
+     @@L2:
   @Attr:
      @@Name:  systemId
      @@Description:
        @@@lang:en
        @@@@: The system identifier of the external subset.
      @@Get:
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
         @@@Description:
           @@@@lang:en
           @@@@@: The system identifier.
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetProp:
             infoset:systemIdentifier
      @@Level[list]:  2
      @@SpecLevel:2
+     @@L2:
   @Attr:
      @@Name:  internalSubset
      @@Description:
@@ -595,7 +720,8 @@ IF:
        @@@@:
          The internal subset as a string, without delimiting square brackets.
      @@Get:
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
         @@@Description:
           @@@@lang:en
           @@@@@: The internal subset as a string.
@@ -614,6 +740,7 @@ IF:
             processor used to build the document.
      @@Level[list]:  2
      @@SpecLevel:2
+     @@L2:
   
   @ReMethod:
      @@Name:  lookupPrefix
@@ -622,6 +749,7 @@ IF:
        @@@@:
          Lookup the namespace prefix associated to the given namespace 
          URI, starting from this node.
+     @@DOMMain:isNamespaceAware:1
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
@@ -630,7 +758,8 @@ IF:
           @@@@lang:en
           @@@@@: The namespace URI to look for.
      @@Return:
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -647,39 +776,37 @@ IF:
             @@@@@@:
               No namespace prefix is found.  Always <DOM:null> 
               is returned for <IF:DocumentType> nodes.
-        @@@Def:
-          @@@@Type:
-            lang:Perl
+        @@@PerlDef:
           @@@@@: $r = null;
      @@Level[list]:  3
      @@SpecLevel:3
-     @@Redefine:
-        DOMCore:Node
+     @@L3:
   @ReAttr:
     @@Name: nodeName
     @@Description:
       @@@lang:en
       @@@@: The node name.
-    @@NSVersion[list]:
-      DOMCore:Node.prefix
-      DOMCore:Node.localName
+    @@DOMMain:isNamespaceUnaware:1
     @@Get:
-      @@@Type: DOMString
+      @@@Type: 
+        DOMMain:DOMString
       @@@Description:
         @@@@lang:en
         @@@@@: The document type name.
       @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@: __INT{{name}}__;
-    @@Redefine: Node
+        @@@@ContentType:
+          lang:dis
+        @@@@DISPerl:cloneCode: .getName
   @ReAttr:
     @@Name: nodeType
     @@Description:
       @@@lang:en
       @@@@: The type of this node.
     @@Get:
-      @@@Type: unsigned-short
+      @@@Type: 
+        DOMMain:unsigned-short
+      @@@actualType:
+        DOMCore:ManakaiDOMNodeType
       @@@InCase:
         @@@@Label: DOCUMENT_TYPE_NODE
         @@@@Description:
@@ -687,10 +814,10 @@ IF:
           @@@@@@:
             This node is a <IF:DocumentType>.
       @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@: $r = __CLASS{Node}__->DOCUMENT_TYPE_NODE;
-    @@Redefine: Node
+        @@@@ContentType:
+          lang:dis
+        @@@@DISLang:constValue:
+          DOMCore:Node.DOCUMENT_TYPE_NODE
   @ReAttr:
      @@Name:  textContent
      @@Description:
@@ -698,7 +825,10 @@ IF:
        @@@@:
          The text content of this node and its descendants.
      @@Get:
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
+        @@@actualType:
+          DOMMain:ManakaiDOMString
         @@@Description:
           @@@@lang:en
           @@@@@: The text content of this node.
@@ -709,12 +839,13 @@ IF:
             @@@@@lang:en
             @@@@@@:
               The text content is defined to be <DOM:null>.
-        @@@Def:
-          @@@@Type:
-            lang:Perl
+        @@@PerlDef:
           @@@@@: $r = null;
      @@Set:
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
+        @@@actualType:
+          DOMain:ManakaiDOMString
         @@@Description:
           @@@@lang:en
           @@@@@: Setting this attribute has no effect.
@@ -725,10 +856,10 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: Setting this attribute has no effect.
-        @@@Def: \
+        @@@PerlDef: \
      @@Level[list]: 3
      @@SpecLevel:3
-     @@Redefine: Node
+     @@L3:
 
   @IntMethod:
     @@Name: newObject
@@ -743,17 +874,9 @@ IF:
         @@@@lang:en
         @@@@@:
           The new object for the <IF:DocumentType> node.
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-               ## Condition sensitive
-          $r = __CLASS{Node}__->__INT{newObject}__;
-          $r->{<Q:DOMCore:nodeType>} = <Q:infoset:DocumentTypeDeclaration>;
-     @@Level[list]:
-       1
-       2
-       3
+      @@@PerlDef:
+        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject>;
+        $r->{<Q:DOMCore:nodeType>} = <Q:infoset:DocumentTypeDeclaration>;
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -791,6 +914,8 @@ IF:
   @Spec:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-5431D1B9
+  @L1:
+
   @Description:
     @@lang:en
     @@@:
@@ -807,7 +932,8 @@ IF:
         @@@lang:en
         @@@@: The public identifier of this notation.
      @@Get:
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
         @@@Description:
           @@@@lang:en
           @@@@@: The public identifier.
@@ -818,7 +944,7 @@ IF:
             @@@@@lang:en
             @@@@@@: The public identifier was not specified.
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetProp:
             infoset:publicIdentifier
@@ -828,7 +954,8 @@ IF:
        @@@lang:en
        @@@@: The system identifier of this notation.
      @@Get:
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
         @@@Description:
           @@@@lang:en
           @@@@@: The system identifier.
@@ -839,7 +966,7 @@ IF:
             @@@@@lang:en
             @@@@@@: The system identifier was not specified.
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetProp:
             infoset:systemIdentifier
@@ -853,9 +980,11 @@ IF:
         \
         For the <IF:Notation> node, it is the <InfosetP:declaration base URI> 
         of the notation information item.
+    @@Type:
+      DOMMain:DOMString
+    @@actualType:
+      ManakaiDOM:ManakaiDOMURI
     @@Get:
-      @@@Type:
-        ManakaiDOM:ManakaiDOMURI
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -869,14 +998,13 @@ IF:
             The DOM implementation was not able to 
             obtain an absolute URI.
       @@@Def:
-        @@@@Type:
+        @@@@ContentType:
           lang:dis
         @@@@GetProp:
           infoset:declarationBaseURI
     @@SpecLevel:3
     @@Level:3
-    @@Redefine:
-      DOMCore:Node
+    @@L3:
   @ReMethod:
      @@Name:  lookupPrefix
      @@Description:
@@ -884,15 +1012,21 @@ IF:
        @@@@:
          Lookup the namespace prefix associated to the given namespace 
          URI, starting from this node.
+     @@DOMMain:isNamespaceAware:1
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
+          DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
           @@@@@: The namespace URI to look for.
      @@Return:
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
+        @@@actualType:
+          DOMMain:ManakaiDOMNamespacePrefix
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -909,33 +1043,30 @@ IF:
             @@@@@@:
               No namespace prefix is found.  Always <DOM:null> 
               is returned for <IF:Notation> nodes.
-        @@@Def:
-          @@@@Type:
-            lang:Perl
+        @@@PerlDef:
           @@@@@: $r = null;
      @@Level[list]:  3
      @@SpecLevel:3
-     @@Redefine:
-        DOMCore:Node
+     @@L3:
   @ReAttr:
     @@Name: nodeName
     @@Description:
       @@@lang:en
       @@@@: The node name.
-    @@NSVersion[list]:
-      DOMCore:Node.prefix
-      DOMCore:Node.localName
+    @@DOMMain:isNamespaceUnaware:1
     @@Get:
-      @@@Type: DOMString
+      @@@Type: 
+        DOMMain:DOMString
+      @@@actualType:
+        DOMMain:ManakaiDOMString
       @@@Description:
         @@@@lang:en
         @@@@@: The notation name.
       @@@Def:
-        @@@@Type:
+        @@@@ContentType:
           lang:dis
         @@@@GetProp:
           DOMCore:name
-    @@Redefine: Node
   @ReAttr:
     @@Name: nodeType
     @@Description:
@@ -950,18 +1081,21 @@ IF:
           @@@@@@:
             This node is a <IF:Notation>.
       @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@: $r = __CLASS{Node}__->NOTATION_NODE;
-    @@Redefine: Node
+        @@@@ContentType:
+          lang:dis
+        @@@@DISLang:constValue: 
+          DOMCore:Node.NOTATION_NODE
   @ReAttr:
      @@Name:  textContent
      @@Description:
        @@@lang:en
        @@@@:
          The text content of this node and its descendants.
+     @@Type:
+       DOMMain:DOMString
+     @@actualType:
+       DOMMain:ManakaiDOMString
      @@Get:
-        @@@Type:  DOMString
         @@@Description:
           @@@@lang:en
           @@@@@: The text content of this node.
@@ -972,12 +1106,9 @@ IF:
             @@@@@lang:en
             @@@@@@:
               The text content is defined to be <DOM:null>.
-        @@@Def:
-          @@@@Type:
-            lang:Perl
+        @@@PerlDef:
           @@@@@: $r = null;
      @@Set:
-        @@@Type:  DOMString
         @@@Description:
           @@@@lang:en
           @@@@@: Setting this attribute has no effect.
@@ -988,10 +1119,10 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: Setting this attribute has no effect.
-        @@@Def: \
+        @@@PerlDef: \
      @@Level[list]: 3
      @@SpecLevel:3
-     @@Redefine: Node
+     @@L3:
  
   @IntMethod:
     @@Name: newObject
@@ -1006,17 +1137,9 @@ IF:
         @@@@lang:en
         @@@@@:
           The new object for the <IF:Notation> node.
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-               ## Condition sensitive
-          $r = __CLASS{Node}__->__INT{newObject}__;
-          $r->{<Q:DOMCore:nodeType>} = <Q:infoset:Notation>;
-     @@Level[list]:
-       1
-       2
-       3
+      @@@PerlDef:
+        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject>;
+        $r->{<Q:DOMCore:nodeType>} = <Q:infoset:Notation>;
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -1052,6 +1175,8 @@ IF:
   @Spec:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-527DCFF2
+  @L1:
+
   @Description:
     @@lang:en
     @@@:
@@ -1076,7 +1201,8 @@ IF:
        @@@lang:en
        @@@@: The public identifier associated with the entity.
      @@Get:
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
         @@@Description:
           @@@@lang:en
           @@@@@: The public identifier.
@@ -1087,7 +1213,7 @@ IF:
             @@@@@lang:en
             @@@@@@: The public identifier is not specified.
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetProp:
             infoset:publicIdentifier
@@ -1097,7 +1223,8 @@ IF:
         @@@lang:en
         @@@@: The system identifier associated with the entity.
      @@Get:
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
         @@@Description:
           @@@@lang:en
           @@@@@: The system identifier.
@@ -1108,7 +1235,7 @@ IF:
             @@@@@lang:en
             @@@@@@: The system identifier is not specified.
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetProp:
             infoset:systemIdentifier
@@ -1118,7 +1245,8 @@ IF:
        @@@lang:en
        @@@@: The name of the notation for the entity.
      @@Get:
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
         @@@Description:
           @@@@lang:en
           @@@@@: The notation name.
@@ -1129,7 +1257,7 @@ IF:
             @@@@@lang:en
             @@@@@@: This entity is a parsed entity.
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetProp:
             infoset:notationName
@@ -1139,7 +1267,8 @@ IF:
        @@@lang:en
        @@@@: The encoding used for this entity at the time of parsing.
      @@Get:
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -1158,12 +1287,13 @@ IF:
               Is it mean that even the internal entity declared in the external 
               entity might have the input encoding!?
          @@@Def:
-           @@@@Type:
+           @@@@ContentType:
              lang:dis
            @@@@GetProp:
              infoset:characterEncodingScheme
      @@Level[list]:  3
      @@SpecLevel:3
+     @@L3:
   @Attr:
      @@Name:  xmlEncoding
      @@Description:
@@ -1171,7 +1301,8 @@ IF:
        @@@@:
          The encoding of this entity, as specified in the text declaration.
      @@Get:
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
         @@@Description:
           @@@@lang:en
           @@@@@: The encoding name.
@@ -1188,12 +1319,13 @@ IF:
             The encoding declaration is required if the text declaration 
             is used, but the text declaration itself is not required. 
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetProp:
             DOMCore:xmlEncoding
      @@Level[list]:  3
      @@SpecLevel:3
+     @@L3:
   @Attr:
      @@Name:  xmlVersion
      @@Description:
@@ -1209,7 +1341,8 @@ IF:
           can use both XML 1.0 and XML 1.1 entities, but both interpreted 
           as XML 1.1 entities.
      @@Get:
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
         @@@Description:
           @@@@lang:en
           @@@@@: The version number.
@@ -1227,12 +1360,12 @@ IF:
             Does the DOM implementation need to provide the default value? 
             What's the default value?
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetProp:
             infoset:version
      @@Level[list]:  3
-     @@SpecLevel:1
+     @@L3:
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -1252,6 +1385,8 @@ IF:
         of the unparsed entity information item.
     @@Get:
       @@@Type:
+        DOMMain:DOMString
+      @@@actualType:
         ManakaiDOM:ManakaiDOMURI
       @@@Description:
         @@@@lang:en
@@ -1266,14 +1401,13 @@ IF:
             The DOM implementation was not able to 
             obtain an absolute URI.
       @@@Def:
-        @@@@Type:
+        @@@@ContentType:
           lang:dis
         @@@@GetProp:
           infoset:declarationBaseURI
     @@SpecLevel:3
     @@Level:3
-    @@Redefine:
-      DOMCore:Node
+    @@L3:
   @ReMethod:
      @@Name:  lookupPrefix
      @@Description:
@@ -1281,15 +1415,21 @@ IF:
        @@@@:
          Lookup the namespace prefix associated to the given namespace 
          URI, starting from this node.
+     @@DOMMain:isNamespaceAware:1
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
+          DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
           @@@@@: The namespace URI to look for.
      @@Return:
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
+        @@@actualType:
+          DOMMain:ManakaiDOMNamespacePrefix
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -1306,29 +1446,25 @@ IF:
             @@@@@@:
               No namespace prefix is found.  Always <DOM:null> 
               is returned for <IF:Entity> nodes.
-        @@@Def:
-          @@@@Type:
-            lang:Perl
+        @@@PerlDef:
           @@@@@: $r = null;
      @@Level[list]:  3
      @@SpecLevel:3
-     @@Redefine:
-        DOMCore:Node
+     @@L3:
   @ReAttr:
     @@Name: nodeName
     @@Description:
       @@@lang:en
       @@@@: The node name.
-    @@NSVersion[list]:
-      DOMCore:Node.prefix
-      DOMCore:Node.localName
+    @@DOMMain:isNamespaceUnaware:1
     @@Get:
-      @@@Type: DOMString
+      @@@Type: 
+        DOMMain:DOMString
       @@@Description:
         @@@@lang:en
         @@@@@: The entity name.
       @@@Def:
-        @@@@Type:
+        @@@@ContentType:
           lang:dis
         @@@@GetProp:
           DOMCore:name
@@ -1339,7 +1475,10 @@ IF:
       @@@lang:en
       @@@@: The type of this node.
     @@Get:
-      @@@Type: unsigned-short
+      @@@Type: 
+        DOMMain:unsigned-short
+      @@@actualType:
+        DOMCore:ManakaiDOMNodeType
       @@@InCase:
         @@@@Label: ENTITY_NODE
         @@@@Description:
@@ -1347,8 +1486,10 @@ IF:
           @@@@@@:
             This node is an <IF:Entity>.
       @@@Def:
-        @@@@Type:
-          lang:Perl
+        @@@@ContentType:
+          lang:dis
+        @@@@DISLang:constValue:
+          DOMCore:
         @@@@@: $r = __CLASS{Node}__->ENTITY_NODE;
     @@Redefine: Node
 
@@ -1417,6 +1558,8 @@ IF:
   @Spec:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-11C98490
+  @L1:
+
   @Description:
     @@lang:en
     @@@:
@@ -1466,6 +1609,8 @@ IF:
         reference information item.
     @@Get:
       @@@Type:
+        DOMMain:DOMString
+      @@@actualType:
         ManakaiDOM:ManakaiDOMURI
       @@@Description:
         @@@@lang:en
@@ -1480,40 +1625,40 @@ IF:
             The DOM implementation was not able to 
             obtain an absolute URI.
       @@@Def:
-        @@@@Type:
+        @@@@ContentType:
           lang:dis
         @@@@GetProp:
           infoset:declarationBaseURI
     @@SpecLevel:3
     @@Level:3
-    @@Redefine:
-      DOMCore:Node
+    @@L3:
   @ReAttr:
     @@Name: nodeName
     @@Description:
       @@@lang:en
       @@@@: The node name.
-    @@NSVersion[list]:
-      DOMCore:Node.prefix
-      DOMCore:Node.localName
+    @@DOMMain:isNamespaceUnaware:1
     @@Get:
-      @@@Type: DOMString
+      @@@Type: 
+        DOMMain:DOMString
       @@@Description:
         @@@@lang:en
         @@@@@: The name of the entity referred.
       @@@Def:
-        @@@@Type:
+        @@@@ContentType:
           lang:dis
         @@@@GetProp:
           DOMCore:name
-    @@Redefine: Node
   @ReAttr:
     @@Name: nodeType
     @@Description:
       @@@lang:en
       @@@@: The type of this node.
     @@Get:
-      @@@Type: unsigned-short
+      @@@Type: 
+        DOMMain:unsigned-short
+      @@@actualType:
+        DOMCore:ManakaiDOMNodeType
       @@@InCase:
         @@@@Label: ENTITY_REFERENCE_NODE
         @@@@Description:
@@ -1521,10 +1666,10 @@ IF:
           @@@@@@:
             This node is an <IF:EntityReference>.
       @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@: $r = __SUPER{Node}__->ENTITY_REFERENCE_NODE;
-    @@Redefine: Node
+        @@@@ContentType:
+          lang:dis
+        @@@@DISLang:constValue:
+          DOMCore:Node.ENTITY_REFERENCE_NODE
 
   @IntMethod:
     @@Name: newObject
@@ -1539,17 +1684,9 @@ IF:
         @@@@lang:en
         @@@@@:
           The new object for the <IF:EntityReference> node.
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-               ## Condition sensitive
-          $r = __CLASS{Node}__->__INT{newObject}__;
-          $r->{<Q:DOMCore:nodeType>} = <Q:DOMXML:EntityReference>;
-     @@Level[list]:
-       1
-       2
-       3
+      @@@PerlDef:
+        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject>;
+        $r->{<Q:DOMCore:nodeType>} = <Q:DOMXML:EntityReference>;
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -1588,6 +1725,8 @@ IF:
   @Spec:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1004215813
+  @L1:
+
   @Description:
     @@lang:en
     @@@:
@@ -1600,14 +1739,17 @@ IF:
        @@@lang:en
        @@@@:
          The target of this processing instruction.
-     @@NSVersion[list]:
+     @@DOMMain:isNamespaceUnaware:1
      @@Get:
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
+        @@@actualType:
+          DOMMain:ManakaiDOMXMLName
         @@@Description:
           @@@@lang:en
           @@@@@: The target name.
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetProp:
             infoset:target
@@ -1620,13 +1762,16 @@ IF:
        \
          The content does not contain the whitespaces 
          delimiting with the target name.
+     @@Type:  
+       DOMMain:DOMString
+     @@actualType:
+       DOMMain:ManakaiDOMString
      @@Get:
-        @@@Type:  DOMString
         @@@Description:
           @@@@lang:en
           @@@@@: The content.
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetProp:
             infoset:content
@@ -1635,20 +1780,20 @@ IF:
           @@@@@:
             Can <DOM:null> be returned (to represent <XML:<lt>?name?<gt>>)?
      @@Set:
-        @@@Type:  DOMString
         @@@Description:
           @@@@lang:en
           @@@@@:
             The content.  It may contain the <SGML:PIC> (<XML:?<gt>>) but such 
             data result the document in unserializable.
         @@@Exception:
-          @@@@Type: DOMException
+          @@@@Type: 
+            DOMCore:DOMException
           @@@@Name: NO_MODIFICATION_ALLOWED_ERR
           @@@@Description:
             @@@@@lang:en
             @@@@@@: This node is read-only.
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@SetProp:
             @@@@@@:
@@ -1663,6 +1808,8 @@ IF:
         The base URI of this node.
     @@Get:
       @@@Type:
+        DOMMain:DOMString
+      @@@actualType:
         ManakaiDOM:ManakaiDOMURI
       @@@Description:
         @@@@lang:en
@@ -1676,43 +1823,40 @@ IF:
           @@@@@@:
             The DOM implementation was not able to 
             obtain an absolute URI.
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          $r = $self->{<Q:TreeCore:node>}
-                    ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{contentBaseURI}__
+      @@@PerlDef:
+        $r = $self->{<Q:TreeCore:node>}
+                  -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode.contentBaseURI>
                                                                       (false);
     @@SpecLevel:3
     @@Level:3
-    @@Redefine:
-      DOMCore:Node
+    @@L3:
   @ReAttr:
     @@Name: nodeName
     @@Description:
       @@@lang:en
       @@@@: The node name.
-    @@NSVersion[list]:
-      DOMCore:Node.prefix
-      DOMCore:Node.localName
+    @@DOMMain:isNamespaceUnaware:1
     @@Get:
-      @@@Type: DOMString
+      @@@Type: 
+        DOMMain:DOMString
       @@@Description:
         @@@@lang:en
         @@@@@: 
           The target name, i.e. same as <A:ProcessingInstruction.target>.
       @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@: __INT{{target}}__;
-    @@Redefine: Node
+        @@@@ContentType:
+          lang:dis
+        @@@@DISPerl:cloneCode: .getTarget
   @ReAttr:
     @@Name: nodeType
     @@Description:
       @@@lang:en
       @@@@: The type of this node.
     @@Get:
-      @@@Type: unsigned-short
+      @@@Type: 
+        DOMMain:unsigned-short
+      @@@actualType:
+        DOMCore:ManakaiDOMNodeType
       @@@InCase:
         @@@@Label: PROCESSING_INSTRUCTION_NODE
         @@@@Description:
@@ -1720,32 +1864,40 @@ IF:
           @@@@@@:
             This node is a <IF:ProcessingInstruction>.
       @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@: $r = __SUPER{Node}__->PROCESSING_INSTRUCTION_NODE;
-    @@Redefine: Node
+        @@@@ContentType:
+          lang:dis
+        @@@@DISLang:constValue:
+          DOMCore:Node.PROCESSING_INSTRUCTION_NODE
   @ReAttr:
      @@Name:  nodeValue
      @@Description:
        @@@lang:en
        @@@@: The value of this node.
      @@Get:
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
+        @@@actualType:
+          DOMMain:ManakaiDOMString
         @@@Exception:
-          @@@@Type: DOMException
+          @@@@Type: 
+            DOMCore:DOMException
           @@@@Name: DOMSTRING_SIZE_ERR
           @@@@Description:
             @@@@@lang:en
             @@@@@@: 
               The target data, i.e. same as <A:ProcessingInstruction.data>.
         @@@Def:
-          @@@@Type: 
-            lang:Perl
-          @@@@@: __INT{{data}}__;
+          @@@@ContentType: 
+            lang:dis
+          @@@@DISPerl:cloneCode:.getData
      @@Set:
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
+        @@@actualType:
+          DOMMain:ManakaiDOMString
         @@@Exception:
-          @@@@Type: DOMException
+          @@@@Type: 
+            DOMCore:DOMException
           @@@@Name: NO_MODIFICATION_ALLOWED_ERR
           @@@@Description:
             @@@@@lang:en
@@ -1756,12 +1908,9 @@ IF:
           @@@@@:
             New node value.
         @@@Def:
-          @@@@Type:
-            lang:Perl
-          @@@@@:
-                           ## Condition sensitive
-            __DEEP{ $self->__SUPER{ProcessingInstruction}__::data ($given) }__;
-    @@Redefine: Node
+          @@@@ContentType:
+            lang:dis
+          @@@@DISPerl:cloneCode: .setData
   @ReAttr:
      @@Name:  textContent
      @@Description:
@@ -1773,14 +1922,18 @@ IF:
           <A:ProcessingInstruction.data> == 
           <A:ProcessingInstruction.nodeValue> == 
           <A:ProcessingInstruction.textContent>.
+     @@Type:  
+       DOMMain:DOMString
+     @@actualType:
+       DOMMain:ManakaiDOMString
      @@Get:
-        @@@Type:  DOMString
         @@@Description:
           @@@@lang:en
           @@@@@:
             The text content of this node, i.e. the <A:Node.nodeValue>.
         @@@Exception:
-          @@@@Type: DOMException
+          @@@@Type: 
+            DOMCore:DOMException
           @@@@Name: DOMSTRING_SIZE_ERR
           @@@@Description:
             @@@@@lang:en
@@ -1789,31 +1942,29 @@ IF:
               fit in a <TYPE:DOMString> variable on the implementation 
               platform.
         @@@Def:
-          @@@@Type: 
-            lang:Perl
-          @@@@@: __INT{{data}}__;
+          @@@@ContentType: 
+            lang:dis
+          @@@@DISPerl:cloneCode: .getData
      @@Set:
-        @@@Type:  DOMString
         @@@Description:
           @@@@lang:en
           @@@@@:
             The new text content of the node.
         @@@Exception:
-          @@@@Type: DOMException
+          @@@@Type: 
+            DOMCore:DOMException
           @@@@Name: NO_MODIFICATION_ALLOWED_ERR
           @@@@Description:
             @@@@@lang:en
             @@@@@@: This node is read-only.
         @@@Def:
-          @@@@Type:
-            lang:Perl
-          @@@@@:
-                           ## Condition sensitive
-            __DEEP{ $self->__SUPER{ProcessingInstruction}__::data ($given) }__;
+          @@@@ContentType:
+            lang:dis
+          @@@@DISPerl:cloneCode:.setData
      @@Level[list]:
         3
      @@SpecLevel:3
-     @@Redefine: Node
+     @@L3:
 
   @IntMethod:
     @@Name: newObject
@@ -1829,18 +1980,10 @@ IF:
         @@@@lang:en
         @@@@@:
           The new object for the <IF:ProcessingInstruction> node.
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-               ## Condition sensitive
-          $r = __CLASS{Node}__->__INT{newObject}__;
-          $r->{<Q:DOMCore:nodeType>} = <Q:infoset:ProcessingInstruction>;
-          $r->{<Q:infoset:content>} = '';
-     @@Level[list]:
-       1
-       2
-       3
+      @@@PerlDef:
+        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject>;
+        $r->{<Q:DOMCore:nodeType>} = <Q:infoset:ProcessingInstruction>;
+        $r->{<Q:infoset:content>} = '';
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -1851,5 +1994,727 @@ IF:
          Other available properties: <Q:infoset:baseURI>, 
          <Q:DOMCore:read-only>, <Q:infoset:parent>, <Q:infoset:content>.
 ## IF:ProcessingInstruction
-    
+
+ClassDef:
+  @Name: ManakaiDOMEntities
+  @Implement:
+    DOMCore:NamedNodeMap
+  @rdf:type:
+    ManakaiDOM:Class
+  @Description:
+    @@lang:en
+    @@@:
+      A collection of the general entities, both external and internal, 
+      declared in the DTD.  Parameter entities and duplicating 
+      declarations are not contained.
+  @ImplNote:
+    @@lang:en
+    @@@:
+      This interface is used by the attribute "DocumentType.entities". 
+  @Method:
+     @@Name:  getNamedItem
+     @@Description:
+       @@@lang:en
+       @@@@: Retrive an entity node specified by name.
+     @@Param:
+        @@@Name:  name
+        @@@Type:  
+          DOMMain:DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The "nodeName" of a node to retrive.
+     @@Return:
+        @@@Type:
+          DOMXML:Entity
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An "Entity" node with the specified "nodeName".
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The "name" does not identify any node in this map.
+  @Method:
+     @@Name:  setNamedItem
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Add a node using its "nodeName" attribute.  If a node with 
+         that name is already present in this map, it is replaced 
+         by the new one.  Replacing a node by itself has no effect.
+     @@ImplNote:
+       @@@lang:en
+       @@@@: "Replacing ... no effect" is clarified by the DOM Level 2 Errata. 
+     @@Param:
+        @@@Name:  arg
+        @@@Type:
+          DOMXML:Entity
+        @@@Description:
+          @@@@lang:en
+          @@@@@: A node to store in this map.
+     @@Return:
+        @@@Type:
+          DOMXML:Entity
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            If the "arg" node replaces an existing node, the replaced node.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The "arg" node does not replace any node in the map.
+        @@@Exception:
+          @@@@Type: 
+            DOMCore:DOMException
+          @@@@Name: WRONG_DOCUMENT_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The "arg" node was created from a different document.
+        @@@Exception:
+          @@@@Type: 
+            DOMCore:DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: This map is read-only.
+        @@@Exception:
+          @@@@Type: 
+            DOMCore:DOMException
+          @@@@Name: HIERARCHY_REQUEST_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              An attempt is made to add a node that is unable to 
+              belong to this map.
+          @@@@SpecLevel:2
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@: This exception has added by the DOM Level 2 Errata.
+  @Method:
+     @@Name:  removeNamedItem
+     @@Description:
+        @@@lang:en
+        @@@@:
+          Remove a node specified by name.
+     @@Param:
+        @@@Name:  name
+        @@@Type:
+          DOMMain:DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The "nodeName" of the node to remove.
+     @@Return:
+        @@@Type:
+          DOMXML:Entity
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node removed from this map.
+        @@@Exception:
+          @@@@Type: 
+            DOMCore:DOMException
+          @@@@Name: NOT_FOUND_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: There is no node named "name" in this map.
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              The DOM Level 1 First Edition also said that if there 
+              is no node named "name", "null" is returned.  It has 
+              removed by the DOM Level 1 First Edition Errata.
+        @@@Exception:
+          @@@@Type: 
+            DOMCore:DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: This map is read-only.
+          @@@@SpecLevel:1
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              This exception is added by the DOM Level 1 First Edition Errata.
+  @Method:
+     @@Name:  item
+     @@Description:
+       @@@lang:en
+       @@@@: Return an item in the map.
+     @@Param:
+        @@@Name:  index
+        @@@Type:  unsigned-long
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The index of the item into this map.
+     @@Return:
+        @@@Type:
+          DOMXML:Entity
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node at the "index"th position in the map.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              The "index" is invalid, i.e. it is greater than or 
+              equal to the number of nodes in this map.
+  @Attr:
+     @@Name:  length
+     @@Description:
+       @@@lang:en
+       @@@@: The number of nodes in this map.
+     @@Get:
+        @@@Type:  unsigned-long
+  @Method:
+     @@Name:  getNamedItemNS
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Retrive a node specified by local name and namespace URI.
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The namespace URI of the node to retrive.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The value for this parameter should always be 
+              <DOM:null>, since general entities are defined 
+              not to have any namespace.
+     @@Param:
+        @@@Name:  localName
+        @@@Type:
+          DOMMain:DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The local name of the node to retrive.
+     @@Return:
+        @@@Type:
+          DOMXML:Entity
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An entity node with the specified local name and 
+            namespace URI.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The "namespaceURI" and "localName" does not identify 
+              any node in this map.
+     @@Level[list]:  2
+     @@SpecLevel:2
+  @Method:
+     @@Name:  setNamedItemNS
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Add a node using its "namespaceURI" and "localName". 
+         If a node with that namespace URI and that local name 
+         is already present in this map, it is replaced by the new one. 
+         Replacing a node by itself has no effect.
+     @@ImplNote:
+       @@@lang:en
+       @@@@: "Replacing ... no effect" is clarified by the DOM Level 2 Errata. 
+     @@Param:
+        @@@Name:  arg
+        @@@Type:
+          DOMXML:Entity
+        @@@Description:
+          @@@@lang:en
+          @@@@@: An entity node to store in this map.
+     @@Return:
+        @@@Type:
+          DOMXML:Entity
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            If the "arg" node replaces an existing node, the replaced node.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The "arg" node replaces no existing node in this map.
+        @@@Exception:
+          @@@@Type: 
+            DOMCore:DOMException
+          @@@@Name: WRONG_DOCUMENT_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The "arg" node was created from a different document.
+        @@@Exception:
+          @@@@Type: 
+            DOMCore:DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: This map is read-only.
+        @@@Exception:
+          @@@@Type: 
+            DOMCore:DOMException
+          @@@@Name: HIERARCHY_REQUEST_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              An attempt is made to add a node that is unable to 
+              belong to this map.
+          @@@@SpecLevel:2
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@: This exception has added by the DOM Level 2 Errata.
+     @@Level[list]:  2
+     @@SpecLevel:2
+  @Method:
+     @@Name:  removeNamedItemNS
+     @@Description:
+        @@@lang:en
+        @@@@:
+          Remove a node specified by local name and namespace URI.
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace URI of the node to remove.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The value for this parameter should always be 
+              <DOM:null>, since general entities are defined 
+              not to have any namespace.
+     @@Param:
+        @@@Name:  localName
+        @@@Type:  
+          DOMMain:DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The local name of the node to remove.
+     @@Return:
+        @@@Type:
+          DOMXML:Entity
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node removed from this map.
+        @@@Exception:
+          @@@@Type: 
+            DOMCore:DOMException
+          @@@@Name: NOT_FOUND_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              There is no node with the specified "namespaceURI" and 
+              "localName" in the map.
+        @@@Exception:
+          @@@@Type: 
+             DOMCore:DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: This map is read-only.
+     @@Level[list]:  2
+     @@SpecLevel:2
+
+  @IntMethod:
+    @@Name: isEqualNamedNodeMap
+    @@Operator:
+      @@@Type:
+        lang:Perl
+      @@@@:==
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Return whether two <IF:NamedNodeMap>s are equal.
+    @@Param:
+      @@@Name:arg
+      @@@Type:ManakaiDOMEntities
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The node list to compare equality with.
+    @@Return:
+      @@@Type:boolean
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        See: <M:Node.isEqualNode>.
+    @@SpecLevel:3
+## IF:ManakaiDOMEntities
+
+ClassDef:
+  @Name: ManakaiDOMNotations
+  @rdf:type: 
+    ManakaiDOM:Class
+  @Description:
+    @@lang:en
+    @@@:
+      A collection of notations declared in the DTD.
+  @ImplNote:
+    @@lang:en
+    @@@:
+      This interface is used by the attribute "DocumentType.notations".
+  @Implement:
+    DOMCore:NamedNodeMap
+  @Method:
+     @@Name:  getNamedItem
+     @@Description:
+       @@@lang:en
+       @@@@: Retrive a node specified by name.
+     @@Param:
+        @@@Name:  name
+        @@@Type:
+          DOMMain:DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The "nodeName" of a node to retrive.
+     @@Return:
+        @@@Type:
+          DOMXML:Notation
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A "Node" (of any type) with the specified "nodeName".
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The "name" does not identify any node in this map.
+  @Method:
+     @@Name:  setNamedItem
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Add a node using its "nodeName" attribute.  If a node with 
+         that name is already present in this map, it is replaced 
+         by the new one.  Replacing a node by itself has no effect.
+     @@ImplNote:
+       @@@lang:en
+       @@@@: "Replacing ... no effect" is clarified by the DOM Level 2 Errata. 
+     @@Param:
+        @@@Name:  arg
+        @@@Type:
+          DOMXML:Notation
+        @@@Description:
+          @@@@lang:en
+          @@@@@: A node to store in this map.
+     @@Return:
+        @@@Type:
+          DOMXML:Notation
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            If the "arg" node replaces an existing node, the replaced node.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The "arg" node does not replace any node in the map.
+        @@@Exception:
+          @@@@Type: 
+            DOMCore:DOMException
+          @@@@Name: WRONG_DOCUMENT_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The "arg" node was created from a different document.
+        @@@Exception:
+          @@@@Type:
+            DOMCore:DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: This map is read-only.
+        @@@Exception
+          @@@@Type: 
+            DOMCore:DOMException
+          @@@@Name: HIERARCHY_REQUEST_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              An attempt is made to add a node that is unable to 
+              belong to this map.
+          @@@@SpecLevel:2
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@: This exception has added by the DOM Level 2 Errata.
+  @Method:
+     @@Name:  removeNamedItem
+     @@Description:
+        @@@lang:en
+        @@@@:
+          Remove a node specified by name.
+     @@Param:
+        @@@Name:  name
+        @@@Type:
+          DOMMain:DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The "nodeName" of the node to remove.
+     @@Return:
+        @@@Type:
+          DOMXML:Notation
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node removed from this map.
+        @@@Exception:
+          @@@@Type: 
+            DOMCore:DOMException
+          @@@@Name: NOT_FOUND_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: There is no node named "name" in this map.
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              The DOM Level 1 First Edition also said that if there 
+              is no node named "name", "null" is returned.  It has 
+              removed by the DOM Level 1 First Edition Errata.
+        @@@Exception:
+          @@@@Type: 
+            DOMCore:DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: This map is read-only.
+          @@@@SpecLevel:1
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              This exception is added by the DOM Level 1 First Edition Errata.
+  @Method:
+     @@Name:  item
+     @@Description:
+       @@@lang:en
+       @@@@: Return an item in the map.
+     @@Param:
+        @@@Name:  index
+        @@@Type:  unsigned-long
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The index of the item into this map.
+     @@Return:
+        @@@Type:
+          DOMXML:Notation
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node at the "index"th position in the map.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              The "index" is invalid, i.e. it is greater than or 
+              equal to the number of nodes in this map.
+  @Attr:
+     @@Name:  length
+     @@Description:
+       @@@lang:en
+       @@@@: The number of nodes in this map.
+     @@Get:
+        @@@Type:  unsigned-long
+  @Method:
+     @@Name:  getNamedItemNS
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Retrive a node specified by local name and namespace URI.
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The namespace URI of the node to retrive.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The node to retrive has no namespace.
+     @@Param:
+        @@@Name:  localName
+        @@@Type:  
+          DOMMain:DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The local name of the node to retrive.
+     @@Return:
+        @@@Type:
+          DOMXML:Notation
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A notation node with the specified local name and 
+            namespace URI.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The "namespaceURI" and "localName" does not identify 
+              any node in this map.
+     @@Level[list]:  2
+     @@SpecLevel:2
+  @Method:
+     @@Name:  setNamedItemNS
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Add a node using its "namespaceURI" and "localName". 
+         If a node with that namespace URI and that local name 
+         is already present in this map, it is replaced by the new one. 
+         Replacing a node by itself has no effect.
+     @@ImplNote:
+       @@@lang:en
+       @@@@: "Replacing ... no effect" is clarified by the DOM Level 2 Errata. 
+     @@Param:
+        @@@Name:  arg
+        @@@Type:
+          DOMXML:Notation
+        @@@Description:
+          @@@@lang:en
+          @@@@@: A node to store in this map.
+     @@Return:
+        @@@Type:
+          DOMXML:Notation
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            If the "arg" node replaces an existing node, the replaced node.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The "arg" node replaces no existing node in this map.
+        @@@Exception:
+          @@@@Type: 
+            DOMCore:DOMException
+          @@@@Name: WRONG_DOCUMENT_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The "arg" node was created from a different document.
+        @@@Exception:
+          @@@@Type: 
+            DOMCore:DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: This map is read-only.
+        @@@Exception:
+          @@@@Type: 
+            DOMCore:DOMException
+          @@@@Name: HIERARCHY_REQUEST_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              An attempt is made to add a node that is unable to 
+              belong to this map.
+          @@@@SpecLevel:2
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@: This exception has added by the DOM Level 2 Errata.
+     @@Level[list]:  2
+     @@SpecLevel:2
+  @Method:
+     @@Name:  removeNamedItemNS
+     @@Description:
+        @@@lang:en
+        @@@@:
+          Remove a node specified by local name and namespace URI.
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace URI of the node to remove.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The node to remove has no namespace.
+     @@Param:
+        @@@Name:  localName
+        @@@Type:  
+          DOMMain:DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The local name of the node to remove.
+     @@Return:
+        @@@Type:
+          DOMXML:Notation
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node removed from this map.
+        @@@Exception:
+          @@@@Type:
+            DOMCore:DOMException
+          @@@@Name: NOT_FOUND_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              There is no node with the specified "namespaceURI" and 
+              "localName" in the map.
+        @@@Exception:
+          @@@@Type: 
+            DOMCore:DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: This map is read-only.
+     @@Level[list]:  2
+     @@SpecLevel:2
+
+  @IntMethod:
+    @@Name: isEqualNamedNodeMap
+    @@Operator:
+      @@@Type:
+        lang:Perl
+      @@@@:==
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Return whether two <IF:NamedNodeMap>s are equal.
+    @@Param:
+      @@@Name:arg
+      @@@Type:ManakaiDOMNotations
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The node list to compare equality with.
+    @@Return:
+      @@@Type:boolean
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        See: <M:Node.isEqualNode>.
+    @@SpecLevel:3
+## IF:ManakaiDOMNotations
+
 ## DOMXML.dis ends here

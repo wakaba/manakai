@@ -28,7 +28,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/27 13:41:54 $
+      $Date: 2004/12/28 13:10:20 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1527,6 +1527,30 @@ FeatureDef:
     @@QName: DOMMainFeature30
     @@ISA: DOMMainFeature20
 
+ElementTypeBinding:
+  @Name: MDOMFeature
+  @ElementType:
+    DOMMain:implementFeature
+  @ShadowContent:
+    @@@: ManakaiDOMFeature10
+
+ElementTypeBinding:
+  @Name: DOMMFeature
+  @ElementType:
+    DOMMain:implementFeature
+  @ShadowContent:
+    @@@: DOMMainFeature10
+    @@For:
+      ManakaiDOM:DOM1
+  @ShadowSibling:
+    @@DOMMain:implementFeature:
+      @@@@: DOMMainFeature20
+      @@@For:
+        ManakaiDOM:DOM2
+    @@DOMMain:implementFeature:
+      @@@@: DOMMainFeature30
+      @@@For:
+        ManakaiDOM:DOM3
 
 ## -- IDL datatypes
 
@@ -1776,6 +1800,8 @@ ResourceDef:
     @@For:
       ManakaiDOM:ManakaiDOMLatest
     @@@: ManakaiDOMStringExtend
+  @DOMMFeature:
+
   @Description:
     @@lang:en
     @@@: 
@@ -2509,6 +2535,24 @@ StringDataTypeDef:
       Examples of DOM URI include RFC 2396/2773 URI reference and 
       IRI reference.
 
+  @ResourceDef:
+    @@QName: isRelativeDOMURI
+    @@rdf:type:
+      dis2pm:InlineCode
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Whether a string is a relative DOM URI or not. 
+    @@PerlDef:
+      @@@@:
+        ($INPUT !~ /\A[0-9A-Za-z+_.%-]+:/)
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          {TODO:: I18n consideration
+          \
+          }
+
 StringDataTypeDef:
   @QName: 
     ManakaiDOM:ManakaiDOMNamespaceURI
@@ -3029,6 +3073,7 @@ ResourceDef:
       ManakaiDOM:ManakaiDOMObject
     @@For:
       ManakaiDOM:ManakaiDOM
+  @DOMMFeature:
 
   @Description:
     @@lang:en
@@ -3233,6 +3278,8 @@ ClassDef:
     ManakaiDOM:ManakaiDOMObject
   @For: 
     ManakaiDOM:ManakaiDOM
+  @MDOMFeature:
+
   @Description:
     @@lang:en
     @@@:
@@ -3298,6 +3345,8 @@ ClassDef:
       ManakaiDOM:ManakaiDOM
     @@@:
       Message::Util::Error
+  @MDOMFeature:
+
   @Description:
     @@lang:en
     @@@:
@@ -3381,6 +3430,8 @@ ResourceDef:
       ::ManakaiDOM:ManakaiDOMCommon
     @@For: 
       !=ManakaiDOM:ManakaiDOMCommon
+  @MDOMFeature:
+
   @Description:
     @@lang:en
     @@@:
@@ -3400,6 +3451,8 @@ ResourceDef:
       ::ManakaiDOM:ManakaiDOMCommon
     @@For: 
       !=ManakaiDOM:ManakaiDOMCommon
+  @MDOMFeature:
+
   @Description:
     @@lang:en
     @@@:
@@ -3410,6 +3463,8 @@ ClassDef:
     ManakaiDOM:ManakaiDOMNodeObject
   @ISA: 
     ManakaiDOM:ManakaiDOMObject
+  @MDOMFeature:
+
   @Description:
     @@lang:en
     @@@:
@@ -3737,6 +3792,14 @@ ClassDef:
     ManakaiDOM:ManakaiDOMNodeReference
   @ISA: 
     ManakaiDOM:ManakaiDOMObject
+  @MDOMFeature:
+  
+  @Description:
+    @@lang:en
+    @@@:
+      A reference to node object.  From the DOM application's view, 
+      it seems as if the node object itself.
+
   @IntMethod:
     @@Name: destroy
     @@Description:
@@ -3789,6 +3852,7 @@ ExceptionDef:
     @@lang:en
     @@@:
       A set of manakai DOM implementation-dependent exceptions.
+  @MDOMFeature:
 
   @Attr:
      @@Name:  code
@@ -3937,6 +4001,8 @@ WarningDef:
     ManakaiDOM:ManakaiDOMImplementationWarning
   @ISA: 
     ManakaiDOM:ManakaiDOMWarning
+  @MDOMFeature:
+
   @Description:
     @@lang:en
     @@@:
