@@ -8,9 +8,10 @@ Message::Util::Formatter --- General format text to composed text converter
 package Message::Util::Formatter;
 use strict;
 use vars qw(%FMT2STR $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+require Message::Util;
 
-## Embeded formatting rules
+## Embeded formatting rules (default)
 %FMT2STR = (
 	char	=> sub {
 	  my $p = $_[0];
@@ -25,13 +26,18 @@ $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 	percent	=> '%',
 );
 
-sub replace ($;\%) {
-  require Message::Util;
+sub new ($) {
+  my $self = bless Message::Util::make_clone (\%FMT2STR), shift;
+  $self;
+}
+
+sub replace ($$;\%) {
+  my $self = shift;
   my $format = shift;
   my $gparam = shift;
   $format =~ s{%([A-Za-z0-9_]+)(?:\(([^\x29]*)\))?;}{
     my ($f, $a) = ($1, $2);
-    my $function = $gparam->{fmt2str}->{$f} || $FMT2STR{$f};
+    my $function = $gparam->{fmt2str}->{$f} || $self->{$f};
     if (ref $function) {
       my %a;
       for (split /[\x09\x20]*,[\x09\x20]*/, $a) {
@@ -74,4 +80,4 @@ Boston, MA 02111-1307, USA.
 =cut
 
 1;
-# $Date: 2002/11/13 08:25:04 $
+# $Date: 2002/11/13 10:59:11 $

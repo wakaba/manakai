@@ -15,7 +15,7 @@ package Message::Util;
 #require 5.6.0;
 use strict;
 use vars qw(%FMT2STR %OPTION %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.25 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.26 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Carp;
 
@@ -679,7 +679,7 @@ sub decode_ccontent ($$) {
 ## obsoleted
 sub sprintxf ($;\%) {
   require Message::Util::Formatter;
-  Message::Util::Formatter::replace (@_);
+  Message::Util::Formatter->new->replace (@_);
 }
 
 sub decide_newline ($) {
@@ -827,4 +827,4 @@ Boston, MA 02111-1307, USA.
 =cut
 
 1;
-# $Date: 2002/11/13 08:26:45 $
+# $Date: 2002/11/13 10:59:11 $
