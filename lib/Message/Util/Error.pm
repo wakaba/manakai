@@ -15,7 +15,7 @@ This module is part of manakai.
 
 package Message::Util::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error;
 push our @ISA, 'Error';
 
@@ -29,7 +29,7 @@ sub import {
   }
 }
 
-sub ___errors () {+{
+sub ___error_def () {+{
  UNKNOWN => {
              description => '"%name;": Unknown error',
              level       => 'fatal',
@@ -38,7 +38,8 @@ sub ___errors () {+{
 
 sub ___get_error_def ($$) {
   my ($self, $name) = @_;
-  my $err = $self->___errors->{$name};
+  my $err;
+  $err = $self->___error_def->{$name} if $self->can ('___error_def');
   return $err if $err;
   no strict 'refs';
   for my $SUPER (@{(ref ($self) || $self).'::ISA'}) {
@@ -152,7 +153,7 @@ Parameter value specified when error is thrown
 package Message::Util::Error::formatter;
 use Message::Util::Formatter::Text;
 push our @ISA, q(Message::Util::Formatter::Text);
-sub rule_def () {+{
+sub ___rule_def () {+{
   name => {
     after => sub {
       my ($f, $name, $p, $o) = @_;
@@ -177,7 +178,7 @@ To make a new error class:
   push our @ISA, 'Message::Util::Error';
   
   ## [REQUIRED] Error types
-  sub ___errors {
+  sub ___error_def {
     ## Returns a reference to hash defining error type
     return {
       ERROR_NAME => {
@@ -251,4 +252,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/12/05 11:41:12 $
+1; # $Date: 2003/12/06 05:10:50 $
