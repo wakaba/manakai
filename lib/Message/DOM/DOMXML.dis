@@ -64,7 +64,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/11/21 13:17:43 $
+     $Date: 2004/11/23 13:20:33 $
 
   @Feature:
     @@Name: XML
@@ -196,18 +196,47 @@ ElementTypeBinding:
     @@resourceFor:
       ManakaiDOM:ForIF
     @@resourceFor:
-      ManakaiDOM:ForClass
+      @@@@:
+        ManakaiDOM:ForClass
+      @@@ForCheck:
+        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
     @@ForCheck:
-      ManakaiDOM:ManakaiDOM
-ElementTypeBinding:
-  @Name: IFDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:IF
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM
+      ManakaiDOM:DOM
+    @@ISA:
+      @@@@:
+        ManakaiDOM:ManakaiDOMException
+      @@@ForCheck:
+        ManakaiDOM:ManakaiDOM
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@ISA:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOM3
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+      @@@For:
+        ManakaiDOM:ManakaiDOMLatest
+    @@ISA:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOM2
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+      @@@For:
+        ManakaiDOM:ManakaiDOM3
+    @@ISA:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOM1
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+      @@@For:
+        ManakaiDOM:ManakaiDOM2
+    @@ISA:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOM
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+      @@@For:
+        ManakaiDOM:ManakaiDOM1
 
 ElementTypeBinding:
   @Name: Method
@@ -217,7 +246,7 @@ ElementTypeBinding:
     @@rdf:type:
       ManakaiDOM:DOMMethod
     @@ForCheck:
-      ManakaiDOM:DOM
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
 ElementTypeBinding:
   @Name: IntMethod
   @ElementType:
@@ -226,7 +255,7 @@ ElementTypeBinding:
     @@rdf:type:
       ManakaiDOM:DOMMethod
     @@ForCheck:
-      ManakaiDOM:ManakaiDOM
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
     @@ManakaiDOM:isForInternal: 1
 ElementTypeBinding:
   @Name: ReMethod
@@ -236,7 +265,7 @@ ElementTypeBinding:
     @@rdf:type:
       ManakaiDOM:DOMMethod
     @@ForCheck:
-      ManakaiDOM:ManakaiDOM
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
     @@ManakaiDOM:isRedefining: 1
 ElementTypeBinding:
   @Name: Param
@@ -267,8 +296,8 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMAttribute
-    @@For:
-      ManakaiDOM:DOM
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
 ElementTypeBinding:
   @Name: IntAttr
   @ElementType:
@@ -276,8 +305,8 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMAttribute
-    @@For:
-      ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
     @@ManakaiDOM:isForInternal: 1
 ElementTypeBinding:
   @Name: ReAttr
@@ -286,8 +315,8 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMAttribute
-    @@For:
-      ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
     @@ManakaiDOM:isRedefining: 1
 ElementTypeBinding:
   @Name: Get
@@ -318,6 +347,8 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:ConstGroup
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
 
 IF:
   @Name:  

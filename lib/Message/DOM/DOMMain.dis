@@ -48,7 +48,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/11/21 13:17:43 $
+     $Date: 2004/11/23 13:20:33 $
   
   @Feature:
     @@QName:
@@ -141,13 +141,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:Const
-ElementTypeBinding:
-  @Name: ObjectDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:Class
 
 ElementTypeBinding:
   @Name: Method
@@ -156,7 +149,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMMethod
-    @@For:
+    @@ForCheck:
       ManakaiDOM:DOM
 ElementTypeBinding:
   @Name: IntMethod
@@ -165,7 +158,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMMethod
-    @@For:
+    @@ForCheck:
       ManakaiDOM:ManakaiDOM
     @@ManakaiDOM:isForInternal: 1
 ElementTypeBinding:
@@ -175,7 +168,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMMethod
-    @@For:
+    @@ForCheck:
       ManakaiDOM:ManakaiDOM
     @@ManakaiDOM:isRedefining: 1
 ElementTypeBinding:
@@ -200,7 +193,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMMethodReturn
-    @@For:
+    @@ForCheck:
       ManakaiDOM:DOM
 ElementTypeBinding:
   @Name: Attr
@@ -209,7 +202,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMAttribute
-    @@For:
+    @@ForCheck:
       ManakaiDOM:DOM
 ElementTypeBinding:
   @Name: IntAttr
@@ -218,7 +211,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMAttribute
-    @@For:
+    @@ForCheck:
       ManakaiDOM:ManakaiDOM
     @@ManakaiDOM:isForInternal: 1
 ElementTypeBinding:
@@ -228,7 +221,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMAttribute
-    @@For:
+    @@ForCheck:
       ManakaiDOM:ManakaiDOM
     @@ManakaiDOM:isRedefining: 1
 ElementTypeBinding:
@@ -1207,10 +1200,14 @@ DataTypeDef:
     @@lang:en
     @@@: An object reference.
 
-ObjectDef:
+ResourceDef:
   @Name:  DOMImplementationRegistry
-  @For:
+  @rdf:type:
+    ManakaiDOM:Class
+  @ForCheck:
     ManakaiDOM:DOM3
+  @ForCheck:
+    !=ManakaiDOM:ManakaiDOM
   @ISA:
     @@@:
       ManakaiDOM:ManakaiDOMObject

@@ -42,7 +42,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/11/21 13:17:43 $
+     $Date: 2004/11/23 13:20:33 $
   
   @Description:
     @@lang:en
@@ -70,22 +70,8 @@ Module:
       DOMCore:DOMImplementation::DOM3
 
   @Require:
-    @@AppModule:
-      @@@For:
-        ManakaiDOM:ManakaiDOM
-      @@@Def:
-        @@@@ContentType:
-          dis:Perl
-        @@@@require:
-          Message::Util::Error
     @@Module:
       @@@Name: DOMMain
-    @@Module:
-      @@@Name: DOMMain
-      @@@For:
-        ManakaiDOM:ManakaiDOM !ManakaiDOM:DOM3
-      @@@WithFor: 
-        ManakaiDOM:DOM3
 
 ForDef:
   @QName:
@@ -327,7 +313,7 @@ ElementTypeBinding:
       ManakaiDOM:ExceptionClass
     @@ISA: ManakaiDOMException
     @@ForCheck:
-      ManakaiDOM:ManakaiDOM
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
 
 ResourceTypeDef:
   @Name: WarningClass
@@ -344,7 +330,7 @@ ElementTypeBinding:
       ManakaiDOM:WarningClass
     @@ISA: ManakaiDOMWarning
     @@ForCheck:
-      ManakaiDOM:ManakaiDOM
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
 
 PropDef:
   @Name: exceptionOrWarningParameter
@@ -408,7 +394,7 @@ ElementTypeBinding:
     @@rdf:type:
       ManakaiDOM:Class
     @@ForCheck:
-      ManakaiDOM:ManakaiDOM
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
 
 ResourceTypeDef:
   @QName: 
@@ -426,6 +412,42 @@ ResourceDef:
     @@lang:en
     @@@:
       The manakai DOM modules
+  @AppName:
+    @@@:
+      Message::DOM::IFLatest::
+    @@ContentType:
+      lang:Perl
+    @@For:
+      ManakaiDOM:ManakaiDOMLatest
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @AppName:
+    @@@:
+      Message::DOM::IFLevel3::
+    @@ContentType:
+      lang:Perl
+    @@For:
+      ManakaiDOM:ManakaiDOM3
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @AppName:
+    @@@:
+      Message::DOM::IFLevel2::
+    @@ContentType:
+      lang:Perl
+    @@For:
+      ManakaiDOM:ManakaiDOM2
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @AppName:
+    @@@:
+      Message::DOM::IFLevel1::
+    @@ContentType:
+      lang:Perl
+    @@For:
+      ManakaiDOM:ManakaiDOM1
+    @@ForCheck:
+      ManakaiDOM:ForIF
   @AppName:
     @@@:
       Message::DOM::IF::
@@ -592,7 +614,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMMethod
-    @@For:
+    @@ForCheck:
       ManakaiDOM:DOM
 ElementTypeBinding:
   @Name: IntMethod
@@ -601,7 +623,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMMethod
-    @@For:
+    @@ForCheck:
       ManakaiDOM:ManakaiDOM
     @@ManakaiDOM:isForInternal: 1
 ElementTypeBinding:
@@ -611,7 +633,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMMethod
-    @@For:
+    @@ForCheck:
       ManakaiDOM:ManakaiDOM
     @@ManakaiDOM:isRedefining: 1
 ElementTypeBinding:
@@ -628,7 +650,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMMethodReturn
-    @@For:
+    @@ForCheck:
       ManakaiDOM:DOM
 ElementTypeBinding:
   @Name: Attr
@@ -637,7 +659,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMAttribute
-    @@For:
+    @@ForCheck:
       ManakaiDOM:DOM
 ElementTypeBinding:
   @Name: IntAttr
@@ -646,7 +668,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMAttribute
-    @@For:
+    @@ForCheck:
       ManakaiDOM:ManakaiDOM
     @@ManakaiDOM:isForInternal: 1
 ElementTypeBinding:
@@ -656,7 +678,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMAttribute
-    @@For:
+    @@ForCheck:
       ManakaiDOM:ManakaiDOM
     @@ManakaiDOM:isRedefining: 1
 ElementTypeBinding:
@@ -1177,8 +1199,6 @@ DataTypeDef:
 
 DataTypeDef:
   @Name: ManakaiDOMNamespaceURI
-  @For:
-    ManakaiDOM:ManakaiDOM2
   @ISA: 
     DOMMain:DOMString
   @FullName:
@@ -1506,16 +1526,6 @@ WarningDef:
 ClassDef:
   @Name: ManakaiDOMObject
   @For: ManakaiDOM
-  @ISA:
-    @@@:
-      DOMMain:DOMObject
-    @@For:
-      ManakaiDOM:DOM3
-  @ISA:
-    @@@: 
-      DOMMain:DOMObject::ManakaiDOM:DOM3
-    @@For:
-      ManakaiDOM:ManakaiDOM !ManakaiDOM:DOM3
   @Description:
     @@lang:en
     @@@:
@@ -1542,8 +1552,7 @@ ClassDef:
         See also <PerlModule:Message::Util::Error>.
     @@Param:
       @@@Name:err
-      @@@Type:
-        DOMMain:DOMObject
+      @@@Type: ManakaiDOMExceptionOrWarning
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1562,7 +1571,7 @@ ClassDef:
 
 ClassDef:
   @Name: ManakaiDOMExceptionOrWarning
-  @For: ManakaiDOM
+  @For: ManakaiDOM !=ManakaiDOM
   @ISA: ManakaiDOMObject
   @Description:
     @@lang:en
@@ -1617,7 +1626,7 @@ ResourceDef:
   @rdf:type:
     ManakaiDOM:ExceptionClass
   @ISA: ManakaiDOMExceptionOrWarning
-  @For: ManakaiDOM
+  @For: ManakaiDOM !=ManakaiDOM
   @Description:
     @@lang:en
     @@@:
@@ -1628,7 +1637,7 @@ ResourceDef:
   @rdf:type:
     ManakaiDOM:WarningClass
   @ISA: ManakaiDOMExceptionOrWarning
-  @For: ManakaiDOM
+  @For: ManakaiDOM !=ManakaiDOM
   @Description:
     @@lang:en
     @@@:

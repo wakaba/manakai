@@ -49,13 +49,37 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/11/21 13:17:43 $
+     $Date: 2004/11/23 13:20:33 $
 
   @Require:
     @@Module:
       @@@Name:ManakaiDOMMain
     @@Module:
       @@@Name: DOMCore
+    @@Module:
+      @@@Name: ManakaiDOMCore
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOM
+      @@@For:
+        ManakaiDOM:ManakaiDOM
+    @@Module:
+      @@@Name: ManakaiDOMCore
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOM1
+      @@@For:
+        ManakaiDOM:ManakaiDOM1
+    @@Module:
+      @@@Name: ManakaiDOMCore
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOM2
+      @@@For:
+        ManakaiDOM:ManakaiDOM2
+    @@Module:
+      @@@Name: ManakaiDOMCore
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOM3
+      @@@For:
+        ManakaiDOM:ManakaiDOM3
   @DefaultFor:
     ManakaiDOM:ManakaiDOMLatest
 
@@ -107,7 +131,7 @@ ElementTypeBinding:
     @@rdf:type:
       ManakaiDOM:Class
     @@For:
-      ManakaiDOM:ManakaiDOM
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
 
 ElementTypeBinding:
   @Name: Method
@@ -159,7 +183,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMAttribute
-    @@For:
+    @@ForCheck:
       ManakaiDOM:DOM
 ElementTypeBinding:
   @Name: IntAttr
@@ -168,7 +192,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMAttribute
-    @@For:
+    @@ForCheck:
       ManakaiDOM:ManakaiDOM
     @@ManakaiDOM:isForInternal: 1
 ElementTypeBinding:
@@ -178,7 +202,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMAttribute
-    @@For:
+    @@ForCheck:
       ManakaiDOM:ManakaiDOM
     @@ManakaiDOM:isRedefining: 1
 ElementTypeBinding:

@@ -74,7 +74,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/11/21 13:17:43 $
+     $Date: 2004/11/23 13:20:33 $
 
   @DefaultFor:
     ManakaiDOM:ManakaiDOMLatest
@@ -86,6 +86,30 @@ Module:
       @@@Name: ManakaiDOMCore
     @@Module:
       @@@Name: DOMXML
+    @@Module:
+      @@@Name: DOMCore
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOM
+      @@@For:
+        ManakaiDOM:ManakaiDOM
+    @@Module:
+      @@@Name: DOMCore
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOM1
+      @@@For:
+        ManakaiDOM:ManakaiDOM1
+    @@Module:
+      @@@Name: DOMCore
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOM2
+      @@@For:
+        ManakaiDOM:ManakaiDOM2
+    @@Module:
+      @@@Name: DOMCore
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOM3
+      @@@For:
+        ManakaiDOM:ManakaiDOM3
 
   @Feature:
     @@Name: Core
@@ -130,6 +154,11 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       @@@@:
+        dis:MultipleResource
+      @@@ForCheck:
+        !ManakaiDOM:ForClass !ManakaiDOM:ForIF
+    @@rdf:type:
+      @@@@:
         ManakaiDOM:ExceptionIF
       @@@ForCheck:
         ManakaiDOM:ForIF
@@ -138,18 +167,13 @@ ElementTypeBinding:
         ManakaiDOM:ExceptionClass
       @@@ForCheck:
         ManakaiDOM:ForClass
-    @@rdf:type:
-      @@@@:
-        dis:MultipleResource
-      @@@ForCheck:
-        !ManakaiDOM:ForClass !ManakaiDOM:ForIF
     @@resourceFor:
       ManakaiDOM:ForIF
     @@resourceFor:
       @@@@:
         ManakaiDOM:ForClass
       @@@ForCheck:
-        ManakaiDOM:ManakaiDOM
+        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
     @@ForCheck:
       ManakaiDOM:DOM
     @@ISA:
@@ -157,6 +181,15 @@ ElementTypeBinding:
         ManakaiDOM:ManakaiDOMException
       @@@ForCheck:
         ManakaiDOM:ManakaiDOM
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@ISA:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOM
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+      @@@For:
+        ManakaiDOM:ManakaiDOM1
 ElementTypeBinding:
   @Name: Exception
   @ElementType:
@@ -173,6 +206,11 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       @@@@:
+        dis:MultipleResource
+      @@@ForCheck:
+        !ManakaiDOM:ForClass !ManakaiDOM:ForIF
+    @@rdf:type:
+      @@@@:
         ManakaiDOM:IF
       @@@ForCheck:
         ManakaiDOM:ForIF
@@ -181,18 +219,13 @@ ElementTypeBinding:
         ManakaiDOM:Class
       @@@ForCheck:
         ManakaiDOM:ForClass
-    @@rdf:type:
-      @@@@:
-        dis:MultipleResource
-      @@@ForCheck:
-        !ManakaiDOM:ForClass !ManakaiDOM:ForIF
     @@resourceFor:
       ManakaiDOM:ForIF
     @@resourceFor:
       @@@@:
         ManakaiDOM:ForClass
       @@@ForCheck:
-        ManakaiDOM:ManakaiDOM
+        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
     @@ForCheck:
       ManakaiDOM:DOM
     @@ISA:
@@ -200,6 +233,13 @@ ElementTypeBinding:
         ManakaiDOM:ManakaiDOMObject
       @@@ForCheck:
         ManakaiDOM:ForClass
+    @@ISA:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOM
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+      @@@For:
+        ManakaiDOM:ManakaiDOM1
 ElementTypeBinding:
   @Name: IFDef
   @ElementType:
@@ -207,8 +247,45 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:IF
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM
+    @@ISA:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOM
+      @@@For:
+        ManakaiDOM:ManakaiDOM1
+
+ElementTypeBinding:
+  @Name: ImplementLevel3
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+      @@@:
+        ::ManakaiDOM:ManakaiDOM3
+      @@ForCheck:
+        ManakaiDOM:ForIF
+      @@For:
+        ManakaiDOM:ManakaiDOMLatest
+ElementTypeBinding:
+  @Name: ImplementLevel2
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+      @@@:
+        ::ManakaiDOM:ManakaiDOM2
+      @@ForCheck:
+        ManakaiDOM:ForIF
+      @@For:
+        ManakaiDOM:ManakaiDOM3
+ElementTypeBinding:
+  @Name: ImplementLevel1
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+      @@@:
+        ::ManakaiDOM:ManakaiDOM1
+      @@ForCheck:
+        ManakaiDOM:ForIF
+      @@For:
+        ManakaiDOM:ManakaiDOM2
 
 ElementTypeBinding:
   @Name: ConfigParam
@@ -247,7 +324,7 @@ ElementTypeBinding:
     @@rdf:type:
       ManakaiDOM:DOMMethod
     @@ForCheck:
-      ManakaiDOM:DOM
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
 ElementTypeBinding:
   @Name: IntMethod
   @ElementType:
@@ -256,7 +333,7 @@ ElementTypeBinding:
     @@rdf:type:
       ManakaiDOM:DOMMethod
     @@ForCheck:
-      ManakaiDOM:ManakaiDOM
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
     @@ManakaiDOM:isForInternal: 1
 ElementTypeBinding:
   @Name: ReMethod
@@ -266,7 +343,7 @@ ElementTypeBinding:
     @@rdf:type:
       ManakaiDOM:DOMMethod
     @@ForCheck:
-      ManakaiDOM:ManakaiDOM
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
     @@ManakaiDOM:isRedefining: 1
 ElementTypeBinding:
   @Name: Param
@@ -289,8 +366,8 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMAttribute
-    @@For:
-      ManakaiDOM:DOM
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
 ElementTypeBinding:
   @Name: IntAttr
   @ElementType:
@@ -298,8 +375,8 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMAttribute
-    @@For:
-      ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
     @@ManakaiDOM:isForInternal: 1
 ElementTypeBinding:
   @Name: ReAttr
@@ -308,8 +385,8 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMAttribute
-    @@For:
-      ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
     @@ManakaiDOM:isRedefining: 1
 ElementTypeBinding:
   @Name: Get
@@ -340,6 +417,8 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:ConstGroup
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
 ElementTypeBinding:
   @Name: Const
   @ElementType:
@@ -347,6 +426,8 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: 
       ManakaiDOM:Const
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
 ElementTypeBinding:
   @Name: XParam
   @ElementType:
@@ -375,14 +456,17 @@ PropDef:
       Temporary - should be bound to ManakaiDOM:DOMConfigParameter
 
 ExceptionDef:
-  @QName:
+  @Name:
     @@@: DOMException
     @@ForCheck:
       ManakaiDOM:ForIF
-  @QName:
+  @Name:
     @@@: ManakaiDOMException
     @@ForCheck:
       ManakaiDOM:ForClass
+  @ImplementLevel1:
+  @ImplementLevel2:
+  @ImplementLevel3:
   @Spec:
     @@DOM3:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-17189187
@@ -1089,6 +1173,7 @@ IF:
       ManakaiDOM:ForClass
     @@For:
       ManakaiDOM:ManakaiDOM
+  @ImplementLevel3:
   @Level[list]:  3
   @SpecLevel:3
   @Spec:
@@ -1644,6 +1729,8 @@ IF:
      @@Param:
         @@@Name:  features
         @@@Type:
+          DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMFeatures
         @@@Description:
           @@@@lang:en
@@ -1718,6 +1805,8 @@ IF:
             }
     @@Level:3
     @@SpecLevel:3
+    @@For:
+      ManakaiDOM:DOM3
 
 IF:
   @Name:
@@ -1732,6 +1821,9 @@ IF:
       ManakaiDOM:ForClass
     @@For:
       ManakaiDOM:ManakaiDOM
+  @ImplementLevel1:
+  @ImplementLevel2:
+  @ImplementLevel3:
   @Spec:
     @@DOM3:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-102161490
@@ -1763,6 +1855,8 @@ IF:
       ManakaiDOM:ManakaiDOMNodeReference
     @@For:
       ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:ForClass
   @Role:
     @@@:
       DOMCore:DOMImplementation
@@ -2311,6 +2405,8 @@ IF:
             The version number of the feature to test.
      @@SpecLevel:3
      @@Level[list]:  3
+     @@For:
+       ManakaiDOM:DOM3
      @@Return:
         @@@Type:  
           DOMMain:DOMObject
@@ -2409,6 +2505,8 @@ IF:
   @ISA:
     @@@:
       ManakaiDOM:ManakaiDOMNodeReference
+    @@ForCheck:
+      ManakaiDOM:ForClass
     @@For:
       ManakaiDOM:ManakaiDOM
   @ImplNote:
@@ -4610,7 +4708,9 @@ IF:
          Return whether the given namespace URI is the default namespace.
      @@Param:
         @@@Name:  namespaceURI
-        @@@Type:
+        @@@Type: 
+          DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
@@ -4637,6 +4737,8 @@ IF:
             $r = $self->{<Q:TreeCore:node>}
                       ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{isDefaultNamespace}__
                                            ($namespaceURI);
+     @@For:
+       ManakaiDOM:DOM3
      @@Level[list]:  3
      @@SpecLevel:3
   @Method:
@@ -4681,6 +4783,8 @@ IF:
             $r = $self->{<Q:TreeCore:node>}
                       ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{lookupNamespaceURI}__
                         ($prefix);
+     @@For:
+       ManakaiDOM:DOM3
      @@Level[list]:  3
      @@SpecLevel:3
   @Method:
@@ -4796,6 +4900,8 @@ IF:
         @@@Type:  DOMString
      @@Level[list]:  3
      @@SpecLevel:3
+     @@For:
+       ManakaiDOM:DOM3
   @Method:
      @@Name:  setUserData
      @@Return:
@@ -4813,6 +4919,8 @@ IF:
         @@@Type:  UserDataHandler
      @@Level[list]:  3
      @@SpecLevel:3
+     @@For:
+       ManakaiDOM:DOM3
   @Method:
      @@Name:  getUserData
      @@Return:
@@ -4823,6 +4931,8 @@ IF:
         @@@Type:  DOMString
      @@Level[list]:  3
      @@SpecLevel:3
+     @@For:
+       ManakaiDOM:DOM3
 
   @IntMethod:
     @@Name: newObject
@@ -5220,6 +5330,8 @@ IFDef:
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
+          DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
@@ -5262,6 +5374,8 @@ IFDef:
               the language exposed through the "Document" does not 
               support XML Namespaces.
      @@IsAbstract:1
+     @@For:
+       ManakaiDOM:DOM2
      @@Level[list]:  2
      @@SpecLevel:2
      @@ImplNote:
@@ -5364,6 +5478,8 @@ IFDef:
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
+          DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
@@ -5416,6 +5532,8 @@ IFDef:
          implenentations do not need to implement this method. 
          The DOM Level 2 Errata and the DOM Level 3 Specification 
          says that the NOT_SUPPORTED_ERR should be raised.
+     @@For:
+       ManakaiDOM:DOM2
      @@Level[list]:  2
      @@SpecLevel:2
 ## IF:NamedNodeMap
@@ -6286,6 +6404,8 @@ IF:
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
+          DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
@@ -6337,6 +6457,8 @@ IF:
                 $r = null;
               }
             }
+     @@For:
+       ManakaiDOM:DOM3
      @@Level[list]:  3
      @@SpecLevel:3
      @@Redefine:Node
@@ -6347,7 +6469,10 @@ IF:
        @@@@:
          The namespace URI of this node.
      @@Get:
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
+        @@@actualType:
+          ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
           @@@@@: The namespace URI.
@@ -6365,6 +6490,8 @@ IF:
             lang:dis
           @@@@GetProp:
             infoset:namespaceName
+     @@For:
+       ManakaiDOM:DOM2
      @@Level[list]:  2
      @@SpecLevel:2
      @@Redefined: Node
@@ -7360,6 +7487,8 @@ IF:
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
+          DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
@@ -7410,6 +7539,8 @@ IF:
                          ## Condition insensitive
               $r = $r->__SUPER{ManakaiDOMNodeObjectNode}__::__INT{textContent}__;
             }
+     @@For:
+       ManakaiDOM:DOM2
      @@Level[list]:  2
      @@SpecLevel:2
   @Method:
@@ -7425,6 +7556,8 @@ IF:
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
+           DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
@@ -7631,6 +7764,8 @@ IF:
             $text->{<Q:infoset:parent>} = $r;
             $r->{<Q:infoset:children>} = [$text];
             $r->{<Q:infoset:specified>} = true;
+     @@For:
+       ManakaiDOM:DOM2
      @@Level[list]:  2
      @@SpecLevel:2
   @Method:
@@ -7648,6 +7783,8 @@ IF:
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
+          DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
@@ -7714,6 +7851,8 @@ IF:
              TODO: default attribute
            \
              Almost same as <M:ManakaiDOMAttributes.removeNamedItemNS>.
+     @@For:
+       ManakaiDOM:DOM2
      @@Level[list]:  2
      @@SpecLevel:2
   @Method:
@@ -7726,6 +7865,8 @@ IF:
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
+          DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
@@ -7777,6 +7918,8 @@ IF:
         2
         3
      @@SpecLevel:2
+     @@For:
+       ManakaiDOM:DOM2
   @Method:
      @@Name:  setAttributeNodeNS
      @@Description:
@@ -7940,9 +8083,10 @@ IF:
          order.
      @@Param:
         @@@Name:  namespaceURI
-        @@@Type:  DOMString
-#        @@@actualType:
-#          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Type:  
+          DOMMain:DOMString
+        @@@actualType:
+          ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -8083,6 +8227,8 @@ IF:
        2
        3
      @@SpecLevel:2
+     @@For:
+       ManakaiDOM:DOM2
      @@NoNSVersion:getElementsByTagName
   @Method:
      @@Name:  hasAttribute
@@ -8132,6 +8278,8 @@ IF:
      @@Param:
         @@@Name:  namespaceURI
         @@@Type: 
+          DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
@@ -8183,6 +8331,8 @@ IF:
             $r = $r ? true : false;
      @@Level[list]:  2
      @@SpecLevel:2
+     @@For:
+       ManakaiDOM:DOM2
   @Attr:
      @@Name:  schemaTypeInfo
      @@Description:
@@ -8309,6 +8459,8 @@ IF:
      @@Param:
         @@@Name:  namespaceURI
         @@@Type: 
+          DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
@@ -8396,6 +8548,8 @@ IF:
             $r->{<Q:DOMCore:userDeterminedId>} = $isId;
      @@Level[list]:  3
      @@SpecLevel:3
+     @@For:
+       ManakaiDOM:DOM3
   @Method:
      @@Name:  setIdAttributeNode
      @@Description:
@@ -8627,6 +8781,8 @@ IF:
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
+          DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
@@ -8675,6 +8831,8 @@ IF:
             }
      @@Level[list]:  3
      @@SpecLevel:3
+     @@For:
+       ManakaiDOM:DOM3
      @@Redefine:Node
   @Attr:
      @@Name:  namespaceURI
@@ -8684,6 +8842,8 @@ IF:
          The namespace URI of this node.
      @@Get:
         @@@Type:
+          DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
@@ -8703,6 +8863,8 @@ IF:
             infoset:namespaceName
      @@Level[list]:  2
      @@SpecLevel:2
+     @@For:
+       ManakaiDOM:DOM2
      @@Redefined: Node
   @ReAttr:
     @@Name: nodeName
@@ -9592,6 +9754,10 @@ IFDef:
       data associated to the DOM nodes.
   @Level[list]:  3
   @SpecLevel:3
+  @For:
+    =ManakaiDOM:ManakaiDOM
+  @For:
+    ManakaiDOM:DOM3
   @ConstGroup:
      @@QName:  OperationType
      @@Type: unsigned-short
@@ -9723,6 +9889,10 @@ IFDef:
     @@@: Describes an error.
   @Level[list]:  3
   @SpecLevel:3
+  @For:
+    ManakaiDOM:DOM3
+  @For:
+    =ManakaiDOM:ManakaiDOM
   @ConstGroup:
      @@QName:  ErrorSeverity
      @@Type: unsigned-short
@@ -9833,6 +10003,10 @@ IFDef:
       are implementation dependent.
   @Level[list]:  3
   @SpecLevel:3
+  @For:
+    ManakaiDOM:DOM3
+  @For:
+    =ManakaiDOM:ManakaiDOM
   @Method:
      @@Name:  handleError
      @@Description:
@@ -10012,6 +10186,10 @@ IFDef:
       validation, <IF:DOMParser>, <IF:DOMSerializer>, etc.
   @Level[list]:  3
   @SpecLevel:3
+  @For:
+    =ManakaiDOM:ManakaiDOM
+  @For:
+    ManakaiDOM:DOM3
   @Method:
      @@Name:  setParameter
      @@Description:
@@ -10235,6 +10413,8 @@ IF:
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
+          DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
@@ -10273,6 +10453,8 @@ IF:
           @@@@@: $r = null;
      @@Level[list]:  3
      @@SpecLevel:3
+     @@For:
+       ManakaiDOM:DOM3
      @@Redefine:Node
   @ReAttr:
     @@Name: nodeName
@@ -11129,6 +11311,8 @@ IF:
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
+          DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
@@ -11283,6 +11467,8 @@ IF:
     @@Level[list]:
       2
       3
+    @@For:
+      ManakaiDOM:DOM2
   @Method:
      @@Name:  createAttributeNS
      @@Description:
@@ -11293,6 +11479,8 @@ IF:
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
+          DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
@@ -11442,6 +11630,8 @@ IF:
     @@Level[list]:
       2
       3
+    @@For:
+      ManakaiDOM:DOM2
   @Method:
      @@Name:  getElementsByTagNameNS
      @@Description:
@@ -11456,9 +11646,10 @@ IF:
           }
      @@Param:
         @@@Name:  namespaceURI
-        @@@Type:DOMString
-#        @@@actualType:
-#          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Type:
+          DOMMain:DOMString
+        @@@actualType:
+          ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -11599,6 +11790,8 @@ IF:
        2
        3
      @@SpecLevel:2
+     @@For:
+       ManakaiDOM:DOM2
      @@NoNSVersion:getElementsByTagName
   @Method:
      @@Name:  getElementById
@@ -11951,6 +12144,8 @@ IF:
             lang:dis
           @@@@GetProp:
             DOMCore:domConfig
+     @@For:
+       ManakaiDOM:DOM3
      @@Level[list]:  3
      @@SpecLevel:3
   @Method:

@@ -175,19 +175,75 @@ sub dis_typeforqnames_to_uri ($;%) {
     short => ExpandedURI q<DOMMain:short>,
     'unsigned-short' => ExpandedURI q<DOMMain:unsigned-short>,
   };
+  if ($typeq eq '' and $opt{use_default_type}) {
+    $type = $opt{use_default_type};
+  }
   if (defined $forq) {
-    $type = $pt->{$typeq} || dis_qname_to_uri ($typeq, %opt);
+    $type ||= $pt->{$typeq} || dis_qname_to_uri ($typeq, %opt);
     if (length $forq) {
       $for = dis_qname_to_uri ($forq, %opt);
     } else {
       $for = ExpandedURI q<ManakaiDOM:all>;
     }
   } else {
-    $type = $pt->{$typeq} || dis_qname_to_uri ($typeq, %opt);
+    $type ||= $pt->{$typeq} || dis_qname_to_uri ($typeq, %opt);
     $for = $opt{For} || ExpandedURI q<ManakaiDOM:all>;
   }
   return dis_typeforuris_to_uri ($type, $for, %opt);
 }
+
+=item $uri = dis_typeforqnames_to_type_uri ($qnameqname, %opt)
+
+Expand a TypeForQNameQName into a URI reference.  If the type with
+specified (or implied) "Type" is not defined, depth-first nearest 
+super-"For" in which the type is defined is searched.
+
+=cut
+
+sub dis_typeforqnames_to_type_uri ($;%) {
+  my ($qq, %opt) = @_;
+  my ($typeq, $forq) = split /::/, $qq, 2;
+  my ($type, $for);
+  my $pt = {
+    boolean => ExpandedURI q<DOMMain:boolean>,
+    long => ExpandedURI q<DOMMain:long>,
+    'unsigned-long' => ExpandedURI q<DOMMain:unsigned-long>,
+    any => ExpandedURI q<DOMMain:any>,
+    DOMString => ExpandedURI q<DOMMain:DOMString>,
+    Object => ExpandedURI q<DOMMain:Object>,
+    short => ExpandedURI q<DOMMain:short>,
+    'unsigned-short' => ExpandedURI q<DOMMain:unsigned-short>,
+  };
+  if ($typeq eq '' and $opt{use_default_type}) {
+    $type = $opt{use_default_type};
+  }
+  if (defined $forq) {
+    $type ||= $pt->{$typeq} || dis_qname_to_uri ($typeq, %opt);
+    if (length $forq) {
+      $for = dis_qname_to_uri ($forq, %opt);
+    } else {
+      $for = ExpandedURI q<ManakaiDOM:all>;
+    }
+  } else {
+    $type ||= $pt->{$typeq} || dis_qname_to_uri ($typeq, %opt);
+    $for = $opt{For} || ExpandedURI q<ManakaiDOM:all>;
+  }
+  
+  my @for = $for;
+  my $i = 0;
+  while (my $for = shift @for) {
+    if (++$i == 1024) {
+      valid_err (q<Too many super-resources>, node => $opt{node});
+    }
+    my $uri = dis_typeforuris_to_uri ($type, $for, %opt);
+    if (defined $State->{Type}->{$uri}->{Name}) {
+      return $State->{Type}->{$uri}->{URI} || $uri;
+    }
+    unshift @for, @{$State->{For}->{$for}->{ISA}},
+                  @{$State->{For}->{$for}->{Implement}};
+  }
+  valid_err (qq<Type <$type> for <$for> must be defined>, node => $opt{node});
+} # dis_typeforqnames_to_type_uri
 
 =item dis_type_canon_uri ($type_uri, %opt)
 
@@ -222,12 +278,20 @@ sub dis_node_for_match ($$%) {
   my ($node, $for_uri, %opt) = @_;
   $for_uri ||= ExpandedURI q<ManakaiDOM:all>;
   my $has_for = 0;
-  FCs: for (@{$node->child_nodes}) {
-    next FCs unless $_->node_type eq '#element';
+  for (@{$node->child_nodes}) {
+    next unless $_->node_type eq '#element';
     if (dis_element_type_match ($_->local_name, 'ForCheck', %opt)) {
       my $for = [split /\s+/, $_->value];
-      for my $f (@$for) {
-        if ($f =~ /^!(.+)$/) {
+      FCs: for my $f (@$for) {
+        if ($f =~ /^!=(.+)$/) {
+          my $uri = dis_qname_to_uri ($1, use_default_namespace => 1, %opt);
+          $State->{def_required}->{For}->{$uri} ||= 1;
+          for my $for_uri ($for_uri, @{$opt{'For+'}||[]}) {
+            if ($uri eq $for_uri) {
+              return undef;
+            }
+          }
+        } elsif ($f =~ /^!(.+)$/) {
           my $uri = dis_qname_to_uri ($1, use_default_namespace => 1, %opt);
           $State->{def_required}->{For}->{$uri} ||= 1;
           for my $for_uri ($for_uri, @{$opt{'For+'}||[]}) {
@@ -235,6 +299,16 @@ sub dis_node_for_match ($$%) {
               return undef;
             }
           }
+        } elsif ($f =~ /^=(.+)$/) {
+          my $uri = dis_qname_to_uri ($1, use_default_namespace => 1, %opt,
+                                      node => $_);
+          $State->{def_required}->{For}->{$uri} ||= 1;
+          for my $for_uri ($for_uri, @{$opt{'For+'}||[]}) {
+            if ($uri eq $for_uri) {
+              next FCs;
+            }
+          }
+          return undef;
         } else {
           my $uri = dis_qname_to_uri ($f, use_default_namespace => 1, %opt,
                                       node => $_);
@@ -256,10 +330,27 @@ sub dis_node_for_match ($$%) {
       my $ok = 1;
       $has_for = 1;
       for my $f (@$for) {
-        if ($f =~ /^!(.+)$/) {
-          my $uri = dis_qname_to_uri ($1, use_default_namespace => 1, %opt);
+        if ($f =~ /^!=(.+)$/) {
+          my $uri = dis_qname_to_uri ($1, use_default_namespace => 1, %opt,
+                                      node => $_);
+          $State->{def_required}->{For}->{$uri} ||= 1;
+          if ($uri eq $for_uri) {
+            $ok = 0;
+            last;
+          }
+        } elsif ($f =~ /^!(.+)$/) {
+          my $uri = dis_qname_to_uri ($1, use_default_namespace => 1, %opt,
+                                      node => $_);
           $State->{def_required}->{For}->{$uri} ||= 1;
           if (dis_uri_for_match ($uri, $for_uri, %opt, node => $_)) {
+            $ok = 0;
+            last;
+          }
+        } elsif ($f =~ /^=(.+)$/) {
+          my $uri = dis_qname_to_uri ($1, use_default_namespace => 1, %opt,
+                                      node => $_);
+          $State->{def_required}->{For}->{$uri} ||= 1;
+          unless ($uri eq $for_uri) {
             $ok = 0;
             last;
           }
@@ -528,6 +619,59 @@ sub dis_get_elements_nodes (%) {
   \@r;
 }
 
+=item {For => for_uri, module => module_uri} = dis_get_module_uri (%opt)
+
+Get module URI reference from either module URI reference (C<$opt{module_uri}>;
+either "For"ed or non-"For"ed) or module name (C<$opt{module_name}>) and 
+"For" URI reference (C<$opt{For}>).  If C<$opt{For}> is not specified, 
+the default "For" (C<Module/DefaultFor>) define in the module is 
+returned.
+
+=cut
+
+sub dis_get_module_uri (%) {
+  my %opt = @_;
+  my $r = {For => $opt{For}};
+  if ($opt{module_name}) {
+    MOD: {
+      for (values %{$State->{Module}}) {
+        next unless defined $_->{Name};
+        if ($_->{Name} eq $opt{module_name}) {
+          $opt{module_uri} = $_->{NameURI};
+          $r->{For} ||= $_->{ExpandedURI q<d:DefaultFor>};
+          last MOD;
+        }
+      }
+      valid_err (qq<Module "$opt{module_name}" not defined>);
+    }
+  }
+  unless ($r->{For}) {
+    MOD: {
+      for (values %{$State->{Module}}) {
+        next unless defined $_->{Name};
+        if ($_->{NameURI} eq $opt{module_uri} or
+            $_->{URI} eq $opt{module_uri}) {
+          $r->{For} = $_->{ExpandedURI q<d:DefaultFor>};
+          last MOD;
+        }
+      }
+      valid_err (qq<Module <$opt{module_uri}> not defined>);
+    }
+  }
+  if (defined $State->{Module}->{$opt{module_uri}}->{Name} and
+      $State->{Module}->{$opt{module_uri}}->{For}->{$opt{For}}) {
+    $r->{module} = $State->{Module}->{$opt{module_uri}}->{URI};
+  } else {
+    my $tfuri = dis_typeforuris_to_uri ($opt{module_uri}, $r->{For}, %opt);
+    if (defined $State->{Module}->{$tfuri}->{Name}) {
+      $r->{module} = $State->{Module}->{$tfuri}->{URI};
+    } else {
+      valid_err (qq{Module <$opt{module_uri}> for <$r->{For}> not defined});
+    }
+  }
+  return $r;
+} # dis_get_module_uri
+
 =item $path = dis_get_module_file_path (%opt)
 
 Get module file path.
@@ -665,6 +809,8 @@ sub dis_load_module_file (%) {
   ## Load Module Definition
   if (dis_load_module_element ($mod, %opt,
                                module_file_name => $file_name)) {
+    impl_msg (qq<Loading definition of "$file_name" for <$opt{For}>...>,
+              node => $mod);
     ## Load Class Definitions
     for (@{$source->child_nodes}) {
       next unless $_->node_type eq '#element';
@@ -736,7 +882,8 @@ sub dis_load_module_element ($;%) {
       for (@{$_->child_nodes}) {
         next unless $_->node_type eq '#element';
         next unless dis_node_for_match ($_, $opt{For}, %opt);
-        if (dis_element_type_match ($_->local_name, 'Module',
+        my $ln = $_->local_name;
+        if (dis_element_type_match ($ln, 'Module',
                                     %opt, node => $_)) {
           local $opt{For} = $opt{For};
           my $wf = dis_get_attr_node (%opt, parent => $_,
@@ -744,7 +891,7 @@ sub dis_load_module_element ($;%) {
           if ($wf) {
             $opt{For} = dis_qname_to_uri ($wf->value, use_default_namespace => 1,
                                           %opt, node => $wf);
-            $mod->{def_required}->{For}->{$opt{For}} ||= 1;
+            $State->{def_required}->{For}->{$opt{For}} ||= 1;
           }
           local $State->{Namespace} = {};
           local $State->{ETBinding} = {};
@@ -756,8 +903,17 @@ sub dis_load_module_element ($;%) {
             if defined $State->{module};
         }
       }
+    } elsif (dis_element_type_match ($ln, 'DefaultFor', %opt, node => $_)) {
+      if (defined $mod->{ExpandedURI q<d:DefaultFor>}) {
+        valid_err (q<"DefaultFor" attribute is alerady specified>,
+                   node => $_);
+      }
+      $mod->{ExpandedURI q<d:DefaultFor>}
+          = dis_qname_to_uri ($_->value, use_default_namespace => 1, 
+                              %opt, node => $_);
     }
   }
+  $mod->{ExpandedURI q<d:DefaultFor>} ||= ExpandedURI q<ManakaiDOM:all>;
   return 1;
 }
 
@@ -893,6 +1049,8 @@ sub dis_apply_etbindings ($;%) {
       for (@{$etb->{ShadowContent}->child_nodes}) {
         $src->append_node ($_->clone);
       }
+      $src->inner_text (new_value => $etb->{ShadowContent}->inner_text);
+         ## Note: Value is not changed if ShadowContent.value is undef.
     }
   }
 }
@@ -1042,23 +1200,29 @@ sub dis_load_classdef_element ($;%) {
     next unless dis_node_for_match ($_, $opt{For}, %opt);
     my $ln = dis_element_type_to_uri ($_->local_name, %opt, node => $_);
     if ($ln eq ExpandedURI q<rdf:type>) {
-      my $uri = dis_typeforqnames_to_uri ($_->value, use_default_namespace => 1,
-                                          %opt, node => $_);
+      my $uri = dis_qname_to_uri ($_->value, use_default_namespace => 1,
+                                  %opt, node => $_);
       $cls->{Type}->{$uri} = 1;
-      $State->{def_required}->{Class}->{$uri} ||= 1;
+      $State->{def_required}->{Class}->{$uri} ||= $_;
       $is_multiresource = 1 if dis_uri_ctype_match
                                    (ExpandedURI q<d:MultipleResource>,
                                     $uri, %opt);
     } elsif ($ln eq ExpandedURI q<d:ISA>) {
       my $uri = dis_typeforqnames_to_uri ($_->value, use_default_namespace => 1,
-                                          %opt, node => $_);
-      push @{$cls->{ISA}||=[]}, $uri;
-      $State->{def_required}->{Class}->{$uri} ||= 1;
+                                          %opt, node => $_,
+                                          use_default_type => $cls->{NameURI});
+      if (not defined $cls->{URI} or $uri ne $cls->{URI}) {
+        push @{$cls->{ISA}||=[]}, $uri;
+        $State->{def_required}->{Class}->{$uri} ||= $_;
+      }
     } elsif ($ln eq ExpandedURI q<d:Implement>) {
       my $uri = dis_typeforqnames_to_uri ($_->value, use_default_namespace => 1,
-                                          %opt, node => $_);
-      push @{$cls->{Implement}||=[]}, $uri;
-      $State->{def_required}->{Class}->{$uri} ||= 1;
+                                          %opt, node => $_,
+                                          use_default_type => $cls->{NameURI});
+      if (not defined $cls->{URI} or $uri ne $cls->{URI}) {
+        push @{$cls->{Implement}||=[]}, $uri;
+        $State->{def_required}->{Class}->{$uri} ||= $_;
+      }
     } elsif ($ln eq ExpandedURI q<d:ResourceDef> and not $is_multiresource) {
       valid_err ("Alias class name cannot be able to have this type of elements",
                  node => $_) if $al;
@@ -1070,6 +1234,7 @@ sub dis_load_classdef_element ($;%) {
   unless (keys %{$cls->{Type}}) {
     valid_err (q<Class type must be specified>, node => $node);
   }
+
 
   if ($is_multiresource) {
     $cls->{Resource} = {}; ## MultipleResource does not have child resource
@@ -1098,8 +1263,11 @@ sub dis_check_undef_type_and_for (%) {
   my %opt = @_;
   for my $type (keys %{$State->{def_required}}) {
     for (keys %{$State->{def_required}->{$type}}) {
-      if ($State->{def_required}->{$type}->{$_} > 0) {
-        valid_err (qq<Definition for $type <$_> is required>);
+      if (ref $State->{def_required}->{$type}->{$_} or
+          $State->{def_required}->{$type}->{$_} > 0) {
+        valid_err (qq<Definition for $type <$_> is required>,
+                   node => ref $State->{def_required}->{$type}->{$_}
+                           ? $State->{def_required}->{$type}->{$_} : undef);
       }
     }
   }
@@ -1188,8 +1356,8 @@ sub dis_perl_init_classdef ($;%) {
   my ($res, %opt) = @_;
   local $opt{For} = [keys %{$res->{For}}]->[0];
   local $State->{module} = $res->{parentModule};
-  local $State->{Namespace}
-    = $State->{Module}->{$res->{parentModule}}->{nsBinding};
+  my $mod = $State->{Module}->{$res->{parentModule}};
+  local $State->{Namespace} = $mod->{nsBinding};
 
   ## Check resource type
   my $type = $res->{ExpandedURI q<dis2pm:type>} || '';
@@ -1200,11 +1368,13 @@ sub dis_perl_init_classdef ($;%) {
          ExpandedURI q<ManakaiDOM:DOMMethodReturn>,
          ExpandedURI q<ManakaiDOM:DOMAttrGet>,
          ExpandedURI q<ManakaiDOM:DOMAttrSet>,
-         ExpandedURI q<ManakaiDOM:Class>,
-         ExpandedURI q<ManakaiDOM:IF>,
-         ExpandedURI q<ManakaiDOM:ExceptionClass>,
-         ExpandedURI q<ManakaiDOM:ExceptionIF>,
-         ExpandedURI q<ManakaiDOM:WarningClass>,
+         (defined $mod->{ExpandedURI q<dis2pm:packageName>} ?
+           (ExpandedURI q<ManakaiDOM:Class>,
+            ExpandedURI q<ManakaiDOM:ExceptionClass>,
+            ExpandedURI q<ManakaiDOM:WarningClass>) : ()),
+         (defined $mod->{ExpandedURI q<dis2pm:ifPackagePrefix>} ?
+           (ExpandedURI q<ManakaiDOM:IF>,
+            ExpandedURI q<ManakaiDOM:ExceptionIF>) : ()),
          ExpandedURI q<ManakaiDOM:InCase>) {
       if (dis_uri_ctype_match ($_, $t, %opt)) {
         $type = $_;
@@ -1240,7 +1410,12 @@ sub dis_perl_init_classdef ($;%) {
     if ($res->{multiple_resource_parent}) {
       IF: for my $if (@{$res->{multiple_resource_parent}->{hasResource}}) {
         for (keys %{$if->{Type}}) {
-          if (dis_uri_ctype_match (ExpandedURI q<ManakaiDOM:IF>, $_, %opt)) {
+          if (dis_uri_ctype_match ({
+                ExpandedURI q<ManakaiDOM:Class> => ExpandedURI q<ManakaiDOM:IF>,
+                ExpandedURI q<ManakaiDOM:ExceptionClass>
+                                     => ExpandedURI q<ManakaiDOM:ExceptionIF>,
+                ExpandedURI q<ManakaiDOM:WarningClass> => 'dummy',
+                                   }->{$type}, $_, %opt)) {
             push @{$res->{Implement}||=[]}, $if->{URI};
             last IF;
           }
@@ -1317,11 +1492,8 @@ sub dis_perl_init_classdef ($;%) {
                                     ->{src}) : undef);
     if ($t) {
       $res->{ExpandedURI q<d:Type>}
-        = dis_typeforqnames_to_uri ($t->value, use_default_namespace => 1,
-                                    %opt, node => $t);
-      valid_err (qq{Type <$res->{ExpandedURI q<d:Type>}> must be defined},
-                 node => $t)
-        unless defined $State->{Type}->{$res->{ExpandedURI q<d:Type>}}->{Name};
+        = dis_typeforqnames_to_type_uri ($t->value, use_default_namespace => 1,
+                                         %opt, node => $t);
       my $i = dis_get_attr_node (%opt, name => 'actualType',
                                  parent => $res->{src}) ||
             ({
@@ -1335,13 +1507,8 @@ sub dis_perl_init_classdef ($;%) {
                                     ->{src}) : undef);
       if ($i) {
         $res->{ExpandedURI q<d:actualType>}
-          = dis_typeforqnames_to_uri ($t->value, use_default_namespace => 1,
-                                      %opt, node => $t);
-        valid_err (qq{Type <$res->{ExpandedURI q<d:actualType>
-                   }> must be defined},
-                   node => $t)
-          unless defined $State->{Type}->{$res->{ExpandedURI q<d:actualType>}}
-                               ->{Name};
+          = dis_typeforqnames_to_type_uri ($t->value, use_default_namespace => 1,
+                                           %opt, node => $t);
       } else {
         $res->{ExpandedURI q<d:actualType>} = $res->{ExpandedURI q<d:Type>};
       }
@@ -1375,21 +1542,14 @@ sub dis_perl_init_classdef ($;%) {
     valid_err (q<Parameter type required>, node => $res->{src})
       unless $t;
     $res->{ExpandedURI q<d:Type>}
-      = dis_typeforqnames_to_uri ($t->value, use_default_namespace => 1,
-                                  %opt, node => $t);
-    valid_err (qq{Type <$res->{ExpandedURI q<d:Type>}> must be defined},
-               node => $t)
-      unless defined $State->{Type}->{$res->{ExpandedURI q<d:Type>}}->{Name};
+      = dis_typeforqnames_to_type_uri ($t->value, use_default_namespace => 1,
+                                       %opt, node => $t);
     my $i = dis_get_attr_node (%opt, name => 'actualType',
                                parent => $res->{src});
     if ($i) {
       $res->{ExpandedURI q<d:actualType>}
-        = dis_typeforqnames_to_uri ($t->value, use_default_namespace => 1,
-                                    %opt, node => $t);
-      valid_err (qq{Type <$res->{ExpandedURI q<d:actualType>}> must be defined},
-                 node => $t)
-        unless defined $State->{Type}->{$res->{ExpandedURI q<d:actualType>}}
-                             ->{Name};
+        = dis_typeforqnames_to_type_uri ($t->value, use_default_namespace => 1,
+                                         %opt, node => $t);
     } else {
       $res->{ExpandedURI q<d:actualType>} = $res->{ExpandedURI q<d:Type>};
     }
@@ -1412,22 +1572,15 @@ sub dis_perl_init_classdef ($;%) {
     my $t = dis_get_attr_node (%opt, name => 'Type', parent => $res->{src});
     if ($t) {
       $res->{ExpandedURI q<d:Type>}
-        = dis_typeforqnames_to_uri ($t->value, use_default_namespace => 1,
-                                    %opt, node => $t);
-      valid_err (qq{Type <$res->{ExpandedURI q<d:Type>}> must be defined},
-                 node => $t)
-        unless defined $State->{Type}->{$res->{ExpandedURI q<d:Type>}}->{Name};
+        = dis_typeforqnames_to_type_uri ($t->value, use_default_namespace => 1,
+                                         %opt, node => $t);
     }
     my $i = dis_get_attr_node (%opt, name => 'actualType',
                                parent => $res->{src});
     if ($i) {
       $res->{ExpandedURI q<d:actualType>}
-        = dis_typeforqnames_to_uri ($t->value, use_default_namespace => 1,
-                                    %opt, node => $t);
-      valid_err (qq{Type <$res->{ExpandedURI q<d:actualType>}> must be defined},
-                 node => $t)
-        unless defined $State->{Type}->{$res->{ExpandedURI q<d:actualType>}}
-                             ->{Name};
+        = dis_typeforqnames_to_type_uri ($t->value, use_default_namespace => 1,
+                                         %opt, node => $t);
     } elsif ($t) {
       $res->{ExpandedURI q<d:actualType>} = $res->{ExpandedURI q<d:Type>};
     }
@@ -1461,11 +1614,8 @@ sub dis_perl_init_classdef ($;%) {
                 parent => $State->{ExpandedURI q<dis2pm:parentResource>}->{src});
     valid_err (q<InCase value type required>, node => $res->{src}) unless $t;
     $res->{ExpandedURI q<d:Type>}
-      = dis_typeforqnames_to_uri ($t->value, use_default_namespace => 1,
-                                  %opt, node => $t);
-    valid_err (qq{Type <$res->{ExpandedURI q<d:Type>}> must be defined},
-               node => $t)
-      unless defined $State->{Type}->{$res->{ExpandedURI q<d:Type>}}->{Name};
+      = dis_typeforqnames_to_type_uri ($t->value, use_default_namespace => 1,
+                                       %opt, node => $t);
     my $i = dis_get_attr_node (%opt, name => 'actualType',
                                parent => $res->{src}) ||
             dis_get_attr_node
@@ -1473,12 +1623,8 @@ sub dis_perl_init_classdef ($;%) {
                 parent => $State->{ExpandedURI q<dis2pm:parentResource>}->{src});
     if ($i) {
       $res->{ExpandedURI q<d:actualType>}
-        = dis_typeforqnames_to_uri ($t->value, use_default_namespace => 1,
-                                    %opt, node => $t);
-      valid_err (qq{Type <$res->{ExpandedURI q<d:actualType>}> must be defined},
-                 node => $t)
-        unless defined $State->{Type}->{$res->{ExpandedURI q<d:actualType>}}
-                             ->{Name};
+        = dis_typeforqnames_to_type_uri ($t->value, use_default_namespace => 1,
+                                         %opt, node => $t);
     } else {
       $res->{ExpandedURI q<d:actualType>} = $res->{ExpandedURI q<d:Type>};
     }
@@ -1499,11 +1645,8 @@ sub dis_perl_init_classdef ($;%) {
                 parent => $State->{ExpandedURI q<dis2pm:parentResource>}->{src});
     valid_err (q<InCase value type required>, node => $res->{src}) unless $t;
     $res->{ExpandedURI q<d:Type>}
-      = dis_typeforqnames_to_uri ($t->value, use_default_namespace => 1,
-                                  %opt, node => $t);
-    valid_err (qq{Type <$res->{ExpandedURI q<d:Type>}> must be defined},
-               node => $t)
-      unless defined $State->{Type}->{$res->{ExpandedURI q<d:Type>}}->{Name};
+      = dis_typeforqnames_to_type_uri ($t->value, use_default_namespace => 1,
+                                       %opt, node => $t);
     my $i = dis_get_attr_node (%opt, name => 'actualType',
                                parent => $res->{src}) ||
             dis_get_attr_node
@@ -1511,12 +1654,8 @@ sub dis_perl_init_classdef ($;%) {
                 parent => $State->{ExpandedURI q<dis2pm:parentResource>}->{src});
     if ($i) {
       $res->{ExpandedURI q<d:actualType>}
-        = dis_typeforqnames_to_uri ($t->value, use_default_namespace => 1,
-                                    %opt, node => $t);
-      valid_err (qq{Type <$res->{ExpandedURI q<d:actualType>}> must be defined},
-                 node => $t)
-        unless defined $State->{Type}->{$res->{ExpandedURI q<d:actualType>}}
-                             ->{Name};
+        = dis_typeforqnames_to_type_uri ($t->value, use_default_namespace => 1,
+                                         %opt, node => $t);
     } else {
       $res->{ExpandedURI q<d:actualType>} = $res->{ExpandedURI q<d:Type>};
     }
@@ -1891,4 +2030,4 @@ sub disdoc_inline2pod ($;%) {
 
 =cut
 
-1; # $Date: 2004/11/22 12:54:48 $
+1; # $Date: 2004/11/23 13:20:33 $

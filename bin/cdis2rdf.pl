@@ -16,11 +16,10 @@ use Message::Util::QName::Filter {
 
 use Getopt::Long;
 use Pod::Usage;
+use Storable;
 my %Opt;
 GetOptions (
-  'for=s' => \$Opt{For},
   'help' => \$Opt{help},
-  'undef-check!' => \$Opt{no_undef_check},
   'output-anon-resource!' => \$Opt{output_anon_resource},
   'output-as-n3' => \$Opt{output_as_n3},
   'output-as-xml' => \$Opt{output_as_xml},
@@ -34,15 +33,11 @@ GetOptions (
   'output-resource-uri-pattern=s' => \$Opt{output_resource_uri_pattern},
   'output-root-anon-resource!' => $Opt{output_root_anon_resource},
 ) or pod2usage (2);
-if ($Opt{help}) {
-  pod2usage (0);
-  exit;
-}
-if ($Opt{output_as_n3} and $Opt{output_as_xml}) {
-  pod2usage (2);
-  exit;
-}
+pod2usage ({-exitval => 0, -verbose => 1}) if $Opt{help};
+pod2usage ({-exitval => 2, -verbose => 1})
+  if $Opt{output_as_n3} and $Opt{output_as_xml};
 $Opt{file_name} = shift;
+pod2usage ({-exitval => 2, -verbose => 0}) unless $Opt{file_name};
 $Opt{output_resource_pattern} ||= qr/./;
 $Opt{output_resource_uri_pattern} ||= qr/./;
 $Opt{output_root_anon_resource} = $Opt{output_anon_resource}
@@ -50,8 +45,6 @@ $Opt{output_root_anon_resource} = $Opt{output_anon_resource}
 $Opt{output_as_xml} = 1 unless $Opt{output_as_n3};
 $Opt{output_anon_resource} = 1 unless defined $Opt{output_anon_resource};
 $Opt{output_local_resource} = 1 unless defined $Opt{output_local_resource};
-$Opt{no_undef_check} = defined $Opt{no_undef_check}
-                         ? $Opt{no_undef_check} ? 0 : 1 : 0;
 $Opt{output_perl_member_pattern} ||= qr/./;
 
 BEGIN {
@@ -63,28 +56,9 @@ sub n3_literal ($) {
   impl_err ("Literal value not defined") unless defined $s;
   qq<"$s">;
 }
-our $State;
+our $State = retrieve ($Opt{file_name})
+     or die "$0: $Opt{file_name}: Cannot load";
 our $result = new manakai::n3;
-
-$State->{DefaultFor} = $Opt{For};
-
-my $source = dis_load_module_file (module_file_name => $Opt{file_name},
-                                   For => $Opt{For},
-                                   use_default_for => 1);
-$State->{for_def_required}->{$State->{DefaultFor}} ||= 1;
-
-dis_check_undef_type_and_for () unless $Opt{no_undef_check};
-
-if (dis_uri_for_match (ExpandedURI q<ManakaiDOM:Perl>, $State->{DefaultFor})) {
-  dis_perl_init ($source, For => $State->{DefaultFor});
-}
-
-my $primary = $result->get_new_anon_id (Name => 'boot');
-$result->add_triple ($primary =>ExpandedURI q<d:module>=> $State->{module})
-                if $Opt{output_module};
-$result->add_triple
-           ($primary =>ExpandedURI q<d:DefaultFor> => $State->{DefaultFor})
-                if $Opt{output_for};
 
 if ($Opt{output_module}) {
 for (keys %{$State->{Module}}) {
@@ -342,43 +316,92 @@ sub stringify_as_xml ($) {
   $xml;
 }
 
-1;
-
 __END__
 
 =head1 NAME
 
-dis2rdf.pl - dis to RDF converter
+cdis2rdf - cdis to RDF converter
 
 =head1 SYNOPSIS
 
-  $ perl dis2rdf.pl input.dis [options...] > output.rdf
+  perl cdis2rdf.pl input.cdis [options...] > output.rdf
+  perl cdis2rdf.pl --help
 
 =head1 DESCRIPTION
 
-This script generates a RDF graph from a "dis" file.
+The C<cdis2rdf> utility generates a RDF graph from a compiled 
+"dis" file.  The graph describes relationship of module, "For" or 
+resource defined in the dis files.  The RDF data outputed are able 
+to be used with other utilities that support RDF.
+
+=head2 OPTIONS
 
 =over 4
 
-=item I<input.dis>
+=item I<input.cdis>
 
-The "dis" file from which a RDF graph is generated.
+A compiled "dis" file from which a RDF graph is generated.
 
 =item I<output.rdf>
 
-An RDF/XML entity is outputed.
+A file to which the RDF data generated is saved.
 
-=item C<--output-module>
+=item C<--output-anon-resource> (default) / C<--nooutput-anon-resource>
 
-Show the relationship of modules.
+Set whether anonymous resources are outputed.
 
-=item C<--output-type>
+=item C<--output-as-n3>
 
-Show the relationship of types.
+Set to output the graph in RDF/Notation3 format.
 
-=item C<--output-for>
+=item C<--output-as-xml> (default)
 
-Show the relationship of "for"s.
+Set to output the graph in RDF/XML format.  Note that the 
+L<RDF::Notation3::XML> Perl module is used to generate the XML entity.
+
+=item C<--help>
+
+Show the help message.
+
+=item C<--output-for> / C<--nooutput-for> (default)
+
+Set whether relationships of "For" URI references are outputed.
+
+=item C<--output-local-resource> (default) / C<--nooutput-local-resource>
+
+Set whether local resources (resources that do have the locally-scoped 
+name but do not have the global name) are outputed.
+
+=item C<--output-only-in-module=I<pattern>> (default: C<.>)
+
+A regex filter that is applied to URI references of module names. 
+This filter is applied to defining-modules of resources (not modules themselves).
+
+=item C<--output-module> / C<--nooutput-module> (default)
+
+Set whehter relationships of modules are outputed.
+
+=item C<--output-perl> / C<--nooutput-perl> (default)
+
+Set whether "For"-Perl specific properties are outputed.
+
+=item C<--output-perl-member-pattern=I<pattern>> (default: C<.>)
+
+A regex filter that is applied to URI references of Perl 
+package members such as methods and constant values.
+
+=item C<--output-resource> / C<--nooutput-resource> (default)
+
+Set whether relationships of resources are outputed.
+
+=item C<--output-resource-uri-pattern=I<pattern>> (default: C<.>)
+
+A regex filter that is applied to URI references of 
+resources.
+
+=item C<--output-root-anon-resource> / C<--nooutput-root-anon-resource> (default: same as C<--output-anon-resource> / C<--nooutput-anon-resource>)
+
+Set whether anonymous resources that are direct children of modules.
 
 =cut
 

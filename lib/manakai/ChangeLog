@@ -1,3 +1,11 @@
+2004-11-23  Wakaba  <wakaba@suika.fam.cx>
+
+	* dis.pl (dis_load_module_element): Save "DefaultFor" attribute 
+	as a property of "Module".
+	(dis_get_module_uri): New function.
+	(dis_node_for_match): New "=QName" match supported.
+	(dis_typeforqnames_to_uri): New 'use_default_type' option added.
+
 2004-11-22  Wakaba  <wakaba@suika.fam.cx>
 
 	* genlib.pl (perl_inherit): Don't output statement if no package
