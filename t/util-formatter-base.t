@@ -81,15 +81,15 @@ try {
 };
 
 try {
-  $f->replace (q(Something%invalid! Syntax error!));
+  $f->replace (q(Something, Something%invalid! Syntax error! Syntax error!));
 } catch Message::Util::Formatter::Base::error with {
   my $err = shift;
-  OK $err->text, q(Semicolon (";") expected at "ng%invalid"**here**"! Syntax e");
+  OK $err->text, q(Semicolon (";") expected at "g, Something%invalid"**here**"! Syntax error! Synt");
 };
 
 try {
   $f->replace (q(%invalid(a=>b!);));
 } catch Message::Util::Formatter::error with {
   my $err = shift;
-  OK $err->text, q[Separator ("," or ")") expected at "valid(a=>b"**here**"!);"];
+  OK $err->text, q[Separator ("," or ")") expected at "%invalid(a=>b"**here**"!);"];
 };
