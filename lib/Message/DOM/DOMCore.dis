@@ -7,8 +7,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
   @DOMViews:
     http://suika.fam.cx/~wakaba/archive/2004/dom/views#
-  @DOMXML:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @infoset:
      http://www.w3.org/2001/04/infoset#
   @lang:
@@ -76,7 +74,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/11/20 11:12:50 $
+     $Date: 2004/11/21 05:17:32 $
 
   @DefaultFor:
     ManakaiDOM:ManakaiDOMLatest
@@ -86,6 +84,8 @@ Module:
       @@@Name: ManakaiDOMMain
     @@Module:
       @@@Name: ManakaiDOMCore
+    @@Module:
+      @@@Name: DOMXML
 
   @Feature:
     @@Name: Core
@@ -195,7 +195,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMMethod
-    @@For:
+    @@ForCheck:
       ManakaiDOM:DOM
 ElementTypeBinding:
   @Name: IntMethod
@@ -204,7 +204,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMMethod
-    @@For:
+    @@ForCheck:
       ManakaiDOM:ManakaiDOM
     @@ManakaiDOM:isForInternal: 1
 ElementTypeBinding:
@@ -214,9 +214,16 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMMethod
-    @@For:
+    @@ForCheck:
       ManakaiDOM:ManakaiDOM
     @@ManakaiDOM:isRedefining: 1
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethodParameter
 ElementTypeBinding:
   @Name: Return
   @ElementType:
@@ -224,8 +231,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMMethodReturn
-    @@For:
-      ManakaiDOM:DOM
 ElementTypeBinding:
   @Name: Attr
   @ElementType:
@@ -276,6 +281,14 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:InCase
+
+ElementTypeBinding:
+  @Name: ConstGroup
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:ConstGroup
 
 ExceptionDef:
   @Name:  DOMException
@@ -1822,7 +1835,8 @@ IF:
         2
         3
      @@Return:
-        @@@Type:  DocumentType
+        @@@Type:  
+          DOMXML:DocumentType
         @@@Description:
           @@@@lang:en
           @@@@@: A new "DocumentType" node.
@@ -1944,7 +1958,8 @@ IF:
             @@@@@@: Document element is not created.
      @@Param:
         @@@Name:  doctype
-        @@@Type:  DocumentType
+        @@@Type:  
+          DOMXML:DocumentType
         @@@Description:
           @@@@lang:en
           @@@@@: The type of document to create.
@@ -4666,13 +4681,15 @@ IF:
   @Method:
      @@Name:  setUserData
      @@Return:
-        @@@Type:  DOMUserData
+        @@@Type:  
+          DOMMain:DOMUserData
      @@Param:
         @@@Name:  key
         @@@Type:  DOMString
      @@Param:
         @@@Name:  data
-        @@@Type:  DOMUserData
+        @@@Type:  
+          DOMMain:DOMUserData
      @@Param:
         @@@Name:  handler
         @@@Type:  UserDataHandler
@@ -4681,7 +4698,8 @@ IF:
   @Method:
      @@Name:  getUserData
      @@Return:
-        @@@Type:  DOMUserData
+        @@@Type: 
+          DOMMain:DOMUserData
      @@Param:
         @@@Name:  key
         @@@Type:  DOMString
@@ -9205,17 +9223,8 @@ IF:
          <Q:DOMCore:read-only>.
 ## IF:Comment
 
-IF:
-  @Name:
-    @@@: TypeInfo
-    @@ForCheck: 
-      ManakaiDOM:ForIF
-  @Name:
-    @@@: ManakaiDOMTypeInfo
-    @@ForCheck: 
-      ManakaiDOM:ForClass
-    @@For:
-      ManakaiDOM:ManakaiDOM
+IFDef:
+  @Name: TypeInfo
   @Description:
     @@lang:en
     @@@:
@@ -9325,7 +9334,7 @@ IF:
        @@@lang:en
        @@@@: Is this namespace *URI*?
   @ConstGroup:
-     @@Name:  DerivationMethods
+     @@QName: DerivationMethods
      @@Description:
        @@@lang:en
        @@@@:
@@ -9421,7 +9430,9 @@ IF:
           @@@@@: The name of the other type definition.
      @@Param:
         @@@Name:  derivationMethod
-        @@@Type:  DerivationMethods
+        @@@Type:  
+          DOMMain:long
+        @@@actualType: DerivationMethods
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -9464,7 +9475,7 @@ IFDef:
   @Level[list]:  3
   @SpecLevel:3
   @ConstGroup:
-     @@Name:  OperationType
+     @@QName:  OperationType
      @@Type: unsigned-short
      @@Description:
        @@@lang:en
@@ -9556,7 +9567,8 @@ IFDef:
           @@@@@: The key for which this handler is being called.
      @@Param:
         @@@Name:  data
-        @@@Type:  DOMUserData
+        @@@Type:  
+          DOMMain:DOMUserData
         @@@Description:
           @@@@lang:en
           @@@@@: The data for which this handler is being called.
@@ -9594,7 +9606,7 @@ IFDef:
   @Level[list]:  3
   @SpecLevel:3
   @ConstGroup:
-     @@Name:  ErrorSeverity
+     @@QName:  ErrorSeverity
      @@Type: unsigned-short
      @@Description:
        @@@lang:en
@@ -9889,13 +9901,14 @@ IFDef:
      @@Param:
         @@@Name:  name
         @@@Type:
-          ManakaiDOMCore:ManakaiDOMConfigurationParameter
+          DOMMain:DOMString
         @@@Description:
           @@@@lang:en
           @@@@@: The name of the parameter to set.
      @@Param:
         @@@Name:  value
-        @@@Type:  DOMUserData
+        @@@Type:  
+          DOMMain:DOMUserData
         @@@Description:
           @@@@lang:en
           @@@@@: 
@@ -9938,13 +9951,14 @@ IFDef:
      @@Param:
         @@@Name:  name
         @@@Type:  
-          ManakaiDOMCore:ManakaiDOMConfigurationParameter
+          DOMMain:DOMString
         @@@Description:
           @@@@lang:en
           @@@@@:
             The name of the parameter.
      @@Return:
-        @@@Type:  DOMUserData
+        @@@Type:  
+          DOMMain:DOMUserData
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -9975,14 +9989,15 @@ IFDef:
      @@Param:
         @@@Name:  name
         @@@Type:
-          ManakaiDOMCore:ManakaiDOMConfigurationParameter
+          DOMMain:DOMString
         @@@Description:
           @@@@lang:en
           @@@@@:
             The name of the parameter to check.
      @@Param:
         @@@Name:  value
-        @@@Type:  DOMUserData
+        @@@Type:  
+          DOMMain:DOMUserData
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -10254,7 +10269,8 @@ IF:
        1
        3
      @@Get:
-        @@@Type:  DocumentType
+        @@@Type:  
+          DOMXML:DocumentType
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -12211,7 +12227,7 @@ ConfigParam:
       and some parameter values defined in the DOM Level 3 Core Specification.
     \
       DOM parameters are similar to features and properties of SAX2.
-  @Param:
+  @CParam:
     @@Name: canonical-form
     @@IsSupportRequired:1
     @@Type: boolean
@@ -12292,7 +12308,7 @@ ConfigParam:
       @@@Description:
         @@@@lang:en
         @@@@@: Do not canonicalize the document or the output.
-  @Param:
+  @CParam:
     @@Name: cdata-sections
     @@IsSupportRequired:1
     @@Type:boolean
@@ -12317,7 +12333,7 @@ ConfigParam:
           Transform <IF:CDATASection> nodes in the document into 
           <IF:Text> nodes.  The new <IF:Text> node is then 
           combined with any adjacent <IF:Text> node.
-  @Param:
+  @CParam:
     @@Name: check-character-normalization
     @@IsSupportRequired
     @@Type:boolean
@@ -12339,7 +12355,7 @@ ConfigParam:
       @@@Description:
         @@@@lang:en
         @@@@@: Do not check whether characters are normalized.
-  @Param:
+  @CParam:
     @@Name: comments
     @@IsSupportRequired:1
     @@Type:boolean
@@ -12358,7 +12374,7 @@ ConfigParam:
         @@@@lang:en
         @@@@@:
            Discard <IF:Comment> nodes in the document.
-  @Param:
+  @CParam:
     @@Name: datatype-normalization
     @@IsSupportRequired:1
     @@Type:boolean
@@ -12383,7 +12399,7 @@ ConfigParam:
       @@@Description:
         @@@@lang:en
         @@@@@: Do not perform schema normalization on the tree.
-  @Param:
+  @CParam:
     @@Name: element-content-whitespace
     @@IsSupportRequired:1
     @@Type:boolean
@@ -12412,7 +12428,7 @@ ConfigParam:
         @@@@Name:canonical-form
         @@@@Type:boolean
         @@@@Value:false
-  @Param:
+  @CParam:
     @@Name: entities
     @@Type:boolean
     @@IsSupportRequired:1
@@ -12443,7 +12459,7 @@ ConfigParam:
         @@@@lang:en
         @@@@@:
           This parameter does not affect <IF:Entity> nodes.
-  @Param:
+  @CParam:
     @@Name: error-handler
     @@Type: 
       DOMCore:DOMErrorHandler
@@ -12480,7 +12496,7 @@ ConfigParam:
         }
         \
         }
-  @Param:
+  @CParam:
     @@Name: infoset
     @@IsSupportRequired:1
     @@Type:boolean
@@ -12558,7 +12574,7 @@ ConfigParam:
                $cfg->{<Q:DOMCoreParam:comment>} && 
                $cfg->{<Q:DOMCoreParam:namespaces>}
              ? true : false;
-  @Param:
+  @CParam:
     @@Name: namespaces
     @@Type:boolean
     @@IsSupportRequired:1
@@ -12580,7 +12596,7 @@ ConfigParam:
         @@@@Name:canonical-form
         @@@@Type:boolean
         @@@@Value:false
-  @Param:
+  @CParam:
     @@Name: namespace-declarations
     @@IsSupportRequired:1
     @@Type:boolean
@@ -12605,7 +12621,7 @@ ConfigParam:
         @@@@Name:canonical-form
         @@@@Type:boolean
         @@@@Value:false
-  @Param:
+  @CParam:
     @@Name: normalize-characters
     @@Type:boolean
     @@IsSupportRequired:1
@@ -12647,7 +12663,7 @@ ConfigParam:
       @@@Description:
         @@@@lang:en
         @@@@@: Do not perform character normalization.
-  @Param:
+  @CParam:
     @@Name:schema-location
     @@IsSupportRequired:1
     @@Type:
@@ -12692,7 +12708,7 @@ ConfigParam:
       @@@Description:
         @@@@lang:en
         @@@@@: No location has been provided.
-  @Param:
+  @CParam:
     @@Name:schema-type
     @@IsSupportRequired:1
     @@Type:
@@ -12736,7 +12752,7 @@ ConfigParam:
       @@@@:
         Other schema languages are outside the scope of the W3C 
         and should recommentd an absolute URI in order to use here.
-  @Param:
+  @CParam:
     @@Name: split-cdata-sections
     @@Type:boolean
     @@IsSupportRequired:1
@@ -12762,7 +12778,7 @@ ConfigParam:
         @@@@@:
           Signal an error if <IF:CDATASection> contains an 
           unrepresentable character.
-  @Param:
+  @CParam:
     @@Name:validate
     @@IsSupportRequired:1
     @@Type:boolean
@@ -12810,7 +12826,7 @@ ConfigParam:
         \
           Note that validation might still happen in case 
           <DOM:validate-if-schema> is <DOM:true>.
-  @Param:
+  @CParam:
     @@Name:validate-if-schema
     @@Type:boolean
     @@IsSupportRequired:1
@@ -12840,7 +12856,7 @@ ConfigParam:
         \
           Note that validation might still happen in case 
           <DOM:validate> is <DOM:true>.
-  @Param:
+  @CParam:
     @@Name:well-formed
     @@Type:boolean
     @@IsSupportRequired:1

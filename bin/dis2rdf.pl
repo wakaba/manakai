@@ -33,9 +33,11 @@ GetOptions (
   'output-local-resource!' => \$Opt{output_local_resource},
   'output-module!' => \$Opt{output_module},
   'output-only-in-module=s' => \$Opt{output_resource_pattern},
-  'output-prop-perl!' => \$Opt{output_prop_perl},
+  'output-perl!' => \$Opt{output_prop_perl},
+  'output-perl-member-pattern=s' => \$Opt{output_perl_member_pattern},
   'output-resource!' => \$Opt{output_resource},
   'output-resource-uri-pattern=s' => \$Opt{output_resource_uri_pattern},
+  'output-root-anon-resource!' => $Opt{output_root_anon_resource},
 ) or pod2usage (2);
 if ($Opt{help}) {
   pod2usage (0);
@@ -45,10 +47,16 @@ if ($Opt{output_as_n3} and $Opt{output_as_xml}) {
   pod2usage (2);
   exit;
 }
+$Opt{file_name} = shift;
+$Opt{output_resource_pattern} ||= qr/./;
+$Opt{output_resource_uri_pattern} ||= qr/./;
+$Opt{output_root_anon_resource} = $Opt{output_anon_resource}
+  unless defined $Opt{output_anon_resource};
 $Opt{output_as_xml} = 1 unless $Opt{output_as_n3};
 $Opt{output_anon_resource} = 1 unless defined $Opt{output_anon_resource};
 $Opt{output_local_resource} = 1 unless defined $Opt{output_local_resource};
 $Opt{no_undef_check} = $Opt{no_undef_check} ? 0 : 1;
+$Opt{output_perl_member_pattern} ||= qr/./;
 
 BEGIN {
 require 'manakai/genlib.pl';
@@ -62,9 +70,6 @@ sub n3_literal ($) {
 our $State;
 our $result = new manakai::n3;
 
-$Opt{file_name} = shift;
-$Opt{output_resource_pattern} ||= qr/.+/;
-$Opt{output_resource_uri_pattern} ||= qr/.+/;
 
 $State->{DefaultFor} = $Opt{For};
 
@@ -83,7 +88,8 @@ if (dis_uri_for_match (ExpandedURI q<ManakaiDOM:Perl>, $State->{DefaultFor})) {
 my $primary = $result->get_new_anon_id (Name => 'boot');
 $result->add_triple ($primary =>ExpandedURI q<d:module>=> $State->{module})
                 if $Opt{output_module};
-$result->add_triple ($primary =>ExpandedURI q<d:DefaultFor> => $State->{DefaultFor})
+$result->add_triple
+           ($primary =>ExpandedURI q<d:DefaultFor> => $State->{DefaultFor})
                 if $Opt{output_for};
 
 if ($Opt{output_module}) {
@@ -159,6 +165,14 @@ if ($Opt{output_resource}) {
     my ($mod, %opt) = @_;
     return unless defined $mod->{Name};
     return unless $mod->{parentModule} =~ /$Opt{output_resource_pattern}/;
+    return if $Opt{output_prop_perl} and
+              $mod->{ExpandedURI q<dis2pm:type>} and
+              {
+                ExpandedURI q<ManakaiDOM:DOMAttribute> => 1,
+                ExpandedURI q<ManakaiDOM:DOMMethod> => 1,
+              }->{$mod->{ExpandedURI q<dis2pm:type>}} and
+              $mod->{Name} and
+              $mod->{Name} !~ /$Opt{output_perl_member_pattern}/;
     if ((defined $mod->{URI} and $opt{key} eq $mod->{URI}) or
         not defined $mod->{URI}) {
       return if defined $mod->{URI} and
@@ -175,8 +189,10 @@ if ($Opt{output_resource}) {
       $result->add_triple ($uri =>ExpandedURI q<d:parentResource>=>
                            $opt{parent_class_uri})
         if defined $opt{parent_class_uri};
-      $result->add_triple ($uri =>ExpandedURI q<d:parentModule>=>
-                           $mod->{parentModule});
+      if ($Opt{output_module}) {
+        $result->add_triple ($uri =>ExpandedURI q<d:parentModule>=>
+                             $mod->{parentModule});
+      }
       for (keys %{$mod->{Type}}) {
         $result->add_triple ($uri =>ExpandedURI q<rdf:type>=> $_);
       }
@@ -186,8 +202,10 @@ if ($Opt{output_resource}) {
       for (@{$mod->{Implement}}) {
         $result->add_triple ($uri =>ExpandedURI q<d:Implement>=> $_);
       }
-      for (keys %{$mod->{For}}) {
-        $result->add_triple ($uri =>ExpandedURI q<d:For>=> $_);
+      if ($Opt{output_for}) {
+        for (keys %{$mod->{For}}) {
+          $result->add_triple ($uri =>ExpandedURI q<d:For>=> $_);
+        }
       }
       for (@{$mod->{hasResource}||[]}) {
         my $ruri = defined $_->{URI}
@@ -200,12 +218,21 @@ if ($Opt{output_resource}) {
         for my $prop ([ExpandedURI q<dis2pm:packageName>],
                       [ExpandedURI q<dis2pm:ifPackagePrefix>],
                       [ExpandedURI q<dis2pm:methodName>],
+                      [ExpandedURI q<dis2pm:paramName>],
                       [ExpandedURI q<ManakaiDOM:isRedefining>,
                         ExpandedURI q<DOMMain:boolean>],
                       [ExpandedURI q<ManakaiDOM:isForInternal>,
+                        ExpandedURI q<DOMMain:boolean>],
+                      [ExpandedURI q<d:Read>, ExpandedURI q<DOMMain:boolean>],
+                      [ExpandedURI q<d:Write>,
                         ExpandedURI q<DOMMain:boolean>]) {
           $result->add_triple ($uri =>$prop->[0]=>
                                n3_literal $mod->{$prop->[0]})
+            if defined $mod->{$prop->[0]};
+        }
+        for my $prop ([ExpandedURI q<d:Type>],
+                      [ExpandedURI q<dis2pm:if>]) {
+          $result->add_triple ($uri =>$prop->[0]=> $mod->{$prop->[0]})
             if defined $mod->{$prop->[0]};
         }
         for (values %{$mod->{ExpandedURI q<dis2pm:method>}||{}}) {
@@ -215,20 +242,39 @@ if ($Opt{output_resource}) {
                               ||= $result->get_new_anon_id (Name => $_->{Name}));
           $result->add_triple ($uri =>ExpandedURI q<dis2pm:method>=> $ruri);
         }
+        if ($mod->{ExpandedURI q<dis2pm:type>} eq
+              ExpandedURI q<ManakaiDOM:DOMMethod>) {
+          $result->add_triple
+                      ($uri =>ExpandedURI q<dis2pm:param>=>
+                       my $p = $result->get_new_anon_id (Name => 'param'));
+          $result->add_triple ($uri =>ExpandedURI q<rdf:type>=>
+                               ExpandedURI q<rdf:Seq>);
+          my $i = 0;
+          for (@{$mod->{ExpandedURI q<dis2pm:param>}||[]}) {
+            my $ruri = defined $_->{URI}
+                          ? $_->{URI}
+                          : ($_->{ExpandedURI q<d:anonID>}
+                              ||= $result->get_new_anon_id (Name => $_->{Name}));
+            $result->add_triple ($p =>(ExpandedURI q<rdf:_>).++$i=> $ruri);
+          }
+        }
       }
       if ($Opt{output_local_resource}) {
         for (keys %{$mod->{Resource}}) {
-          class_to_rdf ($mod->{Resource}->{$_}, parent_class => $mod,
+          class_to_rdf ($mod->{Resource}->{$_}, %opt, parent_class => $mod,
                         parent_class_uri => $uri,
                         key => $_);
         }
       }
     } else { ## Alias URI
-      return if $opt{key} !~ /$Opt{output_resource_uri_pattern}/;
+      return unless $opt{key} =~ /$Opt{output_resource_uri_pattern}/ or
+                    $mod->{URI} =~ /$Opt{output_resource_uri_pattern}/;
       $result->add_triple ($opt{key} =>ExpandedURI q<owl:sameAs>=> $mod->{URI});
     }
   }
   for (sort keys %{$State->{Type}}) {
+    next if not $Opt{output_root_anon_resource} and
+            not defined $State->{Type}->{$_}->{URI};
     class_to_rdf ($State->{Type}->{$_}, key => $_);
   }
 }
@@ -271,7 +317,10 @@ sub stringify_as_xml ($) {
   my ($self) = @_;
   use RDF::Notation3::XML;
   my $notation3 = RDF::Notation3::XML->new;
-  $notation3->parse_string ($self->stringify);
+  my $n3 = $self->stringify;
+  my $rdf_ = ExpandedURI q<rdf:_>;
+  $n3 =~ s/$rdf_/data:,dummy_/g;
+  $notation3->parse_string ($n3);
   my $xml = $notation3->get_string;
   $xml =~ s/\brdf:nodeID="_:/rdf:nodeID="/g;
 #  $xml =~ s/^<\?xml version="1.0" encoding="utf-8"\?>\s*//;

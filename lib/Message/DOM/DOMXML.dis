@@ -1,20 +1,40 @@
 Namespace:
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @infoset:
      http://www.w3.org/2001/04/infoset#
   @lang:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
-  @ManakaiDOMImplementationException:
-     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @MDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
   @TreeCore:\
+
 Module:
-  @Name:DOMXML
-  @BindingName:
+  @QName: 
+    MDOM:DOMXML
+  @AppName:
     @@@: dom
     @@prefix:  w3c.org
-    @@Type:
+    @@ContentType:
       lang:IDL-DOM
+    @@For:
+      ManakaiDOM:IDL
+  @AppName:
+    @@@: org.w3c.dom
+    @@ContentType:
+      lang:Java
+    @@ForCheck:
+      ManakaiDOM:ForIF
+    @@For:
+      ManakaiDOM:Java
   @FullName:
     @@lang:en
     @@@: DOM XML Module
@@ -22,7 +42,7 @@ Module:
     @@DOM3:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-BBACDC08
   @Namespace:     
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+    http://suika.fam.cx/~wakaba/archive/2004/dom/xml#
   
   @Description:
     @@lang:en
@@ -44,27 +64,8 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/10/31 12:30:28 $
+     $Date: 2004/11/21 05:17:32 $
 
-  @Require:
-    @@Module:
-      @@@Name: DOMCore
-      @@@Namespace:
-        http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
-    @@Module:
-      @@@Name: ManakaiDOMXML
-      @@@Namespace:
-        http://suika.fam.cx/~wakaba/archive/2004/mdom-xml#
-  
-  @ConditionDef:
-    @@Name: DOM1
-  @ConditionDef:
-    @@Name: DOM2
-    @@ISA:DOM1
-  @ConditionDef:
-    @@Name: DOM3
-    @@ISA:DOM2
-    
   @Feature:
     @@Name: XML
     @@Version: 1.0
@@ -168,9 +169,169 @@ Module:
     @@Contrib:
       DOMCore:DOMImplementation::DOM3
 
+  @Require:
+    @@Module:
+      @@@Name: DOMCore
+
+ElementTypeBinding:
+  @Name: IF
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:IF
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:Class
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@rdf:type:
+      @@@@:
+        dis:MultipleResource
+      @@@ForCheck:
+        !ManakaiDOM:ForClass !ManakaiDOM:ForIF
+    @@resourceFor:
+      ManakaiDOM:ForIF
+    @@resourceFor:
+      ManakaiDOM:ForClass
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM
+ElementTypeBinding:
+  @Name: IFDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:IF
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@ForCheck:
+      ManakaiDOM:DOM
+ElementTypeBinding:
+  @Name: IntMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isForInternal: 1
+ElementTypeBinding:
+  @Name: ReMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isRedefining: 1
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethodParameter
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethodReturn
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttribute
+    @@For:
+      ManakaiDOM:DOM
+ElementTypeBinding:
+  @Name: IntAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttribute
+    @@For:
+      ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isForInternal: 1
+ElementTypeBinding:
+  @Name: ReAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttribute
+    @@For:
+      ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isRedefining: 1
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttrGet
+ElementTypeBinding:
+  @Name: Set
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttrSet
+ElementTypeBinding:
+  @Name: InCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+
+ElementTypeBinding:
+  @Name: ConstGroup
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:ConstGroup
+
 IF:
-  @Name:  CDATASection
-  @ISA:  Text
+  @Name:  
+    @@@: CDATASection
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @Name:
+    @@@: ManakaiDOMCDATASection
+    @@ForCheck: 
+      ManakaiDOM:ForClass
+    @@For:
+      ManakaiDOM:ManakaiDOM
+  @ISA:  
+    @@@: 
+      DOMCore:Text
+    @@ForCheck: 
+      ManakaiDOM:ForIF
+  @ISA:
+    @@@:
+      DOMCore:ManakaiDOMText
+    @@ForCheck:
+      ManakaiDOM:ForClass
   @Spec:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-667469212
@@ -262,8 +423,26 @@ IF:
 ## IF:CDATASection
 
 IF:
-  @Name:  DocumentType
-  @ISA:  Node
+  @Name:  
+    @@@: DocumentType
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @Name:
+    @@@: ManakaiDOMDocumentType
+    @@ForCheck: 
+      ManakaiDOM:ForClass
+    @@For:
+      ManakaiDOM:ManakaiDOM
+  @ISA:  
+    @@@: 
+      DOMCore:Node
+    @@ForCheck: 
+      ManakaiDOM:ForIF
+  @ISA:
+    @@@:
+      DOMCore:ManakaiDOMNode
+    @@ForCheck:
+      ManakaiDOM:ForClass
   @Spec:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-412266927
@@ -316,7 +495,8 @@ IF:
          duplicating declarations are not contained.
      @@Get:
         @@@Type:
-          ManakaiDOMXML:ManakaiDOMEntities
+          DOMCore:NamedNodeMap
+#          ManakaiDOMXML:ManakaiDOMEntities
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -329,7 +509,8 @@ IF:
          A collection containing the notations declared in the DTD.
      @@Get:
         @@@Type:
-          ManakaiDOMXML:ManakaiDOMNotations
+          DOMCore:NamedNodeMap
+#          ManakaiDOMXML:ManakaiDOMNotations
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -548,8 +729,26 @@ IF:
 ## IF:DocumentType
 
 IF:
-  @Name:  Notation
-  @ISA:  Node
+  @Name:  
+    @@@: Notation
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @Name:
+    @@@: ManakaiDOMNotation
+    @@ForCheck: 
+      ManakaiDOM:ForClass
+    @@For:
+      ManakaiDOM:ManakaiDOM
+  @ISA:  
+    @@@: 
+      DOMCore:Node
+    @@ForCheck: 
+      ManakaiDOM:ForIF
+  @ISA:
+    @@@:
+      DOMCore:ManakaiDOMNode
+    @@ForCheck:
+      ManakaiDOM:ForClass
   @Spec:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-5431D1B9
@@ -791,8 +990,26 @@ IF:
 ## IF:Notation
 
 IF:
-  @Name:  Entity
-  @ISA:  Node
+  @Name:  
+    @@@: Entity
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @Name:
+    @@@: ManakaiDOMEntity
+    @@ForCheck: 
+      ManakaiDOM:ForClass
+    @@For:
+      ManakaiDOM:ManakaiDOM
+  @ISA:  
+    @@@: 
+      DOMCore:Node
+    @@ForCheck: 
+      ManakaiDOM:ForIF
+  @ISA:
+    @@@:
+      DOMCore:ManakaiDOMNode
+    @@ForCheck:
+      ManakaiDOM:ForClass
   @Spec:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-527DCFF2
@@ -1140,8 +1357,24 @@ IF:
 ## IF:Entity
 
 IF:
-  @Name:  EntityReference
-  @ISA:  Node
+  @Name:  
+    @@@: EntityReference
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @Name:
+    @@@: ManakaiDOMEntityReference
+    @@ForCheck: 
+      ManakaiDOM:ForClass
+  @ISA:  
+    @@@: 
+      DOMCore:Node
+    @@ForCheck: 
+      ManakaiDOM:ForIF
+  @ISA:
+    @@@:
+      DOMCore:ManakaiDOMNode
+    @@ForCheck:
+      ManakaiDOM:ForClass
   @Spec:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-11C98490
@@ -1295,8 +1528,24 @@ IF:
 # IF:EntityReference
 
 IF:
-  @Name:  ProcessingInstruction
-  @ISA:  Node
+  @Name:  
+    @@@: ProcessingInstruction
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @Name:
+    @@@: ManakaiDOMProcessingInstruction
+    @@ForCheck: 
+      ManakaiDOM:ForClass
+  @ISA:  
+    @@@: 
+      DOMCore:Node
+    @@ForCheck: 
+      ManakaiDOM:ForIF
+  @ISA:
+    @@@:
+      DOMCore:ManakaiDOMNode
+    @@ForCheck:
+      ManakaiDOM:ForClass
   @Spec:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1004215813

@@ -165,15 +165,23 @@ sub dis_typeforqnames_to_uri ($;%) {
   my ($qq, %opt) = @_;
   my ($typeq, $forq) = split /::/, $qq, 2;
   my ($type, $for);
+  my $pt = {
+    boolean => ExpandedURI q<DOMMain:boolean>,
+    long => ExpandedURI q<DOMMain:long>,
+    'unsigned-long' => ExpandedURI q<DOMMain:unsigned-long>,
+    any => ExpandedURI q<DOMMain:any>,
+    DOMString => ExpandedURI q<DOMMain:DOMString>,
+    Object => ExpandedURI q<DOMMain:Object>,
+  };
   if (defined $forq) {
-    $type = dis_qname_to_uri ($typeq, %opt);
+    $type = $pt->{$typeq} || dis_qname_to_uri ($typeq, %opt);
     if (length $forq) {
       $for = dis_qname_to_uri ($forq, %opt);
     } else {
       $for = ExpandedURI q<ManakaiDOM:all>;
     }
   } else {
-    $type = dis_qname_to_uri ($typeq, %opt);
+    $type = $pt->{$typeq} || dis_qname_to_uri ($typeq, %opt);
     $for = $opt{For} || ExpandedURI q<ManakaiDOM:all>;
   }
   return dis_typeforuris_to_uri ($type, $for, %opt);
@@ -1048,7 +1056,7 @@ sub dis_load_classdef_element ($;%) {
                                           %opt, node => $_);
       push @{$cls->{Implement}||=[]}, $uri;
       $State->{def_required}->{Class}->{$uri} ||= 1;
-    } elsif ($ln eq ExpandedURI q<d:ResourceDef>) {
+    } elsif ($ln eq ExpandedURI q<d:ResourceDef> and not $is_multiresource) {
       valid_err ("Alias class name cannot be able to have this type of elements",
                  node => $_) if $al;
       local $State->{current_class_container} = $cls;
@@ -1061,6 +1069,7 @@ sub dis_load_classdef_element ($;%) {
   }
 
   if ($is_multiresource) {
+    $cls->{Resource} = {}; ## MultipleResource does not have child resource
     for (@{$node->child_nodes}) {
       next unless $_->node_type eq '#element';
       next unless dis_node_for_match ($_, $opt{For}, %opt);
@@ -1120,7 +1129,7 @@ sub dis_perl_init ($;%) {
   ## Perl package name
   for my $mod (values %{$State->{Module}}) {
     next if $mod->{ExpandedURI q<dis2pm:done>};
-    $opt{For} = [keys %{$mod->{For}}]->[0];
+    local $opt{For} = [keys %{$mod->{For}}]->[0];
     ## Perl package name
     my $mg = $State->{Type}->{$mod->{ModuleGroup}};
     my $an = dis_get_attr_node (%opt, parent => $mg->{src}, name => 'AppName');
@@ -1172,13 +1181,14 @@ Load Perl-specific properties for class.
 sub dis_perl_init_classdef ($;%);
 sub dis_perl_init_classdef ($;%) {
   my ($res, %opt) = @_;
+  local $opt{For} = [keys %{$res->{For}}]->[0];
 
   ## Check resource type
   my $type = $res->{ExpandedURI q<dis2pm:type>} || '';
   TYPES: for my $t (keys %{$res->{Type}}) {
     for (ExpandedURI q<ManakaiDOM:DOMMethod>,
          ExpandedURI q<ManakaiDOM:DOMAttribute>,
-         ExpandedURI q<ManakaiDOM:DOMParameter>,
+         ExpandedURI q<ManakaiDOM:DOMMethodParameter>,
          ExpandedURI q<ManakaiDOM:Class>,
          ExpandedURI q<ManakaiDOM:IF>) {
       if (dis_uri_ctype_match ($_, $t, %opt)) {
@@ -1267,6 +1277,46 @@ sub dis_perl_init_classdef ($;%) {
                        ->{ExpandedURI q<dis2pm:method>}->{$name}->{Name};
     $State->{ExpandedURI q<dis2pm:parentResource>}
           ->{ExpandedURI q<dis2pm:method>}->{$name} = $res;
+  } elsif ({ExpandedURI q<ManakaiDOM:DOMMethodParameter> => 1}->{$type}) {
+    ## Parameter name
+    valid_err (qq<Parameter name required>, node => $res->{node})
+      unless $res->{Name};
+    my $name = $res->{Name};
+    $res->{ExpandedURI q<dis2pm:paramName>} = $name;
+
+    ## Parameter value type
+    my $t = dis_get_attr_node (%opt, name => 'Type', parent => $res->{src});
+    valid_err (q<Parameter type required>, node => $res->{src})
+      unless $t;
+    $res->{ExpandedURI q<d:Type>}
+      = dis_typeforqnames_to_uri ($t->value, use_default_namespace => 1,
+                                  %opt, node => $t);
+    valid_err (qq{Type <$res->{ExpandedURI q<d:Type>}> must be defined},
+               node => $t)
+      unless defined $State->{Type}->{$res->{ExpandedURI q<d:Type>}}->{Name};
+    my $i = dis_get_attr_node (%opt, name => 'actualType',
+                               parent => $res->{src});
+    if ($i) {
+      $res->{ExpandedURI q<d:actualType>}
+        = dis_typeforqnames_to_uri ($t->value, use_default_namespace => 1,
+                                    %opt, node => $t);
+      valid_err (qq{Type <$res->{ExpandedURI q<d:actualType>}> must be defined},
+                 node => $t)
+        unless defined $State->{Type}->{$res->{ExpandedURI q<d:actualType>}}
+                             ->{Name};
+    } else {
+      $res->{ExpandedURI q<d:actualType>} = $res->{ExpandedURI q<d:Type>};
+    }
+
+    ## Input or output?
+    my $read = dis_get_attr_node (%opt, name => 'Read', parent => $res->{src});
+    $res->{ExpandedURI q<d:Read>} = ($read and $read->value) ? 1 : 0;
+    my $write = dis_get_attr_node (%opt, name => 'Write', parent => $res->{src});
+    $res->{ExpandedURI q<d:Write>} = ($read and not $read->value) ? 0 : 1;
+    
+    ## Register the parameter
+    push @{$State->{ExpandedURI q<dis2pm:parentResource>}
+                 ->{ExpandedURI q<dis2pm:param>}||=[]}, $res;
   } # $type
   
   ## Register the package
@@ -1605,4 +1655,4 @@ sub disdoc_inline2pod ($;%) {
 
 =cut
 
-1; # $Date: 2004/11/20 11:12:50 $
+1; # $Date: 2004/11/21 05:17:32 $
