@@ -1,3 +1,10 @@
+2004-09-18  Wakaba  <wakaba@suika.fam.cx>
+
+	* ManakaiDOM.dis (MDOM_NEWCHILD_IS_REFCHILD): New warning.
+	(ManakaiDOMNodeObject->orphanate): New internal method.
+	(Interface[ManakaiDOMNodeObject, ManakaiDOMNodeReference]): All calls 
+	of internal methods are now qualified by the package name.
+
 2004-09-17  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMMain.dis: 'SpecLevel' attribute added.
@@ -10,6 +17,7 @@
 	by perl -w.
 	(ops2perl): Declare subroutine 'DESTROY' not to be warned by
 	perl -w.
+	(get_internal_code): Support of lang:dis.
 
 	* ManakaiDOM.dis (newReference): New parameter 'class' introduced.
 

@@ -21,7 +21,8 @@ This script is part of manakai.
 use strict;
 use Message::Markup::SuikaWikiConfig20::Parser;
 use Message::Markup::XML::QName qw/DEFAULT_PFX/;
-use Message::Util::QName::General [qw/ExpandedURI/], {
+use Message::Util::QName::General [qw/ExpandedURI/], { 
+  DOMCore => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#>,
   DOMMain => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#>,
   lang => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#>,
   Perl => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl-->,
@@ -918,10 +919,23 @@ sub dis2perl ($) {
                  perl_literal (expanded_uri ($_->value)) . '}->'.
                  perl_code q{__CLASS{ManakaiDOMNodeObject}__->__INT{newReference}__};
     } elsif ($_->local_name eq 'SetProp') {
-      $r .= perl_statement perl_assign
+      my $t = perl_statement perl_assign
               '$self->{node}->{' .
                  perl_literal (expanded_uri ($_->value)) . '}'
               => perl_var (type => '$', local_name => 'given');
+      if ($_->get_attribute_value ('CheckReadOnly', default => 1)) {
+        $r .= perl_if
+                q[$self->{'node'}->{].
+                  perl_literal (ExpandedURI (q<DOMCore:read-only>)).q[}],
+                perl_statement
+                  (perl_exception
+                     class => 'DOMException',
+                     type => 'NO_MODIFICATION_ALLOWED_ERR',
+                     param => {}),
+                $t;
+      } else {
+        $r .= $t;
+      }
     } elsif ($_->local_name eq 'Type') {
       #
     } else {
@@ -1082,8 +1096,8 @@ sub get_internal_code ($$;%) {
     $you->get_attribute_value ('Name') eq $name
   })) {
     $def = $m->get_attribute ('Return');
-    $def = (get_perl_definition_node $def, name => 'IntDef' or
-            get_perl_definition_node $def, name => 'Def') if $def;
+    $def = (get_perl_definition_node $def, name => 'IntDef', use_dis => 1 or
+            get_perl_definition_node $def, name => 'Def', use_dis => 1) if $def;
   } elsif ($m = $node->get_element_by (sub {
     my ($me, $you) = @_;
     $you->node_type eq '#element' and
@@ -1092,8 +1106,8 @@ sub get_internal_code ($$;%) {
     $you->get_attribute_value ('Name') eq $name
   })) {
     $def = $m->get_attribute ('Get');
-    $def = (get_perl_definition_node $def, name => 'IntDef' or
-            get_perl_definition_node $def, name => 'Def') if $def;
+    $def = (get_perl_definition_node $def, name => 'IntDef', use_dis => 1 or
+            get_perl_definition_node $def, name => 'Def', use_dis => 1) if $def;
   } elsif ($m = $node->get_element_by (sub {
     my ($me, $you) = @_;
     $you->node_type eq '#element' and
@@ -1101,7 +1115,7 @@ sub get_internal_code ($$;%) {
     $you->get_attribute_value ('Name') eq $name
   })) {
     $def = $m->get_attribute ('Return');
-    $def = get_perl_definition_node $def, name => 'Def' if $def;
+    $def = get_perl_definition_node $def, name => 'Def', use_dis => 1 if $def;
   } elsif ($m = $node->get_element_by (sub {
     my ($me, $you) = @_;
     $you->node_type eq '#element' and
@@ -1109,10 +1123,15 @@ sub get_internal_code ($$;%) {
     $you->get_attribute_value ('Name') eq $name
   })) {
     $def = $m->get_attribute ('Get');
-    $def = get_perl_definition_node $def, name => 'Def' if $def;
+    $def = get_perl_definition_node $def, name => 'Def', use_dis => 1 if $def;
   }
   if ($def) {
-    return perl_code $def->value;
+    if (type_expanded_uri ($def->get_attribute_value ('Type', default => ''))
+            eq ExpandedURI q<lang:dis>) {
+      return dis2perl $def;
+    } else {
+      return perl_code $def->value;
+    }
   } else {
     valid_warn qq<Internal method "$name" not defined>;
     is_implemented (if => $Status->{IF}, method => $name, set => 0);
@@ -2781,6 +2800,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/09/17 07:44:11 $
+# $Date: 2004/09/18 11:51:16 $
 
 

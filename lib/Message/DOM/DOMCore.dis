@@ -45,7 +45,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/17 07:44:10 $
+     $Date: 2004/09/18 11:51:16 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -1510,6 +1510,13 @@ IF:
       that represents a single node in the document tree.
   @ISA:
     ManakaiDOM:ManakaiDOMNodeReference::
+  @ImplNote:
+    @@lang:en
+    @@@:
+      "Attr", "Element", "Document", "DocumentFragment", "DocumentType", 
+      "Entity", "EntityReference", "Notation", "ProcessingInstriction" 
+      and "CharacterData" are "Node".  "Comment" and "Text" are 
+      "CharacterData".  "CDATASection" is a "Text".
   @ConstGroup:
      @@Name:  NodeType
      @@Description:
@@ -1913,37 +1920,766 @@ IF:
           object can be exist without its parent of the "Document".
   @Method:
      @@Name:  insertBefore
-     @@Return:
-        @@@Type:  Node
-        @@@Exception[list]:  DOMException
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Insert a node before the existing child node.
      @@Param:
         @@@Name:  newChild
         @@@Type:  Node
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The node to insert.  If the "newChild" node is already 
+            in the tree, it is first removed.
+        @@@InCase:
+          @@@@Type: DocumentFragment
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              All of the children are inserted, in the same order. 
+              After the insertion, the children list of the 
+              "newChild" is empty.
+          @@@@SpecLevel: 1
      @@Param:
         @@@Name:  refChild
         @@@Type:  Node
-     @@ModifiedLevel[list]:  3
-  @Method:
-     @@Name:  replaceChild
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The reference node.  The "newChild" node is inserted before 
+            the "refChild" node.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The "newChild" is inserted at the end of the list of children. 
+        @@@InCase:
+          @@@@Label: Same as "newChild"
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: Inserting a node before itself is implementation dependent.
+          @@@@SpecLevel:3
      @@Return:
         @@@Type:  Node
-        @@@Exception[list]:  DOMException
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node being inserted.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            What should be returned when the "newChild" is a "DocumentFragment" 
+            is unclear.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: HIERARCHY_REQUEST_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              Either this node is of a type that does not allow 
+              children of the type of the "newChild" node [DOM 1, 2, 3],
+              the node to insert is one of ancestors of this node 
+              [DOM 1, 2, 3], the node to insert is this node itself
+              [DOM 3], or this node is of type "Document" and the attemption 
+              to insert a second "DocumentType" or "Element" node 
+              is made [DOM 3].
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@: 
+              Special treatment required if it is a "DocumentFragment".
+              Whether the node is hierarchically valid must be 
+              ensured for each child nodes.
+            \
+              For example, the attemption to add more than one elements 
+              using "DocumentFragment" to the empty "Document" must 
+              be detected.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: WRONG_DOCUMENT_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The "newChild" node was created from a different 
+              document.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either this node is read-only [DOM 1, 2, 3] or the parent of 
+              the node being inserted is read-only [DOM 1 SE, 2, 3].
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NOT_SUPPORTED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This node is of type "Document" and the DOM implementation 
+              does not support the insertion of a "DocumentType" or 
+              "Element" node.
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              While the specification does not address, 
+              in case that the parent of the "newChild" is a "Document" 
+              and the DOM implementation does not support the 
+              removal from it, this error should also be raised.
+          @@@@SpecLevel:3
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $node;
+            my $newNode;
+            CHKDOC: {
+              if (ref $newChild and $newChild->isa ('__IIF{Node::}__')) {
+                $node = $self->{<Q:TreeCore:node>};
+                $newNode = $newChild->{<Q:TreeCore:node>};
+                if ($node->{<Q:DOMCore:ownerDocument>}) {
+                  if ($newNode->{<Q:DOMCore:ownerDocument>}) {
+                    last CHKDOC if $node->{<Q:DOMCore:ownerDocument>}
+                                        ->{<Q:TreeCore:nodeID>} eq
+                                   $newNode->{<Q:DOMCore:ownerDocument>}
+                                        ->{<Q:TreeCore:nodeID>};
+                  }
+                } else { ## I'm "Document" or "DocumentType" node.
+                  if ($node->{<Q:DOMCore:nodeType>} eq <Q:infoset:Document>) {
+                    last CHKDOC;
+                  }
+                }
+              }
+              __EXCEPTION{
+                DOMException.WRONG_DOCUMENT_ERR:
+                  <Q:MDOM_EXCEPTION:param-name> => 'newChild',
+              }__;
+            } # CHKDOC
+            my @newNode = ($newNode);
+            if ($newNode->{<Q:DOMCore:nodeType>} eq
+                <Q:DOMCore:DocumentFragment>) {
+       \       @newNode = @{$newNode->{<Q:infoset:children>}};
+            }
+            if (@newNode) {
+              my $parentNode = $newNode[0]->{<Q:infoset:parent>};
+
+              ## Read-only?
+              if ($node->{<Q:DOMCore:read-only>}) {
+                ## This node is read-only.
+                __EXCEPTION{
+                  DOMException.NO_MODIFICATION_ALLOWED_ERR:
+                    <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_DEST>,
+                }__;
+              } elsif ($parentNode and $parentNode->{<Q:DOMCore:read-only>}) {
+                ## Parent of new node(s) is read-only
+                __EXCEPTION{
+                  DOMException.NO_MODIFICATION_ALLOWED_ERR:
+                    <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_SRC>,
+                    <Q:MDOM_EXCEPTION:param-name> => 'newChild',
+                }__;
+              }
+              
+              ## Check type of this node and new child node
+              CHKTYPE: {
+                if ({
+                      <Q:infoset:Element> => 1,
+                      <Q:DOMCore:DocumentFragment> => 1,
+                      <Q:DOMCore:Entity> => 1,
+                      <Q:DOMCore:EntityReference> => 1,
+                    }->{$node->{<Q:DOMCore:nodeType>}}) {
+                  CHILDTYPE: {
+                    for (@newNode) {
+                      unless ({
+                            <Q:infoset:Element> => 1,
+                            <Q:DOMCore:Text> => 1,
+                            <Q:infoset:Comment> => 1,
+                            <Q:infoset:ProcessingInstruction> => 1,
+                            <Q:DOMCore:CDATASection> => 1,
+                            <Q:DOMCore:EntityReference> => 1,
+                          }->{$_->{<Q:DOMCore:nodeType>}}) {
+                        last CHILDTYPE;
+                      }
+                    }
+                    last CHKTYPE; # No problem
+                  }
+                } elsif ($node->{<Q:DOMCore:nodeType>} eq <Q:infoset:Document>) {
+                  CHILDTYPE: {
+                    my %has;
+                    EACHNEWNODE: for my $newNode (@newNode) {
+                      if ({
+                            <Q:infoset:Element> => 1,
+                            <Q:infoset:DocumentTypeDeclaration> => 1,
+                          }->{$newNode->{<Q:DOMCore:nodeType>}}) {
+                        FOUND: {
+                          if ($has{$newNode->{<Q:DOMCore:nodeType>}}) {
+                            ## DOCTYPE or document element is waiting 
+                            ## to be added
+                            last FOUND;
+                          }
+                          for (@{$node->{<Q:infoset:children>}}) {
+                            ## Document already has a DOCTYPE or doc.element
+                            last FOUND if $_->{<Q:DOMCore:nodeType>} eq
+                                          $newNode->{<Q:DOMCore:nodeType>};
+                          }
+                          $has{$newNode->{<Q:DOMCore:nodeType>}} = 1;
+                          next EACHNEWNODE;
+                        }
+                        __EXCEPTION{
+                          DOMException.HIERARCHY_REQUEST_ERR:
+                            <Q:MDOM_EXCEPTION:subtype>
+                                 => <Q:MDOM_EXCEPTION:HIERARCHY_TOO_MANY_NODES>,
+                            <Q:DOMCore:nodeType>
+                                 => $newNode->{<Q:DOMCore:nodeType>},
+                            <Q:MDOM_EXCEPTION:param-name> => 'newChild',
+                        }__;
+                      } elsif (not {
+                                 <Q:infoset:Comment> => 1,
+                                 <Q:infoset:ProcessingInstruction> => 1,
+                               }->{$newNode->{<Q:DOMCore:nodeType>}}) {
+                        last CHILDTYPE;
+                      }
+                    } # EACHNEWNODE
+                    last CHKTYPE; # No problem
+                  } # CHILDTYPE
+                } elsif ($node->{<Q:DOMCore:nodeType>} eq
+                         <Q:infoset:Attribute>) {
+                  CHILDTYPE: {
+                    for my $newNode (@newNode) {
+                      unless ({
+                            <Q:DOMCore:Text> => 1,
+                            <Q:DOMCore:EntityReference> => 1,
+                          }->{$newNode->{<Q:DOMCore:nodeType>}}) {
+                        last CHILDTYPE;
+                      }
+                    }
+                    last CHKTYPE; # No problem
+                  }
+                } # $node->{<Q:DOMCore:nodeType>}
+                __EXCEPTION{
+                  DOMException.HIERARCHY_REQUEST_ERR:
+                    <Q:MDOM_EXCEPTION:subtype>
+                         => <Q:MDOM_EXCEPTION:HIERARCHY_BAD_TYPE>,
+                    <Q:infoset:nodeType> => $newNode->{<Q:infoset:nodeType>},
+                    <Q:MDOM_EXCEPTION:param-name> => 'newChild',
+                }__;
+              } # CHKTYPE
+              
+              ## Check $newNode (not $newNode[0]) = ancestor-or-self::node()
+              if ($node->{<Q:TreeCore:treeID>} eq
+                  $newNode->{<Q:TreeCore:treeID>}) {
+                my $n = $node;
+                {
+                  if ($newNode->{<Q:TreeCore:nodeID>} eq
+                      $n->{<Q:TreeCore:nodeID>}) {
+                    __EXCEPTION{
+                      DOMException.HIERARCHY_REQUEST_ERR:
+                        <Q:MDOM_EXCEPTION:subtype>
+                             => <Q:MDOM_EXCEPTION:HIERARCHY_ANCESTOR_OR_SELF>,
+                        <Q:MDOM_EXCEPTION:param-name> => 'newChild',
+                    }__;
+                  }
+                  if ($n->{<Q:infoset:parent>}) {
+                    $n = $n->{<Q:infoset:parent>};
+                    redo;
+                  }
+                }
+              }
+              
+              ## Seek the $refChild
+              my $newIndex = @{$node->{<Q:infoset:children>}};
+              REFCHILD: {
+                if (defined $refChild) {
+                  my $refID = $refChild->{<Q:TreeCore:node>}
+                                       ->{<Q:TreeCore:nodeID>};
+                  for my $i (0..$#{$node->{<Q:infoset:children>}}) {
+                    if ($node->{<Q:infoset:children>}->[$i]
+                             ->{<Q:TreeCore:nodeID>} eq $refID) {
+                      $newIndex = $i;
+                      last REFCHILD;
+                    }
+                  }
+                  __EXCEPTION{
+                    DOMException.NOT_FOUND_ERR:
+                      <Q:MDOM_EXCEPTION:param-name> => 'refChild',
+                  }__;
+                }
+              } # REFCHILD
+              if ($newNode[0]->{<Q:infoset:parent>} and
+                  $newNode[0]->{<Q:infoset:parent>}->{<Q:TreeCore:nodeID>} eq
+                  $node->{<Q:TreeCore:nodeID>}) {
+                if (@newNode > 1) {
+                  __EXCEPTION{
+                    ManakaiDOMImplementationException.MDOM_DEBUG_BUG:
+                  }__;
+                } elsif (ref $refChild and
+                         $newNode[0]->{<Q:TreeCore:nodeID>} eq
+                         $refChild->{<Q:TreeCore:node>}->{<Q:TreeCore:nodeID>}) {
+                  __WARNING{
+                    ManakaiDOMImplementationWarning.MDOM_NEWCHILD_IS_REFCHILD: 
+                      <Q:MDOM_EXCEPTION:newChild-param-name> => 'newChild',
+                      <Q:MDOM_EXCEPTION:refChild-param-name> => 'refChild',
+                  }__;
+                  ## And no action.
+                } else {
+                  my $currentIndex;
+                  for my $i (0..$#{$node->{<Q:infoset:children>}}) {
+                    if ($node->{<Q:infoset:children>}->[$i]
+                             ->{<Q:TreeCore:nodeID>} eq
+                        $newNode[0]->{<Q:TreeCore:nodeID>}) {
+                      $currentIndex = $i;
+                    }
+                  }
+                  if ($newIndex < $currentIndex) {
+                    delete $node->{<Q:infoset:children>}->[$currentIndex];
+                    splice @{$node->{<Q:infoset:children>}},
+                           $newIndex, 0, @newNode;
+                  } else {
+                    splice @{$node->{<Q:infoset:children>}},
+                           $newIndex, 0, @newNode;
+                    delete $node->{<Q:infoset:children>}->[$currentIndex];
+                  }
+                }
+              } else { ## $newChild->parentNode ne $self
+                for my $newNode (@newNode) {
+                  delete $newNode->{<Q:infoset:parent>};
+                  $node->__SUPER{ManakaiDOMNodeObject::}__::__INT{importTree}__
+                                                                   ($newNode);
+                  $newNode->{<Q:infoset:parent>} = $node;
+                }
+                splice @{$node->{<Q:infoset:children>}},
+                       $newIndex, 0, @newNode;
+              }
+              
+              if ($newNode->{<Q:DOMCore:nodeType>} eq
+                  <Q:DOMCore:DocumentFragment>) {
+                $newNode->{<Q:infoset:children>} = [];
+              } elsif ($parentNode) {
+                for my $i (0..$#{$parentNode->{<Q:infoset:children>}}) {
+                  if ($parentNode->{<Q:infoset:children>}->[$i]
+                                 ->{<Q:TreeCore:nodeID>} eq
+                      $node->{<Q:TreeCore:nodeID>}) {
+                    delete $parentNode->{<Q:infoset:children>}->[$i];
+                    last;
+                  }
+                }
+              }
+            } # @newNode
+            $r = $newChild;
+     @@Level[list]:
+        1
+     @@SpecLevel[list]:
+        1
+        3
+  @Method:
+     @@Name:  replaceChild
+     @@Description:
+        @@@lang:en
+        @@@@:
+          Replace a child node with the other node.
      @@Param:
         @@@Name:  newChild
         @@@Type:  Node
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The new node to put in the child list.  If the "newChild" node 
+            is already in the tree, it is first removed.
+        @@@InCase:
+          @@@@Type: DocumentFragment
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The "oldChild" node is replaced by all of the 
+              child nodes of the "newChild" node, in the same order. 
+              The child list of the "newChild" is to be empty. 
+              [DOM 1 SE, 2, 3]
      @@Param:
         @@@Name:  oldChild
         @@@Type:  Node
-     @@ModifiedLevel[list]:  3
-  @Method:
-     @@Name:  removeChild
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The node being replaced in the child list.
+        @@@InCase:
+          @@@@Label: Same as the "newChild" node
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Replacing a node with itself is implementation dependent.
+          @@@@SpecLevel: 3
      @@Return:
         @@@Type:  Node
-        @@@Exception[list]:  DOMException
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node replaced.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: HIERARCHY_REQUEST_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either this node is of a type that does not allow 
+              children of the type of the "newChild" node [DOM 1, 2, 3],
+              the node to put in is one of ancestors of this node 
+              [DOM 1, 2, 3], the node to put in is this node itself
+              [DOM 3], or this 
+              node is of type "Document" and the result of the 
+              replacement would add a second "DocumentType" or "Element" node.
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              Special treatment required for the "DocumentFragment" node.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: WRONG_DOCUMENT_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The new node was created from a different document.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either this node is read-only [DOM 1, 2, 3] or the parent of the 
+              new node is read-only [DOM 1 SE, 2, 3].
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NOT_FOUND_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The "oldChild" node is not a child of this node.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NOT_SUPPORTED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This node is of type "Document" and the DOM implementation 
+              does not support the replacement of the "DocumentType" or 
+              "Element" child.
+          @@@@SpecLevel:3
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $node;
+            my $newNode;
+            CHKDOC: {
+              if (ref $newChild and $newChild->isa ('__IIF{Node::}__')) {
+                $node = $self->{<Q:TreeCore:node>};
+                $newNode = $newChild->{<Q:TreeCore:node>};
+                if ($node->{<Q:DOMCore:ownerDocument>}) {
+                  if ($newNode->{<Q:DOMCore:ownerDocument>}) {
+                    last CHKDOC if $node->{<Q:DOMCore:ownerDocument>}
+                                        ->{<Q:TreeCore:nodeID>} eq
+                                   $newNode->{<Q:DOMCore:ownerDocument>}
+                                        ->{<Q:TreeCore:nodeID>};
+                  }
+                } else { ## I'm "Document" or "DocumentType" node.
+                  if ($node->{<Q:DOMCore:nodeType>} eq <Q:infoset:Document>) {
+                    last CHKDOC;
+                  }
+                }
+              }
+              __EXCEPTION{
+                DOMException.WRONG_DOCUMENT_ERR:
+                  <Q:MDOM_EXCEPTION:param-name> => 'newChild',
+              }__;
+            } # CHKDOC
+            my @newNode = ($newNode);
+            if ($newNode->{<Q:DOMCore:nodeType>} eq
+                <Q:DOMCore:DocumentFragment>) {
+       \       @newNode = @{$newNode->{<Q:infoset:children>}};
+            }
+            if (@newNode) {
+              my $parentNode = $newNode[0]->{<Q:infoset:parent>};
+
+              ## Read-only?
+              if ($node->{<Q:DOMCore:read-only>}) {
+                ## This node is read-only.
+                __EXCEPTION{
+                  DOMException.NO_MODIFICATION_ALLOWED_ERR:
+                    <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_DEST>,
+                }__;
+              } elsif ($parentNode and $parentNode->{<Q:DOMCore:read-only>}) {
+                ## Parent of new node(s) is read-only
+                __EXCEPTION{
+                  DOMException.NO_MODIFICATION_ALLOWED_ERR:
+                    <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_SRC>,
+                    <Q:MDOM_EXCEPTION:param-name> => 'newChild',
+                }__;
+              }
+              
+              ## Check type of this node and new child node
+              CHKTYPE: {
+                if ({
+                      <Q:infoset:Element> => 1,
+                      <Q:DOMCore:DocumentFragment> => 1,
+                      <Q:DOMCore:Entity> => 1,
+                      <Q:DOMCore:EntityReference> => 1,
+                    }->{$node->{<Q:DOMCore:nodeType>}}) {
+                  CHILDTYPE: {
+                    for (@newNode) {
+                      unless ({
+                            <Q:infoset:Element> => 1,
+                            <Q:DOMCore:Text> => 1,
+                            <Q:infoset:Comment> => 1,
+                            <Q:infoset:ProcessingInstruction> => 1,
+                            <Q:DOMCore:CDATASection> => 1,
+                            <Q:DOMCore:EntityReference> => 1,
+                          }->{$_->{<Q:DOMCore:nodeType>}}) {
+                        last CHILDTYPE;
+                      }
+                    }
+                    last CHKTYPE; # No problem
+                  }
+                } elsif ($node->{<Q:DOMCore:nodeType>} eq <Q:infoset:Document>) {
+                  CHILDTYPE: {
+                    my %has;
+                    EACHNEWNODE: for my $newNode (@newNode) {
+                      if ({
+                            <Q:infoset:Element> => 1,
+                            <Q:infoset:DocumentTypeDeclaration> => 1,
+                          }->{$newNode->{<Q:DOMCore:nodeType>}}) {
+                        FOUND: {
+                          if ($has{$newNode->{<Q:DOMCore:nodeType>}}) {
+                            ## DOCTYPE or document element is waiting 
+                            ## to be added
+                            last FOUND;
+                          }
+                          for (@{$node->{<Q:infoset:children>}}) {
+                            ## Document already has a DOCTYPE or doc.element
+                            last FOUND if $_->{<Q:DOMCore:nodeType>} eq
+                                          $newNode->{<Q:DOMCore:nodeType>};
+                          }
+                          $has{$newNode->{<Q:DOMCore:nodeType>}} = 1;
+                          next EACHNEWNODE;
+                        }
+                        __EXCEPTION{
+                          DOMException.HIERARCHY_REQUEST_ERR:
+                            <Q:MDOM_EXCEPTION:subtype>
+                                 => <Q:MDOM_EXCEPTION:HIERARCHY_TOO_MANY_NODES>,
+                            <Q:DOMCore:nodeType>
+                                 => $newNode->{<Q:DOMCore:nodeType>},
+                            <Q:MDOM_EXCEPTION:param-name> => 'newChild',
+                        }__;
+                      } elsif (not {
+                                 <Q:infoset:Comment> => 1,
+                                 <Q:infoset:ProcessingInstruction> => 1,
+                               }->{$newNode->{<Q:DOMCore:nodeType>}}) {
+                        last CHILDTYPE;
+                      }
+                    } # EACHNEWNODE
+                    last CHKTYPE; # No problem
+                  } # CHILDTYPE
+                } elsif ($node->{<Q:DOMCore:nodeType>} eq
+                         <Q:infoset:Attribute>) {
+                  CHILDTYPE: {
+                    for my $newNode (@newNode) {
+                      unless ({
+                            <Q:DOMCore:Text> => 1,
+                            <Q:DOMCore:EntityReference> => 1,
+                          }->{$newNode->{<Q:DOMCore:nodeType>}}) {
+                        last CHILDTYPE;
+                      }
+                    }
+                    last CHKTYPE; # No problem
+                  }
+                } # $node->{<Q:DOMCore:nodeType>}
+                __EXCEPTION{
+                  DOMException.HIERARCHY_REQUEST_ERR:
+                    <Q:MDOM_EXCEPTION:subtype>
+                         => <Q:MDOM_EXCEPTION:HIERARCHY_BAD_TYPE>,
+                    <Q:infoset:nodeType> => $newNode->{<Q:infoset:nodeType>},
+                    <Q:MDOM_EXCEPTION:param-name> => 'newChild',
+                }__;
+              } # CHKTYPE
+              
+              ## Check $newNode (not $newNode[0]) = ancestor-or-self::node()
+              if ($node->{<Q:TreeCore:treeID>} eq
+                  $newNode->{<Q:TreeCore:treeID>}) {
+                my $n = $node;
+                {
+                  if ($newNode->{<Q:TreeCore:nodeID>} eq
+                      $n->{<Q:TreeCore:nodeID>}) {
+                    __EXCEPTION{
+                      DOMException.HIERARCHY_REQUEST_ERR:
+                        <Q:MDOM_EXCEPTION:subtype>
+                             => <Q:MDOM_EXCEPTION:HIERARCHY_ANCESTOR_OR_SELF>,
+                        <Q:MDOM_EXCEPTION:param-name> => 'newChild',
+                    }__;
+                  }
+                  if ($n->{<Q:infoset:parent>}) {
+                    $n = $n->{<Q:infoset:parent>};
+                    redo;
+                  }
+                }
+              }
+              
+              ## Seek the $oldChild
+              my $newIndex = @{$node->{<Q:infoset:children>}};
+              REFCHILD: {
+                if (defined $oldChild) {
+                  my $refID = $oldChild->{<Q:TreeCore:node>}
+                                       ->{<Q:TreeCore:nodeID>};
+                  for my $i (0..$#{$node->{<Q:infoset:children>}}) {
+                    if ($node->{<Q:infoset:children>}->[$i]
+                             ->{<Q:TreeCore:nodeID>} eq $refID) {
+                      $newIndex = $i;
+                      last REFCHILD;
+                    }
+                  }
+                  __EXCEPTION{
+                    DOMException.NOT_FOUND_ERR:
+                      <Q:MDOM_EXCEPTION:param-name> => 'oldChild',
+                  }__;
+                }
+              } # REFCHILD
+              if ($newNode[0]->{<Q:infoset:parent>} and
+                  $newNode[0]->{<Q:infoset:parent>}->{<Q:TreeCore:nodeID>} eq
+                  $node->{<Q:TreeCore:nodeID>}) {
+                if (@newNode > 1) {
+                  __EXCEPTION{
+                    ManakaiDOMImplementationException.MDOM_DEBUG_BUG:
+                  }__;
+                } elsif (ref $oldChild and
+                         $newNode[0]->{<Q:TreeCore:nodeID>} eq
+                         $oldChild->{<Q:TreeCore:node>}->{<Q:TreeCore:nodeID>}) {
+                  __WARNING{
+                    ManakaiDOMImplementationWarning.MDOM_NEWCHILD_IS_REFCHILD: 
+                      <Q:MDOM_EXCEPTION:newChild-param-name> => 'newChild',
+                      <Q:MDOM_EXCEPTION:refChild-param-name> => 'oldChild',
+                  }__;
+                  ## And no action.
+                } else {
+                  my $currentIndex;
+                  for my $i (0..$#{$node->{<Q:infoset:children>}}) {
+                    if ($node->{<Q:infoset:children>}->[$i]
+                             ->{<Q:TreeCore:nodeID>} eq
+                        $newNode[0]->{<Q:TreeCore:nodeID>}) {
+                      $currentIndex = $i;
+                    }
+                  }
+                  if ($newIndex < $currentIndex) {
+                    delete $node->{<Q:infoset:children>}->[$currentIndex];
+                    splice @{$node->{<Q:infoset:children>}},
+                           $newIndex, 1, @newNode;
+                  } else {
+                    splice @{$node->{<Q:infoset:children>}},
+                           $newIndex, 1, @newNode;
+                    delete $node->{<Q:infoset:children>}->[$currentIndex];
+                  }
+                }
+              } else { ## $newChild->parentNode ne $self
+                for my $newNode (@newNode) {
+                  delete $newNode->{<Q:infoset:parent>};
+                  $node->__SUPER{ManakaiDOMNodeObject::}__::__INT{importTree}__
+                                                                   ($newNode);
+                  $newNode->{<Q:infoset:parent>} = $node;
+                }
+                splice @{$node->{<Q:infoset:children>}},
+                       $newIndex, 1, @newNode;
+              }
+              
+              if ($newNode->{<Q:DOMCore:nodeType>} eq
+                  <Q:DOMCore:DocumentFragment>) {
+                $newNode->{<Q:infoset:children>} = [];
+              } elsif ($parentNode) {
+                for my $i (0..$#{$parentNode->{<Q:infoset:children>}}) {
+                  if ($parentNode->{<Q:infoset:children>}->[$i]
+                                 ->{<Q:TreeCore:nodeID>} eq
+                      $node->{<Q:TreeCore:nodeID>}) {
+                    delete $parentNode->{<Q:infoset:children>}->[$i];
+                    last;
+                  }
+                }
+              }
+              delete $oldChild->{<Q:TreeCore:node>}->{<Q:infoset:parent>};
+              $oldChild->{<Q:TreeCore:node>}
+                       ->__SUPER{ManakaiDOMNodeObject::}__::__INT{orphanate}__;
+            } # @newNode
+            $r = $oldChild;
+     @@Level[list]:
+        1
+        3
+     @@SpecLevel[list]:
+        1
+        3
+  @Method:
+     @@Name:  removeChild
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Remove a child node from the list of children and return it.
      @@Param:
         @@@Name:  oldChild
         @@@Type:  Node
-     @@ModifiedLevel[list]:  3
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node being removed.
+     @@Return:
+        @@@Type:  Node
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node removed.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: This node is read-only.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NOT_FOUND_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The "oldChild" is not a child of this node.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NOT_SUPPORTED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This node is of type "Document" and the DOM implementation 
+              does not support the removal of the "DocumentType" or 
+              "Element" child.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $node = $self->{<Q:TreeCore:node>};
+            if ($node->{<Q:DOMCore:read-only>}) {
+              __EXCEPTION{
+                DOMException.NO_MODIFICATION_ALLOWED_ERR:
+                  
+              }__;
+            }
+            my $oldChildID = ref $oldChild ?
+                               $oldChild->{<Q:TreeCore:node>}
+                                        ->{<Q:TreeCore:nodeID>} : '';
+            FIND: {
+              for my $i (0..$#{$node->{<Q:infoset:children>}}) {
+                if ($node->{<Q:infoset:children>}->[$i]
+                         ->{<Q:TreeCore:nodeID>} eq $oldChildID) {
+                  delete $node->{<Q:infoset:children>}->[$i];
+                  last FIND;
+                }
+              }
+              __EXCEPTION{
+                DOMException.NOT_FOUND_ERR:
+              }__;
+            }
+            if (ref $oldChild) {
+              $r = $oldChild;
+              delete $oldChild->{<Q:TreeCore:node>}->{<Q:infoset:parent>};
+              $oldChild->{<Q:TreeCore:node>}
+                ->__SUPER{ManakaiDONNodeObject::}__::__INT{orphanate}__;
+            }
+     @@Level[list]:  3
+     @@SpecLevel:3
   @Method:
      @@Name:  appendChild
      @@Description:
@@ -1971,6 +2707,11 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@: The node added.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            What should be returned when the "newChild" node is a 
+            "DocumentFragment" is unclear.
         @@@Exception:
           @@@@Type: DOMException
           @@@@Name: HIERARCHY_REQUEST_ERR
@@ -1978,8 +2719,8 @@ IF:
             @@@@@lang:en
             @@@@@@:
               Either this node is of a type that does not allow 
-              children of the type of the "newChild" node [DOM 1,2,3], 
-              the node to add is one of ancestors of this node [DOM 1,2,3],
+              children of the type of the "newChild" node [DOM 1, 2, 3], 
+              the node to add is one of ancestors of this node [DOM 1, 2, 3],
               the node to add is this node itself [DOM 3] or 
               this node is of type "Document" and the attemption 
               to append a second "DocumentType" or "Element" node 
@@ -2004,7 +2745,7 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              Either this node is read-only [DOM 1,2,3] or
+              Either this node is read-only [DOM 1, 2, 3] or
               the previous (current) parent 
               of the "newChild" node is read-only [DOM 3].
         @@@Exception:
@@ -2047,130 +2788,168 @@ IF:
                   <Q:MDOM_EXCEPTION:param-name> => 'newChild',
               }__;
             } # CHKDOC
-            my $parentNode = $newNode->{<Q:infoset:parent>};
-            if ($node->{<Q:DOMCore:read-only>}) {
-              __EXCEPTION{
-                DOMException.NO_MODIFICATION_ALLOWED_ERR:
-                  <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_DEST>,
-                  <Q:MDOM_EXCEPTION:param-name> => 'newChild',
-              }__;
-            } elsif ($parentNode and $parentNode->{<Q:DOMCore:read-only>}) {
-              __EXCEPTION{
-                DOMException.NO_MODIFICATION_ALLOWED_ERR:
-                  <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_SRC>,
-                  <Q:MDOM_EXCEPTION:param-name> => 'newChild',
-              }__;
-            }
-            CHKTYPE: {
-              if ({
-                    <Q:infoset:Element> => 1,
-                    <Q:DOMCore:DocumentFragment> => 1,
-                    <Q:DOMCore:Entity> => 1,
-                    <Q:DOMCore:EntityReference> => 1,
-                  }->{$node->{<Q:DOMCore:nodeType>}}) {
-                if ({
-                      <Q:infoset:Element> => 1,
-                      <Q:DOMCore:Text> => 1,
-                      <Q:infoset:Comment> => 1,
-                      <Q:infoset:ProcessingInstruction> => 1,
-                      <Q:DOMCore:CDATASection> => 1,
-                      <Q:DOMCore:EntityReference> => 1,
-                    }->{$newNode->{<Q:DOMCore:nodeType>}}) {
-                  last CHKTYPE;
-                }
-              } elsif ($node->{<Q:DOMCore:nodeType>} eq <Q:infoset:Document>) {
-                if ({
-                      <Q:infoset:Element> => 1,
-                      <Q:infoset:DocumentTypeDeclaration> => 1,
-                    }->{$newNode->{<Q:DOMCore:nodeType>}}) {
-                  FOUND: {
-                    for (@{$node->{<Q:infoset:children>}}) {
-                      last FOUND if $_->{<Q:DOMCore:nodeType>} eq
-                                    $newNode->{<Q:DOMCore:nodeType>};
-                    }
-                    last CHKTYPE;
-                  }
-                  __EXCEPTION{
-                    DOMException.HIERARCHY_REQUEST_ERR:
-                     <Q:MDOM_EXCEPTION:subtype>
-                          => <Q:MDOM_EXCEPTION:HIERARCHY_TOO_MANY_NODES>,
-                     <Q:DOMCore:nodeType> => $newNode->{<Q:DOMCore:nodeType>},
-                     <Q:MDOM_EXCEPTION:param-name> => 'newChild',
-                  }__;
-                } elsif ({
-                           <Q:infoset:Comment> => 1,
-                           <Q:infoset:ProcessingInstruction> => 1,
-                         }->{$newNode->{<Q:DOMCore:nodeType>}}) {
-                  last CHKTYPE;
-                }
-              } elsif ($node->{<Q:DOMCore:nodeType>} eq <Q:infoset:Attribute>) {
-                if ({
-                      <Q:DOMCore:Text> => 1,
-                      <Q:DOMCore:EntityReference> => 1,
-                    }->{$newNode->{<Q:DOMCore:nodeType>}}) {
-                  last CHKTYPE;
-                }
-              } # $node->{<Q:DOMCore:nodeType>}
-              __EXCEPTION{
-                DOMException.HIERARCHY_REQUEST_ERR:
-                  <Q:MDOM_EXCEPTION:subtype>
-                       => <Q:MDOM_EXCEPTION:HIERARCHY_BAD_TYPE>,
-                  <Q:infoset:nodeType> => $newNode->{<Q:infoset:nodeType>},
-                  <Q:MDOM_EXCEPTION:param-name> => 'newChild',
-              }__;
-            } # CHKTYPE
-            if ($node->{<Q:TreeCore:treeID>} eq
-                $newNode->{<Q:TreeCore:treeID>}) {
-              my $n = $newNode;
-              {
-                if ($n->{<Q:TreeCore:nodeID>} eq $node->{<Q:TreeCore:nodeID>}) {
-                  __EXCEPTION{
-                    DOMException.HIERARCHY_REQUEST_ERR:
-                      <Q:MDOM_EXCEPTION:subtype>
-                           => <Q:MDOM_EXCEPTION:HIERARCHY_ANCESTOR_OR_SELF>,
-                      <Q:MDOM_EXCEPTION:param-name> => 'newChild',
-                  }__;
-                }
-                if ($n->{<Q:infoset:parent>}) {
-                  $n = $n->{<Q:infoset:parent>};
-                  redo;
-                }
-              }
-            }
+            my @newNode = ($newNode);
             if ($newNode->{<Q:DOMCore:nodeType>} eq
                 <Q:DOMCore:DocumentFragment>) {
-              my @newNode = @{$newNode->{<Q:infoset:children>}};
-              $newNode->{<Q:infoset:children>} = [];
+       \       @newNode = @{$newNode->{<Q:infoset:children>}};
+            }
+            if (@newNode) {
+              my $parentNode = $newNode[0]->{<Q:infoset:parent>};
+
+              ## Read-only?
+              if ($node->{<Q:DOMCore:read-only>}) {
+                ## This node is read-only.
+                __EXCEPTION{
+                  DOMException.NO_MODIFICATION_ALLOWED_ERR:
+                    <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_DEST>,
+                }__;
+              } elsif ($parentNode and $parentNode->{<Q:DOMCore:read-only>}) {
+                ## Parent of new node(s) is read-only
+                __EXCEPTION{
+                  DOMException.NO_MODIFICATION_ALLOWED_ERR:
+                    <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NOMOD_SRC>,
+                    <Q:MDOM_EXCEPTION:param-name> => 'newChild',
+                }__;
+              }
+              
+              ## Check type of this node and new child node
+              CHKTYPE: {
+                if ({
+                      <Q:infoset:Element> => 1,
+                      <Q:DOMCore:DocumentFragment> => 1,
+                      <Q:DOMCore:Entity> => 1,
+                      <Q:DOMCore:EntityReference> => 1,
+                    }->{$node->{<Q:DOMCore:nodeType>}}) {
+                  CHILDTYPE: {
+                    for (@newNode) {
+                      unless ({
+                            <Q:infoset:Element> => 1,
+                            <Q:DOMCore:Text> => 1,
+                            <Q:infoset:Comment> => 1,
+                            <Q:infoset:ProcessingInstruction> => 1,
+                            <Q:DOMCore:CDATASection> => 1,
+                            <Q:DOMCore:EntityReference> => 1,
+                          }->{$_->{<Q:DOMCore:nodeType>}}) {
+                        last CHILDTYPE;
+                      }
+                    }
+                    last CHKTYPE; # No problem
+                  }
+                } elsif ($node->{<Q:DOMCore:nodeType>} eq <Q:infoset:Document>) {
+                  CHILDTYPE: {
+                    my %has;
+                    EACHNEWNODE: for my $newNode (@newNode) {
+                      if ({
+                            <Q:infoset:Element> => 1,
+                            <Q:infoset:DocumentTypeDeclaration> => 1,
+                          }->{$newNode->{<Q:DOMCore:nodeType>}}) {
+                        FOUND: {
+                          if ($has{$newNode->{<Q:DOMCore:nodeType>}}) {
+                            ## DOCTYPE or document element is waiting 
+                            ## to be added
+                            last FOUND;
+                          }
+                          for (@{$node->{<Q:infoset:children>}}) {
+                            ## Document already has a DOCTYPE or doc.element
+                            last FOUND if $_->{<Q:DOMCore:nodeType>} eq
+                                          $newNode->{<Q:DOMCore:nodeType>};
+                          }
+                          $has{$newNode->{<Q:DOMCore:nodeType>}} = 1;
+                          next EACHNEWNODE;
+                        }
+                        __EXCEPTION{
+                          DOMException.HIERARCHY_REQUEST_ERR:
+                            <Q:MDOM_EXCEPTION:subtype>
+                                 => <Q:MDOM_EXCEPTION:HIERARCHY_TOO_MANY_NODES>,
+                            <Q:DOMCore:nodeType>
+                                 => $newNode->{<Q:DOMCore:nodeType>},
+                            <Q:MDOM_EXCEPTION:param-name> => 'newChild',
+                        }__;
+                      } elsif (not {
+                                 <Q:infoset:Comment> => 1,
+                                 <Q:infoset:ProcessingInstruction> => 1,
+                               }->{$newNode->{<Q:DOMCore:nodeType>}}) {
+                        last CHILDTYPE;
+                      }
+                    } # EACHNEWNODE
+                    last CHKTYPE; # No problem
+                  } # CHILDTYPE
+                } elsif ($node->{<Q:DOMCore:nodeType>} eq
+                         <Q:infoset:Attribute>) {
+                  CHILDTYPE: {
+                    for my $newNode (@newNode) {
+                      unless ({
+                            <Q:DOMCore:Text> => 1,
+                            <Q:DOMCore:EntityReference> => 1,
+                          }->{$newNode->{<Q:DOMCore:nodeType>}}) {
+                        last CHILDTYPE;
+                      }
+                    }
+                    last CHKTYPE; # No problem
+                  }
+                } # $node->{<Q:DOMCore:nodeType>}
+                __EXCEPTION{
+                  DOMException.HIERARCHY_REQUEST_ERR:
+                    <Q:MDOM_EXCEPTION:subtype>
+                         => <Q:MDOM_EXCEPTION:HIERARCHY_BAD_TYPE>,
+                    <Q:infoset:nodeType> => $newNode->{<Q:infoset:nodeType>},
+                    <Q:MDOM_EXCEPTION:param-name> => 'newChild',
+                }__;
+              } # CHKTYPE
+              
+              ## Check $newNode (not $newNode[0]) = ancestor-or-self::node()
+              if ($node->{<Q:TreeCore:treeID>} eq
+                  $newNode->{<Q:TreeCore:treeID>}) {
+                my $n = $node;
+                {
+                  if ($newNode->{<Q:TreeCore:nodeID>} eq
+                      $n->{<Q:TreeCore:nodeID>}) {
+                    __EXCEPTION{
+                      DOMException.HIERARCHY_REQUEST_ERR:
+                        <Q:MDOM_EXCEPTION:subtype>
+                             => <Q:MDOM_EXCEPTION:HIERARCHY_ANCESTOR_OR_SELF>,
+                        <Q:MDOM_EXCEPTION:param-name> => 'newChild',
+                    }__;
+                  }
+                  if ($n->{<Q:infoset:parent>}) {
+                    $n = $n->{<Q:infoset:parent>};
+                    redo;
+                  }
+                }
+              }
+              
               for my $newNode (@newNode) {
                 delete $newNode->{<Q:infoset:parent>};
                 $node->__SUPER{ManakaiDOMNodeObject::}__::__INT{importTree}__
-                                                                   ($newNode);
+                                                                 ($newNode);
                 $newNode->{<Q:infoset:parent>} = $node;
               }
               push @{$node->{<Q:infoset:children>}}, @newNode;
-            } else {
-              if ($parentNode) {
+
+              if ($newNode->{<Q:DOMCore:nodeType>} eq
+                  <Q:DOMCore:DocumentFragment>) {
+                $newNode->{<Q:infoset:children>} = [];
+              } elsif ($parentNode) {
                 for my $i (0..$#{$parentNode->{<Q:infoset:children>}}) {
                   if ($parentNode->{<Q:infoset:children>}->[$i]
                                  ->{<Q:TreeCore:nodeID>} eq
-                      $newNode->{<Q:TreeCore:nodeID>}) {
+                      $node->{<Q:TreeCore:nodeID>}) {
                     delete $parentNode->{<Q:infoset:children>}->[$i];
                     last;
                   }
                 }
-                delete $newNode->{<Q:infoset:parent>};
               }
-              $node->__SUPER{ManakaiDOMNodeObject::}__::__INT{importTree}__
-                                                                 ($newNode);
-              push @{$node->{<Q:infoset:children>}}, $newNode;
-              $newNode->{<Q:infoset:parent>} = $node;
-            } # $newNode->{<Q:DOMCore:nodeType>}
+            } # @newNode
+            $r = $newChild;
      @@Level[list]:
         1
         3
      @@SpecLevel[list]:
         1
         3
+     @@ImplNote:
+       @@@lang:en
+       @@@@: See also the implementation note of the "insertBefore" method.
   @Method:
      @@Name:  hasChildNodes
      @@Description:
@@ -2204,13 +2983,18 @@ IF:
   @Method:
      @@Name:  normalize
      @@Level[list]:
-       1
        2
        3
      @@SpecLevel[list]:
-       1
        2
        3
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         This method was defined in the "Element" interface in the DOM 
+         Level 1, but has beem moved to the "Node" interface in the 
+         DOM Level 2.
+     @@RedefinedBy: Element
   @Method:
      @@Name:  isSupported
      @@Return:
@@ -2468,14 +3252,125 @@ IF:
      @@SpecLevel:3
   @Attr:
      @@Name:  textContent
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The text content of this node and its descendants.
      @@Get:
         @@@Type:  DOMString
-        @@@Exception[list]:  DOMException
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The text content of this node.
+        @@@InCase:
+          @@@@Label: Concatenation of the text content of child nodes
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+            For the node of type "Element", "Attr", "Entity", 
+            "EntityReference" or "DocumentFragment",  
+            concatenation of the "textContent" value of every 
+            child node, excluding of type "Comment" or 
+            "ProcessingInstruction", is the text content.
+        @@@InCase:
+          @@@@Label: "nodeValue"
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              For the node of type "Text", "CDATASection", 
+              "Comment" or "ProcessingInstruction", the text content 
+              is same as the value of the attribute "nodeValue".
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              For the node of type "Document", "DocumentType" or 
+              "Notation", the text content is defined to be "null".
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: DOMSTRING_SIZE_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The attribute would return more characters than 
+              fit in a "DOMString" variable on the implementation 
+              platform.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            __DEEP{
+              for (@{$self->{<Q:TreeCore:node>}->{<Q:infoset:children>}}) {
+                if ($_->{<Q:DOMCore:nodeType>} ne <Q:infoset:Comment> and
+                   $_->{<Q:DOMCore:nodeType>} ne
+                                       <Q:infoset:ProcessingInstruction>) {
+                  $r .= $_->textContent;
+                }
+              }
+            }__;
      @@Set:
         @@@Type:  DOMString
-        @@@Exception[list]:  DOMException
-     @@Level[list]:  3
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            Any child nodes of this node are removed and 
+            replaced by a single "Text" node containing the string 
+            specified.
+          \
+            Note that when the "textContent" is defined to be "null", 
+            setting the value has no effect.
+        @@@InCase:
+          @@@@Value:\
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Any child nodes are removed if the value is not defined to 
+              be "null".
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              Any child nodes are removed if the value is not defined 
+              to be "null".
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Descriptin:
+            @@@@@lang:en
+            @@@@@@: This node is read-only.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $node = $self->{<Q:TreeCore:node>};
+            if ($node->{<Q:DOMCore:read-only>}) {
+              __EXCEPTION{
+                DOMException.NO_MODIFICATION_ALLOWED_ERR:
+              }__;
+            }
+            my @oldChild = @{$node->{<Q:infoset:children>}};
+            for (@oldChild) {
+              delete $_->{<Q:infoset:parent>};
+            }
+                           ## Condition sensitive
+            my $textNode = __CLASS{Text}__->__INT{newObject}__;
+            $textNode->{<Q:infoset:content>} = $given;
+            $node->{<Q:infoset:children>} = [$textNode];
+            for (@oldChild) {
+              $_->__SUPER{ManakaiDOMNodeObject}__::__INT{orphanate}__;
+            }
+     @@Level[list]:
+        3
      @@SpecLevel:3
+     @@RedefinedBy: Document
+     @@RedefinedBy: DocumentType
+     @@RedefinedBy: Notation
+     @@RedefinedBy: CharacterData
+     @@RedefinedBy: ProcessingInstrction
   @Method:
      @@Name:  isSameNode
      @@Description:
@@ -2807,70 +3702,365 @@ IF:
 IF:
   @Name:  CharacterData
   @ISA: Node
+  @ImplNote:
+    @@lang:en
+    @@@:
+      The DOM implementation may not put arbitary limits on the 
+      amount of the data that may be stored in a "CharacterData" node. 
+      However, the implementation limits may mean that the entirety of 
+      a node's data may not fit into a single "DOMString".
+  @ImplNote:
+    @@lang:en
+    @@@:
+      "Comment" and "Text" are "CharacterData".  "CDATASection" is a "Text".
   @Attr:
      @@Name:  data
+     @@Description:
+       @@@lang:en
+       @@@@: The character data of the node.
      @@Get:
         @@@Type:  DOMString
-        @@@Exception[list]:  DOMException
-  @@@Def: ##TBD
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: DOMSTRING_SIZE_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The attribute would return more characters than 
+              fit in a "DOMString" variable on the implementation 
+              platform.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            infoset:content
      @@Set:
         @@@Type:  DOMString
-        @@@Exception[list]:  DOMException
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The node is read-only.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@SetProp:
+            @@@@@@:
+              infoset:content
+            @@@@@CheckReadOnly:1
+  @IntMethod:
+    @@Name: getDOMStringValue
+    @@Description:
+      @@@lang:en
+      @@@@: Get the value as DOMString.
+    @@Return:
+      @@@Type: DOMString
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          if (ref $self->{<Q:TreeCore:node>}->{<Q:infoset:content>} and
+              $self->{<Q:TreeCore:node>}->{<Q:infoset:content>}
+                   ->isa ('__IIF{DOMString::}__')) {
+            $r = $self->{<Q:TreeCore:node>}->{<Q:infoset:content>};
+          } else {
+            $r = \$self->{<Q:TreeCore:node>}->{<Q:infoset:content>};
+            if (defined $$r) {
+              __CODE{DOMString: s => r, r => r}__;
+            } else {
+              $r = null;
+            }
+          }
   @Attr:
      @@Name:  length
+     @@Description:
+       @@@lang:en
+       @@@@: 
+         The number of 16-bit units of the "data".
      @@Get:
         @@@Type:  unsigned-long
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The number of 16-bit units of the "data".
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            __INT{{getDOMStringValue}}__;
+            if (defined $r) {
+              __DEEP{
+                $r = $r->length;
+              }__;
+            } else {
+              $r = 0;
+            }
   @Method:
      @@Name:  substringData
-     @@Return:
-        @@@Type:  DOMString
-        @@@Exception[list]:  DOMException
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Extract a range of data from the node.
      @@Param:
         @@@Name:  offset
         @@@Type:  unsigned-long
+        @@@Description:
+          @@@@lang:en
+          @@@@@: Start offset of substring to extract.
      @@Param:
         @@@Name:  count
         @@@Type:  unsigned-long
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+          The number of 16-bit units to extract.  If the sum of the
+          parameters offset and count exceeds the length of the
+          DOMString then all 16-bit units from offset to the end
+          of the DOMString are returned.
+    @@Return:
+      @@@Type: DOMString
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The specified substring.
+      @@@Exception:
+        @@@@Type: DOMException
+        @@@@Name: INDEX_SIZE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The specified "offset" is negative or greater than
+            the number of 16-bit units in the "DOMString", or the specified
+            "count" is negative.
+      @@@Exception:
+        @@@@Type: DOMException
+        @@@@Name: DOMSTRING_SIZE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The specified range does not fit into a "DOMString".
+      @@@Exception:
+        @@@@Type: 
+          ManakaiDOM:ManakaiDOMImplementationException
+        @@@@Name: MDOM_INDEX_IN_SURROGATE_PAIR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: An attempt is made to break surrogate pair.
+      @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            __INT{{getDOMStringValue}}__;
+            __DEEP{
+              $r = $r->__INT{substring}__ ($offset, $count);
+            }__;
   @Method:
      @@Name:  appendData
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Append the string to the end of the character data of the node.
      @@Param:
         @@@Name:  arg
         @@@Type:  DOMString
+        @@@Descroption:
+          @@@@lang:en
+          @@@@@: The string to append.
      @@Return:
-        @@@Exception[list]:  DOMException
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: This node is read-only.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $node = $self->{<Q:TreeCore:node>};
+            if ($node->{<Q:DOMCore:read-only>}) {
+              __EXCEPTION{
+                DOMException.NO_MODIFICATION_ALLOWED_ERR:
+              }__;
+            }
+            $node->{<Q:infoset:content>} .= $arg;
   @Method:
      @@Name:  insertData
-     @@Param:
-        @@@Name:  offset
-        @@@Type:  unsigned-long
-     @@Param:
-        @@@Name:  arg
-        @@@Type:  DOMString
-     @@Return:
-        @@@Exception[list]:  DOMException
+     @@Description:
+       @@@lang:en
+       @@@@: Insert a string at the specified 16-bit unit offset. 
+    @@Param:
+      @@@Name: offset
+      @@@Type: unsigned-long
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The offset from which to insert.
+    @@Param:
+      @@@Name: arg
+      @@@Type: DOMString
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The DOMString to insert.
+    @@Return:
+      @@@Exception:
+        @@@@Type: DOMException
+        @@@@Name: INDEX_SIZE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The specified "offset" is negative or greater than
+            the number of 16-bit units in the DOMString.
+      @@@Exception:
+        @@@@Type: DOMException
+        @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: This node is read-only.
+      @@@Exception:
+        @@@@Type: 
+          ManakaiDOM:ManakaiDOMImplementationException
+        @@@@Name: MDOM_INDEX_IN_SURROGATE_PAIR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: An attempt is made to break surrogate pair.
+      @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+          if ($self->{<Q:TreeCore:node>}->{<Q:DOMCore:read-only>}) {
+            __EXCEPTION{
+              DOMException.NO_MODIFICATION_ALLOWED_ERR:
+            }__;
+          }
+          my $r;
+            __INT{{getDOMStringValue}}__;
+            __DEEP{
+              $r = $r->__INT{insert}__ ($offset, $arg);
+            }__;
   @Method:
      @@Name:  deleteData
-     @@Param:
-        @@@Name:  offset
-        @@@Type:  unsigned-long
-     @@Param:
-        @@@Name:  count
-        @@@Type:  unsigned-long
-     @@Return:
-        @@@Exception[list]:  DOMException
+     @@Description:
+        @@@lang:en
+        @@@@: 
+          Remove a range of 16-bit units from the node.
+    @@Param:
+      @@@Name: offset
+      @@@Type: unsigned-long
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The offset from which to start removing.
+    @@Param:
+      @@@Name: count
+      @@@Type: unsigned-long
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The number of 16-bit units to delete.  If the sum of the
+          parameters offset and count exceeds the length of the
+          DOMString then all 16-bit units from offset to the end
+          of the DOMString are deleted.
+    @@Return:
+      @@@Exception:
+        @@@@Type: DOMException
+        @@@@Name: INDEX_SIZE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The specified "offset" is negative or greater than
+            the number of 16-bit units in the DOMString, or the specified
+            "count" is negative.
+      @@@Exception:
+        @@@@Type: DOMException
+        @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: This node is read-only.
+      @@@Exception:
+        @@@@Type: 
+          ManakaiDOM:ManakaiDOMImplementationException
+        @@@@Name: MDOM_INDEX_IN_SURROGATE_PAIR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: 
+            An attempt is made to break surrogate pair.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          if ($self->{<Q:TreeCore:node>}->{<Q:DOMCore:read-only>}) {
+            __EXCEPTION{
+              DOMException.NO_MODIFICATION_ALLOWED_ERR:
+            }__;
+          }
+          my $r;
+            __INT{{getDOMStringValue}}__;
+            __DEEP{
+              $r->__INT{delete}__ ($offset, $count);
+            }__;
   @Method:
-     @@Name:  replaceData
-     @@Param:
-        @@@Name:  offset
-        @@@Type:  unsigned-long
-     @@Param:
-        @@@Name:  count
-        @@@Type:  unsigned-long
-     @@Param:
-        @@@Name:  arg
-        @@@Type:  DOMString
-     @@Return:
-        @@@Exception[list]:  DOMException
+    @@Name:  replaceData
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Replace the characters starting at the specified 16-bit unit 
+        offset with the specified string.
+    @@Param:
+      @@@Name: offset
+      @@@Type: unsigned-long
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The offset from which to start replacing.
+    @@Param:
+      @@@Name: count
+      @@@Type: unsigned-long
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The number of 16-bit units to replace.  If the sum of the
+          parameters offset and count exceeds the length of the
+          DOMString then all 16-bit units from offset to the end
+          of the DOMString are replaced.
+    @@Param:
+      @@@Name: arg
+      @@@Type: DOMString
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The DOMString with which the range is replaced.
+    @@Return:
+      @@@Exception:
+        @@@@Type: DOMException
+        @@@@Name: INDEX_SIZE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The specified "offset" is negative or greater than
+            the number of 16-bit units in the DOMString, or the specified
+            "count" is negative.
+      @@@Exception:
+        @@@@Type: DOMException
+        @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: This node is read-only.
+      @@@Exception:
+        @@@@Type: 
+          ManakaiDOM:ManakaiDOMImplementationException
+        @@@@Name: MDOM_INDEX_IN_SURROGATE_PAIR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: An attempt is made to break surrogate pair.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          if ($self->{<Q:TreeCore:node>}->{<Q:DOMCore:read-only>}) {
+            __EXCEPTION{
+              DOMException.NO_MODIFICATION_ALLOWED_ERR:
+            }__;
+          }
+          my $r;
+            __INT{{getDOMStringValue}}__;
+            __DEEP{
+              $r = $r->__INT{replace}__ ($offset, $count, $arg);
+            }__;
   @ReAttr:
      @@Name:  nodeValue
      @@Description:
@@ -2914,9 +4104,76 @@ IF:
       2
       3
     @@SpecLevel:1
+  @ReAttr:
+     @@Name:  textContent
+     @@Description:
+       @@@lang:en
+       @@@@: The text content of this node and its descendants.
+     @@@ImplNote:
+        @@@lang:en
+        @@@@:
+          CharacterData->data == CharacterData->nodeValue == 
+          CharacterData->textContent.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The text content of this node, i.e. the "nodeValue".
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: DOMSTRING_SIZE_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The attribute would return more characters than 
+              fit in a "DOMString" variable on the implementation 
+              platform.
+        @@@Def:
+          @@@@Type: 
+            lang:Perl
+          @@@@@: __INT{{data}}__;
+     @@Set:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The new text content of the node.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              The text content is set to the empty.  Note that the 
+              DOM specification does not specify how to treat the "null".
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Descriptin:
+            @@@@@lang:en
+            @@@@@@: This node is read-only.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+                           ## Condition sensitive
+            __DEEP{ $self->__SUPER{CharacterData}__::data ($given) }__;
+     @@Level[list]:
+        3
+     @@SpecLevel:3
+     @@Redefine: Node
+## IF: CharacterData
 
 IF:
   @Name:  Attr
+  @Description:
+    @@lang:en
+    @@@:
+      An attribute in an "Element" object.
+    \
+      The DOM Core treats the attribute values as a plain string, even if 
+      the schema language defines them as having tokenized types.
   @ISA:  Node
   @Require:
     @@Module:
@@ -2931,11 +4188,31 @@ IF:
             InXMLNameChar10
             InXMLNameStartChar11
             InXMLNameChar11
-      @@@Condition: DOM2
+      @@@Condition[list]:
+        DOM2
+        DOM3
+  @ImplNote:
+    @@lang:en
+    @@@:
+      If the implementation knows about the schema in use when 
+      the attribute value is changed, and it is of a different type 
+      than "CDATA", it may normalize it at that time. [SVG DOM, DOM 3]
   @Attr:
      @@Name:  name
+     @@Description:
+       @@@lang:en
+       @@@@: The name of this attribute.
      @@Get:
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The attribute name. 
+        @@@InCase:
+          @@@@Label: Qualified name
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              If the "localName" is different from "null".
         @@@Def:
           @@@@Type:
             lang:Perl
@@ -2948,32 +4225,235 @@ IF:
             } else {
               $r = $node->{<Q:DOMCore:name>};
             }
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            "Element.tagName" is defined to return the uppercase name 
+            if the document is an HTML document.  "Attr.name" is not 
+            defined so.
   @Attr:
      @@Name:  specified
+     @@Description:
+       @@@lang:en
+       @@@@: Whether this attribute is specified explicitly in the document.
      @@Get:
         @@@Type:  boolean
+        @@@InCase:
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This attribute is explicitly given a value in the 
+              instance document.
+        @@@InCase:
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This attribute is not explicitly given a value in the 
+              instance document.
+        @@@Def:
+          @@@@Type:
+             lang:dis
+          @@@@GetProp:
+             infoset:specified
+    @@ImplNote:
+       @@@lang:en
+       @@@@:
+         This attribute is set to "true" if the DOM application 
+         changed the value of this attribute node (even if it ends up 
+         having the same value as the default value).
+    @@ImplNote:
+       @@@lang:en
+       @@@@:
+         The implementation may handle attributes with default 
+         values from other schemas than DTD and XML Schema but 
+         the DOM application should use "normalizeDocument" to 
+         guarantee this information is up-to-date.
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        Removing an attribute node may generate a new attribute 
+        node with the default value and "specified" set to "false".
+      \
+        When "normalizeDocument" is invoked, non-"specified" 
+        attribute nodes are recomputed according to the defaulu 
+        attribute value.
+    @@ImplNote:
+      @@@lang:en
+      @@@@: 
+        The DOM Level 1 Specification (Second Edition) and the 
+        DOM Level 2 Specification says that if the "ownerElement" 
+        is "null", "specified" is always "true".  The DOM Level 3 
+        Specification does not address this case.
+## TODO: Some mechanism required to turn the "specified" attribute "true" 
+## when some node operation is done.
   @Attr:
      @@Name:  value
+     @@Description:
+       @@@lang:en
+       @@@@: The value of this attribute.
      @@Get:
         @@@Type:  DOMString
-  @@@Def:##TBD
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The attribute value as a string.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            __DEEP{
+              $r = $self->__SUPER{Attr::DOM3}__::textContent;
+            }__;
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              This definition might be updated when the new level 
+              of the DOM is introduced.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            Although the specification says nothing, the Attr->value and 
+            Attr->textContent should have the same value by nature.
      @@Set:
         @@@Type:  DOMString
-        @@@Exception[list]:  DOMException
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            Setting of this attribute creates a "Text" node with 
+            the value specified and replaces child nodes of this 
+            node with it.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            The DOM implementation may normalize the value [DOM 3, SVG DOM].
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: This node is read-only.
+          @@@@SpecLevel:1
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              This exception is added in the DOM Level 1 Second Edition.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            __DEEP{
+              $self->__SUPER{Attr::DOM3}__::textContent ($given);
+            }__;
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              This definition might be updated when the new level 
+              of the DOM is introduced.
+      @@SpecLevel[list]:
+         1
+      @@Level[list]: 1
+            
   @Attr:
      @@Name:  ownerElement
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The element to which this attribute is attached.
      @@Get:
         @@@Type:  Element
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The "Element" node.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: This attribute is not in use.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetPropNode:
+            infoset:ownerElement
      @@Level[list]:  2
      @@SpecLevel:2
   @Attr:
      @@Name:  schemaTypeInfo
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The type information associated with this node.
+        \
+         Note that while this type information is guarantee 
+         to be correct after loading the validation, 
+         it may not be reliable if the node was moved.
      @@Get:
         @@@Type:  TypeInfo
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The type information.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMCore:schemaTypeInfo
+## TODO: This might need reconsideration by the definition of the "TypeInfo".
      @@Level[list]:  3
      @@SpecLevel:3
   @Attr:
      @@Name:  isId
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Return whether this attribute is known to be of type ID or not.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         The ways to determine whether an attribute node is known 
+         to contain an identifier:
+        \
+         PSVI - If validation occurred using an XML Schema, the PSVI 
+         contributions values are used to determine whether this 
+         attribute is a schema-determined ID attribute as the 
+         XPointer specification defines, i.e. iif one of the following 
+         is true:
+        \
+         1. The attribute information item has a [memeber type definition] or 
+         [type definition] property whose value in turn has [name] eq "ID" 
+         and [target namespace] eq "http://www.w3.org/2001/XMLSchema".
+        \
+         2. The attribute information item has a [base type definition] 
+         property whose value in turn has [name] eq "ID"
+         and [target namespace] eq "http://www.w3.org/2001/XMLSchema".
+        \
+         3. The attribute information item has a [base type definition] 
+         property whose value has a [base type definition] property 
+         whose value has ... whose value in turn has [name] eq "ID"
+         and [target namespace] eq "http://www.w3.org/2001/XMLSchema".
+        \
+         4. The attribute information item has a [type definition name] 
+         eq "ID" and a [type definition namespace] eq 
+         "http://www.w3.org/2001/XMLSchema".
+        \
+         5. The attribute information item has a 
+         [member type definition name] eq "ID" and a 
+         [member type definition namespace] eq 
+         "http://www.w3.org/2001/XMLSchema".
+        \
+         DTD - If validation occured using a DTD, the infoset 
+         [type definition] value is used to determine whether 
+         this attribute is a DTD-determined ID attribute as the 
+         XPointer framework specification defines.  Iif the 
+         attribute information item has a [type definition] property 
+         eq "ID", it is a DTD-determined ID attribute.
+        \
+         User-determined - If the methods "setIdAttribute", 
+         "setIdAttributeNS", "setIdAttributeNode" was used, 
+         it is an user-determined ID attribute.
+        \
+         Externally-determined - Other mechanisms, including other 
+         schema languages than DTD and XML Schema may provide 
+         ways to determine whether it is a ID attribute.
      @@Get:
         @@@Type:  boolean
      @@Level[list]:  3
@@ -3286,6 +4766,10 @@ IF:
 
 IF:
   @Name:  Element
+  @Description:
+    @@lang:en
+    @@@:
+      An element in a document.
   @ISA:  Node
   @Require:
     @@Module:
@@ -3300,12 +4784,43 @@ IF:
             InXMLNameChar10
             InXMLNameStartChar11
             InXMLNameChar11
-      @@@Condition: DOM2
+      @@@Condition[list]:
+        DOM1
+        DOM2
+        DOM3
   @Attr:
      @@Name:  tagName
+     @@Description:
+       @@@lang:en
+       @@@@: The element type name of this node.
      @@Get:
         @@@Type:  DOMString
-        @@@Def:#TBD
+        @@@InCase:
+          @@@@Label: Qualified name
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              If the "localName" is different from "null".
+        @@@InCase:
+          @@@@Label: Canonical uppercase form of name
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              If this is an HTML element node.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $node = $self->{<Q:TreeCore:node>};
+            if (defined $node->{<Q:infoset:localName>}) {
+              $r = (defined $node->{<Q:infoset:prefix>} ?
+                   $node->{<Q:infoset:prefix>} . ':' : '') . 
+                   $node->{<Q:infoset:localName>};
+            } else {
+              $r = $node->{<Q:DOMCore:tagName>};
+            }
+ ## TODO: toUpper if HTML
+ ## ISSUE: What to do if XHTML?       
   @Method:
      @@Name:  getAttribute
      @@Return:
@@ -3460,8 +4975,20 @@ IF:
      @@SpecLevel:2
   @Attr:
      @@Name:  schemaTypeInfo
+     @@Description:
+        @@@lang:en
+        @@@@: The type information associated with this element.
      @@Get:
         @@@Type:  TypeInfo
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The type information.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMCore:schemaTypeInfo
+## TODO: This might need reconsideration by the definition of the "TypeInfo".
      @@Level[list]:  3
      @@SpecLevel:3
   @Method:
@@ -3503,6 +5030,17 @@ IF:
         @@@Exception[list]:  DOMException
      @@Level[list]:  3
      @@SpecLevel:3
+  @ReMethod:
+    @@Name: normalize
+    @@Return:
+      @@@
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The method "normalize" was defined in the "Element" interface in 
+        the DOM Level 1 but has been moved to 
+        the "Node" interface in the DOM Level 2 and higher.
+    @@Redefine: Node
   
   @ReAttr:
      @@Name:  localName
@@ -3734,6 +5272,10 @@ IF:
 IF:
   @Name:  Text
   @ISA:  CharacterData
+  @ImplNote:
+    @@lang:en
+    @@@:
+     "Text" is a "CharacterData" is a "Node".  "CDATASection" is a "Text".
   @Method:
      @@Name:  splitText
      @@Return:
@@ -3813,10 +5355,15 @@ IF:
           lang:Perl
         @@@@@: $r = __SUPER{Node}__->TEXT_NODE;
     @@Redefine: Node
+    @@RedefinedBy: CDATASection
 
 IF:
   @Name:  Comment
   @ISA:  CharacterData
+  @ImplNote:
+    @@lang:en
+    @@@:
+      "Comment" is a "CharacterData" is a "Node".
   
   @ReAttr:
     @@Name: attributes
@@ -4791,27 +6338,42 @@ IF:
         @@@@@: $r = __SUPER{Node}__->DOCUMENT_NODE;
     @@Redefine: Node
   @ReAttr:
-    @@Name: textContent
-    @@Spec:
-      @@@DOM3:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#Node3-textContent
-    @@Get:
-      @@@Type: DOMString
-      @@@Exception[list]: DOMException
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          $r = null;
-    @@Set:
-      @@@Type: DOMString
-      @@@Exception[list]: DOMException
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          __WARNING{ManakaiDOMImplementationException.ATTR_SET_NO_EFFECT}__;
-
+     @@Name:  textContent
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The text content of this node and its descendants.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The text content of this node.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The text content is defined to be "null".
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@: $r = null;
+     @@Set:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: Setting this attribute has no effect.
+        @@@Warning:
+          @@@@Type:
+            ManakaiDOM:ManakaiDOMImplementationWarning
+          @@@@Name: ATTR_SET_NO_EFFECT
+          @@@@Descriptin:
+            @@@@@lang:en
+            @@@@@@: Setting this attribute has no effect.
+        @@@Def: \
+     @@Level[list]: 3
+     @@SpecLevel:3
+     @@Redefine: Node
   @IntMethod:
     @@Name: newObject
     @@Description:

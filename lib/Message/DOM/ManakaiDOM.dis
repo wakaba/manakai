@@ -28,7 +28,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/17 07:44:11 $
+     $Date: 2004/09/18 11:51:16 $
 
   @Feature:
     @@QName: 
@@ -239,26 +239,6 @@ Exception:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: Arbitrary values for debugging.
-    
-    @@Const:
-      @@@Name: MDOM_NS_EMPTY_URI
-      @@@Type: unsigned-short
-      @@@Value: 4
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The DOM Level 2 Core Specification defines that even the empty 
-          string is treated as a real namespace URI.  The Errata for 
-          the DOM Level 2 Specifications says that it is an error and 
-          the way empty strings are treated is implementation dependent. 
-          The DOM Level 3 Core Specification defines that empty strings 
-          are converted to "null".
-      @@@Param:
-        @@@@QName:
-          ManakaiDOMImplementationException:param-name
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@: The parameter to which inappropriate value is specified.
 
 Warning:
   @Name: ManakaiDOMImplementationWarning
@@ -284,6 +264,47 @@ Warning:
         @@@@lang:en
         @@@@@:
           Setting an attribute value has no effect by definition.
+
+    @@Const:
+      @@@Name: MDOM_NEWCHILD_IS_REFCHILD
+      @@@Type: unsigned-short
+      @@@Value: 1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The node to be inserted is same as the reference node.
+      @@@Param:
+        @@@@QName:
+          MDOM_EXCEPTION:newChild-param-name
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The parameter name for "newChild" node.
+      @@@Param:
+        @@@@QName:
+          MDOM_EXCEPTION:refChild-param-name
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The parameter name for "refChild" node.
+    
+    @@Const:
+      @@@Name: MDOM_NS_EMPTY_URI
+      @@@Type: unsigned-short
+      @@@Value: 4
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The DOM Level 2 Core Specification defines that even the empty 
+          string is treated as a real namespace URI.  The Errata for 
+          the DOM Level 2 Specifications says that it is an error and 
+          the way empty strings are treated is implementation dependent. 
+          The DOM Level 3 Core Specification defines that empty strings 
+          are converted to "null".
+      @@@Param:
+        @@@@QName:
+          ManakaiDOMImplementationException:param-name
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The parameter to which inappropriate value is specified.
 
 IF:
   @Name: ManakaiDOMObject
@@ -384,7 +405,8 @@ IF:
             ## Up - toward root node
             for my $key (@{$self->{<Q:TreeCore:origin>}}) {
               if ($self->{$key}) {
-                if ($self->{$key}->__INT{isExternallyReferred}__) {
+                if ($self->{$key}
+                    ->__SUPER{ManakaiDOMNodeObject::}__::__INT{isExternallyReferred}__) {
                   $r = true;
                   last;
                 }
@@ -395,7 +417,7 @@ IF:
               SUBNODES:
               for my $key (@{$self->{<Q:TreeCore:subnode>}}) {
                 for (@{$self->{$key}}) {
-                  if ($_->__INT{isExternallyReferredDownward}__) {
+                  if ($_->__SUPER{ManakaiDOMNodeObject::}__::__INT{isExternallyReferredDownward}__) {
                     $r = true;
                     last SUBNODES;
                   }
@@ -419,7 +441,7 @@ IF:
           } else {
             for my $key (@{$self->{<Q:TreeCore:subnode>}}) {
               for (@{$self->{$key} || []}) {
-                if ($_->__INT{isExternallyReferredDownward}__) {
+                if ($_->__SUPER{ManakaiDOMNodeObject::}__::__INT{isExternallyReferredDownward}__) {
                   $r = true;
                   last SUBNODES;
                 }
@@ -436,7 +458,8 @@ IF:
         @@@@Type: 
           lang:Perl
         @@@@@:
-          $_->__INT{destroyDownward}__ for @{$self->__INT{getRootNodes}__};
+          $_->__SUPER{ManakaiDOMNodeObject::}__::__INT{destroyDownward}__
+          for @{$self->__SUPER{ManakaiDOMNodeObject::}__::__INT{getRootNodes}__};
   @IntMethod:
     @@Name: destroyDownward
     @@Description:
@@ -451,7 +474,8 @@ IF:
           for my $key (@{$self->{<Q:TreeCore:subnode>}}) {
             my @node = @{$self->{$key} || []};
             delete $self->{$key};
-            $_->__INT{destroyDownward}__ for @node;
+            $_->__SUPER{ManakaiDOMNodeObject::}__::__INT{destroyDownward}__
+                                                                   for @node;
           }
    \       for my $key (@{$self->{<Q:TreeCore:irefnode>}},
    \                    @{$self->{<Q:TreeCore:urefnode>}},
@@ -485,8 +509,9 @@ IF:
           lang:Perl
         @@@@@:
           unless ($node->{<Q:TreeCore:treeID>} eq $self->{<Q:TreeCore:treeID>}) {
-            $_->__INT{changeTreeIDDownward}__ ($self->{<Q:TreeCore:treeID>})
-              for @{$node->__INT{getRootNodes}__};
+            $_->__SUPER{ManakaiDOMNodeObject}__::__INT{changeTreeIDDownward}__
+                                                  ($self->{<Q:TreeCore:treeID>})
+              for @{$node->__SUPER{ManakaiDOMNodeObject}__::__INT{getRootNodes}__};
           }
   @IntMethod:
     @@Name: changeTreeIDDownward
@@ -512,7 +537,7 @@ IF:
           $self->{<Q:TreeCore:treeID>} = ''.$treeID;
           for my $key (@{$self->{<Q:TreeCore:subnode>}}) {
             for (@{$self->{$key}||[]}) {
-              $_->__INT{changeTreeIDDownward}__ ($treeID);
+              $_->__SUPER{ManakaiDOMNodeObject::}__::__INT{changeTreeIDDownward}__ ($treeID);
             }
           }
   @IntMethod:
@@ -530,7 +555,8 @@ IF:
           lang:Perl
         @@@@@:
           for (@{$self->{<Q:TreeCore:origin>}}) {
-            NEW: for my $new (@{$self->{$_}->__INT{getRootNodes}__}) {
+            NEW: for my $new (@{$self->{$_}
+                ->__SUPER{ManakaiDOMNodeObject::}__::__INT{getRootNodes}__}) {
               for my $old (@$r) {
                 next NEW if $old eq $new;
               }
@@ -567,6 +593,25 @@ IF:
               $node->{<Q:TreeCore:nodeID>} eq $self->{<Q:TreeCore:nodeID>}) {
             $r = true;
           }
+  @IntMethod:
+    @@Name: orhpanate
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Change the tree identifier or destroy the tree if it is 
+        no longer referred.
+    @@Return:
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          if ($self->__SUPER{ManakaiDOMNodeObject::}__::__INT{isExternallyReferred}__) {
+            $_->__SUPER{ManakaiDOMNOdeObject::}__::__INT{changeTreeIDDownward}__
+                                                           (__CODE{UniqueID}__)
+              for @{$self->__SUPER{ManakaiDOMNodeObject::}__::__INT{getRootNodes}__};
+          } else {
+            $self->__SUPER{ManakaiDOMNodeObject::}__::__INT{destroy}__;
+          }
 
 IF:
   @Name: ManakaiDOMNodeReference
@@ -587,8 +632,8 @@ IF:
           my $node = $self->{<Q:TreeCore:node>};
           delete $self->{<Q:TreeCore:node>};
           $node->{<Q:TreeCore:rc>}--;
-          unless ($node->__INT{isExternallyReferred}__) {
-            $node->__INT{destroy}__;
+          unless ($node->__SUPER{ManakaiDOMNodeObject::}__::__INT{isExternallyReferred}__) {
+            $node->__SUPER{ManakaiDOMNodeObject::}__::__INT{destroy}__;
           }
 
 ## - For ManakaiDOMNodeObject

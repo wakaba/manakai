@@ -29,7 +29,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/15 04:05:39 $
+     $Date: 2004/09/18 11:51:16 $
   @Require:
     @@Module:
       @@@Name: ManakaiDOM
@@ -244,29 +244,42 @@ IF:
         @@@@@: $r = __CLASS{Node}__->DOCUMENT_TYPE_NODE;
     @@Redefine: Node
   @ReAttr:
-    @@Name: textContent
-    @@Spec:
-      @@@DOM3:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#Node3-textContent
-    @@Get:
-      @@@Type: DOMString
-      @@@Exception[list]: DOMException
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          $r = null;
-    @@Set:
-      @@@Type: DOMString
-      @@@Exception[list]: DOMException
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          __EXCEPTION{ManakaiDOMImplementationException}{
-            -class => 'warn',
-            -type => 'ATTR_SET_NO_EFFECT',
-          }__;
+     @@Name:  textContent
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The text content of this node and its descendants.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The text content of this node.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The text content is defined to be "null".
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@: $r = null;
+     @@Set:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: Setting this attribute has no effect.
+        @@@Warning:
+          @@@@Type:
+            ManakaiDOM:ManakaiDOMImplementationWarning
+          @@@@Name: ATTR_SET_NO_EFFECT
+          @@@@Descriptin:
+            @@@@@lang:en
+            @@@@@@: Setting this attribute has no effect.
+        @@@Def: \
+     @@Level[list]: 3
+     @@SpecLevel:3
+     @@Redefine: Node
 
 IF:
   @Name:  Notation
@@ -331,29 +344,42 @@ IF:
         @@@@@: $r = __CLASS{Node}__->NOTATION_NODE;
     @@Redefine: Node
   @ReAttr:
-    @@Name: textContent
-    @@Spec:
-      @@@DOM3:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#Node3-textContent
-    @@Get:
-      @@@Type: DOMString
-      @@@Exception[list]: DOMException
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          $r = null;
-    @@Set:
-      @@@Type: DOMString
-      @@@Exception[list]: DOMException
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          __EXCEPTION{ManakaiDOMImplementationException}{
-            -class => 'warn',
-            -type => 'ATTR_SET_NO_EFFECT',
-          }__;
+     @@Name:  textContent
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The text content of this node and its descendants.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The text content of this node.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The text content is defined to be "null".
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@: $r = null;
+     @@Set:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: Setting this attribute has no effect.
+        @@@Warning:
+          @@@@Type:
+            ManakaiDOM:ManakaiDOMImplementationWarning
+          @@@@Name: ATTR_SET_NO_EFFECT
+          @@@@Descriptin:
+            @@@@@lang:en
+            @@@@@@: Setting this attribute has no effect.
+        @@@Def: \
+     @@Level[list]: 3
+     @@SpecLevel:3
+     @@Redefine: Node
 
 IF:
   @Name:  Entity
@@ -590,7 +616,59 @@ IF:
           @@@@Type:
             lang:Perl
           @@@@@:
-            __DEEP{ $self->__SUPER{Attr}__::data ($given) }__;
+                           ## Condition sensitive
+            __DEEP{ $self->__SUPER{ProcessingInstruction}__::data ($given) }__;
     @@Redefine: Node
+  @ReAttr:
+     @@Name:  textContent
+     @@Description:
+       @@@lang:en
+       @@@@: The text content of this node and its descendants. 
+     @@@ImplNote:
+        @@@lang:en
+        @@@@:
+          PI->data == PI->nodeValue == 
+          PI->textContent.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The text content of this node, i.e. the "nodeValue".
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: DOMSTRING_SIZE_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The attribute would return more characters than 
+              fit in a "DOMString" variable on the implementation 
+              platform.
+        @@@Def:
+          @@@@Type: 
+            lang:Perl
+          @@@@@: __INT{{data}}__;
+     @@Set:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The new text content of the node.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Descriptin:
+            @@@@@lang:en
+            @@@@@@: This node is read-only.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+                           ## Condition sensitive
+            __DEEP{ $self->__SUPER{ProcessingInstruction}__::data ($given) }__;
+     @@Level[list]:
+        3
+     @@SpecLevel:3
+     @@Redefine: Node
 
 ## DOMXML.dis ends here
