@@ -22,7 +22,7 @@ This module is part of Manakai.
 package Message::Util::Formatter;
 use strict;
 use vars qw(%FMT2STR $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 
 =head1 INITIAL FORMATTING RULES
@@ -124,7 +124,7 @@ sub replace ($$;$$) {
       $f = '-bare_text' if length $t;
       my $function = $gparam->{fmt2str}->{$f} || $self->{$f};
       if (ref $function) {
-	  my %a = (-bare_text => ($a || $t));
+	  my %a = (-bare_text => ($a || $t), -rule_name => $f);
 	  $a =~ s(((?:[^",\{\}]|$BLOCK|"(?:[^"\\]|\\.)*")+)){
 	      my $s = $1; $s =~ s/^[\x09\x0A\x0D\x20]+//; $s =~ s/[\x09\x0A\x0D\x20]+$//;
 	      if ($s =~ /^([^=]*[^\x09\x0A\x0D\x20=])[\x09\x0A\x0D\x20]*=>[\x09\x0A\x0D\x20]*([^\x09\x0A\x0D\x20].*)$/s) {
@@ -294,4 +294,4 @@ Boston, MA 02111-1307, USA.
 =cut
 
 1;
-# $Date: 2003/05/31 07:02:15 $
+# $Date: 2003/07/17 23:57:32 $
