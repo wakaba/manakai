@@ -16,7 +16,7 @@ BEGIN {
   use base Message::Field::Params;
   use vars qw(%DEFAULT %REG $VERSION);
 }
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 %REG = %Message::Field::Params::REG;
 
@@ -165,7 +165,7 @@ Returns or set disposition type.
 sub type ($;$) {
   my $self = shift;
   my $new_value = shift;
-  if ($new_value && $new_value !~ m#$REG{NON_token}#) {
+  if ($new_value && $new_value !~ m#$REG{NON_http_token}#) {
     $self->{type} = $new_value;
   }
   $self->{type};
@@ -243,7 +243,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/23 10:41:33 $
+$Date: 2002/03/26 05:31:55 $
 
 =cut
 

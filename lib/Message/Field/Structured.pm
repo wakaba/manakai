@@ -13,8 +13,9 @@ package Message::Field::Structured;
 require 5.6.0;
 use strict;
 use re 'eval';
-use vars qw(%REG $VERSION);
-$VERSION = '1.00';
+use vars qw(%DEFAULT %REG $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+require Message::Util;
 
 use overload '""' => sub {shift->stringify};
 
@@ -29,6 +30,15 @@ $REG{M_comment} = qr/\x28((?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x27\x2A-\x5B\x5D-\x
 
 $REG{NON_atom} = qr/[^\x09\x20\x21\x23-\x27\x2A\x2B\x2D\x2F\x30-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]/;
 
+%DEFAULT = (
+  encoding_after_encode	=> '*default',
+  encoding_before_decode	=> '*default',
+  hook_encode_string	=> #sub {shift; (value => shift, @_)},
+  	\&Message::Util::encode_header_string,
+  hook_decode_string	=> #sub {shift; (value => shift, @_)},
+  	\&Message::Util::decode_header_string,
+);
+
 =head2 Message::Field::Structured->new ()
 
 Return empty Message::Field::Structured object.
@@ -36,7 +46,10 @@ Return empty Message::Field::Structured object.
 =cut
 
 sub new ($;%) {
-  bless {}, shift;
+  my $class = shift;
+  my $self = bless {option => {@_}}, $class;
+  for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
+  $self;
 }
 
 =head2 Message::Field::Structured->parse ($unfolded_field_body)
@@ -46,8 +59,10 @@ Parse structured C<field-body>.
 =cut
 
 sub parse ($$;%) {
-  my $self = bless {}, shift;
-  my $field_body = shift;
+  my $class = shift;
+  my $self = bless {option => {@_}}, $class;
+  for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
+  my $field_body = $self->_decode_qcontent (shift);
   $self->{field_body} = $field_body;
   $self;
 }
@@ -60,7 +75,7 @@ Returns C<field-body> as a string.
 
 sub stringify ($) {
   my $self = shift;
-  $self->{field_body};
+  $self->_encode_qcontent ($self->{field_body});
 }
 
 =head2 $self->as_plain_string ()
@@ -77,11 +92,41 @@ sub as_plain_string ($) {
   $self->unquote_quoted_string ($self->unquote_comment ($self->{field_body}));
 }
 
+## Decode C<qcontent> (content of C<quoted-string>).
+sub _decode_qcontent ($$) {
+  my $self = shift;
+  my $quoted_string = shift;
+  $quoted_string =~ s{$REG{M_quoted_string}}{
+    my ($qtext) = ($1);
+      $qtext =~ s/\x5C([\x00-\xFF])/$1/g;
+      my %s = &{$self->{option}->{hook_decode_string}} ($self, $qtext,
+                type => 'phrase/quoted');
+      $s{value} =~ s/([\x22\x5C])([\x20-\xFF])?/"\x5C$1".($2?"\x5C$2":'')/ge;
+      '"'.$s{value}.'"';
+  }goex;
+  $quoted_string;
+}
+
+## Encode C<qcontent> (content of C<quoted-string>).
+sub _encode_qcontent ($$) {
+  my $self = shift;
+  my $quoted_string = shift;
+  $quoted_string =~ s{$REG{M_quoted_string}}{
+    my ($qtext) = ($1);
+      $qtext =~ s/\x5C([\x00-\xFF])/$1/g;
+      my %s = &{$self->{option}->{hook_encode_string}} ($self, $qtext,
+                type => 'phrase/quoted');
+      $s{value} =~ s/([\x22\x5C])([\x20-\xFF])?/"\x5C$1".($2?"\x5C$2":'')/ge;
+      '"'.$s{value}.'"';
+  }goex;
+  $quoted_string;
+}
+
 sub quote_unsafe_string ($$) {
   my $self = shift;
   my $string = shift;
   if ($string =~ /$REG{NON_atom}/ || $string =~ /$REG{WSP}$REG{WSP}+/) {
-    $string =~ s/([\x22\x5C])/\x5C$1/g;
+    $string =~ s/([\x22\x5C])([\x20-\xFF])?/"\x5C$1".($2?"\x5C$2":'')/ge;
     $string = '"'.$string.'"';
   }
   $string;

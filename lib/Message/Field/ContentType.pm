@@ -16,7 +16,7 @@ BEGIN {
   use base Message::Field::Params;
   use vars qw(%DEFAULT %REG $VERSION);
 }
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 %REG = %Message::Field::Params::REG;
 
@@ -175,7 +175,7 @@ sub media_type ($;$) {
 sub media_type_major ($;$) {
   my $self = shift;
   my $new_value = shift;
-  if ($new_value && $new_value !~ m#$REG{NON_token}#) {
+  if ($new_value && $new_value !~ m#$REG{NON_http_token}#) {
     $self->{media_type} = $new_value;
   }
   $self->{media_type};
@@ -184,7 +184,7 @@ sub media_type_major ($;$) {
 sub media_type_minor ($;$) {
   my $self = shift;
   my $new_value = shift;
-  if ($new_value && $new_value !~ m#$REG{NON_token}#) {
+  if ($new_value && $new_value !~ m#$REG{NON_http_token}#) {
     $self->{media_subtype} = $new_value;
   }
   $self->{media_subtype};
@@ -264,7 +264,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/23 10:41:33 $
+$Date: 2002/03/26 05:31:55 $
 
 =cut
 

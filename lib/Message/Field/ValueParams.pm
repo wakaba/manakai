@@ -16,7 +16,7 @@ BEGIN {
   use base Message::Field::Params;
   use vars qw(%DEFAULT %REG $VERSION);
 }
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 %REG = %Message::Field::Params::REG;
 
@@ -25,7 +25,7 @@ $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
   value_default	=> '',
   value_no_regex	=> qr/(?!)/,
   value_regex	=> qr/[\x00-\xFF]+/,
-  value_unsafe_rule	=> 'NON_token_wsp',
+  value_unsafe_rule	=> 'NON_http_token_wsp',
   value_type	=> {'*DEFAULT'	=> ':none:',
   },
 );
@@ -224,7 +224,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/25 10:15:26 $
+$Date: 2002/03/26 05:31:56 $
 
 =cut
 

@@ -14,7 +14,7 @@ use strict;
 require 5.6.0;
 use re 'eval';
 use vars qw(%DEFAULT %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 use Carp;
 use overload '@{}' => sub {shift->_delete_empty()->{param}},
@@ -29,6 +29,7 @@ $REG{domain_literal} = qr/\x5B(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x5A\x5E-\xFF])*
 $REG{atext} = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2F-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]+/;
 $REG{atext_dot} = qr/[\x21\x23-\x27\x2A\x2B\x2D-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]+/;
 $REG{token} = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+/;
+$REG{http_token} = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\x7C\x7E]+/;
 $REG{attribute_char} = qr/[\x21\x23-\x24\x26\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+/;
 $REG{S_encoded_word} = qr/=\x3F$REG{atext_dot}\x3F=/;
 
@@ -50,7 +51,11 @@ $REG{NON_atext_dot} = qr/[^\x21\x23-\x27\x2A\x2B\x2D-\x39\x3D\x3F\x41-\x5A\x5E-\
 $REG{NON_atext_dot_wsp} = qr/[^\x09\x20\x21\x23-\x27\x2A\x2B\x2D-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]/;
 $REG{NON_token} = qr/[^\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]/;
 $REG{NON_token_wsp} = qr/[^\x09\x20\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]/;
+$REG{NON_http_token} = qr/[^\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\x7C\x7E]/;
+$REG{NON_http_token_wsp} = qr/[^\x09\x20\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\x7C\x7E]/;
 $REG{NON_attribute_char} = qr/[^\x21\x23-\x24\x26\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]/;
+$REG{NON_http_attribute_char} = qr/[^\x21\x23-\x24\x26\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\x7C\x7E]/;
+	## Yes, C<attribute-char> does not appear in HTTP spec.
 
 
 %DEFAULT = (
@@ -223,7 +228,7 @@ sub add ($$;$%) {
                    is_parameter => 1, language => $option{language}}];
   $p->[1]->{is_parameter} = 0 if !$value && $option{value}>0;
   croak "add: \$name contains of non-attribute-char: $name"
-     if $p->[1]->{is_parameter} && $name =~ /$REG{NON_attribute_char}/;
+     if $p->[1]->{is_parameter} && $name =~ /$REG{NON_http_attribute_char}/;
   $p->[1]->{value} = $self->_param_value ($name => $p->[1]->{value});
   if ($option{prepend}) {
     unshift @{$self->{param}}, $p;
@@ -248,7 +253,7 @@ sub replace ($$;$%) {
                    is_parameter => 1, language => $option{language}}];
   $p->[1]->{is_parameter} = 0 if !$value && $option{value}>0;
   croak "replace: \$name contains of non-attribute-char: $name"
-    if $p->[1]->{is_parameter} && $name =~ /$REG{NON_attribute_char}/;
+    if $p->[1]->{is_parameter} && $name =~ /$REG{NON_http_attribute_char}/;
   $p->[1]->{value} = $self->_param_value ($name => $p->[1]->{value});
   push @{$self->{param}}, $p;
   $p;
@@ -314,7 +319,7 @@ sub parameter_name ($$;$) {
   my $i = shift;
   my $newname = shift;
   if ($newname) {
-    return 0 if $newname =~ /$REG{NON_attribute_char}/;
+    return 0 if $newname =~ /$REG{NON_http_attribute_char}/;
     $self->{param}->[$i]->[0] = $newname;
   }
   $self->{param}->[$i]->[0];
@@ -383,8 +388,8 @@ sub stringify ($;%) {
           ## Note: %-quoting for charset and for language is not allowed.
           ## But charset name can be included non-sttribute-char such as "'".
           ## How can we treat this?
-          $charset =~ s/($REG{NON_attribute_char})/sprintf('%%%02X', ord $1)/ge;
-          $lang =~ s/($REG{NON_attribute_char})/sprintf('%%%02X', ord $1)/ge;
+          $charset =~ s/($REG{NON_http_attribute_char})/sprintf('%%%02X', ord $1)/ge;
+          $lang =~ s/($REG{NON_http_attribute_char})/sprintf('%%%02X', ord $1)/ge;
           if (length $e{value} > $option{parameter_value_max}) {
             for my $i (0..length ($e{value})/$option{parameter_value_max}) {
               $value[$i] = substr ($e{value}, $i*$option{parameter_value_max},
@@ -392,7 +397,8 @@ sub stringify ($;%) {
             }
           } else {$value[0] = $e{value}}
           for my $i (0..$#value) {
-            $value[$i] =~ s/($REG{NON_attribute_char})/sprintf('%%%02X', ord $1)/ge;
+            $value[$i] =~ 
+              s/($REG{NON_http_attribute_char})/sprintf('%%%02X', ord $1)/ge;
           }
           $value[0] = "${charset}'${lang}'".$value[0];
         } elsif (length $e{value} == 0) {
@@ -402,11 +408,12 @@ sub stringify ($;%) {
             for my $i (0..length ($e{value})/$option{parameter_value_max}) {
               $value[$i] = $self->_quote_unsafe_string 
                 (substr ($e{value}, $i*$option{parameter_value_max},
-                    $option{parameter_value_max}), unsafe => 'NON_attribute_char');
+                    $option{parameter_value_max}), 
+                    unsafe => 'NON_http_attribute_char');
             }
           } else {
             $value[0] = $self->_quote_unsafe_string 
-              ($e{value}, unsafe => 'NON_attribute_char');
+              ($e{value}, unsafe => 'NON_http_attribute_char');
           }
         }
         ## Note: quoted-string for parameter name is not allowed.
@@ -418,7 +425,7 @@ sub stringify ($;%) {
         } else {
           my @new;
           my $name = $self->_quote_unsafe_string 
-            ($_->[0], unsafe => 'NON_attribute_char');
+            ($_->[0], unsafe => 'NON_http_attribute_char');
           for my $i (0..$#value) {
             push @new, $name.'*'.$i.($encoded?'*':'').'='.$value[$i];
           }
@@ -427,7 +434,8 @@ sub stringify ($;%) {
       } else {
         my %e = &{$self->{option}->{hook_encode_string}} ($self, 
           $_->[0], type => 'phrase');
-        $new = $self->_quote_unsafe_string ($e{value}, unsafe => 'NON_token_wsp');
+        $new = $self->_quote_unsafe_string ($e{value}, 
+          unsafe => 'NON_http_token_wsp');
       }
       $new;
     } @{$self->{param}}
@@ -456,7 +464,7 @@ sub _quote_unsafe_string ($$;%) {
   my %option = @_;
   $option{unsafe} ||= 'NON_atext_dot';
   if ($string =~ /$REG{$option{unsafe}}/ || $string =~ /$REG{WSP}$REG{WSP}+/) {
-    $string =~ s/([\x22\x5C])([\x20-\xFF])?/"\x5C$1".($2?"\x5C$2":'')/ge;
+    $string =~ s/([\x22\x5C])([\x21-\x7E])?/"\x5C$1".(defined $2?"\x5C$2":'')/ge;
     $string = '"'.$string.'"';
   }
   $string;
@@ -481,6 +489,9 @@ sub _unquote_quoted_string ($$) {
   $quoted_string;
 }
 
+## Unquote C<DQOUTE> and C<quoted-pair> if it is itself a
+## C<quoted-string>.  (Do nothing if it is MULTIPLE
+## C<quoted-string>"S".)
 sub _unquote_if_quoted_string ($$) {
   my $self = shift;
   my $quoted_string = shift;  my $isq = 0;
@@ -543,7 +554,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/25 10:15:26 $
+$Date: 2002/03/26 05:31:55 $
 
 =cut
 

@@ -19,7 +19,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%OPTION %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload '@{}' => sub {shift->{id}},
              '""' => sub {shift->stringify};
 
@@ -68,6 +68,7 @@ sub new ($;%) {
   my $self = bless {}, shift;
   my %option = @_;
   for (%OPTION) {$option{$_} ||= $OPTION{$_}}
+  $self->{id} = [];
   $self->{option} = \%option;
   $self->_init_option ($self->{option}->{field_name});
   $self;
@@ -84,6 +85,7 @@ sub parse ($$;%) {
   my $field_body = shift;
   my %option = @_;
   for (%OPTION) {$option{$_} ||= $OPTION{$_}}
+  $self->{id} = [];
   $self->{option} = \%option;
   $self->_init_option ($self->{option}->{field_name});
   $field_body = $self->delete_comment ($field_body);
@@ -108,7 +110,10 @@ L<$self-E<gt>parse_address_list ()>.
 
 =cut
 
-sub id ($) {@{shift->{id}}}
+sub id ($) {
+  my $self = shift;
+  wantarray? @{$self->{id}}: $self->{id}->[0];
+}
 
 =head2 $self->add ($msg_id, [%option])
 
@@ -259,7 +264,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/20 09:56:26 $
+$Date: 2002/03/26 05:31:55 $
 
 =cut
 
