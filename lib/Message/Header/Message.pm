@@ -10,7 +10,7 @@ require Message::Header::Default;
 package Message::Header::Message;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Message::Header::Message::DeliveryStatus;
 our %OPTION = %Message::Header::Default::OPTION;
@@ -33,7 +33,9 @@ $OPTION{goodcase} = {
 };
 
 $OPTION{value_type} = {
-	':default'	=> ['Message::Field::Unstructured'],
+	':default'	=> ['Message::Field::Unstructured',{
+		-use_encoded_word	=> 0,
+	}],
 	
 	action	=> ['Message::Field::ValueParams'],
 	'arival-date'	=> ['Message::Field::Date'],
@@ -49,7 +51,13 @@ $OPTION{value_type} = {
 	'received-from-mta'	=> ['Message::Field::TypedText'],
 	'remote-mta'	=> ['Message::Field::TypedText'],
 	'reporting-mta'	=> ['Message::Field::TypedText'],
-	status	=> ['Message::Field::Structured'],
+	status	=> ['Message::Field::Domain',{
+		-use_ipv4_address	=> 0,
+		-use_ipv6_address	=> 0,
+		-use_domain_literal	=> 0,
+		-use_comment	=> 1,
+		-output_comment	=> 1,
+	}],
 	'will-retry-until'	=> ['Message::Field::Date'],
 	'x-actual-recipient'	=> ['Message::Field::TypedText',{
 		-separator	=> ';',
@@ -81,9 +89,11 @@ $OPTION{goodcase} = {
 };
 
 $OPTION{value_type} = {
-	':default'	=> ['Message::Field::Unstructured'],
+	':default'	=> ['Message::Field::Unstructured',{
+		-use_encoded_word	=> 0,
+	}],
 	
-	#disposition	=> ['Message::Field::MDNDisposition'],
+	disposition	=> ['Message::Field::MDNDisposition'],
 	'final-recipient'	=> ['Message::Field::TypedText',{
 		-separator	=> ';',
 	}],
@@ -92,9 +102,7 @@ $OPTION{value_type} = {
 	'original-recipient'	=> ['Message::Field::TypedText',{
 		-separator	=> ';',
 	}],
-	#'reporting-ua'	=> ['Message::Field::CSV',{
-	#	-separator	=> ';',
-	#}],
+	'reporting-ua'	=> ['Message::Field::ReportingUA'],
 };
 
 $OPTION{uri_mailto_safe}	= {
@@ -125,7 +133,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/08 11:47:20 $
+$Date: 2002/07/13 09:29:12 $
 
 =cut
 
