@@ -17,7 +17,7 @@ markup constructures.  (SuikaWiki is not "tiny"?  Oh, yes, I see:-))
 
 package SuikaWiki::Markup::XML;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload '""' => \&outer_xml,
              fallback => 1;
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXML_NCNameStartChar InXMLNCNameChar!;
@@ -523,7 +523,8 @@ sub remove_references ($) {
       }
     }
     $_->{flag}->{smxp__defined_with_param_ref} = 0
-      if $_->{flag}->{smxp__defined_with_param_ref};
+      if $_->{flag}->{smxp__defined_with_param_ref}
+      && !$_->{flag}->{smxp__non_processed_declaration};
   }
   $self->{node} = \@node;
 }
@@ -1395,4 +1396,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/07/12 06:12:00 $
+1; # $Date: 2003/07/13 02:32:24 $

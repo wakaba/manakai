@@ -16,7 +16,7 @@ This module is part of SuikaWiki XML support.
 
 package SuikaWiki::Markup::XML::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 our %NS;
 *NS = \%SuikaWiki::Markup::XML::NS;
 
@@ -433,9 +433,13 @@ my %_Error = (
 		description	=> 'For interoperability, at most one definition for given attribute (%s) should be provided',
 		level	=> 'warn',
 	},
-	## XMLName recommendation
+	## XML Names recommendation
 	WARN_XML_NS_URI_IS_RELATIVE	=> {
 		description	=> 'URI of XML Namespace name is a relative URI',
+		level	=> 'warn',
+	},
+	WARN_XMLNAMES_EXTERNAL_NS_ATTR	=> {
+		description	=> 'Namespace declaration attribute ("%s" := <%s>) should be specified explicily in the start tag of element or default-declared in early part of internal subset',
 		level	=> 'warn',
 	},
 	## RFC 3023 'SHOULD'
@@ -462,6 +466,10 @@ my %_Error = (
 		level	=> 'warn',
 	},
 	## Implementation's warning
+	WARN_ATTLIST_DECLARATION_NOT_PROCESSED	=> {
+		description	=> 'This attlist declaration is not processed because unread parameter entity is referred before this declaration',
+		level	=> 'warn',
+	},
 	WARN_DOCTYPE_NOT_FOUND	=> {
 		description	=> 'No document type definition provided for this document',
 		level	=> 'warn',
@@ -470,8 +478,12 @@ my %_Error = (
 		description	=> 'This entity declaration is not processed because unread parameter entity is referred before this declaration',
 		level	=> 'warn',
 	},
+	WARN_EXTERNAL_DEFAULT_ATTR	=> {
+		description	=> 'Attribute default value of "%s" is declared in external entity or declared after reference to external entity is occurred so non-validating processor may generate different groove',
+		level	=> 'warn',
+	},
 	WARN_EXTERNALLY_DEFINED_ENTITY_REFERRED	=> {
-		description	=> 'The entity referred (%s) is declared in the external entity, so different groove can be constructed when external entity is not read',
+		description	=> 'The entity referred (%s) is declared in the external entity, so or declared after reference to external entity is occurred so non-validating processor may generate different groove',
 		level	=> 'warn',
 	},
 	WARN_GUESS_ENCODING_IMPL_ERR	=> {
@@ -722,4 +734,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/07/12 06:12:00 $
+1; # $Date: 2003/07/13 02:32:24 $

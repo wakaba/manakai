@@ -1,3 +1,14 @@
+2003-07-13  Wakaba  <w@suika.fam.cx>
+
+	* Parser.pm (_parse_start_tag): More default attribute support.
+	* EntityManager.pm (get_attr_definitions): Provide information whether attribute declaration may not be read.
+	* Error.pm: Some new errors related to attribute default.
+
+2003-07-12  Wakaba  <w@suika.fam.cx>
+
+	* EntityManager.pm (get_attr_definitions): New function.
+	* Parser.pm (_parse_start_tag): Complete default attribute value.
+
 2003-07-12  Wakaba  <w@suika.fam.cx>
 
 	* Parser.pm, Error.pm: Reimplemented ELEMENT and ATTLIST declarations.

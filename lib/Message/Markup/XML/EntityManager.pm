@@ -21,7 +21,7 @@ This module is part of SuikaWiki XML support.
 
 package SuikaWiki::Markup::XML::EntityManager;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 our %NS;
 *NS = \%SuikaWiki::Markup::XML::NS;
 
@@ -153,6 +153,42 @@ sub _get_entities ($$$$) {
   }
 }
 
+sub get_attr_definitions ($%) {
+  my ($self, %o) = @_;
+  return $self->{cache}->{attr_defs}->{$o{qname}}
+    if $self->{cache}->{attr_defs}->{$o{qname}};
+  my %r;
+  $o{namespace_uri} = $NS{SGML}.'attlist';
+  $o{type} = '#declaration';
+  $o{parent_node} ||= $self->{doctype};
+  my $l = [];
+  $self->_get_entities ($l, $o{parent_node}->{node}, \%o);
+  $r{declaration} = [];
+  for (@$l) {
+    if ($_->get_attribute ('qname', make_new_node => 1)->inner_text eq $o{qname}) {
+      push @{$r{declaration}}, $_;
+    }
+  }
+  for my $decl (@{$r{declaration}}) {
+    for (@{$decl->{node}}) {
+      if ($_->{type} eq '#element' && $_->{namespace_uri} eq $NS{XML}.'attlist',
+          $_->{local_name} eq 'AttDef') {
+        my $aname = $_->get_attribute ('qname', make_new_node => 1)->inner_text;
+        if ($r{attr}->{$aname}) {
+          $self->raise_error ($o{o}, type => 'WARN_XML_ATTLIST_AT_MOST_ONE_ATTR_DEF',
+                              c => $_, t => $aname)
+            if $o{o};
+        } else {
+          $r{attr}->{$aname} = $_;
+          $r{attr_may_not_be_read}->{$aname} = $decl->{flag}->{smxp__declaration_may_not_be_read};
+        }
+      }
+    }
+  }
+  $self->{cache}->{attr_defs}->{$o{qname}} = \%r;
+  \%r;
+}
+
 ## TODO: uri based recursion
 sub get_external_entity ($$$$) {
   my ($self, $parser, $decl, $o) = @_;
@@ -266,8 +302,11 @@ sub is_standalone_document ($) {
         $self->{node}->{flag}->{smxe__standalone} = $a->inner_text eq 'yes' ? 1 : 0;
         return $self->{node}->{flag}->{smxe__standalone};
       }
+    } elsif ($_->{type} eq '#attribute') {
+      ## Check next node too
+    } else {
+      last;	## No xml declaration
     }
-    last;
   }
   $self->{node}->{flag}->{smxe__standalone} = 0;
   return $self->{node}->{flag}->{smxe__standalone};
@@ -502,4 +541,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/07/12 06:12:00 $
+1; # $Date: 2003/07/13 02:32:24 $

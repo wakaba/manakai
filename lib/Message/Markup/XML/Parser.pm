@@ -16,7 +16,7 @@ This module is part of SuikaWiki.
 
 package SuikaWiki::Markup::XML::Parser;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXMLChar
                         InXML_deprecated_noncharacter InXML_unicode_xml_not_suitable!;
 require SuikaWiki::Markup::XML;
@@ -282,7 +282,7 @@ sub _parse_document_entity ($$\$$;%) {
   my ($self, $c, $s, $o, %opt) = @_;
   $o->{entity_type} = 'document_entity';
   my %occur;
-  my $entMan = $opt{entMan} || $c->root_node->flag ('smxp__entity_manager');
+  my $entMan = $opt{entMan};
   while ($$s) {
     if ($$s =~ /^<$xml_re{Name}/) {	# <element/>
       $self->_raise_error ($o, c => $c, type => 'WARN_DOCTYPE_NOT_FOUND') unless $occur{doctype};
@@ -406,14 +406,13 @@ sub _parse_document_entity ($$\$$;%) {
 sub _parse_element_content ($$\$$;%) {
   my ($self, $c, $s, $o, %opt) = @_;
   my $c_initial = overload::StrVal ($c);
-  my $entMan = $opt{entMan} || $c->root_node->flag ('smxp__entity_manager');
   while ($$s) {
     if ($$s =~ m:^<[^!?/]:) {
       if ($c->node_type eq '#document' && $self->_is_brother_of_root_element ($c)) {
         $self->_raise_error ($o, c => $c, type => 'SYNTAX_DATA_OUT_OF_ROOT_ELEMENT',
                              t => substr ($$s, 0, 10));
       }
-      $c = $self->_parse_start_tag ($c, $s, $o, entMan => $entMan);
+      $c = $self->_parse_start_tag ($c, $s, $o, entMan => $opt{entMan});
     } elsif ($$s =~ s/^$xml_re{ETag_M}//s) {
       my $ename = $1;
       if ($ename eq $c->flag ('smxp__original_qname') || $ename eq $c->qname) {
@@ -439,17 +438,18 @@ sub _parse_element_content ($$\$$;%) {
                            t => $entity_ref) if $c->node_type eq '#document';
       my $eref = $self->_parse_reference ($c, $entity_ref, $o);
       unless (index ($eref->{namespace_uri}, 'char') > -1) {	## General entity reference
-        my $entity = $entMan->get_entity ($eref);
+        my $entity = $opt{entMan}->get_entity ($eref);
         if (!$entity && {qw/&lt; 1 &gt; 1 &amp; 1 &quot; 1 &apos; 1/}->{$entity_ref}) {
           $self->_raise_error ($o, c => $c, type => 'WARN_PREDEFINED_ENTITY_NOT_DECLARED',
                                t => $entity_ref);
-          $entity = $entMan->get_entity ($eref);
+          $entity = $opt{entMan}->get_entity ($eref);
         }
         if (!$entity) {
           $self->_raise_error ($o, t => $entity_ref,
-                       type => ($entMan->is_standalone_document_1?'WF':'V').'C_ENTITY_DECLARED');
+                       type => ($opt{entMan}->is_standalone_document_1?'WF':'V')
+                                .'C_ENTITY_DECLARED');
         } else {
-          if ($entity->flag ('smxp__entity_defined_in_external_entity')) {
+          if ($entity->flag ('smxp__declaration_may_not_be_read')) {
             $self->_raise_error ($o, type => 'WARN_EXTERNALLY_DEFINED_ENTITY_REFERRED',
                                  t => $entity_ref);
           }
@@ -464,11 +464,11 @@ sub _parse_element_content ($$\$$;%) {
               $o2->{uri} = $entity->flag ('smxp__uri_in_which_declaration_is');
               $o2->{line} = 0; $o2->{pos} = 0;
               my $ev = $entity_value->_entity_parameter_literal_value;
-              $self->_parse_element_content ($eref, \$ev, $o2);
+              $self->_parse_element_content ($eref, \$ev, $o2, entMan => $opt{entMan});
               $eref->flag (smxp__ref_expanded => 1);
             } else {	## External entity
               $o2->{entity_type} = 'external_general_parsed_entity';
-              my $ext_ent = $entMan->get_external_entity ($self, $entity, $o2);
+              my $ext_ent = $opt{entMan}->get_external_entity ($self, $entity, $o2);
               if ($ext_ent->{NDATA}) {	## non-parsed entity
                 $self->_raise_error ($o, type => 'WFC_PARSED_ENTITY',
                                      c => $entity, t => $entity_ref);
@@ -480,7 +480,7 @@ sub _parse_element_content ($$\$$;%) {
                 $o2->{__entities}->{$entity_ref} = 1;
                 $eref->base_uri ($ext_ent->{base_uri});
                 my $ev = $ext_ent->{text};
-                $self->_parse_element_content ($eref, \$ev, $o2);
+                $self->_parse_element_content ($eref, \$ev, $o2, entMan => $opt{entMan});
                 $eref->flag (smxp__ref_expanded => 1);
               }
             }
@@ -523,10 +523,10 @@ sub _parse_element_content ($$\$$;%) {
 
 sub _parse_start_tag ($$\$$;%) {
   my ($self, $c, $s, $o, %opt) = @_;
-  my ($type_pfx, $type_lname);
+  my ($type_pfx, $type_lname, $type_qname);
   ## Element type name (general identifier)
   if ($$s =~ s/^<($xml_re{Name})//) {
-    my $type_qname = $1;
+    $type_qname = $1;
     if (substr ($type_qname, 0, 1) eq ':' || substr ($type_qname, -1, 1) eq ':') {
       $self->_raise_error ($o, c => $c, type => 'NS_SYNTAX_NAME_IS_QNNAME', t => $type_qname);
       $type_qname =~ tr/:/_/;
@@ -546,6 +546,7 @@ sub _parse_start_tag ($$\$$;%) {
     return $c;
   }
   
+  my $defattr = $opt{entMan}->get_attr_definitions (qname => $type_qname);
   ## Attribute spec list
   my @attr;
   my %defined_attr;
@@ -627,6 +628,49 @@ sub _parse_start_tag ($$\$$;%) {
     }
   }	## while
   
+  ## Default attributes
+  for (keys %{$defattr->{attr}}) {
+    unless ($defined_attr{$_}) {
+      my $defval = $defattr->{attr}->{$_}->get_attribute ('default_value');
+      if ($defval) {
+        my ($attr_pfx, $attr_lname) = $self->_ns_parse_qname ($_);
+        ## TODO: keep default-declared namespace information
+        if ($attr_pfx eq 'xmlns') {
+          my $ns_name = $defval->inner_text;
+          $opt{entMan}->check_ns_uri ($o, $attr_lname => $ns_name) if length $ns_name;
+          if ($defattr->{attr_may_not_be_read}->{$_}
+           && $c->defined_namespace_prefix ($attr_lname) ne $ns_name) {
+            $self->_raise_error ($o, type => 'WARN_XMLNAMES_EXTERNAL_NS_ATTR',
+                                 t => [$attr_lname => $ns_name]);
+          }
+          $c->define_new_namespace ($attr_lname => $ns_name);
+        } elsif (!$attr_pfx && $attr_lname eq 'xmlns') {
+          my $ns_name = $defval->inner_text;
+          if (length ($ns_name) || lc (substr ($ns_name, 0, 3)) eq 'xml') {
+            $opt{entMan}->check_ns_uri ($o, '' => $ns_name);
+          } else {
+            $self->_raise_error ($o, type => 'WARN_XML_NS_URI_IS_RELATIVE', t => $_);
+          }
+          if ($defattr->{attr_may_not_be_read}->{$_}
+           && $c->defined_namespace_prefix ('') ne $ns_name) {
+            $self->_raise_error ($o, type => 'WARN_XMLNAMES_EXTERNAL_NS_ATTR',
+                                 t => ['#default' => $ns_name]);
+          }
+          $c->define_new_namespace ('' => $ns_name);
+        } else {
+          my $attr_node = ref ($c)->new (type => '#attribute', local_name => $attr_lname,
+                                         value => $defval->inner_text);
+          $attr_node->flag (smxp__is_dtd_default => 1);
+          if ($defattr->{attr_may_not_be_read}->{$_}) {
+            $self->_raise_error ($o, type => 'WARN_EXTERNAL_DEFAULT_ATTR', c => $c,
+                                 t => $_);
+          }
+          push @attr, [$attr_pfx => $attr_lname, $attr_node];
+        }
+      }	# has default value
+    }	# unspecified attr
+  }
+  
   ## Namespace of element type name
   {
     my $uri = $c->defined_namespace_prefix ($type_pfx || '');
@@ -640,6 +684,7 @@ sub _parse_start_tag ($$\$$;%) {
       $c->namespace_uri ($NS{internal_ns_invalid}.$self->_uri_escape ($type_pfx));
     }
   }
+  
   ## Namespace of attribute name
   my %ns_attr_defined;
   for (@attr) {
@@ -694,6 +739,9 @@ sub _parse_dtd ($$\$$;%) {
             $eref->flag (smxp__ref_expanded => 1);
           } else {	## External entity
             $o2->{entity_type} = 'external_parameter_entity';
+            $c->root_node->flag (smxp__declaration_may_not_be_read => 1)
+              if !(index ($o->{entity_type}, 'external') > -1)
+              || !$opt{entMan}->is_standalone_document;
             my $ext_ent = $opt{entMan}->get_external_entity ($self, $entity, $o2);
             if ($ext_ent->{NDATA}) {	## non-parsed entity
               $self->_raise_error ($o, type => 'WFC_PARSED_ENTITY', c => $entity, t => $ref);
@@ -899,6 +947,13 @@ sub _parse_attr_value_literal_data ($$\$$;%) {
       substr ($$s, 0, 1) = '';
     }
   }	# $$s
+  ## Note: Implementation of normalize for non-CDATA attribute values should be done
+  ##       out of this module.
+  #if ({qw/ID 1 IDREF 1 IDREFS 1 NMTOKEN 1 NMTOKENS 1
+  #        NOTATION 1 NOTATIONS 1/}->{$opt{attr_type}}) {
+  #  $rt =~ s/\x20\x20+/\x20/g;
+  #  $rt =~ s/^\x20+//;  $rt =~ s/\x20+$//;
+  #}
   $rt;
 }
 
@@ -940,6 +995,9 @@ sub _parse_rpdata ($$\$$;%) {
               $tt .= $ev;
             } else {	## External entity
               $o2->{entity_type} = 'external_parameter_entity';
+              $c->root_node->flag (smxp__declaration_may_not_be_read => 1)
+                if !(index ($o->{entity_type}, 'external') > -1)
+                || !$opt{entMan}->is_standalone_document;
               my $ext_ent = $entMan->get_external_entity ($self, $entity, $o2);
               if ($ext_ent->{NDATA}) {	## non-parsed entity
                 $self->_raise_error ($o, type => 'WFC_PARSED_ENTITY', c => $entity, t => $ref);
@@ -1047,6 +1105,9 @@ sub _parse_md_params ($$\$$$;%) {
               $eref->flag (smxp__ref_expanded => 1);
             } else {	## External entity
               $o2->{entity_type} = 'external_parameter_entity';
+              $c->root_node->flag (smxp__declaration_may_not_be_read => 1)
+                if !(index ($o->{entity_type}, 'external') > -1)
+                || !$opt{entMan}->is_standalone_document;
               my $ext_ent = $entMan->get_external_entity ($self, $entity, $o2);
               if ($ext_ent->{NDATA}) {	## non-parsed entity
                 $self->_raise_error ($o, type => 'WFC_PARSED_ENTITY', c => $entity, t => $ref);
@@ -1054,11 +1115,11 @@ sub _parse_md_params ($$\$$$;%) {
                 $self->_raise_error ($o, type => 'ERR_EXT_ENTITY_NOT_FOUND', c => $entity,
                                          t => [$ref, $o2->{uri}, $ext_ent->{error}->{reason_text}]);
                 $c->root_node->flag (smxp__stop_read_dtd => 1)
-                  unless $entMan->is_standalone_document;
+                  unless $opt{entMan}->is_standalone_document;
               } else {	## parsed entity
                 $o2->{__entities}->{$ref} = 1;
                 my $ev = $ext_ent->{text};
-                $ev = $self->_parse_md_params ($eref, \$ev, $o2, entMan => $entMan);
+                $ev = $self->_parse_md_params ($eref, \$ev, $o2, entMan => $opt{entMan});
                 $entity->flag (smxp__entity_replacement_text_md_params => $ev);
                 $t .= ' '.$ev.' ';
                 $eref->flag (smxp__ref_expanded => 1);
@@ -1266,9 +1327,9 @@ sub _parse_entity_declaration ($\$$$;%) {
     my $entMan = $opt{entMan} || $c->root_node->flag ('smxp__entity_manager');
     my $dont_process = $c->root_node->flag ('smxp__stop_read_dtd');
     my $e = $c->append_new_node (type => '#declaration');
-      $e->flag (smxp__entity_defined_in_external_entity => 1)
-        if index ($o->{entity_type}, 'external') > -1;
       $e->flag (smxp__uri_in_which_declaration_is => $o->{uri});
+      $e->flag (smxp__declaration_may_not_be_read
+                => $c->root_node->flag ('smxp__declaration_may_not_be_read'));
     ## Entity? or notation?
     if ($$s =~ s/^<!ENTITY//) {
       $e->namespace_uri ($NS{SGML}.'entity');
@@ -1564,149 +1625,159 @@ sub _parse_element_declaration ($$$$;%) {
 sub _parse_attlist_declaration ($$$$;%) {
   my ($self, $s, $c, $o, %opt) = (@_);
   $c = $c->append_new_node (type => '#declaration', namespace_uri => $NS{SGML}.'attlist');
+      $c->flag (smxp__declaration_may_not_be_read
+                => $c->root_node->flag ('smxp__declaration_may_not_be_read'));
   unless ($$s =~ s/^<!ATTLIST//s) {
     $self->_raise_error ($o, type => 'UNKNOWN', c => $c, t => substr ($$s, 0, 10));
     return;
   }
   $self->_clp (_________ => $o);
   
+  my $dont_process = $c->root_node->flag ('smxp__stop_read_dtd');
   my $t = $self->_parse_md_params ($c, $s, $o, entMan => $opt{entMan}, return_by_mdc => 1);
+  $dont_process = $c->root_node->flag ('smxp__stop_read_dtd');
   
-  ## Element type name
-  if ($t =~ s/^($xml_re{s}($xml_re{Name}))//s) {
-    my $type_qname = $2;
-    if (substr ($type_qname, 0, 1) eq ':' || substr ($type_qname, -1, 1) eq ':') {
-      $self->_raise_error ($o, c => $c, type => 'NS_SYNTAX_NAME_IS_QNNAME', t => $type_qname);
-      $type_qname =~ tr/:/_/;
+  unless ($dont_process) {
+    ## Element type name
+    if ($t =~ s/^($xml_re{s}($xml_re{Name}))//s) {
+      my $type_qname = $2;
+      if (substr ($type_qname, 0, 1) eq ':' || substr ($type_qname, -1, 1) eq ':') {
+        $self->_raise_error ($o, c => $c, type => 'NS_SYNTAX_NAME_IS_QNNAME', t => $type_qname);
+        $type_qname =~ tr/:/_/;
+      }
+      $c->set_attribute (qname => $type_qname);
+    } else {
+      $self->_raise_error ($o, c => $c, type => 'SYNTAX_INVALID_MD', t => substr ($t, 0, 10));
+      return;
     }
-    $c->set_attribute (qname => $type_qname);
-  } else {
-    $self->_raise_error ($o, c => $c, type => 'SYNTAX_INVALID_MD', t => substr ($t, 0, 10));
-    return;
-  }
-  
-  ## Definition
-  my %defined;
-  while ($t) {
-    if ($t =~ s/^$xml_re{s}($xml_re{Name})//s) {
-      my %attr = (name => $1, type => undef);
-      if (substr ($attr{name}, 0, 1) eq ':' || substr ($attr{name}, -1, 1) eq ':') {
-        $self->_raise_error ($o, c => $c, type => 'NS_SYNTAX_NAME_IS_QNNAME', t => $attr{name});
-        $attr{name} =~ tr/:/_/;
-      }
-      if ($defined{$attr{name}}) {
-        $self->_raise_error ($o, c => $c, type => 'WARN_XML_ATTLIST_AT_MOST_ONE_ATTR_DEF',
-                             t => $attr{name});
-      } else {
-        $defined{$attr{name}} = 1;
-      }
-      $attr{node} = $c->append_new_node (type => '#element', namespace_uri => $NS{XML}.'attlist',
-                                         local_name => 'AttDef');
-      $attr{node}->set_attribute (qname => $attr{name});
-      if ($t =~ s/^$xml_re{s}//s) {
-        if ($t =~ s/^NOTATION$xml_re{s}//s) {
-          $attr{type} = 'NOTATION';
+    
+    ## Definition
+    my %defined;
+    while ($t) {
+      if ($t =~ s/^$xml_re{s}($xml_re{Name})//s) {
+        my %attr = (name => $1, type => undef);
+        if (substr ($attr{name}, 0, 1) eq ':' || substr ($attr{name}, -1, 1) eq ':') {
+          $self->_raise_error ($o, c => $c, type => 'NS_SYNTAX_NAME_IS_QNNAME', t => $attr{name});
+          $attr{name} =~ tr/:/_/;
         }
-        if (!$attr{type} && $t =~ s/^([A-Za-z]+)//) {	# attname type
-          $attr{type} = $1;
-          unless ({qw/CDATA 1 ID 1 IDREF 1 IDREFS 1 NMTOKEN 1 NMTOKENS 1
-                      ENTITY 1 ENTITIES 1/}->{$attr{type}}) {
-            $self->_raise_error ($o, type => 'SYNTAX_ATTLIST_ATTDEF_UNKNOWN_TYPE',
-                                 c => $c, t => $attr{type});
-          }
-        } elsif ($t =~ s/^\(([^)]+)\)//) {	# attname (group)
-          my $grp = $1;
-          if (index ($grp, '(') > -1) {
-            $self->_raise_error ($o, type => 'SYNTAX_ATTLIST_ATTDEF_NESTED_GROUP',
-                                 c => $c, t => $grp);
-          }
-          if (index ($grp, '&') > -1 || index ($grp, ',') > -1) {
-            $self->_raise_error ($o, type => 'SYNTAX_ATTLIST_ATTDEF_NON_BAR_CONNECTOR',
-                                 c => $c, t => $grp);
-          }
-          if ($grp =~ s/([^\p{InXMLNameChar}$xml_re{_s__chars}|])//s) {
-            $self->_raise_error ($o, type => 'SYNTAX_ATTLIST_ATTDEF_GROUP_INVALID_CHAR',
-                                 c => $c, t => $1);
-            $grp =~ s/([^\p{InXMLNameChar}$xml_re{_s__chars}|])//sg;
-          } else {
-            $grp =~ tr/\x09\x0A\x0D\x20//d;	# $xml_re{_s__chars}
-            if ($grp =~ /(^\||\|\||\|$)/) {
-              $self->_raise_error ($o, type => 'SYNTAX_ATTLIST_ATTDEF_GROUP_INVALID_CONNECTOR',
-                                   c => $c, t => $1);
-            }
-          }
-          my @grp = grep {$_} split /\P{InXMLNameChar}+/, $grp;
-          if ($attr{type}) {	## NOTATION
-            for (@grp) {
-              $self->_raise_error ($o, type => 'SYNTAX_ATTLIST_ATTDEF_GROUP_NOTATION_NAME',
-                                   c => $c, t => $_)
-                unless /^$xml_re{Name}$/;
-            }
-          } else {
-            $attr{type} = 'enum';
-          }
-          for (@grp) {
-            if ($attr{enum}->{$_}) {
-              $self->_raise_error ($o, type => 'VC_NO_DUPLICATE_TOKENS', c => $c, t => $_);
-            } else {
-              $attr{enum}->{$_} = 1;
-              $attr{node}->append_new_node (type => '#element', namespace_uri => $NS{XML}.'attlist',
-                                            local_name => 'enum')
-                         ->append_text ($_);
-            }
-          }
-        } else {	# attname #somewhat
-          $self->_raise_error ($o, type => 'SYNTAX_INVALID_MD', c => $c, t => substr ($t, 0, 10));
-          $attr{type} = 'CDATA';
-          next;
+        if ($defined{$attr{name}}) {
+          $self->_raise_error ($o, c => $c, type => 'WARN_XML_ATTLIST_AT_MOST_ONE_ATTR_DEF',
+                               t => $attr{name});
+        } else {
+          $defined{$attr{name}} = 1;
         }
-        $attr{node}->set_attribute (type => $attr{type});
-        
-        ## DefaultDecl
-        if ($t =~ s/^$xml_re{s}\#FIXED//s) {
-          $attr{deftype} = 'FIXED';
-          $attr{node}->set_attribute (default_type => $attr{deftype});
-        }
+        $attr{node} = $c->append_new_node (type => '#element', namespace_uri => $NS{XML}.'attlist',
+                                           local_name => 'AttDef');
+        $attr{node}->set_attribute (qname => $attr{name});
         if ($t =~ s/^$xml_re{s}//s) {
-          if (!$attr{deftype} && $t =~ s/^\#([A-Za-z-]+)//) {
-            $attr{deftype} = $1;
-            unless ({qw/IMPLIED 1 REQUIRED 1/}->{$attr{deftype}}) {
-              $self->_raise_error ($o, type => 'SYNTAX_ATTLIST_ATTDEF_UNKNOWN_DEFAULT', c => $c,
-                                   t => '#'.$attr{deftype});
+          if ($t =~ s/^NOTATION$xml_re{s}//s) {
+            $attr{type} = 'NOTATION';
+          }
+          if (!$attr{type} && $t =~ s/^([A-Za-z]+)//) {	# attname type
+            $attr{type} = $1;
+            unless ({qw/CDATA 1 ID 1 IDREF 1 IDREFS 1 NMTOKEN 1 NMTOKENS 1
+                        ENTITY 1 ENTITIES 1/}->{$attr{type}}) {
+              $self->_raise_error ($o, type => 'SYNTAX_ATTLIST_ATTDEF_UNKNOWN_TYPE',
+                                   c => $c, t => $attr{type});
             }
+          } elsif ($t =~ s/^\(([^)]+)\)//) {	# attname (group)
+            my $grp = $1;
+            if (index ($grp, '(') > -1) {
+              $self->_raise_error ($o, type => 'SYNTAX_ATTLIST_ATTDEF_NESTED_GROUP',
+                                   c => $c, t => $grp);
+            }
+            if (index ($grp, '&') > -1 || index ($grp, ',') > -1) {
+              $self->_raise_error ($o, type => 'SYNTAX_ATTLIST_ATTDEF_NON_BAR_CONNECTOR',
+                                   c => $c, t => $grp);
+            }
+            if ($grp =~ s/([^\p{InXMLNameChar}$xml_re{_s__chars}|])//s) {
+              $self->_raise_error ($o, type => 'SYNTAX_ATTLIST_ATTDEF_GROUP_INVALID_CHAR',
+                                   c => $c, t => $1);
+              $grp =~ s/([^\p{InXMLNameChar}$xml_re{_s__chars}|])//sg;
+            } else {
+              $grp =~ tr/\x09\x0A\x0D\x20//d;	# $xml_re{_s__chars}
+              if ($grp =~ /(^\||\|\||\|$)/) {
+                $self->_raise_error ($o, type => 'SYNTAX_ATTLIST_ATTDEF_GROUP_INVALID_CONNECTOR',
+                                     c => $c, t => $1);
+              }
+            }
+            my @grp = grep {$_} split /\P{InXMLNameChar}+/, $grp;
+            if ($attr{type}) {	## NOTATION
+              for (@grp) {
+                $self->_raise_error ($o, type => 'SYNTAX_ATTLIST_ATTDEF_GROUP_NOTATION_NAME',
+                                     c => $c, t => $_)
+                  unless /^$xml_re{Name}$/;
+              }
+            } else {
+              $attr{type} = 'enum';
+            }
+            for (@grp) {
+              if ($attr{enum}->{$_}) {
+                $self->_raise_error ($o, type => 'VC_NO_DUPLICATE_TOKENS', c => $c, t => $_);
+              } else {
+                $attr{enum}->{$_} = 1;
+                $attr{node}->append_new_node (type => '#element',
+                                              namespace_uri => $NS{XML}.'attlist',
+                                              local_name => 'enum')
+                           ->append_text ($_);
+              }
+            }
+          } else {	# attname #somewhat
+            $self->_raise_error ($o, type => 'SYNTAX_INVALID_MD', c => $c, t => substr ($t, 0, 10));
+            $attr{type} = 'CDATA';
+            next;
+          }
+          $attr{node}->set_attribute (type => $attr{type});
+          
+          ## DefaultDecl
+          if ($t =~ s/^$xml_re{s}\#FIXED//s) {
+            $attr{deftype} = 'FIXED';
             $attr{node}->set_attribute (default_type => $attr{deftype});
-          } elsif ($t =~ s/^($xml_re{__AttValue_simple})//s) {	# attname type "literal"
-            $attr{defvalue} = $attr{node}->set_attribute ('default_value');
-            my $pcdata = substr ($1, 1, length ($1) - 2);
-            $self->_parse_attr_value_literal_data ($attr{defvalue}, \$pcdata, $o,
-                                                   entMan => $opt{entMan});
+          }
+          if ($t =~ s/^$xml_re{s}//s) {
+            if (!$attr{deftype} && $t =~ s/^\#([A-Za-z-]+)//) {
+              $attr{deftype} = $1;
+              unless ({qw/IMPLIED 1 REQUIRED 1/}->{$attr{deftype}}) {
+                $self->_raise_error ($o, type => 'SYNTAX_ATTLIST_ATTDEF_UNKNOWN_DEFAULT', c => $c,
+                                     t => '#'.$attr{deftype});
+              }
+              $attr{node}->set_attribute (default_type => $attr{deftype});
+            } elsif ($t =~ s/^($xml_re{__AttValue_simple})//s) {	# attname type "literal"
+              $attr{defvalue} = $attr{node}->set_attribute ('default_value');
+              my $pcdata = substr ($1, 1, length ($1) - 2);
+              $self->_parse_attr_value_literal_data ($attr{defvalue}, \$pcdata, $o,
+                                                     entMan => $opt{entMan});
+            } elsif ($attr{deftype}) {	# deftype eq FIXED
+              $self->_raise_error ($o, type => 'SYNTAX_ATTLIST_ATTDEF_FIXED_NO_LITERAL', c => $c,
+                                   t => [$attr{name}, substr ($t, 0, 10)]);
+              next;
+            } else {	# attname type $invalid
+              $self->_raise_error ($o, type => 'SYNTAX_INVALID_MD', c => $c,
+                                   t => substr ($t, 0, 10));
+              next;
+            }
           } elsif ($attr{deftype}) {	# deftype eq FIXED
             $self->_raise_error ($o, type => 'SYNTAX_ATTLIST_ATTDEF_FIXED_NO_LITERAL', c => $c,
                                  t => [$attr{name}, substr ($t, 0, 10)]);
             next;
-          } else {	# attname type $invalid
-            $self->_raise_error ($o, type => 'SYNTAX_INVALID_MD', c => $c,
-                                 t => substr ($t, 0, 10));
+          } else {	# attname type$invalid
+            $self->_raise_error ($o, type => 'SYNTAX_INVALID_MD', c => $c, t => substr ($t, 0, 10));
             next;
           }
-        } elsif ($attr{deftype}) {	# deftype eq FIXED
-          $self->_raise_error ($o, type => 'SYNTAX_ATTLIST_ATTDEF_FIXED_NO_LITERAL', c => $c,
-                               t => [$attr{name}, substr ($t, 0, 10)]);
-          next;
-        } else {	# attname type$invalid
+        } else {	# attname#somewhat
           $self->_raise_error ($o, type => 'SYNTAX_INVALID_MD', c => $c, t => substr ($t, 0, 10));
           next;
         }
-      } else {	# attname#somewhat
+      } elsif ($t =~ s/$xml_re{s}$//s) {
+      } else {
         $self->_raise_error ($o, type => 'SYNTAX_INVALID_MD', c => $c, t => substr ($t, 0, 10));
-        next;
+        substr ($t, 0, 1) = '';
       }
-    } elsif ($t =~ s/$xml_re{s}$//s) {
-    } else {
-      $self->_raise_error ($o, type => 'SYNTAX_INVALID_MD', c => $c, t => substr ($t, 0, 10));
-      substr ($t, 0, 1) = '';
-    }
-  }	# $t
+    }	# $t
+  } else {	## dont_process
+    $c->flag (smxp__non_processed_declaration => 1);
+    $self->_raise_error ($o, c => $c, type => 'WARN_ATTLIST_DECLARATION_NOT_PROCESSED');
+  }
 }
 
 sub _is_brother_of_root_element ($$) {
@@ -1795,6 +1866,63 @@ sub flag ($$;$) {
   $self->{flag}->{$name};
 }
 
+=head1 FLAG NAMES DEFINED BY THIS MODULE
+
+=head2 Flag for SuikaWiki::Markup::XML instance
+
+=over 4
+
+=item smxp__declaration_may_not_be_read = 1/0 (root node)
+
+Whether after this flag is trued entity/attlist declarations may not
+be processed (bacause of declared in external entity or declared after
+some external entity reference) or not.
+
+=item smxp__declaration_may_not_be_read = 1/0 (#declaration node)
+
+Whether entity/attlist declaration may not be processed or not.
+
+=item smxp__defined_with_param_ref = 1/0 (#declaration node)
+
+Whether the declaration is defined with one or more parameter entity or not.
+
+=item smxp__entity_manager = instance of entity manager (root node)
+
+=item smxp__entity_replacement_text_md_params = semi-parsed text (Parameter entity #declaration node)
+
+=item smxp__entity_replacement_text_rpdata = semi-parsed text (Parameter entity #declaration node)
+
+=item smxp__is_dtd_default = 1/0 (#attribute node)
+
+Whether the attribute (name and value) is not specified explicily in STag
+so completed from DTD's attlist declaration or not.
+
+=item smxp__non_processed_declaration = 1/0 (Entity/attlist #declaration node)
+
+Whether the declaration is not read 'cause of smxp__stop_read_dtd'ed or not.
+
+=item smxp__original_qname = QName as specified in STag
+
+(Only used to check STag-ETag matching.)
+
+=item smxp__ref_expanded = 1/0 (#reference node)
+
+Whether the reference is expanded or not
+
+=item smxp__src_pos = "$o" object
+
+Start position in source entity (is this flag obsolete??)
+
+=item smxp__stop_read_dtd = 1/0 (root node)
+
+Whether reading entity/attlist declaration is stopped 'cause of
+some of external entity required to interpret the DTD is not processed
+or not.
+
+=item smxp__uri_in_which_declaration_is = uri (Entity #declaration node)
+
+=cut
+
 =head1 LICENSE
 
 Copyright 2003 Wakaba <w@suika.fam.cx>
@@ -1804,4 +1932,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/07/12 06:12:00 $
+1; # $Date: 2003/07/13 02:32:24 $
