@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/02/25 07:32:35 $
+      $Date: 2005/02/26 11:35:51 $
     @@ContentType:
       dis:Date.RCS
   
@@ -197,11 +197,11 @@ ClsDef:
         Creates a new <QUOTE::dis> database.
     @@Return:
       @@@Type:ManakaiDISDatabase
-      @@Description:
-        @@@lang:en
-        @@@@:
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
           A newly created <QUOTE::dis> parser.
-      @@PerlDef:
+      @@@PerlDef:
         $r = bless {
           forDef => {
             <Q::ManakaiDOM:all> => {
@@ -258,8 +258,18 @@ ClsDef:
       @@@PerlDef:
         $typeURI = <Q::DOMMain:any> unless defined $typeURI;
         $forURI = <Q::ManakaiDOM:all> unless defined $forURI;
-        if ($forURI eq <Q::ManakaiDOM:all>) {
-          $r = $typeURI;
+        __CODE{tfurisToURI:: $turi => $typeURI, $furi => $forURI, $uri => $r}__;
+
+  @ResourceDef:
+    @@QName: tfurisToURI
+    @@rdf:type:
+      dis2pm:BlockCode
+    @@enDesc:
+        Converts a pair of name URI reference and <QUOTE::for> URI reference 
+        into a <TYPE::dis:TFQNames>-expanded URI reference. 
+    @@PerlDef:      
+        if ($furi eq <Q::ManakaiDOM:all>) {
+          $uri = $turi;
         } else {
           ## NOTE: [RFC 3986]
           ##       fragment    := *(pchar / "/" / "?")
@@ -271,11 +281,11 @@ ClsDef:
           ##       EscapedData := NormalChar / "^(" / "^)" / "^^"
           ##                    / "(" SchemeData ")"
           ##       NormalChar  := UnicodeChar - [()^]
-          for my $uri ($typeURI, $forURI) {
-            $uri =~ s{([^0-9A-Za-z:;?=_./-])}{sprintf '%%%02X', ord $1}ge;
+          for my $__uri ($turi, $furi) {
+            $__uri =~ s{([^0-9A-Za-z:;?=_./-])}{sprintf '%%%02X', ord $1}ge;
           }
-          $r =qq<data:,200411tf#xmlns(t=data:,200411tf%23)>.
-                             qq<t:tf($typeURI,$forURI)>;
+          $uri = qq<data:,200411tf#xmlns(t=data:,200411tf%23)>.
+                                qq<t:tf($turi,$furi)>;
         }
 
 ##DISImplementation
@@ -323,6 +333,9 @@ ClsDef:
         }__;
         if (defined $r) {
           $r = bless $r, <ClassName::ManakaiDISDocument>;
+          $r-><AS::swcfg21:SWCFGDocument::swcfg21:ForLatest
+                                        .defaultElementTypeNamespaceURI>
+                    (<Q::dis:>);
         }
 ##DISParser
 
@@ -637,7 +650,7 @@ ClsDef:
 
         FORMATCH: {
           __DEEP{
-            my @ce = @{$self-><AG::ManakaiDISElement.disChildElements>};
+            my @ce = @{$self-><M::ManakaiDISElement.disChildElements>};
             for my $ce (@ce) {
               my $et = $ce-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
                                                       .expandedURI>;
@@ -896,7 +909,7 @@ ClsDef:
           } else {  ## In default namespace
             $r = $self-><M::ManakaiDISElement.prefixToURI> (null) . $prefix;
           }
-        }
+        }__;
 
   @Method:
     @@QName: qnameToPair
@@ -931,7 +944,7 @@ ClsDef:
           } else {  ## In default namespace
             $r = [$self-><M::ManakaiDISElement.prefixToURI> (null), $prefix];
           }
-        }
+        }__;
 
   @Method:
     @@Name: tfqnamesToURI
@@ -1012,13 +1025,7 @@ ClsDef:
           $forURI = defined $defaultForURI ? $defaultForURI
                                            : <Q::ManakaiDOM:all>;
         }
-        __DEEP{
-          $r = $self-><AG::ManakaiDISNode.ownerDISDocument>
-                    -><AG::swcfg21:SWCFGDocument::swcfg21:ForLatest
-                                                    .implementation>
-                    -><M::ManakaiDISImplementation.tfurisToURI>
-                                                  ($typeURI, $forURI);
-        }__;
+        __CODE{tfurisToURI:: $turi => $typeURI, $furi => $forURI, $uri => $r}__;
 
   @Method:
     @@Name: disGetAttribute
@@ -1041,7 +1048,7 @@ ClsDef:
         @@@@enDesc:
           No attribute node found. 
       @@@PerlDef:
-        for my $c (@{$self->{src}-><AG::ManakaiDISElement.disChildElements>}) {
+        for my $c (@{$self->{src}-><M::ManakaiDISElement.disChildElements>}) {
           if ($c-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
                                     .expandedURI> eq $attrName and
               $c-><AG::ManakaiDISElement.forMatch> ($forArg, $forpArg) and
@@ -1071,7 +1078,7 @@ ClsDef:
         The attribute (property) element nodes. 
       @@@PerlDef:
         $r = bless [], <ClassName::ManakaiDISElementList>;
-        for my $c (@{$self->{src}-><AG::ManakaiDISElement.disChildElements>}) {
+        for my $c (@{$self->{src}-><M::ManakaiDISElement.disChildElements>}) {
           if ($c-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
                                           .expandedURI> eq $attrName and
               $c-><AG::ManakaiDISElement.forMatch> ($forArg, $forpArg) and
@@ -1081,19 +1088,30 @@ ClsDef:
           }
         }
 
-  @Attr:
+  @Method:
     @@Name: disChildElements
-    @@Type: ManakaiDISElementList
     @@enDesc:
       A list of child elements.  
-    @@Get:
+    @@ForParam:
+    @@ForpParam:
+    @@Return:
+      @@@Type: ManakaiDISElementList
       @@@enDesc:
         The current snapshot of child nodes. 
       @@@PerlDef:
-        $r = bless [@{$self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
-                                                     .childNodes>}],
-                   <ClassName::ManakaiDISElementList>;    
-
+        $r = bless [], <ClassName::ManakaiDISElementList>;    
+        __DEEP{
+          for my $cn (@{$self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
+                                                       .childNodes>}) {
+            ## $cn is an #element.
+            my $dn = $cn->{<Q::TreeCore:node>}
+                        -><M::ManakaiDOM:ManakaiDOMNodeObject
+                            ::ManakaiDOM:Perl.newReference>
+                                      (<ClassName::ManakaiDISElement>);
+            next unless $dn-><M::ManakaiDISElement.forMatch> ($forArg, $forpArg);
+            push @$r, $dn;
+          }
+        }__;
   @Attr:
     @@Name: qnameValueURI
     @@enDesc:
@@ -1109,14 +1127,67 @@ ClsDef:
           No value. 
       @@@UndeclaredPrefixException:
       @@@PerlDef:
-        my $v = $self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
-        if (defined $v and not ref $v eq 'ARRAY') {
-          __DEEP{
-            $r = $self-><AG::ManakaiDISElement.qnameToURI> ($v);
-          }__;
-        } else {
-          $r = null;
-        }
+        __DEEP{
+          my $v = $self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
+          if (defined $v and not ref $v eq 'ARRAY') {
+            $r = $self-><AG::ManakaiDISElement.qnameToURI> ($v, node => $self);
+          } else {
+            $r = null;
+          }
+        }__;
+
+  @Attr:
+    @@Name: qnameValueLocalName
+    @@enDesc:
+      The local name part of the element value (assumed as 
+      written as <TYPE::dis:TypeQName>). 
+      \
+      {NOTE:: What should be if list value?
+      \
+      }
+    @@Get:
+      @@@Type:
+        DISCore:LocalName
+      @@@nullCase:
+        @@@@enDesc:
+          No value. 
+      @@@PerlDef:
+        __DEEP{
+          my $v = $self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
+          if (defined $v and not ref $v eq 'ARRAY') {
+            my ($n, $v) = split /:/, $v, 2;
+            $r = defined $v ? $v : $n;
+          } else {
+            $r = null;
+          }
+        }__;
+
+  @Attr:
+    @@Name: qnameValueNamespaceURI
+    @@enDesc:
+      The namespace URI of the element value (assumed as written 
+      in <TYPE::dis:TypeQName>). 
+      \
+      {NOTE:: What should be if list value?
+      \
+      }
+    @@Get:
+      @@@Type:AnyURI
+      @@@nullCase:
+        @@@@enDesc:
+          No value. 
+      @@@UndeclaredPrefixException:
+      @@@PerlDef:
+        __DEEP{
+          my $v = $self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
+          if (defined $v and not ref $v eq 'ARRAY') {
+            my ($p, $v) = split /:/, $v, 2;
+            $r = $self-><AG::ManakaiDISElement.prefixToURI>
+                                            (defined $v ? $p : null);
+          } else {
+            $r = null;
+          }
+        }__;
 
   @Attr:
     @@Name: tfqnamesValueURI
@@ -1143,6 +1214,55 @@ ClsDef:
           $r = null;
         }
 ##DISElement
+
+ClsDef:
+  @ClsQName: ManakaiDISModuleElement
+  @ClsISA: ManakaiDISElement
+  @enDesc:
+    The <Q::dis:Module> elements. 
+
+  @Attr:
+    @@Name: requireElement
+    @@enDesc:
+      The <Q::dis:Require> child element.  The element is 
+      newly created if not exist. 
+    @@Type: ManakaiDISElement
+    @@Get:
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::swcfg21:SWCFGNode
+                        ::swcfg21:ForLatest.getAttributeNS>
+                                   (<Q::dis:>, 'Require', make_new_node => true);
+        }__;
+
+  @Attr:
+    @@Name: defaultForURI
+    @@enDesc:
+      The value of <Q::dis:DefaultFor> attribute. 
+    @@Type: ForURI
+    @@Get:
+      @@@enDesc:
+        The value of <Q::dis:DefaultFor> child element.  If missing, 
+        <Q::ManakaiDOM:all> is returned. 
+      @@@PerlDef:
+        __DEEP{
+          my $df = $self-><M::swcfg21:SWCFGNode::swcfg21:ForLatest
+                                .getAttributeNS>
+                                         (<Q::dis:>, 'DefaultFor');
+          if ($df) {
+            $r = $df-><AG::ManakaiDISElement.qnameValueURI>
+              || <Q::ManakaiDOM:all>;
+          } else {
+            $r = <Q::ManakaiDOM:all>;
+          }
+        }__;
+    @@Set:
+      @@@PerlDef:
+        __DEEP{
+          $self-><M::swcfg21:SWCFGNode::swcfg21:ForLatest.setAttributeNS>
+                                     (<Q::dis:>, 'DefaultFor' => $given);
+        }__;
+##DISModuleElement
 
 ClsDef:
   @ClsQName: ManakaiDISElementList
@@ -1190,6 +1310,21 @@ ClsDef:
       <QUOTE::dis> document node objects. 
 
   @Attr:
+    @@Name: moduleElement
+    @@enDesc:
+      The <Q::dis:Module> element in this document.  The element is 
+      newly created if not exist. 
+    @@Type: ManakaiDISModuleElement
+    @@Get:
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::swcfg21:SWCFGNode
+                        ::swcfg21:ForLatest.getAttributeNS>
+                                   (<Q::dis:>, 'Module', make_new_node => true);
+        }__;
+        $r = bless $r, <ClassName::ManakaiDISModuleElement>;
+
+  @Attr:
     @@Name: disDatabase
     @@enDesc:
       Associated <QUOTE::dis> database. 
@@ -1223,6 +1358,7 @@ ClsDef:
   @ClsQName: ManakaiDISDatabase
   @enDesc:
     Resource database created from <QUOTE::dis> source data. 
+  @ClsISA: ManakaiDISExceptionTarget
 
   @Method:
     @@Name: getModule
@@ -1365,7 +1501,7 @@ ClsDef:
       @@@Name: fileName
       @@@Type: FileURI
       @@@enDesc:
-        A URI reference identifying a file.  If there is alredy a 
+        A URI reference identifying a file.  If there is already a 
         source document, then the association has been updated. 
     @@Param:
       @@@Name: doc
@@ -1375,7 +1511,228 @@ ClsDef:
     @@Return:
       @@@PerlDef:
         $self->{<Q::sourceFile>}->{$fileName} = $doc;
+
+  @Method:
+    @@Name: loadModule
+    @@enDesc:
+      Loads definitions from a <QUOTE::dis> document. 
+    @@Param:
+      @@@Name: doc
+      @@@Type:ManakaiDISDocument
+      @@@enDesc:
+        The source <QUOTE::dis> document object.  Its 
+        <A::ManakaiDISDocument.disDatabase> must be this database. 
+    @@Param:
+      @@@Name: resolver
+      @@@Type: DISModuleResolver
+      @@@enDesc:
+        The resolver to convert module name into <QUOTE::dis> document object. 
+    @@ForParam:
+    @@Return:
+      @@@RaiseException:
+        @@@@@: NO_MODULE_QNAME_ERR
+        @@@@enDesc:
+          The <Q::dis:Module> element must have a <Q::dis:QName> attribute. 
+      @@@RaiseException:
+        @@@@@: UNABLE_TO_GET_MODULE_ERR
+        @@@@enDesc:
+          The implementation is unable to get a module source. 
+      @@@PerlDef:
+        $resolver = bless $resolver, <ClassName::ManakaiDISModuleResolver>
+                      if ref $resolver eq 'CODE'; 
+        ## -- Module Name, URI
+        $forArg = <Q::ManakaiDOM:all> unless defined $forArg;
+        my $mod_node;
+        my $mod_name_node;
+        __DEEP{
+          $mod_node = $doc-><AG::ManakaiDISDocument.moduleElement>;
+          $mod_name_node = $mod_node-><M::swcfg21:SWCFGNode
+                                        ::swcfg21:ForLatest.getAttributeNS>
+                                                 (<Q::dis:>, 'QName');
+          unless ($mod_name_node) {
+            __UNDEEP{
+              __EXCEPTION{NO_MODULE_QNAME_ERR::
+                DIS:sourceNode => {$mod_node},
+              }__;
+            }__;
+          }
+          my $mod_name_uri;
+          my $mod_uri;
+          my $mod;
+          $mod_name_uri = $mod_name_node-><AG::ManakaiDISElement.qnameValueURI>;
+          __CODE{tfurisToURI:: $turi => $mod_name_uri, $furi => $forArg,
+                               $uri => $mod_uri}__;
+          $mod = $self-><M::ManakaiDISDatabase.getModule> ($mod_uri);
+        
+          unless ($mod-><M::ManakaiDISModuleDefinition.isDefined>) {
+            ## -- Initializes Module Definition Object
+            $mod->{nameURI} = $mod_name_uri;
+            $mod->{localName} = $mod_name_node-><AG::ManakaiDISElement
+                                                       .qnameValueLocalName>;
+            $mod->{namespaceURI} = $mod_name_node-><AG::ManakaiDISElement
+                                                       .qnameValueNamespaceURI>;
+            $mod->{for} = $forArg;
+            $mod->{src} = $mod_node;
+            $mod-><M::ManakaiDISModuleDefinition.isDefined> (true);
+            $self-><M::ManakaiDISDatabase.setSourceFile>
+                                        ($mod->{nameURI} => $mod->{src});
+
+            ## -- Loads Required Modules
+            my $req_node = $mod_node-><AG::ManakaiDISModuleElement
+                                                          .requireElement>;
+            for my $rm (@{$req_node-><M::ManakaiDISElement.disChildElements>}) {
+              next unless $rm-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
+                                               .expandedURI> eq <Q::dis:Module>;
+              my ($uri, $nuri, $ln, $for);
+              my $mqn = $rm-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
+                                      .getAttributeNS> (<Q::dis:>, 'QName');
+              if ($mqn) {
+                my $mqv = $mqn-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
+                                                                   .value>;
+                my $mqp = $mqn-><AG::ManakaiDISElement.qnameToPair>
+                                                       ($mqv, node => $mqn);
+                ($nuri, $ln) = @$mqp;
+              } else {
+                my $mn = $rm-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
+                                      .getAttributeNS> (<Q::dis:>, 'Name');
+                if ($mn) {
+                  $nuri = $mod->{namespaceURI};
+                  $ln = $mn-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
+                } else {
+                  $nuri = $mod->{namespaceURI};
+                  $ln = $mod->{localName};
+                }
+              }
+              my $wfn = $rm-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
+                                      .getAttributeNS> (<Q::dis:>, 'WithFor');
+              if ($wfn) {
+                $for = $wfn-><AG::ManakaiDISElement.qnameValueURI>;
+              } else {
+                $for = $mod->{for};
+              }
+              my $xuri = $nuri . $ln;
+              __CODE{tfurisToURI:: $turi => $xuri, $furi => $for,
+                                   $uri => $uri}__;
+              my $rmod = $self-><M::ManakaiDISDatabase.getModule> ($uri);
+              unless ($rmod-><AG::ManakaiDISModuleDefinition.isDefined>) {
+                my $rdoc = $resolver-><M::ManakaiDISModuleResolver.uriToDocument>
+                                              ($self, $uri, $nuri, $ln, $for);
+                unless ($rdoc) {
+                  __UNDEEP{
+                    __EXCEPTION{UNABLE_TO_GET_MODULE_ERR::
+                      DIS:uri => {$uri},
+                      DIS:namespaceURI => {$nuri},
+                      DIS:localName => {$ln},
+                      DIS:for => {$for},
+                      DIS:sourceNode => {$rm},
+                    }__;
+                  }__;
+                }
+                $self-><M::ManakaiDISDatabase.loadModule>
+                                       ($rdoc, $resolver, for_arg => $for);
+              }
+            } # Child Module elements
+            
+            ## -- Loads "for all"
+            my $nuri = $mod->{NameURI};
+            my $forall = <Q::ManakaiDOM:all>;
+            my $uri;
+            __CODE{tfurisToURI:: $turi => $nuri, $furi => $forall,
+                                 $uri => $uri}__;
+            my $rmod = $self-><M::ManakaiDISDatabase.getModule> ($uri);
+            unless ($rmod-><AG::ManakaiDISModuleDefinition.isDefined>) {
+              my $rdoc = $resolver-><M::ManakaiDISModuleResolver.uriToDocument>
+                               ($self, $uri, $nuri, $mod->{localName}, $forall);
+              unless ($rdoc) {
+                __UNDEEP{
+                  __EXCEPTION{UNABLE_TO_GET_MODULE_ERR::
+                    DIS:uri => {$uri},
+                    DIS:namespaceURI => {$nuri},
+                    DIS:localName => {$mod->{localName}},
+                    DIS:for => {$forall},
+                    DIS:sourceNode => {$mod->{src}},
+                  }__;
+                }__;
+              }
+              $self-><M::ManakaiDISDatabase.loadModule>
+                                         ($rdoc, $resolver, for_arg => $forall);
+            }
+          }
+        }__;
 ##DISDatabase
+
+IFClsDef:
+  @QName:
+    @@@: DISModuleResolver
+    @@ForCheck: ForIF
+  @QName:
+    @@@: ManakaiDISModuleResolver
+    @@ForCheck: ForClass
+  @enDesc:
+    Objects implementing <IF::DISModuleResolver> interface 
+    are used to convert module name into <QUOTE::dis> document object. 
+    \
+    {NOTE:: It is also acceptable to pass a <Perl::CODE> reference 
+            as a method parameter where <IF::DISModuleResolver> is 
+            expected.
+    \
+    }
+  @Method:
+    @@Name: uriToDocument
+    @@enDesc:
+      Returns a <QUOTE::dis> document from module name information. 
+    @@Param:
+      @@@Name: disDB
+      @@@Type: ManakaiDISDatabase
+      @@@enDesc:
+        The <QUOTE::dis> database. 
+    @@Param:
+      @@@Name: moduleURI
+      @@@Type: ModuleURI
+      @@@enDesc:
+        The URI reference of the module. 
+        \
+        {NOTE:: This parameter is redundant, since it can be 
+                composed from other three parameters.
+        \
+        }
+    @@Param:
+      @@@Name: moduleNamespaceURI
+      @@@Type: AnyURI
+      @@@enDesc:
+        The namespace URI of the module name. 
+    @@Param:
+      @@@Name: moduleLocalName
+      @@@Type: 
+        DISCore:LocalName
+      @@@enDesc:
+        The local name of the module name. 
+    @@Param:
+      @@@Name: moduleFor
+      @@@Type: ForURI
+      @@@enDesc:
+        The <QUOTE::for> URI reference for which the module is defined. 
+    @@Return:
+      @@@Type: ManakaiDISDocument
+      @@@enDesc:
+        The <QUOTE::dis> document.  It don't have to be a newly created
+        object. 
+      @@@nullCase:
+        @@@@enDesc:
+          The method is unable to resolve the reference. 
+      @@@PerlDef:
+        $r = $self->(@_);
+  @ManakaiDOM:inputNormalizer:
+    @@ContentType:
+      lang:Perl
+    @@@:
+      $INPUT = bless $INPUT, <ClassName::ManakaiDISModuleResolver>
+                 if ref $INPUT eq 'CODE';
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        <FILE::cdis2pm.pl> does not support non-datatype input normalizers yet.
+##DISModuleResolver
 
 PropDef:
   @QName: sourceFile
@@ -1389,6 +1746,7 @@ ClsDef:
   @enDesc:
     <QUOTE::dis> module definitions. 
   @ClsISA: ManakaiDISPropertyAccessor
+  @ClsISA: ManakaiDISExceptionTarget
   
   @Attr:
     @@Name: uri
@@ -1409,7 +1767,7 @@ ClsDef:
       <QUOTE::for> identifier. 
     @@Get:
       @@@PerlDef:
-        $r = $self->{uri};
+        $r = $self->{nameURI};
 
   @Attr:
     @@Name: localName
@@ -1450,8 +1808,6 @@ ClsDef:
     @@Get:
       @@@PerlDef:
         $r = $self->{<Q::isDefined>};
-
-  ## TODO: exception handler
 ##DISModuleDefinition
 
 ClsDef:
@@ -1460,6 +1816,7 @@ ClsDef:
     @@lang:en
     @@@:
       <QUOTE::dis> <QUOTE::for> definitions. 
+  @ClsISA: ManakaiDISExceptionTarget
   
   @Attr:
     @@Name: uri
@@ -1585,8 +1942,6 @@ ClsDef:
         }
         ## TODO: 
         $self->{<Q::isDefined>} = true;
-
-  ## TODO: exception handler
 ##DISForDefinition
 
 ClsDef:
@@ -1594,6 +1949,7 @@ ClsDef:
   @enDesc:
     <QUOTE::dis> resource definitions. 
   @ClsISA: ManakaiDISPropertyAccessor
+  @ClsISA: ManakaiDISExceptionTarget
   
   @Attr:
     @@Name: uri
@@ -1617,7 +1973,7 @@ ClsDef:
         @@@@enDesc:
           This resource does not have its name URI reference. 
       @@@PerlDef:
-        $r = $self->{uri};
+        $r = $self->{nameURI};
 
   @Attr:
     @@Name: localName
@@ -1777,8 +2133,6 @@ ClsDef:
        $self->{<Q::defininingModule>}
                  = $given-><AG::ManakaiDISModuleDefinition.uri>;
    
-
-  ## TODO: exception handler
 ##DISResourceDefinition
 
 ClsDef:
@@ -1995,13 +2349,15 @@ XParamDef:
   @Description:
     @@lang:en
     @@@:
-      The node from which the string has come. 
+      The node in which an error has occurred. 
   @Type: DISNode
 
 ExceptionDef:
   @ClsQName: ManakaiDISException
   @enDesc:
     Exceptions for the <QUOTE::dis> operations. 
+  @ClsISA:
+    ManakaiDOM:ManakaiDOMException::ManakaiDOM:Perl
   @XConstGroupDef:
     @@ClsQName: ManakaiDISExceptionCode
     @@enDesc:
@@ -2025,6 +2381,132 @@ ExceptionDef:
         @@@@QName: NO_ASSOCIATED_DB_ERR
         @@@@enDesc:
           No <QUOTE::dis> database has been associated with this document. 
+    @@XConstDef:
+      @@@Name: INVALID_SOURCE_ERR
+      @@@Value: 200
+      @@@enDesc:
+        The source input is well-formed but invalid. 
+      @@@XSubTypeDef:
+        @@@@QName: NO_MODULE_QNAME_ERR
+        @@@@enDesc:
+          The <Q::dis:Module> element must have its <Q::dis:QName> 
+          attribute. 
+      @@@XSubTypeDef:
+        @@@@QName: UNABLE_TO_GET_MODULE_ERR
+        @@@@enDesc:
+          The implementation is unable to get the module source. 
+        @@@@Def:
+          @@@@@ContentType:
+            lang:muf
+          @@@@@lang:en
+          @@@@@@:
+            Unable to get the module source of <%p (name => {<Q::DIS:uri>});>
+        @@@@XParam:
+          @@@@@QName: uri
+          @@@@@enDesc:
+            The URI reference of the module. 
+        @@@@XParam:
+          @@@@@QName: namespaceURI
+          @@@@@enDesc:
+            The namespace URI of the module name. 
+        @@@@XParam:
+          @@@@@QName: localName
+          @@@@@enDesc:
+            The local name of the module name. 
+        @@@@XParam:
+          @@@@@QName: for
+          @@@@@enDesc:
+            The <QUOTE::for> of the module.
+##DISException
+
+ClsDef:
+  @ClsQName: ManakaiDISExceptionTarget
+  @enDesc:
+    Objects that is able to be the target of an exception. 
+  @IntMethod:
+    @@Operator:
+      @@@@:
+        ManakaiDOM:MUErrorHandler
+      @@@ContentType:
+        dis:TypeQName
+    @@Description:
+      @@@lang:en
+      @@@@:
+        This method is a generic error handler; all manakai exceptions 
+        and warnings associated to an object are once reported to this method 
+        and then delivered to appropriate entities. 
+        \
+        If the error is an exception (such as <X::DOMCore:DOMException> or 
+        <X::ManakaiDOM:ManakaiDOMImplementationException>), it is 
+        simply thrown.  If the error is only a warning, it is reported 
+        via the <IF::DOMCore:DOMError> interface. 
+        \
+        See <PerlModule::Message::Util::Error> documentation for more 
+        information on the error reporting mechanism.
+        \
+        {NOTE:: This kind of methods are named as <Perl::___report_error> 
+                in the convention of <PerlModule::Message::Util::Error>. 
+        \
+        }
+    @@Param:
+      @@@Name:err
+      @@@Type: 
+        ManakaiDOM:ManakaiDOMExceptionOrWarning::ManakaiDOM:Perl
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          An exception object that describes what kind of error it is 
+          and how it should be recovered. 
+          \
+          {NOTE:: Exception objects in manakai implementation 
+                  inherit the class <PerlModule::Message::Util::Error>, 
+                  that in turn inherits <PerlModule::Error>.
+          \
+          }
+    @@Return:
+      @@@PerlDef:
+          if ($err->isa (<ClassName::ManakaiDOM:ManakaiDOMException
+                                   ::ManakaiDOM:Perl>)) {
+            $err->throw;
+          } else {
+            \## TODO: Implement warning reporting
+            warn $err->stringify;
+          }
+##DISExceptionTarget
+
+ForDef:
+  @QName:
+    DIS:ForIF
+ForDef:
+  @QName:
+    DIS:ForClass
+
+ElementTypeBinding:
+  @Name: IFClsDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@:
+        dis:MultipleResource
+      @@@ForCheck: !ForClass !ForIF
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:IF
+      @@@ForCheck: ForIF
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:Class
+      @@@ForCheck: ForClass
+    @@resourceFor: ForIF
+    @@resourceFor:
+      @@@@: ForClass
+      @@@ForCheck: ForLatest
+    @@DOMMain:implementFeature:
+      @@@@:CoreFeature10
+      @@@ForCheck: ForClass
+    @@ForCheck:
+      ManakaiDOM:Perl
 
 ElementTypeBinding:
   @Name: ClsDef

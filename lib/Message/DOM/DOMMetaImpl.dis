@@ -20,7 +20,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/21 08:06:19 $
+      $Date: 2005/02/26 11:35:50 $
     @@ContentType:
       dis:Date.RCS
   
@@ -377,6 +377,20 @@ PropDef:
     ManakaiDOM:Class
   @dataType:
     dis:TypeForQNames
+
+FeatureDef:
+  @QName: 
+    ManakaiDOM:Minimum
+  @FeatureVerDef:
+    @@Version: 3.0
+    @@QName: 
+      ManakaiDOM:MinimumFeature30
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Minimum DOM implementation, level 3.
+    @@ISA:
+      ManakaiDOM:Minimum
 
 ## -- The bootstrap object
 
@@ -1018,6 +1032,8 @@ IFClsDef:
       ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
   @DOMMain:implementFeature:
     DOMCore:CoreFeature10
+  @DOMMain:implementFeature:
+    ManakaiDOM:MinimumFeature30
 
   @Description:
     @@lang:en

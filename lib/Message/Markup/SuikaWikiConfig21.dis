@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/02/21 08:06:19 $
+      $Date: 2005/02/26 11:35:51 $
     @@ContentType:
       dis:Date.RCS
   
@@ -3100,6 +3100,10 @@ IFClassDef:
                  = $self-><M::SWCFGNode.lookupNamespaceURI>
                                  ($__prefix, make_new_binding => 1);
           }__;
+        } else {
+          $__node->{<Q::namespaceURI>}
+                 = $__node->{<Q::DOMCore:ownerDocument>}
+                          ->{<Q::defaultETNamespaceURI>};
         }
         $__node->{<Q::namespaceExpanded>} = true;
       }

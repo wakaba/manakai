@@ -440,6 +440,10 @@ sub perl_code ($;%) {
       $r = '{'.perl_statement ('local $Error::Depth = $Error::Depth + 1').
               perl_code ($data, %opt) .
            '}';
+    } elsif ($et eq ExpandedURI q<disPerl:UNDEEP>) {   ## Shallow Method Call
+      $r = '{'.perl_statement ('local $Error::Depth = $Error::Depth - 1').
+              perl_code ($data, %opt) .
+           '}';
     } elsif ({
               ExpandedURI q<disPerl:EXCEPTION> => 1,
               ExpandedURI q<disPerl:WARNING> => 1,
@@ -2354,4 +2358,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/02/20 12:28:06 $
+1; # $Date: 2005/02/26 11:35:50 $
