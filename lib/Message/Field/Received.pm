@@ -11,13 +11,13 @@ Internet message header field body
 package Message::Field::Received;
 use strict;
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 
 require Message::Field::Date;
-use overload '@{}' => sub {shift->_delete_empty_item->{item}},
+use overload '@{}' => sub {shift->_delete_empty->{value}},
              '""' => sub { $_[0]->stringify };
 
 *REG = \%Message::Util::REG;
@@ -44,9 +44,11 @@ sub _init ($;%) {
   my $self = shift;
   my %options = @_;
   my %DEFAULT = (
+    -_HASH_NAME	=> 'value',
     -field_name	=> 'received',
     #format	## Inherited
     -parse_all	=> 0,
+    -validate	=> 1,
     -value_type	=> {'*default'	=> [':none:']},
   );
   $self->SUPER::_init (%DEFAULT, %options);
@@ -108,7 +110,7 @@ sub parse ($$;%) {
   $field_body =~ s{$REG{M_name_val_pair}$REG{FWS}}{
     my ($name, $value) = (lc $1, $2);
     $name =~ tr/-/_/;
-    push @{$self->{item}}, [$name => $value];
+    push @{$self->{value}}, [$name => $value];
     ''
   }goex;
   $self;
@@ -127,25 +129,25 @@ array references.
 
 =cut
 
-sub items ($) {@{shift->{item}}}
+sub items ($) {@{shift->{value}}}
 
 sub item_name ($$) {
   my $self = shift;
   my $i = shift;
-  $self->{item}->[$i]->[0];
+  $self->{value}->[$i]->[0];
 }
 
 sub item_value ($$) {
   my $self = shift;
   my $i = shift;
-  $self->{item}->[$i]->[1];
+  $self->{value}->[$i]->[1];
 }
 
 sub item ($$) {
   my $self = shift;
   my $name = lc shift;
   my @ret;
-  for my $item (@{$self->{item}}) {
+  for my $item (@{$self->{value}}) {
     if ($item->[0] eq $name) {
       unless (wantarray) {
         return $item->[1];
@@ -162,81 +164,63 @@ sub date_time ($) {
   $self->{date_time};
 }
 
-=head2 $self->add ($item_name, $item_value)
+## add: Inherited
+## replace: Inherited
 
-Add an C<nama-val-pair>.
+sub _add_hash_check ($$$\%) {
+  my $self = shift;
+  my ($name => $value, $option) = @_;
+  if ($$option{validate} && $name !~ /^$REG{item_name}$/) {
+    if ($$option{dont_croak}) {
+      return (0);
+    } else {
+      Carp::croak qq{add/replace: $name: Invalid item-name};
+    }
+  }
+  $value = $self->_item_value ($name => $value) if $$option{parse};
+  (1, $name => [$name => $value]);
+}
+*_replace_hash_check = \&_add_hash_check;
 
-Note that this method (and other methods) does not check
-C<item-val-pair> is valid as RFC (2)82[12] definition or not.
-(But only C<item-name> is changed when C<stringify>.)
+sub _replace_cleaning ($) {
+  $_[0]->_delete_empty;
+}
+
+=item $count = $r->count ([%options])
+
+Returns the number of C<item-val-pair>s.
+
+Available Options:
+
+=over 2 
+
+=item -name => "C<item-name>"
+
+Counts only C<item-val-oair>s whose name is same as given.
+
+=back
 
 =cut
 
-sub add ($%) {
+*_count_cleaning = \&_replace_cleaning;
+sub _count_by_name ($$\%) {
   my $self = shift;
-  my %gp = @_; my %option = %{$self->{option}};
-  for (grep {/^-/} keys %gp) {$option{substr ($_, 1)} = $gp{$_}}
-  $option{parse} = 1 if defined wantarray;
-  my $p;
-  for (grep {/^[^-]/} keys %gp) {
-    my ($name => $value) = (lc $_ => $gp{$_});
-    $value = $self->_item_value ($name => $value) if $option{parse};
-    if ($option{prepend}) {
-      unshift @{$self->{item}}, [$name => $value];
-    } else {
-      push @{$self->{item}}, [$name => $value];
-    }
-  }
-  $p;
-}
-
-sub replace ($%) {
-  my $self = shift;
-  my %gp = @_; my %option = %{$self->{option}};
-  for (grep {/^-/} keys %gp) {$option{substr ($_, 1)} = $gp{$_}}
-  $option{parse} = 1 if defined wantarray;
-  my $p;
-  for (grep {/^[^-]/} keys %gp) {
-    my ($name => $value) = (lc $_ => $gp{$_});
-    my $f = 0;
-    for my $item (@{$self->{item}}) {
-      if ($item->[0] eq $name) {$item = [$name => $value]; $f = 1}
-    }
-    push @{$self->{item}}, [$name => $value] unless $f == 1;
-  }
-  $p;
+  my ($array, $option) = @_;
+  my $name = lc ($$option{-name});
+  my @a = grep {$_->[0] eq $name} @{$self->{$array}};
+  $#a + 1;
 }
 
 sub delete ($@) {
   my $self = shift;
   my %delete;
   for (@_) {$delete{lc $_} = 1}
-  $self->{item} = [grep {!$delete{$_->[0]}} @{$self->{item}}];
-}
-
-=head2 $self->count ([$item_name])
-
-Returns the number of times the given C<item-name>'ed 
-C<name-val-pair> appears.
-If no $item_name is given, returns the number
-of fields.  (Same as $#$self+1)
-
-=cut
-
-sub count ($;$) {
-  my $self = shift;
-  my ($name) = (lc shift);
-  unless ($name) {
-    $self->_delete_empty;
-    return $#{$self->{item}}+1;
-  }
-  my @c = grep {$_->[0] eq $name} @{$self->{item}};
-  scalar @c;
+  $self->{value} = [grep {!$delete{$_->[0]}} @{$self->{value}}];
 }
 
 sub _delete_empty ($) {
   my $self = shift;
-  $self->{item} = [grep {ref $_ && length $_->[0]} @{$self->{item}}];
+  $self->{value} = [grep {ref $_ && length $_->[0]} @{$self->{value}}];
   $self;
 }
 
@@ -246,7 +230,7 @@ sub stringify ($;%) {
   my %option = @_;
   my @return;
   $self->_delete_empty;
-  for my $item (@{$self->{item}}) {
+  for my $item (@{$self->{value}}) {
     push @return, $item->[0], $item->[1] if $item->[0] =~ /^$REG{item_name}$/;
   }
   join (' ', @return).'; '.$self->{date_time}->as_rfc2822_time;
@@ -274,15 +258,7 @@ Returns a copy of the object.
 
 =cut
 
-sub clone ($) {
-  my $self = shift;
-  $self->_delete_empty;
-  my $clone = $self->SUPER::clone;
-  $clone->{item} = Message::Util::make_clone ($self->{item});
-  $clone->{value_type} = Message::Util::make_clone ($self->{value_type});
-  $clone;
-}
-
+## Inherited
 
 =head1 LICENSE
 
@@ -306,7 +282,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/22 08:28:20 $
+$Date: 2002/05/04 06:03:58 $
 
 =cut
 

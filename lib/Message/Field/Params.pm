@@ -11,7 +11,7 @@ use strict;
 require 5.6.0;
 use re 'eval';
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -30,10 +30,12 @@ use overload '""' => sub { $_[0]->stringify },
 $REG{param} = qr/(?:$REG{atext_dot}|$REG{quoted_string}|$REG{angle_quoted})(?:$REG{atext_dot}|$REG{quoted_string}|$REG{WSP}|,)*/;
 $REG{param_nocomma} = qr/(?:$REG{atext_dot}|$REG{quoted_string}|$REG{angle_quoted})(?:$REG{atext_dot}|$REG{quoted_string}|$REG{WSP})*/;
 	## more naive C<parameter>.  (Comma is allowed for RFC 1049)
+$REG{param_free} = qr/(?:[^\x09\x20\x22\x3B\x3C]|$REG{quoted_string}|$REG{angle_quoted})(?:[^\x22\x3B\x3C]|$REG{quoted_string})*/;
 $REG{parameter} = qr/$REG{token}=(?:$REG{token}|$REG{quoted_string})?/;
 	## as defined by RFC 2045, not RFC 2231.
 
-$REG{M_parameter} = qr/($REG{token})=($REG{token}|$REG{quoted_string})?/;
+#$REG{M_parameter} = qr/($REG{token})=($REG{token}|$REG{quoted_string})?/;
+$REG{M_parameter} = qr/($REG{token})=($REG{quoted_string}|[^\x22]*)/;
 	## as defined by RFC 2045, not RFC 2231.
 $REG{M_parameter_name} = qr/($REG{attribute_char}+)(?:\*([0-9]+)(\*)?|(\*))/;
 	## as defined by RFC 2231.
@@ -54,9 +56,12 @@ sub _init ($;%) {
   my $self = shift;
   my %options = @_;
   my %DEFAULT = (
-    -delete_fws	=> 1,
+    -delete_fws	=> 1,## BUG: this option MUST be '1'.
+    	## parameter parser cannot procede CFWS.
     #encoding_after_encode	## Inherited
     #encoding_before_decode	## Inherited
+    #field_param_name	## Inherited
+    #field_name	## Inherited
     #format	## Inherited
     #hook_encode_string	## Inherited
     #hook_decode_string	## Inherited
@@ -68,7 +73,7 @@ sub _init ($;%) {
     -separator	=> '; ',
     -separator_regex	=> qr/$REG{FWS};$REG{FWS}/,
     -use_parameter_extension	=> 0,
-    -value_type	=> {'*default'	=> [':none:']},
+    #value_type	## Inherited
   );
   $self->SUPER::_init (%DEFAULT, %options);
   $self->{param} = [];
@@ -171,6 +176,8 @@ sub _restore_param ($@) {
                 language => $p->{language}, charset => $p->{charset},
                 type => 'parameter/encoded');
           ($s, $p->{charset}, $p->{language}) = (@s{qw(value charset language)});
+        } elsif ($p->{is_internal}) {
+          $s = $p->{value};
         } else {
           my $q = 0;
           ($s,$q) = Message::Util::unquote_if_quoted_string ($p->{value});
@@ -187,11 +194,12 @@ sub _restore_param ($@) {
         is_encoded => $p->{is_encoded}};
       }
     } else {
-      my $q = 0;
-      ($i->[0], $q) = Message::Util::unquote_if_quoted_string ($i->[0]);
-      my %s = &{$self->{option}->{hook_decode_string}} ($self, $i->[0],
-                type => ($q?'phrase/quoted':'phrase'));
-      push @ret, [$s{value}, {is_parameter => 0}];
+      #my $q = 0;
+      #($i->[0], $q) = Message::Util::unquote_if_quoted_string ($i->[0]);
+      #my %s = &{$self->{option}->{hook_decode_string}} ($self, $i->[0],
+      #          type => ($q?'phrase/quoted':'phrase'));
+      push @ret, [Message::Util::decode_quoted_string ($self, $i->[0]), 
+                  {is_parameter => 0}];
     }
   }
   for my $name (keys %part) {
@@ -213,10 +221,16 @@ sub _restore_param ($@) {
 
 sub _save_param ($@) {
   my $self = shift;
-  my @p = @_;
+  my @p = map {## TODO: BUG:
+    if ($self->{option}->{parse_all} && $_->[1]->{is_parameter}) {
+      $_->[1]->{value} = $self->_parse_value ($_->[0] => $_->[1]->{value});
+    }
+    $_;
+  } @_;
   $self->{param} = \@p;
   $self;
 }
+*__save_param = \&_save_param;	## SHOULD NOT BE OVERRIDDEN!
 
 =back
 
@@ -256,7 +270,7 @@ sub add ($$;$%) {
     $p->[1]->{is_parameter} = 0 if !$value && $po{value};
     Carp::croak "add: \$name contains of non-attribute-char: $name"
       if $p->[1]->{is_parameter} && $name =~ /$REG{NON_http_attribute_char}/;
-    $p->[1]->{value} = $self->_param_value ($name => $p->[1]->{value})
+    $p->[1]->{value} = $self->_parse_value ($name => $p->[1]->{value})
       if $option{parse};
     if ($option{prepend}) {
       unshift @{$self->{param}}, $p;
@@ -282,7 +296,7 @@ sub replace ($%) {
     $p->[1]->{is_parameter} = 0 if !defined ($value) && $po{value};
     Carp::croak "replace: \$name contains of non-attribute-char: $name"
       if $p->[1]->{is_parameter} && $name =~ /$REG{NON_http_attribute_char}/;
-    $p->[1]->{value} = $self->_param_value ($name => $p->[1]->{value})
+    $p->[1]->{value} = $self->_parse_value ($name => $p->[1]->{value})
       if $option{parse};
     my $f = 0;
     for my $param (@{$self->{param}}) {
@@ -337,11 +351,11 @@ sub parameter ($$;$%) {
     if ($param->[0] eq $name) {
       unless (wantarray) {
         $param->[1]->{value} 
-          = $self->_param_value ($name => $param->[1]->{value});
+          = $self->_parse_value ($name => $param->[1]->{value});
         return $param->[1]->{value};
       } else {
         $param->[1]->{value} 
-          = $self->_param_value ($name => $param->[1]->{value});
+          = $self->_parse_value ($name => $param->[1]->{value});
         push @ret, $param->[1]->{value};
       }
     }
@@ -364,42 +378,15 @@ sub parameter_value ($$;$) {
   my $i = shift;
   my $newvalue = shift;
   if ($newvalue) {
-    $newvalue = $self->_param_value ($self->{param}->[$i]->[0] => $newvalue);
+    $newvalue = $self->_parse_value ($self->{param}->[$i]->[0] => $newvalue);
     $self->{param}->[$i]->[1]->{value} = $newvalue;
   }
   $self->{param}->[$i]->[1]->{value} 
-    = $self->_param_value 
+    = $self->_parse_value 
       ($self->{param}->[$i]->[0] => $self->{param}->[$i]->[1]->{value});
   $self->{param}->[$i]->[1]->{value};
 }
 
-## Hook called before returning C<value>.
-## $self->_param_value ($name, $value);
-sub _param_value ($$$) {
-  my $self = shift;
-  my $name = shift || '*default';
-  my $value = shift;
-  return $value if ref $value;
-  my $vtype = $self->{option}->{value_type}->{$name}->[0]
-      || $self->{option}->{value_type}->{'*default'}->[0];
-  my %vopt; %vopt = %{$self->{option}->{value_type}->{$name}->[1]} 
-    if ref $self->{option}->{value_type}->{$name}->[1];
-  if ($vtype eq ':none:') {
-    return $value;
-  } elsif (defined $value) {
-    eval "require $vtype";
-    return $vtype->parse ($value, -format => $self->{option}->{format},
-      -field_name => $self->{option}->{field_name},
-      -field_param_name => $name,
-      -field_body => $self->{option}->{field_body}, %vopt);
-  } else {
-    eval "require $vtype";
-    return $vtype->new (-format => $self->{option}->{format},
-      -field_name => $self->{option}->{field_name},
-      -field_param_name => $name,
-      -field_body => $self->{option}->{field_body}, %vopt);
-  }
-}
 
 sub _delete_empty ($) {
   my $self = shift;
@@ -419,9 +406,11 @@ sub stringify ($;%) {
   my %option = %{$self->{option}};
   for (grep {/^-/} keys %o) {$option{substr ($_, 1)} = $o{$_}}
   $self->_delete_empty;
-  join $self->{option}->{separator},
-    map {
-      my $v = $_->[1];
+  my @ret = ();
+  $self->scan (sub {
+    my $self = shift;
+      my ($n => $v) = @_[0 => 2]; #$_->[1];
+      return unless $self->_stringify_params_check (@_[0 => 2]);
       my $new = '';
       if ($v->{is_parameter}) {
         my ($encoded, @value) = (0, '');
@@ -463,7 +452,7 @@ sub stringify ($;%) {
                     unsafe => 'NON_http_attribute_char');
             }
           } else {
-            my $unsafe = $self->{option}->{parameter_value_unsafe_rule}->{$_->[0]}
+            my $unsafe = $self->{option}->{parameter_value_unsafe_rule}->{$n}
                      || $self->{option}->{parameter_value_unsafe_rule}->{'*default'};
             $value[0] = Message::Util::quote_unsafe_string 
               ($e{value}, unsafe => $unsafe);
@@ -473,14 +462,14 @@ sub stringify ($;%) {
         ## But it is better than output bare non-atext.
         if ($#value == 0) {
           $new = 
-            Message::Util::quote_unsafe_string ($_->[0], 
+            Message::Util::quote_unsafe_string ($n, 
               unsafe => 'NON_attribute_char')
             .($encoded?'*':'').'='.$value[0]
               if defined $value[0];
         } else {
           my @new;
           my $name = Message::Util::quote_unsafe_string 
-            ($_->[0], unsafe => 'NON_http_attribute_char');
+            ($n, unsafe => 'NON_http_attribute_char');
           for my $i (0..$#value) {
             push @new, $name.'*'.$i.($encoded?'*':'').'='.$value[$i];
           }
@@ -488,15 +477,21 @@ sub stringify ($;%) {
         }
       } else {
         my %e = &{$self->{option}->{hook_encode_string}} ($self, 
-          $_->[0], type => 'phrase');
+          $n, type => 'phrase');
         $new = Message::Util::quote_unsafe_string ($e{value}, 
           unsafe => 'NON_http_token_wsp');
       }
-      $new;
-    } @{$self->{param}}
-  ;
+      push @ret, $new;
+  });
+  join $self->{option}->{separator}, @ret;
 }
 *as_string = \&stringify;
+
+sub _stringify_params_check ($$$) {
+  my $self = shift;
+  my ($name, $value) = @_;
+  1;
+}
 
 sub scan ($&) {
   my ($self, $sub) = @_;
@@ -508,7 +503,7 @@ sub scan ($&) {
   #  @field = sort $sort @{$self->{param}};
   #}
   for my $param (@param) {
-    &$sub($param->[0] => $param->[1]->{value}, $param->[1]);
+    &$sub($self, $param->[0] => $param->[1]->{value}, $param->[1]);
   }
 }
 
@@ -536,23 +531,7 @@ sub option ($;$%) {
   }
 }
 
-## TODO: multiple value-type support
-sub value_type ($;$$%) {
-  my $self = shift;
-  my $name = shift || '*default';
-  my $new_value_type = shift;
-  if ($new_value_type) {
-    $self->{option}->{value_type}->{$name} = []
-      unless ref $self->{option}->{value_type}->{$name};
-    $self->{option}->{value_type}->{$name}->[0] = $new_value_type;
-  }
-  if (ref $self->{option}->{value_type}->{$name}) {
-    $self->{option}->{value_type}->{$name}->[0]
-      || $self->{option}->{value_type}->{'*default'}->[0];
-  } else {
-    $self->{option}->{value_type}->{'*default'}->[0];
-  }
-}
+## value_type: Inherited
 
 sub value_unsafe_rule ($$;$%) {
   my $self = shift;
@@ -621,7 +600,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/22 08:28:20 $
+$Date: 2002/05/04 06:03:58 $
 
 =cut
 

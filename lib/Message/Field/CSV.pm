@@ -11,13 +11,14 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 
 use overload '""' => sub { $_[0]->stringify },
              '0+' => sub { $_[0]->count },
+             '@{}' => sub { $_[0]->{value} },	## SHOULD NOT be used
              '.=' => sub { $_[0]->add ($_[1]); $_[0] },
              fallback => 1;
 
@@ -42,12 +43,12 @@ sub _init ($;%) {
   my $self = shift;
   my %options = @_;
   my %DEFAULT = (
-    #encoding_after_encode	## Inherited
-    #encoding_before_decode	## Inherited
+    #encoding_after_encode
+    #encoding_before_decode
     -field_name	=> 'keywords',
-    #format	## Inherited
-    #hook_encode_string	## Inherited
-    #hook_decode_string	## Inherited
+    #format
+    #hook_encode_string
+    #hook_decode_string
     -is_quoted_string	=> 1,	## Can itself quoted-string?
     -long_count	=> 10,
     -parse_all	=> 0,
@@ -55,7 +56,7 @@ sub _init ($;%) {
     -separator	=> ', ',
     -separator_long	=> ', ',
     -max	=> 0,
-    -value_type	=> [':none:'],
+    #value_type
     -value_unsafe_rule	=> 'NON_http_token_wsp',
   );
   $self->SUPER::_init (%DEFAULT, %options);
@@ -73,8 +74,10 @@ sub _init ($;%) {
      list-owner list- list-post list- list-subscribe list- 
      list-unsubscribe list- list-url list- uri list-
      posted-to newsgroups
-     x-brother x-moe x-daughter x-moe
-     x-respect x-moe x-syster x-moe x-wife x-moe);
+     x-brother x-moe x-boss x-moe x-daughter x-moe x-dearfriend x-moe
+     x-favoritesong x-moe 
+     x-friend x-moe x-me x-moe
+     x-respect x-moe x-sister x-moe x-son x-moe x-sublimate x-moe x-wife x-moe);
   my $field_name = lc $self->{option}->{field_name};
   $field_name = $field_type{$field_name} || $field_name;
   if ($field_name eq 'newsgroups') {
@@ -90,21 +93,17 @@ sub _init ($;%) {
     $self->{option}->{value_unsafe_rule} = 'NON_distribution';
   } elsif ($field_name eq 'x-moe') {
     $self->{option}->{is_quoted_string} = 0;
-    $self->{option}->{value_type} = ['Message::Field::ValueParams', 
-      {format => $self->{option}->{format}}];
+    $self->{option}->{value_type}->{'*default'} = ['Message::Field::XMoe'];
   } elsif ($field_name eq 'accept') {
     $self->{option}->{is_quoted_string} = 0;
-    $self->{option}->{value_type} = ['Message::Field::ValueParams', 
-      {format => $self->{option}->{format}}];
+    $self->{option}->{value_type}->{'*default'} = ['Message::Field::ValueParams'];
   } elsif ($field_name eq 'list-') {
     $self->{option}->{is_quoted_string} = 0;
     $self->{option}->{remove_comment} = 0;
-    $self->{option}->{value_type} = ['Message::Field::URI', 
-      {-field_name => $self->{option}->{field_name},
-      -format => $self->{option}->{format}}];
+    $self->{option}->{value_type}->{'*default'} = ['Message::Field::URI'];
   #} elsif ($field_name eq 'p3p') {
   #  $self->{option}->{is_quoted_string} = 0;
-  #  $self->{option}->{value_type} = ['Message::Field::Params'];
+  #  $self->{option}->{value_type}->{'*default'} = ['Message::Field::Params'];
   } elsif ($field_name eq 'encrypted') {
     $self->{option}->{max} = 2;
   }
@@ -152,11 +151,12 @@ sub _parse_list ($$) {
   $fb =~ s{((?:$REG{quoted_string}|$REG{angle_quoted}|$REG{domain_literal}|$REG{comment}|[^\x22\x28\x2C\x3C\x5B])+)}{
     my $s = $1;  $s =~ s/^$REG{WSP}+//;  $s =~ s/$REG{WSP}+$//;
     if ($self->{option}->{is_quoted_string}) {
-      $s = $self->_value (Message::Util::decode_quoted_string ($self, $s))
+      $s = $self->_parse_value ('*default' => 
+        Message::Util::decode_quoted_string ($self, $s))
         if $self->{option}->{parse_all};
       push @ids, Message::Util::decode_quoted_string ($self, $s);
     } else {
-      $s = $self->_value ($s) if $self->{option}->{parse_all};
+      $s = $self->_parse_value ('*default' => $s) if $self->{option}->{parse_all};
       push @ids, $s;
     }
   }goex;
@@ -180,7 +180,7 @@ sub value ($@) {
   my @index = @_;
   my @ret = ();
   for (@index) {
-    $self->{value}->[$_] = $self->_value ($self->{value}->[$_]);
+    $self->{value}->[$_] = $self->_parse_value ('*default' => $self->{value}->[$_]);
     push @ret, $self->{value}->[$_];
   }
   @ret;
@@ -306,27 +306,6 @@ sub clone ($) {
 
 ## Internal functions
 
-## Hook called before returning C<value>.
-## $csv->_param_value ($name, $value);
-sub _value ($$) {
-  my $self = shift;
-  my $value = shift;
-  my $vtype = $self->{option}->{value_type}->[0];
-  my %vopt; %vopt = %{$self->{option}->{value_type}->[1]} 
-    if ref $self->{option}->{value_type}->[1];
-  if (ref $value) {
-    return $value;
-  } elsif ($vtype eq ':none:') {
-    return $value;
-  } elsif ($value) {
-    eval "require $vtype";
-    return $vtype->parse ($value, %vopt);
-  } else {
-    eval "require $vtype";
-    return $vtype->new (%vopt);
-  }
-}
-
 sub _delete_empty ($) {
   my $self = shift;
   $self->{value} = [grep {length $_} @{$self->{value}}];
@@ -354,7 +333,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/22 08:28:20 $
+$Date: 2002/05/04 06:03:58 $
 
 =cut
 

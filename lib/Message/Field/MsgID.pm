@@ -1,261 +1,276 @@
 
 =head1 NAME
 
-Message::Field::MsgID Perl module
+Message::Field::MsgID --- Perl module for Message-ID
+of Internet messages
 
 =head1 DESCRIPTION
 
-Perl module for RFC 822/2822 Message-ID C<field>.
-
-This module supports message ID C<field-body>s defined
-by : RFC 822, RFC 2822, RFC 850, RFC 1036, son-of-RFC1036,
-RFC 1341, RFC 1521, RFC 2045, but does not support: 
-RFC 724, RFC 733.
+This module supports C<msg-id> defined by RFC 2822.
+Message-ID generating algorithm suggested by
+draft-ietf-usefor-msg-id-alt-00 is also supported.
 
 =cut
 
 package Message::Field::MsgID;
-require 5.6.0;
 use strict;
-use re 'eval';
-use vars qw(%OPTION %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
-use overload '@{}' => sub {shift->{id}},
-             '""' => sub {shift->stringify};
+use vars qw(@ISA %REG $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+require Message::Util;
+require Message::Field::Structured;
+push @ISA, qw(Message::Field::Structured);
 
-use Message::Field::MsgID::MsgID;
-$REG{comment} = qr/\x28(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x27\x2A-\x5B\x5D-\xFF]+|(??{$REG{comment}}))*\x29/;
-$REG{quoted_string} = qr/\x22(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\xFF])*\x22/;
-$REG{domain_literal} = qr/\x5B(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x5A\x5E-\xFF])*\x5D/;
+use overload '""' => sub { $_[0]->stringify },
+             fallback => 1;
 
-$REG{WSP} = qr/[\x20\x09]+/;
-$REG{FWS} = qr/[\x20\x09]*/;
-$REG{atext} = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2F\x30-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]+/;
-$REG{dot_atom} = qr/$REG{atext}(?:$REG{FWS}\x2E$REG{FWS}$REG{atext})*/;
-$REG{dot_word} = qr/(?:$REG{atext}|$REG{quoted_string})(?:$REG{FWS}\x2E$REG{FWS}(?:$REG{atext}|$REG{quoted_string}))*/;
-$REG{phrase} = qr/(?:$REG{atext}|$REG{quoted_string})(?:$REG{atext}|$REG{quoted_string}|\.|$REG{FWS})*/;
-$REG{addr_spec} = qr/$REG{dot_word}$REG{FWS}\x40$REG{FWS}(?:$REG{dot_atom}|$REG{domain_literal})/;
-$REG{msg_id} = qr/<$REG{FWS}$REG{addr_spec}$REG{FWS}>/;
-$REG{M_quoted_string} = qr/\x22((?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\xFF])*)\x22/;
-$REG{M_addr_spec} = qr/($REG{dot_word})$REG{FWS}\x40$REG{FWS}($REG{dot_atom}|$REG{domain_literal})/;
+*REG = \%Message::Util::REG;
+## Inherited: comment, quoted_string, domain_literal
+	## WSP, FWS, phrase, NON_atom
+	## msg_id
+	## M_quoted_string
 
-$REG{NON_atom} = qr/[^\x09\x20\x21\x23-\x27\x2A\x2B\x2D\x2F\x30-\x39\x3D\x3F\x41-\x5A\x5E-\x7E\x2E]/;
+=head1 CONSTRUCTORS
 
-%OPTION = (
-  one_id	=> -1,
-  field_name	=> 'message-id',
-  reduce_first	=> 1,
-  reduce_last	=> 3,
-  reduce_max	=> 21,
-);
+The following methods construct new objects:
 
-sub _init_option ($$) {
+=over 4
+
+=cut
+
+## Initialize of this class -- called by constructors
+sub _init ($;%) {
   my $self = shift;
-  my $field_name = shift;
-  if ($field_name eq 'message-id' || $field_name eq 'content-id') {
-    $self->{option}->{one_id} = 1;
-  }
-  $self;
+  my %options = @_;
+  my %DEFAULT = (
+    -encoding_after_encode	=> 'unknown-8bit',
+    -encoding_before_decode	=> 'unknown-8bit',
+    #field_param_name
+    #field_name
+    #format
+    -hash_name	=> '%none',
+    #hook_encode_string
+    #hook_decode_string
+    -software_name	=> 'MFMpm',
+    -software_name_hash	=> '%none',
+    -validate	=> 1,
+  );
+  $self->SUPER::_init (%DEFAULT, %options);
 }
 
-=head2 Message::Field::MsgID->new ()
+=item $m = Message::Field::MsgID->new ([%options])
 
-Returns new MsgID object.
+Constructs a new object.  You might pass some options as parameters 
+to the constructor.
 
 =cut
 
 sub new ($;%) {
-  my $self = bless {}, shift;
+  my $self = shift->SUPER::new (@_);
   my %option = @_;
-  for (%OPTION) {$option{$_} ||= $OPTION{$_}}
-  $self->{id} = [];
-  $self->{option} = \%option;
-  $self->_init_option ($self->{option}->{field_name});
-  $self;
-}
-
-=head2 Message::Field::MsgID->parse ($unfolded_field_body)
-
-Parses C<field-body>.
-
-=cut
-
-sub parse ($$;%) {
-  my $self = bless {}, shift;
-  my $field_body = shift;
-  my %option = @_;
-  for (%OPTION) {$option{$_} ||= $OPTION{$_}}
-  $self->{id} = [];
-  $self->{option} = \%option;
-  $self->_init_option ($self->{option}->{field_name});
-  $field_body = $self->delete_comment ($field_body);
-  @{$self->{id}} = $self->parse_msgid_list ($field_body);
-  $self;
-}
-
-sub parse_msgid_list ($$) {
-  my $self = shift;
-  my $fb = shift;
-  my @ids;
-  $fb =~ s{($REG{msg_id})}{
-    push @ids, Message::Field::MsgID::MsgID->parse ($1);
-  }goex;
-  @ids;
-}
-
-=head2 $self->id ()
-
-Return address list in the format described in
-L<$self-E<gt>parse_address_list ()>.
-
-=cut
-
-sub id ($) {
-  my $self = shift;
-  wantarray? @{$self->{id}}: $self->{id}->[0];
-}
-
-=head2 $self->add ($msg_id, [%option])
-
-Adds an msg-id to C<$self>.
-
-Note that this method (and other methods) does not check
-whether $msg_id is valid or not (It is only checked
-if C<msg-id> is sorounded by angle blankets).
-
-=cut
-
-sub add ($;$%) {
-  my $self = shift;
-  my ($msg_id, %option) = @_;
-  if (!ref $msg_id) {
-    $msg_id = Message::Field::MsgID::MsgID->parse ($msg_id, %option);
+  if ($option{id_left} && $option{id_right}) {
+    $self->{id_left} = $option{id_left};
+    $self->{id_right} = $option{id_right};
+  } elsif ($option{addr_spec}
+    || (($option{fqdn} || $option{ip_address} || $option{uucp})
+        && ($option{login}))) {
+    $self->_newid (\%option);
   }
-  push @{$self->{id}}, $msg_id;
   $self;
 }
 
-sub add_new ($;%) {
-  my $self = shift;
-  my (%option) = @_;
-  my $msg_id = Message::Field::MsgID::MsgID->new (%option);
-  push @{$self->{id}}, $msg_id if length $msg_id;
+sub parse ($;$%) {
+  my $class = shift;
+  my $self = bless {}, $class;
+  my ($body, @c) = $self->Message::Util::delete_comment_to_array (shift);
+  $self->_init (@_);
+  
+  $body = Message::Util::remove_wsp ($body);
+  if ($body =~ /$REG{M_addr_spec}/) {
+    my %s = &{$self->{option}->{hook_decode_string}} ($self,
+              Message::Util::unquote_quoted_string ($1), type => 'quoted-string');
+    $self->{id_left} = $s{value};
+    #my %s = &{$self->{option}->{hook_decode_string}} ($self,
+    #          Message::Util::unquote_if_domain_literal ($2), type => 'domain');
+    #$self->{id_right} = $s{value};
+    $self->{id_right} = $2;
+  }
+  
   $self;
 }
 
-sub reduce ($;%) {
+sub _newid ($\%) {
   my $self = shift;
-  my %option = @_;
-  $option{reduce_max} ||= $self->{option}->{reduce_max};
-  $option{reduce_first} ||= $self->{option}->{reduce_first};
-  $option{reduce_last} ||= $self->{option}->{reduce_last};
-  return $self if $#{$self->{id}}+1 <= $option{reduce_max};
-  return $self if $#{$self->{id}}+1 <= $option{reduce_top}+$option{reduce_last};
-  my @nid;
-  push @nid, @{$self->{id}}[0..$option{reduce_first}-1];
-  push @nid, @{$self->{id}}[-$option{reduce_last}..-1];
-  $self->{id} = \@nid;
+  my $o = shift;
+  $$o{addr_spec} = Message::Util::remove_wsp ($$o{addr_spec});
+  if ($$o{addr_spec} =~ /$REG{M_addr_spec}/) {
+    $$o{login} = $1; $$o{fqdn} = $2;
+  }
+  if ($self->{option}->{validate} && $$o{fqdn} =~ 
+     /[.@](example\.(?:com|org|net)|localdomain|localhost|example|invalid)$/) {
+      Carp::croak "Msg-ID generation: invalid TLD of FQDN: .$1";
+  }
+  if (!$$o{fqdn} && $$o{ip_address}) {
+    if ($self->{option}->{validate}
+      && $$o{ip_address}=~/([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)/){
+      my ($c1, $c2, $c3, $c4) = ($1, $2, $3, $4);
+      Carp::croak "Msg-ID generation: invalid IPv4 address: $c1.$c2.$c3.$c4"
+        ## See [IANAREG] and draft-iana-special-ipv4
+           if ($c1 == 0)	## "this" network
+           || ($c1 == 10)	## private [RFC1918]
+           || ($c1 == 127)	## loopback
+           || ($c1 == 169 && $c2 == 254)	## "link local"
+           || ($c1 == 172 && 16 <= $c2 && $c2 < 32)	## private [RFC1918]
+           || ($c1 == 192 && (($c2 == 0 && $c3 == 2)	## "TEST-NET"
+           || ($c2 == 88 && $c3 == 99)	## 6to4 anycast [RFC3068]
+           || ($c2 == 168)))	## private [RFC1918]
+           || ($c1 == 198 && ($c2 == 18 || $c2 == 19))	## benchmark [RFC2544]
+           || ($c1 >= 224);	## class D,E [RFC3171]
+    }
+    $$o{fqdn} ||= '['.$$o{ip_address}.']';
+  }
+  if (!$$o{fqdn} && $$o{uucp}) {
+    $$o{uucp} .= '.uucp' if $self->{option}->{validate} && $$o{uucp} !~ /\.uucp/i;
+    $$o{fqdn} = $$o{uucp};
+  }
+  Carp::croak "Msg-ID generation: no FQDN"
+    if $self->{option}->{validate} && !$$o{fqdn};
+  
+  $self->{id_right} = $$o{fqdn};
+  
+  Carp::croak "Msg-ID generation: no 'login'"
+    if $self->{option}->{validate} && !$$o{login};
+  $$o{login} = $self->_hash ($$o{login}, $self->{option}->{hash_name});
+  
+  my @s = ('0'..'9','a'..'z','-','=','_');
+  my $unique = $s[rand @s].$s[rand @s].$s[rand @s].'.';
+  $unique .= join ('.', $self->_base39 (time), $self->_base39 ($$), 
+    $self->_hash ($self->{option}->{software_name},
+                  $self->{option}->{software_name_hash}));
+  $self->{id_left} = $unique
+    .'%'.($self->{option}->{hash_name} ne '%none'? 
+            $self->_hash ($self->{option}->{hash_name}, '%none') .'%': '')
+    .$$o{login}
+    .($$o{subject_changed}? '-_-': '');
+  
   $self;
+}
+
+sub _hash ($$;$$) {
+  my $self = shift;
+  my ($str, $hash_name, $add_unsafe) = (shift, lc shift, shift);
+  $add_unsafe ||= qr#[/.=\x09\x20]#;
+  undef $hash_name if $hash_name eq '%none';
+  if ($hash_name eq 'md5') {
+    eval {require Digest::MD5} or Carp::croak "Msg-ID generation: $@";
+    $str = Digest::MD5::md5_base64 ($str);
+  } elsif ($hash_name eq 'sha1') {
+    eval {require Digest::SHA1} or Carp::croak "Msg-ID generation: $@";
+    $str = Digest::SHA1::sha1_base64 ($str);
+  } elsif ($hash_name eq 'md2') {
+    eval {require Digest::MD2} or Carp::croak "Msg-ID generation: $@";
+    $str = Digest::MD2::md2_base64 ($str);
+  } elsif ($hash_name eq 'crypt') {
+    my @s = ('0'..'9','A'..'Z','a'..'z');
+    my $salt = crypt('foobar', '$1$ab$') eq '$1$ab$uAP8qWqcFs3q.Gfl5PkL2.'?
+      '$1$'.join('', map($s[rand @s], 1..8)).'$': $s[rand @s].$s[rand @s];
+    $str = crypt ($str, $salt);
+  }
+  $str =~ s#($add_unsafe)#sprintf('=%02X', ord($1))#ge;
+  $str =~ s/($REG{NON_atext_dot})/sprintf('=%02X', ord($1))/ge;
+  $str;
+}
+
+sub _base39 ($$) {
+  my $self = shift;
+  my $number = shift;
+  my @digit = ('0'..'9','a'..'z','-','=','_');
+  my $ret = '';
+  
+  my ($rem);
+  while ($number > 0) {
+    $rem = $number % @digit;
+    $ret = $digit[ $rem ].$ret;
+    $number = ($number - $rem) / @digit;
+  }
+  $ret;
+}
+
+sub generate ($%) {
+  my $self = shift;
+  my %parameter = @_;
+  for (grep {/^-/} keys %parameter) {$parameter{substr ($_, 1)} = $parameter{$_}}
+  $self->_newid (\%parameter);
+}
+
+sub id_left ($) {
+  my $self = shift;
+  my %e = &{$self->{option}->{hook_encode_string}} ($self,
+    $self->{id_left}, type => 'local-part');
+  Message::Util::quote_unsafe_string ($e{value}, 
+    unsafe_regex => qr/$REG{NON_atext_dot}|^\.|\.$/);
+}
+sub id_right ($) {
+  my $self = shift;
+  #my %e = &{$self->{option}->{hook_encode_string}} ($self,
+  #  $self->{id_right}, type => 'domain');
+  #Message::Util::quote_unsafe_domain ($e{value});
+  Message::Util::quote_unsafe_domain ($self->{id_right});
+}
+sub content ($) {
+  my $self = shift;
+  my ($l, $r) = ($self->id_left, $self->id_right);
+  sprintf '%s@%s', $l, $r if $l && $r;
 }
 
 sub stringify ($;%) {
   my $self = shift;
-  my %option = @_;  
-  $option{one_id} ||= $self->{option}->{one_id};
-  $self->_delete_empty ();
-  if ($option{one_id}>0) {
-    $self->{id}->[0] || '';
-  } else {
-    join ' ', @{$self->{id}};
-  }
+  my ($l, $r) = ($self->id_left, $self->id_right);
+  sprintf '<%s@%s>', $l, $r if $l && $r;
 }
-
-=head2 $self->option ($option_name, [$option_value])
-
-Set/gets new value of the option.
-
-=cut
-
-sub option ($$;$) {
-  my $self = shift;
-  my ($name, $value) = @_;
-  if (defined $value) {
-    $self->{option}->{$name} = $value;
-  }
-  $self->{option}->{$name};
-}
-
-sub _delete_empty ($) {
-  my $self = shift;
-  my @nid;
-  for my $id (@{$self->{id}}) {push @nid, $id if $id}
-  $self->{id} = \@nid;
-}
-
-
-=head2 $self->unquote_quoted_string ($string)
-
-Unquote C<quoted-string>.  Get rid of C<DQUOTE>s and
-C<REVERSED SOLIDUS> included in C<quoted-pair>.
-This method is intended for internal use.
-
-=cut
-
-sub unquote_quoted_string ($$) {
-  my $self = shift;
-  my $quoted_string = shift;
-  $quoted_string =~ s{$REG{M_quoted_string}}{
-    my $qtext = $1;
-    $qtext =~ s/\x5C([\x00-\xFF])/$1/g;
-    $qtext;
-  }goex;
-  $quoted_string;
-}
-
-=head2 $self->delete_comment ($field_body)
-
-Remove all C<comment> in given strictured C<field-body>.
-This method is intended to be used for internal process.
-
-=cut
-
-sub delete_comment ($$) {
-  my $self = shift;
-  my $body = shift;
-  $body =~ s{($REG{quoted_string}|$REG{domain_literal})|$REG{comment}}{
-    my $o = $1;  $o? $o : ' ';
-  }gex;
-  $body;
-}
+*as_string = \&stringify;
 
 =head1 EXAMPLE
 
-  ## Compose field-body for To: field.
-  
-  use Message::Field::Address;
-  my $addr = new Message::Field::Address;
-  $addr->add ('foo@example.org', name => 'Mr. foo bar');
-  $addr->add ('webmaster@example.org', group => 'administrators');
-  $addr->add ('postmaster@example.org', group => 'administrators');
-  
-  my $field_body = $addr->stringify ();
-
-
-  ## Output parsed address-list tree.
-  
-  use Message::Field::Address;
-  my $addr = Message::Field::Address->parse ($field_body);
-  
-  for my $i (@$addr) {
-    if ($i->{type} eq 'group') {
-      print "\x40 $i->{display_name}: \n";
-      for my $j (@{$i->{address}}) {
-        print "\t- $j->{display_name} <$j->{route}$j->{addr_spec}>\n";
-      }
-    } else {
-      print "- $i->{display_name} <$i->{route}$i->{addr_spec}>\n";
-    }
+  use Message::Field::MsgID;
+  my $from = 'foo@bar.example';
+  my $login = 'my-login-name';
+  my $domain = 'foo.bar.example';
+  my $ipv4 = '192.168.0.1';
+  my %mid;
+  $mid{no_crypt} = new Message::Field::MsgID 
+    addr_spec => $from, -validate => 0;
+  $mid{md5} = new Message::Field::MsgID
+    login => $login, ip_address => $ipv4,
+    -hash_name => 'md5', -validate => 0;
+  $mid{sha1} = new Message::Field::MsgID
+    login => $login, fqdn => $domain, subject_changed => 1,
+    -hash_name => 'sha1', -validate => 0;
+  for (keys %mid) {
+    print $_, ":\t", $mid{$_}, "\n";
   }
+  # sha1:   <t-9.bbxkfu.xsem.MFMMpm%sha1%9pnH2R6iN8KSIMby+dPU0i3M8RU-_-@foo.bar.example>
+  # md5:    <7fu.bbxkfu.xsem.MFMMpm%md5%eBpd+12mupwxZBc6kMWR9g@[192.168.0.1]>
+  # no_crypt:       <3vy.bbxkfu.xsem.MFMMpm%foo@bar.example>
+  
+  ## IMPORTANT NOTE: This example uses -validate option with
+  ## '0' (does not validate) value since it uses example (invalid)
+  ## resource names, such as 'foo.bar.example'.  Usually, this option
+  ## shall not be used (and default value = '1' = does validate
+  ## should be used).
+
+=head1 SEE ALSO
+
+RFC 822 E<lt>urn:ietf:rfc:822E<gt>, RFC 2822 E<lt>urn:ietf:rfc:2822E<gt>
+
+RFC 850 E<lt>urn:ietf:rfc:850E<gt>, RFC 1036 E<lt>urn:ietf:rfc:1036E<gt>,
+son-of-RFC1036, draft-ietf-usefor-article-06.txt
+E<lt>urn:ietf:id:draft-ietf-usefor-article-06E<gt>
+
+draft-ietf-usefor-message-id-01.txt
+E<lt>urn:ietf:id:draft-ietf-usefor-message-id-01E<gt>
+
+draft-ietf-usefor-msg-id-alt-00.txt
+E<lt>urn:ietf:id:draft-ietf-usefor-msg-id-alt-00E<gt>
 
 =head1 LICENSE
 
@@ -279,7 +294,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/31 13:11:55 $
+$Date: 2002/05/04 06:03:58 $
 
 =cut
 

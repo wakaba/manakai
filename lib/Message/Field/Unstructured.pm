@@ -9,7 +9,7 @@ unstructured header field bodies of the Internet message
 package Message::Field::Unstructured;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 use overload '""' => sub { $_[0]->stringify },
              '.=' => sub { $_[0]->value_append ($_[1]) },
@@ -21,14 +21,14 @@ use overload '""' => sub { $_[0]->stringify },
 sub _init ($;%) {
   my $self = shift;
   my %options = @_;
-  $self->{option} = {
+  $self->{option} = Message::Util::make_clone ({
     encoding_after_encode	=> '*default',
     encoding_before_decode	=> '*default',
     hook_encode_string	=> #sub {shift; (value => shift, @_)},
     	\&Message::Util::encode_header_string,
     hook_decode_string	=> #sub {shift; (value => shift, @_)},
     	\&Message::Util::decode_header_string,
-  };
+  });
   $self->{field_body} = '';
   
   for my $name (keys %options) {
@@ -169,18 +169,8 @@ Returns a copy of Message::Field::Unstructured object.
 sub clone ($) {
   my $self = shift;
   my $clone = ref($self)->new;
-  for my $name (%{$self->{option}}) {
-    if (ref $self->{option}->{$name} eq 'HASH') {
-      $clone->{option}->{$name} = {%{$self->{option}->{$name}}};
-    } elsif (ref $self->{option}->{$name} eq 'ARRAY') {
-      $clone->{option}->{$name} = [@{$self->{option}->{$name}}];
-    } else {
-      $clone->{option}->{$name} = $self->{option}->{$name};
-    }
-  }
-  $clone->{field_body} = ref $self->{field_body}? 
-                             $self->{field_body}->clone:
-                             $self->{field_body};
+  $clone->{option} = Message::Util::make_clone ($self->{option});
+  $clone->{field_body} = Message::Util::make_clone ($self->{field_body});
   $clone;
 }
 
@@ -218,7 +208,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/05 14:55:28 $
+$Date: 2002/05/04 06:03:58 $
 
 =cut
 
