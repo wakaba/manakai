@@ -1,81 +1,74 @@
 
 =head1 NAME
 
-Message::Field::UA Perl module
-
-=head1 DESCRIPTION
-
-Perl module for C<User-Agent:> field-body.
+Message::Field::UA -- Perl module for Internet message
+header field body consist of C<product> tokens
 
 =cut
 
 package Message::Field::UA;
-require 5.6.0;
 use strict;
-use re 'eval';
-use vars qw(%DEFAULT %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use vars qw(@ISA %REG $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
-require Message::MIME::EncodedWord;
-
+require Message::Field::Structured;
+push @ISA, qw(Message::Field::Structured);
 use overload '""' => sub {shift->stringify},
              '@{}' => sub {shift->product};
 
-$REG{comment} = qr/\x28(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x27\x2A-\x5B\x5D-\xFF]|(??{$REG{comment}}))*\x29/;
-$REG{quoted_string} = qr/\x22(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\xFF])*\x22/;
-$REG{domain_literal} = qr/\x5B(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x5A\x5E-\xFF])*\x5D/;
-
-$REG{WSP} = qr/[\x20\x09]+/;
-$REG{FWS} = qr/[\x20\x09]*/;
-$REG{http_token} = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\x7C\x7E]+/;
+*REG = \%Message::Util::REG;
 $REG{product} = qr#(?:$REG{http_token}|$REG{quoted_string})(?:$REG{FWS}/$REG{FWS}(?:$REG{http_token}|$REG{quoted_string}))?#;
-$REG{S_encoded_word_comment} = qr/=\x3F[\x21-\x27\x2A-\x5B\x5D-\x7E]+\x3F=/;
-
-$REG{M_quoted_string} = qr/\x22((?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\xFF])*)\x22/;
-$REG{M_comment} = qr/\x28((?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x27\x2A-\x5B\x5D-\xFF]|(??{$REG{comment}}))*)\x29/;
 $REG{M_product} = qr#($REG{http_token}|$REG{quoted_string})(?:$REG{FWS}/$REG{FWS}($REG{http_token}|$REG{quoted_string}))?#;
 
-$REG{NON_http_token} = qr/[^\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\x7C\x7E]/;
-$REG{NON_http_token_wsp} = qr/[^\x09\x20\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\x7C\x7E]/;
+=head1 CONSTRUCTORS
 
-%DEFAULT = (
-  add_prepend	=> 1,
-  encoding_after_encode	=> '*default',
-  encoding_before_decode	=> '*default',
-  hook_encode_string	=> #sub {shift; (value => shift, @_)},
-  	\&Message::Util::encode_header_string,
-  hook_decode_string	=> #sub {shift; (value => shift, @_)},
-  	\&Message::Util::decode_header_string,
-);
+The following methods construct new C<Message::Field::Numval> objects:
 
-=head2 Message::Field::UA->new ()
-
-Return empty Message::Field::UA object.
+=over 4
 
 =cut
 
-sub new ($;%) {
-  my $class = shift;
-  my $self = bless {option => {@_}}, $class;
-  for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
-  $self;
+## Initialize of this class -- called by constructors
+sub _init ($;%) {
+  my $self = shift;
+  my %options = @_;
+  my %DEFAULT = (
+    #encoding_after_encode	## Inherited
+    #encoding_before_decode	## Inherited
+    -field_name	=> 'user-agent',
+    #format	## Inherited
+    #hook_encode_string	## Inherited
+    #hook_decode_string	## Inherited
+    -prepend	=> 1,
+  );
+  $self->SUPER::_init (%DEFAULT, %options);
 }
 
-=head2 Message::Field::UA->parse ($unfolded_field_body)
+=item Message::Field::UA->new ([%options])
 
-Parse UA: styled C<field-body>.
+Constructs a new C<Message::Field::UA> object.  You might pass some 
+options as parameters to the constructor.
+
+=cut
+
+## Inherited
+
+=item Message::Field::UA->parse ($field-body, [%options])
+
+Constructs a new C<Message::Field::UA> object with
+given field body.  You might pass some options as parameters to the constructor.
 
 =cut
 
 sub parse ($$;%) {
   my $class = shift;
-  my $self = bless {option => {@_}}, $class;
-  for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
+  my $self = bless {}, $class;
   my $field_body = shift;  my @ua = ();
+  $self->_init (@_);
   $field_body =~ s{^((?:$REG{FWS}$REG{comment})+)}{
     my $comments = $1;
     $comments =~ s{$REG{M_comment}}{
-      my $comment = $self->_decode_ccontent ($1);
+      my $comment = $self->Message::Util::decode_ccontent ($1);
       push @ua, {comment => [$comment]} if $comment;
     }goex;
     '';
@@ -83,24 +76,30 @@ sub parse ($$;%) {
   $field_body =~ s{$REG{M_product}((?:$REG{FWS}$REG{comment})*)}{
     my ($product, $product_version, $comments) = ($1, $2, $3);
     for ($product, $product_version) {
-      my ($s,$q) = ($self->_unquote_if_quoted_string ($_), 0);
+      my ($s,$q) = (Message::Util::unquote_if_quoted_string ($_), 0);
       my %s = &{$self->{option}->{hook_decode_string}} ($self, $s,
                 type => ($q?'token/quoted':'token'));	## What token/quoted is? :-)
       $_ = $s{value};
     }
     my @comment = ();
     $comments =~ s{$REG{M_comment}}{
-      my $comment = $self->_decode_ccontent ($1);
+      my $comment = $self->Message::Util::decode_ccontent ($1);
       push @comment, $comment if $comment;
     }goex;
-    push @ua, {product => $product, product_version => $product_version, 
+    push @ua, {name => $product, version => $product_version, 
                comment => \@comment};
   }goex;
   $self->{product} = \@ua;
   $self;
 }
 
-=head2 $self->stringify ()
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item $self->stringify ()
 
 Returns C<field-body> as a string.
 
@@ -112,47 +111,61 @@ sub stringify ($;%) {
   $option{format} ||= $self->{option}->{format};
   my @r = ();
   for my $p (@{$self->{product}}) {
-    if ($p->{product}) {
+    if ($p->{name}) {
       if ($option{format} eq 'http'
-        && (  $p->{product} =~ /$REG{NON_http_token}/
-           || $p->{product_version} =~ /$REG{NON_http_token}/)) {
-        my %f = (value => $p->{product});
-        $f{value} .= '/'.$p->{product_version} if $p->{product_version};
-        %f = &{$self->{option}->{hook_encode_string}} ($self, 
-          $f{value}, type => 'ccontent');
-        $f{value} =~ s/([\x28\x29\x5C])([\x21-\x7E])?/"\x5C$1".(defined $2?"\x5C$2":'')/ge;
-        push @r, '('.$f{value}.')';
+        && (  $p->{name} =~ /$REG{NON_http_token}/
+           || $p->{version} =~ /$REG{NON_http_token}/)) {
+        my $f = $p->{name};
+        $f .= '/'.$p->{version} if $p->{version};
+        push @r, '('. $self->encode_ccontent ($f) .')';
       } else {
         my %e = &{$self->{option}->{hook_encode_string}} ($self, 
-           $p->{product}, type => 'token');
+           $p->{name}, type => 'token');
         my %f = &{$self->{option}->{hook_encode_string}} ($self, 
-           $p->{product_version}, type => 'token');
-        push @r, $self->_quote_unsafe_string ($e{value}, unsafe => 'NON_http_token')
-          .($f{value}?'/'
-           .$self->_quote_unsafe_string ($f{value}, unsafe => 'NON_http_token')
-           :'');
+           $p->{version}, type => 'token');
+        push @r, 
+          Message::Util::quote_unsafe_string ($e{value}, unsafe => 'NON_http_token')
+          .($f{value} ? '/'
+          .Message::Util::quote_unsafe_string ($f{value}, unsafe => 'NON_http_token')
+          :'');
       }
-    } elsif ($p->{product_version}) {	## Error!
-      my %f = &{$self->{option}->{hook_encode_string}} ($self, 
-         $p->{product_version}, type => 'ccontent');
-      $f{value} =~ s/([\x28\x29\x5C])([\x21-\x7E])?/"\x5C$1".(defined $2?"\x5C$2":'')/ge;
-      push @r, '('.$f{value}.')';
+    } elsif ($p->{version}) {	## Error!
+      push @r, '('. $self->Message::Util::encode_ccontent ($p->{version}) .')';
     }
     for (@{$p->{comment}}) {
-      my %f = &{$self->{option}->{hook_encode_string}} ($self, 
-         $_, type => 'ccontent');
-      $f{value} =~ s/([\x28\x29\x5C])([\x21-\x7E])?/"\x5C$1".(defined $2?"\x5C$2":'')/ge;
-      push @r, '('.$f{value}.')' if $f{value};
+      push @r, '('. $self->Message::Util::encode_ccontent ($_) .')' if $_;
     }
   }
   join ' ', @r;
 }
+*as_string = \&stringify;
+
+=item $array = $self->product
+
+Returns array reference of C<product>s.  Each of array elements
+are hash reference, and it has three key: C<name>, C<version>,
+and C<comment>.  C<comment> is array reference.
+
+Example:
+
+  my $p = $ua->product->[0];
+  printf "%s\t%s\t%s\n", $p->{name}, $p->{version}, join ('; ', @{$p->{comment}});
+
+=cut
 
 sub product ($;%) {
   my $self = shift;
   $self->_delete_empty;
   $self->{product};
 }
+
+=item $name = $ua->product_name ($index)
+
+=item $version = $ua->product_version ($index)
+
+Returns product-name/-version of C<$index>'th C<product>.
+
+=cut
 
 sub product_name ($;$%) {
   my $self = shift;
@@ -166,48 +179,127 @@ sub product_version ($;$%) {
   $self->{product}->[$index]->{product_version} if ref $self->{product}->[$index];
 }
 
+=item $comment_ref = $ua->product_comment ($index)
+
+Returns array reference of C<comment> of C<$index>'th C<product>.
+(You can edit this array.)
+
+=cut
+
 sub product_comment ($;$%) {
   my $self = shift;
   my $index = shift;
-  if (ref $self->{product}->[$index]) {
-    wantarray?
-      @{$self->{product}->[$index]->{comment}}:
-      $self->{product}->[$index]->{comment}->[0];
-  }
+  $self->{product}->[$index]->{comment} if ref $self->{product}->[$index];
 }
 
-sub add ($;%) {
-  my $self = shift;
-  my %option = @_;
-  my %a = (product => $option{name}, product_version => $option{version},
-           comment => $option{comment});
-  if ($option{prepend}||$self->{option}->{add_prepend}>0) {
-    unshift @{$self->{product}}, \%a;
-  } else {
-    push @{$self->{product}}, \%a;
-  }
-  \%a;
-}
+=item $hdr->add ($name, $version, [$name, $version, ...])
 
-sub replace ($;%) {
+Adds some field name/version pairs.  Even if there are
+one or more C<product>s whose name is same as C<$name>
+(case sensible), given name/body pairs are ADDed.  Use C<replace>
+to remove C<old> one.
+
+Instead of C<$version>, you can pass array reference.
+[0] is used for C<version>, the others are saved as elements
+of C<comment>.
+
+C<-prepend> options is available.  C<1> is default.
+
+Example:
+
+  $ua->add (Perl => [$^V, $^O], 'foo.pl' => $VERSION, -prepend => 0);
+  print $ua;	# foo.pl/1.00 Perl/5.6.1 (MSWin32)
+
+=cut
+
+sub add ($%) {
   my $self = shift;
-  my %option = @_;
-  my %a = (product => $option{name}, product_version => $option{version},
-           comment => $option{comment});
-  if ($a{product}) {
-    for my $p (@{$self->{product}}) {
-      if ($p->{product} eq $a{product}) {
-        $p = \%a;
-        return $p;
-      }
+  my %products = @_;
+  my %option = %{$self->{option}};
+  for (grep {/^-/} keys %products) {$option{substr ($_, 1)} = $products{$_}}
+  for (grep {/^[^-]/} keys %products) {
+    my $name = $_;
+    my ($ver, $comment);
+    if (ref $products{$_} eq 'ARRAY') {
+      $ver = shift @{$products{$_}};
+      $comment = $products{$_};
+    } else {
+      $ver = $products{$_};
+      $comment = [];
+    }
+    ## BUG: binary unsafe:-) (ISO-2022-KR, UCS-2,... also can't treat)
+    if ($ver =~ /[\x00-\x08\x0B\x0E-\x1A\x1C-\x1F\x7F]/) {
+      $ver = sprintf '%vd', $ver;
+    }
+    if ($option{prepend}) {
+      unshift @{$self->{product}}, {name => $name, version => $ver,
+                                    comment => $comment};
+    } else {
+      push @{$self->{product}}, {name => $name, version => $ver,
+                                 comment => $comment};
     }
   }
-  if (($option{add_prepend}||$self->{option}->{add_prepend})>0) {
-    unshift @{$self->{product}}, \%a;
-  } else {
-    push @{$self->{product}}, \%a;
+}
+
+=item $hdr->replace ($field-name, $field-body, [$name, $body, ...])
+
+Adds some field name/body pairs.  If there are already
+one or more field with name of C<$field-name>, it is replaced 
+by new one.
+
+Instead of C<$version>, you can pass array reference.
+[0] is used for C<version>, the others are saved as elements
+of C<comment>.
+
+C<-prepend> options is available.  C<1> is default.
+
+=cut
+
+sub replace ($%) {
+  my $self = shift;
+  my %params = @_;
+  my %option = %{$self->{option}};
+  for (grep {/^-/} keys %params) {$option{substr ($_, 1)} = $params{$_}}
+  my (%new_product);
+  for (grep {/^[^-]/} keys %params) {
+    my $name = $_;
+    my ($ver, $comment);
+    if (ref $params{$_} eq 'ARRAY') {
+      $ver = shift @{$params{$_}};
+      $comment = $params{$_};
+    } else {
+      $ver = $params{$_};
+      $comment = [];
+    }
+    ## BUG: binary unsafe:-) (ISO-2022-KR, UCS-2,... also can't treat)
+    if ($ver =~ /[\x00-\x08\x0B\x0E-\x1A\x1C-\x1F\x7F]/) {
+      $ver = sprintf '%vd', $ver;
+    }
+    $new_product{$name} = {name => $name, version => $ver, comment => $comment};
   }
-  \%a;
+  for my $product (@{$self->{product}}) {
+    if (defined $new_product{$product->{name}}) {
+      $product = $new_product {$product->{name}};
+      $new_product{$product->{name}} = undef;
+    }
+  }
+  for (keys %new_product) {
+    push @{$self->{product}}, $new_product{$_};
+  }
+}
+
+=item $ua->delete ($name, [$name, $name,...]);
+
+Deletes C<product>s whose name is C<$name>.
+
+=cut
+
+sub delete ($@) {
+  my $self = shift;
+  my %delete;  for (@_) {$delete{$_} = 1}
+  for my $product (@{$self->{product}}) {
+    undef $product if $delete{$product->{name}};
+  }
 }
 
 sub _delete_empty ($) {
@@ -217,36 +309,44 @@ sub _delete_empty ($) {
   $self->{product} = \@nid;
 }
 
-sub _quote_unsafe_string ($$;%) {
+=item $option-value = $ua->option ($option-name)
+
+Gets option value.
+
+=item $ua->option ($option-name, $option-value, ...)
+
+Set option value(s).  You can pass multiple option name-value pair
+as parameter when setting.
+
+=cut
+
+## Inherited
+
+=item $clone = $ua->clone ()
+
+Returns a copy of the object.
+
+=cut
+
+sub clone ($) {
   my $self = shift;
-  my $string = shift;
-  my %option = @_;
-  $option{unsafe} ||= 'NON_atext_dot';
-  if ($string =~ /$REG{$option{unsafe}}/ || $string =~ /$REG{WSP}$REG{WSP}+/) {
-    $string =~ s/([\x22\x5C])([\x21-\x7E])?/"\x5C$1".(defined $2?"\x5C$2":'')/ge;
-    $string = '"'.$string.'"';
+  $self->_delete_empty;
+  my $clone = $self->SUPER::clone;
+  my @p;
+  for (@{$self->{product}}) {
+    my $name = ref $_->{name}? $_->{name}->clone: $_->{name};
+    my $ver = ref $_->{version}? $_->{version}->clone: $_->{version};
+    my @comment;
+    for (@{$_->{comment}}) {
+      push @comment, ref $_? $_->clone: $_;
+    }
+    push @p, {name => $name, version => $ver, comment => \@comment};
   }
-  $string;
+  $clone->{product} = \@p;
+  $clone;
 }
 
-## Unquote C<DQOUTE> and C<quoted-pair> if it is itself a
-## C<quoted-string>.  (Do nothing if it is MULTIPLE
-## C<quoted-string>"S".)
-sub _unquote_if_quoted_string ($$) {
-  my $self = shift;
-  my $quoted_string = shift;  my $isq = 0;
-  $quoted_string =~ s{^$REG{M_quoted_string}$}{
-    my $qtext = $1;
-    $qtext =~ s/\x5C([\x00-\xFF])/$1/g;
-    $isq = 1;
-    $qtext;
-  }goex;
-  wantarray? ($quoted_string, $isq): $quoted_string;
-}
-
-sub _decode_ccontent ($$) {
-  &Message::MIME::EncodedWord::decode_ccontent (@_[1,0]);
-}
+=back
 
 =head1 LICENSE
 
@@ -270,6 +370,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
+$Date: 2002/04/06 06:01:04 $
 
 =cut
 
