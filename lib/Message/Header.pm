@@ -14,8 +14,9 @@ use strict;
 use vars qw($VERSION %REG);
 $VERSION = '1.00';
 use Carp ();
-use overload '@{}' => sub {shift->_delete_empty_field()->{field}},
-             '""' => sub {shift->stringify};
+use overload '@{}' => sub { shift->_delete_empty_field->{field} },
+             '""' => sub { shift->stringify },
+             fallback => 1;
 
 $REG{WSP}     = qr/[\x09\x20]/;
 $REG{FWS}     = qr/[\x09\x20]*/;
@@ -44,6 +45,13 @@ when C<stringify>.  (Default = 0)
 
 =cut
 
+=head1 CONSTRUCTORS
+
+The following methods construct new C<Message::Header> objects:
+
+=over 4
+
+## Initialize
 my %DEFAULT = (
   capitalize	=> 1,
   fold_length	=> 70,
@@ -64,6 +72,7 @@ $DEFAULT{field_type} = {
 	
 	'content-type'	=> 'Message::Field::ContentType',
 	'content-disposition'	=> 'Message::Field::ContentDisposition',
+	'auto-submitted'	=> 'Message::Field::ValueParams',
 	link	=> 'Message::Field::ValueParams',
 	archive	=> 'Message::Field::ValueParams',
 	'x-face-type'	=> 'Message::Field::ValueParams',
@@ -75,18 +84,24 @@ $DEFAULT{field_type} = {
 	'user-agent'	=> 'Message::Field::UA',
 	server	=> 'Message::Field::UA',
 	
+	## Numeric value
 	'content-length'	=> 'Message::Field::Numval',
 	lines	=> 'Message::Field::Numval',
 	'max-forwards'	=> 'Message::Field::Numval',
 	'mime-version'	=> 'Message::Field::Numval',
+	'x-jsmail-priority'	=> 'Message::Field::Numval',
+	'x-priority'	=> 'Message::Field::Numval',
 	
 	path	=> 'Message::Field::Path',
 };
 for (qw(cancel-lock importance   precedence list-id
   x-face x-mail-count x-msmail-priority x-priority xref))
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Structured'}
-for (qw(approved bcc cc delivered-to disposition-notification-to envelope-to
-  errors-to fcc from mail-followup-to mail-followup-cc reply-to resent-bcc
+for (qw(approved bcc cc complaints-to
+  delivered-to disposition-notification-to envelope-to
+  errors-to fcc from mail-followup-to mail-followup-cc 
+  mail-reply-to
+  notice-requested-upon-delivery-to reply-to resent-bcc
   resent-cc resent-to resent-from resent-sender return-path
   return-receipt-to sender to x-approved x-beenthere
   x-complaints-to x-envelope-from x-envelope-sender
@@ -172,12 +187,12 @@ sub _init ($;%) {
   }
 }
 
-=head2 Message::Header->new ([%initial-fields/options])
+=item Message::Header->new ([%initial-fields/options])
 
 Constructs a new C<Message::Headers> object.  You might pass some initial
 C<field-name>-C<field-body> pairs and/or options as parameters to the constructor.
 
-=head3 example
+Example:
 
  $hdr = new Message::Headers
         Date         => 'Thu, 03 Feb 1994 00:00:00 +0000',
@@ -195,7 +210,7 @@ sub new ($;%) {
   $self;
 }
 
-=head2 Message::Header->parse ($header, [%initial-fields/options])
+=item Message::Header->parse ($header, [%initial-fields/options])
 
 Parses given C<header> and constructs a new C<Message::Headers> 
 object.  You might pass some additional C<field-name>-C<field-body> pairs 
@@ -225,6 +240,16 @@ sub parse ($$;%) {
   }
   $self;
 }
+
+=item Message::Header->parse_array (\@header, [%initial-fields/options])
+
+Parses given C<header> and constructs a new C<Message::Headers> 
+object.  Same as C<Message::Header-E<lt>parse> but this method
+is given an array reference.  You might pass some additional 
+C<field-name>-C<field-body> pairs or/and initial options 
+as parameters to the constructor.
+
+=cut
 
 sub parse_array ($\@;%) {
   my $class = shift;
@@ -257,6 +282,10 @@ sub parse_array ($\@;%) {
   }
   $self;
 }
+
+=back
+
+=head1 METHODS
 
 =head2 $self->field ($field_name)
 
@@ -412,7 +441,7 @@ sub replace ($%) {
   my %option = %{$self->{option}};
   $option{parse} = defined wantarray unless defined $option{parse};
   for (grep {/^-/} keys %params) {$option{substr ($_, 1)} = $params{$_}}
-  my (%new_field, $body);
+  my (%new_field);
   for (grep {/^[^-]/} keys %params) {
     my $name = lc $_;
     $name =~ tr/_/-/ if $option{translate_underscore};
@@ -421,10 +450,10 @@ sub replace ($%) {
     $params{$_} = $self->_field_body ($params{$_}, $name) if $option{parse};
     $new_field{$name} = $params{$_};
   }
+  my $body = (%new_field)[-1];
   for my $field (@{$self->{field}}) {
     if (defined $new_field{$field->{name}}) {
-      $body = $new_field {$field->{name}};
-      $field->{body} = $body;
+      $field->{body} = $new_field {$field->{name}};
       $new_field{$field->{name}} = undef;
     }
   }
@@ -747,7 +776,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/03 13:31:36 $
+$Date: 2002/04/05 14:56:26 $
 
 =cut
 

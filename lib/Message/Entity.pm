@@ -13,11 +13,12 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Header;
 require Message::Util;
-use overload '""' => sub {shift->stringify};
+use overload '""' => sub { $_[0]->stringify },
+             fallback => 1;
 
 sub _init ($;%) {
   my $self = shift;
@@ -63,10 +64,19 @@ The following methods construct new C<Message::Entity> objects:
 
 =over 4
 
-=item Message::Entity->new ([%option])
+=item Message::Entity->new ([%initial-fields/options])
 
-Returns new Message::Entity instance.  Some options can be
-specified as hash.
+Constructs a new C<Message::Entity> object.  You might pass some initial
+C<field-name>-C<field-body> pairs and/or options as parameters to the constructor.
+
+Example:
+
+ $msg = new Message::Entity
+        Date         => 'Thu, 03 Feb 1994 00:00:00 +0000',
+        Content_Type => 'text/html',
+        X_URI => '<http://www.foo.example/>',
+        -format => 'mail-rfc2822'	## not to be header field
+        ;
 
 =cut
 
@@ -84,12 +94,11 @@ sub new ($;%) {
   $self;
 }
 
-=item Message::Entity->parse ($message, [%option])
+=item Message::Entity->parse ($message, [%options])
 
-Parses given C<message> and return a new Message::Entity
-object.  Some options can be specified as hash.
-
-=back
+Parses given C<message> (a message entity) and constructs a new C<Message::Entity>
+object.  You might pass some additional C<field-name>-C<field-body> pairs 
+or/and initial options as parameters to the constructor.
 
 =cut
 
@@ -118,6 +127,8 @@ sub parse ($$;%) {
   $self;
 }
 
+=back
+
 =head1 METHODS
 
 =head2 $self->header ([$new_header])
@@ -129,6 +140,7 @@ called.
 
 =cut
 
+## TODO: to be compatible with HTTP::Message
 sub header ($;$) {
   my $self = shift;
   my $new_header = shift;
@@ -228,31 +240,25 @@ sub stringify ($;%) {
 }
 *as_string = \&stringify;
 
-=head2 $self->option ($option_name)
 
-Returns/set (new) value of the option.
+=head1 SHORTCUT METHOD FOR MESSAGE PROPERTIES
 
-=cut
+=over 4
 
-sub option ($@) {
-  my $self = shift;
-  if (@_ == 1) {
-    return $self->{option}->{ shift (@_) };
-  }
-  while (my ($name, $value) = splice (@_, 0, 2)) {
-    $name =~ s/^-//;
-    $self->{option}->{$name} = $value;
-    if ($name eq 'format') {
-      $self->header->option (-format => $value);
-    }
-  }
-}
+=item $self->content_type ([%options])
 
-=head2 $self->content_type ([%options])
+Returns Internet media type of message body
+(aka MIME type, content type).  Only media type
+(type/subtype pair) is returned, i.e. no parameter
+is returned, if any.  To get such value, or to set
+new value, use C<field> method.
 
-Returns C<body>'s content-type (Internet Media Type).
-This method is not implemented yet so always returns
-C<text/plain>.
+Default is C<text/plain>.
+
+Example:
+
+  $msg->field ('Content-Type')->media_type ('text/html');
+  print $msg->content_type;	## text/html
 
 =cut
 
@@ -263,13 +269,25 @@ sub content_type ($;%) {
   'text/plain';
 }
 
+=item $self->id
+
+Returns ID of message entity.  If there are C<Message-ID:>
+field, its value is returned.  Unless, but there are
+C<Content-ID:> field, it is returned.  Without both of
+fields, C<""> is returned.
+
+=cut
+
 sub id ($) {
   my $self = shift;
   return scalar $self->{header}->field ('message-id')->id
     if $self->{header}->field_exist ('message-id');
+  return scalar $self->{header}->field ('content-id')->id
+    if $self->{header}->field_exist ('content-id');
   '';
 }
 
+## Internal function for addition of User-Agent: C<product>.
 sub _add_ua_field ($) {
   my $self = shift;
   if ($self->{option}->{add_ua}) {
@@ -297,7 +315,47 @@ sub _add_ua_field ($) {
   $self;
 }
 
-=head2 $self->clone ()
+=back
+
+=head1 MISC. METHODS
+
+=over 4
+
+=item $self->option ( $option-name / $option-name, $option-value, ...)
+
+If @_ == 1, returns option value.  Else...
+
+Set option value.  You can pass multiple option name-value pair
+as parameter.  Example:
+
+  $msg->option (-format => 'mail-rfc822',
+                -capitalize => 0);
+  print $msg->option ('-format');	## mail-rfc822
+
+Note that introduction character, i.e. C<-> (HYPHEN-MINUS)
+is optional.  You can also write as this:
+
+  $msg->option (format => 'mail-rfc822',
+                capitalize => 0);
+  print $msg->option ('format');	## mail-rfc822
+
+=cut
+
+sub option ($@) {
+  my $self = shift;
+  if (@_ == 1) {
+    return $self->{option}->{ $_[0] };
+  }
+  while (my ($name, $value) = splice (@_, 0, 2)) {
+    $name =~ s/^-//;
+    $self->{option}->{$name} = $value;
+    if ($name eq 'format') {
+      $self->header->option (-format => $value);
+    }
+  }
+}
+
+=item $self->clone ()
 
 Returns a copy of Message::Entity object.
 
@@ -320,10 +378,16 @@ sub clone ($) {
   $clone;
 }
 
+=back
+
 =head1 EXAMPLE
 
   use Message::Entity;
-  my $msg = new Message::Entity;
+  my $msg = new Message::Entity From	=> 'foo@example.org',
+                                Subject	=> 'Example message',
+                                To	=> 'bar@example.net',
+                                -format	=> 'mail-rfc2822',
+                                body	=> $body;
   $msg->header ($header);
   $msg->body ($body);
   print $msg;
@@ -355,7 +419,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/03 13:31:36 $
+$Date: 2002/04/05 14:56:26 $
 
 =cut
 
