@@ -15,7 +15,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/19 10:57:49 $
+      $Date: 2004/12/27 13:41:54 $
     @@ContentType:
       dis:Date.RCS
   
@@ -371,12 +371,19 @@ PropDef:
       Inheritance relationship of a resource.
   @ISA:
     rdfs:subClassOf
-  @rdfs:domain:
-    rdfs:Property
-  @rdfs:range:
-    rdfs:Property
   @dataType:
     dis:TypeQName
+
+PropDef:
+  @QName:
+    dis:AppISA
+  @Description:
+    @@lang:en
+    @@@:
+      Application dependent is-a relationship.
+  @ISA:
+     rdfs:subClassOf
+
 PropDef:
   @QName:
     dis:Implement

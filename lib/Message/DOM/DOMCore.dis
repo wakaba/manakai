@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/26 09:24:37 $
+      $Date: 2004/12/27 13:41:54 $
     @@ContentType:
       dis:Date.RCS
 
@@ -84,42 +84,6 @@ Module:
         ManakaiDOM:ManakaiDOMLatest
       @@@For:
         !=ManakaiDOM:ManakaiDOMLatest
-
-  @Feature:
-    @@Name: Core
-    @@Version: 2.0
-    @@Condition[list]:
-      DOM2
-      DOM3
-    @@Spec:
-      @@@DOM3:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-BBACDC08
-    @@Description:
-      @@@lang:en
-      @@@@: The DOM Core Module, Level 2.
-    @@Contrib:
-      DOMImplementation::DOM2
-    @@Contrib:
-      DOMImplementation::DOM3
-    @@Contrib:
-      Node::DOM2
-    @@Condition:
-      Node::DOM3
-  @Feature:
-    @@Name: Core
-    @@Version: 3.0
-    @@Condition[list]:
-      DOM3
-    @@Spec:
-      @@@DOM3:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-BBACDC08
-    @@Description:
-      @@@lang:en
-      @@@@: The DOM Core Module, Level 3.
-    @@Contrib:
-      DOMImplementation::DOM3
-    @@Contrib:
-      Node::DOM3
 
 Namespace:
   @dis:
@@ -281,6 +245,11 @@ ElementTypeBinding:
         ManakaiDOM:ForIF
       @@For:
         ManakaiDOM:ManakaiDOMLatest
+  @ShadowSibling:
+    @@DOMMain:implementFeature:
+      @@@@: CoreFeature30
+      @@@For:
+        ManakaiDOM:DOM3
 ElementTypeBinding:
   @Name: ImplementLevel2
   @ElementType:
@@ -292,6 +261,11 @@ ElementTypeBinding:
         ManakaiDOM:ForIF
       @@For:
         ManakaiDOM:ManakaiDOM3
+  @ShadowSibling:
+    @@DOMMain:implementFeature:
+      @@@@: CoreFeature20
+      @@@For:
+        ManakaiDOM:DOM2
 ElementTypeBinding:
   @Name: ImplementLevel1
   @ElementType:
@@ -303,6 +277,11 @@ ElementTypeBinding:
         ManakaiDOM:ForIF
       @@For:
         ManakaiDOM:ManakaiDOM2
+  @ShadowSibling:
+    @@DOMMain:implementFeature:
+      @@@@: CoreFeature
+      @@@For:
+        ManakaiDOM:DOM1
 
 ElementTypeBinding:
   @Name: BlockCode
@@ -544,6 +523,62 @@ PropDef:
     @@lang:en
     @@@:
       Temporary - should be bound to ManakaiDOM:DOMConfigParameter
+
+## -- Feature
+
+ElementTypeBinding:
+  @Name: FeatureDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DOMMain:DOMFeature
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+ElementTypeBinding:
+  @Name: FeatureVerDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DOMMain:DOMFeature
+
+ElementTypeBinding:
+  @Name: featureName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ContentType:
+      dis:String
+
+FeatureDef:
+  @featureName: Core
+  @QName: CoreFeature
+  @FeatureVerDef:
+    @@QName: CoreFeature20
+    @@Version: 2.0
+    @@ISA: CoreFeature
+    @@Spec:
+      @@@DOM3:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-BBACDC08
+    @@Description:
+      @@@lang:en
+      @@@@: The DOM Core Module, Level 2.
+  @FeatureVerDef:
+    @@QName: CoreFeature30
+    @@Version: 3.0
+    @@ISA: CoreFeature20
+    @@Spec:
+      @@@DOM3:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-BBACDC08
+    @@Description:
+      @@@lang:en
+      @@@@: The DOM Core Module, Level 3.
+
+## -- Exception
 
 ExceptionDef:
   @Name:
@@ -1877,6 +1912,16 @@ IF:
   @For:
     =ManakaiDOM:ManakaiDOM
   @Level[list]:  3
+  @ImplementLevel3:
+
+  @Role:
+    @@@: 
+      DOMCore:DOMImplementationSource::ManakaiDOM:ManakaiDOM
+    @@For:
+      ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:ForClass
+
   @Description:
     @@lang:en
     @@@:
@@ -1922,15 +1967,21 @@ IF:
               This source has no DOM implementation that supports the 
               desired features and versions.
         @@@PerlDef:
-            #for my $class (reverse @{$__PACKAGE{Global}__::Role{<Q::DOMCore:DOMImplementation>}||{}}) {
-            #  if (my $new = $class->{class}->can ('new')) {
-            #    if ($class->{class}->__INT{SP:classHasFeature}__ (%features)) {
-            #      $r = $new->($class->{class});
-            #    }
-            #    last;
-            #  }
-            #}
-            \## TODO: New implementation required.
+          CLS: for (values %{<Class::DOMCore:DOMImplementation
+                                     ::ManakaiDOM:ManakaiDOM>::Class}) {
+            for my $fname (keys %$features) {
+              for my $fver (ref $features->{$fname} eq 'HASH'
+                               ? grep {$features->{$fname}->{$_}}
+                                   keys %{$features->{$fname}}
+                               : $features->{$fname}) {
+                unless ($_->{feature}->{$fname}->{$fver}) {
+                  next CLS;
+                }
+              }
+            }
+            $r = $_->{packageName}->_new;
+            last CLS;
+          }
   @Method:
      @@Name:  getDOMImplementationList
      @@Description:
@@ -1957,15 +2008,22 @@ IF:
             A list of DOM implementations that support the desired 
             features and versions.
         @@@PerlDef:
-            $r = <ClassM::ManakaiDOMImplementationList.new>;
-            #for my $class (reverse @{$__PACKAGE{Global}__::Role{<Q::DOMCore:DOMImplementation>}||{}}) {
-            #  if (my $new = $class->{class}->can ('new')) {
-            #    if ($class->{class}->__INT{SP:classHasFeature}__ (%features)) {
-            #      $r->__INT{add}__ ($new->($class->{class}));
-            #    }
-            #  }
-            #}
-            \## TODO: New implementation required.
+          $r = <ClassM::ManakaiDOMImplementationList.new>;
+          CLS: for (values %{<Class::DOMCore:DOMImplementation
+                                     ::ManakaiDOM:ManakaiDOM>::Class}) {
+            for my $fname (keys %$features) {
+              for my $fver (ref $features->{$fname} eq 'HASH'
+                               ? grep {$features->{$fname}->{$_}}
+                                   keys %{$features->{$fname}}
+                               : $features->{$fname}) {
+                unless ($_->{feature}->{$fname}->{$fver}) {
+                  next CLS;
+                }
+              }
+            }
+            $r-><M::DOMCore:ManakaiDOMImplementationList.add>
+                  ($_->{packageName}->_new);
+          }
 
 IF:
   @Name:
@@ -1983,6 +2041,26 @@ IF:
   @ImplementLevel1:
   @ImplementLevel2:
   @ImplementLevel3:
+  @DOMMain:implementFeature:
+    @@@:
+      DOMMain:ManakaiDOMFeature10
+    @@For:
+      ManakaiDOM:ManakaiDOM
+  @DOMMain:implementFeature:
+    @@@:
+      DOMMain:DOMMainFeature10
+    @@For:
+      ManakaiDOM:ManakaiDOM1
+  @DOMMain:implementFeature:
+    @@@:
+      DOMMain:DOMMainFeature20
+    @@For:
+      ManakaiDOM:ManakaiDOM2
+  @DOMMain:implementFeature:
+    @@@:
+      DOMMain:DOMMainFeature30
+    @@For:
+      ManakaiDOM:ManakaiDOM3
   @Spec:
     @@DOM3:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-102161490
@@ -2000,6 +2078,14 @@ IF:
       ManakaiDOM:ManakaiDOM
     @@ForCheck:
       ManakaiDOM:ForClass
+
+  @Role:
+    @@@:
+      DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM
+    @@compat:
+      DOMCore:ManakaiDOMImplementation::ManakaiDOM:ManakaiDOMLatest
+    @@ForCheck:
+      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
 
   @Method:
      @@Name:  hasFeature
@@ -2713,25 +2799,16 @@ IF:
           @@@@@: 
             There is no object available that implements interfaces 
             associated with the <P::feature> and <P::version>. 
-        @@@ImplNote:
-          (Reimplementation required)
-            if (defined $feature) {
-              undef $version if defined $version and not length $version;
-              my $plus = 1 if $feature =~ s/^\+//;
-              $feature = lc $feature;
-              for (reverse @{$__PACKAGE{Global}__::Role{
-                     <Q::DOMCore:DOMImplementation>}||[]}) {
-                if ($_->{compat} eq <Q::ManakaiDOMCore:DOMImplementation>) {
-                  if ($_->{class}->__INT{SP:classHasFeature}__
-                                     ($feature => {version => $version})) {
-                    $r = $self->{<Q::TreeCore:node>}
-                              ->__SUPER{ManakaiDOMNodeObject::}__::__INT{newReference}__
-                                     ($_->{class});
-                    last;
-                  }
-                }
-              }
+        @@@PerlDef:
+          $feature =~ s/^\+//;
+          for (values %{<Class::DOMCore:ManakaiDOMImplementation
+                                     ::ManakaiDOM:ManakaiDOMLatest>::Class}) {
+            if ($_->{feature}->{$feature}->{$version}) {
+              $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject.newReference>
+                      ($self->{<Q::TreeCore:node>}, $_->{packageName});
+              last;
             }
+          }
 
   @IntMethod:
     @@Name:new
@@ -5146,9 +5223,6 @@ IF:
       ManakaiDOM:DOM3
   @Method:
      @@Name:  getFeature
-     @@Return:
-        @@@Type:  
-          DOMMain:DOMObject
      @@Param:
         @@@Name:  feature
         @@@Type:  
@@ -5161,6 +5235,25 @@ IF:
      @@SpecLevel:3
      @@For:
        ManakaiDOM:DOM3
+     @@Return:
+        @@@Type:  
+          DOMMain:DOMObject
+        @@@PerlDef:
+          $feature =~ s/^\+//;
+          for (values %{<Class::DOMCore:ManakaiDOMNode
+                                     ::ManakaiDOM:ManakaiDOMLatest>::Class}) {
+            if ($_->{feature}->{$feature}->{$version}) {
+              $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject.newReference>
+                      ($self->{<Q::TreeCore:node>}, $_->{packageName});
+              last;
+            }
+          }
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         {TODO:: Node type dependent alternatives should be provided.
+         \
+         }
   @Method:
      @@Name:  setUserData
      @@Return:
@@ -6256,6 +6349,17 @@ IF:
       ManakaiDOM:ForClass
     @@For: 
       ManakaiDOM:ManakaiDOM
+
+  @ImplementLevel1:
+  @ImplementLevel2:
+  @ImplementLevel3:
+  
+  @Role:
+    @@@: 
+      DOMCore:ManakaiDOMAttr::ManakaiDOM:ManakaiDOMLatest
+    @@ForCheck:
+      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
+
   @Description:
     @@lang:en
     @@@:
@@ -6956,6 +7060,17 @@ IF:
       ManakaiDOM:ForClass
     @@For: 
       ManakaiDOM:ManakaiDOM
+
+  @ImplementLevel1:
+  @ImplementLevel2:
+  @ImplementLevel3:
+  
+  @Role:
+    @@@: 
+      DOMCore:ManakaiDOMElement::ManakaiDOM:ManakaiDOMLatest
+    @@ForCheck:
+      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
+
   @Description:
     @@lang:en
     @@@:
@@ -9328,6 +9443,17 @@ IF:
       ManakaiDOM:ForClass
     @@For: 
       ManakaiDOM:ManakaiDOM
+
+  @ImplementLevel1:
+  @ImplementLevel2:
+  @ImplementLevel3:
+  
+  @Role:
+    @@@: 
+      DOMCore:ManakaiDOMText::ManakaiDOM:ManakaiDOMLatest
+    @@ForCheck:
+      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
+
   @Description:
     @@lang:en
     @@@:
@@ -9647,6 +9773,17 @@ IF:
       ManakaiDOM:ForClass
     @@For: 
       ManakaiDOM:ManakaiDOM
+
+  @ImplementLevel1:
+  @ImplementLevel2:
+  @ImplementLevel3:
+  
+  @Role:
+    @@@: 
+      DOMCore:ManakaiDOMComment::ManakaiDOM:ManakaiDOMLatest
+    @@ForCheck:
+      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
+
   @Description:
     @@lang:en
     @@@:
@@ -10614,6 +10751,17 @@ IF:
       ManakaiDOM:ForClass
     @@For: 
       ManakaiDOM:ManakaiDOM
+
+  @ImplementLevel1:
+  @ImplementLevel2:
+  @ImplementLevel3:
+  
+  @Role:
+    @@@: 
+      DOMCore:ManakaiDOMDocumentFragment::ManakaiDOM:ManakaiDOMLatest
+    @@ForCheck:
+      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
+
   @Description:
     @@lang:en
     @@@: A "lightweight" or "minimal" "Document" object.
@@ -10766,19 +10914,23 @@ IF:
       ManakaiDOM:ForClass
     @@For: 
       ManakaiDOM:ManakaiDOM
+
+  @ImplementLevel1:
+  @ImplementLevel2:
+  @ImplementLevel3:
+  
+  @Role:
+    @@@: 
+      DOMCore:ManakaiDOMDocument::ManakaiDOM:ManakaiDOMLatest
+    @@ForCheck:
+      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
+
   @Description:
     @@lang:en
     @@@: 
       The entire document.  It is conceptually the root of the 
       document tree and it provides the primary access to the 
       document's data.
-
-  @Role:
-    @@@:
-      DOMCore:Document
-    @@compat:
-      ManakaiDOMCore:Document
-
   @Attr:
      @@Name:  doctype
      @@Description:

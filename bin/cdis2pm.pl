@@ -9,6 +9,7 @@ use Message::Util::QName::Filter {
   disPerl => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl-->,
   DOMCore => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#>,
   DOMMain => q<http://suika.fam.cx/~wakaba/archive/2004/dom/main#>,
+  DOMXML => q<http://suika.fam.cx/~wakaba/archive/2004/dom/xml#>,
   lang => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#>,
   Perl => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl-->,
   license => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/license#>,
@@ -222,16 +223,24 @@ sub perl_code ($;%) {
                               : '') .
                  $mtd->{ExpandedURI q<dis2pm:methodName>} . ' ';
           }
-        } elsif ($et eq ExpandedURI q<disPerl:ClassName> ||
-                 $et eq ExpandedURI q<disPerl:IFName>) {
-                                                        ## Perl package name
+        } elsif ({
+                  ExpandedURI q<disPerl:Class> => 1,
+                  ExpandedURI q<disPerl:IF> => 1,
+                  ExpandedURI q<disPerl:ClassName> => 1,
+                  ExpandedURI q<disPerl:IFName> => 1,
+                 }->{$et}) {                            ## Perl package name
           my $uri = dis_typeforqnames_to_uri ($q, 
                                               use_default_namespace => 1, %opt);
           if (defined $State->{Type}->{$uri}->{Name} and
               defined $State->{Type}->{$uri}
                             ->{ExpandedURI q<dis2pm:packageName>}) {
-            $r = perl_literal ($State->{Type}->{$uri}
-                                     ->{ExpandedURI q<dis2pm:packageName>});
+            $r = $State->{Type}->{$uri}->{ExpandedURI q<dis2pm:packageName>};
+            if ({
+                  ExpandedURI q<disPerl:ClassName> => 1,
+                  ExpandedURI q<disPerl:IFName> => 1,
+                }->{$et}) {
+              $r = perl_literal $r;
+            }
           } else {
             valid_err qq<Package name of class <$uri> must be defined>,
               node => $opt{node};
@@ -1133,6 +1142,24 @@ sub dispm_memref_to_resource ($%) {
   return $mem;
 } # dispm_memref_to_resource
 
+=item $hash = dispm_collect_hash_prop_value ($resource, $propuri, %opt)
+
+Get property values from a resource and its superclasses 
+(C<dis:ISA>s - C<dis:Implement>s are not checked).
+
+=cut
+
+## TODO: Loop test might be required
+sub dispm_collect_hash_prop_value ($$%) {
+  my ($res, $propu, %opt) = @_;
+  my %r;
+  for (@{$res->{ISA}||[]}) {
+    %r = (%{dispm_collect_hash_prop_value ($State->{Type}->{$_}, $propu, %opt)},
+          %r);
+  }
+  %r = (%r, %{$res->{$propu}||{}});
+  \%r;
+} # dispm_collect_hash_prop_value
 
 ## Outputed module and "For"
 my $mf = dis_get_module_uri (module_name => $Opt{module_name},
@@ -1188,7 +1215,11 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
                    => perl_literal version_date time;
     ## Inheritance
     ## TODO: IF "isa" should be expanded
-    my $isa = [];
+    my $isa = $pack->{ExpandedURI q<dis2pm:AppISA>} || [];
+    for (@$isa) {
+      $State->{Module}->{$State->{module}}
+            ->{ExpandedURI q<dis2pm:requiredModule>}->{$_} ||= 1;
+    }
     for my $uri (@{$pack->{ISA}||[]}, @{$pack->{Implement}||[]}) {
       my $pack = $State->{Type}->{$uri};
       if (defined $pack->{ExpandedURI q<dis2pm:packageName>}) {
@@ -1202,6 +1233,113 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
     $result .= perl_inherit $isa;
     $State->{ExpandedURI q<dis2pm:referredPackage>}->{$_} ||= $pack->{src} || 1
       for @$isa;
+    
+    ## Role
+    my $role = dispm_collect_hash_prop_value
+                 ($pack, ExpandedURI q<d:Role>, %opt);
+    my $feature;
+    for (values %$role) {
+      my $roleres = $State->{Type}->{$_->{Role}};
+      my $compatres;
+      $compatres = $State->{Type}->{$_->{compat}} if defined $_->{compat};
+      valid_err qq{Perl package name for interface <$_->{Role}> must be defined},
+        node => $roleres->{src}
+          unless defined $roleres->{ExpandedURI q<dis2pm:packageName>};
+      valid_err qq{Perl package name for class <$_->{compat}> must be defined},
+        node => $compatres->{src}
+          if $compatres and 
+             not defined $compatres->{ExpandedURI q<dis2pm:packageName>};
+      if ({
+           dis_typeforuris_to_uri
+                (ExpandedURI q<DOMCore:DOMImplementation>,
+                 ExpandedURI q<ManakaiDOM:ManakaiDOM>, %opt) => 1,
+           
+           dis_typeforuris_to_uri
+                (ExpandedURI q<DOMCore:ManakaiDOMNode>,
+                 ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>, %opt) => 1,
+           dis_typeforuris_to_uri
+                (ExpandedURI q<DOMCore:ManakaiDOMAttr>,
+                 ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>, %opt) => 1,
+           dis_typeforuris_to_uri
+                (ExpandedURI q<DOMXML:ManakaiDOMCDATASection>,
+                 ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>, %opt) => 1,
+           dis_typeforuris_to_uri
+                (ExpandedURI q<DOMCore:ManakaiDOMComment>,
+                 ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>, %opt) => 1,
+           dis_typeforuris_to_uri
+                (ExpandedURI q<DOMCore:ManakaiDOMDocument>,
+                 ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>, %opt) => 1,
+           dis_typeforuris_to_uri
+                (ExpandedURI q<DOMCore:ManakaiDOMDocumentFragment>,
+                 ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>, %opt) => 1,
+           dis_typeforuris_to_uri
+                (ExpandedURI q<DOMXML:ManakaiDOMDocumentType>,
+                 ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>, %opt) => 1,
+           dis_typeforuris_to_uri
+                (ExpandedURI q<DOMCore:ManakaiDOMElement>,
+                 ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>, %opt) => 1,
+           dis_typeforuris_to_uri
+                (ExpandedURI q<DOMXML:ManakaiDOMEntity>,
+                 ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>, %opt) => 1,
+           dis_typeforuris_to_uri
+                (ExpandedURI q<DOMXML:ManakaiDOMEntityReference>,
+                 ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>, %opt) => 1,
+           dis_typeforuris_to_uri
+                (ExpandedURI q<DOMXML:ManakaiDOMNotation>,
+                 ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>, %opt) => 1,
+           dis_typeforuris_to_uri
+                (ExpandedURI q<DOMXML:ManakaiDOMProcessingInstruction>,
+                 ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>, %opt) => 1,
+           dis_typeforuris_to_uri
+                (ExpandedURI q<DOMCore:ManakaiDOMText>,
+                 ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>, %opt) => 1,
+          }->{$_->{Role}}) {
+        unless ($feature) {
+          $feature = {};
+          for (keys %{dispm_collect_hash_prop_value
+                   ($pack, ExpandedURI q<DOMMain:implementFeature>, %opt)}) {
+            my $f = $State->{Type}->{$_};
+            my $version = $f->{ExpandedURI q<d:Version>};
+            $version = '' unless defined $version;
+            for (keys %{$f->{ExpandedURI q<dis2pm:featureName>}}) {
+              $feature->{$_}->{$version}
+                = length $version
+                    ? $f->{ExpandedURI q<dis2pm:notImplemented>} ? 0 : 1 : 1;
+            }
+          }
+        }
+        my %f = (
+           packageName => $pack->{ExpandedURI q<dis2pm:packageName>},
+           feature => $feature,
+        );
+        
+        $result .= perl_statement
+                     (($compatres
+                          ? perl_var (type => '$',
+                                      package => $compatres
+                                           ->{ExpandedURI q<dis2pm:packageName>},
+                                      local_name => 'Class').
+                            '{'.(perl_literal ($f{packageName})).'} = '
+                          : '').
+                       perl_var (type => '$',
+                                 package => $roleres
+                                           ->{ExpandedURI q<dis2pm:packageName>},
+                                 local_name => 'Class').
+                       '{'.(perl_literal ($f{packageName})).'} = '.
+                       perl_literal \%f);
+      } elsif ({
+                dis_typeforuris_to_uri
+                  (ExpandedURI q<DOMCore:DOMImplementationSource>,
+                   ExpandedURI q<ManakaiDOM:ManakaiDOM>, %opt) => 1,
+               }->{$_->{Role}}) {
+        $result .= perl_statement
+                     'push @org::w3c::dom::DOMImplementationSourceList, '.
+                     perl_literal ($pack->{ExpandedURI q<dis2pm:packageName>});
+      } else {
+        valid_err qq{Role <$_->{Role}> not supported}, $_->{node};
+      }
+    }
+
     ## Members
     if ({
          ExpandedURI q<ManakaiDOM:Class> => 1,
@@ -1230,10 +1368,10 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
               $proto .= ';' unless $param_opt;
               $param_opt++;
             }
-            if (dis_uri_ctype_match ($atype, ExpandedURI q<Perl:Array>, %opt)) {
+            if (dis_uri_ctype_match (ExpandedURI q<Perl:Array>, $atype, %opt)) {
               $proto .= '@';
               push @param, '@'.$param->{ExpandedURI q<dis2pm:paramName>};
-            } elsif (dis_uri_ctype_match ($atype, ExpandedURI q<Perl:Hash>,
+            } elsif (dis_uri_ctype_match (ExpandedURI q<Perl:Hash>, $atype,
                                           %opt)) {
               $proto .= '%';
               push @param, '%'.$param->{ExpandedURI q<dis2pm:paramName>};
@@ -1260,7 +1398,8 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
                          ExpandedURI q<dis2pm:selParent>
                              => $param->{ExpandedURI q<dis2pm:actualTypeNode>});
               if (defined $nm) {
-                $nm =~ s/\$INPUT\b/\$$param[-1] /g;
+                $nm =~ s/\$INPUT\b/$param[-1] /g;
+                ## NOTE: "Perl:Array" or "Perl:Hash" is not supported.
                 $param_norm .= $nm;
               }
             }
@@ -1444,6 +1583,7 @@ for (keys %{$State->{Module}->{$State->{module}}
   next if $_ eq $State->{Module}->{$State->{module}}
                       ->{ExpandedURI q<dis2pm:packageName>};
   $begin .= perl_statement ('require ' . $_);
+  $State->{ExpandedURI q<dis2pm:referredPackage>}->{$_} = -1;
 }
 $result = $begin . $result if $begin;
 

@@ -168,7 +168,7 @@ sub perl_var (%) {
   my %opt = @_;
   my $r = $opt{type} || '';                   # $, @, *, &, $# or empty
   $r = $opt{scope} . ' ' . $r if $opt{scope}; # my, our or local
-  $r .= perl_package_name (%{$opt{package}}) . '::' if $opt{package};
+  $r .= $opt{package} . '::' if $opt{package};
   $r .= $opt{local_name};
   $r;
 }
