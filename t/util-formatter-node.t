@@ -48,6 +48,10 @@ my @s = (
           rule => 'BARE-TEXT%hoge (param=>{%foo;}p);BARE-TEXT',
           result => 'BARE-TEXT[foo:][:foo]BARE-TEXT',
          },
+         {
+          rule => '%l (bare);,%l;,%l (bare => 0);,%l (bare => foo);',
+          result => '1,,0,foo',
+         },
         );
 Test::Simple->import (tests => scalar @s);
                              
@@ -105,6 +109,12 @@ sub rule_def {+{
     main => sub {
       my ($f, $name, $p, $o, %opt) = @_;
       $p->{-parent}->append_text (++$o->{i});
+    },
+  },
+  l => {
+    main => sub {
+      my ($f, $name, $p, $o, %opt) = @_;
+      $p->{-parent}->append_text ($p->{bare});
     },
   },
 }}

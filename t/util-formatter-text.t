@@ -52,6 +52,10 @@ my @s = (
           rule => '%k;%k(content=>{%k;}p);%k;',
           result => '[1[]2][3[[5[]6]]4][7[]8]',
          },
+         {
+          rule => '%l (bare);,%l;,%l (bare => 0);,%l (bare => foo);',
+          result => '1,,0,foo',
+         },
         );
 Test::Simple->import (tests => scalar @s);
                              
@@ -108,6 +112,12 @@ sub rule_def {+{
     after => sub {
       my ($f, $name, $p, $o) = @_;
       $p->{-result} =~ s/%%%%/$p->{content}||''/ge;
+    },
+  },
+  l => {
+    after => sub {
+      my ($f, $name, $p, $o) = @_;
+      $p->{-result} = $p->{bare};
     },
   },
 }}
