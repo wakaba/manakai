@@ -8,7 +8,7 @@ Message::Header --- A Perl Module for Internet Message Headers
 package Message::Header;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.20 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.21 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;	## This may seem silly:-)
 push @ISA, qw(Message::Field::Structured);
 
@@ -34,7 +34,6 @@ push @ISA, qw(Message::Field::Structured);
     -_VALTYPE_DEFAULT	=> ':default',
     -by	=> 'name',	## (Reserved for method level option)
     -field_format_pattern	=> '%s: %s',
-    -field_name_capitalize	=> 1,
     -field_name_case_sensible	=> 0,
     -field_name_unsafe_rule	=> 'NON_ftext',
     -field_name_validation	=> 1,	## Method level option.
@@ -53,119 +52,26 @@ push @ISA, qw(Message::Field::Structured);
     -use_folding	=> 1,
     #-value_type
 );
-  $DEFAULT{-uri_mailto_safe}	= {
-  	## 1 all (no check)	2 no trace & bcc & from
-  	## 3 no sender's info	4 (default) (currently not used)
-  	## 5 only a few
-  	':default'	=> 4,
-  	'cc'	=> 5,
-  	'bcc'	=> 1,
-  	'body'	=> 1,
-  	'comment'	=> 5,
-  	'content-id'	=> 1,
-  	'date'	=> 1,
-  	'from'	=> 1,
-  	'keywords'	=> 5,
-  	'list-id'	=> 1,
-  	'mail-from'	=> 1,
-  	'message-id'	=> 1,
-  	'received'	=> 1,
-  	'resent-bcc'	=> 1,
-  	'resent-date'	=> 1,
-  	'resent-from'	=> 1,
-  	'resent-sender'	=> 1,
-  	'return-path'	=> 1,
-  	'sender'	=> 1,
-  	'subject'	=> 5,
-  	'summary'	=> 5,
-  	'to'	=> 5,
-  	'user-agent'	=> 3,
-  	'x-face'	=> 2,
-  	'x-mailer'	=> 3,
-  	'x-nsubject'	=> 5,
-  	'x-received'	=> 1,
-  	'x400-received'	=> 1,
-  	};
 
 $DEFAULT{-value_type} = {
 	':default'	=> ['Message::Field::Unstructured'],
 	
-	received	=> ['Message::Field::Received'],
-	'x-received'	=> ['Message::Field::Received'],
-	
 	p3p	=> ['Message::Field::Params'],
-	'auto-submitted'	=> ['Message::Field::ValueParams'],
 	link	=> ['Message::Field::ValueParams'],
-	archive	=> ['Message::Field::ValueParams'],
-	'x-face-type'	=> ['Message::Field::ValueParams'],
-	'x-mozilla-draft-info'	=> ['Message::Field::ValueParams'],
-	
-	subject	=> ['Message::Field::Subject'],
-	'x-nsubject'	=> ['Message::Field::Subject'],
 	
 	'list-software'	=> ['Message::Field::UA'],
 	'user-agent'	=> ['Message::Field::UA'],
-	'resent-user-agent'	=> ['Message::Field::UA'],
 	server	=> ['Message::Field::UA'],
-	
-	## A message id
-	'message-id'	=> ['Message::Field::MsgID'],
-	'resent-message-id'	=> ['Message::Field::MsgID'],
-	
-	## Numeric value
-	lines	=> ['Message::Field::Numval'],
-	'max-forwards'	=> ['Message::Field::Numval'],
-	'mime-version'	=> ['Message::Field::Numval'],
-	'x-jsmail-priority'	=> ['Message::Field::Numval'],
-	'x-mail-count'	=> ['Message::Field::Numval'],
-	'x-ml-count'	=> ['Message::Field::Numval'],
-	'x-priority'	=> ['Message::Field::Numval'],
-	
-	path	=> ['Message::Field::Path'],
 };
-for (qw(archive cancel-lock 
-  disposition-notification-options encoding 
-  importance injector-info 
-  pics-label posted-and-mailed precedence list-id message-type 
-  original-recipient priority x-list-id
-  sensitivity status x-face x-msmail-priority xref))
+for (qw(pics-label list-id status))
   {$DEFAULT{-value_type}->{$_} = ['Message::Field::Structured']}
   	## Not supported yet, but to be supported...
   	# x-list: unstructured, ml name
-for (qw(abuse-reports-to apparently-to approved approved-by bcc cc complaints-to
-  delivered-to disposition-notification-to envelope-to
-  errors-to  from mail-copies-to mail-followup-to mail-reply-to
-  notice-requested-upon-delivery-to read-receipt-to register-mail-reply-requested-by 
-  reply-to resent-bcc
-  resent-cc resent-to resent-from resent-sender return-path
-  return-receipt-to return-receipt-requested-to sender to x-abuse-reports-to 
-  x-admin x-approved x-beenthere x-confirm-reading-to
-  x-complaints-to x-envelope-from x-envelope-sender
-  x-envelope-to x-ml-address x-ml-command x-ml-to x-nfrom x-nto
-  x-rcpt-to x-sender x-x-sender))
-  {$DEFAULT{-value_type}->{$_} = ['Message::Field::Addresses']}
-for (qw(client-date date date-received delivery-date expires
-  expire-date nntp-posting-date posted posted-date received-date 
-  reply-by resent-date 
-  x-originalarrivaltime x-tcup-date))
+for (qw(date expires))
   {$DEFAULT{-value_type}->{$_} = ['Message::Field::Date']}
-for (qw(article-updates in-reply-to
-  obsoletes references replaces see-also supersedes))
-  {$DEFAULT{-value_type}->{$_} = ['Message::Field::MsgIDs']}
-for (qw(accept accept-charset accept-encoding accept-language
-  content-language 
-  encrypted followup-to keywords 
-  list-archive list-digest list-help list-owner
-  list-post list-subscribe list-unsubscribe list-url uri newsgroups
-  posted-to))
+for (qw(accept accept-charset accept-encoding accept-language uri))
   {$DEFAULT{-value_type}->{$_} = ['Message::Field::CSV']}
-for (qw(x-brother x-boss x-classmate x-daughter x-dearfriend x-favoritesong 
-  x-friend x-me 
-  x-moe x-respect 
-  x-sublimate x-son x-sister x-wife))
-  {$DEFAULT{-value_type}->{$_} =[ 'Message::Field::CSV']}	## NOT M::F::XMOE!
-for (qw(location referer url x-home-page x-http_referer
-  x-info x-pgp-key x-ml-url x-uri x-url x-web))
+for (qw(location referer))
   {$DEFAULT{-value_type}->{$_} = ['Message::Field::URI']}
 
 my %header_goodcase = (
@@ -176,16 +82,6 @@ my %header_goodcase = (
 	url	=> 'URL',
 	'www-authenticate'	=> 'WWW-Authenticate',
 );
-$DEFAULT{-field_name_capitalize} = sub {
-  my $self = shift;
-  my $name = shift;
-  if ($header_goodcase{$name}) {
-    return $header_goodcase{$name};
-  }
-  $name =~ s/(?:^|-)cgi-/uc $&/ge;
-  $name =~ s/(?:^|-)[a-z]/uc $&/ge;
-  $name;
-};
 
 ## taken from L<HTTP::Header>
 # "Good Practice" order of HTTP message headers:
@@ -257,12 +153,7 @@ sub _init ($;%) {
 sub _init_by_format ($$\%) {
   my $self = shift;
   my ($format, $option) = @_;
-  if ($format =~ /rfc822/) {
-    $header_goodcase{bcc} = 'bcc';
-    $header_goodcase{cc} = 'cc';
-    $header_goodcase{'resent-bcc'} = 'Resent-bcc';
-    $header_goodcase{'resent-cc'} = 'Resent-cc';
-  } elsif ($format =~ /cgi/) {
+  if ($format =~ /cgi/) {
     unshift @header_order, qw(content-type location);
     $option->{field_sort} = 'good-practice';
     $option->{use_folding} = 0;
@@ -271,7 +162,6 @@ sub _init_by_format ($$\%) {
   }
   if ($format =~ /uri-url-mailto/) {
     $option->{output_bcc} = 0;
-    $option->{field_name_capitalize} = 0;
     $option->{field_format_pattern} = '%s=%s';
     $option->{output_folding} = sub {
       $_[1] =~ s/([^:@+\$A-Za-z0-9\-_.!~*])/sprintf('%%%02X', ord $1)/ge;
@@ -456,6 +346,7 @@ sub _parse_value ($$$;%) {
     eval "require $vpackage" or Carp::croak qq{<parse>: $vpackage: Can't load package: $@};
     return $vpackage->parse ($value,
       -format	=> $self->{option}->{format},
+      -field_ns	=> $option{ns},
       -field_name	=> $name,
       -parse_all	=> $self->{option}->{parse_all},
     %vopt);
@@ -463,6 +354,7 @@ sub _parse_value ($$$;%) {
     eval "require $vpackage" or Carp::croak qq{<parse>: $vpackage: Can't load package: $@};
     return $vpackage->new (
       -format	=> $self->{option}->{format},
+      -field_ns	=> $option{ns},
       -field_name	=> $name,
       -parse_all	=> $self->{option}->{parse_all},
     %vopt);
@@ -707,13 +599,13 @@ sub stringify ($;%) {
                 || $self->{ns}->{uri2phname}->{$nsuri};
       $prefix = undef if $nsuri eq $self->{ns}->{default_phuri};
       my $gc = ${$nspackage.'::OPTION'} {to_be_goodcase};
-      if (ref $gc) { $oname = &$gc ($self, $nspackage, $name) }
+      if (ref $gc) { $oname = &$gc ($self, $nspackage, $name, \%option) }
       else { $oname = $name }
       if ($prefix) { $oname = $prefix . '-' . $oname }
       if ($option{format} =~ /uri-url-mailto/) {
-        return if ((   $option{uri_mailto_safe}->{$name}
-             || $option{uri_mailto_safe}->{':default'})
-              < $option{uri_mailto_safe_level});
+        return if (( ${$nspackage.'::OPTION'} {uri_mailto_safe}->{$name}
+                  || ${$nspackage.'::OPTION'} {uri_mailto_safe}->{':default'})
+                  < $option{uri_mailto_safe_level});
         if ($name eq 'to') {
           $body = $self->field ('to', -new_item_unless_exist => 0);
           if (ref $body && $body->have_group) {
@@ -915,7 +807,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/25 09:53:24 $
+$Date: 2002/05/26 01:20:09 $
 
 =cut
 
