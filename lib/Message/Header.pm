@@ -48,7 +48,47 @@ when C<stringify>.  (Default = 0)
   capitalize	=> 1,
   fold_length	=> 70,
   mail_from	=> 0,
+  field_type	=> {_DEFAULT => 'Message::Field::Unstructured'},
 );
+my @field_type_Structured = qw(cancel-lock content-language
+  content-transfer-encoding
+  encrypted importance mime-version precedence user-agent x-cite
+  x-face x-mail-count
+  x-msmail-priority x-priority x-uidl xref);
+for (@field_type_Structured)
+  {$DEFAULT{field_type}->{$_} = 'Message::Field::Structured'}
+my @field_type_Address = qw(approved bcc cc delivered-to envelope-to
+  errors-to from mail-followup-to reply-to resent-bcc
+  resent-cc resent-to resent-from resent-sender return-path
+  return-receipt-to sender to x-approved x-beenthere
+  x-complaints-to x-envelope-from x-envelope-sender
+  x-envelope-to x-ml-address x-ml-command x-ml-to);
+for (@field_type_Address)
+  {$DEFAULT{field_type}->{$_} = 'Message::Field::Address'}
+my @field_type_Date = qw(date date-received delivery-date expires
+  expire-date nntp-posting-date posted reply-by resent-date x-tcup-date);
+for (@field_type_Date)
+  {$DEFAULT{field_type}->{$_} = 'Message::Field::Date'}
+my @field_type_MsgID = qw(content-id in-reply-to message-id
+  references resent-message-id supersedes);
+for (@field_type_MsgID)
+  {$DEFAULT{field_type}->{$_} = 'Message::Field::Structured'}
+my @field_type_Received = qw(received x-received);
+for (@field_type_Received)
+  {$DEFAULT{field_type}->{$_} = 'Message::Field::Structured'}
+my @field_type_Param = qw(content-disposition content-type
+  x-brother x-daughter x-face-type x-respect x-moe
+  x-syster x-wife);
+for (@field_type_Param)
+  {$DEFAULT{field_type}->{$_} = 'Message::Field::Structured'}
+my @field_type_URI = qw(list-archive list-help list-owner
+  list-post list-subscribe list-unsubscribe uri url x-home-page x-http_referer
+  x-info x-pgp-key x-ml-url x-uri x-url x-web);
+for (@field_type_URI)
+  {$DEFAULT{field_type}->{$_} = 'Message::Field::Structured'}
+my @field_type_ListID = qw(list-id);
+for (@field_type_ListID)
+  {$DEFAULT{field_type}->{$_} = 'Message::Field::Structured'}
 
 =head2 Message::Header->new ([%option])
 
@@ -106,9 +146,9 @@ sub field ($$) {
   for my $field (@{$self->{field}}) {
     if ($field->{name} eq $name) {
       unless (wantarray) {
-        return $field->{body};
+        return $self->_field_body ($field->{body}, $name);
       } else {
-        push @ret, $field->{body};
+        push @ret, $self->_field_body ($field->{body}, $name);
       }
     }
   }
@@ -131,7 +171,21 @@ sub field_name ($$) {
 }
 sub field_body ($$) {
   my $self = shift;
-  $self->{field}->[shift]->{body};
+  my $i = shift;
+  $self->_field_body ($self->{field}->[$i]->{body}, $self->{field}->[$i]->{name});
+}
+
+sub _field_body ($$$) {
+  my $self = shift;
+  my ($body, $name) = @_;
+  if (ref $body) {
+    return $body;
+  } else {
+    my $type = $self->{option}->{field_type}->{$name}
+            || $self->{option}->{field_type}->{_DEFAULT};
+    eval "use $type";
+    return $type->parse ($body);
+  }
 }
 
 =head2 $self->field_name_list ()
@@ -283,6 +337,17 @@ sub set_option ($$$) {
   $self;
 }
 
+sub field_type ($$;$) {
+  my $self = shift;
+  my $field_name = shift;
+  my $new_field_type = shift;
+  if ($new_field_type) {
+    $self->{option}->{field_type}->{$field_name} = $new_field_type;
+  }
+  $self->{option}->{field_type}->{$field_name}
+  || $self->{option}->{field_type}->{_DEFAULT};
+}
+
 sub _delete_empty_field ($) {
   my $self = shift;
   my @ret;
@@ -383,7 +448,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/13 14:47:07 $
+$Date: 2002/03/16 08:54:39 $
 
 =cut
 
