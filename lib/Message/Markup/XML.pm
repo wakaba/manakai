@@ -29,7 +29,7 @@ our %Namespace_URI_to_prefix = (
 	'http://purl.org/rss/1.0/'	=> ['', qw/rss rss10/],
 	'http://suika.fam.cx/~wakaba/lang/rfc/translation/'	=> [qw/ja/],
 	'http://www.mozilla.org/xbl'	=> ['', qw/xbl/],
-	'http://www.w3.org/1999/02/22-rdf-syntax-ns#'	=> [qw/rdf RDF/],
+	'http://www.w3.org/1999/02/22-rdf-syntax-ns#'	=> [qw/rdf/],
 	'http://www.w3.org/1999/xhtml'	=> ['', qw/h h1 xhtml xhtml1/],
 	'http://www.w3.org/1999/xlink'	=> [qw/l xlink/],
 	'http://www.w3.org/1999/XSL/Format'	=> [qw/fo xslfo xsl-fo xsl/],
@@ -39,13 +39,11 @@ our %Namespace_URI_to_prefix = (
 	'http://www.w3.org/2000/svg'	=> ['', qw/s svg/],
 	'http://www.w3.org/2002/06/hlink'	=> [qw/h hlink/],
 	'http://www.w3.org/2002/06/xhtml2'	=> ['', qw/h h2 xhtml xhtml2/],
-	'http://www.w3.org/Graphics/SVG/svg-19990412.dtd'	=> ['', qw/svg/],
+	'http://www.w3.org/2002/07/owl'	=> [qw/owl/],
 	'http://www.w3.org/TR/REC-smil'	=> ['', qw/smil smil1/],
+	'http://www.wapforum.org/2001/wml'	=> [qw/wap/],
 	'http://xml.apache.org/xalan'	=> [qw/xalan/],
 	'mailto:julian.reschke@greenbytes.de?subject=rcf2629.xslt'	=> [qw/myns/],
-	'urn:schemas-microsoft-com:office:excel'	=> [qw/x excel/],
-	'urn:schemas-microsoft-com:office:office'	=> [qw/o office/],
-	'urn:schemas-microsoft-com:office:word'	=> [qw/w word/],
 	'urn:schemas-microsoft-com:vml'	=> [qw/v vml/],
 	'urn:schemas-microsoft-com:xslt'	=> [qw/ms msxsl msxslt/],
 	'urn:x-suika-fam-cx:markup:ietf:html:3:draft:00'	=> ['', qw/H HTML HTML3/],
@@ -596,8 +594,9 @@ in this version of this module.
 
 =cut
 
-sub inner_xml ($) {
+sub inner_xml ($;%) {
   my $self = shift;
+  my %o = @_;
   my $r = '';
   if ($self->{type} eq '#comment') {
     $r = $self->inner_text;
@@ -664,12 +663,21 @@ sub inner_xml ($) {
         $r .= '"' . $self->_entitize ($v) . '"';	# BUG: implement this correctly
       }
     } elsif ($self->{local_name} eq 'ELEMENT') {
+      my $to = sub {
+        if ($o{output_tag_omit_declaration}) {
+          ($self->{flag}->{element_tag_start_omitable} ? 'o ' : '- ')
+          .
+          ($self->{flag}->{element_tag_end_omitable} ? 'o ' : '- ');
+        } else {
+          '';
+        }
+      };
       if (ref $self->{node}->[0] && $self->{node}->[0]->{type} eq '#element') {
       ## Element prototype is given
-        $r = $self->{node}->[0]->qname . ' ' . $self->{node}->[0]->content_spec;
+        $r = $self->{node}->[0]->qname . ' ' . &$to . $self->{node}->[0]->content_spec;
       } elsif ($self->_check_name ($self->{target_name})) {
       ## Element type name and contentspec is given
-        $r = $self->{target_name} . ' ' . ($self->inner_text || 'ANY');
+        $r = $self->{target_name} . ' ' . &$to . ($self->inner_text || 'ANY');
       } else {
       ## (Element type name and contetnspac) is given
         $r = $self->inner_text (output_ref_as_is => 1)
@@ -696,7 +704,9 @@ sub inner_xml ($) {
         $r .= '""';
       }
     } else {	# unknown
-      $r = '""';
+        for (@{$self->{node}}) {
+          $r .= $_->outer_xml;
+        }
     }
   } elsif ($self->{type} eq '#section' && !ref $self->{local_name} && $self->{local_name} eq 'CDATA') {
     $r = $self->inner_text;
@@ -845,6 +855,14 @@ sub flag ($$;$) {
   $self->{flag}->{$name};
 }
 
+sub option ($$;$) {
+  my ($self, $name, $value) = @_;
+  if (defined $value) {
+    $self->{option}->{$name} = $value;
+  }
+  $self->{option}->{$name};
+}
+
 =back
 
 =head1 NODE TYPES
@@ -910,4 +928,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/04/29 10:35:53 $
+1; # $Date: 2003/05/10 05:58:06 $
