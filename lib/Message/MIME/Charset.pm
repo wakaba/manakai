@@ -12,55 +12,93 @@ Perl module for MIME charset.
 package Message::MIME::Charset;
 use strict;
 use vars qw(%ENCODER %DECODER %N11NTABLE %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
-%ENCODER = (
-  '*DEFAULT'	=> sub {$_[1]},
-  'us-ascii'	=> sub {$_[1]},
-  'unknown-8bit'	=> sub {$_[1]},
-);
+our %CHARSET;
 
-%DECODER = (
-  '*DEFAULT'	=> sub {$_[1]},
-  'us-ascii'	=> sub {$_[1]},
-  'unknown-8bit'	=> sub {$_[1]},
-);
+$CHARSET{'*DEFAULT'} = {
+	preferred_name	=> '',
+	
+	encoder	=> sub { $_[1] },
+	decoder	=> sub { $_[1] },
+	
+	mime_text	=> 1,	## Suitability in use as MIME text/* charset
+	#accept_cte	=> [qw/7bit .../],
+	cte_7bit_preferred	=> 'quoted-printable',
+};
+$CHARSET{'*default'} = $CHARSET{'*DEFAULT'};
 
-## Charset name normalization
-%N11NTABLE = (
-  'euc'	=> 'euc-jp',	## ...
-  'jis'	=> 'iso-2022-jp',	## Really?
-  'shift-jis'	=> 'shift_jis',
-  'shift-jisx0213'	=> 'shift_jisx0213',
-  'x-big5'	=> 'big5',
-  'x-x-big5'	=> 'big5',
-  'x-euc'	=> 'euc-jp',	## ...
-  'x-euc-jp'	=> 'euc-jp',
-  'x-gbk'	=> 'gbk',
-  'x-gbk2k'	=> 'gb18030',
-  'x-x-gbk'	=> 'gbk',
-  'x-sjis'	=> 'shift_jis',
-);
+$CHARSET{'us-ascii'} = {
+	preferred_name	=> 'us-ascii',
+	
+	encoder	=> sub { $_[1] },
+	decoder	=> sub { $_[1] },
+};
+
+$CHARSET{'iso-2022-int-1'} = {
+	preferred_name	=> 'iso-2022-int-1',
+	
+	encoder	=> sub { $_[1] },
+	decoder	=> sub { $_[1] },
+};
+
+$CHARSET{'unknown-8bit'} = {
+	preferred_name	=> 'unknown-8bit',
+	
+	encoder	=> sub { $_[1] },
+	decoder	=> sub { $_[1] },
+	
+	mime_text	=> 0,
+	cte_7bit_preferred	=> 'quoted-printable',
+};
+$CHARSET{'x-unknown'} = $CHARSET{'unknown-8bit'};
+
+sub make_charset ($%) {
+  my $name = shift;
+  return unless $name;	## Note: charset "0" is not supported.
+  my %definition = @_;
+  if ($definition{preferred_name} ne $name
+      && ref $CHARSET{$definition{preferred_name}}) {
+  ## New charset is an alias of defined charset,
+    $CHARSET{$name} = $CHARSET{$definition{preferred_name}};
+    return;
+  } elsif ($definition{alias_of} && ref $CHARSET{$definition{alias_of}}) {
+  ## New charset is an alias of defined charset,
+    $CHARSET{$name} = $CHARSET{$definition{alias_of}};
+    return;
+  }
+  $CHARSET{$name} = \%definition;
+  
+  ## Set default values
+  $definition{preferred_name} ||= $name;
+  
+  $definition{encoder} ||= sub { $_[1] };
+  $definition{decoder} ||= sub { $_[1] };
+
+  $definition{mime_text} = 0 unless defined $definition{mime_text};
+  $definition{cte_7bit_preferred} = 'base64'
+    unless defined $definition{cte_7bit_preferred};
+}
 
 sub encode ($$) {
   my ($charset, $s) = (lc shift, shift);
-  if (ref $ENCODER{$charset}) {
-    return (&{$ENCODER{$charset}} ($charset, $s), 1);
+  if (ref $CHARSET{$charset}->{encoder}) {
+    return (&{$CHARSET{$charset}->{encoder}} ($charset, $s), 1);
   }
   ($s, 0);
 }
 
 sub decode ($$) {
   my ($charset, $s) = (lc shift, shift);
-  if (ref $DECODER{$charset}) {
-    return (&{$DECODER{$charset}} ($charset, $s), 1);
+  if (ref $CHARSET{$charset}->{decoder}) {
+    return (&{$CHARSET{$charset}->{decoder}} ($charset, $s), 1);
   }
   ($s, 0);
 }
 
 sub name_normalize ($) {
   my $name = lc shift;
-  $N11NTABLE{$name} || $name;
+  $CHARSET{$name}->{preferred_name} || $name;
 }
 
 =head1 LICENSE
@@ -85,7 +123,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/14 13:50:11 $
+$Date: 2002/05/30 12:51:05 $
 
 =cut
 

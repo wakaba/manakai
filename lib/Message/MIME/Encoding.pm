@@ -8,12 +8,12 @@ Message::MIME::Encoding --- Encoding (MIME CTE, HTTP encodings, etc) definitions
 package Message::MIME::Encoding;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 our %ENCODER = (
-	'7bit'	=> sub { ($_[1], decide_coderange (@_[0,1])) },
-	'8bit'	=> sub { ($_[1], decide_coderange (@_[0,1])) },
-	binary	=> sub { ($_[1], decide_coderange (@_[0,1])) },
+	'7bit'	=> sub { ($_[1], decide_coderange (@_[0,1,2])) },
+	'8bit'	=> sub { ($_[1], decide_coderange (@_[0,1,2])) },
+	binary	=> sub { ($_[1], decide_coderange (@_[0,1,2])) },
 	base64	=> sub { require MIME::Base64; 
 		         (MIME::Base64::encode ($_[1]), 'base64') },
 	'quoted-printable'	=> \&encode_qp,
@@ -56,12 +56,22 @@ our %DECODER = (
 	'x-uuencoded'	=> \&uudecode,
 );
 
-sub decide_coderange ($$) {
+sub decide_coderange ($$\%) {
   my $yourself = shift;
-  my $s = shift;	## TODO: check media type and charset
+  my $s = shift;
+  my $option = shift;
+  if (!defined $option->{mt_is_text}) {
+    my $mt; $mt = ($yourself->content_type)[0] if ref $yourself;
+    $option->{mt_is_text} = 1
+      if $mt eq 'text' || $mt eq 'multipart' || $mt eq 'message';
+  }
   return 'binary' if $s =~ /\x00/;
-  return 'binary' if $s =~ /\x0D(?!\x0A)/s;
-  #return 'binary' if $s =~ /(?<!\x0D)\x0A/s;	## BUG: does not work?
+  if ($option->{mt_is_text}) {
+    return 'binary' if $s =~ /\x0D(?!\x0A)/s;
+    return 'binary' if $s =~ /(?<!\x0D)\x0A/s;
+  } else {
+    return 'binary' if $s =~ /\x0D|\x0A/s;
+  }
   return '8bit'   if $s =~ /[\x80-\xFF]/;
   '7bit';
 }
@@ -143,7 +153,7 @@ sub uuencode ($$;%) {
       unless $option{postamble} =~ /$option{newline}$/s;
     $r .= $option{newline} . $option{postamble};
   }
-  ($r, 'x-uuencoded');
+  ($r, 'x-uuencode');
 }
 
 sub uudecode ($$) {
@@ -234,7 +244,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/29 10:54:49 $
+$Date: 2002/05/30 12:51:05 $
 
 =cut
 
