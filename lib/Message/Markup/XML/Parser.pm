@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXMLChar
                         InXML_deprecated_noncharacter InXML_unicode_xml_not_suitable!;
 require Message::Markup::XML;
@@ -274,7 +274,7 @@ sub parse_text ($$;$%) {
     }
     $self->_clp (__ => $o);
   }
-  $self->_parse_document_entity ($r, \$s, $o, entMan => $opt{entMan});
+  $self->_parse_document_entity ($r, \$s, $o, %opt);
   wantarray ? ($r, $o) : $r;
 }
 
@@ -283,10 +283,22 @@ sub _parse_document_entity ($$\$$;%) {
   $o->{entity_type} = 'document_entity';
   my %occur;
   my $entMan = $opt{entMan};
+  my $no_doctype = sub {
+      my ($o) = @_;
+      $self->_raise_error ($o, c => $c, type => 'WARN_DOCTYPE_NOT_FOUND');
+      if ($opt{alt_dtd_external_subset}) {
+        my $D = $c->append_new_node (type => '#declaration', namespace_uri => $NS{SGML}.'doctype');
+        $opt{entMan}->set_doctype_node ($D);
+        $D->set_attribute (SYSTEM => $opt{alt_dtd_external_subset});
+        $self->_raise_error ($o, type => 'MSG_EXTERNAL_DTD_SUBSET_USED',
+        	t => [$opt{alt_dtd_external_subset}]);
+        $self->_parse_dtd_external_subset ($o, $D, \%opt);
+      }
+  };
   while ($$s) {
     if ($$s =~ /^<$xml_re{Name}/) {	# <element/>
-      $self->_raise_error ($o, c => $c, type => 'WARN_DOCTYPE_NOT_FOUND') unless $occur{doctype};
-      $self->_parse_element_content ($c, $s, $o, entMan => $entMan);
+      &$no_doctype ($o) unless $occur{doctype};
+      $self->_parse_element_content ($c, $s, $o, entMan => $opt{entMan});
       $occur{element} = 1;  $occur{pi} = 0;
     } elsif ($$s =~ s/^($xml_re{s})//s) {	# s
       $c->append_text ($1);
@@ -332,11 +344,18 @@ sub _parse_document_entity ($$\$$;%) {
           undef $have_sysid if $have_sysid == 2;
         }
       }
+      if ($opt{alt_dtd_external_subset}) {
+        $D->remove_attribute ('PUBLIC');
+        $D->set_attribute (SYSTEM => $opt{alt_dtd_external_subset});
+        $self->_raise_error ($o, type => 'MSG_EXTERNAL_DTD_SUBSET_USED',
+        	t => [$opt{alt_dtd_external_subset}]);
+        $have_sysid = 1;
+      }
       ## dso for the internal subset
       if ($$s =~ s/^((?:$xml_re{s})?\[)//s) {
         $self->_clp ($1 => $o);
         $self->_parse_dtd ($D, $s, $o, return_with_dsc => 1, validate_notation_declared => 1,
-                           entMan => $entMan);
+                           entMan => $opt{entMan});
         ## dsc and mdo is processed by _parse_dtd
       } elsif ($$s =~ s/^((?:$xml_re{s})?>)//s) {
         $self->_clp ($1 => $o);
@@ -344,22 +363,7 @@ sub _parse_document_entity ($$\$$;%) {
         $self->_raise_error ($o, type => 'SYNTAX_END_OF_MARKUP_NOT_FOUND', c => $D, t => $D);
       }
       ## Read and parse the external subset
-      if ($have_sysid) {
-        my $xsub = $D->set_attribute ('external-subset');
-        my $o2 = $self->_make_clone_of ($o);
-        $o2->{entity_type} = 'dtd_external_subset';
-        $o2->{line} = 0;  $o2->{pos} = 0;
-        my $ext_ent = $entMan->get_external_entity ($self, $D, $o2);
-        if ($ext_ent->{error}->{no_data}) {	## parsed entity but can't be retrived
-          $self->_raise_error ($o, type => 'ERR_EXT_ENTITY_NOT_FOUND', c => $D,
-                               t => ['<!DOCTYPE>', $o2->{uri}, $ext_ent->{error}->{reason_text}]);
-        } else {	## parsed entity
-          $xsub->base_uri ($ext_ent->{base_uri});
-          my $ev = $ext_ent->{text};
-          $self->_parse_dtd ($xsub, \$ev, $o2, entMan => $entMan);
-          $xsub->flag (smxp__ref_expanded => 1);
-        }
-      }
+      $self->_parse_dtd_external_subset ($o, $D, \%opt) if $have_sysid;
     } elsif ($$s =~ s/^$xml_re{PI_M}//s) {	# <?pi?>	## TODO: pi parsing
     ## PI before DOCTYPE declaration
       my ($target, $data, $all) = ($1, $2, $&);
@@ -384,7 +388,7 @@ sub _parse_document_entity ($$\$$;%) {
   unless ($occur{element}) {
     $self->_raise_error ($o, c => $c, type => 'SYNTAX_ROOT_ELEMENT_NOT_FOUND',
                          t => $occur{doctype} eq '1' ? '#IMPLIED' : $occur{doctype});
-    $self->_raise_error ($o, c => $c, type => 'WARN_DOCTYPE_NOT_FOUND') unless $occur{doctype};
+    &$no_doctype ($o) unless $occur{doctype};
   }
   if ($occur{element} && $occur{doctype}) {
     my $root;
@@ -401,7 +405,25 @@ sub _parse_document_entity ($$\$$;%) {
   }
 }
 
-sub _parse_element_content ($$\$$;%) {
+sub _parse_dtd_external_subset ($$$$) {
+  my ($self, $o, $D, $opt) = @_;
+        my $xsub = $D->set_attribute ('external-subset');
+        my $o2 = $self->_make_clone_of ($o);
+        $o2->{entity_type} = 'dtd_external_subset';
+        $o2->{line} = 0;  $o2->{pos} = 0;
+        my $ext_ent = $opt->{entMan}->get_external_entity ($self, $D, $o2);
+        if ($ext_ent->{error}->{no_data}) {	## can't be retrived
+          $self->_raise_error ($o, type => 'ERR_EXT_ENTITY_NOT_FOUND', c => $D,
+                               t => ['<!DOCTYPE>', $o2->{uri}, $ext_ent->{error}->{reason_text}]);
+        } else {
+          $xsub->base_uri ($ext_ent->{base_uri});
+          my $ev = $ext_ent->{text};
+          $self->_parse_dtd ($xsub, \$ev, $o2, entMan => $opt->{entMan});
+          $xsub->flag (smxp__ref_expanded => 1);
+        }
+}
+
+sub _parse_element_content ($$$$;%) {
   my ($self, $c, $s, $o, %opt) = @_;
   my $c_initial = overload::StrVal ($c);
   while ($$s) {
@@ -1465,6 +1487,13 @@ sub _parse_element_declaration ($$$$;%) {
     return;
   }
   
+  ## No content model declaration
+  $t =~ s/^$xml_re{s}//s;
+  unless ($t) {
+    $self->_raise_error ($o, c => $c, type => 'SYNTAX_INVALID_MD', t => substr ($t, 0, 10));
+    return;
+  }
+  
   ## Content model
   my $delimited = 1;
   my $in_group = 0;
@@ -1588,7 +1617,7 @@ sub _parse_element_declaration ($$$$;%) {
     }
   }	# $t
   if ($in_group) {
-    ## Note: Maybe this error does not happen since md_params parsing report it
+    ## Note: Maybe this error will not happen since md_params parsing report it
     $self->_raise_error ($o, c => $c, type => 'SYNTAX_ELEMENT_CMODEL_GROUP_NOT_CLOSED');
   }
   
@@ -1927,4 +1956,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/12 11:29:26 $
+1; # $Date: 2003/09/13 09:04:02 $

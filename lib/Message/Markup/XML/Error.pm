@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 our %NS;
 *NS = \%Message::Markup::XML::NS;
 
@@ -554,6 +554,11 @@ my %_Error = (
 		description	=> 'Text declaration does not have the version pseudo attribute',
 		level	=> 'warn',
 	},
+	## Implementation message
+	MSG_EXTERNAL_DTD_SUBSET_USED	=> {
+		description	=> 'Alternative document type definition external subset (<%s>) is read instead of that declared by document instance',
+		level	=> 'warn',
+	},
 	## Misc
 	UNKNOWN	=> {
 		description	=> 'Unknown error',
@@ -577,11 +582,11 @@ sub raise ($$%) {
                        $o->{uri}, $o->{line}, $o->{pos}, @err_msg;
     my $resolver = $caller->option ('error_handler');
     if (ref $resolver) {
-      $resolver = &$resolver ($caller, $o, $error_type, $error_msg);	## If returned false,
-      &_default_error_handler ($caller, $o, $error_type, $error_msg)
+      $resolver = &$resolver ($caller, $o, $error_type, $error_msg, {});	## If returned false,
+      &_default_error_handler ($caller, $o, $error_type, $error_msg, {})
         if $resolver;	## don't call this.
     } else {
-      &_default_error_handler ($caller, $o, $error_type, $error_msg);
+      &_default_error_handler ($caller, $o, $error_type, $error_msg, {});
     }
 }
 
@@ -629,6 +634,7 @@ sub raise_error ($$%) {
   $error_msg .= ' (%s)' if scalar (@err_msg) && ($error_msg !~ /%s/);
   $error_msg = sprintf $error_msg, @err_msg;
   $err{node_path} = $self->_get_node_path ($node) if $node;
+  $err{raiser_type} = 'Message::Markup::XML::Validator';
   
   my $resolver = $self->{-error_handler};
     if (ref $resolver) {
@@ -700,7 +706,7 @@ sub _get_node_path ($$) {
   } else {
     $nn = 'smxe:x-unknown("'.$nt.'")' . $self->_get_node_position ($node, type => $nt);
   }
-  $nn = $self->_get_node_path ($node->parent_node) . '/' . $nn if $node->parent_node;
+  $nn = $self->_get_node_path ($node->parent_node) . '/' . $nn if ref $node->parent_node;
   $nn = substr ($nn, 1) if substr ($nn, 0, 2) eq '//';
   $nn;
 }
@@ -708,7 +714,7 @@ sub _get_node_path ($$) {
 sub _get_node_position ($$%) {
   my ($self, $node, %prop) = @_;
   my $node_str = overload::StrVal ($node);
-  if ($node->parent_node) {
+  if (ref $node->parent_node) {
     my $i = 1;
     for (@{$node->parent_node->child_nodes}) {
       if ($node_str eq overload::StrVal ($_)) {
@@ -738,4 +744,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/07 03:09:18 $
+1; # $Date: 2003/09/13 09:04:02 $

@@ -15,7 +15,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Validate;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Markup::XML::Parser;
 our (%NS);
 *NS = \%Message::Markup::XML::NS;
@@ -64,7 +64,19 @@ sub new ($;%) {
     	level	=> 'vc',
     },
     VC_ELEMENT_VALID_ELEMENT_MATCH	=> {
-    	description	=> 'Element (type = "%s") does not match to content model',
+    	description	=> 'Child element (type = "%s") cannot appear here, since it does not match to the content model',
+    	level	=> 'vc',
+    },
+    VC_ELEMENT_VALID_ELEMENT_MATCH_EMPTY	=> {
+    	description	=> 'Required child element does not found',
+    	level	=> 'vc',
+    },
+    VC_ELEMENT_VALID_ELEMENT_MATCH_NEED_MORE_ELEMENT	=> {
+    	description	=> 'Required child element does not found',
+    	level	=> 'vc',
+    },
+    VC_ELEMENT_VALID_ELEMENT_MATCH_TOO_MANY_ELEMENT	=> {
+    	description	=> 'Child element (type = "%s") does not match to the content model',
     	level	=> 'vc',
     },
     VC_ELEMENT_VALID_ELEMENT_REF	=> {
@@ -784,17 +796,29 @@ sub _validate_element ($$$) {
         if (&$check_empty_ok ($tree)) {
           
         } else {
-          $self->{error}->raise_error ($node, type => 'VC_ELEMENT_VALID_ELEMENT_MATCH');
+          $self->{error}->raise_error ($node, type => 'VC_ELEMENT_VALID_ELEMENT_MATCH_EMPTY');
           $valid = 0;
         }
-      } else {
+      } else {	## Non-empty
         my $i = 0;
         my $result = &$find_myname (\@nodes, \$i, $tree, {depth => 0, nodes_max => $nodes_max});
-        if ($result->{match} && $i > $nodes_max) {
-          
+        if ($result->{match}) {
+          if ($i > $nodes_max) {
+            ## All child elements match to the model
+          } else {
+            ## Some more child element does not match to the model
+            $self->{error}->raise_error ($node, type => 'VC_ELEMENT_VALID_ELEMENT_MATCH_TOO_MANY_ELEMENT', t => $nodes[$i]->[1]);
+            $valid = 0;
+          }
         } else {
-          $self->{error}->raise_error ($node, type => 'VC_ELEMENT_VALID_ELEMENT_MATCH', t => $nodes[$i]->[1]);
-          $valid = 0;
+          if ($i <= $nodes_max) {
+            ## Some more child element is required by the model
+            $self->{error}->raise_error ($node, type => 'VC_ELEMENT_VALID_ELEMENT_MATCH_NEED_MORE_ELEMENT');
+            $valid = 0;
+          } else {
+            $self->{error}->raise_error ($node, type => 'VC_ELEMENT_VALID_ELEMENT_MATCH', t => $nodes[$i]->[1]);
+            $valid = 0;
+          }
         }
       }
       for (0..$nodes_max) {
@@ -837,4 +861,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/07 03:09:18 $
+1; # $Date: 2003/09/13 09:04:02 $

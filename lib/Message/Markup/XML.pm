@@ -17,7 +17,7 @@ markup constructures.  (SuikaWiki is not "tiny"?  Oh, yes, I see:-))
 
 package Message::Markup::XML;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload '""' => \&outer_xml,
              fallback => 1;
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXML_NCNameStartChar InXMLNCNameChar!;
@@ -235,6 +235,28 @@ sub set_attribute ($$$;%) {
   }
   return $self->append_new_node (type => '#attribute', local_name => $name,
                                  value => $val, namespace_uri => $o{namespace_uri});
+}
+
+=item $attr_node = $x->remove_attribute ($local_name, %options)
+
+Remove the attribute.
+
+Available options: C<namespace_uri>.
+
+=cut
+
+sub remove_attribute ($$;%) {
+  my ($self, $name, %o) = @_;
+  $self->{node} = [grep {
+    if ($_->{type} eq '#attribute'
+     && $_->{local_name} eq $name
+     && $o{namespace_uri} eq $_->{namespace_uri}) {
+      0;
+    } else {
+      1;
+    }
+  } @{$self->{node}}];
+  1;
 }
 
 =item \@children = $x->child_nodes
@@ -933,7 +955,7 @@ sub inner_xml ($;%) {
       if (!$self->{flag}->{smxp__defined_with_param_ref}) {
         $r = $self->get_attribute ('qname');
         $r = $r->inner_text if $r;
-        unless ($self->_check_ncname ($r)) {
+        unless ($self->_check_name ($r)) {
           $r = undef;
         } else {
           $r .= ' ';
@@ -1006,7 +1028,7 @@ sub inner_xml ($;%) {
       if (!$self->{flag}->{smxp__defined_with_param_ref}) {
         $r = $self->get_attribute ('qname');
         $r = $r->inner_text if $r;
-        unless ($self->_check_ncname ($r)) {
+        unless ($self->_check_name ($r)) {
           $r = undef;
         } else {
           $r .= ' ';
@@ -1215,7 +1237,7 @@ sub _get_entity_manager ($) {
   if ($self->{type} eq '#document') {
     unless ($self->{flag}->{smx__entity_manager}) {
       require Message::Markup::XML::EntityManager;
-      $self->{flag}->{smx__entity_manager} = SuikaWiki::Markup::XML::EntityManager->new ($self);
+      $self->{flag}->{smx__entity_manager} = Message::Markup::XML::EntityManager->new ($self);
     }
     return $self->{flag}->{smx__entity_manager};
   } elsif (ref $self->{parent}) {
@@ -1384,4 +1406,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/07 03:09:18 $
+1; # $Date: 2003/09/13 09:04:02 $

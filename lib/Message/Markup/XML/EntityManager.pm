@@ -21,7 +21,7 @@ This module is part of XML.
 
 package Message::Markup::XML::EntityManager;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 our %NS;
 *NS = \%Message::Markup::XML::NS;
 
@@ -199,7 +199,8 @@ sub get_external_entity ($$$$) {
   my ($self, $parser, $decl, $o) = @_;
   my $declns = $decl->namespace_uri;
   my $name = $declns eq $NS{SGML}.'doctype' ?
-             $decl->get_attribute ('qname', make_new_node => 1)->inner_text :
+             ($decl->get_attribute ('qname', make_new_node => 1)->inner_text
+              || '#IMPLIED') :
              $decl->local_name;
   my $p = $self->{external_entity_cache}->{$declns}->{$name};
   if ($name && !$p) {
@@ -546,4 +547,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/07 03:09:18 $
+1; # $Date: 2003/09/13 09:04:02 $
