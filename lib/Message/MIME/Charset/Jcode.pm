@@ -63,7 +63,7 @@ Message::MIME::Charset::Encode.
 package Message::MIME::Charset::Jcode;
 use strict;
 use vars qw(%CODE $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::MIME::Charset;
@@ -142,26 +142,29 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset ('iso-2022-jp' =>
         encoder	=> sub {
           my $s = jcode::jis ($_[1], $CODE{internal});
-          ($s, iso_2022_mime_charset_name ($s));
+          ($s, iso_2022_mime_charset_name ('iso-2022-jp', $s));
         },
         decoder	=> sub { jcode::to ($CODE{internal}, $_[1], 'jis') },
+        name_minimumizer	=> \&iso_2022_mime_charset_name,
         mime_text	=> 1,
         cte_7bit_preferred	=> 'base64',
       );
       Message::MIME::Charset::make_charset ('euc-jp' =>
         encoder	=> sub {
           my $s = jcode::euc ($_[1], $CODE{internal});
-          ($s, euc_japan_mime_charset_name ($s));
+          ($s, euc_japan_mime_charset_name ('euc-jp' => $s));
         },
         decoder	=> sub { jcode::to ($CODE{internal}, $_[1], 'euc') },
+        name_minimumizer	=> \&euc_japan_mime_charset_name,
         mime_text	=> 1,
       );
       Message::MIME::Charset::make_charset (shift_jis =>
         encoder	=> sub {
           my $s = jcode::sjis ($_[1], $CODE{internal});
-          ($s, shift_jis_mime_charset_name ($s));
+          ($s, shift_jis_mime_charset_name (shift_jis => $s));
         },
         decoder	=> sub { jcode::to ($CODE{internal}, $_[1], 'sjis') },
+        name_minimumizer	=> \&shift_jis_mime_charset_name,
         mime_text	=> 1,
       );
     } elsif ($_ eq 'Jcode' || $_ eq 'Jcode.pm') {
@@ -174,26 +177,29 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset ('iso-2022-jp' =>
         encoder	=> sub {
           my $s = Jcode->new ($_[1], $CODE{internal})->jis; ## ->iso_2022_jp;
-          ($s, iso_2022_mime_charset_name ($s));
+          ($s, iso_2022_mime_charset_name ('iso-2022-jp' => $s));
         },
         decoder	=> sub { my $s = $_[1]; Jcode::convert (\$s, $CODE{internal}, 'jis'); $s },
+        name_minimumizer	=> \&iso_2022_mime_charset_name,
         mime_text	=> 1,
         cte_7bit_preferred	=> 'base64',
       );
       Message::MIME::Charset::make_charset ('euc-jp' =>
         encoder	=> sub {
           my $s = Jcode->new ($_[1], $CODE{internal})->euc;
-          ($s, euc_japan_mime_charset_name ($s));
+          ($s, euc_japan_mime_charset_name ('euc-jp' => $s));
         },
         decoder	=> sub { my $s = $_[1]; Jcode::convert (\$s, $CODE{internal}, 'euc'); $s },
+        name_minimumizer	=> \&euc_japan_mime_charset_name,
         mime_text	=> 1,
       );
       Message::MIME::Charset::make_charset (shift_jis =>
         encoder	=> sub {
           my $s = Jcode->new ($_[1], $CODE{internal})->sjis;
-          ($s, shift_jis_mime_charset_name ($s));
+          ($s, shift_jis_mime_charset_name (shift_jis => $s));
         },
         decoder	=> sub { my $s = $_[1]; Jcode::convert (\$s, $CODE{internal}, 'sjis'); $s },
+        name_minimumizer	=> \&shift_jis_mime_charset_name,
         mime_text	=> 1,
       );
       Message::MIME::Charset::make_charset ('utf-8' =>
@@ -222,26 +228,29 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset ('iso-2022-jp' =>
         encoder	=> sub {
           my $s = nkf ( "-j -".uc (substr ($CODE{internal}, 0, 1)), $_[1] );
-          ($s, iso_2022_mime_charset_name ($s));
+          ($s, iso_2022_mime_charset_name ('iso-2022-jp' => $s));
         },
         decoder	=> sub { nkf ( "-". substr ($CODE{internal}, 0, 1) . " -J", $_[1] ) },
+        name_minimumizer	=> \&iso_2022_mime_charset_name,
         mime_text	=> 1,
         cte_7bit_preferred	=> 'base64',
       );
       Message::MIME::Charset::make_charset ('euc-jp' =>
         encoder	=> sub {
           my $s = nkf ( "-e -".uc (substr ($CODE{internal}, 0, 1)), $_[1] );
-          ($s, euc_japan_mime_charset_name ($s));
+          ($s, euc_japan_mime_charset_name ('euc-jp' => $s));
         },
         decoder	=> sub { nkf ( "-". substr ($CODE{internal}, 0, 1) . " -E", $_[1] ) },
+        name_minimumizer	=> \&euc_japan_mime_charset_name,
         mime_text	=> 1,
       );
       Message::MIME::Charset::make_charset (shift_jis =>
         encoder	=> sub {
           my $s = nkf ( "-s -".uc (substr ($CODE{internal}, 0, 1)), $_[1] );
-          ($s, shift_jis_mime_charset_name ($s));
+          ($s, shift_jis_mime_charset_name (shift_jis => $s));
         },
         decoder	=> sub { nkf ( "-". substr ($CODE{internal}, 0, 1) . " -S", $_[1] ) },
+        name_minimumizer	=> \&shift_jis_mime_charset_name,
         mime_text	=> 1,
       );
     } elsif ($_ eq 'Unicode::Japanese' || $_ eq 'Unicode::Japanese.pm') {
@@ -256,26 +265,29 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset ('iso-2022-jp' =>
         encoder	=> sub {
           my $s = Unicode::Japanese->new ($_[1], $CODE{internal})->jis;
-          ($s, iso_2022_mime_charset_name ($s));
+          ($s, iso_2022_mime_charset_name ('iso-2022-jp' => $s));
         },
         decoder	=> sub { Unicode::Japanese->new ($_[1], 'jis')->conv ($CODE{internal}) },
+        name_minimumizer	=> \&iso_2022_mime_charset_name,
         mime_text	=> 1,
         cte_7bit_preferred	=> 'base64',
       );
       Message::MIME::Charset::make_charset ('euc-jp' =>
         encoder	=> sub {
           my $s = Unicode::Japanese->new ($_[1], $CODE{internal})->euc;
-          ($s, euc_japan_mime_charset_name ($s));
+          ($s, euc_japan_mime_charset_name ('euc-jp' => $s));
         },
         decoder	=> sub { Unicode::Japanese->new ($_[1], 'euc')->conv ($CODE{internal}) },
+        name_minimumizer	=> \&euc_japan_mime_charset_name,
         mime_text	=> 1,
       );
       Message::MIME::Charset::make_charset (shift_jis =>
         encoder	=> sub {
           my $s = Unicode::Japanese->new ($_[1], $CODE{internal})->sjis;
-          ($s, shift_jis_mime_charset_name ($s));
+          ($s, shift_jis_mime_charset_name (shift_jis => $s));
         },
         decoder	=> sub { Unicode::Japanese->new ($_[1], 'sjis')->conv ($CODE{internal}) },
+        name_minimumizer	=> \&shift_jis_mime_charset_name,
         mime_text	=> 1,
       );
       Message::MIME::Charset::make_charset ('utf-8' =>
@@ -357,9 +369,20 @@ sub import ($;%) {
   }
 }
 
+sub unimport ($) {
+  for (qw/euc euc-jisx0213 euc-jisx0213-plane1 euc-jp euc_jp iso-2022-jp iso-2022-jp-1 iso-2022-jp-3 iso-2022-jp-3-plane1 jis jis_x0201 junet junet-code shift-jis shift_jis shift-jisx0213 shift_jisx0213 shift_jisx0213-plane1 sjis ucs-2 ucs-2be ucs-2le ucs-4 ucs-4be ucs-4le utf-8 utf-16 utf-16be utf-16le utf-32 utf-32be utf-32le x0201 x-euc x-euc-jisx0213 x-euc-jisx0213-plane1 x-euc-jp x-iso-2022-jp-3 x-shift-jisx0213 x-shift_jisx0213 s-sjis/) {
+    delete $Message::MIME::Charset::CHARSET{$_};
+  }
+  Message::MIME::Charset::make_charset ('*default' =>
+    encoder	=> sub { $_[1] },
+    decoder	=> sub { $_[1] },
+    mime_text	=> 1,
+  );
+}
+
 ## Returns MIME charset of 7bit ISO 2022 (*junet* family)
-sub iso_2022_mime_charset_name ($) {
-  my $s = shift;
+sub iso_2022_mime_charset_name ($$) {
+  shift; my $s = shift;
           if ($s =~ /\x1B\x28[^BJ]|\x1B\x24\x28[^D]|\x1B\x24[^\x28\x40B]/) {
             if ($s =~ /\x1B\x28[^B]|\x1B\x24[^\x28]|\x1B\x24\x28[^OP]/) {
               (charset => 'junet');
@@ -378,8 +401,8 @@ sub iso_2022_mime_charset_name ($) {
 }
 
 ## Returns MIME charset of 8bit ISO 2022 (EUC-Japan)
-sub euc_japan_mime_charset_name ($) {
-  my $s = shift;
+sub euc_japan_mime_charset_name ($$) {
+  shift; my $s = shift;
   if ($s =~ /[\x80-\xFF]/) {
     if ($s =~ /\x8F[\xA1\xA3-\xA5\xA8\xAC-\xAF\xEE-\xFE][\xA1-\xFE]/) {
       if ($s =~ /\x8F[\xA2\xA6\xA7\xA9-\xAB\xB0-\xED][\xA1-\xFE]/) {
@@ -412,8 +435,8 @@ sub euc_japan_mime_charset_name ($) {
 }
 
 ## Returns MIME charset of 8bit ISO 2022 (EUC-Japan)
-sub shift_jis_mime_charset_name ($) {
-  my $s = shift;
+sub shift_jis_mime_charset_name ($$) {
+  shift; my $s = shift;
   if ($s =~ /[\x80-\xFF]/) {
     if ($s =~ /
                   (?:\G|[\x00-\x3F\x7F])
@@ -501,7 +524,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/06 11:24:10 $
+$Date: 2002/06/09 11:09:38 $
 
 =cut
 
