@@ -1789,6 +1789,8 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
           my @param = ('$self');
           my $param_norm = '';
           my $param_opt = 0;
+          my $named_param = 0;
+          my %param_replace;
           my $for = [keys %{$method->{For}}]->[0];
           local $opt{'For+'} = [keys %{$method->{'For+'}||{}}];
           for my $param (@{$method->{ExpandedURI q<dis2pm:param>}||[]}) {
@@ -1797,16 +1799,53 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
               $proto .= ';' unless $param_opt;
               $param_opt++;
             }
+            my $is_np = dis_get_attr_node
+                            (%opt, parent => $param->{src},
+                             name => {uri =>
+                                       ExpandedURI q<DISPerl:isNamedParameter>});
+            if ($named_param) {
+              if (not $is_np or not $is_np->value) {
+                valid_err (q<Named parameter is expected>,
+                           node => $param->{src});
+              }
+            } else {
+              if ($is_np and $is_np->value) {
+                $named_param = 1;
+                $proto .= '%';
+                push @param, '%opt';
+              }
+            }
+            my $param_var;
             if (dis_uri_ctype_match (ExpandedURI q<Perl:Array>, $atype, %opt)) {
+              if ($named_param) {
+                valid_err (qq<Type "$atype" is unable to be used as >.
+                           q<a named parameter>, node => $param->{src});
+              }
               $proto .= '@';
-              push @param, '@'.$param->{ExpandedURI q<dis2pm:paramName>};
+              push @param,
+                   $param_var = '@'.$param->{ExpandedURI q<dis2pm:paramName>};
             } elsif (dis_uri_ctype_match (ExpandedURI q<Perl:Hash>, $atype,
                                           %opt)) {
+              if ($named_param) {
+                valid_err (qq<Type "$atype" is unable to be used as >.
+                           q<a named parameter>, node => $param->{src});
+              }
               $proto .= '%';
-              push @param, '%'.$param->{ExpandedURI q<dis2pm:paramName>};
+              push @param,
+                   $param_var = '%'.$param->{ExpandedURI q<dis2pm:paramName>};
             } else {
-              $proto .= '$';
-              push @param, '$'.$param->{ExpandedURI q<dis2pm:paramName>};
+              unless ($named_param) {
+                $proto .= '$';
+                push @param,
+                     $param_var = '$'.$param->{ExpandedURI q<dis2pm:paramName>};
+              } else {
+                $param_var = '$opt{'
+                           . dis_camelCase_to_underscore_name 
+                               ($param->{ExpandedURI q<dis2pm:paramName>})
+                           . '}';
+              }
+              $param_replace{'$'.$param->{ExpandedURI q<dis2pm:paramName>}}
+                           = $param_var;
             }
             my $nin = dis_get_attr_node
                          (%opt,
@@ -1827,7 +1866,7 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
                          ExpandedURI q<dis2pm:selParent>
                              => $param->{ExpandedURI q<dis2pm:actualTypeNode>});
               if (defined $nm) {
-                $nm =~ s/\$INPUT\b/$param[-1]/g;
+                $nm =~ s/\$INPUT\b/$param_var/g;
                 ## NOTE: "Perl:Array" or "Perl:Hash" is not supported.
                 $param_norm .= $nm;
               }
@@ -1844,6 +1883,9 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
                                      ') = @_');
             my $return = defined $method->{ExpandedURI q<dis2pm:return>}->{Name}
                             ? $method->{ExpandedURI q<dis2pm:return>} : undef;
+            for (keys %param_replace) {
+              $code =~ s/\Q$_\E\b/$param_replace{$_}/g;
+            }
             if ($return->{ExpandedURI q<d:actualType>} ? 1 : 0) {
               my $default = dispm_get_value
                            (%opt, resource => $return,
@@ -2318,4 +2360,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/02/18 06:13:52 $
+1; # $Date: 2005/02/18 08:55:41 $

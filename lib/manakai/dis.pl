@@ -681,6 +681,22 @@ sub dis_get_elements_nodes (%) {
   \@r;
 }
 
+=item $under_score_name = dis_camelCase_to_underscore_name ($camelName)
+
+Converts a camelCaseName to underscore_style_name. 
+
+=cut
+    
+sub dis_camelCase_to_underscore_name ($) {
+  my $name = shift;
+  $name =~ s/^([A-Z0-9]+)$/lc $1/ge;
+  $name =~ s/([A-Z][A-Z0-9]*)$/"_".lc $1/ge;
+  $name =~ s/([A-Z0-9])([A-Z0-9]*)([A-Z0-9])/$1.lc ($2)."_".lc $3/ge;
+  $name =~ s/([A-Z])/"_".lc $1/ge;
+  $name =~ s/(?=[0-9](?!$))/_/g;
+  $name;
+}
+
 =item {For => for_uri, module => module_uri} = dis_get_module_uri (%opt)
 
 Get module URI reference from either module URI reference (C<$opt{module_uri}>;
@@ -1298,7 +1314,7 @@ sub dis_load_classdef_element ($;%) {
       unless ($al) {
         $cls = ($State->{current_class_container}->{Resource}->{$dfuri} ||= {});
         if (defined $cls->{Name}) {
-          valid_err (q<Local class <$dfuri> is already defined>, node => $node);
+          valid_err (qq<Local class <$dfuri> is already defined>, node => $node);
         }
         $cls->{seq} = ++$dis_load_classdef_seq;
         $cls->{Name} = $lname;
@@ -1637,14 +1653,7 @@ sub dis_perl_init_classdef ($;%) {
             ExpandedURI q<DISLang:Attribute> => 1,
            }->{$type}) {
     ## - Method or attribute name
-    my $name = $res->{Name};
-    
-    ## Converts camelCaseName to underscore_style_name
-    $name =~ s/^([A-Z0-9]+)$/lc $1/ge;
-    $name =~ s/([A-Z][A-Z0-9]*)$/"_".lc $1/ge;
-    $name =~ s/([A-Z0-9])([A-Z0-9]*)([A-Z0-9])/$1.lc ($2)."_".lc $3/ge;
-    $name =~ s/([A-Z])/"_".lc $1/ge;
-    $name =~ s/(?=[0-9](?!$))/_/g;
+    my $name = dis_camelCase_to_underscore_name $res->{Name};
     
     ## Prefixes "_" if it is an internal method or attribute
     my $int = dis_get_attr_node
@@ -2754,4 +2763,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/02/18 06:13:52 $
+1; # $Date: 2005/02/18 08:55:41 $

@@ -21,7 +21,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/18 06:13:52 $
+      $Date: 2005/02/18 08:55:41 $
     @@ContentType:
       dis:Date.RCS
   
@@ -67,6 +67,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @Markup:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup#
+  @MDOMX:
+    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @owl:
     http://www.w3.org/2002/07/owl#
   @Perl:
@@ -169,41 +171,14 @@ IFClassDef:
       Each SuikaWikiConfig/2.1 node object implements the 
       <IF::SWCFGNode> interface, which provides access to 
       its properties and chilren. 
-
-  @Method:
-    @@Operator:
-      @@@@:
-        DISPerl:NewMethod
-      @@@ContentType:
-        dis:TypeQName
-    @@ManakaiDOM:isStatic:1
-    @@Description:
-      @@@lang:en
-      @@@@:
-        Constructs a new instance of the SuikaWikiConfig/2.1 node 
-        belonging to a newly created document. 
-        \
-        {NOTE:: Use of this method is <EM::deprecated>; call 
-                <M::SWCFGDocument.createElementNS> or other 
-                factory methods instead. 
-        \
-        }
-    @@TypeParam:
-    @@LocalNameParam:
-    @@NSURIParam:
-    @@ValueParam:
-    @@Return:
-      @@@Type:SWCFGNode
-      @@@actualType:SWCFGNode
-      @@@Description:
-        @@@@lang:en
-        @@@@@:The newly created node object.
-      @@@PerlDef:
-
-  $self = {@_};
-  $self->{type} ||= '#element';
-  $self->{node} ||= [];
-  $self;
+      \
+      {NOTE:: The <M::new> method, available in the module 
+              <PerlModule::Message::Markup::SuikaWikiConfig20::Node>, 
+              is removed from the object model in favor of 
+              the factory methods on <IF::SWCFGImplementation> and 
+              <IF::SWCFGDocument> interfaces. 
+      \
+      }
 
   @Method:
     @@Name:appendNode
@@ -275,7 +250,21 @@ IFClassDef:
           \
           If the <P::node> is of <IF::SWCFGDocumentFragment>, 
           this (parent) node is returned instead. 
-      ##TODO: HIERARCHY_REQUEST_ERRs
+      @@@RaiseException:
+        @@@@@: HIERARCHY_ANCESTOR_OR_SELF_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The <P::node> is an ancestor of this node or this node itself. 
+      @@@RaiseException:
+        @@@@@: HIERARCHY_BAD_TYPE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            An attempt is made to append non-element node on element or 
+            document fragment node or an attempt is made to append any 
+            node on comment node or document or document fragment 
+            node on any node. 
       @@@RaiseException:
         @@@@@:NOT_NODE_ERR
         @@@@Description:
@@ -285,17 +274,15 @@ IFClassDef:
             <P::nodeOrText> is <DOM::false> or is neither of 
             <IF::SWCFGNode> nor <IF::SWCFGString> if 
             <P::nodeOrText> is <DOM::true>. 
-      ##TODO:NO_MODIFICATION_ALLOWED_ERRs
       @@@RaiseException:
-        @@@@@:
-          SWCFGException.WRONG_DOCUMENT_ERR
+        @@@@@: EXTERNAL_NODE_ERR
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
             The <P::node> does not belong to the same document 
             as the owner of this node. 
       @@@PerlDef:
-        unless (UNIVERSAL::isa ($node, <IF::SWCFGNode>)) {
+        unless (UNIVERSAL::isa ($node, <IFName::SWCFGNode>)) {
           if ($opt{nodeOrText}) {
             __DEEP{
               $r = $self-><M::ManakaiSWCFGNode.appendText> ($node);
@@ -306,18 +293,74 @@ IFClassDef:
             }__;
           }
         } else {
+          if ($self-><AG::SWCFGNode.ownerDocument> ne
+              $node-><AG::SWCFGNode.ownerDocument>) {
+            __EXCEPTION{EXTERNAL_NODE_ERR::
+              MDOMX:param-name => 'node',
+            }__;
+          }
+          my $this_node = $self;
+          ANCESTOR: {
+            if ($this_node eq $self) {
+              __EXCEPTION{HIERARCHY_ANCESTOR_OR_SELF_ERR::
+                MDOMX:param-name => 'node',
+              }__;
+            }
+            redo ANCESTOR if $this_node = $self-><AG::SWCFGNode.parentNode>;
+          }
+          my $this_node_type = $self-><M::SWCFGNode.nodeType>;
+          my $that_node_type = $node-><M::SWCFGNode.nodeType>;
+          if ($this_node_type eq '#comment') {
+            __EXCEPTION{HIERARCHY_BAD_TYPE_ERR::
+              MDOMX:param-name => 'node',
+            }__;
+          } elsif ($this_node_type ne '#document') {
+            if ($that_node_type eq '#comment') {
+              __EXCEPTION{HIERARCHY_BAD_TYPE_ERR::
+                MDOMX:param-name => 'node',
+              }__;
+            }
+          } else {
+            if ($that_node_type eq '#document' or
+                $that_node_type eq '#fragment') {
+              __EXCEPTION{HIERARCHY_BAD_TYPE_ERR::
+                MDOMX:param-name => 'node',
+              }__;
+            }
+          }
+
           if ($node-><M::SWCFGNode.nodeType> eq '#fragment') {
-            ## TODO:
-            for (@{$new_node->{node}}) {
-      push @{$self->{node}}, $_;
-      $_->{parent} = $self;
-    }
+            $self->{<Q::TreeCore:node>}
+                 -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+                                     .importTree> ($node->{<Q::TreeCore:node>});
+            for (@{$node->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
+              $_->{<Q::parent>} = $self->{<Q::TreeCore:node>};
+            }
+            push @{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}, 
+       \         @{$node->{<Q::TreeCore:node>}->{<Q::childNodes>}};
+            $node->{<Q::TreeCore:node>}->{<Q::childNodes>} = [];
+            $node->{<Q::TreeCore:node>}
+                 -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+                                               .orphanate>;
             $r = $self;
           } else {
-            ## TODO:
-    push @{$self->{node}}, $new_node;
-    $new_node->{parent} = $self;
-    $new_node;
+            if ($node->{<Q::TreeCore:node>}->{<Q::parent>}) {
+              my @pl = $node->{<Q::TreeCore:node>}->{<Q::parent>}
+                                                  ->{<Q::childNodes>};
+              for (0..$#pl) {
+                if ($pl[$_] eq $node->{<Q::TreeCore:node>}) {
+                  splice @pl, $_, 1, ();
+                  last;
+                }
+              }
+            }
+            $self->{<Q::TreeCore:node>}
+                 -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+                          .importTree> ($node->{<Q::TreeCore:node>});
+            push @{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}},
+                 $node->{<Q::TreeCore:node>};
+            $node->{<Q::TreeCore:node>}->{<Q::parent>}
+                             = $self->{<Q::TreeCore:node>};
             $r = $node;
           }
         }
@@ -339,13 +382,64 @@ IFClassDef:
       @@@Description:
         @@@@lang:en
         @@@@@: The newly created node. 
-      ##NO_MOD err
-      ##HIERARCHY err
+      @@@RaiseException:
+        @@@@@: HIERARCHY_ANCESTOR_OR_SELF_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The <P::node> is an ancestor of this node or this node itself. 
+      @@@RaiseException:
+        @@@@@: HIERARCHY_BAD_TYPE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            An attempt is made to append non-element node on element or 
+            document fragment node or an attempt is made to append any 
+            node on comment node or document or document fragment 
+            node on any node. 
+      @@@RaiseException:
+        @@@@@: EXTERNAL_NODE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The <P::node> does not belong to the same document 
+            as the owner of this node. 
       @@@PerlDef:
-        ##TODO:
-  my $new_node = __PACKAGE__->new (@_);
-  push @{$self->{node}}, $new_node;
-  $new_node->{parent} = $self;
+        my $this_type = $self-><AG::SWCFGNode.nodeType>;
+        if ($this_type eq '#comment') {
+          __EXCEPTION{HIERARCHY_BAD_TYPE_ERR::
+            MDOMX:param-name => 'type',
+          }__;
+        }
+        if ($type eq '#element') {
+          __DEEP{
+            $r = $self-><AG::SWCFGNode.ownerDocument>
+                      -><M::SWCFGDocument.createElementNS>
+                                  ($namespaceURI, $localName);
+          }__;
+          $r->{<Q::TreeCore:node>}->{<Q::value>} = $value
+            if defined $value;
+        } elsif ($type eq '#comment') {
+          if ($this_type ne '#document') {
+            __EXCEPTION{HIERARCHY_BAD_TYPE_ERR::
+              MDOMX:param-name => 'type',
+            }__;
+          }
+          __DEEP{
+            $r = $self-><AG::SWCFGNode.ownerDocument>
+                             -><M::SWCFGDocument.createComment> ($value);
+          }__;
+        } else {
+          __EXCEPTION{HIERARCHY_BAD_TYPE_ERR::
+            MDOMX:param-name => 'type',
+          }__;
+        }
+        $self->{<Q::TreeCore:node>}
+             -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+                          .importTree> ($r->{<Q::TreeCore:node>});
+        push @{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}},
+             $r->{<Q::TreeCore:node>};
+        $r->{<Q::TreeCore:node>}->{<Q::parent>} = $self->{<Q::TreeCore:node>};
 
   @Method:
     @@Name:appendText
@@ -363,10 +457,19 @@ IFClassDef:
         @@@@@:
           A text to append. 
     @@Return:
-      ## HIERARCHY err
+      @@@RaiseException:
+        @@@@@: HIERARCHY_BAD_TYPE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            An attempt is made to set a value to document or 
+            document fragment node. 
       @@@PerlDef:
-        unless (defined $text) {
-          __WARNING{APPEND_NULL_TEXT_ERR}__;
+        my $nt = $self-><AG::SWCFGNode.nodeType>;
+        if ($nt eq '#document' or $nt eq '#fragment') {
+          __EXCEPTION{HIERARCHY_BAD_TYPE_ERR::
+            MDOMX:param-name => 'text',
+          }__;
         } elsif (ref ($self->{<Q::TreeCore:node>}->{<Q::value>}) eq 'ARRAY') {
           push @{$self->{<Q::TreeCore:node>}->{<Q::value>}}, $text;
         } elsif (defined $self->{<Q::TreeCore:node>}->{<Q::value>}) {
@@ -392,12 +495,11 @@ IFClassDef:
           this node, no action has taken. 
     @@Return:
       @@@PerlDef:
-        ## TODO:
-
-  return unless ref $node;
-  $node = overload::StrVal ($node);
-  $self->{node} = [grep { overload::StrVal ($_) ne $node } @{$self->{node}}];
-
+        my $n = $node->{<Q::TreeCore:node>};
+        $self->{<Q::TreeCore:node>}->{<Q::childNodes>}
+           = [grep {$_ ne $n} @{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}];
+        $node->{<Q::TreeCore:node>}
+             -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all.orphanate>;
   @Method:
     @@Name:getAttribute
     @@Description:
@@ -430,20 +532,23 @@ IFClassDef:
           @@@@@@:
             There is no child element found whose name is <P::name>. 
       @@@PerlDef:
-        ## TODO:
-  my ($self, $name, %o) = @_;
-  for (@{$self->{node}}) {
-    if ($_->{type} eq '#element'
-        && $_->{local_name} eq $name) {
-      return $_;
-    }
-  }
-  ## Node is not exist
-  if ($o{make_new_node}) {
-    return $self->append_new_node (type => '#element', local_name => $name);
-  } else {
-    return undef;
-  }
+        FIND: {
+          for (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
+            if ($_->{<Q::nodeType>} eq '#element' and
+                $_->{<Q::localName>} eq $localName) {
+              $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
+              last FIND;
+            }
+          }
+          ## Not found
+          if ($makeNewNode) {
+            __DEEP{
+              $r = $self-><AG::SWCFGNode.ownerDocument>
+                        -><AG::SWCFGDocument.createElementNS> (null, $localName);
+              $self-><M::SWCFGNode.appendNode> ($r);
+            }__;
+          }
+        } # FIND
 
   @Method:
     @@Name:getAttributeNS
@@ -461,6 +566,12 @@ IFClassDef:
         @@@@lang:en
         @@@@@:
           The namespace URI of the element to get. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The null namespace. 
     @@Param:
       @@@Name:localName
       @@@Type:SWCFGString
@@ -485,7 +596,30 @@ IFClassDef:
           @@@@@@:
             There is no child element found whose name is <P::namespaceURI>
             and <P::localName> pair. 
-      
+      @@@PerlDef:
+        FIND: {
+          for (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
+            if ($_->{<Q::nodeType>} eq '#element' and
+                ((not defined $namespaceURI and 
+                  not defined $_->{<Q::namespaceURI>}) or
+                 (defined $namespaceURI and
+                  defined $_->{<Q::namespaceURI>} and
+                  $namespaceURI eq $_->{<Q::namespaceURI>})) and
+                $_->{<Q::localName>} eq $localName) {
+              $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
+              last FIND;
+            }
+          }
+          ## Not found
+          if ($makeNewNode) {
+            __DEEP{
+              $r = $self-><AG::SWCFGNode.ownerDocument>
+                        -><AG::SWCFGDocument.createElementNS>
+                                 ($namespaceURI, $localName);
+              $self-><M::SWCFGNode.appendNode> ($r);
+            }__;
+          }
+        } # FIND
 
   @Method:
     @@Name:getAttributeValue
@@ -502,7 +636,6 @@ IFClassDef:
         @@@@lang:en
         @@@@@:
           The local name of the child element to get its value. 
-    @@MakeNewNodeParam:
     @@DefaultParam:
     @@DefaultListParam:
     @@Return:
@@ -530,17 +663,86 @@ IFClassDef:
             the element value is <DOM::null> or if the <P::default> 
             value is specified as <DOM::null>. 
       @@@PerlDef:
- my $node = $self->get_attribute ($name);
-  if (ref $node) {
-    my $val = $node->value (%opt);
-    if ($opt{default_list} and ref $val eq 'ARRAY' and @$val == 0) {
-      return $opt{default_list};
-    } else {
-      return $val;
-    }
-  } else {
-    return $opt{default_list} || $opt{default};
+        __DEEP{
+          my $node = $self-><M::SWCFGNode.getAttribute> ($localName);
+          if (ref $node) {
+            $r = $node-><M::SWCFGNode.value> (%opt);
+            if ($defaultList and ref $r eq 'ARRAY' and @$r == 0) {
+              $r = $defaultList;
+            }
+          } else {
+            $r = $defaultList || $default;
+          }
+        }__;
 
+  @Method:
+    @@Name:getAttributeValueNS
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns the value of the first child element with a given 
+        local name and namespace URI pair. 
+    @@NewIn21:
+    @@NonNSVariant:.getAttributeValue
+    @@Param:
+      @@@Name:namespaceURI
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The namespace URI of the element to get. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The null namespace. 
+    @@Param:
+      @@@Name:localName
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The local name of the child element to get its value. 
+    @@DefaultParam:
+    @@DefaultListParam:
+    @@Return:
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The value of specified child element.  It might be either 
+          a simple string value, a list (array reference) value or 
+          a <DOM::null> value. 
+          \
+          If the element value is <DOM::null> or there is no such element 
+          exist and the <P::default> parameter is specified, then 
+          the <P::default> value is returned.  If the element 
+          value is of list and it have zero item and the <P::defaultList> 
+          parameter is specified, then the <P::defaultValue> is returned. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Either if there is no such child element found, if 
+            the element value is <DOM::null> or if the <P::default> 
+            value is specified as <DOM::null>. 
+      @@@PerlDef:
+        __DEEP{
+          my $node = $self-><M::SWCFGNode.getAttributeNS>
+                                 ($namespaceURI, $localName);
+          if (ref $node) {
+            $r = $node-><M::SWCFGNode.value> (%opt);
+            if ($defaultList and ref $r eq 'ARRAY' and @$r == 0) {
+              $r = $defaultList;
+            }
+          } else {
+            $r = $defaultList || $default;
+          }
+        }__;
 
   @Method:
     @@Name:getElementBy
@@ -593,23 +795,33 @@ IFClassDef:
             There is no element node with which the <P::code> returns 
             a <DOM::true> value. 
       @@@PerlDef:
-
-  my ($self, $code, %opt) = @_;
-  for (@{$self->{node}}) {
-    if ($_->{type} eq '#element' and
-        $code->($self, $_, %opt)) {
-      return $_;
-    }
-  }
-  ## Node is not exist
-  if ($opt{make_new_node}) {
-    my $n = $self->append_new_node (type => '#element', local_name => 'Node');
-    $opt{make_new_node}->($self, $n, %opt)
-      if ref $opt{make_new_node} eq 'CODE';
-    return $n;
-  } else {
-    return undef;
-  }
+        FIND: {
+          __DEEP{
+            for (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
+              my $this = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
+              if ($_->{<Q::nodeType>} eq '#element' and
+                  $code->($self, $this, %opt)) {
+                $r = $this;
+                last FIND;
+              }
+            }
+          }__;
+          ## Not found
+          if ($makeNewNode) {
+            __DEEP{
+              $r = $self-><M::SWCFGNode.appendNewNode>
+                                (type => '#element',
+                                 namespace_uri =>
+                                     $self-><AG::SWCFGNode.ownerDocument>
+                                          -><AG::SWCFGDocument
+                                                .defaultElementTypeNamespaceURI>,
+                                 local_name => 'Node');
+              if (ref $makeNewNode eq 'CODE') {
+                $makeNewNode->($self, $r, %opt);
+              }
+            }__;
+          }
+        } # FIND
 
   @Method:
     @@Name:setAttribute
@@ -646,23 +858,35 @@ IFClassDef:
             An attempt is made to set a value whose type is neither 
             a string, a list (array reference) or a blessed object. 
       @@@PerlDef:
-        if ({qw/HASH 1 CODE 1/}->{ref ($val)}) {
+        if ({qw/HASH 1 CODE 1/}->{ref ($value)}) {
           __EXCEPTION{BAD_VALUE_ERR::
-            SuikaWikiConfig21:actualType => {ref $val},
+            swcfg21:actualType => {ref $value},
           }__;
         }
 
-        ## TODO:
-  for (@{$self->{node}}) {
-    if ($_->{type} eq '#element'
-        && $_->{local_name} eq $name) {
-      $_->{value} = $val;
-      $_->{node} = [];
-      return $_;
-    }
-  }
-  return $self->append_new_node (type => '#element', local_name => $name,
-                                 value => $val);
+        FIND: {
+          for (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
+            if ($_->{<Q::nodeType>} eq '#element' and
+                $_->{<Q::localName>} eq $localName) {
+              $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
+              $r->{<Q::TreeCore:node>}->{<Q::value>} = $value;
+              for (@{$r->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
+                CORE::delete $_->{<Q::parent>};
+                $_-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+                             .orphanate>;
+              }
+              $r->{<Q::TreeCore:node>}->{<Q::childNodes>} = [];
+              last FIND;
+            }
+          }
+          ## Not found
+          __DEEP{
+            $r = $self-><AG::SWCFGNode.ownerDocument>
+                      -><AG::SWCFGDocument.createElementNS> (null, $localName);
+            $self-><M::SWCFGNode.appendNode> ($r);
+            $r->{<Q::TreeCore:node>}->{<Q::value>} = $value;
+          }__;
+        } # FIND
 
   @Method:
     @@Name:setAttributeNS
@@ -706,7 +930,42 @@ IFClassDef:
           @@@@@@:
             An attempt is made to set a value whose type is neither 
             a string, a list (array reference) or a blessed object. 
+      @@@PerlDef:
+        if ({qw/HASH 1 CODE 1/}->{ref ($value)}) {
+          __EXCEPTION{BAD_VALUE_ERR::
+            swcfg21:actualType => {ref $value},
+          }__;
+        }
 
+        FIND: {
+          for (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
+            if ($_->{<Q::nodeType>} eq '#element' and
+                ((not defined $namespaceURI and 
+                  not defined $_->{<Q::namespaceURI>}) or
+                 (defined $namespaceURI and
+                  defined $_->{<Q::namespaceURI>} and
+                  $namespaceURI eq $_->{<Q::namespaceURI>})) and
+                $_->{<Q::localName>} eq $localName) {
+              $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
+              $r->{<Q::TreeCore:node>}->{<Q::value>} = $value;
+              for (@{$r->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
+                CORE::delete $_->{<Q::parent>};
+                $_-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+                             .orphanate>;
+              }
+              $r->{<Q::TreeCore:node>}->{<Q::childNodes>} = [];
+              last FIND;
+            }
+          }
+          ## Not found
+          __DEEP{
+            $r = $self-><AG::SWCFGNode.ownerDocument>
+                      -><AG::SWCFGDocument.createElementNS>
+                                        ($namespaceURI, $localName);
+            $self-><M::SWCFGNode.appendNode> ($r);
+            $r->{<Q::TreeCore:node>}->{<Q::value>} = $value;
+          }__;
+        } # FIND
 
   @Method:
     @@Name: removeAttribute
@@ -730,17 +989,22 @@ IFClassDef:
         @@@@@:
           Always returns <DOM::true>. 
       @@@PerlDef:
-  my ($self, $name, %opt) = @_;
-  $self->{node} = [grep {
-    if ($_->{type} eq '#element' and
-        $_->{local_name} eq $name) {
-      delete $_->{parent};
-      0;
-    } else {
-      1;
-    }
-  } @{$self->{node}}];
-  1;
+        my @removed;
+        $self->{<Q::TreeCore:node>}->{<Q::childNodes>} = [grep {
+          if ($_->{<Q::nodeType>} eq '#element' and
+              $_->{<Q::localName>} eq $localName) {
+            push @removed, $_;
+            CORE::delete $_->{<Q::parent>};
+            false;
+          } else {
+            true;
+          }
+        } @{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}];
+        for (@removed) {
+          $_-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+                          .orphanate>;
+        }
+        true;
 
   @Method:
     @@Name: removeAttributeNS
@@ -771,19 +1035,44 @@ IFClassDef:
         @@@@lang:en
         @@@@@:
           Always returns <DOM::true>. 
-
+      @@@PerlDef:
+        my @removed;
+        $self->{<Q::TreeCore:node>}->{<Q::childNodes>} = [grep {
+          if ($_->{<Q::nodeType>} eq '#element' and
+              ((not defined $namespaceURI and 
+                not defined $_->{<Q::namespaceURI>}) or
+               (defined $namespaceURI and
+                defined $_->{<Q::namespaceURI>} and
+                $namespaceURI eq $_->{<Q::namespaceURI>})) and
+              $_->{<Q::localName>} eq $localName) {
+            push @removed, $_;
+            CORE::delete $_->{<Q::parent>};
+            false;
+          } else {
+            true;
+          }
+        } @{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}];
+        for (@removed) {
+          $_-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+                          .orphanate>;
+        }
+        true;
 
   @Attr:
     @@Name:childNodes
     @@Type:SWCFGChildNodeList
+    @@actualType:ManakaiSWCFGChildNodeList
     @@Description:
       @@@lang:en
       @@@@:
         The list of child nodes.  If the type of the node is 
         <CODE::#comment>, the list is always empty. 
     @@Get:
-      #@@@PerlDef:
-        ## TODO: childNodes
+      @@@PerlDef:
+        $r = $self->{<Q::TreeCore:node>}
+                  -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+                            .newReference>
+                        (<ClassName::ManakaiSWCFGChildNodeList>);
 
   @Attr:
     @@Name:localName
@@ -968,7 +1257,7 @@ IFClassDef:
         if (defined $newValue) {
           $self->{<Q::TreeCore:node>}->{<Q::value>} = $newValue;
         }
-        ref ($self->{<Q::TreeCore:node>}->{<Q::value>}) eq 'ARRAY'
+        $r = ref ($self->{<Q::TreeCore:node>}->{<Q::value>}) eq 'ARRAY'
                  ? join "\x0A", @{$self->{<Q::TreeCore:node>}->{<Q::value>}} :
                    $self->{<Q::TreeCore:node>}->{<Q::value>};
 
@@ -1020,7 +1309,7 @@ IFClassDef:
         if ($asArray and
             ref $self->{<Q::TreeCore:node>}->{<Q::value>} ne 'ARRAY') {
           $r = defined $self->{<Q::TreeCore:node>}->{<Q::value>}
-                  ? [$self->{<Q::TreeCore:node>}->{<Q::value>}
+                  ? [$self->{<Q::TreeCore:node>}->{<Q::value>}]
                   : [];
         } else {
           $r = $self->{<Q::TreeCore:node>}->{<Q::value>};
@@ -1049,53 +1338,59 @@ IFClassDef:
     @@Return:
       @@@Type:SWCFGString
       @@@PerlDef:
-  my ($self, %opt) = @_;
-  my $r = '';
-  if ($self->{type} eq '#document') {
-    if ($opt{output_header}) {
-      $r = "#?SuikaWikiConst/2.0\x0A";
-    }
-    my $ptype = '#';
-    for (@{$self->{node}}) {
-      $r .= "\x0A" if $ptype eq '#comment' && $_->{type} eq '#comment';
-      $ptype = $_->{type};
-      $r .= $_->stringify;
-    }
-  } elsif ($self->{type} eq '#element') {
-    $r = $self->inner_text;
-    if (scalar @{$self->{node}}) {
-      if (defined $r) {
-        $r =~ s/(^|\x0A)(?=([\\\@\#\s]|$))?/$1."  ".(defined $2?"\\":"")/ges;
-        $r = $self->{local_name}
-           . ":\x0A  \@\@"
-           . (ref ($self->{value}) eq 'ARRAY' ? '[list]' : '')
-           . ":" . (($r !~ /[\x0D\x0A:]/) && (length ($r) < 50) ? '' : "\x0A")
-           . (length $r ? $r : '\\') . "\x0A";
-      } else {
-        $r = $self->{local_name}
-           . ":\x0A";
-      }
-      for (@{$self->{node}}) {
-        next unless $_->{type} eq '#element';
-        my $rc = $_->stringify;
-        $rc =~ s/\x0A  /\x0A     /gs;
-        $rc =~ s/(\x0A +\@)/$1\@/gs;
-        $r .= '  @' . $rc;
-      }
-    } else {
-      $r = '' unless defined $r;
-      $r =~ s/(^|\x0A)(?=([\\\@\#\s]|$))?/$1."  ".(defined $2?"\\":"")/ges;
-      $r = $self->{local_name}
-         . (ref ($self->{value}) eq 'ARRAY' ? '[list]' : '')
-         . ":" . ((($r !~ /[\x0D\x0A:]/) && (length ($r) < 50)) ? '' : "\x0A")
-         . (length $r ? $r : '\\') . "\x0A";
-    }
-    $r = "\\" . $r if substr ($r, 0, 1) =~ /[\\\@\#\s]/;
-  } else {
-    $r = $self->inner_text;
-    $r =~ s/\x0A/\x0A#/gs;
-    $r = '#' . $r . "\n";
-  }
+        my $nt = $self-><AG::SWCFGNode.nodeType>;
+        my $node = $self->{<Q::TreeCore:node>};
+        if ($nt eq '#document') {
+          if ($outputHeader) {
+            $r = '#?SuikaWikiConfig/' . $node->{<Q::version>} . "\n";
+          }
+          
+          my $ptype = '#';  ## Brother's type
+          for (@{$node->{<Q::childNodes>}}) {
+            $r .= "\x0A" if $ptype eq '#comment' and
+                            $_->{<Q::nodeType>} eq '#comment';
+            $ptype = $_->{<Q::nodeType>};
+            $r .= $_->stringify;
+          }
+        } elsif ($nt eq '#element') {
+          $r = $self-><M::SWCFGNode.innerText>;
+          if (scalar @{$node->{<Q::childNodes>}}) {
+            if (defined $r) {
+              $r =~ s/(^|\x0A)(?=([\\\@\#\s]|$))?/$1."  ".
+                                                  (defined $2?"\\":"")/ges;
+              $r = $node->{<Q::localName>}
+                 . ":\x0A  \@\@"
+                 . (ref ($node->{<Q::value>}) eq 'ARRAY' ? '[list]' : '')
+                 . ":" . (($r !~ /[\x0D\x0A:]/) and (length ($r) < 50)
+                          ? '' : "\x0A")
+                 . (length $r ? $r : '\\') . "\x0A";
+            } else {
+              $r = $node->{<Q::localName>}
+                 . ":\x0A";
+            }
+            for (@{$node->{<Q::childNodes>}}) {
+              next unless $_->{<Q::nodeType>} eq '#element';
+              my $rc = $_->stringify;
+              $rc =~ s/\x0A  /\x0A     /gs;
+              $rc =~ s/(\x0A +\@)/$1\@/gs;
+              $r .= '  @' . $rc;
+            }
+          } else {
+            $r = '' unless defined $r;
+            $r =~ s/(^|\x0A)(?=([\\\@\#\s]|$))?/$1."  ".(defined $2?"\\":"")/ges;
+            $r = $node->{<Q::localName>}
+               . (ref ($node->{<Q::value>}) eq 'ARRAY' ? '[list]' : '')
+               . ":" . ((($r !~ /[\x0D\x0A:]/) and (length ($r) < 50))
+                        ? '' : "\x0A")
+               . (length $r ? $r : '\\') . "\x0A";
+          }
+          $r = "\\" . $r if substr ($r, 0, 1) =~ /[\\\@\#\s]/;
+        } else {
+          $r = $self-><AG::SWCFGNode.innerText>;
+          $r =~ s/\x0A/\x0A#/gs;
+          $r = '#' . $r . "\n";
+        }
+      ## TODO: Namespace & binding support
 
   @Method:
     @@Name:rootNode
@@ -1106,14 +1401,14 @@ IFClassDef:
     @@Return:
       @@@Type:SWCFGNode
       @@@PerlDef:
-  my $self = shift;
-  if ($self->{type} eq '#document') {
-    return $self;
-  } elsif (ref $self->{parent}) {
-    return $self->{parent}->root_node;
-  } else {
-    return $self;
-  }
+        $r = $self->{<Q::TreeCore:node>};
+        {
+          if ($r->{<Q::parent>}) {
+            $r = $r->{<Q::parent>};
+            redo;
+          }
+        }
+        $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($r);
 
   @Method:
     @@Name:nodePath
@@ -1171,6 +1466,7 @@ IFClassDef:
             msg => {qq<Node path = "$r" ... Oops! Node type: "$node_type">},
           }__;
         }
+     ## TODO: Namespace support
 
   @Method:
     @@Name:flag
@@ -1482,6 +1778,52 @@ IFClassDef:
         }
         $r = $object-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
                                   .newReference> ($class);
+  
+  @Method:
+     @@Name:  isSameNode
+     @@Description:
+        @@@lang:en
+        @@@@:
+          Return whether this node is the same node as the given one.
+        \
+          When two node references are references to the same object, 
+          even if through a proxy, the references may be used completely 
+          interchangably, such that all attributes have the same values 
+          and calling the same method on either reference always has 
+          exactly same effect.
+     @@NewIn21:
+     @@Operator:
+        @@@@: eq
+        @@@ContentType:
+          lang:Perl
+     @@Param:
+        @@@Name:  other
+        @@@Type:  SWCFGNode
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node to test against.
+     @@Return:
+        @@@Type:  
+          DOMMain:boolean
+        @@@InCase:
+          @@@@Value: true
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The two nodes are the same.
+        @@@InCase:
+          @@@@Value: false
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The two nodes are not same.
+        @@@PerlDef:
+            if (UNIVERSAL::isa ($other,
+                                <ClassName::ManakaiDOM:ManakaiDOMNodeReference
+                                          ::ManakaiDOM:all>)
+                and $other->{<Q::TreeCore:node>}->{<Q::TreeCore:nodeID>}
+                  eq $self->{<Q::TreeCore:node>}->{<Q::TreeCore:nodeID>}) {
+              $r = true;
+            }
 
   @IntMethod:
     @@Name:newObject
@@ -1878,6 +2220,21 @@ IFClassDef:
         } else {
           CORE::delete $self->{<Q::TreeCore:node>}->{<Q::nsBinding>}->{$prefix};
         }
+
+  @Attr:
+    @@Name: defaultElementTypeNamespaceURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The default namespace URI for element type names. 
+    @@NewIn21:
+    @@Type:SWCFGString
+    @@Get:
+      @@@disDef:
+        @@@@GetProp:defaultETNamespaceURI
+    @@Set:
+      @@@disDef:
+        @@@@SetProp:defaultETNamespaceURI
   
   @RedefAttr:
     @@Name:nodeType
@@ -2191,6 +2548,42 @@ ExceptionDef:
       DOMMain:unsigned-long::ManakaiDOM:all
     @@Type:
       DOMMain:unsigned-long
+    @@XConst:
+      @@@Name:HIERARCHY_REQUEST_ERR
+      @@@Value:3
+      @@@Description:
+        @@@@lang:en
+        @@@@@: 
+          An attempt is made to insert a node somewhere it does not belong. 
+      @@@XSubTypeDef:
+        @@@@QName:HIERARCHY_ANCESTOR_OR_SELF_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            An attempt is made to insert an ancestor of this node or 
+            this node itself. 
+      @@@XSubTypeDef:
+        @@@@QName:HIERARCHY_BAD_TYPE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            An attempt is made to insert a comment node into non-document 
+            node or a document or document fragment node somwehre or 
+            any node into comment node. 
+    @@XConst:
+      @@@Name:WRONG_DOCUMENT_ERR
+      @@@Value:4
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A node is used in a different document than the one for which 
+          it is created. 
+      @@@XSubTypeDef:
+        @@@@QName:EXTERNAL_NODE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            An attempt is made to insert a foreign node. 
     @@XConst:
       @@@Name:TYPE_MISMATCH_ERR
       @@@Value:17
