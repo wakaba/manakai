@@ -15,7 +15,7 @@ This module is part of manakai.
 
 package Message::Util::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error;
 push our @ISA, 'Error';
 
@@ -162,10 +162,26 @@ sub ___rule_def () {+{
       $p->{-result} = $o->{-type};
     },
   },
+  ## "t" is obsolete; use "p"
   t => {
     after => sub {
       my ($f, $name, $p, $o) = @_;
       $p->{name} =~ tr/-/_/;
+      my $val = $o->{$p->{name}};
+      if (defined $val) {
+        if (length $val) {
+          $p->{-result} = $val;
+        } else {
+          $p->{-result} = defined $p->{empty} ? $p->{empty} : '<empty>';
+        }
+      } else {
+        $p->{-result} = defined $p->{undef} ? $p->{undef} : '<undef>';
+      }
+    },
+  },
+  p => {
+    after => sub {
+      my ($f, $name, $p, $o) = @_;
       my $val = $o->{$p->{name}};
       if (defined $val) {
         if (length $val) {
@@ -263,4 +279,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/04/25 07:15:49 $
+1; # $Date: 2004/10/09 05:33:41 $
