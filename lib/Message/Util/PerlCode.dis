@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/03/03 06:26:16 $
+      $Date: 2005/03/03 11:19:08 $
     @@ContentType:
       dis:Date.RCS
   
@@ -483,7 +483,7 @@ ClsDef:
 
           ## -- Footer
           $r .= <ClassM::ManakaiPerlCodeImplementation.perlComment>
-                  (q[License: <].$node->{<Q::license>}.qq[>\n]);
+                  (q[License: <].$node->{<Q::dis:License>}.qq[>\n]);
           $r .= qq<1;\n>;
         }__;
 
@@ -512,6 +512,21 @@ ClsDef:
     @@Set:
       @@@disDef:
         @@@@SetProp: currentChunk
+  
+  @Attr:
+    @@Name: licenseURI
+    @@enDesc:
+      The license term URI reference for this code. 
+    @@Type:
+      DISLang:String::ManakaiDOM:all
+    @@Get:
+      @@@disDef:
+        @@@@GetProp: 
+          dis:License
+    @@Set:
+      @@@disDef:
+        @@@@SetProp:
+          dis:License
 ##PerlFile
 
 PropDef:

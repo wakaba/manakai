@@ -270,6 +270,12 @@ sub dis_typeforqnames_to_type_uri ($;%) {
     if (defined $State->{Type}->{$uri}->{Name}) {
       return $State->{Type}->{$uri}->{URI} || $uri;
     }
+    if (not ref $State->{For}->{$for}->{ISA} or
+        not ref $State->{For}->{$for}->{subsetOf} or
+        not ref $State->{For}->{$for}->{Implement}) {
+      valid_err (qq<For <$for> in type <$type> must be defined>,
+                 node => $opt{node});
+    }
     unshift @for, @{$State->{For}->{$for}->{ISA}},
                   @{$State->{For}->{$for}->{subsetOf}},
                   @{$State->{For}->{$for}->{Implement}};
@@ -2770,4 +2776,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/02/28 04:32:40 $
+1; # $Date: 2005/03/03 11:19:08 $
