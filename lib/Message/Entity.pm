@@ -13,7 +13,7 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::Header;
@@ -280,6 +280,7 @@ sub _encode_body ($$\%) {
   	my $ctef = $self->header->field ('content-transfer-encoding',
   	                              -new_item_unless_exist => 0);
   	my $cte = ''; $cte = lc $ctef->value if ref $ctef;
+  	my %enoption;
   	## Get media type of entity body and its accept CTE list
   	  my ($mt,$mst) = $self->content_type;
   	  my $mt_def = $Message::MIME::MediaType::type{$mt}->{$mst};
@@ -287,13 +288,33 @@ sub _encode_body ($$\%) {
   	    ;#unless ref $mt_def;
   	  $mt_def = $Message::MIME::MediaType::type{'/default'}->{'/default'}
   	    unless ref $mt_def;
-  	## If accept CTE list is defined,
-  	if (ref $mt_def->{accept_cte} eq 'ARRAY') {
-  	  my $f = 1; for (@{$mt_def->{accept_cte}}) {
-  	    if ($cte eq $_) {$f = 0; last}
+  	  $enoption{mt_is_text} = 1
+  	    if $mt eq 'text' || $mt eq 'multipart' || $mt eq 'message';
+  	  my ($charset, $charset_def) = '';
+  	  if ($mt_def->{mime_charset}) {
+  	  ## If CT is able to have its charset parameter,
+  	    my $ct = $self->header->field ('content-type', 
+  	                                   -new_item_unless_exist => 0);
+  	    $charset = $ct->parameter ('charset') if ref $ct;
+  	    if ($charset) {
+  	      $charset_def = $Message::MIME::Charset::CHARSET{$charset};
+  	    } else {
+  	      $charset_def = $Message::MIME::Charset::CHARSET{'*default'};
+  	      ## Note: 'encoding_after_encode' option (available for header
+  	      ## field, but not for message body) is hardcoded.
+  	    }
   	  }
-  	  if ($f) {	## If CTE is not accepted,
-  	    $cte = $mt_def->{accept_cte}->[0];
+  	  $charset_def = {} unless ref $charset_def;	## dummy
+  	  $enoption{mt_is_text} = 0 if $charset_def->{mime_text} != 1;
+  	## If accept CTE list is defined,
+  	for my $def ($charset_def, $mt_def) {
+  	  if (ref $def->{accept_cte} eq 'ARRAY') {
+  	    my $f = 1; for (@{$def->{accept_cte}}) {
+  	      if ($cte eq $_) {$f = 0; last}
+  	    }
+  	    if ($f) {	## If CTE is not accepted,
+  	      $cte = $def->{accept_cte}->[0];
+  	    }
   	  }
   	}
   	if ($current_cte eq 'binary' || ($current_cte && $current_cte ne $cte)) {
@@ -303,20 +324,23 @@ sub _encode_body ($$\%) {
   	    my ($e, $decoded);
   	    ($decoded, $e) = &$de ($self, $value);
   	    ## Check transparent coderange
-  	      my $cr = $self->Message::MIME::Encoding::decide_coderange ($decoded);
+  	      my $cr = $self->Message::MIME::Encoding::decide_coderange
+  	        ($decoded, \%enoption);
   	      if ($option->{accept_coderange} eq '8bit') {
   	        if ($cr eq 'binary') {
-  	          $cte = $mt_def->{cte_7bit_preferred} || 'base64';
+  	          $cte = $charset_def->{cte_7bit_preferred}
+  	              || $mt_def->{cte_7bit_preferred} || 'base64';
   	          $en = $Message::MIME::Encoding::ENCODER{$cte};
   	        }
   	      } elsif ($option->{accept_coderange} eq '7bit') {
   	        if ($cr eq 'binary' || $cr eq '8bit') {
-  	          $cte = $mt_def->{cte_7bit_preferred} || 'base64';
+  	          $cte = $charset_def->{cte_7bit_preferred}
+  	              || $mt_def->{cte_7bit_preferred} || 'base64';
   	          $en = $Message::MIME::Encoding::ENCODER{$cte};
   	        }
   	      }
   	    if ($e eq 'binary') {
-  	      ($value, $e) = &$en ($self, $decoded);
+  	      ($value, $e) = &$en ($self, $decoded, \%enoption);
   	        $ctef = $self->header->field ('content-transfer-encoding')
   	           unless ref $ctef;
   	        $ctef->value ($e);
@@ -801,7 +825,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/29 11:05:53 $
+$Date: 2002/05/30 12:53:26 $
 
 =cut
 
