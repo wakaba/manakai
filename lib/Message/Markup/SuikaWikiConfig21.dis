@@ -21,7 +21,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/18 08:55:41 $
+      $Date: 2005/02/18 11:40:52 $
     @@ContentType:
       dis:Date.RCS
   
@@ -38,6 +38,14 @@ Module:
       @@@Name: DOMException
       @@@WithFor:
         ManakaiDOM:all
+    @@Module:
+      @@@Name: DOMBoot
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOM
+    @@Module:
+      @@@Name: DOMBoot
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOMLatest
     @@Module:
       @@@Name: SuikaWikiConfig21
       @@@WithFor:
@@ -57,6 +65,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Lang#
   @DOMCore:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @DOMLS:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @lang:
@@ -143,6 +153,51 @@ ForDef:
     ManakaiDOM:Perl
 
 ## -- Features and versions
+
+ElementTypeBinding:
+  @Name: FeatureDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DOMMain:DOMFeature
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: FeatureVerDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DOMMain:DOMFeature
+
+ElementTypeBinding:
+  @Name: featureQName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ContentType:
+      dis:TypeQName
+
+FeatureDef:
+  @QName: CoreFeature
+  @featureQName: Core
+  @FeatureVerDef:
+    @@QName: CoreFeature21
+    @@Version: 2.1
+    @@ISA: CoreFeature
+    @@FullName:
+      @@@lang:en
+      @@@@:
+        The SuikaWikiConfig/2.1 object model
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The SuikaWikiConfig/2.1 object model. 
 
 PropDef:
   @QName: 
@@ -2699,8 +2754,7 @@ IFClassDef:
     @@Param:
       @@@Name:input
       @@@Type:
-#        DOMLS:LSInput
- DOMMain:any
+        DOMLS:LSInput::ManakaiDOM:ManakaiDOMLatest
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -2735,6 +2789,14 @@ IFClassDef:
     @@@:
       This interface should be implemented on the same object that 
       implements <IF::DOMImplementation>. 
+
+  @Role:
+    @@@:
+      DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM
+    @@compat:
+      DOMCore:ManakaiDOMImplementation::ManakaiDOM:ManakaiDOMLatest
+    @@ForCheck: ForClass
+
   # recognizedVersions : StringList
   
   @Method:
@@ -2880,6 +2942,9 @@ ElementTypeBinding:
     @@resourceFor:
       @@@@: ForClass
       @@@ForCheck: ForLatest
+    @@DOMMain:implementFeature:
+      @@@@:CoreFeature21
+      @@@ForCheck: ForClass
 
 ElementTypeBinding:
   @Name: IFQName

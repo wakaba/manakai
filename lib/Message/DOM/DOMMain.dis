@@ -28,7 +28,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/18 06:13:52 $
+      $Date: 2005/02/18 11:40:52 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1194,6 +1194,10 @@ StringDataTypeDef:
         If <P::features> in future levels of DOM does not 
         have this characteristic, this and some other implementation 
         must be revisited for that levels. 
+        \
+        This input normalizer creates a copy of feature list even if 
+        it is given as a hash reference; it means that <QUOTE::breaking> 
+        any parameter does not affect the input source. 
   @ResourceDef:
     @@QName:
       DOMMain:stringifyFeatures

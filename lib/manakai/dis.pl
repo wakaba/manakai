@@ -1595,15 +1595,22 @@ sub dis_perl_init_classdef ($;%) {
     valid_err ("Perl package name for <$res->{parentModule}> not defined",
                node => $res->{src})
       unless defined $pack;
-    my $an = dis_get_attr_node (%opt, parent => $res->{src}, name => 'AppName');
+    my $an = dis_get_attr_node (%opt, parent => $res->{src}, name => 'AppName',
+                                ContentType => ExpandedURI q<Perl:package-name>);
     if ($an) {
       $pack = $res->{ExpandedURI q<dis2pm:packageName>}
-            = $pack . '::' . $an->value;
+            = $an->value;
     } else {
-      valid_err ("Class name required", node => $res->{src})
-        unless $res->{Name};
-      $pack = $res->{ExpandedURI q<dis2pm:packageName>}
-            = $pack . '::' . $res->{Name};
+      $an = dis_get_attr_node (%opt, parent => $res->{src}, name => 'AppName');
+      if ($an) {
+        $pack = $res->{ExpandedURI q<dis2pm:packageName>}
+              = $pack . '::' . $an->value;
+      } else {
+        valid_err ("Class name required", node => $res->{src})
+          unless $res->{Name};
+        $pack = $res->{ExpandedURI q<dis2pm:packageName>}
+              = $pack . '::' . $res->{Name};
+      }
     }
     ## This class implements...
     if ($res->{multiple_resource_parent}) {
@@ -2763,4 +2770,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/02/18 08:55:41 $
+1; # $Date: 2005/02/18 11:40:52 $

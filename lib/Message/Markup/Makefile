@@ -11,7 +11,8 @@ DISC_PL = $(MANAKAI_BIN_DIR)disc.pl
 DISC = $(PERL) $(DISC_PL) \
                 -I=$(MANAKAI_LIB_MANAKAI_DIR) \
                 -I=$(MANAKAI_LIB_DIR)Message/Util/ \
-                -I=$(MANAKAI_LIB_DIR)Message/Util/Error/ 
+                -I=$(MANAKAI_LIB_DIR)Message/Util/Error/ \
+                -I=$(MANAKAI_LIB_DIR)Message/DOM/ 
 CDIS2PM_OPTIONS = --enable-assert
                   ## TODO: Official release should remove this option.
 CDIS2PM_PL = ../../../bin/cdis2pm.pl

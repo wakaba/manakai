@@ -28,7 +28,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/18 06:13:52 $
+      $Date: 2005/02/18 11:40:52 $
     @@ContentType:
       dis:Date.RCS
 
@@ -1306,11 +1306,11 @@ IF:
      @@Get:
         @@@Type:  LSReader
         @@@PerlDef:
-          $r = $self->{characterStream};
+          $r = $self->{character_stream};
      @@Set:
         @@@Type:  LSReader
         @@@PerlDef:
-          $self->{characterStream} = $given;
+          $self->{character_stream} = $given;
   @Attr:
      @@Name:  byteStream
      @@Description:
@@ -1320,11 +1320,11 @@ IF:
      @@Get:
         @@@Type:  LSInputStream
         @@@PerlDef:
-          $r = $self->{byteStream};
+          $r = $self->{byte_stream};
      @@Set:
         @@@Type:  LSInputStream
         @@@PerlDef:
-          $self->{byteStream} = $given;
+          $self->{byte_stream} = $given;
   @Attr:
      @@Name:  stringData
      @@Description:
@@ -1341,8 +1341,8 @@ IF:
        DOMMain:ManakaiDOMString
      @@Get:
        @@@PerlDef:
-         $r = ref $self->{stringData} eq 'SCALAR'
-                ? ${$self->{stringData}} : $self->{stringData};
+         $r = ref $self->{string_data} eq 'SCALAR'
+                ? ${$self->{string_data}} : $self->{string_data};
      @@Set:
        @@@InCase:
          @@@@Type:
@@ -1355,7 +1355,7 @@ IF:
          @@@@For:
            ManakaiDOM:ManakaiDOM
        @@@PerlDef:
-         $self->{stringData} = ref $given eq 'SCALAR' ? $given : \$given;
+         $self->{string_data} = ref $given eq 'SCALAR' ? $given : \$given;
   @Attr:
      @@Name:  systemId
      @@Description:
@@ -1378,10 +1378,10 @@ IF:
        DOMMain:SystemID
      @@Get:
         @@@PerlDef:
-          $r = $self->{systemId};
+          $r = $self->{system_id};
      @@Set:
         @@@PerlDef:
-          $self->{systemId} = $given;
+          $self->{system_id} = $given;
   @Attr:
      @@Name:  publicId
      @@Description:
@@ -1397,10 +1397,10 @@ IF:
        DOMMain:PublicID
      @@Get:
         @@@PerlDef:
-          $r = $self->{publicId};
+          $r = $self->{public_id};
      @@Set:
         @@@PerlDef:
-          $self->{publicId} = $self;
+          $self->{public_id} = $self;
   @Attr:
      @@Name:  baseURI
      @@Description:
@@ -1418,7 +1418,7 @@ IF:
        ManakaiDOM:ManakaiDOMURI
      @@Get:
        @@@PerlDef:
-         $r = $self->{baseURI};
+         $r = $self->{base_uri};
      @@Set:
        @@@PerlDef:
          if (not defined $given) {
@@ -1431,7 +1431,7 @@ IF:
                infoset:baseURI => {$given},
            }__;
          }
-         $self->{baseURI} = $given;
+         $self->{base_uri} = $given;
   @Attr:
      @@Name:  encoding
      @@Description:
@@ -1467,7 +1467,7 @@ IF:
         @@@InCase:
            @@@@Value:  false
         @@@PerlDef:
-          $r = $self->{certifiedText};
+          $r = $self->{certified_text};
      @@Set:
         @@@Type:
            DOMMain:boolean
@@ -1482,7 +1482,7 @@ IF:
         @@@InCase:
            @@@@Value:  false
         @@@PerlDef:
-          $self->{certifiedText} = $given;
+          $self->{certified_text} = $given;
 
   @IntMethod:
     @@Name:new

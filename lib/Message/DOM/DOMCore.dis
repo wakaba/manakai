@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/18 08:55:41 $
+      $Date: 2005/02/18 11:40:51 $
     @@ContentType:
       dis:Date.RCS
 
@@ -2435,6 +2435,8 @@ IF:
               This source has no DOM implementation that supports the 
               desired features and versions.
         @@@PerlDef:
+          $features->{'core'}->{''} = 1;
+              ## NOTE: This method must return a DOMImplementation object. 
           CLS: for (values %{<IF::DOMCore:DOMImplementation
                                      ::ManakaiDOM:ManakaiDOM>::Class}) {
             for my $fname (keys %$features) {
@@ -2489,6 +2491,8 @@ IF:
             A list of DOM implementations that support the desired 
             features and versions.
         @@@PerlDef:
+          $features->{'core'}->{''} = 1;
+              ## NOTE: This method must return DOMImplementation objects. 
           $r = <ClassM::ManakaiDOMImplementationList.new>;
           CLS: for (values %{<Class::DOMCore:DOMImplementation
                                      ::ManakaiDOM:ManakaiDOM>::Class}) {
