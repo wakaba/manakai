@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/01/06 10:41:31 $
+      $Date: 2005/01/07 13:07:14 $
     @@ContentType:
       dis:Date.RCS
 
@@ -122,6 +122,7 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @MUErrorCore:-
   @null:
     http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
   @perl:
@@ -486,20 +487,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMConfigParameterSet
-ElementTypeBinding:
-  @Name: ErrorSet
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMErrorSet
-ElementTypeBinding:
-  @Name: Error
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMError
+
 ElementTypeBinding:
   @Name: EventSet
   @ElementType:
@@ -611,6 +599,7 @@ ElementTypeBinding:
       ManakaiDOM:ConstGroup
     @@ForCheck:
       ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+
 ElementTypeBinding:
   @Name: XConstGroup
   @ElementType:
@@ -629,6 +618,35 @@ ElementTypeBinding:
         ::ManakaiDOM:ManakaiDOMLatest
       @@@For:
         !ManakaiDOM:ManakaiDOM1
+
+ElementTypeBinding:
+  @Name: ErrorSet
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:ConstGroup
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM ManakaiDOM:ForClass
+    @@aliasChild:
+      @@@@: 1
+      @@@For:
+        ManakaiDOM:ManakaiDOM
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOMLatest
+      @@@For:
+        !ManakaiDOM:ManakaiDOM1
+    @@Type:
+      DOMMain:unsigned-short
+    @@ISA:
+      @@@@:
+        DOMMain:unsigned-short
+      @@@ForCheck:
+        ManakaiDOM:ForClass
 
 ElementTypeBinding:
   @Name: Const
@@ -657,6 +675,36 @@ ElementTypeBinding:
         ::ManakaiDOM:ManakaiDOMLatest
       @@@For:
         !ManakaiDOM:ManakaiDOM1
+
+ElementTypeBinding:
+  @Name: ErrorDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: 
+      ManakaiDOM:Const
+    @@rdf:type:
+      ManakaiDOM:DOMError
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+    @@aliasChild:
+      @@@@: 1
+      @@@For:
+        ManakaiDOM:ManakaiDOM
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOMLatest
+      @@@For:
+        !ManakaiDOM:ManakaiDOM1
+
+ElementTypeBinding:
+  @Name: ErrName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ContentType:
+      DOMCore:DOMErrorType
+
 ElementTypeBinding:
   @Name: XParam
   @ElementType:
@@ -664,8 +712,27 @@ ElementTypeBinding:
   @ShadowContent:
     @@ForCheck:
       ManakaiDOM:ManakaiDOM
+
 ElementTypeBinding:
   @Name: SubTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:ExceptionOrWarningSubType
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:ForClass
+    @@aliasChild:1
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOMLatest
+      @@@For:
+        !ManakaiDOM:ManakaiDOM1
+
+ElementTypeBinding:
+  @Name: ErrSubTypeDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
@@ -4198,18 +4265,20 @@ IF:
                     }
                   }
                   if ($newIndex < $currentIndex) {
-                    delete $node->{<Q::infoset:children>}->[$currentIndex];
+                    splice @{$node->{<Q::infoset:children>}}, $currentIndex,
+                           1, ();
                     splice @{$node->{<Q::infoset:children>}},
                            $newIndex, 0, @newNode;
                   } else {
                     splice @{$node->{<Q::infoset:children>}},
                            $newIndex, 0, @newNode;
-                    delete $node->{<Q::infoset:children>}->[$currentIndex];
+                    splice @{$node->{<Q::infoset:children>}}, $currentIndex,
+                           1, ();
                   }
                 }
               } else { ## $newChild->parentNode ne $self
                 for my $newNode (@newNode) {
-                  delete $newNode->{<Q::infoset:parent>};
+                  CORE::delete $newNode->{<Q::infoset:parent>};
                   $node-><M::ManakaiDOM:ManakaiDOMNodeObject.importTree>
                                                                    ($newNode);
                   $newNode->{<Q::infoset:parent>} = $node;
@@ -4226,7 +4295,7 @@ IF:
                   if ($parentNode->{<Q::infoset:children>}->[$i]
                                  ->{<Q::TreeCore:nodeID>} eq
                       $node->{<Q::TreeCore:nodeID>}) {
-                    delete $parentNode->{<Q::infoset:children>}->[$i];
+                    splice @{$parentNode->{<Q::infoset:children>}}, $i, 1, ();
                     last;
                   }
                 }
@@ -4528,13 +4597,15 @@ IF:
                     }
                   }
                   if ($newIndex < $currentIndex) {
-                    CORE::delete $node->{<Q::infoset:children>}->[$currentIndex];
+                    splice @{$node->{<Q::infoset:children>}}, $currentIndex,
+                           1, ();
                     splice @{$node->{<Q::infoset:children>}},
                            $newIndex, 1, @newNode;
                   } else {
                     splice @{$node->{<Q::infoset:children>}},
                            $newIndex, 1, @newNode;
-                    CORE::delete $node->{<Q::infoset:children>}->[$currentIndex];
+                    splice @{$node->{<Q::infoset:children>}}, $currentIndex,
+                           1, ();
                   }
                 }
               } else { ## $newChild->parentNode ne $self
@@ -4556,7 +4627,7 @@ IF:
                   if ($parentNode->{<Q::infoset:children>}->[$i]
                                  ->{<Q::TreeCore:nodeID>} eq
                       $node->{<Q::TreeCore:nodeID>}) {
-                    CORE::delete $parentNode->{<Q::infoset:children>}->[$i];
+                    splice @{$parentNode->{<Q::infoset:children>}}, $i, 1, ();
                     last;
                   }
                 }
@@ -4625,7 +4696,7 @@ IF:
               for my $i (0..$#{$node->{<Q::infoset:children>}}) {
                 if ($node->{<Q::infoset:children>}->[$i]
                          ->{<Q::TreeCore:nodeID>} eq $oldChildID) {
-                  delete $node->{<Q::infoset:children>}->[$i];
+                  splice @{$node->{<Q::infoset:children>}}, $i, 1, ();
                   last FIND;
                 }
               }
@@ -4635,7 +4706,8 @@ IF:
             }
             if (ref $oldChild) {
               $r = $oldChild;
-              delete $oldChild->{<Q::TreeCore:node>}->{<Q::infoset:parent>};
+              CORE::delete $oldChild->{<Q::TreeCore:node>}
+                                    ->{<Q::infoset:parent>};
               $oldChild->{<Q::TreeCore:node>}
                 -><M::ManakaiDOM:ManakaiDOMNodeObject.orphanate>;
             }
@@ -4882,7 +4954,7 @@ IF:
               }
               
               for my $newNode (@newNode) {
-                delete $newNode->{<Q::infoset:parent>};
+                CORE::delete $newNode->{<Q::infoset:parent>};
                 $node-><M::ManakaiDOM:ManakaiDOMNodeObject.importTree>
                                                                  ($newNode);
                 $newNode->{<Q::infoset:parent>} = $node;
@@ -4897,7 +4969,7 @@ IF:
                   if ($parentNode->{<Q::infoset:children>}->[$i]
                                  ->{<Q::TreeCore:nodeID>} eq
                       $node->{<Q::TreeCore:nodeID>}) {
-                    delete $parentNode->{<Q::infoset:children>}->[$i];
+                    splice @{$parentNode->{<Q::infoset:children>}}, $i, 1, ();
                     last;
                   }
                 }
@@ -7470,6 +7542,11 @@ ResourceDef:
       @@@lang:en
       @@@@:
         Removes an item from this list. 
+        \
+        Unlike the deletion for Perl's standard array, this method 
+        removes an item and moves the rest of the array (i.e. items 
+        whose index is greater than <P::index>) one position, since 
+        the <IF::NodeList> cannot contain a <DOM::null> value. 
     @@Param:
       @@@Name:index
       @@@Type:
@@ -7920,6 +7997,21 @@ ResourceDef:
       @@@PerlDef:
         tie my @list, ref $self, $self;
         $r = \@list;
+
+  @IntMethod:
+    @@Perlop:DESTROY
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Redefines destructor for the class
+        <Class::ManakaiDOM:ManakaiDOMNodeReference>, 
+        since the <PerlModule::Tie::Array> also has its own empty destructor. 
+    @@Return:
+      @@@Def:
+        @@@@ContentType:
+          lang:dis
+        @@@@DISPerl:cloneCode:
+          ManakaiDOM:ManakaiDOMNodeReference.destroy
 
 ##NodeList
 
@@ -13439,21 +13531,61 @@ IFDef:
             @@@@@@: No node is newly created.
       @@Return:
 
-IFDef:
-  @Name:  DOMError
+IF:
+  @QName:
+    @@@: DOMError
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @AppISA:
+    @@@:
+      Message::Util::Error
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM ManakaiDOM:ForIF
+    @@ContentType:
+      lang:Perl
+
+  @QName:
+    @@@: ManakaiDOMError
+    @@ForCheck:
+      ManakaiDOM:ForClass
+  @rdf:type:
+    @@@:
+      DOMMain:ErrorClass
+    @@ForCheck:
+      ManakaiDOM:ForClass
+  @ISA:
+    @@@:
+      ManakaiDOM:ManakaiDOMExceptionOrWarning
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM ManakaiDOM:ForClass
+
   @Description:
     @@lang:en
     @@@: Describes an error.
+
   @Level[list]:  3
   @SpecLevel:3
+  @ImplementLevel3:
   @For:
     ManakaiDOM:DOM3
   @For:
     =ManakaiDOM:ManakaiDOM
+
   @ConstGroup:
-     @@QName:  ErrorSeverity
+     @@QName:
+       @@@@:  ErrorSeverity
+       @@@ForCheck:
+         ManakaiDOM:ForIF
+
+     @@QName:
+       @@@@:ManakaiDOMErrorSeverity
+       @@@ForCheck:
+         ManakaiDOM:ForClass
      @@ISA: 
-       DOMMain:unsigned-short
+       @@@@:
+         DOMMain:unsigned-short
+       @@@ForCheck:
+         ManakaiDOM:ForClass
      @@Type: 
        DOMMain:unsigned-short
      @@Description:
@@ -13495,7 +13627,9 @@ IFDef:
      @@Get:
         @@@Type:  
           DOMMain:unsigned-short
-        @@@actualType:ErrorSeverity
+        @@@actualType:ManakaiDOMErrorSeverity
+        @@@PerlDef:
+          $r = $self->{<Q::MUErrorCore:def>}->{<Q::DOMCore:severity>};
   @Attr:
      @@Name:  message
      @@Description:
@@ -13505,6 +13639,21 @@ IFDef:
      @@Get:
         @@@Type:  
           DOMMain:DOMString
+        @@@PerlDef:
+          @@@@@:
+            __DEEP{
+              $r = $self->text;
+            }__;
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              This attribute getter returns the text returned from 
+              <Perl::Message::Util::Error>'s <Perl::text> method. 
+              \
+              {ISSUE:: It should be <Perl::stringify> instead? 
+                       Or, it should be localized.
+              \
+              }
   @Attr:
      @@Name:  type
      @@Description:
@@ -13522,11 +13671,18 @@ IFDef:
      @@Get:
         @@@Type:  
           DOMMain:DOMString
+        @@@actualType:DOMErrorType
+        @@@PerlDef:
+          $r = $self->{<Q::MUErrorCore:def>}->{<Q::DOMCore:type>};
   @Attr:
      @@Name:  relatedException
      @@Description:
        @@@lang:en
-       @@@@: The related platform dependent exception if any.
+       @@@@: 
+         The related platform dependent exception if any. 
+         \
+         An example would be an <CODE::IOException> or 
+         <CODE::SecurityException> when using the <IF::DOMLS::LSParser>. 
      @@Get:
         @@@Type:  
           DOMMain:DOMObject
@@ -13546,6 +13702,135 @@ IFDef:
        @@@@: The location of the error.
      @@Get:
         @@@Type:  DOMLocator
+
+  @ErrorSet:
+    @@QName:
+      @@@@:ManakaiDOMErrorCode
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Errors that might be reported during the invocation of 
+        the <M::Document.normalizeDocument> method.  These errors 
+        might be reported during the invocation of other methods. 
+    
+    @@ErrorDef:
+      @@@QName: check-character-normalization-failure
+      @@@ErrName:check-character-normalization-failure
+      @@@Value:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A string is encountered that fails normalization checking, 
+          while the parameter <CP::check-character-normalization> 
+          is set to <DOM::true>. 
+      @@@DOMCore:severity:Error
+      @@@DOMCore:relatedData:
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The node in which the string that fails checking is. 
+          @@@@@ForCheck:
+            ManakaiDOM:ManakaiDOM
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          This error is also used by DOM Level 3 LS <IF::LSParser>. 
+    @@ErrorDef:
+      @@@QName:cdata-section-splitted
+      @@@ErrName:cdata-section-splitted
+      @@@Value:2
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A character data section is split while <CP::split-cdata-sections> 
+          is set to <DOM::true>. 
+      @@@DOMCore:severity:Warning
+      @@@DOMCore:relatedData:
+        @@@@Type:
+          DOMXML:CDATASection
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The first <IF::DOMXML:CDATASection> node in the document order 
+            resulting from the split. 
+    @@ErrorDef:
+      @@@QName:wf-invalid-character-in-node-name
+      @@@ErrName:wf-invalid-character-in-node-name
+      @@@DOMCore:severity:FatalError
+      @@@Value:3
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A <A::Node.nodeName> contains an invalid character according 
+          to its node type. 
+      @@@ErrSubTypeDef:
+        @@@@QName:
+          ManakaiDOMCore:normalize-invalid-character
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            A <A::Node.nodeName> attribute contains an invalid character 
+            according to its node type while the parameter 
+            <CP::well-formed> is set to <DOM::true>. 
+        @@@@DOMCore:severity:Error
+      @@@ErrSubTypeDef:
+        @@@@QName:
+          ManakaiDOMLS:serialize-invalid-character
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            A character that cannot be represented in the output character 
+            encoding is encountered within markup but outside of attribute 
+            values. 
+        @@@@DOMCore:severity:FatalError
+    @@ErrorDef:
+      @@@QName:wf-invalid-character
+      @@@ErrName:wf-invalid-character
+      @@@Value:4
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The text inside an <IF::Attr>, <IF::Element>, <IF::Comment>, 
+          <IF::Text> or <IF::DOMXML:CDATASection> node or the data 
+          inside a <IF::DOMXML:ProcessingInstruction> node contains an 
+          invalid character, while the parameter <CP::well-formed>
+          is set to <DOM::true>. 
+      @@@DOMCore:severity:Error
+## Error:normalizeDocument
+
+ElementTypeBinding:
+  @Name: FormatDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISCore:StringDataType
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+    @@rdfs:subClassOf:
+      DISCore:String
+
+FormatDef:
+  @QName:DOMErrorType
+  @Description:
+    @@lang:en
+    @@@:
+      Types of DOM errors, i.e. values for <AG::DOMError.type>. 
+
+PropDef:
+  @QName:
+    DOMCore:type
+  @Description:
+    @@lang:en
+    @@@:
+      The type of a DOM error. 
+  @rdfs:range:
+    DOMCore:DOMErrorType
 
 IF:
   @QName:
@@ -13578,6 +13863,7 @@ IF:
       \
       }
 
+  @ImplementLevel3:
   @Level[list]:  3
   @SpecLevel:3
   @For:
@@ -13627,7 +13913,7 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The processing may continue depending on "DOMError.severity".
+              The processing may continue depending on <A::DOMError.severity>.
         @@@InCase:
           @@@@Value:false
           @@@@Description:
@@ -13642,11 +13928,13 @@ IF:
     @@Description:
       @@@lang:en
       @@@@:
-        Creates a no-op error handler. 
+        Creates a no-op error handler, i.e. a <IF::DOMErrorHandler> 
+        with a <M::DOMErrorHandler.handleError> method that only 
+        returns <DOM::true>. 
     @@Return:
       @@@Type: ManakaiDOMErrorHandler
       @@@PerlDef:
-        $r = bless sub {return false}, ref $self ? ref $self : $self;
+        $r = bless sub {return true}, ref $self ? ref $self : $self;
 ##DOMErrorHandler
 
 IFDef:
@@ -15785,6 +16073,7 @@ IF:
          given node.  Otherwise, this creates a new node 
          with the specified name and replaces the existing node 
          with the new node.
+     @@DOMMain:isNamespaceAware:1
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -16116,7 +16405,7 @@ IF:
           $r->{<Q::DOMCore:nodeType>} = <Q::infoset:Document>;
           $r->{<Q::infoset:version>} = '1.0';
           $r->{<Q::DOMCore:strictErrorChecking>} = true;
-          push @{$r->{<Q::TreeCore:subnode2>}}, <Q::DOMViews:view>;
+          push @{$r->{<Q::TreeCore:subnode>}}, <Q::DOMViews:view>;
           $r->{<Q::DOMViews:view>} = [];
        @@@ImplNote:
          @@@@lang:en
@@ -16862,85 +17151,5 @@ PropDef:
     @@lang:en
     @@@: A related data.
 
-ErrorSet:
-  @Description:
-    @@lang:en
-    @@@:
-      Errors that might be reported during the invocation of the 
-      <M:Document.normalizeDocument> method. 
-
-  @SpecLevel:3
-
-  @Error:
-    @@Name:check-character-normalization-failure
-    @@Description:
-      @@@lang:en
-      @@@@:
-        The parameter <CP:check-character-normalization> is set to
-        <DOM:true> and a string is encountered that fails normalization 
-        checking.
-    @@DOMCore:severity:Error
-    @@DOMCore:relatedData:
-      @@@ImplNote:
-        @@@@lang:en
-        @@@@@:
-          Not specified; it should be the node in which the sequence is. 
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        Used by DOM 3 Core and DOM 3 LS <IF:LSParser>; 
-        see also <Module:DOMLS>.
-
-  @Error:
-    @@Name:cdata-sections-splitted
-    @@Description:
-      @@@lang:en
-      @@@@:
-        <CP:split-cdata-sections> is <DOM:true> and 
-        a <XML:CDATA> section is split.
-    @@DOMCore:severity:Warning
-    @@DOMCore:relatedData:
-      @@@Type:
-        DOMXML:CDATASection
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The first <IF:CDATASection> node in document order 
-          resulting from the split.
-
-  @Error:
-    @@Name:wf-invalid-character-in-node-name
-    @@SubTypeDef:
-      @@@QName:
-        ManakaiDOMCore:normalize-invalid-character
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The parameter <CP:well-formed> is set to <DOM:true> and 
-          the attribute <A:Node.nodeName> contains an invalid character 
-          according to its node type.
-      @@@DOMCore:severity:Error
-    @@SubTypeDef:
-      @@@QName:
-        ManakaiDOMLS:serialize-invalid-character
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          A character that cannot be represented in the output 
-          character encoding is encountered within markup but 
-          outside of attribute values.
-      @@@DOMCore:severity:FatalError
-
-  @Error:
-    @@Name:wf-invalid-character
-    @@Description:
-      @@@lang:en
-      @@@@:
-        <CP::well-formed> is <DOM::true> and the text inside an 
-        <IF:Attr>, <IF:Element>, <IF:Comment>, <IF:Text> or 
-        <IF:CDATASection> node or the data inside 
-        <IF:ProcessingInstruction> node contains an invalid character.
-    @@DOMCore:severity:Error
-## Error:normalizeDocument
 
 ## DOMCore.dis ends here

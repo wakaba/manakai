@@ -28,7 +28,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/01/06 10:41:32 $
+      $Date: 2005/01/07 13:07:14 $
     @@ContentType:
       dis:Date.RCS
   
@@ -494,6 +494,17 @@ ElementTypeBinding:
         ::ManakaiDOM:ManakaiDOMCommon
       @@@For:
         ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOMCommon
+
+ResourceTypeDef:
+  @QName: ErrorClass
+  @FullName:
+    @@lang:en
+    @@@:
+      <IF::DOMCore:DOMError> class
+  @Description:
+    @@lang:en
+    @@@:
+      <IF::DOMError> type and its implementation pairs. 
 
 ResourceTypeDef:
   @QName: 
@@ -3552,12 +3563,19 @@ ResourceDef:
          @@@@lang:en
          @@@@@: 
            A list of DOM implementations that support the desired features. 
+       @@@Description:
+         @@@@lang:en
+         @@@@@:
            \
            {NOTE:: Whilst the returned list itself is a manakai object, 
                    its containing implementation objects might not 
                    be part of manakai.
            \
            }
+           \
+           It may contain a DOM implementation more than one times.
+         @@@@For:
+           ManakaiDOM:ManakaiDOM
        @@@PerlDef:
            __CODE{DOMMain:stringifyFeatures:: $IN => $features,
                                               $OUT => $features}__;
@@ -3999,11 +4017,11 @@ ClassDef:
                   push @n, values %{$node->{$_}};
                 }
               }
-              for (@n, @{$node->{<Q::TreeCore:subnode>}}) {
-                if (ref $node->{$_} eq 'ARRAY') {
-                  push @node, @{$node->{$_}};
-                } elsif (ref $node->{$_} eq 'HASH') {
-                  push @node, values %{$node->{$_}};
+              for (@n, map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}) {
+                if (ref $_ eq 'ARRAY') {
+                  push @node, @$_;
+                } elsif (ref $_ eq 'HASH') {
+                  push @node, values %$_;
                 }
               }
               for (@{$node->{<Q::TreeCore:origin>}}) {
@@ -4031,13 +4049,12 @@ ClassDef:
                   push @n, values %{$node->{$_}};
                 }
               }
-              for (@n, @{$node->{<Q::TreeCore:subnode>}}) {
-                if (ref $node->{$_} eq 'ARRAY') {
+              for (@n, map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}) {
+                if (ref $_ eq 'ARRAY') {
+                  push @node, grep {defined $_->{<Q::TreeCore:nodeID>}} @$_;
+                } elsif (ref $_ eq 'HASH') {
                   push @node, grep {defined $_->{<Q::TreeCore:nodeID>}}
-  \                            @{$node->{$_}}
-                } elsif (ref $node->{$_} eq 'HASH') {
-                  push @node, grep {defined $_->{<Q::TreeCore:nodeID>}}
-                               values %{$node->{$_}};
+                               values %$_;
                 }
               }
               for (@{$node->{<Q::TreeCore:origin>}}) {
@@ -4045,12 +4062,15 @@ ClassDef:
                   if defined $node->{$_} and
                      defined $node->{$_}->{<Q::TreeCore:nodeID>};
               }
-          CORE::delete $node->{$_} for keys %{$node};
+          %$node = ();
         }
     @@ImplNote:
       @@@lang:en
       @@@@:
         This method is different from Perl <Perl::DESTROY> special method.
+        \
+        An <QUOTE::uninitialized> warning in this method might mean 
+        some method puts an <Perl::undef> into a list of nodes. 
 
   @IntMethod:
     @@Name: importTree
@@ -4081,15 +4101,14 @@ ClassDef:
                   push @n, values %{$node->{$_}};
                 }
               }
-  \           for (@n, @{$node->{<Q::TreeCore:subnode>}}) {
-  \             if (ref $node->{$_} eq 'ARRAY') {
+  \           for (@n, map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}) {
+  \             if (ref $_ eq 'ARRAY') {
   \               push @node, grep {$_->{<Q::TreeCore:treeID>} ne
-  \                                 $self->{<Q::TreeCore:treeID>}}
-  \                           @{$node->{$_}}
-                } elsif (ref $node->{$_} eq 'HASH') {
+  \                                 $self->{<Q::TreeCore:treeID>}} @$_;
+                } elsif (ref $_ eq 'HASH') {
                   push @node, grep {$_->{<Q::TreeCore:treeID>} ne
                                     $self->{<Q::TreeCore:treeID>}}
-                              values %{$node->{$_}};
+                              values %$_;
                 }
               }
             for (@{$node->{<Q::TreeCore:origin>}}) {
@@ -4129,13 +4148,12 @@ ClassDef:
                   push @n, values %{$node->{$_}};
                 }
               }
-  \           for (@n, @{$node->{<Q::TreeCore:subnode>}}) {
-  \             if (ref $node->{$_} eq 'ARRAY') {
-  \               push @node, grep {$_->{<Q::TreeCore:treeID>} ne $treeID}
-  \                           @{$node->{$_}}
-                } elsif (ref $node->{$_} eq 'HASH') {
+  \           for (@n, map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}) {
+  \             if (ref $_ eq 'ARRAY') {
+  \               push @node, grep {$_->{<Q::TreeCore:treeID>} ne $treeID} @$_;
+                } elsif (ref $_ eq 'HASH') {
                   push @node, grep {$_->{<Q::TreeCore:treeID>} ne $treeID}
-                              values %{$node->{$_}};
+                              values %$_;
                 }
               }
             for (@{$node->{<Q::TreeCore:origin>}}) {
@@ -4285,6 +4303,7 @@ ClassDef:
       @@@@: DESTROY
     @@Return:
       @@@PerlDef:
+        @@@@@:
           my $node = $self->{<Q::TreeCore:node>};
           if ($node) {
             CORE::delete $self->{<Q::TreeCore:node>};
@@ -4294,40 +4313,36 @@ ClassDef:
               $node-><M::ManakaiDOM:ManakaiDOMNodeObject.destroy>;
             }
           } else {
-            warn q<An object of type ">.ref ($self).
-                 q<" that does not have associated node object is >.
-                 "to be destroied; there might be a memory-leak code"
-              unless $Message::DOM::DOMMain::OnGlobalDestruction;
+            warn ref ($self) . q{->DESTROY: there is no associated }.
+                 q{node object - you have a global variable or }.
+                 qq{potential memory-leak detected\n};
           }
-          END {
-            $Message::DOM::DOMMain::OnGlobalDestruction = true;
-          }
+       @@@@ImplNote:
+         @@@@@lang:en
+         @@@@@@:
+           {P::Warning during the global destruction might mean:
+              \
+              - there be a loop in the manakai internal implementation - 
+                it should be a bug.
+              \
+              - there be a loop created by DOM application, e.g. 
+                event handler.
+              \
+              - there be a global variable that contains a node reference 
+                and it is not altered or <Perl::undef>ed until the global 
+                destruction. 
+              \
+              - or other unknown bad situation.
+              \
+            }
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        Don't override this method unintentionally - for example, 
+        inheritting <PerlModule::Tie::Array> would hide this method 
+        from that class, since that module defines its own 
+        destructor. 
 ##Class:ManakaiDOMNodeReference
-
-ResourceDef:
-  @QName:OnGlobalDestruction
-  @rdf:type:
-    DISPerl:ScalarVariable
-  @AppName:
-    @@@:
-      Message::DOM::DOMMain::OnGlobalDestruction
-    @@ContentType:
-      lang:Perl
-  @For:
-    ManakaiDOM:ManakaiDOMCommon
-  @DefaultValue:
-    @@@:false
-    @@ContentType:
-      dis:Boolean
-  @Type:
-    DOMMain:boolean
-  @Description:
-    @@lang:en
-    @@@:
-      Whether the Perl is during the global destruction or not. 
-      \
-      This flag is turned on by the <Perl::END> code in the 
-      definition of <M::ManakaiDOM:ManakaiDOMNodeReference.destroy>. 
 
 ## -- Manakai implementation-specific exception and warning
 

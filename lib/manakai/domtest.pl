@@ -232,6 +232,7 @@ sub end_of_test () {
     print $REPORT "1..".$Status->{Number}."\n";
     $Status->{Number_local} = 0;
   }
+  delete $Info->{__impl};
 } # end_of_test
 
 =item Special Function C<END>
@@ -534,4 +535,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/01/06 10:41:32 $
+1; # $Date: 2005/01/07 13:07:14 $

@@ -1504,27 +1504,29 @@ sub dis_perl_init_classdef ($;%) {
 
   ## Check resource type
   my $type = $res->{ExpandedURI q<dis2pm:type>} || '';
-  TYPES: for my $t (keys %{$res->{Type}}) {
-    for (ExpandedURI q<ManakaiDOM:DOMMethod>,
+  TYPES: for (
+         ExpandedURI q<ManakaiDOM:DOMMethod>,
          ExpandedURI q<ManakaiDOM:DOMAttribute>,
          ExpandedURI q<ManakaiDOM:DOMMethodParameter>,
          ExpandedURI q<ManakaiDOM:DOMMethodReturn>,
          ExpandedURI q<ManakaiDOM:DOMAttrGet>,
          ExpandedURI q<ManakaiDOM:DOMAttrSet>,
          (defined $mod->{ExpandedURI q<dis2pm:packageName>} ?
-           (ExpandedURI q<ManakaiDOM:Class>,
+           (ExpandedURI q<ManakaiDOM:WarningClass>,
             ExpandedURI q<ManakaiDOM:ExceptionClass>,
-            ExpandedURI q<ManakaiDOM:WarningClass>,
+            ExpandedURI q<DOMMain:ErrorClass>,
+            ExpandedURI q<ManakaiDOM:Class>,
             ExpandedURI q<ManakaiDOM:ExceptionOrWarningSubType>) : ()),
          (defined $mod->{ExpandedURI q<dis2pm:ifPackagePrefix>} ?
-           (ExpandedURI q<ManakaiDOM:IF>,
-            ExpandedURI q<ManakaiDOM:ExceptionIF>) : ()),
+           (ExpandedURI q<ManakaiDOM:ExceptionIF>,
+            ExpandedURI q<ManakaiDOM:IF>) : ()),
          ExpandedURI q<ManakaiDOM:ConstGroup>,
          ExpandedURI q<ManakaiDOM:Const>,
          ExpandedURI q<ManakaiDOM:InCase>,
          ExpandedURI q<ManakaiDOM:DataType>,
          ExpandedURI q<DOMMain:DOMFeature>,
          ExpandedURI q<DISPerl:ScalarVariable>) {
+    for my $t (keys %{$res->{Type}}) {
       if (dis_uri_ctype_match ($_, $t, %opt)) {
         $type = $_;
         last TYPES;
@@ -1537,6 +1539,7 @@ sub dis_perl_init_classdef ($;%) {
   if ({
        ExpandedURI q<ManakaiDOM:Class> => 1,
        ExpandedURI q<ManakaiDOM:ExceptionClass> => 1,
+       ExpandedURI q<DOMMain:ErrorClass> => 1,
        ExpandedURI q<ManakaiDOM:WarningClass> => 1,
       }->{$type}) {
     ## Class package name
@@ -1561,6 +1564,8 @@ sub dis_perl_init_classdef ($;%) {
         for (keys %{$if->{Type}}) {
           if (dis_uri_ctype_match ({
                 ExpandedURI q<ManakaiDOM:Class> => ExpandedURI q<ManakaiDOM:IF>,
+                ExpandedURI q<DOMMain:ErrorClass>
+                                     => ExpandedURI q<ManakaiDOM:IF>,
                 ExpandedURI q<ManakaiDOM:ExceptionClass>
                                      => ExpandedURI q<ManakaiDOM:ExceptionIF>,
                 ExpandedURI q<ManakaiDOM:WarningClass> => 'dummy',
@@ -1775,7 +1780,7 @@ sub dis_perl_init_classdef ($;%) {
   } elsif ({ExpandedURI q<ManakaiDOM:ConstGroup> => 1}->{$type}) {
     ## Constant group name
     my $name = $res->{Name};
-    $res->{ExpandedURI q<dis2pm:constGroupName>} = $name if defined $name;
+    $res->{ExpandedURI q<dis2pm:constGroupName>} = $name;
 
     ## Value type
     my $t = dis_get_attr_node (%opt, name => 'Type', parent => $res->{src});
@@ -1836,13 +1841,42 @@ sub dis_perl_init_classdef ($;%) {
     $State->{ExpandedURI q<dis2pm:parentResource>}
           ->{ExpandedURI q<dis2pm:constGroup>}->{$name} = $res;
   } elsif ({ExpandedURI q<ManakaiDOM:Const> => 1}->{$type}) {
-    ## Constant value name
-    valid_err (qq<Constant value name required>, node => $res->{node})
+    ## - Error severity - if specified, this const defines an error code
+    my $es = dis_get_attr_node (%opt,
+                                name => {uri => ExpandedURI q<DOMCore:severity>},
+                                parent => $res->{src});
+    if ($es) {
+      my $v = $es->value;
+      valid_err (qq<Error severity "$v" is invalid>, node => $es)
+        unless {Warning => 1, Error => 1, FatalError => 1}->{$v};
+      $res->{ExpandedURI q<DOMCore:severity>} = $v;
+    }
+
+    ## - Constant value name
+    valid_err (qq<Constant value name required>, node => $res->{src})
       unless $res->{Name};
-    my $name = $res->{Name};
+    if ($es) {
+      my $ename = dis_get_attr_node (%opt, parent => $res->{src},
+                                     name => 'AppName',
+                                     ContentType =>
+                                       ExpandedURI q<DOMCore:DOMErrorType>);
+      my $v;
+      if ($ename) {
+        $v = $ename->value;
+        $res->{ExpandedURI q<DOMCore:type>} = $v;
+      } else {
+        valid_err (q<DOMError type must have its URI>, node => $res->{src})
+          unless defined $res->{NameURI};
+        $v = $res->{NameURI};
+      }
+      $res->{ExpandedURI q<DOMCore:type>} = $v;
+    }
+    ## Const name
+    my $name = uc $res->{Name};
+    $name =~ tr/-/_/;
     $res->{ExpandedURI q<dis2pm:constName>} = $name;
 
-    ## Value type
+    ## - Value type
     my $t = dis_get_attr_node (%opt, name => 'Type', parent => $res->{src});
     if ($t) {
       $res->{ExpandedURI q<d:Type>}
@@ -1890,6 +1924,7 @@ sub dis_perl_init_classdef ($;%) {
            ExpandedURI q<ManakaiDOM:IF> => 1,
            ExpandedURI q<ManakaiDOM:ExceptionClass> => 1,
            ExpandedURI q<ManakaiDOM:ExceptionIF> => 1,
+           ExpandedURI q<DOMMain:ErrorClass> => 1,
            ExpandedURI q<ManakaiDOM:WarningClass> => 1,
           }->{$res->{ExpandedURI q<dis2pm:parentResource>}
                   ->{ExpandedURI q<dis2pm:type>}}) {
@@ -1903,6 +1938,7 @@ sub dis_perl_init_classdef ($;%) {
            ExpandedURI q<ManakaiDOM:IF> => 1,
            ExpandedURI q<ManakaiDOM:ExceptionClass> => 1,
            ExpandedURI q<ManakaiDOM:ExceptionIF> => 1,
+           ExpandedURI q<DOMMain:ErrorClass> => 1,
            ExpandedURI q<ManakaiDOM:WarningClass> => 1,
           }->{$res->{ExpandedURI q<dis2pm:grandParentResource>}
                   ->{ExpandedURI q<dis2pm:type>}}) {
@@ -1981,11 +2017,40 @@ sub dis_perl_init_classdef ($;%) {
     push @{$State->{ExpandedURI q<dis2pm:parentResource>}
                  ->{ExpandedURI q<dis2pm:inCase>}||=[]}, $res;
   } elsif ({ExpandedURI q<ManakaiDOM:ExceptionOrWarningSubType> => 1}->{$type}) {
-    ## Subtype name
-    my $name = $res->{Name};
-    $res->{ExpandedURI q<dis2pm:subTypeName>} = $name if defined $name;
+    ## - Error severity - if specified, this const defines an error code
+    my $es = dis_get_attr_node (%opt,
+                                name => {uri => ExpandedURI q<DOMCore:severity>},
+                                parent => $res->{src});
+    if ($es) {
+      my $v = $es->value;
+      valid_err (qq<Error severity "$v" is invalid>, node => $es)
+        unless {Warning => 1, Error => 1, FatalError => 1}->{$v};
+      $res->{ExpandedURI q<DOMCore:severity>} = $v;
+    }
 
-    ## Parent exception class/type
+    ## - Subtype name
+    valid_err (qq<Subtype URI required>, node => $res->{src})
+      unless defined $res->{NameURI};
+    if ($es) {
+      my $ename = dis_get_attr_node (%opt, parent => $res->{src},
+                                     name => 'AppName',
+                                     ContentType =>
+                                       ExpandedURI q<DOMCore:DOMErrorType>);
+      my $v;
+      if ($ename) {
+        $v = $ename->value;
+        $res->{ExpandedURI q<DOMCore:type>} = $v;
+      } elsif (defined $State->{ExpandedURI q<dis2pm:parentResource>}
+                             ->{ExpandedURI q<DOMCore:type>}) {
+        $v = $State->{ExpandedURI q<dis2pm:parentResource>}
+                   ->{ExpandedURI q<DOMCore:type>};
+      } else {
+        $v = $res->{NameURI};
+      }
+      $res->{ExpandedURI q<DOMCore:type>} = $v;
+    }
+
+    ## - Parent exception class/type
     $res->{ExpandedURI q<dis2pm:parentResource>}
       = $State->{ExpandedURI q<dis2pm:parentResource>};
     $res->{ExpandedURI q<dis2pm:grandParentResource>}
@@ -2017,6 +2082,7 @@ sub dis_perl_init_classdef ($;%) {
                 qq{must be a "ManakaiDOM:ExceptionClass"}, node => $res->{src}
             unless {
                      ExpandedURI q<ManakaiDOM:ExceptionClass> => 1,
+                     ExpandedURI q<DOMMain:ErrorClass> => 1,
                      ExpandedURI q<ManakaiDOM:WarningClass> => 1,
                    }->{$res->{ExpandedURI q<dis2pm:grandGrandParentResource>}
                            ->{ExpandedURI q<dis2pm:type>}};              
@@ -2034,7 +2100,7 @@ sub dis_perl_init_classdef ($;%) {
         ->{$res} = $res;
 
     $State->{ExpandedURI q<dis2pm:parentResource>}
-          ->{ExpandedURI q<dis2pm:xSubType>}->{$name} = $res;
+          ->{ExpandedURI q<dis2pm:xSubType>}->{$res->{NameURI}} = $res;
   } elsif ($type eq ExpandedURI q<DOMMain:DOMFeature>) {
     ## Feature name/version
     valid_err (q<Feature requires its URI reference>, node => $res->{node})
@@ -2249,7 +2315,9 @@ sub dis_perl_init_classdef ($;%) {
         }
       }
       valid_err q<Unsupported <dis:AppISA> description>, node => $_;
-    } elsif (defined $State->{Type}->{$ln}->{Name}) {
+    }
+
+    if (defined $State->{Type}->{$ln}->{Name}) {
       for (%{$State->{Type}->{$ln}->{Type}}) {
         if (dis_uri_ctype_match (ExpandedURI q<rdf:Property>, $_, %opt)) {
           next N;
@@ -2634,4 +2702,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/01/06 10:41:32 $
+1; # $Date: 2005/01/07 13:07:14 $

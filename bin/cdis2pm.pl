@@ -199,6 +199,7 @@ sub dispm_perl_throws (%) {
   if ($x->{ExpandedURI q<dis2pm:type>} and
       {
         ExpandedURI q<ManakaiDOM:ExceptionClass> => 1,
+        ExpandedURI q<DOMMain:ErrorClass> => 1,
         ExpandedURI q<ManakaiDOM:WarningClass> => 1,
       }->{$x->{ExpandedURI q<dis2pm:type>}}) {
     $opt{type} = $opt{type_resource}->{Name} unless defined $opt{type};
@@ -1559,6 +1560,7 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
        ExpandedURI q<ManakaiDOM:Class> => 1,
        ExpandedURI q<ManakaiDOM:IF> => 1,
        ExpandedURI q<ManakaiDOM:ExceptionClass> => 1,
+       ExpandedURI q<DOMMain:ErrorClass> => 1,
        ExpandedURI q<ManakaiDOM:ExceptionIF> => 1,
        ExpandedURI q<ManakaiDOM:WarningClass> => 1,
       }->{$pack->{ExpandedURI q<dis2pm:type>}}) {
@@ -1761,6 +1763,7 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
     if ({
          ExpandedURI q<ManakaiDOM:Class> => 1,
          ExpandedURI q<ManakaiDOM:ExceptionClass> => 1,
+         ExpandedURI q<DOMMain:ErrorClass> => 1,
          ExpandedURI q<ManakaiDOM:WarningClass> => 1,
         }->{$pack->{ExpandedURI q<dis2pm:type>}}) {
       local $State->{ExpandedURI q<dis2pm:thisClass>} = $pack;
@@ -1997,6 +2000,7 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
       ## -- Error codes
       if ({
            ExpandedURI q<ManakaiDOM:ExceptionClass> => 1,
+           ExpandedURI q<DOMMain:ErrorClass> => 1,
            ExpandedURI q<ManakaiDOM:WarningClass> => 1,
           }->{$pack->{ExpandedURI q<dis2pm:type>}}) {
         $result .= perl_sub
@@ -2010,11 +2014,23 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
                                       dispm_const_value (%opt, resource => $_),
                            description => dispm_muf_description
                                                      (%opt, resource => $_),
+                           ($_->{ExpandedURI q<DOMCore:severity>}
+                              ? (ExpandedURI q<DOMCore:severity>
+                                       => $_->{ExpandedURI q<DOMCore:severity>},
+                                 ExpandedURI q<DOMCore:type>
+                                       => $_->{ExpandedURI q<DOMCore:type>})
+                                    : ()),
                            ExpandedURI q<MDOMX:subtype> => {
                              map {
                                $_->{NameURI} => {
                                  description => dispm_muf_description
                                                      (%opt, resource => $_),
+                                 ($_->{ExpandedURI q<DOMCore:severity>}
+                                    ? (ExpandedURI q<DOMCore:severity>
+                                       => $_->{ExpandedURI q<DOMCore:severity>},
+                                       ExpandedURI q<DOMCore:type>
+                                       => $_->{ExpandedURI q<DOMCore:type>})
+                                    : ()),
                                },
                              } grep {defined $_->{Name}}
                              values %{$_->{ExpandedURI q<dis2pm:xSubType>}||{}}
@@ -2269,4 +2285,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/01/06 10:41:31 $
+1; # $Date: 2005/01/07 13:07:14 $
