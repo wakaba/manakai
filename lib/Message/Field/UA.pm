@@ -1,15 +1,21 @@
 
 =head1 NAME
 
-Message::Field::UA -- Perl module for Internet message
-header field body consist of C<product> tokens
+Message::Field::UA --- Message-pm: User-Agent header fields
+
+=head1 DESCRIPTION
+
+This module provides interface to User-Agent: and other header fields
+which have product-name/product-version pair.
+
+This module is part of Message::* Perl Modules.
 
 =cut
 
 package Message::Field::UA;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 use overload '.='	=> sub { 
@@ -378,7 +384,7 @@ sub replace_system_version ($$;%) {
         @os = (
             $osv[4] == 0? 'Win32s':
             $osv[4] == 1? 'Windows':
-            $osv[4] == 2? 'WindowsNT':
+            $osv[4] == 2? 'Windows NT':
                           'Win32',       \@os_comment);
         @os_comment = (sprintf ('%d.%02d.%d', @osv[1,2], $osv[3] & 0xFFFF));
         push @os_comment, $osv[0] if $osv[0] =~ /[^\x00\x09\x20]/;
@@ -458,7 +464,7 @@ sub replace_rcs ($$;%) {
 
 =head1 LICENSE
 
-Copyright 2002 wakaba E<lt>w@suika.fam.cxE<gt>.
+Copyright 2002 Wakaba <w@suika.fam.cx>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -475,11 +481,6 @@ along with this program; see the file COPYING.  If not, write to
 the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.
 
-=head1 CHANGE
-
-See F<ChangeLog>.
-$Date: 2002/11/13 08:08:52 $
-
 =cut
 
-1;
+1; # $Date: 2002/12/28 08:33:03 $
