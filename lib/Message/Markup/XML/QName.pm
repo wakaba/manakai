@@ -14,7 +14,7 @@ This module is part of manakai XML.
 
 package Message::Markup::XML::QName;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.12.2.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.12.2.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NCNameStartChar InXMLNCNameChar!;
 use Exporter;
 our @ISA = qw/Exporter/;
@@ -24,7 +24,7 @@ our @EXPORT_OK = qw/DEFAULT_PFX ZERO_PFX EMPTY_PFX
                     NULL_URI UNDEF_URI NS_xml_URI NS_xmlns_URI
                     ZERO_URI EMPTY_URI/;
 our %EXPORT_TAGS = (
-  prefix => [qw/DEFAULT_PFX/],
+  prefix => [qw/DEFAULT_PFX ZERO_PFX EMPTY_PFX/],
   'special-uri' => [qw/NULL_URI UNDEF_URI ZERO_URI EMPTY_URI/],
   xml => [qw/NS_xml_URI NS_xmlns_URI/],
 );
@@ -517,4 +517,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/02/22 01:48:26 $
+1; # $Date: 2004/02/24 07:27:12 $
