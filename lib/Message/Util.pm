@@ -16,7 +16,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%FMT2STR %OPTION %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 use Carp ();
 require Message::MIME::EncodedWord;
@@ -458,7 +458,7 @@ sub decode_header_string ($$;%) {
   my $yourself = shift; my $s = shift; my %o = @_;
   $o{charset} ||= $yourself->{option}->{encoding_before_decode};
   $o{charset} = Message::MIME::Charset::name_normalize ($o{charset});
-  my ($t, $r);	## decoded-text, success?
+  my ($t, %r);	## decoded-text, success?
   if ($o{type} !~ /quoted|encoded|domain|word/) {
     my (@s, @r);
     $s =~ s{(([\x09\x20]*(?:\x5C[\x00-\xFF]
@@ -475,18 +475,18 @@ sub decode_header_string ($$;%) {
           }
         }
       } else {
-        my ($u, $q) = ($s[$i], 0);
+        my ($u, %q) = ($s[$i]);
         $u =~ s/\x5C([\x00-\xFF])/$1/g unless $o{type} =~ /text/;
-        ($u,$q) = Message::MIME::Charset::decode ($o{charset}, $u);
-        $s[$i] = $u if $q;
+        ($u,%q) = Message::MIME::Charset::decode ($o{charset}, $u);
+        $s[$i] = $u if $q{success};
       }
     }
-    $t = join '', @s;  $r = 1;
+    $t = join '', @s;  $r{success} = 1;
   } else {
-    ($t,$r) = Message::MIME::Charset::decode ($o{charset}, $s);
+    ($t,%r) = Message::MIME::Charset::decode ($o{charset}, $s);
   }
-  $r ? (value => $t, language => $o{language}):	## suceess
-  (value => $s, language => $o{language},
+  $r{success} ? (value => $t, success => 1, language => $o{language}):	## suceess
+  (value => $s, language => $o{language}, success => 0,
    charset => ($o{charset}=~/\*/?'':$o{charset}));	## fault
 }
 
@@ -512,9 +512,9 @@ sub decode_body_string {
   my $yourself = shift; my $s = shift; my %o = @_;
   $o{charset} ||= $yourself->{option}->{encoding_before_decode};
   $o{charset} = Message::MIME::Charset::name_normalize ($o{charset});
-  my ($t,$r) = Message::MIME::Charset::decode ($o{charset}, $s);
-  $r>0 ? (value => $t):	## suceess
-  (value => $s,
+  my ($t,%r) = Message::MIME::Charset::decode ($o{charset}, $s);
+  $r{success} ? (value => $t, success => 1):	## suceess
+  (value => $s, success => 0,
    charset => ($o{charset}=~/\*/?'':$o{charset}));	## fault
 }
 
@@ -786,7 +786,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/21 03:26:02 $
+$Date: 2002/07/22 02:49:45 $
 
 =cut
 
