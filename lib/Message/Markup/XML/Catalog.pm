@@ -14,7 +14,7 @@ This module is part of SuikaWiki XML support.
 
 package SuikaWiki::Markup::XML::Catalog;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require SuikaWiki::Markup::XML;
 require URI;
 our %NS = (
@@ -283,18 +283,20 @@ sub _resolve_ext_id_w_catalog_file ($$$) {
     for (@{$Catalog{$file}->{'delegate_'.$sys_or_uri}}) {
       if ($_->{original_pfx}
        eq substr ($src_uri, 0, length ($_->{original_pfx}))) {
-        my $new_catalog = $_->{catalog};
-        if ($self->_is_catalog_entry_file_opened ($new_catalog)) {
+        if ($self->_is_catalog_entry_file_opened ($_->{catalog})) {
           $self->{error}->raise_error (undef, type => 'XC_CATALOG_REF_CIRCULAR',
-                                       t => $new_catalog, uri => $file);
+                                       t => $_->{catalog}, uri => $file);
         } else {
-          push @new_catalog, $new_catalog;
+          push @new_catalog, $_;
         }
       }
     }
     if (scalar @new_catalog) {
       my $cat = ref ($self)->new;
       $cat->{parent} = $self;
+      @new_catalog = map {$_->{catalog}}
+                     sort {length ($b->{original_pfx}) <=> length ($a->{original_pfx})}
+                     @new_catalog;
       my $x = $cat->resolve_external_id ({$sys_or_uri => $src_uri}, catalogs => \@new_catalog);
       return $x if $x;
     }
@@ -314,25 +316,28 @@ sub _resolve_ext_id_w_catalog_file ($$$) {
     for (@{$Catalog{$file}->{delegate_public}}) {
       if ($_->{original_pfx}
        eq substr ($xid->{pubid}, 0, length ($_->{original_pfx}))) {
-        my $new_catalog = $_->{catalog};
-        if ($self->_is_catalog_entry_file_opened ($new_catalog)) {
+        if ($self->_is_catalog_entry_file_opened ($_->{catalog})) {
           $self->{error}->raise_error (undef, type => 'XC_CATALOG_REF_CIRCULAR',
-                                       t => $new_catalog, uri => $file);
+                                       t => $_->{catalog}, uri => $file);
         } else {
-          push @new_catalog, $new_catalog;
+          push @new_catalog, $_;
         }
       }
     }
     if (scalar @new_catalog) {
       my $cat = ref ($self)->new;
       $cat->{parent} = $self;
+      @new_catalog = map {$_->{catalog}}
+                     sort {length ($b->{original_pfx}) <=> length ($a->{original_pfx})}
+                     @new_catalog;
       my $x = $cat->resolve_external_id ({public => $xid->{pubid}}, catalogs => \@new_catalog);
       return $x if $x;
     }
   }	# pubid
   
   ## Step 7 or Step 5
-  push @{$self->{current_catalogs}}, map {$_->{catalog}} @{$Catalog{$file}->{additional_catalog}};
+  unshift @{$self->{current_catalogs}},
+          map {$_->{catalog}} @{$Catalog{$file}->{additional_catalog}};
   
   return undef;
 }
@@ -563,4 +568,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/07/05 07:25:49 $
+1; # $Date: 2003/07/06 01:40:36 $
