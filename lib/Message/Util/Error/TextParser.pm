@@ -19,7 +19,7 @@ This module is part of manakai.
 package Message::Util::Error::TextParser;
 require Message::Util::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.3.2.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.3.2.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 sub new ($;%) {
   my $self = bless {}, shift;
@@ -40,7 +40,7 @@ sub set_position ($$;%) {
   }
   my $t = substr ($$s, $pos->{pos}, $length > 0 ? $length : 0);
   ++$pos->{line} and $pos->{char} = 0 
-    while $t =~ /^.+?$self->{option}->{newline}/os;
+    while $t =~ s/^.+?$self->{option}->{newline}//os;
   $pos->{char} += length $t;
   $pos->{pos} += $length;
   $self->{__set_position} = 1;
@@ -143,4 +143,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/02/24 07:29:31 $
+1; # $Date: 2004/02/26 09:02:12 $

@@ -13,7 +13,7 @@ This module is part of manakai XML.
 
 package Message::Markup::XML::Node;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.6.2.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload
   '""'     => \&outer_xml,
   bool     => sub { 
@@ -35,6 +35,8 @@ our @EXPORT_OK = qw(NS_SGML NS_XML
                     XML_ATTLIST);
 our %EXPORT_TAGS = (
   charref => [qw(SGML_NCR SGML_HEX_CHAR_REF)],
+  declaration => [qw(SGML_ATTLIST SGML_DOCTYPE SGML_ELEMENT
+                     SGML_GENERAL_ENTITY SGML_PARAM_ENTITY SGML_NOTATION)],
   entity  => [qw(SGML_GENERAL_ENTITY SGML_PARAM_ENTITY)],
 );
 }
@@ -894,7 +896,7 @@ sub inner_xml ($;%) {
         }
       }
     }
-    Carp::carp 'inner_xml: Unknown document type name' unless $root;
+    Carp::carp 'inner_xml: Document type name unknown' unless $root;
     
     my ($isub, $xid) = ('', $self->external_id);
     for (@{$self->{node}}) {
@@ -1388,4 +1390,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/02/14 11:08:14 $
+1; # $Date: 2004/02/26 09:02:12 $

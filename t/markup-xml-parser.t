@@ -57,10 +57,16 @@ my @a =
   t => q{foo},
   method => 'parse_attribute_value_specification',
   option => {ExpandedURI q<match_or_error> => 1},
-  result => q(0:0:SYNTAX_ALITO_OR_ALITAO_REQUIRED),
+  result => q(0:0:SYNTAX_ATTRIBUTE_VALUE),
  },
  {
   t => q{foo},
+  method => 'parse_attribute_value_specification',
+  option => {ExpandedURI q<match_or_error> => 0},
+  result => q(0:0:SYNTAX_ATTRIBUTE_VALUE),
+ },
+ {
+  t => q{>},
   method => 'parse_attribute_value_specification',
   option => {ExpandedURI q<match_or_error> => 0},
   result => q(1),
@@ -78,41 +84,81 @@ my @a =
  {
   t => q{"foo&amp;bar"},
   method => 'parse_attribute_value_specification',
+  option => {
+             ExpandedURI q<allow-general-entity-reference> => 1,
+             ExpandedURI q<allow-numeric-character-reference> => 1,
+             ExpandedURI q<allow-hex-character-reference> => 1,
+            },
   result => q(1),
  },
  {
   t => q{'foo&amp;bar'},
   method => 'parse_attribute_value_specification',
+  option => {
+             ExpandedURI q<allow-general-entity-reference> => 1,
+             ExpandedURI q<allow-numeric-character-reference> => 1,
+             ExpandedURI q<allow-hex-character-reference> => 1,
+            },
   result => q(1),
  },
  {
   t => q{"foo&#1234;bar"},
   method => 'parse_attribute_value_specification',
+  option => {
+             ExpandedURI q<allow-general-entity-reference> => 1,
+             ExpandedURI q<allow-numeric-character-reference> => 1,
+             ExpandedURI q<allow-hex-character-reference> => 1,
+            },
   result => q(1),
  },
  {
   t => q{'foo&#1234;bar'},
   method => 'parse_attribute_value_specification',
   result => q(1),
+  option => {
+             ExpandedURI q<allow-general-entity-reference> => 1,
+             ExpandedURI q<allow-numeric-character-reference> => 1,
+             ExpandedURI q<allow-hex-character-reference> => 1,
+            },
  },
  {
   t => q{"foo&#xE234;bar"},
   method => 'parse_attribute_value_specification',
+  option => {
+             ExpandedURI q<allow-general-entity-reference> => 1,
+             ExpandedURI q<allow-numeric-character-reference> => 1,
+             ExpandedURI q<allow-hex-character-reference> => 1,
+            },
   result => q(1),
  },
  {
   t => q{'foo&#xE234;bar'},
   method => 'parse_attribute_value_specification',
+  option => {
+             ExpandedURI q<allow-general-entity-reference> => 1,
+             ExpandedURI q<allow-numeric-character-reference> => 1,
+             ExpandedURI q<allow-hex-character-reference> => 1,
+            },
   result => q(1),
  },
  {
   t => q{"foo&#SPACE;bar"},
   method => 'parse_attribute_value_specification',
+  option => {
+             ExpandedURI q<allow-general-entity-reference> => 1,
+             ExpandedURI q<allow-numeric-character-reference> => 1,
+             ExpandedURI q<allow-hex-character-reference> => 1,
+            },
   result => q(0:6:SYNTAX_NAMED_CHARACTER_REFERENCE),
  },
  {
   t => q{"foo&#XE234;bar"},
   method => 'parse_attribute_value_specification',
+  option => {
+             ExpandedURI q<allow-general-entity-reference> => 1,
+             ExpandedURI q<allow-numeric-character-reference> => 1,
+             ExpandedURI q<allow-hex-character-reference> => 1,
+            },
   result => q(0:6:SYNTAX_HCRO_CASE),
  },
  {
@@ -133,16 +179,31 @@ my @a =
  {
   t => q{"foo&#x0120 bar"},
   method => 'parse_attribute_value_specification',
+  option => {
+             ExpandedURI q<allow-general-entity-reference> => 1,
+             ExpandedURI q<allow-numeric-character-reference> => 1,
+             ExpandedURI q<allow-hex-character-reference> => 1,
+            },
   result => q(0:11:SYNTAX_REFC_REQUIRED),
  },
  {
   t => q{"foo&#0120 bar"},
   method => 'parse_attribute_value_specification',
+  option => {
+             ExpandedURI q<allow-general-entity-reference> => 1,
+             ExpandedURI q<allow-numeric-character-reference> => 1,
+             ExpandedURI q<allow-hex-character-reference> => 1,
+            },
   result => q(0:10:SYNTAX_REFC_REQUIRED),
  },
  {
   t => q{"foo&amp bar"},
   method => 'parse_attribute_value_specification',
+  option => {
+             ExpandedURI q<allow-general-entity-reference> => 1,
+             ExpandedURI q<allow-numeric-character-reference> => 1,
+             ExpandedURI q<allow-hex-character-reference> => 1,
+            },
   result => q(0:8:SYNTAX_REFC_REQUIRED),
  },
  {
@@ -233,9 +294,24 @@ my @a =
   result => q(0:14:SYNTAX_S_REQUIRED_BETWEEN_ATTR_SPEC),
  },
  {
+  t => q{<foo bar="bazbaz="bar">},
+  method => 'parse_start_tag',
+  result => q(0:18:SYNTAX_S_REQUIRED_BETWEEN_ATTR_SPEC),
+ },
+ {
+  t => q{<foo "baz"baz="bar">},
+  method => 'parse_start_tag',
+  result => q(0:5:SYNTAX_STAGC_OR_NESTC_REQUIRED),
+ },
+ {
   t => q{<foo="bar">},
   method => 'parse_start_tag',
   result => q(0:4:SYNTAX_STAGC_OR_NESTC_REQUIRED),
+ },
+ {
+  t => q{<foo a=bar>},
+  method => 'parse_start_tag',
+  result => q(0:7:SYNTAX_ATTRIBUTE_VALUE),
  },
  {
   t => q{<foo/>},
@@ -371,7 +447,7 @@ my @a =
  {
   t => q{<!-- comment -- >},
   method => 'parse_markup_declaration',
-  result => q(0:16:SYNTAX_S_IN_COMMENT_DECLARATION),
+  result => q(0:15:SYNTAX_S_IN_COMMENT_DECLARATION),
  },
 
  {
@@ -442,6 +518,275 @@ my @a =
   result => q(1),
  },
 
+ {
+  t => q{<!foo>},
+  method => 'parse_markup_declaration',
+  result => q(0:2:SYNTAX_UNKNOWN_MARKUP_DECLARATION),
+ },
+
+ {
+  t => q{<!DOCTYPE>},
+  method => 'parse_markup_declaration',
+  result => q(0:9:SYNTAX_DOCTYPE_PS_REQUIRED),
+ },
+ {
+  t => q{<!DOCTYPE >},
+  method => 'parse_markup_declaration',
+  result => q(0:10:SYNTAX_DOCTYPE_NAME_REQUIRED),
+ },
+ {
+  t => q{<!DOCTYPE name>},
+  method => 'parse_markup_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!DOCTYPE #IMPLIED>},
+  method => 'parse_markup_declaration',
+  result => q(0:11:SYNTAX_DOCTYPE_IMPLIED),
+ },
+ {
+  t => q{<!DOCTYPE #keyword>},
+  method => 'parse_markup_declaration',
+  result => q(0:11:SYNTAX_DOCTYPE_RNI_KEYWORD),
+ },
+ {
+  t => q{<!DOCTYPE#IMPLIED>},
+  method => 'parse_markup_declaration',
+  result => q(0:9:SYNTAX_DOCTYPE_PS_REQUIRED),
+ },
+ {
+  t => q{<!DOCTYPE name >},
+  method => 'parse_markup_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!DOCTYPE name PUBLIC>},
+  method => 'parse_markup_declaration',
+  result => q(0:21:SYNTAX_DOCTYPE_PS_REQUIRED),
+ },
+ {
+  t => q{<!DOCTYPE name PUBLIC >},
+  method => 'parse_markup_declaration',
+  result => q(0:22:SYNTAX_PUBID_LITERAL_REQUIRED),
+ },
+ {
+  t => q{<!DOCTYPE name PUBLIC[]>},
+  method => 'parse_markup_declaration',
+  result => q(0:21:SYNTAX_DOCTYPE_PS_REQUIRED),
+ },
+ {
+  t => q{<!DOCTYPE name PUBLIC []>},
+  method => 'parse_markup_declaration',
+  result => q(0:22:SYNTAX_PUBID_LITERAL_REQUIRED),
+ },
+ {
+  t => q{<!DOCTYPE name PUBLIC"pubid">},
+  method => 'parse_markup_declaration',
+  result => q(0:21:SYNTAX_DOCTYPE_PS_REQUIRED),
+ },
+ {
+  t => q{<!DOCTYPE name PUBLIC "pubid">},
+  method => 'parse_markup_declaration',
+  result => q(0:29:SYNTAX_DOCTYPE_PS_REQUIRED),
+ },
+ {
+  t => q{<!DOCTYPE name PUBLIC 'pubid'>},
+  method => 'parse_markup_declaration',
+  result => q(0:29:SYNTAX_DOCTYPE_PS_REQUIRED),
+ },
+ {
+  t => q{<!DOCTYPE name PUBLIC "pubid},
+  method => 'parse_markup_declaration',
+  result => q(0:28:SYNTAX_PUBLIT_MLITC_REQUIRED),
+ },
+ {
+  t => q{<!DOCTYPE name PUBLIC 'pubid},
+  method => 'parse_markup_declaration',
+  result => q(0:28:SYNTAX_PUBLIT_MLITAC_REQUIRED),
+ },
+ {
+  t => q{<!DOCTYPE name PUBLIC "pubid" >},
+  method => 'parse_markup_declaration',
+  result => q(0:30:SYNTAX_SYSTEM_LITERAL_REQUIRED),
+ },
+ {
+  t => q{<!DOCTYPE name PUBLIC 'pubid' >},
+  method => 'parse_markup_declaration',
+  result => q(0:30:SYNTAX_SYSTEM_LITERAL_REQUIRED),
+ },
+ {
+  t => q{<!DOCTYPE name PUBLIC "pub<id" "">},
+  method => 'parse_markup_declaration',
+  result => q(0:26:SYNTAX_PUBID_LITERAL_INVALID_CHAR),
+ },
+ {
+  t => q{<!DOCTYPE name PUBLIC "pubid" "sysid">},
+  method => 'parse_markup_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!DOCTYPE name PUBLIC "pubid" "sysid" >},
+  method => 'parse_markup_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!DOCTYPE name PUBLIC "pubid" "sys<>id">},
+  method => 'parse_markup_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!DOCTYPE name PUBLIC "pubid" 'sysid'>},
+  method => 'parse_markup_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!DOCTYPE name PUBLIC "pubid" 'sysid' >},
+  method => 'parse_markup_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!DOCTYPE name PUBLIC "pubid" "sysid>},
+  method => 'parse_markup_declaration',
+  result => q(0:37:SYNTAX_SLITC_REQUIRED),
+ },
+ {
+  t => q{<!DOCTYPE name PUBLIC "pubid" 'sysid>},
+  method => 'parse_markup_declaration',
+  result => q(0:37:SYNTAX_SLITAC_REQUIRED),
+ },
+ 
+ {
+  t => q{<!DOCTYPE name SYSTEM>},
+  method => 'parse_markup_declaration',
+  result => q(0:21:SYNTAX_DOCTYPE_PS_REQUIRED),
+ },
+ {
+  t => q{<!DOCTYPE name SYSTEM >},
+  method => 'parse_markup_declaration',
+  result => q(0:22:SYNTAX_SYSTEM_LITERAL_REQUIRED),
+ },
+ {
+  t => q{<!DOCTYPE name SYSTEM[]>},
+  method => 'parse_markup_declaration',
+  result => q(0:21:SYNTAX_DOCTYPE_PS_REQUIRED),
+ },
+ {
+  t => q{<!DOCTYPE name SYSTEM []>},
+  method => 'parse_markup_declaration',
+  result => q(0:22:SYNTAX_SYSTEM_LITERAL_REQUIRED),
+ },
+ { 
+  t => q{<!DOCTYPE name SYSTEM"sysid">},
+  method => 'parse_markup_declaration',
+  result => q(0:21:SYNTAX_DOCTYPE_PS_REQUIRED),
+ },
+ {
+  t => q{<!DOCTYPE name SYSTEM'sysid'>},
+  method => 'parse_markup_declaration',
+  result => q(0:21:SYNTAX_DOCTYPE_PS_REQUIRED),
+ },
+ {
+  t => q{<!DOCTYPE name SYSTEM "sysid">},
+  method => 'parse_markup_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!DOCTYPE name SYSTEM "sysid" >},
+  method => 'parse_markup_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!DOCTYPE name SYSTEM 'sysid'>},
+  method => 'parse_markup_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!DOCTYPE name SYSTEM 'sysid' >},
+  method => 'parse_markup_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!DOCTYPE name SYSTEM "sysid},
+  method => 'parse_markup_declaration',
+  result => q(0:28:SYNTAX_SLITC_REQUIRED),
+ },
+ {
+  t => q{<!DOCTYPE name SYSTEM 'sysid},
+  method => 'parse_markup_declaration',
+  result => q(0:28:SYNTAX_SLITAC_REQUIRED),
+ },
+ {
+  t => q{<!DOCTYPE name system},
+  method => 'parse_markup_declaration',
+  result => q(0:15:SYNTAX_MARKUP_DECLARATION_UNKNOWN_KEYWORD),
+ },
+
+ {
+  t => q{<!DOCTYPE name[]>},
+  method => 'parse_markup_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!DOCTYPE name []>},
+  method => 'parse_markup_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!DOCTYPE name PUBLIC "pubid" "sysid"[]>},
+  method => 'parse_markup_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!DOCTYPE name PUBLIC "pubid" "sysid" []>},
+  method => 'parse_markup_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!DOCTYPE name PUBLIC "pubid" 'sysid'[]>},
+  method => 'parse_markup_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!DOCTYPE name PUBLIC "pubid" 'sysid' []>},
+  method => 'parse_markup_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!DOCTYPE name PUBLIC "pubid" 'sysid'[] >},
+  method => 'parse_markup_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!DOCTYPE name PUBLIC "pubid" 'sysid' [] >},
+  method => 'parse_markup_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!DOCTYPE name [] SYSTEM 'sysid'},
+  method => 'parse_markup_declaration',
+  result => q(0:18:SYNTAX_MDC_REQUIRED),
+ },
+
+ {
+  t => q{<!DOCTYPE name SYSTEM ""[ <!-- --> ]>},
+  method => 'parse_markup_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!DOCTYPE name SYSTEM ""[ <!-- --> <!> ]>},
+  method => 'parse_markup_declaration',
+  result => q(0:35:SYNTAX_EMPTY_COMMENT_DECLARATION),
+ },
+ {
+  t => q{<!DOCTYPE name SYSTEM ""[ <!-- -- -- --> ]>},
+  method => 'parse_markup_declaration',
+  result => q(0:33:SYNTAX_S_IN_COMMENT_DECLARATION),
+ },
+ {
+  t => q{<!DOCTYPE name SYSTEM ""[ <!-- --> ]  },
+  method => 'parse_markup_declaration',
+  result => q(0:38:SYNTAX_MDC_REQUIRED),
+ },
 );
 
 plan tests => scalar @a;

@@ -14,13 +14,13 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::NodeTree;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Message::Markup::XML::Parser::NodeTree;
 push our @ISA, 'Message::Markup::XML::Parser';
 use Message::Markup::XML::Parser;
 use Message::Markup::XML::QName qw/:prefix/;
-use Message::Markup::XML::Node qw/:charref :entity/;
+use Message::Markup::XML::Node qw/:charref :declaration :entity/;
 
 sub URI_CONFIG () {
   q<http://suika.fam.cx/~wakaba/-temp/2004/2/22/Parser/TreeConstruct/>
@@ -123,7 +123,7 @@ sub attribute_value_specification_start ($$$$%) {
 sub attribute_value_specification_content ($$$$%) {
   my ($self, $src, $p, $pp, %opt) = @_;
   $p->{ExpandedURI q<tree:attribute-value>}
-    ->append_text ($pp->{ExpandedURI q<CDATA>});
+    ->append_text (${$pp->{ExpandedURI q<CDATA>}});
 }
 
 sub general_entity_reference_in_attribute_value_literal_start ($$$$%) {
@@ -180,6 +180,22 @@ sub hex_character_reference_in_content_start ($$$$%) {
                 value => $pp->{ExpandedURI q<character-number>});
 }
 
+sub doctype_declaration_start ($$$$%) {
+  my ($self, $src, $p, $pp, %opt) = @_;
+  $pp->{ExpandedURI q<tree:current>}
+    = my $doctype
+    = $p->{ExpandedURI q<tree:current>}
+        ->append_new_node
+            (type => '#declaration',
+             namespace_uri => SGML_DOCTYPE);
+}
+
+sub doctype_declaration_end ($$$$%) {
+  my ($self, $src, $p, $pp, %opt) = @_;
+  $pp->{ExpandedURI q<tree:current>}
+     ->set_attribute (qname => ${$pp->{ExpandedURI q<doctype>} || \""});
+}
+
 sub comment_declaration_start ($$$$%) {
   my ($self, $src, $p, $pp, %opt) = @_;
   $pp->{ExpandedURI q<tree:current>}
@@ -203,10 +219,6 @@ sub comment_content ($$$$%) {
 sub processing_instruction_start ($$$$%) {
   my ($self, $src, $p, $pp, %opt) = @_;
   my $target_name = $pp->{ExpandedURI q<target-name>};
-  $pp->{ExpandedURI q<tree:pi-parse-style>} = {
-    zml => ExpandedURI q<tree:pseudo-attribute-noref>,
-    'xml-stylesheet' => ExpandedURI q<tree:pseudo-attribute>,
-  }->{$target_name};
   if ($target_name eq 'xml') {
     if ($opt{ExpandedURI q<allow-xml-declaration>}) {
       $pp->{ExpandedURI q<tree:pi-parse-style>}
@@ -250,11 +262,7 @@ sub processing_instruction_content ($$$$%) {
   my $style = $pp->{ExpandedURI q<tree:pi-parse-style>} || '';
   my $pi = $pp->{ExpandedURI q<tree:current>};
   my $data = $pp->{ExpandedURI q<target-data>};
-  if ($style eq ExpandedURI q<tree:pseudo-attribute>) {
-
-  } elsif ($style eq ExpandedURI q<tree:pseudo-attribute-noref>) {
-
-  } elsif ($style eq ExpandedURI q<tree:xml-declaration>) {
+  if ($style eq ExpandedURI q<tree:xml-declaration>) {
     $style = $pp->{ExpandedURI q<tree:xml-pi-type>};
     $self->parse_attribute_specifications
               ($data, $pp,
@@ -262,7 +270,9 @@ sub processing_instruction_content ($$$$%) {
                ExpandedURI q<s-before-attribute-specifications> => ' ',
                ExpandedURI q<allow-numeric-character-reference> => 0,
                ExpandedURI q<allow-hex-character-reference> => 0,
-               ExpandedURI q<allow-general-entity-reference> => 0);
+               ExpandedURI q<allow-general-entity-reference> => 0,
+               ExpandedURI q<match_or_error> => 1,
+               ExpandedURI q<attr-specs-only> => 1);
     my $attr = $pp->{ExpandedURI q<tree:attribute>};
     my $sep = $pp->{ExpandedURI q<tree:s-between-attribute-specifications>};
     if ($attr->[0] and $attr->[0]->[0] eq 'version') {
@@ -416,4 +426,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/02/24 07:25:10 $
+1; # $Date: 2004/02/26 09:02:12 $

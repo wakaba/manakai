@@ -438,6 +438,43 @@ my @a = (
           option => {ExpandedURI q<allow-xml-declaration> => 1},
           error => q(0:28:SYNTAX_XML_UNKNOWN_ATTR),
          },
+         {
+          t => q{<?xml <#version="1.&#x31;" ?>},
+          method => 'parse_processing_instruction',
+          option => {ExpandedURI q<allow-xml-declaration> => 1},
+          error => q(0:6:SYNTAX_ATTR_SPEC_REQUIRED),
+         },
+         {
+          t => qq{<?xml version="&version;" ?>},
+          method => 'parse_processing_instruction',
+          option => {ExpandedURI q<allow-xml-declaration> => 1},
+          error => q(0:15:SYNTAX_GENERAL_ENTREF),
+         },
+         {
+          t => q{<?xml version="1.&#x31;" ?>},
+          method => 'parse_processing_instruction',
+          option => {ExpandedURI q<allow-xml-declaration> => 1},
+          error => q(0:17:SYNTAX_HEX_CHAR_REF),
+         },
+         {
+          t => qq{<?xml version="-&#31;-" ?>},
+          method => 'parse_processing_instruction',
+          option => {ExpandedURI q<allow-xml-declaration> => 1},
+          error => q(0:16:SYNTAX_NUMERIC_CHAR_REF),
+         },
+
+         {
+          t => q{<!DOCTYPE root>},
+          method => q(parse_markup_declaration),
+          result => [q{<!DOCTYPE root>},
+                     q{<!DOCTYPE root []>}],
+         },
+         {
+          t => q{<!DOCTYPE root[]>},
+          method => q(parse_markup_declaration),
+          result => [q{<!DOCTYPE root>},
+                     q{<!DOCTYPE root []>}],
+         },
 );
 
 plan tests => scalar @a;

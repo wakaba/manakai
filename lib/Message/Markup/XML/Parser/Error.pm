@@ -14,7 +14,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Message::Markup::XML::Parser::Error;
 require Message::Util::Error::TextParser;
@@ -50,6 +50,14 @@ sub ___error_def () {+{
     description => q(lit (") or lita (') opening attribute value literal expected),
     level => 'ebnf',
   },
+  SYNTAX_ATTR_SPEC_REQUIRED => {
+    description => q(Attribute specification expected),
+    level => 'ebnf',
+  },
+  SYNTAX_ATTRIBUTE_VALUE => {
+    description => q(Attribute value specification must be an attribute value literal),
+    level => 'ebnf',
+  },
   SYNTAX_COMC_REQUIRED => {
     description => q(com (--) closing comment required),
     level => 'ebnf',
@@ -60,6 +68,30 @@ sub ___error_def () {+{
   },
   SYNTAX_COMMENT_DECLARATION_REQUIRED => {
     description => q(Comment declaration expected),
+    level => 'ebnf',
+  },
+  SYNTAX_DOCTYPE_DECLARATION_REQUIRED => {
+    description => q(Document type declaration expected),
+    level => 'ebnf',
+  },
+  SYNTAX_DOCTYPE_IMPLIED => {
+    description => q(Keyword "IMPLIED" cannot be used as document type name),
+    level => 'ebnf',
+  },
+  SYNTAX_DOCTYPE_NAME_REQUIRED => {
+    description => q(Document type name required),
+    level => 'ebnf',
+  },
+  SYNTAX_DOCTYPE_PS_REQUIRED => {
+    description => q(ps (whitespace) required between parameters),
+    level => 'ebnf',
+  },
+  SYNTAX_DOCTYPE_RNI_KEYWORD => {
+    description => q(Reserved name cannot be used as document type name),
+    level => 'ebnf',
+  },
+  SYNTAX_DOCTYPE_SUBSET_INVALID_CHAR => {
+    description => q(Document type declaration subset cannot contain character "%t (name => char);"),
     level => 'ebnf',
   },
   SYNTAX_ELEMENT_TYPE_NAME_FOLLOWING_ETAGO_REQUIRED => {
@@ -85,12 +117,24 @@ sub ___error_def () {+{
     description => q(tagc (>) terminating end tag required),
     level => 'ebnf',
   },
+  SYNTAX_EXCLAMATION_OR_QUESTION_REQUIRED => {
+    description => q(EXCLAMATION MARK (!) for mdo (<!) or QUESTION MARK (?) for pio (<?) expected just after LESS-THAN SIGN (<)),
+    level => 'ebnf',
+  },
+  SYNTAX_GENERAL_ENTREF => {
+    description => q(General entity reference not allowed),
+    level => 'ebnf',
+  },
   SYNTAX_HASH_OR_NAME_REQUIRED => {
     description => q("#" or Name expected after "&"),
     level => 'ebnf',
   },
   SYNTAX_HCRO_CASE => {
     description => q(Third character of hcro (&#x) must be a LATIN SMALL LETTER X (x)),
+    level => 'ebnf',
+  },
+  SYNTAX_HEX_CHAR_REF => {
+    description => q(Hexademical character reference not allowed),
     level => 'ebnf',
   },
   SYNTAX_HEXDIGIT_REQUIRED => {
@@ -101,9 +145,20 @@ sub ___error_def () {+{
     description => q(Markup declaration expected),
     level => 'ebnf',
   },
+  SYNTAX_MARKUP_DECLARATION_TOO_MANY_PARAM => {
+    description => q(Too many parameters),
+    level => 'ebnf',
+  },
+  SYNTAX_MARKUP_DECLARATION_UNKNOWN_KEYWORD => {
+    description => q(Unknown markup declaration parameter "%t (name => keyword);" specified),
+    level => 'ebnf',
+  },
   SYNTAX_MDC_FOR_COMMENT_REQUIRED => {
     description => q(mdc (>) closing comment declaration required),
     level => 'ebnf',
+  },
+  SYNTAX_MDC_REQUIRED => {
+    description => q(mdc (>) closing markup declaration required),
   },
   SYNTAX_MULTIPLE_COMMENT => {
     description => q(Multiple comment in one comment declaration not allowed),
@@ -121,6 +176,14 @@ sub ___error_def () {+{
     description => q(net (>) required just after nestc (/)),
     level => 'ebnf',
   },
+  SYNTAX_NUMERIC_CHAR_REF => {
+    description => q(Numeric character reference not allowed),
+    level => 'ebnf',
+  },
+  SYNTAX_PARAMETER_REQUIRED => {
+    description => q(Markup declaration parameter required),
+    level => 'ebnf',
+  },
   SYNTAX_PI_TARGET_XML => {
     description => q(Name "%t (name => target-name);" cannot be used as target name for processing instruction),
     level => 'ebnf',
@@ -131,6 +194,26 @@ sub ___error_def () {+{
   },
   SYNTAX_PROCESSING_INSTRUCTION_REQUIRED => {
     description => q(Processing instruction expected),
+    level => 'ebnf',
+  },
+  SYNTAX_PUBID_LITERAL_INVALID_CHAR => {
+    description => q(Public identifier literal cannot contains character "%t (name => char);"),
+    level => 'ebnf',
+  },
+  SYNTAX_PUBID_LITERAL_REQUIRED => {
+    description => q(Public identifier literal expected),
+    level => 'ebnf',
+  },
+  SYNTAX_PUBLIC_ID => {
+    description => q(Public identifier not allowed),
+    level => 'ebnf',
+  },
+  SYNTAX_PUBLIT_MLITC_REQUIRED => {
+    description => q(lit (") closing public identifier literal required),
+    level => 'ebnf',
+  },
+  SYNTAX_PUBLIT_MLITAC_REQUIRED => {
+    description => q(lita (') closing public identifier literal required),
     level => 'ebnf',
   },
   SYNTAX_REFC_REQUIRED => {
@@ -157,6 +240,14 @@ sub ___error_def () {+{
     description => q(SOLIDUS (/) expected),
     level => 'ebnf',
   },
+  SYNTAX_SLITC_REQUIRED => {
+    description => q(lit (") closing system literal required),
+    level => 'ebnf',
+  },
+  SYNTAX_SLITAC_REQUIRED => {
+    description => q(lita (') closing system literal required),
+    level => 'ebnf',
+  },
   SYNTAX_STAGC_OR_NESTC_REQUIRED => {
     description => q(stagc (>) or nestc (/) expected),
     level => 'ebnf',
@@ -169,12 +260,28 @@ sub ___error_def () {+{
     description => q(Start tag not allowed),
     level => 'ebnf',
   },
+  SYNTAX_SYSTEM_ID => {
+    description => q(System identifier not allowed),
+    level => 'ebnf',
+  },
+  SYNTAX_SYSTEM_ID_REQUIRED => {
+    description => q(System identifier required),
+    level => 'ebnf',
+  },
+  SYNTAX_SYSTEM_LITERAL_REQUIRED => {
+    description => q(System literal for system identifier required),
+    level => 'ebnf',
+  },
   SYNTAX_TAG_REQUIRED => {
     description => q(Tag expected),
     level => 'ebnf',
   },
   SYNTAX_TARGET_NAME_REQUIRED => {
     description => q(Target name for processing instruction required),
+    level => 'ebnf',
+  },
+  SYNTAX_UNKNOWN_MARKUP_DECLARATION => {
+    description => q(Markup declaration "%t (name => keyword);" not allowed),
     level => 'ebnf',
   },
   SYNTAX_VI_REQUIRED => {
@@ -351,4 +458,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/02/24 07:25:10 $
+1; # $Date: 2004/02/26 09:02:12 $
