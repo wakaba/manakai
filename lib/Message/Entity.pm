@@ -13,7 +13,7 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.35 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.36 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::Header;
@@ -152,7 +152,6 @@ C<field-name>-C<field-body> pairs and/or options as parameters to the constructo
 Example:
 
  $msg = new Message::Entity
-        Date         => 'Thu, 03 Feb 1994 00:00:00 +0000',
         Content_Type => 'text/html',
         X_URI => '<http://www.foo.example/>',
         -format => 'mail-rfc2822'	## not to be header field
@@ -593,7 +592,7 @@ sub stringify ($;%) {
         $hdr->field ($option{fill_ua_name})->add_our_name (
           -use_Config	=> $option{ua_use_Config},
           -use_Win32	=> $option{ua_use_Win32},
-          -date	=> q$Date: 2002/07/28 00:31:38 $,
+          -date	=> q$Date: 2002/08/01 09:20:34 $,
         );
       }
     } if $option{fill_missing_fields};
@@ -799,6 +798,60 @@ sub destination ($;%) {
            $hdr->field ('bcc')->addr_spec);
   }
   @to;
+}
+
+sub list_name ($) {
+  my $self = shift;
+  my $hdr = $self->{header};
+  if ($hdr->field_exist ('list-id')) {
+    my $lname = $hdr->field ('list-id')->display_name;
+    return $lname if length $lname;
+  }
+  my $v = sub {
+    my $name = shift;
+    my $f = $hdr->field ($name, -new_item_unless_exist => 0);
+    return $f->value if ref $f;
+    undef;
+  };
+  ## BUG: list-name "0" is not supported.
+  my $lname = &$v ('x-ml-name') || &$v ('x-mailing-list-name')
+           || &$v ('x-mailinglist-name') || &$v ('ml-name');
+  return $lname if length $lname;
+  if ($hdr->field_exist ('x-sequence')) {
+    if ($hdr->field ('x-sequence')->value =~ /^(\S+)\s+\d+$/) {
+      return $1;
+    }
+  }
+  if ($hdr->field_exist ('subject')) {
+    return $hdr->field ('subject')->list_name;
+  }
+  undef;
+}
+
+sub list_count ($) {
+  my $self = shift;
+  my $hdr = $self->{header};
+  my $v = sub {
+    my $name = shift;
+    my $f = $hdr->field ($name, -new_item_unless_exist => 0);
+    return $f->value if ref $f;
+    undef;
+  };
+  ## BUG: list-count 0 is not supported.
+  my $lc = &$v ('x-mail-count') || &$v ('x-ml-count') || &$v ('x-mailinglist-id')
+           || &$v ('mail-count') || &$v ('x-article-no') || &$v ('x-ml-counter')
+           || &$v ('x-ml-id') || &$v ('x-ml-sequence') || &$v ('x-serial-no')
+           || &$v ('x-seqno');
+  return $lc if $lc;
+  if ($hdr->field_exist ('x-sequence')) {
+    if ($hdr->field ('x-sequence')->value =~ /^\S+\s+(\d+)$/) {
+      return $1;
+    }
+  }
+  if ($hdr->field_exist ('subject')) {
+    return $hdr->field ('subject')->list_count;
+  }
+  undef;
 }
 
 =back
@@ -1063,7 +1116,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/28 00:31:38 $
+$Date: 2002/08/01 09:20:34 $
 
 =cut
 
