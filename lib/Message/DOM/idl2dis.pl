@@ -247,7 +247,7 @@ for my $module ($tree->append_new_node (type => '#element',
   $module->set_attribute (Name => q<## TBD ##>);
   $module->set_attribute (Namespace => q<:: TBD ::>);
   $module->set_attribute (License => q<license:Perl>);
-  $module->set_attribute ('Date.RCS' => q<$Date: 2004/08/22 07:44:24 $>);
+  $module->set_attribute ('Date.RCS' => q<$Date: 2004/08/29 13:34:38 $>);
 }
 
 fws $s;
@@ -388,7 +388,8 @@ while (pos $$s < length $$s) {
     fws $s;
   } elsif ($$s =~ /\Gvaluetype\b/gc) {
     fws $s;
-    my $valtype = $r->append_new_node (type => '#element', local_name => 'Type');
+    my $valtype = $r->append_new_node (type => '#element',
+                                       local_name => 'DataType');
     my $type = type $s or err $s;
     $valtype->set_attribute (Name => $type);
     fws $s;
@@ -401,7 +402,7 @@ while (pos $$s < length $$s) {
     my $type = type $s or err $s;
     fws $s;
     my $valtype = $r->append_new_node (type => '#element', 
-                                       local_name => 'TypeAlias');
+                                       local_name => 'DataTypeAlias');
     my $name = type $s or err $s;
     $valtype->set_attribute (Name => $name);
     $valtype->set_attribute (Type => $type);

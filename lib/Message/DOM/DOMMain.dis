@@ -29,7 +29,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/08/22 07:44:24 $
+     $Date: 2004/08/29 13:34:38 $
   @Require:
     @@Module:
       @@@Def:
@@ -40,9 +40,15 @@ Module:
         @@@@lang:en
         @@@@@: Perl operator overloading pragma.
     @@Module:
-      @@@Name: ManakaiDOM
-      @@@Namespace:
-        http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+      @@@Name: DOMMain
+      @@@Def:
+      @@@Def:
+        @@@@Type: 
+          lang:Perl
+        @@@@@: 0;
+      @@@Description:
+        @@@@lang:en
+        @@@@@: Dummy.
     @@Module:
       @@@Name: DOMCore
       @@@Namespace:
@@ -53,39 +59,46 @@ Module:
           DOM Core module.  Note that DOMCore module in turn
           requires this (DOMMain) module.
 
+  @ConditionDef:
+    @@Name: DOM1
+  @ConditionDef:
+    @@Name: DOM2
+  @ConditionDef:
+    @@Name: DOM3
+
 ## Definition for built-in IDL types
 
-Type:
+DataType:
   @Name: any
 
-Type: 
+DataType: 
   @Name: object
 
-Type:
+DataType:
   @Name: unsigned-long-long
   @Def:
     @@Type: 
       lang:IDL-DOM
     @@@: unsigned long long
 
-Type:
+DataType:
   @Name: unsigned-long
   @Def:
     @@Type: 
       lang:IDL-DOM
     @@@: unsigned long
 
-Type:
+DataType:
   @Name: long
 
-Type:
+DataType:
   @Name: unsigned-short
   @Def:
     @@Type: 
       lang:IDL-DOM
     @@@: unsigned short
 
-Type:
+DataType:
   @Name: float
 
 ConstGroup:
@@ -109,7 +122,7 @@ Const:
 
 ## Definition from DOM Core IDL
 
-Type:
+DataType:
   @Name:  DOMString
   @Def:
     @@Type:
@@ -120,7 +133,7 @@ Type:
       DOM3Core:core.html#ID-C74D1578
       DOM3Core:core.html#ID-5DFED1F0-h3
   @IntMethod:
-    @@Name: fullyNormalized
+    @@Name: isFullyNormalized
     @@Description:
       @@lang:en
       @@@:
@@ -130,6 +143,20 @@ Type:
         (b) the param "normalize-characters" was set to "true" while using the
         method "Document.normalizeDocument ()" or while using the method
         "Node.normalize ()".
+    @@Return:
+      @@@Type: boolean
+      @@@Result:
+        @@@@Value: true
+        @@@@Type: boolean
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The string is fully normalized.
+      @@@Result:
+        @@@@Value: false
+        @@@@Type: boolean
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The string is not fully normalized.
   @IntMethod:
     @@Name: comparison
     @@Operator:
@@ -142,6 +169,19 @@ Type:
     @@Param:
       @@@Name: caseInsensitive
       @@@Type: boolean
+## TODO:
+      @@@Result:
+        @@@@Value: true
+        @@@@Type: boolean
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The string is fully normalized.
+      @@@Result:
+        @@@@Value: true
+        @@@@Type: boolean
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The string is fully normalized.
     @@Return:
       @@@Type: boolean
       @@@Def:
@@ -150,7 +190,7 @@ Type:
         @@@@@:
           $r = $str eq $self;
 
-Type:
+DataType:
   @Name:  DOMTimeStamp
   @Def:
     @@@:
@@ -214,7 +254,7 @@ Type:
           use integer;
           $$self = ($$self / 1000) * 1000 + $given;
 
-TypeAlias:
+DataTypeAlias:
   @Name:  DOMUserData
   @Type:  any
   @Spec:
@@ -224,7 +264,7 @@ TypeAlias:
     @@lang:en
     @@@: A reference to application data.
 
-TypeAlias:
+DataTypeAlias:
   @Name:  DOMObject
   @Type:  Object
   @Spec:
