@@ -13,7 +13,7 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.30 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.31 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::Header;
@@ -391,14 +391,14 @@ sub _encode_body ($$\%) {
   	      $charset_def = $Message::MIME::Charset::CHARSET{$charset};
   	    } else {
   	      $charset_def = $Message::MIME::Charset::CHARSET{'*default'};
-  	      ## Note: 'encoding_after_encode' option (available for header
-  	      ## field, but not for message body) is hardcoded.
+  	      ## Note: 'encoding_after_encode' option's value is hardcoded.
   	    }
   	  } else {	## Don't have mime style "charset" parameter
   	    $charset_def = {mime_text => 1};
   	  }
   	  $charset_def = {} unless ref $charset_def;	## dummy
-  	  if ($charset_def->{mime_text} != 1) {
+  	  #if ($charset_def->{mime_text} != 1) {	## See also Note above
+  	  if (Message::MIME::Charset::is_mime_text ($charset || '*default') != 1) {
   	    $enoption{mt_is_text} = 0 if $mt eq 'text';
   	    my $ct = $self->{header}->field ('content-type');
   	    $ct->not_mime_text ($option->{text_coderange} eq 'binary'? 0:1);
@@ -555,7 +555,7 @@ sub stringify ($;%) {
       $self->{header}->field ($option{fill_ua_name})->add_our_name (
         -use_Config	=> $option{ua_use_Config},
         -use_Win32	=> $option{ua_use_Win32},
-        -date	=> q$Date: 2002/07/21 03:26:02 $,
+        -date	=> q$Date: 2002/07/22 07:48:28 $,
       );
     }
     $header = $self->{header}->stringify (-format => $option{format},
@@ -981,7 +981,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/21 03:26:02 $
+$Date: 2002/07/22 07:48:28 $
 
 =cut
 
