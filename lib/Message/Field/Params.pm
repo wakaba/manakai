@@ -1,11 +1,8 @@
 
 =head1 NAME
 
-Message::Field::Params Perl module
-
-=head1 DESCRIPTION
-
-Perl module for parameters field body (such as C<Content-Type:>).
+Message::Field::Params --- Perl module for Internet message
+field body consist of parameters, such as C<Content-Type:> field
 
 =cut
 
@@ -13,34 +10,28 @@ package Message::Field::Params;
 use strict;
 require 5.6.0;
 use re 'eval';
-use vars qw(%DEFAULT %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use vars qw(@ISA %REG $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
-use Carp;
-use overload '@{}' => sub {shift->_delete_empty->{param}},
-             '""' => sub {shift->stringify};
+require Message::Field::Structured;
+push @ISA, qw(Message::Field::Structured);
 
-$REG{WSP} = qr/[\x09\x20]/;
-$REG{FWS} = qr/[\x09\x20]*/;
+use overload '""' => sub { $_[0]->stringify },
+             '0+' => sub { $_[0]->count },
+             '.=' => sub { $_[0]->add ($_[1], ['', value => 1]); $_[0] },
+             fallback => 1;
 
-$REG{comment} = qr/\x28(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x27\x2A-\x5B\x5D-\xFF]+|(??{$REG{comment}}))*\x29/;
-$REG{quoted_string} = qr/\x22(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\xFF])*\x22/;
-$REG{domain_literal} = qr/\x5B(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x5A\x5E-\xFF])*\x5D/;
-$REG{uri_literal} = qr/\x3C[\x09\x20\x21\x23-\x3B\x3D\x3F-\x5B\x5D\x5F\x61-\x7A\x7E]*\x3E/;
+*REG = \%Message::Util::REG;
+## Inherited: comment, quoted_string, domain_literal, angle_quoted
+	## WSP, FWS, atext, atext_dot, token, attribute_char
+	## S_encoded_word
+	## M_quoted_string
 
-$REG{atext} = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2F-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]+/;
-$REG{atext_dot} = qr/[\x21\x23-\x27\x2A\x2B\x2D-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]+/;
-$REG{token} = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+/;
-$REG{http_token} = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\x7C\x7E]+/;
-$REG{attribute_char} = qr/[\x21\x23-\x24\x26\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+/;
-$REG{S_encoded_word} = qr/=\x3F$REG{atext_dot}\x3F=/;
-
-$REG{param} = qr/(?:$REG{atext_dot}|$REG{quoted_string}|$REG{uri_literal})(?:$REG{atext_dot}|$REG{quoted_string}|$REG{WSP}|,)*/;
+$REG{param} = qr/(?:$REG{atext_dot}|$REG{quoted_string}|$REG{angle_quoted})(?:$REG{atext_dot}|$REG{quoted_string}|$REG{WSP}|,)*/;
 	## more naive C<parameter>.  (Comma is allowed for RFC 1049)
 $REG{parameter} = qr/$REG{token}=(?:$REG{token}|$REG{quoted_string})?/;
 	## as defined by RFC 2045, not RFC 2231.
 
-$REG{M_quoted_string} = qr/\x22((?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\xFF])*)\x22/;
 $REG{M_parameter} = qr/($REG{token})=($REG{token}|$REG{quoted_string})?/;
 	## as defined by RFC 2045, not RFC 2231.
 $REG{M_parameter_name} = qr/($REG{attribute_char}+)(?:\*([0-9]+)(\*)?|(\*))/;
@@ -48,71 +39,82 @@ $REG{M_parameter_name} = qr/($REG{attribute_char}+)(?:\*([0-9]+)(\*)?|(\*))/;
 $REG{M_parameter_extended_value} = qr/([^']*)'([^']*)'($REG{token}*)/;
 	## as defined by RFC 2231, but more naive.
 
-$REG{NON_atext} = qr/[^\x21\x23-\x27\x2A\x2B\x2D\x2F\x30-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]/;
-$REG{NON_atext_dot} = qr/[^\x21\x23-\x27\x2A\x2B\x2D-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]/;
-$REG{NON_atext_dot_wsp} = qr/[^\x09\x20\x21\x23-\x27\x2A\x2B\x2D-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]/;
-$REG{NON_token} = qr/[^\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]/;
-$REG{NON_token_wsp} = qr/[^\x09\x20\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]/;
-$REG{NON_http_token} = qr/[^\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\x7C\x7E]/;
-$REG{NON_http_token_wsp} = qr/[^\x09\x20\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\x7C\x7E]/;
-$REG{NON_attribute_char} = qr/[^\x21\x23-\x24\x26\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]/;
-$REG{NON_http_attribute_char} = qr/[^\x21\x23-\x24\x26\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\x7C\x7E]/;
-	## Yes, C<attribute-char> does not appear in HTTP spec.
 
+=head1 CONSTRUCTORS
 
-%DEFAULT = (
-  delete_fws	=> 1,
-  encoding_after_encode	=> '*default',
-  encoding_before_decode	=> '*default',
-  hook_encode_string	=> #sub {shift; (value => shift, @_)},
-  	\&Message::Util::encode_header_string,
-  hook_decode_string	=> #sub {shift; (value => shift, @_)},
-  	\&Message::Util::decode_header_string,
-  parameter_value_max	=> 78,
-  use_parameter_extension	=> -1,
-  value_type	=> {'*DEFAULT'	=> [':none:']},
-);
+The following methods construct new objects:
 
-## Initialization for both C<new ()> and C<parse ()> methods.
-sub _initialize ($;%) {$_[0]}
-
-=head2 Message::Field::Params->new ([%option])
-
-Returns new Message::Field::Params.  Some options can be given as hash.
+=over 4
 
 =cut
 
-sub new ($;%) {
-  my $class = shift;
-  my $self = bless {option => {@_}, param => []}, $class;
-  $self->_initialize ();
-  $self->_initialize_new ();
-  for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
-  $self;
+## Initialize of this class -- called by constructors
+sub _init ($;%) {
+  my $self = shift;
+  my %options = @_;
+  my %DEFAULT = (
+    -delete_fws	=> 1,
+    #encoding_after_encode	## Inherited
+    #encoding_before_decode	## Inherited
+    #format	## Inherited
+    #hook_encode_string	## Inherited
+    #hook_decode_string	## Inherited
+    -parameter_name_case_sensible	=> 0,
+    -parameter_value_max_length	=> 78,
+    -parameter_value_unsafe_rule	=> {'*default'	=> 'NON_http_attribute_char'},
+    -parse_all	=> 0,
+    -use_parameter_extension	=> 0,
+    -value_type	=> {'*default'	=> [':none:']},
+  );
+  $self->SUPER::_init (%DEFAULT, %options);
+  $self->{param} = [];
+  if ($self->{option}->{format} =~ /^http-sip/) {
+    $self->{option}->{encoding_before_decode} = 'utf-8';
+    $self->{option}->{encoding_after_decode} = 'utf-8';
+  } elsif ($self->{option}->{format} =~ /^http/) {
+    $self->{option}->{encoding_before_decode} = 'iso-8859-1';
+    $self->{option}->{encoding_after_decode} = 'iso-8859-1';
+  }
 }
 
 ## Initialization for new () method.
 sub _initialize_new ($;%) {
-  my $self = shift;
-  #for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
+  ## Nothing to do
 }
 
-=head2 Message::Field::Params->parse ($nantara, [%option])
+## Initialization for parse () method.
+sub _initialize_parse ($;%) {
+  ## Nothing to do
+}
 
-Parse Message::Field::Params and new ContentType instance.  
-Some options can be given as hash.
+=item $p = Message::Field::Params->new ([%options])
+
+Constructs a new object.  You might pass some options as parameters 
+to the constructor.
+
+=cut
+
+sub new ($;%) {
+  my $self = shift->SUPER::new (@_);
+  $self->_initialize_new (@_);
+  $self;
+}
+
+=item $p = Message::Field::Params->parse ($field-body, [%options])
+
+Constructs a new object with given field body.  You might pass 
+some options as parameters to the constructor.
 
 =cut
 
 sub parse ($$;%) {
   my $class = shift;
+  my $self = bless {}, $class;
   my $body = shift;
-  my $self = bless {option => {@_}, param => []}, $class;
-  $self->_initialize ();
-  $self->_initialize_parse ();
-  for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
-  $body = $self->_delete_comment ($body);
-  $body = $self->_delete_fws ($body) if $self->{option}->{delete_fws}>0;
+  $self->_init (@_);
+  $self->_initialize_parse (@_);
+  $body = Message::Util::delete_comment ($body);
+  $body = $self->_delete_fws ($body) if $self->{option}->{delete_fws};
   my @b = ();
   $body =~ s{$REG{FWS}($REG{param})$REG{FWS}(?:;$REG{FWS}|$)}{
     my $param = $1;
@@ -123,17 +125,11 @@ sub parse ($$;%) {
   $self;
 }
 
-## Initialization for parse () method.
-sub _initialize_parse ($;%) {
-  my $self = shift;
-  #for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
-}
-
 sub _parse_param ($$) {
   my $self = shift;
   my $param = shift;
   if ($param =~ /^$REG{M_parameter}$/) {
-    my ($name, $value) = (lc $1, $2);
+    my ($name, $value) = ($self->_n11n_param_name ($1), $2);
     my ($seq, $isencoded, $charset, $lang) = (-1, 0, '', '');
     if ($name =~ /^$REG{M_parameter_name}$/) {
       ($name, $seq, $isencoded) = ($1, $4?-1:$2, ($3||$4)?1:0);
@@ -166,7 +162,7 @@ sub _restore_param ($@) {
           ($s, $p->{charset}, $p->{language}) = (@s{qw(value charset language)});
         } else {
           my $q = 0;
-          ($s,$q) = $self->_unquote_if_quoted_string ($p->{value});
+          ($s,$q) = Message::Util::unquote_if_quoted_string ($p->{value});
           my %s = &{$self->{option}->{hook_decode_string}} ($self, $s,
                 type => ($q?'parameter/quoted':'parameter'));
           ($s, $p->{charset}, $p->{language}) = (@s{qw(value charset language)});
@@ -175,13 +171,13 @@ sub _restore_param ($@) {
                               charset => $p->{charset}, is_parameter => 1}];
       } else {
         $part{$i->[0]}->[$p->{seq}] = {
-        value => $self->_unquote_if_quoted_string ($p->{value}),
+        value => scalar Message::Util::unquote_if_quoted_string ($p->{value}),
         language => $p->{language}, charset => $p->{charset},
         is_encoded => $p->{is_encoded}};
       }
     } else {
       my $q = 0;
-      ($i->[0], $q) = $self->_unquote_if_quoted_string ($i->[0]);
+      ($i->[0], $q) = Message::Util::unquote_if_quoted_string ($i->[0]);
       my %s = &{$self->{option}->{hook_decode_string}} ($self, $i->[0],
                 type => ($q?'phrase/quoted':'phrase'));
       push @ret, [$s{value}, {is_parameter => 0}];
@@ -211,15 +207,21 @@ sub _save_param ($@) {
   $self;
 }
 
-=head2 $self->add ($name, [$value]. [%option]
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item $p->add ($name => [$value], [$name => $value,...])
 
 Adds parameter name=value pair.
 
   Example:
-    $self->add (title => 'foo of bar');	## title="foo of bar"
-    $self->add (subject => 'hogehoge, foo');	## subject*=''hogehoge%2C%20foo
-    $self->add (foo => 'bar', language => 'en')	## foo*='en'bar
-    $self->add ('text/plain', '', value => 1)	## text/plain
+    $p->add (title => 'foo of bar');	## title="foo of bar"
+    $p->add (subject => 'hogehoge, foo');	## subject*=''hogehoge%2C%20foo
+    $p->add (foo => ['bar', language => 'en'])	## foo*='en'bar
+    $p->add ('text/plain', ['', value => 1])	## text/plain
 
 This method returns array reference of (name, {value => value, attribute...}).
 
@@ -230,45 +232,59 @@ value (1/0, see example above).
 
 sub add ($$;$%) {
   my $self = shift;
-  my ($name, $value, %option) = (lc shift, shift, @_);
-  my $p = [$name, {value => $value, charset => $option{charset},
-                   is_parameter => 1, language => $option{language}}];
-  $p->[1]->{is_parameter} = 0 if !$value && $option{value}>0;
-  croak "add: \$name contains of non-attribute-char: $name"
-     if $p->[1]->{is_parameter} && $name =~ /$REG{NON_http_attribute_char}/;
-  $p->[1]->{value} = $self->_param_value ($name => $p->[1]->{value});
-  if ($option{prepend}) {
-    unshift @{$self->{param}}, $p;
-  } else {
-    push @{$self->{param}}, $p;
-  }
-  $p;
-}
-sub replace ($$;$%) {
-  my $self = shift;
-  my ($name, $value, %option) = (lc shift, shift, @_);
-  for my $param (@{$self->{param}}) {
-    if ($param->[0] eq $name) {
-      $param->[1] = {value => $value, charset => $option{charset},
-                     is_parameter => 1, language => $option{language}};
-      $param->[1]->{is_parameter} = 0 if !$value && $option{value}>0;
-      $param->[1]->{value} = $self->_param_value ($name => $param->[1]->{value});
-      return $param;
+  my %gp = @_;
+  my %option = %{$self->{option}};
+  for (grep {/^-/} keys %gp) {$option{substr ($_, 1)} = $gp{$_}}
+  $option{parse} = 1 if defined wantarray;
+  my $p;
+  for (grep {/^[^-]/} keys %gp) {
+    my ($name, $value, %po) = ($self->_n11n_param_name ($_));
+    if (ref $gp{$_}) {($value, %po) = @{$gp{$_}}} else {$value = $gp{$_}}
+    $p = [$name, {value => $value, charset => $po{charset},
+                   is_parameter => 1, language => $po{language}}];
+    $p->[1]->{is_parameter} = 0 if !$value && $po{value};
+    Carp::croak "add: \$name contains of non-attribute-char: $name"
+      if $p->[1]->{is_parameter} && $name =~ /$REG{NON_http_attribute_char}/;
+    $p->[1]->{value} = $self->_param_value ($name => $p->[1]->{value})
+      if $option{parse};
+    if ($option{prepend}) {
+      unshift @{$self->{param}}, $p;
+    } else {
+      push @{$self->{param}}, $p;
     }
   }
-  my $p = [$name, {value => $value, charset => $option{charset},
-                   is_parameter => 1, language => $option{language}}];
-  $p->[1]->{is_parameter} = 0 if !$value && $option{value}>0;
-  croak "replace: \$name contains of non-attribute-char: $name"
-    if $p->[1]->{is_parameter} && $name =~ /$REG{NON_http_attribute_char}/;
-  $p->[1]->{value} = $self->_param_value ($name => $p->[1]->{value});
-  push @{$self->{param}}, $p;
-  $p;
+  $p->[1]->{is_parameter}? $p->[1]->{value}: $p->[0];
+}
+
+sub replace ($%) {
+  my $self = shift;
+  my %gp = @_;
+  my %option = %{$self->{option}};
+  for (grep {/^-/} keys %gp) {$option{substr ($_, 1)} = $gp{$_}}
+  $option{parse} = 1 if defined wantarray;
+  my $p;
+  for (grep {/^[^-]/} keys %gp) {
+    my ($name, $value, %po) = ($self->_n11n_param_name ($_));
+    if (ref $gp{$_}) {($value, %po) = @{$gp{$_}}} else {$value = $gp{$_}}
+    $p = [$name, {value => $value, charset => $po{charset},
+                  is_parameter => 1, language => $po{language}}];
+    $p->[1]->{is_parameter} = 0 if !$value && $po{value};
+    Carp::croak "replace: \$name contains of non-attribute-char: $name"
+      if $p->[1]->{is_parameter} && $name =~ /$REG{NON_http_attribute_char}/;
+    $p->[1]->{value} = $self->_param_value ($name => $p->[1]->{value})
+      if $option{parse};
+    my $f = 0;
+    for my $param (@{$self->{param}}) {
+      if ($param->[0] eq $name) {$param = $p; $f = 1}
+    }
+    push @{$self->{param}}, $p unless $f == 1;
+  }
+  $p->[1]->{is_parameter}? $p->[1]->{value}: $p->[0];
 }
 
 sub delete ($$;%) {
   my $self = shift;
-  my ($name, $index) = (lc shift, shift);
+  my ($name, $index) = ($self->_n11n_param_name (shift), shift);
   my $i = 0;
   for my $param (@{$self->{param}}) {
     if ($param->[0] eq $name) {
@@ -284,7 +300,7 @@ sub delete ($$;%) {
 
 sub count ($;$%) {
   my $self = shift;
-  my ($name) = (lc shift);
+  my $name = $self->_n11n_param_name (shift);
   unless ($name) {
     $self->_delete_empty ();
     return $#{$self->{param}}+1;
@@ -299,11 +315,11 @@ sub count ($;$%) {
 }
 
 
-sub parameter ($$;$) {
+sub parameter ($$;$%) {
   my $self = shift;
-  my $name = lc shift;
+  my $name = $self->_n11n_param_name (shift);
   my $newvalue = shift;
-  return $self->replace ($name => $newvalue,@_)->[1]->{value} if defined $newvalue;
+  return $self->replace ($name => $newvalue,@_) if defined $newvalue;
   my @ret;
   for my $param (@{$self->{param}}) {
     if ($param->[0] eq $name) {
@@ -345,31 +361,14 @@ sub parameter_value ($$;$) {
   $self->{param}->[$i]->[1]->{value};
 }
 
-sub value_type ($;$$%) {
-  my $self = shift;
-  my $name = shift || '*DEFAULT';
-  my $new_value_type = shift;
-  if ($new_value_type) {
-    $self->{option}->{value_type}->{$name} = []
-      unless ref $self->{option}->{value_type}->{$name};
-    $self->{option}->{value_type}->{$name}->[0] = $new_value_type;
-  }
-  if (ref $self->{option}->{value_type}->{$name}) {
-    $self->{option}->{value_type}->{$name}->[0]
-      || $self->{option}->{value_type}->{'*DEFAULT'}->[0];
-  } else {
-    $self->{option}->{value_type}->{'*DEFAULT'}->[0];
-  }
-}
-
 ## Hook called before returning C<value>.
 ## $self->_param_value ($name, $value);
 sub _param_value ($$$) {
   my $self = shift;
-  my $name = shift || '*DEFAULT';
+  my $name = shift || '*default';
   my $value = shift;
   my $vtype = $self->{option}->{value_type}->{$name}->[0]
-      || $self->{option}->{value_type}->{'*DEFAULT'}->[0];
+      || $self->{option}->{value_type}->{'*default'}->[0];
   my %vopt; %vopt = %{$self->{option}->{value_type}->{$name}->[1]} 
     if ref $self->{option}->{value_type}->{$name}->[1];
   if (ref $value) {
@@ -378,42 +377,33 @@ sub _param_value ($$$) {
     return $value;
   } elsif ($value) {
     eval "require $vtype";
-    return $vtype->parse ($value, %vopt);
+    return $vtype->parse ($value, -format => $self->{option}->{format},
+      -field_body => $self->{option}->{field_body}, %vopt);
   } else {
     eval "require $vtype";
-    return $vtype->new (%vopt);
+    return $vtype->new (-format => $self->{option}->{format},
+      -field_body => $self->{option}->{field_body}, %vopt);
   }
 }
 
 sub _delete_empty ($) {
   my $self = shift;
-  my @ret;
-  for my $param (@{$self->{param}}) {
-    push @ret, $param if ref $param;
-  }
-  $self->{param} = \@ret;
-  $self;
+  $self->{param} = [grep {length $_} @{$self->{param}}];
 }
 
 
-=head2 $self->stringify ([%option])
+=item $field-body = $p->stringify ()
 
-Returns Message::Field::Params as a string.
-
-=head2 $self->as_string ([%option])
-
-An alias of C<stringify>.
+Returns C<field-body> as a string.
 
 =cut
 
 sub stringify ($;%) {
   my $self = shift;
-  my %option = @_;
-  my $use_xparam = $option{use_parameter_extension} 
-            || $self->{option}->{use_parameter_extension};
-  $option{parameter_value_max} 
-            ||= $self->{option}->{parameter_value_max};
-  $self->_delete_empty ();
+  my %o = @_;
+  my %option = %{$self->{option}};
+  for (grep {/^-/} keys %o) {$option{substr ($_, 1)} = $o{$_}}
+  $self->_delete_empty;
   join '; ',
     map {
       my $v = $_->[1];
@@ -423,7 +413,7 @@ sub stringify ($;%) {
         my (%e) = &{$self->{option}->{hook_encode_string}} ($self, 
           $v->{value}, current_charset => $v->{charset}, language => $v->{language},
           type => 'parameter');
-        if ($use_xparam>0 && ($e{charset} || $e{language} 
+        if ($option{use_parameter_extension} && ($e{charset} || $e{language} 
                            || $e{value} =~ /[\x00\x0D\x0A\x80-\xFF]/)) {
           my ($charset, $lang);
           $encoded = 1;
@@ -433,10 +423,10 @@ sub stringify ($;%) {
           ## How can we treat this?
           $charset =~ s/($REG{NON_http_attribute_char})/sprintf('%%%02X', ord $1)/ge;
           $lang =~ s/($REG{NON_http_attribute_char})/sprintf('%%%02X', ord $1)/ge;
-          if (length $e{value} > $option{parameter_value_max}) {
-            for my $i (0..length ($e{value})/$option{parameter_value_max}) {
-              $value[$i] = substr ($e{value}, $i*$option{parameter_value_max},
-                                                   $option{parameter_value_max});
+          if (length $e{value} > $option{parameter_value_max_length}) {
+            for my $i (0..length ($e{value})/$option{parameter_value_max_length}) {
+              $value[$i] = substr ($e{value}, $i*$option{parameter_value_max_length},
+                                     $option{parameter_value_max_length});
             }
           } else {$value[0] = $e{value}}
           for my $i (0..$#value) {
@@ -447,27 +437,31 @@ sub stringify ($;%) {
         } elsif (length $e{value} == 0) {
           $value[0] = '""';
         } else {
-          if ($use_xparam>0 && length $e{value} > $option{parameter_value_max}) {
-            for my $i (0..length ($e{value})/$option{parameter_value_max}) {
-              $value[$i] = $self->_quote_unsafe_string 
-                (substr ($e{value}, $i*$option{parameter_value_max},
-                    $option{parameter_value_max}), 
+          if ($option{use_parameter_extension} 
+              && length $e{value} > $option{parameter_value_max_length}) {
+            for my $i (0..length ($e{value})/$option{parameter_value_max_length}) {
+              $value[$i] = Message::Util::quote_unsafe_string 
+                (substr ($e{value}, $i*$option{parameter_value_max_length},
+                    $option{parameter_value_max_length}), 
                     unsafe => 'NON_http_attribute_char');
             }
           } else {
-            $value[0] = $self->_quote_unsafe_string 
-              ($e{value}, unsafe => 'NON_http_attribute_char');
+            my $unsafe = $self->{option}->{parameter_value_unsafe_rule}->{$_->[0]}
+                     || $self->{option}->{parameter_value_unsafe_rule}->{'*default'};
+            $value[0] = Message::Util::quote_unsafe_string 
+              ($e{value}, unsafe => $unsafe);
           }
         }
         ## Note: quoted-string for parameter name is not allowed.
         ## But it is better than output bare non-atext.
         if ($#value == 0) {
           $new = 
-            $self->_quote_unsafe_string ($_->[0], unsafe => 'NON_attribute_char')
+            Message::Util::quote_unsafe_string ($_->[0], 
+              unsafe => 'NON_attribute_char')
             .($encoded?'*':'').'='.$value[0];
         } else {
           my @new;
-          my $name = $self->_quote_unsafe_string 
+          my $name = Message::Util::quote_unsafe_string 
             ($_->[0], unsafe => 'NON_http_attribute_char');
           for my $i (0..$#value) {
             push @new, $name.'*'.$i.($encoded?'*':'').'='.$value[$i];
@@ -477,91 +471,94 @@ sub stringify ($;%) {
       } else {
         my %e = &{$self->{option}->{hook_encode_string}} ($self, 
           $_->[0], type => 'phrase');
-        $new = $self->_quote_unsafe_string ($e{value}, 
+        $new = Message::Util::quote_unsafe_string ($e{value}, 
           unsafe => 'NON_http_token_wsp');
       }
       $new;
     } @{$self->{param}}
   ;
 }
-sub as_string ($;%) {shift->stringify (@_)}
+*as_string = \&stringify;
 
-=head2 $self->option ($option_name)
-
-Returns/set (new) value of the option.
-
-=cut
-
-sub option ($$;$) {
-  my $self = shift;
-  my ($name, $newval) = @_;
-  if ($newval) {
-    $self->{option}->{$name} = $newval;
+sub scan ($&) {
+  my ($self, $sub) = @_;
+  #my $sort;
+  #$sort = \&_header_cmp if $self->{option}->{sort} eq 'good-practice';
+  #$sort = {$a cmp $b} if $self->{option}->{sort} eq 'alphabetic';
+  my @param = @{$self->{param}};
+  #if (ref $sort) {
+  #  @field = sort $sort @{$self->{param}};
+  #}
+  for my $param (@param) {
+    &$sub($param->[0] => $param->[1]->{value}, $param->[1]);
   }
-  $self->{option}->{$name};
 }
 
-sub _quote_unsafe_string ($$;%) {
+=item $option-value = $ua->option ($option-name)
+
+Gets option value.
+
+=item $csv->option ($option-name, $option-value, ...)
+
+Set option value(s).  You can pass multiple option name-value pair
+as parameter when setting.
+
+=cut
+
+sub option ($;$%) {
   my $self = shift;
-  my $string = shift;
-  my %option = @_;
-  $option{unsafe} ||= 'NON_atext_dot';
-  $option{unsafe_regex} ||= $REG{$option{unsafe}};
-  if ($string =~ /$option{unsafe_regex}/ || $string =~ /$REG{WSP}$REG{WSP}+/) {
-    $string =~ s/([\x22\x5C])([\x21-\x7E])?/"\x5C$1".(defined $2?"\x5C$2":'')/ge;
-    $string = '"'.$string.'"';
+  my $format = $self->{option}->{format};
+  $self->SUPER::option (@_);
+  if ($format ne $self->{option}->{format}) {
+    $self->scan (sub {
+      if (ref $_[1]) {
+        $_[1]->option (-format => $self->{option}->{format});
+      }
+    });
   }
-  $string;
 }
 
-=head2 $self->_unquote_quoted_string ($string)
+sub value_type ($;$$%) {
+  my $self = shift;
+  my $name = shift || '*default';
+  my $new_value_type = shift;
+  if ($new_value_type) {
+    $self->{option}->{value_type}->{$name} = []
+      unless ref $self->{option}->{value_type}->{$name};
+    $self->{option}->{value_type}->{$name}->[0] = $new_value_type;
+  }
+  if (ref $self->{option}->{value_type}->{$name}) {
+    $self->{option}->{value_type}->{$name}->[0]
+      || $self->{option}->{value_type}->{'*default'}->[0];
+  } else {
+    $self->{option}->{value_type}->{'*default'}->[0];
+  }
+}
 
-Unquote C<quoted-string>.  Get rid of C<DQUOTE>s and
-C<REVERSED SOLIDUS> included in C<quoted-pair>.
-This method is intended for internal use.
+sub value_unsafe_rule ($$;$%) {
+  my $self = shift;
+  if (@_ == 1) {
+    return $self->{option}->{parameter_value_unsafe_rule}->{ $_[0] };
+  }
+  while (my ($name, $value) = splice (@_, 0, 2)) {
+    $name = $self->_n11n_param_name ($name);
+    $self->{option}->{parameter_value_unsafe_rule}->{$name} = $value;
+  }
+}
+
+=item $clone = $ua->clone ()
+
+Returns a copy of the object.
 
 =cut
 
-sub _unquote_quoted_string ($$) {
+sub clone ($) {
   my $self = shift;
-  my $quoted_string = shift;
-  $quoted_string =~ s{$REG{M_quoted_string}}{
-    my $qtext = $1;
-    $qtext =~ s/\x5C([\x00-\xFF])/$1/g;
-    $qtext;
-  }goex;
-  $quoted_string;
-}
-
-## Unquote C<DQOUTE> and C<quoted-pair> if it is itself a
-## C<quoted-string>.  (Do nothing if it is MULTIPLE
-## C<quoted-string>"S".)
-sub _unquote_if_quoted_string ($$) {
-  my $self = shift;
-  my $quoted_string = shift;  my $isq = 0;
-  $quoted_string =~ s{^$REG{M_quoted_string}$}{
-    my $qtext = $1;
-    $qtext =~ s/\x5C([\x00-\xFF])/$1/g;
-    $isq = 1;
-    $qtext;
-  }goex;
-  wantarray? ($quoted_string, $isq): $quoted_string;
-}
-
-=head2 $self->_delete_comment ($field_body)
-
-Remove all C<comment> in given strictured C<field-body>.
-This method is intended for internal use.
-
-=cut
-
-sub _delete_comment ($$) {
-  my $self = shift;
-  my $body = shift;
-  $body =~ s{($REG{quoted_string}|$REG{uri_literal}|$REG{domain_literal})|$REG{comment}}{
-    my $o = $1;  $o? $o : ' ';
-  }gex;
-  $body;
+  $self->_delete_empty;
+  my $clone = $self->SUPER::clone;
+  $clone->{param} = Message::Util::make_clone ($self->{param});
+  $clone->{value_type} = Message::Util::make_clone ($self->{value_type});
+  $clone;
 }
 
 sub _delete_fws ($$) {
@@ -574,6 +571,13 @@ sub _delete_fws ($$) {
     else {''}
   }gex;
   $body;
+}
+
+sub _n11n_param_name ($$) {
+  my $self = shift;
+  my $s = shift;
+  $s = lc $s unless $self->{option}->{parameter_name_case_sensible};
+  $s;
 }
 
 =head1 LICENSE
@@ -598,7 +602,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/01 05:32:15 $
+$Date: 2002/04/21 04:27:42 $
 
 =cut
 

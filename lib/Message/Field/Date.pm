@@ -219,7 +219,7 @@ sub unix_time ($;$) {
   my $self = shift;
   my $new_time = shift;
   if (defined $new_time) {
-    $self->{date_time} = $new_time unless $new_time =~ /[^0-9]/;
+    $self->{date_time} = $new_time + 0;
   }
   $self->{date_time};
 }

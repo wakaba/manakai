@@ -1,72 +1,110 @@
 
 =head1 NAME
 
-Message::Field::ValueParams Perl module
-
-=head1 DESCRIPTION
-
-Perl module for "word; parameter(s)" style field body.
+Message::Field::ValueParams --- Perl module for "word; parameter(s)" style
+Internet message field bodies
 
 =cut
 
 package Message::Field::ValueParams;
 use strict;
-BEGIN {
-  no strict;
-  use base Message::Field::Params;
-  use vars qw(%DEFAULT %REG $VERSION);
-}
-$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use vars qw(@ISA %REG $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+require Message::Field::Params;
+push @ISA, qw(Message::Field::Params);
 
-%REG = %Message::Field::Params::REG;
+use overload '+=' => sub { $_[0]->{value} = $_[0]->{value} + $_[1]; $_[0] },
+             '-=' => sub { $_[0]->{value} = $_[0]->{value} - $_[1]; $_[0] },
+             '*=' => sub { $_[0]->{value} = $_[0]->{value} * $_[1]; $_[0] },
+             '**=' => sub { $_[0]->{value} = $_[0]->{value} ** $_[1]; $_[0] },
+             '/=' => sub { $_[0]->{value} = $_[0]->{value} / $_[1]; $_[0] },
+             '%=' => sub { $_[0]->{value} = $_[0]->{value} % $_[1]; $_[0] },
+             fallback => 1;
 
-%DEFAULT = (
-  use_parameter_extension	=> 1,
-  value_default	=> '',
-  value_no_regex	=> qr/(?!)/,	## default = (none)
-  value_regex	=> qr/[\x00-\xFF]+/,
-  value_unsafe_rule	=> 'NON_http_token_wsp',
-);
+*REG = \%Message::Field::Params::REG;
+## Inherited: comment, quoted_string, domain_literal, angle_quoted
+	## WSP, FWS, atext, atext_dot, token, attribute_char
+	## S_encoded_word
+	## M_quoted_string
+	## param, parameter
+	## M_parameter, M_parameter_name, M_parameter_extended_value
 
-## Initialization for both C<new ()> and C<parse ()> methods.
-sub _initialize ($;%) {
+=head1 CONSTRUCTORS
+
+The following methods construct new objects:
+
+=over 4
+
+=cut
+
+## Initialize of this class -- called by constructors
+sub _init ($;%) {
   my $self = shift;
-  my $fname = lc $self->{option}->{field_name};
-  if ($fname eq 'link') {
-    $REG{r_nomatch} = qr/(?!)/;
-    $self->{option}->{value_unsafe_rule} = 'r_nomatch';
-    $self->{option}->{value_type}->{'*value'} = ['Message::Field::URI',
-      {field_name => $self->{option}->{field_name},
-      format => $self->{option}->{format}}];
+  my %options = @_;
+  my %DEFAULT = (
+    #delete_fws	## Inheritted
+    #encoding_after_encode	## Inherited
+    #encoding_before_decode	## Inherited
+    #format	## Inherited
+    #hook_encode_string	## Inherited
+    #hook_decode_string	## Inherited
+    #parameter_name_case_sensible	## Inherited
+    #parameter_value_max_length	## Inherited
+    #parse_all	## Inherited
+    #use_parameter_extension	## Inherited
+    -value_case_sensible	=> 1,
+    -value_default	=> '',
+    -value_no_regex	=> qr/(?!)/,	## default = (none)
+    -value_regex	=> qr/[\x00-\xFF]+/,
+    #value_type	## Inherited
+  );
+  $self->SUPER::_init (%DEFAULT, %options);
+  
+  my $fname = $self->_n11n_field_name ($self->{option}->{field_name});
+  if ($fname eq 'content-disposition') {
+    $self->{option}->{value_case_sensible} = 0;
+    $self->{option}->{value_default} = 'inline';
+    $self->{option}->{value_no_regex} = $REG{NON_token};
+    unless ($self->{option}->{format} =~ /^http/) {
+      $self->{option}->{value_no_regex} = $REG{NON_http_token};
+      $self->{option}->{use_parameter_extension} = 1;
+    }
+    $self->{option}->{value_type}->{'creation-date'} = ['Message::Field::Date'];
+    $self->{option}->{value_type}->{'modification-date'} = ['Message::Field::Date'];
+    $self->{option}->{value_type}->{'read-date'} = ['Message::Field::Date'];
+  } elsif ($fname eq 'link') {
+    $self->{option}->{parameter_value_unsafe_rule}->{'*value'} = 'MATCH_NONE';
+    $self->{option}->{value_type}->{'*value'} = ['Message::Field::URI'];
+  } else {
+    $self->{option}->{parameter_value_unsafe_rule}->{'*value'}
+      = 'NON_http_token_wsp';
   }
-  $self;
 }
 
-=head2 Message::Field::ValueParams->new ([%option])
+## Initialization for new () method.
+sub _initialize_new ($;%) {
+  my $self = shift;
+  $self->{value} = $self->{option}->{value_default};
+}
 
-Returns new Message::Field::ValueParams.  Some options can be given as hash.
+## Initialization for parse () method.
+#sub _initialize_parse ($;%) {
+  ## Inherited
+#}
+
+=item $vp = Message::Field::ValueParams->new ([%options])
+
+Constructs a new object.  You might pass some options as parameters 
+to the constructor.
 
 =cut
 
 ## Inherited
 
-## Initialization for new () method.
-sub _initialize_new ($;%) {
-  my $self = shift;
-  for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
-  $self->{word} = $self->{option}->{value_default};
-}
+=item $vp = Message::Field::ValueParams->parse ($field-body, [%options])
 
-## Initialization for parse () method.
-sub _initialize_parse ($;%) {
-  my $self = shift;
-  for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
-}
-
-=head2 Message::Field::ValueParams->parse ($nantara, [%option])
-
-Parse Message::Field::ValueParams and new ValueParams instance.  
-Some options can be given as hash.
+Constructs a new object with given field body.  You might pass 
+some options as parameters to the constructor.
 
 =cut
 
@@ -75,6 +113,7 @@ Some options can be given as hash.
 sub _save_param ($@) {
   my $self = shift;
   my @p = @_;
+  $self->{value} = $self->{option}->{value_default};
   if ($p[0]->[1]->{is_parameter} == 0) {
     my $type = shift (@p)->[0];
     if ($type && $type !~ /$self->{option}->{value_no_regex}/) {
@@ -83,20 +122,25 @@ sub _save_param ($@) {
       push @p, ['x-invalid-value' => {value => $type, is_parameter => 1}];
     }
   }
-  $self->{value} ||= $self->{option}->{value_default};
   #$self->{param} = \@p;
   $self->SUPER::_save_param (@p);
   $self;
 }
 
-=head2 $self->replace ($name, $value, [%option]
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item $vp->add ($name => [$value], [$name => $value,...])
 
 Sets new parameter C<value> of $name.
 
   Example:
-    $self->add (title => 'foo of bar');	## title="foo of bar"
-    $self->add (subject => 'hogehoge, foo');	## subject*=''hogehoge%2C%20foo
-    $self->add (foo => 'bar', language => 'en')	## foo*='en'bar
+    $vp->add (title => 'foo of bar');	## title="foo of bar"
+    $vp->add (subject => 'hogehoge, foo');	## subject*=''hogehoge%2C%20foo
+    $vp->add (foo => 'bar', language => 'en')	## foo*='en'bar
 
 This method returns array reference of (name, {value => value, attribute...}).
 C<value> is same as returned value of C<$self-E<gt>parameter>.
@@ -104,11 +148,13 @@ C<value> is same as returned value of C<$self-E<gt>parameter>.
 Available options: charset (charset name), language (language tag),
 value (1/0, see example above).
 
-=head2 $self->count ()
+=item $vp->replace ($name => [$value], [$name => $value,...])
 
-Returns the number of C<parameter>.
+=item $count = $vp->count
 
-=head2 $self->parameter ($name, [$new_value])
+Returns the number of C<parameter>s.
+
+=item $param-value = $vp->parameter ($name, [$new_value])
 
 Returns given C<name>'ed C<parameter>'s C<value>.
 
@@ -116,11 +162,11 @@ Note that when $self->{option}->{value_type}->{$name}
 is defined (and it is class name), returned value
 is a reference to the object.
 
-=head2 $self->parameter_name ($index, [$new_name])
+=item $param-name = $vp->parameter_name ($index, [$new_name])
 
 Returns (and set) C<$index>'th C<parameter>'s name.
 
-=head2 $self->parameter_value ($index, [$new_value])
+=item $param-value = $vp->parameter_value ($index, [$new_value])
 
 Returns (and set) C<$index>'th C<parameter>'s value.
 
@@ -130,30 +176,31 @@ is a reference to the object.
 
 =cut
 
-## replace, count, parameter, parameter_name, parameter_value: Inherited.
-## add: inherited but should not be used.
+## add, replace, count, parameter, parameter_name, parameter_value: Inherited.
 
 ## Hook called before returning C<value>.
 ## $self->_param_value ($name, $value);
 ## -- Inherited.
 
-=head2 $self->stringify ([%option])
+=item $field-body = $vp->stringify ()
 
-Returns Content-Disposition C<field-body> as a string.
-
-=head2 $self->as_string ([%option])
-
-An alias of C<stringify>.
+Returns C<field-body> as a string.
 
 =cut
 
 sub stringify ($;%) {
   my $self = shift;
   my $param = $self->SUPER::stringify (@_);
-  $self->value_as_string (@_).($param? '; '.$param: '');
+  $self->value_as_string (@_).(defined $param? '; '.$param: '');
+}
+*as_string = \&stringify;
+
+## This method is intended to be used by child classes
+sub stringify_params ($;%) {
+  shift->SUPER::stringify (@_);
 }
 
-=head2 $self->value ([$new_value])
+=item $value = $vp->value ([$new_value])
 
 Returns or set value.
 
@@ -163,14 +210,14 @@ sub value ($;$%) {
   my $self = shift;
   my $new_value = shift;
   my %option = @_;
-  if ($new_value && $new_value !~ m#$self->{option}->{value_no_regex}#) {
+  if (defined $new_value && $new_value !~ m#$self->{option}->{value_no_regex}#) {
     $self->{value} = $new_value;
   }
-  $self->{value} = $self->_param_value ('*value', $self->{value});
-  $self->{value};
+  $self->{value} = $self->_param_value ('*value' => $self->{value});
+  $self->{option}->{value_case_sensible}? $self->{value}: lc $self->{value};
 }
 
-=head2 $self->value_as_string ([%options])
+=item $value = $vp->value_as_string ([%options])
 
 Returns value.  If necessary, quoted and encoded in
 message format.  Same as C<stringify> except that
@@ -180,22 +227,56 @@ only first "value" is outputed.
 
 sub value_as_string ($;%) {
   my $self = shift;
-  my %option = @_;
   my (%e) = &{$self->{option}->{hook_encode_string}} ($self, 
           $self->{value}, type => 'phrase');
-  my $unsafe_rule = $option{unsafe_rule} || $self->{option}->{value_unsafe_rule};
-  $self->_quote_unsafe_string ($e{value}, unsafe_regex => $REG{$unsafe_rule});
+  my $unsafe_rule = $self->{option}->{parameter_value_unsafe_rule}->{'*value'};
+  Message::Util::quote_unsafe_string ($e{value}, unsafe => $unsafe_rule);
 }
 
 
-=head2 $self->option ($option_name)
+=item $option-value = $vp->option ($option-name)
 
-Returns/set (new) value of the option.
+Gets option value.
+
+=item $vp->option ($option-name, $option-value, ...)
+
+Set option value(s).  You can pass multiple option name-value pair
+as parameter when setting.
 
 =cut
 
 ## Inherited.
 
+=item $clone = $ua->clone ()
+
+Returns a copy of the object.
+
+=cut
+
+## Inherited
+
+=head1 EXAMPLE
+
+  use Message::Field::ValueParams;
+  my $cd = new Message::Field::ValueParams (-field_name => 'Content-Disposition');
+  $cd->type ('attachment');
+  $cd->parameter ('filename' => 'foobar');
+  $cd->parameter ('creation-date' => '')->unix_time (0);
+  print $cd;	## attachment; filename=foobar; 
+            	## creation-date="Thr, 01 Jan 1970 00:00:00 +0000"
+
+  use Message::Field::ValueParams;
+  my $b = q{attachment; filename*=iso-2022-jp''%1B%24B%25U%25%21%25%24%25k%1B%28B};
+  my $cd = Message::Field::ValueParams->parse ($b,
+                    -field_name => 'Content-Disposition');
+  my $filename = $cd->parameter ('FileName');
+  if (!$filename || $filename =~ /[^A-Za-z0-9.,_~=+-]/ || -e $filename) {
+    ## $filename can be unsafe, see RFC 2183.
+    $filename = 'default';
+  }
+  open MSG, "> $filename";
+    print $something;
+  close MSG;
 
 =head1 LICENSE
 
@@ -219,7 +300,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/01 05:32:15 $
+$Date: 2002/04/21 04:27:42 $
 
 =cut
 

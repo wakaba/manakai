@@ -9,7 +9,7 @@ structured header field bodies of the Internet message
 package Message::Field::Structured;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 use overload '""' => sub { $_[0]->stringify },
              '.=' => sub { $_[0]->value_append ($_[1]) },
@@ -33,6 +33,7 @@ sub _init ($;%) {
   encoding_after_encode	=> '*default',
   encoding_before_decode	=> '*default',
   field_name	=> 'x-structured',
+  field_name_case_sensible	=> 0,
   format	=> 'mail-rfc2822',
   hook_encode_string	=> #sub {shift; (value => shift, @_)},
   	\&Message::Util::encode_header_string,
@@ -168,9 +169,15 @@ sub clone ($) {
                              $self->{field_body}->clone:
                              $self->{field_body};
   ## Common hash value (not used in this module)
-  $clone->{value} = ref $self->{value}?
-                        $self->{value}->clone:
-                        $self->{value};
+    if (ref $self->{value} eq 'HASH') {
+      $clone->{value} = {map {ref $_? $_->clone: $_} %{$self->{value}}};
+    } elsif (ref $self->{value} eq 'ARRAY') {
+      $clone->{value} = [map {ref $_? $_->clone: $_} @{$self->{value}}];
+    } elsif (ref $self->{value}) {
+      $clone->{value} = $self->{value}->clone;
+    } else {
+      $clone->{value} = $self->{value};
+    }
   for my $i (@{$self->{comment}}) {
     if (ref $self->{comment}->[$i] eq 'HASH') {
       $clone->{comment}->[$i] = {%{$self->{comment}->[$i]}};
@@ -181,6 +188,13 @@ sub clone ($) {
     }
   }
   $clone;
+}
+
+sub _n11n_field_name ($$) {
+  my $self = shift;
+  my $s = shift;
+  $s = lc $s unless $self->{option}->{field_name_case_sensible};
+  $s;
 }
 
 
@@ -228,7 +242,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/13 01:33:54 $
+$Date: 2002/04/21 04:27:42 $
 
 =cut
 

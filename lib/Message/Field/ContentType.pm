@@ -1,62 +1,90 @@
 
 =head1 NAME
 
-Message::Field::ContentType Perl module
-
-=head1 DESCRIPTION
-
-Perl module for C<Content-Type:> field body.
+Message::Field::ContentType --- Perl module for
+Internet message C<Content-Type:> field body
 
 =cut
 
 package Message::Field::ContentType;
 use strict;
-BEGIN {
-  no strict;
-  use base Message::Field::Params;
-  use vars qw(%DEFAULT %REG $VERSION);
+use vars qw(@ISA %REG $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+require Message::Field::ValueParams;
+push @ISA, qw(Message::Field::ValueParams);
+
+*REG = \%Message::Field::Params::REG;
+## Inherited: comment, quoted_string, domain_literal, angle_quoted
+	## WSP, FWS, atext, atext_dot, token, attribute_char
+	## S_encoded_word
+	## M_quoted_string
+	## param, parameter
+	## M_parameter, M_parameter_name, M_parameter_extended_value
+
+
+=head1 CONSTRUCTORS
+
+The following methods construct new objects:
+
+=over 4
+
+=cut
+
+## Initialize of this class -- called by constructors
+sub _init ($;%) {
+  my $self = shift;
+  my %options = @_;
+  my %DEFAULT = (
+    #delete_fws	## Inheritted
+    #encoding_after_encode	## Inherited
+    #encoding_before_decode	## Inherited
+    #format	## Inherited
+    #hook_encode_string	## Inherited
+    #hook_decode_string	## Inherited
+    -media_type_default	=> 'text',
+    -media_subtype_default	=> 'plain',
+    #parameter_name_case_sensible	## Inherited
+    #parameter_value_max_length	## Inherited
+    #parse_all	## Inherited
+    -rfc1049_vs_mime =>
+    	{postscript	=> 'application/postscript',
+    	scribe	=> 'application/x-scribe',
+    	sgml	=> 'application/sgml',	## text/sgml
+    	troff	=> 'application/x-troff',
+    	dvi	=> 'application/x-dvi',
+    	text	=> 'text/plain',
+    },
+    -use_parameter_extension	=> 1,
+    #value_type	## Inherited
+  );
+  $self->SUPER::_init (%DEFAULT, %options);
 }
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
-%REG = %Message::Field::Params::REG;
+## Initialization for new () method.
+sub _initialize_new ($;%) {
+  my $self = shift;
+  $self->{media_type} = $self->{option}->{media_type_default};
+  $self->{media_subtype} = $self->{option}->{media_subtype_default};
+}
 
-%DEFAULT = (
-  rfc1049_vs_mime => {postscript	=> 'application/postscript',
-                      scribe	=> 'application/x-scribe',
-                      sgml	=> 'application/sgml',	## text/sgml
-                      troff	=> 'application/x-troff',
-                      dvi	=> 'application/x-dvi',
-                      text	=> 'text/plain',
-                     },
-  use_parameter_extension	=> 1,
-);
+## Initialization for parse () method.
+#sub _initialize_parse ($;%) {
+  ## Inherited
+#}
 
-=head2 Message::Field::ContentType->new ([%option])
+=item $ct = Message::Field::ContentType->new ([%options])
 
-Returns new Message::Field::ContentType.  Some options can be given as hash.
+Constructs a new object.  You might pass some options as parameters 
+to the constructor.
 
 =cut
 
 ## Inherited
 
-## Initialization for new () method.
-sub _initialize_new ($;%) {
-  my $self = shift;
-  for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
-  $self->{media_type} = 'text';
-  $self->{media_subtype} = 'plain';
-}
+=item $ct = Message::Field::ContentType->parse ($field-body, [%options])
 
-## Initialization for parse () method.
-sub _initialize_parse ($;%) {
-  my $self = shift;
-  for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
-}
-
-=head2 Message::Field::ContentType->parse ($nantara, [%option])
-
-Parse Message::Field::ContentType and new ContentType instance.  
-Some options can be given as hash.
+Constructs a new object with given field body.  You might pass 
+some options as parameters to the constructor.
 
 =cut
 
@@ -65,7 +93,8 @@ Some options can be given as hash.
 sub _save_param ($@) {
   my $self = shift;
   my @p = @_;
-  my $media_type = 'text/plain';
+  my $media_type = $self->{option}->{media_type_default}
+              .'/'.$self->{option}->{media_subtype_default};
   if ($p[0]->[1]->{is_parameter} == 0) {
     $media_type = shift (@p)->[0];
     if ($media_type =~ m#^($REG{token})/($REG{token})$#) {
@@ -82,17 +111,24 @@ sub _save_param ($@) {
       push @p, ['x-rfc1049-resource-ref', {value => shift (@p)->[0],
         is_parameter => 1}] if $p[0]->[1]->{is_parameter} == 0;
     } else {
-      push @p, ['x-unparsable-media-type', {value => $media_type,
+      push @p, ['x-invalid-media-type', {value => $media_type,
         is_parameter => 1}] if $media_type;
       $self->{media_type} = 'application';
       $self->{media_subtype} = 'octet-stream';
     }
   }
   $self->{param} = \@p;
+  #$self->SUPER::_save_param (@p);
   $self;
 }
 
-=head2 $self->replace ($name, $value, [%option]
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item $ct->replace ($name => [$value], [$name => $value,...])
 
 Sets new parameter C<value> of $name.
 
@@ -106,46 +142,37 @@ This method returns array reference of (name, {value => value, attribute...}).
 Available options: charset (charset name), language (language tag),
 value (1/0, see example above).
 
-=head2 $self->add ($name, $value)
+=item $count = $ct->count ()
 
-Adds new parameter name=value pair.  Even if C<$name> parameter
-is already exist, new C<parameter> is inserted.  This method
-should not be used.
+Returns the number of C<parameter>s.
 
-=head2 $self->count ()
-
-Returns the number of C<parameter>.
-
-=head2 $self->parameter ($name, [$new_value])
+=item $param-value = $ct->parameter ($name, [$new_value])
 
 Returns given C<name>'ed C<parameter>'s C<value>.
 
-=head2 $self->parameter_name ($index, [$new_name])
+=item $param-name = $ct->parameter_name ($index, [$new_name])
 
 Returns (and set) C<$index>'th C<parameter>'s name.
 
-=head2 $self->parameter_value ($index, [$new_value])
+=item $param-value = $ct->parameter_value ($index, [$new_value])
 
 Returns (and set) C<$index>'th C<parameter>'s value.
 
 =cut
 
 ## replace, add, count, parameter, parameter_name, parameter_value: Inherited.
+## (add should not be used for CT: field)
 
-=head2 $self->stringify ([%option])
+=item $field-body = $ct->stringify ()
 
-Returns Content-Type C<field-body> as a string.
-
-=head2 $self->as_string ([%option])
-
-An alias of C<stringify>.
+Returns C<field-body> as a string.
 
 =cut
 
 sub stringify ($;%) {
   my $self = shift;
-  my $param = $self->SUPER::stringify (@_);
-  $self->media_type ().($param? '; '.$param: '');
+  my $param = $self->SUPER::stringify_params (@_);
+  $self->media_type ().(defined $param? '; '.$param: '');
 }
 
 =head2 $self->media_type ([$new_value])
@@ -189,16 +216,35 @@ sub media_type_minor ($;$) {
   }
   $self->{media_subtype};
 }
-sub media_subtype ($;$) {shift->media_type_minor (@_)}
-sub value ($;$) {shift->media_type}
+*media_subtype = \&media_type_minor;
+*value = \&media_type;
+*value_as_string = \&media_type;
 
-=head2 $self->option ($option_name)
+=item $option-value = $ct->option ($option-name)
 
-Returns/set (new) value of the option.
+Gets option value.
+
+=item $ct->option ($option-name, $option-value, ...)
+
+Set option value(s).  You can pass multiple option name-value pair
+as parameter when setting.
 
 =cut
 
 ## Inherited.
+
+=item $clone = $ua->clone ()
+
+Returns a copy of the object.
+
+=cut
+
+sub clone ($) {
+  my $self = shift;
+  my $clone = $self->SUPER::clone;
+  $clone->{media_type} = Message::Util::make_clone($self->{media_type});
+  $clone->{media_subtype} = Message::Util::make_clone($self->{media_subtype});
+}
 
 =head1 STANDARDS
 
@@ -211,15 +257,15 @@ On C<Content-Type:> header field of non-MIME specifications
 (and that of MIME before RFC 2184), extended parameter
 syntax (character set and language specification, encoded
 parameter value and continuation) is not allowed.
-To use such environment, specify use_extended_parameter = -1.
-(Even this value is -1, decode of those parameter values
+To use such environment, specify use_extended_parameter = 0.
+(Even this value is 0, decode of those parameter values
 is still enabled.)
 
   ## Examples
-  my $ct = new Message::Field::ContentType (use_extended_parameter => -1);
+  my $ct = new Message::Field::ContentType (-use_extended_parameter => 0);
   ## or
   my $ct = new Message::Field::ContentType;
-  $ct->option (use_extended_parameter => -1);
+  $ct->option (-use_extended_parameter => 0);
 
 =head1 EXAMPLE
 
@@ -236,7 +282,7 @@ is still enabled.)
   $ct->parameter ('access-type' => 'URL');
   $ct->parameter (url => 'ftp://ftp.bar.foo.example.org/'.
     'pub/a/very/very/very/long/long/uri/of/an/external-object.gz');
-  $ct->option (parameter_value_max => 30);
+  $ct->option (-parameter_value_max => 30);
   print $ct;
   	## message/external-body; access-type=URL; 
   	## url*0="ftp://ftp.bar.foo.example.org/"; 
@@ -265,7 +311,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/05 14:55:28 $
+$Date: 2002/04/21 04:27:42 $
 
 =cut
 
