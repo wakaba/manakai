@@ -8,7 +8,7 @@ Message::Header --- A Perl Module for Internet Message Headers
 package Message::Header;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.27 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.28 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;	## This may seem silly:-)
 push @ISA, qw(Message::Field::Structured);
 
@@ -35,7 +35,7 @@ push @ISA, qw(Message::Field::Structured);
     -field_format_pattern	=> '%s: %s',
     -field_name_case_sensible	=> 0,
     -field_name_unsafe_rule	=> 'NON_ftext',
-    -field_name_validation	=> 1,	## Method level option.
+    -field_name_validation	=> 0,
     -field_sort	=> 0,
     #-format	=> 'mail-rfc2822',
     -header_default_charset	=> 'iso-2022-int-1',
@@ -196,8 +196,12 @@ sub parse ($$;%) {
   my $class = shift;
   my $header = shift;
   my $self = bless {}, $class;
-  $self->_init (@_);	## BUG: don't check linebreak_strict
-  $header =~ s/\x0D?\x0A$REG{WSP}/\x20/gos if $self->{option}->{use_folding};
+  $self->_init (@_);
+  if ($self->{option}->{linebreak_strict}) {
+    $header =~ s/\x0D\x0A$REG{WSP}/\x20/gos if $self->{option}->{use_folding};
+  } else {
+    $header =~ s/\x0D?\x0A$REG{WSP}/\x20/gos if $self->{option}->{use_folding};
+  }
   for my $field (split /\x0D?\x0A/, $header) {
     if ($field =~ /$REG{M_fromline}/) {
       my ($s,undef,$value) = $self->_value_to_arrayitem
@@ -826,7 +830,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/23 12:20:11 $
+$Date: 2002/07/02 06:37:56 $
 
 =cut
 

@@ -16,7 +16,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%FMT2STR %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 use Carp ();
 require Message::MIME::EncodedWord;
@@ -261,7 +261,7 @@ sub quote_unsafe_string ($;%) {
   my %option = @_;
   $option{unsafe} ||= 'NON_atext_dot';
   $option{unsafe_regex} = $option{unsafe} if $option{unsafe} =~ /^\(\?-xism:/;
-  $option{unsafe_regex} ||= qr/$REG{$option{unsafe}}|$REG{WSP}$REG{WSP}|^$REG{WSP}|$REG{WSP}$/;
+  $option{unsafe_regex} ||= qr/$REG{$option{unsafe}}|$REG{WSP}$REG{WSP}|^$REG{WSP}|$REG{WSP}$|^=\x3F/;
   my $r = qr/([\x22\x5C])([\x21-\x7E])?/;
   $r = qr/([\x22\x5C])/ if $option{strict};	## usefor-article
   if ($string =~ /$option{unsafe_regex}/) {
@@ -276,7 +276,7 @@ sub quote_unsafe_domain ($) {
   if ($string =~ /^\[[^\[\]]+\]$/) {
     # 
   } elsif ($string =~ /$REG{NON_atext_dot}/ || $string =~ /^\.|\.$/) {
-    $string =~ s/([\x5B-\x5D])/\x5C$1/g;
+    $string =~ s/([\x0D\x5B-\x5D])/\x5C$1/g;
     $string = '['.$string.']';
   }
   $string;
@@ -444,7 +444,7 @@ sub encode_qcontent ($$) {
       $qtext =~ s/\x5C([\x00-\xFF])/$1/g;
       my %s = &{$yourself->{option}->{hook_encode_string}} ($yourself, $qtext,
                 type => 'phrase/quoted');
-      $s{value} =~ s/([\x22\x5C])([\x20-\xFF])?/"\x5C$1".($2?"\x5C$2":'')/ge;
+      $s{value} =~ s/([\x0D\x22\x5C])([\x20-\xFF])?/"\x5C$1".($2?"\x5C$2":'')/ges;
       '"'.$s{value}.'"';
   }goex;
   $quoted_strings;
@@ -561,6 +561,20 @@ sub sprintxf ($;\%) {
   $format;
 }
 
+sub decide_newline ($) {
+  my $s = shift;
+  my $nl = "\x0D\x0A";
+      my $crlf = $s =~ s/\x0D\x0A/\x0D\x0A/gs;
+      my $lfcr = $s =~ s/\x0A\x0D/\x0A\x0D/gs;
+      my $cr = $s =~ s/\x0D(?!\x0A)/\x0D/gs;
+      my $lf = $s =~ s/(?<!\x0D)\x0A/\x0A/gs;
+      if ($crlf >= $cr && $crlf >= $lf && $crlf >= $lfcr ) { $nl = "\x0D\x0A" }
+      elsif ($lfcr >= $cr && $lfcr >= $lf) { $nl = "\x0A\x0D" }
+      elsif ($cr >= $lf) { $nl = "\x0D" }
+      else { $nl = "\x0A" }
+  $nl;
+}
+
 =head1 LICENSE
 
 Copyright 2002 wakaba E<lt>w@suika.fam.cxE<gt>.
@@ -583,7 +597,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/23 12:20:11 $
+$Date: 2002/07/02 06:37:56 $
 
 =cut
 

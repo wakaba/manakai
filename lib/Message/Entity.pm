@@ -13,7 +13,7 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.22 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.23 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::Header;
@@ -171,14 +171,7 @@ sub parse ($$;%) {
   my %new_field = $self->_init (@_);
   my $nl = "\x0D\x0A";
   unless ($self->{option}->{strict_linebreak}) {
-    unless ($message =~ /\x0D\x0A/s) {
-      my $lfcr = $message =~ s/\x0A\x0D/\x0A\x0D/gs;
-      my $cr = $message =~ s/\x0D(?!\x0A)/\x0D/gs;
-      my $lf = $message =~ s/(?<!\x0D)\x0A/\x0A/gs;
-      if ($lfcr >= $cr && $lfcr >= $lf) { $nl = "\x0A\x0D" }
-      elsif ($cr >= $lf) { $nl = "\x0D" }
-      else { $nl = "\x0A" }
-    }
+    $nl = Message::Util::decide_newline ($message);
   }
   my @header = ();
   my @body = split /$nl/, $message;
@@ -357,6 +350,7 @@ sub _encode_body ($$\%) {
   	    unless ref $mt_def;
   	  $enoption{mt_is_text} = 1
   	    if $mt eq 'text' || $mt eq 'multipart' || $mt eq 'message';
+  	  $enoption{mt_is_text} = 1 if $mt_def->{text_content};
   	  my ($charset, $charset_def) = '';
   	  if ($mt_def->{mime_charset}) {
   	  ## If CT is able to have its charset parameter,
@@ -879,7 +873,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/23 12:20:11 $
+$Date: 2002/07/02 06:37:56 $
 
 =cut
 
