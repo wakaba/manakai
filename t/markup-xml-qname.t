@@ -1,11 +1,13 @@
 #!/usr/bin/perl
 use strict;
 require Test::Simple;
-require Message::Markup::XML;
-use Message::Markup::XML::QName qw/UNDEF_URI NULL_URI DEFAULT_PFX/;
+require Message::Markup::XML::Node;
+use Message::Markup::XML::QName qw/UNDEF_URI NULL_URI DEFAULT_PFX EMPTY_PFX
+                                   EMPTY_URI ZERO_PFX ZERO_URI/;
 sub ok ($;$);
-my $e = new Message::Markup::XML (type => '#element', local_name => 'test',
-	                          namespace_uri => 'http://something.test/');
+my $e = new Message::Markup::XML::Node
+              (type => '#element', local_name => 'test',
+               namespace_uri => 'http://something.test/');
 use Carp q(verbose);
 my @reg_p2n = (
                {
@@ -95,6 +97,24 @@ my @reg_p2n = (
                 opt    => {check_name => 1, resolve_name_uri_relative => 1},
                 result => 1,
                },
+               {
+                prefix => EMPTY_PFX,
+                name   => q<about:name>,
+                opt    => {check_prefix => 1, use_prefix_empty => 0},
+                result => 0,
+               },
+               {
+                prefix => EMPTY_PFX,
+                name   => q<about:name>,
+                opt    => {check_prefix => 1, use_prefix_empty => 1},
+                result => 1,
+               },
+               {
+                prefix => ZERO_PFX,
+                name   => q<about:name>,
+                opt    => {check_prefix => 1},
+                result => 0,
+               },
 );
 
 my @get_p2n = (
@@ -149,6 +169,12 @@ my @get_p2n = (
                 name   => NULL_URI,
                 opt    => {use_name_null => 1, use_prefix_default => 1,
                            ___dont_register => 1},
+                result => 1,
+               },
+               {
+                prefix => EMPTY_PFX,
+                name   => q<http://test.test/2>,
+                opt    => {use_prefix_empty => 1},
                 result => 1,
                },
 );
@@ -236,6 +262,33 @@ my @qname = (
               opt    => {check_qname => 1, check_prefix => 1,
                          check_local_name => 1, qname_separator => '|',
                          use_local_name_star => 1},
+             },
+             {
+              qname  => q":b",
+              prefix => EMPTY_PFX,
+              lname  => q:b:,
+              result => 0,
+              opt    => {check_qname => 1, check_prefix => 1,
+                         check_local_name => 1,
+                         use_prefix_empty => 0},
+             },
+             {
+              qname  => q":b",
+              prefix => EMPTY_PFX,
+              lname  => q:b:,
+              result => 1,
+              opt    => {check_qname => 1, check_prefix => 1,
+                         check_local_name => 1,
+                         use_prefix_empty => 1},
+             },
+             {
+              qname  => q"b",
+              prefix => DEFAULT_PFX,
+              lname  => q:b:,
+              result => 1,
+              opt    => {check_qname => 1, check_prefix => 1,
+                         check_local_name => 1,
+                         use_prefix_empty => 1},
              },
 );
 
@@ -358,6 +411,21 @@ my @expand = (
                xname   => [NULL_URI, q:bar:],
                opt     => {use_prefix_default => 1, use_name_null => 1},
               },
+              {
+               reset   => 0,
+               ns      => {(EMPTY_PFX) => q<about:>},
+               qname   => q":bar",
+               xname   => [q<about:>, q:bar:],
+               opt     => {use_prefix_empty => 1},
+              },
+              {
+               reset   => 0,
+               ns      => {(EMPTY_PFX) => q<about:>,
+                           (DEFAULT_PFX) => q<data:,>},
+               qname   => q"bar",
+               xname   => [q<data:,>, q:bar:],
+               opt     => {use_prefix_empty => 1, use_prefix_default => 1},
+              },
 );
 
 Test::Simple->import (tests => scalar (@reg_p2n)
@@ -467,4 +535,4 @@ for (@expand) {
   ok $chk->{success} && ($_->{qname} eq $chk->{qname}), 'Expand->QName: '.$chk->{reason};
 }
 
-print $e;
+#print $e;
