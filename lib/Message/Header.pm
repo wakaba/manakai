@@ -115,6 +115,25 @@ sub field ($$) {
   @ret;
 }
 
+=head2 $self->field_name ($index)
+
+Returns C<field-name> of $index'th C<field>.
+
+=head2 $self->field_body ($index)
+
+Returns C<field-body> of $index'th C<field>.
+
+=cut
+
+sub field_name ($$) {
+  my $self = shift;
+  $self->{field}->[shift]->{name};
+}
+sub field_body ($$) {
+  my $self = shift;
+  $self->{field}->[shift]->{body};
+}
+
 =head2 $self->field_name_list ()
 
 Returns list of all C<field-name>s.  (Even if there are two
@@ -194,15 +213,21 @@ sub delete ($$;$) {
   $self;
 }
 
-=head2 $self->count ($field_name)
+=head2 $self->count ([$field_name])
 
 Returns the number of times the given C<field> appears.
+If no $field_name is given, returns the number
+of fields.  (Same as $#$self+1)
 
 =cut
 
-sub count ($$) {
+sub count ($;$) {
   my $self = shift;
   my ($name) = (lc shift);
+  unless ($name) {
+    $self->_delete_empty_field ();
+    return $#{$self->{field}}+1;
+  }
   my $count = 0;
   for my $field (@{$self->{field}}) {
     if ($field->{name} eq $name) {
@@ -308,13 +333,19 @@ sub fold ($$;$) {
   use Message::Header;
   my $header = Message::Header->parse ($header);
   
-  for my $field (@$header) {
-    print $field->{name}, "\t=> ", $field->{body}, "\n";
+  ## Next sample is better.
+  #for my $field (@$header) {
+  #  print $field->{name}, "\t=> ", $field->{body}, "\n";
+  #}
+  
+  for my $i (0..$#$header) {
+    print $header->field_name ($i), "\t=> ", $header->field_body ($i), "\n";
   }
   
   
   ## Make simple header
   
+  use Message::Header;
   use Message::Field::Address;
   my $header = new Message::Header;
   
