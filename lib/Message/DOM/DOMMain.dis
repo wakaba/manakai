@@ -15,6 +15,10 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOM_EXCEPTION:
      http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
 Module:
   @QName:
     MDOM:DOMMain
@@ -51,7 +55,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/11/07 13:07:54 $
+     $Date: 2004/11/08 07:23:30 $
   
   @Feature:
     @@QName:
@@ -128,29 +132,125 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@Type:
+    @@rdf:type:
       ManakaiDOM:DataType
 ElementTypeBinding:
   @Name: ConstGroup
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@Type:
+    @@rdf:type:
       ManakaiDOM:ConstGroup
 ElementTypeBinding:
   @Name: Const
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@Type:
+    @@rdf:type:
       ManakaiDOM:Const
 ElementTypeBinding:
   @Name: ObjectDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@Type:
+    @@rdf:type:
       ManakaiDOM:Class
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@For:
+      ManakaiDOM:DOM
+ElementTypeBinding:
+  @Name: IntMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@For:
+      ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isForInternal: 1
+ElementTypeBinding:
+  @Name: ReMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@For:
+      ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isRedefining: 1
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethodReturn
+    @@For:
+      ManakaiDOM:DOM
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttribute
+    @@For:
+      ManakaiDOM:DOM
+ElementTypeBinding:
+  @Name: IntAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttribute
+    @@For:
+      ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isForInternal: 1
+ElementTypeBinding:
+  @Name: ReAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttribute
+    @@For:
+      ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isRedefining: 1
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttrGet
+ElementTypeBinding:
+  @Name: Set
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttrSet
+ElementTypeBinding:
+  @Name: InCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+ElementTypeBinding:
+  @Name: Exception
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMRaises
 
 ## Definition for built-in IDL types
 
@@ -237,9 +337,6 @@ DataTypeDef:
 
 ConstGroup:
   @Name: boolean
-  @IName:boolean
-  @Type:
-    ManakaiDOM:ConstGroup
   @Description:
     @@lang:en
     @@@: A boolean (truth) value.
@@ -248,7 +345,7 @@ ConstGroup:
     @@Value:
       @@@@: 1
       @@@ContentType:
-        lang:Perl
+        lang:dis
     @@Description:
       @@@lang:en
       @@@@: The boolean true value.
@@ -257,7 +354,7 @@ ConstGroup:
     @@Value:
       @@@@: 0
       @@@ContentType:
-        lang:Perl
+        lang:dis
     @@Description:
       @@@lang:en
       @@@@: The boolean false value.
@@ -1092,7 +1189,6 @@ DataTypeDef:
 
 DataTypeDef:
   @Name:  DOMObject
-  @IName: DOMObject
   @For:
     ManakaiDOM:DOM3
   @AliasFor: Object

@@ -27,6 +27,10 @@ Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @null:
     http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
   @TreeCore: \
   @xml:
     http://www.w3.org/XML/1998/namespace
@@ -71,7 +75,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/11/07 13:07:53 $
+     $Date: 2004/11/08 07:23:30 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -129,23 +133,23 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@Type:
+    @@rdf:type:
       ManakaiDOM:Exception
 ElementTypeBinding:
   @Name: IF
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@Type:
+    @@rdf:type:
       ManakaiDOM:IF
-    @@Type:
+    @@rdf:type:
       ManakaiDOM:Class
 ElementTypeBinding:
   @Name: IFDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@Type:
+    @@rdf:type:
       ManakaiDOM:IF
 
 ElementTypeBinding:
@@ -153,21 +157,21 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@Type:
+    @@rdf:type:
       ManakaiDOM:DOMConfigParameterSet
 ElementTypeBinding:
   @Name: ErrorSet
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@Type:
+    @@rdf:type:
       ManakaiDOM:DOMErrorSet
 ElementTypeBinding:
   @Name: EventSet
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@Type:
+    @@rdf:type:
       ManakaiDOM:DOMEventSet
 
 Exception:

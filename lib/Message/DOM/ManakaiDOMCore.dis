@@ -17,6 +17,10 @@ Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @null:
     http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
   @TreeCore: \
   @xhtml1:
     http://www.w3.org/1999/xhtml
@@ -27,13 +31,6 @@ Namespace:
 Module:
   @QName: 
     MDOM:ManakaiDOMCore
-  @BindingName:
-    @@prefix:
-      Message::DOM::
-    @@ContentType:
-      lang:Perl
-    @@For:
-      ManakaiDOM:ManakaiDOM
   @FullName:
     @@lang:en
     @@@: Manakai DOM Core Module
@@ -52,7 +49,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/11/07 13:07:54 $
+     $Date: 2004/11/08 07:23:30 $
 
   @Require:
     @@Module:
@@ -107,21 +104,21 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@Type:
+    @@rdf:type:
       ManakaiDOM:IF
-    @@Type:
+    @@rdf:type:
       ManakaiDOM:Class
 ElementTypeBinding:
   @Name: ClassDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@Type:
+    @@rdf:type:
       ManakaiDOM:Class
 
 ClassDef:
   @Name: ManakaiDOMNodeObjectNode
-  @Type:
+  @rdf:type:
     ManakaiDOM:Class
   @For:
     ManakaiDOM:ManakaiDOM

@@ -19,6 +19,8 @@ Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @MUError:\
   @MUErrorCore:-
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
   @TreeCore:
@@ -45,7 +47,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/11/07 13:07:54 $
+     $Date: 2004/11/08 07:23:30 $
   
   @Description:
     @@lang:en
@@ -73,7 +75,7 @@ Module:
       DOMCore:DOMImplementation::DOM3
 
   @Require:
-    @@BindingModule:
+    @@AppModule:
       @@@For:
         ManakaiDOM:ManakaiDOM
       @@@Def:
@@ -83,6 +85,12 @@ Module:
           Message::Util::Error
     @@Module:
       @@@Name: DOMMain
+    @@Module:
+      @@@Name: DOMMain
+      @@@For:
+        ManakaiDOM:ManakaiDOM !ManakaiDOM:DOM3
+      @@@WithFor: 
+        ManakaiDOM:DOM3
 
 ForDef:
   @QName:
@@ -202,7 +210,7 @@ ResourceTypeDef:
 ResourceDef:
   @QName:
     dis:ResourceDef
-  @Type:
+  @rdf:type:
     dis:ElementType
   @Description:
     @@lang:en
@@ -230,7 +238,7 @@ ElementTypeBinding:
   @ElementType: 
     dis:ResourceDef
   @ShadowContent:
-    @@Type:
+    @@rdf:type:
       rdfs:Class
     @@ISA:
       rdfs:Class
@@ -258,7 +266,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@Type:
+    @@rdf:type:
       ManakaiDOM:DataType
 
 ResourceTypeDef:
@@ -272,7 +280,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@Type:
+    @@rdf:type:
       ManakaiDOM:Exception
 
 ResourceTypeDef:
@@ -286,7 +294,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@Type:
+    @@rdf:type:
       ManakaiDOM:Warning
 
 ResourceTypeDef:
@@ -312,7 +320,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@Type:
+    @@rdf:type:
       ManakaiDOM:Class
 
 ResourceTypeDef:
@@ -325,12 +333,35 @@ ResourceTypeDef:
 ResourceDef:
   @QName:
     MDOM:
-  @Type:
+  @rdf:type:
     dis:ModuleGroup
   @Description:
     @@lang:en
     @@@:
       The manakai DOM modules
+  @AppName:
+    @@@:
+      Message::DOM::
+    @@For:
+      ManakaiDOM:ManakaiDOMLatest
+  @AppName:
+    @@@:
+      Message::DOM::
+    @@ManakaiDOM:moduleSuffix: Level3
+    @@For: 
+      ManakaiDOM:ManakaiDOM3
+  @AppName:
+    @@@:
+      Message::DOM::
+    @@ManakaiDOM:moduleSuffix: Level2
+    @@For: 
+      ManakaiDOM:ManakaiDOM2
+  @AppName:
+    @@@:
+      Message::DOM::
+    @@ManakaiDOM:moduleSuffix: Level1
+    @@For: 
+      ManakaiDOM:ManakaiDOM1
 
 ResourceTypeDef:
   @QName:
@@ -338,12 +369,32 @@ ResourceTypeDef:
   @Description:
     @@lang:en
     @@@: An RDF property.
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdfs:Property
+
 ResourceTypeDef:
   @QName:
     ManakaiDOM:DOMAttribute
   @Description:
     @@lang:en
     @@@: A DOM attribute.
+ResourceTypeDef:
+  @QName: 
+    ManakaiDOM:DOMAttrGet
+  @Description:
+    @@lang:en
+    @@@: DOM attribute getter.
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMAttrSet
+  @Description:
+    @@lang:en
+    @@@: DOM attribute setter.
 ResourceTypeDef:
   @QName:
     ManakaiDOM:DOMMethod
@@ -356,6 +407,12 @@ ResourceTypeDef:
   @Description:
     @@lang:en
     @@@: A DOM method parameter.
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMMethodReturn
+  @Description:
+    @@lang:en
+    @@@: A DOM method return value.
 ResourceTypeDef:
   @QName:
     ManakaiDOM:DOMConfigParameter
@@ -392,6 +449,86 @@ ResourceTypeDef:
   @Description:
     @@lang:en
     @@@: A set of DOM error definitions.
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:InCase
+  @Description:
+    @@lang:en
+    @@@: "In case" description.
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMRaises
+  @Description:
+    @@lang:en
+    @@@: "Raises an exception".
+
+PropDef:
+  @QName:
+    rdf:type
+  @rdfs:domain:
+    rdfs:Resource
+  @rdfs:range:
+    rdfs:Class
+PropDef:
+  @QName:
+    rdf:domain
+  @rdfs:domain:
+    rdfs:Property
+  @rdfs:range:
+    rdfs:Class
+PropDef:
+  @QName:
+    rdf:range
+  @rdfs:domain:
+    rdfs:Property
+  @rdfs:range:
+    rdfs:Class
+
+PropDef:
+  @QName:
+    dis:Type
+  @rdfs:domain:
+    rdfs:Resource
+  @rdfs:range:
+    rdfs:Resource
+PropDef:
+  @QName:
+    dis:For
+  @rdfs:domain:
+    DOMMain:any
+PropDef:
+  @QName:
+    dis:ContentType
+  @rdfs:domain:
+    DOMMain:any
+  @rdfs:range:
+    ManakaiDOM:DataType
+PropDef:
+  @QName:
+    dis:lang
+  @rdfs:domain:
+    DOMMain:any
+PropDef:
+  @QName:
+    dis:script
+  @rdfs:domain:
+    DOMMain:any    
+
+PropDef:
+  @QName:
+    ManakaiDOM:isForInternal
+  @Type:
+    DOMMain:boolean
+PropDef:
+  @QName:
+    ManakaiDOM:isRedefining
+  @Type:
+    DOMMain:boolean
+PropDef:
+  @QName:
+    ManakaiDOM:moduleSuffix
+  @Type:
+    DOMMain:DOMString
 
 DataTypeDef:
   @QName:
@@ -808,12 +945,17 @@ WarningDef:
 
 ClassDef:
   @Name: ManakaiDOMObject
-  @IName:ManakaiDOMObject
-  @Type:
-    ManakaiDOM:Class
   @For: ManakaiDOM
   @ISA:
-    DOMMain:DOMObject
+    @@@:
+      DOMMain:DOMObject
+    @@For:
+      ManakaiDOM:DOM3
+  @ISA:
+    @@@: 
+      DOMMain:DOMObject::ManakaiDOM:DOM3
+    @@For:
+      ManakaiDOM:ManakaiDOM !ManakaiDOM:DOM3
   @Description:
     @@lang:en
     @@@:
@@ -860,8 +1002,6 @@ ClassDef:
 
 ClassDef:
   @Name: ManakaiDOMExceptionOrWarning
-  @IName:ManakaiDOMExceptionOrWarning
-  @Type: Class
   @For: ManakaiDOM
   @Description:
     @@lang:en
@@ -934,8 +1074,6 @@ WarningDef:
 
 ClassDef:
   @Name: ManakaiDOMNodeObject
-  @IName:ManakaiDOMNodeObject
-  @Type: Class
   @ISA: ManakaiDOMObject
   @For: ManakaiDOM
   @Description:
@@ -1251,9 +1389,7 @@ ClassDef:
 
 ClassDef:
   @Name: ManakaiDOMNodeReference
-  @IName:ManakaiDOMNodeReference
   @For: ManakaiDOM
-  @Type: Class
   @ISA: ManakaiDOMObject
   @IntMethod:
     @@Name: destroy

@@ -4,6 +4,7 @@ use strict;
 
 use Message::Util::QName::General [qw/ExpandedURI/], {
   d => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis-->,
+  dis2pm => q<http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#>,
   DOMCore => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#>,
   DOMMain => q<http://suika.fam.cx/~wakaba/archive/2004/dom/main#>,
   infoset => q<http://www.w3.org/2001/04/infoset#>,
@@ -347,8 +348,8 @@ sub dis_uri_for_match ($$%) {
   if ($dis_uri_for_match_loop == 1024) {
     valid_err (qq'$0: "For" URI inheritance might be looping');
   }
-  for (keys %{$State->{For}->{$for_uri}->{ISA}||{}},
-       keys %{$State->{For}->{$for_uri}->{Implement}||{}}) {
+  for (@{$State->{For}->{$for_uri}->{ISA}||[]},
+       @{$State->{For}->{$for_uri}->{Implement}||[]}) {
     if (dis_uri_for_match ($uri, $_, %opt)) {
       return 1;
     }
@@ -425,7 +426,7 @@ sub dis_get_attr_node (%) {
                                           node => $opt{parent});
   for (@{$opt{parent}->child_nodes}) {
     next unless $_->node_type eq '#element';
-    if (dis_element_type_match ($_->local_name, $en, %opt)) {
+    if (dis_element_type_match ($_->local_name, $en, %opt, node => $_)) {
       if (defined $opt{For}) {
         unless (dis_node_for_match ($_, $opt{For}, %opt)) {
           next;
@@ -665,6 +666,7 @@ sub dis_load_module_element ($;%) {
   my $mod = {
     FileName => $opt{module_file_name},
     Namespace => $node->get_attribute_value ('Namespace'),
+    src => $node,
   };
   for ($node->get_attribute ('QName')) {
     valid_err (q<Module "QName" attribute required>, node => $node) unless $_;
@@ -675,7 +677,7 @@ sub dis_load_module_element ($;%) {
     $mod->{URI} = dis_typeforuris_to_uri ($mod->{NameURI}, $opt{For}, %opt);
     $mod->{ModuleGroup} = $uri;
     $mod->{def_required}->{ModuleGroup}->{$uri} ||= 1;
-    $mod->{ISA}->{$mod->{NameURI}} = 1
+    push @{$mod->{ISA}}, $mod->{NameURI}
       unless $mod->{For}->{ExpandedURI q<ManakaiDOM:all>};
   }
   if (not defined $mod->{Namespace}) {
@@ -697,8 +699,17 @@ sub dis_load_module_element ($;%) {
     if (dis_element_type_match ($ln, 'Require', %opt, node => $_)) {
       for (@{$_->child_nodes}) {
         next unless $_->node_type eq '#element';
+        next unless dis_node_for_match ($_, $opt{For}, %opt);
         if (dis_element_type_match ($_->local_name, 'Module',
                                     %opt, node => $_)) {
+          local $opt{For} = $opt{For};
+          my $wf = dis_get_attr_node (%opt, parent => $_,
+                                      name => 'WithFor');
+          if ($wf) {
+            $opt{For} = dis_qname_to_uri ($wf->value, use_default_namespace => 1,
+                                          %opt, node => $wf);
+            $mod->{def_required}->{For}->{$opt{For}} ||= 1;
+          }
           local $State->{Namespace} = {};
           local $State->{ETBinding} = {};
           local $State->{module};
@@ -709,30 +720,6 @@ sub dis_load_module_element ($;%) {
             if defined $State->{module};
         }
       }
-    }
-  }
-  my $bname = dis_get_attr_node (%opt, name => 'BindingName',
-                                 parent => $node);
-  my $for = $opt{For} || ExpandedURI q<ManakaiDOM:all>;
-  if ($bname) {
-    if (dis_uri_for_match (ExpandedURI q<ManakaiDOM:Perl>, $for, %opt)) {
-      my $pf = $bname->get_attribute ('prefix');
-      if ($pf) {
-        $mod->{perl_package_prefix} = $pf->value;
-        if ($bname->value) {
-          $mod->{perl_package_name} = $bname->value;
-        } else {
-          $mod->{perl_package_name} = $mod->{perl_package_prefix}.
-                                      $mod->{Name};
-        }
-      } else {
-        valid_err (q<"prefix" attribute required>, node => $bname);
-      }
-    }
-  } else {
-    if (dis_uri_for_match (ExpandedURI q<ManakaiDOM:Perl>, $for, %opt)) {
-      valid_err (q<"BindingName" attribute specifying "prefix" required>,
-                 node => $node);
     }
   }
   return 1;
@@ -757,8 +744,10 @@ sub dis_load_fordef_element ($;%) {
   $State->{For}->{$uri} = my $for = {
     NameURI => $uri,
     URI => $uri,
-    ISA => {},
-    Implement => {},
+    ISA => [],
+    Implement => [],
+    parentModule => $State->{module},
+    src => $node,
   };
   $State->{def_required}->{For}->{$uri} = -1;
 
@@ -774,12 +763,12 @@ sub dis_load_fordef_element ($;%) {
     if ($ln eq ExpandedURI q<d:ISA>) {
       my $uri = dis_qname_to_uri ($_->value, use_default_namespace => 1,
                                   %opt, node => $_);
-      $for->{$ln}->{$uri} = 1;
+      push @{$for->{ISA}}, $uri;
       $State->{def_required}->{For}->{$uri} ||= 1;
     } elsif ($ln eq ExpandedURI q<d:Implement>) {
       my $uri = dis_qname_to_uri ($_->value, use_default_namespace => 1,
                                   %opt, node => $_);
-      $for->{$ln}->{$uri} = 1;
+      push @{$for->{Implement}}, $uri;
       $State->{def_required}->{For}->{$uri} ||= 1;
     } elsif ({
                ExpandedURI q<d:QName> => 1,
@@ -791,8 +780,8 @@ sub dis_load_fordef_element ($;%) {
       valid_err (q<Unsupported element type>, node => $_);
     }
   }
-  $for->{ISA}->{ExpandedURI q<ManakaiDOM:all>} = 1
-    if not keys %{$for->{ISA}} and
+  push @{$for->{ISA}}, ExpandedURI q<ManakaiDOM:all>
+    if not @{$for->{ISA}} and
        not $for->{URI} eq ExpandedURI q<ManakaiDOM:all>;
 }
 
@@ -891,6 +880,7 @@ sub dis_load_classdef_element ($;%) {
     valid_err (q<Class definition nests too deep>, node => $node);
   }
   my $cls;
+  my $oldcls = '';
   my $qn = dis_get_attr_node (%opt, parent => $node, name => 'QName');
   my $ln = dis_get_attr_node (%opt, parent => $node, name => 'Name');
   my $al = dis_get_attr_node (%opt, parent => $node, name => 'AliasFor');
@@ -904,25 +894,39 @@ sub dis_load_classdef_element ($;%) {
     unless ($al) {
       $cls = ($State->{Type}->{$dfuri} ||= {});
       if (defined $cls->{Name}) {
-        valid_err (qq<Class <$dfuri> already defined>, node => $node);
+        valid_err (qq<Class <$dfuri> is already defined>, node => $node);
       }
       $cls->{Name} = $lname;
       $cls->{NameURI} = $uri;
       $cls->{URI} = $dfuri;
+      $cls->{parentModule} = $State->{module};
+      $cls->{src} = $node;
     } else {
-      my $canon = dis_qname_to_uri ($al->value, %opt, node => $al);
-      $cls = $State->{Type}->{$dfuri} = ($State->{Type}->{$canon} ||= {});
-      $State->{def_required}->{Class}->{$dfuri} ||= 1;
+      my $canon = dis_qname_to_uri ($al->value, 
+                                    use_default_namespace => 1,
+                                    %opt, node => $al);
+      if (defined $State->{Type}->{$dfuri}->{Name}) {
+        valid_err (qq<Class <$dfuri> is already defined>, node => $node);
+      }
+      $oldcls = $State->{Type}->{$dfuri};
+      $cls = ($State->{Type}->{$canon} ||= {});
+      for (keys %{$State->{Type}->{$dfuri}->{aliasURI}||{}}, $dfuri) {
+        $cls->{aliasURI}->{$_} = 1;
+        $State->{Type}->{$_} = $cls;
+      }
+      $State->{def_required}->{Class}->{$dfuri} = -1;
+      $State->{def_required}->{Class}->{$canon} ||= 1;
     }
     $cls->{For}->{$opt{For} ||= ExpandedURI q<ManakaiDOM:all>} = 1;
     if ($State->{current_class_container}) {
-      $State->{current_class_container}->{Class}->{$dfuri} = $cls;
+      $State->{current_class_container}->{Resource}->{$dfuri} = $cls;
+      ## Note: Alias to alias might make confusion.
     }
     $State->{def_required}->{Class}->{$dfuri} = -1;
     unless ($opt{For} eq ExpandedURI q<ManakaiDOM:all>) {
       my $alluri = dis_typeforuris_to_uri ($uri, ExpandedURI q<ManakaiDOM:all>,
                                            %opt);
-      $cls->{ISA}->{$alluri} = 1;
+      push @{$cls->{ISA}||=[]}, $alluri;
       #$State->{def_required}->{Class}->{$alluri} ||= 1;
     }
   } elsif ($ln) {
@@ -938,50 +942,50 @@ sub dis_load_classdef_element ($;%) {
         $cls->{Name} = $lname;
         $cls->{NameURI} = $uri;
         $cls->{URI} = $dfuri;
+        $cls->{parentModule} = $State->{module};
+        $cls->{src} = $node;
       } else {
-        my $canon = dis_qname_to_uri ($al->value, %opt, node => $al);
-        $cls = $State->{Type}->{$dfuri} = ($State->{Type}->{$canon} ||= {});
-        $State->{def_required}->{Class}->{$dfuri} ||= 1;
+        my $canon = dis_qname_to_uri ($al->value, use_default_namespace => 1,
+                                      %opt, node => $al);
+        $oldcls = $State->{Type}->{$dfuri};
+        $cls = ($State->{Type}->{$canon} ||= {});
+        for (keys %{$State->{Type}->{$dfuri}->{aliasURI}||{}}, $dfuri) {
+          $cls->{aliasURI}->{$_} = 1;
+          $State->{Type}->{$_} = $cls;
+        }
+        $State->{def_required}->{Class}->{$dfuri} ||= -1;
+        $State->{def_required}->{Class}->{$canon} ||= 1;
       }
       $cls->{For}->{$opt{For} || ExpandedURI q<ManakaiDOM:all>} = 1;
       $State->{def_required}->{Class}->{$dfuri} = -1;
       unless ($opt{For} eq ExpandedURI q<ManakaiDOM:all>) {
         my $alluri = dis_typeforuris_to_uri ($uri, ExpandedURI q<ManakaiDOM:all>,
                                              %opt);
-        $cls->{ISA}->{$alluri} = 1;
+        push @{$cls->{ISA}||=[]}, $alluri;
         #$State->{def_required}->{Class}->{$alluri} ||= 1;
       }
     } else {  ## Local class
       my $dfuri = dis_typeforuris_to_uri ($lname, $opt{For}, %opt);
       unless ($al) {
-        $cls = ($State->{current_class_container}->{Class}->{$dfuri} ||= {});
+        $cls = ($State->{current_class_container}->{Resource}->{$dfuri} ||= {});
         if (defined $cls->{Name}) {
           valid_err (q<Local class <$dfuri> is already defined>, node => $node);
         }
         $cls->{Name} = $lname;
+        $cls->{parentModule} = $State->{module};
       } else {
-        my $canon = dis_qname_to_uri ($al->value, %opt, node => $al);
-        $cls = $State->{current_class_container}->{Class}->{$dfuri}
-             = ($State->{current_class_contaner}->{Class}->{$canon} ||= {});
-        $State->{def_required}->{Class}->{$dfuri} ||= 1;
+        valid_err (q<Local class aliasing is not supported>, node => $al);
       }
       $cls->{For}->{$opt{For} || ExpandedURI q<ManakaiDOM:all>} = 1;
-      unless ($opt{For} eq ExpandedURI q<ManakaiDOM:all>) {
-        my $alluri = dis_typeforuris_to_uri ($lname,
-                                             ExpandedURI q<ManakaiDOM:all>,
-                                             %opt);
-        $cls->{ISA}->{$alluri} = 1;
-        #$State->{def_required}->{Class}->{$alluri} ||= 1;
-      }
     }
   } else { ## Anon class
     if ($al) {
-      valid_err (q<Name is required for alias>, node => $node);
+      valid_err (q<Anonymous class aliasing is not supported>, node => $node);
     }
     my $lname = sprintf '_:dis-class-%d', $dis_anon_class_id++;
     my $dfuri = dis_typeforuris_to_uri ($lname, $opt{For}, %opt);
     if ($State->{current_class_container}) {
-      $cls = ($State->{current_class_container}->{Class}->{$dfuri} ||= {});
+      $cls = ($State->{current_class_container}->{Resource}->{$dfuri} ||= {});
     } else {
       $cls = ($State->{Type}->{$dfuri} ||= {});
     }
@@ -990,13 +994,15 @@ sub dis_load_classdef_element ($;%) {
     }
     $cls->{Name} = '';
     $cls->{For}->{$opt{For} || ExpandedURI q<ManakaiDOM:all>} = 1;
+    $cls->{parentModule} = $State->{module};
+    $cls->{src} = $node;
   }
 
   for (@{$node->child_nodes}) {
     next unless $_->node_type eq '#element';
     next unless dis_node_for_match ($_, $opt{For}, %opt);
     my $ln = dis_element_type_to_uri ($_->local_name, %opt, node => $_);
-    if ($ln eq ExpandedURI q<d:Type>) {
+    if ($ln eq ExpandedURI q<rdf:type>) {
       my $uri = dis_typeforqnames_to_uri ($_->value, use_default_namespace => 1,
                                           %opt, node => $_);
       $cls->{Type}->{$uri} = 1;
@@ -1004,12 +1010,12 @@ sub dis_load_classdef_element ($;%) {
     } elsif ($ln eq ExpandedURI q<d:ISA>) {
       my $uri = dis_typeforqnames_to_uri ($_->value, use_default_namespace => 1,
                                           %opt, node => $_);
-      $cls->{$ln}->{$uri} = 1;
+      push @{$cls->{ISA}||=[]}, $uri;
       $State->{def_required}->{Class}->{$uri} ||= 1;
     } elsif ($ln eq ExpandedURI q<d:Implement>) {
       my $uri = dis_typeforqnames_to_uri ($_->value, use_default_namespace => 1,
                                           %opt, node => $_);
-      $cls->{Implement}->{$uri} = 1;
+      push @{$cls->{Implement}||=[]}, $uri;
       $State->{def_required}->{Class}->{$uri} ||= 1;
     } elsif ($ln eq ExpandedURI q<d:ResourceDef>) {
       valid_err ("Alias class name cannot be able to have this type of elements",
@@ -1021,8 +1027,8 @@ sub dis_load_classdef_element ($;%) {
   unless (keys %{$cls->{Type}}) {
     valid_err (q<Class type must be specified>, node => $node);
   }
-  $cls->{ISA}->{ExpandedURI q<DOMMain:any>} = 1
-    if not keys %{$cls->{ISA}||{}} and
+  push @{$cls->{ISA}}, ExpandedURI q<DOMMain:any>
+    if not @{$cls->{ISA}||=[]} and
        (not defined $cls->{NameURI} or
         not $cls->{NameURI} eq ExpandedURI q<DOMMain:any>);
 }}
@@ -1043,6 +1049,48 @@ sub dis_check_undef_type_and_for (%) {
     }
   }
 }
+
+
+
+=back
+
+=cut
+
+=head1 APPLICATION-SPECIFIC FUNCTIONS
+
+Application-specific initializations and operations. 
+These functions should be used after C<dis_check_undef_type_and_for> 
+is done.
+
+=head2 Perl-specific Functions
+
+=over 4
+
+=item dis_perl_init ($root_node, %opt)
+
+Read Perl-specific basic properties.
+
+=cut
+
+sub dis_perl_init ($;%) {
+  my ($src, %opt) = @_;
+  ## Perl package name
+  for my $mod (values %{$State->{Module}}) {
+    next if $mod->{ExpandedURI q<dis2pm:done>};
+    $opt{For} = [keys %{$mod->{For}}]->[0];
+    my $mg = $State->{Type}->{$mod->{ModuleGroup}};
+    my $an = dis_get_attr_node (%opt, parent => $mg->{src}, name => 'AppName');
+    if ($an) {
+      my $pn = $an->value . $mod->{Name};
+      my $suffix = dis_get_attr_node
+                      (%opt, parent => $an, 
+                       name => {uri => ExpandedURI q<ManakaiDOM:moduleSuffix>});
+      $pn .= $suffix->value if $suffix;
+      $mod->{ExpandedURI q<dis2pm:packageName>} = $pn;
+    }
+    $mod->{ExpandedURI q<dis2pm:done>} = 1;
+  }  
+} # dis_perl_init
 
 
 =head1 FUNCTIONS FOR DISDOC DOCUMENTATION
@@ -1359,4 +1407,4 @@ sub disdoc_inline2pod ($;%) {
 
 =cut
 
-1; # $Date: 2004/11/07 13:07:54 $
+1; # $Date: 2004/11/08 07:23:30 $

@@ -8,15 +8,25 @@ GetOptions (
   'for=s' => \$Opt{For},
   'help' => \$Opt{help},
   'no-undef-check' => \$Opt{no_undef_check},
+  'output-as-n3' => \$Opt{output_as_n3},
+  'output-as-xml' => \$Opt{output_as_xml},
   'output-for' => \$Opt{output_for},
   'output-local-resource' => \$Opt{output_local_resource},
   'output-module' => \$Opt{output_module},
+  'output-only-in-module=s' => \$Opt{output_resource_pattern},
+  'output-prop-perl' => \$Opt{output_prop_perl},
   'output-resource' => \$Opt{output_resource},
+  'output-resource-uri-pattern=s' => \$Opt{output_resource_uri_pattern},
 ) or pod2usage (2);
 if ($Opt{help}) {
   pod2usage (0);
   exit;
 }
+if ($Opt{output_as_n3} and $Opt{output_as_xml}) {
+  pod2usage (2);
+  exit;
+}
+$Opt{output_as_xml} = 1 unless $Opt{output_as_n3};
 
 BEGIN {
 require 'manakai/genlib.pl';
@@ -30,6 +40,8 @@ our $State;
 our $result = new manakai::n3;
 
 $Opt{file_name} = shift;
+$Opt{output_resource_pattern} ||= qr/.+/;
+$Opt{output_resource_uri_pattern} ||= qr/.+/;
 
 $State->{DefaultFor} = $Opt{For};
 
@@ -41,7 +53,11 @@ $State->{for_def_required}->{$State->{DefaultFor}} ||= 1;
 dis_check_undef_type_and_for ()
   unless $Opt{no_undef_check};
 
-my $primary = $result->get_new_anon_id;
+if (dis_uri_for_match (ExpandedURI q<ManakaiDOM:Perl>, $State->{DefaultFor})) {
+  dis_perl_init ($source, For => $State->{DefaultFor});
+}
+
+my $primary = $result->get_new_anon_id (Name => 'boot');
 $result->add_triple ($primary =>ExpandedURI q<d:module>=> $State->{module})
                 if $Opt{output_module};
 $result->add_triple ($primary =>ExpandedURI q<d:DefaultFor> => $State->{DefaultFor})
@@ -70,8 +86,13 @@ for (keys %{$State->{Module}}) {
     for (keys %{$mod->{For}}) {
       $result->add_triple ($mod->{URI} =>ExpandedURI q<d:For>=> $_);
     }
-    for (keys %{$mod->{ISA}}) {
+    for (@{$mod->{ISA}}) {
       $result->add_triple ($mod->{URI} =>ExpandedURI q<rdfs:subClassOf>=> $_);
+    }
+    if ($Opt{output_prop_perl}) {
+      $result->add_triple ($mod->{URI} =>ExpandedURI q<dis2pm:packageName>=>
+                           n3_literal $mod->{ExpandedURI q<dis2pm:packageName>})
+        if defined $mod->{ExpandedURI q<dis2pm:packageName>};
     }
   } else {
     $result->add_triple ($_ =>ExpandedURI q<owl:sameAs>=> $mod->{URI});
@@ -81,16 +102,19 @@ for (keys %{$State->{Module}}) {
 if ($Opt{output_for}) {
 for (keys %{$State->{For}}) {
   my $mod = $State->{For}->{$_};
+  next unless $mod->{parentModule} =~ /$Opt{output_resource_pattern}/;
   if ($_ eq $mod->{URI}) {
     $result->add_triple ($mod->{URI} =>ExpandedURI q<rdf:type>=>
                          ExpandedURI q<d:For>);
     $result->add_triple ($mod->{URI} =>ExpandedURI q<d:NameURI>=> $mod->{URI});
     $result->add_triple ($mod->{URI} =>ExpandedURI q<d:FullName>=>
                          n3_literal $mod->{FullName});
-    for (keys %{$mod->{ISA}}) {
+    $result->add_triple ($mod->{URI} =>ExpandedURI q<d:parentModule>=>
+                         $mod->{parentModule});
+    for (@{$mod->{ISA}}) {
       $result->add_triple ($mod->{URI} =>ExpandedURI q<rdfs:subClassOf>=> $_);
     }
-    for (keys %{$mod->{Implement}}) {
+    for (@{$mod->{Implement}}) {
       $result->add_triple ($mod->{URI} =>ExpandedURI q<d:Implement>=> $_);
     }
   } else {
@@ -103,9 +127,14 @@ if ($Opt{output_resource}) {
   sub class_to_rdf ($;%) {
     my ($mod, %opt) = @_;
     return unless defined $mod->{Name};
+    return unless $mod->{parentModule} =~ /$Opt{output_resource_pattern}/;
     if ((defined $mod->{URI} and $opt{key} eq $mod->{URI}) or
         not defined $mod->{URI}) {
-      my $uri = defined $mod->{URI} ? $mod->{URI} : $result->get_new_anon_id;
+      return if defined $mod->{URI} and
+                $mod->{URI} !~ /$Opt{output_resource_uri_pattern}/;
+      my $uri = defined $mod->{URI}
+                       ? $mod->{URI}
+                       : $result->get_new_anon_id (Name => $mod->{Name});
       $result->add_triple ($uri =>ExpandedURI q<d:Name>=>
                            n3_literal $mod->{Name}) if length $mod->{Name};
       $result->add_triple ($uri =>ExpandedURI q<d:NameURI>=> $mod->{NameURI})
@@ -113,41 +142,49 @@ if ($Opt{output_resource}) {
       $result->add_triple ($uri =>ExpandedURI q<d:parentResource>=>
                            $opt{parent_class_uri})
         if defined $opt{parent_class_uri};
+      $result->add_triple ($uri =>ExpandedURI q<d:parentModule>=>
+                           $mod->{parentModule});
       for (keys %{$mod->{Type}}) {
         $result->add_triple ($uri =>ExpandedURI q<rdf:type>=> $_);
       }
-      for (keys %{$mod->{ISA}}) {
+      for (@{$mod->{ISA}}) {
         $result->add_triple ($uri =>ExpandedURI q<rdfs:subClassOf>=> $_);
       }
-      for (keys %{$mod->{Implement}}) {
+      for (@{$mod->{Implement}}) {
         $result->add_triple ($uri =>ExpandedURI q<d:Implement>=> $_);
       }
       if ($Opt{output_local_resource}) {
-        for (keys %{$mod->{Class}}) {
-          class_to_rdf ($mod->{Class}->{$_}, parent_class => $mod,
+        for (keys %{$mod->{Resource}}) {
+          class_to_rdf ($mod->{Resource}->{$_}, parent_class => $mod,
                         parent_class_uri => $uri,
                         key => $_);
         }
       }
     } else { ## Alias URI
-      $result->add_triple ($_ =>ExpandedURI q<owl:sameAs>=> $mod->{URI});
+      return if $opt{key} !~ /$Opt{output_resource_uri_pattern}/;
+      $result->add_triple ($opt{key} =>ExpandedURI q<owl:sameAs>=> $mod->{URI});
     }
   }
-  for (keys %{$State->{Type}}) {
+  for (sort keys %{$State->{Type}}) {
     class_to_rdf ($State->{Type}->{$_}, key => $_);
   }
 }
 
-print $result->stringify_as_xml;
+if ($Opt{output_as_xml}) {
+  print $result->stringify_as_xml;
+} else {
+  print $result->stringify;
+}
 
 package manakai::n3;
 sub new ($) {
   bless {triple => [], anon => 0}, shift;
 }
 
-sub get_new_anon_id ($) {
-  my ($self) = @_;
-  return sprintf '_:r%d', $self->{anon}++;
+sub get_new_anon_id ($;%) {
+  my ($self, %opt) = @_;
+  my $s = $opt{Name} ? $opt{Name} : '';
+  return sprintf '_:r%d%s', $self->{anon}++, $s;
 }
 
 sub add_triple ($$$$) {
