@@ -1,0 +1,1531 @@
+Namespace:
+  @DOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
+  @ManakaiDOMHTML:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom/html#
+  @TreeCore:\
+  @xhtml1:
+    http://www.w3.org/1999/xhtml
+Module:
+  @Name:  DOMWebForms
+  @Namespace:
+     http://suika.fam.cx/~wakaba/archive/2004/dom/html#
+  @BindingName:
+     @@@:  html
+     @@Type:
+        lang:IDL-DOM
+     @@prefix:  dom.w3c.org
+     @@Condition:DOM1
+  @BindingName:
+     @@@:  html2
+     @@Type:
+        lang:IDL-DOM
+     @@prefix:  dom.w3c.org
+     @@Condition:DOM2
+  @FullName:
+    @@lang:en
+    @@@: DOM Web Forms Module
+  @Description:
+    @@lang:en
+    @@@:
+      Interfaces to manipulate Web Forms elements or form controls. 
+      \
+      {NOTE:: Most interfaces are originally defined in DOM 
+              Levels 1 and 2 HTML Modules and later ammended 
+              by the Web Forms 2.0 Specification.  These 
+              standards are based on DOM Level 0 implementations. 
+      \
+      }
+
+  @Author:
+     @@FullName: Wakaba
+     @@Mail:  w@suika.fam.cx
+  @License:
+     license:Perl+MPL
+  @Date.RCS:
+     $Date: 2004/10/18 12:23:51 $
+
+  @ConditionDef:
+    @@Name:DOM1
+  @ConditionDef:
+    @@Name:DOM2
+    @@ISA:DOM1
+  @ConditionDef:
+    @@Name:WF20
+    @@ISA:DOM2
+  @NormalCondition:WF20
+
+  @Feature:
+    @@Name:WebForms
+    @@Version:2.0
+    @@FullName:
+      @@@lang:en
+      @@@@:Web Forms 2.0
+    @@Condition:WF20
+  
+  @Require:
+     @@Module:
+        @@@Name:  DOMHTML
+        @@@Namespace:
+          http://suika.fam.cx/~wakaba/archive/2004/dom/html#
+
+DataTypeAlias:
+  @Name:  DOMString
+  @Type:
+     DOMCore:DOMString
+
+IF:
+  @Name:  HTMLOptionsCollection
+  @Description:
+    @@lang:en
+    @@@:
+      A list of nodes representing HTML <HE:option> elements.  
+      An individual node may be accessed by either ordinal index 
+      or the <HA:name> or <HA:id> of the node.
+      \
+      <IF:HTMLOptionCollection> objects are <EM:live>; they are 
+      automatically updated when the underlying document 
+      is changed.
+      
+  @Level[list]:  2
+  @SpecLevel[list]:  2
+  @Attr:
+     @@Name:  length
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The length of the list.
+     @@Get:
+        @@@Type:
+           DOMMain:unsigned-long
+     @@Set:
+        @@@Type:
+           DOMMain:unsigned-long
+        @@@Exception:
+           @@@@Name:  NOT_SUPPORTED_ERR
+           @@@@Type:
+              DOMCore:DOMException
+           @@@@SubType:
+             @@@@@QName:
+               ManakaiDOMHTML:MDOMHTML_IMPL_NOSUPPORT_SET_OPTION_LENGTH
+             @@@@@Description:
+               @@@@@@lang:en
+               @@@@@@@:
+                 Setting the length is not allowed by the DOM 
+                 implementation.
+  @Method:
+     @@Name:  item
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Retrieve a node specified by ordinal index.
+     @@Param:
+        @@@Name:  index
+        @@@Type:
+           DOMMain:unsigned-long
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            Ordinal index of the node to retrieve, in the 
+            document order.  The index origin is <DOM:0>.
+     @@Return:
+        @@@Type:  Node
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The <P:index>th node.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The <P:index> is out of range.
+  @Method:
+     @@Name:  namedItem
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Retrieve a node using a name. 
+       \
+         It first searches for a <IF:Node> with a matching <HA:id> 
+         attributes.  If it does not find one, it searches for a 
+         <IF:Node> (that are allowed to specify a <HA:name> attribute).
+         with a matching <HA:name> attribute.
+     @@Param:
+        @@@Name:  name
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The name of the node to retrieve.  The matching is 
+            case-insensitive in HTML documents and case-sensitve 
+            in XHTML documents.
+     @@Return:
+        @@@Type:  
+          DOMCore:Node
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The <IF:Node> with a <HA:name> or <HA:id> whose 
+            value matches with <P:name>.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              There is no node with such a <P:name>.
+##IF:HTMLOptionCollection
+
+IF:
+  @Name:  HTMLFormElement
+  @Description:
+    @@lang:en
+    @@@:
+      This interface encompasses behavior similar to a collection 
+      and an element.  It provides direct access to the contained 
+      form controls as well as attributes of the form element.
+  @ISA:  
+    DOMHTML:HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:form
+  @Attr:
+     @@Name:  elements
+     @@Description:
+       @@@lang:en
+       @@@@:
+         A collection of all form controls in this form.
+     @@Get:
+        @@@Type:  
+          DOMHTML:HTMLCollection
+  @Attr:
+     @@Name:  length
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The number of form controls in this form.
+     @@Get:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  name
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The name of the form.
+         \
+         {NOTE:: The DOM HTML Specifications does not mention 
+                 to the HTML 4.01 <HA:name> attribute, which is 
+                 added for backward compatibility with DOM Level 0.
+         \
+         }
+     @@DocAttr:
+       @@@Name:name
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  acceptCharset
+     @@DocAttr:
+       @@@Name:accept-charset
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  action
+     @@DocAttr:
+       @@@Name:action
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  enctype
+     @@DocAttr:
+       @@@Name:enctype
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  method
+     @@DocAttr:
+       @@@Name:method
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  target
+     @@DocAttr:
+       @@@Name:targeet
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Method:
+     @@Name:  submit
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Submit the form, as the activation of submit buttons do.
+         \
+         {NOTE:: The <HA:onsubmit> or <EV:submit> event handler is not 
+         guaranteed to be triggered when invoking this method 
+         for historical reasons.  DOM Level 3 <EV:ev:submit> 
+         event is defined not to triggered on this method.
+         \
+         }
+     @@Return:  
+  @Method:
+     @@Name:  reset
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Restore current values of form controls to initial values, 
+         as the activation of reset buttons do.
+     @@Return:  
+##IF:HTMLFormElement
+
+IF:
+  @Name:  HTMLSelectElement
+  @ISA:  
+    DOMHTML:HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:select
+  @Attr:
+     @@Name:  type
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The type of this form control.
+     @@Get:
+        @@@Type:  DOMString
+        @@@InCase:
+          @@@@Value:select-one
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              <A:HTMLSelectElement.multiple> is <DOM:false>.
+        @@@InCase:
+          @@@@Value:select-multiple
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              <A:HTMLSelectElement.multiple> is <DOM:true>.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            __DEEP{
+              $r = $self->multiple ? "select-multiple" : "select-one";
+            }__;
+  @Attr:
+     @@Name:  selectedIndex
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The ordinal index of the selected option.
+     @@Get:
+        @@@Type:
+           DOMMain:long
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The ordinal index of the selected option, starging 
+            from <DOM:0>.  If multiple options are selected, 
+            the index of the first selected option is returned.
+        @@@InCase:
+          @@@@Value:-1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              No option is selected.
+     @@Set:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  value
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The current control value (i.e. the value of the 
+         currently selected option).  If multiple options are 
+         selected, the value of the first selected option.
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  length
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The number of options in this menu control.
+     @@Get:
+        @@@Type:
+           DOMMain:unsigned-long
+     @@Set:
+        @@@Type:
+           DOMMain:unsigned-long
+        @@@Exception:
+           @@@@Name:  NOT_SUPPORTED_ERR
+           @@@@Type:
+              DOMCore:DOMException
+           @@@@SubType:
+             @@@@@QName:
+               DOMHTML:MDOMHTML_IMPL_NOSUPPORT_SET_SELECT_LENGTH
+             @@@@@Description:
+               @@@@@@lang:en
+               @@@@@@@:
+                 Setting the length is not allowed by the 
+                 DOM implementation.
+     @@Level[list]:
+        1
+        2
+     @@SpecLevel[list]:
+        1
+        2
+  @Attr:
+     @@Name:  form
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The <HE:form> element containing this control.
+     @@Get:
+        @@@Type:  HTMLFormElement
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This control is not within the context of a form.
+  @Attr:
+     @@Name:  options
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The collection of <HE:option> elements contained 
+         by this element.
+     @@Get:
+        @@@Type:  HTMLOptionsCollection
+     @@Level[list]:
+        1
+        2
+     @@SpecLevel[list]:
+        1
+        2
+  @Attr:
+     @@Name:  disabled
+     @@DocAttr:
+       @@@Name:disabled
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  multiple
+     @@DocAttr:
+       @@@Name:multiple
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  name
+     @@DocAttr:
+       @@@Name:name
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  size
+     @@DocAttr:
+       @@@Name:size
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  tabIndex
+     @@DocAttr:
+       @@@Name:tabindex
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+  @Method:
+     @@Name:  add
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Add a new element to the collection of <HE:option> 
+         elements.
+     @@Param:
+        @@@Name:  element
+        @@@Type:  
+          DOMHTML:HTMLElement
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The element to add.
+        @@@InCase:
+          @@@@Type:HTMLOptionElement
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The option to add.
+        @@@InCase:
+          @@@@Type:HTMLOptGroupElement
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The option group to add.
+        @@@InCase:
+          @@@@Label:
+            @@@@@lang:en
+            @@@@@@:Otherwise
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This method has no effect.
+     @@Param:
+        @@@Name:  before
+        @@@Type:  
+          DOMHTML:HTMLElement
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            This method is the equivalent of the 
+            <M:Node.insertBefore> method on the parent of 
+            <P:before>.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This method is the equivalent of the 
+              <M:Node.appendChild> method.
+     @@Return:
+        @@@Exception:
+           @@@@Name:  NOT_FOUND_ERR
+           @@@@Type:
+              DOMCore:DOMException
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The <P:before> node is not a descendant of this element.
+  @Method:
+     @@Name:  remove
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Remove an element from the collection of <HE:option> elements.
+     @@Param:
+        @@@Name:  index
+        @@@Type:
+           DOMMain:long
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The ordinal index of the item to remove, starting from 
+            <DOM:0>.  If no element has the given index, 
+            this method has no effect.
+     @@Return:  
+  @Method:
+     @@Name:  blur
+     @@Description:
+        @@@lang:en
+        @@@@: Remove forcus from this element.
+     @@Return:  
+  @Method:
+     @@Name:  focus
+     @@Description:
+       @@@lang:en
+       @@@@:Give forcus to this element.
+     @@Return:  
+##IF:HTMLSelectElement
+
+IF:
+  @Name:  HTMLOptGroupElement
+  @ISA:  
+    DOMHTML:HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:optgroup
+  @Attr:
+     @@Name:  disabled
+     @@DocAttr:
+       @@@Name:disabled
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  label
+     @@DocAttr:
+       @@@Name:label
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+##IF:HTMLOptGroupElement
+
+IF:
+  @Name:  HTMLOptionElement
+  @ISA:  
+    DOMHTML:HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:option
+  @Attr:
+     @@Name:  form
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The <HE:form> element containing this control.
+     @@Get:
+        @@@Type:  HTMLFormElement
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This control is not within the context of a form.
+  @Attr:
+     @@Name:  defaultSelected
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Whether the option is initially selected or not.  
+         The value of this attribute does not change 
+         if the state of the corresponding form control changes.
+     @@DocAttr:
+       @@@Name:selected
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Level[list]:
+        1
+        2
+     @@SpecLevel[list]:
+        1
+        2
+  @Attr:
+     @@Name:  text
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The text contained within the <HE:option> element.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+              if ($self->hasAttributeNS (null, 'label')) {
+                $r = $self->getAttributeNS (null, 'label');
+              } elsif ($self->hasAttribute ('label')) {
+                $r = $self->getAttribute ('label');
+              } else {
+                $r = $self->{<Q:TreeCore:node>}
+                          ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{textContent}__;
+              }
+  @Attr:
+     @@Name:  index
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The index of this <HE:option> in its parent 
+         <HE:select>, starting from <DOM:0>.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Should be <QUOTE:ancestor>, not <QUOTE:parent>?
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Level[list]:
+        1
+        2
+     @@SpecLevel[list]:
+        1
+        2
+  @Attr:
+     @@Name:  disabled
+     @@DocAttr:
+       @@@Name:disabled
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  label
+     @@DocAttr:
+       @@@Name:label
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  selected
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The current state of the corresponding form control. 
+         Changing this attribute changes the state of the form 
+         control, but does not change the value of the HTML 
+         <HA:selected> attribute.
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMHTML:selected
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@SetProp:
+            DOMHTML:selected
+  @Attr:
+     @@Name:  value
+     @@DocAttr:
+       @@@Name:value
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+##IF:HTMLOptionElement
+
+IF:
+  @Name:  HTMLInputElement
+  @ISA:  
+    DOMHTML:HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:input
+  @Attr:
+     @@Name:  defaultValue
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The initial value of the <HTML:text>, <HTML:file> or 
+         <HTML:password> control.
+     @@DocAttr:
+       @@@Name:value
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  defaultChecked
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The initial state of the <HTML:checkbox> or <HTML:radio> 
+         button control.
+     @@DocAttr:
+       @@@Name:checked
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  form
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The <HE:form> element containing this control.
+     @@Get:
+        @@@Type:  HTMLFormElement
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This control is not within the context of a form.
+  @Attr:
+     @@Name:  accept
+     @@DocAttr:
+       @@@Name:accept
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  accessKey
+     @@DocAttr:
+       @@@Name:accesskey
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  align
+     @@DocAttr:
+       @@@Name:align
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  alt
+     @@DocAttr:
+       @@@Name:alt
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  checked
+     @@Description:
+       @@@lang:en
+       @@@@:
+          The current state of the form control.  Changes 
+          to this attribute change the state of the control, 
+          but do not change the value of the HTML <HA:checke> 
+          attribute.  (When the <HA:type> is either <HTML:radio> 
+          or <HTML:checkbox>.)
+          \
+          {NOTE:: During the handling of a <EV:ev:click> 
+                  event, some DOM implementations may change 
+                  the <A:checked> status before the event 
+                  is being dispatched.  If the default action 
+                  of the event is canceled, the <A:checked> 
+                  state is changed back to the original value. 
+                  In other word, the value of this attribute 
+                  during the handling of <EV:ev:click> (or 
+                  e.g. <EV:ev:DOMActivate>) events 
+                  is implementation dependent.
+          \
+          }
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  disabled
+     @@DocAttr:
+       @@@Name:disabled
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  maxLength
+     @@DocAttr:
+       @@@Name:maxlength
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  name
+     @@DocAttr:
+       @@@Name:name
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  readOnly
+     @@DocAttr:
+       @@@Name:readonly
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  size
+     @@DocAttr:
+       @@@Name:size
+     @@Get:
+        @@@Type:
+           DOMMain:unsigned-long
+     @@Set:
+        @@@Type:
+           DOMMain:unsigned-long
+     @@Level[list]:
+        1
+        2
+     @@SpecLevel[list]:
+        1
+        2
+  @Attr:
+     @@Name:  src
+     @@DocAttr:
+       @@@Name:src
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  tabIndex
+     @@DocAttr:
+       @@@Name:tabindex
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  type
+     @@DocAttr:
+       @@@Name:type
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+     @@Level[list]:
+        1
+        2
+     @@SpecLevel[list]:
+        1
+        2
+  @Attr:
+     @@Name:  useMap
+     @@DocAttr:
+       @@@Name:usemap
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         The HTML 4 and XHTML 1.0 <HA:usemap> attribute value 
+         is defined as <SGML:%URI;>, while the XHTML m12n 
+         <HA:usemap> value is <XML:IDREF>.
+  @Attr:
+     @@Name:  value
+     @@Description:
+       @@@lang:en
+       @@@@:
+          The current value of the <HTML:text>, <HTML:file> or 
+          <HTML:password> control.  Changing this attribute 
+          changes the contents of the form control, but does 
+          not change the value of the HTML <HA:value> 
+          attribute.
+          \
+          For the <HTML:button>, <HTML:hidden>, <HTML:submit>, 
+          <HTML:reset>, <HTML:image>, <HTML:checkbox> or 
+          <HTML:radio> control, this attribute represents 
+          the HTML <HA:value> attribute.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            {NOTE:: The actual value may be masked to 
+                    prevent unauthorized use for the <HTML:password> 
+                    input control.
+            \
+            }
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            ISSUE: Some mechanism to mask password required?
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $type;
+            __DEEP{
+              $type = $self->type;
+            }__;
+            if ({text => 1, password => 1, file => 1}->{$type}) {
+              __DISCODE{
+                GetProp:
+              \    DOMHTML:value
+              }__;
+            } else {
+              __DISDODE{
+                get-attribute-value:
+                \ value
+              }__;
+            }
+     @@Set:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            {NOTE:: The <A:value> may be read-only for 
+                    the file upload control.
+            \
+            }
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            TODO: Switch to make file value unchangable required.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $type;
+            __DEEP{
+              $type = $self->type;
+            }__;
+            if ({text => 1, password => 1, file => 1}->{$type}) {
+              __DISCODE{
+                SetProp:
+              \    DOMHTML:value
+              }__;
+            } else {
+              __DISDODE{
+                set-attribute-value:
+                \ value
+              }__;
+            }
+  @Method:
+     @@Name:  blur
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Remove focus from this element.
+     @@Return:  
+  @Method:
+     @@Name:  focus
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Give focus to this element.
+     @@Return:  
+  @Method:
+     @@Name:  select
+     @@Description:
+        @@@lang:en
+        @@@@:
+          Select the contents of the text area.  (For the 
+          <HTML:text>, <HTML:file> or <HTML:password> control).
+     @@Return:  
+  @Method:
+     @@Name:  click
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Simulate a mouse click.  (For the <HTML:button>, 
+         <HTML:checkbox>, <HTML:radio>, <HTML:reset> or 
+         <HTML:submit> control.
+     @@Return:  
+##IF:HTMLInputElement
+
+IF:
+  @Name:  HTMLTextAreaElement
+  @ISA:  
+    DOMHTML:HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:textarea
+  @Attr:
+     @@Name:  defaultValue
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The initial value of the control, i.e. the contents 
+         of the element.  The value of this attribute does 
+         not change if the contents of the corresponding 
+         form control.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            $r = $self->{<Q:TreeCore:node>}
+                      ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{textContent}__;
+     @@Set:
+        @@@Type:  DOMString
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            __DEEP{  ## Latest version
+              $self->__SUPER{Element::}__::textContent ($given);
+            }__;
+     @@Level[list]:
+        1
+        2
+     @@SpecLevel[list]:
+        1
+        2
+  @Attr:
+     @@Name:  form
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The <HE:form> element containing this control.
+     @@Get:
+        @@@Type:  HTMLFormElement
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This control is not within the context of a form.
+  @Attr:
+     @@Name:  accessKey
+     @@DocAttr:
+       @@@Name:accesskey
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  cols
+     @@DocAttr:
+       @@@Name:cols
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  disabled
+     @@DocAttr:
+       @@@Name:disabled
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  name
+     @@DocAttr:
+       @@@Name:name
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  readOnly
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  rows
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  tabIndex
+     @@DocAttr:
+       @@@Name:name
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  type
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The type of this form control.
+     @@Get:
+        @@@Type:  DOMString
+        @@@InCase:
+          @@@@Value:textarea
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Always this value.
+        @@@DefaultValue:textarea
+        @@@Def:\
+  @Attr:
+     @@Name:  value
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The current value of the corresponding form control. 
+         Changing this attribute changes the contents of 
+         the form control, but does not changes the contents 
+         of the element.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The current value.  If the entirely of the data 
+            cannot fit into a single <TYPE:DOMstring>, 
+            the DOM implementation may truncate the data.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMHTML:value
+     @@Set:
+        @@@Type:  DOMString
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@SetProp:
+            DOMHTML:value
+  @Method:
+     @@Name:  blur
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Remove focus from this element.
+     @@Return:  
+  @Method:
+     @@Name:  focus
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Give focus to this element.
+     @@Return:  
+  @Method:
+     @@Name:  select
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Select the contents of the <HE:textarea>.
+     @@Return:  
+##IF:DOMHTMLTextAreaElement
+
+IF:
+  @Name:  HTMLButtonElement
+  @ISA:  
+    DOMHTML:HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:button
+  @Attr:
+     @@Name:  form
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The <HE:form> element containing this control.
+     @@Get:
+        @@@Type:  HTMLFormElement
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This control is not within the context of a form.
+  @Attr:
+     @@Name:  accessKey
+     @@DocAttr:
+       @@@Name:accesskey
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  disabled
+     @@DocAttr:
+       @@@Name:disabled
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  name
+     @@DocAttr:
+       @@@Name:name
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  tabIndex
+     @@DocAttr:
+       @@@Name:tabindex
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  type
+     @@DocAttr:
+       @@@Name:type
+     @@Get:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  value
+     @@DocAttr:
+       @@@Name:value
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+##IF:HTMLButtonElement
+
+IF:
+  @Name:  HTMLLabelElement
+  @ISA:  
+    DOMHTML:HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:label
+  @Attr:
+     @@Name:  form
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The <HE:form> element containing this control.
+     @@Get:
+        @@@Type:  HTMLFormElement
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This control is not within the context of a form.
+  @Attr:
+     @@Name:  accessKey
+     @@DocAttr:
+       @@@Name:accesskey
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  htmlFor
+     @@DocAttr:
+       @@@Name:for
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+##IF:HTMLLabelElement
+
+IF:
+  @Name:  HTMLFieldSetElement
+  @ISA:  
+    DOMHTML:HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:fieldset
+  @Attr:
+     @@Name:  form
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The <HE:form> element containing this control.
+     @@Get:
+        @@@Type:  HTMLFormElement
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This control is not within the context of a form.
+##IF:HTMLFieldSetElement
+
+IF:
+  @Name:  HTMLLegendElement
+  @ISA:  
+    DOMHTML:HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:legend
+  @Attr:
+     @@Name:  form
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The <HE:form> element containing this control.
+     @@Get:
+        @@@Type:  HTMLFormElement
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This control is not within the context of a form.
+  @Attr:
+     @@Name:  accessKey
+     @@DocAttr:
+       @@@Name:
+         accesskey
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  align
+     @@DocAttr:
+       @@@Name:align
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+##IF:HTMLLegendElement
+
+
+## DOMWebForms.dis ends here

@@ -3,11 +3,17 @@ Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
+  @ManakaiDOMHTML:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom/html#
   @TreeCore:\
+  @xhtml1:
+    http://www.w3.org/1999/xhtml
 Module:
-  @Name:  HTML
+  @Name:  DOMHTML
   @Namespace:
-     :: TBD ::
+     http://suika.fam.cx/~wakaba/archive/2004/dom/html#
   @BindingName:
      @@@:  html
      @@Type:
@@ -40,7 +46,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/10/17 12:48:49 $
+     $Date: 2004/10/18 12:23:51 $
 
   @ConditionDef:
     @@Name:DOM1
@@ -109,6 +115,10 @@ Module:
               lang:IDL-DOM
         @@@Namespace:
           http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+     @@Module:
+        @@@Name:  DOMWebForms
+        @@@Namespace:
+          http://suika.fam.cx/~wakaba/archive/2004/dom/html#
 
 DataTypeAlias:
   @Name:  DOMString
@@ -237,109 +247,10 @@ IF:
             @@@@@@:
               There is no node with such a <P:name>.
 
-
-IF:
-  @Name:  HTMLOptionsCollection
-  @Description:
-    @@lang:en
-    @@@:
-      A list of nodes representing HTML <HE:option> elements.  
-      An individual node may be accessed by either ordinal index 
-      or the <HA:name> or <HA:id> of the node.
-      \
-      <IF:HTMLOptionCollection> objects are <EM:live>; they are 
-      automatically updated when the underlying document 
-      is changed.
-      
-  @Level[list]:  2
-  @SpecLevel[list]:  2
-  @Attr:
-     @@Name:  length
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The length of the list.
-     @@Get:
-        @@@Type:
-           DOMMain:unsigned-long
-     @@Set:
-        @@@Type:
-           DOMMain:unsigned-long
-        @@@Exception:
-           @@@@Name:  NOT_SUPPORTED_ERR
-           @@@@Type:
-              DOMCore:DOMException
-           @@@@SubType:
-             @@@@@QName:
-               ManakaiDOMHTML:MDOMHTML_IMPL_NOSUPPORT_SET_OPTION_LENGTH
-             @@@@@Description:
-               @@@@@@lang:en
-               @@@@@@@:
-                 Setting the length is not allowed by the DOM 
-                 implementation.
-  @Method:
-     @@Name:  item
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Retrieve a node specified by ordinal index.
-     @@Param:
-        @@@Name:  index
-        @@@Type:
-           DOMMain:unsigned-long
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            Ordinal index of the node to retrieve, in the 
-            document order.  The index origin is <DOM:0>.
-     @@Return:
-        @@@Type:  Node
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The <P:index>th node.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The <P:index> is out of range.
-  @Method:
-     @@Name:  namedItem
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Retrieve a node using a name. 
-       \
-         It first searches for a <IF:Node> with a matching <HA:id> 
-         attributes.  If it does not find one, it searches for a 
-         <IF:Node> (that are allowed to specify a <HA:name> attribute).
-         with a matching <HA:name> attribute.
-     @@Param:
-        @@@Name:  name
-        @@@Type:  DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The name of the node to retrieve.  The matching is 
-            case-insensitive in HTML documents and case-sensitve 
-            in XHTML documents.
-     @@Return:
-        @@@Type:  Node
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The <IF:Node> with a <HA:name> or <HA:id> whose 
-            value matches with <P:name>.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              There is no node with such a <P:name>.
-##IF:HTMLOptionCollection
+ImplNote:
+  @@lang:en
+  @@@:
+    <IF:HTMLOptionCollection>: See <Module:DOMWebForms>.
 
 IF:
   @Name:  HTMLDocument
@@ -355,9 +266,10 @@ IF:
     @@compat:
       ManakaiDOMCore:Document
     @@root-element:
-      xhtml:html
+      @@@QName:
+        xhtml1:html
     @@root-element:
-      null:html
+      @@@Name:html
     @@doctype-public:
       -//W3C//DTD HTML 4.0//EN
     @@doctype-public:
@@ -1035,7 +947,7 @@ IF:
           @@@@Type:
             lang:Perl
           @@@@@:
-            __SUPER{
+            __DEEP{
               $r = $self->{<Q:TreeCore:node>}
                     ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{textContent}__;
             }__;
@@ -1045,7 +957,7 @@ IF:
           @@@@Type:
             lang:Perl
           @@@@@:
-            __SUPER{  ## Latest version
+            __DEEP{  ## Latest version
               $self->__SUPER{Element::}__::__INT{textContent}__ ($given);
             }__;
 ##IF:HTMLTitleElement
@@ -1130,7 +1042,8 @@ IF:
          \
          }
      @@Get:
-        @@@Type:  HTMLFormElement
+        @@@Type:  
+          DOMWebForms:HTMLFormElement
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
@@ -1282,286 +1195,413 @@ IF:
         @@@Type:  DOMString
 ##IF:HTMLBody
 
-IF:
-  @Name:  HTMLFormElement
-  @Description:
-    @@lang:en
-    @@@:
-      This interface encompasses behavior similar to a collection 
-      and an element.  It provides direct access to the contained 
-      form controls as well as attributes of the form element.
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:form
-  @Attr:
-     @@Name:  elements
-     @@Description:
-       @@@lang:en
-       @@@@:
-         A collection of all form controls in this form.
-     @@Get:
-        @@@Type:  HTMLCollection
-  @Attr:
-     @@Name:  length
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The number of form controls in this form.
-     @@Get:
-        @@@Type:
-           DOMMain:long
-  @Attr:
-     @@Name:  name
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The name of the form.
-         \
-         {NOTE:: The DOM HTML Specifications does not mention 
-                 to the HTML 4.01 <HA:name> attribute, which is 
-                 added for backward compatibility with DOM Level 0.
-         \
-         }
-     @@DocAttr:
-       @@@Name:name
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  acceptCharset
-     @@DocAttr:
-       @@@Name:accept-charset
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  action
-     @@DocAttr:
-       @@@Name:action
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  enctype
-     @@DocAttr:
-       @@@Name:enctype
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  method
-     @@DocAttr:
-       @@@Name:method
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  target
-     @@DocAttr:
-       @@@Name:targeet
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Method:
-     @@Name:  submit
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Submit the form, as the activation of submit buttons do.
-         \
-         {NOTE:: The <HA:onsubmit> or <EV:submit> event handler is not 
-         guaranteed to be triggered when invoking this method 
-         for historical reasons.  DOM Level 3 <EV:ev:submit> 
-         event is defined not to triggered on this method.
-         \
-         }
-     @@Return:  
-  @Method:
-     @@Name:  reset
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Restore current values of form controls to initial values, 
-         as the activation of reset buttons do.
-     @@Return:  
-##IF:HTMLFormElement
+ImplNote:
+  @@lang:en
+  @@@:
+    <IF:HTMLFormElement>, <IF:HTMLSelectElement>, 
+    <IF:HTMLOptionElement>, <IF:HTMLOptGroupElement>, 
+    <IF:HTMLInputElement>, <IF:HTMLTextAreaElement>, 
+    <IF:HTMLButtonElement>, <IF:HTMLFieldSetElement>, 
+    <IF:HTMLLegendElement>: See <Module:WebForms>.
 
 IF:
-  @Name:  HTMLSelectElement
+  @Name:  HTMLUListElement
   @ISA:  HTMLElement
   @ElementType:
     @@QName:
-      xhtml1:select
+      xhtml1:ul
+  @Attr:
+     @@Name:  compact
+     @@DocAttr:
+       @@@Name:compact
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
   @Attr:
      @@Name:  type
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The type of this form control.
+     @@DocAttr:
+       @@@Name:type
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:  DOMString
-        @@@InCase:
-          @@@@Value:select-one
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              <A:HTMLSelectElement.multiple> is <DOM:false>.
-        @@@InCase:
-          @@@@Value:select-multiple
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              <A:HTMLSelectElement.multiple> is <DOM:true>.
-        @@@Def:
-          @@@@Type:
-            lang:Perl
-          @@@@@:
-            __DEEP{
-              $r = $self->multiple ? "select-multiple" : "select-one";
-            }__;
+     @@Set:
+        @@@Type:  DOMString
+
+IF:
+  @Name:  HTMLOListElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:ol
   @Attr:
-     @@Name:  selectedIndex
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The ordinal index of the selected option.
+     @@Name:  compact
+     @@DocAttr:
+       @@@Name:compact
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  start
+     @@DocAttr:
+       @@@Name:start
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:
            DOMMain:long
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The ordinal index of the selected option, starging 
-            from <DOM:0>.  If multiple options are selected, 
-            the index of the first selected option is returned.
-        @@@InCase:
-          @@@@Value:-1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              No option is selected.
      @@Set:
         @@@Type:
            DOMMain:long
+  @Attr:
+     @@Name:  type
+     @@DocAttr:
+       @@@Name:type
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+
+IF:
+  @Name:  HTMLDListElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:dl
+  @Attr:
+     @@Name:  compact
+     @@DocAttr:
+       @@@Name:compact
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+
+IF:
+  @Name:  HTMLDirectoryElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:dir
+    @@DeprecatedBy:
+      DOMHTML:HTML4
+  @Attr:
+     @@Name:  compact
+     @@DocAttr:
+       @@@Name:compact
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+
+IF:
+  @Name:  HTMLMenuElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:menu
+    @@DeprecatedBy:
+      DOMHTML:HTML4
+  @Attr:
+     @@Name:  compact
+     @@DocAttr:
+       @@@Name:compact
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Set:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+
+IF:
+  @Name:  HTMLLIElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:li
+  @Attr:
+     @@Name:  type
+     @@DocAttr:
+       @@@Name:type
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
   @Attr:
      @@Name:  value
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The current control value (i.e. the value of the 
-         currently selected option).  If multiple options are 
-         selected, the value of the first selected option.
+     @@DocAttr:
+       @@@Name:value
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+
+IF:
+  @Name:  HTMLDivElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:div
+  @Attr:
+     @@Name:  align
+     @@DocAttr:
+       @@@Name:align
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+
+IF:
+  @Name:  HTMLParagraphElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:p
+  @Attr:
+     @@Name:  align
+     @@DocAttr:
+       @@@Name:align
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+
+IF:
+  @Name:  HTMLHeadingElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:h1
+  @ElementType:
+    @@QName:
+      xhtml1:h2
+  @ElementType:
+    @@QName:
+      xhtml1:h3
+  @ElementType:
+    @@QName:
+      xhtml1:h4
+  @ElementType:
+    @@QName:
+      xhtml1:h5
+  @ElementType:
+    @@QName:
+      xhtml1:h6
+  @Attr:
+     @@Name:  align
+     @@DocAttr:
+       @@@Name:align
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+
+IF:
+  @Name:  HTMLQuoteElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:blockquote
+  @ElementType:
+    @@QName:
+      xhtml1:q
+  @Attr:
+     @@Name:  cite
+     @@DocAttr:
+       @@@Name:cite
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+
+IF:
+  @Name:  HTMLPreElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:pre
+  @Attr:
+     @@Name:  width
+     @@DocAttr:
+       @@@Name:width
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:
+           DOMMain:long
+     @@Set:
+        @@@Type:
+           DOMMain:long
+
+IF:
+  @Name:  HTMLBRElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:br
+  @Attr:
+     @@Name:  clear
+     @@DocAttr:
+       @@@Name:clear
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+
+IF:
+  @Name:  HTMLBaseFontElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:basefont
+    @@DeprecatedBy:
+      DOMHTML:HTML4
+  @Attr:
+     @@Name:  color
+     @@DocAttr:
+       @@@Name:color
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
-     @@Name:  length
+     @@Name:  face
+     @@DocAttr:
+       @@@Name:face
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  size
      @@Description:
        @@@lang:en
-       @@@@:
-         The number of options in this menu control.
+       @@@@:Computed font size.
+     @@DocAttr:
+       @@@Name:size
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:
-           DOMMain:unsigned-long
+           DOMMain:long
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         TODO: Computed value should be returned.
      @@Set:
         @@@Type:
-           DOMMain:unsigned-long
-        @@@Exception:
-           @@@@Name:  NOT_SUPPORTED_ERR
-           @@@@Type:
-              DOMCore:DOMException
-           @@@@SubType:
-             @@@@@QName:
-               DOMHTML:MDOMHTML_IMPL_NOSUPPORT_SET_SELECT_LENGTH
-             @@@@@Description:
-               @@@@@@lang:en
-               @@@@@@@:
-                 Setting the length is not allowed by the 
-                 DOM implementation.
+           DOMMain:long
      @@Level[list]:
         1
         2
      @@SpecLevel[list]:
         1
         2
+
+IF:
+  @Name:  HTMLFontElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:font
+    @@DeprecatedBy:
+      DOMHTML:HTML4
   @Attr:
-     @@Name:  form
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The <HE:form> element containing this control.
-     @@Get:
-        @@@Type:  HTMLFormElement
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              This control is not within the context of a form.
-  @Attr:
-     @@Name:  options
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The collection of <HE:option> elements contained 
-         by this element.
-     @@Get:
-        @@@Type:  HTMLOptionsCollection
-     @@Level[list]:
-        1
-        2
-     @@SpecLevel[list]:
-        1
-        2
-  @Attr:
-     @@Name:  disabled
+     @@Name:  color
      @@DocAttr:
-       @@@Name:disabled
+       @@@Name:color
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
+        @@@Type:  DOMString
      @@Set:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
+        @@@Type:  DOMString
   @Attr:
-     @@Name:  multiple
+     @@Name:  face
      @@DocAttr:
-       @@@Name:multiple
-     @@Get:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-     @@Set:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-  @Attr:
-     @@Name:  name
-     @@DocAttr:
-       @@@Name:name
+       @@@Name:face
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:  DOMString
      @@Set:
@@ -1570,12 +1610,178 @@ IF:
      @@Name:  size
      @@DocAttr:
        @@@Name:size
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         This is <EM:not> the computed size.
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+
+IF:
+  @Name:  HTMLHRElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:hr
+  @Attr:
+     @@Name:  align
+     @@DocAttr:
+       @@@Name:align
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  noShade
+     @@DocAttr:
+       @@@Name:noshade
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:
-           DOMMain:long
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
      @@Set:
         @@@Type:
-           DOMMain:long
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  size
+     @@DocAttr:
+       @@@Name:size
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  width
+     @@DocAttr:
+       @@@Name:width
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+
+IF:
+  @Name:  HTMLModElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:ins
+  @ElementType:
+    @@QName:
+      xhtml1:del
+  @Attr:
+     @@Name:  cite
+     @@DocAttr:
+       @@@Name:cite
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  dateTime
+     @@DocAttr:
+       @@@Name:datetime
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+
+IF:
+  @Name:  HTMLAnchorElement
+  @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:a
+  @Attr:
+     @@Name:  accessKey
+     @@DocAttr:
+       @@@Name:accesskey
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  charset
+     @@DocAttr:
+       @@@Name:charset
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  coords
+     @@DocAttr:
+       @@@Name:coords
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  href
+     @@DocAttr:
+       @@@Name:href
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  hreflang
+     @@DocAttr:
+       @@@Name:hreflang
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  name
+     @@DocAttr:
+       @@@Name:name
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  rel
+     @@DocAttr:
+        @@@Name:rel
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  rev
+     @@DocAttr:
+       @@@Name:rev
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  shape
+     @@DocAttr:
+       @@@Name:shape
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
   @Attr:
      @@Name:  tabIndex
      @@DocAttr:
@@ -1586,360 +1792,58 @@ IF:
      @@Set:
         @@@Type:
            DOMMain:long
-  @Method:
-     @@Name:  add
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Add a new element to the collection of <HE:option> 
-         elements.
-     @@Param:
-        @@@Name:  element
-        @@@Type:  HTMLElement
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The element to add.
-        @@@InCase:
-          @@@@Type:HTMLOptionElement
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The option to add.
-        @@@InCase:
-          @@@@Type:HTMLOptGroupElement
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The option group to add.
-        @@@InCase:
-          @@@@Label:
-            @@@@@lang:en
-            @@@@@@:Otherwise
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              This method has no effect.
-     @@Param:
-        @@@Name:  before
-        @@@Type:  HTMLElement
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            This method is the equivalent of the 
-            <M:Node.insertBefore> method on the parent of 
-            <P:before>.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              This method is the equivalent of the 
-              <M:Node.appendChild> method.
-     @@Return:
-        @@@Exception:
-           @@@@Name:  NOT_FOUND_ERR
-           @@@@Type:
-              DOMCore:DOMException
-           @@@@Description:
-             @@@@@lang:en
-             @@@@@@:
-               The <P:before> node is not a descendant of this element.
-  @Method:
-     @@Name:  remove
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Remove an element from the collection of <HE:option> elements.
-     @@Param:
-        @@@Name:  index
-        @@@Type:
-           DOMMain:long
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The ordinal index of the item to remove, starting from 
-            <DOM:0>.  If no element has the given index, 
-            this method has no effect.
-     @@Return:  
+  @Attr:
+     @@Name:  target
+     @@DocAttr:
+       @@@Name:target
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  type
+     @@DocAttr:
+       @@@Name:type
+     @@Get:
+        @@@Type:  DOMString
+     @@Set:
+        @@@Type:  DOMString
   @Method:
      @@Name:  blur
-     @@Description:
-        @@@lang:en
-        @@@@: Remove forcus from this element.
+     @@Descriptipn:
+       @@@lang:en
+       @@@@:Remove the focus from this element.
      @@Return:  
   @Method:
      @@Name:  focus
      @@Description:
        @@@lang:en
-       @@@@:Give forcus to this element.
+       @@@@:Give the focus to this element.
      @@Return:  
-##IF:HTMLSelectElement
+##IF:HTMLAnchorElement
 
 IF:
-  @Name:  HTMLOptGroupElement
+  @Name:  HTMLImageElement
   @ISA:  HTMLElement
   @ElementType:
-    @@QName:
-      xhtml1:optgroup
+     @@QName:
+       xhtml1:img
   @Attr:
-     @@Name:  disabled
-     @@DocAttr:
-       @@@Name:disabled
-     @@Get:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-     @@Set:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-  @Attr:
-     @@Name:  label
-     @@DocAttr:
-       @@@Name:label
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-##IF:HTMLOptGroupElement
-
-IF:
-  @Name:  HTMLOptionElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:option
-  @Attr:
-     @@Name:  form
+     @@Name:  name
      @@Description:
-       @@@lang:en
-       @@@@:
-         The <HE:form> element containing this control.
-     @@Get:
-        @@@Type:  HTMLFormElement
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              This control is not within the context of a form.
-  @Attr:
-     @@Name:  defaultSelected
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Whether the option is initially selected or not.  
-         The value of this attribute does not change 
-         if the state of the corresponding form control changes.
+        @@@lang:en
+        @@@@:
+          The name of the element.
+          \
+          {NOTE:: This attribute is provided for backwards compatibility. 
+                  Whilst HTML 4.01 added the <HA:name> attribute 
+                  for compatibility, the DOM HTML Specifications 
+                  does not address this fact - i.e. HTML's and DOM's 
+                  <CODE:name> attributes are not formally associated.
+          \
+          }
      @@DocAttr:
-       @@@Name:selected
-     @@Get:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-     @@Set:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-     @@Level[list]:
-        :: TBD ::
-        2
-     @@SpecLevel[list]:
-        :: TBD ::
-        2
-  @Attr:
-     @@Name:  text
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The text contained within the <HE:option> element.
-     @@Get:
-        @@@Type:  DOMString
-        @@@Def:
-          @@@@Type:
-            lang:Perl
-          @@@@@:
-              if ($self->hasAttributeNS (null, 'label')) {
-                $r = $self->getAttributeNS (null, 'label');
-              } elsif ($self->hasAttribute ('label')) {
-                $r = $self->getAttribute ('label');
-              } else {
-                $r = $self->{<Q:TreeCore:node>}
-                          ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{textContent}__;
-              }
-  @Attr:
-     @@Name:  index
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The index of this <HE:option> in its parent 
-         <HE:select>, starting from <DOM:0>.
-     @@ImplNote:
-       @@@lang:en
-       @@@@:
-         Should be <QUOTE:ancestor>, not <QUOTE:parent>?
-     @@Get:
-        @@@Type:
-           DOMMain:long
-     @@Level[list]:
-        1
-        2
-     @@SpecLevel[list]:
-        1
-        2
-  @Attr:
-     @@Name:  disabled
-     @@DocAttr:
-       @@@Name:disabled
-     @@Get:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-     @@Set:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-  @Attr:
-     @@Name:  label
-     @@DocAttr:
-       @@@Name:label
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  selected
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The current state of the corresponding form control. 
-         Changing this attribute changes the state of the form 
-         control, but does not change the value of the HTML 
-         <HA:selected> attribute.
-     @@Get:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-        @@@Def:
-          @@@@Type:
-            lang:dis
-          @@@@GetProp:
-            DOMHTML:selected
-     @@Set:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-        @@@Def:
-          @@@@Type:
-            lang:dis
-          @@@@SetProp:
-            DOMHTML:selected
-  @Attr:
-     @@Name:  value
-     @@DocAttr:
-       @@@Name:value
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-##IF:HTMLOptionElement
-
-IF:
-  @Name:  HTMLInputElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:input
-  @Attr:
-     @@Name:  defaultValue
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The initial value of the <HTML:text>, <HTML:file> or 
-         <HTML:password> control.
-     @@DocAttr:
-       @@@Name:value
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  defaultChecked
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The initial state of the <HTML:checkbox> or <HTML:radio> 
-         button control.
-     @@DocAttr:
-       @@@Name:checked
-     @@Get:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-     @@Set:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-  @Attr:
-     @@Name:  form
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The <HE:form> element containing this control.
-     @@Get:
-        @@@Type:  HTMLFormElement
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              This control is not within the context of a form.
-  @Attr:
-     @@Name:  accept
-     @@DocAttr:
-       @@@Name:accept
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  accessKey
-     @@DocAttr:
-       @@@Name:accesskey
+       @@@Name:name
      @@Get:
         @@@Type:  DOMString
      @@Set:
@@ -1963,1079 +1867,67 @@ IF:
      @@Set:
         @@@Type:  DOMString
   @Attr:
-     @@Name:  checked
-     @@Description:
-       @@@lang:en
-       @@@@:
-          The current state of the form control.  Changes 
-          to this attribute change the state of the control, 
-          but do not change the value of the HTML <HA:checke> 
-          attribute.  (When the <HA:type> is either <HTML:radio> 
-          or <HTML:checkbox>.)
-          \
-          {NOTE:: During the handling of a <EV:ev:click> 
-                  event, some DOM implementations may change 
-                  the <A:checked> status before the event 
-                  is being dispatched.  If the default action 
-                  of the event is canceled, the <A:checked> 
-                  state is changed back to the original value. 
-                  In other word, the value of this attribute 
-                  during the handling of <EV:ev:click> (or 
-                  e.g. <EV:ev:DOMActivate>) events 
-                  is implementation dependent.
-          \
-          }
-     @@Get:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-     @@Set:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-  @Attr:
-     @@Name:  disabled
+     @@Name:  border
      @@DocAttr:
-       @@@Name:disabled
-     @@Get:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-     @@Set:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-  @Attr:
-     @@Name:  maxLength
-     @@DocAttr:
-       @@@Name:maxlength
-     @@Get:
-        @@@Type:
-           DOMMain:long
-     @@Set:
-        @@@Type:
-           DOMMain:long
-  @Attr:
-     @@Name:  name
-     @@DocAttr:
-       @@@Name:name
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  readOnly
-     @@DocAttr:
-       @@@Name:readonly
-     @@Get:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-     @@Set:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-  @Attr:
-     @@Name:  size
-     @@DocAttr:
-       @@@Name:size
-     @@Get:
-        @@@Type:
-           DOMMain:unsigned-long
-     @@Set:
-        @@@Type:
-           DOMMain:unsigned-long
-     @@Level[list]:
-        :: TBD ::
-        2
-     @@SpecLevel[list]:
-        :: TBD ::
-        2
-  @Attr:
-     @@Name:  src
-     @@DocAttr:
-       @@@Name:src
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  tabIndex
-     @@DocAttr:
-       @@@Name:tabindex
-     @@Get:
-        @@@Type:
-           DOMMain:long
-     @@Set:
-        @@@Type:
-           DOMMain:long
-  @Attr:
-     @@Name:  type
-     @@DocAttr:
-       @@@Name:type
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-     @@Level[list]:
-        1
-        2
-     @@SpecLevel[list]:
-        1
-        2
-  @Attr:
-     @@Name:  useMap
-     @@DocAttr:
-       @@@Name:usemap
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  value
-     @@Description:
-       @@@lang:en
-       @@@@:
-          The current value of the <HTML:text>, <HTML:file> or 
-          <HTML:password> control.  Changing this attribute 
-          changes the contents of the form control, but does 
-          not change the value of the HTML <HA:value> 
-          attribute.
-          \
-          For the <HTML:button>, <HTML:hidden>, <HTML:submit>, 
-          <HTML:reset>, <HTML:image>, <HTML:checkbox> or 
-          <HTML:radio> control, this attribute represents 
-          the HTML <HA:value> attribute.
-     @@Get:
-        @@@Type:  DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            {NOTE:: The actual value may be masked to 
-                    prevent unauthorized use for the <HTML:password> 
-                    input control.
-            \
-            }
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@:
-            ISSUE: Some mechanism to mask password required?
-        @@@Def:
-          @@@@Type:
-            lang:Perl
-          @@@@@:
-            my $type;
-            __DEEP{
-              $type = $self->type;
-            }__;
-            if ({text => 1, password => 1, file => 1}->{$type}) {
-              __DISCODE{
-                GetProp:
-              \    DOMHTML:value
-              }__;
-            } else {
-              __DISDODE{
-                get-attribute-value:
-                \ value
-              }__;
-            }
-     @@Set:
-        @@@Type:  DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            {NOTE:: The <A:value> may be read-only for 
-                    the file upload control.
-            \
-            }
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@:
-            TODO: Switch to make file value unchangable required.
-        @@@Def:
-          @@@@Type:
-            lang:Perl
-          @@@@@:
-            my $type;
-            __DEEP{
-              $type = $self->type;
-            }__;
-            if ({text => 1, password => 1, file => 1}->{$type}) {
-              __DISCODE{
-                SetProp:
-              \    DOMHTML:value
-              }__;
-            } else {
-              __DISDODE{
-                set-attribute-value:
-                \ value
-              }__;
-            }
-  @Method:
-     @@Name:  blur
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Remove focus from this element.
-     @@Return:  
-  @Method:
-     @@Name:  focus
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Give focus to this element.
-     @@Return:  
-  @Method:
-     @@Name:  select
-     @@Description:
-        @@@lang:en
-        @@@@:
-          Select the contents of the text area.  (For the 
-          <HTML:text>, <HTML:file> or <HTML:password> control).
-     @@Return:  
-  @Method:
-     @@Name:  click
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Simulate a mouse click.  (For the <HTML:button>, 
-         <HTML:checkbox>, <HTML:radio>, <HTML:reset> or 
-         <HTML:submit> control.
-     @@Return:  
-##IF:HTMLInputElement
-
-IF:
-  @Name:  HTMLTextAreaElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:textarea
-  @Attr:
-     @@Name:  defaultValue
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The initial value of the control, i.e. the contents 
-         of the element.  The value of this attribute does 
-         not change if the contents of the corresponding 
-         form control.
-     @@Get:
-        @@@Type:  DOMString
-        @@@Def:
-          @@@@Type:
-            lang:Perl
-          @@@@@:
-            $r = $self->{<Q:TreeCore:node>}
-                      ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{textContent}__;
-     @@Set:
-        @@@Type:  DOMString
-        @@@Def:
-          @@@@Type:
-            lang:Perl
-          @@@@@:
-            __DEEP{  ## Latest version
-              $self->__SUPER{Element::}__::textContent ($given);
-            }__;
-     @@Level[list]:
-        1
-        2
-     @@SpecLevel[list]:
-        1
-        2
-  @Attr:
-     @@Name:  form
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The <HE:form> element containing this control.
-     @@Get:
-        @@@Type:  HTMLFormElement
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              This control is not within the context of a form.
-  @Attr:
-     @@Name:  accessKey
-     @@DocAttr:
-       @@@Name:accesskey
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  cols
-     @@DocAttr:
-       @@@Name:cols
-     @@Get:
-        @@@Type:
-           DOMMain:long
-     @@Set:
-        @@@Type:
-           DOMMain:long
-  @Attr:
-     @@Name:  disabled
-     @@DocAttr:
-       @@@Name:disabled
-     @@Get:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-     @@Set:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-  @Attr:
-     @@Name:  name
-     @@DocAttr:
-       @@@Name:name
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  readOnly
-     @@Get:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-     @@Set:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-  @Attr:
-     @@Name:  rows
-     @@Get:
-        @@@Type:
-           DOMMain:long
-     @@Set:
-        @@@Type:
-           DOMMain:long
-  @Attr:
-     @@Name:  tabIndex
-     @@DocAttr:
-       @@@Name:name
-     @@Get:
-        @@@Type:
-           DOMMain:long
-     @@Set:
-        @@@Type:
-           DOMMain:long
-  @Attr:
-     @@Name:  type
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The type of this form control.
-     @@Get:
-        @@@Type:  DOMString
-        @@@InCase:
-          @@@@Value:textarea
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              Always this value.
-        @@@DefaultValue:textarea
-        @@@Def:\
-  @Attr:
-     @@Name:  value
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The current value of the corresponding form control. 
-         Changing this attribute changes the contents of 
-         the form control, but does not changes the contents 
-         of the element.
-     @@Get:
-        @@@Type:  DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The current value.  If the entirely of the data 
-            cannot fit into a single <TYPE:DOMstring>, 
-            the DOM implementation may truncate the data.
-        @@@Def:
-          @@@@Type:
-            lang:dis
-          @@@@GetProp:
-            DOMHTML:value
-     @@Set:
-        @@@Type:  DOMString
-        @@@Def:
-          @@@@Type:
-            lang:dis
-          @@@@SetProp:
-            DOMHTML:value
-  @Method:
-     @@Name:  blur
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Remove focus from this element.
-     @@Return:  
-  @Method:
-     @@Name:  focus
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Give focus to this element.
-     @@Return:  
-  @Method:
-     @@Name:  select
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Select the contents of the <HE:textarea>.
-     @@Return:  
-##IF:DOMHTMLTextAreaElement
-
-IF:
-  @Name:  HTMLButtonElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:button
-  @Attr:
-     @@Name:  form
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The <HE:form> element containing this control.
-     @@Get:
-        @@@Type:  HTMLFormElement
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              This control is not within the context of a form.
-  @Attr:
-     @@Name:  accessKey
-     @@DocAttr:
-       @@@Name:accesskey
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  disabled
-     @@DocAttr:
-       @@@Name:disabled
-     @@Get:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-     @@Set:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-  @Attr:
-     @@Name:  name
-     @@DocAttr:
-       @@@Name:name
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  tabIndex
-     @@DocAttr:
-       @@@Name:tabindex
-     @@Get:
-        @@@Type:
-           DOMMain:long
-     @@Set:
-        @@@Type:
-           DOMMain:long
-  @Attr:
-     @@Name:  type
-     @@DocAttr:
-       @@@Name:type
-     @@Get:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  value
-     @@DocAttr:
-       @@@Name:value
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-##IF:HTMLButtonElement
-
-IF:
-  @Name:  HTMLLabelElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:label
-  @Attr:
-     @@Name:  form
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The <HE:form> element containing this control.
-     @@Get:
-        @@@Type:  HTMLFormElement
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              This control is not within the context of a form.
-  @Attr:
-     @@Name:  accessKey
-     @@DocAttr:
-       @@@Name:accesskey
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  htmlFor
-     @@DocAttr:
-       @@@Name:for
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-##IF:HTMLLabelElement
-
-IF:
-  @Name:  HTMLFieldSetElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:fieldset
-  @Attr:
-     @@Name:  form
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The <HE:form> element containing this control.
-     @@Get:
-        @@@Type:  HTMLFormElement
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              This control is not within the context of a form.
-##IF:HTMLFieldSetElement
-
-IF:
-  @Name:  HTMLLegendElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:legend
-  @Attr:
-     @@Name:  form
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The <HE:form> element containing this control.
-     @@Get:
-        @@@Type:  HTMLFormElement
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              This control is not within the context of a form.
-  @Attr:
-     @@Name:  accessKey
-     @@DocAttr:
-       @@@Name:
-         accesskey
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  align
-     @@DocAttr:
-       @@@Name:align
+       @@@Name:border
        @@@DeprecatedBy:
          DOMHTML:HTML4
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-##IF:HTMLLegendElement
-
-IF:
-  @Name:  HTMLUListElement
-  @ISA:  HTMLElement
-  @Attr:
-     @@Name:  compact
-     @@Get:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-     @@Set:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-  @Attr:
-     @@Name:  type
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-IF:
-  @Name:  HTMLOListElement
-  @ISA:  HTMLElement
-  @Attr:
-     @@Name:  compact
-     @@Get:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-     @@Set:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-  @Attr:
-     @@Name:  start
-     @@Get:
-        @@@Type:
-           DOMMain:long
-     @@Set:
-        @@@Type:
-           DOMMain:long
-  @Attr:
-     @@Name:  type
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-IF:
-  @Name:  HTMLDListElement
-  @ISA:  HTMLElement
-  @Attr:
-     @@Name:  compact
-     @@Get:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-     @@Set:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-IF:
-  @Name:  HTMLDirectoryElement
-  @ISA:  HTMLElement
-  @Attr:
-     @@Name:  compact
-     @@Get:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-     @@Set:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-IF:
-  @Name:  HTMLMenuElement
-  @ISA:  HTMLElement
-  @Attr:
-     @@Name:  compact
-     @@Get:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-     @@Set:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-IF:
-  @Name:  HTMLLIElement
-  @ISA:  HTMLElement
-  @Attr:
-     @@Name:  type
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  value
-     @@Get:
-        @@@Type:
-           DOMMain:long
-     @@Set:
-        @@@Type:
-           DOMMain:long
-IF:
-  @Name:  HTMLDivElement
-  @ISA:  HTMLElement
-  @Attr:
-     @@Name:  align
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-IF:
-  @Name:  HTMLParagraphElement
-  @ISA:  HTMLElement
-  @Attr:
-     @@Name:  align
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-IF:
-  @Name:  HTMLHeadingElement
-  @ISA:  HTMLElement
-  @Attr:
-     @@Name:  align
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-IF:
-  @Name:  HTMLQuoteElement
-  @ISA:  HTMLElement
-  @Attr:
-     @@Name:  cite
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-IF:
-  @Name:  HTMLPreElement
-  @ISA:  HTMLElement
-  @Attr:
-     @@Name:  width
-     @@Get:
-        @@@Type:
-           DOMMain:long
-     @@Set:
-        @@@Type:
-           DOMMain:long
-IF:
-  @Name:  HTMLBRElement
-  @ISA:  HTMLElement
-  @Attr:
-     @@Name:  clear
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-IF:
-  @Name:  HTMLBaseFontElement
-  @ISA:  HTMLElement
-  @Attr:
-     @@Name:  color
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  face
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  size
-     @@Get:
-        @@@Type:
-           DOMMain:long
-     @@Set:
-        @@@Type:
-           DOMMain:long
-     @@Level[list]:
-        :: TBD ::
-        2
-     @@SpecLevel[list]:
-        :: TBD ::
-        2
-IF:
-  @Name:  HTMLFontElement
-  @ISA:  HTMLElement
-  @Attr:
-     @@Name:  color
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  face
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  size
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-IF:
-  @Name:  HTMLHRElement
-  @ISA:  HTMLElement
-  @Attr:
-     @@Name:  align
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  noShade
-     @@Get:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-     @@Set:
-        @@@Type:
-           DOMMain:boolean
-        @@@InCase:
-           @@@@Value:  true
-        @@@InCase:
-           @@@@Value:  false
-  @Attr:
-     @@Name:  size
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  width
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-IF:
-  @Name:  HTMLModElement
-  @ISA:  HTMLElement
-  @Attr:
-     @@Name:  cite
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  dateTime
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-IF:
-  @Name:  HTMLAnchorElement
-  @ISA:  HTMLElement
-  @Attr:
-     @@Name:  accessKey
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  charset
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  coords
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  href
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  hreflang
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  name
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  rel
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  rev
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  shape
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  tabIndex
-     @@Get:
-        @@@Type:
-           DOMMain:long
-     @@Set:
-        @@@Type:
-           DOMMain:long
-  @Attr:
-     @@Name:  target
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  type
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Method:
-     @@Name:  blur
-     @@Return:  \
-  @Method:
-     @@Name:  focus
-     @@Return:  \
-IF:
-  @Name:  HTMLImageElement
-  @ISA:  HTMLElement
-  @Attr:
-     @@Name:  name
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  align
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  alt
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  border
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         The type is <TYPE:DOMString> in both DOM Levels 1 and 2.
   @Attr:
      @@Name:  height
+     @@DocAttr:
+       @@@Name:height
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:
            DOMMain:long
      @@Set:
         @@@Type:
            DOMMain:long
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         THe type was <TYPE:DOMString> in DOM Level 1.
      @@Level[list]:
-        :: TBD ::
+        1
         2
      @@SpecLevel[list]:
-        :: TBD ::
+        1
         2
   @Attr:
      @@Name:  hspace
+     @@DocAttr:
+       @@@Name:hspace
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:
            DOMMain:long
      @@Set:
         @@@Type:
            DOMMain:long
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         The type was <TYPE:DOMString> in DOM Level 1.
      @@Level[list]:
-        :: TBD ::
+        1
         2
      @@SpecLevel[list]:
-        :: TBD ::
+        1
         2
   @Attr:
      @@Name:  isMap
+     @@DocAttr:
+       @@@Name:ismap
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -3058,51 +1950,96 @@ IF:
         @@@Type:  DOMString
   @Attr:
      @@Name:  src
+     @@DocAttr:
+       @@@Name:src
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  useMap
+     @@DocAttr:
+       @@@Name:usemap
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         The HTML 4 and XHTML 1.0 <HA:usemap> attribute value is 
+         of <SGML:%URI;>, while the XHTML m12n <HA:usemap> value 
+         is <XML:IDREF>.
   @Attr:
      @@Name:  vspace
+     @@DocAttr:
+       @@@Name:vspace
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:
            DOMMain:long
      @@Set:
         @@@Type:
            DOMMain:long
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         The type was <TYPE:DOMString> in DOM Level 1.
      @@Level[list]:
-        :: TBD ::
+        1
         2
      @@SpecLevel[list]:
-        :: TBD ::
+        1
         2
   @Attr:
      @@Name:  width
+     @@DocAttr:
+       @@@Name:width
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:
            DOMMain:long
      @@Set:
         @@@Type:
            DOMMain:long
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         The type was <TYPE:DOMString> in DOM Level 1.
      @@Level[list]:
-        :: TBD ::
+        1
         2
      @@SpecLevel[list]:
-        :: TBD ::
+        1
         2
+##IF:HTMLImageElement
+
 IF:
   @Name:  HTMLObjectElement
   @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:object
+  @ImplNote:
+    @@lang:en
+    @@@:
+      In some environments some attributes may be read-only 
+      once the underlying object is instantiated.
   @Attr:
      @@Name:  form
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The <HE:form> element containing this control.
      @@Get:
-        @@@Type:  HTMLFormElement
+        @@@Type:  
+          DOMWebForms:HTMLFormElement
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            This control is not within the context of a form.
   @Attr:
      @@Name:  code
      @@Get:
@@ -3111,42 +2048,60 @@ IF:
         @@@Type:  DOMString
   @Attr:
      @@Name:  align
+     @@DocAttr:
+       @@@Name:align
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  archive
+     @@DocAttr:
+       @@@Name:archive
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  border
+     @@DocAttr:
+       @@@Name:border
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  codeBase
+     @@DocAttr:
+       @@@Name:codebase
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  codeType
+     @@DocAttr:
+       @@@Name:codetype
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  data
+     @@DocAttr:
+       @@@Name:data
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  declare
+     @@DocAttr:
+       @@@Name:declare
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -3163,12 +2118,18 @@ IF:
            @@@@Value:  false
   @Attr:
      @@Name:  height
+     @@DocAttr:
+       @@@Name:height
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  hspace
+     @@DocAttr:
+       @@@Name:gspace
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:
            DOMMain:long
@@ -3177,18 +2138,24 @@ IF:
            DOMMain:long
   @Attr:
      @@Name:  name
+     @@DocAttr:
+       @@@Name:name
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  standby
+     @@DocAttr:
+       @@@Name:name
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  tabIndex
+     @@DocAttr:
+       @@@Name:tabindex
      @@Get:
         @@@Type:
            DOMMain:long
@@ -3197,18 +2164,32 @@ IF:
            DOMMain:long
   @Attr:
      @@Name:  type
+     @@DocAttr:
+        @@@Name:type
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  useMap
+     @@DocAttr:
+       @@@Name:usemap
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         In HTML 4 or XHTML 1.0, the <HA:usemap> attribute is 
+         a <SGML:%URI;>.  In XHTML m12n, the <HA:usemap> 
+         is an <XML:IDREF>.
   @Attr:
      @@Name:  vspace
+     @@DocAttr:
+       @@@Name:vspace
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:
            DOMMain:long
@@ -3217,84 +2198,145 @@ IF:
            DOMMain:long
   @Attr:
      @@Name:  width
+     @@DocAttr:
+       @@@Name:width
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  contentDocument
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The document this object contains, if any and available.
      @@Get:
         @@@Type:  Document
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              There is no containing document or 
+              there is but it is not available.
      @@Level[list]:  2
      @@SpecLevel[list]:  2
+##IF:HTMLObjectElement
+
 IF:
   @Name:  HTMLParamElement
   @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:param
   @Attr:
      @@Name:  name
+     @@DocAttr:
+       @@@Name:name
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  type
+     @@DocAttr:
+       @@@Name:type
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  value
+     @@DocAttr:
+        @@@Name:value
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  valueType
+     @@DocAttr:
+       @@@Name:valuetype
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
+
 IF:
   @Name:  HTMLAppletElement
   @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:applet
+    @@DeprecatedBy:
+      DOMHTML:HTML4
   @Attr:
      @@Name:  align
+     @@DocAttr:
+       @@@Name:align
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  alt
+     @@DocAttr:
+       @@@Name:alt
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  archive
+     @@DocAttr:
+       @@@Name:archive
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  code
+     @@DocAttr:
+       @@@Name:code
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  codeBase
+     @@DocAttr:
+       @@@Name:codebase
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
-     @@Name:  height
-     @@Get:
+     @@Name:  height 
+     @@DocAttr:
+       @@@Name:height
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
+    @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  hspace
+     @@DocAttr:
+       @@@Name:hspace
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:
            DOMMain:long
@@ -3302,31 +2344,43 @@ IF:
         @@@Type:
            DOMMain:long
      @@Level[list]:
-        :: TBD ::
+        1
         2
      @@SpecLevel[list]:
-        :: TBD ::
+        1
         2
   @Attr:
      @@Name:  name
+     @@DocAttr:
+       @@@Name:name
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  object
+     @@DocAttr:
+       @@@Name:object
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
      @@Level[list]:
-        :: TBD ::
+        1
         2
      @@SpecLevel[list]:
-        :: TBD ::
+        1
         2
   @Attr:
      @@Name:  vspace
+     @@DocAttr:
+       @@@Name:vspace
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:
            DOMMain:long
@@ -3334,59 +2388,89 @@ IF:
         @@@Type:
            DOMMain:long
      @@Level[list]:
-        :: TBD ::
+        1
         2
      @@SpecLevel[list]:
-        :: TBD ::
+        1
         2
   @Attr:
      @@Name:  width
+     @@DocAttr:
+       @@@Name:width
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
+##IF:HTMLAppletElement
+
 IF:
   @Name:  HTMLMapElement
   @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:map
   @Attr:
      @@Name:  areas
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The list of areas defined for this image map.
      @@Get:
         @@@Type:  HTMLCollection
   @Attr:
      @@Name:  name
+     @@DocAttr:
+       @@@Name:name
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
+##IF:HTMLMapElement
+
 IF:
   @Name:  HTMLAreaElement
   @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:area
   @Attr:
      @@Name:  accessKey
+     @@DocAttr:
+       @@@Name:accesskey
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  alt
+     @@DocAttr:
+       @@@Name:alt
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  coords
+     @@DocAttr:
+       @@@Name:coords
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  href
+     @@DocAttr:
+       @@@Name:href
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  noHref
+     @@DocAttr:
+       @@@Name:nohref
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -3403,12 +2487,16 @@ IF:
            @@@@Value:  false
   @Attr:
      @@Name:  shape
+     @@DocAttr:
+       @@@Name:shape
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  tabIndex
+     @@DocAttr:
+       @@@Name:tabindex
      @@Get:
         @@@Type:
            DOMMain:long
@@ -3417,39 +2505,78 @@ IF:
            DOMMain:long
   @Attr:
      @@Name:  target
+     @@DocAttr:
+       @@@Name:target
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
+##IF:HTMLAreaElement
+
 IF:
   @Name:  HTMLScriptElement
   @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:script
   @Attr:
      @@Name:  text
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The script content of this element.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         ISSUE: How interact with <HA:src>?
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  htmlFor
+     @@DocAttr:
+       @@@Name:for
+     @@Description:
+       @@@lang:en
+       @@@@:
+         {NOTE:: Reserved for future use by the DOM HTML Specifications. 
+                 The HTML <HA:for> attribute is also reserved 
+                 by the HTML 4 Specifications.
+         \
+         }
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  event
+     @@DocAttr:
+       @@@Name:event
+     @@Description:
+       @@@lang:en
+       @@@@:
+         {NOTE:: Reserved for future use by the DOM HTML Specifications. 
+                 The HTML <HA:event> attribute is also reserved 
+                 by the HTML 4 Specification.
+         \
+         }
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  charset
+     @@DocAttr:
+       @@@Name:charset
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  defer
+     @@DocAttr:
+       @@@Name:defer
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -3466,45 +2593,90 @@ IF:
            @@@@Value:  false
   @Attr:
      @@Name:  src
+     @@DocAttr:
+       @@@Name:src
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  type
+     @@DocAttr:
+       @@@Name:type
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
+##IF:HTMLScriptElement
+
 IF:
   @Name:  HTMLTableElement
   @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:table
   @Attr:
      @@Name:  caption
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The <HE:caption> of the table.
      @@Get:
         @@@Type:  HTMLTableCaptionElement
+        @@@InCase:
+          @@@@Label:
+            @@@@@lang:en
+            @@@@@@:
+              void (= <DOM:null>?)
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: There is no caption.
      @@Set:
         @@@Type:  HTMLTableCaptionElement
         @@@Exception:
-           @@@@Name:  ** TBD **
+           @@@@Name:  HIERARCHY_REQUEST_ERR
            @@@@Type:
               DOMCore:DOMException
+           @@@@SubType:
+             @@@@@QName:
+               ManakaiDOMHTML:MDOM_NOT_CAPTION
+             @@@@@Description:
+               @@@@@@lang:en
+               @@@@@@@:
+                 The given element is not a <HE:caption>.
      @@Level[list]:
-        :: TBD ::
+        1
         2
      @@SpecLevel[list]:
-        :: TBD ::
+        1
         2
   @Attr:
      @@Name:  tHead
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The <HE:thead> of this table.
      @@Get:
         @@@Type:  HTMLTableSectionElement
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              There is no <HE:thead>.
      @@Set:
         @@@Type:  HTMLTableSectionElement
         @@@Exception:
-           @@@@Name:  ** TBD **
+           @@@@Name:  HIERARCHY_REQUEST_ERR
            @@@@Type:
               DOMCore:DOMException
+           @@@@SubType:
+             ManakaiDOMHTML:MDOM_BAD_ELEMENT_TYPE
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@: 
+               The given element is not a <HE:thead>.
      @@Level[list]:
         1
         2
@@ -3513,14 +2685,32 @@ IF:
         2
   @Attr:
      @@Name:  tFoot
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The <HE:tfoot> of this table.
      @@Get:
         @@@Type:  HTMLTableSectionElement
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              There is no <HE:tfoot>.
      @@Set:
         @@@Type:  HTMLTableSectionElement
         @@@Exception:
-           @@@@Name:  ** TBD **
+           @@@@Name:  HIERARCHY_REQUEST_ERR
            @@@@Type:
               DOMCore:DOMException
+           @@@@SubType:
+             @@@@@QName:
+               ManakaiDOMHTML:MDOM_NOT_TFOOT
+             @@@@@Description:
+               @@@@@@lang:en
+               @@@@@@@:
+                 The given element is not a <HE:tfoot>.
      @@Level[list]:
         1
         2
@@ -3529,99 +2719,222 @@ IF:
         2
   @Attr:
      @@Name:  rows
+     @@Description:
+       @@@lang:en
+       @@@@:
+         A collection of all the rows (child or grandchild 
+         <HE:tr> elements) in this table.
      @@Get:
         @@@Type:  HTMLCollection
   @Attr:
      @@Name:  tBodies
+     @@Description:
+       @@@lang:en
+       @@@@:
+         A collection of the table bodies.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         ISSUE: What is collected if simple table?
      @@Get:
         @@@Type:  HTMLCollection
   @Attr:
      @@Name:  align
+     @@DocAttr:
+       @@@Name:align
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  bgColor
+     @@DocAttr:
+       @@@Name:bgcolor
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  border
+     @@DocAttr:
+       @@@Name:border
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  cellPadding
+     @@DocAttr:
+       @@@Name:cellpadding
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  cellSpacing
+     @@DocAttr:
+       @@@Name:cellspacing
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  frame
+     @@DocAttr:
+       @@@Name:frame
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         How <HTML:border> is implemented in DOM Level 0?
   @Attr:
      @@Name:  rules
+     @@DocAttr:
+       @@@Name:rules
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  summary
+     @@DocAttr:
+       @@@Name:summary
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  width
+     @@DocAttr:
+       @@@Name:width
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Method:
      @@Name:  createTHead
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Create the <HE:thead> element (if it does not exist) and 
+         return it.
      @@Return:
         @@@Type:  HTMLElement
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The <HE:thead> element.
   @Method:
      @@Name:  deleteTHead
-     @@Return:  \
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Delete the <HE:thead>, if any, from the table.
+     @@Return:  
   @Method:
      @@Name:  createTFoot
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Create the <HE:tfoot> element (if it does not exist) and 
+         return it.
      @@Return:
         @@@Type:  HTMLElement
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The <HE:tfoot> element.
   @Method:
      @@Name:  deleteTFoot
-     @@Return:  \
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Delete the <HE:tfoot>, if any, from the table.
+     @@Return:  
   @Method:
      @@Name:  createCaption
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Create the table caption element (if it does not exist) and 
+         return it.
      @@Return:
         @@@Type:  HTMLElement
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The table caption.
   @Method:
      @@Name:  deleteCaption
-     @@Return:  \
+     @@Description:
+        @@@lang:en
+        @@@@:
+          Delete the table caption, if any.
+     @@Return:  
   @Method:
      @@Name:  insertRow
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Insert a new empty row in this table.  If this table is 
+         empty, a <HE:tbody> is created and the new row is 
+         inserted into it.
+     @@ImplNote:
+        @@@lang:en
+        @@@@:
+          DOM HTML Specifications note that a table row 
+          cannot be empty according to HTML 4.  But they do not 
+          require DOM implementations to add a table cell.
      @@Param:
         @@@Name:  index
         @@@Type:
            DOMMain:long
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The ordinal index of the row where to insert a new row, 
+            starting from <DOM:0> and relative to the logical 
+            order (not the document order).  The new row is 
+            inserted immediately before and in the same row group 
+            as the current <P:index>th row.
+        @@@InCase:
+          @@@@Value:-1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The new row is appended.
+        @@@InCase:
+          @@@@Label:
+            @@@@@lang:en
+            @@@@@@:
+              The number of rows
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The new row is appended.
      @@Return:
         @@@Type:  HTMLElement
+        @@@Description:
+          @@@@lang:en
+          @@@@@:The newly created row.
         @@@Exception:
-           @@@@Name:  ** TBD **
+           @@@@Name:  INDEX_SIZE_ERR
            @@@@Type:
               DOMCore:DOMException
+           @@@@SubType:
+             @@@@@QName:
+               TODO: What?
+             @@@@@Description:
+               @@@@@@lang:en
+               @@@@@@@:
+                 The <P:index> is greater than the number of rows 
+                 or less than <DOM:-1>.
      @@Level[list]:
         1
         2
@@ -3630,53 +2943,102 @@ IF:
         2
   @Method:
      @@Name:  deleteRow
+     @@Description:
+       @@@lang:en
+       @@@@:Delete a table row.
      @@Param:
         @@@Name:  index
         @@@Type:
            DOMMain:long
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The ordinal index of the row to delete, starting from <DOM:0> 
+            and relative to the logical order (not document order).
+        @@@InCase:
+          @@@@Value:-1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The last row in the table is deleted.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            In the order of <HE:thead> -> <HE:tbody>s -> <HE:tfoot>?
      @@Return:
         @@@Exception:
-           @@@@Name:  ** TBD **
+           @@@@Name:  INDEX_SIZE_ERR
            @@@@Type:
               DOMCore:DOMException
+           @@@@SubType:
+             @@@@@QName:
+               TODO: What?
+             @@@@@Description:
+               @@@@@@lang:en
+               @@@@@@@:
+                 The <P:index> is greater than or equal to 
+                 the number of rows or the <P:index> is 
+                 less than <DOM:-1>.
      @@Level[list]:
         1
         2
      @@SpecLevel[list]:
         1
         2
+##IF:HTMLTableElement
+
 IF:
   @Name:  HTMLTableCaptionElement
   @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:caption
   @Attr:
      @@Name:  align
+     @@DocAttr:
+       @@@Name:align
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
+##IF:HTMLTableCaptionElement
+
 IF:
   @Name:  HTMLTableColElement
   @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:col
   @Attr:
      @@Name:  align
+     @@DocAttr:
+       @@@Name:align
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  ch
+     @@DocAttr:
+       @@@Name:char
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  chOff
+     @@DocAttr:
+       @@@Name:charoff
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  span
+     @@DocAttr:
+       @@@Name:span
      @@Get:
         @@@Type:
            DOMMain:long
@@ -3685,59 +3047,123 @@ IF:
            DOMMain:long
   @Attr:
      @@Name:  vAlign
+     @@DocAttr:
+       @@@Name:valign
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  width
+     @@DocAttr:
+       @@@Name:width
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
+##IF:HTMLTableColElement
+
 IF:
   @Name:  HTMLTableSectionElement
   @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:tbody
+  @ElementType:
+    @@QName:
+      xhtml1:thead
+  @ElementType:
+    @@QName:
+      xhtml1:tfoot
   @Attr:
      @@Name:  align
+     @@DocAttr:
+       @@@Name:align
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  ch
+     @@DocAttr:
+       @@@Name:char
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  chOff
+     @@DocAttr:
+       @@@Name:charoff
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  vAlign
+     @@DocAttr:
+       @@@Name:valign
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  rows
+     @@Description:
+       @@@lang:en
+       @@@@:
+         A collection of rows in this table row group.
      @@Get:
         @@@Type:  HTMLCollection
   @Method:
      @@Name:  insertRow
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Insert a table row into this row group.
      @@Param:
         @@@Name:  index
         @@@Type:
            DOMMain:long
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The ordinal index of the row where to insert a new row, 
+            starting from <DOM:0> and relative only to the 
+            rows contained inside this row group.  The new row 
+            is inserted immediately before the current <P:index>th 
+            row.
+        @@@InCase:
+          @@@@Value:-1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The new row is appended.
+        @@@InCase:
+          @@@@Label:
+            @@@@@lang:en
+            @@@@@@:The number of rows in this row group
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The new row is appended.
      @@Return:
         @@@Type:  HTMLElement
+        @@@Description:
+          @@@@lang:en
+          @@@@@:The newly created table row.
         @@@Exception:
-           @@@@Name:  ** TBD **
+           @@@@Name:  INDEX_SIZE_ERR
            @@@@Type:
               DOMCore:DOMException
+           @@@@SubType:
+             @@@@@QName:
+               TODO: What?
+             @@@@@Description:
+               @@@@@@lang:en
+               @@@@@@@:
+                 The <P:index> is greater than the number 
+                 of rows or less than <DOM:-1>.
      @@Level[list]:
         1
         2
@@ -3746,98 +3172,191 @@ IF:
         2
   @Method:
      @@Name:  deleteRow
+     @@Description:
+        @@@lang:en
+        @@@@:
+          Delete a table row from this table row group.
      @@Param:
         @@@Name:  index
         @@@Type:
            DOMMain:long
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The ordinal index of the row to delete, starting 
+            from <DOM:0> and relative 
+            only to the rows contained inside this row group.
+        @@@InCase:
+          @@@@Value:-1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Delete the last row.
      @@Return:
         @@@Exception:
-           @@@@Name:  ** TBD **
+           @@@@Name:  INDEX_SIZE_ERR
            @@@@Type:
               DOMCore:DOMException
+           @@@@SubType:
+             @@@@@QName:
+               TODO: What?
+             @@@@@Description:
+               @@@@@@lang:en
+               @@@@@@@:
+                 The <P:index> is greater than or equal to 
+                 the number of rows or the <P:index> is less 
+                 than <DOM:-1>.
      @@Level[list]:
         1
         2
      @@SpecLevel[list]:
         1
         2
+##IF:HTMLTableSectionElement
+
 IF:
   @Name:  HTMLTableRowElement
   @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+       xhtml1:tr
   @Attr:
      @@Name:  rowIndex
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The ordinal index of the row, starting from <DOM:0>, 
+         in the logical order (not the document order). 
+         \
+         {NOTE:: The logical order take row groups into account; 
+                 placing <HE:thead> rows first, followed by 
+                 <HE:tbody> rows, followed by <HE:tfoot> rows.
+         \
+         }
      @@Get:
         @@@Type:
            DOMMain:long
      @@Level[list]:
-        :: TBD ::
+        1
         2
      @@SpecLevel[list]:
-        :: TBD ::
+        1
         2
   @Attr:
      @@Name:  sectionRowIndex
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The ordinal index of this row, starting from <DOM:0> 
+         and relative to this row group.
      @@Get:
         @@@Type:
            DOMMain:long
      @@Level[list]:
-        :: TBD ::
+        1
         2
      @@SpecLevel[list]:
-        :: TBD ::
+        1
         2
   @Attr:
      @@Name:  cells
+     @@Description:
+       @@@lang:en
+       @@@@:The collection of cells in this row.
      @@Get:
         @@@Type:  HTMLCollection
      @@Level[list]:
-        :: TBD ::
+        1
         2
      @@SpecLevel[list]:
-        :: TBD ::
+        1
         2
   @Attr:
      @@Name:  align
+     @@DocAttr:
+        @@@Name:align
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  bgColor
+     @@DocAttr:
+       @@@Name:bgcolor
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  ch
+     @@DocAttr:
+       @@@Name:char
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  chOff
+     @@DocAttr:
+       @@@Name:charoff
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  vAlign
+     @@DocAttr:
+       @@@Name:valign
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Method:
      @@Name:  insertCell
+     @@Description:
+        @@@lang:en
+        @@@@:
+          Insert an empty data cell (<HE:td>) into this row.
      @@Param:
         @@@Name:  index
         @@@Type:
            DOMMain:long
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The index where the new cell is inserted, starting 
+            from <DOM:0>.
+        @@@InCase:
+          @@@@Value:-1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:The new cell is appended.
+        @@@InCase:
+          @@@@Label:
+            @@@@@lang:en
+            @@@@@@:The number of cells
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:The new cell is appended.
      @@Return:
         @@@Type:  HTMLElement
+        @@@Description:
+          @@@@lang:en
+          @@@@@:The newly inserted cell.
         @@@Exception:
-           @@@@Name:  ** TBD **
+           @@@@Name:  INDEX_SIZE_ERR
            @@@@Type:
               DOMCore:DOMException
+           @@@@SubType:
+             @@@@@QName:
+               TODO: What?
+             @@@@@Description:
+               @@@@@@lang:en
+               @@@@@@@:
+                 The <P:index> is greater than the number of 
+                 cells or less than <DOM:-1>.
      @@Level[list]:
         1
         2
@@ -3846,67 +3365,119 @@ IF:
         2
   @Method:
      @@Name:  deleteCell
+     @@Description:
+       @@@lang:en
+       @@@@:Delete a cell from this row.
      @@Param:
         @@@Name:  index
         @@@Type:
            DOMMain:long
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The index of the cell to delete, starting from <DOM:0> 
+            and in the document order.
+        @@@InCase:
+          @@@@Value:-1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The last cell is deleted.
      @@Return:
         @@@Exception:
-           @@@@Name:  ** TBD **
+           @@@@Name:  INDEX_SIZE_ERR
            @@@@Type:
               DOMCore:DOMException
+           @@@@SubType:
+             @@@@@QName:
+               TODO: What?
+             @@@@@Description:
+               @@@@@@lang:en
+               @@@@@@@:
+                 THe <P:index> is greater than or equal to the number 
+                 of the cells or less than <DOM:-1>.
      @@Level[list]:
         1
         2
      @@SpecLevel[list]:
         1
         2
+##IF:HTMLTableRowElement
+
 IF:
   @Name:  HTMLTableCellElement
   @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:th
+  @ElementType:
+    @@QName:
+      xhtml1:td
   @Attr:
      @@Name:  cellIndex
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The ordinal index of this cell in the row, 
+         starting from <DOM:0> and in the document order 
+         (not the display order).
      @@Get:
         @@@Type:
            DOMMain:long
   @Attr:
      @@Name:  abbr
+     @@DocAttr:
+       @@@Name:abbr
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  align
+     @@DocAttr:
+       @@@Name:align
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  axis
+     @@DocAttr:
+       @@@Name:axis
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  bgColor
+     @@DocAttr:
+       @@@Name:bgcolor
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  ch
+     @@DocAttr:
+       @@@Name:char
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  chOff
+     @@DocAttr:
+       @@@Name:charoff
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  colSpan
+     @@DocAttr:
+       @@@Name:colspan
      @@Get:
         @@@Type:
            DOMMain:long
@@ -3915,18 +3486,28 @@ IF:
            DOMMain:long
   @Attr:
      @@Name:  headers
+     @@DocAttr:
+       @@@Name:headers
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  height
+     @@DocAttr:
+       @@@Name:height
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  noWrap
+     @@DocAttr:
+       @@@Name:nowrap
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -3943,6 +3524,8 @@ IF:
            @@@@Value:  false
   @Attr:
      @@Name:  rowSpan
+     @@DocAttr:
+       @@@Name:rowspan
      @@Get:
         @@@Type:
            DOMMain:long
@@ -3951,72 +3534,106 @@ IF:
            DOMMain:long
   @Attr:
      @@Name:  scope
+     @@DocAttr:
+       @@@Name:scope
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  vAlign
+     @@DocAttr:
+       @@@Name:valign
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  width
+     @@DocAttr:
+       @@@Name:width
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
+##IF:HTMLTableCellElement
+
 IF:
   @Name:  HTMLFrameSetElement
   @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:frameset
   @Attr:
      @@Name:  cols
+     @@DocAttr:
+       @@@Name:cols
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  rows
+     @@DocAttr:
+       @@@Name:rows
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
+##IF:HTMLFrameSetElement
+
 IF:
   @Name:  HTMLFrameElement
   @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:frame
   @Attr:
      @@Name:  frameBorder
+     @@DocAttr:
+       @@@Name:frameborder
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  longDesc
+     @@DocAttr:
+       @@@Name:longdesc
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  marginHeight
+     @@DocAttr:
+       @@@Name:marginheight
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  marginWidth
+     @@DocAttr:
+       @@@Name:marginwidth
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  name
+     @@DocAttr:
+       @@@Name:name
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  noResize
+     @@DocAttr:
+       @@@Name:noresize
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -4033,89 +3650,142 @@ IF:
            @@@@Value:  false
   @Attr:
      @@Name:  scrolling
+     @@DocAttr:
+       @@@Name:scrolling
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  src
+     @@DocAttr:
+       @@@Name:src
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  contentDocument
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The document this frame contains, if any and available.
      @@Get:
         @@@Type:  Document
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              There is no document or it is not available.
      @@Level[list]:  2
      @@SpecLevel[list]:  2
+##IF:HTMLFrameElement
+
 IF:
   @Name:  HTMLIFrameElement
   @ISA:  HTMLElement
+  @ElementType:
+    @@QName:
+      xhtml1:iframe
   @Attr:
      @@Name:  align
+     @@DocAttr:
+       @@@Name:cols
+       @@@DeprecatedBy:
+         DOMHTML:HTML4
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  frameBorder
+     @@DocAttr:
+       @@@Name:frameborder
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  height
+     @@DocAttr:
+       @@@Name:height
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  longDesc
+     @@DocAttr:
+       @@@Name:longdesc
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  marginHeight
+     @@DocAttr:
+       @@@Name:marginheight
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  marginWidth
+     @@DocAttr:
+       @@@Name:marginwidth
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  name
+     @@DocAttr:
+       @@@Name:name
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  scrolling
+     @@DocAttr:
+       @@@Name:scrolling
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  src
+     @@DocAttr:
+       @@@Name:src
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  width
+     @@DocAttr:
+       @@@Name:width
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  contentDocument
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The document this frame contains, if any and available.
      @@Get:
         @@@Type:  Document
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            There is no document or it is not available.
      @@Level[list]:  2
      @@SpecLevel[list]:  2
-# #endif // _HTML2_IDL_
+##IF:HTMLIFrameElement
+
+## DOMHTML.dis ends here
+
