@@ -14,7 +14,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Message::Markup::XML::Parser::Error;
 require Message::Util::Error::TextParser;
@@ -29,6 +29,36 @@ sub text {
   $self->_FORMATTER_PACKAGE_->new
        ->replace ('%err-line;.%err-char;: '.$self->{-def}->{description}.' %err-at (prefix => {at "}, suffix => {"}, before => 20, after => 20);', param => $self);
 }
+
+sub _FORMATTER_PACKAGE_ () { 'Message::Markup::XML::Parser::Error::formatter' }
+
+package Message::Markup::XML::Parser::Error::formatter;
+push our @ISA, 'Message::Util::Error::TextParser::formatter';
+
+sub ___rule_def () {+{
+  markup_declaration_parameters => {
+    after => sub {
+      my ($self, $name, $p, $o) = @_;
+      my @result;
+      for my $param (@{$o->{param} || []}) {
+        my $result = '(' . $param->{type} . ') ';
+        if (ref $param->{value} eq 'SCALAR') {
+          $result .= '"' . ${$param->{value}} . '"';
+        } else {
+          $result .= '"' . $param->{value} . '"';
+        }
+        push @result, $result;
+      }
+      for (reverse @{$o->{sources} || []}[1..$#{$o->{sources} || []}]) {
+        push @result, '"' . substr ($$_, pos $$_) . '"';
+      }
+      if (@{$o->{sources} || []}) {
+        push @result, '"' . ${$o->{sources}->[0]} . '"';
+      }
+      $p->{-result} = join ', ', @result;
+    },
+  },
+}}
 
 package Message::Markup::XML::Parser::Error::WFC;
 push our @ISA, 'Message::Markup::XML::Parser::Error';
@@ -94,12 +124,45 @@ sub ___error_def () {+{
     description => q(Document type declaration subset cannot contain character "%t (name => char);"),
     level => 'ebnf',
   },
+  SYNTAX_ELEMENT_DECLARATION_TYPE_NAME_GROUP => {
+    description => q(Name group of generic identifiers or rank stems not allowed),
+    level => 'ebnf',
+  },
+  SYNTAX_ELEMENT_DECLARATION_TYPE_NAME_REQUIRED => {
+    description => q(Element type name (generic identifier) required),
+    level => 'ebnf',
+  },
+  SYNTAX_ELEMENT_MODEL_OR_MIN_OR_RANK_REQUIRED => {
+    description => q(Declared content keyword or model group required),
+    level => 'ebnf',
+  },
+  SYNTAX_ELEMENT_PS_REQUIRED => {
+    description => q(One or more ps (whitespaces) required between parameters),
+    level => 'ebnf',
+  },
+  SYNTAX_ELEMENT_RANK_SUFFIX => {
+    description => q(Rank suffix not allowed),
+    level => 'ebnf',
+  },
+  SYNTAX_ELEMENT_SGML_CONTENT_KEYWORD => {
+    description => q(Keyword "%t (name => keyword);" not allowed),
+    level => 'ebnf', 
+  },
+  SYNTAX_ELEMENT_TAG_MIN => {
+    description => q(Tag minimumization parameter not allowed),
+    level => 'ebnf',
+  },
   SYNTAX_ELEMENT_TYPE_NAME_FOLLOWING_ETAGO_REQUIRED => {
     description => q(Element type name (generic identifier) required just after etago (</)),
     level => 'ebnf',
   },
   SYNTAX_ELEMENT_TYPE_NAME_FOLLOWING_STAGO_REQUIRED => {
     description => q(Element type name (generic identifier) required just after stago (<)),
+    level => 'ebnf',
+  },
+  SYNTAX_ELEMENT_UNKNOWN_CONTENT_KEYWORD => {
+    description => q(Unknown keyword "%t (name => keyword);" used),
+    level => 'ebnf',
   },
   SYNTAX_EMPTY_COMMENT_DECLARATION => {
     description => q(Empty comment declaration (<!>) not allowed),
@@ -190,7 +253,7 @@ sub ___error_def () {+{
     level => 'ebnf',
   },
   SYNTAX_MARKUP_DECLARATION_TOO_MANY_PARAM => {
-    description => q(Too many parameters),
+    description => q(Too many parameters "%markup-declaration-parameters;"),
     level => 'ebnf',
   },
   SYNTAX_MARKUP_DECLARATION_UNKNOWN_KEYWORD => {
@@ -252,6 +315,10 @@ sub ___error_def () {+{
     description => q(Processing instruction expected),
     level => 'ebnf',
   },
+  SYNTAX_PS_COMMENT_NOT_ALLOWED => {
+    description => q(Comment not allowed in parameter),
+    level => 'ebnf',
+  }, 
   SYNTAX_PUBID_LITERAL_INVALID_CHAR => {
     description => q(Public identifier literal cannot contains character "%t (name => char);"),
     level => 'ebnf',
@@ -514,4 +581,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/05/17 23:59:33 $
+1; # $Date: 2004/05/23 04:02:48 $

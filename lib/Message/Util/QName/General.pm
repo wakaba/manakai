@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Util::QName::General;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Carp;
 use Message::Markup::XML::QName;
 
@@ -58,7 +58,8 @@ sub import ($$;$) {
   my ($name, $map) = @_;
   Carp::croak "Imported operators must be specified"
     unless ref $name;
-  $self->{ns} = $map || {};
+  Carp::croak "Namespace map must be specified" unless ref $map;
+  $self->{ns} = $map;
   my $caller = caller ($Exporter::ExportLevel);
   no strict 'refs';
   for (@$name) {
@@ -150,4 +151,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/02/24 07:28:58 $
+1; # $Date: 2004/05/23 04:02:48 $

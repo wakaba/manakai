@@ -4,11 +4,15 @@ use Test;
 use Message::Markup::XML::QName qw/NULL_URI DEFAULT_PFX/;
 use Message::Markup::XML::Node;
 use Message::Markup::XML::Parser::Base;
-use Message::Util::QName::General [qw/ExpandedURI/],
+BEGIN {
+  our $NS =
   {
    (DEFAULT_PFX) => Message::Markup::XML::Parser::Base::URI_CONFIG,
    tree => q<http://suika.fam.cx/~wakaba/-temp/2004/2/22/Parser/TreeConstruct/>,
+   test => q<mid:t.markup-xml-parser-base.t+2004.5.20@manakai.suika.fam.cx#>,
   };
+}
+use Message::Util::QName::General [qw/ExpandedURI/], our $NS;
 
 sub match ($$;%) {
   my ($result, $expect, %opt) = @_;
@@ -1101,25 +1105,207 @@ my @a =
   method => 'parse_entity_declaration',
   result => q(0:32:SYNTAX_MDC_REQUIRED),
  },
+
+ {
+  entity => {b => ''},
+  t => q{<!ENTITY a "%b;">},
+  method => 'parse_entity_declaration',
+  result => q(1),
+ },
+ {
+  entity => {b => ''},
+  t => q{<!ENTITY a %b; "aa">},
+  method => 'parse_entity_declaration',
+  result => q(1),
+ },
+ {
+  entity => {b => '"aa"'},
+  t => q{<!ENTITY a %b;>},
+  method => 'parse_entity_declaration',
+  result => q(1),
+ },
+ {
+  entity => {b => q<SYSTEM "foo">},
+  t => q{<!ENTITY a %b;>},
+  method => 'parse_entity_declaration',
+  result => q(1),
+ },
+ {
+  entity => {b => q<  PUBLIC "pub" 'sys'  >},
+  t => q{<!ENTITY a %b;>},
+  method => 'parse_entity_declaration',
+  result => q(1),
+ },
+ {
+  entity => {b => 'SYSTEM'},
+  t => q{<!ENTITY a %b;>},
+  method => 'parse_entity_declaration',
+  result => q(0:14:SYNTAX_ENTITY_PS_REQUIRED),
+ },
+ {
+  entity => {b => "SYSTEM"},
+  t => q{<!ENTITY a %b; >},
+  method => 'parse_entity_declaration',
+  result => q(0:15:SYNTAX_SYSTEM_LITERAL_REQUIRED),
+ },
+ {
+  entity => {b => q<  SYSTEM "foo" >},
+  t => q{<!ENTITY a %b; >},
+  method => 'parse_entity_declaration',
+  result => q(1),
+ },
+ {
+  entity => {b => q<  SYSTEM %c; >,
+             c => q< "sys" >},
+  t => q{<!ENTITY a %b; >},
+  method => 'parse_entity_declaration',
+  result => q(1),
+ },
+ {
+  entity => {b => q<SYSTEM %c; >,
+             c => q< "sys" >},
+  t => q{<!ENTITY%b; >},
+  method => 'parse_entity_declaration',
+  result => q(1),
+ },
+ {
+  entity => {b => q[SYSTEM %c; > ],
+             c => q< "sys" >},
+  t => q{<!ENTITY%b; >},
+  method => 'parse_entity_declaration',
+  result => q(0:11:SYNTAX_MARKUP_DECLARATION_TOO_MANY_PARAM),
+ },
+
+ {
+  t => q{<!ENTITY --comment-->},
+  method => 'parse_entity_declaration',
+  result => q(0:9:SYNTAX_PS_COMMENT),
+ },
+ {
+  t => q{<!ENTITY a --comment-->},
+  method => 'parse_entity_declaration',
+  result => q(0:11:SYNTAX_PS_COMMENT),
+ },
+ {
+  t => q{<!ENTITY a "a" --comment-->},
+  method => 'parse_entity_declaration',
+  result => q(0:15:SYNTAX_PS_COMMENT),
+ },
+
+ {
+  t => q{<!ELEMENT el ANY>},
+  method => 'parse_element_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!ELEMENT el EMPTY   >},
+  method => 'parse_element_declaration',
+  result => q(1),
+ },
+ {
+  t => q{<!ELEMENT el CDATA>},
+  method => 'parse_element_declaration',
+  result => q(0:13:SYNTAX_ELEMENT_SGML_CONTENT_KEYWORD),
+ },
+ {
+  t => q{<!ELEMENT el RCDATA>},
+  method => 'parse_element_declaration',
+  result => q(0:13:SYNTAX_ELEMENT_SGML_CONTENT_KEYWORD),
+ },
+ {
+  t => q{<!ELEMENT el foo>},
+  method => 'parse_element_declaration',
+  result => q(0:13:SYNTAX_ELEMENT_UNKNOWN_CONTENT_KEYWORD),
+ },
+ {
+  t => q{<!ELEMENT el ANY foo>},
+  method => 'parse_element_declaration',
+  result => q(0:17:SYNTAX_MDC_REQUIRED),
+ },
+ {
+  t => q{<!ELEMENT el - - ANY>},
+  method => 'parse_element_declaration',
+  result => q(0:13:SYNTAX_ELEMENT_TAG_MIN),
+ },
+ {
+  t => q{<!ELEMENT el o - ANY>},
+  method => 'parse_element_declaration',
+  result => q(0:13:SYNTAX_ELEMENT_TAG_MIN),
+ },
+ {
+  t => q{<!ELEMENT (el) o - ANY>},
+  method => 'parse_element_declaration',
+  result => q(0:10:SYNTAX_ELEMENT_DECLARATION_TYPE_NAME_GROUP),
+ },
+ {
+  t => q{<!ELEMENT el 1 o - ANY>},
+  method => 'parse_element_declaration',
+  result => q(0:13:SYNTAX_ELEMENT_RANK_SUFFIX),
+ },
+ {
+  t => q{<!ELEMENT>},
+  method => 'parse_element_declaration',
+  result => q(0:9:SYNTAX_ELEMENT_PS_REQUIRED),
+ },
+ {
+  t => q{<!ELEMENT >},
+  method => 'parse_element_declaration',
+  result => q(0:10:SYNTAX_ELEMENT_DECLARATION_TYPE_NAME_REQUIRED),
+ },
+ {
+  t => q{<!ELEMENT e>},
+  method => 'parse_element_declaration',
+  result => q(0:11:SYNTAX_ELEMENT_PS_REQUIRED),
+ },
+ {
+  t => q{<!ELEMENT e >},
+  method => 'parse_element_declaration',
+  result => q(0:12:SYNTAX_ELEMENT_MODEL_OR_MIN_OR_RANK_REQUIRED),
+ },
+ {
+  t => q{<!ELEMENT e ANY},
+  method => 'parse_element_declaration',
+  result => q(0:15:SYNTAX_MDC_REQUIRED),
+ },
 );
 
 plan tests => scalar @a;
 
 my $first_error;
-my $parser = Message::Markup::XML::Parser::Base->new;
+my $first_error_detail;
+my $parser = new test_parser;
 $parser->{error}->{option}->{report} = sub {
   my $err = shift;
   $err->{-object}->set_position ($err->{source}, diff => $err->{position_diff});
-  $first_error ||= join ':', $err->{-object}->get_position ($err->{source}),
+  unless ($first_error) {
+    $first_error = join ':', $err->{-object}->get_position ($err->{source}),
                           $err->{-type};
+    $first_error_detail = $err->stringify;
+  }
 };
 for (@a) {
   $first_error = '';
   my $method = $_->{method};
   pos ($_->{t}) = 0;
+  $parser->{ExpandedURI q<test:entity>} = $_->{entity} || {};
   $parser->$method (
     \$_->{t}, {},
     %{$_->{option}||{}},
   );
-  ok $first_error || 1, $_->{result};
+  ok $first_error || 1, $_->{result}, $first_error_detail;
 }
+
+package test_parser;
+BEGIN {
+  push our @ISA, 'Message::Markup::XML::Parser::Base';
+  use Message::Util::QName::General [qw/ExpandedURI/], $main::NS;
+}
+
+sub parameter_entity_reference_in_parameter_start ($$$$%) {
+  my ($self, $src, $p, $pp, %opt) = @_;
+  for my $reptxt ($self->{ExpandedURI q<test:entity>}
+                       ->{$pp->{ExpandedURI q<entity-name>}}) {
+    push @{$opt{ExpandedURI q<source>}}, \$reptxt if $reptxt;
+  }
+}
+
