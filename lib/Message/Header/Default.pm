@@ -9,7 +9,7 @@ for Default Namespace of Header Fields
 package Message::Header::Default;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Header;
 
 our %OPTION;
@@ -88,6 +88,7 @@ $Message::Header::NS_uri2phpackage{$OPTION{namespace_uri}} = __PACKAGE__;
 ## 
 
 require Message::Header::RFC822;
+require Message::Header::HTTP;
 
 =head1 LICENSE
 
@@ -111,7 +112,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/16 10:45:54 $
+$Date: 2002/07/06 10:29:31 $
 
 =cut
 

@@ -9,13 +9,13 @@ for RFC822 Namespaces of Header Fields
 package Message::Header::RFC822;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Header::Default;
 
 our %OPTION = %Message::Header::Default::OPTION;
 $OPTION{namespace_uri} = 'urn:x-suika-fam-cx:msgpm:header:mail:rfc822';
-$OPTION{namespace_phname} = 'rfc822';
-$OPTION{namespace_phname_goodcase} = 'RFC822';
+$OPTION{namespace_phname} = 'x-rfc822';
+$OPTION{namespace_phname_goodcase} = 'X-RFC822';
 
 $OPTION{case_sensible} = 0;
 
@@ -64,7 +64,6 @@ $OPTION{value_type} = {
 	
 	## A message id
 	'message-id'	=> ['Message::Field::MsgID'],
-	'resent-message-id'	=> ['Message::Field::MsgID'],
 	
 	## Numeric value
 	lines	=> ['Message::Field::Numval'],
@@ -178,8 +177,8 @@ sub _goodcase ($$$\%) {
 package Message::Header::RFC822::Resent;
 our %OPTION = %Message::Header::RFC822::OPTION;
 $OPTION{namespace_uri} = 'urn:x-suika-fam-cx:msgpm:header:mail:rfc822:resent';
-$OPTION{namespace_phname} = 'resent';
-$OPTION{namespace_phname_goodcase} = 'Resent';
+$OPTION{namespace_phname} = 'x-rfc822-resent';
+$OPTION{namespace_phname_goodcase} = 'X-RFC822-Resent';
 $OPTION{namespace_phname_regex} = 'resent';
 
 $OPTION{uri_mailto_safe}	= {
@@ -192,8 +191,8 @@ $Message::Header::NS_uri2phpackage{$OPTION{namespace_uri}} = __PACKAGE__;
 package Message::Header::RFC822::Original;
 our %OPTION = %Message::Header::RFC822::OPTION;
 $OPTION{namespace_uri} = 'urn:x-suika-fam-cx:msgpm:header:mail:rfc822:original';
-$OPTION{namespace_phname} = 'original';
-$OPTION{namespace_phname_goodcase} = 'Original';
+$OPTION{namespace_phname} = 'x-rfc822-original';
+$OPTION{namespace_phname_goodcase} = 'X-RFC822-Original';
 
 $OPTION{value_type} = { %{ $OPTION{value_type} } };
 $OPTION{value_type}->{recipient} = ['Message::Header::Structured'];
@@ -250,8 +249,8 @@ $Message::Header::NS_uri2phpackage{$OPTION{namespace_uri}} = __PACKAGE__;
 package Message::Header::RFC822::List;
 our %OPTION = %Message::Header::RFC822::OPTION;
 $OPTION{namespace_uri} = 'urn:x-suika-fam-cx:msgpm:header:mail:rfc822:list';
-$OPTION{namespace_phname} = 'list';
-$OPTION{namespace_phname_goodcase} = 'List';
+$OPTION{namespace_phname} = 'x-rfc822-list';
+$OPTION{namespace_phname_goodcase} = 'X-RFC822-List';
 
 $OPTION{goodcase} = {
 	'id'	=> 'ID',
@@ -302,7 +301,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/04 06:38:21 $
+$Date: 2002/07/06 10:29:31 $
 
 =cut
 
