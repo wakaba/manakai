@@ -117,14 +117,29 @@ sub perl_code ($;%) {
         if ($et eq ExpandedURI q<disPerl:Q>) {          ## QName constant
           $r = perl_literal (dis_qname_to_uri ($q, use_default_namespace => 1,
                                                %opt));
-        } elsif ($et eq ExpandedURI q<disPerl:M>) {     ## Method call
-          my ($clsq, $mtdq) = split /\s*\.\s*/, $q;
+        } elsif ($et eq ExpandedURI q<disPerl:M> or
+                 $et eq ExpandedURI q<disPerl:ClassM>) {     ## Method call
+          my ($clsq, $mtdq) = split /\s*\.\s*/, $q, 2;
           my $clsu = dis_typeforqnames_to_uri ($clsq,
                                                use_default_namespace => 1, %opt);
           my $cls = $State->{Type}->{$clsu};
           my $clsp = $cls->{ExpandedURI q<dis2pm:packageName>};
-          valid_err qq<Package name of class <$clsu> must be defined>,
-                    node => $opt{node} unless defined $clsp;
+          if ($cls->{ExpandedURI q<dis2pm:type>} and
+              {
+                ExpandedURI q<ManakaiDOM:IF> => 1,
+                ExpandedURI q<ManakaiDOM:ExceptionIF> => 1,
+              }->{$cls->{ExpandedURI q<dis2pm:type>}}) {
+            valid_err q<"disPerl:ClassM" cannot be used for interface methods>,
+                      node => $opt{node} if $et eq ExpandedURI q<disPerl:ClassM>;
+            $clsp = '';
+          } else {
+            valid_err qq<Package name of class <$clsu> must be defined>,
+                      node => $opt{node} unless defined $clsp;
+            $State->{Module}->{$State->{module}}
+                  ->{ExpandedURI q<dis2pm:requiredModule>}
+                  ->{$State->{Module}->{$cls->{parentModule}}
+                           ->{ExpandedURI q<dis2pm:packageName>}} = 1;
+          }
           if ($mtdq =~ /:/) {
             valid_err qq<$mtdq: Prefixed method name not supported>,
                       node => $opt{node};
@@ -140,7 +155,10 @@ sub perl_code ($;%) {
                       q<be defined>, node => $mtd->{src} || $opt{node}
                    if not defined $mtd or
                       not defined $mtd->{ExpandedURI q<dis2pm:methodName>};
-            $r = ' ' . $clsp . '::' .
+            $r = ' ' . ($clsp ? $clsp .
+                                {ExpandedURI q<disPerl:M> => '::',
+                                 ExpandedURI q<disPerl:ClassM> => '->'}->{$et}
+                              : '') .
                  $mtd->{ExpandedURI q<dis2pm:methodName>} . ' ';
           }
         } elsif ($et eq ExpandedURI q<disPerl:ClassName>) {
@@ -222,7 +240,8 @@ sub perl_code ($;%) {
         $r = $opt{internal}->();
       }
     } elsif ($name eq 'DEEP') {   ## Deep Method Call
-      $r = 'do { local $Error::Depth = $Error::Depth + 1;' . perl_code ($data) .
+      $r = '{'.perl_statement ('local $Error::Depth = $Error::Depth + 1').
+              perl_code ($data) .
            '}';
     } elsif ($name eq 'XEXCEPTION' or $name eq 'XWARNING') {
                                   ## Raising an Exception or Warning
@@ -331,7 +350,12 @@ sub dispm_get_code (%) {
                                name => {uri => $key},
                                ContentType => ExpandedURI q<lang:Perl>);
     if ($n) {
-      my $code = perl_code ($n->value, %opt, node => $n);
+      my $code = '';
+      for (@{dis_get_elements_nodes (%opt, parent => $n,
+                                     name => 'require')}) {
+        $code .= perl_statement 'require ' . $_->value;
+      }
+      $code .= perl_code ($n->value, %opt, node => $n);
       if ($opt{is_inline} and
           dis_resource_ctype_match ([ExpandedURI q<dis2pm:InlineCode>],
                                     $opt{resource}, %opt,
@@ -526,6 +550,7 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
         }->{$pack->{ExpandedURI q<dis2pm:type>}}) {
       for my $method (values %{$pack->{ExpandedURI q<dis2pm:method>}}) {
         next unless defined $method->{Name};
+        next unless length $method->{ExpandedURI q<dis2pm:methodName>};
         if ($method->{ExpandedURI q<dis2pm:type>} eq
             ExpandedURI q<ManakaiDOM:DOMMethod>) {
           my $proto = '$';
@@ -684,6 +709,13 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
       } # package const value
     }
   } # root object
+}
+
+for (keys %{$State->{Module}->{$State->{module}}
+                  ->{ExpandedURI q<dis2pm:requiredModule>}||{}}) {
+  next if $_ eq $State->{Module}->{$State->{module}}
+                      ->{ExpandedURI q<dis2pm:packageName>};
+  $result .= perl_statement ('require ' . $_);
 }
 
 $result .= perl_statement 1;

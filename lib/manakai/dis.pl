@@ -856,6 +856,7 @@ sub dis_load_module_file (%) {
                  ExpandedURI q<d:ForDef> => 1,
                  ExpandedURI q<d:Module> => 1,
                  ExpandedURI q<d:Namespace> => 1,
+                 ExpandedURI q<d:ImplNote> => 1,
                }->{$et}) {
         # 
       } else {
@@ -1495,15 +1496,15 @@ sub dis_perl_init_classdef ($;%) {
             ExpandedURI q<ManakaiDOM:DOMAttribute> => 1,
            }->{$type}) {
     ## Method or attribute name
-    valid_err (qq<Method name required>, node => $res->{node})
-      unless $res->{Name};
+    #valid_err (qq<Method name required>, node => $res->{node})
+    #  unless $res->{Name};
     my $name = $res->{Name};
     my $int = dis_get_attr_node
                  (%opt, name => {uri => ExpandedURI q<ManakaiDOM:isForInternal>},
                   parent => $res->{src});
     if ($int and $int->value) {
       $res->{ExpandedURI q<ManakaiDOM:isForInternal>} = 1;
-      $name = '_' . $name;
+      $name = '_' . $name if length $name;
     }
     $res->{ExpandedURI q<dis2pm:methodName>} = $name;
     my $re = dis_get_attr_node
@@ -1514,9 +1515,18 @@ sub dis_perl_init_classdef ($;%) {
     }
     
     ## Register the method
-    valid_err (qq<Perl method "$name" already defined>, node => $res->{node})
-      if defined $State->{ExpandedURI q<dis2pm:parentResource>}
-                       ->{ExpandedURI q<dis2pm:method>}->{$name}->{Name};
+    if (length $name) {
+      valid_err (qq<Perl method "$name" already defined>, node => $res->{node})
+        if defined $State->{ExpandedURI q<dis2pm:parentResource>}
+                         ->{ExpandedURI q<dis2pm:method>}->{$name}->{Name};
+    } else {
+      my $i = 0;
+      $i++ while defined $State->{ExpandedURI q<dis2pm:parentResource>}
+                               ->{ExpandedURI q<dis2pm:method>}
+                               ->{'#anon'.$i};
+      $name = '#anon'.$i;
+    }
+    $res->{ExpandedURI q<dis2pm:methodName+>} = $name;
     $State->{ExpandedURI q<dis2pm:parentResource>}
           ->{ExpandedURI q<dis2pm:method>}->{$name} = $res;
   } elsif ({ExpandedURI q<ManakaiDOM:DOMMethodReturn> => 1,
@@ -2073,4 +2083,4 @@ sub disdoc_inline2pod ($;%) {
 
 =cut
 
-1; # $Date: 2004/12/01 11:49:46 $
+1; # $Date: 2004/12/03 11:28:46 $

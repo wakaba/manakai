@@ -28,7 +28,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/01 11:49:46 $
+      $Date: 2004/12/03 11:28:46 $
     @@ContentType:
       dis:Date.RCS
   
@@ -828,6 +828,7 @@ PropDef:
     @@@:
       The data type of the resource defined, including 
       class attribute type and method return value type.
+
 PropDef:
   @QName:
     dis:actualType
@@ -840,6 +841,14 @@ PropDef:
     @@@:
       The actual data type of the resource defined, including 
       class attribute type and method return value type. 
+ElementTypeBinding:
+  @Name: actualType
+  @ElementType:
+    dis:actualType
+  @ShadowContent:
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM
+
 PropDef:
   @QName:
     dis:Value
@@ -888,13 +897,30 @@ PropDef:
   @QName:
     ManakaiDOM:isForInternal
   @dataType:
-    DOMMain:boolean
+    dis:boolean
   @Description:
     @@lang:en
     @@@:
       Whether the subject resource is prepared for the internal use.  
       In other word, the subject resource is a public member or 
       a private member.
+
+PropDef:
+  @QName:
+    ManakaiDOM:isStatic
+  @dataType:
+    dis:boolean
+  @Description:
+    @@lang:en
+    @@@:
+      Whether the subject resource is a static member of another resource 
+      to which the subject belongs.  It is used to declare a method 
+      is a static method (class method). 
+      \
+      Note that, for the purpose of <Q::ManakaiDOM:isStatic>, the fact 
+      that a method is static does not means the method should not 
+      be called via an object.  Inappropriateness of the use as an 
+      object method should be indicated by other property.
 
 ## -- DOM specific properties and types
 
@@ -1040,6 +1066,21 @@ ElementTypeBinding:
       ManakaiDOM:ForIF
     @@For:
       ManakaiDOM:ManakaiDOMLatest
+
+PropDef:
+  @QName:
+    ManakaiDOM:inputNormalizer
+  @Description:
+    @@lang:en
+    @@@:
+      A code fragment that normalizes inputs, including method parameter 
+      values and new attribute values. 
+      \
+      If the code is written in Perl (<TYPE::lang:Perl>), any occurence 
+      of <Perl::$INPUT> in the code is replaced by the variable name 
+      containing the input. 
+  @rdfs:domain:
+    ManakaiDOM:DataType
 
 ## -- Other
 
@@ -1333,118 +1374,31 @@ ResourceDef:
     @@lang:en
     @@@: 
       A string.  It is used to store Unicode characters.
-  @IntClsMethod:
-    @@Name: new
-    @@Description:
-      @@@lang:en
-      @@@@: 
-        Creates a new instance object of this class.
-    @@Param:
-      @@@Name: arg
-      @@@Type: DOMString
-      @@@Description:
-        @@@@lang:en
-        @@@@@: 
-          A string that is used as initial value of the object to create.
-      @@@InCase:
-        @@@@Value:
-          @@@@@is-null:1
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            The value of object to create is an empty string.
-      @@@InCase:
-        @@@@Type: DOMString
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            The <P:arg> is returned as is.  To copy <TYPE:DOMString> object, 
-            use <M:.clone> method instead.
-      @@@InCase:
-        @@@@Label: 
-          @@@@@lang:en
-          @@@@@@: reference to a scalar value
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            The value of object to create is the scalar value referred 
-            (itself, not copy of it).
-    @@Return:
-      @@@Type: DOMString
-      @@@actualType: ManakaiDOMString
-      @@@Description:
-        @@@@lang:en
-        @@@@@: 
-          A newly created string object.
-      @@@PerlDef:
-        @@@@cast-output: 0
-        @@@@@:
-          $arg = '' if not defined $arg;
-          __CODE{DOMString: s => arg, r => r}__;
-  @IntClsAttr:
-    @@Name: value
-    @@Description:
-      @@@lang:en
-      @@@@: The value of the string, as Perl utf8 scalar value.
-    @@Get:
-      @@@Type: any
-      @@@PerlDef: $r = $self->{value};
-      @@@Operator:
-        @@@@ContentType:
-          lang:Perl
-        @@@@@: ""
-    @@Set:
-      @@@Type: any
-      @@@PerlDef:
-        \## TODO: Check required
-          if (ref $given and
-              $given->isa (<ClassName::ManakaiDOMString>)) {
-            for ('value', <Q::ManakaiDOM:isFullyNormalized>) {
-              $self->{$_} = $given->{$_};
-            }
-          } else {
-            __INT{{initOnChange}}__;
-            $self->{value} = ''.$given;
-          }
   @IntClsAttr:
     @@Name: valueUTF16BE
     @@Description:
       @@@lang:en
       @@@@:
-        The Perl byte-string representation, in UTF-16BE (without 
-        <CHAR:BOM>) encoding.
+        The character string in UTF-16BE (without <CHAR::BOM>) Perl byte-string. 
     @@Get:
       @@@Type: any
-      @@@Def:
-        @@@@Type: 
-          lang:Perl
+      @@@PerlDef:
+        @@@@require: Encode
         @@@@@:
-          $r = Encode::encode ('UTF-16BE', $self->{value});
-    @@Set:
-      @@@Type: any
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          __INT{{initOnChange}}__;
-          $self->{value} = Encode::decode ('UTF-16BE', $given);
+          $r = Encode::encode ('UTF-16BE',
+                               ref $self eq 'SCALAR' ? $$self : $self);
   @IntClsAttr:
     @@Name: length
     @@Description:
       @@@lang:en
       @@@@:
-        The number of 16-bit units (i.e. the number of two-octet pairs) 
-        in the UTF-16BE representation of the string.
+        The number of 16-bit units, i.e. the number of two-octet pairs, 
+        in the UTF-16BE (without <CHAR::BOM>) representation of a string. 
         \
-        {NOTE:: This attribute is copied from the DOM <IF:CharacterData> 
-                interface and ECMAScript <CODE:String> object.
-        \
-        }
-        \
-        {NOTE:: Numbers of 16-bit units different from numbers of 
-                characters in case strings have one or more characters 
-                whose UCS code point is in the range <CODE:U+10000>
-                to <CODE:U+10FFFF>.
+        {NOTE:: The number of 16-bit units in a string is different 
+                from the number of characters in the string if 
+                there is one or more characters whose UCS code point 
+                is into the range <CODE::U+10000> to <CODE::U+10FFFF>.
         \
         }
     @@Get:
@@ -1452,32 +1406,16 @@ ResourceDef:
       @@@Description:
         @@@@lang:en
         @@@@@: The number of 16-bit units.
-      @@@InCase:
-        @@@@Value: 0
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@: 
-            Denotes that the string is empty.
       @@@PerlDef:
-          $r = CORE::length $self->{value};
-          while ($self->{value} =~ /[\x{10000}-\x{10FFFF}]/g) {
-            $r++;
-          }
+          my $s = ref $self eq 'SCALAR' ? $self : \$self;
+          $r = CORE::length $$s;
+          $r++ while $$s =~ /[\x{10000}-\x{10FFFF}]/g;
   @IntClsMethod:
     @@Name: append
     @@Description:
       @@@lang:en
       @@@@:
-        Append the string to the end of the DOMString.
-      \
-        {NOTE:: This method is copied from the 
-                <M:DOMCore:CharacterData.appendData> method.
-        \
-        }
-    @@Operator:
-      @@@@: .=
-      @@@ContentType: 
-        lang:Perl
+        Appends another string at the end of a string.
     @@Param:
       @@@Name: arg
       @@@Type: DOMString
@@ -1489,14 +1427,22 @@ ResourceDef:
       @@@PerlDef:
         @@@@cast-input: 0
         @@@@@:
-          __INT{{initOnChange}}__;
-          $self->{value} .= $arg;
+          if (ref $self eq 'SCALAR') {
+            $$self .= ref $arg eq 'SCALAR' ? $$arg : $arg;
+          }
+          # else: no effect
   @IntClsMethod:
     @@Name: setCurrentPosition
     @@Description:
       @@@lang:en
       @@@@:
-        Set current position in the DOMString.
+        Sets the current position to the specified 16-bit unit offset.
+        \
+        {NOTE:: The current position here is same as the one 
+                that is able to access by the Perl 
+                <Perl::<PerlFunc::pos> (<PerlVar::$s>)> operator.
+        \
+        }
     @@Param:
       @@@Name: offset
       @@@Type: unsigned-long
@@ -1505,7 +1451,7 @@ ResourceDef:
         @@@@@:
           The offset of 16-bit units to which the current position is set.
         \
-          {NOTE:: The <P:offset> value must be in the effective range; 
+          {NOTE:: The <P::offset> value must be in the effective range; 
                   in other word, it must not be negative nor be greater 
                   than the number of 16-bit units in the string. 
                   Otherwise, unlike any other public methods, 
@@ -1514,36 +1460,34 @@ ResourceDef:
           }
     @@Return:
       @@@Exception:
-        @@@@Type: 
-          ManakaiDOM:ManakaiDOMImplementationException
-        @@@@Name: MDOM_INDEX_IN_SURROGATE_PAIR
+        @@@@@:
+          MDOMX:MDOM_INDEX_IN_SURROGATE_PAIR
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
-            An attempt is made to break surrogate pair.
+            An attempt is made to break a surrogate pair.
       @@@PerlDef:
+          return unless ref $self eq 'SCALAR'; # no effect
           use integer;
-          pos ($self->{value}) = 0;
-          while ($offset and pos $self->{value} <= CORE::length $self->{value}) {
-            if ($self->{value} =~ /[^\x{10000}-\x{10FFFF}]{1,$offset}/gc) {
+          pos ($$self) = 0;
+          while ($offset and pos $$self <= CORE::length $$self) {
+            if ($$self =~ /[^\x{10000}-\x{10FFFF}]{1,$offset}/gc) {
               $offset -= $+[0] - $-[0];
-            } elsif ($self->{value}
-                               =~ m{[\x{10000}-\x{10FFFF}]{1,$offset/2}}gc) {
+            } elsif ($$self =~ m{[\x{10000}-\x{10FFFF}]{1,$offset/2}}gc) {
               $offset -= 2 * ($+[0] - $-[0]);
               if ($offset < 0) {
                 __EXCEPTION{
-                  ManakaiDOMImplementationException.
-                    MDOM_DOMSTRING_INDEX_IN_SURROGATE_PAIR::
-                  <Q::MDOMX:param-name> => 'offset',
+                  MDOMX:MDOM_DOMSTRING_INDEX_IN_SURROGATE_PAIR::
+                    <Q::MDOMX:param-name> => 'offset',
                 }__;
               }
             } else {
               __EXCEPTION{
-                ManakaiDOMImplementationException.MDOM_DEBUG_BUG::
-                <Q::MDOMX:values> => {
-                  count => $offset,
-                  position => 1,
-                },
+                MDOMX:MDOM_DEBUG_BUG::
+                  <Q::MDOMX:values> => {
+                    count => $offset,
+                    position => 1,
+                  },
               }__;
             }                
           }
@@ -1553,11 +1497,6 @@ ResourceDef:
       @@@lang:en
       @@@@:
         Removes a range of 16-bit units from a string.
-        \
-        {NOTE:: This method is copied from the 
-                <M:DOMCore:CharacterData.deleteData> method. 
-        \
-        }
     @@Param:
       @@@Name: offset
       @@@Type: unsigned-long
@@ -1576,17 +1515,17 @@ ResourceDef:
           of the string are deleted.
     @@Return:
       @@@Exception:
-        @@@@Type: DOMException
+        @@@@Type: 
+          DOMCore:DOMException
         @@@@Name: INDEX_SIZE_ERR
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
-            Either the <P:offset> value is negative or greater than the number 
-            of 16-bit units in the string, or the <P:count> value is negative. 
+            Either the <P::offset> value is negative or greater than the number 
+            of 16-bit units in the string, or the <P::count> value is negative. 
       @@@Exception:
-        @@@@Type: 
-          ManakaiDOM:ManakaiDOMImplementationException
-        @@@@Name: MDOM_INDEX_IN_SURROGATE_PAIR
+        @@@@@:
+          MDOMX:MDOM_INDEX_IN_SURROGATE_PAIR
         @@@@Description:
           @@@@@lang:en
           @@@@@@: 
@@ -1601,18 +1540,13 @@ ResourceDef:
       @@@lang:en
       @@@@:
         Inserts another string at specified 16-bit unit offset in string.
-        \
-        {NOTE:: This method is copied from the 
-                <M::DOMCore:CharacterData.insertData> method.
-        \
-        }
     @@Param:
       @@@Name: offset
       @@@Type: unsigned-long
       @@@Description:
         @@@@lang:en
         @@@@@: 
-          The offset to which <P:arg> is inserted.
+          The offset to which <P::arg> is inserted.
     @@Param:
       @@@Name: arg
       @@@Type: DOMString
@@ -1628,12 +1562,11 @@ ResourceDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
-            The <P:offset> value is negative or greater than the 
+            The <P::offset> value is negative or greater than the 
             number of 16-bit units in the string.
       @@@Exception:
-        @@@@Type: 
-          ManakaiDOM:ManakaiDOMImplementationException
-        @@@@Name: MDOM_INDEX_IN_SURROGATE_PAIR
+        @@@@@:
+          MDOMX:MDOM_INDEX_IN_SURROGATE_PAIR
         @@@@Description:
           @@@@@lang:en
           @@@@@@: 
@@ -1641,29 +1574,24 @@ ResourceDef:
       @@@PerlDef:
         @@@@cast-input: 0
         @@@@@:
-          if ($offset < 0 or $offset > CORE::length $self->{value} or
-              $offset > $self->length) {
+          return unless ref $self eq 'SCALAR';
+          if ($offset < 0 or $offset > CORE::length $$self or
+              $offset > <M::ManakaiDOMString.length> ($self)) {
             __EXCEPTION{DOMException.INDEX_SIZE_ERR::
               <Q::MDOMX:param-name> => 'offset',
             }__;
           }
-          __INT__;
-      @@@IntDef:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          __INT{{initOnChange}}__;
-          unless ($self->{value} =~ /[\x{10000}-\x{10FFFF}]/) {
-            substr ($self->{value}, $offset, 0) = $arg;
+          unless ($$self =~ /[\x{10000}-\x{10FFFF}]/) {
+            substr ($$self, $offset, 0) = ref $arg eq 'SCALAR' ? $$arg : $arg;
           } else {
-            unless (substr ($self->{value}, 0, $offset)
-                                 =~ /[\x{10000}-\x{10FFFF}]/) {
-              substr ($self->{value}, $offset, 0) = $arg;
+            unless (substr ($$self, 0, $offset) =~ /[\x{10000}-\x{10FFFF}]/) {
+              substr ($$self, $offset, 0) = ref $arg eq 'SCALAR' ? $$arg : $arg;
             } else { # Non-BMP chars before $offset
               __DEEP{
-                $self->__INT{setCurrentPosition}__ ($offset);
+                <M::ManakaiDOMString.setCurrentPosition> ($self, $offset);
               }__;
-              substr ($self->{value}, pos $self->{value}, 0) = $arg;
+              substr ($$self, pos $$self, 0)
+                                        = ref $arg eq 'SCALAR' ? $$arg : $arg;
             }
           }
   @IntClsMethod:
@@ -1673,11 +1601,6 @@ ResourceDef:
       @@@@:
         Replaces a range of 16-bit units in a string 
         with another string.
-        \
-        {NOTE:: This method is copied from the 
-                <M:DOMCore:CharacterData.replaceData> method.
-        \
-        }
     @@Param:
       @@@Name: offset
       @@@Type: unsigned-long
@@ -1691,8 +1614,8 @@ ResourceDef:
         @@@@lang:en
         @@@@@:
           The number of 16-bit units to replace.  If the sum of the
-          <P:offset> value and the <P:count> value exceeds the length of the
-          string then all 16-bit units from the <P:offset> to the end
+          <P::offset> value and the <P::count> value exceeds the length of the
+          string then all 16-bit units from the <P::offset> to the end
           of the string are replaced.
     @@Param:
       @@@Name: arg
@@ -1713,18 +1636,18 @@ ResourceDef:
             the number of 16-bit units in the string, or the 
             <P:count> value is negative.
       @@@Exception:
-        @@@@Type: 
-          ManakaiDOM:ManakaiDOMImplementationException
-        @@@@Name: MDOM_INDEX_IN_SURROGATE_PAIR
+        @@@@@: 
+          MDOMX:MDOM_INDEX_IN_SURROGATE_PAIR
         @@@@Description:
           @@@@@lang:en
           @@@@@@: 
-            An attempt is made to break asurrogate pair.
+            An attempt is made to break a surrogate pair.
       @@@PerlDef:
         @@@@cast-input: 0
         @@@@@:
-          if ($offset < 0 or $offset > CORE::length $self->{value} or
-              $offset > $self->length) {
+          return unless ref $self eq 'SCALAR';
+          if ($offset < 0 or $offset > CORE::length $$self or
+              $offset > <M::ManakaiDOMString.length> ($self)) {
             __EXCEPTION{DOMException.INDEX_SIZE_ERR::
               <Q::MDOMX:param-name> => 'offset',
             }__;
@@ -1734,37 +1657,33 @@ ResourceDef:
               <Q::MDOMX:param-name> => 'count',
             }__;
           }
-          __INT__;
-      @@@IntDef:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          __INT{{initOnChange}}__;
         REPLACE: {
-          unless ($self->{value} =~ /[\x{10000}-\x{10FFFF}]/) {
-            substr ($self->{value}, $offset, $count) = $arg;
+          unless ($$self =~ /[\x{10000}-\x{10FFFF}]/) {
+            substr ($$self, $offset, $count)
+                                 = ref $arg eq 'SCALAR' ? $$arg : $arg;
             last REPLACE;
           } else {
-            unless (substr ($self->{value}, 0, $offset)
+            unless (substr ($$self, 0, $offset)
                                  =~ /[\x{10000}-\x{10FFFF}]/) {
-              unless (substr ($self->{value}, $offset, $count)
+              unless (substr ($$self, $offset, $count)
                                  =~ /[\x{10000}-\x{10FFFF}]/) {
-                substr ($self->{value}, $offset, $count) = $arg;
+                substr ($$self, $offset, $count)
+                                 = ref $arg eq 'SCALAR' ? $$arg : $arg;
                 last REPLACE;
-              } elsif (CORE::length $self->{value} < $offset + $count) {
-                substr ($self->{value}, $offset) = $arg;
+              } elsif (CORE::length $$self < $offset + $count) {
+                substr ($$self, $offset) = ref $arg eq 'SCALAR' ? $$arg : $arg;
                 last REPLACE;
               } else {
-                pos ($self->{value}) = $offset;
+                pos ($$self) = $offset;
               }
             } else { # Non-BMP chars before $offset
               __DEEP{
-                $self->__INT{setCurrentPosition}__ ($offset);
+                <M::ManakaiDOMString.setCurrentPosition> ($self, $offset);
               }__;
             }
           }
           use integer;
-          my $s = substr ($self->{value}, pos $self->{value});
+          my $s = substr ($$self, pos $$self);
           while ($count) {
             if ($s =~ s/[^\x{10000}-\x{10FFFF}]{1,$count}//) {
               $count -= $+[0] - $-[0];
@@ -1772,14 +1691,13 @@ ResourceDef:
               $count -= 2 * ($+[0] - $-[0]);
               if ($count < 0) {
                 __EXCEPTION{
-                  ManakaiDOMImplementationException.
-                          MDOM_DOMSTRING_INDEX_IN_SURROGATE_PAIR::
+                MDOMX:MDOM_DOMSTRING_INDEX_IN_SURROGATE_PAIR::
                   <Q::MDOMX:param-name> => 'count',
                 }__;
               }
             } else {
               __EXCEPTION{
-                ManakaiDOMImplementationException.MDOM_DEBUG_BUG::
+              MDOMX:MDOM_DEBUG_BUG::
                 <Q::MDOMX:values> => {
                         count => $count,
                         position => 1,
@@ -1787,17 +1705,15 @@ ResourceDef:
               }__;
             }
            }
-           substr ($self->{value}, pos $self->{value}) = $arg . $s;
+           substr ($$self, pos $$self)
+                         = (ref $arg eq 'SCALAR' ? $$arg : $arg) . $s;
         } # REPLACE
   @IntClsMethod:
     @@Name: substring
     @@Description:
       @@@lang:en
       @@@@:
-        Extract a range of 16-bit units.
-      \
-        This method is taken from the method substringData in
-        the DOM interface CharacterData.
+        Extracts a range of 16-bit units.
     @@Param:
       @@@Name: offset
       @@@Type: unsigned-long
@@ -1837,15 +1753,15 @@ ResourceDef:
           @@@@@lang:en
           @@@@@@: The specified range does not fit into a DOMString.
       @@@Exception:
-        @@@@Type: 
-          ManakaiDOM:ManakaiDOMImplementationException
-        @@@@Name: MDOM_INDEX_IN_SURROGATE_PAIR
+        @@@@@:
+          MDOMX:MDOM_INDEX_IN_SURROGATE_PAIR
         @@@@Description:
           @@@@@lang:en
           @@@@@@: An attempt is made to break surrogate pair.
       @@@PerlDef:
-          if ($offset < 0 or $offset > CORE::length $self->{value} or
-              $offset > $self->length) {
+          my $s = ref $self eq 'SCALAR' ? $self : \$self;
+          if ($offset < 0 or $offset > CORE::length $$s or
+              $offset > <M::ManakaiDOMString.length> ($self)) {
             __EXCEPTION{DOMException.INDEX_SIZE_ERR::
               <Q::MDOMX:param-name> => 'offset',
             }__;
@@ -1855,39 +1771,33 @@ ResourceDef:
               <Q::MDOMX:param-name> => 'count',
             }__;
           }
-          __INT__;
-      @@@IntDef:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
         SUBSTR: {
-          unless ($self->{value} =~ /[\x{10000}-\x{10FFFF}]/) {
-            $r = substr ($self->{value}, $offset, $count);
+          unless ($$s =~ /[\x{10000}-\x{10FFFF}]/) {
+            $r = substr ($$s, $offset, $count);
             last SUBSTR;
           } else {
-            unless (substr ($self->{value}, 0, $offset)
+            unless (substr ($$s, 0, $offset) =~ /[\x{10000}-\x{10FFFF}]/) {
+              unless (substr ($$s, $offset, $count)
                                  =~ /[\x{10000}-\x{10FFFF}]/) {
-              unless (substr ($self->{value}, $offset, $count)
-                                 =~ /[\x{10000}-\x{10FFFF}]/) {
-                $r = substr ($self->{value}, $offset, $count);
+                $r = substr ($$s, $offset, $count);
                 last SUBSTR;
-              } elsif (CORE::length $self->{value} < $offset + $count) {
-                $r = substr ($self->{value}, $offset);
+              } elsif (CORE::length $$s < $offset + $count) {
+                $r = substr ($$s, $offset);
                 last SUBSTR;
               } else {
-                pos ($self->{value}) = $offset;
+                pos ($$s) = $offset;
               }
             } else { # Non-BMP chars before $offset
               __DEEP{
-                $self->__INT{setCurrentPosition}__ ($offset);
+                <M::ManakaiDOMString.setCurrentPosition> ($s, $offset);
               }__;
             }
           }
-          my $start = pos $self->{value};
+          my $start = pos $$s;
           __DEEP{
-            $self->__INT{setCurrentPosition}__ ($offset + $count);
+            <M::ManakaiDOMString.setCurrentPosition> ($s, $offset + $count);
           }__;
-          $r = substr $self->{value}, $start, pos ($self->{value}) - $start;
+          $r = substr $$s, $start, pos ($$s) - $start;
         } # SUBSTR
   @IntClsAttr:
     @@Name: isFullyNormalized
@@ -1921,8 +1831,6 @@ ResourceDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: The string is not known to be certified as fully normalized.
-      @@@PerlDef:
-        \$r = $self->{<Q::ManakaiDOM:isFullyNormalized>} ? true : false;
     @@ImplNote:
       @@@lang:en
       @@@@:
@@ -1930,10 +1838,6 @@ ResourceDef:
               rather than returning private property value.
   @IntClsMethod:
     @@Name: compare
-    @@Operator:
-      @@@@: eq
-      @@@ContentType: 
-        lang:Perl
     @@Description:
       @@@lang:en
       @@@@: The string comparison.
@@ -1977,34 +1881,13 @@ ResourceDef:
       @@@PerlDef:
         @@@@cast-input: 0
         @@@@@:
-          my $str1;
-          if (UNIVERSAL::isa ($self, <ClassName::ManakaiDOMString>)) {
-            $str1 = $self->{value};
-          } else {
-            $str1 = ''.$self;
-          }
-          if (UNIVERSAL::isa ($str, <ClassName::ManakaiDOMString>)) {
-            $str = $str->{value};
-          }
+          my $str0 = ref $self eq 'SCALAR' ? $self : \$self;
+          my $str1 = ref $str eq 'SCALAR' ? $str : ref $str ? \(''.$str) : \$str;
           if ($caseInsensitive) {
-            $r = lc ($str1) eq lc ($str) ? true : false;
+            $r = lc ($str0) eq lc ($str1) ? true : false;
           } else {
-            $r = $self eq $str ? true : false;
+            $r = $str0 eq $str1 ? true : false;
           }
-  @IntClsMethod:
-    @@Name: initOnChange
-    @@Description:
-      @@@lang:en
-      @@@@: Discade caches when the value has been changed.
-    @@Return:
-      @@@PerlDef:
-        @@@@@:
-          delete $self->{<Q::ManakaiDOM:isFullyNormalized>};
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        This method is not directly called; it is embeded at the 
-        cdis2pm phase.
 ## DataType:DOMString
 
 ResourceDef:
@@ -2079,13 +1962,15 @@ ResourceDef:
             the number of characters (i.e. UTF-32 32-bit code units).
       @@@PerlDef:
         @@@@DefaultValue: $offset32
+        @@@@@:
+          my $s = ref $self eq 'SCALAR' ? $self : \$self;
           if (not defined $offset32 or $offset32 < 0 or
-              CORE::length ($self->{value}) < $offset32) {
+              CORE::length ($$s) < $offset32) {
             __EXCEPTION{DOMException.INDEX_SIZE_ERR::
               <Q::MDOMX:param-name> => 'offset32',
             }__;
           }
-          my $ss = substr $self->{value}, 0, $offset32;
+          my $ss = substr $$s, 0, $offset32;
           if ($ss =~ /[\x{10000}-\x{10FFFF}]/) {
             while ($ss =~ /[\x{10000}-\x{10FFFF}]+/g) {
               $r += $+[0] - $-[0];
@@ -2113,41 +1998,41 @@ ResourceDef:
           surrogate pair, the UTF-32 offset at the end of the pair is 
           returned.
       @@@Exception:
-        @@@@Type: DOMException
+        @@@@Type: 
+          DOMCore:DOMException
         @@@@Name: INDEX_SIZE_ERR
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
-            The specified <P:offset32> is negative or greater than
-            the number of characters (i.e. UTF-32 32-bit code units).
+            The specified <P::offset32> is negative or greater than
+            the number of characters (i.e. UTF-32's 32-bit code units).
       @@@PerlDef:
         @@@@DefaultValue: $offset16
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@: 
-            <QUOTE:Current position> (see the method 
-            <M:ManakaiDOMString.setCurrentPosition>) of the string
+            <QUOTE::Current position> (see the method 
+            <M::ManakaiDOMString.setCurrentPosition>) of the string
             has been changed. 
         @@@@@:
+          my $s = ref $self eq 'SCALAR' ? $self : \$self;
           if (not defined $offset16 or $offset16 < 0 or
-              CORE::length ($self->{value}) * 2 < $offset16) {
+              CORE::length ($$s) * 2 < $offset16) {
             __EXCEPTION{DOMException.INDEX_SIZE_ERR::
               <Q::MDOMX:param-name> => 'offset16',
             }__;
           }
-          pos ($self->{value}) = 0;
+          pos ($$s) = 0;
           use integer;
-          while ($offset16 and
-                 pos $self->{value} <= CORE::length $self->{value}) {
-            if ($self->{value} =~ /[^\x{10000}-\x{10FFFF}]{1,$offset16}/gc) {
+          while ($offset16 and pos $$s <= CORE::length $$s) {
+            if ($$s =~ /[^\x{10000}-\x{10FFFF}]{1,$offset16}/gc) {
               $offset16 -= $+[0] - $-[0];
-            } elsif ($self->{value}
-                               =~ m{[\x{10000}-\x{10FFFF}]{1,$offset16/2}}gc) {
+            } elsif ($$s =~ m{[\x{10000}-\x{10FFFF}]{1,$offset16/2}}gc) {
               $offset16 -= 2 * ($+[0] - $-[0]);
               last if $offset16 < 0;
             } else {
               __EXCEPTION{
-                ManakaiDOMImplementationException.MDOM_DEBUG_BUG::
+              MDOMX:MDOM_DEBUG_BUG::
                 <Q::MDOMX:values> => {
                   count => $offset16,
                   position => 1,
@@ -2160,7 +2045,7 @@ ResourceDef:
               <Q::MDOMX:param-name> => 'offset16',
             }__;
           }
-          $r = pos ($self->{value});
+          $r = pos ($$s);
 ##IF: StringExtended
 
 ## -- DOM specialized string types
@@ -2245,6 +2130,18 @@ StringDataTypeDef:
       a method or the given value of an attribute) is typed as 
       "ManakaiDOMNamespaceURI", the Perl code to check the empty 
       string is outputed as part of the implementation.
+  @ManakaiDOM:inputNormalizer:
+    @@ContentType:
+      lang:Perl
+    @@@:
+      if (CORE::defined $INPUT and CORE::length $INPUT == 0) {
+        __WARNING{MDOMX:MDOM_NS_EMPTY_URI::
+          <Q::MDOMX:param-name> => $INPUT,
+        }__;
+        __FOR{ManakaiDOM:ManakaiDOM3 | ManakaiDOM:ManakaiDOMCommon::
+          $INPUT = undef;
+        }__;
+      }
 
 StringDataTypeDef:
   @QName: 
@@ -2255,7 +2152,11 @@ StringDataTypeDef:
   @Description:
     @@lang:en
     @@@:
-      A DOM feature name.
+      A DOM feature name. 
+      \
+      In some context, a feature name might be prefixed by <CHAR::PLUS SIGN> 
+      to indicate that feature is not required to be <EM::directly> 
+      accessible.
 
 StringDataTypeDef:
   @QName: 
@@ -2265,7 +2166,12 @@ StringDataTypeDef:
     @@@: DOM feature version
   @Description:
     @@lang:en
-    @@@: A DOM feature version number.
+    @@@: 
+      A DOM feature version number. 
+      \
+      In most contexts, an empty string and the <DOM:null> value are 
+      also valid values.  Both values indicate that any version of 
+      that feature is acceptable.
 
 StringDataTypeDef:
   @QName: 
@@ -2279,9 +2185,50 @@ StringDataTypeDef:
   @Description:
     @@lang:en
     @@@:
-      A list of zero or more pairs of a <TYPE:ManakaiDOM:ManakaiDOMFeature> 
-      and an optional <TYPE:ManakaiDOM:ManakaiDOMFeatureVersion>, 
+      A list of zero or more pairs of a <TYPE::ManakaiDOM:ManakaiDOMFeature> 
+      and an optional <TYPE::ManakaiDOM:ManakaiDOMFeatureVersion>, 
       separated by white space.
+      \
+      In the manakai DOM implementation, method parameters and attributes 
+      whose actual datatype is <P::features> also accept a reference 
+      to hash whose key is a feature name and value is corresponding 
+      a feature version (or an empty string).  Don't forget to quote 
+      version number when its fraction part is <CODE:0> (e.g. 
+      quote <FeatureVer:2.0> like <Perl:'2.0'>).
+  @ManakaiDOM:inputNormalizer:
+    @@ContentType:
+      lang:Perl
+    @@@:
+      if (CORE::defined $INPUT) {
+        unless (CORE::ref $INPUT) {
+          my @f = split /\s+/, $INPUT;
+          $INPUT = {};
+          while (@f) {
+            my $name = shift @f;
+            if (@f and $f[0] =~ /^[\d\.]+$/) {
+              $INPUT{$name} = shift @f;
+            } else {
+              $INPUT{$name} = '';
+            }
+          }
+        }
+      } else {
+        $INPUT = {};
+      }
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        In current specifications of DOM, order of features are not 
+        significant and treatement for dupulication of a feature name 
+        is not specified.  
+        If <P::features> in future levels of DOM does not 
+        have this characteristic, this and some other implementation 
+        must be revisited for that levels. 
+
+ImplNote:
+  @lang:en
+  @@:
+    TODO: Move key identifier(s) to keyboard event module.
 
 StringDataTypeDef:
   @QName:
@@ -2302,7 +2249,8 @@ StringDataTypeDef:
       }
 
 StringDataTypeDef:
-  @Name:ManakaiDOMKeyIdentifiers
+  @QName:
+    ManakaiDOM:ManakaiDOMKeyIdentifiers
   @For:
     ManakaiDOM:ManakaiDOM3
   @FullName:
@@ -2312,7 +2260,24 @@ StringDataTypeDef:
     @@lang:en
     @@@:
       Zero or more <TYPE:ManakaiDOM:ManakaiDOMKeyIdentifier> separated 
-      by white space (XML 1.0 <CODE:S>).
+      by white space (XML 1.0 <CODE:S>). 
+      \
+      In the manakai DOM implementations, method parameters and 
+      attributes whose actual datatype is 
+      <TYPE::ManakaiDOM:ManakaiDOMKeyIdentifiers> also accept a reference 
+      to an array whose items are key identifier strings as well as 
+      a plain string of identifiers.
+  @ManakaiDOM:inputNormalizer:
+    @@ContentType:
+      lang:Perl
+    @@@:
+      if (CORE::defined $INPUT) {
+        unless (CORE::ref $INPUT) {
+          $INPUT = [CORE::split /[\x20\x09\x0D\x0A]/, $INPUT];
+        }
+      } else {
+        $INPUT = [];
+      }
 
 ## -- The bootstrap object
 
@@ -2340,20 +2305,42 @@ ResourceDef:
   @Description:
     @@lang:en
     @@@:
-      A binding dependent bootstrap for <IF:DOMImplementation> objects.
+      A binding dependent bootstrap for <IF::DOMCore:DOMImplementation> objects.
+  @Description:
+    @@For:
+      ManakaiDOM:ManakaiDOM
+    @@lang:en
+    @@@:
+      A bootstrap class/object from which DOM implementations can be 
+      retrieved.  For the manakai <Class::ManakaiDOMImplementationRegistry> 
+      implementation, DOM applications can access the registry both 
+      via class methods and via object methods.  That is, applications 
+      are free, but need not to instantiate a 
+      <Class::ManakaiDOMImplementationRegistry> object to get 
+      DOM implementations. 
+      \
+      {NOTE:: Authors of DOM applications will usually want to access 
+              the registry by the means of class methods (i.e. no 
+              instance objects), since most applications don't 
+              require more than one implementations.
+      \
+      }
   @Method:
+    @@For:
+      ManakaiDOM:ManakaiDOM
     @@Name: newInstance
+    @@ManakaiDOM:isStatic: 1
     @@Description:
       @@@lang:en
       @@@@:
-        Construct a new instance of <IF:DOMImplementationRegistry> object.
+        Constructs and returns a new instance of 
+        <Class::ManakaiDOMImplementationRegistry>. 
         \
-        The <IF:DOMImplementationRegistry> object 
-        is initialized by DOM applications or the DOM implementation, 
-        depenging on the context, by first checking the values of the 
-        array <Perl:@org::w3c::dom::DOMImplementationSourceList>, 
-        i.e. names of classes implementing the <IF:DOMImplementationSource> 
-        interface.
+        The newly created object initially has DOM implementation sources 
+        registered to the array 
+        <Perl::@org::w3c::dom::DOMImplementationSourceList> at the time 
+        of the instantiation.  No addition of sources afterwards to the 
+        object is reflected to the global registry and vice versa.
     @@ImplNote;
       @@@lang:en
       @@@@:
@@ -2367,7 +2354,7 @@ ResourceDef:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          A new instance of the <IF:DOMImplementationRegistry>.
+          A new instance of the <IF:ManakaiDOMImplementationRegistry>.
       @@@Def:
         @@@@Type:
           lang:Perl
@@ -2377,41 +2364,66 @@ ResourceDef:
       ManakaiDOM:ManakaiDOM
   @Method:
      @@Name:  getDOMImplementation
+     @@ManakaiDOM:isStatic: 1
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Seeks and returns the first implementation that implements 
+         desired features. 
      @@Param:
         @@@Name:  features
         @@@Type:  DOMString
+        @@@actualType:
+          ManakaiDOM:ManakaiDOMFeatures
         @@@Description:
           @@@@lang:en
-          @@@@@: A list of desired features that must be implemented.
+          @@@@@: 
+            A list of desired features that must be implemented.
      @@Return:
        @@@Type:  
          DOMCore:DOMImplementation
        @@@Description:
          @@@@lang:en
          @@@@@:
-           The first implementation that has the derired features.
+           The first implementation that has the derired features. 
+           \
+           {NOTE:: DOM implementations returned by this method 
+                   might not be manakai DOM objects.
+           \
+           }
        @@@InCase:
          @@@@Value:
            @@@@@is-null:1
          @@@@Description:
            @@@@@lang:en
-           @@@@@@: No implementation found.
-       @@@Def:
-         @@@@Type:
-           lang:Perl
-         @@@@@:
+           @@@@@@: 
+             No implementation implementing the desired features is found.
+       @@@PerlDef:
            __DEEP{
-             for (@{ref $self ? $self
-                              : @org::w3c::dom::DOMImplementationSourceList}) {
-               $r = $_->getDOMImplementation ($features);
+             for (ref $self ? @$self
+                            : @org::w3c::dom::DOMImplementationSourceList) {
+               $r = $_-><M::DOMCore:DOMImplementationSource.getDOMImplementation>
+                                      ($features);
                last if defined $r;
              }
            }__;
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          Stringify of <P::features> is required for non-manakai impl. sources.
   @Method:
      @@Name:  getDOMImplementationList
+     @@ManakaiDOM:isStatic: 1
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Returns a list of all the DOM implementations that implement 
+         desired features.
      @@Param:
         @@@Name:  features
         @@@Type:  DOMString
+        @@@actualType:
+          ManakaiDOM:ManakaiDOMFeatures
         @@@Description:
           @@@@lang:en
           @@@@@: A list of desired features that must be implemented.
@@ -2419,35 +2431,48 @@ ResourceDef:
        @@@Type:  
          DOMCore:DOMImplementationList
        @@@actualType:
-         @@@@: 
-           ManakaiDOMCore:ManakaiDOMImplementationList
-         @@@For:
-           ManakaiDOM:ManakaiDOM
+         ManakaiDOMCore:ManakaiDOMImplementationList
        @@@Description:
          @@@@lang:en
-         @@@@@: A list of implementations that support the desired features.
+         @@@@@: 
+           A list of DOM implementations that support the desired features. 
+           \
+           {NOTE:: Whilst the returned list itself is a manakai object, 
+                   its containing implementation objects might not 
+                   be part of manakai.
+           \
+           }
        @@@PerlDef:
            __DEEP{
-             $r = __CLASS{DOMImplementationList}__->__INT{new}__;
-             for (@{ref $self ? $self
-                              : @org::w3c::dom::DOMImplementationSourceList}) {
-               $r->__INT{add}__ ($_->getDOMImplementationList ($features));
+             $r = <ClassM::DOMCore:ManakaiDOMImplementationList.new>;
+             for (ref $self ? @$self
+                            : @org::w3c::dom::DOMImplementationSourceList) {
+               $r-><M::DOMCore:ManakaiDOMImplementationList.add>
+                         ($_-><M::DOMCore:ManakaiDOMImplementationSource
+                                       .getDOMImplementationList> ($features));
              }
            }__;
   @Method:
     @@Name: addSource
+    @@ManakaiDOM:isStatic: 1
     @@Description:
       @@@lang:en
       @@@@:
-        Adds a <IF:DOMImplementationSource> object to the list of 
-        DOM implementation sources available.
+        Registers a <IF::DOMCore:DOMImplementationSource> object to the 
+        list of DOM implementation sources available to this registry. 
+        \
+        When this method is called as a class method, i.e. with no 
+        object, the new source is added to the global registry.  
+        Otherwise, the new source is added to the local, the object's own 
+        registry and it unable to access via other registries. 
+        \
+        {NOTE:: This method is a manakai-specific method.  Its name and 
+                most of behaviour follow that of the normative Java binding as 
+                defined in the <CITE::DOM Level 3 Specification>.
+        \
+        }
     @@For:
       ManakaiDOM:ManakaiDOM
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        This method has been taken from the normative Java binding of 
-        DOM Level 3.
     @@Param:
       @@@Name: s
       @@@Type: 
@@ -2455,27 +2480,20 @@ ResourceDef:
       @@@Description:
         @@@@lang:en
         @@@@@: 
-          A <IF:DOMImplementationSource> object to be registered.
+          A <IF:DOMImplementationSource> object to be registered. 
     @@Return:
-      @@@Exception:
-        @@@@Type:
-          ManakaiDOM:ManakaiDOMImplementationException
-        @@@@Name: PARAM_NULL_POINTER
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            The parameter <P:list> is <DOM:null>.
       @@@PerlDef:
-          unless (defined $s) {
-            __EXCEPTION{ManakaiDOMImplementationException.PARAM_NULL_POINTER::
-              <Q::MDOMX:param-name> => 's',
-            }__;
-          }
+        @@@@require: overload
+        @@@@@:
+          my $reg = ref $self ? $self
+                              : \@org::w3c::dom::DOMImplementationSourceList;
           PUSH: {
-            for (@$self) {
-              last PUSH if overload::StrVal ($_) eq overload::StrVal ($s);
+            ## Checks if $s is already in list
+            for (@$reg) {
+              last PUSH if overload::StrVal ($_) eq overload::StrVal ($s) or
+                           $_ eq $s;
             }
-            push @$self, $s;
+            push @$reg, $s;
           }
 ## Object:DOMImplementationRegistry
 
@@ -2492,22 +2510,27 @@ ClassDef:
       The common class that is inherited by all manakai DOM object classes.
   
   @IntMethod:
-    @@Name:reportError
     @@Operator:
-      @@@@:object-error-handler
-      @@@Type:
-        lang:Perl
-      @@@ImplNote:
-        @@@@lang:en
-        @@@@@:
-          TODO: Operator name required.
+      ManakaiDOM:MUErrorHandler
     @@Description:
       @@@lang:en
       @@@@:
-        The generic error handler; throw an exception if it is 
-        an exception; raise an event if it is a warning.
-      \
-        See also <PerlModule:Message::Util::Error>.
+        This method is a generic error handler; all manakai exceptions 
+        and warnings associated to an object are once reported to this method 
+        and then delivered to appropriate entities. 
+        \
+        If the error is an exception (such as <X::DOMCore:DOMException> or 
+        <X::ManakaiDOM:ManakaiDOMImplementationException>), it is 
+        simply thrown.  If the error is only a warning, it is reported 
+        via the <IF::DOMCore:DOMError> interface. 
+        \
+        See <PerlModule::Message::Util::Error> documentation for more 
+        information on the error reporting mechanism.
+        \
+        {NOTE:: This kind of methods are named as <Perl::___report_error> 
+                in the convention of <PerlModule::Message::Util::Error>. 
+        \
+        }
     @@Param:
       @@@Name:err
       @@@Type: 
@@ -2515,7 +2538,14 @@ ClassDef:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The exception object that inherits <PerlModule:Message::Util::Error>.
+          An exception object that describes what kind of error it is 
+          and how it should be recovered. 
+          \
+          {NOTE:: Exception objects in manakai implementation 
+                  inherit the class <PerlModule::Message::Util::Error>, 
+                  that in turn inherits <PerlModule::Error>.
+          \
+          }
     @@Return:
       @@@PerlDef:
           if ($err->isa (<ClassName::ManakaiDOM:ManakaiDOMException>)) {
@@ -2545,7 +2575,7 @@ ClassDef:
       @@@lang:en
       @@@@:
         Returns a short plain-text message, written in the 
-        <CODE:i-default> language, that describes 
+        <CODE::i-default> language, that describes 
         what is happened. 
         \
         {NOTE:: This attribute is also defined in the class 
@@ -2567,7 +2597,7 @@ ClassDef:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          An error message written in <CODE:i-default> language.
+          An error message written in <CODE::i-default> language.
       @@@PerlDef:
           my $template;
           if (defined $self->{<Q::MDOMX:subtype>} and
