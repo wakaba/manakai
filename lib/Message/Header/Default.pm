@@ -9,13 +9,14 @@ for Default Namespace of Header Fields
 package Message::Header::Default;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Header;
 
 our %OPTION;
 
 ## Case sensibility of field name
 $OPTION{case_sensible} = 1;
+#$OPTION{to_be_goodcase} = \&...;
 $OPTION{n11n_name} = \&_name_n11n;
 $OPTION{n11n_prefix} = \&_name_n11n;
 
@@ -110,7 +111,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/26 01:18:48 $
+$Date: 2002/06/16 10:45:54 $
 
 =cut
 

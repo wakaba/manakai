@@ -13,7 +13,7 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.20 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.21 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::Header;
@@ -45,7 +45,8 @@ use overload '""' => sub { $_[0]->stringify },
     -text_coderange	=> 'binary',
     	## '8bit' (MIME text/*) / 'binary' (HTTP text/*)
     #ua_field_name	=> 'user-agent',
-    -ua_use_config	=> 1,
+    -ua_use_Config	=> 1,
+    -ua_use_Win32	=> 1,
     -uri_mailto_safe_level	=> 4,
   );
 sub _init ($;%) {
@@ -501,7 +502,12 @@ sub stringify ($;%) {
      && $option{uri_mailto_safe_level} > 1) {
       $self->{header}->field ('content-type')->media_type ('text/plain');
     }
-    $self->_add_ua_field;
+    if ($option{add_ua}) {
+      $self->{header}->field ($option{fill_ua_name})->add_our_name (
+        -use_Config	=> $option{ua_use_Config},
+        -use_Win32	=> $option{ua_use_Win32},
+      );
+    }
     $header = $self->{header}->stringify (-format => $option{format},
       -linebreak_strict => $option{linebreak_strict},
       -uri_mailto_safe_level => $option{uri_mailto_safe_level});
@@ -598,66 +604,6 @@ sub id ($) {
   return scalar $self->{header}->field ('content-id')->id
     if $self->{header}->field_exist ('content-id');
   '';
-}
-
-## Internal function to add of User-Agent: C<product>.
-sub _add_ua_field ($) {
-  my $self = shift;
-  if ($self->{option}->{add_ua}) {
-    my $ua = $self->{header}->field ($self->{option}->{fill_ua_name},
-      -ns => $self->{option}->{fill_ua_ns});
-    $ua->replace ('Message-pm' => $VERSION, -prepend => 0);
-    my (@os, @os_comment);
-    my @perl_comment;
-    if ($self->{option}->{ua_use_config}) {
-      @os_comment = ('');
-      @os = ($^O => \@os_comment);
-      eval q{use Config;
-        @os_comment = ($Config{osvers});
-        push @perl_comment, $Config{archname};
-      };
-      eval q{use Win32;
-        my $build = Win32::BuildNumber;
-        push @perl_comment, "ActivePerl build $build" if $build;
-        my @osv = Win32::GetOSVersion;
-        @os = (
-            $osv[4] == 0? 'Win32s':
-            $osv[4] == 1? 'Windows':
-            $osv[4] == 2? 'WindowsNT':
-                          'Win32',       \@os_comment);
-        @os_comment = (sprintf ('%d.%02d.%d', @osv[1,2], $osv[3] & 0xFFFF));
-        push @os_comment, $osv[0] if $osv[0] =~ /[^\x09\x20]/;
-        if ($osv[4] == 1) {
-          if ($osv[1] == 4) {
-            if ($osv[2] == 0) {
-              if    ($osv[0] =~ /[Aa]/) { push @os_comment, 'Windows 95 OSR1' }
-              elsif ($osv[0] =~ /[Bb]/) { push @os_comment, 'Windows 95 OSR2' }
-              elsif ($osv[0] =~ /[Cc]/) { push @os_comment, 'Windows 95 OSR2.5' }
-              else                      { push @os_comment, 'Windows 95' }
-            } elsif ($osv[2] == 10) {
-              if    ($osv[0] =~ /[Aa]/) { push @os_comment, 'Windows 98 SE' }
-              else                      { push @os_comment, 'Windows 98' }
-            } elsif ($osv[2] == 90) {
-              push @os_comment, 'Windows Me';
-            }
-          }
-        } elsif ($osv[4] == 2) {
-          push @os_comment, 'Windows 2000' if $osv[1] == 5 && $osv[2] == 0;
-          push @os_comment, 'Windows XP' if $osv[1] == 5 && $osv[2] == 1;
-        }
-        push @os_comment, Win32::GetChipName;
-      };
-    } else {
-      push @perl_comment, $^O;
-    }
-    if ($^V) {	## 5.6 or later
-      $ua->replace (Perl => [sprintf ('%vd', $^V), @perl_comment], -prepend => 0);
-    } elsif ($]) {	## Before 5.005
-      $ua->replace (Perl => [ $], @perl_comment], -prepend => 0);
-    }
-    $ua->replace (@os, -prepend => 0) if $self->{option}->{ua_use_config};
-  }
-  $self;
 }
 
 =back
@@ -923,7 +869,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/14 12:07:16 $
+$Date: 2002/06/16 10:45:54 $
 
 =cut
 

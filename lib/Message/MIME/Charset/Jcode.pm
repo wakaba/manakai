@@ -27,6 +27,10 @@ jcode.pl L<lt>http://srekcah.org/jcode/>
 
 Jcode.pm L<lt>http://openlab.ring.gr.jp/Jcode/index-j.html>
 
+=item 'Kconv' or 'Kconv.pm'
+
+Kconv.pm L<lt>ftp://ftp.intec.co.jp/pub/utils/>
+
 =item 'NKF' or 'NKF.pm'
 
 Network Kanji Filter (Perl module version)
@@ -63,7 +67,7 @@ Message::MIME::Charset::Encode.
 package Message::MIME::Charset::Jcode;
 use strict;
 use vars qw(%CODE $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::MIME::Charset;
@@ -135,13 +139,13 @@ sub import ($;%) {
     if ($_ eq 'jcode.pl') {
       require 'jcode.pl';
       Message::MIME::Charset::make_charset ('*default' =>
-        encoder	=> sub { jcode::to ($CODE{output},   $_[1], $CODE{internal}) },
+        encoder	=> sub { jcode::to ($CODE{output}, __jcode_pl_fw_to_hw ($_[1]), $CODE{internal}) },
         decoder	=> sub { jcode::to ($CODE{internal}, $_[1], $CODE{input}) },
         mime_text	=> 1,
       );
       Message::MIME::Charset::make_charset ('iso-2022-jp' =>
         encoder	=> sub {
-          my $s = jcode::jis ($_[1], $CODE{internal});
+          my $s = jcode::jis (__jcode_pl_fw_to_hw ($_[1]), $CODE{internal});
           ($s, iso_2022_mime_charset_name ('iso-2022-jp', $s));
         },
         decoder	=> sub { jcode::to ($CODE{internal}, $_[1], 'jis') },
@@ -152,7 +156,7 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset ('euc-jp' =>
         encoder	=> sub {
           my $s = jcode::euc ($_[1], $CODE{internal});
-          ($s, euc_japan_mime_charset_name ('euc-jp' => $s));
+          (__jcode_pl_fw_to_hw ($s), euc_japan_mime_charset_name ('euc-jp' => $s));
         },
         decoder	=> sub { jcode::to ($CODE{internal}, $_[1], 'euc') },
         name_minimumizer	=> \&euc_japan_mime_charset_name,
@@ -160,7 +164,7 @@ sub import ($;%) {
       );
       Message::MIME::Charset::make_charset (shift_jis =>
         encoder	=> sub {
-          my $s = jcode::sjis ($_[1], $CODE{internal});
+          my $s = jcode::sjis (__jcode_pl_fw_to_hw ($_[1]), $CODE{internal});
           ($s, shift_jis_mime_charset_name (shift_jis => $s));
         },
         decoder	=> sub { jcode::to ($CODE{internal}, $_[1], 'sjis') },
@@ -337,6 +341,45 @@ sub import ($;%) {
         decoder	=> sub { Unicode::Japanese->new ($_[1], 'utf32-le')->conv ($CODE{internal}) },
       );
       Message::MIME::Charset::make_charset ('ucs-4le' => alias_of => 'utf-32le');
+    } elsif ($_ eq 'Kconv' || $_ eq 'Kconv.pm') {
+      unless ($Kconv::VERSION) {
+        eval { require Kconv } or Carp::croak ("Message::MIME::Charset::Jcode: Kconv: $@");
+      }
+      Message::MIME::Charset::make_charset ('*default' =>
+        encoder	=> sub { kconv ($_[1], __kconv_code_name ($CODE{output}), 
+                                       __kconv_code_name ($CODE{internal})) },
+        decoder	=> sub { kconv ($_[1], __kconv_code_name ($CODE{internal}), 
+                                       __kconv_code_name ($CODE{input})) },
+        mime_text	=> 1,
+      );
+      Message::MIME::Charset::make_charset ('iso-2022-jp' =>
+        encoder	=> sub {
+          my $s = kconv ($_[1], &_JIS, __kconv_code_name ($CODE{internal}));
+          ($s, iso_2022_mime_charset_name ('iso-2022-jp' => $s));
+        },
+        decoder	=> sub { kconv ($_[1], __kconv_code_name ($CODE{internal}), &_JIS) },
+        name_minimumizer	=> \&iso_2022_mime_charset_name,
+        mime_text	=> 1,
+        cte_7bit_preferred	=> 'base64',
+      );
+      Message::MIME::Charset::make_charset ('euc-jp' =>
+        encoder	=> sub {
+          my $s = kconv ($_[1], &_EUC, __kconv_code_name ($CODE{internal}));
+          ($s, euc_japan_mime_charset_name ('euc-jp' => $s));
+        },
+        decoder	=> sub { kconv ($_[1], __kconv_code_name ($CODE{internal}), &_EUC) },
+        name_minimumizer	=> \&euc_japan_mime_charset_name,
+        mime_text	=> 1,
+      );
+      Message::MIME::Charset::make_charset (shift_jis =>
+        encoder	=> sub {
+          my $s = kconv ($_[1], &_SJIS, __kconv_code_name ($CODE{internal}));
+          ($s, shift_jis_mime_charset_name (shift_jis => $s));
+        },
+        decoder	=> sub { kconv ($_[1], __kconv_code_name ($CODE{internal}), &_SJIS) },
+        name_minimumizer	=> \&shift_jis_mime_charset_name,
+        mime_text	=> 1,
+      );
     } else {
       Carp::croak "Jcode: $_: Module not supported";
     }
@@ -469,6 +512,27 @@ sub shift_jis_mime_charset_name ($$) {
   }
 }
 
+sub __jcode_pl_fw_to_hw ($) {
+  my $s = shift;
+  return $s unless $CODE{internal} eq 'euc';
+  jcode::tr(\$s, "\xa3\xb0-\xa3\xb9\xa3\xc1-\xa3\xda\xa3\xe1-\xa3\xfa\xa1\xf5".
+                 "\xa1\xa4\xa1\xa5\xa1\xa7\xa1\xa8\xa1\xa9\xa1\xaa\xa1\xae".
+                 "\xa1\xb0\xa1\xb2\xa1\xbf\xa1\xc3\xa1\xca\xa1\xcb\xa1\xce".
+                 "\xa1\xcf\xa1\xd0\xa1\xd1\xa1\xdc\xa1\xf0\xa1\xf3\xa1\xf4".
+                 "\xa1\xf6\xa1\xf7\xa1\xe1\xa2\xaf\xa2\xb0\xa2\xb2\xa2\xb1".
+                 "\xa1\xe4\xa1\xe3\xA1\xC0\xA1\xA1" =>
+            '0-9A-Za-z&,.:;?!`^_/|()[]{}+$%#*@=\'"~-><\\ ');
+  $s;
+}
+
+sub __kconv_code_name ($) {
+  my $c = shift;
+  $c eq 'sjis'? &_SJIS:
+  $c eq 'euc' ? &_EUC:
+  $c eq 'jis' ? &_JIS:
+  &_AUTO;
+}
+
 =head1 EXAMPLE
 
   ## Uses jcode.pl.  Input is euc-japan, output is junet.
@@ -524,7 +588,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/09 11:09:38 $
+$Date: 2002/06/16 10:45:54 $
 
 =cut
 

@@ -14,7 +14,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%ENCODER %DECODER %OPTION %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::MIME::Charset;
 
 $REG{WSP} = qr/[\x09\x20]/;
@@ -110,7 +110,7 @@ sub decode ($) {
 }
 
 sub decode_ccontent ($$) {
-  my $s = shift;  my $yourself = shift;
+  my $yourself = shift;  my $s = shift;
   my (@s, @r) = ();
   my ($i, @t) = (-1);
   $s =~ s{$REG{FWS}$REG{comment}}{$i++; $t[$i] = $&; "\x28${i}\x29"}gex;
@@ -187,7 +187,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/09 11:13:14 $
+$Date: 2002/06/16 10:45:54 $
 
 =cut
 

@@ -9,7 +9,7 @@ for RFC822 Namespaces of Header Fields
 package Message::Header::RFC822;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Header::Default;
 
 our %OPTION = %Message::Header::Default::OPTION;
@@ -82,10 +82,11 @@ $OPTION{value_type} = {
 	subject	=> ['Message::Field::Subject'],
 	'x-nsubject'	=> ['Message::Field::Subject'],
 	
+	'x-face'	=> ['Message::Field::XFace'],
 };
 for (qw(cancel-lock disposition-notification-options encoding 
   importance pics-label  precedence message-type 
-  priority x-list-id sensitivity x-face x-msmail-priority xref))
+  priority x-list-id sensitivity x-msmail-priority xref))
   {$OPTION{value_type}->{$_} = ['Message::Field::Structured']}
 for (qw(abuse-reports-to apparently-to approved approved-by bcc cc complaints-to
   delivered-to disposition-notification-to envelope-to
@@ -251,7 +252,7 @@ $OPTION{goodcase} = {
 $OPTION{value_type} = {
 	':default'	=> ['Message::Field::Unstructured'],
 	
-	id	=> ['Message::Field::Structured'],
+	id	=> ['Message::Field::ListID'],
 	software	=> ['Message::Field::UA'],
 	
 	archive	=> ['Message::Field::CSV'],
@@ -293,7 +294,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/09 11:20:24 $
+$Date: 2002/06/16 10:45:54 $
 
 =cut
 

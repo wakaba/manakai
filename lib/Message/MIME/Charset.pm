@@ -12,7 +12,7 @@ Perl module for MIME charset.
 package Message::MIME::Charset;
 use strict;
 use vars qw(%ENCODER %DECODER %N11NTABLE %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 our %CHARSET;
 
@@ -33,11 +33,7 @@ $CHARSET{'us-ascii'} = {
 	
 	encoder	=> sub { $_[1] },
 	decoder	=> sub { $_[1] },
-	name_minimumizer	=> sub {
-	  shift; my $s = shift;
-	  return (charset => 'unknown-8bit') if $s =~ /[\x80-\xFF]/;
-	  (charset => 'us-ascii');
-	},
+	name_minimumizer	=> \&_charset_name_of_junet8,
 	
 	mime_text	=> 1,
 };
@@ -47,18 +43,7 @@ $CHARSET{'iso-2022-int-1'} = {
 	
 	encoder	=> sub { $_[1] },
 	decoder	=> sub { $_[1] },
-	name_minimumizer	=> sub {
-	  shift; my $s = shift;
-	  return (charset => 'unknown-8bit') if $s =~ /[\x80-\xFF]/;
-	  return (charset => 'us-ascii') unless $s =~ /[\x1B\x0E\x0F]/;
-	  return (charset => 'iso-2022-jp') unless $s =~ /\x1B[^\x24\x28]|\x1B\x24[^\x40B]|\x1B\x28[^BJ]|\x0E|\x0F/;
-	  return (charset => 'iso-2022-jp-1') unless $s =~ /\x1B[^\x24\x28]|\x1B\x24[^\x40B\x28]|\x1B\x28[^BJ]|\x1B\x24\x28[^D]|\x0E|\x0F/;
-	  return (charset => 'iso-2022-jp-3-plane1') unless $s =~ /\x1B[^\x24\x28]|\x1B\x24[^B\x28]|\x1B\x28[^B]|\x1B\x24\x28[^O]|\x0E|\x0F/;
-	  return (charset => 'iso-2022-jp-3') unless $s =~ /\x1B[^\x24\x28]|\x1B\x24[^B\x28]|\x1B\x28[^B]|\x1B\x24\x28[^OP]|\x0E|\x0F/;
-	  return (charset => 'iso-2022-kr') unless $s =~ /\x1B[^\x24]|\x1B\x24[^\x29]|\x1B\x24\x29C/;
-	  return (charset => 'iso-2022-cn') unless $s =~ /\x1B[^\x24\x28]|\x1B\x24[^B]|\x1B\x28[^A]|\x1B\x24\x28[^GH]|\x0E|\x0F/;
-	  (charset => 'iso-2022-int-1');
-	},
+	name_minimumizer	=> \&_charset_name_of_junet8,
 	
 	mime_text	=> 1,
 };
@@ -130,6 +115,34 @@ sub name_minimumize ($$) {
   $charset;
 }
 
+sub _charset_name_of_junet8 ($) {
+  shift; my $s = shift;
+  return (charset => 'us-ascii') unless $s =~ /[\x1B\x0E\x0F\x80-\xFF]/;
+  if ($s =~ /[\x80-\xFF]/) {
+    if ($s =~ /[\xC0-\xFD][\x80-\xBF]*[\x80-\x8F]/) {
+      if ($s =~ /\x1B/) {
+        return (charset => 'x-junet8');
+      } else {
+        return (charset => 'utf-8');
+      }
+    } elsif ($s =~ /\x1B/) {
+      return (charset => 'x-ctext');
+    } else {
+      return (charset => 'iso-8859-1');
+    }
+  }
+  return (charset => 'iso-2022-jp') unless $s =~ /\x1B[^\x24\x28]|\x1B\x24[^\x40B]|\x1B\x28[^BJ]|\x0E|\x0F/;
+  return (charset => 'iso-2022-jp-1') unless $s =~ /\x1B[^\x24\x28]|\x1B\x24[^\x40B\x28]|\x1B\x28[^BJ]|\x1B\x24\x28[^D]|\x0E|\x0F/;
+  return (charset => 'iso-2022-jp-3-plane1') unless $s =~ /\x1B[^\x24\x28]|\x1B\x24[^B\x28]|\x1B\x28[^B]|\x1B\x24\x28[^O]|\x0E|\x0F/;
+  return (charset => 'iso-2022-jp-3') unless $s =~ /\x1B[^\x24\x28]|\x1B\x24[^B\x28]|\x1B\x28[^B]|\x1B\x24\x28[^OP]|\x0E|\x0F/;
+  return (charset => 'iso-2022-kr') unless $s =~ /\x1B[^\x24]|\x1B\x24[^\x29]|\x1B\x24\x29C/;
+  return (charset => 'iso-2022-cn') unless $s =~ /\x1B[^\x4E\x24]|\x1B\x24[^\x29\x2A]|\x1B\x24\x29[^AG]|\x1B\x24\x2A[^H]/;
+  return (charset => 'iso-2022-cn-ext') unless $s =~ /\x1B[^\x4E\x4F\x24]|\x1B\x24[^\x29\x2A]|\x1B\x24\x29[^AEG]|\x1B\x24\x2A[^HIJKLM]/;
+  return (charset => 'iso-2022-jp-2') unless $s =~ /\x1B[^\x24\x28\x2E\x4E]|\x1B\x24[^\x40AB\x28]|\x1B\x24\x28[^CD]|\x1B\x28[^BJ]|\x1B\x2E[^AF]|\x0E|\x0F/;
+  return (charset => 'iso-2022-int-1') unless $s =~ /\x1B[^\x24\x28\x2D]|\x1B\x24[^\x40AB\x28\x29]|\x1B\x24\x28[^DGH]|\x1B\x24\x29[^C]|\x1B\x28[^BJ]|\x1B\x2D[^AF]/;
+  (charset => 'x-iso-2022');
+}
+
 =head1 LICENSE
 
 Copyright 2002 wakaba E<lt>w@suika.fam.cxE<gt>.
@@ -152,7 +165,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/11 12:59:27 $
+$Date: 2002/06/16 10:45:54 $
 
 =cut
 

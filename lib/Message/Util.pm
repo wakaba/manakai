@@ -16,9 +16,11 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 use Carp ();
+require Message::MIME::EncodedWord;
+require Message::MIME::Charset;
 
 =head1 REGEXPS (%Message::Util::REG)
 
@@ -283,14 +285,13 @@ sub make_clone ($) {
 =cut
 
 sub encode_header_string ($$;%) {
-  require Message::MIME::Charset;
   my $yourself = shift; my $s = shift; my %o = @_;
   $o{charset} ||= $yourself->{option}->{encoding_after_encode};
   $o{charset} = Message::MIME::Charset::name_normalize ($o{charset});
   $o{current_charset} = Message::MIME::Charset::name_normalize ($o{current_charset});
   my ($t,%r) = Message::MIME::Charset::encode ($o{charset}, $s);
   my @o = (language => $o{language});
-  if ($r{success}) {	## Convertion successed
+  if ($r{success}) {	## Convertion succeed
     $o{charset} = $r{charset} if $r{charset};
     (value => $t, @o, charset => ($o{charset}=~/\*/?'':$o{charset}));
   } else {	## Fault
@@ -299,8 +300,6 @@ sub encode_header_string ($$;%) {
 }
 
 sub decode_header_string ($$;%) {
-  require Message::MIME::EncodedWord;
-  require Message::MIME::Charset;
   my $yourself = shift; my $s = shift; my %o = @_;
   $o{charset} ||= $yourself->{option}->{encoding_before_decode};
   $o{charset} = Message::MIME::Charset::name_normalize ($o{charset});
@@ -337,7 +336,6 @@ sub decode_header_string ($$;%) {
 }
 
 sub encode_body_string {
-  require Message::MIME::Charset;
   my $yourself = shift; my $s = shift; my %o = @_;
   $o{charset} ||= $yourself->{option}->{encoding_after_encode};
   $o{charset} = Message::MIME::Charset::name_normalize ($o{charset});
@@ -353,7 +351,6 @@ sub encode_body_string {
 }
 
 sub decode_body_string {
-  require Message::MIME::Charset;
   my $yourself = shift; my $s = shift; my %o = @_;
   $o{charset} ||= $yourself->{option}->{encoding_before_decode};
   $o{charset} = Message::MIME::Charset::name_normalize ($o{charset});
@@ -497,8 +494,7 @@ Decodes C<ccontent> (content of C<comment>).
 =cut
 
 sub decode_ccontent ($$) {
-  require Message::MIME::EncodedWord;
-  &Message::MIME::EncodedWord::decode_ccontent (@_[1,0]);
+  Message::MIME::EncodedWord::decode_ccontent (@_);
 }
 
 
@@ -524,7 +520,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/01 05:40:55 $
+$Date: 2002/06/16 10:45:54 $
 
 =cut
 

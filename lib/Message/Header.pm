@@ -8,7 +8,7 @@ Message::Header --- A Perl Module for Internet Message Headers
 package Message::Header;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.25 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.26 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;	## This may seem silly:-)
 push @ISA, qw(Message::Field::Structured);
 
@@ -30,7 +30,6 @@ push @ISA, qw(Message::Field::Structured);
     -_HASH_NAME	=> 'value',
     -_METHODS	=> [qw|field field_exist field_type add replace count delete subject id is|],
     -_MEMBERS	=> [qw|value|],
-    -M_namsepace_prefix_regex => qr/(?!)/,
     -_VALTYPE_DEFAULT	=> ':default',
     -by	=> 'name',	## (Reserved for method level option)
     -field_format_pattern	=> '%s: %s',
@@ -41,7 +40,7 @@ push @ISA, qw(Message::Field::Structured);
     #-format	=> 'mail-rfc2822',
     -linebreak_strict	=> 0,	## Not implemented completely
     -line_length_max	=> 60,	## For folding
-    -ns_default_uri	=> $Message::Header::Default::OPTION{namespace_uri},
+    #ns_default_phuri
     -output_bcc	=> 0,
     -output_folding	=> 1,
     -output_mail_from	=> 0,
@@ -59,14 +58,9 @@ $DEFAULT{-value_type} = {
 	p3p	=> ['Message::Field::Params'],
 	link	=> ['Message::Field::ValueParams'],
 	
-	'list-software'	=> ['Message::Field::UA'],
 	'user-agent'	=> ['Message::Field::UA'],
 	server	=> ['Message::Field::UA'],
 };
-for (qw(pics-label list-id status))
-  {$DEFAULT{-value_type}->{$_} = ['Message::Field::Structured']}
-  	## Not supported yet, but to be supported...
-  	# x-list: unstructured, ml name
 for (qw(date expires))
   {$DEFAULT{-value_type}->{$_} = ['Message::Field::Date']}
 for (qw(accept accept-charset accept-encoding accept-language uri))
@@ -128,9 +122,9 @@ sub _init ($;%) {
   $self->SUPER::_init (%$DEFAULT, %options);
   $self->{value} = [];
   $self->_ns_load_ph ('default');
-  $self->{ns}->{default_phuri} = $self->{ns}->{phname2uri}->{'default'};
   $self->_ns_load_ph ('rfc822');
-  $self->{ns}->{default_phuri} = $self->{ns}->{phname2uri}->{'rfc822'};
+  $self->{option}->{ns_default_phuri} = $self->{ns}->{phname2uri}->{'rfc822'}
+    unless $self->{option}->{ns_default_phuri};
   
   my @new_fields = ();
   for my $name (keys %options) {
@@ -303,7 +297,7 @@ sub _item_match ($$\$\%\%) {
       if ($s) {
         $l{$v->{name} . ':' . ( $option->{ns} || $v->{ns} ) } = 1;
       } else {
-        $l{$v->{name} .':'. ( $option->{ns} || $self->{ns}->{default_phuri} ) } = 1;
+        $l{$v->{name} .':'. ( $option->{ns} || $self->{option}->{ns_default_phuri} ) } = 1;
       }
     }
     return 1 if $l{$$i->{name} . ':' . $$i->{ns}};
@@ -324,6 +318,8 @@ sub _item_return_value ($\$\%) {
     ${$_[1]}->{body};
   }
 }
+*_add_return_value = \&_item_return_value;
+*_replace_return_value = \&_item_return_value;
 
 ## Returns returned (new created) item value    $name, \%option
 sub _item_new_value ($$\%) {
@@ -341,9 +337,10 @@ sub _parse_value ($$$;%) {
   my $value = shift;  return $value if ref $value;
   my %option = @_;
   my $vtype; { no strict 'refs';
-    $vtype = ${&_NS_uri2phpackage ($option{ns}).'::OPTION'}{value_type};
-    if (ref $vtype) { $vtype = $vtype->{$name} }
-    unless (ref $vtype) { $vtype = $vtype->{$self->{option}->{_VALTYPE_DEFAULT}} }
+    my $vt = ${&_NS_uri2phpackage ($option{ns}).'::OPTION'}{value_type};
+    if (ref $vt) {
+      $vtype = $vt->{$name} || $vt->{$self->{option}->{_VALTYPE_DEFAULT}};
+    }
     ## For compatiblity.
     unless (ref $vtype) { $vtype = $self->{option}->{value_type}->{$name}
       || $self->{option}->{value_type}->{$self->{option}->{_VALTYPE_DEFAULT}} }
@@ -389,10 +386,10 @@ sub namespace_ph_default ($;$) {
   my $self = shift;
   if (defined $_[0]) {
     no strict 'refs';
-    $self->{ns}->{default_phuri} = $_[0];
-    $self->_ns_load_ph (${&_NS_uri2phpackage ($self->{ns}->{default_phuri}).'::OPTION'}{namespace_phname});
+    $self->{option}->{ns_default_phuri} = $_[0];
+    $self->_ns_load_ph (${&_NS_uri2phpackage ($self->{option}->{ns_default_phuri}).'::OPTION'}{namespace_phname});
   }
-  $self->{ns}->{default_phuri};
+  $self->{option}->{ns_default_phuri};
 }
 
 =item $hdr->add ($field-name, $field-body, [$name, $body, ...])
@@ -431,7 +428,8 @@ sub _value_to_arrayitem ($$$\%) {
   if (ref $value eq 'ARRAY') {
     ($value, %$value_option) = @$value;
   }
-  my $nsuri = $self->{ns}->{default_phuri};
+  my $nsuri = $self->{option}->{ns_default_phuri};
+  
   no strict 'refs';
   if ($value_option->{ns}) {
     $nsuri = $value_option->{ns};
@@ -446,7 +444,7 @@ sub _value_to_arrayitem ($$$\%) {
     $nsuri = $self->{ns}->{phname2uri}->{$prefix};
     unless ($nsuri) {
       $name = $oprefix . '-' . $name;
-      $nsuri = $self->{ns}->{default_phuri};
+      $nsuri = $self->{option}->{ns_default_phuri};
     }
   }
   $name
@@ -455,7 +453,8 @@ sub _value_to_arrayitem ($$$\%) {
   Carp::croak "$name: invalid field-name"
     if $option->{field_name_validation}
       && $name =~ /$REG{$option->{field_name_unsafe_rule}}/;
-  $value = $self->_parse_value ($name => $value, ns => $nsuri) if $$option{parse};
+  $value = $self->_parse_value ($name => $value, ns => $nsuri)
+    if $$option{parse} || $$option{parse_all};
   $$option{parse} = 0;
   (1, $name.':'.$nsuri => {name => $name, body => $value, ns => $nsuri});
 }
@@ -566,7 +565,7 @@ sub _n11n_field_name ($$) {
   my $self = shift;
   my $s = shift;
   $s =~ s/^$REG{WSP}+//; $s =~ s/$REG{WSP}+$//;
-  $s = lc $s ;#unless $self->{option}->{field_name_case_sensible};
+  $s = lc $s unless ${&_NS_uri2phpackage ($self->{option}->{ns_default_phuri}).'::OPTION'}{case_sensible};
   $s;
 }
 
@@ -609,7 +608,7 @@ sub stringify ($;%) {
       my $oname;	## Outputed field-name
       my $prefix = ${$nspackage.'::OPTION'} {namespace_phname_goodcase}
                 || $self->{ns}->{uri2phname}->{$nsuri};
-      $prefix = undef if $nsuri eq $self->{ns}->{default_phuri};
+      $prefix = undef if $nsuri eq $self->{option}->{ns_default_phuri};
       my $gc = ${$nspackage.'::OPTION'} {to_be_goodcase};
       if (ref $gc) { $oname = &$gc ($self, $nspackage, $name, \%option) }
       else { $oname = $name }
@@ -720,7 +719,7 @@ sub _fold ($$;%) {
   $max = 20 if $max < 20;
   
   my $l = $option{-initial_length} || 0;
-  $string =~ s{([\x09\x20][^\x09\x20]+)}{
+  $string =~ s{((?:^|[\x09\x20])[^\x09\x20]+)}{
     my $s = $1;
     if ($l + length $s > $max) {
       $s = "\x0D\x0A\x20" . $s;
@@ -819,7 +818,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/12 11:38:56 $
+$Date: 2002/06/16 10:45:54 $
 
 =cut
 
