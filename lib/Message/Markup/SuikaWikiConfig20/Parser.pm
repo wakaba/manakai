@@ -15,7 +15,7 @@ This module is part of manakai.
 
 package Message::Markup::SuikaWikiConfig20::Parser;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Markup::SuikaWikiConfig20::Node;
 
 =head1 METHODS
@@ -36,7 +36,7 @@ sub new ($;%) {
 
 sub parse_text ($$) {
   my ($self, $s) = @_;
-  my $root = SuikaWiki::Markup::SuikaWikiConfig20->new
+  my $root = Message::Markup::SuikaWikiConfig20::Node->new
     (type => '#document');
   my $current = $root;
   my $current_element = $root;
@@ -171,4 +171,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/11/15 07:42:34 $
+1; # $Date: 2003/11/15 07:56:10 $
