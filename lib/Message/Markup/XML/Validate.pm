@@ -15,7 +15,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Validate;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Markup::XML::Parser;
 our (%NS);
 *NS = \%Message::Markup::XML::NS;
@@ -241,33 +241,37 @@ sub _validate_attlist_declaration ($$;%) {
     }
     for (@{$attlist->{node}}) {
       my $attr_qname = $_->get_attribute ('qname', make_new_node => 1)->inner_text;
-      if ($_->{type} eq '#element' && $_->{namespace_uri} eq $NS{XML}.'attlist',
-          $_->{local_name} eq 'AttDef') {
+      if ($_->{type} eq '#element'
+      and $_->{namespace_uri} eq $NS{XML}.'attlist'
+      and $_->{local_name} eq 'AttDef') {
         if ($defined{$element_qname}->{$attr_qname}) {
           $self->{error}->raise_error ($attlist, type => 'WARN_XML_ATTLIST_AT_MOST_ONE_ATTR_DEF',
                                        t => [$element_qname, $attr_qname]);
         } else {
           $defined{$element_qname}->{$attr_qname} = 1;
         }
-        my $type = $_->get_attribute ('type', make_new_node => 1)->inner_text;
+        my $type = $_->get_attribute_value ('type');
         if ({qw/ID 1 IDREF 1 IDREFS 1 NMTOKEN 1 NMTOKENS 1 NOTATION 1/}->{$type}) {
-          my $dt = $_->get_attribute ('default_type', make_new_node => 1)->inner_text;
-          if (!{qw/IMPLIED 1 REQUIRED 1/}->{$dt}) {
-            my $dv = $_->get_attribute ('default_value')->inner_text;
+          my $dt = $_->get_attribute_value ('default_type');
+          if (not {qw/IMPLIED 1 REQUIRED 1/}->{$dt}) {
+            my $dv = $_->get_attribute_value ('default_value');
             $dv =~ s/\x20\x20+/\x20/g;
             $dv =~ s/^\x20+//;  $dv =~ s/\x20+$//;
             if ({qw/ID 1 IDREF 1 NOTATION 1/}->{$type}) {
               if ($type eq 'ID') {
-                $self->{error}->raise_error ($attlist, type => 'VC_ID_ATTR_DEFAULT',
+                $self->{error}->raise_error ($attlist,
+                                             type => 'VC_ID_ATTR_DEFAULT',
                                              t => [$element_qname, $attr_qname]);
                 $valid = 0;
               }
               if ($dv !~ /^$xml_re{Name}$/) {
-                $self->{error}->raise_error ($attlist, type => 'VC_ATTR_DEFAULT_LEGAL_VAL_IS_NAME',
+                $self->{error}->raise_error ($attlist,
+                                             type => 'VC_ATTR_DEFAULT_LEGAL_VAL_IS_NAME',
                                              t => [$dv, $type]);
                 $valid = 0;
               } elsif (index ($dv, ':') > -1) {
-                $self->{error}->raise_error ($attlist, type => 'VALID_NS_NAME_IS_NCNAME',
+                $self->{error}->raise_error ($attlist,
+                                             type => 'VALID_NS_NAME_IS_NCNAME',
                                              t => $dv);
                 $valid = 0;
               }
@@ -286,7 +290,7 @@ sub _validate_attlist_declaration ($$;%) {
                 $valid = 0;
               }
             } else {	## IDREFS
-              if ($dv !~ /^$xml_re{Name}(\x20$xml_re{Name})*$/) {
+              if ($dv !~ /^$xml_re{Name}(?:\x20$xml_re{Name})*$/) {
                 $self->{error}->raise_error ($attlist, type => 'VC_ATTR_DEFAULT_LEGAL_VAL_IS_NAMES',
                                              t => [$dv, $type]);
                 $valid = 0;
@@ -308,8 +312,7 @@ sub _validate_attlist_declaration ($$;%) {
                   $defined{$element_qname}->{'>'.$type.'<'} = $attr_qname;
                   if ($type eq 'NOTATION') {
                     if ($edef{$element_qname}) {
-                      if ($edef{$element_qname}->get_attribute ('content',
-                                                                make_new_node => 1)->inner_text
+                      if ($edef{$element_qname}->get_attribute_value ('content')
                           eq 'EMPTY') {
                         $self->{error}->raise_error ($attlist,
                                                      type => 'VC_NO_NOTATION_ON_EMPTY_ELEMENT',
@@ -322,8 +325,9 @@ sub _validate_attlist_declaration ($$;%) {
           }	# NOTATION or ID
         } elsif ($type eq 'enum') {
           for my $enum (@{$_->{node}}) {
-            if ($enum->{type} eq '#element' && $enum->{namespace_uri} eq $NS{XML}.'attlist',
-                $enum->{local_name} eq 'enum') {
+            if ($enum->{type} eq '#element'
+            and $enum->{namespace_uri} eq $NS{XML}.'attlist'
+            and $enum->{local_name} eq 'enum') {
               my $enum_val = $enum->inner_text;
               if ($defined{$element_qname}->{'>enum<'}->{$enum_val}) {
                 $self->{error}->raise_error ($attlist,
@@ -370,7 +374,7 @@ sub _validate_notation_declared ($$;%) {
     $opt{entMan}->get_entities ($l, parent_node => $c, type => '#pi', namespace_uri => '');
     for my $pi (@$l) {
       my $nname = $pi->local_name;
-      if ($defined{$nname} > 0
+      if (($defined{$nname} and $defined{$nname} > 0)
        || $opt{entMan}->get_entity ($nname, namespace_uri => $NS{SGML}.'notation')) {
         $defined{$nname} = 1;
       } else {
@@ -408,11 +412,11 @@ sub _validate_document_instance ($$;%) {
 sub _validate_element ($$$) {
   my ($self, $node, $opt) = @_;
   my $valid = 1;
-  ## DEBUG: 
-  Carp::croak join qq!\t!, caller(0) unless eval q{$node->qname};
+  ### DEBUG: 
+  #Carp::croak join qq!\t!, caller(0) unless eval q{$node->qname};
   my $qname = $node->qname;
   unless ($opt->{_element}->{$qname}) {
-    $opt->{_element}->{$qname} = $opt->{entMan}->is_declared_entity ($qname,
+    $opt->{_element}->{$qname} = $opt->{entMan}->get_entity ($qname,
                                                  namespace_uri => $NS{SGML}.'element');
     unless ($opt->{_element}->{$qname}) {
       $self->{error}->raise_error ($node, type => 'VC_ELEMENT_VALID_DECLARED', t => $qname);
@@ -434,7 +438,7 @@ sub _validate_element ($$$) {
       my $attr_qname = $_->qname;
       $specified{$attr_qname} = 1;	## defined explicilly or by default declaration
       my $attrdef = $opt->{_attrs}->{$qname}->{attr}->{$attr_qname};
-      if ($attrdef) {
+      if (ref $attrdef) {
         my $attr_type = $attrdef->get_attribute ('type', make_new_node => 1)->inner_text;
         my $attr_value = $_->inner_text;
         my $attr_deftype = $attrdef->get_attribute ('default_type', make_new_node => 1)->inner_text;
@@ -551,13 +555,13 @@ sub _validate_element ($$$) {
   
   for my $attr_qname (keys %{$opt->{_attrs}->{$qname}->{attr}}) {
     my $attrdef = $opt->{_attrs}->{$qname}->{attr}->{$attr_qname};
-    if ($attrdef->get_attribute ('default_type', make_new_node => 1)->inner_text
-        eq 'REQUIRED') {
+    if ($attrdef->get_attribute_value ('default_type') eq 'REQUIRED') {
       unless ($specified{$attr_qname}
-       || ($attr_qname eq 'xmlns' && $node->{ns_specified}->{''})
+       || ($attr_qname eq 'xmlns' and $node->{ns_specified}->{''})
        || (substr ($attr_qname, 0, 6) eq 'xmlns:'
-           && defined $node->{ns_specified}->{substr $attr_qname, 6})) {
-        $self->{error}->raise_error ($node, type => 'VC_REQUIRED_ATTR', t => [$qname, $attr_qname]);
+           and defined $node->{ns_specified}->{substr $attr_qname, 6})) {
+        $self->{error}->raise_error ($node, type => 'VC_REQUIRED_ATTR',
+                                     t => [$qname, $attr_qname]);
         $valid = 0;
       }
     }
@@ -565,8 +569,8 @@ sub _validate_element ($$$) {
   
   ## Content check
   my $cmodel = ref $opt->{_element}->{$qname}
-               ? $opt->{_element}->{$qname}->get_attribute ('content',
-                                                            make_new_node => 1)->inner_text
+               ? $opt->{_element}->{$qname}->get_attribute_value ('content',
+                                                                  default => '')
                : 'ANY';
   if ($cmodel eq 'EMPTY') {
     if ($has_child) {
@@ -622,9 +626,10 @@ sub _validate_element ($$$) {
             if ($_->{local_name} eq 'group') {
               push @r, &$make_cmodel_arraytree ($_);
             } elsif ($_->{local_name} eq 'element') {
-              push @r, {qname => ($_->get_attribute ('qname', make_new_node => 1)->inner_text),
-                        occurence => ($_->get_attribute ('occurence',
-                                                          make_new_node => 1)->inner_text || '1')};
+              push @r, {qname => ($_->get_attribute_value ('qname')),
+                        occurence => ($_->get_attribute_value
+                                            ('occurence', default => '1')),
+                        type => 'element'};
             }
           }
         }
@@ -863,4 +868,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/17 09:17:13 $
+1; # $Date: 2003/10/31 08:41:35 $

@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXMLChar
                         InXML_deprecated_noncharacter InXML_unicode_xml_not_suitable!;
 require Message::Markup::XML;
@@ -120,8 +120,8 @@ $xml_re{CDSect_M} = qr/<!\[CDATA\[((?:(?!\]\]>).)*)\]\]>/s;
 # [39] element = EmptyElemTag / STag content ETag
 # [40] STag = "<" Name *(S Attribute) [S] ">"
 # [41] Attribute = Name Eq AttValue
-$xml_re{Attribute} = qr/$xml_re{Name}(?:$xml_re{s})?=(?:$xml_re{s})?$xml_re{__AttValue_simple}/s;
-$xml_re{Attribute_M} = qr/($xml_re{Name})(?:$xml_re{s})?=(?:$xml_re{s})?($xml_re{__AttValue_simple})/s;
+#$xml_re{Attribute} = qr/$xml_re{Name}(?:$xml_re{s})?=(?:$xml_re{s})?$xml_re{__AttValue_simple}/s;
+#$xml_re{Attribute_M} = qr/($xml_re{Name})(?:$xml_re{s})?=(?:$xml_re{s})?($xml_re{__AttValue_simple})/s;
 #$xml_re{STag} = qr/<$xml_re{Name}(?:$xml_re{s}$xml_re{Attribute})*(?:$xml_re{s})?>/s;
 # [42] ETag = "</" Name [S] ">"
 $xml_re{ETag_M} = qr!</($xml_re{Name})(?:$xml_re{s})?>!s;
@@ -130,7 +130,7 @@ $xml_re{ETag_M} = qr!</($xml_re{Name})(?:$xml_re{s})?>!s;
 #                ;; 1.0 FE-errata & 1.0 SE
 # [44] EmptyElemTag = "<" Name *(S Attribute) [S] "/>"
 #$xml_re{__STag_or_EmptyElemTag} = qr!<$xml_re{Name}(?:$xml_re{s}$xml_re{Attribute})*(?:$xml_re{s})?/?>!s;
-$xml_re{__STag_or_EmptyElemTag_simple} = qr!<$xml_re{ame}(?:$xml_re{s}|$xml_re{Name}|$xml_re{__AttValue_simple}|=)*/?>!s;
+#$xml_re{__STag_or_EmptyElemTag_simple} = qr!<$xml_re{Name}(?:$xml_re{s}|$xml_re{Name}|$xml_re{__AttValue_simple}|=)*/?>!s;
 # [45] elementdecl = '<!ELEMENT' S Name S contentspec [S] ">"
 # [46] contentspec = 'EMPTY' / 'ANY' / Mixed / children
 #$xml_re{__contentspec_simple} = qr/(?:$xml_re{Name}|\#PCDATA|[()|,?*+]|$xml_re{s})/s;
@@ -615,7 +615,7 @@ sub _parse_start_tag ($$\$$;%) {
           $self->_parse_attr_value_literal_data ($attr_node, \$pcdata, $o, entMan => $opt{entMan});
           $self->_clp (_ => $o);
           
-          if ($attr_pfx eq 'xmlns') {
+          if (defined $attr_pfx and $attr_pfx eq 'xmlns') {
             $c->{ns_specified}->{$attr_lname} = $attr_node;
             $attr_node->namespace_uri ($NS{xmlns});
             $attr_node->{parent} = $c;	## Note: This code might be dangerous.
@@ -645,8 +645,8 @@ sub _parse_start_tag ($$\$$;%) {
         $self->_raise_error ($o, type => 'SYNTAX_ATTR_NAME_OMITTED', t => $attr_qname);
         $attr_node->append_text ($attr_qname);
       }
-    } elsif ($$s =~ s!^($xml_re{s})?(/)?>!!s) {
-      $self->_clp ($1.$2.'>');
+    } elsif ($$s =~ s!^((?:$xml_re{s})?(/)?>)!!s) {
+      $self->_clp ($1);
       $c->option (use_EmptyElemTag => 1) if $2;
       last;
     } elsif (substr ($$s, 0, 1) eq '<') {
@@ -2008,4 +2008,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/27 07:59:11 $
+1; # $Date: 2003/10/31 08:41:35 $

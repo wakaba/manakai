@@ -16,7 +16,7 @@ This module is part of manakai XML.
 
 package Message::Markup::XML::QName;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NCNameStartChar InXMLNCNameChar!;
 use Exporter;
 our @ISA = qw/Exporter/;
@@ -181,6 +181,7 @@ sub __check_name ($$$) {
   return {success => 1, name => $name};
 }
 
+sub prefix_to_name ($$;%);
 sub prefix_to_name ($$;%) {
   my ($decls, $prefix, %opt) = @_;
   if ($opt{check_prefix}) {
@@ -191,18 +192,19 @@ sub prefix_to_name ($$;%) {
     $prefix = DEFAULT_PFX if $prefix eq '';
   }
   
-  if ($decls->{ns}->{$prefix} eq NULL_URI) {
+  my $decls_name = $decls->{ns}->{$prefix};
+  $decls_name = '' unless defined $decls_name;
+  if ($decls_name eq NULL_URI) {
     if ($opt{use_name_null} && ($prefix eq DEFAULT_PFX)) {
       return {success => 1, prefix => $prefix, name => NULL_URI};
     } else {
       return {success => 0, prefix => $prefix, reason => '__NOT_FOUND'};
     }
-  } elsif (length $decls->{ns}->{$prefix}) {
-    if ($decls->{ns}->{$prefix} eq UNDEF_URI) {
+  } elsif (length $decls_name) {
+    if ($decls_name eq UNDEF_URI) {
       return {success => 0, prefix => $prefix, reason => '__NOT_FOUND'};
     } else {
-      return {success => 1, prefix => $prefix,
-              name => $decls->{ns}->{$prefix}};
+      return {success => 1, prefix => $prefix, name => $decls_name};
     }
   } else {
     if ($opt{ask_parent_node} && ref $decls->{parent}) {    
@@ -218,6 +220,7 @@ sub prefix_to_name ($$;%) {
   }
 }
 
+sub name_to_prefix ($$;%);
 sub name_to_prefix ($$;%) {
   my ($decls, $name, %opt) = @_;
   if ($opt{check_name}) {
@@ -225,10 +228,11 @@ sub name_to_prefix ($$;%) {
     return $chk unless $chk->{success};
     $name = $chk->{name};
   } else {
-    $name = NULL_URI if $name eq '';
+    $name = NULL_URI if not defined $name or $name eq '';
   }
   for my $prefix (%{$decls->{ns}||{}}) {
-    if ($decls->{ns}->{$prefix} eq $name) {
+    if (defined $decls->{ns}->{$prefix}
+    and $decls->{ns}->{$prefix} eq $name) {
       if (!$opt{use_prefix_default} && ($prefix eq DEFAULT_PFX)) {
         #return {success => 0, name => $name, reason => '__NOT_FOUND'};
       } else {
@@ -236,13 +240,19 @@ sub name_to_prefix ($$;%) {
       }
     }
   }
-  if ($opt{ask_parent_node} && ref $decls->{parent}) {    
-    return name_to_prefix ($decls->{parent}->_get_ns_decls_node, $name, %opt,
-                           check_name => 0);
-  } else {
+  if ($opt{ask_parent_node} and ref $decls->{parent}) {
+    ## Document element node will not have parent decls node
+    my $decl_node = $decls->{parent}->_get_ns_decls_node (default => 0);
+    if (ref $decl_node) {  
+      return name_to_prefix ($decls->{parent}->_get_ns_decls_node, $name, %opt,
+                             check_name => 0);
+    }
+  }
+
     if ($opt{use_prefix_default} && ($name eq NULL_URI)) {
       $decls->{ns}->{(DEFAULT_PFX)} = NULL_URI
-        if $decls->{ns}->{(DEFAULT_PFX)} ne NULL_URI;
+        if (not $decls->{ns}->{(DEFAULT_PFX)}
+        or $decls->{ns}->{(DEFAULT_PFX)} ne NULL_URI);
       return {success => 1, name => $name, prefix => DEFAULT_PFX};
     } elsif ($opt{make_new_prefix}) {
       return register_prefix_to_name ($decls,
@@ -252,7 +262,7 @@ sub name_to_prefix ($$;%) {
     } else {
       return {success => 0, name => $name, reason => '__NOT_FOUND'};
     }
-  }
+  
 }
 
 sub generate_prefix ($;$%) {
@@ -311,7 +321,7 @@ sub expanded_name_to_qname ($$$;%) {
 sub split_qname ($;%) {
   my ($qname, %opt) = @_;
   $opt{qname_separator} ||= ':';
-  my ($pfx, $ln) = split $opt{qname_separator}, $qname, 2;
+  my ($pfx, $ln) = split /\Q$opt{qname_separator}/, $qname, 2;
   
   if ($opt{check_qname}) {
     if ((substr ($qname, 0,  1) eq $opt{qname_separator})
@@ -345,7 +355,7 @@ sub split_qname ($;%) {
 
 sub join_qname ($$;%) {
   my ($pfx, $ln, %opt) = @_;
-  $pfx ||= DEFAULT_PFX;
+  $pfx ||= DEFAULT_PFX unless defined $pfx and $pfx eq '0';
   $opt{qname_separator} ||= ':';
   if ($opt{check_qname} || $opt{check_prefix}) {
     if ($pfx ne DEFAULT_PFX) {
@@ -391,4 +401,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/10/31 05:00:05 $
+1; # $Date: 2003/10/31 08:41:35 $

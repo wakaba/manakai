@@ -21,7 +21,7 @@ This module is part of XML.
 
 package Message::Markup::XML::EntityManager;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 our %NS;
 *NS = \%Message::Markup::XML::NS;
 
@@ -143,7 +143,12 @@ sub _get_entities ($$$$) {
   return undef unless ref $nodes;
   for (@$nodes) {
     next if $_->{flag}->{smxp__non_processed_declaration};
-    if (($_->{type} eq $o->{type}) && ($_->{namespace_uri} eq $o->{namespace_uri})) {
+    if (($_->{type} eq $o->{type})
+    and (
+      (     defined $o->{namespace_uri}
+        and defined $_->{namespace_uri}
+        and $_->{namespace_uri} eq $o->{namespace_uri})
+    or (not defined $o->{namespace_uri} and not defined $_->{namespace_uri}))) {
       push @$l, $_;
     } elsif ($_->{type} eq '#reference' || $_->{type} eq '#element') {
       $self->_get_entities ($l, $_->{node}, $o);
@@ -170,15 +175,16 @@ sub get_attr_definitions ($%) {
   $self->_get_entities ($l, $o{parent_node}->{node}, \%o);
   $r{declaration} = [];
   for (@$l) {
-    if ($_->get_attribute ('qname', make_new_node => 1)->inner_text eq $o{qname}) {
+    if ($_->get_attribute_value ('qname') eq $o{qname}) {
       push @{$r{declaration}}, $_;
     }
   }
   for my $decl (@{$r{declaration}}) {
     for (@{$decl->{node}}) {
-      if ($_->{type} eq '#element' && $_->{namespace_uri} eq $NS{XML}.'attlist',
-          $_->{local_name} eq 'AttDef') {
-        my $aname = $_->get_attribute ('qname', make_new_node => 1)->inner_text;
+      if ($_->{type} eq '#element'
+      and $_->{namespace_uri} eq $NS{XML}.'attlist'
+      and $_->{local_name} eq 'AttDef') {
+        my $aname = $_->get_attribute_value ('qname');
         if ($r{attr}->{$aname}) {
           # 
         } else {
@@ -204,7 +210,7 @@ sub get_external_entity ($$$$;%) {
   my $declns = ref $decl ? $decl->namespace_uri : '#document';
   my $name = ref $decl ?
     ($declns eq $NS{SGML}.'doctype' ?
-             ($decl->get_attribute ('qname', make_new_node => 1)->inner_text
+             ($decl->get_attribute_value ('qname')
               || '#IMPLIED') :
              $decl->local_name) :
     $opt{uri};
@@ -557,4 +563,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/27 07:59:11 $
+1; # $Date: 2003/10/31 08:41:35 $
