@@ -1,4 +1,6 @@
 Namespace:
+  @DOMCore:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @lang:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @perl:
@@ -26,7 +28,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/13 03:06:34 $
+     $Date: 2004/09/17 07:44:11 $
 
   @Feature:
     @@QName: 
@@ -309,12 +311,12 @@ IF:
     @@Description:
       @@@lang:en
       @@@@: 
-        Construct a new ManakaiDOMNodeObject object.
+        Construct a new "ManakaiDOMNodeObject" object.
     @@Return:
       @@@Type: ManakaiDOMNodeObject
       @@@Description:
         @@@@lang:en
-        @@@@@: The new node created.
+        @@@@@: The new "ManakaiDOMNodeObject" created.
       @@@Def:
         @@@@Type:
           lang:Perl
@@ -328,12 +330,19 @@ IF:
             <Q:TreeCore:rc> => 0,
             <Q:TreeCore:treeID> => __CODE{UniqueID}__,
             <Q:TreeCore:nodeID> => __CODE{UniqueID}__,
+            <Q:DOMCore:hasFeature> => {},
           }, ref $self || $self;
   @IntMethod:
     @@Name: newReference
     @@Description:
       @@@lang:en
       @@@@: Return a new reference to the node.
+    @@Param:
+      @@@Name: class
+      @@@Description:
+        @@@@lang:en
+        @@@@@: A class the new reference is blessed with.
+      @@@IsOptional:1
     @@Return:
       @@@Type: ManakaiDOMNodeReference
       @@@Description:
@@ -345,7 +354,8 @@ IF:
         @@@@@:
           $r = bless {
             <Q:TreeCore:node> => $self,
-          }, '__CLASS{ManakaiDOMNodeReference}__';
+          }, ref $class ? ref $class : $class ? $class :
+             '__CLASS{ManakaiDOMNodeReference::}__';
           $self->{<Q:TreeCore:rc>}++;
   @IntMethod:
     @@Name: isExternallyReferred
@@ -553,7 +563,7 @@ IF:
           lang:Perl
         @@@@@:
           if (ref $node and
-              $node->isa ('__IF{ManakaiDOMNodeObject}__') and
+              $node->isa ('__IF{ManakaiDOMNodeObject::}__') and
               $node->{<Q:TreeCore:nodeID>} eq $self->{<Q:TreeCore:nodeID>}) {
             $r = true;
           }

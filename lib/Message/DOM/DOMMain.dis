@@ -62,7 +62,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/13 03:06:34 $
+     $Date: 2004/09/17 07:44:11 $
   @Require:
     @@Module:
       @@@Def:
@@ -880,7 +880,7 @@ DataType:
         Unmatched surrogates count as a single UTF-16 value.
       \
         This method is taken from the "StringExtend" informative interface.
-    @@Level: 3
+    @@SpecLevel: 3
     @@Param:
       @@@Name: offset32
       @@@Type: unsigned-long
@@ -929,7 +929,7 @@ DataType:
         Unmatched surrogates count as a single UTF-16 value.
       \
         This method is taken from the "StringExtend" informative interface.
-    @@Level: 3
+    @@SpecLevel: 3
     @@Param:
       @@@Name: offset16
       @@@Type: unsigned-long
@@ -1017,6 +1017,7 @@ DataType:
         Defined as a reference in the Perl binding.
       \
         ISSUE: Need considerations for the interface of this type of objects.
+  @SpecLevel: 2
   @Level: 2
   @Spec:
     @@DOM3[list]:
@@ -1025,6 +1026,7 @@ DataType:
 DataTypeAlias:
   @Name:  DOMUserData
   @Type:  any
+  @SpecLevel: 3
   @Level: 3
   @Spec:
     @@DOM3[list]:
@@ -1036,6 +1038,7 @@ DataTypeAlias:
 DataTypeAlias:
   @Name:  DOMObject
   @Type:  Object
+  @SpecLevel: 3
   @Level: 3
   @Spec:
     @@DOM3[list]:
@@ -1046,6 +1049,7 @@ DataTypeAlias:
 
 IF:
   @Name:  DOMImplementationRegistry
+  @SpecLevel: 3
   @Level[list]: 3
   @Spec:
     @@DOM3[list]:
@@ -1109,10 +1113,12 @@ IF:
          @@@@Type:
            lang:Perl
          @@@@@:
-           for (@$self) {
-             $r = __DEEP{ $_->getDOMImplementation ($features) }__;
-             last if defined $r;
-           }
+           __DEEP{
+             for (@$self) {
+               $r = $_->getDOMImplementation ($features);
+               last if defined $r;
+             }
+           }__;
   @Method:
      @@Name:  getDOMImplementationList
      @@Param:

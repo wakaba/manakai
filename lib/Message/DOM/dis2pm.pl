@@ -122,6 +122,8 @@ sub perl_package_name (%) {
   my $r;
   if ($opt{if}) {
     $r = $ManakaiDOMModulePrefix . q<::IF::> . perl_name $opt{if};
+  } elsif ($opt{iif}) {
+    $r = $ManakaiDOMModulePrefix . q<::IIF::> . perl_name $opt{iif};
   } elsif ($opt{name} or $opt{name_with_condition}) {
     if ($opt{name_with_condition}) {
       if ($opt{name_with_condition} =~ /^([^:]+)::([^:]+)$/) {
@@ -136,7 +138,7 @@ sub perl_package_name (%) {
     $r = $ManakaiDOMModulePrefix . q<::> . $opt{name};
   } elsif ($opt{qname} or $opt{qname_with_condition}) {
     if ($opt{qname_with_condition}) {
-      if ($opt{qname_with_condition} =~ /^(.+)::(.+)$/) {
+      if ($opt{qname_with_condition} =~ /^(.+)::([^:]*)$/) {
         $opt{qname} = $1;
         $opt{condition} = $2;
       } else {
@@ -231,18 +233,18 @@ sub perl_code ($;%) {
   }{
     my ($name, $data) = ($1, $2);
     my $r;
-    if ($name eq 'CLASS') {       ## Manakai DOM Class Name
-      $r = perl_package_name name => $data;
-    } elsif ($name eq 'SUPER') {  ## Manakai DOM Class Name
+    if ($name eq 'CLASS' or      ## Manakai DOM Class
+        $name eq 'SUPER' or      ## Manakai DOM Class (internal)
+        $name eq 'IIF' or        ## DOM Interface + Internal interface & prop
+        $name eq 'IF') {         ## DOM Interface
       local $Status->{condition} = $Status->{condition};
-      if ($data =~ s/::([^:]+)$//) {
+      if ($data =~ s/::([^:]*)$//) {
         $Status->{condition} = $1;
       }
-      $r = perl_package_name name => $data,
-                             is_internal => 1,
+      $r = perl_package_name {qw/CLASS name SUPER name IIF iif IF if/}->{$name}
+                                         => $data,
+                             is_internal => {qw/SUPER 1/}->{$name},
                              condition => $Status->{condition};
-    } elsif ($name eq 'IF') {     ## DOM Interface Name
-      $r = perl_package_name if => $data;
     } elsif ($name eq 'INT') {    ## Internal Method / Attr Name
       if (defined $data) {
         if ($data =~ /^{(\w+)}$/) {
@@ -304,9 +306,7 @@ sub perl_builtin_code ($%) {
   my ($name, %opt) = @_;
   $opt{condition} ||= $Status->{condition};
   my $r;
-  if ($name eq 'DOMString' or
-      $name eq 'ManakaiDOMNamespaceURI' or
-      type_isa ($name, ExpandedURI q<DOMMain:DOMString>)) {
+  if ($name eq 'DOMString') {
     $name = $1 if $name =~ /(\w+)$/;
     $r = q{
           if (defined $arg) {
@@ -321,33 +321,33 @@ sub perl_builtin_code ($%) {
             } else {
               $r = bless {value => $arg}, $self;
             }
-            ##IFEMPTY
           } else {
             $r = undef; # null
           }
     };
     $r =~ s/'IF'/perl_literal (perl_package_name (if => $name))/ge;
-    $r =~ s/\$self\b/perl_literal (perl_package_name (name => $name))/ge;
+    $r =~ s/\$self\b/perl_literal (perl_package_name (name => $name))/ge; 
     $opt{s} or valid_err q<Built-in code parameter "s" required>;
-    if ($name eq 'ManakaiDOMNamespaceURI') {
-      my $t = perl_statement perl_exception
+    $r =~ s/\$arg\b/\$$opt{s}/g;
+    $opt{r} or valid_err q<Built-in code parameter "r" required>;
+    $r =~ s/\$r\b/\$$opt{r}/g;
+    $r =~ s/\$$opt{r} = \$$opt{s};/#/g if $opt{r} eq $opt{s}; 
+  } elsif (type_isa ($name, ExpandedURI q<ManakaiDOM:ManakaiDOMNamespaceURI>)) {
+    $r = perl_statement perl_exception
                 (level => 'WARNING',
                  class => 'ManakaiDOMImplementationWarning',
                  type => 'MDOM_NS_EMPTY_URI',
                  param => {
                    ExpandedURI q<MDOM_EXCEPTION:param-name> => $opt{s},
                  });
-      if ($opt{condition} and $opt{condition} ne 'DOM2') {
-        $t .= perl_statement q<$r = undef>;
-      }
-      $r =~ s/##IFEMPTY/q<if ($r eq '') {>.$t.q<}>/ge;
-    } else {
-      $r =~ s/##IFEMPTY//g;
+    if ($opt{condition} and $opt{condition} ne 'DOM2') {
+      $r .= perl_statement q<$out = undef>;
     }
-    $r =~ s/\$arg\b/\$$opt{s}/g;
+    $r = perl_if (q<defined $in and $in eq ''>, $r);
+    $opt{s} or valid_err q<Built-in code parameter "s" required>;
+    $r =~ s/\$in\b/\$$opt{s}/g;
     $opt{r} or valid_err q<Built-in code parameter "r" required>;
-    $r =~ s/\$r\b/\$$opt{r}/g;
-    $r =~ s/\$$opt{r} = \$$opt{s};/#/g if $opt{r} eq $opt{s};
+    $r =~ s/\$out\b/\$$opt{r}/g;
   } elsif ($name eq 'UniqueID') {
     $r = q{(
       sprintf 'mid:%d.%d.%s.dom.manakai@suika.fam.cx',
@@ -598,6 +598,7 @@ sub perl_if ($$;$) {
 sub ops2perl () {
   my $result = '';
   if ($Status->{Operator}->{DESTROY}) {
+    $result .= perl_statement q<sub DESTROY ($)>;
     $result .= perl_statement
                  perl_assign
                       perl_var (type => '*', local_name => 'DESTROY')
@@ -949,7 +950,8 @@ sub get_description ($%) {
 
 sub get_level_description ($%) {
   my ($node, %opt) = @_;
-  my @l = @{$node->get_attribute_value ('Level', default => [], as_array => 1)};
+  my @l = @{$node->get_attribute_value ('SpecLevel', default => [],
+                                        as_array => 1)};
   unless (@l) {
     my $min = $opt{level}->[0] || 1;
     for ($min..$MAX_DOM_LEVEL) {
@@ -1266,6 +1268,7 @@ sub if2perl ($) {
                                = perl_name $node->get_attribute_value ('Name'),
                                            ucfirst => 1;
   my $if_pack_name = perl_package_name if => $if_name;
+  my $iif_pack_name = perl_package_name iif => $if_name;
   local $Status->{IF} = $if_name;
   local $Status->{if} = {}; ## Temporary data
   local $Info->{Namespace} = {%{$Info->{Namespace}}};
@@ -1290,6 +1293,8 @@ sub if2perl ($) {
     }
     local $Status->{condition} = $condition;
     my $cond_if_pack_name = perl_package_name if => $if_name,
+                                    condition => $condition;
+    my $cond_iif_pack_name = perl_package_name iif => $if_name,
                                     condition => $condition;
     my $cond_pack_name = perl_package_name name => $if_name,
                                     condition => $condition;
@@ -1317,7 +1322,10 @@ sub if2perl ($) {
                                      condition => $_,
                                      is_internal => 1;
       }
-      $result .= perl_inherit [@isaa, $cond_if_pack_name] => $cond_int_pack_name;
+      $result .= perl_inherit [@isaa, $cond_iif_pack_name]
+                                              => $cond_int_pack_name;
+      $result .= perl_inherit [$cond_if_pack_name, $iif_pack_name]
+                                              => $cond_iif_pack_name;
       $result .= perl_inherit [$if_pack_name] => $cond_if_pack_name;
     } else { ## No condition specified
       if ($Info->{NormalCondition}) {
@@ -1326,11 +1334,12 @@ sub if2perl ($) {
                                      is_internal => 1]
                               => $cond_int_pack_name;
       } else {  ## Condition not used
-        $result .= perl_inherit [$if_pack_name] => $cond_int_pack_name;
+        $result .= perl_inherit [$iif_pack_name] => $cond_int_pack_name;
       }
+      $result .= perl_inherit [$if_pack_name] => $iif_pack_name;
     }
     for my $pack ($cond_pack_name, $cond_int_pack_name,
-                  $cond_if_pack_name) {
+                  $cond_iif_pack_name, $cond_if_pack_name) {
       $result .= perl_statement perl_assign
                    perl_var (type => '$',
                              package => {full_name => $pack},
@@ -1372,7 +1381,7 @@ sub if2perl ($) {
       } elsif ($_->local_name eq 'Require') {
         $result .= req2perl ($_, level => \@level, condition => $condition);
       } elsif ({qw/Name 1 Spec 1 ISA 1 Description 1
-                   Level 1 ImplNote 1/}->{$_->local_name}) {
+                   Level 1 SpecLevel 1 ImplNote 1/}->{$_->local_name}) {
         #
       } else {
         valid_warn qq{Element @{[$_->local_name]} not supported};
@@ -1449,7 +1458,7 @@ sub method2perl ($;%) {
                                              default => 'DOMMain:any');
         push @param_list, '$' . $name;
         push @param_desc, pod_item (pod_code '$' . $name);
-        if (type_isa $type, ExpandedURI q<DOMMain:DOMString>) {
+        if (type_isa $type, ExpandedURI q<ManakaiDOM:ManakaiDOMNamespaceURI>) {
           push @param_domstring, [$name, $type];
         }
         push my @param_desc_val,
@@ -1529,7 +1538,7 @@ sub method2perl ($;%) {
               type_expanded_uri $return->get_attribute_value
                                          ('Type',
                                           default => q<DOMMain:any>);
-        if (type_isa $type, ExpandedURI q<DOMMain:DOMString>) {
+        if (type_isa $type, ExpandedURI q<ManakaiDOM:ManakaiDOMNamespaceURI>) {
           $code .= perl_builtin_code $type,
                                      s => 'r', r => 'r',
                                      condition => $opt{condition};
@@ -1651,7 +1660,11 @@ sub method2perl ($;%) {
      if $int_code_node;
 
   if (my $op = get_perl_definition_node $node, name => 'Operator') {
-    $Status->{Operator}->{$op->value} = '\\' . perl_var type => '&', 
+    my $value = $op->value;
+    valid_err qq{Overloaded operator name for "@{[$op->node_path (key => 'Name')
+                 ]}" not specified}
+      unless defined $value;
+    $Status->{Operator}->{$value} = '\\' . perl_var type => '&', 
                                                         local_name => $m_name;
   }
 
@@ -1783,7 +1796,7 @@ sub attr2perl ($;%) {
               type_expanded_uri $return->get_attribute_value
                                          ('Type',
                                           default => q<DOMMain:any>);
-        if (type_isa $type, ExpandedURI q<DOMMain:DOMString>) {
+        if (type_isa $type, ExpandedURI q<ManakaiDOM:ManakaiDOMNamespaceURI>) {
           $code .= perl_builtin_code $type,
                                      s => 'r', r => 'r',
                                      condition => $opt{condition};
@@ -1855,7 +1868,7 @@ sub attr2perl ($;%) {
               type_expanded_uri $set->get_attribute_value
                                          ('Type',
                                           default => q<DOMMain:any>);
-      if (type_isa $type, ExpandedURI q<DOMMain:DOMString>) {
+      if (type_isa $type, ExpandedURI q<ManakaiDOM:ManakaiDOMNamespaceURI>) {
         $set_code = perl_builtin_code ($type,
                                        s => 'given', r => 'given',
                                        condition => $opt{condition})
@@ -2041,7 +2054,7 @@ sub datatype2perl ($;%) {
                   ->{isa_uri}||=[]},
            type_expanded_uri $_->value;
     } elsif ({qw/Name 1 Spec 1 Description 1
-                 Level 1 Def 1 ImplNote 1/}->{$_->local_name}) {
+                 Level 1 SpecLevel 1 Def 1 ImplNote 1/}->{$_->local_name}) {
       #
     } else {
       valid_warn qq{Element @{[$_->local_name]} not supported};
@@ -2099,7 +2112,7 @@ sub datatypealias2perl ($;%) {
 
   for (@{$node->child_nodes}) {
     if ({qw/Name 1 Spec 1 Type 1 Description 1
-            Level 1 Condition 1 ImplNote 1/}->{$_->local_name}) {
+            Level 1 SpecLevel 1 Condition 1 ImplNote 1/}->{$_->local_name}) {
       #
     } else {
       valid_warn qq{Element @{[$_->local_name]} not supported};
@@ -2191,7 +2204,8 @@ sub exception2perl ($;%) {
                              package => $pack_name,
                              any_unless_condition => 1);
     } elsif ({qw/Name 1 Spec 1 Description 1
-                 Level 1 Condition 1 ImplNote 1/}->{$_->local_name}) {
+                 Level 1 SpecLevel 1 Condition 1
+                 ImplNote 1/}->{$_->local_name}) {
       #
     } else {
       valid_warn qq{Element @{[$_->local_name]} not supported};
@@ -2257,7 +2271,7 @@ sub constgroup2perl ($;%) {
                                        => $opt{any_unless_condition});
         $i++;
       } elsif ({qw/Name 1 Spec 1 ISA 1 Description 1
-                   Level 1 Def 1 ImplNote 1/}->{$_->local_name}) {
+                   Level 1 SpecLevel 1 Def 1 ImplNote 1/}->{$_->local_name}) {
         #
       } else {
         valid_warn qq{Element @{[$_->local_name]} not supported};
@@ -2311,12 +2325,10 @@ sub const2perl ($;%) {
     $result = perl_sub name => $longname, prototype => '',
                        code => my $code = get_value_literal
                                                 $node, name => 'Value';
-    $result .= perl_statement
-                 perl_assign
-                      perl_var (type => '*',
-                                package => {full_name => $Info->{Package}},
-                                local_name => $name)
-                   => '\&' . $longname
+    $result .= perl_sub name => perl_var (package => {full_name
+                                                     => $Info->{Package}},
+                                         local_name => $name), prototype => '',
+                       code => $code
        if $opt{package} and $Info->{Package} ne $opt{package};
     my $desc_template = get_perl_definition_node ($node);
     if ($desc_template) {
@@ -2769,6 +2781,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/09/15 04:05:39 $
+# $Date: 2004/09/17 07:44:11 $
 
 

@@ -1,3 +1,22 @@
+2004-09-17  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMMain.dis: 'SpecLevel' attribute added.
+
+	* idl2dis.pl (level): Set 'SpecLevel' attribute as well as 'Level'.
+
+	* dis2pm.pl (get_level_description): Attribute name to see is
+	changed from 'Level' to 'SpecLevel'
+	(const2perl): Don't hardlink constant not to be warned
+	by perl -w.
+	(ops2perl): Declare subroutine 'DESTROY' not to be warned by
+	perl -w.
+
+	* ManakaiDOM.dis (newReference): New parameter 'class' introduced.
+
+	* dis2pm.pl (perl_builtin_code:<ManakaiDOM:ManakaiDOMNamespaceURI>): 
+	Separeted from "DOMString".
+	(if2perl, attr2perl): Don't cast to DOMString.
+
 2004-09-15  Wakaba  <wakaba@suika.fam.cx>
 
 	* dis2pm.pl (perl_builtin_code): __CODE{CheckNCName}__ implemented.
