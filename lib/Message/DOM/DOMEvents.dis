@@ -19,7 +19,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/29 12:17:42 $
+      $Date: 2004/12/31 12:03:39 $
     @@ContentType:
       dis:Date.RCS
 
@@ -29,9 +29,6 @@ Module:
   @Require:
      @@Module:
         @@@Name:  DOMCore
-## TODO:
-#     @@Module:
-#        @@@Name:  DOMViews
     @@Module:
       @@@Name: DOMEvents
       @@@WithFor:
@@ -116,14 +113,14 @@ FeatureDef:
     @@FullName: DOM Level 2 Events
     @@QName: EventsFeature20
     @@ISA: EventsFeature
-    @@ISA:
+    @@DOMMain:requireFeature:
       DOMCore:CoreFeature20
   @FeatureVerDef:
     @@Version:3.0
     @@FullName: DOM Level 3 Events
     @@QName: EventsFeature30
     @@ISA: EventsFeature20
-    @@ISA:
+    @@DOMMain:requireFeature:
       DOMCore:CoreFeature20
 
 ImplNote:
@@ -167,10 +164,64 @@ ImplNote:
   @ImplNote:
     @@lang:en
     @@@:
+
+ResourceDef:
+  @QName: ManakaiDOMEventNamespaceURI
+  @rdf:type:
+    ManakaiDOM:DataType
+  @ISA:
+    ManakaiDOM:ManakaiDOMNamespaceURI
+  @Description:
+    @@lang:en
+    @@@:
+      An event namespace URI.  In DOM Level 3, an event type is identified 
+      by the pair of namespace URI and local name. 
+  @L3:
+  @For:
+    ManakaiDOM:DOM3
+
+## TODO: inherit of inputNormalizer
+
+ResourceDef:
+  @QName: ManakaiDOMEventLocalName
+  @rdf:type:
+    ManakaiDOM:DataType
+  @ISA:
+    DOMMain:ManakaiDOMXMLName
+  @Description:
+    @@lang:en
+    @@@:
+      An event type name.  In DOM Level 2, it identifies the type of 
+      an event.  In DOM Level 3, a pair of a namespace URI and 
+      a local name identifies an event. 
+  @L2:
+  @For:
+    ManakaiDOM:DOM2
+  @InCase:
+    @@Label:
+      @@@lang:en
+      @@@@:
+        XML 1.0 <CODE::Name>
+    @@Description:
+      @@@lang:en
+      @@@@:
+        In DOM Level 2, an event type must be an XML 1.0 <CODE::Name>. 
       In DOM Level 2 Events, event type names begin with 
       <CODE:DOM> (in any case) was reserved.  Third party added 
       events were strongly recommended to start with 
       some prefix to avoid confusion.
+    @@L2:
+  @InCase:
+    @@Label:
+      @@@lang:en
+      @@@@:
+        XML Namespace 1.0 <CODE::NCName>
+    @@Description:
+      @@@lang:en
+      @@@@:
+        In DOM Level 3, a local name part of an event type should 
+        be a XML Namespace 1.0 <CODE::NCName>.
+    @@L3:
 
 ImplNote:
   @FullName:
@@ -203,65 +254,6 @@ ImplNote:
       the target node is removed during the dispatching or if 
       an ancestor is added or removed, the event propagation 
       will always be based on the nodes determined before the dispatching.
-
-ImplNote:
-  @FullName:
-    @@lang:en
-    @@@: Event Listeners
-  @Description:
-    @@lang:en
-    @@@:
-      Event listeners can be registered on all nodes.  Each event listener 
-      is always part of an event group; it is either explicitly in 
-      a group if a group is specified at the registration or 
-      implicitly in the default group.  Within a group, listeners are 
-      ordered in the order of registration.  Listeners will be triggered 
-      in that order.  If the two listeners are not part of the same 
-      group, the order triggered is not specified.
-      \
-      {NOTE:: In general, a DOM application does not need to define 
-              and use a separate group unless other event listeners, 
-              external to the DOM application, may change the propagation.
-              While the DOM implementation may impose priorities on groups, 
-              DOM applications must not rely on it.
-      \
-      }
-      \
-      {NOTE:: DOM Level 2 did not specify any triggering order.
-      \
-      }
-      \
-      If an event listener is registered on a node while an event 
-      gets processed on the node, the event listener will not be 
-      triggered during the current phase but may be triggered 
-      during a later phase in the event flow.
-      If an event listener is removed from a node while an event 
-      is being processed on the node, it will not be triggered 
-      by the current actions.
-      \
-      {P:: There are two ways to associate an event listener to a node:
-      \
-        - at the programming level:: using the <IF:EventTarget> methods.
-      \
-        - at the document level:: using markup such as XML Events, 
-          HTML, VoiceXML, and so on.
-      \
-      }
-      \
-      Actions taken by an event listener might cause additional 
-      events to be dispatched.  Additional events should be 
-      handled in a synchronous manner and may cause reentrance 
-      into the event model.  A DOM application should not depend 
-      on how many synchronous events may be triggered.
-      \
-      DOM Level 2 Events Specification said that any 
-      exceptions throw inside an <IF:EventListener> will not 
-      stop propagation of the event.
-      \
-      {NOTE:: DOM Level 3 Events Specification does not have 
-              this clause.
-      \
-      }
 
 ElementTypeBinding:
   @Name: DataTypeDef
@@ -377,9 +369,10 @@ ElementTypeBinding:
     @@For:
       ManakaiDOM:DOM2
   @ShadowSibling:
-    @@DOMMain:implementFeature
-    @@For:
-      ManakaiDOM:DOM3
+    @@DOMMain:implementFeature:
+      @@@@: EventsFeature30
+      @@@For:
+        ManakaiDOM:DOM3
 
 ElementTypeBinding:
   @Name: L2IF
@@ -671,6 +664,7 @@ ElementTypeBinding:
       ManakaiDOM:Const
     @@ForCheck:
       ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+
 ElementTypeBinding:
   @Name: XConst
   @ElementType:
@@ -726,11 +720,16 @@ IF:
     @@ForCheck:
       ManakaiDOM:ForClass
   @Role:
-    DOMEvents:ManakaiDOMEvent::ManakaiDOM:ManakaiDOMLatest
+    @@@:
+      DOMEvents:ManakaiDOMEvent::ManakaiDOM:ManakaiDOMLatest
+    @@ForCheck:
+      ManakaiDOM:ForClass
 
   @L2IF:
   @Level[list]:  2
   @SpecLevel[list]:  2  
+
+  @DOMEvents:createEventType: HTMLEvents
 
   @Description:
     @@lang:en
@@ -813,7 +812,9 @@ IF:
        @@@For:
          !ManakaiDOM:DOM3
      @@Get:
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
+        @@@actualType: ManakaiDOMEventLocalName
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -825,32 +826,11 @@ IF:
                     identifies the type of the event.
           \
             }
-        @@@InCase:
-          @@@@Label:
-            @@@@@lang:en
-            @@@@@@: 
-              XML 1.0 <XML:Name>
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The <A:type> should be an XML 1.0 <XML:Name> in DOM Level 2 
-              Events.
-          @@@@SpecLevel:2
-        @@@InCase:
-          @@@@Label:
-            @@@@@lang:en
-            @@@@@@:
-              XML Namespace 1.0 <XML:NCName>
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The <A:type> should be an XML Namespace 1.0 <XML:NCName> 
-              in DOM Level 3 Events.
        @@@Def:
          @@@@ContentType:
            lang:dis
          @@@@GetProp:
-           infoset:localName
+           DOMEvents:type
   @Attr:
      @@Name:  target
      @@Description:
@@ -1036,7 +1016,9 @@ IF:
      @@DOMEvents:NSVariant:.initEventNS
      @@Param:
         @@@Name:  eventTypeArg
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
+        @@@actualType: ManakaiDOMEventLocalName
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -1079,7 +1061,7 @@ IF:
            my $node = $self->{<Q::TreeCore:node>};
            unless ($node->{<Q::DOMEvents:isDispatched>}) {
              $node->{<Q::infoset:namespaceName>} = null;
-             $node->{<Q::infoset:localName>} = $eventTypeArg;
+             $node->{<Q::DOMEvents:type>} = $eventTypeArg;
              $node->{<Q::DOMEvents:bubbles>} = $canBubbleArg;
              $node->{<Q::DOMEvents:cancelable>} = $cancelableArg;
            }
@@ -1093,8 +1075,7 @@ IF:
      @@Get:
         @@@Type: 
           DOMMain:DOMString
-        @@@actualType:
-          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@actualType: ManakaiDOMEventNamespaceURI
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
@@ -1221,8 +1202,7 @@ IF:
         @@@Name:  namespaceURIArg
         @@@Type: 
           DOMMain:DOMString
-        @@@actualType:
-          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@actualType: ManakaiDOMEventNamespaceURI
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -1276,7 +1256,7 @@ IF:
            my $node = $self->{<Q::TreeCore:node>};
            unless ($node->{<Q::DOMEvents:isDispatched>}) {
              $node->{<Q::infoset:namespaceName>} = $namespaceURIArg;
-             $node->{<Q::infoset:localName>} = $eventTypeArg;
+             $node->{<Q::DOMEvents:type>} = $eventTypeArg;
              $node->{<Q::DOMEvents:bubbles>} = $canBubbleArg;
              $node->{<Q::DOMEvents:cancelable>} = $cancelableArg;
            }
@@ -1285,6 +1265,18 @@ IF:
      @@L3:
      @@For:
        ManakaiDOM:DOM3
+
+  @IntMethod:
+    @@Name: new
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Constructs a new instance of <IF::Event>.
+    @@Return:
+      @@@Type: ManakaiDOMEvent
+      @@@PerlDef:
+        my $node = <ClassM::ManakaiDOM:ManakaiDOMNodeObject.new>;
+        $r = $node-><M::ManakaiDOM:ManakaiDOMNodeObject.newReference> ($self);
 ##IF:Events
 
 ElementTypeBinding:
@@ -1328,6 +1320,194 @@ PropDef:
   @dataType:
     DISPerl:MemRef
 
+ResourceDef:
+  @QName: CreateEventType
+  @Description:
+    @@lang:en
+    @@@:
+      A type of event interface.  It is used when creating an 
+      event object by <M::DocumentEvent.createEvent>. 
+          \
+      Event type names that can specify as an <P::eventType> 
+      parameter of <M::DocumentEvent.createEvent> method is 
+      interface names of event objects. 
+          \
+          {FIG:: Examples for event interface names
+            \
+            {eg:: 
+             \
+             - <IF::Event>
+             \
+             - <IF::MouseEvent>
+             \
+             - <IF::UIEvent>
+             \
+             - <IF::MutationEvent>
+             \
+            }
+          \
+          }
+      \
+      {NOTE:: Although DOM levels 2 and 3 both defines <P::eventType> 
+              values to specify an interface name, examples in 
+              the DOM Level 2 Events Specification shows feature 
+              names such as <Feature::UIEvents> by mistake.  
+              DOM Level 3 requests DOM implementations to support 
+              these incorrect names for compatibility. 
+       \
+       }
+  @@InCase:
+    @@@Value:UIEvents
+    @@@Description:
+      @@@@lang:en
+      @@@@@:
+        <IF::UIEvent>.  This name is allowed for backward compatibility. 
+  @@InCase:
+    @@@Value:MouseEvents
+    @@@Description:
+      @@@@lang:en
+      @@@@@:
+        <IF::MouseEvent>.  This name is allowed for backward compatibility. 
+  @@InCase:
+    @@@Value:MutationEvents
+    @@@Description:
+      @@@@lang:en
+      @@@@@:
+        <IF::MutationEvent>.  This name is allowed for backward compatibility. 
+  @@InCase:
+    @@@Value:HTMLEvents
+    @@@Description:
+      @@@@lang:en
+      @@@@@:
+        <IF::Event>.  This name is allowed for backward compatibility. 
+  @rdf:type:
+    ManakaiDOM:DataType
+  @ISA:
+    DOMMain:DOMString
+  @For:
+    ManakaiDOM:ManakaiDOM
+
+PropDef:
+  @QName: createEventType
+  @Description:
+    @@lang:en
+    @@@:
+      A type of subject event, as used in <M::DocumentEvent.createEvent>.  
+      It is usually an interface name but some additional names are 
+      also allowed for compatibility with DOM Level 2. 
+  @dataType: CreateEventType
+
+PropDef:
+  @QName: type
+  @Description:
+    @@lang:en
+    @@@:
+      The event type of an subject event object. 
+  @Type:
+    ManakaiDOMEventLocalName::ManakaiDOM:ManakaiDOMLatest
+
+PropDef:
+  @QName: isPropagationStopped
+  @Description:
+    @@lang:en
+    @@@:
+      Whether the propagation of an subject event object is 
+      stopped by DOM application or not.
+  @dataType:
+    dis:Boolean
+
+PropDef:
+  @QName: isImmediatePropagationStopped
+  @Description:
+    @@lang:en
+    @@@:
+      Whether the immediate propagation of an subject event object is 
+      stopped by DOM application or not.
+  @dataType:
+    dis:Boolean
+
+PropDef:
+  @QName: isDefaultPrevented
+  @Description:
+    @@lang:en
+    @@@:
+      Whether the default action of a subject event object is 
+      prevented by DOM application or not.
+  @dataType:
+    dis:Boolean
+
+PropDef:
+  @QName: bubbles
+  @Description:
+    @@lang:en
+    @@@:
+      Whether an subject event object bubbles or not.
+  @dataType:
+    dis:Boolean
+
+PropDef:
+  @QName: cancelable
+  @Description:
+    @@lang:en
+    @@@:
+      Whether an subject event object is cancelable or not. 
+  @dataType:
+    dis:Boolean
+
+PropDef:
+  @QName: isDispatched
+  @Description:
+    @@lang:en
+    @@@:
+      Whether a subject event object has once dispatched or not.
+  @dataType:
+    dis:Boolean
+
+PropDef:
+  @QName: wasDispatched
+  @Description:
+    @@lang:en
+    @@@:
+      Whether a subject event object had already dispatched or not.
+  @dataType:
+    dis:Boolean
+
+PropDef:
+  @QName: timeStamp
+  @Description:
+    @@lang:en
+    @@@:
+      When a subject event object had issued.
+  @Type:
+    DOMMain:DOMTimeStamp::ManakaiDOM:ManakaiDOMLatest
+
+PropDef:
+  @QName: target
+  @Description:
+    @@lang:en
+    @@@:
+      An event target of subject event object. 
+  @Type:
+    EventTarget::ManakaiDOM:ManakaiDOMLatest
+
+PropDef:
+  @QName: currentTarget
+  @Description:
+    @@lang:en
+    @@@:
+      The current event target of subject event object.
+  @Type:
+    EventTarget::ManakaiDOM:ManakaiDOMLatest
+
+PropDef:
+  @QName: eventPhase
+  @Description:
+    @@lang:en
+    @@@:
+      An event phase at which a subject event object is now. 
+  @Type:
+    ManakaiDOMPhaseType::ManakaiDOM:ManakaiDOMLatest
+
 IF:
   @Name:
     @@@: EventTarget
@@ -1339,7 +1519,10 @@ IF:
     @@ForCheck:
       ManakaiDOM:ForClass
   @Role:
-    DOMCore:ManakaiDOMNode::ManakaiDOM:ManakaiDOMLatest
+    @@@:
+      DOMCore:ManakaiDOMNode::ManakaiDOM:ManakaiDOMLatest
+    @@ForCheck:
+      ManakaiDOM:ForClass
 
   @L2IF:
   @Level[list]:  2
@@ -1590,16 +1773,10 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:evt> has not been created using 
-                <M:DocumentEvent.createEvent>.
-          @@@@SubType:
-            @@@@@QName:
-              ManakaiDOMEvent:CUSTOM_EVENT_REQUIRED_ERR
-            @@@@@Description:
-              @@@@@@lang:en
-              @@@@@@@:
-                The <P:evt> does not support the interface <IF:CustomEvent>. 
-          @@@@SpecLevel:3
+                The <P::evt> has not been created using 
+                <M::DocumentEvent.createEvent> and does not 
+                implement the <IF::CustomEvent> interface. 
+            @@@@@L3:
      @@Level[list]:
         2
         3
@@ -1627,8 +1804,7 @@ IF:
         @@@Name:  namespaceURI
         @@@Type:  
           DOMMain:DOMString
-        @@@actualType:
-          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@actualType: ManakaiDOMEventNamespaceURI
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -1702,6 +1878,8 @@ IF:
              push @$ev, {
                eventListener => $listener,
                namespaceURI => $namespaceURI,
+               localName => $type,
+               phase => $useCapture,
                evtGroup => $evtGroup,
              };
            }#REGISTER
@@ -1724,8 +1902,7 @@ IF:
         @@@Name:  namespaceURI
         @@@Type:  
           DOMMain:DOMString
-        @@@actualType:
-          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@actualType: ManakaiDOMEventNamespaceURI
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -1784,7 +1961,7 @@ IF:
                   (not defined $ev->[$_]->{namespaceURI} and
                    not defined $namespaceURI)) and
                  ($ev->[$_]->{eventListener} eq $listener)) {
-               delete $ev->[$_];
+               CORE::delete $ev->[$_];
                last;
              }
            }
@@ -1808,8 +1985,7 @@ IF:
         @@@Name:  namespaceURI
         @@@Type: 
           DOMMain:DOMString
-        @@@actualType:
-          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@actualType: ManakaiDOMEventNamespaceURI
         @@@Description:
           @@@@lang:en
           @@@@@:The namespace URI of the event.
@@ -1851,8 +2027,7 @@ IF:
         @@@Name:  namespaceURI
         @@@Type:  
           DOMMain:DOMString
-        @@@actualType:
-          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@actualType: ManakaiDOMEventNamespaceURI
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -1872,7 +2047,7 @@ IF:
            @@@@Description:
              @@@@@lang:en
              @@@@@@:
-               An event listener is registered.
+               At least one event listener is registered.
         @@@InCase:
            @@@@Value:  false
            @@@@Description:
@@ -1894,6 +2069,34 @@ IF:
      @@L3:
 ##IF:EventTarget
 
+PropDef:
+  @QName: eventListener
+  @Description:
+    @@lang:en
+    @@@:
+      The list of event listeners currently registered to 
+      a subject event target. 
+      \
+      {P:: For the manakai <Class::ManakaiDOMEventTarget> internal 
+      implementation, the value of <Q::eventListener> property 
+      is a hash of arrays of arrays of event listener hashs; the first hash has 
+      event types (local name) as key and former arrays indicate the phase 
+      (<P::useCapture>).  The later arrays, i.e. the third depth arrays, 
+      preserves the order in which event listeners are called.  
+      An event listener hash contains information for an event listener: 
+          \
+          - <CODE::namespaceURI>::: The namespace URI of the event. 
+          \
+          - <CODE::localName>::: The local name of the event (first hash's key). 
+          \
+          - <CODE::evtGroup>::: The event group of the listener.
+          \
+          - <CODE::phase>::: The <P::useCapture> value (first array's index).
+          \
+          - <CODE::eventListener>::: The listener itself. 
+          \
+      }
+
 IF:
   @Name:
     @@@: EventListener
@@ -1913,22 +2116,119 @@ IF:
   @Description:
     @@lang:en
     @@@:
-      The primary way for handling events.  DOM applications 
-      implement this interface and register their listeners 
-      on an <IF:EventListener>.
-     \
-      {NOTE:: In the manakai DOM implementation, event listeners 
-              are required that the Perl <Perl:eq> operation 
-              is defined for two <IF:EventListener> objects and 
-              for an <IF:EventListener> object and a <Perl:CODE> 
-              reference.
-     \
+      The primary way for handling events.  A DOM application 
+      can implement this interface and register its listener 
+      on an <IF::EventTarget>. 
+      \
+      Event listeners are able to be registered on all DOM nodes and 
+      some DOM objects such as <IF::LSParser> if it implements 
+      <IF::EventTarget> interface.  Each event listener is always 
+      part of an event group; it is either explicitly in a group 
+      if a group is specified at the registration or implicitly 
+      in the default group.  (DOM Level 2 does not have the concept 
+      of the event group so that any listener is assumed in the default 
+      group.) Within a group, listeners are ordered in the order 
+      of registration. Listeners will be triggered in that order. 
+      If the two listeners are not part of the same group, 
+      the order triggered is not specified.  (DOM Level 2 does 
+      not specify trigerring order.) 
+      \
+      {NOTE:: In general, a DOM application does not need to define 
+              and use a separate group unless other event listeners, 
+              external to the DOM application, may change the propagation.
+              While the DOM implementation may impose priorities on groups, 
+              DOM applications must not rely on it.
+      \
       }
+      \
+      If an event listener is registered on a node while an event 
+      gets processed on the node, the event listener will not be 
+      triggered during the current phase but may be triggered 
+      during a later phase in the event flow.
+      \
+      If an event listener is removed from a node while an event 
+      is being processed on the node, the event listener will not 
+      be trigerred by the curren actions. 
+      \
+      {P:: There are two ways to associate an event listener to a node:
+      \
+        - at the programming level:: using the <IF::EventTarget> methods.
+      \
+        - at the document level:: using markup such as XML Events, 
+          HTML, SVG, VoiceXML, and so on.
+      \
+      }
+      \
+      Actions taken by an event listener might cause additional 
+      events to be dispatched.  Additional events should be 
+      handled in a synchronous manner and may cause reentrance 
+      into the event model.  A DOM application should not depend 
+      on how many synchronous events may be triggered.
+      \
+      DOM Level 2 Events Specification said that any 
+      exceptions throw inside an <IF::EventListener> will not 
+      stop propagation of the event.  DOM Level 3 Events Specification 
+      does not have such clause. 
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @Description:
+    @@lang:en
+    @@@:
+      In the manakai DOM implementation, an event listener 
+      is required to be able to test its equality with another event listener 
+      or Perl <Perl::CODE> reference by the Perl <Perl::eq> operator.  
+    @@For: 
+      ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @Description:
+    @@lang:en
+    @@@:
+      An event listener. 
+      \
+      {NOTE:: In the manakai DOM implementation, any Perl 
+              <Perl::CODE> reference is able to register 
+              as an event listener.  Event listener registering 
+              method such as <M::ManakaiDOMEventTarget.addEventListenerNS> 
+              converts such listener to a <Class::ManakaiDOMEventListener> 
+              object. 
+      \
+      }
+      \
+      {NOTE:: When using a <Perl::CODE> reference as an event listener, 
+              please take lots of care for use of lexical variables. 
+              For example, 
+              \
+              $node->addEventListenerNS ($ns, $event, sub {
+                print $node->nodeName;
+              }, 0);
+              \
+              might cause a memory leak, since the <Perl::$node> 
+              has the <Perl::CODE> as an event listener and 
+              the <Perl::CODE> has a <QUOTE::reference> to 
+              the variable <Perl::$node> so that Perl's garbage 
+              collection system would not release these memory areas 
+              even after <Perl::$node> is disposed.  One solution is 
+              removing event listeners before <Perl::$node> goes out 
+              of scope.  Example:
+              \
+              my $el = sub {
+                print $node->nodeName;
+              };
+              $node->addEventListenerNS ($ns, $event, $el, 0);
+              \
+              ...
+              \
+              $node->removeEventListenerNS ($ns, $event, $el, 0);
+              \
+              But it might be difficut to take this way in some complex 
+              cases.  Providing a way to make a node reference <QUOTE::waken> 
+              might be a better solution and it's now under consideration.
   @ImplNote:
     @@lang:en
     @@@:
-      In the ECMAScript binding, an <IF:EventListener> is 
-      a function with a parameter <P:evt>.
+      In the ECMAScript binding, an <IF::EventListener> is 
+      a function with a parameter <P::evt>.
 
   @Level[list]:  2
   @SpecLevel[list]:  2
@@ -2024,7 +2324,10 @@ IF:
     @@ForCheck:
       ManakaiDOM:ForClass
   @Role:
-    DOMCore:ManakaiDOMDocument::ManakaiDOM:ManakaiDOMLatest
+    @@@:
+      DOMCore:ManakaiDOMDocument::ManakaiDOM:ManakaiDOMLatest
+    @@ForCheck:
+      ManakaiDOM:ForClass
 
   @Level[list]:  2
   @SpecLevel[list]:  2
@@ -2052,82 +2355,35 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Create an <IF:Event> object.  This method is used when 
-         it is either inconvenient or unnecessary for the DOM application 
-         to create an <IF:Event> object themselves.
+         Creates an <IF::Event> object.  This method is used when 
+         it is inconvenient or unnecessary for DOM application 
+         to create it by themselves.
        \
-         {NOTE:: In cases where the <IF:Event> provided by the DOM 
-                 implementation is insufficient, the DOM application 
-                 may supply their own <IF:Event> implementations. 
-                 However, the DOM implementation needs access to 
-                 the attributes <A:Event.currentTarget> and 
-                 <A:Event/eventPhase> so that the <IF:Event> 
-                 implementation by the DOM application might 
-                 need to support the <IF:CustomEvent> interface.
-       \
+         {NOTE:: In cases where the <IF::Event> implementation provided 
+                 by the DOM implementation is insufficient, the DOM application 
+                 might want to supply their own <IF::Event>. However, 
+                 the DOM implementation needs write-access to attributes 
+                 <A::Event.currentTarget> and <A::Event.eventPhase> so 
+                 that <IF::Event> implementations by DOM application 
+                 might need to support the <IF::CustomEvent> interface.
+            \
          }
        \
          {NOTE:: The appropriate event initialization method 
                  of the created object must be called before 
-                 the <IF:Event> is diapatched via the 
-                 <M:EventTarget,dispatchEvent> method.
+                 the <IF::Event> is diapatched via the 
+                 <M::EventTarget,dispatchEvent> method.
        \
          }
      @@Param:
         @@@Name:  eventType
         @@@Type:  DOMString
+        @@@actualType: CreateEventType
         @@@Description:
           @@@@lang:en
           @@@@@:
             The name of the DOM Events interface to be supported 
             by the created event objects.
-          \
-            {eg:: 
-             \
-             - <IF:Event>
-             \
-             - <IF:MouseEvent>
-             \
-             - <IF:UIEvent>
-             \
-             - <IF:MutationEvent>
-             \
-            }
-        @@@InCase:
-          @@@@Value:UIEvents
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              Same as <Feature:UIEvent>.  This feature name is 
-              allowed for backward compatibility.
-        @@@InCase:
-          @@@@Value:MouseEvents
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              Same as <Feature:MouseEvent>.  This feature name is  
-              allowed for backward compatibility.
-        @@@InCase:
-          @@@@Value:MutationEvents
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              Same as <Feature:MutationEvent>.  This feature name is  
-              allowed for backward compatibility.
-        @@@InCase:
-          @@@@Value:HTMLEvents
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              Same as <Feature:Event>.  This feature name is  
-              allowed for backward compatibility.
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@:
-            Although both DOM Levels 2 and 3 defines the 
-            <P:eventType> as an interface name, the examples 
-            in the definitions in the DOM Level 2 Events Specification 
-            incorrectly shows names such as <Feature:UIEvents>.
      @@Return:
         @@@Type:  Event
         @@@Description:
@@ -2145,6 +2401,22 @@ IF:
                @@@@@@@:
                  The DOM implementation does not support the 
                  interface requested.
+       @@PerlDef:
+         my $cls;
+         for (values %{$<Class::ManakaiDOMEvent::ManakaiDOM:ManakaiDOMLatest
+                            >::Class}) {
+           if ($_->{eventType}->{$eventType}) {
+             $cls = $_->{packageName};
+             last;
+           }
+         }
+         unless ($cls) {
+           __EXCEPTION{ManakaiDOMEvents:MDOM_IMPL_NOSUPPORT_EVENT::
+             DOMEvents:createEventType => {$eventType},
+             MDOMX:param-name => 'eventType',
+           }__;
+         }
+         $r = $cls->_new;
   @Method:
      @@Name:  canDispatch
      @@Description:
@@ -2157,8 +2429,7 @@ IF:
         @@@Name:  namespaceURI
         @@@Type: 
           DOMMain:DOMString
-        @@@actualType:
-          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@actualType: ManakaiDOMEventNamespaceURI
         @@@Description:
           @@@@lang:en
           @@@@@:The namespace URI of the event type.

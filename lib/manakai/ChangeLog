@@ -1,3 +1,19 @@
+2004-12-31  Wakaba  <wakaba@suika.fam.cx>
+
+	* dis.pl (dis_qname_to_uri, dis_qname_to_pair): Ignore leading
+	and trailing white spaces.
+	(dis_perl_init_classdef): "DISPerl:ScalarVariable" support added.
+
+	* DISLang.dis (TreeElementType[nop]): New element type.
+
+	* DISPerl.dis (ScalarVariable, isExportOK): New resources.
+
+2004-12-30  Wakaba  <wakaba@suika.fam.cx>
+
+	* genlib.pl (valid_err): Make node path "key" changable.
+
+	* DISMarkup.dis: New.
+
 2004-12-27  Wakaba  <wakaba@suika.fam.cx>
 
 	* genlib.pl (perl_var): Don't call removed "perl_package_name" function.

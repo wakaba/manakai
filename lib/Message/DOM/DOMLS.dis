@@ -28,7 +28,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/29 12:17:42 $
+      $Date: 2004/12/31 12:03:40 $
     @@ContentType:
       dis:Date.RCS
 
@@ -121,7 +121,7 @@ FeatureDef:
     @@Version:3.0
     @@QName: LSFeature30
     @@ISA: LSFeature
-    @@ISA: 
+    @@DOMMain:requireFeature: 
       DOMCore:CoreFeature20
     @@FullName:
       @@@lang:en
@@ -135,7 +135,7 @@ FeatureDef:
     @@Version:3.0
     @@QName: LSAsyncFeature30
     @@ISA: LSAsyncFeature
-    @@ISA: LSFeature30
+    @@DOMMain:requireFeature: LSFeature30
     @@FullName:
       @@@lang:en
       @@@@:
@@ -824,7 +824,7 @@ IF:
         @@@Type: 
           DOMMain:DOMString
         @@@actualType:
-          ManakaiDOM:ManakaiDOMURI
+          DOMMain:ManakaiDOMSchemaType
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -838,23 +838,6 @@ IF:
             @@@@@lang:en
             @@@@@@:
               The <IF:LSParser> will be free to use any schema found.
-        @@@InCase:
-          @@@@Value:
-            http://www.w3.org/2001/XMLSchema
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: The XML Schema.
-        @@@InCase:
-          @@@@Value:
-            http://www.w3.org/TR/REC-xml
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: The XML 1.0 DTD.
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@:
-            Other schema languages are outside of the scope of the W3C 
-            and should recommend its absolute URI.
      @@Return:
         @@@Type:  LSParser
         @@@Description:
@@ -1098,6 +1081,8 @@ IF:
      @@Param:
         @@@Name:  uri
         @@@Type:  DOMString
+        @@@actualType:
+          DOMMain:RFC2396URIReference
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -1377,14 +1362,14 @@ IF:
          the DOM implementation will attempt to resolve the relative URI 
          with the <A:baseURI>.  If that fails, the behavior is 
          implementation dependent.
+     @@Type:
+       DOMMain:DOMString
+     @@actualType:
+       DOMMain:SystemID
      @@Get:
-        @@@Type:  
-          DOMMain:DOMString
         @@@PerlDef:
           $r = $self->{systemId};
      @@Set:
-        @@@Type:  
-          DOMMain:DOMString
         @@@PerlDef:
           $self->{systemId} = $given;
   @Attr:
@@ -1396,14 +1381,14 @@ IF:
          \
           This may be mapped to an input source using a DOM implementation 
           dependent mechanism.
+     @@Type:
+       DOMMain:DOMString
+     @@actualType:
+       DOMMain:PublicID
      @@Get:
-        @@@Type:  
-          DOMMain:DOMString
         @@@PerlDef:
           $r = $self->{publicId};
      @@Set:
-        @@@Type:  
-          DOMMain:DOMString
         @@@PerlDef:
           $self->{publicId} = $self;
   @Attr:
@@ -1880,6 +1865,8 @@ IFDef:
      @@Param:
         @@@Name:  uri
         @@@Type:  
+          DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMURI
         @@@Description:
           @@@@lang:en
@@ -2048,14 +2035,14 @@ IF:
        @@@@:
          The system identifier or an RFC 2396 URI reference 
          for this output destination.
+     @@Type:
+       DOMMain:DOMString
+     @@actualType:
+       DOMMain:SystemID
      @@Get:
-        @@@Type:  
-          DOMMain:DOMString
         @@@PerlDef:
           $r = $self->{systemId};
      @@Set:
-        @@@Type:  
-          DOMMain:DOMString
         @@@InCase:
           @@@@Label:
             @@@@@lang:en

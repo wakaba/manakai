@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/29 12:17:42 $
+      $Date: 2004/12/31 12:03:39 $
     @@ContentType:
       dis:Date.RCS
 
@@ -110,6 +110,10 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @ManakaiDOMCore:
     http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
+  @ManakaiDOMEvents:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-ev#
+  @ManakaiDOMHTML:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom/html#
   @ManakaiDOMLS:
     http://suika.fam.cx/~wakaba/archive/2004/mdom-ls#
   @ManakaiDOMXML:
@@ -227,6 +231,7 @@ ElementTypeBinding:
         ManakaiDOM:ForIF
       @@@For:
         ManakaiDOM:ManakaiDOM1
+
 ElementTypeBinding:
   @Name: IFDef
   @ElementType:
@@ -330,7 +335,7 @@ ElementTypeBinding:
         ManakaiDOM:ManakaiDOM2
   @ShadowSibling:
     @@DOMMain:implementFeature:
-      @@@@: CoreFeature
+      @@@@: CoreFeature10
       @@@For:
         ManakaiDOM:DOM1
     @@DOMMain:implementFeature:
@@ -364,7 +369,7 @@ ElementTypeBinding:
   @ElementType:
     DOMMain:implementFeature
   @ShadowContent:
-    @@@: CoreFeature
+    @@@: CoreFeature10
     @@For:
       ManakaiDOM:DOM1
   @ShadowSibling:
@@ -742,9 +747,26 @@ FeatureDef:
   @featureName: Core
   @QName: CoreFeature
   @FeatureVerDef:
+    @@QName: CoreFeature10
+    @@Version: 1.0
+    @@ISA: CoreFeature
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The DOM Core Module (Fundemental Interface), Level 1. 
+        \
+        {NOTE:: Although some DOM implementations returns <DOM::true> for 
+                <M::DOMImplementations.hasFeature> with <Feature::Core> and 
+                <FeatureVer::1.0>, this behaviour is not defined by 
+                any level of W3C DOM Specification.  DOM applications 
+                should not expect DOM Level 1 Core implementation 
+                would return <DOM::true> to that method call. 
+          \
+        }
+  @FeatureVerDef:
     @@QName: CoreFeature20
     @@Version: 2.0
-    @@ISA: CoreFeature
+    @@ISA: CoreFeature10
     @@Spec:
       @@@DOM3:
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-BBACDC08
@@ -932,6 +954,13 @@ ExceptionDef:
                 The name of the parameter that specifies the node.
         @@@SubTypeDef:
           @@@@QName:
+            ManakaiDOMHTML:MDOM_NOT_CAPTION
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The given element is not of type <HE::caption>. 
+        @@@SubTypeDef:
+          @@@@QName:
             MDOMX:MDOM_SECOND_DOC_ELEMENT
           @@@@Description:
             @@@@@lang:en
@@ -1083,12 +1112,22 @@ ExceptionDef:
             it does not exist.
      @@XConst:
         @@@Name:  NOT_SUPPORTED_ERR
-        @@@Type:  unsigned-short
+        @@@Type:  
+          DOMMain:unsigned-short
         @@@Value:  9
         @@@Description:
           @@@@lang:en
           @@@@@:
             The DOM implementation does not support the type of object requested.
+        @@@SubTypeDef:
+          @@@@QName:
+            ManakaiDOMEvents:FOREIGN_EVENT_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The event object was created by other DOM implementation. 
+          @@@@For:
+            ManakaiDOM:DOMEventsFeature
         @@@SubTypeDef:
           @@@@QName:
             MDOMX:MDOM_DOC_NOSUPPORT_XML
@@ -1198,6 +1237,22 @@ ExceptionDef:
               );%p (name => {<Q::MDOMX:method>});" not implemented
         @@@SubTypeDef:
           @@@@QName:
+            ManakaiDOMEvents:MDOM_IMPL_NOSUPPORT_EVENT
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The DOM implementation is unable to create an event of 
+              the requested type. 
+          @@@@XParam:
+            @@@@@QName:
+              DOMEvents:createEventType
+            @@@@@Type:
+              DOMMain:DOMString
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@: The type of event requested. 
+        @@@SubTypeDef:
+          @@@@QName:
             MDOMX:MDOM_IMPL_NOSUPPORT_SCHEMA
           @@@@Description:
             @@@@@lang:en
@@ -1220,6 +1275,14 @@ ExceptionDef:
               The schema language specified %p (prefix => {<},
               suffix => {>}, name => {<Q::DOMCore:schemaType>}); 
               is not supported
+        @@@SubTypeDef:
+          @@@@QName:
+            ManakaiDOMHTML:MDOMHTML_IMPL_NOSUPPORT_SET_SELECT_LENGTH
+          @@@Description:
+            @@@@lang:en
+            @@@@@:
+              The DOM implementation does not support setting 
+              <A::DOMHTML:HTMLSelectElement.length>.
         @@@SubTypeDef:
           @@@@QName:
             MDOMX:MDOM_IMPL_NOSUPPORT_XML
@@ -1327,6 +1390,14 @@ ExceptionDef:
         @@@Description:
           @@@@lang:en
           @@@@@: An invalid or illegal string is specified.
+        @@@SubTypeDef:
+          @@@@QName:
+            ManakaiDOMHTML:MDOMHTML_BAD_COOKIE
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The specifieid value does not adhere to RFC 2965 
+              cookie value syntax.
      @@XConst:
         @@@Name:  INVALID_MODIFICATION_ERR
         @@@Type:  unsigned-short
@@ -2998,6 +3069,7 @@ IF:
      @@Level[list]:
        2
        3
+     @@L2:
      @@For:
        ManakaiDOM:DOM2
         
@@ -3039,6 +3111,7 @@ IF:
             A feature version number to request.
      @@SpecLevel:3
      @@Level[list]:  3
+     @@L3:
      @@For:
        ManakaiDOM:DOM3
      @@Return:
@@ -3132,11 +3205,6 @@ IF:
       ManakaiDOM:ForClass
     @@For:
       ManakaiDOM:ManakaiDOM
-  @Role:
-    @@@: 
-      DOMCore:ManakaiDOMNode::ManakaiDOM:ManakaiDOMLatest
-    @@ForCheck:
-      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
 
   @ConstGroup:
      @@QName:
@@ -3348,6 +3416,7 @@ IF:
           @@@@lang:en
           @@@@@: 
             A code representing the type of the underlying object. 
+       @@@PerlDef: \
   @Attr:
      @@Name:  parentNode
      @@Description:
@@ -5085,6 +5154,13 @@ IF:
          The text content of this node and its descendants. 
          Note that element content whitespaces are not considered 
          as the text content of an "Element".
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         A lot of methods and attributes referrs this attribute 
+         by Perl method call or by <Q::DISPerl:cloneCode>. 
+       @@@For:
+         ManakaiDOM:ManakaiDOM
      @@Get:
         @@@Type:  
           DOMMain:DOMString
@@ -5192,7 +5268,7 @@ IF:
             for (@oldChild) {
               CORE::delete $_->{<Q::infoset:parent>};
             }
-            my $textNode = <ClassM::ManakaiDOMText.newObject>;
+            my $textNode = <ClassM::DOMCore:ManakaiDOMText.newObject>;
             $textNode->{<Q::DOMCore:ownerDocument>}
                                    = $node->{<Q::DOMCore:ownerDocument>};
             $node-><M::ManakaiDOM:ManakaiDOMNodeObject.importTree> ($textNode);
@@ -7198,7 +7274,7 @@ ResourceDef:
             @@@@@lang:en
             @@@@@@: The "name" does not identify any node in this map.
          @@@Def:
-           @@@@For: ForAttrMap
+           @@@@ForCheck: ForAttrMap
            @@@@ContentType: 
              lang:dis
            @@@@DISPerl:cloneCode:
@@ -7273,10 +7349,10 @@ ResourceDef:
             @@@@@lang:en
             @@@@@@: This exception has added by the DOM Level 2 Errata.
        @@@PerlDef:
-         @@@@For: ForAttrMap
+         @@@@ForCheck: ForAttrMap
          @@@@@:
            __DEEP{
-             $self-><M::ManakaiDOMNode.setAttributeNode> ($arg);
+             $self-><M::ManakaiDOMElement.setAttributeNode> ($arg);
            }__;
      @@ImplNote:
        @@@lang:en
@@ -7305,7 +7381,7 @@ ResourceDef:
      @@Return:
         @@@Type:  Node
         @@@actualType:
-          @@@@For:ForAttrMap
+          @@@@ForCheck:ForAttrMap
           @@@@@: ManakaiDOMAttr
         @@@Description:
           @@@@lang:en
@@ -7375,7 +7451,7 @@ ResourceDef:
      @@Return:
         @@@Type:  Node
         @@@actualType:
-          @@@@For:ForAttrMap
+          @@@@ForCheck:ForAttrMap
           @@@@@:
             DOMCore:ManakaiDOMAttr
         @@@Description:
@@ -7390,7 +7466,7 @@ ResourceDef:
               The "index" is invalid, i.e. it is greater than or 
               equal to the number of nodes in this map.
         @@@PerlDef:
-          @@@@For:ForAttrMap
+          @@@@ForCheck:ForAttrMap
           @@@@@:
             my $i = 0;
             FIND: for my $ns (sort keys %{$self->{<Q::TreeCore:node>}
@@ -7420,7 +7496,7 @@ ResourceDef:
         @@@Type:  
           DOMMain:unsigned-long
         @@@PerlDef:
-          @@@@For:ForAttrMap
+          @@@@ForCheck:ForAttrMap
           @@@@@:
             for (values %{$self->{<Q::TreeCore:node>}
                                ->{<Q::infoset:attributes>}}) {
@@ -7459,7 +7535,7 @@ ResourceDef:
      @@Return:
         @@@Type:  Node
         @@@actualType:
-          @@@@For:ForAttrMap
+          @@@@ForCheck:ForAttrMap
           @@@@@:ManakaiDOMAttr
         @@@Description:
           @@@@lang:en
@@ -11056,7 +11132,7 @@ IF:
         The method "normalize" was defined in the "Element" interface in 
         the DOM Level 1 but has been moved to 
         the "Node" interface in the DOM Level 2 and higher.
-    @@DOMMain:implementFeature: CoreFeature
+    @@DOMMain:implementFeature: CoreFeature10
     @@For:
       ManakaiDOM:DOM1 !ManakaiDOM:DOM2
     @@Return:
@@ -11070,7 +11146,7 @@ IF:
     @@Get:
       @@@Type: NamedNodeMap
       @@@actualType:
-        ManakaiDOM:ManakaiDOMAttributes
+        ManakaiDOMCore:ManakaiDOMAttributes
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -13523,7 +13599,7 @@ IF:
      @@Return:
         @@@Type:NodeList
         @@@actualType:  
-          ManakaiDOM:ManakaiDOMGetElementsNodeList
+          ManakaiDOMCore:ManakaiDOMGetElementsNodeList
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -14087,7 +14163,7 @@ IF:
      @@Return:
         @@@Type:NodeList
         @@@actualType:
-          ManakaiDOM:ManakaiDOMGetElementsNodeList
+          ManakaiDOMCore:ManakaiDOMGetElementsNodeList
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -15512,7 +15588,7 @@ ConfigParam:
     @@Name:schema-type
     @@IsSupportRequired:1
     @@Type:
-      ManakaiDOM:ManakaiDOMURI
+      DOMMain:ManakaiDOMSchemaType
     @@InCase:
       @@@Label:
         @@@@lang:en
@@ -15531,27 +15607,10 @@ ConfigParam:
           schema language used at load time.
     @@InCase:
       @@@Value:
-        http://www.w3.org/TR/REC-xml
-      @@@Description:
-        @@@@lang:en
-        @@@@@: The XML DTD.
-    @@InCase:
-      @@@Value:
-        http://www.w3.org/2001/XMLSchema
-      @@@Description:
-        @@@@lang:en
-        @@@@@: The XML Schema.
-    @@InCase:
-      @@@Value:
         @@@@is-null:1
       @@@Description:
         @@@@lang:en
-        @@@@@: No valus is provided.
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        Other schema languages are outside the scope of the W3C 
-        and should recommentd an absolute URI in order to use here.
+        @@@@@: No value is provided.
   @CParam:
     @@Name: split-cdata-sections
     @@Type:boolean

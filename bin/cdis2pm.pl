@@ -741,10 +741,14 @@ Gets value property and returns it as a Perl code fragment.
 
 sub dispm_get_value (%) {
   my %opt = @_;
-  my $key = $opt{ExpandedURI q<dis2pm:DefKeyName>} || ExpandedURI q<d:Value>;
+  my $key = $opt{ExpandedURI q<dis2pm:ValueKeyName>} || ExpandedURI q<d:Value>;
   my $vt = $opt{ExpandedURI q<dis2pm:valueType>} || ExpandedURI q<DOMMain:any>;
   local $State->{Namespace}
       = $State->{Module}->{$opt{resource}->{parentModule}}->{nsBinding}
+        if defined $opt{resource}->{Name};
+  local $opt{For} = [keys %{$opt{resource}->{For}}]->[0]
+        if defined $opt{resource}->{Name};
+  local $opt{'For+'} = [keys %{$opt{resource}->{'For+'}||{}}]
         if defined $opt{resource}->{Name};
   my $n = $opt{node} ? [$opt{node}]
                      : dis_get_elements_nodes
@@ -755,6 +759,8 @@ sub dispm_get_value (%) {
     my $type;
     if ($t) {
       $type = dis_qname_to_uri ($t->value, %opt, node => $t);
+    } elsif ($opt{resource}->{ExpandedURI q<dis2pm:actualType>}) {
+      $type = $opt{resource}->{ExpandedURI q<dis2pm:actualType>};
     } else {
       $type = ExpandedURI q<lang:dis>;
     }
@@ -762,13 +768,17 @@ sub dispm_get_value (%) {
       unless defined $State->{Type}->{$type}->{Name};
     
     if (dis_uri_ctype_match (ExpandedURI q<lang:Perl>, $type, %opt)) {
-      ## ISSUE: Is some pre-process required?
-      return $n->value;
-    } elsif (dis_uri_ctype_match (ExpandedURI q<DISCore:String>, $type, %opt)) {
+      return perl_code ($n->value, %opt, node => $n);
+    } elsif (dis_uri_ctype_match (ExpandedURI q<DISCore:String>, $type, %opt) or
+             dis_uri_ctype_match (ExpandedURI q<DOMMain:DOMString>, $type, %opt)) {
       return perl_literal $n->value;
-    } elsif (dis_uri_ctype_match (ExpandedURI q<lang:dis>, $type, %opt)) {
-      ## NOTE: This might not be a valid Perl code fragment.
+    } elsif (dis_uri_ctype_match (ExpandedURI q<DOMMain:unsigned-short>, $type, %opt) or
+             dis_uri_ctype_match (ExpandedURI q<DOMMain:unsigned-long>, $type, %opt) or
+             dis_uri_ctype_match (ExpandedURI q<DOMMain:short>, $type, %opt) or
+             dis_uri_ctype_match (ExpandedURI q<DOMMain:long>, $type, %opt)) {
       return $n->value;
+    } elsif (dis_uri_ctype_match (ExpandedURI q<lang:dis>, $type, %opt)) {
+      return perl_literal $n->value;
     }
   }
 
@@ -790,7 +800,7 @@ Returns a code fragment corresponding to the vaue of C<$const>.
 =cut
 
 sub dispm_const_value (%) {
-  my %opt = @_;
+  my %opt = @_; 
   my $for = [keys %{$opt{resource}->{For}}]->[0];
   local $opt{'For+'} = [keys %{$opt{resource}->{'For+'}||{}}];
   my $value = dispm_get_value
@@ -816,8 +826,19 @@ corresponding to the definition of C<$const>.
 sub dispm_const_value_sub (%) {
   my %opt = @_;
   my $value = dispm_const_value (%opt);
+  my $name = $opt{resource}->{ExpandedURI q<dis2pm:constName>};
+  my $pc = $State->{ExpandedURI q<dis2pm:Package>}
+                 ->{$State->{Module}->{$State->{module}}
+                          ->{ExpandedURI q<dis2pm:packageName>}}
+                 ->{ExpandedURI q<dis2pm:const>} ||= {};
+  valid_err qq<Constant value "$name" is already defined in the same module>,
+    node => $opt{resource}->{src} if defined $pc->{$name}->{resource}->{Name};
+  $pc->{$name} = {
+    name => $name, resource => $opt{resource},
+    package => $State->{ExpandedURI q<dis2pm:currentPackage>},
+  };
   return perl_sub
-            (name => $opt{resource}->{ExpandedURI q<dis2pm:constName>},
+            (name => $name,
              prototype => '',
              code => $value);
 } # dispm_const_value_sub
@@ -838,6 +859,7 @@ sub dispm_const_group (%) {
                  node => $cg->{src});
     }
   }
+
   my $result = '';
   my @cname;
   if (length $name) {
@@ -847,6 +869,18 @@ sub dispm_const_group (%) {
     }
     $opt{ExpandedURI q<dis2pm:constGroupParentPackage>}->{$name} = \@cname;
   }
+
+  my $pc = $State->{ExpandedURI q<dis2pm:Package>}
+                 ->{$State->{Module}->{$State->{module}}
+                          ->{ExpandedURI q<dis2pm:packageName>}}
+                 ->{ExpandedURI q<dis2pm:constGroup>} ||= {};
+  valid_err qq<Constant group "$name" is already defined in the same module>,
+    node => $opt{resource}->{src} if defined $pc->{$name}->{resource}->{Name};
+  $pc->{$name} = {
+    name => $name, resource => $opt{resource},
+    member => \@cname,
+  };
+
   for my $cv (values %{$opt{resource}->{ExpandedURI q<dis2pm:const>}}) {
     next unless defined $cv->{ExpandedURI q<dis2pm:constName>};
     #$result .= dispm_const_value_sub (%opt, resource => $cv);
@@ -913,7 +947,8 @@ sub disperl_to_perl (%) {
       if ($et eq ExpandedURI q<d:GetPropNode>) {
         $code .= perl_if
                    'defined $r',
-                   perl_code (q{<ClassM::ManakaiDOMNode.getNodeReference> ($r)},
+                   perl_code (q{<ClassM::DOMCore:ManakaiDOMNode
+                                                   .getNodeReference> ($r)},
                               %opt, node => $_);
       }
     } elsif ($et eq ExpandedURI q<d:SetProp>) {
@@ -1036,6 +1071,7 @@ sub disperl_to_perl (%) {
               ExpandedURI q<d:For> => 1,
               ExpandedURI q<d:ForCheck> => 1,
               ExpandedURI q<d:ImplNote> => 1,
+              ExpandedURI q<DISLang:nop> => 1,
              }->{$et}) {
       # 
     } else {
@@ -1301,33 +1337,52 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
                 (ExpandedURI q<DOMCore:ManakaiDOMText>,
                  ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>, %opt) => 1,
 
-           dis_typeforuris_to_uri
+           (my $ev = dis_typeforuris_to_uri
                 (ExpandedURI q<DOMEvents:ManakaiDOMEvent>,
-                 ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>, %opt) => 1,
+                 ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>, %opt)) => 1,
           }->{$_->{Role}}) {
         unless ($feature) {
           $feature = {};
           for (keys %{dispm_collect_hash_prop_value
                    ($pack, ExpandedURI q<DOMMain:implementFeature>, %opt)}) {
-            my @f = ([$State->{Type}->{$_}, []]);
+            my @f = ([$State->{Type}->{$_}, [], 1]);
             while (defined (my $f = shift @f)) {
               my $version = $f->[0]->{ExpandedURI q<d:Version>};
               $version = '' unless defined $version;
-              for (keys %{$f->[0]->{ExpandedURI q<dis2pm:featureName>}}) {
-                $feature->{$_}->{$version}
+              $f->[0]->{ExpandedURI q<dis2pm:notImplemented>}
                   = length $version
                       ? $f->[0]->{ExpandedURI q<dis2pm:notImplemented>}
-                        ? 0 : 1
-                      : 1;
-                unless ($feature->{$_}->{$version}) {
-                  $feature->{$_}->{$f->[2]} = 0 for @{$f->[1]};
+                        ? 1 : 0
+                      : 0;
+              for my $fname (keys %{$f->[0]
+                                      ->{ExpandedURI q<dis2pm:featureName>}}) {
+                $feature->{$fname}->{$version}
+                  = $f->[0]->{ExpandedURI q<dis2pm:notImplemented>} ? 0 : 1
+                    if $f->[2];
+                unless ($feature->{$fname}->{$version}) {
+                  $feature->{$_->[0]}->{$_->[1]} = 0 for @{$f->[1]};
                 }
               }
               push @f,
                 map {[$State->{Type}->{$_},
-                      [keys %{$f->[0]->{ExpandedURI q<dis2pm:featureName>}}],
-                      $version]}
+                      ($f->[2]
+                        ? [@{$f->[1]},
+                           map {[$_, $version]}
+                           keys %{$f->[0]
+                                    ->{ExpandedURI q<dis2pm:featureName>}}]
+                        : $f->[1]),
+                      $f->[2]]}
                     @{$f->[0]->{ISA}||[]};
+              push @f,
+                map {[$State->{Type}->{$_},
+                      ($f->[2]
+                        ? [@{$f->[1]},
+                           map {[$_, $version]}
+                           keys %{$f->[0]
+                                    ->{ExpandedURI q<dis2pm:featureName>}}]
+                        : $f->[1]), 0]}
+                    keys %{$f->[0]->{ExpandedURI q<dis2pm:requireFeature>}||{}}
+                      if not $f->[0]->{ExpandedURI q<dis2pm:notImplemented>};
             }
           }
         }
@@ -1335,6 +1390,23 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
            packageName => $pack->{ExpandedURI q<dis2pm:packageName>},
            feature => $feature,
         );
+
+        if ($_->{Role} eq $ev) {
+          my @p = ($pack);
+          my %pu;
+          while (defined (my $p = shift @p)) {
+            if ($p->{ExpandedURI q<dis2pm:type>} eq
+                ExpandedURI q<ManakaiDOM:IF>) {
+              $f{eventType}->{$p->{Name}} = 1;
+            }
+            $f{eventType}->{$_} = 1
+              for keys %{$p->{ExpandedURI q<DOMEvents:createEventType>}||{}};
+            $pu{defined $p->{URI} ? $p->{URI} : ''} = 1;
+            push @p, grep {!$pu{defined $_->{URI} ? $_->{URI} : ''}}
+                     map {$State->{Type}->{$_}}
+                     (@{$p->{ISA}||[]}, @{$p->{Implement}||[]});
+          }
+        }
         
         $result .= perl_statement
                      (($compatres
@@ -1637,13 +1709,13 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
         if ($_->{operator} eq ExpandedURI q<ManakaiDOM:MUErrorHandler>) {
           if ($_->{resource}->{ExpandedURI q<dis2pm:methodName+>} =~ /^\#/) {
             my $code = $_->{resource}->{ExpandedURI q<dis2pm:methodCodeRef>};
-            $code =~ s/\bsub /sub ___error_handler /;
+            $code =~ s/\bsub /sub ___report_error /;
             $result .= $code;
           } else {
             $result .= perl_statement
                          perl_assign
                               perl_var (type => '*',
-                                        local_name => '___error_handler')
+                                        local_name => '___report_error')
                            => perl_var (type => '\&',
                                         local_name => $_->{resource}
                                           ->{ExpandedURI q<dis2pm:methodName>});
@@ -1657,6 +1729,128 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
   } # root object
 }
 
+
+## -- Variables
+for my $var (values %{$State->{Module}->{$State->{module}}
+                            ->{ExpandedURI q<dis2pm:variable>}}) {
+  next unless defined $var->{Name};
+  my $default = dispm_get_value
+                           (%opt, resource => $var,
+                            ExpandedURI q<dis2pm:ValueKeyName>
+                                => ExpandedURI q<d:DefaultValue>,
+                            ExpandedURI q<dis2pm:useDefaultValue> => 1,
+                            ExpandedURI q<dis2pm:valueType>
+                              => $var->{ExpandedURI q<d:actualType>});
+
+  ## ISSUE: scope
+
+  my $v = perl_var
+               (type => $var->{ExpandedURI q<dis2pm:variableType>},
+                local_name => $var->{ExpandedURI q<dis2pm:variableName>});
+  if (defined $default and length $default) {
+    $result .= perl_statement
+                       perl_assign $v => $default;
+  } else {
+    $result .= perl_statement $v;
+  }
+
+  if ($var->{ExpandedURI q<DISPerl:isExportOK>}) {
+    $State->{ExpandedURI q<dis2pm:Package>}
+                 ->{$State->{Module}->{$State->{module}}
+                          ->{ExpandedURI q<dis2pm:packageName>}}
+                 ->{ExpandedURI q<dis2pm:variable>}->{$v} = 1;
+    ## NOTE: Variable name uniqueness is assured in dis.pl.
+  }
+}
+
+## Constant exportion
+{
+  my @xok;
+  my $xr = '';
+  my $cg = $State->{ExpandedURI q<dis2pm:Package>}
+                 ->{$State->{Module}->{$State->{module}}
+                          ->{ExpandedURI q<dis2pm:packageName>}}
+                 ->{ExpandedURI q<dis2pm:constGroup>};
+  my %etag;
+  for (keys %$cg) {
+    $etag{$_} = $cg->{$_}->{member};
+  }
+  $xr .= perl_statement
+           perl_assign
+                perl_var (type => '%', local_name => 'EXPORT_TAG', 
+                          scope => 'our')
+             => '('.(perl_list %etag).')'
+     if keys %etag;
+  
+  my $c = $State->{ExpandedURI q<dis2pm:Package>}
+                 ->{$State->{Module}->{$State->{module}}
+                          ->{ExpandedURI q<dis2pm:packageName>}}
+                 ->{ExpandedURI q<dis2pm:const>};
+  if (keys %$c) {
+    push @xok, keys %$c;
+    $xr .= join '', map {perl_statement "sub $_ ()"} keys %$c;
+    my $al = perl_literal {map {$_ =>
+                                $c->{$_}->{package}.'::'.$_} keys %$c};
+    my $AL = '$al';
+    my $ALD = '$AUTOLOAD';
+    my $XL = '$Exporter::ExportLevel';
+    my $SELF = '$self';
+    my $ARGS = '@_';
+    my $IT = '$_';
+    my $REF = '\\';
+    my $NONAME = '\w';
+    $xr .= qq{
+      sub AUTOLOAD {
+        my $AL = our $ALD;
+        $AL =~ s/.+:://;
+        if ($al -> {$AL}) {
+          no strict 'refs';
+          *{$ALD} = $REF &{$al -> {$AL}};
+          goto &{$ALD};
+        } else {
+          require Carp;
+          Carp::croak (qq<Can't locate method "$ALD">);
+        }
+      }
+      sub import {
+        my $SELF = shift;
+        if ($ARGS) {
+          local $XL = $XL + 1;
+          $SELF->SUPER::import ($ARGS);
+          for (grep {not /$NONAME/} $ARGS) {
+            eval qq{$IT};
+          }
+        }
+      }
+    };
+  }
+
+  for (keys %{$State->{ExpandedURI q<dis2pm:Package>}
+                 ->{$State->{Module}->{$State->{module}}
+                          ->{ExpandedURI q<dis2pm:packageName>}}
+                 ->{ExpandedURI q<dis2pm:variable>}}) {
+    push @xok, $_;
+  }
+
+  if (@xok) {
+    $xr .= perl_statement
+             perl_assign
+                  perl_var (type => '@', local_name => 'EXPORT_OK',
+                            scope => 'our')
+               => '('.(perl_list @xok).')';
+  }
+
+  if ($xr) {
+    $result .= perl_change_package (full_name => $State->{Module}
+                                          ->{$State->{module}}
+                                          ->{ExpandedURI q<dis2pm:packageName>});
+    $result .= $xr;
+    $result .= perl_statement 'use Exporter';
+    $result .= perl_statement 'push our @ISA, "Exporter"';
+  }
+}
+
+## Required modules
 $result .= dispm_package_declarations;
 my $begin = '';
 for (keys %{$State->{Module}->{$State->{module}}

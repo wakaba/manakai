@@ -2,50 +2,69 @@
 use strict;
 
 use lib qw<lib ../lib>;
-use Message::Markup::SuikaWikiConfig20::Parser;
 
-our $result = '';
+use Message::Util::QName::Filter {
+  dis2pm => q<http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#>,
+  ManakaiDOM => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#>,
+};
+
+use Getopt::Long;
+use Pod::Usage;
+use Storable;
+my %Opt;
+GetOptions (
+  'help' => \$Opt{help},
+  'verbose!' => $Opt{verbose},
+) or pod2usage (2);
+pod2usage ({-exitval => 0, -verbose => 1}) if $Opt{help};
+$Opt{file_name} = shift;
+pod2usage ({-exitval => 2, -verbose => 0}) unless $Opt{file_name};
 
 BEGIN {
-  require 'manakai/genlib.pl';
+require 'manakai/genlib.pl';
+require 'manakai/dis.pl';
 }
+our $State = retrieve ($Opt{file_name})
+     or die "$0: $Opt{file_name}: Cannot load";
+
+eval q{
+  sub impl_msg ($;%) {
+    warn shift () . "\n";
+  }
+} unless $Opt{verbose};
+
 
 my $Method;
 my $Attr;
 
-for (@ARGV) {
-  my $s;
-  {
-    open my $file, '<', $_;
-    local $/ = undef;
-    $s = <$file>;
-    close $file;
-  }
-  my $source = Message::Markup::SuikaWikiConfig20::Parser->parse_text ($s);
-  
-  for (@{$source->child_nodes}) {
-    if ($_->node_type eq '#element' and
-        $_->local_name eq 'IF') {
-      my $if = $_->get_attribute_value ('Name');
-      for (@{$_->child_nodes}) {
-        if ($_->node_type eq '#element') {
-          if ($_->local_name eq 'Method') {
-            $Method->{$if}->{$_->get_attribute_value ('Name')} = (my $a = []);
-            for (@{$_->child_nodes}) {
-              if ($_->node_type eq '#element' and
-                  $_->local_name eq 'Param') {
-                push @$a, $_->get_attribute_value ('Name');
-              }
-            }
-          } elsif ($_->local_name eq 'Attr') {
-            $Attr->{$if}->{$_->get_attribute_value ('Name')} = 1;
-          }
+for my $res (values %{$State->{Type}}) {
+  next unless defined $res->{ExpandedURI q<dis2pm:type>};
+  next unless length $res->{Name};
+  if ({
+        ExpandedURI q<ManakaiDOM:IF> => 1,
+        ExpandedURI q<ManakaiDOM:ExceptionIF> => 1,
+       }->{$res->{ExpandedURI q<dis2pm:type>}}) {
+    for my $mtd (values %{$res->{ExpandedURI q<dis2pm:method>}||{}}) {
+      next unless defined $mtd->{ExpandedURI q<dis2pm:type>};
+      next unless length $mtd->{Name};
+      if ($mtd->{ExpandedURI q<dis2pm:type>} eq
+          ExpandedURI q<ManakaiDOM:DOMMethod>) {
+        $Method->{$res->{Name}}->{$mtd->{Name}} = my $param = [];
+        for my $prm (@{$mtd->{ExpandedURI q<dis2pm:param>}||[]}) {
+          next unless defined $prm->{Name};
+          push @$param, $prm->{Name}
+            if $prm->{ExpandedURI q<dis2pm:type>} eq
+               ExpandedURI q<ManakaiDOM:DOMMethodParameter>;
         }
+      } elsif ($mtd->{ExpandedURI q<dis2pm:type>} eq
+               ExpandedURI q<ManakaiDOM:DOMAttribute>) {
+        $Attr->{$res->{Name}}->{$mtd->{Name}} = 1;
       }
     }
   }
 }
 
+our $result = '';
 $result .= perl_statement
              perl_assign
                perl_var
@@ -83,21 +102,21 @@ output_result $result;
 
 =head1 NAME
 
-mkdommemlist.pl - DOM Method & Attribute List Generator
+mkdommemlist.pl - DOM Method and Attribute List Generator
 
 =head1 SYNOPSIS
 
-  perl mkdommemlist.pl file1.dis [file2.dis...] > list.pl
+  perl mkdommemlist.pl source.cdis > list.pl
 
 =head1 DESCRIPTION
 
-The DOM Test Suite by W3C stores its test codes in the abstract 
-format based on XML and they by themselves do not have information 
-on what is method and what is attribute, nor the order of 
-parameters to a method.
+The DOM Test Suite by W3C stores its test codes in the abstract programming 
+language based on XML and they do not have information on what is method, 
+what is attribute, in what order parameters should be 
+passed to methods, and so on.
 
 The C<mkdommemlist.pl> generates lists of method, attributes and 
-parameters for methods from the "dis" files and write it 
+parameters for methods from the "cdis" files and write it 
 out as a Perl script, so that other script, such as 
 L<domtest2perl.pl>, can use this information.
 
@@ -108,6 +127,8 @@ I<Document Object Model (DOM) Conformance Test Suites>,
 
 L<domtest2perl.pl>.
 
+C<Makefile>.
+
 =head1 LICENSE
 
 Copyright 2004 Wakaba <w@suika.fam.cx>.  All rights reserved.
@@ -117,4 +138,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2004/10/16 13:34:56 $
+# $Date: 2004/12/31 12:03:39 $

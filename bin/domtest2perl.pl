@@ -3,9 +3,8 @@ use lib q<../lib>;
 use strict;
 BEGIN { require 'manakai/genlib.pl' }
 
-use Message::Util::QName::General [qw/ExpandedURI/], {
-  ManakaiDOMLS2003
-    => q<http://suika.fam.cx/~wakaba/archive/2004/9/27/mdom-old-ls#>,
+use Message::Util::QName::Filter {
+  ManakaiDOMLS2003 => q<http://suika.fam.cx/~wakaba/archive/2004/9/27/mdom-old-ls#>,
 };
 use Message::DOM::ManakaiDOMLS2003;
 use Message::DOM::DOMLS qw/MODE_SYNCHRONOUS/;
@@ -670,11 +669,11 @@ my $input;
 }
 
 {
-my $dom = Message::DOM::DOMImplementationRegistry
+my $dom = $Message::DOM::DOMImplementationRegistry
             ->getDOMImplementation
                  ({Core => undef,
                    XML => undef,
-                   ExpandedURI q<ManakaiDOMLS2003:LS> => '1.0'});
+                   ExpandedURI q<ManakaiDOMLS2003:LS> => ''});
 
 my $parser = $dom->createLSParser (MODE_SYNCHRONOUS);
 my $in = $dom->createLSInput;

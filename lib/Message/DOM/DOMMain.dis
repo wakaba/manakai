@@ -28,7 +28,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/29 12:17:42 $
+      $Date: 2004/12/31 12:03:40 $
     @@ContentType:
       dis:Date.RCS
   
@@ -276,6 +276,15 @@ ForDef:
   @ISA:
     ManakaiDOM:DOM
 
+ForDef:
+  @QName:
+    ManakaiDOM:DOMEventsFeature
+  @FullName:
+    @@lang:en
+    @@@:  For DOM Events feature, any version
+  @ISA:
+    ManakaiDOM:DOM
+
 ## For the manakai DOM implementation
 
 ForDef:
@@ -300,6 +309,8 @@ ForDef:
     ManakaiDOM:DOMXMLFeature
   @Implement: 
     ManakaiDOM:DOMHTMLFeature
+  @Implement:
+    ManakaiDOM:DOMEventsFeature
   @ISA:
     ManakaiDOM:ManakaiDOM
 ForDef:
@@ -1401,11 +1412,25 @@ StringDataTypeDef:
       lang:Perl
     @@@:
       if (CORE::defined $INPUT) {
-        unless (CORE::ref $INPUT) {
+        if (CORE::ref ($INPUT) eq 'HASH') {
+          my $new = {};
+          for my $fname (keys %{$INPUT}) {
+            if (CORE::ref ($INPUT->{$fname}) eq 'HASH') {
+              my $lfname = lc $fname;
+              for my $fver (keys %{$INPUT->{$fname}}) {
+                $new->{$lfname}->{$fver} = $INPUT->{$fname}->{$fver};
+              }
+            } else {
+              $new->{lc $fname} = {(CORE::defined $new->{$fname}
+                                      ? $new->{$fname} : '') => 1};
+            }
+          }
+          $INPUT = $new;
+        } else {
           my @f = split /\s+/, $INPUT;
           $INPUT = {};
           while (@f) {
-            my $name = shift @f;
+            my $name = lc shift @f;
             if (@f and $f[0] =~ /^[\d\.]+$/) {
               $INPUT->{$name}->{shift @f} = 1;
             } else {
@@ -1440,7 +1465,13 @@ StringDataTypeDef:
         Note that whether input is valid feature name-value pairs is 
         not checked; bad input will produce bad output.
     @@PerlDef:
-      $OUT = join ' ', %{$IN};
+      my @out;
+      for my $fname (keys %{$IN}) {
+        for my $fver (keys %{$IN->{$fname}}) {
+          push @out, $fname . ' ' . $fver . ' ' if $IN->{$fname}->{$fver};
+        }
+      }
+      $OUT = join ' ', @out;
 
 ResourceDef:
   @QName: docSupportsXMLFeature
@@ -1510,6 +1541,16 @@ PropDef:
       A subject resource implements a object feature. 
   @rdfs:range: DOMFeature
   @dataType: 
+    dis:TypeQName
+
+PropDef:
+  @QName: requireFeature
+  @Description:
+    @@lang:en
+    @@@:
+      A subject resource requires a object feature. 
+  @rdfs:range: DOMFeature
+  @dataType:
     dis:TypeQName
 
 FeatureDef:
@@ -2607,11 +2648,48 @@ StringDataTypeDef:
           }
 
 StringDataTypeDef:
+  @QName: RFC2732URIReference
+  @FullName:
+    @@lang:en
+    @@@:
+      RFC 2396 + RFC 2732 URI reference
+  @ISA:
+    ManakaiDOM:ManakaiDOMURI
+
+StringDataTypeDef:
+  @QName: RFC2396URIReference
+  @FullName:
+    @@lang:en
+    @@@:
+      RFC 2396 URI reference
+  @ISA: RFC2732URIReference
+
+StringDataTypeDef:
+  @QName: RFC2396URI
+  @FullName:
+    @@lang:en
+    @@@:
+      RFC 2396 URI
+  @ISA: RFC2396URIReference
+
+StringDataTypeDef:
+  @QName: RFC2396AbsoluteURI
+  @FullName:
+    @@lang:en
+     @@@:
+       RFC 2396 Absolute URI
+  @ISA: RFC2396URI
+
+## TODO: Output escape
+
+StringDataTypeDef:
   @QName: 
     ManakaiDOM:ManakaiDOMNamespaceURI
   @FullName:
     @@lang:en
     @@@: DOM Namespace URI
+  @ISA:
+    ManakaiDOM:ManakaiDOMURI
   @Description:
     @@lang:en
     @@@:
@@ -2649,6 +2727,90 @@ StringDataTypeDef:
           $INPUT = undef;
         }__;
       }
+
+StringDataTypeDef:
+  @QName: ManakaiDOMSchemaType
+  @FullName:
+    @@lang:en
+    @@@:
+      Schema language type
+  @Description:
+    @@lang:en
+    @@@:
+      An absolute URI representing the type of the schema language 
+      <SRC::DOM Level 3 Core <CP::schema-type>, DOM Level 3 Load and Save
+            <M::DOMLS:DOMImplementationLS.createLSParser>>.
+      \
+      {NOTE:: Schema languages other than XML Schema and XML DTD 
+              are outside of the scope of W3C; they should 
+              recommend their identifying absolute URI 
+              <SRC::DOM Level 3 Core <CP::schema-type>, 
+                    DOM Level 3 Load and Save 
+                    <M::DOMLS:DOMImplementationLS.createLSParser>>.
+      \
+      }
+  @ISA:
+    ManakaiDOM:ManakaiDOMURI
+  @InCase:
+    @@Value:
+      http://www.w3.org/2001/XMLSchema
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The XML Schema definition language 
+        <SRC::DOM Level 3 Core <CP::schema-type>, 
+              DOM Level 3 Load and Save
+              <M::DOMLS:DOMImplementationLS.createLSParser>>.
+  @InCase:
+    @@Value:
+      http://www.w3.org/TR/REC-xml
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The XML 1.0 Document Type Definition 
+        <SRC::DOM Level 3 Core <CP::schema-type>, 
+              DOM Level 3 Load and Save
+        <M::DOMLS:DOMImplementationLS.createLSParser>>.
+
+StringDataTypeDef:
+  @@QName: SystemID
+  @@FullName:
+    @@@lang:en
+    @@@@:
+      SGML system identifier
+
+StringDataTypeDef:
+  @@QName: XMLSystemID
+  @@FullName:
+    @@@lang:en
+    @@@@:
+      XML system identifier
+  @@ISA:
+    ManakaiDOM:DOMURI
+  @@ISA: SystemID
+
+StringDataTypeDef:
+  @@QName: PublicID
+  @@FullName:
+    @@@lang:en
+    @@@@:
+      Web SGML public identifier
+
+StringDataTypeDef:
+  @@QName: SGMLPublicID
+  @@FullName:
+    @@@lang:en
+    @@@@:
+      Classic SGML public identifier
+  @@ISA: PublicID
+
+StringDataTypeDef:
+  @@QName: XMLPublicID
+  @@FullName:
+    @@@lang:en
+    @@@@:
+      XML public identifier
+  @@ISA: PublicID
 
 ImplNote:
   @lang:en
@@ -3105,6 +3267,26 @@ ResourceDef:
     }
 
 ## -- The bootstrap object
+
+ResourceDef:
+  @QName: ManakaiDOMImplementationRegistryVar
+  @rdf:type:
+    DISPerl:ScalarVariable
+  @AppName:
+    @@@:
+      Message::DOM::DOMImplementationRegistry
+    @@ContentType:
+      lang:Perl
+  @DefaultValue:
+    @@@:
+      <ClassName::DOMMain:ManakaiDOMImplementationRegistry
+                                  ::ManakaiDOM:ManakaiDOMLatest>
+    @@ContentType:
+      lang:Perl
+  @Type:
+    DOMMain:DOMString
+  @For:
+    ManakaiDOM:ManakaiDOMCommon
 
 ResourceDef:
   @Name:

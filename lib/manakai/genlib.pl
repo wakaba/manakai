@@ -7,6 +7,7 @@ sub output_result ($) {
   print shift;
 }
 
+our $NodePathKey = [qw/Name QName Label/];
 ## Source file might be broken
 sub valid_err ($;%) {
   my ($s, %opt) = @_;
@@ -14,7 +15,7 @@ sub valid_err ($;%) {
   output_result $result;
   if ($opt{node}) {
     if ($opt{node}->isa ('Message::Markup::SuikaWikiConfig20::Node')) {
-      $s = $opt{node}->node_path (key => [qw/Name QName Label/]) . ': ' . $s;
+      $s = $opt{node}->node_path (key => $NodePathKey) . ': ' . $s;
     } elsif ($opt{node}->isa ('Message::DOM::IF::Node')) {
       $s = 'dom:nodeName ("'.$opt{node}->nodeName . '"): ' . $s;
     }

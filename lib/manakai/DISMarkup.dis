@@ -1,0 +1,134 @@
+Module:
+  @QName: 
+    DIS:DISMarkup
+  @FullName:
+    @@lang:en
+    @@@: 
+      <QUOTE:dis> Format Markup Vocaburary Defining Module
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
+  
+  @Author:
+    @@FullName:Wakaba
+    @@Mail:w@suika.fam.cx
+  @License:
+     license:Perl+MPL
+  @Date:
+    @@@:
+      $Date: 2004/12/31 12:03:40 $
+    @@ContentType:
+      dis:Date.RCS
+  
+  @DefaultFor:
+    ManakaiDOM:all
+
+  @Require:
+    @@Module:
+      @@@Name: DISCore
+
+Namespace:
+  @DIS:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @owl:
+    http://www.w3.org/2002/07/owl#
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @s:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
+
+## -- Markup language vocabulary types
+
+ElementTypeBinding:
+  @Name: ResourceTypeDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdfs:Class
+    @@ISA:
+      rdfs:Class
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+ResourceTypeDef:
+  @QName: ElementType
+  @Description:
+    @@lang:en
+    @@@:
+      A markup language element type. 
+
+ResourceTypeDef:
+  @QName: Attribute
+  @Description:
+    @@lang:en
+    @@@:
+      A markup language element attribute type.  
+
+## -- Markup language vocabulary characteristics
+
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdfs:Property
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+PropDef:
+  @QName: elementType
+  @Description:
+    @@lang:en
+    @@@:
+      A subject resource is associated with an object element type. 
+  @rdfs:domain: ElementType
+  @dataType:
+    dis:TypeForQNames
+
+PropDef:
+  @QName:
+    dis:DocAttr
+  @Description:
+    @@lang:en
+    @@@:
+      A subject resource is associated with an object markup attribute. 
+  @rdfs:domain: Attribute
+  @dataType:
+    dis:TypeForQNames
+
+## -- "For markup" definitions
+
+ForDef:
+  @QName:
+    s:ForML
+  @FullName:
+    @@lang:en
+    @@@:
+      For a markup language
+
+ForDef:
+  @QName:
+    s:ForET
+  @FullName:
+    @@lang:en
+    @@@:
+      For an element type
+
+## DISMarkup.dis ends here.

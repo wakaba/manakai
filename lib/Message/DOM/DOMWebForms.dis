@@ -1,38 +1,12 @@
-Namespace:
-  @DOMCore:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
-  @ev:
-    http://www.w3.org/2001/xml-events
-  @lang:
-     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
-  @license:
-     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
-  @ManakaiDOMCore:
-    http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
-  @ManakaiDOMHTML:
-    http://suika.fam.cx/~wakaba/archive/2004/mdom/html#
-  @TreeCore:\
-  @xhtml1:
-    http://www.w3.org/1999/xhtml
 Module:
-  @Name:  DOMWebForms
+  @QName:
+    MDOM:DOMWebForms
   @Namespace:
-     http://suika.fam.cx/~wakaba/archive/2004/dom/html#
-  @BindingName:
-     @@@:  html
-     @@Type:
-        lang:IDL-DOM
-     @@prefix:  dom.w3c.org
-     @@Condition:DOM1
-  @BindingName:
-     @@@:  html2
-     @@Type:
-        lang:IDL-DOM
-     @@prefix:  dom.w3c.org
-     @@Condition:DOM2
+     http://suika.fam.cx/~wakaba/archive/2004/dom/wf#
   @FullName:
     @@lang:en
     @@@: DOM Web Forms Module
+
   @Description:
     @@lang:en
     @@@:
@@ -50,40 +24,507 @@ Module:
      @@Mail:  w@suika.fam.cx
   @License:
      license:Perl+MPL
-  @Date.RCS:
-     $Date: 2004/11/01 07:58:17 $
+  @Date:
+    @@@:
+      $Date: 2004/12/31 12:03:40 $
+    @@ContentType:
+      dis:Date.RCS
 
-  @ConditionDef:
-    @@Name:DOM1
-  @ConditionDef:
-    @@Name:DOM2
-    @@ISA:DOM1
-  @ConditionDef:
-    @@Name:WF20
-    @@ISA:DOM2
-  @NormalCondition:WF20
+  @DefaultFor:
+    ManakaiDOM:ManakaiDOMLatest
 
-  @Feature:
-    @@Name:WebForms
-    @@Version:2.0
-    @@FullName:
-      @@@lang:en
-      @@@@:Web Forms 2.0
-    @@Condition:WF20
-  
   @Require:
      @@Module:
         @@@Name:  DOMHTML
-        @@@Namespace:
-          http://suika.fam.cx/~wakaba/archive/2004/dom/html#
+     @@Module:
+       @@@Name: DOMWebForms
+       @@@WithFor:
+         ManakaiDOM:ManakaiDOM
+     @@Module:
+       @@@Name: DOMWebForms
+       @@@WithFor:
+         ManakaiDOM:ManakaiDOM1
+     @@Module:
+       @@@Name: DOMWebForms
+       @@@WithFor:
+         ManakaiDOM:ManakaiDOM2
+     @@Module:
+       @@@Name: DOMWebForms
+       @@@WithFor:
+         ManakaiDOM:ManakaiDOMLatest
 
-DataTypeAlias:
-  @Name:  DOMString
-  @Type:
-     DOMCore:DOMString
+Namespace:
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @dis2pm:
+    http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
+  @DOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @DOMHTML:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/html#
+  @DOMMain:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @ev:
+    http://www.w3.org/2001/xml-events
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @ManakaiDOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
+  @ManakaiDOMHTML:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom/html#
+  @MDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
+  @MDOMX:
+    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @null:
+    http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
+  @Perl:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @s:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
+  @TreeCore:\
+  @xhtml1:
+    http://www.w3.org/1999/xhtml
+
+ElementTypeBinding:
+  @Name: L1
+  @ElementType:
+    DOMMain:implementFeature
+  @ShadowContent:
+    @@@: 
+      DOMHTML:HTMLFeature10
+    @@For:
+      ManakaiDOM:DOM1 !ManakaiDOM:DOM2
+  @ShadowSibling:
+    @@DOMMain:implementFeature:
+      @@@@: 
+        DOMHTML:HTMLFeature20
+      @@@For:
+        ManakaiDOM:DOM2
+
+ElementTypeBinding:
+  @Name: L1IF
+  @ElementType:
+    DOMMain:implementFeature
+  @ShadowContent:
+    @@@: 
+      DOMHTML:HTMLFeature10
+    @@For:
+      ManakaiDOM:DOM1 !ManakaiDOM:DOM2
+  @ShadowSibling:
+    @@DOMMain:implementFeature:
+      @@@@: 
+        DOMHTML:HTMLFeature20
+      @@@For:
+        ManakaiDOM:DOM2
+    @@ISA:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOM1
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+      @@@For:
+        ManakaiDOM:ManakaiDOM2
+    @@For:
+      ManakaiDOM:DOM1
+    @@For:
+      =ManakaiDOM:ManakaiDOM
+
+ElementTypeBinding:
+  @Name: L2
+  @ElementType:
+    DOMMain:implementFeature
+  @ShadowContent:
+    @@@: 
+      DOMHTML:HTMLFeature20
+    @@For:
+      ManakaiDOM:DOM2
+
+ElementTypeBinding:
+  @Name: L2IF
+  @ElementType:
+    DOMMain:implementFeature
+  @ShadowContent:
+    @@@: 
+      DOMHTML:HTMLFeature20
+    @@For:
+      ManakaiDOM:DOM2
+  @ShadowSibling:
+    @@For:
+      ManakaiDOM:DOM2
+    @@For:
+      =ManakaiDOM:ManakaiDOM
+
+ElementTypeBinding:
+  @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
+
+ElementTypeBinding:
+  @Name: IF
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@:
+        dis:MultipleResource
+      @@@ForCheck:
+        !ManakaiDOM:ForClass !ManakaiDOM:ForIF !DOMHTML:ForHTML
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:IF
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:Class
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@resourceFor:
+      @@@@:
+        ManakaiDOM:ForIF
+      @@@For:
+        =ManakaiDOM:ManakaiDOM
+      @@@For:
+        ManakaiDOM:DOMHTMLFeature
+      @@@ForCheck:
+        !DOMHTML:ForHTML
+    @@resourceFor:
+      @@@@:
+        ManakaiDOM:ForClass
+      @@@ForCheck:
+        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM ManakaiDOM:DOMHTMLFeature
+        !DOMHTML:ForHTML
+    @@ISA:
+      @@@@:
+        ManakaiDOM:ManakaiDOMObject
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@ISA:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOM
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+      @@@For:
+        ManakaiDOM:ManakaiDOM2
+
+ElementTypeBinding:
+  @Name: ET
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@:
+        dis:MultipleResource
+      @@@ForCheck:
+        !ManakaiDOM:ForClass !ManakaiDOM:ForIF !DOMHTML:ForHTML
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:IF
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:Class
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@resourceFor:
+      @@@@:
+        ManakaiDOM:ForIF
+      @@@ForCheck:
+        ManakaiDOM:DOM
+      @@@For:
+        =ManakaiDOM:ManakaiDOM
+      @@@For:
+        ManakaiDOM:DOMHTMLFeature
+    @@resourceFor:
+      @@@@:
+        ManakaiDOM:ForClass
+      @@@ForCheck:
+        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+        ManakaiDOM:DOMHTMLFeature
+
+    @@rdf:type:
+      @@@@:
+        s:ElementType
+      @@@ForCheck:
+        DOMHTML:ForHTML
+
+    @@ISA:
+      @@@@:
+        ManakaiDOM:ManakaiDOMObject
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@ISA:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOM
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+      @@@For:
+        ManakaiDOM:ManakaiDOM2
+    @@DISMarkup:elementType:
+      @@@@:
+        ::DOMHTML:ForHTML40SE
+      @@@ForCheck:
+        ManakaiDOM:DOM1 !ManakaiDOM:DOM2
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          DOM Level 1 First Edition refers the latest version of 
+          HTML 4.0 while Second Edition refers the second edition of 
+          HTML 4.0. 
+    @@DISMarkup:elementType:
+      @@@@:
+        ::DOMHTML:ForHTML401
+      @@@ForCheck:
+        ManakaiDOM:DOM2
+    @@DISMarkup:elementType:
+      @@@@:
+        ::DOMHTML:ForXHTML10SE
+      @@@ForCheck:
+        ManakaiDOM:DOM2
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+ElementTypeBinding:
+  @Name: IntMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isForInternal: 1
+ElementTypeBinding:
+  @Name: ReMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isRedefining: 1
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethodParameter
+ElementTypeBinding:
+  @Name: Exception
+  @ElementType:
+    ManakaiDOM:raises
+
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethodReturn
+
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttribute
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+
+ElementTypeBinding:
+  @Name: ATTR
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:DOMAttribute
+      @@@ForCheck:
+        ManakaiDOM:DOM
+    @@rdf:type:
+      @@@@:
+        s:Attribute
+      @@@ForCheck:
+        DOMHTML:ForHTML
+    @@DocAttr:
+      @@@@:
+        ::DOMHTML:ForHTML40SE
+      @@@ForCheck:
+        ManakaiDOM:DOM1 !ManakaiDOM:DOM2
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          DOM Level 1 First Edition refers the latest version of 
+          HTML 4.0 while Second Edition refers the second edition of 
+          HTML 4.0. 
+    @@DocAttr:
+      @@@@:
+        ::DOMHTML:ForHTML401
+      @@@ForCheck:
+        ManakaiDOM:DOM2
+    @@DocAttr:
+      @@@@:
+        ::DOMHTML:ForXHTML10SE
+      @@@ForCheck:
+        ManakaiDOM:DOM2
+
+ElementTypeBinding:
+  @Name: ReAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttribute
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isRedefining: 1
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttrGet
+    @@ForCheck:
+      ManakaiDOM:DOM
+ElementTypeBinding:
+  @Name: Set
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttrSet
+    @@ForCheck:
+      ManakaiDOM:DOM
+ElementTypeBinding:
+  @Name: InCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+
+ElementTypeBinding:
+  @Name: ConstGroup
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:ConstGroup
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+
+ElementTypeBinding:
+  @Name: Const
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: 
+      ManakaiDOM:Const
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+
+ElementTypeBinding:
+  @Name: Deprecated
+  @ElementType:
+    DOMHTML:isDeprecatedByHTML4
+  @ShadowContent: 1
+  @ShadowSibling:
+    @@ForCheck:
+      !DOMHTML:ForXHTML11
+
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdfs:Property
+    @@AliasFor: 
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: ISAHTMLElement
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@@: 
+      DOMHTML:HTMLElement
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @ShadowSibling:
+    @@ISA:
+      @@@@: 
+        DOMHTML:ManakaiDOMHTMLElement
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+
+ElementTypeBinding:
+  @Name: ETQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck:
+      s:ForML
+ElementTypeBinding:
+  @Name: IFQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck:
+      ManakaiDOM:ForIF
+ElementTypeBinding:
+  @Name: ClsQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck:
+      ManakaiDOM:ForClass
+
+ElementTypeBinding:
+  @Name: DOMAName
+  @ElementType:
+    dis:Name
+  @ShadowContent:
+    @@ForCheck:
+      ManakaiDOM:DOM
+ElementTypeBinding:
+  @Name: AName
+  @ElementType:
+    dis:Name
+  @ShadowContent:
+    @@ForCheck:
+      DOMHTML:ForHTML
 
 IF:
-  @Name:  HTMLOptionsCollection
+  @IFQName:  
+    DOMHTML:HTMLOptionsCollection
+  @ClsQName:ManakaiDOMHTMLOptionsCollection
   @Description:
     @@lang:en
     @@@:
@@ -102,6 +543,8 @@ IF:
       
   @Level[list]:  2
   @SpecLevel[list]:  2
+  @L2IF:
+
   @Attr:
      @@Name:  length
      @@Description:
@@ -142,7 +585,8 @@ IF:
             Ordinal index of the node to retrieve, in the 
             document order.  The index origin is <DOM:0>.
      @@Return:
-        @@@Type:  Node
+        @@@Type:  
+          DOMCore:Node
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -191,19 +635,22 @@ IF:
               There is no node with such a <P:name>.
 ##IF:HTMLOptionCollection
 
-IF:
-  @Name:  HTMLFormElement
+ET:
+  @ETQName:
+    xhtml1:form
+  @IFQName:  
+    DOMHTML:HTMLFormElement
+  @ClsQName:ManakaiDOMHTMLFormElement
+  @ISAHTMLElement:
+  @L1IF:
+
   @Description:
     @@lang:en
     @@@:
       This interface encompasses behavior similar to a collection 
       and an element.  It provides direct access to the contained 
       form controls as well as attributes of the form element.
-  @ISA:  
-    DOMHTML:HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:form
+
   @Attr:
      @@Name:  elements
      @@Description:
@@ -234,48 +681,37 @@ IF:
                  added for backward compatibility with DOM Level 0.
          \
          }
-     @@DocAttr:
-       @@@Name:name
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  acceptCharset
-     @@DocAttr:
-       @@@Name:accept-charset
+  @ATTR:
+     @@AName:accept-charset
+     @@DOMAName:  acceptCharset
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  action
-     @@DocAttr:
-       @@@Name:action
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  enctype
-     @@DocAttr:
-       @@@Name:enctype
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  method
-     @@DocAttr:
-       @@@Name:method
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  target
-     @@DocAttr:
-       @@@Name:targeet
      @@Get:
         @@@Type:  DOMString
      @@Set:
@@ -304,21 +740,24 @@ IF:
      @@Return:  
 ##IF:HTMLFormElement
 
-IF:
-  @Name:  HTMLSelectElement
-  @ISA:  
-    DOMHTML:HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:select
+ET:
+  @ETQName:
+    xhtml1:select
+  @IFQName:  
+    DOMHTML:HTMLSelectElement
+  @ClsQName: ManakaiDOMHTMLSelectElement
+  @ISAHTMLElement: 
+  @L1IF:
+
   @Attr:
      @@Name:  type
      @@Description:
        @@@lang:en
        @@@@:
          The type of this form control.
+     @@Type:
+       DOMMain:DOMString
      @@Get:
-        @@@Type:  DOMString
         @@@InCase:
           @@@@Value:select-one
           @@@@Description:
@@ -336,12 +775,10 @@ IF:
           @@@@@:
             Values were not defined in DOM Level 1 First Edition; 
             they were added in the DOM Level 1 Errata.
-        @@@Def:
-          @@@@Type:
-            lang:Perl
-          @@@@@:
+        @@@PerlDef:
             __DEEP{
-              $r = $self->multiple ? "select-multiple" : "select-one";
+              $r = $self-><M::DOMHTML:HTMLSelectElement.multiple>
+                              ? "select-multiple" : "select-one";
             }__;
   @Attr:
      @@Name:  selectedIndex
@@ -410,6 +847,8 @@ IF:
                  DOM implementation.
         @@@SpecLevel:2
         @@@Level:2
+        @@@For:
+          ManakaiDOM:DOM2
      @@Level[list]:
         1
         2
@@ -423,7 +862,8 @@ IF:
        @@@@:
          The <HE:form> element containing this control.
      @@Get:
-        @@@Type:  HTMLFormElement
+        @@@Type:  
+          DOMHTML:HTMLFormElement
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
@@ -440,20 +880,17 @@ IF:
          by this element.
      @@Get:
         @@@Type:  
-          @@@@@:HTMLOptionsCollection
-          @@@@ImplNote:
-            @@@@@lang:en
-            @@@@@@:
-              The type was <IF:HTMLCollection> in DOM Level 1.
-     @@Level[list]:
-        1
-     @@SpecLevel[list]:
-        1
-        2
-  @Attr:
+          @@@@@:
+            DOMHTML:HTMLOptionsCollection
+          @@@@For:
+            ManakaiDOM:DOM2
+        @@@Type:
+          @@@@@:
+            DOMHTML:HTMLCollection
+          @@@@For:
+            ManakaiDOM:DOM1 !ManakaiDOM:DOM2
+  @ATTR:
      @@Name:  disabled
-     @@DocAttr:
-       @@@Name:disabled
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -468,10 +905,8 @@ IF:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
-  @Attr:
+  @ATTR:
      @@Name:  multiple
-     @@DocAttr:
-       @@@Name:multiple
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -486,28 +921,23 @@ IF:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
-  @Attr:
+  @ATTR:
      @@Name:  name
-     @@DocAttr:
-       @@@Name:name
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  size
-     @@DocAttr:
-       @@@Name:size
      @@Get:
         @@@Type:
            DOMMain:long
      @@Set:
         @@@Type:
            DOMMain:long
-  @Attr:
-     @@Name:  tabIndex
-     @@DocAttr:
-       @@@Name:tabindex
+  @ATTR:
+     @@AName:tabindex
+     @@DOMAName:  tabIndex
      @@Get:
         @@@Type:
            DOMMain:long
@@ -530,13 +960,15 @@ IF:
           @@@@@:
             The element to add.
         @@@InCase:
-          @@@@Type:HTMLOptionElement
+          @@@@Type:
+            DOMHTML:HTMLOptionElement
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
               The option to add.
         @@@InCase:
-          @@@@Type:HTMLOptGroupElement
+          @@@@Type:
+            DOMHTML:HTMLOptGroupElement
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
@@ -612,17 +1044,17 @@ IF:
      @@Return:  
 ##IF:HTMLSelectElement
 
-IF:
-  @Name:  HTMLOptGroupElement
-  @ISA:  
-    DOMHTML:HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:optgroup
-  @Attr:
+ET:
+  @ETQName:
+    xhtml1:optgroup
+  @IFQName:  
+    DOMHTML:HTMLOptGroupElement
+  @ClsQName:ManakaiDOMHTMLOptGroupElement
+  @ISAHTMLElement: 
+  @L1IF:
+
+  @ATTR:
      @@Name:  disabled
-     @@DocAttr:
-       @@@Name:disabled
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -637,23 +1069,24 @@ IF:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
-  @Attr:
+  @ATTR:
      @@Name:  label
-     @@DocAttr:
-       @@@Name:label
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 ##IF:HTMLOptGroupElement
 
-IF:
-  @Name:  HTMLOptionElement
-  @ISA:  
-    DOMHTML:HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:option
+ET:
+  @ETQName:
+    xhtml1:option
+  @IFQName:
+    DOMHTML:HTMLOptionElement
+  @ClsQName:
+    ManakaiDOMHTMLOptionElement
+  @ISAHTMLElement:  
+  @L1IF:
+
   @Attr:
      @@Name:  form
      @@Description:
@@ -661,7 +1094,8 @@ IF:
        @@@@:
          The <HE:form> element containing this control.
      @@Get:
-        @@@Type:  HTMLFormElement
+        @@@Type:  
+          DOMHTML:HTMLFormElement
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
@@ -669,16 +1103,15 @@ IF:
             @@@@@lang:en
             @@@@@@:
               This control is not within the context of a form.
-  @Attr:
-     @@Name:  defaultSelected
+  @ATTR:
+     @@AName:selected
+     @@DOMAName:  defaultSelected
      @@Description:
        @@@lang:en
        @@@@:
          Whether the option is initially selected or not.  
          The value of this attribute does not change 
          if the state of the corresponding form control changes.
-     @@DocAttr:
-       @@@Name:selected
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -707,17 +1140,10 @@ IF:
      @@Get:
         @@@Type:  DOMString
         @@@Def:
-          @@@@Type:
-            lang:Perl
-          @@@@@:
-              if ($self->hasAttributeNS (null, 'label')) {
-                $r = $self->getAttributeNS (null, 'label');
-              } elsif ($self->hasAttribute ('label')) {
-                $r = $self->getAttribute ('label');
-              } else {
-                $r = $self->{<Q:TreeCore:node>}
-                          ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{textContent}__;
-              }
+          @@@@ContentType:
+            lang:dis
+          @@@@DISPerl:cloneCode:
+            DOMCore:ManakaiDOMNode.getTextContent
   @Attr:
      @@Name:  index
      @@Description:
@@ -742,10 +1168,8 @@ IF:
      @@SpecLevel[list]:
         1
         2
-  @Attr:
+  @ATTR:
      @@Name:  disabled
-     @@DocAttr:
-       @@@Name:disabled
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -760,10 +1184,8 @@ IF:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
-  @Attr:
+  @ATTR:
      @@Name:  label
-     @@DocAttr:
-       @@@Name:label
      @@Get:
         @@@Type:  DOMString
      @@Set:
@@ -785,7 +1207,7 @@ IF:
         @@@InCase:
            @@@@Value:  false
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetProp:
             DOMHTML:selected
@@ -797,7 +1219,7 @@ IF:
         @@@InCase:
            @@@@Value:  false
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@SetProp:
             DOMHTML:selected
@@ -806,45 +1228,51 @@ IF:
           @@@@@:
             Marked as read-only attribute in DOM Level 1 First Edition. 
             It was ammended in DOM Level 1 Errata.
-  @Attr:
+  @ATTR:
      @@Name:  value
-     @@DocAttr:
-       @@@Name:value
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 ##IF:HTMLOptionElement
 
-IF:
-  @Name:  HTMLInputElement
-  @ISA:  
-    DOMHTML:HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:input
-  @Attr:
-     @@Name:  defaultValue
+PropDef:
+  @QName:
+    DOMHTML:selected
+  @Description:
+    @@lang:en
+    @@@:
+      Whether a subject option element is selected or not. 
+
+ET:
+  @ETQName:
+    xhtml1:input
+  @IFQName:  
+    DOMHTML:HTMLInputElement
+  @ClsQName:ManakaiDOMHTMLInputElement
+  @ISAHTMLElement: 
+  @L1IF:
+
+  @ATTR:
+     @@AName:value
+     @@DOMAName:  defaultValue
      @@Description:
        @@@lang:en
        @@@@:
          The initial value of the <HTML:text>, <HTML:file> or 
          <HTML:password> control.
-     @@DocAttr:
-       @@@Name:value
+     @@Type: 
+       DOMMain:DOMString
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
-  @Attr:
-     @@Name:  defaultChecked
+  @ATTR:
+     @@AName:checked
+     @@DOMAName:  defaultChecked
      @@Description:
        @@@lang:en
        @@@@:
          The initial state of the <HTML:checkbox> or <HTML:radio> 
          button control.
-     @@DocAttr:
-       @@@Name:checked
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -866,7 +1294,8 @@ IF:
        @@@@:
          The <HE:form> element containing this control.
      @@Get:
-        @@@Type:  HTMLFormElement
+        @@@Type:  
+          DOMHTML:HTMLFormElement
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
@@ -874,36 +1303,28 @@ IF:
             @@@@@lang:en
             @@@@@@:
               This control is not within the context of a form.
-  @Attr:
+  @ATTR:
      @@Name:  accept
-     @@DocAttr:
-       @@@Name:accept
+     @@Type:
+       DOMMain:DOMString
+     @@Get:
+     @@Set:
+  @ATTR:
+     @@AName:accesskey
+     @@DOMAName:  accessKey
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  accessKey
-     @@DocAttr:
-       @@@Name:accesskey
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  align
-     @@DocAttr:
-       @@@Name:align
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  alt
-     @@DocAttr:
-       @@@Name:alt
      @@Get:
         @@@Type:  DOMString
      @@Set:
@@ -945,10 +1366,8 @@ IF:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
-  @Attr:
+  @ATTR:
      @@Name:  disabled
-     @@DocAttr:
-       @@@Name:disabled
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -963,28 +1382,24 @@ IF:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
-  @Attr:
-     @@Name:  maxLength
-     @@DocAttr:
-       @@@Name:maxlength
+  @ATTR:
+     @@AName:maxlength
+     @@DOMAName:  maxLength
      @@Get:
         @@@Type:
            DOMMain:long
      @@Set:
         @@@Type:
            DOMMain:long
-  @Attr:
+  @ATTR:
      @@Name:  name
-     @@DocAttr:
-       @@@Name:name
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  readOnly
-     @@DocAttr:
-       @@@Name:readonly
+  @ATTR:
+     @@AName:readonly
+     @@DOMAName:  readOnly
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -999,10 +1414,8 @@ IF:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
-  @Attr:
+  @ATTR:
      @@Name:  size
-     @@DocAttr:
-       @@@Name:size
      @@Get:
         @@@Type:
            DOMMain:unsigned-long
@@ -1018,44 +1431,39 @@ IF:
      @@SpecLevel[list]:
         1
         2
-  @Attr:
+  @ATTR:
      @@Name:  src
-     @@DocAttr:
-       @@@Name:src
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  tabIndex
-     @@DocAttr:
-       @@@Name:tabindex
+  @ATTR:
+     @@AName:tabindex
+     @@DOMAName:  tabIndex
      @@Get:
         @@@Type:
            DOMMain:long
      @@Set:
         @@@Type:
            DOMMain:long
-  @Attr:
+  @ATTR:
      @@Name:  type
-     @@DocAttr:
-       @@@Name:type
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
         @@@SpecLevel:2
         @@@Level:2
+        @@@L2:
      @@Level[list]:
         1
         2
      @@SpecLevel[list]:
         1
         2
-  @Attr:
-     @@Name:  useMap
-     @@DocAttr:
-       @@@Name:usemap
+  @ATTR:
+     @@AName:usemap
+     @@DOMAName:  useMap
      @@Get:
         @@@Type:  DOMString
      @@Set:
@@ -1102,27 +1510,27 @@ IF:
           @@@@lang:en
           @@@@@:
             ISSUE: Some mechanism to mask password required?
-        @@@Def:
-          @@@@Type:
-            lang:Perl
-          @@@@@:
+        @@@PerlDef:
             my $type;
             __DEEP{
               $type = $self->type;
             }__;
             if ({text => 1, password => 1, file => 1}->{$type}) {
-              __DISCODE{
-                GetProp:
-              \    DOMHTML:value
-              }__;
+              ## TODO:
+             # __DISCODE{
+             #   GetProp:
+             # \    DOMHTML:value
+             # }__;
             } else {
-              __DISDODE{
-                get-attribute-value:
-                \ value
-              }__;
+              ## TODO:
+              #__DISDODE{
+              #  get-attribute-value:
+              #  \ value
+              #}__;
             }
      @@Set:
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -1134,24 +1542,22 @@ IF:
           @@@@lang:en
           @@@@@:
             TODO: Switch to make file value unchangable required.
-        @@@Def:
-          @@@@Type:
-            lang:Perl
-          @@@@@:
+        @@@PerlDef:
             my $type;
             __DEEP{
-              $type = $self->type;
+              $type = $self-><AG::DOMHTML:HTMLInputElement.type>;
             }__;
             if ({text => 1, password => 1, file => 1}->{$type}) {
-              __DISCODE{
-                SetProp:
-              \    DOMHTML:value
-              }__;
+              ## TODO:
+              #__DISCODE{
+              #  SetProp:
+              #\    DOMHTML:value
+              #}__;
             } else {
-              __DISDODE{
-                set-attribute-value:
-                \ value
-              }__;
+              #__DISDODE{
+              #  set-attribute-value:
+              #  \ value
+              #}__;
             }
   @Method:
      @@Name:  blur
@@ -1186,13 +1592,15 @@ IF:
      @@Return:  
 ##IF:HTMLInputElement
 
-IF:
-  @Name:  HTMLTextAreaElement
-  @ISA:  
-    DOMHTML:HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:textarea
+ET:
+  @ETQName:
+    xhtml1:textarea
+  @IFQName:  
+    DOMHTML:HTMLTextAreaElement
+  @ClsQName:ManakaiDOMHTMLTextAreaElement
+  @ISAHTMLElement:
+  @L1IF:
+
   @Attr:
      @@Name:  defaultValue
      @@Description:
@@ -1203,22 +1611,21 @@ IF:
          not change if the contents of the corresponding 
          form control.
      @@Get:
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
         @@@Def:
-          @@@@Type:
-            lang:Perl
-          @@@@@:
-            $r = $self->{<Q:TreeCore:node>}
-                      ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{textContent}__;
+          @@@@ContentType:
+            lang:dis
+          @@@@DISPerl:cloneCode:
+            DOMCore:ManakaiDOMNode.getTextContent
      @@Set:
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
         @@@Def:
-          @@@@Type:
-            lang:Perl
-          @@@@@:
-            __DEEP{  ## Latest version
-              $self->__SUPER{Element::}__::textContent ($given);
-            }__;
+          @@@@ContentType:
+            lang:dis
+          @@@@DISPerl:cloneCode:
+            DOMCore:ManakaiDOMNode.setTextContent
      @@Level[list]:
         1
      @@SpecLevel[list]:
@@ -1231,7 +1638,8 @@ IF:
        @@@@:
          The <HE:form> element containing this control.
      @@Get:
-        @@@Type:  HTMLFormElement
+        @@@Type:  
+          DOMHTML:HTMLFormElement
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
@@ -1239,28 +1647,23 @@ IF:
             @@@@@lang:en
             @@@@@@:
               This control is not within the context of a form.
-  @Attr:
-     @@Name:  accessKey
-     @@DocAttr:
-       @@@Name:accesskey
+  @ATTR:
+     @@AName:accesskey
+     @@DOMAName:  accessKey
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  cols
-     @@DocAttr:
-       @@@Name:cols
      @@Get:
         @@@Type:
            DOMMain:long
      @@Set:
         @@@Type:
            DOMMain:long
-  @Attr:
+  @ATTR:
      @@Name:  disabled
-     @@DocAttr:
-       @@@Name:disabled
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -1275,16 +1678,15 @@ IF:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
-  @Attr:
+  @ATTR:
      @@Name:  name
-     @@DocAttr:
-       @@@Name:name
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  readOnly
+  @ATTR:
+     @@AName:readonly
+     @@DOMAName:  readOnly
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -1299,7 +1701,7 @@ IF:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
-  @Attr:
+  @ATTR:
      @@Name:  rows
      @@Get:
         @@@Type:
@@ -1307,10 +1709,9 @@ IF:
      @@Set:
         @@@Type:
            DOMMain:long
-  @Attr:
-     @@Name:  tabIndex
-     @@DocAttr:
-       @@@Name:name
+  @ATTR:
+     @@AName:tabindex
+     @@DOMAName:  tabIndex
      @@Get:
         @@@Type:
            DOMMain:long
@@ -1336,7 +1737,10 @@ IF:
             @@@@@@:
               Not defined in DOM Level 1 FE - added in Errata.
         @@@DefaultValue:textarea
-        @@@Def:\
+        @@@Def:
+          @@@@ContentType:
+            lang:dis
+          @@@@DISLang:nop:
   @Attr:
      @@Name:  value
      @@Description:
@@ -1355,14 +1759,14 @@ IF:
             cannot fit into a single <TYPE:DOMstring>, 
             the DOM implementation may truncate the data.
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetProp:
             DOMHTML:value
      @@Set:
         @@@Type:  DOMString
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@SetProp:
             DOMHTML:value
@@ -1389,13 +1793,22 @@ IF:
      @@Return:  
 ##IF:DOMHTMLTextAreaElement
 
-IF:
-  @Name:  HTMLButtonElement
-  @ISA:  
-    DOMHTML:HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:button
+PropDef:
+  @QName:value
+  @Description:
+    @@lang:en
+    @@@:
+      The current value of a subject form control.
+
+ET:
+  @ETQName:
+    xhtml1:button
+  @IFQName:
+    DOMHTML:HTMLButtonElement
+  @ClsQName:ManakaiDOMHTMLButtonElement
+  @ISAHTMLElement:
+  @L1IF:
+
   @Attr:
      @@Name:  form
      @@Description:
@@ -1403,7 +1816,8 @@ IF:
        @@@@:
          The <HE:form> element containing this control.
      @@Get:
-        @@@Type:  HTMLFormElement
+        @@@Type:  
+          DOMHTML:HTMLFormElement
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
@@ -1411,18 +1825,15 @@ IF:
             @@@@@lang:en
             @@@@@@:
               This control is not within the context of a form.
-  @Attr:
-     @@Name:  accessKey
-     @@DocAttr:
-       @@@Name:accesskey
+  @ATTR:
+     @@AName:accesskey
+     @@DOMAName:  accessKey
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  disabled
-     @@DocAttr:
-       @@@Name:disabled
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -1437,47 +1848,43 @@ IF:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
-  @Attr:
+  @ATTR:
      @@Name:  name
-     @@DocAttr:
-       @@@Name:name
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  tabIndex
-     @@DocAttr:
-       @@@Name:tabindex
+  @ATTR:
+     @@AName:tabindex
+     @@DOMAName:  tabIndex
      @@Get:
         @@@Type:
            DOMMain:long
      @@Set:
         @@@Type:
            DOMMain:long
-  @Attr:
+  @ATTR:
      @@Name:  type
-     @@DocAttr:
-       @@@Name:type
      @@Get:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  value
-     @@DocAttr:
-       @@@Name:value
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 ##IF:HTMLButtonElement
 
-IF:
-  @Name:  HTMLLabelElement
-  @ISA:  
-    DOMHTML:HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:label
+ET:
+  @ETQName:
+    xhtml1:label
+  @IFQName:
+    DOMHTML:HTMLLabelElement
+  @ClsQName:
+    ManakaiDOMHTMLLabelElement
+  @ISAHTMLElement:
+  @L1IF:
+
   @Attr:
      @@Name:  form
      @@Description:
@@ -1485,7 +1892,8 @@ IF:
        @@@@:
          The <HE:form> element containing this control.
      @@Get:
-        @@@Type:  HTMLFormElement
+        @@@Type:  
+          DOMHTML:HTMLFormElement
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
@@ -1493,31 +1901,31 @@ IF:
             @@@@@lang:en
             @@@@@@:
               This control is not within the context of a form.
-  @Attr:
-     @@Name:  accessKey
-     @@DocAttr:
-       @@@Name:accesskey
+  @ATTR:
+     @@AName:accesskey
+     @@DOMAName:  accessKey
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  htmlFor
-     @@DocAttr:
-       @@@Name:for
+  @ATTR:
+     @@AName:for
+     @@DOMAName:  htmlFor
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 ##IF:HTMLLabelElement
 
-IF:
-  @Name:  HTMLFieldSetElement
-  @ISA:  
-    DOMHTML:HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:fieldset
+ET:
+  @ETQName:
+    xhtml1:fieldset
+  @IFQName:  
+    DOMHTML:HTMLFieldSetElement
+  @ClsQName:ManakaiDOMHTMLFieldSetElement
+  @ISAHTMLElement:
+  @L1IF:
+
   @Attr:
      @@Name:  form
      @@Description:
@@ -1525,7 +1933,8 @@ IF:
        @@@@:
          The <HE:form> element containing this control.
      @@Get:
-        @@@Type:  HTMLFormElement
+        @@@Type:  
+          DOMHTML:HTMLFormElement
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
@@ -1535,13 +1944,15 @@ IF:
               This control is not within the context of a form.
 ##IF:HTMLFieldSetElement
 
-IF:
-  @Name:  HTMLLegendElement
-  @ISA:  
-    DOMHTML:HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:legend
+ET:
+  @ETQName:
+    xhtml1:legend
+  @IFQName:
+    DOMHTML:HTMLLegendElement
+  @ClsQName:  ManakaiDOMHTMLLegendElement
+  @ISAHTMLElement:
+  @L1IF:
+
   @Attr:
      @@Name:  form
      @@Description:
@@ -1549,7 +1960,8 @@ IF:
        @@@@:
          The <HE:form> element containing this control.
      @@Get:
-        @@@Type:  HTMLFormElement
+        @@@Type:  
+          DOMHTML:HTMLFormElement
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
@@ -1557,21 +1969,16 @@ IF:
             @@@@@lang:en
             @@@@@@:
               This control is not within the context of a form.
-  @Attr:
-     @@Name:  accessKey
-     @@DocAttr:
-       @@@Name:
-         accesskey
+  @ATTR:
+     @@AName:accesskey
+     @@DOMAName:  accessKey
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  align
-     @@DocAttr:
-       @@@Name:align
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:

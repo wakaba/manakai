@@ -24,11 +24,13 @@ IDL2DIS = $(PERL) $(IDL2DIS_PL)
 
 DIS_FILES = DOMMain.dis DOMCore.dis DOMXML.dis \
   DOMLS.dis ManakaiDOMLS2003.dis \
-  DOMEvents.dis
+  DOMEvents.dis DOMViews.dis \
+  DOMHTML.dis DOMWebForms.dis
 
-GENERATED_FILES_DOMLATEST = core.cdis ev.cdis ls.cdis \
+GENERATED_FILES_DOMLATEST = core.cdis ev.cdis ls.cdis html.cdis \
   DOMMain.pm DOMCore.pm DOMXML.pm DOMLS.pm ManakaiDOMLS2003.pm \
-  DOMEvents.pm
+  DOMEvents.pm DOMViews.pm \
+  DOMHTML.pm DOMWebForms.pm
 GENERATED_FILES = $(MAIN_CDIS_FILE) $(GENERATED_FILES_DOMLATEST)
 
 NS_MANAKAIDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#
@@ -36,15 +38,17 @@ NS_MANAKAIDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#
 all: dom
 
 dom: dom-latest
-dom-latest: DOMMain.pm-chk DOMCore.pm-chk \
-	$(GENERATED_FILES_DOMLATEST)
+dom-latest: $(GENERATED_FILES_DOMLATEST)
 
 core.cdis: DOMCore.dis DOMMain.dis DOMXML.dis $(DISC_PL)
 	$(DISC) DOMCore.dis --output-file-name=$@
 
-ev.cdis: core.cdis DOMEvents.dis $(DISC_PL)
+ev.cdis: core.cdis DOMEvents.dis DOMViews.dis $(DISC_PL)
 	$(DISC) DOMEvents.dis --input-cdis-file-name=$< \
-                            --output-file-name=$@
+	                    --output-file-name=.$@.1.tmp
+	$(DISC) DOMViews.dis --input-cdis-file-name=.$@.1.tmp \
+	                    --output-file-name=$@
+	$(RM) .$@.1.tmp
 
 ls.cdis: ev.cdis DOMLS.dis ManakaiDOMLS2003.dis $(DISC_PL)
 	$(DISC) DOMLS.dis --input-cdis-file-name=$< \
@@ -53,21 +57,24 @@ ls.cdis: ev.cdis DOMLS.dis ManakaiDOMLS2003.dis $(DISC_PL)
 	                    --output-file-name=$@
 	$(RM) .$@.1.tmp
 
+html.cdis: ls.cdis DOMHTML.dis DOMWebForms.dis $(DISC_PL)
+	$(DISC) DOMHTML.dis --input-cdis-file-name=$< \
+	                    --output-file-name=.$@.1.tmp
+	$(DISC) DOMWebForms.dis --input-cdis-file-name=.$@.1.tmp \
+	                    --output-file-name=$@
+	$(RM) .$@.1.tmp
+
 DOMMain.pm: core.cdis $(CDIS2PM_PL)
 	$(CDIS2PM) $< --for="$(NS_MANAKAIDOM)ManakaiDOMCommon" \
 	  --module-name=DOMMain > $@
 	$(CDIS2PM) $< --for="$(NS_MANAKAIDOM)ManakaiDOMLatest" \
 	  --module-name=DOMMain >> $@
+	$(PERL_CHK) $@
 
-DOMMain.pm-chk: DOMMain.pm
-	$(PERL_CHK) $<
-
-DOMCore.pm: core.cdis $(CDIS2PM_PL)
+DOMCore.pm: core.cdis DOMMain.pm $(CDIS2PM_PL)
 	$(CDIS2PM) $< --for="$(NS_MANAKAIDOM)ManakaiDOMLatest" \
 	  --module-name=DOMCore > $@
-
-DOMCore.pm-chk: DOMCore.pm
-	$(PERL_CHK) $<
+	$(PERL_CHK) $@
 
 DOMXML.pm: core.cdis $(CDIS2PM_PL)
 	$(CDIS2PM) $< --for="$(NS_MANAKAIDOM)ManakaiDOMLatest" \
@@ -79,6 +86,11 @@ DOMEvents.pm: ev.cdis $(CDIS2PM_PL)
 	  --module-name=DOMEvents > $@
 	$(PERL_CHK) $@
 
+DOMViews.pm: ev.cdis $(CDIS2PM_PL)
+	$(CDIS2PM) $< --for="$(NS_MANAKAIDOM)ManakaiDOMLatest" \
+	  --module-name=DOMViews > $@
+	$(PERL_CHK) $@
+
 DOMLS.pm: ls.cdis $(CDIS2PM_PL)
 	$(CDIS2PM) $< --for="$(NS_MANAKAIDOM)ManakaiDOMLatest" \
 	  --module-name=DOMLS > $@
@@ -87,6 +99,16 @@ DOMLS.pm: ls.cdis $(CDIS2PM_PL)
 ManakaiDOMLS2003.pm: ls.cdis $(CDIS2PM_PL)
 	$(CDIS2PM) $< --for="$(NS_MANAKAIDOM)ManakaiDOMLatest" \
 	  --module-name=ManakaiDOMLS2003 > $@
+	$(PERL_CHK) $@
+
+DOMHTML.pm: html.cdis $(CDIS2PM_PL)
+	$(CDIS2PM) $< --for="$(NS_MANAKAIDOM)ManakaiDOMLatest" \
+	  --module-name=DOMHTML > $@
+	$(PERL_CHK) $@
+
+DOMWebForms.pm: html.cdis $(CDIS2PM_PL)
+	$(CDIS2PM) $< --for="$(NS_MANAKAIDOM)ManakaiDOMLatest" \
+	  --module-name=DOMWebForms > $@
 	$(PERL_CHK) $@
 	
 clean:

@@ -33,7 +33,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2004/12/29 12:17:42 $
+      $Date: 2004/12/31 12:03:40 $
     @@ContentType:
       dis:Date.RCS
 
@@ -122,7 +122,7 @@ FeatureDef:
     @@QName: LSFeature10
     @@ISA: 
       ManakaiDOMLS2003:LS
-    @@ISA:
+    @@DOMMain:requireFeature:
       DOMXML:XMLFeature30
     @@FullName:
       @@@lang:en
@@ -420,6 +420,8 @@ ResourceDef:
       Message::Markup::XML::Parser
     @@ContentType:
       lang:Perl
+  @ISA:
+    ManakaiDOM:ManakaiDOMObject
   @DOMMain:implementFeature: LSFeature10
 
   @Description:

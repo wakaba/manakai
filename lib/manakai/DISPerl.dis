@@ -15,7 +15,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/28 13:10:20 $
+      $Date: 2004/12/31 12:03:40 $
     @@ContentType:
       dis:Date.RCS
   
@@ -133,6 +133,36 @@ DataTypeDef:
   @FullName:
     @@lang:en
     @@@: Perl code reference
+
+## -- Perl constructs
+
+ResourceDef:
+  @QName: ScalarVariable
+  @rdf:type:
+    rdfs:Class
+  @ISA:
+    rdfs:Class
+  @FullName:
+    @@lang:en
+    @@@:
+      Scalar variable
+  @AliasFor:
+    @@@:
+      ::ManakaiDOM:all
+    @@For:
+      !=ManakaiDOM:all
+
+## -- Perl construct properties
+
+PropDef:
+  @QName: isExportOK
+  @Description:
+    @@lang:en
+    @@@:
+      Whether a subject resource should be listed in <Perl::@EXPORT_OK> 
+      or not.
+  @dataType:
+    dis:Boolean
 
 ## -- Perl binding specific properties and datatypes
 

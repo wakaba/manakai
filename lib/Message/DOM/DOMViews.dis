@@ -1,13 +1,6 @@
-Namespace:
-  @lang:
-     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
-  @license:
-     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
-  @ManakaiDOMCore:
-     http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
-  @TreeCore:\
 Module:
-  @Name:  DOMViews
+  @QName:
+    MDOM:DOMViews
   @Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/views#
   @BindingName:
@@ -15,6 +8,7 @@ Module:
      @@Type:
         lang:IDL-DOM
      @@prefix:  dom.w3c.org
+
   @Description:
     @@lang:en
     @@@:
@@ -30,44 +24,295 @@ Module:
      @@Mail:  w@suika.fam.cx
   @License:
      license:Perl+MPL
-  @Date.RCS:
-     $Date: 2004/10/17 04:46:43 $
+  @Date:
+    @@@:
+      $Date: 2004/12/31 12:03:40 $
+    @@ContentType:
+      dis:Date.RCS
 
-  @ConditionDef:
-    @@Name:DOM2
-  @NormalCondition:DOM2
-
-  @Feature:
-    @@Name:Views
-    @@Version:2.0
-    @@FullName:
-      @@@lang:en
-      @@@@: DOM Level 2 Views
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        The support for the <Feature:Core>/<FeatureVer:2.0> 
-        feature is required.
+  @DefaultFor:
+    ManakaiDOM:ManakaiDOMLatest
 
   @Require:
      @@Module:
         @@@Name:  DOMCore
-        @@@FileName:
-           @@@@@:  dom.idl
-           @@@@For:
-              lang:IDL-DOM
-        @@@Namespace:
-          http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+     @@Module:
+       @@@Name: DOMViews
+       @@@WithFor:
+         ManakaiDOM:ManakaiDOM
+     @@Module:
+       @@@Name: DOMViews
+       @@@WithFor:
+         ManakaiDOM:ManakaiDOM2
+     @@Module:
+       @@@Name: DOMViews
+       @@@WithFor:
+         ManakaiDOM:ManakaiDOMLatest
+
+Namespace:
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @dis2pm:
+    http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
+  @DOMMain:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @ManakaiDOMCore:
+     http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
+  @MDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
+  @MDOMX:
+    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @Perl:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @TreeCore:\
+
+## -- Features
+
+ElementTypeBinding:
+  @Name: FeatureDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DOMMain:DOMFeature
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+ElementTypeBinding:
+  @Name: FeatureVerDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DOMMain:DOMFeature
+
+ElementTypeBinding:
+  @Name: featureName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ContentType:
+      dis:String
+
+FeatureDef:
+  @featureName: Views
+  @QName: ViewsFeature
+  @FeatureVerDef:
+    @@Version:2.0
+    @@QName: ViewsFeature20
+    @@ISA: ViewsFeature
+    @@FullName:
+      @@@lang:en
+      @@@@: DOM Level 2 Views
+    @@DOMMain:requireFeature:
+      DOMCore:CoreFeature20
+
+ElementTypeBinding:
+  @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
+
+ElementTypeBinding:
+  @Name: IF
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@:
+        dis:MultipleResource
+      @@@ForCheck:
+        !ManakaiDOM:ForClass !ManakaiDOM:ForIF
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:IF
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:Class
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@resourceFor:
+      ManakaiDOM:ForIF
+    @@resourceFor:
+      @@@@:
+        ManakaiDOM:ForClass
+      @@@ForCheck:
+        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:DOM
+    @@ISA:
+      @@@@:
+        ManakaiDOM:ManakaiDOMObject
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@ISA:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOM
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+      @@@For:
+        ManakaiDOM:ManakaiDOM2
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+ElementTypeBinding:
+  @Name: IntMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isForInternal: 1
+ElementTypeBinding:
+  @Name: ReMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isRedefining: 1
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethodParameter
+ElementTypeBinding:
+  @Name: Exception
+  @ElementType:
+    ManakaiDOM:raises
+
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethodReturn
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttribute
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+
+ElementTypeBinding:
+  @Name: ReAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttribute
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isRedefining: 1
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttrGet
+ElementTypeBinding:
+  @Name: Set
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttrSet
+ElementTypeBinding:
+  @Name: InCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+
+ElementTypeBinding:
+  @Name: ConstGroup
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:ConstGroup
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+
+ElementTypeBinding:
+  @Name: L2IF
+  @ElementType:
+    DOMMain:implementFeature
+  @ShadowContent:
+    @@@: ViewsFeature20
+    @@For:
+      ManakaiDOM:DOM2
+  @ShadowSibling:
+    @@For:
+      ManakaiDOM:DOM2
+    @@For:
+      =ManakaiDOM:ManakaiDOM
+
+ElementTypeBinding:
+  @Name: L2
+  @ElementType:
+    DOMMain:implementFeature
+  @ShadowContent:
+    @@@: ViewsFeature20
+    @@For:
+      ManakaiDOM:DOM2
+
 
 IF:
-  @Name:  AbstractView
+  @Name:
+    @@@: AbstractView
+    @@ForCheck:
+      ManakaiDOM:ForIF
+
+  @QName:
+    @@@: ManakaiDOMAbstractView
+    @@ForCheck:
+      ManakaiDOM:ForClass
+
+  @Level[list]:  2
+  @SpecLevel[list]:  2
+  @L2IF:
+
   @Description:
     @@lang:en
     @@@:
        A base interface from which all views shall derived.
 
-  @Level[list]:  2
-  @SpecLevel[list]:  2
   @Attr:
      @@Name:  document
      @@Description:
@@ -78,7 +323,7 @@ IF:
      @@Get:
         @@@Type:  DocumentView
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetPropNode:
             DOMViews:document
@@ -96,12 +341,10 @@ IF:
         @@@@lang:en
         @@@@@:
           The object for the <IF:AbstractView> to be created.
-      @@@Def:
-        @@@@Type:
-          lang:Perl
+      @@@PerlDef:
         @@@@@:
-          my $node = $r = __CLASS{ManakaiDOMNodeObject::}__->__INT{new}__;
-          push @{$node->{<Q:TreeCore:origin>}}, <Q:DOMViews:document>;
+          my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject.new>;
+          push @{$node->{<Q::TreeCore:origin>}}, <Q::DOMViews:document>;
        @@@ImplNote:
          @@@@lang:en
          @@@@@:
@@ -109,24 +352,84 @@ IF:
            <Q:DOMViews:document>.
          \
            Optional properties: none.
+
+  @IntMethod:
+    @@Name: getNodeReference
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates a new <IF::AbstractView> object blessed with an appropriate 
+        class. 
+    @@Param:
+      @@@Name: object
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The node object referred to.
+    @@Param:
+      @@@Name:noSpecializedInterface
+      @@@Type:
+        DOMMain:boolean
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Whether the specialized interface for the type (such as 
+          element type or document type) is selected if available.
+      @@@InCase:
+        @@@@Value:true
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Specialized object is not returned however the 
+            configuration parameter value is set.
+          \
+            Note that even if the specialized interface is not 
+            selected by default, the specialized object can be 
+            obtained from <M:Node.getFeature>.
+      @@@InCase:
+        @@@@Value:false
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Specialized object is returned unless the configuration 
+            disables it.
+    @@Return:
+      @@@Type: ManakaiDOMAbstractView
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The node reference.
+      @@@PerlDef:
+          ## TODO: Find class
+          $r = $object-><M::ManakaiDOM:ManakaiDOMNodeObject.newReference>
+                                                   (<ClassName::AbstractView>);
 ##IF:AbstractView
 
 IF:
-  @Name:  DocumentView
+  @Name:
+    @@@: DocumentView
+    @@ForCheck:
+      ManakaiDOM:ForIF
+
+  @Name:
+    @@@: ManakaiDOMDocumentView
+    @@ForCheck:
+      ManakaiDOM:ForClass
+  @ISA:
+    @@@:
+      DOMCore:ManakaiDOMDocument
+    @@ForCheck:
+      ManakaiDOM:ForClass
+
+  @Level[list]:  2
+  @SpecLevel[list]:  2
+  @L2IF:
+
   @Description:
     @@lang:en
     @@@:
       The interface implemented by <IF:Document> object in 
       DOM Views implementation.
-
-  @Level[list]:  2
-  @SpecLevel[list]:  2
-
-  @Role:
-    @@@:
-      DOMCore:Document
-    @@compat:
-      ManakaiDOMCore:Document
 
   @Attr:
      @@Name:  defaultView
@@ -143,11 +446,13 @@ IF:
             @@@@@lang:en
             @@@@@@:
               No <IF:AbstractView> available.
-        @@@Def:
-          @@@@Type:
-            lang:Perl
+        @@@PerlDef:
           @@@@@:
-            $r = $self->{<Q:TreeCore:node>}->{<Q:DOMViews:view>}->[0];
+            $r = $self->{<Q::TreeCore:node>}->{<Q::DOMViews:view>}->[0];
+            if ($r) {
+              $r = <ClassM::ManakaiDOMAbstractView.getNodeReference> ($r);
+            }
+
 ##IF:DocumentView
 
 ## DOMViews.dis ends here

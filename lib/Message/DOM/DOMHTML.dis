@@ -1,34 +1,26 @@
-Namespace:
-  @lang:
-     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
-  @license:
-     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
-  @ManakaiDOMCore:
-    http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
-  @ManakaiDOMHTML:
-    http://suika.fam.cx/~wakaba/archive/2004/mdom/html#
-  @TreeCore:\
-  @xhtml1:
-    http://www.w3.org/1999/xhtml
 Module:
-  @Name:  DOMHTML
+  @QName:
+    MDOM:DOMHTML
   @Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/dom/html#
-  @BindingName:
+  @AppName:
      @@@:  html
-     @@Type:
+     @@ContentType:
         lang:IDL-DOM
      @@prefix:  dom.w3c.org
-     @@Condition:DOM1
-  @BindingName:
+     @@For:
+       ManakaiDOM:IDL ManakaiDOM:DOM1
+  @AppName:
      @@@:  html2
-     @@Type:
+     @@ContentType:
         lang:IDL-DOM
      @@prefix:  dom.w3c.org
-     @@Condition:DOM2
+     @@For:
+       ManakaiDOM:IDL ManakaiDOM:DOM2
   @FullName:
     @@lang:en
     @@@: DOM HTML Module
+
   @Description:
     @@lang:en
     @@@:
@@ -45,101 +37,384 @@ Module:
      @@Mail:  w@suika.fam.cx
   @License:
      license:Perl+MPL
-  @Date.RCS:
-     $Date: 2004/10/19 08:53:22 $
+  @Date:
+    @@@:
+      $Date: 2004/12/31 12:03:40 $
+    @@ContentType:
+      dis:Date.RCS
 
-  @ConditionDef:
-    @@Name:DOM1
-  @ConditionDef:
-    @@Name:DOM2
-    @@ISA:DOM1
-  @NormalCondition:DOM2
-  
-  @Feature:
-    @@Name:HTML
+  @DefaultFor:
+    ManakaiDOM:ManakaiDOMLatest
+
+  @Require:
+    @@Module:
+      @@@Name: DISMarkup
+      @@@For:
+        =ManakaiDOM:all
+     @@Module:
+        @@@Name:  DOMXML
+        @@@For:
+          ManakaiDOM:DOM
+     @@Module:
+        @@@Name:  DOMWebForms
+    @@Module:
+      @@@Name: DOMHTML
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOM
+    @@Module:
+      @@@Name: DOMHTML
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOM1
+    @@Module:
+      @@@Name: DOMHTML
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOM2
+    @@Module:
+      @@@Name: DOMHTML
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOMLatest
+    @@Module:
+      @@@Name: DOMHTML
+      @@@WithFor:
+        DOMHTML:ForHTML40SE
+    @@Module:
+      @@@Name: DOMHTML
+      @@@WithFor:
+        DOMHTML:ForHTML401
+    @@Module:
+      @@@Name: DOMHTML
+      @@@WithFor:
+        DOMHTML:ForXHTML10SE
+
+Namespace:
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @dis2pm:
+    http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
+  @DOMHTML:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/html#
+  @DOMMain:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @infoset:
+     http://www.w3.org/2001/04/infoset#
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @ManakaiDOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
+  @ManakaiDOMHTML:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom/html#
+  @MDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
+  @MDOMX:
+    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @null:
+    http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
+  @Perl:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @s:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
+  @TreeCore:\
+  @xhtml1:
+    http://www.w3.org/1999/xhtml
+
+## -- "For HTML"
+
+ForDef:
+  @QName:
+    DOMHTML:ForHTML
+  @ISA:
+    s:ForML
+  @FullName:
+    @@lang:en
+    @@@:
+      For Hypertext Markup Language (HTML)
+
+ForDef:
+  @QName:
+    DOMHTML:ForClassicHTML
+  @ISA:
+    DOMHTML:ForHTML
+  @FullName:
+    @@lang:en
+    @@@:
+      For non-XML HTML
+
+ForDef:
+  @QName:
+    DOMHTML:ForHTML4
+  @ISA:
+    DOMHTML:ForHTML
+  @FullName:
+    @@lang:en
+    @@@: For HTML 4
+
+ForDef:
+  @QName:
+    DOMHTML:ForHTML40
+  @ISA:
+    DOMHTML:ForHTML4
+  @FullName:
+    @@lang:en
+    @@@: For HTML 4.0
+
+ForDef:
+  @QName:
+    DOMHTML:ForHTML40FE
+  @ISA:
+    DOMHTML:ForHTML40
+  @FullName:
+    @@lang:en
+    @@@: For HTML 4.0 first edition
+
+ForDef:
+  @QName:
+    DOMHTML:ForHTML40SE
+  @ISA:
+    DOMHTML:ForHTML40
+  @FullName:
+    @@lang:en
+    @@@:
+      For HTML 4.0 second edition
+
+ForDef:
+  @QName:
+    DOMHTML:ForHTML401
+  @ISA:
+    DOMHTML:ForHTML4
+  @FullName:
+    @@lang:en
+    @@@:
+      For HTML 4.01
+
+ForDef:
+  @QName:
+    DOMHTML:ForXHTML
+  @ISA:
+    DOMHTML:ForHTML
+  @FullName:
+    @@lang:en
+    @@@:
+      For XHTML
+
+ForDef:
+  @QName:
+    DOMHTML:ForXHTML1
+  @ISA:
+    DOMHTML:ForXHTML
+  @FullName:
+    @@lang:en
+    @@@:
+      For XHTML 1
+
+ForDef:
+  @QName:
+    DOMHTML:ForXHTML10
+  @ISA:
+    DOMHTML:ForXHTML1
+  @FullName:
+    @@lang:en
+    @@@:
+      For XHTML 1.0
+
+ForDef:
+  @QName:
+    DOMHTML:ForXHTML10FE
+  @ISA:
+    DOMHTML:ForXHTML10
+  @FullName:
+    @@lang:en
+    @@@: For XHTML 1.0 First Edition
+
+ForDef:
+  @QName:
+    DOMHTML:ForXHTML10SE
+  @ISA:
+    DOMHTML:ForXHTML10
+  @FullName:
+    @@lang:en
+    @@@: For XHTML 1.0 Second Edition
+
+ForDef:
+  @QName:
+    DOMHTML:ForXHTML1m12n
+  @ISA:
+    DOMHTML:ForXHTML1
+  @FullName:
+    @@lang:en
+    @@@:
+      For modularized XHTML 1
+
+## TODO: FE and SE required
+
+ForDef:
+  @QName:
+    DOMHTML:ForXHTML11
+  @ISA:
+    DOMHTML:ForXHTML1m12n
+  @FullName:
+    @@lang:en
+    @@@: For XHTML 1.1
+
+## -- Features
+
+ElementTypeBinding:
+  @Name: FeatureDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DOMMain:DOMFeature
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+ElementTypeBinding:
+  @Name: FeatureVerDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DOMMain:DOMFeature
+
+ElementTypeBinding:
+  @Name: featureName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ContentType:
+      dis:String
+
+FeatureDef:
+  @featureName:  HTML
+  @QName: HTMLFeature
+  @FeatureVerDef:
     @@Version:1.0
+    @@QName: HTMLFeature10
+    @@ISA: HTMLFeature
     @@FullName: DOM Level 1 HTML
-    @@Condition:DOM1
     @@ImplNote:
       @@@lang:en
       @@@@:
         The DOM Level 2 HTML Specification does not say DOM Level 2 
         HTML implementations to answer to <M:hasFeature> of 
         <FeatureVer:1.0> as <DOM:true>.
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        The DOM implementation must support 
-        <Module:DOMCore> Module.
-    @@Contrib:
-      DOMCore:DOMImplementation::DOM1
-    @@Contrib:
-      DOMCore:DOMImplementation::DOM2
-    @@Contrib:
-      DOMCore:DOMImplementation::DOM3
-  @Feature:
-    @@Name:HTML
+    @@DOMMain:requireFeature:
+      DOMCore:CoreFeature10
+  @FeatureVerDef:
     @@Version:2.0
+    @@QName: HTMLFeature20
+    @@ISA: HTMLFeature
     @@FullName: DOM Level 2 HTML
-    @@Condition:DOM2
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        The DOM implementation must support 
-        <Feature:Core>/<FeatureVer:2.0>.
-    @@Contrib:
-      DOMCore:DOMImplementation::DOM2
-    @@Contrib:
-      DOMCore:DOMImplementation::DOM3
-  @Feature:
-    @@Name:XHTML
+    @@DOMMain:requireFeature:
+      DOMCore:CoreFeature20
+
+FeatureDef:
+  @featureName: XHTML
+  @QName: XHTMLFeature
+  @FeatureVerDef:
     @@Version:2.0
     @@FullName: DOM Level 2 HTML (with XHTML support)
-    @@Condition:DOM2
-    @@ImplNote:
+    @@QName: XHTMLFeature20
+    @@ISA: XHTMLFeature
+    @@ISA: HTMLFeature20
+    @@ISA:
+      DOMXML:XMLFeature20
+    @@Description:
       @@@lang:en
       @@@@:
-        Equal to <Feature:XML>/<FeatureVer:2.0> and  
-        <Feature:HTML>/<FeatureVer:2.0>.
-    @@Contrib:
-      DOMCore:DOMImplementation::DOM2
-    @@Contrib:
-      DOMCore:DOMImplementation::DOM3
+        DOM Level 2 HTML with XHTML support. 
+        It is equal to <Feature::XML> / <FeatureVer::2.0> and  
+        <Feature::HTML> / <FeatureVer::2.0>.
 
-  @Require:
-     @@Module:
-        @@@Name:  DOMCore
-        @@@FileName:
-           @@@@@:  dom.idl
-           @@@@For:
-              lang:IDL-DOM
-        @@@Namespace:
-          http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
-     @@Module:
-        @@@Name:  DOMWebForms
-        @@@Namespace:
-          http://suika.fam.cx/~wakaba/archive/2004/dom/html#
+ElementTypeBinding:
+  @Name: DataTypeAlias
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DataType
+    @@ForCheck:
+      ManakaiDOM:DOM
 
 DataTypeAlias:
   @Name:  DOMString
-  @Type:
-     DOMCore:DOMString
+  @AliasFor:
+    @@@:
+      DOMMain:DOMString
+    @@For:
+      !ManakaiDOM:IDL
+  @Def:
+    @@For:
+      ManakaiDOM:IDL
+    @@ContentType:
+      lang:dis
+    @@DISLang:dataTypeAliasFor:
+      DOMMain:DOMString
 DataTypeAlias:
   @Name:  Node
-  @Type:
-     DOMCore:Node
+  @AliasFor:
+    @@@:
+      DOMCore:Node
+    @@For:
+      !ManakaiDOM:IDL
+  @Def:
+    @@For:
+      ManakaiDOM:IDL
+    @@ContentType:
+      lang:dis
+    @@DISLang:dataTypeAliasFor:
+      DOMCore:Node
 DataTypeAlias:
   @Name:  Document
-  @Type:
-     DOMCore:Document
+  @AliasFor:
+    @@@:
+      DOMCore:Document
+    @@For:
+      !ManakaiDOM:IDL
+  @Def:
+    @@For:
+      ManakaiDOM:IDL
+    @@ContentType:
+      lang:dis
+    @@DISLang:dataTypeAliasFor:
+      DOMCore:Document
 DataTypeAlias:
   @Name:  NodeList
-  @Type:
-     DOMCore:NodeList
+  @AliasFor:
+    @@@:
+      DOMCore:NodeList
+    @@For:
+      !ManakaiDOM:IDL
+  @Def:
+    @@For:
+      ManakaiDOM:IDL
+    @@ContentType:
+      lang:dis
+    @@DISLang:dataTypeAliasFor:
+      DOMCore:NodeList
 DataTypeAlias:
   @Name:  Element
-  @Type:
-     DOMCore:Element
+  @AliasFor:
+    @@@:
+      DOMCore:Element
+    @@For:
+      !ManakaiDOM:IDL
+  @Def:
+    @@For:
+      ManakaiDOM:IDL
+    @@ContentType:
+      lang:dis
+    @@DISLang:dataTypeAliasFor:
+      DOMCore:Element
 
 ImplNote:
   @lang:en
@@ -152,9 +427,388 @@ ImplNote:
     <IF:HTMLIFrameElement>, <IF:HTMLImageElement>, <IF:HTMLLinkElement>, 
     <IF:HTMLObjectElement>, <IF:HTMLParamElement> and
     <IF:HTMLScriptElement>.
+  @@For:
+    ManakaiDOM:DOM
+
+ElementTypeBinding:
+  @Name: L1
+  @ElementType:
+    DOMMain:implementFeature
+  @ShadowContent:
+    @@@: HTMLFeature10
+    @@For:
+      ManakaiDOM:DOM1 !ManakaiDOM:DOM2
+  @ShadowSibling:
+    @@DOMMain:implementFeature:
+      @@@@: HTMLFeature20
+      @@@For:
+        ManakaiDOM:DOM2
+
+ElementTypeBinding:
+  @Name: L1IF
+  @ElementType:
+    DOMMain:implementFeature
+  @ShadowContent:
+    @@@: HTMLFeature10
+    @@For:
+      ManakaiDOM:DOM1 !ManakaiDOM:DOM2
+  @ShadowSibling:
+    @@DOMMain:implementFeature:
+      @@@@: HTMLFeature20
+      @@@For:
+        ManakaiDOM:DOM2
+    @@ISA:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOM1
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+      @@@For:
+        ManakaiDOM:ManakaiDOM2
+    @@For:
+      ManakaiDOM:DOM1
+    @@For:
+      =ManakaiDOM:ManakaiDOM
+
+ElementTypeBinding:
+  @Name: L2
+  @ElementType:
+    DOMMain:implementFeature
+  @ShadowContent:
+    @@@: HTMLFeature20
+    @@For:
+      ManakaiDOM:DOM2
+
+ElementTypeBinding:
+  @Name: L2IF
+  @ElementType:
+    DOMMain:implementFeature
+  @ShadowContent:
+    @@@: HTMLFeature20
+    @@For:
+      ManakaiDOM:DOM2
+  @ShadowSibling:
+    @@For:
+      ManakaiDOM:DOM2
+    @@For:
+      =ManakaiDOM:ManakaiDOM
+
+ElementTypeBinding:
+  @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
+
+ElementTypeBinding:
+  @Name: IF
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@:
+        dis:MultipleResource
+      @@@ForCheck:
+        !ManakaiDOM:ForClass !ManakaiDOM:ForIF !ForHTML
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:IF
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:Class
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@resourceFor:
+      @@@@:
+        ManakaiDOM:ForIF
+      @@@For:
+        ManakaiDOM:DOMHTMLFeature
+      @@@For:
+        =ManakaiDOM:ManakaiDOM
+      @@@ForCheck: !ForHTML
+    @@resourceFor:
+      @@@@:
+        ManakaiDOM:ForClass
+      @@@ForCheck:
+        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+        ManakaiDOM:DOMHTMLFeature !ForHTML
+    @@ISA:
+      @@@@:
+        ManakaiDOM:ManakaiDOMObject
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@ISA:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOM
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+      @@@For:
+        ManakaiDOM:ManakaiDOM2
+
+ElementTypeBinding:
+  @Name: ET
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@:
+        dis:MultipleResource
+      @@@ForCheck:
+        !ManakaiDOM:ForClass !ManakaiDOM:ForIF !ForHTML
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:IF
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:Class
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@resourceFor:
+      @@@@:
+        ManakaiDOM:ForIF
+      @@@ForCheck:
+        ManakaiDOM:DOM
+      @@@For:
+        ManakaiDOM:DOMHTMLFeature
+      @@@For:
+        =ManakaiDOM:ManakaiDOM
+    @@resourceFor:
+      @@@@:
+        ManakaiDOM:ForClass
+      @@@ForCheck:
+        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM ManakaiDOM:DOMHTMLFeature
+
+    @@rdf:type:
+      @@@@:
+        s:ElementType
+      @@@ForCheck:
+        ForHTML
+
+    @@ISA:
+      @@@@:
+        ManakaiDOM:ManakaiDOMObject
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@ISA:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOM
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+      @@@For:
+        ManakaiDOM:ManakaiDOM2
+    @@DISMarkup:elementType:
+      @@@@:
+        ::ForHTML40SE
+      @@@ForCheck:
+        ManakaiDOM:DOM1 !ManakaiDOM:DOM2
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          DOM Level 1 First Edition refers the latest version of 
+          HTML 4.0 while Second Edition refers the second edition of 
+          HTML 4.0. 
+    @@DISMarkup:elementType:
+      @@@@:
+        ::ForHTML401
+      @@@ForCheck:
+        ManakaiDOM:DOM2
+    @@DISMarkup:elementType:
+      @@@@:
+        ::ForXHTML10SE
+      @@@ForCheck:
+        ManakaiDOM:DOM2
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+ElementTypeBinding:
+  @Name: IntMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isForInternal: 1
+ElementTypeBinding:
+  @Name: ReMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isRedefining: 1
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethodParameter
+ElementTypeBinding:
+  @Name: Exception
+  @ElementType:
+    ManakaiDOM:raises
+
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethodReturn
+
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttribute
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+
+ElementTypeBinding:
+  @Name: ATTR
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@ForCheck:
+      !=ManakaiDOM:ManakaiDOM
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:DOMAttribute
+      @@@ForCheck:
+        ManakaiDOM:DOM
+    @@rdf:type:
+      @@@@:
+        s:Attribute
+      @@@ForCheck:
+        ForHTML
+    @@DocAttr:
+      @@@@:
+        ::ForHTML40SE
+      @@@ForCheck:
+        ManakaiDOM:DOM1 !ManakaiDOM:DOM2
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          DOM Level 1 First Edition refers the latest version of 
+          HTML 4.0 while Second Edition refers the second edition of 
+          HTML 4.0. 
+    @@DocAttr:
+      @@@@:
+        ::ForHTML401
+      @@@ForCheck:
+        ManakaiDOM:DOM2
+    @@DocAttr:
+      @@@@:
+        ::ForXHTML10SE
+      @@@ForCheck:
+        ManakaiDOM:DOM2
+
+ElementTypeBinding:
+  @Name: ReAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttribute
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isRedefining: 1
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttrGet
+    @@ForCheck:
+      ManakaiDOM:DOM
+ElementTypeBinding:
+  @Name: Set
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttrSet
+    @@ForCheck:
+      ManakaiDOM:DOM
+ElementTypeBinding:
+  @Name: InCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+
+ElementTypeBinding:
+  @Name: ConstGroup
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:ConstGroup
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+
+ElementTypeBinding:
+  @Name: Const
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: 
+      ManakaiDOM:Const
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+
+ElementTypeBinding:
+  @Name: Deprecated
+  @ElementType:
+    DOMHTML:isDeprecatedByHTML4
+  @ShadowContent: 1
+  @ShadowSibling:
+    @@ForCheck: !ForXHTML11
+
+PropDef:
+  @QName: isDeprecatedByHTML4
+  @Description:
+    @@lang:en
+    @@@:
+      Whether a subject resource is deprecated by HTML 4 or not. 
+  @dataType: 
+    dis:Boolean
 
 IF:
-  @Name:  HTMLCollection
+  @Name:
+    @@@: HTMLCollection
+    @@ForCheck:
+      ManakaiDOM:ForIF
+
+  @QName:
+    @@@: ManakaiDOMHTMLCollection
+    @@ForCheck:
+      ManakaiDOM:ForClass
+    @@ISA:
+      @@@@:
+        ManakaiDOM:ManakaiDOMNodeReference
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+
   @Description:
     @@lang:en
     @@@:
@@ -166,18 +820,22 @@ IF:
       automatically updated when the underlying document 
       is changed.
 
-  @IsFinal:-1
-  @IsAbstract:1
+  @L1IF:
 
   @Attr:
      @@Name:  length
      @@Description:
        @@@lang:en
        @@@@: The length of the list.
-     @@IsAbstract:1
      @@Get:
         @@@Type:
            DOMMain:unsigned-long
+        @@@PerlDef:
+            my $l = $self->{<Q::TreeCore:node>}
+                         -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                  .getElementsBy>
+                             ($self->{<Q::ManakaiDOMCore:nodeMatch>});
+            $r = @$l;
   @Method:
      @@Name:  item
      @@Description:
@@ -194,7 +852,8 @@ IF:
             The index of the node to retrieve, in the document order. 
             The index origin is <DOM:0>.
      @@Return:
-        @@@Type:  Node
+        @@@Type:  
+          DOMCore:Node
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -206,7 +865,14 @@ IF:
             @@@@@lang:en
             @@@@@@:
               The <P:index> is out of range.
-    @@IsAbstract:1
+        @@@PerlDef:
+           $r = $self->{<Q::TreeCore:node>}
+                     -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                   .getElementBy> 
+                          ($self->{<Q::ManakaiDOMCore:nodeMatch>}, \$index);
+           if (defined $r) {
+             $r = <ClassM::DOMCore:ManakaiDOMNode.getNodeReference> ($r, $self);
+           }
   @Method:
      @@Name:  namedItem
      @@Description:
@@ -224,16 +890,22 @@ IF:
           With XHTML 1.0 documents, it only searches for 
           an <IF:Element> with a matching <HA:id> attribute. 
           The matching is case-sensitive.
-     @@IsAbstract:1
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         XHTML <HA::id> local attributes? XML <XML::ID> attributes? 
+         Any local <XA::id> attributes?
      @@Param:
         @@@Name:  name
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
         @@@Description:
           @@@@lang:en
           @@@@@:
             The name of the <IF:Node> to retrieve.
      @@Return:
-        @@@Type:  Node
+        @@@Type:  
+          DOMCore:Node
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -246,9 +918,59 @@ IF:
             @@@@@lang:en
             @@@@@@:
               There is no node with such a <P:name>.
-    @@SpecLeve[list]:
-      1
-      2
+       @@@PerlDef:
+         my $node = $self->{<Q::TreeCore:node>};
+         $name = "$name";
+         my $index = 0;
+         if (not $node->{<Q::DOMCore:ownerDocument>}
+                      ->{<Q::DOMCore:hasFeature>}->{XML}) {
+           $r = $self->{<Q::TreeCore:node>}
+                     -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                   .getElementBy> 
+                        (sub ($) {
+                         #line 1 "DOMHTML.ManakaiDOMHTMLCollection.namedItem.#1"
+                           my $node = shift;
+                           if ($self->{<Q::ManakaiDOMCore:nodeMatch>}->($node)) {
+                             my $attr = $node->{<Q::infoset:attributes>}
+                                             ->{<Q::null:>}->{name} ||
+                                        $node->{<Q::infoset:attributes>}
+                                             ->{<Q::ManakaiDOM:noNS>}->{name};
+                             if ($attr and
+                                 $attr->
+                                   <AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                          .textContent> eq $name) {
+                               return true;
+                             }
+                           }
+                           return false;
+                         #line 1 "DOMHTML.ManakaiDOMHTMLCollection.namedItem.#2"
+                         }, \$index);
+         }
+         $index = 0;
+         $r ||= $self->{<Q::TreeCore:node>}
+                     -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                   .getElementBy> 
+                        (sub ($) {
+                         #line 1 "DOMHTML.ManakaiDOMHTMLCollection.namedItem.#3"
+                           my $node = shift;
+                           if ($self->{<Q::ManakaiDOMCore:nodeMatch>}->($node)) {
+                             my $attr = $node->{<Q::infoset:attributes>}
+                                             ->{<Q::null:>}->{id} ||
+                                        $node->{<Q::infoset:attributes>}
+                                             ->{<Q::ManakaiDOM:noNS>}->{id};
+                             if ($attr and
+                                 $attr->
+                                   <AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                                          .textContent> eq $name) {
+                               return true;
+                             }
+                           }
+                           return false;
+                         #line 1 "DOMHTML.ManakaiDOMHTMLCollection.namedItem.#4"
+                         }, \$index);
+           if (defined $r) {
+             $r = <ClassM::DOMCore:ManakaiDOMNode.getNodeReference> ($r, $self);
+           }
 
 ImplNote:
   @@lang:en
@@ -256,18 +978,34 @@ ImplNote:
     <IF:HTMLOptionCollection>: See <Module:DOMWebForms>.
 
 IF:
-  @Name:  HTMLDocument
+  @Name:
+    @@@: HTMLDocument
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @ISA:
+    @@@:
+      DOMCore:Document
+    @@ForCheck:
+      ManakaiDOM:ForIF
+
+  @QName:
+    @@@: ManakaiDOMHTMLDocument
+    @@ForCheck:
+      ManakaiDOM:ForClass
+  @ISA:
+    @@@:
+      DOMCore:ManakaiDOMDocument
+    @@ForCheck:
+      ManakaiDOM:ForClass
+
+  @L1IF:
+
   @Description:
     @@lang:en
     @@@:
       The root of the HTML document and holds the entire content. 
 
-  @ISA:  Document
-  @Role:
-    @@@:
-      DOMCore:Document
-    @@compat:
-      ManakaiDOMCore:Document
+  @ImplNote:
     @@root-element:
       @@@QName:
         xhtml1:html
@@ -296,6 +1034,8 @@ IF:
       @@@@:
         TODO: doctype-system required
 
+        mediatype : text/html, text/x-html
+
   @Attr:
      @@Name:  title
      @@Description:
@@ -312,8 +1052,11 @@ IF:
        @@@lang:en
        @@@@:
          The page that linked to this page.
+     @@Type:
+       DOMMain:DOMString
+     @@actualType:
+       DOMMain:RFC2396URI
      @@Get:
-        @@@Type:  DOMString
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -326,12 +1069,10 @@ IF:
               The user navigated to the page directly (not through a 
               link, but for example via bookmark).
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetProp:
-            @@@@@@:
-              DOMHTML:referrer
-            @@@@@uri-format:RFC 2396
+            DOMHTML:referrer
   @Attr:
      @@Name:  domain
      @@Description:
@@ -353,16 +1094,13 @@ IF:
             ISSUE: What is allowed? FQDNs? Non-FQ domain names? 
             IPv4 addresses? IPv6 addresses with or without 
             brackets?
-        @@@Def:
-          @@@@Type:
-            lang:Perl
-          @@@@@:
+        @@@PerlDef:
             $r = null;
-            if (defined $self->{<Q:TreeCore:node>}
-                             ->{<Q:DOMCore:documentURI>}) {
+            if (defined $self->{<Q::TreeCore:node>}
+                             ->{<Q::DOMCore:documentURI>}) {
               require URI;
-              my $uri = URI->new ($self->{<Q:TreeCore:node>}
-                                       ->{<Q:DOMCore:documentURI>});
+              my $uri = URI->new ($self->{<Q::TreeCore:node>}
+                                       ->{<Q::DOMCore:documentURI>});
               if ($uri->can ('host')) {
                 $r = $uri->host;
                 undef $r if defined $r and
@@ -378,13 +1116,13 @@ IF:
          The absolute URI <SRC:RFC 2396> of the document.
      @@Get:
         @@@Type:  DOMString
+        @@@actualType:
+          DOMMain:RFC2396AbsoluteURI
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetProp:
-            @@@@@@:
-              DOMCore:documentURI
-            @@@@@uri-format:RFC 2396
+            DOMCore:documentURI
   @Attr:
      @@Name:  body
      @@Description:
@@ -420,6 +1158,46 @@ IF:
          }
      @@Get:
         @@@Type:  HTMLCollection
+        @@@actualType:
+          ManakaiDOMHTMLCollection
+        @@@PerlDef:
+            my $node = $self->{<Q::TreeCore:node>};
+            my $cis = $node->{<Q::DOMCore:ownerDocument>}
+                           ->{<Q::DOMCore:hasFeature>}->{XML}
+                        ? false
+                        : $node->{<Q::DOMCore:ownerDocument>}
+                               ->{<Q::DOMCore:hasFeature>}->{HTML}
+                            ? true : false;
+            my $chk;
+            $chk = sub {
+                #line 1 "DOMHTML.ManakaiDOMHTMLElement.getImages.#1"
+                my ($self) = @_;
+                if (defined $self->{<Q::infoset:localName>}) {
+                  if (defined $self->{<Q::infoset:namespaceName>}) {
+                    if ($self->{<Q::infoset:namespaceName>} eq <Q::xhtml1:> and
+                        $self->{<Q::infoset:localName>} eq 'img') {
+                      return true;
+                    }
+                  } else { ## Null namespace
+                    if ($self->{<Q::infoset:localName>} eq 'img') {
+                      return true;
+                    }
+                  }
+                } else {
+                  if ($self->{<Q::DOMCore:name>} eq 'img' or
+                      ($cis and lc ($self->{<Q::DOMCore:name>}) eq 'img')) {
+                    return true;
+                  }
+                }
+                return false;
+                #line 1 "DOMHTML.ManakaiDOMHTMLElement.getImages.#2"
+            };
+            __DEEP{
+              $r = $node-><M::ManakaiDOM:ManakaiDOMNodeObject.newReference>
+                                 (<ClassName::ManakaiDOMHTMLCollection>);
+            }__;
+            $r->{<Q::ManakaiDOMCore:nodeMatch>} = $chk;
+
   @Attr:
      @@Name:  applets
      @@Description:
@@ -436,6 +1214,50 @@ IF:
          <HA:object> elements into consideration.
      @@Get:
         @@@Type:  HTMLCollection
+        @@@actualType:
+          ManakaiDOMHTMLCollection
+        @@@PerlDef:
+            my $node = $self->{<Q::TreeCore:node>};
+            my $cis = $node->{<Q::DOMCore:ownerDocument>}
+                           ->{<Q::DOMCore:hasFeature>}->{XML}
+                        ? false
+                        : $node->{<Q::DOMCore:ownerDocument>}
+                               ->{<Q::DOMCore:hasFeature>}->{HTML}
+                            ? true : false;
+            my $chk;
+              $chk = sub {
+                my ($self) = @_;
+                if (defined $self->{<Q::infoset:localName>}) {
+                  if (defined $self->{<Q::infoset:namespaceName>}) {
+                    if ($self->{<Q::infoset:namespaceName>} eq <Q::xhtml1:> and
+                        ($self->{<Q::infoset:localName>} eq 'applet' or
+                         ($self->{<Q::infoset:localName>} eq 'object' and
+                          $self->{<Q::DOMHTML:isApplet>}))) {
+                      return true;
+                    }
+                  } else { ## Null namespace
+                    if ($self->{<Q::infoset:localName>} eq 'applet' or
+                        ($self->{<Q::infoset:localName>} eq 'object' and
+                         $self->{<Q::DOMHTML:isApplet>})) {
+                      return true;
+                    }
+                  }
+                } else {
+                  if ($self->{<Q::DOMCore:name>} eq 'applet' or
+                      ($cis and lc ($self->{<Q::DOMCore:name>}) eq 'applet') or
+                      ($self->{<Q::DOMHTML:isApplet>} and
+                       ($self->{<Q::DOMCore:name>} eq 'object' or
+                        ($cis and lc ($self->{<Q::DOMCore:name>}) eq 'object')))) {
+                    return true;
+                  }
+                }
+                return false;
+              };
+            __DEEP{
+              $r = $node-><M::ManakaiDOM:ManakaiDOMNodeObject.newReference>
+                                 (<ClassName::ManakaiDOMHTMLCollection>);
+            }__;
+            $r->{<Q::ManakaiDOMCore:nodeMatch>} = $chk;
   @Attr:
      @@Name:  links
      @@Description:
@@ -445,6 +1267,57 @@ IF:
          in a document with a value for the <HA:href> attribute.
      @@Get:
         @@@Type:  HTMLCollection
+        @@@actualType:
+          ManakaiDOMHTMLCollection
+        @@@PerlDef:
+            my $node = $self->{<Q::TreeCore:node>};
+            my $cis = $node->{<Q::DOMCore:ownerDocument>}
+                           ->{<Q::DOMCore:hasFeature>}->{XML}
+                        ? false
+                        : $node->{<Q::DOMCore:ownerDocument>}
+                               ->{<Q::DOMCore:hasFeature>}->{HTML}
+                            ? true : false;
+            my $chk;
+              $chk = sub {
+                my ($self) = @_;
+                if (defined $self->{<Q::infoset:localName>}) {
+                  if (defined $self->{<Q::infoset:namespaceName>}) {
+                    if ($self->{<Q::infoset:namespaceName>} eq <Q::xhtml1:> and
+                        {a => 1, area => 1}->{$self->{<Q::infoset:localName>}}) {
+                      return true
+                        if $self->{<Q::infoset:attributes>}
+                                ->{<Q::null:>}->{href} or
+                           $self->{<Q::infoset:attributes>}
+                                ->{<Q::ManakaiDOM:noNS>}->{href};
+                    }
+                  } else { ## Null namespace
+                    if ({a => 1, area => 1}->{$self->{<Q::infoset:localName>}}) {
+                      return true
+                        if $self->{<Q::infoset:attributes>}
+                                ->{<Q::null:>}->{href} or
+                           $self->{<Q::infoset:attributes>}
+                                ->{<Q::ManakaiDOM:noNS>}->{href};
+                    }
+                  }
+                } else {
+                  if ({a => 1, area => 1}->{$self->{<Q::DOMCore:name>}} or
+                      ($cis and {a => 1, area => 1}
+                                       ->{lc $self->{<Q::DOMCore:name>}})) {
+                    return true
+                        if $self->{<Q::infoset:attributes>}
+                                ->{<Q::ManakaiDOM:noNS>}->{href} or
+                           $self->{<Q::infoset:attributes>}
+                                ->{<Q::null:>}->{href};
+                  }
+                }
+                return false;
+              };
+
+            __DEEP{
+              $r = $node-><M::ManakaiDOM:ManakaiDOMNodeObject.newReference>
+                                 (<ClassName::ManakaiDOMHTMLCollection>);
+            }__;
+            $r->{<Q::ManakaiDOMCore:nodeMatch>} = $chk;
   @Attr:
      @@Name:  forms
      @@Description:
@@ -459,6 +1332,44 @@ IF:
          should be contained.
      @@Get:
         @@@Type:  HTMLCollection
+        @@@actualType:
+          ManakaiDOMHTMLCollection
+        @@@PerlDef:
+            my $node = $self->{<Q::TreeCore:node>};
+            my $cis = $node->{<Q::DOMCore:ownerDocument>}
+                           ->{<Q::DOMCore:hasFeature>}->{XML}
+                        ? false
+                        : $node->{<Q::DOMCore:ownerDocument>}
+                               ->{<Q::DOMCore:hasFeature>}->{HTML}
+                            ? true : false;
+            my $chk;
+              $chk = sub {
+                my ($self) = @_;
+                if (defined $self->{<Q::infoset:localName>}) {
+                  if (defined $self->{<Q::infoset:namespaceName>}) {
+                    if ($self->{<Q::infoset:namespaceName>} eq <Q::xhtml1:> and
+                        $self->{<Q::infoset:localName>} eq 'form') {
+                      return true;
+                    }
+                  } else { ## Null namespace
+                    if ($self->{<Q::infoset:localName>} eq 'form') {
+                      return true;
+                    }
+                  }
+                } else {
+                  if ($self->{<Q::DOMCore:name>} eq 'form' or
+                      ($cis and lc ($self->{<Q::DOMCore:name>}) eq 'form')) {
+                    return true;
+                  }
+                }
+                return false;
+              };
+
+            __DEEP{
+              $r = $node-><M::ManakaiDOM:ManakaiDOMNodeObject.newReference>
+                                 (<ClassName::ManakaiDOMHTMLCollection>);
+            }__;
+            $r->{<Q::ManakaiDOMCore:nodeMatch>} = $chk;
   @Attr:
      @@Name:  anchors
      @@Description:
@@ -476,6 +1387,56 @@ IF:
          }
      @@Get:
         @@@Type:  HTMLCollection
+        @@@actualType:
+          ManakaiDOMHTMLCollection
+        @@@PerlDef:
+            my $node = $self->{<Q::TreeCore:node>};
+            my $cis = $node->{<Q::DOMCore:ownerDocument>}
+                           ->{<Q::DOMCore:hasFeature>}->{XML}
+                        ? false
+                        : $node->{<Q::DOMCore:ownerDocument>}
+                               ->{<Q::DOMCore:hasFeature>}->{HTML}
+                            ? true : false;
+            my $chk;
+              $chk = sub {
+                my ($self) = @_;
+                if (defined $self->{<Q::infoset:localName>}) {
+                  if (defined $self->{<Q::infoset:namespaceName>}) {
+                    if ($self->{<Q::infoset:namespaceName>} eq <Q::xhtml1:> and
+                        $self->{<Q::infoset:localName>} eq 'a') {
+                      return true
+                        if $self->{<Q::infoset:attributes>}
+                                ->{<Q::null:>}->{name} or
+                           $self->{<Q::infoset:attributes>}
+                                ->{<Q::ManakaiDOM:noNS>}->{name};
+                    }
+                  } else { ## Null namespace
+                    if ($self->{<Q::infoset:localName>} eq 'a') {
+                      return true
+                        if $self->{<Q::infoset:attributes>}
+                                ->{<Q::null:>}->{name} or
+                           $self->{<Q::infoset:attributes>}
+                                ->{<Q::ManakaiDOM:noNS>}->{name};
+                    }
+                  }
+                } else {
+                  if ($self->{<Q::DOMCore:name>} eq 'a' or
+                      ($cis and lc ($self->{<Q::DOMCore:name>}) eq 'a')) {
+                    return true
+                        if $self->{<Q::infoset:attributes>}
+                                ->{<Q::ManakaiDOM:noNS>}->{name} or
+                           $self->{<Q::infoset:attributes>}
+                                ->{<Q::null:>}->{name};
+                  }
+                }
+                return false;
+              };
+
+            __DEEP{
+              $r = $node-><M::ManakaiDOM:ManakaiDOMNodeObject.newReference>
+                                 (<ClassName::ManakaiDOMHTMLCollection>);
+            }__;
+            $r->{<Q::ManakaiDOMCore:nodeMatch>} = $chk;
   @Attr:
      @@Name:  cookie
      @@Description:
@@ -490,6 +1451,7 @@ IF:
          }
      @@Get:
         @@@Type:  DOMString
+        @@@actualType: RFC2965Cookies
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -507,6 +1469,7 @@ IF:
               No cookie is available for the current frame or document.
      @@Set:
         @@@Type:  DOMString
+        @@@actualType: RFC2965Cookie
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -530,17 +1493,13 @@ IF:
             value is <CODE:0>, any existing cookies of the specified 
             name are removed.
         @@@Exception:
-           @@@@Name:  SYNTAX_ERR
-           @@@@Type:
-              DOMCore:DOMException
-           @@@@SubType:
-             @@@@@QName:
-               ManakaiDOMHTML:MDOMHTML_BAD_COOKIE
-             @@@@@Description:
-               @@@@@@lang:en
-               @@@@@@@:
-                 The new value does not adhere to the 
-                 RFC 2965 <CODE:cookie>.
+          @@@@@:
+            ManakaiDOMHTML:MDOMHTML_BAD_COOKIE
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The new value does not adhere to the 
+              RFC 2965 <CODE:cookie>.
   @Method:
      @@Name:  open
      @@Description:
@@ -578,7 +1537,7 @@ IF:
      @@Return:  
   @Method:
      @@Name:  writeln
-     @@Descripton:
+     @@Description:
        @@@lang:en
        @@@@:
          Write a string followed by a newline character 
@@ -645,8 +1604,10 @@ IF:
       @@@Description:
         @@@@lang:en
         @@@@@:The matching element.
-    @@SpecLevel:1
-    @@Condition:DOM1
+    @@DOMMain:implementFeature:
+      HTMLFeature10
+    @@For:
+      ManakaiDOM:DOM1 !ManakaiDOM:DOM2
   @ImplNote:
     @@lang:en
     @@@:
@@ -668,6 +1629,58 @@ IF:
       \
       }
 ##IF:HTMLDocument
+
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdfs:Property
+    @@AliasFor: 
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+PropDef:
+  @QName: isApplet
+  @FullName:
+    @@lang:en
+    @@@: Is a Java applet
+  @rdfs:domain:
+    xhtml:object
+  @Description:
+    @@lang:en
+    @@@:
+      Whether an <HA::object> element is a Java applet or not. 
+
+ElementTypeBinding:
+  @Name: StringDataTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DataType
+    @@AliasFor: 
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+StringDataTypeDef:
+  @QName: RFC2965Cookies
+  @FullName:
+    @@lang:en
+    @@@:
+      RFC 2965 <CODE::cookies>
+
+StringDataTypeDef:
+  @QName: RFC2965Cookie
+  @FullName:
+    @@lang:en
+    @@@:
+       RFC 2965 <CODE::cookie>
 
 ImplNote:
   @lang:en
@@ -700,15 +1713,35 @@ ImplNote:
     should be in lowercase for compatibility.
 
 IF:
-  @Name:  HTMLElement
+  @Name:
+    @@@: HTMLElement
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @ISA:
+    @@@: 
+      DOMCore:Element
+    @@ForCheck:
+      ManakaiDOM:ForIF
+
+  @L1IF:
+
+  @QName:
+    @@@: ManakaiDOMHTMLElement
+    @@ForCheck:
+      ManakaiDOM:ForClass
+  @ISA:
+    @@@:
+      DOMCore:ManakaiDOMElement
+    @@ForCheck:
+      ManakaiDOM:ForClass
+
   @Description:
     @@lang:en
     @@@:
       An HTML element.  All specific HTML element interfaces 
       are derived from this interface.
 
-  @ISA:  Element
-  @ElementType:
+  @@ElementType:
     @@QName:
       xhtml1:sub
   \##TODO: rewrite this
@@ -739,7 +1772,7 @@ IF:
     @@html-element-type:noscript
     @@html-element-type:address
     @@html-element-type:center
-  @ElementType:
+  @@ElementType:
     @@QName:
       xhtml1:*
   @ImplNote:
@@ -829,49 +1862,51 @@ IF:
       for future use.  It is used later in DOM Level 2 CSS Module.
 ##IF:HTMLElement
 
-IF:
-  @Name:  HTMLHtmlElement
+ET:
+  @ETQName:
+    xhtml1:html
 
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:html
+  @IFQName:
+    @@@: HTMLHtmlElement
+  @ClsQName:
+    @@@: ManakaiDOMHTMLHtmlElement
+  @ISAHTMLElement:
+  @L1IF:
 
-  @Attr:
+  @ATTR:
      @@Name:  version
-     @@DocAttr:
-       @@@QName:version
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 
-IF:
-  @Name:  HTMLHeadElement
+ET:
+  @ETQName:
+    xhtml1:head
+  @IFQName:
+    @@@: HTMLHeadElement
+  @ClsQName:
+    @@@: ManakaiDOMHTMLHeadElement
+  @ISAHTMLElement:
+  @L1IF:
 
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:head
-
-  @Attr:
+  @ATTR:
      @@Name:  profile
-     @@DocAttr:
-       @@@QName:profile
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 
-IF:
-  @Name:  HTMLLinkElement
-
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:link
+ET:
+  @ETQName:
+    xhtml1:link
+  @IFQName:  
+    @@@: HTMLLinkElement
+  @ClsQName:
+    @@@: ManakaiDOMHTMLLinkElement
+  @ISAHTMLElement:
+  @L1IF:
 
   @Attr:
      @@Name:  disabled
@@ -897,7 +1932,7 @@ IF:
              @@@@@@:
                The link is enabled.
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetProp:
             DOMHTML:disabled
@@ -917,82 +1952,74 @@ IF:
              @@@@@@:
                The link is enabled.
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@SetProp:
             DOMHTML:disabled
-  @Attr:
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        A version of WinIE 3 has a <HA::disable> attribute by mistake. 
+  @ATTR:
      @@Name:  charset
-     @@DocAttr:
-       @@@QName:charset
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  href
-     @@DocAttr:
-       @@@QName:href
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  hreflang
-     @@DocAttr:
-       @@@QName:hreflang
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  media
-     @@DocAttr:
-       @@@QName:media
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  rel
-     @@DocAttr:
-       @@@QName:rel
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  rev
-     @@DocAttr:
-       @@@QName:rev
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  target
-     @@DocAttr:
-       @@@QName:target
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  type
-     @@DocAttr:
-       @@@QName:type
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 ##IF:HTMLLinkElement
 
-IF:
-  @Name:  HTMLTitleElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:title
+ET:
+  @ETQName:
+    xhtml1:title
+  @IFQName:
+    @@@: HTMLTitleElement
+  @ClsQName:
+    @@@: ManakaiDOMHTMLTitleElement
+  @ISAHTMLElement:
+  @L1IF:
+
   @Attr:
      @@Name:  text
      @@Description:
@@ -1002,92 +2029,106 @@ IF:
      @@Get:
         @@@Type:  DOMString
         @@@Def:
-          @@@@Type:
-            lang:Perl
-          @@@@@:
-            __DEEP{
-              $r = $self->{<Q:TreeCore:node>}
-                    ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{textContent}__;
-            }__;
+          @@@@ContentType:
+            lang:dis
+          @@@@DISPerl:cloneCode:
+            DOMCore:ManakaiDOMNode::ManakaiDOM:ManakaiDOMLatest.getTextContent
      @@Set:
         @@@Type:  DOMString
         @@@Def:
-          @@@@Type:
-            lang:Perl
-          @@@@@:
-            __DEEP{  ## Latest version
-              $self->__SUPER{Element::}__::__INT{textContent}__ ($given);
-            }__;
+          @@@@ContentType:
+            lang:dis
+          @@@@DISPerl:cloneCode:
+            DOMCore:ManakaiDOMNode::ManakaiDOM:ManakaiDOMLatest.setTextContent
 ##IF:HTMLTitleElement
 
-IF:
-  @Name:  HTMLMetaElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:meta
-  @Attr:
+ET:
+  @ETQName:
+    xhtml1:meta
+  @IFQName:
+    @@@: HTMLMetaElement
+  @ClsQName:
+    @@@: ManakaiDOMHTMLMetaElement
+  @ISAHTMLElement:
+  @L1IF:
+
+  @ATTR:
      @@Name:  content
-     @@DocAttr:
-       @@@QName:content
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  httpEquiv
-     @@DocAttr:
-       @@@QName:http-equiv
+  @ATTR:
+     @@AName:
+       @@@@: http-equiv
+     @@DOMAName:
+       @@@@: httpEquiv
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  name
-     @@DocAttr:
-       @@@QName:name
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  scheme
-     @@DocAttr:
-       @@@QName:scheme
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 
-IF:
-  @Name:  HTMLBaseElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:base
-  @Attr:
+ET:
+  @ETQName:
+    xhtml1:base
+  @IFQName:
+    @@@: HTMLBaseElement
+  @ClsQName:
+    @@@: ManakaiDOMHTMLBaseElement
+  @ISAHTMLElement:
+  @L1IF:
+
+  @ATTR:
      @@Name:  href
-     @@DocAttr:
-       @@@QName:href
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  target
-     @@DocAttr:
-       @@@QName:target
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 
-IF:
-  @Name:  HTMLIsIndexElement
-  @ISA:  HTMLElement
+ElementTypeBinding:
+  @Name: ISAHTMLElement
   @ElementType:
-    @@QName:
-      xhtml1:isindex
+    dis:ISA
+  @ShadowContent:
+    @@@: HTMLElement
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @ShadowSibling:
+    @@ISA:
+      @@@@: ManakaiDOMHTMLElement
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+
+ET:
+  @ETQName:
+    xhtml1:isindex
+  @IFQName:
+    @@@: HTMLIsIndexElement
+  @ClsQName:
+    @@@: ManakaiDOMHTMLIsIndexElement
+  @ISAHTMLElement:
+  @L1IF:
+
+  @ForCheck: !ForXHTML11
+
   @Attr:
      @@Name:  form
      @@Description:
@@ -1101,7 +2142,7 @@ IF:
          }
      @@Get:
         @@@Type:  
-          DOMWebForms:HTMLFormElement
+          DOMHTML:HTMLFormElement
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
@@ -1109,23 +2150,44 @@ IF:
             @@@@@lang:en
             @@@@@@:
               This element is not within the context of a form.
-  @Attr:
+  @ATTR:
      @@Name:  prompt
-     @@DocAttr:
-       @@@Name:prompt
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 
-IF:
-  @Name:  HTMLStyleElement
-  @ISA:  HTMLElement
+ElementTypeBinding:
+  @Name: ETQName
   @ElementType:
-    @@QName:
-      xhtml1:style
+    dis:QName
+  @ShadowContent:
+    @@ForCheck:
+      s:ForML
+ElementTypeBinding:
+  @Name: IFQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck:
+      ManakaiDOM:ForIF
+ElementTypeBinding:
+  @Name: ClsQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck:
+      ManakaiDOM:ForClass
+
+ET:
+  @ETQName:
+    xhtml1:style
+  @IFQName: HTMLStyleElement
+  @ClsQName: ManakaiDOMHTMLStyleElement
+  @ISAHTMLElement:
+  @L1IF:
+
   @Attr:
      @@Name:  disabled
      @@Description:
@@ -1146,7 +2208,7 @@ IF:
              @@@@@lang:en
              @@@@@@:The style sheet is enabled.
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@GetProp:
             DOMHTML:disabled
@@ -1164,89 +2226,87 @@ IF:
              @@@@@lang:en
              @@@@@@:The style sheet is enabled.
         @@@Def:
-          @@@@Type:
+          @@@@ContentType:
             lang:dis
           @@@@SetProp:
             DOMHTML:disabled
-  @Attr:
+  @ATTR:
      @@Name:  media
-     @@DocAttr:
-       @@@Name:media
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  type
-     @@DocAttr:
-       @@@Name:type
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 
-IF:
-  @Name:  HTMLBodyElement
-  @ISA:  HTMLElement
+ElementTypeBinding:
+  @Name: DOMAName
   @ElementType:
-    @@QName:
-      xhtml1:body
-  @Attr:
-     @@Name:  aLink
-     @@DocAttr:
-       @@@Name:alink
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+    dis:Name
+  @ShadowContent:
+    @@ForCheck:
+      ManakaiDOM:DOM
+ElementTypeBinding:
+  @Name: AName
+  @ElementType:
+    dis:Name
+  @ShadowContent:
+    @@ForCheck:
+      s:ForML
+
+ET:
+  @ETQName:
+    xhtml1:body
+  @IFQName:  HTMLBodyElement
+  @ClsQName: ManakaiDOMHTMLBodyElement
+  @ISAHTMLElement:
+  @L1IF:
+
+  @ATTR:
+     @@AName: alink
+     @@DOMAName:  aLink
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  background
-     @@DocAttr:
-       @@@Name:background
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  bgColor
-     @@DocAttr:
-       @@@Name:bgcolor
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+  @ATTR:
+     @@DOMAName:  bgColor
+     @@AName: bgcolor
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  link
-     @@DocAttr:
-       @@@Name:link
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  text
-     @@DocAttr:
-       @@@Name:text
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
-     @@Name:  vLink
-     @@DocAttr:
-       @@@Name:vlink
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@DOMAName:  vLink
+     @@AName: vlink
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
@@ -1262,18 +2322,17 @@ ImplNote:
     <IF:HTMLButtonElement>, <IF:HTMLFieldSetElement>, 
     <IF:HTMLLegendElement>: See <Module:WebForms>.
 
-IF:
-  @Name:  HTMLUListElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:ul
-  @Attr:
+ET:
+  @ETQName: 
+    xhtml1:ul
+  @IFQName:  HTMLUListElement
+  @ClsQName: ManakaiDOMHTMLUListElement
+  @ISAHTMLElement:
+  @L1IF:
+
+  @ATTR:
      @@Name:  compact
-     @@DocAttr:
-       @@@Name:compact
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -1288,29 +2347,25 @@ IF:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
-  @Attr:
+  @ATTR:
      @@Name:  type
-     @@DocAttr:
-       @@@Name:type
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 
-IF:
-  @Name:  HTMLOListElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:ol
-  @Attr:
+ET:
+  @ETQName:
+    xhtml1:ol
+  @IFQName:  HTMLOListElement
+  @ClsQName:ManakaiDOMHTMLOListElement
+  @ISAHTMLElement:
+  @L1IF:
+
+  @ATTR:
      @@Name:  compact
-     @@DocAttr:
-       @@@Name:compact
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -1325,12 +2380,9 @@ IF:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
-  @Attr:
+  @ATTR:
      @@Name:  start
-     @@DocAttr:
-       @@@Name:start
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:
            DOMMain:long
@@ -1339,27 +2391,23 @@ IF:
            DOMMain:long
   @Attr:
      @@Name:  type
-     @@DocAttr:
-       @@@Name:type
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 
-IF:
-  @Name:  HTMLDListElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:dl
-  @Attr:
+ET:
+  @ETQName: 
+    xhtml1:dl
+  @IFQName:  HTMLDListElement
+  @ClsQName: ManakaiDOMHTMLDListElement
+  @ISAHTMLElement:
+  @L1IF:
+
+  @ATTR:
      @@Name:  compact
-     @@DocAttr:
-       @@@Name:compact
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -1375,20 +2423,18 @@ IF:
         @@@InCase:
            @@@@Value:  false
 
-IF:
-  @Name:  HTMLDirectoryElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:dir
-    @@DeprecatedBy:
-      DOMHTML:HTML4
+ET:
+  @ETQName:
+    xhtml1:dir
+  @IFQName:  HTMLDirectoryElement
+  @ClsQName: ManakaiDOMHTMLDirectoryElement
+  @ISAHTMLElement:
+  @L1IF:
+  @Deprecated:
+
   @Attr:
      @@Name:  compact
-     @@DocAttr:
-       @@@Name:compact
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -1404,20 +2450,18 @@ IF:
         @@@InCase:
            @@@@Value:  false
 
-IF:
-  @Name:  HTMLMenuElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:menu
-    @@DeprecatedBy:
-      DOMHTML:HTML4
-  @Attr:
+ET:
+  @ETQName:
+    xhtml1:menu
+  @IFQName:  HTMLMenuElement
+  @ClsQName: ManakaiDOMHTMLMenuElement
+  @ISAHTMLElement:
+  @L1IF:
+  @Deprecated:
+
+  @ATTR:
      @@Name:  compact
-     @@DocAttr:
-       @@@Name:compact
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -1433,28 +2477,24 @@ IF:
         @@@InCase:
            @@@@Value:  false
 
-IF:
-  @Name:  HTMLLIElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:li
-  @Attr:
+ET:
+  @ETQName:
+    xhtml1:li
+  @IFQName:  HTMLLIElement
+  @ClsQName: ManakaiDOMHTMLLIElement
+  @ISAHTMLElement:
+  @L1IF:
+
+  @ATTR:
      @@Name:  type
-     @@DocAttr:
-       @@@Name:type
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  value
-     @@DocAttr:
-       @@@Name:value
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:
            DOMMain:long
@@ -1462,78 +2502,145 @@ IF:
         @@@Type:
            DOMMain:long
 
-IF:
-  @Name:  HTMLDivElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:div
-  @Attr:
+ET:
+  @ETQName:
+    xhtml1:div
+  @IFQName:  HTMLDivElement
+  @ClsQName: ManakaiDOMHTMLDivElement
+  @ISAHTMLElement:
+  @L1IF:
+
+  @ATTR:
      @@Name:  align
-     @@DocAttr:
-       @@@Name:align
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 
-IF:
-  @Name:  HTMLParagraphElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:p
-  @Attr:
+ET:
+  @ETQName:
+    xhtml1:p
+  @IFQName:  HTMLParagraphElement
+  @ClsQName: ManakaiDOMHTMLParagraphElement
+  @ISAHTMLElement:
+  @L1IF:
+
+  @ATTR:
      @@Name:  align
-     @@DocAttr:
-       @@@Name:align
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 
+ForDef:
+  @QName:
+    DOMHTML:ForH1
+ForDef:
+  @QName:
+    DOMHTML:ForH2
+ForDef:
+  @QName:
+    DOMHTML:ForH3
+ForDef:
+  @QName:
+    DOMHTML:ForH4
+ForDef:
+  @QName:
+    DOMHTML:ForH5
+ForDef:
+  @QName:
+    DOMHTML:ForH6
+
 IF:
-  @Name:  HTMLHeadingElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
+  @For: ForHTML
+  @rdf:type:
+    @@@:
+      dis:MultipleResource
+    @@For: ForHTML
+    @@ForCheck:
+      !ManakaiDOM:ForIF !ManakaiDOM:ForClass
+      !ForH1 !ForH2 !ForH3 !ForH4 !ForH5 !ForH6
+  @resourceFor:
+    @@@: ForH1
+    @@For: ForHTML
+  @resourceFor:
+    @@@: ForH2
+    @@For: ForHTML
+  @resourceFor:
+    @@@: ForH3
+    @@For: ForHTML
+  @resourceFor:
+    @@@: ForH4
+    @@For: ForHTML
+  @resourceFor:
+    @@@: ForH5
+    @@For: ForHTML
+  @resourceFor:
+    @@@: ForH6
+    @@For: ForHTML
+  @rdf:type:
+    @@@:
+      s:ElementType
+    @@For:ForHTML
+  
+  @QName:
+    @@@:
       xhtml1:h1
-  @ElementType:
-    @@QName:
+    @@ForCheck: ForH1
+  @QName:
+    @@@:
       xhtml1:h2
-  @ElementType:
-    @@QName:
+    @@ForCheck: ForH2
+  @QName:
+    @@@:
       xhtml1:h3
-  @ElementType:
-    @@QName:
+    @@ForCheck: ForH3
+  @QName:
+    @@@:
       xhtml1:h4
-  @ElementType:
-    @@QName:
+    @@ForCheck: ForH4
+  @QName:
+    @@@:
       xhtml1:h5
-  @ElementType:
-    @@QName:
+    @@ForCheck: ForH5
+  @QName:
+    @@@:
       xhtml1:h6
-  @Attr:
+    @@ForCheck: ForH6
+
+  @IFQName:  HTMLHeadingElement
+  @ClsQName: ManakaiDOMHTMLHeadingElement
+  @ISAHTMLElement:
+  @L1IF:
+
+  @ATTR:
      @@Name:  align
-     @@DocAttr:
-       @@@Name:align
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 
-IF:
+ElementTypeBinding:
+  @Name: IFDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:IF
+    @@ISA:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOM
+      @@@For:
+        ManakaiDOM:ManakaiDOM1
+
+IFDef:
   @Name:HTMLBlockquoteElement
   @ISA:HTMLElement
-  #@ElementType:
-  #  @@QName:
-  #    xhtml1:blockquote
+  @ElementType:
+    xhtml1:blockquote::ForHTML40SE
   @Description:
     @@lang:en
     @@@:
@@ -1543,46 +2650,74 @@ IF:
       <SRC:DOM Level 1 Errata>
   @Attr:
     @@Name:cite
-    @@DocAttr:
-      @@@Name:cite
     @@Get:
       @@@Type:
         DOMMain:DOMString
     @@Set:
       @@@Type:
         DOMMain:DOMString
-  @Condition:DOM1
+  @ForCheck:
+    =ManakaiDOM:DOM1
+
+ForDef:
+  @QName:
+    DOMHTML:ForBlockquote
+ForDef:
+  @QName:
+    DOMHTML:ForQ
 
 IF:
-  @Name:  HTMLQuoteElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
+  @For:ForHTML
+  @rdf:type:
+    @@@:
+      dis:MultipleResource
+    @@ForCheck: ForHTML
+    @@ForCheck:
+      !ManakaiDOM:ForIF !ManakaiDOM:ForClass
+      !ForBlockquote !ForQ
+  @resourceFor:
+    @@@:ForBlockquote
+    @@ForCheck:ForHTML
+  @resourceFor:
+    @@@:ForQ
+    @@ForCheck:ForHTML
+  @rdf:type:
+    @@@:
+      s:ElementType
+    @@For:ForHTML
+
+  @ETQName:
+    @@@:
       xhtml1:blockquote
-  @ElementType:
-    @@QName:
+    @@ForCheck:ForBlockquote
+  @ETQName:
+    @@@:
       xhtml1:q
-  @Attr:
+    @@ForCheck:ForQ
+
+  @IFQName:  HTMLQuoteElement
+  @ClsQName: ManakaiDOMHTMLQuoteElement
+  @ISAHTMLElement:
+  @L1IF:
+
+  @ATTR:
      @@Name:  cite
-     @@DocAttr:
-       @@@Name:cite
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 
-IF:
-  @Name:  HTMLPreElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:pre
-  @Attr:
+ET:
+  @ETQName:
+    xhtml1:pre
+  @IFQName:  HTMLPreElement
+  @ClsQName: ManakaiDOMHTMLPreElement
+  @ISAHTMLElement:
+  @L1IF:
+
+  @ATTR:
      @@Name:  width
-     @@DocAttr:
-       @@@Name:width
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:1
      @@Get:
         @@@Type:
            DOMMain:long
@@ -1590,63 +2725,65 @@ IF:
         @@@Type:
            DOMMain:long
 
-IF:
-  @Name:  HTMLBRElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:br
-  @Attr:
+ET:
+  @ETQName:
+    xhtml1:br
+  @IFQName:  HTMLBRElement
+  @ClsQName:ManakaiDOMHTMLBRElement
+  @ISAHTMLElement:
+  @L1IF:
+
+  @ATTR:
      @@Name:  clear
-     @@DocAttr:
-       @@@Name:clear
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:1
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 
-IF:
-  @Name:  HTMLBaseFontElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:basefont
-    @@DeprecatedBy:
-      DOMHTML:HTML4
-  @Attr:
+ET:
+  @ETQName: 
+    xhtml1:basefont
+  @IFQName:  HTMLBaseFontElement
+  @ClsQName:ManakaiDOMHTMLBaseFontElement
+  @ISAHTMLElement:
+  @L1IF:
+  @Deprecated:
+
+  @ATTR:
      @@Name:  color
-     @@DocAttr:
-       @@@Name:color
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  face
+     @@Deprecated:
      @@DocAttr:
-       @@@Name:face
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  size
      @@Description:
        @@@lang:en
        @@@@:Computed font size.
-     @@DocAttr:
-       @@@Name:size
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+       @@@For:
+         ManakaiDOM:DOM2
+     @@Deprecated:
      @@Get:
         @@@Type:
-           DOMMain:long
+          @@@@@:
+            DOMMain:long
+          @@@@For:
+            ManakaiDOM:DOM2
+        @@@Type:
+          @@@@@:
+            DOMMain:DOMString
+          @@@@For:
+            ManakaiDOM:DOM1 !ManakaiDOM:DOM2
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -1663,40 +2800,32 @@ IF:
         1
         2
 
-IF:
-  @Name:  HTMLFontElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:font
-    @@DeprecatedBy:
-      DOMHTML:HTML4
-  @Attr:
+ET:
+  @ETQName: 
+    xhtml1:font
+  @IFQName:  HTMLFontElement
+  @ClsQName:ManakaiDOMHTMLFontElement
+  @ISAHTMLElement:
+  @Deprecated:
+  @L1IF:
+
+  @ATTR:
      @@Name:  color
-     @@DocAttr:
-       @@@Name:color
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  face
-     @@DocAttr:
-       @@@Name:face
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  size
-     @@DocAttr:
-       @@@Name:size
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -1706,28 +2835,25 @@ IF:
      @@Set:
         @@@Type:  DOMString
 
-IF:
-  @Name:  HTMLHRElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:hr
-  @Attr:
+ET:
+  @ETQName:
+    xhtml1:hr
+  @IFQName:  HTMLHRElement
+  @ClsQName:ManakaiDOMHTMLHRElement
+  @ISAHTMLElement:
+  @L1IF:
+
+  @ATTR:
      @@Name:  align
-     @@DocAttr:
-       @@@Name:align
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  noShade
-     @@DocAttr:
-       @@@Name:noshade
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+  @ATTR:
+     @@AName:noshade
+     @@DOMAName:  noShade
+     @@Deprecated:
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -1742,160 +2868,163 @@ IF:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
-  @Attr:
+  @ATTR:
      @@Name:  size
-     @@DocAttr:
-       @@@Name:size
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  width
-     @@DocAttr:
-       @@@Name:width
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 
+ForDef:
+  @QName:
+    DOMHTML:ForIns
+ForDef:
+  @QName:
+    DOMHTML:ForDel
+
 IF:
-  @Name:  HTMLModElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
+  @For:ForHTML
+  @rdf:type:
+    @@@: 
+      dis:MultipleResource
+    @@ForCheck:
+      !ManakaiDOM:ForIF !ManakaiDOM:ForClass
+      !ForIns !ForDel
+    @@For: ForHTML
+  @resourceFor:
+    @@@: ForIns
+    @@For:ForHTML
+  @resourceFor:
+    @@@: ForDel
+    @@For:ForHTML
+  @rdf:type:
+    @@@:
+      s:ElementType
+    @@For:ForHTML
+
+  @ETQName:
+    @@@:
       xhtml1:ins
-  @ElementType:
-    @@QName:
+    @@ForCheck:ForIns
+  @ETQName:
+    @@@:
       xhtml1:del
-  @Attr:
+    @@ForCheck:ForDel
+
+  @IFQName:  HTMLModElement
+  @ClsQName:ManakaiDOMHTMLModElement
+  @ISAHTMLElement:
+  @L1IF:
+
+  @ATTR:
      @@Name:  cite
-     @@DocAttr:
-       @@@Name:cite
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  dateTime
-     @@DocAttr:
-       @@@Name:datetime
+  @ATTR:
+     @@AName: datetime
+     @@DOMAName:  dateTime
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 
-IF:
-  @Name:  HTMLAnchorElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:a
-  @Attr:
-     @@Name:  accessKey
-     @@DocAttr:
-       @@@Name:accesskey
+ET:
+  @ETQName:
+    xhtml1:a
+  @IFQName:  HTMLAnchorElement
+  @ClsQName:ManakaiDOMHTMLAnchorElement
+  @ISAHTMLElement:
+  @L1IF:
+
+  @ATTR:
+     @@AName:accesskey
+     @@DOMAName:  accessKey
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  charset
-     @@DocAttr:
-       @@@Name:charset
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  coords
-     @@DocAttr:
-       @@@Name:coords
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  href
-     @@DocAttr:
-       @@@Name:href
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  hreflang
-     @@DocAttr:
-       @@@Name:hreflang
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  name
-     @@DocAttr:
-       @@@Name:name
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  rel
-     @@DocAttr:
-        @@@Name:rel
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  rev
-     @@DocAttr:
-       @@@Name:rev
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  shape
-     @@DocAttr:
-       @@@Name:shape
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  tabIndex
-     @@DocAttr:
-       @@@Name:tabindex
+  @ATTR:
+     @@AName:tabindex
+     @@DOMAName:  tabIndex
      @@Get:
         @@@Type:
            DOMMain:long
      @@Set:
         @@@Type:
            DOMMain:long
-  @Attr:
+  @ATTR:
      @@Name:  target
-     @@DocAttr:
-       @@@Name:target
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  type
-     @@DocAttr:
-       @@@Name:type
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Method:
      @@Name:  blur
-     @@Descriptipn:
+     @@Description:
        @@@lang:en
        @@@@:Remove the focus from this element.
      @@Return:  
@@ -1907,12 +3036,14 @@ IF:
      @@Return:  
 ##IF:HTMLAnchorElement
 
-IF:
-  @Name:  HTMLImageElement
-  @ISA:  HTMLElement
-  @ElementType:
-     @@QName:
-       xhtml1:img
+ET:
+  @ETQName:
+    xhtml1:img
+  @IFQName:  HTMLImageElement
+  @ClsQName:ManakaiDOMHTMLImageElement
+  @ISAHTMLElement:
+  @L1IF:
+
   @Attr:
      @@Name:  name
      @@Description:
@@ -1928,35 +3059,35 @@ IF:
           \
           }
      @@DocAttr:
-       @@@Name:name
+       @@@@:
+         ::ForHTML401
+       @@@For:
+         ManakaiDOM:ManakaiDOMLatest
+     @@DocAttr:
+       @@@@:
+         ::ForXHTML10SE
+       @@@For:
+         ManakaiDOM:ManakaiDOMLatest
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  align
-     @@DocAttr:
-       @@@Name:align
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  alt
-     @@DocAttr:
-       @@@Name:alt
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  border
-     @@DocAttr:
-       @@@Name:border
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
@@ -1965,54 +3096,65 @@ IF:
        @@@lang:en
        @@@@:
          The type is <TYPE:DOMString> in both DOM Levels 1 and 2.
-  @Attr:
+  @ATTR:
      @@Name:  height
-     @@DocAttr:
-       @@@Name:height
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
+     @@Type:
+       @@@@:
+         DOMMain:long
+       @@@For:
+         ManakaiDOM:DOM2
+     @@Type:
+       @@@@:
+         DOMMain:DOMString
+       @@@For:
+         ManakaiDOM:DOM1 !ManakaiDOM:DOM2
      @@Get:
         @@@Type:
            DOMMain:long
      @@Set:
         @@@Type:
            DOMMain:long
-     @@ImplNote:
-       @@@lang:en
-       @@@@:
-         THe type was <TYPE:DOMString> in DOM Level 1.
      @@Level[list]:
         1
         2
      @@SpecLevel[list]:
         1
         2
-  @Attr:
+  @ATTR:
      @@Name:  hspace
-     @@DocAttr:
-       @@@Name:hspace
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
-        @@@Type:
+       @@@Type:
+         @@@@@:
            DOMMain:long
+         @@@@For:
+           ManakaiDOM:DOM2
+       @@@Type:
+         @@@@@:
+           DOMMain:DOMString
+         @@@@For:
+           ManakaiDOM:DOM1 !ManakaiDOM:DOM2
      @@Set:
-        @@@Type:
+       @@@Type:
+         @@@@@:
            DOMMain:long
-     @@ImplNote:
-       @@@lang:en
-       @@@@:
-         The type was <TYPE:DOMString> in DOM Level 1.
+         @@@@For:
+           ManakaiDOM:DOM2
+       @@@Type:
+         @@@@@:
+           DOMMain:DOMString
+         @@@@For:
+           ManakaiDOM:DOM1 !ManakaiDOM:DOM2
      @@Level[list]:
         1
         2
      @@SpecLevel[list]:
         1
         2
-  @Attr:
-     @@Name:  isMap
-     @@DocAttr:
-       @@@Name:ismap
+  @ATTR:
+     @@AName:ismap
+     @@DOMAName:  isMap
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -2027,24 +3169,22 @@ IF:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
-  @Attr:
-     @@Name:  longDesc
+  @ATTR:
+     @@AName:longdesc
+     @@DOMAName:  longDesc
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  src
-     @@DocAttr:
-       @@@Name:src
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  useMap
-     @@DocAttr:
-       @@@Name:usemap
+  @ATTR:
+     @@AName:usemap
+     @@DOMAName:  useMap
      @@Get:
         @@@Type:  DOMString
      @@Set:
@@ -2055,22 +3195,21 @@ IF:
          The HTML 4 and XHTML 1.0 <HA:usemap> attribute value is 
          of <SGML:%URI;>, while the XHTML m12n <HA:usemap> value 
          is <XML:IDREF>.
-  @Attr:
+  @ATTR:
      @@Name:  vspace
-     @@DocAttr:
-       @@@Name:vspace
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
-     @@Get:
-        @@@Type:
-           DOMMain:long
-     @@Set:
-        @@@Type:
-           DOMMain:long
-     @@ImplNote:
-       @@@lang:en
+     @@Deprecated:
+     @@Type:
        @@@@:
-         The type was <TYPE:DOMString> in DOM Level 1.
+         DOMMain:long
+       @@@For:
+         ManakaiDOM:DOM2
+     @@Type:
+       @@@@:
+         DOMMain:DOMString
+       @@@For:
+         ManakaiDOM:DOM1 !ManakaiDOM:DOM2
+     @@Get:
+     @@Set:
      @@Level[list]:
         1
         2
@@ -2079,20 +3218,19 @@ IF:
         2
   @Attr:
      @@Name:  width
-     @@DocAttr:
-       @@@Name:width
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
-     @@Get:
-        @@@Type:
-           DOMMain:long
-     @@Set:
-        @@@Type:
-           DOMMain:long
-     @@ImplNote:
-       @@@lang:en
+     @@Deprecated:
+     @@Type:
        @@@@:
-         The type was <TYPE:DOMString> in DOM Level 1.
+         DOMMain:long
+       @@@For:
+         ManakaiDOM:DOM2
+     @@Type:
+       @@@@:
+         DOMMain:DOMString
+       @@@For:
+         ManakaiDOM:DOM1 !ManakaiDOM:DOM2
+     @@Get:
+     @@Set:
      @@Level[list]:
         1
         2
@@ -2101,12 +3239,14 @@ IF:
         2
 ##IF:HTMLImageElement
 
-IF:
-  @Name:  HTMLObjectElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:object
+ET:
+  @ETQName:
+    xhtml1:object
+  @IFQName:  HTMLObjectElement
+  @ClsQName:ManakaiDOMHTMLObjectElement
+  @ISAHTMLElement:
+  @L1IF:
+
   @ImplNote:
     @@lang:en
     @@@:
@@ -2120,7 +3260,7 @@ IF:
          The <HE:form> element containing this control.
      @@Get:
         @@@Type:  
-          DOMWebForms:HTMLFormElement
+          DOMHTML:HTMLFormElement
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -2131,62 +3271,48 @@ IF:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  align
-     @@DocAttr:
-       @@@Name:align
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  archive
-     @@DocAttr:
-       @@@Name:archive
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  border
-     @@DocAttr:
-       @@@Name:border
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  codeBase
-     @@DocAttr:
-       @@@Name:codebase
+  @ATTR:
+     @@AName:codebase
+     @@DOMAName:  codeBase
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  codeType
-     @@DocAttr:
-       @@@Name:codetype
+  @ATTR:
+     @@AName:codetype
+     @@DOMAName:  codeType
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  data
-     @@DocAttr:
-       @@@Name:data
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  declare
-     @@DocAttr:
-       @@@Name:declare
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -2201,64 +3327,53 @@ IF:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
-  @Attr:
+  @ATTR:
      @@Name:  height
-     @@DocAttr:
-       @@@Name:height
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  hspace
-     @@DocAttr:
-       @@@Name:hspace
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:
            DOMMain:long
      @@Set:
         @@@Type:
            DOMMain:long
-  @Attr:
+  @ATTR:
      @@Name:  name
-     @@DocAttr:
-       @@@Name:name
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  standby
-     @@DocAttr:
-       @@@Name:name
+  @ATTR:
+     @@AName:standby
+     @@DOMAName:  standby
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  tabIndex
-     @@DocAttr:
-       @@@Name:tabindex
+  @ATTR:
+     @@AName:tabindex
+     @@DOMAName:  tabIndex
      @@Get:
         @@@Type:
            DOMMain:long
      @@Set:
         @@@Type:
            DOMMain:long
-  @Attr:
+  @ATTR:
      @@Name:  type
-     @@DocAttr:
-        @@@Name:type
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
-     @@Name:  useMap
-     @@DocAttr:
-       @@@Name:usemap
+     @@AName:usemap
+     @@DOMAName:  useMap
      @@Get:
         @@@Type:  DOMString
      @@Set:
@@ -2269,22 +3384,17 @@ IF:
          In HTML 4 or XHTML 1.0, the <HA:usemap> attribute is 
          a <SGML:%URI;>.  In XHTML m12n, the <HA:usemap> 
          is an <XML:IDREF>.
-  @Attr:
+  @ATTR:
      @@Name:  vspace
-     @@DocAttr:
-       @@@Name:vspace
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:
            DOMMain:long
      @@Set:
         @@@Type:
            DOMMain:long
-  @Attr:
+  @ATTR:
      @@Name:  width
-     @@DocAttr:
-       @@@Name:width
      @@Get:
         @@@Type:  DOMString
      @@Set:
@@ -2305,155 +3415,152 @@ IF:
             @@@@@@:
               There is no containing document or 
               there is but it is not available.
+       @@@Def:
+         @@@@ContentType:
+           lang:dis
+         @@@@GetPropNode:
+           DOMHTML:contentDocument
      @@Level[list]:  2
      @@SpecLevel[list]:  2
+     @@L2:
 ##IF:HTMLObjectElement
 
-IF:
-  @Name:  HTMLParamElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:param
-  @Attr:
+PropDef:
+  @QName: contentDocument
+  @Type:
+    ManakaiDOMCore:ManakaiDOMNodeObjectNode::ManakaiDOM:ManakaiDOMCommon
+  @Description:
+    @@lang:en
+    @@@:
+      An (external) <IF::Document> node object referred from an element. 
+
+ET:
+  @ETQName:
+    xhtml1:param
+  @IFQName:  HTMLParamElement
+  @ClsQName:ManakaiDOMHTMLParamElement
+  @ISAHTMLElement:
+  @L1IF:
+
+  @ATTR:
      @@Name:  name
-     @@DocAttr:
-       @@@Name:name
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  type
-     @@DocAttr:
-       @@@Name:type
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  value
-     @@DocAttr:
-        @@@Name:value
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  valueType
-     @@DocAttr:
-       @@@Name:valuetype
+  @ATTR:
+     @@AName:valuetype
+     @@DOMAName:  valueType
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 
-IF:
-  @Name:  HTMLAppletElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:applet
-    @@DeprecatedBy:
-      DOMHTML:HTML4
-  @Attr:
+ET:
+  @ETQName:
+    xhtml1:applet
+  @IFQName:  HTMLAppletElement
+  @ClsQName:ManakaiDOMHTMLAppletElement
+  @ISAHTMLElement:
+  @L1IF:
+  @Deprecated:
+
+  @ATTR:
      @@Name:  align
-     @@DocAttr:
-       @@@Name:align
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  alt
-     @@DocAttr:
-       @@@Name:alt
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  archive
-     @@DocAttr:
-       @@@Name:archive
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  code
-     @@DocAttr:
-       @@@Name:code
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  codeBase
-     @@DocAttr:
-       @@@Name:codebase
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+  @ATTR:
+     @@AName:codebase
+     @@DOMAName:  codeBase
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  height 
-     @@DocAttr:
-       @@@Name:height
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
     @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  hspace
-     @@DocAttr:
-       @@@Name:hspace
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
-        @@@Type:
+       @@@Type:
+         @@@@@:
            DOMMain:long
+         @@@@For:
+           ManakaiDOM:DOM2
+       @@@Type:
+         @@@@@:
+           DOMMain:DOMString
+         @@@@For:
+           ManakaiDOM:DOM1 !ManakaiDOM:DOM2
      @@Set:
-        @@@Type:
+       @@@Type:
+         @@@@@:
            DOMMain:long
-     @@ImplNote:
-       @@@lang:en
-       @@@@:
-         The type was <TYPE:DOMString> in DOM Level 1.
+         @@@@For:
+           ManakaiDOM:DOM2
+       @@@Type:
+         @@@@@:
+           DOMMain:DOMString
+         @@@@For:
+           ManakaiDOM:DOM1 !ManakaiDOM:DOM2
      @@Level[list]:
         1
         2
      @@SpecLevel[list]:
         1
         2
-  @Attr:
+  @ATTR:
      @@Name:  name
-     @@DocAttr:
-       @@@Name:name
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
      @@Name:  object
-     @@DocAttr:
-       @@@Name:object
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
@@ -2465,20 +3572,19 @@ IF:
         2
   @Attr:
      @@Name:  vspace
-     @@DocAttr:
-       @@@Name:vspace
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
-     @@Get:
-        @@@Type:
-           DOMMain:long
-     @@Set:
-        @@@Type:
-           DOMMain:long
-     @@ImplNote:
-       @@@lang:en
+     @@Deprecated:
+     @@Type:
        @@@@:
-         The type was <TYPE:DOMString> in DOM Level 1.
+         DOMMain:long
+       @@@For:
+         ManakaiDOM:DOM2
+     @@Type:
+       @@@@:
+         DOMMain:DOMString
+       @@@For:
+         ManakaiDOM:DOM1 !ManakaiDOM:DOM2
+     @@Get:
+     @@Set:
      @@Level[list]:
         1
         2
@@ -2487,22 +3593,21 @@ IF:
         2
   @Attr:
      @@Name:  width
-     @@DocAttr:
-       @@@Name:width
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 ##IF:HTMLAppletElement
 
-IF:
-  @Name:  HTMLMapElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:map
+ET:
+  @ETQName:
+    xhtml1:map
+  @IFQName:  HTMLMapElement
+  @ClsQName:ManakaiDOMHTMLMapElement
+  @ISAHTMLElement:
+  @L1IF:
+
   @Attr:
      @@Name:  areas
      @@Description:
@@ -2511,58 +3616,50 @@ IF:
          The list of areas defined for this image map.
      @@Get:
         @@@Type:  HTMLCollection
-  @Attr:
+  @ATTR:
      @@Name:  name
-     @@DocAttr:
-       @@@Name:name
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 ##IF:HTMLMapElement
 
-IF:
-  @Name:  HTMLAreaElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:area
-  @Attr:
-     @@Name:  accessKey
-     @@DocAttr:
-       @@@Name:accesskey
+ET:
+  @ETQName:
+    xhtml1:area
+  @IFQName:  HTMLAreaElement
+  @ClsQName:ManakaiDOMAreaElement
+  @ISAHTMLElement:
+  @L1IF:
+
+  @ATTR:
+     @@AName: accesskey
+     @@DOMAName:  accessKey
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  alt
-     @@DocAttr:
-       @@@Name:alt
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  coords
-     @@DocAttr:
-       @@@Name:coords
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  href
-     @@DocAttr:
-       @@@Name:href
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  noHref
-     @@DocAttr:
-       @@@Name:nohref
+  @ATTR:
+     @@AName:nohref
+     @@DOMAName:  noHref
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -2577,40 +3674,37 @@ IF:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
-  @Attr:
+  @ATTR:
      @@Name:  shape
-     @@DocAttr:
-       @@@Name:shape
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
   @Attr:
-     @@Name:  tabIndex
-     @@DocAttr:
-       @@@Name:tabindex
+     @@AName:tabindex
+     @@DOMAName:  tabIndex
      @@Get:
         @@@Type:
            DOMMain:long
      @@Set:
         @@@Type:
            DOMMain:long
-  @Attr:
+  @ATTR:
      @@Name:  target
-     @@DocAttr:
-       @@@Name:target
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 ##IF:HTMLAreaElement
 
-IF:
-  @Name:  HTMLScriptElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:script
+ET:
+  @ETQName:
+    xhtml1:script
+  @IFQName:  HTMLScriptElement
+  @ClsQName:ManakaiDOMHTMLScriptElement
+  @ISAHTMLElement:
+  @L1IF:
+
   @Attr:
      @@Name:  text
      @@Description:
@@ -2626,9 +3720,7 @@ IF:
      @@Set:
         @@@Type:  DOMString
   @Attr:
-     @@Name:  htmlFor
-     @@DocAttr:
-       @@@Name:for
+     @@DOMAName:  htmlFor
      @@Description:
        @@@lang:en
        @@@@:
@@ -2643,8 +3735,6 @@ IF:
         @@@Type:  DOMString
   @Attr:
      @@Name:  event
-     @@DocAttr:
-       @@@Name:event
      @@Description:
        @@@lang:en
        @@@@:
@@ -2657,18 +3747,14 @@ IF:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  charset
-     @@DocAttr:
-       @@@Name:charset
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  defer
-     @@DocAttr:
-       @@@Name:defer
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -2683,30 +3769,28 @@ IF:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
-  @Attr:
+  @ATTR:
      @@Name:  src
-     @@DocAttr:
-       @@@Name:src
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  type
-     @@DocAttr:
-       @@@Name:type
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 ##IF:HTMLScriptElement
 
-IF:
-  @Name:  HTMLTableElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:table
+ET:
+  @ETQName:
+    xhtml1:table
+  @IFQName:  HTMLTableElement
+  @ClsQName:ManakaiDOMHTMLTableElement
+  @ISAHTMLElement:
+  @L1IF:
+
   @Attr:
      @@Name:  caption
      @@Description:
@@ -2726,16 +3810,12 @@ IF:
      @@Set:
         @@@Type:  HTMLTableCaptionElement
         @@@Exception:
-           @@@@Name:  HIERARCHY_REQUEST_ERR
-           @@@@Type:
-              DOMCore:DOMException
-           @@@@SubType:
-             @@@@@QName:
-               ManakaiDOMHTML:MDOM_NOT_CAPTION
-             @@@@@Description:
-               @@@@@@lang:en
-               @@@@@@@:
-                 The given element is not a <HE:caption>.
+          @@@@@:
+            ManakaiDOMHTML:MDOM_NOT_CAPTION
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The given element is not a <HE:caption>.
      @@Level[list]:
         1
      @@SpecLevel[list]:
@@ -2827,54 +3907,42 @@ IF:
          ISSUE: What is collected if simple table?
      @@Get:
         @@@Type:  HTMLCollection
-  @Attr:
+  @ATTR:
      @@Name:  align
-     @@DocAttr:
-       @@@Name:align
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  bgColor
-     @@DocAttr:
-       @@@Name:bgcolor
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+  @ATTR:
+     @@AName:bgcolor
+     @@DOMAName:  bgColor
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  border
-     @@DocAttr:
-       @@@Name:border
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  cellPadding
-     @@DocAttr:
-       @@@Name:cellpadding
+  @ATTR:
+     @@AName:cellpadding
+     @@DOMAName:  cellPadding
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  cellSpacing
-     @@DocAttr:
-       @@@Name:cellspacing
+  @ATTR:
+     @@AName:cellspacing
+     @@DOMAName:  cellSpacing
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  frame
-     @@DocAttr:
-       @@@Name:frame
      @@Get:
         @@@Type:  DOMString
      @@Set:
@@ -2883,26 +3951,20 @@ IF:
        @@@lang:en
        @@@@:
          How <HTML:border> is implemented in DOM Level 0?
-  @Attr:
+  @ATTR:
      @@Name:  rules
-     @@DocAttr:
-       @@@Name:rules
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  summary
-     @@DocAttr:
-       @@@Name:summary
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  width
-     @@DocAttr:
-       @@@Name:width
      @@Get:
         @@@Type:  DOMString
      @@Set:
@@ -3091,122 +4153,148 @@ IF:
         2
 ##IF:HTMLTableElement
 
-IF:
-  @Name:  HTMLTableCaptionElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:caption
-  @Attr:
+ET:
+  @ETQName:
+    xhtml1:caption
+  @IFQName:  HTMLTableCaptionElement
+  @ClsQName:ManakaiDOMHTMLTableCaptionElement
+  @ISAHTMLElement:
+  @L1IF:
+
+  @ATTR:
      @@Name:  align
-     @@DocAttr:
-       @@@Name:align
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 ##IF:HTMLTableCaptionElement
 
-IF:
-  @Name:  HTMLTableColElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:col
-  @Attr:
+ET:
+  @ETQName:
+    xhtml1:col
+  @IFQName:  HTMLTableColElement
+  @ClsQName:ManakaiDOMHTMLTableColElement
+  @ISAHTMLElement:
+  @L1IF:
+
+  @ATTR:
      @@Name:  align
-     @@DocAttr:
-       @@@Name:align
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  ch
-     @@DocAttr:
-       @@@Name:char
+  @ATTR:
+     @@AName:char
+     @@DOMAName:  ch
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  chOff
-     @@DocAttr:
-       @@@Name:charoff
+  @ATTR:
+     @@AName:charoff
+     @@DOMAName:  chOff
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  span
-     @@DocAttr:
-       @@@Name:span
      @@Get:
         @@@Type:
            DOMMain:long
      @@Set:
         @@@Type:
            DOMMain:long
-  @Attr:
-     @@Name:  vAlign
-     @@DocAttr:
-       @@@Name:valign
+  @ATTR:
+     @@AName:valign
+     @@DOMAName:  vAlign
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  width
-     @@DocAttr:
-       @@@Name:width
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 ##IF:HTMLTableColElement
 
+ForDef:
+  @QName:
+    DOMHTML:ForTbody
+ForDef:
+  @QName:
+    DOMHTML:ForThead
+ForDef:
+  @QName:
+    DOMHTML:ForTfoot
+
 IF:
-  @Name:  HTMLTableSectionElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
+  @For:ForHTML
+  @rdf:type:
+    @@@:
+      dis:MultipleResource
+    @@For:ForHTML
+    @@ForCheck:
+      !ManakaiDOM:ForIF !ManakaiDOM:ForClass
+      !ForTbody !ForThead !ForTfoot
+  @resourceFor:
+    @@@: ForTbody
+    @@ForCheck:ForHTML
+  @resourceFor:
+    @@@: ForThead
+    @@ForCheck:ForHTML
+  @resourceFor:
+    @@@: ForTfoot
+    @@ForCheck:ForHTML
+  @rdf:type:
+    @@@:
+      s:ElementType
+    @@For:ForHTML
+
+  @ETQName:
+    @@@:
       xhtml1:tbody
-  @ElementType:
-    @@QName:
+    @@ForCheck:ForTbody
+  @ETQName:
+    @@@:
       xhtml1:thead
-  @ElementType:
-    @@QName:
+    @@ForCheck:ForThead
+  @ETQName:
+    @@@:
       xhtml1:tfoot
-  @Attr:
+    @@ForCheck:ForTfoot
+
+  @IFQName:  HTMLTableSectionElement
+  @ClsQName:ManakaiDOMHTMLTableSectionElement
+  @ISAHTMLElement:
+  @L1IF:
+
+  @ATTR:
      @@Name:  align
-     @@DocAttr:
-       @@@Name:align
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  ch
-     @@DocAttr:
-       @@@Name:char
+  @ATTR: 
+     @@AName: char
+     @@DOMAName:  ch
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  chOff
-     @@DocAttr:
-       @@@Name:charoff
+  @ATTR:
+     @@AName:charoff
+     @@DOMAName:  chOff
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  vAlign
-     @@DocAttr:
-       @@@Name:valign
+  @ATTR:
+     @@AName:valign
+     @@DOMAName:  vAlign
      @@Get:
         @@@Type:  DOMString
      @@Set:
@@ -3333,12 +4421,14 @@ IF:
         2
 ##IF:HTMLTableSectionElement
 
-IF:
-  @Name:  HTMLTableRowElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-       xhtml1:tr
+ET:
+  @ETQName:
+    xhtml1:tr
+  @IFQName:  HTMLTableRowElement
+  @ClsQName:ManakaiDOMHTMLTableRowElement
+  @ISAHTMLElement:
+  @L1IF:
+
   @Attr:
      @@Name:  rowIndex
      @@Description:
@@ -3400,44 +4490,37 @@ IF:
      @@SpecLevel[list]:
         1
         2
-  @Attr:
+  @ATTR:
      @@Name:  align
-     @@DocAttr:
-        @@@Name:align
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  bgColor
-     @@DocAttr:
-       @@@Name:bgcolor
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+  @ATTR:
+     @@AName:bgcolor
+     @@DOMAName:  bgColor
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  ch
-     @@DocAttr:
-       @@@Name:char
+  @ATTR:
+     @@AName:char
+     @@DOMAName:  ch
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  chOff
-     @@DocAttr:
-       @@@Name:charoff
+  @ATTR:
+     @@AName:charoff
+     @@DOMAName:  chOff
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  vAlign
-     @@DocAttr:
-       @@@Name:valign
+  @ATTR:
+     @@AName:valign
+     @@DOMAName:  vAlign
      @@Get:
         @@@Type:  DOMString
      @@Set:
@@ -3548,15 +4631,47 @@ IF:
         2
 ##IF:HTMLTableRowElement
 
+ForDef:
+  @QName:
+    DOMHTML:ForTd
+ForDef:
+  @QName:
+    DOMHTML:ForTh
+
 IF:
-  @Name:  HTMLTableCellElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:th
-  @ElementType:
-    @@QName:
+  @For:ForHTML
+  @rdf:type:
+    @@@:
+      dis:MultipleResource
+    @@For:ForHTML
+    @@ForCheck:
+      !ManakaiDOM:ForIF !ManakaiDOM:ForClass
+      !ForTd !ForTh
+  @resourceFor:
+    @@@: ForTd
+    @@For:ForHTML
+  @resourceFor:
+    @@@:ForTh
+    @@For:ForHTML
+  @rdf:type:
+    @@@:
+      s:ElementType
+    @@For:ForHTML
+
+  @ETQName:
+    @@@:
       xhtml1:td
+    @@ForCheck:ForTd
+  @ETQName:
+    @@@:
+      xhtml1:th
+    @@ForCheck:ForTh
+
+  @IFQName:  HTMLTableCellElement
+  @ClsQName:ManakaiDOMHTMLTableCellElement
+  @ISAHTMLElement:
+  @L1IF:
+
   @Attr:
      @@Name:  cellIndex
      @@Description:
@@ -3572,90 +4687,72 @@ IF:
        @@@lang:en
        @@@@:
          Writable in DOM Level 1 FE - fixed in the Errata.
-  @Attr:
+  @ATTR:
      @@Name:  abbr
-     @@DocAttr:
-       @@@Name:abbr
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  align
-     @@DocAttr:
-       @@@Name:align
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  axis
-     @@DocAttr:
-       @@@Name:axis
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  bgColor
-     @@DocAttr:
-       @@@Name:bgcolor
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+  @ATTR:
+     @@AName:bgcolor
+     @@DOMAName:  bgColor
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  ch
-     @@DocAttr:
-       @@@Name:char
+  @ATTR:
+     @@AName:char
+     @@DOMAName:  ch
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  chOff
-     @@DocAttr:
-       @@@Name:charoff
+  @ATTR:
+     @@AName:charoff
+     @@DOMAName:  chOff
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  colSpan
-     @@DocAttr:
-       @@@Name:colspan
+  @ATTR:
+     @@AName:colspan
+     @@DOMAName:  colSpan
      @@Get:
         @@@Type:
            DOMMain:long
      @@Set:
         @@@Type:
            DOMMain:long
-  @Attr:
+  @ATTR:
      @@Name:  headers
-     @@DocAttr:
-       @@@Name:headers
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  height
-     @@DocAttr:
-       @@@Name:height
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  noWrap
-     @@DocAttr:
-       @@@Name:nowrap
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+  @ATTR:
+     @@AName:nowrap
+     @@DOMAName:  noWrap
+     @@Deprecated:
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -3670,118 +4767,108 @@ IF:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
-  @Attr:
-     @@Name:  rowSpan
-     @@DocAttr:
-       @@@Name:rowspan
+  @ATTR:
+     @@AName:rowspan
+     @@DOMAName:  rowSpan
      @@Get:
         @@@Type:
            DOMMain:long
      @@Set:
         @@@Type:
            DOMMain:long
-  @Attr:
+  @ATTR:
      @@Name:  scope
-     @@DocAttr:
-       @@@Name:scope
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  vAlign
-     @@DocAttr:
-       @@@Name:valign
+  @ATTR:
+     @@AName:valign
+     @@DOMAName:  vAlign
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  width
-     @@DocAttr:
-       @@@Name:width
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 ##IF:HTMLTableCellElement
 
-IF:
-  @Name:  HTMLFrameSetElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:frameset
-  @Attr:
+ET:
+  @ETQName:
+    xhtml1:frameset
+  @IFQName:  HTMLFrameSetElement
+  @ClsQName:ManakaiDOMHTMLFrameSetElement
+  @ISAHTMLElement:
+  @L1IF:
+
+  @ForCheck: !ForXHTML11
+
+  @ATTR:
      @@Name:  cols
-     @@DocAttr:
-       @@@Name:cols
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  rows
-     @@DocAttr:
-       @@@Name:rows
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
 ##IF:HTMLFrameSetElement
 
-IF:
-  @Name:  HTMLFrameElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:frame
-  @Attr:
-     @@Name:  frameBorder
-     @@DocAttr:
-       @@@Name:frameborder
+ET:
+  @ETQName:
+    xhtml1:frame
+  @IFQName:  HTMLFrameElement
+  @ClsQName:ManakaiDOMHTMLFrameElement
+  @ISAHTMLElement:
+  @L1IF:
+
+  @ForCheck: !ForXHTML11
+
+  @ATTR:
+     @@AName:frameborder
+     @@DOMAName:  frameBorder
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  longDesc
-     @@DocAttr:
-       @@@Name:longdesc
+  @ATTR:
+     @@AName:longdesc
+     @@DOMAName:  longDesc
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  marginHeight
-     @@DocAttr:
-       @@@Name:marginheight
+  @ATTR:
+     @@AName:marginheight
+     @@DOMAName:  marginHeight
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  marginWidth
-     @@DocAttr:
-       @@@Name:marginwidth
+  @ATTR:
+     @@AName:marginwidth
+     @@DOMAName:  marginWidth
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  name
-     @@DocAttr:
-       @@@Name:name
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  noResize
-     @@DocAttr:
-       @@@Name:noresize
+  @ATTR:
+     @@AName:noresize
+     @@DOMAName:  noResize
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -3796,18 +4883,14 @@ IF:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
-  @Attr:
+  @ATTR:
      @@Name:  scrolling
-     @@DocAttr:
-       @@@Name:scrolling
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  src
-     @@DocAttr:
-       @@@Name:src
      @@Get:
         @@@Type:  DOMString
      @@Set:
@@ -3827,94 +4910,87 @@ IF:
             @@@@@lang:en
             @@@@@@:
               There is no document or it is not available.
+       @@@Def:
+         @@@@ContentType:
+           lang:dis
+         @@@@GetPropNode:
+           DOMHTML:contentDocument
      @@Level[list]:  2
      @@SpecLevel[list]:  2
+     @@L2:
 ##IF:HTMLFrameElement
 
-IF:
-  @Name:  HTMLIFrameElement
-  @ISA:  HTMLElement
-  @ElementType:
-    @@QName:
-      xhtml1:iframe
-  @Attr:
+ET:
+  @ETQName:
+    xhtml1:iframe
+  @IFQName:  HTMLIFrameElement
+  @ClsQName:ManakaiDOMHTMLIFrameElement
+  @ISAHTMLElement:
+  @L1IF:
+
+  @ForCheck: !ForXHTML11
+
+  @ATTR:
      @@Name:  align
-     @@DocAttr:
-       @@@Name:cols
-       @@@DeprecatedBy:
-         DOMHTML:HTML4
+     @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  frameBorder
-     @@DocAttr:
-       @@@Name:frameborder
+  @ATTR:
+     @@AName:frameborder
+     @@DOMAName:  frameBorder
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  height
-     @@DocAttr:
-       @@@Name:height
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  longDesc
-     @@DocAttr:
-       @@@Name:longdesc
+  @ATTR:
+     @@AName:longdesc
+     @@DOMAName:  longDesc
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  marginHeight
-     @@DocAttr:
-       @@@Name:marginheight
+  @ATTR:
+     @@AName:marginheight
+     @@DOMAName:  marginHeight
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
-     @@Name:  marginWidth
-     @@DocAttr:
-       @@@Name:marginwidth
+  @ATTR:
+     @@AName:marginwidth
+     @@DOMAName:  marginWidth
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  name
-     @@DocAttr:
-       @@@Name:name
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  scrolling
-     @@DocAttr:
-       @@@Name:scrolling
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  src
-     @@DocAttr:
-       @@@Name:src
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  width
-     @@DocAttr:
-       @@@Name:width
      @@Get:
         @@@Type:  DOMString
      @@Set:
@@ -3931,8 +5007,14 @@ IF:
           @@@@lang:en
           @@@@@:
             There is no document or it is not available.
+       @@@Def:
+         @@@@ContentType:
+           lang:dis
+         @@@@GetPropNode:
+           DOMHTML:contentDocument
      @@Level[list]:  2
      @@SpecLevel[list]:  2
+     @@L2:
 ##IF:HTMLIFrameElement
 
 ## DOMHTML.dis ends here

@@ -46,7 +46,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/29 12:17:42 $
+      $Date: 2004/12/31 12:03:40 $
     @@ContentType:
       dis:Date.RCS
 
@@ -314,8 +314,8 @@ FeatureDef:
     @@Version: 1.0
     @@QName: XMLFeature10
     @@ISA: XMLFeature
-    @@ISA:
-      DOMCore:CoreFeature
+    @@DOMMain:requireFeature:
+      DOMCore:CoreFeature10
     @@Spec:
       @@@DOM3[list]:
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-E067D597 
@@ -327,7 +327,7 @@ FeatureDef:
     @@Version: 2.0
     @@QName: XMLFeature20
     @@ISA: XMLFeature10
-    @@ISA:
+    @@DOMMain:requireFeature:
       DOMCore:CoreFeature20
     @@Spec:
       @@@DOM3[list]:
@@ -340,9 +340,9 @@ FeatureDef:
     @@Version: 3.0
     @@QName: XMLFeature30
     @@ISA: XMLFeature20
-    @@ISA:
+    @@DOMMain:requireFeature:
       DOMCore:CoreFeature30
-    @@ISA: XMLVersionFeature10
+    @@DOMMain:requireFeature: XMLVersionFeature10
     @@Spec:
       @@@DOM3[list]:
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-E067D597
@@ -855,7 +855,7 @@ IF:
         @@@Type:  
           DOMMain:DOMString
         @@@actualType:
-          DOMain:ManakaiDOMString
+          DOMMain:ManakaiDOMString
         @@@Description:
           @@@@lang:en
           @@@@@: Setting this attribute has no effect.
