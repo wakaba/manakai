@@ -26,7 +26,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/09 08:04:36 $
+     $Date: 2004/09/10 10:06:13 $
 
   @Feature:
     @@QName: 
@@ -74,6 +74,17 @@ DataTypeAlias:
   @Type: 
     DOMMain:DOMString
 
+DataType:
+  @Name: ManakaiDOMNamespaceURI
+  @ISA: DOMString
+  @Description:
+    @@lang:en
+    @@@:
+      The namespace URI.
+    \
+      This type is not differentiated with "DOMString" in the DOM 
+      specifications.
+
 Exception:
   @Name: ManakaiDOMImplementationException
 
@@ -91,24 +102,25 @@ Exception:
     @@Name: ManakaiDOMImplementationExceptionCode
 
     @@Const:
-      @@@Name: PARAM_INVALID_CLASS
+      @@@Name: MDOM_TYPE_MISMATCH_ERR
       @@@Type: unsigned-short
       @@@Value: 0
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The parameter value must be of some class (interface),
-          but given value does not.
+          The type of an object is incompatible with the expected 
+          type of the parameter.
       @@@Def:
         @@@@Type:
           lang:Perl
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
-            The parameter%t (name => {<Q:MDOM_EXCEPTION:param-name>}, 
-            prefix => { "}, suffix => {"'s}) value must be an 
-            instance of the class%t (name => {<Q:MDOM_EXCEPTION:class>}, 
-            prefix => { "}, suffix => {"}).
+            The type of an object specified as the value of parameter
+            %t (name => {<Q:MDOM_EXCEPTION:param-name>},
+            prefix => { "}, suffix => {"}); is incompatible with the
+            expected type%t (name => {<Q:MDOM_EXCEPTION:class>}, 
+            prefix => {: "}, suffix => {"}).
       @@@Param:
         @@@@QName:
           ManakaiDOMImplementationException:param-name
@@ -132,14 +144,22 @@ Exception:
       @@@Value: 1
       @@@Description:
         @@@@lang:en
-        @@@@@:
-          Null value is given as a parameter.
+        @@@@@: The null value is passed as a parameter.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The null value is passed to the parameter%t (
+            name => {<Q:MDOM_EXCEPTION:param-name>},
+            prefix => { "}, suffix => {"});.
       @@@Param:
         @@@@QName:
           ManakaiDOMImplementationException:param-name
         @@@@Description:
           @@@@@lang:en
-          @@@@@@: Parameter name.
+          @@@@@@: The name of the parameter to which the null value is given.
 
     @@Const:
       @@@Name: MDOM_DOMSTRING_INDEX_IN_SURROGATE_PAIR
@@ -148,8 +168,10 @@ Exception:
       @@@Description:
         @@@@lang:en
         @@@@@: 
-          The specified index points between the high surrogate and
-          the low surrogate.
+          An attempt to break surrogate pair, i.e. the first character of 
+          the range is the low-surrogate (the second 16-bit unit of the surrogate
+          pair) or the last character of the range is the high-surrogate 
+          (the first 16-bit unit of the surrogate pair).
       @@@Param:
         @@@@QName:
           ManakaiDOMImplementationException:param-name
@@ -159,7 +181,7 @@ Exception:
 
     @@Const:
       @@@Name: MDOM_DEBUG_BUG
-      @@@Type: unsigned-long
+      @@@Type: unsigned-short
       @@@Value: 3
       @@@Description:
         @@@@lang:en
@@ -173,6 +195,26 @@ Exception:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: Arbitrary values for debugging.
+    
+    @@Const:
+      @@@Name: MDOM_NS_EMPTY_URI
+      @@@Type: unsigned-short
+      @@@Value: 4
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The DOM Level 2 Core Specification defines that even the empty 
+          string is treated as a real namespace URI.  The Errata for 
+          the DOM Level 2 Specifications says that it is an error and 
+          the way empty strings are treated is implementation dependent. 
+          The DOM Level 3 Core Specification defines that empty strings 
+          are converted to "null".
+      @@@Param:
+        @@@@QName:
+          ManakaiDOMImplementationException:param-name
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The parameter to which inappropriate value is specified.
 
 Warning:
   @Name: ManakaiDOMImplementationWarning

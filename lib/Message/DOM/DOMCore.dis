@@ -1,4 +1,10 @@
 Namespace:
+  @DocTree:
+    http://suika.fam.cx/~wakaba/archive/2004/9/10/dom#
+  @DOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @infoset:
+     http://www.w3.org/2001/04/infoset#
   @lang:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
@@ -9,6 +15,7 @@ Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @MDOM_EXCEPTION:
      http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @TreeCore: \
 Module:
   @Name:  dom
     @@Prefix:  w3c.org
@@ -34,7 +41,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/08 05:38:38 $
+     $Date: 2004/09/10 10:06:13 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -114,30 +121,58 @@ Exception:
         @@@Name:  DOMSTRING_SIZE_ERR
         @@@Type:  unsigned-short
         @@@Value:  2
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The specified range of text does not fit into a DOMString.
      @@Const:
         @@@Name:  HIERARCHY_REQUEST_ERR
         @@@Type:  unsigned-short
         @@@Value:  3
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An attempt is made to insert a node somewhere it does not belong.
      @@Const:
         @@@Name:  WRONG_DOCUMENT_ERR
         @@@Type:  unsigned-short
         @@@Value:  4
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A node is used in a different document than the one
+            that created it.
      @@Const:
         @@@Name:  INVALID_CHARACTER_ERR
         @@@Type:  unsigned-short
         @@@Value:  5
+        @@@Description:
+          @@@@lang:en
+          @@@@@: An invalid or illegal character is specified.
      @@Const:
         @@@Name:  NO_DATA_ALLOWED_ERR
         @@@Type:  unsigned-short
         @@@Value:  6
+        @@@Description:
+          @@@@lang:en
+          @@@@@: Data is specified for a node that does not support data.
      @@Const:
         @@@Name:  NO_MODIFICATION_ALLOWED_ERR
         @@@Type:  unsigned-short
         @@@Value:  7
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An attempt is made to modify an object where 
+            modifications are not allowed. 
      @@Const:
         @@@Name:  NOT_FOUND_ERR
         @@@Type:  unsigned-short
         @@@Value:  8
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An attempt is made to refer a node in a context where 
+            it does not exist.
      @@Const:
         @@@Name:  NOT_SUPPORTED_ERR
         @@@Type:  unsigned-short
@@ -180,45 +215,86 @@ Exception:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: On setting.
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The implementation does not support the type of object requested.
      @@Const:
         @@@Name:  INUSE_ATTRIBUTE_ERR
         @@@Type:  unsigned-short
         @@@Value:  10
+        @@@Description:
+          @@@@lang:en
+          @@@@@: 
+            An attempt is made to add an attribute that is already inuse 
+            elsewhere.
      @@Const:
         @@@Name:  INVALID_STATE_ERR
         @@@Type:  unsigned-short
         @@@Value:  11
         @@@Level[list]:  2
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An attempt is made to use an object that is not (or no longer) 
+            usable.
      @@Const:
         @@@Name:  SYNTAX_ERR
         @@@Type:  unsigned-short
         @@@Value:  12
         @@@Level[list]:  2
+        @@@Description:
+          @@@@lang:en
+          @@@@@: An invalid or illegal string is specified.
      @@Const:
         @@@Name:  INVALID_MODIFICATION_ERR
         @@@Type:  unsigned-short
         @@@Value:  13
         @@@Level[list]:  2
+        @@@Description:
+          @@@@lang:en
+          @@@@@: An attempt is made to modify the type of underlying object.
      @@Const:
         @@@Name:  NAMESPACE_ERR
         @@@Type:  unsigned-short
         @@@Value:  14
         @@@Level[list]:  2
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An attempt is made to create or change an object in 
+            a way that is incorrect with regard to namespaces.
      @@Const:
         @@@Name:  INVALID_ACCESS_ERR
         @@@Type:  unsigned-short
         @@@Value:  15
         @@@Level[list]:  2
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A parameter or an operation is not supported by the 
+            underlying object.
      @@Const:
         @@@Name:  VALIDATION_ERR
         @@@Type:  unsigned-short
         @@@Value:  16
         @@@Level[list]:  3
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An attempt is made to modify an object where the modification 
+            would make the Node invalid with respect to partial validity.
+
      @@Const:
         @@@Name:  TYPE_MISMATCH_ERR
         @@@Type:  unsigned-short
         @@@Value:  17
         @@@Level[list]:  3
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The type of an object is incompatible with the expected 
+            type of the parameter associated to the object.
 
 IF:
   @Name:  DOMStringList
@@ -229,20 +305,49 @@ IF:
   @Description:
     @@lang:en
     @@@:
-      An ordered collection of DOMString values.
+      An ordered collection of "DOMString" values.
+  @ImplNote:
+    @@lang:en
+    @@@:
+      How the collection is implemented is not defined by the 
+      specification.
   @Method:
      @@Name:  item
      @@Spec:
        @@@DOM3:
          http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DOMStringList-item
+     @@Description:
+       @@@lang:en
+       @@@@: Return a "DOMString" in the collection.
      @@Param:
         @@@Name:  index
         @@@Type:  unsigned-long
         @@@Description:
           @@@@lang:en
-          @@@@@: An integral index, starting from zero.
+          @@@@@: Index into the collection.
+        @@@InCase:
+          @@@@Value: 0
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The first item.
+        @@@InCase: 
+          @@@@Label: "length" - 1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The last item.
      @@Return:
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The "DOMString" at the "index"th position in the collection.
+        @@@InCase:
+          @@@@Value: null
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The specified "index" is negative or greater than or equal to 
+              the number of "DOMString"s in the list.
         @@@Def:
           if (not defined $index or
               $index < 0 or
@@ -258,8 +363,15 @@ IF:
      @@Spec:
        @@@DOM3:
          http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DOMStringList-length
+     @@Description:
+       @@@lang:en
+       @@@@: 
+         The number of "DOMString"s in the list.
      @@Get:
         @@@Type:  unsigned-long
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The number of "DOMString"s in the list.
         @@@Def:
           $r = @$self;
   @Method:
@@ -267,13 +379,31 @@ IF:
      @@Spec:
        @@@DOM3: 
          http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DOMStringList-contains
+     @@Description:
+       @@@lang:en
+       @@@@: Test if a string is part of the list.
      @@Param:
         @@@Name:  str
         @@@Type:  DOMString
+        @@@Description:
+          @@@@labg:en
+          @@@@@: The string to look for.
      @@Return:
         @@@Type:  boolean
+        @@@Description:
+          @@@@lang:en
+          @@@@@: Whether the string is part of the list.
+        @@@InCase:
+          @@@@Value: true
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The string has been found.
+        @@@InCase:
+          @@@@Value: false
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The string has not been found.
         @@@Def:
-          $r = false;
           CHK: {
             __DEEP{
               for (@$self) {
@@ -295,17 +425,47 @@ IF:
     @@lang:en
     @@@:
       An ordered collection of parallel pairs of name and namespace values.
+  @ImplNote:
+    @@lang:en
+    @@@: How this collection is implemented is not defined by the specification.
   @Method:
      @@Name:  getName
      @@Spec:
        @@@DOM3:
          http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#NameList-getName
+     @@Description:
+        @@@lang:en
+        @@@@: Return the "index"th name item in the collection.
      @@Param:
         @@@Name:  index
         @@@Type:  unsigned-long
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The index into the collection.
+        @@@InCase:
+          @@@@Value: 0
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The first item.
+        @@@InCase:
+          @@@@Label: "length" - 1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The last item.
      @@Return:
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The name at the "index"th position in the "NameList".
+        @@@InCase:
+          @@@@Value: null
+          @@@@@:
+            There is no name for the specified "index" or
+            the "index" is out of range.
         @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
           if (not defined $index or
               $index < 0 or
               $index > $#$self) {
@@ -314,18 +474,49 @@ IF:
             __INT__;
           }
         @@@IntDef:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
           $r = $self->[$index]->{name};
   @Method:
      @@Name:  getNamespaceURI
      @@Spec:
        @@@DOM3:
          http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#NameList-getNamespaceURI
+     @@Description:
+       @@@lang:en
+       @@@@: Return the "index"th namespace URI item in the collection.
      @@Param:
         @@@Name:  index
         @@@Type:  unsigned-long
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The index into the collection.
+        @@@InCase:
+          @@@@Value: 0
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The first item.
+        @@@InCase:
+          @@@@Label: "length" - 1
+          @@@@Description: 
+            @@@@@lang:en
+            @@@@@@: The last item.
      @@Return:
-        @@@Type:  DOMString
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace URI at the "index" position in the "NameList".
+        @@@InCase:
+          @@@@Value: null
+          @@@@@:
+            There is no namespace URI for the specified "index" or 
+            if the "index" is out of range.
         @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
           if (not defined $index or
               $index < 0 or
               $index > $#$self) {
@@ -334,14 +525,24 @@ IF:
             __INT__;
           }
         @@@IntDef:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
           $r = $self->[$index]->{nsURI};
   @Attr:
      @@Name:  length
      @@Spec:
        @@@DOM3:
          http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#NameList-length
+     @@Description:
+       @@@lang:en
+       @@@@: 
+         The number of name and namespace URI pairs in the list.
      @@Get:
         @@@Type:  unsigned-long
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The number of pairs.
         @@@Def:
           $r = @$self;
   @Method:
@@ -349,14 +550,27 @@ IF:
      @@Spec:
        @@@DOM3:
          http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#NameList-contains
+     @@Description:
+       @@@lang:en
+       @@@@: Test if a name is part of the collection.
      @@Param:
         @@@Name:  str
         @@@Type:  DOMString
         @@@Description:
           @@@@lang:en
-          @@@@@: A name.
+          @@@@@: The name to look for.
      @@Return:
         @@@Type:  boolean
+        @@@InCase:
+          @@@@Value: true
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The name has been found.
+        @@@InCase:
+          @@@@Value: false
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The name has not been found.
         @@@Def:
           $r = false;
           CHK: {
@@ -374,14 +588,39 @@ IF:
      @@Spec:
        @@@DOM3:
          http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#NameList-containsNS
+     @@Description:
+       @@@lang:en
+       @@@@: 
+         Test if the pair of namespace URI and name is part of the collection.
      @@Param:
         @@@Name:  namespaceURI
-        @@@Type:  DOMString
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace URI to look for.
      @@Param:
         @@@Name:  name
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The name to look for.
      @@Return:
         @@@Type:  boolean
+        @@@InCase:
+          @@@@Value: true
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The pair has been found.
+        @@@InCase:
+          @@@@Value: false
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The pair has not been found.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
           $r = false;
           CHK: {
             __DEEP{
@@ -401,17 +640,56 @@ IF:
   @Spec:
     @@DOM3:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DOMImplementationList
+  @Description:
+    @@lang:en
+    @@@: 
+      An ordered collection of DOM implementations.
+  @ImplNote:
+    @@lang:en
+    @@@:
+      How this collection is implemented is not specified by the specification.
   @Method:
      @@Name:  item
      @@Spec:
        @@@DOM3:
          http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DOMImplementationList-item
+     @@Description:
+       @@@lang:en
+       @@@@: Return the "index"th item in the collection.
      @@Param:
         @@@Name:  index
         @@@Type:  unsigned-long
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The index into the collection.
+        @@@InCase:
+          @@@@Value: 0
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The first item.
+        @@@InCase:
+          @@@@Label: "length" - 1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The last item.
      @@Return:
         @@@Type:  DOMImplementation
+        @@@Description:
+          @@@@lang:en
+          @@@@@: 
+            The "DOMImplementation" at the "index"th position in 
+            the collection.
+        @@@InCase:
+          @@@@Value: null
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              There is no "DOMImplementation" for the specified "index", 
+              or the "index" is out of range.
         @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
           if (not defined $index or
               $index < 0 or
               $index > $#$self) {
@@ -420,9 +698,15 @@ IF:
             __INT__;
           }
         @@@IntDef:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
           $r = $self->[$index];
   @Attr:
      @@Name:  length
+     @@Description:
+       @@@lang:en
+       @@@@: The number of "DOMImplementation"s in the list.
      @@Spec:
        @@@DOM3:
          http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DOMImplementationList-length
@@ -435,35 +719,48 @@ IF:
             $r = @$self;
   @IntMethod:
     @@Name: new
+    @@Description:
+      @@@lang:en
+      @@@@: Construct a new instance of the "DOMImplementationList".
     @@Return:
       @@@Type: DOMImplementationList
       @@@Description:
         @@@@lang:en
-        @@@@@: Construct a new instance of the DOMImplementationList.
+        @@@@@: The new instance constructed.
       @@@Def:
         @@@@Type:
           lang:Perl
         @@@@@:
-          $r = bless [], $self;
+          $r = bless [], ref $self ? ref $self : $self;
   @IntMethod:
-    @@Name: append
+    @@Name: add
+    @@Description:
+      @@@lang: en
+      @@@@: Add one or more "DOMImplementation"s to the list.
     @@Param:
       @@@Name: list
       @@@Type: DOMImplementationList
       @@@Description:
         @@@@lang:en
         @@@@@:
-          A list of DOMImplementations.
+          A list of "DOMImplementation"s to be added.
       @@@InCase:
-        @@@@Label: One or more DOMImplementations and/or DOMImplementationLists
+        @@@@Label:
+          One or more "DOMImplementation"s and/or "DOMImplementationList"s
         @@@@Description:
            @@@@@lang:en
            @@@@@@:
-             DOMImplementations and/or lists of them to be added.
+             "DOMImplementation"s and/or lists of them to be added.
     @@Return:
-      @@@Description:
-        @@@@lang: en
-        @@@@@: Append one or more DOMImplementations to the list.
+      @@@Exception:
+        @@@@Type:
+          ManakaiDOM:ManakaiDOMImplementationException
+        @@@@Name: MDOM_TYPE_MISMATCH_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The parameter specified is neither a DOMImplementation object 
+            or a DOMImplementationList object.
       @@@Def:
         @@@@Type:
           lang:Perl
@@ -485,15 +782,21 @@ IF:
             } elsif ($_->isa ("__IF{DOMImplementation}__")) {
               push @$self, $_;
             } else {
-              __EXCEPTION{ManakaiDOMImplementationException.PARAM_INVALID_CLASS:
+              __EXCEPTION{ManakaiDOMImplementationException.
+                          MDOM_TYPE_MISMATCH_ERR:
                 <Q:ManakaiDOMImplementationException:param-name> => 'list',
                 <Q:ManakaiDOMImplementationException:class> => ref $_,
               }__;
             }
           }
+
 IF:
   @Name:  DOMImplementationSource
   @Level[list]:  3
+  @Description:
+    @@lang:en
+    @@@:
+      This interface provides access to DOM implementations available.
   @Spec:
     @@DOM3:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DOMImplementationSource
@@ -502,26 +805,84 @@ IF:
      @@Spec:
        @@@DOM3:
          http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-getDOMImpl
+     @@Description:
+        @@@lang:en
+        @@@@: 
+          Return the first DOM implementation that supports the specified 
+          features and versions.
      @@Param:
         @@@Name:  features
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A string that specifies which features and versions are 
+            required.
      @@Return:
         @@@Type:  DOMImplementation
         @@@Description:
           @@@@lang:en
-          @@@@@: The first DOMImplementation that supports the specified features.
+          @@@@@: 
+            The first DOM implementation that support the desired 
+            features and versions.
+        @@@InCase:
+          @@@@Value: null
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              This source has no DOM implementation that supports the 
+              desired features and versions.
+## TODO: Implement this.
   @Method:
      @@Name:  getDOMImplementationList
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Return a list of DOM implementations that support the specified 
+         features and versions.
      @@Return:
         @@@Type:  DOMImplementationList
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A list of DOM implementations that support the desired 
+            features and versions.
+## TODO: implement this
      @@Param:
         @@@Name:  features
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A string that specifies which features and versions are required.
+
 IF:
   @Name:  DOMImplementation
   @Spec:
     @@DOM3:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-102161490
+  @Description:
+    @@lang:en
+    @@@:
+      This interface provides a number of methods for performing 
+      operations that are independent of any particular instance 
+      of the document object model.
+  @Require:
+    @@Module:
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@use:
+          @@@@@@:
+            Char::Class::XML
+          @@@@@Import[list]:
+            InXMLNameChar
+            InXMLNameStartChar
+            InXMLNCNameChar
+            InXMLNCNameStartChar
+    @@Condition[list]:
+      DOM2
+      DOM3
   @Method:
      @@Name:  hasFeature
      @@Spec:
@@ -531,35 +892,90 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Test if the DOM implementation implements a specific DOM feature.
+         Test if the DOM implementation implements a specific feature 
+         and version.
      @@Param:
         @@@Name:  feature
         @@@Type:  DOMString
         @@@Description:
           @@@@lang:en
-          @@@@@: The name of the feature.
+          @@@@@: The name of the feature to test.
+        @@@InCase:
+          @@@@Value: HTML
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The DOM HTML feature.
+              This is one of the allowed values in DOM Level 1 First Edition.
+        @@@InCase:
+          @@@@Value: XML
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The DOM XML feature.
+              This is one of the allowed values in DOM Level 1 First Edition.
+        @@@InCase:
+          @@@@Label: XML 1.0 Name
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Only an XML 1.0 Name is allowed in DOM Level 1 Second Edition 
+              and DOM Level 2.
+        @@@InCase:
+          @@@@Label: Reversed Internet domain name
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              DOM Level 1 First Edition and DOM Level 2 specifications 
+              says that the feature name defined outside the DOM specifications 
+              should use the reversed Internet domain name to avoid 
+              possible confliction.
+            \
+              This recommendation is withdrawn by the Errata of the DOM Level 2 
+              Specifications.
         @@@InCase:
           @@@@Label:
             @@@@@lang:en
             @@@@@@:
-              The feature name prepended by the "+"
+              The feature name prepended by the PLUS SIGN ("+")
           @@@@Type: DOMString
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
               The specified feature may not be directly castable
-              but would be available through the method getFeature.
+              but would be available through the method "getFeature".
      @@Param:
         @@@Name:  version
         @@@Type:  DOMString
         @@@Description:
           @@@@lang:en
-          @@@@@: The version number of the feature.
+          @@@@@:
+            The version number of the feature to test.
+        @@@InCase:
+          @@@@Value: 1.0
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              DOM Level 1.
+              This is the only allowed value in DOM Level 1 and
+              one of allowed values in DOM Level 2.
+        @@@InCase:
+          @@@@Value: 2.0
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              DOM Level 2.
+              This is one of allowed values in DOM Level 2.
         @@@InCase:
           @@@@Value: null
           @@@@Description:
             @@@@@lang:en
-            @@@@@@: No particular version is specified.
+            @@@@@@:
+              No particular version is specified.
+              \
+              It is implied that this value is allowed in DOM 
+              Level 1 and Level 2.  DOM Level 2 Errata and DOM 
+              Level 3 explicitly allow this value specified.
         @@@InCase:
           @@@@Value: \
           @@@@Type: DOMString
@@ -567,6 +983,9 @@ IF:
             @@@@@lang:en
             @@@@@@:
               No particular version is specified.
+              \
+              This value is allowed in DOM Level 2 Errata and 
+              DOM Level 3.
      @@Return:
         @@@Type:  boolean
         @@@Description:
@@ -586,6 +1005,7 @@ IF:
           @@@@Type:
             lang:Perl
           @@@@@:
+## TODO: feature and version checking
             if (defined $version and $version ne '') {
               $r = $__PACKAGE{Global}__::FeatureImplemented{$feature}
                                                            ->{$version} ?
@@ -600,45 +1020,394 @@ IF:
             }
   @Method:
      @@Name:  createDocumentType
-     @@Return:
-        @@@Type:  DocumentType
-        @@@Exception[list]:  DOMException
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Create an empty "DocumentType" node.
+     @@ImplNote:
+       @@@lang:en
+       @@@@: 
+         HTML-only DOM Level 2 implementations do not need to implement 
+         this method.
      @@Param:
         @@@Name:  qualifiedName
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The qualified name of the document type to be created.
      @@Param:
         @@@Name:  publicId
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The external subset public identifier.
      @@Param:
         @@@Name:  systemId
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The external subset system identifier.
      @@Level[list]:  2
+     @@Return:
+        @@@Type:  DocumentType
+        @@@Description:
+          @@@@lang:en
+          @@@@@: A new "DocumentType" node.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@: The "ownerDocument" attribute is set to "null".
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: INVALID_CHARACTER_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              The "qualifiedName" is not an XML name 
+              accoding to the XML 1.0 specification.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NAMESPACE_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The "qualifiedName" is malformed.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NOT_SUPPORTED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The DOM implementation does not support the "XML" feature and 
+              the language exposed through the "Document" does not support 
+              XML Namespaces.
+        @@@Exception:
+          @@@@Type: ManakaiDOMImplementationException
+          @@@@Name: PARAM_NULL_POINTER
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The "qualifiedName" is the "null" value.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            __CODE{CheckNull: s => qualifiedName}__;
+            __CODE{CheckQName: qname => qualifiedName}__; # [DOM 2,3]
+            ## If namespace not supported: # [DOM 3]
+            #__EXCEPTION{
+            #  DOMException.NOT_SUPPORTED_ERR:
+            #    <Q:MDOM_EXCEPTION:subtype> 
+            #       => <Q:MDOM_EXCEPTION:NS_NOT_SUPPORTED>,
+            #}__;
+            my ($prefix, $lname);
+            if (($lname = $qualifiedName) =~ s/^([^:]+)://) {
+              $prefix = $1;
+            }
+            $r = $self->__CLASS{DocumentType}__->__INT{new}__;
+            my $node = $r->{<Q:TreeCore:node>};
+            $node->{<Q:infoset:prefix>} = $prefix;
+            $node->{<Q:infoset:localName>} = $lname;
+            $node->{<Q:infoset:publicIdentifier>} = $publicId;
+            $node->{<Q:infoset:systemIdentifier>} = $systemId;
   @Method:
      @@Name:  createDocument
-     @@Return:
-        @@@Type:  Document
-        @@@Exception[list]:  DOMException
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Create a "Document" object of the specified type with its 
+         document element.
+     @@ImplNote:
+       @@@lang:en
+       @@@@: 
+         HTML-only DOM Level 2 implementations do not need to implement 
+         this method.
      @@Param:
         @@@Name:  namespaceURI
-        @@@Type:  DOMString
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace URI of the document element to create.
+        @@@InCase:
+          @@@@Value: null
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The null namespace name.
+        @@@InCase:
+          @@@@Value: \
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Considered as a namespace URI in DOM Level 2 or 
+              treated as the "null" value in DOM Level 3.
      @@Param:
         @@@Name:  qualifiedName
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The qualified name of the document element to create.
+        @@@InCase:
+          @@@@Value: null
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: Document element is not created.
      @@Param:
         @@@Name:  doctype
         @@@Type:  DocumentType
-     @@Level[list]:  2
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The type of document to create.
+        @@@InCase:
+          @@@@Value: null
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            "doctype"."ownerDocument" is set to the document being 
+            created unless "doctype" is "null".
+     @@Level[list]:
+       2
+       3
+     @@Return:
+        @@@Type:  Document
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A new Document object.
+          \
+            Note that the object returned may be a specialized "Document" 
+            object based on the "doctype" given.  For example. it might 
+            implement the "HTMLDocument" interface.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: INVALID_CHARACTER_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The specified qualified name is not an XML name 
+              accoding to the XML 1.0 specification.
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              DOM Level 3 specification defines to rely the XML 1.0 
+              specification.  DOM Level 2 specification does not 
+              explicitly defines but the definition for "INVALID_CHARACTER_ERR"
+              refers the XML 1.0 specification.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NAMESPACE_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either the "qualifiedName" is malformed, the "qualifiedName" 
+              has a prefix and the "namespaceURI" is "null", the 
+              "qualifiedName" is "null" and the "namespaceURI" is 
+              different from "null", the "qualifiedName" has 
+              a prefix that is "xml" and the "namespaceURI" is 
+              different from "http://www.w3.org/XML/1998/namespace" or
+              the DOM implementation does not support the "XML" feature 
+              but a non-null "namespaceURI" is provided.
+            \
+              In addition, if the "qualifiedName" has a prefix that is 
+              "xmlns" and the "namespaceURI" is different from 
+              "http://www.w3.org/2000/xmlns/", if the "namespaceURI" 
+              is "http://www.w3.org/XML/1998/namespace" and the 
+              "qualifiedName" has a prefix is different from "xml" or 
+              if the "namespaceURI" is "http://www.w3.org/2000/xmlns/" 
+              and the "qualifiedName" has a prefix is different from "xmlns",
+              this DOM implementation raises this exception.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: WRONG_DOCUMENT_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The "doctype" has already been used with a different 
+              document or was created from a different implementation.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NOT_SUPPORTED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The DOM implementation does not support the "XML" feature 
+              and the language exposed through the "Document" does 
+              not support XML Namespaces.
+        @@@Exception:
+          @@@@Type: ManakaiDOMImplementationException
+          @@@@Name: MDOM_TYPE_MISMATCH_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              The object specified to the "doctype" parameter is not a 
+              "DocumentType".
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my ($prefix, $lname);
+            if (defined $qualifiedName) {     
+              __CODE{CheckQName: qname => qualifiedName}__; # [DOM 2,3]
+              if (($lname = $qualifiedName) =~ s/^([^:]+)://) {
+                $prefix = $1;
+              }
+              if (defined $namespaceURI) {    # ($uri, $qname, $doctype)
+                ## If namespace not supported: # [DOM 3]
+                #__EXCEPTION{
+                ##  DOMException.NAMESPACE_ERR:
+                #  DOMException.NOT_SUPPORTED_ERR:
+                #    <Q:MDOM_EXCEPTION:subtype> 
+                #       => <Q:MDOM_EXCEPTION:NS_NOT_SUPPORTED>,
+                #}__;
+              } else {                        # (null, $qname, $doctype)
+                if ($prefix) {
+                  __EXCEPTION{
+                    DOMException.NAMESPACE_ERR:
+                      <Q:MDOM_EXCEPTION:subtype>
+                         => <Q:MDOM_EXCEPTION:NS_PREFIX_WITH_NULL_URI>,
+                      <Q:infoset:prefix> => $prefix,
+                  }__;                        # [DOM 2,3]
+                }
+              }
+            } elsif (defined $namespaceURI) { # ($uri, null, $doctype)
+              __EXCEPTION{
+                DOMException.NAMESPACE_ERR:
+                  <Q:MDOM_EXCEPTION:subtype>
+                     => <Q:MDOM_EXCEPTION:NS_NULL_QNAME_NON_NULL_URI>,
+                  <Q:infoset:namespaceName> => $namespaceURI,
+              }__;                            # [DOM 3]
+            }
+            if (not $prefix) {
+              if ($prefix eq 'xml' and 
+                  (not $namespaceURI or
+                   $namespaceURI ne q<http://www.w3.org/XML/1998/namespace>)) {
+                __EXCEPTION{
+                  DOMException.NAMESPACE_ERR:
+                    <Q:MDOM_EXCEPTION:subtype>
+                       => <Q:MDOM_EXCEPTION:NS_XML_WITH_OTHER_URI>,
+                    <Q:infoset:namespaceName> => $namespaceURI,
+                }__;                          # [DOM 2,3]
+              } elsif ($prefix eq 'xmlns' and
+                  (not $namespaceURI or
+                   $namespaceURI ne q<http://www.w3.org/2000/xmlns/>)) {
+                __EXCEPTION{
+                  DOMException.NAMESPACE_ERR:
+                    <Q:MDOM_EXCEPTION:subtype>
+                       => <Q:MDOM_EXCEPTION:NS_XMLNS_WITH_OTHER_URI>,
+                    <Q:infoset:namespaceName> => $namespaceURI,
+                }__;                          # DOM doesn't specify this
+              }
+            }
+            if (defined $namespaceURI) {
+              if ($namespaceURI eq q<http://www.w3.org/XML/1998/namespace> and
+                  (not $prefix or $prefix ne 'xml')) {
+                __EXCEPTION{
+                  DOMException.NAMESPACE_ERR:
+                    <Q:MDOM_EXCEPTION:subtype>
+                       => <Q:MDOM_EXCEPTION:NS_XML_URI_WITH_OTHER_PREFIX>,
+                    <Q:infoset:prefix> => $prefix,
+                }__;                          # DOM doesn't specify this
+              } elsif ($namespaceURI eq q<http://www.w3.org/2000/xmlns/> and
+                  (not $prefix or $prefix ne 'xmlns')) {
+                __EXCEPTION{
+                  DOMException.NAMESPACE_ERR:
+                    <Q:MDOM_EXCEPTION:subtype>
+                       => <Q:MDOM_EXCEPTION:NS_XMLNS_URI_WITH_OTHER_PREFIX>,
+                    <Q:infoset:prefix> => $prefix,
+                }__;                          # DOM doesn't specify this
+              }
+            }
+            $r = $self->__CLASS{Document}__::__INT{newByDocumentType}__
+                                                                ($doctype);
+            my $node = $r->{<Q:TreeCore:node>};
+            $node->{<Q:DocTree:documentID>} = __CODE{UniqueID}__;
+            if ($doctype) {
+              if (not $doctype->isa ('__IF{DocumentType}__')) {
+                __EXCEPTION{
+                  ManakaiDOMImplementationException.MDOM_TYPE_MISMATCH_ERR:
+                    <Q:MDOM_EXCEPTION:param-name> => q<doctype>,
+                    <Q:MDOM_EXCEPTION:class> => ref $doctype,
+                }__;
+              }
+              my $doctypeNode = $doctype->{<Q:TreeCore:node>};
+              if ($node->{<Q:TreeCore:treeID>} ne
+                  $doctypeNode->{<Q:TreeCore:treeID>} or
+                  $doctypeNode->{<Q:DocTree:documentID>}) {
+                __EXCEPTION{
+                  DOMException.WRONG_DOCUMENT_ERR:
+                }__;                          # [DOM 2,3]
+              }
+              $doctypeNode->{<Q:DocTree:documentID>}
+                                    = $node->{<Q:TreeCore:node>};
+              $doctypeNode->{<Q:DOMCore:ownerDocument>} = $node;
+              $doctypeNode->{<Q:infoset:parent>} = $node;
+              push @{$node->{<Q:infoset:children>}}, $doctypeNode;
+            }
+            if ($lname) {
+              my $docEl = $r->__CLASS{Node}__::__INT{new}__;
+              my $docNode = $docEl->{<Q:TreeCore:node>};
+              $docNode->{<Q:DocTree:nodeType>} = <Q:infoset:Element>;
+              $docNode->{<Q:infoset:prefix>} = $prefix || null;
+              $docNode->{<Q:infoset:namespaceName>} = $namespaceURI;
+              $docNode->{<Q:infoset:localName>} = $lname;
+              $docNode->{<Q:infoset:parent>} = $node;
+              push @{$node->{<Q:infoset:children>}}, $docNode;
+            }
+        
   @Method:
      @@Name:  getFeature
-     @@Return:
-        @@@Type:  DOMObject
+     @@Description:
+        @@@lang:en
+        @@@@: 
+          Return a specialized object that implements the specialized 
+          APIs of the specified feature and version.
      @@Param:
         @@@Name:  feature
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The name of the feature requested.
+        @@@InCase: 
+          @@@@Label: 
+            The feature name prepended by the PLUS SIGN ("+")
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The PLUS SIGN is ignored.
      @@Param:
         @@@Name:  version
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The version number of the feature to test.
      @@Level[list]:  3
+     @@Return:
+        @@@Type:  DOMObject
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An object that implements the specialized APIs of the 
+            specified feature and version.  That might or might not 
+            implements the "DOMImplementation" interface.
+        @@@InCase:
+          @@@@Type: DOMImplementation
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              An object that implements both the specialized APIs 
+              and the "DOMImplementation" interface.
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              This kind of object must delegate to the primary core 
+              "DOMImplementation" and not return results inconsistent 
+              with the primary core "DOMImplementation" such as 
+              "hasFeature", "getFeature", etc.
+        @@@InCase:
+          @@@@Value: null
+          @@@@@: 
+            There is no object that implements interfaces associated 
+            with the feature and version.
+## TODO: implement this
+
 IF:
   @Name:  Node
   @ConstGroup:

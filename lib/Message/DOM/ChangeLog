@@ -1,4 +1,22 @@
+2004-09-10  Wakaba  <wakaba@suika.fam.cx>
+
+	* ManakaiDOM.dis (MDOM_NS_EMPTY_URI): New Exception type.
+	(ManakaiDOMNamespaceURI): New DataType.
+
+	* DOMCore.dis: Most part of DOMImplementation interface is 
+	implemented.
+
+	* dis2pm.pl (method2perl): Description for returned value
+	is changed to be grouped.
+	(get_value_literal): Don't quote "null" even if it is a DOMString.
+	(perl_exception): Don't output terminating semicolon.
+	(perl_builtin_code): ManakaiDOM:ManakaiDOMNamespaceURI is 
+	supported.
+
 2004-09-09  Wakaba  <wakaba@suika.fam.cx>
+
+	* dis2pm.pl (method2perl, attr2perl): '(Return | Get | Set)/Exception'
+	implemented.
 
 	* idl2dis.pl (type): Don't output Require element for
 	DOMMain module (now it is implicitly required by default).

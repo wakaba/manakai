@@ -150,8 +150,10 @@ sub perl_package_name (%) {
       $opt{ns_prefix} = DEFAULT_PFX;
       $opt{name} = $opt{qname};
     }
-    $r = ns_uri_to_perl_package_name (ns_prefix_to_uri ($opt{ns_prefix})) .
-         '::' . $opt{name};
+    ## ISSUE: Prefix to ...
+    #$r = ns_uri_to_perl_package_name (ns_prefix_to_uri ($opt{ns_prefix})) .
+    #     '::' . $opt{name};
+    $r = $ManakaiDOMModulePrefix . '::' . $opt{name};
   } elsif ($opt{full_name}) {
     $r = $opt{full_name};
   } else {
@@ -270,7 +272,7 @@ sub perl_code ($;%) {
       while ($data =~ /\G(\w+)\s*=>\s*(\w+)\s*(,\s*|$)/g) {
         $param{$1} = $2;
       }
-      $r = perl_builtin_code ($nm, %param);
+      $r = perl_builtin_code ($nm, condition => $opt{condition}, %param);
     } elsif ($name eq 'PACKAGE' and $data) {
       if ($data eq 'Global') {
         $r = $ManakaiDOMModulePrefix;
@@ -290,8 +292,12 @@ sub perl_code ($;%) {
 
 sub perl_builtin_code ($%) {
   my ($name, %opt) = @_;
+  $opt{condition} ||= $Status->{condition};
   my $r;
-  if ($name eq 'DOMString') {
+  if ($name eq 'DOMString' or $name eq 'ManakaiDOMNamespaceURI' or
+      $name eq ExpandedURI q<DOMMain:DOMString> or
+      $name eq ExpandedURI q<ManakaiDOM:ManakaiDOMNamespaceURI>) {
+    $name = $1 if $name =~ /(\w+)$/;
     $r = q{
           if (defined $arg) {
             if (ref $arg) {
@@ -305,17 +311,33 @@ sub perl_builtin_code ($%) {
             } else {
               $r = bless {value => $arg}, $self;
             }
+            ##IFEMPTY
           } else {
             $r = undef; # null
           }
     };
+    $r =~ s/'IF'/perl_literal (perl_package_name (if => $name))/ge;
+    $r =~ s/\$self\b/perl_literal (perl_package_name (name => $name))/ge;
     $opt{s} or valid_err q<Built-in code parameter "s" required>;
+    if ($name eq 'ManakaiDOMNamespaceURI') {
+      my $t = perl_statement perl_exception
+                (level => 'WARNING',
+                 class => 'ManakaiDOMImplementationWarning',
+                 type => 'MDOM_NS_EMPTY_URI',
+                 param => {
+                   ExpandedURI q<MDOM_EXCEPTION:param-name> => $opt{s},
+                 });
+      if ($opt{condition} and $opt{condition} ne 'DOM2') {
+        $t .= perl_statement q<$r = undef>;
+      }
+      $r =~ s/##IFEMPTY/q<if ($r eq '') {>.$t.q<}>/ge;
+    } else {
+      $r =~ s/##IFEMPTY//g;
+    }
     $r =~ s/\$arg\b/\$$opt{s}/g;
     $opt{r} or valid_err q<Built-in code parameter "r" required>;
     $r =~ s/\$r\b/\$$opt{r}/g;
     $r =~ s/\$$opt{r} = \$$opt{s};/#/g if $opt{r} eq $opt{s};
-    $r =~ s/'IF'/perl_literal (perl_package_name (if => 'DOMString'))/ge;
-    $r =~ s/\$self\b/perl_literal (perl_package_name (name => 'DOMString'))/ge;
   } elsif ($name eq 'UniqueID') {
     $r = q{(
       sprintf 'mid:%d.%d.%s.dom.manakai@suika.fam.cx',
@@ -326,6 +348,39 @@ sub perl_builtin_code ($%) {
               ['A'..'Z', 'a'..'z', '0'..'9']->[rand 62] .
               ['A'..'Z', 'a'..'z', '0'..'9']->[rand 62]
     )};
+  } elsif ($name eq 'CheckQName') {
+    $r = perl_code q{
+      __EXCEPTION{
+        DOMException.INVALID_CHARACTER_ERR:
+        <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:CHAR_INVALID_NAME>,
+        <Q:MDOM_EXCEPTION:name> => $qname,
+      }__ if $qname =~ /^\p{InXMLNameStartChar}\p{InXMLNameChar}*$/;
+      __EXCEPTION{
+        DOMException.NAMESPACE_ERR:
+        <Q:MDOM_EXCEPTION:subtype> => <Q:MDOM_EXCEPTION:NS_INVALID_QNAME>,
+        <Q:MDOM_EXCEPTION:qname> => $qname,
+      }__ if $qname =~ /^\p{InXMLNCNameStartChar}\p{InXMLNCNameChar}*(?:\p{InXMLNCNameStartChar}\p{InXMLNCNameChar}*)?/;
+      ## ISSUE: ns prefix association
+    };
+    $opt{qname} or valid_err q<Built-in code parameter "qname" required>;
+    $r =~ s/\$qname\b/\$$opt{qname}/g;
+    $Info->{Require_perl_package_use}->{'Char::Class::XML'} or
+      valid_err q<"Char::Class::XML" must be "Require"d>;
+    for (qw/InXMLNameStartChar InXMLNameChar InXMLNCNameStartChar
+            InXMLNCNameChar/) {
+      $Info->{Require_perl_package_use}->{'Char::Class::XML::::Import'}->{$_} or
+        valid_err qq<"$_" must be exported from "Char::Class::XML">;
+    }
+  } elsif ($name eq 'CheckNull') {
+    $r = perl_code q{
+      __EXCEPTION{
+        ManakaiDOMImplementationException.PARAM_NULL_POINTER:
+          <Q:MDOM_EXCEPTION:param-name> => 'arg',
+      }__ unless defined $arg;
+    };
+    $opt{s} or valid_err q<Built-in code parameter "s" required>;
+    $r =~ s/\$arg\b/\$$opt{s}/g;
+    $r =~ s/'arg'/perl_literal ($opt{s})/ge;
   } else {
     valid_err qq<Built-in code "$name" not defined>;
   }
@@ -335,7 +390,7 @@ sub perl_builtin_code ($%) {
 sub perl_code_source ($%) {
   my ($s, %opt) = @_;
   sprintf qq<#line %d "File <%s> Node <%s>"\n%s\n> .
-          qq<#line 1 "File <%s> Generated fragment #%d"\n>,
+          qq<#line 1 "File <%s> Chunk #%d"\n>,
     $opt{line} || 1, $opt{file} || $Info->{source_filename},
     $opt{path} || 'x:unknown ()', $s, 
     $opt{file} || $Info->{source_filename}, ++$Status->{generated_fragment};
@@ -380,9 +435,13 @@ sub perl_exception (@) {
     $opt{param} = perl_list %{$opt{param}};
   }
   $opt{level} ||= 'EXCEPTION';
-  perl_statement q<report > . $opt{class} . q< > .
+  q<report > . $opt{class} . q< > .
                  perl_list (level => $opt{level},
-                            -type => $opt{type}) . ', ' . $opt{param};
+                            -type => $opt{type},
+                            -object => perl_code_literal
+                                           (perl_var (type => '$',
+                                                      local_name => 'self')),
+                            ($opt{param} ? perl_code_literal $opt{param} : ()));
 }
 
 sub ops2perl () {
@@ -509,14 +568,21 @@ sub type_normalize ($) {
 
 sub type_label ($) {
   my $uri = type_normalize shift;
-  if ($uri =~ /([\w_-]+)$/) {
-    my $label = $1;
-    $label =~ s/--+/ /g;
-    $label =~ s/__+/ /g;
-    return $label;
-  } else {
-    return "<$uri>";
+  my $r = {
+    ExpandedURI q<ManakaiDOM:ManakaiDOMNamespaceURI>
+      => q<DOMString (Namespace URI)>,
+  }->{$uri};
+  unless ($r) {
+    if ($uri =~ /([\w_-]+)$/) {
+      my $label = $1;
+      $label =~ s/--+/ /g;
+      $label =~ s/__+/ /g;
+      $r = $label;
+    } else {
+      $r = "<$uri>";
+    }
   }
+  $r;
 }
 
 sub type_package_name ($) {
@@ -667,7 +733,9 @@ sub get_incase_label ($;%) {
                                                 ('Type',
                                                  default => q<DOMMain:any>));
     if (defined $label) {
-      if ($type eq ExpandedURI q<DOMMain:DOMString>) {
+      if (($type eq ExpandedURI q<DOMMain:DOMString> and $label ne "null") or
+          ($type eq ExpandedURI q<ManakaiDOM:ManakaiDOMNamespaceURI> and
+           $label ne "null")) {
         $label = qq<"$label">;
       }
       $label = $opt{is_pod} ? pod_code $label : $label;
@@ -701,12 +769,14 @@ sub get_value_literal ($%) {
     } else {
       $r = defined $opt{default} ? $opt{default} : 0;
     }
-  } elsif ($type eq ExpandedURI q<DOMMain:DOMString>) {
+  } elsif ($type eq ExpandedURI q<DOMMain:DOMString> or
+           $type eq ExpandedURI q<ManakaiDOM:ManakaiDOMNamespaceURI>) {
     if ($value) {
-      $r = perl_literal $value->value;
+      $r = $value->value;
     } else {
-      $r = perl_literal (defined $opt{default} ? $opt{default} : '');
+      $r = (defined $opt{default} ? $opt{default} : '');
     }
+    $r = $r eq 'null' ? $r : perl_literal 'null';
   } elsif ($type eq ExpandedURI q<Perl:ARRAY>) {
     if ($value) {
       $r = perl_literal $value->value (as_array => 1);
@@ -729,8 +799,8 @@ sub get_value_literal ($%) {
   $r;
 }
 
-sub get_internal_code ($$) {
-  my ($node, $name) = @_;
+sub get_internal_code ($$;%) {
+  my ($node, $name, %opt) = @_;
   $node = $node->parent_node;
   my $m;
   my $def;
@@ -758,7 +828,7 @@ sub get_internal_code ($$) {
     valid_warn qq<Internal method "$name" not defined>;
     is_implemented (if => $Status->{IF}, method => $name, set => 0);
     $Status->{is_implemented} = 0;
-    return perl_exception
+    return perl_statement perl_exception
                   level => 'EXCEPTION',
                   class => 'DOMException',
                   type => 'NOT_SUPPORTED_ERR',
@@ -912,6 +982,8 @@ sub if2perl ($) {
   local $Status->{IF} = $if_name;
   local $Status->{if} = {}; ## Temporary data
   local $Info->{Namespace} = {%{$Info->{Namespace}}};
+  local $Info->{Require_perl_package} = {%{$Info->{Require_perl_package}}};
+  local $Info->{Require_perl_package_use} = {};
   local $Status->{Operator} = {};
   local $Status->{is_implemented} = 1;
 
@@ -929,6 +1001,7 @@ sub if2perl ($) {
     if ($condition =~ /^DOM(\d+)$/) {
       next if @level and $level[0] > $1;
     }
+    local $Status->{condition} = $condition;
     my $cond_if_pack_name = perl_package_name if => $if_name,
                                     condition => $condition;
     my $cond_pack_name = perl_package_name name => $if_name,
@@ -1009,8 +1082,10 @@ sub if2perl ($) {
         $result .= const2perl ($_, level => \@level, condition => $condition,
                                package => $cond_int_pack_name)
           unless $gt;
+      } elsif ($_->local_name eq 'Require') {
+        $result .= req2perl ($_, level => \@level, condition => $condition);
       } elsif ({qw/Name 1 Spec 1 ISA 1 Description 1
-                   Level 1/}->{$_->local_name}) {
+                   Level 1 ImplNote 1/}->{$_->local_name}) {
         #
       } else {
         valid_warn qq{Element @{[$_->local_name]} not supported};
@@ -1087,8 +1162,9 @@ sub method2perl ($;%) {
                                              default => 'DOMMain:any');
         push @param_list, '$' . $name;
         push @param_desc, pod_item (pod_code '$' . $name);
-        if ($type eq ExpandedURI q<DOMMain:DOMString>) {
-          push @param_domstring, $name;
+        if ($type eq ExpandedURI q<DOMMain:DOMString> or
+            $type eq ExpandedURI q<ManakaiDOM:ManakaiDOMNamespaceURI>) {
+          push @param_domstring, [$name, $type];
         }
         push my @param_desc_val,
                           pod_item (type_label $type),
@@ -1126,6 +1202,8 @@ sub method2perl ($;%) {
   }
 
   my @return;
+  my @exception;
+  my $has_exception = 0;
   my $code_node = get_perl_definition_node $return,
                               condition => $opt{condition},
                               level_default => $opt{level_default};
@@ -1161,13 +1239,15 @@ sub method2perl ($;%) {
                                                         type_name => 'Type') .
               $code;
       if ($code_node->get_attribute_value ('cast-output', default => 1)) {
-        if (type_normalize
+        my $type = type_normalize
               type_expanded_uri $return->get_attribute_value
                                          ('Type',
-                                          default => q<DOMMain:any>)
-                  eq ExpandedURI q<DOMMain:DOMString>) {
-          $code .= perl_builtin_code 'DOMString',
-                                     s => 'r', r => 'r';
+                                          default => q<DOMMain:any>);
+        if ($type eq ExpandedURI q<DOMMain:DOMString> or
+            $type eq ExpandedURI q<ManakaiDOM:ManakaiDOMNamespaceURI>) {
+          $code .= perl_builtin_code $type,
+                                     s => 'r', r => 'r',
+                                     condition => $opt{condition};
         }
       }
       $code .= perl_statement ('$r');
@@ -1175,8 +1255,9 @@ sub method2perl ($;%) {
     if ($code_node->get_attribute_value ('auto-argument', default => 1)) {
       if ($code_node->get_attribute_value ('cast-input', default => 1)) {
         for (@param_domstring) {
-          $code = perl_builtin_code ('DOMString',
-                                     s => $_, r => $_) . $code;
+          $code = perl_builtin_code ($_->[1],
+                                     s => $_->[0], r => $_->[0],
+                                     condition => $opt{condition}) . $code;
         }
       }
       $code = perl_statement (perl_assign 'my (' .
@@ -1204,23 +1285,33 @@ sub method2perl ($;%) {
     }
 
     if ($has_return) {
-      push @return, pod_item ('Return Value: ' .
-                              type_label type_expanded_uri
+      push @return, pod_item (type_label type_expanded_uri
                                      $return->get_attribute_value
                                                 ('Type',
                                                  default => 'DOMMain:any')),
                     pod_para (get_description $return);
     }
     for (@{$return->child_nodes}) {
-      next unless $_->local_name eq 'InCase';
-      push @return, pod_item ('Return Value: ' . get_incase_label $_,
-                                                                  is_pod => 1),
-                    pod_para (get_description $_);
-      $has_return++;
+      if ($_->local_name eq 'InCase') {
+        push @return, pod_item ( get_incase_label $_, is_pod => 1),
+                      pod_para (get_description $_);
+        $has_return++;
+      } elsif ($_->local_name eq 'Exception') {
+        push @exception, pod_item ('Exception: ' .
+                                pod_code (type_label ($_->get_attribute_value
+                                                   ('Type',
+                                                    default => 'DOMMain:any'))) .
+                                '.' . pod_code $_->get_attribute_value
+                                                   ('Name',
+                                                    default => '<unknown>')),
+                      pod_para (get_description $_);
+        $has_exception++;
+      }
     }
   } else {
     $int_code = $code
-              = perl_exception
+              = perl_statement ('my $self = shift').
+                perl_statement perl_exception
                   level => 'EXCEPTION',
                   class => 'DOMException',
                   type => 'NOT_SUPPORTED_ERR',
@@ -1229,27 +1320,31 @@ sub method2perl ($;%) {
                     ExpandedURI q<MDOM_EXCEPTION:method> => $Status->{Method},
                   };
     @return = ();
-    push @return, pod_item ('Exception ' . pod_code ('DOMException') . '.' .
+    push @exception, pod_item ('Exception: ' . pod_code ('DOMException') . '.' .
                             pod_code ('NOT_SUPPORTED_ERR')),
                   pod_para ('Call of this method allways result in
                              this exception raisen, since this
                              method is not implemented yet.');
-    $has_return = 1;
+    $has_return = 0;
+    $has_exception = 1;
   }
   is_implemented if => $Status->{IF}, method => $Status->{Method},
                  condition => $opt{condition}, set => $Status->{is_implemented};
-  if (@return) {
+  if ($has_return or $has_exception) {
     if ($has_return) {
-      push @desc, pod_para q<This method results in > .
+      push @desc, pod_para (q<This method results in > .
                            ($has_return == 1 ? q<the value:>
-                                             : q<either:>);
-    } else {
-      push @desc, pod_para q<This method does not return any value,
-                             but it might raise > .
-                           ($has_return == 1 ? q<an exception:>
-                                             : q<one of exceptions from:>);
+                                             : q<either:>)),
+                  pod_list 4, pod_item (pod_code q<$return>),
+                              pod_list (4, @return),
+                              @exception;
+    } elsif ($has_exception) {
+      push @desc, pod_para (q<This method does not return any value,
+                              but it might raise > .
+                            ($has_exception == 1 ? q<an exception:>
+                                                 : q<one of exceptions from:>)),
+                  pod_list 4, @exception;
     }
-    push @desc, pod_list 4, @return;
   } else {
     push @desc, pod_para q<This method does not return any value
                            nor does raise any exceptions.>;
@@ -1375,13 +1470,15 @@ sub attr2perl ($;%) {
                                                         type_name => 'Type') .
               $code;
     if ($code_node->get_attribute_value ('cast-output', default => 1)) {
-      if (type_normalize
+      my $type = type_normalize
               type_expanded_uri $return->get_attribute_value
                                          ('Type',
-                                          default => q<DOMMain:any>)
-                  eq ExpandedURI q<DOMMain:DOMString>) {
-        $code .= perl_builtin_code 'DOMString',
-                                     s => 'r', r => 'r';
+                                          default => q<DOMMain:any>);
+      if ($type eq ExpandedURI q<DOMMain:DOMString> or
+          $type eq ExpandedURI q<ManakaiDOM:ManakaiDOMNamespaceURI>) {
+        $code .= perl_builtin_code $type,
+                                   s => 'r', r => 'r',
+                                   condition => $opt{condition};
       }
     }
     $code .= perl_statement ('$r');
@@ -1400,17 +1497,27 @@ sub attr2perl ($;%) {
                                                  default => 'DOMMain:any')),
                     pod_para (get_description $return);
     for (@{$return->child_nodes}) {
-      next unless $_->local_name eq 'InCase';
-      push @return, pod_item ('Return Value: ' . get_incase_label $_,
-                                                                  is_pod => 1),
-                    pod_para (get_description $_);
+      if ($_->local_name eq 'InCase') {
+        push @return, pod_item ('Return Value: ' . get_incase_label $_,
+                                                                    is_pod => 1),
+                      pod_para (get_description $_);
+      } elsif ($_->local_name eq 'Exception') {
+        push @return, pod_item ('Exception: ' .
+                                pod_code (type_label ($_->get_attribute_value
+                                                   ('Type',
+                                                    default => 'DOMMain:any'))) .
+                                '.' . pod_code $_->get_attribute_value
+                                                   ('Name',
+                                                    default => '<unknown>')),
+                      pod_para (get_description $_);
+      }
     }
   } else {
     is_implemented if => $Status->{IF}, attr => $Status->{Method},
                    condition => $opt{condition}, set => 0, on => 'get';
     $Status->{is_implemented} = 0;
     $int_code = $code
-              = perl_exception
+              = perl_statement perl_exception
                   level => 'EXCEPTION',
                   class => 'DOMException',
                   type => 'NOT_SUPPORTED_ERR',
@@ -1420,7 +1527,7 @@ sub attr2perl ($;%) {
                     ExpandedURI q<MDOM_EXCEPTION:on> => 'get',
                   };
     @return = ();
-    push @return, pod_item ('Exception ' . pod_code ('DOMException') . '.' .
+    push @return, pod_item ('Exception: ' . pod_code ('DOMException') . '.' .
                             pod_code ('NOT_SUPPORTED_ERR')),
                   pod_para ('Getting of this attribute allways result in
                              this exception raisen, since this
@@ -1433,13 +1540,15 @@ sub attr2perl ($;%) {
     is_implemented if => $Status->{IF}, attr => $Status->{Method},
                    condition => $opt{condition}, set => 1, on => 'set';
     if ($code_node->get_attribute_value ('cast-input', default => 1)) {
-      if (type_normalize
+      my $type = type_normalize
               type_expanded_uri $set->get_attribute_value
                                          ('Type',
-                                          default => q<DOMMain:any>)
-                  eq ExpandedURI q<DOMMain:DOMString>) {
-        $set_code = perl_builtin_code ('DOMString',
-                                       s => 'given', r => 'given')
+                                          default => q<DOMMain:any>);
+      if ($type eq ExpandedURI q<DOMMain:DOMString> or 
+          $type eq ExpandedURI q<ManakaiDOM:ManakaiDOMNamespaceURI>) {
+        $set_code = perl_builtin_code ($type,
+                                       s => 'given', r => 'given',
+                                       condition => $opt{condition})
                   . $set_code;
       }
     }
@@ -1451,17 +1560,27 @@ sub attr2perl ($;%) {
                                                  default => 'DOMMain:any')),
                     pod_para (get_description $set);
     for (@{$set->child_nodes}) {
-      next unless $_->local_name eq 'InCase';
-      push @set_desc, pod_item ('Setting Value: ' . get_incase_label $_,
+      if ($_->local_name eq 'InCase') {
+        push @set_desc, pod_item ('Setting Value: ' . get_incase_label $_,
                                                                   is_pod => 1),
-                    pod_para (get_description $_);
+                        pod_para (get_description $_);
+      } elsif ($_->local_name eq 'Exception') {
+        push @set_xcept, pod_item ('Exception: ' .
+                                pod_code (type_label ($_->get_attribute_value
+                                                   ('Type',
+                                                    default => 'DOMMain:any'))) .
+                                '.' . pod_code $_->get_attribute_value
+                                                   ('Name',
+                                                    default => '<unknown>')),
+                      pod_para (get_description $_);
+      }
     }
   } elsif ($has_set) {
     is_implemented if => $Status->{IF}, attr => $Status->{Method},
                    condition => $opt{condition}, set => 0, on => 'set';
     $Status->{is_implemented} = 0;
     $int_set_code = $set_code
-              = perl_exception
+              = perl_statement perl_exception
                   level => 'EXCEPTION',
                   class => 'DOMException',
                   type => 'NOT_SUPPORTED_ERR',
@@ -1471,7 +1590,7 @@ sub attr2perl ($;%) {
                     ExpandedURI q<MDOM_EXCEPTION:on> => 'set',
                   };
     @set_xcept = ();
-    push @set_xcept, pod_item ('Exception ' . pod_code ('DOMException') . '.' .
+    push @set_xcept, pod_item ('Exception: ' . pod_code ('DOMException') . '.' .
                             pod_code ('NOT_SUPPORTED_ERR')),
                   pod_para ('Setting of this attribute allways result in
                              this exception raisen, since this
@@ -1549,9 +1668,20 @@ sub datatype2perl ($;%) {
   local $Status->{IF} = $if_name;
   local $Status->{if} = {}; ## Temporary data
   local $Info->{Namespace} = {%{$Info->{Namespace}}};
+  local $Info->{Require_perl_package} = {%{$Info->{Require_perl_package}}};
+  local $Info->{Require_perl_package_use} = {};
   local $Status->{Operator} = {};
   my $result = perl_package full_name => $pack_name;
-  $result .= perl_inherit [perl_package_name (name => 'ManakaiDOMObject'),
+  my @isa;
+  for (@{$node->child_nodes}) {
+    next unless $_->node_type eq '#element' and
+                $_->local_name eq 'ISA' and
+                condition_match $_, condition => $opt{condition},
+                                    default_any => 1, ge => 1;
+    push @isa, perl_package_name qname_with_condition => $_->value,
+                                 condition => $opt{condition};
+  }
+  $result .= perl_inherit [@isa, perl_package_name (name => 'ManakaiDOMObject'),
                            perl_package_name (if => $if_name)];
   for my $pack ({full_name => $pack_name}, {if => $if_name}) {
     $result .= perl_statement perl_assign
@@ -1585,7 +1715,7 @@ sub datatype2perl ($;%) {
                              condition => $opt{condition},
                              package => $pack_name);
     } elsif ({qw/Name 1 Spec 1 ISA 1 Description 1
-                 Level 1 Def 1/}->{$_->local_name}) {
+                 Level 1 Def 1 ImplNote 1/}->{$_->local_name}) {
       #
     } else {
       valid_warn qq{Element @{[$_->local_name]} not supported};
@@ -1619,6 +1749,8 @@ sub datatypealias2perl ($;%) {
   local $Status->{IF} = $if_name;
   local $Status->{if} = {}; ## Temporary data
   local $Info->{Namespace} = {%{$Info->{Namespace}}};
+  local $Info->{Require_perl_package} = {%{$Info->{Require_perl_package}}};
+  local $Info->{Require_perl_package_use} = {};
   my $result = perl_package full_name => $pack_name;
   $result .= perl_inherit [perl_package_name (full_name => $real_name),
                            perl_package_name (if => $if_name)];
@@ -1641,7 +1773,7 @@ sub datatypealias2perl ($;%) {
 
   for (@{$node->child_nodes}) {
     if ({qw/Name 1 Spec 1 Type 1 Description 1
-            Level 1 Condition 1/}->{$_->local_name}) {
+            Level 1 Condition 1 ImplNote 1/}->{$_->local_name}) {
       #
     } else {
       valid_warn qq{Element @{[$_->local_name]} not supported};
@@ -1663,6 +1795,8 @@ sub exception2perl ($;%) {
   local $Status->{const} = {};
   local $Status->{if} = {}; ## Temporary data
   local $Info->{Namespace} = {%{$Info->{Namespace}}};
+  local $Info->{Require_perl_package} = {%{$Info->{Require_perl_package}}};
+  local $Info->{Require_perl_package_use} = {};
   my $pack_name = perl_package_name
                     name => my $if_name
                                  = perl_name $node->get_attribute_value ('Name'),
@@ -1681,7 +1815,21 @@ sub exception2perl ($;%) {
                pod_head ($Status->{depth}, $type . ' ' . pod_code $if_name),
                pod_paras (get_description ($node)),
                ($mod ? pod_para ('This ' . lc ($type) . ' is introduced in ' .
-                                 $mod . '.') : ());
+                                 $mod . '.') : ()),
+               ($type eq 'Exception' ? 
+                 (pod_para ('To catch this class of exceptions:'),
+                  pod_pre (join "\n",
+                           q|try {                                 |,
+                           q|  ...                                 |,
+                           q|} catch | . $pack_name . q| with {    |,
+                           q|  my $err = shift;                    |,
+                           q|  if ($err->{type} eq 'ERROR_NAME') { |,
+                           q|    ... # Recover from some error,    |,
+                           q|  } else {                            |,
+                           q|    $err->throw; # rethrow if other   |,
+                           q|  }                                   |,
+                           q|}; # Don't forget semicolon!          |))
+               : ());  
 
   for (@{$node->child_nodes}) {
     if ($_->local_name eq 'Method' or
@@ -1717,7 +1865,7 @@ sub exception2perl ($;%) {
                              package => $pack_name,
                              any_unless_condition => 1);
     } elsif ({qw/Name 1 Spec 1 Description 1
-                 Level 1 Condition 1/}->{$_->local_name}) {
+                 Level 1 Condition 1 ImplNote 1/}->{$_->local_name}) {
       #
     } else {
       valid_warn qq{Element @{[$_->local_name]} not supported};
@@ -1783,7 +1931,7 @@ sub constgroup2perl ($;%) {
                                        => $opt{any_unless_condition});
         $i++;
       } elsif ({qw/Name 1 Spec 1 ISA 1 Description 1
-                   Level 1 Def 1/}->{$_->local_name}) {
+                   Level 1 Def 1 ImplNote 1/}->{$_->local_name}) {
         #
       } else {
         valid_warn qq{Element @{[$_->local_name]} not supported};
@@ -1908,8 +2056,10 @@ loading code is generated from C<Name> attribute.
 
 sub req2perl ($) {
   my $node = shift;
+  my $reqnode = $node->local_name eq 'Require' ? $node :
+                  $node->get_attribute ('Require', make_new_node => 1);
   my $result = '';
-  for (@{$node->get_attribute ('Require', make_new_node => 1)->child_nodes}) {
+  for (@{$reqnode->child_nodes}) {
     if ($_->local_name eq 'Module') {
       my $m_name = $_->get_attribute_value ('Name', default => '<anon>');
       my $ns_uri = $_->get_attribute_value ('Namespace');
@@ -1923,25 +2073,35 @@ sub req2perl ($) {
       if ($def) {
         my $s;
         my $req;
+        my $pack_name;
         if ($req = $def->get_attribute ('require')) {
-          $s = 'require ' . (my $pack = perl_code $req->value);
-          $Info->{uri_to_perl_package}->{$ns_uri} = $pack if $ns_uri;
-        } elsif ($req = $def->get_attribute ('use')) {
-          $s = 'use ' . (my $pack_name = perl_code $req->value);
+          $s = 'require ' . ($pack_name = perl_code $req->value);
           $Info->{uri_to_perl_package}->{$ns_uri} = $pack_name if $ns_uri;
+          $Info->{Require_perl_package}->{$pack_name} = 1;
+        } elsif ($req = $def->get_attribute ('use')) {
+          $s = 'use ' . ($pack_name = perl_code $req->value);
+          $Info->{uri_to_perl_package}->{$ns_uri} = $pack_name if $ns_uri;
+          $Info->{Require_perl_package}->{$pack_name} = 1;
+          $Info->{Require_perl_package_use}->{$pack_name} = 1;
         } elsif (defined ($s = $def->value)) {
           # 
         } else {
           valid_warn qq<Required module definition for $m_name is empty>;
         }
-        if ($req and my $list = $req->get_attribute_value ('Import')) {
-          $s .= ' ' . perl_list ref $list ? @$list : $list;
+        if ($req and my $list = $req->get_attribute_value ('Import',
+                                                           as_array => 1)) {
+          if (@$list) {
+            $s .= ' ' . perl_list @$list;
+            $Info->{Require_perl_package_use}
+                 ->{$pack_name . '::::Import'}->{$_} = 1 for @$list;
+          }
         }
         $result .= perl_statement $s;
       } else {
         $result .= perl_statement 'require ' .
                      perl_code "__CLASS{$m_name}__";
       }
+    } elsif ($_->local_name eq 'Condition') {
     } else {
       valid_warn qq[Requiredness type @{[$_->local_name]} not supported];
     }
@@ -2034,6 +2194,8 @@ $Info->{Namespace}->{(DEFAULT_PFX)}
   or valid_err q<Module namespace URI (/Module/Namespace) MUST be specified>;
 $Info->{uri_to_perl_package}->{$Info->{Namespace}->{(DEFAULT_PFX)}}
   = $Info->{Package};
+$Info->{Require_perl_package} = {};
+$Info->{Require_perl_package_use} = {};
 
 ## Make source code
 $result .= perl_comment q<This file is automatically generated from> . "\n" .
@@ -2270,6 +2432,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/09/09 08:04:36 $
+# $Date: 2004/09/10 10:06:13 $
 
 

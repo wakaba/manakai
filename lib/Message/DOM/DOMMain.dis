@@ -60,7 +60,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/09 08:04:36 $
+     $Date: 2004/09/10 10:06:13 $
   @Require:
     @@Module:
       @@@Def:
@@ -389,7 +389,8 @@ DataType:
         @@@@Name: MDOM_INDEX_IN_SURROGATE_PAIR
         @@@@Description:
           @@@@@lang:en
-          @@@@@@: The offset points the middle of the surrogate pair.
+          @@@@@@:
+            An attempt is made to break surrogate pair.
       @@@Def:
         @@@@Type:
           lang:Perl
@@ -452,16 +453,17 @@ DataType:
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
-            Raised if the specified offset is negative or greater than
+            The specified "offset" is negative or greater than
             the number of 16-bit units in the DOMString, or the specified
-            count is negative.
+            "count" is negative.
       @@@Exception:
         @@@@Type: 
           ManakaiDOM:ManakaiDOMImplementationException
         @@@@Name: MDOM_INDEX_IN_SURROGATE_PAIR
         @@@@Description:
           @@@@@lang:en
-          @@@@@@: The offset points the middle of the surrogate pair.
+          @@@@@@: 
+            An attempt is made to break surrogate pair.
       @@@Def:
         @@@@Type:
           lang:Perl
@@ -497,7 +499,7 @@ DataType:
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
-            Raised if the specified offset is negative or greater than
+            The specified "offset" is negative or greater than
             the number of 16-bit units in the DOMString.
       @@@Exception:
         @@@@Type: 
@@ -505,7 +507,7 @@ DataType:
         @@@@Name: MDOM_INDEX_IN_SURROGATE_PAIR
         @@@@Description:
           @@@@@lang:en
-          @@@@@@: The offset points the middle of the surrogate pair.
+          @@@@@@: An attempt is made to break surrogate pair.
       @@@Def:
         @@@@Type:
           lang:Perl
@@ -574,16 +576,16 @@ DataType:
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
-            Raised if the specified offset is negative or greater than
+            The specified "offset" is negative or greater than
             the number of 16-bit units in the DOMString, or the specified
-            count is negative.
+            "count" is negative.
       @@@Exception:
         @@@@Type: 
           ManakaiDOM:ManakaiDOMImplementationException
         @@@@Name: MDOM_INDEX_IN_SURROGATE_PAIR
         @@@@Description:
           @@@@@lang:en
-          @@@@@@: The offset points the middle of the surrogate pair.
+          @@@@@@: An attempt is made to break surrogate pair.
       @@@Def:
         @@@@Type:
           lang:Perl
@@ -692,9 +694,9 @@ DataType:
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
-            The specified offset is negative or greater than
+            The specified "offset" is negative or greater than
             the number of 16-bit units in the DOMString, or the specified
-            count is negative.
+            "count" is negative.
       @@@Exception:
         @@@@Type: DOMException
         @@@@Name: DOMSTRING_SIZE_ERR
@@ -707,7 +709,7 @@ DataType:
         @@@@Name: MDOM_INDEX_IN_SURROGATE_PAIR
         @@@@Description:
           @@@@@lang:en
-          @@@@@@: The offset points the middle of the surrogate pair.
+          @@@@@@: An attempt is made to break surrogate pair.
       @@@Def:
         @@@@Type:
           lang:Perl
@@ -1026,7 +1028,7 @@ IF:
         @@@@Name: PARAM_NULL_POINTER
         @@@@Description:
           @@@@lang:en
-          @@@@@: Given parameter is null.
+          @@@@@: The parameter "list" is the null value.
       @@@Def:
         @@@@Type:
           lang:Perl
