@@ -438,7 +438,7 @@ sub perl_code ($;%) {
                       use_default_namespace => ExpandedURI q<disPerl:>);
     if ($et eq ExpandedURI q<disPerl:DEEP>) {   ## Deep Method Call
       $r = '{'.perl_statement ('local $Error::Depth = $Error::Depth + 1').
-              perl_code ($data) .
+              perl_code ($data, %opt) .
            '}';
     } elsif ({
               ExpandedURI q<disPerl:EXCEPTION> => 1,
@@ -2354,4 +2354,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/02/19 07:21:13 $
+1; # $Date: 2005/02/20 12:28:06 $

@@ -30,7 +30,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/19 07:21:13 $
+      $Date: 2005/02/20 12:28:06 $
     @@ContentType:
       dis:Date.RCS
   
@@ -43,6 +43,14 @@ Module:
       @@@Name: DISPerl
       @@@WithFor:
         ManakaiDOM:all
+    @@Module:
+      @@@Name: DOMMetaImpl
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOMLatest
+    @@Module:
+      @@@Name: DOMBoot
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOM3
 
 Namespace:
   @dis:
@@ -55,6 +63,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @DOMXML:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/xml#
   @lang:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
@@ -311,11 +321,72 @@ PropDef:
   @rdfs:domain: 
     DOMMain:DOMFeature
 
-## -- DOMString (from DOMMain)
+## -- DOM data types and construct types (from DOMMain)
+
+DataTypeDef:
+  @QName:
+    ManakaiDOM:ManakaiDOMObject
 
 DataTypeDef:
   @QName: 
     DOMMain:DOMString
+
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMMethodReturn
+  @Description:
+    @@lang:en
+    @@@: A DOM method return value.
+  @rdfs:subClassOf:
+    DISLang:MethodReturn::ManakaiDOM:all
+
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMMethodParameter
+  @Description:
+    @@lang:en
+    @@@: A DOM method parameter.
+  @rdfs:subClassOf:
+    DISLang:MethodParameter::ManakaiDOM:all
+
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMMethod
+  @Description:
+    @@lang:en
+    @@@: A DOM method.
+  @rdfs:subClassOf:
+    DISLang:Method::ManakaiDOM:all
+
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMAttrSet
+  @Description:
+    @@lang:en
+    @@@: A DOM attribute setter.
+  @rdfs:subClassOf:
+    DISLang:AttributeSet::ManakaiDOM:all
+
+ResourceTypeDef:
+  @QName: 
+    ManakaiDOM:DOMAttrGet
+  @Description:
+    @@lang:en
+    @@@: A DOM attribute getter.
+  @rdfs:subClassOf:
+    DISLang:AttributeGet::ManakaiDOM:all
+
+ResourceTypeDef:
+  @QName:
+    ManakaiDOM:DOMAttribute
+  @FullName:
+    @@lang:en
+    @@@: DOM attribute
+  @Description:
+    @@lang:en
+    @@@: A DOM attribute.
+  @rdfs:subClassOf:
+    DISLang:Attribute::ManakaiDOM:all
 
 ## -- Parameter input normalizer (from DOMMain)
 
@@ -334,7 +405,85 @@ PropDef:
   @rdfs:domain:
     ManakaiDOM:DataType
 
+## -- DOMMain feature (from DOMMain)
+
+FeatureDef:
+  @QName: 
+    ManakaiDOM:DOMMain
+  @FeatureVerDef:
+    @@Version: 1.0
+    @@QName: 
+      DOMMain:DOMMainFeature10
+    @@ISA:
+      ManakaiDOM:DOMMain
+  @FeatureVerDef:
+    @@Version: 2.0
+    @@QName: 
+      DOMMain:DOMMainFeature20
+    @@ISA: 
+      DOMMain:DOMMainFeature10
+  @FeatureVerDef:
+    @@Version: 3.0
+    @@QName: 
+      DOMMain:DOMMainFeature30
+    @@ISA: 
+      DOMMain:DOMMainFeature20
+
+## -- Core feature (from DOMCore)
+
+FeatureDef:
+  @featureName: Core
+  @QName: 
+    DOMCore:CoreFeature
+  @FeatureVerDef:
+    @@QName: 
+      DOMCore:CoreFeature10
+    @@Version: 1.0
+    @@ISA: 
+      DOMCore:CoreFeature
+  @FeatureVerDef:
+    @@QName: 
+      DOMCore:CoreFeature20
+    @@Version: 2.0
+    @@ISA: 
+      DOMCore:CoreFeature10
+  @FeatureVerDef:
+    @@QName: 
+      DOMCore:CoreFeature30
+    @@Version: 3.0
+    @@ISA: 
+      DOMCore:CoreFeature20
+
+ElementTypeBinding:
+  @Name: FeatureDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DOMMain:DOMFeature
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+ElementTypeBinding:
+  @Name: FeatureVerDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DOMMain:DOMFeature
+ElementTypeBinding:
+  @Name: featureName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ContentType:
+      dis:String
+
 ## -- DOM implementation (from DOMCore)
+
+## NOTE: This dummy class is required for "Role" specification
 
 ResourceDef:
   @rdf:type:
@@ -378,6 +527,13 @@ ResourceDef:
       Perl:package-name
   @AppName:
     @@@:
+      Message::DOM::IFLevel3::DOMImplementation
+    @@ForCheck:
+      ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM3
+    @@ContentType:
+      Perl:package-name
+  @AppName:
+    @@@:
       Message::DOM::IF::DOMImplementation
     @@ForCheck:
       ManakaiDOM:ForIF
@@ -387,7 +543,14 @@ ResourceDef:
     @@@:
       Message::DOM::DOMCore::ManakaiDOMImplementation
     @@ForCheck:
-      ManakaiDOM:ForClass
+      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOMLatest
+    @@ContentType:
+      Perl:package-name
+  @AppName:
+    @@@:
+      Message::DOM::DOMCoreLevel3::ManakaiDOMImplementation
+    @@ForCheck:
+      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM3
     @@ContentType:
       Perl:package-name
 
@@ -423,7 +586,7 @@ ResourceDef:
        ManakaiDOM:DOM2
      @@Return:
         @@@Type:  
-          DOMMain:Object
+          DOMXML:DocumentType
         @@@PerlDef: \## Dummy
   @Method:
      @@Name:  createDocument
@@ -441,7 +604,7 @@ ResourceDef:
           DOMMain:any
      @@Return:
         @@@Type: 
-          DOMMain:any
+          DOMCore:Document
         @@@PerlDef: \## Dummy
      @@For:
        ManakaiDOM:DOM2
@@ -464,6 +627,21 @@ ResourceDef:
         @@@PerlDef: \## Dummy
 ##IF:DOMImplementation
 
+ResourceDef:
+  @QName:
+    DOMCore:Document
+  @rdf:type:
+    ManakaiDOM:IF
+  @For:
+    ManakaiDOM:DOM1
+
+ResourceDef:
+  @QName:
+    DOMXML:DocumentType
+  @rdf:type:
+    ManakaiDOM:IF
+  @For:
+    ManakaiDOM:DOM1
 
 ## -- LSInput (from DOMLS)
 
@@ -561,6 +739,11 @@ ElementTypeBinding:
       rdfs:Class::ManakaiDOM:all
     @@subsetOf:
       rdfs:Class::ManakaiDOM:all
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
 
 ElementTypeBinding:
   @Name: PropDef

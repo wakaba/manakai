@@ -28,7 +28,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/19 07:21:13 $
+      $Date: 2005/02/20 12:28:07 $
     @@ContentType:
       dis:Date.RCS
   
@@ -68,6 +68,10 @@ Module:
         @@@@lang:en
         @@@@@:
           The Perl module set to convert character encodings.
+    @@Module:
+      @@@Name: DOMMetaImpl
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOMLatest
     @@Module:
       @@@Name: DOMCore
       @@@Description:
@@ -852,78 +856,6 @@ PropDef:
 
 ## -- Manakai specific properties and datatypes
 
-PropDef:
-  @QName:
-    dis:Role
-  @Description:
-    @@lang:en
-    @@@:
-      A role of the subject class in the DOM system.  It identifies 
-      what kind of classes should be provided as <QUOTE::alternative>s 
-      via, for example, <M::DOMCore:DOMImplementation.getFeature>. 
-      \
-      {P:: Currently, its values includes: 
-      \
-        - <CODE::DOMEvents:ManakaiDOMEvent::ManakaiDOM:ManakaiDOMLatest>::: 
-            Classes that should be available via 
-            <M::DOMEvents:ManakaiDOMDocumentEvent.createEvent>.
-      \
-        - <CODE::DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM>::: 
-            Classes that might be available via <IF::DOMImplementationRegistry>, 
-            <IF::DOMCore:DOMImplementationSource> or 
-            <M::DOMCore:DOMImplementation.getFeature>. 
-      \
-        - <CODE::DOMCore:DOMImplementationSource::ManakaiDOM:ManakaiDOM>:::
-            Classes that should be known to 
-            <Class::ManakaiDOMImplementationRegistry>.
-      \
-        - <CODE::DOMCore:Node::ManakaiDOM:ManakaiDOM>::: 
-            Classes that might be available via <M::DOMCore:Node.getFeature> 
-            or any <IF::Node> returning method and attributes.
-      \
-      }
-  @rdfs:domain:
-    ManakaiDOM:Class
-  @rdfs:range:
-    ManakaiDOM:IF
-  @dataType:
-    dis:TypeForQNames
-
-PropDef:
-  @QName:
-    dis:compat
-  @Description:
-    @@lang:en
-    @@@:
-      The internal data structure (and so on) of a subject resource is 
-      compatible with that of object resource. 
-      \
-      This property is described as a child element of 
-      <Q::dis:Role> property element because of historical reason. 
-      \
-      {P:: Currently used its values are:
-         \
-         - <CODE::DOMCore:ManakaiDOMImplementation::ManakaiDOM:ManakaiDOMLatest>::: 
-             An class that should be available via 
-             <M::DOMCore:ManakaiDOMImplementation.getFeature>. 
-         \
-         - <CODE::DOMCore:ManakaiDOMImplementationSource::ManakaiDOM:ManakaiDOMLatest>:::
-             An class that is able to handle as same manner 
-             as <M::DOMCore:ManakaiDOMImplementationSource> by 
-             <Class::ManakaiDOMImplementationRegistry>.
-         \
-         - <CODE::DOMCore:ManakaiDOMNode::ManakaiDOM:ManakaiDOMLatest>:::
-             An class that should be available via 
-             <M::DOMCore:ManakaiDOMNode.getFeature>.
-         \
-      }
-  @rdfs:domain:
-    ManakaiDOM:Class
-  @rdfs:range:
-    ManakaiDOM:Class
-  @dataType:
-    dis:TypeForQNames
-
 ElementTypeBinding:
   @Name: ImplementLevel1
   @ElementType:
@@ -1077,142 +1009,34 @@ ElementTypeBinding:
 
 ## -- DOM Feature
 
-StringDataTypeDef:
-  @QName: 
-    ManakaiDOM:ManakaiDOMFeatureName
-  @FullName:
-    @@lang:en
-    @@@: DOM feature name
-  @Description:
-    @@lang:en
-    @@@:
-      A DOM feature name. 
-      \
-      In some context, a feature name might be prefixed by <CHAR::PLUS SIGN> 
-      to indicate that feature is not required to be <EM::directly> 
-      accessible (including via binding-dependent cast mechanism).
-      \
-      Note that feature names are case-insensitive.
-  @ManakaiDOM:inputNormalizer:
-    @@ContentType:
-      lang:Perl
-    @@@:
-      $INPUT = lc $INPUT;
+ElementTypeBinding:
+  @Name: MDOMFeature
+  @ElementType:
+    DOMMain:implementFeature
+  @ShadowContent:
+    @@@: ManakaiDOMFeature10
 
-StringDataTypeDef:
-  @QName: 
-    ManakaiDOM:ManakaiDOMFeatureVersion
-  @FullName:
-    @@lang:en
-    @@@: DOM feature version
-  @Description:
-    @@lang:en
-    @@@: 
-      A DOM feature version number. 
-      \
-      In most contexts, an empty string and the <DOM:null> value are 
-      also valid values.  Both values indicate that any version of 
-      that feature is acceptable.
-  @ManakaiDOM:inputNormalizer:
-    @@ContentType:
-      lang:Perl
-    @@@:
-      $INPUT = '' unless defined $INPUT;
-
-StringDataTypeDef:
-  @QName: 
-    ManakaiDOM:ManakaiDOMFeatures
-  @For:
-    ManakaiDOM:ManakaiDOM3
-  @FullName:
-    @@lang:en
-    @@@: 
-      A DOM <P:features>
-  @Description:
-    @@lang:en
-    @@@:
-      A list of zero or more pairs of a <TYPE::ManakaiDOM:ManakaiDOMFeature> 
-      and an optional <TYPE::ManakaiDOM:ManakaiDOMFeatureVersion>, 
-      separated by white space.
-      \
-      In the manakai DOM implementation, method parameters and attributes 
-      whose actual datatype is <P::features> also accept a reference 
-      to hash whose key is a feature name and value is corresponding 
-      a feature version (or an empty string).  Don't forget to quote 
-      version number when its fraction part is <CODE:0> (e.g. 
-      quote <FeatureVer:2.0> like <Perl:'2.0'>).      
-  @ManakaiDOM:inputNormalizer:
-    @@ContentType:
-      lang:Perl
-    @@@:
-      if (CORE::defined $INPUT) {
-        if (CORE::ref ($INPUT) eq 'HASH') {
-          my $new = {};
-          for my $fname (keys %{$INPUT}) {
-            if (CORE::ref ($INPUT->{$fname}) eq 'HASH') {
-              my $lfname = lc $fname;
-              for my $fver (keys %{$INPUT->{$fname}}) {
-                $new->{$lfname}->{$fver} = $INPUT->{$fname}->{$fver};
-              }
-            } else {
-              $new->{lc $fname} = {(CORE::defined $new->{$fname}
-                                      ? $new->{$fname} : '') => 1};
-            }
-          }
-          $INPUT = $new;
-        } else {
-          my @f = split /\s+/, $INPUT;
-          $INPUT = {};
-          while (@f) {
-            my $name = lc shift @f;
-            if (@f and $f[0] =~ /^[\d\.]+$/) {
-              $INPUT->{$name}->{shift @f} = 1;
-            } else {
-              $INPUT->{$name}->{''} = 1;
-            }
-          }
-        }
-      } else {
-        $INPUT = {};
-      }
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        In current specifications of DOM, order of features are not 
-        significant and treatement for dupulication of a feature name 
-        is not specified.  
-        If <P::features> in future levels of DOM does not 
-        have this characteristic, this and some other implementation 
-        must be revisited for that levels. 
-        \
-        This input normalizer creates a copy of feature list even if 
-        it is given as a hash reference; it means that <QUOTE::breaking> 
-        any parameter does not affect the input source. 
-  @ResourceDef:
-    @@QName:
-      DOMMain:stringifyFeatures
-    @@rdf:type:
-      dis2pm:BlockCode
-    @@Description:
-      @@@lang:en
-      @@@@:
-        Converts a manakai internal hash representation of <P::features> 
-        (<PerlVar::$IN>) to a DOM standard string representation of it 
-        (<PerlVar::$OUT>). 
-        \
-        Note that whether input is valid feature name-value pairs is 
-        not checked; bad input will produce bad output.
-    @@PerlDef:
-      my @out;
-      for my $fname (keys %{$IN}) {
-        for my $fver (keys %{$IN->{$fname}}) {
-          push @out, $fname . ' ' . $fver . ' ' if $IN->{$fname}->{$fver};
-        }
-      }
-      $OUT = join ' ', @out;
+ElementTypeBinding:
+  @Name: DOMMFeature
+  @ElementType:
+    DOMMain:implementFeature
+  @ShadowContent:
+    @@@: DOMMainFeature10
+    @@For:
+      ManakaiDOM:DOM1
+  @ShadowSibling:
+    @@DOMMain:implementFeature:
+      @@@@: DOMMainFeature20
+      @@@For:
+        ManakaiDOM:DOM2
+    @@DOMMain:implementFeature:
+      @@@@: DOMMainFeature30
+      @@@For:
+        ManakaiDOM:DOM3
 
 ResourceDef:
-  @QName: docSupportsXMLFeature
+  @QName: 
+    DOMMain:docSupportsXMLFeature
   @rdf:type:
     dis2pm:InlineCode
   @Description:
@@ -1222,81 +1046,17 @@ ResourceDef:
   @PerlDef:
     ($DOCOBJ->{<Q::DOMCore:hasFeature>}->{XML})
 
-ResourceTypeDef:
-  @QName: DOMFeature
-  @FullName:
-    @@lang:en
-    @@@: DOM feature
-
-ElementTypeBinding:
-  @Name: FeatureDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      DOMMain:DOMFeature
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
-
-ElementTypeBinding:
-  @Name: FeatureVerDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      DOMMain:DOMFeature
-
-ElementTypeBinding:
-  @Name: featureQName
-  @ElementType:
-    dis:AppName
-  @ShadowContent:
-    @@ContentType:
-      dis:TypeQName
-
-PropDef:
-  @QName:
-    dis:Version
-  @FullName:
-    @@lang:en
-    @@@: Feature version
-  @Description:
-    @@lang:en
-    @@@:
-      A version number of a feature to define.
-  @rdfs:domain: DOMFeature
-
-PropDef:
-  @QName: implementFeature
-  @Description:
-    @@lang:en
-    @@@:
-      A subject resource implements a object feature. 
-  @rdfs:range: DOMFeature
-  @dataType: 
-    dis:TypeQName
-
-PropDef:
-  @QName: requireFeature
-  @Description:
-    @@lang:en
-    @@@:
-      A subject resource requires a object feature. 
-  @rdfs:range: DOMFeature
-  @dataType:
-    dis:TypeQName
-
 FeatureDef:
-  @QName: ManakaiDOMFeature
+  @QName: 
+    DOMMain:ManakaiDOMFeature
   @featureQName:
     ManakaiDOM:ManakaiDOM
   @FeatureVerDef:
-    @@QName: ManakaiDOMFeature10
+    @@QName: 
+      DOMMain:ManakaiDOMFeature10
     @@Version: 1.0
-    @@ISA: ManakaiDOMFeature
+    @@ISA: 
+      DOMMain:ManakaiDOMFeature
     @@FullName:
       @@@lang:en
       @@@@:
@@ -1327,7 +1087,8 @@ FeatureDef:
       @@@lang:en
       @@@@:
         The manakai DOM implementation <Module::DOMMain> module, level 1
-    @@QName: DOMMainFeature10
+    @@QName: 
+      DOMMain:DOMMainFeature10
     @@ISA:
       ManakaiDOM:DOMMain
   @FeatureVerDef:
@@ -1336,41 +1097,20 @@ FeatureDef:
       @@@lang:en
       @@@@:
         The manakai DOM implementation <Module::DOMMain> module, level 2
-    @@QName: DOMMainFeature20
-    @@ISA: DOMMainFeature10
+    @@QName: 
+      DOMMain:DOMMainFeature20
+    @@ISA: 
+      DOMMain:DOMMainFeature10
   @FeatureVerDef:
     @@Version: 3.0
     @@FullName:
       @@@lang:en
       @@@@:
         The manakai DOM implementation <Module::DOMMain> module, level 3
-    @@QName: DOMMainFeature30
-    @@ISA: DOMMainFeature20
-
-ElementTypeBinding:
-  @Name: MDOMFeature
-  @ElementType:
-    DOMMain:implementFeature
-  @ShadowContent:
-    @@@: ManakaiDOMFeature10
-
-ElementTypeBinding:
-  @Name: DOMMFeature
-  @ElementType:
-    DOMMain:implementFeature
-  @ShadowContent:
-    @@@: DOMMainFeature10
-    @@For:
-      ManakaiDOM:DOM1
-  @ShadowSibling:
-    @@DOMMain:implementFeature:
-      @@@@: DOMMainFeature20
-      @@@For:
-        ManakaiDOM:DOM2
-    @@DOMMain:implementFeature:
-      @@@@: DOMMainFeature30
-      @@@For:
-        ManakaiDOM:DOM3
+    @@QName: 
+      DOMMain:DOMMainFeature30
+    @@ISA: 
+      DOMMain:DOMMainFeature20
 
 ## -- DOM Core Specification datatypes
 
@@ -2930,232 +2670,6 @@ ResourceDef:
     DOMMain:DOMString
   @For:
     ManakaiDOM:ManakaiDOMCommon
-
-ResourceDef:
-  @Name:
-    @@@:  DOMImplementationRegistry
-    @@For:
-      !ManakaiDOM:ManakaiDOM
-  @Name:
-    @@@: ManakaiDOMImplementationRegistry
-    @@For:
-      ManakaiDOM:ManakaiDOM
-  @rdf:type:
-    ManakaiDOM:Class
-  @ForCheck:
-    ManakaiDOM:DOM3
-  @ForCheck:
-    !=ManakaiDOM:ManakaiDOM
-  @ISA:
-    @@@:
-      ManakaiDOM:ManakaiDOMObject
-    @@For:
-      ManakaiDOM:ManakaiDOM
-  @DOMMFeature:
-
-  @Description:
-    @@lang:en
-    @@@:
-      A binding dependent bootstrap for <IF::DOMCore:DOMImplementation> objects.
-  @Description:
-    @@For:
-      ManakaiDOM:ManakaiDOM
-    @@lang:en
-    @@@:
-      A bootstrap class/object from which DOM implementations can be 
-      retrieved.  For the manakai <Class::ManakaiDOMImplementationRegistry> 
-      implementation, DOM applications can access the registry both 
-      via class methods and via object methods.  That is, applications 
-      are free, but need not to instantiate a 
-      <Class::ManakaiDOMImplementationRegistry> object to get 
-      DOM implementations. 
-      \
-      {NOTE:: Authors of DOM applications will usually want to access 
-              the registry by the means of class methods (i.e. no 
-              instance objects), since most applications don't 
-              require more than one implementations.
-      \
-      }
-  @Method:
-    @@For:
-      ManakaiDOM:ManakaiDOM
-    @@Name: newInstance
-    @@ManakaiDOM:isStatic: 1
-    @@Description:
-      @@@lang:en
-      @@@@:
-        Constructs and returns a new instance of 
-        <Class::ManakaiDOMImplementationRegistry>. 
-        \
-        The newly created object initially has DOM implementation sources 
-        registered to the array 
-        <Perl::@org::w3c::dom::DOMImplementationSourceList> at the time 
-        of the instantiation.  No addition of sources afterwards to the 
-        object is reflected to the global registry and vice versa.
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        This method is taken from the normative Java binding.
-      \
-        Note that in this implementation, unlike the Java binding, 
-        <IF:DOMImplementationSource> classes available are not 
-        instantiated at this stage.
-    @@Return:
-      @@@Type: ManakaiDOMImplementationRegistry
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          A new instance of the <IF:ManakaiDOMImplementationRegistry>.
-      @@@PerlDef:
-          $r = bless [@org::w3c::dom::DOMImplementationSourceList], $self;
-    @@For:
-      ManakaiDOM:ManakaiDOM
-  @Method:
-     @@Name:  getDOMImplementation
-     @@ManakaiDOM:isStatic: 1
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Seeks and returns the first implementation that implements 
-         desired features. 
-     @@Param:
-        @@@Name:  features
-        @@@Type:  DOMString
-        @@@actualType:
-          ManakaiDOM:ManakaiDOMFeatures
-        @@@Description:
-          @@@@lang:en
-          @@@@@: 
-            A list of desired features that must be implemented.
-     @@Return:
-       @@@Type:  
-         DOMCore:DOMImplementation
-       @@@Description:
-         @@@@lang:en
-         @@@@@:
-           The first implementation that has the derired features. 
-           \
-           {NOTE:: DOM implementations returned by this method 
-                   might not be manakai DOM objects.
-           \
-           }
-       @@@InCase:
-         @@@@Value:
-           @@@@@is-null:1
-         @@@@Description:
-           @@@@@lang:en
-           @@@@@@: 
-             No implementation implementing the desired features is found.
-       @@@PerlDef:
-           __CODE{DOMMain:stringifyFeatures:: $IN => $features,
-                                              $OUT => $features}__;
-           __DEEP{
-             for (ref $self ? @$self
-                            : @org::w3c::dom::DOMImplementationSourceList) {
-               $r = $_-><M::DOMCore:DOMImplementationSource.getDOMImplementation>
-                                      ($features);
-               last if defined $r;
-             }
-           }__;
-      @@@ImplNote:
-        @@@@lang:en
-        @@@@@:
-          Stringify of <P::features> is required to support non-manakai 
-          <IF::DOMCore:DOMImplementationSource>s. 
-  @Method:
-     @@Name:  getDOMImplementationList
-     @@ManakaiDOM:isStatic: 1
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Returns a list of all the DOM implementations that implement 
-         desired features.
-     @@Param:
-        @@@Name:  features
-        @@@Type:  DOMString
-        @@@actualType:
-          ManakaiDOM:ManakaiDOMFeatures
-        @@@Description:
-          @@@@lang:en
-          @@@@@: A list of desired features that must be implemented.
-     @@Return:
-       @@@Type:  
-         DOMCore:DOMImplementationList
-       @@@actualType:
-         DOMCore:ManakaiDOMImplementationList
-       @@@Description:
-         @@@@lang:en
-         @@@@@: 
-           A list of DOM implementations that support the desired features. 
-       @@@Description:
-         @@@@lang:en
-         @@@@@:
-           \
-           {NOTE:: Whilst the returned list itself is a manakai object, 
-                   its containing implementation objects might not 
-                   be part of manakai.
-           \
-           }
-           \
-           It may contain a DOM implementation more than one times.
-         @@@@For:
-           ManakaiDOM:ManakaiDOM
-       @@@PerlDef:
-           __CODE{DOMMain:stringifyFeatures:: $IN => $features,
-                                              $OUT => $features}__;
-           __DEEP{
-             $r = <ClassM::DOMCore:ManakaiDOMImplementationList.new>;
-             for (ref $self ? @$self
-                            : @org::w3c::dom::DOMImplementationSourceList) {
-               $r-><M::DOMCore:ManakaiDOMImplementationList.add>
-                         ($_-><M::DOMCore:ManakaiDOMImplementationSource
-                                       .getDOMImplementationList> ($features));
-             }
-           }__;
-  @Method:
-    @@Name: addSource
-    @@ManakaiDOM:isStatic: 1
-    @@Description:
-      @@@lang:en
-      @@@@:
-        Registers a <IF::DOMCore:DOMImplementationSource> object to the 
-        list of DOM implementation sources available to this registry. 
-        \
-        When this method is called as a class method, i.e. with no 
-        object, the new source is added to the global registry.  
-        Otherwise, the new source is added to the local, the object's own 
-        registry and it unable to access via other registries. 
-        \
-        {NOTE:: This method is a manakai-specific method.  Its name and 
-                most of behaviour follow that of the normative Java binding as 
-                defined in the <CITE::DOM Level 3 Specification>.
-        \
-        }
-    @@For:
-      ManakaiDOM:ManakaiDOM
-    @@Param:
-      @@@Name: s
-      @@@Type: 
-        DOMCore:DOMImplementationSource
-      @@@Description:
-        @@@@lang:en
-        @@@@@: 
-          A <IF::DOMCore:DOMImplementationSource> object to be registered. 
-    @@Return:
-      @@@PerlDef:
-        @@@@require: overload
-        @@@@@:
-          my $reg = ref $self ? $self
-                              : \@org::w3c::dom::DOMImplementationSourceList;
-          PUSH: {
-            ## Checks if $s is already in list
-            for (@$reg) {
-              last PUSH if overload::StrVal ($_) eq overload::StrVal ($s) or
-                           $_ eq $s;
-            }
-            push @$reg, $s;
-          }
-## Object:DOMImplementationRegistry
 
 ## -- Manakai object
 

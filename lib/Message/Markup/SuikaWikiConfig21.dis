@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/02/19 11:53:29 $
+      $Date: 2005/02/20 12:28:07 $
     @@ContentType:
       dis:Date.RCS
   
@@ -229,6 +229,11 @@ PropDef:
 IFClassDef:
   @IFQName: SWCFGNode
   @ClassQName: ManakaiSWCFGNode
+
+  @ISA:
+    @@@:
+      ManakaiDOM:ManakaiDOMNodeReference::ManakaiDOM:Perl
+    @@ForCheck: ForClass
   
   @Description:
     @@lang:en
@@ -384,13 +389,13 @@ IFClassDef:
               }__;
             }
           }
-          if (($self-><AG::SWCFGNode.ownerDocument> || $self) ne
+          unless (($self-><AG::SWCFGNode.ownerDocument> || $self) eq
               $node-><AG::SWCFGNode.ownerDocument>) {
             __EXCEPTION{EXTERNAL_NODE_ERR::
               MDOMX:param-name => 'node',
             }__;
           }
-          my $this_node = $self;
+          my $this_node = $node;
           ANCESTOR: {
             if ($this_node eq $self) {
               __EXCEPTION{HIERARCHY_ANCESTOR_OR_SELF_ERR::
@@ -541,18 +546,26 @@ IFClassDef:
           @@@@@@:
             An attempt is made to set a value to document node.
       @@@PerlDef:
+        my $node = $self->{<Q::TreeCore:node>};
         my $nt = $self-><AG::SWCFGNode.nodeType>;
         if ($nt eq '#document') {
           __EXCEPTION{HIERARCHY_NO_VALUE_ERR::
             MDOMX:param-name => 'text',
             swcfg21:parentNodeType => {$nt},
           }__;
-        } elsif (ref ($self->{<Q::TreeCore:node>}->{<Q::value>}) eq 'ARRAY') {
-          push @{$self->{<Q::TreeCore:node>}->{<Q::value>}}, $text;
-        } elsif (defined $self->{<Q::TreeCore:node>}->{<Q::value>}) {
-          $self->{<Q::TreeCore:node>}->{<Q::value>} .= $text;
+        } elsif (ref ($node->{<Q::value>}) eq 'ARRAY') {
+          push @{$node->{<Q::value>}}, $text;
+        } elsif (defined $node->{<Q::value>}) {
+          $node->{<Q::value>} .= $text;
         } else {
-          $self->{<Q::TreeCore:node>}->{<Q::value>} = $text;
+          __CODE{expandETBinding:: $node => $node}__;
+          if (defined $node->{<Q::shadowContent>} and
+              defined $node->{<Q::shadowContent>}->{<Q::value>}) {
+            $node->{<Q::value>}
+               = $node->{<Q::shadowContent>}->{<Q::value>} . $text;
+          } else {
+            $node->{<Q::value>} = $text;
+          }
         }
 
   @Method:
@@ -561,6 +574,11 @@ IFClassDef:
       @@@lang:en
       @@@@:
         Removes a node from the child node list of this node. 
+        \
+        {TODO:: How this method should do for shadow tree is not 
+                decided yet. 
+        \
+        }
     @@Param:
       @@@Name:node
       @@@Type:SWCFGNode
@@ -610,12 +628,23 @@ IFClassDef:
             There is no child element found whose name is <P::name>. 
       @@@PerlDef:
         FIND: {
-          for (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
-            my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
+          my $node = $self->{<Q::TreeCore:node>};
+          __CODE{expandETBinding:: $node => $node}__;
+          my @c = (@{$node->{<Q::childNodes>}},
+                   ($node->{<Q::shadowContent>}
+                    ? @{$node->{<Q::shadowContent>}
+                             ->{<Q::childNodes>}} : ()));
+          while (@c) {
+            my $c = <ClassM::ManakaiSWCFGNode.getNodeReference>
+                                                  (my $cn = shift @c);
             if ($c-><AG::SWCFGNode.nodeType> eq '#element' and
                 $c-><AG::SWCFGNode.localName> eq $localName) {
               $r = $c;
               last FIND;
+            }
+            __CODE{expandETBinding:: $node => $cn}__;
+            if ($cn->{<Q::shadowSibling>}) {
+              push @c, @{$cn->{<Q::shadowSibling>}->{<Q::childNodes>}};
             }
           }
           ## Not found
@@ -676,8 +705,15 @@ IFClassDef:
             and <P::localName> pair. 
       @@@PerlDef:
         FIND: {
-          for (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
-            my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
+          my $node = $self->{<Q::TreeCore:node>};
+          __CODE{expandETBinding:: $node => $node}__;
+          my @c = (@{$node->{<Q::childNodes>}},
+                   ($node->{<Q::shadowContent>}
+                    ? @{$node->{<Q::shadowContent>}
+                             ->{<Q::childNodes>}} : ()));
+          while (@c) {
+            my $c = <ClassM::ManakaiSWCFGNode.getNodeReference>
+                                               (my $cn = shift @c);
             if ($c-><AG::SWCFGNode.nodeType> eq '#element' and
                 ((not defined $namespaceURI and 
                   not defined $c-><AG::SWCFGNode.namespaceURI>) or
@@ -687,6 +723,10 @@ IFClassDef:
                 $c-><AG::SWCFGNode.localName> eq $localName) {
               $r = $c;
               last FIND;
+            }
+            __CODE{expandETBinding:: $node => $cn}__;
+            if ($cn->{<Q::shadowSibling>}) {
+              push @c, @{$cn->{<Q::shadowSibling>}->{<Q::childNodes>}};
             }
           }
           ## Not found
@@ -875,13 +915,24 @@ IFClassDef:
             a <DOM::true> value. 
       @@@PerlDef:
         FIND: {
+          my $node = $self->{<Q::TreeCore:node>};
+          __CODE{expandETBinding:: $node => $node}__;
           __DEEP{
-            for (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
-              my $this = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
-              if ($_->{<Q::nodeType>} eq '#element' and
+            my @c = (@{$node->{<Q::childNodes>}},
+                     ($node->{<Q::shadowContent>}
+                      ? @{$node->{<Q::shadowContent>}
+                               ->{<Q::childNodes>}} : ()));
+            while (@c) {
+              my $this = <ClassM::ManakaiSWCFGNode.getNodeReference>
+                              (my $t = shift @c);
+              if ($t->{<Q::nodeType>} eq '#element' and
                   $code->($self, $this, %opt)) {
                 $r = $this;
                 last FIND;
+              }
+              __CODE{expandETBinding:: $node => $t}__;
+              if ($t->{<Q::shadowSibling>}) {
+                push @c, @{$t->{<Q::shadowSibling>}->{<Q::childNodes>}};
               }
             }
           }__;
@@ -911,6 +962,10 @@ IFClassDef:
         Sets the value of the first child element with the given name.  If 
         it does not exist, a new element has created and the value is set 
         to it. 
+        \
+        {TODO:: How this method treats shadow tree is not yet decided.
+        \
+        }
     @@NSVariant:.setAttributeNS
     @@Param:
       @@@Name:localName
@@ -977,6 +1032,10 @@ IFClassDef:
         Sets the value of the first child element with the given name.  If 
         it does not exist, a new element has created and the value is set 
         to it. 
+        \
+        {TODO:: How this method treats shadow tree is not yet decided.
+        \
+        }
     @@NonNSVariant:.setAttribute
     @@NewIn21:
     @@Param:
@@ -1055,6 +1114,10 @@ IFClassDef:
       @@@lang:en
       @@@@:
         Removes all child elements with the given name. 
+        \
+        {TODO:: How this method treats shadow tree is not yet decided.
+        \
+        }
     @@NSVariant:.removeAttributeNS
     @@Param:
       @@@Name:localName
@@ -1095,6 +1158,10 @@ IFClassDef:
       @@@lang:en
       @@@@:
         Removes all child elements with the given name. 
+        \
+        {TODO:: How this method treats shadow tree is not yet decided.
+        \
+        }
     @@NonNSVariant:.removeAttribute
     @@NewIn21:
     @@Param:
@@ -1148,7 +1215,8 @@ IFClassDef:
     @@Description:
       @@@lang:en
       @@@@:
-        The list of child nodes.  If the type of the node is 
+        The list of child nodes, including nodes from shadow trees. 
+        If the type of the node is 
         <CODE::#comment>, the list is always empty. 
     @@Get:
       @@@PerlDef:
@@ -1162,7 +1230,7 @@ IFClassDef:
     @@Description:
       @@@lang:en
       @@@@:
-        The local name of the node. 
+        The local name of the node.  
     @@Type:SWCFGString
     @@Get:
       @@@disDef:
@@ -1274,7 +1342,39 @@ IFClassDef:
     @@Type:SWCFGNode
     @@Description:
       @@@lang:en
-      @@@@:The parent node of this node, if any. 
+      @@@@:
+        The parent node of this node, if any. 
+    @@ModIn21:
+    @@Get:
+      @@@Description:
+        @@@@lang:en
+        @@@@@:The parent node. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGNode
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:This node has no parent node. 
+      @@@PerlDef:
+        $r = $self->{<Q::TreeCore:node>}->{<Q::parent>};
+        if ($r) {
+          if ($r->{<Q::shadowParent>}) {
+            $r = $r->{<Q::shadowParent>};
+          } elsif ($r->{<Q::shadowSiblingOf>}) {
+            $r = $r->{<Q::shadowSiblingOf>}->{<Q::parent>};
+          }
+        }
+        $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($r) if $r;
+
+  @Attr:
+    @@Name:realParentNode
+    @@Type:SWCFGNode
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The parent node of this node, if any. 
+    @@NewIn21:
     @@Get:
       @@@disDef:
         @@@@swcfg21:GetPropNode:parent
@@ -1296,8 +1396,37 @@ IFClassDef:
     @@Description:
       @@@lang:en
       @@@@:
+        The number of children of this node, includeing 
+        child nodes in shadow trees.  If this node has 
+        the value, it is also counted as a <QUOTE::child>. 
+    @@ModIn21:
+    @@Get:
+      @@@PerlDef:
+        my $node = $self->{<Q::TreeCore:node>};
+        $r = (defined $node->{<Q::value>} ? 1 : 0)
+           + @{$node->{<Q::childNodes>}};
+        __CODE{expandETBinding:: $node => $node}__;
+        if ($node->{<Q::shadowContent>}) {
+          $r++ if not defined $node->{<Q::value>} and
+                  defined $node->{<Q::shadowContent>}->{<Q::value>};
+          $r += @{$node->{<Q::shadowContent>}->{<Q::childNodes>}};
+        }
+        for my $cc (@{$node->{<Q::childNodes>}}) {
+          __CODE{expandETBinding:: $node => $cc}__;
+          $r += @{$cc->{<Q::shadowSibling>}->{<Q::childNodes>}}
+             if $cc->{<Q::shadowSibling>};
+        }
+
+  @Attr:
+    @@Name:realCount
+    @@Type:
+      DOMMain:unsigned-long
+    @@Description:
+      @@@lang:en
+      @@@@:
         The number of children of this node.  If this node has 
         the value, it is also counted as a <QUOTE::child>. 
+    @@NewIn21:
     @@Get:
       @@@PerlDef:
         $r = (defined $self->{<Q::TreeCore:node>}->{<Q::value>} ? 1 : 0)
@@ -1309,6 +1438,7 @@ IFClassDef:
       @@@lang:en
       @@@@:
         Returns the text value of this node. 
+    @@ModIn21:
     @@NamedParam:
       @@@Name:newValue
       @@@Type:
@@ -1337,12 +1467,64 @@ IFClassDef:
           @@@@@@:
             The node has no value. 
       @@@PerlDef:
+        my $node = $self->{<Q::TreeCore:node>};
         if (defined $newValue) {
-          $self->{<Q::TreeCore:node>}->{<Q::value>} = $newValue;
+          $node->{<Q::value>} = $newValue;
         }
-        $r = ref ($self->{<Q::TreeCore:node>}->{<Q::value>}) eq 'ARRAY'
-                 ? join "\x0A", @{$self->{<Q::TreeCore:node>}->{<Q::value>}} :
-                   $self->{<Q::TreeCore:node>}->{<Q::value>};
+        my $v;
+        if (defined $node->{<Q::value>}) {
+          $v = $node->{<Q::value>};
+        } else {
+          __CODE{expandETBinding:: $node => $node}__;
+          $v = defined $node->{<Q::shadowContent>}
+                     ? $node->{<Q::shadowContent>}->{<Q::value>} : null;
+        }
+        $r = ref $v eq 'ARRAY' ? join "\x0A", @$v : $v;
+
+  @Method:
+    @@Name:actualInnerText
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns the text value of this node. 
+    @@NewIn21:
+    @@NamedParam:
+      @@@Name:newValue
+      @@@Type:
+        DOMMain:any
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The new node value.  If <P::newValue> is specified, 
+          the node value is changed before returning the value. 
+          Sets a value to document or document fragment node has no effect. 
+    @@Return:
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The value of this node.  If the value is of list, 
+          values are separeted by a <CHAR::LINE FEED> character. 
+          Note that the last item of the list will <EM::not> 
+          suffixed by a <CHAR::LINE FEED>. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The node has no value. 
+      @@@PerlDef:
+        my $node = $self->{<Q::TreeCore:node>};
+        if (defined $newValue) {
+          $node->{<Q::value>} = $newValue;
+        }
+        my $v;
+        if (defined $node->{<Q::value>}) {
+          $v = $node->{<Q::value>};
+        }
+        $r = ref $v eq 'ARRAY' ? join "\x0A", @$v : $v;
 
   @Method:
     @@Name:value
@@ -1350,6 +1532,7 @@ IFClassDef:
       @@@lang:en
       @@@@:
         Returns the value of this node. 
+    @@ModIn21:
     @@NamedParam:
       @@@Name:asArray
       @@@Type:
@@ -1389,13 +1572,19 @@ IFClassDef:
           is returned.  If <P::true> and the node value is not defined, 
           then an empty array reference is returned. 
       @@@PerlDef:
-        if ($asArray and
-            ref $self->{<Q::TreeCore:node>}->{<Q::value>} ne 'ARRAY') {
-          $r = defined $self->{<Q::TreeCore:node>}->{<Q::value>}
-                  ? [$self->{<Q::TreeCore:node>}->{<Q::value>}]
-                  : [];
+        my $node = $self->{<Q::TreeCore:node>};
+        my $v;
+        if (defined $node->{<Q::value>}) {
+          $v = $node->{<Q::value>};
         } else {
-          $r = $self->{<Q::TreeCore:node>}->{<Q::value>};
+          __CODE{expandETBinding:: $node => $node}__;
+          $v = defined $node->{<Q::shadowContent>}
+                     ? $node->{<Q::shadowContent>}->{<Q::value>} : null;
+        }
+        if ($asArray and ref $v ne 'ARRAY') {
+          $r = defined $v ? [$v] : [];
+        } else {
+          $r = $v;
         }
 
   @Method:
@@ -1422,6 +1611,7 @@ IFClassDef:
                 on the comment node. 
         \
         }
+    @@ModIn21:
     @@NamedParam:
       @@@Name:outputHeader
       @@@Type:
@@ -1437,19 +1627,19 @@ IFClassDef:
         my $nt = $self-><AG::SWCFGNode.nodeType>;
         my $node = $self->{<Q::TreeCore:node>};
         if ($nt eq '#element') {
-          $r = $self-><M::SWCFGNode.innerText>;
+          $r = $self-><M::SWCFGNode.actualInnerText>;
           if (scalar @{$node->{<Q::childNodes>}}) {
             if (defined $r) {
               $r =~ s/(^|\x0A)(?=([\\\@\#\s]|$))?/$1."  ".
                                                   (defined $2?"\\":"")/ges;
-              $r = $self-><AG::SWCFGElement.qualifiedName>
+              $r = $self-><AG::SWCFGElement.realQualifiedName>
                  . ":\x0A  \@\@"
                  . (ref ($node->{<Q::value>}) eq 'ARRAY' ? '[list]' : '')
                  . ":" . ((($r !~ /[\x0D\x0A:]/) and (length ($r) < 50))
                           ? '' : "\x0A")
                  . (length $r ? $r : '\\') . "\x0A";
             } else {
-              $r = $self-><AG::SWCFGElement.qualifiedName>
+              $r = $self-><AG::SWCFGElement.realQualifiedName>
                  . ":\x0A";
             }
             for (@{$node->{<Q::childNodes>}}) {
@@ -1463,7 +1653,7 @@ IFClassDef:
           } else {
             $r = '' unless defined $r;
             $r =~ s/(^|\x0A)(?=([\\\@\#\s]|$))?/$1."  ".(defined $2?"\\":"")/ges;
-            $r = $self-><AG::SWCFGElement.qualifiedName>
+            $r = $self-><AG::SWCFGElement.realQualifiedName>
                . (ref ($node->{<Q::value>}) eq 'ARRAY' ? '[list]' : '')
                . ":" . ((($r !~ /[\x0D\x0A:]/) and (length ($r) < 50))
                         ? '' : "\x0A")
@@ -1559,7 +1749,6 @@ IFClassDef:
             msg => {qq[Node type: "$nt"]},
           }__;
         }
-      ## TODO: Namespace & binding support
 
   @Attr:
     @@Name:rootNode
@@ -1644,7 +1833,6 @@ IFClassDef:
             msg => {qq<Node path = "$r" ... Oops! Node type: "$node_type">},
           }__;
         }
-     ## TODO: Namespace support
 
   @Method:
     @@Name:flag
@@ -1790,6 +1978,7 @@ IFClassDef:
         Makes a copy of this node.  All child nodes are cloned and 
         all flags and options are copied (rather than cloned).  
         The new node does not have any parent.  
+    @@ModIn21:
     @@Return:
       @@@Type:SWCFGNode
       @@@Description:
@@ -1806,14 +1995,49 @@ IFClassDef:
             $r = $od-><M::SWCFGDocument.createElementNS>
                             ($self-><AG::SWCFGNode.namespaceURI>,
                              $self-><AG::SWCFGNode.localName>);
+            for (<Q::shadowLocalName>, <Q::shadowNamespaceURI>) {
+              $r->{<Q::TreeCore:node>}->{$_} = $self->{<Q::TreeCore:node>}->{$_};
+            }
             $r->{<Q::TreeCore:node>}->{<Q::value>}
-                      = $self->{<Q::TreeCore:node>}->{<Q::value>};
+                = defined $self->{<Q::TreeCore:node>}->{<Q::value>}
+                  ? ref $self->{<Q::TreeCore:node>}->{<Q::value>} eq 'ARRAY'
+                  ? [@{$self->{<Q::TreeCore:node>}->{<Q::value>}}]
+                  : $self->{<Q::TreeCore:node>}->{<Q::value>} : null;
+            for (<Q::shadowContent>, <Q::shadowSibling>) {
+              if ($self->{<Q::TreeCore:node>}->{$_}) {
+                my $c = <ClassM::ManakaiSWCFGNode.getNodeReference>
+                           ($self->{<Q::TreeCore:node>}->{$_})->clone;
+                $r->{<Q::TreeCore:node>}->{$_} = $c->{<Q::TreeCore:node>};
+                $r->{<Q::TreeCore:node>}
+                  -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+                          .importTree>
+                           ($r->{<Q::TreeCore:node>}->{$_});
+                $r->{<Q::TreeCore:node>}->{$_}
+                  ->{{
+                        <Q::shadowContent> => <Q::shadowParent>,
+                        <Q::shadowSibling> => <Q::shadowSiblingOf>,
+                     }->{$_}} = $r->{<Q::TreeCore:node>};
+              }
+            }
+            for (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
+              my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
+              $r-><AG::SWCFGNode.appendNode> ($c->clone);
+            }
           } elsif ($nt eq '#comment') {
             $r = $od-><M::SWCFGDocument.createComment>
                             ($self->{<Q::TreeCore:node>}->{<Q::value>});
           } elsif ($nt eq '#fragment') {
             $r = $od-><M::SWCFGDocument.createDocumentFragment>;
             ## <Q::isShadowMaster> property is not copied
+            for (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
+              my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
+              $r-><AG::SWCFGNode.appendNode> ($c->clone);
+            }
+            $r->{<Q::TreeCore:node>}->{<Q::value>}
+                = defined $self->{<Q::TreeCore:node>}->{<Q::value>}
+                  ? ref $self->{<Q::TreeCore:node>}->{<Q::value>} eq 'ARRAY'
+                  ? [@{$self->{<Q::TreeCore:node>}->{<Q::value>}}]
+                  : $self->{<Q::TreeCore:node>}->{<Q::value>} : null;
           } elsif ($nt eq '#document') {
             $r = $od-><AG::SWCFGDocument.implementation>
                     -><M::SWCFGImplementation.createSWCFGDocument>;
@@ -1830,34 +2054,45 @@ IFClassDef:
               };
               for (qw/shadowContent shadowSibling/) {
                 if ($b->{$_}) {
-                  $c->{$_} = <ClassM::ManakaiSWCFGNode.getNodeReference>
-                                 ($b->{$_})->clone->{<Q::TreeCore:node>};
+                  my $cl = <ClassM::ManakaiSWCFGNode.getNodeReference>
+                                 ($b->{$_})->clone;
+                  $c->{$_} = $cl->{<Q::TreeCore:node>};
                   $r->{<Q::TreeCore:node>}
                     -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
                           .importTree> ($c->{$_});
                   my @l = $c->{$_};
                   while (@l) {
-                    my $l = shift @l;
+                    my $l = shift @l; next unless $_;
                     $l->{<Q::DOMCore:ownerDocument>} = $r->{<Q::TreeCore:node>};
                     push @l, $_ for @{$l->{<Q::childNodes>}}, 
-          \                         @{$l->{<Q::shadowChildNodes>}},
-          \                         @{$l->{<Q::shadowSiblingNodes>}};
+                                    $l->{<Q::shadowContent>}, ## Does not allowed
+                                    $l->{<Q::shadowSibling>}; ## but for safe
                   }
                   $c->{$_}->{<Q::isShadowMaster>} = true;
                 }
               }
+            }
+            for (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
+              my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_)->clone;
+              $r->{<Q::TreeCore:node>}
+                -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+                          .importTree> ($c->{<Q::TreeCore:node>});
+              my @l = $c->{<Q::TreeCore:node>};
+              while (@l) {
+                my $l = shift @l; next unless $_;
+                $l->{<Q::DOMCore:ownerDocument>} = $r->{<Q::TreeCore:node>};
+                push @l, $_ for @{$l->{<Q::childNodes>}}, 
+                                $l->{<Q::shadowContent>},
+                                $l->{<Q::shadowSibling>};
+              }
+              $r-><AG::SWCFGNode.appendNode> ($c);
             }
           } else {
             __ASSERT{DISPerl:invariant::
               msg => {qq[Node type: "$nt"]},
             }__;
           }
-          for (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
-            my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
-            $r-><AG::SWCFGNode.appendNode> ($c->clone);
-          }
         }__;
-        ## TODO: shadow
         $r->{<Q::TreeCore:node>}->{<Q::flag>}
                            = {%{$self->{<Q::TreeCore:node>}->{<Q::flag>}||{}}};
         $r->{<Q::TreeCore:node>}->{<Q::option>}
@@ -2154,7 +2389,8 @@ IFClassDef:
           $class = <ClassName::ManakaiSWCFGDocumentFragment>;
         } else {
           __ASSERT{DISPerl:invariant::
-            msg => {qq[Node type: "$object->{<Q::nodeType>}"]},
+            msg => {qq[Node type: "$object->{<Q::nodeType>}" ].
+                    qq[(ref: "@{[ref $object]}")]},
           }__;
         }
         $r = $object-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
@@ -2225,21 +2461,17 @@ IFClassDef:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
           push @{$node->{<Q::TreeCore:origin>}}, <Q::parent>;
-          push @{$node->{<Q::TreeCore:subnode>}}, <Q::childNodes>,
-                      <Q::shadowChildNodes>, <Q::shadowSiblingNodes>;
+          push @{$node->{<Q::TreeCore:subnode>}}, <Q::childNodes>;
           push @{$node->{<Q::TreeCore:irefnode>}}, <Q::DOMCore:ownerDocument>;
           push @{$node->{<Q::TreeCore:anydata2>}}, <Q::flag>, <Q::option>;
           $node->{<Q::childNodes>} = [];
-          $node->{<Q::shadowChildNodes>} = [];
-          $node->{<Q::shadowSiblingNodes>} = [];
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
             Required property: <Q::nodeType>, <Q::DOMCore:ownerDocument>. 
             \
             Optional properties: <Q::value>, <Q::parent>, 
-                  <Q::childNodes>, <Q::shadowChildNodes>,
-                  <Q::shadowSiblingNodes>, <Q::flag>, <Q::option>. 
+                  <Q::childNodes>, <Q::flag>, <Q::option>. 
 
   @IntMethod:
     @@Operator:
@@ -2345,6 +2577,8 @@ IFClassDef:
           $r = <ClassM::ManakaiSWCFGNode.newObject>;
           $r->{<Q::nodeType>} = '#comment';
           $r->{<Q::value>} = '';
+          $r->{<Q::namespaceExpanded>} = true; ## Always true
+          $r->{<Q::etExpanded>} = true; ## Always true
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
@@ -2454,7 +2688,56 @@ IFClassDef:
         my $od = $self-><AG::SWCFGNode.ownerDocument>;
         my $defURI = $od-><AG::SWCFGDocument.defaultElementTypeNamespaceURI>;
         if (defined $node->{<Q::namespaceURI>}) {
+          my $nsURI = ($node->{<Q::namespaceURI>} eq <Q::RealName>
+                        ? $node->{<Q::shadowNamespaceURI>}
+                        : $node->{<Q::namespaceURI>});
+          my $ln = ($node->{<Q::namespaceURI>} eq <Q::RealName>
+                        ? $node->{<Q::shadowlocalName>}
+                        : $node->{<Q::localName>});
           if (not defined $defURI or
+              $nsURI ne $defURI or
+              $ln eq 'Namespace' or
+              $ln eq 'ElementTypeBinding' or
+              $ln =~ /:/) {
+            $r = $self-><AG::SWCFGNode.lookupNamespacePrefix>
+                                             ($node->{<Q::namespaceURI>},
+                                              make_new_binding => 1) .
+                 ':' . $ln;
+          } else {
+            $r = $ln;
+          }
+        } else {  ## Null namespace
+          if (defined $defURI or $node->{<Q::localName>} =~ /:/ or
+              $node->{<Q::localName>} eq 'Namespace' or
+              $node->{<Q::localName>} eq 'ElementTypeBinding') {
+            $r = $self-><AG::SWCFGNode.lookupNamespacePrefix>
+                                             ($node->{<Q::namespaceURI>},
+                                              make_new_binding => 1) .
+                 ':' . $node->{<Q::localName>};
+          } else {
+            $r = $node->{<Q::localName>};
+          }
+        }
+
+  @Attr:
+    @@Name: realQualifiedName
+    @@Type: SWCFGString
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The qualified name of the element type, i.e. the local name 
+        with or with out the namespace prefix followed by a <CHAR::COLON>. 
+    @@NewIn21:
+    @@Get:
+      @@@PerlDef:
+        __CODE{expandNamespace}__;
+        my $node = $self->{<Q::TreeCore:node>};
+        my $od = $self-><AG::SWCFGNode.ownerDocument>;
+        my $defURI = $od-><AG::SWCFGDocument.defaultElementTypeNamespaceURI>;
+        if (defined $node->{<Q::namespaceURI>}) {
+          if ($node->{<Q::namespaceURI>} eq <Q::RealName>) {
+            $r = $node->{<Q::localName>};
+          } elsif (not defined $defURI or
               $node->{<Q::namespaceURI>} ne $defURI or
               $node->{<Q::localName>} eq 'Namespace' or
               $node->{<Q::localName>} eq 'ElementTypeBinding' or
@@ -2495,6 +2778,7 @@ IFClassDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@:This node is an element node. 
+
   @RedefAttr:
     @@Name:localName
     @@Description:
@@ -2502,6 +2786,7 @@ IFClassDef:
       @@@@:
         The local name of the node. 
     @@Type:SWCFGString
+    @@ModIn21:
     @@Get:
       @@@Type:SWCFGString
       @@@Description:
@@ -2519,13 +2804,51 @@ IFClassDef:
             No node of type other than <CODE::#element> has the local name. 
       @@@PerlDef:
         __CODE{expandNamespace}__;
-        $r = $self->{<Q::TreeCore:node>}->{<Q::localName>};
+        $r = (defined $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>} and
+              $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>} eq <Q::RealName>)
+               ? $self->{<Q::TreeCore:node>}->{<Q::shadowLocalName>}
+               : $self->{<Q::TreeCore:node>}->{<Q::localName>};
     @@Set:
       @@@Description:
         @@@@lang:en
         @@@@@:
           Sets the local name.  Setting the local name to the node 
           whose type is other than <CODE::#element> has no effect. 
+      @@@PerlDef:
+        __CODE{expandNamespace}__;
+        if (defined $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>} and
+            $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>} eq <Q::RealName>) {
+          $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>}
+              = $self->{<Q::TreeCore:node>}->{<Q::shadowNamespaceURI>};
+        }
+        $self->{<Q::TreeCore:node>}->{<Q::localName>} = $given;
+
+  @Attr:
+    @@Name:realLocalName
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The real local name of the node. 
+    @@Type:SWCFGString
+    @@NewIn21:
+    @@Get:
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The local name of the node.  If an element type binding 
+          has bound to this element, then actual element type name. 
+      @@@PerlDef:
+        __CODE{expandNamespace}__;
+        $r = $self->{<Q::TreeCore:node>}->{<Q::localName>};
+    @@Set:
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Sets the local name.  Setting the local name to the node 
+          whose type is other than <CODE::#element> has no effect.  
+          Changes for element type name does not take effect 
+          until <M::SWCFGDocument.updateElementTypeBinding> method is called. 
       @@@PerlDef:
         __CODE{expandNamespace}__;
         $self->{<Q::TreeCore:node>}->{<Q::localName>} = $given;
@@ -2554,6 +2877,82 @@ IFClassDef:
             The node does not have the namespace URI. 
       @@@PerlDef:
         __CODE{expandNamespace}__;
+        $r = (defined $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>} and
+              $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>} eq <Q::RealName>)
+             ? $self->{<Q::TreeCore:node>}->{<Q::shadowNamespaceURI>}
+             : $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>};
+    @@Set:
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Sets the namespace URI.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: 
+            Sets the node not to have its namespace URI (or sets 
+            the namespace as the <QUOTE::<DOM::null> namespace>. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@ContentType:
+            dis:TypeQName
+          @@@@@@:
+            swcfg21:RealName
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The namespace URI (both <EM::real> or <EM::shadow>) 
+            has left unchanged. 
+      @@@PerlDef:
+        unless (defined $given and $given eq <Q::RealName>) {
+          __CODE{expandNamespace}__;
+          if (defined $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>} and
+             $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>} eq <Q::RealName>) {
+            $self->{<Q::TreeCore:node>}->{<Q::localName>}
+              = $self->{<Q::TreeCore:node>}->{<Q::localName>};
+          }
+          $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>} = $given;
+        }
+
+  @Attr:
+    @@Name:realNamespaceURI
+    @@NewIn21:
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The namespace URI of the node. 
+    @@Type:SWCFGString
+    @@Get:
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The namespace URI of the node. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The node does not have the namespace URI. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@ContentType:
+            dis:TypeQName
+          @@@@@@:
+            swcfg21:RealName
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Any element type binding has been bound to this element; 
+            the local name of this node is the <EM::real> qualified name. 
+      @@@PerlDef:
+        __CODE{expandNamespace}__;
         $r = $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>};
     @@Set:
       @@@Type:SWCFGString
@@ -2570,9 +2969,23 @@ IFClassDef:
           @@@@@@: 
             Sets the node not to have its namespace URI (or sets 
             the namespace as the <QUOTE::<DOM::null> namespace>. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@ContentType:
+            dis:TypeQName
+          @@@@@@:
+            swcfg21:RealName
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The namespace URI (both <EM::real> or <EM::shadow>) 
+            has left unchanged. 
       @@@PerlDef:
-        __CODE{expandNamespace}__;
-        $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>} = $given;
+        unless (defined $given and $given eq <Q::RealName>) {
+          __CODE{expandNamespace}__;
+          $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>} = $given;
+        }
+
   @IntMethod:
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
@@ -2591,6 +3004,8 @@ IFClassDef:
         @@@@@:
           $r = <ClassM::ManakaiSWCFGNode.newObject>;
           $r->{<Q::nodeType>} = '#element';
+          push @{$r->{<Q::TreeCore:subnode>}}, <Q::shadowContent>,
+                                               <Q::shadowSibling>;
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
@@ -2599,7 +3014,64 @@ IFClassDef:
             \
             Optional properties: <Q::value>, <Q::parent>, 
                   <Q::childNodes>, <Q::flag>, <Q::option>, 
-                  <Q::namespaceURI>, <Q::namespaceExpanded>. 
+                  <Q::namespaceURI>, <Q::namespaceExpanded>, 
+                  <Q::shadowContent>, <Q::shadowSibling>, 
+                  <Q::etExpanded>. 
+
+  @ResourceDef:
+    @@QName: expandETBinding
+    @@rdf:type:
+      dis2pm:BlockCode
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Expands element type bindings. 
+    @@ForCheck: ForClass
+    @@PerlDef:
+      unless ($node->{<Q::etExpanded>}) {
+        my $__qn;
+        if ($node->{<Q::namespaceExpanded>}) {
+          $__qn = <ClassM::ManakaiSWCFGNode.getNodeReference> ($node)
+                  -><AG::SWCFGElement.realQualifiedName>;
+        } else {
+          $__qn = $node->{<Q::localName>};
+
+        }
+        my $__od = $node->{<Q::DOMCore:ownerDocument>};
+        if ($__od->{<Q::etBinding>}->{$__qn}) {
+          my $b = $__od->{<Q::etBinding>}->{$__qn};
+          unless ($node->{<Q::namespaceExpanded>}) {
+            $node->{<Q::namespaceURI>} = <Q::RealName>;
+          }
+          unless ($b->{namespaceExpanded}) {
+            if ($b->{shadowLocalName} =~ s/^([^:]*)://g) {
+              my $__prefix = $1;
+              __DEEP{
+                $b->{shadowNamespaceURI}
+                   = <ClassM::ManakaiSWCFGNode.getNodeReference> ($__od)
+                           -><M::SWCFGNode.lookupNamespaceURI>
+                                 ($__prefix, make_new_binding => 1);
+              }__;
+            }
+            $b->{namespaceExpanded} = true;
+          }
+          $node->{<Q::shadowNamespaceURI>} = $b->{shadowNamespaceURI};
+          $node->{<Q::shadowLocalName>} = $b->{shadowLocalName};
+          for (qw/shadowContent shadowSibling/) {
+            next unless $b->{$_};
+            my $cl = <ClassM::ManakaiSWCFGNode.getNodeReference> ($b->{$_})
+                        ->clone;
+            my $__n = $node->{{shadowContent => <Q::shadowContent>,
+                               shadowSibling => <Q::shadowSibling>}->{$_}}
+               = $cl->{<Q::TreeCore:node>};
+            $node-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+                            .importTree> ($__n);
+            $__n->{{shadowContent => <Q::shadowParent>,
+                    shadowSibling => <Q::shadowSiblingOf>}->{$_}} = $node;
+          }
+        }
+        $node->{<Q::etExpanded>} = true;
+      }
 
   @ResourceDef:
     @@QName: expandNamespace
@@ -2611,17 +3083,18 @@ IFClassDef:
       @@@@:
         Expands qualified name into namespace URI and local name. 
     @@PerlDef:
-      unless ($self->{<Q::TreeCore:node>}->{<Q::namespaceExpanded>}) {
-        if ($self->{<Q::TreeCore:node>}->{<Q::localName>}
-            =~ s/^([^:]*)://g) {
-          my $prefix = $1;
+      my $__node = $self->{<Q::TreeCore:node>};
+      __CODE{expandETBinding:: $node => $__node}__;
+      unless ($__node->{<Q::namespaceExpanded>}) {
+        if ($__node->{<Q::localName>} =~ s/^([^:]*)://g) {
+          my $__prefix = $1;
           __DEEP{
-            $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>}
+            $__node->{<Q::namespaceURI>}
                  = $self-><M::SWCFGNode.lookupNamespaceURI>
-                                 ($prefix, make_new_binding => 1);
+                                 ($__prefix, make_new_binding => 1);
           }__;
         }
-        $self->{<Q::TreeCore:node>}->{<Q::namespaceExpanded>} = true;
+        $__node->{<Q::namespaceExpanded>} = true;
       }
 ##SWCFGElement
 
@@ -2647,6 +3120,11 @@ IFClassDef:
       @@@lang:en
       @@@@:
         Creates a new element. 
+        \
+        {NOTE:: No element type binding expansion will occur 
+                at the time of creation. 
+        \
+        }
     @@NewIn21:
     @@Param:
       @@@Name:namespaceURI
@@ -2681,6 +3159,7 @@ IFClassDef:
         $r->{<Q::namespaceURI>} = $namespaceURI;
         $r->{<Q::localName>} = $localName;
         $r->{<Q::namespaceExpanded>} = true;
+        $r->{<Q::etExpanded>} = true;
         $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($r);
 
   @Method:
@@ -2781,12 +3260,45 @@ IFClassDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@:This node is a document node. 
+
   @RedefMethod:
     @@Name:innerText
     @@Description:
       @@@lang:en
       @@@@:
         Returns the text value of this node. 
+    @@NamedParam:
+      @@@Name:newValue
+      @@@Type:
+        DOMMain:any
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          An attempt to set a value to document node has no effect. 
+    @@Return:
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The value of this node.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The node has no value. 
+      @@@disDef:
+        @@@@DISLang:nop:
+
+  @Method:
+    @@Name:actualInnerText
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns the text value of this node. 
+    @@NewIn21:
     @@NamedParam:
       @@@Name:newValue
       @@@Type:
@@ -2832,6 +3344,8 @@ IFClassDef:
           $r->{<Q::nodeType>} = '#document';
           $r->{<Q::nsBinding>} = {URI => ''};
           $r->{<Q::etBinding>} = {};
+          $r->{<Q::namespaceExpanded>} = true; ## Always true
+          $r->{<Q::etExpanded>} = true; ## Always true
           push @{$r->{<Q::TreeCore:subnode2>}}, <Q::etBinding>;
         @@@@ImplNote:
           @@@@@lang:en
@@ -2912,13 +3426,18 @@ IFClassDef:
         @@@@@:
           $r = <ClassM::ManakaiSWCFGNode.newObject>;
           $r->{<Q::nodeType>} = '#fragment';
+          $r->{<Q::namespaceExpanded>} = true; ## Always true
+          $r->{<Q::etExpanded>} = true; ## Always true
+          push @{$r->{<Q::TreeCore:origin>}},
+                     <Q::shadowOwner>, <Q::shadowParent>, <Q::shadowSiblingOf>;
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
             Required property: <Q::DOMCore:ownerDocument>, <Q::nodeType>. 
             \
             Optional properties: <Q::parent>, <Q::value>,
-                  <Q::childNodes>, <Q::flag>, <Q::option>. 
+                  <Q::childNodes>, <Q::flag>, <Q::option>, <Q::shadowOwner>, 
+                  <Q::shadowParent>, <Q::shadowSiblingOf>. 
 ##SWCFGDocumentFragment
 
 IFClassDef:
@@ -2928,12 +3447,36 @@ IFClassDef:
     @@lang:en
     @@@:
       A child node list of a node. 
+
+  @Attr:
+    @@Name:length
+    @@Type:
+      DOMMain:unsigned-long
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The number of child nodes, including those belong to shadow trees. 
+    @@Get:
+      @@@PerlDef:
+        my $node = $self->{<Q::TreeCore:node>};
+        $r = @{$node->{<Q::childNodes>}};
+        __CODE{expandETBinding:: $node => $node}__;
+        if ($node->{<Q::shadowContent>}) {
+          $r += @{$node->{<Q::shadowContent>}->{<Q::childNodes>}};
+        }
+        for my $c (@{$node->{<Q::childNodes>}}) {
+          __CODE{expandETBinding:: $node => $c}__;
+          $r += @{$c->{<Q::shadowSibling>}->{<Q::childNodes>}}
+             if $c->{<Q::shadowSibling>};
+        }
+
   @Method:
     @@Name:item
     @@Description:
       @@@lang:en
       @@@@:
         Returns a child node. 
+    @@NewIn21:
     @@Param:
       @@@Name:index
       @@@Type:
@@ -2958,7 +3501,31 @@ IFClassDef:
           @@@@@@: 
             There is no <P::index>th node in the list. 
       @@@PerlDef:
-        $r = $self->{<Q::TreeCore:node>}->{<Q::childNodes>}->[$index];
+        if ($index < 0) {
+          $index = $self-><AG::SWCFGChildNodeList.length> + $index;
+        }
+        my $node = $self->{<Q::TreeCore:node>};
+        $r = $node->{<Q::childNodes>}->[$index];
+        unless ($r) {
+          $index -= @{$node->{<Q::childNodes>}};
+          __CODE{expandETBinding:: $node => $node}__;
+          $r = $node->{<Q::shadowContent>}->{<Q::childNodes>}->[$index]
+            if $node->{<Q::shadowContent>};
+          unless ($r) {
+            if ($node->{<Q::shadowContent>}) {
+              $index -= @{$node->{<Q::shadowContent>}->{<Q::childNodes>}};
+            }
+            for my $c (@{$node->{<Q::childNodes>}}) {
+              __CODE{expandETBinding:: $node => $c}__;
+              if ($c->{<Q::shadowSibling>}) {
+                $r = $c->{<Q::shadowSibling>}->{<Q::childNodes>}->[$index];
+                last if $r;
+                $index -= @{$c->{<Q::shadowSibling>}->{<Q::childNodes>}};
+              }
+            }
+          }
+        }
+        $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($r) if $r;
 ##SWCFGChildNodeList
 
 PropDef:
@@ -2969,18 +3536,27 @@ PropDef:
       Child nodes of a node. 
 
 PropDef:
-  @QName:shadowChildNodes
+  @QName:shadowContent
   @Description:
     @@lang:en
     @@@:
       Child nodes of a node, copied from the shadow master tree. 
 
 PropDef:
-  @QName:shadowSiblingNodes
+  @QName:shadowSibling
   @Description:
     @@lang:en
     @@@:
       Younger sibling nodes of a node, copied from the shadow master tree. 
+
+PropDef:
+  @QName: shadowOwner
+  @Description:
+    @@lang:en
+    @@@:
+      The owner document of the master shadow tree.  This property is 
+      redudant (always same, if any, as <Q::DOMCore:ownerDocument>) 
+      but need to maintain the origin-subnode relationship. 
 
 PropDef:
   @QName:value
@@ -3025,6 +3601,15 @@ PropDef:
     DOMMain:boolean
 
 PropDef:
+  @QName: etExpanded
+  @Description:
+    @@lang:en
+    @@@:
+      Whether the element type binding has been expanded or not.
+  @Type:
+    DOMMain:boolean
+
+PropDef:
   @QName:nsBinding
   @Description:
     @@lang:en
@@ -3037,6 +3622,18 @@ PropDef:
     @@lang:en
     @@@:
       Element type bindings. 
+
+ResourceDef:
+  @QName: RealName
+  @rdf:type:
+    rdfs:Class
+  @Description:
+    @@lang:en
+    @@@:
+      The special-purpose namespace to which qualified names 
+      unparsed because of element type bindings belong. 
+  @For:
+    =ManakaiDOM:all
 
 PropDef:
   @QName:isShadowMaster
@@ -3074,6 +3671,7 @@ PropDef:
     @@lang:en
     @@@:
       Node-wide options set to the node. 
+  #@Type:c
 
 PropDef:
   @QName:nodeType
@@ -3416,6 +4014,9 @@ IFClassDef:
               $current_element->{<Q::TreeCore:node>}
                               ->{<Q::namespaceExpanded>} = false
                 unless $no_namespace;
+              $current_element->{<Q::TreeCore:node>}
+                              ->{<Q::etExpanded>} = false
+                unless $no_binding;
               if (defined $2) {  ## Foo: bar
                 $current = $root;
                 $current_element = $root;
@@ -3451,6 +4052,9 @@ IFClassDef:
                 $ce->{<Q::TreeCore:node>}
                               ->{<Q::namespaceExpanded>} = false
                   unless $no_namespace;
+                $ce->{<Q::TreeCore:node>}
+                              ->{<Q::etExpanded>} = false
+                  unless $no_binding;
                 $ce-><M::SWCFGNode.flag> ('p__nest_level'
                       => $current_element-><M::SWCFGNode.flag>
                                              ('p__nest_level' => null,
@@ -3467,8 +4071,21 @@ IFClassDef:
                   $current_element
                             = $current_element-><AG::SWCFGNode.parentNode>;
                 }
-                $current_element-><M::SWCFGNode.appendText> ($val)
-                   if defined $val;
+                if (defined $val) {
+                  if (defined $current_element->{<Q::TreeCore:node>}
+                                              ->{<Q::value>}) {
+                    if (ref $current_element->{<Q::TreeCore:node>}->{<Q::value>}
+                          eq 'ARRAY') {
+                      push @{$current_element->{<Q::TreeCore:node>}
+                                             ->{<Q::value>}}, $val;
+                    } else {
+                      $current_element->{<Q::TreeCore:node>}
+                                             ->{<Q::value>} .= $val;
+                    }
+                  } else {
+                    $current_element->{<Q::TreeCore:node>}->{<Q::value>} = $val;
+                  }
+                }
                 $current = $current_element;
                 unless (defined $3) {  ##  @@: \nbar
                   $is_new_element = 1;
@@ -3476,20 +4093,54 @@ IFClassDef:
               }
             } elsif ($line =~ /^(\s+)(\S.*)$/) {
               my ($wsp, $val) = ($1, $2);
-              if (substr ($val, 0, 1) eq '\\') {
-                substr ($val, 0, 1) = '';
-                $wsp = '';
-              }
-              if ($is_new_element or $is_list_element) {
-                $wsp_length = length $wsp;
-                $current_element-><M::SWCFGNode.appendText> ($val);
-                $is_new_element = 0;
-                $vfragment = '';
+              if (substr ($val, 0, 1) eq '#' and
+                  not $is_new_element and
+                  length $wsp < $wsp_length) {  ## Not part of element
+                $current = $root-><M::SWCFGNode.appendNewNode>
+                                         (type => '#comment',
+                                          value => substr ($val, 1));
               } else {
-                $wsp = $no_preserve_wsp ? '' : substr ($wsp, $wsp_length);
-                $current_element-><M::SWCFGNode.appendText>
-                                         ($vfragment . "\x0A" . $wsp . $val);
-                $vfragment = '';
+                if (substr ($val, 0, 1) eq '\\') {
+                  substr ($val, 0, 1) = '';
+                  $wsp = '';
+                }
+                if ($is_new_element or $is_list_element) {
+                  $wsp_length = length $wsp;
+                    if (defined $current_element->{<Q::TreeCore:node>}
+                                                ->{<Q::value>}) {
+                      if (ref $current_element->{<Q::TreeCore:node>}
+                                              ->{<Q::value>} eq 'ARRAY') {
+                        push @{$current_element->{<Q::TreeCore:node>}
+                                               ->{<Q::value>}}, $val;
+                      } else {
+                        $current_element->{<Q::TreeCore:node>}
+                                               ->{<Q::value>} .= $val;
+                      }
+                    } else {
+                      $current_element->{<Q::TreeCore:node>}
+                                      ->{<Q::value>} = $val;
+                    }
+                  $is_new_element = 0;
+                  $vfragment = '';
+                } else {
+                  $wsp = $no_preserve_wsp ? '' : substr ($wsp, $wsp_length);
+                  $val = $vfragment . "\x0A" . $wsp . $val;
+                    if (defined $current_element->{<Q::TreeCore:node>}
+                                                ->{<Q::value>}) {
+                      if (ref $current_element->{<Q::TreeCore:node>}
+                                              ->{<Q::value>} eq 'ARRAY') {
+                        push @{$current_element->{<Q::TreeCore:node>}
+                                               ->{<Q::value>}}, $val;
+                      } else {
+                        $current_element->{<Q::TreeCore:node>}
+                                             ->{<Q::value>} .= $val;
+                      }
+                    } else {
+                      $current_element->{<Q::TreeCore:node>}
+                                             ->{<Q::value>} = $val;
+                    }
+                  $vfragment = '';
+                }
               }
             } elsif ($line =~ /^(\s*)$/) {
               $vfragment .= "\x0A" . substr ($1, $wsp_length)
@@ -3553,11 +4204,21 @@ IFClassDef:
                     $sc->{<Q::nodeType>} = '#fragment';
                     $sc->{<Q::parent>} = null;
                     $sc->{<Q::isShadowMaster>} = true;
+                    $sc->{<Q::shadowOwner>} = $root->{<Q::TreeCore:node>};
+                    $sc->{<Q::namespaceExpanded>} = true;
+                    $sc->{<Q::etExpanded>} = true;
+                    push @{$sc->{<Q::TreeCore:origin>}}, <Q::shadowOwner>, 
+                             <Q::shadowParent>, <Q::shadowSiblingOf>;
                   } elsif ($_->{<Q::localName>} eq 'ShadowSibling') {
                     $ss = $_;
                     $ss->{<Q::nodeType>} = '#fragment';
                     $ss->{<Q::parent>} = null;
                     $ss->{<Q::isShadowMaster>} = true;
+                    $ss->{<Q::shadowOwner>} = $root->{<Q::TreeCore:node>};
+                    $ss->{<Q::namespaceExpanded>} = true;
+                    $ss->{<Q::etExpanded>} = true;
+                    push @{$ss->{<Q::TreeCore:origin>}}, <Q::shadowOwner>,
+                             <Q::shadowParent>, <Q::shadowSiblingOf>;
                   }
                 }
                 $n->{<Q::childNodes>} = [];
@@ -4176,6 +4837,17 @@ ElementTypeBinding:
     @@lang:en
     @@@:
         {NOTE:: Introduced in SuikaWikiConfig/2.1 object model. 
+        \
+        }
+
+ElementTypeBinding:
+  @Name: ModIn21
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+    @@@:
+        {NOTE:: Modified in SuikaWikiConfig/2.1 object model. 
         \
         }
 
