@@ -1,3 +1,17 @@
+2003-06-26  Wakaba  <w@suika.fam.cx>
+
+	* Parser.pm: Give entity type before EntityManager->get_external_entity is called.
+	* Error.pm: Added some new errors related to media type values.
+	* EntityManager.pm (_guess_entity_encoding, _check_media_type): New.
+	(default_uri_resolver): Check and use media type and charset.
+
+2003-06-26  Wakaba  <w@suika.fam.cx>
+
+	* Parser.pm (_parse_xml_or_text_declaration): New method.
+	* EntityManager.pm (default_uri_resolver): Use Parser->_parse_xml_or_text_declaration to remove text declaration.
+	(get_external_entity): Reset uri/entity_type/line/pos statuses.
+	* Error.pm: Some new errors for invalid XML declaration.
+
 2003-06-17  Wakaba  <w@suika.fam.cx>
 
 	* Parser.pm: 

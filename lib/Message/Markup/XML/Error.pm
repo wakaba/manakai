@@ -5,15 +5,43 @@ SuikaWiki::Markup::XML::Error --- SuikaWiki XML: Error handling module for Suika
 
 =head1 DESCRIPTION
 
+This module provides the common error and/or warning handling interface
+for the SuikaWiki::Markup::XML::* modules.  With this module, proper error
+recovering and proper message outputing (eg. output as HTML element,
+localized message, etc.) is easily implementable.
+
 This module is part of SuikaWiki XML support.
 
 =cut
 
 package SuikaWiki::Markup::XML::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+
+## Prefixes:
+## - 'SYNTAX_':	don't match with XML 1.0 EBNF rules
+## - 'WFC_':	violation of well-formedness constraint (fatal error)
+## - 'VC_':	violation of validity constraint (error)
+## - 'NC_':	violation of namespace constraint (error)
+## - 'NS_SYNTAX_':	don't match with XML Namespace 1.0 EBNF rules (error)
+## - 'FATAL_ERR_':	fatal error specified by XML 1.0 spec
+## - 'ERR_':	error specified by XML 1.0 spec
+## - 'WARN_':	don't fullfil XML spec's or implementor's recommendation
+
+## Error levels:
+## - wfc:	well-formedness (including syntax error)
+## - vc:	validity
+## - nswfc:	namespace well-formedness
+## - nsvc:	namespace validity
+## - fatal:	fatal error
+## - warn:	warning
 
 my %_Error = (
+	## Forward compatibility error
+	SYNTAX_UNSUPPORTED_XML_VERSION	=> {
+		description	=> 'Unsupported XML version (%s)',
+		level	=> 'wfc',
+	},
 	## Syntax errors
 	SYNTAX_DATA_OUT_OF_ROOT_ELEMENT	=> {
 		description	=> 'Invalid data or markup out of root element',
@@ -81,6 +109,10 @@ my %_Error = (
   			}->{$o->{entity_type}||'document_entity'}||'in '.$o->{entity_type})},
 		level	=> 'wfc',
 	},
+	SYNTAX_INVALID_PUBID	=> {
+		description	=> 'This public identifier contains at least one invalid character (%s)',
+		level	=> 'wfc',
+	},
 	SYNTAX_LEGAL_CHARACTER	=> {
 		description	=> sub {
 			my $r = sprintf 'The character U-%08X is not a legal XML Char',
@@ -107,11 +139,23 @@ my %_Error = (
 		level	=> 'wfc',
 	},
 	SYNTAX_XML_DECLARE_NO_ATTR	=> {
-		description	=> 'XML (or text) declaration does not have pseudo attribute',
+		description	=> 'XML (or text) declaration has no (valid) pseudo attribute',
+		level	=> 'wfc',
+	},
+	SYNTAX_XML_DECLARE_NO_ENCODING_ATTR	=> {
+		description	=> q(Text declaration must have 'encoding' pseudo attribute),
+		level	=> 'wfc',
+	},
+	SYNTAX_XML_DECLARE_NO_VERSION_ATTR	=> {
+		description	=> q(XML declaration must have 'version' pseudo attribute),
 		level	=> 'wfc',
 	},
 	SYNTAX_XML_DECLARE_POSITION	=> {
 		description	=> 'XML declaration must be at the top of the entity',
+		level	=> 'wfc',
+	},
+	SYNTAX_XML_DECLARE_STANDALONE_ATTR	=> {
+		description	=> q(Text declaration cannot have 'standalone' pseudo attribute),
 		level	=> 'wfc',
 	},
 	## Well-formedness error
@@ -148,6 +192,10 @@ my %_Error = (
 		description	=> 'Replacement text of entity reference in an attribute value literal cannot contain LESS-THAN SIGN (<) itself',
 		level	=> 'wfc',
 	},
+	WFC_PARSED_ENTITY	=> {
+		description	=> 'Entity reference (%s) must not refer non-parsed entity',
+		level	=> 'wfc',
+	},
 	WFC_PE_IN_INTERNAL_SUBSET	=> {
 		description	=> 'Parameter entity (%s) cannot be referred in markup declaration in internal subset of DTD',
 		level	=> 'wfc',
@@ -156,9 +204,13 @@ my %_Error = (
 		description	=> 'Dupulicate attribute specification',
 		level	=> 'wfc',
 	},
-	ERR_PREDEFINED_ENTITY	=> {
+	FATAL_ERR_DECODE_IMPL_ERR	=> {
+		description	=> 'Decode error (%s)',
+		level	=> 'fatal',
+	},
+	FATAL_ERR_PREDEFINED_ENTITY	=> {
 		description	=> 'Predefined entity (%s) must be declared as of the XML specification defined (%s)',
-		level	=> 'wfc',
+		level	=> 'fatal',
 	},
 	## Validity error
 	VC_ENTITY_DECLARED	=> {
@@ -184,6 +236,14 @@ my %_Error = (
 	},
 	## Namespace validity error
 	## XML warning
+	ERR_EXT_ENTITY_NOT_FOUND	=> {
+		description	=> 'External entity (%s == <%s>) cannot be retrived (%s)',
+		level	=> 'vc',
+	},
+	ERR_SYSID_HAS_FRAGMENT	=> {
+		description	=> 'URI Reference converted from system identifier should not have the fragment identifier (%s)',
+		level	=> 'warn',
+	},
 	WARN_PREDEFINED_ENTITY_NOT_DECLARED	=> {
 		description	=> 'Predefined general entity (%s) should be declared before it is referred for interoperability',
 		level	=> 'warn',
@@ -223,11 +283,72 @@ my %_Error = (
 		description	=> 'Parameter entity %s is already declared',
 		level	=> 'warn',
 	},
+	## RFC 3023 'SHOULD'
+	WARN_MT_DTD_EXTERNAL_SUBSET	=> {
+		description	=> q(Media type "application/xml-dtd" SHOULD be used for the external subset of the DTD or the external parameter entity),
+		level	=> 'warn',
+	},
+	WARN_MT_EXTERNAL_GENERAL_PARSED_ENTITY	=> {
+		description	=> q(Media type "application/xml-external-parsed-entity" SHOULD be used for the external general parsed entity),
+		level	=> 'warn',
+	},
+	WARN_MT_XML_FOR_EXT_GENERAL_ENTITY	=> {
+		description	=> 'Using media type %s for external general parsed entity is now forbidden unless the entity is also well-formed as a document entity',
+		level	=> 'warn',
+	},
 	## Implementation's warning
+	WARN_GUESS_ENCODING_IMPL_ERR	=> {
+		description	=> 'Guessing encoding procedure cause some error (%s)',
+		level	=> 'warn',
+	},
+	WARN_INVALID_URI_CHAR_IN_SYSID	=> {
+		description	=> 'System identifier has at least one character that is invalid as part of URI Reference (%s)',
+		level	=> 'warn',
+	},
+	WARN_MT_TEXT_XML	=> {
+		description	=> q(In many case, labeling with the media type "text/xml" is inappropriate.  Use "application/xml" or markup language specified type instead),
+		level	=> 'warn',
+	},
+	WARN_MT_TEXT_XML_EXTERNAL_PARSED_ENTITY	=> {
+		description	=> q(In many case, labeling with the media type "text/xml-external-parsed-entity" is inappropriate.  Use "application/xml-external-parsed-entity" instead),
+		level	=> 'warn',
+	},
+	WARN_NO_CHARSET_PARAM	=> {	## charset parameter is optional
+		description	=> 'Charset parameter should be specified (%s)',
+		level	=> 'warn',
+	},
+	WARN_NO_CHARSET_PARAM_FOR_TEXT	=> {	## charset parameter have default value of ascii
+		description	=> q(Charset parameter is not specified, so default value 'us-ascii' is assumed (%s)),
+		level	=> 'warn',
+	},
+	WARN_NO_EXPLICIT_ENCODING_INFO	=> {	## BOM and '<?' guessing is failed (so general encoding guess is to be called)
+		description	=> q(Neither upper level protocol nor XML's encoding declaration provide encoding scheme information (or cannot read the encoding declaration because of lack of guessability)),
+		level	=> 'warn',
+	},
+	WARN_PID_IS_INVALID_URN	=> {
+		description	=> 'Public identifier (%s) seems an invalid URN',
+		level	=> 'warn',
+	},
+	WARN_PID_IS_NOT_FPI_NOR_URN	=> {
+		description	=> 'Public identifier (%s) should be a formal public identifier or a uniform resource name to ensure interoperability',
+		level	=> 'warn',
+	},
+	WARN_PID_IS_TOO_LONG	=> {
+		description	=> 'Public identifier (%s) should be shorter for interoperability',
+		level	=> 'warn',
+	},
+	WARN_PID_IS_URN_WITH_RESERVED_CHAR	=> {
+		description	=> 'Public identifier (%s) seems a URN and it contains one or more reserved character ("/" and/or "?") which should not be used',
+		level	=> 'warn',
+	},
+	WARN_XML_DECLARE_NO_VERSION_ATTR	=> {
+		description	=> 'Text declaration does not have the version pseudo attribute',
+		level	=> 'warn',
+	},
 	## Misc
 	UNKNOWN	=> {
 		description	=> 'Unknown error',
-		level	=> 'wfc',
+		level	=> 'fatal',
 	},
 );
 ## TODO: error handling should be customizable (hookable) by user of this module
@@ -242,6 +363,7 @@ sub raise ($$%) {
   $error_msg = sprintf $error_msg, @err_msg;
   $error_msg = "Line $o->{line}, position $o->{pos}: " . $error_msg;
   $error_msg = 'Entity '.($err{entity}||$o->{entity}) . ": " . $error_msg if ($err{entity}||$o->{entity});
+  $error_msg = '<'.($o->{uri}) . ">: " . $error_msg if length $o->{uri};
   require Carp;
   Carp::carp ($error_msg);
   #Carp::croak ("Line $o->{line}, position $o->{pos}: ".$error_msg);
@@ -256,4 +378,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/06/17 12:25:07 $
+1; # $Date: 2003/06/27 13:05:57 $
