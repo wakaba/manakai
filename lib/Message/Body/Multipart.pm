@@ -9,7 +9,7 @@ for "multipart/*" Internet Media Types
 package Message::Body::Multipart;
 use strict;
 use vars qw(%DEFAULT @ISA $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Body::Text;
 push @ISA, qw(Message::Body::Text);
@@ -22,7 +22,7 @@ $REG{NON_bchars} = qr#[^0-9A-Za-z'()+_,-./:=?\x20]#;
 %DEFAULT = (
 	## "#i" : only inherited from parent Entity and inherits to child Entity
   -_ARRAY_NAME	=> 'value',
-  -_METHODS	=> [qw|entity_header add delete count item preamble epilogue|],
+  -_METHODS	=> [qw|data_part control_part entity_header add delete count item preamble epilogue|],
   -_MEMBERS	=> [qw|boundary preamble epilogue|],
   #i accept_cte
   #i body_default_charset
@@ -30,6 +30,7 @@ $REG{NON_bchars} = qr#[^0-9A-Za-z'()+_,-./:=?\x20]#;
   #i cte_default
   -default_media_type	=> 'text',
   -default_media_subtype	=> 'plain',
+  -linebreak_strict	=> 0,
   -media_type	=> 'multipart',
   -media_subtype	=> 'mixed',
   #output_epilogue
@@ -102,27 +103,26 @@ sub parse ($$;%) {
   my $body = shift;
   $self->_init (@_);
   my $b = $self->{boundary};
+  my $nl = "\x0D\x0A";
+  unless ($self->{option}->{strict_linebreak}) {
+    $nl = Message::Util::decide_newline ($body);
+  }
   if (length $b) {
-    $self->{value} = [ split /\x0D\x0A--\Q$b\E[\x09\x20]*\x0D\x0A/, $body ];
-    if (length $self->{value}->[0]) {
-      my @p = split /(?:\x0D\x0A)?--\Q$b\E[\x09\x20]*\x0D\x0A/, $self->{value}->[0], 2;
-      $self->{preamble} = $p[0];
-      if (length $p[1]) {
-        $self->{value}->[0] = $p[1];
-      } else { shift (@{$self->{value}}) }
-    }
+    $body = $nl . $body if $body =~ /^--\Q$b\E[\x09\x20]*$nl/s;
+    $self->{value} = [ split /$nl--\Q$b\E[\x09\x20]*$nl/s, $body ];
+    $self->{preamble} = shift (@{ $self->{value} });
     if (length $self->{value}->[-1]) {
-      my @p = split /\x0D\x0A--\Q$b\E--[\x09\x20]*(?:\x0D\x0A)?/, $self->{value}->[-1], 2;
+      my @p = split /$nl--\Q$b\E--[\x09\x20]*(?:$nl)?/s, $self->{value}->[-1], 2;
       $self->{value}->[-1] = $p[0];
       $self->{epilogue} = $p[1];
     }
   } else {
-    $self->{preamble} = [ $body ];
+    $self->{preamble} = $body;
   }
   if ($self->{option}->{parse_all}) {
-    $self->{value} = [map {
+    $self->{value} = [ map {
       $self->_parse_value (body_part => $_);
-    } @{$self->{value}}];
+    } @{ $self->{value} } ];
     $self->{preamble} = $self->_parse_value (preamble => $self->{preamble});
     $self->{epilogue} = $self->_parse_value (epilogue => $self->{epilogue});
   }
@@ -154,7 +154,8 @@ sub _item_match ($$\$\%\%) {
 ## Returns returned item value    \$item-value, \%option
 sub _item_return_value ($\$\%) {
   unless (ref ${$_[1]}) {
-    ${$_[1]} = $_[0]->_parse_value (body_part => ${$_[1]});
+    ${$_[1]} = $_[0]->_parse_value (body_part => ${$_[1]})
+      if $_[2]->{parse};
   }
   ${$_[1]};
 }
@@ -170,6 +171,44 @@ sub _item_new_value ($$\%) {
     $v->header->add ('content-id' => $key);
   }
   $v;
+}
+
+sub data_part ($;%) {
+  my $self = shift;
+  my %option = @_;
+  $option{-by} = 'index';
+  my $st = $self->{option}->{media_subtype};
+  if ($st eq 'signed' || $st eq 'appledouble') {
+    $self->item (0, @_);
+  } elsif ($st eq 'encrypted') {
+    $self->item (1, @_);
+  } else {
+    my $msg = qq{data_part: This method is not supported for $self->{option}->{media_type}/$st};
+    if ($option{-dont_croak}) {
+      Carp::carp $msg;
+    } else {
+      Carp::croak $msg;
+    }
+  }
+}
+
+sub control_part ($;%) {
+  my $self = shift;
+  my %option = @_;
+  $option{-by} = 'index';
+  my $st = $self->{option}->{media_subtype};
+  if ($st eq 'signed' || $st eq 'appledouble') {
+    $self->item (1, @_);
+  } elsif ($st eq 'encrypted') {
+    $self->item (0, @_);
+  } else {
+    my $msg = qq{control_part: This method is not supported for $self->{option}->{media_type}/$st};
+    if ($option{-dont_croak}) {
+      Carp::carp $msg;
+    } else {
+      Carp::croak $msg;
+    }
+  }
 }
 
 sub _add_array_check ($$\%) {
@@ -235,7 +274,14 @@ sub stringify ($;%) {
     }
   }
   if (ref $self->{header}) {
-    $self->{header}->field ('content-type')->parameter (boundary => $b);
+    my $ct = $self->{header}->field ('content-type');
+    my $mt = $ct->media_type;
+    $ct->replace (boundary => $b);
+    if ($mt eq 'multipart/signed') {
+      $ct->replace (protocol => scalar $self->{value}->[1]->content_type);
+    } elsif ($mt eq 'multipart/encrypted') {
+      $ct->replace (protocol => scalar $self->{value}->[0]->content_type);
+    }
   }
   $self->{preamble}."\x0D\x0A--".$b."\x0D\x0A".
   join ("\x0D\x0A--".$b."\x0D\x0A", @parts)
@@ -289,7 +335,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/16 10:44:08 $
+$Date: 2002/07/02 06:30:49 $
 
 =cut
 

@@ -1,3 +1,11 @@
+2002-07-02  Wakaba <w@suika.fam.cx>
+
+	* Multipart.pm:
+	- (parse): Call Message::Util::decide_newline.
+	- (data_part, control_part): New methods.
+	- (stringify): Set 'protocol' parameter of parent entity
+	if media type is message/signed or message/encrypted.
+
 2002-06-23  wakaba <w@suika.fam.cx>
 
 	* TextPlain.pm (stringify): Minimumize MIME charset name
