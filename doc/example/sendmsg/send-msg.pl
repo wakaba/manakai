@@ -1,6 +1,8 @@
 use strict;
-use vars qw($MYNAME $VERSION);
-$MYNAME = 'send.pl'; $VERSION = '2.4';
+use vars qw($MYNAME $MYVERSION $VERSION);
+$MYNAME = 'send.pl';
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$MYVERSION = qq{2.5.$VERSION};
 use lib qw(/home/wakaba/temp/msg/);
 use Message::Entity;
 use Message::Field::Date;
@@ -121,9 +123,10 @@ for my $file (@files) {
   }
   #my $jv=do{my @r=($jcode::rcsid=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
   $ua->add ('jcode.pl' => ['',$jcode::rcsid]);
-  $ua->add ($MYNAME => $VERSION);
+  $ua->add ($MYNAME => $MYVERSION);
   
-  $header->delete (qw(bcc date-received relay-version resent-bcc status x-envelope-from x-envelope-to xref));
+  $header->delete (qw(date-received relay-version status x-envelope-from x-envelope-to xref));
+  $header->option (field_sort => 'good-practice') unless $resent;
   
   my %sopt = (
     -fill_date	=> 0,	-fill_msgid	=> 0,
@@ -375,7 +378,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/26 06:38:53 $
+$Date: 2002/07/27 04:56:38 $
 
 =cut
 

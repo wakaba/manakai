@@ -1,3 +1,13 @@
+2002-07-27  Wakaba <w@suika.fam.cx>
+
+	* send-msg.pl:
+	- Don't remove Bcc: and Resent-Bcc: fields.
+	(But its field-body is still removed.)
+	- ($VERSION): Use CVS (RCS)'s value.
+	- ($MYVERSION): New value.
+	- Sort fields (by 'good-practice' order) unless the 
+	message is to be resent.
+
 2002-07-25  Wakaba <w@suika.fam.cx>
 
 	* ChangeLog: New file.
