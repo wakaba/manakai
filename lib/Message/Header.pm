@@ -51,6 +51,8 @@ The following methods construct new C<Message::Header> objects:
 
 =over 4
 
+=cut
+
 ## Initialize
 my %DEFAULT = (
   capitalize	=> 1,
@@ -90,34 +92,47 @@ $DEFAULT{field_type} = {
 	'max-forwards'	=> 'Message::Field::Numval',
 	'mime-version'	=> 'Message::Field::Numval',
 	'x-jsmail-priority'	=> 'Message::Field::Numval',
+	'x-mail-count'	=> 'Message::Field::Numval',
+	'x-ml-count'	=> 'Message::Field::Numval',
 	'x-priority'	=> 'Message::Field::Numval',
 	
 	path	=> 'Message::Field::Path',
 };
-for (qw(cancel-lock importance   precedence list-id
-  x-face x-mail-count x-msmail-priority x-priority xref))
+for (qw(archive cancel-lock content-features content-md5
+  disposition-notification-options encoding 
+  importance injector-info 
+  pics-label posted-and-mailed precedence list-id message-type 
+  original-recipient priority
+  sensitivity status x-face x-msmail-priority xref))
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Structured'}
-for (qw(approved bcc cc complaints-to
+  	## Not supported yet, but to be supported...
+for (qw(abuse-reports-to apparently-to approved approved-by bcc cc complaints-to
   delivered-to disposition-notification-to envelope-to
-  errors-to fcc from mail-followup-to mail-followup-cc 
-  mail-reply-to
-  notice-requested-upon-delivery-to reply-to resent-bcc
+  errors-to  from mail-copies-to mail-followup-to mail-reply-to
+  notice-requested-upon-delivery-to read-receipt-to register-mail-reply-requested-by 
+  reply-to resent-bcc
   resent-cc resent-to resent-from resent-sender return-path
-  return-receipt-to sender to x-approved x-beenthere
+  return-receipt-to return-receipt-requested-to sender to x-abuse-reports-to 
+  x-admin x-approved 
+  x-beenthere
+  x-confirm-reading-to
   x-complaints-to x-envelope-from x-envelope-sender
-  x-envelope-to x-ml-address x-ml-command x-ml-to x-nfrom x-nto))
+  x-envelope-to x-ml-address x-ml-command x-ml-to x-nfrom x-nto
+  x-rcpt-to x-sender x-x-sender))
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Address'}
 for (qw(date date-received delivery-date expires
-  expire-date nntp-posting-date posted reply-by resent-date x-tcup-date))
+  expire-date nntp-posting-date posted posted-date reply-by resent-date 
+  x-originalarrivaltime x-tcup-date))
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Date'}
 for (qw(article-updates client-date content-id in-reply-to message-id
-  references resent-message-id see-also supersedes))
+  obsoletes references replaces resent-message-id see-also supersedes))
   {$DEFAULT{field_type}->{$_} = 'Message::Field::MsgID'}
 for (qw(accept accept-charset accept-encoding accept-language
   content-language 
   content-transfer-encoding encrypted followup-to keywords 
   list-archive list-digest list-help list-owner
   list-post list-subscribe list-unsubscribe list-url uri newsgroups
+  posted-to
   x-brother x-daughter x-respect x-moe x-syster x-wife))
   {$DEFAULT{field_type}->{$_} = 'Message::Field::CSV'}
 for (qw(content-alias content-base content-location location referer
@@ -357,11 +372,13 @@ sub _field_body ($$$) {
             || $self->{option}->{field_type}->{':DEFAULT'};
     eval "require $type" or Carp::croak ("_field_body: $type: $@");
     unless ($body) {
-      $body = $type->new (-field_name => $name, 
-        -format => $self->{option}->{format});
+      $body = $type->new (-field_name => $name,
+        -format => $self->{option}->{format}
+        , field_name => $name, format => $self->{option}->{format});
     } else {
       $body = $type->parse ($body, -field_name => $name,
-        -format => $self->{option}->{format});
+        -format => $self->{option}->{format},
+         field_name => $name,format => $self->{option}->{format});
     }
   }
   $body;
@@ -381,11 +398,12 @@ sub field_name_list ($) {
   map {$_->{name}} @{$self->{field}};
 }
 
-=head2 $self->add ($field-name, $field-body, [$name, $body, ...])
+=item $hdr->add ($field-name, $field-body, [$name, $body, ...])
 
-Adds an new C<field>.  It is not checked whether
-the field which named $field_body is already exist or not.
-If you don't want duplicated C<field>s, use C<replace> method.
+Adds some field name/body pairs.  Even if there are
+one or more fields named given C<$field-name>,
+given name/body pairs are ADDed.  Use C<replace>
+to remove same-name-fields.
 
 Instead of field name-body pair, you might pass some options.
 Four options are available for this method.
@@ -471,8 +489,7 @@ Deletes C<field> named as $field_name.
 
 sub delete ($@) {
   my $self = shift;
-  my %delete;
-  for (@_) {$delete{lc $_} = 1}
+  my %delete;  for (@_) {$delete{lc $_} = 1}
   for my $field (@{$self->{field}}) {
     undef $field if $delete{$field->{name}};
   }
@@ -776,7 +793,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/05 14:56:26 $
+$Date: 2002/04/19 12:00:36 $
 
 =cut
 

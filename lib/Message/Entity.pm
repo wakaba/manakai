@@ -13,7 +13,7 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Header;
 require Message::Util;
@@ -292,23 +292,21 @@ sub _add_ua_field ($) {
   my $self = shift;
   if ($self->{option}->{add_ua}) {
     my $ua = $self->{header}->field ($self->{option}->{ua_field_name});
-    $ua->replace (name => 'Message-pm', version => $VERSION, add_prepend => -1);
+    $ua->replace ('Message-pm' => $VERSION, -prepend => 0);
     my @os;
     my @perl_comment;
     if ($self->{option}->{ua_use_config}) {
       eval q{use Config;
-        @os = (name => $^O, version => $Config{osvers}, add_prepend => -1);
+        @os = ($^O => $Config{osvers}, -prepend => 0);
         push @perl_comment, $Config{archname};
       };
     } else {
       push @perl_comment, $^O;
     }
     if ($^V) {	## 5.6 or later
-      $ua->replace (name => 'Perl', version => sprintf ('%vd', $^V),
-                    comment => [@perl_comment], add_prepend => -1);
+      $ua->replace (Perl => [sprintf ('%vd', $^V), @perl_comment], -prepend => 0);
     } elsif ($]) {	## Before 5.005
-      $ua->replace (name => 'Perl', version => $],
-                    comment => [@perl_comment], add_prepend => -1);
+      $ua->replace (Perl => [ $], @perl_comment], -prepend => 0);
     }
     $ua->replace (@os) if $self->{option}->{ua_use_config};
   }
@@ -419,7 +417,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/05 14:56:26 $
+$Date: 2002/04/19 12:00:36 $
 
 =cut
 

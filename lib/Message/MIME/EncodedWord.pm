@@ -13,8 +13,8 @@ package Message::MIME::EncodedWord;
 require 5.6.0;
 use strict;
 use re 'eval';
-use vars qw(%ENCODER %DECODER %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use vars qw(%ENCODER %DECODER %OPTION %REG $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::MIME::Charset;
 
 $REG{WSP} = qr/[\x09\x20]/;
@@ -26,6 +26,60 @@ $REG{attribute_char} = qr/[\x21\x23-\x24\x26\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\
 $REG{M_comment} = qr/\x28((?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x27\x2A-\x5B\x5D-\xFF]|(??{$REG{comment}}))*)\x29/;
 $REG{M_encoded_word} = qr/=\x3F($REG{attribute_char})(?:\x2A($REG{attribute_char}))?\x3F($REG{attribute_char})\x3F([\x21-\x3E\x40-\x7E]+)\x3F=/;
 $REG{S_encoded_word} = qr/=\x3F$REG{atext_dot}\x3F=/;
+
+=head1 OPTIONS
+
+=cut
+
+%OPTION = (
+	forcedecode	=> 1,
+);
+
+=over 4
+
+=item $Message::MIME::EncodedWord::OPTION{forcedecode} = 1/0
+
+When no charset decoder (See L<Message::MIME::Charset>)
+for C<ISO-8859-I<n>> is defined, and this option is TRUE, 
+decoding C<encoded-word> functions attempt to decode
+ASCII part of these charset.
+
+RFC 2047 says to support ASCII part of C<ISO-8859-I<n>> at least.
+This requirement is convinient for human users who see final rendering
+result.  But it is not appropriate to process message.
+
+Defalt value is C<1>, force decoding is enabled.
+
+=back
+
+=head2 Note
+
+Before you set new value for these options,
+C<Message::MIME::EncodedWord> should be loaded (C<require>ed).
+Other modules which use C<Message::MIME::EncodedWord>
+will automatically require this module, and this module
+will set initial (default) option value.
+
+Bad example:
+
+  #! perl
+  $Message::MIME::EncodedWord::OPTION{forcedecode} = 0;
+  use Message::Field::Subject;
+  my $subject = Message::Field::Subject->parse ($ARGV[0]);
+  	## At this time, M::F::Subject call M::M::EWord,
+  	## and $OPTION{forcedecode} is set C<1>, default value.
+
+Shold be:
+
+  #! perl
+  require Message::MIME::EncodedWord;
+  $Message::MIME::EncodedWord::OPTION{forcedecode} = 0;
+  use Message::Field::Subject;
+  my $subject = Message::Field::Subject->parse ($ARGV[0]);
+  	## At this time, M::F::Subject call M::M::EWord,
+  	## but perl takes no action since it has already loaded.
+
+=cut
 
 %DECODER = (
   '*DEFAULT'	=> sub {$_[1]},
@@ -42,9 +96,9 @@ sub decode ($) {
     if ($s[$i] =~ /^($REG{FWS})$REG{M_encoded_word}$/) {
       my ($t, $w) = ('', $1);
       ($t, $r[$i]) = (_decode_eword ($2, $3, $4, $5));
-      if ($r[$i] > 0) {
+      if ($r[$i]) {
         $s[$i] = $t;
-        if ($i == 0 || $r[$i-1] <= 0) {
+        if ($i == 0 || $r[$i-1] == 0) {
           $s[$i] = $w.$s[$i];
         }
       }
@@ -61,9 +115,9 @@ sub decode_ccontent ($$) {
     if ($s[$i] =~ /^($REG{FWS})$REG{M_encoded_word}$/) {
       my ($t, $w) = ('', $1);
       ($t, $r[$i]) = (_decode_eword ($2, $3, $4, $5));
-      if ($r[$i] > 0) {
+      if ($r[$i]) {
         $s[$i] = $t;
-        if ($i == 0 || $r[$i-1] <= 0) {
+        if ($i == 0 || $r[$i-1] == 0) {
           $s[$i] = $w.$s[$i];
         }
       }
@@ -82,11 +136,11 @@ sub decode_ccontent ($$) {
 sub _decode_eword ($$$$) {
   my ($charset, $lang, $encoding, $etext) = (shift, shift, lc shift, shift);
   $charset = Message::MIME::Charset::name_normalize ($charset);
-  my ($r,$s) = ('', -1);
+  my ($r,$s) = ('', 0);
   if (ref $DECODER{$encoding}) {
     $r = &{$DECODER{$encoding}} ($encoding, $etext);
     ($r,$s) = Message::MIME::Charset::decode ($charset, $r);
-    if ($s<0 && $charset =~ /^iso-8859-([0-9]+(?:-[ie])?)$/) {
+    if (!$s && $OPTION{forcedecode} && $charset =~ /^iso-8859-([0-9]+(?:-[ie])?)$/) {
       my $n = $1;
       $r =~ s{([\x09\x0A\x0D\x20]*[\x80-\xFF]+[\x09\x0A\x0D\x20]*)}{
         my $t = $1;
@@ -123,7 +177,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/26 15:19:53 $
+$Date: 2002/04/19 12:00:36 $
 
 =cut
 

@@ -12,7 +12,7 @@ Perl module for MIME charset.
 package Message::MIME::Charset;
 use strict;
 use vars qw(%ENCODER %DECODER %N11NTABLE %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 %ENCODER = (
   '*DEFAULT'	=> sub {$_[1]},
@@ -45,7 +45,7 @@ sub encode ($$) {
   if (ref $ENCODER{$charset}) {
     return (&{$ENCODER{$charset}} ($charset, $s), 1);
   }
-  ($s, -1);
+  ($s, 0);
 }
 
 sub decode ($$) {
@@ -53,7 +53,7 @@ sub decode ($$) {
   if (ref $DECODER{$charset}) {
     return (&{$DECODER{$charset}} ($charset, $s), 1);
   }
-  ($s, -1);
+  ($s, 0);
 }
 
 sub name_normalize ($) {
@@ -83,7 +83,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/25 10:17:04 $
+$Date: 2002/04/19 12:00:36 $
 
 =cut
 
