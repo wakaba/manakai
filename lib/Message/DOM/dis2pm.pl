@@ -93,7 +93,8 @@ sub perl_statement ($) {
 }
 
 sub perl_assign ($@) {
-  shift () . ' = ' . join ', ', @_;
+  my ($left, @right) = @_;
+  $left . ' = ' . (@right > 1 ? '(' . join (', ', @right) . ')' : $right[0]);
 }
 
 sub perl_name ($;%) {
@@ -184,7 +185,7 @@ sub perl_sub (%) {
   my %opt = @_;
   my $r = 'sub ';
   $r .= $opt{name} . ' ' if $opt{name};
-  $r .= '(' . $opt{prototype} . ') ' if $opt{prototype};
+  $r .= '(' . $opt{prototype} . ') ' if defined $opt{prototype};
   $r .= "{\n";
   $r .= $opt{code};
   $r .= "}\n";
@@ -192,9 +193,10 @@ sub perl_sub (%) {
 
 sub perl_var (%) {
   my %opt = @_;
-  my $r = $opt{type} || '';
-  $r .= perl_package_name %{$opt{package}} if $opt{package};
-  $r .= '::' . $opt{local_name};
+  my $r = $opt{type} || '';                   # $, @, *, &, $# or empty
+  $r = $opt{scope} . ' ' . $r if $opt{scope}; # my, our or local
+  $r .= perl_package_name (%{$opt{package}}) . '::' if $opt{package};
+  $r .= $opt{local_name};
   $r;
 }
 
@@ -205,6 +207,9 @@ $RegBlockContent = qr/(?>[^{}\\]*)(?>(?>[^{}\\]+|\\.|\{(??{$RegBlockContent})\})
 sub perl_code ($;%);
 sub perl_code ($;%) {
   my ($s, %opt) = @_;
+  $s =~ s/\bnull\b/undef/g;
+  $s =~ s/\btrue\b/1/g;
+  $s =~ s/\bfalse\b/0/g;
   $s =~ s{<Q:([^>]+)>}{           ## QName
     perl_literal (expanded_uri ($1));
   }ge;
@@ -242,6 +247,17 @@ sub perl_code ($;%) {
       } else {
         valid_err qq<Exception type and name required>;
       }      
+    } elsif ($name eq 'CODE') { # Built-in code
+      my ($nm, %param);
+      if ($data =~ s/^(\w+)\s*:\s*//) {
+        $nm = $1;
+      } else {
+        valid_err q<Built-in code name required>;
+      }
+      while ($data =~ /\G(\w+)\s*=>\s*(\w+)\s*(,\s*|$)/g) {
+        $param{$1} = $2;
+      }
+      $r = perl_builtin_code ($nm, %param);
     } elsif ($name eq 'FILE' or $name eq 'LINE' or $name eq 'PACKAGE') {
       $r = qq<__${name}__>;
     } else {
@@ -251,6 +267,40 @@ sub perl_code ($;%) {
   }goex;
   $s;
 }
+}
+
+sub perl_builtin_code ($%) {
+  my ($name, %opt) = @_;
+  my $r;
+  if ($name eq 'DOMString') {
+    $r = q{
+          if (defined $arg) {
+            if (ref $arg) {
+              if (ref $arg eq 'SCALAR') {
+                $r = bless {value => $$arg}, $self;
+              } elsif ($arg->isa ('IF')) {
+                $r = $arg;
+              } else {
+                $r = bless {value => ''.$arg}, $self;
+              }
+            } else {
+              $r = bless {value => $arg}, $self;
+            }
+          } else {
+            $r = bless {value => ''}, $self;
+          }
+    };
+    $opt{s} or valid_err q<Built-in code parameter "s" required>;
+    $r =~ s/\$arg\b/\$$opt{s}/g;
+    $opt{r} or valid_err q<Built-in code parameter "r" required>;
+    $r =~ s/\$r\b/\$$opt{r}/g;
+    $r =~ s/\$$opt{r} = \$$opt{s};/#/g if $opt{r} eq $opt{s};
+    $r =~ s/'IF'/perl_literal (perl_package_name (if => 'DOMString'))/ge;
+    $r =~ s/\$self\b/perl_literal (perl_package_name (name => 'DOMString'))/ge;
+  } else {
+    valid_err qq<Built-in code "$name" not defined>;
+  }
+  $r;
 }
 
 sub perl_code_source ($%) {
@@ -309,7 +359,11 @@ sub pod_block (@) {
 sub pod_head ($$) {
   my ($level, $s) = @_;
   $s =~ s/\s+/ /g;
-  '=head' . $level . ' ' . $s;
+  if ($level < 5) {
+    '=head' . $level . ' ' . $s;  ## pod has only head1-head4.
+  } else {
+    'B<' . $s . '>';
+  }
 }
 
 sub pod_list ($@) {
@@ -321,6 +375,13 @@ sub pod_item ($) {
   my ($s) = @_;
   $s =~ s/\s+/ /g;
   '=item ' . $s;
+}
+
+sub pod_pre ($) {
+  my $s = shift;
+  return '' unless defined $s;
+  $s =~ s/\n/\n  /g;
+  '  ' . $s;
 }
 
 sub pod_para ($) {
@@ -336,11 +397,8 @@ sub pod_paras ($) {
 
 sub pod_code ($) {
   my $s = shift;
-  if ($s =~ /[<>]/) {
-    return qq<C<<< $s >>>>;
-  } else {
-    return qq<C<$s>>;
-  }
+  $s =~ s/([<>])/{'<' => 'E<lt>', '>' => 'E<gt>'}->{$1}/ge;
+  qq<S<C<$s>>>;
 }
 
 
@@ -366,6 +424,20 @@ sub version_date ($) {
   my @time = gmtime shift;
   sprintf q<%04d%02d%02d.%02d%02d>,
           $time[5] + 1900, $time[4] + 1, @time[3,2,1];
+}
+
+{
+my $nest = 0;
+sub type_normalize ($);
+sub type_normalize ($) {
+  my ($uri) = @_;
+  $nest++ == 100 and valid_err q<Possible loop for DataTypeAlias of <$uri>>;
+  if ($Info->{DataTypeAlias}->{$uri}->{canon_uri}) {
+    $uri = type_normalize ($Info->{DataTypeAlias}->{$uri}->{canon_uri});
+  }
+  $nest--;
+  $uri;
+}
 }
 
 sub type_label ($) {
@@ -504,7 +576,7 @@ sub get_incase_label ($;%) {
       $label = $opt{is_pod} ? pod_code $label : $label;
     } else {
       $label = type_label expanded_uri $node->get_attribute_value
-                                              ('Type', default => '');
+                                              ('Type', default => 'DOMMain:any');
     }
   }
   $label;
@@ -627,11 +699,11 @@ sub if2perl ($) {
   $mod = ', that has been ' . $mod if $mod;
   my $result = pod_block
                pod_head ($Status->{depth}, 'Interface ' . pod_code $if_name),
-               pod_para (pod_code ($pack_name) .
+               pod_paras (get_description ($node)),
+               pod_para ('The package ' . pod_code ($pack_name) .
                          q< implements the DOM interface > .
-                         pod_code ($if_name) . $mod . q<.>),
-               pod_paras (get_description ($node));
-
+                         pod_code ($if_name) . $mod . q<.>);
+  
   my $version = perl_statement perl_assign 'our $VERSION', version_date time;
   for my $condition ((sort keys %{$Info->{Condition}}), '') {
     if ($condition =~ /^DOM(\d+)$/) {
@@ -656,13 +728,13 @@ sub if2perl ($) {
     }
     $result .= perl_inherit [$cond_int_pack_name, @isa] => $cond_pack_name;
     if ($condition) {
-      my @isa;
+      my @isaa;
       for (@{$Info->{Condition}->{$condition}->{ISA}}) {
-        push @isa, perl_package_name name => $if_name,
+        push @isaa, perl_package_name name => $if_name,
                                      condition => $_,
                                      is_internal => 1;
       }
-      $result .= perl_inherit [@isa, $cond_if_pack_name] => $cond_int_pack_name;
+      $result .= perl_inherit [@isaa, $cond_if_pack_name] => $cond_int_pack_name;
       $result .= perl_inherit [$if_pack_name] => $cond_if_pack_name;
     } else { ## No condition specified
       $result .= perl_inherit [perl_package_name name => $if_name,
@@ -768,24 +840,29 @@ sub method2perl ($;%) {
   my @param_list;
   my $param_prototype = '$';
   my @param_desc;
+  my @param_domstring;
   if ($node->get_attribute ('Param')) {
     for (@{$node->child_nodes}) {
       if ($_->local_name eq 'Param') {
         my $name = perl_name $_->get_attribute_value ('Name');
+        my $type = expanded_uri $_->get_attribute_value
+                                            ('Type',
+                                             default => 'DOMMain:any');
         push @param_list, '$' . $name;
-        push @param_desc, pod_item (pod_code '$' . $name),
+        push @param_desc, pod_item (pod_code '$' . $name);
+        if ($type eq ExpandedURI q<DOMMain:DOMString>) {
+          push @param_domstring, $name;
+        }
+        push my @param_desc_val,
+                          pod_item (type_label $type),
                           pod_para get_description $_;
         $param_prototype .= '$';
-        my @param_desc_val;
         for (@{$_->child_nodes}) {
           next unless $_->local_name eq 'InCase';
-          push @param_desc_val, pod_item ('Value: ' .
-                                          get_incase_label $_, is_pod => 1),
+          push @param_desc_val, pod_item (get_incase_label $_, is_pod => 1),
                                 pod_para (get_description $_);
         }
-        if (@param_desc_val) {
-          push @param_desc, pod_list 4, @param_desc_val;
-        }
+        push @param_desc, pod_list 4, @param_desc_val;
       }
     }
   }
@@ -798,7 +875,7 @@ sub method2perl ($;%) {
                          '$obj->' . $m_name .
                          ' (' . join (', ', @param_list) . ')')),
                pod_paras (get_description ($node)),
-               $level ? pod_para ('Method ' . pod_code ($m_name) .
+               $level ? pod_para ('The method ' . pod_code ($m_name) .
                            q< has been > . $level . '.') : ();
 
   if (@param_list) {
@@ -824,22 +901,40 @@ sub method2perl ($;%) {
     $code = perl_code_source (perl_code ($code_node->value,
                                          internal => sub {
                                            if ($int_code_node) {
-                                             $int_code_node->value;
+                                             perl_code $int_code_node->value;
                                            } else {
                                              valid_err "<IntDef> for $m_name" .
                                                        " required";
                                            }
                                          }),
                               path => $code_node->node_path (key => 'Name'));
-    $code = perl_statement (perl_assign 'my $r' => perl_literal '') .
-            $code .
-            perl_statement ('$r')
-      if $has_return;
-    $code = perl_statement (perl_assign 'my (' .
-                                        join (', ', '$self', @param_list) .
-                                        ')' => '@_') .
-            $code
-       if $code_node->get_attribute_value ('auto-argument', default => 1);
+    if ($has_return) {
+      $code = perl_statement (perl_assign 'my $r' => perl_literal '') .
+              $code;
+      if ($code_node->get_attribute_value ('cast-output', default => 1)) {
+        if (type_normalize
+              expanded_uri $return->get_attribute_value
+                                         ('Type',
+                                          default => q<DOMMain:any>)
+                  eq ExpandedURI q<DOMMain:DOMString>) {
+          $code .= perl_builtin_code 'DOMString',
+                                     s => 'r', r => 'r';
+        }
+      }
+      $code .= perl_statement ('$r');
+    }
+    if ($code_node->get_attribute_value ('auto-argument', default => 1)) {
+      if ($code_node->get_attribute_value ('cast-input', default => 1)) {
+        for (@param_domstring) {
+          $code = perl_builtin_code ('DOMString',
+                                     s => $_, r => $_) . $code;
+        }
+      }
+      $code = perl_statement (perl_assign 'my (' .
+                                          join (', ', '$self', @param_list) .
+                                          ')' => '@_') .
+              $code;
+    }
     if ($int_code_node) {
       $int_code = perl_code_source (perl_code ($int_code_node->value),
                                     path => $int_code_node->node_path
@@ -856,25 +951,17 @@ sub method2perl ($;%) {
     }
 
     if ($has_return) {
-      push @return, pod_item ('Returned Value: ' .
+      push @return, pod_item ('Return Value: ' .
                               type_label expanded_uri
-                                           $return->get_attribute_value
-                                                      ('Type', default => '')),
+                                     $return->get_attribute_value
+                                                ('Type',
+                                                 default => 'DOMMain:any')),
                     pod_para (get_description $return);
     }
     for (@{$return->child_nodes}) {
       next unless $_->local_name eq 'InCase';
-      my $label = $_->get_attribute_value ('Label', default => '');
-      unless (length $label) {
-        $label = $_->get_attribute_value ('Value', default => '');
-        if (length $label) {
-          $label = pod_code $label;
-        } else {
-          $label = type_label expanded_uri $_->get_attribute_value
-                                                 ('Type', default => '');
-        }
-      }
-      push @return, pod_item ('Returned Value: ' . $label),
+      push @return, pod_item ('Return Value: ' . get_incase_label $_,
+                                                                  is_pod => 1),
                     pod_para (get_description $_);
       $has_return++;
     }
@@ -928,10 +1015,17 @@ sub method2perl ($;%) {
                       code => $int_code
      if $int_code_node;
 
+  if (my $op = get_perl_definition_node $node, name => 'Operator') {
+    $Status->{Operator}->{$op->value} = '\\' . perl_var type => '&', 
+                                                        local_name => $m_name;
+  }
+
   $result;
 } # method2perl
 
 =head2 DataType element
+
+The C<DataType> element defines a datatype.
 
 =cut
 
@@ -943,6 +1037,7 @@ sub datatype2perl ($;%) {
                                  = perl_name $node->get_attribute_value ('Name'),
                                              ucfirst => 1;
   local $Status->{IF} = $if_name;
+  local $Status->{Operator} = {};
   my $result = perl_package full_name => $pack_name;
   $result .= perl_statement perl_assign 'our $VERSION', version_date time;
   $result .= perl_statement 'push our @ISA, ' .
@@ -954,13 +1049,13 @@ sub datatype2perl ($;%) {
                pod_head ($Status->{depth}, 'Type ' . pod_code $if_name),
                pod_paras (get_description ($node));
 
-## TODO: Def
-
   for (@{$node->child_nodes}) {
-    if ($_->local_name eq 'IntMethod') {
+    if ($_->local_name eq 'Method' or
+        $_->local_name eq 'IntMethod') {
       $result .= method2perl ($_, level => \@level, 
                               condition => $opt{condition});
-    } elsif ($_->local_name eq 'IntAttr') {
+    } elsif ($_->local_name eq 'Attr' or
+             $_->local_name eq 'IntAttr') {
       
     } elsif ($_->local_name eq 'ConstGroup') {
       $result .= constgroup2perl ($_, level => \@level, 
@@ -978,6 +1073,14 @@ sub datatype2perl ($;%) {
     }
   }
 
+  if (keys %{$Status->{Operator}}) {
+    $result .= perl_statement 'use overload ' .
+                   join (', ', map {(perl_literal ($_),
+                                     $Status->{Operator}->{$_})}
+                                   keys %{$Status->{Operator}}) . ', ' .
+                   perl_list fallback => 1;
+  }
+
   $result;
 } # datatype2perl
 
@@ -990,37 +1093,47 @@ sub constgroup2perl ($;%) {
   my @level = @{$opt{level} || []};
   my $mod = get_level_description $node, level => \@level;
   my $result = '';
+  my $consts = {};
 
   my $i = 0;
-  for (@{$node->child_nodes}) {
-    my $only_document = $opt{only_document} || 0;
-    unless ($_->node_type eq '#element' and
-            condition_match $_, level_default => \@level,
-                                condition => $opt{condition}) {
-      $only_document = 1;
-    }
-
-    if ($_->local_name eq 'ConstGroup') {
-      $result .= constgroup2perl ($_, level => \@level, 
-                                  condition => $opt{condition},
-                                  without_document => $opt{without_document},
-                                  only_document => $only_document,
-                                  package => $opt{package});
-      $i++;
-    } elsif ($_->local_name eq 'Const') {
-      $result .= const2perl ($_, level => \@level, condition => $opt{condition},
-                             without_document => $opt{without_document},
-                             only_document => $only_document,
-                             package => $opt{package});
-      $i++;
-    } elsif ({qw/Name 1 Spec 1 ISA 1 Description 1
-                 Level 1 Def 1/}->{$_->local_name}) {
-      #
-    } else {
-      valid_warn qq{Element @{[$_->local_name]} not supported};
+  {
+    local $Status->{EXPORT_OK} = $consts;
+    for (@{$node->child_nodes}) {
+      my $only_document = $opt{only_document} || 0;
+      unless ($_->node_type eq '#element' and
+              condition_match $_, level_default => \@level,
+                                  condition => $opt{condition}) {
+        $only_document = 1;
+      }
+      
+      if ($_->local_name eq 'ConstGroup') {
+        $result .= constgroup2perl ($_, level => \@level, 
+                                    condition => $opt{condition},
+                                    without_document => $opt{without_document},
+                                    only_document => $only_document,
+                                    package => $opt{package});
+        $i++;
+      } elsif ($_->local_name eq 'Const') {
+        $result .= const2perl ($_, level => \@level,
+                               condition => $opt{condition},
+                               without_document => $opt{without_document},
+                               only_document => $only_document,
+                               package => $opt{package});
+        $i++;
+      } elsif ({qw/Name 1 Spec 1 ISA 1 Description 1
+                   Level 1 Def 1/}->{$_->local_name}) {
+        #
+      } else {
+        valid_warn qq{Element @{[$_->local_name]} not supported};
+      }
     }
   }
-
+  
+  for (keys %$consts) {
+    $Status->{EXPORT_OK}->{$_} = 1;
+    $Status->{EXPORT_TAGS}->{$name}->{$_} = 1;
+  }
+    
   return $result if $opt{without_document};
 
   $result = pod_block
@@ -1030,7 +1143,10 @@ sub constgroup2perl ($;%) {
                     : ()),
                pod_para ('This constant group has ' .
                          english_number $i, singular => q<value.>,
-                                            plural => q<values.>)) .
+                                            plural => q<values.>),
+               pod_para ('To export all constant values in this group:'),
+               pod_pre (perl_statement "use $Info->{Package} qw/:$name/")
+              ) .
             $result;
 
   $result;
@@ -1050,7 +1166,9 @@ sub const2perl ($;%) {
                pod_paras (get_description ($node)),
                ($mod ? pod_para ('This constant value has been ' . $mod . '.')
                      : ()));
-## TODO:   push @desc,  'To export...
+
+  push @desc, pod_para ('To export this constant value:'),
+              pod_pre (perl_statement "use $Info->{Package} qw/$name/");
   
   my $result = '';
   unless ($opt{only_document}) {
@@ -1065,6 +1183,8 @@ sub const2perl ($;%) {
                    => '\&' . $longname
        if $opt{package} and $Info->{Package} ne $opt{package};
   }
+
+  $Status->{EXPORT_OK}->{$name} = 1;
 
   unless ($opt{without_document}) {
     $result = pod_block (@desc) . $result;
@@ -1135,8 +1255,8 @@ sub req2perl ($) {
           $s = 'require ' . (my $pack = perl_code $req->value);
           $Info->{uri_to_perl_package}->{$ns_uri} = $pack if $ns_uri;
         } elsif ($req = $def->get_attribute ('use')) {
-          $s = 'use ' . (my $pack = perl_code $req->value);
-          $Info->{uri_to_perl_package}->{$ns_uri} = $pack if $ns_uri;
+          $s = 'use ' . (my $pack_name = perl_code $req->value);
+          $Info->{uri_to_perl_package}->{$ns_uri} = $pack_name if $ns_uri;
         } elsif (defined ($s = $def->value)) {
           # 
         } else {
@@ -1326,6 +1446,8 @@ for my $node (@{$source->child_nodes}) {
     $result .= datatype2perl $node;
   } elsif ($node->local_name eq 'DataTypeAlias') {
     
+## TODO: $Info->{DataTypeAlias}->{ uri }->{canon_uri} = uri
+
   } elsif ($node->local_name eq 'ConstGroup') {
     $result .= constgroup2perl $node;
   } elsif ($node->local_name eq 'Const') {
@@ -1334,6 +1456,27 @@ for my $node (@{$source->child_nodes}) {
     #
   } else {
     valid_warn qq{Top-level element type "@{[$node->local_name]}" not supported};
+  }
+}
+
+## Exporter
+if (keys %{$Status->{EXPORT_OK}||{}}) {
+  $result .= perl_package full_name => $Info->{Package};
+  $result .= perl_statement 'require Exporter';
+  $result .= perl_inherit ['Exporter'];
+  $result .= perl_statement
+               perl_assign
+                    perl_var (type => '@', scope => 'our',
+                              local_name => 'EXPORT_OK')
+                 => '(' . perl_list (keys %{$Status->{EXPORT_OK}}) . ')';
+  if (keys %{$Status->{EXPORT_TAGS}||{}}) {
+    $result .= perl_statement
+                 perl_assign
+                       perl_var (type => '%', scope => 'our',
+                                 local_name => 'EXPORT_TAGS')
+                   => '(' . perl_list (map {
+                         $_ => [keys %{$Status->{EXPORT_TAGS}->{$_}}]
+                      } keys %{$Status->{EXPORT_TAGS}}) . ')';
   }
 }
 
@@ -1386,6 +1529,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/08/31 10:00:51 $
+# $Date: 2004/09/01 09:15:12 $
 
 

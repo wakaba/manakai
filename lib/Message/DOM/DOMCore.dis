@@ -32,7 +32,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/08/31 10:00:51 $
+     $Date: 2004/09/01 09:15:12 $
   @Require:
     @@Module:
       @@@Name: ManakaiDOM
@@ -42,14 +42,6 @@ Module:
       @@@Name: DOMMain
       @@@Namepsace:
         http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@use:
-          @@@@@@: __CLASS{DOMMain}__
-          @@@@@Import[list]:
-            :boolean
-            null
 
   @ConditionDef:
     @@Name: DOM1
@@ -102,6 +94,12 @@ Exception:
         @@@Name:  INDEX_SIZE_ERR
         @@@Type:  unsigned-short
         @@@Value:  1
+        @@@Param:
+          @@@@QName:
+            ManakaiDOMImplementationException:param-name
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: Parameter to which inappropriate value specified.
      @@Const:
         @@@Name:  DOMSTRING_SIZE_ERR
         @@@Type:  unsigned-short
@@ -682,7 +680,10 @@ IF:
         @@@Type:  boolean
   @Method:
      @@Name:  normalize
-     @@ModifiedLevel[list]:  3
+     @@Level[list]:
+       1
+       2
+       3
   @Method:
      @@Name:  isSupported
      @@Return:

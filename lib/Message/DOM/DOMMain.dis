@@ -29,7 +29,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/08/31 10:00:51 $
+     $Date: 2004/09/01 09:15:12 $
   @Require:
     @@Module:
       @@@Def:
@@ -40,7 +40,18 @@ Module:
         @@@@lang:en
         @@@@@: Perl operator overloading pragma.
     @@Module:
+      @@@Def:
+        @@@@require: Encode
+        @@@@Type: 
+          lang:Perl
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The Perl modules to convert character encoding.
+    @@Module:
       @@@Name: DOMMain
+      @@@Namespace:
+        http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
       @@@Def:
       @@@Def:
         @@@@Type: 
@@ -70,9 +81,15 @@ Module:
 
 DataType:
   @Name: any
+  @Description:
+    @@lang:en
+    @@@: Any data.
 
 DataType: 
   @Name: object
+  @Description:
+    @@lang:en
+    @@@: Any object.
 
 DataType:
   @Name: unsigned-long-long
@@ -80,6 +97,9 @@ DataType:
     @@Type: 
       lang:IDL-DOM
     @@@: unsigned long long
+  @Description:
+    @@lang:en
+    @@@: Unsigned long long integer.
 
 DataType:
   @Name: unsigned-long
@@ -87,9 +107,15 @@ DataType:
     @@Type: 
       lang:IDL-DOM
     @@@: unsigned long
+  @Description: 
+    @@lang:en
+    @@@: Unsigned long integer.
 
 DataType:
   @Name: long
+  @Description:
+    @@lang:en
+    @@@: Signed long integer.
 
 DataType:
   @Name: unsigned-short
@@ -97,18 +123,39 @@ DataType:
     @@Type: 
       lang:IDL-DOM
     @@@: unsigned short
+  @Description:
+    @@lang:en
+    @@@: Unsigned short integer.
 
 DataType:
   @Name: float
+  @Description:
+    @@lang:en
+    @@@: Floating point number.
 
 ConstGroup:
   @Name: boolean
+  @Description:
+    @@lang:en
+    @@@: Boolean value.
   @Const:
     @@Name: true
-    @@Value: 1
+    @@Value:
+      @@@@: 1
+      @@@Type:
+        lang:Perl
+    @@Description:
+      @@@lang:en
+      @@@@: Boolean true value.
   @Const:
     @@Name: false
-    @@Value: 0
+    @@Value:
+      @@@@: 0
+      @@@Type:
+        lang:Perl
+    @@Description:
+      @@@lang:en
+      @@@@: Boolean false value.
 
 ## Null value
 
@@ -119,6 +166,11 @@ Const:
     @@Type: 
       lang:Perl
     @@@: undef
+  @Description:
+    @@lang:en
+    @@@:
+       The null value.  Note that the null value is different from
+       the empty string or the zero number.
 
 ## Definition from DOM Core IDL
 
@@ -132,11 +184,535 @@ DataType:
     @@DOM3[list]:
       DOM3Core:core.html#ID-C74D1578
       DOM3Core:core.html#ID-5DFED1F0-h3
+  @Description:
+    @@lang:en
+    @@@: The DOMString type is used to store Unicode characters.
+  @IntMethod:
+    @@Name: new
+    @@Description:
+      @@@lang:en
+      @@@@: Return a new instance of the DOMString.
+    @@Param:
+      @@@Name: arg
+      @@@Type: any
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The initial value of the DOMString.
+      @@@InCase:
+        @@@@Value: null
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The initial value is the empty string.
+      @@@InCase:
+        @@@@Type: DOMString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The same DOMString is returned.  To copy DOMString,
+            use the internal method clone.
+      @@@InCase:
+        @@@@Label: reference to the scalar value
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The initial value is the scalar value referred.
+    @@Return:
+      @@@Type: DOMString
+      @@@Description:
+        @@@@lang:en
+        @@@@@: A new DOMString.
+      @@@Def:
+        @@@@Type: 
+          lang:Perl
+        @@@@cast-output: 0
+        @@@@@:
+          __CODE{DOMString: s => arg, r => r}__;
+  @IntAttr:
+    @@Name: value
+    @@Description:
+      @@lang:en
+      @@@: The string as the language native value.
+    @@Get:
+      @@@Type: any
+      @@@Def:
+        @@@@Type: 
+          lang:Perl
+        @@@@@: $r = $self->{value};
+      @@@Operator:
+        @@@@Type:
+          lang:Perl
+        @@@@@: ""
+    @@Set:
+      @@@Type: any
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@: $self->{value} = $given;
+  @IntAttr:
+    @@Name: valueUTF16BE
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The string represented in UTF-16BE encoding.
+    @@Get:
+      @@@Type: any
+      @@@Def:
+        @@@@Type: 
+          lang:Perl
+        @@@@@:
+          $r = Encode::encode ('UTF-16BE', $self->{value});
+    @@Set:
+      @@@Type: any
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $self->{value} = Encode::decode ('UTF-16BE', $given);
+  @Attr:
+    @@Name: length
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The number of 16-bit units (i.e. the number of octets
+        in the UTF-16BE representation of the string).
+        \
+        This attribute is taken from the DOM CharacterData interface.
+    @@Get:
+      @@@Type: unsignedLong
+      @@@InCase:
+        @@@@Value: 0
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The DOMString is empty.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          #$r = length ($self->__INT{valueUTF16BE}__) / 2;
+          $r = length $self->{value};
+          while ($self->{value} =~ /[\x{10000}-\x{10FFFF}]/g) {
+            $r++;
+          }
+  @IntMethod:
+    @@Name: append
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Append the string to the end of the DOMString.
+      \
+        This method is taken from the method appendData in the
+        DOM interface CharacterData.
+    @@Operator:
+      @@@@: .=
+      @@@Type: 
+        lang:Perl
+    @@Param:
+      @@@Name: arg
+      @@@Type: DOMString
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The DOMString to append.
+    @@Return:
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@cast-input: 0
+        @@@@@: $self->{value} .= $arg;
+  @IntMethod:
+    @@Name: setCurrentPosition
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Set current position in the DOMString.
+    @@Param:
+      @@@Name: offset
+      @@@Type: unsigned-long
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The offset of 16-bit units to which current position is set.
+        \
+          The value of this parameter MUST NOT be a negative number and
+          MUST NOT be greater than the number of 16-bit units,
+          otherwise the result is undefined.
+    @@Return:
+      @@@Exception:
+        @@@@Type: 
+          ManakaiDOM:ManakaiDOMImplementationException
+        @@@@Name: MDOM_INDEX_IN_SURROGATE_PAIR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The offset points the middle of the surrogate pair.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          use integer;
+          pos ($self->{value}) = 0;
+          while ($offset and pos $self->{value} <= length $self->{value}) {
+            if ($self->{value} =~ /[^\x{10000}-\x{10FFFF}]{1,$offset}/gc) {
+              $offset -= $+[0] - $-[0];
+            } elsif ($self->{value}
+                               =~ m{[\x{10000}-\x{10FFFF}]{1,$offset/2}}gc) {
+              $offset -= 2 * ($+[0] - $-[0]);
+              if ($offset < 0) {
+                __EXCEPTION{
+                  ManakaiDOMImplementationException.
+                    MDOM_DOMSTRING_INDEX_IN_SURROGATE_PAIR:
+                  <Q:ManakaiDOMImplementationException:param-name>
+                    => 'offset',
+                }__;
+              }
+            } else {
+              __EXCEPTION{
+                ManakaiDOMImplementationException.MDOM_DEBUG_BUG:
+                <Q:ManakaiDOMImplementationException:values> => {
+                  count => $offset,
+                  position => 1,
+                },
+              }__;
+            }                
+          }
+  @IntMethod:
+    @@Name: delete
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Remove a range of 16-bit units from the DOMString.
+      \
+        This method is taken from the method deleteData in
+        the DOM interface CharacterData.
+    @@Param:
+      @@@Name: offset
+      @@@Type: unsigned-long
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The offset from which to start removing.
+    @@Param:
+      @@@Name: count
+      @@@Type: unsigned-long
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The number of 16-bit units to delete.  If the sum of the
+          parameters offset and count exceeds the length of the
+          DOMString then all 16-bit units from offset to the end
+          of the DOMString are deleted.
+    @@Return:
+      @@@Exception:
+        @@@@Type: DOMException
+        @@@@Name: INDEX_SIZE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Raised if the specified offset is negative or greater than
+            the number of 16-bit units in the DOMString, or the specified
+            count is negative.
+      @@@Exception:
+        @@@@Type: 
+          ManakaiDOM:ManakaiDOMImplementationException
+        @@@@Name: MDOM_INDEX_IN_SURROGATE_PAIR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The offset points the middle of the surrogate pair.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          __DEEP{
+            $self->__INT{replace}__ ($offset, $count, '');
+          }__;
+  @IntMethod:
+    @@Name: insert
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Insert a string at the specified 16-bit unit offset.
+      \
+        This method is taken from the method insertData in
+        the DOM interface CharacterData.
+    @@Param:
+      @@@Name: offset
+      @@@Type: unsigned-long
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The offset from which to insert.
+    @@Param:
+      @@@Name: arg
+      @@@Type: DOMString
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The DOMString to insert.
+    @@Return:
+      @@@Exception:
+        @@@@Type: DOMException
+        @@@@Name: INDEX_SIZE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Raised if the specified offset is negative or greater than
+            the number of 16-bit units in the DOMString.
+      @@@Exception:
+        @@@@Type: 
+          ManakaiDOM:ManakaiDOMImplementationException
+        @@@@Name: MDOM_INDEX_IN_SURROGATE_PAIR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The offset points the middle of the surrogate pair.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@cast-input: 0
+        @@@@@:
+          if ($offset < 0 or $offset > length $self->{value} or
+              $offset > $self->__INT{length}__) {
+            __EXCEPTION{DOMException.INDEX_SIZE_ERR:
+              <Q:ManakaiDOMImplementationException:param-name> => 'offset',
+            }__;
+          }
+          __INT__;
+      @@@IntDef:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          unless ($self->{value} =~ /[\x{10000}-\x{10FFFF}]/) {
+            substr ($self->{value}, $offset, 0) = $arg;
+          } else {
+            unless (substr ($self->{value}, 0, $offset)
+                                 =~ /[\x{10000}-\x{10FFFF}]/) {
+              substr ($self->{value}, $offset, 0) = $arg;
+            } else { # Non-BMP chars before $offset
+              __DEEP{
+                $self->__INT{setCurrentPosition}__ ($offset);
+              }__;
+              substr ($self->{value}, pos $self->{value}, 0) = $arg;
+            }
+          }
+  @IntMethod:
+    @@Name: replace
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Replace a range of 16-bit units with the specified string.
+      \
+        This method is taken from the method replaceData in
+        the DOM interface CharacterData.
+    @@Param:
+      @@@Name: offset
+      @@@Type: unsigned-long
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The offset from which to start replacing.
+    @@Param:
+      @@@Name: count
+      @@@Type: unsigned-long
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The number of 16-bit units to replace.  If the sum of the
+          parameters offset and count exceeds the length of the
+          DOMString then all 16-bit units from offset to the end
+          of the DOMString are replaced.
+    @@Param:
+      @@@Name: arg
+      @@@Type: DOMString
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The DOMString with which the range is replaced.
+    @@Return:
+      @@@Exception:
+        @@@@Type: DOMException
+        @@@@Name: INDEX_SIZE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Raised if the specified offset is negative or greater than
+            the number of 16-bit units in the DOMString, or the specified
+            count is negative.
+      @@@Exception:
+        @@@@Type: 
+          ManakaiDOM:ManakaiDOMImplementationException
+        @@@@Name: MDOM_INDEX_IN_SURROGATE_PAIR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The offset points the middle of the surrogate pair.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@cast-input: 0
+        @@@@@:
+          if ($offset < 0 or $offset > length $self->{value} or
+              $offset > $self->__INT{length}__) {
+            __EXCEPTION{DOMException.INDEX_SIZE_ERR:
+              <Q:ManakaiDOMImplementationException:param-name> => 'offset',
+            }__;
+          }
+          if ($count < 0) {
+            __EXCEPTION{DOMException.INDEX_SIZE_ERR:
+              <Q:ManakaiDOMImplementationException:param-name> => 'count',
+            }__;
+          }
+          __INT__;
+      @@@IntDef:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+        REPLACE: {
+          unless ($self->{value} =~ /[\x{10000}-\x{10FFFF}]/) {
+            substr ($self->{value}, $offset, $count) = $arg;
+            last REPLACE;
+          } else {
+            unless (substr ($self->{value}, 0, $offset)
+                                 =~ /[\x{10000}-\x{10FFFF}]/) {
+              unless (substr ($self->{value}, $offset, $count)
+                                 =~ /[\x{10000}-\x{10FFFF}]/) {
+                substr ($self->{value}, $offset, $count) = $arg;
+                last REPLACE;
+              } elsif (length $self->{value} < $offset + $count) {
+                substr ($self->{value}, $offset) = $arg;
+                last REPLACE;
+              } else {
+                pos ($self->{value}) = $offset;
+              }
+            } else { # Non-BMP chars before $offset
+              __DEEP{
+                $self->__INT{setCurrentPosition}__ ($offset);
+              }__;
+            }
+          }
+          use integer;
+          my $s = substr ($self->{value}, pos $self->{value});
+          while ($count) {
+            if ($s =~ s/[^\x{10000}-\x{10FFFF}]{1,$count}//) {
+              $count -= $+[0] - $-[0];
+            } elsif ($s =~ s{[\x{10000}-\x{10FFFF}]{1,$count/2}}{}) {
+              $count -= 2 * ($+[0] - $-[0]);
+              if ($count < 0) {
+                __EXCEPTION{
+                  ManakaiDOMImplementationException.
+                          MDOM_DOMSTRING_INDEX_IN_SURROGATE_PAIR:
+                  <Q:ManakaiDOMImplementationException:param-name>
+                          => 'count',
+                }__;
+              }
+            } else {
+              __EXCEPTION{
+                ManakaiDOMImplementationException.MDOM_DEBUG_BUG:
+                <Q:ManakaiDOMImplementationException:values> => {
+                        count => $count,
+                        position => 1,
+                },
+              }__;
+            }
+           }
+           substr ($self->{value}, pos $self->{value}) = $arg . $s;
+        } # REPLACE
+  @IntMethod:
+    @@Name: substring
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Extract a range of 16-bit units.
+      \
+        This method is taken from the method substringData in
+        the DOM interface CharacterData.
+    @@Param:
+      @@@Name: offset
+      @@@Type: unsigned-long
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The offset from which to start extract.
+    @@Param:
+      @@@Name: count
+      @@@Type: unsigned-long
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The number of 16-bit units to extract.  If the sum of the
+          parameters offset and count exceeds the length of the
+          DOMString then all 16-bit units from offset to the end
+          of the DOMString are returned.
+    @@Return:
+      @@@Type: DOMString
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The specified substring.
+      @@@Exception:
+        @@@@Type: DOMException
+        @@@@Name: INDEX_SIZE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The specified offset is negative or greater than
+            the number of 16-bit units in the DOMString, or the specified
+            count is negative.
+      @@@Exception:
+        @@@@Type: DOMException
+        @@@@Name: DOMSTRING_SIZE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The specified range does not fit into a DOMString.
+      @@@Exception:
+        @@@@Type: 
+          ManakaiDOM:ManakaiDOMImplementationException
+        @@@@Name: MDOM_INDEX_IN_SURROGATE_PAIR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The offset points the middle of the surrogate pair.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          if ($offset < 0 or $offset > length $self->{value} or
+              $offset > $self->__INT{length}__) {
+            __EXCEPTION{DOMException.INDEX_SIZE_ERR:
+              <Q:ManakaiDOMImplementationException:param-name> => 'offset',
+            }__;
+          }
+          if ($count < 0) {
+            __EXCEPTION{DOMException.INDEX_SIZE_ERR:
+              <Q:ManakaiDOMImplementationException:param-name> => 'count',
+            }__;
+          }
+          __INT__;
+      @@@IntDef:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+        SUBSTR: {
+          unless ($self->{value} =~ /[\x{10000}-\x{10FFFF}]/) {
+            $r = substr ($self->{value}, $offset, $count);
+            last SUBSTR;
+          } else {
+            unless (substr ($self->{value}, 0, $offset)
+                                 =~ /[\x{10000}-\x{10FFFF}]/) {
+              unless (substr ($self->{value}, $offset, $count)
+                                 =~ /[\x{10000}-\x{10FFFF}]/) {
+                $r = substr ($self->{value}, $offset, $count);
+                last SUBSTR;
+              } elsif (length $self->{value} < $offset + $count) {
+                $r = substr ($self->{value}, $offset);
+                last SUBSTR;
+              } else {
+                pos ($self->{value}) = $offset;
+              }
+            } else { # Non-BMP chars before $offset
+              __DEEP{
+                $self->__INT{setCurrentPosition}__ ($offset);
+              }__;
+            }
+          }
+          my $start = pos $self->{value};
+          __DEEP{
+            $self->__INT{setCurrentPosition}__ ($offset + $count);
+          }__;
+          $r = substr $self->{value}, $start, pos ($self->{value}) - $start;
+        } # SUBSTR
   @IntMethod:
     @@Name: isFullyNormalized
     @@Description:
-      @@lang:en
-      @@@:
+      @@@lang:en
+      @@@@:
         In DOM 3, characters are fully normalized as defined in appendix B of XML
         1.1 if (a) the param "normalize-characters" was set to "true" while
         loading the document or the document was certified as defined in XML 1.1 or
@@ -187,8 +763,9 @@ DataType:
       @@@Def:
         @@@@Type:
           lang:Perl
+        @@@@cast-input: 0
         @@@@@:
-          $r = $str eq $self;
+          $r = $str eq $self->{value};
 
 DataType:
   @Name:  DOMTimeStamp
@@ -205,7 +782,7 @@ DataType:
     @@Description:
       @@@lang:en
       @@@@:
-        Defined as a reference in Perl binding.
+        Defined as a reference in the Perl binding.
   @Spec:
     @@DOM3[list]:
       DOM3Core:core.html#Core-DOMTimeStamp
@@ -282,13 +859,18 @@ IF:
       DOM3Core:core.html#Bootstrap
       DOM3Core:java-binding.html#Level-3-Java-Binding-Extension
       DOM3Core:ecma-script-binding.html#Level-3-ECMAScript-Binding-Extension
+  @Description:
+    @@lang:en
+    @@@:
+      A language binding dependent bootstrap object for
+      DOMImplementations.
   @Method:
     @@Name: newInstance
     @@Description:
       @@@lang:en
       @@@@:
         Construct a new instance of DOMImplementationRegistry
-        (Taken from DOM Java Binding).
+        (Taken from the DOM Java Binding).
         \
         The DOMImplementationRegistry
         is initialized by application or implementation, depenging on
@@ -302,6 +884,9 @@ IF:
         instanciated.
     @@Return:
       @@@Type: DOMImplementationRegistry
+      @@@Description:
+        @@@@lang:en
+        @@@@@: An instance of the DOMImplementationRegistry.
       @@@Def:
         @@@@Type:
           lang:Perl
@@ -363,7 +948,7 @@ IF:
       @@@lang:en
       @@@@:
         Add a DOMImplementationSource to the list.
-        (Taken from DOM Java Binding.)
+        (Taken from the DOM Java Binding.)
     @@Param:
       @@@Name: s
       @@@Type: DOMImplementationSource

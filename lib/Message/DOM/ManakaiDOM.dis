@@ -22,7 +22,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/08/30 07:53:48 $
+     $Date: 2004/09/01 09:15:12 $
 
   @Require:
     @@Module:
@@ -33,6 +33,8 @@ Module:
           Message::Util::Error
     @@Module:
       @@@Name: ManakaiDOM
+      @@@Namespace:
+        http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
       @@@Def:
         @@@@Type:
           lang:Perl
@@ -43,6 +45,8 @@ Module:
         @@@@@: Dummy.
     @@Module:
       @@@Name: DOMCore
+      @@@Namespace:
+        http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
       @@@Def:
         @@@@Type:
           lang:Perl
@@ -76,10 +80,12 @@ Exception:
 
     @@Const:
       @@@Name: PARAM_INVALID_CLASS
+      @@@Type: unsigned-long
+      @@@Value: 0
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The perameter value must be of some class,
+          The perameter value must be of some class (interface),
           but given value does not.
       @@@Param:
         @@@@QName:
@@ -92,6 +98,8 @@ Exception:
 
     @@Const:
       @@@Name: PARAM_NULL_POINTER
+      @@@Type: unsigned-long
+      @@@Value: 1
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -99,17 +107,49 @@ Exception:
       @@@Param:
         @@@@QName:
           ManakaiDOMImplementationException:param-name
-        @@@@Type:
-          perl:SV
         @@@@Description:
           @@@@@lang:en
-          @@@@@@: Parameter name.            
+          @@@@@@: Parameter name.
+
+    @@Const:
+      @@@Name: MDOM_DOMSTRING_INDEX_IN_SURROGATE_PAIR
+      @@@Type: unsigned-long
+      @@@Value: 2
+      @@@Description:
+        @@@@lang:en
+        @@@@@: 
+          The specified index points between the high surrogate and
+          the low surrogate.
+      @@@Param:
+        @@@@QName:
+          ManakaiDOMImplementationException:param-name
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The parameter to which inappropriate value is specified.
+
+    @@Const:
+      @@@Name: MDOM_DEBUG_BUG
+      @@@Type: unsigned-long
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Unexpected case occurs.
+      @@@Param:
+        @@@@QName:
+          ManakaiDOMImplementationException:values
+        @@@@Type: 
+          Perl:hash
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: Arbitrary values for debugging.
 
   @ConstGroup:
     @@Name: ManakaiDOMImplementationWarningCode
     
     @@Const:
       @@@Name: ATTR_SET_NO_EFFECT
+      @@@Type: unsigned-long
+      @@@Value: 0
       @@@Description:
         @@@@lang:en
         @@@@@:

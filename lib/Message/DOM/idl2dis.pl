@@ -166,14 +166,13 @@ sub level ($) {
   my $n = shift;
   if ($LastComment =~ /Introduced in DOM Level (\d+)/) {
     my $l = $1;
-    my $p = $n->get_attribute_value ('Level', default => []);
-    $p = [$p] unless ref $p;
+    my $p = $n->get_attribute_value ('Level', default => [], as_array => 1);
     $n->set_attribute (Level => [@$p, $l]);
   } elsif ($LastComment =~ /Modified in DOM Level (\d+)/) {
     my $l = $1;
-    my $p = $n->get_attribute_value ('ModifiedLevel', default => []);
-    $p = [$p] unless ref $p;
-    $n->set_attribute (ModifiedLevel => [@$p, $l]);
+    my $p = $n->get_attribute_value ('Level', default => [':: TBD ::'],
+                                     as_array => 1);
+    $n->set_attribute (Level => [@$p, $l]);
   }
 }
 
@@ -253,7 +252,7 @@ for my $module ($tree->append_new_node (type => '#element',
   $module->set_attribute (Name => q<## TBD ##>);
   $module->set_attribute (Namespace => q<:: TBD ::>);
   $module->set_attribute (License => q<license:Perl>);
-  $module->set_attribute ('Date.RCS' => q<$Date: 2004/08/31 10:00:51 $>);
+  $module->set_attribute ('Date.RCS' => q<$Date: 2004/09/01 09:15:12 $>);
 }
 
 fws $s;
