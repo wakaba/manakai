@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="iso-2022-jp"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+   "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xml:lang="ja" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title xml:lang="en">Message::* Perl modules</title>
+<link rel="index" href="./" />
+<?xml-stylesheet href="/s/simpledoc"?>
+<link rel="stylesheet" href="/s/simpledoc" />
+<link rev="made" href="mailto:w@suika.fam.cx" />
+<link rel="copyright" href="/c/pd" title="Public Domain." />
+<meta name="author" content="若葉" />
+<meta name="keywords" content="Perl, module, pm, Message, RFC 822, RFC 2822, RFC 1036, son-of-RFC 1036, MIME, Usefor, HTTP, CGI, header, field" />
+</head>
+<body>
+<h1>Message::* Perl modules</h1>
+
+<h2>はじめのはじめに</h2>
+
+<p>たとえば Perl で書かれた CGI script, それも掲示板なんかには、
+こんなくだらない code が載っていたりします。</p>
+
+<pre class="application-x-perl">
+jcode'convert(*from, "jis");
+jcode'convert(*subject, "jis");
+jcode'convert(*message, "jis");
+open (MAIL, "| $sendmail");
+print MAIL "From: $mail ($from)\n";
+print MAIL "To: $mailto\n";
+print MAIL "Subject: $subject\n";
+print MAIL "\n";
+print MAIL "$message";
+print MAIL "\n";
+close (MAIL);
+</pre>
+
+<p>これでは視認性も良くないですし、うっかり修正し間違えると
+変なメッセージを送信してしまいます。
+(筆者はしょっちゅうはまってました:-)
+(それに多くの code では、
+HTML でのクロスサイトスクリプティング (CSS) 問題と
+類似の問題への対処をしていません。)</p>
+
+<p>オブジェクト指向を取り入れて次のような感じでメッセージを
+構成したいところです。</p>
+
+<pre class="application-x-perl">
+use Message::Entity;
+my $msg = new Message::Entity;
+my $hdr = $msg-&gt;header;
+$hdr-&gt;add ('From')-&gt;add ('me@bar.example');
+$hdr-&gt;add ('To')-&gt;add ('foo@bar.example', display_name =&gt; 'Mr. foo');
+$hdr-&gt;add ('Subject' =&gt; $subject);
+$msg-&gt;body ($body);
+
+# $smtp->send は SMTP で送信する method と仮定。
+$smtp->send ($msg);
+</pre>
+
+<p><a href="http://www.cpan.org/" xml:lang="en">CPAN</a> を探すと、
+これに似たようなことができそうなモジュールはあるようですが、
+実際に使ってみると、与える値によっては <a href="urn:ietf:rfc:822">RFC 822</a>/<a href="urn:ietf:rfc:2822">2822</a> に違反する
+結果を出力するなどの不満があります。 (例えば今の例で
+<code xml:lang="en">To:</code> 領域に使っている
+<code xml:lang="en">display_name</code> で「.」が含まれますが、
+RFC 2822 的には新しいメッセージでは互換性のため
+<code xml:lang="en" class="bnf rfc2822">quoted-string</code>
+にする必要があります。しかしそのまま出力されます。)</p>
+
+<p class="note">参考: 「.」の場合は RFC 2822 的には正しく解釈
+されなければなりませんが (出力はすべきでない)、
+これ以外の文字、例えば制御文字 ESCAPE でも同じようになります。
+こちらは完全に間違いです。</p>
+<p class="note">参考: 実装方針としては不正な値はモジュールに
+渡す前に弾くべきという考え方もあるでしょう。
+でもそんなのは不便です。</p>
+
+<p>ということで、はじめは既存のモジュールの wrapper (あるいは補完) 
+を書くつもりでしたが、なんだかごちゃごちゃしていて、
+それなら車輪の再発明になっても一から書いてみようと考えました。</p>
+
+<h2>実装状況</h2>
+
+<ol>
+<li>RFC 822, RFC 2822 の頭領域 (<code class="bnf rfc2822">header</code> <code class="rfc2822">field</code>) を解釈出来ます。</li>
+<li>電子ニュース (<a href="urn:ietf:rfc:1036">RFC 1036</a> など), MIME, その他の追加頭領域の幾つかを解釈出来ます。</li>
+<li>RFC 822/2822 の <code class="bnf rfc2822">group</code> なメイル・アドレスの領域内容を解釈出来ます。</li>
+<li>日付形式では RFC 822/<a href="urn:ietf:rfc:1123">1123</a>, <a href="urn:ietf:rfc:733">RFC 733</a>, asctime, ISO 8601 (HTTP) などに対応。他の用途に転用出来ます。</li>
+<li><a href="urn:ietf:id:draft-ietf-usefor-msg-id-alt-00">draft-ietf-usefor-msg-id-alt-00</a> に基づいた送信アドレスなどによる <code class="rfc2822">Message-ID</code> を生成出来ます。</li>
+<li>まだ解釈出来ない構造化 (<code class="rfc2822">structured</code>) 頭領域について、表示のために <code class="bnf rfc2822">quoted-pair</code> を unquote して値を返すなど出来ます。</li>
+<li>MIME 本体 (<code class="bnf rfc822">body</code>) にはまだ対応していません。 (<code class="media-type">text/plain</code> <code class="mime-cte">8bit</code> 固定)</li>
+<li>説明はまだ不備です。各モジュールに pod で説明が入っていますが、
+抜けていたり実態に合っていなかったりもします。
+今の段階では code そのものが簡単に理解出来るとは思いますが。</li>
+</ol>
+
+<h2>今後の予定</h2>
+
+<ol>
+<li>電子ニュースの頭領域 (RFC 1036, son-of-RFC1036, draft-usefor) の実装</li>
+<li>MIME の頭領域の実装。</li>
+<li>追加/非標準の頭領域の実装。</li>
+<li>MIME 本体 (<code class="bnf rfc822">body</code>) の実装。</li>
+<li>文字符号変換のための hook の実装?</li>
+<li>documentation。</li>
+<li>使用例の作成。</li>
+</ol>
+
+<h2>入手</h2>
+
+<p>suika.fam.cx の SSH account をお持ちの場合、 CVS から入手出来ます。</p>
+
+<p class="example">$ cvs -d :ext:<var xml:lang="en">username</var>@suika.fam.cx:/home/cvs -d perl/lib/Message/</p>
+
+<p>Web からも取り出せます。 &lt;<a href="/gate/cvs/perl/lib/Message/">http://suika.fam.cx/gate/cvs/perl/lib/Message/</a>&gt; (tarball で一括取得も出来ます。)</p>
+
+<h2>ライセンス</h2>
+
+<p>Message::* Perl modules は自由ソフトウェアです。
+GNU GPL に従って利用出来ます。詳しくは各ファイルを御覧下さい。</p>
+
+<h2>参考文献</h2>
+
+<ul>
+<li><a href="spec/">関連する仕様書 (RFC, Internet-Draft 等)</a></li>
+</ul>
+
+<div class="navigation">
+[<a href="/" title="このサーバーの首頁">/</a>
+<a href="/map" title="このサーバーの案内" rel="index">地図</a>
+<a href="/search/" title="このサーバーの検索">検索</a>]
+<a href="http://validator.w3.org/check/referer" xml:lang="en"><img
+        src="http://www.w3.org/Icons/valid-xhtml11" id="w3c-html"
+        alt="Valid XHTML 1.1!" style="height: 31px; width: 88px" /></a>
+<a href="http://jigsaw.w3.org/css-validator/validator?uri=http://suika.fam.cx/~wakaba/Message-pm/introduction.ja.html" xml:lang="en">
+  <img style="width: 88px; height: 31px" id="w3c-css"
+       src="http://jigsaw.w3.org/css-validator/images/vcss" 
+       alt="Valid CSS!" /></a>
+</div>
+<div class="update">$date: $</div>
+<ul class="myuri">
+<li>&lt;URL:<a href="http://suika.fam.cx/~wakaba/Message-pm/introduction">http://suika.fam.cx/~wakaba/Message-pm/introduction</a>&gt;</li>
+<li>&lt;CVS:<a href="http://suika.fam.cx/gate/cvs/perl/web/Message-pm/">suika.fam.cx:/home/cvs/perl/web/Message-pm/</a>&gt;</li>
+</ul>
+</body></html>
