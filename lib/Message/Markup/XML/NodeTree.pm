@@ -13,7 +13,7 @@ This module is part of manakai XML.
 
 package Message::Markup::XML::NodeTree;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Message::Markup::XML::Node;
 use Message::Markup::XML::QName qw/:prefix :special-uri/;
 use Exporter;
@@ -150,7 +150,7 @@ sub resolve_relative_uri ($;$%) {
   my $base = $self->get_attribute ('base', namespace_uri => $NS{xml});
   $base = ref ($base) ? $base->inner_text : $NS{default_base_uri};
   if ($base !~ /^[0-9A-Za-z.%+-]+:/) {	# $base is relative
-    $base = $self->_resolve_relative_uri_by_parent ($base, \%o);
+    $base = $self->Message::Markup::XML::NodeTree::_resolve_relative_uri_by_parent ($base, \%o);
   }
   eval q{	## Catch error such as $base is 'data:,foo' (non hierarchic scheme,...)
     return URI->new ($rel)->abs ($base || '.');	## BUG (or spec) of URI: $base == false
@@ -216,4 +216,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/02/14 11:08:45 $
+1; # $Date: 2004/02/22 01:46:23 $
