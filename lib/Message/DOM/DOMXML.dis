@@ -29,7 +29,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/08/22 07:44:24 $
+     $Date: 2004/09/13 03:06:34 $
   @Require:
     @@Module:
       @@@Name: ManakaiDOM
@@ -469,61 +469,5 @@ IF:
           lang:Perl
         @@@@@:
           $r = null;
-
-IF:
-  @Name:  DocumentFragment
-  @ISA[list]:  Node
-  
-  @ReAttr:
-    @@Name: attributes
-    @@Spec:
-      @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-84CF096
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
-    @@Get:
-      @@@Type: NamedNodeMap
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          $r = null;
-  @ReAttr:
-    @@Name: nodeName
-    @@Spec:
-      @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
-    @@Get:
-      @@@Type: DOMString
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          $r = q<#document-fragment>;
-  @ReAttr:
-    @@Name: nodeValue
-    @@Spec:
-      @@@DOM3[list]:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D080
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
-    @@Get:
-      @@@Type: DOMString
-      @@@Exception[list]: DOMException
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          $r = null;
-    @@Set:
-      @@@Type: DOMString
-      @@@Exception[list]: DOMException
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          __EXCEPTION{ManakaiDOMImplementationException}{
-            -class => 'warn',
-            -type => 'ATTR_SET_NO_EFFECT',
-          }__;
 
 ## DOMXML.dis ends here

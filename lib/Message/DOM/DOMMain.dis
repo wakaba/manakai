@@ -7,6 +7,8 @@ Namespace:
      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/
   @ManakaiDOMImplementationException:
      http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @MDOM_EXCEPTION:
+     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
 Module:
   @Name:  dom
     @@Prefix:  w3c.org
@@ -60,7 +62,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/10 10:06:13 $
+     $Date: 2004/09/13 03:06:34 $
   @Require:
     @@Module:
       @@@Def:
@@ -230,7 +232,8 @@ DataType:
         @@@@lang:en
         @@@@@: The initial value of the DOMString.
       @@@InCase:
-        @@@@Value: null
+        @@@@Value:
+          @@@@@is-null:1
         @@@@Description:
           @@@@@lang:en
           @@@@@@: The initial value is the empty string.
@@ -868,6 +871,130 @@ DataType:
           lang:Perl
         @@@@@:
           delete $self->{<Q:ManakaiDOM:isFullyNormalized>};
+  @Method:
+    @@Name: findOffset16
+    @@Description:
+      @@@lang:en
+      @@@@: 
+        Return the UTF-16 offset that corresponding to a UTF-32 offset.
+        Unmatched surrogates count as a single UTF-16 value.
+      \
+        This method is taken from the "StringExtend" informative interface.
+    @@Level: 3
+    @@Param:
+      @@@Name: offset32
+      @@@Type: unsigned-long
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The UTF-32 offset.
+    @@Return:
+      @@@Type: unsigned-long
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The UTF-16 offset.
+      @@@Exception:
+        @@@@Type: DOMException
+        @@@@Name: INDEX_SIZE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The specified "offset32" is negative or greater than
+            the number of characters (UTF-32 32-bit code units).
+      @@@DefaultValue:
+        @@@@Type: 
+          lang:Perl
+        @@@@@: $offset32
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          if (not defined $offset32 or $offset32 < 0 or
+              CORE::length ($self->{value}) < $offset32) {
+            __EXCEPTION{DOMException.INDEX_SIZE_ERR:
+              <Q:MDOM_EXCEPTION:param-name> => 'offset32',
+            }__;
+          }
+          my $ss = substr $self->{value}, 0, $offset32;
+          if ($ss =~ /[\x{10000}-\x{10FFFF}]/) {
+            while ($ss =~ /[\x{10000}-\x{10FFFF}]+/g) {
+              $r += $+[0] - $-[0];
+            }
+          }
+  @Method:
+    @@Name: findOffset32
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Return the UTF-32 offset corresponding to a UTF-16 offset.
+        Unmatched surrogates count as a single UTF-16 value.
+      \
+        This method is taken from the "StringExtend" informative interface.
+    @@Level: 3
+    @@Param:
+      @@@Name: offset16
+      @@@Type: unsigned-long
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The UTF-16 offset.
+    @@Return:
+      @@@Type: unsigned-long
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The UTF-32 offset.  If the "offset16" is into the middle of a 
+          surrogate pair, the UTF-32 offset of the end of the pair is 
+          returned.
+      @@@Exception:
+        @@@@Type: DOMException
+        @@@@Name: INDEX_SIZE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The specified "offset32" is negative or greater than
+            the number of characters (UTF-32 32-bit code units).
+      @@@DefaultValue:
+        @@@@Type:
+          lang:Perl
+        @@@@@: $offset16
+      @@@Def:
+         @@@@ImplNote:
+           @@@@@lang:en
+           @@@@@@: "Current position" of the value is changed. 
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          if (not defined $offset16 or $offset16 < 0 or
+              CORE::length ($self->{value}) * 2 < $offset16) {
+            __EXCEPTION{DOMException.INDEX_SIZE_ERR:
+              <Q:MDOM_EXCEPTION:param-name> => 'offset16',
+            }__;
+          }
+          pos ($self->{value}) = 0;
+          use integer;
+          while ($offset16 and
+                 pos $self->{value} <= CORE::length $self->{value}) {
+            if ($self->{value} =~ /[^\x{10000}-\x{10FFFF}]{1,$offset16}/gc) {
+              $offset16 -= $+[0] - $-[0];
+            } elsif ($self->{value}
+                               =~ m{[\x{10000}-\x{10FFFF}]{1,$offset16/2}}gc) {
+              $offset16 -= 2 * ($+[0] - $-[0]);
+              last if $offset16 < 0;
+            } else {
+              __EXCEPTION{
+                ManakaiDOMImplementationException.MDOM_DEBUG_BUG:
+                <Q:ManakaiDOMImplementationException:values> => {
+                  count => $offset16,
+                  position => 1,
+                },
+              }__;
+            }
+          }
+          if ($offset16 > 0) {
+            __EXCEPTION{DOMException.INDEX_SIZE_ERR:
+              <Q:MDOM_EXCEPTION:param-name> => 'offset16',
+            }__;
+          }
+          $r = pos ($self->{value});
 
 DataType:
   @Name:  DOMTimeStamp
@@ -973,7 +1100,8 @@ IF:
          @@@@@:
            The first implementation that has the derired features.
        @@@InCase:
-         @@@@Value: null
+         @@@@Value:
+           @@@@@is-null:1
          @@@@Description:
            @@@@@lang:en
            @@@@@@: No implementation found.

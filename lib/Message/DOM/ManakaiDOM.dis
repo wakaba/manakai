@@ -26,7 +26,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/10 10:06:13 $
+     $Date: 2004/09/13 03:06:34 $
 
   @Feature:
     @@QName: 
@@ -75,15 +75,57 @@ DataTypeAlias:
     DOMMain:DOMString
 
 DataType:
+  @Name: ManakaiDOMURI
+  @ISA: DOMString
+  @Description:
+    @@lang:en
+    @@@:
+      The DOM URI.
+  @ImplNote:
+    @@lang:en
+    @@@: Check also "dis2pm.pl" when edit this definition.
+
+DataType:
   @Name: ManakaiDOMNamespaceURI
   @ISA: DOMString
   @Description:
     @@lang:en
     @@@:
       The namespace URI.
-    \
-      This type is not differentiated with "DOMString" in the DOM 
-      specifications.
+  @ImplNote:
+    @@lang:en
+    @@@: Check also "dis2pm.pl" when edit this definition.
+
+DataType:
+  @Name: ManakaiDOMFeatureName
+  @ISA: DOMString
+  @Description:
+    @@lang:en
+    @@@:
+      The DOM feature name.
+  @ImplNote:
+    @@lang:en
+    @@@: Check also "dis2pm.pl" when edit this definition.
+
+DataType:
+  @Name: ManakaiDOMFeatureVersion
+  @ISA: DOMString
+  @Description:
+    @@lang:en
+    @@@: The DOM feature version.
+  @ImplNote:
+    @@lang:en
+    @@@: Check also "dis2pm.pl" when edit this definition.
+
+DataType:
+  @Name: ManakaiDOMFeatures
+  @ISA: DOMString
+  @Description:
+    @@lang:en
+    @@@: The DOM features and versions.
+  @ImplNote:
+    @@lang:en
+    @@@: Check also "dis2pm.pl" when edit this definition.
 
 Exception:
   @Name: ManakaiDOMImplementationException

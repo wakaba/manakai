@@ -41,7 +41,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/10 10:06:13 $
+     $Date: 2004/09/13 03:06:34 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -342,7 +342,8 @@ IF:
           @@@@@:
             The "DOMString" at the "index"th position in the collection.
         @@@InCase:
-          @@@@Value: null
+          @@@@Value:
+            @@@@@is-null:1
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
@@ -458,8 +459,11 @@ IF:
           @@@@lang:en
           @@@@@: The name at the "index"th position in the "NameList".
         @@@InCase:
-          @@@@Value: null
-          @@@@@:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
             There is no name for the specified "index" or
             the "index" is out of range.
         @@@Def:
@@ -509,8 +513,11 @@ IF:
           @@@@lang:en
           @@@@@: The namespace URI at the "index" position in the "NameList".
         @@@InCase:
-          @@@@Value: null
-          @@@@@:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
             There is no namespace URI for the specified "index" or 
             if the "index" is out of range.
         @@@Def:
@@ -812,7 +819,8 @@ IF:
           features and versions.
      @@Param:
         @@@Name:  features
-        @@@Type:  DOMString
+        @@@Type:
+          ManakaiDOM:ManakaiDOMFeatures
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -826,7 +834,8 @@ IF:
             The first DOM implementation that support the desired 
             features and versions.
         @@@InCase:
-          @@@@Value: null
+          @@@@Value:
+            @@@@@is-null:1
           @@@@Description:
             @@@@@lang:en
             @@@@@@: 
@@ -850,7 +859,8 @@ IF:
 ## TODO: implement this
      @@Param:
         @@@Name:  features
-        @@@Type:  DOMString
+        @@@Type:
+          ManakaiDOM:ManakaiDOMFeatures
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -896,7 +906,8 @@ IF:
          and version.
      @@Param:
         @@@Name:  feature
-        @@@Type:  DOMString
+        @@@Type:
+          ManakaiDOM:ManakaiDOMFeatureName
         @@@Description:
           @@@@lang:en
           @@@@@: The name of the feature to test.
@@ -946,7 +957,8 @@ IF:
               but would be available through the method "getFeature".
      @@Param:
         @@@Name:  version
-        @@@Type:  DOMString
+        @@@Type:
+          ManakaiDOM:ManakaiDOMFeatureVersion
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -967,7 +979,8 @@ IF:
               DOM Level 2.
               This is one of allowed values in DOM Level 2.
         @@@InCase:
-          @@@@Value: null
+          @@@@Value:
+            @@@@@is-null:1
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
@@ -978,7 +991,6 @@ IF:
               Level 3 explicitly allow this value specified.
         @@@InCase:
           @@@@Value: \
-          @@@@Type: DOMString
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
@@ -1005,7 +1017,9 @@ IF:
           @@@@Type:
             lang:Perl
           @@@@@:
+            __CODE{CheckNull: s => feature}__;
 ## TODO: feature and version checking
+            $feature = lc $feature;
             if (defined $version and $version ne '') {
               $r = $__PACKAGE{Global}__::FeatureImplemented{$feature}
                                                            ->{$version} ?
@@ -1127,7 +1141,8 @@ IF:
           @@@@lang:en
           @@@@@: The namespace URI of the document element to create.
         @@@InCase:
-          @@@@Value: null
+          @@@@Value:
+            @@@@@is-null:1
           @@@@Description:
             @@@@@lang:en
             @@@@@@: The null namespace name.
@@ -1145,7 +1160,8 @@ IF:
           @@@@lang:en
           @@@@@: The qualified name of the document element to create.
         @@@InCase:
-          @@@@Value: null
+          @@@@Value:
+            @@@@@is-null:1
           @@@@Description:
             @@@@@lang:en
             @@@@@@: Document element is not created.
@@ -1156,7 +1172,13 @@ IF:
           @@@@lang:en
           @@@@@: The type of document to create.
         @@@InCase:
-          @@@@Value: null
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The document to be created does not have the "DocumentType" 
+              node.
         @@@ImplNote:
           @@@@lang:en
           @@@@@:
@@ -1334,6 +1356,8 @@ IF:
                   DOMException.WRONG_DOCUMENT_ERR:
                 }__;                          # [DOM 2,3]
               }
+              $doctypeNode->__CLASS{ManakaiDOMNodeObject}__::__INT{importTree}__
+                                                                     ($node);
               $doctypeNode->{<Q:DocTree:documentID>}
                                     = $node->{<Q:TreeCore:node>};
               $doctypeNode->{<Q:DOMCore:ownerDocument>} = $node;
@@ -1341,9 +1365,10 @@ IF:
               push @{$node->{<Q:infoset:children>}}, $doctypeNode;
             }
             if ($lname) {
-              my $docEl = $r->__CLASS{Node}__::__INT{new}__;
+              my $docEl = $r->__CLASS{Element}__::__INT{new}__;
               my $docNode = $docEl->{<Q:TreeCore:node>};
-              $docNode->{<Q:DocTree:nodeType>} = <Q:infoset:Element>;
+              $node->__CLASS{ManakaiDOMNodeObject}__->__INT{importTree}__
+                                                        ($docNode);
               $docNode->{<Q:infoset:prefix>} = $prefix || null;
               $docNode->{<Q:infoset:namespaceName>} = $namespaceURI;
               $docNode->{<Q:infoset:localName>} = $lname;
@@ -1360,7 +1385,8 @@ IF:
           APIs of the specified feature and version.
      @@Param:
         @@@Name:  feature
-        @@@Type:  DOMString
+        @@@Type:
+          ManakaiDOM:ManakaiDOMFeatureName
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -1373,7 +1399,8 @@ IF:
             @@@@@@: The PLUS SIGN is ignored.
      @@Param:
         @@@Name:  version
-        @@@Type:  DOMString
+        @@@Type:
+          ManakaiDOM:ManakaiDOMFeatureVersion
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -1402,7 +1429,8 @@ IF:
               with the primary core "DOMImplementation" such as 
               "hasFeature", "getFeature", etc.
         @@@InCase:
-          @@@@Value: null
+          @@@@Value:
+            @@@@@is-null:1
           @@@@@: 
             There is no object that implements interfaces associated 
             with the feature and version.
@@ -2432,21 +2460,169 @@ IF:
         @@@Type:  DOMStringList
 
 IF:
+  @Name:  DocumentFragment
+  @Description:
+    @@lang:en
+    @@@: A "lightweight" or "minimal" "Document" object.
+  @ISA:  Node
+
+  @IntMethod:
+    @@Name: new
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Construct a new instance of the "DocumentFragment".
+      \
+        Note that this method is for the internal use.  DOM 
+        applications must use the "createDocumentFragment" method 
+        of the "Document" interface to create a new "DocumentFragment".
+    @@Return:
+      @@@Type: DocumentFragment
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = $self->__CLASS{Node}__::__INT{new}__;
+          my $node = $r->{<Q:TreeCore:node>};
+          $node->{<Q:DOMCore:nodeType>} = <Q:DOMCore:DocumentFragment>;
+          
+  
+  @ReAttr:
+    @@Name: attributes
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-84CF096
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Get:
+      @@@Type: NamedNodeMap
+      @@@DefaultValue:
+        @@@@is-null: 1
+      @@@Def: \
+  @ReAttr:
+    @@Name: nodeName
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Get:
+      @@@Type: DOMString
+      @@@DefaultValue: \#document-fragment
+      @@@Def: \
+  @ReAttr:
+    @@Name: nodeValue
+    @@Spec:
+      @@@DOM3[list]:
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D080
+        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@Get:
+      @@@Type: DOMString
+      @@@DefaultValue:
+        @@@@is-null: 1
+      @@@Def: \
+    @@Set:
+      @@@Type: DOMString
+      @@@Warning:
+        @@@@Type:
+          ManakaiDOM:ManakaiDOMImplementationWarning
+        @@@@Name: ATTR_SET_NO_EFFECT
+      @@@Def: \
+
+IF:
   @Name:  Document
+  @Description:
+    @@lang:en
+    @@@: 
+      The entire document.  It is conceptually the root of the 
+      document tree and it provides the primary access to the 
+      document's data.
+
   @ISA:  Node
   @Attr:
      @@Name:  doctype
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The "DocumentType" object associated with the "Document".
+       \
+         Note that even this attribute is defined as read-only, 
+         the direct manipulations of child nodes (by the method "insertBefore" 
+         for example) can change the document type.
+     @@Level[list]:
+       1
+       3
      @@Get:
         @@@Type:  DocumentType
-     @@ModifiedLevel[list]:  3
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The "DocumentType" object for the "Document".
+        @@@InCase:
+          @@@@Value: 
+            @@@@@is-null: 1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The document type declaration is omitted or it is an HTML 
+              document.
+            \
+              Note: If it is an HTML document, the "doctype" attribute is 
+              always "null" in DOM Level 1 and Level 2.  In DOM Level 3, 
+              a "DocumentType" object may be returned even if the document 
+              does not have explicit document type declaration.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            for (@{$self->{<Q:TreeCore:node>}->{<Q:infoset:children>}}) {
+              if ($_->{<Q:DOMCore:nodeType>} eq <Q:DOMCore:DocumentType>) {
+                $r = $_->__CLASS{ManakaiDOMNodeObject}__->__INT{newReference}__;
+                last;
+              } elsif ($_->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
+                last;
+              }
+            }
   @Attr:
      @@Name:  implementation
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The "DOMImplementation" object that handles the "Document".
      @@Get:
         @@@Type:  DOMImplementation
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetPropNode:
+            DOMCore:implementation
   @Attr:
      @@Name:  documentElement
+     @@Description:
+       @@@lang:en
+       @@@@: The child node that is the document element of the document.
      @@Get:
         @@@Type:  Element
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The document element.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The document element not found.
+          ## The DOM specifications don't mention this case but for example 
+          ## the DOMImplementation.createDocument (null, null, null) can 
+          ## create a Document that does not have the document element.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            for (@{$self->{<Q:TreeCore:node>}->{<Q:infoset:children>}}) {
+              if ($_->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
+                $r = $_->__CLASS{ManakaiDOMNodeObject}__->__INT{newReference}__;
+                last;
+              }
+            }
   @Method:
      @@Name:  createElement
      @@Return:
@@ -2572,44 +2748,275 @@ IF:
      @@Level[list]:  2
   @Attr:
      @@Name:  inputEncoding
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The encoding used for this document at the time of 
+         the parsing.
+       \
+         This attribute is corresponding to the [character encoding scheme] 
+         property of the document infomation item.
      @@Get:
         @@@Type:  DOMString
+        ## ISSUE: Is this IANA charset?
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The input encoding is not known.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            infoset:characterEncodingScheme
      @@Level[list]:  3
   @Attr:
      @@Name:  xmlEncoding
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The value of the encoding declaration in the XML declaration 
+         of the document.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         This attribute is NOT equal to the [character encoding scheme] 
+         property of the document information item of the Infoset.
      @@Get:
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The encoding.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The encoding is not specified or not known.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMCore:xmlEncoding
      @@Level[list]:  3
   @Attr:
      @@Name:  xmlStandalone
+     @@Description:
+       @@@lang:en
+       @@@@: 
+         Whether the document is standalone or not.
+       \
+         This attribute is corresponding to the standalone declaration 
+         in the XML declaration and the [standalone] property of the 
+         document information item of the XML Infoset.
+     @@ImplNote:
+       @@@lang:en
+       @@@@: Default false.
      @@Get:
         @@@Type:  boolean
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            infoset:standalone
      @@Set:
         @@@Type:  boolean
-        @@@Exception[list]:  DOMException
+        @@@Description:
+          @@@@lang:en
+          @@@@@: Whether standalone or not.
+        @@@InCase:
+          @@@@Value: true
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Standalone "yes".  Note that no verification is done when 
+              setting the value.  DOM applications should use 
+              the method "normalizeDocument" with the "validate" parameter 
+              to verify whether the value match the Validity Constraint.
+        @@@InCase:
+          @@@@Value: false
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: Standalone "no".
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NOT_SUPPORTED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The document does not support the "XML" feature.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $node = $self->{<Q:TreeCore:node>};
+            if ($node->{<Q:DOMCore:hasFeature>}->{XML}) {
+              __EXCEPTION{
+                DOMException.NOT_SUPPORTED_ERR:
+                  <Q:MDOM_EXCEPTION:subtype>
+                     => <Q:MDOM_EXCEPTION:MDOM_NOT_SUPPORTED_DOC_XML>,
+              }__;
+            }
+            $node->{<Q:infoset:standalone>} = $given;
      @@Level[list]:  3
   @Attr:
      @@Name:  xmlVersion
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The version number of the document.
+      \
+         This attribute is corresponding to the version declaration in the 
+         XML declaration and [version] property of the document information 
+         item of the XML Infoset.
      @@Get:
         @@@Type:  DOMString
+        @@@InCase:
+          @@@@Value: 1.0
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The XML version is specified as XML 1.0 or the XML document 
+              has no version declaration.
+        @@@InCase:
+          @@@@Value: 1.1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The XML version is specified as XML 1.1.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The document does not support the "XML" feature.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $node = $self->{<Q:TreeCore:node>};
+            if ($node->{<Q:DOMCore:hasFeature>}->{XML}) {
+              $r = defined $node->{<Q:infoset:version>} ? 
+                   $node->{<Q:infoset:version>} : '1.0';
+            }
      @@Set:
         @@@Type:  DOMString
-        @@@Exception[list]:  DOMException
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The XML version number of the document.  Note that 
+            changing this attribute will affect methods that 
+            check for invalid characters in XML "Name"s.  DOM 
+            application should invoke the method "normalizeDocument" in 
+            order to check for invalid characters in the "Node"s that 
+            are already part of the document.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NOT_SUPPORTED_ERR
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            my $node = $self->{<Q:TreeCore:node>};
+            if ($node->{<Q:DOMCore:hasFeature>}->{XML}) {
+              if ($given and
+                  ($given eq '1.0' or $given eq '1.1')) {
+                $node->{<Q:infoset:version>} = $given;
+              } else {
+                __EXCEPTION{
+                  DOMException.NOT_SUPPORTED_ERR:
+                    <Q:MDOM_EXCEPTION:subtype>
+                       => <Q:MDOM_EXCEPTION:MDOM_NOT_SUPPORTED_XMLVER>,
+                    <Q:infoset:version> => $given,
+                }__;
+              }
+            } else {
+              __EXCEPTION{
+                DOMException.NOT_SUPPORTED_ERR:
+                  <Q:MDOM_EXCEPTION:subtype>
+                     => <Q:MDOM_EXCEPTION:MDOM_NOT_SUPPORTED_DOC_XML>,
+              }__;
+            }
      @@Level[list]:  3
   @Attr:
      @@Name:  strictErrorChecking
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Whether error checking is enforced or not.
      @@Get:
         @@@Type:  boolean
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMCore:strictErrorChecking
      @@Set:
         @@@Type:  boolean
+        @@@Description:
+          @@@@lang:en
+          @@@@@: Whether error checking is enforced or not.
+        @@@InCase:
+          @@@@Value: false
+          @@@@@: 
+            The implementation is free to not every possible error 
+            case normally defined on DOM operations, and not raise any 
+            "DOMException" on DOM operations or report error 
+            while using method "normalizeDocument".  In case of error, 
+            the behavior is undefined.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@SetProp:
+            DOMCore:strictErrorChecking
      @@Level[list]:  3
+     @@ImplNote:
+       @@@lang:en
+       @@@@: This attribute is "true" by default.
   @Attr:
      @@Name:  documentURI
-     @@Get:
-        @@@Type:  DOMString
-     @@Set:
-        @@@Type:  DOMString
+     @@Description:
+       @@@lang:en
+       @@@@: The location of the document.
      @@Level[list]:  3
+     @@Get:
+        @@@Type:
+          ManakaiDOM:ManakaiDOMURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The location of the document.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The location is undefined or the "Document" was created using 
+              the method "createDocument".
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMCore:documentURI
+     @@Set:
+        @@@Type:
+          ManakaiDOM:ManakaiDOMURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@: 
+            The location of the document.  Note that no lexical checking is 
+            performed.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The location is undefined.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@SetProp:
+            DOMCore:documentURI
   @Method:
      @@Name:  adoptNode
      @@Return:
@@ -2621,8 +3028,19 @@ IF:
      @@Level[list]:  3
   @Attr:
      @@Name:  domConfig
+     @@Description:
+       @@@lang:en
+       @@@@: The configuration used when "normalizeDocument" is invoked.
      @@Get:
         @@@Type:  DOMConfiguration
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The DOM configuration object.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMCore:domConfig
      @@Level[list]:  3
   @Method:
      @@Name:  normalizeDocument
@@ -2712,5 +3130,38 @@ IF:
           lang:Perl
         @@@@@:
           __WARNING{ManakaiDOMImplementationException.ATTR_SET_NO_EFFECT}__;
+
+  @IntMethod:
+    @@Name: new
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Construct a new instance of the "Document".
+      \
+        Note that this method is for the internal use.  DOM 
+        applications must use the "createDocument" method 
+        of the "DOMImplementation" interface to create a new "Document".
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The caller of this internal method MUST ensure to set 
+        the attributes: <Q:TreeCore:implementation>.
+    @@Return:
+      @@@Type: Document
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = $self->__CLASS{Node}__::__INT{new}__;
+          my $node = $r->{<Q:TreeCore:node>};
+          $node->{<Q:DOMCore:nodeType>} = <Q:infoset:Document>;
+          my $templateNode = ref $self ? $self->{<Q:TreeCore:node>} : {};
+          for ({name => <Q:DOMCore:implementation>},
+               {name => <Q:DOMCore:xmlVersion>, default => q<1.0>}) {
+            $node->{$_->{name}} = exists $templateNode->{$_->{name}} ?
+                                  $templateNode->{$_->{name}} : $_->{default};
+          }
+          $node->{<Q:DOMCore:strictErrorChecking>} = true;
+          $node->{<Q:DOMCore:hasFeature>}->{XML} = true;
 
 ## DOMCore.dis ends here
