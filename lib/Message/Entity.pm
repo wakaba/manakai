@@ -12,7 +12,7 @@ MIME multipart will be also supported (but not implemented yet).
 
 package Message::Entity;
 use strict;
-use vars qw($VERSION);
+use vars qw($VERSION %DEFAULT);
 $VERSION = '1.00';
 
 use Message::Header;
@@ -75,6 +75,9 @@ sub header ($;$) {
     $self->{header} = $new_header;
   } elsif ($new_header) {
     $self->{header} = Message::Header->parse ($new_header);
+  }
+  unless ($self->{header}) {
+    $self->{header} = new Message::Header;
   }
   $self->{header};
 }
@@ -161,7 +164,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/13 14:47:07 $
+$Date: 2002/03/13 15:10:21 $
 
 =cut
 
