@@ -8,7 +8,7 @@ Message::Body::Text --- Perl Module for Internet Media Types "text/*"
 package Message::Body::Text;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -22,7 +22,8 @@ use overload '""' => sub { $_[0]->stringify },
   -_METHODS	=> [qw|value|],
   -_MEMBERS	=> [qw|_charset|],
   	## header -- Don't clone
-  -default_charset	=> 'us-ascii',
+  -body_default_charset	=> 'us-ascii',
+  -body_default_charset_input	=> 'iso-2022-int-1',
   -hook_encode_string	=> \&Message::Util::encode_body_string,
   -hook_decode_string	=> \&Message::Util::decode_body_string,
   -media_type	=> 'text',
@@ -64,15 +65,18 @@ sub _init ($;%) {
   if ($mt_def->{mime_charset}) {
     $self->{option}->{use_param_charset} = 1;
     if ($self->{option}->{format} =~ /http/) {
-      $self->{option}->{default_charset} = 'iso-8859-1';
+      $self->{option}->{body_default_charset} = 'iso-8859-1';
+      $self->{option}->{body_default_charset_input} = 'iso-8859-1';
     } elsif ($self->{option}->{format} =~ /news-usefor|sip/) {
-      $self->{option}->{default_charset} = 'utf-8';
+      $self->{option}->{body_default_charset} = 'utf-8';
+      $self->{option}->{body_default_charset_input} = 'utf-8';
     } else {
-      $self->{option}->{default_charset} = 'us-ascii';
+      $self->{option}->{body_default_charset} = 'us-ascii';
+      $self->{option}->{body_default_charset_input} = 'iso-2022-int-1';
     }
   }
   if ($mt_def->{default_charset}) {
-    $self->{option}->{default_charset} = $mt_def->{default_charset};
+    $self->{option}->{body_default_charset} = $mt_def->{default_charset};
   }
 }
 
@@ -105,14 +109,19 @@ sub _parse ($$) {
   my $self = shift;
   my $body = shift;
   my $charset;
-  my $ct; $ct = $self->{header}->field ('content-type', -new_item_unless_exist => 0) 
-    if ref $self->{header};
-  $charset = $ct->parameter ('charset') if ref $ct;
-  $charset ||= $self->{option}->{default_charset};
+  if ($self->{option}->{use_param_charset}) {
+    my $ct;
+    $ct = $self->{header}->field ('content-type', -new_item_unless_exist => 0) 
+      if ref $self->{header};
+    $charset = $ct->parameter ('charset') if ref $ct;
+  }
+  unless ($charset) {
+    $charset = $self->{option}->{encoding_before_decode};
+  }
   my %s = &{$self->{option}->{hook_decode_string}} ($self, $body,
     type => 'body', charset => $charset);
   $self->{value} = $s{value};
-  $self->{_charset} = $s{charset};	## When convertion failed
+  $self->{_charset} = $s{charset};	## In case convertion failed
 }
 
 =back
@@ -129,12 +138,7 @@ sub entity_header ($;$) {
   my $new_header = shift;
   if (ref $new_header) {
     $self->{header} = $new_header;
-  #} elsif ($new_header) {
-  #  $self->{header} = Message::Header->parse ($new_header);
   }
-  #unless ($self->{header}) {
-  #  $self->{header} = new Message::Header;
-  #}
   $self->{header};
 }
 
@@ -177,13 +181,16 @@ sub stringify ($;%) {
   }
   my %e;
   unless ($self->{_charset}) {
-    my $charset; $charset = $ct->parameter ('charset') if ref $ct;
-    $charset ||= $option{default_charset};
+    my $charset;
+    if ($option{use_param_charset}) {
+      $charset = $ct->parameter ('charset') if ref $ct;
+    }
+    $charset ||= $option{encoding_after_encode};
     (%e) = &{$option{hook_encode_string}} ($self, $v,
       type => 'body', charset => $charset);
     ## Normalize
     if ($option{use_normalization}) {
-      if ($Message::MIME::Charset::CHARSET{$charset || '*default'}->{mime_text}) {
+      if ($Message::MIME::Charset::CHARSET{ $charset }->{mime_text}) {
         $e{value} =~ s/\x0D(?!\x0A)/\x0D\x0A/gs;
         $e{value} =~ s/(?<!\x0D)\x0A/\x0D\x0A/gs;
         #$e{value} .= "\x0D\x0A" unless $e{value} =~ /\x0D\x0A$/s;
@@ -197,7 +204,12 @@ sub stringify ($;%) {
       $ct = $self->{header}->field ('content-type');
       $ct->value ($option{parent_type});
     }
-    $ct->replace (charset => ($e{charset} || $option{default_charset}));
+    if ($e{charset}) {
+      $ct->replace (charset => $e{charset});
+    } else {
+      $ct->replace (Message::MIME::Charset::name_minimumize
+                    ($option{body_default_charset}, $e{value}));
+    }
   }
   $e{value};
 }
@@ -238,7 +250,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/03 23:39:15 $
+$Date: 2002/07/14 04:26:07 $
 
 =cut
 

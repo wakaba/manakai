@@ -1,3 +1,15 @@
+2002-07-14  Wakaba <w@suika.fam.cx>
+
+	* Text.pm: 
+	- (default_charset): Removed.
+	- (body_default_charset): New option.
+	- (body_default_charset_input): Likewise.
+	- (parse, stringify): Use new options instead of default_charset
+	option.
+	* TextPlain.pm (_init): Set 1 to fill_ct option
+	when format =~ rfc2822 | news-usefor (in addition to
+	http | mime).
+
 2002-07-08  Wakaba <w@suika.fam.cx>
 
 	* MessageDeliveryStatus.pm: New module.
