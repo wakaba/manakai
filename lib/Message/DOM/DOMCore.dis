@@ -51,14 +51,16 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/09/30 05:28:49 $
+     $Date: 2004/10/09 05:32:30 $
 
   @ConditionDef:
     @@Name: DOM1
   @ConditionDef:
     @@Name: DOM2
+    @@ISA:DOM1
   @ConditionDef:
     @@Name: DOM3
+    @@ISA:DOM2
   
   @Require:
     @@Module:
@@ -2205,8 +2207,14 @@ IF:
         @@@Def:
           @@@@Type:
             lang:dis
+                     ## Conditional
           @@@@GetPropNode:
             infoset:parent
+    @@Level[list]:
+      1
+      2
+      3
+    @@SpecLevel:1
   @Attr:
      @@Name:  childNodes
      @@Description:
@@ -2234,7 +2242,7 @@ IF:
           @@@@Type:
             lang:Perl
           @@@@@:
-            $r = $self->{<Q:DOMCore:node>}->
+            $r = $self->{<Q:TreeCore:node>}->
                    __SUPER{ManakaiDOMNodeObject::}__::__INT{newReference}__
                          ## Condition sensitive
                         ('__CLASS{ManakaiDOMChildNodeList}__');
@@ -2428,6 +2436,7 @@ IF:
         @@@Def:
           @@@@Type:
             lang:dis
+                         ## Condition sensitive
           @@@@GetPropNode:
             DOMCore:ownerDocument
      @@SpecLevel[list]:
@@ -2435,6 +2444,8 @@ IF:
         2
      @@Level[list]:
         1
+        2
+        3
      @@ImplNote:
         @@@lang:en
         @@@@:
@@ -5638,9 +5649,12 @@ IF:
         @@@Def:
           @@@@Type:
             lang:dis
+                     ## Conditional
           @@@@GetPropNode:
             infoset:ownerElement
-     @@Level[list]:  2
+     @@Level[list]:  
+        2
+        3
      @@SpecLevel:2
   @Attr:
      @@Name:  schemaTypeInfo
@@ -9618,7 +9632,7 @@ IF:
         @@@Def:
           @@@@Type:
             lang:dis
-          @@@@GetPropNode:
+          @@@@GetProp:
             DOMCore:implementation
   @Attr:
      @@Name:  documentElement
@@ -11355,5 +11369,86 @@ IF:
       3
 
 ## IF: Document
+
+ErrorSet:
+  @Description:
+    @@lang:en
+    @@@:
+      Errors that might be reported during the invocation of the 
+      <M:Document.normalizeDocument> method. 
+
+  @SpecLevel:3
+
+  @Error:
+    @@Name:check-character-normalization-failure
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The parameter <CP:check-character-normalization> is set to
+        <DOM:true> and a string is encountered that fails normalization 
+        checking.
+    @@Severity:Error
+    @@RelatedData:
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          Not specified; it should be the node in which the sequence is. 
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        Used by DOM 3 Core and DOM 3 LS <IF:LSParser>; 
+        see also <Module:DOMLS>.
+
+  @Error:
+    @@Name:cdata-sections-splitted
+    @@Description:
+      @@@lang:en
+      @@@@:
+        <CP:split-cdata-sections> is <DOM:true> and 
+        a <XML:CDATA> section is split.
+    @@Severity:Warning
+    @@RelatedData:
+      @@@Type:
+        DOMXML:CDATASection
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The first <IF:CDATASection> node in document order 
+          resulting from the split.
+
+  @Error:
+    @@Name:wf-invalid-character-in-node-name
+    @@SubType:
+      @@@QName:
+        ManakaiDOMCore:normalize-invalid-character
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The parameter <CP:well-formed> is set to <DOM:true> and 
+          the attribute <A:Node.nodeName> contains an invalid character 
+          according to its node type.
+      @@@Severity:Error
+    @@SubType:
+      @@@QName:
+        ManakaiDOMLS:serialize-invalid-character
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A character that cannot be represented in the output 
+          character encoding is encountered within markup but 
+          outside of attribute values.
+      @@@Severity:FatalError
+
+  @Error:
+    @@Name:wf-invalid-character
+    @@Description:
+      @@@lang:en
+      @@@@:
+        <CP:well-formed> is <DOM:true> and the text inside an 
+        <IF:Attr>, <IF:Element>, <IF:Comment>, <IF:Text> or 
+        <IF:CDATASection> node or the data inside 
+        <IF:ProcessingInstruction> node contains an invalid character.
+    @@Severity:Error
+## Error:normalizeDocument
 
 ## DOMCore.dis ends here

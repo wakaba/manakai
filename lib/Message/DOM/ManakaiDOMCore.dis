@@ -38,14 +38,16 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/09/29 12:39:32 $
+     $Date: 2004/10/09 05:32:30 $
 
   @ConditionDef:
     @@Name: DOM1
   @ConditionDef:
     @@Name: DOM2
+    @@ISA:DOM1
   @ConditionDef:
     @@Name: DOM3
+    @@ISA:DOM2
   
   @Require:
     @@Module:
@@ -104,7 +106,7 @@ IF:
       The extended internal interface for the "ManakaiDOMNodeObject" 
       object used as a "Node".
   @ISA:
-    ManakaiDOM:ManakaiDOMNodeObject
+    ManakaiDOM:ManakaiDOMNodeObject::
   @IntAttr:
     @@Name: textContent
     @@Description:
@@ -808,7 +810,7 @@ IF:
 IF:
   @Name:  ManakaiDOMChildNodeList
   @ISA:
-    ManakaiDOM:ManakaiDOMNodeReference
+    ManakaiDOM:ManakaiDOMNodeReference::
   @Implement: 
     DOMCore:NodeList
   @Description:
@@ -865,7 +867,7 @@ IF:
         @@@Type:  unsigned-long
         @@@Def:
           @@@@Type:
-             lang:dis
+             lang:Perl
           @@@@@:
             $r = @{$self->{<Q:TreeCore:node>}->{<Q:infoset:children>}};
 
@@ -918,7 +920,7 @@ IF:
 IF:
   @Name: ManakaiDOMGetElementsNodeList
   @ISA:
-    ManakaiDOM:ManakaiDOMNodeReference
+    ManakaiDOM:ManakaiDOMNodeReference::
   @Implement:
     DOMCore:NodeList
   @Description:
@@ -965,7 +967,7 @@ IF:
 IF:
   @Name: ManakaiDOMAttributes
   @ISA:
-    ManakaiDOM:ManakaiDOMNodeReference
+    ManakaiDOM:ManakaiDOMNodeReference::
   @Implement:
     DOMCore:NamedNodeMap
   @Description:
@@ -2119,6 +2121,19 @@ ConfigParam:
       @@@@:
         DOM implementations may provide a default <IF:DOMErrorHandler> 
         object.  
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        {P:: This parameter is used in:
+        \
+        {LI:: <M:Document.normalizeDocument>:: If errors occurs, such as an 
+          attempt to update a read-only node or a <A:Node.nodeName> 
+          contains an invalid character.  This method might report 
+          fatal errors.
+        \
+        }
+        \
+        }
   @Param:
     @@Name: infoset
     @@IsSupportRequired:1

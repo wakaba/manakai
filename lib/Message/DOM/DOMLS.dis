@@ -38,7 +38,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/09/30 05:28:50 $
+     $Date: 2004/10/09 05:32:30 $
 
   @ConditionDef:
     @@Name:DOM3
@@ -1218,6 +1218,161 @@ IF:
         @@@Type:
            DOMMain:unsigned-long
 
+ErrorSet:
+  @Description:
+    @@lang:en
+    @@@:
+      Errors reported while parsing an input source.
+  @ImplNote:
+    @@lang:en
+    @@@:
+      The DOM 3 LS Specification does not define all possible errors; 
+      only some common error cases are defined.  Implementations 
+      are expected to raise implementation specific errors and 
+      warnings for any other cases such as I/O errors, 
+      XML well-formedness errors, etc.
+
+  @SpecLevel:3
+
+  @ImplNote:
+    @@lang:en
+    @@@:
+      The error <ERR:check-character-normalization-failure> is 
+      also defined for <M:Document.normalizeDocument>; see 
+      the <Module:DOMCore> module.
+  
+  @Error:
+    @@Name:doctype-not-allowed
+    @@Severity:Fatal
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The parameter <CP:disallow-doctype> is set to <DOM:true> 
+        and a <IF:DocumentType> is encountered.
+
+  @Error:
+    @@Name: no-input-specified
+    @@Description:
+      @@@lang:en
+      @@@@:
+        No input is specified in the <IF:LSInput> object, 
+        i.e. all inputs are <DOM:null>.
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        {P:: This error might be reported by:
+        \
+        - <M:LSParser.parse>
+        \
+        - <M:ManakaiXMLParser2003.parser>
+        \
+        }
+    @@Severity:Fatal
+
+  @Error:
+    @@Name:pi-base-uri-not-preserved
+    @@Severity:Warning
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A processing instruction is encountered in a location 
+        where the base URI cannot be preserved.
+
+  @Error:
+    @@Name:unbound-prefix-in-entity
+    @@Severity:Warning
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The parameter <CP:namespaces> is set to <DOM:true> and 
+        an unbound namespace prefix is encountered in the replacement 
+        text of an entity.
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        This warning is implementation dependent; some 
+        existing parsers may not recognize unbound namespace 
+        prefixes in the replacement text.
+
+  @Error:
+    @@Name:unknown-character-denormalization
+    @@Severity:Fatal
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The parameter <CP:ignore-unknown-character-denormalizations> 
+        is set to <DOM:false> and a character is encountered for 
+        which the processor cannot determine the normalization 
+        properties.
+
+  @Error:
+    @@Name:unsupported-encoding
+    @@Severity:Fatal
+    @@Description:
+      @@@lang:en
+      @@@@:
+        An unsupported encoding is encountered.
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        This error might also be reported when serialization.
+  
+  @Error:
+    @@Name:unsupported-media-type
+    @@Severity:Fatal
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The parameter <CP:supported-media-types-only> is set to 
+        <DOM:true> and an unsupported media type is encountered.
+
+##Error:LSParser
+
+
+ErrorSet:
+  @Description:
+    @@lang:en
+    @@@:
+      Errors reported while serializing a DOM node.
+  @ImplNote:
+    @@lang:en
+    @@@:
+      The DOM 3 LS Specification does not define all possible errors; 
+      only some common error cases are defined.  Implementations 
+      are expected to raise implementation specific errors and 
+      warnings for any other cases such as I/O errors.
+
+  @SpecLevel:3
+
+  @Error:
+    @@Name:no-output-specified
+    @@Severity:Fatal
+    @@Description:
+      @@@lang:en
+      @@@@:
+        No output is specified in the <IF:LSOutput> object.
+  
+  @Error:
+    @@Name:unbound-prefix-in-entity-reference
+    @@Severity:Fatal
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The parameter <CP:namespaces> is set to <DOM:true> 
+        and an entity whose replacement text contains 
+        unbound namespace prefixes is referred in a location 
+        where there are no bindings for the namespace prefixes.
+
+  @ImplNote:
+    @@lang:en
+    @@@:
+      The error <ERR:unsupported-encoding> is defined also for 
+      parsing error.
+    \
+      See <Module:DOMCore> for the definition of the error 
+      <ERR:wf-invalid-character-in-node-name>.
+
+##Error:LSSerializer
 
 ## DOMLS.dis ends here
 

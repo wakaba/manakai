@@ -33,7 +33,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/09/30 05:28:50 $
+     $Date: 2004/10/09 05:32:30 $
   
   @Description:
     @@lang:en
@@ -599,39 +599,10 @@ IF:
           if ($self->{<Q:TreeCore:rc>}) {
             $r = true;
           } else {
-            ## Up - toward root node
-            for my $key (@{$self->{<Q:TreeCore:origin>}}) {
-              if ($self->{$key}) {
-                if ($self->{$key}
-                    ->__SUPER{ManakaiDOMNodeObject::}__::__INT{isExternallyReferred}__) {
-                  $r = true;
-                  last;
-                }
-              }
-            }
-            ## Down - toward leaf nodes
-            unless (@{$self->{<Q:TreeCore:origin>}}) {
-              SUBNODES:
-              for my $key (@{$self->{<Q:TreeCore:subnode>}}) {
-                for (ref $self->{$key} eq 'ARRAY' ? @{$self->{$key}}
-                                                  : values %{$self->{$key}}) {
-                  if ($_->__SUPER{ManakaiDOMNodeObject::}__::__INT{isExternallyReferredDownward}__) {
-                    $r = true;
-                    last SUBNODES;
-                  }
-                }
-              }
-              SUBNODES2:
-              for my $key (@{$self->{<Q:TreeCore:subnode2>}}) {
-                for (ref $self->{$key} eq 'ARRAY' ? @{$self->{$key}}
-                                                  : values %{$self->{$key}}) {
-                  for (ref $_ eq 'ARRAY' ? @$_ : values %$_) {
-                    if ($_->__SUPER{ManakaiDOMNodeObject::}__::__INT{isExternallyReferredDownward}__) {
-                      $r = true;
-                      last SUBNODES2;
-                    }
-                  }
-                }
+            for (@{$self->__SUPER{ManakaiDOMNodeObject::}__::__INT{getRootNodes}__}) {
+              if ($_->__SUPER{ManakaiDOMNodeObject::}__::__INT{isExternallyReferredDownward}__) {
+                $r = true;
+                last;
               }
             }
           }
@@ -649,13 +620,14 @@ IF:
           if ($self->{<Q:TreeCore:rc>}) {
             $r = true;
           } else {
+            DW:{
             SUBNODES:
             for my $key (@{$self->{<Q:TreeCore:subnode>}}) {
               for (ref $self->{$key} eq 'ARRAY' ? @{$self->{$key}}
                                                 : values %{$self->{$key}||{}}) {
                 if ($_->__SUPER{ManakaiDOMNodeObject::}__::__INT{isExternallyReferredDownward}__) {
                   $r = true;
-                  last SUBNODES;
+                  last DW;
                 }
               }
             }
@@ -666,11 +638,11 @@ IF:
                 for (ref $_ eq 'ARRAY' ? @$_ : values %$_) {
                   if ($_->__SUPER{ManakaiDOMNodeObject::}__::__INT{isExternallyReferredDownward}__) {
                     $r = true;
-                    last SUBNODES2;
+                    last DW;
                   }
                 }
               }
-            }
+            }}
           }
   @IntMethod:
     @@Name: destroy
@@ -874,10 +846,14 @@ IF:
           lang:Perl
         @@@@@:
           my $node = $self->{<Q:TreeCore:node>};
-          delete $self->{<Q:TreeCore:node>};
-          $node->{<Q:TreeCore:rc>}--;
-          unless ($node->__SUPER{ManakaiDOMNodeObject::}__::__INT{isExternallyReferred}__) {
-            $node->__SUPER{ManakaiDOMNodeObject::}__::__INT{destroy}__;
+          if ($node) {
+            delete $self->{<Q:TreeCore:node>};
+            $node->{<Q:TreeCore:rc>}--;
+            unless ($node->__SUPER{ManakaiDOMNodeObject::}__::__INT{isExternallyReferred}__) {
+              $node->__SUPER{ManakaiDOMNodeObject::}__::__INT{destroy}__;
+            }
+          } else {
+            warn "Object of ".ref ($self)." without corresponding node object is to be destroied; there might be a memory leaking code";
           }
 
 ## - For ManakaiDOMNodeObject

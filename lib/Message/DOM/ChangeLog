@@ -1,3 +1,24 @@
+2004-10-09  Wakaba  <wakaba@suika.fam.cx>
+
+	* ManakaiDOMLS2003.dis (ManakaiXMLParser2003/parse:#comment): 
+	Set ownerDocument as parent if parent.ownerDocument is null.
+
+	* dis2pm.pl (dis2perl): Report if DIS code has value.
+
+2004-10-06  Wakaba  <wakaba@suika.fam.cx>
+
+	* ManakaiDOMCore.dis (IFs): Inherit non-conditional version
+	of ManakaiDOMMain interfaces.
+
+	* DOMCore.dis (Node.childNodes): Typo fixed.
+
+	* ManakaiDOMLS2003.dis (parse): Check whether the namespace 
+	prefix is null.
+
+	* dis2pm.pl (perl_builtin_code): Allow hash reference as 'features'.
+	(Condition): Don't generate condition inheritance for DOM1, DOM2
+	and DOM3.
+
 2004-09-30  Wakaba  <wakaba@suika.fam.cx>
 
 	* dis2pm.pl (disdoc_inline2pod, disdoc_inline2text): New

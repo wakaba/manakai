@@ -211,7 +211,8 @@ sub perl_package_name (%) {
     $r = $r . '::' . perl_name $opt{condition};
   }
   if ($opt{is_internal}) {
-    $r = $r . '::_internal';
+    $r .= '::_internal';
+    $r .= '_inherit' if $opt{is_for_inheriting};
   }
   $r;
 }
@@ -857,14 +858,24 @@ sub perl_builtin_code ($;%) {
   } elsif ($name eq 'ParseFeatures') {
     $r = q{
       {
-        my @f = grep {length} split /\s+/, $in;
-        for (my $i = 0; $i < @f; $i++) {
-          my ($name, $plus) = (lc $f[$i]);
-          $plus = 1 if $name =~ s/^\+//;
-          if ($i + 1 < @f and $f[$i + 1] =~ /^\d/) {
-            $out{$name} = {version => $f[$i + 1], plus => $plus}; $i++;
-          } else {
-            $out{$name} = {version => undef, plus => $plus};
+        if (ref $in eq 'HASH') {
+          for (keys %$in) {
+            if ($_ =~ /^\+(.+)/) {
+              $out{lc $1} = {version => $in{$_}, plus => 1};
+            } else {
+              $out{lc $_} = {version => $in{$_}, plus => 0};
+            }
+          }
+        } else {
+          my @f = grep {length} split /\s+/, $in;
+          for (my $i = 0; $i < @f; $i++) {
+            my ($name, $plus) = (lc $f[$i]);
+            $plus = 1 if $name =~ s/^\+//;
+            if ($i + 1 < @f and $f[$i + 1] =~ /^\d/) {
+              $out{$name} = {version => $f[$i + 1], plus => $plus}; $i++;
+            } else {
+              $out{$name} = {version => undef, plus => $plus};
+            }
           }
         }
       }
@@ -876,6 +887,7 @@ sub perl_builtin_code ($;%) {
       $opt{$_} or valid_err qq<Built-in code parameter "$_" required>,
                     node => $opt{node};
       $r =~ s/\$$_/\$$opt{$_}/g;
+      $r =~ s/%$_/%$opt{$_}/g;
     }
   } else {
     valid_err qq<Built-in code "$name" not defined>;
@@ -1425,8 +1437,11 @@ sub dis2perl ($) {
       $r .= perl_statement perl_assign
               perl_var (type => '$', local_name => 'r')
               => '$self->{node}->{' .
-                 perl_literal (expanded_uri ($_->value)) . '}->'.
-                 perl_code q{__CLASS{ManakaiDOMNodeObject}__->__INT{newReference}__};
+                 perl_literal (expanded_uri ($_->value)) . '}';
+                             ## Conditional
+      $r .= perl_statement
+              perl_code q{$r = __CLASS{Node}__->__INT{getNodeReference}__ ($r)
+                          if defined $r};
     } elsif ($_->local_name eq 'SetProp') {
       my $t = perl_statement perl_assign
               '$self->{node}->{' .
@@ -1459,8 +1474,12 @@ sub dis2perl ($) {
     } elsif ($_->local_name eq 'Type') {
       #
     } else {
-      valid_err qq{Element type "@{[$_->local_name]}" not supported};
+      valid_err qq{Element type "@{[$_->local_name]}" not supported},
+        node => $_;
     }
+  }
+  if (defined $node->value and length $node->value) {
+    valid_err q{DIS has value}, node => $node;
   }
   $r;
 } # dis2perl
@@ -2350,6 +2369,10 @@ sub if2perl ($) {
     my $cond_int_pack_name = perl_package_name name => $if_name,
                                     condition => $condition,
                                     is_internal => 1;
+    my $cond_iint_pack_name = perl_package_name name => $if_name,
+                                    condition => $condition,
+                                    is_internal => 1,
+                                    is_for_inheriting => 1;
     $result .= perl_package full_name => $cond_int_pack_name;
     my @isa;
     for (@{$node->child_nodes}) {
@@ -2368,16 +2391,16 @@ sub if2perl ($) {
         } else {
           push @isa, perl_package_name qname_with_condition => $_->value,
                                        condition => $condition,
-                                       is_internal => 1;
+                                       is_internal => 1,
+                                       is_for_inheriting => 1;
         }
       } elsif ($_->local_name eq 'Implement') {
         push @isa, perl_package_name if_qname_with_condition => $_->value,
                                      condition => $condition;
       }
     }
-    push @isa, perl_package_name (name => 'ManakaiDOMObject')
+    push my @isag, perl_package_name (name => 'ManakaiDOMObject')
       unless $if_name eq 'ManakaiDOMObject';
-    $result .= perl_inherit [$cond_int_pack_name, @isa] => $cond_pack_name;
     my @isaa;
     if ($condition) {
       for (@{$Info->{Condition}->{$condition}->{ISA}}) {
@@ -2385,12 +2408,18 @@ sub if2perl ($) {
                                      condition => $_,
                                      is_internal => 1;
       }
+      $result .= perl_inherit [$cond_int_pack_name, @isaa, @isa, @isag]
+                                              => $cond_pack_name;
       $result .= perl_inherit [@isaa, $cond_iif_pack_name]
                                               => $cond_int_pack_name;
+      $result .= perl_inherit [$cond_int_pack_name, @isa]
+                                              => $cond_iint_pack_name;
       $result .= perl_inherit [$cond_if_pack_name, $iif_pack_name]
                                               => $cond_iif_pack_name;
       $result .= perl_inherit [$if_pack_name] => $cond_if_pack_name;
     } else { ## No condition specified
+      $result .= perl_inherit [$cond_int_pack_name, @isa, @isag]
+                                              => $cond_pack_name;
       if ($Info->{NormalCondition}) {
         push @isaa, perl_package_name name => $if_name,
                                      condition => $Info->{NormalCondition},
@@ -2400,10 +2429,13 @@ sub if2perl ($) {
       } else {  ## Condition not used
         $result .= perl_inherit [$iif_pack_name] => $cond_int_pack_name;
       }
+      $result .= perl_inherit [$cond_int_pack_name, @isa]
+                              => $cond_iint_pack_name;
       $result .= perl_inherit [$if_pack_name] => $iif_pack_name;
     }
     for my $pack ($cond_pack_name, $cond_int_pack_name,
-                  $cond_iif_pack_name, $cond_if_pack_name) {
+                  $cond_iif_pack_name, $cond_if_pack_name,
+                  $cond_iint_pack_name) {
       $result .= perl_statement perl_assign
                    perl_var (type => '$',
                              package => {full_name => $pack},
@@ -4035,7 +4067,6 @@ $result .= pod_block
     my $fullname = get_description $cond, name => 'FullName';
     $isa = [$isa] unless ref $isa;
     if ($name =~ /^DOM(\d+)$/) {
-      $isa = ["DOM" . ($1 - 1)] if not @$isa and $1 > 1;
       $defcond = $1 if $1 > $defcond;
       $fullname ||= "DOM Level " . (0 + $1);
     }
@@ -4458,6 +4489,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/09/30 05:28:50 $
+# $Date: 2004/10/09 05:32:30 $
 
 
