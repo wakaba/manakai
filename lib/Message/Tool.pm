@@ -15,7 +15,7 @@ but its functions are used by Message::* Perl Modules internally.
 package Message::Tool;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 sub mail_downgrade ($%) {
   my $msg = shift;
@@ -36,6 +36,27 @@ sub mail_downgrade ($%) {
       }
       $from->item (0, -by => 'index')->option (output_display_name => 0) if $buggy;
     }
+}
+
+sub escape_from ($;%) {
+  my $s = shift;
+  my %option = @_;
+  $option{-escape_first_line} = 1 unless defined $option{-escape_first_line};
+  $s =~ s/^(>*From\x20)/>$1/gm;
+  unless ($option{-escape_first_line}) {
+    $s =~ s/^>(>*From\x20)/$1/;
+  }
+  $s;
+}
+sub unescape_from ($;%) {
+  my $s = shift;
+  my %option = @_;
+  $option{-escape_first_line} = 1 unless defined $option{-escape_first_line};
+  $s =~ s/^>(>*From\x20)/$1/gm;
+  unless ($option{-escape_first_line}) {
+    $s =~ s/^(>*From\x20)/>$1/;
+  }
+  $s;
 }
 
 =head1 LICENSE
@@ -60,7 +81,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/26 12:42:00 $
+$Date: 2002/07/28 00:31:38 $
 
 =cut
 

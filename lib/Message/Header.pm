@@ -8,7 +8,7 @@ Message::Header --- A Perl Module for Internet Message Headers
 package Message::Header;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.40 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.41 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;	## This may seem silly:-)
 push @ISA, qw(Message::Field::Structured);
 
@@ -595,6 +595,11 @@ sub rename ($%) {
   $self if defined wantarray;
 }
 
+sub resent_item ($$$;%) {
+  my $self = shift;
+  my ($index, $item_name, %option) = @_;
+  ## TODO: implement this
+}
 
 =item $self->scan(\&doit)
 
@@ -932,7 +937,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/27 04:44:25 $
+$Date: 2002/07/28 00:31:38 $
 
 =cut
 

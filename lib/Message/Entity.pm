@@ -13,7 +13,7 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.34 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.35 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::Header;
@@ -593,7 +593,7 @@ sub stringify ($;%) {
         $hdr->field ($option{fill_ua_name})->add_our_name (
           -use_Config	=> $option{ua_use_Config},
           -use_Win32	=> $option{ua_use_Win32},
-          -date	=> q$Date: 2002/07/27 04:44:25 $,
+          -date	=> q$Date: 2002/07/28 00:31:38 $,
         );
       }
     } if $option{fill_missing_fields};
@@ -752,6 +752,55 @@ sub id ($) {
   '';
 }
 
+sub sender ($;%) {
+  my $self = shift;
+  my %params = @_;
+  my %option = %{$self->{option}};
+  $option{use_x_envelope_from} = 1;	## X-Envelope-From:
+  $option{use_normal} = 1;	## From:, Sender:
+  $option{use_resent} = 1;	## Resent-From:, Resent-Sender:
+  my $hdr = $self->{header};
+  if ($option{use_x_envelope_from} && $hdr->field_exist ('x-envelope-from')) {
+    return $hdr->field ('x-envelope-from')->addr_spec;
+  } elsif ($option{use_resent} && $hdr->field_exist ('resent-sender')) {
+    ## TODO: Resent block support
+    return $hdr->field ('resent-sender')->addr_spec;
+  } elsif ($option{use_resent} && $hdr->field_exist ('resent-from')) {
+    ## TODO: Resent block support
+    return $hdr->field ('resent-from')->addr_spec;
+  } elsif ($option{use_normal} && $hdr->field_exist ('sender')) {
+    return $hdr->field ('sender')->addr_spec;
+  } elsif ($option{use_normal} && $hdr->field_exist ('from')) {
+    return $hdr->field ('from')->addr_spec;
+  }
+  undef;
+}
+
+sub destination ($;%) {
+  my $self = shift;
+  my %params = @_;
+  my %option = %{$self->{option}};
+  $option{use_x_envelope_to} = 1;	## X-Envelope-To:
+  $option{use_normal} = 1;	## To:, Cc:, Bcc:
+  $option{use_resent} = 1;	## Resent-To:, Resent-Cc:, Resent-Bcc:
+  for (grep {/^-/} keys %params) {$option{substr ($_, 1)} = $params{$_}}
+  my $hdr = $self->{header};
+  my @to;
+  if ($option{use_x_envelope_to} && $hdr->field_exist ('x-envelope-to')) {
+    @to = $hdr->field ('x-envelope-to')->addr_spec;
+  } elsif ($option{use_resent} && $hdr->field_exist ('resent-from')) {
+    ## TODO: Resent block support
+    @to = ($hdr->field ('resent-to')->addr_spec,
+           $hdr->field ('resent-cc')->addr_spec,
+           $hdr->field ('resent-bcc')->addr_spec);
+  } elsif ($option{use_normal}) {
+    @to = ($hdr->field ('to')->addr_spec,
+           $hdr->field ('cc')->addr_spec,
+           $hdr->field ('bcc')->addr_spec);
+  }
+  @to;
+}
+
 =back
 
 =head1 MISC. METHODS
@@ -849,6 +898,10 @@ Internet mail message, defined by IETF RFC 733
 
 Internet mail message, defined by IETF RFC 822
 
+=item mail-rfc822+rfc1123
+
+Internet mail message, defined by IETF RFC 822, ammended by RFC 1123
+
 =item mail-rfc2822
 
 Internet mail message, defined by IETF RFC 2822
@@ -929,25 +982,9 @@ HTTP/1.1 response message, defined by IETF RFC 2616
 
 CGI/1.1 output (for HTTP), defined by coar-cgi-v11 (IETF Internet Draft)
 
-=item http-1.0-cgi-1.1
-
-CGI/1.1 output (for HTTP/1.0), defined by coar-cgi-v11 (IETF Internet Draft)
-
-=item http-1.1-cgi-1.1
-
-CGI/1.1 output (for HTTP/1.1), defined by coar-cgi-v11 (IETF Internet Draft)
-
 =item http-cgi-1.2
 
 CGI/1.2 output, defined by coar-cgi-v12 (to be IETF Internet Draft)
-
-=item http-1.0-cgi-1.2
-
-CGI/1.2 output (for HTTP/1.0), defined by coar-cgi-v11 (IETF Internet Draft)
-
-=item http-1.1-cgi-1.2
-
-CGI/1.2 output (for HTTP/1.1), defined by coar-cgi-v11 (IETF Internet Draft)
 
 =item http-sip-2.0
 
@@ -969,7 +1006,7 @@ SIP/2.0 CGI (IETF Internet Draft)
 
 CPIM/1.0 (IETF Internet Draft)
 
-=item uri-url-mailto-mail-rfc822, uri-url-mailto-mail-rfc2822
+=item uri-url-mailto
 
 mailto: URL scheme
 
@@ -977,11 +1014,11 @@ mailto: URL scheme
 
 mailto: URL scheme (defined by RFC 1738)
 
-=item uri-url-mailto-rfc2368, uri-url-mailto-rfc2822
+=item uri-url-mailto-rfc2368
 
 mailto: URL scheme (defined by RFC 2368)
 
-=item uri-url-mailto-to-mail-rfc822, uri-url-mailto-to-mail-rfc2822
+=item uri-url-mailto-to
 
 C<to> part of mailto: URL scheme (for internal use only)
 
@@ -1026,7 +1063,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/27 04:44:25 $
+$Date: 2002/07/28 00:31:38 $
 
 =cut
 

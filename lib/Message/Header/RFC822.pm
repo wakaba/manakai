@@ -9,7 +9,7 @@ for RFC822 Namespaces of Header Fields
 package Message::Header::RFC822;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Header::Default;
 
 our %OPTION = %Message::Header::Default::OPTION;
@@ -32,7 +32,7 @@ $OPTION{field_sort_good_practice_order} = {};
   }
   ## default = 999
   $i = 1000;
-  for (qw/list- mime-version content- xref/) {
+  for (qw/list- mime-version content- status x-uidl xref/) {
       $OPTION{field_sort_good_practice_order}->{$_} = $i++;
   }
 }
@@ -337,7 +337,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/27 04:43:03 $
+$Date: 2002/07/28 00:31:38 $
 
 =cut
 

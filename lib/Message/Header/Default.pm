@@ -9,7 +9,7 @@ for Default Namespace of Header Fields
 package Message::Header::Default;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Header;
 
 our %OPTION;
@@ -109,7 +109,7 @@ sub sort_good_practice ($$\@\%) {
         }
       } else {	## $a->{ns} ne $b->{ns}
         if ($a->{ns} eq $mynsuri) {
-          my $bp = ($hdr->{ns}->{uri2phname}->{ $b->{ns} } || $b->{ns}).'-';
+          my $bp = ($hdr->{ns}->{uri2phname}->{ $b->{ns} } || '~'.$b->{ns}).'-';
           $bp =~ s/^\Q$mynsprefix\E-//;
           $order->{ $a->{name} } ||= 999;
           $order->{ $bp } ||= 999;
@@ -117,7 +117,7 @@ sub sort_good_practice ($$\@\%) {
           $order->{ $a->{name} } <=> $order->{ $bp }
           || $a->{name} cmp $bp;
         } elsif ($b->{ns} eq $mynsuri) {
-          my $ap = ($hdr->{ns}->{uri2phname}->{ $a->{ns} } || $a->{ns}).'-';
+          my $ap = ($hdr->{ns}->{uri2phname}->{ $a->{ns} } || '~'.$a->{ns}).'-';
           $ap =~ s/^\Q$mynsprefix\E-//;
           $order->{ $ap } ||= 999;
           $order->{ $b->{name} } ||= 999;
@@ -125,8 +125,8 @@ sub sort_good_practice ($$\@\%) {
           $order->{ $ap } <=> $order->{ $b->{name} }
           || $ap cmp $b->{name};
         } else {
-          my $ap = ($hdr->{ns}->{uri2phname}->{ $a->{ns} } || $a->{ns}).'-';
-          my $bp = ($hdr->{ns}->{uri2phname}->{ $b->{ns} } || $b->{ns}).'-';
+          my $ap = ($hdr->{ns}->{uri2phname}->{ $a->{ns} } || '~'.$a->{ns}).'-';
+          my $bp = ($hdr->{ns}->{uri2phname}->{ $b->{ns} } || '~'.$b->{ns}).'-';
           $ap =~ s/^\Q$mynsprefix\E-//;
           $bp =~ s/^\Q$mynsprefix\E-//;
           
@@ -183,7 +183,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/27 04:43:03 $
+$Date: 2002/07/28 00:31:38 $
 
 =cut
 
