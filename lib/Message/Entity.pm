@@ -13,7 +13,7 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.28 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.29 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::Header;
@@ -553,7 +553,7 @@ sub stringify ($;%) {
       $self->{header}->field ($option{fill_ua_name})->add_our_name (
         -use_Config	=> $option{ua_use_Config},
         -use_Win32	=> $option{ua_use_Win32},
-        -date	=> q$Date: 2002/07/19 11:49:46 $,
+        -date	=> q$Date: 2002/07/20 03:11:47 $,
       );
     }
     $header = $self->{header}->stringify (-format => $option{format},
@@ -625,8 +625,34 @@ sub content_type ($;%) {
       $ct->media_type_major ($mt);
       $ct->media_type_minor ($mst);
     }
-    if ($self->{option}->{guess_media_type}) {
-      
+    if ($self->{option}->{guess_media_type} && $self->{body} && !ref $self->{body}) {
+      if ($self->{body} =~ /^-----BEGIN PGP SIGNED MESSAGE-----\x0D?$/m
+        && $self->{body} =~ /^-----BEGIN PGP SIGNATURE-----\x0D?$/m
+        && $self->{body} =~ /^-----END PGP SIGNATURE-----\x0D?$/m) {
+        $ct = $self->{header}->field ('content-type') unless ref $ct;
+        $mt = $ct->media_type_major ('text');
+        $mst = $ct->media_type_minor ('x-pgp-cleartext-signed');
+      } elsif ($self->{body} =~ /^-----BEGIN PGP [A-Z\x20]+-----\x0D?$/m
+        && $self->{body} =~ /^-----END PGP [A-Z\x20]+-----\x0D?$/m) {
+        $ct = $self->{header}->field ('content-type') unless ref $ct;
+        $mt = $ct->media_type_major ('application');
+        $mst = $ct->media_type_minor ('pgp');
+        $ct->parameter (format => 'text');
+      } elsif ($self->{body} =~ /^-+ start of forwarded message \(RFC 934 encapsulation\) -+\x0D?$/m) {
+        $ct = $self->{header}->field ('content-type') unless ref $ct;
+        $mt = $ct->media_type_major ('text');
+        $mst = $ct->media_type_minor ('x-message-rfc934');
+      } elsif ($self->{body} =~ /^-{70,70}\x0D?$/m
+        && $self->{body} =~ /^-{30,30}\x0D?$/m
+        && $self->{body} =~ /\x0D?\x0A-{30,30}\x0D?\x0A\x0D?\x0AEnd of.+?Digest.*?\x0D?\x0A\*+(?:\x0D?\x0A)*$/s) {
+        $ct = $self->{header}->field ('content-type') unless ref $ct;
+        $mt = $ct->media_type_major ('text');
+        $mst = $ct->media_type_minor ('x-message-rfc1153');
+      } elsif ($self->{body} =~ /^-----PRIVACY-ENHANCED MESSAGE BOUNDARY-----\x0D?$/m) {
+        $ct = $self->{header}->field ('content-type') unless ref $ct;
+        $mt = $ct->media_type_major ('text');
+        $mst = $ct->media_type_minor ('x-message-pem');
+      }
     }
   } else {
     ($mt, $mst) = ($ct->media_type_major, $ct->media_type_minor);
@@ -637,10 +663,14 @@ sub content_type ($;%) {
       if (ref $mls && $mls =~ /fml/) {
         my $s = $self->{header}->field ('subject', -new_item_unless_exist => 0);
         if (index ($s, 'RFC934(mh-burst)') >= 0) {
-          $mt = 'text';  $mst = 'x-message-rfc934';
           $ct = $self->{header}->field ('content-type') unless ref $ct;
-          $ct->media_type_major ($mt);
-          $ct->media_type_minor ($mst);
+          $mt = $ct->media_type_major ('text');
+          $mst = $ct->media_type_minor ('x-message-rfc934');
+          $ct->delete ('charset');
+        } elsif (index ($s, 'Digest (RFC1153)') >= 0) {
+          $ct = $self->{header}->field ('content-type') unless ref $ct;
+          $mt = $ct->media_type_major ('text');
+          $mst = $ct->media_type_minor ('x-message-rfc1153');
           $ct->delete ('charset');
         }
       }
@@ -935,7 +965,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/19 11:49:46 $
+$Date: 2002/07/20 03:11:47 $
 
 =cut
 

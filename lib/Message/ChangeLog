@@ -1,3 +1,16 @@
+2002-07-20  Wakaba <w@suika.fam.cx>
+
+	* Entity.pm (content_type): Guess media type: 
+	text/x-message-rfc1153, text/x-pgp-cleatext-singed,
+	application/pgp, text/x-message-pem.
+
+2002-07-19  Wakaba <w@suika.fam.cx>
+
+	* Entity.pm:
+	- (guess_media_type): New option.
+	- (content_type): Guess media type (text/x-message-rfc934) 
+	if necessary.
+
 2002-07-13  Wakaba <w@suika.fam.cx>
 
 	* Util.pm:

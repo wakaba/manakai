@@ -8,7 +8,7 @@ Message::MIME::MediaType --- Media-type definitions
 package Message::MIME::MediaType;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Header;
 require Message::Header::Message;
 
@@ -57,6 +57,12 @@ $type{text}->{css} = {
 	mime_charset	=> 1,
 	extension	=> [qw/css/],
 	mac_type	=> ['css '],
+};
+
+$type{text}->{'x-csv'} = {
+	cte_7bit_preferred	=> 'quoted-printable',
+	mime_charset	=> 1,
+	extension	=> [qw/csv/],
 };
 
 $type{text}->{directory} = {
@@ -119,13 +125,30 @@ $type{text}->{javascript} = {	## Not yet registered in [IANAREG]
 	mac_type	=> [qw/TEXT/],
 };
 
+$type{text}->{'x-message-pem'} = {
+	cte_7bit_preferred	=> 'quoted-printable',
+	mime_charset	=> 1,
+};
+
 $type{text}->{'x-message-rfc934'} = {
 	mime_charset	=> 0,
 	handler	=> ['Message::Body::TextMessageRFC934'],
 };
 
+$type{text}->{'x-message-rfc1153'} = {
+	mime_charset	=> 0,
+	handler	=> ['Message::Body::TextMessageRFC1153'],
+};
+
 $type{text}->{parityfec} = {
 	mime_charset	=> 0,
+};
+
+$type{text}->{'x-pgp-cleartext-signed'} = {
+	mime_alternate	=> [qw/application pgp/],
+	cte_7bit_preferred	=> 'quoted-printable',
+	mime_charset	=> 1,
+	handler	=> ['Message::Body::TextPlain'],
 };
 
 $type{text}->{'prs.lines.tag'} = {
@@ -182,10 +205,10 @@ $type{text}->{'uri-list'} = {
 	mac_type	=> [qw/URIs/],
 };
 
-$type{text}->{'x-csv'} = {
+$type{text}->{'x-url-shortcut'} = {
 	cte_7bit_preferred	=> 'quoted-printable',
 	mime_charset	=> 1,
-	extension	=> [qw/csv/],
+	extension	=> [qw/url/],
 };
 
 $type{text}->{xsl} = {	## Not in [IANAREG]
@@ -208,12 +231,6 @@ $type{text}->{'xml-external-parsed-entity'} = {
 	default_charset	=> 'us-ascii',
 	extension	=> [qw/ent xml/],
 	mac_type	=> [qw/TEXT/],
-};
-
-$type{text}->{'x-url-shortcut'} = {
-	cte_7bit_preferred	=> 'quoted-printable',
-	mime_charset	=> 1,
-	extension	=> [qw/url/],
 };
 
 $type{application}->{'octet-stream'} = {
@@ -311,8 +328,16 @@ $type{application}->{'news-transmission'} = {
 	},
 };
 
+$type{application}->{pgp} = {	## Not in [IANAREG].  Obsoleted
+	text_content	=> 1,
+	cte_7bit_preferred	=> 'quoted-printable',
+	mime_charset	=> 1,
+	handler	=> ['Message::Body::TextPlain'],
+};
+
 $type{application}->{'pgp-signature'} = {
 	text_content	=> 1,
+	default_charset	=> 'us-ascii',
 	cte_7bit_preferred	=> 'quoted-printable',
 };
 
@@ -736,7 +761,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/19 11:49:46 $
+$Date: 2002/07/20 03:11:47 $
 
 =cut
 

@@ -8,7 +8,7 @@ Message::MIME::Encoding --- Encoding (MIME CTE, HTTP encodings, etc) definitions
 package Message::MIME::Encoding;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 our %ENCODER = (
 	'7bit'	=> sub { ($_[1], decide_coderange (@_[0,1,2])) },
@@ -116,6 +116,7 @@ sub encode_qp ($$) {
       #join('', map { sprintf('=%02X', ord($_)) } split('', $1) )
     /egm;                        # rule #3 (encode whitespace at eol)
     $s =~ s/${enl}From/$nl=46rom/g;
+    $s =~ s/${enl}-/$nl=2D/g;
     $s =~ s/$enl/$nl/g;
   } else {
     $s =~ s/([\x09\x20])$/
@@ -267,7 +268,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/17 00:33:29 $
+$Date: 2002/07/20 03:11:47 $
 
 =cut
 
