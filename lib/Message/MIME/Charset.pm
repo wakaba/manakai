@@ -16,8 +16,8 @@ Perl module for MIME charset.
 
 package Message::MIME::Charset;
 use strict;
-use vars qw(%CHARSET %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use vars qw(%CHARSET %MSNAME2IANANAME %REG $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 &_builtin_charset;
 sub _builtin_charset () {
@@ -99,6 +99,11 @@ my %_MINIMUMIZER = (
 	'utf-32be'	=> \&_name_utf32be,
 );
 
+%MSNAME2IANANAME = (
+	'iso-2022-jp'	=> 'x-iso2022jp-cp932',
+	'ks_c_5601-1987'	=> 'windows-949',
+);
+
 sub make_charset ($%) {
   my $name = shift;
   return unless $name;	## Note: charset "0" is not supported.
@@ -155,6 +160,11 @@ sub name_minimumize ($$) {
     return &{$_MINIMUMIZER{$charset}} ($charset, $s);
   }
   (charset => $charset);
+}
+
+sub msname2iananame ($) {
+  my $mscharset = shift;
+  $MSNAME2IANANAME{$mscharset} || $mscharset;
 }
 
 sub _name_7bit_iso2022 ($$) {shift;
@@ -446,7 +456,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/19 11:49:46 $
+$Date: 2002/07/21 03:25:23 $
 
 =cut
 

@@ -67,7 +67,7 @@ Message::MIME::Charset::Encode.
 package Message::MIME::Charset::Jcode;
 use strict;
 use vars qw(%CODE $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::MIME::Charset;
 
@@ -145,7 +145,7 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset ('iso-2022-jp' =>
         encoder	=> sub {
           my $s = jcode::jis (__jcode_pl_fw_to_hw ($_[1]), $CODE{internal});
-          ($s, Message::MIME::Charset::_name_8bit_iso_2022 ('iso-2022-jp', $s));
+          ($s, Message::MIME::Charset::_name_8bit_iso2022 ('iso-2022-jp', $s));
         },
         decoder	=> sub { jcode::to ($CODE{internal}, $_[1], 'jis') },
         mime_text	=> 1,
@@ -178,7 +178,7 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset ('iso-2022-jp' =>
         encoder	=> sub {
           my $s = Jcode->new ($_[1], $CODE{internal})->jis; ## ->iso_2022_jp;
-          ($s, Message::MIME::Charset::_name_8bit_iso_2022 ('iso-2022-jp' => $s));
+          ($s, Message::MIME::Charset::_name_8bit_iso2022 ('iso-2022-jp' => $s));
         },
         decoder	=> sub { my $s = $_[1]; Jcode::convert (\$s, $CODE{internal}, 'jis'); $s },
         mime_text	=> 1,
@@ -227,7 +227,7 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset ('iso-2022-jp' =>
         encoder	=> sub {
           my $s = nkf ( "-j -".uc (substr ($CODE{internal}, 0, 1)), $_[1] );
-          ($s, Message::MIME::Charset::_name_8bit_iso_2022 ('iso-2022-jp' => $s));
+          ($s, Message::MIME::Charset::_name_8bit_iso2022 ('iso-2022-jp' => $s));
         },
         decoder	=> sub { nkf ( "-". substr ($CODE{internal}, 0, 1) . " -J", $_[1] ) },
         mime_text	=> 1,
@@ -261,7 +261,7 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset ('iso-2022-jp' =>
         encoder	=> sub {
           my $s = Unicode::Japanese->new ($_[1], $CODE{internal})->jis;
-          ($s, Message::MIME::Charset::_name_8bit_iso_2022 ('iso-2022-jp' => $s));
+          ($s, Message::MIME::Charset::_name_8bit_iso2022 ('iso-2022-jp' => $s));
         },
         decoder	=> sub { Unicode::Japanese->new ($_[1], 'jis')->conv ($CODE{internal}) },
         mime_text	=> 1,
@@ -354,7 +354,7 @@ sub import ($;%) {
       Message::MIME::Charset::make_charset ('iso-2022-jp' =>
         encoder	=> sub {
           my $s = kconv ($_[1], &_JIS, __kconv_code_name ($CODE{internal}));
-          ($s, Message::MIME::Charset::_name_8bit_iso_2022 ('iso-2022-jp' => $s));
+          ($s, Message::MIME::Charset::_name_8bit_iso2022 ('iso-2022-jp' => $s));
         },
         decoder	=> sub { kconv ($_[1], __kconv_code_name ($CODE{internal}), &_JIS) },
         mime_text	=> 1,
@@ -383,6 +383,7 @@ sub import ($;%) {
     Message::MIME::Charset::make_charset (jis => alias_of => 'iso-2022-jp');
     Message::MIME::Charset::make_charset (junet => alias_of => 'iso-2022-jp');
     Message::MIME::Charset::make_charset ('junet-code' => alias_of => 'iso-2022-jp');
+    Message::MIME::Charset::make_charset ('x-iso2022jp-cp932' => alias_of => 'iso-2022-jp');	## TODO: support pseudo ISO-2022-JP of Microsoft CP932
     Message::MIME::Charset::make_charset ('iso-2022-jp-1' => alias_of => 'iso-2022-jp');
     Message::MIME::Charset::make_charset ('iso-2022-jp-3' => alias_of => 'iso-2022-jp');
     Message::MIME::Charset::make_charset ('x-iso-2022-jp-3' => alias_of => 'iso-2022-jp-3');
@@ -495,7 +496,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/17 00:33:29 $
+$Date: 2002/07/21 03:25:23 $
 
 =cut
 
