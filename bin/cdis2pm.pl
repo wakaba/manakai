@@ -33,6 +33,7 @@ use Message::Util::QName::Filter {
   DOMEvents => q<http://suika.fam.cx/~wakaba/archive/2004/dom/events#>,
   DOMMain => q<http://suika.fam.cx/~wakaba/archive/2004/dom/main#>,
   DOMXML => q<http://suika.fam.cx/~wakaba/archive/2004/dom/xml#>,
+  DX => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#>,
   lang => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#>,
   Perl => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl-->,
   license => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/license#>,
@@ -41,6 +42,7 @@ use Message::Util::QName::Filter {
   owl => q<http://www.w3.org/2002/07/owl#>,
   rdf => q<http://www.w3.org/1999/02/22-rdf-syntax-ns#>,
   rdfs => q<http://www.w3.org/2000/01/rdf-schema#>,
+  swcfg21 => q<http://suika.fam.cx/~wakaba/archive/2005/swcfg21#>,
   TreeCore => q<>,
 };
 
@@ -637,8 +639,8 @@ sub perl_code ($;%) {
                perl_statement
                  dispm_perl_throws
                    class =>
-                     ExpandedURI q<ManakaiDOM:ManakaiDOMImplementationException>,
-                   class_for => ExpandedURI q<ManakaiDOM:ManakaiDOMCommon>,
+                     ExpandedURI q<DX:CoreException>,
+                   class_for => ExpandedURI q<ManakaiDOM:all>,
                    type => 'MDOM_DEBUG_BUG',
                    subtype => ExpandedURI q<DOMMain:ASSERTION_ERR>,
                    xparam => {
@@ -784,9 +786,9 @@ sub dispm_get_code (%) {
        defined $opt{resource}->{Name}) or
       ($opt{resource}->{ExpandedURI q<dis2pm:type>} and
        {
-         ExpandedURI q<ManakaiDOM:DOMMethodReturn> => 1,
-         ExpandedURI q<ManakaiDOM:DOMAttrGet> => 1,
-         ExpandedURI q<ManakaiDOM:DOMAttrSet> => 1,
+         ExpandedURI q<DISLang:MethodReturn> => 1,
+         ExpandedURI q<DISLang:AttributeGet> => 1,
+         ExpandedURI q<DISLang:AttributeSet> => 1,
        }->{$opt{resource}->{ExpandedURI q<dis2pm:type>}}) or
       (dis_resource_ctype_match ([ExpandedURI q<dis2pm:InlineCode>,
                                   ExpandedURI q<dis2pm:BlockCode>],
@@ -1100,7 +1102,8 @@ sub disperl_to_perl (%) {
                    perl_assign
                         perl_var (type => '$', local_name => 'r') => $v;
     } elsif ($et eq ExpandedURI q<d:GetProp> or
-             $et eq ExpandedURI q<d:GetPropNode>) {
+             $et eq ExpandedURI q<d:GetPropNode> or
+             $et eq ExpandedURI q<swcfg21:GetPropNode>) {
       my $uri = dis_qname_to_uri ($_->value, %opt, node => $_,
                                   use_default_namespace => 1);
       $code .= perl_statement
@@ -1112,6 +1115,12 @@ sub disperl_to_perl (%) {
         $code .= perl_if
                    'defined $r',
                    perl_code (q{$r = <ClassM::DOMCore:ManakaiDOMNode
+                                                   .getNodeReference> ($r)},
+                              %opt, node => $_);
+      } elsif ($et eq ExpandedURI q<swcfg21:GetPropNode>) {
+        $code .= perl_if
+                   'defined $r',
+                   perl_code (q{$r = <ClassM::swcfg21:ManakaiSWCFGNode
                                                    .getNodeReference> ($r)},
                               %opt, node => $_);
       }
@@ -1772,7 +1781,7 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
       for my $method (values %{$pack->{ExpandedURI q<dis2pm:method>}}) {
         next unless defined $method->{Name};
         if ($method->{ExpandedURI q<dis2pm:type>} eq
-            ExpandedURI q<ManakaiDOM:DOMMethod>) {
+            ExpandedURI q<DISLang:Method>) {
           local $opt{ExpandedURI q<MDOMX:method>}
             = $method->{ExpandedURI q<dis2pm:methodName+>};
           local $opt{ExpandedURI q<dis2pm:currentMethodResource>} = $method;
@@ -1860,7 +1869,7 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
             $code = perl_statement 'my $self = shift;';
             $code .= perl_statement
                       dispm_perl_throws
-                        class => ExpandedURI q<DOMCore:ManakaiDOMException>,
+                        class => ExpandedURI q<DX:CoreException>,
                         class_for => $for1,
                         type => 'NOT_SUPPORTED_ERR',
                         subtype =>
@@ -1881,7 +1890,7 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
                      = perl_sub (name => '', code => $code, prototype => $proto);
           }
         } elsif ($method->{ExpandedURI q<dis2pm:type>} eq
-                 ExpandedURI q<ManakaiDOM:DOMAttribute>) {
+                 ExpandedURI q<DISLang:Attribute>) {
           local $opt{ExpandedURI q<MDOMX:attr>}
             = $method->{ExpandedURI q<dis2pm:methodName+>};
           my $getter = $method->{ExpandedURI q<dis2pm:getter>};
@@ -1915,7 +1924,7 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
           } else { ## Get code not defined
             $get_code = perl_statement
                       dispm_perl_throws
-                        class => ExpandedURI q<DOMCore:ManakaiDOMException>,
+                        class => ExpandedURI q<DX:CoreException>,
                         class_for => $for1,
                         type => 'NOT_SUPPORTED_ERR',
                         subtype =>
@@ -1952,7 +1961,7 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
             } else { ## Set code not defined
               $set_code = perl_statement
                       dispm_perl_throws
-                        class => ExpandedURI q<DOMCore:ManakaiDOMException>,
+                        class => ExpandedURI q<DX:CoreException>,
                         class_for => $for1,
                         type => 'NOT_SUPPORTED_ERR',
                         subtype =>
@@ -2076,21 +2085,45 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
         $ol{fallback} = 1;
         $result .= perl_statement 'use overload '.perl_list %ol;
       }
+      my $op2perl = {
+        ExpandedURI q<ManakaiDOM:MUErrorHandler> => {
+          method_name => '___report_error',
+        },
+        ExpandedURI q<DISPerl:AsStringMethod> => {
+          method_name => 'as_string',
+        },
+        ExpandedURI q<DISPerl:NewMethod> => {
+          method_name => 'new',
+        },
+        ExpandedURI q<DISPerl:CloneMethod> => {
+          method_name => 'clone',
+        },
+      };
       for (values %{$pack->{ExpandedURI q<d:Operator>}||{}}) {
         next unless defined $_->{resource}->{Name};
-        if ($_->{operator} eq ExpandedURI q<ManakaiDOM:MUErrorHandler>) {
+        if ($op2perl->{$_->{operator}}) {
           if ($_->{resource}->{ExpandedURI q<dis2pm:methodName+>} =~ /^\#/) {
             my $code = $_->{resource}->{ExpandedURI q<dis2pm:methodCodeRef>};
-            $code =~ s/\bsub /sub ___report_error /;
+            $code =~ s/\bsub /sub $op2perl->{$_->{operator}}->{method_name} /;
             $result .= $code;
           } else {
             $result .= perl_statement
                          perl_assign
                               perl_var (type => '*',
-                                        local_name => '___report_error')
+                                        local_name => $op2perl->{$_->{operator}}
+                                                              ->{method_name})
                            => perl_var (type => '\&',
                                         local_name => $_->{resource}
                                           ->{ExpandedURI q<dis2pm:methodName>});
+          }
+          if ($_->{operator} eq ExpandedURI q<DISPerl:AsStringMethod>) {
+            $result .= perl_statement
+                         perl_assign
+                              perl_var (type => '*',
+                                        local_name => 'stringify')
+                           => perl_var (type => '\&',
+                                        local_name => $op2perl->{$_->{operator}}
+                                                              ->{method_name});
           }
         } else {
           valid_err qq{Operator <$_->{operator}> is not supported},
@@ -2285,4 +2318,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/01/07 13:07:14 $
+1; # $Date: 2005/02/18 06:13:52 $

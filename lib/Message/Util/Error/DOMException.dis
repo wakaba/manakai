@@ -1,0 +1,664 @@
+Module:
+  @QName:
+    Err:DOMException
+  @FullName:
+    @@lang: en
+    @@@:
+      Manakai DOM-Style Error Reporting System Implementation
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
+  
+  @Description:
+    @@lang:en
+    @@@:
+      This module provides the manakai implementation of DOM-style 
+      error reporting system build on the top of the 
+      <PerlModule::Message::Util::Error>. 
+
+  @Author:
+    @@FullName: Wakaba
+    @@Mail: w@suika.fam.cx
+  @License:
+     license:Perl+MPL
+  @Date:
+    @@@:
+      $Date: 2005/02/18 06:13:52 $
+    @@ContentType:
+      dis:Date.RCS
+  
+  @Require:
+    @@Module:
+      @@@Name: DISPerl
+      @@@WithFor:
+        ManakaiDOM:all
+
+Namespace:
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @dis2pm:
+    http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
+  @DOMMain:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @Err:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/
+  @lang:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @MDOMX:
+    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @MUError:\
+  @MUErrorCore:-
+  @Perl:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @TreeCore:\
+
+ResourceDef:
+  @QName:
+    Err:
+  @rdf:type:
+    dis:ModuleGroup
+  @FullName:
+    @@lang:en
+    @@@:
+      The manakai error reporting modules
+  @AppName:
+    Message::Util::Error::
+
+## -- Resource types
+
+ResourceTypeDef:
+  @QName: 
+    ManakaiDOM:ExceptionIF
+  @FullName:
+    @@lang:en
+    @@@: Exception interface
+  @Description:
+    @@lang:en
+    @@@:
+      An exception type.
+
+ResourceTypeDef:
+  @QName: 
+    ManakaiDOM:ExceptionClass
+  @FullName:
+    @@lang:en
+    @@@: Exception class
+  @Description:
+    @@lang:en
+    @@@:
+      A concrete implementation of an exception type.
+
+ResourceTypeDef:
+  @QName: 
+    ManakaiDOM:WarningClass
+  @FullName:
+    @@lang:en
+    @@@: Warning class
+  @Description:
+    @@lang:en
+    @@@:
+      A warning type (including its implementation).
+
+ResourceTypeDef:
+  @QName: 
+    ManakaiDOM:ExceptionOrWarningSubType
+  @FullName:
+    @@lang:en
+    @@@: Exception/warning subtype
+  @Description:
+    @@lang:en
+    @@@:
+      A subtype of an exception or warning.
+
+PropDef:
+  @QName: 
+    ManakaiDOM:exceptionOrWarningParameter
+  @FullName:
+    @@lang:en
+    @@@: Parameter (for an exception or warning)
+  @rdfs:domain: 
+    ManakaiDOM:Const
+  @Description:
+    @@lang:en
+    @@@:
+      Declares the existence of an additional information about the exception.
+
+ResourceTypeDef:
+  @QName: 
+    DOMMain:XWParameter
+  @FullName:
+    @@lang:en
+    @@@:
+      Exception parameter
+  @Description:
+    @@lang:en
+    @@@:
+      A parameter that is used to describe exceptions and warnings. 
+
+ElementTypeBinding:
+  @Name: ResourceTypeDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdfs:Class
+    @@rdfs:subClassOf:
+      rdfs:Class
+    @@subsetOf:
+      rdfs:Class
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+## -- Throwing of exceptions
+
+PropDef:
+  @QName: 
+    ManakaiDOM:raises
+  @Description:
+    @@lang:en
+    @@@:
+      An exception the method or attribute might raise.
+
+PropDef:
+  @QName: 
+    ManakaiDOM:alwaysWarns
+  @Description:
+    @@lang:en
+    @@@:
+      A warning that is reported everytime the method or attribute is called. 
+      \
+      {NOTE:: By the configuration for warning level, it might not be 
+              reported.
+      \
+      }
+
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdf:Property
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+## -- lang:dis vocabulary
+
+TreeElementType:
+  @Name: raiseException
+  @Description:
+    @@lang:en
+    @@@:
+      Raises an exception.  Content: Same as <Q::ManakaiDOM:raises>.
+
+ElementTypeBinding:
+  @Name: TreeElementType
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:TreeElementType
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+## -- Exception classes
+
+ResourceDef:
+  @QName: 
+    ManakaiDOM:ManakaiDOMExceptionOrWarning
+  @rdf:type:
+    ManakaiDOM:Class
+  @AppISA:
+    @@ContentType:
+      lang:Perl
+    @@@:
+      Message::Util::Error
+
+  @Description:
+    @@lang:en
+    @@@:
+      The base class that should be inherited by all manakai 
+      DOM-style exception and warning classes.  DOM applications 
+      are able to test whether an object is an instance of any 
+      manakai DOM-style exception or warning or not. 
+
+  @Attr:
+    @@Name:text
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns a short plain-text message, written in the 
+        <CODE::i-default> language, that describes 
+        what is happened. 
+        \
+        {NOTE:: This attribute is also defined in the class 
+                <PerlModule::Message::Util::Error> and it is 
+                overridden here for the purpose of manakai 
+                exception and warning reporting. 
+        \
+        }
+        \
+        {NOTE:: This attribute only provides a mechanism for programer 
+                to know what is occuring; for reporting error to end 
+                user, DOM application should implement its own 
+                mechanism with localized message.
+        \
+        }
+    @@Get:
+      @@@Type:
+        DISLang:String
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          An error message written in <CODE::i-default> language.
+      @@@PerlDef:
+          my $template;
+          if (defined $self->{<Q::MDOMX:subtype>} and
+              defined $self->{<Q::MUErrorCore:def>}->{<Q::MDOMX:subtype>}
+                   ->{$self->{<Q::MDOMX:subtype>}}
+                   ->{<Q::MUError:description>}) {
+            $template = $self->{<Q::MUErrorCore:def>}
+                   ->{<Q::MDOMX:subtype>}
+                   ->{$self->{<Q::MDOMX:subtype>}}
+                   ->{<Q::MUError:description>};
+          } elsif (defined $self->{<Q::MUErrorCore:def>}
+                   ->{<Q::MUError:description>}) {
+            $template = $self->{<Q::MUErrorCore:def>}
+                   ->{<Q::MUError:description>};
+          } else {
+            $template = $self->{<Q::MUErrorCore:type>};
+          }
+          $r = $self->_FORMATTER_PACKAGE_->new
+                    ->replace ($template, param => $self);
+
+  @Method:
+    @@Operator:
+      @@@@:
+        DISPerl:AsStringMethod
+      @@@ContentType:
+        dis:TypeQName
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Generates a simple string that describes what kind of error 
+        has occured, written in the <CODE::i-default> language. 
+        \
+        {NOTE:: The <PerlModule::Message::Util::Error> module defines 
+                a generic definition of the method and it is overriden 
+                here for the purpose of manakai DOM's exception system. 
+        \
+        }
+    @@Return:
+      @@@Type:
+        DISLang:String
+      @@@PerlDef:
+        $r = $self->SUPER::stringify;
+        if (defined $self->{<Q::MDOMX:class>}) {
+          if (defined $self->{<Q::MDOMX:method>}) {
+            $r = $self->{<Q::MDOMX:class>} . '->' .
+                 $self->{<Q::MDOMX:method>} . ': ' . $r;
+          } elsif (defined $self->{<Q::MDOMX:attr>}) {
+            $r = $self->{<Q::MDOMX:class>} . '->' .
+                 $self->{<Q::MDOMX:attr>} . ' (' .
+                 $self->{<Q::MDOMX:on>} . '): ' . $r;
+          } else {
+            $r = $self->{<Q::MDOMX:class>} . ': ' . $r;
+          }
+        }
+        if (defined $self->{<Q::MDOMX:param-name>}) {
+          $r = 'Parameter "' . $self->{<Q::MDOMX:param-name>} . '": ' . $r;
+        }
+  @ResourceDef:
+    @@QName:
+      ManakaiDOM:getExceptionCode
+    @@rdf:type:
+      dis2pm:BlockCode
+    @@aliasChild:1
+    @@PerlDef:
+      $r = $self->{<Q::MUErrorCore:def>}->{<Q::DOMCore:code>};
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns the numeric exception code of the object. 
+
+ResourceDef:
+  @QName: 
+    DOMMain:ManakaiDOMExceptionIF
+  @rdf:type:
+    ManakaiDOM:ExceptionIF
+  @Description:
+    @@lang:en
+    @@@:
+      An exception interface that all manakai DOM-style exception interfaces 
+      should inherit. 
+  @AppISA:
+    @@ContentType:
+      lang:Perl
+    @@@:
+      Message::Util::Error
+
+ResourceDef:
+  @QName: 
+    ManakaiDOM:ManakaiDOMException
+  @rdf:type:
+    ManakaiDOM:ExceptionClass
+  @ISA: 
+    ManakaiDOM:ManakaiDOMExceptionOrWarning
+
+  @Description:
+    @@lang:en
+    @@@:
+      An abstract class that is inherited by all manakai DOM-style
+      exception classes.
+
+ResourceDef:
+  @QName: 
+    ManakaiDOM:ManakaiDOMWarning
+  @rdf:type:
+    ManakaiDOM:WarningClass
+  @ISA: 
+    ManakaiDOM:ManakaiDOMExceptionOrWarning
+
+  @Description:
+    @@lang:en
+    @@@:
+      An abstract class that is inherited by all manakai warning classes.
+
+ResourceDef:
+  @QName: CoreException
+  @rdf:type:
+    ManakaiDOM:ExceptionClass
+  @ISA:
+    ManakaiDOM:ManakaiDOMException
+  @Description:
+    @@lang:en
+    @@@:
+      Exceptions common to all manakai DOM-style modules. 
+  @ResourceDef:
+    @@QName: CoreExceptionCode
+    @@rdf:type:
+      ManakaiDOM:ConstGroup
+    @@Type:
+      DOMMain:unsigned-short
+    @@rdfs:subClassOf:
+      DOMMain:unsigned-short
+
+    @@ResourceDef:
+      @@@QName: 
+        MDOMX:MDOM_DEBUG_BUG
+      @@@rdf:type:
+        ManakaiDOM:Const
+      @@@Value: 3
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Unexpected case occurs.  In general, this exception is not 
+          reported.  If the implementation has a bug and 
+          something unexpected is occur, this exception is raised. 
+        \
+          Applications MUST NOT try to catch this exception. 
+          If this exception is raised, please report to the 
+          author of that module.
+          \
+          {NOTE:: New assertion mechanism and subtype <X::ASSERTION_ERR> 
+                  has been introduced; it should be used instead of 
+                  throwing <X::MDOMX:MDOM_DEBUG_BUG> directly. 
+          \
+          }
+      @@@XParam:
+        @@@@QName:
+          MDOMX:values
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: Arbitrary values for debugging.
+
+      @@@XSubTypeDef:
+        @@@@QName: ASSERTION_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Failure to pass an assertion. 
+        @@@@XParam:
+          @@@@@QName:assertionType
+          @@@@@Description:
+            @@@@@@lang:en
+            @@@@@@@:Type of the assertion.
+        @@@@XParam:
+          @@@@@QName:actualValue
+          @@@@@Description:
+            @@@@@@lang:en
+            @@@@@@@: The actual value.
+        @@@@XParam:
+          @@@@@QName:expectedValue
+          @@@@@Description:
+            @@@@@@lang:en
+            @@@@@@@@: The expected value.
+        @@@@XParam:
+          @@@@@QName:expectedLabel
+          @@@@@Description:
+            @@@@@@lang:en
+            @@@@@@@:
+              A simple explaination for expected value. 
+        @@@@XParam:
+          @@@@@QName:traceText
+          @@@@@Description:
+            @@@@@@lang:en
+            @@@@@@@:
+              Perl's stack trace string (return value of <Perl::Carp::longmess>
+              is assumed). 
+        @@@@Def:
+          @@@@@lang:en
+          @@@@@ContentType:
+            lang:muf
+          @@@@@@:
+            ASSERTION ERROR: got "%p (name => {<Q::DOMMain:actualValue>});" 
+            while %p (name => {<Q::DOMMain:expectedValue>}, prefix => {"},
+            suffix => {"});%p (name => {<Q::DOMMain:expectedLabel>},
+            prefix => { (}, suffix => {)}); is expected %p (
+            name => {<Q::DOMMain:traceText>}); 
+  
+    @@ResourceDef:
+      @@@Name: NOT_SUPPORTED_ERR
+      @@@rdf:type:
+        ManakaiDOM:Const
+      @@@Value:9
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The implementation does not support the action. 
+
+        @@@XSubTypeDef:
+          @@@@QName:
+            MDOMX:MDOM_IMPL_ATTR_NOT_IMPLEMENTED
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The implementation does not support this attribute.
+          @@@@XParam:
+            @@@@@QName:
+              MDOMX:class
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The name of class to which the attribute not implemented belongs.
+          @@@@XParam:
+            @@@@@QName:
+              MDOMX:attr
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The name of attribute that is not implemented.
+          @@@@XParam:
+            @@@@@QName:
+              MDOMX:on
+            @@@@@InCase:
+              @@@@@@Value:get
+              @@@@@@Description:
+                @@@@@@@lang:en
+                @@@@@@@@: Getting this attribute is not implemented.
+            @@@@@InCase:
+              @@@@@@Value:set
+              @@@@@@Description:
+                @@@@@@@lang:en
+                @@@@@@@@: Setting this attribute is not implemented.
+          @@@@enMufDef:
+              The attribute "%p (name => {<Q::MDOMX:class>}, suffix => {.}
+              );%p (name => {<Q::MDOMX:attr>});"
+              %p (name => {<Q::MDOMX:on>},
+                  prefix => {(}, suffix => {)}); has not been implemented yet 
+        @@@XSubTypeDef:
+          @@@@QName:
+            MDOMX:MDOM_IMPL_METHOD_NOT_IMPLEMENTED
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The DOM implementation does not support this method.
+          @@@@XParam:
+            @@@@@QName:
+              MDOMX:class
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The name of class to which the method not implemented belongs.
+          @@@@XParam:
+            @@@@@QName:
+              MDOMX:method
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The name of method that is not implemented.
+          @@@@enMufDef:
+              The method "%p (name => {<Q::MDOMX:class>}, suffix => {.}
+              );%p (name => {<Q::MDOMX:method>});" has not been implemented yet
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Method
+
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodReturn
+
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Attribute
+
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:AttributeGet
+
+ElementTypeBinding:
+  @Name: InCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+
+ElementTypeBinding:
+  @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
+
+ElementTypeBinding:
+  @Name:enMufDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@lang:en
+    @@ContentType:
+      lang:muf
+
+ElementTypeBinding:
+  @Name: XSubTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:ExceptionOrWarningSubType
+
+ElementTypeBinding:
+  @Name: XParam
+  @ElementType:
+    ManakaiDOM:exceptionOrWarningParameter
+
+## -- Common exception parameters
+
+XWParam:
+  @QName:
+    MDOMX:param-name
+  @Type: 
+    DISPerl:MethodName
+  @Description:
+    @@lang:en
+    @@@:
+      A name of method parameter that is related to the exception 
+      or warning issued. 
+
+XWParam:
+  @QName:
+    MDOMX:class
+  @Type:
+    perl:package-name
+  @Description:
+    @@lang:en
+    @@@:
+      The name of class in whose method or attribute an exception 
+      or warning is thrown. 
+
+ElementTypeBinding:
+  @Name: XWParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: 
+      DOMMain:XWParameter
+    @@AliasFor:
+      @@@For:
+        !=ManakaiDOM:all
+      @@@@:
+        ::ManakaiDOM:all
+
+## DOMException.dis ends here

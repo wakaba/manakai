@@ -4,7 +4,7 @@ Module:
   @FullName:
     @@lang:en
     @@@: 
-      <QUOTE:dis> Abstract Programming Language Module
+      <QUOTE::dis> Abstract Programming Language Module
   @Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Lang#
   
@@ -15,7 +15,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/01/05 12:19:39 $
+      $Date: 2005/02/18 06:13:52 $
     @@ContentType:
       dis:Date.RCS
   
@@ -35,6 +35,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
   @disPerl:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl--
+  @DOMMain:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @lang:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
@@ -88,6 +90,215 @@ ElementTypeBinding:
         !=ManakaiDOM:all
     @@rdfs:subClassOf:
       DISCore:String
+
+ElementTypeBinding:
+  @Name: ResourceTypeDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdfs:Class
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+    @@rdfs:subClassOf:
+      rdfs:Class
+
+## -- Common Programming Language Constructs
+
+ResourceTypeDef:
+  @QName: 
+    ManakaiDOM:IF
+  @FullName:
+    @@lang:en
+    @@@: Interface
+  @Description:
+    @@lang:en
+    @@@:
+      Interfaces in programming languages. 
+
+ResourceTypeDef:
+  @QName: 
+    ManakaiDOM:Class
+  @FullName:
+    @@lang:en
+    @@@: Class
+  @Description:
+    @@lang:en
+    @@@:
+      Classes in programming languages. 
+
+ForDef:
+  @QName:
+    ManakaiDOM:ForIF
+  @FullName:
+    @@lang:en
+    @@@: For an interface definition
+
+ForDef:
+  @QName:
+    ManakaiDOM:ForClass
+  @FullName:
+    @@lang:en
+    @@@: For a class definition
+
+ResourceTypeDef:
+  @QName: 
+    ManakaiDOM:PrimitiveTypeClass
+  @Description:
+    @@lang:en
+    @@@:
+      A programing language primitive type class (aka wrapper class). 
+      \
+      <QUOTE::PrimitiveTypeClass> may or may not have its instance object; 
+      it is typically accessed via class method, not via object method.
+  @rdfs:subClassOf: 
+    ManakaiDOM:Class
+
+ResourceTypeDef:
+  @QName: Attribute
+  @Description:
+    @@lang:en
+    @@@:
+      A programming language attribute of a structure such as class. 
+
+ResourceTypeDef:
+  @QName: AttributeGet
+  @Description:
+    @@lang:en
+    @@@:
+      A programming language attribute getter. 
+
+ResourceTypeDef:
+  @QName: AttributeSet
+  @Description:
+    @@lang:en
+    @@@: 
+      A programming language attribute setter. 
+
+ResourceTypeDef:
+  @QName: Method
+  @Description:
+    @@lang:en
+    @@@:
+      Methods in programming languages. 
+
+ResourceTypeDef:
+  @QName: MethodReturn
+  @Description:
+    @@lang:en
+    @@@:
+      Method return values (or returning subroutines). 
+
+ResourceTypeDef:
+  @QName: MethodParameter
+  @Description:
+    @@lang:en
+    @@@:
+      Method parameters. 
+
+PropDef:
+  @QName:
+    ManakaiDOM:isStatic
+  @dataType:
+    dis:Boolean
+  @Description:
+    @@lang:en
+    @@@:
+      Whether the subject resource is a static member of another resource 
+      to which the subject belongs.  It is used to declare a method 
+      is a static method (class method). 
+      \
+      Note that, for the purpose of <Q::ManakaiDOM:isStatic>, the fact 
+      that a method is static does not means the method should not 
+      be called via an object.  Inappropriateness of the use as an 
+      object method should be indicated by other property.
+
+## - Types of structures
+
+PropDef:
+  @QName:
+    dis:Type
+  @rdfs:domain:
+    rdfs:Resource
+  @rdfs:range:
+    ManakaiDOM:DataType
+  @Description:
+    @@lang:en
+    @@@:
+      The data type of the resource defined, including 
+      class attribute type and method return value type.
+
+DataTypeDef:
+  @QName: String
+  @rdf:type:
+    ManakaiDOM:DataType
+  @Description:
+    @@lang:en
+    @@@:
+      Any programming language <QUOTE::String> datatype. 
+
+PropDef:
+  @QName:
+    dis:actualType
+  @rdfs:domain:
+    rdfs:Resource
+  @rdfs:range:
+    rdfs:Resource
+  @Description:
+    @@lang:en
+    @@@:
+      The actual data type of the resource defined, including 
+      class attribute type and method return value type. 
+
+## - Operator
+
+PropDef:
+  @QName:
+    dis:Operator
+  @Description:
+    @@lang:en
+    @@@:
+      An operator the subject resource (either method or attribute) 
+      is to be used to evaluate an expression whose at least one operand object 
+      is of a class to which the subject resource belongs.
+  @rdfs:range: 
+    DOMMain:Operator
+
+ResourceDef:
+  @QName: 
+    DOMMain:Operator
+  @Description:
+    @@lang:en
+    @@@:
+      A resource that might be an object of <Q::dis:Operator> property. 
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf:
+    rdfs:Class
+
+ResourceTypeDef:
+  @QName: 
+    ManakaiDOM:ConstGroup
+  @FullName:
+    @@lang:en
+    @@@: Constant group
+  @Description:
+    @@lang:en
+    @@@:
+      A set of constant values.
+
+ResourceTypeDef:
+  @QName: 
+    ManakaiDOM:Const
+  @FullName:
+    @@lang:en
+    @@@: Constant value
+  @Description:
+    @@lang:en
+    @@@: A constant value.
 
 ## -- The lang:dis tree language vocabulary
 

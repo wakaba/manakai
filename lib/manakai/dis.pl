@@ -17,6 +17,7 @@ use strict;
 use Message::Util::QName::Filter {
   d => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis-->,
   dis2pm => q<http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#>,
+  DISLang => q<http://suika.fam.cx/~wakaba/archive/2004/dis/Lang#>,
   DISPerl => q<http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#>,
   DOMCore => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#>,
   DOMEvents => q<http://suika.fam.cx/~wakaba/archive/2004/dom/events#>,
@@ -1535,12 +1536,12 @@ sub dis_perl_init_classdef ($;%) {
   ## Check resource type
   my $type = $res->{ExpandedURI q<dis2pm:type>} || '';
   TYPES: for (
-         ExpandedURI q<ManakaiDOM:DOMMethod>,
-         ExpandedURI q<ManakaiDOM:DOMAttribute>,
-         ExpandedURI q<ManakaiDOM:DOMMethodParameter>,
-         ExpandedURI q<ManakaiDOM:DOMMethodReturn>,
-         ExpandedURI q<ManakaiDOM:DOMAttrGet>,
-         ExpandedURI q<ManakaiDOM:DOMAttrSet>,
+         ExpandedURI q<DISLang:Method>,
+         ExpandedURI q<DISLang:Attribute>,
+         ExpandedURI q<DISLang:MethodParameter>,
+         ExpandedURI q<DISLang:MethodReturn>,
+         ExpandedURI q<DISLang:AttributeGet>,
+         ExpandedURI q<DISLang:AttributeSet>,
          (defined $mod->{ExpandedURI q<dis2pm:packageName>} ?
            (ExpandedURI q<ManakaiDOM:WarningClass>,
             ExpandedURI q<ManakaiDOM:ExceptionClass>,
@@ -1632,17 +1633,20 @@ sub dis_perl_init_classdef ($;%) {
       $pack = $res->{ExpandedURI q<dis2pm:packageName>} = $pack . $res->{Name};
     }    
   } elsif ({
-            ExpandedURI q<ManakaiDOM:DOMMethod> => 1,
-            ExpandedURI q<ManakaiDOM:DOMAttribute> => 1,
+            ExpandedURI q<DISLang:Method> => 1,
+            ExpandedURI q<DISLang:Attribute> => 1,
            }->{$type}) {
-    ## Method or attribute name
+    ## - Method or attribute name
     my $name = $res->{Name};
+    
+    ## Converts camelCaseName to underscore_style_name
     $name =~ s/^([A-Z0-9]+)$/lc $1/ge;
     $name =~ s/([A-Z][A-Z0-9]*)$/"_".lc $1/ge;
     $name =~ s/([A-Z0-9])([A-Z0-9]*)([A-Z0-9])/$1.lc ($2)."_".lc $3/ge;
     $name =~ s/([A-Z])/"_".lc $1/ge;
     $name =~ s/(?=[0-9](?!$))/_/g;
     
+    ## Prefixes "_" if it is an internal method or attribute
     my $int = dis_get_attr_node
                  (%opt, name => {uri => ExpandedURI q<ManakaiDOM:isForInternal>},
                   parent => $res->{src});
@@ -1650,7 +1654,24 @@ sub dis_perl_init_classdef ($;%) {
       $res->{ExpandedURI q<ManakaiDOM:isForInternal>} = 1;
       $name = '_' . $name if length $name;
     }
+    
+    ## Checks against special-purpose method names
+    if ({
+         import => 1,
+         unimport => 1,
+         isa => 1,
+         can => 1,
+         new => 1,
+         as_string => 1,
+         stringify => 1,
+         clone => 1,
+        }->{$name} or $name =~ /^___/) {
+      valid_err (qq<Method name "$name" is reserved>,
+                 node => $res->{src});
+    }
+    
     $res->{ExpandedURI q<dis2pm:methodName>} = $name;
+    
     my $re = dis_get_attr_node
                  (%opt, name => {uri => ExpandedURI q<ManakaiDOM:isRedefining>},
                   parent => $res->{src});
@@ -1708,9 +1729,9 @@ sub dis_perl_init_classdef ($;%) {
     $res->{ExpandedURI q<dis2pm:methodName+>} = $name;
     $State->{ExpandedURI q<dis2pm:parentResource>}
           ->{ExpandedURI q<dis2pm:method>}->{$name} = $res;
-  } elsif ({ExpandedURI q<ManakaiDOM:DOMMethodReturn> => 1,
-            ExpandedURI q<ManakaiDOM:DOMAttrGet> => 1,
-            ExpandedURI q<ManakaiDOM:DOMAttrSet> => 1}->{$type}) {
+  } elsif ({ExpandedURI q<DISLang:MethodReturn> => 1,
+            ExpandedURI q<DISLang:AttributeGet> => 1,
+            ExpandedURI q<DISLang:AttributeSet> => 1}->{$type}) {
     ## Value type
     my $t = dis_get_attr_node (%opt, name => 'Type', parent => $res->{src});
     if ($t) {
@@ -1726,8 +1747,8 @@ sub dis_perl_init_classdef ($;%) {
           = $pr->{ExpandedURI q<dis2pm:TypeNode>};
       } else {
         if ({
-             ExpandedURI q<ManakaiDOM:DOMAttrGet> => 1,
-             ExpandedURI q<ManakaiDOM:DOMAttrSet> => 1,
+             ExpandedURI q<DISLang:AttributeGet> => 1,
+             ExpandedURI q<DISLang:AttributeSet> => 1,
             }->{$type}) {
           valid_err (q<Attribute value type must be declared>,
                      node => $res->{src});
@@ -1754,18 +1775,18 @@ sub dis_perl_init_classdef ($;%) {
       }
     }
 
-    my $p = {ExpandedURI q<ManakaiDOM:DOMMethodReturn>
+    my $p = {ExpandedURI q<DISLang:MethodReturn>
               => ExpandedURI q<dis2pm:return>,
-             ExpandedURI q<ManakaiDOM:DOMAttrGet>
+             ExpandedURI q<DISLang:AttributeGet>
               => ExpandedURI q<dis2pm:getter>,
-             ExpandedURI q<ManakaiDOM:DOMAttrSet>
+             ExpandedURI q<DISLang:AttributeSet>
               => ExpandedURI q<dis2pm:setter>};
     valid_err (qq{<$p->{$type}> already defined}, node => $res->{node})
       if defined $State->{ExpandedURI q<dis2pm:parentResource>}
                        ->{$p->{$type}}->{Name};
     $State->{ExpandedURI q<dis2pm:parentResource>}
           ->{$p->{$type}} = $res;
-  } elsif ({ExpandedURI q<ManakaiDOM:DOMMethodParameter> => 1}->{$type}) {
+  } elsif ({ExpandedURI q<DISLang:MethodParameter> => 1}->{$type}) {
     ## Parameter name
     valid_err (qq<Parameter name required>, node => $res->{src})
       unless $res->{Name};
@@ -2356,7 +2377,7 @@ sub dis_perl_init_classdef ($;%) {
       }
     }
     valid_err (qq<<$ln>: Undefined element type>, node => $_);
-  }
+  } # N
 
   $res->{ExpandedURI q<DOMMain:implementFeature>}
     ||= $State->{ExpandedURI q<dis2pm:parentResource>}
@@ -2370,16 +2391,16 @@ sub dis_perl_init_classdef ($;%) {
     dis_perl_init_classdef ($cres, %opt);
   }
 
-  if ($type eq ExpandedURI q<ManakaiDOM:DOMMethod>) {
+  if ($type eq ExpandedURI q<DISLang:Method>) {
     valid_err (q<Method "dis:Return" element is required>, node => $res->{src})
       unless defined $res->{ExpandedURI q<dis2pm:return>}->{Name};
-  } elsif ($type eq ExpandedURI q<ManakaiDOM:DOMAttribute>) {
+  } elsif ($type eq ExpandedURI q<DISLang:Attribute>) {
     valid_err (q<Attribute "dis:Get" element is required>, node => $res->{src})
       unless defined $res->{ExpandedURI q<dis2pm:getter>}->{Name};    
   } elsif ({
-            ExpandedURI q<ManakaiDOM:DOMMethodReturn> => 1,
-            ExpandedURI q<ManakaiDOM:DOMAttrGet> => 1,
-            ExpandedURI q<ManakaiDOM:DOMAttrSet> => 1,
+            ExpandedURI q<DISLang:MethodReturn> => 1,
+            ExpandedURI q<DISLang:AttributeGet> => 1,
+            ExpandedURI q<DISLang:AttributeSet> => 1,
            }->{$type}) {
     unless ($has_def) {
       $res->{ExpandedURI q<dis2pm:notImplemented>} = 1;
@@ -2733,4 +2754,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/02/16 08:42:41 $
+1; # $Date: 2005/02/18 06:13:52 $

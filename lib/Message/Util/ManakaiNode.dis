@@ -1,0 +1,692 @@
+Module:
+  @QName:
+    Util:ManakaiNode
+  @FullName:
+    @@lang: en
+    @@@:
+      Manakai Generic Node Implementation
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
+  
+  @Description:
+    @@lang:en
+    @@@:
+      The <Module::Util:ManakaiNode> module provides a basic 
+      implementation for glaph (perhaps tree) structures. 
+
+  @Author:
+    @@FullName: Wakaba
+    @@Mail: w@suika.fam.cx
+  @License:
+     license:Perl+MPL
+  @Date:
+    @@@:
+      $Date: 2005/02/18 06:13:52 $
+    @@ContentType:
+      dis:Date.RCS
+  
+  @Require:
+    @@Module:
+      @@@Name: DISPerl
+      @@@WithFor:
+        ManakaiDOM:all
+#    @@Module:
+#      @@@Name: ManakaiNode
+#      @@@WithFor:
+#        ManakaiDOM:Perl
+
+Namespace:
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @dis2pm:
+    http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
+  @lang:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @owl:
+    http://www.w3.org/2002/07/owl#
+  @Perl:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @TreeCore:\
+  @Util:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
+
+ResourceDef:
+  @QName:
+    Util:
+  @rdf:type:
+    dis:ModuleGroup
+  @FullName:
+    @@lang:en
+    @@@:
+      The manakai support modules
+  @AppName:
+    Message::Util::
+
+## -- Internal node object
+
+ClassDef:
+  @QName: 
+    ManakaiDOM:ManakaiDOMNodeObject
+  @Description:
+    @@lang:en
+    @@@:
+      Internal (actual) node objects that is accessed via 
+      <Class::ManakaiDOM:ManakaiDOMNodeReference> objects referring it. 
+  @ImplNote:
+    @@lang:en
+    @@@:
+      No public interface should be defined for any class inheriting 
+      this class - applications should access to nodes only via 
+      <Class::ManakaiDOM:ManakaiDOMNodeReference> objects. 
+  @ImplNote:
+    @@lang:en
+    @@@:
+      A <Class::ManakaiDOM:ManakaiDOMNodeObject> is a blessed hash 
+      reference.  Each hash key and value pair is called as a 
+      <DFN::property>.  Currently, several core properties  
+      are defined as listed below.  Applications for this class, 
+      including <Class::DOMCore:ManakaiDOMNode>, defines additional 
+      properties for their purpose and scope. 
+      \
+      {FIG:: Core node properties
+         \
+         - <CODE::TreeCore:nodeID>::: The global-unique identifier for 
+                                      this node object. 
+         \
+         - <CODE::TreeCore:treeID>::: The global-unique identifier for the 
+                                      tree containing this node object. 
+         \
+         - <CODE::TreeCore:rc>::: The number that denotes how many reference 
+                                  to this node there are. 
+         \
+         - <CODE::TreeCore:origin>::: An array reference, containing 
+                                  hash key names of <DFN::origin> 
+                                  properties for this node. 
+         \
+         - <CODE::TreeCore:subnode>::: An array reference, containing 
+                                hash key names of <DFN::subnode> 
+                                properties for this node. 
+         \
+         - <CODE::TreeCore:subnode2>::: An array reference, containing 
+                    hash key names of <DFN::subnode> (two steps) 
+                    properties for this node. 
+         \
+         - <CODE::TreeCore:irefnode>::: An array reference, containing 
+                    hash key names of <DFN::irefnode> 
+                    properties for this node. 
+         \
+         - <CODE::TreeCore:anydata>::: An array reference, containing 
+                    hash key names of <DFN::anydata> properties for this node. 
+         \
+         - <CODE::TreeCore:anydata2>::: An array reference, containing 
+                    hash key names of <DFN::anydata> (two steps) properties 
+                    for this node. 
+         \
+       }
+
+  @IntMethod:
+    @@Name: new
+    @@Description:
+      @@@lang:en
+      @@@@: 
+        Constructs a new instance of 
+        <Class::ManakaiDOM:ManakaiDOMNodeObject> and returns it.
+    @@Return:
+      @@@Type: 
+        ManakaiDOM:ManakaiDOMNodeObject
+      @@@Description:
+        @@@@lang:en
+        @@@@@: 
+          The newly created <Class::ManakaiDOM:ManakaiDOMNodeObject> instance.
+      @@@PerlDef:
+          $r = bless {
+            <Q::TreeCore:origin> => [],
+            <Q::TreeCore:subnode> => [],
+            <Q::TreeCore:subnode2> => [],
+            <Q::TreeCore:irefnode> => [],
+            <Q::TreeCore:anydata> => [],
+            <Q::TreeCore:anydata2> => [],
+            <Q::TreeCore:rc> => 0,
+            <Q::TreeCore:treeID> => <Code::ManakaiDOM:generateUniqueID>,
+            <Q::TreeCore:nodeID> => <Code::ManakaiDOM:generateUniqueID>,
+          }, ref $self || $self;
+  @IntMethod:
+    @@Name: newReference
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates a new reference to this node and returns it.
+    @@Param:
+      @@@Name: class
+      @@@Type:
+        Perl:package-name
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A Perl class package name with which the newly created 
+          reference is blessed.  The <P::class> class must be a 
+          subclass of <Class::ManakaiDOM:ManakaiDOM:ManakaiDOMNodeReference>.
+    @@Return:
+      @@@Type: 
+        ManakaiDOM:ManakaiDOMNodeReference
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The newly created node reference.
+      @@@PerlDef:
+          $r = bless {
+            <Q::TreeCore:node> => $self,
+          }, ref $class ? ref $class : $class ? $class :
+             <ClassName::ManakaiDOM:ManakaiDOMNodeReference>;
+          $self->{<Q::TreeCore:rc>}++;
+  @IntMethod:
+    @@Name: isExternallyReferred
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Checks whether the tree containing this node has been referred 
+        from the outside of the tree or not. 
+    @@Return:
+      @@@Type: 
+        DISPerl:Boolean
+      @@@InCase:
+        @@@@Value: true
+        @@@@Type:
+          DISPerl:Boolean
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: 
+            There is one or more nodes in the tree that has been 
+            referred via <Class::ManakaiDOM:ManakaiDOMNodeReference> objects.
+      @@@InCase:
+        @@@@Value: false
+        @@@@Type:
+          DISPerl:Boolean
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: No external reference found.
+      @@@PerlDef:
+          if ($self->{<Q::TreeCore:rc>}) {
+            $r = true;
+          } else {
+            my @node = ($self);
+            my %checked;
+            NODES: while (my $node = shift @node) {
+              if ($node->{<Q::TreeCore:rc>}) {
+                $r = true;
+                last NODES;
+              } elsif ($checked{$node->{<Q::TreeCore:nodeID>}}) {
+                next NODES;
+              }
+              my @n;
+              for (@{$node->{<Q::TreeCore:subnode2>}}) {
+                if (ref $node->{$_} eq 'ARRAY') {
+                  push @n, @{$node->{$_}};
+                } elsif (ref $node->{$_} eq 'HASH') {
+                  push @n, values %{$node->{$_}};
+                }
+              }
+              for (@n, map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}) {
+                if (ref $_ eq 'ARRAY') {
+                  push @node, @$_;
+                } elsif (ref $_ eq 'HASH') {
+                  push @node, values %$_;
+                }
+              }
+              for (@{$node->{<Q::TreeCore:origin>}}) {
+                push @node, $node->{$_} if $node->{$_};
+              }
+              $checked{$node->{<Q::TreeCore:nodeID>}} = 1;
+            }
+          }
+
+  @IntMethod:
+    @@Name: destroy
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Destructs the tree containing this node. 
+    @@Return:
+      @@@PerlDef:
+        my @node = ($self);
+        NODES: while (my $node = shift @node) {
+              my @n;
+              for (@{$node->{<Q::TreeCore:subnode2>}}) {
+                if (ref $node->{$_} eq 'ARRAY') {
+                  push @n, @{$node->{$_}};
+                } elsif (ref $node->{$_} eq 'HASH') {
+                  push @n, values %{$node->{$_}};
+                }
+              }
+              for (@n, map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}) {
+                if (ref $_ eq 'ARRAY') {
+                  push @node, grep {defined $_->{<Q::TreeCore:nodeID>}} @$_;
+                } elsif (ref $_ eq 'HASH') {
+                  push @node, grep {defined $_->{<Q::TreeCore:nodeID>}}
+                               values %$_;
+                }
+              }
+              for (@{$node->{<Q::TreeCore:origin>}}) {
+                push @node, $node->{$_}
+                  if defined $node->{$_} and
+                     defined $node->{$_}->{<Q::TreeCore:nodeID>};
+              }
+          %$node = ();
+        }
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        This method is different from Perl <Perl::DESTROY> special 
+        purpose method.
+        \
+        An <QUOTE::uninitialized> warning in this method might mean 
+        some method puts an <Perl::undef> into a list of nodes. 
+
+  @IntMethod:
+    @@Name: importTree
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Changes the tree identifier of the nodes belong to another tree 
+        to be same as this node's tree identifier. 
+    @@Param:
+      @@@Name: node
+      @@@Type: 
+        ManakaiDOM:ManakaiDOMNodeObject
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Any node from the tree to change its identifier. 
+    @@Return:
+      @@@PerlDef:
+        unless ($node->{<Q::TreeCore:treeID>} eq
+                $self->{<Q::TreeCore:treeID>}) {
+          my @node = ($node);
+          NODES: while (my $node = shift @node) {
+              my @n;
+              for (@{$node->{<Q::TreeCore:subnode2>}}) {
+                if (ref $node->{$_} eq 'ARRAY') {
+                  push @n, @{$node->{$_}};
+                } elsif (ref $node->{$_} eq 'HASH') {
+                  push @n, values %{$node->{$_}};
+                }
+              }
+              for (@n, map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}) {
+                if (ref $_ eq 'ARRAY') {
+                  push @node, grep {$_->{<Q::TreeCore:treeID>} ne
+                                    $self->{<Q::TreeCore:treeID>}} @$_;
+                } elsif (ref $_ eq 'HASH') {
+                  push @node, grep {$_->{<Q::TreeCore:treeID>} ne
+                                    $self->{<Q::TreeCore:treeID>}}
+                              values %$_;
+                }
+              }
+            for (@{$node->{<Q::TreeCore:origin>}}) {
+              push @node, $node->{$_}
+                if defined $node->{$_} and
+                   $node->{$_}->{<Q::TreeCore:treeID>} ne
+                   $self->{<Q::TreeCore:treeID>};
+            }
+            $node->{<Q::TreeCore:treeID>} = $self->{<Q::TreeCore:treeID>};
+          }
+        }
+
+  @IntMethod:
+    @@Name: changeTreeID
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Changes tree identifier of all nodes traversable from this node. 
+    @@Param:
+      @@@Name: treeID
+      @@@Type: 
+        DISPerl:String
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The new tree identifier. 
+    @@Return:
+      @@@PerlDef:
+        unless ($self->{<Q::TreeCore:treeID>} eq $treeID) {
+          my @node = ($self);
+          NODES: while (my $node = shift @node) {
+              my @n;
+              for (@{$node->{<Q::TreeCore:subnode2>}}) {
+                if (ref $node->{$_} eq 'ARRAY') {
+                  push @n, @{$node->{$_}};
+                } elsif (ref $node->{$_} eq 'HASH') {
+                  push @n, values %{$node->{$_}};
+                }
+              }
+              for (@n, map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}) {
+                if (ref $_ eq 'ARRAY') {
+                  push @node, grep {$_->{<Q::TreeCore:treeID>} ne $treeID} @$_;
+                } elsif (ref $_ eq 'HASH') {
+                  push @node, grep {$_->{<Q::TreeCore:treeID>} ne $treeID}
+                              values %$_;
+                }
+              }
+            for (@{$node->{<Q::TreeCore:origin>}}) {
+              push @node, $node->{$_}
+                if defined $node->{$_} and
+                   $node->{$_}->{<Q::TreeCore:treeID>} ne $treeID;
+            }
+            $node->{<Q::TreeCore:treeID>} = $treeID;
+          }
+        }
+
+  @IntMethod:
+    @@Name: getRootNodes
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Gets root nodes in the tree to which this node belongs,
+        at <QUOTE::higher> level than this node. 
+        \
+        {NOTE:: The manakai internal tree structure may have more than 
+                one tree root node - it is a set of tree sharing their 
+                nodes rather than a single tree.  In this method 
+                <DFN::root nodes> is defined as the nodes that 
+                have no their <QUOTE::origin> node.  There is at least 
+                one such node by definition of the manakai tree structure. 
+                <QUOTE::Higher> in this context means that the node is reachable
+                by only traversing <QUOTE::origin> relationships from this node. 
+        \
+        }
+    @@Return:
+      @@@Type:
+        Perl:ARRAY
+      @@@PerlDef:
+        my %result;
+        my @node = ($self);
+        NODES: while (my $node = shift @node) {
+          my $i = 0;
+          ORIGINS: for (@{$node->{<Q::TreeCore:origin>}}) {
+            next ORIGINS unless $node->{$_};
+            $i++;
+            push @node, $node->{$_};
+          }
+          if ($i == 0) {
+            $result{$node->{<Q::TreeCore:nodeID>}} = $node;
+          }
+        }
+   \    @$r = (grep {defined $_->{<Q::TreeCore:nodeID>}} values %result);
+
+  @IntMethod:
+    @@Name: isSameNode
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns whether a node is the same as this node or not. 
+        \
+        {NOTE:: The sameness is different from the equality; 
+                two nodes are same iff they are same hash reference. 
+        \
+        }
+    @@Operator:
+      @@@ContentType:
+        lang:Perl
+      @@@@: eq
+    @@Param:
+      @@@Name: node
+      @@@Type: 
+        ManakaiDOM:ManakaiDOMNodeObject
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A node to compare with. 
+    @@Return:
+      @@@Type: 
+        DISPerl:Boolean
+      @@@Description:
+        @@@@lang:en
+        @@@@@: Whether the two nodes are same or not.
+      @@@PerlDef:
+          if (ref $node and
+              UNIVERSAL::isa ($node,
+                              <ClassName::ManakaiDOM:ManakaiDOMNodeObject>) and
+              $node->{<Q::TreeCore:nodeID>} eq $self->{<Q::TreeCore:nodeID>}) {
+            $r = true;
+          }
+  @IntMethod:
+    @@Name: orphanate
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Notifies that this node (and its neibors if any) is no longer 
+        part of the main tree.  If the new tree containing this node 
+        has been referred yet, then the tree is preserved except its 
+        tree identifier has changed.  Otherwise, i.e. the tree is 
+        useless any more, then it is destructed. 
+        \
+        {NOTE:: Interaction on deleting a relationship from multiply 
+                organized <QUOTE::trees> (such as DOM tree and 
+                styled displaying tree) is less studied.  This 
+                method might be modified or addition of another method(s) 
+                might be required when style sheet, XBL, or other 
+                technologies has been implemented.
+        \
+        }
+    @@Return:
+      @@@PerlDef:
+        if ($self-><M::ManakaiDOM:ManakaiDOMNodeObject.isExternallyReferred>) {
+          $self-><M::ManakaiDOM:ManakaiDOMNodeObject.changeTreeID>
+                                 (<Code::ManakaiDOM:generateUniqueID>);
+        } else {
+          $self-><M::ManakaiDOM:ManakaiDOMNodeObject.destroy>;
+        }
+##Class:ManakaiDOMNodeObject
+
+## -- Public node object
+
+ClassDef:
+  @QName: 
+    ManakaiDOM:ManakaiDOMNodeReference
+  @Description:
+    @@lang:en
+    @@@:
+      References to the node object corresponding to it.  From 
+      applications' view, any node object is hidden and 
+      <Class::ManakaiDOM:ManakaiDOMNodeReference> seems as if 
+      the node itself. 
+  @ImplNote:
+    @@lang:en
+    @@@:
+      A <Class::ManakaiDOM:ManakaiDOMNodeReference> is a blessed hash 
+      reference; currently there is a hash key defined:
+        \
+        - <CODE::TreeCore:node>::: A node object 
+             (<Class::ManakaiDOM:ManakaiDOMNodeObject>) to which 
+             this is referring. 
+
+  @IntMethod:
+    @@Name: destroy
+    @@Description:
+      @@@lang:en
+      @@@@: Destroy this reference object.
+    @@Operator:
+      @@@ContentType:
+        lang:Perl
+      @@@@: DESTROY
+    @@Return:
+      @@@PerlDef:
+        @@@@@:
+          my $node = $self->{<Q::TreeCore:node>};
+          if ($node) {
+            CORE::delete $self->{<Q::TreeCore:node>};
+            $node->{<Q::TreeCore:rc>}--;
+            unless ($node-><M::ManakaiDOM:ManakaiDOMNodeObject
+                                              .isExternallyReferred>) {
+              $node-><M::ManakaiDOM:ManakaiDOMNodeObject.destroy>;
+            }
+          } else {
+            warn ref ($self) . q{->DESTROY: there is no associated }.
+                 q{node object - you have a global variable or }.
+                 qq{potential memory-leak detected\n};
+          }
+       @@@@ImplNote:
+         @@@@@lang:en
+         @@@@@@:
+           {P::Warning during the global destruction might mean:
+              \
+              - there be a loop in the manakai internal implementation - 
+                it should be a bug.
+              \
+              - there be a loop created by application, e.g. 
+                event handler containing a reference to any node 
+                belonging to the same tree.
+              \
+              - there be a global variable that contains a node reference 
+                and it is not altered or <Perl::undef>ed until the global 
+                destruction. 
+              \
+              - or other unknown bad situation.
+              \
+            }
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        Don't override this method unintentionally - for example, 
+        inheritting <PerlModule::Tie::Array> would hide this method 
+        from that class, since that module defines its own 
+        destructor. 
+##Class:ManakaiDOMNodeReference
+
+## -- Frequently used code fragments
+
+ResourceDef:
+  @QName:
+    ManakaiDOM:generateUniqueID
+  @rdf:type:
+    dis2pm:InlineCode
+  @Description:
+    @@lang:en
+    @@@:
+      Generates a global-unique opaque string. 
+      \
+      {NOTE:: A URI reference is generated by this code. 
+      \
+      }
+  @AliasFor:
+    @@@:
+      ::ManakaiDOM:all
+    @@For:
+      !=ManakaiDOM:all
+  @PerlDef:
+      (
+        sprintf 'mid:%d.%d.%s.dom.manakai@suika.fam.cx#',
+                time, $$,
+                ['A'..'Z', 'a'..'z', '0'..'9']->[rand 62] .
+                ['A'..'Z', 'a'..'z', '0'..'9']->[rand 62] .
+                ['A'..'Z', 'a'..'z', '0'..'9']->[rand 62] .
+                ['A'..'Z', 'a'..'z', '0'..'9']->[rand 62] .
+                ['A'..'Z', 'a'..'z', '0'..'9']->[rand 62]
+      )
+##ManakaiDOM:generateUniqueID
+
+## -- lang:dis vocabulary
+
+TreeElementType:
+  @QName:
+    dis:GetProp
+  @dataType:
+    dis:TypeQName
+  @rdfs:range:
+    rdf:Property
+  @Description:
+    @@lang:en
+    @@@:
+      Gets the non-nodal value of a <Class::ManakaiDOM:ManakaiDOMNodeReference> 
+      property (actualy <Class::ManakaiDOM:ManakaiDOMNodeObject> property). 
+
+TreeElementType:
+  @QName:
+    dis:SetProp
+  @dataType:
+    dis:TypeQName
+  @rdfs:range:
+    rdf:Property
+  @Description:
+    @@lang:en
+    @@@:
+      Sets the non-nodal value of a <Class::ManakaiDOM:ManakaiDOMNodeReference> 
+      property (actualy <Class::ManakaiDOM:ManakaiDOMNodeObject> property). 
+
+## -- Syntax sugar
+
+ElementTypeBinding:
+  @Name: TreeElementType
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:TreeElementType
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: ClassDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:Class
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: IntMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Method
+    @@ManakaiDOM:isForInternal:1
+
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodReturn
+
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+
+ElementTypeBinding:
+  @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
+
+ElementTypeBinding:
+  @Name: InCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+
+## ManakaiNode.dis ends here

@@ -19,7 +19,7 @@ This module is part of manakai.
 
 package Message::Markup::SuikaWikiConfig20::Node;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 =head1 METHODS
 
@@ -292,7 +292,7 @@ sub stringify ($;%) {
   my $r = '';
   if ($self->{type} eq '#document') {
     if ($opt{output_header}) {
-      $r = "#?SuikaWikiConst/2.0\x0A";
+      $r = "#?SuikaWikiConfig/2.0\x0A";
     }
     my $ptype = '#';
     for (@{$self->{node}}) {
@@ -507,4 +507,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/11/27 10:59:09 $
+1; # $Date: 2005/02/18 06:13:52 $

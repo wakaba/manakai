@@ -21,7 +21,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/16 04:25:00 $
+      $Date: 2005/02/18 06:13:52 $
     @@ContentType:
       dis:Date.RCS
   
@@ -361,6 +361,20 @@ PropDef:
     @@@:
       Condition (obsolete) - use <CODE:For> instead.
 
+ResourceDef:
+  @QName:
+    ManakaiDOM:InCase
+  @rdf:type:
+    rdfs:Class
+  @subsetOf:
+    rdfs:Class
+  @rdfs:subClassOf:
+    rdfs:Class
+  @Description:
+    @@lang:en
+    @@@: 
+      Cases. 
+
 ## -- Resource-to-resource relationships
 
 PropDef:
@@ -479,6 +493,44 @@ PropDef:
   @dataType: 
     dis:Boolean
 
+PropDef:
+  @QName:
+    ManakaiDOM:isRedefining
+  @dataType:
+    dis:Boolean
+  @Description:
+    @@lang:en
+    @@@:
+      Whether the subject resource (such as method or attribute) 
+      redefines another resource defined in one of ancestor inheriting 
+      class or not.
+
+PropDef:
+  @QName:
+    dis:IsAbstract
+  @Description:
+    @@lang:en
+    @@@:
+      Whether the resource is defined abstractly or concretly. 
+      Abstractly defined resource must be concretly overloaded 
+      by inheriting class.
+
+PropDef:
+  @QName:
+    dis:IsFinal
+  @Description: 
+    @@lang:en
+    @@@:
+      Whether a subject resource is overridable or not. 
+      \
+      - <CODE::-1> :: The subject resource have to be overrided.
+      \
+      - <CODE::0>  :: The subject resource is able to be overrided. 
+      \
+      - <CODE::1>  :: The subject resource is unable to be overrided.
+  @dataType:
+    DISCore:Tristate
+
 ## --- Datatype
 
 PropDef:
@@ -509,6 +561,11 @@ ResourceDef:
       A data type, including programming language data types, 
       programming language classes, markup language data types, 
       string formats, and so on. 
+      \
+      {NOTE:: It is different from the <QUOTE::abstract datatypes> 
+              as in the programming languages such as Ada. 
+      \
+      }
   @noVariant: 
 
 ResourceDef:
@@ -537,6 +594,19 @@ ElementTypeBinding:
         ::ManakaiDOM:all
       @@@For:
         !=ManakaiDOM:all
+
+ResourceDef:
+  @QName: 
+    ManakaiDOM:DataType
+  @Description:
+    @@lang:en
+    @@@:
+      A programming language data type.
+  @rdf:type:
+    rdfs:Class
+  @subsetOf: AbstractDataType
+  @rdfs:subClassOf: AbstractDataType
+  @noVariant:
 
 PropDef:
   @QName:
@@ -646,5 +716,53 @@ DataTypeDef:
   @FullName:
     @@lang:en
     @@@: RCS tag-style date and time specification
+
+## -- Definitions
+
+PropDef:
+  @QName:
+    dis:Value
+  @Description:
+    @@lang:en
+    @@@:
+      A value of the resource.
+PropDef:
+  @QName:
+    dis:DefaultValue
+  @Description:
+    @@lang:en
+    @@@: The default value of the resource.
+PropDef:
+  @QName:
+    dis:Def
+  @Description:
+    @@lang:en
+    @@@:
+      A definition of the resource.
+
+## -- Access controls
+
+PropDef:
+  @QName:
+    ManakaiDOM:isForInternal
+  @dataType:
+    dis:Boolean
+  @Description:
+    @@lang:en
+    @@@:
+      Whether the subject resource is prepared for the internal use.  
+      In other word, the subject resource is a public member or 
+      a private member.
+
+## -- Status
+
+PropDef:
+  @QName: isDeprecated
+  @dataType:
+    dis:Boolean
+  @Description:
+    @@lang:en
+    @@@:
+      Whether the use of the subject resource is deprecated or not. 
 
 ## DISCore.dis ends here

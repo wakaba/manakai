@@ -1,0 +1,245 @@
+Module:
+  @QName: 
+    DIS:DISIDL
+  @FullName:
+    @@lang:en
+    @@@: 
+      <QUOTE::dis> IDL Module
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
+
+  @Description:
+    @@lang:en
+    @@@:
+      This module defines IDL datatypes, as defined in 
+      <CITE::OMG IDL Syntax and Semantics> in
+      <CITE::The Common Object Request Broker: Architecture
+             and Specification, version 2>,
+      for the purpose of <QUOTE::dis> system. 
+  @ImplNote:
+    @@lang:en
+    @@@:
+      CORBA 2.0: <lt>http://www.omg.org/cgi-bin/doc?formal/97-02-25>
+  
+  @Author:
+    @@FullName:Wakaba
+    @@Mail:w@suika.fam.cx
+  @License:
+     license:Perl+MPL
+  @Date:
+    @@@:
+      $Date: 2005/02/18 08:55:41 $
+    @@ContentType:
+      dis:Date.RCS
+  
+  @DefaultFor:
+    ManakaiDOM:all
+
+  @Require:
+    @@Module:
+      @@@Name: DISCore
+
+Namespace:
+  @DIS:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @DOMMain:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @owl:
+    http://www.w3.org/2002/07/owl#
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+
+## -- For IDL
+
+ForDef:
+  @QName:
+    ManakaiDOM:IDL
+  @FullName:
+    @@lang:en
+    @@@: For DOM IDL definition
+  @Description:
+    @@lang:en
+    @@@:
+      For OMG IDL definitions, with the style of W3C DOM Working Group. 
+
+## -- IDL datatypes
+
+ResourceDef:
+  @Name: IDLDataType
+  @Description:
+    @@lang:en
+    @@@:
+      A CORBA IDL data type.
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf:
+    ManakaiDOM:DataType
+
+ElementTypeBinding:
+  @Name: IDLDataTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: IDLDataType
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For: 
+        ManakaiDOM:all !=ManakaiDOM:all
+
+IDLDataTypeDef:
+  @QName: 
+    DOMMain:long
+  @Description:
+    @@lang:en
+    @@@:
+      Long signed integer representing the range -2^31 ... 2^31 - 1. 
+
+IDLDataTypeDef:
+  @QName: 
+    DOMMain:unsigned-long
+  @Def:
+    @@ContentType: 
+      lang:IDL-DOM
+    @@@: unsigned long
+  @Description:
+    @@lang:en
+    @@@: 
+      Long unsigned integer representing the range 0 ... 2^32 - 1. 
+
+IDLDataTypeDef:
+  @QName: 
+    DOMMain:short
+  @Def:
+    @@ContentType:
+      lang:IDL-DOM
+    @@@: short
+  @Description:
+    @@lang:en
+    @@@: 
+      Short signed integer representing the range -2^15 ... 2^15 - 1.
+
+IDLDataTypeDef:
+  @QName: 
+    DOMMain:unsigned-short
+  @Def:
+    @@ContentType: 
+      lang:IDL-DOM
+    @@@: unsigned short
+  @Description:
+    @@lang:en
+    @@@: 
+      Short unsigned integer representing the range 0 ... 2^16 - 1.
+
+IDLDataTypeDef:
+  @QName:
+    DOMMain:float
+  @Description:
+    @@lang:en
+    @@@:
+      IEEE signle-precision floating point numbers 
+      <SRC::ANSI/IEEE Std 754-1985>. 
+      \
+      {NOTE:: The CORBA specification sais implementations that 
+              do not fully support the value set of the IEEE 754 
+              floating-point standard to completely specify 
+              their deviance from the standard. 
+      \
+      }
+
+IDLDataTypeDef:
+  @QName: 
+    DOMMain:double
+  @Description:
+    @@lang:en
+    @@@:
+      IEEE double-precision floating point numbers 
+      <SRC::ANSI/IEEE Std 754-1985>. 
+      \
+      {NOTE:: The CORBA specification sais implementations that
+              do not fully support the value set of the IEEE 754
+              floating-point standard to completely specify
+              their deviance from the standard.
+      \
+      }
+
+IDLDataTypeDef:
+  @QName: 
+    DOMMain:char
+  @FullName:
+    @@lang:en
+    @@@: Char Type
+  @Description:
+    @@lang:en
+    @@@:
+      ISO/IEC 8859-1 characters.  During transmission, characters 
+      may be converted to other appropriate forms as required 
+      by a particular language binding.  Such convertions may 
+      change the representation of a character but maintain 
+      the semantics of the character. 
+
+IDLDataTypeDef:
+  @QName:
+    DOMMain:boolean
+  @FullName:
+    @@lang:en
+    @@@:
+      Boolean Type
+  @Description:
+    @@lang:en
+    @@@:
+      True or false. 
+
+IDLDataTypeDef:
+  @QName:
+    DOMMain:octet
+  @FullName:
+    @@lang:en
+    @@@: Octet Type
+  @Description:
+    @@lang:en
+    @@@:
+      An 8-bit quantity that is guaranteed not to undergo any conversion 
+      when transmitted by the communication system. 
+
+IDLDataTypeDef:
+  @QName: 
+    DOMMain:any
+  @FullName:
+    @@lang:en
+    @@@: Any Type
+  @Description:
+    @@lang:en
+    @@@:
+      This type permits the specification of values that can 
+      express any OMG IDL type. 
+
+IDLDataTypeDef: 
+  @QName: 
+    DOMMain:Object
+  @Description:
+    @@lang:en
+    @@@: An object.
+
+IDLDataTypeDef:
+  @QName: 
+    DOMMain:unsigned-long-long
+  @Def:
+    @@ContentType: 
+      lang:IDL-DOM
+    @@@: unsigned long long
+  @FullName:
+    @@lang:en
+    @@@: Unsigned long long integer
+
+## DISIDL.dis ends here

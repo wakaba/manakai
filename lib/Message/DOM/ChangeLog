@@ -1,3 +1,28 @@
+2005-02-18  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMMain.dis (ResourceTypeDef[ManakaiDOM:Const,
+	ManakaiDOM:ConstGroup]): Removed (moved to "lib/manakai/DISLang.dis").
+	(Exception-related definitions): Removed (moved to
+	"lib/Message/Util/Error/DOMException.dis").
+	(ForDef[ManakaiDOM:ForIF, ManakaiDOM:ForClass]): Removed (moved 
+	to DISLang).
+
+2005-02-17  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMMain.dis: Definitions for "ManakaiDOM:ManakaiDOMNodeObject" and
+	"ManakaiDOM:ManakaiDOMNodeReference" are removed (moved to
+	"lib/Message/Util/ManakaiNode.dis").
+	(ResourceDef[ManakaiDOM:DataType]): Removed (moved to
+	"lib/manakai/DISCore.dis").
+	(ResourceTypeDef[ManakaiDOM:IF, ManakaiDOM:Class,
+	ManakaiDOM:PrimitiveTypeClass]): Removed (moved to
+	"lib/manakai/DISLang.dis").
+
+2005-02-16  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMMain.dis (ForDef[ManakaiDOM:Perl]): Removed (moved to
+	DISPerl module).
+
 2005-01-07  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMCore.dis: Each "delete array-item" replaced to a "splice".

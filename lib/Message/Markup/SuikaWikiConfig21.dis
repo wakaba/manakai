@@ -1,0 +1,2966 @@
+Module:
+  @QName:
+    Markup:SuikaWikiConfig21
+  @FullName:
+    @@lang: en
+    @@@:
+      SuikaWikiConfig/2.1 Object Model
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
+  
+  @Description:
+    @@lang:en
+    @@@:
+      The <Module::SuikaWikiConfig21> module provides an object model 
+      for SuikaWikiConfig/2.1 document format.  
+
+  @Author:
+    @@FullName: Wakaba
+    @@Mail: w@suika.fam.cx
+  @License:
+     license:Perl+MPL
+  @Date:
+    @@@:
+      $Date: 2005/02/18 06:13:52 $
+    @@ContentType:
+      dis:Date.RCS
+  
+  @Require:
+    @@Module:
+      @@@Name: ManakaiNode
+      @@@WithFor:
+        ManakaiDOM:all
+    @@Module:
+      @@@Name: DISIDL
+      @@@WithFor:
+        ManakaiDOM:all
+    @@Module:
+      @@@Name: DOMException
+      @@@WithFor:
+        ManakaiDOM:all
+    @@Module:
+      @@@Name: SuikaWikiConfig21
+      @@@WithFor:
+        ManakaiDOM:all
+    @@Module:
+      @@@Name: SuikaWikiConfig21
+      @@@WithFor: 
+        swcfg21:ForLatest
+
+  @DefaultFor: 
+    swcfg21:ForLatest
+
+Namespace:
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @DISLang:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Lang#
+  @DOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @DOMMain:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @lang:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @Markup:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup#
+  @owl:
+    http://www.w3.org/2002/07/owl#
+  @Perl:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @swcfg21:
+    http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
+  @TreeCore:\
+
+ResourceDef:
+  @QName:
+    Markup:
+  @rdf:type:
+    dis:ModuleGroup
+  @FullName:
+    @@lang:en
+    @@@:
+      The manakai Markup Language support modules
+  @AppName:
+    @@@:
+      Message::Markup::IFLatest::
+    @@ContentType:
+      lang:Perl
+    @@ForCheck: 
+      ManakaiDOM:ForIF ForLatest
+  @AppName:
+    @@@:
+      Message::Markup::IF::
+    @@ContentType:
+      lang:Perl
+    @@ForCheck: 
+      ManakaiDOM:ForIF
+  @AppName:
+    @@@:
+      Message::Markup::
+    @@ForCheck: ForLatest
+
+## -- "For" definitions
+
+## For one of multiple resources
+
+ForDef:
+  @QName: 
+    swcfg21:ForIF
+  @FullName:
+    @@lang:en
+    @@@: For interface
+  @ISA:
+    ManakaiDOM:ForIF
+
+ForDef:
+  @QName:
+    swcfg21:ForClass
+  @FullName:
+    @@lang:en
+    @@@: For class
+  @ISA:
+    ManakaiDOM:ForClass
+
+## For a version
+
+ForDef:
+  @QName:
+    swcfg21:ForLatest
+  @FullName:
+    @@lang:en
+    @@@: For latest version
+  @ISA:
+    ManakaiDOM:Perl
+
+## -- Features and versions
+
+PropDef:
+  @QName: 
+    swcfg21:namespaceAwareVariant
+  @Description:
+    @@lang:en
+    @@@:
+      A namespace aware variant of the subject method or attribute. 
+
+PropDef:
+  @QName: namespaceUnawareVariant
+  @Description:
+    @@lang:en
+    @@@:
+      A namespace unaware variant of the subject method or attribute. 
+
+## -- Node
+
+IFClassDef:
+  @IFQName: SWCFGNode
+  @ClassQName: ManakaiSWCFGNode
+  
+  @Description:
+    @@lang:en
+    @@@:
+      Each SuikaWikiConfig/2.1 node object implements the 
+      <IF::SWCFGNode> interface, which provides access to 
+      its properties and chilren. 
+
+  @Method:
+    @@Operator:
+      @@@@:
+        DISPerl:NewMethod
+      @@@ContentType:
+        dis:TypeQName
+    @@ManakaiDOM:isStatic:1
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Constructs a new instance of the SuikaWikiConfig/2.1 node 
+        belonging to a newly created document. 
+        \
+        {NOTE:: Use of this method is <EM::deprecated>; call 
+                <M::SWCFGDocument.createElementNS> or other 
+                factory methods instead. 
+        \
+        }
+    @@TypeParam:
+    @@LocalNameParam:
+    @@NSURIParam:
+    @@ValueParam:
+    @@Return:
+      @@@Type:SWCFGNode
+      @@@actualType:SWCFGNode
+      @@@Description:
+        @@@@lang:en
+        @@@@@:The newly created node object.
+      @@@PerlDef:
+
+  $self = {@_};
+  $self->{type} ||= '#element';
+  $self->{node} ||= [];
+  $self;
+
+  @Method:
+    @@Name:appendNode
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Appends a node to the list of children of this node. 
+    @@Param:
+      @@@Name:node
+      @@@Type:
+        DOMMain:Object
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The node or node value to append. 
+      @@@InCase:
+        @@@@Type:SWCFGNode
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The <P::node> is appended to the list of children. 
+      @@@InCase:
+        @@@@Type:SWCFGDocumentFragment
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Children of the <P::node> is appended. 
+      @@@InCase:
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The <P::node> is appended to the value of this node, 
+            as <M::SWCFGNode.appendText> does, if <P::nodeOrText> 
+            is set to <DOM::true>.  Otherwise, an exception is raised. 
+    @@NamedParam:
+      @@@Name:nodeOrText
+      @@@Type:
+        DOMMain:boolean
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Whether a string input should be accepted or not. 
+      @@@InCase:
+        @@@@Value:true
+        @@@@Type:
+          DOMMain:boolean
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            A <TYPE::SWCFGString> is accepted as a <P::node> parameter 
+            value. 
+      @@@InCase:
+        @@@@Value:false
+        @@@@Type:
+          DOMMain:boolean
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            A <TYPE::SWCFGString> is not accepted as a <P::node> 
+            parameter value. 
+    @@Return:
+      @@@Type:SWCFGNode
+      @@@actualType:ManakaiSWCFGNode
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The node appended to the child list. 
+          \
+          If the <P::node> is of <IF::SWCFGDocumentFragment>, 
+          this (parent) node is returned instead. 
+      ##TODO: HIERARCHY_REQUEST_ERRs
+      @@@RaiseException:
+        @@@@@:NOT_NODE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The <P::node> object is not of <IF::SWCFGNode> if 
+            <P::nodeOrText> is <DOM::false> or is neither of 
+            <IF::SWCFGNode> nor <IF::SWCFGString> if 
+            <P::nodeOrText> is <DOM::true>. 
+      ##TODO:NO_MODIFICATION_ALLOWED_ERRs
+      @@@RaiseException:
+        @@@@@:
+          SWCFGException.WRONG_DOCUMENT_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The <P::node> does not belong to the same document 
+            as the owner of this node. 
+      @@@PerlDef:
+        unless (UNIVERSAL::isa ($node, <IF::SWCFGNode>)) {
+          if ($opt{nodeOrText}) {
+            __DEEP{
+              $r = $self-><M::ManakaiSWCFGNode.appendText> ($node);
+            }__;
+          } else {
+            __EXCEPTION{NOT_NODE_ERR::
+              SuikaWikiConfig21:actualType => {ref $node},
+            }__;
+          }
+        } else {
+          if ($node-><M::SWCFGNode.nodeType> eq '#fragment') {
+            ## TODO:
+            for (@{$new_node->{node}}) {
+      push @{$self->{node}}, $_;
+      $_->{parent} = $self;
+    }
+            $r = $self;
+          } else {
+            ## TODO:
+    push @{$self->{node}}, $new_node;
+    $new_node->{parent} = $self;
+    $new_node;
+            $r = $node;
+          }
+        }
+
+  @Method:
+    @@Name:appendNewNode
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Constructs a new node object and appends it to the child list 
+        of this node. 
+    @@TypeParam:
+    @@LocalNameParam:
+    @@NSURIParam:
+    @@ValueParam:
+    @@Return:
+      @@@Type:SWCFGNode
+      @@@actualType:ManakaiSWCFGNode
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The newly created node. 
+      ##NO_MOD err
+      ##HIERARCHY err
+      @@@PerlDef:
+        ##TODO:
+  my $new_node = __PACKAGE__->new (@_);
+  push @{$self->{node}}, $new_node;
+  $new_node->{parent} = $self;
+
+  @Method:
+    @@Name:appendText
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Appends a string to the value of this node.  If the node value 
+        is of list, the string is added as a new item.  Otherwise, 
+        it is simply added at the end of the current value. 
+    @@Param:
+      @@@Name:text
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A text to append. 
+    @@Return:
+      ## HIERARCHY err
+      @@@PerlDef:
+        unless (defined $text) {
+          __WARNING{APPEND_NULL_TEXT_ERR}__;
+        } elsif (ref ($self->{<Q::TreeCore:node>}->{<Q::value>}) eq 'ARRAY') {
+          push @{$self->{<Q::TreeCore:node>}->{<Q::value>}}, $text;
+        } elsif (defined $self->{<Q::TreeCore:node>}->{<Q::value>}) {
+          $self->{<Q::TreeCore:node>}->{<Q::value>} .= $text;
+        } else {
+          $self->{<Q::TreeCore:node>}->{<Q::value>} = $text;
+        }
+
+  @Method:
+    @@Name:removeChildNode
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Removes a node from the child node list of this node. 
+    @@Param:
+      @@@Name:node
+      @@@Type:SWCFGNode
+      @@@actualType:ManakaiSWCFGNode
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The node to remove.  If the <P::node> is not a child of 
+          this node, no action has taken. 
+    @@Return:
+      @@@PerlDef:
+        ## TODO:
+
+  return unless ref $node;
+  $node = overload::StrVal ($node);
+  $self->{node} = [grep { overload::StrVal ($_) ne $node } @{$self->{node}}];
+
+  @Method:
+    @@Name:getAttribute
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns the first child element node object whose local name matches 
+        with the given name, if any. 
+    @@NSVariant:.getAttributeNS
+    @@Param:
+      @@@Name:localName
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The local name of element to return. 
+    @@MakeNewNodeParam:
+    @@Return:
+      @@@Type:SWCFGElement
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The first child element node whose local name matches to 
+          <P::name>. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGElement
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            There is no child element found whose name is <P::name>. 
+      @@@PerlDef:
+        ## TODO:
+  my ($self, $name, %o) = @_;
+  for (@{$self->{node}}) {
+    if ($_->{type} eq '#element'
+        && $_->{local_name} eq $name) {
+      return $_;
+    }
+  }
+  ## Node is not exist
+  if ($o{make_new_node}) {
+    return $self->append_new_node (type => '#element', local_name => $name);
+  } else {
+    return undef;
+  }
+
+  @Method:
+    @@Name:getAttributeNS
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns the first child node whose name matches to the 
+        pair of namespace URI and local name. 
+    @@NewIn21:
+    @@NonNSVariant:.getAttribute
+    @@Param:
+      @@@Name:namespaceURI
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The namespace URI of the element to get. 
+    @@Param:
+      @@@Name:localName
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The local name of the element to get. 
+    @@MakeNewNodeParam:
+    @@Return:
+      @@@Type:SWCFGElement
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The first child element node whose name matches to 
+          <P::namespaceURI> and <P::localName>. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGElement
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            There is no child element found whose name is <P::namespaceURI>
+            and <P::localName> pair. 
+      
+
+  @Method:
+    @@Name:getAttributeValue
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns the value of the first child element with a given 
+        local name. 
+    @@NSVariant:.getAttributeValueNS
+    @@Param:
+      @@@Name:localName
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The local name of the child element to get its value. 
+    @@MakeNewNodeParam:
+    @@DefaultParam:
+    @@DefaultListParam:
+    @@Return:
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The value of specified child element.  It might be either 
+          a simple string value, a list (array reference) value or 
+          a <DOM::null> value. 
+          \
+          If the element value is <DOM::null> or there is no such element 
+          exist and the <P::default> parameter is specified, then 
+          the <P::default> value is returned.  If the element 
+          value is of list and it have zero item and the <P::defaultList> 
+          parameter is specified, then the <P::defaultValue> is returned. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Either if there is no such child element found, if 
+            the element value is <DOM::null> or if the <P::default> 
+            value is specified as <DOM::null>. 
+      @@@PerlDef:
+ my $node = $self->get_attribute ($name);
+  if (ref $node) {
+    my $val = $node->value (%opt);
+    if ($opt{default_list} and ref $val eq 'ARRAY' and @$val == 0) {
+      return $opt{default_list};
+    } else {
+      return $val;
+    }
+  } else {
+    return $opt{default_list} || $opt{default};
+
+
+  @Method:
+    @@Name:getElementBy
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns the first child element node that satisfies the 
+        given condition, if any. 
+    @@Param:
+      @@@Name:code
+      @@@Type:
+        Perl:CODE
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          An anonymous function whose arguments are a <IF::SWCFGElement> 
+          node and a named parameter list (Perl hash) and
+          returning a boolean value.  This method calls this 
+          function to test an element node should be returned as 
+          the result.  The element node to test is passed as the first 
+          argument and any named parameters to this method are 
+          passed to the function. 
+    @@NamedParam:
+      @@@Name:makeNewNode
+      @@@Type:
+        Perl:CODE
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          An anonymous function whose arguments are a newly created 
+          <IF::SWCFGElement> node and a named parameter list (Perl hash) 
+          with no return value expected.  Any named parameters to this 
+          method are passed to the function.  The function is expected 
+          to modify the node of the first argument (including, but 
+          not limited to, renaming its name) to match the <P::code>'s 
+          condition, although it is not tested. 
+    @@Return:
+      @@@Type:SWCFGElement
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The first matching child element node. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGElement
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            There is no element node with which the <P::code> returns 
+            a <DOM::true> value. 
+      @@@PerlDef:
+
+  my ($self, $code, %opt) = @_;
+  for (@{$self->{node}}) {
+    if ($_->{type} eq '#element' and
+        $code->($self, $_, %opt)) {
+      return $_;
+    }
+  }
+  ## Node is not exist
+  if ($opt{make_new_node}) {
+    my $n = $self->append_new_node (type => '#element', local_name => 'Node');
+    $opt{make_new_node}->($self, $n, %opt)
+      if ref $opt{make_new_node} eq 'CODE';
+    return $n;
+  } else {
+    return undef;
+  }
+
+  @Method:
+    @@Name:setAttribute
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Sets the value of the first child element with the given name.  If 
+        it does not exist, a new element has created and the value is set 
+        to it. 
+    @@NSVariant:.setAttributeNS
+    @@Param:
+      @@@Name:localName
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The name of the element to set the value. 
+    @@Param:
+      @@@Name:value
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The value to set. 
+    @@Return:
+      @@@Type:SWCFGElement
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The element to which the value is set. 
+      @@@RaiseException:
+        @@@@@:BAD_VALUE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            An attempt is made to set a value whose type is neither 
+            a string, a list (array reference) or a blessed object. 
+      @@@PerlDef:
+        if ({qw/HASH 1 CODE 1/}->{ref ($val)}) {
+          __EXCEPTION{BAD_VALUE_ERR::
+            SuikaWikiConfig21:actualType => {ref $val},
+          }__;
+        }
+
+        ## TODO:
+  for (@{$self->{node}}) {
+    if ($_->{type} eq '#element'
+        && $_->{local_name} eq $name) {
+      $_->{value} = $val;
+      $_->{node} = [];
+      return $_;
+    }
+  }
+  return $self->append_new_node (type => '#element', local_name => $name,
+                                 value => $val);
+
+  @Method:
+    @@Name:setAttributeNS
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Sets the value of the first child element with the given name.  If 
+        it does not exist, a new element has created and the value is set 
+        to it. 
+    @@NonNSVariant:.setAttribute
+    @@NewIn21:
+    @@Param:
+      @@@Name:namespaceURI
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The namespace URI of the element to set the value. 
+    @@Param:
+      @@@Name:localName
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The name of the element to set the value. 
+    @@Param:
+      @@@Name:value
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The value to set. 
+    @@Return:
+      @@@Type:SWCFGElement
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The element to which the value is set. 
+      @@@RaiseException:
+        @@@@@:BAD_VALUE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            An attempt is made to set a value whose type is neither 
+            a string, a list (array reference) or a blessed object. 
+
+
+  @Method:
+    @@Name: removeAttribute
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Removes all child elements with the given name. 
+    @@NSVariant:.removeAttributeNS
+    @@Param:
+      @@@Name:localName
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The local name of the element to remove.
+    @@Return:
+      @@@Type:
+        DOMMain:boolean
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Always returns <DOM::true>. 
+      @@@PerlDef:
+  my ($self, $name, %opt) = @_;
+  $self->{node} = [grep {
+    if ($_->{type} eq '#element' and
+        $_->{local_name} eq $name) {
+      delete $_->{parent};
+      0;
+    } else {
+      1;
+    }
+  } @{$self->{node}}];
+  1;
+
+  @Method:
+    @@Name: removeAttributeNS
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Removes all child elements with the given name. 
+    @@NonNSVariant:.removeAttribute
+    @@NewIn21:
+    @@Param:
+      @@@Name:namespaceURI
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The namespace URI of the element to remove. 
+    @@Param:
+      @@@Name:localName
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The local name of the element to remove.
+    @@Return:
+      @@@Type:
+        DOMMain:boolean
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Always returns <DOM::true>. 
+
+
+  @Attr:
+    @@Name:childNodes
+    @@Type:SWCFGChildNodeList
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The list of child nodes.  If the type of the node is 
+        <CODE::#comment>, the list is always empty. 
+    @@Get:
+      #@@@PerlDef:
+        ## TODO: childNodes
+
+  @Attr:
+    @@Name:localName
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The local name of the node. 
+    @@Type:SWCFGString
+    @@Get:
+      @@@disDef:
+        @@@@DISLang:nop:
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The local name of the node. 
+      @@@Type:SWCFGString
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The node does not have the local name. 
+            No node of type other than <CODE::#element> has the local name. 
+    @@Set:
+      @@@disDef:
+        @@@@DISLang:nop:
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Sets the local name.  Setting the local name to the node 
+          whose type is other than <CODE::#element> has no effect. 
+
+  @Attr:
+    @@Name:namespaceURI
+    @@NewIn21:
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The namespace URI of the node. 
+    @@Type:SWCFGString
+    @@Get:
+      @@@disDef:
+        @@@@DISLang:nop:
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The namespace URI of the node. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The node does not have the namespace URI. 
+            No node of type other than <CODE::#element> has the local name. 
+    @@Set:
+      @@@disDef:
+        @@@@DISLang:nop:
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Sets the namespace URI.  Setting the local name to the node 
+          whose type is other than <CODE::#element> has no effect. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: 
+            Sets the node not to have its namespace URI (or sets 
+            the namespace as the <QUOTE::<DOM::null> namespace>. 
+
+  @Attr:
+    @@Name:nodeType
+    @@Type:SWCFGString
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The type of the node. 
+    @@Get:
+      @@@Type:SWCFGString
+      @@@disDef:
+        @@@@ConstValue:\#element
+      @@@InCase:
+        @@@@Value:\#comment
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:This node is a comment node. 
+      @@@InCase:
+        @@@@Value:\#document
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:This node is a document node. 
+      @@@InCase:
+        @@@@Value:\#element
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:This node is an element node. 
+      @@@InCase:
+        @@@@Value:\#fragment
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:This node is a document fragment node. 
+
+  @Attr:
+    @@Name:parentNode
+    @@Type:SWCFGNode
+    @@Description:
+      @@@lang:en
+      @@@@:The parent node of this node, if any. 
+    @@Get:
+      @@@disDef:
+        @@@@swcfg21:GetPropNode:parent
+      @@@Description:
+        @@@@lang:en
+        @@@@@:The parent node. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGNode
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:This node has no parent node. 
+
+  @Attr:
+    @@Name:count
+    @@Type:
+      DOMMain:unsigned-long
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The number of children of this node.  If this node has 
+        the value, it is also counted as a <QUOTE::child>. 
+    @@Get:
+      @@@PerlDef:
+        $r = (defined $self->{<Q::TreeCore:node>}->{<Q::value>} ? 1 : 0)
+           + @{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}};
+
+  @Method:
+    @@Name:innerText
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns the text value of this node. 
+    @@NamedParam:
+      @@@Name:newValue
+      @@@Type:
+        DOMMain:any
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The new node value.  If <P::newValue> is specified, 
+          the node value is changed before returning the value. 
+          Sets a value to document or document fragment node has no effect. 
+    @@Return:
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The value of this node.  If the value is of list, 
+          values are separeted by a <CHAR::LINE FEED> character. 
+          Note that the last item of the list will <EM::not> 
+          suffixed by a <CHAR::LINE FEED>. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The node has no value. 
+      @@@PerlDef:
+        if (defined $newValue) {
+          $self->{<Q::TreeCore:node>}->{<Q::value>} = $newValue;
+        }
+        ref ($self->{<Q::TreeCore:node>}->{<Q::value>}) eq 'ARRAY'
+                 ? join "\x0A", @{$self->{<Q::TreeCore:node>}->{<Q::value>}} :
+                   $self->{<Q::TreeCore:node>}->{<Q::value>};
+
+  @Method:
+    @@Name:value
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns the value of this node. 
+    @@NamedParam:
+      @@@Name:asArray
+      @@@Type:
+        DOMMain:boolean
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Whether the value should be returned as an array reference 
+          even if the node value is a simple string. 
+      @@@InCase:
+        @@@@Value:true
+        @@@@Type:
+          DOMMain:boolean
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The node value is always returned as an array reference. 
+      @@@InCase:
+        @@@@Value:false
+        @@@@Type:
+          DOMMain:boolean
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The node value is returned as an array reference if and 
+            only if the node value is a list value. 
+    @@Return:
+      @@@Type:
+        DOMMain:any
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The node value. If the <P::asArray> value is <DOM::false>, 
+          the current node value is returned as is.  If the <P::asArray> 
+          value is <DOM::true> and the node value is a simple string, 
+          then an array reference containing the value as an only item 
+          is returned.  If <P::true> and the node value is not defined, 
+          then an empty array reference is returned. 
+      @@@PerlDef:
+        if ($asArray and
+            ref $self->{<Q::TreeCore:node>}->{<Q::value>} ne 'ARRAY') {
+          $r = defined $self->{<Q::TreeCore:node>}->{<Q::value>}
+                  ? [$self->{<Q::TreeCore:node>}->{<Q::value>}
+                  : [];
+        } else {
+          $r = $self->{<Q::TreeCore:node>}->{<Q::value>};
+        }
+
+  @Method:
+    @@Operator:
+      @@@ContentType:
+        dis:TypeQName
+      @@@@:
+        DISPerl:AsStringMethod
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The string representation of the node, i.e. the serialized 
+        text form of a SuikaWikiConfig/2.0 document or document fragment. 
+    @@NamedParam:
+      @@@Name:outputHeader
+      @@@Type:
+        DOMMain:boolean
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Whether the magic identifier (the signature header) should 
+          be prefixed or not, if this node is the document node. 
+    @@Return:
+      @@@Type:SWCFGString
+      @@@PerlDef:
+  my ($self, %opt) = @_;
+  my $r = '';
+  if ($self->{type} eq '#document') {
+    if ($opt{output_header}) {
+      $r = "#?SuikaWikiConst/2.0\x0A";
+    }
+    my $ptype = '#';
+    for (@{$self->{node}}) {
+      $r .= "\x0A" if $ptype eq '#comment' && $_->{type} eq '#comment';
+      $ptype = $_->{type};
+      $r .= $_->stringify;
+    }
+  } elsif ($self->{type} eq '#element') {
+    $r = $self->inner_text;
+    if (scalar @{$self->{node}}) {
+      if (defined $r) {
+        $r =~ s/(^|\x0A)(?=([\\\@\#\s]|$))?/$1."  ".(defined $2?"\\":"")/ges;
+        $r = $self->{local_name}
+           . ":\x0A  \@\@"
+           . (ref ($self->{value}) eq 'ARRAY' ? '[list]' : '')
+           . ":" . (($r !~ /[\x0D\x0A:]/) && (length ($r) < 50) ? '' : "\x0A")
+           . (length $r ? $r : '\\') . "\x0A";
+      } else {
+        $r = $self->{local_name}
+           . ":\x0A";
+      }
+      for (@{$self->{node}}) {
+        next unless $_->{type} eq '#element';
+        my $rc = $_->stringify;
+        $rc =~ s/\x0A  /\x0A     /gs;
+        $rc =~ s/(\x0A +\@)/$1\@/gs;
+        $r .= '  @' . $rc;
+      }
+    } else {
+      $r = '' unless defined $r;
+      $r =~ s/(^|\x0A)(?=([\\\@\#\s]|$))?/$1."  ".(defined $2?"\\":"")/ges;
+      $r = $self->{local_name}
+         . (ref ($self->{value}) eq 'ARRAY' ? '[list]' : '')
+         . ":" . ((($r !~ /[\x0D\x0A:]/) && (length ($r) < 50)) ? '' : "\x0A")
+         . (length $r ? $r : '\\') . "\x0A";
+    }
+    $r = "\\" . $r if substr ($r, 0, 1) =~ /[\\\@\#\s]/;
+  } else {
+    $r = $self->inner_text;
+    $r =~ s/\x0A/\x0A#/gs;
+    $r = '#' . $r . "\n";
+  }
+
+  @Method:
+    @@Name:rootNode
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns the root node in the tree to which this node belongs. 
+    @@Return:
+      @@@Type:SWCFGNode
+      @@@PerlDef:
+  my $self = shift;
+  if ($self->{type} eq '#document') {
+    return $self;
+  } elsif (ref $self->{parent}) {
+    return $self->{parent}->root_node;
+  } else {
+    return $self;
+  }
+
+  @Method:
+    @@Name:nodePath
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns a string representing the position of this node 
+        in the document tree. 
+        \
+        {NOTE:: The position is represented in the informal 
+                XPath-like expression.  In the current implementation, 
+                it does not conform to XPath nor is able to 
+                identify the node uniquely.  
+        \
+        }
+    @@NamedParam:
+      @@@Name:key
+      @@@Type:
+        DOMMain:any
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Either an attribute name or a reference to an array 
+          containing attribute names.  Attribute names are 
+          used as <QUOTE::keys> to identify a node. 
+    @@Return:
+      @@@Type:SWCFGString
+      @@@PerlDef:
+        my $parent = $self-><M::SWCFGNode.parentNode>;
+        if ($parent) {
+          $r = $parent-><M::SWCFGNode.nodePath> (%opt);
+        } else {
+          $r = '';
+        }
+        my $node_type = $self-><M::SWCFGNode.nodeType>;
+        if ($node_type eq '#element') {
+          ## TODO: Namespace support
+          $r .= '/' . $self-><M::SWCFGNode.localName>;
+          if ($key) {
+            for (ref $key eq 'ARRAY' ? @{$key} : $key) {
+              my $key_val = $self-><M::SWCFGNode.getAttributeValue> ($_);
+              if (defined $key_val) {
+                $r .= '[@' . $_ . '=' . $key_val . ']';
+              }
+            }
+          }
+        } elsif ($node_type eq '#comment') {
+          $r .= q</comment ()>;
+        } elsif ($node_type eq '#document') {
+          $r .= q</document ()>;
+        } elsif ($node_type eq '#fragment') {
+          $r .= q</fragment ()>;
+        } else {
+          __ASSERT{DISPerl:invariant::
+            msg => {qq<Node path = "$r" ... Oops! Node type: "$node_type">},
+          }__;
+        }
+
+  @Method:
+    @@Name:flag
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Gets or sets an application data associated with this node. 
+        \
+        {NOTE:: The SuikaWikiConfig/2.1 object implementation 
+                does not use <QUOTE::flags> to decide what to do. 
+                Applications are free to use this space. 
+        \
+        }
+    @@Param:
+      @@@Name:name
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The name of flag to get or set its value. 
+          \
+          {NOTE:: Applications are advised to use a URI reference 
+                  <SRC::RFC 3986> for flag names to avoid name confliction. 
+          \
+          }
+    @@Param:
+      @@@Name:value
+      @@@Type:
+        DOMMain:any
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Any data to associate with this node. 
+          \
+          {NOTE:: Associating a node belonging to the same tree as 
+                  this node might lead memory leak because of its 
+                  reference loop. 
+          \
+          }
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:
+          DOMMain:any
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The current flag value is left unchanged. 
+            \
+            {NOTE:: There is no way to remove a flag entirely. 
+            \
+            }
+    @@DefaultParam:
+    @@Return:
+      @@@Type:
+        DOMMain:any
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The (possibly new) value associated with the flag of <P::name>. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:
+          DOMMain:any
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            No value is associated with the flag and no default value provided. 
+      @@@PerlDef:
+        if (defined $value) {
+          $r = $self->{<Q::TreeCore:node>}->{<Q::flag>}->{$name} = $value;
+        } else {
+          $r = defined $self->{<Q::TreeCore:node>}->{<Q::flag>}->{$name}
+                  ? $self->{<Q::TreeCore:node>}->{<Q::flag>} : $default;
+        }
+
+  @Method:
+    @@Name:option
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Gets or sets a named option to this node. 
+        \
+        {NOTE:: Currently no options has defined. 
+        \
+        }
+    @@Param:
+      @@@Name:name
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The option name. 
+    @@Param:
+      @@@Name:value
+      @@@Type:
+        DOMMain:any
+      @@@Description:
+        @@@@lang:en
+        @@@@@:The option value to set. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:
+          DOMMain:any
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The option value is left unchanged. 
+            \
+            {NOTE:: There is no way to remove an option value.  
+            \
+            }
+    @@Return:
+      @@@Type:
+        DOMMain:any
+      @@@Description:
+        @@@@lang:en
+        @@@@@:The (possibly new) value of the option. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:
+          DOMMain:any
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:No value has set to the option. 
+      @@@PerlDef:
+        if (defined $value) {
+          $self->{<Q::TreeCore:node>}->{<Q::option>}->{$name} = $value;
+        }
+        $r = $self->{<Q::TreeCore:node>}->{<Q::option>}->{$name};
+
+  @Method:
+    @@Operator:
+      @@@ContentType:
+        dis:TypeQName
+      @@@@:
+        DISPerl:CloneMethod
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Makes a copy of this node.  All child nodes are cloned and 
+        all flags and options are copied (rather than cloned).  
+        The new node does not have any parent. 
+    @@Return:
+      @@@Type:SWCFGNode
+      @@@Description:
+        @@@@lang:en
+        @@@@@:The cloned node. 
+      @@@PerlDef:
+        ## TODO:
+
+  my $clone = bless {node => []}, ref $self;
+  ## TODO: Cloning recursively
+  $clone->{flag} = {%{$self->{flag}||{}}};
+  $clone->{option} = {%{$self->{option}||{}}};
+  for (qw/local_name value type/) {
+    $clone->{$_} = $self->{$_};
+  }
+  for (@{$self->{node}}) {
+    push @{$clone->{node}}, $_->clone;
+  }
+  $_->{parent} = $clone for @{$clone->{node}};
+
+  @Attr:
+    @@Name:ownerDocument
+    @@NewIn21:
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The document object associated with this node. 
+    @@Get:
+      @@@Type:SWCFGDocument
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The document object associated with this node. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGDocument
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            This node is a document node. 
+      @@@disDef:
+        @@@@swcfg21:GetPropNode:
+          DOMCore:ownerDocument
+
+  @Attr:
+    @@Name:prefix
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The namespace prefix of this node. 
+    @@NewIn21:
+    @@Get:
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:The namespace prefix. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Either this node is not an element node or its namespace 
+            is the default and no prefix is required. 
+      #@@@PerlDef:
+        
+  @Method:
+    @@Name:lookupPrefix
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Looks up the namespace prefix associated to the given 
+        namespace URI.  The default namespaces are ignored. 
+    @@NewIn21:
+    @@Param:
+      @@@Name:namespaceURI
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The namespace URI to look for. 
+    @@Return:
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+           An associated namespace prefix.  If more than one prefix 
+           are associated to the namespace URI, the returned prefix 
+           is implementation dependent. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            No associated namespace prefix found. 
+  @Method:
+    @@Name:lookupNamespaceURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Looks up the namespace URI associated to the given prefix. 
+    @@NewIn21:
+    @@Param:
+      @@@Name:prefix
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The namespace URI to look for. 
+    @@Return:
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:The associated namespace prefix.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            No namespace prefix is associated to the URI. 
+
+  @IntMethod:
+    @@Name:getNodeReference
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns a new reference to the node object. 
+    @@ManakaiDOM:isStatic:1
+    @@Param:
+      @@@Name:object
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The node object to be referred. 
+    @@Return:
+      @@@Type:SWCFGNode
+      @@@actualType:ManakaiSWCFGNode
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A newly created reference.
+      @@@PerlDef:
+        my $class;
+        if ($object->{<Q::nodeType>} eq '#element') {
+          $class = <ClassName::ManakaiSWCFGElement>;
+        } elsif ($object->{<Q::nodeType>} eq '#comment') {
+          $class = <ClassName::ManakaiSWCFGComment>;
+        } elsif ($object->{<Q::nodeType>} eq '#document') {
+          $class = <ClassName::ManakaiSWCFGDocument>;
+        } elsif ($object->{<Q::nodeType>} eq '#fragment') {
+          $class = <ClassName::ManakaiSWCFGDocumentFragment>;
+        } else {
+          __ASSERT{DISPerl:invariant::
+            msg => {qq[Node type: "$object->{<Q::nodeType>}"]},
+          }__;
+        }
+        $r = $object-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+                                  .newReference> ($class);
+
+  @IntMethod:
+    @@Name:newObject
+    @@ManakaiDOM:isStatic:1
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates a new instance object for <IF::SWCFGNode>. 
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The newly created node object.
+      @@@PerlDef:
+        @@@@@:
+          my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
+                                        ::ManakaiDOM:all.new>;
+          push @{$node->{<Q::TreeCore:origin>}}, <Q::parent>;
+          push @{$node->{<Q::TreeCore:subnode>}}, <Q::childNodes>;
+          push @{$node->{<Q::TreeCore:irefnode>}}, <Q::DOMCore:ownerDocument>;
+          push @{$node->{<Q::TreeCore:anydata2>}}, <Q::flag>, <Q::option>;
+          $node->{<Q::childNodes>} = [];
+        @@@@ImplNote:
+          @@@@@lang:en
+          @@@@@@:
+            Required property: <Q::nodeType>, <Q::DOMCore:ownerDocument>. 
+            \
+            Optional properties: <Q::value>, <Q::parent>, 
+                  <Q::childNodes>, <Q::flag>, <Q::option>. 
+##SWCFGNode
+
+IFClassDef:
+  @IFQName:SWCFGComment
+  @ClassQName:ManakaiSWCFGComment
+  @IFISA: SWCFGNode
+  @ClassISA: ManakaiSWCFGNode
+  @Description:
+    @@lang:en
+    @@@:
+      A comment node. 
+      \
+      {NOTE:: A comment node have a value.  A comment node has no child node. 
+              The <CODE::#?SuikaWikiConfig/2.1> magic line is not a comment. 
+              The parent node of a comment node, if any, is always 
+              the document node in SuikaWikiConfig versions 2.0 and 2.1. 
+      \
+      }
+  
+  @RedefAttr:
+    @@Name:nodeType
+    @@Type:SWCFGString
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The type of the node. 
+    @@Get:
+      @@@disDef:
+        @@@@ConstValue:\#comment
+      @@@InCase:
+        @@@@Value:\#comment
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:This node is a comment node. 
+
+  @IntMethod:
+    @@Name:newObject
+    @@ManakaiDOM:isStatic:1
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates a new instance object for <IF::SWCFGComment>. 
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The newly created node object.
+      @@@PerlDef:
+        @@@@@:
+          $r = <ClassM::ManakaiSWCFGNode.newObject>;
+          $r->{<Q::nodeType>} = '#comment';
+          $r->{<Q::value>} = '';
+        @@@@ImplNote:
+          @@@@@lang:en
+          @@@@@@:
+            Required property: <Q::DOMCore:ownerDocument>, <Q::nodeType>. 
+            \
+            Optional properties: <Q::value>, <Q::parent>, 
+                  <Q::childNodes>, <Q::flag>, <Q::option>. 
+##SWCFGComment
+
+IFClassDef:
+  @IFQName:SWCFGElement
+  @ClassQName:ManakaiSWCFGElement
+  @IFISA: SWCFGNode
+  @ClassISA: ManakaiSWCFGNode
+  @Description:
+    @@lang:en
+    @@@:
+      An element node. 
+      \
+      {NOTE:: An element node have a value.  An element node can have 
+              child elements if the value is a simple string (if any). 
+              Future version of SuikaWikiConfig might allow a comment child. 
+      \
+      }
+
+  @Attr:
+    @@Name:expandedURI
+    @@Type:SWCFGString
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The expanded URI of the node. 
+    @@NewIn21:
+    @@Get:
+      @@@PerlDef:
+        if (defined $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>}) {
+          $r = $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>} .
+               $self->{<Q::TreeCore:node>}->{<Q::localName>};
+        } else {
+          $r = $self->{<Q::TreeCore:node>}->{<Q::localName>};
+        }
+  
+  @RedefAttr:
+    @@Name:nodeType
+    @@Type:SWCFGString
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The type of the node. 
+    @@Get:
+      @@@disDef:
+        @@@@ConstValue:\#element
+      @@@InCase:
+        @@@@Value:\#element
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:This node is an element node. 
+  @RedefAttr:
+    @@Name:localName
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The local name of the node. 
+    @@Type:SWCFGString
+    @@Get:
+      @@@disDef:
+        @@@@GetProp:localName
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The local name of the node. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The node does not have the local name. 
+            No node of type other than <CODE::#element> has the local name. 
+    @@Set:
+      @@@disDef:
+        @@@@SetProp:localName
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Sets the local name.  Setting the local name to the node 
+          whose type is other than <CODE::#element> has no effect. 
+
+  @RedefAttr:
+    @@Name:namespaceURI
+    @@NewIn21:
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The namespace URI of the node. 
+    @@Type:SWCFGString
+    @@Get:
+      @@@disDef:
+        @@@@GetProp:namespaceURI
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The namespace URI of the node. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The node does not have the namespace URI. 
+    @@Set:
+      @@@disDef:
+        @@@@SetProp:namespaceURI
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Sets the namespace URI.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: 
+            Sets the node not to have its namespace URI (or sets 
+            the namespace as the <QUOTE::<DOM::null> namespace>. 
+  @IntMethod:
+    @@Name:newObject
+    @@ManakaiDOM:isStatic:1
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates a new instance object for <IF::SWCFGElement>. 
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The newly created node object.
+      @@@PerlDef:
+        @@@@@:
+          $r = <ClassM::ManakaiSWCFGNode.newObject>;
+          $r->{<Q::nodeType>} = '#element';
+        @@@@ImplNote:
+          @@@@@lang:en
+          @@@@@@:
+            Required property: <Q::DOMCore:ownerDocument>, <Q::nodeType>, 
+              <Q::localName>. 
+            \
+            Optional properties: <Q::value>, <Q::parent>, 
+                  <Q::childNodes>, <Q::flag>, <Q::option>, 
+                  <Q::namespaceURI>, <Q::namespaceExpanded>. 
+##SWCFGElement
+
+IFClassDef:
+  @IFQName:SWCFGDocument
+  @ClassQName:ManakaiSWCFGDocument
+  @IFISA: SWCFGNode
+  @ClassISA: ManakaiSWCFGNode
+  @Description:
+    @@lang:en
+    @@@:
+      A document node. 
+      \
+      {NOTE:: A document node does not have any value.  A document node can have 
+              child nodes whose type is either element or comment. 
+              A document node has no parent. 
+      \
+      }
+
+  @Method:
+    @@Name:createElementNS
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates a new element. 
+    @@NewIn21:
+    @@Param:
+      @@@Name:namespaceURI
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The namespace URI of the element to create. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The new element has no namespace. 
+    @@Param:
+      @@@Name:localName
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The local name of the element to create. 
+    @@Return:
+      @@@Type:SWCFGElement
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The newly created element. 
+      @@@PerlDef:
+        $r = <ClassM::ManakaiSWCFGElement.newObject>;
+        $r->{<Q::DOMCore:ownerDocument>} = $self;
+        $r->{<Q::namespaceURI>} = $namespaceURI;
+        $r->{<Q::localName>} = $localName;
+        $r->{<Q::namespaceExpanded>} = true;
+        $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($r);
+
+  @Method:
+    @@Name:createComment
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates a new comment node. 
+    @@NewIn21:
+    @@Param:
+      @@@Name:data
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The initial content of the comment. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The new comment node has the empty value. 
+    @@Return:
+      @@@Type:SWCFGComment
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The newly created comment. 
+      @@@PerlDef:
+        $r = <ClassM::ManakaiSWCFGComment.newObject>;
+        $r->{<Q::DOMCore:ownerDocument>} = $self;
+        $r->{<Q::value>} = defined $data ? $data : '';
+        $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($r);
+
+  @Method:
+    @@Name:createDocumentFragment
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates a new document fragment node. 
+    @@NewIn21:
+    @@Return:
+      @@@Type:SWCFGDocumentFragment
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The newly created document fragment node. 
+      @@@PerlDef:
+        $r = <ClassM::ManakaiSWCFGDocumentFragment.newObject>;
+        $r->{<Q::DOMCore:ownerDocument>} = $self;
+        $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($r);
+
+  @Method:
+    @@Name:bindNamespaceURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Binds a namespace URI to a prefix. 
+    @@NewIn21:
+    @@Param:
+      @@@Name:prefix
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The namespace prefix to which the URI is bound. 
+          If this <P::prefix> is already bound to another URI, 
+          that binding is overwritten. 
+    @@Param:
+      @@@Name:namespaceURI
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The namespace URI. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The namespace binding for <P::prefix> is removed. 
+    @@Return:
+      @@@PerlDef:
+        if (defined $namespaceURI) {
+          $self->{<Q::TreeCore:node>}->{<Q::nsBinding>}->{$prefix}
+                                 = $namespaceURI;
+        } else {
+          CORE::delete $self->{<Q::TreeCore:node>}->{<Q::nsBinding>}->{$prefix};
+        }
+  
+  @RedefAttr:
+    @@Name:nodeType
+    @@Type:SWCFGString
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The type of the node. 
+    @@Get:
+      @@@disDef:
+        @@@@ConstValue:\#document
+      @@@Type:SWCFGString
+      @@@InCase:
+        @@@@Value:\#document
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:This node is a document node. 
+  @RedefMethod:
+    @@Name:innerText
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns the text value of this node. 
+    @@NamedParam:
+      @@@Name:newValue
+      @@@Type:
+        DOMMain:any
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          An attempt to set a value to document node has no effect. 
+    @@Return:
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The value of this node.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The node has no value. 
+      @@@disDef:
+        @@@@DISLang:nop:
+  @IntMethod:
+    @@Name:newObject
+    @@ManakaiDOM:isStatic:1
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates a new instance object for <IF::SWCFGDocument>. 
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The newly created node object.
+      @@@PerlDef:
+        @@@@@:
+          $r = <ClassM::ManakaiSWCFGNode.newObject>;
+          $r->{<Q::nodeType>} = '#document';
+        @@@@ImplNote:
+          @@@@@lang:en
+          @@@@@@:
+            Required property: <Q::DOMCore:ownerDocument>, <Q::nodeType>, 
+                  <Q::DOMCore:implementation>. 
+            \
+            Optional properties: <Q::childNodes>, <Q::flag>, <Q::option>, 
+                  <Q::nsBinding>, <Q::defaultETNamespaceURI>. 
+##SWCFGDocument
+
+IFClassDef:
+  @IFQName:SWCFGDocumentFragment
+  @ClassQName:ManakaiSWCFGDocumentFragment
+  @IFISA: SWCFGNode
+  @ClassISA: ManakaiSWCFGNode
+  @Description:
+    @@lang:en
+    @@@:
+      A document fragment node. 
+      \
+      {NOTE:: A document fragment node does not have any value.
+              A document fragment node can have child elements. 
+              Future version of SuikaWikiConfig might allow a comment child. 
+              A document fragment node has no parent. 
+      \
+      }
+  
+  @RedefAttr:
+    @@Name:nodeType
+    @@Type:SWCFGString
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The type of the node. 
+    @@Get:
+      @@@disDef:
+        @@@@ConstValue:\#fragment
+      @@@InCase:
+        @@@@Value:\#fragment
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:This node is a document fragment node. 
+  @RedefMethod:
+    @@Name:innerText
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns the text value of this node. 
+    @@NamedParam:
+      @@@Name:newValue
+      @@@Type:
+        DOMMain:any
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          An attempt to set a value to document node has no effect. 
+    @@Return:
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The value of this node.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The node has no value. 
+      @@@disDef:
+        @@@@DISLang:nop:
+
+  @IntMethod:
+    @@Name:newObject
+    @@ManakaiDOM:isStatic:1
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates a new instance object for <IF::SWCFGDocumentFragment>. 
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:all
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The newly created node object.
+      @@@PerlDef:
+        @@@@@:
+          $r = <ClassM::ManakaiSWCFGNode.newObject>;
+          $r->{<Q::nodeType>} = '#fragment';
+        @@@@ImplNote:
+          @@@@@lang:en
+          @@@@@@:
+            Required property: <Q::DOMCore:ownerDocument>, <Q::nodeType>. 
+            \
+            Optional properties: <Q::parent>, 
+                  <Q::childNodes>, <Q::flag>, <Q::option>. 
+##SWCFGDocumentFragment
+
+IFClassDef:
+  @IFQName:SWCFGChildNodeList
+  @ClassQName:ManakaiSWCFGChildNodeList
+  @Description:
+    @@lang:en
+    @@@:
+      A child node list of a node. 
+  @Method:
+    @@Name:item
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns a child node. 
+    @@Param:
+      @@@Name:index
+      @@@Type:
+        DOMMain:long
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The ordinal index of the node to retrieve, counting from zero. 
+          A negative index identifies a node from the end of the list. 
+    @@Return:
+      @@@Type:SWCFGNode
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The <P::index>th child node in the list. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGNode
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: 
+            There is no <P::index>th node in the list. 
+      @@@PerlDef:
+        $r = $self->{<Q::TreeCore:node>}->{<Q::childNodes>}->[$index];
+##SWCFGChildNodeList
+
+PropDef:
+  @QName:childNodes
+  @Description:
+    @@lang:en
+    @@@:
+      Child nodes of a node. 
+
+PropDef:
+  @QName:value
+  @Description:
+    @@lang:en
+    @@@:
+      The value of a node.  It is either a simple value, represented
+      as a string, or a 
+      list value, represented as an array reference.  If a node 
+      does not has a value, its value is <DOM::null>. 
+
+PropDef:
+  @QName:namespaceURI
+  @Type:SWCFGString
+  @Description:
+    @@lang:en
+    @@@:
+      The namespace URI of an element node.  
+  @InCase:
+    @@Value:
+      @@@is-null:1
+    @@Type:SWCFGString
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The node has no namespace (or has <QUOTE::<DOM::null> namespace>. 
+
+PropDef:
+  @QName:localName
+  @Description:
+    @@lang:en
+    @@@:
+      The local name of an element node. 
+
+PropDef:
+  @QName:namespaceExpanded
+  @Description:
+    @@lang:en
+    @@@:
+      Whether the namespace URI has expanded or not. 
+  @Type:
+    DOMMain:boolean
+
+PropDef:
+  @QName:nsBinding
+  @Description:
+    @@lang:en
+    @@@:
+      Namespace prefix and URI bindings. 
+
+PropDef:
+  @QName:defaultETNamespaceURI
+  @Description:
+    @@lang:en
+    @@@:
+      Default namespace URI for element type. 
+  @Type: SWCFGString
+
+PropDef:
+  @QName:flag
+  @Type:
+    Perl:HASH
+  @Description:
+    @@lang:en
+    @@@:
+      Flags associated with the node. 
+
+PropDef:
+  @QName:option
+  @Type:
+    Perl:HASH
+  @Description:
+    @@lang:en
+    @@@:
+      Node-wide options set to the node. 
+
+PropDef:
+  @QName:nodeType
+  @Type:SWCFGString
+  @Description:
+    @@lang:en
+    @@@:
+      The node type. 
+
+## -- Exceptions
+
+ExceptionDef:
+  @IFQName: SWCFGException
+  @ClassQName:ManakaiSWCFGException
+  @Description:
+    @@lang:en
+    @@@:
+      Exceptions raised if an attempt to make a bad operation has made. 
+  @XConstGroupDef:
+    @@IFQName: SWCFGExceptionCode
+    @@ClassQName: ManakaiSWCFGExceptionCode
+    @@rdfs:subClassOf:
+      DOMMain:unsigned-long::ManakaiDOM:all
+    @@Type:
+      DOMMain:unsigned-long
+    @@XConst:
+      @@@Name:TYPE_MISMATCH_ERR
+      @@@Value:17
+      @@@Description:
+        @@@@lang:en
+        @@@@@: 
+          The type of an object is incompatible with the type of 
+          the parameter. 
+      @@@XSubTypeDef:
+        @@@@QName:BAD_VALUE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The type of an object is not a string nor a list (array reference). 
+        @@@@XParam:
+          @@@@@QName:actualType
+          @@@@@Description:
+            @@@@@@lang:en
+            @@@@@@@:
+              The type of the object specified. 
+      @@@XSubTypeDef:
+        @@@@QName:NOT_NODE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The type of an object is not <IF::SWCFGNode>. 
+        @@@@XParam:
+          @@@@@QName:actualType
+          @@@@@Description:
+            @@@@@@lang:en
+            @@@@@@@:
+              The type of the object specified. 
+       @@@XSubTypeDef:
+         @@@@QName:APPEND_NULL_TEXT_ERR
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             An attempt is made to append a <DOM::null> value. 
+    @@XConst:
+      @@@Name: NOT_SUPPORTED_ERR
+      @@@Value: 9
+      @@@XSubTypeDef:
+        @@@@QName:SWCFG_VERSION_NOT_SUPPORTED_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The implementation does not support the specified version 
+            of SuikaWikiConfig. 
+        @@@@XParam:
+          @@@@@QName:version
+          @@@@@Description:
+            @@@@@@lang:en
+            @@@@@@@:
+              The version of SuikaWikiConfig that the implementation 
+              does not support. 
+    @@XConst:
+      @@@Name:PARSE_ERR
+      @@@Value:81
+      @@@XSubTypeDef:
+        @@@@QName:SWCFG_PARSE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The implementation is unable to read and parse the 
+            SuikaWikiConfig document. 
+##SWCFGException
+
+XPropDef:
+  @QName:actualType
+  @Description:
+    @@lang:en
+    @@@:
+      The type of the actually specified value. 
+  @dataType:
+    DISCore:String
+
+XPropDef:
+  @QName: version
+  @Type: SWCFGString
+  @Description:
+    @@lang:en
+    @@@:
+      The version of the SuikaWikiConfig format.  Currently there is 
+      version <CODE::2.0> and <CODE::2.1> defined. 
+
+## -- Datatypes
+
+TypeDef:
+  @QName:SWCFGString
+  @rdfs:subClassOf:
+    DISLang:String::ManakaiDOM:all
+  @Description:
+    @@lang:en
+    @@@:
+      Strings. 
+
+## -- Load
+
+IFClassDef: 
+  @IFQName: SWCFGParser
+  @ClassQName: ManakaiSWCFGParser
+  @Description:
+    @@lang:en
+    @@@:
+      This interface provides methods to load SuikaWikiConfig documents. 
+  
+  @Method:
+    @@Name: parse
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Parses a SuikaWikiConfig document from a resource. 
+    @@Param:
+      @@@Name:input
+      @@@Type:
+#        DOMLS:LSInput
+ DOMMain:any
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The <IF::DOMLS:LSInput> from which the source of the document 
+          is to be read. 
+    @@Return:
+      @@@Type:SWCFGDocument
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The newly created SuikaWikiConfig document node. 
+      @@@RaiseException:
+        @@@@@:SWCFG_PARSE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The <IF::SWCFGParser> was unable to load the SuikaWikiConfig 
+            document. 
+
+## -- Bootstraps
+
+IFClassDef:
+  @IFQName: SWCFGImplementation
+  @ClassQName: ManakaiSWCFGImplementation
+  @Description:
+    @@lang:en
+    @@@:
+      This interface allows applications to retrieve an instance of 
+      <IF::SWCFGParser>. 
+  @ImplNote:
+    @@lang:en
+    @@@:
+      This interface should be implemented on the same object that 
+      implements <IF::DOMImplementation>. 
+  # recognizedVersions : StringList
+  
+  @Method:
+    @@Name: createSWCFGDocument
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates an empty <IF::SWCFGDocument> object. 
+    @@NewIn21:
+    @@Param:
+      @@@Name:version
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The version of the SuikaWikiConfig format.  Currently 
+          only the version <CODE::2.1> is supported. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The latest version of the SuikaWikiConfig that the implementation 
+            supports is selected. 
+    @@Return:
+      @@@Type:SWCFGDocument
+      @@@actualType:ManakaiSWCFGDocument
+      @@@Description:
+        @@@@lang:en
+        @@@@@:The newly created SuikaWikiConfig document object.
+      @@@RaiseException:
+        @@@@@:SWCFG_VERSION_NOT_SUPPORTED_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The <P::version> is not supported. 
+      @@@PerlDef:
+        if (defined $version and $version ne '2.1') {
+          __EXCEPTION{SWCFG_VERSION_NOT_SUPPORTED_ERR::
+            swcfg21:version => {$version},
+          }__;
+        }
+        $r = <ClassM::ManakaiSWCFGDocument.newObject>;
+        $r->{<Q::DOMCore:implementation>} = $self;
+        $r->{<Q::version>} = $version || '2.1';
+        $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($r);
+    
+  @Method:
+    @@Name: createSWCFGParser
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates a new <IF::SWCFGParser>. 
+    @@NewIn21:
+    @@Param:
+      @@@Name:versions
+      @@@Type:any
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Future version of this implementation will allow 
+          a list containing the versions of SuikaWikiConfig documents 
+          that can be loaded by the <IF::SWCFGParser> created. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Type:SWCFGString
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Permits SuikaWikiConfig documents of any recognized 
+            version to be loaded by the <IF::SWCFGParser>. 
+    @@Return:
+      @@@Type: SWCFGParser
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The newly created <IF::SWCFGParser>. 
+      @@@RaiseException:
+        @@@@@: SWCFG_VERSION_NOT_SUPPORTED_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The implementation does not support one of the specified 
+            version. 
+      @@@PerlDef:
+        ## TODO: Support $versions
+        if (defined $versions) {
+          __EXCEPTION{SWCFG_VERSION_NOT_SUPPORTED_ERR}__;
+        }
+        $r = bless {<Q::DOMCore:implementation> => $self},
+                   <ClassName::SWCFGParser>;
+
+## -- lang:dis vocabulary
+
+TreeElementType:
+  @QName: GetPropNode
+  @dataType:
+    dis:TypeQName
+  @rdfs:range:
+    rdf:Property
+  @Description:
+    @@lang:en
+    @@@:
+      Gets the nodal value of a <Class::ManakaiDOM:ManakaiDOMNodeReference> 
+      property (actually <Class::ManakaiDOM:ManakaiDOMNodeObject> property). 
+
+## -- Syntax sugar
+
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdf:Property
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: IFClassDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@:
+        dis:MultipleResource
+      @@@ForCheck: !ForClass !ForIF
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:IF
+      @@@ForCheck: ForIF
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:Class
+      @@@ForCheck: ForClass
+    @@resourceFor: ForIF
+    @@resourceFor:
+      @@@@: ForClass
+      @@@ForCheck: ForLatest
+
+ElementTypeBinding:
+  @Name: IFQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ForIF
+
+ElementTypeBinding:
+  @Name: ClassQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ForClass
+
+ElementTypeBinding:
+  @Name: IFISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ForIF
+
+ElementTypeBinding:
+  @Name: ClassISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ForClass
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Method
+
+ElementTypeBinding:
+  @Name: IntMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Method
+    @@ManakaiDOM:isForInternal:1
+
+ElementTypeBinding:
+  @Name: RedefMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Method
+    @@ManakaiDOM:isRedefining:1
+
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodReturn
+
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+
+ElementTypeBinding:
+  @Name: NamedParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1
+
+ElementTypeBinding:
+  @Name: MakeNewNodeParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1
+    @@Name:makeNewNode
+    @@Type:
+      DOMMain:boolean
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Whether a new node should be made when one is not found. 
+    @@ResourceDef:
+      @@@rdf:type:
+        ManakaiDOM:InCase
+      @@@Value:true
+      @@@Type:
+        DOMMain:boolean
+      @@@Description:
+        @@@@lang:en
+        @@@@@: A new node is created when no such node found. 
+    @@ResourceDef:
+      @@@rdf:type:
+        ManakaiDOM:InCase
+      @@@Value:false
+      @@@Type:
+        DOMMain:boolean
+      @@@Description:
+        @@@@lang:en
+        @@@@@: A new node is not created even when no such node found. 
+
+ElementTypeBinding:
+  @Name: DefaultParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1
+    @@Name:default
+    @@Type:
+      DOMMain:any
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Default value that is returned when no explicit value specification 
+        found. 
+    @@ResourceDef:
+      @@@rdf:type:
+        ManakaiDOM:InCase
+      @@@Type:
+        DOMMain:any
+      @@@Value:
+        @@@@is-null:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@: No default value. 
+
+ElementTypeBinding:
+  @Name: DefaultListParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1
+    @@Name:defaultList
+    @@Type:
+      DOMMain:any
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Default list value that is returned when the value is of list 
+        but there is <EM::zero> item found.  The <P::defaultList> value 
+        should be an array reference for consistency. 
+    @@ResourceDef:
+      @@@rdf:type:
+        ManakaiDOM:InCase
+      @@@Value:
+        @@@@is-null:1
+      @@@Type:
+        DOMMain:any
+      @@@Description:
+        @@@@lang:en
+        @@@@@: No default list value. 
+
+ElementTypeBinding:
+  @Name: TypeParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1
+    @@Name:type
+    @@Type:SWCFGString
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Type of the node to create.  This parameter is <EM::required>. 
+    @@ResourceDef:
+      @@@rdf:type:
+        ManakaiDOM:InCase
+      @@@Value:\#comment
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:Comment node.
+    @@ResourceDef:
+      @@@rdf:type:
+        ManakaiDOM:InCase
+      @@@Value:\#document
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:Document node.
+    @@ResourceDef:
+      @@@rdf:type:
+        ManakaiDOM:InCase
+      @@@Value:\#element
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:Element node.
+    @@ResourceDef:
+      @@@rdf:type:
+        ManakaiDOM:InCase
+      @@@Value:\#fragment
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:Document fragment node.
+
+ElementTypeBinding:
+  @Name: LocalNameParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1
+    @@Name:localName
+    @@Type:SWCFGString
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The local name of the node to create.  This parameter is 
+        <EM::required> when the node <P::type> is set to <CODE::#element>. 
+
+ElementTypeBinding:
+  @Name: NSURIParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1
+    @@Name:namespaceURI
+    @@Type:SWCFGString
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The namespace URI of the node to create.  This parameter should 
+        be specified if and only if the node <P::type> is <CODE::#element>. 
+
+ElementTypeBinding:
+  @Name: ValueParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1
+    @@Name:value
+    @@Type:SWCFGString
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The value of the node to create.  This parameter should 
+        only be specified for the node of <P::type> <CODE::#element> 
+        or <CODE::#comment>. 
+    @@ResourceDef:
+      @@@rdf:type:
+        ManakaiDOM:InCase
+      @@@Value:
+        @@@@is-null:1
+      @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          If the <P::type> is set to <CODE::#comment>, a <DOM::null> 
+          value is equivalent to an empty string.  Otherwise, 
+          the node created has no value. 
+
+ElementTypeBinding:
+  @Name: actualType
+  @ElementType:
+    dis:actualType
+  @ShadowContent:
+    @@ForCheck: ForClass
+
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Attribute
+
+ElementTypeBinding:
+  @Name: RedefAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Attribute
+    @@ManakaiDOM:isRedefining:1
+
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:AttributeGet
+
+ElementTypeBinding:
+  @Name: Set
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:AttributeSet
+
+ElementTypeBinding:
+  @Name: InCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+
+ElementTypeBinding:
+  @Name: disDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:dis
+
+ElementTypeBinding:
+  @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
+
+ElementTypeBinding:
+  @Name: TreeElementType
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:TreeElementType
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: NSVariant
+  @ElementType:
+    swcfg21:namespaceAwareVariant
+  @ShadowSibling:
+    @@DISCore:isDeprecated:1
+
+ElementTypeBinding:
+  @Name: NonNSVariant
+  @ElementType:
+    swcfg21:namespaceUnawareVariant
+
+ElementTypeBinding:
+  @Name: NewIn21
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+    @@@:
+        {NOTE:: Introduced in SuikaWikiConfig/2.1 object model. 
+        \
+        }
+
+ElementTypeBinding:
+  @Name: ExceptionDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@:
+        dis:MultipleResource
+      @@@ForCheck: !ForClass !ForIF
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:ExceptionIF
+      @@@ForCheck: ForIF
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:ExceptionClass
+      @@@ForCheck: ForClass
+    @@resourceFor: ForIF
+    @@resourceFor:
+      @@@@: ForClass
+      @@@ForCheck: ForLatest
+    @@ISA:
+      @@@@:
+        DOMMain:ManakaiDOMExceptionIF::ManakaiDOM:all
+      @@@ForCheck: ForIF
+    @@ISA:
+      @@@@:
+        ManakaiDOM:ManakaiDOMException::ManakaiDOM:all
+      @@@ForCheck: ForClass
+
+ElementTypeBinding:
+  @Name: RaiseException
+  @ElementType:
+    ManakaiDOM:raises
+
+ElementTypeBinding:
+  @Name: XConstGroupDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:ConstGroup
+
+ElementTypeBinding:
+  @Name: XConst
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:Const
+
+ElementTypeBinding:
+  @Name: XSubTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:ExceptionOrWarningSubType
+    @@ForCheck: ForClass
+
+ElementTypeBinding:
+  @Name: XParam
+  @ElementType:
+    ManakaiDOM:exceptionOrWarningParameter
+
+ElementTypeBinding:
+  @Name: XPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: 
+      DOMMain:XWParameter
+    @@AliasFor:
+      @@@For:
+        !=ManakaiDOM:all
+      @@@@:
+        ::ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: TypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DataType
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For: 
+        ManakaiDOM:all !=ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: ConstValue
+  @ElementType:
+    DISLang:value
+  @ShadowContent:
+    @@ContentType:
+      DISCore:String
+
+## SuikaWikiConfig21.dis ends here

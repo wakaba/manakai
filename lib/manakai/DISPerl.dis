@@ -15,7 +15,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/01/05 12:19:39 $
+      $Date: 2005/02/18 06:13:52 $
     @@ContentType:
       dis:Date.RCS
   
@@ -33,6 +33,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @dis2pm:
+    http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
   @disPerl:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl--
   @lang:
@@ -91,6 +93,15 @@ ElementTypeBinding:
       @@@For:
         !=ManakaiDOM:all
 
+## -- For Perl
+
+ForDef:
+  @QName:
+    ManakaiDOM:Perl
+  @FullName:
+    @@lang:en
+    @@@: For Perl 5 binding
+
 ## -- Perl datatypes
 
 FormatDef:
@@ -100,20 +111,24 @@ FormatDef:
     @@lang:en
     @@@: Perl 5 code
 
-FormatDef:
-  @QName:
-    Perl:package-name
-  @Description:
-    @@lang:en
-    @@@:
-      A fully qualified Perl package name. 
-
 DataTypeDef:
   @QName:
     Perl:Scalar
   @FullName:
     @@lang:en
     @@@: Perl Scalar Value
+
+DataTypeDef:
+  @QName: String
+  @FullName:
+    @@lang:en
+    @@@: Perl String Value
+
+DataTypeDef:
+  @QName: Boolean
+  @FullName:
+    @@lang:en
+    @@@: Perl Boolean Value
 
 DataTypeDef:
   @QName: Reference
@@ -187,6 +202,47 @@ ResourceDef:
     @@For:
       !=ManakaiDOM:all
 
+ResourceDef:
+  @QName: AsStringMethod
+  @rdf:type:
+    rdfs:Class
+  @FullName:
+    @@lang:en
+    @@@:
+      Methods to searialize an object as a string. 
+  @AliasFor:
+    @@@:
+      ::ManakaiDOM:all
+    @@For:
+      !=ManakaiDOM:all
+
+ResourceDef:
+  @QName: NewMethod
+  @rdf:type:
+    rdfs:Class
+  @FullName:
+    @@lang:en
+    @@@:
+      Methods to construct an instance of a class. 
+  @AliasFor:
+    @@@:
+      ::ManakaiDOM:all
+    @@For:
+      !=ManakaiDOM:all
+
+ResourceDef:
+  @QName:CloneMethod
+  @rdf:type:
+    rdfs:Class
+  @FullName:
+    @@lang:en
+    @@@:Methods to make a clone of an object. 
+  @AliasFor:
+    @@@:
+      ::ManakaiDOM:all
+    @@For:
+      !=ManakaiDOM:all
+
 ## -- Perl construct properties
 
 PropDef:
@@ -198,6 +254,39 @@ PropDef:
       or not.
   @dataType:
     dis:Boolean
+
+PropDef:
+  @QName: isNamedParameter
+  @Description:
+    @@lang:en
+    @@@:
+      Whether the method parameter should be passed by named parameter 
+      (hash) style or not. 
+  @dataType:
+    dis:Boolean
+  @rdfs:domain:
+    DISLang:MethodParameter
+
+## -- Perl names
+
+FormatDef:
+  @QName:
+    Perl:package-name
+  @Description:
+    @@lang:en
+    @@@:
+      A fully qualified Perl package name. 
+
+FormatDef:
+  @QName: MethodName
+  @FullName:
+    @@lang:en
+    @@@:
+      Perl method name
+  @Description:
+    @@lang:en
+    @@@:
+      Perl (unqualified) method names. 
 
 ## -- Perl binding specific properties and datatypes
 
@@ -517,6 +606,33 @@ InlineElementType:
     @@@:
       An inline code fragment (<Q::dis2pm:InlineCode>).
 
+## -- Predefined code templates
+
+ResourceTypeDef:
+  @QName:
+    dis2pm:InlineCode
+  @Description:
+    @@lang:en
+    @@@:
+      An inline code fragment referred by <CODE::<lt>CODE::<VAR::qname><gt>> 
+      preprocessed token.
+      \
+      {NOTE:: If a code fragment is written in Perl (i.e. typed as 
+              <Q::dis:Perl> or its subtypes), line breaks are 
+              replaced by a <CHAR::SPACE>.  Use escape (<Perl::\n>) if 
+              it is significant.
+      \
+      }
+
+ResourceTypeDef:
+  @QName:
+    dis2pm:BlockCode
+  @Description:
+    @@lang:en
+    @@@:
+      A block code fragment referred by <CODE::__CODE{<VAR::qname>}__> 
+      preprocessed block.
+
 ## -- Assertion types for disPerl:ASSERT
 
 ResourceDef:
@@ -575,5 +691,17 @@ AType:
           msg => {qq{Mode "$mode" should be a true value}},
         }__;
       } 
+
+ElementTypeBinding:
+  @Name: ResourceTypeDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdfs:Class
+    @@rdfs:subClassOf:
+      rdfs:Class
+    @@subsetOf:
+      rdfs:Class
 
 ## DISPerl.dis ends here

@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/16 04:24:59 $
+      $Date: 2005/02/18 06:13:52 $
     @@ContentType:
       dis:Date.RCS
 
@@ -170,14 +170,19 @@ ElementTypeBinding:
       ManakaiDOM:DOM
     @@ISA:
       @@@@:
-        DOMMain:ManakaiDOMExceptionIF::ManakaiDOM:ManakaiDOMCommon
+        DOMMain:ManakaiDOMExceptionIF::ManakaiDOM:all
       @@@ForCheck:
         ManakaiDOM:ManakaiDOM ManakaiDOM:ForIF
     @@ISA:
       @@@@:
-        ManakaiDOM:ManakaiDOMException
+        ManakaiDOM:ManakaiDOMException::ManakaiDOM:all
       @@@ForCheck:
         ManakaiDOM:ManakaiDOM
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@ISA:
+      @@@@:
+        ManakaiDOM:ManakaiDOMObject
       @@@ForCheck:
         ManakaiDOM:ForClass
     @@ISA:
@@ -1332,79 +1337,6 @@ ExceptionDef:
           @@@@enMufDef:
             The document is not a namespaced XML document while the 
             operation is for XML Namespace documents 
-        @@@SubTypeDef:
-          @@@@QName:
-            MDOMX:MDOM_IMPL_ATTR_NOT_IMPLEMENTED
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The DOM implementation does not support this attribute.
-          @@@@XParam:
-            @@@@@QName:
-              MDOMX:class
-            @@@@@Type:
-              DOMMain:DOMString
-            @@@@@Description:
-              @@@@@@lang:en
-              @@@@@@@:
-                The name of class to which the attribute not implemented belongs.
-          @@@@XParam:
-            @@@@@QName:
-              MDOMX:attr
-            @@@@@Type:
-              DOMMain:DOMString
-            @@@@@Description:
-              @@@@@@lang:en
-              @@@@@@@:
-                The name of attribute that is not implemented.
-          @@@@XParam:
-            @@@@@QName:
-              MDOMX:on
-            @@@@@Type:
-              DOMMain:DOMString
-            @@@@@InCase:
-              @@@@@@Value:get
-              @@@@@@Description:
-                @@@@@@@lang:en
-                @@@@@@@@: Getting this attribute is not implemented.
-            @@@@@InCase:
-              @@@@@@Value:set
-              @@@@@@Description:
-                @@@@@@@lang:en
-                @@@@@@@@: Setting this attribute is not implemented.
-          @@@@enMufDef:
-              The attribute "%p (name => {<Q::MDOMX:class>}, suffix => {.}
-              );%p (name => {<Q::MDOMX:attr>});"
-              %p (name => {<Q::MDOMX:on>},
-                  prefix => {(}, suffix => {)}); has not been implemented yet 
-        @@@SubTypeDef:
-          @@@@QName:
-            MDOMX:MDOM_IMPL_METHOD_NOT_IMPLEMENTED
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The DOM implementation does not support this method.
-          @@@@XParam:
-            @@@@@QName:
-              MDOMX:class
-            @@@@@Type:
-              DOMMain:DOMString
-            @@@@@Description:
-              @@@@@@lang:en
-              @@@@@@@:
-                The name of class to which the method not implemented belongs.
-          @@@@XParam:
-            @@@@@QName:
-              MDOMX:method
-            @@@@@Type:
-              DOMMain:DOMString
-            @@@@@Description:
-              @@@@@@lang:en
-              @@@@@@@:
-                The name of method that is not implemented.
-          @@@@enMufDef:
-              The method "%p (name => {<Q::MDOMX:class>}, suffix => {.}
-              );%p (name => {<Q::MDOMX:method>});" has not been implemented yet
         @@@SubTypeDef:
           @@@@QName:
             ManakaiDOMEvents:MDOM_IMPL_NOSUPPORT_EVENT
@@ -2670,6 +2602,11 @@ IF:
       ManakaiDOM:ManakaiDOM
     @@ForCheck:
       ManakaiDOM:ForClass
+  @ISA:
+    @@@:
+      ManakaiDOM:ManakaiDOMObject
+    @@ForCheck:
+      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
 
   @Role:
     @@@:
@@ -3476,6 +3413,11 @@ IF:
       ManakaiDOM:ForClass
     @@For:
       ManakaiDOM:ManakaiDOM
+  @ISA:
+    @@@:
+      ManakaiDOM:ManakaiDOMObject
+    @@ForCheck:
+      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
 
   @ConstGroup:
      @@QName:
@@ -7296,6 +7238,11 @@ ResourceDef:
       ManakaiDOM:ManakaiDOMNodeReference
     @@ForCheck:
       DOMCore:ForChildNodeList
+  @ISA:
+    @@@:
+      ManakaiDOM:ManakaiDOMObject
+    @@ForCheck:
+      DOMCore:ForChildNodeList
   @Implement:
     @@@:
       DOMCore:NodeList
@@ -7338,6 +7285,10 @@ ResourceDef:
       ManakaiDOM:ManakaiDOMNodeReference
     @@ForCheck:
       DOMCore:ForGetNodeList
+  @ISA:
+    @@@:
+      ManakaiDOM:ManakaiDOMObject
+    @@ForCheck: ForGetNodeList
   @Implement:
     @@@:
       DOMCore:NodeList
@@ -8138,6 +8089,10 @@ ResourceDef:
       ManakaiDOM:ManakaiDOMNodeReference
     @@ForCheck:
       DOMCore:ForAttrMap
+  @ISA:
+    @@@:
+      ManakaiDOM:ManakaiDOMObject
+    @@ForCheck: ForAttrMap
   @Implement:
     @@@:
       DOMCore:NamedNodeMap
@@ -8185,6 +8140,10 @@ ResourceDef:
       ManakaiDOM:ManakaiDOMNodeReference
     @@ForCheck:
       DOMCore:ForEntityMap
+  @ISA:
+    @@@:
+      ManakaiDOM:ManakaiDOMObject
+    @@ForCheck: ForEntityMap
   @Implement:
     @@@:
       DOMCore:NamedNodeMap
@@ -8238,6 +8197,10 @@ ResourceDef:
       ManakaiDOM:ManakaiDOMNodeReference
     @@ForCheck:
       DOMCore:ForNotationMap
+  @ISA:
+    @@@:
+      ManakaiDOM:ManakaiDOMObject
+    @@ForCheck: ForNotationMap
   @Implement:
     @@@:
       DOMCore:NamedNodeMap

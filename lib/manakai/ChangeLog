@@ -1,4 +1,31 @@
+2005-02-18  Wakaba  <wakaba@suika.fam.cx>
+
+	* DISPerl.dis (FormatDef[MethodName]): New resource.
+
+	* DISLang.dis (ResourceTypeDef[ManakaiDOM:Const,
+	ManakaiDOM:ConstGroup]): Moved from "lib/Message/DOM/DOMMain.dis".
+	(ForDef[ManakaiDOM:ForIF, ManakaiDOM:ForClass]) Moved from DOMMain.
+
+2005-02-17  Wakaba  <wakaba@suika.fam.cx>
+
+	* DISPerl.dis (PropDef[isNamedParameter]): New.
+
+	* DISLang.dis (ResourceTypeDef[ManakaiDOM:IF, ManakaiDOM:Class,
+	ManakaiDOM:PrimitiveTypeClass]):
+	Moved from "lib/Message/DOM/DOMMain.dis".
+
+	* DISIDL.dis: New module (separeted from "lib/Message/DOM/DOMMain.dis"). 
+
+	* DISCore.dis (ResourceDef[ManakaiDOM:DataType]): Moved from
+	"lib/Message/DOM/DOMMain.dis".
+
+	* DISPerl.dis (ResourceDef[CloneMethod]): New resource.
+	(DataTypeDef[String, Boolean]): New type.
+
 2005-02-16  Wakaba  <wakaba@suika.fam.cx>
+
+	* DISPerl.dis (ResourceDef[NewMethod, AsStringMethod]): New resources.
+	(ForDef[ManakaiDOM:Perl]): Moved from DOMMain.dis.
 
 	* dis.pl (dis_perl_init_classdef): Use underscore_style_name
 	for methods and attributes.
