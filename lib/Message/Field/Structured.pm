@@ -1,20 +1,20 @@
 
 =head1 NAME
 
-Message::Field::Structured -- Perl module for
-structured header field bodies of the Internet message
+Message::Field::Structured --- A Perl Module for Internet
+Message Structured Header Field Bodies
 
 =cut
 
 package Message::Field::Structured;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 use overload '""' => sub { $_[0]->stringify },
              '.=' => sub { $_[0]->value_append ($_[1]) },
-             'eq' => sub { $_[0]->{field_body} eq $_[1] },
-             'ne' => sub { $_[0]->{field_body} ne $_[1] },
+             #'eq' => sub { $_[0]->{field_body} eq $_[1] },
+             #'ne' => sub { $_[0]->{field_body} ne $_[1] },
              fallback => 1;
 
 =head1 CONSTRUCTORS
@@ -30,14 +30,16 @@ The following methods construct new C<Message::Field::Structured> objects:
     _ARRAY_NAME	=> '',
     _ARRAY_VALTYPE	=> '*default',
     _HASH_NAME	=> '',
-    _MATHODS	=> [qw|as_plain_string value_append|],
+    _METHODS	=> [qw|as_plain_string value_append|],
     _MEMBERS	=> [qw|field_body|],
+    _VALTYPE_DEFAULT	=> '*default',
     by	=> 'index',	## (Reserved for method level option)
     dont_croak	=> 0,	## Don't die unless very very fatal error
     encoding_after_encode	=> '*default',
     encoding_before_decode	=> '*default',
     field_param_name	=> '',
     field_name	=> 'x-structured',
+    #field_ns	=> '',
     format	=> 'mail-rfc2822',
     hook_encode_string	=> #sub {shift; (value => shift, @_)},
     	\&Message::Util::encode_header_string,
@@ -124,7 +126,8 @@ sub add ($$$%) {
     my $avalue;
     for (@_) {
       local $option{parse} = $option{parse};
-      my ($ok, undef, $avalue) = $self->_add_array_check ($_, \%option);
+      my $ok;
+      ($ok, undef, $avalue) = $self->_add_array_check ($_, \%option);
       if ($ok) {
         $avalue = $self->_parse_value
           ($option{_ARRAY_VALTYPE} => $avalue) if $option{parse};
@@ -135,7 +138,8 @@ sub add ($$$%) {
         }
       }
     }
-    $avalue;	## Return last added value if necessary.
+    $self->_add_return_value (\$avalue, \%option);
+    	## Return last added value if necessary.
     
   } else {
     $array = $self->{option}->{_HASH_NAME};
@@ -160,6 +164,7 @@ sub add ($$$%) {
     my $avalue;
     while (my ($name => $value) = splice (@_, 0, 2)) {
       next if $name =~ /^-/; $name =~ s/^\\//;
+      $name =~ tr/_/-/ if $option{translate_underscore};
       
       my $ok;
       local $option{parse} = $option{parse};
@@ -173,7 +178,8 @@ sub add ($$$%) {
         }
       }
     }
-    $avalue;	## Return last added value if necessary.
+    $self->_add_return_value (\$avalue, \%option);
+    	## Return last added value if necessary.
   }
 }
 
@@ -182,6 +188,10 @@ sub _add_array_check ($$\%) {
 }
 sub _add_hash_check ($$$\%) {
   shift; 1, $_[0] => [@_[0,1]];
+}
+## Returns returned item value    \$item-value, \%option
+sub _add_return_value ($\$\%) {
+  $_[1];
 }
 
 sub replace ($$$%) {
@@ -228,7 +238,8 @@ sub replace ($$$%) {
         push @{$self->{$array}}, $replace{$_};
       }
     }
-    $avalue;	## Return last added value if necessary.
+    $self->_replace_return_value (\$avalue, \%option);
+    	## Return last added value if necessary.
     
   } else {
     $array = $self->{option}->{_HASH_NAME};
@@ -253,6 +264,7 @@ sub replace ($$$%) {
     my ($avalue, %replace);
     while (my ($name => $value) = splice (@_, 0, 2)) {
       next if $name =~ /^-/; $name =~ s/^\\//;
+      $name =~ tr/_/-/ if $option{translate_underscore};
       
       my ($ok, $aname);
       local $option{parse} = $option{parse};
@@ -264,6 +276,7 @@ sub replace ($$$%) {
       }
     }
     for (@{$self->{$array}}) {
+      last unless keys %replace;
       my ($v) = $self->_replace_hash_shift (\%replace => $_, \%option);
       if (defined $v) {
         $_ = $v;
@@ -276,7 +289,8 @@ sub replace ($$$%) {
         push @{$self->{$array}}, $replace{$_};
       }
     }
-    $avalue;	## Return last added value if necessary.
+    $self->_replace_return_value (\$avalue, \%option);
+    	## Return last added value if necessary.
   }
 }
 
@@ -306,6 +320,10 @@ sub _replace_hash_shift ($\%$\%) {
     return $d;
   }
   undef;
+}
+## Returns returned item value    \$item-value, \%option
+sub _replace_return_value ($\$\%) {
+  $_[1];
 }
 
 sub count ($;%) {
@@ -415,6 +433,29 @@ sub item ($$;%) {
   @r;
 }
 
+sub item_exist ($$;%) {
+  my $self = shift;
+  my ($name, %p) = (shift, @_);
+  my %option = %{$self->{option}};
+  for (grep {/^-/} keys %p) {$option{substr ($_, 1)} = $p{$_}}
+  my $array = $option{_ARRAY_NAME} || $option{_HASH_NAME};
+  unless ($array) {
+    return if $option{dont_croak};
+    Carp::croak q{item-exist: Method not available for this module};
+  }
+  my @r;
+  if ($option{by} eq 'index') {
+    return 1 if ref $self->{$array}->[$name];
+  } else {
+    for (@{$self->{$array}}) {
+      if ($self->_item_match ($option{by}, \$_, {$name => 1}, \%option)) {
+        return 1;
+      }
+    }
+  }
+  0;
+}
+
 ## item-by?, \$checked-item, {item-key => 1}, \%option
 sub _item_match ($$\$\%\%) {
   0 #return 1 / 0
@@ -433,31 +474,43 @@ sub _item_new_value ($$\%) {
 ## $self->_parse_value ($type, $value);
 sub _parse_value ($$$) {
   my $self = shift;
-  my $name = shift || '*default';
+  my $name = shift;
   my $value = shift;
   return $value if ref $value;
-  my $vtype = $self->{option}->{value_type}->{$name}->[0]
-      || $self->{option}->{value_type}->{'*default'}->[0];
-  my %vopt; %vopt = %{$self->{option}->{value_type}->{$name}->[1]} 
-    if ref $self->{option}->{value_type}->{$name}->[1];
+  my $handler = $self->{option}->{value_type}->{$name}
+    || $self->{option}->{value_type}->{$self->{option}->{_VALTYPE_DEFAULT}};
+  if (ref $handler eq 'CODE') {
+    $handler = &$handler ($self);
+  }
+  my $vtype = $handler->[0];
+  my %vopt = (
+    -format	=> $self->{option}->{format},
+    -field_ns	=> $self->{option}->{field_ns},
+    -field_name	=> $self->{option}->{field_name},
+    -field_param_name	=> $name,
+    -parse_all	=> $self->{option}->{parse_all},
+  );
+  ## Media type specified option/parameters
+  if (ref $handler->[1] eq 'HASH') {
+    for (keys %{$handler->[1]}) {
+      $vopt{$_} = ${$handler->[1]}{$_};
+    }
+  }
+  ## Inherited options
+  if (ref $handler->[2] eq 'ARRAY') {
+    for (@{$handler->[2]}) {
+      $vopt{'-'.$_} = $self->{option}->{$_};
+    }
+  }
+  
   if ($vtype eq ':none:') {
     return $value;
   } elsif (defined $value) {
     eval "require $vtype" or Carp::croak qq{<parse>: $vtype: Can't load package: $@};
-    return $vtype->parse ($value,
-      -format	=> $self->{option}->{format},
-      -field_name	=> $self->{option}->{field_name},
-      -field_param_name	=> $name,
-      -parse_all	=> $self->{option}->{parse_all},
-    %vopt);
+    return $vtype->parse ($value, %vopt);
   } else {
     eval "require $vtype" or Carp::croak qq{<parse>: $vtype: Can't load package: $@};
-    return $vtype->new (
-      -format	=> $self->{option}->{format},
-      -field_name	=> $self->{option}->{field_name},
-      -field_param_name	=> $name,
-      -parse_all	=> $self->{option}->{parse_all},
-    %vopt);
+    return $vtype->new (%vopt);
   }
 }
 
@@ -518,18 +571,24 @@ sub _comment_stringify ($\%) {
   join ' ', @v;
 }
 
-sub scan ($&) {
-  my ($self, $sub) = @_;
+sub scan ($&;%) {
+  my $self = shift;
+  my $sub = shift;
   my %p = @_; my %option = %{$self->{option}};
   for (grep {/^-/} keys %p) {$option{substr ($_, 1)} = $p{$_}}
   my $array = $self->{option}->{_ARRAY_NAME}
            || $self->{option}->{_HASH_NAME};
-  my @param = @{$self->{$array}};
-  my $sort = $option{sort};
-  @param = sort $sort @param if ref $sort;
+  my @param = $self->_scan_sort (\@{$self->{$array}});
+  #my $sort = $option{sort};
+  #@param = sort $sort @param if ref $sort;
   for my $param (@param) {
     &$sub($self, $param);
   }
+}
+
+sub _scan_sort ($\@) {
+  #my $self = shift;
+  @{$_[1]};
 }
 
 =head1 METHODS
@@ -572,13 +631,6 @@ If @_ == 1, returns option value.  Else...
 Set option value.  You can pass multiple option name-value pair
 as parameter.  Example:
 
-  $msg->option (-format => 'mail-rfc822',
-                -capitalize => 0);
-  print $msg->option ('-format');	## mail-rfc822
-
-Note that introduction character, i.e. C<-> (HYPHEN-MINUS)
-is optional.  You can also write as this:
-
   $msg->option (format => 'mail-rfc822',
                 capitalize => 0);
   print $msg->option ('format');	## mail-rfc822
@@ -590,16 +642,23 @@ sub option ($@) {
   if (@_ == 1) {
     return $self->{option}->{ $_[0] };
   }
+  my %option = @_;
   while (my ($name, $value) = splice (@_, 0, 2)) {
-    $self->{option}->{substr ($name, 1)} = $value;
+    $self->{option}->{$name} = $value;
+  }
+  if ($option{-recursive}) {
+    $self->_option_recursive (\%option);
   }
   $self;
 }
 
+## $self->_option_recursive (\%argv)
+sub _option_recursive ($\%) {}
+
 ## TODO: multiple value-type support
 sub value_type ($;$$%) {
   my $self = shift;
-  my $name = shift || '*default';
+  my $name = shift || $self->{option}->{_VALTYPE_DEFAULT};
   my $new_value_type = shift;
   if ($new_value_type) {
     $self->{option}->{value_type}->{$name} = []
@@ -608,9 +667,9 @@ sub value_type ($;$$%) {
   }
   if (ref $self->{option}->{value_type}->{$name}) {
     $self->{option}->{value_type}->{$name}->[0]
-      || $self->{option}->{value_type}->{'*default'}->[0];
+      || $self->{option}->{value_type}->{$self->{option}->{_VALTYPE_DEFAULT}}->[0];
   } else {
-    $self->{option}->{value_type}->{'*default'}->[0];
+    $self->{option}->{value_type}->{$self->{option}->{_VALTYPE_DEFAULT}}->[0];
   }
 }
 
@@ -635,12 +694,6 @@ sub clone ($) {
   $clone;
 }
 
-sub _n11n_field_name ($$) {
-  my $self = shift;
-  my $s = shift;
-  $s = lc $s ;#unless $self->{option}->{field_name_case_sensible};
-  $s;
-}
 
 my %_method_default_list = qw(new 1 parse 1 stringify 1 option 1 clone 1 method_available 1);
 sub method_available ($$) {
@@ -697,7 +750,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/16 11:43:40 $
+$Date: 2002/06/09 11:08:28 $
 
 =cut
 

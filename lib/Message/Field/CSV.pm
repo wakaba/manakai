@@ -11,7 +11,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -60,6 +60,7 @@ sub _init ($;%) {
     -remove_comment	=> 1,
     -separator	=> ', ',
     -separator_long	=> ', ',
+    -use_comment	=> 1,
     -max	=> 0,
     #value_type
     -value_unsafe_rule	=> 'NON_http_token_wsp',
@@ -72,19 +73,13 @@ sub _init ($;%) {
 ## Accept: text/html; q=1.0, text/plain; q=0.03; *; q=0.01
 
   my %field_type = qw(accept-charset accept accept-encoding accept 
-     accept-language accept
-     content-language keywords
-     followup-to newsgroups
-     list-archive list- list-digest list- list-help list- 
-     list-owner list- list-post list- list-subscribe list- 
-     list-unsubscribe list- list-url list- uri list-
+     accept-language accept followup-to newsgroups
      posted-to newsgroups
      x-brother x-moe x-boss x-moe x-classmate x-moe x-daughter x-moe 
-     x-dearfriend x-moe
-     x-favoritesong x-moe 
+     x-dearfriend x-moe x-favoritesong x-moe 
      x-friend x-moe x-me x-moe
      x-respect x-moe x-sister x-moe x-son x-moe x-sublimate x-moe x-wife x-moe);
-  my $field_name = lc $self->{option}->{field_name};
+  my $field_name = $self->{option}->{field_name};
   $field_name = $field_type{$field_name} || $field_name;
   if ($field_name eq 'newsgroups') {
     $self->{option}->{separator} = ',';
@@ -103,7 +98,11 @@ sub _init ($;%) {
   } elsif ($field_name eq 'accept') {
     $self->{option}->{is_quoted_string} = 0;
     $self->{option}->{value_type}->{'*default'} = ['Message::Field::ValueParams'];
-  } elsif ($field_name eq 'list-') {
+  } elsif ($self->{option}->{field_ns} eq $Message::Header::NS_phname2uri{list}) {
+    $self->{option}->{is_quoted_string} = 0;
+    $self->{option}->{remove_comment} = 0;
+    $self->{option}->{value_type}->{'*default'} = ['Message::Field::URI'];
+  } elsif ($field_name eq 'uri') {
     $self->{option}->{is_quoted_string} = 0;
     $self->{option}->{remove_comment} = 0;
     $self->{option}->{value_type}->{'*default'} = ['Message::Field::URI'];
@@ -144,7 +143,7 @@ sub parse ($$;%) {
   my $field_body = shift;
   $self->_init (@_);
   $field_body = Message::Util::delete_comment ($field_body)
-    if $self->{option}->{remove_comment};
+    if $self->{option}->{use_comment} && $self->{option}->{remove_comment};
   push @{$self->{value}}, $self->_parse_list ($field_body);
   $self;
 }
@@ -233,7 +232,7 @@ sub stringify ($;%) {
   for (grep {/^-/} keys %o) {$option{substr ($_, 1)} = $o{$_}}
   $self->_delete_empty;
   $option{max}--;
-  $option{max} = $#{$self->{value}} if $option{max} <= 0;
+  $option{max} = $#{$self->{value}} if $option{max} < 0;
   $option{max} = $#{$self->{value}} if $#{$self->{value}} < $option{max};
   $option{separator} = $option{separator_long}
     if $option{max} >= $option{long_count};
@@ -334,7 +333,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/16 11:43:40 $
+$Date: 2002/06/09 11:08:27 $
 
 =cut
 

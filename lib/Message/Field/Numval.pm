@@ -9,7 +9,7 @@ Internet message header field body that takes numeric values
 package Message::Field::Numval;
 use strict;
 use vars qw(@ISA $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -72,6 +72,7 @@ sub _init ($;%) {
     #hook_encode_string	## Inherited
     #hook_decode_string	## Inherited
     -output_comment	=> 0,
+    -use_comment	=> 0,
     -value_default	=> 0,
     -value_if_invalid	=> '',
     -value_max	=> 100,
@@ -87,10 +88,12 @@ sub _init ($;%) {
   my $pname = lc $self->{option}->{field_param_name};
   if ($fname eq 'mime-version') {
     $self->{option}->{output_comment} = 1;
+    $self->{option}->{use_comment} = 1;
     $self->{option}->{format_pattern} = '%1.1f';
     $self->{option}->{value_min} = 1;
   } elsif ($fname eq 'x-priority' || $fname eq 'x-jsmail-priority') {
     $self->{option}->{output_comment} = 1;
+    $self->{option}->{use_comment} = 1;
     $self->{option}->{check_max} = 1;
     $self->{option}->{check_min} = 1;
     $self->{option}->{value_min} = 1;	## Highest
@@ -129,7 +132,8 @@ sub parse ($$;%) {
   my $self = bless {}, $class;
   my $fb = shift;
   $self->_init (@_);
-  push @{$self->{comment}}, $self->Message::Util::comment_to_array ($fb);
+  push @{$self->{comment}}, $self->Message::Util::comment_to_array ($fb)
+    if $self->{option}->{use_comment};
   $fb =~ s/[^0-9.-]//g;
   $self->{value} = $& if $fb =~ /-?[0-9]+(\.[0-9]+)?/;
   $self;
@@ -215,18 +219,14 @@ Returns C<field-body> as a string.
 
 sub stringify ($;%) {
   my $self = shift;
-  my %option = @_;
-  for (qw(check_max check_min output_comment value_max value_min value_if_invalid)) {
-    $option{$_} ||= $self->{option}->{$_};
-  }
-  $option{format_pattern} = $self->{option}->{format_pattern}
-    unless defined $option{format_pattern};
+  my %o = @_;  my %option = %{$self->{option}};
+  for (grep {/^-/} keys %o) {$option{substr ($_, 1)} = $o{$_}}
   return $option{value_if_invalid}
     if $option{check_max} && $option{value_max} < $self->{value};
   return $option{value_if_invalid}
     if $option{check_min} && $option{value_min} > $self->{value};
   my $s = sprintf $option{format_pattern}, $self->{value};
-  if ($option{output_comment}) {
+  if ($option{use_comment} && $option{output_comment}) {
     for (@{$self->{comment}}) {
       my $t = $self->Message::Util::encode_ccontent ($_);
       $s .= ' ('.$t.')' if length $t;
@@ -281,7 +281,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/22 08:28:20 $
+$Date: 2002/06/09 11:08:28 $
 
 =cut
 

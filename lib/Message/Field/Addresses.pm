@@ -11,7 +11,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::CSV;
 push @ISA, qw(Message::Field::CSV);
 %REG = %Message::Field::CSV::REG;
@@ -213,6 +213,9 @@ sub _delete_match ($$$\%\%) {
   if ($by eq 'display-name') {
     $$i->{value} = $self->_parse_value ($$i->{type}, $$i->{value});
     return 1 if ref $$i->{value} && $$list{$$i->{value}->display_name};
+  } elsif ($by eq 'addr-spec') {
+    $$i->{value} = $self->_parse_value ($$i->{type}, $$i->{value});
+    return 1 if ref $$i->{value} && $$list{$$i->{value}->addr_spec};
   }
   0;
 }
@@ -220,13 +223,14 @@ sub _delete_match ($$$\%\%) {
 
 ## Returns returned item value    \$item-value, \%option
 sub _item_return_value ($\$\%) {
-  if (ref ${$_[1]}) {
+  if (ref ${$_[1]}->{value}) {
     ${$_[1]}->{value};
   } else {
     ${$_[1]}->{value} = $_[0]->_parse_value (${$_[1]}->{type}, ${$_[1]}->{value});
     ${$_[1]}->{value};
   }
 }
+*_add_return_value = \&_item_return_value;
 
 ## Returns returned (new created) item value    $name, \%option
 sub _item_new_value ($$\%) {
@@ -262,7 +266,8 @@ sub addr_spec ($;%) {
   my $self = shift;
   my @a;
   for (@{$self->{$self->{option}->{_ARRAY_NAME}}}) {
-    $_->{value} = $self->_parse_value ($_->{value}) unless ref $_->{value};
+    $_->{value} = $self->_parse_value
+      ($_->{type} => $_->{value}) unless ref $_->{value};
     if (ref $_->{value}) {
       push @a, $_->{value}->addr_spec (@_);
     } elsif (length $_->{value}) {
@@ -349,7 +354,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/15 07:29:09 $
+$Date: 2002/06/09 11:08:27 $
 
 =cut
 

@@ -9,10 +9,12 @@ date-time used in Internet messages and so on
 package Message::Field::Date;
 use strict;
 use vars qw(%DEFAULT @ISA %MONTH %REG $VERSION %ZONE);
-$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 use Time::Local 'timegm_nocheck';
+use overload '0+' => sub { $_[0]->{date_time} },
+             fallback => 1;
 
 %REG = %Message::Util::REG;
 	$REG{M_dt_rfc822} = qr!(?:[A-Za-z]+	## Day of week
@@ -489,6 +491,17 @@ sub parse ($$;%) {
   $self;
 }
 
+sub zone ($;$) {
+  my $self = shift;
+  my $newzone = shift;
+  unless (ref $newzone) {
+    $self->{option}->{zone} = [$self->_zone_string_to_array ($newzone)];
+  } elsif (defined $newzone) {
+    $self->{option}->{zone} = $newzone;
+  }
+  $self->{option}->{zone};
+}
+
 ## Find "obvious" year
 sub _obvious_year ($$) {
   my $self = shift;
@@ -529,6 +542,18 @@ sub unix_time ($;$) {
     $self->{date_time} = $new_time + 0;
   }
   $self->{date_time};
+}
+
+sub set_datetime ($@) {
+  my $self = shift;
+  my ($year,$month,$day,$hour,$minute,$second,%misc) = @_;
+  my ($zone_sign, $zone_hour, $zone_minute)
+    = $self->_zone_string_to_array ($misc{zone});
+  eval '$self->{date_time} = timegm_nocheck 
+    ($second, $minute-($zone_sign*$zone_minute), $hour-($zone_sign*$zone_hour), 
+     $day, $month-1, $year);';
+  $self->{secfrac} = $misc{secfrac};
+  $self->{option}->{zone} = [$zone_sign, $zone_hour, $zone_minute];
 }
 
 =head2 $self->second_fraction ([$new_fraction])
@@ -584,6 +609,10 @@ sub stringify ($;%) {
 }
 *as_string = \&stringify;
 *as_plain_string = \&stringify;
+## You should use stringify instead of as_rfc2822_time
+sub as_rfc2822_time ($@) {
+  shift->stringify (-format => 'mail-rfc2822', @_);
+}
 
 sub _date2str ($\%) {
   my $self = shift;
@@ -702,7 +731,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/16 11:43:40 $
+$Date: 2002/06/09 11:08:28 $
 
 =cut
 

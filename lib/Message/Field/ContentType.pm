@@ -9,11 +9,12 @@ Internet message C<Content-Type:> field body
 package Message::Field::ContentType;
 use strict;
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::ValueParams;
 push @ISA, qw(Message::Field::ValueParams);
+require Message::MIME::MediaType;
 
-*REG = \%Message::Field::Params::REG;
+%REG = %Message::Field::Params::REG;
 ## Inherited: comment, quoted_string, domain_literal, angle_quoted
 	## WSP, FWS, atext, atext_dot, token, attribute_char
 	## S_encoded_word
@@ -35,6 +36,7 @@ sub _init ($;%) {
   my $self = shift;
   my %options = @_;
   my %DEFAULT = (
+    -_MEMBERS	=> [qw/media_type media_subtype not_mime_text/],
     #delete_fws	## Inheritted
     #encoding_after_encode	## Inherited
     #encoding_before_decode	## Inherited
@@ -54,10 +56,14 @@ sub _init ($;%) {
     	dvi	=> 'application/x-dvi',
     	text	=> 'text/plain',
     },
+    -use_mime_text_alternate	=> 1,
     -use_parameter_extension	=> 1,
     #value_type	## Inherited
   );
   $self->SUPER::_init (%DEFAULT, %options);
+  
+  $self->{option}->{use_mime_text_alternate} = 0
+    if $self->{option}->{format} =~ /http/;
 }
 
 ## Initialization for new () method.
@@ -98,8 +104,8 @@ sub _save_param ($@) {
   if ($p[0]->[1]->{is_parameter} == 0) {
     $media_type = shift (@p)->[0];
     if ($media_type =~ m#^($REG{token})/($REG{token})$#) {
-      $self->{media_type} = $1;
-      $self->{media_subtype} = $2;
+      $self->{media_type} = lc $1;
+      $self->{media_subtype} = lc $2;
     } elsif ($self->{option}->{rfc1049_vs_mime}->{lc $media_type}) {
       ($self->{media_type},$self->{media_subtype}) = ($1,$2)
         if $self->{option}->{rfc1049_vs_mime}->{lc $media_type}
@@ -117,6 +123,20 @@ sub _save_param ($@) {
       $self->{media_subtype} = 'octet-stream';
     }
   }
+  if ($media_type =~ m#^application/x-(?:text|message)#) {
+    my $mt = $1;
+    for (@p) {
+      if ($_->[0] eq 'media-subtype') {
+        $self->{media_type} = $mt;
+        $self->{media_subtype} = $_->[1]->{value};
+        $self->{not_mime_text} = 1;
+        undef $_;
+        last;
+      }
+    }
+  }
+  $self->_delete_empty;
+  $self->_parse_param_value (\@p) if $self->{option}->{parse_all};
   $self->{param} = \@p;
   #$self->SUPER::_save_param (@p);
   $self;
@@ -172,7 +192,28 @@ Returns C<field-body> as a string.
 sub stringify ($;%) {
   my $self = shift;
   my $param = $self->SUPER::stringify_params (@_);
-  $self->media_type ().(length $param? '; '.$param: '');
+  $self->_mime_type ().(length $param? '; '.$param: '');
+}
+
+sub _mime_type ($) {
+  my $self = shift;
+  my $media_type = $self->media_type;
+  ## See also Message::Entity::_encode_body
+  if ($self->{option}->{use_mime_text_alternate}
+   && $self->{not_mime_text}) {
+    if ($media_type =~ m#^text/($REG{token})#) {
+      my $st = $1;
+      my $at = $Message::MIME::MediaType::type{text}->{$st}->{mime_alternate};
+      return sprintf ('%s/%s', @$at) if ref $at eq 'ARRAY';
+      return 'application/x-text; media-subtype='.$st;
+    } elsif ($media_type =~ m#^message/($REG{token})#) {
+      my $st = $1;
+      my $at = $Message::MIME::MediaType::type{message}->{$st}->{mime_alternate};
+      return sprintf ('%s/%s', @$at) if ref $at eq 'ARRAY';
+      return 'application/x-message; media-subtype='.$st;
+    }
+  }
+  $media_type;
 }
 
 =head2 $self->media_type ([$new_value])
@@ -220,6 +261,15 @@ sub media_type_minor ($;$) {
 *value = \&media_type;
 *value_as_string = \&media_type;
 
+sub not_mime_text ($;$) {
+  my $self = shift;
+  my $new_value = shift;
+  if (defined $new_value) {
+    $self->{not_mime_text} = $new_value;
+  }
+  $self->{not_mime_text};
+}
+
 =item $option-value = $ct->option ($option-name)
 
 Gets option value.
@@ -239,11 +289,55 @@ Returns a copy of the object.
 
 =cut
 
-sub clone ($) {
+## Inherited
+
+## $self->_parse_value ($type, $value);
+sub _parse_value ($$$) {
   my $self = shift;
-  my $clone = $self->SUPER::clone;
-  $clone->{media_type} = Message::Util::make_clone($self->{media_type});
-  $clone->{media_subtype} = Message::Util::make_clone($self->{media_subtype});
+  my $name = shift;
+  my $value = shift;
+  return $value if ref $value;
+  my ($mt,$mst) = ($self->{media_type}, $self->{media_subtype});
+  my $mt_def = $Message::MIME::MediaType::type{$mt}->{$mst};
+  $mt_def = $Message::MIME::MediaType::type{$mt}->{'/default'} unless ref $mt_def;
+  $mt_def = $Message::MIME::MediaType::type{'/default'}->{'/default'}
+    unless ref $mt_def;
+  my $handler = $mt_def->{parameter}->{$name}->{handler}
+    || $mt_def->{parameter}->{'*default'}->{handler} || [':none:'];
+  if (ref $handler eq 'CODE') {
+    $handler = &$handler ($self, $mt, $mst);
+  }
+  my $vtype = $handler->[0];
+  my %vopt = (
+    -format	=> $self->{option}->{format},
+    -field_name	=> $self->{option}->{field_name},
+    -field_media_type	=> $mt,
+    -field_media_subtype	=> $mst,
+    -field_param_name	=> $name,
+    -parse_all	=> $self->{option}->{parse_all},
+  );
+  ## Media type specified option/parameters
+  if (ref $handler->[1] eq 'HASH') {
+    for (keys %{$handler->[1]}) {
+      $vopt{$_} = ${$handler->[1]}{$_};
+    }
+  }
+  ## Inherited options
+  if (ref $handler->[2] eq 'ARRAY') {
+    for (@{$handler->[2]}) {
+      $vopt{'-'.$_} = $self->{option}->{$_};
+    }
+  }
+  
+  if ($vtype eq ':none:') {
+    return $value;
+  } elsif (defined $value) {
+    eval "require $vtype" or Carp::croak qq{<parse>: $vtype: Can't load package: $@};
+    return $vtype->parse ($value, %vopt);
+  } else {
+    eval "require $vtype" or Carp::croak qq{<parse>: $vtype: Can't load package: $@};
+    return $vtype->new (%vopt);
+  }
 }
 
 =head1 STANDARDS
@@ -311,7 +405,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/14 13:42:40 $
+$Date: 2002/06/09 11:08:28 $
 
 =cut
 

@@ -11,7 +11,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 
@@ -164,6 +164,13 @@ sub parse ($$;%) {
       type => 'word',
       charset => $self->{option}->{encoding_before_decode_local_part});
   $self;
+}
+
+sub display_name ($;$) {
+  my $self = shift;
+  my $newdn = shift;
+  $self->{display_name} = $newdn if defined $newdn;
+  $self->{display_name};
 }
 
 sub local_part ($;$) {
@@ -327,7 +334,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/17 05:42:27 $
+$Date: 2002/06/09 11:08:28 $
 
 =cut
 

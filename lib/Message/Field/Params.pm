@@ -11,7 +11,7 @@ use strict;
 require 5.6.0;
 use re 'eval';
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -77,7 +77,7 @@ sub _init ($;%) {
   );
   $self->SUPER::_init (%DEFAULT, %options);
   $self->{param} = [];
-  my $fname = $self->_n11n_field_name ($self->{option}->{field_name});
+  my $fname = $self->{option}->{field_name};
   if ($fname eq 'p3p') {
     $self->{option}->{parameter_rule} = 'param_nocomma';
     $self->{option}->{separator} = ', ';
@@ -219,18 +219,30 @@ sub _restore_param ($@) {
   @ret;
 }
 
+## $self->_save_param (@parameters)
+## --- Save parameter values to $self
 sub _save_param ($@) {
   my $self = shift;
-  my @p = map {## TODO: BUG:
-    if ($self->{option}->{parse_all} && $_->[1]->{is_parameter}) {
-      $_->[1]->{value} = $self->_parse_value ($_->[0] => $_->[1]->{value});
-    }
-    $_;
-  } @_;
+  my @p = @_;
+  $self->_parse_param_value (\@p) if $self->{option}->{parse_all};
   $self->{param} = \@p;
   $self;
 }
 *__save_param = \&_save_param;	## SHOULD NOT BE OVERRIDDEN!
+
+## $self->_parse_param_value (\@parameters)
+## --- Parse each values of parameters
+sub _parse_param_value ($\@) {
+  my $self = shift;
+  my $p = shift;
+  @$p = map {
+    if ($_->[1]->{is_parameter}) {
+      $_->[1]->{value} = $self->_parse_value ($_->[0] => $_->[1]->{value});
+    }
+    $_;
+  } @$p;
+  #$p;
+}
 
 =back
 
@@ -390,7 +402,7 @@ sub parameter_value ($$;$) {
 
 sub _delete_empty ($) {
   my $self = shift;
-  $self->{param} = [grep {length $_} @{$self->{param}}];
+  $self->{param} = [grep {ref $_} @{$self->{param}}];
 }
 
 
@@ -417,7 +429,7 @@ sub stringify ($;%) {
         my (%e) = &{$self->{option}->{hook_encode_string}} ($self, 
           $v->{value}, current_charset => $v->{charset}, language => $v->{language},
           type => 'parameter');
-        if ($e{value} eq undef) {
+        if (!defined $e{value}) {
           $value[0] = undef;
         } elsif ($option{use_parameter_extension} && ($e{charset} || $e{language} 
                            || $e{value} =~ /[\x00\x0D\x0A\x80-\xFF]/)) {
@@ -473,7 +485,7 @@ sub stringify ($;%) {
           for my $i (0..$#value) {
             push @new, $name.'*'.$i.($encoded?'*':'').'='.$value[$i];
           }
-          $new = join '; ', @new;
+          $new = join $self->{option}->{separator}, @new;
         }
       } else {
         my %e = &{$self->{option}->{hook_encode_string}} ($self, 
@@ -481,7 +493,7 @@ sub stringify ($;%) {
         $new = Message::Util::quote_unsafe_string ($e{value}, 
           unsafe => 'NON_http_token_wsp');
       }
-      push @ret, $new;
+      push @ret, $new if length $new;
   });
   join $self->{option}->{separator}, @ret;
 }
@@ -600,7 +612,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/14 13:42:40 $
+$Date: 2002/06/09 11:08:28 $
 
 =cut
 

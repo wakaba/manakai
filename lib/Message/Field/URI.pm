@@ -1,8 +1,8 @@
 
 =head1 NAME
 
-Message::Field::URI --- A perl module for a URI 
-which is part of Internet Messages
+Message::Field::URI --- A Perl Module for Internet Message
+Header Field Bodies filled with a URI
 
 =cut
 
@@ -11,38 +11,25 @@ use strict;
 require 5.6.0;
 use re 'eval';
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
-
-$REG{WSP} = qr/[\x09\x20]/;
-$REG{FWS} = qr/[\x09\x20]*/;
 
 %REG = %Message::Util::REG;
 	$REG{SCM_angle_quoted} = qr/<([^\x3E]*)>/;
 
-$REG{uri_literal} = qr/\x3C[\x09\x20\x21\x23-\x3B\x3D\x3F-\x5B\x5D\x5F\x61-\x7A\x7E]*\x3E/;
-$REG{phrase} = qr/(?:$REG{atext}|$REG{quoted_string})(?:$REG{atext}|$REG{quoted_string}|\.|$REG{FWS})*/;
-$REG{phrase_c} = qr/(?:$REG{atext}|$REG{quoted_string}|$REG{comment}|\.|$REG{FWS})*/;
-
 	## Simple version of URI regex  See RFC 2396, RFC 2732, RFC 2324.
-	$REG{escaped} = qr/%[0-9A-Fa-f][0-9A-Fa-f]/;
-	$REG{scheme} = qr/(?:[A-Za-z]|$REG{escaped})(?:[0-9A-Za-z+.-]|$REG{escaped})*/;
-		## RFC 2324 defines escaped UTF-8 schemes:-)
-	$REG{fragment} = qr/\x23(?:[\x21\x24\x26-\x3B\x3D\x3F-\x5A\x5F\x61-\x7A\x7E]|$REG{escaped})*/;
-	$REG{S_uri_body} = qr/(?:[\x21\x24\x26-\x3B\x3D\x3F-\x5A\x5B\x5D\x5F\x61-\x7A\x7E]|$REG{escaped})+/;
-	$REG{S_absoluteURI} = qr/$REG{scheme}:$REG{S_uri_body}/;
-	$REG{S_relativeURI} = qr/$REG{S_uri_body}/;
-	$REG{S_URI_reference} = qr/(?:$REG{S_absoluteURI}|$REG{S_relativeURI})(?:$REG{fragment})?|(?:$REG{fragment})/;
+	#$REG{escaped} = qr/%[0-9A-Fa-f][0-9A-Fa-f]/;
+	#$REG{scheme} = qr/(?:[A-Za-z]|$REG{escaped})(?:[0-9A-Za-z+.-]|$REG{escaped})*/;
+		## RFC 2324 defines escaped UTF-8 scheme names:-)
+	#$REG{fragment} = qr/\x23(?:[\x21\x24\x26-\x3B\x3D\x3F-\x5A\x5F\x61-\x7A\x7E]|$REG{escaped})*/;
+	#$REG{S_uri_body} = qr/(?:[\x21\x24\x26-\x3B\x3D\x3F-\x5A\x5B\x5D\x5F\x61-\x7A\x7E]|$REG{escaped})+/;
+	#$REG{S_absoluteURI} = qr/$REG{scheme}:$REG{S_uri_body}/;
+	#$REG{S_relativeURI} = qr/$REG{S_uri_body}/;
+	#$REG{S_URI_reference} = qr/(?:$REG{S_absoluteURI}|$REG{S_relativeURI})(?:$REG{fragment})?|(?:$REG{fragment})/;
 		## RFC 2396 allows <> (empty URI), but this regex doesn't.
-$REG{M_uri_literal} = qr/\x3C([\x09\x20\x21\x23-\x3B\x3D\x3F-\x5B\x5D\x5F\x61-\x7A\x7E]*)\x3E/;
-$REG{M_S_phrase_uri} = qr/($REG{phrase_c})$REG{M_uri_literal}/;
-$REG{uri_phrase} = qr/[\x21\x23-\x3B\x3D\x3F-\x5B\x5D\x5F\x61-\x7A\x7E]+(?:$REG{WSP}+[\x21\x23-\x27\x29-\x3B\x3D\x3F-\x5B\x5D\x5F\x61-\x7A\x7E][\x21\x23-\x3B\x3D\x3F-\x5B\x5D\x5F\x61-\x7A\x7E]*)*/;
-#$REG{M_phrase_uri} = qr/($REG{phrase_c})<$REG{FWS}($REG{S_URI_reference})$REG{FWS}>/;
-#$REG{M_phrase_uri_a} = qr/($REG{phrase_c})<$REG{FWS}($REG{S_absoluteURI})$REG{FWS}>/;
-#$REG{M_phrase_uri_af} = qr/($REG{phrase_c})<$REG{FWS}($REG{S_absoluteURI}(?:$REG{fragment})?)$REG{FWS}>/;
-#$REG{M_uri_content} = qr/$REG{M_S_phrase_uri}((?:$REG{FWS}$REG{comment})*)|($REG{S_URI_reference})($REG{WSP}(?:$REG{FWS}$REG{comment})*)?/;
-$REG{M_uri_content} = qr/$REG{M_S_phrase_uri}((?:$REG{FWS}$REG{comment})*)|($REG{uri_phrase})($REG{WSP}(?:$REG{FWS}$REG{comment})*)?/;
+	
+	#$REG{uri_phrase} = qr/[\x21\x23-\x3B\x3D\x3F-\x5B\x5D\x5F\x61-\x7A\x7E]+(?:$REG{WSP}+[\x21\x23-\x27\x29-\x3B\x3D\x3F-\x5B\x5D\x5F\x61-\x7A\x7E][\x21\x23-\x3B\x3D\x3F-\x5B\x5D\x5F\x61-\x7A\x7E]*)*/;
 
 =head1 CONSTRUCTORS
 
@@ -85,16 +72,25 @@ sub _init ($;%) {
   
   my $format = $self->{option}->{format};
   my $field = $self->{option}->{field_name};
+  my $fieldns = $self->{option}->{field_ns};
   $format = 'mhtml' if $format =~ /mail|news/;
-  if ($field =~ /^list-/) {	## mail
+  if ($fieldns eq $Message::Header::NS_phname2uri{list}) {
     $self->{option}->{output_display_name} = 0;
     $self->{option}->{allow_empty} = 0;
-  } elsif ($field eq 'content-location') {	## HTTP / MHTML
-    $self->{option}->{output_angle_bracket} = 0;
-    $self->{option}->{output_display_name} = 0;
-    $self->{option}->{output_comment} = 0;
-    $self->{option}->{use_display_name} = 0;
-    $self->{option}->{allow_fragment} = 0;
+  } elsif ($fieldns eq $Message::Header::NS_phname2uri{content}) {
+    if ($field eq 'location') {
+      $self->{option}->{output_angle_bracket} = 0;
+      $self->{option}->{output_display_name} = 0;
+      $self->{option}->{output_comment} = 0;
+      $self->{option}->{use_display_name} = 0;
+      $self->{option}->{allow_fragment} = 0;
+    } elsif ($field eq 'content-base') {
+      $self->{option}->{output_angle_bracket} = 0;
+      $self->{option}->{output_comment} = 0;
+      $self->{option}->{use_display_name} = 0;
+      $self->{option}->{allow_relative} = 0;
+      $self->{option}->{allow_fragment} = 0;
+    }
   } elsif ($field eq 'link') {	## HTTP
     $self->{option}->{output_display_name} = 0;
     $self->{option}->{output_comment} = 0;
@@ -115,12 +111,6 @@ sub _init ($;%) {
   } elsif ($field eq 'uri') {	## HTTP
     $self->{option}->{output_comment} = 0;
     $self->{option}->{output_display_name} = 0;
-  } elsif ($field eq 'content-base') {	## HTTP / MHTML
-    $self->{option}->{output_angle_bracket} = 0;
-    $self->{option}->{output_comment} = 0;
-    $self->{option}->{use_display_name} = 0;
-    $self->{option}->{allow_relative} = 0;
-    $self->{option}->{allow_fragment} = 0;
   }
 }
 
@@ -268,7 +258,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/17 05:42:27 $
+$Date: 2002/06/09 11:08:28 $
 
 =cut
 

@@ -9,7 +9,7 @@ Internet message field bodies
 package Message::Field::ValueParams;
 use strict;
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Params;
 push @ISA, qw(Message::Field::Params);
 
@@ -60,7 +60,9 @@ sub _init ($;%) {
   );
   $self->SUPER::_init (%DEFAULT, %options);
   
-  my $fname = $self->_n11n_field_name ($self->{option}->{field_name});
+  #my $fname = $self->_n11n_field_name ($self->{option}->{field_name});
+  my $fname = $self->{option}->{field_name};
+  my $format = $self->{option}->{format};
   if ($fname eq 'content-disposition') {
     $self->{option}->{value_case_sensible} = 0;
     $self->{option}->{value_default} = 'inline';
@@ -72,6 +74,16 @@ sub _init ($;%) {
     $self->{option}->{value_type}->{'creation-date'} = ['Message::Field::Date'];
     $self->{option}->{value_type}->{'modification-date'} = ['Message::Field::Date'];
     $self->{option}->{value_type}->{'read-date'} = ['Message::Field::Date'];
+  } elsif ($fname eq 'content-transfer-encoding') {
+    $self->{option}->{value_case_sensible} = 0;
+    $self->{option}->{value_no_regex} = $REG{NON_token};
+    if ($format =~ /http/) {
+      $self->{option}->{value_default} = 'binary';
+    } elsif ($format =~ /news-usefor/) {
+      $self->{option}->{value_default} = '8bit';
+    } else {
+      $self->{option}->{value_default} = '7bit';
+    }
   } elsif ($fname eq 'link') {
     $self->{option}->{parameter_value_unsafe_rule}->{'*value'} = 'MATCH_NONE';
     $self->{option}->{value_type}->{'*value'} = ['Message::Field::URI'];
@@ -216,7 +228,7 @@ sub value ($;$%) {
   if (defined $new_value && $new_value !~ m#$self->{option}->{value_no_regex}#) {
     $self->{value} = $new_value;
   }
-  $self->{value} = $self->_param_value ('*value' => $self->{value});
+  $self->{value} = $self->_parse_value ('*value' => $self->{value});
   $self->{option}->{value_case_sensible}? $self->{value}: lc $self->{value};
 }
 
@@ -303,7 +315,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/22 08:28:20 $
+$Date: 2002/06/09 11:08:28 $
 
 =cut
 
