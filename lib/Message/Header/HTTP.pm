@@ -10,7 +10,7 @@ require Message::Header::Default;
 package Message::Header::HTTP;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 our %OPTION = %Message::Header::Default::OPTION;
 $OPTION{namespace_uri} = 'urn:x-suika-fam-cx:msgpm:header:http';
@@ -78,8 +78,11 @@ package Message::Header::HTTP::CCPP;
 ## CC/PP exchange protocol <http://www.w3.org/TR/NOTE-CCPPexchange>
 our %OPTION = %Message::Header::HTTP::OPTION;
 $OPTION{namespace_uri} = 'http://www.w3.org/1999/06/24-CCPPexchange';
+
+$OPTION{use_ph_namespace} = 0;
 $OPTION{namespace_phname} = '';
 $OPTION{namespace_phname_goodcase} = '';
+
 $OPTION{value_type} = {
 	':default'	=> ['Message::Field::Unstructured'],
 		## *-Profile-Diff-(1*DIGIT): field (field-body = application/XML)
@@ -113,7 +116,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/06 11:36:39 $
+$Date: 2002/07/08 11:47:20 $
 
 =cut
 

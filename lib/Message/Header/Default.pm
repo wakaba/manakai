@@ -9,7 +9,7 @@ for Default Namespace of Header Fields
 package Message::Header::Default;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Header;
 
 our %OPTION;
@@ -24,6 +24,7 @@ $OPTION{n11n_prefix} = \&_name_n11n;
 $OPTION{namespace_uri} = 'urn:x-suika-fam-cx:msgpm:header:default';
 
 ## Force & hyphened prefix name of this namespace (ex. "prefix-name")
+$OPTION{use_ph_namespace} = 1;
 $OPTION{namespace_phname} = 'default';
 $OPTION{namespace_phname_goodcase} = 'default';
 
@@ -112,7 +113,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/06 10:29:31 $
+$Date: 2002/07/08 11:47:20 $
 
 =cut
 

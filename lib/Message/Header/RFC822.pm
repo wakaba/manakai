@@ -9,7 +9,7 @@ for RFC822 Namespaces of Header Fields
 package Message::Header::RFC822;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Header::Default;
 
 our %OPTION = %Message::Header::Default::OPTION;
@@ -195,7 +195,9 @@ $OPTION{namespace_phname} = 'x-rfc822-original';
 $OPTION{namespace_phname_goodcase} = 'X-RFC822-Original';
 
 $OPTION{value_type} = { %{ $OPTION{value_type} } };
-$OPTION{value_type}->{recipient} = ['Message::Header::Structured'];
+$OPTION{value_type}->{recipient} = ['Message::Field::TypedText',{
+	-separator	=> ';',
+}];
 
 $OPTION{uri_mailto_safe}	= {
   	':default'	=> 1,
@@ -304,7 +306,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/07 00:46:07 $
+$Date: 2002/07/08 11:47:20 $
 
 =cut
 
