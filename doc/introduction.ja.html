@@ -79,31 +79,97 @@ RFC 2822 的には新しいメッセージでは互換性のため
 を書くつもりでしたが、なんだかごちゃごちゃしていて、
 それなら車輪の再発明になっても一から書いてみようと考えました。</p>
 
-<h2>実装状況</h2>
+<h2>特色 (という程のものでもない。)</h2>
 
 <ol>
-<li>RFC 822, RFC 2822 の頭領域 (<code class="bnf rfc2822">header</code> <code class="rfc2822">field</code>) を解釈出来ます。</li>
-<li>電子ニュース (<a href="urn:ietf:rfc:1036">RFC 1036</a> など), MIME, その他の追加頭領域の幾つかを解釈出来ます。</li>
-<li>RFC 822/2822 の <code class="bnf rfc2822">group</code> なメイル・アドレスの領域内容を解釈出来ます。</li>
-<li>日付形式では RFC 822/<a href="urn:ietf:rfc:1123">1123</a>, <a href="urn:ietf:rfc:733">RFC 733</a>, asctime, ISO 8601 (HTTP) などに対応。他の用途に転用出来ます。</li>
+<li>結構(謎)オブジェクト指向です。</li>
+<li>RFC 822/2822 の <code class="bnf rfc2822">group</code> を解釈出来ます。</li>
 <li><a href="urn:ietf:id:draft-ietf-usefor-msg-id-alt-00">draft-ietf-usefor-msg-id-alt-00</a> に基づいた送信アドレスなどによる <code class="rfc2822">Message-ID</code> を生成出来ます。</li>
-<li>まだ解釈出来ない構造化 (<code class="rfc2822">structured</code>) 頭領域について、表示のために <code class="bnf rfc2822">quoted-pair</code> を unquote して値を返すなど出来ます。</li>
-<li>MIME 本体 (<code class="bnf rfc822">body</code>) にはまだ対応していません。 (<code class="media-type">text/plain</code> <code class="mime-cte">8bit</code> 固定)</li>
-<li>説明はまだ不備です。各モジュールに pod で説明が入っていますが、
-抜けていたり実態に合っていなかったりもします。
-今の段階では code そのものが簡単に理解出来るとは思いますが。</li>
+<li>文字コード独立 (CSI) です。 (但し RFC 822 である都合上(謎)、
+ASCII 互換である必要はあります。 EBCDIC とかは無理です:-&lt;)</li>
+</ol>
+
+<h2>各仕様への対応状況</h2>
+
+<ol>
+<li>電子メイルのメッセージ (RFC 822, RFC 2822) 
+の全機能に (抜けが無ければ) 対応しています。
+但し長さ制限などはチェックしていません。 (MIME の
+<code class="mime">Content-Transfer-Encoding</code>
+と一緒に実装予定)</li>
+<li>電子ニュース記事 (<a href="/uri-res/N2L?urn:ietf:rfc:1036">RFC 1036</a>,
+<a href="spec/son-of-RFC1036">son-of-RFC1036</a>,
+<a href="/uri-res/N2L?urn:ietf:id:draft-usefor-article-06">
+draft-usefor-article (06)</a>) の頭領域の多くに対応しています。</li>
+<li>MIME の本体部分 (body part) にはまだ対応していません。</li>
+<li>MIME の追加頭領域 
+(<a href="/uri-res/N2L?urn:ietf:rfc:2045">RFC 2045</a>,
+<code class="mime">Content-Disposition</code>) に対応しています。
+パラメーター値拡張 (<a href="/uri-res/N2L?urn:ietf:rfc:2231">RFC 2231</a>)
+も入出力ともに実装しました。</li>
+<li>MIME 符号化語 (<code class="mime bnf">encoded-word</code>)
+の解読に対応しています:-) 但し別途変換処理を指定する必要があります。
+(<a href="#code">文字コードの扱い</a>参照)</li>
+<li>HTTP/1.0, HTTP/1.1, CGI/1.1, CGI/1.2 の頭領域のうち、
+ごく一部に対応しています。 MHTML の 
+<code class="mime">Content-Location</code> にも対応しています。</li>
+<li>日付形式では RFC 822/<a href="urn:ietf:rfc:1123">1123</a>, 
+<a href="urn:ietf:rfc:733">RFC 733</a>, asctime, ISO 8601 (HTML) 
+などに対応しています。</li>
+</ol>
+
+<h2>制限事項</h2>
+
+<ol>
+<li>類似モジュール(謎)のように、ファイル名やファイル・ハンドルを
+渡して読み込ませることが出来ません。</li>
+<li>大きなメッセージでも一気に読み込み、全て主記憶領域で
+保持しています。ですからあまり大きなメッセージの処理には
+向いていないでしょう。</li>
+<li><code>CR</code> や <code>LF</code> が単体で出現する場合、
+正しく処理出来ません。 (<code>CRLF</code> と等価とみなします。)
+将来の版ではオプションで制御可能になるかもしれません。</li>
+<li>あったら良さそうな機能が未実装かもしれません。
+(<a href="mailto:w@suika.fam.cx">電子メイル</a>などで教えて下さい。)</li>
+<li>各モジュールのオプション体系があまり整備されていません。
+(それでも気持ち悪くない程度には体系的だと思います。)</li>
+<li>説明文 (document) が良い加減です。</li>
 </ol>
 
 <h2>今後の予定</h2>
 
 <ol>
-<li>電子ニュースの頭領域 (RFC 1036, <a href="spec/son-of-RFC1036">son-of-RFC1036</a>, draft-usefor-article) の実装</li>
-<li>MIME の頭領域の実装。</li>
+<li>電子ニュースの頭領域 (RFC 1036, 
+<a href="spec/son-of-RFC1036">son-of-RFC1036</a>, 
+draft-usefor-article) の完全実装</li>
+<li><del>MIME の頭領域の実装。</del></li>
 <li>追加/非標準の頭領域の実装。</li>
 <li>MIME 本体 (<code class="bnf rfc822">body</code>) の実装。</li>
-<li>文字符号変換のための hook の実装?</li>
+<li><del>文字符号変換のための hook の実装?</del></li>
 <li>documentation。</li>
 <li>使用例の作成。</li>
+</ol>
+
+<h2>必要環境</h2>
+
+<ol>
+<li>perl (Perl 5.6 以降または<span title="human parser">人間解析者</span>:-))
+	<p class="note"><code class="bnf rfc822">comment</code>
+	を表すのに正規表現 <code class="regex">(??{ <var>code</var> })</code> 
+	を使っているので、これを解釈出来る、 
+	5.6 以降の版である必要があります。</p>
+</li>
+<li>Digest::MD2, Digest::MD5, Digest::SHA1
+	<p>Message-ID の生成にこれらを使用する場合のみ、
+	<code>Message::Field::MsgID::MsgID</code> が使います。</p>
+	<p>これらが用意されていない環境ではエラーになるので、
+	(現状では) 上記モジュールの該当部分を書き換えて対処して下さい。</p>
+</li>
+<li>文字コード変換処理
+	<p>日本語メッセージを扱うなら必須でしょう。
+	詳しくは<a href="#code">文字コードの扱い</a>
+	の章をご参照下さい。</p>
+</li>
 </ol>
 
 <h2>入手</h2>
@@ -125,6 +191,125 @@ GNU GPL に従って利用出来ます。詳しくは各ファイルを御覧下さい。</p>
 <li><a href="spec/">関連する仕様書 (RFC, Internet-Draft 等)</a></li>
 </ul>
 
+<h2 id="code">文字コードの扱い</h2>
+
+<p>卑しいことで頭を悩ますのは嫌なので(藁)、
+Message::* は符号化方法独立 (CSI) を目指して実装しています。
+(但し ASCII のしがらみだけは断ち切っていません:-))
+0x00 ～ 0x7F が ASCII (または ASCII と見なして良いもの) である
+場合は、 Message::* を通したことでデータが壊れることは
+無いと思います。</p>
+
+<p>(もちろん、 RFC 822 など各仕様に照らして正統(的)で
+ある必要があります。 <code class="bnf rfc822">atom</code>
+に8ビット・コードが含まれていると正しく扱えません。)
+(早い話が、 <code class="bnf rfc822">quoted-string</code> 
+などでは8ビット透過だということです。回りくどくてごめんなさい。)</p>
+
+<p>既定の状態では文字コードに関係する変換処理は行われません。
+しかし、フック関数っぽいもの(謎)を指定することで、
+変換処理をさせられます。</p>
+
+<p>指定出来るフック関数っぽいものは2種類です。
+<code>DECODER</code> は、元のメッセージを解析する時
+(<code class="perl">parse ()</code>) に適宜呼び出されます。
+<code>ENCODER</code> は、メッセージとして文字列化する際
+(<code class="perl">stringify ()</code> など) に適宜呼び出されます。</p>
+
+<p>これらの関数は、当然、当該処理が呼び出される前に指定しておく
+必要があります。
+<samp class="perl">Message::Entity-&gt;parse</samp> などする前に
+定義しておくと良いでしょう。</p>
+
+<pre class="example perl">
+require Message::MIME::Charset;
+$Message::MIME::Charset::DECODER{'*default'} = sub {jcode::euc ($_[1])};
+$Message::MIME::Charset::ENCODER{'*default'} = sub {jcode::jis ($_[1], 'euc')};
+</pre>
+
+<p>この例では、 jcode.pl を変換処理に使います。
+(もちろん、既に <code class="perl">require</code> 
+されていると仮定しています。)</p>
+<p>最初の <code class="perl">require</code> で、変換処理を担当している
+<code class="perl">Message::MIME::Charset</code> を読み込みます。
+(こうしておかないと、後から既定値 (= 無変換) で
+<code class="perl">*default</code> が上書きされてしまいます。)</p>
+
+<p>この code を使ったスクリプトは内部処理を日本語 EUC 
+で行うと仮定しています。ですから、 <code class="perl">DECODER</code>
+で日本語 EUC に変換します。</p>
+<p>また、日本語メッセージでは <code>ISO-2022-JP</code>
+を使うのが慣習ですから、 <code class="perl">ENCODER</code>
+では 7ビット JIS に変換しています。</p>
+<p>処理を行う関数は、引数が2つ以上与えられます。
+1つ目の引数は呼び出した class module, いわゆる 
+<code class="perl">$self</code> です。(この場合 self ではありませんが:-)
+でも普通は必要ないでしょう。</p>
+<p>2つ目の引数は処理対象の文字列です。</p>
+<p>3つ目以降の引数は、追加オプションのハッシュです。
+ただし、現在追加オプションは定義されていません。</p>
+<p>関数が返す値は(今のところ)一つだけです。
+処理が終わった文字列です。変換結果として何もなくなってしまったら、
+もちろん空文字列を返して構いません。 (<code class="perl">undef</code>
+よりも空文字列の方が望ましいでしょう。)</p>
+
+<p>さて、上記の例では「<code>*default</code>」の EN/DECODER 
+を指定しましたが、ここには代わりに charset 名を指定出来ます。</p>
+
+<pre class="perl example">
+$Message::MIME::Charset::DECODER{'iso-2022-jp'} = sub {jcode::euc ($_[1], 'jis')};
+</pre>
+
+<p>ここでは、 <code>ISO-2022-JP</code> を内部コードに変換する
+方法を定義しています。 charset 名 (および「<code>*default</code>」
+は必ず小文字で書いて下さい!)</p>
+<p>MIME body や、 encoded-word, RFC 2231 の拡張パラメーター値
+など、 charset が指定されている時はその charset 名の変換関数が
+呼び出されます。 (指定された charset 名の変換関数が未定義の時は、
+何も処理しません。) これ以外の場面では、 <code>*default</code>
+で定義された関数が使われます。</p>
+
+<p>最後に、日本語メッセージを扱う際の例を挙げておきます。</p>
+
+<pre class="example perl">
+<span class="comment">## jcode.pl を使用</span>
+require 'jcode.pl';
+require Message::MIME::Charset;
+$Message::MIME::Charset::DECODER{'*default'} = sub {jcode::euc ($_[1])};
+$Message::MIME::Charset::DECODER{'iso-2022-jp'} = sub {jcode::euc ($_[1], 'jis')};
+$Message::MIME::Charset::DECODER{'euc-jp'} = sub {$_[1]};
+$Message::MIME::Charset::DECODER{'shift_jis'} = sub {jcode::euc ($_[1], 'sjis')};
+$Message::MIME::Charset::ENCODER{'*default'} = sub {
+  my $s = $_[1];
+  <span class="comment">## 正規化</span>
+  jcode::tr(\$s,
+      "\xa3\xb0-\xa3\xb9\xa3\xc1-\xa3\xda\xa3\xe1-\xa3\xfa\xa1\xf5".
+      "\xa1\xa4\xa1\xa5\xa1\xa7\xa1\xa8\xa1\xa9\xa1\xaa\xa1\xae".
+      "\xa1\xb0\xa1\xb2\xa1\xbf\xa1\xc3\xa1\xca\xa1\xcb\xa1\xce".
+      "\xa1\xcf\xa1\xd0\xa1\xd1\xa1\xdc\xa1\xf0\xa1\xf3\xa1\xf4".
+      "\xa1\xf6\xa1\xf7\xa1\xe1\xa2\xaf\xa2\xb0\xa2\xb2\xa2\xb1".
+      "\xa1\xe4\xa1\xe3\xA1\xC0\xA1\xA1"
+      => '0-9A-Za-z&amp;,.:;?!`^_/|()[]{}+$%#*@=\'"~-&gt;&lt;\\ ');
+  jcode::jis ($s, 'euc', 'z')
+};
+</pre>
+
+<pre class="example perl">
+<span class="comment">## Jcode.pm を使用</span>
+use Jcode;
+require Message::MIME::Charset;
+$Message::MIME::Charset::DECODER{'*default'} = sub {jcode::euc ($_[1])};
+$Message::MIME::Charset::DECODER{'iso-2022-jp'} = sub {Jcode->new ($_[1], 'jis')->euc};
+$Message::MIME::Charset::DECODER{'euc-jp'} = sub {$_[1]};
+$Message::MIME::Charset::DECODER{'shift_jis'} = sub {Jcode->new ($_[1], 'sjis')->euc};
+$Message::MIME::Charset::DECODER{'utf-8'} = sub {Jcode->new ($_[1], 'utf8')->euc};
+$Message::MIME::Charset::ENCODER{'*default'} = sub {Jcode-&gt;new ($_[1], 'euc')-&gt;jis};
+$Message::MIME::Charset::ENCODER{'utf-8'} = sub {Jcode-&gt;new ($_[1], 'euc')-&gt;utf8};
+</pre>
+
+<p>Perl 5.8 で Encode モジュールが使えるようになれば、
+もっと楽になると期待しています。</p>
+
 <div class="navigation">
 [<a href="/" title="このサーバーの首頁">/</a>
 <a href="/map" title="このサーバーの案内" rel="index">地図</a>
@@ -137,7 +322,7 @@ GNU GPL に従って利用出来ます。詳しくは各ファイルを御覧下さい。</p>
        src="http://jigsaw.w3.org/css-validator/images/vcss" 
        alt="Valid CSS!" /></a>
 </div>
-<div class="update">$Date: 2002/03/21 04:09:59 $</div>
+<div class="update">$Date: 2002/04/01 09:14:50 $</div>
 <ul class="myuri">
 <li>&lt;URL:<a href="http://suika.fam.cx/~wakaba/Message-pm/introduction">http://suika.fam.cx/~wakaba/Message-pm/introduction</a>&gt;</li>
 <li>&lt;CVS:<a href="http://suika.fam.cx/gate/cvs/perl/web/Message-pm/">suika.fam.cx:/home/cvs/perl/web/Message-pm/</a>&gt;</li>
