@@ -11,7 +11,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -44,6 +44,10 @@ sub _init ($;%) {
   my %options = @_;
   my %DEFAULT = (
     -_ARRAY_NAME	=> 'value',
+    -_MEMBERS	=> [qw|value_type|],
+    -_METHODS	=> [qw|add replace count delete item
+                       comment_add comment_delete comment_count
+                       comment_item|],
     #encoding_after_encode
     #encoding_before_decode
     -field_name	=> 'keywords',
@@ -252,7 +256,7 @@ sub _stringify_item ($$\%) {
       }
 }
 
-=item $option-value = $ua->option ($option-name)
+=item $option-value = $csv->option ($option-name)
 
 Gets option value.
 
@@ -295,13 +299,7 @@ Returns a copy of the object.
 
 =cut
 
-sub clone ($) {
-  my $self = shift;
-  $self->_delete_empty;
-  my $clone = $self->SUPER::clone;
-  $clone->{value_type} = Message::Util::make_clone ($self->{value_type});
-  $clone;
-}
+## clone, method_available: Inherited
 
 =back
 
@@ -336,7 +334,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/08 09:11:31 $
+$Date: 2002/05/16 11:43:40 $
 
 =cut
 

@@ -9,7 +9,7 @@ structured header field bodies of the Internet message
 package Message::Field::Structured;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 use overload '""' => sub { $_[0]->stringify },
              '.=' => sub { $_[0]->value_append ($_[1]) },
@@ -62,6 +62,7 @@ sub _init ($;%) {
       $self->{field_body} = $options{$name};
     }
   }
+  $self->{comment} = [];
 }
 
 =item Message::Field::Structured->new ([%options])
@@ -696,7 +697,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/15 07:29:09 $
+$Date: 2002/05/16 11:43:40 $
 
 =cut
 

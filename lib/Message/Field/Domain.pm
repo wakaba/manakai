@@ -11,13 +11,11 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 
-*REG = \%Message::Util::REG;
-	
-
+%REG = %Message::Util::REG;
 
 =head1 CONSTRUCTORS
 
@@ -53,8 +51,8 @@ The following methods construct new objects:
   );
 sub _init ($;%) {
   my $self = shift;
-  my %options = @_;
-  $self->SUPER::_init (%DEFAULT, %options);
+  my $DEFAULT = Message::Util::make_clone (\%DEFAULT);
+  $self->SUPER::_init (%$DEFAULT, @_);
 }
 
 =item $addr = Message::Field::Domain->new ([%options])
@@ -169,7 +167,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/15 07:29:09 $
+$Date: 2002/05/16 11:43:40 $
 
 =cut
 
