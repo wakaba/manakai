@@ -1601,8 +1601,8 @@ sub dis_perl_init_classdef ($;%) {
                                parent => $res->{src});
     if ($i) {
       $res->{ExpandedURI q<d:actualType>}
-        = dis_typeforqnames_to_type_uri ($t->value, use_default_namespace => 1,
-                                         %opt, node => $t);
+        = dis_typeforqnames_to_type_uri ($i->value, use_default_namespace => 1,
+                                         %opt, node => $i);
     } else {
       $res->{ExpandedURI q<d:actualType>} = $res->{ExpandedURI q<d:Type>};
     }
@@ -2083,4 +2083,4 @@ sub disdoc_inline2pod ($;%) {
 
 =cut
 
-1; # $Date: 2004/12/03 11:28:46 $
+1; # $Date: 2004/12/05 12:31:44 $

@@ -74,7 +74,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/12/01 11:49:46 $
+     $Date: 2004/12/05 12:31:44 $
 
   @DefaultFor:
     ManakaiDOM:ManakaiDOMLatest
@@ -1703,8 +1703,11 @@ IF:
       ManakaiDOM:ForClass
     @@For:
       ManakaiDOM:ManakaiDOM
+  @For:
+    ManakaiDOM:DOM3
+  @For:
+    =ManakaiDOM:ManakaiDOM
   @Level[list]:  3
-  @SpecLevel:3
   @Description:
     @@lang:en
     @@@:
@@ -1776,6 +1779,8 @@ IF:
      @@Param:
         @@@Name:  features
         @@@Type:
+          DOMMain:DOMString
+        @@@actualType:
           ManakaiDOM:ManakaiDOMFeatures
         @@@Description:
           @@@@lang:en
@@ -1783,6 +1788,7 @@ IF:
             A string that specifies which features and versions are required.
      @@Return:
         @@@Type:  DOMImplementationList
+        @@@actualType: ManakaiDOMImplementationList
         @@@Description:
           @@@@lang:en
           @@@@@:

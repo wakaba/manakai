@@ -28,7 +28,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/03 11:28:46 $
+      $Date: 2004/12/05 12:31:44 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1081,6 +1081,20 @@ PropDef:
       containing the input. 
   @rdfs:domain:
     ManakaiDOM:DataType
+
+PropDef:
+  @QName:
+    ManakaiDOM:noInputNormalize
+  @Description:
+    @@lang:en
+    @@@:
+      Whether an input normalizer code should be automatically 
+      inserted by code generator.  If <CODE::false> and a normalizer 
+      (<Q::ManakaiDOM:inputNormalizer>) is defined, it is inserted 
+      between input (parameter) declaration and actual code.  Otherwise, 
+      no code is inserted. 
+  @dataType:
+    dis:boolean
 
 ## -- Other
 
@@ -2206,9 +2220,9 @@ StringDataTypeDef:
           while (@f) {
             my $name = shift @f;
             if (@f and $f[0] =~ /^[\d\.]+$/) {
-              $INPUT{$name} = shift @f;
+              $INPUT->{$name} = shift @f;
             } else {
-              $INPUT{$name} = '';
+              $INPUT->{$name} = '';
             }
           }
         }
@@ -2224,6 +2238,22 @@ StringDataTypeDef:
         If <P::features> in future levels of DOM does not 
         have this characteristic, this and some other implementation 
         must be revisited for that levels. 
+  @ResourceDef:
+    @@QName:
+      DOMMain:stringifyFeatures
+    @@rdf:type:
+      dis2pm:BlockCode
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Converts a manakai internal hash representation of <P::features> 
+        (<PerlVar::$IN>) to a DOM standard string representation of it 
+        (<PerlVar::$OUT>). 
+        \
+        Note that whether input is valid feature name-value pairs is 
+        not checked; bad input will produce bad output.
+    @@PerlDef:
+      $OUT = join ' ', %{$IN};
 
 ImplNote:
   @lang:en
@@ -2355,10 +2385,7 @@ ResourceDef:
         @@@@lang:en
         @@@@@:
           A new instance of the <IF:ManakaiDOMImplementationRegistry>.
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
+      @@@PerlDef:
           $r = bless [@org::w3c::dom::DOMImplementationSourceList], $self;
     @@For:
       ManakaiDOM:ManakaiDOM
@@ -2399,6 +2426,8 @@ ResourceDef:
            @@@@@@: 
              No implementation implementing the desired features is found.
        @@@PerlDef:
+           __CODE{DOMMain:stringifyFeatures:: $IN => $features,
+                                              $OUT => $features}__;
            __DEEP{
              for (ref $self ? @$self
                             : @org::w3c::dom::DOMImplementationSourceList) {
@@ -2431,7 +2460,7 @@ ResourceDef:
        @@@Type:  
          DOMCore:DOMImplementationList
        @@@actualType:
-         ManakaiDOMCore:ManakaiDOMImplementationList
+         DOMCore:ManakaiDOMImplementationList
        @@@Description:
          @@@@lang:en
          @@@@@: 
@@ -2443,6 +2472,8 @@ ResourceDef:
            \
            }
        @@@PerlDef:
+           __CODE{DOMMain:stringifyFeatures:: $IN => $features,
+                                              $OUT => $features}__;
            __DEEP{
              $r = <ClassM::DOMCore:ManakaiDOMImplementationList.new>;
              for (ref $self ? @$self

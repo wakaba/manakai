@@ -209,6 +209,9 @@ sub perl_code ($;%) {
   }{
     my ($name, $data) = ($1, $2);
     my $r;
+    my $et = dis_qname_to_uri
+                     ($name, %opt,
+                      use_default_namespace => ExpandedURI q<disPerl:>);
     if ($name eq 'XINT') {    ## Inserting point of the for-internal code
       if (defined $data) {
         if ($data =~ /^{($RegBlockContent)}$/o) {
@@ -255,19 +258,38 @@ sub perl_code ($;%) {
         valid_err qq<Exception type and name required: "$data">,
           node => $opt{node};
       }      
-    } elsif ($name eq 'XCODE') { # Built-in code
+    } elsif ($et eq ExpandedURI q<disPerl:CODE>) {
       my ($nm, %param);
-      if ($data =~ s/^(\w+)\s*(?::\s*|$)//) {
-        $nm = $1;
-      } elsif ($data =~ s/^<(\w[^<>]+)>\s*(?::\s*|$)//) {
+      $data =~ s/^\s+//;
+      if ($data =~ s/^((?>(?!::).)+)//) {
         $nm = $1;
       } else {
-        valid_err q<Built-in code name required>;
+        valid_err q<Code name required>, node => $opt{node};
       }
-      while ($data =~ /\G(\S+)\s*=>\s*(\S+)\s*(?:,\s*|$)/g) {
+      $data =~ s/^::\s*//;
+      while ($data =~ s/^(\S+)\s*=>\s*(\S+)\s*(?:,\s*|$)//) {
         $param{$1} = $2;
       }
-      $r = perl_builtin_code ($nm, condition => $opt{condition}, %param);
+      valid_err qq<Broken CODE argument: "$data">, node => $opt{node}
+        if length $data;
+      
+      my $uri = dis_typeforqnames_to_uri ($nm, use_default_namespace => 1,
+                                          %opt);
+      if (defined $State->{Type}->{$uri}->{Name} and
+          dis_resource_ctype_match (ExpandedURI q<dis2pm:BlockCode>,
+                                    $State->{Type}->{$uri}, %opt)) {
+        ## ISSUE: It might be required to check loop referring
+        $r = dispm_get_code (%opt, resource => $State->{Type}->{$uri},
+                             For => [keys %{$State->{Type}->{$uri}
+                                                  ->{For}}]->[0]);
+        for (grep {/^\$/} keys %param) {
+          $r =~ s/\Q$_\E\b/ $param{$_} /g;
+        }
+        $r = "\n{\n$r\n}\n";
+      } else {
+        valid_err qq<Block code constant <$uri> must be defined>,
+                  node => $opt{node};
+      }
     } elsif ($name eq 'XPACKAGE' and $data) {
       if ($data eq 'Global') {
         #$r = $ManakaiDOMModulePrefix;
@@ -335,7 +357,9 @@ Generates a Perl code fragment from resource(s).
 
 sub dispm_get_code (%) {
   my %opt = @_;
-  if (($opt{resource}->{ExpandedURI q<dis2pm:type>} and
+  if (($opt{ExpandedURI q<dis2pm:getCodeNoTypeCheck>} and
+       defined $opt{resource}->{Name}) or
+      ($opt{resource}->{ExpandedURI q<dis2pm:type>} and
        {
          ExpandedURI q<ManakaiDOM:DOMMethodReturn> => 1,
          ExpandedURI q<ManakaiDOM:DOMAttrGet> => 1,
@@ -555,7 +579,9 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
             ExpandedURI q<ManakaiDOM:DOMMethod>) {
           my $proto = '$';
           my @param = ('self');
+          my $param_norm = '';
           my $param_opt = 0;
+          my $for = [keys %{$method->{For}}]->[0];
           for my $param (@{$method->{ExpandedURI q<dis2pm:param>}||[]}) {
             if ($param->{ExpandedURI q<dis2pm:nullable>}) {
               $proto .= ';' unless $param_opt;
@@ -563,8 +589,18 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
             }
             $proto .= '$';
             push @param, $param->{ExpandedURI q<dis2pm:paramName>};
+            my $nm = dispm_get_code 
+                        (resource => $State->{Type}
+                              ->{$param->{ExpandedURI q<d:actualType>}},
+                         ExpandedURI q<dis2pm:DefKeyName>
+                             => ExpandedURI q<ManakaiDOM:inputNormalizer>,
+                         For => $for,
+                         ExpandedURI q<dis2pm:getCodeNoTypeCheck> => 1);
+            if (defined $nm) {
+              $nm =~ s/\$INPUT\b/\$$param[-1] /g;
+              $param_norm .= $nm;
+            }
           }
-          my $for = [keys %{$method->{For}}]->[0];
           my $code = dispm_get_code
                        (resource => $method->{ExpandedURI q<dis2pm:return>},
                         For => $for);
@@ -581,7 +617,7 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
                             ExpandedURI q<dis2pm:useDefaultValue> => 1,
                             ExpandedURI q<dis2pm:valueType>
                               => $return->{ExpandedURI q<d:actualType>});
-              $code = $my . 
+              $code = $my . $param_norm . 
                       perl_statement
                         (defined $default ? 'my $r = '.$default : 'my $r').
                       $code . "\n" .
@@ -657,6 +693,18 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
           if ($setter) {
             my $set_code = dispm_get_code (resource => $setter, For => $for);
             if (defined $set_code) {
+              my $nm = dispm_get_code 
+                        (resource => $State->{Type}
+                              ->{$setter->{ExpandedURI q<d:actualType>}},
+                         ExpandedURI q<dis2pm:DefKeyName>
+                             => ExpandedURI q<ManakaiDOM:inputNormalizer>,
+                         For => $for,
+                         ExpandedURI q<dis2pm:getCodeNoTypeCheck> => 1);
+              if (defined $nm) {
+                $nm =~ s/\$INPUT\b/\$given /g;
+              } else {
+                $nm = '';
+              }
               my $default = dispm_get_value
                            (resource => $setter,
                             ExpandedURI q<dis2pm:ValueKeyName>
@@ -664,8 +712,9 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
                             ExpandedURI q<dis2pm:useDefaultValue> => 1,
                             ExpandedURI q<dis2pm:valueType>
                               => $getter->{ExpandedURI q<d:actualType>});
-              $set_code = perl_statement
-                          (defined $default ? 'my $r = '.$default : 'my $r').
+              $set_code = $nm .
+                          perl_statement
+                            (defined $default ? 'my $r = '.$default : 'my $r').
                           $set_code. "\n" .
                           perl_statement ('$r');
             } else { ## Set code not defined
