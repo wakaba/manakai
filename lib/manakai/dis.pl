@@ -163,7 +163,7 @@ Expand a TypeForQNameQName into a URI reference.
 
 sub dis_typeforqnames_to_uri ($;%) {
   my ($qq, %opt) = @_;
-  my ($typeq, $forq) = split /::/, $qq, 2;
+  my ($typeq, $forq) = split /\s*::\s*/, $qq, 2;
   my ($type, $for);
   my $pt = {
     boolean => ExpandedURI q<DOMMain:boolean>,
@@ -508,6 +508,29 @@ sub dis_uri_ctype_match ($$%) {
   }
   return 0;
 }}
+
+=item 1/0 = dis_resource_ctype_match ($type_uri, $resource, %opt)
+
+Checks and returns whether a resource is of type C<$type_uri> or not.
+
+=cut
+
+sub dis_resource_ctype_match ($$;%) {
+  my ($uri, $res, %opt) = @_;
+  my @uri = ref $uri ? @$uri : $uri;
+  for (@uri) {
+    return 1 if $res->{Type}->{$_};
+  }
+  for (keys %{$res->{Type}||{}}) {
+    for my $uri (@uri) {
+      if (dis_uri_ctype_match ($uri, $_, %opt)) {
+        return 1;
+      }
+    }
+  }
+  return 0;
+} # dis_resource_ctype_match
+
 
 =item $uri = dis_element_type_to_uri ($element_type, %opt)
 
@@ -2046,4 +2069,4 @@ sub disdoc_inline2pod ($;%) {
 
 =cut
 
-1; # $Date: 2004/11/27 10:59:09 $
+1; # $Date: 2004/11/30 11:05:06 $

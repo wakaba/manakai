@@ -3,6 +3,7 @@ use strict;
 use Message::Util::QName::Filter {
   d => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis-->,
   dis2pm => q<http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#>,
+  disPerl => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl-->,
   DOMCore => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#>,
   DOMMain => q<http://suika.fam.cx/~wakaba/archive/2004/dom/main#>,
   lang => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#>,
@@ -102,16 +103,83 @@ sub perl_code ($;%) {
     node => $opt{node} unless defined $s;
   local $State->{Namespace}
     = $State->{Module}->{$opt{resource}->{parentModule}}->{nsBinding};
-  $s =~ s[<Q:([^<>]+)>|\b(null|true|false)\b][
+  $s =~ s[<([^<>]+)>|\b(null|true|false)\b][
     my ($q, $l) = ($1, $2);
+    my $r;
     if (defined $q) {
       if ($q =~ /\}/) {
-        valid_warn qq<QName "$q" has a "}" - it might be a typo>;
+        valid_warn qq<"<$q>" has a "}" - it might be a typo>;
       }
-      perl_literal (dis_qname_to_uri ($q, %opt));
+      if ($q =~ s/^(.+?):://) {
+        my $et = dis_qname_to_uri
+                     ($1, %opt,
+                      use_default_namespace => ExpandedURI q<disPerl:>);
+        if ($et eq ExpandedURI q<disPerl:Q>) {          ## QName constant
+          $r = perl_literal (dis_qname_to_uri ($q, use_default_namespace => 1,
+                                               %opt));
+        } elsif ($et eq ExpandedURI q<disPerl:M>) {     ## Method call
+          my ($clsq, $mtdq) = split /\s*\.\s*/, $q;
+          my $clsu = dis_typeforqnames_to_uri ($clsq,
+                                               use_default_namespace => 1, %opt);
+          my $cls = $State->{Type}->{$clsu};
+          my $clsp = $cls->{ExpandedURI q<dis2pm:packageName>};
+          valid_err qq<Package name of class <$clsu> must be defined>,
+                    node => $opt{node} unless defined $clsp;
+          if ($mtdq =~ /:/) {
+            valid_err qq<$mtdq: Prefixed method name not supported>,
+                      node => $opt{node};
+          } else {
+            my $mtd;
+            for (values %{$cls->{ExpandedURI q<dis2pm:method>}}) {
+              if (defined $_->{Name} and $_->{Name} eq $mtdq) {
+                $mtd = $_;
+                last;
+              }
+            }
+            valid_err qq<Perl method name for method "$clsp.$mtdq" must >.
+                      q<be defined>, node => $mtd->{src} || $opt{node}
+                   if not defined $mtd or
+                      not defined $mtd->{ExpandedURI q<dis2pm:methodName>};
+            $r = ' ' . $clsp . '::' .
+                 $mtd->{ExpandedURI q<dis2pm:methodName>} . ' ';
+          }
+        } elsif ($et eq ExpandedURI q<disPerl:ClassName>) {
+                                                        ## Perl package name
+          my $uri = dis_typeforqnames_to_uri ($q, 
+                                              use_default_namespace => 1, %opt);
+          if (defined $State->{Type}->{$uri}->{Name} and
+              defined $State->{Type}->{$uri}
+                            ->{ExpandedURI q<dis2pm:packageName>}) {
+            $r = perl_literal ($State->{Type}->{$uri}
+                                     ->{ExpandedURI q<dis2pm:packageName>});
+          } else {
+            valid_err qq<Package name of class <$uri> must be defined>,
+              node => $opt{node};
+          }
+        } elsif ($et eq ExpandedURI q<disPerl:CODE>) {  ## CODE constant
+          my $uri = dis_typeforqnames_to_uri ($q, use_default_namespace => 1,
+                                              %opt);
+          if (defined $State->{Type}->{$uri}->{Name} and
+              dis_resource_ctype_match (ExpandedURI q<dis2pm:InlineCode>,
+                                        $State->{Type}->{$uri}, %opt)) {
+            $r = dispm_get_code (%opt, resource => $State->{Type}->{$uri},
+                                 For => [keys %{$State->{Type}->{$uri}
+                                                      ->{For}}]->[0],
+                                 is_inline => 1);
+          } else {
+            valid_err qq<Inline code constant <$uri> must be defined>,
+              node => $opt{node};
+          }
+        } else {
+          valid_err qq<"$et": Unknown element type>, node => $opt{node};
+        }
+      } else {
+        valid_err qq<"<$q>": Element type must be specified>, node => $opt{node};
+      }
     } else {
-      {true => 1, false => 0, null => 'undef'}->{$l};
+      $r = {true => 1, false => 0, null => 'undef'}->{$l};
     }
+    $r;
   ]ge;
   ## TODO: Ensure Message::Util::Error imported if "try"ing.
   ## ISSUE: __FILE__ & __LINE__ will break if multiline substition happens.
@@ -259,18 +327,38 @@ Generates a Perl code fragment from resource(s).
 
 sub dispm_get_code (%) {
   my %opt = @_;
-  my $key = $opt{ExpandedURI q<dis2pm:DefKeyName>} || ExpandedURI q<d:Def>;
-  my $n = dis_get_attr_node (%opt, parent => $opt{resource}->{src},
-                             name => {uri => $key},
-                             ContentType => ExpandedURI q<lang:Perl>);
-  if ($n) {
-    return perl_code_source
-             perl_code ($n->value,
-                        %opt, node => $n),
-             %opt,
-             node => $n;
+  if (($opt{resource}->{ExpandedURI q<dis2pm:type>} and
+       {
+         ExpandedURI q<ManakaiDOM:DOMMethodReturn> => 1,
+         ExpandedURI q<ManakaiDOM:DOMAttrGet> => 1,
+         ExpandedURI q<ManakaiDOM:DOMAttrSet> => 1,
+       }->{$opt{resource}->{ExpandedURI q<dis2pm:type>}}) or
+      (dis_resource_ctype_match ([ExpandedURI q<dis2pm:InlineCode>,
+                                  ExpandedURI q<dis2pm:BlockCode>],
+                                 $opt{resource}, %opt,
+                                 node => $opt{resource}->{src}))) {
+    my $key = $opt{ExpandedURI q<dis2pm:DefKeyName>} || ExpandedURI q<d:Def>;
+    my $n = dis_get_attr_node (%opt, parent => $opt{resource}->{src},
+                               name => {uri => $key},
+                               ContentType => ExpandedURI q<lang:Perl>);
+    if ($n) {
+      my $code = perl_code ($n->value, %opt, node => $n);
+      if ($opt{is_inline} and
+          dis_resource_ctype_match ([ExpandedURI q<dis2pm:InlineCode>],
+                                    $opt{resource}, %opt,
+                                    node => $opt{resource}->{src})) {
+        $code =~ s/\n/\x20/g;
+        return $code;
+      } else {
+        return perl_code_source ($code, %opt, node => $n);
+      }
+    }
+    return undef;
+  } else {
+    impl_err ("Bad resource for dispm_get_code: ".
+              $opt{resource}->{ExpandedURI q<dis2pm:type>},
+              node => $opt{resource}->{src});
   }
-  return undef;
 } # dispm_get_code
 
 =item $code = dispm_get_value (%opt)
@@ -396,8 +484,10 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
             $proto .= '$';
             push @param, $param->{ExpandedURI q<dis2pm:paramName>};
           }
+          my $for = [keys %{$method->{For}}]->[0];
           my $code = dispm_get_code
-                       (resource => $method->{ExpandedURI q<dis2pm:return>});
+                       (resource => $method->{ExpandedURI q<dis2pm:return>},
+                        For => $for);
           if (defined $code) {
             my $my = perl_statement ('my ('.join (", ", map {"\$$_"} @param).
                                      ') = @_');
@@ -420,15 +510,15 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
               $code = $my . $code;
             }
           } else { ## Code not defined
-            my $for = [keys %{$method->{For}}]->[0];
+            my $for1 = $for;
             unless (dis_uri_for_match (ExpandedURI q<ManakaiDOM:ManakaiDOM1>,
                                        $for, node => $method->{src})) {
-              $for = ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>;
+              $for1 = ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>;
             }
             $code = perl_statement
                       dispm_perl_throws
                         class => ExpandedURI q<DOMCore:ManakaiDOMException>,
-                        class_for => $for,
+                        class_for => $for1,
                         type => 'NOT_SUPPORTED_ERR',
                         subtype =>
                           ExpandedURI q<MDOMX:MDOM_IMPL_METHOD_NOT_IMPLEMENTED>,
@@ -448,11 +538,12 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
           my $setter = defined $method->{ExpandedURI q<dis2pm:setter>}->{Name}
                          ? $method->{ExpandedURI q<dis2pm:setter>} : undef;
           my $for = [keys %{$method->{For}}]->[0];
+          my $for1 = $for;
           unless (dis_uri_for_match (ExpandedURI q<ManakaiDOM:ManakaiDOM1>,
                                      $for, node => $method->{src})) {
-            $for = ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>;
+            $for1 = ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>;
           }
-          my $get_code = dispm_get_code (resource => $getter);
+          my $get_code = dispm_get_code (resource => $getter, For => $for);
           if (defined $get_code) {
             my $default = dispm_get_value
                            (resource => $getter,
@@ -469,7 +560,7 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
             $get_code = perl_statement
                       dispm_perl_throws
                         class => ExpandedURI q<DOMCore:ManakaiDOMException>,
-                        class_for => $for,
+                        class_for => $for1,
                         type => 'NOT_SUPPORTED_ERR',
                         subtype =>
                           ExpandedURI q<MDOMX:MDOM_IMPL_ATTR_NOT_IMPLEMENTED>,
@@ -482,7 +573,7 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
                         };
           }
           if ($setter) {
-            my $set_code = dispm_get_code (resource => $setter);
+            my $set_code = dispm_get_code (resource => $setter, For => $for);
             if (defined $set_code) {
               my $default = dispm_get_value
                            (resource => $setter,
@@ -499,7 +590,7 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
               $set_code = perl_statement
                       dispm_perl_throws
                         class => ExpandedURI q<DOMCore:ManakaiDOMException>,
-                        class_for => $for,
+                        class_for => $for1,
                         type => 'NOT_SUPPORTED_ERR',
                         subtype =>
                           ExpandedURI q<MDOMX:MDOM_IMPL_ATTR_NOT_IMPLEMENTED>,
