@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Util::QName::General;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Carp;
 use Message::Markup::XML::QName;
 
@@ -54,20 +54,21 @@ For example:
 =cut
 
 sub import ($$;$) {
-  my ($self, $name, $map) = @_;
+  my $self = bless {}, shift;
+  my ($name, $map) = @_;
   Carp::croak "Imported operators must be specified"
     unless ref $name;
-  $map ||= {};
+  $self->{ns} = $map || {};
   my $caller = caller ($Exporter::ExportLevel);
   no strict 'refs';
   for (@$name) {
     if ($_ eq 'ExpandedURI') {
       *{ $caller . '::' . $_ } = sub ($) {
-        scalar $self->expanded_name ($map, @_);
+        scalar $self->expanded_name (@_);
       };
     } elsif ($_ eq 'ExpandedName') {
       *{ $caller . '::' . $_ } = sub ($) {
-        $self->expanded_name ($map, @_);
+        $self->expanded_name (@_);
       };
     } else {
       Carp::croak "$_: Function not found";
@@ -103,13 +104,14 @@ in scalar context.
 
 =cut
 
-sub expanded_name ($$$) {
-  my ($self, $map, $qname) = @_;
-  my $chk = Message::Markup::XML::QName::qname_to_expanded_name (
-    {ns => $map},
-    $qname,
-    use_prefix_empty => 1,
-  );
+sub expanded_name ($$) {
+  my ($self, $qname) = @_;
+  my $chk = $self->{cache}->{$qname}
+        ||= Message::Markup::XML::QName::qname_to_expanded_name (
+              $self,
+              $qname,
+              use_prefix_empty => 1,
+            );
   if ($chk->{success}) {
     wantarray ?
       ($chk->{name}, $chk->{local_name})
@@ -148,4 +150,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/02/22 01:48:09 $
+1; # $Date: 2004/02/24 07:28:58 $
