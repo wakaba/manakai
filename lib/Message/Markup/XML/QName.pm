@@ -16,16 +16,25 @@ This module is part of manakai XML.
 
 package Message::Markup::XML::QName;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NCNameStartChar InXMLNCNameChar!;
 use Exporter;
 our @ISA = qw/Exporter/;
 require Carp;
 
-our @EXPORT_OK = qw/DEFAULT_PFX NULL_URI UNDEF_URI NS_xml_URI NS_xmlns_URI/;
+our @EXPORT_OK = qw/DEFAULT_PFX NULL_URI UNDEF_URI NS_xml_URI NS_xmlns_URI
+                    ZERO_URI EMPTY_URI/;
+our %EXPORT_TAGS = (
+  prefix => [qw/DEFAULT_PFX/],
+  'special-uri' => [qw/NULL_URI UNDEF_URI ZERO_URI EMPTY_URI/],
+  xml => [qw/NS_xml_URI NS_xmlns_URI/],
+);
+
 sub DEFAULT_PFX () { q:#default: }
 sub NULL_URI    () { q<http://suika.fam.cx/~wakaba/-temp/2003/09/27/null> }
 sub UNDEF_URI   () { q<http://suika.fam.cx/~wakaba/-temp/2003/09/27/undef> }
+sub ZERO_URI    () { q<http://suika.fam.cx/~wakaba/-temp/2003/12/05/zero> }
+sub EMPTY_URI   () { q<http://suika.fam.cx/~wakaba/-temp/2003/12/05/empty> }
 sub NS_xml_URI  () { q<http://www.w3.org/XML/1998/namespace> }
 sub NS_xmlns_URI() { q<http://www.w3.org/2000/xmlns/> }
 #sub NS_INVALID_URI(){q<http://suika.fam.cx/~wakaba/-temp/2003/05/17/unknown-namespace#> }
@@ -413,4 +422,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/12/01 07:51:48 $
+1; # $Date: 2003/12/05 11:41:45 $
