@@ -13,14 +13,19 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw($VERSION %DEFAULT);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 use Message::Header;
 use overload '""' => sub {shift->stringify};
 
 %DEFAULT = (
+  add_ua	=> 1,
   body_class	=> {'/DEFAULT' => 'Message::Body::TextPlain'},
+  fill_date	=> 1,
+  fill_msgid	=> 1,
   parse_all	=> -1,
+  ua_field_name	=> 'user-agent',
+  ua_use_config	=> 1,
 );
 
 =head2 Message::Entity->new ([%option])
@@ -34,6 +39,8 @@ sub new ($;%) {
   my $class = shift;
   my $self = bless {option => {@_}}, $class;
   for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
+  $self->{header} = new Message::Header;
+  #$self->_add_ua_field;
   $self;
 }
 
@@ -64,6 +71,7 @@ sub parse ($$;%) {
   $self->{body} = join "\n", @body;
   $self->{body} = $self->_body ($self->{body}, $self->content_type)
     if $self->{option}->{parse_all}>0;
+  #$self->_add_ua_field;
   $self;
 }
 
@@ -135,6 +143,17 @@ Returns the C<message> as a string.
 sub stringify ($;%) {
   my $self = shift;
   my %OPT = @_;
+  if (($OPT{fill_date} || $self->{option}->{fill_date})>0
+    && !$self->{header}->field_exist ('date')) {
+    $self->{header}->field ('date')->unix_time (time);
+  }
+  if (($OPT{fill_msgid} || $self->{option}->{fill_msgid})>0
+    && !$self->{header}->field_exist ('message-id')) {
+    my $from = $self->{header}->field ('from')->addr_spec (0);
+    $self->{header}->field ('message-id')->add_new (addr_spec => $from)
+      if $from;
+  }
+  $self->_add_ua_field;
   my ($header, $body) = ($self->{header}, $self->{body});
   $header .= "\n" if $header && $header !~ /\n$/;
   $header."\n".$body;
@@ -167,6 +186,42 @@ C<text/plain>.
 sub content_type ($;%) {
   'text/plain';
 }
+
+sub id ($) {
+  my $self = shift;
+  return scalar $self->{header}->field ('message-id')->id
+    if $self->{header}->field_exist ('message-id');
+  '';0
+}
+
+sub _add_ua_field ($) {
+  my $self = shift;
+  if ($self->{option}->{add_ua}>0) {
+    my $ua = $self->{header}->field ($self->{option}->{ua_field_name});
+    $ua->replace (name => 'Message-pm', version => $VERSION, add_prepend => -1);
+    my @os;
+    my @perl_comment;
+    if ($self->{option}->{ua_use_config}>0) {
+      eval q{use Config;
+        @os = (name => $^O, version => $Config{osvers}, add_prepend => -1);
+        push @perl_comment, $Config{archname};
+      };
+    } else {
+      push @perl_comment, $^O;
+    }
+    if ($^V) {	## 5.6 or later
+      $ua->replace (name => 'Perl', version => sprintf ('%vd', $^V,
+        add_prepend => -1),
+                    comment => [@perl_comment]);
+    } elsif ($]) {	## Before 5.005
+      $ua->replace (name => 'Perl', version => $],
+                    comment => [@perl_comment], add_prepend => -1);
+    }
+    $ua->replace (@os) if $self->{option}->{ua_use_config}>0;
+  }
+  $self;
+}
+
 
 =head1 EXAMPLE
 
@@ -203,7 +258,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/25 10:18:35 $
+$Date: 2002/03/26 05:41:16 $
 
 =cut
 

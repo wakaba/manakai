@@ -49,10 +49,11 @@ when C<stringify>.  (Default = 0)
   fold_length	=> 70,
   field_type	=> {':DEFAULT' => 'Message::Field::Unstructured'},
   mail_from	=> -1,
+  output_bcc	=> -1,
   parse_all	=> -1,
 );
 my @field_type_Structured = qw(cancel-lock
-  importance mime-version path precedence user-agent x-cite
+  importance mime-version path precedence x-cite
   x-face x-mail-count x-msmail-priority x-priority x-uidl xref);
 for (@field_type_Structured)
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Structured'}
@@ -91,8 +92,10 @@ for (@field_type_URI)
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Structured'}
 for (qw(list-id))
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Structured'}
-for (qw(content-description subject title x-nsubject))
+for (qw(subject title x-nsubject))
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Subject'}
+for (qw(list-software user-agent server))
+  {$DEFAULT{field_type}->{$_} = 'Message::Field::UA'}
 
 =head2 Message::Header->new ([%option])
 
@@ -338,11 +341,13 @@ sub stringify ($;%) {
   my @ret;
   $OPT{capitalize} ||= $self->{option}->{capitalize};
   $OPT{mail_from} ||= $self->{option}->{mail_from};
+  $OPT{output_bcc} ||= $self->{option}->{output_bcc};
   push @ret, 'From '.$self->field ('mail-from') if $OPT{mail_from}>0;
   for my $field (@{$self->{field}}) {
     my $name = $field->{name};
-    next unless $field->{name};
+    next unless $name;
     next if $OPT{mail_from}<0 && $name eq 'mail-from';
+    next if $OPT{output_bcc}<0 && ($name eq 'bcc' || $name eq 'resent-bcc');
     my $fbody = scalar $field->{body};
     next unless $fbody;
     $fbody =~ s/\x0D([^\x09\x0A\x20])/\x0D\x20$1/g;
@@ -487,7 +492,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/25 10:18:35 $
+$Date: 2002/03/26 05:41:16 $
 
 =cut
 

@@ -12,7 +12,7 @@ Perl module for MIME C<encoded-word>.
 package Message::MIME::EncodedWord;
 use strict;
 use vars qw(%ENCODER %DECODER %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::MIME::Charset;
 
 $REG{WSP} = qr/[\x09\x20]/;
@@ -39,6 +39,16 @@ sub decode ($$) {
     if (ref $DECODER{$encoding}) {
       $r = &{$DECODER{$encoding}} ($encoding, $etext);
       ($r,$s) = Message::MIME::Charset::decode ($charset, $r);
+      if ($s<0 && $charset =~ /^iso-8859-([0-9]+(?:-[ie])?)$/) {
+        my $n = $1;
+        $r =~ s{([\x09\x0A\x0D\x20]*[\x80-\xFF]+[\x09\x0A\x0D\x20]*)}{
+          my $t = $1;
+          $t =~ s/([\x09\x0A\x0D\x80-\xFF])/sprintf('=%02X', ord $1)/ge;
+          $t =~ tr/\x20/_/;
+          sprintf ' =?iso-8859-%s?q?%s?= ', $n.($lang?'*'.$lang:''), $t;
+        }goex;
+        $s = 1;
+      }
     }
     $r = $& unless ($s>0);
     $r;
@@ -68,7 +78,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/25 10:17:05 $
+$Date: 2002/03/26 05:41:16 $
 
 =cut
 
