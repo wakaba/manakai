@@ -28,7 +28,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/05 12:31:44 $
+      $Date: 2004/12/08 07:36:40 $
     @@ContentType:
       dis:Date.RCS
   
@@ -576,6 +576,19 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: 
       ManakaiDOM:Const
+ElementTypeBinding:
+  @Name: XConst
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: 
+      ManakaiDOM:Const
+    @@aliasChild: 1
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOMCommon
+      @@@For:
+        !=ManakaiDOM:ManakaiDOMCommon
 
 PropDef:
   @QName: 
@@ -1492,16 +1505,16 @@ ResourceDef:
               if ($offset < 0) {
                 __EXCEPTION{
                   MDOMX:MDOM_DOMSTRING_INDEX_IN_SURROGATE_PAIR::
-                    <Q::MDOMX:param-name> => 'offset',
+                    MDOMX:param-name => 'offset',
                 }__;
               }
             } else {
               __EXCEPTION{
                 MDOMX:MDOM_DEBUG_BUG::
-                  <Q::MDOMX:values> => {
+                  MDOMX:values => {{
                     count => $offset,
                     position => 1,
-                  },
+                  }},
               }__;
             }                
           }
@@ -1591,8 +1604,8 @@ ResourceDef:
           return unless ref $self eq 'SCALAR';
           if ($offset < 0 or $offset > CORE::length $$self or
               $offset > <M::ManakaiDOMString.length> ($self)) {
-            __EXCEPTION{DOMException.INDEX_SIZE_ERR::
-              <Q::MDOMX:param-name> => 'offset',
+            __EXCEPTION{DOMCore:ManakaiDOMException.INDEX_SIZE_ERR::
+              MDOMX:param-name => 'offset',
             }__;
           }
           unless ($$self =~ /[\x{10000}-\x{10FFFF}]/) {
@@ -1662,13 +1675,13 @@ ResourceDef:
           return unless ref $self eq 'SCALAR';
           if ($offset < 0 or $offset > CORE::length $$self or
               $offset > <M::ManakaiDOMString.length> ($self)) {
-            __EXCEPTION{DOMException.INDEX_SIZE_ERR::
-              <Q::MDOMX:param-name> => 'offset',
+            __EXCEPTION{DOMCore:ManakaiDOMException.INDEX_SIZE_ERR::
+              MDOMX:param-name => 'offset',
             }__;
           }
           if ($count < 0) {
-            __EXCEPTION{DOMException.INDEX_SIZE_ERR::
-              <Q::MDOMX:param-name> => 'count',
+            __EXCEPTION{DOMCore:ManakaiDOMException.INDEX_SIZE_ERR::
+              MDOMX:param-name => 'count',
             }__;
           }
         REPLACE: {
@@ -1706,16 +1719,16 @@ ResourceDef:
               if ($count < 0) {
                 __EXCEPTION{
                 MDOMX:MDOM_DOMSTRING_INDEX_IN_SURROGATE_PAIR::
-                  <Q::MDOMX:param-name> => 'count',
+                  MDOMX:param-name => 'count',
                 }__;
               }
             } else {
               __EXCEPTION{
               MDOMX:MDOM_DEBUG_BUG::
-                <Q::MDOMX:values> => {
+                MDOMX:values => {{
                         count => $count,
                         position => 1,
-                },
+                }},
               }__;
             }
            }
@@ -1752,6 +1765,8 @@ ResourceDef:
       @@@Exception:
         @@@@Type: 
           DOMCore:DOMException
+        @@@@actualType:
+          DOMCore:ManakaiDOMException
         @@@@Name: INDEX_SIZE_ERR
         @@@@Description:
           @@@@@lang:en
@@ -1762,6 +1777,8 @@ ResourceDef:
       @@@Exception:
         @@@@Type: 
           DOMCore:DOMException
+        @@@@actualType:
+          DOMCore:ManakaiDOMException
         @@@@Name: DOMSTRING_SIZE_ERR
         @@@@Description:
           @@@@@lang:en
@@ -1776,13 +1793,13 @@ ResourceDef:
           my $s = ref $self eq 'SCALAR' ? $self : \$self;
           if ($offset < 0 or $offset > CORE::length $$s or
               $offset > <M::ManakaiDOMString.length> ($self)) {
-            __EXCEPTION{DOMException.INDEX_SIZE_ERR::
-              <Q::MDOMX:param-name> => 'offset',
+            __EXCEPTION{DOMCore:ManakaiDOMException.INDEX_SIZE_ERR::
+              MDOMX:param-name => 'offset',
             }__;
           }
           if ($count < 0) {
-            __EXCEPTION{DOMException.INDEX_SIZE_ERR::
-              <Q::MDOMX:param-name> => 'count',
+            __EXCEPTION{DOMCore:ManakaiDOMException.INDEX_SIZE_ERR::
+              MDOMX:param-name => 'count',
             }__;
           }
         SUBSTR: {
@@ -1980,8 +1997,8 @@ ResourceDef:
           my $s = ref $self eq 'SCALAR' ? $self : \$self;
           if (not defined $offset32 or $offset32 < 0 or
               CORE::length ($$s) < $offset32) {
-            __EXCEPTION{DOMException.INDEX_SIZE_ERR::
-              <Q::MDOMX:param-name> => 'offset32',
+            __EXCEPTION{DOMCore:ManakaiDOMException.INDEX_SIZE_ERR::
+              MDOMX:param-name => 'offset32',
             }__;
           }
           my $ss = substr $$s, 0, $offset32;
@@ -2032,8 +2049,8 @@ ResourceDef:
           my $s = ref $self eq 'SCALAR' ? $self : \$self;
           if (not defined $offset16 or $offset16 < 0 or
               CORE::length ($$s) * 2 < $offset16) {
-            __EXCEPTION{DOMException.INDEX_SIZE_ERR::
-              <Q::MDOMX:param-name> => 'offset16',
+            __EXCEPTION{DOMCore:ManakaiDOMException.INDEX_SIZE_ERR::
+              MDOMX:param-name => 'offset16',
             }__;
           }
           pos ($$s) = 0;
@@ -2047,16 +2064,16 @@ ResourceDef:
             } else {
               __EXCEPTION{
               MDOMX:MDOM_DEBUG_BUG::
-                <Q::MDOMX:values> => {
+                MDOMX:values => {{
                   count => $offset16,
                   position => 1,
-                },
+                }},
               }__;
             }
           }
           if ($offset16 > 0) {
-            __EXCEPTION{DOMException.INDEX_SIZE_ERR::
-              <Q::MDOMX:param-name> => 'offset16',
+            __EXCEPTION{DOMCore:ManakaiDOMException.INDEX_SIZE_ERR::
+              MDOMX:param-name => 'offset16',
             }__;
           }
           $r = pos ($$s);
@@ -3060,7 +3077,7 @@ ClassDef:
 
 ## -- Manakai implementation-specific exception and warning
 
-ExceptionDef
+ExceptionDef:
   @QName: 
     ManakaiDOM:ManakaiDOMImplementationException
   @ISA: 
@@ -3091,9 +3108,16 @@ ExceptionDef
       ManakaiDOM:ConstGroup
     @@ISA:
       DOMMain:unsigned-short
+    @@aliasChild: 1
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOMCommon
+      @@@For:
+        !=ManakaiDOM:ManakaiDOMCommon
 
-    @@Const:
-      @@@Name: MDOM_TYPE_MISMATCH_ERR
+    @@XConst:
+      @@@QName: 
+        MDOMX:MDOM_TYPE_MISMATCH_ERR
       @@@Type: unsigned-short
       @@@Value: 0
       @@@Description:
@@ -3128,8 +3152,9 @@ ExceptionDef
           @@@@@@: Class name to which given value belongs.
           
 
-    @@Const:
-      @@@Name: PARAM_NULL_POINTER
+    @@XConst:
+      @@@QName: 
+        MDOMX:PARAM_NULL_POINTER
       @@@Type: unsigned-short
       @@@Value: 1
       @@@Description:
@@ -3150,8 +3175,9 @@ ExceptionDef
           @@@@@lang:en
           @@@@@@: The name of the parameter to which the null value is given.
 
-    @@Const:
-      @@@Name: MDOM_DOMSTRING_INDEX_IN_SURROGATE_PAIR
+    @@XConst:
+      @@@QName: 
+        MDOMX:MDOM_DOMSTRING_INDEX_IN_SURROGATE_PAIR
       @@@Type: unsigned-long
       @@@Value: 2
       @@@Description:
@@ -3168,8 +3194,9 @@ ExceptionDef
           @@@@@lang:en
           @@@@@@: The parameter to which inappropriate value is specified.
 
-    @@Const:
-      @@@Name: MDOM_DEBUG_BUG
+    @@XConst:
+      @@@QName: 
+        MDOMX:MDOM_DEBUG_BUG
       @@@Type: unsigned-short
       @@@Value: 3
       @@@Description:
@@ -3191,15 +3218,16 @@ ExceptionDef
           @@@@@lang:en
           @@@@@@: Arbitrary values for debugging.
   
-  @Const:
-    @@Name: MDOM_IMPL_BY_APP
-    @@Type: unsigned-short
-    @@Value: 4
-    @@Description:
-      @@@lang:en
-      @@@@:
-        The method or attribute called is part of the callback 
-        interface so that the DOM application must implement it.
+    @@XConst:
+      @@@QName: 
+        MDOMX:MDOM_IMPL_BY_APP
+      @@@Type: unsigned-short
+      @@@Value: 4
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The callee method or attribute is expected to be implemented, 
+          by the DOM application, by overriding it in the inheritting class. 
 
 WarningDef:
   @QName: 
@@ -3232,9 +3260,16 @@ WarningDef:
       ManakaiDOM:ConstGroup
     @@ISA: 
       DOMMain:unsigned-short
+    @@aliasChild:1
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOMCommon
+      @@@For:
+        !=ManakaiDOM:ManakaiDOMCommon
     
-    @@Const:
-      @@@Name: ATTR_SET_NO_EFFECT
+    @@XConst:
+      @@@QName: 
+        MDOMX:ATTR_SET_NO_EFFECT
       @@@Type: unsigned-short
       @@@Value: 0
       @@@Description:
@@ -3242,8 +3277,9 @@ WarningDef:
         @@@@@:
           Setting an attribute value has no effect by definition.
 
-    @@Const:
-      @@@Name: MDOM_NEWCHILD_IS_REFCHILD
+    @@XConst:
+      @@@QName: 
+        MDOMX:MDOM_NEWCHILD_IS_REFCHILD
       @@@Type: unsigned-short
       @@@Value: 1
       @@@Description:
@@ -3263,8 +3299,9 @@ WarningDef:
           @@@@@lang:en
           @@@@@@: The parameter name for "refChild" node.
 
-    @@Const:
-      @@@Name: MDOM_REPLACE_BY_ITSELF_NO_EFFECT
+    @@XConst:
+      @@@QName: 
+        MDOMX:MDOM_REPLACE_BY_ITSELF_NO_EFFECT
       @@@Type:unsigned-short
       @@@Value:2
       @@@Description:
@@ -3273,8 +3310,9 @@ WarningDef:
           An attempt to replace a node by itself is made. 
           It is no effect by definition.
     
-    @@Const:
-      @@@Name: MDOM_NS_EMPTY_URI
+    @@XConst:
+      @@@QName: 
+        MDOMX:MDOM_NS_EMPTY_URI
       @@@Type: unsigned-short
       @@@Value: 4
       @@@Description:

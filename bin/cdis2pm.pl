@@ -66,7 +66,7 @@ Generates a code to throw an exception.
 
 sub dispm_perl_throws (%) {
   my %opt = @_;
-  my $x = $State->{Type}->{$opt{class}};
+  my $x = $opt{class_resource} || $State->{Type}->{$opt{class}};
   my $r = 'report ';
   unless (defined $x->{Name}) {
     $opt{class} = dis_typeforuris_to_uri ($opt{class}, $opt{class_for}, %opt);
@@ -79,15 +79,22 @@ sub dispm_perl_throws (%) {
         ExpandedURI q<ManakaiDOM:ExceptionClass> => 1,
         ExpandedURI q<ManakaiDOM:WarningClass> => 1,
       }->{$x->{ExpandedURI q<dis2pm:type>}}) {
+    $opt{type} = $opt{type_resource}->{Name} unless defined $opt{type};
+    valid_err qq{Exception code must be specified},
+              node => $opt{type_resource}->{src} || $opt{node}
+      unless defined $opt{type};
+    $opt{subtype} = $opt{subtype_resource}->{URI} unless defined $opt{subtype};
+    $opt{xparam}->{ExpandedURI q<MDOMX:subtype>} = $opt{subtype}
+      if defined $opt{subtype};
     $r .= $x->{ExpandedURI q<dis2pm:packageName>} . ' ' .
           perl_list -type => $opt{type},
                     -object => perl_code_literal ('$self'),
                     %{$opt{xparam} || {}};
   } else {
     no warnings 'uninitialized';
-    valid_err (qq{Resource <$opt{class}> (<$x->{ExpandedURI q<dis2pm:type>}>) }.
-               q<is neither exception class nor >.
-               q<warning class>, node => $opt{node});
+    valid_err (qq{Resource <$opt{class}> [<$x->{ExpandedURI q<dis2pm:type>}>] }.
+               q<is neither an exception class nor >.
+               q<a warning class>, node => $opt{node});
   }
   return $r;
 } # dispm_perl_throw
@@ -96,6 +103,7 @@ sub dispm_perl_throws (%) {
 use re 'eval';
 my $RegBlockContent;
 $RegBlockContent = qr/(?>[^{}\\]*)(?>(?>[^{}\\]+|\\.|\{(??{$RegBlockContent})\})*)/s;
+my $RegQNameChar = qr/[^\s<>"'\\\[\]\{\}]/;
 ## Defined by genlib.pl but overridden.
 sub perl_code ($;%) {
   my ($s, %opt) = @_;
@@ -103,7 +111,7 @@ sub perl_code ($;%) {
     node => $opt{node} unless defined $s;
   local $State->{Namespace}
     = $State->{Module}->{$opt{resource}->{parentModule}}->{nsBinding};
-  $s =~ s[<(\w[^<>]+)>|\b(null|true|false)\b][
+  $s =~ s[<($RegQNameChar[^<>]+)>|\b(null|true|false)\b][
     my ($q, $l) = ($1, $2);
     my $r;
     if (defined $q) {
@@ -246,14 +254,140 @@ sub perl_code ($;%) {
       $r = '{'.perl_statement ('local $Error::Depth = $Error::Depth + 1').
               perl_code ($data) .
            '}';
-    } elsif ($name eq 'XEXCEPTION' or $name eq 'XWARNING') {
+    } elsif ($name eq 'EXCEPTION' or $name eq 'WARNING') {
                                   ## Raising an Exception or Warning
-      if ($data =~ s/^\s*(\w+)\s*\.\s*(\w+)\s*(?:\.\s*([\w:]+)\s*)?(?:::\s*|$)//) {
-        $r = perl_exception (level => $name,
-                             class => $1,
-                             type => $2,
-                             subtype => $3,
-                             param => perl_code $data);
+      if ($data =~ s/^         \s* ((?>(?! ::|\.)$RegQNameChar)+) \s*
+                     (?:    \. \s* ((?>(?! ::|\.)$RegQNameChar)+) \s*
+                        (?: \. \s* ((?>(>! ::|\.)$RegQNameChar)+) \s*
+                        )?
+                     )?
+                     (?: ::\s* | $)//ox) {
+        my ($q, $constq, $subtypeq) = ($1, $2, $3);
+        $q =~ s/\|\|/::/g;
+        my $clsuri;
+        my $cls;
+        my $consturi;
+        my $const;
+        my $subtypeuri;
+        my $subtype;
+        if (defined $constq and not defined $subtypeq) {
+          $clsuri = dis_typeforqnames_to_uri ($q, 
+                                              use_default_namespace => 1,
+                                              %opt);
+          $cls = $State->{Type}->{$clsuri};
+          valid_err qq{Exception/warning class definition for }.
+                    qq{<$clsuri> is required}, node => $opt{node}
+                      unless defined $cls->{Name};
+          my ($consttq, $constfq) = split /\|\|/, $constq, 2;
+          if (defined $constfq) {
+            if ($consttq !~ /:/) {
+              valid_err qq<"$constq": Unprefixed exception code QName must >.
+                        q<not be followed by a "For" QName>,
+                        node => $opt{node};
+            } else {
+              $consturi = dis_typeforqnames_to_uri ($consttq.'::'.$constfq,
+                                                    use_default_namespace => 1,
+                                                    %opt);
+            }
+          } else {
+            if ($consttq !~ /:/) {
+              $consturi = $consttq;
+              CONSTCLS: {
+                for (values %{$cls->{ExpandedURI q<dis2pm:xConst>}}) {
+                  if (defined $_->{Name} and $_->{Name} eq $consturi) {
+                    $const = $_;
+                    last CONSTCLS;
+                  }
+                }
+                valid_err qq{Exception/warning code "$consturi" must be }.
+                          qq{defined in the exception/warning class }.
+                          qq{<$clsuri>}, node => $opt{node};
+              }
+            } else {
+              $consturi = dis_typeforqnames_to_uri ($consttq.'::'.$constfq,
+                                                    use_default_namespace => 1,
+                                                    %opt);
+            }
+          }
+          unless ($const) {
+            CONSTCLS: {
+              for (values %{$cls->{ExpandedURI q<dis2pm:xConst>}}) {
+                if (defined $_->{Name} and $_->{URI} and
+                    $_->{URI} eq $consturi) {
+                  $const = $_;
+                  last CONSTCLS;
+                }
+              }
+              valid_err qq{Exception/warning code <$consturi> must be }.
+                        qq{defined in the exception/warning class }.
+                        qq{<$clsuri>}, node => $opt{node};
+            }
+          }
+        } else { ## By code/subtype QName
+          $subtypeq = $q unless defined $constq;
+          $subtypeuri = dis_typeforqnames_to_uri ($subtypeq,
+                                                  use_default_namespace => 1,
+                                                  %opt);
+          $subtype = $State->{Type}->{$subtypeuri};
+          valid_err qq{Exception/warning code/subtype <$subtypeuri> must }.
+                    qq{be defined}, node => $opt{node}
+                  unless defined $subtype->{Name} and
+                         defined $subtype->{ExpandedURI q<dis2pm:type>};
+          if ($subtype->{ExpandedURI q<dis2pm:type>} eq
+                ExpandedURI q<ManakaiDOM:ExceptionOrWarningSubType>) {
+            $const = $subtype->{ExpandedURI q<dis2pm:parentResource>};
+            $cls = $subtype->{ExpandedURI q<dis2pm:grandGrandParentResource>};
+          } elsif ($subtype->{ExpandedURI q<dis2pm:type>} eq
+                     ExpandedURI q<ManakaiDOM:Const>) {
+            $const = $subtype;
+            $subtype = undef;
+            $cls = $const->{ExpandedURI q<dis2pm:grandParentResource>};
+          } else {
+            valid_err qq{Type of <$subtypeuri> must be either }.
+                      q{"ManakaiDOM:Const" or }.
+                      q{"ManakaiDOM:ExceptionOrWarningSubType"},
+                      node => $opt{node};
+          }
+        }
+
+        ## Parameter
+        my %xparam;
+        while ($data =~ s/^\s*($RegQNameChar+)\s*//) {
+          my $pnameuri = dis_qname_to_uri ($1, use_default_namespace => 1, %opt);
+          if (defined $xparam{$pnameuri}) {
+            valid_err qq<Exception parameter <$pnameuri> is already specified>,
+                      node => $opt{node};
+          }
+          if ($data =~ s/^=>\s*'([^']*)'\s*//) {  ## String
+            $xparam{$pnameuri} = $1;
+          } elsif ($data =~ s/^=>\s*\{($RegBlockContent)\}\s*//) {  ## Code
+            $xparam{$pnameuri} = perl_code_literal ($1);
+          } elsif ($data =~ /^,|$/) {  ## Boolean
+            $xparam{$pnameuri} = 1;
+          } else {
+            valid_err qq<<$pnameuri>: Parameter value is expected>,
+                      node => $opt{node};
+          }
+          $data =~ s/^\,\s*// or last;
+        }
+        valid_err qq<"$data": Broken exception parameter specification>,
+                  node => $opt{node} if length $data;
+        for (
+          ExpandedURI q<MDOMX:class>,
+          ExpandedURI q<MDOMX:method>,
+          ExpandedURI q<MDOMX:attr>,
+          ExpandedURI q<MDOMX:on>,
+        ) {
+          $xparam{$_} = $opt{$_} if defined $opt{$_};
+        }
+
+        $r = dispm_perl_throws
+                (%opt, 
+                 class_resource => $cls,
+                 class_for => $opt{For},
+                 type_resource => $const,
+                 subtype_resource => $subtype,
+                 xparam => \%xparam);
       } else {
         valid_err qq<Exception type and name required: "$data">,
           node => $opt{node};
@@ -533,6 +667,7 @@ $result .= perl_statement
                    => perl_literal version_date time;
 
 ## -- Classes
+my %opt;
 for my $pack (values %{$State->{Module}->{$State->{module}}
                              ->{ExpandedURI q<dis2pm:package>}||{}}) {
   next unless defined $pack->{Name};
@@ -572,11 +707,15 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
          ExpandedURI q<ManakaiDOM:ExceptionClass> => 1,
          ExpandedURI q<ManakaiDOM:WarningClass> => 1,
         }->{$pack->{ExpandedURI q<dis2pm:type>}}) {
+      local $opt{ExpandedURI q<MDOMX:class>}
+        = $pack->{ExpandedURI q<dis2pm:packageName>};
       for my $method (values %{$pack->{ExpandedURI q<dis2pm:method>}}) {
         next unless defined $method->{Name};
         next unless length $method->{ExpandedURI q<dis2pm:methodName>};
         if ($method->{ExpandedURI q<dis2pm:type>} eq
             ExpandedURI q<ManakaiDOM:DOMMethod>) {
+          local $opt{ExpandedURI q<MDOMX:method>}
+            = $method->{ExpandedURI q<dis2pm:methodName>};
           my $proto = '$';
           my @param = ('self');
           my $param_norm = '';
@@ -590,7 +729,7 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
             $proto .= '$';
             push @param, $param->{ExpandedURI q<dis2pm:paramName>};
             my $nm = dispm_get_code 
-                        (resource => $State->{Type}
+                        (%opt, resource => $State->{Type}
                               ->{$param->{ExpandedURI q<d:actualType>}},
                          ExpandedURI q<dis2pm:DefKeyName>
                              => ExpandedURI q<ManakaiDOM:inputNormalizer>,
@@ -602,7 +741,8 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
             }
           }
           my $code = dispm_get_code
-                       (resource => $method->{ExpandedURI q<dis2pm:return>},
+                       (%opt, 
+                        resource => $method->{ExpandedURI q<dis2pm:return>},
                         For => $for);
           if (defined $code) {
             my $my = perl_statement ('my ('.join (", ", map {"\$$_"} @param).
@@ -611,7 +751,7 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
                             ? $method->{ExpandedURI q<dis2pm:return>} : undef;
             if ($return->{ExpandedURI q<d:actualType>} ? 1 : 0) {
               my $default = dispm_get_value
-                           (resource => $return,
+                           (%opt, resource => $return,
                             ExpandedURI q<dis2pm:ValueKeyName>
                                 => ExpandedURI q<d:DefaultValue>,
                             ExpandedURI q<dis2pm:useDefaultValue> => 1,
@@ -650,6 +790,8 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
                         code => $code, prototype => $proto);
         } elsif ($method->{ExpandedURI q<dis2pm:type>} eq
                  ExpandedURI q<ManakaiDOM:DOMAttribute>) {
+          local $opt{ExpandedURI q<MDOMX:attr>}
+            = $method->{ExpandedURI q<dis2pm:methodName>};
           my $getter = $method->{ExpandedURI q<dis2pm:getter>};
           valid_err qq{Getter for attribute "$method->{Name}" must be }.
                     q{defined}, node => $method->{src} unless $getter;
@@ -661,10 +803,11 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
                                      $for, node => $method->{src})) {
             $for1 = ExpandedURI q<ManakaiDOM:ManakaiDOMLatest>;
           }
+          local $opt{ExpandedURI q<MDOMX:on>} = 'get';
           my $get_code = dispm_get_code (resource => $getter, For => $for);
           if (defined $get_code) {
             my $default = dispm_get_value
-                           (resource => $getter,
+                           (%opt, resource => $getter,
                             ExpandedURI q<dis2pm:ValueKeyName>
                                 => ExpandedURI q<d:DefaultValue>,
                             ExpandedURI q<dis2pm:useDefaultValue> => 1,
@@ -691,10 +834,12 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
                         };
           }
           if ($setter) {
-            my $set_code = dispm_get_code (resource => $setter, For => $for);
+            local $opt{ExpandedURI q<MDOMX:on>} = 'set';
+            my $set_code = dispm_get_code
+                              (%opt, resource => $setter, For => $for);
             if (defined $set_code) {
               my $nm = dispm_get_code 
-                        (resource => $State->{Type}
+                        (%opt, resource => $State->{Type}
                               ->{$setter->{ExpandedURI q<d:actualType>}},
                          ExpandedURI q<dis2pm:DefKeyName>
                              => ExpandedURI q<ManakaiDOM:inputNormalizer>,
@@ -706,7 +851,7 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
                 $nm = '';
               }
               my $default = dispm_get_value
-                           (resource => $setter,
+                           (%opt, resource => $setter,
                             ExpandedURI q<dis2pm:ValueKeyName>
                                 => ExpandedURI q<d:DefaultValue>,
                             ExpandedURI q<dis2pm:useDefaultValue> => 1,

@@ -15,7 +15,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/11/26 10:55:11 $
+      $Date: 2004/12/08 07:36:41 $
     @@ContentType:
       dis:Date.RCS
   
@@ -400,6 +400,23 @@ PropDef:
     rdfs:Resource
   @dataType:
     dis:TFQNames
+
+PropDef:
+  @QName:
+    dis:aliasChild
+  @Description:
+    @@lang:en
+    @@@:
+      A <QUOTE:dis> processing instruction whether the subject resource 
+      should be interpreted as a resource when the subject resource 
+      is described as an <Q::dis:aliasFor> another resource.  Any 
+      <Q::dis:ResourceDef> that is a child of alias <Q::dis:ResourceDef> 
+      is not processed when a <QUOTE::dis> file 
+      is compiled, unless <Q::dis:aliasChild> is <CODE::1>. 
+  @rdfs:domain:
+    dis:ResourceDef
+  @dataType: 
+    dis:boolean
 
 ## --- Datatype
 

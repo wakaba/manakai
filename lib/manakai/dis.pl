@@ -850,6 +850,7 @@ sub dis_load_module_file (%) {
       next unless dis_node_for_match ($_, $opt{For}, %opt);
       my $et = dis_element_type_to_uri ($_->local_name, %opt, node => $_);
       if ($et eq ExpandedURI q<d:ResourceDef>) {
+        local $State->{current_class_container};
         dis_load_classdef_element ($_, %opt);
       } elsif ({
                  ExpandedURI q<d:ElementTypeBinding> => 1,
@@ -1141,6 +1142,8 @@ sub dis_load_classdef_element ($;%) {
       for (keys %{$State->{Type}->{$dfuri}->{aliasURI}||{}}, $dfuri, $canon) {
         $cls->{aliasURI}->{$_} = 1;
         $State->{Type}->{$_} = $cls;
+        $State->{Resource}->{$_} = $cls
+          unless defined $State->{current_class_container};
       }
       $State->{def_required}->{Class}->{$dfuri} = -1;
       $State->{def_required}->{Class}->{$canon} ||= 1;
@@ -1149,6 +1152,8 @@ sub dis_load_classdef_element ($;%) {
     if ($State->{current_class_container}) {
       $State->{current_class_container}->{Resource}->{$dfuri} = $cls;
       ## Note: Alias to alias might make confusion.
+    } else {
+      $State->{Resource}->{$dfuri} = $cls;
     }
     $State->{def_required}->{Class}->{$dfuri} = -1;
     my $alluri = dis_typeforuris_to_uri ($uri, ExpandedURI q<ManakaiDOM:all>,
@@ -1168,6 +1173,7 @@ sub dis_load_classdef_element ($;%) {
         if (defined $cls->{Name}) {
           valid_err (qq<Class <$dfuri> is already defined>, node => $node);
         }
+        $State->{Resource}->{$dfuri} = $cls;
         $cls->{Name} = $lname;
         $cls->{NameURI} = $uri;
         $cls->{URI} = $dfuri;
@@ -1182,6 +1188,7 @@ sub dis_load_classdef_element ($;%) {
         for (keys %{$State->{Type}->{$dfuri}->{aliasURI}||{}}, $dfuri, $canon) {
           $cls->{aliasURI}->{$_} = 1;
           $State->{Type}->{$_} = $cls;
+          $State->{Resource}->{$_} = $cls;
         }
         $State->{def_required}->{Class}->{$dfuri} ||= -1;
         $State->{def_required}->{Class}->{$canon} ||= 1;
@@ -1220,6 +1227,7 @@ sub dis_load_classdef_element ($;%) {
       $cls = ($State->{current_class_container}->{Resource}->{$dfuri} ||= {});
     } else {
       $cls = ($State->{Type}->{$dfuri} ||= {});
+      $State->{Resource}->{$dfuri} = $cls;
     }
     if (defined $cls->{Name}) {
       impl_err (q<Anonymous class <$dfuri> already defined>, node => $node);
@@ -1262,9 +1270,13 @@ sub dis_load_classdef_element ($;%) {
         $State->{def_required}->{Class}->{$uri} ||= $_;
       }
     } elsif ($ln eq ExpandedURI q<d:ResourceDef> and not $is_multiresource) {
-     #valid_err ("Alias class name cannot be able to have this type of elements",
-     #           node => $_) if $al;
-      unless ($al) {
+      my $p = $al ? 0 : 1;
+      if ($al) {
+        my $ac = dis_get_attr_node (%opt, parent => $_, 
+                                    name => 'aliasChild');
+        $p = 1 if $ac and $ac->value;
+      }
+      if ($p) {
         local $State->{current_class_container} = $cls;
         local $State->{multiple_resource_parent} = {};
         dis_load_classdef_element ($_, %opt);
@@ -1378,7 +1390,7 @@ sub dis_perl_init ($;%) {
     $mod->{ExpandedURI q<dis2pm:done>} = 1;
   }  
 
-  for my $res (values %{$State->{Type}}) {
+  for my $res (values %{$State->{Resource}}) {
     next if $res->{ExpandedURI q<dis2pm:done>};
     next unless defined $res->{Name};
     local $State->{ExpandedURI q<dis2pm:parentResource>}
@@ -1413,7 +1425,8 @@ sub dis_perl_init_classdef ($;%) {
          (defined $mod->{ExpandedURI q<dis2pm:packageName>} ?
            (ExpandedURI q<ManakaiDOM:Class>,
             ExpandedURI q<ManakaiDOM:ExceptionClass>,
-            ExpandedURI q<ManakaiDOM:WarningClass>) : ()),
+            ExpandedURI q<ManakaiDOM:WarningClass>,
+            ExpandedURI q<ManakaiDOM:ExceptionOrWarningSubType>) : ()),
          (defined $mod->{ExpandedURI q<dis2pm:ifPackagePrefix>} ?
            (ExpandedURI q<ManakaiDOM:IF>,
             ExpandedURI q<ManakaiDOM:ExceptionIF>) : ()),
@@ -1642,7 +1655,10 @@ sub dis_perl_init_classdef ($;%) {
     if (defined $name) {
       if (defined $State->{ExpandedURI q<dis2pm:parentResource>}
                         ->{ExpandedURI q<dis2pm:constGroup>}->{$name}->{Name}) {
-        valid_err (qq<Constant group "$name" already defined>,
+        valid_err (qq<Constant group "$name" already defined >.
+                   qq{[<$State->{ExpandedURI q<dis2pm:parentResource>
+                          }->{ExpandedURI q<dis2pm:constGroup>}->{$name
+                          }->{URI}>, <$res->{URI}>]},
                    node => $res->{src});
       }
     } else {
@@ -1651,6 +1667,11 @@ sub dis_perl_init_classdef ($;%) {
                            ->{ExpandedURI q<dis2pm:constGroup>}->{$i}->{Name};
       $name = $i;
     }
+    $res->{ExpandedURI q<dis2pm:parentResource>}
+      = $State->{ExpandedURI q<dis2pm:parentResource>};
+    $res->{ExpandedURI q<dis2pm:grandParentResource>}
+        ->{ExpandedURI q<dis2pm:xConstGroup>}
+        ->{$res} = $res;
     $State->{ExpandedURI q<dis2pm:parentResource>}
           ->{ExpandedURI q<dis2pm:constGroup>}->{$name} = $res;
   } elsif ({ExpandedURI q<ManakaiDOM:Const> => 1}->{$type}) {
@@ -1688,6 +1709,18 @@ sub dis_perl_init_classdef ($;%) {
       valid_err (qq<Constant value "$name" already defined>,
                  node => $res->{src});
     }
+    $res->{ExpandedURI q<dis2pm:parentResource>}
+      = $State->{ExpandedURI q<dis2pm:parentResource>};
+    $res->{ExpandedURI q<dis2pm:grandParentResource>}
+      = $State->{ExpandedURI q<dis2pm:parentResource>}
+              ->{ExpandedURI q<dis2pm:parentResource>};
+    $res->{ExpandedURI q<dis2pm:grandParentResource>}
+        ->{ExpandedURI q<dis2pm:xConstGroup>}
+        ->{$res->{ExpandedURI q<dis2pm:parentResource>}}
+          = $res->{ExpandedURI q<dis2pm:parentResource>};
+    $res->{ExpandedURI q<dis2pm:grandParentResource>}
+        ->{ExpandedURI q<dis2pm:xConst>}
+        ->{$res} = $res;
     $State->{ExpandedURI q<dis2pm:parentResource>}
           ->{ExpandedURI q<dis2pm:const>}->{$name} = $res;
   } elsif ({ExpandedURI q<ManakaiDOM:InCase> => 1}->{$type}) {
@@ -1728,6 +1761,59 @@ sub dis_perl_init_classdef ($;%) {
     ## Register the InCase
     push @{$State->{ExpandedURI q<dis2pm:parentResource>}
                  ->{ExpandedURI q<dis2pm:inCase>}||=[]}, $res;
+  } elsif ({ExpandedURI q<ManakaiDOM:ExceptionOrWarningSubType> => 1}->{$type}) {
+    ## Subtype name
+    my $name = $res->{Name};
+    $res->{ExpandedURI q<dis2pm:subTypeName>} = $name if defined $name;
+
+    ## Parent exception class/type
+    $res->{ExpandedURI q<dis2pm:parentResource>}
+      = $State->{ExpandedURI q<dis2pm:parentResource>};
+    $res->{ExpandedURI q<dis2pm:grandParentResource>}
+      = $res->{ExpandedURI q<dis2pm:parentResource>}
+              ->{ExpandedURI q<dis2pm:parentResource>};
+    $res->{ExpandedURI q<dis2pm:grandGrandParentResource>}
+      = $res->{ExpandedURI q<dis2pm:grandParentResource>}
+              ->{ExpandedURI q<dis2pm:parentResource>};
+    {
+      no warnings 'uninitialized';
+      valid_err qq{Parent of an exception/warning subtype <$res->{URI}> }.
+                qq{[<$res->{ExpandedURI q<dis2pm:parentResource>
+                         }->{ExpandedURI q<dis2pm:type>}>] }.
+                qq{must be a "ManakaiDOM:Const"}, node => $res->{src}
+            unless $res->{ExpandedURI q<dis2pm:parentResource>}
+                       ->{ExpandedURI q<dis2pm:type>} eq
+                   ExpandedURI q<ManakaiDOM:Const>;
+      valid_err qq{Grandparent of an exception/warning subtype <$res->{URI}> }.
+                qq{[<$res->{ExpandedURI q<dis2pm:grandParentResource>
+                         }->{ExpandedURI q<dis2pm:type>}>] }.
+                qq{must be a "ManakaiDOM:ConstGroup"}, node => $res->{src}
+            unless $res->{ExpandedURI q<dis2pm:grandParentResource>}
+                       ->{ExpandedURI q<dis2pm:type>} eq
+                   ExpandedURI q<ManakaiDOM:ConstGroup>;
+      valid_err qq{Parent pf grandparent of an exception/warning subtype }.
+                qq{<$res->{URI}> }.
+                qq{[<$res->{ExpandedURI q<dis2pm:grandGrandParentResource>
+                         }->{ExpandedURI q<dis2pm:type>}>] }.
+                qq{must be a "ManakaiDOM:ExceptionClass"}, node => $res->{src}
+            unless $res->{ExpandedURI q<dis2pm:grandGrandParentResource>}
+                       ->{ExpandedURI q<dis2pm:type>} eq
+                   ExpandedURI q<ManakaiDOM:ExceptionClass>;
+    }
+    $res->{ExpandedURI q<dis2pm:grandGrandParentResource>}
+        ->{ExpandedURI q<dis2pm:xConstGroup>}
+        ->{$res->{ExpandedURI q<dis2pm:grandParentResource>}}
+          = $res->{ExpandedURI q<dis2pm:grandParentResource>};
+    $res->{ExpandedURI q<dis2pm:grandGrandParentResource>}
+        ->{ExpandedURI q<dis2pm:xConst>}
+        ->{$res->{ExpandedURI q<dis2pm:parentResource>}}
+          = $res->{ExpandedURI q<dis2pm:parentResource>};
+    $res->{ExpandedURI q<dis2pm:grandGrandParentResource>}
+        ->{ExpandedURI q<dis2pm:xSubType>}
+        ->{$res} = $res;
+
+    $State->{ExpandedURI q<dis2pm:parentResource>}
+          ->{ExpandedURI q<dis2pm:xSubType>}->{$name} = $res;
   } # $type
   
   ## Register the package
@@ -2083,4 +2169,4 @@ sub disdoc_inline2pod ($;%) {
 
 =cut
 
-1; # $Date: 2004/12/05 12:31:44 $
+1; # $Date: 2004/12/08 07:36:41 $

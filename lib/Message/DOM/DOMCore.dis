@@ -74,7 +74,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/12/05 12:31:44 $
+     $Date: 2004/12/08 07:36:40 $
 
   @DefaultFor:
     ManakaiDOM:ManakaiDOMLatest
@@ -420,6 +420,24 @@ ElementTypeBinding:
     @@ForCheck:
       ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
 ElementTypeBinding:
+  @Name: XConstGroup
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:ConstGroup
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+    @@aliasChild:
+      @@@@: 1
+      @@@For:
+        ManakaiDOM:ManakaiDOM
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOMLatest
+      @@@For:
+        !ManakaiDOM:ManakaiDOM1
+ElementTypeBinding:
   @Name: Const
   @ElementType:
     dis:ResourceDef
@@ -428,6 +446,24 @@ ElementTypeBinding:
       ManakaiDOM:Const
     @@ForCheck:
       ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+ElementTypeBinding:
+  @Name: XConst
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: 
+      ManakaiDOM:Const
+    @@ForCheck:
+      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+    @@aliasChild:
+      @@@@: 1
+      @@@For:
+        ManakaiDOM:ManakaiDOM
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOMLatest
+      @@@For:
+        !ManakaiDOM:ManakaiDOM1
 ElementTypeBinding:
   @Name: XParam
   @ElementType:
@@ -446,6 +482,12 @@ ElementTypeBinding:
       ManakaiDOM:ManakaiDOM
     @@ForCheck:
       ManakaiDOM:ForClass
+    @@aliasChild:1
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOMLatest
+      @@@For:
+        !ManakaiDOM:ManakaiDOM1
 
 PropDef:
   @QName: 
@@ -484,7 +526,7 @@ ExceptionDef:
          @@@@lang:en
          @@@@@: The error code from the constant value group ExceptionCode.
 
-  @ConstGroup:
+  @XConstGroup:
      @@QName:
        @@@@: ExceptionCode
        @@@ForCheck:
@@ -499,7 +541,7 @@ ExceptionDef:
      @@Description:
        @@@lang:en
        @@@@: Integers indicating the type of error generated.
-     @@Const:
+     @@XConst:
         @@@Name:  INDEX_SIZE_ERR
         @@@Type:  unsigned-short
         @@@Value:  1
@@ -521,14 +563,14 @@ ExceptionDef:
                 name => {<Q:MDOM_EXCEPTION:param-name>},
                 prefix => { "}, suffix => {"}); is negative, or 
               greater than the allowed value.
-     @@Const:
+     @@XConst:
         @@@Name:  DOMSTRING_SIZE_ERR
         @@@Type:  unsigned-short
         @@@Value:  2
         @@@Description:
           @@@@lang:en
           @@@@@: The specified range of text does not fit into a DOMString.
-     @@Const:
+     @@XConst:
         @@@Name:  HIERARCHY_REQUEST_ERR
         @@@Type:  unsigned-short
         @@@Value:  3
@@ -604,7 +646,7 @@ ExceptionDef:
               @@@@@@lang:en
               @@@@@@@:
                 The name of the parameter the node is specified.
-     @@Const:
+     @@XConst:
         @@@Name:  WRONG_DOCUMENT_ERR
         @@@Type:  unsigned-short
         @@@Value:  4
@@ -613,7 +655,7 @@ ExceptionDef:
           @@@@@:
             A node is used in a different document than the one
             that created it.
-     @@Const:
+     @@XConst:
         @@@Name:  INVALID_CHARACTER_ERR
         @@@Type:  unsigned-short
         @@@Value:  5
@@ -636,14 +678,14 @@ ExceptionDef:
               @@@@@@lang:en
               @@@@@@@: 
                 The <XML:Name> specified.
-     @@Const:
+     @@XConst:
         @@@Name:  NO_DATA_ALLOWED_ERR
         @@@Type:  unsigned-short
         @@@Value:  6
         @@@Description:
           @@@@lang:en
           @@@@@: Data is specified for a node that does not support data.
-     @@Const:
+     @@XConst:
         @@@Name:  NO_MODIFICATION_ALLOWED_ERR
         @@@Type:  unsigned-short
         @@@Value:  7
@@ -691,7 +733,7 @@ ExceptionDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: This node is read-only.
-     @@Const:
+     @@XConst:
         @@@Name:  NOT_FOUND_ERR
         @@@Type:  unsigned-short
         @@@Value:  8
@@ -700,7 +742,7 @@ ExceptionDef:
           @@@@@:
             An attempt is made to refer a node in a context where 
             it does not exist.
-     @@Const:
+     @@XConst:
         @@@Name:  NOT_SUPPORTED_ERR
         @@@Type:  unsigned-short
         @@@Value:  9
@@ -893,7 +935,7 @@ ExceptionDef:
             @@@@@@:
               The requested mode "%p (name => {<Q:DOMLS:mode>});" 
               is not supported
-     @@Const:
+     @@XConst:
         @@@Name:  INUSE_ATTRIBUTE_ERR
         @@@Type:  unsigned-short
         @@@Value:  10
@@ -902,7 +944,7 @@ ExceptionDef:
           @@@@@: 
             An attempt is made to add an attribute that is already inuse 
             elsewhere.
-     @@Const:
+     @@XConst:
         @@@Name:  INVALID_STATE_ERR
         @@@Type:  unsigned-short
         @@@Value:  11
@@ -919,7 +961,7 @@ ExceptionDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: The parser is busy.
-     @@Const:
+     @@XConst:
         @@@Name:  SYNTAX_ERR
         @@@Type:  unsigned-short
         @@@Value:  12
@@ -928,7 +970,7 @@ ExceptionDef:
         @@@Description:
           @@@@lang:en
           @@@@@: An invalid or illegal string is specified.
-     @@Const:
+     @@XConst:
         @@@Name:  INVALID_MODIFICATION_ERR
         @@@Type:  unsigned-short
         @@@Value:  13
@@ -937,7 +979,7 @@ ExceptionDef:
         @@@Description:
           @@@@lang:en
           @@@@@: An attempt is made to modify the type of underlying object.
-     @@Const:
+     @@XConst:
         @@@Name:  NAMESPACE_ERR
         @@@Type:  unsigned-short
         @@@Value:  14
@@ -1125,7 +1167,7 @@ ExceptionDef:
            @@@@@@:
              The qualified name is <XML:xmlns:xmlns>.  It is prohibited 
              by the XML Namespace Specifications.
-     @@Const:
+     @@XConst:
         @@@Name:  INVALID_ACCESS_ERR
         @@@Type:  unsigned-short
         @@@Value:  15
@@ -1136,7 +1178,7 @@ ExceptionDef:
           @@@@@:
             A parameter or an operation is not supported by the 
             underlying object.
-     @@Const:
+     @@XConst:
         @@@Name:  VALIDATION_ERR
         @@@Type:  unsigned-short
         @@@Value:  16
@@ -1148,7 +1190,7 @@ ExceptionDef:
             An attempt is made to modify an object where the modification 
             would make the Node invalid with respect to partial validity.
 
-     @@Const:
+     @@XConst:
         @@@Name:  TYPE_MISMATCH_ERR
         @@@Type:  unsigned-short
         @@@Value:  17
