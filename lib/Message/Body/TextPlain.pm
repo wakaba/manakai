@@ -8,7 +8,7 @@ Message::Body::TextPlain --- Perl Module for Internet Media Type "text/plain"
 package Message::Body::TextPlain;
 use strict;
 use vars qw(%DEFAULT @ISA $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Body::Text;
 push @ISA, qw(Message::Body::Text);
@@ -148,11 +148,11 @@ sub stringify ($;%) {
       }
       $ct->replace (charset => $e{charset});
     } elsif (ref $ct) {
-      $ct->replace (charset => $self->{option}->{body_default_charset});
+      $ct->replace (Message::MIME::Charset::name_minimumize ($option{body_default_charset}, $e{value}));
     } elsif ($option{fill_ct}) {
       $ct = $self->{header}->field ('content-type');
       $ct->value ($option{media_type}.'/'.$option{media_subtype});
-      $ct->replace (Message::MIME::Charset::name_minimumize ($option{body_default_charset} => $e{value}));
+      $ct->replace (Message::MIME::Charset::name_minimumize ($option{body_default_charset}, $e{value}));
     }
   }
   $e{value};
@@ -188,7 +188,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/16 10:44:08 $
+$Date: 2002/06/23 12:04:49 $
 
 =cut
 
