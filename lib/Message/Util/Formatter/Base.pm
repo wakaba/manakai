@@ -14,7 +14,7 @@ This module is part of manakai.
 
 package Message::Util::Formatter::Base;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 our %DefaultRules = (
   -bare_text => {
@@ -49,7 +49,7 @@ sub new ($;%) {
 
 {
 our $__QuoteBlockContent;
-$__QuoteBlockContent = qr/[^{}]*(?:[^{}]|{(??{$__QuoteBlockContent})})*/;
+$__QuoteBlockContent = qr/[^{}]*(?>[^{}]+|{(??{$__QuoteBlockContent})})*/;
 my $WordM = qr(
                           ([\w-]+)                    ## Bare
                        | {($__QuoteBlockContent)}     ## {Quoted}
@@ -60,13 +60,12 @@ sub replace_option () {+{}}
 
 sub replace ($$;%) {
   my ($self, $format) = (shift, shift);
-  my (%opt) = (@_, %{$self->replace_option});
+  my (%opt) = (%{$self->replace_option}, @_);
   my $defrule = $self->{rule}->($self, '-default');
   my $textrule = $self->{rule}->($self, '-bare_text');
-  my $undefrule = $self->{rule}->($self, '-undef');
   my $entirerule = $self->{rule}->($self, '-entire');
   local $opt{param}->{-result};
-  ($entirerule->{pre}||$defrule->{pre})->($self, '-entire',
+  ($entirerule->{pre}||=$defrule->{pre})->($self, '-entire',
                                           $opt{param}, $opt{param},
                                           option => \%opt);
   pos ($format) = 0;
@@ -74,33 +73,34 @@ sub replace ($$;%) {
     if ($format =~ /\G%([\w-]+)\s*/gc) { # ":" is reserved for QName
       my $name = $1;
       $name =~ tr/-/_/;
-      my $rule = $self->{rule}->($self, $name) || $undefrule;
+      my $rule = $self->{rule}->($self, $name)
+              || $self->{rule}->($self, '-undef');
       my %attr;
-      ($rule->{pre}||$defrule->{pre})->($self, $name, \%attr, $opt{param},
-                                        option => \%opt);
+      ($rule->{pre}||=$defrule->{pre})->($self, $name, \%attr, $opt{param},
+                                         option => \%opt);
       $format =~ /\G\s+/gc;
       
       if ($format =~ /\G\(\s*/gc) {
         while (1) {
-          if ($format =~ /\G$WordM\s*/gc) {
+          if ($format =~ /\G$WordM\s*/gco) {
             my $attr_name = $+;
             $attr_name =~ s/\\(.)/$1/gs if defined $3; # "quoted"
             $attr_name =~ tr/-/_/;
             my $nflag;
             $nflag = $1 if $format =~ /\G(\w+)\s*/gc;
-            if ($format =~ /\G=>\s*$WordM\s*/gc) {
+            if ($format =~ /\G=>\s*$WordM\s*/gco) {
               my $attr_val = $+;
               $attr_val =~ s/\\(.)/$1/gs if defined $3; # "quoted"
               my $vflag;
               $vflag = $1 if $format =~ /\G(\w+)\s*/gc;
-              ($rule->{attr}||$defrule->{attr})->($self, $name,
+              ($rule->{attr}||=$defrule->{attr})->($self, $name,
                                                   \%attr, $opt{param},
                                                   $attr_name => $attr_val,
                                                   -name_flag => $nflag,
                                                   -value_flag => $vflag,
                                                   option => \%opt);
             } else {
-              ($rule->{attr}||$defrule->{attr})->($self, $name,
+              ($rule->{attr}||=$defrule->{attr})->($self, $name,
                                                   \%attr, $opt{param},
                                                   -boolean => $attr_name,
                                                   -name_flag => $nflag,
@@ -114,52 +114,56 @@ sub replace ($$;%) {
           } else {
             throw Message::Util::Formatter::Base::error
               type => 'ATTR_SEPARATOR_NOT_FOUND',
-              -context_before => (pos ($format) > 10 ?
-                                  substr ($format, pos ($format) - 10, 10):
+              -context_before => (pos ($format) > 20 ?
+                                  substr ($format, pos ($format) - 20, 20):
                                   substr ($format, 0, pos ($format))),
-              -context_after => substr ($format, pos ($format), 10);
+              -context_after => substr ($format, pos ($format), 20),
+              -formatter => $self,
+              -option => \%opt;
           }
         } # Attributes
       } # Attribute specification list
       if ($format =~ /\G;/gc) {
-        ($rule->{post}||$defrule->{post})->($self, $name,
+        ($rule->{post}||=$defrule->{post})->($self, $name,
                                             \%attr,
                                             $opt{param},
                                             option => \%opt);
       } else {
         throw Message::Util::Formatter::Base::error
           type => 'SEMICOLON_NOT_FOUND',
-          -context_before => (pos ($format) > 10 ?
-                              substr ($format, pos ($format) - 10, 10):
+          -context_before => (pos ($format) > 20 ?
+                              substr ($format, pos ($format) - 20, 20):
                               substr ($format, 0, pos ($format))),
-          -context_after => substr ($format, pos ($format), 10);
+          -context_after => substr ($format, pos ($format), 20),
+          -formatter => $self,
+          -option => \%opt;
       }
-      ($entirerule->{attr}||$defrule->{attr})->($self, '-entire',
+      ($entirerule->{attr}||=$defrule->{attr})->($self, '-entire',
                                                 $opt{param}, $opt{param},
                                                 $name => \%attr,
                                                 option => \%opt);
-    } elsif ($format =~ /\G[^%]+(?:%[^\w-]|[^%]+)*/gc) {
+    } elsif ($format =~ /\G(?>[^%]+|%(?![\w-]))+/gc) {
       my %attr;
-      ($textrule->{pre}||$defrule->{pre})->($self, '-bare_text',
+      ($textrule->{pre}||=$defrule->{pre})->($self, '-bare_text',
                                             \%attr, $opt{param},
                                             option => \%opt);
-      ($textrule->{attr}||$defrule->{attr})->($self, '-bare_text',
+      ($textrule->{attr}||=$defrule->{attr})->($self, '-bare_text',
                                               \%attr, $opt{param},
                        -bare_text => substr ($format, $-[0], $+[0]-$-[0]),
                                               option => \%opt);
-      ($textrule->{post}||$defrule->{post})->($self, '-bare_text',
+      ($textrule->{post}||=$defrule->{post})->($self, '-bare_text',
                                               \%attr, $opt{param},
                                               option => \%opt);
-      ($entirerule->{attr}||$defrule->{attr})->($self, '-entire',
+      ($entirerule->{attr}||=$defrule->{attr})->($self, '-entire',
                                                 $opt{param}, $opt{param},
                                                 -bare_text => \%attr,
                                                 option => \%opt);
     }
   }
-  ($entirerule->{post}||$defrule->{post})->($self, '-entire',
+  ($entirerule->{post}||=$defrule->{post})->($self, '-entire',
                                             $opt{param}, $opt{param},
                                             option => \%opt);
-  $opt{param}->{-result};
+  return $opt{param}->{-result} if defined wantarray;
 }
 }
 
@@ -194,4 +198,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/11/16 11:44:16 $
+1; # $Date: 2003/12/01 07:50:58 $
