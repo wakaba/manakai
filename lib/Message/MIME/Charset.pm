@@ -1,11 +1,18 @@
 
 =head1 NAME
 
-Message::MIME::Charset Perl module
+Message::MIME::Charset --- Message-pm: Coded character sets support
 
 =head1 DESCRIPTION
 
-Perl module for MIME charset.
+This module provides some abstracted functions to handle string
+in various character codes with (as-far-as-possiblly-) coding system
+independent implemention.
+
+Note that this module is not only used to implement MIME charset mechanism
+but also used to support non-MIME schemes of character encoding.
+
+This module is part of Message::* Perl Modules.
 
 =cut
 
@@ -17,7 +24,7 @@ Perl module for MIME charset.
 package Message::MIME::Charset;
 use strict;
 use vars qw(%CHARSET %MSNAME2IANANAME %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 &_builtin_charset;
 sub _builtin_charset () {
@@ -42,6 +49,11 @@ $CHARSET{'us-ascii'} = {
 	
 	mime_text	=> 1,
 	cte_7bit_preferred	=> 'quoted-printable',
+	
+	divide_string	=> \&_divide_string_1,
+	cte_header_preferred	=> 'q',
+	
+	is_representable_in	=> sub { $_[1] =~ /[^\x00-\x7F]/ ? 0 : 1 },
 };
 
 $CHARSET{'iso-2022-int-1'} = {
@@ -51,6 +63,8 @@ $CHARSET{'iso-2022-int-1'} = {
 	decoder	=> sub { $_[1] },
 	
 	mime_text	=> 1,
+	cte_7bit_preferred	=> 'quoted-printable',
+	cte_header_preferred	=> 'q',
 };
 
 $CHARSET{'unknown-8bit'} = {
@@ -61,6 +75,8 @@ $CHARSET{'unknown-8bit'} = {
 	
 	mime_text	=> 1,
 	cte_7bit_preferred	=> 'base64',
+	
+	divide_string	=> \&_divide_string_1,
 };
 
 $CHARSET{'x-unknown'} = {
@@ -71,6 +87,8 @@ $CHARSET{'x-unknown'} = {
 	
 	mime_text	=> 0,
 	cte_7bit_preferred	=> 'base64',
+	
+	divide_string	=> \&_divide_string_1,
 };
 
 $CHARSET{'*undef'} = {
@@ -81,6 +99,24 @@ $CHARSET{'*undef'} = {
 	
 	mime_text	=> 0,
 	cte_7bit_preferred	=> 'base64',
+};
+
+$CHARSET{'*internal'} = {
+	preferred_name	=> '',
+	
+	#encoder	=> sub { $_[1] },
+	#decoder	=> sub { $_[1] },
+	
+	mime_text	=> 0,
+	cte_7bit_preferred	=> 'base64',
+};
+
+$CHARSET{'*default_value'} = {	## Dummy charset for default property value
+	perl_name	=> undef,
+	preferred_name	=> undef,
+	mime_text	=> 0,
+	cte_7bit_preferred	=> 'base64',
+	cte_header_preferred	=> '*auto',
 };
 
 }	# /builtin_charset
@@ -102,8 +138,8 @@ my %_MINIMUMIZER = (
 	'iso-2022-kr'	=> \&_name_8bit_iso2022,
 	'iso-8859-1'	=> \&_name_8bit_iso2022,
 	jis_x0201	=> \&_name_shift_jis,
-	junet	=> \&_name_8bit_iso2022,
-	'x-junet8'	=> \&_name_net_ascii_8bit,
+	'x-iso-2022-7bit'	=> \&_name_8bit_iso2022,
+	'x-iso-2022-7bit-utf-8'	=> \&_name_net_ascii_8bit,
 	shift_jis	=> \&_name_shift_jis,
 	shift_jisx0213	=> \&_name_shift_jis,
 	'shift_jisx0213-plane1'	=> \&_name_shift_jis,
@@ -122,7 +158,7 @@ for (qw(
 	hp-roman8
 	hz-gb-2312
 	ibm437
-	junet	x-junet8	x-iso-2022
+	x-iso-2022-7bit	x-iso-2022-7bit-utf-8	x-iso-2022
 	iso-2022-cn	iso-2022-cn-ext
 	iso-2022-int-1
 	iso-2022-jp	iso-2022-jp-1	iso-2022-jp-2	iso-2022-jp-3
@@ -219,17 +255,17 @@ sub name_normalize ($) {
   $name;
 }
 
-sub name_minimumize ($$) {
+sub name_minimumize ($$;$) {
   require Message::MIME::Charset::MinName;
-  my ($charset, $s) = (lc shift, shift);
+  my ($charset, $s, $option) = (lc shift, @_);
   if (ref $CHARSET{$charset}->{name_minimumizer} eq 'CODE') {
     return &{$CHARSET{$charset}->{name_minimumizer}} ($charset, $s);
   } elsif (ref $Message::MIME::Charset::MinName::MIN{$charset}) {
-    return &{$Message::MIME::Charset::MinName::MIN{$charset}} ($charset, $s);
+    return &{$Message::MIME::Charset::MinName::MIN{$charset}} ($charset, $s, $option);
   } elsif (ref $_MINIMUMIZER{$charset}) {
-    return &{$_MINIMUMIZER{$charset}} ($charset, $s);
+    return &{$_MINIMUMIZER{$charset}} ($charset, $s, $option);
   } elsif (ref $CHARSET{'*undef'}->{name_minimumizer} eq 'CODE') {
-    return &{$CHARSET{'*undef'}->{name_minimumizer}} ($charset, $s);
+    return &{$CHARSET{'*undef'}->{name_minimumizer}} ($charset, $s, $option);
   }
   (charset => $charset);
 }
@@ -293,7 +329,7 @@ sub _name_7bit_iso2022 ($$) {shift;
                    |\x1B\x24\x29[^C]
                    |\x1B\x28[^BJ]
                    |\x1B\x2D[^AF]/x;
-    return (charset => 'junet')
+    return (charset => 'x-iso-2022-7bit')
       unless $s =~ /\x1B[^\x24\x28\x2C]
                    |\x1B\x24[^\x28\x2C\x40-\x42]
                    |\x1B\x24[\x28\x2C][^\x20-\x7E]
@@ -311,9 +347,9 @@ sub _name_net_ascii_8bit ($) {
   my $name = shift; my $s = shift;
   return (charset => 'us-ascii') unless $s =~ /[\x1B\x0E\x0F\x80-\xFF]/;
   if ($s =~ /[\x80-\xFF]/) {
-    if ($s =~ /[\xC0-\xFD][\x80-\xBF]*[\x80-\x8F]/) {
+    if ($s =~ /[\xC0-\xFD][\x80-\xBF]*[\x80-\xBF]/) {
       if ($s =~ /\x1B/) {
-        return (charset => 'x-junet8');	## junet + UTF-8
+        return (charset => 'x-iso-2022-7bit');	## iso-2022-7bit + UTF-8
       } else {
         return (charset => 'utf-8');
       }
@@ -463,6 +499,7 @@ sub _name_shift_jis ($$) {
   }
 }
 
+eval q{require Encode};
 sub _utf8_on ($) {
   Encode::_utf8_on ($_[0]) if $Encode::VERSION;
 }
@@ -484,9 +521,71 @@ sub is_mime_text ($) {
   0;
 }
 
+sub divide_string ($$;%) {
+  my ($charset, $string, %option) = @_;
+  $option{-max} ||= 70;
+  if (ref $CHARSET{$charset}->{divide_string}) {
+    return &{$CHARSET{$charset}->{divide_string}} ($charset, $string, \%option);
+  } else {
+    my @r;	## 12 = 3*4. Most of stateless codes are 1-4 octets per char.
+    my $l = int ($option{-max} / 12) * 12;
+    for my $i (0..int (length ($string) / $l)) {
+      push @r, substr ($string, $l*$i, $l);
+    }
+    return \@r;
+  }
+}
+sub _divide_string_1 ($%) {
+  my (undef, $string, $option) = @_;
+  my @r;
+  for my $i (0..int (length ($string) / $option->{-max})) {
+    push @r, substr ($string, $option->{-max}*$i, $option->{-max});
+  }
+  return \@r;
+}
+
+sub get_property ($$) {
+  my ($property, $charset) = @_;
+  if (defined $CHARSET{$charset}->{$property}) {
+    return $CHARSET{$charset}->{$property};
+  } else {
+    return $CHARSET{'*default_value'}->{$property};
+  }
+}
+
+=head1 {charset => $charset,...} = Message::MIME::Charset::get_interchange_charset ($charset, $string, {%option})
+
+Get charset name (for IANA name context) for information interchange.
+
+=cut
+
+sub get_interchange_charset ($$;$) {
+  my ($charset, $string, $option) = @_;
+  
+  {charset => $charset};
+}
+
+=head1 1/0 = is_representable_in ($charset, $string, {%option})
+
+Return whether $string (encoded in *internal charset) is able to be
+represented in the $charset.
+
+Options: Currently no option argument is available.
+
+=cut
+
+sub is_representable_in ($$;$) {
+  my ($charset, $string, $option) = @_;
+  if (ref $CHARSET{$charset}->{is_representable_in}) {
+    return &{$CHARSET{$charset}->{is_representable_in}} (@_);
+  } else {
+    return 0;
+  }
+}
+
 =head1 LICENSE
 
-Copyright 2002 wakaba E<lt>w@suika.fam.cxE<gt>.
+Copyright 2002 Wakaba <w@suika.fam.cx>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -503,11 +602,6 @@ along with this program; see the file COPYING.  If not, write to
 the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.
 
-=head1 CHANGE
-
-See F<ChangeLog>.
-$Date: 2002/08/18 06:22:36 $
-
 =cut
 
-1;
+1; # $Date: 2002/12/28 09:07:05 $

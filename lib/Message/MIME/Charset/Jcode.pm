@@ -67,7 +67,7 @@ Message::MIME::Charset::Encode.
 package Message::MIME::Charset::Jcode;
 use strict;
 use vars qw(%CODE $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::MIME::Charset;
 
@@ -400,6 +400,7 @@ sub import ($;%) {
     ## Defines common alias names
     Message::MIME::Charset::make_charset (jis => alias_of => 'iso-2022-jp');
     Message::MIME::Charset::make_charset (junet => alias_of => 'iso-2022-jp');
+    Message::MIME::Charset::make_charset ('x-iso-2022-7bit' => alias_of => 'iso-2022-jp');
     Message::MIME::Charset::make_charset ('junet-code' => alias_of => 'iso-2022-jp');
     Message::MIME::Charset::make_charset ('x-iso2022jp-cp932' => alias_of => 'iso-2022-jp');	## pseudo ISO-2022-JP of Microsoft CP932
     Message::MIME::Charset::make_charset ('iso-2022-jp-1' => alias_of => 'iso-2022-jp');
@@ -428,7 +429,7 @@ sub import ($;%) {
 }
 
 sub unimport ($) {
-  for (qw/euc euc-jisx0213 euc-jisx0213-plane1 euc-jp euc_jp iso-2022-jp iso-2022-jp-1 iso-2022-jp-3 iso-2022-jp-3-plane1 iso-10646-ucs-2 iso-10646-ucs-4 jis jis_x0201 junet junet-code shift-jis shift_jis shift-jisx0213 shift_jisx0213 shift_jisx0213-plane1 sjis ucs-2 ucs-2be ucs-2le ucs-4 ucs-4be ucs-4le utf-8 utf-16 utf-16be utf-16le utf-32 utf-32be utf-32le x0201 x-euc x-euc-jisx0213 x-euc-jisx0213-packed x-euc-jisx0213-plane1 x-euc-jp x-iso-2022-jp-3 x-shift-jisx0213 x-shift_jisx0213 x-sjis/) {
+  for (qw/euc euc-jisx0213 euc-jisx0213-plane1 euc-jp euc_jp iso-2022-jp iso-2022-jp-1 iso-2022-jp-3 iso-2022-jp-3-plane1 iso-10646-ucs-2 iso-10646-ucs-4 jis jis_x0201 junet junet-code shift-jis shift_jis shift-jisx0213 shift_jisx0213 shift_jisx0213-plane1 sjis ucs-2 ucs-2be ucs-2le ucs-4 ucs-4be ucs-4le utf-8 utf-16 utf-16be utf-16le utf-32 utf-32be utf-32le x0201 x-euc x-euc-jisx0213 x-euc-jisx0213-packed x-euc-jisx0213-plane1 x-euc-jp x-iso-2022-7bit x-iso-2022-jp-3 x-shift-jisx0213 x-shift_jisx0213 x-sjis/) {
     delete $Message::MIME::Charset::CHARSET{$_};
   }
   Message::MIME::Charset::make_charset ('*default' =>
@@ -516,7 +517,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/09/10 23:40:21 $
+$Date: 2002/12/28 09:07:05 $
 
 =cut
 

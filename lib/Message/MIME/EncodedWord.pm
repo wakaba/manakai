@@ -14,7 +14,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%ENCODER %DECODER %OPTION %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::MIME::Charset;
 
 $REG{WSP} = qr/[\x09\x20]/;
@@ -84,9 +84,15 @@ Shold be:
 %DECODER = (
   '*DEFAULT'	=> sub { $_[1] },
   '7'	=> sub { $_[1] },
+  '8'	=> sub { $_[1] },
   b	=> sub {require MIME::Base64; MIME::Base64::decode ($_[1])},
   q	=> sub {my $s = $_[1]; $s =~ tr/_/\x20/; 
     $s=~ s/=([0-9A-Fa-f]{2})/pack("C", hex($1))/ge; $s},
+);
+
+%ENCODER = (
+  b	=> sub {require MIME::Base64; my $b = MIME::Base64::encode ($_[1]); $b =~ tr/\x00-\x20//d; ($b, {-encoded => 1})},
+  q	=> \&_encode_q_encoding,
 );
 
 sub decode ($) {
@@ -164,10 +170,210 @@ sub _decode_eword ($$$$) {
   ($r, $s{success});
 }
 
+=head1 $encoded_words = Message::MIME::EncodedWord::encode ($string, %option)
+
+Encode given string as encoded-words if necessary.
+
+Available options:
+
+=over 4
+
+=item -charset => charset (default: 'us-ascii')
+
+Charset name (in lower cases) to be used to encode the output string.
+(Currently 'us-ascii', 'iso-8859-1' and 'us-ascii' is supported.
+'iso-2022-int', 'euc-jp' or other charsets are unable to co-exist with
+encoded-words, in current implemention.)
+
+=item -context => 'default' (default) / 'comment' / 'phrase' / 'quoted_string'
+
+Context in which given string is embeded.
+
+=item -ebcdic_safe => 0/1 (default)
+
+Encode additional ASCII characters (shown in RFC 2047) that
+are not safe in EBCDIC transports.  This option is meaningful only when
+"Q" encoding is used.
+
+=item -encode_char => 1*CHAR / '' (default)
+
+The list of ASCII characters should be encoded in encoded-word
+in addition to non-ASCII characters and special ASCII characters
+determined by C<-context> and C<-ebcdic_safe> options.
+
+=item -encode_encoded_word_like => 0/1 (default)
+
+Encode encoded-word-like tokens in given string or not.
+
+=item -preserve_wsp => 0/1 (default)
+
+If true, 2*WSP is encoded in encoded-word.  Unless string is the content
+of comment or quoted-string, this option value should be true.
+
+=item -q_encode_char => 1*CHAR / '' (default)
+
+The list of ASCII characters should be encoded in q encoding of encoded-word
+in addition to non-ASCII characters and special ASCII characters
+determined by C<-context> and C<-ebcdic_safe> options.
+
+=item -quoted_pair => 1*CHAR / qr|(:: pattern ::)| '' (default)
+
+A character list or a Regexp pattern for characters to be quoted as
+the quoted-pairs.  When '', no character is quoted.
+Quoting is performed to characters NOT encoded as encoded-words.
+This option should be useful if given string is to be a content
+of a comment or quoted-string.  Usually, "\" is also included in
+the character list to represent "\" itself as "\\".
+
+=item -source_charset => charset (default = *internal)
+
+Charset name (in lower case) of given string.
+
+=item -token_maxlength => 1*DIGIT / 0 (default)
+
+Maximal length of a string (1*l<OCTET except WSP>) that can be represented
+as a non-encoded-word.  If 0, no length limit is implied.
+Note that this option does NOT change maximal length of encoded-word.
+(Maximal length of encoded-word is always 75, as defined in RFC 2047.)
+
+=cut
+
+sub encode ($;%) {
+  my $string = shift;
+  my %option = @_;
+  $option{-preserve_wsp} = 1 unless defined $option{-preserve_wsp};
+  $option{-source_charset} ||= '*internal';
+  my $re_encode = join ('|', grep {$_}
+     (($option{-charset} eq 'utf-8' ? '' :
+       $option{-charset} eq 'iso-8859-1' ? '[^\x00-\xFF]' : '[^\x00-\x7F]'),
+      (defined $option{-encode_char} ? qq([$option{-encode_char}]) : ''),
+      (!defined $option{-encode_encoded_word_like}||$option{-encode_encoded_word_like} ? '^=\?' :'')
+     )) || '(?!)';
+  if ($option{-quoted_pair} && !ref $option{-quoted_pair}) {
+    $option{-quoted_pair} = quotemeta $option{-quoted_pair};
+    $option{-quoted_pair} = qr/([$option{-quoted_pair}])/;
+  }
+  my @string = split /(?<=[^\x09\x20])(?=[\x09\x20])/, $string;
+  my @encoded;
+  for my $i (0..$#string) {
+    my $string_nows = $string[$i];
+    my $ws = ''; $ws = $1 if $string_nows =~ s/^([\x09\x20]+)//;
+    $encoded[$i] = -1;
+    if ($i == 0) {	## First component of string
+      if ($string_nows =~ /$re_encode/ || ($option{-preserve_wsp} && length ($ws) > 1)
+      || ($option{-token_maxlength} && length ($string_nows) > $option{-token_maxlength})) {
+        my $estring = _encode ($string[$i], \%option);
+        if ($estring) {
+          $string[$i] = $estring;
+          $encoded[$i] = 1;
+        }
+      }
+    } elsif ($i == $#string && length ($string_nows) == 0) {	## Last component of string is 1*WSP
+      my $estring = _encode ($ws, \%option);
+      if ($estring) {
+        $string[$i] = ' ' . $estring;
+        $encoded[$i] = 1;
+      }
+    } elsif ($i == 0 || !$encoded[$i-1]) {	## Previous token is not encoded
+      if ($string_nows =~ /$re_encode/
+      || ($option{-token_maxlength} && length ($string_nows) > $option{-token_maxlength})) {
+        if ($option{-preserve_wsp} && length ($ws) > 1 && $i) {
+          $string_nows = substr ($ws, 1) . $string_nows;
+          $ws = substr ($ws, 0, 1);
+        } elsif (!$ws) {
+          $ws = ' ';
+        }
+        my $estring = _encode ($string_nows, \%option);
+        if ($estring) {
+          $string[$i] = $ws . $estring;
+          $encoded[$i] = 1;
+        }
+      } elsif ($option{-preserve_wsp} && length ($ws) == 2) {
+        my $estring = _encode (substr ($ws, 1) . $string_nows, \%option);
+        if ($estring) {
+          $string[$i] = substr ($ws, 0, 1) . $estring;
+          $encoded[$i] = 1;
+        }
+      } elsif ($option{-preserve_wsp} && length ($ws) > 2) {
+        my $estring = _encode (substr ($ws, 1, length ($ws) - 2), \%option);
+        if ($estring) {
+          $string_nows =~ s/$option{-quoted_pair}/\\$1/g if $option{-quoted_pair};
+          $string[$i] = substr ($ws, 0, 1) . $estring . substr ($ws, -1) . $string_nows;
+          $encoded[$i] = 0;
+        }
+      }
+    } else {	## Previous token is encoded
+      if ($string_nows =~ /$re_encode/
+      || ($option{-token_maxlength} && length ($string_nows) > $option{-token_maxlength})) {
+        my $estring = _encode ($string[$i], \%option);
+        if ($estring) {
+          $string[$i] = ($i!=0?' ':'') . $estring;
+          $encoded[$i] = 1;
+        }
+      } elsif ($option{-preserve_wsp} && length ($ws) > 1) {
+        my $estring = _encode (substr ($ws, 0, length ($ws) - 1), \%option);
+        if ($estring) {
+          $string_nows =~ s/$option{-quoted_pair}/\\$1/g if $option{-quoted_pair};
+          $string[$i] = ($i!=0?' ':'') . $estring . substr ($ws, -1) . $string_nows;
+          $encoded[$i] = 0;
+        }
+      }
+    }
+    if ($encoded[$i] == -1) {
+      $string[$i] =~ s/$option{-quoted_pair}/\\$1/g if $option{-quoted_pair};
+      $encoded[$i] = 0;
+    }
+  }
+  join '', @string;
+}
+
+## $encoded_text must be octet string (not utf8 string).
+sub _encode_q_encoding ($$;\%) {
+    my ($encoding, $encoded_text, $option) = @_;
+    ## -- What characters are encoded?
+    my $achar = {
+      default	=> q(!"#$%&'()*+,./0123456789:;<>@ABCDEFGHIJKLMNOPQRSTUVWXYZ^`abcdefghijklmnopqrstuvwxyz{|}~\\[]-),
+      comment	=> q(!"#$%&'*+,./0123456789:;<>@ABCDEFGHIJKLMNOPQRSTUVWXYZ^`abcdefghijklmnopqrstuvwxyz{|}~[]-),
+      phrase	=> q(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!*+/-),
+      quoted_string	=> q(!#$%&'()*+,./0123456789:;<>@ABCDEFGHIJKLMNOPQRSTUVWXYZ^`abcdefghijklmnopqrstuvwxyz{|}~[]-),
+    }->{$option->{-context} || 'default'};
+    my $echar = $option->{-q_encode_char}; $echar =~ s/([\/\\])/\\$1/g;
+    eval qq{\$achar =~ tr/$echar//d};
+    $achar =~ tr/!"#$@[\\]^`{|}~//d unless defined $option->{-ebcdic_safe} && $option->{-ebcdic_safe} == 0;
+    $achar = quotemeta $achar;
+    ## -- Encode
+    $encoded_text =~ s/([^$achar])/sprintf '=%02X', ord $1/ge;
+    $encoded_text =~ s/=20/_/g;
+    ($encoded_text, {-encoded => 1});
+}
+sub _encode ($$) {
+  my $option = $_[1];
+  my $charset = $option->{-source_charset};
+  my $encoding = Message::MIME::Charset::get_property ('cte_header_preferred', $charset);
+  my @estr;
+  for my $str (@{Message::MIME::Charset::divide_string ($charset, $_[0], -max => int ((75 - length ($charset.$encoding) - 6) * ({b=>3/4,q=>1/3}->{$encoding}||1)))}) {
+    my $echarset = Message::MIME::Charset::get_interchange_charset ($charset, $str, $option)->{charset} || $charset;
+    my ($estr, %r) = Message::MIME::Charset::encode ($echarset, $str);
+    do {$echarset = $charset; $estr = $str; Message::MIME::Charset::_utf8_off ($estr)} unless $r{success};
+    $encoding = Message::MIME::Charset::get_property ('cte_header_preferred', $echarset);
+    if ($encoding eq '*auto') {
+      $encoding = (($estr =~ tr/\x20-\x7E/\x20-\x7E/) < (length ($estr) * 0.55)) ? 'b' : 'q';
+    }
+    my ($s, $r) = &{$ENCODER{$encoding}} ($encoding, $estr, $option);
+    if ($r->{-encoded}) {	## Success
+      my $echarset = {Message::MIME::Charset::name_minimumize ($echarset, $estr, {-name_only=>1})}->{charset};
+      push @estr, sprintf ('=?%s?%s?%s?=', $echarset, $encoding, $s);
+    } else {
+      return undef;
+    }
+  }
+  join ' ', @estr;
+}
+
 
 =head1 LICENSE
 
-Copyright 2002 wakaba E<lt>w@suika.fam.cxE<gt>.
+Copyright 2002 Wakaba <w@suika.fam.cx>.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -184,11 +390,6 @@ along with this program; see the file COPYING.  If not, write to
 the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.
 
-=head1 CHANGE
-
-See F<ChangeLog>.
-$Date: 2002/07/22 02:48:55 $
-
 =cut
 
-1;
+1; # $Date: 2002/12/28 09:07:05 $
