@@ -72,42 +72,42 @@ sub rule_def {+{
   foo => {
     before => sub {
       my ($f, $name, $p, $o) = @_;
-      ${$p->{-result}} .= "[$name:]";
+      $p->{-result} .= "[$name:]";
     },
     after => sub {
       my ($f, $name, $p, $o) = @_;
-      ${$p->{-result}} .= "[:$name]";
+      $p->{-result} .= "[:$name]";
     },
   },
   bar => {
     after => sub {
       my ($f, $name, $p, $o) = @_;
-      ${$p->{-result}} .= $p->{param};
+      $p->{-result} .= $p->{param};
     },
   },
   i => {
     after => sub {
       my ($f, $name, $p, $o) = @_;
-      ${$p->{-result}} .= ++$o->{param};
+      $p->{-result} .= ++$o->{param};
     },
   },
   j => {
     after => sub {
       my ($f, $name, $p, $o) = @_;
-      ${$p->{-result}} .= '['.++$o->{param1}.'['
-                         . ($p->{content} || '')
-                         .']'.++$o->{param1}.']';
+      $p->{-result} .= '['.++$o->{param1}.'['
+                      . ($p->{content} || '')
+                      .']'.++$o->{param1}.']';
     },
   },
   k => {
     before => sub {
       my ($f, $name, $p, $o) = @_;
-      ${$p->{-result}} .= '['.++$o->{param2}.'[%%%%'
-                         .']'.++$o->{param2}.']';
+      $p->{-result} .= '['.++$o->{param2}.'[%%%%'
+                      .']'.++$o->{param2}.']';
     },
     after => sub {
       my ($f, $name, $p, $o) = @_;
-      ${$p->{-result}} =~ s/%%%%/$p->{content}||''/ge;
+      $p->{-result} =~ s/%%%%/$p->{content}||''/ge;
     },
   },
 }}

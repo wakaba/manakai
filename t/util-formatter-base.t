@@ -11,41 +11,41 @@ my $f = Message::Util::Formatter::Base->new
             bar => {
                     pre => sub {
                       my ($f, $name, $p, $o) = @_;
-                      ${$p->{-result}} .= '<:bar:>';
+                      $p->{-result} = '<:bar:>';
                     },
                     post => sub {
                       my ($f, $name, $p, $o) = @_;
-                      ${$p->{-result}} .= '</:bar:>';
+                      $p->{-result} .= '</:bar:>';
                     },
                    },
             -default => {
                     pre => sub {
                       my ($f, $name, $p, $o) = @_;
-                      ${$p->{-result}} .= "<$name>";
+                      $p->{-result} = "<$name>";
                     },
                     post => sub {
                       my ($f, $name, $p, $o) = @_;
-                      ${$p->{-result}} .= "</$name>";
+                      $p->{-result} .= "</$name>";
                     },
                     attr => sub {
                       my ($f, $name, $p, $o, $key => $val, %opt) = @_;
                       $key = "$key\[$opt{-name_flag}]" if $opt{-name_flag};
                       $val = "$val\[$opt{-value_flag}]" if $opt{-value_flag};
-                      ${$p->{-result}} .= "{$key=$val}";
+                      $p->{-result} .= "{$key=$val}";
                     },
                    },
             -entire => {
                     pre => sub {
                       my ($f, $name, $p, $o) = @_;
-                      ${$p->{-result}} = '<<';
+                      $p->{-result} = '<<';
                     },
                     post => sub {
                       my ($f, $name, $p, $o) = @_;
-                      ${$p->{-result}} .= '>>';
+                      $p->{-result} .= '>>';
                     },
                     attr => sub {
                       my ($f, $name, $p, $o, $key => $val) = @_;
-                      ${$p->{-result}} .= "[[$key:$val]]";
+                      $p->{-result} .= "[[$key:$val->{-result}]]";
                     },
                    },
            });
