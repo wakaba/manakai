@@ -9,7 +9,7 @@ Internet message C<Content-Type:> field body
 package Message::Field::ContentType;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::ValueParams;
 push @ISA, qw(Message::Field::ValueParams);
 require Message::MIME::MediaType;
@@ -220,6 +220,14 @@ sub stringify_value ($) {
   $media_type;
 }
 
+## $self->_stringify_param_check (\%item, \%option)
+sub _stringify_param_check ($\%\%) {
+  my $self = shift;
+  my ($item, $option) = @_;
+  return (0) if $item->{attribute} =~ /^\*/;	## Internal use
+  (1, $item);
+}
+
 =head2 $self->media_type ([$new_value])
 
 Returns or set Internet media type.
@@ -317,6 +325,7 @@ sub _parse_value ($$$) {
     -field_media_type	=> $mt,
     -field_media_subtype	=> $mst,
     -field_param_name	=> $name,
+    -internal_charset_name	=> $self->{option}->{internal_charset_name},
     -parse_all	=> $self->{option}->{parse_all},
   );
   ## Media type specified option/parameters
@@ -408,7 +417,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/06 10:30:43 $
+$Date: 2002/07/21 03:25:00 $
 
 =cut
 

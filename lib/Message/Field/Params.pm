@@ -11,7 +11,7 @@ use strict;
 require 5.6.0;
 use re 'eval';
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 require Message::MIME::Charset;
 require Message::Field::Structured;
@@ -545,12 +545,12 @@ sub stringify ($;%) {
             }
           }
         } else {
-          $e{value}
-            =~ s/($REG{NON_http_attribute_char})/sprintf('%%%02X', ord $1)/ge;
           unless ($e{charset}) {
             $e{charset} = Message::MIME::Charset::name_minimumize
               ($option->{header_default_charset}, $e{value});
           }
+          $e{value}
+            =~ s/($REG{NON_http_attribute_char})/sprintf('%%%02X', ord $1)/ge;
           push @param, sprintf q{%s*=%s'%s'%s%s}, $attribute,
             $e{charset}, $e{language}, $e{value}, $comment;
         }
@@ -635,7 +635,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/07 00:46:07 $
+$Date: 2002/07/21 03:25:00 $
 
 =cut
 

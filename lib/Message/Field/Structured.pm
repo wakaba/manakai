@@ -9,7 +9,7 @@ Message Structured Header Field Bodies
 package Message::Field::Structured;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 use overload '""' => sub { $_[0]->stringify },
              '.=' => sub { $_[0]->value_append ($_[1]) },
@@ -48,6 +48,7 @@ The following methods construct new C<Message::Field::Structured> objects:
     	\&Message::Util::encode_header_string,
     hook_decode_string	=> #sub {shift; (value => shift, @_)},
     	\&Message::Util::decode_header_string,
+    internal_charset_name	=> 'utf-8',
     #name	## Reserved for method level option
     #parse	## Reserved for method level option
     parse_all	=> 0,
@@ -552,10 +553,15 @@ sub _parse_value ($$$) {
   }
   my $vtype = $handler->[0];
   my %vopt = (
+    -body_default_charset	=> $self->{option}->{body_default_charset},
+    -body_default_charset_input	=> $self->{option}->{body_default_charset_input},
     -format	=> $self->{option}->{format},
     -field_ns	=> $self->{option}->{field_ns},
     -field_name	=> $self->{option}->{field_name},
     -field_param_name	=> $name,
+    -header_default_charset	=> $self->{option}->{header_default_charset},
+    -header_default_charset_input	=> $self->{option}->{header_default_charset_input},
+    -internal_charset_name	=> $self->{option}->{internal_charset_name},
     -parse_all	=> $self->{option}->{parse_all},
   );
   ## Media type specified option/parameters
@@ -824,7 +830,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/06 10:30:43 $
+$Date: 2002/07/21 03:25:00 $
 
 =cut
 
