@@ -37,7 +37,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/25 12:58:20 $
+     $Date: 2004/09/26 11:43:06 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -412,6 +412,384 @@ IF:
          @@@@@lang:en
          @@@@@@:
            ISSUE: How treat base URI of <IF:DocumentType>, ...
+  @IntMethod:
+    @@Name:lookupNamespacePrefix
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Lookup the namespace prefix associated to the given namespace URI. 
+        This node must be of type <IF:Element>. 
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        This internal method implements the <DOM:lookupNamespacePrefix> 
+        <SRC:<CITE:DOM Level 3 Core Specification> B.2 Namespace Prefix Lookup>.
+    @@SpecLevel:3
+    @@Param:
+      @@@Name:namespaceURI
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNamespaceURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The namespace URI.  <DOM:null> is not allowed; it must be 
+          checked before the call of this internal method.
+    @@Param:
+      @@@Name:originalElement
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObjectNode
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The element node object to which the original request to lookup the 
+          <P:namespaceURI> is issued.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The original node the request is issued is not an <IF:Element> node.
+    @@Return:
+      @@@Type: 
+        DOMMain:DOMString
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The namespace prefix.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The associated namespace prefix does not found.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = null;
+          FIND: {
+          if ($originalElement) {
+            if (defined $self->{<Q:infoset:namespaceName>} and
+                $self->{<Q:infoset:namespaceName>} eq $namespaceURI and
+                defined $self->{<Q:infoset:prefix>} and
+                $originalElement->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{lookupNamespaceURI}__
+                      ($self->{<Q:infoset:prefix>}) eq $namespaceURI) {
+              $r = $self->{<Q:infoset:prefix>};
+              last FIND;
+            }
+            for (values %{$self->{<Q:infoset:attributes>}->{<Q:xmlns:>}||{}}) {
+              if (defined $_->{<Q:infoset:prefix>} and
+                  $_->{<Q:infoset:prefix>} eq 'xmlns' and
+                  $_->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{textContent}__
+                    eq $namespaceURI and
+                  $originalElement->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{lookupNamespaceURI}__
+                            ($_->{<Q:infoset:localName>}) eq $namespaceURI) {
+                $r = $_->{<Q:infoset:localName>};
+                last FIND;
+              }
+            }
+          }
+            ## If element has ancestor element
+            my $n = $self;
+            ANCESTOR: {
+              if ($n->{<Q:infoset:parent>}) {
+                $n = $n->{<Q:infoset:parent>};
+                if ($n->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
+                  $r = $n->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{lookupNamespacePrefix}__
+                                               ($namespaceURI, $originalElement);
+                  last FIND;
+                } else {
+                  redo ANCESTOR;
+                }
+              }
+            }
+          } # FIND
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Before returning found prefix, the algorithm needs to make 
+         sure that the prefix is not redefined.  This is why 
+         <P:originalElement> is required.
+  @IntMethod:
+    @@Name:isDefaultNamespace
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Return whether the given namespace URI is the 
+        default namespace.
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        This internal method implements the <DOM:isDefaultNamespace> 
+        <SRC:<CITE:DOM Level 3 Core Specification> B.3 Default Namespace Lookup>.
+    @@SpecLevel:3
+    @@Param:
+      @@@Name:namespaceURI
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNamespaceURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The namespace URI to look for.
+    @@Return:
+      @@@Type:boolean
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          if ($self->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
+            if (not defined $self->{<Q:infoset:prefix>}) {
+              if (defined $namespaceURI and
+                  defined $self->{<Q:infoset:namespaceName>} and
+                  $namespaceURI eq $self->{<Q:infoset:namespaceName>}) {
+                $r = true;
+              } elsif (not defined $namespaceURI and
+                       not defined $self->{<Q:infoset:namespaceName>}) {
+                $r = true;
+              }
+              # else false
+            } elsif ($self->{<Q:infoset:attributes>}
+                          ->{<Q:infoset:xmlns:>}->{xmlns}) {
+              my $v = $self->{<Q:infoset:attributes>}
+                           ->{<Q:infoset:xmlns:>}->{xmlns}
+                           ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{textContent}__;
+              if (defined $namespaceURI and $namespaceURI eq $v) {
+                $r = true;
+              } elsif (not defined $namespaceURI and not length $v) {
+                $r = true;
+              }
+              # else false
+            } else {
+              ## If element has ancestor element
+              my $n = $self;
+              ANCESTOR: {
+                if ($n->{<Q:infoset:parent>}) {
+                  $n = $n->{<Q:infoset:parent>};
+                  if ($n->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
+                    $r = $n->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{isDefaultNamespace}__
+                                               ($namespaceURI);
+                    last ANCESTOR;
+                  } else {
+                    redo ANCESTOR;
+                  }
+                }
+                # false
+              }
+            }
+          } elsif ($self->{<Q:DOMCore:nodeType>} eq <Q:infoset:Document>) {
+            for (@{$self->{<Q:infoset:children>}}) {
+              if ($_->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
+                $r = $_->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{isDefaultNamespace}__
+                                               ($namespaceURI);
+                last;
+              }
+            }
+          } elsif ($self->{<Q:DOMCore:nodeType>} eq <Q:infoset:Attribute>) {
+            if ($self->{<Q:infoset:ownerElement>}) {
+              $r = $self->{<Q:infoset:ownerElement>}
+                        ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{isDefaultNamespace}__
+                                               ($namespaceURI);
+              last FIND;
+            }
+          } elsif ({
+                     <Q:DOMXML:Entity> => 1,
+                     <Q:DOMXML:Notation> => 1,
+                     <Q:DOMXML:DocumentType> => 1,
+                     <Q:DOMCore:DocumentFragment> => 1,
+                   }->{$self->{<Q:DOMCore:nodeType>}}) {
+            #
+          } else {
+          #} elsif ({
+          #           <Q:DOMCore:Text> => 1,
+          #           <Q:DOMCore:Comment> => 1,
+          #           <Q:DOMXML:EntityReference> => 1,
+          #           <Q:DOMXML:CDATASection> => 1,
+          #           <Q:infoset:ProcessingInstruction> => 1,
+          #         }->{$self->{<Q:DOMCore:nodeType>}}) {
+            ## If node has ancestor element
+            my $n = $self;
+            ANCESTOR: {
+              if ($n->{<Q:infoset:parent>}) {
+                $n = $n->{<Q:infoset:parent>};
+                if ($n->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
+                  $r = $n->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{isDefaultNamespace}__
+                                               ($namespaceURI);
+                  last ANCESTOR;
+                } else {
+                  redo ANCESTOR;
+                }
+              }
+              # false
+            }
+          } # nodeType
+  @IntMethod:
+    @@Name:lookupNamespaceURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Lookup the namespace URI associated to the given prefix.
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        This internal method implements the <DOM:lookupNamespaceURI> 
+        <SRC:<CITE:DOM Level 3 Core Specification> B.4 Namespace URI Lookup>.
+    @@SpecLevel:3
+    @@Param:
+      @@@Name:prefix
+      @@@Type:
+        DOMMain:DOMString
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The namespace prefix.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: Look for the default namespace URI.
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNamespaceURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The namespace URI.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: No namespace URI associated.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = null;
+          FIND: {
+          if ($self->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
+            if (defined $self->{<Q:infoset:localName>} and
+                defined $self->{<Q:infoset:namespaceName>} and
+                ((defined $self->{<Q:infoset:prefix>} and defined $prefix and
+                  $self->{<Q:infoset:prefix>} eq $prefix) or
+                 (not defined $self->{<Q:infoset:prefix>} and
+                  not defined $prefix))) {
+              $r = $self->{<Q:infoset:namespaceName>};
+              last FIND;
+            }
+            for (values %{$self->{<Q:infoset:attributes>}->{<Q:xmlns:>}||{}}) {
+              if (defined $_->{<Q:infoset:prefix>} and defined $prefix and
+                  $_->{<Q:infoset:prefix>} eq 'xmlns' and
+                  $_->{<Q:infoset:localName>} eq $prefix) {
+                ## Non default namespace
+                $r = $_->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{textContent}__;
+                $r = null unless length $r;
+                last FIND;
+              } elsif (not defined $prefix and
+                       $_->{<Q:infoset:localName>} eq 'xmlns') {
+                ## Default namespace
+                $r = $_->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{textContent}__;
+                $r = null unless length $r;
+                last FIND;
+              }
+            }
+            ## If element has ancestor element
+            my $n = $self;
+            ANCESTOR: {
+              if ($n->{<Q:infoset:parent>}) {
+                $n = $n->{<Q:infoset:parent>};
+                if ($n->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
+                  $r = $n->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{lookupNamespaceURI}__
+                                               ($prefix);
+                  last FIND;
+                } else {
+                  redo ANCESTOR;
+                }
+              }
+            }
+          } elsif ($self->{<Q:DOMCore:nodeType>} eq <Q:infoset:Document>) {
+            for (@{$self->{<Q:infoset:children>}}) {
+              if ($_->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
+                $r = $_->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{lookupNamespaceURI}__
+                                               ($prefix);
+                last FIND;
+              }
+            }
+          } elsif ($self->{<Q:DOMCore:nodeType>} eq <Q:infoset:Attribute>) {
+            if ($self->{<Q:infoset:ownerElement>}) {
+              $r = $self->{<Q:infoset:ownerElement>}
+                        ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{lookupNamespaceURI}__
+                                               ($prefix);
+              last FIND;
+            }
+          } elsif ({
+                     <Q:DOMXML:Entity> => 1,
+                     <Q:DOMXML:Notation> => 1,
+                     <Q:DOMXML:DocumentType> => 1,
+                     <Q:DOMCore:DocumentFragment> => 1,
+                   }->{$self->{<Q:DOMCore:nodeType>}}) {
+            #
+          } else {
+          #} elsif ({
+          #           <Q:DOMCore:Text> => 1,
+          #           <Q:DOMCore:Comment> => 1,
+          #           <Q:DOMXML:EntityReference> => 1,
+          #           <Q:DOMXML:CDATASection> => 1,
+          #           <Q:infoset:ProcessingInstruction> => 1,
+          #         }->{$self->{<Q:DOMCore:nodeType>}}) {
+            ## If node has ancestor element
+            my $n = $self;
+            ANCESTOR: {
+              if ($n->{<Q:infoset:parent>}) {
+                $n = $n->{<Q:infoset:parent>};
+                if ($n->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
+                  $r = $n->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{lookupNamespaceURI}__
+                                               ($prefix);
+                  last FIND;
+                } else {
+                  redo ANCESTOR;
+                }
+              }
+            }
+          } # nodeType
+          } # FIND
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          No-namespace nodes are ignored <SRC:DOM 3>.
+
+  @IntMethod:
+    @@Name:isEqualNode
+    @@Operator:
+      @@@Type:
+        lang:Perl
+      @@@@:==
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Check whether two nodes are equal.
+    @@Param:
+      @@@Name:arg
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObjectNode
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The node object to compare equality with.
+    @@Return:
+      @@@Type:boolean
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          __CLASS{Node::DOM3}__->__INT{getNodeReference}__ ($self, true) ==
+          __CLASS{Node::DOM3}__->__INT{getNodeReference}__ ($arg, true)
+            ? true : false;
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        See <M:Node.isEqualNode>.  This internal method might need to 
+        be modified if future version of DOM modify the specification.
+    @@SpecLevel:3
+    
 ## IF:ManakaiDOMNodeObjectNode
 
 IF:
@@ -481,6 +859,51 @@ IF:
             $r = @{$self->{<Q:TreeCore:node>}->{<Q:infoset:children>}};
     @@Redefine:
        DOMCore:NodeList
+
+  @IntMethod:
+    @@Name: isEqualNodeList
+    @@Operator:
+      @@@Type:
+        lang:Perl
+      @@@@:==
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Return whether two <IF:NodeList>s are equal.
+    @@Param:
+      @@@Name:arg
+      @@@Type:ManakaiDOMChildNodeList
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The node list to compare equality with.
+    @@Return:
+      @@@Type:boolean
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+   \      EQ: {
+   \        last EQ unless @{$self->{<Q:TreeCore:node>}
+   \                              ->{<Q:infoset:children>}} ==
+   \                       @{$arg->{<Q:TreeCore:node>}
+                                 ->{<Q:infoset:children>}};
+            for my $i (0..$#{$self->{<Q:TreeCore:node>}
+                                  ->{<Q:infoset:children>}}) {
+              unless ($self->{<Q:TreeCore:node>}
+                                  ->{<Q:infoset:children>}->[$i] ==
+                      $arg->{<Q:TreeCore:node>}
+                                  ->{<Q:infoset:children>}->[$i]) {
+                last EQ;
+              }
+            }
+            $r = true;
+          }
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        See: <M:Node.isEqualNode>.
+    @@SpecLevel:3
 ## IF:ManakaiDOMChildNodeList
 
 IF:
@@ -542,6 +965,19 @@ IF:
     @@lang:en
     @@@:
       A list of attributes attached to an <IF:Element> node.
+
+  @ImplNote:
+    @@lang:en
+    @@@:
+      An element may have two (or more) attributes that have the same 
+      <A:Node.nodeName>, but different <A:Node.namespaceURI>s. 
+      Which of them is returned by DOM Level 1 methods is 
+      implementation dependent.  The only guarantee is 
+      that all methods that access a named item by its <A:Node.nodeName> 
+      will access the same item, and all methods by its namespace URI
+      and local name will access the same item. 
+      <SRC:<CITE:DOM Level 2 Core> 1.4.8 XML Namespaces,
+      <CITE:DOM Level 3 Core> 1.3.3 XML Namespaces>
 
   @IntMethod:
     @@Name:selectAttrNodeObject
@@ -689,7 +1125,7 @@ IF:
        @@@lang:en
        @@@@: 
          <QUOTE:Replacing ... no effect> is clarified by the DOM Level 2 Errata. 
-     @@NSVersion:setItemNS
+     @@NSVersion:setNamedItemNS
      @@Param:
         @@@Name:  arg
         @@@Type:  
@@ -842,7 +1278,7 @@ IF:
        @@@@:
          New non-<A:specified> attribute will be generated if the schema 
          defines some default value for the attribute removed.
-     @@NSVersion:removeNamedItem
+     @@NSVersion:removeNamedItemNS
      @@Param:
         @@@Name:  name
         @@@Type:  
@@ -1297,7 +1733,7 @@ IF:
        @@@@:
          New non-"specified" attribute will be generated if the schema 
          defines some default value for the attribute removed.
-     @@NoNSVersion:removeNamedItemNS
+     @@NoNSVersion:removeNamedItem
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
@@ -1394,6 +1830,56 @@ IF:
      @@SpecLevel:2
     @@Redefine:
       DOMCore:NamedNodeMap
+
+  @IntMethod:
+    @@Name: isEqualNamedNodeMap
+    @@Operator:
+      @@@Type:
+        lang:Perl
+      @@@@:==
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Return whether two <IF:NamedNodeMap>s are equal.
+    @@Param:
+      @@@Name:arg
+      @@@Type:ManakaiDOMAttributes
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The node list to compare equality with.
+    @@Return:
+      @@@Type:boolean
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          EQ: {
+            for my $ns (keys %{$self->{<Q:TreeCore:node>}
+                                    ->{<Q:infoset:attributes>}}) {
+              last EQ unless $arg->{<Q:TreeCore:node>}
+                                 ->{<Q:infoset:attributes>}->{$ns};
+              last EQ unless keys (%{$arg->{<Q:TreeCore:node>}
+                                 ->{<Q:infoset:attributes>}->{$ns}}) ==
+                             keys (%{$self->{<Q:TreeCore:node>}
+                                 ->{<Q:infoset:attributes>}->{$ns}});
+              for my $ln (keys %{$self->{<Q:TreeCore:node>}
+                                      ->{<Q:infoset:attributes>}->{$ns}}) {
+                last EQ unless $arg->{<Q:TreeCore:node>}
+                                   ->{<Q:infoset:attributes>}->{$ns}->{$ln};
+                last EQ unless $self->{<Q:TreeCore:node>}
+                                    ->{<Q:infoset:attributes>}->{$ns}->{$ln} ==
+                               $arg->{<Q:TreeCore:node>}
+                                    ->{<Q:infoset:attributes>}->{$ns}->{$ln};
+              }
+            }
+            $r = true;
+          }
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        See: <M:Node.isEqualNode>.
+    @@SpecLevel:3
 ## IF:ManakaiDOMAttributes
 
 ConfigParam:

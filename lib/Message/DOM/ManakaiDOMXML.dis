@@ -35,7 +35,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/20 05:53:14 $
+     $Date: 2004/09/26 11:43:06 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -425,6 +425,31 @@ IF:
      @@SpecLevel:2
      @@Redefine: 
        DOMCore:NamedNodeMap
+
+  @IntMethod:
+    @@Name: isEqualNamedNodeMap
+    @@Operator:
+      @@@Type:
+        lang:Perl
+      @@@@:==
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Return whether two <IF:NamedNodeMap>s are equal.
+    @@Param:
+      @@@Name:arg
+      @@@Type:ManakaiDOMEntities
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The node list to compare equality with.
+    @@Return:
+      @@@Type:boolean
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        See: <M:Node.isEqualNode>.
+    @@SpecLevel:3
 ## IF:ManakaiDOMEntities
 
 IF:
@@ -769,6 +794,31 @@ IF:
      @@SpecLevel:2
     @@Redefine:
       DOMCore:NamedNodeMap
+
+  @IntMethod:
+    @@Name: isEqualNamedNodeMap
+    @@Operator:
+      @@@Type:
+        lang:Perl
+      @@@@:==
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Return whether two <IF:NamedNodeMap>s are equal.
+    @@Param:
+      @@@Name:arg
+      @@@Type:ManakaiDOMNotations
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The node list to compare equality with.
+    @@Return:
+      @@@Type:boolean
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        See: <M:Node.isEqualNode>.
+    @@SpecLevel:3
 ## IF:ManakaiDOMNotations
 
 

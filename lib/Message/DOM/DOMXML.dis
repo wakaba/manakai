@@ -43,7 +43,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/25 12:58:20 $
+     $Date: 2004/09/26 11:43:06 $
   @Require:
     @@Module:
       @@@Name: DOMCore
@@ -161,6 +161,9 @@ IF:
       @@@DOM3[list]:
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@NSVersion[list]:
+      DOMCore:Node.prefix
+      DOMCore:Node.localName
     @@Get:
       @@@Type: DOMString
       @@@InCase:
@@ -252,6 +255,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@: The document type name.
+     @@NSVersion[list]:
      @@Get:
         @@@Type:  DOMString
         @@@Description:
@@ -359,11 +363,54 @@ IF:
      @@Level[list]:  2
      @@SpecLevel:2
   
+  @ReMethod:
+     @@Name:  lookupPrefix
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Lookup the namespace prefix associated to the given namespace 
+         URI, starting from this node.
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace URI to look for.
+     @@Return:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An associated namespace prefix.
+          \
+            If more than one prefix are associated to the 
+            namespace URI, which is returned is implementation 
+            dependent.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              No namespace prefix is found.  Always <DOM:null> 
+              is returned for <IF:DocumentType> nodes.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@: $r = null;
+     @@Level[list]:  3
+     @@SpecLevel:3
+     @@Redefine:
+        DOMCore:Node
   @ReAttr:
     @@Name: nodeName
     @@Description:
       @@@lang:en
       @@@@: The node name.
+    @@NSVersion[list]:
+      DOMCore:Node.prefix
+      DOMCore:Node.localName
     @@Get:
       @@@Type: DOMString
       @@@Description:
@@ -536,7 +583,7 @@ IF:
         \
         For the <IF:Notation> node, it is the <InfosetP:declaration base URI> 
         of the notation information item.
-    @@Return:
+    @@Get:
       @@@Type:
         ManakaiDOM:ManakaiDOMURI
       @@@Description:
@@ -560,11 +607,54 @@ IF:
     @@Level:3
     @@Redefine:
       DOMCore:Node
+  @ReMethod:
+     @@Name:  lookupPrefix
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Lookup the namespace prefix associated to the given namespace 
+         URI, starting from this node.
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace URI to look for.
+     @@Return:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An associated namespace prefix.
+          \
+            If more than one prefix are associated to the 
+            namespace URI, which is returned is implementation 
+            dependent.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              No namespace prefix is found.  Always <DOM:null> 
+              is returned for <IF:Notation> nodes.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@: $r = null;
+     @@Level[list]:  3
+     @@SpecLevel:3
+     @@Redefine:
+        DOMCore:Node
   @ReAttr:
     @@Name: nodeName
     @@Description:
       @@@lang:en
       @@@@: The node name.
+    @@NSVersion[list]:
+      DOMCore:Node.prefix
+      DOMCore:Node.localName
     @@Get:
       @@@Type: DOMString
       @@@Description:
@@ -872,7 +962,7 @@ IF:
         \
         For the <IF:Entity> node, it is the <InfosetP:declaration base URI> 
         of the unparsed entity information item.
-    @@Return:
+    @@Get:
       @@@Type:
         ManakaiDOM:ManakaiDOMURI
       @@@Description:
@@ -896,11 +986,54 @@ IF:
     @@Level:3
     @@Redefine:
       DOMCore:Node
+  @ReMethod:
+     @@Name:  lookupPrefix
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Lookup the namespace prefix associated to the given namespace 
+         URI, starting from this node.
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace URI to look for.
+     @@Return:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An associated namespace prefix.
+          \
+            If more than one prefix are associated to the 
+            namespace URI, which is returned is implementation 
+            dependent.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              No namespace prefix is found.  Always <DOM:null> 
+              is returned for <IF:Entity> nodes.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@: $r = null;
+     @@Level[list]:  3
+     @@SpecLevel:3
+     @@Redefine:
+        DOMCore:Node
   @ReAttr:
     @@Name: nodeName
     @@Description:
       @@@lang:en
       @@@@: The node name.
+    @@NSVersion[list]:
+      DOMCore:Node.prefix
+      DOMCore:Node.localName
     @@Get:
       @@@Type: DOMString
       @@@Description:
@@ -1027,7 +1160,7 @@ IF:
         For the <IF:EntityReference> node, it is the 
         <InfosetP:declaration base URI> of the unexpanded entity 
         reference information item.
-    @@Return:
+    @@Get:
       @@@Type:
         ManakaiDOM:ManakaiDOMURI
       @@@Description:
@@ -1056,6 +1189,9 @@ IF:
     @@Description:
       @@@lang:en
       @@@@: The node name.
+    @@NSVersion[list]:
+      DOMCore:Node.prefix
+      DOMCore:Node.localName
     @@Get:
       @@@Type: DOMString
       @@@Description:
@@ -1144,6 +1280,7 @@ IF:
        @@@lang:en
        @@@@:
          The target of this processing instruction.
+     @@NSVersion[list]:
      @@Get:
         @@@Type:  DOMString
         @@@Description:
@@ -1204,7 +1341,7 @@ IF:
       @@@lang:en
       @@@@:
         The base URI of this node.
-    @@Return:
+    @@Get:
       @@@Type:
         ManakaiDOM:ManakaiDOMURI
       @@@Description:
@@ -1235,6 +1372,9 @@ IF:
     @@Description:
       @@@lang:en
       @@@@: The node name.
+    @@NSVersion[list]:
+      DOMCore:Node.prefix
+      DOMCore:Node.localName
     @@Get:
       @@@Type: DOMString
       @@@Description:

@@ -46,7 +46,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/25 12:58:20 $
+     $Date: 2004/09/26 11:43:06 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -1392,6 +1392,7 @@ IF:
        @@@@: 
          HTML-only DOM Level 2 implementations do not need to implement 
          this method.
+     @@NoNSVersion:\
      @@Param:
         @@@Name:  qualifiedName
         @@@Type:  DOMString
@@ -1502,6 +1503,7 @@ IF:
        @@@@:
          Document creation is an operation specific to an 
          implementation in the DOM Level 1.
+     @@NoNSVersion:\
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
@@ -1948,6 +1950,9 @@ IF:
      @@Description:
         @@@lang:en
         @@@@: The node name.
+     @@NSVersion[list]:
+       Node.prefix
+       Node.localName
      @@Get:
         @@@Type:  DOMString
         @@@Def:
@@ -3923,32 +3928,168 @@ IF:
      @@SpecLevel:3
   @Method:
      @@Name:  lookupPrefix
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Lookup the namespace prefix associated to the given namespace 
+         URI, starting from this node.
+       \
+         The default namespace declarations are ignored by this method. 
+         To lookup default namespace, use the <M:Node.isDefaultNamespace>
+         method.
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace URI to look for.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Always <DOM:null> will be returned.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Always <DOM:null> will be returned.
      @@Return:
         @@@Type:  DOMString
-     @@Param:
-        @@@Name:  namespaceURI
-        @@@Type:
-          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An associated namespace prefix.
+          \
+            If more than one prefix are associated to the 
+            namespace URI, which is returned is implementation 
+            dependent.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              No namespace prefix is found.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            if (not defined $namespaceURI) {
+              $r = null;
+            } else {
+              my $n = $self->{<Q:TreeCore:node>};
+              ANCESTOR: {
+                if ($n->{<Q:infoset:parent>}) {
+                  $n = $n->{<Q:infoset:parent>};
+                  if ($n->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
+                    $r = $n->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{lookupNamespacePrefix}__
+                                                 ($namespaceURI, $n);
+                    last ANCESTOR;
+                  } else {
+                    redo ANCESTOR;
+                  }
+                }
+                $r = null;
+              } # ANCESTOR
+            }
      @@Level[list]:  3
      @@SpecLevel:3
+     @@RedefinedBy: Attr
+     @@RedefinedBy:
+       DOMXML:DocumentType
+     @@RedefinedBy:
+       DOMCore:DocumentFragment
+     @@RedefinedBy:
+       DOMXML:Notation
+     @@RedefinedBy:
+       DOMXML:Entity
+     @@RedefinedBy:
+       DOMCore:Document
+     @@RedefinedBy:Element
   @Method:
      @@Name:  isDefaultNamespace
-     @@Return:
-        @@@Type:  boolean
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Return whether the given namespace URI is the default namespace.
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
           ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The namespace URI to look for.
+     @@Return:
+        @@@Type:  boolean
+        @@@InCase:
+          @@@@Value:true
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The specified <P:namespaceURI> is the default namespace.
+        @@@InCase:
+          @@@@Value:false
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The specified <P:namespaceURI> is not the default namespace.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            $r = $self->{<Q:TreeCore:node>}
+                      ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{isDefaultNamespace}__
+                                           ($namespaceURI);
      @@Level[list]:  3
      @@SpecLevel:3
   @Method:
      @@Name:  lookupNamespaceURI
-     @@Return:
-        @@@Type:
-          ManakaiDOM:ManakaiDOMNamespaceURI
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Lookup the namespace URI associated to the given 
+         prefix, starting from this node.
      @@Param:
         @@@Name:  prefix
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The prefix to look for.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Return the default namespace URI if any.
+     @@Return:
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The associated namespace URI.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              No associated namespace URI found.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            $r = $self->{<Q:TreeCore:node>}
+                      ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{lookupNamespaceURI}__
+                        ($prefix);
      @@Level[list]:  3
      @@SpecLevel:3
   @Method:
@@ -3957,12 +4098,99 @@ IF:
        @@@@: ==
        @@@Type:
           lang:Perl
-     @@Return:
-        @@@Type:  boolean
-     @@Param:
+     @@Description:
+       @@@lang:en
+       @@@@: 
+         Test whether two nodes are equal.
+       \
+         Two nodes are equal if their node types, node names, 
+         contents, attributes and some DOM attributes are equal. 
+         Their parent nodes, schema type, user data and some other DOM 
+         attributes do not affect equality.  Future versions of 
+         DOM may take into account more DOM attributes.
+      @@ImplNote:
+        @@@lang:en
+        @@@@:
+          DOM implementations are expected to be updated when 
+          future versions of DOM specify to take into 
+          account more DOM attributes.
+      @@Param:
         @@@Name:  arg
         @@@Type:  Node
-     @@Level[list]:  3
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The node to compare equality with.
+     @@Return:
+        @@@Type:  boolean
+        @@@InCase:
+          @@@@Value:true
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: Two nodes are equal.
+        @@@InCase:
+          @@@@Value:false
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: Two nodes are not equal.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            EQ: {
+              last EQ unless $self->nodeType eq $arg->nodeType;
+              for my $v ([$self->nodeName, $arg->nodeName],
+                         [$self->localName, $arg->localName],
+                         [$self->namespaceURI, $arg->namespaceURI],
+                         [$self->prefix, $arg->prefix], 
+                         [$self->nodeValue, $arg->nodeValue]) {
+                if (not defined $v->[0] and not defined $v->[1]) {
+                  #
+                } elsif (defined $v->[0] and defined $v->[1] and
+                         ''.$v->[0] eq ''.$v->[1]) {
+                  # 
+                } else {
+                  last EQ;
+                }
+              }
+              for my $v ([$self->attributes, $arg->attributes],
+                         [$self->childNodes, $arg->childNodes]) {
+                if (not defined $v->[0] and not defined $v->[1]) {
+                  #
+                } elsif (defined $v->[0] and defined $v->[1] and
+                         $v->[0] == $v->[1]) {
+                  #
+                } else {
+                  last EQ;
+                }
+              }
+              if ($self->nodeType eq $self->DOCUMENT_TYPE_NODE) {
+                for my $v ([$self->publicId, $arg->publicId],
+                           [$self->sysyemId, $arg->systemId],
+                           [$self->internalSubset, $arg->internalSubset]) {
+                  if (not defined $v->[0] and not defined $v->[1]) {
+                    #
+                  } elsif (defined $v->[0] and defined $v->[1] and
+                           ''.$v->[0] eq ''.$v->[1]) {
+                    # 
+                  } else {
+                    last EQ;
+                  }
+                }
+                for my $v ([$self->entities, $arg->entities],
+                           [$self->notations, $arg->notations]) {
+                  if (not defined $v->[0] and not defined $v->[1]) {
+                    #
+                  } elsif (defined $v->[0] and defined $v->[1] and
+                           $v->[0] == $v->[1]) {
+                    #
+                  } else {
+                    last EQ;
+                  }
+                }
+              }
+              $r = true;
+            } # EQ
+    @@Level[list]:  3
      @@SpecLevel:3
   @Method:
      @@Name:  getFeature
@@ -4054,6 +4282,32 @@ IF:
       @@@Description:
         @@@@lang:en
         @@@@@: The node object referred to.
+    @@Param:
+      @@@Name:noSpecializedInterface
+      @@@Type:boolean
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Whether the specialized interface for the type (such as 
+          element type or document type) is selected if available.
+      @@@InCase:
+        @@@@Value:true
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Specialized object is not returned however the 
+            configuration parameter value is set.
+          \
+            Note that even if the specialized interface is not 
+            selected by default, the specialized object can be 
+            obtained from <M:Node.getFeature>.
+      @@@InCase:
+        @@@@Value:false
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Specialized object is returned unless the configuration 
+            disables it.
     @@Return:
       @@@Type: Node
       @@@Description:
@@ -4218,6 +4472,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@: Retrieve a node specified by name.
+     @@NSVersion:getNamedItemNS
      @@Param:
         @@@Name:  name
         @@@Type:  DOMString
@@ -4257,6 +4512,7 @@ IF:
      @@ImplNote:
        @@@lang:en
        @@@@: "Replacing ... no effect" is clarified by the DOM Level 2 Errata. 
+     @@NSVersion:setNamedItemNS
      @@Param:
         @@@Name:  arg
         @@@Type:  Node
@@ -4331,6 +4587,7 @@ IF:
         @@@lang:en
         @@@@:
           Remove a node specified by name.
+     @@NSVersion:removeNamedItemNS
      @@Param:
         @@@Name:  name
         @@@Type:  DOMString
@@ -4432,6 +4689,7 @@ IF:
        @@@lang:en
        @@@@:
          Retrieve a node specified by local name and namespace URI.
+     @@NoNSVersion:getNamedItem
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
@@ -4507,6 +4765,7 @@ IF:
      @@ImplNote:
        @@@lang:en
        @@@@: "Replacing ... no effect" is clarified by the DOM Level 2 Errata. 
+     @@NoNSVersion:setNamedItem
      @@Param:
         @@@Name:  arg
         @@@Type:  Node
@@ -4592,6 +4851,7 @@ IF:
         @@@lang:en
         @@@@:
           Remove a node specified by local name and namespace URI.
+     @@NoNSVersion:removeNamedItem
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
@@ -5367,7 +5627,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Return whether this attribute is known to be of type ID or not.
+         Whether this attribute is known to be of type ID or not.
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -5376,7 +5636,7 @@ IF:
         \
          PSVI - If validation occurred using an XML Schema, the PSVI 
          contributions values are used to determine whether this 
-         attribute is a schema-determined ID attribute as the 
+         attribute is a Schema-determined ID attribute as the 
          XPointer specification defines, i.e. iif one of the following 
          is true:
         \
@@ -5418,6 +5678,27 @@ IF:
          ways to determine whether it is a ID attribute.
      @@Get:
         @@@Type:  boolean
+        @@@InCase:
+          @@@@Value:true
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: 
+              This attribute is a ID attribute.
+        @@@InCase:
+          @@@@Value:false
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              This attribute is not a ID attribute.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            $r = $self->{<Q:TreeCore:node>}->{<Q:DOMCore:userDeterminedId>};
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              TODO: Support non-user-determined ID attributes.
      @@Level[list]:  3
      @@SpecLevel:3
   
@@ -5447,7 +5728,75 @@ IF:
      @@Level[list]:  2
      @@SpecLevel:2
      @@Redefine: Node
-  @Attr:
+  @ReMethod:
+     @@Name:  lookupPrefix
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Lookup the namespace prefix associated to the given namespace 
+         URI, starting from this node.
+       \
+         The default namespace declarations are ignored by this method. 
+         To lookup default namespace, use the <M:Node.isDefaultNamespace>
+         method.
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace URI to look for.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Always <DOM:null> will be returned.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Always <DOM:null> will be returned.
+     @@Return:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An associated namespace prefix.
+          \
+            If more than one prefix are associated to the 
+            namespace URI, which is returned is implementation 
+            dependent.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              No namespace prefix is found.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            if (not defined $namespaceURI) {
+              $r = null;
+            } else {
+              my $n = $self->{<Q:TreeCore:node>};
+              if ($n->{<Q:infoset:ownerElement>}) {
+                $r = $n->{<Q:infoset:ownerElement>}
+                       ->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{lookupNamespacePrefix}__
+                                ($namespaceURI, $n->{<Q:infoset:ownerElement>});
+              } else {
+                $r = null;
+              }
+            }
+     @@Level[list]:  3
+     @@SpecLevel:3
+     @@Redefine:Node
+  @ReAttr:
      @@Name:  namespaceURI
      @@Description:
        @@@lang:en
@@ -5480,6 +5829,9 @@ IF:
     @@Description:
       @@@lang:en
       @@@@: The node name.
+    @@NSVersion[list]:
+      Node.prefix
+      Node.localName
     @@Get:
       @@@Type: DOMString
       @@@Description:
@@ -7078,6 +7430,10 @@ IF:
           @@@@@: The type information.
      @@Level[list]:  3
      @@SpecLevel:3
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         TODO: More study required for the relationship to schemas.
   @Method:
      @@Name:  setIdAttribute
      @@Description:
@@ -7404,7 +7760,7 @@ IF:
       @@@lang:en
       @@@@:
         A node map containing the attributes of this node.
-    @@Return:
+    @@Get:
       @@@Type:
         ManakaiDOM:ManakaiDOMAttributes
       @@@Description:
@@ -7418,7 +7774,7 @@ IF:
           $r = $self->{<Q:TreeCore:node>}
                     ->__SUPER{ManakaiDOMNodeObject::}__::__INT{newReference}__
                          ## Condition sensitive
-                        (__CLASS{ManakaiDOMAttributes}__);
+                        ('__CLASS{ManakaiDOMAttributes}__');
     @@SpecLevel:1
     @@Level[list]:
       1
@@ -7492,6 +7848,69 @@ IF:
      @@Level[list]:  2
      @@SpecLevel:2
      @@Redefine: Node
+  @ReMethod:
+     @@Name:  lookupPrefix
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Lookup the namespace prefix associated to the given namespace 
+         URI, starting from this node.
+       \
+         The default namespace declarations are ignored by this method. 
+         To lookup default namespace, use the <M:Node.isDefaultNamespace>
+         method.
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace URI to look for.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Always <DOM:null> will be returned.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Always <DOM:null> will be returned.
+     @@Return:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An associated namespace prefix.
+          \
+            If more than one prefix are associated to the 
+            namespace URI, which is returned is implementation 
+            dependent.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              No namespace prefix is found.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            if (not defined $namespaceURI) {
+              $r = null;
+            } else {
+              my $n = $self->{<Q:TreeCore:node>};
+              $r = $n->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{lookupNamespacePrefix}__
+                                                 ($namespaceURI, $n);
+            }
+     @@Level[list]:  3
+     @@SpecLevel:3
+     @@Redefine:Node
   @Attr:
      @@Name:  namespaceURI
      @@Description:
@@ -7525,6 +7944,9 @@ IF:
     @@Description:
       @@@lang:en
       @@@@: The node name.
+    @@NSVersion[list]:
+      Node.prefix
+      Node.localName
     @@Get:
       @@@Type: DOMString
       @@@Description:
@@ -7902,6 +8324,9 @@ IF:
       @@@DOM3[list]:
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@NSVersion[list]:
+      Node.prefix
+      Node.localName
     @@Get:
       @@@Type: DOMString
       @@@InCase:
@@ -7991,6 +8416,9 @@ IF:
     @@Description:
       @@@lang:en
       @@@@: The node name.
+    @@NSVersion[list]:
+      Node.prefix
+      Node.localName
     @@Get:
       @@@Type: DOMString
       @@@InCase:
@@ -8908,6 +9336,59 @@ IF:
        2
        3
   
+  @ReMethod:
+     @@Name:  lookupPrefix
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Lookup the namespace prefix associated to the given namespace 
+         URI, starting from this node.
+       \
+         The default namespace declarations are ignored by this method. 
+         To lookup default namespace, use the <M:Node.isDefaultNamespace>
+         method.
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace URI to look for.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Always <DOM:null> will be returned.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Always <DOM:null> will be returned.
+     @@Return:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An associated namespace prefix.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              No namespace prefix is found.  Always <DOM:null> is 
+              returned for the <IF:DocumentFragment> node.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@: $r = null;
+     @@Level[list]:  3
+     @@SpecLevel:3
+     @@Redefine:Node
   @ReAttr:
     @@Name: nodeName
     @@Description:
@@ -8917,6 +9398,9 @@ IF:
       @@@DOM3[list]:
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@NSVersion[list]:
+      Node.prefix
+      Node.localName
     @@Get:
       @@@Type: DOMString
       @@@InCase:
@@ -9458,6 +9942,7 @@ IF:
        @@@@:
          In this NOTEd case, that node might have <Q:infoset:prefix> 
          but will not have <Q:infoset:namespaceName>.
+     @@NSVersion:\
      @@Param:
         @@@Name:  name
         @@@Type:  DOMString
@@ -9676,7 +10161,8 @@ IF:
      @@NoNSVersion:createElement
      @@Param:
         @@@Name:  namespaceURI
-        @@@Type:  DOMString
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -10578,6 +11064,73 @@ IF:
     @@SpecLevel:3
     @@Level[list]:3
     @@Redefine:Node
+  @ReMethod:
+     @@Name:  lookupPrefix
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Lookup the namespace prefix associated to the given namespace 
+         URI, starting from this node.
+       \
+         The default namespace declarations are ignored by this method. 
+         To lookup default namespace, use the <M:Node.isDefaultNamespace>
+         method.
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace URI to look for.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Always <DOM:null> will be returned.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Always <DOM:null> will be returned.
+     @@Return:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An associated namespace prefix.
+          \
+            If more than one prefix are associated to the 
+            namespace URI, which is returned is implementation 
+            dependent.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              No namespace prefix is found.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            if (not defined $namespaceURI) {
+              $r = null;
+            } else {
+              for (@{$self->{<Q:TreeCore:node>}->{<Q:infoset:children>}}) {
+                if ($_->{<Q:DOMCore:nodeType>} eq <Q:infoset:Element>) {
+                  $r = $_->__SUPER{ManakaiDOMNodeObjectNode::}__::__INT{lookupNamespacePrefix}__
+                                                 ($namespaceURI, $_);
+                  last;
+                }
+              }
+            }
+     @@Level[list]:  3
+     @@SpecLevel:3
+     @@Redefine:Node
   @ReAttr:
     @@Name: nodeName
     @@Description:
@@ -10587,6 +11140,9 @@ IF:
       @@@DOM3[list]:
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061
+    @@NSVersion[list]:
+      Node.prefix
+      Node.localName
     @@Get:
       @@@Type: DOMString
       @@@InCase:

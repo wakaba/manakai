@@ -99,8 +99,9 @@ sub english_number ($;%) {
 sub english_list ($;%) {
   my ($list, %opt) = @_;
   if (@$list > 1) {
-    join (', ', @$list[0..($#$list-1)]).
-    ' '.($opt{connector} || 'or').' '.
+    $opt{connector} = defined $opt{connector}
+                          ? qq< $opt{connector} > : qq<, >;
+    join (', ', @$list[0..($#$list-1)]).$opt{connector}.
     $list->[-1];
   } else {
     $list->[0];
@@ -253,10 +254,17 @@ sub perl_code ($;%);
 sub perl_code ($;%) {
   my ($s, %opt) = @_;
   valid_err q<Uninitialized value in perl_code> unless defined $s;
-  $s =~ s{<Q:([^>]+)>|\b(null|true|false)\b}{
-    defined $1 ? perl_literal (expanded_uri ($1))
-               : {qw/null undef true 1 false 0/}->{$2};
-  }ge;
+  $s =~ s[<Q:([^<>]+)>|\b(null|true|false)\b][
+    my ($q, $l) = ($1, $2);
+    if (defined $q) {
+      if ($q =~ /\}/) {
+        valid_warn qq<Possible typo in the QName: "$q">;
+      }
+      perl_literal (expanded_uri ($q));
+    } else {
+      {true => 1, false => 0, null => 'undef'}->{$l};
+    }
+  ]ge;
 ## TODO: Ensure Message::Util::Error imported if try.
 ## ISSUE: __FILE__ & __LINE__ will break if multiline substition happens.
   $s =~ s{
@@ -993,7 +1001,7 @@ sub pod_code ($) {
 
 sub muf_template ($) {
   my $s = shift;
-  $s =~ s{<Q:([^>]+)>}{           ## QName
+  $s =~ s{<Q:([^<>]+)>}{           ## QName
     expanded_uri ($1)
   }ge;
   $s;
@@ -1513,6 +1521,65 @@ sub get_level_description ($%) {
   $r;
 } # get_level_description
 
+sub get_alternate_description ($;%) {
+  my ($node, %opt) = @_;
+  my @desc;
+  $opt{if} ||= 'interface';
+  $opt{method} ||= $node->local_name =~ /Attr/ ? 'attribute' : 'method';
+  
+  ## XML Namespace unaware alternate
+  ## (This method is namespace aware.)
+  my $ns = $node->get_attribute_value ('NoNSVersion', as_array => 1,
+                                       default => undef);
+  if (defined $ns) {
+    my $a = '';
+    if (@$ns) {
+      $a = english_list 
+             [map {
+               if (/^(?:[AM]:)?([^.]+)\.([^.]+)$/) {
+                 pod_code ($2) . ' on the interface '.
+                 type_label (type_expanded_uri ($1), is_pod => 1)
+               } else {
+                 pod_code ($_)
+               }
+             } @$ns], connector => 'and/or';
+      $a = qq<DOM applications dealing with documents that do >.
+           qq<not use XML Namespaces should use $a instead.>;
+    }
+    push @desc, pod_para
+                  qq<This $opt{method} is namespace-aware.  Mixing >.
+                  qq<namespace-aware and -unaware methods can lead >.
+                  qq<to unpredictable result.  $a>;
+  }
+
+  ## XML Namespace aware alternate
+  ## (This method is namespace unaware.)
+  $ns = $node->get_attribute_value ('NSVersion', as_array => 1,
+                                       default => undef);
+  if (defined $ns) {
+    my $a = '';
+    if (@$ns) {
+      $a = english_list 
+             [map {
+               if (/^(?:[AM]:)?([^.]+)\.([^.]+)$/) {
+                 pod_code ($2) . ' on the interface '.
+                 type_label (type_expanded_uri ($1), is_pod => 1)
+               } else {
+                 pod_code ($_)
+               }
+             } @$ns];
+      $a = qq<DOM applications dealing with documents that do >.
+           qq<use XML Namespaces should use $a instead.>;
+    }
+    push @desc, pod_para
+                  qq<This $opt{method} is namespace ignorant.  Mixing >.
+                  qq<namespace-aware and -unaware methods can lead >.
+                  qq<to unpredictable result.  $a>;
+  }
+
+  @desc;
+} # get_alternate_description
+
 sub get_redef_description ($;%) {
   my ($node, %opt) = @_;
   my @desc;
@@ -1575,10 +1642,15 @@ sub get_incase_label ($;%) {
     if ($label) {
       if ($label->get_attribute_value ('is-null', default => 0)) {
         $label = 'null';
-      } elsif (type_isa $type, ExpandedURI q<DOMMain:DOMString>) {
-        $label = perl_literal $label->value;
       } else {
-        $label = $label->value;
+        if (not defined $label->value) {
+          valid_err q<Value is null>, node => $node;
+        }
+        if (type_isa $type, ExpandedURI q<DOMMain:DOMString>) {
+          $label = perl_literal $label->value;
+        } else {
+          $label = $label->value;
+        }
       }
       $label = $opt{is_pod} ? pod_code $label : $label;
     } else {
@@ -1899,7 +1971,6 @@ sub if2perl ($) {
   local $Info->{Namespace} = {%{$Info->{Namespace}}};
   local $Info->{Require_perl_package} = {%{$Info->{Require_perl_package}}};
   local $Info->{Require_perl_package_use} = {};
-  local $Status->{Operator} = {};
   local $Status->{is_implemented} = 1;
 
   my @level;
@@ -1917,6 +1988,7 @@ sub if2perl ($) {
     if ($condition =~ /^DOM(\d+)$/) {
       next if @level and $level[0] > $1;
     }
+    local $Status->{Operator} = {};
     local $Status->{condition} = $condition;
     my $cond_if_pack_name = perl_package_name if => $if_name,
                                     condition => $condition;
@@ -2013,9 +2085,9 @@ sub if2perl ($) {
         valid_warn qq{Element @{[$_->local_name]} not supported};
       }
     }
+    
+    $result .= ops2perl;
   }
-
-  $result .= ops2perl;
 
   $result;
 } # if2perl
@@ -2101,7 +2173,13 @@ sub method2perl ($;%) {
     }
   }
   
-  my $return = $node->get_attribute ('Return', make_new_node => 1);
+  my $return = $node->get_attribute ('Return');
+  unless ($return) {
+    ## NOTE: A method without return value does not have 'Return'
+    ##       before its code is implemented.
+    valid_warn q<Required "Return" element not found>, node => $node;
+    $return = $node->get_attribute ('Return', make_new_node => 1);
+  }
   my $has_return = $return->get_attribute_value ('Type', default => 0) ? 1 : 0;
   push my @desc,
                pod_head ($Status->{depth}, 'Method ' . 
@@ -2305,6 +2383,7 @@ sub method2perl ($;%) {
                            nor does raise any exceptions.>;
   }
 
+  push @desc, get_alternate_description $node;
   push @desc, get_redef_description $node;
 
   if ($node->local_name eq 'IntMethod' or
@@ -2324,8 +2403,8 @@ sub method2perl ($;%) {
 
   if (my $op = get_perl_definition_node $node, name => 'Operator') {
     my $value = $op->value;
-    valid_err qq{Overloaded operator name for "@{[$op->node_path (key => 'Name')
-                 ]}" not specified}
+    valid_err qq{Overloaded operator name not specified},
+      node => $op
       unless defined $value;
     $Status->{Operator}->{$value} = '\\' . perl_var type => '&', 
                                                         local_name => $m_name;
@@ -2350,7 +2429,10 @@ sub attr2perl ($;%) {
     $level = get_level_description $node, level => \@level;
   }
   
-  my $return = $node->get_attribute ('Get', make_new_node => 1);
+  my $return = $node->get_attribute ('Get');
+  unless ($return) {
+    valid_err q<Required "Get" element not found>, node => $node;
+  }
   my $set = $node->get_attribute ('Set');
   my $has_set = defined $set ? 1 : 0;
   push my @desc,
@@ -2639,6 +2721,7 @@ sub attr2perl ($;%) {
   is_implemented if => $Status->{IF}, method => $Status->{Method},
                  condition => $opt{condition}, set => $Status->{is_implemented};
 
+  push @desc, get_alternate_description $node;
   push @desc, get_redef_description $node, method => 'attribute';
 
   if ($node->local_name eq 'IntAttr' or
@@ -3675,6 +3758,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/09/25 12:58:21 $
+# $Date: 2004/09/26 11:43:06 $
 
 
