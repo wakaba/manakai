@@ -14,7 +14,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::NodeTree;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Message::Markup::XML::Parser::NodeTree;
 push our @ISA, 'Message::Markup::XML::Parser::Base';
@@ -442,6 +442,90 @@ sub notation_declaration_start ($$$$%) {
                       namespace_uri => SGML_NOTATION);
 }
 
+sub notation_declaration_end ($$$$%) {
+  my ($self, $src, $p, $pp, %opt) = @_;
+  for my $NOTATION ($pp->{ExpandedURI q<tree:current>}) {
+    $NOTATION->local_name (${$pp->{ExpandedURI q<notation-name>}})
+      if $pp->{ExpandedURI q<notation-name>};
+    $NOTATION->set_attribute (PUBLIC => ${$pp->{ExpandedURI q<tree:PUBLIC>}})
+      if $pp->{ExpandedURI q<tree:PUBLIC>};
+    $NOTATION->set_attribute (SYSTEM => ${$pp->{ExpandedURI q<tree:SYSTEM>}})
+      if $pp->{ExpandedURI q<tree:SYSTEM>};
+  }
+}
+
+sub element_declaration_start ($$$$%) {
+  my ($self, $src, $p, $pp, %opt) = @_;
+  $pp->{ExpandedURI q<tree:current>}
+             = $p->{ExpandedURI q<tree:current>}
+                 ->append_new_node
+                     (type => '#declaration',
+                      namespace_uri => SGML_ELEMENT);
+}
+
+sub model_group_start ($$$$%) {
+  my ($self, $src, $p, $pp, %opt) = @_;
+  ($pp->{ExpandedURI q<tree:physical>} = $p->{ExpandedURI q<tree:physical>})
+     ->{$opt{ExpandedURI q<source>}->[-1]}
+             = $pp->{ExpandedURI q<tree:current>}
+             = $p->{ExpandedURI q<tree:current>}
+                 ->append_new_node
+                     (type => '#element',
+                      namespace_uri => SGML_ELEMENT,
+                      local_name => 'group');
+}
+
+sub model_group_content ($$$$%) {
+  my ($self, $src, $p, $pp, %opt) = @_;
+  if ($pp->{ExpandedURI q<item-type>} eq 'gi') {
+    my $el = $p->{ExpandedURI q<tree:current>}
+               ->append_new_node
+                     (type => '#element',
+                      namespace_uri => SGML_ELEMENT,
+                      local_name => 'element');
+    $el->set_attribute (qname => ${$pp->{ExpandedURI q<element-type-name>}});
+    $el->set_attribute (occurence => ${$pp->{ExpandedURI q<occurrence>}})
+      if $pp->{ExpandedURI q<occurrence>};
+  }
+}
+
+sub model_group_end ($$$$%) {
+  my ($self, $src, $p, $pp, %opt) = @_;
+  my $grp = $pp->{ExpandedURI q<tree:current>};
+  $grp->set_attribute (occurence => ${$pp->{ExpandedURI q<occurrence>}})
+    if $pp->{ExpandedURI q<occurrence>};
+  $grp->set_attribute (connector => ${$pp->{ExpandedURI q<connector>}})
+    if $pp->{ExpandedURI q<connector>};
+}
+
+sub element_declaration_end ($$$$%) {
+  my ($self, $src, $p, $pp, %opt) = @_;
+  for my $ELEMENT ($pp->{ExpandedURI q<tree:current>}) {
+    $ELEMENT->set_attribute (qname => ${$pp->{ExpandedURI q<element-type-name>}})
+      if $pp->{ExpandedURI q<element-type-name>};
+    if ($pp->{ExpandedURI q<element-content-keyword>}) {
+      if (${$pp->{ExpandedURI q<element-content-keyword>}} eq 'EMPTY') {
+        $ELEMENT->set_attribute (content => 'EMPTY');
+      } elsif (${$pp->{ExpandedURI q<element-content-keyword>}} eq 'ANY') {
+        $ELEMENT->set_attribute (content => 'ANY');
+      } else {
+        $ELEMENT->set_attribute (content => 'mixed');
+      }
+    } else {
+      $ELEMENT->set_attribute (content => 'element');
+    }
+  }
+}
+
+sub attlist_declaration_start ($$$$%) {
+  my ($self, $src, $p, $pp, %opt) = @_;
+  $pp->{ExpandedURI q<tree:current>}
+             = $p->{ExpandedURI q<tree:current>}
+                 ->append_new_node
+                     (type => '#declaration',
+                      namespace_uri => SGML_ATTLIST);
+}
+
 sub markup_declaration_parameters_start ($$$$%) {
   my ($self, $src, $p, $pp, %opt) = @_;
   $pp->{ExpandedURI q<tree:physical>}
@@ -809,4 +893,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/07/30 05:01:03 $
+1; # $Date: 2004/07/30 09:37:51 $

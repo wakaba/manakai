@@ -660,6 +660,70 @@ my @a = (
          },
   },
  },
+
+ {
+  method => q<parse_document_entity>,
+  t => q(<!DOCTYPE r [<!NOTATION a SYSTEM "sys">]><r></r>),
+  result => [
+    q<<!DOCTYPE r [<!NOTATION a SYSTEM "sys">]><r xmlns=""></r>>,
+    q<<!DOCTYPE r [<!NOTATION  a SYSTEM "sys">]><r xmlns=""></r>>,
+  ],
+ },
+ {
+  method => q<parse_document_entity>,
+  t => q(<!DOCTYPE r [<!-- --> <!NOTATION ab PUBLIC "sys">]><r></r>),
+  result => [
+    q<<!DOCTYPE r [<!-- --> <!NOTATION ab PUBLIC "sys">]><r xmlns=""></r>>,
+    q<<!DOCTYPE r [<!-- --> <!NOTATION  ab PUBLIC "sys">]><r xmlns=""></r>>,
+  ],
+ },
+
+ {
+  method => q<parse_document_entity>,
+  t => q(<!DOCTYPE r [<!-- --> <!ELEMENT el EMPTY>]><r></r>),
+  result => [
+    q<<!DOCTYPE r [<!-- --> <!ELEMENT el EMPTY>]><r xmlns=""></r>>,
+  ],
+ },
+ {
+  method => q<parse_document_entity>,
+  t => q(<!DOCTYPE r [<!-- --> <!ELEMENT el ANY>]><r></r>),
+  result => [
+    q<<!DOCTYPE r [<!-- --> <!ELEMENT el ANY>]><r xmlns=""></r>>,
+  ],
+ },
+ {
+  method => q<parse_document_entity>,
+  t => q(<!DOCTYPE r [<!-- --> <!ELEMENT el (#PCDATA)>]><r></r>),
+  result => [
+    q<<!DOCTYPE r [<!-- --> <!ELEMENT el (#PCDATA)>]><r xmlns=""></r>>,
+  ],
+ },
+ {
+  method => q<parse_document_entity>,
+  t => q(<!DOCTYPE r [<!-- --> <!ELEMENT el (#PCDATA)*>]><r></r>),
+  result => [
+    q<<!DOCTYPE r [<!-- --> <!ELEMENT el (#PCDATA)*>]><r xmlns=""></r>>,
+  ],
+ },
+ {
+  method => q<parse_document_entity>,
+  t => q(<!DOCTYPE r [<!-- --> <!ELEMENT el (#PCDATA | a)*>]><r></r>),
+  result => [
+    q<<!DOCTYPE r [<!-- --> <!ELEMENT el (#PCDATA | a)*>]><r xmlns=""></r>>,
+    q<<!DOCTYPE r [<!-- --> <!ELEMENT el (#PCDATA|a)*>]><r xmlns=""></r>>,
+  ],
+ },
+ {
+  method => q<parse_document_entity>,
+  t => q(<!DOCTYPE r [<!-- --> <!ELEMENT el (b? | (a*, (c)))+>]><r></r>),
+  result => [
+    q<<!DOCTYPE r [<!-- --> <!ELEMENT el (b? | (a*, (c)))+>]><r xmlns=""></r>>,
+    q<<!DOCTYPE r [<!-- --> <!ELEMENT el (b?|(a*,(c)))+>]><r xmlns=""></r>>,
+  ],
+ },
+
+ # LAST TEST
 );
 
 plan tests => scalar @a;

@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::Base;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML
     qw[InXML_NameStartChar10 InXMLNameChar10
        InXMLNameStartChar11 InXMLNameChar11
@@ -2353,7 +2353,7 @@ sub parse_model_group ($$$%) {
              source => $param->{value});
         }
         $self->parse_model_group
-          ($opt{ExpandedURI q<source>}->[-1], $ppp, %opt);
+          ($opt{ExpandedURI q<source>}->[-1], $pp, %opt);
         $ppp->{ExpandedURI q<item-type>} = 'group';
       } elsif ($param->{type} eq 'rniKeyword') {
         shift @{$p->{ExpandedURI q<param>}};
@@ -2448,7 +2448,7 @@ sub parse_model_group ($$$%) {
         $self->{error}->set_position ($src, moved => 1,
                                       diff => length $del);
         $self->{error}->fork_position ($src => \$del);
-        $p->{ExpandedURI q<occurrence>} = \$del;
+        $pp->{ExpandedURI q<occurrence>} = \$del;
         if ($has_pcdata and $del ne '*') {
           $self->report
             (-type => 'SYNTAX_MODEL_GROUP_'.($i > 1 ? 'MIXED' : 'PCDATA')
@@ -2465,6 +2465,9 @@ sub parse_model_group ($$$%) {
            position_diff => 1);
       }
     }
+    $pp->{ExpandedURI q<connector>} = \$connect;
+    $p->{ExpandedURI q<element-content-keyword>} = \'#PCDATA'
+      if $has_pcdata;
     $self->model_group_end
               ($src, $p, $pp, %opt);
     return 1;
@@ -4266,4 +4269,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/07/30 05:01:03 $
+1; # $Date: 2004/07/30 09:37:50 $

@@ -13,7 +13,7 @@ This module is part of manakai XML.
 
 package Message::Markup::XML::Node;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.6.2.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.6.2.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload
   '""'     => \&outer_xml,
   bool     => sub { 
@@ -976,13 +976,13 @@ sub inner_xml ($;%) {
               and $_->namespace_uri eq SGML_ELEMENT) {
                 if ($_->local_name eq 'group') {
                   my $tt = &$make_cmodel ($_);
-                  push @tt, '(' . $tt . ')'
+                  push @tt, '(' . $tt . ')'         # [sic]
                      . $_->get_attribute_value ('occurence', default => '')
                     if $tt;
                 } elsif ($_->local_name eq 'element') {
                   push @tt, $_->get_attribute_value ('qname')
                      . $_->get_attribute_value ('occurence', default => '');
-                }
+                }                                   # [sic]
               }
             }
             return join scalar ($c->get_attribute_value ('connector')
@@ -1004,13 +1004,14 @@ sub inner_xml ($;%) {
             if ($tt) {
               $r .= '(#PCDATA|' . $tt . ')*';
             } else {
-              $r .= '(#PCDATA)'
-                  . ($grp_node->get_attribute_value ('occurence') eq '*'
+              $r .= '(#PCDATA)'                       # [sic]
+                  . ($grp_node->get_attribute_value ('occurence', default => '')
+                     eq '*'
                      ? '*' : '');
             }
           } else {	## element content
             if ($tt) {
-              $r .= '(' . $tt . ')'
+              $r .= '(' . $tt . ')'                   # [sic]
                   . $grp_node->get_attribute_value ('occurence', default => '');
             } else { ## Error
               $r .= 'EMPTY';
@@ -1395,4 +1396,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/06/27 06:34:07 $
+1; # $Date: 2004/07/30 09:37:50 $
