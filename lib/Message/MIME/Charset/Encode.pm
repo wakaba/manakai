@@ -18,14 +18,61 @@ This module provides such macros for Encode modules.
 package Message::MIME::Charset::Encode;
 use strict;
 use vars qw(%CODE $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::MIME::Charset;
 require Encode;
 
 $CODE{internal} = 'utf-8';
-$CODE{input} = '7bitjis';
-$CODE{output} = '7bitjis';
+
+=head1 $Message::MIME::Charset::Encode::CODE{input} = $perl_charset_name
+=head1 $Message::MIME::Charset::Encode::CODE{output} = $perl_charset_name
+
+Perl Encode module's name of '*default' charset.
+You should change these value if necessary.
+
+=cut
+
+$CODE{input} = '7bit-jis';
+$CODE{output} = '7bit-jis';
+
+require Encode::Alias;
+Encode::Alias::define_alias( qr/^(?:x-)?mac[-_]?(\w+)$/i => '"mac$1"' );
+Encode::Alias::define_alias( qr/^macintosh$/i => '"macroman"' );
+Encode::Alias::define_alias( qr/^windows[-_]?31j$/i => '"cp932"' );
+
+my %_PerlName2IanaName = qw(
+	7bit-jis	iso-2022-jp-1
+	adobestandardencoding	adobe-standard-encoding
+	adobesymbol	adobe-symbol-encoding
+	ascii-ctrl	us-ascii
+	cp37	ibm037
+	cp932	windows-31j	cp936	gbk	cp949	windows-949
+	cp1250	windows-1250	cp1251	windows-1251
+	cp1252	windows-1252	cp1253	windows-1253
+	cp1254	windows-1254	cp1255	windows-1255
+	cp1256	windows-1256	cp1257	windows-1257
+	cp1258	windows-1258
+	euc-cn	gb2312
+	gsm0338	gsm-default-alphabet
+	hz	hz-gb-2312
+	iso-8859-11	tis-620
+	macarabic	x-mac-arabic	maccentraleurroman	x-mac-centralroman
+	maccyrillic	x-mac-cyrillic	macgreek	x-mac-greek
+	machebrew	x-mac-hebrew	macicelandic	x-mac-icelandic
+	macroman	macintosh	macturkish	x-mac-turkish
+	macukrainian	x-mac-ukrainian	macchinesesimp	x-mac-chinesesimp
+	macjapanese	x-mac-japanese	mackorean	x-mac-korean
+	shiftjis	shift_jis	shiftjisx0213	shift_jisx0213
+	ucs-2be	iso-10646-ucs-2	ucs-4be	iso-10646-ucs-4
+	ucs-2le	utf-16le	ucs-2	utf-16
+);
+#	MacCroatian	
+#	MacFarsi	
+#	MacRomanian	
+#	MacRumanian	
+#	MacSami	
+#	MacThai	
 
 sub import ($;%) {
   shift;
@@ -49,10 +96,16 @@ sub import ($;%) {
       #}
       return ($s, success => 0) unless Encode::find_encoding ($name);
       return (Encode::decode ($name, $s), success => 1);
-    }
+    },
+    preferred_name	=> sub {
+      my $name = shift;
+      my $perlname = lc Encode::resolve_alias ($name);
+      $_PerlName2IanaName{$perlname} || $perlname || $name;
+    },
   );
   Message::MIME::Charset::make_charset ('*default' => alias_of => '*undef');
 }
+
 
 =head1 EXAMPLE
 
@@ -92,7 +145,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/22 02:43:53 $
+$Date: 2002/07/22 07:47:15 $
 
 =cut
 
