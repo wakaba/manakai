@@ -15,7 +15,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Validate;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Markup::XML::Parser;
 our (%NS);
 *NS = \%Message::Markup::XML::NS;
@@ -209,9 +209,11 @@ sub validate ($$;%) {
     $opt{entMan} = $node->_get_entity_manager;
   }
   my $valid = 1;
-  for ($self->_validate_notation_declared ($node, entMan => $opt{entMan}),
+  for (
+       $self->_validate_notation_declared ($node, entMan => $opt{entMan}),
        $self->_validate_attlist_declaration ($node, entMan => $opt{entMan}),
-       $self->_validate_document_instance ($node, entMan => $opt{entMan})) {
+       $self->_validate_document_instance ($node, entMan => $opt{entMan})
+      ) {
     $valid &= $_;
   }
   return $valid;
@@ -229,7 +231,7 @@ sub _validate_attlist_declaration ($$;%) {
   for my $attlist (@$l) {
     my $element_qname = $attlist->get_attribute ('qname', make_new_node => 1)->inner_text;
     unless ($edef{$element_qname}) {
-      $edef{$element_qname} = $opt{entMan}->is_declared_entity ($element_qname,
+      $edef{$element_qname} = $opt{entMan}->get_entity ($element_qname,
                                                          namespace_uri => $NS{SGML}.'element');
       unless ($edef{$element_qname}) {
         $self->{error}->raise_error ($attlist, type => 'WARN_XML_ATTLIST_ELEMENT_DECLARED',
@@ -861,4 +863,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/13 09:04:02 $
+1; # $Date: 2003/09/17 09:17:13 $

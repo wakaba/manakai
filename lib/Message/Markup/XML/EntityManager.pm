@@ -21,7 +21,7 @@ This module is part of XML.
 
 package Message::Markup::XML::EntityManager;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 our %NS;
 *NS = \%Message::Markup::XML::NS;
 
@@ -50,8 +50,12 @@ sub is_declared_entity ($$;%) {
     $o{namespace_uri} ||= $NS{SGML}.'entity';
   }
   $self->{cache}->{is_declared_entity}->{$o{namespace_uri}} = {} if $o{clear_cache};
-  $self->{cache}->{is_declared_entity}->{$o{namespace_uri}}->{$name} = $o{set_value}
-    if defined $o{set_value};
+  if (ref $o{set_value}) {
+    $self->{cache}->{entity_declaration}->{$o{namespace_uri}}->{$name} = $o{set_value};
+    $self->{cache}->{is_declared_entity}->{$o{namespace_uri}}->{$name} = 1;
+  } elsif (defined $o{set_value}) {
+    $self->{cache}->{is_declared_entity}->{$o{namespace_uri}}->{$name} = $o{set_value};
+  }
   unless (defined $self->{cache}->{is_declared_entity}->{$o{namespace_uri}}->{$name}) {
     if ($o{seek}) {
       $self->{cache}->{is_declared_entity}->{$o{namespace_uri}}->{$name}
@@ -89,7 +93,7 @@ sub get_entity ($$;%) {
   $self->{cache}->{entity_declaration}->{$o{namespace_uri}} = {} if $o{clear_cache};
   my $e = $self->{cache}->{entity_declaration}->{$o{namespace_uri}}->{$name};
   return $e if ref $e;
-  return undef unless ref $self->{doctype};
+  return undef if !$o{seek} || !(ref $self->{doctype});
   $e = $self->_get_entity ($name, $self->{doctype}->{node}, \%o);
   if (ref $e) {
     $self->{cache}->{entity_declaration}->{$o{namespace_uri}}->{$name} = $e;
@@ -547,4 +551,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/13 09:04:02 $
+1; # $Date: 2003/09/17 09:17:13 $

@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXMLChar
                         InXML_deprecated_noncharacter InXML_unicode_xml_not_suitable!;
 require Message::Markup::XML;
@@ -463,7 +463,7 @@ sub _parse_element_content ($$$$;%) {
       my $eref = $self->_parse_reference ($c, $entity_ref, $o);
       unless (index ($eref->{namespace_uri}, 'char') > -1) {	## General entity reference
         my $entity = $opt{entMan}->get_entity ($eref);
-        if (!$entity && {qw/&lt; 1 &gt; 1 &amp; 1 &quot; 1 &apos; 1/}->{$entity_ref}) {
+        if (!ref ($entity) && {qw/&lt; 1 &gt; 1 &amp; 1 &quot; 1 &apos; 1/}->{$entity_ref}) {
           $self->_raise_error ($o, c => $c, type => 'WARN_PREDEFINED_ENTITY_NOT_DECLARED',
                                t => $entity_ref);
           $entity = $opt{entMan}->get_entity ($eref);
@@ -862,12 +862,12 @@ sub _parse_dtd ($$$$;%) {
     ## Markup section end (= msc + mdc)
     } elsif ($opt{return_with_mse} && ($$s =~ s/^\]\]>//)) {
       $self->_clp (___ => $o);
-      last;
+      return undef;
     ## DOCTYPE declaration end
     } elsif ($opt{return_with_dsc} && ($$s =~ s/^(\](?:$xml_re{s})?>)//s)) {
       $self->_clp ($1 => $o);
       $c = $c->{parent};
-      last;
+      return undef;
     } elsif ($$s =~ s/^($xml_re{PI_M})//s) {
       if ($2 eq 'xml') {
         $self->_raise_error ($o, c => $c, type => 'SYNTAX_XML_DECLARE_POSITION');
@@ -945,7 +945,7 @@ sub _parse_attr_value_literal_data ($$$$;%) {
       my $eref_node = $c->append_new_node (type => '#reference', local_name => $ename,
                                            namespace_uri => $NS{SGML}.'entity');
       my $entity = $opt{entMan}->get_entity ($ename, dont_use_predefined_entities => 1);
-      if (!$entity && {qw/lt 1 gt 1 amp 1 quot 1 apos 1/}->{$ename}) {
+      if (!ref ($entity) && {qw/lt 1 gt 1 amp 1 quot 1 apos 1/}->{$ename}) {
         $self->_raise_error ($o, c => $eref_node, type => 'WARN_PREDEFINED_ENTITY_NOT_DECLARED',
                              t => $entity_ref);
         $entity = $opt{entMan}->get_entity ($ename);
@@ -1025,7 +1025,7 @@ sub _parse_rpdata ($$\$$;%) {
           my $o2 = $self->_make_clone_of ($o);
           if ($o2->{__entities}->{$ref}) {
             $self->_raise_error ($o, c => $c, type => 'WFC_NO_RECURSION', t => $ref);
-          } elsif (defined $entity->flag ('smxp__entity_replacement_text_rpdata')) {
+          } elsif (defined ($entity->flag ('smxp__entity_replacement_text_rpdata'))) {
             my $ev = $entity->flag ('smxp__entity_replacement_text_rpdata');
             $eref->append_text ($ev);
             $tt .= $ev;
@@ -1135,7 +1135,7 @@ sub _parse_md_params ($$$$$;%) {
         } else {
           if ($o->{__entities}->{$ref}) {
             $self->_raise_error ($o, c => $c, type => 'WFC_NO_RECURSION', t => $ref);
-          } elsif (defined $entity->flag ('smxp__entity_replacement_text_md_params')) {
+          } elsif (defined ($entity->flag ('smxp__entity_replacement_text_md_params'))) {
             $t .= ' '.$entity->flag ('smxp__entity_replacement_text_md_params').' ';
           } else {
             my $o2 = $self->_make_clone_of ($o);
@@ -1369,14 +1369,14 @@ sub _parse_xml_declaration ($$$$) {
   }
 }
 
-sub _parse_entity_declaration ($\$$$;%) {
+sub _parse_entity_declaration ($$$$;%) {
     my ($self, $s, $c, $o, %opt) = @_;
     my $p;	## notation ? 'n' : parameter entity ? '%' : undef;
-    my $dont_process = $c->root_node->flag ('smxp__stop_read_dtd');
+    my $root_node = $c->root_node;
     my $e = $c->append_new_node (type => '#declaration');
       $e->flag (smxp__uri_in_which_declaration_is => $o->{uri});
       $e->flag (smxp__declaration_may_not_be_read
-                => $c->root_node->flag ('smxp__declaration_may_not_be_read'));
+                => $root_node->flag ('smxp__declaration_may_not_be_read'));
     ## Entity? or notation?
     if ($$s =~ s/^<!ENTITY//) {
       $e->namespace_uri ($NS{SGML}.'entity');
@@ -1388,9 +1388,10 @@ sub _parse_entity_declaration ($\$$$;%) {
     }
     ## Parameters
     my $t;
+    my $dont_process = $root_node->flag ('smxp__stop_read_dtd');
     $t = $self->_parse_md_params ($e, $s, $o, dont_resolve_entity_ref => $dont_process,
                                   return_by_mdc => 1, entMan => $opt{entMan});
-    $dont_process = $c->root_node->flag ('smxp__stop_read_dtd');
+    $dont_process = $root_node->flag ('smxp__stop_read_dtd');
     unless ($dont_process) {
       my $o = $self->_make_clone_of ($o);
       my $is_internal = 1;
@@ -1421,7 +1422,7 @@ sub _parse_entity_declaration ($\$$$;%) {
         } else {	## Regist to entMan
           $opt{entMan}->is_declared_entity ($ename, namespace_uri => $e->namespace_uri,
                                        dont_use_predefined_entities => 1,
-                                       set_value => 1, seek => 0)
+                                       set_value => $e, seek => 0);
         }
         $self->_raise_error ($o, c => $c, type => 'NS_SYNTAX_NAME_IS_NCNAME', t => $ename)
           if index ($ename, ':') > -1;
@@ -1686,18 +1687,19 @@ sub _parse_element_declaration ($$$$;%) {
 
 sub _parse_attlist_declaration ($$$$;%) {
   my ($self, $s, $c, $o, %opt) = (@_);
+  my $root_node = $c->root_node;
   $c = $c->append_new_node (type => '#declaration', namespace_uri => $NS{SGML}.'attlist');
       $c->flag (smxp__declaration_may_not_be_read
-                => $c->root_node->flag ('smxp__declaration_may_not_be_read'));
+                => $root_node->flag ('smxp__declaration_may_not_be_read'));
   unless ($$s =~ s/^<!ATTLIST//s) {
     $self->_raise_error ($o, type => 'UNKNOWN', c => $c, t => substr ($$s, 0, 10));
     return;
   }
   $self->_clp (_________ => $o);
   
-  my $dont_process = $c->root_node->flag ('smxp__stop_read_dtd');
+  my $dont_process = $root_node->flag ('smxp__stop_read_dtd');
   my $t = $self->_parse_md_params ($c, $s, $o, entMan => $opt{entMan}, return_by_mdc => 1);
-  $dont_process = $c->root_node->flag ('smxp__stop_read_dtd');
+  $dont_process = $root_node->flag ('smxp__stop_read_dtd');
   
   unless ($dont_process) {
     ## Element type name
@@ -1716,7 +1718,7 @@ sub _parse_attlist_declaration ($$$$;%) {
       } else {	## Regist to entMan
         $opt{entMan}->is_declared_entity ($type_qname, namespace_uri => $NS{SGML}.'attlist',
                                           dont_use_predefined_entities => 1,
-                                          set_value => 1, seek => 0)
+                                          set_value => $c, seek => 0)
       }
       $c->set_attribute (qname => $type_qname);
     } else {
@@ -2006,4 +2008,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/14 01:09:36 $
+1; # $Date: 2003/09/17 09:17:13 $
