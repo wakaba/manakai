@@ -15,8 +15,8 @@ package Message::Util;
 require 5.6.0;
 use strict;
 use re 'eval';
-use vars qw(%FMT2STR %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use vars qw(%FMT2STR %OPTION %REG $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 use Carp ();
 require Message::MIME::EncodedWord;
@@ -695,6 +695,75 @@ sub decide_newline ($) {
   $nl;
 }
 
+=item $fqdn = Message::Util::get_host_fqdn
+
+Returns FQDN of THIS host.  If it is unable to get the FQDN,
+returns undef.
+
+=over 3
+
+=item $Message::Util::OPTION{use_Net_Domain} = 1/0
+
+Whether using Net::Domain module to get FQDN or not.
+
+=item $Message::Util::OPTION{use_Sys_Hostname} = 1/0
+
+Whether using Sys::Hostnamen module to get FQDN or not.
+
+=item $Message::Util::OPTION{use_Sys_Hostname_Long} = 1/0
+
+Whether using Sys::Hostnamen::Long module to get FQDN or not.
+
+=back
+
+Note that the value returned by Sys::Hostname::hostname
+usually does not match with the FQDN.  This module is prepared
+as the last way to get.  If you want not to get non-FQDN,
+set 0 to use_Sys_Hostname.  Sys::Hostname is bundled with
+Perl.  This is why its default is 1.
+
+=cut
+
+$OPTION{use_Net_Domain} = 1;
+$OPTION{use_Sys_Hostname} = 1;
+$OPTION{use_Sys_Hostname_Long} = 1;
+$OPTION{use_cache_host_fqdn} = 1;
+$OPTION{__cache_host_fqdn} = undef;
+
+sub get_host_fqdn () {
+  my $f = undef;
+  return $OPTION{__cache_host_fqdn}
+    if $OPTION{use_cache_host_fqdn} && $OPTION{__cache_host_fqdn};
+  if ($OPTION{use_Net_Domain}) {
+    eval q{require Net::Domain;
+      $f = &Net::Domain::hostfqdn;
+    } or Carp::carp "get_host_fqdn: get by Net::Domain: $@";
+    if ($f) {
+      $OPTION{__cache_host_fqdn} = $f;
+      return $f;
+    }
+  }
+  if ($OPTION{use_Sys_Hostname_Long}) {
+    eval q{require Sys::Hostname::Long;
+      $f = &Sys::Hostname::Long::hostname_long;
+    } or Carp::carp "get_host_fqdn: get by Sys::Hostname::Long: $@";
+    if ($f) {
+      $OPTION{__cache_host_fqdn} = $f;
+      return $f;
+    }
+  }
+  if ($OPTION{use_Sys_Hostname}) {
+    eval q{require Sys::Hostname;
+      $f = &Sys::Hostname::hostname;
+    } or Carp::carp "get_host_fqdn: get by Sys::Hostname: $@";
+    if ($f) {
+      $OPTION{__cache_host_fqdn} = $f;
+      return $f;
+    }
+  }
+  undef;
+}
+
 =head1 LICENSE
 
 Copyright 2002 wakaba E<lt>w@suika.fam.cxE<gt>.
@@ -717,7 +786,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/07 00:46:07 $
+$Date: 2002/07/13 09:34:50 $
 
 =cut
 

@@ -9,10 +9,11 @@ for "message/delivery-status" Internet Media Types
 package Message::Body::MessageDeliveryStatus;
 use strict;
 use vars qw(%DEFAULT @ISA $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Body::Text;
 push @ISA, qw(Message::Body::Text);
+require Message::Header::Message;
 
 %DEFAULT = (
   -_ARRAY_NAME	=> 'value',
@@ -41,7 +42,6 @@ sub _init ($;%) {
   my %option = @_;
   $self->SUPER::_init (%$DEFAULT, %option);
   $self->{value} = [];
-  require Message::Header::Message;
   $self->{option}->{value_type}->{per_message} = ['Message::Header',{
   	-format => 'message-delivery-status-per-message',
   	-ns_default_phuri	=> $Message::Header::Message::DeliveryStatus::OPTION{namespace_uri},
@@ -126,7 +126,7 @@ sub _item_match ($$\$\%\%) {
 ## Returns returned item value    \$item-value, \%option
 sub _item_return_value ($\$\%) {
   unless (ref ${$_[1]}) {
-    ${$_[1]} = $_[0]->_parse_value (body_part => ${$_[1]})
+    ${$_[1]} = $_[0]->_parse_value (per_recipient => ${$_[1]})
       if $_[2]->{parse};
   }
   ${$_[1]};
@@ -163,9 +163,11 @@ sub per_message ($;$) {
   my $self = shift;
   my $np = shift;
   if (defined $np) {
-    $np = $self->_parse_value (per_message => $np) if $self->{option}->{parse_all};
     $self->{per_message} = $np;
   }
+  $self->{per_message} = $self->_parse_value (per_message => $self->{per_message})
+    if   ($self->{option}->{parse_all} && defined $np)
+      || (defined wantarray);
   $self->{per_message};
 }
 
@@ -183,7 +185,7 @@ sub stringify ($;%) {
   for (grep {/^-/} keys %o) {$option{substr ($_, 1)} = $o{$_}}
   $self->_delete_empty;
   $self->add ({-parse => 1}, '') unless $#{ $self->{value} } + 1;
-  join ("\x0D\x0A", $self->{per_message}, @{ $self->{value} }) . "\x0D\x0A";
+  join ("\x0D\x0A", $self->{per_message}, @{ $self->{value} });
 }
 *as_string = \&stringify;
 
@@ -214,7 +216,7 @@ sub _fill_fields_pm ($\%\%) {
     && !$exist->{ $option->{fill_reporting_mta_name}.$ns  }) {
     my $rmta = $hdr->field ($option->{fill_reporting_mta_name});
     $rmta->type ('dns');
-    $rmta->value ('localhost');
+    $rmta->value (&Message::Util::get_host_fqdn || 'localhost');
   }
 }
 sub _fill_fields_pr ($\%\%) {
@@ -227,7 +229,7 @@ sub _fill_fields_pr ($\%\%) {
   if ($option->{fill_final_recipient} && !$exist->{ 'final-recipient'.$ns }) {
     my $fr = $hdr->field ('final-recipient');
     $fr->type ('rfc822');
-    $fr->value ('foo@bar.invalid');
+    $fr->value ('foo@'. (&Message::Util::get_host_fqdn || 'bar.invalid'));
   }
   if ($option->{fill_status} && !$exist->{ 'status'.$ns }) {
     my $fr = $hdr->add (status => '4.0.0');
@@ -272,7 +274,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/08 12:39:39 $
+$Date: 2002/07/13 09:34:50 $
 
 =cut
 

@@ -1,3 +1,12 @@
+2002-07-13  Wakaba <w@suika.fam.cx>
+
+	* Util.pm:
+	- (get_host_fqdn): New function.
+	- (%OPTION): New hash.
+	* Entity.pm (stringify): Pass 'format' option
+	to the body (when stringify'ing it) with
+	-parent_format option, instead of -format option.
+
 2002-07-08  Wakaba <w@suika.fam.cx>
 
 	* Entity.pm (parse): Typo fix.

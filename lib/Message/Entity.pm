@@ -13,7 +13,7 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.26 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.27 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::Header;
@@ -482,7 +482,7 @@ sub stringify ($;%) {
   my ($header, $body, $body0);
   if (ref $self->{body}) {
     $self->{body}->entity_header ($self->{header});
-    $body0 = $self->{body}->stringify (-format => $option{format},
+    $body0 = $self->{body}->stringify (-parent_format => $option{format},
       -linebreak_strict => $option{linebreak_strict});
   } else {
     $body0 = $self->{body};
@@ -552,6 +552,7 @@ sub stringify ($;%) {
       $self->{header}->field ($option{fill_ua_name})->add_our_name (
         -use_Config	=> $option{ua_use_Config},
         -use_Win32	=> $option{ua_use_Win32},
+        -date	=> q$Date: 2002/07/13 09:34:50 $,
       );
     }
     $header = $self->{header}->stringify (-format => $option{format},
@@ -915,7 +916,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/08 12:39:39 $
+$Date: 2002/07/13 09:34:50 $
 
 =cut
 

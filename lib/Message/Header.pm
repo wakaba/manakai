@@ -8,7 +8,7 @@ Message::Header --- A Perl Module for Internet Message Headers
 package Message::Header;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.35 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.36 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;	## This may seem silly:-)
 push @ISA, qw(Message::Field::Structured);
 
@@ -134,7 +134,6 @@ sub _init ($;%) {
 sub _init_by_format ($$\%) {
   my $self = shift;
   my ($format, $option) = @_;
-  return if $format eq $option->{format};
   if ($format =~ /http/) {
     $option->{ns_default_phuri} = $self->{ns}->{phname2uri}->{'x-http'};
     if ($format =~ /cgi/) {
@@ -672,7 +671,8 @@ sub stringify ($;%) {
   my %params = @_;
   my %option = %{$self->{option}};
   $option{format} = $params{-format} if $params{-format};
-  $self->_init_by_format ($option{format}, \%option);
+  $self->_init_by_format ($option{format}, \%option)
+    if $self->{option}->{format} ne $option{format};
   for (grep {/^-/} keys %params) {$option{substr ($_, 1)} = $params{$_}}
   ## Fill required fields
     my %exist;
@@ -963,7 +963,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/08 12:39:39 $
+$Date: 2002/07/13 09:34:50 $
 
 =cut
 
