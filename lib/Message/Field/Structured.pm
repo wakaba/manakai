@@ -1,196 +1,186 @@
 
 =head1 NAME
 
-Message::Field::Structured Perl module
-
-=head1 DESCRIPTION
-
-Perl module for RFC 822/2822 structured C<field>s.
+Message::Field::Structured -- Perl module for
+structured header field bodies of the Internet message
 
 =cut
 
 package Message::Field::Structured;
-require 5.6.0;
 use strict;
-use re 'eval';
-use vars qw(%DEFAULT %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use vars qw($VERSION);
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
+use overload '""' => sub { $_[0]->stringify },
+             '.=' => sub { $_[0]->value_append ($_[1]) },
+             'eq' => sub { $_[0]->{field_body} eq $_[1] },
+             'ne' => sub { $_[0]->{field_body} ne $_[1] },
+             fallback => 1;
 
-use overload '""' => sub {shift->stringify};
+=head1 CONSTRUCTORS
 
-$REG{comment} = qr/\x28(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x27\x2A-\x5B\x5D-\xFF]|(??{$REG{comment}}))*\x29/;
-$REG{quoted_string} = qr/\x22(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\xFF])*\x22/;
-$REG{domain_literal} = qr/\x5B(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x5A\x5E-\xFF])*\x5D/;
+The following methods construct new C<Message::Field::Structured> objects:
 
-$REG{WSP} = qr/[\x20\x09]+/;
-$REG{FWS} = qr/[\x20\x09]*/;
-$REG{M_quoted_string} = qr/\x22((?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\xFF])*)\x22/;
-$REG{M_comment} = qr/\x28((?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x27\x2A-\x5B\x5D-\xFF]|(??{$REG{comment}}))*)\x29/;
+=over 4
 
-$REG{NON_atom} = qr/[^\x09\x20\x21\x23-\x27\x2A\x2B\x2D\x2F\x30-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]/;
+=cut
 
-%DEFAULT = (
+## Initialize of this class -- called by constructors
+sub _init ($;%) {
+  my $self = shift;
+  my %options = @_;
+  $self->{option} = {
   encoding_after_encode	=> '*default',
   encoding_before_decode	=> '*default',
   hook_encode_string	=> #sub {shift; (value => shift, @_)},
   	\&Message::Util::encode_header_string,
   hook_decode_string	=> #sub {shift; (value => shift, @_)},
   	\&Message::Util::decode_header_string,
-);
+  };
+  $self->{field_body} = '';
+  
+  for my $name (keys %options) {
+    if (substr ($name, 0, 1) eq '-') {
+      $self->{option}->{substr ($name, 1)} = $options{$name};
+    } elsif (lc $name eq 'body') {
+      $self->{field_body} = $options{$name};
+    }
+  }
+}
 
-=head2 Message::Field::Structured->new ()
+=item Message::Field::Structured->new ([%options])
 
-Return empty Message::Field::Structured object.
+Constructs a new C<Message::Field::Structured> object.  You might pass some 
+options as parameters to the constructor.
 
 =cut
 
 sub new ($;%) {
   my $class = shift;
-  my $self = bless {option => {@_}}, $class;
-  for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
+  my $self = bless {}, $class;
+  $self->_init (@_);
   $self;
 }
 
-=head2 Message::Field::Structured->parse ($unfolded_field_body)
+=item Message::Field::Structured->parse ($field-body, [%options])
 
-Parse structured C<field-body>.
+Constructs a new C<Message::Field::Structured> object with
+given field body.  You might pass some options as parameters to the constructor.
 
 =cut
 
 sub parse ($$;%) {
   my $class = shift;
-  my $self = bless {option => {@_}}, $class;
-  for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
-  my $field_body = $self->_decode_qcontent (shift);
-  $self->{field_body} = $field_body;
+  my $self = bless {}, $class;
+  $self->_init (@_);
+  #my $field_body = $self->Message::Util::decode_qcontent (shift);
+  $self->{field_body} = shift; #$field_body;
   $self;
 }
 
-=head2 $self->stringify ()
+=back
 
-Returns C<field-body> as a string.
+=head1 METHODS
+
+=over 4
+
+=item $self->stringify ([%options])
+
+Returns field body as a string.  Returned string is encoded,
+quoted if necessary (by C<hook_encode_string>).
 
 =cut
 
 sub stringify ($) {
   my $self = shift;
-  $self->_encode_qcontent ($self->{field_body});
+  #$self->Message::Util::encode_qcontent ($self->{field_body});
+  $self->{field_body};
 }
+*as_string = \&stringify;
 
-=head2 $self->as_plain_string ()
+=item $self->as_plain_string
 
-Returns C<field-body> contents as a plain text fragment.
-C<quoted-string> and C<quoted-pair> in C<comment> are
-unquoted, so return value of this method can be invalid
-as a part of the C<field>.
+Returns field body as a string.  Returned string is not encoded
+or quoted, i.e. internal/bare coded string.  This string
+may be unable to use as field body content.  (Its I<structures>
+such as C<comment> and C<quoted-string> are lost.)
 
 =cut
 
 sub as_plain_string ($) {
   my $self = shift;
-  $self->unquote_quoted_string ($self->unquote_comment ($self->{field_body}));
+  my $s = $self->Message::Util::decode_qcontent ($self->{field_body});
+  Message::Util::unquote_quoted_string (Message::Util::unquote_ccontent ($s));
 }
-=head2 $self->option ($option_name, [$option_value])
 
-Set/gets new value of the option.
+=item $self->option ( $option-name / $option-name, $option-value, ...)
+
+If @_ == 1, returns option value.  Else...
+
+Set option value.  You can pass multiple option name-value pair
+as parameter.  Example:
+
+  $msg->option (-format => 'mail-rfc822',
+                -capitalize => 0);
+  print $msg->option ('-format');	## mail-rfc822
+
+Note that introduction character, i.e. C<-> (HYPHEN-MINUS)
+is optional.  You can also write as this:
+
+  $msg->option (format => 'mail-rfc822',
+                capitalize => 0);
+  print $msg->option ('format');	## mail-rfc822
 
 =cut
 
-sub option ($$;$) {
+sub option ($@) {
   my $self = shift;
-  my ($name, $value) = @_;
-  if (defined $value) {
+  if (@_ == 1) {
+    return $self->{option}->{ $_[0] };
+  }
+  while (my ($name, $value) = splice (@_, 0, 2)) {
+    $name =~ s/^-//;
     $self->{option}->{$name} = $value;
   }
-  $self->{option}->{$name};
 }
 
-## Decode C<qcontent> (content of C<quoted-string>).
-sub _decode_qcontent ($$) {
-  my $self = shift;
-  my $quoted_string = shift;
-  $quoted_string =~ s{$REG{M_quoted_string}}{
-    my ($qtext) = ($1);
-      $qtext =~ s/\x5C([\x00-\xFF])/$1/g;
-      my %s = &{$self->{option}->{hook_decode_string}} ($self, $qtext,
-                type => 'phrase/quoted');
-      $s{value} =~ s/([\x22\x5C])([\x20-\xFF])?/"\x5C$1".($2?"\x5C$2":'')/ge;
-      '"'.$s{value}.'"';
-  }goex;
-  $quoted_string;
-}
+=item $self->clone ()
 
-## Encode C<qcontent> (content of C<quoted-string>).
-sub _encode_qcontent ($$) {
-  my $self = shift;
-  my $quoted_string = shift;
-  $quoted_string =~ s{$REG{M_quoted_string}}{
-    my ($qtext) = ($1);
-      $qtext =~ s/\x5C([\x00-\xFF])/$1/g;
-      my %s = &{$self->{option}->{hook_encode_string}} ($self, $qtext,
-                type => 'phrase/quoted');
-      $s{value} =~ s/([\x22\x5C])([\x20-\xFF])?/"\x5C$1".($2?"\x5C$2":'')/ge;
-      '"'.$s{value}.'"';
-  }goex;
-  $quoted_string;
-}
+Returns a copy of Message::Field::Structured object.
 
-sub quote_unsafe_string ($$) {
+=cut
+
+sub clone ($) {
   my $self = shift;
-  my $string = shift;
-  if ($string =~ /$REG{NON_atom}/ || $string =~ /$REG{WSP}$REG{WSP}+/) {
-    $string =~ s/([\x22\x5C])([\x20-\xFF])?/"\x5C$1".($2?"\x5C$2":'')/ge;
-    $string = '"'.$string.'"';
+  my $clone = ref($self)->new;
+  for my $name (%{$self->{option}}) {
+    if (ref $self->{option}->{$name} eq 'HASH') {
+      $clone->{option}->{$name} = {%{$self->{option}->{$name}}};
+    } elsif (ref $self->{option}->{$name} eq 'ARRAY') {
+      $clone->{option}->{$name} = [@{$self->{option}->{$name}}];
+    } else {
+      $clone->{option}->{$name} = $self->{option}->{$name};
+    }
   }
-  $string;
+  $clone->{field_body} = ref $self->{field_body}? 
+                             $self->{field_body}->clone:
+                             $self->{field_body};
+  ## Common hash value (not used in this module)
+  $clone->{value} = ref $self->{value}?
+                        $self->{value}->clone:
+                        $self->{value};
+  for my $i (@{$self->{comment}}) {
+    if (ref $self->{comment}->[$i] eq 'HASH') {
+      $clone->{comment}->[$i] = {%{$self->{comment}->[$i]}};
+    } elsif (ref $self->{comment}->[$i] eq 'ARRAY') {
+      $clone->{comment}->[$i] = [@{$self->{comment}->[$i]}];
+    } else {
+      $clone->{comment}->[$i] = $self->{comment}->[$i];
+    }
+  }
+  $clone;
 }
 
-=head2 $self->unquote_quoted_string ($string)
-
-Unquote C<quoted-string>.  Get rid of C<DQUOTE>s and
-C<REVERSED SOLIDUS> included in C<quoted-pair>.
-This method is intended for internal use.
-
-=cut
-
-sub unquote_quoted_string ($$) {
-  my $self = shift;
-  my $quoted_string = shift;
-  $quoted_string =~ s{$REG{M_quoted_string}}{
-    my $qtext = $1;
-    $qtext =~ s/\x5C([\x00-\xFF])/$1/g;
-    $qtext;
-  }goex;
-  $quoted_string;
-}
-
-sub unquote_comment ($$) {
-  my $self = shift;
-  my $quoted_string = shift;
-  $quoted_string =~ s{$REG{M_comment}}{
-    my $qtext = $1;
-    $qtext =~ s/\x5C([\x00-\xFF])/$1/g;
-    '('.$qtext.')';
-  }goex;
-  $quoted_string;
-}
-
-=head2 $self->delete_comment ($field_body)
-
-Remove all C<comment> in given strictured C<field-body>.
-This method is intended for internal use.
-
-=cut
-
-sub delete_comment ($$) {
-  my $self = shift;
-  my $body = shift;
-  $body =~ s{($REG{quoted_string}|$REG{domain_literal})|$REG{comment}}{
-    my $o = $1;  $o? $o : ' ';
-  }gex;
-  $body;
-}
 
 =head1 EXAMPLE
 
@@ -201,6 +191,18 @@ sub delete_comment ($$) {
   my $field = Message::Field::Structured->parse ($field_body);
   
   print $field->as_plain_string;
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Message::Entity>, L<Message::Header>
+
+=item L<Message::Field::Unstructured>
+
+=item RFC 2822 E<lt>urn:ietf:rfc:2822E<gt>, usefor-article, HTTP/1.0, HTTP/1.1
+
+=back
 
 =head1 LICENSE
 
@@ -224,6 +226,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
+$Date: 2002/04/05 14:55:28 $
 
 =cut
 

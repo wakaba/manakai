@@ -16,7 +16,7 @@ BEGIN {
   use base Message::Field::Params;
   use vars qw(%DEFAULT %REG $VERSION);
 }
-$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 %REG = %Message::Field::Params::REG;
 
@@ -44,7 +44,7 @@ sub _initialize_new ($;%) {
   my $self = shift;
   for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
   $self->{media_type} = 'text';
-  $self->{media_type} = 'plain';
+  $self->{media_subtype} = 'plain';
 }
 
 ## Initialization for parse () method.
@@ -265,7 +265,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/02 11:52:12 $
+$Date: 2002/04/05 14:55:28 $
 
 =cut
 

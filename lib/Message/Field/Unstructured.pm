@@ -1,94 +1,200 @@
 
 =head1 NAME
 
-Message::Field::Unstructured Perl module
-
-=head1 DESCRIPTION
-
-Perl module for RFC 822/2822 Unstructured C<field>s.
+Message::Field::Structured -- Perl module for
+unstructured header field bodies of the Internet message
 
 =cut
 
 package Message::Field::Unstructured;
-require 5.6.0;
 use strict;
-use re 'eval';
-use vars qw(%DEFAULT %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use vars qw($VERSION);
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
-use overload '""' => sub {shift->stringify};
+use overload '""' => sub { $_[0]->stringify },
+             '.=' => sub { $_[0]->value_append ($_[1]) },
+             'eq' => sub { $_[0]->{field_body} eq $_[1] },
+             'ne' => sub { $_[0]->{field_body} ne $_[1] },
+             fallback => 1;
 
-%DEFAULT = (
-  encoding_after_encode	=> '*default',
-  encoding_before_decode	=> '*default',
-  hook_encode_string	=> #sub {shift; (value => shift, @_)},
-  	\&Message::Util::encode_header_string,
-  hook_decode_string	=> #sub {shift; (value => shift, @_)},
-  	\&Message::Util::decode_header_string,
-);
+## Initialize of this class -- called by constructors
+sub _init ($;%) {
+  my $self = shift;
+  my %options = @_;
+  $self->{option} = {
+    encoding_after_encode	=> '*default',
+    encoding_before_decode	=> '*default',
+    hook_encode_string	=> #sub {shift; (value => shift, @_)},
+    	\&Message::Util::encode_header_string,
+    hook_decode_string	=> #sub {shift; (value => shift, @_)},
+    	\&Message::Util::decode_header_string,
+  };
+  $self->{field_body} = '';
+  
+  for my $name (keys %options) {
+    if (substr ($name, 0, 1) eq '-') {
+      $self->{option}->{substr ($name, 1)} = $options{$name};
+    } elsif (lc $name eq 'body') {
+      $self->{field_body} = $options{$name};
+    }
+  }
+}
 
-=head2 Message::Field::Unstructured->new ()
+=head1 CONSTRUCTORS
 
-Returns new Unstructured Header Field object.
+The following methods construct new C<Message::Field::Unstructured> objects:
+
+=over 4
+
+=item Message::Field::Unstructured->new ([%options])
+
+Constructs a new C<Message::Field::Unstructured> object.  You might pass some 
+options as parameters to the constructor.
 
 =cut
 
 sub new ($;%) {
   my $class = shift;
-  my $self = bless {option => {@_}}, $class;
-  for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
+  my $self = bless {}, $class;
+  $self->_init (@_);
   $self;
 }
 
-=head2 Message::Field::Unstructured->new ($field_body)
+=item Message::Field::Unstructured->parse ($field-body, [%options])
 
-Reads and returns Unstructured Header Field object.
+Constructs a new C<Message::Field::Unstructured> object with
+given field body.  You might pass some options as parameters to the constructor.
+
+Although name, this method doesn't parse C<$field-body> (first
+argument) since there is no need to parse unstructured field body:-)
 
 =cut
 
 sub parse ($$;%) {
   my $class = shift;
   my $field_body = shift;
-  my $self = bless {option => {@_}}, $class;
-  for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
+  my $self = bless {}, $class;
+  $self->_init (@_);
   my %s = &{$self->{option}->{hook_decode_string}} ($self, $field_body,
             type => 'text');
   $self->{field_body} = $s{value};
   $self;
 }
 
-=head2 $self->stringify ([%options])
+=back
 
-Returns C<field-body>.
+=head1 METHODS
+
+=over 4
+
+=item $self->stringify ([%options])
+
+Returns field body as a string.  Returned string is encoded
+if necessary (by C<hook_encode_string>).
 
 =cut
 
 sub stringify ($;%) {
   my $self = shift;
   my %option = @_;
-  my (%e) = &{$self->{option}->{hook_encode_string}} ($self, 
-          $self->{field_body}, type => 'text');
+  my (%e) = &{$self->{option}->{hook_encode_string}}
+             ($self, $self->{field_body}, -type => 'text');
   $e{value};
 }
-sub as_string ($;%) {shift->stringify (@_)}
+*as_string = \&stringify;
 
-sub as_plain_string ($;%) {
-  shift->{field_body};
-}
-=head2 $self->option ($option_name, [$option_value])
+=item $self->as_plain_string
 
-Set/gets new value of the option.
+Returns field body as a string.  Returned string is not encoded,
+i.e. internal coded string.
+
+=item $self->value ([$new-value])
+
+Set/gets current value of this field.  Returned/given value
+should not be encoded (i.e. in internal code).
 
 =cut
 
-sub option ($$;$) {
+sub value ($;$) {
   my $self = shift;
-  my ($name, $value) = @_;
-  if (defined $value) {
+  my $v = shift;
+  if (defined $v) {
+    $self->{field_body} = $v;
+  }
+  $self->{field_body};
+}
+*as_plain_string = \&value;
+
+sub value_append ($$) {
+  shift->{field_body} .= shift;
+}
+
+=item $self->option ( $option-name / $option-name, $option-value, ...)
+
+If @_ == 1, returns option value.  Else...
+
+Set option value.  You can pass multiple option name-value pair
+as parameter.  Example:
+
+  $msg->option (-format => 'mail-rfc822',
+                -capitalize => 0);
+  print $msg->option ('-format');	## mail-rfc822
+
+Note that introduction character, i.e. C<-> (HYPHEN-MINUS)
+is optional.  You can also write as this:
+
+  $msg->option (format => 'mail-rfc822',
+                capitalize => 0);
+  print $msg->option ('format');	## mail-rfc822
+
+=cut
+
+sub option ($@) {
+  my $self = shift;
+  if (@_ == 1) {
+    return $self->{option}->{ $_[0] };
+  }
+  while (my ($name, $value) = splice (@_, 0, 2)) {
+    $name =~ s/^-//;
     $self->{option}->{$name} = $value;
   }
-  $self->{option}->{$name};
 }
+
+=item $self->clone ()
+
+Returns a copy of Message::Field::Unstructured object.
+
+=cut
+
+sub clone ($) {
+  my $self = shift;
+  my $clone = ref($self)->new;
+  for my $name (%{$self->{option}}) {
+    if (ref $self->{option}->{$name} eq 'HASH') {
+      $clone->{option}->{$name} = {%{$self->{option}->{$name}}};
+    } elsif (ref $self->{option}->{$name} eq 'ARRAY') {
+      $clone->{option}->{$name} = [@{$self->{option}->{$name}}];
+    } else {
+      $clone->{option}->{$name} = $self->{option}->{$name};
+    }
+  }
+  $clone->{field_body} = ref $self->{field_body}? 
+                             $self->{field_body}->clone:
+                             $self->{field_body};
+  $clone;
+}
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Message::Entity>, L<Message::Header>
+
+=item L<Message::Field::Structured>
+
+=item RFC 2822 E<lt>urn:ietf:rfc:2822E<gt>, usefor-article, HTTP/1.0, HTTP/1.1
+
+=back
 
 =head1 LICENSE
 
@@ -112,6 +218,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
+$Date: 2002/04/05 14:55:28 $
 
 =cut
 

@@ -14,15 +14,12 @@ draft-ietf-usefor-msg-id-alt-00 is supported.
 package Message::Field::MsgID::MsgID;
 use strict;
 use vars qw(%REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
-use Carp;
+$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+require Carp;
 use overload '""' => sub {shift->stringify};
 #use autouse Digest::MD2 => qw(md2_hex md2_base64);
 #use autouse Digest::MD5 => qw(md5_hex md5_base64);
 #use autouse Digest::SHA1 => qw(sha1_hex sha1_base64);
-#use Digest::MD2;
-use Digest::MD5 qw(md5_hex md5_base64);
-#use Digest::SHA1;
 
 $REG{quoted_string} = qr/\x22(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\xFF])*\x22/;
 $REG{domain_literal} = qr/\x5B(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x5A\x5E-\xFF])*\x5D/;
@@ -61,14 +58,23 @@ sub new ($;%) {
   if ($$o{check}>0 
    && $$o{fqdn} =~ 
      /[.@](example\.(?:com|org|net)|localdomain|localhost|example|invalid)$/) {
-      croak "new: invalid TLD of FQDN: .$1";
+      Carp::croak "new: invalid TLD of FQDN: .$1";
   }
   if (!$$o{fqdn} && $$o{ip_address}) {
     if ($$o{check}>0 && $$o{ip_address}=~/([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)/){
       my ($c1, $c2, $c3, $c4) = ($1, $2, $3, $4);
-      croak "new: invalid IPv4 address: $c1.$c2.$c3.$c4" if ($c1 == 10)
-           || ($c1 == 172 && 16 <= $c2 && $c2 < 32) 
-           || ($c1 == 192 && $c2 == 168) || ($c1 >= 224);
+      Carp::croak "new: invalid IPv4 address: $c1.$c2.$c3.$c4"
+        ## See [IANAREG] and draft-iana-special-ipv4
+           if ($c1 == 0)	## "this" network
+           || ($c1 == 10)	## private [RFC1918]
+           || ($c1 == 127)	## loopback
+           || ($c1 == 169 && $c2 == 254)	## "link local"
+           || ($c1 == 172 && 16 <= $c2 && $c2 < 32)	## private [RFC1918]
+           || ($c1 == 192 && (($c2 == 0 && $c3 == 2)	## "TEST-NET"
+           || ($c2 == 88 && $c3 == 99)	## 6to4 anycast [RFC3068]
+           || ($c2 == 168)))	## private [RFC1918]
+           || ($c1 == 198 && ($c2 == 18 || $c2 =19))	## benchmark [RFC2544]
+           || ($c1 >= 224);	## class D,E [RFC3171]
     }
     $$o{fqdn} ||= '['.$$o{ip_address}.']';
   }
@@ -76,19 +82,20 @@ sub new ($;%) {
     $$o{uucp} .= '.uucp' if $$o{check}>0 && $$o{uucp} !~ /\.uucp/i;
     $$o{fqdn} = $$o{uucp};
   }
-  croak "new: no FQDN" if $$o{check}>0 && !$$o{fqdn};
+  Carp::croak "new: no FQDN" if $$o{check}>0 && !$$o{fqdn};
   
   $self->{id_right} = $$o{fqdn};
   
-  croak "no 'login'" if $$o{check}>0 && !$$o{login};
+  Carp::croak "no 'login'" if $$o{check}>0 && !$$o{login};
   $$o{hash_name} ||= $DEFAULT{hash_name};
   $$o{login} = $self->_hash ($$o{login}, $$o{hash_name});
   
   $$o{software_name} ||= $DEFAULT{software_name};
   $$o{software_name_hash} ||= $DEFAULT{software_name_hash};
-  my $unique = join ('.', $self->_base39 (time), $self->_base39 ($$), 
+  my @s = ('0'..'9','a'..'z','-','=','_');
+  my $unique = $s[rand @s].$s[rand @s].$s[rand @s].'.';
+  $unique .= join ('.', $self->_base39 (time), $self->_base39 ($$), 
     $self->_hash ($$o{software_name}, $$o{software_name_hash}));
-  
   $self->{id_left} = $unique
     .'%'.($$o{hash_name} ne '_none'? $self->_hash ($$o{hash_name}, '_none')
          .'%': '')
@@ -103,17 +110,23 @@ sub _hash ($$;$$) {
   $add_unsafe ||= qr#[/.=\x09\x20]#;
   undef $hash_name if $hash_name eq '_none';
   if ($hash_name eq 'md5') {
-    $str = md5_hex ($str);
+    eval {require Digest::MD5} or Carp::croak "_hash: $@";
+    $str = Digest::MD5::md5_hex ($str);
   } elsif ($hash_name eq 'md5_64') {
-    $str = md5_base64 ($str);
-  #} elsif ($hash_name eq 'sha1') {
-  #  $str = sha1_hex ($str);
-  #} elsif ($hash_name eq 'sha1_64') {
-  #  $str = sha1_base64 ($str);
-  #} elsif ($hash_name eq 'md2') {
-  #  $str = md2_hex ($str);
-  #} elsif ($hash_name eq 'md2_base64') {
-  #  $str = md2_base64 ($str);
+    eval {require Digest::MD5} or Carp::croak "_hash: $@";
+    $str = Digest::MD5::md5_base64 ($str);
+  } elsif ($hash_name eq 'sha1') {
+    eval {require Digest::SHA1} or Carp::croak "_hash: $@";
+    $str = Digest::SHA1::sha1_hex ($str);
+  } elsif ($hash_name eq 'sha1_64') {
+    eval {require Digest::SHA1} or Carp::croak "_hash: $@";
+    $str = Digest::SHA1::sha1_base64 ($str);
+  } elsif ($hash_name eq 'md2') {
+    eval {require Digest::MD2} or Carp::croak "_hash: $@";
+    $str = Digest::MD2::md2_hex ($str);
+  } elsif ($hash_name eq 'md2_base64') {
+    eval {require Digest::MD2} or Carp::croak "_hash: $@";
+    $str = Digest::MD2::md2_base64 ($str);
   } elsif ($hash_name eq 'crypt') {
     my @s = ('0'..'9','A'..'Z','a'..'z');
     my $salt = crypt('foobar', '$1$ab$') eq '$1$ab$uAP8qWqcFs3q.Gfl5PkL2.'?
@@ -258,7 +271,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/02 11:52:12 $
+$Date: 2002/04/05 14:55:28 $
 
 =cut
 

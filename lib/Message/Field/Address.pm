@@ -47,25 +47,16 @@ $REG{NON_atom} = qr/[^\x09\x20\x21\x23-\x27\x2A\x2B\x2D\x2F\x30-\x39\x3D\x3F\x41
   dont_reply_display_name	=> '',
   encoding_after_encode	=> '*default',
   encoding_before_decode	=> '*default',
+  format	=> 'rfc2822',
   hook_encode_string	=> #sub {shift; (value => shift, @_)},
   	\&Message::Util::encode_header_string,
   hook_decode_string	=> #sub {shift; (value => shift, @_)},
   	\&Message::Util::decode_header_string,
   is_mailbox	=> -1,	## Allow multiple mail addresses?
-  is_mailbox_name	=> {	## C<is_mailbox> template
-    'complaints-to'	=> 1,
-    'mail-copies-to'	=> 1, 'resent-sender'	=> 1,
-    'return-path'	=> 1, sender	=> 1, 
-    'x-complaints-to'	=> 1,
-  },
   is_return_path	=> -1,
   use_display_name	=> 1,
   use_dont_reply	=> -1,	## See C<$self->dont_reply>
   use_group	=> 1,
-  use_group_name	=> {	## C<use_group> template
-    'approved'	=> -1,
-    'from'	=> -1, 'resent-from'	=> -1,
-  },
   use_keyword	=> -1,	## See C<$self->keyword>
   use_keyword_multiple	=> -1,
 );
@@ -79,10 +70,20 @@ sub _init_option ($$) {
   my $self = shift;
   my $name = shift;
   my $spec = $self->{option}->{format};
-  if ($self->{option}->{is_mailbox_name}->{$name}) {
-    $self->{option}->{is_mailbox} = 1;
-  } elsif ($self->{option}->{use_group_name}->{$name}) {
-      $self->{option}->{use_group} = -1;
+  my %is_mailbox_name	= (	## C<is_mailbox>
+    'complaints-to'	=> 1,
+    'mail-copies-to'	=> 1, 'resent-sender'	=> 1,
+    'return-path'	=> 1, sender	=> 1, 
+    'x-complaints-to'	=> 1,
+  );
+  my %use_group_name	= (	## C<use_group>
+    'approved'	=> -1,
+    'from'	=> -1, 'resent-from'	=> -1,
+  );
+  if ($is_mailbox_name{$name}) {
+    $self->{option}->{is_mailbox} = $is_mailbox_name{$name};
+  } elsif ($use_group_name{$name}) {
+    $self->{option}->{use_group} = $use_group_name{$name};
   }
   if ($spec eq 'usefor') {
     if ($name eq 'reply-to') {
@@ -573,7 +574,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/31 13:11:55 $
+$Date: 2002/04/05 14:55:28 $
 
 =cut
 

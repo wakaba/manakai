@@ -1,105 +1,146 @@
 
 =head1 NAME
 
-Message::Field::Numval Perl module
-
-=head1 DESCRIPTION
-
-Perl module for RFC 2822 style C<field-body>'es,
-which takes numeric value.
+Message::Field::Numval -- Perl module for
+Internet message header field body that takes numeric values
 
 =cut
 
 package Message::Field::Numval;
-require 5.6.0;
 use strict;
-use re 'eval';
-use vars qw(%DEFAULT %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use vars qw(@ISA $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
-use overload '""' => sub {shift->stringify};
+require Message::Field::Structured;
+push @ISA, qw(Message::Field::Structured);
+use overload '.=' => sub { $_[0]->comment_add ($_[1]) },
+             '0+' => sub { $_[0]->{value} || $_[0]->{option}->{value_default} },
+             '+=' => sub {
+               my $n = $_[0]->{value} + $_[1];
+               $_[0]->{value} = $n if $n <= $_[0]->{option}->{value_max};
+               $_[0]
+             },
+             '-=' => sub {
+               my $n = $_[0]->{value} - $_[1];
+               $_[0]->{value} = $n if $_[0]->{option}->{value_min} <= $n;
+               $_[0]
+             },
+             '*=' => sub {
+               my $n = $_[0]->{value} * $_[1];
+               $_[0]->{value} = $n if $n <= $_[0]->{option}->{value_max};
+               $_[0]
+             },
+             '**=' => sub {
+               my $n = $_[0]->{value} ** $_[1];
+               $_[0]->{value} = $n if $n <= $_[0]->{option}->{value_max};
+               $_[0]
+             },
+             '/=' => sub {
+               my $n = $_[0]->{value} / $_[1];
+               $_[0]->{value} = $n if $_[0]->{option}->{value_min} <= $n;
+               $_[0]
+             },
+             '%=' => sub {
+               my $n = $_[0]->{value} % $_[1];
+               $_[0]->{value} = $n if $_[0]->{option}->{value_min} <= $n;
+               $_[0]
+             },
+             'eq' => sub { $_[0]->stringify eq $_[1] },
+             'ne' => sub { $_[0]->stringify eq $_[1] },
+             fallback => 1;
 
-$REG{comment} = qr/\x28(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x27\x2A-\x5B\x5D-\xFF]|(??{$REG{comment}}))*\x29/;
-$REG{M_comment} = qr/\x28((?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x27\x2A-\x5B\x5D-\xFF]|(??{$REG{comment}}))*)\x29/;
 
-%DEFAULT = (
-  check_max	=> -1,
-  check_min	=> 1,
-  encoding_after_encode	=> '*default',
-  encoding_before_decode	=> '*default',
-  field_name	=> 'lines',
-  format_pattern	=> '%d',
-  hook_encode_string	=> #sub {shift; (value => shift, @_)},
-  	\&Message::Util::encode_header_string,
-  hook_decode_string	=> #sub {shift; (value => shift, @_)},
-  	\&Message::Util::decode_header_string,
-  output_comment	=> -1,
-  value_default	=> 0,
-  value_if_invalid	=> '',
-  value_max	=> 100,
-  value_min	=> 0,
-);
+=head1 CONSTRUCTORS
 
-## Initialization for both C<new ()> and C<parse ()> methods.
-sub _initialize ($;%) {
+The following methods construct new C<Message::Field::Numval> objects:
+
+=over 4
+
+=cut
+
+## Initialize of this class -- called by constructors
+sub _init ($;%) {
   my $self = shift;
+  my %options = @_;
+  my %DEFAULT = (
+    -check_max	=> 0,
+    -check_min	=> 1,
+    #encoding_after_encode	## Inherited
+    #encoding_before_decode	## Inherited
+    -field_name	=> 'lines',
+    -format_pattern	=> '%d',
+    #hook_encode_string	## Inherited
+    #hook_decode_string	## Inherited
+    -output_comment	=> 0,
+    -value_default	=> 0,
+    -value_if_invalid	=> '',
+    -value_max	=> 100,
+    -value_min	=> 0,
+  );
+  $self->SUPER::_init (%DEFAULT, %options);
+  $self->{value} = $self->{options}->{value_default};
+  $self->{value} = $options{value} if defined $options{value};
+  $self->{comment} = [];
+  push @{$self->{comment}}, $options{comment} if length $options{comment};
+  
   my $fname = lc $self->{option}->{field_name};
   if ($fname eq 'mime-version') {
     $self->{option}->{output_comment} = 1;
     $self->{option}->{format_pattern} = '%1.1f';
-    $self->{option}->{check_max} = 1;
     $self->{option}->{value_min} = 1;
+  } elsif ($fname eq 'x-priority' || $fname eq 'x-jsmail-priority') {
+    $self->{option}->{output_comment} = 1;
+    $self->{option}->{check_max} = 1;
+    $self->{option}->{check_min} = 1;
+    $self->{option}->{value_min} = 1;	## Highest
+    $self->{option}->{value_max} = 5;	## some implemention uses larger number...
   }
-  $self;
 }
 
-=head2 Message::Field::Numval->new ()
+=item Message::Field::Numval->new ([%options])
 
-Return empty Message::Field::Numval object.
+Constructs a new C<Message::Field::Numval> object.  You might pass some 
+options as parameters to the constructor.
 
 =cut
 
 sub new ($;%) {
   my $class = shift;
-  my $self = bless {comment => [], option => {@_}}, $class;
-  $self->_initialize ();
-  for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
-  $self->{value} = $self->{option}->{value_default};
-  $self->{value} = $DEFAULT{value_default} unless defined $self->{value};
+  my $self = bless {}, $class;
+  $self->_init (@_);
   $self;
 }
 
-=head2 Message::Field::Numval->parse ($unfolded_field_body)
+=item Message::Field::Numval->parse ($field-body, [%options])
 
-Parses C<field-body> consist of a numeric value.
+Constructs a new C<Message::Field::Numval> object with
+given field body.  You might pass some options as parameters to the constructor.
 
 =cut
 
 sub parse ($$;%) {
   my $class = shift;
-  my $field_body = shift;
-  my $self = bless {comment => [], option => {@_}}, $class;
-  $self->_initialize ();
-  for (keys %DEFAULT) {$self->{option}->{$_} ||= $DEFAULT{$_}}
-  $self->{option}->{value_default} = $DEFAULT{value_default}
-    unless defined $self->{option}->{value_default};
-  $field_body =~ s{$REG{M_comment}}{
-      my $comment = $self->_decode_ccontent ($1);
-      push @{$self->{comment}}, $comment if $comment;
-    '';
-  }goex;
-  $field_body =~ s/[^0-9.-]//g;
-  $self->{value} = $& if $field_body =~ /-?[0-9]+(\.[0-9]+)?/;
-  $self->{value} = $self->{option}->{value_default} unless defined $self->{value};
+  my $self = bless {}, $class;
+  my $fb = shift;
+  $self->_init (@_);
+  push @{$self->{comment}}, $self->Message::Util::comment_to_array ($fb);
+  $fb =~ s/[^0-9.-]//g;
+  $self->{value} = $& if $fb =~ /-?[0-9]+(\.[0-9]+)?/;
   $self;
 }
 
-=head2 $self->value ([$new_value])
+=back
+
+=head1 METHODS FOR FIELD BODY VALUE
+
+=over 4
+
+=item $self->value ([$new_value])
 
 Returns or set value.  Note that this method
 does not check whether value is valid or not.
 
-=head2 $self->value_formatted ()
+=item $self->value_formatted ()
 
 Returns formatted value string.  Note that this method
 does not check whether value is valid or not.
@@ -125,7 +166,19 @@ sub value_formatted ($;%) {
   sprintf $option{format_pattern}, $self->{value};
 }
 
-=head2 $self->comment_add ($comment, [%option]
+=item $self->comment ()
+
+Returns array reference of comments.  You can add/remove/change
+array values.
+
+=cut
+
+sub comment ($) {
+  my $self = shift;
+  $self->{comment};
+}
+
+=item $self->comment_add ($comment, [%option]
 
 Adds a C<comment>.  Comments are outputed only when
 the class option (not an option of this method!)
@@ -148,19 +201,7 @@ sub comment_add ($$;%) {
   $self;
 }
 
-=head2 $self->comment ()
-
-Returns array reference of comments.  You can add/remove/change
-array values.
-
-=cut
-
-sub comment ($) {
-  my $self = shift;
-  $self->{comment};
-}
-
-=head2 $self->stringify ()
+=item $self->stringify ()
 
 Returns C<field-body> as a string.
 
@@ -169,35 +210,48 @@ Returns C<field-body> as a string.
 sub stringify ($;%) {
   my $self = shift;
   my %option = @_;
-  $option{check_max} ||= $self->{option}->{check_max};
-  $option{check_min} ||= $self->{option}->{check_min};
-  $option{output_comment} ||= $self->{option}->{output_comment};
+  for (qw(check_max check_min output_comment value_max value_min value_if_invalid)) {
+    $option{$_} ||= $self->{option}->{$_};
+  }
   $option{format_pattern} = $self->{option}->{format_pattern}
     unless defined $option{format_pattern};
-  $option{value_max} ||= $self->{option}->{value_max};
-  $option{value_min} ||= $self->{option}->{value_min};
-  $option{value_if_invalid} ||= $self->{option}->{value_if_invalid};
   return $option{value_if_invalid}
-    if $option{check_max}>0 && $option{value_max}<$self->{value};
+    if $option{check_max} && $option{value_max} < $self->{value};
   return $option{value_if_invalid}
-    if $option{check_min}>0 && $option{value_min}>$self->{value};
+    if $option{check_min} && $option{value_min} > $self->{value};
   my $s = sprintf $option{format_pattern}, $self->{value};
-  if ($option{output_comment}>0) {
+  if ($option{output_comment}) {
     for (@{$self->{comment}}) {
-      my %f = &{$self->{option}->{hook_encode_string}} ($self, 
-         $_, type => 'ccontent');
-      $f{value} =~ s/([\x28\x29\x5C])([\x21-\x7E])?/
-        "\x5C$1".(defined $2?"\x5C$2":'')/ge;
-      $s .= ' ('.$f{value}.')' if defined $f{value};
+      my $t = $self->Message::Util::encode_ccontent ($_);
+      $s .= ' ('.$t.')' if length $t;
     }
   }
   $s;
 }
+*as_string = \&stringify;
 
-sub _decode_ccontent ($$) {
-  require Message::MIME::EncodedWord;
-  &Message::MIME::EncodedWord::decode_ccontent (@_[1,0]);
-}
+=back
+
+=over 4
+
+=item $self->option ( $option-name / $option-name, $option-value, ...)
+
+Set/gets option value(s).  You can pass multiple option name-value pair
+as parameter when setting.
+
+=cut
+
+## Inherited
+
+=item $self->clone ()
+
+Returns a copy of the object.
+
+=cut
+
+## Inherited
+
+=back
 
 =head1 LICENSE
 
@@ -221,6 +275,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
+$Date: 2002/04/05 14:55:28 $
 
 =cut
 
