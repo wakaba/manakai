@@ -1,0 +1,287 @@
+Module:
+  @QName: 
+    DIS:DISPerl
+  @FullName:
+    @@lang:en
+    @@@: 
+      <QUOTE:dis> Perl Support Module
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
+  
+  @Author:
+    @@FullName:Wakaba
+    @@Mail:w@suika.fam.cx
+  @License:
+     license:Perl+MPL
+  @Date:
+    @@@:
+      $Date: 2004/12/18 11:09:28 $
+    @@ContentType:
+      dis:Date.RCS
+  
+  @DefaultFor:
+    ManakaiDOM:all
+
+  @Require:
+    @@Module:
+      @@@Name: DISCore
+    @@Module:
+      @@@Name: DISLang
+
+Namespace:
+  @DIS:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @disPerl:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl--
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @owl:
+    http://www.w3.org/2002/07/owl#
+  @perl:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+
+ElementTypeBinding:
+  @Name: DataTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdfs:Datatype
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdfs:Property
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+## -- Perl datatypes
+
+DataTypeDef:
+  @QName:
+    lang:Perl
+  @FullName:
+    @@lang:en
+    @@@: Perl 5 code
+
+DataTypeDef:
+  @QName:
+    perl:Scalar
+  @FullName:
+    @@lang:en
+    @@@: Perl Scalar Value
+
+DataTypeDef:
+  @QName:
+    perl:Array
+  @FullName:
+    @@lang:en
+    @@@: Perl Array
+
+DataTypeDef:
+  @QName:
+    perl:ARRAY
+  @FullName:
+    @@lang:en
+    @@@: Perl array reference
+
+DataTypeDef:
+  @QName:
+    perl:Hash
+  @FullName:
+    @@lang:en
+    @@@: Perl Hash
+
+DataTypeDef:
+  @QName:
+    perl:hash
+  @FullName:
+    @@lang:en
+    @@@: Perl hash reference
+
+## -- Perl binding specific properties and datatypes
+
+PropDef:
+  @QName:
+    ManakaiDOM:moduleSuffix
+  @Description:
+    @@lang:en
+    @@@:
+      A string suffixing module names.
+
+## -- The dis:Perl tree language vocabulary
+
+DataTypeDef:
+  @QName:
+    dis:Perl
+  @FullName:
+    @@lang:en
+    @@@: 
+     <QUOTE::dis> tree fragment generating Perl code
+  @ISA: 
+    lang:dis
+
+ResourceDef:
+  @Name: TreeElementType
+  @rdf:type:
+    rdfs:Class
+  @ISA:
+    DISLang:TreeElementType
+  @Description:
+    @@lang:en
+    @@@:
+      A <Q::dis:Perl> tree vocabulary element type.
+  @AliasFor:
+    @@@:
+      ::ManakaiDOM:all
+    @@For:
+      !=ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: TreeElementType
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: TreeElementType
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+TreeElementType:
+  @Name: cloneCode
+  @Description:
+    @@lang:en
+    @@@:
+      Copies definition from other resource.
+
+## -- The dis:Perl block preprocessing vocabulary
+
+ResourceDef:
+  @Name: BlockElementType
+  @rdf:type:
+    rdfs:Class
+  @ISA:
+    rdfs:Class
+  @Description:
+    @@lang:en
+    @@@:
+      A <Q::dis:Perl> block preprocessing vocabulary element type.
+  @AliasFor:
+    @@@:
+      ::ManakaiDOM:all
+    @@For:
+      !=ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: BlockElementType
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: BlockElementType
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+BlockElementType:
+  @QName:
+    disPerl:CODE
+
+BlockElementType:
+  @QName:
+    disPerl:EXCEPTION
+
+BlockElementType:
+  @QName:
+    disPerl:WARNING
+
+## -- The dis:Perl inline preprocessing vocabulary
+
+ResourceDef:
+  @Name: InlineElementType
+  @rdf:type:
+    rdfs:Class
+  @ISA:
+    rdfs:Class
+  @Description:
+    @@lang:en
+    @@@:
+      A <Q::dis:Perl> inline preprocessing vocabulary element type.
+  @AliasFor:
+    @@@:
+      ::ManakaiDOM:all
+    @@For:
+      !=ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: InlineElementType
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: InlineElementType
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+InlineElementType:
+  @QName:
+    disPerl:Q
+  @Description:
+    @@lang:en
+    @@@:
+      A qualified name (QName).  It is replaced by a string literal 
+      it value is a URI reference expanded from the QName.
+  @dataType: 
+    dis:TypeQName
+
+InlineElementType:
+  @QName:
+    disPerl:M
+
+InlineElementType:
+  @QName:
+    disPerl:ClassM
+
+InlineElementType:
+  @QName:
+    disPerl:ClassName
+
+InlineElementType:
+  @QName:
+    disPerl:IFName
+
+InlineElementType:
+  @QName:
+    disPerl:C
+
+InlineElementType:
+  @QName:
+    disPerl:Code
+
+## DISPerl.dis ends here

@@ -587,7 +587,15 @@ sub dis_get_attr_node (%) {
         }
       }
       if (defined $opt{ContentType}) {
-        unless (dis_node_ctype_match ($_, $opt{ContentType}, %opt)) {
+        my $ct = dis_node_ctype_match ($_, $opt{ContentType}, %opt);
+        if (ref $ct) {
+          # 
+        } elsif ($ct and $opt{defaultContentType}) {
+          next unless dis_uri_ctype_match ($opt{defaultContentType}, 
+                                           $opt{ContentType}, %opt);
+        } elsif ($ct and not $opt{defaultContentType}) {
+          # 
+        } else {
           next;
         }
       }
@@ -1053,6 +1061,12 @@ sub dis_load_etbinding_element ($;%) {
       $etb->{ElementType} = dis_qname_to_uri ($_->value, %opt, node => $_);
     } elsif ($et eq ExpandedURI q<d:ShadowContent>) {
       $etb->{ShadowContent} = $_;
+    } elsif ($et eq ExpandedURI q<d:ShadowSibling>) {
+      $etb->{ShadowSibling} = $_;
+      my $v = $_->value;
+      if (defined $v and length $v) {
+        valid_err (q<ShadowSibling cannot have its value>, node => $_);
+      }
     } else {
       valid_err (q<Unknown element type>, node => $_);
     }
@@ -1086,6 +1100,11 @@ sub dis_apply_etbindings ($;%) {
       }
       $src->inner_text (new_value => $etb->{ShadowContent}->inner_text);
          ## Note: Value is not changed if ShadowContent.value is undef.
+    }
+    if ($etb->{ShadowSibling}) {
+      for (@{$etb->{ShadowSibling}->child_nodes}) {
+        $src->parent_node->append_node ($_->clone);
+      }
     }
   }
 }
@@ -1640,15 +1659,25 @@ sub dis_perl_init_classdef ($;%) {
       $res->{ExpandedURI q<d:Type>}
         = dis_typeforqnames_to_type_uri ($t->value, use_default_namespace => 1,
                                          %opt, node => $t);
+    } else {
+      my $pr = $State->{ExpandedURI q<dis2pm:parentResource>};
+      if (defined $pr->{ExpandedURI q<d:Type>}) {
+        $res->{ExpandedURI q<d:Type>} = $pr->{ExpandedURI q<d:Type>};
+      }
     }
     my $i = dis_get_attr_node (%opt, name => 'actualType',
                                parent => $res->{src});
     if ($i) {
       $res->{ExpandedURI q<d:actualType>}
-        = dis_typeforqnames_to_type_uri ($t->value, use_default_namespace => 1,
-                                         %opt, node => $t);
-    } elsif ($t) {
-      $res->{ExpandedURI q<d:actualType>} = $res->{ExpandedURI q<d:Type>};
+        = dis_typeforqnames_to_type_uri ($i->value, use_default_namespace => 1,
+                                         %opt, node => $i);
+    } else {
+      my $pr = $State->{ExpandedURI q<dis2pm:parentResource>};
+      if (defined $pr->{ExpandedURI q<d:actualType>}) {
+        $res->{ExpandedURI q<d:actualType>} = $pr->{ExpandedURI q<d:actualType>};
+      } else {
+        $res->{ExpandedURI q<d:actualType>} = $pr->{ExpandedURI q<d:Type>};
+      }
     }
     
     ## Register the constant group
@@ -1682,25 +1711,32 @@ sub dis_perl_init_classdef ($;%) {
     $res->{ExpandedURI q<dis2pm:constName>} = $name;
 
     ## Value type
-    my $t = dis_get_attr_node (%opt, name => 'Type', parent => $res->{src}) ||
-            dis_get_attr_node
-               (%opt, name => 'Type',
-                parent => $State->{ExpandedURI q<dis2pm:parentResource>}->{src});
-    valid_err (q<Const value type required>, node => $res->{src}) unless $t;
-    $res->{ExpandedURI q<d:Type>}
-      = dis_typeforqnames_to_type_uri ($t->value, use_default_namespace => 1,
-                                       %opt, node => $t);
-    my $i = dis_get_attr_node (%opt, name => 'actualType',
-                               parent => $res->{src}) ||
-            dis_get_attr_node
-               (%opt, name => 'actualType',
-                parent => $State->{ExpandedURI q<dis2pm:parentResource>}->{src});
-    if ($i) {
-      $res->{ExpandedURI q<d:actualType>}
+    my $t = dis_get_attr_node (%opt, name => 'Type', parent => $res->{src});
+    if ($t) {
+      $res->{ExpandedURI q<d:Type>}
         = dis_typeforqnames_to_type_uri ($t->value, use_default_namespace => 1,
                                          %opt, node => $t);
     } else {
-      $res->{ExpandedURI q<d:actualType>} = $res->{ExpandedURI q<d:Type>};
+      my $pr = $State->{ExpandedURI q<dis2pm:parentResource>};
+      if (defined $pr->{ExpandedURI q<d:Type>}) {
+        $res->{ExpandedURI q<d:Type>} = $pr->{ExpandedURI q<d:Type>};
+      } else {
+        valid_err (q<Constant value type required>, node => $res->{src});
+      }
+    }
+    my $i = dis_get_attr_node (%opt, name => 'actualType',
+                               parent => $res->{src});
+    if ($i) {
+      $res->{ExpandedURI q<d:actualType>}
+        = dis_typeforqnames_to_type_uri ($i->value, use_default_namespace => 1,
+                                         %opt, node => $i);
+    } else {
+      my $pr = $State->{ExpandedURI q<dis2pm:parentResource>};
+      if (defined $pr->{ExpandedURI q<d:actualType>}) {
+        $res->{ExpandedURI q<d:actualType>} = $pr->{ExpandedURI q<d:actualType>};
+      } else {
+        $res->{ExpandedURI q<d:actualType>} = $pr->{ExpandedURI q<d:Type>};
+      }
     }
     
     ## Register the constant value
@@ -1725,25 +1761,32 @@ sub dis_perl_init_classdef ($;%) {
           ->{ExpandedURI q<dis2pm:const>}->{$name} = $res;
   } elsif ({ExpandedURI q<ManakaiDOM:InCase> => 1}->{$type}) {
     ## Value type
-    my $t = dis_get_attr_node (%opt, name => 'Type', parent => $res->{src}) ||
-            dis_get_attr_node
-               (%opt, name => 'Type',
-                parent => $State->{ExpandedURI q<dis2pm:parentResource>}->{src});
-    valid_err (q<InCase value type required>, node => $res->{src}) unless $t;
-    $res->{ExpandedURI q<d:Type>}
-      = dis_typeforqnames_to_type_uri ($t->value, use_default_namespace => 1,
-                                       %opt, node => $t);
-    my $i = dis_get_attr_node (%opt, name => 'actualType',
-                               parent => $res->{src}) ||
-            dis_get_attr_node
-               (%opt, name => 'actualType',
-                parent => $State->{ExpandedURI q<dis2pm:parentResource>}->{src});
-    if ($i) {
-      $res->{ExpandedURI q<d:actualType>}
+    my $t = dis_get_attr_node (%opt, name => 'Type', parent => $res->{src});
+    if ($t) {
+      $res->{ExpandedURI q<d:Type>}
         = dis_typeforqnames_to_type_uri ($t->value, use_default_namespace => 1,
                                          %opt, node => $t);
     } else {
-      $res->{ExpandedURI q<d:actualType>} = $res->{ExpandedURI q<d:Type>};
+      my $pr = $State->{ExpandedURI q<dis2pm:parentResource>};
+      if (defined $pr->{ExpandedURI q<d:Type>}) {
+        $res->{ExpandedURI q<d:Type>} = $pr->{ExpandedURI q<d:Type>};
+      } else {
+        valid_err (q<InCase value type required>, node => $res->{src});
+      }
+    }
+    my $i = dis_get_attr_node (%opt, name => 'actualType',
+                               parent => $res->{src});
+    if ($i) {
+      $res->{ExpandedURI q<d:actualType>}
+        = dis_typeforqnames_to_type_uri ($i->value, use_default_namespace => 1,
+                                         %opt, node => $i);
+    } else {
+      my $pr = $State->{ExpandedURI q<dis2pm:parentResource>};
+      if (defined $pr->{ExpandedURI q<d:actualType>}) {
+        $res->{ExpandedURI q<d:actualType>} = $pr->{ExpandedURI q<d:actualType>};
+      } else {
+        $res->{ExpandedURI q<d:actualType>} = $pr->{ExpandedURI q<d:Type>};
+      }
     }
     
     ## Value
@@ -2169,4 +2212,4 @@ sub disdoc_inline2pod ($;%) {
 
 =cut
 
-1; # $Date: 2004/12/08 07:36:41 $
+1; # $Date: 2004/12/18 11:09:28 $

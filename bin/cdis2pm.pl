@@ -3,6 +3,7 @@ use strict;
 use Message::Util::QName::Filter {
   d => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis-->,
   dis2pm => q<http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#>,
+  DISPerl => q<http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#>,
   disPerl => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl-->,
   DOMCore => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#>,
   DOMMain => q<http://suika.fam.cx/~wakaba/archive/2004/dom/main#>,
@@ -169,7 +170,8 @@ sub perl_code ($;%) {
                               : '') .
                  $mtd->{ExpandedURI q<dis2pm:methodName>} . ' ';
           }
-        } elsif ($et eq ExpandedURI q<disPerl:ClassName>) {
+        } elsif ($et eq ExpandedURI q<disPerl:ClassName> ||
+                 $et eq ExpandedURI q<disPerl:IFName>) {
                                                         ## Perl package name
           my $uri = dis_typeforqnames_to_uri ($q, 
                                               use_default_namespace => 1, %opt);
@@ -182,7 +184,7 @@ sub perl_code ($;%) {
             valid_err qq<Package name of class <$uri> must be defined>,
               node => $opt{node};
           }
-        } elsif ($et eq ExpandedURI q<disPerl:CODE>) {  ## CODE constant
+        } elsif ($et eq ExpandedURI q<disPerl:Code>) {  ## CODE constant
           my $uri = dis_typeforqnames_to_uri ($q, use_default_namespace => 1,
                                               %opt);
           if (defined $State->{Type}->{$uri}->{Name} and
@@ -504,7 +506,15 @@ sub dispm_get_code (%) {
                                  $opt{resource}, %opt,
                                  node => $opt{resource}->{src}))) {
     my $key = $opt{ExpandedURI q<dis2pm:DefKeyName>} || ExpandedURI q<d:Def>;
+
     my $n = dis_get_attr_node (%opt, parent => $opt{resource}->{src},
+                               name => {uri => $key},
+                               ContentType => ExpandedURI q<d:Perl>);
+    if ($n) {
+      return disperl_to_perl (%opt, node => $n);
+    }
+
+    $n = dis_get_attr_node (%opt, parent => $opt{resource}->{src},
                                name => {uri => $key},
                                ContentType => ExpandedURI q<lang:Perl>);
     if ($n) {
@@ -633,6 +643,93 @@ sub dispm_const_group (%) {
   }
   return $result;
 } # dispm_const_group
+
+=item $code = disperl_to_perl (node => $node, %opt)
+
+Converts a C<d:Perl> node to a Perl code fragment.
+
+=cut
+
+sub disperl_to_perl (%) {
+  my %opt = @_;
+  my $code = '';
+  for (@{$opt{node}->child_nodes}) {
+    next unless $_->node_type eq '#element';
+    next unless dis_node_for_match ($_, $opt{For}, %opt);
+    my $et = dis_element_type_to_uri ($_->local_name, %opt, node => $_);
+    if ($et eq ExpandedURI q<DISPerl:selectByProp>) {
+          my $prop = dis_get_attr_node
+                       (%opt, parent => $_,
+                        name => {uri => ExpandedURI q<DISPerl:propName>});
+          my $propvalue;
+          if ($prop) {
+            $prop = dis_qname_to_uri ($prop->value,
+                                      use_default_namespace => 1,
+                                      %opt, node => $prop);
+            $prop = dis_get_attr_node
+                        (%opt, parent => $opt{Type},
+                         name => {uri => $prop}) if $opt{Type};
+            unless ($prop) {
+              if ($prop) {
+                valid_err q<Element "DISPerl:selectByProp" cannot be used here>,
+                          node => $opt{node};
+              } else {
+                $propvalue = '';
+              }
+            } else {
+              $propvalue = $prop->value;
+            }
+          } else {
+            valid_err q<Attribute "DISPerl:propName" required>,
+                      node => $_;
+          }
+          my $selcase;
+          for my $case (@{$_->child_nodes}) {
+            next unless $case->node_type eq '#element';
+            next unless dis_node_for_match ($case, $opt{For}, %opt);
+            my $et = dis_element_type_to_uri ($case->local_name,
+                                              %opt, node => $case);
+            if ($et eq ExpandedURI q<DISPerl:case>) {
+              my $val = dis_get_attr_node
+                           (%opt, parent => $case,
+                            name => 'Value',
+                            ContentType => ExpandedURI q<lang:dis>,
+                            defaultContentType => ExpandedURI q<lang:dis>);
+              if ($val and $val->value eq $propvalue) {
+                $selcase = $case; last;
+              } elsif (not $val and not $val->value) {
+                $selcase = $case; last;
+              }
+            } elsif ($et eq ExpandedURI q<DISPerl:else>) {
+              $selcase = $case; last;
+            } else {
+              valid_err q<Element type <$et> not allowed here>,
+                        node => $case;
+            }
+          }
+      if ($selcase) {
+        my $lcode = perl_code ($selcase->value, %opt, node => $selcase);
+        $code .= perl_code_source ($lcode, %opt, node => $selcase);
+      }
+    } elsif ({
+              ExpandedURI q<d:ContentType> => 1,
+              ExpandedURI q<d:For> => 1,
+              ExpandedURI q<d:ForCheck> => 1,
+              ExpandedURI q<d:ImplNote> => 1,
+             }->{$et}) {
+      # 
+    } else {
+      valid_err qq<Element type <$et> not supported>,
+                node => $opt{node};
+    }
+  }
+  
+  my $val = $opt{node}->value;
+  if ($val) {
+    
+  }
+  return $code;
+} # disperl_to_perl
 
 
 ## Outputed module and "For"

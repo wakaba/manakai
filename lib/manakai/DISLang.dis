@@ -1,0 +1,144 @@
+Module:
+  @QName: 
+    DIS:DISLang
+  @FullName:
+    @@lang:en
+    @@@: 
+      <QUOTE:dis> Abstract Programming Language Module
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Lang#
+  
+  @Author:
+    @@FullName:Wakaba
+    @@Mail:w@suika.fam.cx
+  @License:
+     license:Perl+MPL
+  @Date:
+    @@@:
+      $Date: 2004/12/18 11:09:28 $
+    @@ContentType:
+      dis:Date.RCS
+  
+  @DefaultFor:
+    ManakaiDOM:all
+
+  @Require:
+    @@Module:
+      @@@Name: DISCore
+
+Namespace:
+  @DIS:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @DISPerl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
+  @disPerl:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl--
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @owl:
+    http://www.w3.org/2002/07/owl#
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+
+ElementTypeBinding:
+  @Name: DataTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdfs:Datatype
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdfs:Property
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+## -- The lang:dis tree language vocabulary
+
+DataTypeDef:
+  @QName:
+    lang:dis
+  @FullName:
+    @@lang:en
+    @@@:
+      The <QUOTE:dis> format
+
+ResourceDef:
+  @Name: TreeElementType
+  @rdf:type:
+    rdfs:Class
+  @ISA:
+    dis:ElementType
+  @Description:
+    @@lang:en
+    @@@:
+      A <Q::lang:dis> tree vocabulary element type.
+  @AliasFor:
+    @@@:
+      ::ManakaiDOM:all
+    @@For:
+      !=ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: TreeElementType
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: TreeElementType
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+TreeElementType:
+  @QName: 
+    DISPerl:selectByProp
+  @Description:
+    @@lang:en
+    @@@:
+      Static (convertion time) selection, from code fragments, 
+      by the value of a (static) property.
+
+TreeElementType:
+  @QName: 
+    DISPerl:propName
+  @Description:
+    @@lang:en
+    @@@:
+      Property name.
+  @dataType:
+    dis:TypeQName
+  @rdfs:domain: 
+    DISPerl:selectByProp
+
+TreeElementType:
+  @QName: 
+    DISPerl:case
+  @Description:
+    @@lang:en
+    @@@:
+      A <QUOTE::case>. 
+
+## DISLang.dis ends here

@@ -28,7 +28,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/08 07:36:40 $
+      $Date: 2004/12/18 11:09:28 $
     @@ContentType:
       dis:Date.RCS
   
@@ -101,6 +101,8 @@ Module:
   @Require:
     @@Module:
       @@@Name: DISCore
+    @@Module:
+      @@@Name: DISPerl
     @@Module:
       @@@Name: DOMMain
       @@@WithFor:
@@ -306,6 +308,24 @@ ForDef:
   @ISA:
     ManakaiDOM:DOM3
 
+ForDef:
+  @QName: 
+    ManakaiDOM:DOMHTMLFeature
+  @FullName:
+    @@lang:en
+    @@@: For DOM HTML feature, any version
+  @ISA:
+    ManakaiDOM:DOM
+
+ForDef:
+  @QName: 
+    ManakaiDOM:DOMXMLFeature
+  @FullName:
+    @@lang:en
+    @@@: For DOM XML feature, any version
+  @ISA:
+    ManakaiDOM:DOM
+
 ## For the manakai DOM implementation
 
 ForDef:
@@ -326,6 +346,10 @@ ForDef:
     @@@: For the manakai DOM Level 1 implementation
   @Implement:
     ManakaiDOM:DOM1
+  @Implement: 
+    ManakaiDOM:DOMXMLFeature
+  @Implement: 
+    ManakaiDOM:DOMHTMLFeature
   @ISA:
     ManakaiDOM:ManakaiDOM
 ForDef:
@@ -363,7 +387,7 @@ ForDef:
     ManakaiDOM:ManakaiDOMCommon
   @FullName:
     @@lang:en
-    @@@: For the manakai implementation of DOM, level independent
+    @@@: For the manakai implementation of DOM, level/feature independent
   @Implement:
     ManakaiDOM:DOM
   @ISA:
@@ -403,6 +427,19 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       rdfs:Property
+
+ElementTypeBinding:
+  @Name: TreeElementType
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:TreeElementType
+    @@AliasFor:
+      @@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
 
 ResourceTypeDef:
   @QName: 
@@ -775,6 +812,13 @@ ElementTypeBinding:
   @ElementType:
     ManakaiDOM:raises
 
+TreeElementType:
+  @Name: raiseException
+  @Description:
+    @@lang:en
+    @@@:
+      Raises an exception.  Content: Same as <Q::ManakaiDOM:raises>.
+
 PropDef:
   @QName: 
     ManakaiDOM:alwaysWarns
@@ -888,7 +932,7 @@ PropDef:
   @Description:
     @@lang:en
     @@@:
-      A definition of the resource (for internal use).
+      OBSOLETE: A definition of the resource (for internal use).
 PropDef:
   @QName:
     dis:IsAbstract
@@ -898,19 +942,28 @@ PropDef:
       Whether the resource is defined abstractly or concretly. 
       Abstractly defined resource must be concretly overloaded 
       by inheriting class.
+
 PropDef:
   @QName:
     dis:IsFinal
   @Description: 
     @@lang:en
     @@@:
-      Whether the resource is overloadable or not.
+      Whether a subject resource is overridable or not. 
+      \
+      - <CODE::-1> :: The subject resource have to be overrided.
+      \
+      - <CODE::0>  :: The subject resource is able to be overrided. 
+      \
+      - <CODE::1>  :: The subject resource is unable to be overrided.
+  @dataType:
+    DISCore:Tristate
 
 PropDef:
   @QName:
     ManakaiDOM:isForInternal
   @dataType:
-    dis:boolean
+    dis:Boolean
   @Description:
     @@lang:en
     @@@:
@@ -922,7 +975,7 @@ PropDef:
   @QName:
     ManakaiDOM:isStatic
   @dataType:
-    dis:boolean
+    dis:Boolean
   @Description:
     @@lang:en
     @@@:
@@ -934,6 +987,60 @@ PropDef:
       that a method is static does not means the method should not 
       be called via an object.  Inappropriateness of the use as an 
       object method should be indicated by other property.
+
+## -- lang:dis vocabulary
+
+TreeElementType:
+  @QName:
+    dis:GetProp
+  @dataType:
+    dis:TypeQName
+  @rdfs:range:
+    rdfs:Property
+  @Description:
+    @@lang:en
+    @@@:
+      Gets the non-nodal value of a <Class::ManakaiDOM:ManakaiDOMNodeReference> 
+      property (actualy <Class::ManakaiDOM:ManakaiDOMNodeObject> property). 
+
+TreeElementType:
+  @QName:
+    dis:SetProp
+  @dataType:
+    dis:TypeQName
+  @rdfs:range:
+    rdfs:Property
+  @Description:
+    @@lang:en
+    @@@:
+      Sets the non-nodal value of a <Class::ManakaiDOM:ManakaiDOMNodeReference> 
+      property (actualy <Class::ManakaiDOM:ManakaiDOMNodeObject> property). 
+
+TreeElementType:
+  @QName:
+    dis:CheckReadOnly
+  @dataType:
+    dis:Boolean
+  @rdfs:domain:
+    dis:SetProp
+  @Description:
+    @@lang:en
+    @@@:
+      Whether if the node to set an attribute value is read-only is 
+      checked before the setting or not. 
+
+TreeElementType:
+  @QName:
+    dis:GetPropNode
+  @dataType:
+    dis:TypeQName
+  @rdfs:range:
+    rdfs:Property
+  @Description:
+    @@lang:en
+    @@@:
+      Gets the nodal value of a <Class::ManakaiDOM:ManakaiDOMNodeReference> 
+      property (actualy <Class::ManakaiDOM:ManakaiDOMNodeObject> property). 
 
 ## -- DOM specific properties and types
 
@@ -1004,6 +1111,7 @@ PropDef:
     @@lang:en
     @@@:
       A namespace-aware variant of the method or attribute.
+
 PropDef:
   @QName:
     dis:NoNSVersion
@@ -1011,54 +1119,25 @@ PropDef:
     @@lang:en
     @@@: A namespace-unaware variant of the method or attribute.
 
-## -- Perl binding specific properties and datatypes
+PropDef:
+  @Name: isNamespaceAware
+  @Description:
+    @@lang:en
+    @@@: 
+      Whether a subject resource is namespace-aware or not.  Note that 
+      the property value of <CODE::false> does not mean the subject 
+      resource is namespace unaware; it might be namespace-neutral.
+  @dataType:
+    dis:Boolean
 
 PropDef:
-  @QName:
-    ManakaiDOM:moduleSuffix
-  @dataType:
-    DOMMain:DOMString
-
-DataTypeDef:
-  @QName:
-    lang:Perl
-  @FullName:
+  @Name: isNamespaceUnaware
+  @Description:
     @@lang:en
-    @@@: Perl 5 code
-
-DataTypeDef:
-  @QName:
-    perl:ARRAY
-  @FullName:
-    @@lang:en
-    @@@: Perl array reference
-
-DataTypeDef:
-  @QName:
-    perl:hash
-  @FullName:
-    @@lang:en
-    @@@: Perl hash reference
-
-DataTypeDef:
-  @QName:
-    dis:Perl
-  @FullName:
-    @@lang:en
-    @@@: 
-     <QUOTE::dis> tree fragment generating Perl code
-  @ISA: 
-    lang:dis
+    @@@:
+      Whether a subject resource is namespace-unaware or not.
 
 ## -- Manakai specific properties and datatypes
-
-DataTypeDef:
-  @QName:
-    lang:muf
-  @FullName:
-    @@lang:en
-    @@@: 
-      <PerlModule:Message::Util::Formatter> template
 
 PropDef:
   @QName:
@@ -1066,7 +1145,13 @@ PropDef:
   @Description:
     @@lang:en
     @@@:
-      A role of the class in the DOM system.
+      A role of class in the DOM system.
+  @rdfs:domain:
+    ManakaiDOM:Class
+  @rdfs:range:
+    ManakaiDOM:IF
+  @dataType:
+    dis:TypeForQNames
 
 ElementTypeBinding:
   @Name: ImplementLevel3
@@ -1107,7 +1192,7 @@ PropDef:
       between input (parameter) declaration and actual code.  Otherwise, 
       no code is inserted. 
   @dataType:
-    dis:boolean
+    dis:Boolean
 
 ## -- Other
 
@@ -1117,6 +1202,14 @@ DataTypeDef:
   @FullName:
     @@lang:en
     @@@: Java code
+
+DataTypeDef:
+  @QName:
+    lang:muf
+  @FullName:
+    @@lang:en
+    @@@: 
+      <PerlModule::Message::Util::Formatter> template
 
 ## -- Obsolete properties
 
@@ -1148,6 +1241,31 @@ ElementTypeBinding:
   @ShadowContent:
     @@ContentType:
       lang:Perl
+
+ResourceTypeDef:
+  @QName:
+    dis2pm:InlineCode
+  @Description:
+    @@lang:en
+    @@@:
+      An inline code fragment referred by <CODE::<lt>CODE::<VAR::qname><gt>> 
+      preprocessed token.
+      \
+      {NOTE:: If a code fragment is written in Perl (i.e. typed as 
+              <Q::dis:Perl> or its subtypes), line breaks are 
+              replaced by a <CHAR::SPACE>.  Use escape (<Perl::\n>) if 
+              it is significant.
+      \
+      }
+
+ResourceTypeDef:
+  @QName:
+    dis2pm:BlockCode
+  @Description:
+    @@lang:en
+    @@@:
+      A block code fragment referred by <CODE::__CODE{<VAR::qname>}__> 
+      preprocessed block.
 
 ## -- IDL datatypes
 
@@ -1249,7 +1367,7 @@ ResourceDef:
     @@Value:
       @@@@: 1
       @@@ContentType:
-        dis:boolean
+        dis:Boolean
     @@Description:
       @@@lang:en
       @@@@: The boolean true value.
@@ -1259,7 +1377,7 @@ ResourceDef:
     @@Value:
       @@@@: 0
       @@@ContentType:
-        dis:boolean
+        dis:Boolean
     @@Description:
       @@@lang:en
       @@@@: The boolean false value.
@@ -2326,6 +2444,67 @@ StringDataTypeDef:
         $INPUT = [];
       }
 
+StringDataTypeDef:
+  @Name: ManakaiDOMQName
+  @FullName:
+    @@lang:en
+    @@@:
+      XML Qualified Name
+  @ManakaiDOM:inputNormalizer:
+    @@ContentType:
+      dis:Perl
+    @@DISPerl:selectByProp:
+      @@@DISPerl:propName:
+        DOMCore:xmlVersion
+      @@@DISPerl:case:
+        @@@@Value: 1.0
+        @@@@@:
+          unless ($INPUT
+                    =~ /\A\p{InXML_NameStartChar10}\p{InXMLNameChar10}*\z/) {
+            __EXCEPTION{
+              MDOMX:MDOM_BAD_NAME::
+                DOMCore:name => {$INPUT},
+                MDOMX:param-name => '$INPUT_NAME',
+                DOMCore:xmlVersion => '1.0',
+            }__;
+          }
+          unless ($INPUT =~ /\A\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*(?::\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*)?\z/) {
+            __EXCEPTION{
+              MDOMX:MDOM_NS_MALFORMED_QNAME::
+                DOMCore:name => {$INPUT},
+                MDOMX:param-name => '$INPUT_NAME',
+                DOMCore:xmlVersion => '1.0',
+            }__;
+          }
+      @@@DISPerl:case:
+        @@@@Value: 1.1
+        @@@@@:
+          unless ($INPUT =~ /\A\p{InXMLNameStartChar11}\p{InXMLNameChar11}*\z/) {
+            __EXCEPTION{
+              MDOMX:MDOM_BAD_NAME::
+                DOMCore:name => {$INPUT},
+                MDOMX:param-name => '$INPUT_NAME',
+                DOMCore:xmlVersion => '1.1',
+            }__;
+          }
+          unless ($INPUT =~ /\A\p{InXMLNCNameStartChar11}\p{InXMLNCNameChar11}*(?::\p{InXMLNCNameStartChar11}\p{InXMLNCNameChar11}*)?\z/) {
+            __EXCEPTION{
+              MDOMX:MDOM_NS_MALFORMED_QNAME::
+                DOMCore:name => {$INPUT},
+                MDOMX:param-name => '$INPUT_NAME',
+                DOMCore:xmlVersion => '1.1',
+            }__;
+          }
+      @@@DISPerl:else:
+        @@@@@:
+          unless ($INPUT =~ //) {
+            
+          }
+        @@@@ImplNote:
+          @@@@@lang:en
+          @@@@@@:
+            TODO: Implement this.
+
 ## -- The bootstrap object
 
 ResourceDef:
@@ -2528,7 +2707,7 @@ ResourceDef:
       @@@Description:
         @@@@lang:en
         @@@@@: 
-          A <IF:DOMImplementationSource> object to be registered. 
+          A <IF::DOMCore:DOMImplementationSource> object to be registered. 
     @@Return:
       @@@PerlDef:
         @@@@require: overload
@@ -2666,6 +2845,21 @@ ClassDef:
           $r = $self->_FORMATTER_PACKAGE_->new
                     ->replace ($template, param => $self);
 
+  @ResourceDef:
+    @@QName:
+      ManakaiDOM:getExceptionCode
+    @@rdf:type:
+      dis2pm:BlockCode
+    @@Def:
+      @@@ContentType:
+        lang:Perl
+      @@@@:
+        $OUTPUT = $self->{<Q::MUErrorCore:def>}->{<Q::DOMCore:code>};
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns the exception/warning code of that exception/warning object. 
+
 ResourceDef:
   @QName: 
     ManakaiDOM:ManakaiDOMException
@@ -2745,8 +2939,8 @@ ClassDef:
             <Q::TreeCore:anydata> => [],
             <Q::TreeCore:anydata2> => [],
             <Q::TreeCore:rc> => 0,
-            <Q::TreeCore:treeID> => <CODE::ManakaiDOM:generateUniqueID>,
-            <Q::TreeCore:nodeID> => <CODE::ManakaiDOM:generateUniqueID>,
+            <Q::TreeCore:treeID> => <Code::ManakaiDOM:generateUniqueID>,
+            <Q::TreeCore:nodeID> => <Code::ManakaiDOM:generateUniqueID>,
             <Q::DOMCore:hasFeature> => {},
           }, ref $self || $self;
   @IntMethod:
@@ -3021,7 +3215,7 @@ ClassDef:
     @@Return:
       @@@PerlDef:
           if ($self-><M::ManakaiDOM:ManakaiDOMNodeObject.isExternallyReferred>) {
-            my $id = <CODE::ManakaiDOM:generateUniqueID>;
+            my $id = <Code::ManakaiDOM:generateUniqueID>;
             $_-><M::ManakaiDOM:ManakaiDOMNodeObject.changeTreeIDDownward> ($id)
               for @{$self-><M::ManakaiDOM:ManakaiDOMNodeObject.getRootNodes>};
             ## NOTE:: "Root nodes" should be this node itself
@@ -3332,31 +3526,6 @@ WarningDef:
           @@@@@@: The parameter to which inappropriate value is specified.
 
 ## -- Frequently used code fragments
-
-ResourceTypeDef:
-  @QName:
-    dis2pm:InlineCode
-  @Description:
-    @@lang:en
-    @@@:
-      An inline code fragment referred by <CODE::<lt>CODE::<VAR::qname><gt>> 
-      preprocessed token.
-      \
-      {NOTE:: If a code fragment is written in Perl (i.e. typed as 
-              <Q::dis:Perl> or its subtypes), line breaks are 
-              replaced by a <CHAR::SPACE>.  Use escape (<Perl::\n>) if 
-              it is significant.
-      \
-      }
-
-ResourceTypeDef:
-  @QName:
-    dis2pm:BlockCode
-  @Description:
-    @@lang:en
-    @@@:
-      A block code fragment referred by <CODE::__CODE{<VAR::qname>}__> 
-      preprocessed block.
 
 ResourceDef:
   @QName:

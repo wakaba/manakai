@@ -1,6 +1,6 @@
 Module:
   @QName: 
-    DIS:Core
+    DIS:DISCore
   @FullName:
     @@lang:en
     @@@: 
@@ -15,7 +15,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/08 07:36:41 $
+      $Date: 2004/12/18 11:09:28 $
     @@ContentType:
       dis:Date.RCS
   
@@ -416,7 +416,7 @@ PropDef:
   @rdfs:domain:
     dis:ResourceDef
   @dataType: 
-    dis:boolean
+    dis:Boolean
 
 ## --- Datatype
 
@@ -480,13 +480,6 @@ PropDef:
 
 DataTypeDef:
   @QName:
-    lang:dis
-  @FullName:
-    @@lang:en
-    @@@:
-      The <QUOTE:dis> format
-DataTypeDef:
-  @QName:
     lang:disdoc
   @FullName:
     @@lang:en
@@ -506,15 +499,37 @@ DataTypeDef:
     @@lang:en
     @@@:
       A pair of resource QName and optional <QUOTE:For> QName.
+
 DataTypeDef:
   @QName:
     dis:Boolean
   @FullName:
     @@lang:en
+    @@@: Boolean truth
+  @Description:
+    @@lang:en
     @@@: 
-      The boolean truth value, i.e. true or false. 
+      A boolean truth value, i.e. true or false. 
       \
       <Q:dis:Boolean> := "1" / "0"
+
+DataTypeDef:
+  @Name: Tristate
+  @FullName:
+    @@lang:en
+    @@@: Tristate value
+  @Description:
+    @@lang:en
+    @@@:
+      A tristate value. 
+      \
+      <Q::Tristate> := "-1" / "0" / "1".
+      \
+      {NOTE:: What a <Q::Tristate> value means depends on the 
+              context where the value is used. 
+      \
+      }
+
 DataTypeDef:
   @QName:
     dis:Date.RCS
