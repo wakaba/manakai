@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::Base;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXMLChar
                         InXML_deprecated_noncharacter InXML_unicode_xml_not_suitable!;
 require Message::Markup::XML::Parser::Error;
@@ -1184,11 +1184,14 @@ sub parse_element_declaration ($$$%) {
                  number => 1, ## Rank suffix
                  ps => 1,
                });
-        my $param = shift @{$pp->{ExpandedURI q<param>}};
+        my $param = $pp->{ExpandedURI q<param>}->[-1];
         last MODEL unless $param;
         if ($param->{type} eq 'grpo') {
-
+          $self->parse_model_group
+            ($opt{ExpandedURI q<source>}->[-1], $pp, %opt);
+          # exception not implemented
         } elsif ($param->{type} eq 'Name') {
+          shift @{$pp->{ExpandedURI q<param>}};
           if ({qw/ANY 1 EMPTY 1/}->{${$param->{value}}}) {
             $pp->{ExpandedURI q<element-content-keyword>} = $param->{value};
           } elsif ({qw/CDATA 1 RCDATA 1/}->{${$param->{value}}}) {
@@ -1212,12 +1215,14 @@ sub parse_element_declaration ($$$%) {
                keyword => ${$param->{value}});
           }
         } elsif ($param->{type} eq 'minus') {
+          shift @{$pp->{ExpandedURI q<param>}};
           $self->report
             (-type => 'SYNTAX_ELEMENT_TAG_MIN',
              -class => 'WFC',
              source => $param->{value});
           redo MODEL;
         } elsif ($param->{type} eq 'number') {
+          shift @{$pp->{ExpandedURI q<param>}};
           $self->report
             (-type => 'SYNTAX_ELEMENT_RANK_SUFFIX',
              -class => 'WFC',
@@ -1264,6 +1269,189 @@ sub parse_element_declaration ($$$%) {
   }
 } # parse_element_declaration
 
+sub parse_model_group ($$$%) {
+  my ($self, $src, $p, %opt) = @_;
+  $p->{ExpandedURI q<param>} ||= [];
+  local $opt{ExpandedURI q<allow-comment>} = 0;
+  local $opt{ExpandedURI q<allow-param-entref>} = 1;
+  local $opt{ExpandedURI q<ps-required>} = 0;
+  local $opt{ExpandedURI q<error-ps-required>}
+        = 'SYNTAX_MODEL_GROUP_PS_REQUIRED';
+  local $opt{ExpandedURI q<source>} = [$src];
+  $self->parse_markup_declaration_parameter
+              ($src, $p,
+               %opt,
+               ExpandedURI q<param-type> => {
+                 grpo => 1,
+                 ps => 1,
+               });
+  if ($p->{ExpandedURI q<param>}->[0] and
+      $p->{ExpandedURI q<param>}->[0]->{type} eq 'grpo') {
+    shift @{$p->{ExpandedURI q<param>}};
+    $self->model_group_start
+              ($src, $p, my $pp = {
+                 ExpandedURI q<param> => $p->{ExpandedURI q<param>},
+               }, %opt);
+    local $opt{ExpandedURI q<match-or-error>} = 0;
+    my $i = 0; # $i'th item currently reading
+    my $has_pcdata = 0;
+    my $connect;
+    PARAMS: {
+      $self->parse_markup_declaration_parameter
+              ($src, $pp, %opt,
+               ExpandedURI q<error-no-match>
+                 => 'SYNTAX_MODEL_GROUP_ITEM_REQUIRED',
+               ExpandedURI q<param-type> => {
+                 Name => 1,  ## Element type name
+                 grpo => 1,  ## Nested model group
+                 dtgo => 1,  ## Data tag model group
+                 rniKeyword => 1, ## #PCDATA
+                 ps => 1,
+               });
+      my $param = $pp->{ExpandedURI q<param>}->[0];
+      my $ppp = {ExpandedURI q<param> => $pp->{ExpandedURI q<param>}};
+      unless ($param) {
+        last PARAMS;
+      } elsif ($param->{type} eq 'Name') {
+        $ppp->{ExpandedURI q<element-type-name>} = $param->{value};
+        $ppp->{ExpandedURI q<item-type>} = 'gi';
+        shift @{$pp->{ExpandedURI q<param>}};
+        my $src = $opt{ExpandedURI q<source>}->[-1];
+        if ($$src =~ /\G([?+*])/gc) {
+          my $del = $1;
+          $self->{error}->set_position ($src, moved => 1,
+                                        diff => length $del);
+          $self->{error}->fork_position ($src => \$del);
+          $ppp->{ExpandedURI q<occurrence>} = \$del;
+        }
+      } elsif ($param->{type} eq 'grpo') {
+        if ($has_pcdata) {
+          $self->report
+            (-type => 'SYNTAX_MODEL_GROUP_MIXED_NESTED',
+             -class => 'WFC',
+             source => $param->{value});
+        }
+        $self->parse_model_group
+          ($opt{ExpandedURI q<source>}->[-1], $ppp, %opt);
+        $ppp->{ExpandedURI q<item-type>} = 'group';
+      } elsif ($param->{type} eq 'rniKeyword') {
+        shift @{$p->{ExpandedURI q<param>}};
+        if (${$param->{value}} eq 'PCDATA') {
+          $ppp->{ExpandedURI q<item-type>} = 'PCDATA';
+          $has_pcdata = 1;
+          $self->report
+            (-type => 'SYNTAX_MODEL_GROUP_PCDATA_POSITION',
+             -class => 'WFC',
+             source => $param->{value})
+            if $i != 0;
+        } else {
+          $self->report
+            (-type => 'SYNTAX_MODEL_GROUP_UNKNOWN_KEYWORD',
+             -class => 'WFC',
+             source => $param->{value},
+             keyword => ${$param->{value}});
+        }
+      } elsif ($param->{type} eq 'dtgo') {
+        shift @{$pp->{ExpandedURI q<param>}};
+        $self->report
+          (-type => 'SYNTAX_DATA_TAG_GROUP',
+           -class => 'WFC',
+           source => $param->{value});
+        redo PARAMS; # not implemented
+      } else {
+        die "$0: ".__PACKAGE__.": $param->{type}: Buggy";
+      }
+      
+      $i++;
+      $self->parse_markup_declaration_parameter
+              ($src, $pp, %opt,
+               ExpandedURI q<match-or-error> => 0,
+               ExpandedURI q<param-type> => {
+                 connector => 1,
+                 ps => 1,
+               },
+               ExpandedURI q<allow-connector> => {
+                 ',' => 1, '|' => 1, '&' => 0,
+               });
+      my $connector = $pp->{ExpandedURI q<param>}->[0];
+      if ($connector and $connector->{type} eq 'connector') {
+        shift @{$pp->{ExpandedURI q<param>}};
+        $ppp->{ExpandedURI q<connector>} = $connector->{value};
+        $connect ||= ${$connector->{value}};
+        if ($connect ne ${$connector->{value}}) {
+          $self->report
+            (-type => 'SYNTAX_MODEL_GROUP_CONNECTOR_MATCH',
+             -class => 'WFC',
+             source => $connector->{value},
+             old => $connect,
+             new => ${$connector->{value}});
+        } elsif ($has_pcdata and $connect ne '|') {
+          $self->report
+            (-type => 'SYNTAX_MODEL_GROUP_MIXED_CONNECTOR',
+             -class => 'WFC',
+             source => $connector->{value},
+             connector => ${$connector->{value}});
+        }
+        $opt{ExpandedURI q<match-or-error>} = 1;
+        $self->model_group_content ($src, $pp, $ppp, %opt);
+        redo PARAMS;
+      } else {
+        $self->model_group_content ($src, $pp, $ppp, %opt);
+      }
+    } continue {
+      $self->parse_markup_declaration_parameter
+              ($src, $pp,
+               %opt,
+               ExpandedURI q<match-or-error> => 0,
+               ExpandedURI q<ps-required> => 0,
+               ExpandedURI q<param-type> => {
+                 ps => 1,
+               });
+      if (@{$pp->{ExpandedURI q<param>}} or
+          @{$opt{ExpandedURI q<source>}} > 1) {
+        $self->report
+              (-type => 'SYNTAX_MARKUP_DECLARATION_TOO_MANY_PARAM',
+               -class => 'WFC',
+               source => ($pp->{ExpandedURI q<param>}->[0] ?
+                            $pp->{ExpandedURI q<param>}->[0]->{value} :
+                            $opt{ExpandedURI q<source>}->[-1]),
+               param => $pp->{ExpandedURI q<param>},
+               sources => $opt{ExpandedURI q<source>});
+      }
+      $$src =~ /\G\)/gc
+        or $self->report
+              (-type => 'SYNTAX_MODEL_GROUP_GRPC_REQUIRED',
+               -class => 'WFC',
+               source => $src);
+      if ($$src =~ /\G([?+*])/gc) {
+        my $del = $1;
+        $self->{error}->set_position ($src, moved => 1,
+                                      diff => length $del);
+        $self->{error}->fork_position ($src => \$del);
+        $p->{ExpandedURI q<occurrence>} = \$del;
+        if ($has_pcdata and $del ne '*') {
+          $self->report
+            (-type => 'SYNTAX_MODEL_GROUP_'.($i > 1 ? 'MIXED' : 'PCDATA')
+                     .'_OCCUR',
+             -class => 'WFC',
+             source => $src,
+             position_diff => 1);
+        }
+      } elsif ($has_pcdata and $i > 1) {
+        $self->report
+          (-type => 'SYNTAX_MODEL_GROUP_PCDATA_OCCUR',
+           -class => 'WFC',
+           source => $src,
+           position_diff => 1);
+      }
+    }
+    $self->model_group_end
+              ($src, $p, $pp, %opt);
+    return 1;
+  } else {
+    return 0;
+  }
+} # parse_model_group
 
 sub parse_markup_declaration_parameter ($$$%) {
   my ($self, undef, $p, %opt) = @_;
@@ -1491,10 +1679,20 @@ sub parse_markup_declaration_parameter ($$$%) {
            $$src =~ /\G>/gc) {
     pos ($$src)--;
     return 1;
-  } elsif ($allow->{dso} and $$src =~ /\G\[/gc) {
-    push @$param, {type => 'dso'};
-  } elsif ($allow->{dsc} and $$src =~ /\G\]/gc) {
-    push @$param, {type => 'dsc'};
+  } elsif ($allow->{connector} and $$src =~ /\G([,|&])/gc) {
+    my $del = $1;
+    $self->{error}->set_position ($src, moved => 1,
+                                  diff => length $del);
+    $self->{error}->fork_position ($src => \$del);
+    unless ($opt{ExpandedURI q<allow-connector>}->{$del}) {
+      $self->report
+        (-type => 'SYNTAX_CONNECTOR',
+         -class => 'WFC',
+         source => $src,
+         position_diff => 1,
+         connector => $del);
+    }
+    push @$param, {type => 'connector', value => \$del};
   } elsif ($allow->{grpo} and $$src =~ /\G(\()/gc) {
     my $del = $1;
     $self->{error}->set_position ($src, moved => 1,
@@ -1507,6 +1705,10 @@ sub parse_markup_declaration_parameter ($$$%) {
                                   diff => length $del);
     $self->{error}->fork_position ($src => \$del);
     push @$param, {type => 'grpc', value => \$del};
+  } elsif ($allow->{dso} and $$src =~ /\G\[/gc) {
+    push @$param, {type => 'dso'};
+  } elsif ($allow->{dsc} and $$src =~ /\G\]/gc) {
+    push @$param, {type => 'dsc'};
   } elsif ($allow->{minus} and $$src =~ /\G(-)/gc) {
     my $min = $1;
     $self->{error}->set_position ($src, moved => 1,
@@ -1519,6 +1721,18 @@ sub parse_markup_declaration_parameter ($$$%) {
                                   diff => length $num);
     $self->{error}->fork_position ($src => \$num);
     push @$param, {type => 'number', value => \$num};
+  } elsif ($allow->{dtgo} and $$src =~ /\G(\[)/gc) {
+    my $del = $1;
+    $self->{error}->set_position ($src, moved => 1,
+                                  diff => length $del);
+    $self->{error}->fork_position ($src => \$del);
+    push @$param, {type => 'dtgo', value => \$del};
+  } elsif ($allow->{dtgc} and $$src =~ /\G(\])/gc) {
+    my $del = $1;
+    $self->{error}->set_position ($src, moved => 1,
+                                  diff => length $del);
+    $self->{error}->fork_position ($src => \$del);
+    push @$param, {type => 'dtgc', value => \$del};
   } else {
     if ($opt{ExpandedURI q<match-or-error>}) {
       $self->report
@@ -1892,6 +2106,10 @@ sub notation_declaration_end ($$$$%) {}
 sub markup_declaration_parameters_start ($$$$%) {}
 sub markup_declaration_parameters_end ($$$$%) {}
 
+sub model_group_start ($$$$%) {}
+sub model_group_content ($$$$%) {}
+sub model_group_end ($$$$%) {}
+
 sub public_identifier_start ($$$$%) {}
 sub system_identifier_start ($$$$%) {}
 
@@ -1946,4 +2164,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/05/23 04:02:48 $
+1; # $Date: 2004/05/27 09:01:54 $

@@ -1267,6 +1267,255 @@ my @a =
   method => 'parse_element_declaration',
   result => q(0:15:SYNTAX_MDC_REQUIRED),
  },
+
+ {
+  t => q<(a)>,
+  method => 'parse_model_group',
+  result => 1,
+ },
+ {
+  t => q<(a,b)>,
+  method => 'parse_model_group',
+  result => 1,
+ },
+ {
+  t => q<(a,b,c)>,
+  method => 'parse_model_group',
+  result => 1,
+ },
+ {
+  t => q<(   a , b  )>,
+  method => 'parse_model_group',
+  result => 1,
+ },
+ {
+  t => q<(   a , b  >,
+  method => 'parse_model_group',
+  result => '0:11:SYNTAX_MODEL_GROUP_GRPC_REQUIRED',
+ },
+  {
+  t => q<(   a ,   >,
+  method => 'parse_model_group',
+  result => '0:10:SYNTAX_MODEL_GROUP_ITEM_REQUIRED',
+ },
+
+ {
+  t => q<( a+ )>,
+  method => 'parse_model_group',
+  result => 1,
+ },
+ {
+  t => q<( a* )>,
+  method => 'parse_model_group',
+  result => 1,
+ },
+ {
+  t => q<( a? )>,
+  method => 'parse_model_group',
+  result => 1,
+ },
+ {
+  t => q<( a?, b )>,
+  method => 'parse_model_group',
+  result => 1,
+ },
+ {
+  t => q<( a?, b, c+ )>,
+  method => 'parse_model_group',
+  result => 1,
+ },
+ {
+  t => q<( a?, b*, c+ )>,
+  method => 'parse_model_group',
+  result => 1,
+ },
+ {
+  t => q<( a?>,
+  method => 'parse_model_group',
+  result => '0:4:SYNTAX_MODEL_GROUP_GRPC_REQUIRED',
+ },
+ {
+  t => q<( a ?>,
+  method => 'parse_model_group',
+  result => '0:4:SYNTAX_MODEL_GROUP_GRPC_REQUIRED',
+ },
+
+ {
+  t => q<( a | b )>,
+  method => 'parse_model_group',
+  result => 1,
+ },
+ {
+  t => q<( a & b )>,
+  method => 'parse_model_group',
+  result => '0:4:SYNTAX_CONNECTOR',
+ },
+
+ {
+  t => q<( a , b )*>,
+  method => 'parse_model_group',
+  result => 1,
+ },
+ {
+  t => q<( a , b )+>,
+  method => 'parse_model_group',
+  result => 1,
+ },
+ {
+  t => q<( a , b )?>,
+  method => 'parse_model_group',
+  result => 1,
+ },
+ {
+  t => q<( a , (b)* )>,
+  method => 'parse_model_group',
+  result => 1,
+ },
+ {
+  t => q<( a , (b, c)* )>,
+  method => 'parse_model_group',
+  result => 1,
+ },
+ {
+  t => q<( a , (b, (c, d)+)* )>,
+  method => 'parse_model_group',
+  result => 1,
+ },
+ {
+  t => q<( a , ([b, %ry; ], (c, d)+)* )>,
+  method => 'parse_model_group',
+  result => '0:7:SYNTAX_DATA_TAG_GROUP',
+ },
+
+ {
+  t => q<( a -- , b -- )>,
+  method => 'parse_model_group',
+  result => '0:4:SYNTAX_PS_COMMENT',
+ },
+ {
+  entity => {
+    b => q<, b>,
+  },
+  t => q<( a %b; )>,
+  method => 'parse_model_group',
+  result => 1,
+ },
+ {
+  entity => {
+    b => q<, >,
+  },
+  t => q<( a %b; )>,
+  method => 'parse_model_group',
+  result => '0:8:SYNTAX_MODEL_GROUP_ITEM_REQUIRED',
+ },
+ {
+  entity => {
+    b => q<, (b) >,
+  },
+  t => q<( a %b; )>,
+  method => 'parse_model_group',
+  result => 1,
+ },
+ {
+  entity => {
+    b => q<, (b >,
+  },
+  t => q<( a %b; ))>,
+  method => 'parse_model_group',
+  result => '0:5:SYNTAX_MODEL_GROUP_GRPC_REQUIRED',
+ },
+ {
+  entity => {
+    b => q<, b) >,
+  },
+  t => q<( a %b; >,
+  method => 'parse_model_group',
+  result => '0:3:SYNTAX_MARKUP_DECLARATION_TOO_MANY_PARAM',
+ },
+
+ {
+  t => q<( #PCDATA )* >,
+  method => 'parse_model_group',
+  result => 1,
+ },
+ {
+  t => q<( #PCDATA ) >,
+  method => 'parse_model_group',
+  result => 1,
+ },
+ {
+  t => q<( #PCDATA | a )* >,
+  method => 'parse_model_group',
+  result => 1,
+ },
+ {
+  t => q<( #PCDATA | a | b)* >,
+  method => 'parse_model_group',
+  result => 1,
+ },
+ {
+  t => q<( #PCDATA )+ >,
+  method => 'parse_model_group',
+  result => '0:11:SYNTAX_MODEL_GROUP_PCDATA_OCCUR',
+ },
+ {
+  t => q<( #PCDATA | a )+ >,
+  method => 'parse_model_group',
+  result => '0:15:SYNTAX_MODEL_GROUP_MIXED_OCCUR',
+ },
+ {
+  t => q<( #PCDATA , a )* >,
+  method => 'parse_model_group',
+  result => '0:10:SYNTAX_MODEL_GROUP_MIXED_CONNECTOR',
+ },
+ {
+  t => q<( #PCDATA | (a) )* >,
+  method => 'parse_model_group',
+  result => '0:12:SYNTAX_MODEL_GROUP_MIXED_NESTED',
+ },
+ {
+  t => q<( b | #PCDATA )* >,
+  method => 'parse_model_group',
+  result => '0:7:SYNTAX_MODEL_GROUP_PCDATA_POSITION',
+ },
+ {
+  t => q<( b | #foo )* >,
+  method => 'parse_model_group',
+  result => '0:7:SYNTAX_MODEL_GROUP_UNKNOWN_KEYWORD',
+ },
+ {
+  t => q<( #PCDATA | a , b ) >,
+  method => 'parse_model_group',
+  result => '0:14:SYNTAX_MODEL_GROUP_CONNECTOR_MATCH',
+ },
+ {
+  t => q<( a , b | a) >,
+  method => 'parse_model_group',
+  result => '0:8:SYNTAX_MODEL_GROUP_CONNECTOR_MATCH',
+ },
+
+ {
+  t => q<<!ELEMENT e ( a , b , a) >>,
+  method => 'parse_element_declaration',
+  result => '1',
+ },
+ {
+  t => q<<!ELEMENT e ( a , b  >>,
+  method => 'parse_element_declaration',
+  result => '0:21:SYNTAX_MODEL_GROUP_GRPC_REQUIRED',
+ },
+ {
+  entity => {b => q<(a, b>},
+  t => q<<!ELEMENT e %b; ) >>,
+  method => 'parse_element_declaration',
+  result => '0:5:SYNTAX_MODEL_GROUP_GRPC_REQUIRED',
+ },
+ {
+  entity => {b => q[(a, b )>]},
+  t => q[<!ELEMENT e %b; ],
+  method => 'parse_element_declaration',
+  result => '0:7:SYNTAX_MARKUP_DECLARATION_TOO_MANY_PARAM',
+ },
 );
 
 plan tests => scalar @a;
@@ -1285,6 +1534,7 @@ $parser->{error}->{option}->{report} = sub {
 };
 for (@a) {
   $first_error = '';
+  $first_error_detail = '';
   my $method = $_->{method};
   pos ($_->{t}) = 0;
   $parser->{ExpandedURI q<test:entity>} = $_->{entity} || {};

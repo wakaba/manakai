@@ -14,7 +14,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Message::Markup::XML::Parser::Error;
 require Message::Util::Error::TextParser;
@@ -49,11 +49,8 @@ sub ___rule_def () {+{
         }
         push @result, $result;
       }
-      for (reverse @{$o->{sources} || []}[1..$#{$o->{sources} || []}]) {
-        push @result, '"' . substr ($$_, pos $$_) . '"';
-      }
-      if (@{$o->{sources} || []}) {
-        push @result, '"' . ${$o->{sources}->[0]} . '"';
+      for (reverse @{$o->{sources} || []}) {
+        push @result, '"' . substr ($$_, pos $$_, 20) . '"';
       }
       $p->{-result} = join ', ', @result;
     },
@@ -98,6 +95,14 @@ sub ___error_def () {+{
   },
   SYNTAX_COMMENT_DECLARATION_REQUIRED => {
     description => q(Comment declaration expected),
+    level => 'ebnf',
+  },
+  SYNTAX_CONNECTOR => {
+    description => q(Connector "%t (name => connector);" not allowed),
+    level => 'ebnf',
+  },
+  SYNTAX_DATA_TAG_GROUP => {
+    description => q(Data tag group not allowed),
     level => 'ebnf',
   },
   SYNTAX_DOCTYPE_DECLARATION_REQUIRED => {
@@ -266,6 +271,51 @@ sub ___error_def () {+{
   },
   SYNTAX_MDC_REQUIRED => {
     description => q(mdc (>) closing markup declaration required),
+    level => 'ebnf',
+  },
+  SYNTAX_MODEL_GROUP_CONNECTOR_MATCH => {
+    description => q(Connector "%t (name => new);" must be "%t (name => old);"),
+    level => 'ebnf',
+  },
+  SYNTAX_MODEL_GROUP_GRPC_REQUIRED => {
+    description => q[grpc [)] closing model group required],
+    level => 'ebnf',
+  },
+  SYNTAX_MODEL_GROUP_ITEM_REQUIRED => {
+    description => q(Element type name or model group required),
+    level => 'ebnf',
+  },
+  SYNTAX_MODEL_GROUP_MIXED_CONNECTOR => {
+    description => q(Connector "%t (name => connector);" cannot be used in mixed content model group; it must be or (|)),
+    level => 'ebnf',
+  },
+  SYNTAX_MODEL_GROUP_MIXED_NESTED => {
+    description => q(Mixed content model group cannot have nested model group),
+    level => 'ebnf',
+  },
+  SYNTAX_MODEL_GROUP_MIXED_OCCUR => {
+    description => q(Occurrence indicator for mixed content model group must be rep (*)),
+    level => 'ebnf',
+  },
+  SYNTAX_MODEL_GROUP_PCDATA_OCCUR => {
+    description => q(Occurrence indicator for mixed content model group that only contains keyword "PCDATA" must be rep (*) if any),
+    level => 'ebnf',
+  },
+  SYNTAX_MODEL_GROUP_PCDATA_POSITION => {
+    description => q(Keyword "PCDATA" not allowed here),
+    level => 'ebnf',
+  },
+  SYNTAX_MODEL_GROUP_PS_REQUIRED => {
+    description => q(One or more ps (whitespaces) required),
+    level => 'ebnf',
+  },
+  SYNTAX_MODEL_GROUP_REQUIRED => {
+    description => q[grpo [(] for model group required],
+    level => 'ebnf',
+  },
+  SYNTAX_MODEL_GROUP_UNKNOWN_KEYWORD => {
+    description => q(Unknown keyword "%t (name => keyword);"),
+    level => 'ebnf',
   },
   SYNTAX_MULTIPLE_COMMENT => {
     description => q(Multiple comment in one comment declaration not allowed),
@@ -581,4 +631,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/05/23 04:02:48 $
+1; # $Date: 2004/05/27 09:01:54 $
