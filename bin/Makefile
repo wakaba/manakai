@@ -1,0 +1,26 @@
+
+MANAKAI_ROOT_DIR = ../
+BIN_DIR = $(MANAKAI_ROOT_DIR)bin/
+LIB_DIR = $(MANAKAI_ROOT_DIR)lib/
+
+DIS_DIR = $(MANAKAI_ROOT_DIR)lib/Message/DOM/
+DIS_FILES = $(DIS_DIR)DOM*.dis
+
+PERL = perl -I$(LIB_DIR)
+PERLC = $(PERL) -c -w 
+RM = rm -fv
+
+MKDOMMEMLIST_PL = $(BIN_DIR)mkdommemlist.pl
+MKDOMMEMLIST = $(PERL) $(MKDOMMEMLIST_PL)
+
+DOMMEMLIST = dommemlist.pl.tmp
+GENERATED_FILES = $(DOMMEMLIST)
+
+all: $(GENERATED_FILES)
+
+$(DOMMEMLIST): $(DIS_FILES) $(MKDOMMEMLIST_PL)
+	$(MKDOMMEMLIST) $(DIS_FILES) > $@
+	$(PERLC) $@
+
+clean:
+	$(RM) $(GENERATED_FILES) *~ .*~ *.BAK .*.BAK
