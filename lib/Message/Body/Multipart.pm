@@ -9,7 +9,7 @@ for "multipart/*" Internet Media Types
 package Message::Body::Multipart;
 use strict;
 use vars qw(%DEFAULT @ISA $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Body::Text;
 push @ISA, qw(Message::Body::Text);
@@ -117,7 +117,7 @@ sub parse ($$;%) {
   $self->_init (@_);
   my $b = $self->{boundary};
   my $nl = "\x0D\x0A";
-  unless ($self->{option}->{strict_linebreak}) {
+  unless ($self->{option}->{linebreak_strict}) {
     $nl = Message::Util::decide_newline ($body);
   }
   if (length $b) {
@@ -361,7 +361,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/04 06:38:21 $
+$Date: 2002/07/08 11:48:12 $
 
 =cut
 
