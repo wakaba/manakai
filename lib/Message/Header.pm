@@ -8,7 +8,7 @@ Message::Header --- A Perl Module for Internet Message Headers
 package Message::Header;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.30 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.31 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;	## This may seem silly:-)
 push @ISA, qw(Message::Field::Structured);
 
@@ -99,8 +99,9 @@ sub _init ($;%) {
   $self->SUPER::_init (%$DEFAULT, %options);
   $self->{value} = [];
   $self->_ns_load_ph ('default');
-  $self->_ns_load_ph ('rfc822');
-  $self->{option}->{ns_default_phuri} = $self->{ns}->{phname2uri}->{'rfc822'}
+  $self->_ns_load_ph ('x-rfc822');
+  $self->_ns_load_ph ('x-http');
+  $self->{option}->{ns_default_phuri} = $self->{ns}->{phname2uri}->{'x-rfc822'}
     unless $self->{option}->{ns_default_phuri};
   
   ## For text/rfc822-headers
@@ -129,12 +130,17 @@ sub _init ($;%) {
 sub _init_by_format ($$\%) {
   my $self = shift;
   my ($format, $option) = @_;
-  if ($format =~ /cgi/) {
-    unshift @header_order, qw(content-type location);
-    $option->{field_sort} = 'good-practice';
-    $option->{use_folding} = 0;
-  } elsif ($format =~ /http/) {
-    $option->{field_sort} = 'good-practice';
+  if ($format =~ /http/) {
+    $option->{ns_default_phuri} = $self->{ns}->{phname2uri}->{'x-http'};
+    if ($format =~ /cgi/) {
+      unshift @header_order, qw(content-type location);
+      $option->{field_sort} = 'good-practice';
+      $option->{use_folding} = 0;
+    } else {
+      $option->{field_sort} = 'good-practice';
+    }
+  } else {	## RFC 822
+    $option->{ns_default_phuri} = $self->{ns}->{phname2uri}->{'x-rfc822'};
   }
   if ($format =~ /uri-url-mailto/) {
     $option->{output_bcc} = 0;
@@ -199,6 +205,7 @@ sub parse ($$;%) {
       push @{$self->{value}}, $value if $s;
     }
   }
+  $self->_ns_associate_numerical_prefix;	## RFC 2774 namespace
   $self;
 }
 
@@ -251,6 +258,7 @@ sub parse_array ($\@;%) {
     }
     last if $#$header < 0;
   }
+  $self->_ns_associate_numerical_prefix;	## RFC 2774 namespace
   $self;
 }
 
@@ -276,7 +284,7 @@ sub _item_match ($$\$\%\%) {
   my ($by, $i, $list, $option) = @_;
   return 0 unless ref $$i;  ## Already removed
   if ($by eq 'name') {
-    my %o = %$option; $o{parse} = 0;
+    my %o = %$option; #$o{parse} = 0;
     my %l;
     for (keys %$list) {
       my ($s, undef, $v) = $self->_value_to_arrayitem ($_, '', %o);
@@ -289,6 +297,18 @@ sub _item_match ($$\$\%\%) {
     return 1 if $l{$$i->{name} . ':' . $$i->{ns}};
   } elsif ($by eq 'ns') {
     return 1 if $list->{ $$i->{ns} };
+  } elsif ($by eq 'http-ns-define') {
+    if ($$i->{ns} eq $self->{ns}->{phname2uri}->{'x-http'}
+     || $$i->{ns} eq $self->{ns}->{phname2uri}->{'x-http-c'}) {
+      my $n = $$i->{name};
+      if ($n eq 'opt' || $n eq 'c-opt' || $n eq 'man' || $n eq 'c-man') {
+        $option->{parse} = 0;
+        $$i->{body} = $self->_parse_value ($$i->{name} => $$i->{body}, ns => $$i->{ns});
+        for my $j (0..$$i->{body}->count-1) {
+          return 1 if $list->{ ($$i->{body}->value ($j))[0]->value };
+        }
+      }
+    }
   }
   0;
 }
@@ -309,9 +329,17 @@ sub _item_return_value ($\$\%) {
 
 ## Returns returned (new created) item value    $name, \%option
 sub _item_new_value ($$\%) {
-    my ($s,undef,$value) = $_[0]->_value_to_arrayitem
-        ($_[1] => '', $_[2]);
+  my $self = shift;
+  my ($name, $option) = @_;
+  if ($option->{by} eq 'http-ns-define') {
+    my $value = $self->_parse_value (opt => '', ns => $self->{ns}->{phname2uri}->{'x-http'});
+    ($value->value (0))[0]->value ($name);
+    {name => 'opt', body => $value, ns => $self->{ns}->{phname2uri}->{'x-http'}};
+  } else {
+    my ($s,undef,$value) = $self->_value_to_arrayitem
+        ($name => '', $option);
     $s? $value: undef;
+  }
 }
 
 
@@ -429,22 +457,50 @@ sub _value_to_arrayitem ($$$\%) {
     ($value, %$value_option) = @$value;
   }
   my $nsuri = $self->{option}->{ns_default_phuri};
+  $name =~ s/^$REG{WSP}+//;  $name =~ s/$REG{WSP}+$//;
   
   no strict 'refs';
   if ($value_option->{ns}) {
     $nsuri = $value_option->{ns};
   } elsif ($option->{ns}) {
     $nsuri = $option->{ns};
-  } elsif ($name =~ s/^([Xx]-[A-Za-z]+|[A-Za-z]+)-//) {
-    my $oprefix = $1;
-    my $prefix
-      = &{${&_NS_uri2phpackage ($nsuri).'::OPTION'}{n11n_prefix}}
-        ($self, &_NS_uri2phpackage ($nsuri), $oprefix);
-    $self->_ns_load_ph ($prefix);
-    $nsuri = $self->{ns}->{phname2uri}->{$prefix};
+  } elsif (($option->{ns_default_phuri} eq $self->{ns}->{uri2phname}->{'x-http'}
+       && $name =~ s/^([0-9]+)-//)
+    || ($name =~ s/^x-http-([0-9]+)-//i)) {	## Numric namespace prefix, RFC 2774
+    my $prefix = 0+$1;
+    $nsuri = $self->{ns}->{number2uri}->{ $prefix };
     unless ($nsuri) {
-      $name = $oprefix . '-' . $name;
+      $self->{ns}->{number2uri}->{ $prefix } = 'urn:x-suika-fam-cx:msgpm:header:x-temp:'.$prefix;
+      $nsuri = $self->{ns}->{number2uri}->{ $prefix };
+    }
+  } elsif (($name =~ s/^([Xx]-[A-Za-z]+|[A-YZa-yz][A-Za-z]*)-
+                       ([Xx]-[A-Za-z]+|[A-YZa-yz][A-Za-z]*)-//x)
+    || $name =~ s/^([Xx]-[A-Za-z]+|[A-Za-z]+)-//) {
+    my ($prefix1, $prefix2) = ($1, $2);
+    my $original_prefix = $&;  my $one_prefix = 0;
+    unless ($prefix2) {
+      $prefix2 = $prefix1;
+      $prefix1 = $self->{ns}->{uri2phname}->{ $option->{ns_default_phuri} };
+      $one_prefix = 1;
+    }
+    my $prefix
+      = &{ ${ &_NS_uri2phpackage ($nsuri).'::OPTION' }{n11n_prefix} }
+        ($self, &_NS_uri2phpackage ($nsuri), $prefix1.'-'.$prefix2);
+    $self->_ns_load_ph ($prefix);
+    $nsuri = $self->{ns}->{phname2uri}->{ $prefix };
+    unless ($nsuri) {
       $nsuri = $self->{option}->{ns_default_phuri};
+      $prefix
+        = &{ ${ &_NS_uri2phpackage ($nsuri).'::OPTION' }{n11n_prefix} }
+          ($self, &_NS_uri2phpackage ($nsuri), $one_prefix? $prefix2: $prefix1);
+      $self->_ns_load_ph ($prefix);
+      $nsuri = $self->{ns}->{phname2uri}->{ $prefix };
+      if ($nsuri) {
+        $name = $prefix2 . '-' . $name unless $one_prefix;
+      } else {
+        $name = $original_prefix . $name;
+        $nsuri = $self->{option}->{ns_default_phuri};
+      }
     }
   }
   $name
@@ -599,6 +655,30 @@ sub stringify ($;%) {
   $self->_init_by_format ($option{format}, \%option);
   for (grep {/^-/} keys %params) {$option{substr ($_, 1)} = $params{$_}}
   my @ret;
+  ## RFC 2774 numerical field name prefix
+  my %nprefix;
+  {no strict 'refs';
+    %nprefix = reverse %{ $self->{ns}->{number2uri} };
+    my $i = (sort { $a <=> $b } keys %{ $self->{ns}->{number2uri} })[-1] + 1;
+    $i = 10 if $i < 10;
+    my $hprefix = ${ &_NS_uri2phpackage
+                       ($self->{ns}->{phname2uri}->{'x-http'})
+                       .'::OPTION' } {namespace_phname_goodcase};
+    for my $uri (keys %nprefix) {
+      if ($nprefix{ $uri } < 10) {
+        $nprefix{ $uri } = $i++;
+      }
+      my $nsfs = $self->item ($uri, -by => 'http-ns-define');
+      for my $i (0..$nsfs->count-1) {
+        my $nsf = ($nsfs->value ($i))[0];
+        if ($nsf->value eq $uri) {
+          $nsf->replace (ns => $nprefix{ $uri });
+          $nprefix{ $uri } = $hprefix . '-' . $nprefix{ $uri };
+          last;
+        }
+      }
+    }
+  }
   my $_stringify = sub {
     no strict 'refs';
       my ($name, $body, $nsuri) = ($_[1]->{name}, $_[1]->{body}, $_[1]->{ns});
@@ -607,9 +687,19 @@ sub stringify ($;%) {
       $body = '' if !$option{output_bcc} && $name eq 'bcc';
       my $nspackage = &_NS_uri2phpackage ($nsuri);
       my $oname;	## Outputed field-name
-      my $prefix = ${$nspackage.'::OPTION'} {namespace_phname_goodcase}
-                || $self->{ns}->{uri2phname}->{$nsuri};
-      $prefix = undef if $nsuri eq $self->{option}->{ns_default_phuri};
+      my $prefix = $nprefix{ $nsuri }
+                || ${$nspackage.'::OPTION'} {namespace_phname_goodcase}
+                || $self->{ns}->{uri2phname}->{ $nsuri };
+      my $default_prefix = ${ &_NS_uri2phpackage ($option{ns_default_phuri})
+                              .'::OPTION'} {namespace_phname_goodcase};
+      $prefix = '' if $prefix eq $default_prefix;
+      $prefix =~ s/^\Q$default_prefix\E-//;
+      #$prefix = undef if $nsuri eq $option{ns_default_phuri};
+      #if ($prefix && $prefix eq $nprefix{ $nsuri }) {	## RFC 2774 prefix
+      #  $prefix = ${ &_NS_uri2phpackage ($self->{ns}->{phname2uri}->{'x-http'})
+      #               .'::OPTION' } {namespace_phname_goodcase} . '-' . $prefix
+      #  unless $option{ns_default_phuri} eq $self->{ns}->{phname2uri}->{'x-http'};
+      #}
       my $gc = ${$nspackage.'::OPTION'} {to_be_goodcase};
       if (ref $gc) { $oname = &$gc ($self, $nspackage, $name, \%option) }
       else { $oname = $name }
@@ -743,6 +833,34 @@ sub _ns_load_ph ($$) {
   $self->{ns}->{uri2phname}->{$self->{ns}->{phname2uri}->{$name}} = $name;
 }
 
+sub _ns_associate_numerical_prefix ($) {
+  my $self = shift;
+  $self->scan (sub {shift;
+    my $f = shift;  return unless $f->{name};
+    if ($f->{ns} eq $self->{ns}->{phname2uri}->{'x-http'}
+     || $f->{ns} eq $self->{ns}->{phname2uri}->{'x-http-c'}) {
+      my $fn = $f->{name};
+      if ($fn eq 'opt' || $fn eq 'man') {
+        $f->{body} = $self->_parse_value ($fn => $f->{body}, ns => $f->{ns});
+        for ($f->{body}->value (0..$f->{body}->count-1)) {
+          my ($nsuri, $number) = ($_->value, $_->item ('ns'));
+          if ($number && $nsuri) {
+            $self->{ns}->{number2uri}->{ $number } = $nsuri;
+          }
+        }
+      }
+    }
+  });
+  $self->scan (sub {shift;
+    my $f = shift;
+    if ($f->{ns} =~ /urn:x-suika-fam-cx:msgpm:header:x-temp:([0-9]+)$/ && $self->{ns}->{number2uri}->{ $1 }) {
+      $f->{ns} = $self->{ns}->{number2uri}->{ $1 };
+    }
+  });
+}
+
+## $package_name = Message::Header::_NS_uri2phpackage ($nsuri)
+## (For internal use of Message::* modules)
 sub _NS_uri2phpackage ($) {
   $NS_uri2phpackage{$_[0]}
   || $NS_uri2phpackage{$Message::Header::Default::OPTION{namespace_uri}};
@@ -822,7 +940,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/04 06:38:21 $
+$Date: 2002/07/06 10:30:10 $
 
 =cut
 

@@ -8,7 +8,7 @@ Message::MIME::MediaType --- Media-type definitions
 package Message::MIME::MediaType;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 our %type;
 
@@ -18,7 +18,9 @@ $type{text}->{plain} = {
 	handler	=> sub {
 	  my $self = shift;
 	  my $ct = $self->header->field ('content-type', -new_item_unless_exist=>0);
-	  if (ref $ct && lc ($ct->parameter ('format')) eq 'flowed') {
+	  if (ref $ct
+	    && lc ($ct->item ('format', -new_item_unless_exist => 0))
+	          eq 'flowed') {
 	    ['Message::Body::TextPlainFlowed'];
 	  } else {	## format="fixed"
 	    ['Message::Body::TextPlain'];
@@ -622,7 +624,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/04 06:38:21 $
+$Date: 2002/07/06 10:30:10 $
 
 =cut
 
