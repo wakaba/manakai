@@ -56,7 +56,9 @@ The following methods construct new C<Message::Header> objects:
 ## Initialize
 my %DEFAULT = (
   capitalize	=> 1,
+  fold	=> 1,
   fold_length	=> 70,
+  field_format_pattern	=> '%s: %s',
   #field_type	=> {},
   format	=> 'mail-rfc2822',
   mail_from	=> 0,
@@ -73,8 +75,8 @@ $DEFAULT{field_type} = {
 	'x-received'	=> 'Message::Field::Received',
 	
 	'content-type'	=> 'Message::Field::ContentType',
-	'content-disposition'	=> 'Message::Field::ContentDisposition',
 	'auto-submitted'	=> 'Message::Field::ValueParams',
+	'content-disposition'	=> 'Message::Field::ValueParams',
 	link	=> 'Message::Field::ValueParams',
 	archive	=> 'Message::Field::ValueParams',
 	'x-face-type'	=> 'Message::Field::ValueParams',
@@ -187,9 +189,10 @@ sub _init ($;%) {
     if $#new_fields > -1;
   
   my $format = $self->{option}->{format};
-  if ($format =~ /^cgi/) {
+  if ($format =~ /cgi/) {
     unshift @header_order, qw(content-type location);
     $self->{option}->{sort} = 'good-practice';
+    $self->{option}->{fold} = 0;
   } elsif ($format =~ /^http/) {
     $self->{option}->{sort} = 'good-practice';
   }
@@ -617,7 +620,8 @@ sub stringify ($;%) {
     $fbody =~ s/\x0D(?=[^\x09\x0A\x20])/\x0D\x20/g;
     $fbody =~ s/\x0A(?=[^\x09\x20])/\x0A\x20/g;
     $name =~ s/((?:^|-)[a-z])/uc($1)/ge if $option{capitalize};
-    push @ret, $name.': '.$self->fold ($fbody);
+    $fbody = $self->_fold ($fbody) if $self->{option}->{fold};
+    push @ret, sprintf $self->{option}->{field_format_pattern}, $name, $fbody;
   });
   my $ret = join ("\n", @ret);
   $ret? $ret."\n": '';
@@ -669,7 +673,7 @@ sub _delete_empty_field ($) {
   $self;
 }
 
-sub fold ($$;$) {
+sub _fold ($$;$) {
   my $self = shift;
   my $string = shift;
   my $len = shift || $self->{option}->{fold_length};
@@ -793,7 +797,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/19 12:00:36 $
+$Date: 2002/04/21 04:28:46 $
 
 =cut
 

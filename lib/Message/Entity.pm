@@ -13,7 +13,7 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Header;
 require Message::Util;
@@ -378,6 +378,148 @@ sub clone ($) {
 
 =back
 
+=head1 C<format>
+
+=over 2
+
+=item mail-rfc650
+
+Internet mail message, defined by IETF RFC 650
+
+=item mail-rfc724
+
+Internet mail message, defined by IETF RFC 724
+
+=item mail-rfc733
+
+Internet mail message, defined by IETF RFC 733
+
+=item mail-rfc822
+
+Internet mail message, defined by IETF RFC 822
+
+=item mail-rfc2822
+
+Internet mail message, defined by IETF RFC 2822
+
+=item mime-1.0
+
+MIME entity
+
+=item mime-1.0-rfc1341
+
+MIME entity, defined by RFC 1341 (and RFC 1342)
+
+=item mime-1.0-rfc1521
+
+MIME entity, defined by RFC 1521 and 1522
+
+=item mime-1.0-rfc2045
+
+MIME entity, defined by RFC 2045,..., 2049
+
+=item news-bnews
+
+Usenet Bnews format
+
+=item news-rfc850
+
+Usenet news format, defined by IETF RFC 850
+
+=item news-rfc1036
+
+Usenet news format, defined by IETF RFC 1036
+
+=item news-son-of-rfc1036
+
+Usenet news format, defined by son-of-RFC1036
+
+=item news-usefor
+
+Usenet news format, defined by usefor-article (IETF Internet Draft)
+
+=item http-1.0-rfc1945
+
+HTTP/1.0 message, defined by IETF RFC 1945
+
+=item http-1.0-rfc1945-request
+
+HTTP/1.0 request message, defined by IETF RFC 1945
+
+=item http-1.0-rfc1945-response
+
+HTTP/1.0 response message, defined by IETF RFC 1945
+
+=item http-1.1-rfc2068
+
+HTTP/1.1 message, defined by IETF RFC 2068
+
+=item http-1.1-rfc2068-request
+
+HTTP/1.1 request message, defined by IETF RFC 2068
+
+=item http-1.1-rfc2068-response
+
+HTTP/1.1 response message, defined by IETF RFC 2068
+
+=item http-1.1-rfc2616
+
+HTTP/1.1 message, defined by IETF RFC 2616
+
+=item http-1.1-rfc2616-request
+
+HTTP/1.1 request message, defined by IETF RFC 2616
+
+=item http-1.1-rfc2616-response
+
+HTTP/1.1 response message, defined by IETF RFC 2616
+
+=item http-cgi-1.1
+
+CGI/1.1 output (for HTTP), defined by coar-cgi-v11 (IETF Internet Draft)
+
+=item http-1.0-cgi-1.1
+
+CGI/1.1 output (for HTTP/1.0), defined by coar-cgi-v11 (IETF Internet Draft)
+
+=item http-1.1-cgi-1.1
+
+CGI/1.1 output (for HTTP/1.1), defined by coar-cgi-v11 (IETF Internet Draft)
+
+=item http-cgi-1.2
+
+CGI/1.2 output, defined by coar-cgi-v12 (to be IETF Internet Draft)
+
+=item http-1.0-cgi-1.2
+
+CGI/1.2 output (for HTTP/1.0), defined by coar-cgi-v11 (IETF Internet Draft)
+
+=item http-1.1-cgi-1.2
+
+CGI/1.2 output (for HTTP/1.1), defined by coar-cgi-v11 (IETF Internet Draft)
+
+=item http-sip-2.0
+
+SIP/2.0 message, defined by IETF RFC 2543
+
+=item http-sip-2.0-request
+
+SIP/2.0 request message, defined by IETF RFC 2543
+
+=item http-sip-2.0-response
+
+SIP/2.0 response message, defined by IETF RFC 2543
+
+=item http-sip-cgi
+
+SIP/2.0 CGI (IETF Internet Draft)
+
+=item cpim-1.0
+
+CPIM/1.0 (IETF Internet Draft)
+
+=back
+
 =head1 EXAMPLE
 
   use Message::Entity;
@@ -417,7 +559,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/19 12:00:36 $
+$Date: 2002/04/21 04:28:46 $
 
 =cut
 
