@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/03/04 12:18:52 $
+      $Date: 2005/03/06 11:12:42 $
     @@ContentType:
       dis:Date.RCS
   
@@ -75,6 +75,8 @@ Module:
     swcfg21:ForLatest
 
 Namespace:
+  @DIS:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @dis2pm:
@@ -89,6 +91,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @infoset:
+    http://www.w3.org/2001/04/infoset#
   @lang:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
@@ -559,6 +563,7 @@ IFClassDef:
           @@@@@lang:en
           @@@@@@:
             An attempt is made to set a value to document node.
+      @@@UndeclaredPrefixException:
       @@@PerlDef:
         my $node = $self->{<Q::TreeCore:node>};
         my $nt = $self-><AG::SWCFGNode.nodeType>;
@@ -641,6 +646,7 @@ IFClassDef:
           @@@@@lang:en
           @@@@@@:
             There is no child element found whose name is <P::name>. 
+      @@@UndeclaredPrefixException:
       @@@PerlDef:
         FIND: {
           my $node = $self->{<Q::TreeCore:node>};
@@ -718,6 +724,7 @@ IFClassDef:
           @@@@@@:
             There is no child element found whose name is <P::namespaceURI>
             and <P::localName> pair. 
+      @@@UndeclaredPrefixException:
       @@@PerlDef:
         FIND: {
           my $node = $self->{<Q::TreeCore:node>};
@@ -928,6 +935,7 @@ IFClassDef:
           @@@@@@:
             There is no element node with which the <P::code> returns 
             a <DOM::true> value. 
+      @@@UndeclaredPrefixException:
       @@@PerlDef:
         FIND: {
           my $node = $self->{<Q::TreeCore:node>};
@@ -1416,6 +1424,7 @@ IFClassDef:
         the value, it is also counted as a <QUOTE::child>. 
     @@ModIn21:
     @@Get:
+      @@@UndeclaredPrefixException:
       @@@PerlDef:
         my $node = $self->{<Q::TreeCore:node>};
         $r = (defined $node->{<Q::value>} ? 1 : 0)
@@ -1586,6 +1595,7 @@ IFClassDef:
           then an array reference containing the value as an only item 
           is returned.  If <P::true> and the node value is not defined, 
           then an empty array reference is returned. 
+      @@@UndeclaredPrefixException:
       @@@PerlDef:
         my $node = $self->{<Q::TreeCore:node>};
         my $v;
@@ -2307,6 +2317,13 @@ IFClassDef:
             No new binding is created if no binding found.  Note that 
             even if no association newly created, this method 
             returns the <DOM::null> value. 
+    @@NamedParam:
+      @@@Name: raisePrefixException
+      @@@Type:
+        DOMMain:boolean
+      @@@enDesc:
+        Whehter an exception should be thrown if <P::prefix>
+        is not declared or not. 
     @@Return:
       @@@Type:SWCFGString
       @@@Description:
@@ -2321,6 +2338,7 @@ IFClassDef:
           @@@@@@:
             No namespace prefix is associated to the prefix or 
             the <DOM::null> namespace is associated. 
+      @@@UndeclaredPrefixException:
       @@@PerlDef:
         my $od = $self-><AG::SWCFGNode.ownerDocument> || $self;
         my $binds = $od->{<Q::TreeCore:node>}->{<Q::nsBinding>};
@@ -2328,6 +2346,12 @@ IFClassDef:
           $r = $binds->{$prefix};
         } elsif ($makeNewBinding) {
           $r = $binds->{$prefix} = $prefix;
+        } elsif ($raisePrefixException) {
+          __EXCEPTION{DIS:UNDECLARED_NS_PREFIX_ERR::
+            infoset:prefix => {$prefix},
+            MDOMX:param-name => 'prefix',
+            DIS:sourceNode => {$self},
+          }__;
         } else {
           $r = null;
         }
@@ -2569,12 +2593,33 @@ IFClassDef:
           TreeCore:nodeID
 ##SWCFGNode
 
+ElementTypeBinding:
+  @Name: XParamDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: 
+      DOMMain:XWParameter
+    @@For:
+      =ManakaiDOM:all
+
 PropDef:
   @QName: fileName
   @Description:
     @@lang:en
     @@@:
       The name of the source file. 
+
+ElementTypeBinding:
+  @Name: UndeclaredPrefixException
+  @ElementType:
+    ManakaiDOM:raises
+  @ShadowContent:
+    @@@: UNDECLARED_NS_PREFIX_ERR
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The implementation has encounted an undeclared namespace prefix. 
 
 IFClassDef:
   @IFQName:SWCFGComment
@@ -2665,6 +2710,7 @@ IFClassDef:
         The expanded URI of the node. 
     @@NewIn21:
     @@Get:
+      @@@UndeclaredPrefixException:
       @@@PerlDef:
         __CODE{expandNamespace}__;
         if (defined $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>}) {
@@ -2701,6 +2747,7 @@ IFClassDef:
           @@@@@@:
             Either this node is not an element node or its namespace 
             is the default and no prefix is required. 
+      @@@UndeclaredPrefixException:
       @@@PerlDef:
         __CODE{expandNamespace}__;
         my $node = $self->{<Q::TreeCore:node>};
@@ -2740,6 +2787,7 @@ IFClassDef:
         with or with out the namespace prefix followed by a <CHAR::COLON>. 
     @@NewIn21:
     @@Get:
+      @@@UndeclaredPrefixException:
       @@@PerlDef:
         __CODE{expandNamespace}__;
         my $node = $self->{<Q::TreeCore:node>};
@@ -2787,6 +2835,7 @@ IFClassDef:
         with or with out the namespace prefix followed by a <CHAR::COLON>. 
     @@NewIn21:
     @@Get:
+      @@@UndeclaredPrefixException:
       @@@PerlDef:
         __CODE{expandNamespace}__;
         my $node = $self->{<Q::TreeCore:node>};
@@ -2860,6 +2909,7 @@ IFClassDef:
           @@@@@@:
             The node does not have the local name. 
             No node of type other than <CODE::#element> has the local name. 
+      @@@UndeclaredPrefixException:
       @@@PerlDef:
         __CODE{expandNamespace}__;
         $r = (defined $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>} and
@@ -2872,6 +2922,7 @@ IFClassDef:
         @@@@@:
           Sets the local name.  Setting the local name to the node 
           whose type is other than <CODE::#element> has no effect. 
+      @@@UndeclaredPrefixException:
       @@@PerlDef:
         __CODE{expandNamespace}__;
         if (defined $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>} and
@@ -2896,6 +2947,7 @@ IFClassDef:
         @@@@@:
           The local name of the node.  If an element type binding 
           has bound to this element, then actual element type name. 
+      @@@UndeclaredPrefixException:
       @@@PerlDef:
         __CODE{expandNamespace}__;
         $r = $self->{<Q::TreeCore:node>}->{<Q::localName>};
@@ -2907,6 +2959,7 @@ IFClassDef:
           whose type is other than <CODE::#element> has no effect.  
           Changes for element type name does not take effect 
           until <M::SWCFGDocument.updateElementTypeBinding> method is called. 
+      @@@UndeclaredPrefixException:
       @@@PerlDef:
         __CODE{expandNamespace}__;
         $self->{<Q::TreeCore:node>}->{<Q::localName>} = $given;
@@ -2933,6 +2986,7 @@ IFClassDef:
           @@@@@lang:en
           @@@@@@:
             The node does not have the namespace URI. 
+      @@@UndeclaredPrefixException:
       @@@PerlDef:
         __CODE{expandNamespace}__;
         $r = (defined $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>} and
@@ -2965,6 +3019,7 @@ IFClassDef:
           @@@@@@:
             The namespace URI (both <EM::real> or <EM::shadow>) 
             has left unchanged. 
+      @@@UndeclaredPrefixException:
       @@@PerlDef:
         unless (defined $given and $given eq <Q::RealName>) {
           __CODE{expandNamespace}__;
@@ -3009,6 +3064,7 @@ IFClassDef:
           @@@@@@:
             Any element type binding has been bound to this element; 
             the local name of this node is the <EM::real> qualified name. 
+      @@@UndeclaredPrefixException:
       @@@PerlDef:
         __CODE{expandNamespace}__;
         $r = $self->{<Q::TreeCore:node>}->{<Q::namespaceURI>};
@@ -3038,6 +3094,7 @@ IFClassDef:
           @@@@@@:
             The namespace URI (both <EM::real> or <EM::shadow>) 
             has left unchanged. 
+      @@@UndeclaredPrefixException:
       @@@PerlDef:
         unless (defined $given and $given eq <Q::RealName>) {
           __CODE{expandNamespace}__;
@@ -3085,6 +3142,7 @@ IFClassDef:
       @@@@:
         Expands element type bindings. 
     @@ForCheck: ForClass
+    @@UndeclaredPrefixException:
     @@PerlDef:
       unless ($node->{<Q::etExpanded>}) {
         my $__qn;
@@ -3111,7 +3169,8 @@ IFClassDef:
                 $b->{shadowNamespaceURI}
                    = <ClassM::ManakaiSWCFGNode.getNodeReference> ($__od)
                            -><M::SWCFGNode.lookupNamespaceURI>
-                                 ($__prefix, make_new_binding => 1);
+                                 ($__prefix, make_new_binding => false,
+                                  raise_prefix_exception => true);
               }__;
             }
             $b->{namespaceExpanded} = true;
@@ -3143,6 +3202,7 @@ IFClassDef:
       @@@lang:en
       @@@@:
         Expands qualified name into namespace URI and local name. 
+    @@UndeclaredPrefixException:
     @@PerlDef:
       my $__node = $self->{<Q::TreeCore:node>};
       __CODE{expandETBinding:: $node => $__node}__;
@@ -3152,7 +3212,8 @@ IFClassDef:
           __DEEP{
             $__node->{<Q::namespaceURI>}
                  = $self-><M::SWCFGNode.lookupNamespaceURI>
-                                 ($__prefix, make_new_binding => 1);
+                                 ($__prefix, make_new_binding => false, 
+                                  raise_prefix_exception => true);
           }__;
         } else {
           $__node->{<Q::namespaceURI>}
@@ -3532,6 +3593,7 @@ IFClassDef:
       @@@@:
         The number of child nodes, including those belong to shadow trees. 
     @@Get:
+      @@@UndeclaredPrefixException:
       @@@PerlDef:
         my $node = $self->{<Q::TreeCore:node>};
         $r = @{$node->{<Q::childNodes>}};
@@ -3579,6 +3641,7 @@ IFClassDef:
           @@@@@lang:en
           @@@@@@: 
             There is no <P::index>th node in the list. 
+      @@@UndeclaredPrefixException:
       @@@PerlDef:
         if ($index < 0) {
           $index = $self-><AG::SWCFGChildNodeList.length> + $index;
@@ -3976,6 +4039,28 @@ ExceptionDef:
               The version of SuikaWikiConfig that the implementation 
               does not support. 
     @@XConst:
+      @@@Name: NAMESPACE_ERR
+      @@@Value:14
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          An error related to namespaces has occurred. 
+      @@@XSubTypeDef:
+        @@@@QName: 
+          DIS:UNDECLARED_NS_PREFIX_ERR
+        @@@@enDesc:
+          The implementation has encounted an undeclared namespace 
+          prefix. 
+        @@@@XParam:
+          @@@@@QName: 
+            infoset:prefix
+          @@@@@enDesc:
+            The namespace prefix. 
+        @@@@XSourceNodeParam:
+        @@@@enMufDef:
+          Namespace prefix "%p (name => {<Q::infoset:prefix>});" is 
+          not declared
+    @@XConst:
       @@@Name:PARSE_ERR
       @@@Value:81
       @@@XSubTypeDef:
@@ -3986,6 +4071,34 @@ ExceptionDef:
             The implementation is unable to read and parse the 
             SuikaWikiConfig document. 
 ##SWCFGException
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: XSourceNodeParam
+  @ElementType:
+    ManakaiDOM:exceptionOrWarningParameter
+  @ShadowContent:
+    @@QName: 
+      DIS:sourceNode
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The node in which an error has occurred. 
+
+XParamDef:
+  @QName: 
+    DIS:sourceNode
+  @Description:
+    @@lang:en
+    @@@:
+      The node in which an error has occurred. 
+  @Type: ManakaiSWCFGNode
 
 XPropDef:
   @QName: parentNodeType
@@ -4457,6 +4570,10 @@ IFClassDef:
     @@@:
       This interface should be implemented on the same object that 
       implements <IF::DOMImplementation>. 
+    @@ForCheck: ForIF
+
+  @ClassISA:
+    DOMMetaImpl:ManakaiDOMMinimumImplementation::ManakaiDOM:ManakaiDOMLatest
 
   @Role:
     @@@:

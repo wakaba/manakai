@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/03/05 12:00:44 $
+      $Date: 2005/03/06 11:12:42 $
     @@ContentType:
       dis:Date.RCS
   
@@ -40,10 +40,14 @@ Module:
         ManakaiDOM:Perl
     @@Module:
       @@@Name: DOMBoot
+      @@@QName: 
+        MDOM:DOMBoot
       @@@WithFor:
         ManakaiDOM:ManakaiDOMLatest
     @@Module:
       @@@Name: DOMMetaImpl
+      @@@QName:
+        MDOM:DOMMetaImpl
       @@@WithFor:
         ManakaiDOM:ManakaiDOMLatest
 
@@ -75,6 +79,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @Markup:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup#
+  @MDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @owl:
@@ -206,6 +212,9 @@ ClsDef:
       The parent construction of this object. 
     @@Get:
       @@@Type: ManakaiPerlCodeFragment
+      @@@nullCase:
+        @@@@enDesc:
+          This object has no parent. 
       @@@PerlDef:
         $r = $self->{<Q::TreeCore:node>}->{<Q::pc:parent>};
         $r = $r-><M::ManakaiDOM:ManakaiDOMNodeObject
@@ -633,6 +642,50 @@ ClsDef:
                          (<ClassName::ManakaiPerlSub>) if $r;
 
   @Method:
+    @@Name: setSub
+    @@enDesc:
+      Sets a subrotine. 
+    @@Param:
+      @@@Name: subName
+      @@@Type:
+        DISLang:String::ManakaiDOM:all
+      @@@enDesc:
+        The name of the subroutine. 
+        \
+        {NOTE:: The <P::subName> value must be equal to the 
+                <A::ManakaiPerlSub.localName> of the <P::subArg>.
+    @@Param:
+      @@@Name: subArg
+      @@@Type: ManakaiPerlSub
+      @@@enDesc:
+        The subroutine object.
+    @@Return:
+      @@@RaiseException:
+        @@@@@:IN_USE_NODE_ERR
+        @@@@enDesc:
+          An attempt is made to set a subroutine that is 
+          already used elsewhere. 
+      @@@PerlDef:
+        my $ops = $self->{<Q::TreeCore:node>}->{<Q::pc:sub>};
+        if (ref $ops->{$subName}) {
+          CORE::delete $ops->{<Q::pc:parent>};
+          $ops->{$subName}
+              -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl.orphanate>;
+        }
+        if ($subArg->{<Q::TreeCore:node>}->{<Q::pc:parent>}) {
+          __EXCEPTION{IN_USE_NODE_ERR::
+            pc:parentNode => {$subArg->{<Q::TreeCore:node>}
+                                        ->{<Q::pc:parent>}},
+            pc:childNode => {$subArg},
+          }__;
+        }
+        $self->{<Q::TreeCore:node>}-><M::MNodeObject.importTree>
+                                          ($subArg->{<Q::TreeCore:node>});
+        $ops->{$subName} = $subArg->{<Q::TreeCore:node>};
+        $subArg->{<Q::TreeCore:node>}->{<Q::pc:parent>}
+                         = $self->{<Q::TreeCore:node>};
+
+  @Method:
     @@Name: getSubAliasName
     @@enDesc:
       Gets the real name of a subroutine. 
@@ -738,6 +791,53 @@ ClsDef:
         $r = $r-><M::ManakaiDOM:ManakaiDOMNodeObject
                    ::ManakaiDOM:Perl.newReference>
                          (<ClassName::ManakaiPerlSub>) if $r;
+
+  @Method:
+    @@Name: setOverloadSub
+    @@enDesc:
+      Sets an overloading subrotine. 
+    @@Param:
+      @@@Name: opName
+      @@@Type:
+        DISLang:String::ManakaiDOM:all
+      @@@enDesc:
+        The name of the opeartor to overload. 
+    @@Param:
+      @@@Name: subArg
+      @@@Type: ManakaiPerlSub
+      @@@enDesc:
+        The subroutine object.
+    @@Return:
+      @@@UnknownOperatorException:
+      @@@RaiseException:
+        @@@@@:IN_USE_NODE_ERR
+        @@@@enDesc:
+          An attempt is made to set a subroutine that is 
+          already used elsewhere. 
+      @@@PerlDef:
+        unless (<Code::operatorNameList>->{$opName}) {
+          __EXCEPTION{UNSUPPORTED_OPERATOR_ERR::
+            pc:operator => {$opName},
+          }__;
+        }
+        my $ops = $self->{<Q::TreeCore:node>}->{<Q::dis2pm:operator>};
+        if (ref $ops->{$opName}) {
+          CORE::delete $ops->{<Q::pc:parent>};
+          $ops->{$opName}
+              -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl.orphanate>;
+        }
+        if ($subArg->{<Q::TreeCore:node>}->{<Q::pc:parent>}) {
+          __EXCEPTION{IN_USE_NODE_ERR::
+            pc:parentNode => {$self},
+            pc:childNode => {$subArg},
+          }__;
+        }
+        $self->{<Q::TreeCore:node>}-><M::MNodeObject.importTree>
+                                          ($subArg->{<Q::TreeCore:node>});
+        $ops->{$opName} = $subArg->{<Q::TreeCore:node>};
+        $subArg->{<Q::TreeCore:node>}->{<Q::pc:parent>}
+                         = $self->{<Q::TreeCore:node>};
+
 
   @Method:
     @@Name: getOverloadMethodName
@@ -981,14 +1081,31 @@ ClsDef:
         $r = @{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}};
 
   @Attr:
-    @@Name: name
+    @@Name: localName
     @@enDesc:
       The name of this subroutine. 
     @@Type:
       DISPerl:SubName
     @@Get: 
+      @@@nullCase:
+        @@@@enDesc:
+          This subroutine has no name. 
       @@@disDef:
         @@@@GetProp: localName
+    @@Set:
+      @@@enDesc:
+        Sets the name of this subroutine. 
+        \
+        {NOTE:: Setting this attribute does not change the 
+                name by which the subroutine is registerred to 
+                the parent object.
+        \
+        }
+      @@@nullCase:
+        @@@@enDesc:
+          This subroutine has no name. 
+      @@@disDef:
+        @@@@SetProp: localName
 
   @Attr:
     @@Name: prototype
@@ -1042,6 +1159,48 @@ ClsDef:
         @@@@SetProp: sourceLine
 
   @Method:
+    @@Name: appendCodeFragment
+    @@enDesc:
+      Appends a <Class::ManakaiPerlCodeFragment> object. 
+    @@Param:
+      @@@Name: codeArg
+      @@@Type: ManakaiPerlCodeFragment
+      @@@enDesc:
+        A code fragment object. 
+    @@Return:
+      @@@RaiseException:
+        @@@@@:BAD_CHILD_ERR
+        @@@@enDesc:
+          An attempt is made to append a child
+          that is not a <Class::ManakaiPerlUnparsedCode>.
+      @@@RaiseException:
+        @@@@@:IN_USE_NODE_ERR
+        @@@@enDesc:
+          An attempt is made to append a node that is 
+          already used elsewhere. 
+      @@@PerlDef:
+        if (UNIVERSAL::isa ($codeArg, <ClassName::ManakaiPerlUnparsedCode>)) {
+          if ($codeArg->{<Q::TreeCore:node>}->{<Q::pc:parent>}) {
+            __EXCEPTION{IN_USE_NODE_ERR::
+              pc:parentNode => {$codeArg->{<Q::TreeCore:node>}
+                                        ->{<Q::pc:parent>}},
+              pc:childNode => {$codeArg},
+            }__;
+          }
+          $self->{<Q::TreeCore:node>}-><M::MNodeObject.importTree>
+                                          ($codeArg->{<Q::TreeCore:node>});
+          push @{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}},
+               $codeArg->{<Q::TreeCore:node>};
+          $codeArg->{<Q::TreeCore:node>}->{<Q::pc:parent>}
+                                         = $self->{<Q::TreeCore:node>};
+        } else {
+          __EXCEPTION{BAD_CHILD_ERR::
+            pc:parentNode => {$self},
+            pc:childNode => {$codeArg},
+          }__;
+        }
+
+  @Method:
     @@Name: appendCode
     @@enDesc:
       Appends an unparsed Perl code fragment. 
@@ -1064,7 +1223,8 @@ ClsDef:
         $node->{<Q::sourceLine>} += ($codeArg =~ tr/\x0A/\x0A/);
         $r = $r-><M::ManakaiDOM:ManakaiDOMNodeObject
                    ::ManakaiDOM:Perl.newReference>
-                           (<ClassName::ManakaiPerlUnparsedCode>);
+                           (<ClassName::ManakaiPerlUnparsedCode>); 
+        ## TODO: child & import
 
   @Method:
     @@Name: skipLines
@@ -1099,6 +1259,16 @@ ClsDef:
         $r .= "}\n";
 ##PerlSub
 
+XParamDef:
+  @QName: parentNode
+  @enDesc:
+    Parent node. 
+
+XParamDef:
+  @QName: childNode
+  @enDesc:
+    Child node. 
+
 ClsDef:
   @ClsQName: ManakaiPerlUnparsedCode
   @ClsISA: ManakaiPerlCodeFragment
@@ -1128,8 +1298,58 @@ ClsDef:
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
-            Optional properties: <Q::pc:cide>.
+            Optional properties: <Q::pc:code>.
+
+  @Attr:
+    @@Name: code
+    @@enDesc:
+      Perl code. 
+    @@Type:
+      lang:Perl::ManakaiDOM:all
+    @@Get:
+      @@@disDef:
+        @@@@GetProp: code
+    @@Set:
+      @@@disDef:
+        @@@@SetProp: code
+
+  @Attr:
+    @@Name: sourceFile
+    @@enDesc:
+      The source file name of this fragment. 
+    @@Type:
+      DISLang:String
+    @@Get:
+      @@@enDesc:
+        Any string identifying the source. 
+      @@@nullCase:
+        @@@@enDesc: No source file name is set. 
+      @@@disDef:
+        @@@@GetProp: sourceFile
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc: No (or unknown) source file. 
+      @@@disDef:
+        @@@@SetProp: sourceFile
+
+  @Attr:
+    @@Name: sourceLine
+    @@enDesc:
+      Source file line number of the first line of this fragment. 
+    @@Type:
+      DOMMain:unsigned-long
+    @@Get:
+      @@@disDef:
+        @@@@GetProp: sourceLine
+    @@Set:
+      @@@disDef:
+        @@@@SetProp: sourceLine
 ##PerlUnparsedCode
+
+ElementTypeBinding:
+  @Name: RaiseException
+  @ElementType:
+    ManakaiDOM:raises
 
 ClsDef:
   @ClsQName: ManakaiPerlCodeImplementation
@@ -1273,7 +1493,63 @@ ClsDef:
           $r = join (q<, >, map {<ClassM::ManakaiPerlCodeImplementation
                                               .perlLiteral> ($_)} @{$val});
         }__;
+
+  @Method:
+    @@Name: createPerlSub
+    @@enDesc:
+      Creates a new <Class::ManakaiPerlSub> object. 
+    @@Param:
+      @@@Name: subName
+      @@@Type:
+        DISLang:String
+      @@@enDesc:
+        The name of the subroutine to create.
+      @@@nullCase:
+        @@@@enDesc:
+          The subroutine created has no name. 
+    @@Return:
+      @@@Type:ManakaiPerlSub
+      @@@enDesc: 
+        Newly created Perl subroutine object. 
+      @@@PerlDef:
+        __DEEP{
+          $r = <ClassM::ManakaiPerlSub.newObject>
+                 -><M::MNodeObject.newReference> (<ClassName::ManakaiPerlSub>);
+          $r-><M::ManakaiPerlSub.localName> ($subName) if defined $subName;
+        }__;
+
+  @Method:
+    @@Name: createPerlUnparsedCode
+    @@enDesc:
+      Creates a new <Class::ManakaiPerlUnparsedCode> object. 
+    @@Param:
+      @@@Name: codeArg
+      @@@Type:
+        lang:Perl::ManakaiDOM:all
+      @@@enDesc:
+        The code fragment. 
+      @@@nullCase:
+        @@@@enDesc:
+          The fragment initially has no code. 
+    @@Return:
+      @@@Type:ManakaiPerlUnparsedCode
+      @@@enDesc: 
+        Newly created Perl code object. 
+      @@@PerlDef:
+        __DEEP{
+          $r = <ClassM::ManakaiPerlUnparsedCode.newObject>
+                    -><M::MNodeObject.newReference>
+                             (<ClassName::ManakaiPerlUnparsedCode>);
+          $r-><M::ManakaiPerlUnparsedCode.code> ($codeArg) if defined $codeArg;
+        }__;
 ##PerlCodeImplementation
+
+ResourceDef:
+  @QName: MNodeObject
+  @rdf:type:
+    ManakaiDOM:Class
+  @AliasFor:
+    ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
 
 PropDef:
   @QName: code
@@ -1333,6 +1609,37 @@ ExceptionDef:
     @@ClsQName: ManakaiPerlCodeExceptionCode
     @@enDesc:
       Exception codes for <Class::ManakaiPerlCodeException>. 
+    @@XConstDef:
+      @@@Name: HIERARCHY_REQUEST_ERR
+      @@@Value:3
+      @@@enDesc:
+        An attempt is made to break the hierarchy. 
+      @@@XSubTypeDef:
+        @@@@QName: BAD_CHILD_ERR
+        @@@@enDesc:
+          An attempt is made to append a node as a child whose type 
+          is not allowed. 
+        @@@@XParam:
+          @@@@@QName: childNode
+          @@@@@enDesc:
+            The node attempted to append. 
+        @@@@XParam:
+          @@@@@QName: parentNode
+          @@@@@enDesc:
+            The node to whose child list an attempt to append is made. 
+      @@@XSubTypeDef:
+        @@@@QName: IN_USE_NODE_ERR
+        @@@@enDesc:
+          An attempt is made to append a node that has already been used
+          elsewhere. 
+        @@@@XParam:
+          @@@@@QName: childNode
+          @@@@@enDesc:
+            The node attempted to append. 
+        @@@@XParam:
+          @@@@@QName: parentNode
+          @@@@@enDesc:
+            The parent node of the <XP::childNode>. 
     @@XConstDef:
       @@@Name: NOT_SUPPORTED_ERR
       @@@Value:9

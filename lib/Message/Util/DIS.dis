@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/03/05 12:00:44 $
+      $Date: 2005/03/06 11:12:42 $
     @@ContentType:
       dis:Date.RCS
   
@@ -43,6 +43,10 @@ Module:
       @@@Name: DIS
       @@@WithFor: 
         DIS:ForLatest
+    @@Module:
+      @@@Name: PerlCode
+      @@@WithFor:
+        ManakaiDOM:Perl
 
   @DefaultFor: 
     DIS:ForLatest
@@ -667,6 +671,13 @@ ClsDef:
             No new binding is created if no binding found.  Note that 
             even if no association newly created, this method 
             returns the <DOM::null> value. 
+    @@NamedParam:
+      @@@Name: raisePrefixException
+      @@@Type:
+        DOMMain:boolean
+      @@@enDesc:
+        Whehter an exception should be thrown if <P::prefix>
+        is not declared or not. 
     @@Return:
       @@@Type: AnyURI
       @@@Description:
@@ -680,6 +691,7 @@ ClsDef:
           @@@@@@:
             No namespace URI is associated to the prefix or 
             the <DOM::null> namespace is associated. 
+      @@@UndeclaredPrefixException:
       @@@PerlDef:
         my $od = $self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
                                                .ownerDocument> || $self;
@@ -709,6 +721,12 @@ ClsDef:
             };
             if ($makeNewBinding) {
               $r = $binds->{$prefix} = $prefix;
+            } elsif ($raisePrefixException) {
+              __EXCEPTION{DIS:UNDECLARED_NS_PREFIX_ERR::
+                infoset:prefix => {$prefix},
+                MDOMX:param-name => 'prefix',
+                DIS:sourceNode => {$self},
+              }__;
             } else {
               $r = null;
             }
@@ -995,6 +1013,8 @@ ClsDef:
           @@@@@lang:en
           @@@@@@:
             No default type provided.  All <P::mediaType> will match. 
+    @@ForParam:
+    @@ForpParam:
     @@Return:
       @@@Type:
         DOMMain:boolean
@@ -1006,7 +1026,8 @@ ClsDef:
         if (defined $mediaType) {
           __DEEP{
             my $ctn = $self-><M::ManakaiDISElement.disGetAttribute>
-                                               (<Q::dis:ContentType>);
+                                  (<Q::dis:ContentType>, for_arg => $forArg,
+                                   forp_arg => $forpArg);
             my $ct;
             $ct = $ctn-><AG::ManakaiDISElement.qnameValueURI> if $ctn;
             $ct = $defaultMediaType unless defined $ct;
@@ -1280,8 +1301,9 @@ ClsDef:
                                   (for_arg => $forArg, forp_arg => $forpArg)}) {
           if ($c-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
                                     .expandedURI> eq $attrName and
-              $c-><AG::ManakaiDISElement.mediaTypeMatch>
-                                         ($mediaType, $defaultMediaType)) {
+              $c-><M::ManakaiDISElement.mediaTypeMatch>
+                                  ($mediaType, $defaultMediaType,
+                                   for_arg => $forArg, forp_arg => $forpArg)) {
             $r = $c;
             last;
           }
@@ -1310,8 +1332,9 @@ ClsDef:
                                   (for_arg => $forArg, forp_arg => $forpArg)}) {
           if ($c-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
                                           .expandedURI> eq $attrName and
-              $c-><AG::ManakaiDISElement.mediaTypeMatch>
-                                         ($mediaType, $defaultMediaType)) {
+              $c-><M::ManakaiDISElement.mediaTypeMatch>
+                                  ($mediaType, $defaultMediaType,
+                                   for_arg => $forArg, forp_arg => $forpArg)) {
             push @$r, $c;
           }
         }
@@ -2063,6 +2086,17 @@ ClsDef:
                     -><M::swcfg21:SWCFGNode::swcfg21:ForLatest.flag>
                                          (<Q::swcfg21:fileName>);
             
+            ## -- Loads "for" definition
+            my $root_elements
+                       = $doc-><M::ManakaiDISDocument.disAllChildElements>;
+            if ($mod->{for} eq <Q::ManakaiDOM:all>) {
+              for my $el (@$root_elements) {
+                next unless $el-><M::swcfg21:SWCFGElement::swcfg21:ForLatest
+                                          .expandedURI> eq <Q::dis:ForDef>;
+                $self-><M::ManakaiDISDatabase.loadFor> ($mod, $el);
+              }
+            }
+
             ## -- Loads "for all"
             my $rmod = $self-><M::ManakaiDISDatabase.getModule>
                                ($mod->{nameURI}, for_arg => <Q::ManakaiDOM:all>);
@@ -2141,17 +2175,7 @@ ClsDef:
               }
             } # Child Module elements
             
-            my $root_elements
-                       = $doc-><M::ManakaiDISDocument.disAllChildElements>;
-            if ($mod->{for} eq <Q::ManakaiDOM:all>) {
-              ## -- Loads "for" definitions
-              for my $el (@$root_elements) {
-                next unless $el-><M::swcfg21:SWCFGElement::swcfg21:ForLatest
-                                          .expandedURI> eq <Q::dis:ForDef>;
-                $self-><M::ManakaiDISDatabase.loadFor> ($mod, $el);
-              }
-            }
-
+            ## -- Loads child resources
             $root_elements = $doc-><M::ManakaiDISDocument.disChildElements>
                                          (for_arg => $forArg);
             for my $el (@$root_elements) {
@@ -3543,10 +3567,12 @@ ClsDef:
                               forp_arg => $self->{forp});
             if ($op_node) {
               if ($op_node-><M::ManakaiDISElement.mediaTypeMatch>
-                                  (<Q::lang:Perl>)) {
+                                  (<Q::lang:Perl>, for_arg => $self->{for},
+                                   for_arg => $self->{forp})) {
                 $r = $op_node-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
               } elsif ($op_node-><M::ManakaiDISElement.mediaTypeMatch>
-                                  (<Q::dis:TypeQName>)) {
+                                  (<Q::dis:TypeQName>, for_arg => $self->{for},
+                                   for_arg => $self->{forp})) {
                 $r = $op_node-><AG::ManakaiDISElement.qnameValueURI>;
               } else {
                 my $ct_uri = $op_node-><M::ManakaiDISElement.mediaTypeURI>
@@ -3733,7 +3759,242 @@ ClsDef:
         } else {
           $r = overload::Overloaded ($self) <=> $anotherResource;
         }
+
+  @Attr:
+    @@Name: plCodeFragment
+    @@enDesc:
+      Perl code definition fragment of this resource. 
+    @@Type: MPLCodeFragment
+    @@Get:
+      @@@enDesc:
+        Perl code.
+      @@@nullCase:
+        @@@@enDesc:
+          This node does not have Perl code definition. 
+      @@@RaiseException:
+        @@@@@:NO_METHOD_RETURN_ERR
+        @@@@enDesc:
+          This resource is a <Q::DISLang:Method> but it does not 
+          have <Q::DISLang:MethodReturn> child-resource. 
+      @@@RaiseException:
+        @@@@@:NO_ATTR_GET_ERR
+        @@@@enDesc:
+          This resource is a <Q::DISLang:Attribute> but it does not 
+          have <Q::DISLang:AttributeGet> child-resource.
+      @@@RaiseException:
+        @@@@@:UNSUPPORTED_MEDIA_TYPE_ERR
+        @@@@enDesc:
+          The media type of <Q::dis:Def> element is not supported.
+      @@@PerlDef:
+        __DEEP{
+          if (exists $self->{<Q::plCodeFragment>}) {
+            $r = $self->{<Q::plCodeFragment>};
+          } elsif (not $self->{src}) {
+            $r = $self->{<Q::plCodeFragment>} = null;
+          } elsif ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
+                                (<Q::DISLang:MethodReturn>) or
+                   $self-><M::ManakaiDISResourceDefinition.isTypeURI>
+                                (<Q::DISLang:AttributeGet>) or
+                   $self-><M::ManakaiDISResourceDefinition.isTypeURI>
+                                (<Q::DISLang:AttrobuteSet>)) {
+            my $def = $self->{src}-><M::ManakaiDISElement.disGetAttribute>
+                                (<Q::dis:Def>, for_arg => $self->{for},
+                                 forp_arg => $self->{forp});
+            if ($def-><M::ManakaiDISElement.mediaTypeMatch> (<Q::lang:Perl>)) {
+              $r = $self->{<Q::plCodeFragment>}
+                 = $self-><M::ManakaiDISResourceDefinition.plImplementation>
+                        -><M::MPLImpl.createPerlUnparsedCode>
+                      ($def-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest.value>);
+              $r-><AS::MPLUnparsedCode.sourceFile>
+                         ($self->{src}-><M::swcfg21:SWCFGNode
+                                          ::swcfg21:ForLatest.nodePath>
+                               (key => [qw/Name QName type Type/]));
+              $r-><AS::MPLUnparsedCode.sourceLine> (1);
+            } elsif ($def-><M::ManakaiDISElement.mediaTypeMatch>
+                                                         (<Q::lang:dis>)) {
+              $r = $self->{<Q::plCodeFragment>}
+                 = $self-><M::ManakaiDISResourceDefinition.plImplementation>
+                        -><M::MPLImpl.createPerlUnparsedCode>
+                      ($def-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest.value>);
+ ## TODO: implement
+            } else {
+              my $mt = $def-><M::ManakaiDISElement.mediaTypeURI>
+                                   (for_arg => $self->{for},
+                                    forp_arg => $self->{forp});
+              __UNDEEP{
+                __EXCEPTION{UNSUPPORTED_MEDIA_TYPE_ERR::
+                  DIS:uri => {$mt},
+                  DIS:sourceNode => {$def},
+                }__;
+              }__;
+            } # media type
+          } elsif ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
+                                (<Q::DISLang:Method>)) {
+            my $ret = $self-><M::ManakaiDISResourceDefinition
+                            .getChildResourceByType> (<Q::DISLang:MethodReturn>);
+            unless ($ret) { 
+              __UNDEEP{
+                __EXCEPTION{NO_METHOD_RETURN_ERR::
+                  DIS:errResource => {$self},
+                  DIS:sourceNode => {$self->{src}},
+                }__;
+              }__;
+            }
+            $r = $self->{<Q::plCodeFragment>}
+               = $self-><M::ManakaiDISResourceDefinition.plImplementation>
+                        -><M::MPLImpl.createPerlSub>
+                            ($self-><AG::ManakaiDISResourceDefinition.plName>);
+
+            
+                 ## TODO: Parameter, sub, ...
+            $r-><M::MPLSub.appendCodeFragment>
+                     ($ret-><AG::ManakaiDISResourceDefinition.plCodeFragment>);
+
+          } elsif ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
+                                (<Q::DISLang:Attribute>)) {  
+            my $get = $self-><M::ManakaiDISResourceDefinition
+                            .getChildResourceByType> (<Q::DISLang:AttributeGet>);
+            unless ($get) { 
+              __UNDEEP{
+                __EXCEPTION{NO_ATTR_GET_ERR::
+                  DIS:errResource => {$self},
+                  DIS:sourceNode => {$self->{src}},
+                }__;
+              }__;
+            }
+            $r = $self->{<Q::plCodeFragment>}
+               = $self-><M::ManakaiDISResourceDefinition.plImplementation>
+                        -><M::MPLImpl.createPerlSub>
+                            ($self-><AG::ManakaiDISResourceDefinition.plName>);
+
+            
+                 ## TODO: Parameter, sub, set, ...
+            $r-><M::MPLSub.appendCodeFragment>
+                     ($get-><AG::ManakaiDISResourceDefinition.plCodeFragment>);
+
+          } else {
+            $r = $self->{<Q::plCodeFragment>} = null;  
+          } # rdf:type
+        }__;
+
+  @Attr:
+    @@Name:plImplementation
+    @@enDesc:
+      The <Class::PerlCode:ManakaiPerlCodeImplementation> object. 
+    @@Type: MPLImpl
+    @@Get:
+      @@@enDesc:
+        The Perl code implementation object. 
+      @@@nullCase:
+        This resource has no source tree associated. 
+      @@@RaiseException:
+        @@@@@:NO_PERL_CODE_IMPL_ERR
+        @@@@enDesc:
+          There is no implementation that implements 
+          the <Feature::Util:PerlCode> feature, version <FeatureVer::1.0>. 
+      @@@PerlDef:
+        if ($self->{src}) {
+          __DEEP{
+            $r = ($self->{src}-><AG::SWCFGNode.ownerDocument> or
+                        $self->{src})-><AG::SWCFGDoc.implementation>
+                           -><M::DOMMinImpl.getFeature>
+                                   (<Q::Util:PerlCode> => '1.0');
+          }__;
+          unless (defined $r) {
+            __EXCEPTION{NO_PERL_CODE_IMPL_ERR::
+              
+            }__;
+          }
+        }
+
+  @Method:
+    @@Name: getChildResourceByType
+    @@enDesc:
+      Gets a static child resource selected by its type. 
+    @@Param:
+      @@@Name:typeURI
+      @@@Type:ResourceURI
+      @@@enDesc:
+        A URI reference identifying a resource type. 
+    @@Return:
+      @@@Type: ManakaiDISResourceDefinition
+      @@@enDesc:
+        The first (by document order) child resource whose 
+        type matches with <P::resType>. 
+      @@@nullCase:
+        @@@@enDesc:
+          There is no resource whose type is <P::resType>.
+      @@@PerlDef:
+        __DEEP{
+          for my $cr_uri (@{$self->{<Q::DIS:childResource>}}) {
+            my $cr = $self->{db}-><M::ManakaiDISDatabase.getResource>
+                                             ($cr_uri);
+            if ($cr-><M::ManakaiDISResourceDefinition.isTypeURI> ($typeURI)) {
+              $r = $cr;
+              last;
+            }
+          }
+        }__;
 ##DISResourceDefinition
+
+ResourceDef:
+  @QName: DOMMinImpl
+  @rdf:type:
+    ManakaiDOM:IF
+  @AliasFor:
+    DOMMetaImpl:ManakaiDOMMinimumImplementationIF::ManakaiDOM:ManakaiDOMLatest
+
+ResourceDef:
+  @QName: SWCFGNode
+  @rdf:type:
+    ManakaiDOM:IF
+  @AliasFor:
+    swcfg21:SWCFGNode::swcfg21:ForLatest
+
+ResourceDef:
+  @QName: SWCFGDoc
+  @rdf:type:
+    ManakaiDOM:IF
+  @AliasFor:
+    swcfg21:SWCFGDocument::swcfg21:ForLatest
+
+ResourceDef:
+  @QName: MPLImpl
+  @rdf:type:
+    ManakaiDOM:Class
+  @AliasFor:
+    PerlCode:ManakaiPerlCodeImplementation::ManakaiDOM:Perl
+
+ResourceDef:
+  @QName: MPLCodeFragment
+  @rdf:type:
+    ManakaiDOM:Class
+  @AliasFor:
+    PerlCode:ManakaiPerlCodeFragment::ManakaiDOM:Perl
+
+ResourceDef:
+  @QName: MPLSub
+  @rdf:type:
+    ManakaiDOM:Class
+  @AliasFor:
+    PerlCode:ManakaiPerlSub::ManakaiDOM:Perl
+
+ResourceDef:
+  @QName: MPLUnparsedCode
+  @rdf:type:
+    ManakaiDOM:Class
+  @AliasFor:
+    PerlCode:ManakaiPerlUnparsedCode::ManakaiDOM:Perl
+
+PropDef:
+  @QName: plCodeFragment
+  @enDesc:
+    Cache for <A::ManakaiDISResourceDefinition.plCodeFragment>.
+
+XParamDef:
+  @QName: errResource
+  @enDesc:
+    A resource on which an error has occurred. 
 
 XParamDef:
   @QName: generatedName
@@ -3842,6 +4103,11 @@ ClsDef:
         @@@@enDesc:
           No value has specified. 
       @@@UndeclaredPrefixException:
+      @@@RaiseException:
+        @@@@@:UNSUPPORTED_MEDIA_TYPE_ERR
+        @@@@enDesc:
+          The media type of the attribute node in the source tree
+          corresponding to this resource is not supported. 
       @@@PerlDef:
         if (defined $self->{$propName}) {
           $r = $self->{db}-><M::ManakaiDISDatabase.getResource>
@@ -3855,11 +4121,15 @@ ClsDef:
               $defaultMediaType = <Q::dis:TypeQName>
                                            unless defined $defaultMediaType;
               if ($r-><M::ManakaiDISElement.mediaTypeMatch>
-                                   (<Q::dis:TypeQName>, $defaultMediaType)) {
+                                   (<Q::dis:TypeQName>, $defaultMediaType,
+                                    for_arg => $self->{for},
+                                    forp_arg => $self->{forp})) {
                 $self->{$propName}
                    = $r-><AG::ManakaiDISElement.qnameValueURI>;
               } elsif ($r-><M::ManakaiDISElement.mediaTypeMatch>
-                                   (<Q::dis:TFQNames>, $defaultMediaType)) {
+                                   (<Q::dis:TFQNames>, $defaultMediaType,
+                                    for_arg => $self->{for},
+                                    forp_arg => $self->{forp})) {
                 $self->{$propName}
                    = $r-><M::ManakaiDISElement.tfqnamesValueURI>
                              ($self->{src}-><AG::swcfg21:SWCFGNode
@@ -3915,6 +4185,11 @@ ClsDef:
         \
         }
       @@@UndeclaredPrefixException:
+      @@@RaiseException:
+        @@@@@:UNSUPPORTED_MEDIA_TYPE_ERR
+        @@@@enDesc:
+          The media type of the attribute node in the source tree
+          corresponding to this resource is not supported. 
       @@@PerlDef:
         $r = [];
         if (defined $self->{$propName}) {
@@ -3934,10 +4209,14 @@ ClsDef:
                                    forp_arg => $self->{forp})}) {
               my $res_uri;
               if ($res_name_node-><M::ManakaiDISElement.mediaTypeMatch>
-                                   (<Q::dis:TypeQName>, $defaultMediaType)) {
+                                   (<Q::dis:TypeQName>, $defaultMediaType,
+                                    for_arg => $self->{for},
+                                    forp_arg => $self->{forp})) {
                 $res_uri = $res_name_node-><AG::ManakaiDISElement.qnameValueURI>;
               } elsif ($res_name_node-><M::ManakaiDISElement.mediaTypeMatch>
-                                   (<Q::dis:TFQNames>, $defaultMediaType)) {
+                                   (<Q::dis:TFQNames>, $defaultMediaType,
+                                    for_arg => $self->{for},
+                                    forp_arg => $self->{forp})) {
                 $res_uri =$res_name_node-><M::ManakaiDISElement.tfqnamesValueURI>
                              ($self->{src}-><AG::swcfg21:SWCFGNode
                                                ::swcfg21:ForLatest.nodeID>,
@@ -4141,20 +4420,18 @@ ElementTypeBinding:
 ## -- Exceptions
 
 XParamDef:
-  @QName: sourceNode
-  @Description:
-    @@lang:en
-    @@@:
-      The node in which an error has occurred. 
-  @Type: ManakaiDISNode
-
-XParamDef:
   @QName: anotherSourceNode
   @enDesc:
     Another source node in which an error has occurred.  In cases 
     of <QUOTE::already defined> errors, it is the node that 
     defines the resource first. 
   @Type: ManakaiDISNode
+
+ResourceDef:
+  @QName: UNDECLARED_NS_PREFIX_ERR
+  @For: ForLatest
+  @AliasFor: 
+    DIS:UNDECLARED_NS_PREFIX_ERR::swcfg21:ForLatest
 
 ExceptionDef:
   @ClsQName: ManakaiDISException
@@ -4197,24 +4474,14 @@ ExceptionDef:
           @@@@@enDesc:
             The URI reference of the media type that is not supported. 
         @@@@XSourceNodeParam:
-    @@XConstDef:
-      @@@Name: NAMESPACE_ERR
-      @@@Value:14
-      @@@enDesc:
-        An error related to namespaces has occurred. 
-      @@@XSubTypeDef:
-        @@@@QName: UNDECLARED_NS_PREFIX_ERR
-        @@@@enDesc:
-          The implementation has encounted an undeclared namespace 
-          prefix. 
-        @@@@XParam:
-          @@@@@QName: 
-            infoset:prefix
-          @@@@@enDesc:
-            The namespace prefix. 
         @@@@enMufDef:
-          Namespace prefix "%p (name => {<Q::infoset:prefix>});" is 
-          not declared
+          Media type <%p (name => {<Q::DIS:uri>});> is not supported
+      @@@XSubTypeDef:
+        @@@@QName: NO_PERL_CODE_IMPL_ERR
+        @@@@enDesc:
+          There is no implementation that supports the 
+          <Feature::Util:PerlCode> feature, version 
+          <FeatureVer::1.0>.
     @@XConstDef:
       @@@Name: INVALID_STATE_ERR
       @@@Value:11
@@ -4370,6 +4637,18 @@ ExceptionDef:
         @@@@QName: NO_DIS_TYPE_ERR
         @@@@enDesc:
           <Q::dis:Type> attribute is not found. 
+        @@@@XSourceNodeParam:
+      @@@XSubTypeDef:
+        @@@@QName: NO_METHOD_RETURN_ERR
+        @@@@enDesc:
+          A <Q::DISLang:Method> resource does not have any
+          <Q::DISLang:MethodReturn> child. 
+        @@@@XSourceNodeParam:
+      @@@XSubTypeDef:
+        @@@@QName: NO_ATTR_GET_ERR
+        @@@@enDesc:
+          A <Q::DISLang:Attribute> resource does not have any
+          <Q::DISLang:AttributeGet> child. 
         @@@@XSourceNodeParam:
 ##DISException
 
@@ -4889,11 +5168,8 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: 
       DOMMain:XWParameter
-    @@AliasFor:
-      @@@For:
-        !=ManakaiDOM:all
-      @@@@:
-        ::ManakaiDOM:all
+    @@For:
+      =ManakaiDOM:all
 
 ElementTypeBinding:
   @Name: enMufDef

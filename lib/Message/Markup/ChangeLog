@@ -1,3 +1,15 @@
+2005-03-06  Wakaba  <wakaba@suika.fam.cx>
+
+	* SuikaWikiConfig21.dis (ExceptionDef): "DIS:UNDECLARED_NS_PREFIX_ERR"
+	moved from "lib/Message/Util/DIS.dis".
+	(lookupNamespaceURI): Raises undeclared prefix exception
+	if prefix is not defined.
+	(expandNamespace, expandETBinding and other methods): Raises
+	undeclared prefix exception if prefix is not defined.
+
+	* SuikaWikiConfig21.dis (IFClassDef[ManakaiSWCFGImplementation]): Inherit
+	ManakaiDOMMinimumImplementation.
+
 2005-02-28  Wakaba  <wakaba@suika.fam.cx>
 
 	* SuikaWikiConfig21.dis (SWCFGNode.nodeID): New attribute.
