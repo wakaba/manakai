@@ -21,7 +21,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/03/05 12:00:44 $
+      $Date: 2005/03/16 09:08:14 $
     @@ContentType:
       dis:Date.RCS
   
@@ -796,6 +796,18 @@ PropDef:
     @@lang:en
     @@@:
       Whether the use of the subject resource is deprecated or not. 
+
+PropDef:
+  @QName: alt
+  @dataType:
+    dis:TFQNames
+  @Description:
+    @@lang:en
+    @@@:
+      Another resource the subject resource is deprecated in favor of. 
+      \
+      This property is specified as a child element of 
+      <Q::isDeprecated> property element.
 
 ## -- License
 

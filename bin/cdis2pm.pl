@@ -532,7 +532,7 @@ sub perl_code ($;%) {
                              ExpandedURI q<dis2pm:DefKeyName>
                                => ExpandedURI q<d:Def>);
         for (grep {/^\$/} keys %$param) {
-          $r =~ s/\Q$_\E\b/$param->{$_}/g;
+          $r =~ s/\Q$_\E\b/ref $param->{$_} ? ${$param->{$_}} : $param->{$_}/ge;
         }
         valid_err qq<Block code <$uri> is empty>, node => $opt{node}
           unless length $r;
@@ -2361,4 +2361,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/03/02 07:46:31 $
+1; # $Date: 2005/03/16 09:08:13 $

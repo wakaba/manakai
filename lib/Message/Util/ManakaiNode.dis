@@ -21,7 +21,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/03/04 12:18:52 $
+      $Date: 2005/03/16 09:08:14 $
     @@ContentType:
       dis:Date.RCS
   
@@ -177,6 +177,9 @@ ClassDef:
       @@@lang:en
       @@@@:
         Creates a new reference to this node and returns it.
+    @@DISCore:isDeprecated:
+      @@@@:1
+      @@@DISCore:alt: getNewReference
     @@Param:
       @@@Name: class
       @@@Type:
@@ -200,6 +203,109 @@ ClassDef:
           }, ref $class ? ref $class : $class ? $class :
              <ClassName::ManakaiDOM:ManakaiDOMNodeReference>;
           $self->{<Q::TreeCore:rc>}++;
+
+  @ResourceDef:
+    @@QName: getNewReference
+    @@rdf:type:
+      dis2pm:BlockCode
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates a new node reference object. 
+    @@ResourceDef:
+      @@@rdf:type:
+        DISPerl:CodeParameter
+      @@@Name: $object
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject
+      @@@In:1
+      @@@enDesc:
+        A node object for which a reference is created.
+      @@@DISPerl:paramStyle: var
+    @@ResourceDef:
+      @@@rdf:type:
+        DISPerl:CodeParameter
+      @@@Name: $ref
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeReferemce
+      @@@Out:1
+      @@@enDesc:
+        A node reference for <P::$object>.  It may or may not 
+        be same as <P::$object>.
+      @@@DISPerl:paramStyle: var
+    @@ResourceDef:
+      @@@rdf:type:
+        DISPerl:CodeParameter
+      @@@Name: $class
+      @@@Type:
+        Perl:package-name::ManakaiDOM:all
+      @@@enDesc:
+        A package name with which <P::$ref> is blessed. 
+      @@@In:1
+      @@@DISPerl:paramStyle: any
+    @@PerlDef:
+      $object->{<Q::TreeCore:rc>}++;
+      $ref = bless {
+        <Q::TreeCore:node> => $object,
+      }, $class;
+
+  @ResourceDef:
+    @@QName: getWeakReference
+    @@rdf:type:
+      dis2pm:BlockCode
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates a new weak node reference object. 
+        \
+        The weak node reference is actually a node reference
+        except that this code fragment does not increment
+        the reference count of the object.  When all non-weak 
+        references to the object are destructed, then
+        the object is destructed and any operation via 
+        weak references will lead unexpected result.
+        \
+        {NOTE:: It is intended that internal code creates a weak reference
+                so that it gets access to public interface. 
+        \
+        }
+    @@ResourceDef:
+      @@@rdf:type:
+        DISPerl:CodeParameter
+      @@@Name: $object
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject
+      @@@In:1
+      @@@enDesc:
+        A node object for which a reference is created.
+      @@@DISPerl:paramStyle: var
+    @@ResourceDef:
+      @@@rdf:type:
+        DISPerl:CodeParameter
+      @@@Name: $ref
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeReferemce
+      @@@Out:1
+      @@@enDesc:
+        A node reference for <P::$object>.  It may or may not 
+        be same as <P::$object>.
+      @@@DISPerl:paramStyle: var
+    @@ResourceDef:
+      @@@rdf:type:
+        DISPerl:CodeParameter
+      @@@Name: $class
+      @@@Type:
+        Perl:package-name::ManakaiDOM:all
+      @@@enDesc:
+        A package name with which <P::$ref> is blessed. 
+      @@@In:1
+      @@@DISPerl:paramStyle: any
+    @@PerlDef:
+      $ref = bless {
+        <Q::TreeCore:node> => $object,
+        <Q::TreeCore:isWeak> => true,
+      }, $class;
+
   @IntMethod:
     @@Name: isExternallyReferred
     @@Description:
@@ -257,8 +363,13 @@ ClassDef:
                   push @node, values %$p;
                 }
               }
-              for my $p (@{$node->{<Q::TreeCore:origin>}},
-  \                      @{$node->{<Q::TreeCore:subnode0>}}) {
+              for my $p (@{$node->{<Q::TreeCore:origin>}}) {
+                unshift @node, $node->{$p} if $node->{$p};
+                ## NOTE: Puts the top of the list,
+                ##       since upper-level nodes are expected to be referred
+                ##       more than lower-levels.
+              }
+              for my $p (@{$node->{<Q::TreeCore:subnode0>}}) {
                 push @node, $node->{$p} if $node->{$p};
               }
               $checked{$node->{<Q::TreeCore:nodeID>}} = 1;
@@ -275,7 +386,6 @@ ClassDef:
       @@@PerlDef:
         my @node = ($self);
         NODES: while (my $node = shift @node) {
-          next unless ref $node eq <ClassName::ManakaiDOM:ManakaiDOMNodeObject>;
               my @n;
               for my $p (@{$node->{<Q::TreeCore:subnode2>}}) {
                 if (ref $node->{$p} eq 'ARRAY') {
@@ -563,10 +673,12 @@ ClassDef:
           my $node = $self->{<Q::TreeCore:node>};
           if ($node) {
             CORE::delete $self->{<Q::TreeCore:node>};
-            $node->{<Q::TreeCore:rc>}--;
-            unless ($node-><M::ManakaiDOM:ManakaiDOMNodeObject
-                                              .isExternallyReferred>) {
-              $node-><M::ManakaiDOM:ManakaiDOMNodeObject.destroy>;
+            unless ($self->{<Q::TreeCore:isWeak>}) {
+              $node->{<Q::TreeCore:rc>}--;
+              unless ($node-><M::ManakaiDOM:ManakaiDOMNodeObject
+                                                .isExternallyReferred>) {
+                $node-><M::ManakaiDOM:ManakaiDOMNodeObject.destroy>;
+              }
             }
           } else {
             warn ref ($self) . q{->DESTROY: there is no associated }.
@@ -600,6 +712,30 @@ ClassDef:
         from that class, since that module defines its own 
         destructor. 
 ##Class:ManakaiDOMNodeReference
+
+PropDef:
+  @QName: isWeak
+  @enDesc:
+    Whether a reference is weak or not. 
+  @rdfs:range:
+    ManakaiDOM:ManakaiDONNodeReference
+  @Type:
+    DOMMain:boolean::ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name:PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdf:Property
+
+ElementTypeBinding:
+  @Name:enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
 
 ## -- Frequently used code fragments
 

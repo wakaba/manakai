@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/03/06 11:12:42 $
+      $Date: 2005/03/16 09:08:13 $
     @@ContentType:
       dis:Date.RCS
   
@@ -60,6 +60,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
   @DISlib:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @disPerl:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl--
   @DOMCore:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @DOMLS:
@@ -1142,6 +1144,15 @@ ClsDef:
         @@@@@:
           A qualified name. 
     @@NodeParam:
+    @@NamedParam:
+      @@@Name: defaultNamespaceURI
+      @@@Type: AnyURI
+      @@@enDesc:
+        Default namespace URI reference. 
+      @@@nullCase:
+        @@@@enDesc:
+          The default namespace is the namespace defined by the module
+          to which this resource belongs.
     @@Return:
       @@@Type: AnyURI
       @@@Description:
@@ -1156,7 +1167,11 @@ ClsDef:
           if (defined $lname) {
             $r = $self-><M::ManakaiDISElement.prefixToURI> ($prefix) . $lname;
           } else {  ## In default namespace
-            $r = $self-><M::ManakaiDISElement.prefixToURI> (null) . $prefix;
+            if (defined $defaultNamespaceURI) {
+              $r = $defaultNamespaceURI . $prefix;
+            } else {
+              $r = $self-><M::ManakaiDISElement.prefixToURI> (null) . $prefix;
+            }
           }
         }__;
 
@@ -2888,7 +2903,36 @@ ClsDef:
             $r = $self-><M::ManakaiDISModuleDefinition.plFullyQualifiedName>;
           }
         }__;
+
+  @Method:
+    @@Name: plAddRequireModule
+    @@enDesc:
+      Adds a <QUOTE::dis> module into the list of modules that 
+      defines a Perl module file referred by Perl module file
+      defined by this module.
+    @@Param:
+      @@@Name: moduleArg
+      @@@Type: ManakaiDISModuleDefinition
+      @@@enDesc:
+        A module definition.
+    @@Return:
+      @@@RaiseException:
+        @@@@@: RESOURCE_NOT_DEFINED_ERR
+        @@@@enDesc:
+          The module group to which <P::moduleArg> belongs
+          is not defined.
+      @@@PerlDef:
+        __DEEP{
+          my $pack = $moduleArg-><AG::ManakaiDISModuleDefinition
+                                     .plFullyQualifiedName>;
+          $self->{<Q::DIS:plRequireModule>}->{$pack} = true;
+        }__;
 ##DISModuleDefinition
+
+PropDef:
+  @QName: plRequireModule
+  @enDesc:
+    A list of Perl package name that this resource is referring.
 
 ElementTypeBinding:
   @Name: NoPerlModuleNameException
@@ -3796,7 +3840,12 @@ ClsDef:
                    $self-><M::ManakaiDISResourceDefinition.isTypeURI>
                                 (<Q::DISLang:AttributeGet>) or
                    $self-><M::ManakaiDISResourceDefinition.isTypeURI>
-                                (<Q::DISLang:AttrobuteSet>)) {
+                                (<Q::DISLang:AttributeSet>) or
+                   $self-><M::ManakaiDISResourceDefinition.isTypeURI>
+                                (<Q::dis2pm:BlockCode>) or
+                   $self-><M::ManakaiDISResourceDefinition.isTypeURI>
+                                (<Q::dis2pm:InlineCode>)) {
+            $self->{<Q::plCodeFragment>} = null;  ## To avoid loop
             my $def = $self->{src}-><M::ManakaiDISElement.disGetAttribute>
                                 (<Q::dis:Def>, for_arg => $self->{for},
                                  forp_arg => $self->{forp});
@@ -3830,6 +3879,7 @@ ClsDef:
             } # media type
           } elsif ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
                                 (<Q::DISLang:Method>)) {
+            $self->{<Q::plCodeFragment>} = null;  ## To avoid loop
             my $ret = $self-><M::ManakaiDISResourceDefinition
                             .getChildResourceByType> (<Q::DISLang:MethodReturn>);
             unless ($ret) { 
@@ -3847,11 +3897,12 @@ ClsDef:
 
             
                  ## TODO: Parameter, sub, ...
-            $r-><M::MPLSub.appendCodeFragment>
+            $r-><M::MPLSS.appendCodeFragment>
                      ($ret-><AG::ManakaiDISResourceDefinition.plCodeFragment>);
 
           } elsif ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
                                 (<Q::DISLang:Attribute>)) {  
+            $self->{<Q::plCodeFragment>} = null;  ## To avoid loop
             my $get = $self-><M::ManakaiDISResourceDefinition
                             .getChildResourceByType> (<Q::DISLang:AttributeGet>);
             unless ($get) { 
@@ -3869,10 +3920,10 @@ ClsDef:
 
             
                  ## TODO: Parameter, sub, set, ...
-            $r-><M::MPLSub.appendCodeFragment>
+            $r-><M::MPLSS.appendCodeFragment>
                      ($get-><AG::ManakaiDISResourceDefinition.plCodeFragment>);
 
-          } else {
+          } else {  ## Not supported
             $r = $self->{<Q::plCodeFragment>} = null;  
           } # rdf:type
         }__;
@@ -3935,7 +3986,579 @@ ClsDef:
             }
           }
         }__;
+
+  @Method:
+    @@Name: getChildResourceByNameAndType
+    @@enDesc:
+      Gets a static child resource selected by its local name and type. 
+    @@Param:
+      @@@Name: localName
+      @@@Type:
+        DISCore:LocalName::ManakaiDOM:all
+      @@@enDesc:
+        A local name. 
+    @@Param:
+      @@@Name:typeURI
+      @@@Type:ResourceURI
+      @@@enDesc:
+        A URI reference identifying a resource type. 
+    @@Return:
+      @@@Type: ManakaiDISResourceDefinition
+      @@@enDesc:
+        The first (by document order) child resource whose 
+        type matches for <P::localName> and <P::resType>. 
+      @@@nullCase:
+        @@@@enDesc:
+          There is no resource whose name is <P::localName> and
+          whose type is <P::resType>.
+      @@@PerlDef:
+        __DEEP{
+          for my $cr_uri (@{$self->{<Q::DIS:childResource>}}) {
+            my $cr = $self->{db}-><M::ManakaiDISDatabase.getResource>
+                                             ($cr_uri);
+            my $ln = $cr-><M::ManakaiDISResourceDefinition.localName>;
+            if (defined $ln and $ln eq $localName and
+                $cr-><M::ManakaiDISResourceDefinition.isTypeURI> ($typeURI)) {
+              $r = $cr;
+              last;
+            }
+          }
+        }__;
+
+  @Method:
+    @@Name: getConstResourceByName
+    @@enDesc:
+      Gets a constant value resource by its local name. 
+    @@Param:
+      @@@Name:localName
+      @@@Type:
+        DISLang:String::ManakaiDOM:all
+      @@@enDesc:
+        Constant name.
+    @@Return:
+      @@@Type: ManakaiDISResourceDefinition
+      @@@enDesc:
+        The constant resource identified by <P::localName>.
+      @@@nullCase:
+        @@@@enDesc:
+          There is no such constant resource.
+      @@@PerlDef:
+        __DEEP{
+          my @constGroup;
+          for my $cr_uri (@{$self->{<Q::DIS:childResource>}}) {
+            my $cr = $self->{db}-><M::ManakaiDISDatabase.getResource>
+                                             ($cr_uri);
+            my $ln = $cr-><M::ManakaiDISResourceDefinition.localName>;
+            if ($ln and $ln eq $localName and
+                $cr-><M::ManakaiDISResourceDefinition.isTypeURI>
+                         (<Q::ManakaiDOM:Const>)) {
+              $r = $cr;
+              last;
+            } elsif ($cr-><M::ManakaiDISResourceDefinition.isTypeURI>
+                                (<Q::ManakaiDOM:ConstGroup>)) {
+              push @constGroup, $cr;
+            }
+          }
+          unless ($r) {
+            for my $cg (@constGroup) {
+              $r = $cg-><M::ManakaiDISResourceDefinition
+                                .getChildResourceByNameAndType>
+                             ($localName, <Q::ManakaiDOM:Const>);
+              last if $r;
+            }
+          }
+        }__;
+
+  @Method:
+    @@Name: plPreprocessPerlCode
+    @@enDesc:
+      Preprocesses a Perl block-level code fragment. 
+    @@Param:
+      @@@Name:codeArg
+      @@@Type:
+        lang:Perl::ManakaiDOM:all
+      @@@enDesc:
+        A Perl block-level code (statements and/or blocks).
+    @@Return:
+      @@@Type: 
+        lang:Perl::ManakaiDOM:all
+      @@@enDesc:
+        Preprocessed Perl code. 
+      @@@PerlDef:
+        \##
+      
+  @Method:
+    @@Name: plPreprocessPerlStatement
+    @@enDesc:
+      Preprocesses a Perl inline code fragment
+      (code fragment smaller than statement). 
+    @@Param:
+      @@@Name:codeArg
+      @@@Type:
+        lang:Perl::ManakaiDOM:all
+      @@@enDesc:
+        A Perl code fragment.
+    @@NodeParam:
+    @@Return:
+      @@@Type:
+        lang:Perl::ManakaiDOM:all
+      @@@enDesc:
+        Preprocessed Perl code.
+      @@@InlineElementException:
+      @@@PerlDef:
+        unless ($self->{src}) {
+          __EXCEPTION{NO_SOURCE_NODE_ERR::
+            DIS:uri => {$self->{uri}},
+          }__;
+        }
+        __DEEP{
+          our $RegQNameChar;
+          my $plimpl = $self-><AG::ManakaiDISResourceDefinition
+                                  .plImplementation>;
+          $r = $plimpl-><M::MPLImpl.createPerlInlineContainer>;
+          for my $source_code (split /(?<![?^qwr])(\x3C$RegQNameChar[^<>]+> |
+                                      \b(?:null|true|false)\b)/x, $codeArg) {
+            if ($source_code =~ s/^\x3C//) {
+              $source_code =~ s/>$//;
+              if ($source_code =~ /=$/) {
+              ## TODO: Warning
+              #  valid_warn qq<Inline element "\x3C$source_code>" ends with a "=" - >.
+              #              q{should "=" be used place of "=>"?};
+              }
+              if ($source_code =~ s/^(.+?):://) {
+                my $et = $self->{src}
+                              -><M::ManakaiDISElement.qnameToURI>
+                                     ($1,
+                                      node => $node,
+                                      default_namespace_uri => <Q::disPerl:>);
+                if ($et eq <Q::disPerl:Q>) {          ## QName constant
+                  $r-><M::PLAnyCon.appendStringLiteral>
+                              ($self->{src}
+                                    -><M::ManakaiDISElement.qnameToURI>
+                                           ($source_code, node => $node));
+                } elsif ({
+                  <Q::disPerl:M> => 1,
+                  <Q::disPerl:ClassM> => 1,
+                  <Q::disPerl:AG> => 1,
+                  <Q::disPerl:AS> => 1,
+                }->{$et}) {     ## Method call
+                  my ($class_qname, $method_qname)
+                         = split /\s*\.\s*/, $source_code, 2;
+                  my $class_uri
+                         = $self->{src}
+                                -><M::ManakaiDISElement.tfqnamesToURI>
+                                       ($class_qname,
+                                        $self-><AG::ManakaiDISResourceDefinition
+                                                     .ownerClassURI>,
+                                        $self->{for},
+                                        node => $node);
+                  my $class = $self->{db}-><M::ManakaiDISDatabase.getResource>
+                                                   ($class_uri);
+                  $class-><M::ManakaiDISResourceDefinition.isReferred>
+                                                   ($node || $self->{src});
+                  if ($et eq <Q::disPerl::ClassM> and
+                      $class-><M::ManakaiDISResourceDefinition.isTypeURI>
+                                     (<Q::ManakaiDOM:IF>)) {
+                    __UNDEEP{
+                      __EXCEPTION{INTERFACE_CLASS_METHOD_ERR::
+                        DIS:uri => {$class_uri},
+                        DIS:elementType => {$et},
+                        DIS:sourceNode => {$node || $self->{src}},
+                        DIS:sourceCode => {$source_code},
+                      }__;
+                    }__;
+                  }
+                  unless ($class-><M::ManakaiDISResourceDefinition.isTypeURI>
+                                         (<Q::ManakaiDOM:IF>)) {
+                    $self-><AG::ManakaiDISResourceDefinition.definingModule>
+                         -><M::ManakaiDISModuleDefinition.plAddRequireModule>
+                                ($class-><AG::ManakaiDISResourceDefinition
+                                            .definingModule>);
+                  }
+                  my $method = $self-><M::ManakaiDISResourceDefinition
+                                         .getChildResourceByNameAndType>
+                                    ($method_qname,
+                                     {
+                                       <Q::disPerl:AG> => <Q::DISLang:Attribute>,
+                                       <Q::disPerl:AS> => <Q::DISLang:Attribute>,
+                                     }->{$et} || <Q::DISLang:Method>);
+                  if (not $method or
+                      not $method-><AG::ManakaiDISResourceDefinition
+                                                           .isDefined>) {
+                    __UNDEEP{
+                      __EXCEPTION{RESOURCE_NOT_DEFINED_ERR::
+                        DIS:localName => {$method_qname},
+                        DIS:elementType => {$et},
+                        DIS:sourceNode => {$node || $self->{src}},
+                        DIS:sourceCode => {$source_code},
+                      }__;
+                    }__;
+                  }
+                  my $class_name = '';
+                  if ($et eq <Q::disPerl:ClassM>) {
+                    $class_name = $class-><AG::ManakaiDISResourceDefinition
+                                              .plFullyQualifiedName> . '->';
+                  }
+                  my $method_name = $method-><AG::ManakaiDISResourceDefinition
+                                                 .plName>;
+                  $r-><M::PLAnyCon.appendBare>
+                                           ($class_name . $method_name);
+                } elsif ({
+                  <Q::disPerl:Class> => 1,
+                  <Q::disPerl:ClassName> => 1,
+                  <Q::disPerl:IF> => 1,
+                  <Q::disPerl:IFName> => 1,
+                }->{$et}) {                            ## Perl package name
+                  my $class_uri
+                         = $self->{src}
+                                -><M::ManakaiDISElement.tfqnamesToURI>
+                                       ($source_code,
+                                        $self-><AG::ManakaiDISResourceDefinition
+                                                     .ownerClassURI>,
+                                        $self->{for},
+                                        node => $node);
+                  my $class = $self->{db}-><M::ManakaiDISDatabase.getResource>
+                                                   ($class_uri);
+                  $class-><M::ManakaiDISResourceDefinition.isReferred>
+                                                   ($node || $self->{src});
+                  my $pack = $class-><M::ManakaiDISResourceDefinition
+                                                  .plFullyQualifiedName>;
+                  if ({
+                    <Q::disPerl:ClassName> => 1,
+                    <Q::disPerl:IFName> => 1,
+                  }->{$et}) {
+                    $r-><M::PLAnyCon.appendStringLiteral> ($pack);
+                  } else {
+                    $r-><M::PLAnyCon.appendBare> ($pack);
+                  }
+                } elsif ($et eq <Q::disPerl:Code>) { ## Inline code
+                  my $code_name;
+                  $source_code =~ s/^\s+//;
+                  if ($source_code =~ s/^((?>(?!::).)+)//s) {
+                    $code_name = $1;
+                    $code_name =~ tr/|/:/;
+                  } else {
+                    __UNDEEP{
+                      __EXCEPTION{PERL_PREPROCESS_NO_CODE_NAME_ERR::
+                        DIS:sourceCode => {$source_code},
+                        DIS:sourceNode => {$node || $self->{src}},
+                      }__;
+                    }__;
+                  }
+                  $source_code =~ s/^::\s*//;
+                  my $param = $self-><M::ManakaiDISResourceDefinition
+                                        .plParsePreprocessParameter>
+                                           ($source_code, node => $node);
+                  my $code_uri = $self->{src}-><M::ManakaiDISElement
+                                           .tfqnamesToURI>
+                                           ($code_name, null, $self->{for},
+                                            node => $node);
+                  my $code = $self->{db}-><M::ManakaiDISDatabase.getResource>
+                                           ($code_uri);
+                  $code-><M::ManakaiDISResourceDefinition.isReferred>
+                                           ($node || $self->{src});
+                  unless ($code-><M::ManakaiDISResourceDefinition.isTypeURI>
+                                           (<Q::dis2pm:InlineCode>)) {
+                    __UNDEEP{__EXCEPTION{RESOURCE_NOT_DEFINED_ERR::
+                      DIS:uri => {$code_uri},
+                      DIS:sourceNode => {$node || $self->{src}},
+                      DIS:sourceCode => {$source_code},
+                      DIS:expectedType => {<Q::dis2pm:InlineCode>},
+                    }__;}__;
+                  }
+                  my $pc = $code-><AG::ManakaiDISResourceDefinition
+                                       .plCodeFragment>->clone;
+                  unless (defined $pc) {
+                    __UNDEEP{__EXCEPTION{PERL_CODE_NOT_DEFINED_ERR::
+                      DIS:sourceNode => {$node || $self->{src}},
+                      DIS:sourceCode => {$source_code},
+                      DIS:uri => {$code_uri},
+                    }__}__;
+                  }
+                  for my $var (grep {/^\$/} keys %$param) {
+                    my $value;
+                    if ($param->{$var}->{type} eq 'variable') {
+                      $value = $plimpl-><M::MPLImpl.createPerlVariable>
+                                          ('$', null, $param->{$var}->{value});
+                    } elsif ($param->{$var}->{type} eq 'code') {
+                      $value = $plimpl-><M::MPLImpl.createPerlInlineUnparsedCode>
+                                          ($param->{$var}->{value});
+                    } else {
+                      $value = $plimpl-><M::MPLImpl.createPerlStringLiteral>
+                                          ($param->{$var}->{value});
+                    }
+                    $pc-><M::MPLCodeFragment.replaceVariable>
+                                          ($var => $value);
+                  }
+                  $r-><M::PLInCon.appendCode> ($pc);
+                } elsif ($et eq <Q::disPerl:C>) {
+                  my ($class_qname, $const_name) = split /\./, $source_code, 2;
+                  my $class_uri
+                         = $self->{src}
+                                -><M::ManakaiDISElement.tfqnamesToURI>
+                                       ($class_qname,
+                                        $self-><AG::ManakaiDISResourceDefinition
+                                                     .ownerClassURI>,
+                                        $self->{for},
+                                        node => $node);
+                  my $class = $self->{db}-><M::ManakaiDISDatabase.getResource>
+                                                   ($class_uri);
+                  $class-><M::ManakaiDISResourceDefinition.isReferred>
+                                                   ($node || $self->{src});
+                  my $const = $class-><M::ManakaiDISResourceDefinition
+                                         .getConstResourceByName> ($const_name);
+                  unless (defined $const) {
+                    __UNDEEP{__EXCEPTION{RESOURCE_NOT_DEFINED_ERR::
+                      DIS:sourceNode => {$node || $self->{src}},
+                      DIS:sourceCode => {$source_code},
+                      DIS:localName => {$const_name},
+                    }__}__;
+                  }
+                  my $pc = $const-><M::ManakaiDISResourceDefinition
+                                       .plCodeFragment>->clone;
+                  unless (defined $pc) {
+                    __UNDEEP{__EXCEPTION{PERL_CODE_NOT_DEFINED_ERR::
+                      DIS:sourceNode => {$node || $self->{src}},
+                      DIS:sourceCode => {$source_code},
+                      DIS:localName => {$const_name},
+                    }__}__;
+                  }
+                  $r-><M::PLInCon.appendCodeFragment> ($pc);
+                } else {
+                  __UNDEEP{__EXCEPTION{UNSUPPORTED_ELEMENT_TYPE_ERR::
+                    DIS:elementType => {$et},
+                    DIS:sourceNode => {$node || $self->{src}},
+                  }__}__;
+                }
+              } else {
+                __UNDEEP{__EXCEPTION{PERL_PREPROCESS_NO_ELEMENT_TYPE_ERR::
+                  DIS:sourceNode => {$node || $self->{src}},
+                  DIS:sourceCode => {$source_code},
+                }__}__;
+              }
+            } elsif ({
+              'tr'.'ue' => true,
+              'fal'.'se' => true,
+              'nu'.'ll' => true,
+            }->{$source_code}) {
+              $r-><M::PLAnyCon.appendAtom> ({
+                'tr'.'ue' => 1,
+                'fal'.'se' => 0,
+                'nu'.'ll' => 'undef',
+              }->{$source_code});
+            } else {
+              $r-><M::PLInCon.appendCode> ($source_code);
+            }
+          } # for
+        }__; # DEEP
+
+  @Attr:
+    @@Name: ownerClassURI
+    @@enDesc:
+      The URI reference of the class resource this resource
+      belongs to.
+    @@Type: ResourceURI
+    @@Get:
+      @@@enDesc:
+        The URI reference of the <TYPE::ManakaiDOM:Class> resource.
+        If this resource is a class, then the URI reference
+        of this resource is returned.
+      @@@nullCase:
+        @@@@enDesc:
+          This resource does not belong to any class.
+      @@@PerlDef:
+        if (exists $self->{<Q::DIS:ownerClass>}) {
+          $r = $self->{<Q::DIS:ownerClass>};
+        } else {
+          my $res = $self;
+          __DEEP{
+            {
+              if ($res-><M::ManakaiDISResourceDefinition.isTypeURI>
+                             (<Q::ManakaiDOM:Class>)) {
+                $r = $res->{uri};
+              } else {
+                $res = $res-><M::ManakaiDISPropertyAccessor
+                              .getPropertyResource> (<Q::dis2pm:parentResource>);
+                redo if $res;
+              }
+            }
+          }__;
+          $self->{<Q::DIS:ownerClass>} = $r;
+        }
+  
+  @IntMethod:
+    @@Name: plParsePreprocessParameter
+    @@enDesc:
+      Parses a parameter specification in preprocessing instruction
+      and return it as a hash reference.
+      \
+      {NOTE:: The callee have to ensure that this resource has its 
+              <CODE::src> before the call to this method.
+      \
+      }
+    @@Param:
+      @@@Name: paramSpec
+      @@@Type:
+        DISLang:String::ManakaiDOM:all
+      @@@enDesc:
+        A parameter specification to parse.
+    @@NodeParam:
+    @@Return:
+      @@@Type:
+        Perl:hash::ManakaiDOM:all
+      @@@enDesc:
+        Hash containing parameters.  Each hash value is also 
+        a hash reference, containing two keys <CODE::type> 
+        (its value is either <CODE::bare>, <CODE::quoted>,
+         <CODE::code> or <CODE::variable>) and
+        <CODE::value>.
+      @@@RaiseException:
+        @@@@@:BROKEN_PARAM_SPEC_ERR
+        @@@@enDesc:
+          The <P::paramSpec> is not well-formed.
+      @@@PerlDef:
+        BEGIN{
+          our $RegQNameChar = qr/[^\s<>"'\\\[\]\{\},=\$\@%]/;
+          use re 'eval';
+          our $RegBlockContent;
+          $RegBlockContent = qr/(?>[^{}\\]*)(?>(?>[^{}\\]+|\\.|\{(??{
+                                $RegBlockContent})\})*)/s;
+        }
+
+        our $RegQNameChar;
+        our $RegBlockContent;
+        $r = {};
+        while ($paramSpec =~ s/^
+          ## Parameter name
+          (\$? $RegQNameChar+)\s*
+  
+          (?: =>? \s*
+               ## ">" is now optional for inline element (">" is delimiter)
+
+          ## Parameter value
+          (
+            ## Bare string
+               $RegQNameChar+
+            |
+            ## Quoted string
+               '(?>[^'\\]*)' ## ISSUE: escape mechanism required?
+            |
+            ## Code
+               \{$RegBlockContent\}
+   
+          )
+
+          \s*)?
+
+        (?:,\s*|$)//ox) {
+
+        my ($n, $v) = ($1, $2);
+        if (defined $v) {
+          if ($v =~ /^'/) {
+            $v = {type => 'quoted',
+                  value => substr ($v, 1, length ($v) - 2)};
+          } elsif ($v =~ /^\{/) {
+            $v = {type => 'code', value => substr ($v, 1, length ($v) - 2)};
+          } elsif ($v =~ /^\$/) {
+            $v => {type => 'variable', value => $v};
+          } else {
+            $v = {type => 'bare', value => $v};
+          }
+        } else {
+          $v = {type => 'boolean', value => true};
+        }
+    
+        if ($n =~ /^\$/) {
+          $r->{$n} = $v;
+        } else {
+          __DEEP{
+            $r->{$self->{src}-><M::ManakaiDISElement.qnameToURI>
+                                 ($n, node => $node || $self->{src})} = $v;
+          }__;
+        }
+      } # while
+
+      if (length $paramSpec) {
+        __EXCEPTION{BROKEN_PARAM_SPEC_ERR::
+          DIS:sourceCode => {$paramSpec},
+          DIS:sourceNode => {$node || $self->{src}},
+        }__;
+      }
+
 ##DISResourceDefinition
+
+ElementTypeBinding:
+  @Name: InlineElementException
+  @ElementType:
+    ManakaiDOM:raises
+  @ShadowContent: 
+    @@@: NO_SOURCE_NODE_ERR
+    @@Description:
+      @@@lang:en
+      @@@@:
+        This resource definition does not have associated node 
+        in the source tree. 
+  @ShadowSibling:
+    @@ManakaiDOM:raises:
+      @@@@: INTERFACE_CLASS_METHOD_ERR
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          An attempt is made to call a class (static) method
+          via an interface, not class. 
+    @@ManakaiDOM:raises:
+      @@@@: RESOURCE_NOT_DEFINED_ERR
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A package, method or attribute is not defined or not 
+          a resoure of that type.
+    @@ManakaiDOM:raises:
+      @@@@: NO_LOCAL_NAME_ERR
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A referred resource does not have its local name so
+          that it is impossible to refer it by name.
+    @@ManakaiDOM:raises:
+      @@@@: RESERVED_PERL_METHOD_NAME_ERR
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A referred method has its name reserved for special-purpose. 
+    @@ManakaiDOM:raises:
+      @@@@: BROKEN_PARAM_SPEC_ERR
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A parameter specification is not well-formed.
+    @@ManakaiDOM:raises:
+      @@@@: PERL_PREPROCESS_NO_CODE_NAME_ERR
+      @@@enDesc:
+        A preprocessing instruction does not contain
+        Perl code fragment name. 
+    @@ManakaiDOM:raises:
+      @@@@: PERL_CODE_NOT_DEFINED_ERR
+      @@@enDesc:
+        The referred resource does not have its Perl definition.
+    @@ManakaiDOM:raises:
+      @@@@: PERL_PREPROCESS_NO_ELEMENT_TYPE_ERR
+      @@@enDesc:
+        A preprocessing instruction does not contain its element type name.
+    @@ManakaiDOM:raises:
+      @@@@: UNSUPPORTED_ELEMENT_TYPE_ERR
+      @@@enDesc:
+        An unknown element type is encounted.
+
+PropDef:
+  @QName: ownerClass
+  @enDesc:
+    The class to which this resource belongs.
+  @Type: ResourceURI
+  @rdfs:range: 
+    rdf:Resource
+  @rdfs:domain: 
+    ManakaiDOM:Class
 
 ResourceDef:
   @QName: DOMMinImpl
@@ -3971,6 +4594,27 @@ ResourceDef:
     ManakaiDOM:Class
   @AliasFor:
     PerlCode:ManakaiPerlCodeFragment::ManakaiDOM:Perl
+
+ResourceDef:
+  @QName: PLInCon
+  @rdf:type:
+    ManakaiDOM:Class
+  @AliasFor:
+    PerlCode:ManakaiPerlInlineContainer::ManakaiDOM:Perl
+
+ResourceDef:
+  @QName: PLAnyCon
+  @rdf:type:
+    ManakaiDOM:Class
+  @AliasFor:
+    PerlCode:ManakaiPerlAnyContainer::ManakaiDOM:Perl
+
+ResourceDef:
+  @QName: MPLSS
+  @rdf:type:
+    ManakaiDOM:Class
+  @AliasFor:
+    PerlCode:ManakaiPerlStatementContainer::ManakaiDOM:Perl
 
 ResourceDef:
   @QName: MPLSub
@@ -4477,6 +5121,15 @@ ExceptionDef:
         @@@@enMufDef:
           Media type <%p (name => {<Q::DIS:uri>});> is not supported
       @@@XSubTypeDef:
+        @@@@QName: UNSUPPORTED_ELEMENT_TYPE_ERR
+        @@@@enDesc:
+          An unsupported type of element is encounted.
+        @@@@XSourceNodeParam:
+        @@@@XParam:
+          @@@@@QName:elementType
+          @@@@@enDesc:
+            The element type URI reference of the element.
+      @@@XSubTypeDef:
         @@@@QName: NO_PERL_CODE_IMPL_ERR
         @@@@enDesc:
           There is no implementation that supports the 
@@ -4612,14 +5265,46 @@ ExceptionDef:
       @@@XSubTypeDef:
         @@@@QName: RESOURCE_NOT_DEFINED_ERR
         @@@@enDesc:
-          A <QUOTE::dis> resource is referred but not defined. 
+          A <QUOTE::dis> resource is referred but not defined 
+          or the resource referred does not have the type expected. 
         @@@@XSourceNodeParam:
         @@@@XParam:
           @@@@@QName: uri
           @@@@@enDesc:
             The URI reference of the resource that is not defined.
+        @@@@XParam:
+          @@@@@QName: elementType
+          @@@@@enDesc:
+            <QUOTE::dis> element type (either tree element type
+            or preprocessing element type) of the element
+            in which a reference to the undefined resource is contained.
+        @@@@XParam:
+          @@@@@QName: localName
+          @@@@@enDesc:
+            The local name of the undefined resource.
+        @@@@XParam:
+          @@@@QName: sourceCode
+          @@@@enDesc:
+            Source code fragment that referres this resource.
+        @@@@XParam:
+          @@@@@QName:expectedType
+          @@@@@enDesc:
+            Expected resource type.
         @@@@enMufDef:
-          Resource <%p (name => {<Q::DIS:uri>});> is not defined
+          Resource%p (name => {<Q::DIS:uri>}, prefix => { <},
+          suffix => {>});%p (name => {<Q::DIS:localName>},
+          prefix => { "}, suffix => {"}); is not defined or wrong type%p
+          (name => {<Q::DIS:expectedType>}, prefix => { (<},
+           suffix => {> is expected)});
+      @@@XSubTypeDef:
+        @@@@QName: NO_SOURCE_NODE_ERR
+        @@@@enDesc:
+          A resource does not have associated node in the source tree.
+        @@@@XSourceNodeParam:
+        @@@@XParam:
+          @@@@@QName:uri
+          @@@@@enDesc:
+            The URI reference of the resource.
       @@@XSubTypeDef:
         @@@@QName: RESERVED_PERL_METHOD_NAME_ERR
         @@@@enDesc:
@@ -4650,7 +5335,91 @@ ExceptionDef:
           A <Q::DISLang:Attribute> resource does not have any
           <Q::DISLang:AttributeGet> child. 
         @@@@XSourceNodeParam:
+      @@@XSubTypeDef:
+        @@@@QName:INTERFACE_CLASS_METHOD_ERR
+        @@@@enDesc:
+          An attempt is made to call a static (class) method
+          from an interface.
+        @@@@XSourceNodeParam:
+        @@@@XParam:
+          @@@@@QName:uri
+          @@@@@enDesc:
+            The URI reference of the interface.
+        @@@@XParam:
+          @@@@@QName:sourceCode
+          @@@@@enDesc:
+            Source code fragment that calls a class method.
+        @@@@XParam:
+          @@@@@QName:elementType
+          @@@@@enDesc:
+            The element type URI reference of the element
+            that calls a method.
+      @@@XSubTypeDef:
+        @@@@QName: BROKEN_PARAM_SPEC_ERR
+        @@@@enDesc:
+          A parameter specification is broken.
+        @@@@XParam:
+          @@@@@QName: sourceCode
+          @@@@@enDesc:
+            Source code fragment that contains the broken parameter
+            specification.
+        @@@@XSourceNodeParam:
+      @@@XSubTypeDef:
+        @@@@QName:PERL_PREPROCESS_NO_ELEMENT_TYPE_ERR
+        @@@@enDesc:
+          A preprocessing instruction does not have its element 
+          type.
+        @@@@XSourceNodeParam:
+        @@@@XParam:
+          @@@@@QName:sourceCode
+          @@@@@enDesc:
+            Source code fragment.
+      @@@XSubTypeDef:
+        @@@@QName: PERL_PREPROCESS_NO_CODE_NAME_ERR
+        @@@@enDesc:
+          A preprocessing instruction requires Perl code
+          fragment name but it is not specified.
+        @@@@XSourceNodeParam:
+        @@@@XParam:
+          @@@@@QName: sourceCode
+          @@@@@enDesc:
+            Source code fragment.
+        @@@@XParam:
+          @@@@@QName:elementType
+          @@@@@enDesc:
+            The type of the element in which code name should have
+            been specified.
+      @@@XSubTypeDef:
+        @@@@QName: PERL_CODE_NOT_DEFINED_ERR
+        @@@@enDesc:
+          A resource does not have its Perl definition.
+        @@@@XSourceNodeParam:
+        @@@@XParam:
+          @@@@@QName:sourceCode
+          @@@@@enDesc:
+            Source code fragment.
+        @@@@XParam:
+          @@@@@QName:localName
+          @@@@@enDesc:
+            The local name of the resource referred.
+        @@@@XParam:
+          @@@@@QName:uri
+          @@@@@enDesc:
+            The URI reference of the resource referred.
 ##DISException
+
+XParamDef:
+  @QName:expectedType
+  @Type: ResourceURI
+  @enDesc:
+    Expected resource type URI reference.
+
+XParamDef:
+  @QName: sourceCode
+  @Type:
+    DISLang:String::ManakaiDOM:all
+  @enDesc:
+    The source code fragment in which an error occurred.
 
 XParamDef:
   @QName: elementType

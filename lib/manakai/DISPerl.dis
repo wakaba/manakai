@@ -15,7 +15,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/03/03 06:26:16 $
+      $Date: 2005/03/16 09:08:14 $
     @@ContentType:
       dis:Date.RCS
   
@@ -660,6 +660,51 @@ ResourceTypeDef:
     @@@:
       A block code fragment referred by <CODE::__CODE{<VAR::qname>}__> 
       preprocessed block.
+
+ResourceTypeDef:
+  @QName: CodeParameter
+  @Description:
+    @@lang:en
+    @@@:
+      Paramaters for <Q::dis2pm:BlockCode> or <Q::dis2pm:InlineCode>.
+      \
+      {P:: A <Q::CodeParameter> resource should have properties:
+          
+          \
+          - <Q::dis:Name> or <Q::dis:QName>::: Parameter name.
+                             Namespaces are ignored.
+          \
+          - <Q::dis:Type>::: Parameter value datatype. 
+          \
+          - <Q::dis:In>::: Whether the caller sets a value or not. 
+                           The default is <CODE::1> (true).
+          \
+          - <Q::dis:Out>::: Whether the callee sets a value or not. 
+                            The default is <CODE::0> (false).
+          \
+          - <Q::paramStyle>::: Value type of parameter. 
+                            The default is <CODE::any>.
+          \
+      }
+
+PropDef:
+  @QName: paramStyle
+  @Description:
+    @@lang:en
+    @@@:
+      How parameter value should be specified.
+  @dataType: ParamStyleValue
+
+ResourceTypeDef:
+  @QName: ParamStyleValue
+  @Description:
+    @@lang:en
+    @@@:
+      Possible values for <Q::paramStyle> property.
+      \
+      - <CODE::any>::: Any type of value.
+      \
+      - <CODE::var>::: Variable. 
 
 ## -- Assertion types for disPerl:ASSERT
 
