@@ -17,7 +17,7 @@ markup constructures.  (SuikaWiki is not "tiny"?  Oh, yes, I see:-))
 
 package Message::Markup::XML;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload '""' => \&outer_xml,
              fallback => 1;
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXML_NCNameStartChar InXMLNCNameChar!;
@@ -78,6 +78,7 @@ sub new ($;%) {
   my $class = shift;
   my $self = bless {@_}, $class;
   $self->{type} ||= '#element';
+  ## Use of "qname" parameter is deprecated
   if ($self->{qname}) {
     ($self->{namespace_prefix}, $self->{local_name}) = $self->_ns_parse_qname ($self->{qname});
     $self->{_qname} = $self->{qname};
@@ -530,6 +531,7 @@ sub remove_marked_section ($) {
   $self->{node} = \@node;
 }
 
+## TODO: references in EntityValue
 sub remove_references ($) {
   my $self = shift;
   my @node;
@@ -544,7 +546,7 @@ sub remove_references ($) {
     || ($self->{type} eq '#declaration' && $_->{namespace_uri} eq $NS{SGML}.'entity')) {
       push @node, $_;
     } else {
-      if (index ($_->{namespace_uri}, 'char')) {
+      if (index ($_->{namespace_uri}, 'char') > -1) {
         my $e = ref ($_)->new (type => '#text', value => chr $_->{value});
         $e->{parent} = $self;
         push @node, $e;
@@ -863,12 +865,13 @@ sub inner_xml ($;%) {
   my $r = '';
   if ($self->{type} eq '#comment') {
     $r = $self->inner_text;
-    $r =~ s/--/-&#x45;/g;
+    $r =~ s/--/-&#45;/g;
   } elsif ($self->{type} eq '#pi') {
     my $isc = $self->_is_same_class ($self->{value});
     if (!$isc && length ($self->{value})) {
       $r = ' ' . $self->{value};
-      $r =~ s/\?>/? >/g;	# Same replacement as of the recommendation of XSLT:p.i.
+      #$r =~ s/\?>/? >/g;	## Same replacement as of the recommendation of XSLT:p.i.
+      $r =~ s/\?>/?&gt;/g;	## Some PI (such as xml-stylesheet) support predefined entity reference
     }
     for (($isc?$self->{value}:()), @{$self->{node}}) {
       if ($_->node_type eq '#attribute') {
@@ -1408,4 +1411,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/13 22:35:00 $
+1; # $Date: 2003/09/14 01:09:36 $

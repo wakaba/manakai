@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXMLChar
                         InXML_deprecated_noncharacter InXML_unicode_xml_not_suitable!;
 require Message::Markup::XML;
@@ -79,7 +79,7 @@ $xml_re{__AttValue_simple} = qr/"[^"]*"|'[^']*'/s;
 #$xml_re{CharData} = qr/(?:(?!\]\]>)[^<&])*/s;
 $xml_re{__CharDataP} = qr/(?:(?!\]\]>)[^<&])+/s;
 # [15] Comment = "<!--" *((Char - "-") / ("-" (Char - "-")))) "-->"
-$xml_re{Comment_M} = qr/<!--((?:(?!--).)*)-->/s;
+#$xml_re{Comment_M} = qr/<!--((?:(?!--).)*)-->/s;
 # [16] PI = "<?" PITarget [S (*Char - (*Char "?>" *Char))] "?>"
 $xml_re{PI_M} = qr/<\?($xml_re{Name})(?:$xml_re{s}((?:(?!\?>).)*))?\?>/s;
 $xml_re{_xml_PI_M} = qr/<\?xml(?:$xml_re{s}((?:(?!\?>).)*))?\?>/s;
@@ -282,7 +282,6 @@ sub _parse_document_entity ($$\$$;%) {
   my ($self, $c, $s, $o, %opt) = @_;
   $o->{entity_type} = 'document_entity';
   my %occur;
-  my $entMan = $opt{entMan};
   my $no_doctype = sub {
       my ($o) = @_;
       $self->_raise_error ($o, c => $c, type => 'WARN_DOCTYPE_NOT_FOUND');
@@ -305,7 +304,7 @@ sub _parse_document_entity ($$\$$;%) {
       $self->_clp ($1 => $o);
     } elsif ($$s =~ s/^<!DOCTYPE//) {
       my $D = $c->append_new_node (type => '#declaration', namespace_uri => $NS{SGML}.'doctype');
-      $entMan->set_doctype_node ($D);
+      $opt{entMan}->set_doctype_node ($D);
       $self->_clp (_________ => $o);
       if ($$s =~ s/^($xml_re{s}($xml_re{Name}))//s) {
         $D->set_attribute (qname => $2);
@@ -321,7 +320,7 @@ sub _parse_document_entity ($$\$$;%) {
         if ($$s =~ s/^($xml_re{s})($xml_re{__AttValue_simple})//s) {
           $self->_clp ($1 => $o);
           my $pid = $2; $pid = substr ($pid, 1, length ($pid) - 2);
-          $D->set_attribute (PUBLIC => $entMan->check_public_id ($o, $pid));
+          $D->set_attribute (PUBLIC => $opt{entMan}->check_public_id ($o, $pid));
           $self->_clp ($2 => $o);
           $have_sysid = 1;
         } else {
@@ -334,9 +333,8 @@ sub _parse_document_entity ($$\$$;%) {
       if ($have_sysid) {
         if ($$s =~ s/^($xml_re{s})($xml_re{__AttValue_simple})//s) {
           $self->_clp ($1 => $o);
-          $entMan ||= $c->_get_entity_manager;
           my $sid = $2; $sid = substr ($sid, 1, length ($sid) - 2);
-          $D->set_attribute (SYSTEM => $entMan->check_system_id ($o, $sid));
+          $D->set_attribute (SYSTEM => $opt{entMan}->check_system_id ($o, $sid));
           $self->_clp ($2 => $o);
         } elsif ($have_sysid) {
           $self->_raise_error ($o, type => 'SYNTAX_DOCTYPE_SYSID_LITERAL_NOT_FOUND', c => $D);
@@ -364,20 +362,18 @@ sub _parse_document_entity ($$\$$;%) {
       }
       ## Read and parse the external subset
       $self->_parse_dtd_external_subset ($o, $D, \%opt) if $have_sysid;
-    } elsif ($$s =~ s/^$xml_re{PI_M}//s) {	# <?pi?>	## TODO: pi parsing
+    } elsif ($$s =~ s/^($xml_re{PI_M})//s) {	# <?pi?>	## TODO: pi parsing
     ## PI before DOCTYPE declaration
-      my ($target, $data, $all) = ($1, $2, $&);
-      if ($target eq 'xml') {
+      if ($2 eq 'xml') {
         $self->_raise_error ($o, c => $c, type => 'SYNTAX_XML_DECLARE_POSITION');
       } else {
-        $c->append_new_node (type => '#pi', local_name => $target, value => $data)
+        $c->append_new_node (type => '#pi', local_name => $2, value => $3)
           ->flag (smxp__src_pos => $self->_make_clone_of ($o));
-        $self->_clp ($all => $o);
+        $self->_clp ($1 => $o);
       }
       $occur{pi} = 1;
-    } elsif ($$s =~ s/^$xml_re{Comment_M}//s) {	# <!-- -->	## TODO: parse comment
-      $c->append_new_node (type => '#comment', value => $1);
-      $self->_clp ($& => $o);
+    } elsif ($$s =~ /^<!--/) {
+      $self->_parse_comment_declaration ($s, $c, $o);
       $occur{comment} = 1;
     } else {
       $self->_raise_error ($o, c => $c, type => 'SYNTAX_INVALID_CHAR', t => substr ($$s, 0, 10));
@@ -386,8 +382,16 @@ sub _parse_document_entity ($$\$$;%) {
   }	# $$s
   
   unless ($occur{element}) {
-    $self->_raise_error ($o, c => $c, type => 'SYNTAX_ROOT_ELEMENT_NOT_FOUND',
-                         t => $occur{doctype} eq '1' ? '#IMPLIED' : $occur{doctype});
+    if ($occur{doctype} && ($occur{doctype} ne '1')) {	# root element type is known
+      $self->_raise_error ($o, c => $c, type => 'SYNTAX_ROOT_ELEMENT_NOT_FOUND',
+                           t => $occur{doctype});
+      $c->append_new_node (type => '#element', qname => ($occur{doctype} || 'root'));
+    } else {	# root element type is unknown
+      $self->_raise_error ($o, c => $c, type => 'SYNTAX_ROOT_ELEMENT_NOT_FOUND',
+                           t => '#IMPLIED');
+      $c->append_new_node (type => '#element', local_name => 'root',
+                           namespace_uri => $NS{internal_ns_invalid});
+    }
     &$no_doctype ($o) unless $occur{doctype};
   }
   if ($occur{element} && $occur{doctype}) {
@@ -433,8 +437,8 @@ sub _parse_element_content ($$$$;%) {
                              t => substr ($$s, 0, 10));
       }
       $c = $self->_parse_start_tag ($c, $s, $o, entMan => $opt{entMan});
-    } elsif ($$s =~ s/^$xml_re{ETag_M}//s) {
-      my $ename = $1;
+    } elsif ($$s =~ s/^($xml_re{ETag_M})//s) {
+      my $ename = $2;
       if ($ename eq $c->flag ('smxp__original_qname') || $ename eq $c->qname) {
         $c = $c->{parent};
       } else {	## Element type name does not match
@@ -443,7 +447,7 @@ sub _parse_element_content ($$$$;%) {
         $self->_raise_error ($o_etn, c => $c, type => 'WFC_ELEMENT_TYPE_MATCH',
                              t => [$ename, $c->qname]);
       }
-      _count_lp ($&, $o);
+      $self->_clp ($1 => $o);
     } elsif (($c->node_type eq '#document') && ($$s =~ s/^($xml_re{s})//s)) {
       $c->append_text ($1);
       $self->_clp ($1 => $o);
@@ -464,7 +468,7 @@ sub _parse_element_content ($$$$;%) {
                                t => $entity_ref);
           $entity = $opt{entMan}->get_entity ($eref);
         }
-        if (!$entity) {
+        if (!ref $entity) {
           $self->_raise_error ($o, t => $entity_ref,
                        type => ($opt{entMan}->is_standalone_document_1?'WF':'V')
                                 .'C_ENTITY_DECLARED');
@@ -507,15 +511,14 @@ sub _parse_element_content ($$$$;%) {
           }
         }
       }	# if &foo;
-    } elsif ($$s =~ s/^($xml_re{CDSect_M})//s) {
+    } elsif ($$s =~ /^<!--/) {
+      $self->_parse_comment_declaration ($s, $c, $o);
+    } elsif ($$s =~ s/^($xml_re{CDSect_M})//s) {	## TODO
       $self->_raise_error ($o, c => $c, type => 'SYNTAX_DATA_OUT_OF_ROOT_ELEMENT', t => '<![')
         if $c->node_type eq '#document';
       $c->append_new_node (type => '#section', value => $2)
         ->set_attribute (status => 'CDATA');
       $self->_clp ($1 => $o);
-    } elsif ($$s =~ s/^$xml_re{Comment_M}//s) {	## TODO: 
-      $c->append_new_node (type => '#comment', value => $1);
-      _count_lp ($&, $o);
     } elsif ($$s =~ s/^($xml_re{PI_M})//s) {	## TODO: warn unless declared
       my ($target, $data, $all) = ($2, $3, $1);
       if ($target eq 'xml') {
@@ -646,7 +649,7 @@ sub _parse_start_tag ($$\$$;%) {
       $self->_clp ($1.$2.'>');
       $c->option (use_EmptyElemTag => 1) if $2;
       last;
-    } elsif ($$s =~ m/^</) {
+    } elsif (substr ($$s, 0, 1) eq '<') {
       $self->_raise_error ($o, type => 'SYNTAX_TAG_NOT_CLOSED', t => substr ($$s, 0, 10));
       last;
     } else {
@@ -740,18 +743,17 @@ sub _parse_start_tag ($$\$$;%) {
   $c->option ('use_EmptyElemTag') ? $c->parent_node : $c;
 }
 
-sub _parse_dtd ($$\$$;%) {
+sub _parse_dtd ($$$$;%) {
   my ($self, $c, $s, $o, %opt) = @_;
-  my $c_initial = overload::StrVal ($c);
   while ($$s) {
-    if ($$s =~ s/^($xml_re{PEReference_M})//s) {
-      my ($ref, $ename) = ($1, $2);
+    if ($$s =~ s/^$xml_re{PEReference_M}//s) {
+      my ($ref, $ename) = ('%'.$1.';', $1);
       $self->_raise_error ($o, c => $c, type => 'NS_SYNTAX_NAME_IS_NCNAME', t => $ref)
         if index ($ename, ':') > -1;
       my $entity = $opt{entMan}->get_entity ($ename, namespace_uri => $NS{SGML}.'entity:parameter');
       my $eref = $c->append_new_node (type => '#reference', local_name => $ename,
                                       namespace_uri => $NS{SGML}.'entity:parameter');
-      if (!$entity) {
+      if (!ref $entity) {
         $self->_raise_error ($o, c => $c, type => 'VC_ENTITY_DECLARED', t => $ref);
       } else {
         my $o2 = $self->_make_clone_of ($o);
@@ -795,83 +797,138 @@ sub _parse_dtd ($$\$$;%) {
     } elsif ($$s =~ s/^($xml_re{s})//s) {
       $c->append_text ($1);
       $self->_clp ($1 => $o);
-    } elsif ($$s =~ s/^($xml_re{Comment_M})//s) {	## TODO: reimple
-      $c->append_new_node (type => '#comment', value => $2);
-      $self->_clp ($1 => $o);
-    } elsif ($$s =~ m/^<!(?:ENTITY|NOTATION)(?:$xml_re{s}|%)/s) {
-      $self->_parse_entity_declaration ($s, $c, $o, entMan => $opt{entMan});
-    } elsif ($$s =~ m/^<!ELEMENT(?:$xml_re{s}|%)/s) {
-      $self->_parse_element_declaration ($s, $c, $o, entMan => $opt{entMan});
-    } elsif ($$s =~ m/^<!ATTLIST(?:$xml_re{s}|%)/s) {
-      $self->_parse_attlist_declaration ($s, $c, $o, entMan => $opt{entMan});
-    ## Markup section start (= mdo + mso)
-    } elsif ($$s =~ s/^<!\[//) {
-      $self->_raise_error ($o, c => $c, type => 'SYNTAX_MS_IN_INTERNAL_SUBSET')
-        if $o->{entity_type} eq 'document_entity';
-      $self->_clp (___ => $o);
-      ## Status keyword list
-      if ($$s =~ s/^([^[]+)\[//s) {
-        my $skl = $1;
-        my $ms = $c->append_new_node (type => '#section');
-        my ($status, @params);
+    } elsif ($$s =~ m/^<!/) {
+      if ($$s =~ m/^<!(?:ENTITY|NOTATION)(?:$xml_re{s}|%)?/s) {
+        $self->_parse_entity_declaration ($s, $c, $o, entMan => $opt{entMan});
+      } elsif ($$s =~ m/^<!ELEMENT(?:$xml_re{s}|%)?/s) {
+        $self->_parse_element_declaration ($s, $c, $o, entMan => $opt{entMan});
+      } elsif ($$s =~ m/^<!ATTLIST(?:$xml_re{s}|%)?/s) {
+        $self->_parse_attlist_declaration ($s, $c, $o, entMan => $opt{entMan});
+      } elsif ($$s =~ m/^<!--/) {
+        $self->_parse_comment_declaration ($s, $c, $o);
+      ## Markup section start (= mdo + mso)
+      } elsif ($$s =~ s/^<!\[//) {
+        $self->_raise_error ($o, c => $c, type => 'SYNTAX_MS_IN_INTERNAL_SUBSET')
+          if $o->{entity_type} eq 'document_entity';
+        $self->_clp (___ => $o);
+        ## Status keyword list
+        if ($$s =~ s/^([^[]*)\[//s) {
+          my $skl = $1;
+          my $ms = $c->append_new_node (type => '#section');
+          my ($status, @params);
           my $t = $self->_parse_md_params ($ms->set_attribute ('status_list'), \$skl, $o,
                                            entMan => $opt{entMan});
-          if ($t =~ /^(?:$xml_re{s})?(IGNORE|INCLUDE)(?:$xml_re{s})?$/s) {
+          if ($t =~ /^(?:$xml_re{s})?(I(?:GNORE|NCLUDE))(?:$xml_re{s})?$/s) {
             $status = $1;
           } else {
-            $self->_raise_error ($o, c => $ms, type => 'SYNTAX_MS_INVALID_STATUS_STRING', t => $t);
+            unless ($status) {
+              $self->_raise_error ($o, c => $ms, type => 'SYNTAX_MS_NO_STATUS_KEYWORD');
+            } else {
+              $self->_raise_error ($o, c => $ms, type => 'SYNTAX_MS_INVALID_STATUS_STRING',
+                                   t => $t);
+            }
             $status = index ($t, 'IGNORE') > -1 ? 'IGNORE' : 'INCLUDE';
           }
-        $self->_clp ('[' => $o);
-        $self->_raise_error ($o, c => $ms, type => 'SYNTAX_MS_NO_STATUS_KEYWORD') unless $status;
-        $ms->set_attribute (status => ($status || 'INCLUDE'));
-        ## Content and markup section end
-        if ($status eq 'INCLUDE') {
-          $self->_parse_dtd ($ms, $s, $o, return_with_mse => 1, entMan => $opt{entMan});
-        } else {
-          $self->_parse_ignored_marked_section ($ms, $s, $o);
+          $self->_clp ($skl.'[' => $o);
+          $ms->set_attribute (status => $status);
+          ## Content and markup section end
+          if ($status eq 'INCLUDE') {
+            $self->_parse_dtd ($ms, $s, $o, return_with_mse => 1, entMan => $opt{entMan});
+          } else {
+            $self->_parse_ignored_marked_section ($ms, $s, $o);
+          }
+        } else {	## Fatal error: Status keyword not found
+          $self->_raise_error ($o, c => $c, type => 'SYNTAX_MS_NO_STATUS');
+          ## Note: parse as a section is stopped (following is parsed as DTD)
         }
-      } else {	## Fatal error: Status keyword not found
-        $self->_raise_error ($o, c => $c, type => 'SYNTAX_MS_NO_STATUS');
-        ## Note: parse as a section is stopped (following is parsed as DTD)
+      } else {	# <!UNKNOWN
+        if ($$s =~ s/^<!(([A-Za-z]+)[^>"']*(?:[^>"']|"[^"]*"|'[^']*')*)>//s) {
+          $self->_clp (__ => $o);
+          $self->_raise_error ($o, c => $c, type => 'SYNTAX_MD_UNKNOWN_KWD', t => $2);
+          $c->append_new_node (type => '#comment', value => $1);
+          $self->_clp ($1.'_' => $o);
+        } elsif ($$s =~ s/^<!>//) {
+          $self->_raise_error ($o, c => $c, type => 'SYNTAX_MD_COMMENT_DECL_EMPTY');
+          $c->append_new_node (type => '#comment', value => '');
+          $self->_clp (___ => $o);
+        } else {
+          $self->_clp (__ => $o);
+          $self->_raise_error ($o, c => $c, type => 'SYNTAX_MD_KWD_EXPECTED',
+                               t => substr ($$s, 0, 10));
+          $c->append_new_node (type => '#comment', value => '');
+          substr ($$s, 0, 2) = '';
+        }
       }
     ## Markup section end (= msc + mdc)
-    } elsif ($opt{return_with_mse} && $$s =~ s/^\]\]>//) {
+    } elsif ($opt{return_with_mse} && ($$s =~ s/^\]\]>//)) {
       $self->_clp (___ => $o);
       last;
     ## DOCTYPE declaration end
-    } elsif ($opt{return_with_dsc} && $$s =~ s/^(\](?:$xml_re{s})?>)//s) {
+    } elsif ($opt{return_with_dsc} && ($$s =~ s/^(\](?:$xml_re{s})?>)//s)) {
       $self->_clp ($1 => $o);
       $c = $c->{parent};
       last;
     } elsif ($$s =~ s/^($xml_re{PI_M})//s) {
-      my ($target, $data, $all) = ($2, $3, $1);
-      if ($target eq 'xml') {
+      if ($2 eq 'xml') {
         $self->_raise_error ($o, c => $c, type => 'SYNTAX_XML_DECLARE_POSITION');
       } else {
-        $c->append_new_node (type => '#pi', local_name => $target, value => $data)
+        $c->append_new_node (type => '#pi', local_name => $2, value => $3)
           ->flag (smxp__src_pos => $self->_make_clone_of ($o));
         ## Notation declared warning is checked after rest of the DTD is read
       }
-      $self->_clp ($all => $o);
+      $self->_clp ($1 => $o);
     } else {
       $self->_raise_error ($o, c => $c, type => 'SYNTAX_INVALID_CHAR', t => substr ($$s, 0, 10));
+      $self->_clp (substr ($$s, 0, 1) => $o);
       substr ($$s, 0, 1) = '';
-      $self->_clp (_ => $o);
     }
   }	# while $$s
-  while (overload::StrVal ($c_initial) ne overload::StrVal ($c)) {
-    if (ref $c->{parent}) {
-      $self->_raise_error ($o, type => 'SYNTAX_END_OF_MARKUP_NOT_FOUND', t => $c);
-      $c = $c->{parent};
-    } else {
-      last;
-    }
-  }	# while
+  if ($opt{return_with_mse} || $opt{return_with_dsc}) {
+    $self->_raise_error ($o, type => 'SYNTAX_END_OF_MARKUP_NOT_FOUND', t => $c);
+  }
+  undef;
 }
 
+## Note: don't give empty comment declaration (<!>) or broken start (<! -- foo -->)
+sub _parse_comment_declaration ($$$$;%) {
+  my ($self, $s, $c, $o, %opt) = @_;
+  my $in_com = 0;
+  my $has_com = 0;
+  substr ($$s, 0, 2) = '';	# <!
+  $self->_clp (__ => $o);
+  while ($$s) {
+    if ($in_com && ($$s =~ s/^([^-]+(?:[^-]|-[^-])*|-[^-](?:[^-]|-[^-])*)//s)) {
+      $c->append_new_node (type => '#comment', value => $1);
+      $self->_clp ($1 => $o);
+    } elsif ($$s =~ s/^--//) {
+      unless ($in_com) {	# open
+        $in_com = 1;
+        $self->_raise_error ($o, c => $c, type => 'SYNTAX_MD_COMMENT_MULTIPLE')
+          if $has_com;
+        $has_com = 1;
+      } else {	# close
+        $in_com = 0;
+      }
+      $self->_clp (__ => $o);
+    } elsif (!$in_com && ($$s =~ s/^($xml_re{s})//s)) {
+      $self->_raise_error ($o, c => $c, type => 'SYNTAX_MD_COMMENT_DS');
+      $self->_clp ($1 => $o);
+    } elsif (!$in_com && ($$s =~ s/^>//)) {
+      $self->_clp (_ => $o);
+      return undef;
+    } else {
+      $self->_raise_error ($o, c => $c, type => 'SYNTAX_INVALID_CHAR', t => substr ($$s, 0, 10));
+      $self->_clp (substr ($$s, 0, 1) => $o);
+      substr ($$s, 0, 1) = '';
+    }
+  }
+  $self->_raise_error ($o, c => $c, type => 'SYNTAX_MD_COMMENT_COM_NOT_CLOSED')
+    if $in_com;
+  $self->_raise_error ($o, c => $c, type => 'SYNTAX_MD_NOT_CLOSED');
+  undef;
+}
 
-sub _parse_attr_value_literal_data ($$\$$;%) {
+sub _parse_attr_value_literal_data ($$$$;%) {
   my ($self, $c, $s, $o, %opt) = @_;
   my $rt = '';
   while ($$s) {
@@ -881,19 +938,19 @@ sub _parse_attr_value_literal_data ($$\$$;%) {
       $c->append_new_node (type => '#reference', value => ord $char,
                            namespace_uri => $NS{SGML}.'char:ref'.(defined $1?':hex':''));
       $rt .= $char;
-    } elsif ($$s =~ s/^(&($xml_re{Name});)//) {
-      my ($ename, $entity_ref) = ($2, $1);
+    } elsif ($$s =~ s/^&($xml_re{Name});//) {
+      my ($ename, $entity_ref) = ($1, '%'.$1.';');
       $self->_raise_error ($o, c => $c, type => 'NS_SYNTAX_NAME_IS_NCNAME', t => $ename)
         if index ($ename, ':') > -1;
       my $eref_node = $c->append_new_node (type => '#reference', local_name => $ename,
                                            namespace_uri => $NS{SGML}.'entity');
       my $entity = $opt{entMan}->get_entity ($ename, dont_use_predefined_entities => 1);
-      if (!$entity && {qw/&lt; 1 &gt; 1 &amp; 1 &quot; 1 &apos; 1/}->{$entity_ref}) {
+      if (!$entity && {qw/lt 1 gt 1 amp 1 quot 1 apos 1/}->{$ename}) {
         $self->_raise_error ($o, c => $eref_node, type => 'WARN_PREDEFINED_ENTITY_NOT_DECLARED',
                              t => $entity_ref);
         $entity = $opt{entMan}->get_entity ($ename);
       }
-      if (!$entity) {
+      if (!ref $entity) {
         $self->_raise_error ($o, c => $eref_node,
                              type => ($opt{entMan}->is_standalone_document_1?
                                       'WF':'V').'C_ENTITY_DECLARED',
@@ -949,11 +1006,10 @@ sub _parse_attr_value_literal_data ($$\$$;%) {
 
 sub _parse_rpdata ($$\$$;%) {
   my ($self, $c, $s, $o, %opt) = @_;
-  my $entMan = $opt{entMan} || $c->root_node->flag ('smxp__entity_manager');
   my $tt = '';
   while ($$s) {
-    if ($$s =~ s/^($xml_re{PEReference_M})//) {
-      my ($ref, $ename) = ($1, $2);
+    if ($$s =~ s/^$xml_re{PEReference_M}//) {
+      my ($ref, $ename) = ('%'.$1.';', $1);
       $self->_raise_error ($o, type => 'WFC_PE_IN_INTERNAL_SUBSET', t => $ref)
         if $o->{entity_type} eq 'document_entity';
       $self->_raise_error ($o, type => 'NS_SYNTAX_NAME_IS_NCNAME', t => $ref)
@@ -961,8 +1017,9 @@ sub _parse_rpdata ($$\$$;%) {
       my $eref = $c->append_new_node (type => '#reference', local_name => $ename,
                                       namespace_uri => $NS{SGML}.'entity:parameter');
       unless ($opt{dont_resolve_entity_ref}) {
-        my $entity = $entMan->get_entity ($ename, namespace_uri => $NS{SGML}.'entity:parameter');
-        if (!$entity) {
+        my $entity = $opt{entMan}->get_entity ($ename,
+                                               namespace_uri => $NS{SGML}.'entity:parameter');
+        if (!ref $entity) {
           $self->_raise_error ($o, c => $c, type => 'VC_ENTITY_DECLARED', t => $ref);
         } else {
           my $o2 = $self->_make_clone_of ($o);
@@ -980,7 +1037,7 @@ sub _parse_rpdata ($$\$$;%) {
               $o2->{uri} = $entity->flag ('smxp__uri_in_which_declaration_is');
               $o2->{line} = 0; $o2->{pos} = 0;
               my $ev = $entity_value->_entity_parameter_literal_value;
-              $ev = $self->_parse_rpdata ($eref, \$ev, $o2, entMan => $entMan);
+              $ev = $self->_parse_rpdata ($eref, \$ev, $o2, entMan => $opt{entMan});
               $entity->flag (smxp__entity_replacement_text_rpdata => $ev);
               $tt .= $ev;
             } else {	## External entity
@@ -988,18 +1045,18 @@ sub _parse_rpdata ($$\$$;%) {
               $c->root_node->flag (smxp__declaration_may_not_be_read => 1)
                 if !(index ($o->{entity_type}, 'external') > -1)
                 || !$opt{entMan}->is_standalone_document;
-              my $ext_ent = $entMan->get_external_entity ($self, $entity, $o2);
+              my $ext_ent = $opt{entMan}->get_external_entity ($self, $entity, $o2);
               if ($ext_ent->{NDATA}) {	## non-parsed entity
                 $self->_raise_error ($o, type => 'WFC_PARSED_ENTITY', c => $entity, t => $ref);
               } elsif ($ext_ent->{error}->{no_data}) {	## parsed entity but can't be retrived
                 $self->_raise_error ($o, type => 'ERR_EXT_ENTITY_NOT_FOUND', c => $entity,
                                          t => [$ref, $o2->{uri}, $ext_ent->{error}->{reason_text}]);
                 $c->root_node->flag (smxp__stop_read_dtd => 1)
-                  unless $entMan->is_standalone_document;
+                  unless $opt{entMan}->is_standalone_document;
               } else {	## parsed entity
                 $o2->{__entities}->{$ref} = 1;
                 my $ev = $ext_ent->{text};
-                $ev = $self->_parse_rpdata ($eref, \$ev, $o2, entMan => $entMan);
+                $ev = $self->_parse_rpdata ($eref, \$ev, $o2, entMan => $opt{entMan});
                 $entity->flag (smxp__entity_replacement_text_rpdata => $ev);
                 $tt .= $ev;
                 $eref->flag (smxp__ref_expanded => 1);
@@ -1012,21 +1069,21 @@ sub _parse_rpdata ($$\$$;%) {
     } elsif ($$s =~ s/^([^%]+)//) {
       my $t = $1; my $r = '';
       while ($t) {
-        if ($t =~ s/^(&#(?:x([0-9A-Fa-f]+)|([0-9]+));)//) {
-          for (chr ($2 ? hex ($2) : $3)) {
+        if ($t =~ s/^&#(?:x([0-9A-Fa-f]+)|([0-9]+));//) {
+          for (chr ($1 ? hex ($1) : $2)) {
             $self->_warn_char_val ($o, $_, ref => 1);
             $r .= $_;
             $c->append_new_node (type => '#reference', value => ord $_,
-                                 namespace_uri => $NS{SGML}.'char:ref'.(defined $2 ? ':hex' : ''));
+                                 namespace_uri => $NS{SGML}.'char:ref'.(defined $1 ? ':hex' : ''));
           }
-          $self->_clp ($1 => $o);
-        } elsif ($t =~ s/^(&($xml_re{Name});)//) {
-          my ($entity_ref, $eref) = ($1, $2);
+          $self->_clp ((defined $1 ? '___':'__').$1 => $o);
+        } elsif ($t =~ s/^&($xml_re{Name});//) {
+          my ($entity_ref, $eref) = ($1, '&'.$1.';');
           $r .= $entity_ref;
           $self->_raise_error ($o, type => 'NS_SYNTAX_NAME_IS_NCNAME', c => $c, t => $entity_ref)
             if index ($eref, ':') > -1;
-          my $entity = $entMan->get_entity ($eref);
-          if ($entity && $entity->get_attribute ('NDATA')) {
+          my $entity = $opt{entMan}->get_entity ($eref);
+          if (ref ($entity) && ref ($entity->get_attribute ('NDATA'))) {
             $self->_raise_error ($o, type => 'ERR_XML_NDATA_REF_IN_ENTITY_VALUE',
                                  c => $c, t => $entity_ref);
             ## Note: this error is not raisen when the entity referred is declared after
@@ -1051,20 +1108,19 @@ sub _parse_rpdata ($$\$$;%) {
       $tt .= $r;
     } else {
       $self->_raise_error ($o, type => 'SYNTAX_INVALID_CHAR', t => substr ($$s, 0, 10));
+      $self->_clp (substr ($$s, 0, 1) => $o);
       substr ($$s, 0, 1) = '';
-      $self->_clp (_ => $o);
     }
   }	# while $$s
   $tt;
 }
 
-sub _parse_md_params ($$\$$$;%) {
+sub _parse_md_params ($$$$$;%) {
   my ($self, $c, $s, $o, %opt) = @_;
-  my $entMan = $opt{entMan} || $c->root_node->flag ('smxp__entity_manager');
   my $t = '';
   while ($$s) {
-    if ($$s =~ s/^($xml_re{PEReference_M})//) {
-      my ($ref, $ename) = ($1, $2);
+    if ($$s =~ s/^$xml_re{PEReference_M}//) {
+      my ($ref, $ename) = ('%'.$1.';', $1);
       $self->_raise_error ($o, c => $c, type => 'WFC_PE_IN_INTERNAL_SUBSET', t => $ref)
         if $o->{entity_type} eq 'document_entity';
       $self->_raise_error ($o, c => $c, type => 'NS_SYNTAX_NAME_IS_NCNAME', t => $ref)
@@ -1072,8 +1128,9 @@ sub _parse_md_params ($$\$$$;%) {
       my $eref = $c->append_new_node (type => '#reference', local_name => $ename,
                                       namespace_uri => $NS{SGML}.'entity:parameter');
       unless ($opt{dont_resolve_entity_ref}) {
-        my $entity = $entMan->get_entity ($ename, namespace_uri => $NS{SGML}.'entity:parameter');
-        if (!$entity) {
+        my $entity = $opt{entMan}->get_entity ($ename,
+                                               namespace_uri => $NS{SGML}.'entity:parameter');
+        if (!ref $entity) {
           $self->_raise_error ($o, c => $c, type => 'VC_ENTITY_DECLARED', t => $ref);
         } else {
           if ($o->{__entities}->{$ref}) {
@@ -1089,7 +1146,7 @@ sub _parse_md_params ($$\$$$;%) {
               $o2->{uri} = $entity->flag ('smxp__uri_in_which_declaration_is');
               $o2->{line} = 0; $o2->{pos} = 0;
               my $ev = $entity_value->_entity_parameter_literal_value;
-              $ev = $self->_parse_md_params ($eref, \$ev, $o2, entMan => $entMan);
+              $ev = $self->_parse_md_params ($eref, \$ev, $o2, entMan => $opt{entMan});
               $entity->flag (smxp__entity_replacement_text_md_params => $ev);
               $t .= ' '.$ev.' ';
               $eref->flag (smxp__ref_expanded => 1);
@@ -1098,7 +1155,7 @@ sub _parse_md_params ($$\$$$;%) {
               $c->root_node->flag (smxp__declaration_may_not_be_read => 1)
                 if !(index ($o->{entity_type}, 'external') > -1)
                 || !$opt{entMan}->is_standalone_document;
-              my $ext_ent = $entMan->get_external_entity ($self, $entity, $o2);
+              my $ext_ent = $opt{entMan}->get_external_entity ($self, $entity, $o2);
               if ($ext_ent->{NDATA}) {	## non-parsed entity
                 $self->_raise_error ($o, type => 'WFC_PARSED_ENTITY', c => $entity, t => $ref);
               } elsif ($ext_ent->{error}->{no_data}) {	## parsed entity but can't be retrived
@@ -1137,7 +1194,7 @@ sub _parse_md_params ($$\$$$;%) {
     } elsif ($$s =~ s/^\(//) {
       $c->append_text ('(');
       my $grp = $c->append_new_node (type => '#element', namespace_uri => $NS{SGML}.'group');
-      $t .= '('.$self->_parse_md_params ($grp, $s, $o, entMan => $entMan, return_by_grpc => 1);
+      $t .= '('.$self->_parse_md_params ($grp, $s, $o, entMan => $opt{entMan}, return_by_grpc => 1);
       $c->flag (smxp__defined_with_param_ref => 1)
         if $grp->flag ('smxp__defined_with_param_ref');
     } elsif ($$s =~ s/^([%#,|])//) {
@@ -1148,13 +1205,13 @@ sub _parse_md_params ($$\$$$;%) {
       $c->append_text ($1);
       $t .= $1;
       $self->_clp ($1 => $o);
-    } elsif ($opt{return_by_mdc} && $$s =~ s/^>//) {	## mdc
+    } elsif ($opt{return_by_mdc} && ($$s =~ s/^>//)) {	## mdc
       $self->_clp (_ => $o);
       return $t;
-    } elsif (($opt{return_by_mdc}||$opt{return_by_grpc}) && $$s =~ m/^</) {	## maybe mdo
+    } elsif (($opt{return_by_mdc}||$opt{return_by_grpc}) && ($$s =~ m/^</)) {	## maybe mdo
       $self->_raise_error ($o, type => 'SYNTAX_END_OF_MARKUP_NOT_FOUND', t => $c, c => $c);
       return $t;
-    } elsif ($opt{return_by_grpc} && $$s =~ s/^\)//) {	## grpc
+    } elsif ($opt{return_by_grpc} && ($$s =~ s/^\)//)) {	## grpc
       $self->_clp (_ => $o);
       $t .= ')';
       $c->parent_node->append_text (')');
@@ -1166,8 +1223,8 @@ sub _parse_md_params ($$\$$$;%) {
       return $t;
     } else {
       $self->_raise_error ($o, type => 'SYNTAX_INVALID_CHAR', t => substr ($$s, 0, 10));
+      $self->_clp (substr ($$s, 0, 1) => $o);
       substr ($$s, 0, 1) = '';
-      $self->_clp (_ => $o);
     }
   }	# while
   if ($opt{return_by_grpc}) {
@@ -1212,7 +1269,7 @@ sub _parse_reference ($$$$) {
     } else {
       $self->_raise_error ($o, type => 'UNKNOWN', t => $ref);
     }
-  _count_lp ($ref, $o);
+  $self->_clp ($ref => $o);
   $r;
 }
 
@@ -1224,13 +1281,14 @@ sub _parse_ignored_marked_section ($$\$$;%) {
       $self->_parse_ignored_marked_section ($c->append_new_node (type => '#section'), $s, $o);
     } elsif ($$s =~ s/^\]\]>//) {
       $self->_clp (___ => $o);
-      return;
+      return undef;
     } elsif ($$s =~ s/^((?:(?!<!\[|\]\]>).)+)//s) {
       $c->append_text ($1);
       $self->_clp ($1 => $o);
     }
   }	# $$s
   $self->_raise_error ($o, c => $c, type => 'SYNTAX_END_OF_MARKUP_NOT_FOUND', t => $c);
+  undef;
 }
 
 sub _parse_xml_or_text_declaration ($$\$$) {
@@ -1251,8 +1309,8 @@ sub _parse_xml_declaration ($$$$) {
   my $stage = 0;	# 0: <?xml, 1: version="", 2: encoding="", 3: standalone="", 4: ?>
   $attrs = ' ' . $attrs;
   while ($attrs) {
-    if ($attrs =~ s/^$xml_re{s}version(?:$xml_re{s})?=(?:$xml_re{s})?("[A-Za-z0-9_.:-]+"|'[A-Za-z0-9_.:-]+')//s) {
-      my $version = substr ($1, 1, length ($1) - 2);
+    if ($attrs =~ s/^($xml_re{s}version(?:$xml_re{s})?=(?:$xml_re{s})?("[A-Za-z0-9_.:-]+"|'[A-Za-z0-9_.:-]+'))//s) {
+      my $version = substr ($2, 1, length ($2) - 2);
       if ($stage > 0) {
         $self->_raise_error ($o, c => $attrs, type => 'SYNTAX_XML_DECLARE', t => 'version');
       }
@@ -1261,8 +1319,8 @@ sub _parse_xml_declaration ($$$$) {
       if ($version ne '1.0') {
         $self->_raise_error ($o, c => $attrs, type => 'SYNTAX_UNSUPPORTED_XML_VERSION', t => $version);
       }
-      _count_lp ($&, $o); $stage++;
-    } elsif ($attrs =~ s/^$xml_re{s}encoding(?:$xml_re{s})?=(?:$xml_re{s})?("[A-Za-z0-9_.-]+"|'[A-Za-z0-9_.:-]+')//s) {
+      $self->_clp ($1 => $o); $stage++;
+    } elsif ($attrs =~ s/^($xml_re{s}encoding(?:$xml_re{s})?=(?:$xml_re{s})?("[A-Za-z0-9_.-]+"|'[A-Za-z0-9_.:-]+'))//s) {
       if ($stage > 2) {
         $self->_raise_error ($o, c => $attrs, type => 'SYNTAX_XML_DECLARE', t => 'encoding');
       } elsif ($stage == 0) {	## No version pseudo-attr
@@ -1274,9 +1332,9 @@ sub _parse_xml_declaration ($$$$) {
           $o->{entity_type} = 'external_parsed_entity';
         }
       }
-      $c->set_attribute (encoding => substr ($1, 1, length ($1) - 2));
-      _count_lp ($&, $o); $stage = 2;
-    } elsif ($attrs =~ s/^$xml_re{s}standalone(?:$xml_re{s})?=(?:$xml_re{s})?("(?:yes|no)"|'(?:yes|no)')//s) {
+      $c->set_attribute (encoding => substr ($2, 1, length ($2) - 2));
+      $self->_clp ($1 => $o); $stage = 2;
+    } elsif ($attrs =~ s/^($xml_re{s}standalone(?:$xml_re{s})?=(?:$xml_re{s})?("(?:yes|no)"|'(?:yes|no)'))//s) {
       if ($stage == 0) {	## 'version' or 'encoding' is expected
         if ($o->{entity_type} eq 'document_entity') {	## XML declaration
           $self->_raise_error ($o, c => $attrs, type => 'SYNTAX_XML_DECLARE_NO_VERSION_ATTR');
@@ -1289,18 +1347,18 @@ sub _parse_xml_declaration ($$$$) {
       } elsif ($stage > 3) {
         $self->_raise_error ($o, c => $attrs, type => 'SYNTAX_XML_DECLARE', t => 'standalone');
       }
-      $c->set_attribute (standalone => (substr ($1, 1, 1) eq 'y' ? 'yes' : 'no'));
-      _count_lp ($&, $o); $stage = 3;
+      $c->set_attribute (standalone => (substr ($2, 1, 1) eq 'y' ? 'yes' : 'no'));
+      $self->_clp ($1 => $o); $stage = 3;
     } elsif ($attrs =~ s/^($xml_re{s})//s) {
       my $s = $1;
       if ($stage == 0) {
         $self->_raise_error ($o, c => $attrs, type => 'SYNTAX_XML_DECLARE_NO_ATTR');
         $c->set_attribute (version => '1.0');
       }
-      _count_lp ($s, $o); $stage = 4;
+      $self->_clp ($s, $o); $stage = 4;
     } else {
       $self->_raise_error ($o, c => $attrs, type => 'SYNTAX_XML_DECLARE', t => $attrs);
-      _count_lp ($attrs, $o); undef $attrs;
+      $self->_clp ($attrs => $o); undef $attrs;
     }
   }	# while
   if ($stage == 0) {
@@ -1314,7 +1372,6 @@ sub _parse_xml_declaration ($$$$) {
 sub _parse_entity_declaration ($\$$$;%) {
     my ($self, $s, $c, $o, %opt) = @_;
     my $p;	## notation ? 'n' : parameter entity ? '%' : undef;
-    my $entMan = $opt{entMan} || $c->root_node->flag ('smxp__entity_manager');
     my $dont_process = $c->root_node->flag ('smxp__stop_read_dtd');
     my $e = $c->append_new_node (type => '#declaration');
       $e->flag (smxp__uri_in_which_declaration_is => $o->{uri});
@@ -1332,7 +1389,7 @@ sub _parse_entity_declaration ($\$$$;%) {
     ## Parameters
     my $t;
     $t = $self->_parse_md_params ($e, $s, $o, dont_resolve_entity_ref => $dont_process,
-                                  return_by_mdc => 1, entMan => $entMan);
+                                  return_by_mdc => 1, entMan => $opt{entMan});
     $dont_process = $c->root_node->flag ('smxp__stop_read_dtd');
     unless ($dont_process) {
       my $o = $self->_make_clone_of ($o);
@@ -1351,7 +1408,7 @@ sub _parse_entity_declaration ($\$$$;%) {
       my $ename;
       if ($t =~ s/^($xml_re{Name})//) {
         $ename = $1;
-        if ($entMan->is_declared_entity ($ename, namespace_uri => $e->namespace_uri,
+        if ($opt{entMan}->is_declared_entity ($ename, namespace_uri => $e->namespace_uri,
                                          dont_use_predefined_entities => 1,
                                          seek => 0)) {
           if ($p eq 'n') {
@@ -1362,7 +1419,7 @@ sub _parse_entity_declaration ($\$$$;%) {
                                  type => 'WARN_UNIQUE_'.($p eq '%' ? 'PARAMETER_' : '').'ENTITY_NAME');
           }
         } else {	## Regist to entMan
-          $entMan->is_declared_entity ($ename, namespace_uri => $e->namespace_uri,
+          $opt{entMan}->is_declared_entity ($ename, namespace_uri => $e->namespace_uri,
                                        dont_use_predefined_entities => 1,
                                        set_value => 1, seek => 0)
         }
@@ -1382,13 +1439,13 @@ sub _parse_entity_declaration ($\$$$;%) {
           $self->_raise_error ($o, c => $e, type => 'SYNTAX_MD_PID_NOT_FOUND',
                                t => substr ($t, 0, 10));
         } else {
-          $e->set_attribute (PUBLIC => $entMan->check_public_id
+          $e->set_attribute (PUBLIC => $opt{entMan}->check_public_id
                                                       ($o, substr ($1, 1, length ($1) - 2)));
           my $f = $t =~ s/^$xml_re{s}//s ? 1 : 0;
           if ($t =~ s/^($xml_re{__AttValue_simple})//s) {
             $self->_raise_error ($o, c => $e, type => 'SYNTAX_INVALID_MD', t => substr ($t, 0, 10))
               unless $f;
-            $e->set_attribute (SYSTEM => $entMan->check_system_id
+            $e->set_attribute (SYSTEM => $opt{entMan}->check_system_id
                                                         ($o, substr ($1, 1, length ($1) - 2)));
           } else {
             if ($p ne 'n') {
@@ -1403,7 +1460,7 @@ sub _parse_entity_declaration ($\$$$;%) {
         $self->_raise_error ($o, c => $e, type => 'SYNTAX_INVALID_MD', t => substr ($t, 0, 10))
           unless $t =~ s/^$xml_re{s}//s;
         if ($t =~ s/^($xml_re{__AttValue_simple})//s) {
-          $e->set_attribute (SYSTEM => $entMan->check_system_id
+          $e->set_attribute (SYSTEM => $opt{entMan}->check_system_id
                                                       ($o, substr ($1, 1, length ($1) - 2)));
         } else {	## TODO: error text
           $self->_raise_error ($o, c => $e, type => 'SYNTAX_MD_SYSID_NOT_FOUND',
@@ -1414,7 +1471,7 @@ sub _parse_entity_declaration ($\$$$;%) {
       } elsif ($p ne 'n' && $t =~ s/^($xml_re{__AttValue_simple})//s) {	## EntityValue (ENTITY only)
         ## TOTO: $o
         my $ev = $1; $ev = substr ($ev, 1, length ($ev) - 2);
-        $ev = $self->_parse_rpdata ($e->set_attribute ('value'), \$ev, $o);
+        $ev = $self->_parse_rpdata ($e->set_attribute ('value'), \$ev, $o, entMan => $opt{entMan});
         unless (defined $e->flag ('smxp__entity_replacement_text_rpdata')) {
           $e->flag (smxp__entity_replacement_text_rpdata => $ev);
         }
@@ -1847,18 +1904,11 @@ sub _make_clone_of ($$;%) {
   }
 }
 
-## [obsolete] [internal] Count up line/position
-## _count_lp ($string, $o)
-sub _count_lp ($$) {
-  my ($s, $o) = @_;
-  $s =~ s/[^\x0A\x0D]*(?:\x0D\x0A?|\x0A)/$o->{line}++;$o->{pos}=0;''/ges;
-  $o->{pos} += length $s;
-}
 ## [internal] Count up line/position
 ## $self->_clp ($string, $o)
 sub _clp ($$$) {
   my (undef, $s => $o) = @_;
-  $s =~ s/[^\x0A]*\x0A/$o->{line}++; $o->{pos} = 0; ''/ges;
+  $s =~ s/\G[^\x0A]*\x0A/($o->{line}++, $o->{pos} = 0, '')/ges;
   $o->{pos} += length $s;
 }
 
@@ -1956,4 +2006,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/13 22:35:00 $
+1; # $Date: 2003/09/14 01:09:36 $

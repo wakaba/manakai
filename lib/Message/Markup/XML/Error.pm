@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 our %NS;
 *NS = \%Message::Markup::XML::NS;
 
@@ -220,12 +220,40 @@ my %_Error = (
 		},
 		level	=> 'wfc',
 	},
+	SYNTAX_MD_COMMENT_COM_NOT_CLOSED	=> {
+		description	=> 'Comment must be terminated with com and mdc ("-->")',
+		level	=> 'wfc',
+	},
+	SYNTAX_MD_COMMENT_DECL_EMPTY	=> {
+		description	=> 'Empty comment declaration ("<!>") is not allowed in XML',
+		level	=> 'wfc',
+	},
+	SYNTAX_MD_COMMENT_DS	=> {
+		description	=> 'ds (whitespace) in comment declaration is not allowed in XML',
+		level	=> 'wfc',
+	},
+	SYNTAX_MD_COMMENT_MULTIPLE	=> {
+		description	=> 'Multiple comment is not allowed in XML',
+		level	=> 'wfc',
+	},
+	SYNTAX_MD_KWD_EXPECTED	=> {
+		description	=> 'Keyword, com ("--") or mso ("[") should follow the mdo ("<!%s")',
+		level	=> 'wfc',
+	},
 	SYNTAX_MD_NAME_NOT_FOUND	=> {
 		description	=> 'Name is required by this type of declaration',
 		level	=> 'wfc',
 	},
+	SYNTAX_MD_NOT_CLOSED	=> {
+		description	=> 'Markup declaration must be terminated with mdc (">")',
+		level	=> 'wfc',
+	},
 	SYNTAX_MD_SYSID_NOT_FOUND	=> {
 		description	=> 'System identifier is required by this type of declaration',
+		level	=> 'wfc',
+	},
+	SYNTAX_MD_UNKNOWN_KWD	=> {
+		description	=> 'Keyword of markup declaration ("%s") is not defined in XML',
 		level	=> 'wfc',
 	},
 	SYNTAX_MS_IN_INTERNAL_SUBSET	=> {
@@ -744,4 +772,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/13 09:04:02 $
+1; # $Date: 2003/09/14 01:09:36 $
