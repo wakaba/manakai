@@ -16,7 +16,9 @@ This module is part of SuikaWiki XML support.
 
 package SuikaWiki::Markup::XML::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our %NS;
+*NS = \%SuikaWiki::Markup::XML::NS;
 
 ## Prefixes:
 ## - 'SYNTAX_':	don't match with XML 1.0 EBNF rules
@@ -457,22 +459,168 @@ my %_Error = (
 		level	=> 'fatal',
 	},
 );
-## TODO: error handling should be customizable (hookable) by user of this module
+
 sub raise ($$%) {
-  my (undef, $o, %err) = @_;
+  my ($caller, $o, %err) = @_;
   my $error_type = $_Error{$err{type}} || $_Error{UNKNOWN};
   my $error_msg = ref $error_type->{description} ? &{$error_type->{description}} ($o, \%err)
                                                  : $error_type->{description};
   my @err_msg;
   ref $err{t} eq 'ARRAY' ? @err_msg = @{$err{t}} : defined $err{t} ? @err_msg = $err{t} : undef;
   $error_msg .= ' (%s)' if scalar (@err_msg) && ($error_msg !~ /%s/);
-  $error_msg = sprintf $error_msg, @err_msg;
-  $error_msg = "Line $o->{line}, position $o->{pos}: " . $error_msg;
-  $error_msg = 'Entity '.($err{entity}||$o->{entity}) . ": " . $error_msg if ($err{entity}||$o->{entity});
-  $error_msg = '<'.($o->{uri}) . ">: " . $error_msg ;#if defined $o->{uri};
+  $error_msg = sprintf 'Entity %s <%s>: line %d position %d: '.$error_msg,
+                       ($err{entity}||$o->{entity}||'#document'),
+                       $o->{uri}, $o->{line}, $o->{pos}, @err_msg;
+    my $resolver = $caller->option ('error_handler');
+    if (ref $resolver) {
+      $resolver = &$resolver ($caller, $o, $error_type, $error_msg);	## If returned false,
+      &_default_error_handler ($caller, $o, $error_type, $error_msg)
+        if $resolver;	## don't call this.
+    } else {
+      &_default_error_handler ($caller, $o, $error_type, $error_msg);
+    }
+}
+
+sub _default_error_handler ($$$$) {
+  my ($caller, $o, $error_type, $error_msg) = @_;
   require Carp;
-  Carp::carp ($error_msg);
-  #Carp::croak ("Line $o->{line}, position $o->{pos}: ".$error_msg);
+  if ({qw/fatal 1 wfc 1 nswfc 1/}->{$error_type->{level}}) {
+    Carp::croak ($error_msg);
+  } else {
+    Carp::carp ($error_msg);
+  }
+}
+
+=head1 ERROR REPORTING WITH NODE INFORMATION
+
+=over 4
+
+=item $err = SuikaWiki::Markup::XML::Error->new ({error definitions})
+
+Constructs new error reporting object.   Hash reference to error definition list (like %_Error
+defined in this module) must be specified as an argument.
+
+=cut
+
+sub new ($$) {
+  my $class = shift;
+  bless shift, $class;
+}
+
+=item $err->raise_error ($node, %detail)
+
+Raises an error (or a warning, if defined so)
+
+=cut
+
+sub raise_error ($$%) {
+  my ($self, $node, %err) = @_;
+  my $error_type = $self->{$err{type}} || $self->{UNKNOWN};
+  my $error_msg = ref $error_type->{description} ? &{$error_type->{description}} ($node, \%err)
+                                                 : $error_type->{description};
+  my @err_msg;
+  ref $err{t} eq 'ARRAY' ? @err_msg = @{$err{t}} : defined $err{t} ? @err_msg = $err{t} : undef;
+  $error_msg .= ' (%s)' if scalar (@err_msg) && ($error_msg !~ /%s/);
+  $error_msg = sprintf $error_msg, @err_msg;
+  $err{node_path} = $self->_get_node_path ($node) if $node;
+  
+  my $resolver = $self->{-error_handler};
+    if (ref $resolver) {
+      $resolver = &$resolver ($self, $node, $error_type, $error_msg, \%err);	## If returned false,
+      $self->_default_error_handler_2 ($node, $error_type, $error_msg, \%err)
+        if $resolver;	## don't call this.
+    } else {
+      $self->_default_error_handler ($node, $error_type, $error_msg, \%err);
+    }
+}
+
+sub _default_error_handler_2 ($$$$$) {
+  my ($self, $node, $error_type, $error_msg, $err) = @_;
+  require Carp;
+  $error_msg = $err->{node_path} . ': ' . $error_msg if $err->{node_path};
+  $error_msg = 'Document <'.$err->{uri}.'>: ' . $error_msg if $err->{uri};
+  if ({qw/fatal 1 nswfc 1/}->{$error_type->{level}}) {
+    Carp::croak ($error_msg);
+  } else {
+    Carp::carp ($error_msg);
+  }
+}
+
+sub _get_node_path ($$) {
+  my ($self, $node) = @_;
+  my $nn = '';
+  my $nt = $node->node_type;
+  my $nnsuri = $node->namespace_uri;
+  my $nlname = $node->local_name;
+  if ($nt eq '#element') {
+    $nn = $node->qname
+        . $self->_get_node_position ($node, namespace_uri => $nnsuri, local_name => $nlname,
+                                     type => $nt);
+  } elsif ($nt eq '#attribute') {
+    $nn = '@' . $node->qname;
+  } elsif ($nt eq '#text' || $nt eq '#comment') {
+    $nn = 'smxe:'.substr ($nt, 1) . '()' . $self->_get_node_position ($node, type => $nt);
+  } elsif ($nt eq '#pi') {
+    $nn = 'smxe:pi("' . $nlname . '")'
+        . $self->_get_node_position ($node, local_name => $nlname, type => $nt);
+  } elsif ($nt eq '#section') {
+    my $nstatus = $node->get_attribute ('status', make_new_node => 1)->inner_text||'INCLUDE';
+    $nn = 'smxe:section("'.$nstatus.'")'
+        . $self->_get_node_position ($node, status => $nstatus, type => $nt);
+  } elsif ($nt eq '#declaration') {
+    $nn = 'smxe:declaration('.
+          ({split /\s+/, qq/$NS{SGML}attlist          "ATTLIST"
+               $NS{SGML}doctype          "DOCTYPE"
+               $NS{SGML}element          "ELEMENT"
+               $NS{SGML}entity           "ENTITY"
+               $NS{SGML}notation         "NOTATION"/}->{$nnsuri}||'smxe:ns("'.$nnsuri.'")')
+          .')' . $self->_get_node_position ($node, namespace_uri => $nnsuri,
+                                            local_name => $nlname, type => $nt);
+  } elsif ($nt eq '#reference') {
+    $nn = 'smxe:ref('.
+          ({split /\s+/, qq/$NS{SGML}char:ref         "char"
+               $NS{SGML}char:ref:hex     "char"
+               $NS{SGML}entity           "general"
+               $NS{SGML}entity:parameter "parameter"/}->{$nnsuri}||'smxe:ns("'.$nnsuri.'")')
+          .($nlname ? ', "'.$nlname.'"':'')
+          .')' . $self->_get_node_position ($node, namespace_uri => $nnsuri,
+                                                   local_name => $nlname, type => $nt);
+  } elsif ($nt eq '#document') {
+    $nn = '/';
+  } elsif ($nt eq '#fragment') {
+    $nn = 'smxe:fragment()' . $self->_get_node_position ($node, type => $nt);
+  } elsif ($nt eq '#xml') {
+    $nn = 'smxe:xml()' . $self->_get_node_position ($node, type => $nt);
+  } else {
+    $nn = 'smxe:x-unknown("'.$nt.'")' . $self->_get_node_position ($node, type => $nt);
+  }
+  $nn = $self->_get_node_path ($node->parent_node) . '/' . $nn if $node->parent_node;
+  $nn = substr ($nn, 1) if substr ($nn, 0, 2) eq '//';
+  $nn;
+}
+
+sub _get_node_position ($$%) {
+  my ($self, $node, %prop) = @_;
+  my $node_str = overload::StrVal ($node);
+  if ($node->parent_node) {
+    my $i = 1;
+    for (@{$node->parent_node->child_nodes}) {
+      if ($node_str eq overload::StrVal ($_)) {
+        return '[smxe:position()='.$i.']';
+      } elsif (($prop{type} eq $_->node_type)
+          && (defined $prop{namespace_uri} ? ($prop{namespace_uri} eq $_->namespace_uri) : 1)
+          && (defined $prop{local_name} ? ($prop{local_name} eq $_->local_name) : 1)
+          && (defined $prop{status} ? ($prop{status} eq ($_->get_attribute
+                                       ('status', make_new_node => 1)->inner_text
+                                       || 'INCLUDE')) : 1)
+      ) {
+          $i++;
+      }
+    }
+    return '[smxe:error()]';
+  } else {
+    return '';
+  }
 }
 
 =head1 LICENSE
@@ -484,4 +632,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/06/30 11:06:28 $
+1; # $Date: 2003/07/05 07:25:50 $

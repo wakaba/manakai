@@ -17,7 +17,7 @@ markup constructures.  (SuikaWiki is not "tiny"?  Oh, yes, I see:-))
 
 package SuikaWiki::Markup::XML;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload '""' => \&outer_xml,
              fallback => 1;
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXML_NCNameStartChar InXMLNCNameChar!;
@@ -968,9 +968,9 @@ sub inner_xml ($;%) {
       #}
       }
     ## TODO: reform
-    } elsif ($self->{local_name} eq 'ATTLIST') {
-      if ($self->_check_name ($self->{target_name})) {
-        $r = $self->{target_name};
+    } elsif ($self->{namespace_uri} eq $NS{SGML}.'attlist') {
+      if ($self->_check_name ($self->{local_name})) {
+        $r = $self->{local_name};
       }
       my $t = $self->inner_text (output_ref_as_is => 1);
       $r .= "\n\t" . $t if $t;
@@ -1071,7 +1071,7 @@ sub outer_xml ($) {
         $r .= $c . $self->end_tag;
       }
       return $r;
-      #'{'.$self->{type}.': '.$r.'}';	## DEBUG: show structure
+      #return '{'.$self->{type}.': '.$r.'}';	## DEBUG: show structure
     }
   }
 }
@@ -1312,4 +1312,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/06/30 11:06:28 $
+1; # $Date: 2003/07/05 07:26:05 $

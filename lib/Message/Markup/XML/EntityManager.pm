@@ -21,13 +21,14 @@ This module is part of SuikaWiki XML support.
 
 package SuikaWiki::Markup::XML::EntityManager;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 our %NS;
 *NS = \%SuikaWiki::Markup::XML::NS;
 
 # $class->new ($yourself)
 sub new ($$) {
   my $self = bless {node => $_[1]}, $_[0];
+  return $self unless ref $self->{node};
   for (@{$self->{node}->{node}}) {
     if ($_->{type} eq '#declaration' && $_->{namespace_uri} eq $NS{SGML}.'doctype') {
       $self->{doctype} = $_;
@@ -37,6 +38,7 @@ sub new ($$) {
   $self;
 }
 
+sub set_root_node ($$) { $_[0]->{node} = $_[1] }
 sub set_doctype_node ($$) { $_[0]->{doctype} = $_[1] }
 
 sub is_declared_entity ($$;%) {
@@ -172,7 +174,7 @@ sub get_external_entity ($$$$) {
       $_->{uri} = $p->{uri};  $_->{line} = 0;  $_->{pos} = 0;
     }
   if ($name && !$p->{__flag}) {
-    my $resolver = $self->{node}->flag ('smxe__uri_resolver');
+    my $resolver = $parser->option ('uri_resolver');
     if (ref $resolver) {
       $resolver = &$resolver ($self, $parser, $decl, $p, $o);	## If returned false,
       $self->default_uri_resolver ($parser, $decl, $p, $o) if $resolver;	## don't call this.
@@ -194,15 +196,15 @@ sub get_external_entity ($$$$) {
 
 =cut
 
-sub default_uri_resolver ($$$) {
-  my ($self, $parser, $decl, $p, $o) = @_;
+sub default_uri_resolver ($$$$$;%) {
+  my ($self, $parser, $decl, $p, $o, %opt) = @_;
   require LWP::UserAgent;
   my $ua = LWP::UserAgent->new;
   $ua->agent ('"SuikaWiki::Markup::XML::EntityManager"/'.$VERSION);
   	## TODO: use Message::Field::UA
   my $req = HTTP::Request->new (GET => $p->{uri});
   my $res = $ua->request ($req);
-  if ($res->is_success) {
+  if ($res->is_success || $opt{accept_error_page}) {
     ## TODO: use Message::Entity for more intelligent/strict parsing:-)
     $p->{base_uri} = $res->base;	## See Content-Base: and Content-Location: (and HTML:BASE)
     $p->{uri} = $res->request->uri;  $o->{uri} = $p->{uri};	## Redirect support
@@ -214,7 +216,7 @@ sub default_uri_resolver ($$$) {
     #$p->{text} .= "<!--$p->{uri}-->";	## DEBUG: base URI
     ## Charset/encoding convertion
     my $encoding;
-    if ($CT =~ /charset\s*=\s*"?([^"]+)"?/i) {	## BUG: This check is not strict
+    if ($CT =~ /charset\s*=\s*"?([^",;\s]+)"?/i) {	## BUG: This check is not strict
       $encoding = lc $1;
     } else {	## No charset parameter
       if ($p->{uri}->scheme eq 'file') {
@@ -239,11 +241,14 @@ sub default_uri_resolver ($$$) {
       #$self->_raise_error ($o, type => 'WARN_NO_EXPLICIT_ENCODING_INFO');
     }
     ## parse and remove xml declaration
-    $p->{text_declaration} = ref ($decl)->new (type => '#pi', local_name => 'xml');
-    $parser->_parse_xml_or_text_declaration ($p->{text_declaration}, \$p->{text}, $o);
+    unless ($opt{dont_parse_text_declaration}) {
+      $p->{text_declaration} = (ref ($decl)||$decl)->new (type => '#pi', local_name => 'xml');
+      $parser->_parse_xml_or_text_declaration ($p->{text_declaration}, \$p->{text}, $o);
+    }
   } else {
     $p->{error}->{no_data} = 1;
     $p->{error}->{reason_text} = $res->status_line;
+    $p->{uri} = $res->request->uri;  $o->{uri} = $p->{uri};	## Redirect support
   }
 }
 
@@ -321,7 +326,7 @@ sub check_public_id ($$$) {
 
 sub check_system_id ($$$) {
   my ($self, $o, $sysid) = @_;
-  if ($sysid =~ m"([0-9A-Za-z_.!~*'();/?:\@&=+\$,%[]#-])"s) {
+  if ($sysid =~ m"([^0-9A-Za-z_.!~*'();/?:\@&=+\$,%\[\]#-])"s) {
     $self->_raise_error ($o, type => 'WARN_INVALID_URI_CHAR_IN_SYSID', t => $1);
   }
   if ($sysid =~ s/(#[^#]*)$//g) {
@@ -335,7 +340,7 @@ sub check_system_id ($$$) {
 
 sub check_ns_uri ($$$$) {	## TODO: check predefined NS
   my ($self, $o, $ns_pfx => $ns_name) = @_;
-  if ($ns_name =~ m"([0-9A-Za-z_.!~*'();/?:\@&=+\$,%[]#-])"s) {
+  if ($ns_name =~ m"([^0-9A-Za-z_.!~*'();/?:\@&=+\$,%\[\]#-])"s) {
     $self->_raise_error ($o, type => 'WARN_INVALID_URI_CHAR_IN_NS_NAME', t => $1);
   }
   if ($ns_name !~ /^[0-9A-Za-z.+-]+:/) {
@@ -460,6 +465,22 @@ sub _check_media_type ($$$) {
   }
 }
 
+sub option ($$;$) {
+  my ($self, $name, $value) = @_;
+  if (defined $value) {
+    $self->{option}->{$name} = $value;
+  }
+  $self->{option}->{$name};
+}
+
+sub flag ($$;$) {
+  my ($self, $name, $value) = @_;
+  if (defined $value) {
+    $self->{flag}->{$name} = $value;
+  }
+  $self->{flag}->{$name};
+}
+
 ## $self->_raise_error: Raising error or warn
 require SuikaWiki::Markup::XML::Error;
 *_raise_error = \&SuikaWiki::Markup::XML::Error::raise;
@@ -478,4 +499,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/06/30 11:06:28 $
+1; # $Date: 2003/07/05 07:25:50 $

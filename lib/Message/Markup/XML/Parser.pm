@@ -16,7 +16,7 @@ This module is part of SuikaWiki.
 
 package SuikaWiki::Markup::XML::Parser;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXMLChar
                         InXML_deprecated_noncharacter InXML_unicode_xml_not_suitable!;
 require SuikaWiki::Markup::XML;
@@ -232,20 +232,26 @@ $xml_re{__AttlistDecl_simple} = qr/<!ATTLIST(?:$xml_re{PEReference}|$xml_re{Name
 
 
 sub new ($;%) {
-  my $self = bless {}, shift;
-  $self->{_constructor_option} = {@_};
+  my $class = shift;
+  my $self = bless {@_}, $class;
   $self;
 }
 
-sub parse_text ($$;$) {
-  my ($self, $s, $o) = @_;
+sub parse_text ($$;$%) {
+  my ($self, $s, $o, %opt) = @_;
   $o ||= {line => 0, pos => 0, entity_type => 'document_entity',
-          uri => $self->{_constructor_option}->{uri}->{document_entity}};
+          uri => $self->{option}->{document_entity_uri}};
   my $r = SuikaWiki::Markup::XML->new (type => '#document');
-  $r->{flag} = $self->{_constructor_option}->{flag} || {};
-  $r->base_uri ($self->{_constructor_option}->{uri}->{base})
-    if defined $self->{_constructor_option}->{uri}->{base};
-  $r->flag (smxp__entity_manager => $r->_get_entity_manager);
+  $r->base_uri ($self->{option}->{document_entity_base_uri})
+    if defined $self->{option}->{document_entity_base_uri};
+  unless ($opt{entMan}) {
+    $opt{entMan} = $r->_get_entity_manager;
+    $opt{entMan}->option (uri_resolver => $self->{option}->{uri_resolver});
+    $opt{entMan}->option (error_handler => $self->{option}->{error_handler});
+  } else {
+    $opt{entMan}->set_root_node ($r);
+  }
+  $r->flag (smxp__entity_manager => $opt{entMan});
   
   ## Line-break normalization
   $s =~ s/\x0D\x0A/\x0A/g;
@@ -267,7 +273,7 @@ sub parse_text ($$;$) {
     }
     $self->_clp (__ => $o);
   }
-  $self->_parse_document_entity ($r, \$s, $o);
+  $self->_parse_document_entity ($r, \$s, $o, entMan => $opt{entMan});
   wantarray ? ($r, $o) : $r;
 }
 
@@ -1395,7 +1401,7 @@ sub _parse_xml_declaration ($$$$) {
   if ($stage == 0) {
     $self->_raise_error ($o, c => $attrs, type => 'SYNTAX_XML_DECLARE_NO_ATTR');
     $c->set_attribute (version => '1.0');
-  } elsif ($stage == 1 && substr ($o->{entity_type}, 'external') > -1) {
+  } elsif ($stage == 1 && index ($o->{entity_type}, 'external') > -1) {
     $self->_raise_error ($o, c => $attrs, type => 'SYNTAX_XML_DECLARE_NO_ENCODING_ATTR');
   }
 }
@@ -1572,12 +1578,12 @@ sub _parse_element_declaration ($$$$) {
 sub _parse_attlist_declaration ($$$$) {
     my ($self, $all, $c, $o) = (@_);
     my $e = undef;
-    $e = $c->append_new_node (type => '#declaration', local_name => 'ATTLIST');
+    $e = $c->append_new_node (type => '#declaration', namespace_uri => $NS{SGML}.'attlist');
     $all =~ s/^<!ATTLIST//s;
     _count_lp ('<!ATTLIST', $o);
     ## Element type name
     if ($all =~ s/^$xml_re{s}($xml_re{Name})//s) {
-      $e->target_name ($1);
+      $e->local_name ($1);
       _count_lp ($&, $o);
     }
     ## Definition
@@ -1661,6 +1667,23 @@ sub _ns_parse_qname ($$) {
   }
 }
 
+
+sub option ($$;$) {
+  my ($self, $name, $value) = @_;
+  if (defined $value) {
+    $self->{option}->{$name} = $value;
+  }
+  $self->{option}->{$name};
+}
+
+sub flag ($$;$) {
+  my ($self, $name, $value) = @_;
+  if (defined $value) {
+    $self->{flag}->{$name} = $value;
+  }
+  $self->{flag}->{$name};
+}
+
 =head1 LICENSE
 
 Copyright 2003 Wakaba <w@suika.fam.cx>
@@ -1670,4 +1693,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/06/30 11:06:28 $
+1; # $Date: 2003/07/05 07:25:50 $
