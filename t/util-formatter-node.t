@@ -75,7 +75,7 @@ sub replace_option () {
   };
 }
 
-sub rule_def {+{
+sub ___rule_def {+{
   foo => {
     main => sub {
       my ($f, $name, $p, $o) = @_;

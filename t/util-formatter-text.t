@@ -72,7 +72,7 @@ BEGIN {
 require Message::Util::Formatter::Text;
 our @ISA = q(Message::Util::Formatter::Text);
 }
-sub rule_def {+{
+sub ___rule_def {+{
   foo => {
     before => sub {
       my ($f, $name, $p, $o) = @_;

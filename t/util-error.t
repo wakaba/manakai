@@ -11,7 +11,7 @@ sub OK ($$) {
 }
 
 try {
-  throw Message::Util::Error type => 'SOMETHING_UNKNOWN';
+  throw Message::Util::Error -type => 'SOMETHING_UNKNOWN';
 } catch Message::Util::Error with {
   my $err = shift;
   OK $err->text, qq("SOMETHING_UNKNOWN": Unknown error);
@@ -25,7 +25,7 @@ try {
 OK 1, 1;
 
 try {
-  throw test_error type => 'ERR1', -param1 => 'VAL1', -param2 => 'VAL2';
+  throw test_error -type => 'ERR1', param1 => 'VAL1', param2 => 'VAL2';
 } catch test_error with {
   my $err = shift;
   OK $err->text, qq(Param1 "VAL1"; Param2 "VAL2");
@@ -35,7 +35,7 @@ package test_error;
 BEGIN {
 our @ISA = 'Message::Util::Error';
 }
-sub ___errors () {+{
+sub ___error_def () {+{
   ERR1 => {
     description => q(Param1 "%t(name=>param1);"; Param2 "%t(name=>param2);"),
   },
