@@ -1,3 +1,16 @@
+2003-04-29  Wakaba  <w@offweb.ddo.jp>
+
+	* XML.pm: Bug fixes.
+	(content_spec): New function.
+	(inner_xml#pi): If pi's content has '?>', replace to '? >'. (same behavior
+	as XSLT's.) (Was replaced to '?&gt;'.)
+	(#reference, #section): New support.
+	(#declaration): All XML's declarations are supported.
+	(inner_text%output_ref_as_is): New option.
+	(_check_name): New.
+	(flag): New.
+	(POD:NODE TYPES): New documentation.
+
 2003-04-27  Wakaba  <w@offweb.ddo.jp>
 
 	* ChangeLog: New file.

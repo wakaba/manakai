@@ -17,8 +17,9 @@ markup constructures.  (SuikaWiki is not "tiny"?  Oh, yes, I see:-))
 
 package SuikaWiki::Markup::XML;
 use strict;
-use overload '""' => \&stringify;
-use Char::Class::XML qw!InXML_NCNameStartChar InXMLNCNameChar!;
+use overload '""' => \&stringify,
+             fallback => 1;
+use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXML_NCNameStartChar InXMLNCNameChar!;
 our %Namespace_URI_to_prefix = (
 	'DAV:'	=> [qw/dav webdav/],
 	'http://greenbytes.de/2002/rfcedit'	=> [qw/ed/],
@@ -59,8 +60,7 @@ my %Cache;
 
 Returns new instance of the module.  It is itself a node.
 
-Available options: C<type> (default: C<#element>), C<local_name>, C<namespace_uri>,
-C<value>.
+Available options: C<data_type>, C<default_decl>, C<type> (default: C<#element>), C<local_name>, C<namespace_uri>, C<target_name> and C<value>.
 
 =cut
 
@@ -68,6 +68,11 @@ sub new ($;%) {
   my $class = shift;
   my $self = bless {@_}, $class;
   $self->{type} ||= '#element';
+  for (qw/target_name value/) {
+    if (ref $self->{$_}) {
+      $self->{$_}->{parent} = $self;
+    }
+  }
   $self->{node} ||= [];
   $self;
 }
@@ -82,12 +87,20 @@ itself, are appended.
 This method returns the appended node unless the type of given node is C<#fragment>.
 In such cases, this node (C<$x>) is returned.
 
+Available options: C<node_or_text>.
+
 =cut
 
-sub append_node ($$) {
+sub append_node ($$;%) {
   my $self = shift;
-  my $new_node = shift;
-  die "append_node: Invalid node" unless ref $new_node;
+  my ($new_node, %o) = @_;
+  unless (ref $new_node) {
+    if ($o{node_or_text}) {
+      return $self->append_text ($new_node);
+    } else {
+      die "append_node: Invalid node" unless ref $new_node;
+    }
+  }
   if ($new_node->{type} eq '#fragment') {
     for (@{$new_node->{node}}) {
       push @{$self->{node}}, $_;
@@ -132,6 +145,12 @@ sub append_text ($$;%) {
   #} else {
     $self->append_new_node (type => '#text', value => $s);
   #}
+}
+
+sub append_baretext ($$;%) {
+  my $self = shift;
+  my $s = shift;
+  $self->append_new_node (type => '#xml', value => $s);
 }
 
 =item $attr_node = $x->get_attribute ($local_name, %options)
@@ -210,7 +229,8 @@ Returns the number of child nodes.
 
 # TODO: support counting by type
 sub count ($;@) {
-  scalar @{shift->{node}};
+  my $self = shift;
+  (defined $self->{value} ? 1 : 0) + scalar @{$self->{node}};
 }
 
 # $prefix = $x->_get_namespace_prefix ($namespace_uri)
@@ -259,7 +279,8 @@ sub _prefix_to_uri ($$;$%) {
   if (uc (substr $prefix, 0, 3) eq 'XML') {
     return 'http://www.w3.org/XML/1998/namespace' if $prefix eq 'xml:';
     return 'http://www.w3.org/2000/xmlns/' if $prefix eq 'xmlns:';
-  } if (defined $self->{ns}->{$prefix}) {
+  }
+  if (defined $self->{ns}->{$prefix}) {
     $self->{ns}->{$prefix};
   } elsif (ref $self->{parent}) {
     shift;	# $self
@@ -283,7 +304,7 @@ sub _uri_to_prefix ($$;$%) {
       next if ($_ eq '') && !(!defined $o{use_no_prefix} || $o{use_no_prefix});
       return $_ if $self->{ns}->{$_} eq $uri;
     }
-    if (ref $self->{parent}) {
+    if (ref ($self->{parent}) && $self->{parent}->{type} ne '#declaration') {
       shift;	# $self
       $self->{parent}->_uri_to_prefix (@_);
     } else {
@@ -360,8 +381,28 @@ sub start_tag ($) {
     $r;
   } elsif ($self->{type} eq '#comment') {
     '<!-- ';
-  } elsif ($self->{type} eq '#pi' && $self->_check_ncname ($self->{local_name})) {
-    '<?' . $self->{local_name};
+  } elsif ($self->{type} eq '#pi' && $self->_check_ncname ($self->{target_name} || $self->{local_name})) {
+    '<?' . ($self->{target_name} || $self->{local_name});
+  } elsif ($self->{type} eq '#reference') {
+    if ($self->{namespace_uri} eq 'urn:x-suika-fam-cx:markup:sgml:char:ref:hex') {
+      '&#x';
+    } elsif ($self->{namespace_uri} eq 'urn:x-suika-fam-cx:markup:sgml:char:ref') {
+      '&#';
+    } elsif (ref $self->{target_name} && $self->{target_name}->{type} eq '#declaration') {
+      if ($self->{target_name}->{namespace_uri} eq 'urn:x-suika-fam-cx:markup:sgml:entity:parameter') {
+        '%';
+      } else {
+        '&';
+      }
+    } elsif ($self->_check_ncname ($self->{target_name} || $self->{local_name})) {
+      if ($self->{namespace_uri} eq 'urn:x-suika-fam-cx:markup:sgml:entity:parameter') {
+        '%';
+      } else {
+        '&';
+      }
+    } else {	# error
+      '';
+    }
   } elsif ($self->{type} eq '#declaration' && $self->_check_ncname ($self->{local_name})) {
     my $r = '<!' . $self->{local_name} . ' ';
     if ($self->{local_name} eq 'DOCTYPE' && ref $self->{parent}) {
@@ -373,7 +414,15 @@ sub start_tag ($) {
         }
       }
       $r .= ($qname ? $qname : '#IMPLIED') . ' ';
-      $r;
+    }
+    $r;
+  } elsif ($self->{type} eq '#section') {
+    if (ref $self->{local_name} && $self->{local_name}->{type} eq '#reference') {
+      '<![' . $self->{local_name} . '[';
+    } elsif ($self->_check_ncname ($self->{local_name})) {
+      '<![' . $self->{local_name} . '[';
+    } else {	# error
+      '';
     }
   } else {
     '';
@@ -395,9 +444,19 @@ sub end_tag ($) {
     ' -->';
   } elsif ($self->{type} eq '#pi' && $self->_check_ncname ($self->{local_name})) {
     '?>';
+  } elsif ($self->{type} eq '#reference') {
+    ';';
   } elsif ($self->{type} eq '#declaration' && $self->_check_ncname ($self->{local_name})) {
     my $r = '';
     $r .= '>';
+  } elsif ($self->{type} eq '#section') {
+    if (ref $self->{local_name} && $self->{local_name}->{type} eq '#reference') {
+      ']]>';
+    } elsif ($self->_check_ncname ($self->{local_name})) {
+      ']]>';
+    } else {	# error
+      '';
+    }
   } else {
     '';
   }
@@ -434,6 +493,10 @@ sub attribute_value ($) {
   if ($self->{type} eq '#attribute' && $self->_check_ncname ($self->{local_name})) {
     '"' . $self->_entitize ($self->inner_text) . '"';
   } elsif ($self->{type} eq '#pair' && $self->_check_ncname ($self->{local_name})) {
+    if (ref $self->{value} && $self->{value}->{type} eq '#declaration'
+     && $self->{value}->_check_ncname ($self->{value}->{target_name})) {
+      return $self->{value}->{target_name};
+    }
     my $t = $self->inner_text;
     if ($t =~ /"/) {
       if ($t =~ /'/) {
@@ -467,6 +530,61 @@ sub attribute ($) {
   }
 }
 
+sub external_id ($;%) {
+  my $self = shift;
+  my %o = @_;
+  my ($pubid, $sysid, $ndata);
+      for (@{$self->{node}}) {
+        if ($_->{type} eq '#pair') {
+          if ($_->{local_name} eq 'PUBLIC') {
+            $pubid = $_;
+          } elsif ($_->{local_name} eq 'SYSTEM') {
+            $sysid = $_;
+          } elsif ($_->{local_name} eq 'NDATA') {
+            $ndata = $_;
+          }
+        }
+      }
+      my $r = '';
+      if ($pubid && $sysid) {
+        $r = $pubid->attribute . ' ' . $sysid->attribute_value;
+      } elsif ($sysid) {
+        $r = $sysid->attribute;
+      } elsif ($pubid && $o{allow_pubid_only}) {
+        $r = $pubid->attribute;
+      }
+  if ($r && $ndata && $o{use_ndata}) {
+    $r .= ' ' . $ndata->attribute;
+  }
+  $r;
+}
+
+=item $s = $x->content_spec
+
+Generates contentspec of element type declaration (ex. C<(E1 | E2 | E3)>)
+or AttDef of attribute declaration (ex. C<name CDATA #REQUIRED>).
+
+=cut
+
+sub content_spec ($) {
+  my $self = shift;
+  if ($self->{type} eq '#element') {
+        my $text = 0;
+        my $contentspec = join ' | ', map {$_->qname} grep {$text = 1 if $_->{type} eq '#text'; $_->{type} eq '#element'} @{$self->{node}};
+        $contentspec = '#PCDATA' . ($contentspec ? ' | ' . $contentspec : '') if $text;
+        
+    return $contentspec ? '(' . $contentspec . ')' : 'EMPTY';
+  } elsif ($self->{type} eq '#attribute') {
+    my $attdef = $self->qname . "\t" . ($self->{data_type} || 'CDATA') . "\t";
+    my $default = $self->{default_decl};
+    $default .= ' ' . $self->attribute_value if $default eq '#FIXED';
+    unless ($default) {
+      $default = defined $self->{value} ? $self->attribute_value : '#IMPLIED';
+    }
+    return $attdef . $default;
+  }
+}
+
 =item $tag = $x->inner_xml
 
 Returns the content of the node in XML syntax.  (In case of the C<#element> nodes,
@@ -487,7 +605,7 @@ sub inner_xml ($) {
   } elsif ($self->{type} eq '#pi') {
     if (length $self->{value}) {
       $r = ' ' . $self->{value};
-      $r =~ s/\?>/?&gt;/g;
+      $r =~ s/\?>/? >/g;	# Same replacement as of the recommendation of XSLT:p.i.
     }
     for (@{$self->{node}}) {
       if ($_->node_type eq '#attribute') {
@@ -498,35 +616,91 @@ sub inner_xml ($) {
         $r .= ' ' . $s if length $s;
       }
     }
+  } elsif ($self->{type} eq '#reference') {
+    if ($self->{namespace_uri} eq 'urn:x-suika-fam-cx:markup:sgml:char:ref:hex') {
+      $r = sprintf '%02X', $self->{value};
+    } elsif ($self->{namespace_uri} eq 'urn:x-suika-fam-cx:markup:sgml:char:ref') {
+      $r = sprintf '%02d', $self->{value};
+    } elsif (ref $self->{target_name} && $self->{target_name}->{type} eq '#declaration') {
+      $r = $self->{target_name}->{target_name};
+    } elsif ($self->_check_ncname ($self->{target_name} || $self->{local_name})) {
+      $r = ($self->{target_name} || $self->{local_name});
+    } else {	# error
+      $r = '';
+    }
   } elsif ($self->{type} eq '#declaration') {
-    my ($isub, $pubid, $sysid) = ('');
-    for (@{$self->{node}}) {
-      if ($_->{type} eq '#pair') {
-        if ($_->{local_name} eq 'PUBLIC') {
-          $pubid = $_;
-        } elsif ($_->{local_name} eq 'SYSTEM') {
-          $sysid = $_;
+    if ($self->{local_name} eq 'DOCTYPE') {
+      my ($isub, $xid) = ('', $self->external_id);
+      for (@{$self->{node}}) {
+        $isub .= $_->outer_xml if $_->{type} ne '#pair';
+      }
+      if ($xid) {
+        $r = $xid;
+        if ($isub) {
+          $r .= " [\n" . $isub . "]";
         }
       } else {
-        $isub .= $_->outer_xml;
+        if ($isub) {
+          $r = "[\n" . $isub . "]";
+        } else {
+          $r = "[]";
+        }
       }
-    }
-    if ($sysid) {
-      if ($pubid) {
-        $r = $pubid->attribute . ' ' . $sysid->attribute_value;
+    } elsif ($self->{local_name} eq 'ENTITY' && $self->_check_ncname ($self->{target_name})) {
+      my $ndatable = 1;
+      $r = $self->{target_name} . ' ';
+      if ($self->{namespace_uri} eq 'urn:x-suika-fam-cx:markup:sgml:entity:parameter') {
+        $r = '% ' . $r;
+        $ndatable = 0;
+      }
+      my ($v, $xid) = ($self->{value}, $self->external_id (use_ndata => $ndatable));
+      if ($xid) {
+        $r .= $xid;
       } else {
-        $r = $sysid->attribute;
+        #$v = $self->_entitize ($v);
+        for (@{$self->{node}}) {
+          $v .= $_->outer_xml if $_->{type} ne '#pair';
+        }
+        $r .= '"' . $self->_entitize ($v) . '"';	# BUG: implement this correctly
       }
-      if ($isub) {
-        $r .= " [\n" . $isub . "\n]";
-      }
-    } else {
-      if ($isub) {
-        $r = "[\n" . $isub . "\n]";
+    } elsif ($self->{local_name} eq 'ELEMENT') {
+      if (ref $self->{node}->[0] && $self->{node}->[0]->{type} eq '#element') {
+      ## Element prototype is given
+        $r = $self->{node}->[0]->qname . ' ' . $self->{node}->[0]->content_spec;
+      } elsif ($self->_check_name ($self->{target_name})) {
+      ## Element type name and contentspec is given
+        $r = $self->{target_name} . ' ' . ($self->inner_text || 'ANY');
       } else {
-        $r = "[]";
+      ## (Element type name and contetnspac) is given
+        $r = $self->inner_text (output_ref_as_is => 1)
+          || 'Name ANY';	# error
       }
+    } elsif ($self->{local_name} eq 'ATTLIST') {
+      if ($self->_check_name ($self->{target_name})) {
+        $r = $self->{target_name};
+      }
+      my $t = $self->inner_text (output_ref_as_is => 1);
+      $r .= "\n\t" . $t if $t;
+      $r ||= 'Name';	# error!
+      for (@{$self->{node}}) {
+        if ($_->{type} eq '#attribute') {
+          $r .= "\n\t" . $_->content_spec;
+        }
+      }
+    } elsif ($self->{local_name} eq 'NOTATION' && $self->_check_ncname ($self->{target_name})) {
+      $r = $self->{target_name} . ' ';
+      my ($v, $xid) = ($self->{value}, $self->external_id (allow_pubid_only => 1));
+      if ($xid) {
+        $r .= $xid;
+      } else {
+        $r .= '""';
+      }
+    } else {	# unknown
+      $r = '""';
     }
+  } elsif ($self->{type} eq '#section' && !ref $self->{local_name} && $self->{local_name} eq 'CDATA') {
+    $r = $self->inner_text;
+    $r =~ s/]]>/]]>]]<![CDATA[>/g;
   } else {
     if ($self->{type} ne '#xml') {
       $r = $self->_entitize ($self->{value});
@@ -566,7 +740,10 @@ sub outer_xml ($) {
       $r .= $self->end_tag;
       $r;
     } else {
-      $self->start_tag . $self->inner_xml . $self->end_tag;
+      my $r = $self->start_tag . $self->inner_xml . $self->end_tag;
+      $r .= "\n" if $self->{type} eq '#declaration';
+      $r;
+      #'{'.$self->{type}.': '.$r.'}';	# for debug
     }
   }
 }
@@ -578,13 +755,27 @@ as WinIE DOM C<inner_text ()> function's or XPath C<text()> function's.
 But some classes that inherits this module might implement to return other
 value (eg. to return the value of the alt attribute of html:img element).
 
+Available options: C<output_ref_as_is>.
+
 =cut
 
-sub inner_text ($) {
+sub inner_text ($;%) {
   my $self = shift;
+  my %o = @_;
   my $r = $self->{value};
-  for (@{$self->{node}}) {
-    $r .= $_->inner_text unless $_->node_type eq '#attribute';
+  if ($o{output_ref_as_is}) {	## output as if RCDATA
+    for (@{$self->{node}}) {
+      my $nt = $_->node_type;
+      if ($nt eq '#reference') {
+        $r .= $_->outer_xml;
+      } elsif ($nt ne '#attribute') {
+        $r .= map {s/&/&amp;/g; $_} $_->inner_text;
+      }
+    }
+  } else {
+    for (@{$self->{node}}) {
+      $r .= $_->inner_text unless $_->node_type eq '#attribute';
+    }
   }
   $r;
 }
@@ -603,6 +794,20 @@ sub _entitize ($$) {
   $s;
 }
 
+# 1/0 = $x->_check_name ($s)
+sub _check_name ($$) {
+  my $self = shift;
+  my $s = shift;
+  return $Cache{name}->{$s} if defined $Cache{name}->{$s};
+  if ($s =~ /^\p{InXML_NameStartChar}/ && $s !~ /\P{InXMLNameChar}/) {
+  # \p{...}('*'/'+'/'{n,}') does not work...
+    $Cache{name}->{$s} = 1;
+    1;
+  } else {
+    $Cache{name}->{$s} = 0;
+    0;
+  }
+}
 # 1/0 = $x->_check_ncname ($s)
 sub _check_ncname ($$) {
   my $self = shift;
@@ -628,7 +833,73 @@ sub _check_namespace_prefix ($$) {
   $self->_check_ncname ($s);
 }
 
+## TODO: cleaning $self->{node} before outputing, to ensure nodes not to have
+## multiple parents.
+## TODO: normalize namespace URI (removing non URI chars)
+
+sub flag ($$;$) {
+  my ($self, $name, $value) = @_;
+  if (defined $value) {
+    $self->{flag}->{$name} = $value;
+  }
+  $self->{flag}->{$name};
+}
+
 =back
+
+=head1 NODE TYPES
+
+=over 4 
+
+=item #attribute
+
+Attribute.  Its XML representation takes the form of NAME="VALUE".
+
+=item #comment
+
+Comment declarement. <!-- -->
+
+=item #declarement
+
+SGML's declarements, such as SGML, DOCTYPE, ENTITY, etc.
+<!SGML ...>, <!DOCTYPE root []>, <!ENTITY % name "value">
+
+=item #element
+
+Element.  Its XML representation consists of start tag, content and end tag,
+like <TYPE>content</TYPE>.
+
+=item #fragment
+
+Fragment of nodes.  It's similar to DOM's fragment node.
+
+=item #pair
+
+A name-value pair.
+
+=item #pi
+
+Prosessing instruction. <?NAME VALUE?>
+
+=item #reference
+
+Character reference or general or parameter entity reference.
+&#nnnn;, &#xhhhh;, &name;, %name;.
+
+=item #section
+
+Markup section.  CDATA, INCLUDE and IGNORE are supported by XML.
+<![%type;[...]]>
+
+=item #text
+
+Text.
+
+=item #xml
+
+Preformatted XML text.
+
+=cut
 
 =head1 LICENSE
 
@@ -639,4 +910,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/04/27 11:45:59 $
+1; # $Date: 2003/04/29 10:35:53 $
