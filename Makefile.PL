@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile (
     NAME         => 'manakai',
     DISTNAME     => 'manakai',      
-    VERSION_FROM => 'Message/Entity.pm',
+    VERSION_FROM => 'lib/Message/Entity.pm',
     PREREQ_PM    => {
                      'Carp' => 0,
                     },

@@ -21,7 +21,7 @@ This module is part of XML.
 
 package Message::Markup::XML::EntityManager;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 our %NS;
 *NS = \%Message::Markup::XML::NS;
 
@@ -199,21 +199,27 @@ sub get_attr_definitions ($%) {
 }
 
 ## TODO: uri based recursion
-sub get_external_entity ($$$$) {
-  my ($self, $parser, $decl, $o) = @_;
-  my $declns = $decl->namespace_uri;
-  my $name = $declns eq $NS{SGML}.'doctype' ?
+sub get_external_entity ($$$$;%) {
+  my ($self, $parser, $decl, $o, %opt) = @_;
+  my $declns = ref $decl ? $decl->namespace_uri : '#document';
+  my $name = ref $decl ?
+    ($declns eq $NS{SGML}.'doctype' ?
              ($decl->get_attribute ('qname', make_new_node => 1)->inner_text
               || '#IMPLIED') :
-             $decl->local_name;
+             $decl->local_name) :
+    $opt{uri};
   my $p = $self->{external_entity_cache}->{$declns}->{$name};
   if ($name && !$p) {
     $p = {name => $name};  $self->{external_entity_cache}->{$declns}->{$name} = $p;
-    for (qw/PUBLIC SYSTEM NDATA/) {
-      $p->{$_} = $decl->get_attribute ($_);
-      $p->{$_} = ref $p->{$_} ? $p->{$_}->inner_text : undef;
+    if (ref $decl) {
+      for (qw/PUBLIC SYSTEM NDATA/) {
+        $p->{$_} = ref $decl ? $decl->get_attribute ($_) : $opt{$_};
+        $p->{$_} = ref $p->{$_} ? $p->{$_}->inner_text : undef;
+      }
+      $p->{uri} = $decl->resolve_relative_uri ($p->{SYSTEM}, use_references_base_uri => 1);
+    } else {
+      $p->{uri} = $opt{uri};
     }
-    $p->{uri} = $decl->resolve_relative_uri ($p->{SYSTEM}, use_references_base_uri => 1);
   }
     for ($o) {
       $_->{entity_type} ||= 'external_parsed_entity';
@@ -222,10 +228,10 @@ sub get_external_entity ($$$$) {
   if ($name && !$p->{__flag}) {
     my $resolver = $parser->option ('uri_resolver');
     if (ref $resolver) {
-      $resolver = &$resolver ($self, $parser, $decl, $p, $o);	## If returned false,
-      $self->default_uri_resolver ($parser, $decl, $p, $o) if $resolver;	## don't call this.
+      $resolver = &$resolver ($self, $parser, $decl, $p, $o, %opt);	## If returned false,
+      $self->default_uri_resolver ($parser, $decl, $p, $o, %opt) if $resolver;	## don't call this.
     } else {
-      $self->default_uri_resolver ($parser, $decl, $p, $o);
+      $self->default_uri_resolver ($parser, $decl, $p, $o, %opt);
     }
     ## Line-break normalization
     $p->{text} =~ s/\x0D\x0A/\x0A/gs;
@@ -237,7 +243,7 @@ sub get_external_entity ($$$$) {
 
 =pod example
 
- my $parser = Message::Markup::XML::Parser->new (flag => {smxe__uri_resolver => sub {
+ my $parser = Message::Markup::XML::Parser->new (option => {uri_resolver => sub {
  	my ($self, $decl, $p) = @_;
  	@@ $p->{SYSTEM} =~ s///g @@
  	return 1;
@@ -551,4 +557,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/17 09:17:13 $
+1; # $Date: 2003/09/27 07:59:11 $

@@ -17,7 +17,7 @@ markup constructures.  (SuikaWiki is not "tiny"?  Oh, yes, I see:-))
 
 package Message::Markup::XML;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.20 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload '""' => \&outer_xml,
              fallback => 1;
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXML_NCNameStartChar InXMLNCNameChar!;
@@ -55,6 +55,7 @@ my %Cache;
 our %NS = (
 	SGML	=> 'urn:x-suika-fam-cx:markup:sgml:',
 	XML	=> 'urn:x-suika-fam-cx:markup:xml:',
+        default_base_uri => q<about:unknown>,
 	internal_attr_duplicate	=> 'http://suika.fam.cx/~wakaba/-temp/2003/05/17/invalid-attr#',
 	internal_invalid_sysid	=> 'http://system.identifier.invalid/',
 	internal_ns_invalid	=> 'http://suika.fam.cx/~wakaba/-temp/2003/05/17/unknown-namespace#',
@@ -572,7 +573,7 @@ sub resolve_relative_uri ($;$%) {
   require URI;
   my ($self, $rel, %o) = @_;
   my $base = $self->get_attribute ('base', namespace_uri => $NS{xml});
-  $base = ref ($base) ? $base->inner_text : undef;
+  $base = ref ($base) ? $base->inner_text : $NS{default_base_uri};
   if ($base !~ /^(?:[0-9A-Za-z.+-]|%[0-9A-Fa-f]{2})+:/) {	# $base is relative
     $base = $self->_resolve_relative_uri_by_parent ($base, \%o);
   }
@@ -1411,4 +1412,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/14 01:09:36 $
+1; # $Date: 2003/09/27 07:59:11 $

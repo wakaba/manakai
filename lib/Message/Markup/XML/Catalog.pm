@@ -14,7 +14,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Catalog;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Markup::XML;
 require URI;
 our %NS = (
@@ -250,7 +250,8 @@ sub resolve_external_id ($$%) {
   ## Step 9 or Step 6
   return (defined $xid->{system} ? $xid->{system}
         : defined $xid->{uri}    ? $xid->{uri}
-        : $self->_pubid_to_urn ($xid->{public})) if $opt{return_default};
+        : defined $xid->{public} ? $self->_pubid_to_urn ($xid->{public})
+        : undef) if $opt{return_default};
   return undef;
 }
 
@@ -568,4 +569,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/07 03:09:18 $
+1; # $Date: 2003/09/27 07:59:11 $

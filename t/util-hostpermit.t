@@ -39,53 +39,52 @@ my @test = (
               ok $checker->match_ipv4 ('1.1.1.1', v1.1.1.1);
               ok $checker->match_ipv4 (v1.1.1.1, v1.1.1.1);
               
-              ok $checker->match_ipv4 ('1.1.1.1/3', '1.1.1.1');
-              ok !$checker->match_ipv4 ('1.1.1.1/3', '1.1.1.45');
-              ok $checker->match_ipv4 ('1.1.1.1/3', '1.1.1.0');
-              ok $checker->match_ipv4 ('1.1.1.1/3', '1.1.1.7');
-              ok !$checker->match_ipv4 ('1.1.1.1/3', '1.1.1.8');
-              ok !$checker->match_ipv4 ('1.1.1.1/3', '1.1.32.0');
-              ok !$checker->match_ipv4 ('1.1.1.1/3', '1.43.32.0');
-              ok !$checker->match_ipv4 ('1.1.1.1/3', '41.153.32.0');
-              ok $checker->match_ipv4 ('1.1.1.1/8', '1.1.1.1');
-              ok $checker->match_ipv4 ('1.1.1.1/8', '1.1.1.45');
-              ok $checker->match_ipv4 ('1.1.1.1/8', '1.1.1.0');
-              ok !$checker->match_ipv4 ('1.1.1.1/8', '1.1.32.0');
-              ok !$checker->match_ipv4 ('1.1.1.1/8', '1.43.32.0');
-              ok !$checker->match_ipv4 ('1.1.1.1/8', '41.153.32.0');
-              ok $checker->match_ipv4 ('1.1.1.1/13', '1.1.1.1');
-              ok $checker->match_ipv4 ('1.1.1.1/13', '1.1.1.45');
-              ok $checker->match_ipv4 ('1.1.1.1/13', '1.1.1.0');
-              ok $checker->match_ipv4 ('1.1.1.1/13', '1.1.13.0');
-              ok $checker->match_ipv4 ('1.1.1.1/13', '1.1.21.0');
-              ok $checker->match_ipv4 ('1.1.1.1/13', '1.1.31.0');
-              ok !$checker->match_ipv4 ('1.1.1.1/13', '1.1.32.0');
-              ok !$checker->match_ipv4 ('1.1.1.1/13', '1.43.32.0');
-              ok !$checker->match_ipv4 ('1.1.1.1/13', '41.153.32.0'); 
+              ok $checker->match_ipv4 ('1.1.1.1/29', '1.1.1.1');
+              ok !$checker->match_ipv4 ('1.1.1.1/29', '1.1.1.45');
+              ok $checker->match_ipv4 ('1.1.1.1/29', '1.1.1.0');
+              ok $checker->match_ipv4 ('1.1.1.1/29', '1.1.1.7');
+              ok !$checker->match_ipv4 ('1.1.1.1/29', '1.1.1.8');
+              ok !$checker->match_ipv4 ('1.1.1.1/29', '1.1.32.0');
+              ok !$checker->match_ipv4 ('1.1.1.1/29', '1.43.32.0');
+              ok !$checker->match_ipv4 ('1.1.1.1/29', '41.153.32.0');
+              ok $checker->match_ipv4 ('1.1.1.1/24', '1.1.1.1');
+              ok $checker->match_ipv4 ('1.1.1.1/24', '1.1.1.45');
+              ok $checker->match_ipv4 ('1.1.1.1/24', '1.1.1.0');
+              ok !$checker->match_ipv4 ('1.1.1.1/24', '1.1.32.0');
+              ok !$checker->match_ipv4 ('1.1.1.1/24', '1.43.32.0');
+              ok !$checker->match_ipv4 ('1.1.1.1/24', '41.153.32.0');
+              ok $checker->match_ipv4 ('1.1.1.1/19', '1.1.1.1');
+              ok $checker->match_ipv4 ('1.1.1.1/19', '1.1.1.45');
+              ok $checker->match_ipv4 ('1.1.1.1/19', '1.1.1.0');
+              ok $checker->match_ipv4 ('1.1.1.1/19', '1.1.13.0');
+              ok $checker->match_ipv4 ('1.1.1.1/19', '1.1.21.0');
+              ok $checker->match_ipv4 ('1.1.1.1/19', '1.1.31.0');
+              ok !$checker->match_ipv4 ('1.1.1.1/19', '1.1.32.0');
+              ok !$checker->match_ipv4 ('1.1.1.1/19', '1.43.32.0');
+              ok !$checker->match_ipv4 ('1.1.1.1/19', '41.153.32.0'); 
               ok $checker->match_ipv4 ('1.1.1.1/16', '1.1.1.1');
               ok $checker->match_ipv4 ('1.1.1.1/16', '1.1.1.45');
               ok $checker->match_ipv4 ('1.1.1.1/16', '1.1.32.0');
               ok !$checker->match_ipv4 ('1.1.1.1/16', '1.43.32.0');
               ok !$checker->match_ipv4 ('1.1.1.1/16', '41.153.32.0');
-              ok $checker->match_ipv4 ('1.1.1.1/24', '1.1.1.1');
-              ok $checker->match_ipv4 ('1.1.1.1/24', '1.1.1.45');
-              ok $checker->match_ipv4 ('1.1.1.1/24', '1.1.32.0');
-              ok $checker->match_ipv4 ('1.1.1.1/24', '1.153.32.0');
-              ok !$checker->match_ipv4 ('1.1.1.1/24', '41.153.32.0');
-              ok $checker->match_ipv4 ('1.1.1.1/32', '1.1.1.1');
-              ok $checker->match_ipv4 ('1.1.1.1/32', '1.1.1.0');
-              ok $checker->match_ipv4 ('1.1.1.1/32', '123.43.56.23');
+              ok $checker->match_ipv4 ('1.1.1.1/8', '1.1.1.1');
+              ok $checker->match_ipv4 ('1.1.1.1/8', '1.1.1.45');
+              ok $checker->match_ipv4 ('1.1.1.1/8', '1.1.32.0');
+              ok $checker->match_ipv4 ('1.1.1.1/8', '1.153.32.0');
+              ok !$checker->match_ipv4 ('1.1.1.1/8', '41.153.32.0');
+              ok $checker->match_ipv4 ('1.1.1.1/0', '1.1.1.1');
+              ok $checker->match_ipv4 ('1.1.1.1/0', '1.1.1.0');
+              ok $checker->match_ipv4 ('1.1.1.1/0', '123.43.56.23');
               
-              ok !$checker->match_ipv4 (v1.1.1.1, v1.1.1455.1), 'invalid addr';
-              ok !$checker->match_ipv4 (v1.1.1.1, '1.1.1455.1'), 'invalid addr';
-              ok $checker->match_ipv4 (v1.1.1455.1, v1.1.1.1), 'invalid pattern';
-              ok $checker->match_ipv4 ('1.1.1455.1', v1.1.1.1), 'invalid pattern';
-              ok !$checker->match_ipv4 ('123', '44.44.3.2'), 'invalid pattern';
-              ok !$checker->match_ipv4 ('*.12.3.1', '5.4.3.2'), 'invalid pattern';
-              ok !$checker->match_ipv4 ('12.3/32', '5.4.3.2'), 'invalid pattern';
-              ok $checker->match_ipv4 (v1.1.1.1, '12.3.3'), 'invalid addr';
-              ok $checker->match_ipv4 (v1.1.1.1, '1.1.1.1/31'), 'invalid addr';
-              ok $checker->match_ipv4 ('1.1.1.1/39', '1.1.1.0'), 'invalid pattern';
+              ok do {$checker->match_ipv4 (v1.1.1.1, v1.1.1455.1); 1}, 'invalid addr';
+              ok do {$checker->match_ipv4 (v1.1.1.1, '1.1.1455.1'); 1}, 'invalid addr';
+              ok do {$checker->match_ipv4 (v1.1.1455.1, v1.1.1.1); 1}, 'invalid pattern';
+              ok do {$checker->match_ipv4 ('1.1.1455.1', v1.1.1.1); 1}, 'invalid pattern';
+              ok do {$checker->match_ipv4 ('123', '44.44.3.2'); 1}, 'invalid pattern';
+              ok do {$checker->match_ipv4 ('*.12.3.1', '5.4.3.2'); 1}, 'invalid pattern';
+              ok do {$checker->match_ipv4 ('12.3/32', '5.4.3.2'); 1}, 'invalid pattern';
+              ok do {$checker->match_ipv4 (v1.1.1.1, '12.3.3'); 1}, 'invalid addr';
+              ok do {$checker->match_ipv4 ('1.1.1.1/39', '1.1.1.0'); 1}, 'invalid pattern';
               
             },2..49,
             sub {
@@ -98,9 +97,10 @@ my @test = (
 Deny host=example.org
 Allow host=example.net
 Allow ipv4=12.34.5.6
+Allow host=www.example.com port=80
 Deny host=*
-Deny ipv4=0.0.0.0/32
-Deny ipv6=0::0/128");
+Deny ipv4=0.0.0.0/0
+Deny ipv6=0::0/0");
               ok $checker->check ('example.com');
               ok !$checker->check ('example.org');
               ok $checker->check ('example.net');
@@ -114,8 +114,11 @@ Deny ipv6=0::0/128");
               ok !$checker->check ('0::2');
               
               ok $checker->check ('example.com', 80);
+              ok $checker->check ('example.net', 80);
               ok !$checker->check ('example.org', 80);
-            },2,3,4,5,6,7,8,9,10,11,12,
+              ok $checker->check ('www.example.com', 80);
+              ok !$checker->check ('www.example.com', 8080);
+            },2..15,
            );
 
 Test::Simple->import (tests => scalar @test);
@@ -134,6 +137,6 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/17 02:34:18 $
+1; # $Date: 2003/09/27 07:59:11 $
 
 

@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXMLChar
                         InXML_deprecated_noncharacter InXML_unicode_xml_not_suitable!;
 require Message::Markup::XML;
@@ -939,7 +939,7 @@ sub _parse_attr_value_literal_data ($$$$;%) {
                            namespace_uri => $NS{SGML}.'char:ref'.(defined $1?':hex':''));
       $rt .= $char;
     } elsif ($$s =~ s/^&($xml_re{Name});//) {
-      my ($ename, $entity_ref) = ($1, '%'.$1.';');
+      my ($ename, $entity_ref) = ($1, '&'.$1.';');
       $self->_raise_error ($o, c => $c, type => 'NS_SYNTAX_NAME_IS_NCNAME', t => $ename)
         if index ($ename, ':') > -1;
       my $eref_node = $c->append_new_node (type => '#reference', local_name => $ename,
@@ -2008,4 +2008,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/17 09:17:13 $
+1; # $Date: 2003/09/27 07:59:11 $

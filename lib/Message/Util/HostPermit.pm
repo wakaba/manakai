@@ -11,7 +11,7 @@ This module is part of manakai.
 
 package Message::Util::HostPermit;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 =head1 METHODS
 
@@ -69,7 +69,7 @@ sub check ($$;$) {
       }
     }
   }
-  return 1;
+  return 0;
 }
 
 sub match_host ($$$) {
@@ -97,17 +97,21 @@ sub match_ipv4 ($$$) {
     $addr =~ /([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)/;
     $addr = pack 'C4', $1, $2, $3, $4;
   }
+  my $mask = pack 'C4', 255, 255, 255, 255;
   if (length ($pattern) != 4) {
     $pattern =~ m!([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)(?:/([0-9]+))?!;
     $pattern = pack 'C4', $1, $2, $3, $4;
-    my $m = $5; $m %= 33;
-    my $mask = pack 'C4', (($m > 24) ? (2**($m-24)-1, 255, 255, 255) :
-                           ($m > 16) ? (0, 2**($m-16)-1, 255, 255) :
-                           ($m >  8) ? (0, 0, 2**($m-8)-1, 255) :
-                                       (0, 0, 0, 2**$m));
-    $pattern |= $mask;
+    my $m = $5; $m = 32 if $m > 32;
+    if (defined $m) {
+      $mask = pack 'C4', (($m > 24) ? (255, 255, 255, (2**($m-24)-1) << (32-$m)) :
+                          ($m > 16) ? (255, 255, (2**($m-16)-1) << (24-$m), 0) :
+                          ($m >  8) ? (255, (2**($m-8)-1) << (16-$m), 0, 0) :
+                                      ((2**$m-1) << (8-$m), 0, 0, 0));
+    }
+    $pattern &= $mask;
+    #printf '[%vd] %vd (%s) %vd (%vd) %d', $mask, $pattern, $_[1], ($addr & $mask), $addr, (($addr & $mask) eq $pattern);
   }
-  return (($addr & $pattern) eq $addr) ? 1 : 0;
+  return (($addr & $mask) eq $pattern) ? 1 : 0;
 }
 
 ## TODO: IPv6 support
@@ -124,4 +128,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/17 02:34:32 $
+1; # $Date: 2003/09/27 07:59:11 $
