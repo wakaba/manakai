@@ -4,6 +4,7 @@ use Message::Util::QName::Filter {
   DIS => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#>,
   dis => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis-->,
   ManakaiDOM => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#>,
+  swcfg21 => q<http://suika.fam.cx/~wakaba/archive/2005/swcfg21#>,
 };
 
 use Getopt::Long;
@@ -46,8 +47,7 @@ my $parser = $impl->create_dis_parser;
 my $db;
 
 if (defined $Opt{input_file_name}) {
-  $db = retrieve ($Opt{input_file_name})
-     or die "$0: $Opt{input_file_name}: Cannot load";
+  $db = $impl->pl_load_dis_database ($Opt{input_file_name});
 } else {  ## New database
   $db = $impl->create_dis_database;
 }
@@ -60,6 +60,7 @@ $doc->dis_database ($db);
 
 my $for = $Opt{for};
 $for = $doc->module_element->default_for_uri unless length $for;
+$db->get_for ($for)->is_referred ($doc);
 print STDERR qq<Loading definition of "$file_name" for <$for>...\n>;
 
 $db->load_module ($doc, sub ($$$$$$) {
@@ -87,13 +88,14 @@ $db->load_module ($doc, sub ($$$$$$) {
   return undef;
 }, for_arg => $for);
 
-#$State->{def_required}->{For}->{$State->{DefaultFor}} ||= 1;
-#dis_check_undef_type_and_for () unless $Opt{no_undef_check};
+
+$db->check_undefined_resource unless $Opt{no_undef_check};
+
 #if (dis_uri_for_match (ExpandedURI q<ManakaiDOM:Perl>, $State->{DefaultFor})) {
 #  dis_perl_init ($source, For => $State->{DefaultFor});
 #}
 
-nstore $db, $Opt{output_file_name};
+$db->pl_store ($Opt{output_file_name});
 exit;
 
 ## (db, parser, abs file path, abs base path) -> dis doc obj
@@ -109,6 +111,7 @@ sub dac_load_module_file ($$$;$) {
     open my $file, '<', $file_name or die "$0: $file_name: $!";
     $dis = $parser->parse ({character_stream => $file});
     $db->set_source_file ($file_uri => $dis);
+    $dis->flag (ExpandedURI q<swcfg21:fileName> => $file_uri);
     print STDERR qq<done\n>;
   }
   $dis;

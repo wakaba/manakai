@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/03/03 11:19:07 $
+      $Date: 2005/03/04 12:18:52 $
     @@ContentType:
       dis:Date.RCS
   
@@ -217,6 +217,8 @@ ClsDef:
             }, <ClassName::ManakaiDISForDefinition>),
           },
           resDef => {},
+          modDef => {},
+          seq => 0,
         }, <ClassName::ManakaiDISDatabase>;
 
   @Method:
@@ -370,8 +372,57 @@ ClsDef:
         $r =~ s/([A-Z0-9])([A-Z0-9]*)([A-Z0-9])/$1.lc ($2)."_".lc $3/ge;
         $r =~ s/([A-Z])/"_".lc $1/ge;
         $r =~ s/(?=[0-9](?!$))/_/g;
-  
+
+  @Method:
+    @@Name: plLoadDISDatabase
+    @@enDesc:
+      Loads a database from a file that was saved by 
+      <M::ManakaiDISDatabase.plStore>. 
+      \
+      {NOTE:: <QUOTE::dis> documents restored from external file
+              would have different <A::ManakaiDISDocument.implementation> 
+              than this <Class::ManakaiDISImplementation>, even if 
+              it has been created by this implementation
+              and stored in the same session. 
+      \
+      }
+    @@Param:
+      @@@Name:fileName
+      @@@Type: 
+        DISLang:String
+      @@@enDesc:
+        An environment-dependent file name. 
+    @@Return:
+      @@@Type: ManakaiDISDatabase
+      @@@SimpleException:
+      @@@PerlDef:
+        use Storable qw/retrieve/;
+        local $Carp::CarpLevel = $Carp::CarpLevel + 1;
+        $r = retrieve $fileName;
+
+        ## Restores weak references
+        require Scalar::Util;
+        for my $doc (values %{$r->{<Q::DIS:sourceFile>}}) {
+          Scalar::Util::weaken ($doc->{<Q::TreeCore:node>}->{<Q::DIS:db>});
+        }
+        for my $def (values %{$r->{modDef}},
+                     values %{$r->{forDef}},
+                     values %{$r->{resDef}}) {
+          Scalar::Util::weaken ($def->{db});
+        }
 ##DISImplementation
+
+ElementTypeBinding:
+  @Name: SimpleException
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+    @@@:
+      - Exception of type <PerlModule::Error::Simple>::: 
+             I/O error or other error reported by <PerlModule::Storable>. 
+
+## TODO: Formal description required for simple exception
 
 ClsDef:
   @ClsQName: ManakaiDISParser
@@ -787,15 +838,15 @@ ClsDef:
               my $et = $ce-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
                                                       .expandedURI>;
               if ($et eq <Q::dis:ForCheck>) {
-                my $for = [split /\s+/, $ce-><AG::swcfg21:SWCFGNode
-                                                ::swcfg21:ForLatest.value>];
-                FCs: for my $f (@$for) {
+                my $fors = [split /\s+/, $ce-><AG::swcfg21:SWCFGNode
+                                                 ::swcfg21:ForLatest.value>];
+                FCs: for my $f (@$fors) {
                   if ($f =~ /^!=(.+)$/) {        ## -- NOT EQUAL TO
                     my $uri = $self-><AG::ManakaiDISElement.qnameToURI> ($1);
-                    my $f = $self-><AG::ManakaiDISNode.ownerDISDocument>
-                                 -><AG::ManakaiDISDocument.disDatabase>
-                                 -><M::ManakaiDISDatabase.getFor> ($uri);
-                    $f-><AG::ManakaiDISForDefinition.isReferred> ($ce);
+                    my $for = $self-><AG::ManakaiDISNode.ownerDISDocument>
+                                   -><AG::ManakaiDISDocument.disDatabase>
+                                   -><M::ManakaiDISDatabase.getFor> ($uri);
+                    $for-><AG::ManakaiDISForDefinition.isReferred> ($ce);
                     for my $arg_uri ($forArg, @{$forpArg}) {
                       if ($uri eq $arg_uri) {
                         $r = false;
@@ -804,22 +855,22 @@ ClsDef:
                     }
                   } elsif ($f =~ /^!(.+)$/) {    ## -- NOT ISA
                     my $uri = $self-><AG::ManakaiDISElement.qnameToURI> ($1);
-                    my $f = $self-><AG::ManakaiDISNode.ownerDISDocument>
-                                 -><AG::ManakaiDISDocument.disDatabase>
-                                 -><M::ManakaiDISDatabase.getFor> ($uri);
-                    $f-><AG::ManakaiDISForDefinition.isReferred> ($ce);
+                    my $for = $self-><AG::ManakaiDISNode.ownerDISDocument>
+                                   -><AG::ManakaiDISDocument.disDatabase>
+                                   -><M::ManakaiDISDatabase.getFor> ($uri);
+                    $for-><AG::ManakaiDISForDefinition.isReferred> ($ce);
                     for my $arg_uri ($forArg, @{$forpArg}) {
-                      if ($f-><M::ManakaiDISForDefinition.isaURI> ($arg_uri)) {
+                      if ($for-><M::ManakaiDISForDefinition.isaURI> ($arg_uri)) {
                         $r = false;
                         last FORMATCH;
                       }
                     }
                   } elsif ($f =~ /^=(.+)$/) {    ## -- EQUAL TO
                     my $uri = $self-><AG::ManakaiDISElement.qnameToURI> ($1);
-                    my $f = $self-><AG::ManakaiDISNode.ownerDISDocument>
-                                 -><AG::ManakaiDISDocument.disDatabase>
-                                 -><M::ManakaiDISDatabase.getFor> ($uri);
-                    $f-><AG::ManakaiDISForDefinition.isReferred> ($ce);
+                    my $for = $self-><AG::ManakaiDISNode.ownerDISDocument>
+                                   -><AG::ManakaiDISDocument.disDatabase>
+                                   -><M::ManakaiDISDatabase.getFor> ($uri);
+                    $for-><AG::ManakaiDISForDefinition.isReferred> ($ce);
                     for my $arg_uri ($forArg, @{$forpArg}) {
                       if ($arg_uri eq $uri) {
                         next FCs;
@@ -828,13 +879,13 @@ ClsDef:
                     $r = false;
                     last FORMATCH;
                   } else {                       ## -- ISA
-                    my $uri = $self-><AG::ManakaiDISElement.qnameToURI> ($1);
-                    my $f = $self-><AG::ManakaiDISNode.ownerDISDocument>
-                                 -><AG::ManakaiDISDocument.disDatabase>
-                                 -><M::ManakaiDISDatabase.getFor> ($uri);
-                    $f-><AG::ManakaiDISForDefinition.isReferred> ($ce);
+                    my $uri = $self-><AG::ManakaiDISElement.qnameToURI> ($f);
+                    my $for = $self-><AG::ManakaiDISNode.ownerDISDocument>
+                                   -><AG::ManakaiDISDocument.disDatabase>
+                                   -><M::ManakaiDISDatabase.getFor> ($uri);
+                    $for-><AG::ManakaiDISForDefinition.isReferred> ($ce);
                     for my $arg_uri ($forArg, @{$forpArg}) {
-                      if ($f-><M::ManakaiDISForDefinition.isaURI> ($arg_uri)) {
+                      if ($for-><M::ManakaiDISForDefinition.isaURI> ($arg_uri)) {
                         next FCs;
                       }
                     }
@@ -850,48 +901,48 @@ ClsDef:
               if ($self-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
                                                      .expandedURI> eq
                   <Q::dis:For>) {
-                my $for = [split /\s+/, $ce-><AG::swcfg21:SWCFGNode
-                                                ::swcfg21:ForLatest.value>];
+                my $fors = [split /\s+/, $ce-><AG::swcfg21:SWCFGNode
+                                                 ::swcfg21:ForLatest.value>];
                 my $ok = true;
                 $has_for = true;
-                AFOR: for my $f (@$for) {
+                AFOR: for my $f (@$fors) {
                   if ($f =~ /^!=(.+)$/) {         ## -- NOT EQUAL TO
                     my $uri = $self-><AG::ManakaiDISElement.qnameToURI> ($1);
-                    my $f = $self-><AG::ManakaiDISNode.ownerDISDocument>
-                                 -><AG::ManakaiDISDocument.disDatabase>
-                                 -><M::ManakaiDISDatabase.getFor> ($uri);
-                    $f-><AG::ManakaiDISForDefinition.isReferred> ($ce);
+                    my $for = $self-><AG::ManakaiDISNode.ownerDISDocument>
+                                   -><AG::ManakaiDISDocument.disDatabase>
+                                   -><M::ManakaiDISDatabase.getFor> ($uri);
+                    $for-><AG::ManakaiDISForDefinition.isReferred> ($ce);
                     if ($uri eq $forArg) {
                       $ok = false;
                       last AFOR;
                     }
                   } elsif ($f =~ /^!(.+)$/) {     ## -- NOT ISA
                     my $uri = $self-><AG::ManakaiDISElement.qnameToURI> ($1);
-                    my $f = $self-><AG::ManakaiDISNode.ownerDISDocument>
-                                 -><AG::ManakaiDISDocument.disDatabase>
-                                 -><M::ManakaiDISDatabase.getFor> ($uri);
-                    $f-><AG::ManakaiDISForDefinition.isReferred> ($ce);
-                    if ($f-><M::ManakaiDISForDefinition.isaURI> ($forArg)) {
+                    my $for = $self-><AG::ManakaiDISNode.ownerDISDocument>
+                                   -><AG::ManakaiDISDocument.disDatabase>
+                                   -><M::ManakaiDISDatabase.getFor> ($uri);
+                    $for-><AG::ManakaiDISForDefinition.isReferred> ($ce);
+                    if ($for-><M::ManakaiDISForDefinition.isaURI> ($forArg)) {
                       $ok = false;
                       last AFOR;
                     }
                   } elsif ($f =~ /^=(.+)$/) {     ## -- EQUAL TO
                     my $uri = $self-><AG::ManakaiDISElement.qnameToURI> ($1);
-                    my $f = $self-><AG::ManakaiDISNode.ownerDISDocument>
-                                 -><AG::ManakaiDISDocument.disDatabase>
-                                 -><M::ManakaiDISDatabase.getFor> ($uri);
-                    $f-><AG::ManakaiDISForDefinition.isReferred> ($ce);
+                    my $for = $self-><AG::ManakaiDISNode.ownerDISDocument>
+                                   -><AG::ManakaiDISDocument.disDatabase>
+                                   -><M::ManakaiDISDatabase.getFor> ($uri);
+                    $for-><AG::ManakaiDISForDefinition.isReferred> ($ce);
                     unless ($uri eq $forArg) {
                       $ok = false;
                       last AFOR;
                     }
                   } else {                        ## -- ISA
-                    my $uri = $self-><AG::ManakaiDISElement.qnameToURI> ($1);
-                    my $f = $self-><AG::ManakaiDISNode.ownerDISDocument>
-                                 -><AG::ManakaiDISDocument.disDatabase>
-                                 -><M::ManakaiDISDatabase.getFor> ($uri);
-                    $f-><AG::ManakaiDISForDefinition.isReferred> ($ce);
-                    unless ($f-><M::ManakaiDISForDefinition.isaURI> ($forArg)) {
+                    my $uri = $self-><AG::ManakaiDISElement.qnameToURI> ($f);
+                    my $for = $self-><AG::ManakaiDISNode.ownerDISDocument>
+                                   -><AG::ManakaiDISDocument.disDatabase>
+                                   -><M::ManakaiDISDatabase.getFor> ($uri);
+                    $for-><AG::ManakaiDISForDefinition.isReferred> ($ce);
+                    unless ($for-><M::ManakaiDISForDefinition.isaURI>($forArg)) {
                       $ok = false;
                       last AFOR;
                     }
@@ -1039,7 +1090,7 @@ ClsDef:
       @@@UndeclaredPrefixException:
       @@@PerlDef:
         $qname =~ s/^\s+//; $qname =~ s/\s+$//;
-        my ($prefix, $lname) = split /:/, $qname;
+        my ($prefix, $lname) = split /:/, $qname, 2;
         __DEEP{
           if (defined $lname) {
             $r = $self-><M::ManakaiDISElement.prefixToURI> ($prefix) . $lname;
@@ -1074,7 +1125,7 @@ ClsDef:
       @@@UndeclaredPrefixException:
       @@@PerlDef:
         $qname =~ s/^\s+//; $qname =~ s/\s+$//;
-        my ($prefix, $lname) = split /:/, $qname;
+        my ($prefix, $lname) = split /:/, $qname, 2;
         __DEEP{
           if (defined $lname) {
             $r = [$self-><M::ManakaiDISElement.prefixToURI> ($prefix), $lname];
@@ -1687,12 +1738,13 @@ ClsDef:
       @@@@:
         Returns a <QUOTE::dis> module definition. 
     @@Param:
-      @@@Name: modURI
+      @@@Name: moduleURI
       @@@Type: ModuleURI
       @@@Description:
         @@@@lang:en
         @@@@@:
           A <QUOTE::dis> module URI reference. 
+    @@ForParam:
     @@Return:
       @@@Type: ManakaiDISModuleDefinition
       @@@Description:
@@ -1700,6 +1752,13 @@ ClsDef:
         @@@@@:
           The module definition. 
       @@@PerlDef:
+        my $modURI;
+        if (defined $forArg) {
+          __CODE{tfurisToURI:: $turi => $moduleURI, $furi => $forArg,
+                               $uri => $modURI}__;
+        } else {
+          $modURI = $moduleURI;
+        }
         if (defined $self->{modDef}->{$modURI}) {
           $r = $self->{modDef}->{$modURI};
         } else {
@@ -1760,7 +1819,7 @@ ClsDef:
       @@@@:
         Returns a <QUOTE::dis> resource definition. 
     @@Param:
-      @@@Name: resURI
+      @@@Name: resourceURI
       @@@Type: ResourceURI
       @@@Description:
         @@@@lang:en
@@ -1771,6 +1830,7 @@ ClsDef:
           @@@@@lang:en
           @@@@@@:
             Defaulted to <Q::DOMMain:any>. 
+    @@ForParam:
     @@Return:
       @@@Type: ManakaiDISResourceDefinition
       @@@Description:
@@ -1778,7 +1838,14 @@ ClsDef:
         @@@@@:
           The resource definition. 
       @@@PerlDef:
-        $resURI = <Q::DOMMain:any> unless defined $resURI;
+        $resourceURI = <Q::DOMMain:any> unless defined $resourceURI;
+        my $resURI;
+        if (defined $forArg) {
+          __CODE{tfurisToURI:: $turi => $resourceURI, $furi => $forArg,
+                               $uri => $resURI}__;
+        } else {
+          $resURI = $resourceURI;
+        }
         if (defined $self->{resDef}->{$resURI}) {
           $r = $self->{resDef}->{$resURI};
         } else {
@@ -1791,6 +1858,7 @@ ClsDef:
                  db => $self,
                  for => <Q::ManakaiDOM:all>,
                  forp => [],
+                 seq => -1,
                }, <ClassName::ManakaiDISResourceDefinition>;
           require Scalar::Util;
           Scalar::Util::weaken ($r->{db});
@@ -1886,12 +1954,10 @@ ClsDef:
               }__;
             }__;
           }
-          my $mod_uri;
           my $mod_name_uri = $mod_name_node
                                 -><AG::ManakaiDISElement.qnameValueURI>;
-          __CODE{tfurisToURI:: $turi => $mod_name_uri, $furi => $forArg,
-                               $uri => $mod_uri}__;
-          my $mod = $self-><M::ManakaiDISDatabase.getModule> ($mod_uri);
+          my $mod = $self-><M::ManakaiDISDatabase.getModule>
+                                   ($mod_name_uri, for_arg => $forArg);
         
           unless ($mod-><M::ManakaiDISModuleDefinition.isDefined>) {
             ## -- Initializes Module Definition Object
@@ -1906,31 +1972,32 @@ ClsDef:
             $self-><M::ManakaiDISDatabase.setSourceFile>
                                         ($mod->{nameURI} => $doc);
 
+            $mod->{<Q::DIS:sourceFile>}
+              = $mod->{src}
+                    -><AG::swcfg21:SWCFGNode::swcfg21:ForLatest.ownerDocument>
+                    -><M::swcfg21:SWCFGNode::swcfg21:ForLatest.flag>
+                                         (<Q::swcfg21:fileName>);
             
             ## -- Loads "for all"
-            my $nuri = $mod->{nameURI};
-            my $forall = <Q::ManakaiDOM:all>;
-            my $uri;
-            __CODE{tfurisToURI:: $turi => $nuri, $furi => $forall,
-                                 $uri => $uri}__;
-            my $rmod = $self-><M::ManakaiDISDatabase.getModule> ($uri);
+            my $rmod = $self-><M::ManakaiDISDatabase.getModule>
+                               ($mod->{nameURI}, for_arg => <Q::ManakaiDOM:all>);
             unless ($rmod-><AG::ManakaiDISModuleDefinition.isDefined>) {
               my $rdoc = $resolver-><M::ManakaiDISModuleResolver.uriToDocument>
-                               ($self, $uri, $mod->{namespaceURI},
-                                $mod->{localName}, $forall);
+                               ($self, $rmod->{uri}, $mod->{namespaceURI},
+                                $mod->{localName}, <Q::ManakaiDOM:all>);
               unless ($rdoc) {
                 __UNDEEP{
                   __EXCEPTION{UNABLE_TO_GET_MODULE_ERR::
-                    DIS:uri => {$uri},
+                    DIS:uri => {$rmod->{uri}},
                     DIS:namespaceURI => {$mod->{namespaceURI}},
                     DIS:localName => {$mod->{localName}},
-                    DIS:for => {$forall},
+                    DIS:for => {<Q::ManakaiDOM:all>},
                     DIS:sourceNode => {$mod->{src}},
                   }__;
                 }__;
               }
               $self-><M::ManakaiDISDatabase.loadModule>
-                                         ($rdoc, $resolver, for_arg => $forall);
+                            ($rdoc, $resolver, for_arg => <Q::ManakaiDOM:all>);
             } # Unless "for all" loaded
 
             ## -- Loads Required Modules
@@ -1966,17 +2033,15 @@ ClsDef:
               } else {
                 $for = $mod->{for};
               }
-              my $xuri = $nuri . $ln;
-              __CODE{tfurisToURI:: $turi => $xuri, $furi => $for,
-                                   $uri => $uri}__;
-              my $rmod = $self-><M::ManakaiDISDatabase.getModule> ($uri);
+              my $rmod = $self-><M::ManakaiDISDatabase.getModule>
+                                       ($nuri . $ln, for_arg => $for);
               unless ($rmod-><AG::ManakaiDISModuleDefinition.isDefined>) {
                 my $rdoc = $resolver-><M::ManakaiDISModuleResolver.uriToDocument>
-                                              ($self, $uri, $nuri, $ln, $for);
+                                       ($self, $rmod->{uri}, $nuri, $ln, $for);
                 unless ($rdoc) {
                   __UNDEEP{
                     __EXCEPTION{UNABLE_TO_GET_MODULE_ERR::
-                      DIS:uri => {$uri},
+                      DIS:uri => {$rmod->{uri}},
                       DIS:namespaceURI => {$nuri},
                       DIS:localName => {$ln},
                       DIS:for => {$for},
@@ -2002,7 +2067,7 @@ ClsDef:
             for my $el (@$root_elements) {
               if ($el-><M::ManakaiDISElement.isResourceElement>) {
                 $self-><M::ManakaiDISDatabase.loadResource>
-                                         ($mod, null, $mod, $el,
+                                         ($mod, null, null, $el,
                                           for_arg => $forArg);
               } else {
                 my $et = $el-><M::swcfg21:SWCFGElement::swcfg21:ForLatest
@@ -2136,22 +2201,13 @@ ClsDef:
           a direct child of the document node. 
     @@Param:
       @@@Name: dynParent
-      @@@Type:
-        DOMMain:Object
+      @@@Type: ManakaiDISResourceDefinition
       @@@enDesc:
         The dynamic parent resource of the resource to load. 
-      @@@InCase:
-        @@@@Type: ManakaiDISResourceDefinition
+      @@@nullCase:
         @@@@enDesc:
-          If this resource is one of representations of 
-          <Q::dis:MultileResource>, then <P::dynParent> is that <QUOTE::multiple>
-          resource definition.  Otherwise, same as <P::parentResource>. 
-      @@@InCase:
-        @@@@Type: ManakaiDISModuleDefinition
-        @@@@enDesc:
-          If this resource is a root resource, then <P::dynParent> is 
-          the module in which the resource is defined, i.e. same
-          as <P::mod>. 
+          If this resource is a root resource, i.e. <P::el> is
+          a direct child of the document node. 
     @@Param:
       @@@Name: el
       @@@Type:ManakaiDISElement
@@ -2181,14 +2237,12 @@ ClsDef:
           my $res;
           if ($qn_node) {
             my $qn_uri = $qn_node-><AG::ManakaiDISElement.qnameValueURI>;
-            my $uri;
-            __CODE{tfurisToURI:: $turi => $qn_uri, $furi => $forArg,
-                                 $uri => $uri}__;
-            $res = $self-><M::ManakaiDISDatabase.getResource> ($uri);
+            $res = $self-><M::ManakaiDISDatabase.getResource>
+                                ($qn_uri, for_arg => $forArg);
             if ($res-><M::ManakaiDISForDefinition.isDefined>) {
               __UNDEEP{
                 __EXCEPTION{RESOURCE_ALREADY_DEFINED_ERR::
-                  DIS:uri => {$uri},
+                  DIS:uri => {$res->{uri}},
                   DIS:sourceNode => {$qn_node},
                   DIS:anotherSourceNode => {$res->{src}},
                 }__;
@@ -2211,10 +2265,8 @@ ClsDef:
                 __CODE{getChildResourceURI:: $parentURI => $puri,
                                              $localName => $ln,
                                              $result => $ru}__;
-                my $uri;
-                __CODE{tfurisToURI:: $turi => $ru, $furi => $forArg,
-                                     $uri => $uri}__;
-                $res = $self-><M::ManakaiDISDatabase.getResource> ($uri);
+                $res = $self-><M::ManakaiDISDatabase.getResource>
+                                    ($ru, for_arg => $forArg);
                 $res->{nameURI} = $ru;
                 $res->{localName} = $n_node-><AG::swcfg21:SWCFGNode
                                                 ::swcfg21:ForLatest.value>;
@@ -2228,14 +2280,12 @@ ClsDef:
                                             .getPropertyText>
                                                  (<Q::dis:Namespace>, null);
                 my $qn_uri = $ns_uri . $ln;
-                my $uri;
-                __CODE{tfurisToURI:: $turi => $qn_uri, $furi => $forArg,
-                                     $uri => $uri}__;
-                $res = $self-><M::ManakaiDISDatabase.getResource> ($uri);
+                $res = $self-><M::ManakaiDISDatabase.getResource>
+                                    ($qn_uri, for_arg => $forArg);
                 if ($res-><M::ManakaiDISForDefinition.isDefined>) {
                   __UNDEEP{
                     __EXCEPTION{RESOURCE_ALREADY_DEFINED_ERR::
-                      DIS:uri => {$uri},
+                      DIS:uri => {$res->{uri}},
                       DIS:sourceNode => {$n_node},
                       DIS:anotherSourceNode => {$res->{src}},
                     }__;
@@ -2254,16 +2304,19 @@ ClsDef:
           $res->{forp} = $forpArg;
           $res->{src} = $el;
           $res->{<Q::definingModule>} = $mod->{uri};
+          $mod-><M::ManakaiDISPropertyAccessor.addPropertyResourceList>
+                                            (<Q::DIS:resource>, $res);
           $res->{<Q::dis2pm:parentResource>}
              = $parentResource ? $parentResource->{uri} : null;
           $res->{<Q::dynamicParentResource>}
-             = UNIVERSAL::isa ($dynParent,
-                               <ClassName::ManakaiDISResourceDefinition>)
-             ? $dynParent->{uri} : null;
-          $res->{aliasURI}->{$node_uri} = true;
-          $self->{resDef}->{$node_uri} = $res;
+             = $dynParent ? $dynParent->{uri} : null;
+          unless ($res->{uri} eq $node_uri) {
+            my $nu_res = $self-><M::ManakaiDISDatabase.getResource> ($node_uri);
+            $res-><M::ManakaiDISResourceDefinition.mergeAsAlias> ($nu_res);
+          }
           $res->{<Q::isDefined>} = true;
-
+          $res->{seq} = $self->{seq}++;
+          
           ## -- Alias
           my $al_node = $el-><M::ManakaiDISElement.disGetAttribute>
                                       (<Q::dis:AliasFor>, for_arg => $forArg,
@@ -2379,7 +2432,41 @@ ClsDef:
           }
         }
         
+
+  @Method:
+    @@Name: plStore
+    @@enDesc:
+      Saves this database to an external file. 
+      \
+      {NOTE:: Saved files can be loaded by 
+              <M::ManakaiDISImplementation.plLoadDISDatabase>.
+      \
+      }
+    @@Param:
+      @@@Name: fileName
+      @@@Type:
+        DISLang:String
+      @@@enDesc:
+        An environment-dependent file name of external database to save. 
+        \
+        {NOTE:: If there is already a file named as <P::fileName>, then 
+                it is overwritten. 
+        \
+        }
+    @@Return:
+      @@@SimpleException:
+      @@@PerlDef:
+        use Storable qw/nstore/;
+        local $Carp::CarpLevel = $Carp::CarpLevel + 1;
+        nstore $self, $fileName;
 ##DISDatabase
+
+PropDef:
+  @QName: resource
+  @enDesc:
+    Resources defined in a module. 
+  @rdfs:range: ManakaiDISResourceDefinition
+  @rdfs:domain: ManakaiDISModuleDefinition
 
 PropDef:
   @QName:
@@ -2745,8 +2832,7 @@ ClsDef:
       @@@lang:en
       @@@@:
         Whether this <QUOTE::for> is referred somewhere or not. 
-    @@Type:
-      DOMMain:any
+    @@Type: ManakaiDISElement
     @@Get:
       @@@InCase:
         @@@@Type:ManakaiDISElement
@@ -2762,7 +2848,7 @@ ClsDef:
         @@@@enDesc:
           This <QUOTE::for> is referred by the element. 
       @@@PerlDef:
-        $self->{<Q::isReferred>} = true if $given;
+        $self->{<Q::isReferred>} = $given if $given;
 
   @Attr:
     @@Name: definingModule
@@ -2985,16 +3071,16 @@ ClsDef:
     @@Type: ManakaiDISElement
     @@Get:
       @@@enDesc:
-        This resource is referred by the element. 
+        An element that referres this resource.
       @@@nullCase:
         This resource is not referred. 
       @@@PerlDef:
         $r = $self->{<Q::isReferred>};
     @@Set:
       @@@enDesc:
-        This resource is referred by this element. 
+        An element that referres this resource. 
       @@@PerlDef:
-        $self->{<Q::isReferred>} = true if $given;
+        $self->{<Q::isReferred>} = $given if $given;
 
   @Attr:
     @@Name: definingModule
@@ -3459,6 +3545,37 @@ ClsDef:
           $self-><AG::ManakaiDISResourceDefinition.disActualDataTypeNode>;
         }__;
         $r = $self->{<Q::dis2pm:actualTypeNode>};
+
+  @IntMethod:
+    @@Operator:
+      @@@@: <=>
+      @@@ContentType:
+        lang:Perl
+    @@enDesc:
+      Which is greater (i.e. the spaceship operator). 
+      A resource is less than another if it is loaded by
+      <M::ManakaiDISDatabase.loadResource> before another is loaded. 
+      Order for non-loaded resource definitions are not defined. 
+      \
+      {NOTE:: In the current implementation, non-loaded resources 
+              are less than any loaded resource and the order in 
+              non-loaded resources is unknown. 
+      \
+      }
+    @@Param:
+      @@@Name: anotherResource
+      @@@Type: ManakaiDISResourceDefinition
+      @@@enDesc: Another resource to compare.
+    @@Return:
+      @@@Type:
+        DOMMain:unsigned-long
+      @@@PerlDef:
+        if (UNIVERSAL::isa ($anotherResource,
+                            <ClassName::ManakaiDISResourceDefinition>)) {
+          $r = $self->{seq} <=> $anotherResource->{seq};
+        } else {
+          $r = overload::Overloaded ($self) <=> $anotherResource;
+        }
 ##DISResourceDefinition
 
 XParamDef:
@@ -3559,20 +3676,21 @@ ClsDef:
       @@@UndeclaredPrefixException:
       @@@PerlDef:
         if (defined $self->{$propName}) {
-          $r = $self->{$propName};
+          $r = $self->{db}-><M::ManakaiDISDatabase.getResource>
+                                                    ($self->{$propName});
         } elsif ($self->{src}) {
           __DEEP{
             $r = $self->{src}-><M::ManakaiDISElement.disGetAttribute>
                                   ($propName, for_arg => $self->{for},
                                    forp_arg => $self->{forp});
             if ($r) {
-              $r = $self->{$propName}
+              $self->{$propName}
                  = $r-><AG::ManakaiDISElement.qnameValueURI>;
+              $r = $self->{db}-><M::ManakaiDISDatabase.getResource>
+                                                    ($self->{$propName});
+              $r-><M::ManakaiDISResourceDefinition.isReferred> ($self->{src});
             }
           }__;
-        }
-        if ($r) {
-          $r = $self->{db}-><M::ManakaiDISDatabase.getResource> ($r);
         }
 
   @Method:

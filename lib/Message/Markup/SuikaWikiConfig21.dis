@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/02/28 04:32:40 $
+      $Date: 2005/03/04 12:18:52 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1821,6 +1821,10 @@ IFClassDef:
           used as <QUOTE::keys> to identify a node. 
     @@Return:
       @@@Type:SWCFGString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Node path string. 
       @@@PerlDef:
         my $parent = $self-><M::SWCFGNode.parentNode>;
         if ($parent) {
@@ -1830,7 +1834,7 @@ IFClassDef:
         }
         my $node_type = $self-><M::SWCFGNode.nodeType>;
         if ($node_type eq '#element') {
-          $r .= '/' . $self-><AG::SWCFGElement.qualifiedName>;
+          $r .= '/' . $self-><AG::SWCFGElement.realQualifiedName>;
           if ($key) {
             for my $k (ref $key eq 'ARRAY' ? @{$key} : $key) {
               my $key_val = $self-><M::SWCFGNode.getAttributeValue> ($k);
@@ -1842,7 +1846,9 @@ IFClassDef:
         } elsif ($node_type eq '#comment') {
           $r .= q</comment ()>;
         } elsif ($node_type eq '#document') {
-          $r .= q</document ()>;
+          $r .= q</document (>
+             .  ($self-><M::SWCFGNode.flag> (<Q::swcfg21:fileName>) || '')
+             .  q<)>;
         } elsif ($node_type eq '#fragment') {
           $r .= q</fragment ()>;
         } else {
@@ -2562,6 +2568,13 @@ IFClassDef:
         @@@@GetProp:
           TreeCore:nodeID
 ##SWCFGNode
+
+PropDef:
+  @QName: fileName
+  @Description:
+    @@lang:en
+    @@@:
+      The name of the source file. 
 
 IFClassDef:
   @IFQName:SWCFGComment
