@@ -25,7 +25,7 @@ This module is part of Manakai.
 package Message::Util::Formatter;
 use strict;
 use vars qw(%FMT2STR $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 
 =head1 INITIAL FORMATTING RULES
@@ -120,7 +120,8 @@ sub replace ($$;$$) {
   $format = $format->inner_text
     if ref ($format) && (ref ($format) eq $self->{-option}->{return_class});
   #use re 'eval';
-  our $BLOCK = qr/\{(?:[^\{\}]|(??{$BLOCK}))*\}/;
+  our $BLOCK;
+  $BLOCK = qr/\{(?:[^\{\}]|(??{$BLOCK}))*\}/;
                                         #[\x09\x0A\x0D\x200-9A-Za-z._=>,-]
   $format =~ s{%([A-Za-z0-9_-]+)[\x09\x0A\x0D\x20]*(?:\(((?:[^{}"()]|$BLOCK|"(?:[^"\\]|\\.)*")*)\))?[\x09\x0A\x0D\x20]*;|(%|[^%]+)}{
       my ($f, $a, $t) = ($1, $2, $3);
@@ -298,4 +299,4 @@ Boston, MA 02111-1307, USA.
 =cut
 
 1;
-# $Date: 2003/11/16 11:44:44 $
+# $Date: 2004/07/25 07:16:33 $
