@@ -11,7 +11,7 @@ This module is part of manakai.
 
 package Message::Util::HostPermit;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 =head1 METHODS
 
@@ -46,7 +46,9 @@ sub add_rule ($$) {
 
 sub check ($$;$) {
   my ($self, $name, $port) = @_;
-  my ($name, undef, undef, undef, $addr) = gethostbyname ($name);
+  return 0 unless defined $name;
+  my $addr;
+  ($name, undef, undef, undef, $addr) = gethostbyname ($name);
   return 0 if !$name && !$addr;
   for my $rule (@{$self->{rule}}) {
     if ($rule->{-host}) {
@@ -94,15 +96,17 @@ sub match_host ($$$) {
 sub match_ipv4 ($$$) {
   my ($self, $pattern, $addr) = @_;
   if (length ($addr) != 4) {
-    $addr =~ /([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)/;
+    $addr =~ /([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)/ or return 0;
     $addr = pack 'C4', $1, $2, $3, $4;
   }
   my $mask = pack 'C4', 255, 255, 255, 255;
   if (length ($pattern) != 4) {
-    $pattern =~ m!([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)(?:/([0-9]+))?!;
+    $pattern =~ m!([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)(?:/([0-9]+))?!
+      or return 0;
     $pattern = pack 'C4', $1, $2, $3, $4;
-    my $m = $5; $m = 32 if $m > 32;
+    my $m = $5;
     if (defined $m) {
+      $m = $m > 32 ? 32 : $m + 0;
       $mask = pack 'C4', (($m > 24) ? (255, 255, 255, (2**($m-24)-1) << (32-$m)) :
                           ($m > 16) ? (255, 255, (2**($m-16)-1) << (24-$m), 0) :
                           ($m >  8) ? (255, (2**($m-8)-1) << (16-$m), 0, 0) :
@@ -128,4 +132,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/27 07:59:11 $
+1; # $Date: 2003/10/31 08:39:50 $

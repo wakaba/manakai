@@ -19,7 +19,7 @@ This module is part of manakai.
 package Message::Util::Error::TextParser;
 use base Message::Util::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 =head1 METHODS
 
@@ -43,6 +43,9 @@ sub raise ($%) {
   my ($self, %err) = @_;
   if ($err{position}) {
     $err{position_data} = $self->{pos}->{$err{position}};
+    unless (defined $err{position_data}->{line}) {
+      warn qq'raise: position data "$err{position}" not initialized';
+    }
     $err{position_msg} = sprintf 'Line %d position %d',
       $err{position_data}->{line}, $err{position_data}->{pos};
   }
@@ -86,4 +89,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/08/05 07:30:14 $
+1; # $Date: 2003/10/31 08:39:50 $
