@@ -19,7 +19,7 @@ This module is part of manakai.
 
 package Message::Util::Formatter::Node;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util::Formatter::Base;
 our @ISA = 'Message::Util::Formatter::Base';
 
@@ -27,7 +27,10 @@ sub rule_def () {+{
     -attr_bare_text => {
       main => sub {
         my ($self, $name, $p, $o, %opt) = @_;
-        return $opt{-parent}->append_text ($opt{-attr_bare_text});
+        return ref $opt{-parent} ?
+                 $opt{-parent}->append_text ($opt{-attr_bare_text})
+               : $opt{-class}->new (type => '#text',
+                                    value => $opt{-attr_bare_text});
       },
     },
     -bare_text => {
@@ -44,8 +47,8 @@ sub rule_def () {+{
     },
     -default   => {
       pre => sub { 
-        my ($self, $name, $p, $o, %opt) = @_;
-        local $p->{-parent} = $o->{-result};
+#        my ($self, $name, $p, $o, %opt) = @_;
+#        local $p->{-parent} = $o->{-result};
       },
       post => sub { 
         my ($self, $name, $p, $o, %opt) = @_;
@@ -54,10 +57,14 @@ sub rule_def () {+{
       },
       attr => sub {
         my ($self, $name, $p, $o, $key, $val, %opt) = @_;
-        if ($opt{-value_flag} and index ($opt{-value_flag}, 'p') > -1) {
-          $p->{-parse_flag}->{$key} = 1;
+        if ($key eq '-boolean') {
+          $p->{$val} = 1;
+        } else {
+          if ($opt{-value_flag} and index ($opt{-value_flag}, 'p') > -1) {
+            $p->{-parse_flag}->{$key} = 1;
+          }
+          $p->{$key} = $val;
         }
-        $p->{$key} = $val;
       },                 
       main => sub {
       },
@@ -98,15 +105,20 @@ sub new ($;%) {
 
 sub parse_attr ($$$$;%) {
   my ($self, $p, $name, $o, %opt) = @_;
-  if ($p->{-parse_flag}->{$name}) {
-    $p->{$name} = $self->replace ($p->{$name}, param => $o, 
-                                  -parent => $opt{-parent},
-                                  %{$opt{option}});
+  if ($p->{-parse_flag}->{$name} > 0) {
+    $p->{-parse_flag}->{$name} = -1;
+    $p->{$name} = $self->replace ($p->{$name},
+                                  %{$opt{option}}, param => $o,
+                                  -parent => $opt{-parent});
+  } elsif ($p->{-parse_flag}->{$name} < 0) {
+    $p->{$name};
   } elsif ($opt{-non_parsed_to_node}) {
-    $self->call (-attr_bare_text => 'main', $p, $o,
-                 -attr_bare_text => $p->{$name},
-                 -parent => $opt{-parent},
-                 %{$opt{option}});
+    $p->{$name} = $self->call (-attr_bare_text => 'main', $p, $o,
+                               %{$opt{option}},
+                               -attr_bare_text => $p->{$name},
+                               -parent => $opt{-parent});
+  } else {
+    undef;
   }
 }
 
@@ -119,4 +131,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/11/16 11:44:24 $
+1; # $Date: 2003/12/01 07:50:29 $

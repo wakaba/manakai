@@ -15,7 +15,7 @@ This module is part of manakai.
 
 package Message::Util::Formatter::Text;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util::Formatter::Base;
 our @ISA = 'Message::Util::Formatter::Base';
 
@@ -48,10 +48,14 @@ sub rule_def () {+{
       },
       attr => sub {
         my ($self, $name, $p, $o, $key, $val, %opt) = @_;
-        if ($opt{-value_flag} and index ($opt{-value_flag}, 'p') > -1) {
-          $val = $self->replace ($val, param => $o);
+        if ($key eq '-boolean') {
+          $p->{$val} = 1;
+        } else {
+          if ($opt{-value_flag} and index ($opt{-value_flag}, 'p') > -1) {
+            $val = $self->replace ($val, param => $o);
+          }
+          $p->{$key} = $val;
         }
-        $p->{$key} = $val;
       },                 
       before => sub {
       },
@@ -96,4 +100,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/11/16 11:44:16 $
+1; # $Date: 2003/12/01 07:50:14 $
