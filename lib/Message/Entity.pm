@@ -13,7 +13,7 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.32 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.33 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::Header;
@@ -28,18 +28,26 @@ use overload '""' => sub { $_[0]->stringify },
     -_MEMBERS	=> [qw|header body _cte|],
     	## entity_header -- Don't clone.
     -accept_coderange	=> '7bit',	## 7bit / 8bit / binary
-    #add_ua	=> 1,
     -body_default_charset	=> 'iso-2022-int-1',
     -body_default_charset_input	=> 'iso-2022-int-1',
     -body_default_media_type	=> 'text',
     -body_default_media_subtype	=> 'plain',
     -cte_default	=> '7bit',
-    #fill_date	=> 1,
-    -fill_date_name	=> 'date',
-    -fill_md5	=> 0,
-    -fill_md5_name	=> 'md5',
-    #fill_msgid	=> 1,
-    -fill_msgid_name	=> 'message-id',
+    -fill_missing_fields	=> 1,
+    	#add_ua	=> 1,
+    	#fill_date	=> 1,
+    	-fill_date_name	=> 'date',
+    	-fill_destination	=> 0,
+    	#fill_destination_ns
+    	#fill_destination_resent_ns
+    	#fill_from_ns
+    	-fill_md5	=> 0,
+    	-fill_md5_name	=> 'md5',
+    	#fill_msgid	=> 1,
+    	-fill_msgid_name	=> 'message-id',
+    	#fill_sender_ns
+    	-fill_source	=> 1,
+    	-recalc_md5	=> 1,
     -force_mime_entity	=> 0,
     -format	=> 'mail-rfc2822',
     -guess_media_type	=> 1,
@@ -50,7 +58,6 @@ use overload '""' => sub { $_[0]->stringify },
     -hook_stringify_fill_fields	=> sub {},
     -linebreak_strict	=> 0,	## BUG: not work perfectly
     -parse_all	=> 0,
-    -recalc_md5	=> 1,
     -text_coderange	=> 'binary',
     	## '8bit' (MIME text/*) / 'binary' (HTTP text/*)
     #ua_field_name	=> 'user-agent',
@@ -83,13 +90,18 @@ sub _init ($;%) {
   my $format = $self->{option}->{format};
   if ($format =~ /http/) {
     $self->{option}->{fill_date_ns}       = $Message::Header::NS_phname2uri{'x-http'};
+    $self->{option}->{fill_from_ns}       = $Message::Header::NS_phname2uri{'x-http'};
     $self->{option}->{fill_msgid_from_ns} = $Message::Header::NS_phname2uri{'x-http'};
     $self->{option}->{fill_ua_ns}         = $Message::Header::NS_phname2uri{'x-http'};
     $self->{option}->{accept_coderange} = 'binary';
     $self->{option}->{text_coderange} = 'binary';
     $self->{option}->{cte_default} = 'binary';
   } else {
+    if ($format =~ /mail-rfc822|mail-rfc2822/) {
+      $self->{option}->{fill_destination} = 1;
+    }
     $self->{option}->{fill_date_ns}       = $Message::Header::NS_phname2uri{'x-rfc822'};
+    $self->{option}->{fill_from_ns}       = $Message::Header::NS_phname2uri{'x-rfc822'};
     $self->{option}->{fill_msgid_from_ns} = $Message::Header::NS_phname2uri{'x-rfc822'};
     $self->{option}->{fill_ua_ns}         = $Message::Header::NS_phname2uri{'x-rfc822'};
     $self->{option}->{text_coderange} = '8bit';
@@ -100,8 +112,10 @@ sub _init ($;%) {
       $self->{option}->{accept_coderange} = '7bit';
     }
   }
-  $self->{option}->{fill_msgid_ns}   = $Message::Header::NS_phname2uri{'x-rfc822'};
-  $self->{option}->{fill_mimever_ns} = $Message::Header::NS_phname2uri{'x-rfc822'};
+  for (qw/fill_msgid_ns fill_mimever_ns fill_destination_ns fill_sender_ns/) {
+    $self->{option}->{$_} = $Message::Header::NS_phname2uri{'x-rfc822'};
+  }
+  $self->{option}->{fill_destination_resent_ns} = $Message::Header::NS_phname2uri{'x-rfc822-resent'};
   unless (defined $self->{option}->{fill_date}) {
     $self->{option}->{fill_date} = $format !~ /mime-entity|cgi|uri-url-mailto/;
   }
@@ -493,74 +507,115 @@ sub stringify ($;%) {
   $body = $self->_encode_body ($body0, \%option);
   if (ref $self->{header}) {
     my %exist;
-    for ($self->{header}->field_name_list) {$exist{$_} = 1}
-    &{ $option{hook_stringify_fill_fields} } ($self, \%exist, \%option);
     my $ns_content = $Message::Header::NS_phname2uri{content};
-    if ($option{fill_date}
-       && !$exist{$option{fill_date_name}.':'.$option{fill_date_ns}}) {
-      $self->{header}->field
-        ($option{fill_date_name}, -ns => $option{fill_date_ns})->unix_time (time);
-    }
-    if ($option{fill_msgid}
-       && !$exist{$option{fill_msgid_name}.':'.$option{fill_msgid_ns}}) {
-      my $from = $self->{header}->field
-        ('from', -ns => $option{fill_msgid_from_ns}, -new_item_unless_exist => 0);
-      $from = $from->addr_spec if ref $from;
-      $self->{header}->field
-        ($option{fill_msgid_name}, -ns => $option{fill_msgid_ns})
-        ->generate (addr_spec => $from)
-        if $from;
-    }	# fill_msgid
-    if (($option{fill_md5} && !$exist{ $option{fill_md5_name} .':'. $ns_content})
-     || ($option{recalc_md5} && $exist{ $option{fill_md5_name} .':'. $ns_content})) {
-      my $md5;
-      eval q{
-        require Digest::MD5;  require MIME::Base64;
-        $md5 = MIME::Base64::encode (Digest::MD5::md5 ($body0));
-        $md5 =~ tr/\x09\x0A\x0D\x20//d;
-      } or Carp::carp $@;
-      if ($md5) {
-        my $md5f = $self->{header}->field ($option{fill_md5_name}, -ns => $ns_content);
-        $md5f->value ($md5);
+    my $filler;
+    $filler = sub {
+      my ($hdr, $exist, $hdr_option) = @_;
+      for ($self->{header}->field_name_list) {$exist{$_} = 1}
+      &{ $option{hook_stringify_fill_fields} } ($self, \%exist, \%option);
+      ## Date: (RFC 822, HTTP)
+      if ($option{fill_date}
+         && !$exist{$option{fill_date_name}.':'.$option{fill_date_ns}}) {
+        $self->{header}->field
+          ($option{fill_date_name}, -ns => $option{fill_date_ns})->unix_time (time);
       }
-    }
-    my $ismime = 0;
-    for (keys %exist) {if (/:$ns_content$/) { $ismime = 1; last }}
-    unless ($ismime) {
-      $ismime = 1 if $option{force_mime_entity};
-      $ismime = 1 if $option{fill_md5};
-      $ismime = 1 if $option{body_default_media_type} ne 'text';
-      $ismime = 1 if $option{body_default_media_subtype} ne 'plain';
-    }
-    if ($ismime) {
-      if ($option{fill_ct} && !$exist{'type:'.$ns_content}) {
-          my $ct = $self->{header}->field ('type',
-            -parse => 1, -ns => $ns_content);
-          $ct->media_type ($option{body_default_media_type}.'/'
-                          .$option{body_default_media_subtype});
-          $ct->replace (Message::MIME::Charset::name_minimumize ($option{body_default_charset} => $body0));
+      ## Message-ID: (RFC 822)
+      if ($option{fill_msgid}
+         && !$exist{$option{fill_msgid_name}.':'.$option{fill_msgid_ns}}) {
+        my $from = $self->{header}->field
+          ('from', -ns => $option{fill_msgid_from_ns}, -new_item_unless_exist => 0);
+        $from = $from->addr_spec if ref $from;
+        $self->{header}->field
+          ($option{fill_msgid_name}, -ns => $option{fill_msgid_ns})
+          ->generate (addr_spec => $from)
+          if $from;
+      }	# fill_msgid
+      ## To:, CC:, BCC:, Resent-To:, Resent-Cc:, Resent-Bcc: (RFC 822)
+      if ($option{fill_destination}) {
+        if ( !$exist{ 'to:'.$option{fill_destination_ns} }
+          && !$exist{ 'cc:'.$option{fill_destination_ns} }
+          && !$exist{ 'bcc:'.$option{fill_destination_ns} }
+          && !$exist{ 'to:'.$option{fill_destination_resent_ns} }
+          && !$exist{ 'cc:'.$option{fill_destination_resent_ns} }
+          && !$exist{ 'bcc:'.$option{fill_destination_resent_ns} } ) {
+          $hdr->add (bcc => '');
+        }
       }
-      if ($option{fill_mimever}
-          && !$exist{'mime-version:'.$option{fill_mimever_ns}}) {
-        ## BUG: doesn't support rfc10]49, HTTP (ie. non-MIME) content-*: fields
-        $self->{header}->add ('mime-version' => '1.0', 
-          -parse => 0, -ns => $option{fill_mimever_ns});
+      ## From:, Sender:
+      if ($option{fill_source}) {
+        ## From:
+        if (!$exist{ 'from:'.$option{fill_from_ns} }) {
+          $hdr->add (from => 'Unknown source <foo@bar.invalid>',
+                     -ns => $option{fill_from_ns});
+        ## From: exists, Sender: not exist
+        } elsif (!$exist{ 'sender:'.$option{fill_sender_ns} }) {
+          my $from = $hdr->field ('from', -ns => $option{fill_from_ns});
+          if ($from->count > 1) {
+            $hdr->field ('sender', -ns => $option{fill_sender_ns})
+                ->add ($from->item (0, -by => 'index'));
+          }
+        }
       }
-    }	# $ismime
-    if ($option{format} =~ /uri-url-mailto/ && $exist{'type:$ns_content'}
+      ## Content-MD5:
+      if (($option{fill_md5} && !$exist{ $option{fill_md5_name} .':'. $ns_content})
+        || ($option{recalc_md5} && $exist{ $option{fill_md5_name} .':'. $ns_content})) {
+        my $md5;
+        eval q{
+          require Digest::MD5;  require MIME::Base64;
+          $md5 = MIME::Base64::encode (Digest::MD5::md5 ($body0));
+          $md5 =~ tr/\x09\x0A\x0D\x20//d;
+        } or Carp::carp $@;
+        if ($md5) {
+          my $md5f = $self->{header}->field ($option{fill_md5_name}, -ns => $ns_content);
+          $md5f->value ($md5);
+        }
+      }
+      my $ismime = 0;
+      for (keys %exist) {if (/:$ns_content$/) { $ismime = 1; last }}
+      unless ($ismime) {
+        $ismime = 1 if $option{force_mime_entity};
+        $ismime = 1 if $option{fill_md5};
+        $ismime = 1 if $option{body_default_media_type} ne 'text';
+        $ismime = 1 if $option{body_default_media_subtype} ne 'plain';
+      }
+      if ($ismime) {
+        ## Content-Type: (MIME, HTTP)
+        if ($option{fill_ct} && !$exist{'type:'.$ns_content}) {
+            my $ct = $self->{header}->field ('type',
+              -parse => 1, -ns => $ns_content);
+            $ct->media_type ($option{body_default_media_type}.'/'
+                            .$option{body_default_media_subtype});
+            $ct->replace (Message::MIME::Charset::name_minimumize ($option{body_default_charset} => $body0));
+        }
+        ## MIME-Version: (MIME)
+        if ($option{fill_mimever}
+            && !$exist{'mime-version:'.$option{fill_mimever_ns}}) {
+          ## BUG: doesn't support rfc10]49, HTTP (ie. non-MIME) content-*: fields
+          $self->{header}->add ('mime-version' => '1.0', 
+            -parse => 0, -ns => $option{fill_mimever_ns});
+        }
+      }	# $ismime
+      ## User-Agent: (USEFOR, HTTP)
+      if ($option{add_ua}) {
+        $self->{header}->field ($option{fill_ua_name})->add_our_name (
+          -use_Config	=> $option{ua_use_Config},
+          -use_Win32	=> $option{ua_use_Win32},
+          -date	=> q$Date: 2002/07/27 00:39:54 $,
+        );
+      }
+    } if $option{fill_missing_fields};
+    
+    if ($option{format} =~ /uri-url-mailto/
+     && $self->{header}->field_exist ('type', -ns => $ns_content)
      && $option{uri_mailto_safe_level} > 1) {
-      $self->{header}->field ('content-type')->media_type ('text/plain');
+      $self->{header}->field ('type', -ns => $ns_content)->media_type ('text/plain');
     }
-    if ($option{add_ua}) {
-      $self->{header}->field ($option{fill_ua_name})->add_our_name (
-        -use_Config	=> $option{ua_use_Config},
-        -use_Win32	=> $option{ua_use_Win32},
-        -date	=> q$Date: 2002/07/26 12:42:00 $,
-      );
-    }
-    $header = $self->{header}->stringify (-format => $option{format},
-      -linebreak_strict => $option{linebreak_strict},
-      -uri_mailto_safe_level => $option{uri_mailto_safe_level});
+    $header = $self->{header}->stringify (
+    	-format => $option{format},
+    	-linebreak_strict => $option{linebreak_strict},
+    	-uri_mailto_safe_level => $option{uri_mailto_safe_level},
+    	($filler? (-hook_stringify_fill_fields	=> $filler) :()),
+    );
   } else {
     $header = $self->{header};
     unless ($option{linebreak_strict}) {
@@ -978,7 +1033,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/26 12:42:00 $
+$Date: 2002/07/27 00:39:54 $
 
 =cut
 
