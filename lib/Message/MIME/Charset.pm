@@ -12,7 +12,7 @@ Perl module for MIME charset.
 package Message::MIME::Charset;
 use strict;
 use vars qw(%ENCODER %DECODER %N11NTABLE %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 our %CHARSET;
 
@@ -33,6 +33,8 @@ $CHARSET{'us-ascii'} = {
 	
 	encoder	=> sub { $_[1] },
 	decoder	=> sub { $_[1] },
+	
+	mime_text	=> 1,
 };
 
 $CHARSET{'iso-2022-int-1'} = {
@@ -40,6 +42,8 @@ $CHARSET{'iso-2022-int-1'} = {
 	
 	encoder	=> sub { $_[1] },
 	decoder	=> sub { $_[1] },
+	
+	mime_text	=> 1,
 };
 
 $CHARSET{'unknown-8bit'} = {
@@ -83,9 +87,9 @@ sub make_charset ($%) {
 sub encode ($$) {
   my ($charset, $s) = (lc shift, shift);
   if (ref $CHARSET{$charset}->{encoder}) {
-    return (&{$CHARSET{$charset}->{encoder}} ($charset, $s), 1);
+    return (&{$CHARSET{$charset}->{encoder}} ($charset, $s), success => 1);
   }
-  ($s, 0);
+  ($s, success => 0);
 }
 
 sub decode ($$) {
@@ -123,7 +127,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/30 12:51:05 $
+$Date: 2002/06/01 05:37:18 $
 
 =cut
 

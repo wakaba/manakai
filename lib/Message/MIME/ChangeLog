@@ -1,3 +1,11 @@
+2002-06-01  wakaba <w@suika.fam.cx>
+
+	* Charset.pm:
+	- (encode): Returns minimum charset name if possible.
+	- (definition of iso-2022-int-1, us-ascii): mime_text = 1.
+	* Encoding.pm (decide_coderange): Returns 'binary'
+	when there are lines consist of more than 998 octets.
+
 2002-05-30  wakaba <w@suika.fam.cx>
 
 	* Charset.pm:

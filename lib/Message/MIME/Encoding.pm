@@ -8,7 +8,7 @@ Message::MIME::Encoding --- Encoding (MIME CTE, HTTP encodings, etc) definitions
 package Message::MIME::Encoding;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 our %ENCODER = (
 	'7bit'	=> sub { ($_[1], decide_coderange (@_[0,1,2])) },
@@ -72,6 +72,7 @@ sub decide_coderange ($$\%) {
   } else {
     return 'binary' if $s =~ /\x0D|\x0A/s;
   }
+  return 'binary' if $s =~ /[^\x0D\x0A]{999}/;
   return '8bit'   if $s =~ /[\x80-\xFF]/;
   '7bit';
 }
@@ -244,7 +245,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/30 12:51:05 $
+$Date: 2002/06/01 05:37:18 $
 
 =cut
 
