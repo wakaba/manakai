@@ -11,7 +11,7 @@ date-time used in Internet messages and so on
 package Message::Field::Date;
 use strict;
 use vars qw(%DEFAULT %FMT2STR @ISA %MONTH %REG $VERSION %ZONE);
-$VERSION=do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.20 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 use Time::Local 'timegm_nocheck';
@@ -157,7 +157,7 @@ my $_tm = sub { $_[0]->{local}?'tm_local':'tm' };
 
 %ZONE = (	## NA = Northern America
   ADT	=> [-1,  3,  0],	## (NA)Atlantic Daylight	733
-  CHST	=> [-1, 10,  0],	## Alaska-Hawaii Standard
+  AHST	=> [-1, 10,  0],	## Alaska-Hawaii Standard
   AST	=> [-1,  4,  0],	## (NA)Atlantic Standard	733
   AT	=> [-1,  2,  0],	## Azores
   BDT	=> [-1, 10,  0],	## 	733
@@ -185,10 +185,12 @@ my $_tm = sub { $_[0]->{local}?'tm_local':'tm' };
   FST	=> [+1,  2,  0],	## French Summer
   FWT	=> [+1,  1,  0],	## French Winter
   GDT	=> [+1,  1,  0],	## 	724
+  #GDT	=> [+1,  2,  0],	## German Daylight
   #GM
   GMT	=> [+1,  0,  0],	## Greenwich Mean	733, 822
   #GST	=> [-1,  3,  0],	## Greenland Standard
-  GST	=> [+1, 10,  0],	## Guam Standard
+  GST	=> [+1,  1,  0],	## German Standard
+  #GST	=> [+1, 10,  0],	## Guam Standard
   HDT	=> [-1,  9,  0],	## Hawaii Daylight	733
   HKT	=> [+1,  8,  0],	## Hong Kong
   HST	=> [-1, 10,  0],	## Hawaii Standard	733
@@ -777,7 +779,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/11/13 08:08:51 $
+$Date: 2002/12/28 08:45:50 $
 
 =cut
 

@@ -9,13 +9,13 @@ message header C<Subject:> field body
 package Message::Field::Subject;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, q(Message::Field::Structured);
 
 %REG = %Message::Util::REG;
 	$REG{news_control} = qr/^cmsg$REG{WSP}+/;
-	$REG{prefix_fwd} = qr/(?i)Fwd?/;
+	$REG{prefix_fwd} = qr/(?i)(?:Fwd?|Forward)/;
 	$REG{prefix_list} = qr/[(\[][A-Za-z0-9._-]+[\x20:-]\d+[)\]]/;
 	$REG{M_prefix_list} = qr/[(\[]([A-Za-z0-9._-]+)[\x20:-](\d+)[)\]]/;
 	$REG{M_was_subject} = qr/\([Ww][Aa][Ss][:\x09\x20]$REG{FWS}(.+?)$REG{FWS}\)$REG{FWS}$/;
@@ -30,11 +30,15 @@ push @ISA, q(Message::Field::Structured);
 	    	## ! kou koku !
 	    |[!\x{FF01}] $REG{FWS} [\x{9023}\x{F99A}]\x{7D61}\x{65B9}\x{6CD5}\x{7121}\x{3057}? $REG{FWS} [!\x{FF01}]
 	    	## ! ren raku hou hou nashi !
-	    |\x{672A}\x{627F}\x{8AFE}\x{5E83}[\x{543F}\x{544A}][\x{203B}\x{0FBF}]
+	    |[\x{672A}\x{672B}] [\x09\x0A\x0D\x20\x{3000}]* 
+	     \x{627F} [\x09\x0A\x0D\x20\x{3000}]* 
+	     \x{8AFE} [\x09\x0A\x0D\x20\x{3000}]* 
+	     \x{5E83} [\x09\x0A\x0D\x20\x{3000}]* 
+	     [\x{543F}\x{544A}] [\x09\x0A\x0D\x20\x{3000}]* [\x{203B}\x{0FBF}]
 	    	## mi shou daku kou koku *
 	  /x;
 	} else {
-	  $REG{prefix_re} = qr/(?i)Re|Sv/;
+	  $REG{prefix_re} = qr/(?i)Re|Sv|Odp/;
 	  $REG{prefix_advertisement} = qr/(?i)ADV?:/;
 	}
 	$REG{prefix_general} = qr/((?:$REG{prefix_re}|$REG{prefix_fwd})\^?[\[\(]?\d*[\]\)]?[:>]$REG{FWS})+/x;
@@ -354,7 +358,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/11/13 08:08:52 $
+$Date: 2002/12/28 08:45:50 $
 
 =cut
 
