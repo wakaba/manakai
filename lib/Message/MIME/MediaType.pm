@@ -8,7 +8,8 @@ Message::MIME::MediaType --- Media-type definitions
 package Message::MIME::MediaType;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+require Message::Header;
 
 our %type;
 
@@ -355,6 +356,34 @@ $type{application}->{'x-lirs+csv'} = {
 	extension	=> [qw/lirs/],
 };
 
+$type{application}->{'x-mail-message'} = {
+	cte_7bit_preferred	=> 'quoted-printable',
+	text_content	=> 1,
+	mime_charset	=> 0,
+	handler	=> sub {
+	  my $self = shift;
+	  my $ct = $self->header->field ('content-type', -new_item_unless_exist=>0);
+	  my %p;
+	  if (ref $ct) {
+	    $p{format} = lc $ct->item ('format', -new_item_unless_exist => 0);
+	    $p{hc} = lc $ct->item ('header-charset', -new_item_unless_exist => 0);
+	    $p{bc} = lc $ct->item ('body-charset', -new_item_unless_exist => 0);
+	  }
+	  $p{format} = 'mail-' . ($p{format} || 'rfc2822');
+	  
+	  my %o;
+	  $o{-header_charset} = $p{hc} if $p{hc};
+	  $o{-body_charset} = $p{bc} if $p{bc};
+	  ['Message::Entity', {
+	  	-add_ua	=> 0,
+	  	-fill_date	=> 0,
+	  	-fill_msgid	=> 0,
+	  	-format	=> $p{format},
+	  	%o,
+	  }]
+	},
+};
+
 $type{application}->{xml} = {
 	text_content	=> 1,
 	mime_charset	=> 1,
@@ -433,6 +462,46 @@ $type{message}->{'delivery-status'} = {
 	accept_cte	=> [qw/7bit/],
 	cte_7bit_preferred	=> 'quoted-printable',
 	handler	=> ['Message::Body::MessageDeliveryStatus'],
+};
+require Message::Header::Message;
+$type{message}->{'disposition-notification'} = {
+	mime_alternate	=> [qw/message disposition-notification/],
+	accept_cte	=> [qw/7bit/],
+	cte_7bit_preferred	=> 'quoted-printable',
+	handler	=> ['Message::Header',{
+		-format => 'message-disposition-notification',
+		-ns_default_phuri	=> $Message::Header::Message::DispositionNotification::OPTION{namespace_uri},
+		-hook_init_fill_options	=> sub {
+		  my ($hdr, $option) = @_;
+		  for (qw/disposition final_recipient reporting_ua/) {
+		    unless (defined $option->{ 'fill_' . $_ }) {
+		      $option->{ 'fill_' . $_ } = 1;
+		    }
+		  }
+		},
+		-hook_stringify_fill_fields	=> sub {
+		  my ($hdr, $exist, $option) = @_;
+		  my $ns = ':'.$option->{ns_default_phuri};
+		  if ($option->{fill_disposition}
+		    && !$exist->{ 'disposition'.$ns  }) {
+		    #my $d = $hdr->replace (disposition
+		    #  => 'manual-action/MDN-sent-manually; displayed');
+		    $hdr->field ('disposition');
+		  }
+		  if ($option->{fill_final_recipient}
+		    && !$exist->{ 'final-recipient'.$ns  }) {
+		    my $fr = $hdr->field ('final-recipient');
+		    $fr->type ('rfc822');
+		    $fr->value ('foo@' . (&Message::Util::get_host_fqdn || 'bar.invalid'));
+		  }
+		  if ($option->{fill_reporting_ua}
+		    && !$exist->{ 'reporting-ua'.$ns  }) {
+		    my $rua = $hdr->field ('reporting-ua');
+		    $rua->ua_name (&Message::Util::get_host_fqdn || 'bar.invalid');
+		    $rua->ua_product->add_our_name;
+		  }
+		},
+	}],
 };
 
 $type{message}->{'external-body'} = {
@@ -520,13 +589,14 @@ $type{message}->{partial} = {
 };
 
 $type{message}->{rfc822} = {
+	mime_alternate	=> [qw/application x-mail-message/],
 	accept_cte	=> [qw/7bit 8bit binary/],
 	cte_7bit_preferred	=> 'quoted-printable',
 	handler	=> ['Message::Entity', {
 		-add_ua	=> 0,
 		-fill_date	=> 0,
 		-fill_msgid	=> 0,
-		-format	=> 'mail-rfc822',
+		-format	=> 'mail-rfc822+rfc1123',
 	}],
 };
 
@@ -625,7 +695,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/08 11:49:18 $
+$Date: 2002/07/13 09:30:42 $
 
 =cut
 
