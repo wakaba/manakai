@@ -79,10 +79,6 @@ sub type ($) {
   }
   if ($type !~ /[^a-z-]/ and
       not {qw/attribute 1 readonly 1 in 1 const 1 void 1/}->{$type}) {
-    register_required_module
-      (Name => 'DOMMain',
-       Namespace => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#>,
-       PerlRequire => q<__CLASS{DOMMain}__>);
     $type = 'DOMMain:' . $type;
   }
   return $type;
@@ -252,7 +248,7 @@ for my $module ($tree->append_new_node (type => '#element',
   $module->set_attribute (Name => q<## TBD ##>);
   $module->set_attribute (Namespace => q<:: TBD ::>);
   $module->set_attribute (License => q<license:Perl>);
-  $module->set_attribute ('Date.RCS' => q<$Date: 2004/09/01 09:15:12 $>);
+  $module->set_attribute ('Date.RCS' => q<$Date: 2004/09/09 08:59:03 $>);
 }
 
 fws $s;
