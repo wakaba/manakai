@@ -49,7 +49,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/11/19 14:12:30 $
+     $Date: 2004/11/21 13:17:43 $
 
   @Require:
     @@Module:
@@ -100,26 +100,115 @@ Module:
       DOMCore:DOMImplementation::DOM3
 
 ElementTypeBinding:
-  @Name: IF
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:Class
-ElementTypeBinding:
   @Name: ClassDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:Class
+    @@For:
+      ManakaiDOM:ManakaiDOM
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@ForCheck:
+      ManakaiDOM:DOM
+ElementTypeBinding:
+  @Name: IntMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isForInternal: 1
+ElementTypeBinding:
+  @Name: ReMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isRedefining: 1
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethodParameter
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethodReturn
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttribute
+    @@For:
+      ManakaiDOM:DOM
+ElementTypeBinding:
+  @Name: IntAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttribute
+    @@For:
+      ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isForInternal: 1
+ElementTypeBinding:
+  @Name: ReAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttribute
+    @@For:
+      ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isRedefining: 1
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttrGet
+ElementTypeBinding:
+  @Name: Set
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttrSet
+ElementTypeBinding:
+  @Name: InCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+ElementTypeBinding:
+  @Name: Exception
+  @ElementType:
+    ManakaiDOM:raises
 
 ClassDef:
   @Name: ManakaiDOMNodeObjectNode
-  @rdf:type:
-    ManakaiDOM:Class
-  @For:
-    ManakaiDOM:ManakaiDOM
 
   @Description:
     @@lang:en
@@ -473,8 +562,7 @@ ClassDef:
           checked before the call of this internal method.
     @@Param:
       @@@Name:originalElement
-      @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObjectNode
+      @@@Type:ManakaiDOMNodeObjectNode
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -805,8 +893,7 @@ ClassDef:
         Check whether two nodes are equal.
     @@Param:
       @@@Name:arg
-      @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObjectNode
+      @@@Type:ManakaiDOMNodeObjectNode
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -853,8 +940,8 @@ ClassDef:
         @@@@lang:en
         @@@@@:
           A reference to the ordinal index of the element to return.
-      @@@In:1
-      @@@Out:
+      @@@Write:1
+      @@@Read:
         @@@@@:1
         @@@@Description:
           @@@@@lang:en
@@ -964,10 +1051,6 @@ ClassDef:
 
 ClassDef:
   @Name:  ManakaiDOMChildNodeList
-  @For:
-    ManakaiDOM:ManakaiDOM
-  @Type:
-    ManakaiDOM:Class
 
   @ISA:
     ManakaiDOM:ManakaiDOMNodeReference
@@ -990,7 +1073,8 @@ ClassDef:
           @@@@lang:en
           @@@@@: The index of the node into the child node list.
      @@Return:
-        @@@Type:  Node
+        @@@Type:  
+          DOMCore:Node
         @@@Description:
           @@@@lang:en
           @@@@@: 
@@ -1079,10 +1163,6 @@ ClassDef:
 
 ClassDef:
   @Name: ManakaiDOMGetElementsNodeList
-  @Type: 
-    ManakaiDOM:Class
-  @For:
-    ManakaiDOM:ManakaiDOM
   @ISA:
     ManakaiDOM:ManakaiDOMNodeReference
   @Implement:
@@ -1156,12 +1236,10 @@ ClassDef:
             $r = @$l;
 ## IF:ManakaiDOMGetElementsNodeList
 
-IF:
+ClassDef:
   @Name: ManakaiDOMAttributes
   @ISA:
     ManakaiDOM:ManakaiDOMNodeReference
-  @For:
-    ManakaiDOM:ManakaiDOM
   @Implement:
     DOMCore:NamedNodeMap
   @Description:

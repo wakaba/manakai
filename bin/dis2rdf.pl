@@ -55,7 +55,8 @@ $Opt{output_root_anon_resource} = $Opt{output_anon_resource}
 $Opt{output_as_xml} = 1 unless $Opt{output_as_n3};
 $Opt{output_anon_resource} = 1 unless defined $Opt{output_anon_resource};
 $Opt{output_local_resource} = 1 unless defined $Opt{output_local_resource};
-$Opt{no_undef_check} = $Opt{no_undef_check} ? 0 : 1;
+$Opt{no_undef_check} = defined $Opt{no_undef_check}
+                         ? $Opt{no_undef_check} ? 0 : 1 : 0;
 $Opt{output_perl_member_pattern} ||= qr/./;
 
 BEGIN {
@@ -231,9 +232,21 @@ if ($Opt{output_resource}) {
             if defined $mod->{$prop->[0]};
         }
         for my $prop ([ExpandedURI q<d:Type>],
-                      [ExpandedURI q<dis2pm:if>]) {
+                      [ExpandedURI q<d:actualType>]) {
           $result->add_triple ($uri =>$prop->[0]=> $mod->{$prop->[0]})
             if defined $mod->{$prop->[0]};
+        }
+        for my $prop ([ExpandedURI q<dis2pm:getter>],
+                      [ExpandedURI q<dis2pm:setter>],
+                      [ExpandedURI q<dis2pm:return>]) {
+          my $oo = $mod->{$prop->[0]};
+          if ($oo and defined $oo->{Name}) {
+            my $o = defined $oo->{URI}
+                      ? $oo->{URI}
+                      : ($oo->{ExpandedURI q<d:anonID>}
+                            ||= $result->get_new_anon_id (Name => $oo->{Name}));
+            $result->add_triple ($uri =>$prop->[0]=> $o)
+          }
         }
         for (values %{$mod->{ExpandedURI q<dis2pm:method>}||{}}) {
           my $ruri = defined $_->{URI}
@@ -319,10 +332,11 @@ sub stringify_as_xml ($) {
   my $notation3 = RDF::Notation3::XML->new;
   my $n3 = $self->stringify;
   my $rdf_ = ExpandedURI q<rdf:_>;
-  $n3 =~ s/$rdf_/data:,dummy_/g;
+  $n3 =~ s{$rdf_}{ExpandedURI q<rdf:XXXX__dummy__XXXX>}ge;
   $notation3->parse_string ($n3);
   my $xml = $notation3->get_string;
   $xml =~ s/\brdf:nodeID="_:/rdf:nodeID="/g;
+  $xml =~ s/XXXX__dummy__XXXX/_/g;
 #  $xml =~ s/^<\?xml version="1.0" encoding="utf-8"\?>\s*//;
   $xml;
 }

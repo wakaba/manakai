@@ -64,7 +64,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/11/21 05:17:32 $
+     $Date: 2004/11/21 13:17:43 $
 
   @Feature:
     @@Name: XML
@@ -245,6 +245,14 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMMethodParameter
+ElementTypeBinding:
+  @Name: Exception
+  @ElementType:
+    ManakaiDOM:raises
+ElementTypeBinding:
+  @Name: Warning
+  @ElementType:
+    ManakaiDOM:alwaysWarns
 ElementTypeBinding:
   @Name: Return
   @ElementType:

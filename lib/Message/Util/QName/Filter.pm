@@ -1,6 +1,6 @@
 package Message::Util::QName::Filter;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Carp;
 use Filter::Util::Call;
 
@@ -32,7 +32,7 @@ sub filter ($) {
   $status;
 } # filter
 
-1; # $Date: 2004/11/20 11:12:50 $
+1; # $Date: 2004/11/21 13:17:43 $
 __END__
 
 =head1 NAME
@@ -58,7 +58,14 @@ like C<< ExpandedURI q<prefix:local-name> >>.
 To enable the filter, use the C<use> statement with a hash reference 
 binding namespace prefixes with namespace URI references.
 
-This module is part of manakai.
+Note.  Take care when a QName is written in some delimited structure 
+such as regex.  For example, C<< s/rdf:/ExpandedURI q<rdf:>/g >> 
+would make syntax errors reported because C<< ExpandedURI q<rdf:> >> 
+is expanded to the namespace URI and it includes C</> (SOLIDUS)
+characters so that it is treated as a terminator by Perl parser. 
+Use non-URI characters to delimit, e.g.: 
+
+  s{rdf:}{ExpandedURi q<rdf:>}g
 
 =head1 SEE ALSO
 

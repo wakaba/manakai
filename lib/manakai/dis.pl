@@ -172,6 +172,8 @@ sub dis_typeforqnames_to_uri ($;%) {
     any => ExpandedURI q<DOMMain:any>,
     DOMString => ExpandedURI q<DOMMain:DOMString>,
     Object => ExpandedURI q<DOMMain:Object>,
+    short => ExpandedURI q<DOMMain:short>,
+    'unsigned-short' => ExpandedURI q<DOMMain:unsigned-short>,
   };
   if (defined $forq) {
     $type = $pt->{$typeq} || dis_qname_to_uri ($typeq, %opt);
@@ -700,6 +702,7 @@ sub dis_load_module_element ($;%) {
     FileName => $opt{module_file_name},
     Namespace => $node->get_attribute_value ('Namespace'),
     src => $node,
+    nsBinding => $State->{Namespace},
   };
   for ($node->get_attribute ('QName')) {
     valid_err (q<Module "QName" attribute required>, node => $node) unless $_;
@@ -1130,6 +1133,8 @@ sub dis_perl_init ($;%) {
   for my $mod (values %{$State->{Module}}) {
     next if $mod->{ExpandedURI q<dis2pm:done>};
     local $opt{For} = [keys %{$mod->{For}}]->[0];
+    local $State->{module} = $mod->{URI};
+    local $State->{Namespace} = $mod->{nsBinding};
     ## Perl package name
     my $mg = $State->{Type}->{$mod->{ModuleGroup}};
     my $an = dis_get_attr_node (%opt, parent => $mg->{src}, name => 'AppName');
@@ -1182,6 +1187,9 @@ sub dis_perl_init_classdef ($;%);
 sub dis_perl_init_classdef ($;%) {
   my ($res, %opt) = @_;
   local $opt{For} = [keys %{$res->{For}}]->[0];
+  local $State->{module} = $res->{parentModule};
+  local $State->{Namespace}
+    = $State->{Module}->{$res->{parentModule}}->{nsBinding};
 
   ## Check resource type
   my $type = $res->{ExpandedURI q<dis2pm:type>} || '';
@@ -1189,8 +1197,13 @@ sub dis_perl_init_classdef ($;%) {
     for (ExpandedURI q<ManakaiDOM:DOMMethod>,
          ExpandedURI q<ManakaiDOM:DOMAttribute>,
          ExpandedURI q<ManakaiDOM:DOMMethodParameter>,
+         ExpandedURI q<ManakaiDOM:DOMMethodReturn>,
+         ExpandedURI q<ManakaiDOM:DOMAttrGet>,
+         ExpandedURI q<ManakaiDOM:DOMAttrSet>,
          ExpandedURI q<ManakaiDOM:Class>,
-         ExpandedURI q<ManakaiDOM:IF>) {
+         ExpandedURI q<ManakaiDOM:IF>,
+         ExpandedURI q<ManakaiDOM:Exception>,
+         ExpandedURI q<ManakaiDOM:Warning>) {
       if (dis_uri_ctype_match ($_, $t, %opt)) {
         $type = $_;
         last TYPES;
@@ -1200,10 +1213,14 @@ sub dis_perl_init_classdef ($;%) {
   $res->{ExpandedURI q<dis2pm:type>} = $type;
 
   my $pack;
-  if ($type eq ExpandedURI q<ManakaiDOM:Class>) {
+  if ({
+       ExpandedURI q<ManakaiDOM:Class> => 1,
+       ExpandedURI q<ManakaiDOM:Exception> => 1,
+       ExpandedURI q<ManakaiDOM:Warning> => 1,
+      }->{$type}) {
     ## Class package name
     $pack = $State->{Module}->{$res->{parentModule}}
-                     ->{ExpandedURI q<dis2pm:packageName>};
+                  ->{ExpandedURI q<dis2pm:packageName>};
     valid_err ("Perl package name for <$res->{parentModule}> not defined",
                node => $res->{src})
       unless defined $pack;
@@ -1277,6 +1294,68 @@ sub dis_perl_init_classdef ($;%) {
                        ->{ExpandedURI q<dis2pm:method>}->{$name}->{Name};
     $State->{ExpandedURI q<dis2pm:parentResource>}
           ->{ExpandedURI q<dis2pm:method>}->{$name} = $res;
+  } elsif ({ExpandedURI q<ManakaiDOM:DOMMethodReturn> => 1,
+            ExpandedURI q<ManakaiDOM:DOMAttrGet> => 1,
+            ExpandedURI q<ManakaiDOM:DOMAttrSet> => 1}->{$type}) {
+    ## Value type
+    my $t = dis_get_attr_node (%opt, name => 'Type', parent => $res->{src}) ||
+            ({
+              ExpandedURI q<ManakaiDOM:DOMMethod> => 1,
+              ExpandedURI q<ManakaiDOM:DOMAttribute> => 1
+             }->{$State->{ExpandedURI q<dis2pm:parentResource>}
+                       ->{ExpandedURI q<dis2pm:type>}} ?
+                dis_get_attr_node
+                   (%opt, name => 'Type',
+                    parent => $State->{ExpandedURI q<dis2pm:parentResource>}
+                                    ->{src}) : undef);
+    if ($t) {
+      $res->{ExpandedURI q<d:Type>}
+        = dis_typeforqnames_to_uri ($t->value, use_default_namespace => 1,
+                                    %opt, node => $t);
+      valid_err (qq{Type <$res->{ExpandedURI q<d:Type>}> must be defined},
+                 node => $t)
+        unless defined $State->{Type}->{$res->{ExpandedURI q<d:Type>}}->{Name};
+      my $i = dis_get_attr_node (%opt, name => 'actualType',
+                                 parent => $res->{src}) ||
+            ({
+              ExpandedURI q<ManakaiDOM:DOMMethod> => 1,
+              ExpandedURI q<ManakaiDOM:DOMAttribute> => 1
+             }->{$State->{ExpandedURI q<dis2pm:parentResource>}
+                       ->{ExpandedURI q<dis2pm:type>}} ?
+                dis_get_attr_node
+                   (%opt, name => 'actualType',
+                    parent => $State->{ExpandedURI q<dis2pm:parentResource>}
+                                    ->{src}) : undef);
+      if ($i) {
+        $res->{ExpandedURI q<d:actualType>}
+          = dis_typeforqnames_to_uri ($t->value, use_default_namespace => 1,
+                                      %opt, node => $t);
+        valid_err (qq{Type <$res->{ExpandedURI q<d:actualType>
+                   }> must be defined},
+                   node => $t)
+          unless defined $State->{Type}->{$res->{ExpandedURI q<d:actualType>}}
+                               ->{Name};
+      } else {
+        $res->{ExpandedURI q<d:actualType>} = $res->{ExpandedURI q<d:Type>};
+      }
+    } elsif ({
+              ExpandedURI q<ManakaiDOM:DOMAttrGet> => 1,
+              ExpandedURI q<ManakaiDOM:DOMAttrSet> => 1,
+             }->{$type}) {
+      valid_err (q<Attribute value type must be declared>, node => $res->{src});
+    }
+
+    my $p = {ExpandedURI q<ManakaiDOM:DOMMethodReturn>
+              => ExpandedURI q<dis2pm:return>,
+             ExpandedURI q<ManakaiDOM:DOMAttrGet>
+              => ExpandedURI q<dis2pm:getter>,
+             ExpandedURI q<ManakaiDOM:DOMAttrSet>
+              => ExpandedURI q<dis2pm:setter>};
+    valid_err (qq{<$p->{$type}> already defined}, node => $res->{node})
+      if defined $State->{ExpandedURI q<dis2pm:parentResource>}
+                       ->{$p->{$type}}->{Name};
+    $State->{ExpandedURI q<dis2pm:parentResource>}
+          ->{$p->{$type}} = $res;
   } elsif ({ExpandedURI q<ManakaiDOM:DOMMethodParameter> => 1}->{$type}) {
     ## Parameter name
     valid_err (qq<Parameter name required>, node => $res->{node})
@@ -1338,6 +1417,23 @@ sub dis_perl_init_classdef ($;%) {
     local $State->{ExpandedURI q<dis2pm:parentResource>} = $res;
     dis_perl_init_classdef ($cres, %opt);
   }
+
+  ## Validate children
+  N: for (@{$res->{src}->child_nodes}) {
+    next if $_->node_type ne '#element';
+    my $ln = dis_element_type_to_uri ($_->local_name, %opt, node => $_);
+    if ($ln eq ExpandedURI q<d:ResourceDef>) {
+      next N;
+    } elsif (defined $State->{Type}->{$ln}->{Name}) {
+      for (%{$State->{Type}->{$ln}->{Type}}) {
+        if (dis_uri_ctype_match (ExpandedURI q<rdfs:Property>, $_, %opt)) {
+          next N;
+        }
+      }
+    }
+    valid_err (qq<<$ln>: Undefined element type>, node => $_);
+  }
+
   $res->{ExpandedURI q<dis2pm:done>} = 1;
 } # dis_perl_init_classdef
 
@@ -1655,4 +1751,4 @@ sub disdoc_inline2pod ($;%) {
 
 =cut
 
-1; # $Date: 2004/11/21 05:17:32 $
+1; # $Date: 2004/11/21 13:17:43 $

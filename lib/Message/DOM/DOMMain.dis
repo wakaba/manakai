@@ -48,7 +48,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/11/21 05:17:32 $
+     $Date: 2004/11/21 13:17:43 $
   
   @Feature:
     @@QName:
@@ -179,6 +179,21 @@ ElementTypeBinding:
       ManakaiDOM:ManakaiDOM
     @@ManakaiDOM:isRedefining: 1
 ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethodParameter
+ElementTypeBinding:
+  @Name: Exception
+  @ElementType:
+    ManakaiDOM:raises
+ElementTypeBinding:
+  @Name: Warning
+  @ElementType:
+    ManakaiDOM:alwaysWarns
+ElementTypeBinding:
   @Name: Return
   @ElementType:
     dis:ResourceDef
@@ -240,22 +255,37 @@ ElementTypeBinding:
 
 ## Definition for built-in IDL types
 
-DataTypeDef:
+ResourceDef:
+  @Name: IDLDataType
+  @Description:
+    @@lang:en
+    @@@:
+      A CORBA IDL data type.
+  @rdf:type:
+    rdfs:Class
+  @ISA:
+    ManakaiDOM:DataType
+ElementTypeBinding:
+  @Name: IDLDataTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: IDLDataType
+
+IDLDataTypeDef:
   @Name: any
   @Description:
     @@lang:en
     @@@: Any data.
 
-DataTypeDef: 
+IDLDataTypeDef: 
   @Name: Object
-  @IName:Object
   @Description:
     @@lang:en
     @@@: An object.
 
-DataTypeDef:
+IDLDataTypeDef:
   @Name: unsigned-long-long
-  @IName:unsigned-long-long
   @Def:
     @@For:
       ManakaiDOM:IDL
@@ -269,9 +299,8 @@ DataTypeDef:
     @@lang:en
     @@@: A unsigned long long integer.
 
-DataTypeDef:
+IDLDataTypeDef:
   @Name: unsigned-long
-  @IName:unsigned-long
   @Def:
     @@For:
       ManakaiDOM:IDL
@@ -285,9 +314,8 @@ DataTypeDef:
     @@lang:en
     @@@: A unsigned long integer.
 
-DataTypeDef:
+IDLDataTypeDef:
   @Name: long
-  @IName:long
   @FullName:
     @@lang:en
     @@@: Long integer
@@ -295,9 +323,8 @@ DataTypeDef:
     @@lang:en
     @@@: A signed long integer.
 
-DataTypeDef:
+IDLDataTypeDef:
   @Name: unsigned-short
-  @IName:unsigned-short
   @Def:
     @@For:
       ManakaiDOM:IDL
@@ -311,9 +338,8 @@ DataTypeDef:
     @@lang:en
     @@@: An unsigned short integer.
 
-DataTypeDef:
+IDLDataTypeDef:
   @Name: float
-  @IName:float
   @FullName:
     @@lang:en
     @@@: Floating point number
@@ -326,6 +352,7 @@ ConstGroup:
   @Description:
     @@lang:en
     @@@: A boolean (truth) value.
+  @rdf:type: IDLDataType
   @Const:
     @@Name: true
     @@Value:
@@ -983,7 +1010,6 @@ DataTypeDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: The match is done as case-sensitive.
-      @@@IsOptional: 1
     @@Return:
       @@@Type: boolean
       @@@Description:
@@ -1183,8 +1209,6 @@ DataTypeDef:
 
 ObjectDef:
   @Name:  DOMImplementationRegistry
-  @Type:
-    ManakaiDOM:Class
   @For:
     ManakaiDOM:DOM3
   @ISA:
@@ -1238,7 +1262,8 @@ ObjectDef:
           @@@@lang:en
           @@@@@: A list of desired features that must be implemented.
      @@Return:
-       @@@Type:  DOMImplementation
+       @@@Type:  
+         DOMCore:DOMImplementation
        @@@Description:
          @@@@lang:en
          @@@@@:
@@ -1269,7 +1294,8 @@ ObjectDef:
           @@@@lang:en
           @@@@@: A list of desired features that must be implemented.
      @@Return:
-       @@@Type:  DOMImplementationList
+       @@@Type:  
+         DOMCore:DOMImplementationList
        @@@Description:
          @@@@lang:en
          @@@@@: A list of implementations that support the desired features.
@@ -1296,7 +1322,8 @@ ObjectDef:
         This method is taken from the normative Java binding.
     @@Param:
       @@@Name: s
-      @@@Type: DOMImplementationSource
+      @@@Type: 
+        DOMCore:DOMImplementationSource
       @@@Description:
         @@@@lang:en
         @@@@@: 

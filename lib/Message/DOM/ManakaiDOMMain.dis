@@ -19,6 +19,8 @@ Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @MUError:\
   @MUErrorCore:-
+  @owl:
+    http://www.w3.org/2002/07/owl#
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
@@ -40,7 +42,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/11/20 11:12:50 $
+     $Date: 2004/11/21 13:17:43 $
   
   @Description:
     @@lang:en
@@ -305,21 +307,30 @@ ElementTypeBinding:
       ManakaiDOM:DataType
 
 ResourceTypeDef:
-  @Name: Exception
+  @Name: ExceptionIF
   @Description:
     @@lang:en
     @@@:
       An exception type.
+ResourceTypeDef:
+  @Name: ExceptionClass
+  @Description:
+    @@lang:en
+    @@@:
+      A concrete implementation of exception.
 ElementTypeBinding:
   @Name: ExceptionDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
-      ManakaiDOM:Exception
+      ManakaiDOM:ExceptionClass
+    @@ISA: ManakaiDOMException
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM
 
 ResourceTypeDef:
-  @Name: Warning
+  @Name: WarningClass
   @Description:
     @@lang:en
     @@@:
@@ -330,7 +341,31 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
-      ManakaiDOM:Warning
+      ManakaiDOM:WarningClass
+    @@ISA: ManakaiDOMWarning
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM
+
+PropDef:
+  @Name: exceptionOrWarningParameter
+  @rdfs:domain: Const
+  @Description:
+    @@lang:en
+    @@@:
+      Declares the existence of an additional information about the exception.
+ResourceTypeDef:
+  @Name: ExceptionOrWarningSubType
+  @Description:
+    @@lang:en
+    @@@:
+      A subtype of an exception or warning.
+ElementTypeBinding:
+  @Name: XParam
+  @ElementType:
+    ManakaiDOM:exceptionOrWarningParameter
+  @ShadowContent:
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM
 
 ResourceTypeDef:
   @Name: ConstGroup
@@ -343,6 +378,21 @@ ResourceTypeDef:
   @Description:
     @@lang:en
     @@@: A constant value.
+ElementTypeBinding:
+  @Name: Const
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: Const
+PropDef:
+  @QName: 
+    dis:IsBitMask
+  @dataType:
+    DOMMain:boolean
+  @Description:
+    @@lang:en
+    @@@:
+      Whether the constant group is defined as bitmask values or not.
 
 ResourceTypeDef:
   @Name: Class
@@ -357,6 +407,8 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:Class
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM
 
 ResourceTypeDef:
   @QName: 
@@ -451,6 +503,22 @@ ResourceTypeDef:
   @Description:
     @@lang:en
     @@@: A DOM method parameter.
+PropDef:
+  @QName:
+    dis:Read
+  @Description:
+    @@lang:en
+    @@@: Whether the subject resource is readable or not.
+  @dataType:
+    dis:Boolean
+PropDef:
+  @QName:
+    dis:Write
+  @Description:
+    @@lang:en
+    @@@: Whether the subject resource is writable or not.
+  @dataType: 
+    dis:Boolean
 ResourceTypeDef:
   @QName:
     ManakaiDOM:DOMMethodReturn
@@ -500,6 +568,119 @@ ResourceTypeDef:
     @@lang:en
     @@@: 
       <QUOTE:In case> description.
+PropDef:
+  @QName: raises
+  @Description:
+    @@lang:en
+    @@@:
+      An exception the method or attribute might raise.
+PropDef:
+  @QName: alwaysWarns
+  @Description:
+    @@lang:en
+    @@@:
+      A warning that is reported everytime the method or attribute is called. 
+      \
+      {NOTE:: By the configuration for warning level, it might not be 
+              reported.
+      \
+      }
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@For:
+      ManakaiDOM:DOM
+ElementTypeBinding:
+  @Name: IntMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@For:
+      ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isForInternal: 1
+ElementTypeBinding:
+  @Name: ReMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@For:
+      ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isRedefining: 1
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethodParameter
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethodReturn
+    @@For:
+      ManakaiDOM:DOM
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttribute
+    @@For:
+      ManakaiDOM:DOM
+ElementTypeBinding:
+  @Name: IntAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttribute
+    @@For:
+      ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isForInternal: 1
+ElementTypeBinding:
+  @Name: ReAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttribute
+    @@For:
+      ManakaiDOM:ManakaiDOM
+    @@ManakaiDOM:isRedefining: 1
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttrGet
+ElementTypeBinding:
+  @Name: Set
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMAttrSet
+ElementTypeBinding:
+  @Name: InCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+
 
 PropDef:
   @QName:
@@ -510,18 +691,194 @@ PropDef:
     rdfs:Class
 PropDef:
   @QName:
-    rdf:domain
+    rdfs:domain
   @rdfs:domain:
     rdfs:Property
   @rdfs:range:
     rdfs:Class
 PropDef:
   @QName:
-    rdf:range
+    rdfs:range
   @rdfs:domain:
     rdfs:Property
   @rdfs:range:
     rdfs:Class
+
+PropDef:
+  @QName:
+    dis:For
+  @rdfs:domain:
+    rdfs:Resource
+  @dataType:
+    dis:TypeQName
+  @Description:
+    @@lang:en
+    @@@:
+      A <Q:For> for which the resource is used (<QUOTE:OR> filter).
+PropDef:
+  @QName:
+    dis:ForCheck
+  @rdfs:domain:
+    rdfs:Resource
+  @dataType:
+    dis:TypeQName
+  @Description:
+    @@lang:en
+    @@@:
+      A <Q:For> for which the resource is used (<QUOTE:AND> filter).
+PropDef:
+  @QName:
+    dis:ContentType
+  @rdfs:domain:
+    DOMMain:any
+  @rdfs:range:
+    ManakaiDOM:DataType
+  @dataType:
+    dis:TypeQName
+  @Description:
+    @@lang:en
+    @@@:
+      The media type (content type) of the content.
+PropDef:
+  @QName:
+    dis:lang
+  @rdfs:domain:
+    rdfs:Resource
+  @Description:
+    @@lang:en
+    @@@:
+      The natural language in which the content is written.
+PropDef:
+  @QName:
+    dis:script
+  @rdfs:domain:
+    rdfs:Resource
+  @Description:
+    @@lang:en
+    @@@:
+      The writting script in which the content is written.
+
+PropDef:
+  @QName:
+    dis:Name
+  @Description:
+    @@lang:en
+    @@@:
+      A name of a resource.
+PropDef:
+  @QName:
+    dis:QName
+  @Description:
+    @@lang:en
+    @@@:
+      A qualified name of a resource.
+PropDef:
+  @QName:
+    dis:AppName
+  @Description:
+    @@lang:en
+    @@@: An application (binding) dependent name of a resource.
+PropDef:
+  @QName:
+    rdfs:label
+  @Description:
+    @@lang:en
+    @@@: A human-readable name of the subject resource.
+PropDef:
+  @QName:
+    dis:FullName
+  @Description:
+    @@lang:en
+    @@@:
+      A human-readable name of a resource.
+  @ISA:
+    rdfs:label
+PropDef:
+  @QName:
+    dis:Label
+  @Description:
+    @@lang:en
+    @@@:
+      A human-readable simple header of a resource.
+  @ISA:
+    rdfs:label
+
+PropDef:
+  @QName:
+    rdfs:comment
+  @Description:
+    @@lang:en
+    @@@: A description of the subject resource.
+PropDef:
+  @QName:
+    dis:Description
+  @Description:
+    @@lang:en
+    @@@:
+      A human-readable description of a resource.
+  @ISA:
+    rdfs:comment
+PropDef:
+  @QName:
+    dis:ImplNote
+  @Description:
+    @@lang:en
+    @@@:
+      An implementor's node about resource.
+PropDef:
+  @QName:
+    dis:Spec
+  @Description:
+    @@lang:en
+    @@@:
+      A reference to a specification.  (Obsolete)
+PropDef:
+  @QName:
+    dis:Level
+  @Description:
+    @@lang:en
+    @@@:
+      DOM Level (obsolete)
+PropDef:
+  @QName:
+    dis:SpecLevel
+  @Description:
+    @@lang:en
+    @@@:
+      DOM Level of specification (obsolete) - use <CODE:For> instead.
+PropDef:
+  @QName:
+    dis:Condition
+  @Description:
+    @@lang:en
+    @@@:
+      Condition (obsolete) - use <CODE:For> instead.
+PropDef:
+  @QName:
+    dis:Redefine
+  @Description:
+    @@lang:en
+    @@@: Declares redefining (obsolete)
+PropDef:
+  @QName:
+    dis:RedefinedBy
+  @Description:
+    @@lang:en
+    @@@: Declares redefined in elsewhere (obsolete)
+PropDef:
+  @QName:
+    dis:Redefined
+  @Description:
+    @@lang:en
+    @@@: Declares redefined in elsewhere (obsolete)
+
+PropDef:
+  @QName:
+    dis:Operator
+  @Description:
+    @@lang:en
+    @@@:
+      Overload of an operator.
 
 PropDef:
   @QName:
@@ -530,57 +887,213 @@ PropDef:
     rdfs:Resource
   @rdfs:range:
     rdfs:Resource
+  @Description:
+    @@lang:en
+    @@@:
+      The data type of the resource defined, including 
+      class attribute type and method return value type.
 PropDef:
   @QName:
-    dis:For
+    dis:actualType
   @rdfs:domain:
-    DOMMain:any
-PropDef:
-  @QName:
-    dis:ContentType
-  @rdfs:domain:
-    DOMMain:any
+    rdfs:Resource
   @rdfs:range:
-    ManakaiDOM:DataType
+    rdfs:Resource
+  @Description:
+    @@lang:en
+    @@@:
+      The actual data type of the resource defined, including 
+      class attribute type and method return value type. 
 PropDef:
   @QName:
-    dis:lang
-  @rdfs:domain:
-    DOMMain:any
+    dis:Value
+  @Description:
+    @@lang:en
+    @@@:
+      A value of the resource.
 PropDef:
   @QName:
-    dis:script
-  @rdfs:domain:
-    DOMMain:any    
+    dis:DefaultValue
+  @Description:
+    @@lang:en
+    @@@: The default value of the resource.
+PropDef:
+  @QName:
+    dis:Def
+  @Description:
+    @@lang:en
+    @@@:
+      A definition of the resource.
+PropDef:
+  @QName:
+    dis:IntDef
+  @Description:
+    @@lang:en
+    @@@:
+      A definition of the resource (for internal use).
+PropDef:
+  @QName:
+    dis:IsAbstract
+  @Description:
+    @@lang:en
+    @@@:
+      Whether the resource is defined abstractly or concretly. 
+      Abstractly defined resource must be concretly overloaded 
+      by inheriting class.
+PropDef:
+  @QName:
+    dis:IsFinal
+  @Description: 
+    @@lang:en
+    @@@:
+      Whether the resource is overloadable or not.
 
 PropDef:
   @QName:
+    dis:dataType
+  @Description:
+    @@lang:en
+    @@@:
+      Lexical data type of the property object.
+  @rdfs:domain:
+    rdfs:Property
+  @rdfs:range:
+    rdfs:Property
+  @dataType:
+    dis:TypeQName
+
+PropDef:
+  @QName:
+    rdfs:subClassOf
+  @Description:
+    @@lang:en
+    @@@:
+      The subject is a subclass of a class.
+  @rdfs:domain:
+    rdfs:Class
+  @rdfs:range:
+    rdfs:Class
+PropDef:
+  @QName:
+    dis:ISA
+  @Description:
+    @@lang:en
+    @@@:
+      Inheritance relationship of a resource.
+  @ISA:
+    rdfs:subClassOf
+  @rdfs:domain:
+    rdfs:Property
+  @rdfs:range:
+    rdfs:Property
+  @dataType:
+    dis:TypeQName
+PropDef:
+  @QName:
+    dis:Implement
+  @Description:
+    @@lang:en
+    @@@:
+      <QUOTE:Implementing> relationship of a resource.
+PropDef:
+  @QName:
+    owl:sameAs
+  @Description:
+    @@lang:en
+    @@@:
+      The subject is same as the object.
+PropDef:
+  @QName:
+    dis:aliasFor
+  @Description:
+    @@lang:en
+    @@@:
+      Make a resource as alias for another resource.
+  @ISA:
+    owl:sameAs
+  @rdfs:domain:
+    rdfs:Resource
+  @rdfs:range:
+    rdfs:Resource
+  @dataType:
+    dis:TFQNames
+
+PropDef:
+  @QName:
+    dis:Require
+  @Description:
+    @@lang:en
+    @@@: 
+      References to external modules.
+PropDef:
+  @QName:
     ManakaiDOM:isForInternal
-  @Type:
+  @dataType:
     DOMMain:boolean
 PropDef:
   @QName:
     ManakaiDOM:isRedefining
-  @Type:
+  @dataType:
     DOMMain:boolean
+
 PropDef:
   @QName:
     ManakaiDOM:moduleSuffix
-  @Type:
+  @dataType:
     DOMMain:DOMString
+
+PropDef:
+  @QName:
+    dis:NSVersion
+  @Description:
+    @@lang:en
+    @@@:
+      A namespace-aware variant of the method or attribute.
+PropDef:
+  @QName:
+    dis:NoNSVersion
+  @Description:
+    @@lang:en
+    @@@: A namespace-unaware variant of the method or attribute.
+PropDef:
+  @QName:
+    dis:Role
+  @Description:
+    @@lang:en
+    @@@:
+      A role of the class in the DOM system.
 
 DataTypeDef:
   @QName:
-    lang:dis
-  @IQName:
     lang:dis
   @FullName:
     @@lang:en
     @@@: dis grove
 DataTypeDef:
   @QName:
-    lang:Perl
-  @IQName:
+    dis:TypeQName
+  @FullName:
+    @@lang:en
+    @@@: A dis QName
+DataTypeDef:
+  @QName: 
+    dis:TFQNames
+  @FullName:
+    @@lang:en
+    @@@:
+      A pair of resource QName and optional <QUOTE:For> QName
+DataTypeDef:
+  @QName:
+    dis:Boolean
+  @FullName:
+    @@lang:en
+    @@@: 
+      The boolean truth value, i.e. true or false.
+  @ISA:
+    DOMMain:boolean
+
+DataTypeDef:
+  @QName:
     lang:Perl
   @ISA:
     DOMMain:DOMString
@@ -589,18 +1102,27 @@ DataTypeDef:
     @@@: Perl 5 code
 DataTypeDef:
   @QName:
-    dis:Perl
-  @IQName:
+    perl:ARRAY
+  @FullName:
+    @@lang:en
+    @@@: Perl array reference
+DataTypeDef:
+  @QName:
+    perl:hash
+  @FullName:
+    @@lang:en
+    @@@: Perl hash reference
+DataTypeDef:
+  @QName:
     dis:Perl
   @FullName:
     @@lang:en
     @@@: dis grove for Perl
   @ISA: 
     lang:dis
+
 DataTypeDef:
   @QName:
-    lang:disdoc
-  @IQName:
     lang:disdoc
   @FullName:
     @@lang:en
@@ -609,8 +1131,6 @@ DataTypeDef:
     DOMMain:DOMString
 DataTypeDef:
   @QName:
-    lang:muf
-  @IQName:
     lang:muf
   @FullName:
     @@lang:en
@@ -765,7 +1285,6 @@ DataTypeDef:
 
 ExceptionDef:
   @Name: ManakaiDOMImplementationException
-  @IName:ManakaiDOMImplementationException
   @ISA: ManakaiDOMException
   @For: ManakaiDOM
   @Description:
@@ -777,16 +1296,13 @@ ExceptionDef:
   @Attr:
      @@Name:  code
      @@Get:
-       @@@Type:  unsigned-short
-       @@@Description:
-         @@@@lang:en
-         @@@@@:
-           The error code from the constant value group
-           "ManakaiDOMImplementationExceptionCode".
+       @@@Type:  
+         DOMMain:unsigned-short
+       @@@actualType: ManakaiDOMImplementationExceptionCode
 
-  @ClassDef:
-    @@Name: ManakaiDOMImplementationExceptionCode
-    @@Type:
+  @ResourceDef:
+    @@QName: ManakaiDOMImplementationExceptionCode
+    @@rdf:type:
       ManakaiDOM:ConstGroup
     @@ISA:
       DOMMain:unsigned-short
@@ -810,14 +1326,14 @@ ExceptionDef:
             prefix => { "}, suffix => {"}); is incompatible with the
             expected type%t (name => {<Q:MDOM_EXCEPTION:class>}, 
             prefix => {: "}, suffix => {"}).
-      @@@Param:
+      @@@XParam:
         @@@@QName:
           ManakaiDOMImplementationException:param-name
         @@@@Description:
           @@@@@lang:en
           @@@@@@: The parameter name.
           
-      @@@Param:
+      @@@XParam:
         @@@@QName:
           ManakaiDOMImplementationException:class
         @@@@Type:
@@ -842,7 +1358,7 @@ ExceptionDef:
             The null value is passed to the parameter%t (
             name => {<Q:MDOM_EXCEPTION:param-name>},
             prefix => { "}, suffix => {"});.
-      @@@Param:
+      @@@XParam:
         @@@@QName:
           ManakaiDOMImplementationException:param-name
         @@@@Description:
@@ -860,7 +1376,7 @@ ExceptionDef:
           the range is the low-surrogate (the second 16-bit unit of the surrogate
           pair) or the last character of the range is the high-surrogate 
           (the first 16-bit unit of the surrogate pair).
-      @@@Param:
+      @@@XParam:
         @@@@QName:
           ManakaiDOMImplementationException:param-name
         @@@@Description:
@@ -881,7 +1397,7 @@ ExceptionDef:
           DOM application MUST NOT try to catch this exception. 
           If this exception is raised, please report to the 
           author of that module.
-      @@@Param:
+      @@@XParam:
         @@@@QName:
           ManakaiDOMImplementationException:values
         @@@@Type: 
@@ -902,7 +1418,6 @@ ExceptionDef:
 
 WarningDef:
   @Name: ManakaiDOMImplementationWarning
-  @IName:ManakaiDOMImplementationWarning
   @ISA: ManakaiDOMWarning
   @For: ManakaiDOM
   @Description:
@@ -921,9 +1436,9 @@ WarningDef:
            The warning code from the constant value group
            ManakaiDOMImplementationWarningCode.
 
-  @ClassDef:
+  @ResourceDef:
     @@Name: ManakaiDOMImplementationWarningCode
-    @@Type:
+    @@rdf:type:
       ManakaiDOM:ConstGroup
     @@ISA: 
       DOMMain:unsigned-short
@@ -945,13 +1460,13 @@ WarningDef:
         @@@@lang:en
         @@@@@:
           The node to be inserted is same as the reference node.
-      @@@Param:
+      @@@XParam:
         @@@@QName:
           MDOM_EXCEPTION:newChild-param-name
         @@@@Description:
           @@@@@lang:en
           @@@@@@: The parameter name for "newChild" node.
-      @@@Param:
+      @@@XParam:
         @@@@QName:
           MDOM_EXCEPTION:refChild-param-name
         @@@@Description:
@@ -981,7 +1496,7 @@ WarningDef:
           the way empty strings are treated is implementation dependent. 
           The DOM Level 3 Core Specification defines that empty strings 
           are converted to "null".
-      @@@Param:
+      @@@XParam:
         @@@@QName:
           ManakaiDOMImplementationException:param-name
         @@@@Description:
@@ -1048,6 +1563,7 @@ ClassDef:
 ClassDef:
   @Name: ManakaiDOMExceptionOrWarning
   @For: ManakaiDOM
+  @ISA: ManakaiDOMObject
   @Description:
     @@lang:en
     @@@:
@@ -1068,7 +1584,7 @@ ClassDef:
         but redefined here for the purpose of manakai DOM modules.
     @@Return:
       @@@Type:
-        ManakaiDOM:DOMString
+        DOMMain:DOMString
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1096,9 +1612,10 @@ ClassDef:
           $r = $self->_FORMATTER_PACKAGE_->new
                     ->replace ($template, param => $self);
 
-ExceptionDef:
+ResourceDef:
   @Name: ManakaiDOMException
-  @IName:ManakaiDOMException
+  @rdf:type:
+    ManakaiDOM:ExceptionClass
   @ISA: ManakaiDOMExceptionOrWarning
   @For: ManakaiDOM
   @Description:
@@ -1106,9 +1623,10 @@ ExceptionDef:
     @@@:
       The common interface that is implemented by all Manakai DOM 
       exceptions.
-WarningDef:
+ResourceDef:
   @Name: ManakaiDOMWarning
-  @IName:ManakaiDOMWarning
+  @rdf:type:
+    ManakaiDOM:WarningClass
   @ISA: ManakaiDOMExceptionOrWarning
   @For: ManakaiDOM
   @Description:
@@ -1126,7 +1644,6 @@ ClassDef:
     @@@:
       An internal node object.  This interface defines a number of basic 
       operations to the node or the grove. 
-  \
   @ImplNote:
     @@lang:en
     @@@:
@@ -1169,10 +1686,11 @@ ClassDef:
       @@@@: Return a new reference to the node.
     @@Param:
       @@@Name: class
+      @@@Type:
+        DOMMain:any
       @@@Description:
         @@@@lang:en
         @@@@@: A class the new reference is blessed with.
-      @@@IsOptional:1
     @@Return:
       @@@Type: ManakaiDOMNodeReference
       @@@Description:

@@ -74,7 +74,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/11/21 05:17:32 $
+     $Date: 2004/11/21 13:17:43 $
 
   @DefaultFor:
     ManakaiDOM:ManakaiDOMLatest
@@ -129,7 +129,43 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
-      ManakaiDOM:Exception
+      @@@@:
+        ManakaiDOM:ExceptionIF
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:ExceptionClass
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@rdf:type:
+      @@@@:
+        dis:MultipleResource
+      @@@ForCheck:
+        !ManakaiDOM:ForClass !ManakaiDOM:ForIF
+    @@resourceFor:
+      ManakaiDOM:ForIF
+    @@resourceFor:
+      @@@@:
+        ManakaiDOM:ForClass
+      @@@ForCheck:
+        ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:DOM
+    @@ISA:
+      @@@@:
+        ManakaiDOM:ManakaiDOMException
+      @@@ForCheck:
+        ManakaiDOM:ManakaiDOM
+ElementTypeBinding:
+  @Name: Exception
+  @ElementType:
+    ManakaiDOM:raises
+ElementTypeBinding:
+  @Name: Warning
+  @ElementType:
+    ManakaiDOM:alwaysWarns
+
 ElementTypeBinding:
   @Name: IF
   @ElementType:
@@ -153,9 +189,17 @@ ElementTypeBinding:
     @@resourceFor:
       ManakaiDOM:ForIF
     @@resourceFor:
-      ManakaiDOM:ForClass
+      @@@@:
+        ManakaiDOM:ForClass
+      @@@ForCheck:
+        ManakaiDOM:ManakaiDOM
     @@ForCheck:
-      ManakaiDOM:ManakaiDOM
+      ManakaiDOM:DOM
+    @@ISA:
+      @@@@:
+        ManakaiDOM:ManakaiDOMObject
+      @@@ForCheck:
+        ManakaiDOM:ForClass
 ElementTypeBinding:
   @Name: IFDef
   @ElementType:
@@ -180,6 +224,13 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMErrorSet
+ElementTypeBinding:
+  @Name: Error
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMError
 ElementTypeBinding:
   @Name: EventSet
   @ElementType:
@@ -289,9 +340,49 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:ConstGroup
+ElementTypeBinding:
+  @Name: Const
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: 
+      ManakaiDOM:Const
+ElementTypeBinding:
+  @Name: XParam
+  @ElementType:
+    ManakaiDOM:exceptionOrWarningParameter
+  @ShadowContent:
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM
+ElementTypeBinding:
+  @Name: SubTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:ExceptionOrWarningSubType
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:ForClass
+
+PropDef:
+  @QName: 
+    dis:CParam
+  @ImplNote:
+    @@lang:en
+    @@@:
+      Temporary - should be bound to ManakaiDOM:DOMConfigParameter
 
 ExceptionDef:
-  @Name:  DOMException
+  @QName:
+    @@@: DOMException
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @QName:
+    @@@: ManakaiDOMException
+    @@ForCheck:
+      ManakaiDOM:ForClass
   @Spec:
     @@DOM3:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-17189187
@@ -302,12 +393,22 @@ ExceptionDef:
   @Attr:
      @@Name:  code
      @@Get:
-       @@@Type:  unsigned-short
+       @@@Type:  
+         DOMMain:unsigned-short
+       @@@actualType: ExceptionCode
        @@@Description:
          @@@@lang:en
          @@@@@: The error code from the constant value group ExceptionCode.
+
   @ConstGroup:
-     @@Name:  ExceptionCode
+     @@QName:
+       @@@@: ExceptionCode
+       @@@ForCheck:
+         ManakaiDOM:ForIF
+     @@QName:
+       @@@@: ManakaiDOMExceptionCode
+       @@@ForCheck:
+         ManakaiDOM:ForClass
      @@Spec:
        @@@DOM3:
          http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-258A00AF
@@ -318,7 +419,7 @@ ExceptionDef:
         @@@Name:  INDEX_SIZE_ERR
         @@@Type:  unsigned-short
         @@@Value:  1
-        @@@Param:
+        @@@XParam:
           @@@@QName:
             MDOM_EXCEPTION:param-name
           @@@@Description:
@@ -351,29 +452,29 @@ ExceptionDef:
           @@@@lang:en
           @@@@@:
             An attempt is made to insert a node somewhere it does not belong.
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
-            MDOM_EXCEPTION:HIERARCHY_ANCHESTOR_OR_SELF
+            MDOM_EXCEPTION:HIERARCHY_ANCESTOR_OR_SELF
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
               An attempt is made to insert a node that is one of 
               ancestor of this node or that is this node itself.
-          @@@@Param:
+          @@@@XParam:
             @@@@@QName:
               MDOM_EXCEPTION:param-name
             @@@@@Type:DOMString
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: The name of the parameter that specifies the node.
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             MDOM_EXCEPTION:HIERARCHY_BAD_TYPE
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
               An attempt is made to insert a node whose type is not allowed.
-          @@@@Param:
+          @@@@XParam:
             @@@@@QName:
               infoset:nodeType
             @@@@@Type:
@@ -381,7 +482,7 @@ ExceptionDef:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: The type of the node being tried to insert.
-          @@@@Param:
+          @@@@XParam:
             @@@@@QName:
               MDOM_EXCEPTION:param-name
             @@@@@Type:DOMString
@@ -389,14 +490,14 @@ ExceptionDef:
               @@@@@@lang:en
               @@@@@@@:
                 The name of the parameter that specifies the node.
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             MDOM_EXCEPTION:MDOM_SECOND_DOC_ELEMENT
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
               An attempt is made to insert a second document element node.
-          @@@@Param:
+          @@@@XParam:
             @@@@@QName:
               MDOM_EXCEPTION:param-name
             @@@@@Type: DOMString
@@ -404,14 +505,14 @@ ExceptionDef:
               @@@@@@lang:en
               @@@@@@@:
                 The name of the parameter the node is specified.
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             MDOM_EXCEPTION:MDOM_SECOND_DOCTYPE
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
               An attempt is made to insert a second document type node.
-          @@@@Param:
+          @@@@XParam:
             @@@@@QName:
               MDOM_EXCEPTION:param-name
             @@@@@Type: DOMString
@@ -435,14 +536,14 @@ ExceptionDef:
         @@@Description:
           @@@@lang:en
           @@@@@: An invalid or illegal character is specified.
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             MDOM_EXCEPTION:MDOM_BAD_NAME
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
               The specified name is not a SGML or XML <XML:Name>.
-          @@@@Param:
+          @@@@XParam:
             @@@@@QName:
               DOMCore:name
             @@@@@Type:
@@ -467,40 +568,40 @@ ExceptionDef:
           @@@@@:
             An attempt is made to modify an object where 
             modifications are not allowed. 
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             MDOM_EXCEPTION:NOMOD_ATTR
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
               One of attribute nodes is read-only. 
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             MDOM_EXCEPTION:NOMOD_CHILD
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
               One of child nodes is read-only. 
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             MDOM_EXCEPTION:NOMOD_PARENT
           @@@@Description:
             @@@@@lang:en
             @@@@@@: The parent node of this node is read-only.
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             MDOM_EXCEPTION:NOMOD_SRC_PARENT
           @@@@Description:
             @@@@@lang:en
             @@@@@@: The parent node of the source node is read-only.
-          @@@@Param:
+          @@@@XParam:
             @@@@@QName:
               MDOM_EXCEPTION:param-name
             @@@@@Type:DOMString
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: The parameter by which the source node is specified.
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             MDOM_EXCEPTION:NOMOD_THIS
           @@@@Description:
@@ -523,7 +624,7 @@ ExceptionDef:
           @@@@lang:en
           @@@@@:
             The DOM implementation does not support the type of object requested.
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             MDOM_EXCEPTION:MDOM_DOC_NOSUPPORT_XML
           @@@@Description:
@@ -542,14 +643,14 @@ ExceptionDef:
            \
               This DOM implementation throws the exception in 
               both levels.
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             MDOM_EXCEPTION:MDOM_IMPL_NOSUPPORT_SCHEMA
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
               The DOM implementation does not support the schema language.
-          @@@@Param:
+          @@@@XParam:
             @@@@@QName:
               DOMCore:schemaType
             @@@@@Type:
@@ -566,14 +667,14 @@ ExceptionDef:
               The schema language specified %p (prefix => {<},
               suffix => {>}, name => {<Q:DOMCore:schemaType>}); 
               is not supported
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             MDOM_EXCEPTION:MDOM_IMPL_NOSUPPORT_XML
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
               The DOM implementation does not support the <DOM:XML> feature.
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             MDOM_EXCEPTION:MDOM_IMPL_NOSUPPORT_XMLVER
           @@@@Description:
@@ -581,14 +682,14 @@ ExceptionDef:
             @@@@@@:
               The DOM implementation does not support the XML 
               version specified.
-          @@@@Param:
+          @@@@XParam:
             @@@@@QName:
               infoset:version
             @@@@@Type:DOMString
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: The XML version
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             MDOM_EXCEPTION:MDOM_IMPL_ATTR_NOT_IMPLEMENTED
           @@@@Description:
@@ -596,7 +697,7 @@ ExceptionDef:
             @@@@@@:
               The DOM implementation does not implement the 
               attribute.
-          @@@@Param:
+          @@@@XParam:
             @@@@@Name:attr
             @@@@@Type:
               DOMMain:DOMString
@@ -604,7 +705,7 @@ ExceptionDef:
               @@@@@@lang:en
               @@@@@@@:
                 The name of the attribute that is not implemented.
-          @@@@Param:
+          @@@@XParam:
             @@@@@Name:if
             @@@@@Type:
               DOMMain:DOMString
@@ -612,7 +713,7 @@ ExceptionDef:
               @@@@@@lang:en
               @@@@@@@:
                 The interface name.
-          @@@@Param:
+          @@@@XParam:
             @@@@@Name:on
             @@@@@Type:
               DOMMain:DOMString
@@ -637,14 +738,14 @@ ExceptionDef:
               );%p (name => {<Q:MDOM_EXCEPTION:attr>});"
               %p (name => {<Q:MDOM_EXCEPTION:on>},
                   prefix => {(}, suffix => {)}); not implemented
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             MDOM_EXCEPTION:MDOM_IMPL_METHOD_NOT_IMPLEMENTED
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
               The DOM implementation does not implement the method.
-          @@@@Param:
+          @@@@XParam:
             @@@@@Name:if
             @@@@@Type:
               DOMMain:DOMString
@@ -652,7 +753,7 @@ ExceptionDef:
               @@@@@@lang:en
               @@@@@@@:
                 The interface name.
-          @@@@Param:
+          @@@@XParam:
             @@@@@Name:method
             @@@@@Type:
               DOMMain:DOMString
@@ -667,7 +768,7 @@ ExceptionDef:
             @@@@@@:
               The method "%p (name => {<Q:MDOM_EXCEPTION:if>}, suffix => {.}
               );%p (name => {<Q:MDOM_EXCEPTION:method>});" not implemented
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             MDOM_EXCEPTION:MDOM_NODE_NOSUPPORT_XMLNS
           @@@@Description:
@@ -677,7 +778,7 @@ ExceptionDef:
               might have been created by the DOM Level 1 methods or
               instantiated from the markup language that does not 
               support XML Namespaces.
-          @@@@Param:
+          @@@@XParam:
             @@@@@QName:
               MDOM_EXCEPTION:param-name
             @@@@@Type: 
@@ -687,13 +788,13 @@ ExceptionDef:
               @@@@@@@:
                 The name of the parameter that provides the node 
                 that does not support XML Namespaces.
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             ManakaiDOMLS:MDOMLS_IMPL_NOSUPPORT_MODE
           @@@@Description:
             @@@@@lang:en
             @@@@@@: The DOM implementation does not support the requested mode.
-          @@@@Param: 
+          @@@@XParam: 
             @@@@@QName:
               DOMLS:mode
             @@@@@Type:
@@ -728,7 +829,7 @@ ExceptionDef:
           @@@@@:
             An attempt is made to use an object that is not (or no longer) 
             usable.
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             ManakaiDOMLS:MDOMLS_BUSY
           @@@@Description:
@@ -763,7 +864,7 @@ ExceptionDef:
           @@@@@:
             An attempt is made to create or change an object in 
             a way that is incorrect with regard to namespaces.
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             MDOM_EXCEPTION:MDOM_NS_BAD_NCNAME
           @@@@Description:
@@ -771,7 +872,7 @@ ExceptionDef:
             @@@@@@:
               The specified <XML:NCName> is illegal according to 
               the XML version in use.
-          @@@@Param:
+          @@@@XParam:
             @@@@@QName:
               infoset:name
             @@@@@Type:
@@ -780,7 +881,7 @@ ExceptionDef:
               @@@@@@lang:en
               @@@@@@@:
                 The <XML:NCName> specified.
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             MDOM_EXCEPTION:MDOM_NS_MALFORMED_QNAME
           @@@@Description:
@@ -788,7 +889,7 @@ ExceptionDef:
             @@@@@@:
               The specified qualified name is malformed according 
               to the XML version in use.
-          @@@@Param:
+          @@@@XParam:
             @@@@@QName:
               DOMCore:qualifiedName
             @@@@@Type:
@@ -796,7 +897,7 @@ ExceptionDef:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: The qualified name specified.
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             MDOM_EXCEPTION:MDOM_NS_NULL_QNAME_WITH_NON_NULL_URI
           @@@@Description:
@@ -804,7 +905,7 @@ ExceptionDef:
             @@@@@@:
               The qualified name specified is not <DOM:null> but 
               the namespace URI that is not <DOM:null> is specified.
-          @@@@Param:
+          @@@@XParam:
             @@@@@QName:
               infoset:namespaceName
             @@@@@Type:
@@ -812,7 +913,7 @@ ExceptionDef:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: The namespace URI specified.
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             MDOM_EXCEPTION:MDOM_NS_OTHER_WITH_XML_URI
           @@@@Description:
@@ -821,21 +922,21 @@ ExceptionDef:
               The namespace prefix specified is not equal to <XML:xml> 
               while the namespace URI is 
               <URI:http://www.w3.org/XML/1998/namespace>.
-          @@@@Param:
+          @@@@XParam:
             @@@@@QName:
               infoset:prefix
             @@@@@Type: DOMString
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: The namespace prefix.
-          @@@@Param:
+          @@@@XParam:
             @@@@@QName:
               DOMCore:qualifiedName
             @@@@@Type: DOMString
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: The qualified name.
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             MDOM_EXCEPTION:MDOM_NS_OTHER_WITH_XMLNS_URI
           @@@@Description:
@@ -844,21 +945,21 @@ ExceptionDef:
               The namespace prefix specified is not equal to <XML:xmlns> 
               while the namespace URI is 
               <URI:http://www.w3.org/2000/xmlns>.
-          @@@@Param:
+          @@@@XParam:
             @@@@@QName:
               infoset:prefix
             @@@@@Type: DOMString
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: The namespace prefix.
-          @@@@Param:
+          @@@@XParam:
             @@@@@QName:
               DOMCore:qualifiedName
             @@@@@Type: DOMString
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: The qualified name.
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             MDOM_EXCEPTION:MDOM_NS_PREFIX_WITH_NULL_URI
           @@@@Description:
@@ -866,7 +967,7 @@ ExceptionDef:
             @@@@@@:
               The namespace prefix is specified but the namespace URI 
               is <DOM:null>.
-          @@@@Param:
+          @@@@XParam:
             @@@@@QName:
               infoset:prefix
             @@@@@Type:
@@ -874,14 +975,14 @@ ExceptionDef:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: The namespace prefix specified.
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             MDOM_EXCEPTION:MDOM_NS_QNAME_IS_XMLNS
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
               The qualified name specified equals to <XML:xmlns>.
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             MDOM_EXCEPTION:MDOM_NS_XML_WITH_OTHER_URI
           @@@@Description:
@@ -890,7 +991,7 @@ ExceptionDef:
               The namespace prefix specified is <XML:xml> and 
               the namespace URI is other than 
               <URI:http://www.w3.org/XML/1998/namespace>.
-          @@@@Param:
+          @@@@XParam:
             @@@@@QName:
               infoset:namespaceName
             @@@@@Type:
@@ -898,7 +999,7 @@ ExceptionDef:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: The namespace URI.
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             MDOM_EXCEPTION:MDOM_NS_XMLNS_WITH_OTHER_URI
           @@@@Description:
@@ -907,7 +1008,7 @@ ExceptionDef:
               The namespace prefix specified is <XML:xmlns> and 
               the namespace URI is other than 
               <URI:http://www.w3.org/2000/xmlns>.
-          @@@@Param:
+          @@@@XParam:
             @@@@@QName:
               infoset:namespaceName
             @@@@@Type:
@@ -915,7 +1016,7 @@ ExceptionDef:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: The namespace URI.
-        @@@SubType:
+        @@@SubTypeDef:
           @@@@QName:
             MDOM_EXCEPTION:MDOM_NS_XMLNSQ_WITH_OTHER_URI
           @@@@Description:
@@ -924,7 +1025,7 @@ ExceptionDef:
               The qualified name is <XML:xmlns> and 
               the namespace URI is other than 
               <URI:http://www.w3.org/2000/xmlns>.
-          @@@@Param:
+          @@@@XParam:
             @@@@@QName:
               infoset:namespaceName
             @@@@@Type:
@@ -932,7 +1033,7 @@ ExceptionDef:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: The namespace URI.
-       @@@SubType:
+       @@@SubTypeDef:
          @@@@QName:
            MDOM_EXCEPTION:MDOM_NS_XMLNS_XMLNS
          @@@@Description:
@@ -1671,7 +1772,7 @@ IF:
   @Method:
      @@Name:  hasFeature
      @@Spec:
-       @@DOM3[list]:
+       @@@DOM3[list]:
          http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-5CED94D7
          http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DOMFeatures
      @@Description:
@@ -1738,7 +1839,6 @@ IF:
           @@@@lang:en
           @@@@@:
             The version number of the feature to test.
-        @@@IsOptional:1
         @@@InCase:
           @@@@Value: 1.0
           @@@@Description:
@@ -2212,7 +2312,8 @@ IF:
      @@SpecLevel:3
      @@Level[list]:  3
      @@Return:
-        @@@Type:  DOMObject
+        @@@Type:  
+          DOMMain:DOMObject
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -2319,7 +2420,16 @@ IF:
       "CharacterData".  "CDATASection" is a "Text".
   @IsFinal:-1
   @ConstGroup:
-     @@Name:  NodeType
+     @@QName:
+       @@@@: NodeType
+       @@@ForCheck:
+         ManakaiDOM:ForIF
+     @@QName:
+       @@@@: ManakaiDOMNodeType
+       @@@ForCheck:
+         ManakaiDOM:ForClass
+     @@ISA:
+       DOMMain:unsigned-short
      @@Description:
        @@@lang:en
        @@@@: An integer indicating which type of node this is.
@@ -2550,8 +2660,8 @@ IF:
        @@@@:
          A list of node that contains all children of this node if any.
      @@Get:
-        @@@Type:
-          ManakaiDOM:ManakaiDOMChildNodeList
+        @@@Type: NodeList
+#          ManakaiDOM:ManakaiDOMChildNodeList
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -2561,8 +2671,8 @@ IF:
             @@@@@lang:en
             @@@@@@:
               A <IF:NodeList> containing no nodes
-          @@@@Type:
-            ManakaiDOM:ManakaiDOMChildNodeList
+          @@@@Type: NodeList
+#            ManakaiDOM:ManakaiDOMChildNodeList
           @@@@Description:
             @@@@@lang:en
             @@@@@@: This node has no child node.
@@ -4163,7 +4273,14 @@ IF:
     @@RedefinedBy:
       DOMXML:Notation
   @ConstGroup:
-     @@Name:  DocumentPosition
+     @@QName: 
+       @@@@: DocumentPosition
+       @@@ForCheck:
+         ManakaiDOM:ForIF
+     @@QName:
+       @@@@: ManakaiDOMDocumentPosition
+       @@@ForCheck:
+         ManakaiDOM:ForClass
      @@Description:
        @@@lang:en
        @@@@:
@@ -4669,7 +4786,8 @@ IF:
   @Method:
      @@Name:  getFeature
      @@Return:
-        @@@Type:  DOMObject
+        @@@Type:  
+          DOMMain:DOMObject
      @@Param:
         @@@Name:  feature
         @@@Type:  DOMString
@@ -5485,7 +5603,7 @@ IF:
      @@Param:
         @@@Name:  arg
         @@@Type:  DOMString
-        @@@Descroption:
+        @@@Description:
           @@@@lang:en
           @@@@@: The string to append.
      @@Return:
@@ -7131,8 +7249,8 @@ IF:
               Match all element type names.
      @@Return:
         @@@Type:  NodeList
-        @@@ObjectType:
-          ManakaiDOMCore:ManakaiDOMGetElementsNodeList
+#        @@@actualType:
+#          ManakaiDOMCore:ManakaiDOMGetElementsNodeList
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -7823,8 +7941,8 @@ IF:
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:  DOMString
-        @@@ObjectType:
-          ManakaiDOM:ManakaiDOMNamespaceURI
+#        @@@actualType:
+#          ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -7853,8 +7971,8 @@ IF:
               Match all local names.
      @@Return:
         @@@Type:  NodeList
-        @@@ObjectType:
-          ManakaiDOMCore:ManakaiDOMGetElementsNodeList
+#        @@@actualType:
+#          ManakaiDOMCore:ManakaiDOMGetElementsNodeList
         @@@Exception:
           @@@@Type:DOMException
           @@@@Name:NOT_SUPPORTED_ERR
@@ -8408,8 +8526,8 @@ IF:
       @@@@:
         A node map containing the attributes of this node.
     @@Get:
-      @@@Type:
-        ManakaiDOM:ManakaiDOMAttributes
+      @@@Type: NamedNodeMap
+#        ManakaiDOM:ManakaiDOMAttributes
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -9648,7 +9766,7 @@ IFDef:
        @@@@:
          The severity of the error.
      @@Get:
-        @@@Type:  ErrorSeverity     
+        @@@Type:  ErrorSeverity
   @Attr:
      @@Name:  message
      @@Description:
@@ -9679,7 +9797,8 @@ IFDef:
        @@@lang:en
        @@@@: The related platform dependent exception if any.
      @@Get:
-        @@@Type:  DOMObject
+        @@@Type:  
+          DOMMain:DOMObject
   @Attr:
      @@Name:  relatedData
      @@Description:
@@ -9687,7 +9806,8 @@ IFDef:
        @@@@:
          The related "DOMError.type" dependent data if any.
      @@Get:
-        @@@Type:  DOMObject
+        @@@Type:  
+          DOMMain:DOMObject
   @Attr:
      @@Name:  location
      @@Description:
@@ -10423,7 +10543,7 @@ IF:
        @@@@:
          Create an empty <IF:DocumentFragment> object.
      @@Return:
-        @@@Type:  DocumentFragment 
+        @@@Type:  DocumentFragment
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -10525,7 +10645,8 @@ IF:
           @@@@@:
             The data for the <XML:CDATA> section.
      @@Return:
-        @@@Type:  CDATASection
+        @@@Type:  
+          DOMXML:CDATASection
         @@@Description:
           @@@@lang:en
           @@@@@: 
@@ -10604,7 +10725,8 @@ IF:
           @@@@@:
             The data for the node.
      @@Return:
-        @@@Type:  ProcessingInstruction
+        @@@Type:  
+          DOMXML:ProcessingInstruction
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -10751,7 +10873,8 @@ IF:
           @@@@@:
             This is an XML <XML:Name>, not an XML Names <XML:NCName>.
      @@Return:
-        @@@Type:  EntityReference
+        @@@Type:  
+          DOMXML:EntityReference
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -10847,8 +10970,8 @@ IF:
               Match all element type names.
      @@Return:
         @@@Type:NodeList
-        @@@ObjectType:  
-          ManakaiDOM:ManakaiDOMGetElementsNodeList
+#        @@@actualType:  
+#          ManakaiDOM:ManakaiDOMGetElementsNodeList
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -11334,8 +11457,8 @@ IF:
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:DOMString
-        @@@ObjectType:
-          ManakaiDOM:ManakaiDOMNamespaceURI
+#        @@@actualType:
+#          ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -11363,8 +11486,8 @@ IF:
             @@@@@@: Match all local names.
      @@Return:
         @@@Type:NodeList
-        @@@ObjectType:
-          ManakaiDOM:ManakaiDOMGetElementsNodeList
+#        @@@actualType:
+#          ManakaiDOM:ManakaiDOMGetElementsNodeList
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -12896,6 +13019,25 @@ ConfigParam:
         @@@@Value:false
 ##ConfigParam:Document
 
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdfs:Property
+
+PropDef:
+  @QName: severity
+  @Description:
+    @@lang:en
+    @@@: The severity of an error.
+PropDef:
+  @QName: relatedData
+  @Description:
+    @@lang:en
+    @@@: A related data.
+
 ErrorSet:
   @Description:
     @@lang:en
@@ -12913,8 +13055,8 @@ ErrorSet:
         The parameter <CP:check-character-normalization> is set to
         <DOM:true> and a string is encountered that fails normalization 
         checking.
-    @@Severity:Error
-    @@RelatedData:
+    @@DOMCore:severity:Error
+    @@DOMCore:relatedData:
       @@@ImplNote:
         @@@@lang:en
         @@@@@:
@@ -12932,8 +13074,8 @@ ErrorSet:
       @@@@:
         <CP:split-cdata-sections> is <DOM:true> and 
         a <XML:CDATA> section is split.
-    @@Severity:Warning
-    @@RelatedData:
+    @@DOMCore:severity:Warning
+    @@DOMCore:relatedData:
       @@@Type:
         DOMXML:CDATASection
       @@@Description:
@@ -12944,7 +13086,7 @@ ErrorSet:
 
   @Error:
     @@Name:wf-invalid-character-in-node-name
-    @@SubType:
+    @@SubTypeDef:
       @@@QName:
         ManakaiDOMCore:normalize-invalid-character
       @@@Description:
@@ -12953,8 +13095,8 @@ ErrorSet:
           The parameter <CP:well-formed> is set to <DOM:true> and 
           the attribute <A:Node.nodeName> contains an invalid character 
           according to its node type.
-      @@@Severity:Error
-    @@SubType:
+      @@@DOMCore:severity:Error
+    @@SubTypeDef:
       @@@QName:
         ManakaiDOMLS:serialize-invalid-character
       @@@Description:
@@ -12963,7 +13105,7 @@ ErrorSet:
           A character that cannot be represented in the output 
           character encoding is encountered within markup but 
           outside of attribute values.
-      @@@Severity:FatalError
+      @@@DOMCore:severity:FatalError
 
   @Error:
     @@Name:wf-invalid-character
@@ -12974,7 +13116,7 @@ ErrorSet:
         <IF:Attr>, <IF:Element>, <IF:Comment>, <IF:Text> or 
         <IF:CDATASection> node or the data inside 
         <IF:ProcessingInstruction> node contains an invalid character.
-    @@Severity:Error
+    @@DOMCore:severity:Error
 ## Error:normalizeDocument
 
 ## DOMCore.dis ends here
