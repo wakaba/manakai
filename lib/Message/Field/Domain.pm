@@ -11,7 +11,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 
@@ -96,10 +96,10 @@ sub parse ($$;%) {
   } elsif (@d == 1 && $d[0] !~ /[^0-9:.]/) {
     $self->{type} = 'ipv6';
   } elsif (@d == 4) {
-    if  (0 <= $d[0] && $d[0] < 256
-     &&  0 <= $d[1] && $d[1] < 256
-     &&  0 <= $d[2] && $d[2] < 256
-     &&  0 <= $d[3] && $d[3] < 256) {
+    if  ($d[0] !~ /[^0-9]/ && 0 <= $d[0] && $d[0] < 256
+     &&  $d[1] !~ /[^0-9]/ && 0 <= $d[1] && $d[1] < 256
+     &&  $d[2] !~ /[^0-9]/ && 0 <= $d[2] && $d[2] < 256
+     &&  $d[3] !~ /[^0-9]/ && 0 <= $d[3] && $d[3] < 256) {
       $self->{type} = 'ipv4';
       @d = (pack ('C4', @d));
     }
@@ -169,7 +169,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/14 13:42:40 $
+$Date: 2002/05/15 07:29:09 $
 
 =cut
 

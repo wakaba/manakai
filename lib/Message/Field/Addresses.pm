@@ -11,12 +11,12 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::CSV;
 push @ISA, qw(Message::Field::CSV);
 %REG = %Message::Field::CSV::REG;
 	$REG{SC_angle_addr} = qr/<(?:$REG{quoted_string}|$REG{domain_literal}|$REG{comment}|[^\x22\x28\x5B\x3E])+>|<>/;
-	$REG{SC_group} = qr/:(?:$REG{comment}|$REG{quoted_string}|(??{$REG{SC_group}})|$REG{domain_literal}|$REG{SC_angle_addr}|[^\x22\x28\x5B\x3A\x3E\x3B])+;/;
+	$REG{SC_group} = qr/:(?:$REG{comment}|$REG{quoted_string}|(??{$REG{SC_group}})|$REG{domain_literal}|$REG{SC_angle_addr}|[^\x22\x28\x5B\x3A\x3E\x3B])*;/;
 
 =head1 CONSTRUCTORS
 
@@ -115,7 +115,7 @@ sub _parse_list ($$) {
   }
   $fb =~ s{(?:$REG{quoted_string}|$REG{comment}|[^\x22\x28\x2C\x3A\x3C\x5B]|$REG{SC_group}|$REG{SC_angle_addr}|$REG{domain_literal})+}{
     my $s = $&;  $s =~ s/^$REG{WSP}+//;  $s =~ s/$REG{WSP}+$//;
-    if ($s =~ /^(?:$REG{quoted_string}|$REG{comment}|[^\x22\x28\x2C\x3A\x3C\x5B])*:/) {
+    if ($s =~ /^(?:$REG{quoted_string}|$REG{comment}|[^\x22\x28\x2C\x3A-\x3C\x5B])*:/) {
       $s = $self->_parse_value (group => $s) if $self->{option}->{parse_all};
       $s = {type => 'group', value => $s};
     } else {	## address or keyword
@@ -258,7 +258,19 @@ sub display_name ($;$) {
   $_[0]->{group_name};
 }
 
-##TODO: addr_spec
+sub addr_spec ($;%) {
+  my $self = shift;
+  my @a;
+  for (@{$self->{$self->{option}->{_ARRAY_NAME}}}) {
+    $_->{value} = $self->_parse_value ($_->{value}) unless ref $_->{value};
+    if (ref $_->{value}) {
+      push @a, $_->{value}->addr_spec (@_);
+    } elsif (length $_->{value}) {
+      push @a, $_->{value};
+    }
+  }
+  wantarray? @a: $a[0];
+}
 
 ## stringify: Inherited
 #*as_string = \&stringify;
@@ -337,7 +349,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/14 13:42:40 $
+$Date: 2002/05/15 07:29:09 $
 
 =cut
 

@@ -11,7 +11,7 @@ require 5.6.0;
 use strict;
 use re 'eval';
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 
@@ -33,7 +33,11 @@ The following methods construct new objects:
   %DEFAULT = (
     -_ARRAY_NAME	=> 'route',
     -_ARRAY_VALTYPE	=> 'domain',
-    -_MEMBERS	=> [qw|display_name route local-part domain keyword|],
+    -_MEMBERS	=> [qw|display_name route local_part domain keyword|],
+    -_METHODS	=> [qw|addr_spec display_name local_part domain keyword
+                       have_group comment_add comment_delete comment_item
+                       comment_count route_add route_count route_delete
+                       route_item|],
     -allow_empty_addr_spec	=> 0,
     -by	=> 'domain',
     -comment_to_display_name	=> 1,
@@ -54,6 +58,7 @@ The following methods construct new objects:
     -output_angle_bracket	=> 1,
     -output_comment	=> 1,
     -output_display_name	=> 1,
+    -output_keyword	=> 0,
     -output_route	=> 0,
     -parse_all	=> 1,	## = parse_domain + parse_local_part
     -parse_domain	=> 1,
@@ -73,6 +78,7 @@ sub _init ($;%) {
   my $format = $self->{option}->{format};
   my $field = $self->{option}->{field};
   if ($format =~ /mail-rfc822/) {
+    $self->{option}->{output_route} = 1
       if $field eq 'from' || $field eq 'resent-from'
       || $field eq 'sender' || $field eq 'resent-sender'
       || $field eq 'to' || $field eq 'cc' || $field eq 'bcc'
@@ -82,6 +88,7 @@ sub _init ($;%) {
   }
   if ($self->{option}->{field_name} eq 'mail-copies-to') {
     $self->{option}->{use_keyword} = 1;
+    $self->{option}->{output_keyword} = 1;
   }
   if ($self->{option}->{field_name} eq 'return-path') {
     $self->{option}->{allow_empty_addr_spec} = 1;
@@ -209,6 +216,20 @@ sub _item_new_value ($$\%) {
   $_[0]->_parse_value (domain => $_[2]->{by} eq 'domain'?$_[1]:'');
 }
 
+sub have_group ($) {0}
+
+sub addr_spec ($;%) {
+  my $self = shift;
+  my %o = (
+    -output_angle_bracket	=> 0,
+    -output_comment	=> 0,
+    -output_display_name	=> 0,
+    -output_keyword	=> 0,
+    -output_route	=> 0,
+  );
+  $self->stringify (%o, @_);
+}
+
 sub stringify ($;%) {
   my $self = shift;
   my %o = @_;  my %option = %{$self->{option}};
@@ -298,7 +319,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/05/14 13:42:40 $
+$Date: 2002/05/15 07:29:09 $
 
 =cut
 

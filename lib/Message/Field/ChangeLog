@@ -1,7 +1,19 @@
 2002-05-15  wakaba <w@suika.fam.cx>
 
+	* Address.pm: Removed.
+	* Domain.pm: Bug fix (doesn't treat four-sub-domain-
+	domain as (invalid) IPv4 address).
+	* Mailbox.pm (addr_spec): New method.
+	* Addresses.pm (addr_spec): Likewise.
+	
+	* Structured.pm (option): Doesn't treat ( "-" option-name )
+	as an alias of option-name.  (A ( "-" option-name ) should
+	be recognized as an option for 'option' method.)
+
+2002-05-14  wakaba <w@suika.fam.cx>
+
 	* Addresses.pm, Mailbox.pm, Domain.pm
-	(son-of-Address.pm's): New modules.
+	(sons-of-Address.pm): New modules.
 	* Structured.pm:
 	- (method_available): New method.
 	- (clone): Checks _MEMBERS option.
