@@ -52,7 +52,8 @@ when C<stringify>.  (Default = 0)
 );
 my @field_type_Structured = qw(cancel-lock content-language
   content-transfer-encoding
-  encrypted importance mime-version precedence user-agent x-cite
+  encrypted followup-to importance mime-version newsgroups 
+  path precedence user-agent x-cite
   x-face x-mail-count
   x-msmail-priority x-priority x-uidl xref);
 for (@field_type_Structured)
@@ -75,7 +76,7 @@ for (@field_type_MsgID)
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Structured'}
 my @field_type_Received = qw(received x-received);
 for (@field_type_Received)
-  {$DEFAULT{field_type}->{$_} = 'Message::Field::Structured'}
+  {$DEFAULT{field_type}->{$_} = 'Message::Field::Received'}
 my @field_type_Param = qw(content-disposition content-type
   x-brother x-daughter x-face-type x-respect x-moe
   x-syster x-wife);
@@ -89,6 +90,9 @@ for (@field_type_URI)
 my @field_type_ListID = qw(list-id);
 for (@field_type_ListID)
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Structured'}
+my @field_type_Subject = qw(content-description subject title);
+for (@field_type_Subject)
+  {$DEFAULT{field_type}->{$_} = 'Message::Field::Subject'}
 
 =head2 Message::Header->new ([%option])
 
@@ -146,9 +150,11 @@ sub field ($$) {
   for my $field (@{$self->{field}}) {
     if ($field->{name} eq $name) {
       unless (wantarray) {
-        return $self->_field_body ($field->{body}, $name);
+        $field->{body} = $self->_field_body ($field->{body}, $name);
+        return $field->{body};
       } else {
-        push @ret, $self->_field_body ($field->{body}, $name);
+        $field->{body} = $self->_field_body ($field->{body}, $name);
+        push @ret, $field->{body};
       }
     }
   }
@@ -172,20 +178,25 @@ sub field_name ($$) {
 sub field_body ($$) {
   my $self = shift;
   my $i = shift;
-  $self->_field_body ($self->{field}->[$i]->{body}, $self->{field}->[$i]->{name});
+  $self->{field}->[$i]->{body}
+   = $self->_field_body ($self->{field}->[$i]->{body}, $self->{field}->[$i]->{name});
+  $self->{field}->[$i]->{body};
 }
 
 sub _field_body ($$$) {
   my $self = shift;
   my ($body, $name) = @_;
-  if (ref $body) {
-    return $body;
-  } else {
+  unless (ref $body) {
     my $type = $self->{option}->{field_type}->{$name}
             || $self->{option}->{field_type}->{_DEFAULT};
-    eval "use $type";
-    return $type->parse ($body);
+    eval "require $type";
+    unless ($body) {
+      $body = $type->new (field_name => $name);
+    } else {
+      $body = $type->parse ($body, field_name => $name);
+    }
   }
+  $body;
 }
 
 =head2 $self->field_name_list ()
@@ -214,8 +225,9 @@ sub add ($$$) {
   my $self = shift;
   my ($name, $body) = (lc shift, shift);
   return 0 if $name =~ /$REG{UNSAFE_field_name}/;
+  $body = $self->_field_body ($body, $name);
   push @{$self->{field}}, {name => $name, body => $body};
-  $self;
+  $body;
 }
 
 =head2 $self->relace ($field_name, $field_body)
@@ -308,8 +320,10 @@ sub stringify ($;%) {
     my $name = $field->{name};
     next unless $field->{name};
     next if !$OPT{mail_from} && $name eq 'mail-from';
+    my $fbody = scalar $field->{body};
+    next unless $fbody;
     $name =~ s/((?:^|-)[a-z])/uc($1)/ge if $OPT{capitalize};
-    push @ret, $name.': '.$self->fold ($field->{body});
+    push @ret, $name.': '.$self->fold ($fbody);
   }
   my $ret = join ("\n", @ret);
   $ret? $ret."\n": "";
@@ -448,7 +462,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/16 08:54:39 $
+$Date: 2002/03/20 09:56:52 $
 
 =cut
 
