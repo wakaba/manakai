@@ -16,7 +16,7 @@ This module is part of manakai XML.
 
 package Message::Markup::XML::QName;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NCNameStartChar InXMLNCNameChar!;
 use Exporter;
 our @ISA = qw/Exporter/;
@@ -90,15 +90,26 @@ sub register_prefix_to_name ($$$;%) {
     return {success => 0, prefix => $prefix, reason => '__NON_DEFAULT_NULL_NS'};
   }
   
-  if ($opt{check_registered}) {
-    if ($decls->{ns}->{$prefix} eq $name) {
+  if ($opt{check_registered_as_is}) {
+    my $c = prefix_to_name ($decls, $prefix, %opt,
+                            check_prefix => 0);
+    if ($c->{success} && ($c->{name} eq $name)) {
       return {success => 1, name => $name, prefix => $prefix,
               reason => 'REGISTERED'};
-    } elsif ($decls->{ns}->{$prefix} eq UNDEF_URI) {
-      ## 
-    } elsif (defined $decls->{ns}->{$prefix}) {
-      return {success => 0, name => $name, prefix => $prefix,
-              reason => 'REGISTERED'};
+    }
+  } elsif ($opt{check_registered}) {
+    my $c = prefix_to_name ($decls, $prefix, %opt,
+                            check_prefix => 0);
+    if ($c->{success}) {
+      if ($c->{name} eq $name) {
+        return {success => 1, name => $name, prefix => $prefix,
+                reason => 'REGISTERED'};
+      } elsif ($c->{name} eq UNDEF_URI) {
+        ## 
+      } elsif (defined $c->{name}) {
+        return {success => 0, name => $name, prefix => $prefix,
+                reason => 'REGISTERED'};
+      }
     }
   }
   
@@ -112,8 +123,8 @@ sub __check_prefix ($$$) {
   my ($decls, $prefix, $opt) = @_;
   substr ($prefix, -1, 1) = '' if substr ($prefix, -1, 1) eq ':';
   if ($prefix eq '' || $prefix eq DEFAULT_PFX) {
-    return {success => 0, prefix => DEFAULT_PFX, reason => 'DEFAULT_NAMESPACE'}
-      unless $opt->{use_default_namespace};
+    return {success => 0, prefix => DEFAULT_PFX, reason => 'PREFIX_DEFAULT'}
+      unless $opt->{use_prefix_default};
     $prefix = DEFAULT_PFX;
   } else {
     return {success => 0, prefix => $prefix, reason => 'PREFIX_XML'}
@@ -123,7 +134,7 @@ sub __check_prefix ($$$) {
     return {success => 0, prefix => $prefix, reason => 'PREFIX_XML_'}
       if $opt->{check_prefix_xml_} && (lc substr ($prefix, 0, 3) eq 'xml');
     return {success => 0, reason => 'PREFIX__NON_NCNAME'} 
-      if $prefix !~ /^\p{InXML_NCNameStartChar}\p{InXMLNCNameChar}*$/;
+      unless $prefix =~ /^\p{InXML_NCNameStartChar}\p{InXMLNCNameChar}*$/;
   }
   
   if ($opt->{check_prefix_registered}) {
@@ -193,10 +204,17 @@ sub prefix_to_name ($$;%) {
       return {success => 1, prefix => $prefix,
               name => $decls->{ns}->{$prefix}};
     }
-  } elsif ($opt{use_name_null} && ($prefix eq DEFAULT_PFX)) {
-    return {success => 1, prefix => $prefix, name => NULL_URI};
   } else {
-    return {success => 0, prefix => $prefix, reason => '__NOT_FOUND'};
+    if ($opt{ask_parent_node} && ref $decls->{parent}) {    
+      return prefix_to_name ($decls->{parent}->_get_ns_decls_node, $prefix, %opt,
+                             check_prefix => 0);
+    } else {
+      if ($opt{use_name_null} && ($prefix eq DEFAULT_PFX)) {
+        return {success => 1, prefix => $prefix, name => NULL_URI};
+      } else {
+        return {success => 0, prefix => $prefix, reason => '__NOT_FOUND'};
+      }
+    }
   }
 }
 
@@ -218,15 +236,22 @@ sub name_to_prefix ($$;%) {
       }
     }
   }
-  if ($opt{use_prefix_default} && ($name eq NULL_URI)) {
-    return {success => 1, name => $name, prefix => DEFAULT_PFX};
-  } elsif ($opt{make_new_prefix}) {
-    return register_prefix_to_name ($decls,
-                                    generate_prefix ($decls, $name, %opt)
-                                    => $name, 
-                                    %opt);
+  if ($opt{ask_parent_node} && ref $decls->{parent}) {    
+    return name_to_prefix ($decls->{parent}->_get_ns_decls_node, $name, %opt,
+                           check_name => 0);
   } else {
-    return {success => 0, name => $name, reason => '__NOT_FOUND'};
+    if ($opt{use_prefix_default} && ($name eq NULL_URI)) {
+      $decls->{ns}->{(DEFAULT_PFX)} = NULL_URI
+        if $decls->{ns}->{(DEFAULT_PFX)} ne NULL_URI;
+      return {success => 1, name => $name, prefix => DEFAULT_PFX};
+    } elsif ($opt{make_new_prefix}) {
+      return register_prefix_to_name ($decls,
+                                      generate_prefix ($decls, $name, %opt)
+                                      => $name, 
+                                      %opt);
+    } else {
+      return {success => 0, name => $name, reason => '__NOT_FOUND'};
+    }
   }
 }
 
@@ -320,7 +345,7 @@ sub split_qname ($;%) {
 
 sub join_qname ($$;%) {
   my ($pfx, $ln, %opt) = @_;
-  $pfx = DEFAULT_PFX unless defined $pfx;
+  $pfx ||= DEFAULT_PFX;
   $opt{qname_separator} ||= ':';
   if ($opt{check_qname} || $opt{check_prefix}) {
     if ($pfx ne DEFAULT_PFX) {
@@ -366,4 +391,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/30 01:58:17 $
+1; # $Date: 2003/10/31 05:00:05 $

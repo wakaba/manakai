@@ -1,5 +1,8 @@
 2003-09-30  Wakaba  <wakaba@suika.fam.cx>
 
+	* QName.pm (name_to_prefix): Overwrite DEFAULT_PFX := NULL_URI
+	if DEFAULT_PFX != NULL_URI is defined.
+
 	* XPath.pm (_get_ns_decls_node): Renamed from __get_ns_decls_node.
 	(qname): New option 'use_context_function_library'.
 
