@@ -16,7 +16,8 @@ use re 'eval';
 use vars qw(%REG $VERSION);
 $VERSION = '1.00';
 
-use overload '@{}' => sub {shift->{address}};
+use overload '@{}' => sub {shift->{address}},
+             '""' => sub {shift->stringify};
 
 $REG{comment} = qr/\x28(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x27\x2A-\x5B\x5D-\xFF]+|(??{$REG{comment}}))*\x29/;
 $REG{quoted_string} = qr/\x22(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\xFF])*\x22/;
@@ -40,7 +41,7 @@ $REG{M_quoted_string} = qr/\x22((?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\
 
 $REG{NON_atom} = qr/[^\x09\x20\x21\x23-\x27\x2A\x2B\x2D\x2F\x30-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]/;
 
-=head2 $self->new ()
+=head2 Message::Field::Address->new ()
 
 Return empty address object.
 
@@ -50,7 +51,7 @@ sub new ($) {
   bless {type => '_ROOT'}, shift;
 }
 
-=head2 $self->parse ($unfolded_field_body)
+=head2 Message::Field::Address->parse ($unfolded_field_body)
 
 Parse structured C<field-body> contain of C<address-list>.
 
@@ -278,6 +279,7 @@ sub delete_comment ($$) {
 
   ## Compose field-body for To: field.
   
+  use Message::Field::Address;
   my $addr = new Message::Field::Address;
   $addr->add ('foo@example.org', name => 'Mr. foo bar');
   $addr->add ('webmaster@example.org', group => 'administrators');
@@ -324,6 +326,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
+$Date: 2002/03/16 01:26:30 $
 
 =cut
 
