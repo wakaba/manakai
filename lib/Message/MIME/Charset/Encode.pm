@@ -1,13 +1,15 @@
 
 =head1 NAME
 
-Message::MIME::Charset::Encode --- Encode module plug-in for Message::* Perl Modules
+Message::MIME::Charset::Encode --- Message-pm: Encode module plug-in for Message::* Perl Modules
 
 =head1 DESCRIPTION
 
 Message::* therselves don't convert coding systems of parts of
 messages, but have mechanism to define to call external functions.
 This module provides such macros for Encode modules.
+
+This module is part of Message::* Perl Modules.
 
 =head1 USAGE
 
@@ -18,7 +20,7 @@ This module provides such macros for Encode modules.
 package Message::MIME::Charset::Encode;
 use strict;
 use vars qw(%CODE $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::MIME::Charset;
 require Encode;
@@ -95,11 +97,12 @@ sub import ($;%) {
     encoder	=> sub {
       my ($name, $s) = @_;
       $name = $CODE{output} if $name =~ /\*/;
-      unless (Encode::find_encoding ($name)) {
+      my $e = Encode::find_encoding ($name);
+      unless ($e) {
         Message::MIME::Charset::_utf8_off ($s);
         return ($s, success => 0);
       }
-      return (Encode::encode ($name, $s), success => 1);
+      return ($e->encode ($s), success => 1);
     },
     decoder	=> sub {
       my ($name, $s) = @_;
@@ -109,8 +112,17 @@ sub import ($;%) {
       #  $name = Encode::Guess->guess ($s);
       #  return ($name->decode ($s), success => 1) if ref $name;
       #}
-      return ($s, success => 0) unless Encode::find_encoding ($name);
-      return (Encode::decode ($name, $s), success => 1);
+      return ($s, success => 0) unless my $e = Encode::find_encoding ($name);
+      if (Message::MIME::Charset::is_utf8 ($s)) {
+        if ($name eq 'utf-8') {
+          return ($s, success => 1);
+        } else {
+          $s = Encode::encode ('iso-8859-1', $s, Encode::XMLCREF ());
+          return ($e->decode ($s), success => 1);
+        }
+      } else {
+        return ($e->decode ($s), success => 1);
+      }
     },
     preferred_name	=> \&_preferred_name,
   );
@@ -137,7 +149,7 @@ sub import ($;%) {
   );
 }
 
-sub _encoder ($@) {
+sub _encoder ($$@) {
   no strict 'refs';
   my $p1 = shift;
   my $p2 = shift;
@@ -146,14 +158,19 @@ sub _encoder ($@) {
     Message::MIME::Charset::_utf8_off ($s);
     return ($s, success => 0);
   }
-  return (Encode::encode (@_), success => 1);
+  return (Encode::encode ($_[0],$_[1],$_[2]), success => 1);
 }
 sub _decoder ($@) {
   no strict 'refs';
   my $p = shift;
   return ($_[1], success => 0)
     if !${'Encode::'.$p.'::VERSION'} && !eval qq{use Encode::$p};
-  return (Encode::decode (@_), success => 1);
+  if (Message::MIME::Charset::is_utf8 ($_[1])) {
+    my $s = Encode::encode ('iso-8859-1', $_[1]);
+    return (Encode::decode ($_[0],$s,$_[2]), success => 1);
+  } else {
+    return (Encode::decode ($_[0],$_[1],$_[2]), success => 1);
+  }
 }
 sub _preferred_name ($) {
       my $name = shift;
@@ -179,7 +196,7 @@ Encode
 
 =head1 LICENSE
 
-Copyright 2002 wakaba E<lt>w@suika.fam.cxE<gt>.
+Copyright 2002 Wakaba <w@suika.fam.cx>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -199,7 +216,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/08/29 12:30:46 $
+$Date: 2002/12/29 03:04:53 $
 
 =cut
 

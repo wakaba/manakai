@@ -24,7 +24,7 @@ This module is part of Message::* Perl Modules.
 package Message::MIME::Charset;
 use strict;
 use vars qw(%CHARSET %MSNAME2IANANAME %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 &_builtin_charset;
 sub _builtin_charset () {
@@ -506,6 +506,9 @@ sub _utf8_on ($) {
 sub _utf8_off ($) {
   Encode::_utf8_off ($_[0]) if $Encode::VERSION;
 }
+sub is_utf8 ($) {
+  Encode::is_utf8 ($_[0]) if $Encode::VERSION;
+}
 
 sub is_mime_text ($) {
   my $name = lc shift;
@@ -604,4 +607,4 @@ Boston, MA 02111-1307, USA.
 
 =cut
 
-1; # $Date: 2002/12/28 09:07:05 $
+1; # $Date: 2002/12/29 03:04:53 $

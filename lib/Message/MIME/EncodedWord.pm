@@ -10,11 +10,9 @@ Perl module for MIME C<encoded-word>.
 =cut
 
 package Message::MIME::EncodedWord;
-require 5.6.0;
 use strict;
-use re 'eval';
 use vars qw(%ENCODER %DECODER %OPTION %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::MIME::Charset;
 
 $REG{WSP} = qr/[\x09\x20]/;
@@ -95,27 +93,55 @@ Shold be:
   q	=> \&_encode_q_encoding,
 );
 
-sub decode ($) {
-  my $s = shift;
-  my (@s, @r) = ();
-  $s =~ s{\G([\x09\x20]*[^\x09\x20]+)}{push @s, $1}goex;
-  for my $i (0..$#s) {
-    $r[$i] = 0;
-    if ($s[$i] =~ /^($REG{FWS})$REG{M_encoded_word}$/) {
+=head1 $string = Message::MIME::EncodedWord::decode ($text, %option)
+
+Decodes encoded-words in given text and return as a string (in internal code).
+
+Options:
+
+=over 4
+
+=item -process_non_encoded_word => CODE / 0 (default)
+
+Procedure for non-encoded-word string.  This option can be useful
+with comment decoder to unquote quoted-pair and/or to decode 8-bit string
+of HTTP.
+
+=back
+
+=cut
+
+sub decode ($;%) {
+  my @string = split /(?<=[^\x09\x20])(?=[\x09\x20])/, shift;
+  my %option = @_;
+  my @r;	## Token is encoded-word or not
+  for my $i (0..$#string) {
+    if ($string[$i] =~ m(^([\x09\x20]*)=\?([0-9A-Za-z!#\$%&'+^_`{|}~.-]{1,67})(?:\*([0-9A-Za-z!#\$&+^_`{|}~.-]{1,65}))?\?([0-9A-Za-z!#\$%&'*+^_`{|}~.-]{1,67})\?([\x21-\x3E\x40-\x7E]{1,67})\?=$)) {
       my ($t, $w) = ('', $1);
       ($t, $r[$i]) = (_decode_eword ($2, $3, $4, $5));
-      if ($r[$i]) {
-        $s[$i] = $t;
-        if ($i == 0 || $r[$i-1] == 0) {
-          $s[$i] = $w.$s[$i];
-        }
-      }
+      $string[$i] = ($i == 0 || !$r[$i-1] ? $w : '') . $t if $r[$i];
+    } elsif (ref $option{-process_non_encoded_word}) {
+      ($string[$i], $r[$i]) = &{$option{-process_non_encoded_word}} ($string[$i], \%option);
+    } else {
+      $r[$i] = 0;
     }
   }
-  join '', @s;
+  join '', @string;
+}
+
+sub _decode_eword ($$$$) {
+  my ($charset, $lang, $encoding, $etext) = (shift, shift, lc shift, shift);
+  $charset = Message::MIME::Charset::name_normalize ($charset);
+  my ($r,%s);
+  if (ref $DECODER{$encoding}) {	## decode TE
+    $r = &{$DECODER{$encoding}} ($encoding, $etext);
+    ($r,%s) = Message::MIME::Charset::decode ($charset, $r);
+  }
+  ($r, $s{success});
 }
 
 sub decode_ccontent ($$) {
+use re 'eval';
   my $yourself = shift;  my $s = shift;
   my (@s, @r) = ();
   my ($i, @t) = (-1);
@@ -147,27 +173,6 @@ sub decode_ccontent ($$) {
     }
   }
   join '', @s;
-}
-
-sub _decode_eword ($$$$) {
-  my ($charset, $lang, $encoding, $etext) = (shift, shift, lc shift, shift);
-  $charset = Message::MIME::Charset::name_normalize ($charset);
-  my ($r,%s) = ('');
-  if (ref $DECODER{$encoding}) {	## decode TE
-    $r = &{$DECODER{$encoding}} ($encoding, $etext);
-    ($r,%s) = Message::MIME::Charset::decode ($charset, $r);
-    if (!$s{success} && $OPTION{forcedecode} && $charset =~ /^iso-8859-([0-9]+(?:-[ie])?)$/) {
-      my $n = $1;
-      $r =~ s{([\x09\x0A\x0D\x20]*[\x80-\xFF]+[\x09\x0A\x0D\x20]*)}{
-        my $t = $1;
-        $t =~ s/([\x09\x0A\x0D\x80-\xFF])/sprintf('=%02X', ord $1)/ge;
-        $t =~ tr/\x20/_/;
-        sprintf ' =?iso-8859-%s?q?%s?= ', $n.($lang?'*'.$lang:''), $t;
-      }goex;
-      $s{success} = 1;
-    }
-  }
-  ($r, $s{success});
 }
 
 =head1 $encoded_words = Message::MIME::EncodedWord::encode ($string, %option)
@@ -392,4 +397,4 @@ Boston, MA 02111-1307, USA.
 
 =cut
 
-1; # $Date: 2002/12/28 09:07:05 $
+1; # $Date: 2002/12/29 03:04:53 $
