@@ -257,7 +257,8 @@ sub stringify ($;%) {
     $name =~ s/((?:^|-)[a-z])/uc($1)/ge if $OPT{capitalize};
     push @ret, $name.': '.$self->fold ($field->{body});
   }
-  join "\n", @ret;
+  my $ret = join ("\n", @ret);
+  $ret? $ret."\n": "";
 }
 
 =head2 $self->get_option ($option_name)
@@ -382,6 +383,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
+$Date: 2002/03/13 14:47:07 $
 
 =cut
 
