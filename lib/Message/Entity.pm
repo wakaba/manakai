@@ -13,10 +13,14 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw($VERSION %DEFAULT);
-$VERSION = '1.00';
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 use Message::Header;
 use overload '""' => sub {shift->stringify};
+
+%DEFAULT = (
+  body_class	=> {'/DEFAULT' => 'Message::Body::TextPlain'},
+);
 
 =head2 Message::Entity->new ([%option])
 
@@ -95,7 +99,25 @@ sub body ($;$) {
   if ($new_body) {
     $self->{body} = $new_body;
   }
+  $self->{body} = $self->_body ($self->{body}, $self->content_type)
+    unless ref $self->{body};
   $self->{body};
+}
+
+sub _body ($;$$) {
+  my $self = shift;
+  my $body = shift;
+  my $ct = shift;
+  $ct = $self->{option}->{body_class}->{$ct}
+     || $self->{option}->{body_class}->{'/DEFAULT'};
+  eval "require $ct";
+  if (ref $body) {
+    return $body;
+  } elsif ($body) {
+    return $ct->parse ($body);
+  } else {
+    return $ct->new ($body);
+  }
 }
 
 =head2 $self->stringify ([%option])
@@ -112,26 +134,31 @@ sub stringify ($;%) {
   $header."\n".$body;
 }
 
-=head2 $self->get_option ($option_name)
+=head2 $self->option ($option_name)
 
-Returns value of the option.
-
-=head2 $self->set_option ($option_name, $option_value)
-
-Set new value of the option.
+Returns/set (new) value of the option.
 
 =cut
 
-sub get_option ($$) {
+sub option ($$;$) {
   my $self = shift;
-  my ($name) = @_;
+  my ($name, $newval) = @_;
+  if ($newval) {
+    $self->{option}->{$name} = $newval;
+  }
   $self->{option}->{$name};
 }
-sub set_option ($$$) {
-  my $self = shift;
-  my ($name, $value) = @_;
-  $self->{option}->{$name} = $value;
-  $self;
+
+=head2 $self->content_type ([%options])
+
+Returns C<body>'s content-type (Internet Media Type).
+This method is not implemented yet so always returns
+C<text/plain>.
+
+=cut
+
+sub content_type ($;%) {
+  'text/plain';
 }
 
 =head1 EXAMPLE
@@ -141,6 +168,11 @@ sub set_option ($$$) {
   $msg->header ($header);
   $msg->body ($body);
   print $msg;
+
+=head1 SEE ALSO
+
+Message::* Perl modules
+<http://suika.fam.cx/~wakaba/Message-pm/>
 
 =head1 LICENSE
 
@@ -164,7 +196,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/13 15:10:21 $
+$Date: 2002/03/21 04:21:28 $
 
 =cut
 

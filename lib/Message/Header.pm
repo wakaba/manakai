@@ -48,22 +48,19 @@ when C<stringify>.  (Default = 0)
   capitalize	=> 1,
   fold_length	=> 70,
   mail_from	=> 0,
-  field_type	=> {_DEFAULT => 'Message::Field::Unstructured'},
+  field_type	=> {':DEFAULT' => 'Message::Field::Unstructured'},
 );
-my @field_type_Structured = qw(cancel-lock content-language
-  content-transfer-encoding
-  encrypted followup-to importance mime-version newsgroups 
-  path precedence user-agent x-cite
-  x-face x-mail-count
-  x-msmail-priority x-priority x-uidl xref);
+my @field_type_Structured = qw(cancel-lock
+  importance mime-version path precedence user-agent x-cite
+  x-face x-mail-count x-msmail-priority x-priority x-uidl xref);
 for (@field_type_Structured)
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Structured'}
 my @field_type_Address = qw(approved bcc cc delivered-to envelope-to
-  errors-to from mail-followup-to reply-to resent-bcc
+  errors-to fcc from mail-followup-to mail-followup-cc mail-from reply-to resent-bcc
   resent-cc resent-to resent-from resent-sender return-path
   return-receipt-to sender to x-approved x-beenthere
   x-complaints-to x-envelope-from x-envelope-sender
-  x-envelope-to x-ml-address x-ml-command x-ml-to);
+  x-envelope-to x-ml-address x-ml-command x-ml-to x-nfrom x-nto);
 for (@field_type_Address)
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Address'}
 my @field_type_Date = qw(date date-received delivery-date expires
@@ -74,24 +71,22 @@ my @field_type_MsgID = qw(content-id in-reply-to message-id
   references resent-message-id see-also supersedes);
 for (@field_type_MsgID)
   {$DEFAULT{field_type}->{$_} = 'Message::Field::MsgID'}
-my @field_type_Received = qw(received x-received);
-for (@field_type_Received)
+for (qw(received x-received))
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Received'}
-my @field_type_Param = qw(content-disposition content-type
+for (qw(accept accept-charset accept-encoding accept-language
+  content-disposition content-language 
+  content-transfer-encoding content-type encrypted followup-to keywords newsgroups
   x-brother x-daughter x-face-type x-respect x-moe
-  x-syster x-wife);
-for (@field_type_Param)
-  {$DEFAULT{field_type}->{$_} = 'Message::Field::Structured'}
+  x-syster x-wife))
+  {$DEFAULT{field_type}->{$_} = 'Message::Field::CSV'}
 my @field_type_URI = qw(list-archive list-help list-owner
   list-post list-subscribe list-unsubscribe uri url x-home-page x-http_referer
   x-info x-pgp-key x-ml-url x-uri x-url x-web);
 for (@field_type_URI)
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Structured'}
-my @field_type_ListID = qw(list-id);
-for (@field_type_ListID)
+for (qw(list-id))
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Structured'}
-my @field_type_Subject = qw(content-description subject title);
-for (@field_type_Subject)
+for (qw(content-description subject title x-nsubject))
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Subject'}
 
 =head2 Message::Header->new ([%option])
@@ -188,7 +183,7 @@ sub _field_body ($$$) {
   my ($body, $name) = @_;
   unless (ref $body) {
     my $type = $self->{option}->{field_type}->{$name}
-            || $self->{option}->{field_type}->{_DEFAULT};
+            || $self->{option}->{field_type}->{':DEFAULT'};
     eval "require $type";
     unless ($body) {
       $body = $type->new (field_name => $name);
@@ -359,7 +354,7 @@ sub field_type ($$;$) {
     $self->{option}->{field_type}->{$field_name} = $new_field_type;
   }
   $self->{option}->{field_type}->{$field_name}
-  || $self->{option}->{field_type}->{_DEFAULT};
+  || $self->{option}->{field_type}->{':DEFAULT'};
 }
 
 sub _delete_empty_field ($) {
@@ -462,7 +457,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/20 11:41:58 $
+$Date: 2002/03/21 04:21:28 $
 
 =cut
 
