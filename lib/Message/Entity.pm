@@ -13,7 +13,7 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::Header;
@@ -38,6 +38,7 @@ use overload '""' => sub { $_[0]->stringify },
     -fill_date_name	=> 'date',
     #fill_msgid	=> 1,
     -fill_msgid_name	=> 'message-id',
+    -force_mime_entity	=> 0,
     -format	=> 'mail-rfc2822',
     -linebreak_strict	=> 0,	## BUG: not work perfectly
     -parse_all	=> 0,
@@ -466,6 +467,7 @@ sub stringify ($;%) {
     my $ismime = 0;
     for (keys %exist) {if (/:$ns_content$/) { $ismime = 1; last }}
     unless ($ismime) {
+      $ismime = 1 if $option{force_mime_entity};
       $ismime = 1 if $option{body_default_media_type} ne 'text';
       $ismime = 1 if $option{body_default_media_subtype} ne 'plain';
     }
@@ -910,7 +912,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/09 11:20:24 $
+$Date: 2002/06/11 13:01:21 $
 
 =cut
 
