@@ -11,7 +11,7 @@ use strict;
 require 5.6.0;
 use re 'eval';
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 
@@ -125,7 +125,11 @@ sub display_name ($;$%) {
   if (defined $dname) {
     $self->{display_name} = $dname;
   }
-  $self->{display_name};
+  if (length $self->{display_name}) {
+    $self->{display_name};
+  } elsif ($self->{option}->{comment_to_display_name}) {
+    $self->{comment}->[0];
+  }
 }
 
 
@@ -224,7 +228,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/23 12:10:15 $
+$Date: 2002/11/13 08:08:51 $
 
 =cut
 

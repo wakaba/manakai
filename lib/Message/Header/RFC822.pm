@@ -9,7 +9,7 @@ for RFC822 Namespaces of Header Fields
 package Message::Header::RFC822;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Header::Default;
 
 our %OPTION = %Message::Header::Default::OPTION;
@@ -130,8 +130,8 @@ for (qw(abuse-reports-to apparently-to approved approved-by bcc cc complaints-to
   return-receipt-to return-receipt-requested-to sender to x-abuse-reports-to 
   x-admin x-approved x-beenthere x-biglobe-sender x-cc-sender x-confirm-reading-to
   x-complaints-to x-envelope-from x-envelope-sender
-  x-envelope-to x-ml-address x-ml-command x-ml-to x-nfrom x-nto
-  x-rcpt-to x-sender x-x-sender))
+  x-envelope-to x-from x-ml-address x-ml-command x-ml-to x-nfrom x-nto
+  x-rcpt-to x-sender x-to x-x-sender))
   {$OPTION{value_type}->{$_} = ['Message::Field::Addresses']}
 for (qw(client-date date date-received delivery-date expires
   expire-date nntp-posting-date posted posted-date received-date 
@@ -352,7 +352,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/08/03 11:42:22 $
+$Date: 2002/11/13 08:08:52 $
 
 =cut
 

@@ -14,7 +14,7 @@ require 5.6.0;	## (require: v5.6.0 data type)
 package Message::Entity;
 use strict;
 use vars qw(%DEFAULT %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.37 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.38 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::Header;
@@ -103,7 +103,7 @@ sub _init ($;%) {
     $self->{option}->{text_coderange} = 'binary';
     $self->{option}->{cte_default} = 'binary';
   } else {
-    if ($format =~ /mail-rfc822|mail-rfc2822/) {
+    if ($format =~ /mail-rfc822|mail-rfc2822/ && $format !~ /mime-entity/) {
       $self->{option}->{fill_destination} = 1;
     }
     $self->{option}->{fill_date_ns} = $ns822 unless defined $options{-fill_date_ns};
@@ -623,7 +623,7 @@ sub stringify ($;%) {
         $hdr->field ($option{fill_ua_name})->add_our_name (
           -use_Config	=> $option{ua_use_Config},
           -use_Win32	=> $option{ua_use_Win32},
-          -date	=> q$Date: 2002/08/04 00:16:32 $,
+          -date	=> q$Date: 2002/11/13 08:08:51 $,
         );
       }
     } if $option{fill_missing_fields};
@@ -787,7 +787,7 @@ sub content_type ($;%) {
   if (wantarray) {
     ($mt, $mst);
   } else {
-    $ct->media_type;
+    ref $ct ? $ct->media_type : sprintf '%s/%s', $mt, $mst;
   }
 }
 *media_type = \&content_type;
@@ -904,7 +904,10 @@ sub list_count ($) {
            || &$v ('x-seqno');
   return $lc if $lc;
   if ($hdr->field_exist ('x-sequence')) {
-    if ($hdr->field ('x-sequence')->value =~ /^\S+\s+(\d+)$/) {
+    my $s = $hdr->field ('x-sequence')->value;
+    if ($s =~ /^\S+\s+(\d+)$/) {
+      return $1;
+    } elsif ($s =~ /(\d+)/) {
       return $1;
     }
   }
@@ -1177,7 +1180,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/08/04 00:16:32 $
+$Date: 2002/11/13 08:08:51 $
 
 =cut
 

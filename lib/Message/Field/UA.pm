@@ -6,12 +6,10 @@ header field body consist of C<product> tokens
 
 =cut
 
-require 5.6.0;
 package Message::Field::UA;
 use strict;
-use re 'eval';
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 use overload '.='	=> sub { 
@@ -46,6 +44,7 @@ use overload '.='	=> sub {
     -use_comment	=> 1,
     #-use_quoted_string	=> 1,
     -use_Win32	=> 1,
+    -use_Win32_API	=> 1,
 );
 
 =head1 CONSTRUCTORS
@@ -98,6 +97,7 @@ sub parse ($$;%) {
   my $self = bless {}, $class;
   my $field_body = shift;  my @ua = ();
   $self->_init (@_);
+  use re 'eval';
   $field_body =~ s{^((?:$REG{FWS}$REG{comment})+)}{
     my $comments = $1;
     $comments =~ s{$REG{M_comment}}{
@@ -339,26 +339,49 @@ sub add_our_name ($;%) {
                       version => $Message::Entity::VERSION, 
                       -prepend => 0);
   }
-    my (@os, @os_comment);
+  
+  ## Perl version and architecture
     my @perl_comment;
-    if ($option{use_Config}) {
-      @os_comment = ('');
-      @os = ($^O => \@os_comment);
-      eval q{use Config;
-        @os_comment = ($Config{osvers});
-        push @perl_comment, $Config{archname};
-      };
-      eval q{use Win32;
-        my $build = Win32::BuildNumber;
-        push @perl_comment, "ActivePerl build $build" if $build;
-        my @osv = Win32::GetOSVersion;
+    eval q{use Config; push @perl_comment, $Config{archname}} if $option{use_Config};
+    eval q{require Win32; my $build; $build = &Win32::BuildNumber ();
+      push @perl_comment, "ActivePerl build $build" if $build;
+    } if $option{use_Win32};
+    undef $@;
+    
+    if ($^V) {	## 5.6 or later
+      $ua->replace (Perl => [sprintf ('%vd', $^V), @perl_comment], -prepend => 0);
+    } elsif ($]) {	## Before 5.005
+      $ua->replace (Perl => [ $], @perl_comment], -prepend => 0);
+    }
+    $option{prepend} = 0;
+    $ua->replace_system_version ('os', \%option);
+  $ua;
+}
+
+sub replace_system_version ($$;%) {
+  my $ua = shift;
+  my $type = shift;
+  my %option;
+  if (ref $_[0]) {
+    %option = %{$_[0]};
+  } else {
+    my %o = @_;  %option = %{ $ua->{option} };
+    for (grep {/^-/} keys %o) {$option{substr ($_, 1)} = $o{$_}}
+  }
+  
+  if ($type eq 'os') {
+    my @os_comment = ('');
+    my @os = ($^O => \@os_comment);
+    eval q{use Config; @os_comment = ($Config{osvers})} if $option{use_Config};
+    eval q{require Win32;
+        my @osv = &Win32::GetOSVersion ();
         @os = (
             $osv[4] == 0? 'Win32s':
             $osv[4] == 1? 'Windows':
             $osv[4] == 2? 'WindowsNT':
                           'Win32',       \@os_comment);
         @os_comment = (sprintf ('%d.%02d.%d', @osv[1,2], $osv[3] & 0xFFFF));
-        push @os_comment, $osv[0] if $osv[0] =~ /[^\x09\x20]/;
+        push @os_comment, $osv[0] if $osv[0] =~ /[^\x00\x09\x20]/;
         if ($osv[4] == 1) {
           if ($osv[1] == 4) {
             if ($osv[2] == 0) {
@@ -377,18 +400,31 @@ sub add_our_name ($;%) {
           push @os_comment, 'Windows 2000' if $osv[1] == 5 && $osv[2] == 0;
           push @os_comment, 'Windows XP' if $osv[1] == 5 && $osv[2] == 1;
         }
-        push @os_comment, Win32::GetChipName;
-      } if $option{use_Win32};
-      undef $@;
-    } else {
-      push @perl_comment, $^O;
-    }
-    if ($^V) {	## 5.6 or later
-      $ua->replace (Perl => [sprintf ('%vd', $^V), @perl_comment], -prepend => 0);
-    } elsif ($]) {	## Before 5.005
-      $ua->replace (Perl => [ $], @perl_comment], -prepend => 0);
-    }
-    $ua->replace (@os, -prepend => 0) if $option{use_Config};
+        push @os_comment, &Win32::GetChipName ();
+    } if $option{use_Win32};
+    undef $@;
+    $ua->replace (@os, -prepend => $option{prepend});
+  } elsif ('ie') {	## Internet Explorer
+    my $flag = 0;
+    eval q{use Win32::Registry;
+      my $ie;
+      $::HKEY_LOCAL_MACHINE->Open('SOFTWARE\Microsoft\Internet Explorer', $ie) or die $^E;
+      my ($type, $value);
+      $ie->QueryValueEx (Version => $type, $value) or die $^E;
+      die unless $value;
+      $ua->replace (MSIE => $value, -prepend => $option{prepend});
+      $flag = 1;
+    } or Carp::carp ($@) if !$flag;
+    eval q{require Win32::API;
+      my $GV = new Win32::API (shlwapi => "DllGetVersion", P => 'N');
+      my $ver = pack lllll => 4*5, 0, 0, 0, 0;
+      $GV->Call ($ver);
+      my (undef, $major, $minor, $build) = unpack lllll => $ver;
+      $ua->replace (MSIE => sprintf ("%d.%02d.%04d", $major, $minor, $build),
+        -prepend => $option{prepend});
+      $flag = 1;
+    } if $option{use_Win32_API} && !$flag;
+  }
   $ua;
 }
 
@@ -442,7 +478,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/30 08:50:36 $
+$Date: 2002/11/13 08:08:52 $
 
 =cut
 

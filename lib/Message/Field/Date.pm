@@ -11,7 +11,7 @@ date-time used in Internet messages and so on
 package Message::Field::Date;
 use strict;
 use vars qw(%DEFAULT %FMT2STR @ISA %MONTH %REG $VERSION %ZONE);
-$VERSION=do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 use Time::Local 'timegm_nocheck';
@@ -93,7 +93,7 @@ The following methods construct new objects:
   JAN	=> 1,	JANUARY	=> 1,
   FEB	=> 2,	FEBRUARY	=> 2,
   MAR	=> 3,	MARCH	=> 3,
-  APR	=> 4,	APRIL	=> 4,
+  APR	=> 4,	APRIL	=> 4,	ARL	=> 4,
   MAY	=> 5,
   JUN	=> 6,	JUNE	=> 6,
   JUL	=> 7,	JULY	=> 7,
@@ -175,6 +175,7 @@ my $_tm = sub { $_[0]->{local}?'tm_local':'tm' };
   CST	=> [-1,  6,  0],	## (NA)Central Standard	733, 822
   EADT	=> [+1, 11,  0],	## Eastern Australian Daylight
   EADT	=> [+1, 10,  0],	## Eastern Australian Standard
+  #EASTERN
   ECT	=> [+1,  1,  0],	## Central European (French)
   EDT	=> [-1,  4,  0],	## (NA)Eastern Daylight	733, 822
   EEST	=> [+1,  3,  0],	## Eastern European Summer
@@ -184,6 +185,7 @@ my $_tm = sub { $_[0]->{local}?'tm_local':'tm' };
   FST	=> [+1,  2,  0],	## French Summer
   FWT	=> [+1,  1,  0],	## French Winter
   GDT	=> [+1,  1,  0],	## 	724
+  #GM
   GMT	=> [+1,  0,  0],	## Greenwich Mean	733, 822
   #GST	=> [-1,  3,  0],	## Greenland Standard
   GST	=> [+1, 10,  0],	## Guam Standard
@@ -203,6 +205,7 @@ my $_tm = sub { $_[0]->{local}?'tm_local':'tm' };
   KST	=> [+1,  9,  0],	## Korean Standard
   LCL	=> [-1,  0,  0],	## (unknown zone used by LSMTP)
   LOCAL	=> [-1,  0,  0],	## local time zone
+  #LON
   LT	=> [-1,  0,  0],	## Luna Time [RFC 1607]
   MDT	=> [-1,  6,  0],	## (NA)Mountain Daylight	733, 822
   MET	=> [+1,  0,  0],	## Middle European
@@ -211,6 +214,7 @@ my $_tm = sub { $_[0]->{local}?'tm_local':'tm' };
   MEWT	=> [+1,  0,  0],	## Middle European Winter
   MEZ	=> [+1,  0,  0],	## Central European (German)
   MST	=> [-1,  7,  0],	## (NA)Mountain Standard	733, 822
+  MOUNTAIN	=> [-1,  7,  0],	## (maybe) (NA)Mountain Standard	733, 822
   MT	=> [-1,  0,  0],	## Mars Time [RFC 1607]
   NDT	=> [-1,  2, 30],	## Newfoundland Daylight
   NFT	=> [-1,  3, 30],	## Newfoundland Standard
@@ -220,14 +224,18 @@ my $_tm = sub { $_[0]->{local}?'tm_local':'tm' };
   NZD	=> [+1, 13,  0],	## New Zealand Daylight
   NZT	=> [+1, 12,  0],	## New Zealand
   NZDT	=> [+1, 13,  0],	## New Zealand Daylight
+  NZS	=> [+1, 12,  0],	## (maybe) New Zealand Standard
   NZST	=> [+1, 12,  0],	## New Zealand Standard
   PDT	=> [-1,  7,  0],	## (NA)Pacific Daylight	733, 822
+  #PM
   PST	=> [-1,  8,  0],	## (NA)Pacific Standard	733, 822
+  #SAMST
   SET	=> [+1,  1,  0],	## Seychelles
   SST	=> [+1,  2,  0],	## Swedish Summer
   #SST	=> [+1,  7,  0],	## South Sumatra
   SWT	=> [+1,  1,  0],	## Swedish Winter
   UKR	=> [+1,  2,  0],	## Ukraine
+  UNDEFINED	=> [-1,  0,  0],	## undefined
   UT	=> [+1,  0,  0],	## Universal Time	822
   UTC	=> [+1,  0,  0],	## Coordinated Universal Time
   WADT	=> [+1,  8,  0],	## West Australian Daylight
@@ -694,7 +702,11 @@ sub _zone_string_to_array ($$;$) {
       my ($s, $h, $m) = ($1, $2, $3);
       $s ||= '+';  $s =~ tr/+-/-+/;
       @azone = ("${s}1", 0+$h, 0+$m);
+    } elsif ($zone =~ /^GMT([+-])([0-9][0-9]?)([0-9][0-9])?/i) {
+      @azone = ("${1}1", 0+$2, 0+$3);
     } elsif ($zone =~ /([+-])([0-9][0-9])([0-9][0-9])/) {
+      @azone = ("${1}1", $2, $3);
+    } elsif ($zone =~ /([+-])([0-9])([0-9][0-9])/) {
       @azone = ("${1}1", $2, $3);
     } elsif ($zone =~ /([+-]?)([0-9]+)(?:[:.-]([0-9]+))?/) {
       @azone = ("${1}1", $2, 0+$3);
@@ -765,7 +777,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/08/29 12:14:37 $
+$Date: 2002/11/13 08:08:51 $
 
 =cut
 

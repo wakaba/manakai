@@ -8,7 +8,7 @@ Message::Header --- A Perl Module for Internet Message Headers
 package Message::Header;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.41 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.42 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;	## This may seem silly:-)
 push @ISA, qw(Message::Field::Structured);
 
@@ -297,7 +297,7 @@ sub _item_return_value ($\$\%) {
     ${$_[1]}->{body};
   } else {
     ${$_[1]}->{body} = $_[0]->_parse_value (${$_[1]}->{name} => ${$_[1]}->{body},
-      ns => ${$_[1]}->{ns});
+      ns => ${$_[1]}->{ns}) if $_[2]->{parse};
     ${$_[1]}->{body};
   }
 }
@@ -937,7 +937,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/28 00:31:38 $
+$Date: 2002/11/13 08:08:51 $
 
 =cut
 

@@ -9,7 +9,7 @@ Message Structured Header Field Bodies
 package Message::Field::Structured;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.20 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.21 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 use overload '""' => sub { $_[0]->stringify },
              '.=' => sub { $_[0]->value_append ($_[1]) },
@@ -151,7 +151,7 @@ sub add ($$$%) {
     unless ($array) {
       my %option = @_;
       return if $option{-dont_croak};
-      Carp::croak q{add: Method not available for this module};
+      Carp::croak (q{add: Method not available for this module});
     }
     
   ## --- field is named value list (i.e. hash)
@@ -251,7 +251,7 @@ sub replace ($$$%) {
     unless ($array) {
       my %option = @_;
       return if $option{-dont_croak};
-      Carp::croak q{replace: Method not available for this module};
+      Carp::croak (q{replace: Method not available for this module});
     }
     
   ## --- field is named value list (i.e. hash)
@@ -360,7 +360,7 @@ sub count ($;%) {
            || $self->{option}->{_HASH_NAME};
   unless ($array) {
     return if $option{-dont_croak};
-    Carp::croak q{count: Method not available for this module};
+    Carp::croak (q{count: Method not available for this module});
   }
   $self->_count_cleaning;
   return $self->_count_by_name ($array => \%option) if defined $option{-name};
@@ -389,7 +389,7 @@ sub delete ($@) {
   my $array = $option{_ARRAY_NAME} || $option{_HASH_NAME};
   unless ($array) {
     return if $option{dont_croak};
-    Carp::croak q{delete: Method not available for this module};
+    Carp::croak (q{delete: Method not available for this module});
   }
   if ($option{by} && $option{by} ne 'index') {
     my %name; for (@_) {$name{$_} = 1}
@@ -446,7 +446,7 @@ sub item ($$;%) {
   my $array = $option{_ARRAY_NAME} || $option{_HASH_NAME};
   unless ($array) {
     return if $option{dont_croak};
-    Carp::croak q{item: Method not available for this module};
+    Carp::croak (q{item: Method not available for this module});
   }
   $option{parse} = 1 unless defined $option{parse};
   $option{parse} = 1 if $option{parse_all} && !defined $option{parse};
@@ -489,7 +489,7 @@ sub item_exist ($$;%) {
   my $array = $option{_ARRAY_NAME} || $option{_HASH_NAME};
   unless ($array) {
     return if $option{dont_croak};
-    Carp::croak q{item-exist: Method not available for this module};
+    Carp::croak (q{item-exist: Method not available for this module});
   }
   my @r;
   if ($option{by} eq 'index') {
@@ -578,10 +578,10 @@ sub _parse_value ($$$) {
   if ($vtype eq ':none:') {
     return $value;
   } elsif (defined $value) {
-    eval "require $vtype" or Carp::croak qq{<parse>: $vtype: Can't load package: $@};
+    eval "require $vtype" or Carp::croak (qq{<parse>: $vtype: Can't load package: $@});
     return $vtype->parse ($value, %vopt);
   } else {
-    eval "require $vtype" or Carp::croak qq{<parse>: $vtype: Can't load package: $@};
+    eval "require $vtype" or Carp::croak (qq{<parse>: $vtype: Can't load package: $@});
     return $vtype->new (%vopt);
   }
 }
@@ -828,7 +828,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/08/01 06:42:38 $
+$Date: 2002/11/13 08:08:52 $
 
 =cut
 

@@ -8,7 +8,7 @@ Message::MIME::MediaType --- Media-type definitions
 package Message::MIME::MediaType;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Header;
 require Message::Header::Message;
 
@@ -345,12 +345,14 @@ $type{application}->{'pgp-signature'} = {
 	cte_7bit_preferred	=> 'quoted-printable',
 };
 
-$type{application}->{'rdf+xml'} = {	## Not in [IANAREG]
+$type{application}->{'rdf+xml'} = {	## Not in [IANAREG],
+					## draft-swartz-rdfcore-rdfxml-mediatype
 	text_content	=> 1,
 	mime_charset	=> 1,
 	default_charset	=> 'us-ascii',	# See RFC 3023
 	cte_7bit_preferred	=> 'quoted-printable',
 	extension	=> [qw/rdf/],
+	mac_type	=> [qw/TEXT/],
 };
 
 $type{application}->{rtf} = {
@@ -372,6 +374,18 @@ $type{application}->{'sgml-open-catalog'} = {
 	cte_7bit_preferred	=> 'quoted-printable',
 	mime_charset	=> 1,
 };
+
+$type{application}->{'smil+xml'} = {	## Not in [IANAREG] yet (draft-hoschka-smil-media-type)
+	text_content	=> 1,
+	mime_charset	=> 1,
+	default_charset	=> 'us-ascii',	# See RFC 3023
+	cte_7bit_preferred	=> 'quoted-printable',
+	extension	=> [qw/smil smi sml/],
+	parameter	=> {
+		profile	=> {},	# URI
+	},
+};
+$type{application}->{smil} = $type{application}->{'smil+xml'};
 
 $type{application}->{'x-perl'} = {
 	mime_charset	=> 1,
@@ -683,6 +697,8 @@ $type{message}->{'s-http'} = {
 	},
 };
 
+# message/sip, message/sipfrag
+
 ## --- Multipart/*
 my @multipart_inherit = qw/accept_coderange body_default_charset body_default_charset_input cte_default text_coderange/;
 
@@ -759,7 +775,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/08/04 00:16:32 $
+$Date: 2002/11/13 08:08:52 $
 
 =cut
 

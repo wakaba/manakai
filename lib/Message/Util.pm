@@ -12,15 +12,12 @@ Note that there is another module, Message::Tool.
 =cut
 
 package Message::Util;
-require 5.6.0;
+#require 5.6.0;
 use strict;
-use re 'eval';
 use vars qw(%FMT2STR %OPTION %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.23 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.24 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Carp;
-require Message::MIME::EncodedWord;
-require Message::MIME::Charset;
 
 =head1 REGEXPS (%Message::Util::REG)
 
@@ -42,8 +39,13 @@ require Message::MIME::Charset;
 	$REG{WSP} = qr/[\x09\x20]/;
 	$REG{FWS} = qr/[\x09\x20]*/;	## not same as 2822's
 ## Basic structure
-	$REG{comment} = qr/\x28(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x27\x2A-\x5B\x5D-\xFF]|(??{$REG{comment}}))*\x29/;
-	$REG{M_comment} = qr/\x28((?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x27\x2A-\x5B\x5D-\xFF]|(??{$REG{comment}}))*)\x29/;
+	if (defined $^V) {	# $^V gt v6.5.0
+	  $REG{comment} = qr/\x28(?:\x5C[\x00-\xFF]|[^\x28\x29\x5C]|(??{$REG{comment}}))*\x29/;
+	  $REG{M_comment} = qr/\x28((?:\x5C[\x00-\xFF]|[^\x28\x29\x5C]|(??{$REG{comment}}))*)\x29/;
+	} else {
+	  $REG{comment} = qr/\x28(?:\x5C(?:.|[\x0A\x0D])|[^\x28\x29\x5C]|\x28(?:\x5C(?:.|[\x0A\x0D])|[^\x28\x29\x5C])*\x29)*\x29/;
+	  $REG{M_comment} = qr/\x28((?:\x5C(?:.|[\x0A\x0D])|[^\x28\x29\x5C]|\x28(?:\x5C(?:.|[\x0A\x0D])|[^\x28\x29\x5C])*\x29)*)\x29/;
+	}
 	
 	$REG{quoted_string} = qr/\x22(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\xFF])*\x22/;
 	$REG{M_quoted_string} = qr/\x22((?:\x5C[\x00-\xFF]|[^\x0D\x22\x5C])*)\x22/;
@@ -143,6 +145,7 @@ Gets rid of all C<comment>s.  Inserts a SP instead.
 =cut
 
 sub delete_comment ($) {
+  use re 'eval';
   my $body = shift;
   $body =~ s{($REG{quoted_string}|$REG{domain_literal}|$REG{angle_quoted})|$REG{comment}}{
     my $o = $1;  $o? $o : ' ';
@@ -201,6 +204,7 @@ Unquotes C<quoted-pair> in C<comment>s.
 =cut
 
 sub unquote_ccontent ($) {
+  use re 'eval';
   my $comment = shift;
   $comment =~ s{$REG{M_comment}}{
     my $ctext = $1;
@@ -456,6 +460,7 @@ sub make_clone ($) {
 =cut
 
 sub encode_header_string ($$;%) {
+  require Message::MIME::Charset;
   my $yourself = shift; my $s = shift; my %o = @_;
   $o{charset} ||= $yourself->{option}->{encoding_after_encode};
   $o{charset} = Message::MIME::Charset::name_normalize ($o{charset});
@@ -474,6 +479,8 @@ sub encode_header_string ($$;%) {
 }
 
 sub decode_header_string ($$;%) {
+  require Message::MIME::Charset;
+  require Message::MIME::EncodedWord;
   my $yourself = shift; my $s = shift; my %o = @_;
   $o{charset} ||= $yourself->{option}->{encoding_before_decode};
   $o{charset} = Message::MIME::Charset::name_normalize ($o{charset});
@@ -510,6 +517,7 @@ sub decode_header_string ($$;%) {
 }
 
 sub encode_body_string {
+  require Message::MIME::Charset;
   my $yourself = shift; my $s = shift; my %o = @_;
   $o{charset} ||= $yourself->{option}->{encoding_after_encode};
   $o{charset} = Message::MIME::Charset::name_normalize ($o{charset});
@@ -528,6 +536,7 @@ sub encode_body_string {
 }
 
 sub decode_body_string {
+  require Message::MIME::Charset;
   my $yourself = shift; my $s = shift; my %o = @_;
   $o{charset} ||= $yourself->{option}->{encoding_before_decode};
   $o{charset} = Message::MIME::Charset::name_normalize ($o{charset});
@@ -618,6 +627,7 @@ and returns them as array.
 =cut
 
 sub comment_to_array ($$) {
+  use re 'eval';
   my $yourself = shift;
   my $body = shift;
   my @r = ();
@@ -625,7 +635,8 @@ sub comment_to_array ($$) {
     my ($o, $c) = ($1, $2);
     if ($o) {$o}
     else {
-      push @r, decode_ccontent ($yourself, $c);
+      require Message::MIME::EncodedWord;
+      push @r, Message::MIME::EncodedWord::decode_ccontent ($yourself, $c);
       ' ';
     }
   }gex;
@@ -633,6 +644,7 @@ sub comment_to_array ($$) {
 }
 
 sub delete_comment_to_array ($$;%) {
+  use re 'eval';
   my $yourself = shift;
   my $body = shift;
   my %option = @_;
@@ -642,7 +654,8 @@ sub delete_comment_to_array ($$;%) {
     my ($o, $c) = ($1, $2);
     if ($o) {$o}
     else {
-      push @r, decode_ccontent ($yourself, $c);
+      require Message::MIME::EncodedWord;
+      push @r, Message::MIME::EncodedWord::decode_ccontent ($yourself, $c);
       ' ';
     }
   }gex;
@@ -671,7 +684,8 @@ Decodes C<ccontent> (content of C<comment>).
 =cut
 
 sub decode_ccontent ($$) {
-  Message::MIME::EncodedWord::decode_ccontent (@_);
+  require Message::MIME::EncodedWord;
+  Message::MIME::EncodedWord::decode_ccontent ($_[0], $_[1]);
 }
 
 sub sprintxf ($;\%) {
@@ -756,7 +770,7 @@ sub get_host_fqdn () {
   if ($OPTION{use_Net_Domain}) {
     eval q{require Net::Domain;
       $f = &Net::Domain::hostfqdn;
-    } or Carp::carp "get_host_fqdn: get by Net::Domain: $@";
+    } or Carp::carp ("get_host_fqdn: get by Net::Domain: $@");
     if ($f) {
       $OPTION{__cache_host_fqdn} = $f;
       return $f;
@@ -765,7 +779,7 @@ sub get_host_fqdn () {
   if ($OPTION{use_Sys_Hostname_Long}) {
     eval q{require Sys::Hostname::Long;
       $f = &Sys::Hostname::Long::hostname_long;
-    } or Carp::carp "get_host_fqdn: get by Sys::Hostname::Long: $@";
+    } or Carp::carp ("get_host_fqdn: get by Sys::Hostname::Long: $@");
     if ($f) {
       $OPTION{__cache_host_fqdn} = $f;
       return $f;
@@ -774,7 +788,7 @@ sub get_host_fqdn () {
   if ($OPTION{use_Sys_Hostname}) {
     eval q{require Sys::Hostname;
       $f = &Sys::Hostname::hostname;
-    } or Carp::carp "get_host_fqdn: get by Sys::Hostname: $@";
+    } or Carp::carp ("get_host_fqdn: get by Sys::Hostname: $@");
     if ($f) {
       $OPTION{__cache_host_fqdn} = $f;
       return $f;
@@ -787,6 +801,24 @@ sub is_utf8 ($) {
   my $s = shift;
   return Encode::is_utf8 ($s) if $Encode::VERSION;
   0;
+}
+
+sub enentity_html ($) {
+  my $s = shift;
+  $s =~ s/&/&amp;/;
+  $s =~ s/</&lt;/;
+  $s =~ s/>/&gt;/;
+  $s =~ s/"/&quot;/;
+  $s;
+}
+
+sub deentity_html ($) {
+  my $s = shift;
+  $s =~ s/&lt;/</;
+  $s =~ s/&gt;/>/;
+  $s =~ s/&quot;/"/;
+  $s =~ s/&amp;/&/;
+  $s;
 }
 
 package Message::Util::Wide;
@@ -805,10 +837,9 @@ sub unquote_if_quoted_string ($) {
   wantarray? ($quoted_string, $isq): $quoted_string;
 }
 
-
 =head1 LICENSE
 
-Copyright 2002 wakaba E<lt>w@suika.fam.cxE<gt>.
+Copyright 2002 Wakaba <w@suika.fam.cx>.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -825,11 +856,7 @@ along with this program; see the file COPYING.  If not, write to
 the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.
 
-=head1 CHANGE
-
-See F<ChangeLog>.
-$Date: 2002/08/05 09:40:54 $
-
 =cut
 
 1;
+# $Date: 2002/11/13 08:08:51 $
