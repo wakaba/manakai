@@ -17,7 +17,7 @@ markup constructures.  (SuikaWiki is not "tiny"?  Oh, yes, I see:-))
 
 package Message::Markup::XML;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.23 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.24 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload '""' => \&outer_xml,
              fallback => 1;
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXML_NCNameStartChar InXMLNCNameChar!;
@@ -855,6 +855,7 @@ sub inner_xml ($;%) {
   if ($self->{type} eq '#comment') {
     $r = $self->inner_text;
     $r =~ s/--/-&#45;/g;
+    $r =~ s/-$/&#45;/;
   } elsif ($self->{type} eq '#pi') {
     my $isc = $self->_is_same_class ($self->{value});
     if (!$isc and defined $self->{value} and length ($self->{value})) {
@@ -928,33 +929,39 @@ sub inner_xml ($;%) {
         $xid_opt{allow_pubid_only} = 1;
       }
       
-      my ($v, $xid) = ($self->{value});
-      $xid = $self->external_id (%xid_opt) unless $self->{flag}->{smxp__defined_with_param_ref};
+      my $xid;
+      $xid = $self->external_id (%xid_opt)
+        unless $self->{flag}->{smxp__defined_with_param_ref};
       if ($xid) {	## External ID
         $r .= $xid;
       } else {	## EntityValue
-        my $entity_value = $self->get_attribute ('value');
-        undef $entity_value if $self->{flag}->{smxp__defined_with_param_ref};
-        if ($entity_value) {	# <!ENTITY foo "bar">
+        my $entity_value;
+        $entity_value = $self->get_attribute ('value')
+          unless $self->{flag}->{smxp__defined_with_param_ref};
+        if (ref $entity_value) {	# <!ENTITY foo "bar">
           $r .= $entity_value->entity_value;
-        } else {	## Parameter entity reference
-          my $isc = $self->_is_same_class ($self->{value});
-          $r .= $self->{value} unless $isc;
-          for (($isc?$self->{value}:()), @{$self->{node}}) {
-            $r .= $_->outer_xml unless $_->{type} eq '#attribute';
+        } else {	## Consist of parameters
+          my $params = '';
+          Carp::carp qq({value} property ("$self->{value}") is not allowed for this type of node)
+              if defined $self->{value};
+          for (@{$self->{node}}) {
+            $params .= $_->outer_xml unless $_->{type} eq '#attribute';
           }
+          $r .= length $params ? $params : '""';
         }
       }
     } elsif ($self->{namespace_uri} eq $NS{SGML}.'element') {
-      if (!$self->{flag}->{smxp__defined_with_param_ref}) {
-        $r = $self->get_attribute_value ('qname');
+      $r = $self->get_attribute_value ('qname')
+        unless $self->{flag}->{smxp__defined_with_param_ref};
+      if ($r) {
         unless ($self->_check_name ($r)) {
-          $r = undef;
+          Carp::carp qq'"$r": QName expected';
+          $r = '';
         } else {
           $r .= ' ';
         }
         
-        my $cmodel = $self->get_attribute_value ('content') || 'element';
+        my $cmodel = $self->get_attribute_value ('content', default => 'EMPTY');
         if ($cmodel ne 'mixed' and $cmodel ne 'element') {
           $r .= $cmodel;
         } else {  # element content or mixed content
@@ -982,7 +989,7 @@ sub inner_xml ($;%) {
           };
           my $tt;
           my $grp_node;
-          for (@{$self->child_nodes}) {
+          for (@{$self->{node}}) {
             if ($_->node_type eq '#element'
             and $_->namespace_uri eq $NS{SGML}.'element'
             and $_->local_name eq 'group') {
@@ -1021,22 +1028,23 @@ sub inner_xml ($;%) {
           }
       }
     } elsif ($self->{namespace_uri} eq $NS{SGML}.'attlist') {
-      if (!$self->{flag}->{smxp__defined_with_param_ref}) {
-        $r = $self->get_attribute_value ('qname');
+      $r = $self->get_attribute_value ('qname')
+        unless $self->{flag}->{smxp__defined_with_param_ref};
+      if ($r) {
         unless ($self->_check_name ($r)) {
-          $r = undef;
-        } else {
-          $r .= ' ';
+          Carp::carp qq'inner_xml: "$r": QName expected';
+          $r = '';
         }
         for (@{$self->{node}}) {
-          if ($_->{type} eq '#element' && $_->{namespace_uri} eq $NS{XML}.'attlist'
-           && $_->{local_name} eq 'AttDef') {
+          if ($_->{type} eq '#element'
+          and $_->{namespace_uri} eq $NS{XML}.'attlist'
+          and $_->{local_name} eq 'AttDef') {
             $r .= "\n\t" . $_->get_attribute_value ('qname');
-            my $attr_type = $_->get_attribute_value ('type');
+            my $attr_type = $_->get_attribute_value ('type', default => 'CDATA');
             if ($attr_type ne 'enum') {
               $r .= "\t" . $attr_type;
             }
-            if ($attr_type eq 'enum' || $attr_type eq 'NOTATION') {
+            if ($attr_type eq 'enum' or $attr_type eq 'NOTATION') {
               my @l;
               for my $item (@{$_->{node}}) {
                 if ($item->{type} eq '#element'
@@ -1047,36 +1055,38 @@ sub inner_xml ($;%) {
               }
               $r .= "\t(" . join ('|', @l) . ')';
             }
-            ## DefaultDecl
+            ## DefaultDecl -- Keyword
             my $deftype = $_->get_attribute_value ('default_type');
             if ($deftype) {
               $r .= "\t#" . $deftype;
             }
-            if (!$deftype || $deftype eq 'FIXED') {
-              $r .= "\t" . $_->get_attribute ('default_value', make_new_node => 1)
-                             ->attribute_value;
+            ## DefaultDecl -- Attribute value specification
+            if (not $deftype or $deftype eq 'FIXED') {
+              $r .= "\t" 
+                 . $_->get_attribute ('default_value', make_new_node => 1)
+                     ->attribute_value;
             }
           }	# AttDef
         }
       } else {	## Save source doc's description as far as possible
-          my $isc = $self->_is_same_class ($self->{value});
-          $r .= $self->{value} unless $isc;
-          for (($isc?$self->{value}:()), @{$self->{node}}) {
-            unless ($_->{type} eq '#attribute' || $_->{type} eq '#element') {
-              $r .= $_->outer_xml;
-            } elsif ($_->{type} eq '#element'
-                 and $_->{namespace_uri} eq $NS{SGML}.'group') {
-              $r .= $_->outer_xml;
-            }
-          }
-      }
-    } else {	# unknown
+        Carp::carp '{value} should not be used here' if defined $self->{value};
         for (@{$self->{node}}) {
-          $r .= $_->outer_xml;
+          unless ($_->{type} eq '#attribute' || $_->{type} eq '#element') {
+            $r .= $_->outer_xml;
+          } elsif ($_->{type} eq '#element'
+               and $_->{namespace_uri} eq $NS{SGML}.'group') {
+            $r .= $_->outer_xml;
+          }
         }
+      }
+    } else {	# unknown declaration
+      Carp::carp qq'Unsupported type (<$self->{namespace_uri}>) of markup declaration';
+      for (@{$self->{node}}) {
+        $r .= $_->outer_xml;
+      }
     }
   } elsif ($self->{type} eq '#section') {
-    my $status = $self->get_attribute_value ('status');
+    my $status = $self->get_attribute_value ('status', default => '');
     if ($status eq 'CDATA') {
       $r = $self->inner_text;
       $r =~ s/]]>/]]>]]<![CDATA[>/g;
@@ -1093,13 +1103,20 @@ sub inner_xml ($;%) {
       } elsif ($status) {
         $r = $status.'['.$r;
       } else {
-        ## Must be an ignored section
+        ## Must be an ignore*d* section
+        $r = '[';
       }
       my $isc = $self->_is_same_class ($self->{value});
-      $r .= join '', map {s/\]\]>/]]&gt;/g; $_} $self->{value} unless $isc;
+      if (not $isc and defined $self->{value}) {
+        my $s = $self->{value};
+        $s =~ s/\]\]>/]]&gt;/g;
+        $r .= $s;
+      }
       for (($isc?$self->{value}:()), @{$self->{node}}) {
         if ($_->{type} eq '#text') {
-          $r .= join '', map {s/\]\]>/]]&gt;/g; $_} $_->inner_text;	## Anyway, this is error
+          my $s = $_->inner_text;
+          $s =~ s/\]\]>/]]&gt;/g;
+          $r .= $s;  ## But this will be non well-formed.
         } elsif ($_->{type} ne '#attribute') {
           $r .= $_->outer_xml;
         }
@@ -1412,4 +1429,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/10/31 08:41:35 $
+1; # $Date: 2003/11/01 06:11:13 $
