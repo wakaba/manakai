@@ -9,7 +9,7 @@ for "multipart/*" Internet Media Types
 package Message::Body::Multipart;
 use strict;
 use vars qw(%DEFAULT @ISA $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Body::Text;
 push @ISA, qw(Message::Body::Text);
@@ -224,7 +224,7 @@ sub stringify ($;%) {
   } elsif (substr ($b, -1, 1) eq "\x20") {
     $b .= 'B';
   }
-  my $blength = 45;
+  my $blength = 35;
   $b ||= $self->_generate_boundary ($blength);
   my $i = 1; while ($i++) {
     my @t = grep {/\Q--$b\E/} @parts;
@@ -289,7 +289,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/11 12:58:06 $
+$Date: 2002/06/16 10:44:08 $
 
 =cut
 

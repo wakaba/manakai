@@ -8,7 +8,7 @@ Message::Body::Text --- Perl Module for Internet Media Types "text/*"
 package Message::Body::Text;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
@@ -56,13 +56,11 @@ sub _init ($;%) {
   $mt_def = $Message::MIME::MediaType::type{$mt}->{'/default'} unless ref $mt_def;
   $mt_def = $Message::MIME::MediaType::type{'/default'}->{'/default'}
     unless ref $mt_def;
-  if ($mt_def->{mime_text}) {
     if ($self->{option}->{format} =~ /http/) {
       $self->{option}->{use_normalization} = 0;
     } else {
       $self->{option}->{use_normalization} = 1;
     }
-  }
   if ($mt_def->{mime_charset}) {
     $self->{option}->{use_param_charset} = 1;
     if ($self->{option}->{format} =~ /http/) {
@@ -238,7 +236,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/09 10:57:16 $
+$Date: 2002/06/16 10:44:08 $
 
 =cut
 

@@ -9,7 +9,7 @@ for "message/external-body" Internet Media Types
 package Message::Body::MessageExternalBody;
 use strict;
 use vars qw(%DEFAULT @ISA $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Body::Text;
 push @ISA, qw(Message::Body::Text);
@@ -25,6 +25,7 @@ push @ISA, qw(Message::Body::Text);
   -linebreak_strict	=> 1,
   -media_type	=> 'message',
   -media_subtype	=> 'external-body',
+  -msg_id_from	=> '',
   -output_phantom_body	=> 1,
   -parse_all	=> 0,
   #use_normalization	=> 0,
@@ -52,6 +53,9 @@ sub _init ($;%) {
   $self->{option}->{value_type}->{phantom_body} = ['Message::Body::TextPlain',
     {-media_type => 'text', -media_subtype => '/external_phantom_body'},
     \@ilist];
+  $self->{encapsulated_header} = new Message::Header
+    -parse_all => $self->{option}->{parse_all},
+    -format => 'mime-entity-external-body';
 }
 
 =item $body = Message::Body::Multipart->new ([%options])
@@ -250,7 +254,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/14 11:35:11 $
+$Date: 2002/06/16 10:44:08 $
 
 =cut
 

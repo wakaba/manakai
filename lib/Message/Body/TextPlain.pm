@@ -8,7 +8,7 @@ Message::Body::TextPlain --- Perl Module for Internet Media Type "text/plain"
 package Message::Body::TextPlain;
 use strict;
 use vars qw(%DEFAULT @ISA $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Body::Text;
 push @ISA, qw(Message::Body::Text);
@@ -47,6 +47,11 @@ sub _init ($;%) {
   unless (defined $self->{option}->{fill_ct}) {
     $self->{option}->{fill_ct} = $self->{option}->{format} =~ /http|mime/;
   }
+    if ($self->{option}->{format} =~ /http/) {
+      $self->{option}->{use_normalization} = 0;
+    } else {
+      $self->{option}->{use_normalization} = 1;
+    }
 }
 
 =item $body = Message::Body::TextPlain->new ([%options])
@@ -183,7 +188,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/09 10:57:16 $
+$Date: 2002/06/16 10:44:08 $
 
 =cut
 
