@@ -1740,25 +1740,49 @@ sub dis_perl_init_classdef ($;%) {
     }
     
     ## Register the constant value
-    if (defined $State->{ExpandedURI q<dis2pm:parentResource>}
-                      ->{ExpandedURI q<dis2pm:const>}->{$name}->{Name}) {
-      valid_err (qq<Constant value "$name" already defined>,
-                 node => $res->{src});
+    my @p;
+    {no warnings 'uninitialized';
+      $res->{ExpandedURI q<dis2pm:parentResource>}
+        = $State->{ExpandedURI q<dis2pm:parentResource>};
+      if ({
+           ExpandedURI q<ManakaiDOM:ConstGroup> => 1,
+           ExpandedURI q<ManakaiDOM:Class> => 1,
+           ExpandedURI q<ManakaiDOM:IF> => 1,
+           ExpandedURI q<ManakaiDOM:ExceptionClass> => 1,
+           ExpandedURI q<ManakaiDOM:ExceptionIF> => 1,
+           ExpandedURI q<ManakaiDOM:WarningClass> => 1,
+          }->{$res->{ExpandedURI q<dis2pm:parentResource>}
+                  ->{ExpandedURI q<dis2pm:type>}}) {
+        push @p, $res->{ExpandedURI q<dis2pm:parentResource>};
+      }
+      $res->{ExpandedURI q<dis2pm:grandParentResource>}
+        = $State->{ExpandedURI q<dis2pm:parentResource>}
+                ->{ExpandedURI q<dis2pm:parentResource>};
+      if ({
+           ExpandedURI q<ManakaiDOM:Class> => 1,
+           ExpandedURI q<ManakaiDOM:IF> => 1,
+           ExpandedURI q<ManakaiDOM:ExceptionClass> => 1,
+           ExpandedURI q<ManakaiDOM:ExceptionIF> => 1,
+           ExpandedURI q<ManakaiDOM:WarningClass> => 1,
+          }->{$res->{ExpandedURI q<dis2pm:grandParentResource>}
+                  ->{ExpandedURI q<dis2pm:type>}}) {
+        push @p, $res->{ExpandedURI q<dis2pm:grandParentResource>};
+      }
+      $res->{ExpandedURI q<dis2pm:grandParentResource>}
+          ->{ExpandedURI q<dis2pm:xConstGroup>}
+          ->{$res->{ExpandedURI q<dis2pm:parentResource>}}
+            = $res->{ExpandedURI q<dis2pm:parentResource>};
+      $res->{ExpandedURI q<dis2pm:grandParentResource>}
+          ->{ExpandedURI q<dis2pm:xConst>}
+          ->{$res} = $res;
     }
-    $res->{ExpandedURI q<dis2pm:parentResource>}
-      = $State->{ExpandedURI q<dis2pm:parentResource>};
-    $res->{ExpandedURI q<dis2pm:grandParentResource>}
-      = $State->{ExpandedURI q<dis2pm:parentResource>}
-              ->{ExpandedURI q<dis2pm:parentResource>};
-    $res->{ExpandedURI q<dis2pm:grandParentResource>}
-        ->{ExpandedURI q<dis2pm:xConstGroup>}
-        ->{$res->{ExpandedURI q<dis2pm:parentResource>}}
-          = $res->{ExpandedURI q<dis2pm:parentResource>};
-    $res->{ExpandedURI q<dis2pm:grandParentResource>}
-        ->{ExpandedURI q<dis2pm:xConst>}
-        ->{$res} = $res;
-    $State->{ExpandedURI q<dis2pm:parentResource>}
-          ->{ExpandedURI q<dis2pm:const>}->{$name} = $res;
+    for (@p) {
+      if (defined $_->{ExpandedURI q<dis2pm:const>}->{$name}->{Name}) {
+        valid_err (qq<Constant value "$name" already defined in >.
+                   q<the same scope>, node => $res->{src});
+      }
+      $_->{ExpandedURI q<dis2pm:const>}->{$name} = $res;
+    }
   } elsif ({ExpandedURI q<ManakaiDOM:InCase> => 1}->{$type}) {
     ## Value type
     my $t = dis_get_attr_node (%opt, name => 'Type', parent => $res->{src});
@@ -2212,4 +2236,4 @@ sub disdoc_inline2pod ($;%) {
 
 =cut
 
-1; # $Date: 2004/12/18 11:09:28 $
+1; # $Date: 2004/12/19 10:57:49 $

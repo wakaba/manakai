@@ -28,7 +28,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2004/12/18 11:09:28 $
+      $Date: 2004/12/19 10:57:49 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2285,7 +2285,7 @@ StringDataTypeDef:
     @@@:
       if (CORE::defined $INPUT and CORE::length $INPUT == 0) {
         __WARNING{MDOMX:MDOM_NS_EMPTY_URI::
-          <Q::MDOMX:param-name> => $INPUT,
+          MDOMX:param-name => {$INPUT},
         }__;
         __FOR{ManakaiDOM:ManakaiDOM3 | ManakaiDOM:ManakaiDOMCommon::
           $INPUT = undef;
