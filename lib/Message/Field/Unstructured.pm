@@ -9,7 +9,7 @@ unstructured header field bodies of the Internet message
 package Message::Field::Unstructured;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Util;
 use overload '""' => sub { $_[0]->stringify },
              '.=' => sub { $_[0]->value_append ($_[1]) },
@@ -90,7 +90,7 @@ sub parse ($$;%) {
   my %s = &{$self->{option}->{hook_decode_string}} ($self,
     $field_body,
     type => 'text',
-    charset	=> $option->{encoding_before_decode},
+    charset	=> $self->{option}->{encoding_before_decode},
   );
   if ($s{charset}) {	## Convertion failed
     $self->{_charset} = $s{charset};
@@ -253,7 +253,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/08/01 06:42:38 $
+$Date: 2002/08/01 09:19:46 $
 
 =cut
 

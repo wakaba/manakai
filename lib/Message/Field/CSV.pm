@@ -7,28 +7,53 @@ field body consist of comma separated values
 =cut
 
 package Message::Field::CSV;
-require 5.6.0;
+require 5.6.0;	## eval 're'
 use strict;
-use re 'eval';
-use vars qw(@ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
-require Message::Util;
+use vars qw(%DEFAULT @ISA %REG $VERSION);
+$VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 
 use overload '""' => sub { $_[0]->stringify },
              '0+' => sub { $_[0]->count },
-             '@{}' => sub { $_[0]->{value} },	## SHOULD NOT be used
              '.=' => sub { $_[0]->add ($_[1]); $_[0] },
              fallback => 1;
 
-*REG = \%Message::Util::REG;
+%REG = %Message::Util::REG;
 ## Inherited: comment, quoted_string, domain_literal, angle_quoted
 	## WSP, FWS, atext
-
-## From usefor-article
+	
+	## From usefor-article
 	$REG{NON_component} = qr/[^\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5F\x61-\x7A\x80-\xFF\x2F\x3D\x3F]/;
 	$REG{NON_distribution} = qr/[^\x21\x2B\x2D\x30-\x39\x41-\x5A\x5F\x61-\x7A]/;
+
+%DEFAULT = (
+	-_ARRAY_NAME	=> 'value',
+	-_MEMBERS	=> [qw|value_type|],
+	-_METHODS	=> [qw|add  count delete item
+	               comment_add comment_delete comment_count
+	               comment_item|],	# replace (not implemented yet)
+	#encoding_after_encode
+	#encoding_before_decode
+	#field_param_name
+	#field_name
+	#field_ns
+	#format
+	#header_default_charset
+	#header_default_charset_input
+	#hook_encode_string
+	#hook_decode_string
+    -is_quoted_string	=> 1,	## Can it be itself a quoted-string?
+    -long_count	=> 10,
+	#parse_all
+    -remove_comment	=> 1,
+    -separator	=> ', ',
+    -separator_long	=> ', ',
+    -use_comment	=> 1,
+    -max	=> 0,
+    #value_type
+    -value_unsafe_rule	=> 'NON_http_token_wsp',
+);
 
 =head1 CONSTRUCTORS
 
@@ -42,36 +67,8 @@ The following methods construct new objects:
 sub _init ($;%) {
   my $self = shift;
   my %options = @_;
-  my %DEFAULT = (
-    -_ARRAY_NAME	=> 'value',
-    -_MEMBERS	=> [qw|value_type|],
-    -_METHODS	=> [qw|add replace count delete item
-                       comment_add comment_delete comment_count
-                       comment_item|],
-    #encoding_after_encode
-    #encoding_before_decode
-    -field_name	=> 'keywords',
-    #format
-    #hook_encode_string
-    #hook_decode_string
-    -is_quoted_string	=> 1,	## Can itself quoted-string?
-    -long_count	=> 10,
-    -parse_all	=> 0,
-    -remove_comment	=> 1,
-    -separator	=> ', ',
-    -separator_long	=> ', ',
-    -use_comment	=> 1,
-    -max	=> 0,
-    #value_type
-    -value_unsafe_rule	=> 'NON_http_token_wsp',
-  );
   $self->SUPER::_init (%DEFAULT, %options);
-  $self->{value} = [];
-
-## Keywords: foo, bar, "and so on"
-## Newsgroups: local.test,local.foo,local.bar
-## Accept: text/html; q=1.0, text/plain; q=0.03; *; q=0.01
-
+  
   my %field_type = qw(accept-charset accept accept-encoding accept 
      accept-language accept followup-to newsgroups
      posted-to newsgroups
@@ -111,9 +108,6 @@ sub _init ($;%) {
     $self->{option}->{is_quoted_string} = 0;
     $self->{option}->{remove_comment} = 0;
     $self->{option}->{value_type}->{'*default'} = ['Message::Field::URI'];
-  #} elsif ($field_name eq 'p3p') {
-  #  $self->{option}->{is_quoted_string} = 0;
-  #  $self->{option}->{value_type}->{'*default'} = ['Message::Field::Params'];
   } elsif ($field_name eq 'encrypted') {
     $self->{option}->{max} = 2;
   }
@@ -155,6 +149,7 @@ sub parse ($$;%) {
 
 ## Parses csv string and returns array
 sub _parse_list ($$) {
+  use re 'eval';
   my $self = shift;
   my $fb = shift;
   my @ids;
@@ -185,16 +180,7 @@ Returns C<$index>'th value(s).
 
 =cut
 
-sub value ($@) {
-  my $self = shift;
-  my @index = @_;
-  my @ret = ();
-  for (@index) {
-    $self->{value}->[$_] = $self->_parse_value ('*default' => $self->{value}->[$_]);
-    push @ret, $self->{value}->[$_];
-  }
-  @ret;
-}
+sub value ($@) { shift->item (@_) }
 
 =item $number = $csv->count
 
@@ -202,11 +188,7 @@ Returns number of values.
 
 =cut
 
-sub count ($) {
-  my $self = shift;
-  $self->_delete_empty;
-  $#{$self->{value}}+1;
-}
+## Inherited
 
 =iterm $csv->add ($value1, [$value2, $value3,...])
 
@@ -223,6 +205,7 @@ sub _add_array_check ($$\%) {
   }
   (1, value => $value);
 }
+*_replace_array_check = \&_add_array_check;
 
 =item $field-body = $csv->stringify ()
 
@@ -284,26 +267,13 @@ is automatically used).
 
 Set value-type.
 
-=cut
-
-sub value_type ($;$) {
-  my $self = shift;
-  my $new_value_type = shift;
-  if (ref $new_value_type eq 'ARRAY') {
-    $self->{option}->{value_type} = $new_value_type;
-  } elsif ($new_value_type) {
-    $self->{option}->{value_type}->[0] = $new_value_type;
-  }
-  $self->{option}->{value_type}->[0] || ':none:';
-}
-
 =item $clone = $ua->clone ()
 
 Returns a copy of the object.
 
 =cut
 
-## clone, method_available: Inherited
+## value_type, clone, method_available: Inherited
 
 =back
 
@@ -338,7 +308,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/07 00:46:07 $
+$Date: 2002/08/01 09:19:46 $
 
 =cut
 

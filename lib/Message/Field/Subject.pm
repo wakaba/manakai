@@ -9,7 +9,7 @@ message header C<Subject:> field body
 package Message::Field::Subject;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, q(Message::Field::Structured);
 
@@ -40,14 +40,15 @@ push @ISA, q(Message::Field::Structured);
 	$REG{prefix_general} = qr/((?:$REG{prefix_re}|$REG{prefix_fwd})\^?[\[\(]?\d*[\]\)]?[:>]$REG{FWS})+/x;
 	$REG{prefix_general_list} = qr/($REG{prefix_general}|$REG{FWS}$REG{prefix_list}$REG{FWS})+/x;
 
-## Initialize of this class -- called by constructors
 %DEFAULT = (
 	-_MEMBERS	=> [qw/is list_count list_name news_control was_subject/],
-	-_METHODS	=> [qw/as_plain_string is list_count list_name news_control was_subject value value_type/],
+	-_METHODS	=> [qw/as_plain_string is list_count list_name 
+	         	       news_control was_subject value value_type/],
 	#encoding_after_encode
 	#encoding_before_decode
 	-format_news_control	=> 'cmsg %s',
 	-format_prefix_fwd	=> 'Fwd: %s',
+	-format_prefix_list	=> '[%s:%05d] %s',
 	-format_prefix_re	=> 'Re: %s',
 	-format_was_subject	=> '%s (was: %s)',
 	#field_param_name
@@ -59,13 +60,13 @@ push @ISA, q(Message::Field::Structured);
 	#hook_encode_string
 	#hook_decode_string
 	-output_general_prefix	=> 1,
-	-output_list_prefix	=> 1,
+	-output_list_prefix	=> 0,
 	-output_news_control	=> 1,
 	-output_was_subject	=> 1,	## ["-"] 1*DIGIT
 	#parse_all
 	-parse_was_subject	=> 1,
 	-use_general_prefix	=> 1,
-	-use_list_prefix	=> 0,
+	-use_list_prefix	=> 1,
 	-use_message_from_subject	=> 0,
 	-use_news_control	=> 1,
 	-use_was_subject	=> 1,
@@ -85,6 +86,13 @@ sub _init ($;%) {
   my $self = shift;
   my %options = @_;
   $self->SUPER::_init (%DEFAULT, %options);
+  
+  my $fname = $self->{option}->{field_name};
+  if ($fname =~ /^x-.subject$/) {
+    $self->{option}->{use_list_prefix} = 0 unless defined $options{-use_list_prefix};
+    $self->{option}->{use_news_control} = 0 unless defined $options{-use_news_control};
+    $self->{option}->{use_message_from_subject} = 0 unless defined $options{-use_message_from_subject};
+  }
   
   #$self->{option}->{value_type}->{news_control} = ['Message::Field::UsenetControl',{}, [qw//]];
   $self->{option}->{value_type}->{was_subject} = ['Message::Field::Subject',{},
@@ -221,6 +229,11 @@ sub stringify ($;%) {
       $value = sprintf $option{format_prefix_re}, $value if $self->{is}->{reply};
       $value = sprintf $option{format_prefix_fwd}, $value if $self->{is}->{foward};
     }
+    if ($option{use_list_prefix} && $option{output_list_prefix}) {
+      $value = sprintf $option{format_prefix_list},
+        $self->{list_name}, $self->{list_count}, $value
+        if length $self->{list_name} && defined $self->{list_count};
+    }
     if ($option{use_was_subject} && $option{output_was_subject} > 0) {
       my $was;
       if (ref $self->{was_subject}) {
@@ -341,7 +354,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/08/01 06:42:38 $
+$Date: 2002/08/01 09:19:46 $
 
 =cut
 
