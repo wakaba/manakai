@@ -16,7 +16,7 @@ This module is part of manakai XML.
 
 package Message::Markup::XML::QName;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NCNameStartChar InXMLNCNameChar!;
 use Exporter;
 our @ISA = qw/Exporter/;
@@ -120,6 +120,8 @@ sub __check_prefix ($$$) {
       if $opt->{check_prefix_xml} && ($prefix eq 'xml');
     return {success => 0, prefix => $prefix, reason => 'PREFIX_XMLNS'}
       if ($opt->{check_prefix_xmlns} && ($prefix eq 'xmlns'));
+    return {success => 0, prefix => $prefix, reason => 'PREFIX_XML_'}
+      if $opt->{check_prefix_xml_} && (lc substr ($prefix, 0, 3) eq 'xml');
     return {success => 0, reason => 'PREFIX__NON_NCNAME'} 
       if $prefix !~ /^\p{InXML_NCNameStartChar}\p{InXMLNCNameChar}*$/;
   }
@@ -153,9 +155,9 @@ sub __check_name ($$$) {
         unless $name =~ /^[0-9A-Za-z.%+-]+:/;
     }
     return {success => 0, name => $name, reason => 'NAME_XML'}
-      if $opt->{check_name_xml} && $name eq $NS{xml};
+      if $opt->{check_name_xml} && ($name eq $NS{xml});
     return {success => 0, name => $name, reason => 'NAME_XMLNS'}
-      if $opt->{check_name_xmlns} && $name eq $NS{xmlns};
+      if $opt->{check_name_xmlns} && ($name eq $NS{xmlns});
   }
   
   if ($opt->{check_name_registered}) {
@@ -364,4 +366,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/28 01:05:04 $
+1; # $Date: 2003/09/30 01:58:17 $

@@ -17,7 +17,7 @@ markup constructures.  (SuikaWiki is not "tiny"?  Oh, yes, I see:-))
 
 package Message::Markup::XML;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.20 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.21 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload '""' => \&outer_xml,
              fallback => 1;
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXML_NCNameStartChar InXMLNCNameChar!;
@@ -91,12 +91,21 @@ sub new ($;%) {
       if defined $self->{namespace_uri};
   }
   for (qw/local_name value/) {
-    if ($self->{$_} && $self->_is_same_class ($self->{$_})) {
-      $self->{$_}->{parent} = $self;
-    }
+    $self->__set_parent_node ($self->{$_});
   }
   $self->{node} = [];
   $self;
+}
+
+sub __set_parent_node ($$) {
+  my ($parent, $child) = @_;
+  if (!ref $child) {
+    ## 
+  } elsif (substr (ref ($child), 0, 20) eq 'Message::Markup::XML') {
+    $child->{parent} = $parent;
+  } elsif (ref ($child) && $parent->_is_same_class ($child)) {
+    $child->{parent} = $parent;
+  }
 }
 
 sub _ns_parse_qname ($$) {
@@ -227,6 +236,7 @@ sub set_attribute ($$$;%) {
      && $_->{local_name} eq $name
      && $o{namespace_uri} eq $_->{namespace_uri}) {
       $_->{value} = $val;
+      $self->__set_parent_node ($val);
       $_->{node} = [];
       return $_;
     }
@@ -1238,6 +1248,18 @@ sub root_node ($) {
   }
 }
 
+sub _get_ns_decls_node ($) {
+  my $self = shift;
+  if ($self->{type} eq '#element') {
+    return $self;
+  } elsif (ref $self->{parent}) {
+    return $self->{parent}->_get_ns_decls_node;
+  } else {
+    warn 'there is no namespace declarations node';
+    return {};
+  }
+}
+
 sub _get_entity_manager ($) {
   my $self = shift;
   if ($self->{type} eq '#document') {
@@ -1412,4 +1434,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/09/27 07:59:11 $
+1; # $Date: 2003/09/30 01:58:17 $
