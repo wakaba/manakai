@@ -1,9 +1,21 @@
+2003-06-17  Wakaba  <w@suika.fam.cx>
+
+	* Parser.pm: 
+	- Report error when entity or notation name contains colon.
+	- Some bug fixes about line/position counting for error reporting.
+	* EntityManager.pm (get_entity): Returns pre-defined entities 
+	immediately (before seeking into DTD node is occured).  (As Web SGML
+	defined.)
+	* Error.pm (ERR_PREDEFINED_ENTITY): New error.
+	* Parser.pm (_parse_entity_declaration): Raise error if it's XML's
+	pre-defined entity and its replacement text does not match to that
+	of pre-defined entity.
+
 2003-06-16  Wakaba  <w@suika.fam.cx>
 
 	* Parser.pm: Replacing of entity references is supported.
 	* Error.pm: New.
 	* EntityManager.pm: New.
-	* 
 
 2003-05-25  Wakaba  <w@offweb.ddo.jp>
 

@@ -11,7 +11,7 @@ This module is part of SuikaWiki XML support.
 
 package SuikaWiki::Markup::XML::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 my %_Error = (
 	## Syntax errors
@@ -156,6 +156,10 @@ my %_Error = (
 		description	=> 'Dupulicate attribute specification',
 		level	=> 'wfc',
 	},
+	ERR_PREDEFINED_ENTITY	=> {
+		description	=> 'Predefined entity (%s) must be declared as of the XML specification defined (%s)',
+		level	=> 'wfc',
+	},
 	## Validity error
 	VC_ENTITY_DECLARED	=> {
 		description	=> 'Entity %s should (or must to be valid) be declared before it is referred',
@@ -252,4 +256,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/06/16 09:58:26 $
+1; # $Date: 2003/06/17 12:25:07 $

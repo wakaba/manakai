@@ -16,7 +16,7 @@ This module is part of SuikaWiki.
 
 package SuikaWiki::Markup::XML::Parser;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXML_NCNameStartChar InXMLNCNameChar InXMLChar InXML_deprecated_noncharacter InXML_unicode_xml_not_suitable!;
 use SuikaWiki::Markup::XML;
 require SuikaWiki::Markup::XML::Error;
@@ -296,7 +296,7 @@ sub parse_text ($$;$) {
     _count_lp ($1, $o) if $s =~ s/^($xml_re{s})//s;
     if ($s =~ s/^\[//s) {
       _count_lp ('[', $o);
-      $self->_parse_dtd ($D, \$s, $o, return_with_dsc => 1);
+      $self->_parse_dtd ($D, \$s, $o, return_with_dsc => 1, validate_ndata => 1);
     } elsif ($s =~ s/^>//s) {
       _count_lp ('>', $o);
     } else {
@@ -317,7 +317,7 @@ sub parse_text ($$;$) {
       _count_lp ($&, $o);
     } elsif ($s =~ /^<![A-Z]/) {	# <!DECLARATION>
       $o->{entity_type} ||= 'dtd_external_subset';
-      $self->_parse_dtd ($c, \$s, $o);
+      $self->_parse_dtd ($c, \$s, $o, validate_ndata => 1);
     ## TODO: ext.general parsed entity
     } else {
       $self->_raise_error ($o, p => $c, type => 'SYNTAX_INVALID_CHAR', t => substr ($s, 0, 1));
@@ -566,7 +566,7 @@ sub _parse_dtd ($$\$$;%) {
     } elsif ($opt{return_with_dsc} && $$s =~ s/^\](?:$xml_re{s})?>//s) {
       _count_lp ($&, $o);
       $c = $c->{parent};
-      return;
+      last;
     } elsif ($$s =~ s/^($xml_re{__NotationDecl_simple})//s) {
       $self->_parse_entity_declaration ($1, $c, $o);
     } elsif ($$s =~ s/^$xml_re{PI_M}//s) {
@@ -590,6 +590,7 @@ sub _parse_dtd ($$\$$;%) {
     } else {
       $self->_raise_error ($o, p => $c, type => 'SYNTAX_INVALID_CHAR', t => substr ($$s, 0, 1));
       substr ($$s, 0, 1) = '';
+      _count_lp (' ', $o);
     ## TODO: markup section
     }
   }	# while $$s
@@ -599,6 +600,26 @@ sub _parse_dtd ($$\$$;%) {
       $c = $c->{parent};
     } else {
       last;
+    }
+  }	# while
+  if ($opt{validate_ndata}) {
+    my $l = [];
+    my $entMan = $c->_get_entity_manager;
+    $entMan->get_entities ($l, namespace_uri => $NS{SGML}.'entity');
+    my %defined;
+    for my $ent (@$l) {
+      for ($ent->get_attribute ('NDATA')) {
+      if (ref $_) {
+        my $nname = $_->inner_text;
+        if ($defined{$nname} > 0
+         || $entMan->get_entity ($nname, namespace_uri => $NS{SGML}.'notation')) {
+          $defined{$nname} = 1;
+        } else {
+          $self->_raise_error ($_->flag ('smxp__src_pos'), type => 'VC_NOTATION_DECLARED',
+                               t => $nname, c => $_);
+          $defined{$nname} = -1;
+        }
+      }}	# NDATA exist
     }
   }
 }
@@ -750,6 +771,9 @@ sub _parse_rpdata ($$\$$) {
       if ($o->{entity_type} eq 'document_entity') {
         $self->_raise_error ($o, type => 'WFC_PE_IN_INTERNAL_SUBSET', t => $ref);
       }
+      if (index ($ename, ':') > -1) {
+        $self->_raise_error ($o, type => 'NS_SYNTAX_NAME_IS_NCNAME', t => $ref);
+      }
       $entMan ||= $c->_get_entity_manager;
       my $eref = $c->append_new_node (type => '#reference', local_name => $ename,
                                       namespace_uri => $NS{SGML}.'entity:parameter');
@@ -776,17 +800,29 @@ sub _parse_rpdata ($$\$$) {
       }
       _count_lp ($1.'%;', $o);
     } elsif ($$s =~ s/^([^%]+)//) {
-      my $t = $1;
-      if ($t =~ /&(?!(?:$xml_re{Name}|#(?:x[0-9A-Fa-f]+|[0-9]+));)/) {
-        $self->_raise_error ($o, type => 'SYNTAX_INVALID_CHAR', c => $c, t => '&');
+      my $t = $1; my $r = '';
+      while ($t) {
+        if ($t =~ s/^&#(?:x([0-9A-Fa-f]+)|([0-9]+));//) {
+          my $char = chr ($1 ? hex $1 : 0+$2);
+          $self->_warn_char_val ($o, $char, ref => 1);
+          $r .= $char;
+          _count_lp ($&, $o);
+        } elsif ($t =~ s/^(&$xml_re{Name};)//) {
+          $r .= $1;
+          if (index ($1, ':') > -1) {
+            $self->_raise_error ($o, type => 'NS_SYNTAX_NAME_IS_NCNAME', c => $c, t => $1);
+          }
+          _count_lp ($1, $o);
+        } elsif ($t =~ s/^&//) {
+          $self->_raise_error ($o, type => 'SYNTAX_INVALID_CHAR', c => $c, t => '&');
+          $r .= '&';
+          _count_lp ('&', $o);
+        } elsif ($t =~ s/^([^&]+)//s) {
+          $r .= $1;
+          _count_lp ($1, $o);
+        }
       }
-      $t =~ s{&#(?:x([0-9A-Fa-f]+)|([0-9]+));}{
-                my $char = chr ($1 ? hex $1 : 0+$2);
-                $self->_warn_char_val ($o, $char, ref => 1);
-                $char;
-      }ge;
-      $c->append_new_node (type => '#text', value => $t);
-      _count_lp ($t, $o);
+      $c->append_new_node (type => '#text', value => $r);
     } else {
       $self->_raise_error ($o, type => 'SYNTAX_INVALID_CHAR', t => substr ($$s, 0, 1));
       substr ($$s, 0, 1) = '';
@@ -866,6 +902,7 @@ sub _parse_markup_declaration_parameters ($$$$$) {
     } else {
       $self->_raise_error ($o, type => 'SYNTAX_INVALID_CHAR', t => substr ($$s, 0, 10));
       substr ($$s, 0, 1) = '';
+      _count_lp (' ', $o);
     }
   }	# while
 }
@@ -996,17 +1033,23 @@ sub _parse_entity_declaration ($$$$) {
       $self->_raise_error ((shift (@params)->flag ('smxp__src_pos') || $o), c => $e,
                            type => 'SYNTAX_MD_NAME_NOT_FOUND');
     } else {	## Name exist
-      my $ename = shift (@params)->inner_text;
+      my $part = shift (@params);
+      my $ename = $part->inner_text;
       $entMan ||= $c->_get_entity_manager;
       if ($entMan->get_entity ($ename, namespace_uri => $e->namespace_uri,
                                        dont_use_predefined_entities => 1)) {
         if ($p eq 'n') {
-          $self->_raise_error ($o, c => $e, type => 'VC_UNIQUE_NOTATION_NAME', t => $ename);
+          $self->_raise_error (($part->flag ('smxp__src_pos') || $o), c => $e,
+                               type => 'VC_UNIQUE_NOTATION_NAME', t => $ename);
         } else {
-          $self->_raise_error ($o, c => $e, type => 'WARN_UNIQUE_'
-                                                   .($p eq '%' ? 'PARAMETER_' : '')
-                                                   .'ENTITY_NAME', t => $ename);
+          $self->_raise_error (($part->flag ('smxp__src_pos') || $o), c => $e,
+                               type => 'WARN_UNIQUE_'.($p eq '%' ? 'PARAMETER_' : '')
+                                                     .'ENTITY_NAME', t => $ename);
         }
+      }
+      if (index ($ename, ':') > -1) {
+        $self->_raise_error (($part->flag ('smxp__src_pos') || $o), c => $c,
+                             type => 'NS_SYNTAX_NAME_IS_NCNAME', t => $ename);
       }
       $e->local_name ($ename);
       if ($params[0]->flag ('smxp__pmdp_type') eq 'S') {
@@ -1035,9 +1078,21 @@ sub _parse_entity_declaration ($$$$) {
             my $pubid = shift (@params)->inner_text;
             $e->set_attribute (PUBLIC => $pubid);
           } elsif ($p ne 'n') {	## EntityValue (ENTITY only)
-            my $vv = shift (@params)->inner_text;
-            my $v = $e->set_attribute ('value');
-            $self->_parse_rpdata ($v, \$vv, $o);
+            my $part = shift (@params);
+            my $vv = $part->inner_text;
+            my $o2 = $self->_make_clone_of ($part->flag ('smxp__src_pos')); _count_lp ('"', $o2);
+            $self->_parse_rpdata ($e->set_attribute ('value'), \$vv, $o2);
+            if (($p ne '%') && {qw/lt 1 gt 1 amp 1 quot 1 apos 1/}->{$ename}) {
+              ## TODO: check when external entity
+              my $ev = $e->get_attribute ('value')->_entity_parameter_literal_value;
+              unless ({qw/lt|&#60;  1 gt|>&#62; 1 amp|&#38;  1 apos|&#39;  1 quot|&#34;  1
+                          lt|&#x3c; 1 gt|&#x3e; 1 amp|&#x26; 1 apos|&#x27; 1 quot|&#x22; 1
+                                      gt|>      1              apos|'      1 quot|"      1
+                         /}->{$ename.'|'.lc ($ev)}) {
+                $self->_raise_error ($part->flag ('smxp__src_pos'), c => $e,
+                                     type => 'ERR_PREDEFINED_ENTITY', t => [$ename, $ev]);
+              }
+            }
           } else {
             $self->_raise_error (shift (@params)->flag ('smxp__src_pos'), c => $e,
                                  type => 'SYNTAX_INVALID_LITERAL');
@@ -1088,14 +1143,14 @@ sub _parse_entity_declaration ($$$$) {
               my $part = shift (@params);
               my $nname = $part->inner_text;
               $entMan ||= $c->_get_entity_manager;
-              my $notation = $entMan->get_entity ($nname, namespace_uri => $NS{SGML}.'notation');
-              if (!$notation) {
-                ## TODO: is notation declared before ENTITY is declared using it? Or, before any
-                ##       REFERENCE to it is occured?
-                $self->_raise_error ($part->flag ('smxp__src_pos'), type => 'VC_NOTATION_DECLARED',
-                                     t => $nname, c => $e);
-              }
-              $e->set_attribute (NDATA => $nname);
+              ## Whether notation declared is validated after all of DTD is read
+              #my $notation = $entMan->get_entity ($nname, namespace_uri => $NS{SGML}.'notation');
+              #if (!$notation) {
+              #  $self->_raise_error ($part->flag ('smxp__src_pos'), type => 'VC_NOTATION_DECLARED',
+              #                       t => $nname, c => $e);
+              #}
+              $e->set_attribute (NDATA => $nname)
+                ->flag (smxp__src_pos => $part->flag ('smxp__src_pos'));
             }	# Notation Name
           }	# NDATA
         } else {	# no literal 2 nor NDATA
@@ -1119,69 +1174,7 @@ sub _parse_entity_declaration ($$$$) {
                              type => 'SYNTAX_INVALID_MD', t => $param->inner_text);
       }
     }
-    if ($p ne 'n') {
-      
-    }
-    _count_lp ($all.'>', $o);
-}
-
-# example: $self->_validate_entity_declaration ($o, $entDec, '&'.$ename.';', {check_general => 1});
-sub _validate_entity_declaration ($$$$$) {
-  my ($self, $o, $c, $s, $opt) = @_;
-  my $entMan;
-  while ($s) {
-    if ($s =~ s/^($xml_re{EntityRef_M}|$xml_re{PEReference_M})//) {
-      my $ref = $1;
-      my $entname = $2 || $3;
-      do {_count_lp ($ref, $o); next} if !$opt->{check_general} && $2;
-      $opt->{check_general}--;
-      if (index ($entname, ':') > -1) {
-        ## TODO:
-      }
-      $entMan ||= $c->_get_entity_manager;
-      my $entity = $entMan->get_entity ($entname, dont_use_predefined_entities => 1,
-                                        namespace_uri => $NS{SGML}.'entity'.($2?'':':parameter'));
-      if (!$entity) {
-        if ($2 && {qw/lt 1 gt 1 amp 1 quot 1 apos 1/}->{$entname}) {
-          $self->_raise_error ($o, c => $c, type => 'WARN_PREDEFINED_ENTITY_NOT_DECLARED',
-                               t => $entname);
-        } else {
-          $self->_raise_error ($o, c => $c,
-                            type => ($entMan->is_standalone_document_1?'WF':'V').'C_ENTITY_DECLARED',
-                            t => $ref);
-        }
-      } else {
-        do {_count_lp ($ref, $o); next} if $entity->flag ('smxp__ved_validated');
-        $entity->flag (smxp__ved_validated => 1);
-        my $o2 = $self->_make_clone_of ($o);
-        if ($o2->{__entities}->{$ref}) {
-          $self->_raise_error ($o, c => $c, type => 'WFC_NO_RECURSION', t => $ref);
-        } else {
-          my $entity_value = $entity->get_attribute ('value');
-          ## TODO: support external entity
-          if (ref $entity_value) {
-            $o2->{__entities}->{$ref} = 1;
-            $o2->{entity} = $ref; $o2->{line} = 0; $o2->{pos} = 0;
-            my $ev = $entity_value->entity_value; $ev = substr ($ev, 1, length ($ev) - 2);
-            $self->_validate_entity_declaration ($o2, $entity, $ev, $opt);
-          } else {	## External non-parsed entity
-            ## TODO:
-            $self->_raise_error ($o, c => $c, type => 'WFC_NO_EXTERNAL_ENTITY_REFERENCE', t => $ref);
-          }
-        }
-      }
-      _count_lp ($ref, $o);
-    } elsif ($s =~ s/^&#(?:x([0-9A-Fa-f]+)|([0-9]+));//) {
-      my $ch = ($1 ? hex $1 : 0+$2);
-      $self->_warn_char_val ($o, chr $ch, ref => 1);
-      _count_lp ($&, $o);
-    } elsif ($s =~ s/([^&%]+)//s) {
-      _count_lp ($1, $o);
-    } elsif ($s =~ s/([&%])//s) {	## TODO:
-      #$self->_raise_error ($o, type => 'SYNTAX_INVALID_CHAR', t => $1, c => $c);
-      _count_lp ($1, $o);
-    }
-  }
+    _count_lp ('>', $o);
 }
 
 sub _parse_element_declaration ($$$$) {
@@ -1272,4 +1265,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/06/16 09:58:26 $
+1; # $Date: 2003/06/17 12:25:07 $
