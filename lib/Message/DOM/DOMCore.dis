@@ -32,7 +32,7 @@ Module:
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/08/29 13:34:38 $
+     $Date: 2004/08/30 07:53:48 $
   @Require:
     @@Module:
       @@@Name: ManakaiDOM
@@ -922,7 +922,7 @@ IF:
      @@Level[list]:  2
 IF:
   @Name:  CharacterData
-  @ISA[list]:  Node
+  @ISA: Node
   @Attr:
      @@Name:  data
      @@Get:
@@ -988,7 +988,7 @@ IF:
         @@@Exception[list]:  DOMException
 IF:
   @Name:  Attr
-  @ISA[list]:  Node
+  @ISA:  Node
   @Attr:
      @@Name:  name
      @@Get:
@@ -1036,7 +1036,7 @@ IF:
 
 IF:
   @Name:  Element
-  @ISA[list]:  Node
+  @ISA:  Node
   @Attr:
      @@Name:  tagName
      @@Get:
@@ -1252,7 +1252,7 @@ IF:
 
 IF:
   @Name:  Text
-  @ISA[list]:  CharacterData
+  @ISA:  CharacterData
   @Method:
      @@Name:  splitText
      @@Return:
@@ -1310,7 +1310,7 @@ IF:
 
 IF:
   @Name:  Comment
-  @ISA[list]:  CharacterData
+  @ISA:  CharacterData
   
   @ReAttr:
     @@Name: attributes
@@ -1544,7 +1544,7 @@ IF:
 
 IF:
   @Name:  Document
-  @ISA[list]:  Node
+  @ISA:  Node
   @Attr:
      @@Name:  doctype
      @@Get:

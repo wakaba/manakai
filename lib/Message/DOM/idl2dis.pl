@@ -247,7 +247,7 @@ for my $module ($tree->append_new_node (type => '#element',
   $module->set_attribute (Name => q<## TBD ##>);
   $module->set_attribute (Namespace => q<:: TBD ::>);
   $module->set_attribute (License => q<license:Perl>);
-  $module->set_attribute ('Date.RCS' => q<$Date: 2004/08/29 13:34:38 $>);
+  $module->set_attribute ('Date.RCS' => q<$Date: 2004/08/30 07:53:48 $>);
 }
 
 fws $s;
@@ -286,7 +286,11 @@ while (pos $$s < length $$s) {
     if ($$s =~ /\G\{/gc) {
       my $if = $r->append_new_node (type => '#element', local_name => 'IF');
       $if->set_attribute (Name => $name);
-      $if->set_attribute (ISA => \@isa) if @isa;
+      for (@isa) {
+        $if->append_new_node (type => '#element',
+                              local_name => 'ISA',
+                              value => $_);
+      }
       level $if;
       clear_comment;
       fws $s;

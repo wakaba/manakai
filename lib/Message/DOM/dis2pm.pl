@@ -125,6 +125,24 @@ sub perl_package_name (%) {
     $opt{name} = perl_name $opt{name};
     $opt{name} = $opt{prefix} . '::' . $opt{name} if $opt{prefix};
     $r = $ManakaiDOMModulePrefix . q<::> . $opt{name};
+  } elsif ($opt{qname} or $opt{qname_with_condition}) {
+    if ($opt{qname_with_condition}) {
+      if ($opt{qname_with_condition} =~ /^(.+)::(.+)$/) {
+        $opt{qname} = $1;
+        $opt{condition} = $2;
+      } else {
+        $opt{qname} = $opt{qname_with_condition};
+      }
+    }
+    if ($opt{qname} =~ /^([^:]*):(.*)$/) {
+      $opt{ns_prefix} = $1;
+      $opt{name} = $2;
+    } else {
+      $opt{ns_prefix} = DEFAULT_PFX;
+      $opt{name} = $opt{qname};
+    }
+    $r = ns_uri_to_perl_package_name (ns_prefix_to_uri ($opt{ns_prefix})) .
+         '::' . $opt{name};
   } elsif ($opt{full_name}) {
     $r = $opt{full_name};
   } else {
@@ -132,6 +150,9 @@ sub perl_package_name (%) {
   }
   if ($opt{condition}) {
     $r = $r . '::' . perl_name $opt{condition};
+  }
+  if ($opt{is_internal}) {
+    $r = $r . '::_internal';
   }
   $r;
 }
@@ -143,6 +164,18 @@ sub perl_package (%) {
     return perl_statement qq<package $fn>;
   } else {
     return '';
+  }
+}
+
+sub perl_inherit ($;$) {
+  my ($isa, $mod) = @_;
+  if ($mod) {
+    perl_statement 'push ' . perl_var (type => '@',
+                                       local_name => 'ISA',
+                                       package => {full_name => $mod}) .
+                   ', ' . perl_list (@$isa);
+  } else {
+    perl_statement 'push our @ISA, ' . perl_list (@$isa);
   }
 }
 
@@ -343,17 +376,31 @@ sub type_label ($) {
   }
 }
 
+sub ns_uri_to_perl_package_name ($) {
+  my $uri = shift;
+  if ($Info->{uri_to_perl_package}->{$uri}) {
+    return $Info->{uri_to_perl_package}->{$uri};
+  } else {
+    return qq<Perl package name for namespace <$uri> not defined>;
+  }
+}
+
+sub ns_prefix_to_uri ($) {
+  my $pfx = shift;
+  if ($Info->{Namespace}->{$pfx}) {
+    return $Info->{Namespace}->{$pfx};
+  } else {
+    valid_err qq<Namespace prefix "$pfx" not declared>;
+  }  
+}
+
 sub expanded_uri ($) {
   my $lname = shift || '';
-  my $pfx = '#default';
+  my $pfx = DEFAULT_PFX;
   if ($lname =~ s/^([^:]*)://) {
     $pfx = $1;
   }
-  if ($Info->{Namespace}->{$pfx}) {
-    return $Info->{Namespace}->{$pfx} . $lname;
-  } else {
-    valid_err qq<Namespace "$pfx" not declared>;
-  }
+  ns_prefix_to_uri ($pfx) . $lname;
 }
 
 sub array_contains ($$) {
@@ -410,27 +457,26 @@ sub get_description ($%) {
 
 sub get_level_description ($%) {
   my ($node, %opt) = @_;
-  my $l = $node->get_attribute_value ('Level', default => []);
-  $l = [$l] unless ref $l;
-  unless (@$l) {
+  my @l = @{$node->get_attribute_value ('Level', default => [], as_array => 1)};
+  unless (@l) {
     my $min = $opt{level}->[0] || 1;
     for ($min..3) {
       if ($Info->{Condition}->{'DOM' . $_}) {
-        unshift @$l, $_;
+        unshift @l, $_;
         last;
       }
     }
   }
-  return q<> unless @$l;
-  @$l = sort {$a <=> $b} @$l;
-  @{$opt{level}} = @$l;
-  my $r = q<introduced in DOM Level > . (0 + shift @$l);
-  if (@$l > 1) {
-    my $s = 0 + pop @$l;
-    $r .= q< and modified in DOM Levels > . join ', ', @$l;
+  return q<> unless @l;
+  @l = sort {$a <=> $b} @l;
+  @{$opt{level}} = @l;
+  my $r = q<introduced in DOM Level > . (0 + shift @l);
+  if (@l > 1) {
+    my $s = 0 + pop @l;
+    $r .= q< and modified in DOM Levels > . join ', ', @l;
     $r .= qq< and $s>;
-  } elsif (@$l == 1) {
-    $r .= q< and modified in DOM Level > . (0 + $l->[0]);
+  } elsif (@l == 1) {
+    $r .= q< and modified in DOM Level > . (0 + $l[0]);
   }
   $r;
 }
@@ -445,6 +491,48 @@ sub register_namespace_declaration ($) {
         $Info->{Namespace}->{$_->local_name} = $_->value;
       }
     }
+  }
+}
+
+sub condition_match ($%) {
+  my ($node, %opt) = @_;
+  my $conds = $node->get_attribute_value ('Condition', default => [],
+                                          as_array => 1);
+  my $level = $node->get_attribute_value
+                        ('Level',
+                         default_list => @$conds ? []
+                                                 : ($opt{level_default} || []),
+                         as_array => 1);
+  if (not $opt{condition}) {
+    if (@$conds == 0 and @$level == 0) {
+      return 1;
+    } elsif (array_contains $conds, '$normal') {
+      return 1;
+    } elsif ($opt{ge} and not @$conds) {
+      return 1;
+    } else {
+      return 0;
+    }
+  } else {
+    if (array_contains $conds, $opt{condition}) {
+      return 1;
+    } elsif ($opt{condition} =~ /^DOM(\d+)$/) {
+      if ($opt{ge}) {
+        for (my $i = $1; $i; $i--) {
+          if (array_contains $level, $i) {
+            return 1;
+          }
+        }
+      } else {
+        if ($1 and array_contains $level, $1) {
+          return 1;
+        }
+      }
+    }
+    if ($opt{default_any} and @$conds == 0 and @$level == 0) {
+      return 1;
+    }
+    return 0;
   }
 }
 
@@ -501,7 +589,10 @@ sub if2perl ($) {
                     name => my $if_name
                                = perl_name $node->get_attribute_value ('Name'),
                                            ucfirst => 1;
+  my $if_pack_name = perl_package_name if => $if_name;
   local $Status->{IF} = $if_name;
+  local $Status->{if} = {}; ## Temporary data
+  local $Info->{Namespace} = {%{$Info->{Namespace}}};
 
   my @level;
   my $mod = get_level_description $node, level => \@level;
@@ -514,48 +605,49 @@ sub if2perl ($) {
                pod_paras (get_description ($node));
 
   my $version = perl_statement perl_assign 'our $VERSION', version_date time;
-  my $isa = $node->get_attribute_value ('ISA', default => []);
-  $isa = [$isa] unless ref $isa;
-  @$isa = map {perl_package_name name_with_condition => $_} @$isa;
   for my $condition ((sort keys %{$Info->{Condition}}), '') {
     if ($condition =~ /^DOM(\d+)$/) {
       next if @level and $level[0] > $1;
     }
-    my $if_pack = perl_package_name if => $if_name,
+    my $cond_if_pack_name = perl_package_name if => $if_name,
                                     condition => $condition;
-    $result .= perl_package full_name => $pack_name, condition => $condition;
+    my $cond_pack_name = perl_package_name name => $if_name,
+                                    condition => $condition;
+    my $cond_int_pack_name = perl_package_name name => $if_name,
+                                    condition => $condition,
+                                    is_internal => 1;
+    $result .= perl_package full_name => $cond_int_pack_name;
+    my @isa;
+    for (@{$node->child_nodes}) {
+      next unless $_->node_type eq '#element' and
+                  $_->local_name eq 'ISA' and
+                  condition_match $_, condition => $condition,
+                                      default_any => 1, ge => 1;
+      push @isa, perl_package_name qname_with_condition => $_->value,
+                                   is_internal => 1;
+    }
+    $result .= perl_inherit [$cond_int_pack_name, @isa] => $cond_pack_name;
     if ($condition) {
-      my @isa = map {perl_package_name name_with_condition => $_}
-                    @{$Info->{Condition}->{$condition} or
-                      valid_err qq<Condition $condition not defined>}
-           if $condition;
-      @isa = @$isa unless @isa;
-      $result .= perl_statement 'push our @ISA, ' . perl_list $if_pack, @isa;
-      $result .= perl_statement 'push ' .
-                                perl_var (type => '@',
-                                          package => {full_name => $if_pack},
-                                          local_name => 'ISA') .
-                                ', ' . perl_literal perl_package_name
-                                                      if => $if_name;
-      $Info->{DefaultCondition} ||= $if_pack;
-    } else {
-      $result .= perl_statement 'push our @ISA, ' .
-                      perl_literal perl_package_name
-                                     if => $if_name,
-                                     condition => $Info->{DefaultCondition}
-        if $Info->{DefaultCondition};
+      my @isa;
+      for (@{$Info->{Condition}->{$condition}->{ISA}}) {
+        push @isa, perl_package_name name => $if_name,
+                                     condition => $_,
+                                     is_internal => 1;
+      }
+      $result .= perl_inherit [@isa, $cond_if_pack_name] => $cond_int_pack_name;
+      $result .= perl_inherit [$if_pack_name] => $cond_if_pack_name;
+    } else { ## No condition specified
+      $result .= perl_inherit [perl_package_name name => $if_name,
+                                     condition => $Info->{NormalCondition},
+                                     is_internal => 1]
+                              => $cond_int_pack_name
+         if $Info->{NormalCondition};
     }
     $result .= $version;
 
     for (@{$node->child_nodes}) {
-      if ($_->get_attribute_value ('Condition', default => '') ne $condition) {
-        if ($condition =~ /^DOM(\d+)$/) {
-          my $level = $_->get_attribute_value ('Level', default => \@level);
-          next unless array_contains $level, 0+$1;
-        } else {
-          next;
-        }
-      }
+      next unless condition_match $_, level_default => \@level,
+                                  condition => $condition;
       
       if ($_->local_name eq 'Method' or
           $_->local_name eq 'IntMethod' or
@@ -763,7 +855,8 @@ sub method2perl ($;%) {
                            nor exceptions.>;
   }
 
-  if ($node->local_name eq 'IntMethod') {
+  if ($node->local_name eq 'IntMethod' or
+      $Status->{if}->{method_documented}->{$m_name}++) {
     $result .= pod_block pod_comment @desc;
   } else {
     $result .= pod_block @desc;
@@ -868,9 +961,10 @@ sub req2perl ($) {
   my $result = '';
   for (@{$node->get_attribute ('Require', make_new_node => 1)->child_nodes}) {
     if ($_->local_name eq 'Module') {
-      my $m_name = perl_name $_->get_attribute_value ('Name',
-                                                      default => '<anon>'),
-                             ucfirst => 1;
+      my $m_name = $_->get_attribute_value ('Name', default => '<anon>');
+      my $ns_uri = $_->get_attribute_value ('Namespace');
+      $Info->{Namespace}->{$m_name} = $ns_uri;
+      $m_name = perl_name $m_name, ucfirst => 1;
       my $desc = get_description $_;
       $result .= perl_comment (($m_name ne '<anon>' ? $m_name : '') .
                                ($desc ? ' - ' . $desc : ''))
@@ -880,9 +974,11 @@ sub req2perl ($) {
         my $s;
         my $req;
         if ($req = $def->get_attribute ('require')) {
-          $s = 'require ' . perl_code $req->value;
+          $s = 'require ' . (my $pack = perl_code $req->value);
+          $Info->{uri_to_perl_package}->{$ns_uri} = $pack if $ns_uri;
         } elsif ($req = $def->get_attribute ('use')) {
-          $s = 'use ' . perl_code $req->value;
+          $s = 'use ' . (my $pack = perl_code $req->value);
+          $Info->{uri_to_perl_package}->{$ns_uri} = $pack if $ns_uri;
         } elsif (defined ($s = $def->value)) {
           # 
         } else {
@@ -986,6 +1082,8 @@ $Info->{Package} = perl_code (get_perl_definition $Module, name => 'Package')
 $Info->{Namespace}->{(DEFAULT_PFX)}
   = $Module->get_attribute_value ('Namespace')
   or valid_err q<Module namespace URI (/Module/Namespace) MUST be specified>;
+$Info->{uri_to_perl_package}->{$Info->{Namespace}->{(DEFAULT_PFX)}}
+  = $Info->{Package};
 
 ## Make source code
 $result .= perl_comment q<This file is automatically generated from> . "\n" .
@@ -1021,13 +1119,13 @@ $result .= pod_block
       $isa = ["DOM" . ($1 - 1)] if not @$isa and $1 > 1;
       $defcond = $1 if $1 > $defcond;
     }
-    $Info->{Condition}->{$name} = $isa;
+    $Info->{Condition}->{$name}->{ISA} = $isa;
   }
   if (keys %{$Info->{Condition}}) {
-    $Info->{DefaultCondition} = $Module->get_attribute_value
-                                            ('DefaultCondition') ||
+    $Info->{NormalCondition} = $Module->get_attribute_value
+                                            ('NormalCondition') ||
                                 $defcond ? 'DOM' . $defcond :
-                                valid_err q<Module/DefaultCondition required>;
+                                valid_err q<Module/NormalCondition required>;
   }
 
 ## 'require'ing external modules
@@ -1130,6 +1228,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/08/29 13:34:38 $
+# $Date: 2004/08/30 07:53:48 $
 
 
