@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::Base;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXMLChar
                         InXML_deprecated_noncharacter InXML_unicode_xml_not_suitable!;
 require Message::Markup::XML::Parser::Error;
@@ -40,6 +40,14 @@ sub new ($;%) {
   $self->{error} ||= Message::Util::Error::TextParser->new
                        (package => 'Message::Markup::XML::Parser::Error');
   $self;
+}
+
+sub reset ($;%) {
+  my ($self, %opt) = @_;
+  for (keys %$self) {
+    delete $self->{$_} unless $_ eq 'error';
+  }
+  $self->{error}->reset;
 }
 
 sub parse_document_entity ($$$%) {
@@ -147,7 +155,8 @@ sub parse_element ($$$%) {
       my $end_tag = 0;
       while (pos $$src < length $$src) {
         if ($$src =~ /\G([^<&]+)/gc) {
-          local $pp->{ExpandedURI q<CDATA>} = $1;
+          my $t = $1;
+          local $pp->{ExpandedURI q<CDATA>} = \$t;
           $self->element_content
                    ($src, $p, $pp, %opt);
         } elsif (substr ($$src, pos $$src, 1) eq '<') {
@@ -180,7 +189,7 @@ sub parse_element ($$$%) {
                      -class => 'WFC',
                      source => $src);
                 }
-                local $pp->{ExpandedURI q<CDATA>} = $tag;
+                local $pp->{ExpandedURI q<CDATA>} = \$tag;
                 $self->element_content
                   ($src, $p, $pp, %opt);
               }
@@ -194,7 +203,7 @@ sub parse_element ($$$%) {
                  (-type => 'SYNTAX_ELEMENT_TYPE_NAME_FOLLOWING_ETAGO_REQUIRED',
                   -class => 'WFC',
                   source => $src);
-              local $pp->{ExpandedURI q<CDATA>} = '</';
+              local $pp->{ExpandedURI q<CDATA>} = \'</';
               $self->element_content
                    ($src, $p, $pp, %opt);
             }
@@ -208,21 +217,21 @@ sub parse_element ($$$%) {
                       CDATA => 1,
                       ps => 0,
                     })
-              or local $pp->{ExpandedURI q<CDATA>} = '<',
+              or local $pp->{ExpandedURI q<CDATA>} = \'<',
                  pos ($$src)++,
                  $self->element_content
                    ($src, $p, $pp, %opt);
           } elsif ($n eq '?') {
             $self->parse_processing_instruction
                    ($src, $pp, %opt)
-              or local $pp->{ExpandedURI q<CDATA>} = '<',
+              or local $pp->{ExpandedURI q<CDATA>} = \'<',
                  pos ($$src)++,
                  $self->element_content
                    ($src, $p, $pp, %opt);
           } else {
             $self->parse_element
                    ($src, $pp, %opt)
-              or local $pp->{ExpandedURI q<CDATA>} = '<',
+              or local $pp->{ExpandedURI q<CDATA>} = \'<',
                  pos ($$src)++,
                  $self->element_content
                    ($src, $p, $pp, %opt);
@@ -231,7 +240,8 @@ sub parse_element ($$$%) {
           $self->parse_reference_in_content
             ($src, $pp,
              %opt,
-             ExpandedURI q<match-or-error> => 1);
+             ExpandedURI q<match-or-error> => 1,
+             ExpandedURI q<content-parser> => 'parse_content');
         } else {
           Carp::croak "Buggy implementation!";
         }
@@ -266,6 +276,91 @@ sub parse_element ($$$%) {
     return 0;
   }
 }
+
+sub parse_content ($$$%) {
+  my ($self, $src, $p, %opt) = @_;
+  my $pp = $opt{pp} || {};
+
+      while (pos $$src < length $$src) {
+        if ($$src =~ /\G([^<&]+)/gc) {
+          local $pp->{ExpandedURI q<CDATA>} = $1;
+          $self->element_content
+                   ($src, $p, $pp, %opt);
+        } elsif (substr ($$src, pos $$src, 1) eq '<') {
+          my $n = substr ($$src, 1 + pos $$src, 1);
+          if ($n eq '/') {
+            if ($$src =~ m#\G</(\p{InXML_NameStartChar}\p{InXMLNameChar}*)#gc) {
+              my $type = $1;
+                $self->report
+                  (-type => 'SYNTAX_END_TAG_NOT_ALLOWED',
+                   -class => 'WFC',
+                   source => $src,
+                   position_diff => 2 + length $type);
+                my $tag = '</' . $type;
+                $$src =~ /\G($REG_S+)/gco and $tag .= $1;
+                if ($$src =~ /\G>/gc) {
+                  $tag .= '>';
+                } else {
+                  $self->report
+                    (-type => 'SYNTAX_ETAGC_REQUIRED',
+                     -class => 'WFC',
+                     source => $src);
+                }
+                pos $tag = 0;
+                local $pp->{ExpandedURI q<CDATA>} = \$tag;
+                $self->element_content
+                  ($src, $p, $pp, %opt);
+            } else {
+              pos ($$src) += 2;
+              $self->report
+                 (-type => 'SYNTAX_ELEMENT_TYPE_NAME_FOLLOWING_ETAGO_REQUIRED',
+                  -class => 'WFC',
+                  source => $src);
+              local $pp->{ExpandedURI q<CDATA>} = \'</';
+              $self->element_content
+                   ($src, $p, $pp, %opt);
+            }
+          } elsif ($n eq '!') {
+            $self->parse_markup_declaration
+                   ($src, $pp, %opt,
+                    ExpandedURI q<allow-declaration> => {
+                      comment => 1,
+                      section => 1,
+                    }, ExpandedURI q<allow-section> => {
+                      CDATA => 1,
+                      ps => 0,
+                    })
+              or local $pp->{ExpandedURI q<CDATA>} = \'<',
+                 pos ($$src)++,
+                 $self->element_content
+                   ($src, $p, $pp, %opt);
+          } elsif ($n eq '?') {
+            $self->parse_processing_instruction
+                   ($src, $pp, %opt)
+              or local $pp->{ExpandedURI q<CDATA>} = \'<',
+                 pos ($$src)++,
+                 $self->element_content
+                   ($src, $p, $pp, %opt);
+          } else {
+            $self->parse_element
+                   ($src, $pp, %opt)
+              or local $pp->{ExpandedURI q<CDATA>} = \'<',
+                 pos ($$src)++,
+                 $self->element_content
+                   ($src, $p, $pp, %opt);
+          }
+        } elsif (substr ($$src, pos $$src, 1) eq '&') {
+          $self->parse_reference_in_content
+            ($src, $pp,
+             %opt,
+             ExpandedURI q<match-or-error> => 1,
+             ExpandedURI q<content-parser> => 'parse_content');
+        } else {
+          Carp::croak "Buggy implementation!";
+        }
+      }
+    return 1;
+} # parse_content
 
 sub parse_start_tag ($$$%) {
   my ($self, $src, $p, %opt) = @_;
@@ -430,58 +525,16 @@ sub parse_attribute_value_specification ($$$%) {
   if ($$src =~ /\G(["'])/gc) {
     my $pp = {};
     $pp->{ExpandedURI q<literal-delimiter>} = my $litdelim = $1;
-    $self->{error}->set_position ($src, moved => 1);
-    $pp->{ExpandedURI q<position>} = [$self->{error}->get_position ($src)];
     my $start_method = $opt{ExpandedURI q<method-start-attr-value-spec>} ||
                        'attribute_value_specification_start';
     $self->$start_method ($src, $p, $pp, %opt);
-    my $content_method = $opt{ExpandedURI q<method-content-attr-value-spec>} ||
-                         'attribute_value_specification_content';
     if ($litdelim eq '"') {
-      while (pos $$src < length $$src) {
-        $self->{error}->set_position ($src, moved => 1);
-        if ($$src =~ /\G([^"&<]+)/gc) {
-          my $s = $1;
-          pos $s = 0;
-          $self->{error}->fork_position ($src => \$s);
-          local $pp->{ExpandedURI q<CDATA>} = \$s;
-          $self->$content_method
-                   ($src, $p, $pp, %opt);
-        } elsif ($$src =~ /\G(?=&)/gc) {
-          if (not $opt{ExpandedURI q<use-reference>} or
-              not $self->parse_reference_in_attribute_value_literal
-                   ($src, $pp,
-                    %opt,
-                    ExpandedURI q<match-or-error> => 1)) {
-            my $s = '&';
-            pos $s = 0;
-            $self->{error}->fork_position ($src => \$s);
-            local $pp->{ExpandedURI q<CDATA>} = \$s;
-            pos ($$src)++;
-            $self->$content_method
-                   ($src, $p, $pp, %opt);
-          }
-        } elsif ($$src =~ /\G</gc) {
-          my $s = '<';
-          pos $s = 0;
-          $self->{error}->fork_position ($src => \$s);
-          $self->report
-                   (-type => 'SYNTAX_NO_LESS_THAN_IN_ATTR_VAL',
-                    -class => 'WFC',
-                    source => $src,
-                    position_diff => 1);
-          local $pp->{ExpandedURI q<CDATA>} = \$s;
-          $self->$content_method
-                   ($src, $p, $pp, %opt);
-        } else {
-          my $s = '';
-          pos $s = 0;
-          $self->{error}->fork_position ($src => \$s);
-          local $pp->{ExpandedURI q<CDATA>} = \$s;
-          $self->$content_method
-                   ($src, $p, $pp, %opt);
-          last;
-        }
+      if ($$src =~ /\G([^"]*)/gc) {
+        my $s = $1; pos $s = 0;
+        $self->{error}->set_position ($src, moved => 1, diff => length $s);
+        $self->{error}->fork_position ($src => \$s);
+        $self->parse_avdata
+                      (\$s, $p, %opt, pp => $pp);
       }
       unless ($$src =~ /\G"/gc) {
         $self->report (-type => 'SYNTAX_ALITC_REQUIRED',
@@ -489,50 +542,12 @@ sub parse_attribute_value_specification ($$$%) {
                        source => $src);
       }
     } else { #if ($litdelim eq "'")
-      while (pos $$src < length $$src) {
-        $self->{error}->set_position ($src, moved => 1);
-        if ($$src =~ /\G([^'&<]+)/gc) {
-          my $s = $1;
-          pos $s = 0;
-          $self->{error}->fork_position ($src => \$s);
-          local $pp->{ExpandedURI q<CDATA>} = \$s;
-          $self->$content_method
-                   ($src, $p, $pp, %opt);
-        } elsif ($$src =~ /\G(?=&)/gc) {
-          if (not $opt{ExpandedURI q<use-reference>} or
-              not $self->parse_reference_in_attribute_value_literal
-                   ($src, $pp,
-                    %opt,
-                    ExpandedURI q<match-or-error> => 1)) {
-            my $s = '&';
-            pos $s = 0;
-            $self->{error}->fork_position ($src => \$s);
-            local $pp->{ExpandedURI q<CDATA>} = \$s;
-            pos ($$src)++;
-            $self->$content_method
-                   ($src, $p, $pp, %opt);
-          }
-        } elsif ($$src =~ /\G</gc) {
-          my $s = '<';
-          pos $s = 0;
-          $self->{error}->fork_position ($src => \$s);
-          $self->report
-                   (-type => 'SYNTAX_NO_LESS_THAN_IN_ATTR_VAL',
-                    -class => 'WFC',
-                    source => $src,
-                    position_diff => 1);
-          local $pp->{ExpandedURI q<CDATA>} = \$s;
-          $self->$content_method
-                   ($src, $p, $pp, %opt);
-        } else {
-          my $s = '';
-          pos $s = 0;
-          $self->{error}->fork_position ($src => \$s);
-          local $pp->{ExpandedURI q<CDATA>} = \$s;
-          $self->$content_method
-                   ($src, $p, $pp, %opt);
-          last;
-        }
+      if ($$src =~ /\G([^']*)/gc) {
+        my $s = $1; pos $s = 0;
+        $self->{error}->set_position ($src, moved => 1, diff => length $s);
+        $self->{error}->fork_position ($src => \$s);
+        $self->parse_avdata
+                      (\$s, $p, %opt, pp => $pp);
       }
       unless ($$src =~ /\G'/gc) {
         $self->report (-type => 'SYNTAX_ALITAC_REQUIRED',
@@ -574,6 +589,64 @@ sub parse_attribute_value_specification ($$$%) {
     }
     return 0;
   }
+}
+
+sub parse_avdata ($$$%) {
+  my ($self, $src, $p, %opt) = @_;
+  my $pp = $opt{pp} || {};
+  my $content_method = $opt{ExpandedURI q<method-content-attr-value-spec>} ||
+                       'attribute_value_specification_content';
+      while (pos $$src < length $$src) {
+        if ($$src =~ /\G([^&<]+)/gc) {
+          my $s = $1;
+          pos $s = 0;
+          $self->{error}->set_position ($src, moved => 1, diff => length $s);
+          $self->{error}->fork_position ($src => \$s);
+          local $pp->{ExpandedURI q<CDATA>} = \$s;
+          $self->$content_method
+                   ($src, $p, $pp, %opt);
+        } elsif ($$src =~ /\G(?=&)/gc) {
+          if (not $opt{ExpandedURI q<use-reference>} or
+              not $self->parse_reference_in_attribute_value_literal
+                   ($src, $pp,
+                    %opt,
+                    ExpandedURI q<match-or-error> => 1,
+                    ExpandedURI q<error-avdata-lt>
+                      => 'WFC_NO_LESS_THAN_IN_ATTR_VAL')) {
+            my $s = '&';
+            pos $s = 0;
+            $self->{error}->fork_position ($src => \$s);
+            local $pp->{ExpandedURI q<CDATA>} = \$s;
+            pos ($$src)++;
+            $self->$content_method
+                   ($src, $p, $pp, %opt);
+          }
+        } elsif ($$src =~ /\G</gc) {
+          my $s = '<';
+          pos $s = 0;
+          $self->{error}->set_position ($src, moved => 1, diff => 1);
+          $self->{error}->fork_position ($src => \$s);
+          $self->report
+                   (-type => $opt{ExpandedURI q<error-avdata-lt>} ||
+                             'SYNTAX_NO_LESS_THAN_IN_ATTR_VAL',
+                    -class => 'WFC',
+                    source => $src,
+                    position_diff => 1);
+          local $pp->{ExpandedURI q<CDATA>} = \$s;
+          $self->$content_method
+                   ($src, $p, $pp, %opt);
+        } else { # Dummy report
+          my $s = '';
+          pos $s = 0;
+          $self->{error}->set_position ($src, moved => 1);
+          $self->{error}->fork_position ($src => \$s);
+          local $pp->{ExpandedURI q<CDATA>} = \$s;
+          $self->$content_method
+                   ($src, $p, $pp, %opt);
+          last;
+        }
+      }
+  return 1;
 }
 
 sub parse_reference_in_attribute_value_literal ($$$%) {
@@ -642,18 +715,81 @@ sub parse_reference_in_attribute_value_literal ($$$%) {
         return 0;
       }
     } elsif ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
+      my $s = $1; pos $s = 0;
       unless ($opt{ExpandedURI q<allow-general-entity-reference>}) {
         $self->report
                (-type => 'SYNTAX_GENERAL_ENTREF',
                 -class => 'WFC',
                 source => $src,
-                position_diff => 1 + length $1);
+                position_diff => 1 + length $s);
       }
+      $self->{error}->set_position ($src, moved => 1, diff => length $s);
+      $self->{error}->fork_position ($src => \$s);
+      my $pp = {ExpandedURI q<entity-name> => \$s};
+      if ($self->{ExpandedURI q<_:opened-general-entity>}->{$s}) {
+        $self->report
+          (-type => 'WFC_NO_RECURSION',
+           -class => 'WFC',
+           source => $src,
+           position_diff => length $s,
+           entity_name => $s);
+        $pp->{ExpandedURI q<entity-opened>} = 1;
+      }
+      $opt{ExpandedURI q<source>} = [$src];
       $self->general_entity_reference_in_attribute_value_literal_start
-               ($src,
-                $p,
-                {ExpandedURI q<entity-name> => $1},
-                %opt);
+               ($src, $p, $pp, %opt);
+      EXPAND: {
+        last EXPAND if $pp->{ExpandedURI q<entity-opened>};
+        if (overload::StrVal ($src) ne
+            overload::StrVal ($opt{ExpandedURI q<source>}->[-1])) {
+          if ($self->{error}->get_flag
+               ($opt{ExpandedURI q<source>}->[-1],
+                ExpandedURI q<is-external-entity>)) {
+            $self->report
+               (-type => 'WFC_NO_EXTERNAL_ENTITY_REFERENCES',
+                -class => 'WFC',
+                source => $src,
+                position_diff => length $s,
+                entity_name => $s);
+            last EXPAND;
+          } elsif ($self->{ExpandedURI q<is-standalone>} and
+                   $self->{error}->get_flag
+               ($opt{ExpandedURI q<source>}->[-1],
+                ExpandedURI q<is-declared-externally>)) {
+            $self->report
+               (-type => 'WFC_ENTITY_DECLARED__INTERNAL',
+                -class => 'WFC',
+                source => $src,
+                position_diff => length $s,
+                entity_name => $s);
+          } elsif ($self->{error}->get_flag
+               ($opt{ExpandedURI q<source>}->[-1],
+                ExpandedURI q<is-unparsed-entity>)) {
+            ## This code will not be executed, since all unparsed entities
+            ## are external entities.
+            $self->report
+               (-type => 'WFC_PARSED_ENTITY',
+                -class => 'WFC',
+                source => $src,
+                position_diff => length $s,
+                entity_name => $s);
+            last EXPAND;
+          }
+          local $self->{ExpandedURI q<_:opened-general-entity>}->{$s} = 1;
+          $self->parse_avdata
+               ($opt{ExpandedURI q<source>}->[-1], $p, %opt, pp => $pp);
+          $pp->{ExpandedURI q<reference-expanded>} = 1;
+        } elsif ($self->{ExpandedURI q<is-standalone>}) {
+          $self->report
+               (-type => 'WFC_ENTITY_DECLARED',
+                -class => 'WFC',
+                source => $src,
+                position_diff => length $s,
+                entity_name => $s);
+        }
+      }
+      $self->general_entity_reference_in_attribute_value_literal_end
+               ($src, $p, $pp, %opt);
     } else {
       $self->report
                (-type => 'SYNTAX_HASH_OR_NAME_REQUIRED',
@@ -731,11 +867,63 @@ sub parse_reference_in_content ($$$%) {
         return 0;
       }
     } elsif ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
-     $self->general_entity_reference_in_content_start
-               ($src,
-                $p,
-                {ExpandedURI q<entity-name> => $1},
-                %opt);
+      my $s = $1; pos $s = 0;
+      $self->{error}->set_position ($src, moved => 1, diff => length $s);
+      $self->{error}->fork_position ($src => \$s);
+      my $pp = {ExpandedURI q<entity-name> => \$s};
+      if ($self->{ExpandedURI q<_:opened-general-entity>}->{$s}) {
+        $self->report
+          (-type => 'WFC_NO_RECURSION',
+           -class => 'WFC',
+           source => $src,
+           position_diff => length $s,
+           entity_name => $s);
+        $pp->{ExpandedURI q<entity-opened>} = 1;
+      }
+      $opt{ExpandedURI q<source>} = [$src];
+      $self->general_entity_reference_in_content_start
+               ($src, $p, $pp, %opt);
+      EXPAND: {
+        last EXPAND if $pp->{ExpandedURI q<entity-opened>};
+        if (overload::StrVal ($src) ne
+            overload::StrVal ($opt{ExpandedURI q<source>}->[-1])) {
+          if ($self->{ExpandedURI q<is-standalone>} and
+                   $self->{error}->get_flag
+               ($opt{ExpandedURI q<source>}->[-1],
+                ExpandedURI q<is-declared-externally>)) {
+            $self->report
+               (-type => 'WFC_ENTITY_DECLARED__INTERNAL',
+                -class => 'WFC',
+                source => $src,
+                position_diff => length $s,
+                entity_name => $s);
+          } elsif ($self->{error}->get_flag
+               ($opt{ExpandedURI q<source>}->[-1],
+                ExpandedURI q<is-unparsed-entity>)) {
+            $self->report
+               (-type => 'WFC_PARSED_ENTITY',
+                -class => 'WFC',
+                source => $src,
+                position_diff => length $s,
+                entity_name => $s);
+            last EXPAND;
+          }
+          local $self->{ExpandedURI q<_:opened-general-entity>}->{$s} = 1;
+          my $parser = $opt{ExpandedURI q<content-parser>};
+          $self->$parser
+               ($opt{ExpandedURI q<source>}->[-1], $p, %opt, pp => $pp);
+          $pp->{ExpandedURI q<reference-expanded>} = 1;
+        } elsif ($self->{ExpandedURI q<is-standalone>}) {
+          $self->report
+               (-type => 'WFC_ENTITY_DECLARED',
+                -class => 'WFC',
+                source => $src,
+                position_diff => length $s,
+                entity_name => $s);
+        }
+      }
+      $self->general_entity_reference_in_content_end
+               ($src, $p, $pp, %opt);
     } else {
       $self->report
                (-type => 'SYNTAX_HASH_OR_NAME_REQUIRED',
@@ -834,7 +1022,7 @@ sub parse_reference_in_rpdata ($$$%) {
         return 0;
       }
     } elsif ($$src =~ /\G(\p{InXML_NameStartChar}\p{InXMLNameChar}*)/gc) {
-     $self->general_entity_reference_in_rpdata_start
+      $self->general_entity_reference_in_rpdata_start
                ($src,
                 $p,
                 {ExpandedURI q<entity-name> => $1},
@@ -3235,7 +3423,12 @@ sub hex_character_reference_in_rpdata_start ($$$$%) {}
 
 sub general_entity_reference_in_attribute_value_literal_start
     ($$$$%) {}
+sub general_entity_reference_in_attribute_value_literal_end
+    ($$$$%) {}
+
 sub general_entity_reference_in_content_start ($$$$%) {}
+sub general_entity_reference_in_content_end ($$$$%) {}
+
 sub general_entity_reference_in_rpdata_start
   ($$$$%) {}
 
@@ -3252,4 +3445,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/05/31 00:48:44 $
+1; # $Date: 2004/06/01 09:11:22 $

@@ -86,6 +86,7 @@ my @a =
   result => q(0:4:SYNTAX_NO_LESS_THAN_IN_ATTR_VAL),
  },
  {
+  entity => {amp => q<&#x26;>},
   t => q{"foo&amp;bar"},
   method => 'parse_attribute_value_specification',
   option => {
@@ -97,6 +98,7 @@ my @a =
   result => q(1),
  },
  {
+  entity => {amp => q<&#x26;>},
   t => q{'foo&amp;bar'},
   method => 'parse_attribute_value_specification',
   option => {
@@ -211,6 +213,7 @@ my @a =
   result => q(0:10:SYNTAX_REFC_REQUIRED),
  },
  {
+  entity => {amp => q<&#x26;>},
   t => q{"foo&amp bar"},
   method => 'parse_attribute_value_specification',
   option => {
@@ -377,6 +380,7 @@ my @a =
   result => q(0:11:SYNTAX_STAGC_OR_NESTC_REQUIRED),
  },
  {
+  entity => {ref => q<ref>},
   t => q{<e>text&ref;and&#1234;text</e>},
   method => 'parse_element',
   result => q(1),
@@ -1773,6 +1777,7 @@ my @a =
   result => 1,
  },
  {
+  entity => {lt => qq{&#@{[ord '<']};}},
   t => q[<!ATTLIST foo a NOTATION ( a|b|c ) 'c&lt;b&#33;!&#x4a;b'>],
   method => 'parse_attlist_declaration',
   result => 1,
@@ -2438,6 +2443,186 @@ comment -->
   method => 'parse_document_entity',
   result => '0:5:SYNTAX_XML_VERSION_REQUIRED',
  },
+
+ {
+  entity => {f => q{baz}},
+  t => q{<e>foo&f;bar</e>},
+  method => 'parse_element',
+  result => 1,
+ },
+ {
+  entity => {f => q{baz<bar/>}},
+  t => q{<e>foo&f;bar</e>},
+  method => 'parse_element',
+  result => 1,
+ },
+ {
+  entity => {f => q{baz<bar>bar</bar>z}},
+  t => q{<e>foo&f;bar</e>},
+  method => 'parse_element',
+  result => 1,
+ },
+ {
+  entity => {f => q{baz&l;z}, l => q{foo}},
+  t => q{<e>foo&f;bar</e>},
+  method => 'parse_element',
+  result => 1,
+ },
+ {
+  entity => {f => q{baz<bar>bar</bar}},
+  t => q{<e>foo&f;bar</e>},
+  method => 'parse_element',
+  result => '0:16:SYNTAX_ETAGC_REQUIRED',
+ },
+ {
+  entity => {f => q{baz<bar>bar}},
+  t => q{<e>foo&f;bar</e>},
+  method => 'parse_element',
+  result => '0:11:SYNTAX_END_TAG_REQUIRED',
+ },
+ {
+  entity => {f => q{baz</bar>bar}},
+  t => q{<e>foo&f;bar</e>},
+  method => 'parse_element',
+  result => '0:3:SYNTAX_END_TAG_NOT_ALLOWED',
+ },
+ {
+  entity => {f => q{baz&bar}, bar => q<bar>},
+  t => q{<e>foo&f;bar</e>},
+  method => 'parse_element',
+  result => '0:7:SYNTAX_REFC_REQUIRED',
+ },
+ {
+  entity => {f => q{baz< bar}},
+  t => q{<e>foo&f;bar</e>},
+  method => 'parse_element',
+  result => '0:4:SYNTAX_ELEMENT_TYPE_NAME_FOLLOWING_STAGO_REQUIRED',
+ },
+ {
+  entity => {f => q{baz &g;bar}, g => {replace => q{fff}, external => 1}},
+  t => q{<e>foo&f;bar</e>},
+  method => 'parse_element',
+  option => {ExpandedURI q<allow-general-entity-reference> => 1,
+             ExpandedURI q<use-reference> => 1},
+  result => 1,
+ },
+ {
+  entity => {f => q{baz &g;bar}, g => {unparsed => 1, external => 1}},
+  t => q{<e>foo&f;bar</e>},
+  method => 'parse_element',
+  option => {ExpandedURI q<allow-general-entity-reference> => 1,
+             ExpandedURI q<use-reference> => 1},
+  result => '0:5:WFC_PARSED_ENTITY',
+ },
+ {
+  entity => {f => q{baz &f;bar}},
+  t => q{<e>foo&f;bar</e>},
+  method => 'parse_element',
+  option => {ExpandedURI q<allow-general-entity-reference> => 1,
+             ExpandedURI q<use-reference> => 1},
+  result => '0:5:WFC_NO_RECURSION',
+ },
+ {
+  entity => {f => q{baz &g;bar}, g => q{foo &f;bar}},
+  t => q{<e>foo&f;bar</e>},
+  method => 'parse_element',
+  option => {ExpandedURI q<allow-general-entity-reference> => 1,
+             ExpandedURI q<use-reference> => 1},
+  result => '0:5:WFC_NO_RECURSION',
+ },
+ {
+  entity => {f => {replace => q{baz bar}, externally => 1}},
+  t => q{<e>foo&f;bar</e>},
+  method => 'parse_element',
+  option => {ExpandedURI q<allow-general-entity-reference> => 1,
+             ExpandedURI q<use-reference> => 1,
+             ExpandedURI q<test:standalone> => 1},
+  result => '0:7:WFC_ENTITY_DECLARED__INTERNAL',
+ },
+ {
+  entity => {f => {replace => q{baz bar}, externally => 1}},
+  t => q{<e>foo&f;bar</e>},
+  method => 'parse_element',
+  option => {ExpandedURI q<allow-general-entity-reference> => 1,
+             ExpandedURI q<use-reference> => 1,
+             ExpandedURI q<test:standalone> => 0},
+  result => 1,
+ },
+
+ {
+  entity => {f => q{baz bar}},
+  t => q{"foo&f;bar"},
+  method => 'parse_attribute_value_specification',
+  option => {ExpandedURI q<allow-general-entity-reference> => 1,
+             ExpandedURI q<use-reference> => 1},
+  result => 1,
+ },
+ {
+  entity => {f => q{baz &g;bar}, g => q{fff}},
+  t => q{"foo&f;bar"},
+  method => 'parse_attribute_value_specification',
+  option => {ExpandedURI q<allow-general-entity-reference> => 1,
+             ExpandedURI q<use-reference> => 1},
+  result => 1,
+ },
+ {
+  entity => {f => q{baz< bar}},
+  t => q{'foo&f;bar'},
+  method => 'parse_attribute_value_specification',
+  option => {ExpandedURI q<allow-general-entity-reference> => 1,
+             ExpandedURI q<use-reference> => 1},
+  result => '0:3:WFC_NO_LESS_THAN_IN_ATTR_VAL',
+ },
+ {
+  entity => {f => q{baz &g;bar}, g => {replace => q{fff}, external => 1}},
+  t => q{"foo&f;bar"},
+  method => 'parse_attribute_value_specification',
+  option => {ExpandedURI q<allow-general-entity-reference> => 1,
+             ExpandedURI q<use-reference> => 1},
+  result => '0:5:WFC_NO_EXTERNAL_ENTITY_REFERENCES',
+ },
+ {
+  entity => {f => q{baz &g;bar}, g => {unparsed => 1, external => 1}},
+  t => q{"foo&f;bar"},
+  method => 'parse_attribute_value_specification',
+  option => {ExpandedURI q<allow-general-entity-reference> => 1,
+             ExpandedURI q<use-reference> => 1},
+  result => '0:5:WFC_NO_EXTERNAL_ENTITY_REFERENCES',
+ },
+ {
+  entity => {f => q{baz &f;bar}},
+  t => q{"foo&f;bar"},
+  method => 'parse_attribute_value_specification',
+  option => {ExpandedURI q<allow-general-entity-reference> => 1,
+             ExpandedURI q<use-reference> => 1},
+  result => '0:5:WFC_NO_RECURSION',
+ },
+ {
+  entity => {f => q{baz &g;bar}, g => q{foo &f;bar}},
+  t => q{"foo&f;bar"},
+  method => 'parse_attribute_value_specification',
+  option => {ExpandedURI q<allow-general-entity-reference> => 1,
+             ExpandedURI q<use-reference> => 1},
+  result => '0:5:WFC_NO_RECURSION',
+ },
+ {
+  entity => {f => {replace => q{baz bar}, externally => 1}},
+  t => q{"foo&f;bar"},
+  method => 'parse_attribute_value_specification',
+  option => {ExpandedURI q<allow-general-entity-reference> => 1,
+             ExpandedURI q<use-reference> => 1,
+             ExpandedURI q<test:standalone> => 1},
+  result => '0:5:WFC_ENTITY_DECLARED__INTERNAL',
+ },
+ {
+  entity => {f => {replace => q{baz bar}, externally => 1}},
+  t => q{"foo&f;bar"},
+  method => 'parse_attribute_value_specification',
+  option => {ExpandedURI q<allow-general-entity-reference> => 1,
+             ExpandedURI q<use-reference> => 1,
+             ExpandedURI q<test:standalone> => 0},
+  result => 1,
+ },
 );
 
 plan tests => scalar @a;
@@ -2459,13 +2644,16 @@ for (@a) {
   $first_error_detail = '';
   my $method = $_->{method};
   pos ($_->{t}) = 0;
+  $parser->reset;
   $parser->{ExpandedURI q<test:entity>} = $_->{entity} || {};
-  $parser->$method (
-    \$_->{t}, {},
-    %{$_->{option}||{ExpandedURI q<allow-declaration>=>{qw/DOCTYPE 1 ENTITY 1 ELEMENT 1 NOTATION 1 ATTLIST 1 comment 1 section 1/},
-                     ExpandedURI q<allow-param-entref> => 1,
-                     ExpandedURI q<use-reference> => 1}},
-  );
+  $_->{option} ||= {
+    ExpandedURI q<allow-declaration>=>{qw/DOCTYPE 1 ENTITY 1 ELEMENT 1 NOTATION 1 ATTLIST 1 comment 1 section 1/},
+    ExpandedURI q<allow-param-entref> => 1,
+    ExpandedURI q<use-reference> => 1,
+  };
+  $parser->{ExpandedURI q<is-standalone>}
+    = $_->{option}->{ExpandedURI q<test:standalone>};
+  $parser->$method (\$_->{t}, {}, %{$_->{option}});
   ok $first_error || 1, $_->{result}, $first_error_detail;
 }
 
@@ -2500,3 +2688,32 @@ sub parameter_entity_reference_in_subset_start ($$$$%) {
   }
 }
 
+sub general_entity_reference_in_attribute_value_literal_start ($$$$%) {
+  my ($self, $src, $p, $pp, %opt) = @_;
+  return if $pp->{ExpandedURI q<entity-opened>};
+  for my $reptxt ($self->{ExpandedURI q<test:entity>}
+                       ->{${$pp->{ExpandedURI q<entity-name>}}}) {
+    if (ref $reptxt eq 'HASH') {
+      pos $reptxt->{replace} = 0 if defined $reptxt->{replace};
+      push @{$opt{ExpandedURI q<source>}}, \($reptxt->{replace});
+      $self->{error}->set_flag
+        ((\$reptxt->{replace}),
+         ExpandedURI q<is-external-entity> => $reptxt->{external});
+      $self->{error}->set_flag
+        ((\$reptxt->{replace}),
+         ExpandedURI q<is-unparsed-entity> => $reptxt->{unparsed});
+      $self->{error}->set_flag
+        ((\$reptxt->{replace}),
+         ExpandedURI q<is-declared-externally> => $reptxt->{externally});
+    } elsif (not defined $reptxt) {
+      warn "Entity ${$pp->{ExpandedURI q<entity-name>}} not defined";
+    } else {
+      pos $reptxt = 0;
+      push @{$opt{ExpandedURI q<source>}}, \$reptxt if $reptxt;
+    }
+  }
+}
+BEGIN {
+*general_entity_reference_in_content_start
+ = \&general_entity_reference_in_attribute_value_literal_start;
+}

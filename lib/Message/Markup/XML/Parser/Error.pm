@@ -14,7 +14,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Message::Markup::XML::Parser::Error;
 require Message::Util::Error::TextParser;
@@ -658,13 +658,34 @@ sub ___error_def () {+{
     description => q(Element type name in end tag (%t (name => end-tag-type-name);) MUST match with that in start tag (%t (name => start-tag-type-name);)),
     level => 'wfc',
   },
+  WFC_ENTITY_DECLARED => {
+    description => q(Entity "%t (name => entity-name);" must be declared before referred in standalone document),
+    level => 'wfc',
+  },
+  WFC_ENTITY_DECLARED__INTERNAL => {
+    description => q(Entity "%t (name => entity-name);" must be declared within internal subset part of document entity),
+    level => 'wfc',
+  },
   # WFC_EXTERNAL_SUBSET
+  # WFC_IN_DTD
+  WFC_LEGAL_CHARACTER => {
+    description => q(Character %%%% is not in document character set),
+    level => 'wfc',
+  },
   WFC_NO_EXTERNAL_ENTITY_REFERENCES => {
     description => q(External entity (%t (name => entity-name);) cannot be referred in attribute value literal),
     level => 'wfc',
   },
   WFC_NO_LESS_THAN_IN_ATTR_VAL => {
     description => q(LESS-THAN SIGN (<) not allowed in replacement text of entity referred in attribute value literal),
+    level => 'wfc',
+  },
+  WFC_NO_RECURSION => {
+    description => q(Parsed entity "%t (name => entity-name);" cannot contain recursive reference to itself, either directly or indirectly),
+    level => 'wfc',
+  },
+  WFC_PARSED_ENTITY => {
+    description => q(Referred entity "%t (name => entity-name);" is unparsed entity),
     level => 'wfc',
   },
   # WFC_PE_BETWEEN_DECLARATIONS
@@ -781,4 +802,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/05/31 00:48:44 $
+1; # $Date: 2004/06/01 09:11:22 $

@@ -19,12 +19,19 @@ This module is part of manakai.
 package Message::Util::Error::TextParser;
 require Message::Util::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.3.2.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.3.2.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 sub new ($;%) {
   my $self = bless {}, shift;
   $self->{option} = {@_, newline => qr/\x0A|\x0D\x0A?/};
   $self;
+}
+
+sub reset ($;%) {
+  my ($self, %opt) = @_;
+  for (keys %$self) {
+    delete $self->{$_} unless $_ eq 'option';
+  }
 }
 
 sub set_position ($$;%) {
@@ -163,4 +170,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/05/31 00:48:44 $
+1; # $Date: 2004/06/01 09:11:23 $
