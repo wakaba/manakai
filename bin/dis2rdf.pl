@@ -5,18 +5,13 @@ use Message::Util::QName::Filter {
   dis2pm => q<http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#>,
   DOMCore => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#>,
   DOMMain => q<http://suika.fam.cx/~wakaba/archive/2004/dom/main#>,
-  infoset => q<http://www.w3.org/2001/04/infoset#>,
   lang => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#>,
   Perl => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl-->,
   license => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/license#>,
   ManakaiDOM => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#>,
-  MDOM_EXCEPTION => q<http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#>,
   owl => q<http://www.w3.org/2002/07/owl#>,
   rdf => q<http://www.w3.org/1999/02/22-rdf-syntax-ns#>,
   rdfs => q<http://www.w3.org/2000/01/rdf-schema#>,
-  xml => q<http://www.w3.org/XML/1998/namespace>,
-  xmlns => q<http://www.w3.org/2000/xmlns/>,
-  xsd => q<http://www.w3.org/2001/XMLSchema#>,
 };
 
 use Getopt::Long;
@@ -71,7 +66,6 @@ sub n3_literal ($) {
 our $State;
 our $result = new manakai::n3;
 
-
 $State->{DefaultFor} = $Opt{For};
 
 my $source = dis_load_module_file (module_file_name => $Opt{file_name},
@@ -79,8 +73,7 @@ my $source = dis_load_module_file (module_file_name => $Opt{file_name},
                                    use_default_for => 1);
 $State->{for_def_required}->{$State->{DefaultFor}} ||= 1;
 
-dis_check_undef_type_and_for ()
-  unless $Opt{no_undef_check};
+dis_check_undef_type_and_for () unless $Opt{no_undef_check};
 
 if (dis_uri_for_match (ExpandedURI q<ManakaiDOM:Perl>, $State->{DefaultFor})) {
   dis_perl_init ($source, For => $State->{DefaultFor});
@@ -220,12 +213,16 @@ if ($Opt{output_resource}) {
                       [ExpandedURI q<dis2pm:ifPackagePrefix>],
                       [ExpandedURI q<dis2pm:methodName>],
                       [ExpandedURI q<dis2pm:paramName>],
+                      [ExpandedURI q<dis2pm:constGroupName>],
+                      [ExpandedURI q<dis2pm:constName>],
                       [ExpandedURI q<ManakaiDOM:isRedefining>,
                         ExpandedURI q<DOMMain:boolean>],
                       [ExpandedURI q<ManakaiDOM:isForInternal>,
                         ExpandedURI q<DOMMain:boolean>],
                       [ExpandedURI q<d:Read>, ExpandedURI q<DOMMain:boolean>],
                       [ExpandedURI q<d:Write>,
+                        ExpandedURI q<DOMMain:boolean>],
+                      [ExpandedURI q<dis2pm:undefable>,
                         ExpandedURI q<DOMMain:boolean>]) {
           $result->add_triple ($uri =>$prop->[0]=>
                                n3_literal $mod->{$prop->[0]})
@@ -248,12 +245,16 @@ if ($Opt{output_resource}) {
             $result->add_triple ($uri =>$prop->[0]=> $o)
           }
         }
-        for (values %{$mod->{ExpandedURI q<dis2pm:method>}||{}}) {
-          my $ruri = defined $_->{URI}
-                      ? $_->{URI}
-                      : ($_->{ExpandedURI q<d:anonID>}
-                              ||= $result->get_new_anon_id (Name => $_->{Name}));
-          $result->add_triple ($uri =>ExpandedURI q<dis2pm:method>=> $ruri);
+        for my $p (ExpandedURI q<dis2pm:method>,
+                   ExpandedURI q<dis2pm:constGroup>,
+                   ExpandedURI q<dis2pm:const>) {
+          for my $v (values %{$mod->{$p}||{}}) {
+            my $ruri = defined $v->{URI}
+                      ? $v->{URI}
+                      : ($v->{ExpandedURI q<d:anonID>}
+                              ||= $result->get_new_anon_id (Name => $v->{Name}));
+            $result->add_triple ($uri =>$p=> $ruri);
+          }
         }
         if ($mod->{ExpandedURI q<dis2pm:type>} eq
               ExpandedURI q<ManakaiDOM:DOMMethod>) {

@@ -1,8 +1,9 @@
 package Message::Util::QName::Filter;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Carp;
 use Filter::Util::Call;
+our $DEBUG;
 
 sub import ($$) {
   my ($self, $map) = @_;
@@ -26,13 +27,15 @@ sub filter ($) {
         $r = $prefix;
       }
       $r =~ s/([<>\\])/\\$1/g;
-      q[ q<] . $r . q[> ];
+      $r = q[ q<] . $r . q[> ];
+      print STDERR "MUQNameFilter: $r\n" if $DEBUG;
+      $r;
     }ge;
   }
   $status;
 } # filter
 
-1; # $Date: 2004/11/21 13:17:43 $
+1; # $Date: 2004/11/22 12:54:48 $
 __END__
 
 =head1 NAME

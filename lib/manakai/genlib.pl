@@ -110,6 +110,7 @@ sub perl_internal_name ($) {
 
 sub perl_inherit ($;$) {
   my ($isa, $mod) = @_;
+  return '' unless @$isa;
   if ($mod) {
     perl_statement 'push ' . perl_var (type => '@',
                                        local_name => 'ISA',
@@ -128,6 +129,7 @@ sub perl_sub (%) {
   $r .= "{\n";
   $r .= $opt{code};
   $r .= "}\n";
+  $r;
 }
 
 sub perl_cases (@) {
