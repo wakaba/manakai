@@ -1,12 +1,11 @@
 
 =head1 NAME
 
-Message::Field::Address Perl module
+Message::Field::Unstructured Perl module
 
 =head1 DESCRIPTION
 
-Perl module for RFC 822/2822 address related C<field>s.
-$Id: Unstructured.pm,v 1.1 2002/03/16 01:26:31 wakaba Exp $
+Perl module for RFC 822/2822 Unstructured C<field>s.
 
 =cut
 
@@ -25,7 +24,7 @@ Return empty address object.
 
 =cut
 
-sub new ($) {
+sub new ($;%) {
   bless {}, shift;
 }
 
@@ -35,7 +34,7 @@ Parse structured C<field-body> contain of C<address-list>.
 
 =cut
 
-sub parse ($$) {
+sub parse ($$;%) {
   my $self = bless {}, shift;
   my $field_body = shift;
   $self->{field_body} = $field_body;

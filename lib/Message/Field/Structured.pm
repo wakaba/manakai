@@ -35,7 +35,7 @@ Return empty Message::Field::Structured object.
 
 =cut
 
-sub new ($) {
+sub new ($;%) {
   bless {}, shift;
 }
 
@@ -45,7 +45,7 @@ Parse structured C<field-body>.
 
 =cut
 
-sub parse ($$) {
+sub parse ($$;%) {
   my $self = bless {}, shift;
   my $field_body = shift;
   $self->{field_body} = $field_body;

@@ -13,7 +13,7 @@ package Message::Field::Address;
 require 5.6.0;
 use strict;
 use re 'eval';
-use vars qw(%REG $VERSION);
+use vars qw(%OPTION %REG $VERSION);
 $VERSION = '1.00';
 
 use overload '@{}' => sub {shift->{address}},
@@ -41,14 +41,39 @@ $REG{M_quoted_string} = qr/\x22((?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\
 
 $REG{NON_atom} = qr/[^\x09\x20\x21\x23-\x27\x2A\x2B\x2D\x2F\x30-\x39\x3D\x3F\x41-\x5A\x5E-\x7E]/;
 
+%OPTION = (
+  is_mailbox	=> -1,
+  is_return_path	=> -1,
+  use_display_name	=> 1,
+  use_group	=> 1,
+);
+
+sub _init_option ($$) {
+  my $self = shift;
+  my $field_name = shift;
+  if ($field_name eq 'from' || $field_name eq 'resent-from') {
+    $self->{option}->{is_mailbox} = 1;
+  } elsif ($field_name eq 'return-path') {
+    $self->{option}->{is_mailbox} = 1;
+    $self->{option}->{is_return_path} = 1;
+    $self->{option}->{use_display_name} = -1;
+  }
+  $self;
+}
+
 =head2 Message::Field::Address->new ()
 
 Return empty address object.
 
 =cut
 
-sub new ($) {
-  bless {type => '_ROOT'}, shift;
+sub new ($;%) {
+  my $self = bless {type => '_ROOT'}, shift;
+  my %option = @_;
+  for (%OPTION) {$option{$_} ||= $OPTION{$_}}
+  $self->{option} = \%option;
+  $self->_init_option ($self->{option}->{field_name});
+  $self;
 }
 
 =head2 Message::Field::Address->parse ($unfolded_field_body)
@@ -57,9 +82,13 @@ Parse structured C<field-body> contain of C<address-list>.
 
 =cut
 
-sub parse ($$) {
+sub parse ($$;%) {
   my $self = bless {}, shift;
   my $field_body = shift;
+  my %option = @_;
+  for (%OPTION) {$option{$_} ||= $OPTION{$_}}
+  $self->{option} = \%option;
+  $self->_init_option ($self->{option}->{field_name});
   $field_body = $self->delete_comment ($field_body);
   my %addr = $self->parse_address_list ($field_body);
   $self->{address} = $addr{address};
@@ -111,15 +140,20 @@ sub add ($$;%) {
   $self;
 }
 
-sub stringify ($) {
+sub stringify ($;%) {
   my $self = shift;
+  my %option = @_;  
+  $option{is_mailbox} ||= $self->{option}->{is_mailbox};
+  $option{is_return_path} ||= $self->{option}->{is_return_path};
+  $option{use_display_name} ||= $self->{option}->{use_display_name};
+  $option{use_group} ||= $self->{option}->{use_group};
   my @return;
   for my $address (@{$self->{address}}) {
     my $return = '';
     next if !$address->{addr_spec} && $address->{type} ne 'group';
-    if ($address->{display_name}) {
+    if ($address->{display_name} && $option{use_display_name}>0) {
       $return = $self->quote_unsafe_string ($address->{display_name})
-        .($address->{type} eq 'group'? ': ': ' ');
+        .($address->{type} eq 'group' && $option{use_group}>0? ': ': ' ');
     }
     if ($address->{type} ne 'group') {
       $return .= '<'.$address->{route}.$address->{addr_spec}.'>';
@@ -129,14 +163,19 @@ sub stringify ($) {
         next unless $mailbox->{addr_spec};
         my $g_return = '';
         $g_return = $self->quote_unsafe_string ($mailbox->{display_name}) .' '
-          if $mailbox->{display_name};
+          if $mailbox->{display_name} && $option{use_display_name}>0;
         $g_return .= '<'.$mailbox->{route}.$mailbox->{addr_spec}.'>';
         push @g_return, $g_return;
+        last if $option{is_mailbox}>0;
       }
       $return .= join ', ', @g_return;
-      $return .= ';' if $address->{type} eq 'group';
+      $return .= ';' if $address->{type} eq 'group' && $option{use_group}>0;
     }
     push @return, $return;
+    last if $option{is_mailbox}>0;
+  }
+  if ($option{is_return_path}>0 && $#return == -1) {
+    push @return, '<>';
   }
   join ', ', @return;
 }
@@ -326,7 +365,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/16 01:26:30 $
+$Date: 2002/03/20 09:56:26 $
 
 =cut
 
