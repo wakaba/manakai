@@ -22,7 +22,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/04/01 07:58:46 $
+      $Date: 2005/04/02 07:43:15 $
     @@ContentType:
       dis:Date.RCS
   
@@ -103,6 +103,20 @@ ResourceTypeDef:
     ManakaiDOM:IF::ManakaiDOM:all
 
 ResourceTypeDef:
+  @QName: AnyExceptionClass
+  @FullName:
+    @@lang:en
+    @@@:
+      Any <QUOTE::exception> class
+  @Description:
+    @@lang:en
+    @@@:
+      Concrete implementations of any type of <QUOTE::exception>,
+      including <QUOTE::error> and <QUOTE::warning>.
+  @rdfs:subClassOf:
+    ManakaiDOM:Class::ManakaiDOM:all
+
+ResourceTypeDef:
   @QName: 
     ManakaiDOM:ExceptionClass
   @FullName:
@@ -113,7 +127,7 @@ ResourceTypeDef:
     @@@:
       A concrete implementation of an exception type.
   @rdfs:subClassOf:
-    ManakaiDOM:Class::ManakaiDOM:all
+    AnyExceptionClass::ManakaiDOM:all
 
 ResourceTypeDef:
   @QName: 
@@ -126,7 +140,7 @@ ResourceTypeDef:
     @@@:
       A warning type (including its implementation).
   @rdfs:subClassOf:
-    ManakaiDOM:Class::ManakaiDOM:all
+    AnyExceptionClass::ManakaiDOM:all
 
 ResourceTypeDef:
   @QName: 
@@ -295,8 +309,7 @@ ElementTypeBinding:
 ResourceDef:
   @QName: 
     ManakaiDOM:ManakaiDOMExceptionOrWarning
-  @rdf:type:
-    ManakaiDOM:Class
+  @rdf:type: AnyExceptionClass
   @AppISA:
     @@ContentType:
       lang:Perl

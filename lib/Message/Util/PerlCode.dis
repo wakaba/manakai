@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/04/01 07:58:46 $
+      $Date: 2005/04/02 07:43:15 $
     @@ContentType:
       dis:Date.RCS
   
@@ -267,36 +267,8 @@ ClsDef:
       @@@PerlDef:
         my $nt = $object->{<Q::pc:nodeType>};
         my $pack;
-        if ($nt eq 'unparsed') {
-          $pack = <ClassName::ManakaiPerlUnparsedCode>;
-        } elsif ($nt eq 'bare') {
-          $pack = <ClassName::ManakaiPerlBare>;
-        } elsif ($nt eq 'atom') {
-          $pack = <ClassName::ManakaiPerlAtom>;
-        } elsif ($nt eq 'variable') {
-          $pack = <ClassName::ManakaiPerlVariable>;
-        } elsif ($nt eq 'inunparsed') {
-          $pack = <ClassName::ManakaiPerlInlineUnparsedCode>;
-        } elsif ($nt eq 'incontainer') {
-          $pack = <ClassName::ManakaiPerlInlineContainer>;
-        } elsif ($nt eq 'statement') {
-          $pack = <ClassName::ManakaiPerlStatement>;
-        } elsif ($nt eq 'string') {
-          $pack = <ClassName::ManakaiPerlStringLiteral>;
-        } elsif ($nt eq 'block') {
-          $pack = <ClassName::ManakaiPerlBlock>;
-        } elsif ($nt eq 'sub') {
-          $pack = <ClassName::ManakaiPerlSub>;
-        } elsif ($nt eq 'package') {
-          $pack = <ClassName::ManakaiPerlPackageScope>;
-        } elsif ($nt eq 'file') {
-          $pack = <ClassName::ManakaiPerlFile>;
-        } else {
-          __ASSERT{DISPerl:invariant::
-            msg => {qq[Node type: "$nt" ].
-                    qq[(ref: "@{[ref $object]}")]},
-          }__;
-        }
+        __CODE{pc:nodeTypeToPackageName::
+                 $nodeType => $nt, $packageName => $pack, $object => $object}__;
         __CODE{ManakaiNode:getNewReference::
                  $object => $object, $ref => $r, $class => $pack}__;
 
@@ -355,6 +327,47 @@ ClsDef:
           }__;
         }
 ##PerlCodeFragment
+
+ResourceDef:
+  @QName: nodeTypeToPackageName
+  @rdf:type:
+    dis2pm:BlockCode
+  @enDesc:
+    Gets Perl class package name from a node type string.
+  @PerlDef:
+        if ($nodeType eq 'unparsed') {
+          $packageName = <ClassName::ManakaiPerlUnparsedCode>;
+        } elsif ($nodeType eq 'bare') {
+          $packageName = <ClassName::ManakaiPerlBare>;
+        } elsif ($nodeType eq 'atom') {
+          $packageName = <ClassName::ManakaiPerlAtom>;
+        } elsif ($nodeType eq 'variable') {
+          $packageName = <ClassName::ManakaiPerlVariable>;
+        } elsif ($nodeType eq 'inunparsed') {
+          $packageName = <ClassName::ManakaiPerlInlineUnparsedCode>;
+        } elsif ($nodeType eq 'incontainer') {
+          $packageName = <ClassName::ManakaiPerlInlineContainer>;
+        } elsif ($nodeType eq 'statement') {
+          $packageName = <ClassName::ManakaiPerlStatement>;
+        } elsif ($nodeType eq 'string') {
+          $packageName = <ClassName::ManakaiPerlStringLiteral>;
+        } elsif ($nodeType eq 'blockcontainer') {
+          $packageName = <ClassName::ManakaiPerlBlockContainer>;
+        } elsif ($nodeType eq 'block') {
+          $packageName = <ClassName::ManakaiPerlBlock>;
+        } elsif ($nodeType eq 'sub') {
+          $packageName = <ClassName::ManakaiPerlSub>;
+        } elsif ($nodeType eq 'package') {
+          $packageName = <ClassName::ManakaiPerlPackageScope>;
+        } elsif ($nodeType eq 'file') {
+          $packageName = <ClassName::ManakaiPerlFile>;
+        } else {
+          __ASSERT{DISPerl:invariant::
+            msg => {qq[Node type: "$nodeType" ].
+                    qq[(ref: "@{[ref $object]}")]},
+          }__;
+        }
+
 
 PropDef:
   @QName: nodeType
@@ -1265,6 +1278,7 @@ ClsDef:
       @@@PerlDef:
         if ({
           unparsed => 1, if => 1, statement => 1, block => 1,
+          blockcontainer => true,
           inunparsed => 1, variable => 1, bare => 1, atom => 1,
           incontainer => 1, string => 1, assign => 1,
         }->{$codeArg->{<Q::TreeCore:node>}->{<Q::pc:nodeType>}}) {
@@ -1561,7 +1575,21 @@ ClsDef:
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
-            Properties: <Q::pc:nodeType>, <Q::pc:code>.
+            Properties: <Q::pc:nodeType>, <Q::pc:code>,
+                        <Q::pc:sourceFile>, <Q::pc:sourceLine>.
+
+  @IntCloneMethod:
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@PerlDef:
+          my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
+                                        ::ManakaiDOM:Perl.new>;
+          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
+          for my $prop (<Q::pc:sourceFile>, <Q::pc:sourceLine>, <Q::pc:code>) {
+            $node->{$prop} = $nodeObject->{$prop};
+          }
+          $node->{<Q::pc:nodeType>} = 'unparsed';
 
   @Attr:
     @@Name: code
@@ -1618,12 +1646,12 @@ ClsDef:
         my $node = $self->{<Q::TreeCore:node>};
         __DEEP{
           my $file = $self-><AG::ManakaiPerlCodeFragment.fileNode>;
-          $r = sprintf (qq<\n#line %d "%s (Chunk %d)"\n>,
+          $r = sprintf (qq<\n#line %d "%s (Chunk #%d)"\n>,
                         $node->{<Q::pc:sourceLine>},
                         $node->{<Q::pc:sourceFile>},
                         $file-><M::ManakaiPerlFile.getNextChunkNumber>)
              . $node->{<Q::pc:code>}
-             . sprintf (qq<\n#line 1 "%s (Chunk %d)"\n>,
+             . sprintf (qq<\n#line 1 "%s (Chunk #%d)"\n>,
                         $file-><AG::ManakaiPerlFile.sourceFile>,
                         $file-><M::ManakaiPerlFile.getNextChunkNumber>);
         }__;
@@ -1661,6 +1689,19 @@ ClsDef:
           @@@@@lang:en
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:code>.
+
+  @IntCloneMethod:
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@PerlDef:
+          my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
+                                        ::ManakaiDOM:Perl.new>;
+          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
+          for my $prop (<Q::pc:code>) {
+            $node->{$prop} = $nodeObject->{$prop};
+          }
+          $node->{<Q::pc:nodeType>} = 'inunparsed';
 
   @Attr:
     @@Name: code
@@ -1718,6 +1759,19 @@ ClsDef:
           @@@@@lang:en
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::infoset:data>.
+
+  @IntCloneMethod:
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@PerlDef:
+          my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
+                                        ::ManakaiDOM:Perl.new>;
+          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
+          for my $prop (<Q::infoset:data>) {
+            $node->{$prop} = $nodeObject->{$prop};
+          }
+          $node->{<Q::pc:nodeType>} = 'string';
 
   @Attr:
     @@Name: data
@@ -1780,6 +1834,19 @@ ClsDef:
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:code>.
 
+  @IntCloneMethod:
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@PerlDef:
+          my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
+                                        ::ManakaiDOM:Perl.new>;
+          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
+          for my $prop (<Q::pc:code>) {
+            $node->{$prop} = $nodeObject->{$prop};
+          }
+          $node->{<Q::pc:nodeType>} = 'bare';
+
   @Attr:
     @@Name: code
     @@enDesc:
@@ -1837,6 +1904,19 @@ ClsDef:
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:code>.
 
+  @IntCloneMethod:
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@PerlDef:
+          my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
+                                        ::ManakaiDOM:Perl.new>;
+          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
+          for my $prop (<Q::pc:code>) {
+            $node->{$prop} = $nodeObject->{$prop};
+          }
+          $node->{<Q::pc:nodeType>} = 'atom';
+
   @ToStringMethod:
     @@Return:
       @@@Type:
@@ -1886,7 +1966,21 @@ ClsDef:
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:variableType>,
               <Q::packageName>, <Q::localName> (required),
-              <Q::variableScope>.
+              <Q::variableScope>, <Q::hashKey>.
+
+  @IntCloneMethod:
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@PerlDef:
+          my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
+                                        ::ManakaiDOM:Perl.new>;
+          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
+          for my $prop (<Q::pc:variableType>, <Q::packageName>,
+                        <Q::localName>, <Q::variableScope>, <Q::hashKey>) {
+            $node->{$prop} = $nodeObject->{$prop};
+          }
+          $node->{<Q::pc:nodeType>} = 'variable';
 
   @Attr:
     @@Name: variableType
@@ -2152,7 +2246,29 @@ ClsDef:
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
-            Properties: <Q::pc:nodeType>, <Q::pc:childNodes>.
+            Properties: <Q::pc:nodeType>, <Q::pc:childNodes>, <Q::pc:parent>.
+
+  @IntCloneMethod:
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@PerlDef:
+          my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
+                                        ::ManakaiDOM:Perl.new>;
+          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
+          $node->{<Q::pc:nodeType>} = 'statement';
+          $node->{<Q::pc:childNodes>} = [];
+          for my $cno (@{$nodeObject->{<Q::pc:childNodes>}}) {
+            my $pack;
+            my $nt = $cno->{<Q::pc:nodeType>};
+            __CODE{pc:nodeTypeToPackageName::
+                     $nodeType => $nt, $packageName => $pack, $object => $cno}__;
+                                 ## NOTE: Method name written directly
+            my $cno_clone = $pack->_make_clone_object;
+            push @{$node->{<Q::pc:childNodes>}}, $cno_clone;
+            $cno_clone->{<Q::pc:parent>} = $node;
+            ## NOTE: Tree ID is not updated yet.
+          }
 
   @ToStringMethod:
     @@Return:
@@ -2196,7 +2312,30 @@ ClsDef:
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
-            Properties: <Q::pc:nodeType>, <Q::pc:childNodes>.
+            Properties: <Q::pc:nodeType>, <Q::pc:childNodes>,
+                  <Q::pc:parent>.
+
+  @IntCloneMethod:
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@PerlDef:
+          my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
+                                        ::ManakaiDOM:Perl.new>;
+          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
+          $node->{<Q::pc:nodeType>} = 'incontainer';
+          $node->{<Q::pc:childNodes>} = [];
+          for my $cno (@{$nodeObject->{<Q::pc:childNodes>}}) {
+            my $pack;
+            my $nt = $cno->{<Q::pc:nodeType>};
+            __CODE{pc:nodeTypeToPackageName::
+                     $nodeType => $nt, $packageName => $pack, $object => $cno}__;
+                                 ## NOTE: Method name written directly
+            my $cno_clone = $pack->_make_clone_object;
+            push @{$node->{<Q::pc:childNodes>}}, $cno_clone;
+            $cno_clone->{<Q::pc:parent>} = $node;
+            ## NOTE: Tree ID is not updated yet.
+          }
 
   @Method:
     @@Name: appendCodeFragment
@@ -2321,7 +2460,31 @@ ClsDef:
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
-            Properties: <Q::pc:nodeType>, <Q::pc:childNodes>, <Q::pc:label>.
+            Properties: <Q::pc:nodeType>, <Q::pc:childNodes>, <Q::pc:label>,
+                <Q::pc:parent>.
+
+  @IntCloneMethod:
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@PerlDef:
+          my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
+                                        ::ManakaiDOM:Perl.new>;
+          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
+          $node->{<Q::pc:nodeType>} = 'block';
+          $node->{<Q::pc:childNodes>} = [];
+          for my $cno (@{$nodeObject->{<Q::pc:childNodes>}}) {
+            my $pack;
+            my $nt = $cno->{<Q::pc:nodeType>};
+            __CODE{pc:nodeTypeToPackageName::
+                     $nodeType => $nt, $packageName => $pack, $object => $cno}__;
+                                 ## NOTE: Method name written directly
+            my $cno_clone = $pack->_make_clone_object ($cno);
+            push @{$node->{<Q::pc:childNodes>}}, $cno_clone;
+            $cno_clone->{<Q::pc:parent>} = $node;
+            ## NOTE: Tree ID is not updated yet.
+          }
+          $node->{<Q::pc:label>} = $nodeObject->{<Q::pc:label>};
 
   @ToStringMethod:
     @@Return:
@@ -2330,18 +2493,140 @@ ClsDef:
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
-        for my $cno (@{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}}) {
-          my $cn = <ClassM::ManakaiPerlCodeFragment.getNodeReference> ($cno);
-          if ($cno->{<Q::pc:nodeType>} eq 'incontainer' and
-   \          @{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}} == 1) {
-            $r .= '(' . $cn->stringify . ')';
-          } else {
-            $r .= $cn->stringify;
+        my $node = $self->{<Q::TreeCore:node>};
+        if (@{$node->{<Q::pc:childNodes>}} == 1 and
+            $node->{<Q::pc:childNodes>}->[0]->{<Q::pc:nodeType>} eq 'block') {
+          my $cn;
+          __CODE{ManakaiNode:getWeakReference::
+                     $object => {$node->{<Q::pc:childNodes>}->[0]},
+                     $ref => $cn,
+                     $class => {<ClassName::ManakaiPerlBlock>}}__;
+          $r = $cn->stringify;
+        } else {
+          for my $cno (@{$node->{<Q::pc:childNodes>}}) {
+            my $cn = <ClassM::ManakaiPerlCodeFragment.getNodeReference> ($cno);
+            if ($cno->{<Q::pc:nodeType>} eq 'incontainer' and
+   \            @{$node->{<Q::pc:childNodes>}} == 1) {
+              $r .= '(' . $cn->stringify . ')';
+            } else {
+              $r .= $cn->stringify;
+            }
           }
+          __DEEP{
+            my $file = $self-><AG::ManakaiPerlCodeFragment.fileNode>;
+            $r = sprintf (qq<\n{\n#line %d "%s (Chunk #%d)"\n>,
+                          $node->{<Q::pc:sourceLine>},
+                          $node->{<Q::pc:sourceFile>},
+                          $file-><M::ManakaiPerlFile.getNextChunkNumber>)
+               . $r
+               . sprintf (qq<\n#line 1 "%s (Chunk #%d)"\n}\n>,
+                          $file-><AG::ManakaiPerlFile.sourceFile>,
+                          $file-><M::ManakaiPerlFile.getNextChunkNumber>);
+          }__;
         }
-        $r = '{' . $r . '}';
 
 ##PerlBlock
+
+ClsDef:
+  @ClsQName: ManakaiPerlBlockContainer
+  @ClsISA: ManakaiPerlStatementContainer
+  @enDesc:
+    Perl block-level code container whose content may or may
+    not semantically be self-contained. 
+  
+  @IntMethod:
+    @@Name:newObject
+    @@ManakaiDOM:isStatic:1
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates a new instance object for
+        <Class::ManakaiPerlBlockContainer>. 
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The newly created node object.
+      @@@PerlDef:
+        @@@@@:
+          my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
+                                        ::ManakaiDOM:Perl.new>;
+          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
+          $node->{<Q::pc:childNodes>} = [];
+          $node->{<Q::pc:nodeType>} = 'blockcontainer';
+        @@@@ImplNote:
+          @@@@@lang:en
+          @@@@@@:
+            Properties: <Q::pc:nodeType>, <Q::pc:childNodes>, <Q::pc:label>,
+                <Q::pc:parent>.
+
+  @IntCloneMethod:
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@PerlDef:
+          my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
+                                        ::ManakaiDOM:Perl.new>;
+          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
+          $node->{<Q::pc:nodeType>} = 'blockcontainer';
+          $node->{<Q::pc:childNodes>} = [];
+          for my $cno (@{$nodeObject->{<Q::pc:childNodes>}}) {
+            my $pack;
+            my $nt = $cno->{<Q::pc:nodeType>};
+            __CODE{pc:nodeTypeToPackageName::
+                     $nodeType => $nt, $packageName => $pack, $object => $cno}__;
+                                 ## NOTE: Method name written directly
+            my $cno_clone = $pack->_make_clone_object ($cno);
+            push @{$node->{<Q::pc:childNodes>}}, $cno_clone;
+            $cno_clone->{<Q::pc:parent>} = $node;
+            ## NOTE: Tree ID is not updated yet.
+          }
+          $node->{<Q::pc:label>} = $nodeObject->{<Q::pc:label>};
+
+  @ToStringMethod:
+    @@Return:
+      @@@Type:
+        DISLang:String
+      @@@enDesc:
+        Perl code. 
+      @@@PerlDef:
+        my $node = $self->{<Q::TreeCore:node>};
+        if (@{$node->{<Q::pc:childNodes>}} == 1 and
+            {
+              block => true, blockcontainer => true,
+            }->{$node->{<Q::pc:childNodes>}->[0]->{<Q::pc:nodeType>}}) {
+          my $cn;
+          __CODE{ManakaiNode:getWeakReference::
+                     $object => {$node->{<Q::pc:childNodes>}->[0]},
+                     $ref => $cn,
+                     $class => {<ClassName::ManakaiPerlBlock>}}__;
+          $r = $cn->stringify;
+        } else {
+          for my $cno (@{$node->{<Q::pc:childNodes>}}) {
+            my $cn = <ClassM::ManakaiPerlCodeFragment.getNodeReference> ($cno);
+            if ($cno->{<Q::pc:nodeType>} eq 'incontainer' and
+   \            @{$node->{<Q::pc:childNodes>}} == 1) {
+              $r .= '(' . $cn->stringify . ')';
+            } else {
+              $r .= $cn->stringify;
+            }
+          }
+          __DEEP{
+            my $file = $self-><AG::ManakaiPerlCodeFragment.fileNode>;
+            $r = sprintf (qq<\n#line %d "%s (Chunk #%d)"\n>,
+                          $node->{<Q::pc:sourceLine>},
+                          $node->{<Q::pc:sourceFile>},
+                          $file-><M::ManakaiPerlFile.getNextChunkNumber>)
+               . $r
+               . sprintf (qq<\n#line 1 "%s (Chunk #%d)"\n>,
+                          $file-><AG::ManakaiPerlFile.sourceFile>,
+                          $file-><M::ManakaiPerlFile.getNextChunkNumber>);
+          }__;
+        }
+
+##PerlBlockContainer
 
 PropDef:
   @QName:label
@@ -2715,6 +3000,22 @@ ClsDef:
                    $object => $r, $ref => $r,
                    $class => {<ClassName::ManakaiPerlBlock>}}__;
         }__;
+
+  @Method:
+    @@Name: createPerlBlockContainer
+    @@enDesc:
+      Creates a new <Class::ManakaiPerlBlockContainer> object. 
+    @@Return:
+      @@@Type:ManakaiPerlBlockContainer
+      @@@enDesc: 
+        Newly created Perl code object. 
+      @@@PerlDef:
+        __DEEP{
+          $r = <ClassM::ManakaiPerlBlockContainer.newObject>;
+          __CODE{ManakaiNode:getNewReference::
+                   $object => $r, $ref => $r,
+                   $class => {<ClassName::ManakaiPerlBlockContainer>}}__;
+        }__;
 ##PerlCodeImplementation
 
 ResourceDef:
@@ -2951,6 +3252,68 @@ ElementTypeBinding:
       @@@lang:en
       @@@@:
         Returns the textual Perl source code representation of this object. 
+
+
+ElementTypeBinding:
+  @Name: IntCloneMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Method
+    @@Name: makeCloneObject
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns the node object of a deep clone of a node object.
+    @@ManakaiDOM:isStatic:1
+    @@ManakaiDOM:isForInternal:1
+    @@ResourceDef:
+      @@@rdf:type:
+        DISLang:MethodParameter
+      @@@Name: nodeObject
+      @@@Type: 
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@Description:
+        @@@@lang:en
+        @@@@@: Node object to copy.
+  @ShadowSibling:
+    @@ResourceDef:
+      @@@rdf:type:
+        DISLang:Method
+      @@@Operator:
+        @@@@@:
+          DISPerl:CloneMethod
+        @@@@ContentType:
+          dis:TypeQName
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Generates a deep clone of this node and returns it.
+      @@@ResourceDef:
+        @@@@rdf:type:
+          DISLang:MethodReturn
+        @@@@Type: ManakaiPerlCodeFragment
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: 
+            The newly created clone node.
+            \
+            {NOTE:: The <A::.parentNode> attribute of the clone
+                    is set to <DOM::null>.
+            \
+            }
+        @@@@Def:
+          @@@@@ContentType:
+            lang:Perl
+          @@@@@@:
+                            ## NOTE: Method name directly written
+            my $ro = $self->_make_clone_object ($self->{<Q::TreeCore:node>});
+            $ro-><M::ManakaiDOM:ManakaiDOMNodeObject
+                   ::ManakaiDOM:Perl.changeTreeID>
+                                 (<Code::ManakaiDOM:generateUniqueID
+                                       ::ManakaiDOM:Perl>);
+            $r = <ClassM::ManakaiPerlCodeFragment.getNodeReference> ($ro);
 
 ElementTypeBinding:
   @Name: IntMethod

@@ -15,7 +15,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/04/01 07:58:46 $
+      $Date: 2005/04/02 07:43:16 $
     @@ContentType:
       dis:Date.RCS
   
@@ -109,6 +109,17 @@ ElementTypeBinding:
 ## -- Common Programming Language Constructs
 
 ResourceTypeDef:
+  @QName: AnyClass
+  @FullName:
+    @@lang:en
+    @@@:
+      Class or Interface
+  @Description:
+    @@lang:en
+    @@@:
+      Any kind of class or something similar to it, including interface.
+
+ResourceTypeDef:
   @QName: 
     ManakaiDOM:IF
   @FullName:
@@ -118,6 +129,7 @@ ResourceTypeDef:
     @@lang:en
     @@@:
       Interfaces in programming languages. 
+  @rdfs:subClassOf: AnyClass
 
 ResourceTypeDef:
   @QName: 
@@ -129,6 +141,7 @@ ResourceTypeDef:
     @@lang:en
     @@@:
       Classes in programming languages. 
+  @rdfs:subClassOf: AnyClass
 
 ForDef:
   @QName:
