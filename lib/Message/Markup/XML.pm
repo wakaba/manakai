@@ -17,8 +17,8 @@ markup constructures.  (SuikaWiki is not "tiny"?  Oh, yes, I see:-))
 
 package SuikaWiki::Markup::XML;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
-use overload '""' => \&stringify,
+our $VERSION = do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use overload '""' => \&outer_xml,
              fallback => 1;
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXML_NCNameStartChar InXMLNCNameChar!;
 our %Namespace_URI_to_prefix = (
@@ -175,6 +175,13 @@ sub append_baretext ($$;%) {
   my $self = shift;
   my $s = shift;
   $self->append_new_node (type => '#xml', value => $s);
+}
+
+sub remove_child_node ($$) {
+  my ($self, $node) = @_;
+  return unless ref $node;
+  $node = overload::StrVal ($node);
+  $self->{node} = [grep { overload::StrVal ($_) ne $node } @{$self->{node}}];
 }
 
 =item $attr_node = $x->get_attribute ($local_name, %options)
@@ -452,6 +459,55 @@ sub qname ($) {
   undef;
 }
 
+sub merge_external_subset ($) {
+  my $self = shift;
+  unless ($self->{type} eq '#declaration' && $self->{namespace_uri} eq $NS{SGML}.'doctype') {
+    return unless $self->{type} eq '#document' || $self->{type} eq '#fragment';
+    for (@{$self->{node}}) {
+      $_->merge_external_subset;
+    }
+    return;
+  }
+  my $xsub = $self->get_attribute ('external-subset');
+  return unless ref $xsub;
+  for (@{$xsub->{node}}) {
+    $_->{parent} = $self;
+  }
+  push @{$self->{node}}, @{$xsub->{node}};
+  $self->remove_child_node ($xsub);
+  $self->remove_child_node ($self->get_attribute ('PUBLIC'));
+  $self->remove_child_node ($self->get_attribute ('SYSTEM'));
+  $self->remove_marked_section;
+}
+
+sub remove_marked_section ($) {
+  my $self = shift;
+  my @node;
+  for (@{$self->{node}}) {
+    $_->remove_marked_section;
+  }
+  for (@{$self->{node}}) {
+    if ($_->{type} ne '#section') {
+      push @node, $_;
+    } else {
+      my $status = $_->get_attribute ('status', make_new_node => 1)->inner_text;
+      if ($status eq 'CDATA') {
+        $_->{type} = '#text';
+        $_->remove_child_node ($_->get_attribute ('status'));
+        push @node, $_;
+      } elsif ($status ne 'IGNORE') {	# INCLUDE
+        for my $e (@{$_->{node}}) {
+          if ($e->{type} ne '#attribute') {
+            $e->{parent} = $self;
+            push @node, $e;
+          }
+        }
+      }
+    }
+  }
+  $self->{node} = \@node;
+}
+
 sub remove_references ($) {
   my $self = shift;
   my @node;
@@ -599,13 +655,7 @@ sub start_tag ($) {
     }
     $r;
   } elsif ($self->{type} eq '#section') {
-    if (ref $self->{local_name} && $self->{local_name}->{type} eq '#reference') {
-      '<![' . $self->{local_name} . '[';
-    } elsif ($self->_check_ncname ($self->{local_name})) {
-      '<![' . $self->{local_name} . '[';
-    } else {	# error
-      '';
-    }
+    '<![';
   } else {
     '';
   }
@@ -633,13 +683,7 @@ sub end_tag ($) {
   } elsif ($self->{type} eq '#declaration' && $self->_check_ncname ($self->{local_name})) {
     '>';
   } elsif ($self->{type} eq '#section') {
-    if (ref $self->{local_name} && $self->{local_name}->{type} eq '#reference') {
-      ']]>';
-    } elsif ($self->_check_ncname ($self->{local_name})) {
-      ']]>';
-    } else {	# error
-      '';
-    }
+    ']]>';
   } else {
     '';
   }
@@ -770,10 +814,11 @@ sub external_id ($;%) {
         }
       }
       my $r = '';
-      if (length $pubid) {
+      if (defined $pubid) {
         $pubid =~ s|([^\x0A\x0D\x20A-Za-z0-9'()+,./:=?;!*#\@\$_%-])|sprintf '%%%02X', ord $1|ges;
+        $pubid = '"' . $pubid . '"';
       }
-      if (length $sysid) {
+      if (defined $sysid) {
         if ($sysid =~ /"/) {
           if ($sysid =~ /'/) {
             $sysid =~ s/"/&quot;/; $sysid = '"' . $sysid . '"';
@@ -785,11 +830,11 @@ sub external_id ($;%) {
         }
       }
       if ($pubid && $sysid) {
-        $r = 'PUBLIC "' . $pubid . '" ' . $sysid;
+        $r = 'PUBLIC ' . $pubid . ' ' . $sysid;
       } elsif ($sysid) {
         $r = 'SYSTEM ' . $sysid;
       } elsif ($pubid && $o{allow_pubid_only}) {
-        $r = 'PUBLIC "' . $pubid . '"';
+        $r = 'PUBLIC ' . $pubid;
       }
   if ($r && $ndata && $o{use_ndata}) {
     $r .= ' NDATA ' . $ndata;
@@ -896,9 +941,9 @@ sub inner_xml ($;%) {
         }
       }
       $r = $root . ' ' . $r;
-    } elsif ($self->{namespace_uri} eq 'urn:x-suika-fam-cx:markup:sgml:entity'
-          || $self->{namespace_uri} eq 'urn:x-suika-fam-cx:markup:sgml:entity:parameter'
-          || $self->{namespace_uri} eq 'urn:x-suika-fam-cx:markup:sgml:notation') {
+    } elsif ($self->{namespace_uri} eq $NS{SGML}.'entity'
+          || $self->{namespace_uri} eq $NS{SGML}.'entity:parameter'
+          || $self->{namespace_uri} eq $NS{SGML}.'notation') {
       my %xid_opt;
       $r = $self->{local_name} . ' ' if !$self->{flag}->{smxp__defined_with_param_ref}
                                         && $self->_check_ncname ($self->{local_name});
@@ -920,8 +965,9 @@ sub inner_xml ($;%) {
         if ($entity_value) {	# <!ENTITY foo "bar">
           $r .= $entity_value->entity_value;
         } else {	## Parameter entity reference
-          $r .= $self->{value};
-          for (@{$self->{node}}) {
+          my $isc = $self->_is_same_class ($self->{value});
+          $r .= $self->{value} unless $isc;
+          for (($isc?$self->{value}:()), @{$self->{node}}) {
             $r .= $_->outer_xml unless $_->{type} eq '#attribute';
           }
         }
@@ -970,9 +1016,37 @@ sub inner_xml ($;%) {
           $r .= $_->outer_xml;
         }
     }
-  } elsif ($self->{type} eq '#section' && !ref $self->{local_name} && $self->{local_name} eq 'CDATA') {
-    $r = $self->inner_text;
-    $r =~ s/]]>/]]>]]<![CDATA[>/g;
+  } elsif ($self->{type} eq '#section') {
+    my $status = $self->get_attribute ('status', make_new_node => 1)->inner_text;
+    if ($status eq 'CDATA') {
+      $r = $self->inner_text;
+      $r =~ s/]]>/]]>]]<![CDATA[>/g;
+      $r = 'CDATA['.$r;
+    } else {
+      my $sl = $self->get_attribute ('status_list', make_new_node => 1);
+      if ($sl->{flag}->{smxp__defined_with_param_ref}) {
+        my $isc = $self->_is_same_class ($self->{value});
+        $status = '';
+        $status = $sl->{value} unless $isc;
+        for (($isc?$sl->{value}:()), @{$sl->{node}}) {
+          $status .= $_->outer_xml unless $_->{type} eq '#attribute';
+        }
+        $r = $status.'['.$r;
+      } elsif ($status) {
+        $r = $status.'['.$r;
+      } else {
+        ## Must be an ignored section
+      }
+      my $isc = $self->_is_same_class ($self->{value});
+      $r .= join '', map {s/\]\]>/]]&gt;/g; $_} $self->{value} unless $isc;
+      for (($isc?$self->{value}:()), @{$self->{node}}) {
+        if ($_->{type} eq '#text') {
+          $r .= join '', map {s/\]\]>/]]&gt;/g; $_} $_->inner_text;	## Anyway, this is error
+        } elsif ($_->{type} ne '#attribute') {
+          $r .= $_->outer_xml;
+        }
+      }
+    }
   } else {
     if ($self->{type} ne '#xml') {
       $r = $self->_entitize ($self->{value});
@@ -1086,8 +1160,28 @@ sub inner_text ($;%) {
   $r;
 }
 
-{no warnings;	# prototype mismatch
-*stringify = \&outer_xml;
+sub _is_same_class ($$) {
+  my ($self, $something) = @_;
+  return 0 if !ref $something
+           || ref ($something) eq 'ARRAY'
+           || ref ($something) eq 'HASH'
+           || ref ($something) eq 'CODE';
+  if (eval q{$self->_CLASS_NAME eq $something->_CLASS_NAME}) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+sub root_node ($) {
+  my $self = shift;
+  if ($self->{type} eq '#document') {
+    return $self;
+  } elsif (ref $self->{parent}) {
+    return $self->{parent}->root_node;
+  } else {
+    return $self;
+  }
 }
 
 sub _get_entity_manager ($) {
@@ -1267,4 +1361,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/06/27 13:07:44 $
+1; # $Date: 2003/06/29 08:34:36 $

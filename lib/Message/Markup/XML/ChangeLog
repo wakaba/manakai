@@ -1,3 +1,10 @@
+2003-06-29  Wakaba  <w@suika.fam.cx>
+
+	* Parser.pm (_parse_document_entity, _parse_ignored_section): New.
+	* Error.pm: New errors related to marked section.
+	* EntityManager.pm (get_entity, get_entities): Bug fixes and caching.
+	(is_standalone_document): New function.
+
 2003-06-27  Wakaba  <w@suika.fam.cx>
 
 	* Parser.pm: Give entity type before EntityManager->get_external_entity is called.

@@ -16,7 +16,7 @@ This module is part of SuikaWiki XML support.
 
 package SuikaWiki::Markup::XML::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## Prefixes:
 ## - 'SYNTAX_':	don't match with XML 1.0 EBNF rules
@@ -45,6 +45,18 @@ my %_Error = (
 	## Syntax errors
 	SYNTAX_DATA_OUT_OF_ROOT_ELEMENT	=> {
 		description	=> 'Invalid data or markup out of root element',
+		level	=> 'wfc',
+	},
+	SYNTAX_DOCTYPE_NAME_NOT_FOUND	=> {
+		description	=> 'Document type name must be specified in the document type declaration',
+		level	=> 'wfc',
+	},
+	SYNTAX_DOCTYPE_PID_LITERAL_NOT_FOUND	=> {
+		description	=> 'Minimum literal for the public identifier must follow the keyword PUBLIC',
+		level	=> 'wfc',
+	},
+	SYNTAX_DOCTYPE_SYSID_LITERAL_NOT_FOUND	=> {
+		description	=> 'Literal of the system identifier must follow the keyword SYSTEM or the minimum literal of the public identifier in XML',
 		level	=> 'wfc',
 	},
 	SYNTAX_END_OF_MARKUP_NOT_FOUND	=> {
@@ -130,8 +142,36 @@ my %_Error = (
 		description	=> 'System identifier is required by this type of declaration',
 		level	=> 'wfc',
 	},
+	SYNTAX_MS_IN_INTERNAL_SUBSET	=> {
+		description	=> 'Marked section cannot be used in the internal subset of the DTD in XML',
+		level	=> 'wfc',
+	},
+	SYNTAX_MS_INVALID_STATUS_STRING	=> {
+		description	=> 'Invalid string in the status keyword list',
+		level	=> 'wfc',
+	},
+	SYNTAX_MS_MULTIPLE_STATUS	=> {
+		description	=> 'Multiple status keyword (%s) cannot be used',
+		level	=> 'wfc',
+	},
+	SYNTAX_MS_NO_STATUS_KEYWORD	=> {
+		description	=> 'No status keyword found',
+		level	=> 'wfc',
+	},
+	SYNTAX_MS_NON_XML_STATUS	=> {
+		description	=> 'This status keyword (%s) cannot be used in XML',
+		level	=> 'wfc',
+	},
+	SYNTAX_MS_UNKNOWN_STATUS	=> {
+		description	=> 'Unknown status keyword (%s) is used',
+		level	=> 'wfc',
+	},
 	SYNTAX_PE_NDATA	=> {
 		description	=> 'Parameter entity must be a parsed entity',
+		level	=> 'wfc',
+	},
+	SYNTAX_ROOT_ELEMENT_NOT_FOUND	=> {
+		description	=> 'There is no root element (type = %s) in this document entity',
 		level	=> 'wfc',
 	},
 	SYNTAX_XML_DECLARE	=> {
@@ -209,7 +249,7 @@ my %_Error = (
 		level	=> 'fatal',
 	},
 	FATAL_ERR_PREDEFINED_ENTITY	=> {
-		description	=> 'Predefined entity (%s) must be declared as of the XML specification defined (%s)',
+		description	=> 'Predefined entity (%s := %s) must be declared as of the XML specification defined',
 		level	=> 'fatal',
 	},
 	## Validity error
@@ -219,6 +259,10 @@ my %_Error = (
 	},
 	VC_NOTATION_DECLARED	=> {
 		description	=> 'Notation %s should (or must to be valid) be declared',
+		level	=> 'vc',
+	},
+	VC_ROOT_ELEMENT_TYPE	=> {
+		description	=> 'Document type name (%s) and element type name of the root element (%s) should (or must to be valid) match',
 		level	=> 'vc',
 	},
 	VC_UNIQUE_NOTATION_NAME	=> {
@@ -235,15 +279,20 @@ my %_Error = (
 		level	=> 'nswfc',
 	},
 	## Namespace validity error
-	## XML warning
+	## XML (non-fatal) error
 	ERR_EXT_ENTITY_NOT_FOUND	=> {
 		description	=> 'External entity (%s == <%s>) cannot be retrived (%s)',
 		level	=> 'vc',
 	},
-	ERR_SYSID_HAS_FRAGMENT	=> {
+	ERR_XML_NDATA_REF_IN_ENTITY_VALUE	=> {
+		description	=> 'Unparsed entity (%s) cannot be referred in EntityValue',
+		level	=> 'warn',	## Was fatal error but refined by SE Errata
+	},
+	ERR_XML_SYSID_HAS_FRAGMENT	=> {
 		description	=> 'URI Reference converted from system identifier should not have the fragment identifier (%s)',
 		level	=> 'warn',
 	},
+	## XML warning
 	WARN_PREDEFINED_ENTITY_NOT_DECLARED	=> {
 		description	=> 'Predefined general entity (%s) should be declared before it is referred for interoperability',
 		level	=> 'warn',
@@ -297,6 +346,18 @@ my %_Error = (
 		level	=> 'warn',
 	},
 	## Implementation's warning
+	WARN_DOCTYPE_NOT_FOUND	=> {
+		description	=> 'No document type definition provided for this document',
+		level	=> 'warn',
+	},
+	WARN_ENTITY_DECLARATION_NOT_PROCESSED	=> {
+		description	=> 'This entity declaration is not processed because unread parameter entity is referred before this declaration',
+		level	=> 'warn',
+	},
+	WARN_EXTERNALLY_DEFINED_ENTITY_REFERRED	=> {
+		description	=> 'The entity referred (%s) is declared in the external entity, so different groove can be constructed when external entity is not read',
+		level	=> 'warn',
+	},
 	WARN_GUESS_ENCODING_IMPL_ERR	=> {
 		description	=> 'Guessing encoding procedure cause some error (%s)',
 		level	=> 'warn',
@@ -325,6 +386,14 @@ my %_Error = (
 		description	=> q(Neither upper level protocol nor XML's encoding declaration provide encoding scheme information (or cannot read the encoding declaration because of lack of guessability)),
 		level	=> 'warn',
 	},
+	WARN_PI_TARGET_NOTATION	=> {
+		description	=> 'Target name of the process instruction (%s) should be declared as a notation name to ensure interoperability',
+		level	=> 'warn',
+	},
+	WARN_PID_EMPTY	=> {
+		description	=> 'Public identifier is empty',
+		level	=> 'warn',
+	},
 	WARN_PID_IS_INVALID_URN	=> {
 		description	=> 'Public identifier (%s) seems an invalid URN',
 		level	=> 'warn',
@@ -339,6 +408,10 @@ my %_Error = (
 	},
 	WARN_PID_IS_URN_WITH_RESERVED_CHAR	=> {
 		description	=> 'Public identifier (%s) seems a URN and it contains one or more reserved character ("/" and/or "?") which should not be used',
+		level	=> 'warn',
+	},
+	WARN_SYSID_EMPTY	=> {
+		description	=> 'System identifier is empty, in most case it is wrong',
 		level	=> 'warn',
 	},
 	WARN_XML_DECLARE_NO_VERSION_ATTR	=> {
@@ -363,7 +436,7 @@ sub raise ($$%) {
   $error_msg = sprintf $error_msg, @err_msg;
   $error_msg = "Line $o->{line}, position $o->{pos}: " . $error_msg;
   $error_msg = 'Entity '.($err{entity}||$o->{entity}) . ": " . $error_msg if ($err{entity}||$o->{entity});
-  $error_msg = '<'.($o->{uri}) . ">: " . $error_msg if length $o->{uri};
+  $error_msg = '<'.($o->{uri}) . ">: " . $error_msg ;#if defined $o->{uri};
   require Carp;
   Carp::carp ($error_msg);
   #Carp::croak ("Line $o->{line}, position $o->{pos}: ".$error_msg);
@@ -378,4 +451,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/06/27 13:05:57 $
+1; # $Date: 2003/06/29 08:34:37 $

@@ -21,7 +21,7 @@ This module is part of SuikaWiki XML support.
 
 package SuikaWiki::Markup::XML::EntityManager;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 my %NS = (
 	SGML	=> 'urn:x-suika-fam-cx:markup:sgml:',
@@ -39,8 +39,31 @@ sub new ($$) {
   $self;
 }
 
-## TODO: is this result cachable?
-sub get_entity ($$%) {
+sub set_doctype_node ($$) {
+  $_[0]->{doctype} = $_[1];
+}
+
+sub is_declared_entity ($$;%) {
+  my ($self, $name, %o) = @_;
+  if (ref $name) {
+    $o{namespace_uri} ||= $name->{namespace_uri};
+    $name = $name->{local_name};
+  } else {
+    $o{namespace_uri} ||= $NS{SGML}.'entity';
+  }
+  $self->{cache}->{is_declared_entity}->{$o{namespace_uri}} = {} if $o{clear_cache};
+  $self->{cache}->{is_declared_entity}->{$o{namespace_uri}}->{$name} = $o{set_value}
+    if defined $o{set_value};
+  unless (defined $self->{cache}->{is_declared_entity}->{$o{namespace_uri}}->{$name}) {
+    if ($o{seek}) {
+      $self->{cache}->{is_declared_entity}->{$o{namespace_uri}}->{$name}
+        = $self->get_entity ($name, %o) ? 1 : 0;
+    }
+  }
+  $self->{cache}->{is_declared_entity}->{$o{namespace_uri}}->{$name};
+}
+
+sub get_entity ($$;%) {
   my ($self, $name, %o) = @_;
   if (ref $name) {
     $o{namespace_uri} ||= $name->{namespace_uri};
@@ -65,16 +88,39 @@ sub get_entity ($$%) {
       }
     }
   }
-  $self->_get_entity ($name, $self->{doctype}->{node}, \%o);
+  $self->{cache}->{entity_declaration}->{$o{namespace_uri}} = {} if $o{clear_cache};
+  my $e = $self->{cache}->{entity_declaration}->{$o{namespace_uri}}->{$name};
+  return $e if ref $e;print qq#$name\n#;
+  $e = $self->_get_entity ($name, $self->{doctype}->{node}, \%o);
+  if (ref $e) {
+    $self->{cache}->{entity_declaration}->{$o{namespace_uri}}->{$name} = $e;
+    return $e;
+  }
+  return undef unless ref $self->{doctype};
+  my $xsub = $self->{doctype}->get_attribute ('external-subset');
+  if (ref $xsub) {
+    $e = $self->_get_entity ($name, $xsub->{node}, \%o);
+    if (ref $e) {
+      $self->{cache}->{entity_declaration}->{$o{namespace_uri}}->{$name} = $e;
+      return $e;
+    }
+  }
+  return undef;
 }
 sub _get_entity ($$$$) {
   my ($self, $name, $nodes, $o) = @_;
   return undef unless ref $nodes;
   for (@$nodes) {
+    next if $_->{flag}->{smxp__non_processed_declaration};
     if ($_->{type} eq '#declaration' && $_->{namespace_uri} eq $o->{namespace_uri}
      && $_->{local_name} eq $name) {
       return $_;
     } elsif ($_->{type} eq '#reference') {
+      my $e = $self->_get_entity ($name, $_->{node}, $o);
+      return $e if ref $e;
+    } elsif ($_->{type} eq '#section'
+          && ($_->get_attribute ('status', make_new_node => 1)->inner_text||'INCLUDE')
+              eq 'INCLUDE') {
       my $e = $self->_get_entity ($name, $_->{node}, $o);
       return $e if ref $e;
     }
@@ -85,27 +131,40 @@ sub _get_entity ($$$$) {
 # DOM's get*By*
 sub get_entities ($$%) {
   my ($self, $l, %o) = @_;
-  $o{namespace_uri} ||= $NS{SGML}.'entity';
-  $self->_get_entities ($l, $self->{doctype}->{node}, \%o);
+  $o{namespace_uri} = $NS{SGML}.'entity' unless defined $o{namespace_uri};
+  $o{type} ||= '#declaration';
+  $o{parent_node} ||= $self->{doctype};
+  $self->_get_entities ($l, $o{parent_node}->{node}, \%o);
 }
 sub _get_entities ($$$$) {
   my ($self, $l, $nodes, $o) = @_;
   return undef unless ref $nodes;
   for (@$nodes) {
-    if ($_->{type} eq '#declaration' && $_->{namespace_uri} eq $o->{namespace_uri}) {
+    next if $_->{flag}->{smxp__non_processed_declaration};
+    if (($_->{type} eq $o->{type}) && ($_->{namespace_uri} eq $o->{namespace_uri})) {
       push @$l, $_;
     } elsif ($_->{type} eq '#reference') {
+      $self->_get_entities ($l, $_->{node}, $o);
+    } elsif ($_->{type} eq '#section'
+          && ($_->get_attribute ('status', make_new_node => 1)->inner_text||'INCLUDE')
+              eq 'INCLUDE') {
+      $self->_get_entities ($l, $_->{node}, $o);
+    } elsif ($_->{type} eq '#attribute' && $_->{local_name} eq 'external-subset') {
       $self->_get_entities ($l, $_->{node}, $o);
     }
   }
 }
 
+## TODO: uri based recursion
 sub get_external_entity ($$$$) {
   my ($self, $parser, $decl, $o) = @_;
-  my $name = $decl->local_name;
-  my $p = $self->{external_entity_cache}->{$name};
+  my $declns = $decl->namespace_uri;
+  my $name = $declns eq $NS{SGML}.'doctype' ?
+             $decl->get_attribute ('qname', make_new_node => 1)->inner_text :
+             $decl->local_name;
+  my $p = $self->{external_entity_cache}->{$declns}->{$name};
   if ($name && !$p) {
-    $p = {name => $name};  $self->{external_entity_cache}->{$name} = $p;
+    $p = {name => $name};  $self->{external_entity_cache}->{$declns}->{$name} = $p;
     for (qw/PUBLIC SYSTEM NDATA/) {
       $p->{$_} = $decl->get_attribute ($_);
       $p->{$_} = ref $p->{$_} ? $p->{$_}->inner_text : undef;
@@ -192,6 +251,23 @@ sub default_uri_resolver ($$$) {
   }
 }
 
+sub is_standalone_document ($) {
+  my $self = shift;
+  return $self->{node}->{flag}->{smxe__standalone}
+      if defined $self->{node}->{flag}->{smxe__standalone};
+  for (@{$self->{node}->{node}}) {
+    if ($_->{type} eq '#pi' && $_->{local_name} eq 'xml') {
+      my $a = $_->get_attribute ('standalone');
+      if (ref $a) {
+        $self->{node}->{flag}->{smxe__standalone} = $a->inner_text eq 'yes' ? 1 : 0;
+        return $self->{node}->{flag}->{smxe__standalone};
+      }
+    }
+    last;
+  }
+  $self->{node}->{flag}->{smxe__standalone} = 0;
+  return $self->{node}->{flag}->{smxe__standalone};
+}
 sub is_standalone_document_1 ($) {
   my $self = shift;
   return $self->{node}->{flag}->{smxe__standalone_1}
@@ -203,8 +279,8 @@ sub is_standalone_document_1 ($) {
         $self->{node}->{flag}->{smxe__standalone_1} = $a->inner_text eq 'yes' ? 1 : 0;
         return $self->{node}->{flag}->{smxe__standalone_1};
       }
-      last;
     }
+    last;
   }
   if ($self->{doctype}) {
     if ($self->{doctype}->external_id) {
@@ -224,7 +300,10 @@ sub is_standalone_document_1 ($) {
 
 sub check_public_id ($$$) {
   my ($self, $o, $pubid) = @_;
-  if ($pubid =~ m"([^\x0A\x0D\x20A-Z0-9'()+,./:=?;!*#\@\$_%-])"s) {
+  if (length ($pubid) == 0) {
+    $self->_raise_error ($o, type => 'WARN_PID_EMPTY');
+  }
+  if ($pubid =~ m"([^\x0A\x0D\x20A-Za-z0-9'()+,./:=?;!*#\@\$_%-])"s) {
     $self->_raise_error ($o, type => 'SYNTAX_INVALID_PUBID', t => $1);
   }
   $pubid =~ s/[\x0A\x0D\x20]+/\x20/gs;
@@ -248,8 +327,12 @@ sub check_system_id ($$$) {
   my ($self, $o, $sysid) = @_;
   if ($sysid =~ m"([0-9A-Za-z_.!~*'();/?:\@&=+\$,%[]#-])"s) {
     $self->_raise_error ($o, type => 'WARN_INVALID_URI_CHAR_IN_SYSID', t => $1);
-  } elsif ($sysid =~ s/(#[^#]*)$//g) {
-    $self->_raise_error ($o, type => 'ERR_SYSID_HAS_FRAGMENT', t => $1);
+  }
+  if ($sysid =~ s/(#[^#]*)$//g) {
+    $self->_raise_error ($o, type => 'ERR_XML_SYSID_HAS_FRAGMENT', t => $1);
+  }
+  if (length ($sysid) == 0) {
+    $self->_raise_error ($o, type => 'WARN_SYSID_EMPTY');
   }
   $sysid;
 }
@@ -375,6 +458,11 @@ sub _check_media_type ($$$) {
 require SuikaWiki::Markup::XML::Error;
 *_raise_error = \&SuikaWiki::Markup::XML::Error::raise;
 
+=head1 DEVELOPER'S NOTE
+
+This module "knows" how SuikaWiki::Markup::XML works, i.e. this module accesses
+internal structure of that module directly.
+
 =head1 LICENSE
 
 Copyright 2003 Wakaba <w@suika.fam.cx>
@@ -384,4 +472,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/06/27 13:05:57 $
+1; # $Date: 2003/06/29 08:34:37 $
