@@ -55,7 +55,8 @@ my @field_type_Structured = qw(cancel-lock
   x-face x-mail-count x-msmail-priority x-priority x-uidl xref);
 for (@field_type_Structured)
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Structured'}
-my @field_type_Address = qw(approved bcc cc delivered-to envelope-to
+my @field_type_Address = qw(approved bcc cc delivered-to disposition-notification-to 
+  envelope-to
   errors-to fcc from mail-followup-to mail-followup-cc mail-from reply-to resent-bcc
   resent-cc resent-to resent-from resent-sender return-path
   return-receipt-to sender to x-approved x-beenthere
@@ -73,11 +74,14 @@ for (@field_type_MsgID)
   {$DEFAULT{field_type}->{$_} = 'Message::Field::MsgID'}
 for (qw(received x-received))
   {$DEFAULT{field_type}->{$_} = 'Message::Field::Received'}
+$DEFAULT{field_type}->{'content-type'} = 'Message::Field::ContentType';
+$DEFAULT{field_type}->{'content-disposition'} = 'Message::Field::ContentDisposition';
+for (qw(x-face-type))
+  {$DEFAULT{field_type}->{$_} = 'Message::Field::ValueParams'}
 for (qw(accept accept-charset accept-encoding accept-language
-  content-disposition content-language 
-  content-transfer-encoding content-type encrypted followup-to keywords newsgroups
-  x-brother x-daughter x-face-type x-respect x-moe
-  x-syster x-wife))
+  content-language 
+  content-transfer-encoding encrypted followup-to keywords newsgroups
+  x-brother x-daughter x-respect x-moe x-syster x-wife))
   {$DEFAULT{field_type}->{$_} = 'Message::Field::CSV'}
 my @field_type_URI = qw(list-archive list-help list-owner
   list-post list-subscribe list-unsubscribe uri url x-home-page x-http_referer
@@ -216,12 +220,17 @@ If you don't want duplicated C<field>s, use C<replace> method.
 
 =cut
 
-sub add ($$$) {
+sub add ($$$;%) {
   my $self = shift;
   my ($name, $body) = (lc shift, shift);
+  my %option = @_;
   return 0 if $name =~ /$REG{UNSAFE_field_name}/;
   $body = $self->_field_body ($body, $name);
-  push @{$self->{field}}, {name => $name, body => $body};
+  if ($option{prepend}) {
+   unshift @{$self->{field}}, {name => $name, body => $body};
+  } else {
+    push @{$self->{field}}, {name => $name, body => $body};
+  }
   $body;
 }
 
@@ -242,7 +251,7 @@ sub replace ($$$) {
   for my $field (@{$self->{field}}) {
     if ($field->{name} eq $name) {
       $field->{body} = $body;
-      return $self;
+      return $body;
     }
   }
   push @{$self->{field}}, {name => $name, body => $body};
@@ -457,7 +466,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/03/21 04:21:28 $
+$Date: 2002/03/23 11:43:06 $
 
 =cut
 
