@@ -24,14 +24,15 @@ if (defined $output_filename) {
   $output_file = \*STDOUT;
 }
 
-our $Method; 
+our $Method;
+our $IFMethod;
 our $Attr;
-our $MethodParam;
 my $Assert = {
   qw/assertDOMException 1
      assertFalse 1
      assertNotNull 1
      assertNull 1
+     assertSize 1
      assertTrue 1/
 };
 my $Misc = {
@@ -182,6 +183,13 @@ sub node2code ($) {
                            local_name => $node->getAttributeNS (undef, 'var')).
                  ' = '
         if $node->hasAttributeNS (undef, 'var');
+      my $param;
+      if ($node->hasAttributeNS (undef, 'interface')) {
+        $param = $IFMethod->{$node->getAttributeNS (undef, 'interface')}
+                          ->{$ln};
+      } else {
+        $param = $Method->{$ln};
+      }
       $result .= perl_var (type => '$',
                            local_name => $node->getAttributeNS (undef, 'obj')).
               '->'.$ln.' ('.
@@ -189,7 +197,7 @@ sub node2code ($) {
                      map {
                        to_perl_value ($node->getAttributeNS (undef, $_),
                                       default => 'undef')
-                     } @{$Method->{$ln}}).
+                     } @$param).
               ");\n";
     } elsif ($Attr->{$ln}) {
       if ($node->hasAttributeNS (undef, 'var')) {
@@ -240,6 +248,19 @@ sub node2code ($) {
                  );
       $result .= ");\n";
     $Status->{Number}++;
+  } elsif ($ln eq 'assertSize') {
+    my $size = to_perl_value ($node->getAttributeNS (undef, 'size'));
+    my $coll = to_perl_value ($node->getAttributeNS (undef, 'collection'));
+    $result .= perl_statement 'assertSize ('.
+                 perl_list 
+                   ($node->getAttributeNS (undef, 'id'),
+                    perl_code_literal $size, perl_code_literal $coll).
+               ')';
+    if ($node->hasChildNodes) {
+      $result .= perl_if
+                   qq<$size == size ($coll)>,
+                   block2code ($node);
+    }
   } elsif ($ln eq 'assertTrue' or $ln eq 'assertFalse') {
       my $condition;
       if ($node->hasAttributeNS (undef, 'actual')) {

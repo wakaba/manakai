@@ -60,6 +60,16 @@ $result .= perl_statement
              perl_assign
                perl_var
                  (type => '$',
+                  local_name => 'IFMethod')
+             => perl_literal {
+                  map {
+                    $_ => $Method->{$_}
+                  } keys %$Method
+                };
+$result .= perl_statement
+             perl_assign
+               perl_var
+                 (type => '$',
                   local_name => 'Attr')
              => perl_literal {
                   map {$_ => 1}
@@ -107,4 +117,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2004/10/10 06:10:00 $
+# $Date: 2004/10/16 13:34:56 $

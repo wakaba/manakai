@@ -794,6 +794,32 @@ sub perl_builtin_code ($;%) {
   $r;
 }
 
+=head2 C<Operator> element
+
+An C<Operatpr> element associates an operator or special-purpose 
+function name to the method or attribute.  For the Perl binding, 
+it can be used to declare the method or attribute to be 
+called at the operation (by overloading of an operator; 
+see also L<overload>).
+
+Element value: A C<Type> dependent operator name.  
+For the Perl binding, it is either the operator name 
+used with the C<overload> module (except C<=>), 
+C<DESTROY> or C<new>.
+
+Child elements:
+
+=over 4
+
+=item C<Type> = type (Required)
+
+The type of the element value.  It also specifies the 
+target binding of the C<Operatpr> element.
+
+=back
+
+=cut
+
 sub ops2perl () {
   my $result = '';
   for (keys %{$Status->{Operator}}) {
@@ -893,6 +919,27 @@ sub qname_label ($;%) {
   }
 }
 
+=head1 TYPES
+
+In the DIS format, types (such as datatypes of something defined 
+by the DIS document or media types of the element values) are 
+identified by pair of a namespace URI and a local name.  In general, 
+the pair is specified by a QName in the DIS document.  The pair is 
+sometiems interpreted as a URI reference for the purpose of 
+comparise. 
+
+NOTE:  In DIS documents, the QName is less strictly defined than 
+the XML standards; its namespace prefix can be empty; and 
+its namespace prefix and local name can contain any character 
+other than C<COLON>.  In addition, the interpretation of the 
+null-prefixed QName might differ by the context in which the 
+QName is used.  In general, its namespace is the default 
+namespace, as is QName in the XML document representing an element 
+type name.  But some local names, such as C<long> and C<DOMString> 
+might be interpreted as belonging to the C<DOMMain> namespace.
+
+=cut
+
 {
 my $nest = 0;
 sub type_normalize ($);
@@ -934,18 +981,24 @@ sub type_label ($;%) {
   my %opt = @_;
   my $pod_code = sub { $opt{is_pod} ? pod_code $_[0] : $_[0] };
   my $r = {
+    ExpandedURI q<DOMMain:boolean> => q<Boolean Value>,
+    ExpandedURI q<DOMMain:long> => q<Signed Long Integer>,
     ExpandedURI q<DOMMain:unsigned-long> => q<Unsigned Long Integer>,
-    ExpandedURI q<DOMMain:unsigned-short> => q<Unsigned Short Integer>,
+    ExpandedURI q<DOMMain:unsigned-short> => q<Unsigned Short Floating Number>,
     ExpandedURI q<ManakaiDOM:ManakaiDOMURI>
       => $pod_code->(q<DOMString>).q< (DOM URI)>,
     ExpandedURI q<ManakaiDOM:ManakaiDOMNamespaceURI>
-      => $pod_code->(q<DOMString>).q< (Namespace URI)>,
+      => $pod_code->(q<DOMString>).q< (DOM Namespace URI)>,
     ExpandedURI q<ManakaiDOM:ManakaiDOMFeatureName>
       => $pod_code->(q<DOMString>).q< (DOM Feature name)>,
     ExpandedURI q<ManakaiDOM:ManakaiDOMFeatureVersion>
       => $pod_code->(q<DOMString>).q< (DOM Feature version)>,
     ExpandedURI q<ManakaiDOM:ManakaiDOMFeatures>
       => $pod_code->(q<DOMString>).q< (DOM features)>,
+    ExpandedURI q<ManakaiDOM:ManakaiDOMKeyIdentifier>
+      => $pod_code->(q<DOMString>).q< (DOM Key Identifier)>,
+    ExpandedURI q<ManakaiDOM:ManakaiDOMKeyIdentifiers>
+      => $pod_code->(q<DOMString>).q< (DOM Key Identifiers)>,
   }->{$uri};
   unless ($r) {
     if ($uri =~ /([\w_-]+)$/) {
@@ -1094,6 +1147,12 @@ sub get_perl_definition ($%) {
   $def ? $def->value : $opt{default};
 }
 
+=head1 DISDOC DOCUMENTATION FORMAT
+
+The DISDOC format is a documentation format for DIS documents. 
+
+=cut
+
 sub dis2perl ($) {
   my $node = shift;
   my $r = '';
@@ -1182,6 +1241,13 @@ sub disdoc2text ($;%) {
           $marker = disdoc_inline2text ($1, %opt) . ': ';
         }
         push @r, $marker . (disdoc_inline2text ($s, %opt));
+      } elsif ($et eq 'NOTE') {
+        push @r, "NOTE: ". disdoc_inline2text ($s, %opt);
+      } elsif ($et eq 'eg') {
+        push @r, "Example. ";
+        $s =~ s/^\s+//;
+        valid_err qq<Invalid content for DISDOC "eg" element: "$s">,
+          node => $opt{node} if length $s;
       } else {
         valid_err qq<Unknown DISDOC element type "$et">, node => $opt{node};
       }
@@ -1219,10 +1285,12 @@ sub disdoc_inline2text ($;%) {
         node => $opt{node};
     } elsif (defined $cdata) {
       $r = $cdata;
-    } elsif ({DFN => 1, CITE => 1}->{$type}) {
+    } elsif ({DFN => 1, CITE => 1, KEY => 1}->{$type}) {
       $r = disdoc_inline2text $data;
     } elsif ({SRC => 1}->{$type}) {
       $r = q<[>. disdoc_inline2text ($data) . q<]>;
+    } elsif ({EM => 1}->{$type}) {
+      $r = q<*>. disdoc_inline2text ($data) . q<*>;
     } elsif ({URI => 1}->{$type}) {
       $r = q{<} . $data . q{>};
     } elsif ({CODE => 1, Perl => 1}->{$type}) {
@@ -1279,6 +1347,13 @@ sub disdoc2pod ($;%) {
       push @el, {type => $et};
       if ($et eq 'P') { ## Paragraph
         push @r, pod_para (disdoc_inline2pod ($s, %opt));
+      } elsif ($et eq 'NOTE') {
+        push @r, pod_para (pod_em ('NOTE').": ".disdoc_inline2pod ($s, %opt));
+      } elsif ($et eq 'eg') {
+        push @r, pod_para (pod_em ('Example').". ");
+        $s =~ s/^\s+//;
+        valid_err qq<Invalid content for DISDOC "eg" element: "$s">,
+          node => $opt{node} if length $s;
       } elsif ($et eq 'LI' or $et eq 'OLI') { ## List
         my $marker = '*';
         unless ($el[-1]->{type} eq '#list') {
@@ -1357,8 +1432,10 @@ sub disdoc_inline2pod ($;%) {
         node => $opt{node};
     } elsif (defined $cdata) {
       $r = pod_cdata $cdata; 
-    } elsif ({CODE => 1}->{$type}) {
+    } elsif ({CODE => 1, KEY => 1}->{$type}) {
       $r = pod_code disdoc_inline2pod $data;
+    } elsif ({EM => 1}->{$type}) {
+      $r = pod_em disdoc_inline2pod $data;
     } elsif ({DFN => 1}->{$type}) {
       $r = pod_dfn disdoc_inline2pod $data;
     } elsif ({CITE => 1}->{$type}) {
@@ -1590,7 +1667,8 @@ sub get_redef_description ($;%) {
   }
   if ($node->get_attribute_value ('IsAbstract', default => 0)) {
     push @desc, pod_para (qq<This $opt{method} is defined abstractly; >.
-                          qq<it must be overridden by cocrete implementation. >);
+                          qq<it must be overridden by the concrete >.
+                          qq<implementation. >);
   }
     my @redefBy;
     for (@{$node->child_nodes}) {
@@ -2016,7 +2094,8 @@ sub if2perl ($) {
     push @desc, pod_para ('This interface is intended to be implemented '.
                           'by DOM applications.  To implement this '.
                           'interface, put the statement '),
-                pod_pre ('push our @ISA, q<'.($is_abs?$if_name:$pack_name).'>;'),
+                pod_pre ('push our @ISA, q<'.($is_abs?$if_pack_name:$pack_name).
+                         '>;'),
                 pod_para ('on your package and define methods and '.
                           'attributes.');
   }
@@ -2329,12 +2408,12 @@ sub method2perl ($;%) {
         }
         push my @param_desc_val,
                           pod_item (type_label $type, is_pod => 1),
-                          pod_para get_description $_;
+                          pod_paras get_description $_;
         $param_prototype .= '$';
         for (@{$_->child_nodes}) {
           next unless $_->local_name eq 'InCase';
           push @param_desc_val, pod_item (get_incase_label $_, is_pod => 1),
-                                pod_para (get_description $_);
+                                pod_paras (get_description $_);
         }
         push @param_desc, pod_list 4, @param_desc_val;
       }
@@ -2359,7 +2438,7 @@ sub method2perl ($;%) {
                            q< has been > . $level . '.') : ();
 
   if (@param_list) {
-    push @desc, pod_para ('This method requires ' .
+    push @desc, pod_para ('This method has ' .
                           english_number (@param_list + 0,
                                           singular => q<parameter>,
                                           plural => q<parameters>) . ':'),
@@ -2487,12 +2566,12 @@ sub method2perl ($;%) {
                                                 ('Type',
                                                  default => 'DOMMain:any')),
                                           is_pod => 1)),
-                    pod_para (get_description $return);
+                    pod_paras (get_description $return);
     }
     for (@{$return->child_nodes}) {
       if ($_->local_name eq 'InCase') {
         push @return, pod_item ( get_incase_label $_, is_pod => 1),
-                      pod_para (get_description $_);
+                      pod_paras (get_description $_);
         $has_return++;
       } elsif ($_->local_name eq 'Exception') {
         push @exception, pod_item ('Exception: ' .
@@ -2503,7 +2582,7 @@ sub method2perl ($;%) {
                                 '.' . pod_code $_->get_attribute_value
                                                    ('Name',
                                                     default => '<unknown>')),
-                      pod_para (get_description $_);
+                      pod_paras (get_description $_);
         my @st;
         for (@{$_->child_nodes}) {
           next unless $_->node_type eq '#element';
@@ -2775,11 +2854,11 @@ sub attr2perl ($;%) {
                                                 ('Type',
                                                  default => 'DOMMain:any'),
                                           is_pod => 1)),
-                    pod_para (get_description $return);
+                    pod_paras (get_description $return);
     for (@{$return->child_nodes}) {
       if ($_->local_name eq 'InCase') {
         push @return, pod_item (get_incase_label $_, is_pod => 1),
-                      pod_para (get_description $_);
+                      pod_paras (get_description $_);
       } elsif ($_->local_name eq 'Exception') {
         push @return_xcept, pod_item ('Exception: ' .
                                 (type_label ($_->get_attribute_value
@@ -2789,7 +2868,7 @@ sub attr2perl ($;%) {
                                 '.' . pod_code $_->get_attribute_value
                                                    ('Name',
                                                     default => '<unknown>')),
-                      pod_para (get_description $_);
+                      pod_paras (get_description $_);
         my @st;
         for (@{$_->child_nodes}) {
           next unless $_->node_type eq '#element';
@@ -2863,11 +2942,11 @@ sub attr2perl ($;%) {
                                                 ('Type',
                                                  default => 'DOMMain:any')),
                                           is_pod => 1)),
-                    pod_para (get_description $set);
+                    pod_paras (get_description $set);
     for (@{$set->child_nodes}) {
       if ($_->local_name eq 'InCase') {
         push @set_desc, pod_item (get_incase_label $_, is_pod => 1),
-                        pod_para (get_description $_);
+                        pod_paras (get_description $_);
       } elsif ($_->local_name eq 'Exception') {
         push @set_xcept, pod_item ('Exception: ' .
                                 (type_label ($_->get_attribute_value
@@ -2877,7 +2956,7 @@ sub attr2perl ($;%) {
                                 '.' . pod_code $_->get_attribute_value
                                                    ('Name',
                                                     default => '<unknown>')),
-                      pod_para (get_description $_);
+                      pod_paras (get_description $_);
         my @st;
         for (@{$_->child_nodes}) {
           next unless $_->node_type eq '#element';
@@ -3443,12 +3522,12 @@ sub param2poditem ($;%) {
                                                 ('Type',
                                                  default => 'DOMMain:any')),
                                    is_pod => 1)),
-             pod_para (get_description $node);
+             pod_paras (get_description $node);
   for (@{$node->child_nodes}) {
     last unless $_->node_type eq '#element';
     if ($_->local_name eq 'InCase') {
       push @val, pod_item (get_incase_label $_, is_pod => 1),
-                 pod_para (get_description $_);
+                 pod_paras (get_description $_);
     } elsif ({qw/Name 1 QName 1 Type 1
                  Description 1 ImplNote 1/}->{$_->local_name}) {
       # 
@@ -3479,7 +3558,7 @@ sub subtype2poditem ($;%) {
       node => $node;
   }
   
-  push @desc, pod_para (get_description $node);
+  push @desc, pod_paras (get_description $node);
   my @param;
   for (@{$node->child_nodes}) {
     last unless $_->node_type eq '#element';
@@ -3689,7 +3768,9 @@ for (ExpandedURI q<ManakaiDOM:ManakaiDOMURI>,
      ExpandedURI q<ManakaiDOM:ManakaiDOMNamespaceURI>,
      ExpandedURI q<ManakaiDOM:ManakaiDOMFeatureName>,
      ExpandedURI q<ManakaiDOM:ManakaiDOMFeatureVersion>,
-     ExpandedURI q<ManakaiDOM:ManakaiDOMFeatures>) {
+     ExpandedURI q<ManakaiDOM:ManakaiDOMFeatures>,
+     ExpandedURI q<ManakaiDOM:ManakaiDOMKeyIdentifier>,
+     ExpandedURI q<ManakaiDOM:ManakaiDOMKeyIdentifiers>) {
   $Info->{DataTypeAlias}->{$_}
        ->{isa_uri} = [ExpandedURI q<DOMMain:DOMString>];
 }
@@ -3733,7 +3814,7 @@ $result .= pod_block
                        ' - ' . get_description ($Module, name => 'FullName')),
              section (
                opt => pod_head (1, 'DESCRIPTION'),
-               req => pod_para (get_description ($Module)),
+               req => pod_paras (get_description ($Module)),
              ),
              pod_head (1, 'DOM INTERFACES');
 
@@ -4169,6 +4250,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/10/10 06:09:47 $
+# $Date: 2004/10/16 13:34:55 $
 
 
