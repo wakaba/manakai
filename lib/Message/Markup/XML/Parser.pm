@@ -16,7 +16,7 @@ This module is part of SuikaWiki.
 
 package SuikaWiki::Markup::XML::Parser;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXMLChar
                         InXML_deprecated_noncharacter InXML_unicode_xml_not_suitable!;
 require SuikaWiki::Markup::XML;
@@ -31,7 +31,7 @@ WARNING: This module is under construction.  Interface of this module is not yet
 
 =cut
 
-my %xml_re;
+our %xml_re;
 # [1] document = prolog element *Misc
 # [2] Char = %x09 / %x0A / %x0D / U+0020-U+D7FF / U+E000-U+FFFD / U+10000-U+10FFFF ;; 1.0
 # [2] Char = %x09 / %x0A / %x0D / %x20-7E / U+0085 / U+00A0-U+D7FF / U+E000-U+FFFD
@@ -286,7 +286,6 @@ sub _parse_document_entity ($$\$$;%) {
   while ($$s) {
     if ($$s =~ /^<$xml_re{Name}/) {	# <element/>
       $self->_raise_error ($o, c => $c, type => 'WARN_DOCTYPE_NOT_FOUND') unless $occur{doctype};
-      $self->_validate_notation_declared ($c) if $occur{pi} && $occur{doctype};
       $self->_parse_element_content ($c, $s, $o, entMan => $entMan);
       $occur{element} = 1;  $occur{pi} = 0;
     } elsif ($$s =~ s/^($xml_re{s})//s) {	# s
@@ -386,7 +385,6 @@ sub _parse_document_entity ($$\$$;%) {
     $self->_raise_error ($o, c => $c, type => 'SYNTAX_ROOT_ELEMENT_NOT_FOUND',
                          t => $occur{doctype} eq '1' ? '#IMPLIED' : $occur{doctype});
     $self->_raise_error ($o, c => $c, type => 'WARN_DOCTYPE_NOT_FOUND') unless $occur{doctype};
-    $self->_validate_notation_declared ($c) if $occur{pi} && $occur{doctype};
   }
   if ($occur{element} && $occur{doctype}) {
     my $root;
@@ -838,48 +836,8 @@ sub _parse_dtd ($$\$$;%) {
       last;
     }
   }	# while
-  
-  $self->_validate_notation_declared ($c, $o, entMan => $opt{entMan})
-    if $opt{validate_notation_declared};
 }
 
-sub _validate_notation_declared ($$$;%) {
-  my ($self, $c, $o, %opt) = @_;
-    my $l = [];
-    my $entMan = $opt{entMan} || $c->root_node->flag ('smxp__entity_manager');
-    my %defined;
-    ## NDATA notation declared?
-    $entMan->get_entities ($l, parent_node => $c, namespace_uri => $NS{SGML}.'entity');
-    for my $ent (@$l) {
-      for ($ent->get_attribute ('NDATA')) {
-      if (ref $_) {
-        my $nname = $_->inner_text;
-        if ($defined{$nname} > 0
-         || $entMan->get_entity ($nname, namespace_uri => $NS{SGML}.'notation')) {
-          $defined{$nname} = 1;
-        } else {
-          $self->_raise_error ($_->flag ('smxp__src_pos'), type => 'VC_NOTATION_DECLARED',
-                               t => $nname, c => $_);
-          $defined{$nname} = -1;
-        }
-      }}	# NDATA exist
-    }
-    ## PI target name notation declared?
-    @$l = ();
-    $entMan->get_entities ($l, parent_node => $c, type => '#pi', namespace_uri => '');
-    for my $pi (@$l) {
-      my $nname = $pi->local_name;
-      if ($defined{$nname} > 0
-       || $entMan->get_entity ($nname, namespace_uri => $NS{SGML}.'notation')) {
-        $defined{$nname} = 1;
-      } else {
-        $self->_raise_error ($pi->flag ('smxp__src_pos'), type => 'WARN_PI_TARGET_NOTATION',
-                             t => $nname, c => $pi)
-          unless lc (substr ($nname, 0, 3)) eq 'xml';	## Target name xml* is maintained by W3C
-        $defined{$nname} = -1;
-      }
-    }	# pi
-}
 
 sub _parse_attr_value_literal_data ($$\$$;%) {
   my ($self, $c, $s, $o, %opt) = @_;
@@ -1374,7 +1332,7 @@ sub _parse_entity_declaration ($\$$$;%) {
         } else {	## Regist to entMan
           $entMan->is_declared_entity ($ename, namespace_uri => $e->namespace_uri,
                                        dont_use_predefined_entities => 1,
-                                       set_new_value => 1, seek => 0)
+                                       set_value => 1, seek => 0)
         }
         $self->_raise_error ($o, c => $c, type => 'NS_SYNTAX_NAME_IS_NCNAME', t => $ename)
           if index ($ename, ':') > -1;
@@ -1482,6 +1440,16 @@ sub _parse_element_declaration ($$$$;%) {
     if (substr ($type_qname, 0, 1) eq ':' || substr ($type_qname, -1, 1) eq ':') {
       $self->_raise_error ($o, c => $c, type => 'NS_SYNTAX_NAME_IS_QNNAME', t => $type_qname);
       $type_qname =~ tr/:/_/;
+    }
+    if ($opt{entMan}->is_declared_entity ($type_qname, namespace_uri => $NS{SGML}.'element',
+                                          dont_use_predefined_entities => 1,
+                                          seek => 0)) {
+      $self->_raise_error ($o, c => $c,
+                           type => 'VC_UNIQUE_ELEMENT_TYPE_NAME', t => $type_qname);
+    } else {	## Regist to entMan
+      $opt{entMan}->is_declared_entity ($type_qname, namespace_uri => $NS{SGML}.'element',
+                                        dont_use_predefined_entities => 1,
+                                        set_value => 1, seek => 0)
     }
     $c->set_attribute (qname => $type_qname);
   } else {
@@ -1639,11 +1607,22 @@ sub _parse_attlist_declaration ($$$$;%) {
   
   unless ($dont_process) {
     ## Element type name
+    my $type_qname;
     if ($t =~ s/^($xml_re{s}($xml_re{Name}))//s) {
-      my $type_qname = $2;
+      $type_qname = $2;
       if (substr ($type_qname, 0, 1) eq ':' || substr ($type_qname, -1, 1) eq ':') {
         $self->_raise_error ($o, c => $c, type => 'NS_SYNTAX_NAME_IS_QNNAME', t => $type_qname);
         $type_qname =~ tr/:/_/;
+      }
+      if ($opt{entMan}->is_declared_entity ($type_qname, namespace_uri => $NS{SGML}.'attlist',
+                                            dont_use_predefined_entities => 1,
+                                            seek => 0)) {
+        $self->_raise_error ($o, c => $c,
+                             type => 'WARN_XML_ATTLIST_AT_MOST_ONE_DECLARATION', t => $type_qname);
+      } else {	## Regist to entMan
+        $opt{entMan}->is_declared_entity ($type_qname, namespace_uri => $NS{SGML}.'attlist',
+                                          dont_use_predefined_entities => 1,
+                                          set_value => 1, seek => 0)
       }
       $c->set_attribute (qname => $type_qname);
     } else {
@@ -1774,6 +1753,10 @@ sub _parse_attlist_declaration ($$$$;%) {
         substr ($t, 0, 1) = '';
       }
     }	# $t
+    unless (scalar keys %defined) {
+      $self->_raise_error ($o, c => $c, type => 'WARN_XML_ATTLIST_AT_LEAST_ONE_ATTR_DEF',
+                           t => $type_qname);
+    }
   } else {	## dont_process
     $c->flag (smxp__non_processed_declaration => 1);
     $self->_raise_error ($o, c => $c, type => 'WARN_ATTLIST_DECLARATION_NOT_PROCESSED');
@@ -1932,4 +1915,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/07/13 02:32:24 $
+1; # $Date: 2003/07/14 07:36:55 $

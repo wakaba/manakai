@@ -16,7 +16,7 @@ This module is part of SuikaWiki XML support.
 
 package SuikaWiki::Markup::XML::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 our %NS;
 *NS = \%SuikaWiki::Markup::XML::NS;
 
@@ -344,63 +344,63 @@ my %_Error = (
 	},
 	## Validity error
 	VC_ENTITY_DECLARED	=> {
-		description	=> 'Entity %s should (or must to be valid) be declared before it is referred',
+		description	=> 'Entity "%s" should (or must to be valid) be declared before it is referred',
 		level	=> 'vc',
 	},
 	VC_NO_DUPLICATE_TOKENS	=> {
-		description	=> 'Group element (%s) must be unique in the group',
-		level	=> 'vc',
-	},
-	VC_NOTATION_DECLARED	=> {
-		description	=> 'Notation %s should (or must to be valid) be declared',
+		description	=> 'Group element ("%s") must be unique in the group',
 		level	=> 'vc',
 	},
 	VC_ROOT_ELEMENT_TYPE	=> {
-		description	=> 'Document type name (%s) and element type name of the root element (%s) should (or must to be valid) match',
+		description	=> 'Document type name ("%s") and element type name of the root element ("%s") should (or must to be valid) match',
+		level	=> 'vc',
+	},
+	VC_UNIQUE_ELEMENT_TYPE_NAME	=> {
+		description	=> 'Element type "%s" is already declared',
 		level	=> 'vc',
 	},
 	VC_UNIQUE_NOTATION_NAME	=> {
-		description	=> 'Notation %s is already declared',
-		level	=> 'warn',
+		description	=> 'Notation "%s" is already declared',
+		level	=> 'vc',
 	},
 	## Namespace well-formedness error
 	NS_SYNTAX_LNAME_IS_NCNAME	=> {
-		description	=> 'Character just after the colon (:) in QName (%s) must be one of NameStartChar in namespaced XML document',
+		description	=> 'Character just after the colon (":") in QName ("%s") must be one of NameStartChar in namespaced XML document',
 		level	=> 'nswfc',
 	},
 	NC_PREFIX_NOT_DEFINED	=> {
-		description	=> 'Undeclared namespace prefix (%s) is used',
+		description	=> 'Undeclared namespace prefix "%s" is used',
 		level	=> 'nswfc',
 	},
 	NS_SYNTAX_NAME_IS_NCNAME	=> {
-		description	=> 'Name with colon (%s) cannot be used here in namespaced XML document',
+		description	=> 'Name with colon ("%s") cannot be used here in namespaced XML document',
 		level	=> 'nswfc',
 	},
 	NS_SYNTAX_NAME_IS_QNAME	=> {
-		description	=> 'Name with colon (%s) must match with QName in namespaced XML document',
+		description	=> 'Name with colon ("%s") must match with QName in namespaced XML document',
 		level	=> 'nswfc',
 	},
 	NC_UNIQUE_ATT_SPEC	=> {
-		description	=> 'Dupulicate attribute specification (%s == <%s>:%s)',
+		description	=> 'Dupulicate attribute specification ("%s" == "<%s>:%s")',
 		level	=> 'wfc',
 	},
 	## Namespace validity error
 	## XML (non-fatal) error
 	ERR_EXT_ENTITY_NOT_FOUND	=> {
-		description	=> 'External entity (%s == <%s>) cannot be retrived (%s)',
+		description	=> 'External entity ("%s" == <%s>) cannot be retrived (%s)',
 		level	=> 'vc',
 	},
 	ERR_XML_NDATA_REF_IN_ENTITY_VALUE	=> {
-		description	=> 'Unparsed entity (%s) cannot be referred in EntityValue',
+		description	=> 'Unparsed entity "%s" cannot be referred in EntityValue',
 		level	=> 'warn',	## Was fatal error but refined by SE Errata
 	},
 	ERR_XML_SYSID_HAS_FRAGMENT	=> {
-		description	=> 'URI Reference converted from system identifier should not have the fragment identifier (%s)',
+		description	=> 'URI Reference converted from system identifier should not have the fragment identifier <%s>',
 		level	=> 'warn',
 	},
 	## XML warning
 	WARN_PREDEFINED_ENTITY_NOT_DECLARED	=> {
-		description	=> 'Predefined general entity (%s) should be declared before it is referred for interoperability',
+		description	=> 'Predefined general entity "%s" should be declared before it is referred for interoperability',
 		level	=> 'warn',
 	},
 	WARN_UNICODE_COMPAT_CHARACTER	=> {
@@ -414,7 +414,7 @@ my %_Error = (
 	},
 	WARN_UNICODE_NONCHARACTER	=> {
 		description	=> sub {
-			my $r = sprintf 'Use of the code point U+%04X is deprecated, since it is noncharacter in the Unicode Standard',
+			my $r = sprintf 'Use of the code point U+%04X is deprecated, since it is noncharacter or control character in the Unicode Standard',
 			        $_[1]->{t};
 			$_[1]->{t} = undef;
 			$r;
@@ -422,15 +422,23 @@ my %_Error = (
 		level	=> 'warn',
 	},
 	WARN_UNIQUE_ENTITY_NAME	=> {
-		description	=> 'General entity %s is already declared',
+		description	=> 'General entity "%s" is already declared',
 		level	=> 'warn',
 	},
 	WARN_UNIQUE_PARAMETER_ENTITY_NAME	=> {
-		description	=> 'Parameter entity %s is already declared',
+		description	=> 'Parameter entity "%s" is already declared',
+		level	=> 'warn',
+	},
+	WARN_XML_ATTLIST_AT_LEAST_ONE_ATTR_DEF	=> {
+		description	=> 'For interoperability, at least one definition should be provided in an attlist declaration (element type = "%s")',
 		level	=> 'warn',
 	},
 	WARN_XML_ATTLIST_AT_MOST_ONE_ATTR_DEF	=> {
-		description	=> 'For interoperability, at most one definition for given attribute (%s) should be provided',
+		description	=> 'For interoperability, at most one definition for given attribute ("%s") should be provided',
+		level	=> 'warn',
+	},
+	WARN_XML_ATTLIST_AT_MOST_ONE_DECLARATION	=> {
+		description	=> 'For interoperability, at most one declaration for given element type ("%s") should be provided',
 		level	=> 'warn',
 	},
 	## XML Names recommendation
@@ -516,10 +524,6 @@ my %_Error = (
 	},
 	WARN_NO_EXPLICIT_ENCODING_INFO	=> {	## BOM and '<?' guessing is failed (so general encoding guess is to be called)
 		description	=> q(Neither upper level protocol nor XML's encoding declaration provide encoding scheme information (or cannot read the encoding declaration because of lack of guessability)),
-		level	=> 'warn',
-	},
-	WARN_PI_TARGET_NOTATION	=> {
-		description	=> 'Target name of the process instruction (%s) should be declared as a notation name to ensure interoperability',
 		level	=> 'warn',
 	},
 	WARN_PID_EMPTY	=> {
@@ -734,4 +738,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/07/13 02:32:24 $
+1; # $Date: 2003/07/14 07:36:55 $

@@ -21,7 +21,7 @@ This module is part of SuikaWiki XML support.
 
 package SuikaWiki::Markup::XML::EntityManager;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 our %NS;
 *NS = \%SuikaWiki::Markup::XML::NS;
 
@@ -141,11 +141,12 @@ sub _get_entities ($$$$) {
     next if $_->{flag}->{smxp__non_processed_declaration};
     if (($_->{type} eq $o->{type}) && ($_->{namespace_uri} eq $o->{namespace_uri})) {
       push @$l, $_;
-    } elsif ($_->{type} eq '#reference') {
+    } elsif ($_->{type} eq '#reference' || $_->{type} eq '#element') {
       $self->_get_entities ($l, $_->{node}, $o);
-    } elsif ($_->{type} eq '#section'
-          && ($_->get_attribute ('status', make_new_node => 1)->inner_text||'INCLUDE')
-              eq 'INCLUDE') {
+    } elsif (($_->{type} eq '#section'
+              && ($_->get_attribute ('status', make_new_node => 1)->inner_text||'INCLUDE')
+              eq 'INCLUDE')
+         || ($_->{type} eq '#declaration' && $_->{namespace_uri} eq $NS{SGML}.'doctype')) {
       $self->_get_entities ($l, $_->{node}, $o);
     } elsif ($_->{type} eq '#attribute' && $_->{local_name} eq 'external-subset') {
       $self->_get_entities ($l, $_->{node}, $o);
@@ -541,4 +542,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/07/13 02:32:24 $
+1; # $Date: 2003/07/14 07:36:55 $
