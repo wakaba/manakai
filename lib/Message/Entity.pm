@@ -14,7 +14,7 @@ require 5.6.0;	## (require: v5.6.0 data type)
 package Message::Entity;
 use strict;
 use vars qw(%DEFAULT %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.39 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.40 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::Header;
@@ -207,7 +207,8 @@ sub parse ($$;%) {
   $message =~ s/(?:$nl)+$/$nl/s if $self->{option}->{remove_post_newline};
   if ($self->{option}->{use_magic_line}) {
     ## TODO: Reset format option?
-    if ($message =~ s/>?From (.+?)$nl//gs) {	## Mail from line
+    if ($message =~ s/^>?From (.+?)$nl//os) {	## Mail from line
+      ## TODO: Multiple from lines
       $new_field{'x-rfc822-mail-from'} = $1;
     } elsif ($message =~ s#^($REG{http_token})\x20($REG{S_uri})\x20($REG{http_token})/([0-9]+)\.([0-9]+)$nl##gs) {
     ## HTTP Request
@@ -624,7 +625,7 @@ sub stringify ($;%) {
         $hdr->field ($option{fill_ua_name})->add_our_name (
           -use_Config	=> $option{ua_use_Config},
           -use_Win32	=> $option{ua_use_Win32},
-          -date	=> q$Date: 2002/12/28 09:10:16 $,
+          -date	=> q$Date: 2004/01/06 09:02:41 $,
         );
       }
     } if $option{fill_missing_fields};
@@ -1181,7 +1182,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/12/28 09:10:16 $
+$Date: 2004/01/06 09:02:41 $
 
 =cut
 
