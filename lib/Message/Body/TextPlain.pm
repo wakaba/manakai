@@ -8,29 +8,26 @@ Message::Body::TextPlain --- Perl Module for Internet Media Type "text/plain"
 package Message::Body::TextPlain;
 use strict;
 use vars qw(%DEFAULT @ISA $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
-require Message::Field::Structured;
-push @ISA, qw(Message::Field::Structured);
-require Message::Header;
-require Message::MIME::Charset;
-use overload '""' => sub { $_[0]->stringify },
-             fallback => 1;
+require Message::Body::Text;
+push @ISA, qw(Message::Body::Text);
 
-  %DEFAULT = (
-    -_METHODS	=> [qw|value|],
-    -_MEDIA_TYPE	=> 'text/plain',
-    -_MEMBERS	=> [qw|_charset|],
-    -body_default_charset	=> 'us-ascii',
-    -body_default_charset_input	=> 'iso-2022-int-1',
-    #encoding_after_encode
-    #encoding_before_decode
-    -hook_encode_string	=> \&Message::Util::encode_body_string,
-    -hook_decode_string	=> \&Message::Util::decode_body_string,
-    -parse_all	=> 0,
-    -use_normalization	=> 1,
-    -use_param_charset	=> 1,
-  );
+%DEFAULT = (
+  -_METHODS	=> [qw|value|],
+  -_MEMBERS	=> [qw|_charset|],
+  -body_default_charset	=> 'us-ascii',
+  -body_default_charset_input	=> 'iso-2022-int-1',
+  #encoding_after_encode
+  #encoding_before_decode
+  #fill_ct	=> 0,
+  #hook_encode_string
+  #hook_decode_string
+  -media_type	=> 'text',
+  -media_subtype	=> 'plain',
+  -use_normalization	=> 1,
+  -use_param_charset	=> 1,
+);
 
 =head1 CONSTRUCTORS
 
@@ -47,11 +44,8 @@ sub _init ($;%) {
   my %option = @_;
   $self->SUPER::_init (%$DEFAULT, %option);
   
-  if (ref $option{header}) {
-    $self->{header} = $option{header};
-  }
-  if ($self->{option}->{format} =~ /http/) {
-    $self->{option}->{use_normalization} = 0;
+  unless (defined $self->{option}->{fill_ct}) {
+    $self->{option}->{fill_ct} = $self->{option}->{format} =~ /http|mime/;
   }
 }
 
@@ -97,19 +91,7 @@ sub parse ($$;%) {
 
 =cut
 
-sub header ($;$) {
-  my $self = shift;
-  my $new_header = shift;
-  if (ref $new_header) {
-    $self->{header} = $new_header;
-  #} elsif ($new_header) {
-  #  $self->{header} = Message::Header->parse ($new_header);
-  }
-  #unless ($self->{header}) {
-  #  $self->{header} = new Message::Header;
-  #}
-  $self->{header};
-}
+## Inherited
 
 =item $body->value ([$new_body])
 
@@ -118,14 +100,7 @@ Set $new_body instead of current C<body>.
 
 =cut
 
-sub value ($;$) {
-  my $self = shift;
-  my $new_body = shift;
-  if ($new_body) {
-    $self->{value} = $new_body;
-  }
-  $self->{value};
-}
+## Inherited
 
 =head2 $self->stringify ([%option])
 
@@ -154,7 +129,7 @@ sub stringify ($;%) {
       if ($Message::MIME::Charset::CHARSET{$charset || '*default'}->{mime_text}) {
         $e{value} =~ s/\x0D(?!\x0A)/\x0D\x0A/gs;
         $e{value} =~ s/(?<!\x0D)\x0A/\x0D\x0A/gs;
-        $e{value} .= "\x0D\x0A" unless $e{value} =~ /\x0D\x0A$/s;
+        #$e{value} .= "\x0D\x0A" unless $e{value} =~ /\x0D\x0A$/s;
       }
     }
   } else {
@@ -164,22 +139,20 @@ sub stringify ($;%) {
     if ($e{charset}) {
       unless (ref $ct) {
         $ct = $self->{header}->field ('content-type');
-        $ct->value ($option{_MEDIA_TYPE});
+        $ct->value ($option{media_type}.'/'.$option{media_subtype});
       }
       $ct->replace (charset => $e{charset});
     } elsif (ref $ct) {
       $ct->replace (charset => $self->{option}->{body_default_charset});
+    } elsif ($option{fill_ct}) {
+      $ct = $self->{header}->field ('content-type');
+      $ct->value ($option{media_type}.'/'.$option{media_subtype});
+      $ct->replace (Message::MIME::Charset::name_minimumize ($option{body_default_charset} => $e{value}));
     }
   }
   $e{value};
 }
 *as_string = \&stringify;
-
-=head2 $self->option ($option_name)
-
-Returns/set (new) value of the option.
-
-=cut
 
 ## Inherited: option, clone
 
@@ -210,7 +183,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/01 05:30:59 $
+$Date: 2002/06/09 10:57:16 $
 
 =cut
 

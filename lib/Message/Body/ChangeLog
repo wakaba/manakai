@@ -1,3 +1,12 @@
+2002-06-09  wakaba <w@suika.fam.cx>
+
+	* Multipart.pm: New module.
+	* Text.pm (stringify): Don't append "\x0D\x0A" unless it
+	when normalization.
+	* TextPlain.pm (stringify): 
+	- Minimumlizes mime charset name (if fill_ct).
+	- Don't append "\x0D\x0A" unless it when normalization.
+
 2002-06-01  wakaba <w@suika.fam.cx>
 
 	* TextPlain.pm: Reimplemented with parent class
