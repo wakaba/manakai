@@ -38,7 +38,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/10/10 00:01:09 $
+     $Date: 2004/10/11 10:37:12 $
 
   @ConditionDef:
     @@Name:DOM3
@@ -1182,66 +1182,228 @@ IF:
         @@@Type:  DOMConfiguration
   @Attr:
      @@Name:  newLine
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The end-of-line character sequence to be used in the XML entity 
+         being written out.  Although any string can be set, 
+         other sequences than the ones specified by the XML specifications 
+         can result in a document that is either not serializable 
+         or not well-formed.
+       \
+         The default value of this attribute is implementation specific.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         The DOM implementation should choose the default to match 
+         the usual convention for text files in the environment being used. 
+         The DOM implementation must choose a default sequence 
+         that is admited for XML 1.0 or XML 1.1, depending on the 
+          serialized content.
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Reset to the default value.
   @Attr:
      @@Name:  filter
+     @@Description:
+       @@@lang:en
+       @@@@:
+         A filter that will be called out before serializing 
+         each <IF:Node>.  The filter can choose to remove 
+         the node from the stream or to terminate the serialization early.
+      \
+         Note that the filter is invoked after the operations 
+         requested by configuration parameters have been applied.
      @@Get:
         @@@Type:  LSSerializerFilter
      @@Set:
         @@@Type:  LSSerializerFilter
   @Method:
      @@Name:  write
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Serialize the specified node and write it out.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         {P:: The encoding is:
+         \
+           = <A:LSOutput.encoding>
+         \
+           = <A:Document.inputEncoding>
+         \
+           = <A:Document.xmlEncoding>
+         \
+           = <CODE:UTF-8>
+         }
+         If the specified encoding is not supported, the fatal error 
+         <ERR:unsupported-encoding> is raised.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         The DOM implementation is responsible of associating the 
+         appropriate media type with the serialized data.
+       \
+         When writing to an HTTP URI, the <CODE:PUT> method is performed. 
+         For other URI schemes, the mechanism for writing the data is 
+         implementation dependent.
      @@Param:
         @@@Name:  nodeArg
         @@@Type:  Node
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The node to serialize.
      @@Param:
         @@@Name:  destination
         @@@Type:  LSOutput
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The destination.
      @@Return:
         @@@Type:
            DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The <P:nodeArg> was successfully serialized.
         @@@InCase:
            @@@@Value:  false
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The normal processing was stopped but the DOM 
+               implementation kept serializing the document; 
+               the result of the serialization being 
+               implementation dependent then.
         @@@Exception:
-           @@@@Name:  ** TBD **
+           @@@@Name:  SERIALIZE_ERR
            @@@@Type:  LSException
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The serializer was unable to serialize the node. 
+           @@@@ImplNote:
+             @@@@@lang:en
+             @@@@@@:
+               DOM applications should use error handler to get 
+               details on the error.
+        @@@Error:
+          @@@@Name:unsupported-encoding
+          @@@@Severity:Fatal
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The encoding specified explicitly or implicitly is 
+              not supported by the serializer.
+        @@@Error:
+          @@@@Name:no-output-specified
+          @@@@Severity:Fatal
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              No output is specified in the <P:destination>.
   @Method:
      @@Name:  writeToURI
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Serialize the specified node and write it as the resource 
+         specified by the URI.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         This is a convinience method; it acts as if <M:LSSerializer.write> 
+         was called with a <IF:LSOutput> with no encoding specified 
+         and <A:LSOutput.systemId> set to <P:uri>.
      @@Param:
         @@@Name:  nodeArg
         @@@Type:  Node
+        @@@Description:
+          @@@@lang:en
+          @@@@@:The node to serialize.
      @@Param:
         @@@Name:  uri
-        @@@Type:  DOMString
+        @@@Type:  
+          ManakaiDOM:ManakaiDOMURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@:The URI to write to.
      @@Return:
         @@@Type:
            DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The <P:nodeArg> was successfully serialized.
         @@@InCase:
            @@@@Value:  false
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The normal processing was stopped but the implementation 
+               kept serializing the document; the result of the serialization 
+               is implementation dependent then.
         @@@Exception:
-           @@@@Name:  ** TBD **
+           @@@@Name:  SERIALIZATION_ERR
            @@@@Type:  LSException
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The serializer was unable to serialize the node.
   @Method:
      @@Name:  writeToString
+     @@Description:
+        @@@lang:en
+        @@@@:
+          Serialize the specified node and write it to a 
+          <TYPE:DOMString>.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         The encoding used is the encoding of the <TYPE:DOMString>, 
+         i.e. <CODE:UTF-16>.  No <CHAR:BOM> is generated.
      @@Param:
         @@@Name:  nodeArg
         @@@Type:  Node
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The node to serialize.
      @@Return:
         @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The serialized data.
         @@@Exception:
-           @@@@Name:  ** TBD **
+           @@@@Name:  DOMSTRING_SISE_ERR
            @@@@Type:
               DOMCore:DOMException
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The resulting string is too long to fit in a <TYPE:DOMString>.
         @@@Exception:
-           @@@@Name:  ** TBD **
+           @@@@Name:  SERIALIZE_ERR
            @@@@Type:  LSException
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The serializer was unable to serialize the node.
 
 IF:
   @Name:  LSOutput

@@ -1,4 +1,6 @@
 Namespace:
+  @DOMEvents:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/events#
   @DOMLS:
     http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
   @DOMXML:
@@ -51,7 +53,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/10/10 06:11:56 $
+     $Date: 2004/10/11 10:37:12 $
 
   @ConditionDef:
     @@Name: DOM1
@@ -4475,6 +4477,7 @@ IF:
           push @{$node->{<Q:TreeCore:subnode>}}, <Q:infoset:children>;
           push @{$node->{<Q:TreeCore:subnode2>}}, <Q:infoset:attributes>;
           push @{$node->{<Q:TreeCore:irefnode>}}, <Q:DOMCore:ownerDocument>;
+          push @{$node->{<Q:TreeCore:anydata2>}}, <Q:DOMEvents:eventListener>;
           $node->{<Q:infoset:children>} = [];
           $node->{<Q:infoset:attributes>} = {};
           $node->{<Q:DOMCore:hasFeature>}->{XML} = true;
@@ -9629,6 +9632,12 @@ IF:
       document's data.
 
   @ISA:  Node
+  @Role:
+    @@@:
+      DOMCore:Document
+    @@compat:
+      ManakaiDOMCore:Document
+
   @Require:
     @@Module:
       @@@Def:

@@ -33,7 +33,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date.RCS:
-     $Date: 2004/10/10 06:11:57 $
+     $Date: 2004/10/11 10:37:13 $
   
   @Description:
     @@lang:en
@@ -545,6 +545,7 @@ IF:
             <Q:TreeCore:irefnode> => [],
             <Q:TreeCore:urefnode> => [],
             <Q:TreeCore:anydata> => [],
+            <Q:TreeCore:anydata2> => [],
             <Q:TreeCore:rc> => 0,
             <Q:TreeCore:treeID> => __CODE{UniqueID}__,
             <Q:TreeCore:nodeID> => __CODE{UniqueID}__,
@@ -684,18 +685,9 @@ IF:
           }
    \       for my $key (@{$self->{<Q:TreeCore:irefnode>}},
    \                    @{$self->{<Q:TreeCore:urefnode>}},
-   \                    @{$self->{<Q:TreeCore:anydata>}}) {
-            if (ref $self->{$key} eq 'ARRAY') {
-              for (@{$self->{$key}}) {
-                delete $self->{$key}->{$_};
-              }
-            } elsif (ref $self->{$key} eq 'HASH') {
-              for (keys %{$self->{$key}}) {
-                delete $self->{$key}->{$_};
-              }
-            } else {
-              delete $self->{$key};
-            }
+   \                    @{$self->{<Q:TreeCore:anydata>}},
+   \                    @{$self->{<Q:TreeCore:anydata2>}}) {
+            delete $self->{$key};
           }
   @IntMethod:
     @@Name: importTree

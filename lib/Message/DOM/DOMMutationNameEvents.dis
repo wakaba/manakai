@@ -1,0 +1,332 @@
+Namespace:
+  @DOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @DOMEvents:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/events#
+  @ev:
+    http://www.w3.org/2001/xml-events
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOMEvents:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-ev#
+  @TreeCore:\
+Module:
+  @Name:  DOMMutationNameEvents
+  @Namespace:
+     http://suika.fam.cx/~wakaba/archive/2004/dom/events#
+  @BindingName:
+     @@@:  events
+     @@Type:
+        lang:IDL-DOM
+     @@prefix:  dom.w3c.org
+  @FullName:
+    @@lang:en
+    @@@: DOM Mutation Name Events Module
+  @Description:
+    @@lang:en
+    @@@:
+      Notify changes to the name of a node.
+
+  @Author:
+     @@FullName:  Wakaba
+     @@Mail:  w@suika.fam.cx
+  @License:
+     license:Perl+MPL
+  @Date.RCS:
+     $Date: 2004/10/11 10:37:13 $
+
+  @ConditionDef:
+    @@Name:DOM2
+  @ConditionDef:
+    @@Name:DOM3
+    @@ISA:DOM2
+  @NormalCondition:DOM3
+
+  @Feature:
+    @@Name:MutationNameEvents
+    @@Version:3.0
+    @@FullName: DOM Level 3 Mutation Name Events
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The support for <Feature:MutationEvents>/<FeatureVer:3.0> and
+        <Feature:Core>/<FeatureVer:3.0> is required.
+    @@Condition[list]:
+      DOM3
+    @@Contrib:
+      DOMCore:DOMImplementation::
+
+
+  @Require:
+     @@Module:
+        @@@Name:  DOMMutationEvents
+        @@@Namespace:
+           http://suika.fam.cx/~wakaba/archive/2004/dom/events#
+
+EventSet:
+  @Event:
+    @@QName:
+      ev:DOMElementNameChanged
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The <A:Node.namespaceURI> and/or the <A:Node.nodeName> 
+        of an <IF:Element> have been modified.
+    @@ActionBefore:
+      @@@lang:en
+      @@@@:
+        The element type name has been modified.
+    @@Type:MutationEvent
+    @@IsBubbling:1
+    @@IsCancalable:0
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The renamed <IF:Element> node.
+    @@MutationNameEvent.prevNamespaceURI:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNamespaceURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The previous namespace URI.
+    @@MutationNameEvent.prevNodeName:
+      @@@Type:
+        DOMMain:DOMString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The previous node name.
+  @Event:
+    @@QName:
+      ev:DOMAttributeNameChanged
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The <A:Node.namespaceURI> and/or the <A:Node.nodeName>
+        of an <IF:Attr> have been modified.
+    @@ActionBefore:
+      @@@lang:en
+      @@@@:
+        The attribute name has been modified.
+    @@Type:MutationEvent
+    @@IsBubbling:1
+    @@IsCancalable:0
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The parent <IF:Element> node whose <IF:Attr> has been renamed.
+    @@MutationNameEvent.prevNamespaceURI:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNamespaceURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The previous namespace URI.
+    @@MutationNameEvent.prevNodeName:
+      @@@Type:
+        DOMMain:DOMString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The previous node name.
+    @@MutationEvent.relatedNode:
+      @@@Type:
+        DOMCore:Attr
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The renamed <IF:Attr> node.
+##EventSet
+
+IF:
+  @Name:  MutationNameEvent
+  @Description:
+    @@lang:en
+    @@@:
+      Provide specific contextual information associated 
+      with mutation name event types.
+  @Example:
+    @@For:
+      lang:Perl
+    @@FullName:
+      @@@lang:en
+      @@@@:
+        Create an instance of the <IF:MutationNameEvent> interface
+    @@Code:
+      @@@Type:
+        lang:Perl
+      @@@@:
+        my $mnev = $DocumentEvent->createEvent ('MutationNameEvent');
+
+  @ISA:  
+    DOMMutationEvents:MutationEvent
+  @Role:
+    @@@:
+      DOMEvents:Event
+    @@compat:
+      ManakaiDOMEvents:Events
+
+  @Level[list]:  3
+  @SpecLevel[list]:  3
+
+  @Attr:
+     @@Name:  prevNamespaceURI
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The previous namespace URI.
+     @@Get:
+        @@@Type: 
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The previous value of the <A:Node.namespaceURI>.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMMutationNameEvents:prevNamespaceURI
+  @Attr:
+     @@Name:  prevNodeName
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The previous node name.
+     @@Get:
+        @@@Type:  
+          DOMMain:DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The previous value of the <A:Node.nodeName>.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMMutationNameEvents:prevNodeName
+  @Method:
+     @@Name:  initMutationNameEvent
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Initialize the value of a <IF:MutationNameEvent> object.  It 
+         has the same behavior as <M:MutationEvent.initMutationEvent>.
+     @@NSVersion:initMutationNameEventNS
+     @@Param:
+        @@@Name:  typeArg
+        @@@Type:  
+          DOMMain:DOMString
+     @@Param:
+        @@@Name:  canBubbleArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  cancelableArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  relatedNodeArg
+        @@@Type:  
+          DOMCore:Node
+     @@Param:
+        @@@Name:  prevNamespaceURIArg
+        @@@Type:  
+          ManakaiDOM:ManakaiDOMNamespaceURI
+     @@Param:
+        @@@Name:  prevNodeNameArg
+        @@@Type:  
+          DOMMain:DOMString
+     @@Return:  
+       @@@Def:
+         @@@@Type:
+           lang:Perl
+         @@@@@:
+                  ## Conditional
+           $self->__SUPER{MutationEvent}__::initEvent
+                     ($typeArg, $canBubbleArg, $cancelableArg);
+           for ($self->{<Q:TreeCore:node>}) {
+             $_->{<Q:DOMMutationNameEvents:prevNamespaceURI>}
+                                            = $prevNamespaceURIArg;
+             $_->{<Q:DOMMutationNameEvents:prevNodeName>} = $prevNodeNameArg;
+           }
+     @@Level[list]:  3
+     @@SpecLevel[list]:  3
+  @Method:
+     @@Name:  initMutationNameEventNS 
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Initialize the value of a <IF:MutationNameEvent> object.  It 
+         has the same behavior as <M:MutationEvent.initMutationEventNS>.
+     @@NoNSVersion:initMutationNameEvent
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type: 
+          ManakaiDOM:ManakaiDOMNamespaceURI
+     @@Param:
+        @@@Name:  typeArg
+        @@@Type:  
+          DOMMain:DOMString
+     @@Param:
+        @@@Name:  canBubbleArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  cancelableArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  relatedNodeArg
+        @@@Type:  
+          DOMCore:Node
+     @@Param:
+        @@@Name:  prevNamespaceURIArg
+        @@@Type:  
+          ManakaiDOM:ManakaiDOMNamespaceURI
+     @@Param:
+        @@@Name:  prevNodeNameArg
+        @@@Type:  
+          DOMMain:DOMString
+     @@Return:  
+       @@@Def:
+         @@@@Type:
+           lang:Perl
+         @@@@@:
+                  ## Conditional
+           $self->__SUPER{MutationEvent}__::initEventNS
+                     ($namespaceURI, $typeArg, $canBubbleArg, $cancelableArg);
+           for ($self->{<Q:TreeCore:node>}) {
+             $_->{<Q:DOMMutationNameEvents:prevNamespaceURI>}
+                                            = $prevNamespaceURIArg;
+             $_->{<Q:DOMMutationNameEvents:prevNodeName>} = $prevNodeNameArg;
+           }
+     @@Level[list]:  3
+     @@SpecLevel[list]:  3
+
+## DOMMutationEvents.dis ends here

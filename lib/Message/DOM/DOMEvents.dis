@@ -1,0 +1,2690 @@
+Namespace:
+  @ev:
+    http://www.w3.org/2001/xml-events
+  @infoset:
+     http://www.w3.org/2001/04/infoset#
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
+  @ManakaiDOMEvents:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-ev#
+  @TreeCore:\
+Module:
+  @Name:  DOMEvents
+  @Namespace:
+     http://suika.fam.cx/~wakaba/archive/2004/dom/events#
+  @BindingName:
+     @@@:  events
+     @@Type:
+        lang:IDL-DOM
+     @@prefix:  dom.w3c.org
+  @FullName:
+    @@lang:en
+    @@@: DOM Events Module
+  @Author:
+     @@FullName:  Wakaba
+     @@Mail:  w@suika.fam.cx
+  @License:
+     license:Perl+MPL
+  @Date.RCS:
+     $Date: 2004/10/11 10:37:12 $
+
+  @ConditionDef:
+    @@Name:DOM2
+  @ConditionDef:
+    @@Name:DOM3
+    @@ISA:DOM2
+  @NormalCondition:DOM3
+
+  @Feature:
+    @@Name:Events
+    @@Version:2.0
+    @@FullName: DOM Level 2 Events
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The support for <Feature:Core>/<FeatureVer:2.0> is required.
+    @@Condition[list]:
+      DOM2
+      DOM3
+    @@Contrib:
+      DOMCore:DOMImplementation::
+    @@Contrib:
+      DocumentEvent::DOM2
+    @@Contrib:
+      DocumentEvent::DOM3
+    @@Contrib:
+      EventTarget::DOM2
+    @@Contrib:
+      EventTarget::DOM3
+  @Feature:
+    @@Name:Events
+    @@Version:3.0
+    @@FullName: DOM Level 3 Events
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The support for <Feature:Core>/<FeatureVer:2.0> is required.
+    @@Condition[list]:
+      DOM3
+    @@Contrib:
+      DOMCore:DOMImplementation::
+    @@Contrib:
+      DocumentEvent::DOM3
+    @@Contrib:
+      EventTarget::DOM3
+
+
+  @Require:
+     @@Module:
+        @@@Name:  DOMCore
+        @@@FileName:
+           @@@@@:  dom.idl
+           @@@@For:
+              lang:IDL-DOM
+        @@@Namespace:
+           http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+     @@Module:
+        @@@Name:  DOMViews
+        @@@FileName:
+           @@@@@:  views.idl
+           @@@@For:
+              lang:IDL-DOM
+        @@@Namespace:
+           :: TBD ::
+
+Doc:
+  @FullName:
+    @@lang:en
+    @@@: Event Types and Event Categories
+  @Description:
+    @@lang:en
+    @@@:
+      Each event is associated with a <DFN:event type>.  The type is 
+      identified by the pair of a DOM URI and a local name. 
+      They are case-sensitive.
+    \
+      Each event type in turn could be part of one or more categories. 
+      An <DFN:event category> is also identified by the pair of 
+      a DOM URI and a local name.
+    \
+      {NOTE::
+         DOM Level 2 Events methods are namespace ignorant; in DOM 
+         Level 2 Events, the event type is only represented by 
+         an XML 1.0 <XML:Name>.  While it is safe to use both Level 2 and 
+         Level 3 methods when not dealing with namespaces, 
+         using them at the same time should be avoided.
+      \
+      }
+      \
+      {P:: For compatibility, the dispatching of an event will ignore 
+      namespace URIs if either the event or the event listener 
+      has a <DOM:null> namespace URI, that is:
+      \
+      - If a DOM Level 2 event (<DOM:null> namespace URI) is 
+        dispatched, all event listeners that match the local name 
+        will be triggered.
+      \
+      - If a DOM Level 3 event (non-<DOM:null> namespace URI) is 
+        dispatched, all event listeners with the same local name 
+        that match the namespace URI or whose namespace URI is <DOM:null> 
+        will be triggered.
+      \
+      }
+  @ImplNote:
+    @@lang:en
+    @@@:
+      In DOM Level 2 Events, event type names begin with 
+      <CODE:DOM> (in any case) was reserved.  Third party added 
+      events were strongly recommended to start with 
+      some prefix to avoid confusion.
+
+Doc:
+  @FullName:
+    @@lang:en
+    @@@: DOM Event Flow
+  @Description:
+    @@lang:en
+    @@@:
+      {P:: The event dispathcing (propagation) occurs in the order:
+      \
+       = Capture phase:: the event is dispatched to ancestors of 
+                         the target from the root of the tree 
+                         to the direct parent of the target node.
+      \
+       = Target pharse:: the event is dispatched to the target node.
+      \
+       = Bubbling phase:: the event is dispatched to ancestors of 
+                          the target from the direct parent of 
+                          the target node to the root of the tree.
+      \
+       = Default actions:: not part of the DOM Event flow; they are 
+                           invoked, if any, after the event is dispatched.
+      \
+      }
+      \
+      Some events may not necessarily accomplish the three pharses; 
+      see <A:Event.bubbles>.
+      \
+      Ancesotrs are determined before the initial dispatch; even if 
+      the target node is removed during the dispatching or if 
+      an ancestor is added or removed, the event propagation 
+      will always be based on the nodes determined before the dispatching.
+
+Doc:
+  @FullName:
+    @@lang:en
+    @@@: Event Listeners
+  @Description:
+    @@lang:en
+    @@@:
+      Event listeners can be registered on all nodes.  Each event listener 
+      is always part of an event group; it is either explicitly in 
+      a group if a group is specified at the registration or 
+      implicitly in the default group.  Within a group, listeners are 
+      ordered in the order of registration.  Listeners will be triggered 
+      in that order.  If the two listeners are not part of the same 
+      group, the order triggered is not specified.
+      \
+      {NOTE:: In general, a DOM application does not need to define 
+              and use a separate group unless other event listeners, 
+              external to the DOM application, may change the propagation.
+              While the DOM implementation may impose priorities on groups, 
+              DOM applications must not rely on it.
+      \
+      }
+      \
+      {NOTE:: DOM Level 2 did not specify any triggering order.
+      \
+      }
+      \
+      If an event listener is registered on a node while an event 
+      gets processed on the node, the event listener will not be 
+      triggered during the current phase but may be triggered 
+      during a later phase in the event flow.
+      If an event listener is removed from a node while an event 
+      is being processed on the node, it will not be triggered 
+      by the current actions.
+      \
+      {P:: There are two ways to associate an event listener to a node:
+      \
+        - at the programming level:: using the <IF:EventTarget> methods.
+      \
+        - at the document level:: using markup such as XML Events, 
+          HTML, VoiceXML, and so on.
+      \
+      }
+      \
+      Actions taken by an event listener might cause additional 
+      events to be dispatched.  Additional events should be 
+      handled in a synchronous manner and may cause reentrance 
+      into the event model.  A DOM application should not depend 
+      on how many synchronous events may be triggered.
+      \
+      DOM Level 2 Events Specification said that any 
+      exceptions throw inside an <IF:EventListener> will not 
+      stop propagation of the event.
+      \
+      {NOTE:: DOM Level 3 Events Specification does not have 
+              this clause.
+      \
+      }
+
+EventSet:
+  @Event:
+    @@QName:
+      ev:textInput
+    @@Description:
+      @@@lang:en
+      @@@@:
+        One or more characters have been entered.
+     \
+        {eg:
+        \
+          - A key is pressed or released on a keyboard device.
+        \
+          - Characters are passed from an input method editor.
+        \
+          - Characters are passed as the result of a voice command.
+        \
+          - A <QUOTE:paste> operation generates a simple 
+            sequence of characters (a text without any structure or 
+            style information).
+        \
+        }
+    @@Type:TextEvent
+    @@IsBubbling:1
+    @@IsCancelable:1
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+    @@SpecLevel:3
+  @Event:
+    @@Name:click
+    @@QName: 
+      ev:click
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A pointing device button is clicked over an element.  The 
+        definition of a <QUOTE:click> depends on the environment 
+        configuration.
+       \
+        In the case of nested elements, this event is always targeted 
+        at the most deeply nested element.
+       \
+          Events <EV:ev:mousedown> and <EV:ev:mouseup> are 
+          dispatched before the <EV:ev:click>.  The target node 
+          must be the same betweeb these three events; otherwise, i.e. 
+          <EV:ev:mousemove> and <EV:ev:mouseout> occur betweeb the 
+          press and release of the button, <EV:ev:click> cannot occur.
+    @@Type:MouseEvent
+    @@IsBubbling:1
+    @@IsCancelable:1
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+    @@SpecLevel:2
+  @Event:
+    @@Name:mousedown
+    @@QName:
+      ev:mousedown
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A pointing device button is pressed over an element.
+        \
+        In the case of nested elements, this event is always targeted
+        at the most deeply nested element.
+    @@Type:MouseEvent
+    @@IsBubbling:1
+    @@IsCancelable:1
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+    @@SpecLevel:2
+  @Event:
+    @@Name:mouseup
+    @@QName:
+      ev:mouseup
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A pointing device button is released over an element.
+        \
+        In the case of nested elements, this event is always targeted
+        at the most deeply nested element.
+    @@Type:MouseEvent
+    @@IsBubbling:1
+    @@IsCancelable:1
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+    @@SpecLevel:2
+  @Event:
+    @@Name:mouseover
+    @@QName:
+      ev:mouseover
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A pointing device is moved onto an element.
+        \
+        In the case of nested elements, this event is always targeted
+        at the most deeply nested element.
+    @@Type:MouseEvent
+    @@IsBubbling:1
+    @@IsCancelable:1
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+    @@SpecLevel:2
+  @Event:
+    @@Name:mousemove
+    @@QName:
+      ev:mousemove
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A pointing device is moved while it is over an element. 
+        \
+        In the case of nested elements, this event is always targeted
+        at the most deeply nested element.
+    @@Type:MouseEvent
+    @@IsBubbling:1
+    @@IsCancelable:1
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+    @@SpecLevel:2
+  @Event:
+    @@Name:mouseout
+    @@QName:
+      ev:mouseout
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A pointing device is moved away from an element.
+        \
+        In the case of nested elements, this event is always targeted
+        at the most deeply nested element.
+    @@Type:MouseEvent
+    @@IsBubbling:1
+    @@IsCancelable:1
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+    @@SpecLevel:2
+
+  @Event:
+    @@QName:
+      ev:keydown
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A key is pressed down. 
+      \
+        This event type is device dependent and relies on the 
+        capabilities of the input devices and how they are mapped 
+        in the operating system.
+      \
+        This event type is generated after the keyboard mapping 
+        but before the processing of an input method editor.
+      \
+        This event should logically happen before the event 
+        <EV:ev:keyup> is produced.  Whether a keydown 
+        contributes to the generation of a text event is 
+        implementation dependent.
+    @@Type:KeyboardEvent
+    @@IsBubbling:1
+    @@IsCancelable:1
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+    @@SpecLevel:3
+  @Event:
+    @@QName:
+      ev:keyup
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A key is released.
+       \
+        This event type is device dependent and relies on the 
+        capabilities of the input devices and how they are mapped in 
+        the operating system.
+       \
+        This event type is generated after the keyboard mapping but 
+        before the process of an input method editor.
+       \
+        This event should logically happen after the event 
+        <EV:ev:keydown> is produced.
+       \
+        Whether a keyup contributes to the generation of a text 
+        event is implementation dependent.
+    @@Type:KeyboardEvent
+    @@IsBubbling:1
+    @@IsCancelable:1
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+    @@SpecLevel:3
+
+  @Event:
+    @@QName:
+      ev:load
+    @@Description:
+      @@@lang:en
+      @@@@@:
+        The DOM implementation finishes loading the resource (such as 
+        document) and any dependent resources (such as images, 
+        style sheets).
+      \
+        {NOTE:: Dependent resources that fail to load will not 
+                prevent this event from firing if the resoure that 
+                loaded them is still accessible via the DOM interfaces.
+     \
+        }
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         The DOM implementation is required to dispatch this event 
+         at least on the <IF:Document> node if this event is dispatched.
+    @@Type:Event
+    @@IsBubbling:0
+    @@IsCancalable:0
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Node
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          <IF:Document> or <IF:Element> node.
+  @Event:
+    @@QName:
+      ev:unload
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The DOM implementation removes from the environment 
+        the resource (such as document) or any dependent resources 
+        (such as images, style sheets).
+    @@ActionAfter:
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The document is unloaded.
+    @@ImplNote:
+      @@@lang:en
+       @@@@:
+         The DOM implementation is required to dispatch this event
+         at least on the <IF:Document> node if this event is dispatched.
+    @@Type:Event
+    @@IsBubbling:0
+    @@IsCancalable:0
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Node
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          <IF:Document> or <IF:Element> node.
+  @Event:
+    @@QName:
+      ev:abort
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The loading of the document, or a resource linked from it, 
+        is stopped before being entirely loaded.
+    @@Type:Event
+    @@IsBubbling:1
+    @@IsCancalable:0
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+  @Event:
+    @@QName:
+      ev:error
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The document, or a resource linked from it, 
+        has been loaded but cannot be interpreted accordint to 
+        its semantic.
+        \
+        {eg:
+        \
+          - A resource is invalid as an image.
+        \
+          - A script execution error occured.
+        \
+          - An XML document is not well-formed.
+        \
+        }
+    @@Type:Event
+    @@IsBubbling:1
+    @@IsCancalable:0
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+  @Event:
+    @@QName:
+      ev:select
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A user selects some text.
+      \
+        {NOTE:: DOM Level 3 Events does not provides contextual information 
+                to access the selected text.
+      \
+        }
+    @@ActionBefore:
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The selection occured.
+    @@Type:Event
+    @@IsBubbling:1
+    @@IsCancalable:0
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+  @Event:
+    @@QName:
+      ev:change
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A control loses the input focus and its value has been 
+        modified since gaining focus.
+    @@Type:Event
+    @@IsBubbling:1
+    @@IsCancalable:0
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+  @Event:
+    @@QName:
+      ev:submit
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A form is submitted.
+    @@Type:Event
+    @@IsBubbling:1
+    @@IsCancalable:1
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+  @Event:
+    @@QName:
+      ev:reset
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A form is reset.
+    @@Type:Event
+    @@IsBubbling:1
+    @@IsCancalable:1
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+  @Event:
+    @@QName:
+      ev:resize
+    @@Description:
+      @@@lang:en
+      @@@@@:
+        A document view or an element has been resized.
+    @@ActionBefore:
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The resize occurred.
+    @@Type:UIEvent
+    @@IsBubbling:1
+    @@IsCancalable:0
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Node
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          <IF:Document> or <IF:Element> node.
+  @Event:
+    @@QName:
+      ev:scroll
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A document view or an element has been scrolled.
+    @@ActionBefore:
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The scroll occurred.
+    @@Type:UIEvent
+    @@IsBubbling:1
+    @@IsCancalable:0
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Node
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          <IF:Document> or <IF:Element> node.
+
+DataTypeAlias:
+  @Name:  DOMString
+  @Type:
+     DOMMain:DOMString
+DataTypeAlias:
+  @Name:  DOMTimeStamp
+  @Type:
+     DOMMain:DOMTimeStamp
+DataTypeAlias:
+  @Name:  DOMObject
+  @Type:
+     DOMMain:DOMObject
+DataTypeAlias:
+  @Name:  Node
+  @Type:
+     DOMCore:Node
+
+Exception:
+  @Name:  EventException
+  @Level[list]:  2
+  @SpecLevel[list]:  2
+  @Attr:
+     @@Name:  code
+     @@Get:
+        @@@Type:
+           DOMMain:unsigned-short
+  @ConstGroup:
+     @@Name:  EventExceptionCode
+     @@Description: 
+       @@@lang:en
+       @@@@:
+         The type of error generated.
+     @@Type:
+        DOMMain:unsigned-short
+     @@Const:
+        @@@Name:  UNSPECIFIED_EVENT_TYPE_ERR
+        @@@Type:
+           DOMMain:unsigned-short
+        @@@Value:  0
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The event type was not specified or the event type 
+            is <DOM:null> or an empty string.
+     @@Const:
+        @@@Name:  DISPATCH_REQUEST_ERR
+        @@@Type:
+           DOMMain:unsigned-short
+        @@@Value:  1
+        @@@Level[list]:  3
+        @@@SpecLevel[list]:  3
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The <IF:Event> object is already dispatched in the tree.
+
+IF:
+  @Name:  Event
+  @Description:
+    @@lang:en
+    @@@:
+      Provide contextual information about an event to the listener 
+      processing the event.  More specific context information is passed to 
+      event listeners by deriving additional interfaces from 
+      <IF:Event>.
+    \
+      {NOTE:: An object that implements the <IF:Event> interface 
+              (and additional interfaces, if any) is passed as 
+              the parameter to an <IF:EventListener>.
+    \
+      }
+    \
+      {NOTE:: To create an instance of the <IF:Event> interface, 
+              use the <M:DocumentEvent.createEvent> method.
+    \
+      }
+  @Level[list]:  2
+  @SpecLevel[list]:  2
+  
+  @Role:
+    @@@:
+      DOMEvents:Event
+    @@compat:
+      ManakaiDOMEvents:Event
+
+  @ConstGroup:
+     @@Name:  PhaseType
+     @@Type:
+        DOMMain:unsigned-short
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Pharses of the event flow.
+     @@Const:
+        @@@Name:  CAPTURING_PHASE
+        @@@Type:
+           DOMMain:unsigned-short
+        @@@Value:  1
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The current event pharse is the capture phase.
+     @@Const:
+        @@@Name:  AT_TARGET
+        @@@Type:
+           DOMMain:unsigned-short
+        @@@Value:  2
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The current event phase is the target phase.
+     @@Const:
+        @@@Name:  BUBBLING_PHASE
+        @@@Type:
+           DOMMain:unsigned-short
+        @@@Value:  3
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The current event phase is the bubbling phase.
+  @Attr:
+     @@Name:  type
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The event type.
+     @@Get:
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The event type.  This value is case-sensitive.
+          \
+            {NOTE:: If the attribute <A:Event.namespaceURI> is 
+                    different from <DOM:null>, the pair of 
+                    <A:namespaceURI> and <A:type> (local name) 
+                    identifies the type of the event.
+          \
+            }
+        @@@InCase:
+          @@@@Label:
+            @@@@@lang:en
+            @@@@@@: 
+              XML 1.0 <XML:Name>
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The <A:type> should be an XML 1.0 <XML:Name> in DOM Level 2 
+              Events.
+          @@@@SpecLevel:2
+        @@@InCase:
+          @@@@Label:
+            @@@@@lang:en
+            @@@@@@:
+              XML Namespace 1.0 <XML:NCName>
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The <A:type> should be an XML Namespace 1.0 <XML:NCName> 
+              in DOM Level 3 Events.
+       @@@Def:
+         @@@@Type:
+           lang:dis
+         @@@@GetProp:
+           infoset:localName
+  @Attr:
+     @@Name:  target
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The event target.
+     @@Get:
+        @@@Type:  EventTarget
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMEvents:target
+  @Attr:
+     @@Name:  currentTarget
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The <IF:EventTarget> whose <IF:EventListeners> are 
+         currently being processed.
+     @@Get:
+        @@@Type:  EventTarget
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMEvents:currentTarget
+  @Attr:
+     @@Name:  eventPhase
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Which phase of event flow is currently being accomplished.
+     @@Get:
+        @@@Type: PhaseType
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMEvents:PhaseType
+  @Attr:
+     @@Name:  bubbles
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Whether the event is a bubbling event.
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@: The event can bubble.
+        @@@InCase:
+           @@@@Value:  false
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@: The event cannot bubble.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMEvents:bubbles
+  @Attr:
+     @@Name:  cancelable
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Whether the event can have its default action prevented.
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@: The default action can be prevented.
+        @@@InCase:
+           @@@@Value:  false
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@: The default action cannot be prevented.
+       @@@Def:
+         @@@@Type:
+           lang:dis
+         @@@@GetProp:
+           DOMEvents:cancelable
+  @Attr:
+     @@Name:  timeStamp
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The time at which the event was created.
+     @@Get:
+        @@@Type:  DOMTimeStamp
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The time in milliseconds relative to the implementation 
+            dependent epoch.
+        @@@InCase:
+          @@@@Value:0
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The time is not available.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMEvents:timeStamp
+  @Method:
+     @@Name:  stopPropagation
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Prevent event listeners of the same group to be triggered 
+         but its effect is deferred untill all event listeners attached 
+         on the <A:currentTarget> have been triggerred.
+         Multiple calles to this method have no additional effect.
+       \
+         {NOTE:: This method does not prevent the default action 
+                 from being invoked.
+       \
+         }
+     @@Return:  
+       @@@Def:
+         @@@@Type:
+           lang:Perl
+         @@@@@:
+           $self->{<Q:TreeCore:node>}
+                ->{<Q:DOMEvents:isPropagationStopped>} = true;
+         @@@@ImplNote:
+           @@@@@lang:en
+           @@@@@@:
+             This implementation only changes the status of this object; 
+             the caller of this event should access this property 
+             to know whether the propagation should be continued or not.
+  @Method:
+     @@Name:  preventDefault
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Signify that the event is to be canceled, i.e. 
+         any default action normally taken after the DOM Event flow 
+         will not occur.  Calling this method for a non-cancelable 
+         event has no effect.
+       \
+         {NOTE:: This method does not stop the event propagation.
+       \
+         }
+     @@Return: 
+       @@@Def:
+         @@@@Type:
+           lang:Perl
+         @@@@@:
+           $self->{<Q:TreeCore:node>}
+                ->{<Q:DOMEvents:isDefaultPrevented>} = true;
+         @@@@ImplNote:
+           @@@@@lang:en
+           @@@@@@:
+             This implementation only changes the status of this object; 
+             the caller of this event should access this property 
+             to know whether the default action should be fired or not.
+  @Method:
+     @@Name:  initEvent
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Initialize the value of an <IF:Event> created through 
+         the <M:DocumentEvent.createEvent> method. 
+         \
+         This event 
+         only be called before the <IF:Event> has been dispatched 
+         via the <M:EventTarget.dispatchEvent> method.
+         If this method is called several times before invoking 
+         the <M:EventTarget.dispatchEvent>, only the final invocation 
+         takes precedence.  This method has no effect if called 
+         after the event has been dispatched.  If called from 
+         a subclass of the <IF:Event> interface, only the values 
+         specified in this method are modified; all other attributes 
+         are left unchanged.
+     @@NSVersion:initEventNS
+     @@Param:
+        @@@Name:  eventTypeArg
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The event type.  The <A:Event.type> is set to this value. 
+            \
+            {NOTE:: The attribute <A:Event.namespaceURI> is set 
+                    to <DOM:null>.
+            \
+            }
+     @@Param:
+        @@@Name:  canBubbleArg
+        @@@Type:
+           DOMMain:boolean
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            Whether the bubbling can be occur.  The <A:Event.bubbles> is set 
+            to this value.
+            This parameter overrides the intrinsic bubbling behavior.
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  cancelableArg
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            Whether the default action is cancelable.  The <A:Event.cancelable> 
+            is set to this value.
+            This parameter overrides the intrinsic cancelabilization.
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Return: 
+       @@@Def:
+         @@@@Type:
+           lang:Perl
+         @@@@@:
+           my $node = $self->{<Q:TreeCore:node>};
+           unless ($node->{<Q:DOMEvents:isDispatched>}) {
+             $node->{<Q:infoset:namespaceName>} = null;
+             $node->{<Q:infoset:localName>} = $eventTypeArg;
+             $node->{<Q:DOMEvents:bubbles>} = $canBubbleArg;
+             $node->{<Q:DOMEvents:cancelable>} = $cancelableArg;
+           }
+  @Attr:
+     @@Name:  namespaceURI
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The namespace URI associated with this event.
+     @@Get:
+        @@@Type: 
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The namespace URI is unspecified.
+              \
+              {NOTE:: For events initialized with a DOM Level 2 Events 
+                      method, the namespace URI is always <DOM:null>.
+              \
+              }
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            infoset:namespaceName
+     @@NoNSVersion[list]:type 
+     @@Level[list]:  3
+     @@SpecLevel[list]:  3
+  @Method:
+     @@Name:  isCustom
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Whether the event implements the <IF:CustomEvent> interface.
+     @@Return:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The event object implements the <IF:CustomEvent> interface.
+        @@@InCase:
+           @@@@Value:  false
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The event object does not implement the 
+               <IF:CustomEvent> interface.
+        @@@Def:\
+     @@Level[list]:  3
+     @@SpecLevel[list]:  3
+     @@RedefinedBy:CustomEvent
+  @Method:
+     @@Name:  stopImmediatePropagation
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Prevent event listeners of the same group to be triggered. 
+         Multiple calles of this method have no additional effect.
+       \
+         {NOTE:: This method does not prevent the default action 
+                 from being invoked. 
+       \
+         }
+     @@Return:  
+       @@@Def:
+         @@@@Type:
+           lang:Perl
+         @@@@@:
+           $self->{<Q:TreeCore:node>}
+                ->{<Q:DOMEvents:isImmediatePropagationStopped>} = true;
+     @@Level[list]:  3
+     @@SpecLevel[list]:  3
+  @Method:
+     @@Name:  isDefaultPrevented
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Whether the <M:Event.preventDefault> method has been called.
+     @@Return:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The <M:Event.preventDefault> method has been called.
+        @@@InCase:
+           @@@@Value:  false
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The <M:Event.preventDefault> method has not been called.
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMEvents:isDefaultPrevented
+     @@Level[list]:  3
+     @@SpecLevel[list]:  3
+  @Method:
+     @@Name:  initEventNS
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Initialize the value of an <IF:Event> created through 
+         the <M:DocumentEvent.createEvent> method. 
+         \
+         This event 
+         only be called before the <IF:Event> has been dispatched 
+         via the <M:EventTarget.dispatchEvent> method.
+         If this method is called several times before invoking 
+         the <M:EventTarget.dispatchEvent>, only the final invocation 
+         takes precedence.  This method has no effect if called 
+         after the event has been dispatched.  If called from 
+         a subclass of the <IF:Event> interface, only the values 
+         specified in this method are modified; all other attributes 
+         are left unchanged.
+     @@NoNSVersion:initEvent
+     @@Param:
+        @@@Name:  namespaceURIArg
+        @@@Type: 
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The namespace URI of the event type.  The <A:Event.namespaceURI> 
+            is set to this value.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The event type has no namespace.
+     @@Param:
+        @@@Name:  eventTypeArg
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The local name of the event type.  The <A:Event.type> 
+            is set to this value.
+     @@Param:
+        @@@Name:  canBubbleArg
+        @@@Type:
+           DOMMain:boolean
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            Whether the bubbling can occur.  The <A:Event.bubbling> 
+            is set to this value.  This parameter overrides the 
+            intrinsic bubbling behavior.
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  cancelableArg
+        @@@Type:
+           DOMMain:boolean
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            Whether the default action is cancelable.  The <A:Event.cancelable> 
+            is set to this value.  This parameter overrides the 
+            intrinsic cancalability.
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Return: 
+       @@@Def:
+         @@@@Type:
+           lang:Perl
+         @@@@@:
+           my $node = $self->{<Q:TreeCore:node>};
+           unless ($node->{<Q:DOMEvents:isDispatched>}) {
+             $node->{<Q:infoset:namespaceName>} = $namespaceURIArg;
+             $node->{<Q:infoset:localName>} = $eventTypeArg;
+             $node->{<Q:DOMEvents:bubbles>} = $canBubbleArg;
+             $node->{<Q:DOMEvents:cancelable>} = $cancelableArg;
+           }
+     @@Level[list]:  3
+     @@SpecLevel[list]:  3
+##IF:Events
+
+IF:
+  @Name:  EventTarget
+  @Description:
+    @@lang:en
+    @@@:
+      The interface implemented by all the objects that could 
+      be event targets in a DOM implementation that supports 
+      the Event flows.
+    \
+      When used with the DOM event flow, this interface is 
+      implemented by all target nodes and target ancestors.  
+      This interface can be obtained by using binding-specific casting 
+      methods on an instance of the <IF:Node> interface.
+    \
+      {NOTE:: Copying a <IF:Node> (with methods such as 
+              <M:Node.cloneNode>) does not copy event listeners 
+              attached to it.  Moving a <IF:Node> does not 
+              affect event listeners.
+    \
+      }
+  @Level[list]:  2
+  @SpecLevel[list]:  2
+
+  @Role:
+    @@@:
+      DOMCore:Node
+    @@compat:
+      ManakaiDOMCore:Node
+  
+  @ImplNote:
+    @@lang:en
+    @@@:
+      Asynchronous <IF:LSParser> objects are expected to implement 
+      the <IF:EventTarget> interface.  See <Module:DOMLS> module.
+
+  @Method:
+     @@Name:  addEventListener
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Register an event listener in the default group.
+         \
+         Invoking <M:addEventListener> or <M:addEventListenerNS> 
+         multiple times on the same <IF:EventTarget> with the 
+         same parameters <A:namespaceURI>, <A:type>, <A:listener> 
+         and <A:useCapture> has no additional effect - it is 
+         independently of the event group.  In order to change 
+         the triggering order or to guarantee that an event listener 
+         will be added to the event target for the specified 
+         event group, invoke <M:removeEventListenerNS> first.
+     @@NSVersion:addEventListenerNS
+     @@Param:
+        @@@Name:  type
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The event type.
+     @@Param:
+        @@@Name:  listener
+        @@@Type:  EventListener
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The event listener.  It is an object implemented by 
+            the DOM application that implements the 
+            <IF:EventListener> interface.
+     @@Param:
+        @@@Name:  useCapture
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The event listener will be called on the capture phase.
+        @@@InCase:
+           @@@@Value:  false
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The event listener will be triggered during 
+               the target and bubbling phases.
+     @@Return:  
+       @@@Def:
+         @@@@Type:
+           lang:Perl
+         @@@@@:
+           my $ev = $self->{<Q:TreeCore:node>}->{<Q:DOMEvents:eventListener>}
+                         ->{$type}->[$useCapture ? 1 : 0] ||= [];
+           REGISTER: {
+             for (@$ev) {
+               \## ISSUE: How this check should be done?
+               if (not defined $_->{namespaceURI} and
+                   $_->{eventListener} eq $listener) {
+                 ## Already registered
+                 last REGISTER;
+               }
+             }
+             if (ref $listener eq 'CODE') {
+                                ## Conditional
+               $listener = __CLASS{EventListener}__::__INT{newByCODE}__
+                                  ($listener);
+             }
+             push @$ev, {
+               eventListener => $listener,
+               namespaceURI => null,
+               evtGroup => null,
+             };
+           }#REGISTER
+     @@SpecLevel:2
+     @@Level[list]:
+       2
+       3
+  @Method:
+     @@Name:  removeEventListener
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Remove an event listener from the default group. 
+         If arguments do not identify any currently registered 
+         <IF:EventListener>, the method call has no effect.
+     @@ImplNote:
+       @@@lang:en
+       @@@@: 
+         If the event target has event listeners that met the 
+         arguments and that has a namespace URI, this method 
+         could remove any or none of those listeners - the 
+         result is implementation dependent.
+     @@NSVersion:removeEventListenerNS
+     @@Param:
+        @@@Name:  type
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The event type.
+     @@Param:
+        @@@Name:  listener
+        @@@Type:  EventListener
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The event listener to remove.
+     @@Param:
+        @@@Name:  useCapture
+        @@@Type:
+           DOMMain:boolean
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            Whether the event listener to remove was registered 
+            for the capture phase or not.
+          \
+            {NOTE:: Removal of an event listener registered for 
+                    the capture phase does not affect the same listener 
+                    registered for the target and bubbling phases, and 
+                    vice versa.
+          \
+            }
+        @@@InCase:
+           @@@@Value:  true
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The event listener to remove was registered for 
+               the capture phase.
+        @@@InCase:
+           @@@@Value:  false
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The event listener to remove was registered for 
+               the target and bubbling phases.
+        @@@ImplNote:
+          @@@@@lang:en
+          @@@@@@:
+            TODO: A warning about NS required.
+     @@Return:  
+       @@@Def:
+         @@@@Type:
+           lang:Perl
+         @@@@@:
+           my $ev = $self->{<Q:TreeCore:node>}->{<Q:DOMEvents:eventListener>}
+                         ->{$type}->[$useCapture ? 1 : 0] ||= [];
+           for (0..$#$ev) {
+             if (not defined $ev->[$_]->{namespaceURI} and
+                 $ev->[$_]->{eventListener} eq $listener) {
+               delete $ev->[$_];
+               last;
+             }
+           }
+  @Method:
+     @@Name:  dispatchEvent
+     @@Description:
+        @@@lang:en
+        @@@@:
+          Dispatch an event.  The event target of the event dispatched 
+          is the <IF:EventTarget> object on which this method is called.
+     @@Param:
+        @@@Name:  evt
+        @@@Type:  Event
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The event to be diapatched.
+     @@Return:
+        @@@Type:
+           DOMMain:boolean
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            Whether any of the event listeners called 
+            the <M:Event.preventDefault> method.
+        @@@InCase:
+           @@@@Value:  true
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The <M:Event.preventDefault> method was not called.
+        @@@InCase:
+           @@@@Value:  false
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The <M:Event.preventDefault> method was called.
+        @@@Exception:
+           @@@@Name:  UNSPECIFIED_EVENT_TYPE_ERR
+           @@@@Type:  EventException
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The <IF:Event.type> is not specified or its value 
+               is <DOM:null> or an empty string.
+           @@@@SpecLevel:2
+        @@@Exeption:
+          @@@@Name:DISPATCH_REQUEST_ERR
+          @@@@Type:EventException
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The <P:evt> is already being dispatched in the tree.
+          @@@@SpecLevel:3
+        @@@Exception:
+          @@@@Name:NOT_SUPPORTED_ERR
+          @@@@Type:
+            @@@@@: 
+              DOMCore:DOMException
+            @@@@ImplNote:
+              @@@@@lang:en
+              @@@@@@:
+                While the specification does not say this exception is 
+                in <X:DOMException> nor says that this method 
+                raises a <X:DOMException>, the <X:EventException> 
+                does not have the <X:NOT_SUPPORTED_ERR>.
+          @@@@SubType:
+            @@@@@QName:
+              ManakaiDOMEvents:FOREIGN_EVENT_ERR
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:evt> has not been created using 
+                <M:DocumentEvent.createEvent>.
+          @@@@SubType:
+            @@@@@QName:
+              ManakaiDOMEvent:CUSTOM_EVENT_REQUIRED_ERR
+            @@@@@Description:
+              @@@@@@lang:en
+              @@@@@@@:
+                The <P:evt> does not support the interface <IF:CustomEvent>. 
+          @@@@SpecLevel:3
+     @@Level[list]:
+        2
+        3
+     @@SpecLevel[list]:
+        2
+        3
+  @Method:
+     @@Name:  addEventListenerNS
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Register an event listener in a specified group.
+         \
+         Invoking <M:addEventListener> or <M:addEventListenerNS> 
+         multiple times on the same <IF:EventTarget> with the 
+         same parameters <A:namespaceURI>, <A:type>, <A:listener> 
+         and <A:useCapture> has no additional effect - it is 
+         independently of the event group.  In order to change 
+         the triggering order or to guarantee that an event listener 
+         will be added to the event target for the specified 
+         event group, invoke <M:removeEventListenerNS> first.
+     @@NoNSVersion:addEventListener
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The namespace URI of the event.
+     @@Param:
+        @@@Name:  type
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The local name of the event.
+     @@Param:
+        @@@Name:  listener
+        @@@Type:  EventListener
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The event listener - an object implemented by the DOM 
+            application that implements the <IF:EventListener> 
+            interface.
+     @@Param:
+        @@@Name:  useCapture
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The event listener will be called on the capture phase.
+        @@@InCase:
+           @@@@Value:  false
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The event listener will be triggered during the target 
+               and bubbling phases.
+     @@Param:
+        @@@Name:  evtGroup
+        @@@Type:  DOMObject
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The object that represents the event group.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The event listener is attached to the default group.
+     @@Return:  
+       @@@Def:
+         @@@@Type:
+           lang:Perl
+         @@@@@:
+           my $ev = $self->{<Q:TreeCore:node>}->{<Q:DOMEvents:eventListener>}
+                         ->{$type}->[$useCapture ? 1 : 0] ||= [];
+           REGISTER: {
+             for (@$ev) {
+               if (((defined $_->{namespaceURI} and defined $namespaceURI and
+                     $_->{namespaceURI} eq $namespaceURI) or
+                    (not defined $_->{namespaceURI} and
+                     not defined $namespaceURI)) and
+                   ($_->{eventListener} eq $listener)) {
+                 ## Already registered
+                 last REGISTER;
+               }
+             }
+             if (ref $listener eq 'CODE') {
+                                ## Conditional
+               $listener = __CLASS{EventListener}__::__INT{newByCODE}__
+                                  ($listener);
+             }
+             push @$ev, {
+               eventListener => $listener,
+               namespaceURI => $namespaceURI,
+               evtGroup => $evtGroup,
+             };
+           }#REGISTER
+     @@Level[list]:  3
+     @@SpecLevel[list]:  3
+  @Method:
+     @@Name:  removeEventListenerNS
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Remove an event listener.
+         If arguments do not identify any currently registered 
+         <IF:EventListener>, the method call has no effect.
+     @@NoNSVersion:removeEventListener
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The namespace URI of the event.
+     @@Param:
+        @@@Name:  type
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The local name of the event.
+     @@Param:
+        @@@Name:  listener
+        @@@Type:  EventListener
+        @@@Description:
+          @@@@lang:en
+          @@@@@:The event listener to remove.
+     @@Param:
+        @@@Name:  useCapture
+        @@@Type:
+           DOMMain:boolean
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            Whether the event listener to remove was registered 
+            for the capture phase or not.
+          \
+            {NOTE:: Removal of an event listener registered for 
+                    the capture phase does not affect the same listener 
+                    registered for the target and bubbling phases, and 
+                    vice versa.
+          \
+            }
+        @@@InCase:
+           @@@@Value:  true
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The event listener to remove was registered for 
+               the capture phase.
+        @@@InCase:
+           @@@@Value:  false
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The event listener to remove was registered for 
+               the target and bubbling phases.
+     @@Return:  
+       @@@Def:
+         @@@@Type:
+           lang:Perl
+         @@@@@:
+           my $ev = $self->{<Q:TreeCore:node>}->{<Q:DOMEvents:eventListener>}
+                         ->{$type}->[$useCapture ? 1 : 0] ||= [];
+           for (0..$#$ev) {
+             if (((defined $ev->[$_]->{namespaceURI} and
+                   defined $namespaceURI and
+                   $ev->[$_]->{namespaceURI} eq $namespaceURI) or
+                  (not defined $ev->[$_]->{namespaceURI} and
+                   not defined $namespaceURI)) and
+                 ($ev->[$_]->{eventListener} eq $listener)) {
+               delete $ev->[$_];
+               last;
+             }
+           }
+     @@Level[list]:  3
+     @@SpecLevel[list]:  3
+  @Method:
+     @@Name:  willTriggerNS
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Return whether an event listener, attached to this 
+         <IF:EventTarget> or one of its ancestors, will be 
+         triggered by the specified event type during the 
+         dispatch of the event to this <IF:EventTarget> 
+         or one of its descendants.
+     @@NoNSVersion[list]:
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type: 
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@:The namespace URI of the event.
+     @@Param:
+        @@@Name:  type
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:The local name of the event.
+     @@Return:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               An event listener will be triggered.
+        @@@InCase:
+           @@@@Value:  false
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               No event listener will be triggered.
+     @@Level[list]:  3
+     @@SpecLevel[list]:  3
+  @Method:
+     @@Name:  hasEventListenerNS
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Return whether this <IF:EventTarget> contains an 
+         event listener registered for the specified event type.
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The namespace URI of the event.
+     @@Param:
+        @@@Name:  type
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The event type (local name).
+     @@Return:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               An event listener is registered.
+        @@@InCase:
+           @@@@Value:  false
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               No event listener is registered.
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            for (@{$self->{<Q:TreeCore:node>}->{<Q:DOMEvents:eventListener>}
+                                             ->{$type}||[]}) {
+              if (@$_) {
+                $r = true;
+                last;
+              }
+            }
+     @@Level[list]:  3
+     @@SpecLevel[list]:  3
+##IF:EventTarget
+
+IF:
+  @Name:  EventListener
+  @Description:
+    @@lang:en
+    @@@:
+      The primary way for handling events.  DOM applications 
+      implement this interface and register their listeners 
+      on an <IF:EventListener>.
+     \
+      {NOTE:: In the manakai DOM implementation, event listeners 
+              are required that the Perl <Perl:eq> operation 
+              is defined for two <IF:EventListener> objects and 
+              for an <IF:EventListener> object and a <Perl:CODE> 
+              reference.
+     \
+      }
+  @ImplNote:
+    @@lang:en
+    @@@:
+      In the ECMAScript binding, an <IF:EventListener> is 
+      a function with a parameter <P:evt>.
+  @Level[list]:  2
+  @SpecLevel[list]:  2
+  @IsAbstract:1
+  @IsFinal:-1
+  @ImplByApp:1
+  @Method:
+     @@Name:  handleEvent
+     @@IsAbstract:1
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Handle an event.  This method is called whenever an 
+         event occurs.
+     @@Param:
+        @@@Name:  evt
+        @@@Type:  Event
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The contextual information about the event.
+     @@Return:  
+       @@@Type:
+         lang:Perl
+       @@@@:
+         $self->($evt);
+  @IntMethod:
+    @@Name:isSameEventListener
+    @@Operator:
+      @@@@:eq
+      @@@Type:
+        lang:Perl
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Return whether two event listeners are same or not.
+    @@Param:
+      @@@Name:listener
+      @@@Type:EventListener
+    @@Return:
+      @@@Type:
+        DOMMain:boolean
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          if (ref $listener eq 'CODE') {
+            $r = overload::Overloaded ($self) eq $listener ? true : false;
+          } elsif (not ref $listener) {
+            $r = false;
+          } elsif ($listener->isa ('__IIF{EventListener}__')) {
+            $r = overload::Overloaded ($self) eq
+                 overload::Overloaded ($listener) ? true : false;
+          } else {
+          #} elsif ($listener->isa ('__IF{EventListener}__')) {
+            $r = overload::Overloaded ($self) eq $listener ? true : false;
+          }
+  @IntMethod:
+    @@Name:newByCODE
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Create a new instance of the <IF:EventListener> with a 
+        code.
+    @@Param:
+      @@@Name:code
+      @@@Type:
+        DOMMain:Object
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The code used as an event handler. 
+        \
+          In the Perl binding, it is a <Perl:CODE> reference - a reference 
+          to the subroutine.
+        \
+          {NOTE:: The <P:code> is blessed with the event handler class.
+        \
+          }
+    @@Return:
+      @@@Type:EventListener
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The newly created event listener.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = bless $code, ref $self ? ref $self : $self;
+##IF:EventListener
+
+IF:
+  @Name:  DocumentEvent
+  @Description:
+    @@lang:en
+    @@@:
+      Provide a mechanism by which the DOM application 
+      can create an <IF:Event> object.
+  @ImplNote:
+    @@lang:en
+    @@@:
+      If the <IF:Document> object supports the feature 
+      <Feature:Events>, this interface must be implemented on the same object.
+      \
+      If the <IF:Document> object supports the feature <Feature:Events> 
+      with the prefix of <DOM:+>, an object that supports 
+      this interface must be returned by invoking the method 
+      <M:Node.getFeature> with arguements <DOM:+Events> and 
+      <FeatureVer:3.0> on the <IF:Document> object.
+  @Role:
+    @@@:
+      DOMCore:Document
+    @@compat:
+      ManakaiDOMCore:Document
+
+  @Level[list]:  2
+  @SpecLevel[list]:  2
+
+  @Method:
+     @@Name:  createEvent
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Create an <IF:Event> object.  This method is used when 
+         it is either inconvenient or unnecessary for the DOM application 
+         to create an <IF:Event> object themselves.
+       \
+         {NOTE:: In cases where the <IF:Event> provided by the DOM 
+                 implementation is insufficient, the DOM application 
+                 may supply their own <IF:Event> implementations. 
+                 However, the DOM implementation needs access to 
+                 the attributes <A:Event.currentTarget> and 
+                 <A:Event/eventPhase> so that the <IF:Event> 
+                 implementation by the DOM application might 
+                 need to support the <IF:CustomEvent> interface.
+       \
+         }
+       \
+         {NOTE:: The appropriate event initialization method 
+                 of the created object must be called before 
+                 the <IF:Event> is diapatched via the 
+                 <M:EventTarget,dispatchEvent> method.
+       \
+         }
+     @@Param:
+        @@@Name:  eventType
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The name of the DOM Events interface to be supported 
+            by the created event objects.
+          \
+            {eg:: 
+             \
+             - <IF:Event>
+             \
+             - <IF:MouseEvent>
+             \
+             - <IF:UIEvent>
+             \
+             - <IF:MutationEvent>
+             \
+            }
+        @@@InCase:
+          @@@@Value:UIEvents
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Same as <Feature:UIEvent>.  This feature name is 
+              allowed for backward compatibility.
+        @@@InCase:
+          @@@@Value:MouseEvents
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Same as <Feature:MouseEvent>.  This feature name is  
+              allowed for backward compatibility.
+        @@@InCase:
+          @@@@Value:MutationEvents
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Same as <Feature:MutationEvent>.  This feature name is  
+              allowed for backward compatibility.
+        @@@InCase:
+          @@@@Value:HTMLEvents
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Same as <Feature:Event>.  This feature name is  
+              allowed for backward compatibility.
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            Although both DOM Levels 2 and 3 defines the 
+            <P:eventType> as an interface name, the examples 
+            in the definitions in the DOM Level 2 Events Specification 
+            incorrectly shows names such as <Feature:UIEvents>.
+     @@Return:
+        @@@Type:  Event
+        @@@Description:
+          @@@@lang:en
+          @@@@@:The newly created event object.
+        @@@Exception:
+           @@@@Name:  NOT_SUPPORTED_ERR
+           @@@@Type:
+              DOMCore:DOMException
+           @@@@SubType:
+             @@@@@QName:
+               ManakaiDOMEvents:MDOM_IMPL_NOSUPPORT_EVENT
+             @@@@@Description:
+               @@@@@@lang:en
+               @@@@@@@:
+                 The DOM implementation does not support the 
+                 interface requested.
+  @Method:
+     @@Name:  canDispatch
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Test if the DOM implementation can generate events 
+         of a specified type.
+     @@NoNSVersion[list]:
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type: 
+          ManakaiDOM:ManakaiDOMNamespaceURI
+        @@@Description:
+          @@@@lang:en
+          @@@@@:The namespace URI of the event type.
+     @@Param:
+        @@@Name:  type
+        @@@Type:  DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:The local name of the event type.
+     @@Return:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The DOM implementation can generate and dispatch 
+               the event type specified.
+        @@@InCase:
+           @@@@Value:  false
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The DOM implementation cannot generate and dispatch
+               the event type specified.
+     @@Level[list]:  3
+     @@SpecLevel[list]:  3
+##IF:DocumentEvent
+
+IF:
+  @Name:  CustomEvent
+  @Description:
+    @@lang:en
+    @@@:
+      Provide access to the attributes <A:Event.currentTarget> and 
+      <A:Event.eventPhase>.  It is intended to be used by the 
+      DOM implementation to access the underlying current target and 
+      event phase while dispatching a custom <IF:Event> in the tree.
+      \
+      {NOTE:: It is intended to be implemented, and <EM:not used>, 
+              by the DOM application.
+      \
+      }
+      \
+      {NOTE:: Changing the current target or the current phase by a 
+              DOM application during the dispatch may result in 
+              unpredictable results.
+      \
+      }
+  @ImplNote:
+    @@lang:en
+    @@@:
+      The DOM implementation should ensure that both methods 
+      return the appropriate current target and phase before 
+      invoking each event listener on the current target, 
+      to protect DOM applications from malicious event listeners.
+      \
+      {NOTE:: An object that implements this interface must have 
+              the <M:Event.isCustom> method returning <DOM:true>.
+      \
+      }
+  @ISA:  Event
+
+  @Level[list]:  3
+  @SpecLevel[list]:  3
+  @Method:
+     @@Name:  setDispatchState
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Set the values of attributes <A:Event.currentTarget> 
+         and <A:Event.eventPhase>.  It also reset the states 
+         of <M:Event.isPropagationStopped> and 
+         <M:Event.isImmediatePropagationStopped>.
+     @@Param:
+        @@@Name:  target
+        @@@Type:  EventTarget
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The new event target.
+     @@Param:
+        @@@Name:  phase
+        @@@Type: PhaseType
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The event phase.
+     @@Return:  
+        @@@Def:
+          @@@@Type:
+            lang:Perl
+          @@@@@:
+            for ($self->{<Q:TreeCore:node>}) {
+              $_->{<Q:DOMEvents:currentTarget>} = $target;
+              $_->{<Q:DOMEvents:phase>} = $phase;
+              $_->{<Q:DOMEvents:isPropagationStopped>} = false;
+              $_->{<Q:DOMEvents:isImmediatePropagationStopped>} = false;
+            }
+  @Method:
+     @@Name:  isPropagationStopped
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Return whether the <M:Event.stopPropagation> method has 
+         been called.
+     @@Return:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The event propagation has been stopped in the current group.
+        @@@InCase:
+           @@@@Value:  false
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMEvents:isPropagationStopped
+  @Method:
+     @@Name:  isImmediatePropagationStopped
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Return whether the method <M:Event.stopImmediatePropagation> 
+         has been called for this event.
+       \
+         {NOTE:: It is intended that this method is used by the DOM 
+                 implementation, not by the DOM application.
+       \
+         }
+     @@Return:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+           @@@@Description:
+             @@@@@lang:en
+             @@@@@@:
+               The event propagation has been stopped immediately 
+               in the current group.
+        @@@InCase:
+           @@@@Value:  false
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMEvents:isImmediatePropagationStopped
+  @ReMethod:
+    @@Name:isCustom
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Return whether the object implements the <IF:CustomEvent> interface.
+    @@Return:
+      @@@Type:
+        DOMMain:boolean
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:$r=true;
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          This method must returns <DOM:true>.
+    @@SpecLevel:3
+    @@Level:3
+##IF:CustomEvent
+
+IF:
+  @Name:  TextEvent
+
+  @ISA:  UIEvent
+  @Role:
+    @@@:
+      DOMEvents:Event
+    @@compat:
+      ManakaiDOMEvents:Events
+
+  @Level[list]:  3
+  @SpecLevel[list]:  3
+  @Attr:
+     @@Name:  data
+     @@Get:
+        @@@Type:  DOMString
+  @Method:
+     @@Name:  initTextEvent
+     @@Param:
+        @@@Name:  typeArg
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  canBubbleArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  cancelableArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  viewArg
+        @@@Type:
+           DOMViews:AbstractView
+     @@Param:
+        @@@Name:  dataArg
+        @@@Type:  DOMString
+     @@Return:  \
+  @Method:
+     @@Name:  initTextEventNS
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  type
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  canBubbleArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  cancelableArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  viewArg
+        @@@Type:
+           DOMViews:AbstractView
+     @@Param:
+        @@@Name:  dataArg
+        @@@Type:  DOMString
+     @@Return:  \
+IF:
+  @Name:  MouseEvent
+
+  @ISA:  UIEvent
+  @Role:
+    @@@:
+      DOMEvents:Event
+    @@compat:
+      ManakaiDOMEvents:Events
+
+  @Level[list]:  2
+  @SpecLevel[list]:  2
+  @Attr:
+     @@Name:  screenX
+     @@Get:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  screenY
+     @@Get:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  clientX
+     @@Get:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  clientY
+     @@Get:
+        @@@Type:
+           DOMMain:long
+  @Attr:
+     @@Name:  ctrlKey
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  shiftKey
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  altKey
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  metaKey
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  button
+     @@Get:
+        @@@Type:
+           DOMMain:unsigned-short
+  @Attr:
+     @@Name:  relatedTarget
+     @@Get:
+        @@@Type:  EventTarget
+  @Method:
+     @@Name:  initMouseEvent
+     @@Param:
+        @@@Name:  typeArg
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  canBubbleArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  cancelableArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  viewArg
+        @@@Type:
+           DOMViews:AbstractView
+     @@Param:
+        @@@Name:  detailArg
+        @@@Type:
+           DOMMain:long
+     @@Param:
+        @@@Name:  screenXArg
+        @@@Type:
+           DOMMain:long
+     @@Param:
+        @@@Name:  screenYArg
+        @@@Type:
+           DOMMain:long
+     @@Param:
+        @@@Name:  clientXArg
+        @@@Type:
+           DOMMain:long
+     @@Param:
+        @@@Name:  clientYArg
+        @@@Type:
+           DOMMain:long
+     @@Param:
+        @@@Name:  ctrlKeyArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  altKeyArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  shiftKeyArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  metaKeyArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  buttonArg
+        @@@Type:
+           DOMMain:unsigned-short
+     @@Param:
+        @@@Name:  relatedTargetArg
+        @@@Type:  EventTarget
+     @@Return:  \
+  @Method:
+     @@Name:  getModifierState
+     @@Param:
+        @@@Name:  keyIdentifierArg
+        @@@Type:  DOMString
+     @@Return:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Level[list]:  3
+     @@SpecLevel[list]:  3
+  @Method:
+     @@Name:  initMouseEventNS
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  typeArg
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  canBubbleArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  cancelableArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  viewArg
+        @@@Type:
+           DOMViews:AbstractView
+     @@Param:
+        @@@Name:  detailArg
+        @@@Type:
+           DOMMain:long
+     @@Param:
+        @@@Name:  screenXArg
+        @@@Type:
+           DOMMain:long
+     @@Param:
+        @@@Name:  screenYArg
+        @@@Type:
+           DOMMain:long
+     @@Param:
+        @@@Name:  clientXArg
+        @@@Type:
+           DOMMain:long
+     @@Param:
+        @@@Name:  clientYArg
+        @@@Type:
+           DOMMain:long
+     @@Param:
+        @@@Name:  buttonArg
+        @@@Type:
+           DOMMain:unsigned-short
+     @@Param:
+        @@@Name:  relatedTargetArg
+        @@@Type:  EventTarget
+     @@Param:
+        @@@Name:  modifiersList
+        @@@Type:  DOMString
+     @@Return:  \
+     @@Level[list]:  3
+     @@SpecLevel[list]:  3
+
+IF:
+  @Name:  KeyboardEvent
+
+  @ISA:  UIEvent
+  @Role:
+    @@@:
+      DOMEvents:Event
+    @@compat:
+      ManakaiDOMEvents:Events
+
+  @Level[list]:  3
+  @SpecLevel[list]:  3
+  @ConstGroup:
+     @@Name:  KeyLocationCode
+     @@Type:
+        DOMMain:unsigned-long
+     @@Const:
+        @@@Name:  DOM_KEY_LOCATION_STANDARD
+        @@@Type:
+           DOMMain:unsigned-long
+        @@@Value:  0x00
+     @@Const:
+        @@@Name:  DOM_KEY_LOCATION_LEFT
+        @@@Type:
+           DOMMain:unsigned-long
+        @@@Value:  0x01
+     @@Const:
+        @@@Name:  DOM_KEY_LOCATION_RIGHT
+        @@@Type:
+           DOMMain:unsigned-long
+        @@@Value:  0x02
+     @@Const:
+        @@@Name:  DOM_KEY_LOCATION_NUMPAD
+        @@@Type:
+           DOMMain:unsigned-long
+        @@@Value:  0x03
+  @Attr:
+     @@Name:  keyIdentifier
+     @@Get:
+        @@@Type:  DOMString
+  @Attr:
+     @@Name:  keyLocation
+     @@Get:
+        @@@Type:
+           DOMMain:unsigned-long
+  @Attr:
+     @@Name:  ctrlKey
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  shiftKey
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  altKey
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Attr:
+     @@Name:  metaKey
+     @@Get:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Method:
+     @@Name:  getModifierState
+     @@Param:
+        @@@Name:  keyIdentifierArg
+        @@@Type:  DOMString
+     @@Return:
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+  @Method:
+     @@Name:  initKeyboardEvent
+     @@Param:
+        @@@Name:  typeArg
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  canBubbleArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  cancelableArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  viewArg
+        @@@Type:
+           DOMViews:AbstractView
+     @@Param:
+        @@@Name:  keyIdentifierArg
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  keyLocationArg
+        @@@Type:
+           DOMMain:unsigned-long
+     @@Param:
+        @@@Name:  modifiersList
+        @@@Type:  DOMString
+     @@Return:  \
+  @Method:
+     @@Name:  initKeyboardEventNS
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  typeArg
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  canBubbleArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  cancelableArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  viewArg
+        @@@Type:
+           DOMViews:AbstractView
+     @@Param:
+        @@@Name:  keyIdentifierArg
+        @@@Type:  DOMString
+     @@Param:
+        @@@Name:  keyLocationArg
+        @@@Type:
+           DOMMain:unsigned-long
+     @@Param:
+        @@@Name:  modifiersList
+        @@@Type:  DOMString
+     @@Return:  
+
+## DOMEvents.dis ends here
+

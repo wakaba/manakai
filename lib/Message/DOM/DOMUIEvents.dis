@@ -1,0 +1,348 @@
+Namespace:
+  @DOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @ev:
+    http://www.w3.org/2001/xml-events
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOMEvents:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-ev#
+  @TreeCore:\
+Module:
+  @Name:  DOMUIEvents
+  @Namespace:
+     http://suika.fam.cx/~wakaba/archive/2004/dom/events#
+  @BindingName:
+     @@@:  events
+     @@Type:
+        lang:IDL-DOM
+     @@prefix:  dom.w3c.org
+  @FullName:
+    @@lang:en
+    @@@: DOM User Interface Events Module
+  @Description:
+    @@lang:en
+    @@@:
+      Basic event types associated with user interfaces.
+
+  @Author:
+     @@FullName:  Wakaba
+     @@Mail:  w@suika.fam.cx
+  @License:
+     license:Perl+MPL
+  @Date.RCS:
+     $Date: 2004/10/11 10:37:25 $
+
+  @ConditionDef:
+    @@Name:DOM2
+  @ConditionDef:
+    @@Name:DOM3
+    @@ISA:DOM2
+  @NormalCondition:DOM3
+
+  @Feature:
+    @@Name:UIEvents
+    @@Version:2.0
+    @@FullName: DOM Level 2 User Interface Events
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The support for <Feature:Events>/<FeatureVer:2.0> and 
+        <Feature:View>/<FeatureVer:2.0> is required.
+    @@Condition[list]:
+      DOM2
+      DOM3
+    @@Contrib:
+      DOMCore:DOMImplementation::
+  @Feature:
+    @@Name:UIEvents
+    @@Version:3.0
+    @@FullName: DOM Level 3 User Interface Events
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The support for <Feature:Events>/<FeatureVer:3.0> 
+        and <Feature:View>/<FeatureVer:2.0> is required.
+    @@Condition[list]:
+      DOM3
+    @@Contrib:
+      DOMCore:DOMImplementation::
+
+
+  @Require:
+     @@Module:
+        @@@Name:  DOMEvents
+        @@@FileName:
+           @@@@@:  events.idl
+           @@@@For:
+              lang:IDL-DOM
+        @@@Namespace:
+           http://suika.fam.cx/~wakaba/archive/2004/dom/events#
+     @@Module:
+        @@@Name:  DOMViews
+        @@@FileName:
+           @@@@@:  views.idl
+           @@@@For:
+              lang:IDL-DOM
+        @@@Namespace:
+           http://suika.fam.cx/~wakaba/archive/2004/dom/views#
+
+EventSet:
+  @Event:
+    @@Name:DOMActivate
+    @@QName:
+      ev:DOMActivate
+    @@Type:UIEvent
+    @@Description:
+      @@@lang:en
+      @@@@:
+        An element is activated.
+        The activation of an element is device and user agent dependent.       
+        \
+        {eg:
+        \
+         - An element is clicked using a mouse.
+        \
+         - An element is double-clicked using a mouse.
+        \
+         - An element is activated using a keyboard.
+        \
+         - An element is activated by a voice command.
+        \
+        }
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+    @@IsCancelable:1
+    @@IsBubbling:1
+    @@SpecLevel:2
+  @Event:
+    @@Name:DOMFocusIn
+    @@QName:
+      ev:DOMFocusIn
+    @@Description:
+      @@@lang:en
+      @@@@:
+        An event target receives focus.
+      \
+        {eg: 
+         \
+         - A pointing device is moved onto an element.
+         \
+         - A keyboard navigation gives the focus to an element.
+         \
+        }
+    @@ActionBefore:
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The focus is given to the event target.
+    @@IsBubbling:1
+    @@IsCancelable:0
+    @@Type:UIEvent
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+    @@SpecLevel:2
+  @Event:
+    @@Name:DOMFocusOut
+    @@QName:
+      ev:DOMFocusOut
+    @@Description:
+      @@@lang:en
+      @@@@:
+        An event target loses focus.
+        \
+        {eg: 
+         \
+         - A pointing device is moved out of an element.
+         \
+         - A tabbing navigation is moved out of the element.
+        }
+    @@ActionBefore:
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The focus is taken from the event target.
+    @@IsBubbling:1
+    @@IsCancelable:0
+    @@Type:UIEvent
+    @@EventTarget:
+      @@@Type:
+        DOMCore:Element
+    @@SpecLevel:2
+
+IF:
+  @Name:  UIEvent
+  @Description:
+    @@lang:en
+    @@@:
+      Provide specific contextual information associated 
+      with User Interface events.
+  @Example:
+    @@FullName:
+      @@@lang:en
+      @@@@:
+        Create an instance of the <IF:UIEvent>
+    @@Code:
+      @@@Type:
+        lang:Perl
+      @@@@:
+        my $uievent = $DocumentEvent->createEvent ('UIEvent');
+  
+  @ISA:  
+    DOMEvents:Event
+  @Role:
+    @@@:
+      DOMEvents:Event
+    @@compat:
+      ManakaiDOMEvents:Events
+
+  @Level[list]:  2
+  @SpecLevel[list]:  
+    2
+    3
+  @Attr:
+     @@Name:  view
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The <IF:AbstractView> from which the event was generated.
+     @@Get:
+        @@@Type:
+           DOMViews:AbstractView
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMUIEvents:view
+  @Attr:
+     @@Name:  detail
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Some detail information about the event.  It depends on 
+         the type of event.
+     @@Get:
+        @@@Type:
+           DOMMain:long
+        @@@Def:
+          @@@@Type:
+            lang:dis
+          @@@@GetProp:
+            DOMUIEvents:detail
+  @Method:
+     @@Name:  initUIEvent
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Initialize the value of a <IF:UIEvent> object.  It has the 
+         same behavior as <M:Event.initEvent>.
+     @@NSVersion:initUIEventNS
+     @@Param:
+        @@@Name:  typeArg
+        @@@Type:  
+          DOMMain:DOMString
+     @@Param:
+        @@@Name:  canBubbleArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  cancelableArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  viewArg
+        @@@Type:
+           DOMViews:AbstractView
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The new value for the attribute <A:view>.
+     @@Param:
+        @@@Name:  detailArg
+        @@@Type:
+           DOMMain:long
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The new value for the attribute <A:detail>.
+     @@Return: 
+       @@@Def:
+         @@@@Type:
+           lang:Perl
+         @@@@@:
+                  ## Conditional
+           $self->__SUPER{Event}__::initEvent
+                     ($typeArg, $canBubbleArg, $cancelableArg);
+           $self->{<Q:TreeCore:node>}->{<Q:DOMUIEvents:view>} = $viewArg;
+           $self->{<Q:TreeCore:node>}->{<Q:DOMUIEvents:detail>} = $detailArg;
+    @@SpecLevel:2
+    @@Level[list]:
+      2
+      3
+  @Method:
+     @@Name:  initUIEventNS
+     @@NoNSVersion:initUIEvent
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Initialize the value of a <IF:UIEvent> object.  It has 
+         the same behavior as <M:Event.initEventNS>.
+     @@Param:
+        @@@Name:  namespaceURI
+        @@@Type:  
+          ManakaiDOM:ManakaiDOMNamespaceURI
+     @@Param:
+        @@@Name:  typeArg
+        @@@Type:  
+          DOMMain:DOMString
+     @@Param:
+        @@@Name:  canBubbleArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  cancelableArg
+        @@@Type:
+           DOMMain:boolean
+        @@@InCase:
+           @@@@Value:  true
+        @@@InCase:
+           @@@@Value:  false
+     @@Param:
+        @@@Name:  viewArg
+        @@@Type:
+           DOMViews:AbstractView
+     @@Param:
+        @@@Name:  detailArg
+        @@@Type:
+           DOMMain:long
+     @@Return: 
+       @@@Def:
+         @@@@Type:
+           lang:Perl
+         @@@@@:
+                  ## Conditional
+           $self->__SUPER{Event}__::initEventNS
+                     ($namespaceURI, $typeArg, $canBubbleArg, $cancelableArg);
+           $self->{<Q:TreeCore:node>}->{<Q:DOMUIEvents:view>} = $viewArg;
+           $self->{<Q:TreeCore:node>}->{<Q:DOMUIEvents:detail>} = $detailArg;
+     @@Level[list]:  3
+     @@SpecLevel[list]:  3
+##IF:UIEvent
+
+## DOMUIEvents.dis ends here
