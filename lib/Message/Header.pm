@@ -8,7 +8,7 @@ Message::Header --- A Perl Module for Internet Message Headers
 package Message::Header;
 use strict;
 use vars qw(%DEFAULT @ISA %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.31 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.32 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;	## This may seem silly:-)
 push @ISA, qw(Message::Field::Structured);
 
@@ -22,7 +22,8 @@ push @ISA, qw(Message::Field::Structured);
 
 ## Namespace support
 	our %NS_phname2uri;	## PH-namespace name -> namespace URI
-	our %NS_uri2phpackage;	## namespace URI -> PH-package name
+	our %NS_uri2package;	## namespace URI -> Package name
+	our %NS_uri2phpackage;	## namespace URI -> PH-Package name
 	require Message::Header::Default;	## Default namespace
 
 ## Initialize of this class -- called by constructors
@@ -188,24 +189,34 @@ sub parse ($$;%) {
   } else {
     $header =~ s/\x0D?\x0A$REG{WSP}/\x20/gos if $self->{option}->{use_folding};
   }
+  my %option = (%{ $self->{option} });
+  $option{parse_all} = 0;
   for my $field (split /\x0D?\x0A/, $header) {
     if ($field =~ /$REG{M_fromline}/) {
       my ($s,undef,$value) = $self->_value_to_arrayitem
-        ('mail-from' => $1, $self->{option});
+        ('mail-from' => $1, \%option);
       push @{$self->{value}}, $value if $s;
     } elsif ($field =~ /$REG{M_field}/) {
       my ($name, $body) = ($1, $2);
       $body =~ s/$REG{WSP}+$//;
       my ($s,undef,$value) = $self->_value_to_arrayitem
-        ($name => $body, $self->{option});
+        ($name => $body, \%option);
       push @{$self->{value}}, $value if $s;
     } elsif (length $field) {
       my ($s,undef,$value) = $self->_value_to_arrayitem
-        ('x-unknown' => $field, $self->{option});
+        ('x-unknown' => $field, \%option);
       push @{$self->{value}}, $value if $s;
     }
   }
   $self->_ns_associate_numerical_prefix;	## RFC 2774 namespace
+  for (@{ $self->{value} }) {
+    no strict 'refs';
+    $_->{name}
+      = &{ ${ &_NS_uri2package ($_->{ns}).'::OPTION' }{n11n_name} }
+      ($self, &_NS_uri2package ($_->{ns}), $_->{name});
+    $_->{body} = $self->_parse_value ($_->{name} => $_->{body}, ns => $_->{ns})
+      if $self->{option}->{parse_all};
+  }
   $self;
 }
 
@@ -351,7 +362,7 @@ sub _parse_value ($$$;%) {
   my $value = shift;  return $value if ref $value;
   my %option = @_;
   my $vtype; { no strict 'refs';
-    my $vt = ${&_NS_uri2phpackage ($option{ns}).'::OPTION'}{value_type};
+    my $vt = ${&_NS_uri2package ($option{ns}).'::OPTION'}{value_type};
     if (ref $vt) {
       $vtype = $vt->{$name} || $vt->{$self->{option}->{_VALTYPE_DEFAULT}};
     }
@@ -415,7 +426,7 @@ sub namespace_ph_default ($;$) {
   if (defined $_[0]) {
     no strict 'refs';
     $self->{option}->{ns_default_phuri} = $_[0];
-    $self->_ns_load_ph (${&_NS_uri2phpackage ($self->{option}->{ns_default_phuri}).'::OPTION'}{namespace_phname});
+    $self->_ns_load_ph (${&_NS_uri2package ($self->{option}->{ns_default_phuri}).'::OPTION'}{namespace_phname});
   }
   $self->{option}->{ns_default_phuri};
 }
@@ -484,15 +495,15 @@ sub _value_to_arrayitem ($$$\%) {
       $one_prefix = 1;
     }
     my $prefix
-      = &{ ${ &_NS_uri2phpackage ($nsuri).'::OPTION' }{n11n_prefix} }
-        ($self, &_NS_uri2phpackage ($nsuri), $prefix1.'-'.$prefix2);
+      = &{ ${ &_NS_uri2package ($nsuri).'::OPTION' }{n11n_prefix} }
+        ($self, &_NS_uri2package ($nsuri), $prefix1.'-'.$prefix2);
     $self->_ns_load_ph ($prefix);
     $nsuri = $self->{ns}->{phname2uri}->{ $prefix };
     unless ($nsuri) {
       $nsuri = $self->{option}->{ns_default_phuri};
       $prefix
-        = &{ ${ &_NS_uri2phpackage ($nsuri).'::OPTION' }{n11n_prefix} }
-          ($self, &_NS_uri2phpackage ($nsuri), $one_prefix? $prefix2: $prefix1);
+        = &{ ${ &_NS_uri2package ($nsuri).'::OPTION' }{n11n_prefix} }
+          ($self, &_NS_uri2package ($nsuri), $one_prefix? $prefix2: $prefix1);
       $self->_ns_load_ph ($prefix);
       $nsuri = $self->{ns}->{phname2uri}->{ $prefix };
       if ($nsuri) {
@@ -504,8 +515,8 @@ sub _value_to_arrayitem ($$$\%) {
     }
   }
   $name
-    = &{${&_NS_uri2phpackage ($nsuri).'::OPTION'}{n11n_name}}
-      ($self, &_NS_uri2phpackage ($nsuri), $name);
+    = &{${&_NS_uri2package ($nsuri).'::OPTION'}{n11n_name}}
+      ($self, &_NS_uri2package ($nsuri), $name);
   Carp::croak "$name: invalid field-name"
     if $option->{field_name_validation}
       && $name =~ /$REG{$option->{field_name_unsafe_rule}}/;
@@ -622,7 +633,7 @@ sub _n11n_field_name ($$) {
   my $self = shift;
   my $s = shift;
   $s =~ s/^$REG{WSP}+//; $s =~ s/$REG{WSP}+$//;
-  $s = lc $s unless ${&_NS_uri2phpackage ($self->{option}->{ns_default_phuri}).'::OPTION'}{case_sensible};
+  $s = lc $s unless ${&_NS_uri2package ($self->{option}->{ns_default_phuri}).'::OPTION'}{case_sensible};
   $s;
 }
 
@@ -661,7 +672,7 @@ sub stringify ($;%) {
     %nprefix = reverse %{ $self->{ns}->{number2uri} };
     my $i = (sort { $a <=> $b } keys %{ $self->{ns}->{number2uri} })[-1] + 1;
     $i = 10 if $i < 10;
-    my $hprefix = ${ &_NS_uri2phpackage
+    my $hprefix = ${ &_NS_uri2package
                        ($self->{ns}->{phname2uri}->{'x-http'})
                        .'::OPTION' } {namespace_phname_goodcase};
     for my $uri (keys %nprefix) {
@@ -685,21 +696,15 @@ sub stringify ($;%) {
       return unless length $name;
       return if $option{output_mail_from} && $name eq 'mail-from';
       $body = '' if !$option{output_bcc} && $name eq 'bcc';
-      my $nspackage = &_NS_uri2phpackage ($nsuri);
+      my $nspackage = &_NS_uri2package ($nsuri);
       my $oname;	## Outputed field-name
       my $prefix = $nprefix{ $nsuri }
                 || ${$nspackage.'::OPTION'} {namespace_phname_goodcase}
                 || $self->{ns}->{uri2phname}->{ $nsuri };
-      my $default_prefix = ${ &_NS_uri2phpackage ($option{ns_default_phuri})
+      my $default_prefix = ${ &_NS_uri2package ($option{ns_default_phuri})
                               .'::OPTION'} {namespace_phname_goodcase};
       $prefix = '' if $prefix eq $default_prefix;
       $prefix =~ s/^\Q$default_prefix\E-//;
-      #$prefix = undef if $nsuri eq $option{ns_default_phuri};
-      #if ($prefix && $prefix eq $nprefix{ $nsuri }) {	## RFC 2774 prefix
-      #  $prefix = ${ &_NS_uri2phpackage ($self->{ns}->{phname2uri}->{'x-http'})
-      #               .'::OPTION' } {namespace_phname_goodcase} . '-' . $prefix
-      #  unless $option{ns_default_phuri} eq $self->{ns}->{phname2uri}->{'x-http'};
-      #}
       my $gc = ${$nspackage.'::OPTION'} {to_be_goodcase};
       if (ref $gc) { $oname = &$gc ($self, $nspackage, $name, \%option) }
       else { $oname = $name }
@@ -865,6 +870,11 @@ sub _NS_uri2phpackage ($) {
   $NS_uri2phpackage{$_[0]}
   || $NS_uri2phpackage{$Message::Header::Default::OPTION{namespace_uri}};
 }
+sub _NS_uri2package ($) {
+  $NS_uri2package{$_[0]}
+  || $NS_uri2phpackage{$_[0]}
+  || $NS_uri2phpackage{$Message::Header::Default::OPTION{namespace_uri}};
+}
 
 =head2 $self->clone ()
 
@@ -940,7 +950,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/07/06 10:30:10 $
+$Date: 2002/07/06 11:37:01 $
 
 =cut
 
