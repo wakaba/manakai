@@ -17,7 +17,7 @@ markup constructures.  (SuikaWiki is not "tiny"?  Oh, yes, I see:-))
 
 package SuikaWiki::Markup::XML;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload '""' => \&stringify,
              fallback => 1;
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXML_NCNameStartChar InXMLNCNameChar!;
@@ -41,6 +41,7 @@ our %Namespace_URI_to_prefix = (
 	'http://www.w3.org/2002/06/hlink'	=> [qw/h hlink/],
 	'http://www.w3.org/2002/06/xhtml2'	=> ['', qw/h h2 xhtml xhtml2/],
 	'http://www.w3.org/2002/07/owl'	=> [qw/owl/],
+	'http://www.w3.org/2002/xforms/cr'	=> [qw/f xforms/],
 	'http://www.w3.org/TR/REC-smil'	=> ['', qw/smil smil1/],
 	'http://www.wapforum.org/2001/wml'	=> [qw/wap/],
 	'http://xml.apache.org/xalan'	=> [qw/xalan/],
@@ -996,6 +997,7 @@ sub _entitize ($$;%) {
   $s =~ s/"/&quot;/g;
   $s =~ s/%/&#x25;/g if $o{percent};
   $s =~ s/'/&#x27;/g if $o{apos};
+  $s =~ s/([\x00-\x08\x0B\x0C\x0E-\x1F])/sprintf '&amp;#%d;', ord $1/g;
   $s;
 }
 
@@ -1140,4 +1142,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/05/25 10:55:14 $
+1; # $Date: 2003/05/31 07:01:46 $
