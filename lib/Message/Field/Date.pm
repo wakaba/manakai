@@ -11,7 +11,7 @@ date-time used in Internet messages and so on
 package Message::Field::Date;
 use strict;
 use vars qw(%DEFAULT %FMT2STR @ISA %MONTH %REG $VERSION %ZONE);
-$VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::Field::Structured;
 push @ISA, qw(Message::Field::Structured);
 use Time::Local 'timegm_nocheck';
@@ -103,49 +103,6 @@ The following methods construct new objects:
   NOV	=> 11,	NOVEMBER	=> 11,
   DEC	=> 12,	DECEMBER	=> 12,
 );
-
-if (defined $^V) {
-  use utf8;
-  %MONTH = (%MONTH,
-    qw(睦月 1 霞初月 1 暮新月 1 太郎月 1 子日月 1 初春月 1
-       初空月 1 早緑月 1 年端月 1 年初月 1 孟春 1 祝月 1
-       元月 1 端月 1
-       
-       如月 2 初花月 2 梅月 2 梅見月 2 雪消月 2 小草生月 2
-       仲春 2 令月 2 仲陽 2
-       
-       弥生 3 桜月 3 晩春 3 早花咲月 3 染色月 3 花見月 3
-       春惜月 3 雛月 3 夢見月 3 季春 3 暮春 3
-       
-       卯月 4 卯花月 4 得鳥羽月 4 夏初月 4 花残月 4 孟夏 4
-       麦秋 4 初夏 4 首夏 4
-       
-       五月 5 皐月 5 早月 5 菖蒲月 5 五色月 5 狭雲月 5 早苗月 5
-       田草月 5 橘月 5 雨月 5 仲夏 5 星月 5 鶉月 5 早稲月 5
-       
-       水無月 6 弥涼暮月 6 風待月 6 涼暮月 6 蝉羽月 6 常夏月 6
-       鳴神月 6 松風月 6 季夏 6 晩夏 6 林鐘 6
-       
-       文月 7 秋初月 7 七夕月 7 親月 7 文披月 7 書披月 7
-       愛合月 7 女郎花月 7 初秋 7 孟秋 7 新秋 7
-       
-       葉月 8 初月 8 秋風月 8 草津月 8 木染月 8 月見月 8 萩月 8
-       紅染月 8 仲秋 8 清秋 8
-       
-       長月 9 玄月 9 色どり月 9 菊咲月 9 菊月 9 寝覚月 9 暮秋 9
-       紅葉月 9 季秋 9 晩秋 9
-       
-       神無月 10 神有月 10 神去月 10 小春 10 時雨月 10 初霜月 10
-       孟冬 10 初冬 10
-       
-       霜月 11 神楽月 11 神帰月 11 霜降月 11 子月 11 雪待月 11
-       仲冬 11 朔月 11 露ごもりの葉月 11
-       
-       師走 12 除月 12 弟月 12 親子月 12 限月 12 暮来月 12 年積月 12
-       春待月 12 梅初月 12 季冬 12 晩冬 12 極月 12 臘月 12 蠟月 12 蝋月 12
-     )
-  );
-}
 
 {
 my $_p2f = sub { my ($s, $n) = @_; $s eq 'none'? q(%d): $s eq 'SP'? qq(%${n}d): qq(%0${n}d) };
@@ -240,6 +197,7 @@ my $_tm = sub { $_[0]->{local}?'tm_local':'tm' };
   #IST	=> [+1,  5, 30],	## Indian standard
   IT	=> [+1,  3, 30],	## Iran
   JST	=> [+1,  9,  0],	## Japan Central Standard
+  #JT	=> [+1,  9,  0],	## Japan Central Standard
   JT	=> [+1,  7, 30],	## Java
   KDT	=> [+1, 10,  0],	## Korean Daylight
   KST	=> [+1,  9,  0],	## Korean Standard
@@ -315,6 +273,7 @@ sub _init ($;%) {
   my $DEFAULT = Message::Util::make_clone (\%DEFAULT);
   my %option = @_;
   $self->SUPER::_init (%$DEFAULT, %option);
+  $self->{date_time} = 0;
   $self->{date_time} = $option{unix} if defined $option{unix};
   $self->{secfrac} = $option{frac} if defined $option{frac};
   unless (ref $self->{option}->{zone}) {
@@ -675,6 +634,7 @@ sub stringify ($;%) {
   my $self = shift;
   my %o = @_;
   my %option = %{$self->{option}};
+  $option{format_parameters} ||= {};
   for (grep {/^-/} keys %o) {$option{substr ($_, 1)} = $o{$_}}
   unless ($option{format_template}) {
     if ($option{format} =~ /mail-rfc2822|news-usefor|mail-rfc822\+rfc1123|news-son-of-rfc1036|mime/) {
@@ -702,9 +662,9 @@ sub stringify ($;%) {
   my $c = '';
   $c = $self->_comment_stringify
     if $option{output_comment} && @{ $self->{comment} } > 0;
-  Message::Util::sprintxf ($option{format_template}, {
+  &Message::Util::sprintxf ($option{format_template}, {
   	comment	=> $c,
-  	fmt2str	=> \%FMT2STR,
+  	fmt2str	=> ($option{format_macros} || \%FMT2STR),
   	option	=> \%option,
   	time	=> $self->{date_time},
   	time_local	=> $l_time,
@@ -712,6 +672,7 @@ sub stringify ($;%) {
   	tm_local	=> [ gmtime $l_time ],
   	secfrac	=> $self->{secfrac},
   	secfrac_local	=> $self->{secfrac},	## Not supported yet
+  	%{ $option{format_parameters} },
   });
 }
 *as_string = \&stringify;
@@ -804,7 +765,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/08/05 09:33:18 $
+$Date: 2002/08/29 12:14:37 $
 
 =cut
 
