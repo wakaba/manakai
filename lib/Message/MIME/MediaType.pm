@@ -8,7 +8,7 @@ Message::MIME::MediaType --- Media-type definitions
 package Message::MIME::MediaType;
 use strict;
 use vars qw($VERSION);
-$VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 our %type;
 
@@ -211,6 +211,9 @@ $type{application}->{'octet-stream'} = {
 		conversions	=> {
 			handler	=> ['Message::Field::CSV'],
 		},	## obsolete
+		'x-conversions'	=> {
+			handler	=> ['Message::Field::CSV'],
+		},
 		name	=> {},
 		padding	=> {
 			handler	=> ['Message::Field::Numval',{
@@ -423,6 +426,45 @@ $type{message}->{'external-body'} = {
 	mime_alternate	=> [qw/message external-body/],
 	accept_cte	=> [qw/7bit/],
 	cte_7bit_preferred	=> 'quoted-printable',
+	handler	=> ['Message::Body::MessageExternalBody',{},
+		[qw/body_default_charset body_default_charset_input/],
+	],
+	parameter	=> {
+		expiration	=> {
+			handler	=> ['Message::Field::Date',{
+				-format	=> 'mail-rfc822+rfc1123',
+			}],
+		},
+		server	=> {
+			handler	=> ['Message::Field::Mailbox',{
+				-output_angle_bracket	=> 0,
+				-output_display_name	=> 0,
+			}],
+		},
+		site	=> {
+			handler	=> ['Message::Field::Domain',{
+				-format_ipv4	=> '%vd',
+				-format_ipv6	=> '%s',
+				-use_domain_literal	=> 0,
+			}],
+		},
+		size	=> {
+			handler	=> ['Message::Field::Numval'],
+		},
+		subject	=> {
+			handler	=> ['Message::Field::Subject',{
+				-remove_ml_prefix	=> 0,
+			}],
+		},
+		url	=> {
+			handler	=> ['Message::Field::URI',{
+				-allow_relative	=> 0,
+				-output_angle_bracket	=> 0,
+				-use_comment	=> 0,
+				-use_display_name	=> 0,
+			}],
+		},
+	},
 };
 
 $type{message}->{http} = {
@@ -570,7 +612,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/09 11:13:14 $
+$Date: 2002/06/14 12:07:16 $
 
 =cut
 

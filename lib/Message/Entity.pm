@@ -13,7 +13,7 @@ MIME multipart will be also supported (but not implemented yet).
 package Message::Entity;
 use strict;
 use vars qw(%DEFAULT $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.20 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util;
 require Message::Header;
@@ -164,8 +164,19 @@ sub parse ($$;%) {
   my $message = shift;
   my $self = bless {}, $class;
   my %new_field = $self->_init (@_);
-  my @header = ();	## BUG: This doesn't see linebreak_strict
-  my @body = split /\x0D?\x0A/, $message;	## BUG: not binary-safe
+  my $nl = "\x0D\x0A";
+  unless ($self->{option}->{strict_linebreak}) {
+    unless ($message =~ /\x0D\x0A/s) {
+      my $lfcr = $message =~ s/\x0A\x0D/\x0A\x0D/gs;
+      my $cr = $message =~ s/\x0D(?!\x0A)/\x0D/gs;
+      my $lf = $message =~ s/(?<!\x0D)\x0A/\x0A/gs;
+      if ($lfcr >= $cr && $lfcr >= $lf) { $nl = "\x0A\x0D" }
+      elsif ($cr >= $lf) { $nl = "\x0D" }
+      else { $nl = "\x0A" }
+    }
+  }
+  my @header = ();
+  my @body = split /$nl/, $message;
   while (1) {
     my $line = shift @body;
     unless (length($line)) {
@@ -178,7 +189,7 @@ sub parse ($$;%) {
   $self->{header} = parse_array Message::Header \@header,
     -parse_all => $self->{option}->{parse_all},
     -format => $self->{option}->{format}, %new_field;
-  $self->{body} = join "\x0D\x0A", @body;	## BUG: binary-unsafe
+  $self->{body} = join $nl, @body;
   $self->{body} = $self->_parse_value ([$self->content_type] => $self->{body})
     if $self->{option}->{parse_all};
   $self;
@@ -912,7 +923,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/11 13:01:21 $
+$Date: 2002/06/14 12:07:16 $
 
 =cut
 
