@@ -12,7 +12,7 @@ Perl module for MIME charset.
 package Message::MIME::Charset;
 use strict;
 use vars qw(%ENCODER %DECODER %N11NTABLE %REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 our %CHARSET;
 
@@ -33,6 +33,11 @@ $CHARSET{'us-ascii'} = {
 	
 	encoder	=> sub { $_[1] },
 	decoder	=> sub { $_[1] },
+	name_minimumizer	=> sub {
+	  shift; my $s = shift;
+	  return (charset => 'unknown-8bit') if $s =~ /[\x80-\xFF]/;
+	  (charset => 'us-ascii');
+	},
 	
 	mime_text	=> 1,
 };
@@ -44,6 +49,7 @@ $CHARSET{'iso-2022-int-1'} = {
 	decoder	=> sub { $_[1] },
 	name_minimumizer	=> sub {
 	  shift; my $s = shift;
+	  return (charset => 'unknown-8bit') if $s =~ /[\x80-\xFF]/;
 	  return (charset => 'us-ascii') unless $s =~ /[\x1B\x0E\x0F]/;
 	  return (charset => 'iso-2022-jp') unless $s =~ /\x1B[^\x24\x28]|\x1B\x24[^\x40B]|\x1B\x28[^BJ]|\x0E|\x0F/;
 	  return (charset => 'iso-2022-jp-1') unless $s =~ /\x1B[^\x24\x28]|\x1B\x24[^\x40B\x28]|\x1B\x28[^BJ]|\x1B\x24\x28[^D]|\x0E|\x0F/;
@@ -146,7 +152,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/06/09 11:13:14 $
+$Date: 2002/06/11 12:59:27 $
 
 =cut
 
