@@ -235,7 +235,13 @@ sub perl_code ($;%) {
       $r = perl_package_name if => $data;
     } elsif ($name eq 'INT') {    ## Internal Method / Attr Name
       if (defined $data) {
-        $r = perl_internal_name $data;
+        if ($data =~ /^{(\w+)}$/) {
+          valid_err q<Preprocessing macro INT{} cannot be used here>
+            unless $opt{internal};
+          $r = $opt{internal}->($1);
+        } else {
+          $r = perl_internal_name $data;
+        }
       } else {
         valid_err q<Preprocessing macro INT cannot be used here>
           unless $opt{internal};
@@ -513,6 +519,15 @@ sub type_label ($) {
   }
 }
 
+sub type_package_name ($) {
+  my $qname = shift;
+  if ($qname =~ /^([^:]*):([^:]*)$/) {
+    perl_package_name name => perl_name $2, ucfirst => 1;
+  } else {
+    perl_package_name name => perl_name $qname, ucfirst => 1;
+  }
+}
+
 sub ns_uri_to_perl_package_name ($) {
   my $uri = shift;
   if ($Info->{uri_to_perl_package}->{$uri}) {
@@ -533,7 +548,7 @@ sub ns_prefix_to_uri ($) {
 
 sub type_expanded_uri ($) {
   my $qname = shift || '';
-  if ($qname =~ /^[a-z-]+$/) {
+  if ($qname =~ /^[a-z-]+$/ or $qname eq 'Object') {
     expanded_uri ("DOMMain:$qname");
   } else {
     expanded_uri ($qname);
@@ -714,6 +729,46 @@ sub get_value_literal ($%) {
   $r;
 }
 
+sub get_internal_code ($$) {
+  my ($node, $name) = @_;
+  $node = $node->parent_node;
+  my $m;
+  my $def;
+  if ($m = $node->get_element_by (sub {
+    my ($me, $you) = @_;
+    $you->node_type eq '#element' and
+    ($you->local_name eq 'Method' or
+     $you->local_name eq 'ReMethod') and
+    $you->get_attribute_value ('Name') eq $name
+  })) {
+    $def = $m->get_attribute ('Return');
+    $def = get_perl_definition_node $def, name => 'IntDef' if $def;
+  } elsif ($m = $node->get_element_by (sub {
+    my ($me, $you) = @_;
+    $you->node_type eq '#element' and
+    $you->local_name eq 'IntMethod' and
+    $you->get_attribute_value ('Name') eq $name
+  })) {
+    $def = $m->get_attribute ('Return');
+    $def = get_perl_definition_node $def, name => 'Def' if $def;
+  }
+  if ($def) {
+    return perl_code $def->value;
+  } else {
+    valid_warn qq<Internal method "$name" not defined>;
+    is_implemented (if => $Status->{IF}, method => $name, set => 0);
+    $Status->{is_implemented} = 0;
+    return perl_exception
+                  level => 'EXCEPTION',
+                  class => 'DOMException',
+                  type => 'NOT_SUPPORTED_ERR',
+                  param => {
+                    ExpandedURI q<MDOM_EXCEPTION:if> => $Status->{IF},
+                    ExpandedURI q<MDOM_EXCEPTION:method> => $name,
+                  };
+  }
+} # get_internal_code
+
 sub register_namespace_declaration ($) {
   my $node = shift;
   for (@{$node->child_nodes}) {
@@ -733,11 +788,11 @@ sub is_implemented (%) {
   my (%opt) = @_;
   my $r = 0;
   $nest++ == 100 and valid_err q<Condition loop detected>;
-  my $member = $Info->{is_implemented}->{$opt{if}}->{$opt{method} ||
+  my $member = ($Info->{is_implemented}->{$opt{if}}->{$opt{method} ||
                                                      $opt{attr} . '.' . $opt{on}}
-            ||= {};
+            ||= {});
   if (exists $opt{set}) {
-    $r = $member->{$opt{condition} || ''} = $opt{set};
+    $r = ($member->{$opt{condition} || ''} = $opt{set});
   } else {
     if (defined $member->{$opt{condition} || ''}) {
       $r = $member->{$opt{condition} || ''};
@@ -858,6 +913,7 @@ sub if2perl ($) {
   local $Status->{if} = {}; ## Temporary data
   local $Info->{Namespace} = {%{$Info->{Namespace}}};
   local $Status->{Operator} = {};
+  local $Status->{is_implemented} = 1;
 
   my @level;
   my $mod = get_level_description $node, level => \@level;
@@ -891,6 +947,8 @@ sub if2perl ($) {
                                    condition => $condition,
                                    is_internal => 1;
     }
+    push @isa, perl_package_name (name => 'ManakaiDOMObject')
+      unless $if_name eq 'ManakaiDOMObject';
     $result .= perl_inherit [$cond_int_pack_name, @isa] => $cond_pack_name;
     if ($condition) {
       my @isaa;
@@ -1007,6 +1065,7 @@ sub method2perl ($;%) {
   my $level;
   my @level = @{$opt{level} || []};
   local $Status->{Method} = $m_name;
+  local $Status->{is_implemented} = 1;
   my $result = '';
   if ($node->local_name eq 'IntMethod') {
     $m_name = perl_internal_name $m_name;
@@ -1076,12 +1135,20 @@ sub method2perl ($;%) {
   my $code = '';
   my $int_code = '';
   if ($code_node) {
-    is_implemented if => $Status->{IF}, method => $Status->{Method},
-                   condition => $opt{condition}, set => 1;
     $code = perl_code_source (perl_code ($code_node->value,
                                          internal => sub {
+                                           return get_internal_code ($node, 
+                                                                     $_[0])
+                                             if $_[0];
                                            if ($int_code_node) {
-                                             perl_code $int_code_node->value;
+                                             perl_code $int_code_node->value,
+                                               internal => sub {
+                                                 $_[0]?get_internal_code
+                                                         ($node, $_[0]) :
+                                                 valid_err q<Preprocessing >.
+                                                   q<macro INT cannot be used >.
+                                                   q<here>;
+                                               };
                                            } else {
                                              valid_err "<IntDef> for $m_name" .
                                                        " required";
@@ -1118,7 +1185,11 @@ sub method2perl ($;%) {
               $code;
     }
     if ($int_code_node) {
-      $int_code = perl_code_source (perl_code ($int_code_node->value),
+      $int_code = perl_code_source (perl_code ($int_code_node->value,
+                                               internal => sub {
+                $_[0] ? get_internal_code $node, $_[0] :
+                valid_err q<Preprocessing macro INT cannot be used here>;
+                                               }),
                                     path => $int_code_node->node_path
                                               (key => 'Name'));
       $int_code = perl_statement (perl_assign 'my $r' => perl_literal '') .
@@ -1148,8 +1219,6 @@ sub method2perl ($;%) {
       $has_return++;
     }
   } else {
-    is_implemented if => $Status->{IF}, method => $Status->{Method},
-                   condition => $opt{condition}, set => 0;
     $int_code = $code
               = perl_exception
                   level => 'EXCEPTION',
@@ -1167,6 +1236,8 @@ sub method2perl ($;%) {
                              method is not implemented yet.');
     $has_return = 1;
   }
+  is_implemented if => $Status->{IF}, method => $Status->{Method},
+                 condition => $opt{condition}, set => $Status->{is_implemented};
   if (@return) {
     if ($has_return) {
       push @desc, pod_para q<This method results in > .
@@ -1214,6 +1285,7 @@ sub attr2perl ($;%) {
   my $level;
   my @level = @{$opt{level} || []};
   local $Status->{Method} = $m_name;
+  local $Status->{is_implemented} = 1;
   my $result = '';
   if ($node->local_name eq 'IntAttr') {
     $m_name = perl_internal_name $m_name;
@@ -1241,10 +1313,10 @@ sub attr2perl ($;%) {
                               level_default => $opt{level_default};
   my ($set_code_node, $int_set_code_node);
   if ($has_set) {
-    $code_node = get_perl_definition_node $set,
+    $set_code_node = get_perl_definition_node $set,
                               condition => $opt{condition},
                               level_default => $opt{level_default};
-    $int_code_node = get_perl_definition_node $set, name => 'IntDef',
+    $int_set_code_node = get_perl_definition_node $set, name => 'IntDef',
                               condition => $opt{condition},
                               level_default => $opt{level_default};
   }
@@ -1254,16 +1326,40 @@ sub attr2perl ($;%) {
   my $int_set_code = '';
   for ({code => \$code, code_node => $code_node,
         internal => sub {
+          return get_internal_code $node, $_[0] if $_[0];
           if ($int_code_node) {
-            perl_code $int_code_node->value;
+            perl_code $int_code_node->value,
+              internal => sub {
+                $_[0] ? get_internal_code $node, $_[0] :
+                valid_err q<Preprocessing macro INT cannot be used here>;
+              };
           } else {
             valid_err "<IF[Name = $Status->{IF}]/Attr[Name = $m_name]/" .
                       "Get/IntDef> required";
           }
         }},
-       {code => \$int_code, code_node => $int_code_node},
-       {code => \$set_code, code_node => $set_code_node},
-       {code => \$int_set_code, code_node => $int_set_code_node}) {
+       {code => \$int_code, code_node => $int_code_node,
+        internal => sub {$_[0]?get_internal_code $node,$_[0]:
+                         valid_err q<Preprocessing macro INT cannot be> .
+                                   q<used here>}},
+       {code => \$set_code, code_node => $set_code_node,
+        internal => sub {
+          return get_internal_code $node, $_[0] if $_[0];
+          if ($int_set_code_node) {
+            perl_code $int_set_code_node->value,
+              internal => sub {
+                $_[0] ? get_internal_code $node, $_[0] :
+                valid_err q<Preprocessing macro INT cannot be used here>;
+              };
+          } else {
+            valid_err "<IF[Name = $Status->{IF}]/Attr[Name = $m_name]/" .
+                      "Set/IntDef> required";
+          }
+        }},
+       {code => \$int_set_code, code_node => $int_set_code_node,
+        internal => sub {$_[0]?get_internal_code $node,$_[0]:
+                         valid_err q<Preprocessing macro INT cannot be> .
+                                   q<used here>}}) {
     ${$_->{code}} = perl_code_source (perl_code ($_->{code_node}->value,
                                                  internal => $_->{internal}),
                                       path => $_->{code_node}->node_path
@@ -1312,6 +1408,7 @@ sub attr2perl ($;%) {
   } else {
     is_implemented if => $Status->{IF}, attr => $Status->{Method},
                    condition => $opt{condition}, set => 0, on => 'get';
+    $Status->{is_implemented} = 0;
     $int_code = $code
               = perl_exception
                   level => 'EXCEPTION',
@@ -1362,6 +1459,7 @@ sub attr2perl ($;%) {
   } elsif ($has_set) {
     is_implemented if => $Status->{IF}, attr => $Status->{Method},
                    condition => $opt{condition}, set => 0, on => 'set';
+    $Status->{is_implemented} = 0;
     $int_set_code = $set_code
               = perl_exception
                   level => 'EXCEPTION',
@@ -1388,6 +1486,8 @@ sub attr2perl ($;%) {
   } else {
     push @desc, pod_para ('This attribute is read-only.');
   }
+  is_implemented if => $Status->{IF}, method => $Status->{Method},
+                 condition => $opt{condition}, set => $Status->{is_implemented};
 
   push @desc, pod_list 4,
                   pod_item (q<Result on getting:>),
@@ -1405,9 +1505,11 @@ sub attr2perl ($;%) {
   
   my $proto;
   if ($has_set) {
-    $code = q<my ($self, $given) = @_; if (defined $given) {> . $set_code .
+    $code = q<my $self = shift; if (exists $_[0]) {> . 
+            q<my $given = shift;> . $set_code .
             q<} else {> . $code . q<}>;
-    $int_code = q<my ($self, $given) = @_; if (defined $given) {> .
+    $int_code = q<my $self = shift; if (defined $given) {> .
+                q<my $given = shift;> .
                 $int_set_code . q<} else {> . $int_code . q<}>;
     $proto = '$;$';
   } else {
@@ -1449,8 +1551,8 @@ sub datatype2perl ($;%) {
   local $Info->{Namespace} = {%{$Info->{Namespace}}};
   local $Status->{Operator} = {};
   my $result = perl_package full_name => $pack_name;
-  $result .= perl_statement 'push our @ISA, ' .
-                            perl_list perl_package_name (if => $if_name);
+  $result .= perl_inherit [perl_package_name (name => 'ManakaiDOMObject'),
+                           perl_package_name (if => $if_name)];
   for my $pack ({full_name => $pack_name}, {if => $if_name}) {
     $result .= perl_statement perl_assign
                  perl_var (type => '$',
@@ -1461,10 +1563,10 @@ sub datatype2perl ($;%) {
   
   my @level = @{$opt{level} || []};
   my $mod = get_level_description $node, level => \@level;
-  $mod = ', that has been ' . $mod if $mod;
   $result .= pod_block
                pod_head ($Status->{depth}, 'Type ' . pod_code $if_name),
-               pod_paras (get_description ($node));
+               pod_paras (get_description ($node)),
+               ($mod ? pod_para ('This type is ' . $mod) : ());
 
   for (@{$node->child_nodes}) {
     if ($_->local_name eq 'Method' or
@@ -1494,6 +1596,60 @@ sub datatype2perl ($;%) {
 
   $result;
 } # datatype2perl
+
+sub datatypealias2perl ($;%) {
+  my ($node, %opt) = @_;
+  local $Status->{depth} = $Status->{depth} + 1;
+  my $if_name = $node->get_attribute_value ('Name');
+  my $long_name = expanded_uri $if_name;
+  my $real_long_name = type_expanded_uri
+                         (my $real_name = $node->get_attribute_value
+                                             ('Type', default => 'DOMMain:any'));
+  if (type_label $real_long_name eq type_label $long_name) {
+    $Info->{DataTypeAlias}->{$long_name}->{canon_uri} = $real_long_name;
+    return perl_comment sprintf '%s <%s> := %s <%s>',
+                                type_label $long_name, $long_name,
+                                type_label $real_long_name, $real_long_name;
+  }
+  $Info->{DataTypeAlias}->{$long_name}->{canon_uri} = $real_long_name;
+  
+  $if_name = perl_name $if_name, ucfirst => 1;
+  $real_name = type_package_name $real_name;
+  my $pack_name = perl_package_name name => $if_name;
+  local $Status->{IF} = $if_name;
+  local $Status->{if} = {}; ## Temporary data
+  local $Info->{Namespace} = {%{$Info->{Namespace}}};
+  my $result = perl_package full_name => $pack_name;
+  $result .= perl_inherit [perl_package_name (full_name => $real_name),
+                           perl_package_name (if => $if_name)];
+  for my $pack ({if => $if_name}) {
+    $result .= perl_statement perl_assign
+                 perl_var (type => '$',
+                           package => $pack,
+                           local_name => 'VERSION')
+                 => version_date time;
+  }
+  
+  my @level = @{$opt{level} || []};
+  my $mod = get_level_description $node, level => \@level;
+  $result .= pod_block
+               pod_head ($Status->{depth}, 'Type ' . pod_code $if_name),
+               pod_paras (get_description ($node)),
+               pod_para ('This type is an alias of the type ' .
+                         pod_code (type_label $real_long_name) . '.'),
+               ($mod ? pod_para ('This type is ' . $mod) : ());
+
+  for (@{$node->child_nodes}) {
+    if ({qw/Name 1 Spec 1 Type 1 Description 1
+            Level 1 Condition 1/}->{$_->local_name}) {
+      #
+    } else {
+      valid_warn qq{Element @{[$_->local_name]} not supported};
+    }
+  }
+
+  $result;
+} # datatypealias2perl
 
 =item Exception top-level element
 
@@ -1964,9 +2120,7 @@ for my $node (@{$source->child_nodes}) {
   } elsif ($node->local_name eq 'DataType') {
     $result .= datatype2perl $node;
   } elsif ($node->local_name eq 'DataTypeAlias') {
-    
-## TODO: $Info->{DataTypeAlias}->{ uri }->{canon_uri} = uri
-
+    $result .= datatypealias2perl $node;
   } elsif ($node->local_name eq 'ConstGroup') {
     $result .= constgroup2perl $node;
   } elsif ($node->local_name eq 'Const') {
@@ -2001,7 +2155,7 @@ if (keys %{$Status->{EXPORT_OK}||{}}) {
 
 ## Feature
 my @feature_desc;
-for my $condition (keys %{$Info->{Condition}}, '') {
+for my $condition (sort keys %{$Info->{Condition}}, '') {
   for my $Feature (@{$Module->child_nodes}) {
     next unless $Feature->node_type eq '#element' and
                 $Feature->local_name eq 'Feature' and
@@ -2009,20 +2163,27 @@ for my $condition (keys %{$Info->{Condition}}, '') {
     my $not_implemented;
     IF: for my $if (keys %{$Info->{is_implemented}}) {
       for my $mem (keys %{$Info->{is_implemented}->{$if}}) {
-        unless ($Info->{is_implemented}->{$if}->{$mem}->{$condition}) {
-          $not_implemented = [$if, $mem];
+        ## Note: In fact, this checks whether the method is NOT implemented
+        ##       rather than the method IS implemented.
+        if (exists $Info->{is_implemented}->{$if}->{$mem}->{$condition} and
+            not $Info->{is_implemented}->{$if}->{$mem}->{$condition}) {
+          $not_implemented = [$if, $mem, $condition];
           last IF;
         }
       }
     }
     
-    my $f_name = $Feature->get_attribute_value ('Name');
+    my $f_name = $Feature->get_attribute_value ('Name', default => '');
+    unless (length $f_name) {
+      $f_name = expanded_uri $Feature->get_attribute_value ('QName');
+    }
     my $f_ver = $Feature->get_attribute_value ('Version');
     
     push @feature_desc, pod_item ('Feature ' . pod_code ($f_name) .
                                   ' version ' . pod_code ($f_ver) .
+                                  ($Info->{Condition}->{$condition}->{FullName} ?
                                   ' [' . $Info->{Condition}->{$condition}
-                                              ->{FullName} . ']'),
+                                              ->{FullName} . ']' : '')),
                         pod_paras (get_description $Feature);
 
     if ($not_implemented) {
@@ -2030,10 +2191,11 @@ for my $condition (keys %{$Info->{Condition}}, '') {
                                     'in this feature but not yet fully ' .
                                     'implemented.');
       $result .= perl_comment "$f_name, $f_ver: $not_implemented->[0]." .
-                              "$not_implemented->[1] not implemented.";
+                              "$not_implemented->[1]<$not_implemented->[2]>" .
+                              " not implemented.";
     } else {
       push @feature_desc, pod_para ('This module implements this feature, ' .
-                                    'so that the method calls such as ' .
+                                    'so that the method calls ' .
                                     pod_code ('$DOMImplementation' .
                                               '->hasFeature (' .
                                               perl_literal ($f_name) .
@@ -2043,7 +2205,7 @@ for my $condition (keys %{$Info->{Condition}}, '') {
                                               '->hasFeature (' .
                                               perl_literal ($f_name) .
                                               ', null)') .
-                                    ' returns ' . pod_code ('true') . '.');
+                                    ' will return ' . pod_code ('true') . '.');
       $result .= perl_statement 
                    perl_assign 
                      '$' . $ManakaiDOMModulePrefix.'::FeatureImplemented{' .
@@ -2108,6 +2270,6 @@ defined by the copyright holder of the source document.
 
 =cut
 
-# $Date: 2004/09/09 03:29:39 $
+# $Date: 2004/09/09 08:04:36 $
 
 

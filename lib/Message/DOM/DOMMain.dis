@@ -25,11 +25,42 @@ Module:
     @@@:
       This module implements IDL/DOM core datatypes (such as
       DOMString) and objects (such as DOMImplementationRegistry).
+
+  @Feature:
+    @@QName:
+      ManakaiDOM:DOMMain
+    @@Version: 1.0
+    @@Condition[list]:
+      DOM1
+      DOM2
+      DOM3
+    @@Description:
+      @@@lang:en
+      @@@@: The manakai DOM implementation DOMMain module for DOM Level 1.
+  @Feature:
+    @@QName:
+      ManakaiDOM:DOMMain
+    @@Version: 2.0
+    @@Condition[list]:
+      DOM2
+      DOM3
+    @@Description:
+      @@@lang:en
+      @@@@: The manakai DOM implementation DOMMain module for DOM Level 2.
+  @Feature:
+    @@QName: 
+      ManakaiDOM:DOMMain
+    @@Version: 3.0
+    @@Condition: DOM3
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The manakai DOM implementation DOMMain module for DOM Level 3.
   
   @License:
      license:Perl
   @Date.RCS:
-     $Date: 2004/09/08 05:38:38 $
+     $Date: 2004/09/09 08:04:36 $
   @Require:
     @@Module:
       @@@Def:
@@ -86,7 +117,7 @@ DataType:
     @@@: Any data.
 
 DataType: 
-  @Name: object
+  @Name: Object
   @Description:
     @@lang:en
     @@@: Any object.
@@ -248,7 +279,16 @@ DataType:
       @@@Def:
         @@@@Type:
           lang:Perl
-        @@@@@: $self->{value} = $given;
+        @@@@@:
+          if (ref $given and
+              $given->isa ('__CLASS{DOMString}__')) {
+            for ('value', <Q:ManakaiDOM:isFullyNormalized>) {
+              $self->{$_} = $given->{$_};
+            }
+          } else {
+            __INT{{initOnChange}}__;
+            $self->{value} = ''.$given;
+          }
   @IntAttr:
     @@Name: valueUTF16BE
     @@Description:
@@ -268,6 +308,7 @@ DataType:
         @@@@Type:
           lang:Perl
         @@@@@:
+          __INT{{initOnChange}}__;
           $self->{value} = Encode::decode ('UTF-16BE', $given);
   @Attr:
     @@Name: length
@@ -280,7 +321,7 @@ DataType:
         This attribute is taken from the DOM CharacterData interface
         and ECMAScript String object.
     @@Get:
-      @@@Type: unsignedLong
+      @@@Type: unsigned-long
       @@@Description:
         @@@lang:en
         @@@@: The number of 16-bit units.
@@ -293,7 +334,6 @@ DataType:
         @@@@Type:
           lang:Perl
         @@@@@:
-          #$r = CORE::length ($self->__INT{valueUTF16BE}__) / 2;
           $r = CORE::length $self->{value};
           while ($self->{value} =~ /[\x{10000}-\x{10FFFF}]/g) {
             $r++;
@@ -322,7 +362,9 @@ DataType:
         @@@@Type:
           lang:Perl
         @@@@cast-input: 0
-        @@@@@: $self->{value} .= $arg;
+        @@@@@:
+          __INT{{initOnChange}}__;
+          $self->{value} .= $arg;
   @IntMethod:
     @@Name: setCurrentPosition
     @@Description:
@@ -480,6 +522,7 @@ DataType:
         @@@@Type:
           lang:Perl
         @@@@@:
+          __INT{{initOnChange}}__;
           unless ($self->{value} =~ /[\x{10000}-\x{10FFFF}]/) {
             substr ($self->{value}, $offset, 0) = $arg;
           } else {
@@ -562,6 +605,7 @@ DataType:
         @@@@Type:
           lang:Perl
         @@@@@:
+          __INT{{initOnChange}}__;
         REPLACE: {
           unless ($self->{value} =~ /[\x{10000}-\x{10FFFF}]/) {
             substr ($self->{value}, $offset, $count) = $arg;
@@ -713,74 +757,128 @@ DataType:
           }__;
           $r = substr $self->{value}, $start, pos ($self->{value}) - $start;
         } # SUBSTR
-  @IntMethod:
+  @IntAttr:
     @@Name: isFullyNormalized
     @@Description:
       @@@lang:en
       @@@@:
-        In DOM 3, characters are fully normalized as defined in appendix B of XML
-        1.1 if (a) the param "normalize-characters" was set to "true" while
-        loading the document or the document was certified as defined in XML 1.1 or
-        (b) the param "normalize-characters" was set to "true" while using the
-        method "Document.normalizeDocument ()" or while using the method
-        "Node.normalize ()".
-    @@Return:
+        In DOM 3, characters are fully normalized as defined in appendix B 
+        of the XML 1.1 specification if (a) the parameter 
+        "normalize-characters" was set to "true" while loading the document 
+        or the document was certified as defined in XML 1.1 specification or 
+        (b) the parameter "normalize-characters" was set to "true" while 
+        using the method "normalizeDocument" of the "Document" interface or 
+        while using the method "normalize" of the "Node" interface.
+      \
+        This attribute provides the information whether the string is 
+        certified as fully normalized.  Getting of this attribute does 
+        not test whether the string is actually normalized nor does 
+        do the normalization.
+    @@Get:
       @@@Type: boolean
-      @@@Result:
+      @@@InCase:
         @@@@Value: true
         @@@@Type: boolean
         @@@@Description:
           @@@@@lang:en
-          @@@@@@: The string is fully normalized.
-      @@@Result:
+          @@@@@@: The string was certified as fully normalized.
+      @@@InCase:
         @@@@Value: false
         @@@@Type: boolean
         @@@@Description:
           @@@@@lang:en
-          @@@@@@: The string is not fully normalized.
+          @@@@@@: The string is not known to be certified as fully normalized.
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          $r = $self->{<Q:ManakaiDOM:isFullyNormalized>} ? true : false;
   @IntMethod:
-    @@Name: comparison
+    @@Name: compare
     @@Operator:
       @@@@: eq
       @@@Type: 
         lang:Perl
+    @@Description:
+      @@@lang:en
+      @@@@: The string comparison.
     @@Param:
       @@@Name: str
       @@@Type: DOMString
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The string to be compared.
     @@Param:
       @@@Name: caseInsensitive
       @@@Type: boolean
-## TODO:
-      @@@Result:
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The case-sentitivility of the match.
+      @@@InCase:
         @@@@Value: true
-        @@@@Type: boolean
         @@@@Description:
           @@@@@lang:en
-          @@@@@@: The string is fully normalized.
-      @@@Result:
-        @@@@Value: true
-        @@@@Type: boolean
+          @@@@@@: The match is done as case-insensitive.
+      @@@InCase:
+        @@@@Value: false
         @@@@Description:
           @@@@@lang:en
-          @@@@@@: The string is fully normalized.
+          @@@@@@: The match is done as case-sensitive.
+      @@@IsOptional: 1
     @@Return:
       @@@Type: boolean
+      @@@Description:
+        @@@@lang:en
+        @@@@@: Whether the string is fully normalized or not.
+      @@@InCase:
+        @@@@Value: true
+        @@@@Type: boolean
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The string is fully normalized.
+      @@@InCase:
+        @@@@Value: true
+        @@@@Type: boolean
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The string is fully normalized.
       @@@Def:
         @@@@Type:
           lang:Perl
         @@@@cast-input: 0
         @@@@@:
-          $r = $str eq $self->{value};
+          if ($str->isa ('__CLASS{DOMString}__')) {
+            $str = $str->{value};
+          }
+          if ($caseInsensitive) {
+            $r = lc ($str) eq lc ($self->{value});
+          } else {
+            $r = $str eq $self->{value};
+          }
+  @IntMethod:
+    @@Name: initOnChange
+    @@Description:
+      @@@lang:en
+      @@@@: Discade caches when the value has been changed.
+    @@Return:
+      @@@Def:
+        @@@@Type:
+          lang:Perl
+        @@@@@:
+          delete $self->{<Q:ManakaiDOM:isFullyNormalized>};
 
 DataType:
   @Name:  DOMTimeStamp
+  @Description:
+    @@lang:en
+    @@@: An absolute or relative time.  A number of milliseconds.
   @Def:
     @@@:
       unsigned-long-long
     @@Description:
       @@@lang:en
       @@@@:
-        An alias to DOMMain:unsigned-long-long.
+        An alias to the type DOMMain:unsigned-long-long.
   @Def:
     @@Type:
       lang:Perl
@@ -788,57 +886,17 @@ DataType:
       @@@lang:en
       @@@@:
         Defined as a reference in the Perl binding.
+      \
+        ISSUE: Need considerations for the interface of this type of objects.
+  @Level: 2
   @Spec:
     @@DOM3[list]:
       DOM3Core:core.html#Core-DOMTimeStamp
-  @Description:
-    @@lang:en
-    @@@: An absolute or relative time.  A number of milliseconds.
-#  @IntAttr:
-#    @@Name: unixTime
-#    @@Description:
-#      @@@lang:en
-#      @@@@: A number of seconds from the Epoch (i.e. 1970-01-01T00:00:00Z).
-#    @@Get:
-#      @@@Type: unsigned-long
-#      @@@Def:
-#        @@@@Type:
-#          lang:Perl
-#        @@@@@:
-#          use integer;
-#          $r = ($$self / 1000) - $EPOCH;
-### TODO: Define $EPOCH
-#    @@Set:
-#      @@@Type: unsigned-long
-#      @@@Def:
-#        @@@@Type:
-#          lang:Perl
-#        @@@@@:
-#          $$self = $given * 1000 + $EPOCH;
-  @IntAttr:
-    @@Name: millisecond
-    @@Description:
-      @@@lang:en
-      @@@@: A number of milliseconds.  Value is between 0 and 999 (inclusive).
-    @@Get:
-      @@@Type: unsigned-long
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          $r = $$self % 1000;
-    @@Set:
-      @@@Type: unsigned-long
-      @@@Def:
-        @@@@Type:
-          lang:Perl
-        @@@@@:
-          use integer;
-          $$self = ($$self / 1000) * 1000 + $given;
 
 DataTypeAlias:
   @Name:  DOMUserData
   @Type:  any
+  @Level: 3
   @Spec:
     @@DOM3[list]:
       DOM3Core:core.html#Core-DOMUserData
@@ -849,6 +907,7 @@ DataTypeAlias:
 DataTypeAlias:
   @Name:  DOMObject
   @Type:  Object
+  @Level: 3
   @Spec:
     @@DOM3[list]:
       DOM3Core:core.html#Core-DOMObject
@@ -941,12 +1000,12 @@ IF:
          @@@@Type:
            lang:Perl
          @@@@@:
-           $r = __DEEP{ __CLASS{DOMImplementationList}__->__INT{new}__ }__;
-           for (@$self) {
-             __DEEP{
+           __DEEP{
+             $r = __CLASS{DOMImplementationList}__->__INT{new}__;
+             for (@$self) {
                $r->__INT{append}__ ($_->getDOMImplementationList ($features));
-             }__;
-           }
+             }
+           }__;
   @Method:
     @@Name: addSource
     @@Description:
