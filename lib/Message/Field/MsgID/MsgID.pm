@@ -14,15 +14,15 @@ draft-ietf-usefor-msg-id-alt-00 is supported.
 package Message::Field::MsgID::MsgID;
 use strict;
 use vars qw(%REG $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Carp;
 use overload '""' => sub {shift->stringify};
 #use autouse Digest::MD2 => qw(md2_hex md2_base64);
 #use autouse Digest::MD5 => qw(md5_hex md5_base64);
 #use autouse Digest::SHA1 => qw(sha1_hex sha1_base64);
-use Digest::MD2;
-use Digest::MD5;
-use Digest::SHA1;
+#use Digest::MD2;
+use Digest::MD5 qw(md5_hex md5_base64);
+#use Digest::SHA1;
 
 $REG{quoted_string} = qr/\x22(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\xFF])*\x22/;
 $REG{domain_literal} = qr/\x5B(?:\x5C[\x00-\xFF]|[\x00-\x0C\x0E-\x5A\x5E-\xFF])*\x5D/;
@@ -106,14 +106,14 @@ sub _hash ($$;$$) {
     $str = md5_hex ($str);
   } elsif ($hash_name eq 'md5_64') {
     $str = md5_base64 ($str);
-  } elsif ($hash_name eq 'sha1') {
-    $str = sha1_hex ($str);
-  } elsif ($hash_name eq 'sha1_64') {
-    $str = sha1_base64 ($str);
-  } elsif ($hash_name eq 'md2') {
-    $str = md2_hex ($str);
-  } elsif ($hash_name eq 'md2_base64') {
-    $str = md2_base64 ($str);
+  #} elsif ($hash_name eq 'sha1') {
+  #  $str = sha1_hex ($str);
+  #} elsif ($hash_name eq 'sha1_64') {
+  #  $str = sha1_base64 ($str);
+  #} elsif ($hash_name eq 'md2') {
+  #  $str = md2_hex ($str);
+  #} elsif ($hash_name eq 'md2_base64') {
+  #  $str = md2_base64 ($str);
   } elsif ($hash_name eq 'crypt') {
     my @s = ('0'..'9','A'..'Z','a'..'z');
     my $salt = crypt('foobar', '$1$ab$') eq '$1$ab$uAP8qWqcFs3q.Gfl5PkL2.'?
@@ -258,7 +258,7 @@ Boston, MA 02111-1307, USA.
 =head1 CHANGE
 
 See F<ChangeLog>.
-$Date: 2002/04/01 06:05:38 $
+$Date: 2002/04/02 11:52:12 $
 
 =cut
 
