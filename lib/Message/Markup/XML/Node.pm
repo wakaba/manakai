@@ -13,7 +13,7 @@ This module is part of manakai XML.
 
 package Message::Markup::XML::Node;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.6.2.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.6.2.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use overload
   '""'     => \&outer_xml,
   bool     => sub { 
@@ -900,7 +900,12 @@ sub inner_xml ($;%) {
     
     my ($isub, $xid) = ('', $self->external_id);
     for (@{$self->{node}}) {
-      $isub .= $_->outer_xml if $_->{type} ne '#attribute';
+      if ($_->{type} eq '#element' and
+          $_->{namespace_uri} eq SGML_DOCTYPE and
+          $_->{local_name} eq 'subset') {
+        $isub .= $_->inner_xml;
+        last;
+      }
     }
     my $r;
     if ($xid) {
@@ -1390,4 +1395,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/02/26 09:02:12 $
+1; # $Date: 2004/06/27 06:34:07 $

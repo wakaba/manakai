@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::Base;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML
     qw[InXML_NameStartChar10 InXMLNameChar10
        InXMLNameStartChar11 InXMLNameChar11
@@ -926,7 +926,7 @@ sub parse_reference_in_attribute_value_literal ($$$%) {
           } elsif ($self->{error}->get_flag
                ($opt{ExpandedURI q<source>}->[-1],
                 ExpandedURI q<is-unparsed-entity>)) {
-            ## This code will not be executed, since all unparsed entities
+            ## This code will never be executed, since all unparsed entities
             ## are external entities.
             $self->report
                (-type => 'WFC_PARSED_ENTITY',
@@ -934,6 +934,7 @@ sub parse_reference_in_attribute_value_literal ($$$%) {
                 source => $src,
                 position_diff => length $s,
                 entity_name => $s);
+            shift @{$opt{ExpandedURI q<source>}};
             last EXPAND;
           }
           local $self->{ExpandedURI q<_:opened-general-entity>}->{$s} = 1;
@@ -1075,6 +1076,7 @@ sub parse_reference_in_content ($$$%) {
                 source => $src,
                 position_diff => length $s,
                 entity_name => $s);
+            shift @{$opt{ExpandedURI q<source>}};
             last EXPAND;
           }
           local $self->{ExpandedURI q<_:opened-general-entity>}->{$s} = 1;
@@ -1161,6 +1163,7 @@ sub parse_reference_in_rpdata ($$$%) {
                 source => $src,
                 position_diff => length $s,
                 entity_name => $s);
+            shift @{$opt{ExpandedURI q<source>}};
             last EXPAND;
           }
           local $self->{ExpandedURI q<_:opened-parameter-entity>}->{$s} = 1;
@@ -1563,10 +1566,9 @@ sub parse_entity_declaration ($$$%) {
         my $enttext = $pp->{ExpandedURI q<param>}->[0];
         if ($enttext) {
           if ($enttext->{type} eq 'paralit') {
-            $self->literal_entity_value_content
-              ($src, $pp, 
-               {ExpandedURI q<literal-entity-value> => $enttext->{value}},
-               %opt);
+            $pp->{ExpandedURI q<entity-value>} = $enttext->{value};
+            $self->entity_value_content
+              ($src, $p, $pp, %opt);
             shift @{$pp->{ExpandedURI q<param>}};
 
           ## External Entity Specification
@@ -1658,12 +1660,12 @@ sub parse_entity_declaration ($$$%) {
                    ps => 1,
                  });
               my $enttext2 = shift @{$pp->{ExpandedURI q<param>}};
-              $self->literal_entity_value_content
-                ($src, $pp, 
-                 {ExpandedURI q<literal-entity-value> => $enttext2->{value},
-                  ExpandedURI q<entity-value-keyword> => ${$enttext->{value}}},
-                 %opt)
-                if $enttext2;
+              if ($enttext2) {
+                $pp->{ExpandedURI q<entity-value>} = $enttext2->{value};
+                $pp->{ExpandedURI q<entity-value-keyword>} = $enttext->{value};
+                $self->entity_value_content
+                  ($src, $p, $pp, %opt);
+              }
             } else {
               $self->report
                 (-type => 'SYNTAX_ENTITY_TEXT_KEYWORD',
@@ -1793,7 +1795,7 @@ sub parse_notation_declaration ($$$%) {
                -class => 'SYNTAX',
                source => $src);
     }
-    $self->entity_declaration_end
+    $self->notation_declaration_end
               ($src, $p, $pp, %opt);
     return 1;
   } else {
@@ -2191,7 +2193,7 @@ sub parse_attlist_declaration ($$$%) {
                -class => 'SYNTAX',
                source => $src);
     }
-    $self->entity_declaration_end
+    $self->attlist_declaration_end
               ($src, $p, $pp, %opt);
     return 1;
   } else {
@@ -2505,7 +2507,11 @@ sub parse_markup_declaration_parameter ($$$%) {
     my $has_ps = 0;
     my $pos = pos $$src;
     EATPS: while (1) {
-      if ($$src =~ /\G$REG_S+/gco) {
+      if ($$src =~ /\G($REG_S+)/gco) {
+        my $s = $1;
+        $self->markup_declaration_parameter
+              ($src, $p, {ExpandedURI q<parameter> =>
+                          {type => 'ps', value => \$s}}, %opt);
         if ($opt{ExpandedURI q<end-with-mdc>} and
             $$src =~ /\G>/gc) {
           pos ($$src)--;
@@ -2580,6 +2586,7 @@ sub parse_markup_declaration_parameter ($$$%) {
                           source => $src,
                           position_diff => 1 + length $s,
                           entity_name => $s);
+                shift @{$opt{ExpandedURI q<source>}};
                 last EXPAND;
               }
 
@@ -2666,6 +2673,8 @@ sub parse_markup_declaration_parameter ($$$%) {
                                   diff => length $name);
     $self->{error}->fork_position ($src => \$name);
     push @$param, {type => 'Name', value => \$name};
+    $self->markup_declaration_parameter
+              ($src, $p, {ExpandedURI q<parameter> => $param->[-1]}, %opt);
     return 1;
   } elsif ($allow->{rniKeyword} and
            $$src =~ /\G\#($XML_NAME{$self->{ExpandedURI q<xml-version>}||'1.0'})/gc) {
@@ -2675,6 +2684,8 @@ sub parse_markup_declaration_parameter ($$$%) {
                                   diff => length $name);
     $self->{error}->fork_position ($src => \$name);
     push @$param, {type => 'rniKeyword', value => \$name};
+    $self->markup_declaration_parameter
+              ($src, $p, {ExpandedURI q<parameter> => $param->[-1]}, %opt);
     return 1;
   } elsif ($allow->{paralit} and
            $$src =~ /\G(["'])/gc) {
@@ -2738,7 +2749,9 @@ sub parse_markup_declaration_parameter ($$$%) {
                 line => $pos->[0],
                 char => $pos->[1]);
     }
-    push @$param, {type => 'publit', value => \$pubid};
+    push @$param, {type => 'publit', value => \$pubid, delimiter => $lit};
+    $self->markup_declaration_parameter
+              ($src, $p, {ExpandedURI q<parameter> => $param->[-1]}, %opt);
   } elsif ($allow->{syslit} and
            $$src =~ /\G(["'])/gc) {
     my $lit = $1;
@@ -2764,18 +2777,29 @@ sub parse_markup_declaration_parameter ($$$%) {
                (\$sysid,
                 line => $pos->[0],
                 char => $pos->[1]);
-    push @$param, {type => 'syslit', value => \$sysid};
+    push @$param, {type => 'syslit', value => \$sysid, delimiter => $lit};
+    $self->markup_declaration_parameter
+              ($src, $p, {ExpandedURI q<parameter> => $param->[-1]}, %opt);
   } elsif ($allow->{attrValLit} and
            $$src =~ /\G(?=["'])/gc) {
     push @$param, {type => 'attrValLit'};
   } elsif ($allow->{peroName} and
-           $$src =~ /\G%$REG_S+/gco) {
+           $$src =~ /\G%($REG_S+)/gco) {
+    $self->markup_declaration_parameter
+              ($src, $p, {ExpandedURI q<parameter> => {type => 'pero'}}, %opt);
+    my $s = $1;
+    $self->markup_declaration_parameter
+              ($src, $p,
+               {ExpandedURI q<parameter> => {type => 'ps', value => \$s}},
+               %opt);
     if ($$src =~ /\G($XML_NAME{$self->{ExpandedURI q<xml-version>}||'1.0'})/gc) {
       my $name = $1;
       $self->{error}->set_position ($src, moved => 1,
                                     diff => length $name);
       $self->{error}->fork_position ($src => \$name);
       push @$param, {type => 'peroName', value => \$name};
+      $self->markup_declaration_parameter
+              ($src, $p, {ExpandedURI q<parameter> => $param->[-1]}, %opt);
       return 1;
     } else {
       $self->report
@@ -2929,7 +2953,11 @@ sub parse_external_identifiers ($$$%) {
              });
     my $pubid = shift @{$p->{ExpandedURI q<param>}};
     return 1 unless $pubid;
-    my $pp = {ExpandedURI q<public-id> => $pubid->{value}};
+    my $pp = {ExpandedURI q<original-public-id> => $pubid->{value}};
+    $pubid = ${$pubid->{value}};
+    $pubid =~ s/$REG_S+/\x20/go;
+    $pubid =~ s/^\x20//; $pubid =~ s/\x20$//;
+    $pp->{ExpandedURI q<public-id>} = \$pubid;
     $self->public_identifier_start 
             ($src, $p, $pp, %opt);
     
@@ -3047,8 +3075,9 @@ sub parse_doctype_subset ($$$%) {
         $self->{error}->set_position ($src, moved => 1,
                                       diff => length $cdata);
         $self->{error}->fork_position ($src => \$cdata);
+        local $pp->{ExpandedURI q<s>} = \$cdata;
         $self->doctype_subset_content
-                  ($src, $p, {ExpandedURI q<s> => \$cdata}, %opt);
+                  ($src, $p, $pp, %opt);
       } elsif ($$src =~ /\G%/gc) {
         if ($$src =~ /\G($XML_NAME{$self->{ExpandedURI q<xml-version>}||'1.0'})/gc) {
           my $s = $1; pos $s = 0;
@@ -3091,6 +3120,7 @@ sub parse_doctype_subset ($$$%) {
                           source => $src,
                           position_diff => length $s,
                           entity_name => $s);
+                shift @{$opt{ExpandedURI q<source>}};
                 last EXPAND;
               }
               local $self->{ExpandedURI q<_:opened-parameter-entity>}->{$s} = 1;
@@ -3149,8 +3179,9 @@ sub parse_doctype_subset ($$$%) {
         $self->{error}->set_position ($src, moved => 1,
                                       diff => length $cdata);
         $self->{error}->fork_position ($src => \$cdata);
+        local $pp->{ExpandedURI q<CDATA>} = \$cdata;
         $self->doctype_subset_content
-                  ($src, $p, {ExpandedURI q<CDATA> => \$cdata}, %opt);
+                  ($src, $p, $pp, %opt);
       } else {
         die substr $$src, pos $$src;
       }
@@ -3842,18 +3873,18 @@ sub doctype_subset_start ($$$$%) {}
 sub doctype_subset_content ($$$$%) {}
 sub doctype_subset_end ($$$$%) {}
 
-=item entity_declaration_start, literal_entity_value_content, entity_declaration_end
+=item entity_declaration_start, entity_value_content, entity_declaration_end
 
 Entity declaration.
 
-Method C<literal_entity_value_content> is called if entity declaration
+Method C<entity_value_content> is called if entity declaration
 has parameter literal that defines internal entity.
 
 =cut
 
 sub entity_declaration_start ($$$$%) {}
 sub entity_declaration_end ($$$$%) {}
-sub literal_entity_value_content ($$$$%) {}
+sub entity_value_content ($$$$%) {}
 
 =item element_declaration_start, element_declaration_end
 
@@ -4128,4 +4159,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/06/22 07:36:20 $
+1; # $Date: 2004/06/27 06:34:07 $

@@ -1,16 +1,35 @@
 #!/usr/bin/perl -w
 use strict;
 
-use Message::Markup::XML::Node;
+use Message::Markup::XML::Node qw/SGML_DOCTYPE/;
 use Message::Markup::XML::Parser::NodeTree;
 use Message::Markup::XML::QName qw/:prefix :special-uri/;
+use Message::Util::ResourceResolver::XML;
 use Message::Util::QName::General [qw/ExpandedURI/],
   {
    (DEFAULT_PFX) => Message::Markup::XML::Parser::Base::URI_CONFIG (),
    tree => Message::Markup::XML::Parser::NodeTree::URI_CONFIG (),
    test => q<http://suika.fam.cx/~wakaba/-temp/2004/2/22/test/>,
+   rr => Message::Util::ResourceResolver::Base::URI_CONFIG (),
+   rrx => Message::Util::ResourceResolver::XML::URI_CONFIG (),
   };
 use Test;
+
+push @mytest::resresolver::ISA, 'Message::Util::ResourceResolver::XML';
+
+sub mytest::resresolver::get_resource ($;%) {
+  my ($self, %opt) = @_;
+  my $res = $self->{ExpandedURI q<test:resource>};
+  my $uri = $opt{ExpandedURI q<SYSTEM>};
+  if ($res->{$uri}) {
+    return {%{$res->{$uri}},
+            ExpandedURI q<rr:success> => 1};
+  } else {
+    return {ExpandedURI q<rr:success> => 0};
+  }
+}
+
+package main;
 
 my @a = (
          {
@@ -264,6 +283,149 @@ my @a = (
           result => [q{<!DOCTYPE root><root xmlns="" />},
                      q{<!DOCTYPE root []><root xmlns="" />}],
          },
+
+ {
+  t => q{<!DOCTYPE root SYSTEM "sys">},
+  method => q(parse_doctype_declaration),
+  result => [q{<!DOCTYPE root SYSTEM "sys">}],
+ },
+ {
+  t => q{<!DOCTYPE root PUBLIC "pub" "sys">},
+  method => q(parse_doctype_declaration),
+  result => [q{<!DOCTYPE root PUBLIC "pub" "sys">}],
+ },
+ {
+  t => q{<!DOCTYPE root PUBLIC "pub  " "sys"[<!---->]>},
+  method => q(parse_doctype_declaration),
+  result => [q{<!DOCTYPE root PUBLIC "pub" "sys" [<!---->]>}],
+ },
+
+ {
+  t => q{<!ENTITY foo "bar">},
+  method => q(parse_doctype_subset),
+  result => [q{<!ENTITY foo "bar">},
+             q{<!ENTITY  foo "bar">}],
+ },
+ {
+  t => q{<!ENTITY % foo "bar">},
+  method => q(parse_doctype_subset),
+  result => [q{<!ENTITY % foo "bar">},
+             q{<!ENTITY  % foo "bar">}],
+ },
+ {
+  t => q{<!ENTITY foo PUBLIC "bar" "baz">},
+  method => q(parse_doctype_subset),
+  result => [q{<!ENTITY foo PUBLIC "bar" "baz">},
+             q{<!ENTITY  foo PUBLIC "bar" "baz">}],
+ },
+ {
+  t => q{<!ENTITY % foo SYSTEM "bar">},
+  method => q(parse_doctype_subset),
+  result => [q{<!ENTITY % foo SYSTEM "bar">},
+             q{<!ENTITY  % foo SYSTEM "bar">}],
+ },
+ {
+  t => q{<!ENTITY foo PUBLIC "bar" "baz" NDATA notation>},
+  method => q(parse_doctype_subset),
+  result => [q{<!ENTITY foo PUBLIC "bar" "baz" NDATA notation>},
+             q{<!ENTITY  foo PUBLIC "bar" "baz" NDATA notation>}],
+ },
+ 
+ {
+  t => q{<!ENTITY bar %foo;>},
+  method => q(parse_doctype_external_subset),
+  error => q<0:14:VC_ENTITY_DECLARED__PARAM>,
+ },
+ {
+  t => q{<!ENTITY % foo " 'bar' ">
+         <!ENTITY % bar %foo;>},
+  method => q(parse_doctype_external_subset),
+  result =>
+      [q{<!ENTITY % foo " 'bar' ">
+         <!ENTITY % bar %foo;>},
+       q{<!ENTITY  % foo " 'bar' ">
+         <!ENTITY  % bar %foo;>},
+       q{<!ENTITY % foo " 'bar' ">
+         <!ENTITY % bar "bar">},
+       q{<!ENTITY  % foo " 'bar' ">
+         <!ENTITY  % bar   'bar'  >}],
+ },
+ {
+  t => q{<!ENTITY % foo "-- foo --">
+         <!ENTITY % bar "-- %foo; --">},
+  method => q(parse_doctype_subset),
+  result =>
+      [q{<!ENTITY % foo "-- foo --">
+         <!ENTITY % bar "-- %foo; --">},
+       q{<!ENTITY  % foo "-- foo --">
+         <!ENTITY  % bar "-- %foo; --">},
+       q{<!ENTITY % foo "-- foo --">
+         <!ENTITY % bar "-- -- foo -- --">},
+       q{<!ENTITY  % foo "-- foo --">
+         <!ENTITY  % bar "-- -- foo -- --">}],
+ },
+
+ {
+  t => q{<!ENTITY % foo SYSTEM "about:ent1">
+         <!ENTITY % bar %foo; >},
+  method => q(parse_doctype_external_subset),
+  error => q<1:25:EXTERNAL_PARAM_ENTITY_NOT_READ>,
+ },
+ {
+  t => q{<!NOTATION n1 SYSTEM "n1">
+         <!ENTITY % foo SYSTEM "about:ent1" NDATA n1>
+         <!ENTITY % bar %foo; >},
+  method => q(parse_doctype_external_subset),
+  error => q<2:25:WFC_PARSED_ENTITY>,
+ },
+ {
+  t => q{<!ENTITY % foo SYSTEM "about:ent1">
+         <!ENTITY % bar %foo; >},
+  method => q(parse_doctype_external_subset),
+  result
+   => [q{<!ENTITY % foo SYSTEM "about:ent1">
+         <!ENTITY % bar %foo; >},
+       q{<!ENTITY  % foo SYSTEM "about:ent1">
+         <!ENTITY  % bar %foo; >},
+       q{<!ENTITY % foo SYSTEM "about:ent1">
+         <!ENTITY % bar " text ">}],
+  resource => {q<about:ent1>
+                 => {ExpandedURI q<rrx:literal-entity-value>
+                       => q{<?xml version="1.0" encoding="us-ascii"?>
+                            " text "},
+                    },
+              },
+ },
+ {
+  t => q{<!ENTITY % foo SYSTEM "http://www.example.com/test/1">
+         <!ENTITY % foo2 "SYSTEM 'http://www.example.com/test/2'">
+         <!ENTITY % bar %foo; >},
+  method => q(parse_doctype_external_subset),
+  result
+   => [q{<!ENTITY % foo SYSTEM "http://www.example.com/test/1">
+         <!ENTITY % foo2 "SYSTEM 'http://www.example.com/test/2'">
+         <!ENTITY % bar %foo; >},
+       q{<!ENTITY  % foo SYSTEM "http://www.example.com/test/1">
+         <!ENTITY  % foo2 "SYSTEM 'http://www.example.com/test/2'">
+         <!ENTITY  % bar %foo; >},
+       q{<!ENTITY % foo SYSTEM "http://www.example.com/test/1">
+         <!ENTITY % foo2 "SYSTEM 'http://www.example.com/test/2'">
+         <!ENTITY % bar SYSTEM 'http://www.example.com/test/2'>},
+       q{<!ENTITY % foo SYSTEM "http://www.example.com/test/1">
+         <!ENTITY % foo2 "SYSTEM 'http://www.example.com/test/2'">
+         <!ENTITY % bar SYSTEM "http://www.example.com/test/2">}],
+  resource => {q<http://www.example.com/test/1>
+                 => {ExpandedURI q<rrx:literal-entity-value>
+                       => q{<?xml version="1.0" encoding="us-ascii"?>
+                            %foo2;},
+                    },
+               q<http://www.example.com/test/2>
+                 => {ExpandedURI q<rrx:literal-entity-value>
+                       => q{<?xml version="1.0" encoding="us-ascii"?>
+                            " text "},
+                    },
+              },
+ },
 );
 
 plan tests => scalar @a;
@@ -298,6 +460,35 @@ my %current = (
       ExpandedURI q<test:method> => 'parse_element',
     };
   },
+  parse_doctype_subset => sub {
+    +{
+      ExpandedURI q<tree:current>
+      => do {
+           my $doctype = Message::Markup::XML::Node->new
+                                         (type => '#declaration',
+                                          namespace_uri => SGML_DOCTYPE);
+           $doctype->set_attribute (qname => 'test');
+           $doctype;
+      },
+      ExpandedURI q<test:result-prefix>
+        => q(<!DOCTYPE test [),
+      ExpandedURI q<test:result-suffix>
+        => q(]>),
+      ExpandedURI q<test:method> => 'parse_doctype_subset',
+    };
+  },
+  parse_doctype_external_subset => sub {
+    +{
+      ExpandedURI q<tree:current>
+        => Message::Markup::XML::Node->new (type => '#fragment'),
+      ExpandedURI q<test:result-prefix>
+        => q(<doctype:subset xmlns:doctype="urn:x-suika-fam-cx:markup:sgml:doctype">),
+      ExpandedURI q<test:result-suffix>
+        => q(</doctype:subset>),
+      ExpandedURI q<test:method> => 'parse_doctype_subset',
+      ExpandedURI q<test:option> => {ExpandedURI q<allow-param-entref> => 1},
+    };
+  },
   parse_in_con_mode => sub {
     +{
       ExpandedURI q<tree:current>
@@ -310,8 +501,15 @@ my %current = (
     };
   },
 );
+
+my $rr = new mytest::resresolver;
+
 for (@a) {
   undef $first_error;
+  $parser->reset;
+  $rr->reset;
+  $parser->{ExpandedURI q<tree:resource-resolver>} = $rr;
+  $rr->{ExpandedURI q<test:resource>} = $_->{resource};
   my $method = $_->{method};
   pos ($_->{t}) = 0;
   my $current = ($current{$method} || $current{-default})->();
@@ -321,6 +519,7 @@ for (@a) {
     \$_->{t},
     $current,
     %{$_->{option}||{}},
+    %{$current->{ExpandedURI q<test:option>}||{}},
   );
   if ($first_error) {
     ok $first_error, $_->{error};

@@ -14,7 +14,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1.2.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.1.2.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Message::Markup::XML::Parser::Error;
 require Message::Util::Error::TextParser;
@@ -764,6 +764,10 @@ package Message::Markup::XML::Parser::Error::VC;
 push our @ISA, 'Message::Markup::XML::Parser::Error';
 
 sub ___error_def () {+{
+  VC_ENTITY_DECLARED__PARAM => {
+    description => q(Parameter "%t (name => entity-name);" must be declared before it is referred),
+    level => 'vc',
+  },
 }}
 
 =item Message::Markup::XML::Parser::Error::Error
@@ -1039,6 +1043,11 @@ sub ___error_def () {+{
     description => q(Processing instruction target name "%t (name => target-name);" should be declared as notation),
     level => 'not_declared',
   },
+
+  EXTERNAL_PARAM_ENTITY_NOT_READ => {
+    description => q(External parameter entity "%t (name => entity-name);" is not read),
+    level => 'skipped',
+  },
 }}
 
 =head1 SEE ALSO
@@ -1059,4 +1068,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/06/22 07:36:20 $
+1; # $Date: 2004/06/27 06:34:07 $
