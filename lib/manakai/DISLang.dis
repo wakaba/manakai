@@ -15,7 +15,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/04/02 07:43:16 $
+      $Date: 2005/04/10 05:40:59 $
     @@ContentType:
       dis:Date.RCS
   
@@ -171,11 +171,24 @@ ResourceTypeDef:
     ManakaiDOM:Class
 
 ResourceTypeDef:
+  @QName: AnyMethod
+  @FullName:
+    @@lang:en
+    @@@:
+      Attribute or method
+  @Description:
+    @@lang:en
+    @@@:
+      Any method-like programming languaguage construtures,
+      including methods, attributes and constructors.
+
+ResourceTypeDef:
   @QName: Attribute
   @Description:
     @@lang:en
     @@@:
       A programming language attribute of a structure such as class. 
+  @rdfs:subClassOf: AnyMethod
 
 ResourceTypeDef:
   @QName: AttributeGet
@@ -197,6 +210,7 @@ ResourceTypeDef:
     @@lang:en
     @@@:
       Methods in programming languages. 
+  @rdfs:subClassOf: AnyMethod
 
 ResourceTypeDef:
   @QName: MethodReturn

@@ -22,7 +22,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/04/02 07:43:15 $
+      $Date: 2005/04/10 05:40:59 $
     @@ContentType:
       dis:Date.RCS
   
@@ -574,9 +574,27 @@ ResourceDef:
             suffix => {"});%p (name => {<Q::DOMMain:expectedLabel>},
             prefix => { (}, suffix => {)}); is expected %p (
             name => {<Q::DOMMain:traceText>}); 
+
+    @@ResourceDef:
+      @@@QName: NO_MODIFICATION_ALLOWED_ERR
+      @@@rdf:type:
+        ManakaiDOM:Const
+      @@@Value:7
+      @@@Description:
+        @@@@lang:en
+        @@@@@: An attempt is made to modify read-only object.
+      @@@XSubTypeDef:
+        @@@@QName: READ_ONLY_ATTRIBUTE_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            An attempt is made to modify a read-only attribute.
+          @@@@enMufDef:
+              Attribute "%p (name => {<Q::MDOMX:class>}, suffix => {.}
+              );%p (name => {<Q::MDOMX:attr>});" is read-only
   
     @@ResourceDef:
-      @@@Name: NOT_SUPPORTED_ERR
+      @@@QName: NOT_SUPPORTED_ERR
       @@@rdf:type:
         ManakaiDOM:Const
       @@@Value:9

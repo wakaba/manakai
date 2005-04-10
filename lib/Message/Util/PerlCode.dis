@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/04/04 15:21:32 $
+      $Date: 2005/04/10 05:40:59 $
     @@ContentType:
       dis:Date.RCS
   
@@ -388,6 +388,8 @@ ResourceDef:
           $packageName = <ClassName::ManakaiPerlBlockContainer>;
         } elsif ($nodeType eq 'block') {
           $packageName = <ClassName::ManakaiPerlBlock>;
+        } elsif ($nodeType eq 'if') {
+          $packageName = <ClassName::ManakaiPerlIf>;
         } elsif ($nodeType eq 'sub') {
           $packageName = <ClassName::ManakaiPerlSub>;
         } elsif ($nodeType eq 'package') {
@@ -486,7 +488,7 @@ ClsDef:
     @@NamedParam:
       @@@Name: makeNewPackage
       @@@Type:
-        DOMMain:boolean
+        DOMMain:boolean::ManakaiDOM:all
       @@@enDesc:
         Whether a new package scope object should be created if 
         no package of <P::packageName> found. 
@@ -535,7 +537,7 @@ ClsDef:
     @@NamedParam:
       @@@Name: makeNewPackage
       @@@Type:
-        DOMMain:boolean
+        DOMMain:boolean::ManakaiDOM:all
       @@@enDesc:
         Whether a new package scope object should be created if 
         no package of <P::packageName> found. 
@@ -577,7 +579,7 @@ ClsDef:
     @@enDesc:
       The number of child code fragments. 
     @@Type:
-      DOMMain:unsigned-long
+      DOMMain:unsigned-long::ManakaiDOM:all
     @@Get:
       @@@PerlDef:
         $r = @{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}};
@@ -589,12 +591,12 @@ ClsDef:
       Perl code is primary generated. 
     @@Get:
       @@@Type:
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@disDef:
         @@@@GetProp: sourceFile
     @@Set:
       @@@Type:
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@disDef:
         @@@@SetProp: sourceFile
 
@@ -604,12 +606,12 @@ ClsDef:
       The name URI reference of the source module that this package defines.
     @@Get:
       @@@Type:
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@disDef:
         @@@@GetProp: sourceModule
     @@Set:
       @@@Type:
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@disDef:
         @@@@SetProp: sourceModule
 
@@ -620,19 +622,19 @@ ClsDef:
       package is. 
     @@Get:
       @@@Type:
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@disDef:
         @@@@GetProp: sourceFor
     @@Set:
       @@@Type:
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@disDef:
         @@@@SetProp: sourceFor
 
   @ToStringMethod:
     @@Return:
       @@@Type:
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@enDesc:
         The Perl code generated. 
       @@@PerlDef:
@@ -765,7 +767,7 @@ ClsDef:
   @Attr:
     @@Name: packageName
     @@Type:
-      Perl:package-name
+      Perl:package-name::ManakaiDOM:all
     @@enDesc:
       The fully-qualified package name. 
     @@Get: 
@@ -818,7 +820,7 @@ ClsDef:
     @@NamedParam:
       @@@Name: makeNewNode
       @@@Type:
-        DOMMain:boolean
+        DOMMain:boolean::ManakaiDOM:all
       @@@enDesc:
         Whether a new subroutine object should be created, 
         if it is not exist, or not. 
@@ -964,7 +966,7 @@ ClsDef:
     @@NamedParam:
       @@@Name: makeNewNode
       @@@Type:
-        DOMMain:boolean
+        DOMMain:boolean::ManakaiDOM:all
       @@@enDesc:
         Whether a new subroutine object should be created, 
         if it is not exist, or not. 
@@ -1121,7 +1123,7 @@ ClsDef:
     @@enDesc:
       The number of child code fragments. 
     @@Type:
-      DOMMain:unsigned-long
+      DOMMain:unsigned-long::ManakaiDOM:all
     @@Get:
       @@@PerlDef:
         $r = keys (%{$self->{<Q::TreeCore:node>}->{<Q::pc:sub>}})
@@ -1158,7 +1160,7 @@ ClsDef:
   @ToStringMethod:
     @@Return:
       @@@Type:
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
@@ -1261,7 +1263,7 @@ ClsDef:
     @@enDesc:
       The source file name of this fragment. 
     @@Type:
-      DISLang:String
+      DISLang:String::ManakaiDOM:all
     @@Get:
       @@@enDesc:
         Any string identifying the source. 
@@ -1280,7 +1282,7 @@ ClsDef:
     @@enDesc:
       Source file line number of the first line of this fragment. 
     @@Type:
-      DOMMain:unsigned-long
+      DOMMain:unsigned-long::ManakaiDOM:all
     @@Get:
       @@@disDef:
         @@@@GetProp: sourceLine
@@ -1294,7 +1296,7 @@ ClsDef:
       The current source file name that is referred when 
       a code fragment is added. 
     @@Type:
-      DISLang:String
+      DISLang:String::ManakaiDOM:all
     @@Get:
       @@@nullCase:
         @@@@enDesc: No source file name is set. 
@@ -1495,6 +1497,97 @@ ClsDef:
             }__;
           }
         }
+
+  @Method:
+    @@Name: appendNewIf
+    @@enDesc:
+      Appends a newly created <Class::ManakaiPerlIf> object. 
+    @@Param:
+      @@@Name: conditionArg
+      @@@Type: ManakaiPerlCodeFragment
+      @@@enDesc:
+        Conditoon code fragment object.
+    @@Param:
+      @@@Name: trueArg
+      @@@Type: ManakaiPerlCodeFragment
+      @@@enDesc:
+        A true code fragment object. 
+      @@@nullCase:
+        @@@@enDesc: No true code.
+    @@Param:
+      @@@Name: falseArg
+      @@@Type: ManakaiPerlCodeFragment
+      @@@enDesc:
+        A false code fragment object. 
+      @@@nullCase:
+        @@@@enDesc: No false code.
+    @@Return:
+      @@@RaiseException:
+        @@@@@:BAD_CHILD_ERR
+        @@@@enDesc:
+          An attempt is made to append a child
+          that is not valid type.
+      @@@RaiseException:
+        @@@@@:IN_USE_NODE_ERR
+        @@@@enDesc:
+          An attempt is made to append a node that is 
+          already used elsewhere. 
+      @@@PerlDef:
+        for my $arg ([conditionArg => $conditionArg]) {
+          if ({
+            atom => 1, bare => 1, incontainer => 1, assign => true,
+            inunparsed => 1, variable => 1, string => true,
+          }->{$arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:nodeType>}}) {
+            if ($arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:parent>}) {
+              __EXCEPTION{IN_USE_NODE_ERR::
+                pc:parentNode => {$arg->[1]->{<Q::TreeCore:node>}
+                                          ->{<Q::pc:parent>}},
+                pc:childNode => {$arg->[1]},
+                MDOMX:param-name => {$arg->[0]},
+              }__;
+            }
+          } else {
+            __EXCEPTION{BAD_CHILD_ERR::
+              pc:parentNode => {$self},
+              pc:childNode => {$arg->[1]},
+              MDOMX:param-name => {$arg->[0]},
+            }__;
+          }
+        } # c
+
+        for my $arg ([trueArg => $trueArg],
+                     [falseArg => $falseArg]) {
+          next unless $arg->[1];
+          if ({
+                blockcontainer => true,
+              }->{$arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:nodeType>}}) {
+            if ($arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:parent>}) {
+              __EXCEPTION{IN_USE_NODE_ERR::
+                pc:parentNode => {$arg->[1]->{<Q::TreeCore:node>}
+                                          ->{<Q::pc:parent>}},
+                pc:childNode => {$arg->[1]},
+                MDOMX:param-name => {$arg->[0]},
+              }__;
+            }
+          } else {
+            __EXCEPTION{BAD_CHILD_ERR::
+              pc:parentNode => {$self},
+              pc:childNode => {$arg->[1]},
+              MDOMX:param-name => {$arg->[0]},
+            }__;
+          }
+        } # t/f
+
+        my $assign = <ClassM::ManakaiPerlIf.newObject>;
+        $assign->{<Q::pc:condition>} = $conditionArg->{<Q::TreeCore:node>};
+        $assign->{<Q::pc:true>} = $trueArg->{<Q::TreeCore:node>} if $trueArg;
+        $assign->{<Q::pc:false>} = $falseArg->{<Q::TreeCore:node>} if $falseArg;
+        $conditionArg->{<Q::TreeCore:node>}->{<Q::pc:parent>} = $assign;
+        $trueArg->{<Q::TreeCore:node>}->{<Q::pc:parent>} = $assign if $trueArg;
+        $falseArg->{<Q::TreeCore:node>}->{<Q::pc:parent>} = $assign if $falseArg;
+        $self->{<Q::TreeCore:node>}-><M::MNodeObject.importTree> ($assign);
+        $assign->{<Q::pc:parent>} = $self->{<Q::TreeCore:node>};
+        push @{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}}, $assign;
 ##PerlStatementContainer
 
 ClsDef:
@@ -1538,7 +1631,7 @@ ClsDef:
     @@enDesc:
       The name of this subroutine. 
     @@Type:
-      DISPerl:SubName
+      DISPerl:SubName::ManakaiDOM:all
     @@Get: 
       @@@nullCase:
         @@@@enDesc:
@@ -1674,7 +1767,7 @@ ClsDef:
     @@enDesc:
       The source file name of this fragment. 
     @@Type:
-      DISLang:String
+      DISLang:String::ManakaiDOM:all
     @@Get:
       @@@enDesc:
         Any string identifying the source. 
@@ -1693,7 +1786,7 @@ ClsDef:
     @@enDesc:
       Source file line number of the first line of this fragment. 
     @@Type:
-      DOMMain:unsigned-long
+      DOMMain:unsigned-long::ManakaiDOM:all
     @@Get:
       @@@disDef:
         @@@@GetProp: sourceLine
@@ -1704,7 +1797,7 @@ ClsDef:
   @ToStringMethod:
     @@Return:
       @@@Type:
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
@@ -1785,7 +1878,7 @@ ClsDef:
   @ToStringMethod:
     @@Return:
       @@@Type:
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
@@ -1857,7 +1950,7 @@ ClsDef:
   @ToStringMethod:
     @@Return:
       @@@Type:
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
@@ -1866,6 +1959,11 @@ ClsDef:
         $r =~ s/(['\\])/\\$1/g;
         $r = q<'> . $r . q<'>;
 ##PerlStringLiteral
+
+## TODO: -> Separate module
+PropDef:
+  @QName:
+    infoset:data
 
 ClsDef:
   @ClsQName: ManakaiPerlBare
@@ -1929,7 +2027,7 @@ ClsDef:
   @ToStringMethod:
     @@Return:
       @@@Type:
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
@@ -1986,7 +2084,7 @@ ClsDef:
   @ToStringMethod:
     @@Return:
       @@@Type:
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
@@ -2118,7 +2216,7 @@ ClsDef:
   @ToStringMethod:
     @@Return:
       @@@Type:
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
@@ -2189,7 +2287,7 @@ ClsDef:
     @@enDesc:
       The number of child code fragments. 
     @@Type:
-      DOMMain:unsigned-long
+      DOMMain:unsigned-long::ManakaiDOM:all
     @@Get:
       @@@PerlDef:
         $r = @{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}};
@@ -2401,7 +2499,7 @@ ClsDef:
   @ToStringMethod:
     @@Return:
       @@@Type:
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
@@ -2544,7 +2642,7 @@ ClsDef:
   @ToStringMethod:
     @@Return:
       @@@Type:
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
@@ -2625,7 +2723,7 @@ ClsDef:
   @ToStringMethod:
     @@Return:
       @@@Type:
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
@@ -2731,7 +2829,7 @@ ClsDef:
   @ToStringMethod:
     @@Return:
       @@@Type:
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
@@ -2832,7 +2930,7 @@ ClsDef:
   @ToStringMethod:
     @@Return:
       @@@Type:
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
@@ -2842,6 +2940,105 @@ ClsDef:
              <ClassM::ManakaiPerlCodeFragment.getNodeReference>
                 ($node->{<Q::pc:right>})->stringify;
 ##PerlAssignment
+
+ClsDef:
+  @ClsQName: ManakaiPerlIf
+  @ClsISA: ManakaiPerlCodeFragment
+  @enDesc:
+    Perl variable assignment.
+  
+  @IntMethod:
+    @@Name:newObject
+    @@ManakaiDOM:isStatic:1
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates a new instance object for
+        <Class::ManakaiPerlAssignment>. 
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The newly created node object.
+      @@@PerlDef:
+        @@@@@:
+          my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
+                                        ::ManakaiDOM:Perl.new>;
+          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
+          push @{$node->{<Q::TreeCore:subnode0>}}, <Q::pc:condition>,
+                     <Q::pc:true>, <Q::pc:false>;
+          $node->{<Q::pc:nodeType>} = 'if';
+        @@@@ImplNote:
+          @@@@@lang:en
+          @@@@@@:
+            Properties: <Q::pc:nodeType>, <Q::pc:true>, <Q::pc:false>,
+                <Q::pc:parent>, <Q::pc:condition>.
+
+  @IntCloneMethod:
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@PerlDef:
+          my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
+                                        ::ManakaiDOM:Perl.new>;
+          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
+          push @{$node->{<Q::TreeCore:subnode0>}}, <Q::pc:condition>,
+                     <Q::pc:true>, <Q::pc:false>;
+          $node->{<Q::pc:nodeType>} = 'if';
+          for my $prop (<Q::pc:true>, <Q::pc:false>, <Q::pc:condition>) {
+            my $pack;
+            my $cno = $nodeObject->{$prop};
+            next unless $cno;
+            my $nt = $cno->{<Q::pc:nodeType>};
+            __CODE{pc:nodeTypeToPackageName::
+                     $nodeType => $nt, $packageName => $pack, $object => $cno}__;
+                                 ## NOTE: Method name written directly
+            my $cno_clone = $pack->_make_clone_object ($cno);
+            $node->{$prop} = $cno_clone;
+            $cno_clone->{<Q::pc:parent>} = $node;
+            ## NOTE: Tree ID is not updated yet.
+          }
+
+  @ToStringMethod:
+    @@Return:
+      @@@Type:
+        DISLang:String::ManakaiDOM:all
+      @@@enDesc:
+        Perl code. 
+      @@@PerlDef:
+        my $node = $self->{<Q::TreeCore:node>};
+        $r = <ClassM::ManakaiPerlCodeFragment.getNodeReference>
+                ($node->{<Q::pc:condition>})->stringify;
+        my $true_code = <ClassM::ManakaiPerlCodeFragment.getNodeReference>
+                     ($node->{<Q::pc:true>})->stringify if $node->{<Q::pc:true>};
+        my $false_code = <ClassM::ManakaiPerlCodeFragment.getNodeReference>
+                   ($node->{<Q::pc:false>})->stringify if $node->{<Q::pc:false>};
+        if (defined $true_code) {
+          if (defined $false_code) {
+            $r = q<if (> . $r . q<) {> . $true_code .
+                 q<} else {> . $false_code . q<}>;
+          } else {
+            $r = q<if (> . $r . q<) {> . $true_code . q<}>;
+          }
+        } else {
+          $r = q<unless (> . $r . q<) {> . $false_code . q<}>;
+        }
+##PerlIf
+
+PropDef:
+  @QName:condition
+  @enDesc:
+    Condition.
+PropDef:
+  @QName:true
+  @enDesc:
+    If true.
+PropDef:
+  @QName:false
+  @enDesc:
+    If false.
 
 PropDef:
   @QName:left
@@ -2896,12 +3093,12 @@ ClsDef:
     @@Param:
       @@@Name: str
       @@@Type: 
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@enDesc:
         A comment text. 
     @@Return:
       @@@Type:
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@enDesc:
         A Perl comment string.
       @@@PerlDef:
@@ -2919,12 +3116,12 @@ ClsDef:
     @@Param:
       @@@Name: perlDate
       @@@Type:
-        DOMMain:unsigned-long
+        DOMMain:unsigned-long::ManakaiDOM:all
       @@@enDesc:
         A Perl representation of date. 
     @@Return:
       @@@Type:
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@enDesc:
         RFC 3339 date string. 
       @@@PerlDef:
@@ -2940,12 +3137,12 @@ ClsDef:
     @@Param:
       @@@Name: perlDate
       @@@Type:
-        DOMMain:unsigned-long
+        DOMMain:unsigned-long::ManakaiDOM:all
       @@@enDesc:
         A Perl representation of date. 
     @@Return:
       @@@Type:
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@enDesc:
         A Perl number literal. 
       @@@PerlDef:
@@ -2960,12 +3157,12 @@ ClsDef:
     @@Param:
       @@@Name: val
       @@@Type: 
-        DOMMain:any
+        DOMMain:any::ManakaiDOM:all
       @@@enDesc:
         A Perl value. 
     @@Return:
       @@@Type:
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@enDesc:
         A Perl lexical representation of <P::val>. 
       @@@PerlDef:
@@ -2993,12 +3190,12 @@ ClsDef:
     @@Param:
       @@@Name: val
       @@@Type: 
-        Perl:ARRAY
+        Perl:ARRAY::ManakaiDOM:all
       @@@enDesc:
         A Perl array reference. 
     @@Return:
       @@@Type:
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@enDesc:
         A Perl lexical representation of <CODE::@$val>. 
       @@@PerlDef:
@@ -3014,7 +3211,7 @@ ClsDef:
     @@Param:
       @@@Name: subName
       @@@Type:
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@enDesc:
         The name of the subroutine to create.
       @@@nullCase:
@@ -3271,6 +3468,98 @@ ClsDef:
             $r-><M::ManakaiPerlAnyContainer.appendBare> ($codeArg);
           }__;
         }
+
+  @Method:
+    @@Name: createPerlIf
+    @@enDesc:
+      Creates a <Class::ManakaiPerlIf> object. 
+    @@Param:
+      @@@Name: conditionArg
+      @@@Type: ManakaiPerlCodeFragment
+      @@@enDesc:
+        Conditoon code fragment object.
+    @@Param:
+      @@@Name: trueArg
+      @@@Type: ManakaiPerlCodeFragment
+      @@@enDesc:
+        A true code fragment object. 
+      @@@nullCase:
+        @@@@enDesc: No true code.
+    @@Param:
+      @@@Name: falseArg
+      @@@Type: ManakaiPerlCodeFragment
+      @@@enDesc:
+        A false code fragment object. 
+      @@@nullCase:
+        @@@@enDesc: No false code.
+    @@Return:
+      @@@RaiseException:
+        @@@@@:BAD_CHILD_ERR
+        @@@@enDesc:
+          An attempt is made to append a child
+          that is not valid type.
+      @@@RaiseException:
+        @@@@@:IN_USE_NODE_ERR
+        @@@@enDesc:
+          An attempt is made to append a node that is 
+          already used elsewhere. 
+      @@@PerlDef:
+        for my $arg ([conditionArg => $conditionArg]) {
+          if ({
+            atom => 1, bare => 1, incontainer => 1, assign => true,
+            inunparsed => 1, variable => 1, string => true,
+          }->{$arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:nodeType>}}) {
+            if ($arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:parent>}) {
+              __EXCEPTION{IN_USE_NODE_ERR::
+                pc:parentNode => {$arg->[1]->{<Q::TreeCore:node>}
+                                          ->{<Q::pc:parent>}},
+                pc:childNode => {$arg->[1]},
+                MDOMX:param-name => {$arg->[0]},
+              }__;
+            }
+          } else {
+            __EXCEPTION{BAD_CHILD_ERR::
+              pc:parentNode => {$self},
+              pc:childNode => {$arg->[1]},
+              MDOMX:param-name => {$arg->[0]},
+            }__;
+          }
+        } # c
+
+        for my $arg ([trueArg => $trueArg],
+                     [falseArg => $falseArg]) {
+          next unless $arg->[1];
+          if ({
+                blockcontainer => true,
+              }->{$arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:nodeType>}}) {
+            if ($arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:parent>}) {
+              __EXCEPTION{IN_USE_NODE_ERR::
+                pc:parentNode => {$arg->[1]->{<Q::TreeCore:node>}
+                                          ->{<Q::pc:parent>}},
+                pc:childNode => {$arg->[1]},
+                MDOMX:param-name => {$arg->[0]},
+              }__;
+            }
+          } else {
+            __EXCEPTION{BAD_CHILD_ERR::
+              pc:parentNode => {$self},
+              pc:childNode => {$arg->[1]},
+              MDOMX:param-name => {$arg->[0]},
+            }__;
+          }
+        } # t/f
+
+        my $assign = <ClassM::ManakaiPerlIf.newObject>;
+        $assign->{<Q::pc:condition>} = $conditionArg->{<Q::TreeCore:node>};
+        $assign->{<Q::pc:true>} = $trueArg->{<Q::TreeCore:node>} if $trueArg;
+        $assign->{<Q::pc:false>} = $falseArg->{<Q::TreeCore:node>} if $falseArg;
+        $assign->{<Q::TreeCore:node>}-><M::MNodeObject.importTree> ($_)
+           for (grep {$_}
+                  $assign->{<Q::pc:condition>}, $assign->{<Q::pc:true>},
+                  $assign->{<Q::pc:false>});
+        $conditionArg->{<Q::TreeCore:node>}->{<Q::pc:parent>} = $assign;
+        $trueArg->{<Q::TreeCore:node>}->{<Q::pc:parent>} = $assign if $trueArg;
+        $falseArg->{<Q::TreeCore:node>}->{<Q::pc:parent>} = $assign if $falseArg;
 ##PerlCodeImplementation
 
 ResourceDef:
@@ -3322,7 +3611,7 @@ PropDef:
 PropDef:
   @QName: packageName
   @Type:
-    Perl:package-name
+    Perl:package-name::ManakaiDOM:all
   @enDesc:
     The fully qualified names of packages. 
 
@@ -3672,7 +3961,7 @@ ElementTypeBinding:
       ManakaiDOM:InCase
     @@Value:true
     @@Type:
-      DOMMain:boolean
+      DOMMain:boolean::ManakaiDOM:all
 
 
 ElementTypeBinding:
@@ -3684,7 +3973,7 @@ ElementTypeBinding:
       ManakaiDOM:InCase
     @@Value:false
     @@Type:
-      DOMMain:boolean
+      DOMMain:boolean::ManakaiDOM:all
 
 ElementTypeBinding:
   @Name: enDesc
