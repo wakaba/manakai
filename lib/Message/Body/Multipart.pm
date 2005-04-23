@@ -1,20 +1,28 @@
 
 =head1 NAME
 
-Message::Body::Multipart --- Perl module
-for "multipart/*" Internet Media Types
+Message::Body::Multipart - MIME Multipart Body for Internet Messages
+
+=head1 DESCRIPTION
+
+This module provides a support for C<multipart/*> Internet Media Types. 
+With this module, each multipart body part can be treated 
+as for standalone MIME messages.  It also provides the access
+to prologue and epilogue.
+
+This module is part of manakai, a Perl library for Internet messages.
 
 =cut
 
 package Message::Body::Multipart;
 use strict;
 use vars qw(%DEFAULT @ISA $VERSION);
-$VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+$VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Body::Text;
 push @ISA, qw(Message::Body::Text);
 
-my @BCHARS = ('0'..'9', 'A'..'Z', 'a'..'z', qw#+ _ , - . / : =#);
+my @BCHARS = ('0'..'9', 'A'..'Z', 'a'..'z', qw#+ _ , - . / =#);
 #my @BCHARS = ('0'..'9', 'A'..'Z', 'a'..'z', qw#' ( ) + _ , - . / : = ?#, ' ');	## RFC 2046
 my %REG;
 $REG{NON_bchars} = qr#[^0-9A-Za-z'()+_,-./:=?\x20]#;
@@ -158,6 +166,24 @@ sub parse ($$;%) {
 }
 
 =back
+
+=item $obj = $mp->item ($index, %options)
+
+Returns the C<$index>th part as a MIME message object. 
+If C<$index> is equal to or greater than the number of 
+body parts this multipart body contains, then a new 
+part is inserted to the last of the message and it is returned. 
+Note that it does not necessariliy has the index of C<$index>. 
+
+Use semantically named methods such as C<control_part> if
+the multipart type makes some assumption for the structure of 
+the multipart body.  For example, extracting the signature
+part from a C<multipart/signature> body, then the 
+C<control_part> method is preferred to the method call C<item (0)>.
+
+=item $num = $mp->count
+
+Returns the number of body parts contained in this multipart body.
 
 =cut
 
@@ -354,9 +380,11 @@ sub _generate_boundary ($$) {
 
 RFC 2046 <urn:ietf:rfc:2046>
 
+SuikaWiki:multipart/*
+
 =head1 LICENSE
 
-Copyright 2002 wakaba E<lt>w@suika.fam.cxE<gt>.
+Copyright 2002-2005 Wakaba <w@suika.fam.cx>.  All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -373,11 +401,7 @@ along with this program; see the file COPYING.  If not, write to
 the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.
 
-=head1 CHANGE
-
-See F<ChangeLog>.
-$Date: 2002/07/19 11:49:22 $
-
 =cut
 
-1;
+1; # $Date: 2005/04/23 07:14:30 $
+
