@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/04/27 06:24:48 $
+      $Date: 2005/04/27 12:32:39 $
     @@ContentType:
       dis:Date.RCS
   
@@ -314,7 +314,7 @@ ClsDef:
         if ($node->{<Q::pc:nodeType>} eq 'unparsed' or
             $node->{<Q::pc:nodeType>} eq 'inunparsed') {
           my $newVariable = ref $newValue ? $newValue->stringify : ''.$newValue;
-          $node->{<Q::pc:code>} =~ s/\$\Q$originalVariable\E\b/$newVariable/g;
+          $node->{<Q::pc:code>} =~ s/\Q$originalVariable\E\b/$newVariable/g;
         } elsif ($node->{<Q::pc:childNodes>}) {
           __DEEP{
             for my $cnoi (0..$#{$node->{<Q::pc:childNodes>}}) {
@@ -489,7 +489,8 @@ ClsDef:
             Properties: <Q::pc:sourceFile>,
                <Q::pc:sourceModule>, <Q::pc:sourceFor>, <Q::childNodes>, 
                <Q::pc:currentPackage>, <Q::pc:currentChunk>,
-               <Q::pc:nodeType>.
+               <Q::pc:nodeType>, <Q::pc:useModuleName>, 
+               <Q::pc:requireResourceURI>.
 
   @Method:
     @@Name: appendNewPackage
@@ -864,19 +865,20 @@ ClsDef:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
           push @{$node->{<Q::TreeCore:subnode2>}}, <Q::pc:sub>,
-                                                 <Q::dis2pm:overload>;
+                                                 <Q::dis2pm:operator>;
           push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
           $node->{<Q::pc:sub>} = {};
+          $node->{<Q::dis2pm:operator>} = {};
           $node->{<Q::dis:ISA>} = [];
           $node->{<Q::dis:Implement>} = {};
-          $node->{<Q::dis2pm:overload>} = {};
           $node->{<Q::pc:nodeType>} = 'package';
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
-            Properties: <Q::pc:sub>, <Q::dis2pm:overload>,
+            Properties: <Q::pc:sub>, <Q::dis2pm:operator>,
               <Q::dis:ISA>, <Q::dis:Implement>,
-              <Q::pc:nodeType>.
+              <Q::pc:nodeType>, <Q::pc:useModuleName>, 
+               <Q::pc:requireResourceURI>.
 
   @Method:
     @@Name: getSub
@@ -1277,7 +1279,8 @@ ClsDef:
                                                         ([$cnk => $cno]) . ', ';
           }
         }
-        $r .= 'use overload ' . $op . qq[fallback => 1;\n] if $op;
+        $r .= 'use overload bool => sub () {1}, ' .
+              $op . qq[fallback => 1;\n] if $op;
 ##PerlPackageScope
 
 PropDef:
@@ -1687,7 +1690,8 @@ ClsDef:
           @@@@@@:
             Optional properties: <Q::pc:localName>,
                <Q::pc:sourceFile>, <Q::pc:sourceLine>,
-               <Q::pc:nodeType>.
+               <Q::pc:nodeType>, <Q::pc:useModuleName>, 
+               <Q::pc:requireResourceURI>.
 
   @Attr:
     @@Name: localName
@@ -1754,6 +1758,18 @@ ClsDef:
           $r .= $cn->stringify;
         }
         $r .= "}\n";
+
+  @NumValMethod:
+    @@Return:
+      @@@Type:
+        DISIDL:AnyRealNumber::ManakaiDOM:all
+      @@@PerlDef:
+        my $cno = $self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}->[-1];
+        if ($cno) {
+          my $cn = <ClassM::ManakaiPerlCodeFragment.getNodeReference> ($cno);
+          $r = 0 + $cn;
+        }
+
 ##PerlSub
 
 XParamDef:
@@ -1797,7 +1813,9 @@ ClsDef:
           @@@@@lang:en
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:code>,
-                        <Q::pc:sourceFile>, <Q::pc:sourceLine>.
+                        <Q::pc:sourceFile>, <Q::pc:sourceLine>,
+               <Q::pc:useModuleName>, 
+               <Q::pc:requireResourceURI>.
 
   @IntCloneMethod:
     @@Return:
@@ -1811,6 +1829,10 @@ ClsDef:
             $node->{$prop} = $nodeObject->{$prop};
           }
           $node->{<Q::pc:nodeType>} = 'unparsed';
+          $node->{<Q::pc:requireResourceURI>}
+             = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
+          $node->{<Q::pc:useModuleName>}
+             = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
 
   @Attr:
     @@Name: code
@@ -1910,7 +1932,8 @@ ClsDef:
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
-            Properties: <Q::pc:nodeType>, <Q::pc:code>.
+            Properties: <Q::pc:nodeType>, <Q::pc:code>, <Q::pc:useModuleName>, 
+               <Q::pc:requireResourceURI>.
 
   @IntCloneMethod:
     @@Return:
@@ -1924,6 +1947,10 @@ ClsDef:
             $node->{$prop} = $nodeObject->{$prop};
           }
           $node->{<Q::pc:nodeType>} = 'inunparsed';
+          $node->{<Q::pc:requireResourceURI>}
+             = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
+          $node->{<Q::pc:useModuleName>}
+             = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
 
   @Attr:
     @@Name: code
@@ -1980,7 +2007,9 @@ ClsDef:
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
-            Properties: <Q::pc:nodeType>, <Q::infoset:data>.
+            Properties: <Q::pc:nodeType>,
+               <Q::infoset:data>, <Q::pc:useModuleName>, 
+               <Q::pc:requireResourceURI>.
 
   @IntCloneMethod:
     @@Return:
@@ -1994,6 +2023,10 @@ ClsDef:
             $node->{$prop} = $nodeObject->{$prop};
           }
           $node->{<Q::pc:nodeType>} = 'string';
+          $node->{<Q::pc:requireResourceURI>}
+             = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
+          $node->{<Q::pc:useModuleName>}
+             = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
 
   @Attr:
     @@Name: data
@@ -2009,6 +2042,15 @@ ClsDef:
       @@@disDef:
         @@@@SetProp: 
           infoset:data
+
+  @NumValMethod:
+    @@Return:
+      @@@Type:
+        DISIDL:AnyRealNumber::ManakaiDOM:all
+      @@@enDesc:
+        Numeric value of the Perl code. 
+      @@@PerlDef:
+        $r = 0 + $self->{<Q::TreeCore:node>}->{<Q::infoset:data>};
 
   @ToStringMethod:
     @@Return:
@@ -2059,7 +2101,8 @@ ClsDef:
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
-            Properties: <Q::pc:nodeType>, <Q::pc:code>.
+            Properties: <Q::pc:nodeType>, <Q::pc:code>, <Q::pc:useModuleName>, 
+               <Q::pc:requireResourceURI>.
 
   @IntCloneMethod:
     @@Return:
@@ -2073,6 +2116,10 @@ ClsDef:
             $node->{$prop} = $nodeObject->{$prop};
           }
           $node->{<Q::pc:nodeType>} = 'bare';
+          $node->{<Q::pc:requireResourceURI>}
+             = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
+          $node->{<Q::pc:useModuleName>}
+             = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
 
   @Attr:
     @@Name: code
@@ -2129,7 +2176,8 @@ ClsDef:
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
-            Properties: <Q::pc:nodeType>, <Q::pc:code>.
+            Properties: <Q::pc:nodeType>, <Q::pc:code>, <Q::pc:useModuleName>, 
+               <Q::pc:requireResourceURI>.
 
   @IntCloneMethod:
     @@Return:
@@ -2143,6 +2191,19 @@ ClsDef:
             $node->{$prop} = $nodeObject->{$prop};
           }
           $node->{<Q::pc:nodeType>} = 'atom';
+          $node->{<Q::pc:requireResourceURI>}
+             = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
+          $node->{<Q::pc:useModuleName>}
+             = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
+
+  @NumValMethod:
+    @@Return:
+      @@@Type:
+        DISIDL:AnyRealNumber::ManakaiDOM:all
+      @@@enDesc:
+        Numeric value of the Perl code. 
+      @@@PerlDef:
+        $r = 0 + $self->{<Q::TreeCore:node>}->{<Q::pc:code>};
 
   @ToStringMethod:
     @@Return:
@@ -2193,7 +2254,8 @@ ClsDef:
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:variableType>,
               <Q::packageName>, <Q::localName> (required),
-              <Q::variableScope>, <Q::hashKey>.
+              <Q::variableScope>, <Q::hashKey>, <Q::pc:useModuleName>, 
+               <Q::pc:requireResourceURI>.
 
   @IntCloneMethod:
     @@Return:
@@ -2208,6 +2270,10 @@ ClsDef:
             $node->{$prop} = $nodeObject->{$prop};
           }
           $node->{<Q::pc:nodeType>} = 'variable';
+          $node->{<Q::pc:requireResourceURI>}
+             = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
+          $node->{<Q::pc:useModuleName>}
+             = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
 
   @Attr:
     @@Name: variableType
@@ -2532,7 +2598,9 @@ ClsDef:
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
-            Properties: <Q::pc:nodeType>, <Q::pc:childNodes>, <Q::pc:parent>.
+            Properties: <Q::pc:nodeType>, <Q::pc:childNodes>,
+               <Q::pc:parent>, <Q::pc:useModuleName>, 
+               <Q::pc:requireResourceURI>.
 
   @IntCloneMethod:
     @@Return:
@@ -2556,6 +2624,10 @@ ClsDef:
             $cno_clone->{<Q::pc:parent>} = $node;
             ## NOTE: Tree ID is not updated yet.
           }
+          $node->{<Q::pc:requireResourceURI>}
+             = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
+          $node->{<Q::pc:useModuleName>}
+             = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
 
   @ToStringMethod:
     @@Return:
@@ -2601,7 +2673,8 @@ ClsDef:
           @@@@@lang:en
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:childNodes>,
-                  <Q::pc:parent>.
+                  <Q::pc:parent>, <Q::pc:useModuleName>, 
+               <Q::pc:requireResourceURI>.
 
   @IntCloneMethod:
     @@Return:
@@ -2625,6 +2698,10 @@ ClsDef:
             $cno_clone->{<Q::pc:parent>} = $node;
             ## NOTE: Tree ID is not updated yet.
           }
+          $node->{<Q::pc:requireResourceURI>}
+             = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
+          $node->{<Q::pc:useModuleName>}
+             = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
 
   @Method:
     @@Name: appendCodeFragment
@@ -2750,7 +2827,9 @@ ClsDef:
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:childNodes>, <Q::pc:label>,
                 <Q::pc:parent>, <Q::pc:sourceFile>, <Q::pc:sourceLine>,
-                <Q::pc:currentSoruceFile>, <Q::pc:currentSourceLine>.
+                <Q::pc:currentSoruceFile>,
+                <Q::pc:currentSourceLine>, <Q::pc:useModuleName>, 
+                <Q::pc:requireResourceURI>.
 
   @IntCloneMethod:
     @@Return:
@@ -2778,6 +2857,10 @@ ClsDef:
                         <Q::pc:currentSourceFile>, <Q::pc:currentSourceLine>) {
             $node->{$prop} = $nodeObject->{$prop};
           }
+          $node->{<Q::pc:requireResourceURI>}
+             = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
+          $node->{<Q::pc:useModuleName>}
+             = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
 
   @ToStringMethod:
     @@Return:
@@ -2856,7 +2939,9 @@ ClsDef:
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:childNodes>,
                 <Q::pc:parent>, <Q::pc:sourceFile>, <Q::pc:sourceLine>,
-                <Q::pc:currentSourceFile>, <Q::pc:currentSourceLine>.
+                <Q::pc:currentSourceFile>,
+                <Q::pc:currentSourceLine>, <Q::pc:useModuleName>, 
+                <Q::pc:requireResourceURI>.
 
   @IntCloneMethod:
     @@Return:
@@ -2884,6 +2969,10 @@ ClsDef:
                         <Q::pc:currentSourceFile>, <Q::pc:currentSourceLine>) {
             $node->{$prop} = $nodeObject->{$prop};
           }
+          $node->{<Q::pc:requireResourceURI>}
+             = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
+          $node->{<Q::pc:useModuleName>}
+             = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
 
   @ToStringMethod:
     @@Return:
@@ -2961,7 +3050,8 @@ ClsDef:
           @@@@@lang:en
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:left>, <Q::pc:right>,
-                <Q::pc:parent>.
+                <Q::pc:parent>, <Q::pc:useModuleName>, 
+               <Q::pc:requireResourceURI>.
 
   @IntCloneMethod:
     @@Return:
@@ -2985,6 +3075,10 @@ ClsDef:
             $cno_clone->{<Q::pc:parent>} = $node;
             ## NOTE: Tree ID is not updated yet.
           }
+          $node->{<Q::pc:requireResourceURI>}
+             = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
+          $node->{<Q::pc:useModuleName>}
+             = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
 
   @ToStringMethod:
     @@Return:
@@ -3033,7 +3127,8 @@ ClsDef:
           @@@@@lang:en
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:true>, <Q::pc:false>,
-                <Q::pc:parent>, <Q::pc:condition>.
+                <Q::pc:parent>, <Q::pc:condition>, <Q::pc:useModuleName>, 
+               <Q::pc:requireResourceURI>.
 
   @IntCloneMethod:
     @@Return:
@@ -3059,6 +3154,10 @@ ClsDef:
             $cno_clone->{<Q::pc:parent>} = $node;
             ## NOTE: Tree ID is not updated yet.
           }
+          $node->{<Q::pc:requireResourceURI>}
+             = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
+          $node->{<Q::pc:useModuleName>}
+             = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
 
   @ToStringMethod:
     @@Return:
@@ -3251,12 +3350,12 @@ ClsDef:
         } elsif (ref $val eq 'ARRAY') {
           __DEEP{
             $r = q<[> . <ClassM::ManakaiPerlCodeImplementation
-                                            .perlLiteral> ($val) . q<]>;
+                                            .perlList> ($val) . q<]>;
           }__;
         } elsif (ref $val eq 'HASH') {
           __DEEP{
             $r = q<{> . <ClassM::ManakaiPerlCodeImplementation
-                                            .perlLiteral> ([%$val]) . q<}>;
+                                            .perlList> ([%$val]) . q<}>;
           }__;
         } else {
           $val =~ s/(['\\])/\\$1/g;
@@ -3883,6 +3982,21 @@ ElementTypeBinding:
       @@@@:
         Returns the textual Perl source code representation of this object. 
 
+ElementTypeBinding:
+  @Name: NumValMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Method
+    @@Operator:
+      @@@@: 0+
+      @@@ContentType:
+        lang:Perl
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns the numeric value of this object.
 
 ElementTypeBinding:
   @Name: IntCloneMethod

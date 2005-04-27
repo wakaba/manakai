@@ -28,7 +28,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/18 08:55:41 $
+      $Date: 2005/04/27 12:32:39 $
     @@ContentType:
       dis:Date.RCS
   
@@ -97,6 +97,15 @@ ElementTypeBinding:
       @@@For: 
         ManakaiDOM:all !=ManakaiDOM:all
 
+ResourceDef:
+  @QName: AnyRealNumber
+  @Description:
+    @@lang:en
+    @@@:
+      Any IDL datatype that represents a subset of the real numbers.
+  @rdf:type:
+    ManakaiDOM:DataType
+
 IDLDataTypeDef:
   @QName: 
     DOMMain:long
@@ -104,6 +113,7 @@ IDLDataTypeDef:
     @@lang:en
     @@@:
       Long signed integer representing the range -2^31 ... 2^31 - 1. 
+  @rdfs:subClassOf: AnyRealNumber
 
 IDLDataTypeDef:
   @QName: 
@@ -116,6 +126,7 @@ IDLDataTypeDef:
     @@lang:en
     @@@: 
       Long unsigned integer representing the range 0 ... 2^32 - 1. 
+  @rdfs:subClassOf: AnyRealNumber
 
 IDLDataTypeDef:
   @QName: 
@@ -128,6 +139,7 @@ IDLDataTypeDef:
     @@lang:en
     @@@: 
       Short signed integer representing the range -2^15 ... 2^15 - 1.
+  @rdfs:subClassOf: AnyRealNumber
 
 IDLDataTypeDef:
   @QName: 
@@ -140,6 +152,7 @@ IDLDataTypeDef:
     @@lang:en
     @@@: 
       Short unsigned integer representing the range 0 ... 2^16 - 1.
+  @rdfs:subClassOf: AnyRealNumber
 
 IDLDataTypeDef:
   @QName:
@@ -156,6 +169,7 @@ IDLDataTypeDef:
               their deviance from the standard. 
       \
       }
+  @rdfs:subClassOf: AnyRealNumber
 
 IDLDataTypeDef:
   @QName: 
@@ -172,6 +186,7 @@ IDLDataTypeDef:
               their deviance from the standard.
       \
       }
+  @rdfs:subClassOf: AnyRealNumber
 
 IDLDataTypeDef:
   @QName: 
@@ -241,5 +256,6 @@ IDLDataTypeDef:
   @FullName:
     @@lang:en
     @@@: Unsigned long long integer
+  @rdfs:subClassOf: AnyRealNumber
 
 ## DISIDL.dis ends here

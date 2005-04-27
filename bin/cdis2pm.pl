@@ -2126,6 +2126,7 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
       }
       if (keys %ol) {
         $ol{fallback} = 1;
+        $ol{bool} ||= perl_code_literal 'sub () {1}';
         $result .= perl_statement 'use overload '.perl_list %ol;
       }
       my $op2perl = {
@@ -2361,4 +2362,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/03/16 09:08:13 $
+1; # $Date: 2005/04/27 12:32:39 $

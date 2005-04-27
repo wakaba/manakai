@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/04/27 06:24:47 $
+      $Date: 2005/04/27 12:32:39 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1738,11 +1738,15 @@ ClsDef:
                                                        ($vnode_value);
                 }
               } elsif ($dataTypeURI) {
-                # if () {
-                #} else { ## DOMMain:DOMString or some
+                $dataType ||= $disDatabase-><M::ManakaiDISDatabase.getResource>
+                                              ($dataTypeURI);
+                if ($dataType-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
+                                              (<Q::DISIDL:AnyRealNumber>)) {
+                  $r = $plimpl-><M::MPLImpl.createPerlAtom> (0 + $vnode_value);
+                } else { ## DOMMain:DOMString or some
                   $r = $plimpl-><M::MPLImpl.createPerlStringLiteral>
                                                        ($vnode_value);
-                #}
+                }
               } else {  ## Untyped
                 $r = $plimpl-><M::MPLImpl.createPerlStringLiteral>($vnode_value);
               }
@@ -1758,13 +1762,7 @@ ClsDef:
             } elsif ($dataType-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
                                               (<Q::DOMMain:boolean>) or
                      $dataType-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
-                                              (<Q::DOMMain:unsigned-long>) or
-                     $dataType-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
-                                              (<Q::DOMMain:unsigned-short>) or
-                     $dataType-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
-                                              (<Q::DOMMain:long>) or
-                     $dataType-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
-                                              (<Q::DOMMain:short>)) {
+                                              (<Q::DISIDL:AnyRealNumber>)) {
               $r = $plimpl-><M::MPLImpl.createPerlAtom> ('0');
             } elsif ($dataType-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
                                               (<Q::Perl:ARRAY>)) {
@@ -3720,6 +3718,33 @@ ClsDef:
     <QUOTE::dis> resource definitions. 
   @ClsISA: ManakaiDISPropertyAccessor
   @ClsISA: ManakaiDISExceptionTarget
+
+  @IntMethod:
+    @@Operator:
+      @@@@:eq
+      @@@ContentType:
+        lang:Perl
+    @@enDesc:
+      Whether two <QUOTE::dis> resource definitions are equal or not. 
+      Two resource definitions are equal iff one's <A::.uri> is
+      literally equal to another's <A::.uri>.
+    @@Param:
+      @@@Name: anotherResource
+      @@@Type: ManakaiDISResourceDefinition
+      @@@enDesc:
+        Another resource definition to compare.
+    @@Return:
+      @@@Type:
+        DOMMain:boolean::ManakaiDOM:all
+      @@@enDesc:
+        Whether two resources are equal or not. 
+      @@@PerlDef:
+        if (UNIVERSAL::isa ($anotherResource,
+                            <ClassName::ManakaiDISResourceDefinition>)) {
+          $r = $self->{uri} eq $anotherResource->{uri};
+        } else {
+          $r = false;
+        }
   
   @Attr:
     @@Name: uri
@@ -4096,12 +4121,22 @@ ClsDef:
                               (<Q::ManakaiDOM:Const>) or
                    $self-><M::ManakaiDISResourceDefinition.isTypeURI>
                               (<Q::ManakaiDOM:ConstGroup>)) {
-            $r = $self->{localName};
+            $r = uc $self->{localName};
             unless (defined $r) {
               __UNDEEP{
                 __EXCEPTION{NO_LOCAL_NAME_ERR::
                   DIS:uri => {$self->{uri}},
                   DIS:sourceNode => {$self->{src}},
+                }__;
+              }__;
+            }
+            if ($r =~ /^_/ or $r =~ /_$/) {
+              __UNDEEP{
+                __EXCEPTION{RESERVED_PERL_METHOD_NAME_ERR::
+                  DIS:uri => {$self->{uri}},
+                  DIS:localName => {$self->{localName}},
+                  DIS:soruceNode => {$self->{src}},
+                  DIS:generatedName => {$r},
                 }__;
               }__;
             }
@@ -4235,7 +4270,8 @@ ClsDef:
             if ($self-><M::ManakaiDISPropertyAccessor.getPropertyBoolean>
                                  (<Q::DISPerl:isNamedParameter>, false)) {
               $r = '$opt{' . 
-                   <ClassM::ManakaiDISImplementation.camelCaseToUnderscoreName> .
+                   <ClassM::ManakaiDISImplementation.camelCaseToUnderscoreName>
+                                                       ($r) .
                    '}';
             } elsif ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
                                                        (<Q::Perl:Array>)) {
@@ -4763,7 +4799,7 @@ ClsDef:
 
               $ret->{<Q::DIS:plDefined>} = true;
               $self->{<Q::DIS:plDefined>} = true;
-            } else {
+            } else {  ## Method code not defined
               my $cls = $self->{db}-><M::ManakaiDISDatabase.getResource>
                                               (<Q::DOMException:CoreException>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
@@ -4808,8 +4844,7 @@ ClsDef:
             my $data_type = $get-><AG::ManakaiDISResourceDefinition
                                       .disActualDataTypeResource>;
             my $get_code = $plimpl-><M::MPLImpl.createPerlBlockContainer>;
-            $get_code-><M::PLBlockCon.appendStatement>
-                            (q<my ($self) = @_>);
+            $get_code-><M::PLBlockCon.appendStatement> (q<my ($self) = @_>);
             my $code = $get-><AG::ManakaiDISResourceDefinition.plCodeFragment>;
             if ($code) {
               ## Default value
@@ -4890,6 +4925,7 @@ ClsDef:
                 $set->{<Q::DIS:plDefined>} = true;
                 $self->{<Q::DIS:plDefined>} = $get->{<Q::DIS:plDefined>};
               } else { ## Setter code not defined
+                $set_code-><M::PLBlockCon.appendStatement> (q<my ($self) = @_>);
                 my $cls = $self->{db}-><M::ManakaiDISDatabase.getResource>
                                               (<Q::DOMException:CoreException>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
@@ -4911,6 +4947,7 @@ ClsDef:
               $set->{<Q::DIS:plDefined>} = false;
               $self->{<Q::DIS:plDefined>} = false;
             } else {  ## No attribute setter
+              $set_code-><M::PLBlockCon.appendStatement> (q<my ($self) = @_>);
               my $cls = $self->{db}-><M::ManakaiDISDatabase.getResource>
                                               (<Q::DOMException:CoreException>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
@@ -4943,6 +4980,23 @@ ClsDef:
                                         (q<@_ == 1>),
                       $get_code,
                       $set_code);
+          } elsif ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
+                              (<Q::ManakaiDOM:Const>)) {
+            my $data_type = $self-><AG::ManakaiDISResourceDefinition
+                                       .disActualDataTypeResource>;
+            my $value = $self->{src}
+                             -><M::ManakaiDISElement.plValueCodeFragment>
+                              (<Q::dis:Value>, $self->{db},
+                               for_arg => $self->{for},
+                               forp_arg => $self->{forp},
+                               data_type_uri => $data_type
+                                    -><AG::ManakaiDISResourceDefinition.uri>);
+            my $plimpl = $self-><AG::ManakaiDISResourceDefinition
+                                                       .plImplementation>;
+            $r = $plimpl-><M::MPLImpl.createPerlSub>
+                            ($self-><AG::ManakaiDISResourceDefinition.plName>);
+            $r-><M::PLBlockCon.appendCodeFragment> ($value);
+            $r-><AS::MPLSub.prototype> ('');
           } elsif ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
                               (<Q::ManakaiDOM:Class>)) {
             my $plimpl = $self-><AG::ManakaiDISResourceDefinition
@@ -4979,6 +5033,7 @@ ClsDef:
             my @cr = @{$self-><M::ManakaiDISPropertyAccessor
                                          .getPropertyResourceList>
                                     (<Q::DIS:childResource>)};
+            my @const;
             for my $cr (@cr) {
               if ($cr-><M::ManakaiDISResourceDefinition.isTypeURI>
                                     (<Q::DISLang:Method>) or
@@ -5033,9 +5088,89 @@ ClsDef:
                     DIS:sourceNode => {$cr->{src}},
                   }__}__;
                 }
+              } elsif ($cr-><M::ManakaiDISResourceDefinition.isTypeURI>
+                                (<Q::ManakaiDOM:ConstGroup>)) {
+                for my $gcr (@{$cr-><M::ManakaiDISPropertyAccessor
+                                         .getPropertyResourceList>
+                                    (<Q::DIS:childResource>)}) {
+                  if ($gcr-><M::ManakaiDISResourceDefinition.isTypeURI>
+                                (<Q::ManakaiDOM:Const>)) {
+                    my $sub = $gcr-><AG::ManakaiDISResourceDefinition
+                                        .plCodeFragment>;
+                    if ($r-><M::PLPack.getSub> ($sub-><AG::MPLSub.localName>)) {
+                      __UNDEEP{__EXCEPTION{
+                          PERL_SUBROUTINE_ALREADY_DEFINED_ERR::
+                            PerlCode:localName => {$sub-><AG::MPLSub.localName>},
+                            DIS:uri => {$gcr->{uri}},
+                            DIS:sourceNode => {$gcr->{src}},
+                      }__}__;
+                    }
+                    $r-><M::PLPack.setSub>
+                             ($sub-><AG::MPLSub.localName> => $sub);
+                    push @const, $gcr;
+                  }
+                }
+              } elsif ($cr-><M::ManakaiDISResourceDefinition.isTypeURI>
+                                (<Q::ManakaiDOM:Const>)) {
+                my $sub = $cr-><AG::ManakaiDISResourceDefinition.plCodeFragment>;
+                if ($r-><M::PLPack.getSub> ($sub-><AG::MPLSub.localName>)) {
+                  __UNDEEP{__EXCEPTION{
+                          PERL_SUBROUTINE_ALREADY_DEFINED_ERR::
+                            PerlCode:localName => {$sub-><AG::MPLSub.localName>},
+                            DIS:uri => {$cr->{uri}},
+                            DIS:sourceNode => {$cr->{src}},
+                  }__}__;
+                }
+                $r-><M::PLPack.setSub> ($sub-><AG::MPLSub.localName> => $sub);
+                push @const, $cr;
               }
             }
-            ## TODO: Exceptions and constants and variables
+            ## TODO: variables
+
+            if ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
+                             (<Q::DOMException:AnyExceptionClass>)) {
+              my $err_def = $plimpl-><M::MPLImpl.createPerlSub> ('___error_def');
+              $err_def-><AS::MPLSub.prototype> ('');
+              $err_def-><M::PLBlockCon.appendCode>
+                 ($plimpl-><M::MPLImpl.perlList>
+                   ([{
+                       map {
+                         $_-><AG::ManakaiDISResourceDefinition.plName> => {
+                           <Q::DOMCore:code> => 0 + $_
+                             -><AG::ManakaiDISResourceDefinition.plCodeFragment>,
+                           description => $_
+                       -><AG::ManakaiDISResourceDefinition.plMufDescriptionText>,
+#                           ($_->{ExpandedURI q< DOMCore:severity>}
+#                              ? (ExpandedURI q< DOMCore:severity>
+#                                      => $_->{ExpandedURI q< DOMCore:severity>},
+#                                 ExpandedURI q< DOMCore:type>
+#                                       => $_->{ExpandedURI q< DOMCore:type>})
+#                                    : ()),
+                           <Q::MDOMX:subtype> => {
+                             map {
+                               $_-><AG::ManakaiDISResourceDefinition.nameURI>
+                               => {
+                                 description => $_
+                       -><AG::ManakaiDISResourceDefinition.plMufDescriptionText>,
+#                                 ($_->{ExpandedURI q< DOMCore:severity>}
+#                                    ? (ExpandedURI q< DOMCore:severity>
+#                                      => $_->{ExpandedURI q< DOMCore:severity>},
+#                                       ExpandedURI q< DOMCore:type>
+#                                       => $_->{ExpandedURI q< DOMCore:type>})
+#                                    : ()),
+                               },
+                             } grep {
+                               $_-><M::ManakaiDISResourceDefinition.isTypeURI>
+                                    (<Q::ManakaiDOM:ExceptionOrWarningSubType>)
+                             } @{$_-><M::ManakaiDISPropertyAccessor
+                                         .getPropertyResourceList>
+                                    (<Q::DIS:childResource>)}
+                           },
+                         },
+                       } @const
+                    }]));
+              $r-><M::PLPack.setSub> (___error_def => $err_def);
+            }
           } else {  ## Not supported
             $r = $self->{<Q::plCodeFragment>} = null;
           } # rdf:type
@@ -6024,7 +6159,7 @@ ClsDef:
           } elsif ($v =~ /^\{/) {
             $v = {type => 'code', value => substr ($v, 1, length ($v) - 2)};
           } elsif ($v =~ /^\$/) {
-            $v = {type => 'variable', value => $v};
+            $v = {type => 'variable', value => substr $v, 1};
           } else {
             $v = {type => 'bare', value => $v};
           }
@@ -6377,6 +6512,47 @@ ClsDef:
           $codeArg-><M::MPLCodeFragment.disAddRequireURI>
                       ($resourceArg-><AG::ManakaiDISResourceDefinition.uri>);
         }__;
+
+  @IntMethod:
+    @@Name: plMufDescriptionText
+    @@enDesc:
+      {TODO:: Formal documentation-access API required.
+      \
+      }
+    @@Return:
+      @@@Type:
+        DISLang:String::ManakaiDOM:all
+      @@@PerlDef:
+        __DEEP{
+          my $muf = $self->{src}-><M::ManakaiDISElement.disGetAttribute>
+                             (<Q::dis:Def>, for_arg => $self->{for},
+                              forp_arg => $self->{forp},
+                              media_type => <Q::lang:muf>);
+          if ($muf) {
+            $r = $muf-><M::SWCFGNode.value>;
+            $r =~ s/<Q::([^<>]+)>/$self->{src}-><M::ManakaiDISElement.
+                                     qnameToURI> ($1, node => $muf)/ge;
+            $r =~ s/\s+/ /g;
+            $r =~ s/^ //;
+            $r =~ s/ $//;
+          } else {
+            my $desc = $self->{src}-><M::ManakaiDISElement.disGetAttribute>
+                             (<Q::dis:Description>, for_arg => $self->{for},
+                              forp_arg => $self->{forp},
+                              media_type => <Q::lang:disdoc>,
+                              default_media_type => <Q::lang:disdoc>);
+            if ($desc) {
+              $r = $desc-><M::SWCFGNode.value>;
+              $r =~ s/\s+/ /g;
+              $r =~ s/^ //;
+              $r =~ s/ $//;
+              $r =~ s/%/%percent;/g;
+            }
+          }
+        }__;
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@: Currently only common-used patterns are supported.
 ##DISResourceDefinition
 
 PropDef:
@@ -8118,4 +8294,14 @@ ElementTypeBinding:
     @@ContentType:
       lang:muf
     @@lang:en
+
+ResourceDef:
+  @QName:
+    lang:muf
+  @rdf:type:
+    rdfs:Class
+  @ImplNote:
+    @@lang:en
+    @@@:
+      Should be moved to some other module.
 
