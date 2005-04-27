@@ -2053,7 +2053,7 @@ sub dis_perl_init_classdef ($;%) {
         $res->{ExpandedURI q<d:Type>} = $pr->{URI};
         $res->{ExpandedURI q<dis2pm:TypeNode>} = $pr->{src};
       } else {
-        valid_err (q<InCase value type required>, node => $res->{src});
+        valid_warn (q<InCase value type required>, node => $res->{src});
       }
     }
     my $i = dis_get_attr_node (%opt, name => 'actualType',
@@ -2777,4 +2777,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/04/01 07:58:46 $
+1; # $Date: 2005/04/27 06:24:48 $

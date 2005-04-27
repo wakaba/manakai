@@ -1,0 +1,1790 @@
+Module:
+  @QName: 
+    DIS:XML
+  @FullName:
+    @@lang:en
+    @@@: 
+      <QUOTE::dis> Format XML Module
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/XML#
+
+  @Description:
+    @@lang:en
+    @@@:
+      This module provides basic XML-related vocabulary 
+      including XML Information Set.
+  
+  @Author:
+    @@FullName:Wakaba
+    @@Mail:w@suika.fam.cx
+  @License:
+     license:Perl+MPL
+  @Date:
+    @@@:
+      $Date: 2005/04/27 06:24:48 $
+    @@ContentType:
+      dis:Date.RCS
+  
+  @DefaultFor:
+    ManakaiDOM:all
+
+  @Require:
+    @@Module:
+      @@@Name: DISRDF
+
+Namespace:
+  @DIS:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @is:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/XML#
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @m12n:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/XML#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @infoset:
+    http://www.w3.org/2001/04/infoset#
+  @owl:
+    http://www.w3.org/2002/07/owl#
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @xi:
+    http://www.w3.org/2001/XInclude
+
+## XML Infoset Information Items
+
+ResourceDef:
+  @QName: NameInXMLInfoset
+  @enDesc:
+    A resource name as used in the XML Information Set specification
+    or other source specification.
+  @rdf:type:
+    rdfs:Class
+  @rdfs:domain:
+    rdfs:Resource
+  @rdfs:range:
+    rdfs:Literal
+
+ElementTypeBinding:
+  @Name: InfosetName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ContentType:
+      NameInXMLInfoset
+
+ResourceDef:
+  @QName:
+    infoset:InfoItem
+  @InfosetName: information item
+  @rdf:type:
+    rdfs:Class
+  @enDesc:
+    An abstract description of some part of an XML document. 
+
+ResourceDef:
+  @QName: InfosetProperty
+  @InfosetName: property
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf:
+    rdf:Property
+  @enDesc:
+    An information set property.
+
+ResourceDef:
+  @QName: hasProperty
+  @rdf:type:
+    rdf:Property
+  @enDesc:
+    The subject resource has an information set property. 
+  @rdfs:domain: 
+    infoset:InfoItem
+  @rdfs:range: InfosetProperty
+
+ElementTypeBinding:
+  @Name: InfoPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      InfosetProperty
+
+ResourceDef:
+  @QName:
+    infoset:Unknown
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf:
+    infoset:AttributeType
+  @rdfs:subClassOf:
+    infoset:Literal
+  @rdfs:subClassOf:
+    infoset:Boolean
+  @rdfs:subClassOf:
+    infoset:Notation
+  @rdfs:subClassOf:
+    infoset:References
+
+ResourceDef:
+  @QName:
+    infoset:Unknown.unknown
+  @InfosetName: unknown
+  @rdf:type:
+    infoset:Unknown
+  @enDesc:
+    The property value is unknown.
+
+ElementTypeBinding:
+  @Name: unknownCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@@:
+        infoset:Unknown.unknown
+      @@@ContentType:
+        dis:TypeQName
+
+ElementTypeBinding:
+  @Name: InCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+
+ResourceDef:
+  @QName:
+    infoset:NoValue
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf:
+    infoset:AttributeType
+  @rdfs:subClassOf:
+    infoset:Literal
+  @rdfs:subClassOf:
+    infoset:Boolean
+  @rdfs:subClassOf:
+    infoset:Standalone
+  @rdfs:subClassOf:
+    infoset:Notation
+  @rdfs:subClassOf:
+    infoset:References
+
+ResourceDef:
+  @QName:
+    infoset:NoValue.noValue
+  @InfosetName: no value
+  @rdf:type:
+    infoset:NoValue
+  @enDesc:
+    The property has no value.
+
+ElementTypeBinding:
+  @Name: noValueCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@@:
+        infoset:NoValue.noValue
+      @@@ContentType:
+        dis:TypeQName
+
+ResourceDef:
+  @QName:
+    infoset:InfoItemSet
+  @rdfs:subClassOf:
+    rdf:Bag
+  @rdf:type:
+    rdfs:Class
+
+ResourceDef:
+  @QName:
+    infoset:References
+  @rdf:type:
+    rdfs:Class
+
+ResourceDef:
+  @QName:
+    infoset:InfoItemSeq
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf:
+    rdf:Seq
+  @rdfs:subClassOf:
+    infoset:References
+
+ElementTypeBinding:
+  @Name: InfoItemDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdfs:Class
+    @@rdfs:subClassOf:
+      infoset:InfoItem
+
+InfoItemDef:
+  @QName:
+    infoset:Document
+  @InfosetName: document
+  @enDesc:
+    There is exactly one document information item in the information
+    set for an XML document and all other information items are
+    accessible from the properties of the document information item,
+    either directly or indirectly.
+  @is:hasProperty: 
+    infoset:children
+  @is:hasProperty: 
+    infoset:documentElement
+  @is:hasProperty: 
+    infoset:notations
+  @is:hasProperty: 
+    infoset:unparsedEntities
+  @is:hasProperty: 
+    infoset:baseURI
+  @is:hasProperty:
+    infoset:characterEncodingScheme
+  @is:hasProperty:
+    infoset:standalone
+  @is:hasProperty:
+    infoset:version
+  @is:hasProperty:
+    infoset:allDeclarationsProcessed
+
+InfoPropDef:
+  @QName:
+    infoset:children
+  @InfosetName: children
+  @enDesc:
+    An ordered list of child information items, in document order. 
+    \
+    - <InfoItem::Document information item>::: The list contains exactly one
+        <InfoItem::element information item> and it may contain
+        <InfoItem::processing instruction information items>,
+        <InfoItem::comment information items> and/or
+        a <InfoItem::document type declaration information item>.
+    \
+    - <InfoItem::Element information items>::: The list contains 
+        <InfoItem::element information items>, 
+        <InfoItem::processing instruction information items>,
+        <InfoItem::unexpanded entity reference information items>,
+        <InfoItem::character information items> and/or
+        <InfoItem::comment information items>.
+    \
+    - <InfoItem::Document type declaration information item>:::
+         The list contains <InfoItem::processing instruction items>
+         appearing in the DTD, in the original document order. 
+         Information items from the internal subset appear before
+         those in the external subset.
+  @rdfs:domain:
+    infoset:InfoItem
+  @rdfs:range:
+    infoset:InfoItemSeq
+
+InfoPropDef:
+  @QName:
+    infoset:documentElement
+  @InfosetName: document element
+  @enDesc:
+    The element information item corresponding to the document element.
+  @rdfs:domain:
+    infoset:Document
+  @rdfs:range:
+    infoset:Element
+
+InfoPropDef:
+  @QName:
+    infoset:notations
+  @InfosetName: notations
+  @enDesc:
+    An unordered set of notation information items declared in the DTD.
+  @noValueCase:
+    @@enDesc:
+      If any notation is multiply declared.
+  @rdfs:domain:
+    infoset:Document
+  @rdfs:range:
+    infoset:NotationSet
+  @Type:
+    infoset:NotationSet::ManakaiDOM:all
+
+ResourceDef:
+  @QName:
+    infoset:NotationSet
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf:
+    infoset:InfoItemSet
+
+ResourceDef:
+  @QName:
+    infoset:UnparsedEntitySet
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf:
+    infoset:InfoItemSet
+
+InfoPropDef:
+  @QName:
+    infoset:unparsedEntities
+  @InfosetName: unparsed entities
+  @enDesc:
+    An unordered set of unparsed entity information items declared
+    in the DTD.
+  @rdfs:domain:
+    infoset:Document
+  @rdfs:range:
+    infoset:UnparsedEntitySet
+
+InfoPropDef:
+  @QName:
+    infoset:baseURI
+  @InfosetName: base URI
+  @enDesc:
+    The base URI computed according to the XML Base specification. 
+    The value does not reflect any URI percent-encoding that may be
+    required for retrieval of the resource, but it may include
+    escaped characters if these were specified in the document
+    or returned by a server in the case of redirection.
+    \
+    In some cases such as a document read from a string,
+    the rules in the XML Base specification may result in a base 
+    URI being application dependent.  In these cases, the value
+    is not defined. 
+    \
+    When resolving relative URI references, this property should
+    be used in preference to the values of <XA::xml:base> attributes.
+    \
+    - Document information item::: The base URI of the document entity.
+    \
+    - Element information items::: The base URI of the element.
+    \
+    - Processing instruction information items::: The base URI
+                                   of the processing instruction.
+  @rdfs:domain:
+    infoset:InfoItem
+  @rdfs:range:
+    infoset:Literal
+
+ResourceDef:
+  @QName:
+    infoset:Literal
+  @rdf:type:
+    rdfs:Class
+  
+InfoPropDef:
+  @QName:
+    infoset:characterEncodingScheme
+  @InfosetName: character encoding scheme
+  @enDesc:
+    The name of the character encoding scheme in which the 
+    document entity is expressed.
+  @rdfs:domain:
+    infoset:Document
+  @rdfs:range:
+    rdfs:Literal
+
+InfoPropDef:
+  @QName:
+    infoset:standalone
+  @InfosetName: standalone
+  @enDesc:
+    An indication of the standalone status of the document.
+  @InCase:
+    @@Value:
+      @@@@:
+        infoset:Standalone
+      @@@ContentType:
+        dis:TypeQName
+    @@enDesc:
+      The standalone declaration in the XML declaration of the 
+      document entity is set to <XML::yes>.
+  @InCase:
+    @@Value:
+      @@@@:
+        infoset:Standalone.no
+      @@@ContentType:
+        dis:TypeQName
+    @@enDesc:
+      The standalone declaration in the XML declaration of the
+      document entity is set to <XML::false>.
+  @noValueCase:
+    @@enDesc:
+      There is no standalone declaration in the document entity.
+  @rdfs:domain:
+    infoset:Document
+  @rdfs:range:
+    infoset:Standalone
+  @Type:
+    infoset:Standalone::ManakaiDOM:all
+
+ResourceDef:
+  @QName:
+    infoset:Standalone
+  @rdf:type:
+    rdfs:Class
+
+ResourceDef:
+  @QName:
+    infoset:Standalone.yes
+  @InfosetName: yes
+  @rdf:type:
+    infoset:Standalone
+
+ResourceDef:
+  @QName:
+    infoset:Standalone.no
+  @InfosetName: no
+  @rdf:type:
+    infoset:Standalone
+
+InfoPropDef:
+  @QName:
+    infoset:version
+  @InfosetName: version
+  @enDesc:
+    A string representing the XML version of the document,
+    derived from the XML declaration.
+  @noValueCase:
+    @@enDesc:
+      The document entity has no XML declaration.
+  @rdfs:domain:
+    infoset:Document
+  @rdfs:range:
+    infoset:Literal
+  @Type:
+    infoset:Literal::ManakaiDOM:all
+
+InfoPropDef:
+  @QName:
+    infoset:allDeclarationsProcessed
+  @InfosetName: all declarations processed
+  @enDesc:
+    An indication of whether the XML processor has read the complete
+    DTD or not.  This property is not strictly speaking part of the 
+    information set of the document.
+  @trueCase:
+    @@enDesc:
+      Properties are never unknown.
+  @falseCase:
+    @@enDesc:
+      Certain properties may be unknown.
+  @rdfs:domain: 
+    infoset:Document
+  @rdfs:range:
+    infoset:Boolean
+  @Type:
+    infoset:Boolean::ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: trueCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@@:
+        infoset:Boolean.true
+      @@@ContentType:
+        dis:TypeQName
+
+ElementTypeBinding:
+  @Name: falseCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@@:
+        infoset:Boolean.false
+      @@@ContentType:
+        dis:TypeQName
+
+InfoItemDef:
+  @QName:
+    infoset:Element
+  @InfosetName: element
+  @enDesc:
+    An element in the XML document.
+  @is:hasProperty:
+    infoset:namespaceName
+  @is:hasProperty:
+    infoset:localName
+  @is:hasProperty:
+    infoset:prefix
+  @is:hasProperty:
+    infoset:children
+  @is:hasProperty:
+    infoset:attributes
+  @is:hasProperty:
+    infoset:namespaceAttributes
+  @is:hasProperty:
+    infoset:inScopeNamespaces
+  @is:hasProperty:
+    infoset:baseURI
+  @is:hasProperty:
+    infoset:parent
+  @is:hasProperty: includedHistory
+  @is:hasProperty: language
+
+InfoPropDef:
+  @QName:
+    infoset:namespaceName
+  @InfosetName: namespace name
+  @enDesc:
+    - <InfoItem::Element information items>:::
+         The namespace name of the element type.
+    \
+    - <InfoItem::Attribute information items>:::
+         The namespace name of the attribute.  Note that all
+         namespace attributes, including <XA::xmlns> attributes,
+         have a value of <URI::http://www.w3.org/2000/xmlns/>.
+    \
+    - <InfoItem::Namespace information items>:::
+         The namespace name to which the <InfoProp::prefix> is bound. 
+    \
+    It is the normalized value of the corresponding namespace 
+    declaration attribute and no additional URI percent-encoding
+    is applied to it by the XML processor.
+    \
+    Note that the XML Information Set specification does 
+    not define an information set for documents that do not 
+    conform to the Namespaces in XML or Namespaces in XML 1.1
+    specification and for documents that use relative 
+    URI references in namespace declarations.
+  @noValueCase:
+    @@enDesc:
+      The element type or the attribute does not belong to a namespace.
+  @rdfs:domain:
+    infoset:InfoItem
+  @rdfs:range:
+    infoset:Literal
+  @Type:
+    infoset:Literal::ManakaiDOM:all
+
+InfoPropDef:
+  @QName:
+    infoset:localName
+  @InfosetName: local name
+  @enDesc:
+    The local part of the element type name or the attribute name. 
+  @rdfs:domain:
+    infoset:InfoItem
+  @rdfs:range:
+    rdfs:Literal
+
+InfoPropDef:
+  @QName:
+    infoset:prefix
+  @InfosetName: prefix
+  @enDesc:
+    - <InfoItem::Element information items>:::
+        The namespace prefix part of the element type name.
+    \
+    - <InfoItem::Attribute information items>:::
+        The namespace prefix part of the attribute name. 
+    \
+    - <InfoItem::Namespace information items>:::
+        The prefix whose binding is described by the information item,
+        derived from the name of the namespace declaration
+        attribute.
+  @noValueCase:
+    @@enDesc:
+      - <InfoItem::Element information items>:::
+          The element type name is unprefixed.
+      \
+      - <InfoItem::Attribute information items>:::
+          The attribute name is unprefixed.  Note that 
+          <XA::xmlns> attributes fall in this case.
+      \
+      - <InfoItem::Namespace information items>:::
+          The name of the namespace declaration attribute 
+          corresponding to this information item is 
+          <XA::xmlns> so that the declaration is of the
+          default namespace.
+  @rdfs:domain:
+    infoset:InfoItem
+  @rdfs:range:
+    infoset:Literal
+  @Type:
+    infoset:Literal::ManakaiDOM:all
+
+ResourceDef:
+  @QName:
+    infoset:AttributeSet
+  @rdfs:subClassOf:
+    infoset:InfoItemSet
+  @rdf:type:
+    rdfs:Class
+
+InfoPropDef:
+  @QName:
+    infoset:attributes
+  @InfosetName: attributes
+  @enDesc:
+    An unordered set of attribute information items,
+    corresponding to the attributes of this element,
+    either directly specified or defaulted from the DTD. 
+    Namespace declaration attributes do not appear in this set.
+  @rdfs:domain:
+    infoset:Element
+  @rdfs:range:
+    infoset:AttributeSet
+
+InfoPropDef:
+  @InfosetName: namespace attributes
+  @enDesc:
+    An unordered set of attribute information items,
+    corresponding to the attributes of this element,
+    either directly specified or defaulted from the DTD.
+  @rdfs:domain:
+    infoset:Element
+  @rdfs:range:
+    infoset:AttributeSet
+
+InfoPropDef:
+  @QName:
+    infoset:inScopeNamespaces
+  @InfosetName: in-scope namespaces
+  @enDesc:
+    An unordered set of namespace information items in effect for 
+    this element information item.  
+    \
+    This set always contains a namespace information item
+    with the <InfoProp:prefix> of <XML::xml> that is implicitly 
+    bound to the <InfoProp:namespace name> 
+    <URI::http://www.w3.org/XML/1998/namespace>.
+    It does not contain a namespace information item
+    with prefix <XML::xmlns>.
+    \
+    This set will include namespace information items corresponding 
+    to all of the members of <InfoProp::namespace attributes>
+    except for any declarations that undeclare prefixes.
+  @rdfs:domain:
+    infoset:Element
+  @rdfs:range:
+    infoset:NamespaceSet
+
+ResourceDef:
+  @QName:
+    infoset:NamespaceSet
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf:
+    infoset:InfoItemSet
+
+InfoPropDef:
+  @QName:
+    infoset:parent
+  @InfosetName: parent
+  @enDesc:
+    <InfoItem::Element information items>::: The 
+    <InfoItem::document information item> or 
+    <InfoItem::element information item> that contains 
+    this information item in its <InfoProp::children> property.
+    \
+    <InfoItem::Processing instruction information items>::: The 
+        <InfoItem::document information item>, 
+        <InfoItem::element information item> or
+        <InfoItem::document type declaration information item>
+        that contains this information item in its <InfoProp::children>
+        property.
+    \
+    <InfoItem::Unexpanded entity reference information items>:::
+        The <InfoItem::element information item> that
+        contains this information item in its <InfoProp::children> property.
+    \
+    <InfoItem::Character information items>:::
+        The <InfoItem::element information item> that
+        contains this information item in its <InfoProp::children> property.
+    \
+    - <InfoItem::Comment information items>:::
+        The <InfoItem::document information item> or
+        <InfoItem::element information item> that
+        contains this information item in its <InfoProp::children> property.
+    \
+    - <InfoItem::Document type declaration items>:::
+        The <InfoItem::document information item>.
+  @rdfs:domain:
+    infoset:InfoItem
+  @rdfs:range:
+    infoset:InfoItem
+
+InfoItemDef:
+  @QName:
+    infoset:Attribute
+  @InfosetName: attribute
+  @enDesc:
+    Attributes of elements in the document, including 
+    those which are namespace declarations. 
+  @is:hasProperty:
+    infoset:namespaceName
+  @is:hasProperty:
+    infoset:localName
+  @is:hasProperty:
+    infoset:prefix
+  @is:hasProperty:
+    infoset:normalizedValue
+  @is:hasProperty:
+    infoset:specified
+  @is:hasProperty:
+    infoset:attributeType
+  @is:hasProperty:
+    infoset:references
+  @is:hasProperty:
+    infoset:ownerElement
+
+InfoPropDef:
+  @QName:
+    infoset:normalizedValue
+  @InfosetName: normalized value
+  @enDesc:
+    The normalized attribute value.
+  @rdfs:domain:
+    infoset:Attribute
+  @rdfs:range:
+    rdfs:Literal
+
+InfoPropDef:
+  @QName:
+    infoset:specified
+  @InfosetName: specified
+  @enDesc:
+    A flag indicating whether this attribute was acutally specified
+    in the start-tag of the element or was defaulted from the DTD.
+  @rdfs:domain:
+    infoset:Attribute
+  @rdfs:range:
+    infoset:Boolean
+
+ResourceDef:
+  @QName:
+    infoset:Boolean
+  @rdf:type:
+    rdfs:Class
+
+ResourceDef:
+  @QName:
+    infoset:Boolean.true
+  @rdf:type:
+    infoset:Boolean
+
+ResourceDef:
+  @QName:
+    infoset:Boolean.false
+  @rdf:type:
+    infoset:Boolean
+
+InfoPropDef:
+  @QName:
+    infoset:attributeType
+  @InfosetName: attribute type
+  @enDesc:
+    An indication of the type declared for this attribute in the DTD. 
+    \
+    Note that the value of this property is not affected by the validity
+    of the attribute value.
+  @noValueCase:
+    @@enDesc:
+      There is no declaration for the attribute and
+      the <InfoProp::all declarations processed> property of 
+      the <InfoItem::document information item> is <CODE::true>.
+      \
+      Applications should treat <CODE::no value> as equivalent to
+      a value of <CODE::CDATA>.
+  @unknownCase:
+    @@enDesc:
+      There is no declaration for the attribute has been read but the
+      <InfoProp::all declarations processed> property of the
+      <InfoItem::document information item> is <CODE::false>
+      (so there may be an unread declaration).
+      \
+      Applications should treat <CODE::unknown> as equivalent to
+      a value of <CODE::CDATA>.
+  @rdfs:domain:
+    infoset:Attribute
+  @rdfs:range:
+    infoset:AttributeType
+  @Type:
+    infoset:AttributeType::ManakaiDOM:all
+
+ResourceDef:
+  @QName:
+    infoset:AttributeType
+  @rdf:type:
+    rdfs:Class
+
+ElementTypeBinding:
+  @Name: AttrTypeDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      infoset:AttributeType
+
+AttrTypeDef:
+  @QName:
+    infoset:AttributeType.ID
+  @InfosetName: ID
+
+AttrTypeDef:
+  @QName:
+    infoset:AttributeType.IDREF
+  @InfosetName: IDREF
+
+AttrTypeDef:
+  @QName:
+    infoset:AttributeType.IDREFS
+  @InfosetName: IDREFS
+
+AttrTypeDef:
+  @QName:
+    infoset:AttributeType.ENTITY
+  @InfosetName: ENTITY
+
+AttrTypeDef:
+  @QName:
+    infoset:AttributeType.ENTITIES
+  @InfosetName: ENTITIES
+
+AttrTypeDef:
+  @QName:
+    infoset:AttributeType.NMTOKEN
+  @InfosetName: NMTOKEN
+
+AttrTypeDef:
+  @QName:
+    infoset:AttributeType.NMTOKENS
+  @InfosetName: NMTOKENS
+
+AttrTypeDef:
+  @QName:
+    infoset:AttributeType.NOTATION
+  @InfosetName: NOTATION
+
+AttrTypeDef:
+  @QName:
+    infoset:AttributeType.CDATA
+  @InfosetName: CDATA
+
+AttrTypeDef:
+  @QName:
+    infoset:AttributeType.ENUMERATION
+  @InfosetName: ENUMERATION
+
+
+InfoPropDef:
+  @QName:
+    infoset:references
+  @InfosetName: references
+  @enDesc:
+    An ordered list of the information items referred to
+    in the attribute value, in the order that they apper there.
+  @InCase:
+    @@enLabel:
+      An ordered list of the <InfoItem::element information items>.
+    @@enDesc:
+      The <InfoProp::attribute type> is <CODE::IDREF> or <CODE::IDREFS>.
+  @InCase:
+    @@enLabel:
+      An ordered list of the <InfoItem::unparsed entity information items>.
+    @@enDesc:
+      The <InfoProp::attribute type> is <CODE::ENTITY> or <CODE::ENTITIES>.
+  @InCase:
+    @@enLabel:
+      An ordered list of the <InfoItem::notation information items>.
+    @@enDesc:
+      The <InfoProp::attribute type> is <CODE::NOTATION>.
+  @noValueCase:
+    @@enDesc:
+      The <InfoProp::attribute type> is <CODE::ID>, <CODE::NMTOKEN>,
+      <CODE::NMTOKENS>, <CODE::CDATA>, <CODE::ENUMERATION> or
+      <CODE::no value>.
+  @noValueCase:
+    @@enDesc:
+      The attribute value is syntactically invalid.
+  @noValueCase:
+    @@enDesc:
+      The <InfoProp::attribute type> is <CODE::IDREF> or <CODE::IDREFS>
+      and any of the identifiers does not appear as the value of 
+      an ID attribute in the document and the
+      <InfoProp::all declarations processed> property of 
+      the <InfoItem::document information item> is <CODE::true>.
+  @noValueCase:
+    @@enDesc:
+      The <InfoProp::attribute type> is <CODE::ENTITY>, <CODE::ENTITIES>
+      or <CODE::NOTATION> and there is no declaration for any of the 
+      entities or the notation and the
+      <InfoProp::all declarations processed> property of 
+      the <InfoItem::document information item> is <CODE::true>.
+  @noValueCase:
+    @@enDesc:
+      The <InfoProp::attribute type> is <CODE::IDREF> or <CODE::IDREFS>
+      and any of the identifiers appears as the value of
+      more than one ID attribute in the document.
+  @noValueCase:
+    @@enDesc:
+      The <InfoProp::attribute type> is <CODE::NOTATION> and
+      there are multiple declarations for the notation.
+  @unknownCase:
+    @@enDesc:
+      The <InfoProp::attribute type> is <CODE::IDREF> or <CODE::IDREFS>
+      and any of the identifiers does not appear as the value of 
+      an ID attribute in the document but the
+      <InfoProp::all declarations processed> property of 
+      the <InfoItem::document information item> is <CODE::false>.
+  @unknownCase:
+    @@enDesc:
+      The <InfoProp::attribute type> is <CODE::ENTITY>, <CODE::ENTITIES>
+      or <CODE::NOTATION> and there is no declaration for any of the 
+      entities or the notation but the
+      <InfoProp::all declarations processed> property of 
+      the <InfoItem::document information item> is <CODE::false>.
+  @unknownCase:
+    @@enDesc:
+      The <InfoProp::attribute type> is <CODE::unknown>.
+  @rdfs:domain:
+    infoset:Attribute
+  @rdfs:range:
+    infoset:References
+  @Type:
+    infoset:References::ManakaiDOM:all
+
+InfoPropDef:
+  @QName:
+    infoset:ownerElement
+  @InfosetName: owner element
+  @enDesc:
+    The element information item that contains this attribute
+    information item in its <InfoProp::attributes> or
+    <InfoProp::namespace attributes> property.
+  @rdfs:domain: 
+    infoset:Attribute
+  @rdfs:range:
+    infoset:Element
+
+InfoItemDef:
+  @QName:
+    infoset:ProcessingInstruction
+  @InfosetName: processing instruction
+  @enDesc:
+    Processing instructions in the document. 
+    \
+    Note that the XML declaration and text declarations are not
+    considered as processing instructions.
+  @is:hasProperty:
+    infoset:target
+  @is:hasProperty:
+    infoset:content
+  @is:hasProperty:
+    infoset:baseURI
+  @is:hasProperty:
+    infoset:notation
+  @is:hasProperty:
+    infoset:parent
+  @is:hasProperty: includeHistory
+
+InfoPropDef:
+  @QName:
+    infoset:target
+  @InfosetName: target
+  @enDesc:
+    A string representing the target part of the processing instruction.
+  @rdfs:domain:
+    infoset:ProcessingInstruction
+  @rdfs:range:
+    rdfs:Literal
+
+InfoPropDef:
+  @QName: 
+    infoset:content
+  @InfosetName: content
+  @enDesc:
+    - <InfoItem::Processing instruction information items>:::
+         A string representing the content of the processing instruction
+    excluding the <InfoProp::target> and any white space immediately following
+    it.  If there is no such content, then the value of this property 
+    will be an empty string.
+    \
+    - <InfoItem::Comment information items>:::
+         A string representing the content of the comment.
+  @rdfs:domain:
+    infoset:InfoItem
+  @rdfs:range:
+    rdfs:Literal
+
+InfoPropDef:
+  @InfosetName: notation
+  @enDesc:
+    The <InfoItem:notation information item> named by the 
+    <InfoProp::target>.
+  @noValueCase:
+    @@enDesc:
+      There is no declaration for a notation with that name
+      and the <InfoProp::all declarations processed> property 
+      of the <InfoItem::document information item> is <CODE::true>,
+      or there are multiple such declarations.
+  @unknownCase:
+    @@enDesc:
+      No declaration for a notation with that name has been read
+      but the <InfoProp::all declarations processed> property
+      of the <InfoItem::document information item> is <CODE::false>.
+  @Type:
+    rdfs:Resource::ManakaiDOM:all
+
+InfoPropDef:
+  @QName:
+    infoset:UnexpandedEntityReference
+  @InfosetName: unexpanded entity reference
+  @enDesc:
+    A placeholder by which an XML processor can indicate that 
+    it has not expanded an external parsed entity.  
+    \
+    {NOTE:: A validating XML processor or a non-validating processor
+            that reads all external parsed entities will never
+            generate <InfoItem::unexpanded entity reference items> 
+            for a valid XML document.
+    \
+    }
+  @is:hasProperty:
+    infoset:name
+  @is:hasProperty:
+    infoset:systemIdentifier
+  @is:hasProperty:
+    infoset:publicIdentifier
+  @is:hasProperty:
+    infoset:declarationBaseURI
+  @is:hasProperty:
+    infoset:parent
+
+InfoPropDef:
+  @QName:
+    infoset:name
+  @InfosetName: name
+  @enDesc:
+    - <InfoItem::Unparsed entity reference information items>:::
+           The name of the entity referenced.
+    \
+    - <InfoItem::Unparsed entity information items>:::
+           The name of the entity.
+    \
+    - <InfoItem::Notation information items>:::
+           The name of the notation.
+  @rdfs:domain:
+    infoset:InfoItem
+  @rdfs:range:
+    rdfs:Literal
+
+InfoPropDef:
+  @QName:
+    infoset:systemIdentifier
+  @InfosetName: system identifier
+  @enDesc:
+    The system identifier, as it appears in the declaration,
+    without URI percent-encoding applied by the XML processor.
+    \
+    - <InfoItem::Unexpanded entity reference information items>:::
+        The system identifier of the entity referenced.
+    \
+    - <InfoItem::Document type declaration information items>:::
+        The system identifier of the external subset.
+    \
+    - <InfoItem::Unparsed entity information items>:::
+        The system identifier of the entity.
+    \
+    - <InfoItem::Notation information items>:::
+        The system identifier of the notation.
+  @noValueCase:
+    @@enDesc:
+      - <InfoItem::Unexpanded entity reference information items>:::
+          There is no declaration for the entity referenced
+      and the <InfoProp::all declarations processed> property 
+      of the <InfoItem::document information item> is <CODE::true>.
+      \
+      - <InfoItem::Document type declaration information items>:::
+         There is no external subset.
+      \
+      - <InfoItem::Notation information items>:::
+         No system identifier was specified.
+  @unknownCase:
+    @@enDesc:
+      - <InfoItem::Unexpanded entity reference information items>:::
+          There is no declaration for the entity referenced
+      but the <InfoProp::all declarations processed> property
+      of the <InfoItem::document information item> is <CODE::false>.
+  @rdfs:domain:
+    infoset:InfoItem
+  @rdfs:range:
+    infoset:Literal
+  @Type:
+    infoset:Literal::ManakaiDOM:all
+
+InfoPropDef:
+  @QName:
+    infoset:publicIdentifier
+  @InfosetName: public identifier
+  @enDesc:
+    The normalized public identifier.
+    \
+    - <InfoItem::Unexpanded entity reference information items>:::
+         The public identifier of the entity referenced. 
+    \
+    - <InfoItem::Document type declaration information items>:::
+         The public identifier of the external subset.
+    \
+    - <InfoItem::Unparsed entity information items>:::
+         The public identifier of the entity.
+    \
+    - <InfoItem::Notation information items>:::
+         The public identifier of the notation.
+  @noValueCase:
+    @@enDesc:
+      - <InfoItem::Unexpanded entity reference information items>:::
+           There is no declaration for the entity referenced
+      and the <InfoProp::all declarations processed> property
+      of the <InfoItem::document information item> is <CODE::true>,
+      or the entity declaration does not include a public identifier.
+      \
+      - <InfoItem::Document type declaration information items>:::
+           There is no external subset or no public identifier was specified.
+      \
+      - <InfoItem::Unparsed entity information items>:::
+           No public identifier was specified.
+      \
+      - <InfoItem::Notation information items>:::
+           No public identifier was specified.
+  @unknownCase:
+    @@enDesc:
+      - <InfoItem::Unexpanded entity reference information items>:::
+           There is no declaration for the entity referenced
+      but the <InfoProp::all declarations processed> property
+      of the <InfoItem::document information item> is <CODE::false>.
+  @rdfs:domain:
+    infoset:InfoItem
+  @rdfs:range:
+    infoset:Literal
+  @Type:
+    infoset:Literal::ManakaiDOM:all
+
+InfoPropDef:
+  @QName:
+    infoset:declarationBaseURI
+  @InfosetName: declaration base URI
+  @enDesc:
+    The base URI relative to which the <InfoProp::system identifier>
+    should be resolved. 
+    \
+    The base URI is computed according to the XML Base specification. 
+    The value does not reflect any URI percent-encoding that may be
+    required for retrieval of the resource, but it may include
+    escaped characters if these were specified in the document
+    or returned by a server in the case of redirection.
+    \
+    In some cases such as a document read from a string,
+    the rules in the XML Base specification may result in a base 
+    URI being application dependent.  In these cases, the value
+    is not defined. 
+  @noValueCase:
+    @@enDesc:
+      There is no declaration for the entity referenced
+      and the <InfoProp::all declarations processed> property 
+      of the <InfoItem::document information item> is <CODE::true>.
+  @unknownCase:
+    @@enDesc:
+      There is no declaration for the entity referenced
+      but the <InfoProp::all declarations processed> property
+      of the <InfoItem::document information item> is <CODE::false>.
+  @rdfs:domain:
+    infoset:InfoItem
+  @rdfs:range:
+    infoset:Literal
+  @Type:
+    infoset:Literal::ManakaiDOM:all
+
+InfoPropDef:
+  @QName:
+    infoset:Character
+  @InfosetName: character
+  @enDesc:
+    A data character that appears in the document,
+    either literally, as a character reference or within 
+    a CDATA section. 
+   \
+    {NOTE:: Although each character is logically separate information
+            item, XML applications are free to chunk characters into 
+            larger groups as necessary or desirable.
+    \
+    }
+  @is:hasProperty:
+    infoset:characterCode
+  @is:hasProperty:
+    infoset:elementContentWhitespace
+  @is:hasProperty:
+    infoset:parent
+  @is:hasProperty: includeHistory
+
+ResourceDef:
+  @QName:
+    infoset:Integer
+  @rdfs:subClassOf:
+    rdfs:Literal
+  @rdf:type:
+    rdfs:Class
+
+InfoPropDef:
+  @QName:
+    infoset:characterCode
+  @InfosetName: character code
+  @enDesc:
+    The ISO/IEC 10646 code position of the character.
+  @rdfs:domain:
+    infoset:Character
+  @rdfs:range:
+    infoset:Integer
+
+InfoPropDef:
+  @QName:
+    infoset:elementContentWhitespace
+  @InfosetName: element content whitespace
+  @enDesc:
+    A boolean indicating whether the character is white space
+    appearing within element content or not. 
+    \
+    {NOTE:: Validating XML processors are <EM::required> to
+            provide this property.
+    \
+    }
+  @trueCase:
+    @@enDesc:
+      The character is white space apperaing within element content.
+  @falseCase:
+    @@enDesc:
+      The character is not white space appearing within 
+      element content or is not white space.
+  @noValueCase:
+    @@enDesc:
+      There is no declaration for the containing element type and
+      the <InfoProp::all declarations processed> property
+      of the <InfoItem::document information item> is <CODE::true>,
+      or there are multiple declarations.
+  @unknownCase:
+    @@enDesc:
+      No declaration for the containing element type has been 
+      read but the <InfoProp::all declarations processed> property
+      of the <InfoItem::document information item> is <CODE::false>.
+  @rdfs:domain:
+    infoset:Character
+  @rdfs:range:
+    infoset:Boolean
+  @Type:
+    infoset:Boolean::ManakaiDOM:all
+
+InfoItemDef:
+  @QName:
+    infoset:Comment
+  @InfosetName: comment
+  @enDesc:
+    An XML comment.
+  @is:hasProperty:
+    infoset:content
+  @is:hasProperty:
+    infoset:parent
+  @is:hasProperty: includeHistory
+
+InfoItemDef:
+  @QName:
+    infoset:DocumentTypeDeclaration
+  @InfosetName: document type declaration
+  @enDesc:
+    A document type declaration.
+    \
+    {NOTE:: Entities and notations are provided as properties
+            of the <InfoItem::document information item>,
+            not the <InfoItem::document type declaration information item>.
+  @is:hasProperty:
+    infoset:systemIdentifier
+  @is:hasProperty:
+    infoset:publicIdentifier
+  @is:hasProperty:
+    infoset:children
+  @is:hasProperty:
+    infoset:parent
+
+InfoItemDef:
+  @QName:
+    infoset:UnparsedEntity
+  @InfosetName: unparsed entity
+  @enDesc:
+    An unparsed entity declared in the DTD.
+  @is:hasProperty:
+    infoset:name
+  @is:hasProperty:
+    infoset:systemIdentifier
+  @is:hasProperty:
+    infoset:publicIdentifier
+  @is:hasProperty:
+    infoset:declarationBaseURI
+  @is:hasProperty:
+    infoset:notationName
+  @is:hasProperty:
+    infoset:notation
+
+InfoPropDef:
+  @QName:
+    infoset:notationName
+  @InfosetName: notation name
+  @enDesc:
+    The notation name associated with the entity.
+  @rdfs:domain:
+    infoset:UnparsedEntity
+  @rdfs:range:
+    @@@:
+      infoset:Literal
+    @@ImplNote:
+      Should have been <Q::rdfs:Literal>?
+
+InfoPropDef:
+  @QName:
+    infoset:notation
+  @InfosetName: notation
+  @enDesc:
+    The <InfoItem::notation information item> named by the
+    <InfoItem::notation name>.
+  @noValueCase:
+    @@enDesc:
+      There is no declaration for a notation with that name
+      and the <InfoProp::all declarations processed> property
+      of the <InfoItem::document information item> is <CODE::true>,
+      or there are multiple declarations.
+  @unknownCase:
+    @@enDesc:
+      No declaration for a notation with that name
+      but the <InfoProp::all declarations processed> property
+      of the <InfoItem::document information item> is <CODE::false>.
+  @rdfs:domain:
+    infoset:UnparsedEntity
+  @rdfs:range:
+    infoset:Notation
+  @Type:
+    infoset:Notation::ManakaiDOM:all
+
+InfoItemDef:
+  @QName:
+    infoset:Notation
+  @InfosetName: notation
+  @enDesc:
+    A notation declared in the DTD.
+  @is:hasProperty:
+    infoset:Name
+  @is:hasProperty:
+    infoset:systemIdentifier
+  @is:hasProperty:
+    infoset:publicIdentifier
+  @is:hasProperty:
+    infoset:declarationBaseURI
+
+InfoItemDef:
+  @QName:
+    infoset:Namespace
+  @InfosetName: namespace
+  @enDesc:
+    A namespace that is in scope for an element.
+  @is:hasProperty:
+    infoset:prefix
+  @is:hasProperty:
+    infoset:namespaceName
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+  
+ElementTypeBinding:
+  @Name: enLabel
+  @ElementType:
+    dis:Label
+  @ShadowContent:
+    @@lang:en
+
+## -- Link Set Infoset Contributions from XML Linking and Style WG Note
+
+InfoPropDef:
+  @QName: linkSet
+  @InfosetName: link set
+  @enDesc:
+    The set of <InfoItem::link information items> 
+    associated with this document.
+  @rdfs:domain:
+    infoset:Document
+  @rdfs:range:
+    LinkBag
+
+ResourceDef:
+  @QName: ElementBag
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf:
+    infoset:InfoItemBag
+
+ResourceDef:
+  @QName: LinkBag
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf: ElementBag
+  @enDesc:
+    An unordered set of <InfoItem::link information items>.
+
+InfoPropDef:
+  @QName: startingParticipantArcs
+  @InfosetName: starting participant arcs
+  @enDesc:
+    A list of the <InfoItem::arc information items>
+    for which this information item is a part of 
+    the <InfoItem::start participant information item>
+    for the arc.
+  @rdfs:domain:
+    infoset:InfoItem
+  @rdfs:range:
+    StartParticipantBag
+
+ResourceDef:
+  @QName: StartParticipantBag
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf: ElementBag
+  @enDesc:
+    An unordered set of <InfoItem::start participant information items>.
+
+InfoPropDef:
+  @QName: endingParticipantArcs
+  @InfosetName: ending participant arcs
+  @enDesc:
+    A list of the <InfoItem::arc information items>
+    for which this information item is a part of 
+    the <InfoItem::end participant information item>
+    for the arc.
+  @rdfs:domain:
+    infoset:InfoItem
+  @rdfs:range:
+    EndParticipantBag
+
+ResourceDef:
+  @QName: EndParticipantBag
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf: ElementBag
+  @enDesc:
+    An unordered set of <InfoItem::end participant information items>.
+
+## -- From XInclude 1.0
+
+InfoPropDef:
+  @QName: includeHistory
+  @InfosetName: include history
+  @enDesc:
+    A list of <InfoItem::element information items> representing
+    the <Q::xi:include> elements for recursive levels of inclusion.
+  @rdfs:domain:
+    infoset:InfoItem
+  @rdfs:range:
+    XIncludeElementSeq
+
+ResourceDef:
+  @QName: ElementSeq
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf:
+    infoset:InfoItemSeq
+
+ResourceDef:
+  @QName: XIncludeElementSeq
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf:
+    ElementSeq
+  @enDesc:
+    An ordered list of <Q::xi:include> <InfoItem::element information items>
+    representing recursive levels of inclusion.
+
+InfoPropDef:
+  @QName: language
+  @InfosetName: language
+  @enDesc:
+    The <InfoProp::normalized value> of the <XA::xml:lang> 
+    <InfoItem::attribute information item> apperaring on the
+    <InfoItem::element information item>, if any, or
+    the value of the <InfoProp::language> property 
+    of the <InfoProp::parent> <InfoItem::element information item>
+    if any.
+  @noValueCase:
+    @@enDesc:
+      Either this <InfoItem::element information item> has an
+      <XA::xml:lang> <InfoItem::attribute information item>
+      whose <InfoProp::normalized value> is an empty string
+      or this <InfoItem::element information item> does not 
+      have such an <InfoItem::attribute information item> 
+      and there is no <InfoProp::parent> <InfoItem::element information item>.
+  @rdfs:domain:
+    infoset:Element
+  @rdfs:range:
+    infoset:Literal
+  @Type:
+    infoset:Literal::ManakaiDOM:all
+
+## TODO: PSVI
+
+## XHTML m12n Modularized Document Types
+
+ResourceDef:
+  @QName:
+    m12n:DocumentModel
+  @enDesc:
+    The effective structure and constraints of a given document type.
+    The document model constitutes the abstract representation of 
+    the physical or semantic structures of a class of documents.
+  @rdf:type:
+    rdfs:Class
+
+ResourceDef:
+  @QName:
+    m12n:DocumentType
+  @enDesc:
+    A class of documents sharing a common abstract structure. 
+  @rdf:type:
+    rdfs:Class
+# @rdfs:subClassOf:
+#   sgml:DocumentType
+
+ResourceDef:
+  @QName:
+    m12n:HybridDocumentType
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf:
+    m12n:DocumentType
+  @enDesc:
+    A hybrid document type is a document type composed from
+    a collection of XML DTDs or DTD Modules.
+
+ResourceDef:
+  @QName:
+    m12n:DocumentTypeDefinition
+  @enDesc:
+    A formal, machine-readable expression of the XML structure and
+    syntax rules to which a document instance of a specific document
+    type must conform; the schema type used in XML 1.0 to validate
+    conformance of a document instance to its declared document type.
+  @rdf:type:
+    rdfs:Class
+
+ResourceDef:
+  @QName:
+    m12n:MarkupModel
+  @enDesc:
+    The markup vocabulary and grammer as defined by a document
+    type definition.
+    \
+    The markup model is the concrete representation in markup syntax
+    of the document model.  The same document model may be 
+    expressed by a variety of markup models.
+  @rdf:type:
+    rdfs:Class
+
+ResourceDef:
+  @QName:
+    m12n:Driver
+  @enDesc:
+    A generally short file used to declare and instantiate the
+    modules of a DTD.
+  @rdf:type:
+    rdfs:Class
+
+ResourceDef:
+  @QName:
+    m12n:HybridDocument
+  @enDesc:
+    A hybrid document is a document that uses more than one XML
+    namespaces.
+  @rdf:type:
+    rdfs:Class
+
+ResourceDef:
+  @QName:
+    m12n:parentDocumentType
+  @enDesc:
+    The parent document type of a hybrid document is 
+    the document type of the root element.
+  @rdf:type:
+    rdf:Property
+  @rdfs:domain:
+    m12n:HybridDocument
+  @rdfs:range:
+    m12n:DocumentType
+
+ResourceDef:
+  @QName:
+    m12n:AbstractModule
+  @enDesc:
+    A unit of document type specification corresponding to 
+    a distinct type of content, corresponding to a 
+    markup construct reflecting this distinct type.
+  @rdf:type:
+    rdfs:Class
+
+ResourceDef:
+  @QName:
+    m12n:Module
+  @enDesc:
+    An anstract unit within a document model expressed as a
+    DTD fragment, used to consolidate markup declaration.
+  @rdf:type:
+    rdfs:Class
+
+ResourceDef:
+  @QName: AnyModuleDefinition
+  @enDesc:
+    A module definition with any implementation mechanism.
+  @rdf:type:
+    rdfs:Class
+
+ResourceDef:
+  @QName:
+    m12n:ModuleImplementation
+  @enDesc:
+    A module implementation consists of element types,
+    attribute-list declarations, and/or 
+    content model declarations.
+    \
+    Implementation mechanisms include XML DTDs and XML Schemas.
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf: AnyModuleDefinition
+
+ResourceDef:
+  @QName:
+    m12n:XHTMLFamilyModule
+  @enDesc:
+    An XHTML-comforming module.
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf:
+    m12n:Module
+
+ResourceDef:
+  @QName: AbstractModuleDefinition
+  @enDesc:
+    A definition of a module using prose text and some informal
+    markup conventions as defined in XHTML m12n specification.
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf: AnyModuleDefinition
+
+ResourceDef:
+  @QName:
+    m12n:MarkupDeclaration
+  @enDesc:
+    A syntactical construct within a DTD declaring an entity or
+    defining a markup structure.
+  @rdf:type:
+    rdfs:Class
+
+ResourceDef:
+  @QName:
+    m12n:ElementType
+  @enDesc:
+    A container for a distinct semantic class of document content.
+  @rdf:type:
+    rdfs:Class
+
+ResourceDef:
+  @QName:
+    m12n:ElementDeclaration
+  @enDesc:
+    The element declaration constrains which element types
+    may occur as descendants within an element. 
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf:
+    m12n:MarkupDeclaration
+
+ResourceDef:
+  @QName:
+    m12n:Element
+  @enDesc:
+    An instance of an element type.
+  @rdf:type:
+    rdfs:Class
+
+ResourceDef:
+  @QName:
+    m12n:AttributeDefinitionListDeclaration
+  @enDesc:
+    The attribute definition list declaration defines
+    the set of attributes for a given element type and may 
+    also establish type constraints and default values.
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf:
+    m12n:MarkupDeclaration
+
+ResourceDef:
+  @QName:
+    m12n:ContentModel
+  @enDesc:
+    The declared markup structure allowed within instances
+    of an element type. 
+  @rdf:type:
+    rdfs:Class
+
+ResourceDef:
+  @QName: ElementContentModel
+  @enDesc:
+    XML 1.0 element content.
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf:
+    m12n:ContentModel
+
+ResourceDef:
+  @QName: MixedContentModel
+  @enDesc:
+    XML 1.0 mixed content.
+  @rdf:type:
+    rdfs:Class
+  @rdfs:subClassOf:
+    m12n:ContentModel
+
+ResourceDef:
+  @QName:
+    m12n:ModularizationModel
+  @enDesc:
+    The abstract design of the document type definition 
+    in support of the modularization goals.
+  @rdf:type:
+    rdfs:Class
+
+ResourceDef:
+  @QName:
+    m12n:Modularization
+  @enDesc:
+    An implementation of a modularization model.
+  @rdf:type:
+    rdfs:Class

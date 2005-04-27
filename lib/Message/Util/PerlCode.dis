@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/04/10 05:40:59 $
+      $Date: 2005/04/27 06:24:48 $
     @@ContentType:
       dis:Date.RCS
   
@@ -357,7 +357,49 @@ ClsDef:
             }
           }__;
         }
+
+  @Method:
+    @@Name: addUsePerlModuleName
+    @@enDesc:
+      Adds a Perl module into the list of Perl modules 
+      <Perl::use>d by this code fragment.
+    @@Param:
+      @@@Name: moduleName
+      @@@Type:
+        Perl:package-name::ManakaiDOM:all
+      @@@enDesc:
+        The name of the module package that should be <Perl::use>d.
+    @@Return:
+      @@@PerlDef:
+        $self->{<Q::TreeCore:node>}->{<Q::pc:useModuleName>}
+             ->{$moduleName} = true;
+
+  @Method:
+    @@Name: disAddRequireURI
+    @@enDesc:
+      Adds a <QUOTE::dis> resource into the list of <Perl::require>d
+      resources of this code fragment.
+    @@Param:
+      @@@Name: uriArg
+      @@@Type:
+        DISLang:String::ManakaiDOM:all
+      @@@enDesc:
+        The URI reference of the resource to add.
+    @@Return:
+      @@@PerlDef:
+        $self->{<Q::TreeCore:node>}->{<Q::pc:requireResourceURI>}
+             ->{$uriArg} = true;
 ##PerlCodeFragment
+
+PropDef:
+  @QName: useModuleName
+  @enDesc:
+    The list of modules. 
+
+PropDef:
+  @QName: requireResourceURI
+  @enDesc:
+    The list of resources.
 
 ResourceDef:
   @QName: nodeTypeToPackageName
@@ -474,6 +516,35 @@ ClsDef:
         __CODE{ManakaiNode:getNewReference::
                  $object => $r, $ref => $r,
                  $class => {<ClassName::ManakaiPerlPackageScope>}}__;
+
+  @Method:
+    @@Name: appendPackage
+    @@enDesc:
+      Appends a Perl package scope object.
+    @@Param:
+      @@@Name: codeArg
+      @@@Type: ManakaiPerlPackageScope
+      @@@enDesc:
+        The package to append.
+    @@Return:
+      @@@RaiseException:
+        @@@@@:IN_USE_NODE_ERR
+        @@@@enDesc:
+          An attempt is made to set a subroutine that is 
+          already used elsewhere. 
+      @@@PerlDef:
+        my $packobj = $codeArg->{<Q::TreeCore:node>};
+        if ($packobj->{<Q::pc:parent>}) {
+          __EXCEPTION{IN_USE_NODE_ERR::
+            pc:childNode => {$codeArg},
+            MDOMX:param-name => 'codeArg',
+          }__;
+        }
+        $self->{<Q::TreeCore:node>}
+             -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+                            .importTree> ($packobj);
+        push @{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}}, $packobj;
+        $packobj->{<Q::pc:parent>} = $self->{<Q::TreeCore:node>};
 
   @Method:
     @@Name: getFirstPackage
@@ -885,8 +956,6 @@ ClsDef:
         }
         if ($subArg->{<Q::TreeCore:node>}->{<Q::pc:parent>}) {
           __EXCEPTION{IN_USE_NODE_ERR::
-            pc:parentNode => {$subArg->{<Q::TreeCore:node>}
-                                        ->{<Q::pc:parent>}},
             pc:childNode => {$subArg},
           }__;
         }
@@ -1130,7 +1199,7 @@ ClsDef:
            + keys (%{$self->{<Q::TreeCore:node>}->{<Q::dis2pm:operator>}});
 
   @Method:
-    @@Name: addIsaPackage
+    @@Name: addISAPackage
     @@enDesc:
       Adds a class package that this class inherits. 
     @@Param:
@@ -1351,8 +1420,6 @@ ClsDef:
         }->{$codeArg->{<Q::TreeCore:node>}->{<Q::pc:nodeType>}}) {
           if ($codeArg->{<Q::TreeCore:node>}->{<Q::pc:parent>}) {
             __EXCEPTION{IN_USE_NODE_ERR::
-              pc:parentNode => {$codeArg->{<Q::TreeCore:node>}
-                                        ->{<Q::pc:parent>}},
               pc:childNode => {$codeArg},
             }__;
           }
@@ -1540,8 +1607,6 @@ ClsDef:
           }->{$arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:nodeType>}}) {
             if ($arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:parent>}) {
               __EXCEPTION{IN_USE_NODE_ERR::
-                pc:parentNode => {$arg->[1]->{<Q::TreeCore:node>}
-                                          ->{<Q::pc:parent>}},
                 pc:childNode => {$arg->[1]},
                 MDOMX:param-name => {$arg->[0]},
               }__;
@@ -1563,8 +1628,6 @@ ClsDef:
               }->{$arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:nodeType>}}) {
             if ($arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:parent>}) {
               __EXCEPTION{IN_USE_NODE_ERR::
-                pc:parentNode => {$arg->[1]->{<Q::TreeCore:node>}
-                                          ->{<Q::pc:parent>}},
                 pc:childNode => {$arg->[1]},
                 MDOMX:param-name => {$arg->[0]},
               }__;
@@ -2414,8 +2477,6 @@ ClsDef:
           }->{$arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:nodeType>}}) {
             if ($arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:parent>}) {
               __EXCEPTION{IN_USE_NODE_ERR::
-                pc:parentNode => {$arg->[1]->{<Q::TreeCore:node>}
-                                          ->{<Q::pc:parent>}},
                 pc:childNode => {$arg->[1]},
                 MDOMX:param-name => {$arg->[0]},
               }__;
@@ -2592,8 +2653,6 @@ ClsDef:
         }->{$codeArg->{<Q::TreeCore:node>}->{<Q::pc:nodeType>}}) {
           if ($codeArg->{<Q::TreeCore:node>}->{<Q::pc:parent>}) {
             __EXCEPTION{IN_USE_NODE_ERR::
-              pc:parentNode => {$codeArg->{<Q::TreeCore:node>}
-                                        ->{<Q::pc:parent>}},
               pc:childNode => {$codeArg},
             }__;
           }
@@ -3085,6 +3144,27 @@ ClsDef:
                  $object => $r, $ref => $r,
                  $class => {<ClassName::ManakaiPerlFile>}}__;
 
+  @Method:
+    @@Name: createPerlPackage
+    @@enDesc:
+      Creates a new package scope block. 
+    @@Param:
+      @@@Name: packageName
+      @@@Type:
+        Perl:package-name::ManakaiDOM:all
+      @@@enDesc:
+        The fully-qualified name of the package to create. 
+    @@Return:
+      @@@Type: ManakaiPerlPackageScope
+      @@@enDesc:
+        The newly created package scope object. 
+      @@@PerlDef:
+        $r = <ClassM::ManakaiPerlPackageScope.newObject>;
+        $r->{<Q::pc:packageName>} = $packageName;
+        __CODE{ManakaiNode:getNewReference::
+                 $object => $r, $ref => $r,
+                 $class => {<ClassName::ManakaiPerlPackageScope>}}__;
+
   @IntMethod:
     @@Name: perlComment
     @@ManakaiDOM:isStatic:1
@@ -3511,8 +3591,6 @@ ClsDef:
           }->{$arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:nodeType>}}) {
             if ($arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:parent>}) {
               __EXCEPTION{IN_USE_NODE_ERR::
-                pc:parentNode => {$arg->[1]->{<Q::TreeCore:node>}
-                                          ->{<Q::pc:parent>}},
                 pc:childNode => {$arg->[1]},
                 MDOMX:param-name => {$arg->[0]},
               }__;
@@ -3534,8 +3612,6 @@ ClsDef:
               }->{$arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:nodeType>}}) {
             if ($arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:parent>}) {
               __EXCEPTION{IN_USE_NODE_ERR::
-                pc:parentNode => {$arg->[1]->{<Q::TreeCore:node>}
-                                          ->{<Q::pc:parent>}},
                 pc:childNode => {$arg->[1]},
                 MDOMX:param-name => {$arg->[0]},
               }__;

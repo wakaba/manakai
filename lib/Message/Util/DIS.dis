@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/04/10 05:40:59 $
+      $Date: 2005/04/27 06:24:47 $
     @@ContentType:
       dis:Date.RCS
   
@@ -3529,36 +3529,7 @@ ClsDef:
             $r = $self-><AG::ManakaiDISModuleDefinition.plFullyQualifiedName>;
           }
         }__;
-
-  @Method:
-    @@Name: plAddRequireModule
-    @@enDesc:
-      Adds a <QUOTE::dis> module into the list of modules that 
-      defines a Perl module file referred by Perl module file
-      defined by this module.
-    @@Param:
-      @@@Name: moduleArg
-      @@@Type: ManakaiDISModuleDefinition
-      @@@enDesc:
-        A module definition.
-    @@Return:
-      @@@RaiseException:
-        @@@@@: RESOURCE_NOT_DEFINED_ERR
-        @@@@enDesc:
-          The module group to which <P::moduleArg> belongs
-          is not defined.
-      @@@PerlDef:
-        __DEEP{
-          my $pack = $moduleArg-><AG::ManakaiDISModuleDefinition
-                                     .plFullyQualifiedName>;
-          $self->{<Q::DIS:plRequireModule>}->{$pack} = true;
-        }__;
 ##DISModuleDefinition
-
-PropDef:
-  @QName: plRequireModule
-  @enDesc:
-    A list of Perl package name that this resource is referring.
 
 ElementTypeBinding:
   @Name: NoPerlModuleNameException
@@ -4571,6 +4542,21 @@ ClsDef:
       @@@disPerlException:
       @@@InlineElementException:
       @@@BlockElementException:
+      @@@RaiseException:
+        @@@@@:PERL_SUBROUTINE_ALREADY_DEFINED_ERR
+        @@@@enDesc:
+          A resource defines a Perl subroutine whose name is
+          same as the name of another subroutine. 
+      @@@RaiseException:
+        @@@@@:PERL_OPERATOR_ALREADY_OVERLOADED_ERR
+        @@@@enDesc:
+          A resource is defined to overload an operator 
+          that is also defined to be overloaded by another resource.
+      @@@RaiseException:
+        @@@@@:PERL_UNUSED_SUBROUTINE_ERR
+        @@@@enDesc:
+          A resource defines a Perl subroutine which is not
+          used anywhere.
       @@@PerlDef:
         __DEEP{
           if (exists $self->{<Q::plCodeFragment>}) {
@@ -4807,8 +4793,6 @@ ClsDef:
           } elsif ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
                                 (<Q::DISLang:Attribute>)) {  
             $self->{<Q::plCodeFragment>} = null;  ## To avoid loop
-            my $plimpl = $self-><AG::ManakaiDISResourceDefinition
-                                                       .plImplementation>;
             my $get = $self-><M::ManakaiDISResourceDefinition
                             .getChildResourceByType> (<Q::DISLang:AttributeGet>);
             unless ($get) { 
@@ -4819,6 +4803,8 @@ ClsDef:
                 }__;
               }__;
             }
+            my $plimpl = $self-><AG::ManakaiDISResourceDefinition
+                                                       .plImplementation>;
             my $data_type = $get-><AG::ManakaiDISResourceDefinition
                                       .disActualDataTypeResource>;
             my $get_code = $plimpl-><M::MPLImpl.createPerlBlockContainer>;
@@ -4957,6 +4943,99 @@ ClsDef:
                                         (q<@_ == 1>),
                       $get_code,
                       $set_code);
+          } elsif ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
+                              (<Q::ManakaiDOM:Class>)) {
+            my $plimpl = $self-><AG::ManakaiDISResourceDefinition
+                                                       .plImplementation>;
+            $r = $plimpl-><M::MPLImpl.createPerlPackage>
+                              ($self-><AG::ManakaiDISResourceDefinition
+                                         .plFullyQualifiedName>);
+            ## This class inherits...
+            for my $scls (@{$self-><M::ManakaiDISPropertyAccessor
+                                         .getPropertyResourceList>
+                                    (<Q::dis:ISA>,
+                                     default_media_type => <Q::dis:TFQNames>)}) {
+              my $spack_name = $scls-><AG::ManakaiDISResourceDefinition
+                                         .plFullyQualifiedName>;
+              if (defined $spack_name) {
+                $r-><M::PLPack.addISAPackage> ($spack_name);
+              }
+            }
+            ## This class implements...
+            for my $scls (@{$self-><M::ManakaiDISPropertyAccessor
+                                         .getPropertyResourceList>
+                                    (<Q::dis:Implement>, recursive_isa => true,
+                                     default_media_type => <Q::dis:TFQNames>)}) {
+              my $spack_name = $scls-><AG::ManakaiDISResourceDefinition
+                                         .plFullyQualifiedName>;
+              if (defined $spack_name) {
+                $r-><M::PLPack.addImplementPackage> ($spack_name);
+              }
+            }
+
+            ## TODO: Use's
+    
+            ## Class members
+            my @cr = @{$self-><M::ManakaiDISPropertyAccessor
+                                         .getPropertyResourceList>
+                                    (<Q::DIS:childResource>)};
+            for my $cr (@cr) {
+              if ($cr-><M::ManakaiDISResourceDefinition.isTypeURI>
+                                    (<Q::DISLang:Method>) or
+                  $cr-><M::ManakaiDISResourceDefinition.isTypeURI>
+                                    (<Q::DISLang:Attribute>)) {
+                my $is_attr = $cr-><M::ManakaiDISResourceDefinition.isTypeURI>
+                                    (<Q::DISLang:Attribute>) ? true : false;
+                my $pname = $cr-><AG::ManakaiDISResourceDefinition.plName>;
+                my $op = $cr-><AG::ManakaiDISResourceDefinition
+                                  .plMethodOperator>;
+                my $psub = $cr-><AG::ManakaiDISResourceDefinition
+                                  .plCodeFragment>;
+                if (defined $pname) {
+                  if ($r-><M::PLPack.getSub> ($pname)) {
+                    __UNDEEP{__EXCEPTION{PERL_SUBROUTINE_ALREADY_DEFINED_ERR::
+                      PerlCode:localName => {$pname},
+                      DIS:uri => {$cr->{uri}},
+                      DIS:sourceNode => {$cr->{src}},
+                    }__}__;
+                  }
+                  $r-><M::PLPack.setSub> ($pname => $psub);
+          
+                  if (defined $op and not $cr-><AG::ManakaiDISResourceDefinition
+                                                   .isAnonymous>) {
+                    if ($op =~ /^[A-Z]+$/) {
+                      if ($r-><M::PLPack.getSubAliasName> ($op)) {
+                        __UNDEEP{__EXCEPTION{
+                          PERL_SUBROUTINE_ALREADY_DEFINED_ERR::
+                            PerlCode:localName => {$op},
+                            DIS:uri => {$cr->{uri}},
+                            DIS:sourceNode => {$cr->{src}},
+                        }__}__;
+                      }
+                      $r-><M::PLPack.setSubAliasName> ($op => $pname);
+                    } else {
+                      if ($r-><M::PLPack.getOverloadMethodName> ($op)) {
+                        __UNDEEP{__EXCEPTION{
+                          PERL_OPERATOR_ALREADY_OVERLOADED_ERR::
+                            PerlCode:operator => {$op},
+                            DIS:uri => {$cr->{uri}},
+                            DIS:sourceNode => {$cr->{src}},
+                        }__}__;
+                      }
+                      $r-><M::PLPack.setOverloadMethodName> ($op => $pname);
+                    }
+                  }
+                } elsif (defined $op) {
+                  $r-><M::PLPack.setOverloadSub> ($op => $psub);
+                } else {
+                  __UNDEEP{__EXCEPTION{PERL_UNUSED_SUBROUTINE_ERR::
+                    DIS:uri => {$cr->{uri}},
+                    DIS:sourceNode => {$cr->{src}},
+                  }__}__;
+                }
+              }
+            }
+            ## TODO: Exceptions and constants and variables
           } else {  ## Not supported
             $r = $self->{<Q::plCodeFragment>} = null;
           } # rdf:type
@@ -5631,10 +5710,8 @@ ClsDef:
                   }
                   unless ($class-><M::ManakaiDISResourceDefinition.isTypeURI>
                                          (<Q::ManakaiDOM:IF>)) {
-                    $self-><AG::ManakaiDISResourceDefinition.definingModule>
-                         -><M::ManakaiDISModuleDefinition.plAddRequireModule>
-                                ($class-><AG::ManakaiDISResourceDefinition
-                                            .definingModule>);
+                    $self-><M::ManakaiDISResourceDefinition.plAddRequireResource>
+                                         ($class => $r);
                   }
                   my $method = $class-><M::ManakaiDISResourceDefinition
                                          .getChildResourceByNameAndType>
@@ -5829,6 +5906,8 @@ ClsDef:
                 } elsif ($source_code =~ /^t r y \s* \x7B$/x) {
                   $r-><M::PLInCon.appendCode> ('tr'.
                        'y '."\x7B".'local $Error::Depth = $Error::Depth + 3;');
+                  $r-><M::MPLCodeFragment.addUsePerlModuleName>
+                                                    ('Message::Util::Error');
                 } else {
                   $r-><M::PLInCon.appendCode> ($source_code);
                 }
@@ -6131,8 +6210,8 @@ ClsDef:
             DIS:expectedType => {<Q::DOMException:AnyExceptionClass>},
           }__;
         }
-        $self-><AG::ManakaiDISResourceDefinition.definingModule>
-           -><M::ManakaiDISModuleDefinition.plAddRequireModule> ($xclass_module);
+        $self-><M::ManakaiDISResourceDefinition.plAddRequireResource>
+                               ($xclass_module => $statement);
         $xparam->{-type} = {type => 'quoted',
                             value => $xcode-><AG::ManakaiDISResourceDefinition
                                                   .plName>};
@@ -6275,6 +6354,29 @@ ClsDef:
           }__;
           $self->{<Q::TreeCore:node>}->{<Q::DIS:plDefined>} = $r;
         }
+  
+  @IntMethod:
+    @@Name: plAddRequireResource
+    @@enDesc:
+      Adds a resource to the list of resources that should
+      be <Perl::require>d from a Perl code fragment.
+    @@Param:
+      @@@Name: resourceArg
+      @@@Type: ManakaiDISResourceDefinition
+      @@@enDesc:
+        A resource that is <Perl::require>d by <P::codeArg>.
+    @@Param:
+      @@@Name: codeArg
+      @@@Type: MPLCodeFragment
+      @@@enDesc:
+        A code fragment.  <P::resourceArg> is added to the
+        list of <Perl::require>d resources of this code fragment.
+    @@Return:
+      @@@PerlDef:
+        __DEEP{
+          $codeArg-><M::MPLCodeFragment.disAddRequireURI>
+                      ($resourceArg-><AG::ManakaiDISResourceDefinition.uri>);
+        }__;
 ##DISResourceDefinition
 
 PropDef:
@@ -6431,6 +6533,13 @@ ResourceDef:
     ManakaiDOM:IF
   @AliasFor:
     DOMMetaImpl:ManakaiDOMMinimumImplementationIF::ManakaiDOM:ManakaiDOMLatest
+
+ResourceDef:
+  @QName: PLPack
+  @rdf:type:
+    ManakaiDOM:Class
+  @AliasFor:
+    PerlCode:ManakaiPerlPackageScope::ManakaiDOM:Perl
 
 ResourceDef:
   @QName: SWCFGNode
@@ -7417,6 +7526,45 @@ ExceptionDef:
          @@@@@enDesc:
            The type of the element by which this attribute
            is referred.
+     @@@XSubTypeDef:
+       @@@@QName: PERL_SUBROUTINE_ALREADY_DEFINED_ERR
+       @@@@enDesc:
+         A resource defines a Perl subroutine whose name is 
+         same as another subroutine. 
+       @@@@XSourceNodeParam:
+       @@@@XParam:
+         @@@@@QName:uri
+         @@@@@enDesc:
+           The URI reference of the resource that defines the Perl subroutine. 
+       @@@@XParam:
+         @@@@@QName:
+           PerlCode:localName
+         @@@@@enDesc:
+           The name of the Perl subroutine. 
+     @@@XSubTypeDef:
+       @@@@QName: PERL_OPERATOR_ALREADY_OVERLOADED_ERR
+       @@@@enDesc:
+         A resource is defined to overload a Perl operator which 
+         is already overloaded by another resource.
+       @@@@XSourceNodeParam:
+       @@@@XParam:
+         @@@@@QName:uri
+         @@@@@enDesc:
+           The URI reference of the resource that defines the overloading.
+       @@@@XParam:
+         @@@@@QName: 
+           PerlCode:operator
+         @@@@@enDesc:
+           The operator. 
+     @@@XSubTypeDef:
+       @@@@QName: PERL_UNUSED_SUBROUTINE_ERR
+       @@@@enDesc:
+         A resource defines a Perl subroutine but it is not used.
+       @@@@XSourceNodeParam:
+       @@@@XParam:
+         @@@@@QName:uri
+         @@@@@enDesc:
+           The URI reference of the resource.
 ##DISException
 
 XParamDef:

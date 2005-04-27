@@ -27,7 +27,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/16 04:25:00 $
+      $Date: 2005/04/27 06:24:48 $
     @@ContentType:
       dis:Date.RCS
   
@@ -37,14 +37,22 @@ Module:
   @Require:
     @@Module:
       @@@Name: DISCore
+      @@@QName:
+        DIS:DISCore
+    @@Module:
+      @@@Name: XML
+      @@@QName:
+        DIS:XML
 
 Namespace:
   @DIS:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @infoset:
+    http://www.w3.org/2001/04/infoset#
   @license:
-     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
   @ManakaiDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @owl:
@@ -150,6 +158,10 @@ ResourceDef:
     rdfs:Class
   @subsetOf:
     rdfs:Class
+  @rdfs:subClassOf:
+    infoset:Literal
+  @subsetOf:
+    infoset:Literal
   @noVariant:
 
 ResourceDef:
@@ -422,5 +434,19 @@ PropType:
       Transitive properties.  A property <VAR::P> is transitive iff 
       <MATH::<VAR::x> <VAR::P> <VAR::y> and <VAR::y> <VAR::P> <VAR::z> 
              =<gt> <VAR::x> <VAR::P> <VAR::z>>. 
+
+## -- Containers
+
+ResourceDef:
+  @QName:
+    rdf:Bag
+  @rdf:type:
+    rdfs:Class
+
+ResourceDef:
+  @QName:
+    rdf:Seq
+  @rdf:type:
+    rdfs:Class
 
 ## DISRDF.dis ends here
