@@ -1522,10 +1522,12 @@ Get property values from a resource and its superclasses
 
 =cut
 
-## TODO: Loop test might be required
+our $DispmCollectHashPropValueDepth = 0;
 sub dispm_collect_hash_prop_value ($$%) {
   my ($res, $propu, %opt) = @_;
   my %r;
+  local $DispmCollectHashPropValueDepth = $DispmCollectHashPropValueDepth + 1;
+  return {} if $DispmCollectHashPropValueDepth == 10;
   for (@{$res->{ISA}||[]}) {
     %r = (%{dispm_collect_hash_prop_value ($State->{Type}->{$_}, $propu, %opt)},
           %r);
@@ -1603,13 +1605,15 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
           ->{$pack->{ExpandedURI q<dis2pm:packageName>}} = -1;
     for my $uri (@{$pack->{ISA}||[]}, 
                  @{$pack->{Implement}||[]}) {
-      my $pack = $State->{Type}->{$uri};
-      if (defined $pack->{ExpandedURI q<dis2pm:packageName>}) {
-        push @$isa, $pack->{ExpandedURI q<dis2pm:packageName>};
-        if ($pack->{ExpandedURI q<dis2pm:type>} eq 
+      my $ipack = $State->{Type}->{$uri};
+      if (defined $ipack->{ExpandedURI q<dis2pm:packageName>} and
+          $ipack->{ExpandedURI q<dis2pm:packageName>}
+            ne $pack->{ExpandedURI q<dis2pm:packageName>}) {
+        push @$isa, $ipack->{ExpandedURI q<dis2pm:packageName>};
+        if ($ipack->{ExpandedURI q<dis2pm:type>} eq 
             ExpandedURI q<ManakaiDOM:ExceptionIF>) {
           $State->{ExpandedURI q<dis2pm:xifReferred>}
-                ->{$pack->{ExpandedURI q<dis2pm:packageName>}} ||= 1;
+                ->{$ipack->{ExpandedURI q<dis2pm:packageName>}} ||= 1;
         }
       } else {
         impl_msg ("Inheriting package name for <$uri> not defined",
@@ -2362,4 +2366,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/04/27 12:32:39 $
+1; # $Date: 2005/04/28 15:22:59 $

@@ -20,7 +20,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/04/01 07:58:46 $
+      $Date: 2005/04/28 15:22:59 $
     @@ContentType:
       dis:Date.RCS
   
@@ -108,6 +108,71 @@ Namespace:
     http://www.w3.org/XML/1998/namespace
   @xmlns:
     http://www.w3.org/2000/xmlns/
+
+## -- Manakai object
+
+ResourceDef:
+  @QName: 
+    ManakaiDOM:ManakaiDOMObject
+  @rdf:type:
+    ManakaiDOM:Class
+  @For: 
+    ManakaiDOM:ManakaiDOM
+
+  @Description:
+    @@lang:en
+    @@@:
+      The common class that is inherited by all manakai DOM object classes.
+  
+  @IntMethod:
+    @@Operator:
+      @@@@:
+        ManakaiDOM:MUErrorHandler
+      @@@ContentType:
+        dis:TypeQName
+    @@Description:
+      @@@lang:en
+      @@@@:
+        This method is a generic error handler; all manakai exceptions 
+        and warnings associated to an object are once reported to this method 
+        and then delivered to appropriate entities. 
+        \
+        If the error is an exception (such as <X::DOMCore:DOMException> or 
+        <X::ManakaiDOM:ManakaiDOMImplementationException>), it is 
+        simply thrown.  If the error is only a warning, it is reported 
+        via the <IF::DOMCore:DOMError> interface. 
+        \
+        See <PerlModule::Message::Util::Error> documentation for more 
+        information on the error reporting mechanism.
+        \
+        {NOTE:: This kind of methods are named as <Perl::___report_error> 
+                in the convention of <PerlModule::Message::Util::Error>. 
+        \
+        }
+    @@Param:
+      @@@Name:err
+      @@@Type: 
+        ManakaiDOM:ManakaiDOMExceptionOrWarning::ManakaiDOM:Perl
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          An exception object that describes what kind of error it is 
+          and how it should be recovered. 
+          \
+          {NOTE:: Exception objects in manakai implementation 
+                  inherit the class <PerlModule::Message::Util::Error>, 
+                  that in turn inherits <PerlModule::Error>.
+          \
+          }
+    @@Return:
+      @@@PerlDef:
+          if ($err->isa (<ClassName::ManakaiDOM:ManakaiDOMException
+                                   ::ManakaiDOM:Perl>)) {
+            $err->throw;
+          } else {
+            \## TODO: Implement warning reporting
+            warn $err->stringify;
+          }
 
 ## -- The feature system (DOM)
 
@@ -802,7 +867,7 @@ IFClsDef:
      @@Param:
         @@@Name:  index
         @@@Type:  
-          DOMMain:unsigned-long
+          DOMMain:unsigned-long::ManakaiDOM:all
         @@@Description:
           @@@@lang:en
           @@@@@: 
@@ -847,7 +912,7 @@ IFClsDef:
          http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DOMImplementationList-length
      @@Get:
         @@@Type:  
-          DOMMain:unsigned-long
+          DOMMain:unsigned-long::ManakaiDOM:all
         @@@PerlDef:
             $r = @$self;
   @IntMethod:
@@ -884,7 +949,7 @@ IFClsDef:
           <IF::DOMImplementationList> objects to add.
     @@Return:
       @@@Type:
-        DOMMain:boolean
+        DOMMain:boolean::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@: Whether the addition has succeed or not. 
@@ -905,7 +970,7 @@ IFClsDef:
           for (@list) {
             if (UNIVERSAL::isa ($_, <IFName::DOMCore:DOMImplementationList>)) {
               __DEEP{
-                my $len = $_-><M::DOMCore:DOMImplementationList.length>; 
+                my $len = $_-><AG::DOMCore:DOMImplementationList.length>; 
                 for (my $i = 0; $i < $len; $i++) {
                   push @$self, $_-><M::DOMCore:DOMImplementationList.item> ($i);
                 }
@@ -1153,7 +1218,7 @@ IFClsDef:
           The version number of the feature to test. 
     @@Return:
       @@@Type:  
-        DOMMain:boolean
+        DOMMain:boolean::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@: 
@@ -1212,7 +1277,7 @@ IFClsDef:
             A feature version number to request.
      @@Return:
         @@@Type:  
-          DOMMain:DOMObject
+          DOMMain:DOMObject::ManakaiDOM:all
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -1267,6 +1332,14 @@ IFClsDef:
                           ::ManakaiDOM:Perl.newReference> ($self);
         $node->{<Q::ManakaiDOM:implID>} = $node->{<Q::TreeCore:nodeID>};
 ##ManakaiDOMMinimumImplementation
+
+PropDef:
+  @QName:
+    DOMCore:implementation
+  @Description:
+    @@lang:en
+    @@@:
+      The implementation object.
 
 ElementTypeBinding:
   @Name: PerlDef

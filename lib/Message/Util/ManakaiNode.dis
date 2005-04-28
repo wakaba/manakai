@@ -21,7 +21,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/03/16 09:08:14 $
+      $Date: 2005/04/28 15:22:59 $
     @@ContentType:
       dis:Date.RCS
   
@@ -158,7 +158,7 @@ ClassDef:
         @@@@lang:en
         @@@@@: 
           The newly created <Class::ManakaiDOM:ManakaiDOMNodeObject> instance.
-      @@@PerlDef:
+      @@@PerlDef: 
           $r = bless {
             <Q::TreeCore:origin> => [],
             <Q::TreeCore:subnode0> => [],
@@ -183,7 +183,7 @@ ClassDef:
     @@Param:
       @@@Name: class
       @@@Type:
-        Perl:package-name
+        Perl:package-name::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -200,7 +200,7 @@ ClassDef:
       @@@PerlDef:
           $r = bless {
             <Q::TreeCore:node> => $self,
-          }, ref $class ? ref $class : $class ? $class :
+          }, ref $class ? ref $class : defined $class ? $class :
              <ClassName::ManakaiDOM:ManakaiDOMNodeReference>;
           $self->{<Q::TreeCore:rc>}++;
 
@@ -315,11 +315,11 @@ ClassDef:
         from the outside of the tree or not. 
     @@Return:
       @@@Type: 
-        DISPerl:Boolean
+        DISPerl:Boolean::ManakaiDOM:all
       @@@InCase:
         @@@@Value: true
         @@@@Type:
-          DISPerl:Boolean
+          DISPerl:Boolean::ManakaiDOM:all
         @@@@Description:
           @@@@@lang:en
           @@@@@@: 
@@ -328,7 +328,7 @@ ClassDef:
       @@@InCase:
         @@@@Value: false
         @@@@Type:
-          DISPerl:Boolean
+          DISPerl:Boolean::ManakaiDOM:all
         @@@@Description:
           @@@@@lang:en
           @@@@@@: No external reference found.
@@ -490,7 +490,7 @@ ClassDef:
     @@Param:
       @@@Name: treeID
       @@@Type: 
-        DISPerl:String
+        DISPerl:String::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -554,7 +554,7 @@ ClassDef:
         }
     @@Return:
       @@@Type:
-        Perl:ARRAY
+        Perl:ARRAY::ManakaiDOM:all
       @@@PerlDef:
         my %result;
         my @node = ($self);
@@ -596,7 +596,7 @@ ClassDef:
           A node to compare with. 
     @@Return:
       @@@Type: 
-        DISPerl:Boolean
+        DISPerl:Boolean::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@: Whether the two nodes are same or not.

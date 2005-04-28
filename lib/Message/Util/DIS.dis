@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/04/27 12:32:39 $
+      $Date: 2005/04/28 15:22:59 $
     @@ContentType:
       dis:Date.RCS
   
@@ -796,8 +796,8 @@ ClsDef:
             This node is a document node. 
       @@@PerlDef:
         $r = <ClassM::ManakaiDISNode.getNodeReference>
-                ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:ownerDocument>})
-          if $self->{<Q::TreeCore:node>}->{<Q::DOMCore:ownerDocument>};
+                ($self->{<Q::TreeCore:node>}->{<Q::swcfg21:ownerDocument>})
+          if $self->{<Q::TreeCore:node>}->{<Q::swcfg21:ownerDocument>};
 ##DISNode
 
 ClsDef:
@@ -1893,7 +1893,7 @@ ClsDef:
               }
             } elsif ($const-><M::ManakaiDISResourceDefinition.isTypeURI>
                                  (<Q::DISLang:AnyMethod>)) {
-              my $ret = $self-><M::ManakaiDISResourceDefinition
+              my $ret = $const-><M::ManakaiDISResourceDefinition
                                   .getChildResourceByType>
                                  ($const-><M::ManakaiDISResourceDefinition
                                         .isTypeURI> (<Q::DISLang:Method>)
@@ -1909,6 +1909,8 @@ ClsDef:
                       DIS:errResource => {$const},
                       DIS:sourceNode => {$const->{src}},
                       DIS:elementType => {$et},
+                      DIS:uri => {$const->{uri}},
+                      DIS:localName => {$const->{localName}},
                     }__;
                   } elsif ($on and $on eq 'set') {
                     __EXCEPTION{NO_ATTR_SET_ERR::
@@ -1949,14 +1951,10 @@ ClsDef:
                             (null, $disResource->{db},
                              for_arg => $forArg,
                              forp_arg => $forpArg);
-            if ($containsStatements) {
-              $r = $plimpl-><M::MPLImpl.createPerlStatement>;
-              my $rvar = $plimpl-><M::MPLImpl.createPerlVariable>
+            $r = $plimpl-><M::MPLImpl.createPerlStatement>;
+            my $rvar = $plimpl-><M::MPLImpl.createPerlVariable>
                                                  ('$', null, 'r');
-              $r-><M::PLAnyCon.appendNewAssignment> ($rvar => $val);
-            } else {
-              $r = $val;
-            }
+            $r-><M::PLAnyCon.appendNewAssignment> ($rvar => $val);
           } elsif ({
             <Q::dis:GetProp> => true,
             <Q::dis:GetPropNode> => true,
@@ -3383,6 +3381,7 @@ ClsDef:
     <QUOTE::dis> module definitions. 
   @ClsISA: ManakaiDISPropertyAccessor
   @ClsISA: ManakaiDISExceptionTarget
+  @ClsISA: ManakaiDISPerlModuleDefinition
   
   @Attr:
     @@Name: uri
@@ -3394,6 +3393,33 @@ ClsDef:
     @@Get:
       @@@PerlDef:
         $r = $self->{uri};
+
+  @IntMethod:
+    @@Operator:
+      @@@@:eq
+      @@@ContentType:
+        lang:Perl
+    @@enDesc:
+      Whether two <QUOTE::dis> module definitions are equal or not. 
+      Two <QUOTE::dis> module definitions are equal iff their canonical
+      URI references are literally (in character-by-character) equivalent.
+    @@Param:
+      @@@Name: anotherModule
+      @@@Type: ManakaiDISModuleDefinition
+      @@@enDesc:
+        Another <QUOTE::dis> module definition to compare.
+    @@Return:
+      @@@Type:
+        DOMMain:boolean::ManakaiDOM:all
+      @@@enDesc:
+        Whether two resources are equal or not. 
+      @@@PerlDef:
+        if (UNIVERSAL::isa ($anotherModule,
+                            <ClassName::ManakaiDISModuleDefinition>)) {
+          $r = $self->{uri} eq $anotherModule->{uri};
+        } else {
+          $r = false;
+        }
 
   @Attr:
     @@Name: nameURI
@@ -3527,6 +3553,15 @@ ClsDef:
             $r = $self-><AG::ManakaiDISModuleDefinition.plFullyQualifiedName>;
           }
         }__;
+
+  @Attr:
+    @@Name: ownerModule
+    @@ManakaiDOM:isRedefining:1
+    @@enDesc:
+      This module itself.
+    @@Get:
+      @@@Type: ManakaiDISModuleDefinition
+      @@@PerlDef: $r = $self;
 ##DISModuleDefinition
 
 ElementTypeBinding:
@@ -3661,7 +3696,8 @@ ClsDef:
         $self->{<Q::isReferred>} = $given if $given;
 
   @Attr:
-    @@Name: definingModule
+    @@Name: ownerModule
+    @@ManakaiDOM:isRedefining:1
     @@Description:
       @@@lang:en
       @@@@:
@@ -3713,11 +3749,96 @@ ClsDef:
 ##DISForDefinition
 
 ClsDef:
+  @ClsQName: ManakaiDISPerlModuleDefinition
+  @enDesc:
+    A class inherited by classes whose object might (but not necessarily) define
+    a Perl module. 
+  @ImplNote:
+    @@lang:en
+    @@@:
+      Any object whose class inheriting this class must also inherit
+      the <Class::ManakaiDISPropertyAccessor> class.
+  
+  @Method:
+    @@Name: plGeneratePerlModuleFile
+    @@enDesc:
+      Generates a Perl file object. 
+    @@Return:
+      @@@Type: PLFile
+      @@@enDesc:
+        A Perl file object generated from this resource.
+      @@@RaiseException:
+        @@@@@:NO_LICENSE_ATTR_ERR
+        @@@@enDesc:
+          The <Q::dis:Module> element does not have the
+          <Q::dis:License> attribute.
+      @@@NoPerlModuleNameException:
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::ManakaiDISPropertyAccessor.plImplementation>
+                    -><M::MPLImpl.createPerlFile>;
+          $r-><AS::PLFile.sourceFile>
+                 ($self-><M::ManakaiDISPropertyAccessor.getPropertyText>
+                                (<Q::DIS:sourceFile>, ''));
+          $r-><AS::PLFile.sourceModule> ($self->{nameURI});
+          $r-><AS::PLFile.sourceFor> ($self->{for});
+        
+          my $ownermod = $self-><AG::ManakaiDISPropertyAccessor.ownerModule>;
+          my $license = $ownermod-><M::ManakaiDISPropertyAccessor
+                                     .getPropertyResource> (<Q::dis:License>);
+          unless ($license) {
+            __UNDEEP{__EXCEPTION{NO_LICENSE_ATTR_ERR::
+              DIS:sourceNode => {$ownermod->{src}},
+              DIS:uri => {$ownermod->{uri}},
+            }__}__;
+          }
+          $r-><AS::PLFile.licenseURI>
+                            ($license-><AG::ManakaiDISResourceDefinition.uri>);
+
+          ## TODO: Custom module construction support
+          for my $cls (@{$self-><M::ManakaiDISPropertyAccessor
+                                   .getPropertyResourceList>
+                                              (<Q::DIS:resource>)}) {
+            if ($cls-><M::ManakaiDISResourceDefinition.isTypeURI>
+                              (<Q::ManakaiDOM:Class>) and
+                $cls-><AG::ManakaiDISResourceDefinition.ownerModule>
+                   eq $ownermod) {
+              my $pack = $cls-><AG::ManakaiDISResourceDefinition.plCodeFragment>;
+              $r-><M::PLFile.appendPackage> ($pack);
+            }
+          }
+
+          ## TODO: Custom module construction support
+          my $thismod_name = $self-><AG::ManakaiDISModuleDefinition
+                                                     .plFullyQualifiedName>;
+          for my $uri (@{$r-><M::MPLCodeFragment.disGetRequireURIList>}) {
+            my $mod = $self->{db}-><M::ManakaiDISDatabase.getResource> ($uri)
+                           -><AG::ManakaiDISResourceDefinition.ownerModule>;
+            next unless $mod;
+            my $pack = $mod-><AG::ManakaiDISModuleDefinition
+                                                     .plFullyQualifiedName>;
+            $r-><M::PLFile.addRequirePerlModuleName> ($pack)
+              unless $pack eq $thismod_name;
+          }
+        }__;
+
+
+##DISPerlModuleDefinition
+
+ResourceDef:
+  @QName: PLFile
+  @AliasFor:
+    PerlCode:ManakaiPerlFile::ManakaiDOM:Perl
+  @rdf:type:
+    rdfs:Class
+
+ClsDef:
   @ClsQName: ManakaiDISResourceDefinition
   @enDesc:
     <QUOTE::dis> resource definitions. 
   @ClsISA: ManakaiDISPropertyAccessor
   @ClsISA: ManakaiDISExceptionTarget
+  @ClsISA: ManakaiDISPerlModuleDefinition
 
   @IntMethod:
     @@Operator:
@@ -3958,15 +4079,12 @@ ClsDef:
         $self->{<Q::isReferred>} = $given if $given;
 
   @Attr:
-    @@Name: definingModule
+    @@Name: ownerModule
+    @@ManakaiDOM:isRedefining:1
     @@Description:
       @@@lang:en
       @@@@:
         The <QUOTE::dis> module in which this resource is defined.
-        \
-        {NOTE:: Method name should have been <CODE::ownerModule> or some.
-        \
-        }
     @@Type: ManakaiDISModuleDefinition
     @@Get:
       @@@Description:
@@ -3983,14 +4101,6 @@ ClsDef:
                   -><M::ManakaiDISDatabase.getModule>
                            ($self->{<Q::definingModule>})
            if defined $self->{<Q::definingModule>};
-   @@Set:
-     @@@Description:
-       @@@@lang:en
-       @@@@@:
-         The module object to which the <QUOTE::defining module> is set. 
-     @@@PerlDef:
-       $self->{<Q::defininingModule>}
-                 = $given-><AG::ManakaiDISModuleDefinition.uri>;
    
   @Method:
     @@Name: mergeAsAlias
@@ -4238,11 +4348,11 @@ ClsDef:
               }
               if ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
                               (<Q::ManakaiDOM:IF>)) {
-                $r = $self-><AG::ManakaiDISResourceDefinition.definingModule>
+                $r = $self-><AG::ManakaiDISResourceDefinition.ownerModule>
                           -><AG::ManakaiDISModuleDefinition.plInterfaceName>
                    . '::' . $self->{localName};
               } else {
-                $r = $self-><AG::ManakaiDISResourceDefinition.definingModule>
+                $r = $self-><AG::ManakaiDISResourceDefinition.ownerModule>
                           -><AG::ManakaiDISModuleDefinition.plFullyQualifiedName>
                    . '::' . $self->{localName};
               }
@@ -4273,14 +4383,18 @@ ClsDef:
                    <ClassM::ManakaiDISImplementation.camelCaseToUnderscoreName>
                                                        ($r) .
                    '}';
-            } elsif ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
-                                                       (<Q::Perl:Array>)) {
-              $r = '@' . $r;
-            } elsif ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
-                                                       (<Q::Perl:Hash>)) {
-              $r = '%' . $r;
             } else {
-              $r = '$' . $r;
+              my $dt = $self-><AG::ManakaiDISResourceDefinition
+                                 .disActualDataTypeResource>;
+              if ($dt-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
+                                                       (<Q::Perl:Array>)) {
+                $r = '@' . $r;
+              } elsif ($dt-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
+                                                       (<Q::Perl:Hash>)) {
+                $r = '%' . $r;
+              } else {
+                $r = '$' . $r;
+              }
             }
           }__;
         }
@@ -4294,10 +4408,12 @@ ClsDef:
     @@Get:
       @@@PerlDef:
           __DEEP{
-            if ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
+            my $dt = $self-><AG::ManakaiDISResourceDefinition
+                                 .disActualDataTypeResource>;
+            if ($dt-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
                                                        (<Q::Perl:Array>)) {
               $r = '@' . $r;
-            } elsif ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
+            } elsif ($dt-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
                                                        (<Q::Perl:Hash>)) {
               $r = '%' . $r;
             } else {
@@ -4661,10 +4777,12 @@ ClsDef:
                 __EXCEPTION{NO_METHOD_RETURN_ERR::
                   DIS:errResource => {$self},
                   DIS:sourceNode => {$self->{src}},
+                  DIS:uri => {$self->{uri}},
+                  DIS:localName => {$self->{localName}},
                 }__;
               }__;
             }
-            my $plimpl = $self-><AG::ManakaiDISResourceDefinition
+            my $plimpl = $self-><AG::ManakaiDISPropertyAccessor
                                                        .plImplementation>;
             $r = $self->{<Q::plCodeFragment>}
                = $plimpl-><M::MPLImpl.createPerlSub>
@@ -4839,7 +4957,7 @@ ClsDef:
                 }__;
               }__;
             }
-            my $plimpl = $self-><AG::ManakaiDISResourceDefinition
+            my $plimpl = $self-><AG::ManakaiDISPropertyAccessor
                                                        .plImplementation>;
             my $data_type = $get-><AG::ManakaiDISResourceDefinition
                                       .disActualDataTypeResource>;
@@ -4991,7 +5109,7 @@ ClsDef:
                                forp_arg => $self->{forp},
                                data_type_uri => $data_type
                                     -><AG::ManakaiDISResourceDefinition.uri>);
-            my $plimpl = $self-><AG::ManakaiDISResourceDefinition
+            my $plimpl = $self-><AG::ManakaiDISPropertyAccessor
                                                        .plImplementation>;
             $r = $plimpl-><M::MPLImpl.createPerlSub>
                             ($self-><AG::ManakaiDISResourceDefinition.plName>);
@@ -4999,7 +5117,7 @@ ClsDef:
             $r-><AS::MPLSub.prototype> ('');
           } elsif ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
                               (<Q::ManakaiDOM:Class>)) {
-            my $plimpl = $self-><AG::ManakaiDISResourceDefinition
+            my $plimpl = $self-><AG::ManakaiDISPropertyAccessor
                                                        .plImplementation>;
             $r = $plimpl-><M::MPLImpl.createPerlPackage>
                               ($self-><AG::ManakaiDISResourceDefinition
@@ -5014,6 +5132,8 @@ ClsDef:
               if (defined $spack_name) {
                 $r-><M::PLPack.addISAPackage> ($spack_name);
               }
+              $self-><M::ManakaiDISResourceDefinition.plAddRequireResource>
+                          ($scls => $r);
             }
             ## This class implements...
             for my $scls (@{$self-><M::ManakaiDISPropertyAccessor
@@ -5175,36 +5295,6 @@ ClsDef:
             $r = $self->{<Q::plCodeFragment>} = null;
           } # rdf:type
         }__;
-
-  @Attr:
-    @@Name:plImplementation
-    @@enDesc:
-      The <Class::PerlCode:ManakaiPerlCodeImplementation> object. 
-    @@Type: MPLImpl
-    @@Get:
-      @@@enDesc:
-        The Perl code implementation object. 
-      @@@nullCase:
-        This resource has no source tree associated. 
-      @@@RaiseException:
-        @@@@@:NO_PERL_CODE_IMPL_ERR
-        @@@@enDesc:
-          There is no implementation that implements 
-          the <Feature::Util:PerlCode> feature, version <FeatureVer::1.0>. 
-      @@@PerlDef:
-        if ($self->{src}) {
-          __DEEP{
-            $r = ($self->{src}-><AG::SWCFGNode.ownerDocument> or
-                        $self->{src})-><AG::SWCFGDoc.implementation>
-                           -><M::DOMMinImpl.getFeature>
-                                   (<Q::Util:PerlCode> => '1.0');
-          }__;
-          unless (defined $r) {
-            __EXCEPTION{NO_PERL_CODE_IMPL_ERR::
-              
-            }__;
-          }
-        }
 
   @Method:
     @@Name: getChildResourceByType
@@ -5373,8 +5463,7 @@ ClsDef:
           our $RegQNameChar;
           our $RegBlockContent;
           use re 'eval';
-          my $plimpl = $self-><AG::ManakaiDISResourceDefinition
-                                  .plImplementation>;
+          my $plimpl = $self-><AG::ManakaiDISPropertyAccessor.plImplementation>;
           $r = $plimpl-><M::MPLImpl.createPerlBlock>;
           if (defined $sourceLine) {
             $r-><AS::PLBlockCon.sourceFile> ($sourceFile);
@@ -5505,8 +5594,10 @@ ClsDef:
                       $value = $plimpl-><M::MPLImpl.createPerlVariable>
                                           ('$', null, $param->{$var}->{value});
                     } elsif ($param->{$var}->{type} eq 'code') {
-                      $value = $plimpl-><M::MPLImpl.createPerlInlineUnparsedCode>
-                                          ($param->{$var}->{value});
+                      $value = $self-><M::ManakaiDISResourceDefinition
+                                         .plPreprocessPerlStatement>
+                                            ($param->{$var}->{value},
+                                             contains_statements => false);
                     } else {
                       $value = $plimpl-><M::MPLImpl.createPerlStringLiteral>
                                           ($param->{$var}->{value});
@@ -5760,8 +5851,7 @@ ClsDef:
         }
         __DEEP{
           our $RegQNameChar;
-          my $plimpl = $self-><AG::ManakaiDISResourceDefinition
-                                  .plImplementation>;
+          my $plimpl = $self-><AG::ManakaiDISPropertyAccessor.plImplementation>;
           if ($containsStatements) {
             $r = $plimpl-><M::MPLImpl.createPerlBlockContainer>;
             if (defined $sourceLine) {
@@ -5965,8 +6055,10 @@ ClsDef:
                       $value = $plimpl-><M::MPLImpl.createPerlVariable>
                                           ('$', null, $param->{$var}->{value});
                     } elsif ($param->{$var}->{type} eq 'code') {
-                      $value = $plimpl-><M::MPLImpl.createPerlInlineUnparsedCode>
-                                          ($param->{$var}->{value});
+                      $value = $self-><M::ManakaiDISResourceDefinition
+                                         .plPreprocessPerlStatement>
+                                            ($param->{$var}->{value},
+                                             contains_statements => false);
                     } else {
                       $value = $plimpl-><M::MPLImpl.createPerlStringLiteral>
                                           ($param->{$var}->{value});
@@ -6335,7 +6427,7 @@ ClsDef:
            $xclass-><AG::ManakaiDISResourceDefinition.plFullyQualifiedName>.
            ' -object => $self');
         my $xclass_module = $xclass-><AG::ManakaiDISResourceDefinition
-                                            .definingModule>;
+                                            .ownerModule>;
         unless ($xclass-><AG::ManakaiDISResourceDefinition.isDefined> or
                 not $xclass_module) {
           __EXCEPTION{RESOURCE_NOT_DEFINED_ERR::
@@ -6345,6 +6437,8 @@ ClsDef:
             DIS:expectedType => {<Q::DOMException:AnyExceptionClass>},
           }__;
         }
+        $xclass_module-><AS::ManakaiDISResourceDefinition
+                                                   .isReferred> ($self->{src});
         $self-><M::ManakaiDISResourceDefinition.plAddRequireResource>
                                ($xclass_module => $statement);
         $xparam->{-type} = {type => 'quoted',
@@ -6513,13 +6607,14 @@ ClsDef:
                       ($resourceArg-><AG::ManakaiDISResourceDefinition.uri>);
         }__;
 
-  @IntMethod:
+  @Attr:
+    @@ManakaiDOM:isForInternal:1
     @@Name: plMufDescriptionText
     @@enDesc:
       {TODO:: Formal documentation-access API required.
       \
       }
-    @@Return:
+    @@Get:
       @@@Type:
         DISLang:String::ManakaiDOM:all
       @@@PerlDef:
@@ -6807,6 +6902,61 @@ ClsDef:
   @enDesc:
     Accessor methods for resource or module properties. 
   
+  @Attr:
+    @@Name:plImplementation
+    @@enDesc:
+      The <Class::PerlCode:ManakaiPerlCodeImplementation> object. 
+    @@Type: MPLImpl
+    @@Get:
+      @@@enDesc:
+        The Perl code implementation object. 
+      @@@nullCase:
+        This resource has no source tree associated. 
+      @@@RaiseException:
+        @@@@@:NO_PERL_CODE_IMPL_ERR
+        @@@@enDesc:
+          There is no implementation that implements 
+          the <Feature::Util:PerlCode> feature, version <FeatureVer::1.0>. 
+      @@@PerlDef:
+        if ($self->{src}) {
+          __DEEP{
+            $r = ($self->{src}-><AG::SWCFGNode.ownerDocument> or
+                        $self->{src})-><AG::SWCFGDoc.implementation>
+                           -><M::DOMMinImpl.getFeature>
+                                   (<Q::Util:PerlCode> => '1.0');
+          }__;
+          unless (defined $r) {
+            __EXCEPTION{NO_PERL_CODE_IMPL_ERR::
+              
+            }__;
+          }
+        }
+
+  @Attr:
+    @@Name: ownerModule
+    @@enDesc:
+      The <QUOTE::dis> module in which this object is defined. 
+      For a <QUOTE::dis> module object, the module itself is the
+      <QUOTE::owner>.
+    @@Get:
+      @@@Type: ManakaiDISModuleDefinition
+      @@@PerlDef: $r = $self;
+
+  @Attr:
+    @@Name: sourceElement
+    @@enDesc:
+      The source <QUOTE::dis> element node from which this 
+      definition is read. 
+    @@Get:
+      @@@Type: ManakaiDISElement
+      @@@InCase:
+        @@@@Type: ManakaiDISModuleElement
+        @@@@enDesc: If this resource is a module.
+      @@@PerlDef: $r = $self->{src};
+      @@@nullCase:
+        @@@@enDesc:
+          The definition is not yet read.
+
   @Method:
     @@Name: getPropertyBoolean
     @@enDesc:
@@ -7139,6 +7289,10 @@ PropDef:
     @@lang:en
     @@@:
       The <QUOTE::dis> module in which the subject resource is defined. 
+      \
+      {NOTE:: The local name should have been <QUOTE::ownerModule> or some.
+      \
+      }
   @rdfs:domain:
     DISCore:Module
 
@@ -7492,6 +7646,20 @@ ExceptionDef:
           A <Q::DISLang:Method> resource does not have any
           <Q::DISLang:MethodReturn> child. 
         @@@@XSourceNodeParam:
+        @@@@XParam:
+          @@@@@QName:errResource
+          @@@@@enDesc: The method resource.
+        @@@@XParam:
+          @@@@@QName:uri
+          @@@@@enDesc:
+            The URI reference of the method.
+        @@@@XParam:
+          @@@@@QName:localName
+          @@@@@enDesc:
+            The local name of the resource.
+        @@@@enMufDef:
+          Method "%p (name => {<Q::DIS:localName>});" does not have
+          "Return" child
       @@@XSubTypeDef:
         @@@@QName: NO_ATTR_GET_ERR
         @@@@enDesc:
@@ -7741,6 +7909,16 @@ ExceptionDef:
          @@@@@QName:uri
          @@@@@enDesc:
            The URI reference of the resource.
+     @@@XSubTypeDef:
+       @@@@QName: NO_LICENSE_ATTR_ERR
+       @@@@enDesc:
+         The <Q::dis:Module> element does not have the
+         <Q::dis:License> attribute.
+       @@@@XSourceNodeParam:
+       @@@@XParam:
+         @@@@@QName:uri
+         @@@@@enDesc:
+           The URI reference of the module.
 ##DISException
 
 XParamDef:

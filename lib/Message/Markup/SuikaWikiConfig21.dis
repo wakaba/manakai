@@ -29,13 +29,15 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/04/04 15:21:31 $
+      $Date: 2005/04/28 15:22:59 $
     @@ContentType:
       dis:Date.RCS
   
   @Require:
     @@Module:
       @@@Name: ManakaiNode
+      @@@QName:
+        Util:ManakaiNode
       @@@WithFor:
         ManakaiDOM:all
     @@Module:
@@ -116,6 +118,8 @@ Namespace:
   @swcfg21:
     http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
   @TreeCore:\
+  @Util:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
   @UtilError:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/
 
@@ -277,7 +281,7 @@ IFClassDef:
     @@Param:
       @@@Name:node
       @@@Type:
-        DOMMain:Object
+        DOMMain:Object::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -305,7 +309,7 @@ IFClassDef:
     @@NamedParam:
       @@@Name:nodeOrText
       @@@Type:
-        DOMMain:boolean
+        DOMMain:boolean::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -313,7 +317,7 @@ IFClassDef:
       @@@InCase:
         @@@@Value:true
         @@@@Type:
-          DOMMain:boolean
+          DOMMain:boolean::ManakaiDOM:all
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
@@ -322,7 +326,7 @@ IFClassDef:
       @@@InCase:
         @@@@Value:false
         @@@@Type:
-          DOMMain:boolean
+          DOMMain:boolean::ManakaiDOM:all
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
@@ -384,8 +388,8 @@ IFClassDef:
             }__;
           }
         } else {
-          my $this_node_type = $self-><M::SWCFGNode.nodeType>;
-          my $that_node_type = $node-><M::SWCFGNode.nodeType>;
+          my $this_node_type = $self-><AG::SWCFGNode.nodeType>;
+          my $that_node_type = $node-><AG::SWCFGNode.nodeType>;
           if ($this_node_type eq '#comment') {
             __EXCEPTION{HIERARCHY_BAD_TYPE_ERR::
               MDOMX:param-name => 'node',
@@ -426,7 +430,7 @@ IFClassDef:
             redo ANCESTOR if $this_node = $this_node-><AG::SWCFGNode.parentNode>;
           }
 
-          if ($node-><M::SWCFGNode.nodeType> eq '#fragment') {
+          if ($node-><AG::SWCFGNode.nodeType> eq '#fragment') {
             $self->{<Q::TreeCore:node>}
                  -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
                                      .importTree> ($node->{<Q::TreeCore:node>});
@@ -675,7 +679,7 @@ IFClassDef:
           if ($makeNewNode) {
             __DEEP{
               $r = ($self-><AG::SWCFGNode.ownerDocument> || $self)
-                        -><AG::SWCFGDocument.createElementNS> (null, $localName);
+                        -><M::SWCFGDocument.createElementNS> (null, $localName);
               $self-><M::SWCFGNode.appendNode> ($r);
             }__;
           }
@@ -758,7 +762,7 @@ IFClassDef:
           if ($makeNewNode) {
             __DEEP{
               $r = ($self-><AG::SWCFGNode.ownerDocument> || $self)
-                        -><AG::SWCFGDocument.createElementNS>
+                        -><M::SWCFGDocument.createElementNS>
                                  ($namespaceURI, $localName);
               $self-><M::SWCFGNode.appendNode> ($r);
             }__;
@@ -898,7 +902,7 @@ IFClassDef:
     @@Param:
       @@@Name:code
       @@@Type:
-        Perl:CODE
+        Perl:CODE::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -912,7 +916,7 @@ IFClassDef:
     @@NamedParam:
       @@@Name:makeNewNode
       @@@Type:
-        Perl:CODE
+        Perl:CODE::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1044,7 +1048,7 @@ IFClassDef:
           ## Not found
           __DEEP{
             $r = ($self-><AG::SWCFGNode.ownerDocument> || $self)
-                      -><AG::SWCFGDocument.createElementNS> (null, $localName);
+                      -><M::SWCFGDocument.createElementNS> (null, $localName);
             $self-><M::SWCFGNode.appendNode> ($r);
             $r->{<Q::TreeCore:node>}->{<Q::value>} = $value;
           }__;
@@ -1127,7 +1131,7 @@ IFClassDef:
           ## Not found
           __DEEP{
             $r = ($self-><AG::SWCFGNode.ownerDocument> || $self)
-                      -><AG::SWCFGDocument.createElementNS>
+                      -><M::SWCFGDocument.createElementNS>
                                         ($namespaceURI, $localName);
             $self-><M::SWCFGNode.appendNode> ($r);
             $r->{<Q::TreeCore:node>}->{<Q::value>} = $value;
@@ -1154,7 +1158,7 @@ IFClassDef:
           The local name of the element to remove.
     @@Return:
       @@@Type:
-        DOMMain:boolean
+        DOMMain:boolean::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1206,7 +1210,7 @@ IFClassDef:
           The local name of the element to remove.
     @@Return:
       @@@Type:
-        DOMMain:boolean
+        DOMMain:boolean::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1418,7 +1422,7 @@ IFClassDef:
   @Attr:
     @@Name:count
     @@Type:
-      DOMMain:unsigned-long
+      DOMMain:unsigned-long::ManakaiDOM:all
     @@Description:
       @@@lang:en
       @@@@:
@@ -1447,7 +1451,7 @@ IFClassDef:
   @Attr:
     @@Name:realCount
     @@Type:
-      DOMMain:unsigned-long
+      DOMMain:unsigned-long::ManakaiDOM:all
     @@Description:
       @@@lang:en
       @@@@:
@@ -1469,7 +1473,7 @@ IFClassDef:
     @@NamedParam:
       @@@Name:newValue
       @@@Type:
-        DOMMain:any
+        DOMMain:any::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1518,7 +1522,7 @@ IFClassDef:
     @@NamedParam:
       @@@Name:newValue
       @@@Type:
-        DOMMain:any
+        DOMMain:any::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1563,7 +1567,7 @@ IFClassDef:
     @@NamedParam:
       @@@Name:asArray
       @@@Type:
-        DOMMain:boolean
+        DOMMain:boolean::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1572,7 +1576,7 @@ IFClassDef:
       @@@InCase:
         @@@@Value:true
         @@@@Type:
-          DOMMain:boolean
+          DOMMain:boolean::ManakaiDOM:all
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
@@ -1580,7 +1584,7 @@ IFClassDef:
       @@@InCase:
         @@@@Value:false
         @@@@Type:
-          DOMMain:boolean
+          DOMMain:boolean::ManakaiDOM:all
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
@@ -1588,7 +1592,7 @@ IFClassDef:
             only if the node value is a list value. 
     @@Return:
       @@@Type:
-        DOMMain:any
+        DOMMain:any::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1643,7 +1647,7 @@ IFClassDef:
     @@NamedParam:
       @@@Name:outputHeader
       @@@Type:
-        DOMMain:boolean
+        DOMMain:boolean::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1767,7 +1771,7 @@ IFClassDef:
           }
           $r .= "\x0A" . 'Namespace:' . "\x0A" . $ns . "\x0A" if length $ns;
         } elsif ($nt eq '#comment') {
-          $r = $self-><AG::SWCFGNode.innerText>;
+          $r = $self-><M::SWCFGNode.innerText>;
           $r =~ s/\x0A/\x0A#/gs;
           $r = '#' . $r . "\n";
         } elsif ($nt eq '#fragment') {
@@ -1803,7 +1807,7 @@ IFClassDef:
             $r = $r->{<Q::shadowSiblingOf>};
             redo;
           } elsif ($r->{<Q::isShadowMaster>}) {
-            $r = $r->{<Q::DOMCore:ownerDocument>};
+            $r = $r->{<Q::ownerDocument>};
           }
         }
         $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($r);
@@ -1825,7 +1829,7 @@ IFClassDef:
     @@NamedParam:
       @@@Name:key
       @@@Type:
-        DOMMain:any
+        DOMMain:any::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1839,13 +1843,13 @@ IFClassDef:
         @@@@@:
           Node path string. 
       @@@PerlDef:
-        my $parent = $self-><M::SWCFGNode.parentNode>;
+        my $parent = $self-><AG::SWCFGNode.parentNode>;
         if ($parent) {
           $r = $parent-><M::SWCFGNode.nodePath> (%opt);
         } else {
           $r = '';
         }
-        my $node_type = $self-><M::SWCFGNode.nodeType>;
+        my $node_type = $self-><AG::SWCFGNode.nodeType>;
         if ($node_type eq '#element') {
           $r .= '/' . $self-><AG::SWCFGElement.realQualifiedName>;
           if ($key) {
@@ -1897,7 +1901,7 @@ IFClassDef:
     @@Param:
       @@@Name:value
       @@@Type:
-        DOMMain:any
+        DOMMain:any::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1912,7 +1916,7 @@ IFClassDef:
         @@@@Value:
           @@@@@is-null:1
         @@@@Type:
-          DOMMain:any
+          DOMMain:any::ManakaiDOM:all
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
@@ -1924,7 +1928,7 @@ IFClassDef:
     @@DefaultParam:
     @@Return:
       @@@Type:
-        DOMMain:any
+        DOMMain:any::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1933,7 +1937,7 @@ IFClassDef:
         @@@@Value:
           @@@@@is-null:1
         @@@@Type:
-          DOMMain:any
+          DOMMain:any::ManakaiDOM:all
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
@@ -1965,7 +1969,7 @@ IFClassDef:
     @@Param:
       @@@Name:value
       @@@Type:
-        DOMMain:any
+        DOMMain:any::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:The option value to set. 
@@ -1973,7 +1977,7 @@ IFClassDef:
         @@@@Value:
           @@@@@is-null:1
         @@@@Type:
-          DOMMain:any
+          DOMMain:any::ManakaiDOM:all
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
@@ -1984,7 +1988,7 @@ IFClassDef:
             }
     @@Return:
       @@@Type:
-        DOMMain:any
+        DOMMain:any::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:The (possibly new) value of the option. 
@@ -1992,7 +1996,7 @@ IFClassDef:
         @@@@Value:
           @@@@@is-null:1
         @@@@Type:
-          DOMMain:any
+          DOMMain:any::ManakaiDOM:all
         @@@@Description:
           @@@@@lang:en
           @@@@@@:No value has set to the option. 
@@ -2033,7 +2037,7 @@ IFClassDef:
             for my $p (<Q::shadowLocalName>, <Q::shadowNamespaceURI>,
                        <Q::localName>, <Q::namespaceURI>,
                        <Q::namespaceExpanded>, <Q::etExpanded>,
-                       <Q::DOMCore:ownerDocument>) {
+                       <Q::ownerDocument>) {
               $r->{<Q::TreeCore:node>}->{$p} = $self->{<Q::TreeCore:node>}->{$p};
             }
             $r->{<Q::TreeCore:node>}->{<Q::value>}
@@ -2059,7 +2063,7 @@ IFClassDef:
             }
             for my $cn (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
               my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($cn);
-              $r-><AG::SWCFGNode.appendNode> ($c->clone);
+              $r-><M::SWCFGNode.appendNode> ($c->clone);
             }
           } elsif ($nt eq '#comment') {
             $r = $od-><M::SWCFGDocument.createComment>
@@ -2069,7 +2073,7 @@ IFClassDef:
             ## <Q::isShadowMaster> property is not copied
             for my $cn (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
               my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($cn);
-              $r-><AG::SWCFGNode.appendNode> ($c->clone);
+              $r-><M::SWCFGNode.appendNode> ($c->clone);
             }
             $r->{<Q::TreeCore:node>}->{<Q::value>}
                 = defined $self->{<Q::TreeCore:node>}->{<Q::value>}
@@ -2101,7 +2105,7 @@ IFClassDef:
                   my @l = $c->{$p};
                   while (@l) {
                     my $l = shift @l; next unless $l;
-                    $l->{<Q::DOMCore:ownerDocument>} = $r->{<Q::TreeCore:node>};
+                    $l->{<Q::ownerDocument>} = $r->{<Q::TreeCore:node>};
                     for my $n (@{$l->{<Q::childNodes>}}, 
                                $l->{<Q::shadowContent>},   ## Does not allowed
                                $l->{<Q::shadowSibling>}) { ## but for safe
@@ -2120,14 +2124,14 @@ IFClassDef:
               my @l = $c->{<Q::TreeCore:node>};
               while (@l) {
                 my $l = shift @l; next unless $l;
-                $l->{<Q::DOMCore:ownerDocument>} = $r->{<Q::TreeCore:node>};
+                $l->{<Q::ownerDocument>} = $r->{<Q::TreeCore:node>};
                 for my $n (@{$l->{<Q::childNodes>}}, 
                            $l->{<Q::shadowContent>},
                            $l->{<Q::shadowSibling>}) {
                   push @l, $n;
                 }
               }
-              $r-><AG::SWCFGNode.appendNode> ($c);
+              $r-><M::SWCFGNode.appendNode> ($c);
             }
           } else {
             __ASSERT{DISPerl:invariant::
@@ -2162,8 +2166,7 @@ IFClassDef:
           @@@@@@:
             This node is a document node. 
       @@@disDef:
-        @@@@swcfg21:GetPropNode:
-          DOMCore:ownerDocument
+        @@@@swcfg21:GetPropNode: ownerDocument
 
   @Method:
     @@Name:lookupNamespacePrefix
@@ -2190,7 +2193,7 @@ IFClassDef:
     @@NamedParam:
       @@@Name: makeNewBinding
       @@@Type: 
-        DOMMain:boolean
+        DOMMain:boolean::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -2300,7 +2303,7 @@ IFClassDef:
     @@NamedParam:
       @@@Name: makeNewBinding
       @@@Type:
-        DOMMain:boolean
+        DOMMain:boolean::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -2325,7 +2328,7 @@ IFClassDef:
     @@NamedParam:
       @@@Name: raisePrefixException
       @@@Type:
-        DOMMain:boolean
+        DOMMain:boolean::ManakaiDOM:all
       @@@enDesc:
         Whehter an exception should be thrown if <P::prefix>
         is not declared or not. 
@@ -2484,7 +2487,7 @@ IFClassDef:
           @@@@@: The node to test against.
      @@Return:
         @@@Type:  
-          DOMMain:boolean
+          DOMMain:boolean::ManakaiDOM:all
         @@@InCase:
           @@@@Value: true
           @@@@Description:
@@ -2525,13 +2528,13 @@ IFClassDef:
                                         ::ManakaiDOM:Perl.new>;
           push @{$node->{<Q::TreeCore:origin>}}, <Q::parent>;
           push @{$node->{<Q::TreeCore:subnode>}}, <Q::childNodes>;
-          push @{$node->{<Q::TreeCore:irefnode>}}, <Q::DOMCore:ownerDocument>;
+          push @{$node->{<Q::TreeCore:irefnode>}}, <Q::ownerDocument>;
           push @{$node->{<Q::TreeCore:anydata2>}}, <Q::flag>, <Q::option>;
           $node->{<Q::childNodes>} = [];
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
-            Required property: <Q::nodeType>, <Q::DOMCore:ownerDocument>. 
+            Required property: <Q::nodeType>, <Q::ownerDocument>. 
             \
             Optional properties: <Q::value>, <Q::parent>, 
                   <Q::childNodes>, <Q::flag>, <Q::option>. 
@@ -2600,9 +2603,8 @@ IFClassDef:
         }
     @@Get:
       @@@Type: SWCFGString
-      @@@disDef:
-        @@@@GetProp:
-          TreeCore:nodeID
+      @@@PerlDef:
+        $r = $self->{<Q::TreeCore:node>}->{<Q::TreeCore:nodeID>};
 ##SWCFGNode
 
 ElementTypeBinding:
@@ -2691,7 +2693,7 @@ IFClassDef:
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
-            Required property: <Q::DOMCore:ownerDocument>, <Q::nodeType>. 
+            Required property: <Q::ownerDocument>, <Q::nodeType>. 
             \
             Optional properties: <Q::value>, <Q::parent>, 
                   <Q::childNodes>, <Q::flag>, <Q::option>. 
@@ -2771,7 +2773,7 @@ IFClassDef:
               $node->{<Q::localName>} eq 'Namespace' or
               $node->{<Q::localName>} eq 'ElementTypeBinding' or
               $node->{<Q::localName>} =~ /:/) {
-            $r = $self-><AG::SWCFGNode.lookupNamespacePrefix>
+            $r = $self-><M::SWCFGNode.lookupNamespacePrefix>
                                              ($node->{<Q::namespaceURI>},
                                               make_new_binding => 1);
           } else {
@@ -2781,7 +2783,7 @@ IFClassDef:
           if (defined $defURI or $node->{<Q::localName>} =~ /:/ or
               $node->{<Q::localName>} eq 'Namespace' or
               $node->{<Q::localName>} eq 'ElementTypeBinding') {
-            $r = $self-><AG::SWCFGNode.lookupNamespacePrefix>
+            $r = $self-><M::SWCFGNode.lookupNamespacePrefix>
                                              ($node->{<Q::namespaceURI>},
                                               make_new_binding => 1);
           } else {
@@ -2817,7 +2819,7 @@ IFClassDef:
               $ln eq 'Namespace' or
               $ln eq 'ElementTypeBinding' or
               $ln =~ /:/) {
-            $r = $self-><AG::SWCFGNode.lookupNamespacePrefix>
+            $r = $self-><M::SWCFGNode.lookupNamespacePrefix>
                                              ($node->{<Q::namespaceURI>},
                                               make_new_binding => 1) .
                  ':' . $ln;
@@ -2828,7 +2830,7 @@ IFClassDef:
           if (defined $defURI or $node->{<Q::localName>} =~ /:/ or
               $node->{<Q::localName>} eq 'Namespace' or
               $node->{<Q::localName>} eq 'ElementTypeBinding') {
-            $r = $self-><AG::SWCFGNode.lookupNamespacePrefix>
+            $r = $self-><M::SWCFGNode.lookupNamespacePrefix>
                                              ($node->{<Q::namespaceURI>},
                                               make_new_binding => 1) .
                  ':' . $node->{<Q::localName>};
@@ -2861,7 +2863,7 @@ IFClassDef:
               $node->{<Q::localName>} eq 'Namespace' or
               $node->{<Q::localName>} eq 'ElementTypeBinding' or
               $node->{<Q::localName>} =~ /:/) {
-            $r = $self-><AG::SWCFGNode.lookupNamespacePrefix>
+            $r = $self-><M::SWCFGNode.lookupNamespacePrefix>
                                              ($node->{<Q::namespaceURI>},
                                               make_new_binding => 1) .
                  ':' . $node->{<Q::localName>};
@@ -2872,7 +2874,7 @@ IFClassDef:
           if (defined $defURI or $node->{<Q::localName>} =~ /:/ or
               $node->{<Q::localName>} eq 'Namespace' or
               $node->{<Q::localName>} eq 'ElementTypeBinding') {
-            $r = $self-><AG::SWCFGNode.lookupNamespacePrefix>
+            $r = $self-><M::SWCFGNode.lookupNamespacePrefix>
                                              ($node->{<Q::namespaceURI>},
                                               make_new_binding => 1) .
                  ':' . $node->{<Q::localName>};
@@ -3136,7 +3138,7 @@ IFClassDef:
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
-            Required property: <Q::DOMCore:ownerDocument>, <Q::nodeType>, 
+            Required property: <Q::ownerDocument>, <Q::nodeType>, 
               <Q::localName>. 
             \
             Optional properties: <Q::value>, <Q::parent>, 
@@ -3165,7 +3167,7 @@ IFClassDef:
           $__qn = $node->{<Q::localName>};
 
         }
-        my $__od = $node->{<Q::DOMCore:ownerDocument>};
+        my $__od = $node->{<Q::ownerDocument>};
         if ($__od->{<Q::etBinding>}->{$__qn}) {
           my $b = $__od->{<Q::etBinding>}->{$__qn};
           $node->{<Q::namespaceURI>} = <Q::RealName>;
@@ -3229,7 +3231,7 @@ IFClassDef:
           }__;
         } else {
           $__node->{<Q::namespaceURI>}
-                 = $__node->{<Q::DOMCore:ownerDocument>}
+                 = $__node->{<Q::ownerDocument>}
                           ->{<Q::defaultETNamespaceURI>};
         }
         $__node->{<Q::namespaceExpanded>} = true;
@@ -3293,7 +3295,7 @@ IFClassDef:
           The newly created element. 
       @@@PerlDef:
         $r = <ClassM::ManakaiSWCFGElement.newObject>;
-        $r->{<Q::DOMCore:ownerDocument>} = $self->{<Q::TreeCore:node>};
+        $r->{<Q::ownerDocument>} = $self->{<Q::TreeCore:node>};
         $r->{<Q::namespaceURI>} = $namespaceURI;
         $r->{<Q::localName>} = $localName;
         $r->{<Q::namespaceExpanded>} = true;
@@ -3330,7 +3332,7 @@ IFClassDef:
           The newly created comment. 
       @@@PerlDef:
         $r = <ClassM::ManakaiSWCFGComment.newObject>;
-        $r->{<Q::DOMCore:ownerDocument>} = $self->{<Q::TreeCore:node>};
+        $r->{<Q::ownerDocument>} = $self->{<Q::TreeCore:node>};
         $r->{<Q::value>} = defined $data ? $data : '';
         $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($r);
 
@@ -3349,7 +3351,7 @@ IFClassDef:
           The newly created document fragment node. 
       @@@PerlDef:
         $r = <ClassM::ManakaiSWCFGDocumentFragment.newObject>;
-        $r->{<Q::DOMCore:ownerDocument>} = $self->{<Q::TreeCore:node>};
+        $r->{<Q::ownerDocument>} = $self->{<Q::TreeCore:node>};
         $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($r);
 
   @Attr:
@@ -3408,7 +3410,7 @@ IFClassDef:
     @@NamedParam:
       @@@Name:newValue
       @@@Type:
-        DOMMain:any
+        DOMMain:any::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -3440,7 +3442,7 @@ IFClassDef:
     @@NamedParam:
       @@@Name:newValue
       @@@Type:
-        DOMMain:any
+        DOMMain:any::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -3488,7 +3490,7 @@ IFClassDef:
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
-            Required property: <Q::DOMCore:ownerDocument>, <Q::nodeType>, 
+            Required property: <Q::ownerDocument>, <Q::nodeType>, 
                   <Q::DOMCore:implementation>, <Q::nsBinding>, 
                   <Q::etBinding>. 
             \
@@ -3518,7 +3520,7 @@ IFClassDef:
   @Attr:
     @@Name: isShadowMaster
     @@Type: 
-      DOMMain:boolean
+      DOMMain:boolean::ManakaiDOM:all
     @@Description:
       @@@lang:en
       @@@@:
@@ -3571,7 +3573,7 @@ IFClassDef:
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
-            Required property: <Q::DOMCore:ownerDocument>, <Q::nodeType>. 
+            Required property: <Q::ownerDocument>, <Q::nodeType>. 
             \
             Optional properties: <Q::parent>, <Q::value>,
                   <Q::childNodes>, <Q::flag>, <Q::option>, <Q::shadowOwner>, 
@@ -3595,7 +3597,7 @@ IFClassDef:
   @Attr:
     @@Name:length
     @@Type:
-      DOMMain:unsigned-long
+      DOMMain:unsigned-long::ManakaiDOM:all
     @@Operator:
       @@@@:FETCHSIZE
       @@@ContentType:
@@ -3633,7 +3635,7 @@ IFClassDef:
     @@Param:
       @@@Name:index
       @@@Type:
-        DOMMain:long
+        DOMMain:long::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -3778,8 +3780,13 @@ PropDef:
     @@lang:en
     @@@:
       The owner document of the master shadow tree.  This property is 
-      redudant (always same, if any, as <Q::DOMCore:ownerDocument>) 
+      redudant (always same, if any, as <Q::ownerDocument>) 
       but need to maintain the origin-subnode relationship. 
+
+PropDef:
+  @QName: ownerDocument
+  @enDesc:
+    The owner document node. 
 
 PropDef:
   @QName:value
@@ -3821,7 +3828,7 @@ PropDef:
     @@@:
       Whether the namespace URI has expanded or not. 
   @Type:
-    DOMMain:boolean
+    DOMMain:boolean::ManakaiDOM:all
 
 PropDef:
   @QName: etExpanded
@@ -3830,7 +3837,7 @@ PropDef:
     @@@:
       Whether the element type binding has been expanded or not.
   @Type:
-    DOMMain:boolean
+    DOMMain:boolean::ManakaiDOM:all
 
 PropDef:
   @QName:nsBinding
@@ -3866,7 +3873,7 @@ PropDef:
       Whether a document fragment node is the root node of a 
       shadow master tree or not. 
   @Type:
-    DOMMain:boolean
+    DOMMain:boolean::ManakaiDOM:all
   @rdfs:range: SWCFGDocumentFragment
 
 PropDef:
@@ -3880,7 +3887,7 @@ PropDef:
 PropDef:
   @QName:flag
   @Type:
-    Perl:HASH
+    Perl:HASH::ManakaiDOM:all
   @Description:
     @@lang:en
     @@@:
@@ -3889,7 +3896,7 @@ PropDef:
 PropDef:
   @QName:option
   @Type:
-    Perl:HASH
+    Perl:HASH::ManakaiDOM:all
   @Description:
     @@lang:en
     @@@:
@@ -3919,7 +3926,7 @@ ExceptionDef:
     @@rdfs:subClassOf:
       DOMMain:unsigned-long::ManakaiDOM:all
     @@Type:
-      DOMMain:unsigned-long
+      DOMMain:unsigned-long::ManakaiDOM:all
     @@XConst:
       @@@Name:HIERARCHY_REQUEST_ERR
       @@@Value:3
@@ -4280,7 +4287,7 @@ IFClassDef:
               } else {
                 $is_list_element = 0;
               }
-              $current_element = $root-><AG::SWCFGNode.appendNewNode>
+              $current_element = $root-><M::SWCFGNode.appendNewNode>
                                             (type => '#element',
                                              local_name => $name,
                                              value => $val);
@@ -4318,7 +4325,7 @@ IFClassDef:
                   $current_element
                        = $current_element-><AG::SWCFGNode.parentNode>;
                 }
-                $ce = $current_element-><AG::SWCFGNode.appendNewNode>
+                $ce = $current_element-><M::SWCFGNode.appendNewNode>
                                            (type => '#element',
                                             local_name => $name,
                                             value => $val);
@@ -4567,6 +4574,11 @@ IFClassDef:
             warn $err->stringify;
           }
 
+PropDef:
+  @QName: parent
+  @enDesc:
+    The parent node object of this node. 
+
 ## -- Bootstraps
 
 IFClassDef:
@@ -4652,7 +4664,8 @@ IFClassDef:
     @@NewIn21:
     @@Param:
       @@@Name:versions
-      @@@Type:any
+      @@@Type:
+        DOMMain:any::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -4832,7 +4845,7 @@ ElementTypeBinding:
     @@DISPerl:isNamedParameter:1
     @@Name:makeNewNode
     @@Type:
-      DOMMain:boolean
+      DOMMain:boolean::ManakaiDOM:all
     @@Description:
       @@@lang:en
       @@@@:
@@ -4842,7 +4855,7 @@ ElementTypeBinding:
         ManakaiDOM:InCase
       @@@Value:true
       @@@Type:
-        DOMMain:boolean
+        DOMMain:boolean::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@: A new node is created when no such node found. 
@@ -4851,7 +4864,7 @@ ElementTypeBinding:
         ManakaiDOM:InCase
       @@@Value:false
       @@@Type:
-        DOMMain:boolean
+        DOMMain:boolean::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@: A new node is not created even when no such node found. 
@@ -4866,7 +4879,7 @@ ElementTypeBinding:
     @@DISPerl:isNamedParameter:1
     @@Name:default
     @@Type:
-      DOMMain:any
+      DOMMain:any::ManakaiDOM:all
     @@Description:
       @@@lang:en
       @@@@:
@@ -4876,7 +4889,7 @@ ElementTypeBinding:
       @@@rdf:type:
         ManakaiDOM:InCase
       @@@Type:
-        DOMMain:any
+        DOMMain:any::ManakaiDOM:all
       @@@Value:
         @@@@is-null:1
       @@@Description:
@@ -4893,7 +4906,7 @@ ElementTypeBinding:
     @@DISPerl:isNamedParameter:1
     @@Name:defaultList
     @@Type:
-      DOMMain:any
+      DOMMain:any::ManakaiDOM:all
     @@Description:
       @@@lang:en
       @@@@:
@@ -4906,7 +4919,7 @@ ElementTypeBinding:
       @@@Value:
         @@@@is-null:1
       @@@Type:
-        DOMMain:any
+        DOMMain:any::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@: No default list value. 

@@ -10,19 +10,49 @@ use Message::Util::QName::Filter {
 use Getopt::Long;
 use Pod::Usage;
 use Storable qw/nstore retrieve/;
-my %Opt;
+my %Opt = ();
 GetOptions (
   'db-base-directory-path=s' => \$Opt{db_base_path},
   'for=s' => \$Opt{For},
   'help' => \$Opt{help},
-  'input-cdis-file-name=s' => \$Opt{input_file_name},
+  'input-db-file-name=s' => \$Opt{input_file_name},
   'output-file-name=s' => \$Opt{output_file_name},
   'search-path|I=s' => sub {
     shift;
     my @value = split /\s+/, shift;
     while (my ($ns, $path) = splice @value, 0, 2, ()) {
+      unless (defined $path) {
+        die qq[$0: Search-path parameter without path: "$ns"];
+      }
       push @{$Opt{input_search_path}->{$ns} ||= []}, $path;
     }
+  },
+  'search-path-catalog-file-name=s' => sub {
+    shift;
+    require File::Spec;
+    my $path = my $path_base = shift;
+    $path_base =~ s#[^/]+$##;
+    $Opt{search_path_base} = $path_base;
+    open my $file, '<', $path or die "$0: $path: $!";
+    while (<$file>) {
+      if (s/^\s*\@//) {     ## Processing instruction
+        my ($target, $data) = split /\s+/;
+        if ($target eq 'base') {
+          $Opt{search_path_base} = File::Spec->rel2abs ($data, $path_base);
+        } else {
+          die "$0: $target: Unknown target";
+        }
+      } elsif (/^\s*\#/) {  ## Comment
+        #
+      } elsif (/\S/) {      ## Catalog entry
+        s/^\s+//;
+        my ($ns, $path) = split /\s+/;
+        push @{$Opt{input_search_path}->{$ns} ||= []},
+             File::Spec->rel2abs ($path, $Opt{search_path_base});
+      }
+    }
+    ## NOTE: File paths with SPACEs are not supported
+    ## NOTE: Future version might use file: URI instead of file path.
   },
   'undef-check!' => \$Opt{no_undef_check},
   'verbose!' => $Opt{verbose},
@@ -33,7 +63,6 @@ pod2usage ({-exitval => 2, -verbose => 0}) unless $Opt{file_name};
 pod2usage ({-exitval => 2, -verbose => 0}) unless $Opt{output_file_name};
 $Opt{no_undef_check} = defined $Opt{no_undef_check}
                          ? $Opt{no_undef_check} ? 0 : 1 : 0;
-push @{$Opt{module_file_search_path}}, '.';
 
 use Message::DOM::DOMMetaImpl;
 use Message::Util::DIS;
@@ -91,10 +120,6 @@ $db->load_module ($doc, sub ($$$$$$) {
 
 $db->check_undefined_resource unless $Opt{no_undef_check};
 
-#if (dis_uri_for_match (ExpandedURI q<ManakaiDOM:Perl>, $State->{DefaultFor})) {
-#  dis_perl_init ($source, For => $State->{DefaultFor});
-#}
-
 $db->pl_store ($Opt{output_file_name});
 exit;
 
@@ -107,7 +132,7 @@ sub dac_load_module_file ($$$;$) {
   my $file_uri = URI::file->new ($file_name)->rel ($base_uri);
   my $dis = $db->get_source_file ($file_uri);
   unless ($dis) {
-    print STDERR qq<Opening file "$file_name"...>;
+    print STDERR qq<Opening file <$file_uri>...>;
     open my $file, '<', $file_name or die "$0: $file_name: $!";
     $dis = $parser->parse ({character_stream => $file});
     $db->set_source_file ($file_uri => $dis);

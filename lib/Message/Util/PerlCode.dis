@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/04/27 12:32:39 $
+      $Date: 2005/04/28 15:22:59 $
     @@ContentType:
       dis:Date.RCS
   
@@ -375,6 +375,37 @@ ClsDef:
              ->{$moduleName} = true;
 
   @Method:
+    @@Name: getUsePerlModuleNameList
+    @@enDesc:
+      Returns a list of Perl modules names that is <Perl::use>d
+      by this code fragment, including all descendant nodes. 
+    @@Return:
+      @@@Type:
+        Perl:ARRAY::ManakaiDOM:all
+      @@@enDesc:
+        A list of module names.  Note that the list is <EM::dead>; 
+        any modification to it does not affect to the code fragment
+        and vice versa.
+      @@@PerlDef:
+        my $list = {};
+        my @node = ($self->{<Q::TreeCore:node>});
+        while (my $node = shift @node) {
+          next unless $node;
+          for my $mname (keys %{$node->{<Q::pc:useModuleName>} || {}}) {
+            $list->{$mname} ||= $node->{<Q::pc:useModuleName>}->{$mname};
+          }
+          push @node, $node->{$_} for @{$node->{<Q::TreeCore:subnode0>}};
+          my @n;
+          for my $nn (map {$node->{$_}} @{$node->{<Q::TreeCore:subnode2>}}) {
+            push @n, (ref $nn eq 'ARRAY' ? @$nn : values %{$nn || {}});
+          }
+          for my $n ((map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}), @n) {
+            push @node, (ref $n eq 'ARRAY' ? @$n : values %{$n || {}});
+          }
+        }
+        $r = [grep {$list->{$_}} keys %$list];
+
+  @Method:
     @@Name: disAddRequireURI
     @@enDesc:
       Adds a <QUOTE::dis> resource into the list of <Perl::require>d
@@ -389,6 +420,37 @@ ClsDef:
       @@@PerlDef:
         $self->{<Q::TreeCore:node>}->{<Q::pc:requireResourceURI>}
              ->{$uriArg} = true;
+
+  @Method:
+    @@Name: disGetRequireURIList
+    @@enDesc:
+      Returns a list of <QUOTE::dis> resource URI references that is
+      <Perl::require>d by this code fragment, including all descendant nodes. 
+    @@Return:
+      @@@Type:
+        Perl:ARRAY::ManakaiDOM:all
+      @@@enDesc:
+        A list of resource URI references.  Note that the list is <EM::dead>; 
+        any modification to it does not affect to the code fragment
+        and vice versa.
+      @@@PerlDef:
+        my $list = {};
+        my @node = ($self->{<Q::TreeCore:node>});
+        while (my $node = shift @node) {
+          next unless $node;
+          for my $mname (keys %{$node->{<Q::pc:requireResourceURI>} || {}}) {
+            $list->{$mname} ||= $node->{<Q::pc:requireResourceURI>}->{$mname};
+          }
+          push @node, $node->{$_} for @{$node->{<Q::TreeCore:subnode0>}};
+          my @n;
+          for my $nn (map {$node->{$_}} @{$node->{<Q::TreeCore:subnode2>}}) {
+            push @n, (ref $nn eq 'ARRAY' ? @$nn : values %{$nn || {}});
+          }
+          for my $n ((map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}), @n) {
+            push @node, (ref $n eq 'ARRAY' ? @$n : values %{$n || {}});
+          }
+        }
+        $r = [grep {$list->{$_}} keys %$list];
 ##PerlCodeFragment
 
 PropDef:
@@ -490,7 +552,7 @@ ClsDef:
                <Q::pc:sourceModule>, <Q::pc:sourceFor>, <Q::childNodes>, 
                <Q::pc:currentPackage>, <Q::pc:currentChunk>,
                <Q::pc:nodeType>, <Q::pc:useModuleName>, 
-               <Q::pc:requireResourceURI>.
+               <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
   @Method:
     @@Name: appendNewPackage
@@ -731,6 +793,12 @@ ClsDef:
           $self-><AS::ManakaiPerlFile.currentPackage> ('main');
           $self-><AS::ManakaiPerlFile.currentChunkNumber> (0);
 
+          ## -- Requires
+          for my $pack (grep {$node->{<Q::pc:requireModuleName>}->{$_}}
+                        keys %{$node->{<Q::pc:requireModuleName>} || {}}) {
+            $r .= qq<require $pack;\n>;
+          }
+
           ## -- Packages
           my $pack = {};
           for my $sp (@{$node->{<Q::pc:childNodes>}}) {
@@ -810,7 +878,28 @@ ClsDef:
       @@@disDef:
         @@@@SetProp:
           dis:License
+
+  @Method:
+    @@Name: addRequirePerlModuleName
+    @@enDesc:
+      Adds a Perl module into the list of Perl modules 
+      <Perl::require>d by this code fragment.
+    @@Param:
+      @@@Name: moduleName
+      @@@Type:
+        Perl:package-name::ManakaiDOM:all
+      @@@enDesc:
+        The name of the module package that should be <Perl::require>d.
+    @@Return:
+      @@@PerlDef:
+        $self->{<Q::TreeCore:node>}->{<Q::pc:requireModuleName>}
+             ->{$moduleName} = true;
 ##PerlFile
+
+PropDef:
+  @QName: requireModuleName
+  @enDesc:
+    The list of <Perl::require>d Perl module names
 
 PropDef:
   @QName: sourceModule
@@ -864,7 +953,7 @@ ClsDef:
         @@@@@:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:subnode2>}}, <Q::pc:sub>,
+          push @{$node->{<Q::TreeCore:subnode>}}, <Q::pc:sub>,
                                                  <Q::dis2pm:operator>;
           push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
           $node->{<Q::pc:sub>} = {};
@@ -1237,14 +1326,20 @@ ClsDef:
       @@@PerlDef:
         my $file = $self-><AG::ManakaiPerlCodeFragment.parentNode>;
         my $node = $self->{<Q::TreeCore:node>};
+
+        ## Package name
         my $pn = $node->{<Q::pc:packageName>};
         $r .= q<package > . $pn . ";\n";
+
+        ## Package version
         __DEEP{
           $file-><AS::ManakaiPerlFile.currentPackage> ($pn);
           $r .= 'our $VERSION = '.
                 <ClassM::ManakaiPerlCodeImplementation.versionDateTime> (time).
                 ";\n";
         }__;
+
+        ## Inheritance
         my @isa = (@{$node->{<Q::dis:ISA>}},
                    sort keys %{$node->{<Q::dis:Implement>}});
         if (@isa) {
@@ -1252,6 +1347,14 @@ ClsDef:
                 <ClassM::ManakaiPerlCodeImplementation.perlList> (\@isa) .
                 ";\n";
         }
+
+        ## Uses
+        my $use = $self-><M::ManakaiPerlCodeFragment.getUsePerlModuleNameList>;
+        for my $pack (@$use) {
+          $r .= 'use ' . $pack . ";\n";
+        }
+
+        ## Subroutines
         for my $cnk (keys %{$node->{<Q::pc:sub>}}) {
           my $cno = $node->{<Q::pc:sub>}->{$cnk};
           if (ref $cno) {
@@ -1264,6 +1367,8 @@ ClsDef:
             $r .= qq<*$cnk = \&$cno;\n>;
           }
         }
+
+        ## Operators
         my $op = '';
         for my $cnk (keys %{$node->{<Q::dis2pm:operator>}}) {
           my $cno = $node->{<Q::dis2pm:operator>}->{$cnk};
@@ -2387,7 +2492,7 @@ ClsDef:
           This variable is not for hash value access.
       @@@disDef:
         @@@@SetProp: hashKey
-##PerlInlineUnparsedCode
+##PerlVariable
 
 PropDef:
   @QName: variableScope
@@ -2619,7 +2724,7 @@ ClsDef:
             __CODE{pc:nodeTypeToPackageName::
                      $nodeType => $nt, $packageName => $pack, $object => $cno}__;
                                  ## NOTE: Method name written directly
-            my $cno_clone = $pack->_make_clone_object;
+            my $cno_clone = $pack->_make_clone_object ($cno);
             push @{$node->{<Q::pc:childNodes>}}, $cno_clone;
             $cno_clone->{<Q::pc:parent>} = $node;
             ## NOTE: Tree ID is not updated yet.
@@ -2693,7 +2798,7 @@ ClsDef:
             __CODE{pc:nodeTypeToPackageName::
                      $nodeType => $nt, $packageName => $pack, $object => $cno}__;
                                  ## NOTE: Method name written directly
-            my $cno_clone = $pack->_make_clone_object;
+            my $cno_clone = $pack->_make_clone_object ($cno);
             push @{$node->{<Q::pc:childNodes>}}, $cno_clone;
             $cno_clone->{<Q::pc:parent>} = $node;
             ## NOTE: Tree ID is not updated yet.

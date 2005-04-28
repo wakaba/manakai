@@ -22,7 +22,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/04/10 05:40:59 $
+      $Date: 2005/04/28 15:22:59 $
     @@ContentType:
       dis:Date.RCS
   
@@ -350,7 +350,7 @@ ResourceDef:
         }
     @@Get:
       @@@Type:
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -394,7 +394,7 @@ ResourceDef:
         }
     @@Return:
       @@@Type:
-        DISLang:String
+        DISLang:String::ManakaiDOM:all
       @@@PerlDef:
         $r = $self->SUPER::stringify;
         if (defined $self->{<Q::MDOMX:class>}) {
@@ -491,7 +491,7 @@ ResourceDef:
     @@rdf:type:
       ManakaiDOM:ConstGroup
     @@Type:
-      DOMMain:unsigned-short
+      DOMMain:unsigned-short::ManakaiDOM:all
     @@rdfs:subClassOf:
       DOMMain:unsigned-short::ManakaiDOM:all
 
