@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/04/29 06:07:06 $
+      $Date: 2005/04/29 14:55:52 $
     @@ContentType:
       dis:Date.RCS
   
@@ -115,11 +115,8 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       DOMMain:DOMFeature
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
+    @@ForCheck:
+      ManakaiDOM:all
 
 ElementTypeBinding:
   @Name: FeatureVerDef
@@ -142,7 +139,7 @@ FeatureDef:
   @FeatureVerDef:
     @@QName: CoreFeature10
     @@Version: 1.0
-    @@ISA: Core
+    @@DOMMetaImpl:instanceFeatureOf: Core
     @@FullName:
       @@@lang:en
       @@@@:
@@ -416,6 +413,8 @@ ClsDef:
                      values %{$r->{resDef}}) {
           Scalar::Util::weaken ($def->{db});
         }
+
+  @DOMMetaImpl:provideFeature: CoreFeature10
 ##DISImplementation
 
 ElementTypeBinding:
@@ -3782,16 +3781,23 @@ ClsDef:
           The <Q::dis:Module> element does not have the
           <Q::dis:License> attribute.
       @@@NoPerlModuleNameException:
+      @@@RaiseException:
+        @@@@@:RESOURCE_NOT_DEFINED_ERR
+        @@@@enDesc:
+          A feature referred from this module is not defined.
       @@@PerlDef:
         __DEEP{
           $r = $self-><AG::ManakaiDISPropertyAccessor.plImplementation>
                     -><M::MPLImpl.createPerlFile>;
+
+          ## -- Source information
           $r-><AS::PLFile.sourceFile>
                  ($self-><M::ManakaiDISPropertyAccessor.getPropertyText>
                                 (<Q::DIS:sourceFile>, ''));
           $r-><AS::PLFile.sourceModule> ($self->{nameURI});
           $r-><AS::PLFile.sourceFor> ($self->{for});
-        
+          
+          ## -- License information
           my $ownermod = $self-><AG::ManakaiDISPropertyAccessor.ownerModule>;
           my $license = $ownermod-><M::ManakaiDISPropertyAccessor
                                      .getPropertyResource> (<Q::dis:License>);
@@ -3804,6 +3810,7 @@ ClsDef:
           $r-><AS::PLFile.licenseURI>
                             ($license-><AG::ManakaiDISResourceDefinition.uri>);
 
+          ## -- Classes
           ## TODO: Custom module construction support
           for my $cls (@{$self-><M::ManakaiDISPropertyAccessor
                                    .getPropertyResourceList>
@@ -3812,9 +3819,84 @@ ClsDef:
                    eq $ownermod) {
               if ($cls-><M::ManakaiDISResourceDefinition.isTypeURI>
                               (<Q::ManakaiDOM:Class>)) {
+                ## -- Subroutines and variables
                 my $pack = $cls-><AG::ManakaiDISResourceDefinition
                                      .plCodeFragment>;
                 $r-><M::PLFile.appendPackage> ($pack);
+                my $pack_name = $cls-><AG::ManakaiDISResourceDefinition
+                                          .plFullyQualifiedName>;
+
+                ## -- Features
+                my %feature;
+                for my $el (@{$cls->{src}
+                                  -><M::ManakaiDISElement.disChildElements>
+                                      (for_arg => $self->{for},
+                                       forp_arg => $self->{forp})}) {
+                  next unless $el-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
+                                .expandedURI> eq <Q::DOMMetaImpl:provideFeature>;
+                  my $furi = $el-><AG::ManakaiDISElement.qnameValueURI>;
+                  my $f = $self->{db}-><M::ManakaiDISDatabase.getResource>
+                                                                   ($furi);
+                  unless ($f-><AS::ManakaiDISResourceDefinition.isDefined>) {
+                    __UNDEEP{__EXCEPTION{RESOURCE_NOT_DEFINED_ERR::
+                      DIS:sourceNode => {$el},
+                      DIS:uri => {$furi},
+                      DIS:expectedType => {<Q::DOMMain:DOMFeature>},
+                    }__}__;
+                  }
+                  for my $s ($f, @{$f-><M::ManakaiDISPropertyAccessor
+                                    .getPropertyResourceList>
+                                   (<Q::DOMMetaImpl:extendFeature>,
+                                    recursive => true,
+                                    default_media_type => <Q::dis:TypeQName>)}) {
+                    $feature{$s-><AG::ManakaiDISResourceDefinition.uri>}
+                         = [$s, $el];
+                  }
+                }
+                for my $f (values %feature) {
+                  my @fname = @{$f->[0]-><AG::ManakaiDISResourceDefinition
+                                        .featureNameList>};
+                  my $fver = $f->[0]-><M::ManakaiDISPropertyAccessor
+                                        .getPropertyText>
+                                        (<Q::dis:Version>, null);
+                  next unless defined $fver;
+                  my $fi = $self-><M::ManakaiDISPerlModuleDefinition
+                        .plIsFeatureImplemented> ($f->[0]->{uri}) ? true : false;
+                  my @ec = @{$f->[1]-><M::ManakaiDISElement.disChildElements>
+                                    (for_arg => $self->{for},
+                                     forp_arg => $self->{forp})};
+                  if (@ec) {
+                    for my $ec (@ec) {
+                      next unless $ec-><AG::swcfg21:SWCFGElement
+                                          ::swcfg21:ForLatest
+                               .expandedURI> eq <Q::DOMMetaImpl:providedThrough>;
+                      my $curi = $ec-><M::ManakaiDISElement.tfqnamesValueURI>
+                                    ($self->{nameURI}, $self->{for});
+                      my $c = $self->{db}-><M::ManakaiDISDatabase.getResource>
+                                                                    ($curi);
+                      $c-><AS::ManakaiDISResourceDefinition.isReferred> ($ec);
+                      my $cp = $c-><AG::ManakaiDISResourceDefinition
+                                       .plFullyQualifiedName>;
+                      for my $fname (@fname) {
+                        $r-><M::PLBlockCon.appendStatement>
+                          ('$' . $cp . '::ProvideFeature{q<' .
+                           $fname . '>}->{q<' . $fver . '>} ||= '.$fi);
+                        $r-><M::PLBlockCon.appendStatement>
+                          ('$' . $cp . '::ProvideFeature{q<' .
+                           $fname . '>}->{q<>} = 1');
+                      }
+                    }
+                  } else {  ## No DOMMetaImpl:ProvidedThrough attribute
+                    for my $fname (@fname) {
+                      $r-><M::PLBlockCon.appendStatement>
+                        ('$' . $pack_name . '::ProvideFeature{q<' .
+                         $fname . '>}->{q<' . $fver . '>} ||= '.$fi);
+                      $r-><M::PLBlockCon.appendStatement>
+                        ('$' . $pack_name . '::ProvideFeature{q<' .
+                         $fname . '>}->{q<>} = 1');
+                    }
+                  }
+                }
               } elsif ($cls-><M::ManakaiDISResourceDefinition.isTypeURI>
                               (<Q::DISPerl:ScalarVariable>) and
                        not $cls-><M::ManakaiDISPropertyAccessor
@@ -3825,6 +3907,7 @@ ClsDef:
             }
           }
 
+          ## -- Require'ing external modules
           ## TODO: Custom module construction support
           my $thismod_name = $self-><AG::ManakaiDISModuleDefinition
                                                      .plFullyQualifiedName>;
@@ -3837,10 +3920,104 @@ ClsDef:
             $r-><M::PLFile.addRequirePerlModuleName> ($pack)
               unless $pack eq $thismod_name;
           }
+
+
         }__;
 
+  @Method:
+    @@Name: plIsFeatureImplemented
+    @@enDesc
+      Returns whether a feature is implemented by this module
+      or resource or not. 
+      \
+      {NOTE:: For modules, tests for features not provided
+              by the modules will return <DOM::true>.  For 
+              resources, if it does not provides the support
+              for the feature, then this method will return <DOM::true>.
+      \
+      }
+      \
+      {NOTE:: Feature inheritances are not taken into account.
+      \
+      }
+    @@Param:
+      @@@Name:featureResourceURI
+      @@@Type: ResourceURI
+      @@@enDesc:
+        The URI reference of the resource definition for 
+        the feature to test.
+    @@Return:
+      @@@Type:
+        DOMMain:boolean::ManakaiDOM:all
+      @@@enDesc:
+        Whether the feature is implemented or not.
+      @@@PerlDef:
+      __DEEP{
+        if (defined $self->{<Q::DIS:isFeatureImplemented>}
+                         ->{$featureResourceURI}) {
+          $r = $self->{<Q::DIS:isFeatureImplemented>}
+                         ->{$featureResourceURI};
+        } elsif ($self->isa (<ClassName::ManakaiDISModuleDefinition>)) {
+          $r = true;
+          for my $cls (@{$self-><M::ManakaiDISPropertyAccessor
+                                   .getPropertyResourceList>
+                                      (<Q::DIS:resource>)}) {
+            if ($cls-><M::ManakaiDISResourceDefinition.isTypeURI>
+                                      (<Q::ManakaiDOM:Class>)) {
+              unless ($cls-><M::ManakaiDISPerlModuleDefinition
+                               .plIsFeatureImplemented>
+                                      ($featureResourceURI)) {
+                $r = false;
+                last;
+              }
+            }                
+            ## NOTE: DISPerl:ScalarVariable's are always implemented
+          }
+          $self->{<Q::DIS:isFeatureImplemented>}
+                         ->{$featureResourceURI} = $r;
+        } else { ## Resource definition
+          ## TODO: Custom module definition
+          if ($self-><M::ManakaiDISResourceDefinition.isFeatureProvided>
+                              ($featureResourceURI)) {
+            if ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
+                              (<Q::DISLang:MethodReturn>) or
+                $self-><M::ManakaiDISResourceDefinition.isTypeURI>
+                              (<Q::DISLang:AttributeGet>) or
+                $self-><M::ManakaiDISResourceDefinition.isTypeURI>
+                              (<Q::DISLang:AttributeSet>)) {
+              my $def = $self->{src}-><M::ManakaiDISElement.disGetAttribute>
+                                (<Q::dis:Def>, for_arg => $self->{for},
+                                 forp_arg => $self->{forp});
+              $r = $def ? true : false;
+            } else {
+              $r = true;
+              for my $res (@{$self-><M::ManakaiDISPropertyAccessor
+                                     .getPropertyResourceList>
+                              (<Q::DIS:childResource>)}) {
+                if ($res-><M::ManakaiDISResourceDefinition.isTypeURI>
+                              (<Q::DISLang:AnyMethod>)) {
+                  unless ($res-><M::ManakaiDISPerlModuleDefinition
+                                 .plIsFeatureImplemented>
+                              ($featureResourceURI)) {
+                    $r = false;
+                    last;
+                  }
+                }
+              } # for
+            } # self.type
+          } else {
+            $r = true;
+          }
+          $self->{<Q::DIS:isFeatureImplemented>}->{$featureResourceURI} = $r;
+        }
+      }__;
 
 ##DISPerlModuleDefinition
+
+PropDef:
+  @QName: isFeatureImplemented
+  @enDesc:
+    The list of whether a feature is implemented or not. 
 
 ResourceDef:
   @QName: PLFile
@@ -6735,6 +6912,112 @@ ClsDef:
       @@@ImplNote:
         @@@@lang:en
         @@@@@: Currently only common-used patterns are supported.
+
+  @Method:
+    @@Name: isFeatureProvided
+    @@enDesc:
+      Whether a feature is provided by this resource or not.
+      Note that the feature is actually available (implemented)
+      or not is other thing (use <M::ManakaiDISPerlModuleDefinition
+      .plIsFeatureImplemented> instead).
+    @@Param:
+      @@@Name: featureResourceURI
+      @@@Type: ResourceURI
+      @@@enDesc:
+        The URI reference of the resource definition for the feature to test.
+    @@Return:
+      @@@Type:
+        DOMMain:boolean::ManakaiDOM:all
+      @@@enDesc:
+        Whether the feature is provided or not.
+      @@@PerlDef:
+      __DEEP{
+        my @f = @{$self-><M::ManakaiDISPropertyAccessor
+                               .getPropertyResourceList>
+                                  (<Q::DOMMain:implementFeature>,
+                                   recursive_isa => true,
+                                   default_media_type => <Q::dis:TypeQName>)};
+        if (@f) {
+          for my $f (@f) {
+            if ($f-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
+                         ($featureResourceURI)) {
+              $r = true;
+              last;
+            }
+          }
+        } else {
+          my $parent = $self-><M::ManakaiDISPropertyAccessor
+                                 .getPropertyResource>
+                                   (<Q::dis2pm:parentResource>);
+          $r = $parent-><M::ManakaiDISResourceDefinition.isFeatureProvided>
+                                   ($featureResourceURI)
+            if $parent;
+        }
+      }__;
+
+  @Attr:
+    @@Name: featureNameList
+    @@enDesc:
+      The list of the names of the feature defined by this resource.
+    @@Type:
+      Perl:ARRAY::ManakaiDOM:all
+    @@Get:
+      @@@RaiseException:
+        @@@@@:UNSUPPORTED_MEDIA_TYPE_ERR
+        @@@@enDesc:
+          There is an <Q::dis:AppName> attribute whose media 
+          type is not supported.
+      @@@RaiseException:
+        @@@@@: NO_SOURCE_NODE_ERR
+        @@@@enDesc:
+          This resource definition does not have associated node 
+          in the source tree. 
+      @@@PerlDef:
+        unless ($self->{src}) {
+          __EXCEPTION{NO_SOURCE_NODE_ERR::
+            DIS:uri => {$self->{uri}},
+          }__;
+        }
+        __DEEP{
+          for my $ce (@{$self->{src}-><M::ManakaiDISElement.disChildElements>
+                            (for_arg => $self->{for},
+                             forp_arg => $self->{forp})}) {
+            if ($ce-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest.expandedURI>
+                     eq <Q::dis:AppName>) {
+              if ($ce-><M::ManakaiDISElement.mediaTypeMatch>
+                            (<Q::dis:TypeQName>,
+                             for_arg => $self->{for},
+                             forp_arg => $self->{forp},
+                             default_media_type => <Q::dis:String>)) {
+                push @$r, lc $ce-><AG::ManakaiDISElement.qnameValueURI>;
+              } elsif ($ce-><M::ManakaiDISElement.mediaTypeMatch>
+                            (<Q::dis:String>,
+                             for_arg => $self->{for},
+                             forp_arg => $self->{forp},
+                             default_media_type => <Q::dis:String>)) {
+                push @$r, lc $ce-><M::SWCFGNode.value>;
+              } else {
+                my $mt = $ce-><M::ManakaiDISElement.mediaTypeURI>
+                                   (for_arg => $self->{for},
+                                    forp_arg => $self->{forp});
+                __UNDEEP{
+                  __EXCEPTION{UNSUPPORTED_MEDIA_TYPE_ERR::
+                    DIS:uri => {$mt},
+                    DIS:sourceNode => {$ce},
+                  }__;
+                }__;
+              }
+            }
+          }
+          unless (@$r) {
+            if ($self-><AG::ManakaiDISResourceDefinition.isAnonymous>) {
+              my $ln = $self-><AG::ManakaiDISResourceDefinition.localName>;
+              push @$r, $ln if defined $ln;
+            } else {
+              push @$r, $self-><AG::ManakaiDISResourceDefinition.nameURI>;
+            }
+          }
+        }__;
 ##DISResourceDefinition
 
 PropDef:
@@ -7200,6 +7483,13 @@ ClsDef:
       Gets property value resource list. 
     @@PropNameParam:
     @@NamedParam:
+      @@@Name: recursive
+      @@@Type:
+        DOMMain:boolean::ManakaiDOM:all
+      @@@enDesc:
+        Whether property resource values of this resource
+        should also be included to the returned list or not.
+    @@NamedParam:
       @@@Name: recursiveISA
       @@@Type:
         DOMMain:boolean::ManakaiDOM:all
@@ -7282,6 +7572,22 @@ ClsDef:
             }
           }__;
         }
+        if ($recursive) {
+          __DEEP{
+            $opt{___recursive_isa_done} ||= {$self->{uri} => true};
+            my @p_res = @$r;
+            for my $p_res (@p_res) {
+              next if $opt{___recursive_isa_done}->{$p_res->{uri}};
+              $opt{___recursive_isa_done}->{$p_res->{uri}} = true;
+              push @$r, @{$p_res-><M::ManakaiDISPropertyAccessor
+                                     .getPropertyResourceList>
+                                          ($propName, recursive => true,
+                                           recursive_isa => $recursiveISA,
+                         ___recursive_isa_done => $opt{___recursive_isa_done},
+                         default_media_type => $defaultMediaType)};
+            }
+          }__;
+        }
         if ($recursiveISA) {
           __DEEP{
             $opt{___recursive_isa_done} ||= {$self->{uri} => true};
@@ -7292,6 +7598,7 @@ ClsDef:
               push @$r, @{$p_res-><M::ManakaiDISPropertyAccessor
                                      .getPropertyResourceList>
                                           (<Q::dis:ISA>, recursive_isa => true,
+                                           recursive => $recursive,
                          ___recursive_isa_done => $opt{___recursive_isa_done},
                          default_media_type => $defaultMediaType)};
             }

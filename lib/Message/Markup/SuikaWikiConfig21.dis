@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/04/28 15:22:59 $
+      $Date: 2005/04/29 14:55:52 $
     @@ContentType:
       dis:Date.RCS
   
@@ -193,11 +193,8 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       DOMMain:DOMFeature
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
+    @@ForCheck:
+      ManakaiDOM:all
 
 ElementTypeBinding:
   @Name: FeatureVerDef
@@ -219,9 +216,18 @@ FeatureDef:
   @QName: CoreFeature
   @featureQName: Core
   @FeatureVerDef:
+    @@QName: CoreFeature20
+    @@Version: 2.0
+    @@DOMMetaImpl:instanceFeatureOf: CoreFeature
+    @@FullName:
+      @@@lang:en
+      @@@@:
+        The SuikaWikiConfig/2.0 object model
+  @FeatureVerDef:
     @@QName: CoreFeature21
     @@Version: 2.1
-    @@ISA: CoreFeature
+    @@DOMMetaImpl:instanceFeatureOf: CoreFeature
+    @@DOMMetaImpl:extendFeature: CoreFeature20
     @@FullName:
       @@@lang:en
       @@@@:
@@ -4598,6 +4604,8 @@ IFClassDef:
 
   @ClassISA:
     DOMMetaImpl:ManakaiDOMMinimumImplementation::ManakaiDOM:ManakaiDOMLatest
+
+  @DOMMetaImpl:provideFeature: CoreFeature21
 
   @Role:
     @@@:

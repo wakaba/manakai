@@ -20,7 +20,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/04/28 15:22:59 $
+      $Date: 2005/04/29 14:55:52 $
     @@ContentType:
       dis:Date.RCS
   
@@ -425,6 +425,30 @@ PropDef:
     DOMMain:DOMFeature
 
 PropDef:
+  @QName: provideFeature
+  @Description:
+    @@lang:en
+    @@@:
+      The subject resource intends to provide a part 
+      of the object feature. 
+  @rdfs:domain:
+    DOMMain:DOMFeature
+
+PropDef:
+  @QName: providedThrough
+  @Description:
+    @@lang:en
+    @@@:
+      The feature is provided through the object class. 
+      \
+      If this attribute is missing from a <Q::provideFeature>
+      element and its parent is a <Q::ManakaiDOM:Class> definition,
+      then that class with the current <QUOTE::for> is
+      the <Q::providedThrough> class.
+  @rdfs:domain:
+    ManakaiDOM:Class
+
+PropDef:
   @QName: 
     DOMMain:implementFeature
   @Description:
@@ -435,6 +459,28 @@ PropDef:
     DOMMain:DOMFeature
   @dataType: 
     dis:TypeQName
+
+PropDef:
+  @QName: instanceFeatureOf
+  @Description:
+    @@lang:en
+    @@@:
+      The subject feature is an instance of the object feature set.
+  @rdfs:range:
+    DOMMain:DOMFeature
+  @rdfs:domain:
+    DOMMain:DOMFeature
+
+PropDef:
+  @QName: extendFeature
+  @Description:
+    @@lang:en
+    @@@:
+      The subject feature extends the object feature.
+  @rdfs:range:
+    DOMMain:DOMFeature
+  @rdfs:domain:
+    DOMMain:DOMFeature
 
 PropDef:
   @QName: 
