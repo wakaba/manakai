@@ -1793,6 +1793,40 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
       local $State->{ExpandedURI q<dis2pm:thisClass>} = $pack;
       local $opt{ExpandedURI q<MDOMX:class>}
         = $pack->{ExpandedURI q<dis2pm:packageName>};
+
+      ## -- Variables
+      for my $var (values %{$pack->{ExpandedURI q<dis2pm:variable>}}) {
+        next unless defined $var->{Name};
+        my $default = dispm_get_value
+                           (%opt, resource => $var,
+                            ExpandedURI q<dis2pm:ValueKeyName>
+                                => ExpandedURI q<d:DefaultValue>,
+                            ExpandedURI q<dis2pm:useDefaultValue> => 1,
+                            ExpandedURI q<dis2pm:valueType>
+                              => $var->{ExpandedURI q<d:actualType>});
+        
+        my $v = perl_var
+               (type => $var->{ExpandedURI q<dis2pm:variableType>},
+                scope => (($var->{ExpandedURI q<dis2pm:variableName>} =~ /::/ or
+                           (defined $default and
+                            index ($default, 
+                                   $var->{ExpandedURI q<dis2pm:variableName>})
+                            > -1)) ? undef : 'our'),
+                local_name => $var->{ExpandedURI q<dis2pm:variableName>});
+        if (defined $default and length $default) {
+          if (not $var->{ExpandedURI q<dis2pm:variableName>} =~ /::/ and
+              index ($default, $var->{ExpandedURI q<dis2pm:variableName>})
+              > -1) {
+            $result .= perl_statement 'our '.$v;
+          }
+          $result .= perl_statement
+                       perl_assign $v => $default;
+        } else {
+          $result .= perl_statement $v;
+        }
+      }
+
+      ## -- Subroutines
       for my $method (values %{$pack->{ExpandedURI q<dis2pm:method>}}) {
         next unless defined $method->{Name};
         if ($method->{ExpandedURI q<dis2pm:type>} eq
@@ -2178,7 +2212,9 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
                     node => $_->{resource}->{src};
         }
       }
-    }
+
+
+    } # Class
   } # root object
 }
 
@@ -2195,10 +2231,10 @@ for my $var (values %{$State->{Module}->{$State->{module}}
                             ExpandedURI q<dis2pm:valueType>
                               => $var->{ExpandedURI q<d:actualType>});
 
-  ## ISSUE: scope
-
   my $v = perl_var
                (type => $var->{ExpandedURI q<dis2pm:variableType>},
+                scope => ($var->{ExpandedURI q<dis2pm:variableName>}
+                              =~ /::/ ? undef : 'our'),
                 local_name => $var->{ExpandedURI q<dis2pm:variableName>});
   if (defined $default and length $default) {
     $result .= perl_statement
@@ -2366,4 +2402,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/04/28 15:22:59 $
+1; # $Date: 2005/04/29 06:07:06 $

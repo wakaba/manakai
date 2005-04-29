@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/04/28 15:22:59 $
+      $Date: 2005/04/29 06:07:06 $
     @@ContentType:
       dis:Date.RCS
   
@@ -515,7 +515,7 @@ PropDef:
 
 ClsDef:
   @ClsQName: ManakaiPerlFile
-  @ClsISA: ManakaiPerlCodeFragment
+  @ClsISA: ManakaiPerlStatementContainer
   @enDesc:
     Perl source code files.
 
@@ -643,7 +643,8 @@ ClsDef:
           the <P::makeNewPackage> parameter is set to <DOM::false>. 
       @@@PerlDef:
         for my $cn (@{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}}) {
-          if ($cn->{<Q::pc:packageName>} eq $packageName) {
+          if ($cn->{<Q::pc:nodeType>} eq 'package' and
+              $cn->{<Q::pc:packageName>} eq $packageName) {
             $r = $cn;
             last;
           }
@@ -693,7 +694,8 @@ ClsDef:
       @@@PerlDef:
         for my $cn (reverse @{$self->{<Q::TreeCore:node>}
                                    ->{<Q::pc:childNodes>}}) {
-          if ($cn->{<Q::pc:packageName>} eq $packageName) {
+          if ($cn->{<Q::pc:nodeType>} eq 'package' and
+              $cn->{<Q::pc:packageName>} eq $packageName) {
             $r = $cn;
             last;
           }
@@ -707,16 +709,6 @@ ClsDef:
             $r = $self-><M::ManakaiPerlFile.appendNewPackage> ($packageName);
           }__;
         }
-
-  @Attr:
-    @@Name: length
-    @@enDesc:
-      The number of child code fragments. 
-    @@Type:
-      DOMMain:unsigned-long::ManakaiDOM:all
-    @@Get:
-      @@@PerlDef:
-        $r = @{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}};
 
   @Attr:
     @@Name: sourceFile
@@ -799,18 +791,17 @@ ClsDef:
             $r .= qq<require $pack;\n>;
           }
 
-          ## -- Packages
+          ## -- Packages and global objects
           my $pack = {};
-          for my $sp (@{$node->{<Q::pc:childNodes>}}) {
-            my $spe;
-            __CODE{ManakaiNode:getWeakReference::
-                     $object => $sp, $ref => $spe,
-                     $class => {<ClassName::ManakaiPerlPackageScope>}}__;
-            $r .= $spe->stringify;
-            for my $ipack (keys %{$sp->{<Q::dis:Implement>}}) {
-              $pack->{$ipack} ||= true; # not defined
+          for my $cno (@{$node->{<Q::pc:childNodes>}}) {
+            my $cn = <ClassM::ManakaiPerlCodeFragment.getNodeReference> ($cno);
+            $r .= $cn->stringify;
+            if ($cno->{<Q::pc:nodeType>} eq 'package') {
+              for my $ipack (keys %{$cno->{<Q::dis:Implement>}}) {
+                $pack->{$ipack} ||= true; # not defined
+              }
+              $pack->{$cno->{<Q::pc:packageName>}} = []; # defined
             }
-            $pack->{$sp->{<Q::pc:packageName>}} = []; # defined
           }
 
           ## -- Enables interface packages
@@ -923,7 +914,11 @@ PropDef:
 
 ClsDef:
   @ClsQName: ManakaiPerlPackageScope
-  @ClsISA: ManakaiPerlCodeFragment
+  @ClsISA: ManakaiPerlStatementContainer
+
+  @enDesc:
+    A Perl lexical lines for which a <Perl::package> declaration
+    in effect. 
 
   @Attr:
     @@Name: packageName
@@ -954,20 +949,22 @@ ClsDef:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
           push @{$node->{<Q::TreeCore:subnode>}}, <Q::pc:sub>,
-                                                 <Q::dis2pm:operator>;
+                                                 <Q::dis2pm:operator>,
+                                                 <Q::pc:childNodes>;
           push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
           $node->{<Q::pc:sub>} = {};
           $node->{<Q::dis2pm:operator>} = {};
           $node->{<Q::dis:ISA>} = [];
           $node->{<Q::dis:Implement>} = {};
           $node->{<Q::pc:nodeType>} = 'package';
+          $node->{<Q::pc:childNodes>} = [];
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
             Properties: <Q::pc:sub>, <Q::dis2pm:operator>,
               <Q::dis:ISA>, <Q::dis:Implement>,
               <Q::pc:nodeType>, <Q::pc:useModuleName>, 
-               <Q::pc:requireResourceURI>.
+               <Q::pc:requireResourceURI>, <Q::pc:childNodes>.
 
   @Method:
     @@Name: getSub
@@ -1278,17 +1275,6 @@ ClsDef:
         }
         $ops->{$opName} = $methodName;
 
-  @Attr:
-    @@Name: length
-    @@enDesc:
-      The number of child code fragments. 
-    @@Type:
-      DOMMain:unsigned-long::ManakaiDOM:all
-    @@Get:
-      @@@PerlDef:
-        $r = keys (%{$self->{<Q::TreeCore:node>}->{<Q::pc:sub>}})
-           + keys (%{$self->{<Q::TreeCore:node>}->{<Q::dis2pm:operator>}});
-
   @Method:
     @@Name: addISAPackage
     @@enDesc:
@@ -1352,6 +1338,12 @@ ClsDef:
         my $use = $self-><M::ManakaiPerlCodeFragment.getUsePerlModuleNameList>;
         for my $pack (@$use) {
           $r .= 'use ' . $pack . ";\n";
+        }
+
+        ## Package-scope objects
+        for my $cno (@{$node->{<Q::pc:childNodes>}}) {
+          my $cn = <ClassM::ManakaiPerlCodeFragment.getNodeReference> ($cno);
+          $r .= $cn->stringify;
         }
 
         ## Subroutines
@@ -2742,7 +2734,7 @@ ClsDef:
         Perl code. 
       @@@PerlDef:
         $r = $self->SUPER::stringify;
-        $r .= ';' if length $r;
+        $r .= ";\n" if length $r;
 ##PerlStatement
 
 ClsDef:
@@ -3661,6 +3653,12 @@ ClsDef:
         DISLang:String::ManakaiDOM:all
       @@@enDesc:
         Variable prefix.
+      @@@nullCase:
+        @@@@enDesc:
+          If the <P::packageName> is <DOM::null>, then 
+          the <P::variableType> is detected by the prefix of
+          <P::localName>.  Otherwise, it is an unprefixed variable
+          such as file handle.
     @@Param:
       @@@Name: packageName
       @@@Type:
@@ -3676,7 +3674,9 @@ ClsDef:
       @@@Type:
         DISLang:String::ManakaiDOM:all
       @@@enDesc:
-        Variable name.
+        Variable name.  If both <P::variableType> and <P::packageName>
+        is <DOM::null>, the <P::localName> value may be prefixed
+        by any possible <P::variableType> value.
     @@Return:
       @@@Type:ManakaiPerlVariable
       @@@enDesc: 
@@ -3687,6 +3687,10 @@ ClsDef:
           __CODE{ManakaiNode:getNewReference::
                    $object => $r, $ref => $r,
                    $class => {<ClassName::ManakaiPerlVariable>}}__;
+          if (not $variableType and not $packageName and
+              $localName =~ s/^(\\?[\$\@%&*])//) {
+            $variableType = $1;
+          }
           $r-><AS::ManakaiPerlVariable.variableType> ($variableType);
           $r-><AS::ManakaiPerlVariable.packageName> ($packageName);
           $r-><AS::ManakaiPerlVariable.localName> ($localName);
