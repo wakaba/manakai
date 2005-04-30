@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/04/29 14:55:52 $
+      $Date: 2005/04/30 06:52:21 $
     @@ContentType:
       dis:Date.RCS
   
@@ -3785,6 +3785,10 @@ ClsDef:
         @@@@@:RESOURCE_NOT_DEFINED_ERR
         @@@@enDesc:
           A feature referred from this module is not defined.
+      @@@RaiseException:
+        @@@@@:UNSUPPORTED_ROLE_ERR
+        @@@@enDesc:
+          A <Q::dis:Role> is not supported.
       @@@PerlDef:
         __DEEP{
           $r = $self-><AG::ManakaiDISPropertyAccessor.plImplementation>
@@ -3895,6 +3899,51 @@ ClsDef:
                         ('$' . $pack_name . '::ProvideFeature{q<' .
                          $fname . '>}->{q<>} = 1');
                     }
+                  }
+                }
+
+                ## -- Roles
+                for my $role (@{$cls-><M::ManakaiDISPropertyAccessor
+                          .getPropertyResourceNodeList>
+                             (<Q::dis:Role>, recursive_isa => true,
+                              default_media_type => <Q::dis:TFQNames>)}) {
+                  my @compat;
+                  for my $compat_el (@{$role->[1]-><M::ManakaiDISElement
+                                           .disChildElements>
+                                              (for_arg => $cls->{for},
+                                               forp_arg => $cls->{forp})}) {
+                    next unless $compat_el-><AG::swcfg21:SWCFGElement
+                       ::swcfg21:ForLatest.expandedURI> eq <Q::dis:compat>;
+                    push @compat, my $compat = $self->{db}
+                             -><M::ManakaiDISDatabase.getResource>
+                                    ($compat_el-><M::ManakaiDISElement
+                                       .tfqnamesValueURI> 
+                                             ($cls->{nameURI}, $cls->{for}));
+                    $compat-><AS::ManakaiDISResourceDefinition.isReferred>
+                                    ($role->[1]);
+                  }
+                  if ($role->[0]-><AG::ManakaiDISResourceDefinition.nameURI>
+                         eq <Q::DOMCore:DOMImplementation> and
+                      $role->[0]-><AG::ManakaiDISResourceDefinition.forURI>
+                         eq <Q::ManakaiDOM:ManakaiDOM>) {
+                    for my $rpack ($role->[0], @compat) {
+                      $r-><M::PLBlockCon.appendStatement>
+                              ('$' . $rpack-><AG::ManakaiDISResourceDefinition
+                                                 .plFullyQualifiedName> .
+                               '::Class{q<' . $pack_name . '>} = 1');
+                    }
+                  } elsif ($role->[0]-><AG::ManakaiDISResourceDefinition.nameURI>
+                         eq <Q::DOMCore:DOMImplementationSource> and
+                      $role->[0]-><AG::ManakaiDISResourceDefinition.forURI>
+                         eq <Q::ManakaiDOM:ManakaiDOM>) {
+                    $r-><M::PLBlockCon.appendStatement>
+                         ('push @org::w3c::dom::DOMImplementationSourceList, q<'.
+                          $pack_name . '>');
+                  } else {
+                    __UNDEEP{__EXCEPTION{UNSUPPORTED_ROLE_ERR::
+                      DIS:sourceNode => {$role->[1]},
+                      DIS:uri => {$role->[0]->{uri}},
+                    }__}__;
                   }
                 }
               } elsif ($cls-><M::ManakaiDISResourceDefinition.isTypeURI>
@@ -5298,6 +5347,8 @@ ClsDef:
                                         (q<@_ == 1>),
                       $get_code,
                       $set_code);
+
+          ## -- Constants
           } elsif ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
                               (<Q::ManakaiDOM:Const>)) {
             my $data_type = $self-><AG::ManakaiDISResourceDefinition
@@ -5315,6 +5366,8 @@ ClsDef:
                             ($self-><AG::ManakaiDISResourceDefinition.plName>);
             $r-><M::PLBlockCon.appendCodeFragment> ($value);
             $r-><AS::MPLSub.prototype> ('');
+
+          ## -- Classes
           } elsif ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
                               (<Q::ManakaiDOM:Class>)) {
             my $plimpl = $self-><AG::ManakaiDISPropertyAccessor
@@ -5322,7 +5375,7 @@ ClsDef:
             $r = $plimpl-><M::MPLImpl.createPerlPackage>
                               ($self-><AG::ManakaiDISResourceDefinition
                                          .plFullyQualifiedName>);
-            ## This class inherits...
+            ## - Inheritance
             for my $scls (@{$self-><M::ManakaiDISPropertyAccessor
                                          .getPropertyResourceList>
                                     (<Q::dis:ISA>,
@@ -5335,7 +5388,8 @@ ClsDef:
               $self-><M::ManakaiDISResourceDefinition.plAddRequireResource>
                           ($scls => $r);
             }
-            ## This class implements...
+
+            ## - Implementing interfaces
             for my $scls (@{$self-><M::ManakaiDISPropertyAccessor
                                          .getPropertyResourceList>
                                     (<Q::dis:Implement>, recursive_isa => true,
@@ -5347,12 +5401,13 @@ ClsDef:
               }
             }
     
-            ## Class members
+            ## - Class members
             my @cr = @{$self-><M::ManakaiDISPropertyAccessor
                                          .getPropertyResourceList>
                                     (<Q::DIS:childResource>)};
             my @const;
             for my $cr (@cr) {
+              ## - Subroutines
               if ($cr-><M::ManakaiDISResourceDefinition.isTypeURI>
                                     (<Q::DISLang:Method>) or
                   $cr-><M::ManakaiDISResourceDefinition.isTypeURI>
@@ -5406,6 +5461,7 @@ ClsDef:
                     DIS:sourceNode => {$cr->{src}},
                   }__}__;
                 }
+              ## - Constant groups
               } elsif ($cr-><M::ManakaiDISResourceDefinition.isTypeURI>
                                 (<Q::ManakaiDOM:ConstGroup>)) {
                 for my $gcr (@{$cr-><M::ManakaiDISPropertyAccessor
@@ -5428,6 +5484,7 @@ ClsDef:
                     push @const, $gcr;
                   }
                 }
+              ## - Constants
               } elsif ($cr-><M::ManakaiDISResourceDefinition.isTypeURI>
                                 (<Q::ManakaiDOM:Const>)) {
                 my $sub = $cr-><AG::ManakaiDISResourceDefinition.plCodeFragment>;
@@ -5441,6 +5498,7 @@ ClsDef:
                 }
                 $r-><M::PLPack.setSub> ($sub-><AG::MPLSub.localName> => $sub);
                 push @const, $cr;
+              ## Package-scope variables
               } elsif ($cr-><M::ManakaiDISResourceDefinition.isTypeURI>
                                 (<Q::DISPerl:ScalarVariable>)) {
                 my $varn = $cr-><AG::ManakaiDISResourceDefinition
@@ -5472,6 +5530,7 @@ ClsDef:
               } # Type of child resources
             }
 
+            ## - Exceptions
             if ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
                              (<Q::DOMException:AnyExceptionClass>)) {
               my $err_def = $plimpl-><M::MPLImpl.createPerlSub> ('___error_def');
@@ -5516,6 +5575,8 @@ ClsDef:
                     }]));
               $r-><M::PLPack.setSub> (___error_def => $err_def);
             }
+
+          ## -- Global variables
           } elsif ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
                                      (<Q::DISPerl:ScalarVariable>)) {
             my $plimpl = $self-><AG::ManakaiDISPropertyAccessor
@@ -5559,9 +5620,9 @@ ClsDef:
           There is no resource whose type is <P::resType>.
       @@@PerlDef:
         __DEEP{
-          for my $cr_uri (@{$self->{<Q::DIS:childResource>}}) {
+          for my $cru (@{$self->{<Q::DIS:childResource>}}) {
             my $cr = $self->{db}-><M::ManakaiDISDatabase.getResource>
-                                             ($cr_uri);
+                                             ($cru->[0]);
             if ($cr-><M::ManakaiDISResourceDefinition.isTypeURI> ($typeURI)) {
               $r = $cr;
               last;
@@ -5595,9 +5656,9 @@ ClsDef:
           whose type is <P::resType>.
       @@@PerlDef:
         __DEEP{
-          for my $cr_uri (@{$self->{<Q::DIS:childResource>}}) {
+          for my $cru (@{$self->{<Q::DIS:childResource>}}) {
             my $cr = $self->{db}-><M::ManakaiDISDatabase.getResource>
-                                             ($cr_uri);
+                                             ($cru->[0]);
             my $ln = $cr-><AG::ManakaiDISResourceDefinition.localName>;
             if (defined $ln and $ln eq $localName and
                 $cr-><M::ManakaiDISResourceDefinition.isTypeURI> ($typeURI)) {
@@ -5627,9 +5688,9 @@ ClsDef:
       @@@PerlDef:
         __DEEP{
           my @constGroup;
-          for my $cr_uri (@{$self->{<Q::DIS:childResource>}}) {
+          for my $cru (@{$self->{<Q::DIS:childResource>}}) {
             my $cr = $self->{db}-><M::ManakaiDISDatabase.getResource>
-                                             ($cr_uri);
+                                             ($cru->[0]);
             my $ln = $cr-><AG::ManakaiDISResourceDefinition.localName>;
             if ($ln and $ln eq $localName and
                 $cr-><M::ManakaiDISResourceDefinition.isTypeURI>
@@ -7524,10 +7585,10 @@ ClsDef:
       @@@PerlDef:
         $r = [];
         if (defined $self->{$propName}) {
-          for my $res_uri (@{ref $self->{$propName} eq 'ARRAY'
+          for my $resu (@{ref $self->{$propName} eq 'ARRAY'
                                          ? $self->{$propName} : []}) {
             push @$r,
-                 $self->{db}-><M::ManakaiDISDatabase.getResource> ($res_uri);
+                 $self->{db}-><M::ManakaiDISDatabase.getResource> ($resu->[0]);
           }
         } elsif ($self->{src}) {
           __DEEP{
@@ -7563,7 +7624,7 @@ ClsDef:
                   }__;
                 }__;
               }
-              push @{$self->{$propName}}, $res_uri;
+              push @{$self->{$propName}}, [$res_uri, $res_name_node];
               my $res = $self->{db}-><M::ManakaiDISDatabase.getResource>
                                                                 ($res_uri);
               push @$r, $res;
@@ -7606,6 +7667,96 @@ ClsDef:
         }
 
   @Method:
+    @@Name: getPropertyResourceNodeList
+    @@enDesc:
+      Gets property value resource and source node (if any) list. 
+    @@PropNameParam:
+    @@NamedParam:
+      @@@Name: recursive
+      @@@Type:
+        DOMMain:boolean::ManakaiDOM:all
+      @@@enDesc:
+        Whether property resource values of this resource
+        should also be included to the returned list or not.
+    @@NamedParam:
+      @@@Name: recursiveISA
+      @@@Type:
+        DOMMain:boolean::ManakaiDOM:all
+      @@@enDesc:
+        Whether property resource values of <Q::dis:ISA> resources 
+        of this resource should also be included to the returned list or not. 
+    @@NamedParam:
+      @@@Name: defaultMediaType
+      @@@Type: ResourceURI
+      @@@enDesc:
+        The URI reference of the default media type which is used 
+        when the property value is retrieved from the source tree 
+        and the source tree element does not have its <Q::dis:ContentType>
+        attribute specified. 
+      @@@nullCase:
+        @@@@enDesc:
+          Defaulted to <Q::dis:TypeQName>.
+    @@Return:
+      @@@Type:
+        Perl:ARRAY::ManakaiDOM:all
+      @@@enDesc:
+        An array reference of the property value resources. 
+        \
+        {NOTE:: This list is <QUOTE::dead>.
+        \
+        }
+      @@@UndeclaredPrefixException:
+      @@@RaiseException:
+        @@@@@:UNSUPPORTED_MEDIA_TYPE_ERR
+        @@@@enDesc:
+          The media type of the attribute node in the source tree
+          corresponding to this resource is not supported. 
+      @@@PerlDef:
+        __DEEP{
+          $self-><M::ManakaiDISPropertyAccessor.getPropertyResourceList>
+                           ($propName, default_media_type => $defaultMediaType);
+          $r = [map {[
+            $self->{db}-><M::ManakaiDISDatabase.getResource> ($_->[0]),
+            $_->[1], # Node if any
+          ]} @{$self->{$propName}}];
+        }__;
+
+        ## NOTE: Same as the code in getPropertyResourceList
+        ##       w/o method names and "map"s
+        if ($recursive) {
+          __DEEP{
+            $opt{___recursive_isa_done} ||= {$self->{uri} => true};
+            my @p_res = map {$_->[0]} @$r;
+            for my $p_res (@p_res) {
+              next if $opt{___recursive_isa_done}->{$p_res->{uri}};
+              $opt{___recursive_isa_done}->{$p_res->{uri}} = true;
+              push @$r, @{$p_res-><M::ManakaiDISPropertyAccessor
+                                     .getPropertyResourceNodeList>
+                                          ($propName, recursive => true,
+                                           recursive_isa => $recursiveISA,
+                         ___recursive_isa_done => $opt{___recursive_isa_done},
+                         default_media_type => $defaultMediaType)};
+            }
+          }__;
+        }
+        if ($recursiveISA) {
+          __DEEP{
+            $opt{___recursive_isa_done} ||= {$self->{uri} => true};
+            my @p_res = map {$_->[0]} @$r;
+            for my $p_res (@p_res) {
+              next if $opt{___recursive_isa_done}->{$p_res->{uri}};
+              $opt{___recursive_isa_done}->{$p_res->{uri}} = true;
+              push @$r, @{$p_res-><M::ManakaiDISPropertyAccessor
+                                     .getPropertyResourceNodeList>
+                                          (<Q::dis:ISA>, recursive_isa => true,
+                                           recursive => $recursive,
+                         ___recursive_isa_done => $opt{___recursive_isa_done},
+                         default_media_type => $defaultMediaType)};
+            }
+          }__;
+        }
+
+  @Method:
     @@Name: addPropertyResourceList
     @@enDesc:
       Adds a resource to a resource-list property value. 
@@ -7631,9 +7782,14 @@ ClsDef:
     @@Return:
       @@@PerlDef:
         if (ref $self->{$propName} eq 'ARRAY') {
-          push @{$self->{$propName}}, $res->{uri};
+          push @{$self->{$propName}}, [$res->{uri}];
         } elsif (not defined $self->{$propName}) {
-          $self->{$propName} = [$res->{uri}];
+          $self->{$propName} = [[$res->{uri}]];
+        } else {
+          __ASSERT{DISPerl:invariant::
+            msg => {q[ref $self->{<].qq[$propName>} = "@{[ref
+                       $self->{$propName}]}"]},
+          }__;
         }
 
 ElementTypeBinding:
@@ -8313,6 +8469,17 @@ ExceptionDef:
          @@@@@QName:uri
          @@@@@enDesc:
            The URI reference of the module.
+     @@@XSubTypeDef:
+       @@@@QName: UNSUPPORTED_ROLE_ERR
+       @@@@enDesc:
+         A <Q::dis:Role> is not supported.
+       @@@@XSourceNodeParam:
+       @@@@XParam:
+         @@@@@QName:uri
+         @@@@@enDesc:
+           The URI reference of the unsupported role.
+       @@@@enMufDef:
+         Role <%p (name => {<Q::DIS:uri>});> is not supported
 ##DISException
 
 XParamDef:

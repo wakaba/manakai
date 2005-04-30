@@ -62,13 +62,15 @@ DIS_FILES_FOR_DIS = \
   $(MANAKAI_LIB_DIR)Message/Util/PerlCode.dis
 ## NOTE: DIS.dis must be first
 
-GENERATED_FILES = $(TEMP_LIB_DIR) \
+PHASE1_PM_FILES = \
   $(TEMP_LIB_DIR)Message/Util/ManakaiNode.pm \
   $(TEMP_LIB_DIR)Message/DOM/DOMMetaImpl.pm \
   $(TEMP_LIB_DIR)Message/Markup/SuikaWikiConfig21.pm \
   $(TEMP_LIB_DIR)Message/Util/Error/DOMException.pm \
   $(TEMP_LIB_DIR)Message/Util/PerlCode.pm \
-  $(TEMP_LIB_DIR)Message/Util/DIS.pm \
+  $(TEMP_LIB_DIR)Message/Util/DIS.pm
+
+GENERATED_FILES = $(TEMP_LIB_DIR) $(PHASE1_PM_FILES) \
   \
   $(TEMP_LIB2_DIR) \
   $(TEMP_LIB2_DIR)Message/Util/ManakaiNode.pm \
@@ -129,7 +131,8 @@ $(TEMP_LIB2_DIR):
 	$(MKDIR) -p $(TEMP_LIB2_DIR)Message/DOM
 	$(MKDIR) -p $(TEMP_LIB2_DIR)Message/Markup
 
-$(TEMP_LIB2_DIR)dom.dac: $(DIS_FILES_FOR_DOMMETAIMPL) $(DAC_PL)
+$(TEMP_LIB2_DIR)dom.dac: $(DIS_FILES_FOR_DOMMETAIMPL) \
+  $(DAC_PL) $(PHASE1_PM_FILES)
 	$(DAC)$@ $<
 
 $(TEMP_LIB2_DIR)dis.dac: $(DIS_FILES_FOR_DIS) $(TEMP_LIB2_DIR)dom.dac $(DAC_PL)
