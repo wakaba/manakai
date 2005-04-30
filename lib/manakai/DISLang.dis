@@ -15,7 +15,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/04/10 05:40:59 $
+      $Date: 2005/04/30 11:17:55 $
     @@ContentType:
       dis:Date.RCS
   
@@ -352,6 +352,33 @@ ResourceTypeDef:
   @Description:
     @@lang:en
     @@@: A constant value.
+
+## -- "Role" properties
+
+PropDef:
+  @QName: role
+  @Description:
+    @@lang:en
+    @@@:
+    The subject resource plays the <QUOTE::role> of the object resource.
+    \
+    {NOTE:: Currently its <Q::rdfs:domain> is limited to 
+            <Q::ManakaiDOM:Class>; future version of this property
+            may allow other types of objects as the domain.
+    \
+    }
+  @rdfs:domain:
+    ManakaiDOM:Class
+  @rdfs:range: Role
+  @dataType:
+    dis:TypeQName
+
+ResourceTypeDef:
+  @QName: Role
+  @Description:
+    @@lang:en
+    @@@:
+      <QUOTE::Role> types.
 
 ## -- The lang:dis tree language vocabulary
 

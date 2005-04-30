@@ -20,7 +20,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/04/29 14:55:52 $
+      $Date: 2005/04/30 11:17:55 $
     @@ContentType:
       dis:Date.RCS
   
@@ -494,6 +494,135 @@ PropDef:
   @dataType:
     dis:TypeQName
 
+FeatureDef:
+  @QName: 
+    ManakaiDOM:Minimum
+  @FeatureVerDef:
+    @@Version: 3.0
+    @@QName: 
+      ManakaiDOM:MinimumFeature30
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Minimum DOM implementation, level 3.
+    @@DOMMetaImpl:instanceFeatureOf:
+      ManakaiDOM:Minimum
+
+## -- Roles
+
+ResourceDef:
+  @QName: ImplementationSourceForManakaiDOMImplementationRegistry
+  @rdf:type:
+    DISLang:Role
+  @ForCheck:
+    =ManakaiDOM:all
+  @Description:
+    @@lang:en
+    @@@:
+      If a class plays this <QUOTE::role>, then it must implement
+      the <IF::DOMCore:DOMImplementationSource> interface with
+      its two methods statically callable (i.e. they can be 
+      called without any instance of the class).  Any class
+      playing this <QUOTE::role> will be contacted when 
+      the <M::DOMMain:ManakaiDOMImplementationRegistry.getDOMImplementationList>
+      method is called.
+
+ResourceDef:
+  @QName: ManakaiDOMImplementationSourceRole
+  @rdf:type:
+    DISLang:Role
+  @ForCheck:
+    =ManakaiDOM:all
+  @rdfs:subClassOf: ImplementationSourceForManakaiDOMImplementationRegistry
+  @Description:
+    @@lang:en
+    @@@:
+      If a class plays this <QUOTE::role>, then it must implement
+      the <IF::DOMCore:DOMImplementationSource> interface with
+      its two methods statically callable (i.e. they can be 
+      called without any instance of the class).  Any class
+      playing this <QUOTE::role> will be contacted when 
+      the <M::DOMMain:ManakaiDOMImplementationRegistry.getDOMImplementationList>
+      method is called.
+      \
+      {NOTE:: Whether the class implements the 
+              <IF::DOMCore:ManakaiDOMImplementationSource> interface
+              or not is another problem.
+      \
+      }
+
+ResourceDef:
+  @QName: ImplementationForManakaiDOMImplementationSource
+  @rdf:type:
+    DISLang:Role
+  @ForCheck:
+    =ManakaiDOM:all
+  @Description:
+    @@lang:en
+    @@@:
+      The <QUOTE::role> that instances of the class is available via
+      the <IF::DOMCore:DOMImplementationSource> interface 
+      implemented by the <Class::DOMCore:ManakaiDOMImplementationSource>
+      objects.
+
+ResourceDef:
+  @QName: ImplementationCompatibleWithManakaiDOMMinimumImplementation
+  @rdf:type:
+    DISLang:Role
+  @ForCheck:
+    =ManakaiDOM:all
+  @Description:
+    @@lang:en
+    @@@:
+      The <QUOTE::role> that the class is compatible with the class
+      <Class::DOMMetaImpl:ManakaiDOMMetaImplementation> so that 
+      any instance of the class compatible with it is castable 
+      to the class via the <M::DOMMetaImpl:ManakaiDOMMetaImplementation
+      .getFeature> method.
+
+ResourceDef:
+  @QName: ManakaiAnyImplementationRole
+  @rdf:type:
+    DISLang:Role
+  @ForCheck:
+    =ManakaiDOM:all
+  @rdfs:subClassOf: ImplementationCompatibleWithManakaiDOMMinimumImplementation
+  @Description:
+    @@lang:en
+    @@@:
+      Any class that plays this <QUOTE::role> might be accessible 
+      via <M::DOMMetaImpl:ManakaiDOMMinimumImplementation
+            ::ManakaiDOM:ManakaiDOMLatest.getFeature>.
+      \
+      {NOTE:: The class don't have to implement the 
+              <IF::DOMMetaImpl:ManakaiDOMMinimumImplementationIF
+                 ::ManakaiDOM:ManakaiDOMLatest> interface.
+      \
+      }
+
+ResourceDef:
+  @QName: ManakaiDOMImplementationRole
+  @rdf:type:
+    DISLang:Role
+  @ForCheck:
+    =ManakaiDOM:all
+  @rdfs:subClassOf: ImplementationForManakaiDOMImplementationSource
+  @rdfs:subClassOf: ManakaiAnyImplementationRole
+  @Description:
+    @@lang:en
+    @@@:
+      Any class that plays this <QUOTE::role> might be accessible
+      via <Class::DOMCore:ManakaiDOMImplementationSource
+                ::ManakaiDOM:ManakaiDOMLatest>
+      or <M::DOMMetaImpl:ManakaiDOMMinimumImplementation
+           ::ManakaiDOM:ManakaiDOMLatest.getFeature>.
+      \
+      {NOTE:: The class that plays this <QUOTE::role> must implement the
+              <IF::DOMMetaImpl:ManakaiDOMMinimumImplementation
+                 ::ManakaiDOM:ManakaiDOMLatest> interface.
+      \
+      }
+
 PropDef:
   @QName:
     dis:Role
@@ -522,6 +651,12 @@ PropDef:
         - <CODE::DOMCore:Node::ManakaiDOM:ManakaiDOM>::: 
             Classes that might be available via <M::DOMCore:Node.getFeature> 
             or any <IF::Node> returning method and attributes.
+      \
+      }
+      \
+      {NOTE:: <Q::dis:Role> is deprecated in favor of <Q::DISLang:role>;
+              <Q::dis:Role> is retained here for compatibility 
+              with old <CODE::cdis2pm> utility.
       \
       }
   @rdfs:domain:
@@ -559,26 +694,18 @@ PropDef:
              <M::DOMCore:ManakaiDOMNode.getFeature>.
          \
       }
+      \
+      {NOTE:: <Q::dis:compat> is deprecated in favor of <Q::DISLang:role>;
+              <Q::dis:compat> is retained here for compatibility 
+              with old <CODE::cdis2pm> utility.
+      \
+      }
   @rdfs:domain:
     ManakaiDOM:Class
   @rdfs:range:
     ManakaiDOM:Class
   @dataType:
     dis:TypeForQNames
-
-FeatureDef:
-  @QName: 
-    ManakaiDOM:Minimum
-  @FeatureVerDef:
-    @@Version: 3.0
-    @@QName: 
-      ManakaiDOM:MinimumFeature30
-    @@Description:
-      @@@lang:en
-      @@@@:
-        Minimum DOM implementation, level 3.
-    @@ISA:
-      ManakaiDOM:Minimum
 
 ## -- The bootstrap object
 
@@ -1037,6 +1164,8 @@ IFClsDef:
     DOMCore:ManakaiDOMImplementationSource
   @CoreLevel3:
 
+  @DISLang:role: ManakaiDOMImplementationSourceRole
+
   @Role:
     @@@: 
       DOMCore:DOMImplementationSource::ManakaiDOM:ManakaiDOM
@@ -1193,6 +1322,14 @@ IFClsDef:
   @IFQName: ManakaiDOMMinimumImplementationIF
   @ClsQName: ManakaiDOMMinimumImplementation
 
+  @Description:
+    @@lang:en
+    @@@:
+      The <IF::ManakaiDOMMinimumImplementationIF> interface 
+      is a subset of the DOM Level 3 <IF::DOMCore:DOMImplementation>
+      interface.  This interface provides only two methods:
+      <M::.hasFeature> (DOM Level 1) and <M::.getFeature> (DOM Level 3).
+
   @ISA:
     @@@:
       DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM1
@@ -1209,6 +1346,10 @@ IFClsDef:
     @@ForCheck:
       ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
 
+  @DISLang:role: ManakaiDOMImplementationRole
+  @DOMMetaImpl:provideFeature:
+    ManakaiDOM:MinimumFeature30
+
   @Role:
     @@@:
       DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM
@@ -1221,14 +1362,6 @@ IFClsDef:
   @DOMMain:implementFeature:
     ManakaiDOM:MinimumFeature30
 
-  @Description:
-    @@lang:en
-    @@@:
-      A small <IF::DOMCore:DOMImplementation> that only supports 
-      <M::.hasFeature> (from DOM Level 1) and <M::.getFeature> 
-      (from DOM Level 3) methods.  This class might be useful
-      for lightweight applications that do not require the full 
-      DOM implementation. 
   @For:
     ManakaiDOM:ManakaiDOMLatest
   @For:
