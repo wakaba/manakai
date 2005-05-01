@@ -15,6 +15,7 @@ GetOptions (
   'db-base-directory-path=s' => \$Opt{db_base_path},
   'for=s' => \$Opt{For},
   'help' => \$Opt{help},
+  'implementation-registry-package=s' => \$Opt{implreg_pack},
   'input-db-file-name=s' => \$Opt{input_file_name},
   'output-file-name=s' => \$Opt{output_file_name},
   'search-path|I=s' => sub {
@@ -64,10 +65,16 @@ pod2usage ({-exitval => 2, -verbose => 0}) unless $Opt{output_file_name};
 $Opt{no_undef_check} = defined $Opt{no_undef_check}
                          ? $Opt{no_undef_check} ? 0 : 1 : 0;
 
+$Opt{implreg_pack} ||= $Message::DOM::DOMImplementationRegistry;
+if ($Opt{implreg_pack} eq
+    'Message::DOM::DOMMetaImpl::ManakaiDOMImplementationRegistryCompat') {
+  unshift @Message::Markup::SuikaWikiConfig21::ManakaiSWCFGImplementation::ISA,
+          'Message::DOM::DOMMetaImpl::ManakaiDOMMinimumImplementationCompat';
+}
+
 use Message::DOM::DOMMetaImpl;
 use Message::Util::DIS;
-my $impl = $Message::DOM::DOMImplementationRegistry
-                 ->get_dom_implementation
+my $impl = $Opt{implreg_pack}->get_dom_implementation
                            ({ExpandedURI q<ManakaiDOM:Minimum> => '3.0',
                              '+' . ExpandedURI q<DIS:Core> => '1.0'})
                  ->get_feature (ExpandedURI q<DIS:Core> => '1.0');

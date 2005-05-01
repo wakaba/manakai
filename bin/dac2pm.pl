@@ -103,6 +103,7 @@ GetOptions (
   'enable-assertion!' => \$Opt{outputAssertion},
   'for=s' => \$Opt{For},
   'help' => \$Opt{help},
+  'implementation-registry-package=s' => \$Opt{implreg_pack},
   'module-uri=s' => \$Opt{module_uri},
   'output-module-version!' => \$Opt{outputModuleVersion},
   'verbose!' => $Opt{verbose},
@@ -119,8 +120,14 @@ $Opt{outputModuleVersion} = 1 unless defined $Opt{outputModuleVersion};
 
 ## TODO: Verbose mode
 
-my $impl = $Message::DOM::DOMImplementationRegistry
-           ->get_dom_implementation
+$Opt{implreg_pack} ||= $Message::DOM::DOMImplementationRegistry;
+if ($Opt{implreg_pack} eq
+    'Message::DOM::DOMMetaImpl::ManakaiDOMImplementationRegistryCompat') {
+  unshift @Message::Markup::SuikaWikiConfig21::ManakaiSWCFGImplementation::ISA,
+          'Message::DOM::DOMMetaImpl::ManakaiDOMMinimumImplementationCompat';
+}
+
+my $impl = $Opt{implreg_pack}->get_dom_implementation
                ({
                  ExpandedURI q<ManakaiDOM:Minimum> => '3.0',
                  '+' . ExpandedURI q<DIS:Core> => '1.0',
@@ -172,4 +179,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/04/28 15:22:59 $
+1; # $Date: 2005/05/01 12:44:05 $

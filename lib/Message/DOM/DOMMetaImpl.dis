@@ -20,7 +20,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/04/30 11:17:55 $
+      $Date: 2005/05/01 12:44:05 $
     @@ContentType:
       dis:Date.RCS
   
@@ -77,6 +77,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/events#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @DOMMetaImpl:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
   @DOMXML:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xml#
   @infoset:
@@ -721,7 +723,7 @@ ResourceDef:
       lang:Perl
   @DefaultValue:
     @@@:
-      <ClassName::DOMMain:ManakaiDOMImplementationRegistry
+      <ClassName::DOMMetaImpl:ManakaiDOMImplementationRegistry
                                   ::ManakaiDOM:ManakaiDOMLatest>
     @@ContentType:
       lang:Perl
@@ -730,23 +732,74 @@ ResourceDef:
   @For:
     ManakaiDOM:ManakaiDOMLatest
 
+ForDef:
+  @QName: 
+    DOMMetaImpl:ForCDIS
+  @enDesc:
+    For <File::cdis2pm.pl>, an old version of the <QUOTE::dis> utility.
+
+ForDef:
+  @QName: 
+    DOMMetaImpl:ForDAC
+  @enDesc:
+    For <QUOTE::dac>, the latest version of the <QUOTE::dis> utility.
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+
+ImplNote:
+  {TODO:: Exclude <Q::ForCDIS> part by module plan.
+  \
+  }
+
 ## -- The implementation registry object
 
 ResourceDef:
   @QName:
+    @@@: ManakaiDOMImplementationRegistry
+    @@ForCheck: ForDAC
+  @QName:
     @@@:  
       DOMMain:DOMImplementationRegistry
-    @@For:
-      !ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      !ManakaiDOM:ManakaiDOM ForCDIS
   @QName:
     @@@: 
       DOMMain:ManakaiDOMImplementationRegistry
-    @@For:
-      ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM ForCDIS
+  @AppName:
+    @@@:
+      Message::DOM::DOMMetaImpl::ManakaiDOMImplementationRegistryCompat
+    @@ContentType:
+      Perl:package-name
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM ForCDIS
   @rdf:type:
-    ManakaiDOM:Class
+    @@@:
+      ManakaiDOM:Class
+    @@ForCheck: ForDAC
+  @rdf:type:
+    @@@:
+      ManakaiDOM:Class
+    @@ForCheck: ForCDIS
+
   @ForCheck:
     ManakaiDOM:DOM3 !=ManakaiDOM:ManakaiDOM
+  @rdf:type:
+    @@@:
+      dis:MultipleResource
+    @@ForCheck: !ForCDIS !ForDAC
+  @resourceFor:
+    @@@: ForCDIS
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOMLatest
+  @resourceFor: ForDAC
+
   @ISA:
     @@@:
       ManakaiDOM:ManakaiDOMObject
@@ -778,8 +831,8 @@ ResourceDef:
       \
       }
   @Method:
-    @@For:
-      ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM ForCDIS
     @@Name: newInstance
     @@ManakaiDOM:isStatic: 1
     @@Description:
@@ -810,8 +863,7 @@ ResourceDef:
           A new instance of the <IF:ManakaiDOMImplementationRegistry>.
       @@@PerlDef:
           $r = bless [@org::w3c::dom::DOMImplementationSourceList], $self;
-    @@For:
-      ManakaiDOM:ManakaiDOM
+
   @Method:
      @@Name:  getDOMImplementation
      @@ManakaiDOM:isStatic: 1
@@ -831,10 +883,10 @@ ResourceDef:
           @@@@@: 
             A list of desired features that must be implemented.
      @@Return:
-       @@@Type:  
+       @@@Type:
          @@@@@:
            DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM
-         @@@@For:
+         @@@@ForCheck:
            ManakaiDOM:ManakaiDOM
        @@@Type:
          DOMCore:DOMImplementation
@@ -864,6 +916,22 @@ ResourceDef:
            @@@@@@: 
              No implementation implementing the desired features is found.
        @@@PerlDef:
+         @@@@ForCheck: ForDAC
+         @@@@@:
+           __CODE{DOMMain:stringifyFeatures:: $IN => $features,
+                                              $OUT => $features}__;
+           __DEEP{
+             for my $class (
+               keys %Message::DOM::ManakaiDOMImplementationRegistry::SourceClass
+             ) {
+               $r = $class-><M::DOMCore:DOMImplementationSource
+                               .getDOMImplementation> ($features);
+               last if defined $r;
+             }
+           }__;
+       @@@PerlDef:
+         @@@@ForCheck: ForCDIS
+         @@@@@:
            __CODE{DOMMain:stringifyFeatures:: $IN => $features,
                                               $OUT => $features}__;
            __DEEP{
@@ -890,7 +958,8 @@ ResourceDef:
          desired features.
      @@Param:
         @@@Name:  features
-        @@@Type:  DOMString
+        @@@Type:  
+          DOMMain:DOMString
         @@@actualType:
           ManakaiDOM:ManakaiDOMFeatures
         @@@Description:
@@ -919,6 +988,23 @@ ResourceDef:
          @@@@For:
            ManakaiDOM:ManakaiDOM
        @@@PerlDef:
+         @@@@ForCheck: ForDAC
+         @@@@@:
+           __CODE{DOMMain:stringifyFeatures:: $IN => $features,
+                                              $OUT => $features}__;
+           __DEEP{
+             $r = <ClassM::DOMCore:ManakaiDOMImplementationList.new>;
+             for my $class (
+               keys %Message::DOM::ManakaiDOMImplementationRegistry::SourceClass
+             ) {
+               $r-><M::DOMCore:ManakaiDOMImplementationList.add>
+                         ($class-><M::DOMCore:ManakaiDOMImplementationSource
+                                       .getDOMImplementationList> ($features));
+             }
+           }__;
+       @@@PerlDef:
+         @@@@ForCheck: ForCDIS
+         @@@@@:
            __CODE{DOMMain:stringifyFeatures:: $IN => $features,
                                               $OUT => $features}__;
            __DEEP{
@@ -949,8 +1035,8 @@ ResourceDef:
                 defined in the <CITE::DOM Level 3 Specification>.
         \
         }
-    @@For:
-      ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM ForCDIS
     @@Param:
       @@@Name: s
       @@@Type:
@@ -1157,14 +1243,81 @@ IFClsDef:
             }
           }
 
-IFClsDef:
-  @IFQName:
-    DOMCore:DOMImplementationSource
-  @ClsQName:
-    DOMCore:ManakaiDOMImplementationSource
+ResourceDef:
+  @rdf:type:
+    @@@:
+      dis:MultipleResource
+    @@ForCheck:
+      !ManakaiDOM:ForIF !ManakaiDOM:ForClass !ForCDIS !ForDAC
+  @resourceFor:
+    @@@:
+      ManakaiDOM:ForIF
+    @@ForCheck:
+      !ManakaiDOM:ForClass
+  @resourceFor:
+    @@@:
+      ManakaiDOM:ForClass
+    @@ForCheck: 
+      !ManakaiDOM:ForClass
+  
+  @rdf:type:
+    @@@:
+      ManakaiDOM:IF
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @QName:
+    @@@:
+      DOMCore:DOMImplementationSource
+    @@ForCheck:
+      ManakaiDOM:ForIF
+
+  @rdf:type:
+    @@@:
+      dis:MultipleResource
+    @@ForCheck:
+      ManakaiDOM:ForClass !ForCDIS !ForDAC !ManakaiDOM:ForIF
+  @resourceFor:
+    @@@: ForCDIS
+    @@ForCheck:
+      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOMLatest
+  @resourceFor:
+    @@@: ForDAC
+    @@ForCheck:
+      ManakaiDOM:ForClass
+
+  @rdf:type:
+    @@@:
+      ManakaiDOM:Class
+    @@ForCheck: 
+      ManakaiDOM:ForClass ForCDIS
+  @QName:
+    @@@:
+      DOMCore:ManakaiDOMImplementationSource
+    @@ForCheck:
+      ManakaiDOM:ForClass ForCDIS
+  @AppName:
+    @@@:
+      Message::DOM::DOMMetaImpl::ManakaiDOMImplementationSourceCompat
+    @@ContentType:
+      Perl:package-name
+    @@ForCheck:
+      ManakaiDOM:ForClass ForCDIS
+  
+  @rdf:type:
+    @@@:
+      ManakaiDOM:Class
+    @@ForCheck:
+      ManakaiDOM:ForClass ForDAC
+  @QName:
+    @@@: ManakaiDOMImplementationSource
+    @@ForCheck:
+      ManakaiDOM:ForClass ForDAC
+
   @CoreLevel3:
 
-  @DISLang:role: ManakaiDOMImplementationSourceRole
+  @DISLang:role:
+    @@@: ManakaiDOMImplementationSourceRole
+    @@ForCheck: ForDAC
 
   @Role:
     @@@: 
@@ -1172,7 +1325,7 @@ IFClsDef:
     @@For:
       ManakaiDOM:ManakaiDOM
     @@ForCheck:
-      ManakaiDOM:ForClass
+      ManakaiDOM:ForClass ForCDIS
 
   @Description:
     @@lang:en
@@ -1225,6 +1378,59 @@ IFClsDef:
               This source has no DOM implementation that supports the 
               desired features and versions.
         @@@PerlDef:
+          @@@@ForCheck: ForDAC
+          @@@@@:
+            CLS: for my $class (grep {
+              $Message::DOM::ManakaiDOMImplementationSource::SourceClass{$_}
+            } keys %Message::DOM::ManakaiDOMImplementationSource::SourceClass) {
+              __CODE{makeClassISAList:: $CLASS => $class}__;
+              for my $fname (keys %$features) {
+                my $fkey = $fname;
+                my $plus = $fname =~ s/^\+// ? true : false;
+                FVER: for my $fver (grep {$features->{$fkey}->{$_}}
+                                       keys %{$features->{$fkey}}) {
+                  for my $cls ($class, @{$Message::DOM::ClassISA{$class}}) {
+                    if ($Message::DOM::ImplFeature{$class}->{$fname}->{$fver} ||=
+                           ## (Caching)
+                        $Message::DOM::ImplFeature{$cls}->{$fname}->{$fver}) {
+                      next FVER; # Feature/version found
+                    }
+                  }
+
+                  if ($plus) {
+                    if ($Message::DOM::ManakaiDOMImplementation::CompatClass{
+                          $class}) {
+                      my %compat_cls;
+                      for my $cls (grep {
+                        $Message::DOM::ManakaiDOMImplementation::CompatClass{
+                        $_}
+                      } keys
+                      %Message::DOM::ManakaiDOMImplementation::CompatClass) {
+                        next if $compat_cls{$cls};
+                        __CODE{makeClassISAList:: $CLASS => $cls}__;
+                        for my $c (@{$Message::DOM::ClassISA{$cls}}) {
+                          $compat_cls{$c} = true;
+                        }                 
+                      }
+                      for my $cls (keys %compat_cls) {
+                        if ($Message::DOM::ImplFeature{$cls}
+                              ->{$fname}->{$fver}) {
+                          next FVER; # +Feature/ver found
+                        }
+                      }
+                    }
+                  }
+                  next CLS; # Not found
+                } # FVER
+              } # FNAME
+
+              ## Class found
+              $r = $class->_new;
+              last CLS;    ## NOTE: Method name directly written
+            } # CLS
+        @@@PerlDef:
+          @@@@ForCheck: ForCDIS
+          @@@@@:
           $features->{'core'}->{''} = 1;
               ## NOTE: This method must return a DOMImplementation object. 
           CLS: for my $fcls (values %{<IF::DOMCore:DOMImplementation
@@ -1234,7 +1440,7 @@ IFClsDef:
               my $plus = $fname =~ s/^\+// ? 1 : 0;
               F: for my $fver (grep {$features->{$fkey}->{$_}}
                                      keys %{$features->{$fkey}}) {
-                unless ($fcls->{feature}->{$fkey}->{$fver}) {
+                unless ($fcls->{feature}->{$fname}->{$fver}) {
                   ## Accessible via getFeature
                   if ($plus and
                       ${<Class::DOMCore:ManakaiDOMImplementation
@@ -1283,6 +1489,60 @@ IFClsDef:
             A list of DOM implementations that support the desired 
             features and versions.
         @@@PerlDef:
+          @@@@ForCheck: ForDAC
+          @@@@@:
+            $r = <ClassM::DOMCore:ManakaiDOMImplementationList.new>;
+            CLS: for my $class (grep {
+              $Message::DOM::ManakaiDOMImplementationSource::SourceClass{$_}
+            } keys %Message::DOM::ManakaiDOMImplementationSource::SourceClass) {
+              __CODE{makeClassISAList:: $CLASS => $class}__;
+              for my $fname (keys %$features) {
+                my $fkey = $fname;
+                my $plus = $fname =~ s/^\+// ? true : false;
+                FVER: for my $fver (grep {$features->{$fkey}->{$_}}
+                                       keys %{$features->{$fkey}}) {
+                  for my $cls ($class, @{$Message::DOM::ClassISA{$class}}) {
+                    if ($Message::DOM::ImplFeature{$class}->{$fname}->{$fver} ||=
+                           ## (Caching)
+                        $Message::DOM::ImplFeature{$cls}->{$fname}->{$fver}) {
+                      next FVER; # Feature/version found
+                    }
+                  }
+
+                  if ($plus) {
+                    if ($Message::DOM::ManakaiDOMImplementation::CompatClass{
+                          $class}) {
+                      my %compat_cls;
+                      for my $cls (grep {
+                        $Message::DOM::ManakaiDOMImplementation::CompatClass{
+                        $_}
+                      } keys
+                      %Message::DOM::ManakaiDOMImplementation::CompatClass) {
+                        next if $compat_cls{$cls};
+                        __CODE{makeClassISAList:: $CLASS => $cls}__;
+                        for my $c (@{$Message::DOM::ClassISA{$cls}}) {
+                          $compat_cls{$c} = true;
+                        }                 
+                      }
+                      for my $cls (keys %compat_cls) {
+                        if ($Message::DOM::ImplFeature{$cls}
+                              ->{$fname}->{$fver}) {
+                          next FVER; # +Feature/ver found
+                        }
+                      }
+                    }
+                  }
+                  next CLS; # Not found
+                } # FVER
+              } # FNAME
+
+              ## Class found
+              $r-><M::DOMCore:ManakaiDOMImplementationList.add> ($class->_new);
+              last CLS;                 ## NOTE: Method name directly written
+            } # CLS
+        @@@PerlDef:
+          @@@@ForCheck: ForCDIS
+          @@@@@:
           $features->{'core'}->{''} = 1;
               ## NOTE: This method must return DOMImplementation objects. 
           $r = <ClassM::DOMCore:ManakaiDOMImplementationList.new>;
@@ -1316,11 +1576,98 @@ IFClsDef:
           }
 ##DOMImplementationSource
 
+ResourceDef:
+  @QName: makeClassISAList
+  @rdf:type:
+    dis2pm:BlockCode
+  @enDesc:
+    Makes the list of <QUOTE::is-a> classes of a class.
+  @PerlDef:
+    unless ($Message::DOM::ClassISA{$CLASS}) {
+      no strict 'refs';
+      my %__class;
+      my @__chk = ($CLASS);
+      while (my $__chk = shift @__chk) {
+        $__class{$__chk} = true;
+        for my $__isa (@{$__chk . '::ISA'}) {
+          if ($__isa !~ /::IF::/ and 
+              not $__class{$__isa}) {
+            push @__chk, $__isa;
+          }
+        }
+      }
+      $Message::DOM::ClassISA{$CLASS} = [keys %__class];
+    }
+
 ## -- Simplified DOMImplementation interface
 
-IFClsDef:
-  @IFQName: ManakaiDOMMinimumImplementationIF
-  @ClsQName: ManakaiDOMMinimumImplementation
+ResourceDef:
+  @rdf:type:
+    @@@:
+      dis:MultipleResource
+    @@ForCheck:
+      !ManakaiDOM:ForIF !ManakaiDOM:ForClass !ForCDIS !ForDAC
+  @resourceFor:
+    @@@:
+      ManakaiDOM:ForIF
+    @@ForCheck:
+      !ManakaiDOM:ForClass
+  @resourceFor:
+    @@@:
+      ManakaiDOM:ForClass
+    @@ForCheck: 
+      !ManakaiDOM:ForClass
+  
+  @rdf:type:
+    @@@:
+      ManakaiDOM:IF
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @QName:
+    @@@: ManakaiDOMMinimumImplementationIF
+    @@ForCheck:
+      ManakaiDOM:ForIF
+
+  @rdf:type:
+    @@@:
+      dis:MultipleResource
+    @@ForCheck:
+      ManakaiDOM:ForClass !ForCDIS !ForDAC !ManakaiDOM:ForIF
+  @resourceFor:
+    @@@: ForCDIS
+    @@ForCheck:
+      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOMLatest
+  @resourceFor:
+    @@@: ForDAC
+    @@ForCheck:
+      ManakaiDOM:ForClass
+
+  @rdf:type:
+    @@@:
+      ManakaiDOM:Class
+    @@ForCheck: 
+      ManakaiDOM:ForClass ForCDIS
+  @QName:
+    @@@: ManakaiDOMMinimumImplementationCompat
+    @@ForCheck:
+      ManakaiDOM:ForClass ForCDIS
+  @AppName:
+    @@@:
+      Message::DOM::DOMMetaImpl::ManakaiDOMMinimumImplementationCompat
+    @@ContentType:
+      Perl:package-name
+    @@ForCheck:
+      ManakaiDOM:ForClass ForCDIS
+  
+  @rdf:type:
+    @@@:
+      ManakaiDOM:Class
+    @@ForCheck:
+      ManakaiDOM:ForClass ForDAC
+  @QName:
+    @@@: ManakaiDOMMinimumImplementation
+    @@ForCheck:
+      ManakaiDOM:ForClass ForDAC
 
   @Description:
     @@lang:en
@@ -1346,7 +1693,9 @@ IFClsDef:
     @@ForCheck:
       ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
 
-  @DISLang:role: ManakaiDOMImplementationRole
+  @DISLang:role:
+    @@@: ManakaiDOMImplementationRole
+    @@ForCheck: ForDAC
   @DOMMetaImpl:provideFeature:
     ManakaiDOM:MinimumFeature30
 
@@ -1356,7 +1705,7 @@ IFClsDef:
     @@compat:
       DOMCore:ManakaiDOMImplementation::ManakaiDOM:ManakaiDOMLatest
     @@ForCheck:
-      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
+      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM ForCDIS
   @DOMMain:implementFeature:
     DOMCore:CoreFeature10
   @DOMMain:implementFeature:
@@ -1413,8 +1762,33 @@ IFClsDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: The feature is not implemented.
-      @@@PerlDef:
-        my $plus = $feature =~ s/^\+// ? 1 : 0;
+        @@@PerlDef:
+          @@@@ForCheck: ForDAC
+          @@@@@:
+            my $plus = $feature =~ s/^\+// ? 1 : 0;
+            my $class = ref $self;
+            __CODE{makeClassISAList:: $CLASS => $class}__;
+            if (defined $Message::DOM::ImplFeature{$class}
+                                ->{$feature}->{$version}) {
+              $r = $Message::DOM::ImplFeature{$class}
+                                ->{$feature}->{$version};
+            } elsif ($plus) {
+              CLASS: for my $class (grep {
+                $Message::DOM::ManakaiDOMImplementation::CompatClass{$_}
+              } keys %Message::DOM::ManakaiDOMImplementation::CompatClass) {
+                for my $cls ($class, @{$Message::DOM::ClassISA{$class}}) {
+                  if ($Message::DOM::ImplFeature{$class}
+                                   ->{$feature}->{$version}) {
+                    $r = true;
+                    last CLASS;
+                  }
+                }
+              }
+            }
+        @@@PerlDef:
+          @@@@ForCheck: ForCDIS
+          @@@@@:
+            my $plus = $feature =~ s/^\+// ? 1 : 0;
         if (${<IF::DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM>::Class}{
             ref $self}->{$feature}->{$version}) {
           $r = true;
@@ -1480,6 +1854,25 @@ IFClsDef:
             There is no object available that implements interfaces 
             associated with the <P::feature> and <P::version>. 
         @@@PerlDef:
+          @@@@ForCheck: ForDAC
+          @@@@@:
+            $feature =~ s/^\+//;
+            CLASS: for my $class (grep {
+              $Message::DOM::ManakaiDOMImplementation::CompatClass{$_}
+            } keys %Message::DOM::ManakaiDOMImplementation::CompatClass) {
+              __CODE{makeClassISAList:: $CLASS => $class}__;
+              for my $cls ($class, @{$Message::DOM::ClassISA{$class}}) {
+                if ($Message::DOM::ImplFeature{$class}->{$feature}->{$version}) {
+                  $r = $self->{<Q::TreeCore:node>}
+                            -><M::ManakaiDOM:ManakaiDOMNodeObject
+                                     ::ManakaiDOM:Perl.newReference> ($class);
+                  last CLASS;
+                }
+              }
+            }
+        @@@PerlDef:
+          @@@@ForCheck: ForCDIS
+          @@@@@:
           $feature =~ s/^\+//;
           for (values %{<Class::DOMCore:ManakaiDOMImplementation
                                      ::ManakaiDOM:ManakaiDOMLatest>::Class}) {

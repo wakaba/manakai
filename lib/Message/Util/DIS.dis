@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/05/01 05:33:58 $
+      $Date: 2005/05/01 12:44:05 $
     @@ContentType:
       dis:Date.RCS
   
@@ -467,8 +467,10 @@ ClsDef:
             document. 
       @@@PerlDef:
         __DEEP{
-          $r = $self-><M::swcfg21:ManakaiSWCFGParser
-                        ::swcfg21:ForLatest.parse> ($input);
+          $r = $self->SUPER::parse ($input)
+                      ## NOTE: Method name directly written
+                      #< M::swcfg21:ManakaiSWCFGParser
+                      #  ::swcfg21:ForLatest.parse> ($input)
         }__;
         if (defined $r) {
           $r = bless $r, <ClassName::ManakaiDISDocument>;
@@ -3913,21 +3915,23 @@ ClsDef:
                                        .plFullyQualifiedName>;
                       for my $fname (@fname) {
                         $r-><M::PLBlockCon.appendStatement>
-                          ('$' . $cp . '::ProvideFeature{q<' .
+                          ('$Message::DOM::ImplFeature{q<' . $cp .
+                           '>}->{q<' .
                            $fname . '>}->{q<' . $fver . '>} ||= '.$fi);
                         $r-><M::PLBlockCon.appendStatement>
-                          ('$' . $cp . '::ProvideFeature{q<' .
-                           $fname . '>}->{q<>} = 1');
+                          ('$Message::DOM::ImplFeature{q<' . $cp .
+                           '>}->{q<' . $fname . '>}->{q<>} = 1');
                       }
                     }
                   } else {  ## No DOMMetaImpl:ProvidedThrough attribute
                     for my $fname (@fname) {
                       $r-><M::PLBlockCon.appendStatement>
-                        ('$' . $pack_name . '::ProvideFeature{q<' .
+                        ('$Message::DOM::ImplFeature{q<' . $pack_name .
+                         '>}->{q<' .
                          $fname . '>}->{q<' . $fver . '>} ||= '.$fi);
                       $r-><M::PLBlockCon.appendStatement>
-                        ('$' . $pack_name . '::ProvideFeature{q<' .
-                         $fname . '>}->{q<>} = 1');
+                        ('$Message::DOM::ImplFeature{q<' . $pack_name .
+                         '>}->{q<' . $fname . '>}->{q<>} = 1');
                     }
                   }
                 }
@@ -3953,7 +3957,7 @@ ClsDef:
    (<Q::DOMMetaImpl:ImplementationCompatibleWithManakaiDOMMinimumImplementation>)
                   ) {
                     $r-><M::PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMMinimumImplementation'.
+                          ('$Message::DOM::ManakaiDOMImplementation'.
                            '::CompatClass{q<' . $pack_name . '>} = 1');
                   }
                 }
@@ -7123,11 +7127,23 @@ ClsDef:
             }
           }
           unless (@$r) {
+            my $pr = $self-><M::ManakaiDISPropertyAccessor
+                              .getPropertyResource> (<Q::dis2pm:parentResource>);
+            if ($pr) {
+              if ($pr-><M::ManakaiDISResourceDefinition.isTypeURI>
+                            (<Q::DOMMain:DOMFeature>) and
+                  not $pr-><AG::ManakaiDISResourceDefinition.isAnonymous>) {
+                push @$r, @{$pr-><AG::ManakaiDISResourceDefinition
+                                     .featureNameList>};
+              }
+            }
+          }
+          unless (@$r) {
             if ($self-><AG::ManakaiDISResourceDefinition.isAnonymous>) {
               my $ln = $self-><AG::ManakaiDISResourceDefinition.localName>;
-              push @$r, $ln if defined $ln;
+              push @$r, lc $ln if defined $ln;
             } else {
-              push @$r, $self-><AG::ManakaiDISResourceDefinition.nameURI>;
+              push @$r, lc $self-><AG::ManakaiDISResourceDefinition.nameURI>;
             }
           }
         }__;

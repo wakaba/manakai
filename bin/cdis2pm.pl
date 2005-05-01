@@ -1705,7 +1705,8 @@ for my $pack (values %{$State->{Module}->{$State->{module}}
               for my $fname (keys %{$f->[0]
                                       ->{ExpandedURI q<dis2pm:featureName>}}) {
                 $feature->{$fname}->{$version}
-                  = $f->[0]->{ExpandedURI q<dis2pm:notImplemented>} ? 0 : 1
+                  = 1
+                  #= $f->[0]->{ExpandedURI q<dis2pm:notImplemented>} ? 0 : 1
                     if $f->[2];
                 unless ($feature->{$fname}->{$version}) {
                   $feature->{$_->[0]}->{$_->[1]} = 0 for @{$f->[1]};
@@ -2402,4 +2403,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/04/29 06:07:06 $
+1; # $Date: 2005/05/01 12:44:05 $

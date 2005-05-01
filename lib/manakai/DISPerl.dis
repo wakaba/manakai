@@ -15,7 +15,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/04/29 06:07:06 $
+      $Date: 2005/05/01 12:44:05 $
     @@ContentType:
       dis:Date.RCS
   
@@ -285,12 +285,16 @@ FormatDef:
     @@lang:en
     @@@:
       A fully qualified Perl package name. 
+  @rdfs:subClassOf:
+    lang:Perl
 
 FormatDef:
   @QName: SubName
   @FullName:
     @@lang:en
     @@@: Perl subroutine name
+  @rdfs:subClassOf:
+    lang:Perl
 
 FormatDef:
   @QName: MethodName
@@ -310,6 +314,8 @@ FormatDef:
     @@lang:en
     @@@:
       Perl subroutine prototype 
+  @rdfs:subClassOf:
+    lang:Perl
 
 ## -- Perl binding specific properties and datatypes
 
@@ -344,7 +350,7 @@ DataTypeDef:
     @@lang:en
     @@@: 
      <QUOTE::dis> tree fragment generating Perl code
-  @ISA: 
+  @rdfs:subClassOf: 
     lang:dis
 
 ResourceDef:
