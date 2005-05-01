@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/04/30 11:17:55 $
+      $Date: 2005/05/01 05:33:58 $
     @@ContentType:
       dis:Date.RCS
   
@@ -3812,6 +3812,11 @@ ClsDef:
 
           ## -- Classes
           ## TODO: Custom module construction support
+          my $thismod_name = $self-><AG::ManakaiDISModuleDefinition
+                                                     .plFullyQualifiedName>;
+          my $thismod_pack = $r-><M::PLFile.getLastPackage>
+                                     ($thismod_name, make_new_package => true);
+          my %const;
           for my $cls (@{$self-><M::ManakaiDISPropertyAccessor
                                    .getPropertyResourceList>
                                               (<Q::DIS:resource>)}) {
@@ -3825,6 +3830,35 @@ ClsDef:
                 $r-><M::PLFile.appendPackage> ($pack);
                 my $pack_name = $cls-><AG::ManakaiDISResourceDefinition
                                           .plFullyQualifiedName>;
+
+                ## -- Constants
+                for my $cr (@{$cls-><M::ManakaiDISPropertyAccessor
+                                       .getPropertyResourceList>
+                                          (<Q::DIS:childResource>)}) {
+                  if ($cr-><M::ManakaiDISResourceDefinition.isTypeURI>
+                                          (<Q::ManakaiDOM:Const>)) {
+                    $thismod_pack-><M::PLPack.addExport>
+                      (null,
+                       my $nm = $cr-><AG::ManakaiDISResourceDefinition.plName>);
+                    $const{$nm} = $cr-><AG::ManakaiDISResourceDefinition
+                                           .plFullyQualifiedName>;
+                  } elsif ($cr-><M::ManakaiDISResourceDefinition.isTypeURI>
+                                          (<Q::ManakaiDOM:ConstGroup>)) {
+                    my $tag = $cr-><AG::ManakaiDISResourceDefinition.plName>;
+                    for my $gcr (@{$cr-><M::ManakaiDISPropertyAccessor
+                                       .getPropertyResourceList>
+                                          (<Q::DIS:childResource>)}) {
+                      if ($gcr-><M::ManakaiDISResourceDefinition.isTypeURI>
+                                          (<Q::ManakaiDOM:Const>)) {
+                        $thismod_pack-><M::PLPack.addExport>
+                          ($tag, my $nm = $gcr-><AG::ManakaiDISResourceDefinition
+                                                   .plName>);
+                        $const{$nm} = $gcr-><AG::ManakaiDISResourceDefinition
+                                                   .plFullyQualifiedName>;
+                      }
+                    }
+                  }
+                }
 
                 ## -- Features
                 my %feature;
@@ -3931,12 +3965,41 @@ ClsDef:
                       ($cls-><AG::ManakaiDISResourceDefinition.plCodeFragment>);
               }
             }
+          } # Classes
+
+          ## -- Exporter (constants)
+          if (keys %const) {
+            my $map = <ClassM::MPLImpl.perlLiteral> (\%const);
+            $thismod_pack-><M::PLBlockCon.appendStatement> ("sub $_ ()")
+              for keys %const;
+            $thismod_pack-><M::PLPack.getSub> ('AUTOLOAD', make_new_node => true)
+              -><M::PLBlockCon.appendCode> (q[
+                my $al = our $AUTOLOAD;
+                $al =~ s/.+:://;
+                if (] . $map . q[->{$al}) {
+                  no strict 'refs';
+                  *{$AUTOLOAD} = \&{] . $map . q[->{$al}};
+                  goto &{$AUTOLOAD};
+                } else {
+                  require Carp;
+                  Carp::croak (qq<Can't locate method "$AUTOLOAD">);
+                }
+              ]);
+            $thismod_pack-><M::PLPack.getSub> ('import', make_new_node => true)
+              -><M::PLBlockCon.appendCode> (q[
+                my $self = shift;
+                if (@_) {
+                  local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
+                  $self->SUPER::import (@_);
+                  for (grep {not /\W/} @_) {
+                    eval qq{$_};
+                  }
+                }
+              ]);
           }
 
           ## -- Require'ing external modules
           ## TODO: Custom module construction support
-          my $thismod_name = $self-><AG::ManakaiDISModuleDefinition
-                                                     .plFullyQualifiedName>;
           for my $uri (@{$r-><M::MPLCodeFragment.disGetRequireURIList>}) {
             my $mod = $self->{db}-><M::ManakaiDISDatabase.getResource> ($uri)
                            -><AG::ManakaiDISResourceDefinition.ownerModule>;
@@ -4448,32 +4511,7 @@ ClsDef:
           if (exists $self->{<Q::dis2pm:name>}) {
             $r = $self->{<Q::dis2pm:name>};
           } elsif ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
-                              (<Q::ManakaiDOM:Const>) or
-                   $self-><M::ManakaiDISResourceDefinition.isTypeURI>
-                              (<Q::ManakaiDOM:ConstGroup>)) {
-            $r = uc $self->{localName};
-            unless (defined $r) {
-              __UNDEEP{
-                __EXCEPTION{NO_LOCAL_NAME_ERR::
-                  DIS:uri => {$self->{uri}},
-                  DIS:sourceNode => {$self->{src}},
-                }__;
-              }__;
-            }
-            if ($r =~ /^_/ or $r =~ /_$/) {
-              __UNDEEP{
-                __EXCEPTION{RESERVED_PERL_METHOD_NAME_ERR::
-                  DIS:uri => {$self->{uri}},
-                  DIS:localName => {$self->{localName}},
-                  DIS:soruceNode => {$self->{src}},
-                  DIS:generatedName => {$r},
-                }__;
-              }__;
-            }
-          } elsif ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
-                              (<Q::DISLang:Method>) or
-                   $self-><M::ManakaiDISResourceDefinition.isTypeURI>
-                              (<Q::DISLang:Attribute>)) {
+                              (<Q::DISLang:AnyMethod>)) {
             if (defined $self->{localName}) {
               $r = <ClassM::ManakaiDISImplementation.camelCaseToUnderscoreName>
                                                ($self->{localName});
@@ -4511,6 +4549,38 @@ ClsDef:
             } else {
               $r = null;
             }
+          } elsif ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
+                              (<Q::ManakaiDOM:Const>)) {
+            unless (defined $self->{localName}) {
+              __UNDEEP{
+                __EXCEPTION{NO_LOCAL_NAME_ERR::
+                  DIS:uri => {$self->{uri}},
+                  DIS:sourceNode => {$self->{src}},
+                }__;
+              }__;
+            }
+            $r = uc $self->{localName};
+            if ($r =~ /^_/ or $r =~ /_$/) {
+              __UNDEEP{
+                __EXCEPTION{RESERVED_PERL_METHOD_NAME_ERR::
+                  DIS:uri => {$self->{uri}},
+                  DIS:localName => {$self->{localName}},
+                  DIS:soruceNode => {$self->{src}},
+                  DIS:generatedName => {$r},
+                }__;
+              }__;
+            }
+          } elsif ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
+                              (<Q::ManakaiDOM:ConstGroup>)) {
+            $r = $self->{localName};
+            unless (defined $r) {
+              __UNDEEP{
+                __EXCEPTION{NO_LOCAL_NAME_ERR::
+                  DIS:uri => {$self->{uri}},
+                  DIS:sourceNode => {$self->{src}},
+                }__;
+              }__;
+            }
           } else {
             $r = null;
           }
@@ -4543,8 +4613,8 @@ ClsDef:
           The local name of this resource is not defined. 
       @@@PerlDef:
         __DEEP{
-          if (exists $self->{<Q::dis2pm:name>}) {
-            $r = $self->{<Q::dis2pm:name>};
+          if (exists $self->{<Q::PerlCode.plFullyQualifiedName>}) {
+            $r = $self->{<Q::PerlCode:plFullyQualifiedName>};
           } elsif ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
                               (<Q::ManakaiDOM:Class>) or
                    $self-><M::ManakaiDISResourceDefinition.isTypeURI>
@@ -4577,10 +4647,15 @@ ClsDef:
                    . '::' . $self->{localName};
               }
             }
+          } elsif ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
+                              (<Q::ManakaiDOM:Const>)) {
+            $r = $self-><AG::ManakaiDISResourceDefinition.ownerModule>
+                      -><AG::ManakaiDISModuleDefinition.plFullyQualifiedName>
+               . '::' . $self-><AG::ManakaiDISResourceDefinition.plName>;
           } else {
             $r = null;
           }
-          $self->{<Q::dis2pm:name>} = $r;
+          $self->{<Q::PerlCode:plFullyQualifiedName>} = $r;
         }__;
 
   @Attr:
@@ -7057,6 +7132,11 @@ ClsDef:
           }
         }__;
 ##DISResourceDefinition
+
+PropDef:
+  @QName: plFullyQualifiedName
+  @enDesc:
+    Fully qualified name.
 
 PropDef:
   @QName:plDefined

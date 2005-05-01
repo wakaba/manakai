@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/04/30 11:17:55 $
+      $Date: 2005/05/01 05:33:58 $
     @@ContentType:
       dis:Date.RCS
   
@@ -888,6 +888,11 @@ ClsDef:
 ##PerlFile
 
 PropDef:
+  @QName: export
+  @enDesc:
+    The list of exported members.
+
+PropDef:
   @QName: requireModuleName
   @enDesc:
     The list of <Perl::require>d Perl module names
@@ -964,7 +969,8 @@ ClsDef:
             Properties: <Q::pc:sub>, <Q::dis2pm:operator>,
               <Q::dis:ISA>, <Q::dis:Implement>,
               <Q::pc:nodeType>, <Q::pc:useModuleName>, 
-               <Q::pc:requireResourceURI>, <Q::pc:childNodes>.
+              <Q::pc:requireResourceURI>, <Q::pc:childNodes>,
+              <Q::pc:export>.
 
   @Method:
     @@Name: getSub
@@ -1378,6 +1384,46 @@ ClsDef:
         }
         $r .= 'use overload bool => sub () {1}, ' .
               $op . qq[fallback => 1;\n] if $op;
+
+
+        ## -- Exports
+        if (keys %{$node->{<Q::pc:export>} || {}}) {
+          $r .= q[our %EXPORT_TAG = (] . 
+                  <ClassM::ManakaiPerlCodeImplementation.perlList>
+                     ([map {$_ => [keys %{$node->{<Q::pc:export>}->{$_}}]}
+                       grep {$_} keys %{$node->{<Q::pc:export>}}]) . qq[);\n];
+          $r .= q[our @EXPORT_OK = (] .
+                  <ClassM::ManakaiPerlCodeImplementation.perlList>
+                     ([map {keys %{$node->{<Q::pc:export>}->{$_}}}
+                       keys %{$node->{<Q::pc:export>}}]) . qq[);\n];
+          $r .= q[use Exporter; push our @ISA, 'Exporter';] . qq[\n];
+        }
+
+  @Method:
+    @@Name: addExport
+    @@enDesc:
+      Adds a name to the list of exported items (<Perl::@EXPORT_OK).
+    @@Param:
+      @@@Name: exportTag
+      @@@Type:
+        lang:Perl::ManakaiDOM:all
+      @@@enDesc:
+        The name of the tag (without <CHAR::COLON> prefix). 
+        The <P::exportName> is added both to <Perl::@EXPORT_OK>
+        and <Perl::$EXPORT_OK{<P::exportTag>}>.
+      @@@nullCase:
+        @@@@enDesc:
+          The <P::exportName> is added only to the <Perl::@EXPORT_OK>.
+    @@Param:
+      @@@Name: exportName
+      @@@Type:
+        lang:Perl::ManakaiDOM:all
+      @@@enDesc:
+        The name to be exported.
+    @@Return:
+      @@@PerlDef:
+        $self->{<Q::TreeCore:node>}->{<Q::pc:export>}
+             ->{defined $exportTag ? $exportTag : ''}->{$exportName} = true;
 ##PerlPackageScope
 
 PropDef:
