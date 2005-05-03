@@ -20,7 +20,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/01 12:44:05 $
+      $Date: 2005/05/03 12:34:37 $
     @@ContentType:
       dis:Date.RCS
   
@@ -723,7 +723,7 @@ ResourceDef:
       lang:Perl
   @DefaultValue:
     @@@:
-      <ClassName::DOMMetaImpl:ManakaiDOMImplementationRegistry
+      <ClassName::DOMMain:ManakaiDOMImplementationRegistry
                                   ::ManakaiDOM:ManakaiDOMLatest>
     @@ContentType:
       lang:Perl
@@ -760,7 +760,8 @@ ImplNote:
 
 ResourceDef:
   @QName:
-    @@@: ManakaiDOMImplementationRegistry
+    @@@: 
+      DOMMain:ManakaiDOMImplementationRegistry
     @@ForCheck: ForDAC
   @QName:
     @@@:  
@@ -769,14 +770,7 @@ ResourceDef:
       !ManakaiDOM:ManakaiDOM ForCDIS
   @QName:
     @@@: 
-      DOMMain:ManakaiDOMImplementationRegistry
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM ForCDIS
-  @AppName:
-    @@@:
-      Message::DOM::DOMMetaImpl::ManakaiDOMImplementationRegistryCompat
-    @@ContentType:
-      Perl:package-name
+      DOMMain:ManakaiDOMImplementationRegistryCompat
     @@ForCheck:
       ManakaiDOM:ManakaiDOM ForCDIS
   @rdf:type:
@@ -1292,14 +1286,7 @@ ResourceDef:
       ManakaiDOM:ForClass ForCDIS
   @QName:
     @@@:
-      DOMCore:ManakaiDOMImplementationSource
-    @@ForCheck:
-      ManakaiDOM:ForClass ForCDIS
-  @AppName:
-    @@@:
-      Message::DOM::DOMMetaImpl::ManakaiDOMImplementationSourceCompat
-    @@ContentType:
-      Perl:package-name
+      DOMCore:ManakaiDOMImplementationSourceCompat
     @@ForCheck:
       ManakaiDOM:ForClass ForCDIS
   
@@ -1309,7 +1296,8 @@ ResourceDef:
     @@ForCheck:
       ManakaiDOM:ForClass ForDAC
   @QName:
-    @@@: ManakaiDOMImplementationSource
+    @@@: 
+      DOMCore:ManakaiDOMImplementationSource
     @@ForCheck:
       ManakaiDOM:ForClass ForDAC
 
@@ -1433,8 +1421,8 @@ ResourceDef:
           @@@@@:
           $features->{'core'}->{''} = 1;
               ## NOTE: This method must return a DOMImplementation object. 
-          CLS: for my $fcls (values %{<IF::DOMCore:DOMImplementation
-                                     ::ManakaiDOM:ManakaiDOM>::Class}) {
+          CLS: for my $fcls (values %<IF::DOMCore:DOMImplementation
+                                     ::ManakaiDOM:ManakaiDOM>::Class) {
             for my $fname (keys %$features) {
               my $fkey = $fname;
               my $plus = $fname =~ s/^\+// ? 1 : 0;
@@ -1443,12 +1431,12 @@ ResourceDef:
                 unless ($fcls->{feature}->{$fname}->{$fver}) {
                   ## Accessible via getFeature
                   if ($plus and
-                      ${<Class::DOMCore:ManakaiDOMImplementation
-                                     ::ManakaiDOM:ManakaiDOMLatest>::Class}{
+                      $<Class::DOMCore:ManakaiDOMImplementation
+                                     ::ManakaiDOM:ManakaiDOMLatest>::Class{
                         $fcls->{packageName}}->{packageName}) {
                     for my $pfcls (values
-                                     %{<Class::DOMCore:ManakaiDOMImplementation
-                                     ::ManakaiDOM:ManakaiDOMLatest>::Class}) {
+                                     %<Class::DOMCore:ManakaiDOMImplementation
+                                     ::ManakaiDOM:ManakaiDOMLatest>::Class) {
                       if ($pfcls->{feature}->{$fname}->{$fver}) {
                         next F;
                       }
@@ -1546,8 +1534,8 @@ ResourceDef:
           $features->{'core'}->{''} = 1;
               ## NOTE: This method must return DOMImplementation objects. 
           $r = <ClassM::DOMCore:ManakaiDOMImplementationList.new>;
-          CLS: for (values %{<Class::DOMCore:DOMImplementation
-                                     ::ManakaiDOM:ManakaiDOM>::Class}) {
+          CLS: for (values %<Class::DOMCore:DOMImplementation
+                                     ::ManakaiDOM:ManakaiDOM>::Class) {
             for my $fname (keys %$features) {
               my $plus = $fname =~ s/^\+// ? 1 : 0;
               F: for my $fver (ref $features->{$fname} eq 'HASH'
@@ -1557,11 +1545,11 @@ ResourceDef:
                 unless ($_->{feature}->{$fname}->{$fver}) {
                   ## Accessible via getFeature
                   if ($plus and
-                      ${<Class::DOMCore:ManakaiDOMImplementation
-                                     ::ManakaiDOM:ManakaiDOMLatest>::Class}{
+                      $<Class::DOMCore:ManakaiDOMImplementation
+                                     ::ManakaiDOM:ManakaiDOMLatest>::Class{
                         $_->{packageName}}->{packageName}) {
-                    for (values %{<Class::DOMCore:ManakaiDOMImplementation
-                                     ::ManakaiDOM:ManakaiDOMLatest>::Class}) {
+                    for (values %<Class::DOMCore:ManakaiDOMImplementation
+                                     ::ManakaiDOM:ManakaiDOMLatest>::Class) {
                       if ($_->{feature}->{$fname}->{$fver}) {
                         next F;
                       }
@@ -1649,13 +1637,6 @@ ResourceDef:
       ManakaiDOM:ForClass ForCDIS
   @QName:
     @@@: ManakaiDOMMinimumImplementationCompat
-    @@ForCheck:
-      ManakaiDOM:ForClass ForCDIS
-  @AppName:
-    @@@:
-      Message::DOM::DOMMetaImpl::ManakaiDOMMinimumImplementationCompat
-    @@ContentType:
-      Perl:package-name
     @@ForCheck:
       ManakaiDOM:ForClass ForCDIS
   
@@ -1789,12 +1770,12 @@ ResourceDef:
           @@@@ForCheck: ForCDIS
           @@@@@:
             my $plus = $feature =~ s/^\+// ? 1 : 0;
-        if (${<IF::DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM>::Class}{
+        if ($<IF::DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM>::Class{
             ref $self}->{$feature}->{$version}) {
           $r = true;
         } else {
-          for (values %{<Class::DOMCore:ManakaiDOMImplementation
-                                     ::ManakaiDOM:ManakaiDOMLatest>::Class}) {
+          for (values %<Class::DOMCore:ManakaiDOMImplementation
+                                     ::ManakaiDOM:ManakaiDOMLatest>::Class) {
             if ($_->{feature}->{$feature}->{$version}) {
               $r = true;
               last;
@@ -1874,8 +1855,8 @@ ResourceDef:
           @@@@ForCheck: ForCDIS
           @@@@@:
           $feature =~ s/^\+//;
-          for (values %{<Class::DOMCore:ManakaiDOMImplementation
-                                     ::ManakaiDOM:ManakaiDOMLatest>::Class}) {
+          for (values %<Class::DOMCore:ManakaiDOMImplementation
+                                     ::ManakaiDOM:ManakaiDOMLatest>::Class) {
             if ($_->{feature}->{$feature}->{$version}) {
               $r = $self->{<Q::TreeCore:node>}
                         -><M::ManakaiDOM:ManakaiDOMNodeObject

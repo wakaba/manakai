@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/05/01 05:33:58 $
+      $Date: 2005/05/03 12:34:38 $
     @@ContentType:
       dis:Date.RCS
   
@@ -375,6 +375,22 @@ ClsDef:
              ->{$moduleName} = true;
 
   @Method:
+    @@Name: addRequirePerlModuleName
+    @@enDesc:
+      Adds a Perl module into the list of Perl modules 
+      <Perl::require>d by this code fragment.
+    @@Param:
+      @@@Name: moduleName
+      @@@Type:
+        Perl:package-name::ManakaiDOM:all
+      @@@enDesc:
+        The name of the module package that should be <Perl::require>d.
+    @@Return:
+      @@@PerlDef:
+        $self->{<Q::TreeCore:node>}->{<Q::pc:requireModuleName>}
+             ->{$moduleName} = true;
+
+  @Method:
     @@Name: getUsePerlModuleNameList
     @@enDesc:
       Returns a list of Perl modules names that is <Perl::use>d
@@ -390,9 +406,40 @@ ClsDef:
         my $list = {};
         my @node = ($self->{<Q::TreeCore:node>});
         while (my $node = shift @node) {
-          next unless $node;
+          next unless ref $node;
           for my $mname (keys %{$node->{<Q::pc:useModuleName>} || {}}) {
             $list->{$mname} ||= $node->{<Q::pc:useModuleName>}->{$mname};
+          }
+          push @node, $node->{$_} for @{$node->{<Q::TreeCore:subnode0>}};
+          my @n;
+          for my $nn (map {$node->{$_}} @{$node->{<Q::TreeCore:subnode2>}}) {
+            push @n, (ref $nn eq 'ARRAY' ? @$nn : values %{$nn || {}});
+          }
+          for my $n ((map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}), @n) {
+            push @node, (ref $n eq 'ARRAY' ? @$n : values %{$n || {}});
+          }
+        }
+        $r = [grep {$list->{$_}} keys %$list];
+
+  @Method:
+    @@Name: getRequirePerlModuleNameList
+    @@enDesc:
+      Returns a list of Perl modules names that is <Perl::require>d
+      by this code fragment, including all descendant nodes. 
+    @@Return:
+      @@@Type:
+        Perl:ARRAY::ManakaiDOM:all
+      @@@enDesc:
+        A list of module names.  Note that the list is <EM::dead>; 
+        any modification to it does not affect to the code fragment
+        and vice versa.
+      @@@PerlDef:
+        my $list = {};
+        my @node = ($self->{<Q::TreeCore:node>});
+        while (my $node = shift @node) {
+          next unless ref $node;
+          for my $mname (keys %{$node->{<Q::pc:requireModuleName>} || {}}) {
+            $list->{$mname} ||= $node->{<Q::pc:requireModuleName>}->{$mname};
           }
           push @node, $node->{$_} for @{$node->{<Q::TreeCore:subnode0>}};
           my @n;
@@ -437,7 +484,7 @@ ClsDef:
         my $list = {};
         my @node = ($self->{<Q::TreeCore:node>});
         while (my $node = shift @node) {
-          next unless $node;
+          next unless ref $node;
           for my $mname (keys %{$node->{<Q::pc:requireResourceURI>} || {}}) {
             $list->{$mname} ||= $node->{<Q::pc:requireResourceURI>}->{$mname};
           }
@@ -786,8 +833,9 @@ ClsDef:
           $self-><AS::ManakaiPerlFile.currentChunkNumber> (0);
 
           ## -- Requires
-          for my $pack (grep {$node->{<Q::pc:requireModuleName>}->{$_}}
-                        keys %{$node->{<Q::pc:requireModuleName>} || {}}) {
+          my $req = $self-><M::ManakaiPerlCodeFragment
+                              .getRequirePerlModuleNameList>;
+          for my $pack (@$req) {
             $r .= qq<require $pack;\n>;
           }
 
@@ -869,22 +917,6 @@ ClsDef:
       @@@disDef:
         @@@@SetProp:
           dis:License
-
-  @Method:
-    @@Name: addRequirePerlModuleName
-    @@enDesc:
-      Adds a Perl module into the list of Perl modules 
-      <Perl::require>d by this code fragment.
-    @@Param:
-      @@@Name: moduleName
-      @@@Type:
-        Perl:package-name::ManakaiDOM:all
-      @@@enDesc:
-        The name of the module package that should be <Perl::require>d.
-    @@Return:
-      @@@PerlDef:
-        $self->{<Q::TreeCore:node>}->{<Q::pc:requireModuleName>}
-             ->{$moduleName} = true;
 ##PerlFile
 
 PropDef:
@@ -970,7 +1002,7 @@ ClsDef:
               <Q::dis:ISA>, <Q::dis:Implement>,
               <Q::pc:nodeType>, <Q::pc:useModuleName>, 
               <Q::pc:requireResourceURI>, <Q::pc:childNodes>,
-              <Q::pc:export>.
+              <Q::pc:export>, <Q::pc:requireModuleName>.
 
   @Method:
     @@Name: getSub
@@ -1362,7 +1394,7 @@ ClsDef:
                      $class => {<ClassName::ManakaiPerlSub>}}__;
             $r .= $cn->stringify;
           } else {
-            $r .= qq<*$cnk = \&$cno;\n>;
+            $r .= qq<*$cnk = \\&$cno;\n>;
           }
         }
 
@@ -1834,7 +1866,7 @@ ClsDef:
             Optional properties: <Q::pc:localName>,
                <Q::pc:sourceFile>, <Q::pc:sourceLine>,
                <Q::pc:nodeType>, <Q::pc:useModuleName>, 
-               <Q::pc:requireResourceURI>.
+               <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
   @Attr:
     @@Name: localName
@@ -1958,7 +1990,7 @@ ClsDef:
             Properties: <Q::pc:nodeType>, <Q::pc:code>,
                         <Q::pc:sourceFile>, <Q::pc:sourceLine>,
                <Q::pc:useModuleName>, 
-               <Q::pc:requireResourceURI>.
+               <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
   @IntCloneMethod:
     @@Return:
@@ -1976,6 +2008,8 @@ ClsDef:
              = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
           $node->{<Q::pc:useModuleName>}
              = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
+          $node->{<Q::pc:requireModuleName>}
+             = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
 
   @Attr:
     @@Name: code
@@ -2032,13 +2066,13 @@ ClsDef:
         my $node = $self->{<Q::TreeCore:node>};
         __DEEP{
           my $file = $self-><AG::ManakaiPerlCodeFragment.fileNode>;
-          $r = sprintf (qq<\n#line %d "%s (Chunk #%d)"\n>,
+          $r = sprintf (qq<\n#line %d "%s [u] (Chunk #%d)"\n>,
                         $node->{<Q::pc:sourceLine>} || 1,
                         $node->{<Q::pc:sourceFile>} ||
                           $file-><AG::ManakaiPerlFile.sourceFile>,
                         $file-><M::ManakaiPerlFile.getNextChunkNumber>)
              . $node->{<Q::pc:code>}
-             . sprintf (qq<\n#line 1 "%s (Chunk #%d)"\n>,
+             . sprintf (qq<\n#line 1 "%s [/u] (Chunk #%d)"\n>,
                         $file-><AG::ManakaiPerlFile.sourceFile>,
                         $file-><M::ManakaiPerlFile.getNextChunkNumber>);
         }__;
@@ -2076,7 +2110,7 @@ ClsDef:
           @@@@@lang:en
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:code>, <Q::pc:useModuleName>, 
-               <Q::pc:requireResourceURI>.
+               <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
   @IntCloneMethod:
     @@Return:
@@ -2094,6 +2128,8 @@ ClsDef:
              = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
           $node->{<Q::pc:useModuleName>}
              = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
+          $node->{<Q::pc:requireModuleName>}
+             = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
 
   @Attr:
     @@Name: code
@@ -2152,7 +2188,7 @@ ClsDef:
           @@@@@@:
             Properties: <Q::pc:nodeType>,
                <Q::infoset:data>, <Q::pc:useModuleName>, 
-               <Q::pc:requireResourceURI>.
+               <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
   @IntCloneMethod:
     @@Return:
@@ -2170,6 +2206,8 @@ ClsDef:
              = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
           $node->{<Q::pc:useModuleName>}
              = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
+          $node->{<Q::pc:requireModuleName>}
+             = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
 
   @Attr:
     @@Name: data
@@ -2245,7 +2283,7 @@ ClsDef:
           @@@@@lang:en
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:code>, <Q::pc:useModuleName>, 
-               <Q::pc:requireResourceURI>.
+               <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
   @IntCloneMethod:
     @@Return:
@@ -2263,6 +2301,8 @@ ClsDef:
              = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
           $node->{<Q::pc:useModuleName>}
              = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
+          $node->{<Q::pc:requireModuleName>}
+             = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
 
   @Attr:
     @@Name: code
@@ -2320,7 +2360,7 @@ ClsDef:
           @@@@@lang:en
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:code>, <Q::pc:useModuleName>, 
-               <Q::pc:requireResourceURI>.
+               <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
   @IntCloneMethod:
     @@Return:
@@ -2338,6 +2378,8 @@ ClsDef:
              = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
           $node->{<Q::pc:useModuleName>}
              = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
+          $node->{<Q::pc:requireModuleName>}
+             = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
 
   @NumValMethod:
     @@Return:
@@ -2398,7 +2440,7 @@ ClsDef:
             Properties: <Q::pc:nodeType>, <Q::pc:variableType>,
               <Q::packageName>, <Q::localName> (required),
               <Q::variableScope>, <Q::hashKey>, <Q::pc:useModuleName>, 
-               <Q::pc:requireResourceURI>.
+               <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
   @IntCloneMethod:
     @@Return:
@@ -2417,6 +2459,8 @@ ClsDef:
              = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
           $node->{<Q::pc:useModuleName>}
              = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
+          $node->{<Q::pc:requireModuleName>}
+             = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
 
   @Attr:
     @@Name: variableType
@@ -2743,7 +2787,7 @@ ClsDef:
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:childNodes>,
                <Q::pc:parent>, <Q::pc:useModuleName>, 
-               <Q::pc:requireResourceURI>.
+               <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
   @IntCloneMethod:
     @@Return:
@@ -2771,6 +2815,8 @@ ClsDef:
              = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
           $node->{<Q::pc:useModuleName>}
              = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
+          $node->{<Q::pc:requireModuleName>}
+             = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
 
   @ToStringMethod:
     @@Return:
@@ -2817,7 +2863,7 @@ ClsDef:
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:childNodes>,
                   <Q::pc:parent>, <Q::pc:useModuleName>, 
-               <Q::pc:requireResourceURI>.
+               <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
   @IntCloneMethod:
     @@Return:
@@ -2845,6 +2891,8 @@ ClsDef:
              = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
           $node->{<Q::pc:useModuleName>}
              = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
+          $node->{<Q::pc:requireModuleName>}
+             = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
 
   @Method:
     @@Name: appendCodeFragment
@@ -2972,7 +3020,7 @@ ClsDef:
                 <Q::pc:parent>, <Q::pc:sourceFile>, <Q::pc:sourceLine>,
                 <Q::pc:currentSoruceFile>,
                 <Q::pc:currentSourceLine>, <Q::pc:useModuleName>, 
-                <Q::pc:requireResourceURI>.
+                <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
   @IntCloneMethod:
     @@Return:
@@ -3004,6 +3052,8 @@ ClsDef:
              = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
           $node->{<Q::pc:useModuleName>}
              = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
+          $node->{<Q::pc:requireModuleName>}
+             = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
 
   @ToStringMethod:
     @@Return:
@@ -3033,13 +3083,13 @@ ClsDef:
           }
           __DEEP{
             my $file = $self-><AG::ManakaiPerlCodeFragment.fileNode>;
-            $r = sprintf (qq<\n{\n#line %d "%s (Chunk #%d)"\n>,
+            $r = sprintf (qq<\n{\n#line %d "%s [b] (Chunk #%d)"\n>,
                           $node->{<Q::pc:sourceLine>} || 1,
                           $node->{<Q::pc:sourceFile>} ||
                             $file-><AG::ManakaiPerlFile.sourceFile>,
                           $file-><M::ManakaiPerlFile.getNextChunkNumber>)
                . $r
-               . sprintf (qq<\n#line 1 "%s (Chunk #%d)"\n}\n>,
+               . sprintf (qq<\n#line 1 "%s [/b] (Chunk #%d)"\n}\n>,
                           $file-><AG::ManakaiPerlFile.sourceFile>,
                           $file-><M::ManakaiPerlFile.getNextChunkNumber>);
           }__;
@@ -3084,7 +3134,7 @@ ClsDef:
                 <Q::pc:parent>, <Q::pc:sourceFile>, <Q::pc:sourceLine>,
                 <Q::pc:currentSourceFile>,
                 <Q::pc:currentSourceLine>, <Q::pc:useModuleName>, 
-                <Q::pc:requireResourceURI>.
+                <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
   @IntCloneMethod:
     @@Return:
@@ -3116,6 +3166,8 @@ ClsDef:
              = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
           $node->{<Q::pc:useModuleName>}
              = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
+          $node->{<Q::pc:requireModuleName>}
+             = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
 
   @ToStringMethod:
     @@Return:
@@ -3147,13 +3199,13 @@ ClsDef:
           }
           __DEEP{
             my $file = $self-><AG::ManakaiPerlCodeFragment.fileNode>;
-            $r = sprintf (qq<\n#line %d "%s (Chunk #%d)"\n>,
+            $r = sprintf (qq<\n#line %d "%s [bc] (Chunk #%d)"\n>,
                           $node->{<Q::pc:sourceLine>} || 1,
                           $node->{<Q::pc:sourceFile>} ||
                             $file-><AG::ManakaiPerlFile.sourceFile>,
                           $file-><M::ManakaiPerlFile.getNextChunkNumber>)
                . $r
-               . sprintf (qq<\n#line 1 "%s (Chunk #%d)"\n>,
+               . sprintf (qq<\n#line 1 "%s [/bc] (Chunk #%d)"\n>,
                           $file-><AG::ManakaiPerlFile.sourceFile>,
                           $file-><M::ManakaiPerlFile.getNextChunkNumber>);
           }__;
@@ -3194,7 +3246,7 @@ ClsDef:
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:left>, <Q::pc:right>,
                 <Q::pc:parent>, <Q::pc:useModuleName>, 
-               <Q::pc:requireResourceURI>.
+               <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
   @IntCloneMethod:
     @@Return:
@@ -3222,6 +3274,8 @@ ClsDef:
              = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
           $node->{<Q::pc:useModuleName>}
              = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
+          $node->{<Q::pc:requireModuleName>}
+             = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
 
   @ToStringMethod:
     @@Return:
@@ -3271,7 +3325,7 @@ ClsDef:
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:true>, <Q::pc:false>,
                 <Q::pc:parent>, <Q::pc:condition>, <Q::pc:useModuleName>, 
-               <Q::pc:requireResourceURI>.
+               <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
   @IntCloneMethod:
     @@Return:
@@ -3301,6 +3355,8 @@ ClsDef:
              = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
           $node->{<Q::pc:useModuleName>}
              = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
+          $node->{<Q::pc:requireModuleName>}
+             = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
 
   @ToStringMethod:
     @@Return:

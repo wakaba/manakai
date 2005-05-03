@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/05/01 12:44:05 $
+      $Date: 2005/05/03 12:34:38 $
     @@ContentType:
       dis:Date.RCS
   
@@ -175,8 +175,9 @@ ClsDef:
         @@@@@:
           The newly created <QUOTE::dis> document object.
       @@@PerlDef:
-        $r = $self-><M::swcfg21:SWCFGImplementation::swcfg21:ForLatest
-                                              .createSWCFGDocument>;
+        $r = bless $self-><M::swcfg21:SWCFGImplementation::swcfg21:ForLatest
+                                              .createSWCFGDocument>,
+                   <ClassName::ManakaiDISDocument>;
         $r-><AS::swcfg21:SWCFGDocument::swcfg21:ForLatest
                                         .defaultElementTypeNamespaceURI>
                     (<Q::dis:>);
@@ -2152,9 +2153,10 @@ ClsDef:
     @@Get:
       @@@PerlDef:
         __DEEP{
-          $r = $self-><M::swcfg21:SWCFGNode
+          $r = bless $self-><M::swcfg21:SWCFGNode
                         ::swcfg21:ForLatest.getAttributeNS>
-                                   (<Q::dis:>, 'Require', make_new_node => true);
+                                   (<Q::dis:>, 'Require', make_new_node => true),
+                     <ClassName::ManakaiDISElement>;
         }__;
 
   @Attr:
@@ -2172,7 +2174,8 @@ ClsDef:
                                 .getAttributeNS>
                                          (<Q::dis:>, 'DefaultFor');
           if ($df) {
-            $r = $df-><AG::ManakaiDISElement.qnameValueURI>
+            $r = (bless $df, <ClassName::ManakaiDISElement>)
+                 -><AG::ManakaiDISElement.qnameValueURI>
               || <Q::ManakaiDOM:all>;
           } else {
             $r = <Q::ManakaiDOM:all>;
@@ -2586,6 +2589,7 @@ ClsDef:
               }__;
             }__;
           }
+          $mod_name_node = bless $mod_name_node, <ClassName::ManakaiDISElement>;
           my $mod_name_uri = $mod_name_node
                                 -><AG::ManakaiDISElement.qnameValueURI>;
           my $mod = $self-><M::ManakaiDISDatabase.getModule>
@@ -2657,7 +2661,8 @@ ClsDef:
               if ($mqn) {
                 my $mqv = $mqn-><M::swcfg21:SWCFGNode::swcfg21:ForLatest
                                                                    .value>;
-                my $mqp = $mqn-><M::ManakaiDISElement.qnameToPair>
+                my $mqp = (bless $mqn, <ClassName::ManakaiDISElement>)
+                          -><M::ManakaiDISElement.qnameToPair>
                                                        ($mqv, node => $mqn);
                 ($nuri, $ln) = @$mqp;
               } else {
@@ -2674,7 +2679,8 @@ ClsDef:
               my $wfn = $rm-><M::swcfg21:SWCFGNode::swcfg21:ForLatest
                                       .getAttributeNS> (<Q::dis:>, 'WithFor');
               if ($wfn) {
-                $for = $wfn-><AG::ManakaiDISElement.qnameValueURI>;
+                $for = (bless $wfn, <ClassName::ManakaiDISElement>)
+                       -><AG::ManakaiDISElement.qnameValueURI>;
               } else {
                 $for = $mod->{for};
               }
@@ -2773,6 +2779,7 @@ ClsDef:
               }__;
             }__;
           }
+          $qn_node = bless $qn_node, <ClassName::ManakaiDISElement>;
           my $qn_uri = $qn_node-><AG::ManakaiDISElement.qnameValueURI>;
           my $for = $self-><M::ManakaiDISDatabase.getFor> ($qn_uri);
         
@@ -3146,7 +3153,6 @@ ClsDef:
           or not an exception.
       @@@PerlDef:
         my ($q1, $q2, $q3) = split /\s*\.\s*/, $xcref, 3;
-        my $r = [];
         __DEEP{
           if (defined $q3) {
             $r->[2] = $self-><M::ManakaiDISDatabase.getResource>
@@ -4010,7 +4016,7 @@ ClsDef:
             next unless $mod;
             my $pack = $mod-><AG::ManakaiDISModuleDefinition
                                                      .plFullyQualifiedName>;
-            $r-><M::PLFile.addRequirePerlModuleName> ($pack)
+            $r-><M::MPLCodeFragment.addRequirePerlModuleName> ($pack)
               unless $pack eq $thismod_name;
           }
 
@@ -4545,7 +4551,7 @@ ClsDef:
                                                   .plMethodOperator>) {
                 $r = {
                        <Q::ManakaiDOM:MUErrorHandler> => '___report_error',
-                       <Q::DISPerl:AsStringMethod> => 'as_string',
+                       <Q::DISPerl:AsStringMethod> => 'stringify',
                        <Q::DISPerl:NewMethod> => 'new',
                        <Q::DISPerl:CloneMethod> => 'clone',
                      }->{$op_uri};
@@ -5041,7 +5047,9 @@ ClsDef:
             unless ($def) {
               $r = null;
             } elsif ($def-><M::ManakaiDISElement.mediaTypeMatch>
-                                                         (<Q::lang:Perl>)) {
+                                            (<Q::lang:Perl>, null,
+                                             for_arg => $self->{for},
+                                             forp_arg => $self->{forp})) {
               my $source_code = $def-><M::swcfg21:SWCFGNode
                                         ::swcfg21:ForLatest.value>; 
               $r = $self->{<Q::plCodeFragment>}
@@ -5055,7 +5063,9 @@ ClsDef:
                              .plPreprocessPerlCode> ($source_code,
                                                      node => $def);
             } elsif ($def-><M::ManakaiDISElement.mediaTypeMatch>
-                                                         (<Q::lang:dis>)) {
+                                             (<Q::lang:dis>, null,
+                                              for_arg => $self->{for},
+                                              forp_arg => $self->{forp})) {
               $r = $self->{<Q::plCodeFragment>}
                  = $def-><M::ManakaiDISElement.plCodeFragment>
                             ($self, for_arg => $self->{for},
@@ -5445,6 +5455,23 @@ ClsDef:
                           ($scls => $r);
             }
 
+            for my $el (@{$self->{src}-><M::ManakaiDISElement
+                                            .disChildElements>
+                             (for_arg => $self->{for},
+                              forp_arg => $self->{forp})}) {
+              if ($el-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest.expandedURI>
+                      eq <Q::dis:AppISA> and
+                  $el-><M::ManakaiDISElement.mediaTypeMatch>
+                            (<Q::lang:Perl>, <Q::lang:Perl>,
+                             for_arg => $self->{for},
+                             forp_arg => $self->{forp})) {
+                my $spack_name = $el-><M::SWCFGNode.value>;
+                $r-><M::PLPack.addISAPackage> ($spack_name);
+                $r-><M::MPLCodeFragment.addRequirePerlModuleName>
+                                              ($spack_name);                     
+              }
+            }
+
             ## - Implementing interfaces
             for my $scls (@{$self-><M::ManakaiDISPropertyAccessor
                                          .getPropertyResourceList>
@@ -5485,8 +5512,9 @@ ClsDef:
                   }
                   $r-><M::PLPack.setSub> ($pname => $psub);
           
-                  if (defined $op and not $cr-><AG::ManakaiDISResourceDefinition
-                                                   .isAnonymous>) {
+                  if (defined $op and
+                      defined $cr-><AG::ManakaiDISResourceDefinition
+                                       .localName>) {
                     if ($op =~ /^[A-Z]+$/) {
                       if ($r-><M::PLPack.getSubAliasName> ($op)) {
                         __UNDEEP{__EXCEPTION{
@@ -5908,7 +5936,7 @@ ClsDef:
                 <Q::disPerl:WARNING> => 1,
               }->{$et}) {
                 $r-><M::PLBlockCon.skipLines> ($source_code);
-                if ($source_code =~ s/^((?:(?!::).)+)(::\s*)?//s) {
+                if ($source_code =~ s/^((?:(?!::).)+)(?:::\s*)?//s) {
                   my ($cls, $const, $subtype)
                     = @{$self->{db}-><M::ManakaiDISDatabase.xcrefToResource>
                                          ($1, $self->{src},
@@ -6525,6 +6553,10 @@ ClsDef:
                   $r-><M::MPLCodeFragment.addUsePerlModuleName>
                                                     ('Message::Util::Error');
                 } else {
+                  if ($source_code =~ s/^(\s*[\w:]+\s*)//) {
+                    ## NOTE: "$cond ?\n1\n:0" would be a syntax error
+                    $r-><M::PLAnyCon.appendAtom> ($1);
+                  }
                   $r-><M::PLInCon.appendCode> ($source_code);
                 }
               }
@@ -6818,8 +6850,7 @@ ClsDef:
             DIS:expectedType => {<Q::DOMException:AnyExceptionClass>},
           }__;
         }
-        $xclass_module-><AS::ManakaiDISResourceDefinition
-                                                   .isReferred> ($self->{src});
+        $xclass-><AS::ManakaiDISResourceDefinition.isReferred> ($self->{src});
         $self-><M::ManakaiDISResourceDefinition.plAddRequireResource>
                                ($xclass_module => $statement);
         $xparam->{-type} = {type => 'quoted',
@@ -7006,8 +7037,8 @@ ClsDef:
                               media_type => <Q::lang:muf>);
           if ($muf) {
             $r = $muf-><M::SWCFGNode.value>;
-            $r =~ s/<Q::([^<>]+)>/$self->{src}-><M::ManakaiDISElement.
-                                     qnameToURI> ($1, node => $muf)/ge;
+            $r =~ s{< Q ::([^<>]+)>}{$self->{src}-><M::ManakaiDISElement.
+                                     qnameToURI> ($1, node => $muf)}gex;
             $r =~ s/\s+/ /g;
             $r =~ s/^ //;
             $r =~ s/ $//;
@@ -9059,13 +9090,4 @@ ElementTypeBinding:
       lang:muf
     @@lang:en
 
-ResourceDef:
-  @QName:
-    lang:muf
-  @rdf:type:
-    rdfs:Class
-  @ImplNote:
-    @@lang:en
-    @@@:
-      Should be moved to some other module.
 

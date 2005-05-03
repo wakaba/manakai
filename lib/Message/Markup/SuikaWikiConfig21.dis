@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/05/01 05:33:58 $
+      $Date: 2005/05/03 12:34:37 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1236,9 +1236,9 @@ IFClassDef:
         true;
 
   @Attr:
-    @@Name:childNodes
-    @@Type:SWCFGChildNodeList
-    @@actualType:ManakaiSWCFGChildNodeList
+    @@Name: childNodes
+    @@Type: SWCFGChildNodeList
+    @@actualType: ManakaiSWCFGChildNodeList
     @@Description:
       @@@lang:en
       @@@@:
@@ -1740,7 +1740,7 @@ IFClassDef:
                     . (length $ebc ? $ebc : '\\') . "\x0A";
               }
             }
-          } # <Q::etBinding>
+          } # swcfg21:etBinding
           $r .= $eb;
 
           ## Namespace bindings
@@ -2052,7 +2052,7 @@ IFClassDef:
                           .importTree>
                            ($r->{<Q::TreeCore:node>}->{$p});
                 $r->{<Q::TreeCore:node>}->{$p}
-                  ->{{
+                  ->{+{
                         <Q::shadowContent> => <Q::shadowParent>,
                         <Q::shadowSibling> => <Q::shadowSiblingOf>,
                      }->{$p}} = $r->{<Q::TreeCore:node>};
@@ -2067,7 +2067,7 @@ IFClassDef:
                             ($self->{<Q::TreeCore:node>}->{<Q::value>});
           } elsif ($nt eq '#fragment') {
             $r = $od-><M::SWCFGDocument.createDocumentFragment>;
-            ## <Q::isShadowMaster> property is not copied
+            ## swcfg21:isShadowMaster property is not copied
             for my $cn (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
               my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($cn);
               $r-><M::SWCFGNode.appendNode> ($c->clone);
@@ -2685,8 +2685,8 @@ IFClassDef:
           $r = <ClassM::ManakaiSWCFGNode.newObject>;
           $r->{<Q::nodeType>} = '#comment';
           $r->{<Q::value>} = '';
-          $r->{<Q::namespaceExpanded>} = true; ## Always true
-          $r->{<Q::etExpanded>} = true; ## Always true
+          $r->{<Q::namespaceExpanded>} = true; ## Always t r u e
+          $r->{<Q::etExpanded>} = true; ## Always t r u e
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
@@ -3481,8 +3481,8 @@ IFClassDef:
           $r->{<Q::nodeType>} = '#document';
           $r->{<Q::nsBinding>} = {URI => ''};
           $r->{<Q::etBinding>} = {};
-          $r->{<Q::namespaceExpanded>} = true; ## Always true
-          $r->{<Q::etExpanded>} = true; ## Always true
+          $r->{<Q::namespaceExpanded>} = true; ## Always t r u e
+          $r->{<Q::etExpanded>} = true; ## Always t r u e
           push @{$r->{<Q::TreeCore:subnode2>}}, <Q::etBinding>;
         @@@@ImplNote:
           @@@@@lang:en
@@ -3563,8 +3563,8 @@ IFClassDef:
         @@@@@:
           $r = <ClassM::ManakaiSWCFGNode.newObject>;
           $r->{<Q::nodeType>} = '#fragment';
-          $r->{<Q::namespaceExpanded>} = true; ## Always true
-          $r->{<Q::etExpanded>} = true; ## Always true
+          $r->{<Q::namespaceExpanded>} = true; ## Always t r u e
+          $r->{<Q::etExpanded>} = true; ## Always t r u e
           push @{$r->{<Q::TreeCore:origin>}},
                      <Q::shadowOwner>, <Q::shadowParent>, <Q::shadowSiblingOf>;
         @@@@ImplNote:
@@ -3578,8 +3578,8 @@ IFClassDef:
 ##SWCFGDocumentFragment
 
 IFClassDef:
-  @IFQName:SWCFGChildNodeList
-  @ClassQName:ManakaiSWCFGChildNodeList
+  @IFQName: SWCFGChildNodeList
+  @ClassQName: ManakaiSWCFGChildNodeList
   @Description:
     @@lang:en
     @@@:

@@ -51,6 +51,8 @@ DAC2PM = $(PERL2) \
       $(DAC2PM_OPTIONS)
 
 PHASE3_PERL_OPTIONS = 
+PHASE3_DAC2PM_OPTIONS = --enable-assert
+                  ## TODO: Official release should remove this option.
 
 DIS_FILES_FOR_DOMMETAIMPL = \
   $(MANAKAI_LIB_DIR)Message/DOM/DOMBoot.dis \
@@ -184,10 +186,46 @@ $(TEMP_LIB2_DIR)Message/Util/Error/DOMException.pm: \
 phase3: $(PHASE2_PM_FILES)
 	$(CD) $(MANAKAI_LIB_DIR)Message/Util && \
 	  $(MAKE) all \
-	    PERL_OPTIONS="-I../../$(TEMP_LIB2_DIR) -I../../$(MANAKAI_LIB_DIR) \
+	    PERL_OPTIONS2="-I../../lib/$(TEMP_LIB2_DIR) \
+	                   -I../../lib/$(MANAKAI_LIB_DIR) \
 	                  $(PHASE3_PERL_OPTIONS)" \
-	    PERLC_OPTIONS="-I../../$(MANAKAI_LIB_DIR) $(PHASE3_PERL_OPTIONS)"
-
+	    PERLC_OPTIONS2="-I../../lib/$(MANAKAI_LIB_DIR) \
+	                    $(PHASE3_PERL_OPTIONS)" \
+	    DAC2PM_OPTIONS2="$(PHASE3_DAC2PM_OPTIONS)" \
+	    PERL_OPTIONS3="-I../../../lib/$(TEMP_LIB2_DIR) \
+	                   -I../../../lib/$(MANAKAI_LIB_DIR) \
+	                  $(PHASE3_PERL_OPTIONS)" \
+	    PERLC_OPTIONS3="-I../../../lib/$(MANAKAI_LIB_DIR) \
+	                    $(PHASE3_PERL_OPTIONS)" \
+	    DAC2PM_OPTIONS3="$(PHASE3_DAC2PM_OPTIONS)"
+	$(CD) $(MANAKAI_LIB_DIR)Message/Markup && \
+	  $(MAKE) all \
+	    PERL_OPTIONS2="-I../../lib/$(TEMP_LIB2_DIR) \
+	                   -I../../lib/$(MANAKAI_LIB_DIR) \
+	                  $(PHASE3_PERL_OPTIONS)" \
+	    PERLC_OPTIONS2="-I../../lib/$(MANAKAI_LIB_DIR) \
+	                    $(PHASE3_PERL_OPTIONS)" \
+	    DAC2PM_OPTIONS2="$(PHASE3_DAC2PM_OPTIONS)" \
+	    PERL_OPTIONS3="-I../../../lib/$(TEMP_LIB2_DIR) \
+	                   -I../../../lib/$(MANAKAI_LIB_DIR) \
+	                  $(PHASE3_PERL_OPTIONS)" \
+	    PERLC_OPTIONS3="-I../../../lib/$(MANAKAI_LIB_DIR) \
+	                    $(PHASE3_PERL_OPTIONS)" \
+	    DAC2PM_OPTIONS3="$(PHASE3_DAC2PM_OPTIONS)"
+	$(CD) $(MANAKAI_LIB_DIR)Message/DOM && \
+	  $(MAKE) boot \
+	    PERL_OPTIONS2="-I../../lib/$(TEMP_LIB2_DIR) \
+	                   -I../../lib/$(MANAKAI_LIB_DIR) \
+	                  $(PHASE3_PERL_OPTIONS)" \
+	    PERLC_OPTIONS2="-I../../lib/$(MANAKAI_LIB_DIR) \
+	                    $(PHASE3_PERL_OPTIONS)" \
+	    DAC2PM_OPTIONS2="$(PHASE3_DAC2PM_OPTIONS)" \
+	    PERL_OPTIONS3="-I../../../lib/$(TEMP_LIB2_DIR) \
+	                   -I../../../lib/$(MANAKAI_LIB_DIR) \
+	                  $(PHASE3_PERL_OPTIONS)" \
+	    PERLC_OPTIONS3="-I../../../lib/$(MANAKAI_LIB_DIR) \
+	                    $(PHASE3_PERL_OPTIONS)" \
+	    DAC2PM_OPTIONS3="$(PHASE3_DAC2PM_OPTIONS)"
 
 ## Misc.
 

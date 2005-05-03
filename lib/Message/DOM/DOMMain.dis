@@ -28,7 +28,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/04/28 15:22:59 $
+      $Date: 2005/05/03 12:34:37 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1035,6 +1035,35 @@ ResourceDef:
       Whether a document has support for the <Feature::XML> feature or not.
   @PerlDef:
     ($DOCOBJ->{<Q::DOMCore:hasFeature>}->{XML})
+
+ElementTypeBinding:
+  @Name: FeatureDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DOMMain:DOMFeature
+    @@AliasFor:
+      @@@@:
+        ::ManakaiDOM:all
+      @@@For:
+        !=ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: FeatureVerDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DOMMain:DOMFeature
+
+ElementTypeBinding:
+  @Name: featureQName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ContentType:
+      dis:TypeQName
 
 FeatureDef:
   @QName: 
