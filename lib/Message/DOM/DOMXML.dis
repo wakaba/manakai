@@ -46,7 +46,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/03 12:34:37 $
+      $Date: 2005/05/04 13:49:27 $
     @@ContentType:
       dis:Date.RCS
 
@@ -563,7 +563,7 @@ IF:
         Construct an object for a new instance of the <IF:CDATASection> node.
     @@Return:
       @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -666,7 +666,8 @@ IF:
             A <IF:NamedNodeMap> containing <IF:Entity>s.
       @@@PerlDef:
         $r = $self->{<Q::TreeCore:node>}
-                  -><M::ManakaiDOM:ManakaiDOMNodeObject.newReference>
+                  -><M::ManakaiDOM:ManakaiDOMNodeObject
+                      ::ManakaiDOM:Perl.newReference>
                         (<ClassName::ManakaiDOMXML:ManakaiDOMEntities>);
   @Attr:
      @@Name:  notations
@@ -685,7 +686,8 @@ IF:
             A <IF:NamedNodeMap> containing <IF:Notation>s.
       @@@PerlDef:
         $r = $self->{<Q::TreeCore:node>}
-                  -><M::ManakaiDOM:ManakaiDOMNodeObject.newReference>
+                  -><M::ManakaiDOM:ManakaiDOMNodeObject
+                      ::ManakaiDOM:Perl.newReference>
                         (<ClassName::ManakaiDOMXML:ManakaiDOMNotations>);
   @Attr:
      @@Name:  publicId
@@ -808,7 +810,7 @@ IF:
       @@@Def:
         @@@@ContentType:
           lang:dis
-        @@@@DISPerl:cloneCode: .getName
+        @@@@DISPerl:cloneCode: .name.get
   @ReAttr:
     @@Name: nodeType
     @@Description:
@@ -881,7 +883,7 @@ IF:
         Construct an object for a new instance of the <IF:DocumentType> node.
     @@Return:
       @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1147,7 +1149,7 @@ IF:
         Construct an object for a new instance of the <IF:Notation> node.
     @@Return:
       @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1514,7 +1516,7 @@ IF:
         Construct an object for a new instance of the <IF:Entity> node.
     @@Return:
       @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1688,7 +1690,7 @@ IF:
         Construct an object for a new instance of the <IF:EntityReference> node.
     @@Return:
       @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1855,7 +1857,7 @@ IF:
       @@@Def:
         @@@@ContentType:
           lang:dis
-        @@@@DISPerl:cloneCode: .getTarget
+        @@@@DISPerl:cloneCode: .target.get
   @ReAttr:
     @@Name: nodeType
     @@Description:
@@ -1898,7 +1900,7 @@ IF:
         @@@Def:
           @@@@ContentType: 
             lang:dis
-          @@@@DISPerl:cloneCode:.getData
+          @@@@DISPerl:cloneCode:.data.get
      @@Set:
         @@@Type:  
           DOMMain:DOMString
@@ -1919,7 +1921,7 @@ IF:
         @@@Def:
           @@@@ContentType:
             lang:dis
-          @@@@DISPerl:cloneCode: .setData
+          @@@@DISPerl:cloneCode: .data.set
   @ReAttr:
      @@Name:  textContent
      @@Description:
@@ -1953,7 +1955,7 @@ IF:
         @@@Def:
           @@@@ContentType: 
             lang:dis
-          @@@@DISPerl:cloneCode: .getData
+          @@@@DISPerl:cloneCode: .data.set
      @@Set:
         @@@Description:
           @@@@lang:en
@@ -1969,7 +1971,7 @@ IF:
         @@@Def:
           @@@@ContentType:
             lang:dis
-          @@@@DISPerl:cloneCode:.setData
+          @@@@DISPerl:cloneCode:.data.set
      @@Level[list]:
         3
      @@SpecLevel:3
@@ -1984,7 +1986,7 @@ IF:
         <IF:ProcessingInstruction> node.
     @@Return:
       @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
       @@@Description:
         @@@@lang:en
         @@@@@:

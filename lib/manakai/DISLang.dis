@@ -15,7 +15,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/04/30 11:17:55 $
+      $Date: 2005/05/04 13:49:27 $
     @@ContentType:
       dis:Date.RCS
   
@@ -236,6 +236,40 @@ ResourceTypeDef:
 
 PropDef:
   @QName:
+    ManakaiDOM:noInputNormalize
+  @Description:
+    @@lang:en
+    @@@:
+      Whether an input normalizer code should be automatically 
+      inserted by code generator.  If <CODE::false> and a normalizer 
+      (<Q::ManakaiDOM:inputNormalizer>) is defined, it is inserted 
+      between input (parameter) declaration and actual code.  Otherwise, 
+      no code is inserted. 
+  @dataType:
+    dis:Boolean
+
+PropDef:
+  @QName:
+    ManakaiDOM:inputNormalizer
+  @Description:
+    @@lang:en
+    @@@:
+      A code fragment that normalizes inputs, including method parameter 
+      values and new attribute values. 
+      \
+      If the code is written in Perl (<TYPE::lang:Perl>), any occurence 
+      of <Perl::$INPUT> in the code is replaced by the variable name 
+      containing the input. 
+      \
+      This property is <EM::obsolete> but not removed for compatibility
+      with <FILE::cdis2pm.pl>.
+  @rdfs:domain:
+    ManakaiDOM:DataType
+  @rdf:type:
+    owl:DeprecatedProperty
+
+PropDef:
+  @QName:
     dis:In
   @Description:
     @@lang:en
@@ -352,6 +386,18 @@ ResourceTypeDef:
   @Description:
     @@lang:en
     @@@: A constant value.
+
+PropDef:
+  @QName: 
+    dis:IsBitMask
+  @Description:
+    @@lang:en
+    @@@:
+      Whether the constant group is defined as bitmask values or not.
+  @rdfs:domain:
+    ManakaiDOM:ConstGroup
+  @dataType:
+    dis:Boolean
 
 ## -- "Role" properties
 
@@ -495,5 +541,45 @@ TreeElementType:
       An <QUOTE::otherwise> case.
   @rdfs:domain:
     DISPerl:selectByProp
+
+TreeElementType:
+  @QName:
+    ManakaiDOM:InputNormalize
+  @Description:
+    @@lang:en
+    @@@:
+      Inserts an input normalizing code, if any, for a parameter.
+
+## -- Reserved for potential future extensions
+
+## NOTE: These definitions may be moved to another modules in future revision.
+
+DataTypeDef:
+  @QName:
+    lang:Java
+  @FullName:
+    @@lang:en
+    @@@: Java code
+
+DataTypeDef:
+  @QName:
+    lang:ECMAScript
+  @FullName:
+    @@lang:en
+    @@@: ECMAScript code
+
+ForDef:
+  @QName:
+    ManakaiDOM:Java
+  @FullName:
+    @@lang:en
+    @@@: For Java binding
+
+ForDef:
+  @QName:
+    ManakaiDOM:ECMAScript
+  @FullName:
+    @@lang:en
+    @@@: For ECMAScript binding
 
 ## DISLang.dis ends here

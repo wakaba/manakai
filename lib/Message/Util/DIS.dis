@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/05/03 12:34:38 $
+      $Date: 2005/05/04 13:49:27 $
     @@ContentType:
       dis:Date.RCS
   
@@ -64,6 +64,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl--
   @DOMCore:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @DOMException:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @DOMLS:
     http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
   @DOMMain:
@@ -1826,7 +1828,7 @@ ClsDef:
               my $ccode = $c-><M::ManakaiDISElement.plCodeFragment>
                                   ($disResource,
                                    for_arg => $forArg, forp_arg => $forpArg);
-              $r-><M::PLBlockCon.appendCodeFragment> ($ccode) if $ccode;
+              $r-><M::PLBlockCon.appendCodeFragment> ($ccode->clone) if $ccode;
             }
           } elsif ({
             <Q::DISLang:constValue> => true,
@@ -1849,6 +1851,7 @@ ClsDef:
                                          .getConstResourceByName> ($const_name);
                 unless (defined $const) {
                   __UNDEEP{__EXCEPTION{RESOURCE_NOT_DEFINED_ERR::
+                    DIS:parentURI => {$uri},
                     DIS:localName => {$const_name},
                     DIS:sourceNode => {$self},
                     DIS:elementType => {$et},
@@ -1861,6 +1864,7 @@ ClsDef:
                                           ($const_name, <Q::DISLang:AnyMethod>);
                 unless (defined $const) {
                   __UNDEEP{__EXCEPTION{RESOURCE_NOT_DEFINED_ERR::
+                    DIS:parentURI => {$uri},
                     DIS:localName => {$const_name},
                     DIS:sourceNode => {$self},
                     DIS:elementType => {$et},
@@ -5060,8 +5064,16 @@ ClsDef:
                                             node => $def,
                                             contains_statements => false)
                      : $self-><M::ManakaiDISResourceDefinition
-                             .plPreprocessPerlCode> ($source_code,
-                                                     node => $def);
+                             .plPreprocessPerlCode>
+                                   ($source_code,
+                                    node => $def,
+                                    method_resource => 
+                                $self-><M::ManakaiDISResourceDefinition
+                                          .isTypeURI> (<Q::DISLang:MethodReturn>)
+                                ? $self-><M::ManakaiDISPropertyAccessor
+                                            .getPropertyResource>
+                                                   (<Q::dis2pm:parentResource>)
+                                : null);
             } elsif ($def-><M::ManakaiDISElement.mediaTypeMatch>
                                              (<Q::lang:dis>, null,
                                               for_arg => $self->{for},
@@ -5237,7 +5249,7 @@ ClsDef:
                                               (<Q::DOMException:CoreException>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
               my $const = $self->{db}-><M::ManakaiDISDatabase.getResource>
-                                          (<Q::DOMException:NOT_SUPPROTED_ERR>,
+                                          (<Q::DOMException:NOT_SUPPORTED_ERR>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
               my $subtype = $self->{db}-><M::ManakaiDISDatabase.getResource>
                                   (<Q::MDOMX:MDOM_IMPL_METHOD_NOT_IMPLEMENTED>,
@@ -5313,7 +5325,7 @@ ClsDef:
                                               (<Q::DOMException:CoreException>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
               my $const = $self->{db}-><M::ManakaiDISDatabase.getResource>
-                                          (<Q::DOMException:NOT_SUPPROTED_ERR>,
+                                          (<Q::DOMException:NOT_SUPPORTED_ERR>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
               my $subtype = $self->{db}-><M::ManakaiDISDatabase.getResource>
                                     (<Q::MDOMX:MDOM_IMPL_ATTR_NOT_IMPLEMENTED>,
@@ -5363,7 +5375,7 @@ ClsDef:
                                               (<Q::DOMException:CoreException>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
                 my $const = $self->{db}-><M::ManakaiDISDatabase.getResource>
-                                          (<Q::DOMException:NOT_SUPPROTED_ERR>,
+                                          (<Q::DOMException:NOT_SUPPORTED_ERR>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
                 my $subtype = $self->{db}-><M::ManakaiDISDatabase.getResource>
                                     (<Q::MDOMX:MDOM_IMPL_ATTR_NOT_IMPLEMENTED>,
@@ -6508,16 +6520,26 @@ ClsDef:
                       DIS:expectedType => {<Q::ManakaiDOM:Const>},
                     }__}__;
                   }
-                  my $pc = $const-><AG::ManakaiDISResourceDefinition
-                                       .plCodeFragment>->clone;
-                  unless (defined $pc) {
-                    __UNDEEP{__EXCEPTION{PERL_CODE_NOT_DEFINED_ERR::
-                      DIS:sourceNode => {$node || $self->{src}},
-                      DIS:sourceCode => {$source_code},
-                      DIS:localName => {$const_name},
-                    }__}__;
+                  $const-><AS::ManakaiDISResourceDefinition.isReferred> ($node);
+
+                  my $data_type = $const-><AG::ManakaiDISResourceDefinition
+                                       .disActualDataTypeResource>;
+                  my $val = $const->{src}-><M::ManakaiDISElement
+                                            .plValueCodeFragment>
+                            (<Q::dis:Value>, $const,
+                             for_arg => $const->{for},
+                             forp_arg => $const->{forp},
+                             data_type_uri => $data_type
+                                    -><AG::ManakaiDISResourceDefinition.uri>);
+                  unless (defined $val) {
+                    __UNDEEP{__EXCEPTION{NO_CONST_VALUE_ERR::
+                      DIS:uri => {$const->{uri}},
+                      DIS:localName => {$const->{localName}},
+                      DIS:sourceNode => {$const->{src}},
+                      DIS:elementType => {$et},
+                   }__}__;
                   }
-                  $r-><M::PLInCon.appendCodeFragment> ($pc);
+                  $r-><M::PLInCon.appendCodeFragment> ($val);
                 } else {
                   __UNDEEP{__EXCEPTION{UNSUPPORTED_ELEMENT_TYPE_ERR::
                     DIS:elementType => {$et},
@@ -6771,11 +6793,12 @@ ClsDef:
           No input processor found.
       @@@PerlDef:
         my $type;
+        my $type_node;
         try {
           $type = $self-><AG::ManakaiDISResourceDefinition
                              .disActualDataTypeResource>;
-          #$type_node = $self->< AG::ManakaiDISResourceDefinition
-          #                        .disActualDataTypeNode>;
+          $type_node = $self-><AG::ManakaiDISResourceDefinition
+                                  .disActualDataTypeNode>;
         } catch <Class::ManakaiDISException> with {
           my $err = shift;
           unless ($err->{<Q::MDOMX:subtype>} eq <Q::DIS:NO_DIS_TYPE_ERR>) {
@@ -6784,8 +6807,19 @@ ClsDef:
         };
         if ($type) {
           __DEEP{
-            $r = $type-><M::ManakaiDISResourceDefinition.getChildResourceByType>
+            my $noinput = $type_node-><M::ManakaiDISElement.disGetAttribute>
+                                              (<Q::ManakaiDOM:noInputNormalize>,
+                                               for_arg => $self->{for},
+                                               forp_arg => $self->{forp});
+                                    ## NOTE: Is this correct?
+                                    ##       Should be "for" for the resource
+                                    ##       for which the "actualType" element
+                                    ##       is specified?
+            unless ($noinput and $noinput-><M::SWCFGNode.value>) {
+              $r = $type-><M::ManakaiDISResourceDefinition
+                                         .getChildResourceByType>
                                                    (<Q::DISLang:InputProcessor>);
+            }
           }__;
         }
 
@@ -8038,8 +8072,16 @@ ExceptionDef:
           @@@@@enDesc:
             The URI reference of the media type that is not supported. 
         @@@@XSourceNodeParam:
+        @@@@XParam:
+          @@@@@QName:elementType
+          @@@@@enDesc:
+            The URI reference of the element type of the element
+            in which the media type is referenced.
         @@@@enMufDef:
-          Media type <%p (name => {<Q::DIS:uri>});> is not supported
+          %p (name => {<Q::DIS:sourceCode>}, prefix => {"}, suffix => {": }
+          );%p (name => {<Q::DIS:elementType>}, prefix => { (Element type: <},
+          suffix => {>) }
+          );Media type <%p (name => {<Q::DIS:uri>});> is not supported
       @@@XSubTypeDef:
         @@@@QName: UNSUPPORTED_ELEMENT_TYPE_ERR
         @@@@enDesc:
@@ -8201,6 +8243,11 @@ ExceptionDef:
             or preprocessing element type) of the element
             in which a reference to the undefined resource is contained.
         @@@@XParam:
+          @@@@@QName:parentURI
+          @@@@@enDesc:
+            The URI reference of the resource from whose child resources
+            a resource is tried to find.
+        @@@@XParam:
           @@@@@QName: localName
           @@@@@enDesc:
             The local name of the undefined resource.
@@ -8214,6 +8261,7 @@ ExceptionDef:
             Expected resource type.
         @@@@enMufDef:
           %p (name => {<Q::DIS:sourceCode>}, prefix => {"}, suffix => {": });
+          %p (name => {<Q::DIS:parentURI>}, prefix => {(In <}, suffix => {>) });
           Resource%p (name => {<Q::DIS:uri>}, prefix => { <},
           suffix => {>});%p (name => {<Q::DIS:localName>},
           prefix => { "}, suffix => {"}); is not defined or wrong type%p

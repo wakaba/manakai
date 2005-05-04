@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/05/03 12:34:38 $
+      $Date: 2005/05/04 13:49:27 $
     @@ContentType:
       dis:Date.RCS
   
@@ -69,6 +69,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @dx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @infoset:
     http://www.w3.org/2001/04/infoset#
   @lang:
@@ -153,58 +155,10 @@ ClsDef:
   @ClsQName: ManakaiPerlCodeFragment
   @ClsISA:
     ManakaiDOM:ManakaiDOMNodeReference::ManakaiDOM:Perl
+  @ClsISA:
+    dx:ManakaiDefaultExceptionHandler::ManakaiDOM:Perl
   @enDesc:
     A class on which another Perl code classes are constructed based. 
-
-  @IntMethod:
-    @@Operator:
-      @@@@:
-        ManakaiDOM:MUErrorHandler
-      @@@ContentType:
-        dis:TypeQName
-    @@Description:
-      @@@lang:en
-      @@@@:
-        This method is a generic error handler; all manakai exceptions 
-        and warnings associated to an object are once reported to this method 
-        and then delivered to appropriate entities. 
-        \
-        If the error is an exception (such as <X::DOMCore:DOMException> or 
-        <X::ManakaiDOM:ManakaiDOMImplementationException>), it is 
-        simply thrown.  If the error is only a warning, it is reported 
-        via the <IF::DOMCore:DOMError> interface. 
-        \
-        See <PerlModule::Message::Util::Error> documentation for more 
-        information on the error reporting mechanism.
-        \
-        {NOTE:: This kind of methods are named as <Perl::___report_error> 
-                in the convention of <PerlModule::Message::Util::Error>. 
-        \
-        }
-    @@Param:
-      @@@Name:err
-      @@@Type: 
-        ManakaiDOM:ManakaiDOMExceptionOrWarning::ManakaiDOM:Perl
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          An exception object that describes what kind of error it is 
-          and how it should be recovered. 
-          \
-          {NOTE:: Exception objects in manakai implementation 
-                  inherit the class <PerlModule::Message::Util::Error>, 
-                  that in turn inherits <PerlModule::Error>.
-          \
-          }
-    @@Return:
-      @@@PerlDef:
-          if ($err->isa (<ClassName::ManakaiDOM:ManakaiDOMException
-                                   ::ManakaiDOM:Perl>)) {
-            $err->throw;
-          } else {
-            \## TODO: Implement warning reporting
-            warn $err->stringify;
-          }
 
   @Attr:
     @@Name: parentNode
@@ -1868,6 +1822,38 @@ ClsDef:
                <Q::pc:nodeType>, <Q::pc:useModuleName>, 
                <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
+  @IntCloneMethod:
+    @@Return:
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@PerlDef:
+          my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
+                                        ::ManakaiDOM:Perl.new>;
+          $node->{<Q::pc:nodeType>} = 'sub';
+          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
+          push @{$node->{<Q::TreeCore:subnode>}}, <Q::pc:childNodes>;
+          for my $prop (<Q::pc:sourceFile>, <Q::pc:sourceLine>) {
+            $node->{$prop} = $nodeObject->{$prop};
+          }
+          $node->{<Q::pc:requireResourceURI>}
+             = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
+          $node->{<Q::pc:useModuleName>}
+             = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
+          $node->{<Q::pc:requireModuleName>}
+             = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
+          $node->{<Q::pc:childNodes>} = [];
+          for my $cno (@{$nodeObject->{<Q::pc:childNodes>}}) {
+            my $pack;
+            my $nt = $cno->{<Q::pc:nodeType>};
+            __CODE{pc:nodeTypeToPackageName::
+                     $nodeType => $nt, $packageName => $pack, $object => $cno}__;
+                                 ## NOTE: Method name written directly
+            my $cno_clone = $pack->_make_clone_object ($cno);
+            push @{$node->{<Q::pc:childNodes>}}, $cno_clone;
+            $cno_clone->{<Q::pc:parent>} = $node;
+            ## NOTE: Tree ID is not updated yet.
+          }
+
   @Attr:
     @@Name: localName
     @@enDesc:
@@ -3422,6 +3408,9 @@ ClsDef:
   @ClsQName: ManakaiPerlCodeImplementation
   @enDesc:
     The class that provides factory methods. 
+
+  @ClsISA:
+    dx:ManakaiDefaultExceptionHandler::ManakaiDOM:Perl
 
   @DISLang:role:
     DOMMetaImpl:ManakaiAnyImplementationRole

@@ -30,7 +30,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/04/28 15:22:59 $
+      $Date: 2005/05/04 13:49:27 $
     @@ContentType:
       dis:Date.RCS
   
@@ -361,23 +361,6 @@ ResourceTypeDef:
     @@@: A DOM attribute.
   @rdfs:subClassOf:
     DISLang:Attribute::ManakaiDOM:all
-
-## -- Parameter input normalizer (from DOMMain)
-
-PropDef:
-  @QName:
-    ManakaiDOM:inputNormalizer
-  @Description:
-    @@lang:en
-    @@@:
-      A code fragment that normalizes inputs, including method parameter 
-      values and new attribute values. 
-      \
-      If the code is written in Perl (<TYPE::lang:Perl>), any occurence 
-      of <Perl::$INPUT> in the code is replaced by the variable name 
-      containing the input. 
-  @rdfs:domain:
-    ManakaiDOM:DataType
 
 ## -- DOMMain feature (from DOMMain)
 

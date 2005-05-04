@@ -1,16 +1,10 @@
 Module:
   @QName:
     MDOM:DOMMain
-  @AppName:
-    @@@: dom
-    @@prefix:  w3c.org
-    @@ContentType:
-      lang:IDL-DOM
-    @@For:
-      ManakaiDOM:IDL
   @FullName:
     @@lang: en
-    @@@: DOM Core DataTypes and Objects
+    @@@:
+      DOM Commonly-used Datatypes and Objects
   @Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   
@@ -28,35 +22,31 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/03 12:34:37 $
+      $Date: 2005/05/04 13:49:27 $
     @@ContentType:
       dis:Date.RCS
   
   @Require:
     @@Module:
-      @@@Name: DISIDL
       @@@QName:
         DISlib:DISIDL
       @@@WithFor:
         ManakaiDOM:all
     @@Module:
-      @@@Name: DISPerl
       @@@QName:
         DISlib:DISPerl
       @@@WithFor:
         ManakaiDOM:all
     @@Module:
-      @@@Name:ManakaiNode
       @@@QName:
         Util:ManakaiNode
       @@@WithFor:
         ManakaiDOM:all
     @@Module:
-      @@@Name: DOMException
       @@@QName:
         UtilError:DOMException
       @@@WithFor:
-        ManakaiDOM:all
+        ManakaiDOM:Perl
     @@Module:
       @@@Name: DOMMain
       @@@WithFor:
@@ -65,17 +55,6 @@ Module:
       @@@Name: DOMMain
       @@@WithFor:
         ManakaiDOM:ManakaiDOMLatest
-    @@AppModule:
-      @@@For:
-        ManakaiDOM:ManakaiDOM
-      @@@Def:
-        @@@@require: Encode
-        @@@@ContentType: 
-          dis:Perl
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The Perl module set to convert character encodings.
     @@Module:
       @@@Name: DOMMetaImpl
       @@@WithFor:
@@ -103,6 +82,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/events#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @dx:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/XML#
   @infoset:
     http://www.w3.org/2001/04/infoset#
   @lang:
@@ -217,21 +198,6 @@ ResourceDef:
       ManakaiDOM:ManakaiDOMCommon
 
 ## -- "For" definitions
-
-## For a language
-
-ForDef:
-  @QName:
-    ManakaiDOM:Java
-  @FullName:
-    @@lang:en
-    @@@: For Java binding
-ForDef:
-  @QName:
-    ManakaiDOM:ECMAScript
-  @FullName:
-    @@lang:en
-    @@@: For ECMAScript binding
 
 ## For the Document Object Model
 
@@ -433,11 +399,6 @@ ElementTypeBinding:
       ManakaiDOM:ManakaiDOMObject
     @@ForCheck:
       ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOMCommon
-      @@@For:
-        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOMCommon
 
 ResourceTypeDef:
   @QName: ErrorClass
@@ -458,16 +419,11 @@ ElementTypeBinding:
     @@rdf:type:
       ManakaiDOM:WarningClass
     @@ISA: 
-      ManakaiDOM:ManakaiDOMWarning::ManakaiDOM:all
+      ManakaiDOM:ManakaiDOMWarning::ManakaiDOM:Perl
     @@ISA:
       ManakaiDOM:ManakaiDOMObject
     @@ForCheck:
       ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOMCommon
-      @@@For:
-        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOMCommon
 
 ElementTypeBinding:
   @Name: SubTypeDef
@@ -478,12 +434,6 @@ ElementTypeBinding:
       ManakaiDOM:ExceptionOrWarningSubType
     @@ForCheck:
       ManakaiDOM:ManakaiDOM
-    @@aliasChild:1
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOMCommon
-      @@@For:
-        !=ManakaiDOM:ManakaiDOMCommon
 
 ElementTypeBinding:
   @Name: XParam
@@ -507,22 +457,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: 
       ManakaiDOM:Const
-    @@aliasChild: 1
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOMCommon
-      @@@For:
-        !=ManakaiDOM:ManakaiDOMCommon
-
-PropDef:
-  @QName: 
-    dis:IsBitMask
-  @dataType:
-    DOMMain:boolean
-  @Description:
-    @@lang:en
-    @@@:
-      Whether the constant group is defined as bitmask values or not.
 
 ResourceTypeDef:
   @QName:
@@ -535,6 +469,7 @@ ResourceTypeDef:
     @@@: A DOM attribute.
   @rdfs:subClassOf:
     DISLang:Attribute
+
 ElementTypeBinding:
   @Name: Attr
   @ElementType:
@@ -646,16 +581,6 @@ ElementTypeBinding:
       ManakaiDOM:DOMMethodParameter
 
 ElementTypeBinding:
-  @Name: noVariant
-  @ElementType:
-    dis:AliasFor
-  @ShadowContent:
-    @@@:
-      ::ManakaiDOM:all
-    @@For:
-      !=ManakaiDOM:all
-
-ElementTypeBinding:
   @Name: FormatDef
   @ElementType:
     dis:ResourceDef
@@ -693,28 +618,6 @@ ElementTypeBinding:
     @@rdf:type:
       ManakaiDOM:DOMMethodReturn
 
-PropDef:
-  @QName:
-    dis:Read
-  @FullName:
-    @@lang:en
-    @@@: Is readable
-  @Description:
-    @@lang:en
-    @@@: Whether the subject resource is readable or not.
-  @dataType:
-    dis:Boolean
-PropDef:
-  @QName:
-    dis:Write
-  @FullName:
-    @@lang:en
-    @@@: Is writable
-  @Description:
-    @@lang:en
-    @@@: Whether the subject resource is writable or not.
-  @dataType: 
-    dis:Boolean
 
 ElementTypeBinding:
   @Name: InCase
@@ -777,12 +680,10 @@ TreeElementType:
 
 Const:
   @Name: null
-  @Type: any
-  @AliasFor:
-    @@@:
-      ::ManakaiDOM:all
-    @@For:
-      !=ManakaiDOM:all
+  @Type: 
+    ManakaiDOM:any::ManakaiDOM:all
+  @ForCheck:
+    ManakaiDOM:all
   @Value:
     @@ContentType: 
       lang:Perl
@@ -904,69 +805,10 @@ ElementTypeBinding:
     @@For:
       ManakaiDOM:ManakaiDOMLatest
 
-PropDef:
-  @QName:
-    ManakaiDOM:inputNormalizer
-  @Description:
-    @@lang:en
-    @@@:
-      A code fragment that normalizes inputs, including method parameter 
-      values and new attribute values. 
-      \
-      If the code is written in Perl (<TYPE::lang:Perl>), any occurence 
-      of <Perl::$INPUT> in the code is replaced by the variable name 
-      containing the input. 
-  @rdfs:domain:
-    ManakaiDOM:DataType
-
-TreeElementType:
-  @QName:
-    ManakaiDOM:InputNormalize
-  @Description:
-    @@lang:en
-    @@@:
-      Inserts an input normalizing code, if any, for a parameter.
-
-PropDef:
-  @QName:
-    ManakaiDOM:noInputNormalize
-  @Description:
-    @@lang:en
-    @@@:
-      Whether an input normalizer code should be automatically 
-      inserted by code generator.  If <CODE::false> and a normalizer 
-      (<Q::ManakaiDOM:inputNormalizer>) is defined, it is inserted 
-      between input (parameter) declaration and actual code.  Otherwise, 
-      no code is inserted. 
-  @dataType:
-    dis:Boolean
-
-
-## -- Other
-
-DataTypeDef:
-  @QName:
-    lang:Java
-  @FullName:
-    @@lang:en
-    @@@: Java code
-
-DataTypeDef:
-  @QName:
-    lang:muf
-  @FullName:
-    @@lang:en
-    @@@: 
-      <PerlModule::Message::Util::Formatter> template
-
-DataTypeDef:
-  @QName:
-    lang:ECMAScript
-  @FullName:
-    @@lang:en
-    @@@: ECMAScript code
-
 ## -- Obsolete properties
+
+## NOTE: These definitions will be removed after 
+##       all these instances removed from the <QUOTE::dis> source files.
 
 PropDef:
   @QName:
@@ -1043,11 +885,8 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       DOMMain:DOMFeature
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
+    @@ForCheck:
+      ManakaiDOM:all
 
 ElementTypeBinding:
   @Name: FeatureVerDef
@@ -1074,7 +913,7 @@ FeatureDef:
     @@QName: 
       DOMMain:ManakaiDOMFeature10
     @@Version: 1.0
-    @@ISA: 
+    @@DOMMetaImpl:instanceFeatureOf: 
       DOMMain:ManakaiDOMFeature
     @@FullName:
       @@@lang:en
@@ -1108,7 +947,7 @@ FeatureDef:
         The manakai DOM implementation <Module::DOMMain> module, level 1
     @@QName: 
       DOMMain:DOMMainFeature10
-    @@ISA:
+    @@DOMMetaImpl:instanceFeatureOf:
       ManakaiDOM:DOMMain
   @FeatureVerDef:
     @@Version: 2.0
@@ -1118,7 +957,7 @@ FeatureDef:
         The manakai DOM implementation <Module::DOMMain> module, level 2
     @@QName: 
       DOMMain:DOMMainFeature20
-    @@ISA: 
+    @@DOMMetaImpl:instanceFeatureOf: 
       DOMMain:DOMMainFeature10
   @FeatureVerDef:
     @@Version: 3.0
@@ -1128,7 +967,7 @@ FeatureDef:
         The manakai DOM implementation <Module::DOMMain> module, level 3
     @@QName: 
       DOMMain:DOMMainFeature30
-    @@ISA: 
+    @@DOMMetaImpl:instanceFeatureOf: 
       DOMMain:DOMMainFeature20
 
 ## -- DOM Core Specification datatypes
@@ -1149,11 +988,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DOMDataType
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For: 
-        !=ManakaiDOM:all
 
 ResourceDef:
   @For:
@@ -1207,7 +1041,8 @@ ResourceDef:
   @Def:
     @@ContentType:
       lang:dis
-    @@DISLang:dataTypeAliasFor: unsigned-long-long
+    @@DISLang:dataTypeAliasFor: 
+      DOMMain:unsigned-long-long::ManakaiDOM:all
     @@ForCheck:
       ManakaiDOM:ForIF ManakaiDOM:IDL
   @ImplNote:
@@ -1221,7 +1056,8 @@ DOMDataTypeDef:
   @Name:  DOMUserData
   @For:
     ManakaiDOM:DOM3
-  @AliasFor: any
+  @AliasFor: 
+    DOMMain:any::ManakaiDOM:all
   @Description:
     @@lang:en
     @@@: A reference to application data.
@@ -1230,7 +1066,8 @@ DOMDataTypeDef:
   @Name:  DOMObject
   @For:
     ManakaiDOM:DOM3
-  @AliasFor: Object
+  @AliasFor: 
+    DOMMain:Object::ManakaiDOM:all
   @Description:
     @@lang:en
     @@@: An object reference.
@@ -1305,13 +1142,14 @@ ResourceDef:
       @@@@:
         The character string in UTF-16BE (without <CHAR::BOM>) Perl byte-string. 
     @@Get:
-      @@@Type: any
+      @@@Type: 
+        DOMMain:any::ManakaiDOM:all
       @@@PerlDef:
         @@@@require: Encode
         @@@@@:
           $r = Encode::encode ('UTF-16BE',
                                ref $self eq 'SCALAR' ? $$self : $self);
-  @IntClsAttr:
+  @IntClsMethod:
     @@Name: length
     @@Description:
       @@@lang:en
@@ -1325,7 +1163,7 @@ ResourceDef:
                 is into the range <CODE::U+10000> to <CODE::U+10FFFF>.
         \
         }
-    @@Get:
+    @@Return:
       @@@Type: unsigned-long
       @@@Description:
         @@@@lang:en
@@ -1407,7 +1245,7 @@ ResourceDef:
               }
             } else {
               __EXCEPTION{
-                MDOMX:MDOM_DEBUG_BUG::
+                MDOMX:MDOM_DEBUG_BUG||ManakaiDOM:Perl::
                   MDOMX:values => {{
                     count => $offset,
                     position => 1,
@@ -1500,7 +1338,7 @@ ResourceDef:
         @@@@@:
           return unless ref $self eq 'SCALAR';
           if ($offset < 0 or $offset > CORE::length $$self or
-              $offset > <M::ManakaiDOMString.length> ($self)) {
+              $offset > <ClassM::ManakaiDOMString.length> ($self)) {
             __EXCEPTION{DOMCore:ManakaiDOMException.INDEX_SIZE_ERR::
               MDOMX:param-name => 'offset',
             }__;
@@ -1571,7 +1409,7 @@ ResourceDef:
         @@@@@:
           return unless ref $self eq 'SCALAR';
           if ($offset < 0 or $offset > CORE::length $$self or
-              $offset > <M::ManakaiDOMString.length> ($self)) {
+              $offset > <ClassM::ManakaiDOMString.length> ($self)) {
             __EXCEPTION{DOMCore:ManakaiDOMException.INDEX_SIZE_ERR::
               MDOMX:param-name => 'offset',
             }__;
@@ -1621,7 +1459,7 @@ ResourceDef:
               }
             } else {
               __EXCEPTION{
-              MDOMX:MDOM_DEBUG_BUG::
+              MDOMX:MDOM_DEBUG_BUG||ManakaiDOM:Perl::
                 MDOMX:values => {{
                         count => $count,
                         position => 1,
@@ -1689,7 +1527,7 @@ ResourceDef:
       @@@PerlDef:
           my $s = ref $self eq 'SCALAR' ? $self : \$self;
           if ($offset < 0 or $offset > CORE::length $$s or
-              $offset > <M::ManakaiDOMString.length> ($self)) {
+              $offset > <ClassM::ManakaiDOMString.length> ($self)) {
             __EXCEPTION{DOMCore:ManakaiDOMException.INDEX_SIZE_ERR::
               MDOMX:param-name => 'offset',
             }__;
@@ -1817,6 +1655,20 @@ ResourceDef:
             $r = $str0 eq $str1 ? true : false;
           }
 ## DataType:DOMString
+
+ResourceDef:
+  @QName: boolean
+  @AliasFor:
+    DOMMain:boolean::ManakaiDOM:all
+  @ForCheck:
+    !=ManakaiDOM:all
+
+ResourceDef:
+  @QName: unsigned-long
+  @AliasFor:
+    DOMMain:unsigned-long::ManakaiDOM:all
+  @ForCheck:
+    !=ManakaiDOM:all
 
 ResourceDef:
   @For: 
@@ -1960,7 +1812,7 @@ ResourceDef:
               last if $offset16 < 0;
             } else {
               __EXCEPTION{
-              MDOMX:MDOM_DEBUG_BUG::
+              MDOMX:MDOM_DEBUG_BUG||ManakaiDOM:Perl::
                 MDOMX:values => {{
                   count => $offset16,
                   position => 1,
@@ -2113,10 +1965,9 @@ StringDataTypeDef:
       a method or the given value of an attribute) is typed as 
       "ManakaiDOMNamespaceURI", the Perl code to check the empty 
       string is outputed as part of the implementation.
-  @ManakaiDOM:inputNormalizer:
-    @@ContentType:
-      lang:Perl
-    @@@:
+
+  @DISLang:InputProcessor:
+    @@PerlDef:
       if (CORE::defined $INPUT and CORE::length $INPUT == 0) {
         __WARNING{MDOMX:MDOM_NS_EMPTY_URI::
           MDOMX:param-name => {$INPUT},
@@ -2170,46 +2021,6 @@ StringDataTypeDef:
               DOM Level 3 Load and Save
         <M::DOMLS:DOMImplementationLS.createLSParser>>.
 
-StringDataTypeDef:
-  @@QName: SystemID
-  @@FullName:
-    @@@lang:en
-    @@@@:
-      SGML system identifier
-
-StringDataTypeDef:
-  @@QName: XMLSystemID
-  @@FullName:
-    @@@lang:en
-    @@@@:
-      XML system identifier
-  @@rdfs:subClassOf:
-    ManakaiDOM:DOMURI
-  @@rdfs:subClassOf: SystemID
-
-StringDataTypeDef:
-  @@QName: PublicID
-  @@FullName:
-    @@@lang:en
-    @@@@:
-      Web SGML public identifier
-
-StringDataTypeDef:
-  @@QName: SGMLPublicID
-  @@FullName:
-    @@@lang:en
-    @@@@:
-      Classic SGML public identifier
-  @@rdfs:subClassOf: PublicID
-
-StringDataTypeDef:
-  @@QName: XMLPublicID
-  @@FullName:
-    @@@lang:en
-    @@@@:
-      XML public identifier
-  @@rdfs:subClassOf: PublicID
-
 ImplNote:
   @lang:en
   @@:
@@ -2252,10 +2063,9 @@ StringDataTypeDef:
       <TYPE::ManakaiDOM:ManakaiDOMKeyIdentifiers> also accept a reference 
       to an array whose items are key identifier strings as well as 
       a plain string of identifiers.
-  @ManakaiDOM:inputNormalizer:
-    @@ContentType:
-      lang:Perl
-    @@@:
+
+  @DISLang:InputProcessor:
+    @@PerlDef:
       if (CORE::defined $INPUT) {
         unless (CORE::ref $INPUT) {
           $INPUT = [CORE::split /[\x20\x09\x0D\x0A]/, $INPUT];
@@ -2269,35 +2079,30 @@ StringDataTypeDef:
   @FullName:
     @@lang:en
     @@@: XML Name
-  @ManakaiDOM:inputNormalizer:
+  @DISLang:InputProcessor:
+    @@PerlDef: \
 
   @ResourceDef:
-    @@QName: validateXMLName
+    @@QName: testXML10Name
+    @@enDesc:
+      Tests whether a scalar variable string is a valid XML 1.0 
+      <CODE::Name> or not.
+    @@PerlDef:
+      ($INPUT =~ /\A\p{inxml:_NameStartChar10}\p{inxml:NameChar10}*\z/)
     @@rdf:type:
       dis2pm:InlineCode
     @@aliasChild:1
-    @@Def:
-      @@@ContentType:
-        dis:Perl
-      @@@DISPerl:selectByProp:
-        @@@@DISPerl:propName:
-          infoset:version
-        @@@@DISPerl:case:
-          @@@@@Value:
-            @@@@@@@: 1.0
-            @@@@@@Type:
-              DOMMain:DOMString
-          @@@@@@:
-            ($INPUT =~ /\A\p{InXML_NameStartChar10}\p{InXMLNameChar10}*\z/)
-        @@@@DISPerl:case:
-          @@@@@Value:
-            @@@@@@@: 1.1
-            @@@@@@Type:
-              DOMMain:DOMString
-          @@@@@@:
-            ($INPUT =~ /\A\p{InXMLNameStartChar11}\p{InXMLNameChar11}*\z/)
-        @@@@DISPerl:else:
-          ** NOT IMPLEMENTED **
+  
+  @ResourceDef:
+    @@QName: testXML11Name
+    @@enDesc: 
+      Tests whether a scalar variable string is a valid XML 1.1
+      <CODE::Name> or not.
+    @@PerlDef:
+      ($INPUT =~ /\A\p{inxml:NameStartChar11}\p{inxml:NameChar11}*\z/)
+    @@rdf:type:
+      dis2pm:InlineCode
+    @@aliasChild: 1
 
   @ResourceDef:
     @@QName: ensureXMLName
@@ -2320,11 +2125,9 @@ StringDataTypeDef:
         if (defined $INPUT) {
           __FOR{ManakaiDOM:DOM3::
             if (((not defined $XMLVERSION or $XMLVERSION eq '1.0') and
-                 not <Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
-                            infoset:version = '1.0'>) or
+                 not <Code::DOMMain:testXMLName10:: $INPUT = $INPUT>) or
                 ($XMLVERSION eq '1.1' and
-                 not <Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
-                            infoset:version = '1.1'>)) {
+                 not <Code::DOMMain:testXMLName11:: $INPUT = $INPUT>)) {
               __EXCEPTION{MDOMX:MDOM_BAD_NAME::
                 DOMCore:name => {$INPUT},
                 MDOMX:param-name => '$INPUT_PARAM_NAME',
@@ -2332,9 +2135,8 @@ StringDataTypeDef:
               }__;
             }
           }__;
-          __FOR{ManakaiDOM:DOM2 !ManakaiDOM:DOM3::
-            unless (<Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
-                           infoset:version = '1.0'>) {
+          __FOR{!ManakaiDOM:DOM3::
+            unless (<Code::DOMMain:testXMLName10:: $INPUT = $INPUT>) {
               __EXCEPTION{MDOMX:MDOM_BAD_NAME::
                 DOMCore:name => {$INPUT},
                 MDOMX:param-name => '$INPUT_PARAM_NAME',
@@ -2350,35 +2152,31 @@ StringDataTypeDef:
   @FullName:
     @@lang:en
     @@@: XML NCName
-  @ManakaiDOM:inputNormalizer:
+
+  @DISLang:InputProcessor:
+    @@PerlDef:\
 
   @ResourceDef:
-    @@QName: validateXMLNCName
+    @@QName: testXML10NCName
     @@rdf:type:
       dis2pm:InlineCode
     @@aliasChild:1
-    @@Def:
-      @@@ContentType:
-        dis:Perl
-      @@@DISPerl:selectByProp:
-        @@@@DISPerl:propName:
-          infoset:version
-        @@@@DISPerl:case:
-          @@@@@Value:
-            @@@@@@@: 1.0
-            @@@@@@Type:
-              DOMMain:DOMString
-          @@@@@@:
-            ($INPUT =~ /\A\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*\z/)
-        @@@@DISPerl:case:
-          @@@@@Value:
-            @@@@@@@: 1.1
-            @@@@@@Type:
-              DOMMain:DOMString
-          @@@@@@:
-            ($INPUT =~ /\A\p{InXMLNCNameStartChar11}\p{InXMLNCNameChar11}*\z/)
-        @@@@DISPerl:else:
-          ** NOT IMPLEMENTED **
+    @@enDesc:
+      Tests whether a scalar variable string is a valid XML Namespace
+      1.0 <CODE::NCName> or not.
+    @@PerlDef:
+      ($INPUT =~ /\A\p{inxml:_NCNameStartChar10}\p{inxml:NCNameChar10}*\z/)
+
+  @ResourceDef:
+    @@QName: testXML11NCName
+    @@rdf:type:
+      dis2pm:InlineCode
+    @@aliasChild:1
+    @@enDesc:
+      Tests whether a scalar variable string is a valid XML Namespace
+      1.1 <CODE::NCName> or not.
+    @@PerlDef:
+      ($INPUT =~ /\A\p{inxml:NCNameStartChar11}\p{inxml:NCNameChar11}*\z/)
 
 StringDataTypeDef:
   @QName: ManakaiDOMNamespacePrefix
@@ -2403,9 +2201,10 @@ StringDataTypeDef:
     @@Description:
       @@@lang:en
       @@@@:
-        DOM Level 3 defines that the treatement for empty prefix 
-        is implementation dependent.  The manakai DOM implementation 
-        assumes ut as uf <DOM::null> is specified.
+        The DOM Level 3 Core Specification specifies that how
+        the empty prefix string is treated is implementation-dependent;
+        the manakai DOM implementations does not distingulish
+        it with the <DOM::null> value.
       @@@For:
         ManakaiDOM:DOM3
     @@PerlDef:
@@ -2419,11 +2218,9 @@ StringDataTypeDef:
         if (defined $INPUT) {
           __FOR{ManakaiDOM:DOM3::
             if (($XMLVERSION eq '1.0' and
-                 not <Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
-                            infoset:version = '1.0'>) or
+                 not <Code::DOMMain:testXML10Name:: $INPUT = $INPUT>) or
                 ($XMLVERSION eq '1.1' and
-                 not <Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
-                            infoset:version = '1.1'>)) {
+                 not <Code::DOMMain:testXML11Name:: $INPUT = $INPUT)) {
               __EXCEPTION{MDOMX:MDOM_BAD_NAME::
                 DOMCore:name => {$INPUT},
                 MDOMX:param-name => '$INPUT_PARAM_NAME',
@@ -2438,8 +2235,7 @@ StringDataTypeDef:
             }
           }__;
           __FOR{ManakaiDOM:DOM2 !ManakaiDOM:DOM3::
-            unless (<Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
-                           infoset:version = '1.0'>) {
+            unless (<Code::DOMMain:testXML10Name:: $INPUT = $INPUT>) {
               __EXCEPTION{MDOMX:MDOM_BAD_NAME::
                 DOMCore:name => {$INPUT},
                 MDOMX:param-name => '$INPUT_PARAM_NAME',
@@ -2469,77 +2265,6 @@ StringDataTypeDef:
     @@lang:en
     @@@:
       XML Qualified Name
-  @ManakaiDOM:inputNormalizer:
-    @@ContentType:
-      dis:Perl
-    @@DISPerl:selectByProp:
-      @@@DISPerl:propName:
-        infoset:version
-      @@@DISPerl:case:
-        @@@@Value: 1.0
-        @@@@@:
-          unless (<Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
-                           infoset:version = '1.0'>) {
-            __EXCEPTION{
-              MDOMX:MDOM_BAD_NAME::
-                DOMCore:name => {$INPUT},
-                MDOMX:param-name => '$INPUT_NAME',
-                infoset:version => '1.0',
-            }__;
-          }
-          unless (<Code::DOMMain:validateXMLQName:: $INPUT = $INPUT,
-                      infoset:version = '1.0'>) {
-            __EXCEPTION{
-              MDOMX:MDOM_NS_MALFORMED_QNAME::
-                DOMCore:name => {$INPUT},
-                MDOMX:param-name => '$INPUT_NAME',
-                infoset:version => '1.0',
-            }__;
-          }
-      @@@DISPerl:case:
-        @@@@Value: 1.1
-        @@@@@:
-          unless (<Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
-                      infoset:version = '1.1'>) {
-            __EXCEPTION{
-              MDOMX:MDOM_BAD_NAME::
-                DOMCore:name => {$INPUT},
-                MDOMX:param-name => '$INPUT_NAME',
-                infoset:version => '1.1',
-            }__;
-          }
-          unless (<Code::DOMMain:validateXMLQName:: $INPUT = $INPUT,
-                      infoset:version = '1.1'>) {
-            __EXCEPTION{
-              MDOMX:MDOM_NS_MALFORMED_QNAME::
-                DOMCore:name => {$INPUT},
-                MDOMX:param-name => '$INPUT_NAME',
-                infoset:version => '1.1',
-            }__;
-          }
-      @@@DISPerl:else: ** NOT IMPLEMENTED **
-
-  @ResourceDef:
-    @@QName: validateXMLQName
-    @@rdf:type:
-      dis2pm:InlineCode
-    @@aliasChild:1
-    @@Def:
-      @@@ContentType:
-        dis:Perl
-      @@@DISPerl:selectByProp:
-        @@@@DISPerl:propName:
-          infoset:version
-        @@@@DISPerl:case:
-          @@@@@Value: 1.0
-          @@@@@@:
-            ($INPUT =~ /\A\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*(?::\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*)?\z/)
-        @@@@DISPerl:case:
-          @@@@@Value: 1.1
-          @@@@@@:
-            ($INPUT =~ /\A\p{InXMLNCNameStartChar11}\p{InXMLNCNameChar11}*(?::\p{InXMLNCNameStartChar11}\p{InXMLNCNameChar11}*)?\z/)
-        @@@@DISPerl:else:
-          ** NOT IMPLEMENTED **
 
   @ResourceDef:
     @@QName: ensureXMLQName
@@ -2550,13 +2275,13 @@ StringDataTypeDef:
       @@@@:
         Checks whether a string is a legal XML qualified name and if not 
         then raises an exception.
+    @@aliasChild:1
     @@PerlDef:
       @@@For:
         ManakaiDOM:DOM3
       @@@@:
         if ($XMLVERSION eq '1.1') {
-          unless (<Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
-                      infoset:version = '1.1'>) {
+          unless (<Code::DOMMain:testXML11Name:: $INPUT = $INPUT>) {
             __EXCEPTION{
               MDOMX:MDOM_BAD_NAME::
                 DOMCore:name => {$INPUT},
@@ -2564,8 +2289,7 @@ StringDataTypeDef:
                 infoset:version => '1.1',
             }__;
           }
-          unless (<Code::DOMMain:validateXMLQName:: $INPUT = $INPUT,
-                      infoset:version = '1.1'>) {
+          unless (<Code::DOMMain:testXML11QName:: $INPUT = $INPUT>) {
             __EXCEPTION{
               MDOMX:MDOM_NS_MALFORMED_QNAME::
                 DOMCore:name => {$INPUT},
@@ -2574,8 +2298,7 @@ StringDataTypeDef:
             }__;
           }
         } else {
-          unless (<Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
-                           infoset:version = '1.0'>) {
+          unless (<Code::DOMMain:testXML10Name:: $INPUT = $INPUT>) {
             __EXCEPTION{
               MDOMX:MDOM_BAD_NAME::
                 DOMCore:name => {$INPUT},
@@ -2583,8 +2306,7 @@ StringDataTypeDef:
                 infoset:version => '1.0',
             }__;
           }
-          unless (<Code::DOMMain:validateXMLQName:: $INPUT = $INPUT,
-                      infoset:version = '1.0'>) {
+          unless (<Code::DOMMain:testXML10QName:: $INPUT = $INPUT>) {
             __EXCEPTION{
               MDOMX:MDOM_NS_MALFORMED_QNAME::
                 DOMCore:name => {$INPUT},
@@ -2597,8 +2319,7 @@ StringDataTypeDef:
        @@@For:
          ManakaiDOM:DOM2 !ManakaiDOM:DOM3
        @@@@:
-          unless (<Code::DOMMain:validateXMLName:: $INPUT = $INPUT,
-                           infoset:version = '1.0'>) {
+          unless (<Code::DOMMain:testXML10Name:: $INPUT = $INPUT>) {
             __EXCEPTION{
               MDOMX:MDOM_BAD_NAME::
                 DOMCore:name => {$INPUT},
@@ -2606,8 +2327,7 @@ StringDataTypeDef:
                 infoset:version => '1.0',
             }__;
 v          }
-          unless (<Code::DOMMain:validateXMLQName:: $INPUT = $INPUT,
-                      infoset:version = '1.0'>) {
+          unless (<Code::DOMMain:testXML10QName:: $INPUT = $INPUT>) {
             __EXCEPTION{
               MDOMX:MDOM_NS_MALFORMED_QNAME::
                 DOMCore:name => {$INPUT},
@@ -2615,6 +2335,77 @@ v          }
                 infoset:version => '1.0',
             }__;
           }
+
+StringDataTypeDef:
+  @QName: ManakaiDOMXML10QName
+  @rdfs:subClassOf: ManakaiDOMXML10QName
+  @enDesc:
+    XML 1.0 Namespace Qualified Names.
+  
+  @DISLang:InputProcessor:
+    @@PerlDef:
+      unless (<Code::DOMMain:testXML10Name:: $INPUT = $INPUT>) {
+        __EXCEPTION{MDOMX:MDOM_BAD_NAME::
+            DOMCore:name => {$INPUT},
+            MDOMX:param-name => '$INPUT_NAME',
+            infoset:version => '1.0',
+        }__;
+      }
+      unless (<Code::DOMMain:testXML10QName:: $INPUT = $INPUT>) {
+        __EXCEPTION{MDOMX:MDOM_NS_MALFORMED_QNAME::
+          DOMCore:name => {$INPUT},
+          MDOMX:param-name => '$INPUT_NAME',
+          infoset:version => '1.0',
+        }__;
+      }
+
+  @ResourceDef:
+    @@QName: testXML10QName
+    @@rdf:type:
+      dis2pm:InlineCode
+    @@enDesc:
+      Tests whether a scalar variable string is a valid XML
+      Namespace 1.0 qualified name or not.
+    @@aliasChild:1
+    @@PerlDef:
+      ($INPUT =~ /\A\p{inxml:_NCNameStartChar10}\p{inxml:NCNameChar10
+                  }*(?::\p{inxml:_NCNameStartChar10}\p{inxml:NCNameChar10}*)?\z/)
+
+StringDataTypeDef:
+  @QName: ManakaiDOMXML11QName
+  @rdfs:subClassOf: ManakaiDOMXMLQName
+  @enDesc:
+    XML 1.1 Namespace Qualified Names.
+  
+  @DISLang:InputProcessor:
+    @@PerlDef:
+      unless (<Code::DOMMain:testXML11Name:: $INPUT = $INPUT>) {
+        __EXCEPTION{MDOMX:MDOM_BAD_NAME::
+          DOMCore:name => {$INPUT},
+          MDOMX:param-name => '$INPUT_NAME',
+          infoset:version => '1.1',
+        }__;
+      }
+      unless (<Code::DOMMain:testXML11QName:: $INPUT = $INPUT>) {
+        __EXCEPTION{MDOMX:MDOM_NS_MALFORMED_QNAME::
+          DOMCore:name => {$INPUT},
+          MDOMX:param-name => '$INPUT_NAME',
+          infoset:version => '1.1',
+        }__;
+      }
+
+  @ResourceDef:
+    @@QName: testXML11QName
+    @@rdf:type:
+      dis2pm:InlineCode
+    @@enDesc:
+      Tests whether a scalar variable string is a valid XML
+      Namespace 1.1 qualified name or not.
+    @@aliasChild:1
+    @@PerlDef:
+      ($INPUT =~ /\A\p{inxml:NCNameStartChar11}\p{inxml:NCNameChar11
+                  }*(?::\p{inxml:NCNameStartChar11}\p{inxml:NCNameChar11}*)?\z/)
+
         
 
 ResourceDef:
@@ -2689,11 +2480,11 @@ ExceptionDef:
          The error code that denotes what kind of exception occures.
      @@Get:
        @@@Type:  
-         DOMMain:unsigned-short
+         DOMMain:unsigned-short::ManakaiDOM:all
        @@@actualType: 
          ManakaiDOM:ManakaiDOMImplementationExceptionCode
        @@@PerlDef: 
-         __CODE{ManakaiDOM:getExceptionCode::ManakaiDOM:all}__;
+         __CODE{ManakaiDOM:getExceptionCode||ManakaiDOM:Perl}__;
 
   @ResourceDef:
     @@QName: 
@@ -2701,79 +2492,13 @@ ExceptionDef:
     @@rdf:type:
       ManakaiDOM:ConstGroup
     @@rdfs:subClassOf:
-      DOMMain:unsigned-short
+      DOMMain:unsigned-short::ManakaiDOM:all
     @@aliasChild: 1
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOMCommon
-      @@@For:
-        !=ManakaiDOM:ManakaiDOMCommon
-
-    @@XConst:
-      @@@QName: 
-        MDOMX:MDOM_TYPE_MISMATCH_ERR
-      @@@Type: unsigned-short
-      @@@Value: 0
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The type of an object is incompatible with the expected 
-          type of the parameter.
-      @@@Def:
-        @@@@lang:en
-        @@@@ContentType:
-          lang:muf
-        @@@@@:
-            The type of an object specified as the value of parameter
-            %t (name => {<Q::MDOMX:param-name>},
-            prefix => { "}, suffix => {"}); is incompatible with the
-            expected type%t (name => {<Q::MDOMX:class>}, 
-            prefix => {: "}, suffix => {"}).
-      @@@XParam:
-        @@@@QName:
-          MDOMX:param-name
-        @@@@Type: DOMMethodParameterName
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@: The parameter name.
-          
-      @@@XParam:
-        @@@@QName:
-          MDOMX:class
-        @@@@Type:
-          perl:package-name
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@: Class name to which given value belongs.
-          
-
-    @@XConst:
-      @@@QName: 
-        MDOMX:PARAM_NULL_POINTER
-      @@@Type: unsigned-short
-      @@@Value: 1
-      @@@Description:
-        @@@@lang:en
-        @@@@@: The null value is passed as a parameter.
-      @@@Def:
-        @@@@lang:en
-        @@@@ContentType:
-          lang:muf
-        @@@@@:
-            The null value is passed to the parameter%t (
-            name => {<Q::MDOMX:param-name>},
-            prefix => { "}, suffix => {"});.
-      @@@XParam:
-        @@@@QName:
-          MDOMX:param-name
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@: The name of the parameter to which the null value is given.
+    @@Type: unsigned-short
 
     @@XConst:
       @@@QName: 
         MDOMX:MDOM_DOMSTRING_INDEX_IN_SURROGATE_PAIR
-      @@@Type: unsigned-long
       @@@Value: 2
       @@@Description:
         @@@@lang:en
@@ -2788,19 +2513,6 @@ ExceptionDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: The parameter to which inappropriate value is specified.
-
-    @@XConst:
-      @@@QName: 
-        MDOMX:MDOM_IMPL_BY_APP
-      @@@Type: unsigned-short
-      @@@Value: 4
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The callee method or attribute is expected to be implemented, 
-          by the DOM application, by overriding it in the inheritting class. 
-
-    
 
 WarningDef:
   @QName: 
@@ -2826,7 +2538,7 @@ WarningDef:
            The warning code from the constant value group
            ManakaiDOMImplementationWarningCode.
        @@@PerlDef: 
-         __CODE{ManakaiDOM:getExceptionCode::ManakaiDOM:all}__;
+         __CODE{ManakaiDOM:getExceptionCode||ManakaiDOM:Perl}__;
 
   @ResourceDef:
     @@QName: 
@@ -2836,12 +2548,6 @@ WarningDef:
     @@rdfs:subClassOf: 
       DOMMain:unsigned-short
     @@Type: unsigned-short
-    @@aliasChild:1
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOMCommon
-      @@@For:
-        !=ManakaiDOM:ManakaiDOMCommon
     
     @@XConst:
       @@@QName: 
@@ -2988,5 +2694,12 @@ WarningDef:
           @@@@@lang:en
           @@@@@@:
             The specified URI reference.
+
+ResourceDef:
+  @QName: unsigned-short
+  @AliasFor:
+    DOMMain:unsigned-short::ManakaiDOM:all
+  @ForCheck:
+    !=ManakaiDOM:all
 
 ## DOMMain.dis ends here

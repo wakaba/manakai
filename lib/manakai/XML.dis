@@ -21,7 +21,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/04/27 06:24:48 $
+      $Date: 2005/05/04 13:49:27 $
     @@ContentType:
       dis:Date.RCS
   
@@ -37,6 +37,10 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @DOMMain:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @dx:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/XML#
   @is:
     http://suika.fam.cx/~wakaba/archive/2004/dis/XML#
   @lang:
@@ -1788,3 +1792,111 @@ ResourceDef:
     An implementation of a modularization model.
   @rdf:type:
     rdfs:Class
+
+## -- Lexical Datatypes
+
+ElementTypeBinding:
+  @Name: StringDataTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISCore:StringDataType
+    @@rdfs:subClassOf:
+      DISCore:String::ManakaiDOM:all
+
+StringDataTypeDef:
+  @QName: ExternalID
+  @FullName:
+    @@lang:en
+    @@@:
+      SGML External Identifiers
+
+StringDataTypeDef:
+  @QName: 
+    DOMMain:SystemID
+  @FullName:
+    @@lang:en
+    @@@:
+      SGML system identifier
+  @rdfs:subClassOf: ExternalID
+
+StringDataTypeDef:
+  @QName: 
+    DOMMain:XMLSystemID
+  @FullName:
+    @@lang:en
+    @@@:
+      XML system identifier
+  @rdfs:subClassOf: 
+    DOMMain:SystemID
+
+StringDataTypeDef:
+  @QName: 
+    DOMMain:PublicID
+  @FullName:
+    @@lang:en
+    @@@:
+      Web SGML public identifier
+  @rdfs:subClassOf:
+    ExternalID
+
+StringDataTypeDef:
+  @QName: 
+    DOMMain:SGMLPublicID
+  @FullName:
+    @@lang:en
+    @@@:
+      Classic SGML public identifier
+  @rdfs:subClassOf: 
+    DOMMain:PublicID
+
+StringDataTypeDef:
+  @QName: 
+    DOMMain:XMLPublicID
+  @FullName:
+    @@lang:en
+    @@@:
+      XML public identifier
+  @rdfs:subClassOf: 
+    DOMMain:PublicID
+
+## -- XML Versions
+
+ForDef:
+  @QName:
+    dx:ForXML
+  @FullName:
+    @@lang:en
+    @@@:
+      For XML
+
+ForDef:
+  @QName:
+    dx:ForXML1
+  @FullName:
+    @@lang:en
+    @@@:
+      For XML 1
+  @ISA: 
+    dx:ForXML
+
+ForDef:
+  @QName: 
+    dx:ForXML10
+  @FullName:
+    @@lang:en
+    @@@:
+      For XML 1.0
+  @ISA:
+    dx:ForXML1
+
+ForDef:
+  @QName:
+    dx:ForXML11
+  @FullName:
+    @@lang:en
+    @@@:
+      For XML 1.1
+  @ISA:
+    dx:ForXML1

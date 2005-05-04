@@ -152,9 +152,9 @@ unless ($mod->is_defined) {
 
 my $pl = $mod->pl_generate_perl_module_file;
 
-$db->check_undefined_resource;
-
 print $pl->stringify;
+
+$db->check_undefined_resource;
 
 =head1 SEE ALSO
 
@@ -179,4 +179,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/05/01 12:44:05 $
+1; # $Date: 2005/05/04 13:49:26 $
