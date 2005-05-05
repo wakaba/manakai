@@ -22,7 +22,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/04 13:49:27 $
+      $Date: 2005/05/05 12:30:03 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2125,9 +2125,9 @@ StringDataTypeDef:
         if (defined $INPUT) {
           __FOR{ManakaiDOM:DOM3::
             if (((not defined $XMLVERSION or $XMLVERSION eq '1.0') and
-                 not <Code::DOMMain:testXMLName10:: $INPUT = $INPUT>) or
+                 not <Code::DOMMain:testXML10Name:: $INPUT = $INPUT>) or
                 ($XMLVERSION eq '1.1' and
-                 not <Code::DOMMain:testXMLName11:: $INPUT = $INPUT>)) {
+                 not <Code::DOMMain:testXML11Name:: $INPUT = $INPUT>)) {
               __EXCEPTION{MDOMX:MDOM_BAD_NAME::
                 DOMCore:name => {$INPUT},
                 MDOMX:param-name => '$INPUT_PARAM_NAME',
@@ -2136,7 +2136,7 @@ StringDataTypeDef:
             }
           }__;
           __FOR{!ManakaiDOM:DOM3::
-            unless (<Code::DOMMain:testXMLName10:: $INPUT = $INPUT>) {
+            unless (<Code::DOMMain:testXML10Name:: $INPUT = $INPUT>) {
               __EXCEPTION{MDOMX:MDOM_BAD_NAME::
                 DOMCore:name => {$INPUT},
                 MDOMX:param-name => '$INPUT_PARAM_NAME',
@@ -2220,7 +2220,7 @@ StringDataTypeDef:
             if (($XMLVERSION eq '1.0' and
                  not <Code::DOMMain:testXML10Name:: $INPUT = $INPUT>) or
                 ($XMLVERSION eq '1.1' and
-                 not <Code::DOMMain:testXML11Name:: $INPUT = $INPUT)) {
+                 not <Code::DOMMain:testXML11Name:: $INPUT = $INPUT>)) {
               __EXCEPTION{MDOMX:MDOM_BAD_NAME::
                 DOMCore:name => {$INPUT},
                 MDOMX:param-name => '$INPUT_PARAM_NAME',

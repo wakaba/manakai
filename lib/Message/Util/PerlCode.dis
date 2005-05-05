@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/05/04 13:49:27 $
+      $Date: 2005/05/05 12:30:03 $
     @@ContentType:
       dis:Date.RCS
   
@@ -3077,7 +3077,8 @@ ClsDef:
                . $r
                . sprintf (qq<\n#line 1 "%s [/b] (Chunk #%d)"\n}\n>,
                           $file-><AG::ManakaiPerlFile.sourceFile>,
-                          $file-><M::ManakaiPerlFile.getNextChunkNumber>);
+                          $file-><M::ManakaiPerlFile.getNextChunkNumber>)
+              if length $r;
           }__;
         }
 
@@ -3876,6 +3877,7 @@ ClsDef:
       @@@nullCase:
         @@@@enDesc: No false code.
     @@Return:
+      @@@Type: ManakaiPerlIf
       @@@RaiseException:
         @@@@@:BAD_CHILD_ERR
         @@@@enDesc:
@@ -3932,13 +3934,19 @@ ClsDef:
         $assign->{<Q::pc:condition>} = $conditionArg->{<Q::TreeCore:node>};
         $assign->{<Q::pc:true>} = $trueArg->{<Q::TreeCore:node>} if $trueArg;
         $assign->{<Q::pc:false>} = $falseArg->{<Q::TreeCore:node>} if $falseArg;
-        $assign->{<Q::TreeCore:node>}-><M::MNodeObject.importTree> ($_)
+        $assign-><M::MNodeObject.importTree> ($_)
            for (grep {$_}
                   $assign->{<Q::pc:condition>}, $assign->{<Q::pc:true>},
                   $assign->{<Q::pc:false>});
         $conditionArg->{<Q::TreeCore:node>}->{<Q::pc:parent>} = $assign;
         $trueArg->{<Q::TreeCore:node>}->{<Q::pc:parent>} = $assign if $trueArg;
         $falseArg->{<Q::TreeCore:node>}->{<Q::pc:parent>} = $assign if $falseArg;
+        if (defined wantarray) {
+          __CODE{ManakaiNode:getNewReference::
+            $object => $assign, $ref => $r,
+            $class =>{<ClassName::ManakaiPerlIf>},
+          }__;
+        }
 ##PerlCodeImplementation
 
 ResourceDef:

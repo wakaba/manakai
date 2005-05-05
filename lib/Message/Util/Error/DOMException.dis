@@ -22,7 +22,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/04 13:49:27 $
+      $Date: 2005/05/05 12:30:03 $
     @@ContentType:
       dis:Date.RCS
   
@@ -86,6 +86,13 @@ ResourceDef:
       The manakai error reporting modules
   @AppName:
     Message::Util::Error::
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
 
 ## -- Resource types
 
@@ -798,6 +805,8 @@ ResourceDef:
     This class provides a default exception handler.
   @rdf:type:
     ManakaiDOM:Class
+  @ForCheck:
+    ManakaiDOM:Perl
 
   @ResourceDef:
     @@rdf:type:

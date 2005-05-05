@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/05/04 13:49:27 $
+      $Date: 2005/05/05 12:30:03 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1827,7 +1827,8 @@ ClsDef:
                                   (for_arg => $forArg, forp_arg => $forpArg)}) {
               my $ccode = $c-><M::ManakaiDISElement.plCodeFragment>
                                   ($disResource,
-                                   for_arg => $forArg, forp_arg => $forpArg);
+                                   for_arg => $forArg, forp_arg => $forpArg,
+                                   contains_statements => $containsStatements);
               $r-><M::PLBlockCon.appendCodeFragment> ($ccode->clone) if $ccode;
             }
           } elsif ({
@@ -1836,11 +1837,17 @@ ClsDef:
           }->{$et}) {
             my ($qname, $const_name, $on) = split /\s*\.\s*/,
                                              $self-><M::SWCFGNode.value>, 3;
+            my $parentResource = $disResource-><M::ManakaiDISPropertyAccessor
+                                                .getPropertyResource>
+                                                (<Q::dis2pm:parentResource>);
             my $uri = $self-><M::ManakaiDISElement.tfqnamesToURI>
-                                      ($qname,
-                                       $disResource->
-                                         <AG::ManakaiDISResourceDefinition.uri>,
-                                       $forArg, node => $self);
+                             ($qname,
+                              ($parentResource-><M::ManakaiDISPropertyAccessor
+                                                .getPropertyResource>
+                                                (<Q::dis2pm:parentResource>) ||
+                               $parentResource || $disResource)->
+                                      <AG::ManakaiDISResourceDefinition.nameURI>,
+                              $forArg, node => $self);
             my $const;
             if (defined $const_name) {
               my $owner = $disResource->{db}-><M::ManakaiDISDatabase.getResource>
@@ -2028,24 +2035,25 @@ ClsDef:
             my $chk = $self-><M::ManakaiDISElement.disGetAttribute>
                                            (<Q::dis:CheckReadOnly>);
             if ($chk and $chk-><M::SWCFGNode.value>) {
-              my $q = $plimpl-><M::MPLImpl.createPerlIf>;
+              my $q = $plimpl-><M::MPLImpl.createPerlIf>
                        (my $qc = $plimpl-><M::MPLImpl.createPerlInlineContainer>,
                         my $qt = $plimpl-><M::MPLImpl.createPerlBlockContainer>);
               $qc-><M::PLInCon.appendCode> ('$self->{node}->{');
               $qc-><M::PLAnyCon.appendStringLiteral> (<Q::DOMCore:read-only>);
               $qc-><M::PLInCon.appendCode> ('}');
 
-              my $for_uri = $disResource-><M::ManakaiDISDatabase.getFor>
+              my $for_uri = $disResource->{db}-><M::ManakaiDISDatabase.getFor>
                                ($forArg)-><M::ManakaiDISForDefinition.isaURI>
                                (<Q::ManakaiDOM:ManakaiDOM1>)
                             ? $forArg : <Q::ManakaiDOM:ManakaiDOMLatest>;
-              my $cls = $self->{db}-><M::ManakaiDISDatabase.getResource>
+              my $cls = $disResource->{db}-><M::ManakaiDISDatabase.getResource>
                                                 (<Q::DOMCore:DOMException>,
                                                        for_arg => $for_uri);
-              my $const = $self->{db}-><M::ManakaiDISDatabase.getResource>
+              my $const = $disResource->{db}-><M::ManakaiDISDatabase.getResource>
                                  (<Q::DOMCore:NO_MODIFICATION_ALLOWED_ERR>,
                                                        for_arg => $for_uri);
-              my $subtype = $self->{db}-><M::ManakaiDISDatabase.getResource>
+              my $subtype = $disResource->{db}
+                                            -><M::ManakaiDISDatabase.getResource>
                                                     (<Q::MDOMX:NOMOD_THIS>,
                                                        for_arg => $for_uri);
               $_-><AS::ManakaiDISResourceDefinition.isReferred>
@@ -6070,12 +6078,15 @@ ClsDef:
                 } elsif ($et eq <Q::disPerl:FOR>) {
                   if ($source_code =~ s/^(((?>(?!::).)*)::\s*)//) {
                     $r-><M::PLBlockCon.skipLines> ($1);
-                    V: for (split /\s*\|\s*/, $2) {
+                    V: for my $forq (split /\s*\|\s*/, $2) {
+                      my $notfor = ($forq =~ s/^!\s*// ? true : false);
                       my $for_uri = $self->{src}
                                          -><M::ManakaiDISElement.qnameToURI>
-                                              ($_, node => $node);
-                      if ($self-><M::ManakaiDISResourceDefinition
-                                    .isForURI> ($for_uri)) {
+                                              ($forq, node => $node);
+                      my $formatch = $self-><M::ManakaiDISResourceDefinition
+                                               .isForURI> ($for_uri);
+                      if (($formatch and not $notfor) or
+                          (not $formatch and $notfor)) {
                         $r-><M::PLBlockCon.appendCodeFragment>
                             ($self-><M::ManakaiDISResourceDefinition
                                   .plPreprocessPerlCode>
