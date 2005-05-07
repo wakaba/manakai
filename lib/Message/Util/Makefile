@@ -48,22 +48,26 @@ all.dac: $(DIS_FILES) $(DAC_PL) \
 
 ManakaiNode.pm: all.dac $(DAC2PM_PL)
 	$(DAC2PM) $< \
-	  --module-uri="$(NS_UTIL)ManakaiNode" > $@
+	  --module-uri="$(NS_UTIL)ManakaiNode" \
+	  --output-file-path="$@"
 	$(PERL_CHK) $@
 
 DIS.pm: all.dac $(DAC2PM_PL)
 	$(DAC2PM) $< \
-	  --module-uri="$(NS_UTIL)DIS" > $@
+	  --module-uri="$(NS_UTIL)DIS" \
+	  --output-file-path="$@"
 	$(PERL_CHK) $@
 
 PerlCode.pm: all.dac $(DAC2PM_PL)
 	$(DAC2PM) $< \
-	  --module-uri="$(NS_UTIL)PerlCode" > $@
+	  --module-uri="$(NS_UTIL)PerlCode" \
+	  --output-file-path="$@"
 	$(PERL_CHK) $@
 
 Error/DOMException.pm: all.dac $(DAC2PM_PL)
 	$(DAC2PM) $< \
-	  --module-uri="$(NS_UTIL_ERR)DOMException" > $@
+	  --module-uri="$(NS_UTIL_ERR)DOMException" \
+	  --output-file-path="$@"
 	$(PERL_CHK) $@
 
 # $(CORE_DAC_FILE)

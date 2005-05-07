@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/05 12:30:03 $
+      $Date: 2005/05/07 13:56:36 $
     @@ContentType:
       dis:Date.RCS
 
@@ -2262,24 +2262,59 @@ IF:
       operations that are independent of any particular instance 
       of the document object model.
 
+  ## For DOM Level 3
+  @ISA:
+    @@@:
+      DOMMetaImpl:ManakaiDOMMinimumImplementationIF
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM3 ManakaiDOM:ForIF
+  
+  @ISA:
+    @@@:
+      DOMMetaImpl:ManakaiDOMMinimumImplementation
+    @@ForCheck:
+      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM3
+
+  ## For DOM Levels 1 and 2
   @ISA:
     @@@:
       ManakaiDOM:ManakaiDOMNodeReference::ManakaiDOM:Perl
     @@ForCheck:
-      ManakaiDOM:ManakaiDOM ManakaiDOM:ForClass
+      ManakaiDOM:ForClass !ManakaiDOM:ManakaiDOM3 ManakaiDOM:ManakaiDOM
   @ISA:
     @@@:
       ManakaiDOM:ManakaiDOMObject
     @@ForCheck:
-      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
+      ManakaiDOM:ForClass !ManakaiDOM:ManakaiDOM3 ManakaiDOM:ManakaiDOM
 
-  @Role:
+  @DISLang:role:
     @@@:
-      DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM
-    @@compat:
-      DOMCore:ManakaiDOMImplementation::ManakaiDOM:ManakaiDOMLatest
+      DOMMetaImpl:ManakaiDOMImplementationRole
+
+  @DOMMetaImpl:provideFeature:
+    @@@: CoreFeature10
     @@ForCheck:
-      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
+      ManakaiDOM:DOM1
+  @DOMMetaImpl:provideFeature:
+    @@@: CoreFeature20
+    @@ForCheck:
+      ManakaiDOM:DOM2
+  @DOMMetaImpl:provideFeature:
+    @@@: CoreFeature30
+    @@ForCheck:
+      ManakaiDOM:DOM3
+  @DOMMetaImpl:provideFeature:
+    @@@: MDOMCoreFeature10
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM1
+  @DOMMetaImpl:provideFeature:
+    @@@: MDOMCoreFeature20
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM2
+  @DOMMetaImpl:provideFeature:
+    @@@: MDOMCoreFeature30
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM3
 
   @Method:
      @@Name:  hasFeature
@@ -2418,20 +2453,10 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: The feature is not implemented.
-        @@@PerlDef:
-          my $plus = $feature =~ s/^\+// ? 1 : 0;
-          if ($<IF::DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM>::Class{
-              ref $self}->{$feature}->{$version}) {
-            $r = true;
-          } else {
-            for (values %<Class::DOMCore:ManakaiDOMImplementation
-                                     ::ManakaiDOM:ManakaiDOMLatest>::Class) {
-              if ($_->{feature}->{$feature}->{$version}) {
-                $r = true;
-                last;
-              }
-            }
-          } 
+        @@@disDef:
+          @@@@DISPerl:cloneCode:
+            DOMMetaImpl:ManakaiDOMMinimumImplementation
+            ::ManakaiDOM:ManakaiDOMLatest.hasFeature
   @Method:
      @@Name:  createDocumentType
      @@Description:
@@ -3020,18 +3045,10 @@ IF:
           @@@@@: 
             There is no object available that implements interfaces 
             associated with the <P::feature> and <P::version>. 
-        @@@PerlDef:
-          $feature =~ s/^\+//;
-          for (values %<Class::DOMCore:ManakaiDOMImplementation
-                                     ::ManakaiDOM:ManakaiDOMLatest>::Class) {
-            if ($_->{feature}->{$feature}->{$version}) {
-              $r = $self->{<Q::TreeCore:node>}
-                        -><M::ManakaiDOM:ManakaiDOMNodeObject
-                            ::ManakaiDOM:Perl.newReference>
-                                                        ($_->{packageName});
-              last;
-            }
-          }
+        @@@disDef:
+          @@@@DISPerl:cloneCode:
+            DOMMetaImpl:ManakaiDOMMinimumImplementation
+            ::ManakaiDOM:ManakaiDOMLatest.getFeature
 
   @IntMethod:
     @@Name:new
@@ -3055,6 +3072,14 @@ IF:
         $node->{<Q::ManakaiDOM:implID>} = $node->{<Q::TreeCore:nodeID>};
       
 ##IF:DOMImplementation
+
+ElementTypeBinding:
+  @Name: disDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:dis
 
 IF:
   @Name:
@@ -5084,8 +5109,23 @@ IF:
      @@SpecLevel:3
      @@For:
        ManakaiDOM:DOM3
+
   @Attr:
      @@Name:  textContent
+
+     @@Level[list]:
+        3
+     @@SpecLevel:3
+
+     @@ManakaiDOM:isForInternal:
+       @@@@:1
+       @@@ForCheck: 
+         !ManakaiDOM:DOM3
+     @@For:
+       ManakaiDOM:ManakaiDOM
+     @@For:
+       ManakaiDOM:DOM3
+
      @@Description:
        @@@lang:en
        @@@@:
@@ -5142,8 +5182,9 @@ IF:
               fit in a "DOMString" variable on the implementation 
               platform.
         @@@PerlDef:
-          $r = $self->{<Q::TreeCore:node>}
-                    -><AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode.textContent>;
+          __CODE{DOMCore:getNodeTextContent::
+                           $node => $self,
+                           $result => $r}__;
      @@Set:
         @@@Type:  
           DOMMain:DOMString
@@ -5178,12 +5219,82 @@ IF:
             @@@@@lang:en
             @@@@@@: This node is read-only.
         @@@PerlDef:
-          __CODE{DOMCore:setNodeTextContent}__;
-     @@Level[list]:
-        3
-     @@SpecLevel:3
-     @@For:
-       ManakaiDOM:DOM3
+          __CODE{DOMCore:setNodeTextContent::
+                    $node => $self,
+                    $given => $given}__;
+
+  @ResourceDef:
+    @@QName: getNodeTextContent
+    @@aliasChild:1
+    @@rdf:type:
+      dis2pm:BlockCode
+    @@ForCheck:
+      ManakaiDOM:ForClass
+    @@enDesc:
+      Gets a text content of a node.
+    @@PerlDef:
+      my $__nodeobj = $node->{<Q::TreeCore:node>};
+      if ({
+             <Q::infoset:Element> => true,
+             <Q::infoset:Attribute> => true,
+             <Q::DOMXML:Entity> => true,
+             <Q::DOMXML:EntityReference> => true,
+             <Q::DOMCore:DocumentFragment> => true,
+      }->{$__nodeobj->{<Q::DOMCore:nodeType>}}) {
+        __DEEP{
+          for my $__cno (@{$node->{<Q::TreeCore:node>}
+                                ->{<Q::infoset:children>}}) {
+            if ($__cno->{<Q::TreeCore:node>}->{<Q::nodeType>}
+                   eq <Q::DOMCore:Text>) {
+              $result .= $__cno->{<Q::infoset:content>}
+                unless $__cno->{<Q::infoset:elementContentWhitespace>};
+            } elsif (not {
+                  <Q::infoset:Comment> => true,
+                  <Q::infoset:ProcessingInstruction> => true,
+            }->{$__cno->{<Q::DOMCore:nodeType>}}) {
+              my $__cn;
+              __CODE{ManakaiNode:getWeakReference||ManakaiDOM:Perl::
+                $object => $__cno, $ref => $__cn,
+                $class => {{
+                  <Q::infoset:Element> => <ClassName::ManakaiDOMElement>,
+                  <Q::DOMXML:CDATASection> =>
+                              <ClassName::DOMXML:ManakaiDOMCDATASection>,
+                  <Q::DOMXML:EntityReference> =>
+                           <ClassName::DOMXML:ManakaiDOMEntityReference>,
+                }->{$__cno->{<Q::DOMCore:nodeType>}} ||
+                <ClassName::ManakaiDOMNode>},
+              }__;
+              __FOR{ManakaiDOM:DOM3::
+                $result .= $__cn-><AG::DOMCore:Node.textContent>;
+              }__;
+              __FOR{!ManakaiDOM:DOM3::
+                $result .= $__cn-><AG::DOMCore:ManakaiDOMNode.textContent>;
+              }__;
+            }
+          }
+        }__;
+      } elsif ({
+          <Q::DOMCore:Text> => true,
+          <Q::DOMXML:CDATASection> => true,
+          <Q::infoset:Comment> => true,
+          <Q::infoset:ProcessingInstruction> => true,
+      }->{$node->{<Q::TreeCore:node>}->{<Q::DOMCore:nodeType>}}) {
+        $result = $node->{<Q::TreeCore:node>}->{<Q::infoset:content>};
+      } else {
+        ## TODO: Namespace node not supported yet
+        __ASSERT{DISPerl:invariant::
+          msg => {qq{Node type: "$node->{<Q::TreeCore:node>
+                     }->{<Q::DOMCore:nodeType>}"}}
+        }__;
+        $result = null;
+      }
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+            ISSUE: Element content does not allow non-whitespace 
+            character data or CDATA section.  In invalid document, 
+            how this is?
+
   @ResourceDef:
     @@QName: setNodeTextContent
     @@aliasChild:1
@@ -5196,25 +5307,25 @@ IF:
     @@ForCheck:
       ManakaiDOM:ForClass
     @@PerlDef:
-            my $node = $self->{<Q::TreeCore:node>};
-            if ($node->{<Q::DOMCore:read-only>}) {
+            my $__node = $node->{<Q::TreeCore:node>};
+            if ($__node->{<Q::DOMCore:read-only>}) {
               __EXCEPTION{
                 MDOMX:NOMOD_THIS::
               }__;
             }
-            my @oldChild = @{$node->{<Q::infoset:children>}};
-            for (@oldChild) {
-              CORE::delete $_->{<Q::infoset:parent>};
+            my @__oldChild = @{$__node->{<Q::infoset:children>}};
+            for my $__oc (@__oldChild) {
+              CORE::delete $__oc->{<Q::infoset:parent>};
             }
-            my $textNode = <ClassM::DOMCore:ManakaiDOMText.newObject>;
-            $textNode->{<Q::DOMCore:ownerDocument>}
-                                   = $node->{<Q::DOMCore:ownerDocument>};
-            $node-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                                                 .importTree> ($textNode);
-            $textNode->{<Q::infoset:content>} = $given;
-            $node->{<Q::infoset:children>} = [$textNode];
-            for (@oldChild) {
-              $_-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+            my $__textNode = <ClassM::DOMCore:ManakaiDOMText.newObject>;
+            $__textNode->{<Q::DOMCore:ownerDocument>}
+                                   = $__node->{<Q::DOMCore:ownerDocument>};
+            $__node-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+                                                 .importTree> ($__textNode);
+            $__textNode->{<Q::infoset:content>} = $given;
+            $__node->{<Q::infoset:children>} = [$__textNode];
+            for my $__oc (@__oldChild) {
+              $__oc-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
                      .orphanate>;
             }
   @Method:
@@ -5769,6 +5880,113 @@ IF:
 
 ## IF: Node
 
+ElementTypeBinding:
+  @Name: RoleDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Role
+    @@ForCheck:
+      =ManakaiDOM:all
+
+RoleDef:
+  @QName: ElementRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of an <IF::Element> node. 
+
+RoleDef:
+  @QName: AttributeRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of an <IF::Attr> node. 
+
+RoleDef:
+  @QName: TextRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of an <IF::Text> node. 
+
+RoleDef:
+  @QName: CommentRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of an <IF::Comment> node. 
+
+RoleDef:
+  @QName: DocumentRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of an <IF::Document> node. 
+
+RoleDef:
+  @QName: DocumentFragmentRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of an <IF::DocumentFragment> node. 
+
+RoleDef:
+  @QName: DocumentTypeRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of an <IF::DOMXML:DocumentType> node. 
+
+RoleDef:
+  @QName: EntityRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of an <IF::DOMXML:Entity> node. 
+
+RoleDef:
+  @QName: EntityReferenceRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of an <IF::DOMXML:EntityReference> node. 
+
+RoleDef:
+  @QName: ProcessingInstructionRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of an <IF::DOMXML:ProcessingInstruction> node. 
+
+RoleDef:
+  @QName: NotationRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of a <IF::DOMXML:Notation> node. 
+
+RoleDef:
+  @QName: CDATASectionRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of a <IF::DOMXML:CDATASection> node. 
+
+RoleDef:
+  @QName: NamespaceRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of a <IF::DOMXPath:Namespace> node. 
+
+RoleDef:
+  @QName: AnyNodeRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of a <IF::Node> node. 
+  @rdfs:subClassOf: ElementRole
+  @rdfs:subClassOf: AttributeRole
+  @rdfs:subClassOf: DocumentRole
+  @rdfs:subClassOf: DocumentFragmentRole
+  @rdfs:subClassOf: DocumentTypeRole
+  @rdfs:subClassOf: TextRole
+  @rdfs:subClassOf: CommentRole
+  @rdfs:subClassOf: EntityRole
+  @rdfs:subClassOf: EntityReferenceRole
+  @rdfs:subClassOf: NotationRole
+  @rdfs:subClassOf: ProcessingInstructionRole
+  @rdfs:subClassOf: CDATASectionRole
+  @rdfs:subClassOf: NamespaceRole
+
 ClassDef:
   @QName: 
     ManakaiDOMCore:ManakaiDOMNodeObjectNode
@@ -5784,68 +6002,6 @@ ClassDef:
       The extended internal interface for the "ManakaiDOMNodeObject" 
       object used as a "Node".
 
-  @IntAttr:
-    @@Name: textContent
-    @@Description:
-      @@@lang:en
-      @@@@:
-        Text (character data) content of this node (including 
-        its descendants).
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        This attribute is parallel to the attribute "textContent" of 
-        the "Node" interface.
-    @@Type:
-      DOMMain:ManakaiDOMString
-    @@Get:
-      @@@PerlDef:
-          if ({
-                <Q::infoset:Element> => 1,
-                <Q::infoset:Attribute> => 1,
-                <Q::DOMXML:Entity> => 1,
-                <Q::DOMXML:EntityReference> => 1,
-                <Q::DOMCore:DocumentFragment> => 1,
-              }->{$self->{<Q::DOMCore:nodeType>}}) {
-            __DEEP{
-              for (@{$self->{<Q::infoset:children>}}) {
-                if ($_->{<Q::DOMCore:nodeType>} eq <Q::DOMCore:Text>) {
-                  unless ($_->{<Q::infoset:elementContentWhitespace>}) {
-                    $r .= $_-><AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode
-                                   .textContent>;
-                  }
-                } elsif ($_->{<Q::DOMCore:nodeType>} ne <Q::infoset:Comment> and
-                   $_->{<Q::DOMCore:nodeType>} ne
-                                       <Q::infoset:ProcessingInstruction>) {
-                  $r .= $_-><AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode
-                                 .textContent>;
-                }
-              }
-            }__;
-          } elsif ({
-                     <Q::DOMCore:Text> => 1,
-                     <Q::DOMXML:CDATASection> => 1,
-                     <Q::infoset:Comment> => 1,
-                     <Q::infoset:ProcessingInstruction> => 1,
-                   }->{$self->{<Q::DOMCore:nodeType>}}) {
-            $r = $self->{<Q::infoset:content>};
-          } else {
-            __ASSERT{DISPerl:invariant::
-              msg => {qq{Node type: "$self->{<Q::DOMCore:nodeType>}"}}
-            }__;
-            $r = null;
-          }
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@:
-            ISSUE: Element content does not allow non-whitespace 
-            character data or CDATA section.  In invalid document, 
-            how this is?
-      @@ImplNote:
-        @@@lang:en
-        @@@@:
-          Setting is not defined - use the attribute "textContent" of 
-          the  "Node" interface.
   @IntMethod:
     @@Name: contentBaseURI
     @@Description:
@@ -5912,7 +6068,7 @@ ClassDef:
                    $self->{<Q::infoset:namespaceName>} eq <Q::xml:>) or
                   (not defined $self->{<Q::infoset:localName>} and
                    $self->{<Q::DOMCore:name>} eq 'xml:base')) {
-                $r = $self-><AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                $r = $self->< AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode
                                          .textContent>;
                 if (defined $r and
                     <Code::DOMMain:isRelativeDOMURI:: $INPUT = $r>) {
@@ -6068,7 +6224,7 @@ ClassDef:
                                   $_->{<Q::infoset:attributes>}
                                     ->{<Q::ManakaiDOM:noNS>}->{href};
                           if ($a) {
-                            $r = $a-><AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                            $r = $a->< AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode
                                              .textContent>;
                             unless (<Code::DOMMain:isRelativeDOMURI::
                                              $INPUT = $r>) {
@@ -6175,7 +6331,7 @@ ClassDef:
             for (values %{$self->{<Q::infoset:attributes>}->{<Q::xmlns:>}||{}}) {
               if (defined $_->{<Q::infoset:prefix>} and
                   $_->{<Q::infoset:prefix>} eq 'xmlns' and
-                  $_-><AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode.textContent>
+                  $_->< AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode.textContent>
                     eq $namespaceURI and
                   $originalElement-><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
                                             .lookupNamespaceURI>
@@ -6251,7 +6407,7 @@ ClassDef:
                           ->{<Q::infoset:xmlns:>}->{xmlns}) {
               my $v = $self->{<Q::infoset:attributes>}
                            ->{<Q::infoset:xmlns:>}->{xmlns}
-                           -><AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                           ->< AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode
                                     .textContent>;
               if (defined $namespaceURI and $namespaceURI eq $v) {
                 $r = true;
@@ -6382,14 +6538,14 @@ ClassDef:
                   $_->{<Q::infoset:prefix>} eq 'xmlns' and
                   $_->{<Q::infoset:localName>} eq $prefix) {
                 ## Non default namespace
-                $r = $_-><AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                $r = $_->< AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode
                                            .textContent>;
                 $r = null unless length $r;
                 last FIND;
               } elsif (not defined $prefix and
                        $_->{<Q::infoset:localName>} eq 'xmlns') {
                 ## Default namespace
-                $r = $_-><AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode
+                $r = $_->< AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode
                                            .textContent>;
                 $r = null unless length $r;
                 last FIND;
@@ -9199,12 +9355,8 @@ IF:
   @ImplementLevel1:
   @ImplementLevel2:
   @ImplementLevel3:
-  
-  @Role:
-    @@@: 
-      DOMCore:ManakaiDOMAttr::ManakaiDOM:ManakaiDOMLatest
-    @@ForCheck:
-      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
+
+  @DISLang:role: AttributeRole
 
   @Description:
     @@lang:en
@@ -9360,7 +9512,8 @@ IF:
               This exception is added in the DOM Level 1 Errata and 
               incorporated into the DOM Level 1 Second Edition.
         @@@PerlDef:
-          __CODE{DOMCore:setNodeTextContent}__;
+          __CODE{DOMCore:setNodeTextContent::
+                    $node => $self, $given => $given}__;
   @Attr:
      @@Name:  ownerElement
      @@Description:
@@ -9408,6 +9561,7 @@ IF:
      @@SpecLevel:3
      @@For:
        ManakaiDOM:DOM3
+
   @Attr:
      @@Name:  isId
      @@Description:
@@ -9484,10 +9638,19 @@ IF:
             @@@@@lang:en
             @@@@@@:
               TODO: Support non-user-determined ID attributes.
+
      @@Level[list]:  3
      @@SpecLevel:3
+
      @@For:
        ManakaiDOM:DOM3
+     @@For:
+       ManakaiDOM:ManakaiDOM
+
+     @@ManakaiDOM:isForInternal:
+       @@@@:1
+       @@@ForCheck:
+         !ManakaiDOM:DOM3
   
   @ReAttr:
      @@Name:  localName
@@ -9913,11 +10076,7 @@ IF:
   @ImplementLevel2:
   @ImplementLevel3:
   
-  @Role:
-    @@@: 
-      DOMCore:ManakaiDOMElement::ManakaiDOM:ManakaiDOMLatest
-    @@ForCheck:
-      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
+  @DISLang:role: ElementRole
 
   @Description:
     @@lang:en
@@ -10113,7 +10272,11 @@ IF:
         @@@PerlDef:
           __CODE{selectAttrNodeObject}__;
           if ($r) {
-            $r = $r-><AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode.textContent>;
+            __CODE{ManakaiNode:getWeakReference||ManakaiDOM:Perl::
+              $object => $r, $ref => $r,
+              $class => {<Class::ManakaiDOMAttr>},
+            }__;
+            $r = $r-><AG::DOMCore:Node.textContent>;
           } else {
             $r = '';
           }
@@ -10745,7 +10908,11 @@ IF:
           @@@@@:
             __CODE{selectAttrNodeObjectNS}__;
             if ($r) {
-              $r = $r-><AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode.textContent>;
+              __CODE{ManakaiNode:getWeakReference||ManakaiDOM:Perl::
+                $object => $r, $ref => $r,
+                $class => {<Class::ManakaiDOMAttr>},
+              }__;
+              $r = $r-><AG::DOMCore:Node.textContent>;
             }
           @@@@For:
             ManakaiDOM:DOMXMLFeature
@@ -12441,11 +12608,7 @@ IF:
   @ImplementLevel2:
   @ImplementLevel3:
   
-  @Role:
-    @@@: 
-      DOMCore:ManakaiDOMText::ManakaiDOM:ManakaiDOMLatest
-    @@ForCheck:
-      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
+  @DISLang:role: TextRole
 
   @Description:
     @@lang:en
@@ -12812,11 +12975,7 @@ IF:
   @ImplementLevel2:
   @ImplementLevel3:
   
-  @Role:
-    @@@: 
-      DOMCore:ManakaiDOMComment::ManakaiDOM:ManakaiDOMLatest
-    @@ForCheck:
-      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
+  @DISLang:role: CommentRole
 
   @Description:
     @@lang:en
@@ -14021,11 +14180,7 @@ IF:
   @ImplementLevel2:
   @ImplementLevel3:
   
-  @Role:
-    @@@: 
-      DOMCore:ManakaiDOMDocumentFragment::ManakaiDOM:ManakaiDOMLatest
-    @@ForCheck:
-      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
+  @DISLang:role: DocumentFragmentRole
 
   @Description:
     @@lang:en
@@ -14184,11 +14339,7 @@ IF:
   @ImplementLevel2:
   @ImplementLevel3:
   
-  @Role:
-    @@@: 
-      DOMCore:ManakaiDOMDocument::ManakaiDOM:ManakaiDOMLatest
-    @@ForCheck:
-      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
+  @DISLang:role: DocumentRole
 
   @Description:
     @@lang:en
@@ -15478,6 +15629,26 @@ IF:
             @@@@@lang:en
             @@@@@@:
               No element with the specified <SGML:ID> exists.
+       @@@PerlDef:
+         my @nodeo = (@{$self->{<Q::TreeCore:node>}->{<Q::infoset:children>}});
+         NODES: while (my $nodeo = shift @nodeo) {
+           next unless $nodeo->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>;
+           for my $attro (map {values %$_}
+                          values %{$nodeo->{<Q::infoset:attributes>}}) {
+             my $attr;
+             __CODE{ManakaiNode:getWeakReference
+                    ||ManakaiDOM:Perl::
+                      $object => $attro, $ref => $attr,
+                      $class => {<ClassName::ManakaiDOMAttr>},
+             }__;
+             if ($attr-><AG::ManakaiDOMAttr.isId> and
+                 $attr-><AG::ManakaiDOMAttr.value> eq $elementId) {
+               $r = <ClassM::ManakaiDOMNode.getNodeReference> ($nodeo);
+               last NODES;
+             }
+           }
+           push @nodeo, @{$nodeo->{<Q::infoset:children>}};
+         }
   @Attr:
      @@Name:  inputEncoding
      @@Description:

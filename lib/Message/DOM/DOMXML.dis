@@ -46,7 +46,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/04 13:49:27 $
+      $Date: 2005/05/07 13:56:36 $
     @@ContentType:
       dis:Date.RCS
 
@@ -315,7 +315,7 @@ FeatureDef:
   @FeatureVerDef:
     @@Version: 1.0
     @@QName: XMLFeature10
-    @@ISA: XMLFeature
+    @@DOMMetaImpl:instanceFeatureOf: XMLFeature
     @@DOMMain:requireFeature:
       DOMCore:CoreFeature10
     @@Spec:
@@ -328,7 +328,7 @@ FeatureDef:
   @FeatureVerDef:
     @@Version: 2.0
     @@QName: XMLFeature20
-    @@ISA: XMLFeature10
+    @@DOMMetaImpl:extendFeature: XMLFeature10
     @@DOMMain:requireFeature:
       DOMCore:CoreFeature20
     @@Spec:
@@ -341,7 +341,7 @@ FeatureDef:
   @FeatureVerDef:
     @@Version: 3.0
     @@QName: XMLFeature30
-    @@ISA: XMLFeature20
+    @@DOMMetaImpl:extendFeature: XMLFeature20
     @@DOMMain:requireFeature:
       DOMCore:CoreFeature30
     @@DOMMain:requireFeature: XMLVersionFeature10
@@ -359,7 +359,7 @@ FeatureDef:
   @FeatureVerDef:
     @@Version: 1.0
     @@QName: XMLVersionFeature10
-    @@ISA: XMLVersionFeature
+    @@DOMMetaImpl:instanceFeatureOf: XMLVersionFeature
     @@Spec:
       @@@DOM3[list]:
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#Document3-version
@@ -370,7 +370,7 @@ FeatureDef:
   @FeatureVerDef:
     @@Version: 1.1
     @@QName: XMLVersionFeature11
-    @@ISA: XMLVersionFeature
+    @@DOMMetaImpl:instanceFeatureOf: XMLVersionFeature
     @@Spec:
       @@@DOM3[list]:
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#Document3-version
@@ -386,21 +386,21 @@ FeatureDef:
   @FeatureVerDef:
     @@Version: 1.0
     @@QName: MDOMXMLFeature10
-    @@ISA: MDOMXMLFeature
+    @@DOMMetaImpl:instanceFeatureOf: MDOMXMLFeature
     @@Description:
       @@@lang:en
       @@@@: The Manakai DOM XML Module, Level 1.
   @FeatureVerDef:
     @@Version: 2.0
     @@QName: MDOMXMLFeature20
-    @@ISA: MDOMXMLFeature10
+    @@DOMMetaImpl:extendFeature: MDOMXMLFeature10
     @@Description:
       @@@lang:en
       @@@@: The Manakai DOM XML Module, Level 2.
   @FeatureVerDef:
     @@Version: 3.0
     @@QName: MDOMXMLFeature30
-    @@ISA: MDOMXMLFeature20
+    @@DOMMetaImpl:extendFeature: MDOMXMLFeature20
     @@Description:
       @@@lang:en
       @@@@: The Manakai DOM XML Module, Level 3.
@@ -496,6 +496,11 @@ IF:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-667469212
   @L1:
+
+  @DISLang:role: 
+    @@@:
+      DOMCore:CDATASectionRole
+    @@DISCore:stopISARecursive:1
 
   @Description:
     @@lang:en
@@ -607,6 +612,9 @@ IF:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-412266927
   @L1:
+
+  @DISLang:role: 
+    DOMCore:DocumentTypeRole
 
   @Description:
     @@lang:en
@@ -930,6 +938,9 @@ IF:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-5431D1B9
   @L1:
 
+  @DISLang:role: 
+    DOMCore:NotationRole
+
   @Description:
     @@lang:en
     @@@:
@@ -1193,6 +1204,9 @@ IF:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-527DCFF2
   @L1:
+
+  @DISLang:role: 
+    DOMCore:EntityRole
 
   @Description:
     @@lang:en
@@ -1571,6 +1585,9 @@ IF:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-11C98490
   @L1:
 
+  @DISLang:role: 
+    DOMCore:EntityReferenceRole
+
   @Description:
     @@lang:en
     @@@:
@@ -1737,6 +1754,9 @@ IF:
     @@DOM3[list]:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1004215813
   @L1:
+
+  @DISLang:role: 
+    DOMCore:ProcessingInstructionRole
 
   @Description:
     @@lang:en

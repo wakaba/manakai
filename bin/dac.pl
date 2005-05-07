@@ -99,9 +99,12 @@ $for = $doc->module_element->default_for_uri unless length $for;
 $db->get_for ($for)->is_referred ($doc);
 print STDERR qq<Loading definition of "$file_name" for <$for>...\n>;
 
+my $ResourceCount = 0;
 $db->load_module ($doc, sub ($$$$$$) {
   my ($self, $db, $uri, $ns, $ln, $for) = @_;
+  print STDERR qq<\n>;
   print STDERR qq<Loading definition of "$ln" for <$for>...\n>;
+  $ResourceCount = 0;
 
   ## -- Already in database
   my $doc = $db->get_source_file ($ns.$ln);
@@ -122,12 +125,19 @@ $db->load_module ($doc, sub ($$$$$$) {
 
   ## -- Not found
   return undef;
-}, for_arg => $for);
+}, for_arg => $for, on_resource_read => sub ($$) {
+  if ((++$ResourceCount % 10) == 0) {
+    print STDERR "*";
+    print STDERR " " if ($ResourceCount % (10 * 10)) == 0;
+    print STDERR "\n" if ($ResourceCount % (10 * 50)) == 0;
+  }
+});
 
 
 $db->check_undefined_resource unless $Opt{no_undef_check};
 
 $db->pl_store ($Opt{output_file_name});
+print STDERR "\n";
 exit;
 
 ## (db, parser, abs file path, abs base path) -> dis doc obj

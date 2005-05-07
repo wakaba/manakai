@@ -83,6 +83,12 @@ C<--module-name> or C<--module-uri> is required.
 A URI reference that identifies a module to output.  Either 
 C<--module-name> or C<--module-uri> is required. 
 
+=item --output-file-path=I<perl-module-file-path> (default: C<STDOUT>)
+
+A platform-dependent file name path for the output.
+If it is not specified, then the generated Perl module
+content is outputed to the standard output.
+
 =item --output-module-version (default) / --nooutput-module-version
 
 Whether the C<$VERSION> special variable should be generated or not. 
@@ -105,6 +111,7 @@ GetOptions (
   'help' => \$Opt{help},
   'implementation-registry-package=s' => \$Opt{implreg_pack},
   'module-uri=s' => \$Opt{module_uri},
+  'output-file-path=s' => \$Opt{output_file_name},
   'output-module-version!' => \$Opt{outputModuleVersion},
   'verbose!' => $Opt{verbose},
 ) or pod2usage (2);
@@ -152,7 +159,13 @@ unless ($mod->is_defined) {
 
 my $pl = $mod->pl_generate_perl_module_file;
 
-print $pl->stringify;
+my $output;
+defined $Opt{output_file_name} 
+      ? (open $output, '>', $Opt{output_file_name}
+           or die "$0: $Opt{output_file_name}: $!")
+      : ($output = \*STDOUT);
+
+print $output $pl->stringify;
 
 $db->check_undefined_resource;
 
@@ -179,4 +192,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/05/04 13:49:26 $
+1; # $Date: 2005/05/07 13:56:36 $

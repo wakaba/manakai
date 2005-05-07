@@ -38,9 +38,8 @@ all: $(GENERATED_FILES)
 
 all.dac: $(DIS_FILES) $(DAC_PL)
 	$(DAC).$@.1.tmp DISPerl.dis
-	$(DAC).$@.2.tmp --input-db-file-name=".$@.1.tmp" XML.dis
-	$(DAC)$@ --input-db-file-name=".$@.2.tmp" DISMarkup.dis
-	$(RM) .$@.1.tmp .$@.2.tmp
+	$(DAC)$@ --input-db-file-name=".$@.1.tmp" DISMarkup.dis
+	$(RM) .$@.1.tmp
 
 clean:
 	$(RM) $(GENERATED_FILES) .*.tmp *~ .*~

@@ -15,7 +15,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/01/05 12:19:39 $
+      $Date: 2005/05/07 13:56:36 $
     @@ContentType:
       dis:Date.RCS
   
@@ -57,11 +57,20 @@ ElementTypeBinding:
       rdfs:Class
     @@ISA:
       rdfs:Class
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
+    @@ForCheck:
+      =ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+
+ResourceTypeDef:
+  @QName: ElementTypeOrElementInNS
+  @enDesc:
+    <Q::ElementType>s and <Q::AnyElementInNS>'es.
 
 ResourceTypeDef:
   @QName: ElementType
@@ -69,6 +78,14 @@ ResourceTypeDef:
     @@lang:en
     @@@:
       A markup language element type. 
+  @rdfs:subClassOf: ElementTypeOrElementInNS
+
+ResourceTypeDef:
+  @QName: AnyElementInNS
+  @enDesc:
+    Element type wildcards that represent any element type
+    in a particular namespace.
+  @rdfs:subClassOf: ElementTypeOrElementInNS
 
 ResourceTypeDef:
   @QName: Attribute
@@ -76,6 +93,12 @@ ResourceTypeDef:
     @@lang:en
     @@@:
       A markup language element attribute type.  
+
+ResourceTypeDef:
+  @QName: AnyAttributeInNS
+  @enDesc:
+    Attribute name wildcards that represent any attribute
+    in a particular namespace.
 
 ## -- Markup language vocabulary characteristics
 

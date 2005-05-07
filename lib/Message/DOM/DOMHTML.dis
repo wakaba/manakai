@@ -3,6 +3,7 @@ Module:
     MDOM:DOMHTML
   @Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/dom/html#
+
   @AppName:
      @@@:  html
      @@ContentType:
@@ -17,6 +18,7 @@ Module:
      @@prefix:  dom.w3c.org
      @@For:
        ManakaiDOM:IDL ManakaiDOM:DOM2
+
   @FullName:
     @@lang:en
     @@@: DOM HTML Module
@@ -25,12 +27,15 @@ Module:
     @@lang:en
     @@@:
       The DOM HTML Module provides objects and methods specific 
-      to HTML 4 documents and XHTML 1.0 documents. THe HTML 
+      to HTML 4 documents and XHTML 1.0 documents. The HTML 
       DOM exposes a number of convinience methods and attributes 
       that are more appropriate to script writers.  These 
       enhancements rely on transitional or frameset DTDs 
-      of HTML 4.0 <SRC:DOM Level 1 HTML> or HTML 4.01 
-      <SRC:DOM Level 2 HTML> and XHTML 1.0 <SRC:DOM Level 2 HTML>.
+      of HTML 4.0 <SRC::DOM Level 1 HTML> or HTML 4.01 
+      <SRC::DOM Level 2 HTML> and XHTML 1.0 <SRC::DOM Level 2 HTML>. 
+      \
+      Form related interfaces are provided by a separate
+      module, <Module::DOMWebForms>.
 
   @Author:
      @@FullName: Wakaba
@@ -39,7 +44,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/18 06:13:52 $
+      $Date: 2005/05/07 13:56:36 $
     @@ContentType:
       dis:Date.RCS
 
@@ -48,13 +53,14 @@ Module:
 
   @Require:
     @@Module:
-      @@@Name: DISMarkup
-      @@@For:
-        =ManakaiDOM:all
+      @@@QName: 
+        DISlib:DISMarkup
+      @@@WithFor:
+        ManakaiDOM:all
      @@Module:
         @@@Name:  DOMXML
-        @@@For:
-          ManakaiDOM:DOM
+        @@@WithFor:
+          ManakaiDOM:ManakaiDOMLatest
      @@Module:
         @@@Name:  DOMWebForms
     @@Module:
@@ -91,6 +97,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @dis2pm:
     http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
+  @DISlib:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
   @DOMHTML:
     http://suika.fam.cx/~wakaba/archive/2004/dom/html#
   @DOMMain:
@@ -124,6 +132,19 @@ Namespace:
   @TreeCore:\
   @xhtml1:
     http://www.w3.org/1999/xhtml
+  @xml:
+    http://www.w3.org/XML/1998/namespace
+  @xmlns:
+    http://www.w3.org/2000/xmlns/
+
+ImplNote:
+  @lang:en
+  @@:
+    {TODO:: Lowercase'ize Perl method/attribute names.
+    \
+    ISSUE: Should createTHead be createThead?
+    \
+    }
 
 ## -- "For HTML"
 
@@ -135,7 +156,7 @@ ForDef:
   @FullName:
     @@lang:en
     @@@:
-      For Hypertext Markup Language (HTML)
+      For Hypertext Markup Language (HTML), any version
 
 ForDef:
   @QName:
@@ -145,7 +166,7 @@ ForDef:
   @FullName:
     @@lang:en
     @@@:
-      For non-XML HTML
+      For non-XML-based HTML, any version
 
 ForDef:
   @QName:
@@ -202,7 +223,7 @@ ForDef:
   @FullName:
     @@lang:en
     @@@:
-      For XHTML
+      For XHTML, compatible with W3C XHTML 1, any version
 
 ForDef:
   @QName:
@@ -272,11 +293,9 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       DOMMain:DOMFeature
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
+    @@ForCheck:
+      ManakaiDOM:all
+
 ElementTypeBinding:
   @Name: FeatureVerDef
   @ElementType:
@@ -299,8 +318,10 @@ FeatureDef:
   @FeatureVerDef:
     @@Version:1.0
     @@QName: HTMLFeature10
-    @@ISA: HTMLFeature
-    @@FullName: DOM Level 1 HTML
+    @@DOMMetaImpl:instanceFeatureOf: HTMLFeature
+    @@FullName:
+      @@@@: DOM Level 1 HTML
+      @@@lang:en
     @@ImplNote:
       @@@lang:en
       @@@@:
@@ -312,8 +333,10 @@ FeatureDef:
   @FeatureVerDef:
     @@Version:2.0
     @@QName: HTMLFeature20
-    @@ISA: HTMLFeature
-    @@FullName: DOM Level 2 HTML
+    @@DOMMetaImpl:instanceFeatureOf: HTMLFeature
+    @@FullName:
+      @@@@: DOM Level 2 HTML
+      @@@lang:en
     @@DOMMain:requireFeature:
       DOMCore:CoreFeature20
 
@@ -322,11 +345,13 @@ FeatureDef:
   @QName: XHTMLFeature
   @FeatureVerDef:
     @@Version:2.0
-    @@FullName: DOM Level 2 HTML (with XHTML support)
+    @@FullName:
+      @@@@: DOM Level 2 HTML (with XHTML support)
+      @@@lang:en
     @@QName: XHTMLFeature20
-    @@ISA: XHTMLFeature
-    @@ISA: HTMLFeature20
-    @@ISA:
+    @@DOMMetaImpl:instanceFeatureOf: XHTMLFeature
+    @@DOMMain:extendFeature: HTMLFeature20
+    @@DOMMain:extendFeature:
       DOMXML:XMLFeature20
     @@Description:
       @@@lang:en
@@ -359,6 +384,7 @@ DataTypeAlias:
       lang:dis
     @@DISLang:dataTypeAliasFor:
       DOMMain:DOMString
+
 DataTypeAlias:
   @Name:  Node
   @AliasFor:
@@ -373,6 +399,7 @@ DataTypeAlias:
       lang:dis
     @@DISLang:dataTypeAliasFor:
       DOMCore:Node
+
 DataTypeAlias:
   @Name:  Document
   @AliasFor:
@@ -387,6 +414,7 @@ DataTypeAlias:
       lang:dis
     @@DISLang:dataTypeAliasFor:
       DOMCore:Document
+
 DataTypeAlias:
   @Name:  NodeList
   @AliasFor:
@@ -401,6 +429,7 @@ DataTypeAlias:
       lang:dis
     @@DISLang:dataTypeAliasFor:
       DOMCore:NodeList
+
 DataTypeAlias:
   @Name:  Element
   @AliasFor:
@@ -468,6 +497,7 @@ ElementTypeBinding:
       ManakaiDOM:DOM1
     @@For:
       =ManakaiDOM:ManakaiDOM
+    @@For: ForHTML
 
 ElementTypeBinding:
   @Name: L2
@@ -491,6 +521,7 @@ ElementTypeBinding:
       ManakaiDOM:DOM2
     @@For:
       =ManakaiDOM:ManakaiDOM
+    @@For: ForHTML
 
 ElementTypeBinding:
   @Name: PerlDef
@@ -543,9 +574,7 @@ ElementTypeBinding:
       @@@@:
         ::ManakaiDOM:ManakaiDOM
       @@@ForCheck:
-        ManakaiDOM:ForIF
-      @@@For:
-        ManakaiDOM:ManakaiDOM2
+        ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM1
 
 ElementTypeBinding:
   @Name: ET
@@ -597,9 +626,7 @@ ElementTypeBinding:
       @@@@:
         ::ManakaiDOM:ManakaiDOM
       @@@ForCheck:
-        ManakaiDOM:ForIF
-      @@@For:
-        ManakaiDOM:ManakaiDOM2
+        ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM1
     @@DISMarkup:elementType:
       @@@@:
         ::ForHTML40SE
@@ -611,6 +638,7 @@ ElementTypeBinding:
           DOM Level 1 First Edition refers the latest version of 
           HTML 4.0 while Second Edition refers the second edition of 
           HTML 4.0. 
+      @@@DISCore:stopISARecursive:1
     @@DISMarkup:elementType:
       @@@@:
         ::ForHTML401
@@ -621,6 +649,7 @@ ElementTypeBinding:
         ::ForXHTML10SE
       @@@ForCheck:
         ManakaiDOM:DOM2
+      @@@DISCore:stopISARecursive:1
 
 ElementTypeBinding:
   @Name: Method
@@ -805,7 +834,7 @@ IF:
       ManakaiDOM:ForClass
   @ISA:
     @@@:
-      ManakaiDOM:ManakaiDOMNodeReference
+      ManakaiDOM:ManakaiDOMNodeReference::ManakaiDOM:Perl
     @@ForCheck:
       ManakaiDOM:ForClass
   @ISA:
@@ -933,22 +962,36 @@ IF:
                      -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
                                    .getElementBy> 
                         (sub ($) {
-                         #line 1 "DOMHTML.ManakaiDOMHTMLCollection.namedItem.#1"
+      \#line 1 "DOMHTML.ManakaiDOMHTMLCollection.namedItem.#1"
                            my $node = shift;
                            if ($self->{<Q::ManakaiDOMCore:nodeMatch>}->($node)) {
                              my $attr = $node->{<Q::infoset:attributes>}
                                              ->{<Q::null:>}->{name} ||
                                         $node->{<Q::infoset:attributes>}
                                              ->{<Q::ManakaiDOM:noNS>}->{name};
-                             if ($attr and
-                                 $attr->
-                                   <AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode
-                                          .textContent> eq $name) {
-                               return true;
+                             if ($attr) {
+                               my $attrn;
+                               __CODE{ManakaiNode:getWeakReference
+                                      ||ManakaiDOM:Perl::
+                                 $object => $attr, $ref => $attrn,
+                                 $class => {<ClassName::DOMCore:ManakaiDOMAttr>},
+                               }__;
+                               __FOR{ManakaiDOM:DOM3::
+                                 if ($attrn-><AG::DOMCore:Node.textContent>
+                                        eq $name) {
+                                   return true;
+                                 }
+                               }__;
+                               __FOR{!ManakaiDOM:DOM3::
+                                 if ($attrn-><AG::DOMCore:ManakaiDOMNode
+                                                .textContent> eq $name) {
+                                   return true;
+                                 }
+                               }__;
                              }
                            }
                            return false;
-                         #line 1 "DOMHTML.ManakaiDOMHTMLCollection.namedItem.#2"
+      \#line 1 "DOMHTML.ManakaiDOMHTMLCollection.namedItem.#2"
                          }, \$index);
          }
          $index = 0;
@@ -956,22 +999,36 @@ IF:
                      -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
                                    .getElementBy> 
                         (sub ($) {
-                         #line 1 "DOMHTML.ManakaiDOMHTMLCollection.namedItem.#3"
+      \#line 1 "DOMHTML.ManakaiDOMHTMLCollection.namedItem.#3"
                            my $node = shift;
                            if ($self->{<Q::ManakaiDOMCore:nodeMatch>}->($node)) {
                              my $attr = $node->{<Q::infoset:attributes>}
                                              ->{<Q::null:>}->{id} ||
                                         $node->{<Q::infoset:attributes>}
                                              ->{<Q::ManakaiDOM:noNS>}->{id};
-                             if ($attr and
-                                 $attr->
-                                   <AG::ManakaiDOMCore:ManakaiDOMNodeObjectNode
-                                          .textContent> eq $name) {
-                               return true;
+                             if ($attr) {
+                               my $attrn;
+                               __CODE{ManakaiNode:getWeakReference
+                                      ||ManakaiDOM:Perl::
+                                 $object => $attr, $ref => $attrn,
+                                 $class => {<ClassName::DOMCore:ManakaiDOMAttr>},
+                               }__;
+                               __FOR{ManakaiDOM:DOM3::
+                                 if ($attrn-><AG::DOMCore:Node.textContent>
+                                        eq $name) {
+                                   return true;
+                                 }
+                               }__;
+                               __FOR{!ManakaiDOM:DOM3::
+                                 if ($attrn-><AG::DOMCore:ManakaiDOMNode
+                                                .textContent> eq $name) {
+                                   return true;
+                                 }
+                               }__;
                              }
                            }
                            return false;
-                         #line 1 "DOMHTML.ManakaiDOMHTMLCollection.namedItem.#4"
+      \#line 1 "DOMHTML.ManakaiDOMHTMLCollection.namedItem.#4"
                          }, \$index);
            if (defined $r) {
              $r = <ClassM::DOMCore:ManakaiDOMNode.getNodeReference> ($r, $self);
@@ -984,7 +1041,7 @@ ImplNote:
 
 IF:
   @Name:
-    @@@: HTMLDOMImplementation
+    @@@: ManakaiDOMHTMLDOMImplementationIF
     @@ForCheck:
       ManakaiDOM:ForIF
   @ISA:
@@ -1008,6 +1065,8 @@ IF:
   @For:
     =ManakaiDOM:ManakaiDOM
   @DOMMain:implementFeature: HTMLFeature20
+
+  @DOMMetaImpl:provideFeature: HTMLFeature20
 
   @Description:
     @@lang:en
@@ -1086,6 +1145,68 @@ IF:
                      ($r-><M::DOMCore:Document.createElement>
                                            ('BODY'));
 
+
+  @Method:
+    @@Name: createXHTMLDocument
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates an <IF::HTMLDocument> object with the minimal tree 
+        made of <HE::html>, <HE::head>, <HE::title> and <HE::body> elements
+        and with the <Feature::XHTML> feature. 
+        \
+        {NOTE:: This method is <EM::manakai extension>.
+        \
+        }
+    
+    @@For:
+      ManakaiDOM:ManakaiDOMLatest
+    
+    @@Param:
+      @@@Name:title
+      @@@Type:
+        DOMMain:DOMString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The title of the document to create.  It is set as the content of 
+          the <HE::title> element, through a child <IF::DOMCore:Text> node. 
+    @@Return:
+      @@@Type: HTMLDocument
+      @@@actualType: ManakaiDOMHTMLDocument
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A newly created HTML document.
+      @@@PerlDef:
+        __DEEP{
+          my $node = $r-><M::DOMCore:ManakaiDOMDocument.newObject>;
+          $node->{<Q::DOMCore:implementation>} = $self;
+          $node->{<Q::ManakaiDOM:implID>}
+                = $self->{<Q::TreeCore:node>}->{<Q::ManakaiDOM:implID>};
+          $node->{<Q::DOMCore:hasFeature>}->{HTML} = 1;
+          $node->{<Q::DOMCore:hasFeature>}->{XML} = 1;
+          $r = <ClassM::DOMCore:ManakaiDOMNode.getNodeReference> ($node);
+          $r-><M::DOMCore:Node.appendChild>
+                  (my $html = $r-><M::DOMCore:Document.createElementNS>
+                                    (<Q::xhtml1:>, 'html'));
+          $html-><M::DOMCore:Element.setAttributeNS>
+                  (<Q::xmlns:>, 'xmlns', <Q::xhtml1:>);
+          $html-><M::DOMCore:Node.appendChild>
+                     (my $head = $r-><M::DOMCore:Document.createElementNS>
+                                           (<Q::xhtml1:>, 'head'));
+          $head-><M::DOMCore:Node.appendChild>
+                     (my $titleEl = $r-><M::DOMCore:Document.createElementNS>
+                                           (<Q::xhtml1:>, 'title'));
+          if (length $title) {
+            $titleEl-><M::DOMCore:Node.appendChild>
+                         ($r-><M::DOMCore:Document.createTextNode> ($title));
+          }
+          $html-><M::DOMCore:Node.appendChild>
+                     ($r-><M::DOMCore:Document.createElementNS>
+                                           (<Q::xhtml1:>, 'body'));
+        }__;
+
 IF:
   @Name:
     @@@: HTMLDocument
@@ -1150,11 +1271,119 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         The title of a document, as specified by the <HE:tile> element.
+         The title of a document, as specified by the <HE::title> element.
      @@Get:
         @@@Type:  DOMString
+        @@@PerlDef:
+          __DEEP{
+            DOC: for my $child (@{$self-><AG::DOMCore:Node.childNodes>}) {
+              if ($child-><AG::DOMCore:Node.nodeType> ==
+                    <C::DOMCore:Node.ELEMENT_NODE> and
+                  <Code::isHTMLElement:: $elementNode = $child,
+                                         $elementType = 'html'>) {
+                for my $child (@{$child-><AG::DOMCore:Node.childNodes>}) {
+                  if ($child-><AG::DOMCore:Node.nodeType> ==
+                        <C::DOMCore:Node.ELEMENT_NODE> and
+                      <Code::isHTMLElement:: $elementNode = $child,
+                                             $elementType = 'head'>) {
+                    for my $child (@{$child-><AG::DOMCore:Node.childNodes>}) {
+                      if ($child-><AG::DOMCore:Node.nodeType> ==
+                            <C::DOMCore:Node.ELEMENT_NODE> and
+                          <Code::isHTMLElement:: $elementNode = $child,
+                                                 $elementType = 'title'>) {
+                        __CODE{DOMCore:getNodeTextContent::
+                                 $node => $child,
+                                 $result => $r}__;
+                        last DOC;
+                      }
+                    }
+                    last DOC; # xhtml1:title not found
+                  }
+                }
+                last DOC; # xhtml1:head not found
+              }
+            }
+          }__;
      @@Set:
+        @@@Exception:
+          @@@@@: 
+            DOMCore:DOMException.NO_MODIFICATION_ALLOWED_ERR
+          @@@@enDesc:
+            Either the <HE::title> element is read-only, 
+            there is no <HE::title> element and the <HE::head>
+            element is read-only, there is no <HE::head>
+            element and the <HE::html> element is read-only,
+            or there is no <HE::html> element and the document
+            node is read-only.
+          @@@@ForCheck:
+            ManakaiDOM:ManakaiDOM
+        @@@Exception:
+          @@@@@:
+            MDOMX:MDOM_SECOND_DOC_ELEMENT
+          @@@@enDesc:
+            The document element (root element) of the document
+            is not an <HE::html> element.
+          @@@@ForCheck:
+            ManakaiDOM:ManakaiDOM
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            The Spec. does not specify what has occured if
+            there is no <HE::title> element.
         @@@Type:  DOMString
+        @@@PerlDef:
+          __DEEP{
+            my $html;
+            for my $child (@{$self-><AG::DOMCore:Node.childNodes>}) {
+              if ($child-><AG::DOMCore:Node.nodeType> ==
+                    <C::DOMCore:Node.ELEMENT_NODE> and
+                  <Code::isHTMLElement:: $elementNode = $child,
+                                         $elementType = 'html'>) {
+                $html = $child;
+                last;
+              }
+            }
+            unless ($html) {
+              $html = $self-><M::DOMCore:Node.appendChild>
+                                ($self-><M::DOMCore:Document.createElementNS>
+                                           (<Q::xhtml1:>, 'html'));
+            }
+            
+            my $head;
+            for my $child (@{$html-><AG::DOMCore:Node.childNodes>}) {
+              if ($child-><AG::DOMCore:Node.nodeType> ==
+                    <C::DOMCore:Node.ELEMENT_NODE> and
+                  <Code::isHTMLElement:: $elementNode = $child,
+                                         $elementType = 'head'>) {
+                $head = $child;
+                last;
+              }
+            }
+            unless ($head) {
+              $head = $html-><M::DOMCore:Node.appendChild>
+                                ($self-><M::DOMCore:Document.createElementNS>
+                                           (<Q::xhtml1:>, 'head'));
+            }
+
+            my $title;
+            for my $child (@{$head-><AG::DOMCore:Node.childNodes>}) {
+              if ($child-><AG::DOMCore:Node.nodeType> ==
+                    <C::DOMCore:Node.ELEMENT_NODE> and
+                  <Code::isHTMLElement:: $elementNode = $child,
+                                         $elementType = 'title'>) {
+                $title = $child;
+                last;
+              }
+            }
+            unless ($title) {
+              $title = $head-><M::DOMCore:Node.appendChild>
+                                ($self-><M::DOMCore:Document.createElementNS>
+                                           (<Q::xhtml1:>, 'title'));
+            }
+            
+            __CODE{DOMCore:setNodeTextContent::
+                      $node => $title, $given => $given}__;
+          }__;
   @Attr:
      @@Name:  referrer
      @@Description:
@@ -1248,12 +1477,104 @@ IF:
           @@@@lang:en
           @@@@@:
             The <HA:body> element or the outermost <HA:frameset> element.
+        @@@nullCase:
+          @@@@enDesc:
+            The document does not have the <HA::body> element
+            nor a <HA::frameset> element.
+        @@@PerlDef:
+          __DEEP{
+            DOC: for my $child (@{$self-><AG::DOMCore:Node.childNodes>}) {
+              if ($child-><AG::DOMCore:Node.nodeType> ==
+                    <C::DOMCore:Node.ELEMENT_NODE> and
+                  <Code::isHTMLElement:: $elementNode = $child,
+                                         $elementType = 'html'>) {
+                for my $child (@{$child-><AG::DOMCore:Node.childNodes>}) {
+                  if ($child-><AG::DOMCore:Node.nodeType> ==
+                        <C::DOMCore:Node.ELEMENT_NODE>) {
+                    if (<Code::isHTMLElement:: $elementNode = $child,
+                                               $elementType = 'body'> or
+                        <Code::isHTMLElement:: $elementNode = $child,
+                                               $elementType = 'frameset'>) {
+                      $r = $child;
+                      last DOC;
+                    }
+                  }
+                }
+                last DOC; # xhtml1:html not found
+              }
+            }
+          }__;
      @@Set:
         @@@Type:  HTMLElement
         @@@ImplNote:
           @@@@lang:en
           @@@@@:
             ISSUE: Why this attribute is writable?  No exception?
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            What should be happen if non-<HE::body> and non-<HE::frameset>
+            element is attempted to set?  A <C::DOMCore:DOMException
+            .HIERARCHY_ERR>?  The current implementation
+            does no check.
+        @@@Exception:
+          @@@@@: 
+            DOMCore:DOMException.NO_MODIFICATION_ALLOWED_ERR
+          @@@@enDesc:
+            Either the <HE::html> element is read-only, 
+            or there is no <HE::html> element and the document
+            node is read-only.
+          @@@@ForCheck:
+            ManakaiDOM:ManakaiDOM
+        @@@Exception:
+          @@@@@:
+            MDOMX:MDOM_SECOND_DOC_ELEMENT
+          @@@@enDesc:
+            The document element (root element) of the document
+            is not an <HE::html> element.
+          @@@@ForCheck:
+            ManakaiDOM:ManakaiDOM
+        @@@ImplNote:
+          @@@@lang:en
+          @@@@@:
+            The Spec. does not specify what has occured if
+            there is no <HE::html> element.
+        @@@PerlDef:
+          __DEEP{
+            my $html;
+            for my $child (@{$self-><AG::DOMCore:Node.childNodes>}) {
+              if ($child-><AG::DOMCore:Node.nodeType> ==
+                    <C::DOMCore:Node.ELEMENT_NODE> and
+                  <Code::isHTMLElement:: $elementNode = $child,
+                                         $elementType = 'html'>) {
+                $html = $child;
+                last;
+              }
+            }
+            unless ($html) {
+              $html = $self-><M::DOMCore:Node.appendChild>
+                                ($self-><M::DOMCore:Document.createElementNS>
+                                           (<Q::xhtml1:>, 'html'));
+            }
+            
+            my $body;
+            for my $child (@{$html-><AG::DOMCore:Node.childNodes>}) {
+              if ($child-><AG::DOMCore:Node.nodeType> ==
+                    <C::DOMCore:Node.ELEMENT_NODE>) {
+                if (<Code::isHTMLElement:: $elementNode = $child,
+                                           $elementType = 'body'> or
+                    <Code::isHTMLElement:: $elementNode = $child,
+                                           $elementType = 'frameset'>) {
+                $body = $child;
+                last;
+              }
+            }
+            if ($body) {
+              $html-><M::DOMCore:Node.replaceChild> ($body => $given);
+            } else {
+              $html-><M::DOMCore:Node.appendChild> ($given);
+            }
+          }__;
   @Attr:
      @@Name:  images
      @@Description:
@@ -1270,39 +1591,22 @@ IF:
         @@@actualType:
           ManakaiDOMHTMLCollection
         @@@PerlDef:
-            my $node = $self->{<Q::TreeCore:node>};
-            my $cis = $node->{<Q::DOMCore:ownerDocument>}
-                           ->{<Q::DOMCore:hasFeature>}->{XML}
-                        ? false
-                        : $node->{<Q::DOMCore:ownerDocument>}
-                               ->{<Q::DOMCore:hasFeature>}->{HTML}
-                            ? true : false;
             my $chk;
             $chk = sub {
-                #line 1 "DOMHTML.ManakaiDOMHTMLElement.getImages.#1"
+        \#line 1 "DOMHTML.ManakaiDOMHTMLElement.getImages.#1"
                 my ($self) = @_;
-                if (defined $self->{<Q::infoset:localName>}) {
-                  if (defined $self->{<Q::infoset:namespaceName>}) {
-                    if ($self->{<Q::infoset:namespaceName>} eq <Q::xhtml1:> and
-                        $self->{<Q::infoset:localName>} eq 'img') {
-                      return true;
-                    }
-                  } else { ## Null namespace
-                    if ($self->{<Q::infoset:localName>} eq 'img') {
-                      return true;
-                    }
-                  }
+                if (<Code::isHTMLElemento:: $elementNodeo = $self,
+                                            $elementType = 'img'>) {
+                  return true;
                 } else {
-                  if ($self->{<Q::DOMCore:name>} eq 'img' or
-                      ($cis and lc ($self->{<Q::DOMCore:name>}) eq 'img')) {
-                    return true;
-                  }
+                  return false;
                 }
-                return false;
-                #line 1 "DOMHTML.ManakaiDOMHTMLElement.getImages.#2"
+        \#line 1 "DOMHTML.ManakaiDOMHTMLElement.getImages.#2"
             };
             __DEEP{
-              $r = $node-><M::ManakaiDOM:ManakaiDOMNodeObject.newReference>
+              $r = $self->{<Q::TreeCore:node>}
+                        -><M::ManakaiDOM:ManakaiDOMNodeObject
+                            ::ManakaiDOM:Perl.newReference>
                                  (<ClassName::ManakaiDOMHTMLCollection>);
             }__;
             $r->{<Q::ManakaiDOMCore:nodeMatch>} = $chk;
@@ -1326,47 +1630,30 @@ IF:
         @@@actualType:
           ManakaiDOMHTMLCollection
         @@@PerlDef:
-            my $node = $self->{<Q::TreeCore:node>};
-            my $cis = $node->{<Q::DOMCore:ownerDocument>}
-                           ->{<Q::DOMCore:hasFeature>}->{XML}
-                        ? false
-                        : $node->{<Q::DOMCore:ownerDocument>}
-                               ->{<Q::DOMCore:hasFeature>}->{HTML}
-                            ? true : false;
             my $chk;
-              $chk = sub {
+            $chk = sub {
+        \#line 1 "DOMHTML.ManakaiDOMHTMLElement.getApplets.#1"
                 my ($self) = @_;
-                if (defined $self->{<Q::infoset:localName>}) {
-                  if (defined $self->{<Q::infoset:namespaceName>}) {
-                    if ($self->{<Q::infoset:namespaceName>} eq <Q::xhtml1:> and
-                        ($self->{<Q::infoset:localName>} eq 'applet' or
-                         ($self->{<Q::infoset:localName>} eq 'object' and
-                          $self->{<Q::DOMHTML:isApplet>}))) {
-                      return true;
-                    }
-                  } else { ## Null namespace
-                    if ($self->{<Q::infoset:localName>} eq 'applet' or
-                        ($self->{<Q::infoset:localName>} eq 'object' and
-                         $self->{<Q::DOMHTML:isApplet>})) {
-                      return true;
-                    }
-                  }
+                if (<Code::isHTMLElemento:: $elementNodeo = $self,
+                                            $elementType = 'applet'>) {
+                  return true;
+                } elsif (<Code::isHTMLElemento:: $elementNodeo = $self,
+                                                 $elementType = 'object'> and
+                         $self->{<Q::DOMHTML:isApplet>}) {
+                  return true;
                 } else {
-                  if ($self->{<Q::DOMCore:name>} eq 'applet' or
-                      ($cis and lc ($self->{<Q::DOMCore:name>}) eq 'applet') or
-                      ($self->{<Q::DOMHTML:isApplet>} and
-                       ($self->{<Q::DOMCore:name>} eq 'object' or
-                        ($cis and lc ($self->{<Q::DOMCore:name>}) eq 'object')))) {
-                    return true;
-                  }
+                  return false;
                 }
-                return false;
-              };
+        \#line 1 "DOMHTML.ManakaiDOMHTMLElement.getApplets.#2"
+            };
             __DEEP{
-              $r = $node-><M::ManakaiDOM:ManakaiDOMNodeObject.newReference>
+              $r = $self->{<Q::TreeCore:node>}
+                        -><M::ManakaiDOM:ManakaiDOMNodeObject
+                            ::ManakaiDOM:Perl.newReference>
                                  (<ClassName::ManakaiDOMHTMLCollection>);
             }__;
             $r->{<Q::ManakaiDOMCore:nodeMatch>} = $chk;
+
   @Attr:
      @@Name:  links
      @@Description:
@@ -1379,54 +1666,36 @@ IF:
         @@@actualType:
           ManakaiDOMHTMLCollection
         @@@PerlDef:
-            my $node = $self->{<Q::TreeCore:node>};
-            my $cis = $node->{<Q::DOMCore:ownerDocument>}
-                           ->{<Q::DOMCore:hasFeature>}->{XML}
-                        ? false
-                        : $node->{<Q::DOMCore:ownerDocument>}
-                               ->{<Q::DOMCore:hasFeature>}->{HTML}
-                            ? true : false;
             my $chk;
-              $chk = sub {
+            $chk = sub {
+        \#line 1 "DOMHTML.ManakaiDOMHTMLElement.getLinks.#1"
                 my ($self) = @_;
-                if (defined $self->{<Q::infoset:localName>}) {
-                  if (defined $self->{<Q::infoset:namespaceName>}) {
-                    if ($self->{<Q::infoset:namespaceName>} eq <Q::xhtml1:> and
-                        {a => 1, area => 1}->{$self->{<Q::infoset:localName>}}) {
-                      return true
+                if (<Code::isHTMLElemento:: $elementNodeo = $self,
+                                            $elementType = 'a'>) {
+                  return true
                         if $self->{<Q::infoset:attributes>}
                                 ->{<Q::null:>}->{href} or
                            $self->{<Q::infoset:attributes>}
                                 ->{<Q::ManakaiDOM:noNS>}->{href};
-                    }
-                  } else { ## Null namespace
-                    if ({a => 1, area => 1}->{$self->{<Q::infoset:localName>}}) {
-                      return true
+                } elsif (<Code::isHTMLElemento:: $elementNodeo = $self,
+                                                 $elementType = 'area'>) {
+                  return true
                         if $self->{<Q::infoset:attributes>}
                                 ->{<Q::null:>}->{href} or
                            $self->{<Q::infoset:attributes>}
                                 ->{<Q::ManakaiDOM:noNS>}->{href};
-                    }
-                  }
-                } else {
-                  if ({a => 1, area => 1}->{$self->{<Q::DOMCore:name>}} or
-                      ($cis and {a => 1, area => 1}
-                                       ->{lc $self->{<Q::DOMCore:name>}})) {
-                    return true
-                        if $self->{<Q::infoset:attributes>}
-                                ->{<Q::ManakaiDOM:noNS>}->{href} or
-                           $self->{<Q::infoset:attributes>}
-                                ->{<Q::null:>}->{href};
-                  }
                 }
                 return false;
-              };
-
+        \#line 1 "DOMHTML.ManakaiDOMHTMLElement.getLinks.#2"
+            };
             __DEEP{
-              $r = $node-><M::ManakaiDOM:ManakaiDOMNodeObject.newReference>
+              $r = $self->{<Q::TreeCore:node>}
+                        -><M::ManakaiDOM:ManakaiDOMNodeObject
+                            ::ManakaiDOM:Perl.newReference>
                                  (<ClassName::ManakaiDOMHTMLCollection>);
             }__;
             $r->{<Q::ManakaiDOMCore:nodeMatch>} = $chk;
+
   @Attr:
      @@Name:  forms
      @@Description:
@@ -1444,38 +1713,22 @@ IF:
         @@@actualType:
           ManakaiDOMHTMLCollection
         @@@PerlDef:
-            my $node = $self->{<Q::TreeCore:node>};
-            my $cis = $node->{<Q::DOMCore:ownerDocument>}
-                           ->{<Q::DOMCore:hasFeature>}->{XML}
-                        ? false
-                        : $node->{<Q::DOMCore:ownerDocument>}
-                               ->{<Q::DOMCore:hasFeature>}->{HTML}
-                            ? true : false;
             my $chk;
-              $chk = sub {
+            $chk = sub {
+        \#line 1 "DOMHTML.ManakaiDOMHTMLElement.getForms.#1"
                 my ($self) = @_;
-                if (defined $self->{<Q::infoset:localName>}) {
-                  if (defined $self->{<Q::infoset:namespaceName>}) {
-                    if ($self->{<Q::infoset:namespaceName>} eq <Q::xhtml1:> and
-                        $self->{<Q::infoset:localName>} eq 'form') {
-                      return true;
-                    }
-                  } else { ## Null namespace
-                    if ($self->{<Q::infoset:localName>} eq 'form') {
-                      return true;
-                    }
-                  }
+                if (<Code::isHTMLElemento:: $elementNodeo = $self,
+                                            $elementType = 'form'>) {
+                  return true;
                 } else {
-                  if ($self->{<Q::DOMCore:name>} eq 'form' or
-                      ($cis and lc ($self->{<Q::DOMCore:name>}) eq 'form')) {
-                    return true;
-                  }
+                  return false;
                 }
-                return false;
-              };
-
+        \#line 1 "DOMHTML.ManakaiDOMHTMLElement.getForms.#2"
+            };
             __DEEP{
-              $r = $node-><M::ManakaiDOM:ManakaiDOMNodeObject.newReference>
+              $r = $self->{<Q::TreeCore:node>}
+                        -><M::ManakaiDOM:ManakaiDOMNodeObject
+                            ::ManakaiDOM:Perl.newReference>
                                  (<ClassName::ManakaiDOMHTMLCollection>);
             }__;
             $r->{<Q::ManakaiDOMCore:nodeMatch>} = $chk;
@@ -1499,53 +1752,29 @@ IF:
         @@@actualType:
           ManakaiDOMHTMLCollection
         @@@PerlDef:
-            my $node = $self->{<Q::TreeCore:node>};
-            my $cis = $node->{<Q::DOMCore:ownerDocument>}
-                           ->{<Q::DOMCore:hasFeature>}->{XML}
-                        ? false
-                        : $node->{<Q::DOMCore:ownerDocument>}
-                               ->{<Q::DOMCore:hasFeature>}->{HTML}
-                            ? true : false;
             my $chk;
-              $chk = sub {
+            $chk = sub {
+        \#line 1 "DOMHTML.ManakaiDOMHTMLElement.getAnchors.#1"
                 my ($self) = @_;
-                if (defined $self->{<Q::infoset:localName>}) {
-                  if (defined $self->{<Q::infoset:namespaceName>}) {
-                    if ($self->{<Q::infoset:namespaceName>} eq <Q::xhtml1:> and
-                        $self->{<Q::infoset:localName>} eq 'a') {
-                      return true
+                if (<Code::isHTMLElemento:: $elementNodeo = $self,
+                                            $elementType = 'a'>) {
+                  return true
                         if $self->{<Q::infoset:attributes>}
                                 ->{<Q::null:>}->{name} or
                            $self->{<Q::infoset:attributes>}
                                 ->{<Q::ManakaiDOM:noNS>}->{name};
-                    }
-                  } else { ## Null namespace
-                    if ($self->{<Q::infoset:localName>} eq 'a') {
-                      return true
-                        if $self->{<Q::infoset:attributes>}
-                                ->{<Q::null:>}->{name} or
-                           $self->{<Q::infoset:attributes>}
-                                ->{<Q::ManakaiDOM:noNS>}->{name};
-                    }
-                  }
-                } else {
-                  if ($self->{<Q::DOMCore:name>} eq 'a' or
-                      ($cis and lc ($self->{<Q::DOMCore:name>}) eq 'a')) {
-                    return true
-                        if $self->{<Q::infoset:attributes>}
-                                ->{<Q::ManakaiDOM:noNS>}->{name} or
-                           $self->{<Q::infoset:attributes>}
-                                ->{<Q::null:>}->{name};
-                  }
                 }
                 return false;
-              };
-
+        \#line 1 "DOMHTML.ManakaiDOMHTMLElement.getAnchors.#2"
+            };
             __DEEP{
-              $r = $node-><M::ManakaiDOM:ManakaiDOMNodeObject.newReference>
+              $r = $self->{<Q::TreeCore:node>}
+                        -><M::ManakaiDOM:ManakaiDOMNodeObject
+                            ::ManakaiDOM:Perl.newReference>
                                  (<ClassName::ManakaiDOMHTMLCollection>);
             }__;
             $r->{<Q::ManakaiDOMCore:nodeMatch>} = $chk;
+
   @Attr:
      @@Name:  cookie
      @@Description:
@@ -1713,6 +1942,9 @@ IF:
       @@@Description:
         @@@@lang:en
         @@@@@:The matching element.
+      @@@disDef:
+        @@@@DISPerl:cloneCode:
+          DOMCore:ManakaiDOMElement::ManakaiDOM:ManakaiDOMLatest.getElementById
     @@DOMMain:implementFeature:
       HTMLFeature10
     @@For:
@@ -1850,7 +2082,23 @@ IF:
       An HTML element.  All specific HTML element interfaces 
       are derived from this interface.
 
-  @@ElementType:
+  @s:elementType:
+    @@@:
+      AnyHTMLElement::ForHTML40SE
+    @@ForCheck:
+      ManakaiDOM:DOM1 !ManakaiDOM:DOM2
+  @s:elementType:
+    @@@:
+      AnyHTMLElement::ForHTML401
+    @@ForCheck: 
+      ManakaiDOM:DOM2
+  @s:elementType:
+    @@@:
+      AnyHTMLElement::ForXHTML10SE
+    @@ForCheck:
+      ManakaiDOM:DOM2
+
+  @ImplNote:
     @@QName:
       xhtml1:sub
   \##TODO: rewrite this
@@ -1881,9 +2129,7 @@ IF:
     @@html-element-type:noscript
     @@html-element-type:address
     @@html-element-type:center
-  @@ElementType:
-    @@QName:
-      xhtml1:*
+
   @ImplNote:
     @@lang:en
     @@@:
@@ -1893,10 +2139,12 @@ IF:
 
   @Attr:
      @@Name:  id
-     @@DocAttr:
-       @@@QName:id
-       @@@ElementType:
-         xhtml1:*
+     @@DocAttr1:
+       id::HTML40SE
+     @@DocAttr2S:
+       id::HTML401
+     @@DocAttr2X:
+       id::XHTML10SE
      @@Get:
         @@@Type:  DOMString
      @@Set:
@@ -1907,10 +2155,12 @@ IF:
         Some element in HTML 4/XHTML 1.0 does not have <HA:class> attribute.
   @Attr:
      @@Name:  title
-     @@DocAttr:
-       @@@QName:title
-       @@@ElementType:
-         xhtml1:*
+     @@DocAttr1:
+       title::HTML40SE
+     @@DocAttr2S:
+       title::HTML401
+     @@DocAttr2X:
+       title::XHTML10SE
      @@Get:
         @@@Type:  DOMString
      @@Set:
@@ -1921,12 +2171,12 @@ IF:
         Some element in HTML 4/XHTML 1.0 does not have <HA:class> attribute.
   @Attr:
      @@Name:  lang
-     @@DocAttr:
-       @@@QName:lang
-       @@@ElementType:
-         xhtml1:*
-       @@@DeprecatedBy:
-         DOMHTML:XHTML1.0
+     @@DocAttr1:
+       lang::HTML40SE
+     @@DocAttr2S:
+       lang::HTML401
+     @@DocAttr2X:
+       lang::XHTML10SE
      @@Get:
         @@@Type:  DOMString
      @@Set:
@@ -1937,10 +2187,12 @@ IF:
         Some element in HTML 4/XHTML 1.0 does not have <HA:class> attribute.
   @Attr:
      @@Name:  dir
-     @@DocAttr:
-       @@@ElementType:
-         xhtml1:*
-       @@@QName:dir
+     @@DocAttr1:
+       dir::HTML40SE
+     @@DocAttr2S:
+       dir::HTML401
+     @@DocAttr2X:
+       dir::XHTML10SE
      @@Get:
         @@@Type:  DOMString
      @@Set:
@@ -1951,10 +2203,12 @@ IF:
         Some element in HTML 4/XHTML 1.0 does not have <HA:class> attribute.
   @Attr:
      @@Name:  className
-     @@DocAttr:
-       @@@ElementType:
-         xhtml1:*
-       @@@QName:class
+     @@DocAttr1:
+       class::HTML40SE
+     @@DocAttr2S:
+       class::HTML401
+     @@DocAttr2X:
+       class::XHTML10SE
      @@Get:
         @@@Type:  DOMString
      @@Set:
@@ -1970,6 +2224,172 @@ IF:
       The <A:HTMLElement.style> is reserved by DOM Level 1 First Edition 
       for future use.  It is used later in DOM Level 2 CSS Module.
 ##IF:HTMLElement
+
+ElementTypeBinding:
+  @Name: DocAttr1
+  @ElementType:
+    dis:DocAttr
+  @ShadowContent:
+    @@ForCheck:
+      ManakaiDOM:DOM1 !ManakaiDOM:DOM2
+ElementTypeBinding:
+  @Name: DocAttr2S
+  @ElementType:
+    dis:DocAttr
+  @ShadowContent:
+    @@ForCheck:
+      ManakaiDOM:DOM2
+ElementTypeBinding:
+  @Name: DocAttr2X
+  @ElementType:
+    dis:DocAttr
+  @ShadowContent:
+    @@ForCheck:
+      ManakaiDOM:DOM2
+
+ResourceDef:
+  @QName: AnyHTMLElement
+  @enDesc:
+    Any HTML element types.
+  @rdf:type:
+    s:AnyElementInNS
+  @AppName:
+    @@@:
+      xhtml1:*
+    @@ContentType:
+      dis:TypeQName
+  @ForCheck: ForHTML
+
+  ## TODO: Move to attribute set
+
+  @AttrDef:
+    @@QName: dir
+  @AttrDef:
+    @@QName: id
+  @AttrDef:
+    @@QName: lang
+    @@DeprecatedBy:
+      DOMHTML:XHTML1.0
+  @AttrDef:
+    @@QName: class
+  @AttrDef:
+    @@QName: title
+
+ElementTypeBinding:
+  @Name: AttrDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      s:Attribute
+
+ResourceDef:
+  @QName: isHTMLElement
+  @rdf:type:
+    dis2pm:InlineCode
+  @enDesc:
+    Tests whether this is an HTML element of the given type or not.
+  @Param:
+    @@Name: elementNode
+    @@Type: 
+      DOMCore:Element
+    @@enDesc:
+      The element node to test.
+  @Param:
+    @@Name: elementType
+    @@Type: 
+      DOMMain:DOMString
+    @@enDesc:
+      The element type name to test.
+  @PerlDef:
+      do {
+          my $__ln = $elementNode->{<Q::TreeCore:node>}
+                                 ->{<Q::infoset:localName>};
+          if (defined $__ln) {  ## Namespace-aware node
+            my $__ns = $elementNode->{<Q::TreeCore:node>}
+                                   ->{<Q::infoset:namespaceName>};
+            if ($__ns eq <Q::xhtml1:> or
+                (not defined $__ns and
+                 $elementNode->{<Q::TreeCore:node>}->{<Q::DOMCore:hasFeature>}
+                      ->{HTML})) {
+              $elementType eq $__ln ? true : false;
+            } else {
+              false;
+            }
+          } elsif ($elementNode->{<Q::TreeCore:node>}->{<Q::DOMCore:hasFeature>}
+                        ->{HTML}) {
+            if ($elementNode->{<Q::TreeCore:node>}->{<Q::DOMCore:hasFeature>}
+                        ->{XML}) {
+              $elementType eq $elementNode-><AG::DOMCore:Node.nodeName>
+                 ? true : false;
+            } else {
+              $elementType eq lc ($elementNode-><AG::DOMCore:Node.nodeName>)
+                 ? true : false;
+            }
+          } else {
+            false;
+          }
+      }
+
+ResourceDef:
+  @QName: isHTMLElemento
+  @rdf:type:
+    dis2pm:InlineCode
+  @enDesc:
+    Tests whether this is an HTML element of the given type or not.
+  @Param:
+    @@Name: elementNodeo
+    @@Type: 
+      ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+    @@enDesc:
+      The element node to test.
+  @Param:
+    @@Name: elementType
+    @@Type: 
+      DOMMain:DOMString
+    @@enDesc:
+      The element type name to test.
+  @PerlDef:
+      do {
+          my $__ln = $elementNodeo->{<Q::infoset:localName>};
+          if (defined $__ln) {  ## Namespace-aware node
+            my $__ns = $elementNodeo->{<Q::infoset:namespaceName>};
+            if ($__ns eq <Q::xhtml1:> or
+                (not defined $__ns and
+                 $elementNodeo->{<Q::DOMCore:hasFeature>}
+                      ->{HTML})) {
+              $elementType eq $__ln ? true : false;
+            } else {
+              false;
+            }
+          } elsif ($elementNodeo->{<Q::DOMCore:hasFeature>}
+                        ->{HTML}) {
+            my $elClass = <ClassName::DOMCore:ManakaiDOMElement>;
+            my $elementNode = <Code::ManakaiNode:getWeakRef
+                                   ||ManakaiDOM:Perl::
+              $object = $elementNodeo,
+              $class = $elClass,
+            >;
+            if ($elementNodeo->{<Q::DOMCore:hasFeature>}
+                        ->{XML}) {
+              $elementType eq $elementNode-><AG::DOMCore:Node.nodeName>
+                 ? true : false;
+            } else {
+              $elementType eq lc ($elementNode-><AG::DOMCore:Node.nodeName>)
+                 ? true : false;
+            }
+          } else {
+            false;
+          }
+      }
+
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
 
 ET:
   @ETQName:
@@ -2141,14 +2561,14 @@ ET:
           @@@@ContentType:
             lang:dis
           @@@@DISPerl:cloneCode:
-            DOMCore:ManakaiDOMNode::ManakaiDOM:ManakaiDOMLatest.getTextContent
+            DOMCore:ManakaiDOMNode::ManakaiDOM:ManakaiDOMLatest.textContent.get
      @@Set:
         @@@Type:  DOMString
         @@@Def:
           @@@@ContentType:
             lang:dis
           @@@@DISPerl:cloneCode:
-            DOMCore:ManakaiDOMNode::ManakaiDOM:ManakaiDOMLatest.setTextContent
+            DOMCore:ManakaiDOMNode::ManakaiDOM:ManakaiDOMLatest.textContent.set
 ##IF:HTMLTitleElement
 
 ET:
@@ -2259,6 +2679,8 @@ ET:
             @@@@@lang:en
             @@@@@@:
               This element is not within the context of a form.
+       @@@disDef:
+         @@@@DISLang:nop:
   @ATTR:
      @@Name:  prompt
      @@Deprecated:
@@ -2268,12 +2690,23 @@ ET:
         @@@Type:  DOMString
 
 ElementTypeBinding:
+  @Name: disDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:dis
+
+ElementTypeBinding:
   @Name: ETQName
   @ElementType:
-    dis:QName
+    dis:AppName
   @ShadowContent:
     @@ForCheck:
       s:ForML
+    @@ContentType:
+      dis:TypeQName
+
 ElementTypeBinding:
   @Name: IFQName
   @ElementType:
@@ -2351,6 +2784,11 @@ ET:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
+
+PropDef:
+  @QName: disabled
+  @enDesc:
+    <A::.disabled>.
 
 ElementTypeBinding:
   @Name: DOMAName
@@ -2748,7 +3186,7 @@ ElementTypeBinding:
 IFDef:
   @Name:HTMLBlockquoteElement
   @ISA:HTMLElement
-  @ElementType:
+  @s:elementType:
     xhtml1:blockquote::ForHTML40SE
   @Description:
     @@lang:en
@@ -2866,10 +3304,9 @@ ET:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  face
      @@Deprecated:
-     @@DocAttr:
      @@Get:
         @@@Type:  DOMString
      @@Set:
@@ -2925,14 +3362,14 @@ ET:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  face
      @@Deprecated:
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
-  @Attr:
+  @ATTR:
      @@Name:  size
      @@Deprecated:
      @@ImplNote:
@@ -3535,6 +3972,11 @@ ET:
 ##IF:HTMLObjectElement
 
 PropDef:
+  @QName: referrer
+  @enDesc:
+    <A::HTMLDocument.referrer>.
+
+PropDef:
   @QName: contentDocument
   @Type:
     ManakaiDOMCore:ManakaiDOMNodeObjectNode::ManakaiDOM:ManakaiDOMCommon
@@ -3708,6 +4150,14 @@ ET:
      @@Set:
         @@@Type:  DOMString
 ##IF:HTMLAppletElement
+
+ResourceDef:
+  @QName:
+    DOMMain:long
+  @AliasFor:
+    DOMMain:long::ManakaiDOM:all
+  @ForCheck:
+    !=ManakaiDOM:all
 
 ET:
   @ETQName:

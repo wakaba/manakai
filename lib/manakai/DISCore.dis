@@ -21,7 +21,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/04/10 05:40:59 $
+      $Date: 2005/05/07 13:56:36 $
     @@ContentType:
       dis:Date.RCS
   
@@ -531,6 +531,17 @@ PropDef:
   @dataType:
     DISCore:Tristate
 
+PropDef:
+  @QName: stopISARecusrive
+  @Description:
+    @@lang:en
+    @@@:
+      Whether the <Q::dis:ISA>-recursive property search
+      (i.e. <M::DIS:ManakaiDISPropertyAccessor.getPropertyResourceList>)
+       should be stopped or not.
+  @dataType:
+    dis:Boolean
+
 ## --- Datatype
 
 PropDef:
@@ -741,6 +752,11 @@ DataTypeDef:
   @FullName:
     @@lang:en
     @@@: String
+
+DataTypeDef:
+  @QName:
+    dis:String
+  @AliasFor: String
 
 DataTypeDef:
   @QName:

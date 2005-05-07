@@ -26,7 +26,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/01/05 12:19:39 $
+      $Date: 2005/05/07 13:56:36 $
     @@ContentType:
       dis:Date.RCS
 
@@ -136,6 +136,8 @@ ElementTypeBinding:
       ManakaiDOM:DOM1
     @@For:
       =ManakaiDOM:ManakaiDOM
+    @@For:
+      DOMHTML:ForHTML
 
 ElementTypeBinding:
   @Name: L2
@@ -161,6 +163,8 @@ ElementTypeBinding:
       ManakaiDOM:DOM2
     @@For:
       =ManakaiDOM:ManakaiDOM
+    @@For:
+      DOMHTML:ForHTML
 
 ElementTypeBinding:
   @Name: PerlDef
@@ -283,16 +287,19 @@ ElementTypeBinding:
           DOM Level 1 First Edition refers the latest version of 
           HTML 4.0 while Second Edition refers the second edition of 
           HTML 4.0. 
+      @@@DISCore:stopISARecursive:1
     @@DISMarkup:elementType:
       @@@@:
         ::DOMHTML:ForHTML401
       @@@ForCheck:
         ManakaiDOM:DOM2
+      @@@DISCore:stopISARecursive:1
     @@DISMarkup:elementType:
       @@@@:
         ::DOMHTML:ForXHTML10SE
       @@@ForCheck:
         ManakaiDOM:DOM2
+      @@@DISCore:stopISARecursive:1
 
 ElementTypeBinding:
   @Name: Method
@@ -777,7 +784,7 @@ ET:
             they were added in the DOM Level 1 Errata.
         @@@PerlDef:
             __DEEP{
-              $r = $self-><M::DOMHTML:HTMLSelectElement.multiple>
+              $r = $self-><AG::DOMHTML:HTMLSelectElement.multiple>
                               ? "select-multiple" : "select-one";
             }__;
   @Attr:
@@ -1143,7 +1150,7 @@ ET:
           @@@@ContentType:
             lang:dis
           @@@@DISPerl:cloneCode:
-            DOMCore:ManakaiDOMNode.getTextContent
+            DOMCore:ManakaiDOMNode.textContent.get
   @Attr:
      @@Name:  index
      @@Description:
@@ -1517,13 +1524,13 @@ ET:
             }__;
             if ({text => 1, password => 1, file => 1}->{$type}) {
               ## TODO:
-             # __DISCODE{
+             # __ DISCODE{
              #   GetProp:
              # \    DOMHTML:value
              # }__;
             } else {
               ## TODO:
-              #__DISDODE{
+              #__ DISDODE{
               #  get-attribute-value:
               #  \ value
               #}__;
@@ -1549,12 +1556,12 @@ ET:
             }__;
             if ({text => 1, password => 1, file => 1}->{$type}) {
               ## TODO:
-              #__DISCODE{
+              #__ DISCODE{
               #  SetProp:
               #\    DOMHTML:value
               #}__;
             } else {
-              #__DISDODE{
+              #__ DISDODE{
               #  set-attribute-value:
               #  \ value
               #}__;
@@ -1617,7 +1624,7 @@ ET:
           @@@@ContentType:
             lang:dis
           @@@@DISPerl:cloneCode:
-            DOMCore:ManakaiDOMNode.getTextContent
+            DOMCore:ManakaiDOMNode.textContent.get
      @@Set:
         @@@Type:  
           DOMMain:DOMString
@@ -1625,7 +1632,7 @@ ET:
           @@@@ContentType:
             lang:dis
           @@@@DISPerl:cloneCode:
-            DOMCore:ManakaiDOMNode.setTextContent
+            DOMCore:ManakaiDOMNode.textContent.set
      @@Level[list]:
         1
      @@SpecLevel[list]:
@@ -1874,6 +1881,13 @@ ET:
      @@Set:
         @@@Type:  DOMString
 ##IF:HTMLButtonElement
+
+ResourceDef:
+  @QName: DOMString
+  @AliasFor:
+    DOMMain:DOMString
+  @ForCheck:
+    ManakaiDOM:ManakaiDOM
 
 ET:
   @ETQName:

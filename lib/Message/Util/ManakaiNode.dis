@@ -21,7 +21,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/04/28 15:22:59 $
+      $Date: 2005/05/07 13:56:36 $
     @@ContentType:
       dis:Date.RCS
   
@@ -302,6 +302,52 @@ ClassDef:
       @@@DISPerl:paramStyle: any
     @@PerlDef:
       $ref = bless {
+        <Q::TreeCore:node> => $object,
+        <Q::TreeCore:isWeak> => true,
+      }, $class;
+
+  @ResourceDef:
+    @@QName: getWeakRef
+    @@rdf:type:
+      dis2pm:InlineCode
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Creates a new weak node reference object. 
+        \
+        The weak node reference is actually a node reference
+        except that this code fragment does not increment
+        the reference count of the object.  When all non-weak 
+        references to the object are destructed, then
+        the object is destructed and any operation via 
+        weak references will lead unexpected result.
+        \
+        {NOTE:: It is intended that internal code creates a weak reference
+                so that it gets access to public interface. 
+        \
+        }
+    @@ResourceDef:
+      @@@rdf:type:
+        DISPerl:CodeParameter
+      @@@Name: $object
+      @@@Type:
+        ManakaiDOM:ManakaiDOMNodeObject
+      @@@In:1
+      @@@enDesc:
+        A node object for which a reference is created.
+      @@@DISPerl:paramStyle: var
+    @@ResourceDef:
+      @@@rdf:type:
+        DISPerl:CodeParameter
+      @@@Name: $class
+      @@@Type:
+        Perl:package-name::ManakaiDOM:all
+      @@@enDesc:
+        A package name with which <P::$ref> is blessed. 
+      @@@In:1
+      @@@DISPerl:paramStyle: any
+    @@PerlDef:
+      bless {
         <Q::TreeCore:node> => $object,
         <Q::TreeCore:isWeak> => true,
       }, $class;

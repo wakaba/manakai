@@ -40,7 +40,8 @@ all.dac: $(DIS_FILES) $(DAC_PL) $(UTIL_DAC_FILE)
 
 SuikaWikiConfig21.pm: all.dac $(DAC2PM_PL)
 	$(DAC2PM) $< \
-	  --module-uri="$(NS_MARKUP)SuikaWikiConfig21" > $@
+	  --module-uri="$(NS_MARKUP)SuikaWikiConfig21" \
+	  --output-file-path="$@"
 	$(PERL_CHK) $@
 
 # $(UTIL_DAC_FILE)

@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/05/05 12:30:03 $
+      $Date: 2005/05/07 13:56:36 $
     @@ContentType:
       dis:Date.RCS
   
@@ -90,6 +90,8 @@ Namespace:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
+  @s:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
   @swcfg21:
     http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
   @TreeCore:\
@@ -2564,6 +2566,15 @@ ClsDef:
       @@@enDesc:
         The resolver to convert module name into <QUOTE::dis> document object. 
     @@ForParam:
+    @@NamedParam:
+      @@@Name: onResourceRead
+      @@@Type:
+        Perl:CODE::ManakaiDOM:all
+      @@@enDesc:
+        An event handler called when a resource is read.
+      @@@nullCase:
+        @@@@enDesc:
+          No event handler is read.
     @@Return:
       @@@RaiseException:
         @@@@@: NO_MODULE_QNAME_ERR
@@ -2656,7 +2667,8 @@ ClsDef:
                 }__;
               }
               $self-><M::ManakaiDISDatabase.loadModule>
-                            ($rdoc, $resolver, for_arg => <Q::ManakaiDOM:all>);
+                            ($rdoc, $resolver, for_arg => <Q::ManakaiDOM:all>,
+                             on_resource_read => $onResourceRead);
             } # Unless "for all" loaded
 
             ## -- Loads Required Modules
@@ -2713,7 +2725,8 @@ ClsDef:
                   }__;
                 }
                 $self-><M::ManakaiDISDatabase.loadModule>
-                                       ($rdoc, $resolver, for_arg => $for);
+                                       ($rdoc, $resolver, for_arg => $for,
+                                        on_resource_read => $onResourceRead);
               }
             } # Child Module elements
             
@@ -2724,7 +2737,8 @@ ClsDef:
               if ($el-><AG::ManakaiDISElement.isResourceElement>) {
                 $self-><M::ManakaiDISDatabase.loadResource>
                                          ($mod, null, null, $el,
-                                          for_arg => $forArg);
+                                          for_arg => $forArg,
+                                          on_resource_read => $onResourceRead);
               } else {
                 my $et = $el-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
                                                                .expandedURI>;
@@ -2872,6 +2886,15 @@ ClsDef:
         The source <QUOTE::dis> <Q::dis:ResourceDef> element object. 
     @@ForParam:
     @@ForpParam:
+    @@NamedParam:
+      @@@Name: onResourceRead
+      @@@Type:
+        Perl:CODE::ManakaiDOM:all
+      @@@enDesc:
+        An event handler called when a resource is read.
+      @@@nullCase:
+        @@@@enDesc:
+          No event handler is read.
     @@Return:
       @@@ResDefDupException:
       @@@ElementNotAllowedException:
@@ -2972,6 +2995,7 @@ ClsDef:
           }
           $res->{<Q::isDefined>} = true;
           $res->{seq} = $self->{seq}++;
+          $res->{<Q::sourceNodeID>} = $node_id;
           
           ## -- Alias
           my $al_node = $el-><M::ManakaiDISElement.disGetAttribute>
@@ -3035,7 +3059,8 @@ ClsDef:
               unless ($al_node) {
                 $self-><M::ManakaiDISDatabase.loadResource>
                                      ($mod, $res, $res, $re,
-                                      for_arg => $forArg, forp_arg => $forpArg);
+                                      for_arg => $forArg, forp_arg => $forpArg,
+                                      on_resource_read => $onResourceRead);
               } else {
                 my $ac = $re-><M::ManakaiDISElement.disGetAttribute>
                                     (<Q::dis:aliasChild>, for_arg => $forArg,
@@ -3044,7 +3069,8 @@ ClsDef:
                                    ::swcfg21:ForLatest.value>) {
                   $self-><M::ManakaiDISDatabase.loadResource>
                                      ($mod, $res, $res, $re,
-                                      for_arg => $forArg, forp_arg => $forpArg);
+                                      for_arg => $forArg, forp_arg => $forpArg,
+                                      on_resource_read => $onResourceRead);
                 }
               }
             }
@@ -3061,10 +3087,12 @@ ClsDef:
                 $self-><M::ManakaiDISDatabase.loadResource>
                                 ($mod, $parentResource, $res, $el,
                                  for_arg => $forArg,
-                                 forp_arg => [@{$forpArg}, $for_uri]);
+                                 forp_arg => [@{$forpArg}, $for_uri],
+                                 on_resource_read => $onResourceRead);
               }
             }
           }
+          ($onResourceRead or sub {})->($self, $res);
         }__; # DEEP
 
   @Method:
@@ -3250,6 +3278,12 @@ ClsDef:
                                                ($node or $contextNode);
         }__;
 ##DISDatabase
+
+PropDef:
+  @QName: sourceNodeID
+  @enDesc:
+    The URI reference of the source node identifier. 
+  @rdfs:domain: ManakaiDISResourceDefinition
 
 PropDef:
   @QName: resource
@@ -3805,6 +3839,11 @@ ClsDef:
         @@@@@:RESOURCE_NOT_DEFINED_ERR
         @@@@enDesc:
           A feature referred from this module is not defined.
+      @@@RaiseException:
+        @@@@@:RESOURCE_NOT_DEFINED_ERR
+        @@@@enDesc:
+          A markup vocabulary is referred but it is not defined
+          or have a different type than the expected one.
       @@@PerlDef:
         __DEEP{
           $r = $self-><AG::ManakaiDISPropertyAccessor.plImplementation>
@@ -3925,7 +3964,7 @@ ClsDef:
                                           ::swcfg21:ForLatest
                                .expandedURI> eq <Q::DOMMetaImpl:providedThrough>;
                       my $curi = $ec-><M::ManakaiDISElement.tfqnamesValueURI>
-                                    ($self->{nameURI}, $self->{for});
+                                  ($self->{<Q::DIS:sourceNodeID>}, $self->{for});
                       my $c = $self->{db}-><M::ManakaiDISDatabase.getResource>
                                                                     ($curi);
                       $c-><AS::ManakaiDISResourceDefinition.isReferred> ($ec);
@@ -3976,6 +4015,144 @@ ClsDef:
                   ) {
                     $r-><M::PLBlockCon.appendStatement>
                           ('$Message::DOM::ManakaiDOMImplementation'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
+                  
+                  ## Node
+                  if ($role-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
+                                (<Q::DOMCore:ElementRole>)) {
+                    my $for_specific_et;
+                    for my $et (@{$cls-><M::ManakaiDISPropertyAccessor
+                          .getPropertyResourceList>
+                             (<Q::s:elementType>, isa_recursive => true,
+                              default_media_type => <Q::dis:TFQNames>)}) {
+                      $for_specific_et = true;
+                      my $ln = $et-><AG::ManakaiDISResourceDefinition
+                                        .mvLocalName>;
+                      $ln = '*' unless defined $ln;
+                      my $ns = $et-><AG::ManakaiDISResourceDefinition
+                                        .mvNamespaceURI>;
+                      $ns = '' unless defined $ns;
+                        ## ISSUE: Is NULL-namespace should be allowed here?
+                      $r-><M::PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMElement' .
+                           '::CompatClassET{q<' . $ns . '>}->{q<' . $ln .
+                           '>}->{q<' . $pack_name . '>} = 1');
+                    }
+                    $r-><M::PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMElement'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1')
+                      unless $for_specific_et;
+                  }
+                  if ($role-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
+                                (<Q::DOMCore:AttributeRole>)) {
+                    my $for_specific_attr;
+                    for my $at (@{$cls-><M::ManakaiDISPropertyAccessor
+                          .getPropertyResourceList>
+                             (<Q::dis:DocAttr>, isa_recursive => true,
+                              default_media_type => <Q::dis:TFQNames>)}) {
+                      $for_specific_attr = true;
+                      my $ln = $at-><AG::ManakaiDISResourceDefinition
+                                        .mvLocalName>;
+                      $ln = '*' unless defined $ln;
+                      my $ns = $at-><AG::ManakaiDISResourceDefinition
+                                        .mvNamespaceURI>;
+                      $ns = '' unless defined $ns;
+                      my $et = $at-><AG::ManakaiDISResourceDefinition
+                                        .mvOwnerElementResource>;
+                      my $etns = '*';
+                      my $etln = '*';
+                      if ($et) {
+                        $etns = $et-><AG::ManakaiDISResourceDefinition
+                                          .mvLocalName>;
+                        $etln = '*' unless defined $etln;
+                        my $etns = $at-><AG::ManakaiDISResourceDefinition
+                                          .mvNamespaceURI>;
+                        $etns = '' unless defined $etns;
+                          ## ISSUE: Should NULL-namespace be allowed here?
+                      }
+                      
+                      $r-><M::PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMElement' .
+                           '::CompatClassAttr{q<' . $etns . '>}->{q<' . $etln .
+                           '>}->{q<' . $ns . '>}->{q<' . $ln . '>}->{q<' .
+                           $pack_name . '>} = 1');
+                    }
+                    $r-><M::PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMAttr'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1')
+                      unless $for_specific_attr;
+                  }
+                  if ($role-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
+                                (<Q::DOMCore:TextRole>)) {
+                    $r-><M::PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMText'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
+                  if ($role-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
+                                (<Q::DOMCore:CommentRole>)) {
+                    $r-><M::PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMComment'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
+                  if ($role-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
+                                (<Q::DOMCore:CDATASectionRole>)) {
+                    $r-><M::PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMCDATASection'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
+                  if ($role-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
+                                (<Q::DOMCore:ProcessingInstructionRole>)) {
+                    $r-><M::PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMProcessingInstruction'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                    ## TODO: Target name dependent
+                  }
+                  if ($role-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
+                                (<Q::DOMCore:DocumentRole>)) {
+                    $r-><M::PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMDocument'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                    ## TODO: by document type name and media type
+                  }
+                  if ($role-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
+                                (<Q::DOMCore:DocumentFragmentRole>)) {
+                    $r-><M::PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMDocumentFragment'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
+                  if ($role-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
+                                (<Q::DOMCore:DocumentTypeRole>)) {
+                    $r-><M::PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMDocumentType'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                    ## TODO: Doctype name or public ID dependent
+                  }
+                  if ($role-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
+                                (<Q::DOMCore:EntityRole>)) {
+                    $r-><M::PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMEntity'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                    ## TODO: Entity name or public ID dependent
+                  }
+                  if ($role-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
+                                (<Q::DOMCore:EntityReferenceRole>)) {
+                    $r-><M::PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMEntityReference'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                    ## TODO: Entity name or public ID dependent
+                  }
+                  if ($role-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
+                                (<Q::DOMCore:NotationRole>)) {
+                    $r-><M::PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMNotation'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                    ## TODO: Notation name or public ID dependent
+                  }
+                  if ($role-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
+                                (<Q::DOMCore:NamespaceRole>)) {
+                    $r-><M::PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMNamespace'.
                            '::CompatClass{q<' . $pack_name . '>} = 1');
                   }
                 }
@@ -4037,7 +4214,7 @@ ClsDef:
 
   @Method:
     @@Name: plIsFeatureImplemented
-    @@enDesc
+    @@enDesc:
       Returns whether a feature is implemented by this module
       or resource or not. 
       \
@@ -4195,6 +4372,21 @@ ClsDef:
           This resource does not have its name URI reference. 
       @@@PerlDef:
         $r = $self->{nameURI};
+
+  @Attr:
+    @@Name: sourceNodeID
+    @@enDesc:
+      The identifier URI reference of the source node. 
+    @@Type: ResourceURI
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          The resource is not (yet) associated with any source node.
+      @@@PerlDef:
+        $r = $self->{<Q::DIS:sourceNodeID>};
+    @@Set:
+      @@@PerlDef:
+        $self->{<Q::DIS:sourceNodeID>} = $given;
 
   @Attr:
     @@Name: localName
@@ -7223,7 +7415,116 @@ ClsDef:
             }
           }
         }__;
+
+  @Attr:
+    @@Name: mvLocalName
+    @@enDesc:
+      The local name of the markup vocabulary element defined by this
+      resource.
+    @@Type:
+      DISLang:String::ManakaiDOM:all
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          Either this resource does not define a markup vocabulary element
+          or it does define an element but it does not have a local name.
+      @@@PerlDef:
+        __DEEP{
+          if (exists $self->{<Q::mvLocalName>}) {
+            $r = $self->{<Q::mvLocalName>};
+          } elsif ($self->{src}) {
+            my $node = $self->{src}-><M::ManakaiDISElement.disGetAttribute>
+                        (<Q::dis:AppName>, 
+                         for_arg => $self->{for},
+                         forp_arg => $self->{forp},
+                         media_type => <Q::dis:TypeQName>,
+                         default_media_type => <Q::dis:TypeQName>);
+            if ($node) {
+              $r = $self->{<Q::mvLocalName>}
+                 = $node-><AG::ManakaiDISElement.qnameValueLocalName>;
+            } else {
+              $r = $self->{<Q::mvLocalName>} = null;
+            }
+          } else {
+            $r = $self->{<Q::mvLocalName>} = null;
+          }
+        }__;
+
+  @Attr:
+    @@Name: mvNamespaceURI
+    @@enDesc:
+      The namespace URI of the markup vocabulary element defined by this
+      resource.
+    @@Type: AnyURI
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          Either this resource does not define a markup vocabulary element
+          or it does define an element but it does not have a namespace URI.
+      @@@PerlDef:
+        __DEEP{
+          if (exists $self->{<Q::mvNamespaceURI>}) {
+            $r = $self->{<Q::mvNamespaceURI>};
+          } elsif ($self->{src}) {
+            my $node = $self->{src}-><M::ManakaiDISElement.disGetAttribute>
+                        (<Q::dis:AppName>, 
+                         for_arg => $self->{for},
+                         forp_arg => $self->{forp},
+                         media_type => <Q::dis:TypeQName>,
+                         default_media_type => <Q::dis:TypeQName>);
+            if ($node) {
+              $r = $self->{<Q::mvNamespaceURI>}
+                 = $node-><AG::ManakaiDISElement.qnameValueNamespaceURI>;
+            } else {
+              $r = $self->{<Q::mvNamespaceURI>} = null;
+            }
+          } else {
+            $r = $self->{<Q::mvNamespaceURI>} = null;
+          }
+        }__;
+
+  @Attr:
+    @@Name: mvOwnerElementResource
+    @@enDesc:
+      An <QUOTE::owner element> resource of the markup vocabulary
+      element defined by this resource.
+    @@Type: ManakaiDISResourceDefinition
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          Either this resource does not define a markup vocabulary element
+          or it does define an element but it does not have an owner.
+      @@@PerlDef:
+        __DEEP{
+          if (exists $self->{<Q::DIS:mvOwnerElementURI>}) {
+            $r = $self->{db}-><M::ManakaiDISDatabase.getResource>
+                                ($self->{<Q::DIS:mvOwnerElementURI>})
+              if defined $self->{<Q::DIS:mvOwnerElementURI>};
+          } elsif (defined $self->{<Q::dis2pm:parentResource>}) {
+            $r = $self->{db}-><M::ManakaiDISDatabase.getResource>
+                                ($self->{<Q::dis2pm:parentResource>});
+            undef $r unless $r-><M::ManakaiDISResourceDefinition
+                                   .isTypeURI> (<Q::s:AnyOwnerElement>);
+            $self->{<Q::DIS:mvOwnerElementURI>} = $r->{uri} if $r;
+          }
+        }__;
 ##DISResourceDefinition
+
+PropDef:
+  @QName: mvLocalName
+  @enDesc:
+    <A::ManakaiDISResourceDefinition.mvLocalName>.
+
+PropDef:
+  @QName: mvNamespaceURI
+  @enDesc:
+    <A::ManakaiDISResourceDefinition.mvNamespaceURI>.
+
+PropDef:
+  @QName: mvOwnerElementURI
+  @enDesc:
+    <A::ManakaiDISResourceDefinition.mvOwnerElementResource>
+    (<QUOTE::dis> resource URI reference).
 
 PropDef:
   @QName: plFullyQualifiedName
@@ -7666,8 +7967,7 @@ ClsDef:
                                     forp_arg => $self->{forp})) {
                 $self->{$propName}
                    = $r-><M::ManakaiDISElement.tfqnamesValueURI>
-                             ($self->{src}-><AG::swcfg21:SWCFGNode
-                                               ::swcfg21:ForLatest.nodeID>,
+                             ($self->{<Q::DIS:sourceNodeID>},
                               $self->{for});
               } else {
                 my $mt = $r-><M::ManakaiDISElement.mediaTypeURI>
@@ -7784,8 +8084,7 @@ ClsDef:
                                     for_arg => $self->{for},
                                     forp_arg => $self->{forp})) {
                 $res_uri =$res_name_node-><M::ManakaiDISElement.tfqnamesValueURI>
-                             ($self->{src}-><AG::swcfg21:SWCFGNode
-                                               ::swcfg21:ForLatest.nodeID>,
+                             ($self->{<Q::DIS:sourceNodeID>},
                               $self->{for});
               } else {
                 my $mt = $res_name_node-><M::ManakaiDISElement.mediaTypeURI>
@@ -7804,6 +8103,15 @@ ClsDef:
               push @$r, $res;
               $res-><AS::ManakaiDISResourceDefinition.isReferred>
                                                          ($res_name_node);
+              if ($isaRecursive) {
+                my $stop_rec = $res_name_node-><M::ManakaiDISElement
+                                                  .disGetAttribute>
+                                   (<Q::DISCore:stopISARecursive>,
+                                    for_arg => $self->{for},
+                                    forp_arg => $self->{forp});
+                $isaRecursive = false
+                  if $stop_rec and $stop_rec-><M::SWCFGNode.value>;
+              }
             }
           }__;
         }
