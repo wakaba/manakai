@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/05/07 13:56:36 $
+      $Date: 2005/05/08 14:18:02 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1298,6 +1298,96 @@ ClsDef:
         __CODE{tfurisToURI:: $turi => $typeURI, $furi => $forURI, $uri => $r}__;
 
   @Method:
+    @@Name: tfpqnamesToURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Converts a <TYPE::DISCore:TFPQNames>
+        into an expanded URI reference. 
+    @@Param:
+      @@@Name: tfpqnames
+      @@@Type: 
+        DISCore:TFPQNames::ManakaiDOM:all
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A <TYPE::DISCore:TFPQNames> to identify a resource. 
+    @@Param:
+      @@@Name: defaultTypeURI
+      @@@Type: NameURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A name URI reference used if it is missing from 
+          <P::tfqnames>. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Equivalent to <Q::DOMMain:any>. 
+    @@Param:
+      @@@Name: defaultForURI
+      @@@Type: ForURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A <QUOTE::for> URI reference used if it is missing from 
+          <P::tfqnames>. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Equivalent to <QUOTE::for all>, i.e. <Q::ManakaiDOM:all>. 
+    @@NodeParam:
+    @@Return:
+      @@@Type: 
+        DISCore:TFURI::ManakaiDOM:all
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The <TYPE::dis:TFQNames>-expanded URI references.  
+      @@@UndeclaredPrefixException:
+      @@@PerlDef:
+        my ($typeq, $forq, @forpq) = split /\s*[:|][:|]\s*/, $tfpqnames;
+        my ($typeURI, $forURI);
+        my $forpURI = [];
+        undef $forq if defined $forq and $forq eq '+';
+        if (defined $forq) {
+          __DEEP{
+            $typeURI = $typeq eq ''
+                       ? defined $defaultTypeURI ? $defaultTypeURI
+                                                 : <Q::DOMMain:any>
+                       : $self-><M::ManakaiDISElement.qnameToURI> ($typeq, %opt);
+            if (length $forq) {
+              $forURI = $self-><M::ManakaiDISElement.qnameToURI> ($forq, %opt);
+            } else {
+              $forURI = <Q::ManakaiDOM:all>;
+            }
+          }__;
+        } else {  ## "For" omitted
+          __DEEP{
+            $typeURI = $typeq eq ''
+                       ? defined $defaultTypeURI ? $defaultTypeURI
+                                                 : <Q::DOMMain:any>
+                       : $self-><M::ManakaiDISElement.qnameToURI> ($typeq, %opt);
+          }__;
+          $forURI = defined $defaultForURI ? $defaultForURI
+                                           : <Q::ManakaiDOM:all>;
+        }
+        __DEEP{
+          for my $forpq (@forpq) {
+            push @$forpURI, $self-><M::ManakaiDISElement.qnameToURI>
+                                                 ($forpq, %opt);
+          }
+        }__;
+        __CODE{tfpurisToURI:: $turi => $typeURI, $furi => $forURI,
+                              $forp => $forpURI,  $uri => $r}__;
+
+  @Method:
     @@Name: disGetAttribute
     @@enDesc:
       Gets an attribute node. 
@@ -1523,6 +1613,8 @@ ClsDef:
           @@@@@lang:en
           @@@@@@:
             Equivalent to <QUOTE::for all>, i.e. <Q::ManakaiDOM:all>. 
+    @@ForParam:
+    @@ForpParam:
     @@Return:
       @@@Type:ResourceURI
       @@@nullCase:
@@ -1533,8 +1625,17 @@ ClsDef:
         my $v = $self-><M::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
         if (defined $v and not ref $v eq 'ARRAY') {
           __DEEP{
-            $r = $self-><M::ManakaiDISElement.tfqnamesToURI>
-                                  ($v, $defaultTypeURI, $defaultForURI);
+            if ($self-><M::ManakaiDISElement.mediaTypeMatch>
+                                  (<Q::DISCore:TFPQNames>, <Q::dis:TFQNames>,
+                                   for_arg => $forArg, forp_arg => $forpArg)) {
+              $r = $self-><M::ManakaiDISElement.tfpqnamesToURI>
+                                  ($v, $defaultTypeURI, $defaultForURI,
+                                   node => $self);
+            } else {
+              $r = $self-><M::ManakaiDISElement.tfqnamesToURI>
+                                  ($v, $defaultTypeURI, $defaultForURI,
+                                   node => $self);
+            }
           }__;
         } else {
           $r = null;
@@ -3003,7 +3104,9 @@ ClsDef:
                                        forp_arg => $forpArg);
           if ($al_node) {
             my $canon_uri = $al_node-><M::ManakaiDISElement.tfqnamesValueURI>
-                                                           ($node_id, $forArg);
+                                                           ($node_id, $forArg,
+                                    for_arg => $self->{for},
+                                    forp_arg => $self->{forp});
             my $canon_res = $self-><M::ManakaiDISDatabase.getResource>
                                                            ($canon_uri);
             $canon_res-><AS::ManakaiDISResourceDefinition.isReferred> ($al_node);
@@ -3042,7 +3145,8 @@ ClsDef:
                                                    (<Q::dis:subsetOf>)) {
               my $sres = $self-><M::ManakaiDISDatabase.getResource>
                                   ($ce-><M::ManakaiDISElement.tfqnamesValueURI>
-                                                    ($node_id, $forArg));
+                                                    ($node_id, $forArg,
+                                    for_arg => $forArg, forp_arg => $forpArg));
               $res-><M::ManakaiDISResourceDefinition.addSuperResource> ($sres);
             } elsif ($ce-><AG::ManakaiDISElement.isResourceElement>) {
               push @cres, $ce;
@@ -3964,7 +4068,9 @@ ClsDef:
                                           ::swcfg21:ForLatest
                                .expandedURI> eq <Q::DOMMetaImpl:providedThrough>;
                       my $curi = $ec-><M::ManakaiDISElement.tfqnamesValueURI>
-                                  ($self->{<Q::DIS:sourceNodeID>}, $self->{for});
+                                  ($self->{<Q::DIS:sourceNodeID>}, $self->{for},
+                                   for_arg => $self->{for},
+                                   forp_arg => $self->{forp});
                       my $c = $self->{db}-><M::ManakaiDISDatabase.getResource>
                                                                     ($curi);
                       $c-><AS::ManakaiDISResourceDefinition.isReferred> ($ec);
@@ -3992,6 +4098,34 @@ ClsDef:
                     }
                   }
                 }
+
+                my %ifeature;
+                my $ifpoint = 0;
+                for my $feature (@{$cls-><M::ManakaiDISPropertyAccessor
+                          .getPropertyResourceList>
+                             (<Q::DOMMain:implementFeature>,
+                              isa_recursive => true,
+                              default_media_type => <Q::dis:TypeQName>)}) {
+                  my $fver = $feature-><M::ManakaiDISPropertyAccessor
+                                        .getPropertyText>
+                                        (<Q::dis:Version>, null);
+                  $ifpoint += $fver;
+                  my $fi = defined $fver
+                         ? $self-><M::ManakaiDISPerlModuleDefinition
+                                     .plIsFeatureImplemented>
+                                           ($feature->{uri}) ? true : false
+                         : true;
+                  for my $fname (@{$feature-><AG::ManakaiDISResourceDefinition
+                                                 .featureNameList>}) {
+                    $ifeature{$fname}->{$fver} = $fi;
+                  }                  
+                }
+                $r-><M::PLBlockCon.appendStatement>
+                        ('$Message::DOM::ClassFeature{q<' . $pack_name .
+                         '>} = ' . <ClassM::MPLImpl.perlLiteral> (\%ifeature));
+                $r-><M::PLBlockCon.appendStatement>
+                        ('$Message::DOM::ClassPoint{q<' . $pack_name .
+                         '>} = ' . $ifpoint);
 
                 ## -- Roles
                 for my $role (@{$cls-><M::ManakaiDISPropertyAccessor
@@ -5014,7 +5148,8 @@ ClsDef:
               $r = $self->{<Q::dis:Type>}
                  = $self->{<Q::dis2pm:TypeNode>}
                           -><M::ManakaiDISElement.tfqnamesValueURI>
-                                  (null, $self->{for});
+                                  (null, $self->{for}, for_arg => $self->{for},
+                                   forp_arg => $self->{forp});
               $r = $self->{db}-><M::ManakaiDISDatabase.getResource> ($r);
               $r-><AS::ManakaiDISResourceDefinition.isReferred>
                                  ($self->{<Q::dis2pm:TypeNode>});
@@ -5081,7 +5216,8 @@ ClsDef:
               $r = $self->{<Q::dis:actualType>}
                  = $self->{<Q::dis2pm:actualTypeNode>}
                         -><M::ManakaiDISElement.tfqnamesValueURI>
-                                  (null, $self->{for});
+                                  (null, $self->{for}, for_arg => $self->{for},
+                                   forp_arg => $self->{forp});
               $r = $self->{db}-><M::ManakaiDISDatabase.getResource> ($r);
               $r-><AS::ManakaiDISResourceDefinition.isReferred>
                                  ($self->{<Q::dis2pm:actualTypeNode>});
@@ -5101,7 +5237,8 @@ ClsDef:
                    = $self->{<Q::dis:Type>}
                    = $self->{<Q::dis2pm:TypeNode>}
                           -><M::ManakaiDISElement.tfqnamesValueURI>
-                                  (null, $self->{for});
+                                  (null, $self->{for}, for_arg => $self->{for},
+                                   forp_arg => $self->{forp});
                 $r = $self->{db}-><M::ManakaiDISDatabase.getResource> ($r);
                 $r-><AS::ManakaiDISResourceDefinition.isReferred>
                                  ($self->{<Q::dis2pm:actualTypeNode>});
@@ -6535,7 +6672,7 @@ ClsDef:
                                 -><M::ManakaiDISElement.tfqnamesToURI>
                                        ($class_qname,
                                         $self-><AG::ManakaiDISResourceDefinition
-                                                     .ownerClassURI>,
+                                                     .ownerClassNodeURI>,
                                         $self->{for},
                                         node => $node);
                   my $class = $self->{db}-><M::ManakaiDISDatabase.getResource>
@@ -6583,6 +6720,7 @@ ClsDef:
                     __UNDEEP{
                       __EXCEPTION{RESOURCE_NOT_DEFINED_ERR::
                         DIS:localName => {$method_qname},
+                        DIS:parentURI => {$class_uri},
                         DIS:elementType => {$et},
                         DIS:sourceNode => {$node || $self->{src}},
                         DIS:sourceCode => {$source_code},
@@ -6613,7 +6751,7 @@ ClsDef:
                                 -><M::ManakaiDISElement.tfqnamesToURI>
                                        ($source_code,
                                         $self-><AG::ManakaiDISResourceDefinition
-                                                     .ownerClassURI>,
+                                                     .ownerClassNodeURI>,
                                         $self->{for},
                                         node => $node);
                   my $class = $self->{db}-><M::ManakaiDISDatabase.getResource>
@@ -6706,7 +6844,7 @@ ClsDef:
                                 -><M::ManakaiDISElement.tfqnamesToURI>
                                        ($class_qname,
                                         $self-><AG::ManakaiDISResourceDefinition
-                                                     .ownerClassURI>,
+                                                     .ownerClassNodeURI>,
                                         $self->{for},
                                         node => $node);
                   my $class = $self->{db}-><M::ManakaiDISDatabase.getResource>
@@ -6758,10 +6896,13 @@ ClsDef:
                 }__}__;
               }
             } else {
-              for my $source_code (split /\b( t r u e \b|
-                                              f a l s e \b|
-                                              n u l l \b|
-                                              t r y \s* \{)/x, $source_code) {
+              for my $source_code (split /(\b
+                                            (?: t r u e \b|
+                                                f a l s e \b|
+                                                n u l l \b|
+                                                t r y \s* \x7B ) |
+        \                                   \\ p \x7B [^\x7B\x7D\\]+ \x7D)/x,
+                                   $source_code) {
                 if ({
                   'tr'.'ue' => true,
                   'fal'.'se' => true,
@@ -6777,6 +6918,21 @@ ClsDef:
                        'y '."\x7B".'local $Error::Depth = $Error::Depth + 3;');
                   $r-><M::MPLCodeFragment.addUsePerlModuleName>
                                                     ('Message::Util::Error');
+                } elsif ($source_code =~ /^\\ p \x7B ([^\x7B\x7D\\]+) \x7D$/x) {
+                  my $cls = $1;
+                  $cls =~ s/^\s+//s;
+                  $cls =~ s/\s+$//s;
+                  ## TODO: Formal character class support required
+                  if ($cls =~ /^inxml\s*[:|]\s*(\w+)/) {
+                    $r-><M::PLAnyCon.appendAtom> ('\\'.'p{InXML'.$1.'}');
+                    $r-><M::MPLCodeFragment.addUseCharClassName>
+                                        ('Char::Class::XML', 'InXML'.$1);
+                  } else {
+                    __UNDEEP{__EXCEPTION{RESOURCE_NOT_DEFINED_ERR::
+                      DIS:sourceNode => {$node},
+                      DIS:sourceCode => {$source_code},
+                    }__}__;
+                  }
                 } else {
                   if ($source_code =~ s/^(\s*[\w:]+\s*)//) {
                     ## NOTE: "$cond ?\n1\n:0" would be a syntax error
@@ -6790,9 +6946,9 @@ ClsDef:
         }__; # DEEP
 
   @Attr:
-    @@Name: ownerClassURI
+    @@Name: ownerClassNodeURI
     @@enDesc:
-      The URI reference of the class resource this resource
+      The node URI reference of the class resource this resource
       belongs to.
     @@Type: ResourceURI
     @@Get:
@@ -6809,14 +6965,14 @@ ClsDef:
         } else {
           my $res = $self;
           __DEEP{
-            {
+            RES: {
               if ($res-><M::ManakaiDISResourceDefinition.isTypeURI>
                              (<Q::ManakaiDOM:Class>)) {
-                $r = $res->{uri};
+                $r = $res-><AG::ManakaiDISResourceDefinition.sourceNodeID>;
               } else {
                 $res = $res-><M::ManakaiDISPropertyAccessor
                               .getPropertyResource> (<Q::dis2pm:parentResource>);
-                redo if $res;
+                redo RES if $res;
               }
             }
           }__;
@@ -7968,7 +8124,9 @@ ClsDef:
                 $self->{$propName}
                    = $r-><M::ManakaiDISElement.tfqnamesValueURI>
                              ($self->{<Q::DIS:sourceNodeID>},
-                              $self->{for});
+                              $self->{for},
+                                    for_arg => $self->{for},
+                                    forp_arg => $self->{forp});
               } else {
                 my $mt = $r-><M::ManakaiDISElement.mediaTypeURI>
                                    (for_arg => $self->{for},
@@ -8085,7 +8243,18 @@ ClsDef:
                                     forp_arg => $self->{forp})) {
                 $res_uri =$res_name_node-><M::ManakaiDISElement.tfqnamesValueURI>
                              ($self->{<Q::DIS:sourceNodeID>},
-                              $self->{for});
+                              $self->{for},
+                                    for_arg => $self->{for},
+                                    forp_arg => $self->{forp});
+              } elsif ($res_name_node-><M::ManakaiDISElement.mediaTypeMatch>
+                                   (<Q::DISCore:TFPQNames>, $defaultMediaType,
+                                    for_arg => $self->{for},
+                                    forp_arg => $self->{forp})) {
+                $res_uri=$res_name_node-><M::ManakaiDISElement.tfqnamesValueURI>
+                             ($self->{<Q::DIS:sourceNodeID>},
+                              $self->{for},
+                                    for_arg => $self->{for},
+                                    forp_arg => $self->{forp});
               } else {
                 my $mt = $res_name_node-><M::ManakaiDISElement.mediaTypeURI>
                                    (for_arg => $self->{for},
@@ -8140,8 +8309,8 @@ ClsDef:
               $opt{___recursive_isa_done}->{$p_res->{uri}} = true;
               push @$r, @{$p_res-><M::ManakaiDISPropertyAccessor
                                      .getPropertyResourceList>
-                                          (<Q::dis:ISA>, recursive_isa => true,
-                                           recursive => $recursive,
+                                          (<Q::dis:ISA>, 
+                                           recursive => true,
                          ___recursive_isa_done => $opt{___recursive_isa_done},
                          default_media_type => $defaultMediaType)};
             }

@@ -46,7 +46,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/07 13:56:36 $
+      $Date: 2005/05/08 14:18:01 $
     @@ContentType:
       dis:Date.RCS
 
@@ -114,32 +114,38 @@ ElementTypeBinding:
       ManakaiDOM:DOM
     @@ISA:
       @@@@:
-        ::ManakaiDOM:ManakaiDOM3
+        ::ManakaiDOM:ManakaiDOM3||ManakaiDOM:ForIF
       @@@ForCheck:
         ManakaiDOM:ForIF
       @@@For:
         ManakaiDOM:ManakaiDOMLatest
+      @@@ContentType: DISCore|TFPQNames
     @@ISA:
       @@@@:
-        ::ManakaiDOM:ManakaiDOM2
+        ::ManakaiDOM:ManakaiDOM2||ManakaiDOM:ForIF
       @@@ForCheck:
         ManakaiDOM:ForIF
       @@@For:
         ManakaiDOM:ManakaiDOM3
+      @@@ContentType: DISCore|TFPQNames
     @@ISA:
       @@@@:
-        ::ManakaiDOM:ManakaiDOM1
+        ::ManakaiDOM:ManakaiDOM1||ManakaiDOM:ForIF
       @@@ForCheck:
         ManakaiDOM:ForIF
       @@@For:
         ManakaiDOM:ManakaiDOM2
+      @@@ContentType: DISCore|TFPQNames
     @@ISA:
       @@@@:
-        ::ManakaiDOM:ManakaiDOM
+        ::ManakaiDOM:ManakaiDOM||ManakaiDOM:ForIF
       @@@ForCheck:
-        ManakaiDOM:ForIF
-      @@@For:
-        ManakaiDOM:ManakaiDOM1
+        ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM1
+      @@@ContentType: DISCore|TFPQNames
+    @@Implement:
+      @@@@: ||+||ManakaiDOM|ForIF
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
+      @@@ContentType: DISCore|TFPQNames
 
 ElementTypeBinding:
   @Name: ClassDef

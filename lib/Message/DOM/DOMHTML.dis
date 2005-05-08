@@ -44,7 +44,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/07 13:56:36 $
+      $Date: 2005/05/08 14:18:01 $
     @@ContentType:
       dis:Date.RCS
 
@@ -486,18 +486,12 @@ ElementTypeBinding:
       @@@@: HTMLFeature20
       @@@For:
         ManakaiDOM:DOM2
-    @@ISA:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOM1
-      @@@ForCheck:
-        ManakaiDOM:ForIF
-      @@@For:
-        ManakaiDOM:ManakaiDOM2
     @@For:
       ManakaiDOM:DOM1
     @@For:
       =ManakaiDOM:ManakaiDOM
     @@For: ForHTML
+## NOTE: A Level 2 interface is not always upward-compatible with Level 1 i.f.
 
 ElementTypeBinding:
   @Name: L2
@@ -507,6 +501,15 @@ ElementTypeBinding:
     @@@: HTMLFeature20
     @@For:
       ManakaiDOM:DOM2
+
+ElementTypeBinding:
+  @Name: L2ISAL1
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@@: ||ManakaiDOM|ManakaiDOM1||ManakaiDOM|ForIF
+    @@ForCheck: ManakaiDOM|ForIF ManakaiDOM|ManakaiDOM
+    @@ContentType: DISCore|TFPQNames
 
 ElementTypeBinding:
   @Name: L2IF
@@ -572,9 +575,14 @@ ElementTypeBinding:
         ManakaiDOM:ForClass
     @@ISA:
       @@@@:
-        ::ManakaiDOM:ManakaiDOM
+        ::ManakaiDOM:ManakaiDOM||ManakaiDOM:ForIF
       @@@ForCheck:
         ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM1
+      @@@ContentType: DISCore|TFPQNames
+    @@Implement:
+      @@@@: ||+||ManakaiDOM|ForIF
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
+      @@@ContentType: DISCore|TFPQNames
 
 ElementTypeBinding:
   @Name: ET
@@ -624,9 +632,15 @@ ElementTypeBinding:
         ManakaiDOM:ForClass
     @@ISA:
       @@@@:
-        ::ManakaiDOM:ManakaiDOM
+        ::ManakaiDOM:ManakaiDOM||ManakaiDOM:ForIF
       @@@ForCheck:
         ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM1
+      @@@ContentType: DISCore|TFPQNames
+    @@Implement:
+      @@@@: ||+||ManakaiDOM|ForIF
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
+      @@@ContentType: DISCore|TFPQNames
+
     @@DISMarkup:elementType:
       @@@@:
         ::ForHTML40SE
@@ -1122,7 +1136,7 @@ IF:
         @@@@@:
           A newly created HTML document.
       @@@PerlDef:
-          my $node = $r-><M::DOMCore:ManakaiDOMDocument.newObject>;
+          my $node = <ClassM::DOMCore:ManakaiDOMDocument.newObject>;
           $node->{<Q::DOMCore:implementation>} = $self;
           $node->{<Q::ManakaiDOM:implID>}
                 = $self->{<Q::TreeCore:node>}->{<Q::ManakaiDOM:implID>};
@@ -1180,7 +1194,7 @@ IF:
           A newly created HTML document.
       @@@PerlDef:
         __DEEP{
-          my $node = $r-><M::DOMCore:ManakaiDOMDocument.newObject>;
+          my $node = <ClassM::DOMCore:ManakaiDOMDocument.newObject>;
           $node->{<Q::DOMCore:implementation>} = $self;
           $node->{<Q::ManakaiDOM:implID>}
                 = $self->{<Q::TreeCore:node>}->{<Q::ManakaiDOM:implID>};
@@ -1565,8 +1579,9 @@ IF:
                                            $elementType = 'body'> or
                     <Code::isHTMLElement:: $elementNode = $child,
                                            $elementType = 'frameset'>) {
-                $body = $child;
-                last;
+                  $body = $child;
+                  last;
+                }
               }
             }
             if ($body) {
@@ -3132,30 +3147,106 @@ IF:
       s:ElementType
     @@For:ForHTML
   
-  @QName:
+  @ETQName:
     @@@:
       xhtml1:h1
     @@ForCheck: ForH1
-  @QName:
+  @ETQName:
     @@@:
       xhtml1:h2
     @@ForCheck: ForH2
-  @QName:
+  @ETQName:
     @@@:
       xhtml1:h3
     @@ForCheck: ForH3
-  @QName:
+  @ETQName:
     @@@:
       xhtml1:h4
     @@ForCheck: ForH4
-  @QName:
+  @ETQName:
     @@@:
       xhtml1:h5
     @@ForCheck: ForH5
-  @QName:
+  @ETQName:
     @@@:
       xhtml1:h6
     @@ForCheck: ForH6
+  
+  @s:elementType:
+    @@@: ||ForHTML40SE||ForH1
+    @@ForCheck: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQName
+    @@DISCore:stopISARecursive:1
+  @s:elementType:
+    @@@: ||ForHTML401||ForH1
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+    @@DISCore:stopISARecursive:1
+  @s:elementType:
+    @@@: ||ForXHTML10SE||ForH1
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+    @@DISCore:stopISARecursive:1
+  @s:elementType:
+    @@@: ||ForHTML40SE||ForH2
+    @@ForCheck: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @s:elementType:
+    @@@: ||ForHTML401||ForH2
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @s:elementType:
+    @@@: ||ForXHTML10SE||ForH2
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @s:elementType:
+    @@@: ||ForHTML40SE||ForH3
+    @@ForCheck: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @s:elementType:
+    @@@: ||ForHTML401||ForH3
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @s:elementType:
+    @@@: ||ForXHTML10SE||ForH3
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @s:elementType:
+    @@@: ||ForHTML40SE||ForH4
+    @@ForCheck: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @s:elementType:
+    @@@: ||ForHTML401||ForH4
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @s:elementType:
+    @@@: ||ForXHTML10SE||ForH4
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @s:elementType:
+    @@@: ||ForHTML40SE||ForH5
+    @@ForCheck: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @s:elementType:
+    @@@: ||ForHTML401||ForH5
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @s:elementType:
+    @@@: ||ForXHTML10SE||ForH5
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @s:elementType:
+    @@@: ||ForHTML40SE||ForH6
+    @@ForCheck: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @s:elementType:
+    @@@: ||ForHTML401||ForH6
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @s:elementType:
+    @@@: ||ForXHTML10SE||ForH6
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
 
   @IFQName:  HTMLHeadingElement
   @ClsQName: ManakaiDOMHTMLHeadingElement
@@ -3186,8 +3277,6 @@ ElementTypeBinding:
 IFDef:
   @Name:HTMLBlockquoteElement
   @ISA:HTMLElement
-  @s:elementType:
-    xhtml1:blockquote::ForHTML40SE
   @Description:
     @@lang:en
     @@@:
@@ -3247,12 +3336,48 @@ IF:
   @ISAHTMLElement:
   @L1IF:
 
+  @s:elementType:
+    @@@: ||ForHTML40SE||ForBlockquote
+    @@ForCheck: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+    @@DISCore:stopISARecursive:1
+  @s:elementType:
+    @@@: ||ForHTML401||ForBlockquote
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+    @@DISCore:stopISARecursive:1
+  @s:elementType:
+    @@@: ||ForXHTML10SE||ForBlockquote
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+    @@DISCore:stopISARecursive:1
+
+  @s:elementType:
+    @@@: ||ForHTML40SE||ForQ
+    @@ForCheck: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @s:elementType:
+    @@@: ||ForHTML401||ForQ
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @s:elementType:
+    @@@: ||ForXHTML10SE||ForQ
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+
   @ATTR:
      @@Name:  cite
      @@Get:
         @@@Type:  DOMString
      @@Set:
         @@@Type:  DOMString
+
+ElementTypeBinding:
+  @Name: elementType
+  @ElementType:
+    s:elementType
+  @ShadowContent:
+    @@DISCore:stopISARecursive:1
 
 ET:
   @ETQName:
@@ -3464,6 +3589,32 @@ IF:
     @@@:
       xhtml1:del
     @@ForCheck:ForDel
+
+  @elementType:
+    @@@: ||ForHTML40SE||ForIns
+    @@ForCheck: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @elementType:
+    @@@: ||ForHTML401||ForIns
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @elementType:
+    @@@: ||ForXHTML10SE||ForIns
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+
+  @elementType:
+    @@@: ||ForHTML40SE||ForDel
+    @@ForCheck: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @elementType:
+    @@@: ||ForHTML401||ForDel
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @elementType:
+    @@@: ||ForXHTML10SE||ForDel
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
 
   @IFQName:  HTMLModElement
   @ClsQName:ManakaiDOMHTMLModElement
@@ -4826,6 +4977,47 @@ IF:
       xhtml1:tfoot
     @@ForCheck:ForTfoot
 
+  @elementType:
+    @@@: ||ForHTML40SE||ForTfoot
+    @@ForCheck: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @elementType:
+    @@@: ||ForHTML401||ForTfoot
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @elementType:
+    @@@: ||ForXHTML10SE||ForTfoot
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+
+
+  @elementType:
+    @@@: ||ForHTML40SE||ForTbody
+    @@ForCheck: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @elementType:
+    @@@: ||ForHTML401||ForTbody
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @elementType:
+    @@@: ||ForXHTML10SE||ForTbody
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+
+
+  @elementType:
+    @@@: ||ForHTML40SE||ForThead
+    @@ForCheck: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @elementType:
+    @@@: ||ForHTML401||ForThead
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @elementType:
+    @@@: ||ForXHTML10SE||ForThead
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+
   @IFQName:  HTMLTableSectionElement
   @ClsQName:ManakaiDOMHTMLTableSectionElement
   @ISAHTMLElement:
@@ -5225,6 +5417,32 @@ IF:
     @@@:
       xhtml1:th
     @@ForCheck:ForTh
+
+  @elementType:
+    @@@: ||ForHTML40SE||ForTh
+    @@ForCheck: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @elementType:
+    @@@: ||ForHTML401||ForTh
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @elementType:
+    @@@: ||ForXHTML10SE||ForTh
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+
+  @elementType:
+    @@@: ||ForHTML40SE||ForTd
+    @@ForCheck: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @elementType:
+    @@@: ||ForHTML401||ForTd
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+  @elementType:
+    @@@: ||ForXHTML10SE||ForTd
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
 
   @IFQName:  HTMLTableCellElement
   @ClsQName:ManakaiDOMHTMLTableCellElement

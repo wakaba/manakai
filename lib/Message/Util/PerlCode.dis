@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/05/05 12:30:03 $
+      $Date: 2005/05/08 14:18:02 $
     @@ContentType:
       dis:Date.RCS
   
@@ -329,6 +329,28 @@ ClsDef:
              ->{$moduleName} = true;
 
   @Method:
+    @@Name: addUseCharClassName
+    @@enDesc:
+      Adds a Perl module into the list of Perl character classes 
+      <Perl::use>d by this code fragment.
+    @@Param:
+      @@@Name: moduleName
+      @@@Type:
+        Perl:package-name::ManakaiDOM:all
+      @@@enDesc:
+        The name of the module package that should be <Perl::use>d.
+    @@Param:
+      @@@Name: charClassName
+      @@@Type:
+        lang:Perl::ManakaiDOM:all
+      @@@enDesc:
+        The name of the character class.
+    @@Return:
+      @@@PerlDef:
+        $self->{<Q::TreeCore:node>}->{<Q::pc:useCharClassName>}
+             ->{$moduleName}->{$charClassName} = true;
+
+  @Method:
     @@Name: addRequirePerlModuleName
     @@enDesc:
       Adds a Perl module into the list of Perl modules 
@@ -374,6 +396,39 @@ ClsDef:
           }
         }
         $r = [grep {$list->{$_}} keys %$list];
+
+  @Method:
+    @@Name: getUseCharClassNameList
+    @@enDesc:
+      Returns a list of Perl character class names that is <Perl::use>d
+      by this code fragment, including all descendant nodes. 
+    @@Return:
+      @@@Type:
+        Perl:hash::ManakaiDOM:all
+      @@@enDesc:
+        A list of module names.  Note that the list is <EM::dead>; 
+        any modification to it does not affect to the code fragment
+        and vice versa.
+      @@@PerlDef:
+        my @node = ($self->{<Q::TreeCore:node>});
+        while (my $node = shift @node) {
+          next unless ref $node;
+          for my $mname (keys %{$node->{<Q::pc:useCharClassName>} || {}}) {
+            for my $cname (keys %{$node->{<Q::pc:useCharClassName>}
+                                       ->{$mname}}) {
+              $r->{$mname}->{$cname}
+                  ||= $node->{<Q::pc:useCharClassName>}->{$mname}->{$cname};
+            }
+          }
+          push @node, $node->{$_} for @{$node->{<Q::TreeCore:subnode0>}};
+          my @n;
+          for my $nn (map {$node->{$_}} @{$node->{<Q::TreeCore:subnode2>}}) {
+            push @n, (ref $nn eq 'ARRAY' ? @$nn : values %{$nn || {}});
+          }
+          for my $n ((map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}), @n) {
+            push @node, (ref $n eq 'ARRAY' ? @$n : values %{$n || {}});
+          }
+        }
 
   @Method:
     @@Name: getRequirePerlModuleNameList
@@ -456,6 +511,11 @@ ClsDef:
 
 PropDef:
   @QName: useModuleName
+  @enDesc:
+    The list of modules. 
+
+PropDef:
+  @QName: useCharClassName
   @enDesc:
     The list of modules. 
 
@@ -552,7 +612,8 @@ ClsDef:
             Properties: <Q::pc:sourceFile>,
                <Q::pc:sourceModule>, <Q::pc:sourceFor>, <Q::childNodes>, 
                <Q::pc:currentPackage>, <Q::pc:currentChunk>,
-               <Q::pc:nodeType>, <Q::pc:useModuleName>, 
+               <Q::pc:nodeType>, <Q::pc:useModuleName>,
+               <Q::pc:useCharClassName>, 
                <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
   @Method:
@@ -954,7 +1015,8 @@ ClsDef:
           @@@@@@:
             Properties: <Q::pc:sub>, <Q::dis2pm:operator>,
               <Q::dis:ISA>, <Q::dis:Implement>,
-              <Q::pc:nodeType>, <Q::pc:useModuleName>, 
+              <Q::pc:nodeType>, <Q::pc:useModuleName>,
+              <Q::pc:useCharClassName>,  
               <Q::pc:requireResourceURI>, <Q::pc:childNodes>,
               <Q::pc:export>, <Q::pc:requireModuleName>.
 
@@ -1330,6 +1392,13 @@ ClsDef:
         my $use = $self-><M::ManakaiPerlCodeFragment.getUsePerlModuleNameList>;
         for my $pack (@$use) {
           $r .= 'use ' . $pack . ";\n";
+        }
+
+        my $cls = $self-><M::ManakaiPerlCodeFragment.getUseCharClassNameList>;
+        for my $pack (keys %$cls) {
+          $r .= 'use ' . $pack . ' ' .
+                <ClassM::ManakaiPerlCodeImplementation.perlList>
+                   ([grep {$cls->{$pack}->{$_}} keys %{$cls->{$pack}}]) . ";\n";
         }
 
         ## Package-scope objects
@@ -1817,7 +1886,7 @@ ClsDef:
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
-            Optional properties: <Q::pc:localName>,
+            Optional properties: <Q::pc:localName>, <Q::pc:useCharClassName>, 
                <Q::pc:sourceFile>, <Q::pc:sourceLine>,
                <Q::pc:nodeType>, <Q::pc:useModuleName>, 
                <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
@@ -1839,6 +1908,9 @@ ClsDef:
              = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
           $node->{<Q::pc:useModuleName>}
              = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
+          $node->{<Q::pc:useCharClassName>}
+             = {map {$_ => {%{$nodeObject->{<Q::pc:useCharClassName>}->{$_}}}}
+                keys %{$nodeObject->{<Q::pc:useCharClassName>} || {}}};
           $node->{<Q::pc:requireModuleName>}
              = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
           $node->{<Q::pc:childNodes>} = [];
@@ -1975,7 +2047,7 @@ ClsDef:
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:code>,
                         <Q::pc:sourceFile>, <Q::pc:sourceLine>,
-               <Q::pc:useModuleName>, 
+               <Q::pc:useModuleName>, <Q::pc:useCharClassName>,  
                <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
   @IntCloneMethod:
@@ -1994,6 +2066,9 @@ ClsDef:
              = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
           $node->{<Q::pc:useModuleName>}
              = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
+          $node->{<Q::pc:useCharClassName>}
+             = {map {$_ => {%{$nodeObject->{<Q::pc:useCharClassName>}->{$_}}}}
+                keys %{$nodeObject->{<Q::pc:useCharClassName>} || {}}};
           $node->{<Q::pc:requireModuleName>}
              = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
 
@@ -2096,6 +2171,7 @@ ClsDef:
           @@@@@lang:en
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:code>, <Q::pc:useModuleName>, 
+               <Q::pc:useCharClassName>, 
                <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
   @IntCloneMethod:
@@ -2114,6 +2190,9 @@ ClsDef:
              = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
           $node->{<Q::pc:useModuleName>}
              = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
+          $node->{<Q::pc:useCharClassName>}
+             = {map {$_ => {%{$nodeObject->{<Q::pc:useCharClassName>}->{$_}}}}
+                keys %{$nodeObject->{<Q::pc:useCharClassName>} || {}}};
           $node->{<Q::pc:requireModuleName>}
              = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
 
@@ -2172,7 +2251,7 @@ ClsDef:
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
-            Properties: <Q::pc:nodeType>,
+            Properties: <Q::pc:nodeType>, <Q::pc:useCharClassName>, 
                <Q::infoset:data>, <Q::pc:useModuleName>, 
                <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
@@ -2192,6 +2271,9 @@ ClsDef:
              = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
           $node->{<Q::pc:useModuleName>}
              = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
+          $node->{<Q::pc:useCharClassName>}
+             = {map {$_ => {%{$nodeObject->{<Q::pc:useCharClassName>}->{$_}}}}
+                keys %{$nodeObject->{<Q::pc:useCharClassName>} || {}}};
           $node->{<Q::pc:requireModuleName>}
              = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
 
@@ -2269,6 +2351,7 @@ ClsDef:
           @@@@@lang:en
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:code>, <Q::pc:useModuleName>, 
+               <Q::pc:useCharClassName>, 
                <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
   @IntCloneMethod:
@@ -2287,6 +2370,9 @@ ClsDef:
              = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
           $node->{<Q::pc:useModuleName>}
              = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
+          $node->{<Q::pc:useCharClassName>}
+             = {map {$_ => {%{$nodeObject->{<Q::pc:useCharClassName>}->{$_}}}}
+                keys %{$nodeObject->{<Q::pc:useCharClassName>} || {}}};
           $node->{<Q::pc:requireModuleName>}
              = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
 
@@ -2346,6 +2432,7 @@ ClsDef:
           @@@@@lang:en
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:code>, <Q::pc:useModuleName>, 
+               <Q::pc:useCharClassName>, 
                <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
   @IntCloneMethod:
@@ -2364,6 +2451,9 @@ ClsDef:
              = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
           $node->{<Q::pc:useModuleName>}
              = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
+          $node->{<Q::pc:useCharClassName>}
+             = {map {$_ => {%{$nodeObject->{<Q::pc:useCharClassName>}->{$_}}}}
+                keys %{$nodeObject->{<Q::pc:useCharClassName>} || {}}};
           $node->{<Q::pc:requireModuleName>}
              = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
 
@@ -2425,6 +2515,7 @@ ClsDef:
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:variableType>,
               <Q::packageName>, <Q::localName> (required),
+              <Q::pc:useCharClassName>, 
               <Q::variableScope>, <Q::hashKey>, <Q::pc:useModuleName>, 
                <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
@@ -2445,6 +2536,9 @@ ClsDef:
              = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
           $node->{<Q::pc:useModuleName>}
              = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
+          $node->{<Q::pc:useCharClassName>}
+             = {map {$_ => {%{$nodeObject->{<Q::pc:useCharClassName>}->{$_}}}}
+                keys %{$nodeObject->{<Q::pc:useCharClassName>} || {}}};
           $node->{<Q::pc:requireModuleName>}
              = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
 
@@ -2772,7 +2866,7 @@ ClsDef:
           @@@@@lang:en
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:childNodes>,
-               <Q::pc:parent>, <Q::pc:useModuleName>, 
+               <Q::pc:parent>, <Q::pc:useModuleName>, <Q::pc:useCharClassName>,  
                <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
   @IntCloneMethod:
@@ -2801,6 +2895,9 @@ ClsDef:
              = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
           $node->{<Q::pc:useModuleName>}
              = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
+          $node->{<Q::pc:useCharClassName>}
+             = {map {$_ => {%{$nodeObject->{<Q::pc:useCharClassName>}->{$_}}}}
+                keys %{$nodeObject->{<Q::pc:useCharClassName>} || {}}};
           $node->{<Q::pc:requireModuleName>}
              = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
 
@@ -2848,7 +2945,7 @@ ClsDef:
           @@@@@lang:en
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:childNodes>,
-                  <Q::pc:parent>, <Q::pc:useModuleName>, 
+               <Q::pc:parent>, <Q::pc:useModuleName>, <Q::pc:useCharClassName>,  
                <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
   @IntCloneMethod:
@@ -2877,6 +2974,9 @@ ClsDef:
              = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
           $node->{<Q::pc:useModuleName>}
              = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
+          $node->{<Q::pc:useCharClassName>}
+             = {map {$_ => {%{$nodeObject->{<Q::pc:useCharClassName>}->{$_}}}}
+                keys %{$nodeObject->{<Q::pc:useCharClassName>} || {}}};
           $node->{<Q::pc:requireModuleName>}
              = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
 
@@ -3004,7 +3104,7 @@ ClsDef:
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:childNodes>, <Q::pc:label>,
                 <Q::pc:parent>, <Q::pc:sourceFile>, <Q::pc:sourceLine>,
-                <Q::pc:currentSoruceFile>,
+                <Q::pc:currentSoruceFile>, <Q::pc:useCharClassName>, 
                 <Q::pc:currentSourceLine>, <Q::pc:useModuleName>, 
                 <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
@@ -3038,6 +3138,9 @@ ClsDef:
              = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
           $node->{<Q::pc:useModuleName>}
              = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
+          $node->{<Q::pc:useCharClassName>}
+             = {map {$_ => {%{$nodeObject->{<Q::pc:useCharClassName>}->{$_}}}}
+                keys %{$nodeObject->{<Q::pc:useCharClassName>} || {}}};
           $node->{<Q::pc:requireModuleName>}
              = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
 
@@ -3119,7 +3222,7 @@ ClsDef:
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:childNodes>,
                 <Q::pc:parent>, <Q::pc:sourceFile>, <Q::pc:sourceLine>,
-                <Q::pc:currentSourceFile>,
+                <Q::pc:currentSourceFile>, <Q::pc:useCharClassName>, 
                 <Q::pc:currentSourceLine>, <Q::pc:useModuleName>, 
                 <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
@@ -3153,6 +3256,9 @@ ClsDef:
              = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
           $node->{<Q::pc:useModuleName>}
              = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
+          $node->{<Q::pc:useCharClassName>}
+             = {map {$_ => {%{$nodeObject->{<Q::pc:useCharClassName>}->{$_}}}}
+                keys %{$nodeObject->{<Q::pc:useCharClassName>} || {}}};
           $node->{<Q::pc:requireModuleName>}
              = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
 
@@ -3232,7 +3338,7 @@ ClsDef:
           @@@@@lang:en
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:left>, <Q::pc:right>,
-                <Q::pc:parent>, <Q::pc:useModuleName>, 
+                <Q::pc:parent>, <Q::pc:useModuleName>, <Q::pc:useCharClassName>, 
                <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
   @IntCloneMethod:
@@ -3261,6 +3367,9 @@ ClsDef:
              = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
           $node->{<Q::pc:useModuleName>}
              = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
+          $node->{<Q::pc:useCharClassName>}
+             = {map {$_ => {%{$nodeObject->{<Q::pc:useCharClassName>}->{$_}}}}
+                keys %{$nodeObject->{<Q::pc:useCharClassName>} || {}}};
           $node->{<Q::pc:requireModuleName>}
              = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
 
@@ -3311,6 +3420,7 @@ ClsDef:
           @@@@@lang:en
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:true>, <Q::pc:false>,
+               <Q::pc:useCharClassName>, 
                 <Q::pc:parent>, <Q::pc:condition>, <Q::pc:useModuleName>, 
                <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
@@ -3342,6 +3452,9 @@ ClsDef:
              = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
           $node->{<Q::pc:useModuleName>}
              = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
+          $node->{<Q::pc:useCharClassName>}
+             = {map {$_ => {%{$nodeObject->{<Q::pc:useCharClassName>}->{$_}}}}
+                keys %{$nodeObject->{<Q::pc:useCharClassName>} || {}}};
           $node->{<Q::pc:requireModuleName>}
              = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
 

@@ -30,7 +30,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/04 13:49:27 $
+      $Date: 2005/05/08 14:18:01 $
     @@ContentType:
       dis:Date.RCS
   
@@ -491,6 +491,13 @@ ResourceDef:
       Perl:package-name
   @AppName:
     @@@:
+      Message::DOM::IFLevel1::DOMImplementation
+    @@ForCheck:
+      ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM1
+    @@ContentType:
+      Perl:package-name
+  @AppName:
+    @@@:
       Message::DOM::IF::DOMImplementation
     @@ForCheck:
       ManakaiDOM:ForIF
@@ -510,6 +517,11 @@ ResourceDef:
       ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM3
     @@ContentType:
       Perl:package-name
+  @ISA:
+    @@@:
+      DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM1
 
   @Method:
      @@Name:  hasFeature

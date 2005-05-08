@@ -105,7 +105,7 @@ $(MANAKAI_LIB_DIR)manakai/all.dac: \
 # $(UTIL_DAC_FILE)
 $(MANAKAI_LIB_DIR)Message/Util/all.dac: \
   DOMMetaImpl.dis DOMBoot.dis
-	$(CD) $(MANAKAI_ROOT_DIR)Message/Util/ && \
+	$(CD) $(MANAKAI_LIB_DIR)Message/Util/ && \
 	  $(MAKE) all.dac
 
 clean:

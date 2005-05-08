@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/05/03 12:34:37 $
+      $Date: 2005/05/08 14:18:01 $
     @@ContentType:
       dis:Date.RCS
   
@@ -68,6 +68,10 @@ Module:
       @@@Name: SuikaWikiConfig21
       @@@WithFor:
         ManakaiDOM:all
+    @@Module:
+      @@@Name: SuikaWikiConfig21
+      @@@WithFor:
+        ManakaiDOM:ManakaiDOM
     @@Module:
       @@@Name: SuikaWikiConfig21
       @@@WithFor: 
@@ -248,10 +252,15 @@ PropDef:
 IFClassDef:
   @IFQName: SWCFGNode
   @ClassQName: ManakaiSWCFGNode
+  @IFISA:
+    SWCFGNode::ManakaiDOM:ManakaiDOM
 
   @ISA:
     @@@:
       ManakaiDOM:ManakaiDOMNodeReference::ManakaiDOM:Perl
+    @@ForCheck: ForClass
+  @Implement:
+    @@@: SWCFGNode
     @@ForCheck: ForClass
   
   @Description:
@@ -2632,11 +2641,21 @@ ElementTypeBinding:
       @@@@:
         The implementation has encounted an undeclared namespace prefix. 
 
+ElementTypeBinding:
+  @Name: ClsImpl
+  @ElementType:
+    dis:Implement
+  @ShadowContent:
+    @@ForCheck: ForClass
+
 IFClassDef:
   @IFQName:SWCFGComment
   @ClassQName:ManakaiSWCFGComment
+  @IFISA:
+    SWCFGComment::ManakaiDOM:ManakaiDOM
   @IFISA: SWCFGNode
   @ClassISA: ManakaiSWCFGNode
+  @ClsImpl: SWCFGComment
   @Description:
     @@lang:en
     @@@:
@@ -2701,6 +2720,7 @@ IFClassDef:
   @ClassQName:ManakaiSWCFGElement
   @IFISA: SWCFGNode
   @ClassISA: ManakaiSWCFGNode
+  @ClsImpl: SWCFGElement
   @Description:
     @@lang:en
     @@@:
@@ -3240,6 +3260,9 @@ IFClassDef:
   @ClassQName:ManakaiSWCFGDocument
   @IFISA: SWCFGNode
   @ClassISA: ManakaiSWCFGNode
+  @ClsImpl: SWCFGDocument
+  @IFISA:
+    SWCFGDocument::ManakaiDOM:ManakaiDOM
   @Description:
     @@lang:en
     @@@:
@@ -3500,6 +3523,9 @@ IFClassDef:
   @ClassQName:ManakaiSWCFGDocumentFragment
   @IFISA: SWCFGNode
   @ClassISA: ManakaiSWCFGNode
+  @ClsImpl: SWCFGDocumentFragment
+  @IFISA:
+    SWCFGDocumentFragment::ManakaiDOM:ManakaiDOM
   @Description:
     @@lang:en
     @@@:
@@ -3580,6 +3606,9 @@ IFClassDef:
 IFClassDef:
   @IFQName: SWCFGChildNodeList
   @ClassQName: ManakaiSWCFGChildNodeList
+  @ClsImpl: SWCFGChildNodeList
+  @IFISA:
+    SWCFGChildNodeList::ManakaiDOM:ManakaiDOM
   @Description:
     @@lang:en
     @@@:
@@ -4166,6 +4195,9 @@ TypeDef:
 IFClassDef: 
   @IFQName: SWCFGParser
   @ClassQName: ManakaiSWCFGParser
+  @ClsImpl: SWCFGParser
+  @IFISA:
+    SWCFGParser::ManakaiDOM:ManakaiDOM
   @Description:
     @@lang:en
     @@@:
@@ -4581,6 +4613,9 @@ PropDef:
 IFClassDef:
   @IFQName: SWCFGImplementation
   @ClassQName: ManakaiSWCFGImplementation
+  @ClsImpl: SWCFGImplementation
+  @IFISA:
+    SWCFGImplementation::ManakaiDOM:ManakaiDOM
   @Description:
     @@lang:en
     @@@:

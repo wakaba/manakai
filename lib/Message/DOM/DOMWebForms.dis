@@ -26,7 +26,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/07 13:56:36 $
+      $Date: 2005/05/08 14:18:01 $
     @@ContentType:
       dis:Date.RCS
 
@@ -127,11 +127,12 @@ ElementTypeBinding:
         ManakaiDOM:DOM2
     @@ISA:
       @@@@:
-        ::ManakaiDOM:ManakaiDOM1
+        ::ManakaiDOM:ManakaiDOM1||ManakaiDOM|ForIF
       @@@ForCheck:
         ManakaiDOM:ForIF
       @@@For:
         ManakaiDOM:ManakaiDOM2
+      @@@ContentType: DISCore|TFPQNames
     @@For:
       ManakaiDOM:DOM1
     @@For:
@@ -216,11 +217,16 @@ ElementTypeBinding:
         ManakaiDOM:ForClass
     @@ISA:
       @@@@:
-        ::ManakaiDOM:ManakaiDOM
+        ::ManakaiDOM:ManakaiDOM||ManakaiDOM|ForIF
       @@@ForCheck:
         ManakaiDOM:ForIF
       @@@For:
         ManakaiDOM:ManakaiDOM2
+      @@@ContentType: DISCore|TFPQNames
+    @@Implement:
+      @@@@: ||+||ManakaiDOM|ForIF
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
+      @@@ContentType: DISCore|TFPQNames
 
 ElementTypeBinding:
   @Name: ET
@@ -271,11 +277,17 @@ ElementTypeBinding:
         ManakaiDOM:ForClass
     @@ISA:
       @@@@:
-        ::ManakaiDOM:ManakaiDOM
+        ::ManakaiDOM:ManakaiDOM||ManakaiDOM|ForIF
       @@@ForCheck:
         ManakaiDOM:ForIF
       @@@For:
         ManakaiDOM:ManakaiDOM2
+      @@@ContentType: DISCore|TFPQNames
+    @@Implement:
+      @@@@: ||+||ManakaiDOM|ForIF
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
+      @@@ContentType: DISCore|TFPQNames
+
     @@DISMarkup:elementType:
       @@@@:
         ::DOMHTML:ForHTML40SE
@@ -1520,7 +1532,7 @@ ET:
         @@@PerlDef:
             my $type;
             __DEEP{
-              $type = $self->type;
+              $type = $self-><AG::DOMHTML:HTMLInputElement.type>;
             }__;
             if ({text => 1, password => 1, file => 1}->{$type}) {
               ## TODO:
@@ -1801,7 +1813,8 @@ ET:
 ##IF:DOMHTMLTextAreaElement
 
 PropDef:
-  @QName:value
+  @QName:
+    DOMHTML:value
   @Description:
     @@lang:en
     @@@:

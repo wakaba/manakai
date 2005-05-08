@@ -21,7 +21,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/07 13:56:36 $
+      $Date: 2005/05/08 14:18:02 $
     @@ContentType:
       dis:Date.RCS
   
@@ -708,7 +708,15 @@ DataTypeDef:
   @Description:
     @@lang:en
     @@@:
-      A pair of resource QName and optional <QUOTE:For> QName.
+      A pair of resource QName and optional <QUOTE::For> QName.
+
+DataTypeDef:
+  @QName: TFPQNames
+  @Description:
+    @@lang:en
+    @@@:
+      A triplet of resource QName and optional <QUOTE::For> QName
+      and zero or more <QUOTE::For+> QNames.
 
 DataTypeDef:
   @QName: TFURI

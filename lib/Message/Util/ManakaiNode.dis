@@ -21,7 +21,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/07 13:56:36 $
+      $Date: 2005/05/08 14:18:02 $
     @@ContentType:
       dis:Date.RCS
   
@@ -347,10 +347,10 @@ ClassDef:
       @@@In:1
       @@@DISPerl:paramStyle: any
     @@PerlDef:
-      bless {
+      (bless {
         <Q::TreeCore:node> => $object,
         <Q::TreeCore:isWeak> => true,
-      }, $class;
+      }, $class)
 
   @IntMethod:
     @@Name: isExternallyReferred
@@ -385,8 +385,8 @@ ClassDef:
             my @node = ($self);
             my %checked;
             NODES: while (my $node = shift @node) {
-              next unless ref $node eq
-                          <ClassName::ManakaiDOM:ManakaiDOMNodeObject>;
+              next unless UNIVERSAL::isa ($node,
+                          <ClassName::ManakaiDOM:ManakaiDOMNodeObject>);
               if ($node->{<Q::TreeCore:rc>}) {
                 $r = true;
                 last NODES;
@@ -504,13 +504,13 @@ ClassDef:
               for my $p (@n,
                          map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}) {
                 if (ref $p eq 'ARRAY') {
-                  push @node, grep {ref $_ eq
-                                    <ClassName::ManakaiDOM:ManakaiDOMNodeObject>
+                  push @node, grep {UNIVERSAL::isa ($_,
+                                    <ClassName::ManakaiDOM:ManakaiDOMNodeObject>)
                                     and $_->{<Q::TreeCore:treeID>} ne
                                     $self->{<Q::TreeCore:treeID>}} @$p;
                 } elsif (ref $p eq 'HASH') {
-                  push @node, grep {ref $_ eq
-                                    <ClassName::ManakaiDOM:ManakaiDOMNodeObject>
+                  push @node, grep {UNIVERSAL::isa ($_,
+                                    <ClassName::ManakaiDOM:ManakaiDOMNodeObject>)
                                     and $_->{<Q::TreeCore:treeID>} ne
                                     $self->{<Q::TreeCore:treeID>}}
                               values %$p;
@@ -546,8 +546,8 @@ ClassDef:
         unless ($self->{<Q::TreeCore:treeID>} eq $treeID) {
           my @node = ($self);
           NODES: while (my $node = shift @node) {
-            next unless ref $node eq
-                        <ClassName::ManakaiDOM:ManakaiDOMNodeObject>;
+            next unless UNIVERSAL::isa ($node,
+                        <ClassName::ManakaiDOM:ManakaiDOMNodeObject>);
               my @n;
               for my $p (@{$node->{<Q::TreeCore:subnode2>}}) {
                 if (ref $node->{$p} eq 'ARRAY') {
@@ -559,13 +559,13 @@ ClassDef:
               for my $p (@n,
                          map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}) {
                 if (ref $p eq 'ARRAY') {
-                  push @node, grep {ref $_ eq
-                                    <ClassName::ManakaiDOM:ManakaiDOMNodeObject>
+                  push @node, grep {UNIVERSAL::isa ($_,
+                                    <ClassName::ManakaiDOM:ManakaiDOMNodeObject>)
                                     and
                                     $_->{<Q::TreeCore:treeID>} ne $treeID} @$p;
                 } elsif (ref $p eq 'HASH') {
-                  push @node, grep {ref $_ eq
-                                    <ClassName::ManakaiDOM:ManakaiDOMNodeObject>
+                  push @node, grep {UNIVERSAL::isa ($_,
+                                    <ClassName::ManakaiDOM:ManakaiDOMNodeObject>)
                                     and $_->{<Q::TreeCore:treeID>} ne $treeID}
                               values %$p;
                 }

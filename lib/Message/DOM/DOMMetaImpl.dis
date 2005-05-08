@@ -20,7 +20,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/03 12:34:37 $
+      $Date: 2005/05/08 14:18:01 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1062,30 +1062,64 @@ ResourceDef:
 
 ## -- DOM implementation list & source from DOM Level 3 Core module
 
-ElementTypeBinding:
-  @Name: CoreLevel3
-  @ElementType:
-    dis:For
-  @ShadowContent:
+ResourceDef:
+  @rdf:type:
     @@@:
-      ManakaiDOM:DOM3
-  @ShadowSibling:
-    @@For:
-      =ManakaiDOM:ManakaiDOM
-    @@DOMMain:implementFeature:
-      DOMCore:CoreFeature30
-    @@ISA:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOM3
-      @@@ForCheck:
-        ManakaiDOM:ForIF ManakaiDOM:ManakaiDOMLatest
+      dis:MultipleResource
+    @@ForCheck:
+      !ManakaiDOM:ForClass !ManakaiDOM:ForIF
+  @rdf:type:
+    @@@:
+      ManakaiDOM:IF
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @rdf:type:
+    @@@:
+      ManakaiDOM:Class
+    @@ForCheck:
+      ManakaiDOM:ForClass
+  @resourceFor:
+    ManakaiDOM:ForIF
+  @resourceFor:
+    @@@:
+      ManakaiDOM:ForClass
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
 
-IFClsDef:
   @IFQName:
     DOMCore:DOMImplementationList
   @ClsQName:
     DOMCore:ManakaiDOMImplementationList
-  @CoreLevel3:
+
+  @For:
+    ManakaiDOM:DOM3
+  @For:
+    =ManakaiDOM:ManakaiDOM
+
+  @DOMMain:implementFeature:
+    DOMCore:CoreFeature30
+
+  @ISA:
+    @@@:
+      ManakaiDOM:ManakaiDOMObject
+    @@ForCheck:
+      ManakaiDOM:ForClass
+  @Implement:
+    @@@:
+      DOMCore:DOMImplementationList
+    @@ForCheck:
+      ManakaiDOM:ForClass
+
+  @ISA:
+    @@@:
+      DOMCore:DOMImplementationList::ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM3
+  @ISA:
+    @@@:
+      DOMCore:DOMImplementationList::ManakaiDOM:ManakaiDOM3
+    @@ForCheck:
+      ManakaiDOM:ForIF ManakaiDOM:ManakaiDOMLatest
 
   @Spec:
     @@DOM3:
@@ -1252,7 +1286,7 @@ ResourceDef:
     @@@:
       ManakaiDOM:ForClass
     @@ForCheck: 
-      !ManakaiDOM:ForClass
+      !ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
   
   @rdf:type:
     @@@:
@@ -1301,7 +1335,40 @@ ResourceDef:
     @@ForCheck:
       ManakaiDOM:ForClass ForDAC
 
-  @CoreLevel3:
+  @Implement:
+    @@@:
+      DOMCore:DOMImplementationSource::ManakaiDOM:ManakaiDOMLatest
+    @@ForCheck:
+      ManakaiDOM:ForClass ForDAC ManakaiDOM:ManakaiDOMLatest
+  @Implement:
+    @@@:
+      DOMCore:DOMImplementationSource::ManakaiDOM:ManakaiDOM3
+    @@ForCheck:
+      ManakaiDOM:ForClass ForDAC ManakaiDOM:ManakaiDOM3
+  @Implement:
+    @@@:
+      DOMCore:DOMImplementationSource::ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:ForClass ForDAC ManakaiDOM:ManakaiDOM
+
+  @For:
+    ManakaiDOM:DOM3
+  @For:
+    =ManakaiDOM:ManakaiDOM
+
+  @DOMMain:implementFeature:
+    DOMCore:CoreFeature30
+
+  @ISA:
+    @@@:
+      DOMCore:DOMImplementationSource::ManakaiDOM:ManakaiDOM3
+    @@ForCheck:
+      ManakaiDOM:ForIF ManakaiDOM:ManakaiDOMLatest
+  @ISA:
+    @@@:
+      DOMCore:DOMImplementationSource::ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM3
 
   @DISLang:role:
     @@@: ManakaiDOMImplementationSourceRole
@@ -1649,6 +1716,10 @@ ResourceDef:
     @@@: ManakaiDOMMinimumImplementation
     @@ForCheck:
       ManakaiDOM:ForClass ForDAC
+  @Implement:
+    @@@: ManakaiDOMMinimumImplementationIF
+    @@ForCheck:
+      ManakaiDOM:ForClass ForDAC ManakaiDOM:ManakaiDOMLatest
 
   @Description:
     @@lang:en
@@ -1660,9 +1731,20 @@ ResourceDef:
 
   @ISA:
     @@@:
+      ManakaiDOMMinimumImplementationIF::ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM3
+  @ISA:
+    @@@:
       DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM1
     @@ForCheck:
       ManakaiDOM:ForIF
+  @ISA:
+    @@@:
+      DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM
+    @@ForCheck:
+      ManakaiDOM:ForIF
+
   @ISA:
     @@@:
       ManakaiDOM:ManakaiDOMNodeReference::ManakaiDOM:Perl
@@ -2045,45 +2127,3 @@ ElementTypeBinding:
   @ShadowContent:
     @@ForCheck:
       ManakaiDOM:ForClass
-
-ElementTypeBinding:
-  @Name: IFClsDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      @@@@:
-        dis:MultipleResource
-      @@@ForCheck:
-        !ManakaiDOM:ForClass !ManakaiDOM:ForIF
-    @@rdf:type:
-      @@@@:
-        ManakaiDOM:IF
-      @@@ForCheck:
-        ManakaiDOM:ForIF
-    @@rdf:type:
-      @@@@:
-        ManakaiDOM:Class
-      @@@ForCheck:
-        ManakaiDOM:ForClass
-    @@resourceFor:
-      ManakaiDOM:ForIF
-    @@resourceFor:
-      @@@@:
-        ManakaiDOM:ForClass
-      @@@ForCheck:
-        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
-    @@ForCheck:
-      ManakaiDOM:DOM
-    @@ISA:
-      @@@@:
-        ManakaiDOM:ManakaiDOMObject
-      @@@ForCheck:
-        ManakaiDOM:ForClass
-    @@ISA:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOM
-      @@@ForCheck:
-        ManakaiDOM:ForIF
-      @@@For:
-        ManakaiDOM:ManakaiDOM1
