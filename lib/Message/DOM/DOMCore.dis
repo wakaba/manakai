@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/08 14:18:01 $
+      $Date: 2005/05/09 11:59:32 $
     @@ContentType:
       dis:Date.RCS
 
@@ -5850,15 +5850,19 @@ IF:
               for my $pack ((sort {
                 $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
               } grep {
-                $Message::DOM::CompatClassET{$ns}->{'*'}->{$_} and
-                $_->isa (<IFName::Element::ManakaiDOM:ManakaiDOM>)
-              } keys %{$Message::DOM::CompatClassET{$ns}->{$ln}}),
+                $Message::DOM::ManakaiDOMElement::CompatClassET{$ns}
+                        ->{$ln}->{$_} and
+                $_->isa (<IFName::Element>)
+              } keys %{$Message::DOM::ManakaiDOMElement::CompatClassET{$ns}
+                               ->{$ln}}),
               (sort {
                 $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
               } grep {
-                $Message::DOM::CompatClassET{$ns}->{'*'}->{$_} and
-                $_->isa (<IFName::Element::ManakaiDOM:ManakaiDOM>)
-              } keys %{$Message::DOM::CompatClassET{$ns}->{'*'}})) {
+                $Message::DOM::ManakaiDOMElement::CompatClassET{$ns}
+                        ->{'*'}->{$_} and
+                $_->isa (<IFName::Element>)
+              } keys %{$Message::DOM::ManakaiDOMElement::CompatClassET{$ns}
+                               ->{'*'}})) {
                 $class = $pack;
                 last FIND;
               }
@@ -5872,19 +5876,65 @@ IF:
           } elsif ($nt eq <Q::infoset:Comment>) {
             $class = <ClassName::ManakaiDOMComment>;
           } elsif ($nt eq <Q::infoset:Document>) {
-            ## TODO: Find class by doctype
+            CHILD: for my $co (@{$object->{<Q::infoset:children>}}) {
+              ## By root element type
+              if ($co->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
+                my $ns;
+                my $ln;
+                if (defined $co->{<Q::infoset:localName>}) { ## Namespace-aware
+                  $ns = $co->{<Q::infoset:namespaceName>};
+                  $ns = '' unless defined $ns;
+                  $ln = $co->{<Q::infoset:localName>};
+                } elsif ($co->{<Q::DOMCore:hasFeature>}->{HTML}) {
+                  $ns = <Q::xhtml1:>;
+                  $ln = lc $co->{<Q::DOMCore:name>};
+                }
+                if (defined $ln) {
+                  for my $pack ((sort {
+                    $Message::DOM::ClassPoint{$b} <=>
+                    $Message::DOM::ClassPoint{$a}
+                  } grep {
+                    $Message::DOM::ManakaiDOMDocument::CompatClassET{$ns}
+                        ->{$ln}->{$_} and
+                    $_->isa (<IFName::Document>)
+                  } keys %{$Message::DOM::ManakaiDOMDocument::CompatClassET{$ns}
+                               ->{$ln}}),
+                  (sort {
+                    $Message::DOM::ClassPoint{$b} <=>
+                    $Message::DOM::ClassPoint{$a}
+                  } grep {
+                    $Message::DOM::ManakaiDOMDocument::CompatClassET{$ns}
+                        ->{'*'}->{$_} and
+                    $_->isa (<IFName::Document>)
+                  } keys %{$Message::DOM::ManakaiDOMDocument::CompatClassET{$ns}
+                               ->{'*'}})) {
+                    $class = $pack;
+                    last FIND;
+                  }
+                }
+                last CHILD; # Not found
+
+              ## By document type or by external subset identifier
+              } elsif ($co->{<Q::DOMCore:nodeType>} eq
+                       <Q::infoset:DocumentTypeDeclaration>) {
+
+                # Not found --> checking root element
+              }
+            }
             $class = <ClassName::ManakaiDOMDocument>;
-          } elsif ($nt eq <Q::DOMCore:DocumentFragment>) {
-            $class = <ClassName::ManakaiDOMDocumentFragment>;
-          } elsif ($nt eq <Q::DOMXML:EntityReference>) {
-            $class = <ClassName::DOMXML:ManakaiDOMEntityReference>;
           } elsif ($nt eq <Q::infoset:ProcessingInstruction>) {
             ## TODO: Find class by namespace URI and local name
             $class = <ClassName::DOMXML:ManakaiDOMProcessingInstruction>;
-          } elsif ($nt eq <Q::DOMXML:Entity>) {
-            $class = <ClassName::DOMXML:ManakaiDOMEntity>;
           } elsif ($nt eq <Q::DOMXML:CDATASection>) {
             $class = <ClassName::DOMXML:ManakaiDOMCDATASection>;
+          } elsif ($nt eq <Q::DOMXML:EntityReference>) {
+            $class = <ClassName::DOMXML:ManakaiDOMEntityReference>;
+          } elsif ($nt eq <Q::DOMCore:DocumentFragment>) {
+            $class = <ClassName::ManakaiDOMDocumentFragment>;
+          } elsif ($nt eq <Q::infoset:DocumentTypeDeclaration>) {
+            $class = <ClassName::DOMXML:ManakaiDOMDocumentType>;
+          } elsif ($nt eq <Q::DOMXML:Entity>) {
+            $class = <ClassName::DOMXML:ManakaiDOMEntity>;
           } elsif ($nt eq <Q::infoset:Notation>) {
             $class = <ClassName::DOMXML:ManakaiDOMNotation>;
           } else {

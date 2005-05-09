@@ -44,7 +44,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/08 14:18:01 $
+      $Date: 2005/05/09 11:59:32 $
     @@ContentType:
       dis:Date.RCS
 
@@ -491,6 +491,10 @@ ElementTypeBinding:
     @@For:
       =ManakaiDOM:ManakaiDOM
     @@For: ForHTML
+    @@ISA:
+      @@@@: ||ManakaiDOM|ManakaiDOM2||ManakaiDOM|ForIF
+      @@@ForCheck: ManakaiDOM|ForIF ManakaiDOM|ManakaiDOMLatest
+      @@@ContentType: DISCore|TFPQNames
 ## NOTE: A Level 2 interface is not always upward-compatible with Level 1 i.f.
 
 ElementTypeBinding:
@@ -625,11 +629,6 @@ ElementTypeBinding:
       @@@ForCheck:
         ForHTML
 
-    @@ISA:
-      @@@@:
-        ManakaiDOM:ManakaiDOMObject
-      @@@ForCheck:
-        ManakaiDOM:ForClass
     @@ISA:
       @@@@:
         ::ManakaiDOM:ManakaiDOM||ManakaiDOM:ForIF
@@ -851,11 +850,7 @@ IF:
       ManakaiDOM:ManakaiDOMNodeReference::ManakaiDOM:Perl
     @@ForCheck:
       ManakaiDOM:ForClass
-  @ISA:
-    @@@:
-      ManakaiDOM:ManakaiDOMObject
-    @@ForCheck:
-      ManakaiDOM:ForClass
+  @L2ISAL1:
 
   @Description:
     @@lang:en
@@ -1141,7 +1136,8 @@ IF:
           $node->{<Q::ManakaiDOM:implID>}
                 = $self->{<Q::TreeCore:node>}->{<Q::ManakaiDOM:implID>};
           $node->{<Q::DOMCore:hasFeature>}->{HTML} = 1;
-          $r = <ClassM::DOMCore:ManakaiDOMNode.getNodeReference> ($node);
+          my $cls = <ClassName::DOMCore:ManakaiDOMDocument>;
+          $r = <Code::getWeakRef:: $object = $node, $class = $cls>;
           $r-><M::DOMCore:Node.appendChild>
                   (my $html = $r-><M::DOMCore:Document.createElement>
                                     ('HTML'));
@@ -1158,6 +1154,7 @@ IF:
           $html-><M::DOMCore:Node.appendChild>
                      ($r-><M::DOMCore:Document.createElement>
                                            ('BODY'));
+          $r = <ClassM::DOMCore:ManakaiDOMNode.getNodeReference> ($node);
 
 
   @Method:
@@ -1200,7 +1197,8 @@ IF:
                 = $self->{<Q::TreeCore:node>}->{<Q::ManakaiDOM:implID>};
           $node->{<Q::DOMCore:hasFeature>}->{HTML} = 1;
           $node->{<Q::DOMCore:hasFeature>}->{XML} = 1;
-          $r = <ClassM::DOMCore:ManakaiDOMNode.getNodeReference> ($node);
+          my $cls = <ClassName::DOMCore:ManakaiDOMDocument>;
+          $r = <Code::getWeakRef:: $object = $node, $class = $cls>;
           $r-><M::DOMCore:Node.appendChild>
                   (my $html = $r-><M::DOMCore:Document.createElementNS>
                                     (<Q::xhtml1:>, 'html'));
@@ -1219,7 +1217,13 @@ IF:
           $html-><M::DOMCore:Node.appendChild>
                      ($r-><M::DOMCore:Document.createElementNS>
                                            (<Q::xhtml1:>, 'body'));
+          $r = <ClassM::DOMCore:ManakaiDOMNode.getNodeReference> ($node);
         }__;
+
+ResourceDef:
+  @QName: getWeakRef
+  @AliasFor:
+    ManakaiNode:getWeakRef::ManakaiDOM:Perl
 
 IF:
   @Name:
@@ -1249,12 +1253,17 @@ IF:
     @@@:
       The root of the HTML document and holds the entire content. 
 
+  @s:rootElementType:
+    @@@: html||ForHTML40SE
+    @@ForCheck: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
+  @s:rootElementType:
+    @@@: html||ForHTML401
+    @@ForCheck: ManakaiDOM|DOM2
+  @s:rootElementType:
+    @@@: html||ForXHTML10SE
+    @@ForCheck: ManakaiDOM|DOM2
+
   @ImplNote:
-    @@root-element:
-      @@@QName:
-        xhtml1:html
-    @@root-element:
-      @@@Name:html
     @@doctype-public:
       -//W3C//DTD HTML 4.0//EN
     @@doctype-public:
@@ -1984,7 +1993,7 @@ IF:
         - <A:vlinkColor>
       \
       }
-##IF:HTMLDocument
+##HTMLDocument
 
 ElementTypeBinding:
   @Name: PropDef
@@ -2409,6 +2418,9 @@ ElementTypeBinding:
 ET:
   @ETQName:
     xhtml1:html
+  @QName:
+    @@@: html
+    @@ForCheck: s|ForML
 
   @IFQName:
     @@@: HTMLHtmlElement

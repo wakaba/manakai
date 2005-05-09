@@ -20,7 +20,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/08 14:18:01 $
+      $Date: 2005/05/09 11:59:32 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1731,6 +1731,11 @@ ResourceDef:
 
   @ISA:
     @@@:
+      ManakaiDOMMinimumImplementationIF::ManakaiDOM:ManakaiDOM3
+    @@ForCheck:
+      ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM3 !=ManakaiDOM:ManakaiDOM3
+  @ISA:
+    @@@:
       ManakaiDOMMinimumImplementationIF::ManakaiDOM:ManakaiDOM
     @@ForCheck:
       ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM3
@@ -1775,7 +1780,7 @@ ResourceDef:
     ManakaiDOM:MinimumFeature30
 
   @For:
-    ManakaiDOM:ManakaiDOMLatest
+    ManakaiDOM:ManakaiDOM3
   @For:
     =ManakaiDOM:ManakaiDOM
   

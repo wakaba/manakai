@@ -15,7 +15,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/07 13:56:36 $
+      $Date: 2005/05/09 11:59:32 $
     @@ContentType:
       dis:Date.RCS
   
@@ -121,7 +121,16 @@ PropDef:
     @@lang:en
     @@@:
       A subject resource is associated with an object element type. 
-  @rdfs:domain: ElementType
+  @rdfs:domain: AnyElementInNS
+  @dataType:
+    dis:TFQNames
+
+PropDef:
+  @QName: rootElementType
+  @enDesc:
+    The subject resource is associated with documents whose
+    root element type is identified by the object resource.
+  @rdfs:domain: AnyElementInNS
   @dataType:
     dis:TFQNames
 

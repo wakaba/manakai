@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/05/08 14:18:02 $
+      $Date: 2005/05/09 11:59:32 $
     @@ContentType:
       dis:Date.RCS
   
@@ -4123,6 +4123,8 @@ ClsDef:
                 $r-><M::PLBlockCon.appendStatement>
                         ('$Message::DOM::ClassFeature{q<' . $pack_name .
                          '>} = ' . <ClassM::MPLImpl.perlLiteral> (\%ifeature));
+
+                ## Score calculated from provided features
                 $r-><M::PLBlockCon.appendStatement>
                         ('$Message::DOM::ClassPoint{q<' . $pack_name .
                          '>} = ' . $ifpoint);
@@ -4244,9 +4246,28 @@ ClsDef:
                   }
                   if ($role-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
                                 (<Q::DOMCore:DocumentRole>)) {
+                    my $for_specific_et;
+                    for my $et (@{$cls-><M::ManakaiDISPropertyAccessor
+                          .getPropertyResourceList>
+                             (<Q::s:rootElementType>, isa_recursive => true,
+                              default_media_type => <Q::dis:TFQNames>)}) {
+                      $for_specific_et = true;
+                      my $ln = $et-><AG::ManakaiDISResourceDefinition
+                                        .mvLocalName>;
+                      $ln = '*' unless defined $ln;
+                      my $ns = $et-><AG::ManakaiDISResourceDefinition
+                                        .mvNamespaceURI>;
+                      $ns = '' unless defined $ns;
+                        ## ISSUE: Is NULL-namespace should be allowed here?
+                      $r-><M::PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMDocument' .
+                           '::CompatClassET{q<' . $ns . '>}->{q<' . $ln .
+                           '>}->{q<' . $pack_name . '>} = 1');
+                    }
                     $r-><M::PLBlockCon.appendStatement>
                           ('$Message::DOM::ManakaiDOMDocument'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                           '::CompatClass{q<' . $pack_name . '>} = 1')
+                      unless $for_specific_et;
                     ## TODO: by document type name and media type
                   }
                   if ($role-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
