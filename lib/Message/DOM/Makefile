@@ -31,22 +31,16 @@ DAC2PM = $(PERL_) $(DAC2PM_PL) $(DAC2PM_OPTIONS)
 CORE_DAC_FILE = $(MANAKAI_LIB_DIR)manakai/all.dac
 UTIL_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Util/all.dac
 
-DIS_FILES_CORE = DOMMain.dis DOMCore.dis DOMXML.dis
+DIS_FILES_CORE = DOMMain.dis DOMCore.dis DOMXML.dis DOMLS.dis
 DIS_FILES_HTML = DOMHTML.dis DOMWebForms.dis
 
 DIS_FILES = DOMMetaImpl.dis $(DIS_FILES_CORE) $(DIS_FILES_HTML)
 
 _DIS_FILES = \
-  DOMLS.dis ManakaiDOMLS2003.dis \
+  ManakaiDOMLS2003.dis \
   DOMEvents.dis DOMViews.dis
 
-GENERATED_FILES_DOMLATEST = core.cdis ev.cdis ls.cdis html.cdis \
-  DOMMain.pm DOMCore.pm DOMXML.pm DOMLS.pm ManakaiDOMLS2003.pm \
-  DOMEvents.pm DOMViews.pm \
-  DOMHTML.pm DOMWebForms.pm \
-  meta.cdis DOMMetaImpl.dis
-
-GENERATED_FILES = core.dac DOMMain.pm DOMCore.pm DOMXML.pm \
+GENERATED_FILES = core.dac DOMMain.pm DOMCore.pm DOMXML.pm DOMLS.pm \
   html.dac DOMHTML.pm DOMWebForms.pm
 BOOT_GENERATED_FILES = boot.dac DOMMetaImpl.pm
 
@@ -55,21 +49,25 @@ all: $(GENERATED_FILES)
 core.dac: $(DIS_FILES_CORE) $(DAC_PL) $(CORE_DAC_FILE) \
   $(MANAKAI_LIB_DIR)Message/Util/ManakaiNode.dis \
   $(MANAKAI_LIB_DIR)Message/Util/Error/DOMException.dis
-	$(DAC)$@ --input-db-file-name="$(CORE_DAC_FILE)" DOMXML.dis
+	$(DAC)$@ --input-db-file-name="$(CORE_DAC_FILE)" DOMLS.dis
 
 html.dac: $(DIS_FILES_HTML) $(DAC_PL) core.dac
 	$(DAC)$@ --input-db-file-name="core.dac" DOMHTML.dis
 
 DOMMain.pm: core.dac $(DAC2PM_PL)
-	$(DAC2PM) $< --module-uri="$(NS_MDOM)DOMMain" > $@
+	$(DAC2PM) $< --module-uri="$(NS_MDOM)DOMMain" --output-file-path="$@"
 	$(PERL_CHK) $@
 
 DOMCore.pm: core.dac $(DAC2PM_PL)
-	$(DAC2PM) $< --module-uri="$(NS_MDOM)DOMCore" > $@
+	$(DAC2PM) $< --module-uri="$(NS_MDOM)DOMCore" --output-file-path="$@"
 	$(PERL_CHK) $@
 
 DOMXML.pm: core.dac $(DAC2PM_PL)
-	$(DAC2PM) $< --module-uri="$(NS_MDOM)DOMXML" > $@
+	$(DAC2PM) $< --module-uri="$(NS_MDOM)DOMXML" --output-file-path="$@"
+	$(PERL_CHK) $@
+
+DOMLS.pm: core.dac $(DAC2PM_PL)
+	$(DAC2PM) $< --module-uri="$(NS_MDOM)DOMLS" --output-file-path="$@"
 	$(PERL_CHK) $@
 
 DOMHTML.pm: html.dac $(DAC2PM_PL)
@@ -86,8 +84,7 @@ boot.dac: DOMMetaImpl.dis DOMBoot.dis $(DAC_PL) $(UTIL_DAC_FILE)
 	$(DAC)$@ --input-db-file-name="$(UTIL_DAC_FILE)" DOMMetaImpl.dis
 
 DOMMetaImpl.pm: boot.dac $(DAC2PM_PL)
-	$(DAC2PM) $< --module-uri="$(NS_MDOM)DOMMetaImpl" \
-	  --output-file-path="$@"
+	$(DAC2PM) $< --module-uri="$(NS_MDOM)DOMMetaImpl" --output-file-path="$@"
 	$(PERL_CHK) $@
 
 # $(CORE_DAC_FILE)
@@ -110,23 +107,3 @@ $(MANAKAI_LIB_DIR)Message/Util/all.dac: \
 
 clean:
 	$(RM) $(GENERATED_FILES) $(BOOT_GENERATED_FILES) .*.tmp *~ .*~
-
-DOMEvents.pm: ev.cdis $(CDIS2PM_PL)
-	$(CDIS2PM) $< --for="$(NS_MANAKAIDOM)ManakaiDOMLatest" \
-	  --module-name=DOMEvents > $@
-	$(PERL_CHK) $@
-
-DOMViews.pm: ev.cdis $(CDIS2PM_PL)
-	$(CDIS2PM) $< --for="$(NS_MANAKAIDOM)ManakaiDOMLatest" \
-	  --module-name=DOMViews > $@
-	$(PERL_CHK) $@
-
-DOMLS.pm: ls.cdis $(CDIS2PM_PL)
-	$(CDIS2PM) $< --for="$(NS_MANAKAIDOM)ManakaiDOMLatest" \
-	  --module-name=DOMLS > $@
-	$(PERL_CHK) $@
-
-ManakaiDOMLS2003.pm: ls.cdis $(CDIS2PM_PL)
-	$(CDIS2PM) $< --for="$(NS_MANAKAIDOM)ManakaiDOMLatest" \
-	  --module-name=ManakaiDOMLS2003 > $@
-	$(PERL_CHK) $@

@@ -2261,7 +2261,10 @@ sub dis_perl_init_classdef ($;%) {
   ## Register the package
   if ($pack) {
     valid_err (qq<Perl package "$pack" is already defined>, node => $res->{src})
-      if defined $State->{ExpandedURI q<dis2pm:package>}->{$pack}->{Name};
+      if defined $State->{ExpandedURI q<dis2pm:package>}->{$pack}->{Name} and
+         $pack !~ /::IF::/;
+           ## NOTE: Dupulication is allowed if it is an interface package
+           ##       to avoid some bug
     $State->{ExpandedURI q<dis2pm:package>}->{$pack} = $res;
     impl_err (qq<Perl package "$pack" is already defined>, node => $res->{src})
       if defined $State->{Module}->{$res->{parentModule}}
@@ -2777,4 +2780,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/04/27 06:24:48 $
+1; # $Date: 2005/05/11 14:07:42 $

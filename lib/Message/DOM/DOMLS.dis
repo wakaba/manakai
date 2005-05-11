@@ -3,11 +3,14 @@ Module:
     MDOM:DOMLS
   @Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
-  @BindingName:
+
+  @AppName:
      @@@:  ls
-     @@Type:
+     @@ContentType:
         lang:IDL-DOM
      @@prefix:  dom.w3c.org
+    @@ForCheck: ManakaiDOM|IDL
+
   @FullName:
     @@@: DOM Load and Save Module
     @@@@lang:en
@@ -28,7 +31,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/19 07:21:13 $
+      $Date: 2005/05/11 14:07:41 $
     @@ContentType:
       dis:Date.RCS
 
@@ -38,8 +41,8 @@ Module:
   @Require:
      @@Module:
         @@@Name:  DOMCore
-     @@Module:
-        @@@Name:  DOMEvents
+#     @@Module:
+#        @@@Name:  DOMEvents
 ## TODO: Implement these modules
 #     @@Module:
 #        @@@Name:  DOMTraversal
@@ -59,6 +62,10 @@ Module:
 Namespace:
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @DOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @DOMMain:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @infoset:
      http://www.w3.org/2001/04/infoset#
   @lang:
@@ -120,7 +127,7 @@ FeatureDef:
   @FeatureVerDef:
     @@Version:3.0
     @@QName: LSFeature30
-    @@ISA: LSFeature
+    @@DOMMetaImpl:instanceFeatureOf: LSFeature
     @@DOMMain:requireFeature: 
       DOMCore:CoreFeature20
     @@FullName:
@@ -134,7 +141,7 @@ FeatureDef:
   @FeatureVerDef:
     @@Version:3.0
     @@QName: LSAsyncFeature30
-    @@ISA: LSAsyncFeature
+    @@DOMMetaImpl:instanceFeatureOf: LSAsyncFeature
     @@DOMMain:requireFeature: LSFeature30
     @@FullName:
       @@@lang:en
@@ -420,6 +427,7 @@ ElementTypeBinding:
         ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
     @@ForCheck:
       ManakaiDOM:DOM
+
     @@ISA:
       @@@@:
         DOMMain:ManakaiDOMExceptionIF::ManakaiDOM:Perl
@@ -427,23 +435,21 @@ ElementTypeBinding:
         ManakaiDOM:ManakaiDOM ManakaiDOM:ForIF
     @@ISA:
       @@@@:
-        ManakaiDOM:ManakaiDOMException::ManakaiDOM:Perl
-      @@@ForCheck:
-        ManakaiDOM:ManakaiDOM
-      @@@ForCheck:
-        ManakaiDOM:ForClass
-    @@ISA:
-      @@@@:
-        ManakaiDOM:ManakaiDOMObject
-      @@@ForCheck:
-        ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
-    @@ISA:
-      @@@@:
         ::ManakaiDOM:ManakaiDOM
       @@@ForCheck:
         ManakaiDOM:ForIF
       @@@For:
         ManakaiDOM:ManakaiDOM1
+
+    @@ISA:
+      @@@@:
+        ManakaiDOM:ManakaiDOMException::ManakaiDOM:Perl
+      @@@ForCheck:
+        ManakaiDOM:ManakaiDOM
+    @@Implement:
+      @@@@: ||+||ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ForClass
+      @@@ContentType: DISCore|TFPQNames
 
 ExceptionDef:
   @Name:  
@@ -468,8 +474,8 @@ ExceptionDef:
         @@@Type:
            DOMMain:unsigned-short
         @@@actualType: ManakaiDOMLSExceptionCode
-        @@@PerlDef:
-          __CODE{ManakaiDOM:getExceptionCode}__;
+     @@ForCheck: ManakaiDOM|ForIF
+
   @ConstGroup:
      @@QName:  
        @@@@: LSExceptionCode
@@ -479,11 +485,9 @@ ExceptionDef:
        @@@@: ManakaiDOMLSExceptionCode
        @@@ForCheck:
          ManakaiDOM:ForClass
-     @@ISA:
-       @@@@:
-         DOMMain:unsigned-short
-       @@@ForCheck:
-         ManakaiDOM:ForClass
+
+     @@rdfs:subClassOf: DOMMain|unsigned-short
+
      @@Description:
         @@@lang:en
         @@@@: The type of error generated.
@@ -537,11 +541,17 @@ ElementTypeBinding:
         ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
     @@For:
       =ManakaiDOM:ManakaiDOM
+
     @@ISA:
       @@@@:
         ManakaiDOM:ManakaiDOMObject
       @@@ForCheck:
         ManakaiDOM:ForClass
+    @@Implement:
+      @@@@: ||+||ManakaiDOM|ForIF
+      @@@ForCheck: ManakaiDOM|ForClass
+      @@@ContentType: DISCore|TFPQNames
+
     @@ISA:
       @@@@:
         ::ManakaiDOM:ManakaiDOM
@@ -741,17 +751,12 @@ IF:
       DOMCore:ManakaiDOMImplementation
     @@ForCheck:
       ManakaiDOM:ForClass
-  @Role:
-    @@@:
-      DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM
-    @@compat:
-      DOMCore:ManakaiDOMImplementation::ManakaiDOM:ManakaiDOMLatest
-    @@ForCheck:
-      ManakaiDOM:ForClass
 
   @L3:
   @For:
     ManakaiDOM:DOM3
+
+  @DOMMetaImpl:provideFeature: LSFeature30
 
   @Description:
     @@lang:en
@@ -778,11 +783,10 @@ IF:
        @@@@: ManakaiDOMImplementationLSMode
        @@@ForCheck:
          ManakaiDOM:ForClass
-     @@ISA:
-       @@@@:
-         DOMMain:unsigned-short
-       @@@ForCheck:
-          ManakaiDOM:ForClass
+
+     @@rdfs:subClassOf:
+       DOMMain:unsigned-short
+
      @@Description:
        @@@lang:en
        @@@@:The mode of the parser.
@@ -915,7 +919,158 @@ IF:
           @@@@@: The newly created output object.
        @@@PerlDef:
          $r = <ClassM::ManakaiDOMLSOutput.new>;
-##IF:DOMImplementationLS
+##DOMImplementationLS
+
+IF:
+  @QName:
+    @@@: ManakaiDOMImplementationLSExtendedIF
+    @@ForCheck: ManakaiDOM|ForIF
+
+  @QName:
+    @@@: ManakaiDOMImplementationLSExtended
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @For: ManakaiDOM|ManakaiDOMLatest
+
+  @ISA:
+    @@@: DOMImplementationLS
+    @@ForCheck: ManakaiDOM|ForIF
+  @ISA:
+    @@@: ManakaiDOMImplementationLS
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @Method:
+    @@Name: createMLSParser
+    @@enDesc:
+      Creates a parser.  It may or may not implement 
+      the <IF::LSParser> interface, may or may not support parsing
+      of XML entities and may or may not 
+      support generation of <IF::DOMCore:Node> objects.  In other word,
+      this method may create any object whose class 
+      has the semantics of some kind of <QUOTE::parsing>.
+    @@Param:
+      @@@Name: features
+      @@@Type: DOMString
+      @@@actualType: ManakaiDOM|ManakaiDOMFeatures
+      @@@enDesc:
+        A list of features that must be supported by 
+        the object returned.
+        \
+        {NOTE:: The <CHAR::PLUS SIGN> prefix is reserved for possible
+                future use and must not be used
+                in this parameter value. 
+        \
+        }
+    @@Return:
+      @@@Type: DOMMain|DOMObject
+      @@@enDesc:
+        The newly created parser object, which supports
+        the features requested by the <P::features> parameter.
+      @@@RaiseException:
+        @@@@@: DOMCore|FEATURE_NOT_SUPPORTED_ERR
+        @@@@enDesc:
+          No parser implementation found that supports 
+          all of the requested features.
+      @@@PerlDef:
+            CLS: for my $class (grep {
+              $Message::DOM::DOMLS::ParserClass{$_}
+            } keys %Message::DOM::DOMLS::ParserClass) {
+              for my $fname (keys %$features) {
+                my $fkey = $fname;
+                #my $plus = $fname =~ s/^\+// ? true : false;
+                FVER: for my $fver (grep {$features->{$fkey}->{$_}}
+                                       keys %{$features->{$fkey}}) {
+                  if ($Message::DOM::ClassFeature{$class}->{$fname}->{$fver}) {
+                    next FVER; # Feature/version found
+                  }
+                  next CLS; # Not found
+                } # FVER
+              } # FNAME
+
+              ## Class found
+              $r = $class->new;
+              last CLS;    ## NOTE: Method name directly written
+            } # CLS
+
+
+  @Method:
+    @@Name: createMLSSerializer
+    @@enDesc:
+      Creates a serializer.  It may or may not implement 
+      the <IF::LSSerializer> interface, may or may not support serialization
+      of <IF::DOMCore:Node> objects and may or may not 
+      support serialization as XML entities.  In other word, 
+      this method may create any object whose class 
+      has the semantics of some kind of <QUOTE::serialization>.
+    @@Param:
+      @@@Name: features
+      @@@Type: DOMString
+      @@@actualType: ManakaiDOM|ManakaiDOMFeatures
+      @@@enDesc:
+        A list of features that must be supported by 
+        the object returned.
+        \
+        {NOTE:: The <CHAR::PLUS SIGN> prefix is reserved for possible
+                future use and must not be used
+                in this parameter value. 
+        \
+        }
+    @@Return:
+      @@@Type: DOMCore|DOMObject
+      @@@enDesc:
+        The newly created serializer object, which supports
+        the features requested by the <P::features> parameter.
+      @@@RaiseException:
+        @@@@@: DOMCore|FEATURE_NOT_SUPPORTED_ERR
+        @@@@enDesc:
+          No serializer implementation found that supports 
+          all of the requested features.
+      @@@PerlDef:
+            CLS: for my $class (grep {
+              $Message::DOM::DOMLS::SerializerClass{$_}
+            } keys %Message::DOM::DOMLS::SerializerClass) {
+              for my $fname (keys %$features) {
+                my $fkey = $fname;
+                #my $plus = $fname =~ s/^\+// ? true : false;
+                FVER: for my $fver (grep {$features->{$fkey}->{$_}}
+                                       keys %{$features->{$fkey}}) {
+                  if ($Message::DOM::ClassFeature{$class}->{$fname}->{$fver}) {
+                    next FVER; # Feature/version found
+                  }
+                  next CLS; # Not found
+                } # FVER
+              } # FNAME
+
+              ## Class found
+              $r = $class->new;
+              last CLS;    ## NOTE: Method name directly written
+            } # CLS
+##DOMImplementationLSExtended
+
+ResourceDef:
+  @QName: ParserRole
+  @rdf:type: DISLang|Role
+  @ForCheck: ManakaiDOM|all
+  @enDesc:
+    Classes playing this role are parsers and 
+    may be instantiated via the <M::ManakaiDOMImplementationLSExtended
+    .createMLSParser> method.
+
+ResourceDef:
+  @QName: SerializerRole
+  @rdf:type: DISLang|Role
+  @ForCheck: ManakaiDOM|all
+  @enDesc:
+    Classes playing this role are serializers and 
+    may be instantiated via the <M::ManakaiDOMImplementationLSExtended
+    .createMLSSerializer> method.
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
 
 IF:
   @Name:
@@ -931,6 +1086,8 @@ IF:
   @L3:
   @For:
     ManakaiDOM:DOM3
+
+  @DISLang:role: ParserRole
 
   @Description:
     @@lang:en
@@ -1515,26 +1672,22 @@ IF:
     @@ForCheck:
       ManakaiDOM:ManakaiDOM
 
-  @ManakaiDOM:inputNormalizer:
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM3
-    @@ContentType:
-      lang:Perl
-    @@@:
+  @ResourceDef:
+    @@rdf:type: DISLang|InputProcessor
+    @@ForCheck: ManakaiDOM|ManakaiDOM3
+    @@PerlDef:
       if (ref $INPUT eq 'HASH') {
         $INPUT = bless $INPUT, <ClassName::DOMLS:ManakaiDOMLSInput>;
       }
-  @ManakaiDOM:inputNormalizer:
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM !ManakaiDOM:ManakaiDOM3
-    @@ContentType:
-      lang:Perl
-    @@@:
+  @ResourceDef:
+    @@rdf:type: DISLang|InputProcessor
+    @@ForCheck: ManakaiDOM|ManakaiDOM !ManakaiDOM|ManakaiDOM3
+    @@PerlDef:
       if (ref $INPUT eq 'HASH') {
         $INPUT = bless $INPUT, 
               <ClassName::DOMLS:ManakaiDOMLSInput::ManakaiDOM:ManakaiDOMLatest>;
       }
-##IF:LSInput
+##LSInput
 
 IFDef:
   @Name:  LSResourceResolver
@@ -1629,18 +1782,24 @@ IFDef:
       XML document or external (respectively) entity will be created 
       when possible.  For all other types, the serialized form 
       is implementation dependent.
+
+  @DISLang:role: SerializerRole
+
   @ImplNote:
     @@lang:en
     @@@:
-      The XML data is written to a string or an output stream. 
-      Any changes or fixups made during the serialization 
-      affect only the serialized data.
+      The result XML data is written to a string or an output stream.
+      Any changes and/or fixup's made during the serialization
+      affect only the serialized data, not affecting the original data.
     \
-      If the <A:Node.namespaceURI> is an empty string, it 
-      will be treated them as <DOM:null>, ignoring <A:Node.prefix>.
+      If a <A::DOMCore:Node.namespaceURI> is empty string, then 
+      it will be treated as <DOM::null> and <A::DOMCore:Node.prefix>
+      value is ignored.
     \
-      XML well-formedness is guaranteed if the document 
-      or entity comes from a parse operation and has been unchanged.
+      The XML well-formedness of the result data is guaranted
+      if the document or entity comes from a parse operation
+      and has remained unchanged.
+
   @ImplNote:
     @@lang:en
     @@@:
@@ -1722,7 +1881,7 @@ IFDef:
       \
       If the <XML:encoding> declaration is generated, it will be the 
       encoding name used during the serialization.
-      \
+  
       
   @Attr:
      @@Name:  domConfig
@@ -2123,8 +2282,8 @@ IF:
 
 IFDef:
   @Name:  LSProgressEvent
-  @ISA:
-     DOMEvents:Event
+#  @ISA:
+#     DOMEvents:Event
   @Attr:
      @@Name:  input
      @@Get:
@@ -2141,8 +2300,8 @@ IFDef:
            DOMMain:unsigned-long
 IFDef:
   @Name:  LSLoadEvent
-  @ISA:
-     DOMEvents:Event
+#  @ISA:
+#     DOMEvents:Event
   @Attr:
      @@Name:  newDocument
      @@Get:

@@ -33,6 +33,14 @@ DAC2PM = $(PERL_) $(DAC2PM_PL) $(DAC2PM_OPTIONS)
 
 CORE_DAC_FILE = $(MANAKAI_LIB_DIR)manakai/all.dac
 
+DOMLS_DIS_FILE3 = $(MANAKAI_LIB_DIR)Message/DOM/DOMLS.dis
+DOMLS_DIS_FILE = $(DOMLS_DIS_FILE3)
+
+DOMBOOT_DIS_FILE3 = $(DOMLS_DIS_FILE)
+                    ## Dummy
+                    #$(MANAKAI_LIB_DIR)Message/DOM/DOMBoot.dis
+DOMBOOT_DIS_FILE = $(DOMBOOT_DIS_FILE3)
+
 DIS_FILES = ManakaiNode.dis DIS.dis PerlCode.dis Error/DOMException.dis
 
 GENERATED_FILES = all.dac ManakaiNode.pm DIS.pm PerlCode.pm \
@@ -43,8 +51,17 @@ all: $(GENERATED_FILES)
 all.dac: $(DIS_FILES) $(DAC_PL) \
   $(MANAKAI_LIB_DIR)Message/Markup/SuikaWikiConfig21.dis \
   $(MANAKAI_LIB_DIR)Message/DOM/DOMMetaImpl.dis \
-  $(MANAKAI_LIB_DIR)Message/DOM/DOMBoot.dis $(CORE_DAC_FILE)
-	$(DAC)$@ --input-db-file-name="$(CORE_DAC_FILE)" DIS.dis
+  $(DOMBOOT_DIS_FILE) $(CORE_DAC_FILE) \
+  $(DOMLS_DIS_FILE)
+	$(DAC)$@.1.tmp --input-db-file-name="$(CORE_DAC_FILE)" \
+	  $(DOMBOOT_DIS_FILE) \
+	  --for="$(NS_MANAKAIDOM)ManakaiDOMLatest"
+	$(DAC)$@.2.tmp --input-db-file-name="$@.1.tmp" $(DOMLS_DIS_FILE) \
+	  --for="$(NS_MANAKAIDOM)ManakaiDOMLatest"
+	$(DAC)$@.3.tmp --input-db-file-name="$@.2.tmp" $(DOMLS_DIS_FILE) \
+	  --for="$(NS_MANAKAIDOM)ManakaiDOM3"
+	$(DAC)$@ --input-db-file-name="$@.3.tmp" DIS.dis
+	$(RM) $@.1.tmp $@.2.tmp $@.3.tmp
 
 ManakaiNode.pm: all.dac $(DAC2PM_PL)
 	$(DAC2PM) $< \

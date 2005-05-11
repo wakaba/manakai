@@ -22,7 +22,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/05 12:30:03 $
+      $Date: 2005/05/11 14:07:41 $
     @@ContentType:
       dis:Date.RCS
   
@@ -53,6 +53,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
   @DISlib:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @DOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @Err:
@@ -419,6 +421,20 @@ ResourceDef:
         if (defined $self->{<Q::MDOMX:param-name>}) {
           $r = 'Parameter "' . $self->{<Q::MDOMX:param-name>} . '": ' . $r;
         }
+
+  @Attr:
+    @@Name: code
+    @@enDesc:
+      A numeric exception code that identifies the kind of 
+      the error.  It should be equal to one of constant values
+      defined as members of the exception interface that the
+      object implements. 
+    @@Type: 
+      DOMMain:unsigned-short::ManakaiDOM:all
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{<Q::MUErrorCore:def>}->{<Q::DOMCore:code>};
+
   @ResourceDef:
     @@QName:
       ManakaiDOM:getExceptionCode

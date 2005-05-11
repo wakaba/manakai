@@ -94,7 +94,7 @@ my $base_path = Cwd::abs_path ($Opt{db_base_path}) if length $Opt{db_base_path};
 my $doc = dac_load_module_file ($db, $parser, $file_name, $base_path);
 $doc->dis_database ($db);
 
-my $for = $Opt{for};
+my $for = $Opt{For};
 $for = $doc->module_element->default_for_uri unless length $for;
 $db->get_for ($for)->is_referred ($doc);
 print STDERR qq<Loading definition of "$file_name" for <$for>...\n>;

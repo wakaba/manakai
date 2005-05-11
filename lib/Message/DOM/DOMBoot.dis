@@ -30,7 +30,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/08 14:18:01 $
+      $Date: 2005/05/11 14:07:41 $
     @@ContentType:
       dis:Date.RCS
   
@@ -613,86 +613,6 @@ ResourceDef:
     ManakaiDOM:DOM1
 
 ## -- LSInput (from DOMLS)
-
-ResourceDef:
-  @QName: 
-    DOMLS:LSInput
-  @rdf:type:
-    ManakaiDOM:IF
-  @For:
-    ManakaiDOM:DOM3
-      
-  @Attr:
-     @@Name:  characterStream
-     @@Get:
-        @@@Type:  
-          DOMLS:LSReader
-     @@Set:
-        @@@Type:  
-          DOMLS:LSReader
-  @Attr:
-     @@Name:  byteStream
-     @@Get:
-        @@@Type:  
-          DOMLS:LSInputStream
-     @@Set:
-        @@@Type:  
-          DOMLS:LSInputStream
-  @Attr:
-     @@Name:  stringData
-     @@Type:  
-       DOMMain:DOMString
-     @@Get:
-     @@Set:
-  @Attr:
-     @@Name:  systemId
-     @@Type:
-       DOMMain:DOMString
-     @@Get:
-     @@Set:
-  @Attr:
-     @@Name:  publicId
-     @@Type:
-       DOMMain:DOMString
-     @@Get:
-     @@Set:
-  @Attr:
-     @@Name:  baseURI
-     @@Type:
-       DOMMain:DOMString
-     @@Get:
-     @@Set:
-  @Attr:
-     @@Name:  encoding
-     @@Type:
-       DOMMain:DOMString
-     @@Get:
-     @@Set:
-  @Attr:
-     @@Name:  certifiedText
-     @@Get:
-        @@@Type:
-           DOMMain:boolean
-     @@Set:
-       @@@Type:
-         DOMMain:boolean
-
-  @InputProcessor:
-    @@PerlDef:
-      if (ref $INPUT eq 'HASH') {
-        require Message::DOM::DOMLS;
-        $INPUT = bless $INPUT, 'Message::DOM::DOMLS::ManakaiDOMLSInput';
-      }
-
-  @ManakaiDOM:inputNormalizer:
-    @@ContentType:
-      lang:Perl
-    @@@:
-      if (ref $INPUT eq 'HASH') {
-        require Message::DOM::DOMLS;
-        $INPUT = bless $INPUT, 'Message::DOM::DOMLS::ManakaiDOMLSInput';
-      }
-##IF:LSInput
 
 ElementTypeBinding:
   @Name: InputProcessor

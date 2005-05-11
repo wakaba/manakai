@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/05/09 11:59:32 $
+      $Date: 2005/05/11 14:07:41 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2947,6 +2947,7 @@ ClsDef:
               __EXCEPTION{FOR_ALREADY_DEFINED_ERR::
                 DIS:sourceNode => {$el},
                 DIS:anotherSourceNode => {$for->{src}},
+                DIS:uri => {$for->{uri}},
               }__;
             }__;
           } # isDefine?
@@ -4027,8 +4028,8 @@ ClsDef:
                 my %feature;
                 for my $el (@{$cls->{src}
                                   -><M::ManakaiDISElement.disChildElements>
-                                      (for_arg => $self->{for},
-                                       forp_arg => $self->{forp})}) {
+                                      (for_arg => $cls->{for},
+                                       forp_arg => $cls->{forp})}) {
                   next unless $el-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
                                 .expandedURI> eq <Q::DOMMetaImpl:provideFeature>;
                   my $furi = $el-><AG::ManakaiDISElement.qnameValueURI>;
@@ -4060,17 +4061,17 @@ ClsDef:
                   my $fi = $self-><M::ManakaiDISPerlModuleDefinition
                         .plIsFeatureImplemented> ($f->[0]->{uri}) ? true : false;
                   my @ec = @{$f->[1]-><M::ManakaiDISElement.disChildElements>
-                                    (for_arg => $self->{for},
-                                     forp_arg => $self->{forp})};
+                                    (for_arg => $cls->{for},
+                                     forp_arg => $cls->{forp})};
                   if (@ec) {
                     for my $ec (@ec) {
                       next unless $ec-><AG::swcfg21:SWCFGElement
                                           ::swcfg21:ForLatest
                                .expandedURI> eq <Q::DOMMetaImpl:providedThrough>;
                       my $curi = $ec-><M::ManakaiDISElement.tfqnamesValueURI>
-                                  ($self->{<Q::DIS:sourceNodeID>}, $self->{for},
-                                   for_arg => $self->{for},
-                                   forp_arg => $self->{forp});
+                                  ($self->{<Q::DIS:sourceNodeID>}, $cls->{for},
+                                   for_arg => $cls->{for},
+                                   forp_arg => $cls->{forp});
                       my $c = $self->{db}-><M::ManakaiDISDatabase.getResource>
                                                                     ($curi);
                       $c-><AS::ManakaiDISResourceDefinition.isReferred> ($ec);
@@ -4309,6 +4310,19 @@ ClsDef:
                     $r-><M::PLBlockCon.appendStatement>
                           ('$Message::DOM::ManakaiDOMNamespace'.
                            '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
+
+                  if ($role-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
+                                (<Q::DOMLS:ParserRole>)) {
+                    $r-><M::PLBlockCon.appendStatement>
+                          ('$Message::DOM::DOMLS::ParserClass{q<'.
+                           $pack_name . '>} = 1');
+                  }
+                  if ($role-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
+                                (<Q::DOMLS:SerializerRole>)) {
+                    $r-><M::PLBlockCon.appendStatement>
+                          ('$Message::DOM::DOMLS::SerializerClass{q<'.
+                           $pack_name . '>} = 1');
                   }
                 }
               } elsif ($cls-><M::ManakaiDISResourceDefinition.isTypeURI>
@@ -6797,6 +6811,12 @@ ClsDef:
                   } else {
                     $r-><M::PLAnyCon.appendBare> ($pack);
                   }
+                  $self-><M::ManakaiDISResourceDefinition.plAddRequireResource>
+                                         ($class => $r)
+                    if {
+                      <Q::disPerl:Class> => true,
+                      <Q::disPerl:ClassName> => true,
+                    }->{$et};
                 } elsif ($et eq <Q::disPerl:Code>) { ## Inline code
                   my $code_name;
                   $source_code =~ s/^\s+//;

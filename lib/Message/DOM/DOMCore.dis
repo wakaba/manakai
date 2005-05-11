@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/09 11:59:32 $
+      $Date: 2005/05/11 14:07:41 $
     @@ContentType:
       dis:Date.RCS
 
@@ -1281,6 +1281,19 @@ ExceptionDef:
           @@@@@:
             The DOM implementation does not support the type of object requested.
         @@@SubTypeDef:
+          @@@@QName: FEATURE_NOT_SUPPORTED_ERR
+          @@@@enDesc:
+            One or more of the requested features or their versions
+            are not supported by the implementation.
+          @@@@XParam:
+            @@@@@QName: features
+            @@@@@enDesc:
+              The features or the combination of the features
+              that are not supported.
+          @@@@enMufDef:
+            %p (name => {<Q::DOMCore:features>}, prefix => {"},
+            suffix => {": });Unsupported features requested
+        @@@SubTypeDef:
           @@@@QName:
             ManakaiDOMEvents:FOREIGN_EVENT_ERR
           @@@@Description:
@@ -1815,6 +1828,12 @@ ExceptionDef:
           @@@@@:
             The type of an object is incompatible with the expected 
             type of the parameter associated to the object.
+
+PropDef:
+  @QName: features
+  @enDesc:
+    Lists of features.
+  @Type: ManakaiDOM|ManakaiDOMFeatures
 
 IF:
   @Name:

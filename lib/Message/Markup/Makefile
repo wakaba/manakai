@@ -54,7 +54,8 @@ $(MANAKAI_LIB_DIR)Message/Util/all.dac: \
   $(MANAKAI_LIB_DIR)manakai/DISLang.dis \
   $(MANAKAI_LIB_DIR)manakai/DISPerl.dis \
   $(MANAKAI_LIB_DIR)manakai/XML.dis \
-  SuikaWikiConfig21.dis
+  SuikaWikiConfig21.dis \
+  $(MANAKAI_LIB_DIR)Message/DOM/DOMLS.dis
 	$(CD) $(MANAKAI_LIB_DIR)Message/Util/ && \
 	  $(MAKE) all.dac
 
