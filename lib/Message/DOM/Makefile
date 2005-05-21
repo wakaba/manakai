@@ -49,6 +49,7 @@ all: $(GENERATED_FILES)
 core.dac: $(DIS_FILES_CORE) $(DAC_PL) $(CORE_DAC_FILE) \
   $(MANAKAI_LIB_DIR)Message/Util/ManakaiNode.dis \
   $(MANAKAI_LIB_DIR)Message/Util/Error/DOMException.dis
+	$(CD) $(MANAKAI_LIB_DIR) && $(MAKE) ../lib/Message/DOM/DOMLS.pm
 	$(DAC)$@ --input-db-file-name="$(CORE_DAC_FILE)" DOMLS.dis
 
 html.dac: $(DIS_FILES_HTML) $(DAC_PL) core.dac
@@ -67,6 +68,7 @@ DOMXML.pm: core.dac $(DAC2PM_PL)
 	$(PERL_CHK) $@
 
 DOMLS.pm: core.dac $(DAC2PM_PL)
+	$(CD) $(MANAKAI_LIB_DIR) && $(MAKE) ../lib/Message/DOM/DOMLS.pm
 	$(DAC2PM) $< --module-uri="$(NS_MDOM)DOMLS" --output-file-path="$@"
 	$(PERL_CHK) $@
 

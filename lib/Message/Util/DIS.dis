@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/05/11 14:07:41 $
+      $Date: 2005/05/21 16:16:41 $
     @@ContentType:
       dis:Date.RCS
   
@@ -4119,6 +4119,7 @@ ClsDef:
                   for my $fname (@{$feature-><AG::ManakaiDISResourceDefinition
                                                  .featureNameList>}) {
                     $ifeature{$fname}->{$fver} = $fi;
+                    $ifeature{$fname}->{''} = true;
                   }                  
                 }
                 $r-><M::PLBlockCon.appendStatement>
@@ -6188,7 +6189,7 @@ ClsDef:
     @@rdf:type:
       DISPerl:ScalarVariable
     @@DefaultValue:
-      @@@@: qr/[^\s<>"'\\\[\]\{\},=\$\@%]/
+      @@@@: qr[[^\s<>"'/\\\[\]\{\},!\?=\$\@%]]
       @@@ContentType:
         lang:Perl
     @@Type:

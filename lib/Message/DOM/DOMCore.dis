@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/11 14:07:41 $
+      $Date: 2005/05/21 16:16:41 $
     @@ContentType:
       dis:Date.RCS
 
@@ -5315,13 +5315,12 @@ IF:
           <Q::DOMXML:CDATASection> => true,
           <Q::infoset:Comment> => true,
           <Q::infoset:ProcessingInstruction> => true,
-      }->{$node->{<Q::TreeCore:node>}->{<Q::DOMCore:nodeType>}}) {
-        $result = $node->{<Q::TreeCore:node>}->{<Q::infoset:content>};
+      }->{$__nodeobj->{<Q::DOMCore:nodeType>}}) {
+        $result = $__nodeobj->{<Q::infoset:content>};
       } else {
         ## TODO: Namespace node not supported yet
         __ASSERT{DISPerl:invariant::
-          msg => {qq{Node type: "$node->{<Q::TreeCore:node>
-                     }->{<Q::DOMCore:nodeType>}"}}
+          msg => {qq{Node type: "$__nodeobj->{<Q::DOMCore:nodeType>}"}}
         }__;
         $result = null;
       }
@@ -5861,7 +5860,8 @@ IF:
               $ns = $object->{<Q::infoset:namespaceName>};
               $ns = '' unless defined $ns;
               $ln = $object->{<Q::infoset:localName>};
-            } elsif ($object->{<Q::DOMCore:hasFeature>}->{HTML}) {
+            } elsif ($object->{<Q::DOMCore:ownerDocument>}
+                            ->{<Q::DOMCore:hasFeature>}->{HTML}) {
               $ns = <Q::xhtml1:>;
               $ln = lc $object->{<Q::DOMCore:name>};
             }
@@ -5904,7 +5904,8 @@ IF:
                   $ns = $co->{<Q::infoset:namespaceName>};
                   $ns = '' unless defined $ns;
                   $ln = $co->{<Q::infoset:localName>};
-                } elsif ($co->{<Q::DOMCore:hasFeature>}->{HTML}) {
+                } elsif ($co->{<Q::DOMCore:ownerDocument>}
+                            ->{<Q::DOMCore:hasFeature>}->{HTML}) {
                   $ns = <Q::xhtml1:>;
                   $ln = lc $co->{<Q::DOMCore:name>};
                 }
@@ -5939,7 +5940,24 @@ IF:
 
                 # Not found --> checking root element
               }
+            } # CHILD
+
+            if ($object->{<Q::DOMCore:ownerDocument>}
+                       ->{<Q::DOMCore:hasFeature>}->{HTML}) {
+              for my $pack ((sort {
+                    $Message::DOM::ClassPoint{$b} <=>
+                    $Message::DOM::ClassPoint{$a}
+              } grep {
+                  $Message::DOM::ManakaiDOMDocument::CompatClassET{<Q::xhtml1:>}
+                      ->{'*'}->{$_} and
+                  $_->isa (<IFName::Document>)
+              } keys %{$Message::DOM::ManakaiDOMDocument::CompatClassET{
+                               <Q::xhtml1:>}->{'*'}})) {
+                $class = $pack;
+                last FIND;
+              }
             }
+
             $class = <ClassName::ManakaiDOMDocument>;
           } elsif ($nt eq <Q::infoset:ProcessingInstruction>) {
             ## TODO: Find class by namespace URI and local name

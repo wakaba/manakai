@@ -44,7 +44,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/09 11:59:32 $
+      $Date: 2005/05/21 16:16:41 $
     @@ContentType:
       dis:Date.RCS
 
@@ -2334,15 +2334,19 @@ ResourceDef:
                                    ->{<Q::infoset:namespaceName>};
             if ($__ns eq <Q::xhtml1:> or
                 (not defined $__ns and
-                 $elementNode->{<Q::TreeCore:node>}->{<Q::DOMCore:hasFeature>}
+                 $elementNode->{<Q::TreeCore:node>}
+                             ->{<Q::DOMCore:ownerDocument>}
+                             ->{<Q::DOMCore:hasFeature>}
                       ->{HTML})) {
               $elementType eq $__ln ? true : false;
             } else {
               false;
             }
-          } elsif ($elementNode->{<Q::TreeCore:node>}->{<Q::DOMCore:hasFeature>}
+          } elsif ($elementNode->{<Q::TreeCore:node>}
+                        ->{<Q::DOMCore:ownerDocument>}->{<Q::DOMCore:hasFeature>}
                         ->{HTML}) {
-            if ($elementNode->{<Q::TreeCore:node>}->{<Q::DOMCore:hasFeature>}
+            if ($elementNode->{<Q::TreeCore:node>}
+                        ->{<Q::DOMCore:ownerDocument>}->{<Q::DOMCore:hasFeature>}
                         ->{XML}) {
               $elementType eq $elementNode-><AG::DOMCore:Node.nodeName>
                  ? true : false;
@@ -2380,13 +2384,15 @@ ResourceDef:
             my $__ns = $elementNodeo->{<Q::infoset:namespaceName>};
             if ($__ns eq <Q::xhtml1:> or
                 (not defined $__ns and
-                 $elementNodeo->{<Q::DOMCore:hasFeature>}
+                 $elementNodeo->{<Q::DOMCore:ownerDocument>}
+                      ->{<Q::DOMCore:hasFeature>}
                       ->{HTML})) {
               $elementType eq $__ln ? true : false;
             } else {
               false;
             }
-          } elsif ($elementNodeo->{<Q::DOMCore:hasFeature>}
+          } elsif ($elementNodeo
+                        ->{<Q::DOMCore:ownerDocument>}->{<Q::DOMCore:hasFeature>}
                         ->{HTML}) {
             my $elClass = <ClassName::DOMCore:ManakaiDOMElement>;
             my $elementNode = <Code::ManakaiNode:getWeakRef
@@ -2394,7 +2400,8 @@ ResourceDef:
               $object = $elementNodeo,
               $class = $elClass,
             >;
-            if ($elementNodeo->{<Q::DOMCore:hasFeature>}
+            if ($elementNodeo
+                        ->{<Q::DOMCore:ownerDocument>}->{<Q::DOMCore:hasFeature>}
                         ->{XML}) {
               $elementType eq $elementNode-><AG::DOMCore:Node.nodeName>
                  ? true : false;
