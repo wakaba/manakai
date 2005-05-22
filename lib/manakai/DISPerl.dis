@@ -15,7 +15,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/01 12:44:05 $
+      $Date: 2005/05/22 13:32:00 $
     @@ContentType:
       dis:Date.RCS
   
@@ -677,6 +677,8 @@ ResourceTypeDef:
               it is significant.
       \
       }
+  @rdfs:subClassOf:
+    DISCore:AnyDefContainer
 
 ResourceTypeDef:
   @QName:
@@ -686,6 +688,8 @@ ResourceTypeDef:
     @@@:
       A block code fragment referred by <CODE::__CODE{<VAR::qname>}__> 
       preprocessed block.
+  @rdfs:subClassOf:
+    DISCore:AnyDefContainer
 
 ResourceTypeDef:
   @QName: CodeParameter

@@ -15,7 +15,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/04 13:49:27 $
+      $Date: 2005/05/22 13:32:00 $
     @@ContentType:
       dis:Date.RCS
   
@@ -196,6 +196,8 @@ ResourceTypeDef:
     @@lang:en
     @@@:
       A programming language attribute getter. 
+  @rdfs:subClassOf:
+    DISCore:AnyDefContainer
 
 ResourceTypeDef:
   @QName: AttributeSet
@@ -203,6 +205,8 @@ ResourceTypeDef:
     @@lang:en
     @@@: 
       A programming language attribute setter. 
+  @rdfs:subClassOf:
+    DISCore:AnyDefContainer
 
 ResourceTypeDef:
   @QName: Method
@@ -218,6 +222,8 @@ ResourceTypeDef:
     @@lang:en
     @@@:
       Method return values (or returning subroutines). 
+  @rdfs:subClassOf:
+    DISCore:AnyDefContainer
 
 ResourceTypeDef:
   @QName: MethodParameter
@@ -233,6 +239,8 @@ ResourceTypeDef:
     @@@:
       Processors checking or normalizing a method or attribute input
       before the execution of the body of it.
+  @rdfs:subClassOf:
+    DISCore:AnyDefContainer
 
 PropDef:
   @QName:

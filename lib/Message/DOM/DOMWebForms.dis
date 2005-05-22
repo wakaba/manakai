@@ -26,7 +26,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/08 14:18:01 $
+      $Date: 2005/05/22 13:32:00 $
     @@ContentType:
       dis:Date.RCS
 
@@ -700,41 +700,35 @@ ET:
                  added for backward compatibility with DOM Level 0.
          \
          }
+     @@rcdata:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:accept-charset
      @@DOMAName:  acceptCharset
+     @@rcdata:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  action
+     @@ruri:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  enctype
+     @@rcdata:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  method
+     @@renum:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  target
+     @@rcdata:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @Method:
      @@Name:  submit
      @@Description:
@@ -910,59 +904,46 @@ ET:
             ManakaiDOM:DOM1 !ManakaiDOM:DOM2
   @ATTR:
      @@Name:  disabled
+     @@rbool:
      @@Get:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
      @@Set:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
   @ATTR:
      @@Name:  multiple
+     @@rbool:
      @@Get:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
      @@Set:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
   @ATTR:
      @@Name:  name
+     @@rcdata:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  size
+     @@rlong:
      @@Get:
-        @@@Type:
-           DOMMain:long
      @@Set:
-        @@@Type:
-           DOMMain:long
   @ATTR:
      @@AName:tabindex
      @@DOMAName:  tabIndex
+     @@rlong:
      @@Get:
-        @@@Type:
-           DOMMain:long
      @@Set:
-        @@@Type:
-           DOMMain:long
   @Method:
      @@Name:  add
      @@Description:
@@ -1074,26 +1055,22 @@ ET:
 
   @ATTR:
      @@Name:  disabled
+     @@rbool:
      @@Get:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
      @@Set:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
   @ATTR:
      @@Name:  label
+     @@rcdata:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 ##IF:HTMLOptGroupElement
 
 ET:
@@ -1131,16 +1108,13 @@ ET:
          Whether the option is initially selected or not.  
          The value of this attribute does not change 
          if the state of the corresponding form control changes.
+     @@rbool:
      @@Get:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
      @@Set:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
@@ -1189,26 +1163,22 @@ ET:
         2
   @ATTR:
      @@Name:  disabled
+     @@rbool:
      @@Get:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
      @@Set:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
   @ATTR:
      @@Name:  label
+     @@rcdata:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @Attr:
      @@Name:  selected
      @@Description:
@@ -1249,10 +1219,9 @@ ET:
             It was ammended in DOM Level 1 Errata.
   @ATTR:
      @@Name:  value
+     @@rcdata:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 ##IF:HTMLOptionElement
 
 PropDef:
@@ -1280,8 +1249,7 @@ ET:
        @@@@:
          The initial value of the <HTML:text>, <HTML:file> or 
          <HTML:password> control.
-     @@Type: 
-       DOMMain:DOMString
+     @@rcdata:
      @@Get:
      @@Set:
   @ATTR:
@@ -1292,16 +1260,13 @@ ET:
        @@@@:
          The initial state of the <HTML:checkbox> or <HTML:radio> 
          button control.
+     @@rbool:
      @@Get:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
      @@Set:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
@@ -1324,30 +1289,26 @@ ET:
               This control is not within the context of a form.
   @ATTR:
      @@Name:  accept
-     @@Type:
-       DOMMain:DOMString
+     @@rcdata:
      @@Get:
      @@Set:
   @ATTR:
      @@AName:accesskey
      @@DOMAName:  accessKey
+     @@rcdata:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  align
      @@Deprecated:
+     @@renum:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  alt
+     @@rcdata:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @Attr:
      @@Name:  checked
      @@Description:
@@ -1387,16 +1348,13 @@ ET:
            @@@@Value:  false
   @ATTR:
      @@Name:  disabled
+     @@rbool:
      @@Get:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
      @@Set:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
@@ -1404,47 +1362,44 @@ ET:
   @ATTR:
      @@AName:maxlength
      @@DOMAName:  maxLength
+     @@rlong:
      @@Get:
-        @@@Type:
-           DOMMain:long
      @@Set:
-        @@@Type:
-           DOMMain:long
   @ATTR:
      @@Name:  name
+     @@rcdata:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:readonly
      @@DOMAName:  readOnly
+     @@rbool:
      @@Get:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
      @@Set:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
   @ATTR:
      @@Name:  size
+     @@Type:
+       @@@@: DOMMain|unsigned-long||ManakaiDOM|all
+       @@@ForCheck: ManakaiDOM|DOM2
+     @@actualType:
+       @@@@: DOMHTML|UnsignedNumeric
+       @@@ForCheck: ManakaiDOM|DOM2
+     @@Type:
+       @@@@: DOMString
+       @@@ForCheck: !ManakaiDOM|DOM2
+     @@actualType:
+       @@@@: DOMHTML|CDATADOMString
+       @@@ForCheck: !ManakaiDOM|DOM2
      @@Get:
-        @@@Type:
-           DOMMain:unsigned-long
      @@Set:
-        @@@Type:
-           DOMMain:unsigned-long
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The type was <TYPE:DOMString> in DOM Level 1.
      @@Level[list]:
         1
      @@SpecLevel[list]:
@@ -1452,25 +1407,20 @@ ET:
         2
   @ATTR:
      @@Name:  src
+     @@ruri:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:tabindex
      @@DOMAName:  tabIndex
+     @@rlong:
      @@Get:
-        @@@Type:
-           DOMMain:long
      @@Set:
-        @@@Type:
-           DOMMain:long
   @ATTR:
      @@Name:  type
+     @@rcdata:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
         @@@SpecLevel:2
         @@@Level:2
         @@@L2:
@@ -1483,10 +1433,9 @@ ET:
   @ATTR:
      @@AName:usemap
      @@DOMAName:  useMap
+     @@ruri:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -1669,74 +1618,57 @@ ET:
   @ATTR:
      @@AName:accesskey
      @@DOMAName:  accessKey
+     @@rcdata:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  cols
+     @@rlong:
      @@Get:
-        @@@Type:
-           DOMMain:long
      @@Set:
-        @@@Type:
-           DOMMain:long
   @ATTR:
      @@Name:  disabled
+     @@rbool:
      @@Get:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
      @@Set:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
   @ATTR:
      @@Name:  name
+     @@rcdata:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:readonly
      @@DOMAName:  readOnly
+     @@rbool:
      @@Get:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
      @@Set:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
   @ATTR:
      @@Name:  rows
+     @@rlong:
      @@Get:
-        @@@Type:
-           DOMMain:long
      @@Set:
-        @@@Type:
-           DOMMain:long
   @ATTR:
      @@AName:tabindex
      @@DOMAName:  tabIndex
+     @@rlong:
      @@Get:
-        @@@Type:
-           DOMMain:long
      @@Set:
-        @@@Type:
-           DOMMain:long
   @Attr:
      @@Name:  type
      @@Description:
@@ -1848,51 +1780,42 @@ ET:
   @ATTR:
      @@AName:accesskey
      @@DOMAName:  accessKey
+     @@rcdata:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  disabled
+     @@rbool:
      @@Get:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
      @@Set:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
   @ATTR:
      @@Name:  name
+     @@rcdata:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:tabindex
      @@DOMAName:  tabIndex
+     @@rlong:
      @@Get:
-        @@@Type:
-           DOMMain:long
      @@Set:
-        @@@Type:
-           DOMMain:long
   @ATTR:
      @@Name:  type
+     @@renum:
      @@Get:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  value
+     @@rcdata:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 ##IF:HTMLButtonElement
 
 ResourceDef:
@@ -1931,17 +1854,15 @@ ET:
   @ATTR:
      @@AName:accesskey
      @@DOMAName:  accessKey
+     @@rcdata:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:for
      @@DOMAName:  htmlFor
+     @@rcdata:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 ##IF:HTMLLabelElement
 
 ET:
@@ -1999,18 +1920,55 @@ ET:
   @ATTR:
      @@AName:accesskey
      @@DOMAName:  accessKey
+     @@rcdata:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  align
      @@Deprecated:
+     @@renum:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 ##IF:HTMLLegendElement
 
+ElementTypeBinding:
+  @Name: rcdata
+  @ElementType:
+    dis:Type
+  @ShadowContent: DOMString
+  @ShadowSibling:
+    @@actualType: DOMHTML|CDATADOMString
+
+ElementTypeBinding:
+  @Name: ruri
+  @ElementType:
+    dis:Type
+  @ShadowContent: DOMString
+  @ShadowSibling:
+    @@actualType: DOMHTML|URIDOMString
+
+ElementTypeBinding:
+  @Name: renum
+  @ElementType:
+    dis:Type
+  @ShadowContent: DOMString
+  @ShadowSibling:
+    @@actualType: DOMHTML|EnumDOMString
+
+ElementTypeBinding:
+  @Name: rbool
+  @ElementType:
+    dis:Type
+  @ShadowContent: DOMMain|boolean||ManakaiDOM|all
+  @ShadowSibling:
+    @@actualType: DOMHTML|Boolean
+
+ElementTypeBinding:
+  @Name: rlong
+  @ElementType:
+    dis:Type
+  @ShadowContent: DOMMain|long||ManakaiDOM|all
+  @ShadowSibling:
+    @@actualType: DOMHTML|Numeric
 
 ## DOMWebForms.dis ends here

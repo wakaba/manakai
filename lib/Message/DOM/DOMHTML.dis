@@ -44,7 +44,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/21 16:16:41 $
+      $Date: 2005/05/22 13:31:59 $
     @@ContentType:
       dis:Date.RCS
 
@@ -91,6 +91,10 @@ Module:
       @@@Name: DOMHTML
       @@@WithFor:
         DOMHTML:ForXHTML10SE
+    @@Module:
+      @@@Name: DOMHTML
+      @@@WithFor:
+        DOMHTML:ForHTML5
 
 Namespace:
   @dis:
@@ -284,6 +288,14 @@ ForDef:
     @@lang:en
     @@@: For XHTML 1.1
 
+ForDef:
+  @QName: DOMHTML|ForHTML5
+  @FullName:
+    @@lang:en
+    @@@:
+      For HTML 5 (Work in progress)
+  @ISA: DOMHTML|ForHTML
+
 ## -- Features
 
 ElementTypeBinding:
@@ -311,6 +323,14 @@ ElementTypeBinding:
   @ShadowContent:
     @@ContentType:
       dis:String
+
+ElementTypeBinding:
+  @Name: featureQName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ContentType:
+      dis:TypeQName
 
 FeatureDef:
   @featureName:  HTML
@@ -359,6 +379,8 @@ FeatureDef:
         DOM Level 2 HTML with XHTML support. 
         It is equal to <Feature::XML> / <FeatureVer::2.0> and  
         <Feature::HTML> / <FeatureVer::2.0>.
+
+## -- Datatypes
 
 ElementTypeBinding:
   @Name: DataTypeAlias
@@ -444,6 +466,442 @@ DataTypeAlias:
       lang:dis
     @@DISLang:dataTypeAliasFor:
       DOMCore:Element
+
+ElementTypeBinding:
+  @Name: ReflectTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: ManakaiDOM|DataType
+    @@ForCheck: !ManakaiDOM|IDL
+
+ReflectTypeDef:
+  @QName: CDATADOMString
+  @enDesc:
+    <IF::DOMMain:DOMString> for DOM attributes reflecting
+    <SGML::CDATA> element attributes.
+  @rdfs:subClassOf: DOMString
+  @ResourceDef:
+    @@rdf:type: DOMMain|ReflectGet
+    @@DefaultValue: \
+    @@enDesc:
+      The DOM attribute returns the current value of the element attribute
+      in a transparent, case-sensitive manner.
+      \
+      If the element attribute is absent, the default value, if any,
+      or the empty string is returned.
+    @@PerlDef:
+      my $ao = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                    ->{<Q::null:>}->{$LOCAL_NAME} ||
+               $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                    ->{<Q::ManakaiDOM:noNS>}->{$LOCAL_NAME};
+      if ($ao) {
+        my $attr;
+        __CODE{ManakaiNode:getWeakReference||ManakaiDOM:Perl::
+          $object => $ao, $ref => $attr,
+          $class => {<ClassName::DOMCore:ManakaiDOMAttr>},
+        }__;
+        __DEEP{
+          $r = $ao-><AG::DOMCore:Attr.value>;
+        }__;
+      }
+  @ResourceDef:
+    @@QName: CDATADOMStringSet
+    @@rdf:type: DOMMain|ReflectSet
+    @@enDesc:
+      The corresponding element attribute is set to the given value,
+      in a transparent, case-sensitive manner.
+    @@ImplNote:
+      @@@lang:en
+      @@@@: 
+        What will happen if the <DOM::null> value is given?
+    @@PerlDef:
+      my $ao = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                    ->{<Q::null:>}->{$LOCAL_NAME} ||
+               $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                    ->{<Q::ManakaiDOM:noNS>}->{$LOCAL_NAME};
+      if ($ao) {
+        my $attr;
+        __CODE{ManakaiNode:getWeakReference||ManakaiDOM:Perl::
+          $object => $ao, $ref => $attr,
+          $class => {<ClassName::DOMCore:ManakaiDOMAttr>},
+        }__;
+        __DEEP{
+          $ao-><AS::DOMCore:Attr.value> ($given);
+        }__;
+      } else {
+        __DEEP{
+          __FOR{ManakaiDOM|DOM2::
+            $self-><M::DOMCore:Element.setAttributeNS>
+                                               (null, $LOCAL_NAME => $given);
+          }__;
+          __FOR{!ManakaiDOM|DOM2::
+            $self-><M::DOMCore:Element.setAttribute> ($LOCAL_NAME => $given);
+          }__;
+        }__;
+      }
+
+ReflectTypeDef:
+  @QName: EnumDOMString
+  @enDesc:
+    <IF::DOMMain:DOMString> for DOM attributes reflecting
+    element attributes which is defined to only allow a specific
+    set of values.
+  @rdfs:subClassOf: DOMString
+  @ResourceDef:
+    @@rdf:type: DOMMain|ReflectGet
+    @@DefaultValue: \
+    @@enDesc:
+      The DOM attribute returns the current value of the element attribute
+      in lowercase.
+      \
+      If the element attribute is absent, the default value, if any,
+      or the empty string is returned.
+    @@PerlDef:
+      my $ao = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                    ->{<Q::null:>}->{$LOCAL_NAME} ||
+               $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                    ->{<Q::ManakaiDOM:noNS>}->{$LOCAL_NAME};
+      if ($ao) {
+        my $attr;
+        __CODE{ManakaiNode:getWeakReference||ManakaiDOM:Perl::
+          $object => $ao, $ref => $attr,
+          $class => {<ClassName::DOMCore:ManakaiDOMAttr>},
+        }__;
+        __DEEP{
+          $r = lc $ao-><AG::DOMCore:Attr.value>;
+        }__;
+      }
+  @ResourceDef:
+    @@rdf:type: DOMMain|ReflectSet
+    @@enDesc:
+      The corresponding element attribute is set to the given value,
+      in a transparent, case-sensitive manner.
+    @@ImplNote:
+      @@@lang:en
+      @@@@: 
+        What will happen if the <DOM::null> value is given?
+    @@disDef:
+      @@@DISPerl:cloneCode: CDATADOMStringSet
+
+ReflectTypeDef:
+  @QName: URIDOMString
+  @enDesc:
+    <IF::DOMMain:DOMString> for DOM attributes reflecting
+    element attributes defined to contain a IRI.
+  @rdfs:subClassOf: DOMString
+  @ResourceDef:
+    @@rdf:type: DOMMain|ReflectGet
+    @@DefaultValue: \
+    @@enDesc:
+      The DOM attribute returns the current value of the element attribute,
+      resolved to an absolute IRI.
+      \
+      If the element attribute is absent, the default value, if any,
+      or the empty string is returned.
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        {TODO:: Resolving.
+        \
+        }
+    @@PerlDef:
+      my $ao = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                    ->{<Q::null:>}->{$LOCAL_NAME} ||
+               $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                    ->{<Q::ManakaiDOM:noNS>}->{$LOCAL_NAME};
+      if ($ao) {
+        my $attr;
+        __CODE{ManakaiNode:getWeakReference||ManakaiDOM:Perl::
+          $object => $ao, $ref => $attr,
+          $class => {<ClassName::DOMCore:ManakaiDOMAttr>},
+        }__;
+        __DEEP{
+          $r = $ao-><AG::DOMCore:Attr.value>;
+        }__;
+      }
+  @ResourceDef:
+    @@rdf:type: DOMMain|ReflectSet
+    @@enDesc:
+      The corresponding element attribute is set to the given literal value.
+    @@ImplNote:
+      @@@lang:en
+      @@@@: 
+        What will happen if the <DOM::null> value is given?
+    @@disDef:
+      @@@DISPerl:cloneCode: CDATADOMStringSet
+      
+ReflectTypeDef:
+  @QName: Boolean
+  @enDesc:
+    <IF::DOMMain:boolean::ManakaiDOM:all> for DOM attributes reflecting
+    boolean element attributes.
+  @rdfs:subClassOf: DOMMain|boolean||ManakaiDOM|all
+  @ResourceDef:
+    @@rdf:type: DOMMain|ReflectGet
+    @@DefaultValue: false
+    @@enDesc:
+      The DOM attribute returns <DOM::true> if the element attribute
+      is set and <DOM::false> if it is absent.
+    @@PerlDef:
+      my $ao = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                    ->{<Q::null:>}->{$LOCAL_NAME} ||
+               $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                    ->{<Q::ManakaiDOM:noNS>}->{$LOCAL_NAME};
+      $r = $ao ? true : false;
+  @ResourceDef:
+    @@rdf:type: DOMMain|ReflectSet
+    @@enDesc:
+      The element attribute is removed if the DOM attribute
+      is set to <DOM::false> and is set to have the same
+      value as its local name if the DOM attribute is set to <DOM::true>.
+    @@PerlDef:
+      my $ao = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                    ->{<Q::null:>}->{$LOCAL_NAME} ||
+               $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                    ->{<Q::ManakaiDOM:noNS>}->{$LOCAL_NAME};
+      if ($ao) {
+        if ($given) {
+          my $attr;
+          __CODE{ManakaiNode:getWeakReference||ManakaiDOM:Perl::
+            $object => $ao, $ref => $attr,
+            $class => {<ClassName::DOMCore:ManakaiDOMAttr>},
+          }__;
+          __DEEP{
+            $ao-><AS::DOMCore:Attr.value> ($LOCAL_NAME);
+          }__;
+        } else {
+          if ($self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                   ->{<Q::null:>}->{$LOCAL_NAME}) {
+            CORE::delete $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                              ->{<Q::null:>}->{$LOCAL_NAME};
+          } else {
+            CORE::delete $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                              ->{<Q::ManakaiDOM:noNS>}->{$LOCAL_NAME};
+          }
+          CORE::delete $ao->{<Q::infoset:ownerElement>};
+          $ao-><M::ManakaiDOM|ManakaiDOMNodeObject||ManakaiDOM|Perl.orphanate>;
+        }
+      } else {
+        if ($given) {
+          __DEEP{
+            __FOR{ManakaiDOM|DOM2::
+              $self-><M::DOMCore:Element.setAttributeNS>
+                                              (null, $LOCAL_NAME => $LOCAL_NAME);
+            }__;
+            __FOR{!ManakaiDOM|DOM2::
+              $self-><M::DOMCore:Element.setAttribute>
+                                                    ($LOCAL_NAME => $LOCAL_NAME);
+            }__;
+          }__;
+        }
+      }
+
+ReflectTypeDef:
+  @QName: Numeric
+  @enDesc:
+    <IF::DOMMain:long::ManakaiDOM:all> for DOM attributes reflecting
+    number element attributes.
+  @rdfs:subClassOf: DOMMain|long||ManakaiDOM|all
+  @ResourceDef:
+    @@rdf:type: DOMMain|ReflectGet
+    @@DefaultValue: 0
+    @@enDesc:
+      The DOM attribute returns a numeric type value converted
+      from the element attribute value.  If the convertion 
+      fails or if the element attribute is absent, then
+      the default value is returned or <DOM::0> if there is 
+      no default value. 
+    @@PerlDef:
+      my $ao = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                    ->{<Q::null:>}->{$LOCAL_NAME} ||
+               $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                    ->{<Q::ManakaiDOM:noNS>}->{$LOCAL_NAME};
+      if ($ao) {
+        my $attr;
+        __CODE{ManakaiNode:getWeakReference||ManakaiDOM:Perl::
+          $object => $ao, $ref => $attr,
+          $class => {<ClassName::DOMCore:ManakaiDOMAttr>},
+        }__;
+        __DEEP{
+          $r = $ao-><AG::DOMCore:Attr.value>;
+        }__;
+        __CODE{convertToNumericType::
+          $original => $r, 
+          $result => $r,
+          $default => {0},
+        }__;
+      }
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        {TODO:: Default value other than 0.
+        \
+        }
+  @ResourceDef:
+    @@rdf:type: DOMMain|ReflectSet
+    @@enDesc:
+      The given value is converted to a string representing
+      the number in decimal (base ten) and then that
+      string is set to the element attribute.
+    @@QName: NumericSet
+    @@PerlDef:
+      my $ao = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                    ->{<Q::null:>}->{$LOCAL_NAME} ||
+               $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                    ->{<Q::ManakaiDOM:noNS>}->{$LOCAL_NAME};
+      if ($ao) {
+        my $attr;
+        __CODE{ManakaiNode:getWeakReference||ManakaiDOM:Perl::
+          $object => $ao, $ref => $attr,
+          $class => {<ClassName::DOMCore:ManakaiDOMAttr>},
+        }__;
+        __DEEP{
+          $ao-><AS::DOMCore:Attr.value> (0 + $given);
+        }__;
+      } else {
+        __DEEP{
+          __FOR{ManakaiDOM|DOM2::
+            $self-><M::DOMCore:Element.setAttributeNS>
+                                               (null, $LOCAL_NAME => 0 + $given);
+          }__;
+          __FOR{!ManakaiDOM|DOM2::
+            $self-><M::DOMCore:Element.setAttribute> ($LOCAL_NAME => 0 + $given);
+                                                    
+          }__;
+        }__;
+      }
+
+  @ResourceDef:
+    @@rdf:type: dis2pm|BlockCode
+    @@QName: convertToNumericType
+    @@enDesc:
+      Converts a string to a number. 
+      \
+      When an HTML 5 (work in progress) user agent needs to
+      convert a string to a number, algorithms equivalent
+      to those specified in ECMA 262 section 9.3.1
+      <sw010:csection::ToNumber Applied to the String Type> and
+      8.5 <sw010:csection::The Number type> should be used
+      (possibly after suitably altering the algorithms to handle
+      numbers of the range that the user agent can support).
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+      - StringNumericLiteral := [StrWhiteSpace]
+                                [StrNumericLiteral [StrWhiteSpace]]
+      \
+      - StrWhiteSpace := 1*StrWhiteSpaceChar
+      \
+      - StrWhiteSpaceChar := TAB / SP / NBSP / FF / VT / CR / LF / LS / PS / USP
+                          ;; U+0009 / U+0020 / U+00A0 / U+000C / U+000D /
+                             U+000A / U+2028 / U+2029 / Zs
+      \
+      - StrNumericLiteral := StrDecimalLiteral / HexIntegerLiteral
+      \
+      - StrDecimalLiteral := ["+" / "-"] StrUnsignedDecimalLiteral
+      \
+      - StrUnsignedDecimalLiteral := 'Infinity' /
+               1*DIGIT ["."  0*DIGIT]  [ExponentPart] /
+                        "."  1*DIGIT  [ExponentPart]
+      \
+      - ExponentPart := "E" SignedInteger
+      \
+      - SignedInteger := ["+" / "-"] 1*DIGIT
+      \
+      - HexIntegerLiteral := "0x" 1*HEXDIGIT
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        ECMA 262 3rd edition (1999) references Unicode 2.1
+        and section 7.2 <sw10:csection::White Space> 
+        cites Unicode without version number, while section 6
+        <sw10:csection::Source Text> refers Unicode 2.1 or later.
+    @@PerlDef:
+      if ($original =~ m{
+        \A  [\x09\x0A\x0C\x0D\x20\u{00A0}\u{2028}\u{2029}\pZs]*
+
+        (?: (
+
+            ## Decimal
+
+            [+-] (?: [0-9]+(?:\.[0-9]*)?([eE][+-][0-9]+)? |
+                              \.[0-9]+  ([eE][+-][0-9]+)? |
+                     Infinity ) |
+
+            ## Hex
+
+            0[xX][0-9A-Fa-f]+
+
+            )
+
+            [\x09\x0A\x0C\x0D\x20\u{00A0}\u{2028}\u{2029}\pZs]* )? \z
+      }s) {
+        my $__str = $1;
+        if (defined $__str) {
+          if (lc substr ($__str, 0, 2) eq '0x') {
+            $result = hex $__str;
+          } else {
+            $result = 0 + $__str;
+          }
+          ## BUG: Infinity is not supported
+        } else {
+          $result = +0;
+        }
+      } else { ## NaN
+        $result = $default;
+      }
+
+ReflectTypeDef:
+  @QName: UnsignedNumeric
+  @enDesc:
+    <IF::DOMMain:unsigned-long::ManakaiDOM:all> for DOM attributes reflecting
+    number element attributes.
+  @rdfs:subClassOf: DOMMain|unsigned-long||ManakaiDOM|all
+  @ResourceDef:
+    @@rdf:type: DOMMain|ReflectGet
+    @@DefaultValue: 0
+    @@enDesc:
+      The DOM attribute returns a numeric type value converted
+      from the element attribute value.  If the convertion 
+      fails or if the element attribute is absent, then
+      the default value is returned or <DOM::0> if there is 
+      no default value. 
+    @@PerlDef:
+      my $ao = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                    ->{<Q::null:>}->{$LOCAL_NAME} ||
+               $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                    ->{<Q::ManakaiDOM:noNS>}->{$LOCAL_NAME};
+      if ($ao) {
+        my $attr;
+        __CODE{ManakaiNode:getWeakReference||ManakaiDOM:Perl::
+          $object => $ao, $ref => $attr,
+          $class => {<ClassName::DOMCore:ManakaiDOMAttr>},
+        }__;
+        __DEEP{
+          $r = $ao-><AG::DOMCore:Attr.value>;
+        }__;
+        __CODE{convertToNumericType::
+          $original => $r, 
+          $result => $r,
+          $default => {0},
+        }__;
+        $r = 0 if $r < 0;
+      }
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        {TODO:: What should be returned if negative value?
+        \
+        }
+  @ResourceDef:
+    @@rdf:type: DOMMain|ReflectSet
+    @@enDesc:
+      The given value is converted to a string representing
+      the number in decimal (base ten) and then that
+      string is set to the element attribute.
+    @@disDef:
+      @@@DISPerl:cloneCode: NumericSet
 
 ImplNote:
   @lang:en
@@ -589,6 +1047,33 @@ ElementTypeBinding:
       @@@ContentType: DISCore|TFPQNames
 
 ElementTypeBinding:
+  @Name: ClsOnly
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@:
+        dis:MultipleResource
+      @@@ForCheck:
+        !ManakaiDOM:ForClass !ManakaiDOM:ForIF !ForHTML
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:Class
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@resourceFor:
+      @@@@:
+        ManakaiDOM:ForClass
+      @@@ForCheck:
+        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+        ManakaiDOM:DOMHTMLFeature !ForHTML
+    @@ISA:
+      @@@@:
+        ManakaiDOM:ManakaiDOMObject
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+
+ElementTypeBinding:
   @Name: ET
   @ElementType:
     dis:ResourceDef
@@ -651,7 +1136,7 @@ ElementTypeBinding:
           DOM Level 1 First Edition refers the latest version of 
           HTML 4.0 while Second Edition refers the second edition of 
           HTML 4.0. 
-      @@@DISCore:stopISARecursive:1
+      @@@@@DISCore:stopISARecursive:1
     @@DISMarkup:elementType:
       @@@@:
         ::ForHTML401
@@ -662,7 +1147,70 @@ ElementTypeBinding:
         ::ForXHTML10SE
       @@@ForCheck:
         ManakaiDOM:DOM2
-      @@@DISCore:stopISARecursive:1
+      @@@@@DISCore:stopISARecursive:1
+
+ElementTypeBinding:
+  @Name: H5ETX
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@:
+        dis:MultipleResource
+      @@@ForCheck:
+        !ManakaiDOM:ForClass !ManakaiDOM:ForIF !ForHTML
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:IF
+      @@@ForCheck:
+        ManakaiDOM:ForIF
+    @@rdf:type:
+      @@@@:
+        ManakaiDOM:Class
+      @@@ForCheck:
+        ManakaiDOM:ForClass
+    @@resourceFor:
+      @@@@:
+        ManakaiDOM:ForIF
+      @@@ForCheck:
+        ManakaiDOM:DOM
+      @@@For:
+        ManakaiDOM:DOMHTMLFeature
+      @@@For:
+        =ManakaiDOM:ManakaiDOM
+    @@resourceFor:
+      @@@@:
+        ManakaiDOM:ForClass
+      @@@ForCheck:
+        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM ManakaiDOM:DOMHTMLFeature
+
+    @@rdf:type:
+      @@@@:
+        s:ElementType
+      @@@ForCheck:
+        ForHTML
+
+    @@ISA:
+      @@@@:
+        ::ManakaiDOM:ManakaiDOM||ManakaiDOM:ForIF
+      @@@ForCheck:
+        ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM1
+      @@@ContentType: DISCore|TFPQNames
+    @@Implement:
+      @@@@: ||+||ManakaiDOM|ForIF
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
+      @@@ContentType: DISCore|TFPQNames
+
+    @@DISMarkup:elementType:
+      @@@@: ||ForHTML5
+      @@@ForCheck: ManakaiDOM|ManakaiDOMLatest
+      @@@@@DISCore:stopISARecursive:1
+
+    @@DOMMain:implementFeature: HTMLExtendedFeature30
+
+    @@For: =ManakaiDOM|ManakaiDOM
+    @@For: ManakaiDOM|ManakaiDOMLatest
+    @@For: ForHTML5
 
 ElementTypeBinding:
   @Name: Method
@@ -722,6 +1270,21 @@ ElementTypeBinding:
       ManakaiDOM:DOMAttribute
     @@ForCheck:
       ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+
+ElementTypeBinding:
+  @Name: Attrs
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: ManakaiDOM|DOMAttribute
+      @@@ForCheck: ManakaiDOM|DOM
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+    @@For: ManakaiDOM|ManakaiDOM
+    @@For: ForHTML
+    @@rdf:type:
+      @@@@: s|Attribute
+      @@@ForCheck: ForHTML
 
 ElementTypeBinding:
   @Name: ATTR
@@ -914,7 +1477,7 @@ IF:
                                    .getElementBy> 
                           ($self->{<Q::ManakaiDOMCore:nodeMatch>}, \$index);
            if (defined $r) {
-             $r = <ClassM::DOMCore:ManakaiDOMNode.getNodeReference> ($r, $self);
+             $r = <ClassM::DOMCore:ManakaiDOMNode.getNodeReference> ($r);
            }
   @Method:
      @@Name:  namedItem
@@ -1040,7 +1603,7 @@ IF:
       \#line 1 "DOMHTML.ManakaiDOMHTMLCollection.namedItem.#4"
                          }, \$index);
            if (defined $r) {
-             $r = <ClassM::DOMCore:ManakaiDOMNode.getNodeReference> ($r, $self);
+             $r = <ClassM::DOMCore:ManakaiDOMNode.getNodeReference> ($r);
            }
 
 ImplNote:
@@ -1074,8 +1637,10 @@ IF:
   @For:
     =ManakaiDOM:ManakaiDOM
   @DOMMain:implementFeature: HTMLFeature20
+  @DOMMain:implementFeature: HTMLExtendedFeature30
 
   @DOMMetaImpl:provideFeature: HTMLFeature20
+  @DOMMetaImpl:provideFeature: HTMLExtendedFeature30
 
   @Description:
     @@lang:en
@@ -2164,15 +2729,14 @@ IF:
   @Attr:
      @@Name:  id
      @@DocAttr1:
-       id::HTML40SE
+       id::ForHTML40SE
      @@DocAttr2S:
-       id::HTML401
+       id::ForHTML401
      @@DocAttr2X:
-       id::XHTML10SE
+       id::ForXHTML10SE
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
     @@ImplNote:
       @@@lang:en
       @@@@:
@@ -2180,15 +2744,14 @@ IF:
   @Attr:
      @@Name:  title
      @@DocAttr1:
-       title::HTML40SE
+       title::ForHTML40SE
      @@DocAttr2S:
-       title::HTML401
+       title::ForHTML401
      @@DocAttr2X:
-       title::XHTML10SE
+       title::ForXHTML10SE
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
     @@ImplNote:
       @@@lang:en
       @@@@:
@@ -2196,15 +2759,14 @@ IF:
   @Attr:
      @@Name:  lang
      @@DocAttr1:
-       lang::HTML40SE
+       lang::ForHTML40SE
      @@DocAttr2S:
-       lang::HTML401
+       lang::ForHTML401
      @@DocAttr2X:
-       lang::XHTML10SE
+       lang::ForXHTML10SE
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
     @@ImplNote:
       @@@lang:en
       @@@@:
@@ -2212,15 +2774,14 @@ IF:
   @Attr:
      @@Name:  dir
      @@DocAttr1:
-       dir::HTML40SE
+       dir::ForHTML40SE
      @@DocAttr2S:
-       dir::HTML401
+       dir::ForHTML401
      @@DocAttr2X:
-       dir::XHTML10SE
+       dir::ForXHTML10SE
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
     @@ImplNote:
       @@@lang:en
       @@@@:
@@ -2228,15 +2789,14 @@ IF:
   @Attr:
      @@Name:  className
      @@DocAttr1:
-       class::HTML40SE
+       class::ForHTML40SE
      @@DocAttr2S:
-       class::HTML401
+       class::ForHTML401
      @@DocAttr2X:
-       class::XHTML10SE
+       class::ForXHTML10SE
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
     @@ImplNote:
       @@@lang:en
       @@@@:
@@ -2247,7 +2807,52 @@ IF:
     @@@:
       The <A:HTMLElement.style> is reserved by DOM Level 1 First Edition 
       for future use.  It is used later in DOM Level 2 CSS Module.
-##IF:HTMLElement
+##HTMLElement
+
+ElementTypeBinding:
+  @Name: ReflectCDATA
+  @ElementType:
+    dis:Type
+  @ShadowContent:
+    @@@: DOMString
+  @ShadowSibling:
+    @@actualType: CDATADOMString
+
+ElementTypeBinding:
+  @Name: ReflectURI
+  @ElementType:
+    dis:Type
+  @ShadowContent:
+    @@@: DOMString
+  @ShadowSibling:
+    @@actualType: URIDOMString
+
+ElementTypeBinding:
+  @Name: ReflectEnum
+  @ElementType:
+    dis:Type
+  @ShadowContent:
+    @@@: DOMString
+  @ShadowSibling:
+    @@actualType: EnumDOMString
+
+ElementTypeBinding:
+  @Name: ReflectBoolean
+  @ElementType:
+    dis:Type
+  @ShadowContent:
+    @@@: DOMMain|boolean||ManakaiDOM|all
+  @ShadowSibling:
+    @@actualType: Boolean
+
+ElementTypeBinding:
+  @Name: ReflectNumeric
+  @ElementType:
+    dis:Type
+  @ShadowContent:
+    @@@: DOMMain|long||ManakaiDOM|all
+  @ShadowSibling:
+    @@actualType: Numeric
 
 ElementTypeBinding:
   @Name: DocAttr1
@@ -2439,10 +3044,9 @@ ET:
   @ATTR:
      @@Name:  version
      @@Deprecated:
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 
 ET:
   @ETQName:
@@ -2456,10 +3060,9 @@ ET:
 
   @ATTR:
      @@Name:  profile
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 
 ET:
   @ETQName:
@@ -2525,52 +3128,44 @@ ET:
         A version of WinIE 3 has a <HA::disable> attribute by mistake. 
   @ATTR:
      @@Name:  charset
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  href
+     @@ReflectURI:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  hreflang
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  media
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  rel
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  rev
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  target
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  type
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 ##IF:HTMLLinkElement
 
 ET:
@@ -2617,31 +3212,27 @@ ET:
 
   @ATTR:
      @@Name:  content
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:
        @@@@: http-equiv
      @@DOMAName:
        @@@@: httpEquiv
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  name
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  scheme
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 
 ET:
   @ETQName:
@@ -2655,16 +3246,14 @@ ET:
 
   @ATTR:
      @@Name:  href
+     @@ReflectURI:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  target
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 
 ElementTypeBinding:
   @Name: ISAHTMLElement
@@ -2718,10 +3307,9 @@ ET:
   @ATTR:
      @@Name:  prompt
      @@Deprecated:
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 
 ElementTypeBinding:
   @Name: disDef
@@ -2808,16 +3396,14 @@ ET:
             DOMHTML:disabled
   @ATTR:
      @@Name:  media
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  type
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 
 PropDef:
   @QName: disabled
@@ -2839,6 +3425,659 @@ ElementTypeBinding:
     @@ForCheck:
       s:ForML
 
+IF:
+  @IFQName: HTMLStrictlyInlineContainerExtended
+  @ClsQName: ManakaiDOMHTMLStrictlyInlineContainerExtended
+  @DOMMain:implementFeature: HTMLExtendedFeature30
+
+  @Method:
+    @@Name: appendNewAnchor
+    @@enDesc:
+      Appends a new <HE::a> element.
+    @@Param:
+      @@@Name: hrefArg
+      @@@Type: DOMString
+      @@@enDesc:
+        A URI reference to be set to the <HA::href> attribute
+        of the newly created element.
+    @@Param:
+      @@@Name: textArg
+      @@@Type: DOMString
+      @@@enDesc:
+        Text content of the newly created element.
+      @@@nullCase:
+        @@@@enDesc: No text node is added.
+    @@Param:
+      @@@Name: classArg
+      @@@Type: DOMString
+      @@@enDesc:
+        A space-separeted list of classes to be set to
+        the <HA::class> attribute of the newly created element.
+      @@@nullCase:
+        @@@@enDesc:
+          No class is set.
+    @@Return:
+      @@@Type: HTMLAnchorElement
+      @@@enDesc:
+        The newly created <HE::a> element.
+      @@@RaiseException:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          This node is read-only.
+      @@@PerlDef:
+        __DEEP{
+          $self-><M::DOMCore:Node.appendChild>
+                     ($r = $self-><AG::DOMCore:Node.ownerDocument>
+                                -><M::DOMCore:Document.createElementNS>
+                                    (<Q::xhtml1:>, 'a'));
+          $r-><AS::HTMLAnchorElement.href> ($hrefArg);
+          if (defined $textArg) {
+            $r-><AS::DOMCore:Node.textContent> ($textArg);
+          }
+          if (defined $classArg) {
+            $r-><AS::HTMLElement.className> ($classArg);
+          }
+        }__;
+
+  @Method:
+    @@Name: appendNewAbbr
+    @@enDesc:
+      Appends a new <HE::abbr> element.
+    @@Param:
+      @@@Name: shortForm
+      @@@Type: DOMString
+      @@@enDesc:
+        Text content of the newly created element.
+      @@@nullCase:
+        @@@@enDesc: No text node is added.
+    @@Param:
+      @@@Name: longForm
+      @@@Type: DOMString
+      @@@enDesc:
+        A text to be set to the <HA::title> attribute
+        of the newly created element.
+      @@@nullCase:
+        @@@@enDesc: No long form.
+    @@Param:
+      @@@Name: classArg
+      @@@Type: DOMString
+      @@@enDesc:
+        A space-separeted list of classes to be set to
+        the <HA::class> attribute of the newly created element.
+      @@@nullCase:
+        @@@@enDesc:
+          No class is set.
+    @@Return:
+      @@@Type: HTMLElement
+      @@@enDesc:
+        The newly created <HE::abbr> element.
+      @@@RaiseException:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          This node is read-only.
+      @@@PerlDef:
+        __DEEP{
+          $self-><M::DOMCore:Node.appendChild>
+                     ($r = $self-><AG::DOMCore:Node.ownerDocument>
+                                -><M::DOMCore:Document.createElementNS>
+                                    (<Q::xhtml1:>, 'abbr'));
+          if (defined $shortForm) {
+            $r-><AS::DOMCore:Node.textContent> ($shortForm);
+          }
+          if (defined $longForm) {
+            $r-><AS::HTMLElement.title> ($longForm);
+          }
+          if (defined $classArg) {
+            $r-><AS::HTMLElement.className> ($classArg);
+          }
+        }__;
+
+  @Method:
+    @@Name: appendNewDfn
+    @@enDesc:
+      Appends a new <HE::dfn> element.
+    @@Param:
+      @@@Name: textArg
+      @@@Type: DOMString
+      @@@enDesc:
+        Text content of the newly created element.
+      @@@nullCase:
+        @@@@enDesc: No text node is added.
+    @@Param:
+      @@@Name: titleArg
+      @@@Type: DOMString
+      @@@enDesc:
+        A definitive word to be set to
+        the <HA::title> attribute of the newly created element.
+      @@@nullCase:
+        @@@@enDesc:
+          No title is set.
+    @@Param:
+      @@@Name: classArg
+      @@@Type: DOMString
+      @@@enDesc:
+        A space-separeted list of classes to be set to
+        the <HA::class> attribute of the newly created element.
+      @@@nullCase:
+        @@@@enDesc:
+          No class is set.
+    @@Return:
+      @@@Type: HTMLElement
+      @@@enDesc:
+        The newly created <HE::dfn> element.
+      @@@RaiseException:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          This node is read-only.
+      @@@PerlDef:
+        __DEEP{
+          $self-><M::DOMCore:Node.appendChild>
+                     ($r = $self-><AG::DOMCore:Node.ownerDocument>
+                                -><M::DOMCore:Document.createElementNS>
+                                    (<Q::xhtml1:>, 'dfn'));
+          if (defined $textArg) {
+            $r-><AS::DOMCore:Node.textContent> ($textArg);
+          }
+          if (defined $titleArg) {
+            $r-><AS::HTMLElement.title> ($titleArg);
+          }
+          if (defined $classArg) {
+            $r-><AS::HTMLElement.className> ($classArg);
+          }
+        }__;
+  
+  @enImplNote:
+    ISSUE: Array should be allowed for setting className?
+           (Waiting for WA1)
+
+  @Method:
+    @@Name: appendNewPhrase
+    @@enDesc:
+      Appends a new phrase element or text.
+    @@Param:
+      @@@Name: namespaceNameArg
+      @@@Type: DOMString
+      @@@enDesc:
+        Element type namespace URI.
+      @@@nullCase:
+        @@@@enDesc:
+          The default value, <URI::http://www.w3.org/1999/xhtml>,
+          is used.
+    @@Param:
+      @@@Name: localNameArg
+      @@@Type: DOMString
+      @@@enDesc:
+        Element type local name. 
+      @@@nullCase:
+        @@@@enDesc:
+          No element is added.
+    @@Param:
+      @@@Name: textArg
+      @@@Type: DOMString
+      @@@enDesc:
+        Text content of the newly created element.
+        If <P::localNameArg> is <DOM::null>, the <P::textArg>
+        is directly appended to this element.
+      @@@nullCase:
+        @@@@enDesc: No text node is added.
+    @@Param:
+      @@@Name: classArg
+      @@@Type: DOMString
+      @@@enDesc:
+        A space-separeted list of classes to be set to
+        the <HA::class> attribute of the newly created element. 
+        If the <P::localNameArg> is <DOM::null>, this parameter
+        is ignored.
+      @@@nullCase:
+        @@@@enDesc:
+          No class is set.
+    @@Return:
+      @@@Type: HTMLElement
+      @@@enDesc:
+        The newly created element.
+      @@@nullCase:
+        @@@@enDesc:
+          If <P::localNameArg>
+          is <DOM::null>.
+      @@@RaiseException:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          This node is read-only.
+      @@@RaiseException:
+        @@@@@: DOMCore|DOMException.INVALID_CHARACTER_ERR
+        @@@@enDesc:
+          <P::localNameArg> is not a legal <CODE::Name>
+          of the markup language in use.
+      @@@RaiseException:
+        @@@@@: DOMCore|DOMException.NAMESPACE_ERR
+        @@@@enDesc:
+          <P::localNameArg> is not a legal <CODE::NCName>
+          of the XML version in use.
+      @@@PerlDef:
+        __DEEP{
+          if (defined $localNameArg) {
+            $self-><M::DOMCore:Node.appendChild>
+                     ($r = $self-><AG::DOMCore:Node.ownerDocument>
+                                -><M::DOMCore:Document.createElementNS>
+                                    (defined $namespaceNameArg 
+                                       ? $namespaceNameArg : <Q::xhtml1:>,
+                                     $localNameArg));
+            if (defined $textArg) {
+              $r-><AS::DOMCore:Node.textContent> ($textArg);
+            }
+            if (defined $classArg) {
+              $r-><AS::HTMLElement.className> ($classArg);
+            }
+          } else {
+            $self-><M::DOMCore:Node.appendChild>
+                     ($self-><AG::DOMCore:Node.ownerDocument>
+                           -><M::DOMCore:Document.createTextNode> ($textArg));
+          }
+        }__;
+##HTMLStrictlyInlineContainerExtended
+
+ClsOnly:
+  @For: ManakaiDOM|ManakaiDOMLatest
+  @ClsQName: ManakaiDOMHTMLStrictlyInlineElementExtended
+  @ClsISA: ManakaiDOMHTMLStrictlyInlineContainerExtended
+  @ClsISA: ManakaiDOMHTMLElement
+
+  @enDesc:
+    Strictly inline-level content elements whose content
+    is also strictly inline-level content.
+
+  @enImplNote:
+    Future version of manakai might split this class into
+    indivisual element type classes.
+
+  @s:elementType: em||ForHTML5
+  @s:elementType: small||ForHTML5
+  @s:elementType: i||ForHTML5
+  @s:elementType: var||ForHTML5
+  @s:elementType: kbd||ForHTML5
+  @s:elementType: sup||ForHTML5
+  @s:elementType: sub||ForHTML5
+  @s:elementType: cite||ForHTML5
+  @s:elementType: abbr||ForHTML5
+  @s:elementType: dfn||ForHTML5
+##HTMLStrictlyInlineElementExtended
+
+ResourceDef:
+  @QName: em
+  @rdf:type: s|ElementType
+  @For: ForHTML
+  @ETQName: xhtml1|em
+
+ResourceDef:
+  @QName: small
+  @rdf:type: s|ElementType
+  @For: ForHTML
+  @ETQName: xhtml1|small
+
+ResourceDef:
+  @QName: i
+  @rdf:type: s|ElementType
+  @For: ForHTML
+  @ETQName: xhtml1|i
+
+ResourceDef:
+  @QName: var
+  @rdf:type: s|ElementType
+  @For: ForHTML
+  @ETQName: xhtml1|var
+
+ResourceDef:
+  @QName: kbd
+  @rdf:type: s|ElementType
+  @For: ForHTML
+  @ETQName: xhtml1|kbd
+
+ResourceDef:
+  @QName: sup
+  @rdf:type: s|ElementType
+  @For: ForHTML
+  @ETQName: xhtml1|sup
+
+ResourceDef:
+  @QName: sub
+  @rdf:type: s|ElementType
+  @For: ForHTML
+  @ETQName: xhtml1|sub
+
+ResourceDef:
+  @QName: cite
+  @rdf:type: s|ElementType
+  @For: ForHTML
+  @ETQName: xhtml1|cite
+
+ResourceDef:
+  @QName: abbr
+  @rdf:type: s|ElementType
+  @For: ForHTML
+  @ETQName: xhtml1|abbr
+
+ResourceDef:
+  @QName: dfn
+  @rdf:type: s|ElementType
+  @For: ForHTML
+  @ETQName: xhtml1|dfn
+
+IF:
+  @IFQName: HTMLStructuredInlineContainerExtended
+  @ClsQName: ManakaiDOMHTMLStructuredInlineContainerExtended
+  @DOMMain:implementFeature: HTMLExtendedFeature30
+
+  @Method:
+    @@Name: appendNewUl
+    @@enDesc:
+      Appends a new empty <HE::ul> element.
+    @@enImplNote:
+      Array containing items should be accepted as a parameter?
+    @@Return:
+      @@@Type: HTMLUListElement
+      @@@enDesc:
+        The newly created <HE::ul> element.
+      @@@RaiseException:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          This node is read-only.
+      @@@PerlDef:
+        __DEEP{
+          $self-><M::DOMCore:Node.appendChild>
+                     ($r = $self-><AG::DOMCore:Node.ownerDocument>
+                                -><M::DOMCore:Document.createElementNS>
+                                    (<Q::xhtml1:>, 'ul'));
+        }__;
+
+  @Method:
+    @@Name: appendNewDl
+    @@enDesc:
+      Appends a new empty <HE::dl> element.
+    @@enImplNote:
+      Array containing items should be accepted as a parameter?
+    @@Return:
+      @@@Type: HTMLDListElement
+      @@@enDesc:
+        The newly created <HE::dl> element.
+      @@@RaiseException:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          This node is read-only.
+      @@@PerlDef:
+        __DEEP{
+          $self-><M::DOMCore:Node.appendChild>
+                     ($r = $self-><AG::DOMCore:Node.ownerDocument>
+                                -><M::DOMCore:Document.createElementNS>
+                                    (<Q::xhtml1:>, 'dl'));
+        }__;
+
+
+  @Method:
+    @@Name: appendNewTable
+    @@enDesc:
+      Appends a new empty table whose only child is a <HE::tbody> element.
+    @@enImplNote:
+      Array containing items should be accepted as a parameter?
+      Caption? Row & Col number?
+    @@Return:
+      @@@Type: HTMLTableElement
+      @@@enDesc:
+        The newly created <HE::table> element.
+      @@@RaiseException:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          This node is read-only.
+      @@@PerlDef:
+        __DEEP{
+          my $od = $self-><AG::DOMCore:Node.ownerDocument>;
+          $self-><M::DOMCore:Node.appendChild>
+                     ($r = $od-><M::DOMCore:Document.createElementNS>
+                                    (<Q::xhtml1:>, 'table'));
+          $r-><M::DOMCore:Node.appendChild>
+                     ($od-><M::DOMCore:Document.createElementNS>
+                                    (<Q::xhtml1:>, 'tbody'));
+        }__;
+##StructuredInlineContainerExtended
+
+IF:
+  @IFQName: HTMLInlineContainerExtended
+  @ClsQName: ManakaiDOMHTMLInlineContainerExtended
+  @DOMMain:implementFeature: HTMLExtendedFeature30
+
+  @IFISA: HTMLStrictlyInlineContainerExtended
+  @ClsISA: ManakaiDOMHTMLStrictlyInlineContainerExtended
+
+  @IFISA: HTMLStructuredInlineContainerExtended
+  @ClsISA: ManakaiDOMHTMLStructuredInlineContainerExtended
+##HTMLInlineContainerExtended
+
+ClsOnly:
+  @For: ManakaiDOM|ManakaiDOMLatest
+  @ClsQName: ManakaiDOMHTMLInlineElementExtended
+  @ClsISA: ManakaiDOMHTMLInlineContainerExtended
+  @ClsISA: ManakaiDOMHTMLElement
+
+  @enDesc:
+    Strictly inline-level content elements whose content
+    is conditionally either strictly inline-level content or
+    any inline-level content.
+
+  @enImplNote:
+    Future version of manakai might split this class into
+    indivisual element type classes.
+
+  @s:elementType: code||ForHTML5
+  @s:elementType: samp||ForHTML5
+  @s:elementType: span||ForHTML5
+##HTMLInlineElementExtended
+
+ResourceDef:
+  @QName: code
+  @rdf:type: s|ElementType
+  @For: ForHTML
+  @ETQName: xhtml1|code
+
+ResourceDef:
+  @QName: samp
+  @rdf:type: s|ElementType
+  @For: ForHTML
+  @ETQName: xhtml1|samp
+
+ResourceDef:
+  @QName: span
+  @rdf:type: s|ElementType
+  @For: ForHTML
+  @ETQName: xhtml1|span
+
+IF:
+  @IFQName: HTMLBlockContainerExtended
+  @ClsQName: ManakaiDOMHTMLBlockContainerExtended
+  @DOMMain:implementFeature: HTMLExtendedFeature30
+
+  @IFISA: HTMLStructuredInlineContainerExtended
+  @ClsISA: ManakaiDOMHTMLStructuredInlineContainerExtended
+
+  @Method:
+    @@Name: appendNewParagraph
+    @@enDesc:
+      Appends a new <HE::p> element.
+    @@Return:
+      @@@Type: HTMLParagraphElement
+      @@@enDesc:
+        The newly created <HE::p> element.
+      @@@RaiseException:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          This node is read-only.
+      @@@PerlDef:
+        __DEEP{
+          $self-><M::DOMCore:Node.appendChild>
+                     ($r = $self-><AG::DOMCore:Node.ownerDocument>
+                                -><M::DOMCore:Document.createElementNS>
+                                    (<Q::xhtml1:>, 'p'));
+        }__;
+##HTMLBlockContainerExtended
+
+IF:
+  @IFQName: HTMLSectioningElementExtended
+  @ClsQName: ManakaiDOMHTMLSectioningElementExtended
+  @DOMMain:implementFeature: HTMLExtendedFeature30
+
+  @IFISA: HTMLBlockContainerExtended
+  @ClsISA: ManakaiDOMHTMLBlockContainerExtended
+  
+  @Method:
+    @@Name: appendNewSection
+    @@enDesc:
+      Appends a new <HE::section> element.
+    @@ImplNote:
+      @@@lang:en
+      @@@@: 
+        Better method name?
+    @@Param:
+      @@@Name: title
+      @@@Type: DOMString
+      @@@enDesc:
+        The title text of the section.  If this parameter is 
+        specified, the newly created <HE::section> element
+        has a newly created heading element with a
+        text node whose <A::DOMCore:CharacterData.data> is set to <P::title>.
+      @@@nullCase:
+        @@@@enDesc:
+          The newly created section does not have an initial
+          heading element. 
+    @@Return:
+      @@@Type: HTMLSectionElementExtended
+      @@@actualType: ManakaiDOMHTMLSectionElementExtended
+      @@@enDesc:
+        The newly created <HE::section> element.
+      @@@RaiseException:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          This node is read-only.
+      @@@PerlDef:
+        __DEEP{
+          $self-><M::DOMCore:Node.appendChild>
+                     ($r = $self-><AG::DOMCore:Node.ownerDocument>
+                                -><M::DOMCore:Document.createElementNS>
+                                    (<Q::xhtml1:>, 'section'));
+          if (defined $title) {
+            $r-><M::DOMCore:Node.appendChild>
+                     ($self-><AG::DOMCore:Node.ownerDocument>
+                           -><M::DOMCore:Document.createElementNS>
+                                    (<Q::xhtml1:>, 'h1'))
+                                                   ## TODO: Rank
+              -><AS::DOMCore:Node.textContent> ($title);
+          }
+        }__;
+
+  @Attr:
+    @@Name: heading
+    @@enDesc:
+      The heading element for this section.
+    @@enImplNote:
+      {TODO:: Update as in Web Applications 1.0.
+      \
+      }
+    @@Type: HTMLElement
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          This sectioning element does not have a heading.
+      @@@PerlDef:
+        for my $co (@{$self->{<Q::TreeCore:node>}->{<Q::infoset:children>}}) {
+          if ($co->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element> and
+              (<Code::isHTMLElemento:: $elementNodeo = $co,
+                                        $elementType = 'h1'> or
+               <Code::isHTMLElemento:: $elementNodeo = $co,
+                                        $elementType = 'h2'> or
+               <Code::isHTMLElemento:: $elementNodeo = $co,
+                                        $elementType = 'h3'> or
+               <Code::isHTMLElemento:: $elementNodeo = $co,
+                                        $elementType = 'h4'> or
+               <Code::isHTMLElemento:: $elementNodeo = $co,
+                                        $elementType = 'h5'> or
+               <Code::isHTMLElemento:: $elementNodeo = $co,
+                                        $elementType = 'h6'>)) {
+            $r = <ClassM::DOMCore:ManakaiDOMNode.getNodeReference> ($co);
+            last;
+          }
+        }
+    @@enImplNote: Should setter be defined as e.g. caption?
+
+  @Method:
+    @@Name: createHeading
+    @@enDesc:
+      Creates a heading element and preprends as the first 
+      child node of this element or returns an existing one.
+    @@enImplNote:
+      Should prepend or append?  Rank?
+    @@Return:
+      @@@Type: HTMLHeadingElement
+      @@@enDesc:
+        A heading element. 
+      @@@RaiseException:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          This node is read-only.
+      @@@PerlDef:
+      A: {
+        for my $co (@{$self->{<Q::TreeCore:node>}->{<Q::infoset:children>}}) {
+          if ($co->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element> and
+              (<Code::isHTMLElemento:: $elementNodeo = $co,
+                                        $elementType = 'h1'> or
+               <Code::isHTMLElemento:: $elementNodeo = $co,
+                                        $elementType = 'h2'> or
+               <Code::isHTMLElemento:: $elementNodeo = $co,
+                                        $elementType = 'h3'> or
+               <Code::isHTMLElemento:: $elementNodeo = $co,
+                                        $elementType = 'h4'> or
+               <Code::isHTMLElemento:: $elementNodeo = $co,
+                                        $elementType = 'h5'> or
+               <Code::isHTMLElemento:: $elementNodeo = $co,
+                                        $elementType = 'h6'>)) {
+            $r = <ClassM::DOMCore:ManakaiDOMNode.getNodeReference> ($co);
+            last A;
+          }
+        }
+        
+        ## Not found
+        __DEEP{
+          $r = $self-><M::DOMCore:Node.insertBefore>
+                         ($self-><AG::DOMCore:Node.ownerDocument>
+                               -><M::DOMCore:Document.createElementNS>
+                                    (<Q::xhtml1:>, 'h1'),
+                          $self-><AG::DOMCore:Node.firstChild>);
+        }__;
+      }
+##HTMLSectioningElementExtended
+
+ElementTypeBinding:
+  @Name: enImplNote
+  @ElementType:
+    dis:ImplNote
+  @ShadowContent:
+    @@lang:en
+
+H5ETX:
+  @ETQName: xhtml1|section
+  @IFQName: HTMLSectionElementExtended
+  @ClsQName: ManakaiDOMHTMLSectionElementExtended
+  
+  @IFISA: HTMLSectioningElementExtended
+  @ClsISA: ManakaiDOMHTMLSectioningElementExtended
+  @ISAHTMLElement:
+##HTMLSectionElementExtended
+
+ElementTypeBinding:
+  @Name: nullCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: ManakaiDOM|InCase
+    @@Value:
+      @@@is-null:1
+
 ET:
   @ETQName:
     xhtml1:body
@@ -2851,48 +4090,51 @@ ET:
      @@AName: alink
      @@DOMAName:  aLink
      @@Deprecated:
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  background
      @@Deprecated:
+     @@ReflectURI:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@DOMAName:  bgColor
      @@AName: bgcolor
      @@Deprecated:
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  link
      @@Deprecated:
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  text
      @@Deprecated:
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @Attr:
      @@DOMAName:  vLink
      @@AName: vlink
      @@Deprecated:
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
-##IF:HTMLBody
+##HTMLBodyElement
+
+IF:
+  @IFQName: HTMLBodyElementExtended
+  @ClsQName: ManakaiDOMHTMLBodyElementExtended
+  
+  @IFISA: HTMLSectioningElementExtended
+  @ClsISA: ManakaiDOMHTMLSectioningElementExtended
+  @ClsISA: ManakaiDOMHTMLBodyElement
+##HTMLBodyElementExtended
 
 ImplNote:
   @@lang:en
@@ -2902,6 +4144,269 @@ ImplNote:
     <IF:HTMLInputElement>, <IF:HTMLTextAreaElement>, 
     <IF:HTMLButtonElement>, <IF:HTMLFieldSetElement>, 
     <IF:HTMLLegendElement>: See <Module:WebForms>.
+
+FeatureDef:
+  @QName: HTMLExtendedFeature
+  @featureQName: ManakaiDOM|HTML
+  @FeatureVerDef:
+    @@QName: HTMLExtendedFeature30
+    @@enDesc:
+      Extended interfaces.
+    @@DOMMain:requireFeature: HTMLFeature20
+    @@DOMMain:requireFeature: DOMCore|CoreFeature30
+    @@DOMMetaImpl:instanceFeatureOf: HTMLExtendedFeature
+    @@Version: 3.0
+
+IF:
+  @IFQName: HTMLListElementExtended
+  @ClsQName: ManakaiDOMHTMLListElementExtended
+  @DOMMain:implementFeature: HTMLExtendedFeature30
+  
+  @Method:
+    @@Name: insertItem
+    @@enDesc:
+      Inserts a new empty item in the list.  The new item is
+      inserted immediately before the current <P::index>th 
+      item in the list.  
+      \
+      If this node is a <HE::dl> element, a pair of
+      <HE::dt> element and <HE::dd> element is 
+      inserted immediately before the <P::index>th <HE::dt> element.
+      Otherwise, a <HE::li> element is inserted
+      immediately before the <P::index>th <HE::li> element. 
+    @@Param:
+      @@@Name:index
+      @@@Type:DOMMain|long||ManakaiDOM|all
+      @@@enDesc:
+        The item number where to insert a new item.  
+        The index starts from <DOM::0>.
+      @@@InCase:
+        @@@@enLabel: 
+          <DOM::-1> or equal to the number of items
+        @@@@enDesc:
+          The new item is appended.
+    @@Return:
+      @@@Type: HTMLElement
+      @@@actualType: ManakaiDOMHTMLElement
+      @@@enDesc:
+        The newly created element.  If this node is a <HE::dl>
+        element, the newly created <HE::dt> element is returned.
+        Otherwise, the <HE::li> element is returned.
+      @@@RaiseException:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          This node is read-only.
+      @@@RaiseException:
+        @@@@@: DOMCore|DOMException.INDEX_SIZE_ERR
+        @@@@enDesc:
+          If the specified <P::index> is greater than
+          the number of rows or if the <P::index> is a negative
+          number other than <DOM::-1>.
+      @@@PerlDef:
+        @@@@ImplNote:
+          @@@@@lang:en
+          @@@@@@:
+            For non-<HE::dl> elements.
+        @@@@@: 
+          if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:read-only>}) {
+            __EXCEPTION{
+              MDOMX:NOMOD_THIS::
+            }__;
+          }
+
+          my $before;
+          my $after;
+          __CODE{splitChildrenByElementIndex::
+            $children => {[@{$self->{<Q::TreeCore:node>}
+                                  ->{<Q::infoset:children>}}]},
+            $before => $before, $after => $after,
+            $elementType => 'li', $index => $index,
+          }__;
+          
+          __DEEP{
+            $r = $self-><AG::DOMCore:Node.ownerDocument>
+                      -><M::DOMCore:Document.createElementNS>
+                            (<Q::xhtml1:>, 'li');
+          }__;
+          $self->{<Q::TreeCore:node>}
+               -><M::ManakaiDOM|ManakaiDOMNodeObject||ManakaiDOM|Perl.importTree>
+                    ($r->{<Q::TreeCore:node>});
+          $r->{<Q::TreeCore:node>}->{<Q::infoset:parent>}
+                = $self->{<Q::TreeCore:node>};
+          $self->{<Q::TreeCore:node>}->{<Q::infoset:children>}
+                = [@$before, $r->{<Q::TreeCore:node>}, @$after];
+           
+##HTMLListElementExtended
+
+ElementTypeBinding:
+  @Name: IFISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+IF:
+  @IFQName: HTMLUListElementExtended
+  @ClsQName: ManakaiDOMHTMLUListElementExtended
+  @DOMMain:implementFeature: HTMLExtendedFeature30
+
+  @IFISA: HTMLListElementExtended
+
+  @ClsISA: ManakaiDOMHTMLListElementExtended
+  @ClsISA: ManakaiDOMHTMLUListElement
+##HTMLUListElementExtended
+
+IF:
+  @IFQName: HTMLOListElementExtended
+  @ClsQName: ManakaiDOMHTMLOListElementExtended
+  @DOMMain:implementFeature: HTMLExtendedFeature30
+
+  @IFISA: HTMLListElementExtended
+
+  @ClsISA: ManakaiDOMHTMLListElementExtended
+  @ClsISA: ManakaiDOMHTMLOListElement
+##HTMLOListElementExtended
+
+IF:
+  @IFQName: HTMLDListElementExtended
+  @ClsQName: ManakaiDOMHTMLDListElementExtended
+  @DOMMain:implementFeature: HTMLExtendedFeature30
+
+  @IFISA: HTMLListElementExtended
+
+  @ClsISA: ManakaiDOMHTMLListElementExtended
+  @ClsISA: ManakaiDOMHTMLDListElement
+  
+  @Method:
+    @@Name: insertItem
+    @@ManakaiDOM:isRedefining:1
+    @@ForCheck: ManakaiDOM|ForClass
+    @@enDesc:
+      Inserts a new empty pair of <HE::dt> and
+      <HE::dd> elements in the list.  The new item is
+      inserted immediately before the current <P::index>th 
+      <HE::dt> element in the list.  
+    @@Param:
+      @@@Name:index
+      @@@Type:DOMMain|long||ManakaiDOM|all
+      @@@enDesc:
+        The item number where to insert a new item.  
+        The index starts from <DOM::0>.
+      @@@InCase:
+        @@@@enLabel: 
+          <DOM::-1> or equal to the number of items
+        @@@@enDesc:
+          The new item is appended.
+    @@Return:
+      @@@Type: HTMLElement
+      @@@actualType: ManakaiDOMHTMLElement
+      @@@enDesc:
+        The newly created <HE::dt> element.  Note that
+        the new <HE::dd> element can be obtained by
+        <AG::DOMCore:Node.nextSibling> attribute of the returned
+        node.
+      @@@RaiseException:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          This node is read-only.
+      @@@RaiseException:
+        @@@@@: DOMCore|DOMException.INDEX_SIZE_ERR
+        @@@@enDesc:
+          If the specified <P::index> is greater than
+          the number of rows or if the <P::index> is a negative
+          number other than <DOM::-1>.
+      @@@PerlDef:
+        @@@@ImplNote:
+          @@@@@lang:en
+          @@@@@@:
+            For non-<HE::dl> elements.
+        @@@@@: 
+          if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:read-only>}) {
+            __EXCEPTION{
+              MDOMX:NOMOD_THIS::
+            }__;
+          }
+
+          my $before;
+          my $after;
+          __CODE{splitChildrenByElementIndex::
+            $children => {[@{$self->{<Q::TreeCore:node>}
+                                  ->{<Q::infoset:children>}}]},
+            $before => $before, $after => $after,
+            $elementType => 'dt', $index => $index,
+          }__;
+
+          my $dd;          
+          __DEEP{
+            my $od = $self-><AG::DOMCore:Node.ownerDocument>;
+            $r = $od-><M::DOMCore:Document.createElementNS>
+                            (<Q::xhtml1:>, 'dt');
+            $dd = $od-><M::DOMCore:Document.createElementNS>
+                            (<Q::xhtml1:>, 'dd');
+          }__;
+          $self->{<Q::TreeCore:node>}
+               -><M::ManakaiDOM|ManakaiDOMNodeObject||ManakaiDOM|Perl.importTree>
+                    ($r->{<Q::TreeCore:node>});
+          $r->{<Q::TreeCore:node>}->{<Q::infoset:parent>}
+                = $self->{<Q::TreeCore:node>};
+          $self->{<Q::TreeCore:node>}
+               -><M::ManakaiDOM|ManakaiDOMNodeObject||ManakaiDOM|Perl.importTree>
+                    ($dd->{<Q::TreeCore:node>});
+          $dd->{<Q::TreeCore:node>}->{<Q::infoset:parent>}
+                = $self->{<Q::TreeCore:node>};
+          $self->{<Q::TreeCore:node>}->{<Q::infoset:children>}
+                = [@$before, $r->{<Q::TreeCore:node>},
+                             $dd->{<Q::TreeCore:node>}, @$after];
+           
+##HTMLDListElementExtended
+
+ResourceDef:
+  @QName: splitChildrenByElementIndex
+  @rdf:type: dis2pm|BlockCode
+  @enDesc:
+    Splits a child node list into two groups: nodes before
+    <P::index>th <P::elementType> element node (not inclusive) and
+    any remind nodes.
+  @PerlDef:
+          my $__i = 0;
+          $after = $children;
+          FIND: {
+            last FIND if $index == -1;
+            while (my $__co = shift @$after) {
+              if ($__co->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element> and
+                  <Code::isHTMLElemento:: $elementNodeo = $__co,
+                                          $elementType = $elementType>) {
+                if ($index == $__i++) {  ## Position found
+                  unshift @$after, $__co;
+                  last FIND;
+                } else {
+                  push @$before, $__co;
+                }
+              } else {
+                push @$before, $__co;
+              }
+            }
+            last FIND if $index == $__i; ## Equal to number
+
+            __EXCEPTION{DOMCore:ManakaiDOMException.INDEX_SIZE_ERR::
+              MDOMX:param-name => 'index',
+            }__
+          } # FIND
+
+
+ElementTypeBinding:
+  @Name: enLabel
+  @ElementType:
+    dis:Label
+  @ShadowContent:
+    @@lang:en
 
 ET:
   @ETQName: 
@@ -2914,16 +4419,13 @@ ET:
   @ATTR:
      @@Name:  compact
      @@Deprecated:
+     @@ReflectBoolean:
      @@Get:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
      @@Set:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
@@ -2931,10 +4433,9 @@ ET:
   @ATTR:
      @@Name:  type
      @@Deprecated:
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 
 ET:
   @ETQName:
@@ -2947,16 +4448,13 @@ ET:
   @ATTR:
      @@Name:  compact
      @@Deprecated:
+     @@ReflectBoolean:
      @@Get:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
      @@Set:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
@@ -2964,19 +4462,15 @@ ET:
   @ATTR:
      @@Name:  start
      @@Deprecated:
+     @@ReflectNumeric:
      @@Get:
-        @@@Type:
-           DOMMain:long
      @@Set:
-        @@@Type:
-           DOMMain:long
   @Attr:
      @@Name:  type
      @@Deprecated:
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 
 ET:
   @ETQName: 
@@ -2989,16 +4483,13 @@ ET:
   @ATTR:
      @@Name:  compact
      @@Deprecated:
+     @@ReflectBoolean:
      @@Get:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
      @@Set:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
@@ -3016,16 +4507,13 @@ ET:
   @Attr:
      @@Name:  compact
      @@Deprecated:
+     @@ReflectBoolean:
      @@Get:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
      @@Set:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
@@ -3043,16 +4531,13 @@ ET:
   @ATTR:
      @@Name:  compact
      @@Deprecated:
+     @@ReflectBoolean:
      @@Get:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
      @@Set:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
@@ -3069,19 +4554,15 @@ ET:
   @ATTR:
      @@Name:  type
      @@Deprecated:
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @Attr:
      @@Name:  value
      @@Deprecated:
+     @@ReflectNumeric:
      @@Get:
-        @@@Type:
-           DOMMain:long
      @@Set:
-        @@@Type:
-           DOMMain:long
 
 ET:
   @ETQName:
@@ -3094,10 +4575,9 @@ ET:
   @ATTR:
      @@Name:  align
      @@Deprecated:
+     @@ReflectEnum:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 
 ET:
   @ETQName:
@@ -3110,10 +4590,9 @@ ET:
   @ATTR:
      @@Name:  align
      @@Deprecated:
+     @@ReflectEnum:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 
 ForDef:
   @QName:
@@ -3133,6 +4612,30 @@ ForDef:
 ForDef:
   @QName:
     DOMHTML:ForH6
+
+IF:
+  @IFQName: HTMLParagraphElementExtended
+  @ClsQName: ManakaiDOMHTMLParagraphElementExtended
+  @DOMMain:implementFeature: HTMLExtendedFeature30
+
+  @IFISA: HTMLBlockContainerExtended
+  @IFISA: HTMLParagraphElement
+
+  @ClsISA: ManakaiDOMHTMLBlockContainerExtended
+  @ClsISA: ManakaiDOMHTMLParagraphElement
+##HTMLParagraphElementExtended
+
+IF:
+  @IFQName: HTMLHeadingElementExtended
+  @ClsQName: ManakaiDOMHTMLHeadingElementExtended
+  @DOMMain:implementFeature: HTMLExtendedFeature30
+
+  @IFISA: HTMLBlockContainerExtended
+  @IFISA: HTMLHeadingElement
+
+  @ClsISA: ManakaiDOMHTMLBlockContainerExtended
+  @ClsISA: ManakaiDOMHTMLHeadingElement
+##HTMLHeadingElementExtended
 
 IF:
   @For: ForHTML
@@ -3272,13 +4775,52 @@ IF:
   @ISAHTMLElement:
   @L1IF:
 
-  @ATTR:
+  @Attrs:
      @@Name:  align
+     @@docAttrP1S: ||ForHTML40SE||ForH1
+     @@docAttrP2S: ||ForHTML401||ForH1
+     @@docAttrP2X: ||ForXHTML10SE||ForH1
+     @@docAttrP1S: ||ForHTML40SE||ForH2
+     @@docAttrP2S: ||ForHTML401||ForH2
+     @@docAttrP2X: ||ForXHTML10SE||ForH2
+     @@docAttrP1S: ||ForHTML40SE||ForH3
+     @@docAttrP2S: ||ForHTML401||ForH3
+     @@docAttrP2X: ||ForXHTML10SE||ForH3
+     @@docAttrP1S: ||ForHTML40SE||ForH4
+     @@docAttrP2S: ||ForHTML401||ForH4
+     @@docAttrP2X: ||ForXHTML10SE||ForH4
+     @@docAttrP1S: ||ForHTML40SE||ForH5
+     @@docAttrP2S: ||ForHTML401||ForH5
+     @@docAttrP2X: ||ForXHTML10SE||ForH5
+     @@docAttrP1S: ||ForHTML40SE||ForH6
+     @@docAttrP2S: ||ForHTML401||ForH6
+     @@docAttrP2X: ||ForXHTML10SE||ForH6
      @@Deprecated:
+     @@ReflectEnum:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
+
+ElementTypeBinding:
+  @Name: docAttrP1S
+  @ElementType:
+    dis:DocAttr
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+ElementTypeBinding:
+  @Name: docAttrP2
+  @ElementType:
+    dis:DocAttr
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
+ElementTypeBinding:
+  @Name: docAttrP2X
+  @ElementType:
+    dis:DocAttr
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|DOM2
+    @@ContentType: DISCore|TFPQNames
 
 ElementTypeBinding:
   @Name: IFDef
@@ -3384,12 +4926,17 @@ IF:
     @@ForCheck: ManakaiDOM|DOM2
     @@ContentType: DISCore|TFPQNames
 
-  @ATTR:
+  @Attrs:
      @@Name:  cite
+     @@ReflectURI:
+     @@docAttrP1S: ||ForHTML40SE||ForQ
+     @@docAttrP2S: ||ForHTML401||ForQ
+     @@docAttrP2X: ||ForXHTML10SE||ForQ
+     @@docAttrP1S: ||ForHTML40SE||ForBlockquote
+     @@docAttrP2S: ||ForHTML401||ForBlockquote
+     @@docAttrP2X: ||ForXHTML10SE||ForBlockquote
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 
 ElementTypeBinding:
   @Name: elementType
@@ -3409,12 +4956,9 @@ ET:
   @ATTR:
      @@Name:  width
      @@Deprecated:1
+     @@ReflectNumeric:
      @@Get:
-        @@@Type:
-           DOMMain:long
      @@Set:
-        @@@Type:
-           DOMMain:long
 
 ET:
   @ETQName:
@@ -3427,10 +4971,9 @@ ET:
   @ATTR:
      @@Name:  clear
      @@Deprecated:1
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 
 ET:
   @ETQName: 
@@ -3444,17 +4987,15 @@ ET:
   @ATTR:
      @@Name:  color
      @@Deprecated:
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  face
      @@Deprecated:
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  size
      @@Description:
@@ -3463,26 +5004,30 @@ ET:
        @@@For:
          ManakaiDOM:DOM2
      @@Deprecated:
-     @@Get:
-        @@@Type:
-          @@@@@:
-            DOMMain:long
-          @@@@For:
-            ManakaiDOM:DOM2
-        @@@Type:
-          @@@@@:
-            DOMMain:DOMString
-          @@@@For:
-            ManakaiDOM:DOM1 !ManakaiDOM:DOM2
-     @@ImplNote:
-       @@@lang:en
+     @@Type:
        @@@@:
-         TODO: Computed value should be returned. 
-         In DOM Level 1, it was <EM:not> the computed value 
-         and the type was <TYPE:DOMString>.
+         DOMMain:long
+       @@@For:
+         ManakaiDOM:DOM2
+     @@actualType:
+       @@@@: Numeric
+       @@@For: ManakaiDOM|DOM2
+     @@Type:
+       @@@@:
+         DOMMain:DOMString
+       @@@For:
+         ManakaiDOM:DOM1 !ManakaiDOM:DOM2
+     @@actualType:
+       @@@@: CDATADOMString
+       @@@For: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
+     @@Get:
+       @@@ImplNote:
+         @@@@lang:en
+         @@@@@:
+           TODO: Computed value should be returned. 
+           In DOM Level 1, it was <EM:not> the computed value 
+           and the type was <TYPE:DOMString>.
      @@Set:
-        @@@Type:
-           DOMMain:long
      @@Level[list]:
         1
         2
@@ -3502,17 +5047,15 @@ ET:
   @ATTR:
      @@Name:  color
      @@Deprecated:
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  face
      @@Deprecated:
+     @@ReflectCDATA: 
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  size
      @@Deprecated:
@@ -3520,10 +5063,9 @@ ET:
        @@@lang:en
        @@@@:
          This is <EM:not> the computed size.
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 
 ET:
   @ETQName:
@@ -3536,24 +5078,20 @@ ET:
   @ATTR:
      @@Name:  align
      @@Deprecated:
+     @@ReflectEnum:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:noshade
      @@DOMAName:  noShade
      @@Deprecated:
+     @@ReflectBoolean:
      @@Get:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
      @@Set:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
@@ -3561,17 +5099,15 @@ ET:
   @ATTR:
      @@Name:  size
      @@Deprecated:
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  width
      @@Deprecated:
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 
 ForDef:
   @QName:
@@ -3640,19 +5176,29 @@ IF:
   @ISAHTMLElement:
   @L1IF:
 
-  @ATTR:
+  @Attrs:
      @@Name:  cite
+     @@ReflectURI:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
-  @ATTR:
+     @@docAttrP1S: ||ForHTML40SE||ForIns
+     @@docAttrP2S: ||ForHTML401||ForIns
+     @@docAttrP2X: ||ForXHTML10SE||ForIns
+     @@docAttrP1S: ||ForHTML40SE||ForDel
+     @@docAttrP2S: ||ForHTML401||ForDel
+     @@docAttrP2X: ||ForXHTML10SE||ForDel
+  @Attrs:
      @@AName: datetime
      @@DOMAName:  dateTime
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
+     @@docAttrP1S: ||ForHTML40SE||ForIns
+     @@docAttrP2S: ||ForHTML401||ForIns
+     @@docAttrP2X: ||ForXHTML10SE||ForIns
+     @@docAttrP1S: ||ForHTML40SE||ForDel
+     @@docAttrP2S: ||ForHTML401||ForDel
+     @@docAttrP2X: ||ForXHTML10SE||ForDel
 
 ET:
   @ETQName:
@@ -3665,79 +5211,65 @@ ET:
   @ATTR:
      @@AName:accesskey
      @@DOMAName:  accessKey
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  charset
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  coords
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  href
+     @@ReflectURI:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  hreflang
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  name
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  rel
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  rev
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  shape
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:tabindex
      @@DOMAName:  tabIndex
+     @@ReflectNumeric:
      @@Get:
-        @@@Type:
-           DOMMain:long
      @@Set:
-        @@@Type:
-           DOMMain:long
   @ATTR:
      @@Name:  target
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  type
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @Method:
      @@Name:  blur
      @@Description:
@@ -3752,6 +5284,17 @@ ET:
      @@Return:  
 ##IF:HTMLAnchorElement
 
+IF:
+  @IFQName: HTMLAnchorElementExtended
+  @ClsQName: ManakaiDOMHTMLAnchorElementExtended
+  
+  @IFISA: HTMLAnchorElement
+  @IFISA: HTMLStrictlyInlineContainerExtended
+
+  @ClsISA: ManakaiDOMHTMLAnchorElement
+  @ClsISA: ManakaiDOMHTMLStrictlyInlineContainerExtended
+##HTMLAnchorElementExtended
+
 ET:
   @ETQName:
     xhtml1:img
@@ -3760,7 +5303,21 @@ ET:
   @ISAHTMLElement:
   @L1IF:
 
-  @Attr:
+  @ResourceDef:
+    @@rdf:type:
+      @@@@: ManakaiDOM|DOMAttribute
+      @@@ForCheck: ManakaiDOM|DOM
+
+    @@For: ManakaiDOM|DOM1
+
+    @@rdf:type:
+      @@@@: s|Attribute
+      @@@ForCheck: ForHTML
+
+    @@For: ForHTML401
+    @@For: ForXHTML10SE
+    @@enImplNote: Does 10SE defines this attr?
+
      @@Name:  name
      @@Description:
         @@@lang:en
@@ -3784,30 +5341,26 @@ ET:
          ::ForXHTML10SE
        @@@For:
          ManakaiDOM:ManakaiDOMLatest
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  align
      @@Deprecated:
+     @@ReflectEnum:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  alt
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  border
      @@Deprecated:
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -3815,22 +5368,9 @@ ET:
   @ATTR:
      @@Name:  height
      @@Deprecated:
-     @@Type:
-       @@@@:
-         DOMMain:long
-       @@@For:
-         ManakaiDOM:DOM2
-     @@Type:
-       @@@@:
-         DOMMain:DOMString
-       @@@For:
-         ManakaiDOM:DOM1 !ManakaiDOM:DOM2
+     @@ReflectStringLong:
      @@Get:
-        @@@Type:
-           DOMMain:long
      @@Set:
-        @@@Type:
-           DOMMain:long
      @@Level[list]:
         1
         2
@@ -3840,28 +5380,9 @@ ET:
   @ATTR:
      @@Name:  hspace
      @@Deprecated:
+     @@ReflectStringLong:
      @@Get:
-       @@@Type:
-         @@@@@:
-           DOMMain:long
-         @@@@For:
-           ManakaiDOM:DOM2
-       @@@Type:
-         @@@@@:
-           DOMMain:DOMString
-         @@@@For:
-           ManakaiDOM:DOM1 !ManakaiDOM:DOM2
      @@Set:
-       @@@Type:
-         @@@@@:
-           DOMMain:long
-         @@@@For:
-           ManakaiDOM:DOM2
-       @@@Type:
-         @@@@@:
-           DOMMain:DOMString
-         @@@@For:
-           ManakaiDOM:DOM1 !ManakaiDOM:DOM2
      @@Level[list]:
         1
         2
@@ -3871,16 +5392,13 @@ ET:
   @ATTR:
      @@AName:ismap
      @@DOMAName:  isMap
+     @@ReflectBoolean:
      @@Get:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
      @@Set:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
@@ -3888,23 +5406,20 @@ ET:
   @ATTR:
      @@AName:longdesc
      @@DOMAName:  longDesc
+     @@ReflectURI:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  src
+     @@ReflectURI:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:usemap
      @@DOMAName:  useMap
+     @@ReflectURI:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -3914,16 +5429,7 @@ ET:
   @ATTR:
      @@Name:  vspace
      @@Deprecated:
-     @@Type:
-       @@@@:
-         DOMMain:long
-       @@@For:
-         ManakaiDOM:DOM2
-     @@Type:
-       @@@@:
-         DOMMain:DOMString
-       @@@For:
-         ManakaiDOM:DOM1 !ManakaiDOM:DOM2
+     @@ReflectStringLong:
      @@Get:
      @@Set:
      @@Level[list]:
@@ -3935,16 +5441,7 @@ ET:
   @Attr:
      @@Name:  width
      @@Deprecated:
-     @@Type:
-       @@@@:
-         DOMMain:long
-       @@@For:
-         ManakaiDOM:DOM2
-     @@Type:
-       @@@@:
-         DOMMain:DOMString
-       @@@For:
-         ManakaiDOM:DOM1 !ManakaiDOM:DOM2
+     @@ReflectStringLong:
      @@Get:
      @@Set:
      @@Level[list]:
@@ -3954,6 +5451,24 @@ ET:
         1
         2
 ##IF:HTMLImageElement
+
+ElementTypeBinding:
+  @Name: ReflectStringLong
+  @ElementType:
+    dis:Type
+  @ShadowContent: 
+    @@@: DOMMain|long
+    @@For: ManakaiDOM|DOM2
+  @ShadowSibling:
+    @@actualType: 
+      @@@@: Numeric
+      @@@For: ManakaiDOM|DOM2
+    @@Type:
+      @@@@: DOMMain|DOMString
+      @@@For: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
+    @@actualType:
+      @@@@: CDATADOMString
+      @@@For: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
 
 ET:
   @ETQName:
@@ -3983,6 +5498,8 @@ ET:
             This control is not within the context of a form.
   @Attr:
      @@Name:  code
+     @@enDesc:
+       Applet class file.
      @@Get:
         @@@Type:  DOMString
      @@Set:
@@ -3990,55 +5507,47 @@ ET:
   @ATTR:
      @@Name:  align
      @@Deprecated:
+     @@ReflectEnum:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  archive
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  border
      @@Deprecated:
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:codebase
      @@DOMAName:  codeBase
+     @@ReflectURI:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:codetype
      @@DOMAName:  codeType
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  data
+     @@ReflectURI:
+       @@@ImplNote: Relative to codebase
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  declare
+     @@ReflectBoolean:
      @@Get:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
      @@Set:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
@@ -4046,54 +5555,43 @@ ET:
   @ATTR:
      @@Name:  height
      @@Deprecated:
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  hspace
      @@Deprecated:
+     @@ReflectNumeric:
      @@Get:
-        @@@Type:
-           DOMMain:long
      @@Set:
-        @@@Type:
-           DOMMain:long
   @ATTR:
      @@Name:  name
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:standby
      @@DOMAName:  standby
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:tabindex
      @@DOMAName:  tabIndex
+     @@ReflectNumeric:
      @@Get:
-        @@@Type:
-           DOMMain:long
      @@Set:
-        @@@Type:
-           DOMMain:long
   @ATTR:
      @@Name:  type
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @Attr:
      @@AName:usemap
      @@DOMAName:  useMap
+     @@ReflectURI:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -4103,18 +5601,14 @@ ET:
   @ATTR:
      @@Name:  vspace
      @@Deprecated:
+     @@ReflectNumeric:
      @@Get:
-        @@@Type:
-           DOMMain:long
      @@Set:
-        @@@Type:
-           DOMMain:long
   @ATTR:
      @@Name:  width
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @Attr:
      @@Name:  contentDocument
      @@Description:
@@ -4165,29 +5659,25 @@ ET:
 
   @ATTR:
      @@Name:  name
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  type
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  value
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:valuetype
      @@DOMAName:  valueType
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 
 ET:
   @ETQName:
@@ -4201,71 +5691,47 @@ ET:
   @ATTR:
      @@Name:  align
      @@Deprecated:
+     @@ReflectEnum:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  alt
      @@Deprecated:
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  archive
      @@Deprecated:
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  code
      @@Deprecated:
+     @@ReflectCDATA:
+       @@@ImplNote: URI?
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:codebase
      @@DOMAName:  codeBase
      @@Deprecated:
+     @@ReflectURI:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  height 
      @@Deprecated:
-    @@Get:
-        @@@Type:  DOMString
+     @@ReflectCDATA:
+     @@Get:
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  hspace
      @@Deprecated:
+     @@ReflectStringLong:
      @@Get:
-       @@@Type:
-         @@@@@:
-           DOMMain:long
-         @@@@For:
-           ManakaiDOM:DOM2
-       @@@Type:
-         @@@@@:
-           DOMMain:DOMString
-         @@@@For:
-           ManakaiDOM:DOM1 !ManakaiDOM:DOM2
      @@Set:
-       @@@Type:
-         @@@@@:
-           DOMMain:long
-         @@@@For:
-           ManakaiDOM:DOM2
-       @@@Type:
-         @@@@@:
-           DOMMain:DOMString
-         @@@@For:
-           ManakaiDOM:DOM1 !ManakaiDOM:DOM2
      @@Level[list]:
         1
         2
@@ -4275,17 +5741,15 @@ ET:
   @ATTR:
      @@Name:  name
      @@Deprecated:
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @Attr:
      @@Name:  object
      @@Deprecated:
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
      @@Level[list]:
         1
      @@SpecLevel[list]:
@@ -4294,16 +5758,7 @@ ET:
   @Attr:
      @@Name:  vspace
      @@Deprecated:
-     @@Type:
-       @@@@:
-         DOMMain:long
-       @@@For:
-         ManakaiDOM:DOM2
-     @@Type:
-       @@@@:
-         DOMMain:DOMString
-       @@@For:
-         ManakaiDOM:DOM1 !ManakaiDOM:DOM2
+     @@ReflectStringLong:
      @@Get:
      @@Set:
      @@Level[list]:
@@ -4315,10 +5770,9 @@ ET:
   @Attr:
      @@Name:  width
      @@Deprecated:
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 ##IF:HTMLAppletElement
 
 ResourceDef:
@@ -4347,10 +5801,9 @@ ET:
         @@@Type:  HTMLCollection
   @ATTR:
      @@Name:  name
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 ##IF:HTMLMapElement
 
 ET:
@@ -4364,66 +5817,54 @@ ET:
   @ATTR:
      @@AName: accesskey
      @@DOMAName:  accessKey
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  alt
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  coords
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  href
+     @@ReflectURI:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:nohref
      @@DOMAName:  noHref
+     @@ReflectBoolean:
      @@Get:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
      @@Set:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
   @ATTR:
+     @@ReflectCDATA:
      @@Name:  shape
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @Attr:
      @@AName:tabindex
      @@DOMAName:  tabIndex
+     @@ReflectNumeric:
      @@Get:
-        @@@Type:
-           DOMMain:long
      @@Set:
-        @@@Type:
-           DOMMain:long
   @ATTR:
      @@Name:  target
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 ##IF:HTMLAreaElement
 
 ET:
@@ -4478,38 +5919,32 @@ ET:
         @@@Type:  DOMString
   @ATTR:
      @@Name:  charset
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  defer
+     @@ReflectBoolean:
      @@Get:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
      @@Set:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
   @ATTR:
      @@Name:  src
+     @@ReflectURI:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  type
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 ##IF:HTMLScriptElement
 
 ET:
@@ -4639,65 +6074,56 @@ ET:
   @ATTR:
      @@Name:  align
      @@Deprecated:
+     @@ReflectEnum:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:bgcolor
      @@DOMAName:  bgColor
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  border
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:cellpadding
      @@DOMAName:  cellPadding
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:cellspacing
      @@DOMAName:  cellSpacing
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  frame
+     @@ReflectEnum:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
      @@ImplNote:
        @@@lang:en
        @@@@:
          How <HTML:border> is implemented in DOM Level 0?
   @ATTR:
      @@Name:  rules
+     @@ReflectEnum:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  summary
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  width
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @Method:
      @@Name:  createTHead
      @@Description:
@@ -4893,10 +6319,9 @@ ET:
   @ATTR:
      @@Name:  align
      @@Deprecated:
+     @@ReflectEnum:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 ##IF:HTMLTableCaptionElement
 
 ET:
@@ -4909,45 +6334,37 @@ ET:
 
   @ATTR:
      @@Name:  align
+     @@ReflectEnum:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:char
      @@DOMAName:  ch
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:charoff
      @@DOMAName:  chOff
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  span
+     @@ReflectNumeric:
      @@Get:
-        @@@Type:
-           DOMMain:long
      @@Set:
-        @@@Type:
-           DOMMain:long
   @ATTR:
      @@AName:valign
      @@DOMAName:  vAlign
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  width
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 ##IF:HTMLTableColElement
 
 ForDef:
@@ -5042,33 +6459,65 @@ IF:
   @ISAHTMLElement:
   @L1IF:
 
-  @ATTR:
+  @Attrs:
      @@Name:  align
+     @@ReflectEnum:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
-  @ATTR: 
+     @@docAttrP1S: ||ForHTML40SE||ForThead
+     @@docAttrP2S: ||ForHTML401||ForThead
+     @@docAttrP2X: ||ForXHTML10SE||ForThead
+     @@docAttrP1S: ||ForHTML40SE||ForTbody
+     @@docAttrP2S: ||ForHTML401||ForTbody
+     @@docAttrP2X: ||ForXHTML10SE||ForTbody
+     @@docAttrP1S: ||ForHTML40SE||ForTfoot
+     @@docAttrP2S: ||ForHTML401||ForTfoot
+     @@docAttrP2X: ||ForXHTML10SE||ForTfoot
+  @Attrs: 
      @@AName: char
      @@DOMAName:  ch
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
-  @ATTR:
+     @@docAttrP1S: ||ForHTML40SE||ForThead
+     @@docAttrP2S: ||ForHTML401||ForThead
+     @@docAttrP2X: ||ForXHTML10SE||ForThead
+     @@docAttrP1S: ||ForHTML40SE||ForTbody
+     @@docAttrP2S: ||ForHTML401||ForTbody
+     @@docAttrP2X: ||ForXHTML10SE||ForTbody
+     @@docAttrP1S: ||ForHTML40SE||ForTfoot
+     @@docAttrP2S: ||ForHTML401||ForTfoot
+     @@docAttrP2X: ||ForXHTML10SE||ForTfoot
+  @Attrs:
      @@AName:charoff
      @@DOMAName:  chOff
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
-  @ATTR:
+     @@docAttrP1S: ||ForHTML40SE||ForThead
+     @@docAttrP2S: ||ForHTML401||ForThead
+     @@docAttrP2X: ||ForXHTML10SE||ForThead
+     @@docAttrP1S: ||ForHTML40SE||ForTbody
+     @@docAttrP2S: ||ForHTML401||ForTbody
+     @@docAttrP2X: ||ForXHTML10SE||ForTbody
+     @@docAttrP1S: ||ForHTML40SE||ForTfoot
+     @@docAttrP2S: ||ForHTML401||ForTfoot
+     @@docAttrP2X: ||ForXHTML10SE||ForTfoot
+  @Attrs:
      @@AName:valign
      @@DOMAName:  vAlign
+     @@ReflectEnum:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
+     @@docAttrP1S: ||ForHTML40SE||ForThead
+     @@docAttrP2S: ||ForHTML401||ForThead
+     @@docAttrP2X: ||ForXHTML10SE||ForThead
+     @@docAttrP1S: ||ForHTML40SE||ForTbody
+     @@docAttrP2S: ||ForHTML401||ForTbody
+     @@docAttrP2X: ||ForXHTML10SE||ForTbody
+     @@docAttrP1S: ||ForHTML40SE||ForTfoot
+     @@docAttrP2S: ||ForHTML401||ForTfoot
+     @@docAttrP2X: ||ForXHTML10SE||ForTfoot
   @Attr:
      @@Name:  rows
      @@Description:
@@ -5262,39 +6711,34 @@ ET:
         2
   @ATTR:
      @@Name:  align
+     @@ReflectEnum:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:bgcolor
      @@DOMAName:  bgColor
      @@Deprecated:
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:char
      @@DOMAName:  ch
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:charoff
      @@DOMAName:  chOff
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:valign
      @@DOMAName:  vAlign
+     @@ReflectEnum:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @Method:
      @@Name:  insertCell
      @@Description:
@@ -5483,115 +6927,179 @@ IF:
        @@@lang:en
        @@@@:
          Writable in DOM Level 1 FE - fixed in the Errata.
-  @ATTR:
+  @Attrs:
      @@Name:  abbr
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
-  @ATTR:
+     @@docAttrP1S: ||ForHTML40SE||ForTh
+     @@docAttrP2S: ||ForHTML401||ForTh
+     @@docAttrP2X: ||ForXHTML10SE||ForTh
+     @@docAttrP1S: ||ForHTML40SE||ForTd
+     @@docAttrP2S: ||ForHTML401||ForTd
+     @@docAttrP2X: ||ForXHTML10SE||ForTd
+  @Attrs:
      @@Name:  align
+     @@ReflectEnum:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
-  @ATTR:
+     @@docAttrP1S: ||ForHTML40SE||ForTh
+     @@docAttrP2S: ||ForHTML401||ForTh
+     @@docAttrP2X: ||ForXHTML10SE||ForTh
+     @@docAttrP1S: ||ForHTML40SE||ForTd
+     @@docAttrP2S: ||ForHTML401||ForTd
+     @@docAttrP2X: ||ForXHTML10SE||ForTd
+  @Attrs:
      @@Name:  axis
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
-  @ATTR:
+     @@docAttrP1S: ||ForHTML40SE||ForTh
+     @@docAttrP2S: ||ForHTML401||ForTh
+     @@docAttrP2X: ||ForXHTML10SE||ForTh
+     @@docAttrP1S: ||ForHTML40SE||ForTd
+     @@docAttrP2S: ||ForHTML401||ForTd
+     @@docAttrP2X: ||ForXHTML10SE||ForTd
+  @Attrs:
      @@AName:bgcolor
      @@DOMAName:  bgColor
      @@Deprecated:
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
-  @ATTR:
+     @@docAttrP1S: ||ForHTML40SE||ForTh
+     @@docAttrP2S: ||ForHTML401||ForTh
+     @@docAttrP2X: ||ForXHTML10SE||ForTh
+     @@docAttrP1S: ||ForHTML40SE||ForTd
+     @@docAttrP2S: ||ForHTML401||ForTd
+     @@docAttrP2X: ||ForXHTML10SE||ForTd
+  @Attrs:
      @@AName:char
      @@DOMAName:  ch
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
-  @ATTR:
+     @@docAttrP1S: ||ForHTML40SE||ForTh
+     @@docAttrP2S: ||ForHTML401||ForTh
+     @@docAttrP2X: ||ForXHTML10SE||ForTh
+     @@docAttrP1S: ||ForHTML40SE||ForTd
+     @@docAttrP2S: ||ForHTML401||ForTd
+     @@docAttrP2X: ||ForXHTML10SE||ForTd
+  @Attrs:
      @@AName:charoff
      @@DOMAName:  chOff
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
-  @ATTR:
+     @@docAttrP1S: ||ForHTML40SE||ForTh
+     @@docAttrP2S: ||ForHTML401||ForTh
+     @@docAttrP2X: ||ForXHTML10SE||ForTh
+     @@docAttrP1S: ||ForHTML40SE||ForTd
+     @@docAttrP2S: ||ForHTML401||ForTd
+     @@docAttrP2X: ||ForXHTML10SE||ForTd
+  @Attrs:
      @@AName:colspan
      @@DOMAName:  colSpan
+     @@ReflectNumeric:
      @@Get:
-        @@@Type:
-           DOMMain:long
      @@Set:
-        @@@Type:
-           DOMMain:long
-  @ATTR:
+     @@docAttrP1S: ||ForHTML40SE||ForTh
+     @@docAttrP2S: ||ForHTML401||ForTh
+     @@docAttrP2X: ||ForXHTML10SE||ForTh
+     @@docAttrP1S: ||ForHTML40SE||ForTd
+     @@docAttrP2S: ||ForHTML401||ForTd
+     @@docAttrP2X: ||ForXHTML10SE||ForTd
+  @Attrs:
      @@Name:  headers
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
-  @ATTR:
+     @@docAttrP1S: ||ForHTML40SE||ForTh
+     @@docAttrP2S: ||ForHTML401||ForTh
+     @@docAttrP2X: ||ForXHTML10SE||ForTh
+     @@docAttrP1S: ||ForHTML40SE||ForTd
+     @@docAttrP2S: ||ForHTML401||ForTd
+     @@docAttrP2X: ||ForXHTML10SE||ForTd
+  @Attrs:
      @@Name:  height
      @@Deprecated:
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
-  @ATTR:
+     @@docAttrP1S: ||ForHTML40SE||ForTh
+     @@docAttrP2S: ||ForHTML401||ForTh
+     @@docAttrP2X: ||ForXHTML10SE||ForTh
+     @@docAttrP1S: ||ForHTML40SE||ForTd
+     @@docAttrP2S: ||ForHTML401||ForTd
+     @@docAttrP2X: ||ForXHTML10SE||ForTd
+  @Attrs:
      @@AName:nowrap
      @@DOMAName:  noWrap
      @@Deprecated:
+     @@ReflectBoolean:
      @@Get:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
      @@Set:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
-  @ATTR:
+     @@docAttrP1S: ||ForHTML40SE||ForTh
+     @@docAttrP2S: ||ForHTML401||ForTh
+     @@docAttrP2X: ||ForXHTML10SE||ForTh
+     @@docAttrP1S: ||ForHTML40SE||ForTd
+     @@docAttrP2S: ||ForHTML401||ForTd
+     @@docAttrP2X: ||ForXHTML10SE||ForTd
+  @Attrs:
      @@AName:rowspan
      @@DOMAName:  rowSpan
+     @@ReflectNumeric:
      @@Get:
-        @@@Type:
-           DOMMain:long
      @@Set:
-        @@@Type:
-           DOMMain:long
-  @ATTR:
+     @@docAttrP1S: ||ForHTML40SE||ForTh
+     @@docAttrP2S: ||ForHTML401||ForTh
+     @@docAttrP2X: ||ForXHTML10SE||ForTh
+     @@docAttrP1S: ||ForHTML40SE||ForTd
+     @@docAttrP2S: ||ForHTML401||ForTd
+     @@docAttrP2X: ||ForXHTML10SE||ForTd
+  @Attrs:
      @@Name:  scope
+     @@ReflectEnum:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
-  @ATTR:
+     @@docAttrP1S: ||ForHTML40SE||ForTh
+     @@docAttrP2S: ||ForHTML401||ForTh
+     @@docAttrP2X: ||ForXHTML10SE||ForTh
+     @@docAttrP1S: ||ForHTML40SE||ForTd
+     @@docAttrP2S: ||ForHTML401||ForTd
+     @@docAttrP2X: ||ForXHTML10SE||ForTd
+  @Attrs:
      @@AName:valign
      @@DOMAName:  vAlign
+     @@ReflectEnum:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
-  @ATTR:
+     @@docAttrP1S: ||ForHTML40SE||ForTh
+     @@docAttrP2S: ||ForHTML401||ForTh
+     @@docAttrP2X: ||ForXHTML10SE||ForTh
+     @@docAttrP1S: ||ForHTML40SE||ForTd
+     @@docAttrP2S: ||ForHTML401||ForTd
+     @@docAttrP2X: ||ForXHTML10SE||ForTd
+  @Attrs:
      @@Name:  width
      @@Deprecated:
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
+     @@docAttrP1S: ||ForHTML40SE||ForTh
+     @@docAttrP2S: ||ForHTML401||ForTh
+     @@docAttrP2X: ||ForXHTML10SE||ForTh
+     @@docAttrP1S: ||ForHTML40SE||ForTd
+     @@docAttrP2S: ||ForHTML401||ForTd
+     @@docAttrP2X: ||ForXHTML10SE||ForTd
 ##IF:HTMLTableCellElement
 
 ET:
@@ -5606,16 +7114,14 @@ ET:
 
   @ATTR:
      @@Name:  cols
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  rows
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
 ##IF:HTMLFrameSetElement
 
 ET:
@@ -5631,66 +7137,56 @@ ET:
   @ATTR:
      @@AName:frameborder
      @@DOMAName:  frameBorder
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:longdesc
      @@DOMAName:  longDesc
+     @@ReflectURI:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:marginheight
      @@DOMAName:  marginHeight
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:marginwidth
      @@DOMAName:  marginWidth
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  name
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:noresize
      @@DOMAName:  noResize
+     @@ReflectBoolean:
      @@Get:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
      @@Set:
-        @@@Type:
-           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
            @@@@Value:  false
   @ATTR:
      @@Name:  scrolling
+     @@ReflectEnum:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  src
+     @@ReflectURI:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @Attr:
      @@Name:  contentDocument
      @@Description:
@@ -5729,68 +7225,58 @@ ET:
   @ATTR:
      @@Name:  align
      @@Deprecated:
+     @@ReflectEnum:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:frameborder
      @@DOMAName:  frameBorder
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  height
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:longdesc
      @@DOMAName:  longDesc
+     @@ReflectURI:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:marginheight
      @@DOMAName:  marginHeight
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@AName:marginwidth
      @@DOMAName:  marginWidth
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  name
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  scrolling
+     @@ReflectEnum:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  src
+     @@ReflectURI:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @ATTR:
      @@Name:  width
+     @@ReflectCDATA:
      @@Get:
-        @@@Type:  DOMString
      @@Set:
-        @@@Type:  DOMString
   @Attr:
      @@Name:  contentDocument
      @@Description:

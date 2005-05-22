@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/05/21 16:16:41 $
+      $Date: 2005/05/22 13:32:00 $
     @@ContentType:
       dis:Date.RCS
   
@@ -451,7 +451,7 @@ ClsDef:
     @@Param:
       @@@Name: input
       @@@Type:
-        DOMLS:LSInput::ManakaiDOM:ManakaiDOM3
+        DOMLS:LSInput::ManakaiDOM:ManakaiDOMLatest
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -2053,6 +2053,9 @@ ClsDef:
                 }__; # UNDEEP
               }
               $r = $ret-><AG::ManakaiDISResourceDefinition.plCodeFragment>;
+            } elsif ($const-><M::ManakaiDISResourceDefinition.isTypeURI>
+                                 (<Q::DISCore:AnyDefContainer>)) {
+              $r = $const-><AG::ManakaiDISResourceDefinition.plCodeFragment>;
             } else {
               if ($et eq <Q::DISLang:constValue>) {
                 __UNDEEP{__EXCEPTION{RESOURCE_NOT_DEFINED_ERR::
@@ -5397,6 +5400,16 @@ ClsDef:
         @@@@enDesc:
           A resource defines a Perl subroutine which is not
           used anywhere.
+      @@@RaiseException:
+        @@@@@: NO_REFLECT_GET_DEFINED_ERR
+        @@@@enDesc:
+          An attribute is defined to reflect an element attribute
+          but no reflecting attribute getter template is defined.
+      @@@RaiseException:
+        @@@@@: NO_REFLECT_SET_DEFINED_ERR
+        @@@@enDesc:
+          An attribute is defined to reflect an element attribute
+          but no reflecting attribute setter template is defined.
       @@@PerlDef:
         __DEEP{
           if (exists $self->{<Q::plCodeFragment>}) {
@@ -5414,7 +5427,11 @@ ClsDef:
                    $self-><M::ManakaiDISResourceDefinition.isTypeURI>
                                 (<Q::dis2pm:InlineCode>) or
                    $self-><M::ManakaiDISResourceDefinition.isTypeURI>
-                                (<Q::DISLang:InputProcessor>)) {
+                                (<Q::DISLang:InputProcessor>) or
+                   $self-><M::ManakaiDISResourceDefinition.isTypeURI>
+                                (<Q::DOMMain:ReflectGet>) or
+                   $self-><M::ManakaiDISResourceDefinition.isTypeURI>
+                                (<Q::DOMMain:ReflectSet>)) {
             $self->{<Q::plCodeFragment>} = null;  ## To avoid loop
             my $def = $self->{src}-><M::ManakaiDISElement.disGetAttribute>
                                 (<Q::dis:Def>, for_arg => $self->{for},
@@ -5657,6 +5674,7 @@ ClsDef:
                 }__;
               }__;
             }
+            my $da; ## Reflecting element attribute
             my $plimpl = $self-><AG::ManakaiDISPropertyAccessor
                                                        .plImplementation>;
             my $data_type = $get-><AG::ManakaiDISResourceDefinition
@@ -5664,6 +5682,54 @@ ClsDef:
             my $get_code = $plimpl-><M::MPLImpl.createPerlBlockContainer>;
             $get_code-><M::PLBlockCon.appendStatement> (q<my ($self) = @_>);
             my $code = $get-><AG::ManakaiDISResourceDefinition.plCodeFragment>;
+            unless ($code) {
+              $da = $self-><M::ManakaiDISPropertyAccessor.getPropertyResource>
+                                 (<Q::dis:DocAttr>,
+                                  default_media_type => <Q::DISCore:TFPQNames>);
+              if ($da) {  ## Reflecting an element attribute
+                my $data_type_node = $get-><AG::ManakaiDISResourceDefinition
+                                               .disActualDataTypeNode>;
+                my $daget_node = $data_type_node-><M::ManakaiDISElement
+                                              .disGetAttribute>
+                                               (<Q::DOMMain:reflectGet>,
+                                                for_arg => $get->{for},
+                                                forp_arg => $get->{forp},
+                                                media_type => <Q::dis:TFQNames>);
+                ## TODO: More work might be required for 
+                ##       default values for element attributes.
+                my $daget;
+                if ($daget_node) {
+                  $daget = $self->{db}-><M::ManakaiDISDatabase.getResource>
+                            ($daget_node-><M::ManakaiDISElement.tfqnamesValueURI>
+                             (for_arg => $get->{for}, forp_arg => $get->{forp}));
+                } else {
+                  $daget = $data_type-><M::ManakaiDISResourceDefinition
+                              .getChildResourceByType> (<Q::DOMMain:ReflectGet>);
+                }
+                if ($daget) {
+                  $code = $daget-><AG::ManakaiDISResourceDefinition
+                                                         .plCodeFragment>->clone;
+                  $code-><M::MPLCodeFragment.replaceVariable>
+                         ('$LOCAL_NAME' => $plimpl-><M::MPLImpl
+                                              .createPerlStringLiteral>
+                              ($daget-><AG::ManakaiDISResourceDefinition
+                                           .mvLocalName>));
+                  my $nsuri = $daget-><AG::ManakaiDISResourceDefinition
+                                           .mvNamespaceURI>;
+                  $code-><M::MPLCodeFragment.replaceVariable>
+                         ('$NS_URI' => defined $nsuri
+                                       ? $plimpl-><M::MPLImpl
+                                              .createPerlStringLiteral> ($nsuri)
+                                       : $plimpl-><M::MPLImpl
+                                              .createPerlAtom> ('undef'));
+                } else {
+                  __UNDEEP{__EXCEPTION{NO_REFLECT_GET_DEFINED_ERR::
+                    DIS:sourceNode => {$self->{src}},
+                    DIS:uri => {$data_type->{uri}},
+                  }__}__;
+                }
+              }
+            }
             if ($code) {
               ## Default value
               my $def = $get->{src}-><M::ManakaiDISElement
@@ -5722,6 +5788,53 @@ ClsDef:
               my $data_type = $set-><AG::ManakaiDISResourceDefinition
                                        .disActualDataTypeResource>;
               my $code = $set-><AG::ManakaiDISResourceDefinition.plCodeFragment>;
+              unless ($code) {
+                $da ||= $self-><M::ManakaiDISPropertyAccessor
+                                  .getPropertyResource>
+                                 (<Q::dis:DocAttr>,
+                                  default_media_type => <Q::DISCore:TFPQNames>);
+                if ($da) {  ## Reflecting an element attribute
+                  my $data_type_node = $set-><AG::ManakaiDISResourceDefinition
+                                               .disActualDataTypeNode>;
+                  my $daset_node = $data_type_node-><M::ManakaiDISElement
+                                              .disGetAttribute>
+                                               (<Q::DOMMain:reflectSet>,
+                                                for_arg => $set->{for},
+                                                forp_arg => $set->{forp},
+                                                media_type => <Q::dis:TFQNames>);
+                  my $daset;
+                  if ($daset_node) {
+                    $daset = $self->{db}-><M::ManakaiDISDatabase.getResource>
+                            ($daset_node-><M::ManakaiDISElement.tfqnamesValueURI>
+                             (for_arg => $set->{for}, forp_arg => $set->{forp}));
+                  } else {
+                    $daset = $data_type-><M::ManakaiDISResourceDefinition
+                              .getChildResourceByType> (<Q::DOMMain:ReflectSet>);
+                  }
+                  if ($daset) {
+                    $code = $daset-><AG::ManakaiDISResourceDefinition
+                                                         .plCodeFragment>->clone;
+                    $code-><M::MPLCodeFragment.replaceVariable>
+                         ('$LOCAL_NAME' => $plimpl-><M::MPLImpl
+                                              .createPerlStringLiteral>
+                              ($daset-><AG::ManakaiDISResourceDefinition
+                                           .mvLocalName>));
+                    my $nsuri = $daset-><AG::ManakaiDISResourceDefinition
+                                           .mvNamespaceURI>;
+                    $code-><M::MPLCodeFragment.replaceVariable>
+                         ('$NS_URI' => defined $nsuri
+                                       ? $plimpl-><M::MPLImpl
+                                              .createPerlStringLiteral> ($nsuri)
+                                       : $plimpl-><M::MPLImpl
+                                              .createPerlAtom> ('undef'));
+                  } else {
+                    __UNDEEP{__EXCEPTION{NO_REFLECT_SET_DEFINED_ERR::
+                      DIS:sourceNode => {$self->{src}},
+                      DIS:uri => {$data_type->{uri}},
+                    }__}__;
+                  }
+                }
+              }
               if ($code) {
                 ## Input
                 $set_code-><M::PLBlockCon.appendStatement>
@@ -5743,7 +5856,8 @@ ClsDef:
                 $set->{<Q::DIS:plDefined>} = true;
                 $self->{<Q::DIS:plDefined>} = $get->{<Q::DIS:plDefined>};
               } else { ## Setter code not defined
-                $set_code-><M::PLBlockCon.appendStatement> (q<my ($self) = @_>);
+                $set_code-><M::PLBlockCon.appendStatement>
+                                              (q<my ($self) = @_>);
                 my $cls = $self->{db}-><M::ManakaiDISDatabase.getResource>
                                               (<Q::DOMException:CoreException>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
@@ -5761,9 +5875,9 @@ ClsDef:
                             .plAppendThrow>
                                ($set_code, $cls, $const, $subtype,
                                 {%$context_param});
+                $set->{<Q::DIS:plDefined>} = false;
+                $self->{<Q::DIS:plDefined>} = false;
               }
-              $set->{<Q::DIS:plDefined>} = false;
-              $self->{<Q::DIS:plDefined>} = false;
             } else {  ## No attribute setter
               $set_code-><M::PLBlockCon.appendStatement> (q<my ($self) = @_>);
               my $cls = $self->{db}-><M::ManakaiDISDatabase.getResource>
@@ -6079,6 +6193,11 @@ ClsDef:
       @@@Type:ResourceURI
       @@@enDesc:
         A URI reference identifying a resource type. 
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        ISSUE: Some inheritance tracing required for 
+        e.g. <Q::DISLang:InputProcessor> and <Q::DOMMain:ReflectGet>?
     @@Return:
       @@@Type: ManakaiDISResourceDefinition
       @@@enDesc:
@@ -6189,7 +6308,7 @@ ClsDef:
     @@rdf:type:
       DISPerl:ScalarVariable
     @@DefaultValue:
-      @@@@: qr[[^\s<>"'/\\\[\]\{\},!\?=\$\@%]]
+      @@@@: qr/[^\s<>"'\/\\\[\]\{\},!\?=\$\@%]/
       @@@ContentType:
         lang:Perl
     @@Type:
@@ -6584,17 +6703,6 @@ ClsDef:
             } # for
           }__; # DEEP
 
-
-  ## Checks \p character classes
-#  while ($s =~ /\\p{([^{}]+)}/gs) {
-#    my $name = $1;
-#    $State->{ExpandedURI q<dis2pm:Package>}
-#          ->{$State->{ExpandedURI q<dis2pm:currentPackage>}}
-#          ->{ExpandedURI q<dis2pm:requiredCharClass>}
-#          ->{$name} ||= $opt{node} || 1;
-#  }
-
-      
   @Method:
     @@Name: plPreprocessPerlStatement
     @@enDesc:
@@ -8162,6 +8270,10 @@ ClsDef:
               } elsif ($r-><M::ManakaiDISElement.mediaTypeMatch>
                                    (<Q::dis:TFQNames>, $defaultMediaType,
                                     for_arg => $self->{for},
+                                    forp_arg => $self->{forp}) or
+                       $r-><M::ManakaiDISElement.mediaTypeMatch>
+                                   (<Q::DISCore:TFPQNames>, $defaultMediaType,
+                                    for_arg => $self->{for},
                                     forp_arg => $self->{forp})) {
                 $self->{$propName}
                    = $r-><M::ManakaiDISElement.tfqnamesValueURI>
@@ -8175,7 +8287,7 @@ ClsDef:
                                     forp_arg => $self->{forp});
                 __UNDEEP{
                   __EXCEPTION{UNSUPPORTED_MEDIA_TYPE_ERR::
-                    DIS:uri => {$mt},
+                    DIS:uri => {$mt || $defaultMediaType},
                     DIS:sourceNode => {$r},
                   }__;
                 }__;
@@ -8361,16 +8473,22 @@ ClsDef:
         if ($isaRecursive) {
           __DEEP{
             $opt{___recursive_isa_done} ||= {$self->{uri} => true};
+            $opt{___isa_recursive_done} ||= {$self->{uri} => true};
             my @p_res = @{$self-><M::ManakaiDISPropertyAccessor
                                     .getPropertyResourceList>
                                       (<Q::dis:ISA>, recursive_isa => false,
-                                       recursive => true,
+                                       recursive => false,
                                        default_media_type => <Q::dis:TFQNames>)};
             for my $p_res (@p_res) {
+              next if $opt{___isa_recursive_done}->{$p_res->{uri}};
+              $opt{___isa_recursive_done}->{$p_res->{uri}} = true;
               push @$r, @{$p_res-><M::ManakaiDISPropertyAccessor
                                      .getPropertyResourceList>
                                           ($propName, recursive_isa => false,
                                            recursive => false,
+                                       isa_recursive => true,
+                                       ___isa_recursive_done =>
+                                                     $opt{___isa_recursive_done},
                                        default_media_type => $defaultMediaType)};
             }
           }__;
@@ -9114,6 +9232,32 @@ ExceptionDef:
            The URI reference of the unsupported role.
        @@@@enMufDef:
          Role <%p (name => {<Q::DIS:uri>});> is not supported
+     @@@XSubTypeDef:
+       @@@@QName: NO_REFLECT_GET_DEFINED_ERR
+       @@@@enDesc:
+          An attribute is defined to reflect an element attribute
+          but no reflecting attribute getter template is defined.
+       @@@@XSourceNodeParam:
+       @@@@XParam:
+         @@@@@QName:uri
+         @@@@@enDesc:
+           The URI reference of the datatype resource for which
+           a getter template should have been defined.
+     @@@XSubTypeDef:
+       @@@@QName: NO_REFLECT_SET_DEFINED_ERR
+       @@@@enDesc:
+          An attribute is defined to reflect an element attribute
+          but no reflecting attribute setter template is defined.
+       @@@@XSourceNodeParam:
+       @@@@XParam:
+         @@@@@QName:uri
+         @@@@@enDesc:
+           The URI reference of the datatype resource for which
+           a setter template should have been defined.
+  @ImplNote:
+    @@lang:en
+    @@@:
+      ISSUE: Too many subtypes for a type!  New type should be added?
 ##DISException
 
 XParamDef:
