@@ -1,0 +1,291 @@
+Module:
+  @QName:
+    DIS:DISDoc
+  @FullName:
+    @@lang: en
+    @@@:
+      <QUOTE::disdoc> Documentation Support Module
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#DISDoc/
+  
+  @Description:
+    @@lang:en
+    @@@:
+      This module provides an object model for <QUOTE::disdoc>
+      documentation format.  
+
+  @Author:
+    @@FullName: Wakaba
+    @@Mail: w@suika.fam.cx
+  @License:
+    @@@:
+      license:Perl+MPL
+    @@Original:
+      @@@FullName:
+        manakai <CODE::lib/manakai/dis.pl>
+      @@@Year:2004
+      @@@Author:
+        @@@@FullName:Wakaba
+        @@@@Mail:w@suika.fam.cx
+  @Date:
+    @@@:
+      $Date: 2005/05/23 13:26:55 $
+    @@ContentType:
+      dis:Date.RCS
+  
+  @Require:
+    @@Module:
+      @@@QName: Util|DIS
+      @@@WithFor: 
+        DIS:ForLatest
+    @@Module:
+      @@@QName: MDOM|DOMHTML
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+
+  @DefaultFor: 
+    DIS:ForLatest
+
+Namespace:
+  @DIS:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @dis2pm:
+    http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
+  @DISlib:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @disPerl:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl--
+  @DOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @DOMException:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
+  @DOMLS:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
+  @DOMMain:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @infoset:
+    http://www.w3.org/2001/04/infoset#
+  @lang:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @Markup:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup#
+  @MDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
+  @MDOMX:
+    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @owl:
+    http://www.w3.org/2002/07/owl#
+  @Perl:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @s:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
+  @swcfg21:
+    http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
+  @TreeCore:\
+  @Util:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
+
+## -- Features
+
+ElementTypeBinding:
+  @Name: FeatureDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DOMMain:DOMFeature
+    @@ForCheck:
+      ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: FeatureVerDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DOMMain:DOMFeature
+
+ElementTypeBinding:
+  @Name: featureQName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ContentType:
+      dis:TypeQName
+
+FeatureDef:
+  @QName: DIS|HTML
+  @FeatureVerDef:
+    @@QName: DIS|HTML20
+    @@Version: 2.0
+    @@DOMMetaImpl:instanceFeatureOf: DIS|HTML
+    @@DOMMain:requireFeature: DIS|CoreFeature10
+    @@FullName:
+      @@@@:
+        <QUOTE::disdoc>, version 2.0
+      @@@lang:en
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType: 
+    dis:Description
+  @ShadowContent: 
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: IFClassDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor: ManakaiDOM|ForClass
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|IF
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||+||ManakaiDOM|ForIF
+      @@@ForCheck: ManakaiDOM|ForClass
+      @@@ContentType: DISCore|TFPQNames
+
+ElementTypeBinding:
+  @Name: IFQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: IFISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+## -- disdoc extended interface for dis core objects
+
+IFClassDef:
+  @IFQName: DISResourceDoc
+  @ClsQName: ManakaiDISResourceDoc
+
+  @enDesc:
+    This interface provides an access to <QUOTE::disdoc>
+    methods from <QUOTE::dis> resource definition.
+    \
+    This interface can be obtained
+    from the object implementing
+    <Class::DIS:ManakaiDISResourceDefinition> class
+    by calling the <M::DIS:ManakaiDISResourceDefinition
+    .getFeature> method with the <P::feature> parameter
+    set to <Feature::DIS|HTML>.
+
+  @ClsISA: DIS|ManakaiDISResourceDefinition
+
+  @Method:
+    @@Name: getFullName
+    @@enDesc:
+      Returns a copy of (human readable) full name. 
+    @@NegoParam:
+    @@Return:
+      @@@Type: DOMCore|DocumentFragment
+      @@@enDesc:
+        A DOM node containing full name. 
+      @@@nullCase:
+        @@@@enDesc:
+          No full name for this resource.
+
+  @Method:
+    @@Name: getLabel
+    @@enDesc:
+      Returns a copy of (human readable) label.
+    @@NegoParam:
+    @@Return:
+      @@@Type: DOMCore|DocumentFragment
+      @@@enDesc:
+        A DOM node containing label.
+      @@@nullCase:
+        @@@@enDesc:
+          No label for this resource.
+
+  @Method:
+    @@Name: getDescription
+    @@enDesc:
+      Returns a copy of (human readable) description.
+    @@NegoParam:
+    @@Param:
+      @@@Name: withImplNote
+      @@@enDesc:
+        Whether should implementor's notes also be returned or not.
+      @@@Type: DOMMain|boolean||ManakaiDOM|all
+      @@@trueCase:
+        @@@@enDesc:
+          Implementor's notes will also be part of the returned value.
+      @@@falseCase:
+        @@@@enDesc:
+          The result will not contains any implementor's notes.
+    @@Return:
+      @@@Type: DOMCore|DocumentFragment
+      @@@enDesc:
+        A DOM node containing label.
+      @@@nullCase:
+        @@@@enDesc:
+          No label for this resource.
+##DISResourceDoc
+
+ElementTypeBinding:
+  @Name: nullCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: ManakaiDOM|InCase
+    @@Value:
+      @@@is-null:1
+
+ElementTypeBinding:
+  @Name: NegoParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|MethodParameter
+    @@Name: condition
+    @@Type: DISDOCNegotiationCondition
+    @@Description:
+      @@@lang:en
+      @@@@: A condition object for negotiation.
+    @@ResourceDef:
+      @@@@rdf:type: ManakaiDOM|InCase
+      @@@@Value:
+        @@@@@is-null:1
+      @@@@Description:
+        @@@@@lang:en
+        @@@@@@: No negotiation.

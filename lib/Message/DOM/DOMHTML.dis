@@ -44,7 +44,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/22 13:31:59 $
+      $Date: 2005/05/23 13:26:55 $
     @@ContentType:
       dis:Date.RCS
 
@@ -1136,7 +1136,7 @@ ElementTypeBinding:
           DOM Level 1 First Edition refers the latest version of 
           HTML 4.0 while Second Edition refers the second edition of 
           HTML 4.0. 
-      @@@@@DISCore:stopISARecursive:1
+      @@@DISCore:stopISARecursive:1
     @@DISMarkup:elementType:
       @@@@:
         ::ForHTML401
@@ -1147,7 +1147,7 @@ ElementTypeBinding:
         ::ForXHTML10SE
       @@@ForCheck:
         ManakaiDOM:DOM2
-      @@@@@DISCore:stopISARecursive:1
+      @@@DISCore:stopISARecursive:1
 
 ElementTypeBinding:
   @Name: H5ETX
@@ -1204,7 +1204,7 @@ ElementTypeBinding:
     @@DISMarkup:elementType:
       @@@@: ||ForHTML5
       @@@ForCheck: ManakaiDOM|ManakaiDOMLatest
-      @@@@@DISCore:stopISARecursive:1
+      @@@DISCore:stopISARecursive:1
 
     @@DOMMain:implementFeature: HTMLExtendedFeature30
 
@@ -4376,9 +4376,14 @@ ResourceDef:
     any remind nodes.
   @PerlDef:
           my $__i = 0;
+          $before = [];
           $after = $children;
           FIND: {
-            last FIND if $index == -1;
+            if ($index == -1) {
+              $before = $after;
+              $after = [];
+              last FIND;
+            }
             while (my $__co = shift @$after) {
               if ($__co->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element> and
                   <Code::isHTMLElemento:: $elementNodeo = $__co,

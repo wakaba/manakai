@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/05/22 13:32:00 $
+      $Date: 2005/05/23 13:26:55 $
     @@ContentType:
       dis:Date.RCS
   
@@ -110,6 +110,26 @@ ForDef:
   @ISA:
     ManakaiDOM:Perl
 
+## -- Submodules
+
+
+ResourceDef:
+  @QName:
+    DIS:
+  @rdf:type:
+    dis:ModuleGroup
+  @FullName:
+    @@lang:en
+    @@@:
+      <QUOTE::dis> modules
+  @AppName:
+    @@@:
+      Message::Util::IF::
+    @@ForCheck: 
+      ManakaiDOM:ForIF
+  @AppName:
+    Message::Util::DIS::
+
 ## -- Features
 
 ElementTypeBinding:
@@ -154,6 +174,53 @@ FeatureDef:
         The <QUOTE::dis> object model, version 1.0. 
     @@DOMMain:requireFeature: 
       swcfg21:CoreFeature21
+
+## -- Roles
+
+ElementTypeBinding:
+  @Name: RoleDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Role
+    @@ForCheck:
+      =ManakaiDOM:all
+
+RoleDef:
+  @QName: ModuleRole
+  @enDesc:
+    Any class playing this role may be returned by
+    <M::ManakaiDISModuleDefinition.getFeature> method with
+    appropriate feature parameters.
+
+RoleDef:
+  @QName: ForRole
+  @enDesc:
+    Any class playing this role may be returned by
+    <M::ManakaiDISForDefinition.getFeature> method with
+    appropriate feature parameters.
+
+RoleDef:
+  @QName: ResourceRole
+  @enDesc:
+    Any class playing this role may be returned by
+    <M::ManakaiDISResourceDefinition.getFeature> method with
+    appropriate feature parameters.
+
+RoleDef:
+  @QName: ElementRole
+  @enDesc:
+    Any class playing this role may be returned by
+    <M::ManakaiDISElement.getFeature> method with
+    appropriate feature parameters.
+
+RoleDef:
+  @QName: DatabaseRole
+  @enDesc:
+    Any class playing this role may be returned by
+    <M::ManakaiDISDatabase.getFeature> method with
+    appropriate feature parameters.
 
 ## -- SuikaWikiConfig/2.1 extended classes
 
@@ -815,6 +882,8 @@ ClsDef:
     @@lang:en
     @@@:
       <QUOTE::dis> element node objects. 
+
+  @DISLang:role: ElementRole
 
   @Method:
     @@Name: forMatch
@@ -2200,6 +2269,60 @@ ClsDef:
             }__}__;
           }
         }__; # DEEP
+
+  @Method:
+     @@Name:  getFeature
+     @@Description:
+        @@@lang:en
+        @@@@:
+          Returns a specialized object that implements the specialized 
+          interfaces of the specified feature and version.
+     @@Param:
+        @@@Name:  feature
+        @@@Type:
+          DISLang:String::ManakaiDOM:all
+        @@@actualType:
+          ManakaiDOM:ManakaiDOMFeatureName::ManakaiDOM:ManakaiDOMLatest
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A feature name to request.
+     @@Param:
+        @@@Name:  version
+        @@@Type:
+          DISLang:String::ManakaiDOM:all
+        @@@actualType:
+          ManakaiDOM:ManakaiDOMFeatureVersion::ManakaiDOM:ManakaiDOMLatest
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A feature version number to request.
+     @@Return:
+        @@@Type:  
+          DOMMain:Object::ManakaiDOM:all
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An object that implements the specialized APIs of the 
+            <P::feature> and <P::version>.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@@: 
+            There is no object available that implements interfaces 
+            associated with the <P::feature> and <P::version>. 
+        @@@PerlDef:
+            $feature =~ s/^\+//;
+            CLASS: for my $class (grep {
+              $Message::Util::DIS::ManakaiDISElement::CompatClass{$_}
+            } keys %Message::Util::DIS::ManakaiDISElement::CompatClass) {
+              if ($Message::DOM::ClassFeature{$class}->{$feature}->{$version}) {
+                $r = $self->{<Q::TreeCore:node>}
+                          -><M::ManakaiDOM:ManakaiDOMNodeObject
+                                     ::ManakaiDOM:Perl.newReference> ($class);
+                last CLASS;
+              }
+            }
 ##DISElement
 
 ElementTypeBinding:
@@ -2261,6 +2384,11 @@ ClsDef:
   @ClsISA: ManakaiDISElement
   @enDesc:
     The <Q::dis:Module> elements. 
+
+  @DISLang:role:
+    @@@:
+      DISLang:NullRole
+    @@DISCore:stopISARecursive:1
 
   @Attr:
     @@Name: requireElement
@@ -2483,6 +2611,8 @@ ClsDef:
   @enDesc:
     Resource database created from <QUOTE::dis> source data. 
   @ClsISA: ManakaiDISExceptionTarget
+
+  @DISLang:role: DatabaseRole
 
   @Method:
     @@Name: getModule
@@ -3385,6 +3515,57 @@ ClsDef:
           $r->[0]-><AS::ManakaiDISResourceDefinition.isReferred>
                                                ($node or $contextNode);
         }__;
+
+  @Method:
+     @@Name:  getFeature
+     @@Description:
+        @@@lang:en
+        @@@@:
+          Returns a specialized object that implements the specialized 
+          interfaces of the specified feature and version.
+     @@Param:
+        @@@Name:  feature
+        @@@Type:
+          DISLang:String::ManakaiDOM:all
+        @@@actualType:
+          ManakaiDOM:ManakaiDOMFeatureName::ManakaiDOM:ManakaiDOMLatest
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A feature name to request.
+     @@Param:
+        @@@Name:  version
+        @@@Type:
+          DISLang:String::ManakaiDOM:all
+        @@@actualType:
+          ManakaiDOM:ManakaiDOMFeatureVersion::ManakaiDOM:ManakaiDOMLatest
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A feature version number to request.
+     @@Return:
+        @@@Type: ManakaiDISDatabase
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An object that implements the specialized APIs of the 
+            <P::feature> and <P::version>. 
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@@: 
+            There is no object available that implements interfaces 
+            associated with the <P::feature> and <P::version>. 
+        @@@PerlDef:
+          $feature =~ s/^\+//;
+          CLASS: for my $class (grep {
+            $Message::Util::DIS::ManakaiDISDatabase::CompatClass{$_}
+          } keys %Message::Util::DIS::ManakaiDISDatabase::CompatClass) {
+            if ($Message::DOM::ClassFeature{$class}->{$feature}->{$version}) {
+              $r = bless $self, $class;
+              last CLASS;
+            }
+          }
 ##DISDatabase
 
 PropDef:
@@ -3552,6 +3733,8 @@ ClsDef:
   @ClsISA: ManakaiDISPropertyAccessor
   @ClsISA: ManakaiDISExceptionTarget
   @ClsISA: ManakaiDISPerlModuleDefinition
+
+  @DISLang:role: ModuleRole
   
   @Attr:
     @@Name: uri
@@ -3732,6 +3915,57 @@ ClsDef:
     @@Get:
       @@@Type: ManakaiDISModuleDefinition
       @@@PerlDef: $r = $self;
+
+  @Method:
+     @@Name:  getFeature
+     @@Description:
+        @@@lang:en
+        @@@@:
+          Returns a specialized object that implements the specialized 
+          interfaces of the specified feature and version.
+     @@Param:
+        @@@Name:  feature
+        @@@Type:
+          DISLang:String::ManakaiDOM:all
+        @@@actualType:
+          ManakaiDOM:ManakaiDOMFeatureName::ManakaiDOM:ManakaiDOMLatest
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A feature name to request.
+     @@Param:
+        @@@Name:  version
+        @@@Type:
+          DISLang:String::ManakaiDOM:all
+        @@@actualType:
+          ManakaiDOM:ManakaiDOMFeatureVersion::ManakaiDOM:ManakaiDOMLatest
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A feature version number to request.
+     @@Return:
+        @@@Type: ManakaiDISModuleDefinition
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An object that implements the specialized APIs of the 
+            <P::feature> and <P::version>. 
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@@: 
+            There is no object available that implements interfaces 
+            associated with the <P::feature> and <P::version>. 
+        @@@PerlDef:
+          $feature =~ s/^\+//;
+          CLASS: for my $class (grep {
+            $Message::Util::DIS::ManakaiDISModuleDefinition::CompatClass{$_}
+          } keys %Message::Util::DIS::ManakaiDISModuleDefinition::CompatClass) {
+            if ($Message::DOM::ClassFeature{$class}->{$feature}->{$version}) {
+              $r = bless $self, $class;
+              last CLASS;
+            }
+          }
 ##DISModuleDefinition
 
 ElementTypeBinding:
@@ -3753,6 +3987,8 @@ ClsDef:
     @@@:
       <QUOTE::dis> <QUOTE::for> definitions. 
   @ClsISA: ManakaiDISExceptionTarget
+
+  @DISLang:role: ForRole
   
   @Attr:
     @@Name: uri
@@ -3915,6 +4151,57 @@ ClsDef:
             }
           }
         }__;
+
+  @Method:
+     @@Name:  getFeature
+     @@Description:
+        @@@lang:en
+        @@@@:
+          Returns a specialized object that implements the specialized 
+          interfaces of the specified feature and version.
+     @@Param:
+        @@@Name:  feature
+        @@@Type:
+          DISLang:String::ManakaiDOM:all
+        @@@actualType:
+          ManakaiDOM:ManakaiDOMFeatureName::ManakaiDOM:ManakaiDOMLatest
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A feature name to request.
+     @@Param:
+        @@@Name:  version
+        @@@Type:
+          DISLang:String::ManakaiDOM:all
+        @@@actualType:
+          ManakaiDOM:ManakaiDOMFeatureVersion::ManakaiDOM:ManakaiDOMLatest
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A feature version number to request.
+     @@Return:
+        @@@Type: ManakaiDISForDefinition
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An object that implements the specialized APIs of the 
+            <P::feature> and <P::version>. 
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@@: 
+            There is no object available that implements interfaces 
+            associated with the <P::feature> and <P::version>. 
+        @@@PerlDef:
+          $feature =~ s/^\+//;
+          CLASS: for my $class (grep {
+            $Message::Util::DIS::ManakaiDISForDefinition::CompatClass{$_}
+          } keys %Message::Util::DIS::ManakaiDISForDefinition::CompatClass) {
+            if ($Message::DOM::ClassFeature{$class}->{$feature}->{$version}) {
+              $r = bless $self, $class;
+              last CLASS;
+            }
+          }
 
 ##DISForDefinition
 
@@ -4328,6 +4615,37 @@ ClsDef:
                           ('$Message::DOM::DOMLS::SerializerClass{q<'.
                            $pack_name . '>} = 1');
                   }
+
+                  if ($role-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
+                                (<Q::DIS:ModuleRole>)) {
+                    $r-><M::PLBlockCon.appendStatement>
+                          ('$Message::Util::DIS::ManakaiDISModuleDefinition'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
+                  if ($role-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
+                                (<Q::DIS:ForRole>)) {
+                    $r-><M::PLBlockCon.appendStatement>
+                          ('$Message::Util::DIS::ManakaiDISForDefinition'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
+                  if ($role-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
+                                (<Q::DIS:ResourceRole>)) {
+                    $r-><M::PLBlockCon.appendStatement>
+                          ('$Message::Util::DIS::ManakaiDISResourceDefinition'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
+                  if ($role-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
+                                (<Q::DIS:ElementRole>)) {
+                    $r-><M::PLBlockCon.appendStatement>
+                          ('$Message::Util::DIS::ManakaiDISElement'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
+                  if ($role-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
+                                (<Q::DIS:DatabaseRole>)) {
+                    $r-><M::PLBlockCon.appendStatement>
+                          ('$Message::Util::DIS::ManakaiDISDatabase'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
                 }
               } elsif ($cls-><M::ManakaiDISResourceDefinition.isTypeURI>
                               (<Q::DISPerl:ScalarVariable>) and
@@ -4494,6 +4812,8 @@ ClsDef:
   @ClsISA: ManakaiDISPropertyAccessor
   @ClsISA: ManakaiDISExceptionTarget
   @ClsISA: ManakaiDISPerlModuleDefinition
+
+  @DISLang:role: ResourceRole
 
   @IntMethod:
     @@Operator:
@@ -7814,6 +8134,57 @@ ClsDef:
             $self->{<Q::DIS:mvOwnerElementURI>} = $r->{uri} if $r;
           }
         }__;
+
+  @Method:
+     @@Name:  getFeature
+     @@Description:
+        @@@lang:en
+        @@@@:
+          Returns a specialized object that implements the specialized 
+          interfaces of the specified feature and version.
+     @@Param:
+        @@@Name:  feature
+        @@@Type:
+          DISLang:String::ManakaiDOM:all
+        @@@actualType:
+          ManakaiDOM:ManakaiDOMFeatureName::ManakaiDOM:ManakaiDOMLatest
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A feature name to request.
+     @@Param:
+        @@@Name:  version
+        @@@Type:
+          DISLang:String::ManakaiDOM:all
+        @@@actualType:
+          ManakaiDOM:ManakaiDOMFeatureVersion::ManakaiDOM:ManakaiDOMLatest
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A feature version number to request.
+     @@Return:
+        @@@Type: ManakaiDISResourceDefinition
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An object that implements the specialized APIs of the 
+            <P::feature> and <P::version>. 
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@@: 
+            There is no object available that implements interfaces 
+            associated with the <P::feature> and <P::version>. 
+        @@@PerlDef:
+          $feature =~ s/^\+//;
+          CLASS: for my $class (grep {
+            $Message::Util::DIS::ManakaiDISResourceDefinition::CompatClass{$_}
+          } keys %Message::Util::DIS::ManakaiDISResourceDefinition::CompatClass){
+            if ($Message::DOM::ClassFeature{$class}->{$feature}->{$version}) {
+              $r = bless $self, $class;
+              last CLASS;
+            }
+          }
 ##DISResourceDefinition
 
 PropDef:
