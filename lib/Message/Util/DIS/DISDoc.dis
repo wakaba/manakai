@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/05/23 13:26:55 $
+      $Date: 2005/05/24 12:04:01 $
     @@ContentType:
       dis:Date.RCS
   
@@ -123,15 +123,27 @@ ElementTypeBinding:
       dis:TypeQName
 
 FeatureDef:
+  @QName: DIS|Doc
+  @FeatureVerDef:
+    @@QName: DIS|Doc20
+    @@Version: 2.0
+    @@DOMMetaImpl:instanceFeatureOf: DIS|Doc
+    @@DOMMain:requireFeature: DIS|CoreFeature10
+    @@FullName:
+      @@@lang:en
+      @@@@:
+        <QUOTE::disdoc> version 2.0
+
+FeatureDef:
   @QName: DIS|HTML
   @FeatureVerDef:
     @@QName: DIS|HTML20
     @@Version: 2.0
     @@DOMMetaImpl:instanceFeatureOf: DIS|HTML
-    @@DOMMain:requireFeature: DIS|CoreFeature10
+    @@DOMMain:requireFeature: DIS|Doc20
     @@FullName:
       @@@@:
-        <QUOTE::disdoc>, version 2.0
+        <QUOTE::disdoc> version 2.0 with HTML output
       @@@lang:en
 
 ElementTypeBinding:
@@ -164,6 +176,23 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ForClass
       @@@ContentType: DISCore|TFPQNames
 
+    @@DOMMain:implementFeature: DIS|Doc20
+    @@DOMMain:implementFeature: DIS|HTML20
+
+ElementTypeBinding:
+  @Name: IFDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|IF
+      @@@ForCheck: ManakaiDOM|ForIF
+
 ElementTypeBinding:
   @Name: IFQName
   @ElementType:
@@ -192,29 +221,42 @@ ElementTypeBinding:
   @ShadowContent:
     @@ForCheck: ManakaiDOM|ForClass
 
-## -- disdoc extended interface for dis core objects
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Method
+
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|MethodReturn
+
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|MethodParameter
+
+## -- disdoc Extended Interfaces for dis Database Objects
 
 IFClassDef:
-  @IFQName: DISResourceDoc
-  @ClsQName: ManakaiDISResourceDoc
+  @IFQName: DISAnyResourceDISDoc
+  @ClsQName: ManakaiDISAnyResourceDISDoc
 
   @enDesc:
     This interface provides an access to <QUOTE::disdoc>
-    methods from <QUOTE::dis> resource definition.
-    \
-    This interface can be obtained
-    from the object implementing
-    <Class::DIS:ManakaiDISResourceDefinition> class
-    by calling the <M::DIS:ManakaiDISResourceDefinition
-    .getFeature> method with the <P::feature> parameter
-    set to <Feature::DIS|HTML>.
-
-  @ClsISA: DIS|ManakaiDISResourceDefinition
+    methods from <QUOTE::dis> resource, module or <QUOTE::for> definition.
 
   @Method:
     @@Name: getFullName
     @@enDesc:
       Returns a copy of (human readable) full name. 
+    @@OwnerDocArg:
     @@NegoParam:
     @@Return:
       @@@Type: DOMCore|DocumentFragment
@@ -225,22 +267,10 @@ IFClassDef:
           No full name for this resource.
 
   @Method:
-    @@Name: getLabel
-    @@enDesc:
-      Returns a copy of (human readable) label.
-    @@NegoParam:
-    @@Return:
-      @@@Type: DOMCore|DocumentFragment
-      @@@enDesc:
-        A DOM node containing label.
-      @@@nullCase:
-        @@@@enDesc:
-          No label for this resource.
-
-  @Method:
     @@Name: getDescription
     @@enDesc:
       Returns a copy of (human readable) description.
+    @@OwnerDocArg:
     @@NegoParam:
     @@Param:
       @@@Name: withImplNote
@@ -260,7 +290,84 @@ IFClassDef:
       @@@nullCase:
         @@@@enDesc:
           No label for this resource.
-##DISResourceDoc
+##DISAnyResourceDoc
+
+IFClassDef:
+  @IFQName: DISResourceDISDoc
+  @ClsQName: ManakaiDISResourceDISDoc
+
+  @IFISA: DISAnyResourceDISDoc
+  @ClsISA: ManakaiDISAnyResourceDISDoc
+
+  @DISLang:role: DIS|ResourceRole
+
+  @enDesc:
+    This interface provides an access to <QUOTE::disdoc>
+    methods from <QUOTE::dis> resource definition.
+    \
+    This interface can be obtained
+    from the object implementing
+    <Class::DIS:ManakaiDISResourceDefinition> class
+    by calling the <M::DIS:ManakaiDISResourceDefinition
+    .getFeature> method with the <P::feature> parameter
+    set to <Feature::DIS|Doc>.
+
+  @Method:
+    @@Name: getLabel
+    @@enDesc:
+      Returns a copy of (human readable) label.
+    @@OwnerDocArg:
+    @@NegoParam:
+    @@Return:
+      @@@Type: DOMCore|DocumentFragment
+      @@@enDesc:
+        A DOM node containing label.
+      @@@nullCase:
+        @@@@enDesc:
+          No label for this resource.
+##DISResourceDISDoc
+
+IFClassDef:
+  @IFQName: DISModuleDISDoc
+  @ClsQName: ManakaiDISModuleDISDoc
+
+  @IFISA: DISAnyResourceDISDoc
+  @ClsISA: ManakaiDISAnyResourceDISDoc
+
+  @DISLang:role: DIS|ModuleRole
+
+  @enDesc:
+    This interface provides an access to <QUOTE::disdoc>
+    methods from <QUOTE::dis> module definition.
+    \
+    This interface can be obtained
+    from the object implementing
+    <Class::DIS:ManakaiDISModuleDefinition> class
+    by calling the <M::DIS:ManakaiDISModuleDefinition
+    .getFeature> method with the <P::feature> parameter
+    set to <Feature::DIS|Doc>.
+##DISModuleDISDoc
+
+IFClassDef:
+  @IFQName: DISForDISDoc
+  @ClsQName: ManakaiDISForDISDoc
+
+  @IFISA: DISAnyResourceDISDoc
+  @ClsISA: ManakaiDISAnyResourceDISDoc
+
+  @DISLang:role: DIS|ForRole
+
+  @enDesc:
+    This interface provides an access to <QUOTE::disdoc>
+    methods from <QUOTE::dis> <QUOTE::for> definition.
+    \
+    This interface can be obtained
+    from the object implementing
+    <Class::DIS:ManakaiDISForDefinition> class
+    by calling the <M::DIS:ManakaiDISForDefinition
+    .getFeature> method with the <P::feature> parameter
+    set to <Feature::DIS|Doc>.
+##DISForDISDoc
 
 ElementTypeBinding:
   @Name: nullCase
@@ -278,7 +385,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: DISLang|MethodParameter
     @@Name: condition
-    @@Type: DISDOCNegotiationCondition
+    @@Type: DISDocNegotiationCondition
     @@Description:
       @@@lang:en
       @@@@: A condition object for negotiation.
@@ -289,3 +396,388 @@ ElementTypeBinding:
       @@@@Description:
         @@@@@lang:en
         @@@@@@: No negotiation.
+
+ElementTypeBinding:
+  @Name: OwnerDocArg
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|MethodParameter
+    @@Name: ownerDocumentArg
+    @@Type: Document
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A DOM <IF::DOMCore:Document> object that is used to
+        construct the tree.  It is set to the <A::DOMCore:Node.ownerDocument>
+        of the result nodes.
+
+## -- disdoc Extended Interface for dis Object Model
+
+IFClsDef:
+  @IFQName: DISElementDISDoc
+  @ClsQName: ManakaiDISElementDISDoc
+
+  @ClsISA: DIS|ManakaiDISElement
+
+  @IFISA: DISDocNamespaceResolver
+  @Implement: DISDocNamespaceResolver
+
+  @enDesc:
+    <QUOTE::disdoc> interface for <QUOTE::dis> elements.
+    \
+    This interface can be obtained from a <Class::DIS:ManakaiDISElement>
+    class by <M::DIS|ManakaiDISElement.getFeature> method
+    with the parameter of <Feature::DIS|Doc>.
+    
+  @Attr:
+    @@Name: languageURI
+    @@enDesc:
+      The natural language URI reference for the content
+      of this element.
+    @@Type: DIS|AnyURI
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          No language tag for this element. 
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        {NOTE:: Currently language tag does not inherit.  Should it
+                inherit?
+        \
+        }
+
+  @Attr:
+    @@Name: scriptURI
+    @@enDesc:
+      The script (writing system) URI reference for the content
+      of this element.
+    @@Type: DIS|AnyURI
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          No script tag for this element. 
+
+  @Method:
+    @@Name: languageMatch
+    @@enDesc:
+      Whether a language matches to the language of this element or not.
+      \
+      {NOTE:: A language matches to the language of this element 
+              if the language is a subclass of the element language.
+      \
+      }
+    @@Param:
+      @@Name: langURI
+      @@Type: DIS|AnyURI
+      @@enDesc:
+        The language tag URI reference of the language to compare. 
+    @@Param:
+      @@Name: defaultLangURI
+      @@Type: DIS|AnyURI
+      @@enDesc:
+        The language tag URI reference of the default language.
+        It is considered as the element language if the element
+        does not have the language information.
+      @@nullCase:
+        @@@enDesc:
+          The <CODE::i-default> language is the default language.
+    @@Return:
+      @@Type: DOMMain|boolean||ManakaiDOM|all
+      @@enDesc:
+        Whether the <P::langURI> matches to the language of this element. 
+
+  @Method:
+    @@Name: scriptMatch
+    @@enDesc:
+      Whether a script (writing system) matches to the script
+      of this element or not.
+      \
+      {NOTE:: A script matches to the script of this element 
+              if the script is a subclass of the element script.
+      \
+      }
+    @@Param:
+      @@Name: scriptURI
+      @@Type: DIS|AnyURI
+      @@enDesc:
+        The script tag URI reference of the script to compare. 
+    @@Param:
+      @@Name: defaultScriptURI
+      @@Type: DIS|AnyURI
+      @@enDesc:
+        The script tag URI reference of the default script.
+        It is considered as the element script if the element
+        does not have the script information.
+      @@nullCase:
+        @@@enDesc:
+          The language-dependent default is the default script.
+    @@Return:
+      @@Type: DOMMain|boolean||ManakaiDOM|all
+      @@enDesc:
+        Whether the <P::scriptURI> matches to the script of this element. 
+
+  @Method:
+    @@Name: getDISDocTree
+    @@PerlName: get_disdoc_tree
+    @@enDesc:
+      Returns a copy of XML tree representation of the <QUOTE::disdoc>
+      content of this element.
+    @@OwnerDocArg:
+    @@Param:
+      @@@Name: defaultMediaType
+      @@@Type: DIS|AnyURI
+      @@@enDesc:
+        The default media type of the element.
+      @@@nullCase:
+        @@@@enDesc:
+          The <QUOTE::disdoc> documentation language, i.e. <Q::lang:disdoc>,
+          is the default of the default.
+    @@Return:
+      @@@Type: DocumentFragment
+      @@@enDesc:
+        A DOM tree generated from the content.
+      @@@nullCase:
+        @@@@enDesc:
+          This element does not contain a documentation.
+
+  @Attr:
+    @@Name: documentationGroupId
+    @@enDesc:
+      An identifier that identifies a set of documentation
+      elements such as of <Q::dis:Description>. 
+      \
+      {NOTE:: Documentation child elements of an element
+              is considered as zero or more sets of 
+              documentation element groups; each group
+              has an identifier unique (only) in the scope
+              of those groups (uniqueness among elements
+              in another hierarchy is not guaranted). 
+      \
+      }
+    @@Type: DIS|AnyURI
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        If a child element has a <Q::dd:id> attribute,
+        the identifier is composed from that value and
+        the element type.  Otherwise, the identifier is
+        its element type.
+    @@Get:
+      
+
+  @ImplNote:
+    @@lang:en
+    @@@:
+      <M::.lookupNamespaceURI> method is defined in 
+      <Class::DIS:ManakaiDISElement>.
+
+  @Attr:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: defaultDISDocNamespaceURI
+    @@PerlName: default_disdoc_namespace_uri
+    @@enDesc:
+      The default namespace URI for <QUOTE::disdoc> element types.
+    @@Type: DIS|AnyURI
+    @@Get:
+      @@@enDesc:
+        Always <URIQ::ddel:>.
+      @@@Def:
+        @@@@ContentType: lang|dis
+        @@@@DISLang:value:
+          @@@@@@: ddel|
+          @@@@@ContentType: dis|TypeQName
+##DISElementDISDoc
+
+ResourceDef:
+  @QName: Document
+  @AliasFor: DOMCore|Document||ManakaiDOM|ManakaiDOMLatest
+
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    DISLang:Attribute
+
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    DISLang:AttributeGet
+
+ElementTypeBinding:
+  @Name: Set
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    DISLang:AttributeSet
+
+ResourceDef:
+  @QName: disdocBlock
+  @AliasFor: lang|disdoc||ManakaiDOM|all
+
+ResourceDef:
+  @QName: disdocInline
+  @AliasFor: lang|disdocInline||ManakaiDOM|all
+
+## -- disdoc Extended Interfaces for DOM Objects
+
+IFClsDef:
+  @IFQName: DocumentDISDoc
+  @ClsQName: ManakaiDOMDocumentDISDoc
+
+  @DOMMetaImpl:provideFeature:
+    @@@: DIS|Doc20
+    @@DOMMetaImpl:providedThrough: DIS|ManakaiDISImplementation
+
+  @enDesc:
+    This interface provides a set of methods to parse <QUOTE::disdoc>
+    formatted texts and creates DOM trees.
+    \
+    This interface must be implemented by objects which
+    implement the <IF::DOMCore:Document> interface if 
+    the DOM implementation supports the <Feature::DIS|Doc>. 
+    This interface can be obtained from a <IF::DOMCore:Document>
+    object via <M::DOMCore:Document.getFeature> method
+    with the parameter of <Feature::DIS|Doc>.
+
+  @Method:
+    @@Name: parseDISDocText
+    @@PerlName: parse_disdoc_text
+    @@enDesc:
+      Parses a <QUOTE::disdoc> formatted text in the block-level context.
+    @@Param:
+      @@@Name: namespaceContext
+      @@@Type: DISDocNamespaceResolver
+      @@@enDesc:
+        A node or something used to resolve namespace prefix.
+    @@Param:
+      @@@Name: sourceText
+      @@@Type: disdocBlock
+      @@@enDesc:
+        A <QUOTE::disdoc> block-level fragment.
+    @@Return:
+      @@@Type: DocumentFragment
+      @@@enDesc:
+        <QUOTE::disdoc> tree constructed from <P::sourceText>.
+      @@@RaiseException:
+        @@@@@: UNDECLARED_NS_PREFIX_ERR
+        @@@@enDesc:
+          A namespace prefix is not declared.
+
+  @Method:
+    @@Name: parseDISDocInlineText
+    @@PerlName: parse_disdoc_inline_text
+    @@enDesc:
+      Parses a <QUOTE::disdoc> formatted text in the inline-level context.
+    @@Param:
+      @@@Name: namespaceContext
+      @@@Type: DISDocNamespaceResolver
+      @@@enDesc:
+        A node or something used to resolve namespace prefix.
+    @@Param:
+      @@@Name: sourceText
+      @@@Type: DISLang|String||ManakaiDOM|all
+      @@@enDesc:
+        A <QUOTE::disdoc> inline-level fragment.
+    @@Return:
+      @@@Type: DocumentFragment
+      @@@enDesc:
+        <QUOTE::disdoc> tree constructed from <P::sourceText>.
+      @@@PrefixException:
+##DocumentDISDoc
+
+ElementTypeBinding:
+  @Name: PerlName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ContentType: lang|Perl
+
+ElementTypeBinding:
+  @Name: PrefixException
+  @ElementType:
+    ManakaiDOM:raises
+  @ShadowContent:
+    @@@: UNDECLARED_NS_PREFIX_ERR
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A namespace prefix is not declared.
+
+ElementTypeBinding:
+  @Name: RaiseException
+  @ElementType:
+    ManakaiDOM:raises
+
+ResourceDef:
+  @QName: DocumentFragment
+  @AliasFor: DOMCore|DocumentFragment||ManakaiDOM|all
+
+ResourceDef:
+  @QName: UNDECLARED_NS_PREFIX_ERR
+  @AliasFor:
+    DIS:UNDECLARED_NS_PREFIX_ERR::swcfg21:ForLatest
+
+## -- disdoc Utility Interfaces
+
+IFClsDef:
+  @IFQName: DISDocNegotiationCondition
+  @ClsQName: ManakaiDISDocNegotiationCondition
+##DISDocNegotiationCondition
+
+IFDef:
+  @IFQName: DISDocNamespaceResolver
+
+  @enDesc:
+    A namespace resolver interface for <QUOTE::disdoc>. 
+    Objects implementing this interface must provide
+    lookup functions from namespace prefix or default namespace
+    to corresponding namespace URI reference.
+
+  @Attr:
+    @@Name: defaultDISDocNamespaceURI
+    @@PerlName: default_disdoc_namespace_uri
+    @@enDesc:
+      The default namespace URI for <QUOTE::disdoc> element types.
+    @@Type: DIS|AnyURI
+    @@Get: 
+ 
+  @Method:
+    @@Name: lookupNamespaceURI
+    @@enDesc:
+      Looks up the namespace URI associated to the given prefix.
+    @@Param:
+      @@@Name:prefix
+      @@@Type:
+        DISCore:NamespacePrefix::ManakaiDOM:all
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The namespace URI to look for.
+    @@Return:
+      @@@Type: DIS|AnyURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:The associated namespace URI.
+      @@@nullCase:
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            No namespace URI is associated to the prefix or
+            the <DOM::null> namespace is associated.
+      @@@PrefixException:
+##DISDocNamespaceResolver
+
+
+ElementTypeBinding:
+  @Name: NamedParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1

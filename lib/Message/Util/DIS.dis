@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/05/23 13:26:55 $
+      $Date: 2005/05/24 12:04:01 $
     @@ContentType:
       dis:Date.RCS
   
@@ -3544,7 +3544,8 @@ ClsDef:
           @@@@@:
             A feature version number to request.
      @@Return:
-        @@@Type: ManakaiDISDatabase
+        @@@Type: 
+          DOMMain:Object::ManakaiDOM:all
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -3562,7 +3563,7 @@ ClsDef:
             $Message::Util::DIS::ManakaiDISDatabase::CompatClass{$_}
           } keys %Message::Util::DIS::ManakaiDISDatabase::CompatClass) {
             if ($Message::DOM::ClassFeature{$class}->{$feature}->{$version}) {
-              $r = bless $self, $class;
+              $r = bless {o => $self}, $class;
               last CLASS;
             }
           }
@@ -3944,7 +3945,8 @@ ClsDef:
           @@@@@:
             A feature version number to request.
      @@Return:
-        @@@Type: ManakaiDISModuleDefinition
+        @@@Type: 
+          DOMMain:Object::ManakaiDOM:all
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -3962,7 +3964,7 @@ ClsDef:
             $Message::Util::DIS::ManakaiDISModuleDefinition::CompatClass{$_}
           } keys %Message::Util::DIS::ManakaiDISModuleDefinition::CompatClass) {
             if ($Message::DOM::ClassFeature{$class}->{$feature}->{$version}) {
-              $r = bless $self, $class;
+              $r = bless {o => $self}, $class;
               last CLASS;
             }
           }
@@ -4180,7 +4182,8 @@ ClsDef:
           @@@@@:
             A feature version number to request.
      @@Return:
-        @@@Type: ManakaiDISForDefinition
+        @@@Type: 
+          DOMMain:Object::ManakaiDOM:all
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -4198,7 +4201,7 @@ ClsDef:
             $Message::Util::DIS::ManakaiDISForDefinition::CompatClass{$_}
           } keys %Message::Util::DIS::ManakaiDISForDefinition::CompatClass) {
             if ($Message::DOM::ClassFeature{$class}->{$feature}->{$version}) {
-              $r = bless $self, $class;
+              $r = bless {o => $self}, $class;
               last CLASS;
             }
           }
@@ -8163,7 +8166,8 @@ ClsDef:
           @@@@@:
             A feature version number to request.
      @@Return:
-        @@@Type: ManakaiDISResourceDefinition
+        @@@Type: 
+          DOMMain:Object::ManakaiDOM:all
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -8181,7 +8185,7 @@ ClsDef:
             $Message::Util::DIS::ManakaiDISResourceDefinition::CompatClass{$_}
           } keys %Message::Util::DIS::ManakaiDISResourceDefinition::CompatClass){
             if ($Message::DOM::ClassFeature{$class}->{$feature}->{$version}) {
-              $r = bless $self, $class;
+              $r = bless {o => $self}, $class;
               last CLASS;
             }
           }
