@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/05/24 12:04:01 $
+      $Date: 2005/05/28 13:38:45 $
     @@ContentType:
       dis:Date.RCS
   
@@ -46,6 +46,10 @@ Module:
     DIS:ForLatest
 
 Namespace:
+  @dd:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#DISDoc/
+  @ddel:
+    http://suika.fam.cx/~wakaba/archive/2005/disdoc#
   @DIS:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#
   @dis:
@@ -64,6 +68,12 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @html3:
+    urn:x-suika-fam-cx:markup:ietf:html:3:draft:00:
+  @html5:
+    http://www.w3.org/1999/xhtml
+  @ilang:
+    urn:x-suika-fam-cx:lang:
   @infoset:
     http://www.w3.org/2001/04/infoset#
   @lang:
@@ -78,6 +88,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @nl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/NaturalLanguage#
   @owl:
     http://www.w3.org/2002/07/owl#
   @Perl:
@@ -88,11 +100,21 @@ Namespace:
     http://www.w3.org/2000/01/rdf-schema#
   @s:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
+  @script:
+    http://suika.fam.cx/~wakaba/archive/2005/5/script#
+  @sw010:
+    urn:x-suika-fam-cx:markup:suikawiki:0:10:
   @swcfg21:
     http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
   @TreeCore:\
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
+  @xhtml1:
+    http://www.w3.org/1999/xhtml
+  @xhtml2:
+    http://www.w3.org/2002/06/xhtml2
+  @xml:
+    http://www.w3.org/XML/1998/namespace
 
 ## -- Features
 
@@ -242,6 +264,54 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: DISLang|MethodParameter
 
+## -- disdoc Implementation Interface
+
+IFClassDef:
+  @IFQName: DISImplementationDISDoc
+  @ClsQName: ManakaiDISImplementationDISDoc
+  
+  @ClsISA: DIS|ManakaiDISImplementation
+
+  @enDesc:
+    This interface provides factory methods to create
+    <QUOTE::disdoc>-related objects.
+
+  @Method:
+    @@Name: createDISDocNegotiationCondition
+    @@PerlName: create_disdoc_negotiation_condition
+    @@enDesc:
+      Creates a new <IF::DISDocNegotiationCondition> object and 
+      returns it.
+    @@Return:
+      @@@Type: DISDocNegotiationCondition
+      @@@actualType: ManakaiDISDocNegotiationCondition
+      @@@enDesc:
+        A newly created negotiation condition object.
+      @@@PerlDef:
+        $r = bless {}, <ClassName::ManakaiDISDocNegotiationCondition>;
+##DISImplementationDISDoc
+
+ElementTypeBinding:
+  @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType: lang|Perl
+
+ElementTypeBinding:
+  @Name: disDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType: lang|dis
+
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdf|Property
+
 ## -- disdoc Extended Interfaces for dis Database Objects
 
 IFClassDef:
@@ -259,12 +329,27 @@ IFClassDef:
     @@OwnerDocArg:
     @@NegoParam:
     @@Return:
-      @@@Type: DOMCore|DocumentFragment
+      @@@Type: DocumentFragment
       @@@enDesc:
         A DOM node containing full name. 
       @@@nullCase:
         @@@@enDesc:
           No full name for this resource.
+      @@@PerlDef:
+        __DEEP{
+          if ($self->{o}->{src}) {
+            my $fn = $self->{o}->{src}
+                          -><M::DIS:ManakaiDISElement.disGetAttribute>
+                                 (<Q::dis:FullName>,
+                                  for_arg => $self->{o}->{for},
+                                  forp_arg => $self->{o}->{forp});
+            if ($fn) {
+              $r = $fn-><M::DIS:ManakaiDISElement.getFeature> (<Q::DIS:Doc>)
+                      -><M::ManakaiDISElementDISDoc.getDISDocTree>
+                              ($ownerDocumentArg, <Q::lang:disdocInline>);
+            }
+          }
+        }__;
 
   @Method:
     @@Name: getDescription
@@ -284,12 +369,57 @@ IFClassDef:
         @@@@enDesc:
           The result will not contains any implementor's notes.
     @@Return:
-      @@@Type: DOMCore|DocumentFragment
+      @@@Type: DocumentFragment
       @@@enDesc:
         A DOM node containing label.
       @@@nullCase:
         @@@@enDesc:
           No label for this resource.
+      @@@PerlDef:
+        __DEEP{
+          if ($self->{o}->{src}) {
+            my @el = ([]); # $el[0] is dummy
+            my %el;
+            for my $c (@{$self->{o}->{src}
+                              -><M::DIS:ManakaiDISElement.disChildElements>
+                                  (for_arg => $self->{o}->{for},
+                                   forp_arg => $self->{o}->{forp})}) {
+              if ($c-><M::DIS:ManakaiDISElement.elementTypeMatch>
+                                  (<Q::dis:Description>) or
+                  ($withImplNote and
+                   $c-><M::DIS:ManakaiDISElement.elementTypeMatch>
+                                  (<Q::dis:ImplNote>))) {
+                my $d = $c-><M::DIS:ManakaiDISElement.getFeature> (<Q::DIS:Doc>);
+                my $id = $d-><M::ManakaiDISElementDISDoc.documentationGroupId>
+                                  (for_arg => $self->{o}->{for},
+                                   forp_arg => $self->{o}->{forp});
+                if ($el{$id}) {
+                  push @{$el[$el{$id}]}, $d;
+                } else {
+                  $el{$id} = @el;
+                  push @el, [$d];
+                }
+              }
+            } # children
+
+            shift @el; # Discard dummy item
+            for my $els (@el) {
+              my $el = $condition-><M::ManakaiDISDocNegotiationCondition
+                                      .selectDISElement> ($els);
+              next unless $el;
+              my $elr = $el-><M::ManakaiDISElementDISDoc.getDISDocTree>
+                              ($ownerDocumentArg, <Q::lang:disdoc>);
+              if ($elr) {
+                if ($r) {
+                  $r-><M::DOMCore:Node||ManakaiDOM|ManakaiDOMLatest
+                         .appendChild> ($elr);
+                } else {
+                  $r = $elr;
+                }
+              }
+            } # groups
+          }
+        }__;
 ##DISAnyResourceDoc
 
 IFClassDef:
@@ -319,12 +449,26 @@ IFClassDef:
     @@OwnerDocArg:
     @@NegoParam:
     @@Return:
-      @@@Type: DOMCore|DocumentFragment
+      @@@Type: DocumentFragment
       @@@enDesc:
         A DOM node containing label.
       @@@nullCase:
         @@@@enDesc:
           No label for this resource.
+        __DEEP{
+          if ($self->{o}->{src}) {
+            my $fn = $self->{o}->{src}
+                          -><M::DIS:ManakaiDISElement.disGetAttribute>
+                                 (<Q::dis:Label>,
+                                  for_arg => $self->{o}->{for},
+                                  forp_arg => $self->{o}->{forp});
+            if ($fn) {
+              $r = $fn-><M::DIS:ManakaiDISElement.getFeature> (<Q::DIS:Doc>)
+                      -><M::ManakaiDISElementDISDoc.getDISDocTree>
+                              ($ownerDocumentArg, <Q::lang:disdocInline>);
+            }
+          }
+        }__;
 ##DISResourceDISDoc
 
 IFClassDef:
@@ -414,7 +558,7 @@ ElementTypeBinding:
 
 ## -- disdoc Extended Interface for dis Object Model
 
-IFClsDef:
+IFClassDef:
   @IFQName: DISElementDISDoc
   @ClsQName: ManakaiDISElementDISDoc
 
@@ -430,16 +574,48 @@ IFClsDef:
     class by <M::DIS|ManakaiDISElement.getFeature> method
     with the parameter of <Feature::DIS|Doc>.
     
-  @Attr:
+  @Method:
     @@Name: languageURI
     @@enDesc:
       The natural language URI reference for the content
       of this element.
     @@Type: DIS|AnyURI
-    @@Get:
+    @@Param:
+      @@Name: defaultLangURI
+      @@Type: DIS|AnyURI
+      @@enDesc:
+        The language tag URI reference of the default language.
+        It is considered as the element language if the element
+        does not have the language information.
+      @@nullCase:
+        @@@enDesc:
+          No default language information.
+    @@ForParam:
+    @@ForpParam:
+    @@Return:
+      @@@enDesc:
+        The natural language URI referemce.
       @@@nullCase:
         @@@@enDesc:
-          No language tag for this element. 
+          No language tag for this element and <P::defaultLangURI>
+          parameter is not specified. 
+      @@@PerlDef:
+      __DEEP{
+        my $lang = $self-><M::DIS:ManakaiDISElement.disGetAttribute>
+                       (<Q::dis:lang>, for_arg => $forArg, forp_arg => $forpArg);
+        if ($lang) {
+          my $v = $lang-><M::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
+          if (defined $v and not ref $v eq 'ARRAY') {
+            $r = $lang-><M::DIS|ManakaiDISElement.qnameToURI>
+                             ($v, node => $self,
+                              default_namespace_uri => <Q::ilang:>);
+          } else {
+            $r = $defaultLangURI;
+          }
+        } else {
+          $r = $defaultLangURI;
+        }
+      }__;
     @@ImplNote:
       @@@lang:en
       @@@@:
@@ -448,16 +624,48 @@ IFClsDef:
         \
         }
 
-  @Attr:
+  @Method:
     @@Name: scriptURI
     @@enDesc:
       The script (writing system) URI reference for the content
       of this element.
     @@Type: DIS|AnyURI
-    @@Get:
+    @@Param:
+      @@Name: defaultScriptURI
+      @@Type: DIS|AnyURI
+      @@enDesc:
+        The script tag URI reference of the default script.
+        It is considered as the element script if the element
+        does not have the script information.
+      @@nullCase:
+        @@@enDesc:
+          No default script information.
+    @@ForParam:
+    @@ForpParam:
+    @@Return:
+      @@@enDesc:
+        The natural script URI referemce.
       @@@nullCase:
         @@@@enDesc:
-          No script tag for this element. 
+          No script tag for this element and <P::defaultScriptURI>
+          parameter is not specified. 
+      @@@PerlDef:
+      __DEEP{
+        my $lang = $self-><M::DIS:ManakaiDISElement.disGetAttribute>
+                     (<Q::dis:script>, for_arg => $forArg, forp_arg => $forpArg);
+        if ($lang) {
+          my $v = $lang-><M::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
+          if (defined $v and not ref $v eq 'ARRAY') {
+            $r = $lang-><M::DIS|ManakaiDISElement.qnameToURI>
+                             ($v, node => $self,
+                              default_namespace_uri => <Q::script:>);
+          } else {
+            $r = $defaultScriptURI;
+          }
+        } else {
+          $r = $defaultScriptURI;
+        }
+      }__;
 
   @Method:
     @@Name: languageMatch
@@ -481,12 +689,38 @@ IFClsDef:
         It is considered as the element language if the element
         does not have the language information.
       @@nullCase:
-        @@@enDesc:
-          The <CODE::i-default> language is the default language.
+        @@@enDesc: No default language.
+    @@ForParam:
+    @@ForpParam:
     @@Return:
       @@Type: DOMMain|boolean||ManakaiDOM|all
       @@enDesc:
         Whether the <P::langURI> matches to the language of this element. 
+      @@PerlDef:
+        if (defined $langURI) {
+          __DEEP{
+            my $ct = $self-><M::ManakaiDISElementDISDoc.languageURI>
+                                  ($defaultLangURI, for_arg => $forArg,
+                                   forp_arg => $forpArg);
+            $ct = $defaultLangURI unless defined $ct;
+            unless (defined $ct) {
+              $r = false;
+            } else {
+              my $res = $self-><AG::DIS|ManakaiDISNode.ownerDISDocument>
+                                 -><AG::DIS|ManakaiDISDocument.disDatabase>
+                                 -><M::DIS|ManakaiDISDatabase.getResource> ($ct);
+              $res-><AS::DIS|ManakaiDISResourceDefinition.isReferred> ($self);
+              unless ($res-><M::ManakaiDISResourceDefinition
+                                               .isSubsetOfURI> ($langURI)) {
+                $r = false;
+              } else {
+                $r = true;
+              }
+            }
+          }__;
+        } else {
+          $r = true;
+        }
 
   @Method:
     @@Name: scriptMatch
@@ -512,11 +746,38 @@ IFClsDef:
         does not have the script information.
       @@nullCase:
         @@@enDesc:
-          The language-dependent default is the default script.
+          No default script information.
+    @@ForParam:
+    @@ForpParam:
     @@Return:
       @@Type: DOMMain|boolean||ManakaiDOM|all
       @@enDesc:
-        Whether the <P::scriptURI> matches to the script of this element. 
+        Whether the <P::scriptURI> matches to the script of this element.
+      @@PerlDef:
+        if (defined $scriptURI) {
+          __DEEP{
+            my $ct = $self-><M::ManakaiDISElementDISDoc.scriptURI>
+                                  ($defaultScriptURI, for_arg => $forArg,
+                                   forp_arg => $forpArg);
+            $ct = $defaultScriptURI unless defined $ct;
+            unless (defined $ct) {
+              $r = false;
+            } else {
+              my $res = $self-><AG::DIS|ManakaiDISNode.ownerDISDocument>
+                                 -><AG::DIS|ManakaiDISDocument.disDatabase>
+                                 -><M::DIS|ManakaiDISDatabase.getResource> ($ct);
+              $res-><AS::DIS|ManakaiDISResourceDefinition.isReferred> ($self);
+              unless ($res-><M::ManakaiDISResourceDefinition
+                                               .isSubsetOfURI> ($scriptURI)) {
+                $r = false;
+              } else {
+                $r = true;
+              }
+            }
+          }__;
+        } else {
+          $r = true;
+        }
 
   @Method:
     @@Name: getDISDocTree
@@ -541,8 +802,42 @@ IFClsDef:
       @@@nullCase:
         @@@@enDesc:
           This element does not contain a documentation.
+      @@@PerlDef:
+        __DEEP{
+          my $ctu = $self-><M::DIS:ManakaiDISElement.mediaTypeURI>
+                                ($defaultMediaType, for_arg => $forArg,
+                                 forp_arg => $forpArg);
+          my $ct = $self-><AG::DIS|ManakaiDISNode.ownerDISDocument>
+                                -><AG::DIS|ManakaiDISDocument.disDatabase>
+                                -><M::DIS|ManakaiDISDatabase.getResource> ($ctu);
+          if ($ct-><M::DIS:ManakaiDISResourceDefinition.isSubsetOfURI>
+                                (<Q::lang:disdoc>)) {
+            my $doc = $ownerDocumentArg-><M::Node.getFeature> (<Q::DIS|Doc>);
+            $r = $doc-><M::ManakaiDOMDocumentDISDoc.parseDISDocText>
+                         ($self-><M::SWCFGNode.value>,
+                          node => $self,
+                          language_uri => $self-><M::ManakaiDISElementDISDoc
+                             .languageURI> (null, for_arg => $forArg,
+                                            forp_arg => $forpArg),
+                          script_uri => $self-><M::ManakaiDISElementDISDoc
+                             .scriptURI> (null, for_arg => $forArg,
+                                            forp_arg => $forpArg));
+          } elsif ($ct-><M::DIS:ManakaiDISResourceDefinition.isSubsetOfURI>
+                                (<Q::lang:disdocInline>)) {
+            my $doc = $ownerDocumentArg-><M::Node.getFeature> (<Q::DIS|Doc>);
+            $r = $doc-><M::ManakaiDOMDocumentDISDoc.parseDISDocInlineText>
+                             ($self-><M::SWCFGNode.value>,
+                          node => $self,
+                          language_uri => $self-><M::ManakaiDISElementDISDoc
+                             .languageURI> (null, for_arg => $forArg,
+                                            forp_arg => $forpArg),
+                          script_uri => $self-><M::ManakaiDISElementDISDoc
+                             .scriptURI> (null, for_arg => $forArg,
+                                            forp_arg => $forpArg));
+          }
+        }__;
 
-  @Attr:
+  @Method:
     @@Name: documentationGroupId
     @@enDesc:
       An identifier that identifies a set of documentation
@@ -557,15 +852,35 @@ IFClsDef:
       \
       }
     @@Type: DIS|AnyURI
+    @@ForParam:
+    @@ForpParam:
     @@ImplNote:
       @@@lang:en
       @@@@:
-        If a child element has a <Q::dd:id> attribute,
+        If a child element has a <Q::dd:id> attribute whose
+        value is <DOM::true>,
         the identifier is composed from that value and
         the element type.  Otherwise, the identifier is
         its element type.
-    @@Get:
-      
+    @@Return:
+      @@@enDesc:
+        An opaque identifier value.
+      @@@PerlDef:
+        __DEEP{
+          my $eturi = $self-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
+                                  .expandedURI>;
+          my $ddid = $self-><M::DIS|ManakaiDISElement.disGetAttribute>
+                                  (<Q::dd:id>, for_arg => $forArg, 
+                                   forp_arg => $forpArg);
+          my $ddidv = $ddid ? $ddidv-><M::SWCFGNode.value> : 0;
+          if ($ddidv) {
+            for my $__uri ($ddidv, $eturi) {
+              $__uri =~ s{([^0-9A-Za-z:;?=_.~/-])}{sprintf '%%%02X', ord $1}ge;
+            }
+            $r = qq<data:,200411tf#xmlns(t=data:,200411tf%23)>.
+                                qq<t:id($eturi,$ddidv)>;      
+          }
+        }__;
 
   @ImplNote:
     @@lang:en
@@ -577,6 +892,23 @@ IFClsDef:
     @@ForCheck: ManakaiDOM|ForClass
     @@Name: defaultDISDocNamespaceURI
     @@PerlName: default_disdoc_namespace_uri
+    @@enDesc:
+      The default namespace URI for <QUOTE::disdoc> contents.
+      It is defined by the <Q::dis:Namespace> attribute
+      of the <Q::dis:Module> top-level element.
+    @@Type: DIS|AnyURI
+    @@Get:
+      @@@PerlDef:
+          __DEEP{
+            $r = ($self-><AG::DIS|ManakaiDISNode.ownerDISDocument> || $self)
+                       -><AG::DIS|ManakaiDISDocument.moduleElement>
+                       -><AG::DIS|ManakaiDISModuleElement.definingNamespaceURI>;
+          }__;
+
+  @Attr:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: defaultDISDocElementNamespaceURI
+    @@PerlName: default_disdoc_element_namespace_uri
     @@enDesc:
       The default namespace URI for <QUOTE::disdoc> element types.
     @@Type: DIS|AnyURI
@@ -590,6 +922,60 @@ IFClsDef:
           @@@@@ContentType: dis|TypeQName
 ##DISElementDISDoc
 
+PropDef:
+  @QName: dd|id
+  @enDesc:
+    Group identifier without element type information. 
+
+ElementTypeBinding:
+  @Name: ForParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1
+    @@Name: forArg
+    @@Type: DIS|ForURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The <QUOTE::for> URI reference. 
+    @@ResourceDef:
+      @@@rdf:type:
+        ManakaiDOM:InCase
+      @@@Value:
+        @@@@is-null:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Equivalent to <Q::ManakaiDOM:all>, i.e. <QUOTE::for all>. 
+
+ElementTypeBinding:
+  @Name: ForpParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1
+    @@Name: forpArg
+    @@Type: DIS|ForURIList
+    @@Description:
+      @@@lang:en
+      @@@@:
+        An array reference containing additional <QUOTE::for> 
+        constraints (<QUOTE::For+> list).
+    @@ResourceDef:
+      @@@rdf:type:
+        ManakaiDOM:InCase
+      @@@Value:
+        @@@@is-null:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Equivalent to the empty array reference. 
+
 ResourceDef:
   @QName: Document
   @AliasFor: DOMCore|Document||ManakaiDOM|ManakaiDOMLatest
@@ -599,25 +985,29 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    DISLang:Attribute
+    @@rdf:type: DISLang|Attribute
 
 ElementTypeBinding:
   @Name: Get
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    DISLang:AttributeGet
+    @@rdf:type: DISLang|AttributeGet
 
 ElementTypeBinding:
   @Name: Set
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    DISLang:AttributeSet
+    @@rdf:type: DISLang|AttributeSet
 
 ResourceDef:
-  @QName: disdocBlock
+  @QName: disdocBlocks
   @AliasFor: lang|disdoc||ManakaiDOM|all
+
+ResourceDef:
+  @QName: SWCFGNode
+  @AliasFor: swcfg21|SWCFGNode||swcfg21|ForLatest
 
 ResourceDef:
   @QName: disdocInline
@@ -625,7 +1015,7 @@ ResourceDef:
 
 ## -- disdoc Extended Interfaces for DOM Objects
 
-IFClsDef:
+IFClassDef:
   @IFQName: DocumentDISDoc
   @ClsQName: ManakaiDOMDocumentDISDoc
 
@@ -656,23 +1046,336 @@ IFClsDef:
         A node or something used to resolve namespace prefix.
     @@Param:
       @@@Name: sourceText
-      @@@Type: disdocBlock
+      @@@Type: disdocBlocks
       @@@enDesc:
         A <QUOTE::disdoc> block-level fragment.
+    @@NamedParam:
+      @@@Name: node
+      @@@Type: DIS|ManakaiDISElement
+      @@@enDesc:
+        A <QUOTE::dis> element in which the <P::sourceText>
+        is contained.  This information is used to report errors
+        and to get resources for languages and scripts.
+      @@@nullCase:
+        @@@@enDesc: No source node.
+    @@NamedParam:
+      @@@Name: languageURI
+      @@@Type: DIS|AnyURI
+      @@@enDesc:
+        The language information of the context in which the <P::sourceText>
+        is contained.
+      @@@nullCase:
+        @@@@enDesc: No language information.
+    @@NamedParam:
+      @@@Name: scriptURI
+      @@@Type: DIS|AnyURI
+      @@@enDesc:
+        The script information of the context in which the <P::sourceText>
+        is contained.
+      @@@nullCase:
+        @@@@enDesc: No script information.
     @@Return:
       @@@Type: DocumentFragment
       @@@enDesc:
         <QUOTE::disdoc> tree constructed from <P::sourceText>.
+      @@@PrefixException:
       @@@RaiseException:
-        @@@@@: UNDECLARED_NS_PREFIX_ERR
+        @@@@@:DIS|NO_END_TAG_ERR
         @@@@enDesc:
-          A namespace prefix is not declared.
+          An end tag is not found where it is required.
+      @@@RaiseException:
+        @@@@@:DOMCore|DOMException.INVALID_CHARACTER_ERR
+        @@@@enDesc:
+          An illegular element type name is specified.
+      @@@RaiseException:
+        @@@@@:DOMCore|DOMException.NAMESPACE_ERR
+        @@@@enDesc:
+          An illegular element type name is specified.
+      @@@PerlDef:
+      __DEEP{
+        $sourceText =~ s/\x0D\x0A/\x0A/g;
+        $sourceText =~ tr/\x0D/\x0A/;
+        my @s = split /\x0A[\x09\x20]*(?:(?:\x0A[\x09\x20]*)+|(?=[\{\}]))/x,
+                      $sourceText;
+        $r = $ownerDocumentArg-><M::Document.createDocumentFragment>;
+
+        my $root = $r-><M::Node.appendChild>
+                            ($ownerDocumentArg-><M::Document.createElementNS>
+                                                     (<Q::xhtml1:>, 'div'));
+        $root-><M::Element.setAttributeNS> (null, class => 'disdoc-blocks');
+        if ($node) {
+          my $db = $node-><AG::DIS|ManakaiDISNode.ownerDISDocument>
+                        -><AG::DIS|ManakaiDISDocument.disDatabase>;
+          if (defined $languageURI) {
+            my $lang = $db-><M::DIS|ManakaiDISDatabase
+                               .getResource> ($languageURI);
+            my $tag = $lang-><M::DIS|ManakaiDISPropertyAccessor
+                                .getPropertyText> (<Q::nl:ietfPreferredTag>) ||
+                      $lang-><M::DIS|ManakaiDISPropertyAccessor
+                                .getPropertyText> (<Q::nl:ietfTag>);
+            if ($tag) {
+              $root-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:lang' => $tag);
+            } else {
+              $root-><M::Element.setAttributeNS> (<Q::script:>, 'script:lang'
+                                                            => $languageURI);
+            }
+          }
+          if (defined $scriptURI) {
+            $root-><M::Element.setAttributeNS> (<Q::script:>, 'script:script'
+                                                              => $scriptURI);
+          }
+        }
+        $root-><M::Element.setAttributeNS>
+                           (<Q::ddel:>, 'ddel:mmParsed' => true);
+
+        my $current = $root;
+        my @lextype = ('');
+        for my $s (@s) {
+          if ($s =~ s/^\{([0-9A-Za-z:|._\@^\s-]+)::\s*//x) { ## Start tag
+            my ($type, $lang, $script) = split /\s*\@\s*/, $1, 3;
+            my ($etype, $ltype) = split /\s*^^\s*/, $type, 2;
+            my ($nsp, $ln, $ns) = split /\s*[:|]\s*/, $etype, 2;
+            if (defined $ln) {
+              $ns = $namespaceContext-><M::DISDocNamespaceContext
+                                           .lookupNamespaceURI> ($nsp);
+              unless (defined $ns) {
+                __UNDEEP{__EXCEPTION{DIS:UNDECLARED_NS_PREFIX_ERR::
+                  infoset:prefix => {$nsp},
+                  DIS:sourceNode => {$node},
+                }__}__;
+              }
+            } else {
+              $ln = $nsp;
+              $ns = $namespaceContext-><AG::DISDocNamespaceContext
+                                           .defaultDISDocElementNamespaceURI>;
+            }
+            if (defined $ltype) {
+              my ($lnsp, $lln, $lns) = split /\s*[:|]\s*/, $ltype, 2;
+              if (defined $lln) {
+                $lns = $namespaceContext-><M::DISDocNamespaceContext
+                                             .lookupNamespaceURI> ($lnsp);
+                unless (defined $lns) {
+                  __UNDEEP{__EXCEPTION{DIS:UNDECLARED_NS_PREFIX_ERR::
+                    infoset:prefix => {$lnsp},
+                    DIS:sourceNode => {$node},
+                  }__}__;
+                }
+              } else {
+                $lln = $lnsp;
+                $lns = $namespaceContext-><AG::DISDocNamespaceContext
+                                             .defaultDISDocElementNamespaceURI>;
+              }
+              push @lextype, $lns.$lln;
+              $current-><M::Element.setAttributeNS>
+                             (<Q::ddel:>, 'ddel:lexType' => $lextype[-1]);
+            } else { # No explicit lextype
+              push @lextype, {
+              }->{$ns.$ln} || '';
+            }
+            my $this;
+            if ($ns eq <Q::ddel:> and ($ln eq 'LI' or $ln eq 'OLI')) {
+              unless ($current-><AG::Node.namespaceURI> eq <Q::xhtml2:> and
+                  {ul => true,
+                   ol => true}->{$current-><AG::Node.localName>}) {
+                $current = $current-><M::Node.appendChild>
+                              ($ownerDocumentArg-><M::Document.createElementNS>
+                                  (<Q::xhtml2:>, 
+                                   {LI => 'ul',
+                                    OLI => 'ol'}->{$ln} || 'ul'));
+                $current-><M::Element.setAttributeNS>
+                                  (<Q::ddel:>, 'ddel:tag' => 'implied');
+              }
+              $this = $current = $current-><M::Node.appendChild>
+                  ($ownerDocumentArg-><M::Document.createElementNS>
+                              (<Q::xhtml2:>, 'li'));
+              $current-><M::Element.setAttributeNS>
+                            (<Q::ddel:>, 'ddel:ordered' => true) if $ln eq 'OLI';
+              $current-><M::Element.setAttributeNS>
+                              (<Q::ddel:>, 'ddel:mmParsed' => true);
+              $current-><M::Element.setAttributeNS>
+                              (<Q::ddel:>, 'ddel:tag' => 'block');
+              if ($s =~ s/^(.*)::://s) {
+                my $m = $current-><M::Node.appendChild>
+                     ($ownerDocumentArg-><M::Document.createElementNS>
+                                  (<Q::ddel:>, 'ddel:listMarker'))
+                $m-><M::Node.appendChild>
+                         ($self-><M::DocumentDISDoc.parseDISDocInlineText>
+                           ($ownerDocumentArg, $namespaceContext, $1,
+                            node => $node, language_uri => null,
+                            script_uri => null));
+                $m-><M::Element.setAttributeNS>
+                              (<Q::ddel:>, 'ddel:tag' => 'implied');
+              }
+              $current = $current-><M::Node.appendChild>
+                     ($ownerDocumentArg-><M::Document.createElementNS>
+                                  (<Q::ddel:>, 'ddel:listContent'))
+                      -><M::Node.appendChild>
+                       ($self-><M::DocumentDISDoc.parseDISDocInlineText>
+                         ($ownerDocumentArg, $namespaceContext, $s,
+                          node => $node, language_uri => null,
+                          script_uri => null));
+              $current-><M::Element.setAttributeNS>
+                              (<Q::ddel:>, 'ddel:tag' => 'implied');
+            } else {
+              if ($current-><AG::Node.namespaceURI> eq <Q::xhtml2:> and
+                  ($current-><AG::Node.localName> eq 'ul' or
+                   $current-><AG::Node.localName> eq 'li') and
+                  $current-><M::Node.getAttributeNS>
+                                          (<Q::ddel:>, 'tag') eq 'implied') {
+                $current = $current-><AG::Node.parentNode>;
+              }
+              $this = $current = $current-><M::Node.appendChild>
+                  ($ownerDocumentArg-><M::Document.createElementNS>
+                              ({
+                                 <Q::ddel:NOTE> => <Q::html3:>,
+                                 <Q::ddel:P> => <Q::xhtml2:>,
+                               }->{$ns.$ln} || $ns,
+                               {
+                                 <Q::ddel:NOTE> => 'note',
+                                 <Q::ddel:P> => 'p',
+                               }->{$ln.$ln} || $ln));
+              $current-><M::Element.setAttributeNS>
+                              (<Q::ddel:>, 'ddel:tag' => 'block');
+              $current-><M::Node.appendChild>
+                     ($self-><M::DocumentDISDoc.parseDISDocInlineText>
+                       ($ownerDocumentArg, $namespaceContext, $s,
+                        node => $node, language_uri => null,
+                        script_uri => null));
+            }
+            if ($lang) {
+              my ($nsp, $ln, $ns) = split /\s*[:|]\s*/, $lang, 2;
+              if (defined $ln) {
+                $ns = $namespaceContext-><M::DISDocNamespaceContext
+                                           .lookupNamespaceURI> ($nsp);
+                unless (defined $ns) {
+                  __UNDEEP{__EXCEPTION{DIS:UNDECLARED_NS_PREFIX_ERR::
+                    infoset:prefix => {$nsp},
+                    DIS:sourceNode => {$node},
+                  }__}__;
+                }
+              } else {
+                $ln = $nsp;
+                $ns = <Q::ilang:>;
+              }
+              if ($ns eq <Q::ilang:>) {
+                $this-><M::Element.setAttributeNS>
+                                 (<Q::xml:>, 'xml:lang' => $ln);
+              } else {
+                $this-><M::Element.setAttributeNS>
+                                 (<Q::script:>, 'script:lang' => $ln);
+              }
+            }
+            if ($script) {
+              my ($nsp, $ln, $ns) = split /\s*[:|]\s*/, $script, 2;
+              if (defined $ln) {
+                $ns = $namespaceContext-><M::DISDocNamespaceContext
+                                           .lookupNamespaceURI> ($nsp);
+                unless (defined $ns) {
+                  __UNDEEP{__EXCEPTION{DIS:UNDECLARED_NS_PREFIX_ERR::
+                    infoset:prefix => {$nsp},
+                    DIS:sourceNode => {$node},
+                  }__}__;
+                }
+              } else {
+                $ln = $nsp;
+                $ns = <Q::script:>;
+              }
+              $this-><M::Element.setAttributeNS>
+                                 (<Q::script:>, 'script:script' => $ln);
+            }
+          } elsif ($s =~ /^\s*\}\s*$/) { ## End tag
+            while ($current-><M::Element.getAttributeNS>
+                                      (<Q::ddel:>, 'tag') eq 'implied') {
+              $current = $current-><AG::Node.parentNode>;
+            }
+            $current = $current-><AG::Node.parentNode>;
+          } elsif ($s =~ s/^\s*([-=])\s*//) { ## List
+            my $marker = $1;
+            unless ($current-><AG::Node.namespaceURI> eq <Q::xhtml2:> and
+                    {ul => true,
+                     ol => true}->{$current-><AG::Node.localName>}) {
+              $current = $current-><M::Node.appendChild>
+                              ($ownerDocumentArg-><M::Document.createElementNS>
+                                  (<Q::xhtml2:>, 
+                                   {'-' => 'ul',
+                                    '=' => 'ol'}->{$marker} || 'ul'));
+              $current-><M::Element.setAttributeNS>
+                                  (<Q::ddel:>, 'ddel:tag' => 'implied');
+            }
+            my $li = $current-><M::Node.appendChild>
+                          ($ownerDocumentArg-><M::Document.createElementNS>
+                             (<Q::xhtml2:>, 'li'));
+            $li-><M::Element.setAttributeNS>
+                          (<Q::ddel:>, 'ddel:ordered' => true) if $marker eq '=';
+            $li-><M::Node.setAttributeNS>
+                                (<Q::ddel:>, 'ddel:tag' => 'implied');
+            $li-><M::Node.setAttributeNS>
+                                (<Q::ddel:>, 'ddel:mmParsed' => true);
+            if ($s =~ s/^(.*)::://s) {
+              my $m = $li-><M::Node.appendChild>
+                     ($ownerDocumentArg-><M::Document.createElementNS>
+                                  (<Q::ddel:>, 'ddel:listMarker'))
+              $m-><M::Node.appendChild>
+                         ($self-><M::DocumentDISDoc.parseDISDocInlineText>
+                           ($ownerDocumentArg, $namespaceContext, $1,
+                            node => $node, language_uri => null,
+                            script_uri => null));
+              $m-><M::Element.setAttributeNS>
+                              (<Q::ddel:>, 'ddel:tag' => 'implied');
+            }
+            $li = $li-><M::Node.appendChild>
+                     ($ownerDocumentArg-><M::Document.createElementNS>
+                                  (<Q::ddel:>, 'ddel:listContent'))
+                   -><M::Node.appendChild>
+                       ($self-><M::DocumentDISDoc.parseDISDocInlineText>
+                         ($ownerDocumentArg, $namespaceContext, $s,
+                          node => $node, language_uri => null,
+                          script_uri => null));
+            $li-><M::Element.setAttributeNS>
+                              (<Q::ddel:>, 'ddel:tag' => 'implied');
+          } else {
+            ## /^\s*[^\w\s<]/ is reserved for future extensions
+            if ($current-><AG::Node.namespaceURI> eq <Q::xhtml2:> and
+                ($current-><AG::Node.localName> eq 'ul' or
+                 $current-><AG::Node.localName> eq 'li') and
+                $current-><M::Node.getAttributeNS>
+                                          (<Q::ddel:>, 'tag') eq 'implied') {
+              $current = $current-><AG::Node.parentNode>;
+            }
+            my $p = $current-><M::Node.appendChild>
+                          ($ownerDocumentArg-><M::Document.createElementNS>
+                             (<Q::xhtml2:>, 'p'));
+            $p-><M::Node.setAttributeNS>
+                                (<Q::ddel:>, 'ddel:tag' => 'implied');
+            $o-><M::Node.appendChild>
+                       ($self-><M::DocumentDISDoc.parseDISDocInlineText>
+                         ($ownerDocumentArg, $namespaceContext, $s,
+                          node => $node, language_uri => null,
+                          script_uri => null));
+          }
+        } # for
+
+        while ($current-><M::Node.getAttributeNS>
+                                          (<Q::ddel:>, 'tag') eq 'implied') {
+          $current = $current-><AG::Node.parentNode>;
+        }
+      }__;
+
+      unless ($current eq $root) {
+        __EXCEPTION{DIS|NO_END_TAG_ERR::
+          DIS:elementType => {$current-><AG::Element.namespaceURI> .
+                              $current-><AG::Element.localName>},
+          DIS:sourceNode => {$node},
+          DIS:sourceCode => {$sourceText},
+        }__;
+      }
 
   @Method:
     @@Name: parseDISDocInlineText
     @@PerlName: parse_disdoc_inline_text
     @@enDesc:
       Parses a <QUOTE::disdoc> formatted text in the inline-level context.
+    @@OwnerDocArg:
     @@Param:
       @@@Name: namespaceContext
       @@@Type: DISDocNamespaceResolver
@@ -680,14 +1383,245 @@ IFClsDef:
         A node or something used to resolve namespace prefix.
     @@Param:
       @@@Name: sourceText
-      @@@Type: DISLang|String||ManakaiDOM|all
+      @@@Type: lang|disdocInline||ManakaiDOM|all
       @@@enDesc:
         A <QUOTE::disdoc> inline-level fragment.
+    @@NamedParam:
+      @@@Name: node
+      @@@Type: DIS|ManakaiDISElement
+      @@@enDesc:
+        A <QUOTE::dis> element in which the <P::sourceText>
+        is contained.  This information is used to report errors.
+      @@@nullCase:
+        @@@@enDesc: No source node.
+    @@NamedParam:
+      @@@Name: languageURI
+      @@@Type: DIS|AnyURI
+      @@@enDesc:
+        The language information of the context in which the <P::sourceText>
+        is contained.
+      @@@nullCase:
+        @@@@enDesc: No language information.
+    @@NamedParam:
+      @@@Name: scriptURI
+      @@@Type: DIS|AnyURI
+      @@@enDesc:
+        The script information of the context in which the <P::sourceText>
+        is contained.
+      @@@nullCase:
+        @@@@enDesc: No script information.
     @@Return:
       @@@Type: DocumentFragment
       @@@enDesc:
         <QUOTE::disdoc> tree constructed from <P::sourceText>.
+      @@@RaiseException:
+        @@@@@:DIS|NO_END_TAG_ERR
+        @@@@enDesc:
+          An end tag is not found where it is required.
+      @@@RaiseException:
+        @@@@@:DOMCore|DOMException.INVALID_CHARACTER_ERR
+        @@@@enDesc:
+          An illegular element type name is specified.
+      @@@RaiseException:
+        @@@@@:DOMCore|DOMException.NAMESPACE_ERR
+        @@@@enDesc:
+          An illegular element type name is specified.
       @@@PrefixException:
+      @@@PerlDef:
+        $sourceText =~ s/^\s+//;
+        $sourceText =~ s/\s+$//;
+
+        ## Container
+        $r = $ownerDocumentArg-><M::Document.createDocumentFragment>;
+        my $current = $r;
+
+        ## Language
+        if ($node) {
+          my $db = $node-><AG::DIS|ManakaiDISNode.ownerDISDocument>
+                        -><AG::DIS|ManakaiDISDocument.disDatabase>;
+          if (defined $languageURI or defined $scriptURI) {
+            $current = $r-><M::Node.appendChild>
+                             ($ownerDocumentArg-><M::Document.createElementNS>
+                                 (<Q::xhtml2:>, 'div'));
+            $current-><M::Element.setAttributeNS>
+                             (null, class => 'disdoc-inline');
+          }
+          if (defined $languageURI) {
+            my $lang = $db-><M::DIS|ManakaiDISDatabase
+                               .getResource> ($languageURI);
+            my $tag = $lang-><M::DIS|ManakaiDISPropertyAccessor
+                                .getPropertyText> (<Q::nl:ietfPreferredTag>) ||
+                      $lang-><M::DIS|ManakaiDISPropertyAccessor
+                                .getPropertyText> (<Q::nl:ietfTag>);
+            if ($tag) {
+              $current-><M::Element.setAttributeNS>
+                             (<Q::xml:>, 'xml:lang' => $tag);
+            } else {
+              $current-><M::Element.setAttributeNS> (<Q::script:>, 'script:lang'
+                                                            => $languageURI);
+            }
+          }
+          if (defined $scriptURI) {
+            $current-><M::Element.setAttributeNS> (<Q::script:>, 'script:script'
+                                                              => $scriptURI);
+          }
+        }
+        
+        __DEEP{
+          while (CORE::length $sourceText) {
+            if ($sourceText =~ s/^([^<>]+)//) {
+              $current-><M::Node.appendChild>
+                          ($ownerDocumentArg-><M::Document.createTextNode> ($1));
+            } elsif ($sourceText =~ s/^<\s*(lt|gt|[{}:=-]|SP)\s*>//) {
+              $current-><M::Node.appendChild>
+                          ($ownerDocumentArg-><M::Document.createTextNode>
+                             ({
+                                lt => '<', gt => '>', 'SP' => ' ',
+                                '{' => '{', '}' => '}', ':' => ':',
+                                '=' => '=', '-' => '-',
+                              }->{$1}));
+            } elsif ($sourceText =~ s/^<([0-9A-Za-z_.:|\@\s-]+):://) {
+              my ($type, $lang, $script) = split /\s*\@\s*/, $1, 3;
+              my ($etype, $ltype) = split /\s*^^\s*/, $type, 2;
+
+              my ($nsp, $ln, $ns) = split /\s*[:|]\s*/, $etype, 2;
+              if (defined $ns) {
+                $ns = $namespaceContext-><M::DISDocNamespaceContext
+                                           .lookupNamespaceURI> ($nsp);
+                unless (defined $ns) {
+                  __UNDEEP{__EXCEPTION{DIS:UNDECLARED_NS_PREFIX_ERR::
+                    infoset:prefix => {$nsp},
+                    DIS:sourceNode => {$node},
+                  }__}__;
+                }
+              } else {
+                $ln = $nsp;
+                $ns = $namespaceContext-><AG::DISDocNamespaceContext
+                                           .defaultDISDocElementNamespaceURI>;
+              }
+
+              $current = $current-><M::Node.appendChild>
+                            ($ownerDocumentArg-><M::Document.createElementNS>
+                                ({
+                                   <Q::ddel:CITE> => <Q::html5:>,
+                                   <Q::ddel:CODE> => <Q::html5:>,
+                                   <Q::ddel:DFN> => <Q::html5:>,
+                                   <Q::ddel:EM> => <Q::html5:>,
+                                   <Q::ddel:KEY> => <Q::sw010:>,
+                                   <Q::ddel:QUOTE> => <Q::html5:>,
+                                   <Q::ddel:SRC> => <Q::sw010:>,
+                                 }->{$ns.$ln} || $ns,
+                                 {
+                                   <Q::ddel:CITE> => 'cite',
+                                   <Q::ddel:CODE> => 'code',
+                                   <Q::ddel:DFN> => 'dfn',
+                                   <Q::ddel:EM> => 'em',
+                                   <Q::ddel:KEY> => 'key',
+                                   <Q::ddel:QUOTE> => 'q',
+                                   <Q::ddel:SRC> => 'src',
+                                 }->{$ns.$ln} || $ln));
+              
+              if (defined $ltype) {
+                my ($lnsp, $lln, $lns) = split /\s*[:|]\s*/, $ltype, 2;
+                if (defined $lln) {
+                  $lns = $namespaceContext-><M::DISDocNamespaceContext
+                                               .lookupNamespaceURI> ($lnsp);
+                  unless (defined $lns) {
+                    __UNDEEP{__EXCEPTION{DIS:UNDECLARED_NS_PREFIX_ERR::
+                      infoset:prefix => {$lnsp},
+                      DIS:sourceNode => {$node},
+                    }__}__;
+                  }
+                } else {
+                  $lln = $lnsp;
+                  $lns = $namespaceContext-><AG::DISDocNamespaceContext
+                                             .defaultDISDocElementNamespaceURI>;
+                }
+                push @lextype, $lns.$lln;
+                $current-><M::Element.setAttributeNS>
+                               (<Q::ddel:>, 'ddel:lexType' => $lextype[-1]);
+              } else { # No explicit lextype
+                push @lextype, {
+                  <Q::ddel:A> => <Q::DISPerl:MemRef>,
+                  <Q::ddel:CP> => <Q::DISCore:NCNameOrQName>,
+                  <Q::ddel:ERR> => <Q::DISCore:NCNameOrQName>,
+                  <Q::ddel:EV> => <Q::DISCore:NCNameOrQName>,
+                  <Q::ddel:IF> => <Q::dis:TFQNames>,
+                  <Q::ddel:Feature> => <Q::DISCore:NCNameOrQName>,
+                  <Q::ddel:M> => <Q::DISPerl:MemRef>,
+                  <Q::ddel:Q> => <Q::dis:TypeQName>,
+                  <Q::ddel:TYPE> => <Q::dis:TFQNames>,
+                  <Q::ddel:WARN> => <Q::DOMMain:XCodeRef>,
+                  <Q::ddel:X> => <Q::DOMMain:XCodeRef>,
+                  <Q::ddel:XA> => <Q::DISCore:NCNameOrQName>,
+                  <Q::ddel:XE> => <Q::DISCore:NCNameOrQName>,
+                }->{$ns.$ln} || '';
+              }
+
+              if ($lang) {
+                my ($nsp, $ln, $ns) = split /\s*[:|]\s*/, $lang, 2;
+                if (defined $ln) {
+                  $ns = $namespaceContext-><M::DISDocNamespaceContext
+                                             .lookupNamespaceURI> ($nsp);
+                  unless (defined $ns) {
+                    __UNDEEP{__EXCEPTION{DIS:UNDECLARED_NS_PREFIX_ERR::
+                      infoset:prefix => {$nsp},
+                      DIS:sourceNode => {$node},
+                    }__}__;
+                  }
+                } else {
+                  $ln = $nsp;
+                  $ns = <Q::ilang:>;
+                }
+                if ($ns eq <Q::ilang:>) {
+                  $this-><M::Element.setAttributeNS>
+                                   (<Q::xml:>, 'xml:lang' => $ln);
+                } else {
+                  $this-><M::Element.setAttributeNS>
+                                   (<Q::script:>, 'script:lang' => $ln);
+                }
+              }
+              if ($script) {
+                my ($nsp, $ln, $ns) = split /\s*[:|]\s*/, $script, 2;
+                if (defined $ln) {
+                  $ns = $namespaceContext-><M::DISDocNamespaceContext
+                                             .lookupNamespaceURI> ($nsp);
+                  unless (defined $ns) {
+                    __UNDEEP{__EXCEPTION{DIS:UNDECLARED_NS_PREFIX_ERR::
+                      infoset:prefix => {$nsp},
+                      DIS:sourceNode => {$node},
+                    }__}__;
+                  }
+                } else {
+                  $ln = $nsp;
+                  $ns = <Q::script:>;
+                }
+                $this-><M::Element.setAttributeNS>
+                                   (<Q::script:>, 'script:script' => $ln);
+              }
+            } elsif ($sourceText =~ s/^>//) { ## End tag
+              unless ($current eq $r) {
+                $current = $current-><AG::Node.parentNode>;
+              } else {  ## Illegular
+                $current-><M::Node.appendChild>
+                        ($ownerDocumentArg-><M::Document.createTextNode> ('>'));
+              }
+            ## TODO: lextype parsing
+            } elsif ($sourceText =~ s/^(.)//s) { ## Illegular "<" and ">"
+              $current-><M::Node.appendChild>
+                          ($ownerDocumentArg-><M::Document.createTextNode>
+                              ($1));
+            }
+          } # while
+        }__;
+
+      unless ($current eq $root) {
+        __EXCEPTION{DIS|NO_END_TAG_ERR::
+          DIS:elementType => {$current-><AG::Element.namespaceURI> .
+                              $current-><AG::Element.localName>},
+          DIS:sourceNode => {$node},
+        }__;
+      }
 ##DocumentDISDoc
 
 ElementTypeBinding:
@@ -714,8 +1648,12 @@ ElementTypeBinding:
     ManakaiDOM:raises
 
 ResourceDef:
+  @QName: Element
+  @AliasFor: DOMCore|Element||ManakaiDOM|ManakaiDOMLatest
+
+ResourceDef:
   @QName: DocumentFragment
-  @AliasFor: DOMCore|DocumentFragment||ManakaiDOM|all
+  @AliasFor: DOMCore|DocumentFragment||ManakaiDOM|ManakaiDOMLatest
 
 ResourceDef:
   @QName: UNDECLARED_NS_PREFIX_ERR
@@ -724,9 +1662,39 @@ ResourceDef:
 
 ## -- disdoc Utility Interfaces
 
-IFClsDef:
+IFClassDef:
   @IFQName: DISDocNegotiationCondition
   @ClsQName: ManakaiDISDocNegotiationCondition
+
+  @Method:
+    @@Name: selectDISElement
+    @@enDesc:
+      Selects a <QUOTE::dis> element by this condition.
+    @@Param:
+      @@@Name: elements
+      @@@Type: Perl|ARRAY||ManakaiDOM|all
+      @@@enDesc:
+        A reference to array whose items are <QUOTE::dis> elements.
+    @@Return:
+      @@@Type: DIS|ManakaiDISElement
+      @@@enDesc:
+        A <QUOTE::dis> element choosen from <P::element>.
+      @@@nullCase:
+        @@@@enDesc:
+          No appropaiate element.
+      @@@PerlDef:
+        $r = $elements->[0];
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          {TODO:: Implementation required.
+          \
+          }
+
+  @ImplNote:
+    @@lang:en
+    @@@:
+      Attributes and/or methods such as Accept-Language is required.
 ##DISDocNegotiationCondition
 
 IFDef:
@@ -742,9 +1710,17 @@ IFDef:
     @@Name: defaultDISDocNamespaceURI
     @@PerlName: default_disdoc_namespace_uri
     @@enDesc:
-      The default namespace URI for <QUOTE::disdoc> element types.
+      The default namespace URI for <QUOTE::disdoc> contents.
     @@Type: DIS|AnyURI
     @@Get: 
+
+  @Attr:
+    @@Name: defaultDISDocElementNamespaceURI
+    @@PerlName: default_disdoc_element_namespace_uri
+    @@enDesc:
+      The default namespace URI for <QUOTE::disdoc> element types.
+    @@Type: DIS|AnyURI
+    @@Get:
  
   @Method:
     @@Name: lookupNamespaceURI
@@ -781,3 +1757,7 @@ ElementTypeBinding:
     @@rdf:type:
       DISLang:MethodParameter
     @@DISPerl:isNamedParameter:1
+
+ResourceDef:
+  @QName: Node
+  @AliasFor: DOMCore|Node||ManakaiDOM|ManakaiDOMLatest

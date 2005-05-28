@@ -206,7 +206,7 @@ $(TEMP_LIB2_DIR)Message/Util/Error/DOMException.pm: \
 
 phase3: $(PHASE2_PM_FILES) $(MANAKAI_LIB_DIR)Message/DOM/DOMLS.pm
 	$(CD) $(MANAKAI_LIB_DIR)Message/Util && \
-	  $(MAKE) all \
+	  $(MAKE) boot \
 	    PERL_OPTIONS2="-I../../lib/$(TEMP_LIB2_DIR) \
 	                   -I../../lib/$(MANAKAI_LIB_DIR) \
 	                  $(PHASE3_PERL_OPTIONS)" \
@@ -255,6 +255,8 @@ phase3: $(PHASE2_PM_FILES) $(MANAKAI_LIB_DIR)Message/DOM/DOMLS.pm
 	                    $(PHASE3_PERL_OPTIONS)" \
 	    DAC2PM_OPTIONS3="$(PHASE3_DAC2PM_OPTIONS)"
 	    DOMLS_DIS_FILE3="../../../lib/$(TEMP_LIB_DIR)Message/DOM/DOMLS.dis"
+
+## TODO: Make other modules
 
 $(MANAKAI_LIB_DIR)Message/DOM/DOMLS.pm: $(PHASE1_DOMLS_PM_FILE)
 	$(CP) $< $@

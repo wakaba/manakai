@@ -21,7 +21,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/24 12:04:01 $
+      $Date: 2005/05/28 13:38:46 $
     @@ContentType:
       dis:Date.RCS
   
@@ -632,6 +632,7 @@ PropDef:
     @@lang:en
     @@@:
       The media type (content type) of the content.
+
 PropDef:
   @QName:
     dis:lang
@@ -641,6 +642,8 @@ PropDef:
     @@lang:en
     @@@:
       The natural language in which the content is written.
+  @dataType: LanguageTag
+
 PropDef:
   @QName:
     dis:script
@@ -650,6 +653,7 @@ PropDef:
     @@lang:en
     @@@:
       The writting script in which the content is written.
+  @dataType: ScriptTag
 
 DataTypeDef:
   @QName:
@@ -709,6 +713,39 @@ DataTypeDef:
       prefix := *(<any character> - ":")
       \
       local-name := *(<any character> - ":")
+
+DataTypeDef:
+  @QName: NCNameOrQName
+  @Description:
+    @@lang:en
+    @@@:
+      A QName with or without <CHAR::COLON>.  If
+      it does not contain a <CHAR::COLON>, it is namespace-unaware
+      or in the null namespace.
+
+DataTypeDef:
+  @QName: LanguageTag
+  @Description:
+    @@lang:en
+    @@@:
+      A qualified name whose default namespace bound to
+      the language tag namespace.  See <Module::DIS:NaturalLanguage> module.
+  @rdfs:subClassOf:
+    dis:TypeQName
+  @subsetOf:
+    dis:TypeQName
+
+DataTypeDef:
+  @QName: ScriptTag
+  @Description:
+    @@lang:en
+    @@@:
+      A qualified name whose default namespace bound to
+      the script tag namespace.  See <Module::DIS:NaturalLanguage> module.
+  @rdfs:subClassOf:
+    dis:TypeQName
+  @subsetOf:
+    dis:TypeQName
 
 DataTypeDef:
   @QName: 

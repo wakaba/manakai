@@ -19,6 +19,7 @@ NS_MANAKAIDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#
 NS_DIS        = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS\#
 NS_UTIL       = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 NS_UTIL_ERR   = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/
+NS_UTIL_DIS   = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS\#
 
 DAC_PL = $(MANAKAI_BIN_DIR)dac.pl
 DAC = $(PERL_) $(DAC_PL) \
@@ -41,14 +42,22 @@ DOMBOOT_DIS_FILE3 = $(DOMLS_DIS_FILE)
                     #$(MANAKAI_LIB_DIR)Message/DOM/DOMBoot.dis
 DOMBOOT_DIS_FILE = $(DOMBOOT_DIS_FILE3)
 
-DIS_FILES = ManakaiNode.dis DIS.dis PerlCode.dis Error/DOMException.dis
+BOOT_DIS_FILES = ManakaiNode.dis DIS.dis PerlCode.dis Error/DOMException.dis
+DIS_FILES = $(BOOT_DIS_FILES) DIS/DISDoc.dis
 
-GENERATED_FILES = base.dac all.dac ManakaiNode.pm DIS.pm PerlCode.pm \
+BOOT_GENERATED_FILES = base.dac min.dac ManakaiNode.pm DIS.pm PerlCode.pm \
   Error/DOMException.pm
+GENERATED_FILES = $(BOOT_GENERATED_FILES) all.dac DIS/DISDoc.pm
 
 all: $(GENERATED_FILES)
 
-all.dac: base.dac $(DIS_FILES) $(DAC_PL)
+boot: $(BOOT_GENERATED_FILES)
+
+all.dac: min.dac $(DIS_FILES) $(DAC_PL) \
+  $(MANAKAI_LIB_DIR)manakai/NaturalLanguage.dis
+	$(DAC)$@ --input-db-file-name="$<" DIS/DISDoc.dis
+
+min.dac: base.dac $(BOOT_DIS_FILES) $(DAC_PL)
 	$(DAC)$@ --input-db-file-name="$<" DIS.dis
 
 base.dac: $(DAC_PL) \
@@ -65,27 +74,33 @@ base.dac: $(DAC_PL) \
 	  --for="$(NS_MANAKAIDOM)ManakaiDOM3"
 	$(RM) $@.1.tmp $@.2.tmp
 
-ManakaiNode.pm: all.dac $(DAC2PM_PL)
+ManakaiNode.pm: min.dac $(DAC2PM_PL)
 	$(DAC2PM) $< \
 	  --module-uri="$(NS_UTIL)ManakaiNode" \
 	  --output-file-path="$@"
 	$(PERL_CHK) $@
 
-DIS.pm: all.dac $(DAC2PM_PL)
+DIS.pm: min.dac $(DAC2PM_PL)
 	$(DAC2PM) $< \
 	  --module-uri="$(NS_UTIL)DIS" \
 	  --output-file-path="$@"
 	$(PERL_CHK) $@
 
-PerlCode.pm: all.dac $(DAC2PM_PL)
+PerlCode.pm: min.dac $(DAC2PM_PL)
 	$(DAC2PM) $< \
 	  --module-uri="$(NS_UTIL)PerlCode" \
 	  --output-file-path="$@"
 	$(PERL_CHK) $@
 
-Error/DOMException.pm: all.dac $(DAC2PM_PL)
+Error/DOMException.pm: min.dac $(DAC2PM_PL)
 	$(DAC2PM) $< \
 	  --module-uri="$(NS_UTIL_ERR)DOMException" \
+	  --output-file-path="$@"
+	$(PERL_CHK) $@
+
+DIS/DISDoc.pm: all.dac $(DAC2PM_PL)
+	$(DAC2PM) $< \
+	  --module-uri="$(NS_UTIL_DIS)DISDoc" \
 	  --output-file-path="$@"
 	$(PERL_CHK) $@
 

@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/05/24 12:04:01 $
+      $Date: 2005/05/28 13:38:45 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1893,7 +1893,9 @@ ClsDef:
             if ($isnull and $isnull-><M::SWCFGNode.value>) {
               $r = $plimpl-><M::MPLImpl.createPerlAtom> ('null');
             } else {
-              my $vnode_type_uri = $vnode-><M::ManakaiDISElement.mediaTypeURI>;
+              my $vnode_type_uri = $vnode-><M::ManakaiDISElement.mediaTypeURI>
+                                           (for_arg => $forArg,
+                                            forp_arg => $forpArg);
               my $vnode_value = $vnode-><M::SWCFGNode.value>;
               if ($vnode_type_uri) {
                 my $vnode_type = $disResource->{db}
@@ -5222,7 +5224,20 @@ ClsDef:
             $r = $self->{<Q::dis2pm:name>};
           } elsif ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
                               (<Q::DISLang:AnyMethod>)) {
-            if (defined $self->{localName}) {
+            
+            my $an_node = $self->{src}-><M::ManakaiDISElement.disGetAttribute>
+                              (<Q::dis:AppName>, for_arg => $self->{for},
+                               forp_arg => $self->{forp},
+                               media_type => <Q::lang:Perl>,
+                               default_media_type => <Q::lang:Perl>);
+            if ($an_node) {
+              $r = $an_node-><M::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
+              if ($self-><M::ManakaiDISPropertyAccessor.getPropertyBoolean>
+                                (<Q::ManakaiDOM:isForInternal>, false)) {
+                $r = '_' . $r;
+              }
+              ## No reserved name checks
+            } elsif (defined $self->{localName}) {
               $r = <ClassM::ManakaiDISImplementation.camelCaseToUnderscoreName>
                                                ($self->{localName});
               if ($self-><M::ManakaiDISPropertyAccessor.getPropertyBoolean>
@@ -9629,6 +9644,23 @@ ExceptionDef:
          @@@@@enDesc:
            The URI reference of the datatype resource for which
            a setter template should have been defined.
+     @@@XSubTypeDef:
+       @@@@@QName: NO_END_TAG_ERR
+       @@@@@enDesc:
+         Close tag not found.
+       @@@@@XSourceNodeParam:
+       @@@@@XParam:
+         @@@@@QName: elementType
+         @@@@@enDesc:
+           The type URI reference of the element that is not closed.
+       @@@@@XParam:
+         @@@@@QName: sourceCode
+         @@@@@enDesc:
+           The source code fragment near the position where
+           an end tag is required.
+       @@@@@enMufDef:
+         End tag for element "%p (name => {<Q::DIS:elementType>});"
+         is required
   @ImplNote:
     @@lang:en
     @@@:
