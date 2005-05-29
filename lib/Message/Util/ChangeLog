@@ -1,3 +1,11 @@
+2005-05-29  Wakaba  <wakaba@suika.fam.cx>
+
+	* DIS.dis (plGeneratePerlModuleFile): Bug fixed so that
+	even if DOMMetaImpl:provideFeature has child nodes but
+	they are not DOMMetaImpl:providedThrough a ImplFeature
+	statement is generated.
+	(plCodeFragment): Bug fixed so that dis:SetProp works correctly.
+
 2005-05-26  Wakaba  <wakaba@suika.fam.cx>
 
 	* Makefile: Rules for DISDoc module added.

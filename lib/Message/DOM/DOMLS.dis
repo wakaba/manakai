@@ -31,7 +31,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/21 16:16:41 $
+      $Date: 2005/05/29 12:56:34 $
     @@ContentType:
       dis:Date.RCS
 
@@ -949,12 +949,12 @@ FeatureDef:
     @@featureQName: DOMLS|LS
     @@Version: 3.0
     @@enDesc:
-      The <IF::ManakaiDOMImplementationLSExtendedIF
+      The <IF::DOMImplementationLSExtended
              ::ManakaiDOM:ManakaiDOMLatest> interface.
 
 IF:
   @QName:
-    @@@: ManakaiDOMImplementationLSExtendedIF
+    @@@: DOMImplementationLSExtendedIF
     @@ForCheck: ManakaiDOM|ForIF
 
   @QName:
@@ -1874,7 +1874,9 @@ IF:
           return $s;
         };
         while (my $src = shift @src) {
-          if (ref $src) {
+          if (ref $src eq 'ARRAY') {
+            pop @$nsbind;  ## End tag
+          } elsif (ref $src) {
             if ($src->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
               my @csrc;
               my $etag;
@@ -1971,8 +1973,7 @@ IF:
                   ## Available from element itself?
                   if (defined $src->{<Q::infoset:namespaceName>} and
                       $src->{<Q::infoset:namespaceName>} eq $ans and
-                      defined $src->{<Q::infoset:prefix>} and
-                      length $src->{<Q::infoset:prefix>}) {
+                      defined $src->{<Q::infoset:prefix>}) {
                     if (defined $ns->{$src->{<Q::infoset:prefix>}}) {
                       if ($ns->{$src->{<Q::infoset:prefix>}} eq $ans) {
                         ## Namespace already defined
@@ -2014,6 +2015,15 @@ IF:
                        .  $src->{<Q::infoset:localName>};
                     $etag = '</' . $src->{<Q::infoset:prefix>} . ':'
                        .  $src->{<Q::infoset:localName>} . '>';
+                  } elsif (defined $src->{<Q::infoset:prefix>}) {
+                    $attrr{'xmlns:'.$src->{<Q::infoset:prefix>}}
+                      = [$xescape->($src->{<Q::infoset:namespaceName>})];
+                    $ns->{$src->{<Q::infoset:prefix>}}
+                      = $src->{<Q::infoset:namespaceName>};
+                    $r .= '<' . $src->{<Q::infoset:prefix>} . ':'
+                       .  $src->{<Q::infoset:localName>};
+                    $etag = '</' . $src->{<Q::infoset:prefix>} . ':'
+                       .  $src->{<Q::infoset:localName>} . '>';
                   } else {
                     PFX: {
                       ## Non-NULL namespace and prefix is not defined
@@ -2038,6 +2048,8 @@ IF:
                       $i++ while (exists $ns->{'ns'.$i});
                       $ns->{'ns'.$i} = $src->{<Q::infoset:namespaceName>};
                       $attrr{'xmlns:ns'.$i} = [$xescape->($ns->{'ns'.$i})];
+                      $r .= '<'.'ns' . $i . ':' . $src->{<Q::infoset:localName>};
+                      $etag = '</ns'.$i.':'.$src->{<Q::infoset:localName>} . '>';
                     }
                   }
                 } else {
@@ -2063,11 +2075,12 @@ IF:
 
               ## Children
               if (@{$src->{<Q::infoset:children>}}) {
-                push @csrc, '>', @{$src->{<Q::infoset:children>}}, $etag;
+                push @csrc, '>', @{$src->{<Q::infoset:children>}}, $etag, [];
               } elsif ($src->{<Q::ManakaiDOMLS2003:use_EmptyElemTag>}) {
                 push @csrc, ' />';
+                shift @$nsbind;
               } else {
-                push @csrc, '>' . $etag;
+                push @csrc, '>' . $etag, [];
               }
               unshift @src, @csrc;
             } elsif ($src->{<Q::DOMCore:nodeType>} eq <Q::DOMCore:Text>) {

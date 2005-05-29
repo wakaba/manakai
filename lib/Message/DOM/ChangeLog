@@ -1,3 +1,13 @@
+2005-05-29  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMLS.dis (SimpleSerializer): End tag was sometimes missing.  Use
+	namespace prefix of element type if it is not declared
+	but not used else.  A shift is replaced by pop:).
+
+	* DOMCore.dis (getFeature): The getFeature method 
+	for Node-derived classes implemented.
+	* DOMXML.dis (getFeature): Ditto.
+
 2005-05-21  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMCore.dis (getNodeReference): Use HTMLDocument class

@@ -46,7 +46,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/08 14:18:01 $
+      $Date: 2005/05/29 12:56:34 $
     @@ContentType:
       dis:Date.RCS
 
@@ -591,7 +591,68 @@ IF:
          \
          Other available properties: <Q:infoset:parent>, 
          <Q:infoset:content>.
-## IF:CDATASection
+
+  @Method:
+     @@Name:  getFeature
+     @@enDesc:
+       Returns a specialized object that implements the
+       specialized interfaces of the specified feature and version.
+     @@ManakaiDOM:isRedefining:1
+     @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|DOM3
+     @@Param:
+        @@@Name:  feature
+        @@@Type:  
+          DOMMain:DOMString
+        @@@actualType: ManakaiDOM|ManakaiDOMFeatureName
+        @@@enDesc:
+          The feature name to request.
+        @@@InCase:
+          @@@@Label:
+            @@@@@lang:en
+            @@@@@@: 
+              Feature name preceded by a <CHAR::PLUS SIGN>
+          @@@@enDesc:
+            The <CHAR::PLUS SIGN> is ignored.
+     @@Param:
+        @@@Name:  version
+        @@@Type:  
+          DOMMain:DOMString
+        @@@actualType: ManakaiDOM|ManakaiDOMFeatureVersion
+        @@@enDesc:
+          The feature version to request.
+        @@@nullCase:
+          @@@@enDesc:
+            No specific version is requested.
+     @@Return:
+        @@@Type:  
+          DOMMain:DOMObject
+        @@@enDesc:
+          An object implementing the specialized interfaces.
+          Note that the specialized object may or may not
+          implement the <IF::Node> interface.
+        @@@nullCase:
+          @@@@enDesc:
+            There is no object available that implements
+            the specialized interfaces.
+        @@@PerlDef:
+            $feature =~ s/^\+//;
+            if ($Message::DOM::ClassFeature{ref $self}->{$feature}->{$version}) {
+              ## This class
+              $r = $self;
+            } else {
+              CLASS: for my $class (grep {
+                $Message::DOM::ManakaiDOMCDATASection::CompatClass{$_}
+              } keys %Message::DOM::ManakaiDOMCDATASection::CompatClass) {
+                if ($Message::DOM::ClassFeature{$class}
+                            ->{$feature}->{$version}) {
+                  $r = $self->{<Q::TreeCore:node>}
+                            -><M::ManakaiDOM:ManakaiDOMNodeObject
+                                       ::ManakaiDOM:Perl.newReference> ($class);
+                  last CLASS;
+                }
+              }
+            }
+##CDATASection
 
 IF:
   @Name:  
@@ -916,7 +977,71 @@ IF:
          Other available properties: <Q:infoset:parent>, 
          <Q:infoset:publicIdentifier>, <Q:infoset:systemIdentifier>, 
          <Q:infoset:prefix>, <Q:DOMCore:read-only>, <Q:DOMCore:ownerDocument>.
-## IF:DocumentType
+
+  @Method:
+     @@Name:  getFeature
+     @@enDesc:
+       Returns a specialized object that implements the
+       specialized interfaces of the specified feature and version.
+     @@ManakaiDOM:isRedefining:1
+     @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|DOM3
+     @@Param:
+        @@@Name:  feature
+        @@@Type:  
+          DOMMain:DOMString
+        @@@actualType: ManakaiDOM|ManakaiDOMFeatureName
+        @@@enDesc:
+          The feature name to request.
+        @@@InCase:
+          @@@@Label:
+            @@@@@lang:en
+            @@@@@@: 
+              Feature name preceded by a <CHAR::PLUS SIGN>
+          @@@@enDesc:
+            The <CHAR::PLUS SIGN> is ignored.
+     @@Param:
+        @@@Name:  version
+        @@@Type:  
+          DOMMain:DOMString
+        @@@actualType: ManakaiDOM|ManakaiDOMFeatureVersion
+        @@@enDesc:
+          The feature version to request.
+        @@@nullCase:
+          @@@@enDesc:
+            No specific version is requested.
+     @@Return:
+        @@@Type:  
+          DOMMain:DOMObject
+        @@@enDesc:
+          An object implementing the specialized interfaces.
+          Note that the specialized object may or may not
+          implement the <IF::Node> interface.
+        @@@nullCase:
+          @@@@enDesc:
+            There is no object available that implements
+            the specialized interfaces.
+        @@@PerlDef:
+            $feature =~ s/^\+//;
+            if ($Message::DOM::ClassFeature{ref $self}->{$feature}->{$version}) {
+              ## This class
+              $r = $self;
+            } else {
+              ## Document type dependent classes
+                ## TODO:
+              ## Document type independent classes
+              CLASS: for my $class (grep {
+                $Message::DOM::ManakaiDOMDocumentType::CompatClass{$_}
+              } keys %Message::DOM::ManakaiDOMDocumentType::CompatClass) {
+                if ($Message::DOM::ClassFeature{$class}
+                            ->{$feature}->{$version}) {
+                  $r = $self->{<Q::TreeCore:node>}
+                            -><M::ManakaiDOM:ManakaiDOMNodeObject
+                                       ::ManakaiDOM:Perl.newReference> ($class);
+                  last CLASS;
+                }
+              }
+            }
+##DocumentType
 
 IF:
   @Name:  
@@ -1183,7 +1308,71 @@ IF:
          Other available properties: <Q:infoset:declarationBaseURI>, 
          <Q:infoset:publicIdentifier>, <Q:infoset:systemIdentifier>, 
          <Q:DOMCore:read-only>.
-## IF:Notation
+
+  @Method:
+     @@Name:  getFeature
+     @@enDesc:
+       Returns a specialized object that implements the
+       specialized interfaces of the specified feature and version.
+     @@ManakaiDOM:isRedefining:1
+     @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|DOM3
+     @@Param:
+        @@@Name:  feature
+        @@@Type:  
+          DOMMain:DOMString
+        @@@actualType: ManakaiDOM|ManakaiDOMFeatureName
+        @@@enDesc:
+          The feature name to request.
+        @@@InCase:
+          @@@@Label:
+            @@@@@lang:en
+            @@@@@@: 
+              Feature name preceded by a <CHAR::PLUS SIGN>
+          @@@@enDesc:
+            The <CHAR::PLUS SIGN> is ignored.
+     @@Param:
+        @@@Name:  version
+        @@@Type:  
+          DOMMain:DOMString
+        @@@actualType: ManakaiDOM|ManakaiDOMFeatureVersion
+        @@@enDesc:
+          The feature version to request.
+        @@@nullCase:
+          @@@@enDesc:
+            No specific version is requested.
+     @@Return:
+        @@@Type:  
+          DOMMain:DOMObject
+        @@@enDesc:
+          An object implementing the specialized interfaces.
+          Note that the specialized object may or may not
+          implement the <IF::Node> interface.
+        @@@nullCase:
+          @@@@enDesc:
+            There is no object available that implements
+            the specialized interfaces.
+        @@@PerlDef:
+            $feature =~ s/^\+//;
+            if ($Message::DOM::ClassFeature{ref $self}->{$feature}->{$version}) {
+              ## This class
+              $r = $self;
+            } else {
+              ## Notation dependent classes
+                ## TODO:
+              ## Notation independent classes
+              CLASS: for my $class (grep {
+                $Message::DOM::ManakaiDOMNotation::CompatClass{$_}
+              } keys %Message::DOM::ManakaiDOMNotation::CompatClass) {
+                if ($Message::DOM::ClassFeature{$class}
+                            ->{$feature}->{$version}) {
+                  $r = $self->{<Q::TreeCore:node>}
+                            -><M::ManakaiDOM:ManakaiDOMNodeObject
+                                       ::ManakaiDOM:Perl.newReference> ($class);
+                  last CLASS;
+                }
+              }
+            }
+##Notation
 
 IF:
   @Name:  
@@ -1565,7 +1754,71 @@ IF:
          <Q:infoset:version>, <Q:DOMCore:xmlEncoding>,
          <Q:infoset:characterEncodingScheme>,
          <Q:infoset:baseURI>.
-## IF:Entity
+
+  @Method:
+     @@Name:  getFeature
+     @@enDesc:
+       Returns a specialized object that implements the
+       specialized interfaces of the specified feature and version.
+     @@ManakaiDOM:isRedefining:1
+     @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|DOM3
+     @@Param:
+        @@@Name:  feature
+        @@@Type:  
+          DOMMain:DOMString
+        @@@actualType: ManakaiDOM|ManakaiDOMFeatureName
+        @@@enDesc:
+          The feature name to request.
+        @@@InCase:
+          @@@@Label:
+            @@@@@lang:en
+            @@@@@@: 
+              Feature name preceded by a <CHAR::PLUS SIGN>
+          @@@@enDesc:
+            The <CHAR::PLUS SIGN> is ignored.
+     @@Param:
+        @@@Name:  version
+        @@@Type:  
+          DOMMain:DOMString
+        @@@actualType: ManakaiDOM|ManakaiDOMFeatureVersion
+        @@@enDesc:
+          The feature version to request.
+        @@@nullCase:
+          @@@@enDesc:
+            No specific version is requested.
+     @@Return:
+        @@@Type:  
+          DOMMain:DOMObject
+        @@@enDesc:
+          An object implementing the specialized interfaces.
+          Note that the specialized object may or may not
+          implement the <IF::Node> interface.
+        @@@nullCase:
+          @@@@enDesc:
+            There is no object available that implements
+            the specialized interfaces.
+        @@@PerlDef:
+            $feature =~ s/^\+//;
+            if ($Message::DOM::ClassFeature{ref $self}->{$feature}->{$version}) {
+              ## This class
+              $r = $self;
+            } else {
+              ## Entity dependent classes
+                ## TODO:
+              ## Entity independent classes
+              CLASS: for my $class (grep {
+                $Message::DOM::ManakaiDOMEntity::CompatClass{$_}
+              } keys %Message::DOM::ManakaiDOMEntity::CompatClass) {
+                if ($Message::DOM::ClassFeature{$class}
+                            ->{$feature}->{$version}) {
+                  $r = $self->{<Q::TreeCore:node>}
+                            -><M::ManakaiDOM:ManakaiDOMNodeObject
+                                       ::ManakaiDOM:Perl.newReference> ($class);
+                  last CLASS;
+                }
+              }
+            }
+##Entity
 
 IF:
   @Name:  
@@ -2030,6 +2283,71 @@ IF:
          \
          Other available properties: <Q:infoset:baseURI>, 
          <Q:DOMCore:read-only>, <Q:infoset:parent>, <Q:infoset:content>.
-## IF:ProcessingInstruction
+
+  @Method:
+     @@Name:  getFeature
+     @@enDesc:
+       Returns a specialized object that implements the
+       specialized interfaces of the specified feature and version.
+     @@ManakaiDOM:isRedefining:1
+     @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|DOM3
+     @@Param:
+        @@@Name:  feature
+        @@@Type:  
+          DOMMain:DOMString
+        @@@actualType: ManakaiDOM|ManakaiDOMFeatureName
+        @@@enDesc:
+          The feature name to request.
+        @@@InCase:
+          @@@@Label:
+            @@@@@lang:en
+            @@@@@@: 
+              Feature name preceded by a <CHAR::PLUS SIGN>
+          @@@@enDesc:
+            The <CHAR::PLUS SIGN> is ignored.
+     @@Param:
+        @@@Name:  version
+        @@@Type:  
+          DOMMain:DOMString
+        @@@actualType: ManakaiDOM|ManakaiDOMFeatureVersion
+        @@@enDesc:
+          The feature version to request.
+        @@@nullCase:
+          @@@@enDesc:
+            No specific version is requested.
+     @@Return:
+        @@@Type:  
+          DOMMain:DOMObject
+        @@@enDesc:
+          An object implementing the specialized interfaces.
+          Note that the specialized object may or may not
+          implement the <IF::Node> interface.
+        @@@nullCase:
+          @@@@enDesc:
+            There is no object available that implements
+            the specialized interfaces.
+        @@@PerlDef:
+            $feature =~ s/^\+//;
+            if ($Message::DOM::ClassFeature{ref $self}->{$feature}->{$version}) {
+              ## This class
+              $r = $self;
+            } else {
+              ## Target dependent classes
+                ## TODO:
+              ## Target independent classes
+              CLASS: for my $class (grep {
+                $Message::DOM::ManakaiDOMProcessingInstruction::CompatClass{$_}
+              } keys %Message::DOM::ManakaiDOMProcessingInstruction::CompatClass
+              ) {
+                if ($Message::DOM::ClassFeature{$class}
+                            ->{$feature}->{$version}) {
+                  $r = $self->{<Q::TreeCore:node>}
+                            -><M::ManakaiDOM:ManakaiDOMNodeObject
+                                       ::ManakaiDOM:Perl.newReference> ($class);
+                  last CLASS;
+                }
+              }
+            }
+##ProcessingInstruction
 
 ## DOMXML.dis ends here

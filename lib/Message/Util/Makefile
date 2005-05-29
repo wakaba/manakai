@@ -47,15 +47,21 @@ DIS_FILES = $(BOOT_DIS_FILES) DIS/DISDoc.dis
 
 BOOT_GENERATED_FILES = base.dac min.dac ManakaiNode.pm DIS.pm PerlCode.pm \
   Error/DOMException.pm
-GENERATED_FILES = $(BOOT_GENERATED_FILES) all.dac DIS/DISDoc.pm
+GENERATED_FILES = $(BOOT_GENERATED_FILES) allbase.dac all.dac DIS/DISDoc.pm
 
 all: $(GENERATED_FILES)
 
 boot: $(BOOT_GENERATED_FILES)
 
-all.dac: min.dac $(DIS_FILES) $(DAC_PL) \
+all.dac: allbase.dac $(DIS_FILES) $(DAC_PL) \
   $(MANAKAI_LIB_DIR)manakai/NaturalLanguage.dis
 	$(DAC)$@ --input-db-file-name="$<" DIS/DISDoc.dis
+
+allbase.dac: min.dac $(DAC_PL) \
+  $(MANAKAI_LIB_DIR)Message/DOM/DOMHTML.dis \
+  $(MANAKAI_LIB_DIR)Message/DOM/DOMWebForms.dis
+	$(DAC)$@ --input-db-file-name="$<" \
+	  $(MANAKAI_LIB_DIR)Message/DOM/DOMHTML.dis
 
 min.dac: base.dac $(BOOT_DIS_FILES) $(DAC_PL)
 	$(DAC)$@ --input-db-file-name="$<" DIS.dis

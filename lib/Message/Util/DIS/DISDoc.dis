@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/05/28 13:38:45 $
+      $Date: 2005/05/29 12:56:35 $
     @@ContentType:
       dis:Date.RCS
   
@@ -112,9 +112,11 @@ Namespace:
   @xhtml1:
     http://www.w3.org/1999/xhtml
   @xhtml2:
-    http://www.w3.org/2002/06/xhtml2
+    http://www.w3.org/2002/06/xhtml2/
   @xml:
     http://www.w3.org/XML/1998/namespace
+  @xmlns:
+    http://www.w3.org/2000/xmlns/
 
 ## -- Features
 
@@ -346,7 +348,9 @@ IFClassDef:
             if ($fn) {
               $r = $fn-><M::DIS:ManakaiDISElement.getFeature> (<Q::DIS:Doc>)
                       -><M::ManakaiDISElementDISDoc.getDISDocTree>
-                              ($ownerDocumentArg, <Q::lang:disdocInline>);
+                              ($ownerDocumentArg, <Q::lang:disdocInline>,
+                               for_arg => $self->{o}->{for},
+                               forp_arg => $self->{o}->{forp});
             }
           }
         }__;
@@ -408,7 +412,9 @@ IFClassDef:
                                       .selectDISElement> ($els);
               next unless $el;
               my $elr = $el-><M::ManakaiDISElementDISDoc.getDISDocTree>
-                              ($ownerDocumentArg, <Q::lang:disdoc>);
+                              ($ownerDocumentArg, <Q::lang:disdoc>,
+                               for_arg => $self->{o}->{for},
+                               forp_arg => $self->{o}->{forp});
               if ($elr) {
                 if ($r) {
                   $r-><M::DOMCore:Node||ManakaiDOM|ManakaiDOMLatest
@@ -465,7 +471,9 @@ IFClassDef:
             if ($fn) {
               $r = $fn-><M::DIS:ManakaiDISElement.getFeature> (<Q::DIS:Doc>)
                       -><M::ManakaiDISElementDISDoc.getDISDocTree>
-                              ($ownerDocumentArg, <Q::lang:disdocInline>);
+                              ($ownerDocumentArg, <Q::lang:disdocInline>,
+                               for_arg => $self->{o}->{for},
+                               forp_arg => $self->{o}->{forp});
             }
           }
         }__;
@@ -581,14 +589,14 @@ IFClassDef:
       of this element.
     @@Type: DIS|AnyURI
     @@Param:
-      @@Name: defaultLangURI
-      @@Type: DIS|AnyURI
-      @@enDesc:
+      @@@Name: defaultLangURI
+      @@@Type: DIS|AnyURI
+      @@@enDesc:
         The language tag URI reference of the default language.
         It is considered as the element language if the element
         does not have the language information.
-      @@nullCase:
-        @@@enDesc:
+      @@@nullCase:
+        @@@@enDesc:
           No default language information.
     @@ForParam:
     @@ForpParam:
@@ -631,14 +639,14 @@ IFClassDef:
       of this element.
     @@Type: DIS|AnyURI
     @@Param:
-      @@Name: defaultScriptURI
-      @@Type: DIS|AnyURI
-      @@enDesc:
+      @@@Name: defaultScriptURI
+      @@@Type: DIS|AnyURI
+      @@@enDesc:
         The script tag URI reference of the default script.
         It is considered as the element script if the element
         does not have the script information.
-      @@nullCase:
-        @@@enDesc:
+      @@@nullCase:
+        @@@@enDesc:
           No default script information.
     @@ForParam:
     @@ForpParam:
@@ -677,26 +685,26 @@ IFClassDef:
       \
       }
     @@Param:
-      @@Name: langURI
-      @@Type: DIS|AnyURI
-      @@enDesc:
+      @@@Name: langURI
+      @@@Type: DIS|AnyURI
+      @@@enDesc:
         The language tag URI reference of the language to compare. 
     @@Param:
-      @@Name: defaultLangURI
-      @@Type: DIS|AnyURI
-      @@enDesc:
+      @@@Name: defaultLangURI
+      @@@Type: DIS|AnyURI
+      @@@enDesc:
         The language tag URI reference of the default language.
         It is considered as the element language if the element
         does not have the language information.
-      @@nullCase:
-        @@@enDesc: No default language.
+      @@@nullCase:
+        @@@@enDesc: No default language.
     @@ForParam:
     @@ForpParam:
     @@Return:
-      @@Type: DOMMain|boolean||ManakaiDOM|all
-      @@enDesc:
+      @@@Type: DOMMain|boolean||ManakaiDOM|all
+      @@@enDesc:
         Whether the <P::langURI> matches to the language of this element. 
-      @@PerlDef:
+      @@@PerlDef:
         if (defined $langURI) {
           __DEEP{
             my $ct = $self-><M::ManakaiDISElementDISDoc.languageURI>
@@ -710,7 +718,7 @@ IFClassDef:
                                  -><AG::DIS|ManakaiDISDocument.disDatabase>
                                  -><M::DIS|ManakaiDISDatabase.getResource> ($ct);
               $res-><AS::DIS|ManakaiDISResourceDefinition.isReferred> ($self);
-              unless ($res-><M::ManakaiDISResourceDefinition
+              unless ($res-><M::DIS:ManakaiDISResourceDefinition
                                                .isSubsetOfURI> ($langURI)) {
                 $r = false;
               } else {
@@ -733,27 +741,27 @@ IFClassDef:
       \
       }
     @@Param:
-      @@Name: scriptURI
-      @@Type: DIS|AnyURI
-      @@enDesc:
+      @@@Name: scriptURI
+      @@@Type: DIS|AnyURI
+      @@@enDesc:
         The script tag URI reference of the script to compare. 
     @@Param:
-      @@Name: defaultScriptURI
-      @@Type: DIS|AnyURI
-      @@enDesc:
+      @@@Name: defaultScriptURI
+      @@@Type: DIS|AnyURI
+      @@@enDesc:
         The script tag URI reference of the default script.
         It is considered as the element script if the element
         does not have the script information.
-      @@nullCase:
-        @@@enDesc:
+      @@@nullCase:
+        @@@@enDesc:
           No default script information.
     @@ForParam:
     @@ForpParam:
     @@Return:
-      @@Type: DOMMain|boolean||ManakaiDOM|all
-      @@enDesc:
+      @@@Type: DOMMain|boolean||ManakaiDOM|all
+      @@@enDesc:
         Whether the <P::scriptURI> matches to the script of this element.
-      @@PerlDef:
+      @@@PerlDef:
         if (defined $scriptURI) {
           __DEEP{
             my $ct = $self-><M::ManakaiDISElementDISDoc.scriptURI>
@@ -767,7 +775,7 @@ IFClassDef:
                                  -><AG::DIS|ManakaiDISDocument.disDatabase>
                                  -><M::DIS|ManakaiDISDatabase.getResource> ($ct);
               $res-><AS::DIS|ManakaiDISResourceDefinition.isReferred> ($self);
-              unless ($res-><M::ManakaiDISResourceDefinition
+              unless ($res-><M::DIS:ManakaiDISResourceDefinition
                                                .isSubsetOfURI> ($scriptURI)) {
                 $r = false;
               } else {
@@ -795,6 +803,8 @@ IFClassDef:
         @@@@enDesc:
           The <QUOTE::disdoc> documentation language, i.e. <Q::lang:disdoc>,
           is the default of the default.
+    @@ForParam:
+    @@ForpParam:
     @@Return:
       @@@Type: DocumentFragment
       @@@enDesc:
@@ -814,7 +824,7 @@ IFClassDef:
                                 (<Q::lang:disdoc>)) {
             my $doc = $ownerDocumentArg-><M::Node.getFeature> (<Q::DIS|Doc>);
             $r = $doc-><M::ManakaiDOMDocumentDISDoc.parseDISDocText>
-                         ($self-><M::SWCFGNode.value>,
+                         ($self, $self-><M::SWCFGNode.value>,
                           node => $self,
                           language_uri => $self-><M::ManakaiDISElementDISDoc
                              .languageURI> (null, for_arg => $forArg,
@@ -826,7 +836,7 @@ IFClassDef:
                                 (<Q::lang:disdocInline>)) {
             my $doc = $ownerDocumentArg-><M::Node.getFeature> (<Q::DIS|Doc>);
             $r = $doc-><M::ManakaiDOMDocumentDISDoc.parseDISDocInlineText>
-                             ($self-><M::SWCFGNode.value>,
+                             ($self, $self-><M::SWCFGNode.value>,
                           node => $self,
                           language_uri => $self-><M::ManakaiDISElementDISDoc
                              .languageURI> (null, for_arg => $forArg,
@@ -872,7 +882,7 @@ IFClassDef:
           my $ddid = $self-><M::DIS|ManakaiDISElement.disGetAttribute>
                                   (<Q::dd:id>, for_arg => $forArg, 
                                    forp_arg => $forpArg);
-          my $ddidv = $ddid ? $ddidv-><M::SWCFGNode.value> : 0;
+          my $ddidv = $ddid ? $ddid-><M::SWCFGNode.value> : 0;
           if ($ddidv) {
             for my $__uri ($ddidv, $eturi) {
               $__uri =~ s{([^0-9A-Za-z:;?=_.~/-])}{sprintf '%%%02X', ord $1}ge;
@@ -1019,6 +1029,8 @@ IFClassDef:
   @IFQName: DocumentDISDoc
   @ClsQName: ManakaiDOMDocumentDISDoc
 
+  @ClsISA: DOMCore|ManakaiDOMDocument||ManakaiDOM|ManakaiDOMLatest
+
   @DOMMetaImpl:provideFeature:
     @@@: DIS|Doc20
     @@DOMMetaImpl:providedThrough: DIS|ManakaiDISImplementation
@@ -1093,6 +1105,7 @@ IFClassDef:
           An illegular element type name is specified.
       @@@PerlDef:
       __DEEP{
+        my $ownerDocumentArg = $self;
         $sourceText =~ s/\x0D\x0A/\x0A/g;
         $sourceText =~ tr/\x0D/\x0A/;
         my @s = split /\x0A[\x09\x20]*(?:(?:\x0A[\x09\x20]*)+|(?=[\{\}]))/x,
@@ -1120,23 +1133,25 @@ IFClassDef:
                                                             => $languageURI);
             }
           }
-          if (defined $scriptURI) {
-            $root-><M::Element.setAttributeNS> (<Q::script:>, 'script:script'
+        } elsif (defined $languageURI) {
+          $root-><M::Element.setAttributeNS> (<Q::script:>, 'script:lang'
+                                                              => $languageURI);
+        }
+        if (defined $scriptURI) {
+          $root-><M::Element.setAttributeNS> (<Q::script:>, 'script:script'
                                                               => $scriptURI);
-          }
         }
         $root-><M::Element.setAttributeNS>
                            (<Q::ddel:>, 'ddel:mmParsed' => true);
 
         my $current = $root;
-        my @lextype = ('');
         for my $s (@s) {
           if ($s =~ s/^\{([0-9A-Za-z:|._\@^\s-]+)::\s*//x) { ## Start tag
             my ($type, $lang, $script) = split /\s*\@\s*/, $1, 3;
-            my ($etype, $ltype) = split /\s*^^\s*/, $type, 2;
+            my ($etype, $ltype) = split /\s*\^\^\s*/, $type, 2;
             my ($nsp, $ln, $ns) = split /\s*[:|]\s*/, $etype, 2;
             if (defined $ln) {
-              $ns = $namespaceContext-><M::DISDocNamespaceContext
+              $ns = $namespaceContext-><M::DISDocNamespaceResolver
                                            .lookupNamespaceURI> ($nsp);
               unless (defined $ns) {
                 __UNDEEP{__EXCEPTION{DIS:UNDECLARED_NS_PREFIX_ERR::
@@ -1144,15 +1159,18 @@ IFClassDef:
                   DIS:sourceNode => {$node},
                 }__}__;
               }
+              $nsp .= ':';
             } else {
               $ln = $nsp;
-              $ns = $namespaceContext-><AG::DISDocNamespaceContext
+              $ns = $namespaceContext-><AG::DISDocNamespaceResolver
                                            .defaultDISDocElementNamespaceURI>;
+              $nsp = '';
             }
+            my $ltypenode;
             if (defined $ltype) {
               my ($lnsp, $lln, $lns) = split /\s*[:|]\s*/, $ltype, 2;
               if (defined $lln) {
-                $lns = $namespaceContext-><M::DISDocNamespaceContext
+                $lns = $namespaceContext-><M::DISDocNamespaceResolver
                                              .lookupNamespaceURI> ($lnsp);
                 unless (defined $lns) {
                   __UNDEEP{__EXCEPTION{DIS:UNDECLARED_NS_PREFIX_ERR::
@@ -1162,15 +1180,12 @@ IFClassDef:
                 }
               } else {
                 $lln = $lnsp;
-                $lns = $namespaceContext-><AG::DISDocNamespaceContext
+                $lns = $namespaceContext-><AG::DISDocNamespaceResolver
                                              .defaultDISDocElementNamespaceURI>;
               }
-              push @lextype, $lns.$lln;
-              $current-><M::Element.setAttributeNS>
-                             (<Q::ddel:>, 'ddel:lexType' => $lextype[-1]);
-            } else { # No explicit lextype
-              push @lextype, {
-              }->{$ns.$ln} || '';
+              $ltypenode = $ownerDocumentArg-><M::Document.createAttributeNS>
+                             (<Q::ddel:>, 'ddel:lexType');
+              $ltypenode-><AS::Node.textContent> ($lns.$lln);
             }
             my $this;
             if ($ns eq <Q::ddel:> and ($ln eq 'LI' or $ln eq 'OLI')) {
@@ -1180,14 +1195,14 @@ IFClassDef:
                 $current = $current-><M::Node.appendChild>
                               ($ownerDocumentArg-><M::Document.createElementNS>
                                   (<Q::xhtml2:>, 
-                                   {LI => 'ul',
-                                    OLI => 'ol'}->{$ln} || 'ul'));
+                                   {LI => 'h2:ul',
+                                    OLI => 'h2:ol'}->{$ln} || 'h2:ul'));
                 $current-><M::Element.setAttributeNS>
                                   (<Q::ddel:>, 'ddel:tag' => 'implied');
               }
               $this = $current = $current-><M::Node.appendChild>
                   ($ownerDocumentArg-><M::Document.createElementNS>
-                              (<Q::xhtml2:>, 'li'));
+                              (<Q::xhtml2:>, 'h2:li'));
               $current-><M::Element.setAttributeNS>
                             (<Q::ddel:>, 'ddel:ordered' => true) if $ln eq 'OLI';
               $current-><M::Element.setAttributeNS>
@@ -1197,10 +1212,10 @@ IFClassDef:
               if ($s =~ s/^(.*)::://s) {
                 my $m = $current-><M::Node.appendChild>
                      ($ownerDocumentArg-><M::Document.createElementNS>
-                                  (<Q::ddel:>, 'ddel:listMarker'))
+                                  (<Q::ddel:>, 'ddel:listMarker'));
                 $m-><M::Node.appendChild>
                          ($self-><M::DocumentDISDoc.parseDISDocInlineText>
-                           ($ownerDocumentArg, $namespaceContext, $1,
+                           ($namespaceContext, $1,
                             node => $node, language_uri => null,
                             script_uri => null));
                 $m-><M::Element.setAttributeNS>
@@ -1208,10 +1223,10 @@ IFClassDef:
               }
               $current = $current-><M::Node.appendChild>
                      ($ownerDocumentArg-><M::Document.createElementNS>
-                                  (<Q::ddel:>, 'ddel:listContent'))
-                      -><M::Node.appendChild>
+                                  (<Q::ddel:>, 'ddel:listContent'));
+              $current-><M::Node.appendChild>
                        ($self-><M::DocumentDISDoc.parseDISDocInlineText>
-                         ($ownerDocumentArg, $namespaceContext, $s,
+                         ($namespaceContext, $s,
                           node => $node, language_uri => null,
                           script_uri => null));
               $current-><M::Element.setAttributeNS>
@@ -1220,7 +1235,7 @@ IFClassDef:
               if ($current-><AG::Node.namespaceURI> eq <Q::xhtml2:> and
                   ($current-><AG::Node.localName> eq 'ul' or
                    $current-><AG::Node.localName> eq 'li') and
-                  $current-><M::Node.getAttributeNS>
+                  $current-><M::Element.getAttributeNS>
                                           (<Q::ddel:>, 'tag') eq 'implied') {
                 $current = $current-><AG::Node.parentNode>;
               }
@@ -1231,21 +1246,24 @@ IFClassDef:
                                  <Q::ddel:P> => <Q::xhtml2:>,
                                }->{$ns.$ln} || $ns,
                                {
-                                 <Q::ddel:NOTE> => 'note',
-                                 <Q::ddel:P> => 'p',
-                               }->{$ln.$ln} || $ln));
+                                 <Q::ddel:NOTE> => 'H3:note',
+                                 <Q::ddel:P> => 'h2:p',
+                               }->{$ln.$ln} || $nsp.$ln));
               $current-><M::Element.setAttributeNS>
                               (<Q::ddel:>, 'ddel:tag' => 'block');
               $current-><M::Node.appendChild>
                      ($self-><M::DocumentDISDoc.parseDISDocInlineText>
-                       ($ownerDocumentArg, $namespaceContext, $s,
+                       ($namespaceContext, $s,
                         node => $node, language_uri => null,
                         script_uri => null));
+            }
+            if ($ltypenode) {
+              $this-><M::Element.setAttributeNodeNS> ($ltypenode);
             }
             if ($lang) {
               my ($nsp, $ln, $ns) = split /\s*[:|]\s*/, $lang, 2;
               if (defined $ln) {
-                $ns = $namespaceContext-><M::DISDocNamespaceContext
+                $ns = $namespaceContext-><M::DISDocNamespaceResolver
                                            .lookupNamespaceURI> ($nsp);
                 unless (defined $ns) {
                   __UNDEEP{__EXCEPTION{DIS:UNDECLARED_NS_PREFIX_ERR::
@@ -1262,13 +1280,13 @@ IFClassDef:
                                  (<Q::xml:>, 'xml:lang' => $ln);
               } else {
                 $this-><M::Element.setAttributeNS>
-                                 (<Q::script:>, 'script:lang' => $ln);
+                                 (<Q::script:>, 'script:lang' => $ns.$ln);
               }
             }
             if ($script) {
               my ($nsp, $ln, $ns) = split /\s*[:|]\s*/, $script, 2;
               if (defined $ln) {
-                $ns = $namespaceContext-><M::DISDocNamespaceContext
+                $ns = $namespaceContext-><M::DISDocNamespaceResolver
                                            .lookupNamespaceURI> ($nsp);
                 unless (defined $ns) {
                   __UNDEEP{__EXCEPTION{DIS:UNDECLARED_NS_PREFIX_ERR::
@@ -1281,7 +1299,7 @@ IFClassDef:
                 $ns = <Q::script:>;
               }
               $this-><M::Element.setAttributeNS>
-                                 (<Q::script:>, 'script:script' => $ln);
+                                 (<Q::script:>, 'script:script' => $ns.$ln);
             }
           } elsif ($s =~ /^\s*\}\s*$/) { ## End tag
             while ($current-><M::Element.getAttributeNS>
@@ -1297,85 +1315,84 @@ IFClassDef:
               $current = $current-><M::Node.appendChild>
                               ($ownerDocumentArg-><M::Document.createElementNS>
                                   (<Q::xhtml2:>, 
-                                   {'-' => 'ul',
-                                    '=' => 'ol'}->{$marker} || 'ul'));
+                                   {'-' => 'h2:ul',
+                                    '=' => 'h2:ol'}->{$marker} || 'h2:ul'));
               $current-><M::Element.setAttributeNS>
                                   (<Q::ddel:>, 'ddel:tag' => 'implied');
             }
             my $li = $current-><M::Node.appendChild>
                           ($ownerDocumentArg-><M::Document.createElementNS>
-                             (<Q::xhtml2:>, 'li'));
+                             (<Q::xhtml2:>, 'h2:li'));
             $li-><M::Element.setAttributeNS>
                           (<Q::ddel:>, 'ddel:ordered' => true) if $marker eq '=';
-            $li-><M::Node.setAttributeNS>
+            $li-><M::Element.setAttributeNS>
                                 (<Q::ddel:>, 'ddel:tag' => 'implied');
-            $li-><M::Node.setAttributeNS>
+            $li-><M::Element.setAttributeNS>
                                 (<Q::ddel:>, 'ddel:mmParsed' => true);
             if ($s =~ s/^(.*)::://s) {
               my $m = $li-><M::Node.appendChild>
                      ($ownerDocumentArg-><M::Document.createElementNS>
-                                  (<Q::ddel:>, 'ddel:listMarker'))
+                                  (<Q::ddel:>, 'ddel:listMarker'));
               $m-><M::Node.appendChild>
                          ($self-><M::DocumentDISDoc.parseDISDocInlineText>
-                           ($ownerDocumentArg, $namespaceContext, $1,
+                           ($namespaceContext, $1,
                             node => $node, language_uri => null,
                             script_uri => null));
               $m-><M::Element.setAttributeNS>
                               (<Q::ddel:>, 'ddel:tag' => 'implied');
             }
-            $li = $li-><M::Node.appendChild>
+            my $lc = $li-><M::Node.appendChild>
                      ($ownerDocumentArg-><M::Document.createElementNS>
-                                  (<Q::ddel:>, 'ddel:listContent'))
-                   -><M::Node.appendChild>
+                                  (<Q::ddel:>, 'ddel:listContent'));
+            $lc-><M::Node.appendChild>
                        ($self-><M::DocumentDISDoc.parseDISDocInlineText>
-                         ($ownerDocumentArg, $namespaceContext, $s,
+                         ($namespaceContext, $s,
                           node => $node, language_uri => null,
                           script_uri => null));
-            $li-><M::Element.setAttributeNS>
+            $lc-><M::Element.setAttributeNS>
                               (<Q::ddel:>, 'ddel:tag' => 'implied');
           } else {
             ## /^\s*[^\w\s<]/ is reserved for future extensions
             if ($current-><AG::Node.namespaceURI> eq <Q::xhtml2:> and
                 ($current-><AG::Node.localName> eq 'ul' or
                  $current-><AG::Node.localName> eq 'li') and
-                $current-><M::Node.getAttributeNS>
+                $current-><M::Element.getAttributeNS>
                                           (<Q::ddel:>, 'tag') eq 'implied') {
               $current = $current-><AG::Node.parentNode>;
             }
             my $p = $current-><M::Node.appendChild>
                           ($ownerDocumentArg-><M::Document.createElementNS>
-                             (<Q::xhtml2:>, 'p'));
-            $p-><M::Node.setAttributeNS>
+                             (<Q::xhtml2:>, 'h2:p'));
+            $p-><M::Element.setAttributeNS>
                                 (<Q::ddel:>, 'ddel:tag' => 'implied');
-            $o-><M::Node.appendChild>
+            $p-><M::Node.appendChild>
                        ($self-><M::DocumentDISDoc.parseDISDocInlineText>
-                         ($ownerDocumentArg, $namespaceContext, $s,
+                         ($namespaceContext, $s,
                           node => $node, language_uri => null,
                           script_uri => null));
           }
         } # for
 
-        while ($current-><M::Node.getAttributeNS>
+        while ($current-><M::Element.getAttributeNS>
                                           (<Q::ddel:>, 'tag') eq 'implied') {
           $current = $current-><AG::Node.parentNode>;
         }
-      }__;
 
-      unless ($current eq $root) {
-        __EXCEPTION{DIS|NO_END_TAG_ERR::
-          DIS:elementType => {$current-><AG::Element.namespaceURI> .
-                              $current-><AG::Element.localName>},
-          DIS:sourceNode => {$node},
-          DIS:sourceCode => {$sourceText},
-        }__;
-      }
+        unless ($current eq $root) {
+          __UNDEEP{__EXCEPTION{DIS|NO_END_TAG_ERR::
+            DIS:elementType => {$current-><AG::Element.namespaceURI> .
+                                $current-><AG::Element.localName>},
+            DIS:sourceNode => {$node},
+            DIS:sourceCode => {$sourceText},
+          }__}__;
+        }
+      }__;
 
   @Method:
     @@Name: parseDISDocInlineText
     @@PerlName: parse_disdoc_inline_text
     @@enDesc:
       Parses a <QUOTE::disdoc> formatted text in the inline-level context.
-    @@OwnerDocArg:
     @@Param:
       @@@Name: namespaceContext
       @@@Type: DISDocNamespaceResolver
@@ -1430,22 +1447,23 @@ IFClassDef:
       @@@PerlDef:
         $sourceText =~ s/^\s+//;
         $sourceText =~ s/\s+$//;
+        my $ownerDocumentArg = $self;
 
         ## Container
-        $r = $ownerDocumentArg-><M::Document.createDocumentFragment>;
+        my $root = $r = $ownerDocumentArg-><M::Document.createDocumentFragment>;
         my $current = $r;
 
         ## Language
+        if (defined $languageURI or defined $scriptURI) {
+          $root = $current = $r-><M::Node.appendChild>
+                             ($ownerDocumentArg-><M::Document.createElementNS>
+                                 (<Q::xhtml1:>, 'div'));
+          $current-><M::Element.setAttributeNS>
+                             (null, class => 'disdoc-inline');
+        }
         if ($node) {
           my $db = $node-><AG::DIS|ManakaiDISNode.ownerDISDocument>
                         -><AG::DIS|ManakaiDISDocument.disDatabase>;
-          if (defined $languageURI or defined $scriptURI) {
-            $current = $r-><M::Node.appendChild>
-                             ($ownerDocumentArg-><M::Document.createElementNS>
-                                 (<Q::xhtml2:>, 'div'));
-            $current-><M::Element.setAttributeNS>
-                             (null, class => 'disdoc-inline');
-          }
           if (defined $languageURI) {
             my $lang = $db-><M::DIS|ManakaiDISDatabase
                                .getResource> ($languageURI);
@@ -1461,13 +1479,17 @@ IFClassDef:
                                                             => $languageURI);
             }
           }
-          if (defined $scriptURI) {
-            $current-><M::Element.setAttributeNS> (<Q::script:>, 'script:script'
+        } elsif (defined $languageURI) {
+          $current-><M::Element.setAttributeNS> (<Q::script:>, 'script:lang'
+                                                              => $languageURI);
+        }
+        if (defined $scriptURI) {
+          $current-><M::Element.setAttributeNS> (<Q::script:>, 'script:script'
                                                               => $scriptURI);
-          }
         }
         
         __DEEP{
+          my @lextype = ('');
           while (CORE::length $sourceText) {
             if ($sourceText =~ s/^([^<>]+)//) {
               $current-><M::Node.appendChild>
@@ -1482,11 +1504,11 @@ IFClassDef:
                               }->{$1}));
             } elsif ($sourceText =~ s/^<([0-9A-Za-z_.:|\@\s-]+):://) {
               my ($type, $lang, $script) = split /\s*\@\s*/, $1, 3;
-              my ($etype, $ltype) = split /\s*^^\s*/, $type, 2;
+              my ($etype, $ltype) = split /\s*\^\^\s*/, $type, 2;
 
               my ($nsp, $ln, $ns) = split /\s*[:|]\s*/, $etype, 2;
               if (defined $ns) {
-                $ns = $namespaceContext-><M::DISDocNamespaceContext
+                $ns = $namespaceContext-><M::DISDocNamespaceResolver
                                            .lookupNamespaceURI> ($nsp);
                 unless (defined $ns) {
                   __UNDEEP{__EXCEPTION{DIS:UNDECLARED_NS_PREFIX_ERR::
@@ -1494,10 +1516,12 @@ IFClassDef:
                     DIS:sourceNode => {$node},
                   }__}__;
                 }
+                $nsp .= ':';
               } else {
                 $ln = $nsp;
-                $ns = $namespaceContext-><AG::DISDocNamespaceContext
+                $ns = $namespaceContext-><AG::DISDocNamespaceResolver
                                            .defaultDISDocElementNamespaceURI>;
+                $nsp = '';
               }
 
               $current = $current-><M::Node.appendChild>
@@ -1519,12 +1543,12 @@ IFClassDef:
                                    <Q::ddel:KEY> => 'key',
                                    <Q::ddel:QUOTE> => 'q',
                                    <Q::ddel:SRC> => 'src',
-                                 }->{$ns.$ln} || $ln));
+                                 }->{$ns.$ln} || $nsp.$ln));
               
               if (defined $ltype) {
                 my ($lnsp, $lln, $lns) = split /\s*[:|]\s*/, $ltype, 2;
                 if (defined $lln) {
-                  $lns = $namespaceContext-><M::DISDocNamespaceContext
+                  $lns = $namespaceContext-><M::DISDocNamespaceResolver
                                                .lookupNamespaceURI> ($lnsp);
                   unless (defined $lns) {
                     __UNDEEP{__EXCEPTION{DIS:UNDECLARED_NS_PREFIX_ERR::
@@ -1534,7 +1558,7 @@ IFClassDef:
                   }
                 } else {
                   $lln = $lnsp;
-                  $lns = $namespaceContext-><AG::DISDocNamespaceContext
+                  $lns = $namespaceContext-><AG::DISDocNamespaceResolver
                                              .defaultDISDocElementNamespaceURI>;
                 }
                 push @lextype, $lns.$lln;
@@ -1556,12 +1580,18 @@ IFClassDef:
                   <Q::ddel:XA> => <Q::DISCore:NCNameOrQName>,
                   <Q::ddel:XE> => <Q::DISCore:NCNameOrQName>,
                 }->{$ns.$ln} || '';
+                if ($lextype[-1] ne '') {
+                  $current-><M::Element.setAttributeNS>
+                               (<Q::ddel:>, 'ddel:lexType' => $lextype[-1]);
+                  $current-><M::Element.setAttributeNS>
+                               (<Q::ddel:>, 'ddel:lexTypeImplied' => true);
+                }
               }
 
               if ($lang) {
                 my ($nsp, $ln, $ns) = split /\s*[:|]\s*/, $lang, 2;
                 if (defined $ln) {
-                  $ns = $namespaceContext-><M::DISDocNamespaceContext
+                  $ns = $namespaceContext-><M::DISDocNamespaceResolver
                                              .lookupNamespaceURI> ($nsp);
                   unless (defined $ns) {
                     __UNDEEP{__EXCEPTION{DIS:UNDECLARED_NS_PREFIX_ERR::
@@ -1574,17 +1604,18 @@ IFClassDef:
                   $ns = <Q::ilang:>;
                 }
                 if ($ns eq <Q::ilang:>) {
-                  $this-><M::Element.setAttributeNS>
+                  $current-><M::Element.setAttributeNS>
                                    (<Q::xml:>, 'xml:lang' => $ln);
                 } else {
-                  $this-><M::Element.setAttributeNS>
-                                   (<Q::script:>, 'script:lang' => $ln);
+                  ## TODO: set xml:lang to UND(?)
+                  $current-><M::Element.setAttributeNS>
+                                   (<Q::script:>, 'script:lang' => $ns.$ln);
                 }
               }
               if ($script) {
                 my ($nsp, $ln, $ns) = split /\s*[:|]\s*/, $script, 2;
                 if (defined $ln) {
-                  $ns = $namespaceContext-><M::DISDocNamespaceContext
+                  $ns = $namespaceContext-><M::DISDocNamespaceResolver
                                              .lookupNamespaceURI> ($nsp);
                   unless (defined $ns) {
                     __UNDEEP{__EXCEPTION{DIS:UNDECLARED_NS_PREFIX_ERR::
@@ -1596,32 +1627,120 @@ IFClassDef:
                   $ln = $nsp;
                   $ns = <Q::script:>;
                 }
-                $this-><M::Element.setAttributeNS>
-                                   (<Q::script:>, 'script:script' => $ln);
+                $current-><M::Element.setAttributeNS>
+                                   (<Q::script:>, 'script:script' => $ns.$ln);
               }
             } elsif ($sourceText =~ s/^>//) { ## End tag
+              my $lextype = pop @lextype;
+              if ($lextype eq <Q::dis:TypeQName>) {
+                my @children = @{$current-><AG::Node.childNodes>};
+                if (@children == 1 and
+                    (my $c = $children[0])-><AG::Node.nodeType>
+                          == <C::Node.TEXT_NODE>) {
+                  my ($pfx, $ln) = split /\s*[:|]\s*/,
+                                        $c-><AG::Node.textContent>, 2;
+                  $pfx =~ s/^\s+//; $ln =~ s/\s+$// if defined $ln;
+                  if (defined $ln) {
+                    my $ns = $namespaceContext-><M::DISDocNamespaceResolver
+                                             .lookupNamespaceURI> ($pfx);
+                    if (defined $ns) {
+                      $current-><M::Element.setAttributeNS>
+                                   (<Q::xmlns:>, 'xmlns:'.$pfx => $ns);
+                    }
+                    $current-><M::Node.insertBefore>
+                       ($ownerDocumentArg-><M::Document.createElementNS>
+                           (<Q::ddel:>, 'ddel:prefix'), $c)
+                            -><AS::Node.textContent> ($pfx);
+                    $c-><AS::Node.textContent> (':');
+                    $current-><M::Node.appendChild>
+                       ($ownerDocumentArg-><M::Document.createElementNS>
+                           (<Q::ddel:>, 'ddel:localName'))
+                            -><AS::Node.textContent> ($ln);
+                  } else {
+                    my $ns = $namespaceContext-><AG::DISDocNamespaceResolver
+                                             .defaultDISDocNamespaceURI>;
+                    if (defined $ns) {
+                      $current-><M::Element.setAttributeNS>
+                                   (<Q::xmlns:>, xmlns => $ns);
+                    }
+                    $current-><M::Node.replaceChild>
+                       (my $p = $ownerDocumentArg-><M::Document.createElementNS>
+                           (<Q::ddel:>, 'ddel:localName'), $c);
+                    $p-><AS::Node.textContent> ($pfx);
+                  }
+                } else {  ## dis:TypeQName with children
+                  my $prefix = $ownerDocumentArg
+                                     -><M::Document.createDocumentFragment>;
+                  my $has_prefix = false;
+                  while (@children) {
+                    my $child = $children[0];
+                    if ($child-><AG::Node.nodeType> == <C::Node.TEXT_NODE>) {
+                      my $cval = $child-><AG::Node.textContent>;
+                      if ($cval =~ s/^(.*?)[:|]\s*//) {
+                        my $bval = $1;
+                        $bval =~ s/\s+$//;
+                        $prefix-><M::Node.appendChild>
+                                 ($ownerDocumentArg-><M::Document.createTextNode>
+                                    ($bval)) if length $bval;
+                        $child-><AS::Node.textContent> ($cval);
+                        $prefix-><M::Node.appendChild> ($child);
+                        $has_prefix = true;
+                        last;
+                      } else {
+                        $prefix-><M::Node.appendChild> ($child);
+                      }
+                    } else {
+                      $prefix-><M::Node.appendChild> ($child);
+                    }
+                  } # while
+                  my $ln = $ownerDocumentArg-><M::Document.createElementNS>
+                                (<Q::ddel:>, 'ddel:localName');
+                  while (@children) {
+                    $ln-><M::Node.appendChild> ($children[0]);
+                  }
+                  if ($has_prefix) {
+                    $current-><M::Node.appendChild>
+                       ($ownerDocumentArg-><M::Document.createElementNS>
+                           (<Q::ddel:>, 'ddel:prefix'))
+                            -><M::Node.appendChild> ($prefix);
+                    $current-><M::Node.appendChild>
+                       ($ownerDocumentArg-><M::Document.createTextNode>
+                           (':'));
+
+                  }
+                  $current-><M::Node.appendChild> ($ln);
+                }
+              } elsif ($lextype eq <Q::DISCore:NamespacePrefix>) {
+                my $pfx = $current-><AG::Node.textContent>;
+                my $ns = $namespaceContext-><M::DISDocNamespaceResolver
+                                             .lookupNamespaceURI> ($pfx);
+                if (defined $ns and length $ns) {
+                  $current-><M::Element.setAttributeNS>
+                                      (<Q::xmlns:>, 'xmlns:'.$pfx => $ns);
+                }
+              }
+
               unless ($current eq $r) {
                 $current = $current-><AG::Node.parentNode>;
               } else {  ## Illegular
                 $current-><M::Node.appendChild>
                         ($ownerDocumentArg-><M::Document.createTextNode> ('>'));
               }
-            ## TODO: lextype parsing
             } elsif ($sourceText =~ s/^(.)//s) { ## Illegular "<" and ">"
               $current-><M::Node.appendChild>
                           ($ownerDocumentArg-><M::Document.createTextNode>
                               ($1));
             }
           } # while
-        }__;
 
-      unless ($current eq $root) {
-        __EXCEPTION{DIS|NO_END_TAG_ERR::
-          DIS:elementType => {$current-><AG::Element.namespaceURI> .
-                              $current-><AG::Element.localName>},
-          DIS:sourceNode => {$node},
+          unless ($current eq $root) {
+            __UNDEEP{__EXCEPTION{DIS|NO_END_TAG_ERR::
+              DIS:elementType => {$current-><AG::Element.namespaceURI> .
+                                  $current-><AG::Element.localName>},
+              DIS:sourceNode => {$node},
+            }__}__;
+          }
         }__;
-      }
 ##DocumentDISDoc
 
 ElementTypeBinding:

@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/05/28 13:38:45 $
+      $Date: 2005/05/29 12:56:35 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2241,7 +2241,10 @@ ClsDef:
                             .plAppendThrow>
                                ($qt, $cls, $const, $subtype,
                                 {%$context_param});
-              $r = $q;
+              my $or = $r;
+              $r = $plimpl-><M::MPLImpl.createPerlBlockContainer>;
+              $r-><M::PLBlockCon.appendCodeFragment> ($or);
+              $r-><M::PLBlockCon.appendCodeFragment> ($q);
             } # Read-only checking
           } elsif ($et eq <Q::DOMMain:raiseException>) {
             my ($cls, $const, $subtype)
@@ -4359,6 +4362,7 @@ ClsDef:
                                     (for_arg => $cls->{for},
                                      forp_arg => $cls->{forp})};
                   if (@ec) {
+                    my $has_through = false;
                     for my $ec (@ec) {
                       next unless $ec-><AG::swcfg21:SWCFGElement
                                           ::swcfg21:ForLatest
@@ -4381,19 +4385,21 @@ ClsDef:
                           ('$Message::DOM::ImplFeature{q<' . $cp .
                            '>}->{q<' . $fname . '>}->{q<>} = 1');
                       }
+                      $has_through = true;
                     }
-                  } else {  ## No DOMMetaImpl:ProvidedThrough attribute
-                    for my $fname (@fname) {
-                      $r-><M::PLBlockCon.appendStatement>
+                    next if $has_through;
+                  }
+                  ## No DOMMetaImpl:ProvidedThrough attribute
+                  for my $fname (@fname) {
+                    $r-><M::PLBlockCon.appendStatement>
                         ('$Message::DOM::ImplFeature{q<' . $pack_name .
                          '>}->{q<' .
                          $fname . '>}->{q<' . $fver . '>} ||= '.$fi);
-                      $r-><M::PLBlockCon.appendStatement>
+                    $r-><M::PLBlockCon.appendStatement>
                         ('$Message::DOM::ImplFeature{q<' . $pack_name .
                          '>}->{q<' . $fname . '>}->{q<>} = 1');
-                    }
                   }
-                }
+                } # for
 
                 my %ifeature;
                 my $ifpoint = 0;
@@ -4607,6 +4613,8 @@ ClsDef:
                           ('$Message::DOM::ManakaiDOMNamespace'.
                            '::CompatClass{q<' . $pack_name . '>} = 1');
                   }
+                  ## NOTE: DOMCore:AnyNodeRole is subset of  
+                  ##       DOMCore:ElementRole and DOMCore:TextRole and ...
 
                   if ($role-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
                                 (<Q::DOMLS:ParserRole>)) {
