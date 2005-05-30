@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/05/29 12:56:35 $
+      $Date: 2005/05/30 12:10:06 $
     @@ContentType:
       dis:Date.RCS
   
@@ -117,6 +117,8 @@ Namespace:
     http://www.w3.org/XML/1998/namespace
   @xmlns:
     http://www.w3.org/2000/xmlns/
+  @xsi:
+    http://www.w3.org/2001/XMLSchema-instance
 
 ## -- Features
 
@@ -1143,10 +1145,12 @@ IFClassDef:
         }
         $root-><M::Element.setAttributeNS>
                            (<Q::ddel:>, 'ddel:mmParsed' => true);
+        $root-><M::Element.setAttributeNS>
+                           (<Q::ddel:>, 'ddel:tag' => 'entity');
 
         my $current = $root;
         for my $s (@s) {
-          if ($s =~ s/^\{([0-9A-Za-z:|._\@^\s-]+)::\s*//x) { ## Start tag
+          if ($s =~ s/^\{([0-9A-Za-z:|._\@^\s-]+?)::\s*//x) { ## Start tag
             my ($type, $lang, $script) = split /\s*\@\s*/, $1, 3;
             my ($etype, $ltype) = split /\s*\^\^\s*/, $type, 2;
             my ($nsp, $ln, $ns) = split /\s*[:|]\s*/, $etype, 2;
@@ -1306,7 +1310,14 @@ IFClassDef:
                                       (<Q::ddel:>, 'tag') eq 'implied') {
               $current = $current-><AG::Node.parentNode>;
             }
-            $current = $current-><AG::Node.parentNode>;
+            if ($current-><M::Element.getAttributeNS>
+                                          (<Q::ddel:>, 'tag') eq 'entity') {
+              ## Broken end tag
+              $current-><M::Node.appendChild>
+                          ($ownerDocumentArg-><M::Document.createTextNode> ($s));
+            } else {
+              $current = $current-><AG::Node.parentNode>;
+            }
           } elsif ($s =~ s/^\s*([-=])\s*//) { ## List
             my $marker = $1;
             unless ($current-><AG::Node.namespaceURI> eq <Q::xhtml2:> and
@@ -1427,6 +1438,21 @@ IFClassDef:
         is contained.
       @@@nullCase:
         @@@@enDesc: No script information.
+    @@NamedParam:
+      @@@Name: defaultNameURI
+      @@@Type: DIS|AnyURI
+      @@@enDesc:
+        The default <QUOTE::name URI> used to interpret <Q::dis:TFQNames>.
+      @@@nullCase:
+        @@@@enDesc: No default name.
+    @@NamedParam:
+      @@@Name: defaultForURI
+      @@@Type: DIS|AnyURI
+      @@@enDesc:
+        The default <QUOTE::for URI> used to interpret <Q::dis:TFQNames>.
+      @@@nullCase:
+        @@@@enDesc:
+          No default <QUOTE::for>.
     @@Return:
       @@@Type: DocumentFragment
       @@@enDesc:
@@ -1458,8 +1484,10 @@ IFClassDef:
           $root = $current = $r-><M::Node.appendChild>
                              ($ownerDocumentArg-><M::Document.createElementNS>
                                  (<Q::xhtml1:>, 'div'));
-          $current-><M::Element.setAttributeNS>
+          $root-><M::Element.setAttributeNS>
                              (null, class => 'disdoc-inline');
+          $root-><M::Element.setAttributeNS>
+                           (<Q::ddel:>, 'ddel:tag' => 'entity');
         }
         if ($node) {
           my $db = $node-><AG::DIS|ManakaiDISNode.ownerDISDocument>
@@ -1502,7 +1530,7 @@ IFClassDef:
                                 '{' => '{', '}' => '}', ':' => ':',
                                 '=' => '=', '-' => '-',
                               }->{$1}));
-            } elsif ($sourceText =~ s/^<([0-9A-Za-z_.:|\@\s-]+):://) {
+            } elsif ($sourceText =~ s/^<([0-9A-Za-z_.:|\@\s-]+?)(?:::|(?=>))//) {
               my ($type, $lang, $script) = split /\s*\@\s*/, $1, 3;
               my ($etype, $ltype) = split /\s*\^\^\s*/, $type, 2;
 
@@ -1631,42 +1659,146 @@ IFClassDef:
                                    (<Q::script:>, 'script:script' => $ns.$ln);
               }
             } elsif ($sourceText =~ s/^>//) { ## End tag
+              if ($current-><AG::Node.nodeType> != <C::Node.ELEMENT_NODE> or
+                  $current-><M::Element.getAttributeNS>
+                                (<Q::ddel:>, 'tag') eq 'entity') {
+                ## Illegal end tag
+                $current-><M::Node.appendChild>
+                         ($ownerDocumentArg-><M::Document.createTextNode> ('>'));
+                next; # while
+              }
               my $lextype = pop @lextype;
-              if ($lextype eq <Q::dis:TypeQName>) {
+              if ($lextype eq <Q::dis:TypeQName> or
+                  $lextype eq <Q::DISCore:NCNameOrQName>) {
                 my @children = @{$current-><AG::Node.childNodes>};
                 if (@children == 1 and
                     (my $c = $children[0])-><AG::Node.nodeType>
                           == <C::Node.TEXT_NODE>) {
-                  my ($pfx, $ln) = split /\s*[:|]\s*/,
-                                        $c-><AG::Node.textContent>, 2;
-                  $pfx =~ s/^\s+//; $ln =~ s/\s+$// if defined $ln;
-                  if (defined $ln) {
+                  my $q = $c-><AG::Node.textContent>;
+                  $current-><M::Node.removeChild> ($c);
+                  __CODE{qnameToElement::
+                    $qname => $q, $namespaceContext => $namespaceContext,
+                    $ownerDocument => $ownerDocumentArg,
+                    $useDefaultNamespace => {$lextype eq <Q::dis:TypeQName>},
+                    $element => $current,
+                  }__;
+                } else {  ## dis:TypeQName with children
+                  my $prefix = $ownerDocumentArg
+                                     -><M::Document.createDocumentFragment>;
+                  my $has_prefix = false;
+                  while (@children) {
+                    my $child = $children[0];
+                    if ($child-><AG::Node.nodeType> == <C::Node.TEXT_NODE>) {
+                      my $cval = $child-><AG::Node.textContent>;
+                      if ($cval =~ s/^(.*?)[:|]\s*//) {
+                        my $bval = $1;
+                        $bval =~ s/\s+$//;
+                        $prefix-><M::Node.appendChild>
+                                 ($ownerDocumentArg-><M::Document.createTextNode>
+                                    ($bval)) if length $bval;
+                        $child-><AS::Node.textContent> ($cval);
+                        $prefix-><M::Node.appendChild> ($child);
+                        $has_prefix = true;
+                        last;
+                      } else {
+                        $prefix-><M::Node.appendChild> ($child);
+                      }
+                    } else {
+                      $prefix-><M::Node.appendChild> ($child);
+                    }
+                  } # while
+                  my $ln = $ownerDocumentArg-><M::Document.createElementNS>
+                                (<Q::ddel:>, 'ddel:localName');
+                  $ln-><M::Element.setAttributeNS>
+                                (<Q::ddel:>, 'ddel:tag' => 'datatag');
+                  while (@children) {
+                    $ln-><M::Node.appendChild> ($children[0]);
+                  }
+                  if ($has_prefix) {
+                    my $pn = $current-><M::Node.appendChild>
+                       ($ownerDocumentArg-><M::Document.createElementNS>
+                           (<Q::ddel:>, 'ddel:prefix'));
+                    $pn-><M::Node.appendChild> ($prefix);
+                    $pn-><M::Element.setAttributeNS>
+                                (<Q::ddel:>, 'ddel:tag' => 'datatag');
+                    $current-><M::Node.appendChild>
+                       ($ownerDocumentArg-><M::Document.createTextNode>
+                           (':'));
+
+                    my $pfx = $prefix-><AS::Node.textContent>;
                     my $ns = $namespaceContext-><M::DISDocNamespaceResolver
                                              .lookupNamespaceURI> ($pfx);
-                    if (defined $ns) {
-                      $current-><M::Element.setAttributeNS>
-                                   (<Q::xmlns:>, 'xmlns:'.$pfx => $ns);
+                    $current-><M::Element.setAttributeNS>
+                                   (<Q::xmlns:>, 'xmlns:'.$pfx =>
+                                    defined $ns ? $ns : '');
+                    unless (defined $ns) {
+                      $ownerDocumentArg-><AS::Document.xmlVersion> ('1.1');
                     }
+                  } else {  ## Default namespace
+                    my $ns = $lextype eq <Q::dis:TypeQName>
+                               ? $namespaceContext-><AG::DISDocNamespaceResolver
+                                             .defaultDISDocNamespaceURI>
+                               : null;
+                    $current-><M::Element.setAttributeNS>
+                                  (<Q::xmlns:>, xmlns => defined $ns ? $ns : '');
+                  }
+                  $current-><M::Node.appendChild> ($ln);
+                }
+                $current-><M::Element.setAttributeNS>
+                                  (<Q::ddel:>, 'ddel:mmParsed' => true);
+              } elsif ($lextype eq <Q::dis:TFQNames>) {
+                my @children = @{$current-><AG::Node.childNodes>};
+                if (@children == 1 and
+                    (my $c = $children[0])-><AG::Node.nodeType>
+                          == <C::Node.TEXT_NODE>) {
+                  my ($tq, $fq) = split /\s*[:|][:|]\s*/,
+                                        $c-><AG::Node.textContent>, 2;
+                  $tq =~ s/^\s+//; $fq =~ s/\s+$// if defined $fq;
+                  ## T QName
+                  $current-><M::Node.replaceChild>
+                      (my $tqn = $ownerDocumentArg-><M::Document.createElementNS>
+                                   (<Q::ddel:>, 'ddel:nameQName'), $c);
+                  $tqn-><M::Element.setAttributeNS>
+                                (<Q::ddel:>, 'ddel:tag' => 'datatag');
+                  if (length $tq) {
+                    __CODE{qnameToElement::
+                      $qname => $tq, $namespaceContext => $namespaceContext,
+                      $ownerDocument => $ownerDocumentArg,
+                      $useDefaultNamespace => {true},
+                      $element => $tqn,
+                    }__;
+                  } else { ## No T QName
+                    if (defined $defaultNameURI) {
+                      $tqn-><M::Element.setAttributeNS>
+                              (<Q::ddel:>, 'ddel:defaultURI' => $defaultNameURI);
+                    }
+                  }
+                  ## F QName
+                  $current-><M::Node.appendChild>
+                      (my $fqn = $ownerDocumentArg-><M::Document.createElementNS>
+                                   (<Q::ddel:>, 'ddel:forQName'));
+                  $fqn-><M::Element.setAttributeNS>
+                                (<Q::ddel:>, 'ddel:tag' => 'datatag');
+                  if (defined $fq) {
                     $current-><M::Node.insertBefore>
-                       ($ownerDocumentArg-><M::Document.createElementNS>
-                           (<Q::ddel:>, 'ddel:prefix'), $c)
-                            -><AS::Node.textContent> ($pfx);
-                    $c-><AS::Node.textContent> (':');
-                    $current-><M::Node.appendChild>
-                       ($ownerDocumentArg-><M::Document.createElementNS>
-                           (<Q::ddel:>, 'ddel:localName'))
-                            -><AS::Node.textContent> ($ln);
-                  } else {
-                    my $ns = $namespaceContext-><AG::DISDocNamespaceResolver
-                                             .defaultDISDocNamespaceURI>;
-                    if (defined $ns) {
-                      $current-><M::Element.setAttributeNS>
-                                   (<Q::xmlns:>, xmlns => $ns);
+                        ($ownerDocumentArg-><M::Document.createTextNode>
+                                ('::'), $fqn);
+                    if (length $fq) {
+                      __CODE{qnameToElement::
+                        $qname => $fq, $namespaceContext => $namespaceContext,
+                        $ownerDocument => $ownerDocumentArg,
+                        $useDefaultNamespace => {true},
+                        $element => $fqn,
+                      }__;
+                    } else {
+                      $fqn-><M::Element.setAttributeNS>
+                          (<Q::ddel:>, 'ddel:defaultURI' => <Q::ManakaiDOM:all>);
                     }
-                    $current-><M::Node.replaceChild>
-                       (my $p = $ownerDocumentArg-><M::Document.createElementNS>
-                           (<Q::ddel:>, 'ddel:localName'), $c);
-                    $p-><AS::Node.textContent> ($pfx);
+                  } else { ## No F QName
+                    if (defined $defaultForURI) {
+                      $fqn-><M::Element.setAttributeNS>
+                              (<Q::ddel:>, 'ddel:defaultURI' => $defaultForURI);
+                    }
                   }
                 } else {  ## dis:TypeQName with children
                   my $prefix = $ownerDocumentArg
@@ -1695,21 +1827,46 @@ IFClassDef:
                   } # while
                   my $ln = $ownerDocumentArg-><M::Document.createElementNS>
                                 (<Q::ddel:>, 'ddel:localName');
+                  $ln-><M::Element.setAttributeNS>
+                                (<Q::ddel:>, 'ddel:tag' => 'datatag');
                   while (@children) {
                     $ln-><M::Node.appendChild> ($children[0]);
                   }
                   if ($has_prefix) {
-                    $current-><M::Node.appendChild>
+                    my $pn = $current-><M::Node.appendChild>
                        ($ownerDocumentArg-><M::Document.createElementNS>
-                           (<Q::ddel:>, 'ddel:prefix'))
-                            -><M::Node.appendChild> ($prefix);
+                           (<Q::ddel:>, 'ddel:prefix'));
+                    $pn-><M::Node.appendChild> ($prefix);
+                    $pn-><M::Element.setAttributeNS>
+                                (<Q::ddel:>, 'ddel:tag' => 'datatag');
                     $current-><M::Node.appendChild>
                        ($ownerDocumentArg-><M::Document.createTextNode>
                            (':'));
 
+                    my $pfx = $pn-><AS::Node.textContent>;
+                    my $ns = $namespaceContext-><M::DISDocNamespaceResolver
+                                             .lookupNamespaceURI> ($pfx);
+                    $current-><M::Element.setAttributeNS>
+                                   (<Q::xmlns:>, 'xmlns:'.$pfx =>
+                                    defined $ns ? $ns : '');
+                    unless (defined $ns) {
+                      $ownerDocumentArg-><AS::Document.xmlVersion> ('1.1');
+                    }
+                  } else {  ## Default namespace
+                    my $ns = $lextype eq <Q::dis:TypeQName>
+                               ? $namespaceContext-><AG::DISDocNamespaceResolver
+                                             .defaultDISDocNamespaceURI>
+                               : null;
+                    $current-><M::Element.setAttributeNS>
+                                  (<Q::xmlns:>, xmlns => defined $ns ? $ns : '');
                   }
                   $current-><M::Node.appendChild> ($ln);
                 }
+
+              } elsif ($lextype eq <Q::DISPerl:MemRef>) {
+
+              } elsif ($lextype eq <Q::DOMMain:XCodeRef>) {
+
               } elsif ($lextype eq <Q::DISCore:NamespacePrefix>) {
                 my $pfx = $current-><AG::Node.textContent>;
                 my $ns = $namespaceContext-><M::DISDocNamespaceResolver
@@ -1741,6 +1898,57 @@ IFClassDef:
             }__}__;
           }
         }__;
+
+  @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@rdf:type: dis2pm|BlockCode
+    @@QName: qnameToElement
+    @@enDesc:
+      Converts a <Q::dis:TypeQName> to its tree representation.
+      \
+      Parameter: <Perl::$qname>, <Perl::$namespaceContext>,
+                 <Perl::$ownerDocument>, <Perl::$useDefaultNamespace>,
+                 <Perl::$element>.
+    @@PerlDef:
+      $qname =~ s/^\s+//;
+      $qname =~ s/\s+$//;
+      my ($__pfx, $__ln) = split /\s*[:|]\s*/, $qname, 2;
+      if (defined $__ln) {
+        my $__ns = $namespaceContext-><M::DISDocNamespaceResolver
+                                             .lookupNamespaceURI> ($__pfx);
+        $element-><M::Element.setAttributeNS>
+                   (<Q::xmlns:>, 'xmlns:'.$__pfx => defined $__ns ? $__ns : '');
+        unless (defined $__ns) {
+          $ownerDocument-><AS::Document.xmlVersion> ('1.1');
+        }
+        my $__pn = $element-><M::Node.appendChild>
+                         ($ownerDocument-><M::Document.createElementNS>
+                           (<Q::ddel:>, 'ddel:prefix'));
+        $__pn-><AS::Node.textContent> ($__pfx);
+        $__pn-><M::Element.setAttributeNS>
+                                (<Q::ddel:>, 'ddel:tag' => 'datatag');
+        $element-><M::Node.appendChild>
+                         ($ownerDocument-><M::Document.createTextNode> (':'));
+        my $__lnn = $element-><M::Node.appendChild>
+                         ($ownerDocument-><M::Document.createElementNS>
+                           (<Q::ddel:>, 'ddel:localName'));
+        $__lnn-><AS::Node.textContent> ($__ln);
+        $__lnn-><M::Element.setAttributeNS>
+                                (<Q::ddel:>, 'ddel:tag' => 'datatag');
+      } else {  ## Default namespace
+        my $__ns = $useDefaultNamespace
+                               ? $namespaceContext-><AG::DISDocNamespaceResolver
+                                             .defaultDISDocNamespaceURI>
+                               : null;
+        $element-><M::Element.setAttributeNS>
+                              (<Q::xmlns:>, xmlns => defined $__ns ? $__ns : '');
+        $element-><M::Node.appendChild>
+                      (my $__p = $ownerDocument-><M::Document.createElementNS>
+                           (<Q::ddel:>, 'ddel:localName'));
+        $__p-><AS::Node.textContent> ($__pfx);
+        $__p-><M::Element.setAttributeNS>
+                                (<Q::ddel:>, 'ddel:tag' => 'datatag');
+      }                    
 ##DocumentDISDoc
 
 ElementTypeBinding:
