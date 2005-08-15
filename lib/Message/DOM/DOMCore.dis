@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/29 12:56:34 $
+      $Date: 2005/08/15 07:59:40 $
     @@ContentType:
       dis:Date.RCS
 
@@ -1561,7 +1561,7 @@ ExceptionDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The specified <XML::NCName> is illegal according to 
+              The specified <CODE::NCName> is illegal according to 
               the XML version in use.
           @@@@enMufDef:
             The NCName%p (name => {<Q::infoset:name>}, prefix => { "},
@@ -1573,7 +1573,7 @@ ExceptionDef:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <XML::NCName> specified.
+                The <CODE::NCName> specified.
           @@@@XParam:
             @@@@@QName:
               infoset:version
@@ -1729,7 +1729,7 @@ ExceptionDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The qualified name specified equals to <XML::xmlns>.
+              The qualified name specified equals to <XA::xmlns>.
         @@@SubTypeDef:
           @@@@QName:
             MDOMX:MDOM_NS_XML_WITH_OTHER_URI
@@ -1787,7 +1787,7 @@ ExceptionDef:
          @@@@Description:
            @@@@@lang:en
            @@@@@@:
-             The qualified name is <XML::xmlns:xmlns>.  It is prohibited 
+             The qualified name is <XA::xmlns:xmlns>.  It is prohibited 
              by the XML Namespace Specifications.
         @@@SubTypeDef:
           @@@@QName: MDOMX_HTML_NSURI
@@ -2815,8 +2815,8 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The DOM implementation does not support the <DOM:XML> feature and 
-              the language exposed through the <IF:Document> does not support 
+              The DOM implementation does not support the <DOM::XML> feature and 
+              the language exposed through the <IF::Document> does not support 
               XML Namespaces.
             @@@@@ImplNote:
               @@@@@@lang:en
@@ -3035,7 +3035,7 @@ IF:
         ## TODO: Move to DOMMain
         @@@InCase: 
           @@@@Label: 
-            The feature name prepended by the <CHAR:PLUS SIGN> (<DOM:+>)
+            The feature name prepended by the <CHAR:PLUS SIGN> (<DOM::+>)
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
@@ -3417,12 +3417,12 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            A <IF:NodeList> object.
+            A <IF::NodeList> object.
         @@@InCase:
           @@@@Label:
             @@@@@lang:en
             @@@@@@:
-              A <IF:NodeList> containing no nodes
+              A <IF::NodeList> containing no nodes
           @@@@Type: NodeList
           @@@@actualType:
             ManakaiDOMCore:ManakaiDOMChildNodeList
@@ -3935,6 +3935,7 @@ IF:
                 } elsif (ref $refChild and
                          $newNode[0]->{<Q::TreeCore:nodeID>} eq
                          $refChild->{<Q::TreeCore:node>}->{<Q::TreeCore:nodeID>}) {
+                  ## refChild is the same node as the newChild
                   __WARNING{
                     MDOMX:MDOM_NEWCHILD_IS_REFCHILD::
                       MDOMX:newChild-param-name => 'newChild',
@@ -3942,6 +3943,7 @@ IF:
                   }__;
                   ## And no action.
                 } else {
+                  ## refChild and newChild are siblings each other.
                   my $currentIndex;
                   for my $i (0..$#{$node->{<Q::infoset:children>}}) {
                     if ($node->{<Q::infoset:children>}->[$i]
@@ -3950,14 +3952,15 @@ IF:
                       $currentIndex = $i;
                     }
                   }
+                  ## Changes the position of the newChild in the parent nodelist
                   if ($newIndex < $currentIndex) {
                     splice @{$node->{<Q::infoset:children>}}, $currentIndex,
                            1, ();
                     splice @{$node->{<Q::infoset:children>}},
-                           $newIndex, 0, @newNode;
+                           $newIndex, 1, @newNode;
                   } else {
                     splice @{$node->{<Q::infoset:children>}},
-                           $newIndex, 0, @newNode;
+                           $newIndex, 1, @newNode;
                     splice @{$node->{<Q::infoset:children>}}, $currentIndex,
                            1, ();
                   }
@@ -3978,12 +3981,12 @@ IF:
                   <Q::DOMCore:DocumentFragment>) {
                 $newNode->{<Q::infoset:children>} = [];
               } elsif ($parentNode) {
-                for my $i (0..$#{$parentNode->{<Q::infoset:children>}}) {
+                P: for my $i (0..$#{$parentNode->{<Q::infoset:children>}}) {
                   if ($parentNode->{<Q::infoset:children>}->[$i]
                                  ->{<Q::TreeCore:nodeID>} eq
-                      $node->{<Q::TreeCore:nodeID>}) {
+                      $newNode->{<Q::TreeCore:nodeID>}) {
                     splice @{$parentNode->{<Q::infoset:children>}}, $i, 1, ();
-                    last;
+                    last P;
                   }
                 }
               }
@@ -4258,6 +4261,11 @@ IF:
                     ManakaiDOMException.NOT_FOUND_ERR::
                       MDOMX:param-name => 'oldChild',
                   }__;
+                } else { ## oldChild is n u l l
+                  __EXCEPTION{
+                    ManakaiDOMException.NOT_FOUND_ERR::
+                      MDOMX:param-name => 'oldChild',
+                  }__;
                 }
               } # REFCHILD
               if ($newNode[0]->{<Q::infoset:parent>} and
@@ -4313,12 +4321,12 @@ IF:
                   <Q::DOMCore:DocumentFragment>) {
                 $newNode->{<Q::infoset:children>} = [];
               } elsif ($parentNode) {
-                for my $i (0..$#{$parentNode->{<Q::infoset:children>}}) {
+                P: for my $i (0..$#{$parentNode->{<Q::infoset:children>}}) {
                   if ($parentNode->{<Q::infoset:children>}->[$i]
                                  ->{<Q::TreeCore:nodeID>} eq
-                      $node->{<Q::TreeCore:nodeID>}) {
+                      $newNode->{<Q::TreeCore:nodeID>}) {
                     splice @{$parentNode->{<Q::infoset:children>}}, $i, 1, ();
-                    last;
+                    last P;
                   }
                 }
               }
@@ -4634,7 +4642,7 @@ IF:
               if ($node->{<Q::TreeCore:treeID>} eq
                   $newNode->{<Q::TreeCore:treeID>}) {
                 my $n = $node;
-                {
+                P: {
                   if ($newNode->{<Q::TreeCore:nodeID>} eq
                       $n->{<Q::TreeCore:nodeID>}) {
                     __EXCEPTION{
@@ -4644,7 +4652,7 @@ IF:
                   }
                   if ($n->{<Q::infoset:parent>}) {
                     $n = $n->{<Q::infoset:parent>};
-                    redo;
+                    redo P;
                   }
                 }
               }
@@ -4662,12 +4670,12 @@ IF:
                   <Q::DOMCore:DocumentFragment>) {
                 $newNode->{<Q::infoset:children>} = [];
               } elsif ($parentNode) {
-                for my $i (0..$#{$parentNode->{<Q::infoset:children>}}) {
+                RP: for my $i (0..$#{$parentNode->{<Q::infoset:children>}}) {
                   if ($parentNode->{<Q::infoset:children>}->[$i]
                                  ->{<Q::TreeCore:nodeID>} eq
-                      $node->{<Q::TreeCore:nodeID>}) {
+                      $newNode->{<Q::TreeCore:nodeID>}) {
                     splice @{$parentNode->{<Q::infoset:children>}}, $i, 1, ();
-                    last;
+                    last RP;
                   }
                 }
               }
@@ -4719,16 +4727,16 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Put all <IF:Text> nodes in the full depth of the sub-tree 
-         underneath this <IF:Node>, including attribute nodes 
-         attaced to the <IF:Element>, 
+         Put all <IF::Text> nodes in the full depth of the sub-tree 
+         underneath this <IF::Node>, including attribute nodes 
+         attaced to the <IF::Element>, 
          into a "normal" form where only structure separates 
-         <IF:Text> nodes, i.e. there are neither adjacent <IF:Text> 
-         nodes nor empty <IF:Text> nodes. <SRC:DOM 1, 2, 3>
+         <IF::Text> nodes, i.e. there are neither adjacent <IF::Text> 
+         nodes nor empty <IF::Text> nodes. <SRC::DOM 1, 2, 3>
        \
-         If the parameter <DOM:normalize-characters> of the 
-         <A:Document.domConfig> is <DOM:true>, the characters 
-         of the <IF:Text> nodes will also be fully normalized. 
+         If the parameter <DOM::normalize-characters> of the 
+         <A:Document.domConfig> is <DOM::true>, the characters 
+         of the <IF::Text> nodes will also be fully normalized. 
          <SRC:DOM 3>
      @@ImplNote:
        @@@lang:en
@@ -4993,7 +5001,7 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              This node is an <IF:Element> and has any attributes.
+              This node is an <IF::Element> and has any attributes.
         @@@InCase:
           @@@@Value:false
           @@@@Description:
@@ -5047,7 +5055,7 @@ IF:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         = If the <IF:Document> support the feature <Feature:HTML>,
+         = If the <IF::Document> support the feature <Feature::HTML>,
        \
          == If there is a <HE::base> element with the <HA:href> attribute, 
             the base URI is its value.
@@ -5435,7 +5443,7 @@ IF:
          URI, starting from this node.
        \
          The default namespace declarations are ignored by this method. 
-         To lookup default namespace, use the <M:Node.isDefaultNamespace>
+         To lookup default namespace, use the <M::Node.isDefaultNamespace>
          method.
      @@DOMMain:isNamespaceAware:1
      @@Param:
@@ -5453,14 +5461,14 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              Always <DOM:null> will be returned.
+              Always <DOM::null> will be returned.
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              Always <DOM:null> will be returned.
+              Always <DOM::null> will be returned.
      @@Return:
         @@@Type:  
           DOMMain:DOMString
@@ -5527,13 +5535,13 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The specified <P:namespaceURI> is the default namespace.
+              The specified <P::namespaceURI> is the default namespace.
         @@@InCase:
           @@@@Value:false
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The specified <P:namespaceURI> is not the default namespace.
+              The specified <P::namespaceURI> is not the default namespace.
         @@@PerlDef:
             $r = $self->{<Q::TreeCore:node>}
                       -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
@@ -5822,14 +5830,14 @@ IF:
     @@Description:
       @@@lang:en
       @@@@: 
-        Construct an object for a new instance of the <IF:Node>.
+        Construct an object for a new instance of the <IF::Node>.
     @@Return:
       @@@Type:
         ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The object for the <IF:Node> to be created.
+          The object for the <IF::Node> to be created.
       @@@PerlDef:
           my $node = $r = bless <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                  ::ManakaiDOM:Perl.new>,
@@ -5845,12 +5853,12 @@ IF:
        @@@ImplNote:
          @@@@lang:en
          @@@@@:
-           Other properties required to be a legal <IF:Node> object:
+           Other properties required to be a legal <IF::Node> object:
            <Q::DOMCore:nodeType>.
          \
            Optional properties: <Q::infoset:localName>, <Q::infoset:prefix>,
-           <Q::DOMCore:ownerDocument> (required for an <IF:Node> whose 
-           type is other than <IF:Document> and <IF:DocumentType>), 
+           <Q::DOMCore:ownerDocument> (required for an <IF::Node> whose 
+           type is other than <IF::Document> and <IF::DocumentType>), 
            <Q::infoset:namespaceName>, <Q::DOMCore:name>,
            <Q::DOMCore:read-only>.
 
@@ -6557,22 +6565,22 @@ ClassDef:
        @@@@ImplNote:
          @@@@@lang:en
          @@@@@@:
-           TODO: <HTML:codebase> attribute should be considered by option.
+           TODO: <HA::codebase> attribute should be considered by option.
        @@@@ImplNote:
          @@@@@lang:en
          @@@@@@:
-           ISSUE: How treat base URI of <IF:DocumentType>, ...
+           ISSUE: How treat base URI of <IF::DocumentType>, ...
   @IntMethod:
     @@Name:lookupNamespacePrefix
     @@Description:
       @@@lang:en
       @@@@:
         Lookup the namespace prefix associated to the given namespace URI. 
-        This node must be of type <IF:Element>. 
+        This node must be of type <IF::Element>. 
     @@ImplNote:
       @@@lang:en
       @@@@:
-        This internal method implements the <DOM:lookupNamespacePrefix> 
+        This internal method implements the <DOM::lookupNamespacePrefix> 
         <SRC:<CITE:DOM Level 3 Core Specification> B.2 Namespace Prefix Lookup>.
     @@Param:
       @@@Name:namespaceURI
@@ -6581,7 +6589,7 @@ ClassDef:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The namespace URI.  <DOM:null> is not allowed; it must be 
+          The namespace URI.  <DOM::null> is not allowed; it must be 
           checked before the call of this internal method.
     @@Param:
       @@@Name:originalElement
@@ -6591,14 +6599,14 @@ ClassDef:
         @@@@lang:en
         @@@@@:
           The element node object to which the original request to lookup the 
-          <P:namespaceURI> is issued.
+          <P::namespaceURI> is issued.
       @@@InCase:
         @@@@Value:
           @@@@@is-null:1
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
-            The original node the request is issued is not an <IF:Element> node.
+            The original node the request is issued is not an <IF::Element> node.
     @@Return:
       @@@Type: 
         @@@@@:
@@ -6666,7 +6674,7 @@ ClassDef:
        @@@@:
          Before returning found prefix, the algorithm needs to make 
          sure that the prefix is not redefined.  This is why 
-         <P:originalElement> is required.
+         <P::originalElement> is required.
   @IntMethod:
     @@Name:isDefaultNamespace
     @@Description:
@@ -6677,7 +6685,7 @@ ClassDef:
     @@ImplNote:
       @@@lang:en
       @@@@:
-        This internal method implements the <DOM:isDefaultNamespace> 
+        This internal method implements the <DOM::isDefaultNamespace> 
         <SRC:<CITE:DOM Level 3 Core Specification> B.3 Default Namespace Lookup>.
     @@Param:
       @@@Name:namespaceURI
@@ -6792,7 +6800,7 @@ ClassDef:
     @@ImplNote:
       @@@lang:en
       @@@@:
-        This internal method implements the <DOM:lookupNamespaceURI> 
+        This internal method implements the <DOM::lookupNamespaceURI> 
         <SRC:<CITE:DOM Level 3 Core Specification> B.4 Namespace URI Lookup>.
     @@Param:
       @@@Name:prefix
@@ -6935,10 +6943,10 @@ ClassDef:
         @@@@lang:en
         @@@@@:
           A code reference.  The code referred is called with a 
-          parameter of this <IF:ManakaiDOMNodeObjectNode> object 
-          when an <IF:Element> node is determined whether it could 
-          be returned.  The code should return either <DOM:true> or 
-          <DOM:false>.
+          parameter of this <IF::ManakaiDOMNodeObjectNode> object 
+          when an <IF::Element> node is determined whether it could 
+          be returned.  The code should return either <DOM::true> or 
+          <DOM::false>.
     @@Param:
       @@@Name:index
       @@@Type:
@@ -6953,30 +6961,30 @@ ClassDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
-            The number of <IF:Element> nodes with which <P:check> has 
-            returned <DOM:true> is minused from the original value. 
+            The number of <IF::Element> nodes with which <P::check> has 
+            returned <DOM::true> is minused from the original value. 
             \
-            For example, if the original <P:index> is <CODE:4> and 
-            there is three <P:check>-<DOM:true> <IF:Element> nodes, 
-            then <P:index> would result in <CODE:1> and this method 
-            itself would return <DOM:null>.  If there is five (or more)
+            For example, if the original <P::index> is <CODE::4> and 
+            there is three <P::check>-<DOM::true> <IF::Element> nodes, 
+            then <P::index> would result in <CODE:1> and this method 
+            itself would return <DOM::null>.  If there is five (or more)
             such nodes, 
-            <P:index> would be <CODE:-1> and the return value would be 
+            <P::index> would be <CODE:-1> and the return value would be 
             the fiveth matching node.
       @@@InCase:
         @@@@Value:0
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
-            The first <IF:Element> node with which <P:check> has returned 
-            <DOM:true> is returned.
+            The first <IF::Element> node with which <P::check> has returned 
+            <DOM::true> is returned.
     @@Return:
       @@@Type:
         ManakaiDOMCore:ManakaiDOMNodeObjectNode
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The <IF:Element> node that met the condition.
+          The <IF::Element> node that met the condition.
       @@@InCase:
         @@@@Value:
           @@@@@is-null:1
@@ -7018,17 +7026,17 @@ ClassDef:
         @@@@lang:en
         @@@@@:
           A code reference.  The code referred is called with a 
-          parameter of this <IF:ManakaiDOMNodeObjectNode> object 
-          when an <IF:Element> node is determined whether it could 
-          be returned.  The code should return either <DOM:true> or 
-          <DOM:false>.
+          parameter of this <IF::ManakaiDOMNodeObjectNode> object 
+          when an <IF::Element> node is determined whether it could 
+          be returned.  The code should return either <DOM::true> or 
+          <DOM::false>.
     @@Return:
       @@@Type:
         perl:ARRAY::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
         @@@@@:
-          An array reference to the <IF:Element> nodes that meet the condition.
+          An array reference to the <IF::Element> nodes that meet the condition.
       @@@PerlDef:
           $r = [];
           for (@{$self->{<Q::infoset:children>}}) {
@@ -7487,10 +7495,10 @@ ResourceDef:
     @@@:
       An ordered collection of nodes.
     \
-      Node objects contained in a <IF:NodeList> may be accessed 
+      Node objects contained in a <IF::NodeList> may be accessed 
       by an ordinal index, starting from zero.
     \
-    \ <IF:NodeList> objects are <QUOTE:live>.
+    \ <IF::NodeList> objects are <QUOTE::live>.
   @ImplNote:
     @@lang:en
     @@@:
@@ -8384,12 +8392,12 @@ ResourceDef:
     @@@:
       A unordered collection of nodes that can be accessed by name. 
     \
-      Node objects contained in a <IF:NamedNodeMap> may also 
+      Node objects contained in a <IF::NamedNodeMap> may also 
       be accessed by an ordinal index, starting from zero. 
       However, this is simply to allow convenient enumeration of 
-      a <IF:NamedNodeMap>.
+      a <IF::NamedNodeMap>.
     \
-    \ <IF:NamedNodeMap> objects are <QUOTE:live>.
+    \ <IF::NamedNodeMap> objects are <QUOTE::live>.
 
   @Description:
     @@lang:en
@@ -8622,9 +8630,9 @@ ResourceDef:
             @@@@@@:
               TODO: Default attribute
             \
-              This code is almost same as <M:Element.removeAttribute>. 
-              This method returns an <IF:Attr> removed but that method 
-              does not (<M:Element.removeAttributeNode> does).
+              This code is almost same as <M::Element.removeAttribute>. 
+              This method returns an <IF::Attr> removed but that method 
+              does not (<M::Element.removeAttributeNode> does).
   @Method:
      @@Name:  item
      @@Description:
@@ -8945,7 +8953,7 @@ ResourceDef:
               It is unclear whether the node should be returned if 
               the node is <QUOTE:replaced> by itself.
              \
-              This code is almost same as <M:Element.setAttributeNodeNS>
+              This code is almost same as <M::Element.setAttributeNodeNS>
               without some points.
         @@@Def:
           @@@@ForCheck:
@@ -9114,7 +9122,7 @@ ResourceDef:
     @@Description:
       @@@lang:en
       @@@@:
-        Return whether two <IF:NamedNodeMap>s are equal.
+        Return whether two <IF::NamedNodeMap>s are equal.
     @@Param:
       @@@Name:arg
       @@@Type:NamedNodeMap
@@ -9170,7 +9178,7 @@ ResourceDef:
     @@ImplNote:
       @@@lang:en
       @@@@:
-        See: <M:Node.isEqualNode>.
+        See: <M::Node.isEqualNode>.
 ##NamedNodeMap
 
 IF:
@@ -9996,7 +10004,7 @@ IF:
          URI, starting from this node.
        \
          The default namespace declarations are ignored by this method. 
-         To lookup default namespace, use the <M:Node.isDefaultNamespace>
+         To lookup default namespace, use the <M::Node.isDefaultNamespace>
          method.
      @@Param:
         @@@Name:  namespaceURI
@@ -10013,14 +10021,14 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              Always <DOM:null> will be returned.
+              Always <DOM::null> will be returned.
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              Always <DOM:null> will be returned.
+              Always <DOM::null> will be returned.
      @@Return:
         @@@Type:  
           DOMMain:DOMString
@@ -10332,7 +10340,7 @@ IF:
     @@Description:
       @@@lang:en
       @@@@:
-        Construct an object for a new instance of the <IF:Attr> node.
+        Construct an object for a new instance of the <IF::Attr> node.
     @@ManakaiDOM:isStatic:1
     @@Return:
       @@@Type:
@@ -10340,14 +10348,14 @@ IF:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The new object for the <IF:Attr> node.
+          The new object for the <IF::Attr> node.
       @@@PerlDef:
           $r = <ClassM::ManakaiDOMNode.newObject>;
           $r->{<Q::DOMCore:nodeType>} = <Q::infoset:Attribute>;
      @@ImplNote:
        @@@lang:en
        @@@@:
-         Other properties required to be a legal <IF:Attr> object:
+         Other properties required to be a legal <IF::Attr> object:
          Either <Q::DOMCore:name> or <Q::infoset:localName>, 
          <Q::DOMCore:ownerDocument>.
        \
@@ -10536,8 +10544,8 @@ IF:
     @@Description:
       @@@lang:en
       @@@@:
-        Select an <IF:ManakaiDOMNodeObject> object that represents an 
-        <IF:Attr> node.
+        Select an <IF::ManakaiDOMNodeObject> object that represents an 
+        <IF::Attr> node.
 
     @@Param:
       @@@Name:name
@@ -10555,7 +10563,7 @@ IF:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The <IF:ManakaiDOMNodeObject> object.
+          The <IF::ManakaiDOMNodeObject> object.
       @@@InCase:
         @@@@Value:
           @@@@@is-null:1
@@ -10701,7 +10709,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:name> is not a legal SGML or XML <XML:Name>.
+                The <P::name> is not a legal SGML or XML <CODE::Name>.
         @@@Exception:
           @@@@Type:DOMException
           @@@@Name:NO_MODIFICATION_ALLOWED_ERR
@@ -10711,7 +10719,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                This (<IF:Element>) node is read-only.
+                This (<IF::Element>) node is read-only.
             @@@@@SpecLevel:1
           @@@@SubType:
             @@@@@QName:
@@ -10719,7 +10727,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <IF:Attr> node to edit is read-only.
+                The <IF::Attr> node to edit is read-only.
             @@@@@SpecLevel[list]:
         @@@PerlDef:
             if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:read-only>}) {
@@ -10792,7 +10800,7 @@ IF:
           @@@@lang:en
           @@@@@:
             The name of the attribute to remove.  If no attribute 
-            with this <P:name> is found, this method has no effect.
+            with this <P::name> is found, this method has no effect.
      @@Return:
         @@@Exception:
           @@@@Type:DOMException
@@ -10803,7 +10811,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                This (<IF:Element>) node is read-only.
+                This (<IF::Element>) node is read-only.
         @@@PerlDef:
           @@@@@:
             if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:read-only>}) {
@@ -10847,7 +10855,7 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The <IF:Attr> node with the specified name.
+            The <IF::Attr> node with the specified name.
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
@@ -10877,28 +10885,28 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@: 
-            The <IF:Attr> node to add to the attribute list.
+            The <IF::Attr> node to add to the attribute list.
      @@Return:
         @@@Type:  Attr
         @@@actualType: ManakaiDOMAttr
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The replaced <IF:Attr> node.
+            The replaced <IF::Attr> node.
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              No <IF:Attr> node was replaced.
+              No <IF::Attr> node was replaced.
         @@@Exception:
           @@@@Type:DOMException
           @@@@Name:WRONG_DOCUMENT_ERR
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The <P:newAttr> node was created from a different document.
+              The <P::newAttr> node was created from a different document.
         @@@Exception:
           @@@@Type:DOMException
           @@@@Name:NO_MODIFICATION_ALLOWED_ERR
@@ -10908,15 +10916,15 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: 
-                This (<IF:Element>) node is read-only.
+                This (<IF::Element>) node is read-only.
          @@@Exception:
            @@@@Type:DOMException
            @@@@Name:INUSE_ATTRIBUTE_ERR
            @@@@Description:
              @@@@@lang:en
              @@@@@@:
-               The <P:newAttr> node is already used as an attribute 
-               of another <IF:Element> object.
+               The <P::newAttr> node is already used as an attribute 
+               of another <IF::Element> object.
          @@@PerlDef:
             if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:read-only>}) {
               __EXCEPTION{
@@ -11022,14 +11030,14 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                This (<IF:Element>) node is read-only.
+                This (<IF::Element>) node is read-only.
         @@@Exception:
           @@@@Type:DOMException
           @@@@Name:NOT_FOUND_ERR
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The <P:oldAttr> node is not an attribute of this element.
+              The <P::oldAttr> node is not an attribute of this element.
         @@@PerlDef:
             my $node = $self->{<Q::TreeCore:node>};
             if ($node->{<Q::DOMCore:read-only>}) {
@@ -11067,7 +11075,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Return a <IF:NodeList> of all descendant elements with a 
+         Return a <IF::NodeList> of all descendant elements with a 
          given element type name, in the document order.
      @@Param:
         @@@Name:  name
@@ -11094,7 +11102,7 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            A list of matching <IF:Element> nodes.
+            A list of matching <IF::Element> nodes.
         @@@PerlDef:
             my $node = $self->{<Q::TreeCore:node>};
             my $chk;
@@ -11166,8 +11174,8 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Select a <IF:ManakaiDOMNodeObject> object that represents 
-         an <IF:Attr> node, by namespace URI and local name.
+         Select a <Class::ManakaiDOMNodeObject> object that represents 
+         an <IF::Attr> node, by namespace URI and local name.
      @@Param:
         @@@Name:  namespaceURI
         @@@Type:
@@ -11217,7 +11225,7 @@ IF:
     @@ImplNote:
       @@@lang:en
       @@@@:
-        The same method is defined in <IF:ManakaiDOMAttributes>.
+        The same method is defined in <IF::ManakaiDOMAttributes>.
   @Method:
      @@Name:  getAttributeNS
      @@Description:
@@ -11259,7 +11267,7 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The <IF:Attr> value as a string.
+            The <IF::Attr> value as a string.
         @@@InCase:
           @@@@Value:\
           @@@@Description:
@@ -11275,8 +11283,8 @@ IF:
               @@@@@@lang:en
               @@@@@@@:
                 The DOM implementation does not support the feature 
-                <Feature:XML> and the language exposed through the 
-                <IF:Document> does not support XML Namespaces.
+                <Feature::XML> and the language exposed through the 
+                <IF::Document> does not support XML Namespaces.
         @@@PerlDef:
           @@@@@:
             __CODE{selectAttrNodeObjectNS}__;
@@ -11351,7 +11359,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:qualifiedName> is not an XML <XML:Name>.
+                The <P::qualifiedName> is not an XML <CODE::Name>.
           @@@@SpecLevel:2
         @@@Exception:
           @@@@Type: DOMException
@@ -11362,7 +11370,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: 
-                The <P:qualifiedName> is malformed as a qualified name.
+                The <P::qualifiedName> is malformed as a qualified name.
             @@@@@SpecLevel:2
           @@@@SubType:
             @@@@@QName:
@@ -11370,8 +11378,8 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:qualifiedName> has a prefix and the
-                <P:namespaceURI> is <DOM:null>.
+                The <P::qualifiedName> has a prefix and the
+                <P::namespaceURI> is <DOM::null>.
             @@@@@SpecLevel:2
           @@@@SubType:
             @@@@@QName:
@@ -11379,9 +11387,9 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:qualifiedName> has a prefix that is <XML:xml> and the
-                <P:namespaceURI> is different from
-                <URI:http://www.w3.org/XML/1998/namespace>.
+                The <P::qualifiedName> has a prefix that is <XML::xml> and the
+                <P::namespaceURI> is different from
+                <URI::http://www.w3.org/XML/1998/namespace>.
             @@@@@SpecLevel:2
           @@@@SubType:
             @@@@@QName:
@@ -11389,9 +11397,9 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:qualifiedName> has a prefix that is <XML:xmlns> and
-                the <P:namespaceURI> is different from the
-                <URI:http://www.w3.org/2000/xmlns>.
+                The <P::qualifiedName> has a prefix that is <XML::xmlns> and
+                the <P::namespaceURI> is different from the
+                <URI::http://www.w3.org/2000/xmlns>.
             @@@@@SpecLevel:3
           @@@@SubType:
             @@@@@QName:
@@ -11399,9 +11407,9 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:qualifiedName> is <XML:xmlns> and
-                the <P:namespaceURI> is different from the
-                <URI:http://www.w3.org/2000/xmlns>.
+                The <P::qualifiedName> is <XA::xmlns> and
+                the <P::namespaceURI> is different from the
+                <URI::http://www.w3.org/2000/xmlns>.
             @@@@@SpecLevel:2
           @@@@SubType:
             @@@@@QName:
@@ -11409,10 +11417,10 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:namespaceURI> is 
-                <URI:http://www.w3.org/XML/1998/namespace> and the 
-                prefix of the <P:qualifiedName> is different from 
-                <XML:xml>.
+                The <P::namespaceURI> is 
+                <URI::http://www.w3.org/XML/1998/namespace> and the 
+                prefix of the <P::qualifiedName> is different from 
+                <XA::xml>.
             @@@@@SpecLevel[list]:
           @@@@SubType:
             @@@@@QName:
@@ -11420,8 +11428,8 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:namespaceURI> is <URI:http://www.w3.org/2000/xmlns> and 
-                neither the <P:qualifiedName> nor its prefix is <XML:xmlns>.
+                The <P::namespaceURI> is <URI::http://www.w3.org/2000/xmlns> and 
+                neither the <P::qualifiedName> nor its prefix is <XML::xmlns>.
             @@@@@SpecLevel:3
           @@@@SubType:
             @@@@@QName:
@@ -11429,7 +11437,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:qualifiedName> is <XML:xmlns:xmlns>.
+                The <P::qualifiedName> is <XA::xmlns:xmlns>.
             @@@@@SpecLevel[list]:
           @@@@ImplNote:
             @@@@@lang:en
@@ -11443,7 +11451,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                This document does not support the <Feature:XML> 
+                This document does not support the <Feature::XML> 
                 feature.
             @@@@@SpecLevel:2
         @@@Exception:
@@ -11455,7 +11463,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                This (<IF:Element>) node is read-only.
+                This (<IF::Element>) node is read-only.
             @@@@@SpecLevel:2
           @@@@SubType:
             @@@@@QName:
@@ -11463,7 +11471,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <IF:Attr> node to edit is read-only.
+                The <IF::Attr> node to edit is read-only.
             @@@@@SpecLevel[list]:
         @@@PerlDef:
           @@@@For:
@@ -11582,8 +11590,8 @@ IF:
           @@@@@:
             The local name of the attribute to remove.
           \
-            If no attribute with this <P:localName> and 
-            <P:namespaceURI> is found, this method has no effect.
+            If no attribute with this <P::localName> and 
+            <P::namespaceURI> is found, this method has no effect.
      @@Return:
         @@@Exception:
           @@@@Type:DOMException
@@ -11594,7 +11602,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                This (<IF:Element>) node is read-only.
+                This (<IF::Element>) node is read-only.
         @@@Exception:
           @@@@Type:DOMException
           @@@@Name:NOT_SUPPORTED_ERR
@@ -11605,8 +11613,8 @@ IF:
               @@@@@@lang:en
               @@@@@@@:
                 The DOM implementation does not support the feature 
-                <Feature:XML> and the language exposed through 
-                the <IF:Document> does not support XML Namespaces.
+                <Feature::XML> and the language exposed through 
+                the <IF::Document> does not support XML Namespaces.
         @@@PerlDef:
           @@@@For:
             ManakaiDOM:DOMXMLFeature
@@ -11628,7 +11636,7 @@ IF:
            @@@@@@:
              TODO: default attribute
            \
-             Almost same as <M:ManakaiDOMAttributes.removeNamedItemNS>.
+             Almost same as <M::ManakaiDOMAttributes.removeNamedItemNS>.
         @@@Def:
           @@@@ForCheck:
             !ManakaiDOM:DOMXMLFeature
@@ -11645,7 +11653,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Retrieve an <IF:Attr> node by local name and namespace URI.
+         Retrieve an <IF::Attr> node by local name and namespace URI.
      @@NoNSVersion:.getAttributeNode
      @@Param:
         @@@Name:  namespaceURI
@@ -11675,7 +11683,7 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The <IF:Attr> node.
+            The <IF::Attr> node.
         @@@@InCase:
           @@@@@Value:
             @@@@@@is-null:1
@@ -11689,8 +11697,8 @@ IF:
               @@@@@@lang:en
               @@@@@@@:
                 The DOM implementation does not support the feature 
-                <Feature:XML> and the language exposed through the 
-                <IF:Document> does not support XML Namespaces.
+                <Feature::XML> and the language exposed through the 
+                <IF::Document> does not support XML Namespaces.
         @@@PerlDef:
           @@@@For:
             ManakaiDOM:DOMXMLFeature
@@ -11738,21 +11746,21 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The <IF:Attr> node replaced by the <P:newAttr> node.
+            The <IF::Attr> node replaced by the <P::newAttr> node.
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The <P:newAttr> node replaces no existing node.
+              The <P::newAttr> node replaces no existing node.
          @@@Exception:
            @@@@Name:WRONG_DOCUMENT_ERR
            @@@@Type:DOMException
            @@@@Description:
              @@@@@lang:en
              @@@@@@:
-               The <P:newAttr> node was created from a different document.
+               The <P::newAttr> node was created from a different document.
          @@@Exception:
            @@@@Name:NO_MODIFICATION_ALLOWED_ERR
            @@@@Type:DOMException
@@ -11762,15 +11770,15 @@ IF:
              @@@@@Description:
                @@@@@@lang:en
                @@@@@@@:
-                 This (<IF:Element>) node is read-only.
+                 This (<IF::Element>) node is read-only.
          @@@Exception:
            @@@@Name:INUSE_ATTRIBUTE_ERR
            @@@@Type:DOMException
            @@@@Description:
              @@@@@lang:en
              @@@@@@:
-               The <P:newAttr> node is already used as an attribute 
-               of another <IF:Element> object.
+               The <P::newAttr> node is already used as an attribute 
+               of another <IF::Element> object.
          @@@Exception:
            @@@@Name:NOT_SUPPORTED_ERR
            @@@@Type:DOMException
@@ -11781,8 +11789,8 @@ IF:
                @@@@@@lang:en
                @@@@@@@:
                  The DOM implementation does not support the feature 
-                 <Feature:XML> and the language exposed through the 
-                 <IF:Document> does not support XML Namespaces.
+                 <Feature::XML> and the language exposed through the 
+                 <IF::Document> does not support XML Namespaces.
              @@@@@SpecLevel:2
            @@@@SubType:
              @@@@@QName:
@@ -11790,7 +11798,7 @@ IF:
              @@@@@Description:
                @@@@@@lang:en
                @@@@@@@:
-                 The <P:newAttr> node does not support XML Namespace.
+                 The <P::newAttr> node does not support XML Namespace.
              @@@@@SpecLevel[list]:
          @@@PerlDef:
            @@@@For:
@@ -11881,7 +11889,7 @@ IF:
      @@Description: 
        @@@lang:en
        @@@@:
-         Return a <IF:NodeList> of all the descendant <IF:Element> nodes 
+         Return a <IF::NodeList> of all the descendant <IF::Element> nodes 
          with a given local name and namespace URI pair in the document 
          order.
      @@Param:
@@ -11935,8 +11943,8 @@ IF:
               @@@@@@lang:en
               @@@@@@@:
                 The DOM implementation does not support the 
-                <Feature:XML> feature and the language exposed 
-                through the <IF:Document> does not support XML 
+                <Feature::XML> feature and the language exposed 
+                through the <IF::Document> does not support XML 
                 Namespaces.
           @@@@ImplNote:
             @@@@@lang:en
@@ -11949,8 +11957,8 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            A new <IF:NodeList> object containing all the matched 
-            <IF:Element> nodes.
+            A new <IF::NodeList> object containing all the matched 
+            <IF::Element> nodes.
         @@@PerlDef:
           @@@@For:
             ManakaiDOM:DOMXMLFeature
@@ -12141,8 +12149,8 @@ IF:
               @@@@@@lang:en
               @@@@@@@:
                 The DOM implementation does not support the feature 
-                <Feature:XML> and the language exposed through the 
-                <IF:Document> does not support XML Namespaces.
+                <Feature::XML> and the language exposed through the 
+                <IF::Document> does not support XML Namespaces.
         @@@PerlDef:
           @@@@For:
             ManakaiDOM:DOMXMLFeature
@@ -12228,7 +12236,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                This (<IF:Element>) node is read-only.
+                This (<IF::Element>) node is read-only.
             @@@@@SpecLevel:3
           @@@@SubType:
             @@@@@QName:
@@ -12241,8 +12249,8 @@ IF:
           @@@@ImplNote:
             @@@@@lang:en
             @@@@@@:
-              Is <QUOTE:user-determined ID> a property of the 
-              <IF:Attr> or of the <IF:Element>?
+              Is <QUOTE::user-determined ID> a property of the 
+              <IF::Attr> or of the <IF::Element>?
         @@@Exception:
           @@@@Type:DOMException
           @@@@Name:NOT_FOUND_ERR
@@ -12336,7 +12344,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                This (<IF:Element>) node is read-only.
+                This (<IF::Element>) node is read-only.
             @@@@@SpecLevel:3
           @@@@SubType:
             @@@@@QName:
@@ -12349,8 +12357,8 @@ IF:
           @@@@ImplNote:
             @@@@@lang:en
             @@@@@@:
-              Is <QUOTE:user-determined ID> a property of the 
-              <IF:Attr> or of the <IF:Element>?
+              Is <QUOTE::user-determined ID> a property of the 
+              <IF::Attr> or of the <IF::Element>?
         @@@Exception:
           @@@@Type:DOMException
           @@@@Name:NOT_FOUND_ERR
@@ -12440,7 +12448,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                This (<IF:Element>) node is read-only.
+                This (<IF::Element>) node is read-only.
             @@@@@SpecLevel:3
           @@@@SubType:
             @@@@@QName:
@@ -12453,15 +12461,15 @@ IF:
           @@@@ImplNote:
             @@@@@lang:en
             @@@@@@:
-              Is <QUOTE:user-determined ID> a property of the 
-              <IF:Attr> or of the <IF:Element>?
+              Is <QUOTE::user-determined ID> a property of the 
+              <IF::Attr> or of the <IF::Element>?
         @@@Exception:
           @@@@Type:DOMException
           @@@@Name:NOT_FOUND_ERR
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The <P:idAttr> is not an attribute of this element.
+              The <P::idAttr> is not an attribute of this element.
         @@@PerlDef:
             if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:read-only>}) {
               __EXCEPTION{
@@ -12544,7 +12552,7 @@ IF:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          A <IF:NamedNodeMap> object.
+          A <IF::NamedNodeMap> object.
       @@@PerlDef:
           $r = $self->{<Q::TreeCore:node>}
                     -><M::ManakaiDOM:ManakaiDOMNodeObject
@@ -12584,9 +12592,9 @@ IF:
        @@@ImplNote:
          @@@@lang:en
          @@@@@:
-           If a document has both a <HTML:base> element and 
-           an <XML:xml:base> attribute, or even in the case that 
-           an XHTML 1 document has an <XML:xml:base> attribute, 
+           If a document has both a <HE::base> element and 
+           an <XA::xml:base> attribute, or even in the case that 
+           an XHTML 1 document has an <XA::xml:base> attribute, 
            its result is not defined by any W3C specification.
     @@SpecLevel:3
     @@Level[list]:3
@@ -12632,7 +12640,7 @@ IF:
          URI, starting from this node.
        \
          The default namespace declarations are ignored by this method. 
-         To lookup default namespace, use the <M:Node.isDefaultNamespace>
+         To lookup default namespace, use the <M::Node.isDefaultNamespace>
          method.
      @@DOMMain:isNamespaceAware:1
      @@Param:
@@ -12650,14 +12658,14 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              Always <DOM:null> will be returned.
+              Always <DOM::null> will be returned.
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              Always <DOM:null> will be returned.
+              Always <DOM::null> will be returned.
      @@Return:
         @@@Type:  
           DOMMain:DOMString
@@ -12914,21 +12922,21 @@ IF:
     @@Description:
       @@@lang:en
       @@@@:
-        Construct an object for a new instance of the <IF:Element> node.
+        Construct an object for a new instance of the <IF::Element> node.
     @@Return:
       @@@Type:
         ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The new object for the <IF:Element> node.
+          The new object for the <IF::Element> node.
       @@@PerlDef:
         $r = <ClassM::ManakaiDOMNode.newObject>;
         $r->{<Q::DOMCore:nodeType>} = <Q::infoset:Element>;
      @@ImplNote:
        @@@lang:en
        @@@@:
-         Other properties required to be a legal <IF:Element> object:
+         Other properties required to be a legal <IF::Element> object:
          Either <Q::DOMCore:name> or <Q::infoset:localName>, 
          <Q::DOMCore:ownerDocument>.
        \
@@ -13240,7 +13248,7 @@ IF:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         The DOM Level 3 Core Specification is unclear about <IF:CDATASection>s.
+         The DOM Level 3 Core Specification is unclear about <IF::CDATASection>s.
          They should also be included (c.f. the definition for 
          <A:Text.replaceWholeText>).
          \
@@ -13402,14 +13410,14 @@ IF:
     @@Description:
       @@@lang:en
       @@@@:
-        Construct an object for a new instance of the <IF:Text> node.
+        Construct an object for a new instance of the <IF::Text> node.
     @@Return:
       @@@Type:
         ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The new object for the <IF:Text> node.
+          The new object for the <IF::Text> node.
       @@@PerlDef:
           $r = <ClassM::ManakaiDOMNode.newObject>;
           $r->{<Q::DOMCore:nodeType>} = <Q::DOMCore:Text>;
@@ -13417,7 +13425,7 @@ IF:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         Other properties requires to be a legal <IF:Text>:
+         Other properties requires to be a legal <IF::Text>:
          <Q::DOMCore:ownerDocument>.
          \
          Other available properties: <Q::infoset:ElementContentWhitespace>, 
@@ -13575,14 +13583,14 @@ IF:
     @@Description:
       @@@lang:en
       @@@@:
-        Construct an object for a new instance of the <IF:Comment> node.
+        Construct an object for a new instance of the <IF::Comment> node.
     @@Return:
       @@@Type:
         ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The new object for the <IF:Comment> node.
+          The new object for the <IF::Comment> node.
       @@@PerlDef:
           $r = <ClassM::ManakaiDOMNode.newObject>;
           $r->{<Q::DOMCore:nodeType>} = <Q::infoset:Comment>;    
@@ -13590,7 +13598,7 @@ IF:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         Other properties required to be a legal <IF:Comment> object:
+         Other properties required to be a legal <IF::Comment> object:
          <Q::DOMCore:ownerDocument>.
         \
          Other available properties: <Q::infoset:parent>, <Q::infoset:content>, 
@@ -14593,8 +14601,8 @@ IFDef:
   @ImplNote:
     @@lang:en
     @@@:
-      Parameters affect: <M:Document.normalizeDocument>, 
-      validation, <IF:DOMParser>, <IF:DOMSerializer>, etc.
+      Parameters affect: <M::Document.normalizeDocument>, 
+      validation, <IF::DOMParser>, <IF::DOMSerializer>, etc.
   @Level[list]:  3
   @SpecLevel:3
   @For:
@@ -14717,7 +14725,7 @@ IFDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: 
-              \ <DOM:true> will be returned.
+              \ <DOM::true> will be returned.
      @@Return:
         @@@Type:  
           DOMMain:boolean
@@ -14741,7 +14749,7 @@ IFDef:
        @@@lang:en
        @@@@:
          The list of the parameters supported by this 
-         <IF:DOMConfiguration> object and for which at least 
+         <IF::DOMConfiguration> object and for which at least 
          one value can be set by the DOM application.
      @@ImplNote:
        @@@lang:en
@@ -14804,7 +14812,7 @@ IF:
        @@@ImplNote:
          @@@@lang:en
          @@@@@:
-           Other properties required to be a legal <IF:DocumentFragment> 
+           Other properties required to be a legal <IF::DocumentFragment> 
            object: <Q::DOMCore:ownerDocument>. 
          \
            Other available properties: <Q::infoset:children>, 
@@ -14819,7 +14827,7 @@ IF:
          URI, starting from this node.
        \
          The default namespace declarations are ignored by this method. 
-         To lookup default namespace, use the <M:Node.isDefaultNamespace>
+         To lookup default namespace, use the <M::Node.isDefaultNamespace>
          method.
      @@Param:
         @@@Name:  namespaceURI
@@ -14836,14 +14844,14 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              Always <DOM:null> will be returned.
+              Always <DOM::null> will be returned.
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              Always <DOM:null> will be returned.
+              Always <DOM::null> will be returned.
      @@Return:
         @@@Type:  
           DOMMain:DOMString
@@ -14857,8 +14865,8 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              No namespace prefix is found.  Always <DOM:null> is 
-              returned for the <IF:DocumentFragment> node.
+              No namespace prefix is found.  Always <DOM::null> is 
+              returned for the <IF::DocumentFragment> node.
         @@@PerlDef:
           @@@@@: $r = null;
      @@Level[list]:  3
@@ -15102,7 +15110,7 @@ IF:
          Create an element.
        \
          If there are known attributes with default values, 
-         <IF:Attr> nodes representing them are automatically 
+         <IF::Attr> nodes representing them are automatically 
          created and attached to the element created.
      @@NSVersion:.createElementNS
      @@Param:
@@ -15115,7 +15123,7 @@ IF:
             The name of the element type to instantiate.
           \
             The case-sensitivity depends on that of the markup language 
-            in use.  If it is case-insensitive, the <P:tagName> is 
+            in use.  If it is case-insensitive, the <P::tagName> is 
             mapped to the canonical form of that markup language 
             by the DOM implementation.
      @@Return:
@@ -15145,7 +15153,7 @@ IF:
           @@@@ImplNote:
             @@@@@lang:en
             @@@@@@:
-              TODO: <P:tagName> should be normalized to uppercases if HTML.
+              TODO: <P::tagName> should be normalized to uppercases if HTML.
             \
               TODO: Default attribute should be implemented.
   @Method:
@@ -15153,13 +15161,13 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Create an empty <IF:DocumentFragment> object.
+         Create an empty <IF::DocumentFragment> object.
      @@Return:
         @@@Type:  DocumentFragment
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The new <IF:DocumentFragment> object.
+            The new <IF::DocumentFragment> object.
         @@@PerlDef:
             my $docNode = $self->{<Q::TreeCore:node>};
             my $node = <ClassM::ManakaiDOMDocumentFragment.newObject>;
@@ -15175,7 +15183,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Create a <IF:Text> node.
+         Create a <IF::Text> node.
      @@Param:
         @@@Name:  data
         @@@Type:  
@@ -15188,7 +15196,7 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The new <IF:Text> object.
+            The new <IF::Text> object.
         @@@PerlDef:
             my $docNode = $self->{<Q::TreeCore:node>};
             my $node = <ClassM::ManakaiDOMText.newObject>;
@@ -15205,7 +15213,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Create a <IF:Comment> node.
+         Create a <IF::Comment> node.
      @@Param:
         @@@Name:  data
         @@@Type:  
@@ -15218,7 +15226,7 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The new <IF:Comment> object.
+            The new <IF::Comment> object.
         @@@PerlDef:
             my $docNode = $self->{<Q::TreeCore:node>};
             my $node = <ClassM::ManakaiDOMComment.newObject>;
@@ -15235,7 +15243,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Create a <IF:CDATASection> node.
+         Create a <IF::CDATASection> node.
      @@Param:
         @@@Name:  data
         @@@Type:  
@@ -15243,14 +15251,14 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The data for the <XML:CDATA> section.
+            The data for the <XML::CDATA> section.
      @@Return:
         @@@Type:  
           DOMXML:CDATASection
         @@@Description:
           @@@@lang:en
           @@@@@: 
-            The new <IF:CDATASection> object.
+            The new <IF::CDATASection> object.
         @@@Exception:
           @@@@Type:DOMException
           @@@@Name:NOT_SUPPORTED_ERR
@@ -15260,14 +15268,14 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                This document does not support the <Feature:XML> feature. 
+                This document does not support the <Feature::XML> feature. 
           @@@@ImplNote:
             @@@@@lang:en
             @@@@@@:
               HTML-only DOM implementations must also implement this method. 
               The DOM Level 3 Core Specification should have changed 
               the description from <QUOTE:if this document is an HTML document> 
-              to <QUOTE:if this document does not support the <Feature:XML> 
+              to <QUOTE:if this document does not support the <Feature::XML> 
               feature> for consistency with other non-HTML methods.
         @@@PerlDef:
             my $docNode = $self->{<Q::TreeCore:node>};
@@ -15291,7 +15299,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Create a <IF:ProcessingInstruction> node.
+         Create a <IF::ProcessingInstruction> node.
      @@Param:
         @@@Name:  target
         @@@Type:  
@@ -15303,12 +15311,12 @@ IF:
         @@@ImplNote:
           @@@@lang:en
           @@@@@:
-            This is an XML <XML:Name>, not an XML Names <XML:NCName>.
+            This is an XML <CODE::Name>, not an XML Names <CODE::NCName>.
         @@@ImplNote:
           @@@@lang:en
           @@@@@:
             The XML Specifications prohibit target names 
-            matching to <XML:xml> in any lower/upper-case. 
+            matching to <XML::xml> in any lower/upper-case. 
             The DOM Specifications does not.
      @@Param:
         @@@Name:  data
@@ -15324,7 +15332,7 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The new <IF:ProcessingInstruction> object.
+            The new <IF::ProcessingInstruction> object.
         @@@Exception:
           @@@@Type:DOMException
           @@@@Name:INVALID_CHARACTER_ERR
@@ -15334,7 +15342,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:name> is not an XML <XML:Name>.
+                The <P::name> is not an XML <CODE::Name>.
         @@@Exception:
           @@@@Type:DOMException
           @@@@Name:NOT_SUPPORTED_ERR
@@ -15344,7 +15352,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                This document does not support the <Feature:XML> feature.
+                This document does not support the <Feature::XML> feature.
         @@@PerlDef:
             my $docNode = $self->{<Q::TreeCore:node>};
             my $version = <Code::getDocumentXMLVersion::
@@ -15373,7 +15381,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Create an <IF:Attr> node.
+         Create an <IF::Attr> node.
      @@NSVersion: .createAttributeNS
      @@Param:
         @@@Name:  name
@@ -15385,7 +15393,7 @@ IF:
         @@@ImplNote:
           @@@@lang:en
           @@@@@:
-            There is no case-sensitivility consideration of the <P:name> 
+            There is no case-sensitivility consideration of the <P::name> 
             in the DOM Specifications.  Maybe attribute names are 
             lower-cased if it is an HTML document.
      @@Return:
@@ -15393,12 +15401,12 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            A new <IF:Attr> object.
+            A new <IF::Attr> object.
         @@@ImplNote:
           @@@@lang:en
           @@@@@:
-            <A:Node.nodeName> := <P:name>, <A:Node.localName> := <DOM:null>, 
-            <A:Node.prefix> := <DOM:null>, <A:Node.namespaceURI> := <DOM:null>, 
+            <A:Node.nodeName> := <P::name>, <A:Node.localName> := <DOM::null>, 
+            <A:Node.prefix> := <DOM::null>, <A:Node.namespaceURI> := <DOM::null>, 
             value := empty.
         @@@Exception:
           @@@@Type: DOMException
@@ -15409,7 +15417,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:name> is not a SGML or XML <XML:Name>.
+                The <P::name> is not a SGML or XML <CODE::Name>.
         @@@PerlDef:
             my $docNode = $self->{<Q::TreeCore:node>};
             my $version = <Code::getDocumentXMLVersion::
@@ -15431,13 +15439,13 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Create an <IF:EntityReference> object.  If the entity referred 
-         is known, the child list of the <IF:EntityReference> is 
-         made the same as that of the corresponding <IF:Entity> node.
+         Create an <IF::EntityReference> object.  If the entity referred 
+         is known, the child list of the <IF::EntityReference> is 
+         made the same as that of the corresponding <IF::Entity> node.
        \
-         NOTE: If any descendant of the <IF:Entity> node has an 
+         NOTE: If any descendant of the <IF::Entity> node has an 
          unbound namespace prefix, the corresponding descendant of 
-         the <IF:EntityReference> node created is also unbound.
+         the <IF::EntityReference> node created is also unbound.
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -15455,14 +15463,14 @@ IF:
         @@@ImplNote:
           @@@@lang:en
           @@@@@:
-            This is an XML <XML:Name>, not an XML Names <XML:NCName>.
+            This is an XML <CODE::Name>, not an XML Names <CODE::NCName>.
      @@Return:
         @@@Type:  
           DOMXML:EntityReference
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The new <IF:EntityReference> object.
+            The new <IF::EntityReference> object.
         @@@Exception:
           @@@@Type:DOMException
           @@@@Name:INVALID_CHARACTER_ERR
@@ -15472,7 +15480,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:name> is not an XML <XML:Name>.
+                The <P::name> is not an XML <CODE::Name>.
         @@@Exception:
           @@@@Type:DOMException
           @@@@Name:NOT_SUPPORTED_ERR
@@ -15482,7 +15490,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                This document does not support the <Feature:XML> feature.
+                This document does not support the <Feature::XML> feature.
         @@@PerlDef:
             my $docNode = $self->{<Q::TreeCore:node>};
             my $version = <Code::getDocumentXMLVersion::
@@ -15515,24 +15523,24 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Return a <IF:NodeList> of all the <IF:Element> in document 
+         Return a <IF::NodeList> of all the <IF::Element> in document 
          order with a given element type name and are contained in the document.
          \
-         {NOTE:: <IF:Element> nodes also have the 
-                 <M:Element.getElementsByTagName> method.
+         {NOTE:: <IF::Element> nodes also have the 
+                 <M::Element.getElementsByTagName> method.
          \
          }
      @@ImplNote:
        @@@lang:en
        @@@@:
-         Does <QUOTE:contained> mean that an <IF:Element> node 
-         which is not a descendant of the <IF:Document> does not match?
+         Does <QUOTE::contained> mean that an <IF::Element> node 
+         which is not a descendant of the <IF::Document> does not match?
        \
-         The DOM Level 2 Specification specifies as <QUOTE:pre-order 
+         The DOM Level 2 Specification specifies as <QUOTE::pre-order 
          traversal>.  The DOM Level 3 Specifies it by 
-         <QUOTE:in document order> and this makes the ambigiousness.
+         <QUOTE::in document order> and this makes the ambigiousness.
        \
-         Should <IF:Element> nodes in <IF:Entity> nodes be matched?
+         Should <IF::Element> nodes in <IF::Entity> nodes be matched?
      @@Param:
         @@@Name:  tagname
         @@@Type:  
@@ -15556,8 +15564,8 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            A new <IF:NodeList> object containing all the matched 
-            <IF:Element> objects.
+            A new <IF::NodeList> object containing all the matched 
+            <IF::Element> objects.
         @@@PerlDef:
             my $node = $self->{<Q::TreeCore:node>};
             my $chk;
@@ -15609,13 +15617,13 @@ IF:
          <A:CharacterData.data>, <A:CharacterData.length>.
        \
          User data is not carried over.  However, if any 
-         <IF:UserDataHandler>s has specified, these handlers will 
+         <IF::UserDataHandler>s has specified, these handlers will 
          be called with the appropriate parameters before this method 
          returns.
        \
-         <A:parentNode> := <DOM:null>.  <A:Attr.ownerElement> := <DOM:null>. 
-         <A:Attr.specified> := <DOM:true>.
-         Specified attribute nodes attached to the <IF:Element> node 
+         <A:parentNode> := <DOM::null>.  <A:Attr.ownerElement> := <DOM::null>. 
+         <A:Attr.specified> := <DOM::true>.
+         Specified attribute nodes attached to the <IF::Element> node 
          are imported.  Default attributes are created if exists.
      @@Param:
         @@@Name:  importedNode
@@ -15625,7 +15633,7 @@ IF:
           @@@@@:
             The node to import.
             \
-            Note that <IF:Document> or <IF:DocumentType> nodes cannot 
+            Note that <IF::Document> or <IF::DocumentType> nodes cannot 
             be imported.
      @@Param:
         @@@Name:  deep
@@ -15634,14 +15642,14 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            Whether the subtree under the <P:importedNode> 
+            Whether the subtree under the <P::importedNode> 
             is recursively imported or not.
             \
-            This parameter has no effect on <IF:Attr>, <IF:EntityReference>, 
-            <IF:Notation>, <IF:ProcessingInstruction>, <IF:Text>, 
-            <IF:CDATASection> and <IF:Comment> nodes.  The descendants of 
-            the <IF:Attr> node are 
-            always imported.  The descendants of the <IF:EntityReference> 
+            This parameter has no effect on <IF::Attr>, <IF::EntityReference>, 
+            <IF::Notation>, <IF::ProcessingInstruction>, <IF::Text>, 
+            <IF::CDATASection> and <IF::Comment> nodes.  The descendants of 
+            the <IF::Attr> node are 
+            always imported.  The descendants of the <IF::EntityReference> 
             node are always not imported.
         @@@InCase:
           @@@@Value:true
@@ -15649,8 +15657,8 @@ IF:
             @@@@@lang:en
             @@@@@@:
               The descendants are recursively imported if the 
-              <P:importedNode> is of <IF:DocumentFragment>, <IF:Element> or 
-              <IF:Entity>.
+              <P::importedNode> is of <IF::DocumentFragment>, <IF::Element> or 
+              <IF::Entity>.
         @@@InCase:
           @@@@Value:false
           @@@@Description:
@@ -15673,10 +15681,10 @@ IF:
           @@@@ImplNote:
             @@@@@lang:en
             @@@@@@:
-              Maybe, if this document is not <Feature:XML> and 
-              the node type is either <IF:ProcessingInstruction>, 
-              <IF:Notation>, <IF:EntityReference>, <IF:Entity> or 
-              <IF:CDATASection>.  And if namespaced nodes are imported?
+              Maybe, if this document is not <Feature::XML> and 
+              the node type is either <IF::ProcessingInstruction>, 
+              <IF::Notation>, <IF::EntityReference>, <IF::Entity> or 
+              <IF::CDATASection>.  And if namespaced nodes are imported?
         @@@Exception:
           @@@@Type:DOMException
           @@@@Name:INVALID_CHARACTER_ERR
@@ -15686,7 +15694,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                One of the imported names is not a SGML or XML <XML:Name>.
+                One of the imported names is not a SGML or XML <CODE::Name>.
      @@L2:
      @@Level[list]:  2
      @@SpecLevel:2
@@ -15700,7 +15708,7 @@ IF:
          Create an element.
        \
          If there are known attributes with default values, 
-         <IF:Attr> nodes representing them are automatically 
+         <IF::Attr> nodes representing them are automatically 
          created and attached to the element created.
      @@NoNSVersion:.createElement
      @@Param:
@@ -15738,7 +15746,7 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            A new <IF:Element> object.
+            A new <IF::Element> object.
         @@@Exception:
           @@@@Type: DOMException
           @@@@Name: INVALID_CHARACTER_ERR
@@ -15748,7 +15756,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:qualifiedName> is not an XML <XML:Name>.
+                The <P::qualifiedName> is not an XML <CODE::Name>.
             @@@@@SpecLevel:2
         @@@Exception:
           @@@@Type: DOMException
@@ -15759,7 +15767,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: 
-                The <P:qualifiedName> is malformed as a qualified name.
+                The <P::qualifiedName> is malformed as a qualified name.
             @@@@@SpecLevel:2
           @@@@SubType:
             @@@@@QName:
@@ -15767,8 +15775,8 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:qualifiedName> has a prefix and the
-                <P:namespaceURI> is <DOM:null>.
+                The <P::qualifiedName> has a prefix and the
+                <P::namespaceURI> is <DOM::null>.
             @@@@@SpecLevel:2
           @@@@SubType:
             @@@@@QName:
@@ -15776,9 +15784,9 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:qualifiedName> has a prefix that is <XML:xml> and the
-                <P:namespaceURI> is different from
-                <URI:http://www.w3.org/XML/1998/namespace>.
+                The <P::qualifiedName> has a prefix that is <CODE::xml> and the
+                <P::namespaceURI> is different from
+                <URI::http://www.w3.org/XML/1998/namespace>.
             @@@@@SpecLevel:2
           @@@@SubType:
             @@@@@QName:
@@ -15786,9 +15794,9 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:qualifiedName> has a prefix that is <XML:xmlns> and
-                the <P:namespaceURI> is different from the
-                <URI:http://www.w3.org/2000/xmlns>.
+                The <P::qualifiedName> has a prefix that is <XML::xmlns> and
+                the <P::namespaceURI> is different from the
+                <URI::http://www.w3.org/2000/xmlns>.
             @@@@@SpecLevel:3
           @@@@SubType:
             @@@@@QName:
@@ -15796,9 +15804,9 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:qualifiedName> is <XML:xmlns> and
-                the <P:namespaceURI> is different from the
-                <URI:http://www.w3.org/2000/xmlns>.
+                The <P::qualifiedName> is <XA::xmlns> and
+                the <P::namespaceURI> is different from the
+                <URI::http://www.w3.org/2000/xmlns>.
             @@@@@SpecLevel:3
           @@@@SubType:
             @@@@@QName:
@@ -15806,10 +15814,10 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:namespaceURI> is 
-                <URI:http://www.w3.org/XML/1998/namespace> and the 
-                prefix of the <P:qualifiedName> is different from 
-                <XML:xml>.
+                The <P::namespaceURI> is 
+                <URI::http://www.w3.org/XML/1998/namespace> and the 
+                prefix of the <P::qualifiedName> is different from 
+                <XML::xml>.
             @@@@@SpecLevel[list]:
           @@@@SubType:
             @@@@@QName:
@@ -15817,8 +15825,8 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:namespaceURI> is <URI:http://www.w3.org/2000/xmlns> and 
-                neither the <P:qualifiedName> nor its prefix is <XML:xmlns>.
+                The <P::namespaceURI> is <URI::http://www.w3.org/2000/xmlns> and 
+                neither the <P::qualifiedName> nor its prefix is <XML::xmlns>.
             @@@@@SpecLevel:3
           @@@@SubType:
             @@@@@QName:
@@ -15826,7 +15834,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:qualifiedName> is <XML:xmlns:xmlns>.
+                The <P::qualifiedName> is <XA::xmlns:xmlns>.
             @@@@@SpecLevel[list]:
         @@@Exception:
           @@@@Type:DOMException
@@ -15837,7 +15845,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                This document does not support the <Feature:XML> 
+                This document does not support the <Feature::XML> 
                 feature.
         @@@PerlDef:
           @@@@For:
@@ -15932,7 +15940,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:qualifiedName> is not an XML <XML:Name>.
+                The <P::qualifiedName> is not an XML <CODE::Name>.
         @@@Exception:
           @@@@Type: DOMException
           @@@@Name: NAMESPACE_ERR
@@ -15942,7 +15950,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: 
-                The <P:qualifiedName> is malformed as a qualified name.
+                The <P::qualifiedName> is malformed as a qualified name.
             @@@@@SpecLevel:2
           @@@@SubType:
             @@@@@QName:
@@ -15950,8 +15958,8 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:qualifiedName> has a prefix and the
-                <P:namespaceURI> is <DOM:null>.
+                The <P::qualifiedName> has a prefix and the
+                <P::namespaceURI> is <DOM::null>.
             @@@@@SpecLevel:2
           @@@@SubType:
             @@@@@QName:
@@ -15959,9 +15967,9 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:qualifiedName> has a prefix that is <XML:xml> and the
-                <P:namespaceURI> is different from
-                <URI:http://www.w3.org/XML/1998/namespace>.
+                The <P::qualifiedName> has a prefix that is <CODE::xml> and the
+                <P::namespaceURI> is different from
+                <URI::http://www.w3.org/XML/1998/namespace>.
             @@@@@SpecLevel:2
           @@@@SubType:
             @@@@@QName:
@@ -15969,9 +15977,9 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:qualifiedName> has a prefix that is <XML:xmlns> and
-                the <P:namespaceURI> is different from the
-                <URI:http://www.w3.org/2000/xmlns>.
+                The <P::qualifiedName> has a prefix that is <XML::xmlns> and
+                the <P::namespaceURI> is different from the
+                <URI::http://www.w3.org/2000/xmlns>.
             @@@@@SpecLevel:3
           @@@@SubType:
             @@@@@QName:
@@ -15979,9 +15987,9 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:qualifiedName> is <XML:xmlns> and
-                the <P:namespaceURI> is different from the
-                <URI:http://www.w3.org/2000/xmlns>.
+                The <P::qualifiedName> is <XA::xmlns> and
+                the <P::namespaceURI> is different from the
+                <URI::http://www.w3.org/2000/xmlns>.
             @@@@@SpecLevel:2
           @@@@SubType:
             @@@@@QName:
@@ -15989,10 +15997,10 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:namespaceURI> is 
-                <URI:http://www.w3.org/XML/1998/namespace> and the 
-                prefix of the <P:qualifiedName> is different from 
-                <XML:xml>.
+                The <P::namespaceURI> is 
+                <URI::http://www.w3.org/XML/1998/namespace> and the 
+                prefix of the <P::qualifiedName> is different from 
+                <XML::xml>.
             @@@@@SpecLevel[list]:
           @@@@SubType:
             @@@@@QName:
@@ -16000,8 +16008,8 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:namespaceURI> is <URI:http://www.w3.org/2000/xmlns> and 
-                neither the <P:qualifiedName> nor its prefix is <XML:xmlns>.
+                The <P::namespaceURI> is <URI::http://www.w3.org/2000/xmlns> and 
+                neither the <P::qualifiedName> nor its prefix is <XML::xmlns>.
             @@@@@SpecLevel:3
           @@@@SubType:
             @@@@@QName:
@@ -16009,7 +16017,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:qualifiedName> is <XML:xmlns:xmlns>.
+                The <P::qualifiedName> is <XA::xmlns:xmlns>.
             @@@@@SpecLevel[list]:
           @@@@ImplNote:
             @@@@@lang:en
@@ -16023,7 +16031,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                This document does not support the <Feature:XML> 
+                This document does not support the <Feature::XML> 
                 feature.
         @@@PerlDef:
           @@@@For:
@@ -16071,11 +16079,11 @@ IF:
      @@Description:
         @@@lang:en
         @@@@:
-          Return a <IF:NodeList> of all the <IF:Element> nodes 
+          Return a <IF::NodeList> of all the <IF::Element> nodes 
           with a given local name and namespace URI in document order.
           \
-          {NOTE:: <IF:Element> nodes also have the 
-                  <M:Element.getElementsByTagNameNS> method.
+          {NOTE:: <IF::Element> nodes also have the 
+                  <M::Element.getElementsByTagNameNS> method.
           \
           }
      @@Param:
@@ -16121,8 +16129,8 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            A new <IF:NodeList> object containing all the 
-            matched <IF:Element> objects.
+            A new <IF::NodeList> object containing all the 
+            matched <IF::Element> objects.
         @@@Exception:
           @@@@Type:DOMException
           @@@@Name:NOT_SUPPORTED_ERR
@@ -16132,18 +16140,18 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The DOM implementation does not support the <Feature:XML> 
+                The DOM implementation does not support the <Feature::XML> 
                 feature and the language exposed through the 
-                <IF:Document> is not support XML Namespaces.
+                <IF::Document> is not support XML Namespaces.
           @@@@SpecLevel:
         @@@ImplNote:
           @@@@lang:en
           @@@@@:
-            For <M:Element.getElementsByTagNameNS>, DOM Level 2 allows 
+            For <M::Element.getElementsByTagNameNS>, DOM Level 2 allows 
             HTML-only DOM implementations not to implement that method 
             and its Errata and DOM Level 3 say to raise 
             <X:NOT_SUPPORTED_ERROR> if it is called.  
-            <M:Document.getElementsByTagNameNS> should also raise the 
+            <M::Document.getElementsByTagNameNS> should also raise the 
             exception, shouldn't it?
         @@@PerlDef:
           @@@@For:
@@ -16238,7 +16246,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Return the <IF:Element> that has an <SGML:ID> attribute 
+         Return the <IF::Element> that has an <SGML:ID> attribute 
          with the given value.
        \
          If more than one element has an <SGML:ID> attribute 
@@ -16247,11 +16255,11 @@ IF:
        @@@lang:en
        @@@@:
          DOM implementations are expected to use the <A:Attr.isId> 
-         to detect an <SGML:ID> attribute.
+         to detect an <SGML::ID> attribute.
        \
-         <XML:ID> ATTRIBUTES, not <XML:ID> ELEMENTS.
+         <XML::ID> ATTRIBUTES, not <XML::ID> ELEMENTS.
        \
-         Can an <IF:Element> that is not a descendant of the <IF:Document> 
+         Can an <IF::Element> that is not a descendant of the <IF::Document> 
          be returned?
      @@Param:
         @@@Name:  elementId
@@ -16272,7 +16280,7 @@ IF:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         This method was first defined in the interface <IF:HTMLDocument> 
+         This method was first defined in the interface <IF::HTMLDocument> 
          in the DOM Level 1.
      @@Return:
         @@@Type:  Element
@@ -16426,7 +16434,7 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The current document does not support the <Feature:XML> 
+                The current document does not support the <Feature::XML> 
                 feature.
         @@@Def:
           @@@@ContentType:
@@ -16437,7 +16445,7 @@ IF:
           @@@@lang:en
           @@@@@:
             Isn't <X:DOMException.NO_MODIFICATION_ALLOWED_ERR> raised?
-            (Since DOM Level 1-3 does not have read-only <IF:Document> node?)
+            (Since DOM Level 1-3 does not have read-only <IF::Document> node?)
      @@Level[list]:  3
      @@SpecLevel:3
      @@For:
@@ -16643,20 +16651,20 @@ IF:
          Act as if the document was going through a save and 
          load cycle, putting the document in a "normal" form.
        \
-         - Update the replacement tree of <IF:EntityReference> nodes.
+         - Update the replacement tree of <IF::EntityReference> nodes.
        \
-         - Normalize <IF:Text> nodes, as the method <M:Node.normalize> does.
+         - Normalize <IF::Text> nodes, as the method <M::Node.normalize> does.
        \
-         - Other normalization specified by the <M:Document.domConfig>.
+         - Other normalization specified by the <M::Document.domConfig>.
        \
          Mutation events, when supported, are generated to reflect  
          the changes occuring on the document.
        \
          If errors occur, such as an attempt to update a read-only 
-         node or a <A:Node.nodeName> contains an invalid character, 
+         node or a <A::Node.nodeName> contains an invalid character, 
          (fatal and non-fatal) errors and warnings will be reported using 
-         the <IF:DOMErrorHandler> object associated with the 
-         <DOM:error-handler> parameter.
+         the <IF::DOMErrorHandler> object associated with the 
+         <DOM::error-handler> parameter.
      @@Return:
      @@Level[list]:  3
      @@SpecLevel:3
@@ -16667,7 +16675,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Rename an <IF:Element> or <IF:Attr> node. 
+         Rename an <IF::Element> or <IF::Attr> node. 
       \
          When possible, this simply changes the name of the 
          given node.  Otherwise, this creates a new node 
@@ -16700,12 +16708,12 @@ IF:
          the new element type name.  The implementation may 
          update from other schemas.
        \ 
-         <IF:Attr> attached to an <IF:Element> is first removed from 
-         the <IF:Element>.  Then either modifying the existing node 
+         <IF::Attr> attached to an <IF::Element> is first removed from 
+         the <IF::Element>.  Then either modifying the existing node 
          or creating a new node and put is back.
        \
-         A user data event <DOM:NODE_RENAMED> is fired and if 
-         the implementation supports the <Feature:MutationNameEvents>, 
+         A user data event <DOM::NODE_RENAMED> is fired and if 
+         the implementation supports the <Feature::MutationNameEvents>, 
          each mutation operation involved fires the appropriate event 
          and in the end 
          <Q::ev:DOMElementNameChanged> or <Q::ev:DOMAttributeNameChanged> 
@@ -16746,7 +16754,7 @@ IF:
             @@@@@lang:en
             @@@@@@:
               The type of the specified node is neither 
-              <IF:Element> nor <IF:Attr>, or the DOM implementation 
+              <IF::Element> nor <IF::Attr>, or the DOM implementation 
               does not support the renaming of the document element.
         @@@Exception:
           @@@@Type:DOMException
@@ -16757,28 +16765,28 @@ IF:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
-                The <P:qualifiedName> is not an XML <XML:Name>.
+                The <P::qualifiedName> is not an XML <XML::Name>.
        @@@Exception:
          @@@@Type:DOMException
          @@@@Name:WRONG_DOCUMENT_ERR
          @@@@Description:
            @@@@@lang:en
            @@@@@@:
-             The <P:n> was created from a different document.
+             The <P::n> was created from a different document.
        @@@Exception:
          @@@@Type:DOMException
          @@@@Name:NAMESPACE_ERR
          @@@@Description:
            @@@@@lang:en
            @@@@@@:
-             Either the <P:qualifiedName> is malformed, 
-             the <P:qualifiedName> has a prefix and the <P:namespaceURI> 
-             is <DOM:null>, the <P:qualifiedName> has a prefix that 
-             is <XML:xml> and the <P:namespaceURI> is different 
-             from <URI:http://www.w3.org/XML/1998/namespace>, 
-             the <P:n> is an attribute and <P:qualifiedName> or its 
-             prefix is <XML:xmlns> and the <P:namespaceURI> is 
-             different from <URI:http://www.w3.org/2000/xmlns/>.
+             Either the <P::qualifiedName> is malformed, 
+             the <P::qualifiedName> has a prefix and the <P::namespaceURI> 
+             is <DOM::null>, the <P::qualifiedName> has a prefix that 
+             is <XML::xml> and the <P::namespaceURI> is different 
+             from <URI::http://www.w3.org/XML/1998/namespace>, 
+             the <P::n> is an attribute and <P::qualifiedName> or its 
+             prefix is <XML::xmlns> and the <P::namespaceURI> is 
+             different from <URI::http://www.w3.org/2000/xmlns/>.
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -16821,9 +16829,9 @@ IF:
        @@@ImplNote:
          @@@@lang:en
          @@@@@:
-           If a document has both a <HTML:base> element and 
-           an <XML:xml:base> attribute, or even in the case that 
-           an XHTML 1 document has an <XML:xml:base> attribute, 
+           If a document has both a <HE::base> element and 
+           an <XA::xml:base> attribute, or even in the case that 
+           an XHTML 1 document has an <XA::xml:base> attribute, 
            its result is not defined by any W3C specification.
     @@SpecLevel:3
     @@Level[list]:3
@@ -16838,7 +16846,7 @@ IF:
          URI, starting from this node.
        \
          The default namespace declarations are ignored by this method. 
-         To lookup default namespace, use the <M:Node.isDefaultNamespace>
+         To lookup default namespace, use the <M::Node.isDefaultNamespace>
          method.
      @@Param:
         @@@Name:  namespaceURI
@@ -16853,14 +16861,14 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              Always <DOM:null> will be returned.
+              Always <DOM::null> will be returned.
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              Always <DOM:null> will be returned.
+              Always <DOM::null> will be returned.
      @@Return:
         @@@Type:  
           DOMMain:DOMString
@@ -17010,7 +17018,7 @@ IF:
        @@@ImplNote:
          @@@@lang:en
          @@@@@:
-           Other properties required to be a legal <IF:Document> object:
+           Other properties required to be a legal <IF::Document> object:
            <Q::DOMCore:implementation>, <Q::ManakaiDOM:implID>, 
            <Q::DOMCore:hasFeature>.
          \
@@ -17159,7 +17167,7 @@ ConfigParam:
   @Description:
     @@lang:en
     @@@:
-      A parameter name used with the <IF:DOMConfiguration>.
+      A parameter name used with the <IF::DOMConfiguration>.
     \
       Names are case-insensitive.  To avoid possible conflicts, 
       names referring to parameters defined outside the DOM 
@@ -17265,7 +17273,7 @@ ConfigParam:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          Keep <IF:CDATASection> nodes in the document.
+          Keep <IF::CDATASection> nodes in the document.
       @@@SetParam:
         @@@@Name: canonicel-form
         @@@@Type:boolean
@@ -17276,9 +17284,9 @@ ConfigParam:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          Transform <IF:CDATASection> nodes in the document into 
-          <IF:Text> nodes.  The new <IF:Text> node is then 
-          combined with any adjacent <IF:Text> node.
+          Transform <IF::CDATASection> nodes in the document into 
+          <IF::Text> nodes.  The new <IF::Text> node is then 
+          combined with any adjacent <IF::Text> node.
   @CParam:
     @@Name: check-character-normalization
     @@IsSupportRequired
@@ -17292,8 +17300,8 @@ ConfigParam:
           as defined in Appendix B of the XML 1.1 Specification.  When 
           a sequence of characters is encountered that fails 
           normalization checking, an error with the 
-          <A:DOMError.type> equals to 
-          <DOM:check-character-normalization-failure> is issued.
+          <A::DOMError.type> equals to 
+          <DOM::check-character-normalization-failure> is issued.
     @@InCase:
       @@@Value: false
       @@@IsSupportRequired:1
@@ -17312,14 +17320,14 @@ ConfigParam:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          Keep <IF:Comment> nodes in the document.
+          Keep <IF::Comment> nodes in the document.
     @@InCase:
       @@@Value:false
       @@@IsSupportRequired:1
       @@@Description:
         @@@@lang:en
         @@@@@:
-           Discard <IF:Comment> nodes in the document.
+           Discard <IF::Comment> nodes in the document.
   @CParam:
     @@Name: datatype-normalization
     @@IsSupportRequired:1
@@ -17331,8 +17339,8 @@ ConfigParam:
         @@@@@:
           Expose schema normalized values in the tree.
         \
-          This parameter required to have <DOM:validate> parameter 
-          equals to <DOM:true>, or this parameter has no effect.
+          This parameter required to have <DOM::validate> parameter 
+          equals to <DOM::true>, or this parameter has no effect.
         \
           Note that the attribute value normalization as defined 
           in the XML Specifications does not applied.  This 
@@ -17362,14 +17370,14 @@ ConfigParam:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          Discard all <IF:Text> nodes that contain whitespaces 
+          Discard all <IF::Text> nodes that contain whitespaces 
           in element content.
       @@@ImplNote:
         @@@@lang:en
         @@@@@:
           DOM implementations are expected to use the attribute 
-          <A:Text.isElementContentWhitespace> to determine 
-          whether a <IF:Text> node should be discarded.
+          <A::Text.isElementContentWhitespace> to determine 
+          whether a <IF::Text> node should be discarded.
       @@@SetParam:
         @@@@Name:canonical-form
         @@@@Type:boolean
@@ -17385,7 +17393,7 @@ ConfigParam:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          Keep <IF:EntityReferences> nodes in the document.
+          Keep <IF::EntityReferences> nodes in the document.
       @@@SetParam:
         @@@@Name:canonical-form
         @@@@Type:boolean
@@ -17396,15 +17404,15 @@ ConfigParam:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          Remove all <IF:EntityReference> nodes from the document, 
+          Remove all <IF::EntityReference> nodes from the document, 
           putting the entity expansions directly in their place. 
-          <IF:Text> nodes are normalized as defined in 
-          <M:Node.normalize>.  Only unexpanded entity references 
+          <IF::Text> nodes are normalized as defined in 
+          <M::Node.normalize>.  Only unexpanded entity references 
           are kept in the document.
       @@@ImplNote:
         @@@@lang:en
         @@@@@:
-          This parameter does not affect <IF:Entity> nodes.
+          This parameter does not affect <IF::Entity> nodes.
   @CParam:
     @@Name: error-handler
     @@Type: 
@@ -17414,28 +17422,28 @@ ConfigParam:
       @@@lang:en
       @@@@:
         If an error is encountered in the document, the DOM 
-        implementation will callback the <IF:DOMErrorHandler>. 
+        implementation will callback the <IF::DOMErrorHandler>. 
       \
-        When called, <A:DOMError.relatedData> will contain 
+        When called, <A::DOMError.relatedData> will contain 
         the closest node to where the error occurred. 
         If the implementation is unable to determine the node 
-        where the error occurs, <A:DOMError.relatedData> will 
-        contain the <IF:Document> node. 
+        where the error occurs, <A::DOMError.relatedData> will 
+        contain the <IF::Document> node. 
       \
         Mutations to the document from within an error handler 
         will result in implementation dependent behavior.
     @@ImplNote:
       @@@lang:en
       @@@@:
-        DOM implementations may provide a default <IF:DOMErrorHandler> 
+        DOM implementations may provide a default <IF::DOMErrorHandler> 
         object.  
     @@ImplNote:
       @@@lang:en
       @@@@:
         {P:: This parameter is used in:
         \
-        {LI:: <M:Document.normalizeDocument>:: If errors occurs, such as an 
-          attempt to update a read-only node or a <A:Node.nodeName> 
+        {LI:: <M::Document.normalizeDocument>:: If errors occurs, such as an 
+          attempt to update a read-only node or a <A::Node.nodeName> 
           contains an invalid character.  This method might report 
           fatal errors.
         \
@@ -17493,18 +17501,18 @@ ConfigParam:
       @@@ImplNote:
         @@@@lang:en
         @@@@@:
-          <M:DOMConfiguration.getParameter> with this parameter 
-          returns <DOM:true> iif <CODE:!<DOM:validate-if-schema> && 
-          !<DOM:entities> && !<DOM:datatype-normalization> && 
-          !<DOM:cdata-sections> && <DOM:namespace-declarations> && 
-          <DOM:well-formed> && <DOM:element-content-whitespace> && 
-          <DOM:comment> && <DOM:namespaces>>.
+          <M::DOMConfiguration.getParameter> with this parameter 
+          returns <DOM::true> iif <CODE::!<DOM::validate-if-schema> && 
+          !<DOM::entities> && !<DOM::datatype-normalization> && 
+          !<DOM::cdata-sections> && <DOM::namespace-declarations> && 
+          <DOM::well-formed> && <DOM::element-content-whitespace> && 
+          <DOM::comment> && <DOM::namespaces>>.
     @@InCase:
       @@@Value:false
       @@@Description:
         @@@@lang:en
         @@@@@:
-          Setting <DOM:infoset> to <DOM:false> has no effect.
+          Setting <DOM::infoset> to <DOM::false> has no effect.
     @@Get:
       @@@Def:
         @@@@ContentType:
@@ -17584,7 +17592,7 @@ ConfigParam:
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
-            The default is <DOM:true> but fully-normalization is 
+            The default is <DOM::true> but fully-normalization is 
             not required to be supported <SRC:DOM Level 3 LS>.
       @@@Description:
         @@@@lang:en
@@ -17625,27 +17633,27 @@ ConfigParam:
           The schemas against which validation should occur, i.e. 
           the current schema.
       \
-        The types of schemas must match the <DOM:schema-type>, 
+        The types of schemas must match the <DOM::schema-type>, 
         otherwise the behaviour is undefined.
       \
         The schemas specified here take precedence to the schema 
         specified in the document itself.  For namespace aware schema, 
         if a schema specified using this parameter and a schema 
         specified in the document instance in a schema document 
-        share the same <CODE:targetNamespace>, the schema specified 
+        share the same <CODE::targetNamespace>, the schema specified 
         by the DOM application will be used.  If two schemas 
         specified by the application share the same 
-        <CODE:targetNamespace> or have no namespace, the behavior 
+        <CODE::targetNamespace> or have no namespace, the behavior 
         is implementation dependent.
       \
-        This parameter is ignored unless the <DOM:schema-type> 
+        This parameter is ignored unless the <DOM::schema-type> 
         value is set.
       @@@ImplNote:
         @@@@lang:en
         @@@@@:
-        Whitespace = <XML:S> in the XML 1.0 Specification.
+        Whitespace = <CODE::S> in the XML 1.0 Specification.
       \
-        It is strongly recommended that the <A:Document.documentURI>, 
+        It is strongly recommended that the <A::Document.documentURI>, 
         will be set so that an implementation can successfully resolve 
         any external entities referred. 
     @@InCase:
@@ -17692,20 +17700,20 @@ ConfigParam:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          Split CDATA sections containing the <SGML:MSE> 
-          (<XML:]]<gt>>).
+          Split CDATA sections containing the <SGML::MSE> 
+          (<XML::]]<gt>>).
         \
           When CDATA section is split, a warning is issued with 
-          a <A:DOMError.type> equals to <DOM:cdata-sections-splitted> 
-          and <A:DOMError.relatedData> equals to the first 
-          <IF:CDATASection> node in document order.
+          a <A::DOMError.type> equals to <DOM::cdata-sections-splitted> 
+          and <A::DOMError.relatedData> equals to the first 
+          <IF::CDATASection> node in document order.
     @@InCase:
       @@@Value:false
       @@@IsSupportRequired:1
       @@@Description:
         @@@@lang:en
         @@@@@:
-          Signal an error if <IF:CDATASection> contains an 
+          Signal an error if <IF::CDATASection> contains an 
           unrepresentable character.
   @CParam:
     @@Name:validate
@@ -17723,22 +17731,22 @@ ConfigParam:
           the error handler is notified.
         \
           Schema-normalized values will not exposed unless the 
-          parameter <DOM:datatype-normalization> is <DOM:true>.
+          parameter <DOM::datatype-normalization> is <DOM::true>.
         \
           Following attributes are revaluated:
         \
-          - Attribute nodes with <A:Attr.specified> equals to <DOM:false>.
+          - Attribute nodes with <A::Attr.specified> equals to <DOM::false>.
         \
-          - The value of the attribute <A:Text.isElementContentWhitespace> 
-          for all <IF:Text> nodes.
+          - The value of the attribute <A::Text.isElementContentWhitespace> 
+          for all <IF::Text> nodes.
         \
-          - The value of the attribute <A:Attr.isId> for all <IF:Attr> nodes.
+          - The value of the attribute <A::Attr.isId> for all <IF::Attr> nodes.
         \
-          - The attributes <A:Element.schemaTypeInfo> and 
-          <A:Attr.schemaTypeInfo>.
+          - The attributes <A::Element.schemaTypeInfo> and 
+          <A::Attr.schemaTypeInfo>.
         \
           DOM applications should consider setting the parameter 
-          <DOM:well-formed> to <DOM:true>.
+          <DOM::well-formed> to <DOM::true>.
       @@@SetParam:
         @@@@Name: validate-if-schema
         @@@@Type:boolean
@@ -17754,7 +17762,7 @@ ConfigParam:
           processing.  Default attribute information are kept.
         \
           Note that validation might still happen in case 
-          <DOM:validate-if-schema> is <DOM:true>.
+          <DOM::validate-if-schema> is <DOM::true>.
   @CParam:
     @@Name:validate-if-schema
     @@Type:boolean
@@ -17767,7 +17775,7 @@ ConfigParam:
           Enable validation only if a declaration for the document 
           element can be found in a schema.  If validation is enabled, 
           this parameter has the same behavior as the parameter 
-          <DOM:validate> set to <DOM:true>.
+          <DOM::validate> set to <DOM::true>.
       @@@SetParam:
         @@@@Name:validate
         @@@@Type:boolean
@@ -17784,7 +17792,7 @@ ConfigParam:
           processing.  Default attribute information are kept.
         \
           Note that validation might still happen in case 
-          <DOM:validate> is <DOM:true>.
+          <DOM::validate> is <DOM::true>.
   @CParam:
     @@Name:well-formed
     @@Type:boolean
@@ -17797,23 +17805,23 @@ ConfigParam:
         @@@@lang:en
         @@@@@:
           Check if all nodes are well-formed according to the XML 
-          version in use (<A:Document.xmlVersion>), i.e.:
+          version in use (<A::Document.xmlVersion>), i.e.:
         \
-          - Check if the attribute <A:Node.nodeName> contains 
+          - Check if the attribute <A::Node.nodeName> contains 
           invalid characters according to its node type and generate 
-          a <IF:DOMError> of type <DOM:wf-invalid-character-in-node-name>, 
-          with a <DOM:SEVERITY_ERROR> severity, if necessary.
+          a <IF::DOMError> of type <DOM::wf-invalid-character-in-node-name>, 
+          with a <DOM::SEVERITY_ERROR> severity, if necessary.
         \
-          - Check if the text content inside <IF:Attr>, <IF:Element>, 
-          <IF:Comment>, <IF:Text> and <IF:CDATASection> nodes for 
-          invalid characters and generate a <IF:DOMError> of type 
-          <DOM:wf-invalid-character>, with a 
-          <DOM:SEVERITY_ERROR> severity, if necessary.
+          - Check if the text content inside <IF::Attr>, <IF::Element>, 
+          <IF::Comment>, <IF::Text> and <IF::CDATASection> nodes for 
+          invalid characters and generate a <IF::DOMError> of type 
+          <DOM::wf-invalid-character>, with a 
+          <DOM::SEVERITY_ERROR> severity, if necessary.
         \
-          - Check if the data inside <IF:ProcessingInstruction> nodes 
-          for invalid characters and generate a <IF:DOMError> 
-          of type <DOM:wf-invalid-character>, with a
-          <DOM:SEVERITY_ERROR> severity, if necessary.
+          - Check if the data inside <IF::ProcessingInstruction> nodes 
+          for invalid characters and generate a <IF::DOMError> 
+          of type <DOM::wf-invalid-character>, with a
+          <DOM::SEVERITY_ERROR> severity, if necessary.
     @@InCase:
       @@@Value:false
       @@@Description:

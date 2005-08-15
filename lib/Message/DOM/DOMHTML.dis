@@ -44,7 +44,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/23 13:26:55 $
+      $Date: 2005/08/15 07:59:41 $
     @@ContentType:
       dis:Date.RCS
 
@@ -3456,6 +3456,10 @@ IF:
       @@@nullCase:
         @@@@enDesc:
           No class is set.
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          <IF::DOMTokenString> and <IF::DOMStringList> shuld also be supported.
     @@Return:
       @@@Type: HTMLAnchorElement
       @@@enDesc:
@@ -3587,8 +3591,11 @@ IF:
         }__;
   
   @enImplNote:
-    ISSUE: Array should be allowed for setting className?
-           (Waiting for WA1)
+    {TODO::
+      <P::classArg>s should also accept <IF::DOMTokenString> (HTML5)
+      and <IF::DOMStringList> (DOM3) and any Perl array references.
+      (Pending until the publication of a fixed draft of HTML5)
+    }
 
   @Method:
     @@Name: appendNewPhrase
@@ -3601,8 +3608,11 @@ IF:
         Element type namespace URI.
       @@@nullCase:
         @@@@enDesc:
-          The default value, <URI::http://www.w3.org/1999/xhtml>,
-          is used.
+          The HTML namespace URI, <URI::http://www.w3.org/1999/xhtml>,
+          is assumed.
+          \
+          {NOTE:: The <DOM::null> namespace is not supported.
+          }
     @@Param:
       @@@Name: localNameArg
       @@@Type: DOMString
@@ -3610,14 +3620,14 @@ IF:
         Element type local name. 
       @@@nullCase:
         @@@@enDesc:
-          No element is added.
+          No element is added and the <P::namespaceNameArg> is ignored.
     @@Param:
       @@@Name: textArg
       @@@Type: DOMString
       @@@enDesc:
         Text content of the newly created element.
         If <P::localNameArg> is <DOM::null>, the <P::textArg>
-        is directly appended to this element.
+        is directly appended to this element as a new <IF::Text> node.
       @@@nullCase:
         @@@@enDesc: No text node is added.
     @@Param:
@@ -4174,6 +4184,10 @@ IF:
       inserted immediately before the <P::index>th <HE::dt> element.
       Otherwise, a <HE::li> element is inserted
       immediately before the <P::index>th <HE::li> element. 
+    @@enImplNote:
+      This behaviour may be changed if the HTML5 introduces
+      the <QUOTE::di> element type which contains pair of <HE::dt>
+      and <HE::dd> elements.
     @@Param:
       @@@Name:index
       @@@Type:DOMMain|long||ManakaiDOM|all

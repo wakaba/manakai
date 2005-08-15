@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/05/29 12:56:35 $
+      $Date: 2005/08/15 07:59:41 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1148,6 +1148,7 @@ ClsDef:
       @@@UndeclaredPrefixException:
       @@@PerlDef:
           __DEEP{
+            $r = $defaultMediaType;
             my $ctn = $self-><M::ManakaiDISElement.disGetAttribute>
                                 (<Q::dis:ContentType>, for_arg => $forArg,
                                  forp_arg => $forpArg);

@@ -1,3 +1,23 @@
+2005-08-15  Wakaba  <wakaba@suika.fam.cx>
+
+	* DISDoc.dis (getDescription): Don't use $condition parameter
+	if it is null.
+
+2005-08-14  Wakaba  <wakaba@suika.fam.cx>
+
+	* DISDoc.dis: Use HTML 5 element types rather than XHTML 2 ones.
+	(parseDISDocInlineText, parseDISDocText): Unset (set empty text) 
+	the xml:lang attribute if the natural language of the element is unable
+	to be represented by the IETF language tags.
+	(parseDISDocInlineText, parseDISDocText): Use original element
+	type in the ddel: namespace URI rather than the XHTML 1 div element 
+	type for the container elements.
+	(splitElementContentByString, tfqnamesToElement): New code fragments.
+	(qnameToElement): Revised to use splitElementContentByString.
+	(parseDISDocInlineText): Now supports expansion of markup
+	minimumization of lextypes dis:TypeQName, dis:TFQNames,
+	DISPerl:MemRef and ManakaiDOM:XCodeRef.
+
 2005-05-29  Wakaba  <wakaba@suika.fam.cx>
 
 	* DISDoc.dis: Lextype dis:TypeQName implemented.
