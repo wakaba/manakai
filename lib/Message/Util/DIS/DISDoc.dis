@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/08/15 07:59:41 $
+      $Date: 2005/08/18 12:50:49 $
     @@ContentType:
       dis:Date.RCS
   
@@ -812,7 +812,8 @@ IFClassDef:
       @@@PerlDef:
         __DEEP{
           my $ctu = $self-><M::DIS:ManakaiDISElement.mediaTypeURI>
-                                ($defaultMediaType, for_arg => $forArg,
+                                (default_media_type => $defaultMediaType,
+                                 for_arg => $forArg,
                                  forp_arg => $forpArg);
           my $ct = $self-><AG::DIS|ManakaiDISNode.ownerDISDocument>
                                 -><AG::DIS|ManakaiDISDocument.disDatabase>

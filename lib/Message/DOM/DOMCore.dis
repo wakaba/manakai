@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/08/15 07:59:40 $
+      $Date: 2005/08/18 12:50:48 $
     @@ContentType:
       dis:Date.RCS
 
@@ -650,9 +650,9 @@ ElementTypeBinding:
         !ManakaiDOM:ManakaiDOM1
     @@Type:
       DOMMain:unsigned-short
-    @@ISA:
+    @@rdfs:subClassOf:
       @@@@:
-        DOMMain:unsigned-short
+        DOMMain:unsigned-short||ManakaiDOM|Perl
       @@@ForCheck:
         ManakaiDOM:ForClass
 
@@ -2317,8 +2317,7 @@ IF:
 
   ## For DOM Levels 1 and 2
   @ISA:
-    @@@:
-      ManakaiDOM:ManakaiDOMNodeReference::ManakaiDOM:Perl
+    @@@: ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl
     @@ForCheck:
       ManakaiDOM:ForClass !ManakaiDOM:ManakaiDOM3 ManakaiDOM:ManakaiDOM
   @ISA:
@@ -2888,9 +2887,7 @@ IF:
                   MDOMX:param-name => 'doctype',
                 }__;
               }
-              $doctypeNode-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                                                 .importTree>
-                                                                     ($node);
+              $doctypeNode-><M::NodeStem.importTree> ($node);
               $doctypeNode->{<Q::DOMCore:ownerDocument>} = $node;
               $doctypeNode->{<Q::infoset:parent>} = $node;
               push @{$node->{<Q::infoset:children>}}, $doctypeNode;
@@ -2907,8 +2904,7 @@ IF:
                 }
               }__;
               my $docElObj = <ClassM::ManakaiDOMElement.newObject>;
-              $node-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                                                .importTree> ($docElObj);
+              $node-><M::NodeStem.importTree> ($docElObj);
               $docElObj->{<Q::infoset:prefix>} = $prefix;
               $docElObj->{<Q::infoset:namespaceName>} = $namespaceURI;
               $docElObj->{<Q::infoset:localName>} = $lname;
@@ -2973,9 +2969,7 @@ IF:
                   MDOMX:param-name => 'doctype',
                 }__;
               }
-              $doctypeNode-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                                                 .importTree>
-                                                                     ($node);
+              $doctypeNode-><M::NodeStem.importTree> ($node);
               $doctypeNode->{<Q::DOMCore:ownerDocument>} = $node;
               $doctypeNode->{<Q::infoset:parent>} = $node;
               push @{$node->{<Q::infoset:children>}}, $doctypeNode;
@@ -2990,8 +2984,7 @@ IF:
             }
             if ($lname) {
               my $docElObj = <ClassM::ManakaiDOMElement.newObject>;
-              $node-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                                                   .importTree> ($docElObj);
+              $node-><M::NodeStem.importTree> ($docElObj);
               $docElObj->{<Q::infoset:prefix>} = $prefix;
               $docElObj->{<Q::infoset:namespaceName>} = $namespaceURI;
               $docElObj->{<Q::infoset:localName>} = $lname;
@@ -3105,13 +3098,23 @@ IF:
         @@@@@:
           The newly created DOM implementation object.
       @@@PerlDef:
-        my $node = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
-                          ::ManakaiDOM:Perl.new>;
-        $r = $node-><M::ManakaiDOM:ManakaiDOMNodeObject
-                      ::ManakaiDOM:Perl.newReference> ($self);
+        my $node = <ClassM::ManakaiNode|ManakaiNodeStem||ManakaiDOM|Perl.new>;
+        __CODE{getNodeRef::
+          $object => $node,
+          $ref => $r,
+          $class => {ref $self ? ref $self : $self},
+        }__;
         $node->{<Q::ManakaiDOM:implID>} = $node->{<Q::TreeCore:nodeID>};
       
 ##DOMImplementation
+
+ResourceDef:
+  @QName: NodeStem
+  @AliasFor: ManakaiNode|NodeStem||ManakaiDOM|Perl
+
+ResourceDef:
+  @QName: NodeRef
+  @AliasFor: ManakaiNode|NodeRef||ManakaiDOM|Perl
 
 ElementTypeBinding:
   @Name: disDef
@@ -3144,8 +3147,7 @@ IF:
     @@ForCheck:
       ManakaiDOM:ForClass
   @ISA:
-    @@@:
-      ManakaiDOM:ManakaiDOMNodeReference::ManakaiDOM:Perl
+    @@@: ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl
     @@ForCheck:
       ManakaiDOM:ForClass
     @@For:
@@ -3169,8 +3171,8 @@ IF:
        @@@@: ManakaiDOMNodeType
        @@@ForCheck:
          ManakaiDOM:ForClass
-     @@ISA:
-       DOMMain:unsigned-short
+     @@rdfs:subClassOf:
+       DOMMain:unsigned-short||ManakaiDOM|all
      @@Description:
        @@@lang:en
        @@@@: An integer indicating which type of node this is.
@@ -3430,10 +3432,11 @@ IF:
             @@@@@lang:en
             @@@@@@: This node has no child node.
         @@@PerlDef:
-          $r = $self->{<Q::TreeCore:node>}
-                    -><M::ManakaiDOM:ManakaiDOMNodeObject
-                        ::ManakaiDOM:Perl.newReference>
-                        (<ClassName::ManakaiDOMCore:ManakaiDOMChildNodeList>);
+          __CODE{getNodeRef::
+            $object => {$self->{<Q::TreeCore:node>}},
+            $ref => $r,
+            $class => {<ClassName::ManakaiDOMCore:ManakaiDOMChildNodeList>},
+          }__;
      @@SpecLevel:1
      @@Level[list]:
        1
@@ -3755,9 +3758,7 @@ IF:
             CHKDOC: {
               if (UNIVERSAL::isa ($newChild, <IFName::Node
                                               ::ManakaiDOM:ManakaiDOM>) and
-                  UNIVERSAL::isa ($newChild, <ClassName::
-                                  ManakaiDOM:ManakaiDOMNodeReference
-                                  ::ManakaiDOM:Perl>)) {
+                  UNIVERSAL::isa ($newChild, <IFName::NodeRef>)) {
                 $node = $self->{<Q::TreeCore:node>};
                 $newNode = $newChild->{<Q::TreeCore:node>};
                 if ($node->{<Q::DOMCore:ownerDocument>}) {
@@ -3968,9 +3969,7 @@ IF:
               } else { ## $newChild->parentNode ne $self
                 for my $newNode (@newNode) {
                   CORE::delete $newNode->{<Q::infoset:parent>};
-                  $node-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                                                                .importTree>
-                                                                   ($newNode);
+                  $node-><M::NodeStem.importTree> ($newNode);
                   $newNode->{<Q::infoset:parent>} = $node;
                 }
                 splice @{$node->{<Q::infoset:children>}},
@@ -4093,9 +4092,7 @@ IF:
             CHKDOC: {
               if (UNIVERSAL::isa ($newChild, <IFName::Node
                                               ::ManakaiDOM:ManakaiDOM>) and
-                  UNIVERSAL::isa ($newChild, <ClassName::
-                                  ManakaiDOM:ManakaiDOMNodeReference
-                                  ::ManakaiDOM:Perl>)) {
+                  UNIVERSAL::isa ($newChild, <IFName::NodeRef>)) {
                 $node = $self->{<Q::TreeCore:node>};
                 $newNode = $newChild->{<Q::TreeCore:node>};
                 if ($node->{<Q::DOMCore:ownerDocument>}) {
@@ -4308,9 +4305,7 @@ IF:
               } else { ## $newChild->parentNode ne $self
                 for my $newNode (@newNode) {
                   CORE::delete $newNode->{<Q::infoset:parent>};
-                  $node-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                                                 .importTree>
-                                                                   ($newNode);
+                  $node-><M::NodeStem.importTree> ($newNode);
                   $newNode->{<Q::infoset:parent>} = $node;
                 }
                 splice @{$node->{<Q::infoset:children>}},
@@ -4332,9 +4327,7 @@ IF:
               }
               CORE::delete $oldChild->{<Q::TreeCore:node>}
                                     ->{<Q::infoset:parent>};
-              $oldChild->{<Q::TreeCore:node>}
-                       -><M::ManakaiDOM:ManakaiDOMNodeObject
-                           ::ManakaiDOM:Perl.orphanate>;
+              $oldChild->{<Q::TreeCore:node>}-><M::NodeStem.orphanate>;
             } # @newNode
             $r = $oldChild;
      @@Level[list]:
@@ -4407,9 +4400,7 @@ IF:
               $r = $oldChild;
               CORE::delete $oldChild->{<Q::TreeCore:node>}
                                     ->{<Q::infoset:parent>};
-              $oldChild->{<Q::TreeCore:node>}
-                -><M::ManakaiDOM:ManakaiDOMNodeObject
-                    ::ManakaiDOM:Perl.orphanate>;
+              $oldChild->{<Q::TreeCore:node>}-><M::NodeStem.orphanate>;
             }
      @@Level[list]:  3
      @@SpecLevel:3
@@ -4506,9 +4497,7 @@ IF:
             CHKDOC: {
               if (UNIVERSAL::isa ($newChild, <IFName::Node
                                               ::ManakaiDOM:ManakaiDOM>) and
-                  UNIVERSAL::isa ($newChild, <ClassName::
-                                  ManakaiDOM:ManakaiDOMNodeReference
-                                  ::ManakaiDOM:Perl>)) {
+                  UNIVERSAL::isa ($newChild, <IFName::NodeRef>)) {
                 $node = $self->{<Q::TreeCore:node>};
                 $newNode = $newChild->{<Q::TreeCore:node>};
                 if ($node->{<Q::DOMCore:ownerDocument>}) {
@@ -4659,9 +4648,7 @@ IF:
               
               for my $newNode (@newNode) {
                 CORE::delete $newNode->{<Q::infoset:parent>};
-                $node-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                                               .importTree>
-                                                                 ($newNode);
+                $node-><M::NodeStem.importTree> ($newNode);
                 $newNode->{<Q::infoset:parent>} = $node;
               }
               push @{$node->{<Q::infoset:children>}}, @newNode;
@@ -5010,7 +4997,7 @@ IF:
               This node does not have any attribute.
         @@@PerlDef:
             for (values %{$self->{<Q::TreeCore:node>}
-                               ->{<Q::infoset:attributes>}}) {
+                               ->{<Q::infoset:attributes>}||{}}) {
               if (keys %$_) {
                 $r = true;
                 last;
@@ -5077,7 +5064,7 @@ IF:
        @@@lang:en
        @@@@:
          The DOM Level 3 Specification does not address to 
-         <HTML:codebase> attributes.
+         <HA::codebase> attributes.
      @@Level[list]:  3
      @@SpecLevel:3
      @@Spec:
@@ -5376,13 +5363,11 @@ IF:
             my $__textNode = <ClassM::DOMCore:ManakaiDOMText.newObject>;
             $__textNode->{<Q::DOMCore:ownerDocument>}
                                    = $__node->{<Q::DOMCore:ownerDocument>};
-            $__node-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                                                 .importTree> ($__textNode);
+            $__node-><M::NodeStem.importTree> ($__textNode);
             $__textNode->{<Q::infoset:content>} = $given;
             $__node->{<Q::infoset:children>} = [$__textNode];
             for my $__oc (@__oldChild) {
-              $__oc-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                     .orphanate>;
+              $__oc-><M::NodeStem.orphanate>;
             }
   @Method:
      @@Name:  isSameNode
@@ -5423,10 +5408,8 @@ IF:
             @@@@@lang:en
             @@@@@@: The two nodes are not same.
         @@@PerlDef:
-            if (UNIVERSAL::isa ($other, 
-                                <ClassName::ManakaiDOM:ManakaiDOMNodeReference
-                                          ::ManakaiDOM:Perl>)
-                and $other->{<Q::TreeCore:node>}->{<Q::TreeCore:nodeID>}
+            if (UNIVERSAL::isa ($other, <IFName::NodeRef>) and
+                $other->{<Q::TreeCore:node>}->{<Q::TreeCore:nodeID>}
                   eq $self->{<Q::TreeCore:node>}->{<Q::TreeCore:nodeID>}) {
               $r = true;
             }
@@ -5832,24 +5815,17 @@ IF:
       @@@@: 
         Construct an object for a new instance of the <IF::Node>.
     @@Return:
-      @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@Type: NodeStem
       @@@Description:
         @@@@lang:en
         @@@@@:
           The object for the <IF::Node> to be created.
       @@@PerlDef:
-          my $node = $r = bless <ClassM::ManakaiDOM:ManakaiDOMNodeObject
-                                 ::ManakaiDOM:Perl.new>,
+          my $node = $r = bless <ClassM::ManakaiNode|ManakaiNodeStem||
+                                         ManakaiDOM|Perl.new>,
                             <ClassName::ManakaiDOMCore:ManakaiDOMNodeObjectNode>;
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::infoset:parent>,
-                                                <Q::infoset:ownerElement>;
-          push @{$node->{<Q::TreeCore:subnode>}}, <Q::infoset:children>;
-          push @{$node->{<Q::TreeCore:subnode2>}}, <Q::infoset:attributes>;
           push @{$node->{<Q::TreeCore:irefnode>}}, <Q::DOMCore:ownerDocument>;
           push @{$node->{<Q::TreeCore:anydata2>}}, <Q::DOMEvents:eventListener>;
-          $node->{<Q::infoset:children>} = [];
-          $node->{<Q::infoset:attributes>} = {};
        @@@ImplNote:
          @@@@lang:en
          @@@@@:
@@ -5873,8 +5849,7 @@ IF:
         "newByDocumentType" of the "Document" interface.
     @@Param:
       @@@Name: object
-      @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@Type: NodeStem
       @@@Description:
         @@@@lang:en
         @@@@@: The node object referred to.
@@ -6129,9 +6104,11 @@ IF:
             }__;
           }
           } # FIND
-          $r = $object-><M::ManakaiDOM:ManakaiDOMNodeObject
-                          ::ManakaiDOM:Perl.newReference>
-                                                                      ($class);
+          __CODE{getNodeRef::
+            $object => $object,
+            $ref => $r,
+            $class => $class,
+          }__;
 
   @IntMethod:
     @@Name: getCoreNodeReference
@@ -6141,8 +6118,7 @@ IF:
         Create a new "Node" object blessed with the appropriate class.
     @@Param:
       @@@Name: object
-      @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@Type: NodeStem
       @@@Description:
         @@@@lang:en
         @@@@@: The node object referred to.
@@ -6185,8 +6161,11 @@ IF:
                 }},
             }__;
           }
-          $r = $object-><M::ManakaiDOM:ManakaiDOMNodeObject
-                          ::ManakaiDOM:Perl.newReference> ($class);
+          __CODE{getNodeRef::
+            $object => $object,
+            $ref => $r,
+            $class => $class,
+          }__;
 ##Node
 
 ElementTypeBinding:
@@ -6299,8 +6278,7 @@ RoleDef:
 ClassDef:
   @QName: 
     ManakaiDOMCore:ManakaiDOMNodeObjectNode
-  @ISA:
-    ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+  @ISA: ManakaiNode|ManakaiNodeStem||ManakaiDOM|Perl
   @DOMMain:implementFeature: MDOMCoreFeature10
   @DOMMain:implementFeature: MDOMCoreFeature20
   @DOMMain:implementFeature: MDOMCoreFeature30
@@ -6992,7 +6970,7 @@ ClassDef:
           @@@@@lang:en
           @@@@@@:There is no such node.
       @@@PerlDef:
-          for (@{$self->{<Q::infoset:children>}}) {
+          for (@{$self->{<Q::infoset:children>}||[]}) {
             last if $$index < 0;
             if ($_->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
               if ($check->($_)) {
@@ -7039,7 +7017,7 @@ ClassDef:
           An array reference to the <IF::Element> nodes that meet the condition.
       @@@PerlDef:
           $r = [];
-          for (@{$self->{<Q::infoset:children>}}) {
+          for (@{$self->{<Q::infoset:children>}||[]}) {
             if ($_->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
               if ($check->($_)) {
                 push @$r, $_;
@@ -7176,7 +7154,7 @@ ClassDef:
              One of descendant (or attribute) is read-only. 
      @@@PerlDef:
        @@@@@:
-         if (@{$self->{<Q::infoset:children>}}) {
+         if (@{$self->{<Q::infoset:children>}||[]}) {
            my @new;
            my $changed = false;
            my @change;
@@ -7200,10 +7178,7 @@ ClassDef:
                      if ($child->{<Q::DOMCore:read-only>}) {
                        ## Creates a new node
                        my $text = <ClassM::ManakaiDOMText.newObject>;
-                       $self-><M::ManakaiDOM:ManakaiDOMNodeObject
-                                ::ManakaiDOM:Perl
-                                                              .importTree>
-                                                                       ($text);
+                       $self-><M::NodeStem.importTree> ($text);
                        push @change, [$text, 'append', $pchild];
                        push @change, [$text, 'append', $child];
                        $text->{<Q::infoset:content>} = '';
@@ -7282,8 +7257,7 @@ ClassDef:
   
              for (@removed) {
                CORE::delete $_->{<Q::infoset:parent>};
-               $_-><M::ManakaiDOM:ManakaiDOMNodeObject
-                     ::ManakaiDOM:Perl.orphanate>;
+               $_-><M::NodeStem.orphanate>;
              }
    
              $self->{<Q::infoset:children>} = \@new;
@@ -7316,7 +7290,7 @@ ClassDef:
         Normalization should be done after the merge of adjacent 
         text nodes, since the merge might change the status 
         of normalization. 
-## ClassDef:ManakaiDOMNodeObjectNode
+##ManakaiDOMNodeObjectNode
 
 ForDef:
   @QName:
@@ -7410,8 +7384,7 @@ ResourceDef:
     @@ForCheck:
       DOMCore:ForChildNodeList
   @ISA:
-    @@@:
-      ManakaiDOM:ManakaiDOMNodeReference::ManakaiDOM:Perl
+    @@@: ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl
     @@ForCheck:
       DOMCore:ForChildNodeList
   @ISA:
@@ -7457,8 +7430,7 @@ ResourceDef:
       ManakaiDOM:Class
     @@ForCheck: ForGetNodeList
   @ISA:
-    @@@:
-      ManakaiDOM:ManakaiDOMNodeReference::ManakaiDOM:Perl
+    @@@: ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl
     @@ForCheck:
       DOMCore:ForGetNodeList
   @ISA:
@@ -8111,8 +8083,7 @@ ResourceDef:
       @@@Def:
         @@@@ContentType:
           lang:dis
-        @@@@DISPerl:cloneCode:
-          ManakaiDOM:ManakaiDOMNodeReference::ManakaiDOM:Perl.destroy
+        @@@@DISPerl:cloneCode: NodeRef.destroy
 
 ##NodeList
 
@@ -8235,8 +8206,7 @@ ResourceDef:
       ManakaiDOM:Class
     @@ForCheck: ForAttrMap
   @ISA:
-    @@@:
-      ManakaiDOM:ManakaiDOMNodeReference::ManakaiDOM:Perl
+    @@@: ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl
     @@ForCheck:
       DOMCore:ForAttrMap
   @ISA:
@@ -8286,8 +8256,7 @@ ResourceDef:
       ManakaiDOM:Class
     @@ForCheck: ForEntityMap
   @ISA:
-    @@@:
-      ManakaiDOM:ManakaiDOMNodeReference::ManakaiDOM:Perl
+    @@@: ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl
     @@ForCheck:
       DOMCore:ForEntityMap
   @ISA:
@@ -8343,8 +8312,7 @@ ResourceDef:
       ManakaiDOM:Class
     @@ForCheck: ForNotationMap
   @ISA:
-    @@@:
-      ManakaiDOM:ManakaiDOMNodeReference::ManakaiDOM:Perl
+    @@@: ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl
     @@ForCheck:
       DOMCore:ForNotationMap
   @ISA:
@@ -8618,8 +8586,7 @@ ResourceDef:
               $r = <ClassM::ManakaiDOMNode.getNodeReference> ($obj)
                 if defined wantarray;
               CORE::delete $obj->{<Q::infoset:ownerElement>};
-              $obj-><M::ManakaiDOM:ManakaiDOMNodeObject
-                      ::ManakaiDOM:Perl.orphanate>;
+              $obj-><M::NodeStem.orphanate>;
             } else {
               __EXCEPTION{
                 ManakaiDOMException.NOT_FOUND_ERR::
@@ -8943,8 +8910,7 @@ ResourceDef:
                 $r = <ClassM::ManakaiDOMNode.getNodeReference> ($obj)
                   if defined wantarray;
                 CORE::delete $obj->{<Q::infoset:parent>};
-                $obj-><M::ManakaiDOM:ManakaiDOMNodeObject
-                        ::ManakaiDOM:Perl.orphanate>;
+                $obj-><M::NodeStem.orphanate>;
               }
             }
           @@@@ImplNote:
@@ -9069,8 +9035,7 @@ ResourceDef:
               $r = <ClassM::ManakaiDOMNode.getNodeReference> ($obj)
                   if defined wantarray;
               CORE::delete $obj->{<Q::infoset:ownerElement>};
-              $obj-><M::ManakaiDOM:ManakaiDOMNodeObject
-                      ::ManakaiDOM:Perl.orphanate>;
+              $obj-><M::NodeStem.orphanate>;
             } else {
               __EXCEPTION{
                 ManakaiDOMException.NOT_FOUND_ERR::
@@ -10343,14 +10308,16 @@ IF:
         Construct an object for a new instance of the <IF::Attr> node.
     @@ManakaiDOM:isStatic:1
     @@Return:
-      @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@Type: NodeStem
       @@@Description:
         @@@@lang:en
         @@@@@:
           The new object for the <IF::Attr> node.
       @@@PerlDef:
           $r = <ClassM::ManakaiDOMNode.newObject>;
+          push @{$r->{<Q::TreeCore:origin>}}, <Q::infoset:ownerElement>;
+          push @{$r->{<Q::TreeCore:subnode>}}, <Q::infoset:children>;
+          $r->{<Q::infoset:children>} = [];
           $r->{<Q::DOMCore:nodeType>} = <Q::infoset:Attribute>;
      @@ImplNote:
        @@@lang:en
@@ -10420,9 +10387,11 @@ IF:
               } keys %Message::DOM::ManakaiDOMAttr::CompatClass) {
                 if ($Message::DOM::ClassFeature{$class}
                             ->{$feature}->{$version}) {
-                  $r = $self->{<Q::TreeCore:node>}
-                            -><M::ManakaiDOM:ManakaiDOMNodeObject
-                                       ::ManakaiDOM:Perl.newReference> ($class);
+                  __CODE{getNodeRef::
+                    $object => {$self->{<Q::TreeCore:node>}},
+                    $ref => $r,
+                    $class => $class,
+                  }__;
                   last CLASS;
                 }
               }
@@ -10558,8 +10527,7 @@ IF:
         @@@@@:
           The name of the attribute to select.
     @@Return:
-      @@@Type: 
-        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@Type: NodeStem
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -10748,8 +10716,7 @@ IF:
               $r->{<Q::infoset:children>} = [];
               for (@children) {
                 CORE::delete $_->{<Q::infoset:parent>};
-                $_-><M::ManakaiDOM:ManakaiDOMNodeObject
-                      ::ManakaiDOM:Perl.orphanate>;
+                $_-><M::NodeStem.orphanate>;
               }
             } else {
               my $docNode = $self->{<Q::DOMCore:ownerDocument>};
@@ -10759,8 +10726,7 @@ IF:
                                              $XMLVERSION => $version}__;
               $r = <ClassM::ManakaiDOMAttr.newObject>;
               $r->{<Q::DOMCore:name>} = $name;
-              $node-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                                                       .importTree> ($r);
+              $node-><M::NodeStem.importTree> ($r);
               $r->{<Q::infoset:ownerElement>} = $node;
               $r->{<Q::DOMCore:ownerDocument>} = $node
                                                  ->{<Q::DOMCore:ownerDocument>};
@@ -10768,8 +10734,7 @@ IF:
                    ->{<Q::ManakaiDOM:noNS>}->{$name} = $r;
             }
             my $text = <ClassM::ManakaiDOMText.newObject>;
-            $node-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                                                        .importTree> ($text);
+            $node-><M::NodeStem.importTree> ($text);
             $text->{<Q::infoset:content>} = defined $value ? $value : '';
             $text->{<Q::DOMCore:ownerDocument>} = $self->{<Q::TreeCore:node>}
                                                  ->{<Q::DOMCore:ownerDocument>};
@@ -10823,8 +10788,7 @@ IF:
             __CODE{selectAttrNodeObjectForRemove}__;
             if ($r) {
               CORE::delete $r->{<Q::infoset:ownerElement>};
-              $r-><M::ManakaiDOM:ManakaiDOMNodeObject
-                    ::ManakaiDOM:Perl.orphanate>;
+              $r-><M::NodeStem.orphanate>;
             }
           @@@@ImplNote:
             @@@@@lang:en
@@ -10982,8 +10946,7 @@ IF:
                 $r = <ClassM::ManakaiDOMNode.getNodeReference> ($obj)
                   if defined wantarray;
                 CORE::delete $obj->{<Q::infoset:parent>};
-                $obj-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                                             .orphanate>;
+                $obj-><M::NodeStem.orphanate>;
               }
             }
           @@@@ImplNote:
@@ -11064,8 +11027,7 @@ IF:
               }__;
             }
             CORE::delete $attrNode->{<Q::infoset:ownerElement>};
-            $attrNode-><M::ManakaiDOM:ManakaiDOMNodeObject
-                         ::ManakaiDOM:Perl.orphanate>; 
+            $attrNode-><M::NodeStem.orphanate>;
           @@@@ImplNote:
             @@@@@lang:en
             @@@@@@:
@@ -11127,10 +11089,11 @@ IF:
                 }
               };
             }
-            __DEEP{
-              $r = $node-><M::ManakaiDOM:ManakaiDOMNodeObject
-                            ::ManakaiDOM:Perl.newReference>
-                    (<ClassName::ManakaiDOMCore:ManakaiDOMGetElementsNodeList>);
+            __CODE{getNodeRef::
+              $object => $node, $ref => $r,
+              $class => {
+                <ClassName::ManakaiDOMCore:ManakaiDOMGetElementsNodeList>
+              },
             }__;
             $r->{<Q::ManakaiDOMCore:nodeMatch>} = $chk;
      @@NSVersion:.getElementsByTagNameNS
@@ -11203,8 +11166,7 @@ IF:
           @@@@lang:en
           @@@@@: The local name of the attribute to select.
      @@Return:
-        @@@Type:
-          ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+        @@@Type: NodeStem
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -11512,13 +11474,11 @@ IF:
               $r->{<Q::infoset:children>} = [];
               for (@children) {
                 CORE::delete $_->{<Q::infoset:parent>};
-                $_-><M::ManakaiDOM:ManakaiDOMNodeObject
-                      ::ManakaiDOM:Perl.orphanate>;
+                $_-><M::NodeStem.orphanate>;
               }
             } else {
               $r = <ClassM::ManakaiDOMAttr.newObject>;
-              $node-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                                                     .importTree> ($r);
+              $node-><M::NodeStem.importTree> ($r);
               $r->{<Q::DOMCore:ownerDocument>} = $node
                                                  ->{<Q::DOMCore:ownerDocument>};
               $r->{<Q::infoset:prefix>} = $prefix;
@@ -11530,8 +11490,7 @@ IF:
                    ->{$localName} = $r;
             }
             my $text = <ClassM::ManakaiDOMText.newObject>;
-            $node-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                                                    .importTree> ($text);
+            $node-><M::NodeStem.importTree> ($text);
             $text->{<Q::DOMCore:ownerDocument>} = $self->{<Q::TreeCore:node>}
                                                  ->{<Q::DOMCore:ownerDocument>};
             $text->{<Q::infoset:content>} = defined $value ? $value : '';
@@ -11628,8 +11587,7 @@ IF:
             __CODE{selectAttrNodeObjectForRemoveNS}__;
             if ($r) {
               CORE::delete $r->{<Q::infoset:ownerElement>};
-              $r-><M::ManakaiDOM:ManakaiDOMNodeObject
-                    ::ManakaiDOM:Perl.orphanate>;
+              $r-><M::NodeStem.orphanate>;
             }
          @@@@ImplNote:
            @@@@@lang:en
@@ -11862,8 +11820,7 @@ IF:
                 $r = <ClassM::ManakaiDOMNode.getNodeReference> ($obj)
                   if defined wantarray;
                 CORE::delete $obj->{<Q::infoset:parent>};
-                $obj-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                                                    .orphanate>;
+                $obj-><M::NodeStem.orphanate>;
               }
             }
           @@@@ImplNote:
@@ -12027,10 +11984,11 @@ IF:
                 };
               }
             }
-            __DEEP{
-              $r = $node-><M::ManakaiDOM:ManakaiDOMNodeObject
-                            ::ManakaiDOM:Perl.newReference>
-                     (<ClassName::ManakaiDOMCore:ManakaiDOMGetElementsNodeList>);
+            __CODE{getNodeRef::
+              $object => $node, $ref => $r,
+              $class => {
+                <ClassName::ManakaiDOMCore:ManakaiDOMGetElementsNodeList>
+              },
             }__;
             $r->{<Q::ManakaiDOMCore:nodeMatch>} = $chk;
         @@@Def:
@@ -12554,10 +12512,13 @@ IF:
         @@@@@:
           A <IF::NamedNodeMap> object.
       @@@PerlDef:
-          $r = $self->{<Q::TreeCore:node>}
-                    -><M::ManakaiDOM:ManakaiDOMNodeObject
-                        ::ManakaiDOM:Perl.newReference>
-                        (<ClassName::ManakaiDOMCore:ManakaiDOMAttributes>);
+        __CODE{getNodeRef::
+          $object => {$self->{<Q::TreeCore:node>}},
+          $ref => $r,
+          $class => {
+            <ClassName::ManakaiDOMCore:ManakaiDOMAttributes>
+          },
+        }__;
   @ReAttr:
     @@Name:baseURI
     @@Description:
@@ -12924,14 +12885,18 @@ IF:
       @@@@:
         Construct an object for a new instance of the <IF::Element> node.
     @@Return:
-      @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@Type: NodeStem
       @@@Description:
         @@@@lang:en
         @@@@@:
           The new object for the <IF::Element> node.
       @@@PerlDef:
         $r = <ClassM::ManakaiDOMNode.newObject>;
+        push @{$r->{<Q::TreeCore:origin>}}, <Q::infoset:parent>;
+        push @{$r->{<Q::TreeCore:subnode2>}}, <Q::infoset:attributes>;
+        $r->{<Q::infoset:attributes>} = {};
+        push @{$r->{<Q::TreeCore:subnode>}}, <Q::infoset:children>;
+        $r->{<Q::infoset:children>} = [];
         $r->{<Q::DOMCore:nodeType>} = <Q::infoset:Element>;
      @@ImplNote:
        @@@lang:en
@@ -13022,9 +12987,11 @@ IF:
                                  ->{'*'}})) {
                   if ($Message::DOM::ClassFeature{$pack}
                             ->{$feature}->{$version}) {
-                    $r = $self->{<Q::TreeCore:node>}
-                              -><M::ManakaiDOM:ManakaiDOMNodeObject
-                                       ::ManakaiDOM:Perl.newReference> ($pack);
+                    __CODE{getNodeRef::
+                      $object => {$self->{<Q::TreeCore:node>}},
+                      $ref => $r,
+                      $class => $pack,
+                    }__;
                     last CLASS;
                   }
                 }
@@ -13036,14 +13003,20 @@ IF:
               } keys %Message::DOM::ManakaiDOMElement::CompatClass) {
                 if ($Message::DOM::ClassFeature{$class}
                             ->{$feature}->{$version}) {
-                  $r = $self->{<Q::TreeCore:node>}
-                            -><M::ManakaiDOM:ManakaiDOMNodeObject
-                                       ::ManakaiDOM:Perl.newReference> ($class);
+                  __CODE{getNodeRef::
+                    $object => {$self->{<Q::TreeCore:node>}},
+                    $ref => $r,
+                    $class => $class,
+                  }__;
                   last CLASS;
                 }
               }
             }
 ##Element
+
+ResourceDef:
+  @QName: getNodeRef
+  @AliasFor: ManakaiNode|getNewReference||ManakaiDOM|Perl
 
 ForDef:
   @QName:
@@ -13192,9 +13165,7 @@ IF:
           $newNode->{<Q::DOMCore:ownerDocument>} = $parentNode
                                                  ->{<Q::DOMCore:ownerDocument>};
           if ($parentNode) {
-            $parentNode-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                                                          .importTree>
-                                                                   ($newNode);
+            $parentNode-><M::NodeStem.importTree> ($newNode);
             for my $i (0..$#{$parentNode->{<Q::infoset:children>}}) {
               if ($parentNode->{<Q::infoset:children>}->[$i]
                              ->{<Q::TreeCore:nodeID>} eq
@@ -13412,14 +13383,14 @@ IF:
       @@@@:
         Construct an object for a new instance of the <IF::Text> node.
     @@Return:
-      @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@Type: NodeStem
       @@@Description:
         @@@@lang:en
         @@@@@:
           The new object for the <IF::Text> node.
       @@@PerlDef:
           $r = <ClassM::ManakaiDOMNode.newObject>;
+          push @{$r->{<Q::TreeCore:origin>}}, <Q::infoset:parent>;
           $r->{<Q::DOMCore:nodeType>} = <Q::DOMCore:Text>;
           $r->{<Q::infoset:content>} = '';
      @@ImplNote:
@@ -13484,9 +13455,11 @@ IF:
               } keys %Message::DOM::ManakaiDOMText::CompatClass) {
                 if ($Message::DOM::ClassFeature{$class}
                             ->{$feature}->{$version}) {
-                  $r = $self->{<Q::TreeCore:node>}
-                            -><M::ManakaiDOM:ManakaiDOMNodeObject
-                                       ::ManakaiDOM:Perl.newReference> ($class);
+                  __CODE{getNodeRef::
+                    $object => {$self->{<Q::TreeCore:node>}},
+                    $ref => $r,
+                    $class => $class,
+                  }__;
                   last CLASS;
                 }
               }
@@ -13585,14 +13558,14 @@ IF:
       @@@@:
         Construct an object for a new instance of the <IF::Comment> node.
     @@Return:
-      @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@Type: NodeStem
       @@@Description:
         @@@@lang:en
         @@@@@:
           The new object for the <IF::Comment> node.
       @@@PerlDef:
           $r = <ClassM::ManakaiDOMNode.newObject>;
+          push @{$r->{<Q::TreeCore:origin>}}, <Q::infoset:parent>;
           $r->{<Q::DOMCore:nodeType>} = <Q::infoset:Comment>;    
           $r->{<Q::infoset:content>} = '';
      @@ImplNote:
@@ -13657,9 +13630,11 @@ IF:
               } keys %Message::DOM::ManakaiDOMComment::CompatClass) {
                 if ($Message::DOM::ClassFeature{$class}
                             ->{$feature}->{$version}) {
-                  $r = $self->{<Q::TreeCore:node>}
-                            -><M::ManakaiDOM:ManakaiDOMNodeObject
-                                       ::ManakaiDOM:Perl.newReference> ($class);
+                  __CODE{getNodeRef::
+                    $object => {$self->{<Q::TreeCore:node>}},
+                    $ref => $r,
+                    $class => $class,
+                  }__;
                   last CLASS;
                 }
               }
@@ -13934,8 +13909,8 @@ IFDef:
     ManakaiDOM:DOM3
   @ConstGroup:
      @@QName:  OperationType
-     @@ISA: 
-       DOMMain:unsigned-short
+     @@rdfs:subClassOf: 
+       DOMMain:unsigned-short||ManakaiDOM|Perl
      @@Type:
        DOMMain:unsigned-short
      @@Description:
@@ -14108,11 +14083,8 @@ IF:
        @@@@:ManakaiDOMErrorSeverity
        @@@ForCheck:
          ManakaiDOM:ForClass
-     @@ISA: 
-       @@@@:
-         DOMMain:unsigned-short
-       @@@ForCheck:
-         ManakaiDOM:ForClass
+     @@rdfs:subClassOf: 
+       DOMMain:unsigned-short||ManakaiDOM|Perl
      @@Type: 
        DOMMain:unsigned-short
      @@Description:
@@ -14801,13 +14773,15 @@ IF:
         applications must use the "createDocumentFragment" method 
         of the "Document" interface to create a new "DocumentFragment".
     @@Return:
-      @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@Type: NodeStem
       @@@Description:
         @@@@lang:en
         @@@@@: The new object for the "DocumentFragment".
       @@@PerlDef:
           $r = <ClassM::ManakaiDOMNode.newObject>;
+          push @{$r->{<Q::TreeCore:origin>}}, <Q::infoset:parent>;
+          push @{$r->{<Q::TreeCore:subnode>}}, <Q::infoset:children>;
+          $r->{<Q::infoset:children>} = [];
           $r->{<Q::DOMCore:nodeType>} = <Q::DOMCore:DocumentFragment>;          
        @@@ImplNote:
          @@@@lang:en
@@ -14970,9 +14944,11 @@ IF:
               } keys %Message::DOM::ManakaiDOMDocumentFragment::CompatClass) {
                 if ($Message::DOM::ClassFeature{$class}
                             ->{$feature}->{$version}) {
-                  $r = $self->{<Q::TreeCore:node>}
-                            -><M::ManakaiDOM:ManakaiDOMNodeObject
-                                       ::ManakaiDOM:Perl.newReference> ($class);
+                  __CODE{getNodeRef::
+                    $object => {$self->{<Q::TreeCore:node>}},
+                    $ref => $r,
+                    $class => $class,
+                  }__;
                   last CLASS;
                 }
               }
@@ -15590,10 +15566,11 @@ IF:
                 }
               };
             }
-            __DEEP{
-              $r = $node-><M::ManakaiDOM:ManakaiDOMNodeObject
-                            ::ManakaiDOM:Perl.newReference>
-                    (<ClassName::ManakaiDOMCore:ManakaiDOMGetElementsNodeList>);
+            __CODE{getNodeRef::
+              $object => $node, $ref => $r,
+              $class => {
+                <ClassName::ManakaiDOMCore:ManakaiDOMGetElementsNodeList>
+              },
             }__;
             $r->{<Q::ManakaiDOMCore:nodeMatch>} = $chk;
     @@NSVersion:.getElementsByTagNameNS
@@ -16221,12 +16198,13 @@ IF:
                 };
               }
             }
-            __DEEP{
-              $r = $node-><M::ManakaiDOM:ManakaiDOMNodeObject
-                            ::ManakaiDOM:Perl.newReference>
-                    (<ClassName::ManakaiDOMCore:ManakaiDOMGetElementsNodeList>);
-              $r->{<Q::ManakaiDOMCore:nodeMatch>} = $chk;
+            __CODE{getNodeRef::
+              $object => $node, $ref => $r,
+              $class => {
+                <ClassName::ManakaiDOMCore:ManakaiDOMGetElementsNodeList>
+              },
             }__;
+            $r->{<Q::ManakaiDOMCore:nodeMatch>} = $chk;
         @@@Def:
           @@@@ForCheck:
             !ManakaiDOM:DOMXMLFeature
@@ -16295,7 +16273,7 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              No element with the specified <SGML:ID> exists.
+              No element with the specified <SGML::ID> exists.
        @@@PerlDef:
          my @nodeo = (@{$self->{<Q::TreeCore:node>}->{<Q::infoset:children>}});
          NODES: while (my $nodeo = shift @nodeo) {
@@ -17003,17 +16981,19 @@ IF:
         The caller of this internal method MUST ensure to set 
         the attributes: <Q::TreeCore:implementation>.
     @@Return:
-      @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@Type: NodeStem
       @@@Description:
         @@@@lang:en
         @@@@@: The new object for the "Document".
       @@@PerlDef:
           $r = <ClassM::ManakaiDOMNode.newObject>;
+          push @{$r->{<Q::TreeCore:origin>}}, <Q::infoset:parent>;
           $r->{<Q::DOMCore:nodeType>} = <Q::infoset:Document>;
           $r->{<Q::infoset:version>} = '1.0';
           $r->{<Q::DOMCore:strictErrorChecking>} = true;
-          push @{$r->{<Q::TreeCore:subnode>}}, <Q::DOMViews:view>;
+          push @{$r->{<Q::TreeCore:subnode>}},
+               <Q::infoset:children>, <Q::DOMViews:view>;
+          $r->{<Q::infoset:children>} = [];
           $r->{<Q::DOMViews:view>} = [];
        @@@ImplNote:
          @@@@lang:en
@@ -17087,9 +17067,11 @@ IF:
               } keys %Message::DOM::ManakaiDOMDocument::CompatClass) {
                 if ($Message::DOM::ClassFeature{$class}
                             ->{$feature}->{$version}) {
-                  $r = $self->{<Q::TreeCore:node>}
-                            -><M::ManakaiDOM:ManakaiDOMNodeObject
-                                       ::ManakaiDOM:Perl.newReference> ($class);
+                  __CODE{getNodeRef::
+                    $object => {$self->{<Q::TreeCore:node>}},
+                    $ref => $r,
+                    $class => $class,
+                  }__;
                   last CLASS;
                 }
               }

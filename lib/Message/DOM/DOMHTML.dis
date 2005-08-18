@@ -44,7 +44,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/08/15 07:59:41 $
+      $Date: 2005/08/18 12:50:49 $
     @@ContentType:
       dis:Date.RCS
 
@@ -680,7 +680,7 @@ ReflectTypeDef:
                               ->{<Q::ManakaiDOM:noNS>}->{$LOCAL_NAME};
           }
           CORE::delete $ao->{<Q::infoset:ownerElement>};
-          $ao-><M::ManakaiDOM|ManakaiDOMNodeObject||ManakaiDOM|Perl.orphanate>;
+          $ao-><M::NodeStem.orphanate>;
         }
       } else {
         if ($given) {
@@ -1409,8 +1409,7 @@ IF:
     @@ForCheck:
       ManakaiDOM:ForClass
   @ISA:
-    @@@:
-      ManakaiDOM:ManakaiDOMNodeReference::ManakaiDOM:Perl
+    @@@: NodeRef
     @@ForCheck:
       ManakaiDOM:ForClass
   @L2ISAL1:
@@ -2192,11 +2191,10 @@ IF:
                 }
         \#line 1 "DOMHTML.ManakaiDOMHTMLElement.getImages.#2"
             };
-            __DEEP{
-              $r = $self->{<Q::TreeCore:node>}
-                        -><M::ManakaiDOM:ManakaiDOMNodeObject
-                            ::ManakaiDOM:Perl.newReference>
-                                 (<ClassName::ManakaiDOMHTMLCollection>);
+            __CODE{getNodeRef::
+              $object => {$self->{<Q::TreeCore:node>}},
+              $ref => $r,
+              $class => {<ClassName::ManakaiDOMHTMLCollection>},
             }__;
             $r->{<Q::ManakaiDOMCore:nodeMatch>} = $chk;
 
@@ -2235,11 +2233,10 @@ IF:
                 }
         \#line 1 "DOMHTML.ManakaiDOMHTMLElement.getApplets.#2"
             };
-            __DEEP{
-              $r = $self->{<Q::TreeCore:node>}
-                        -><M::ManakaiDOM:ManakaiDOMNodeObject
-                            ::ManakaiDOM:Perl.newReference>
-                                 (<ClassName::ManakaiDOMHTMLCollection>);
+            __CODE{getNodeRef::
+              $object => {$self->{<Q::TreeCore:node>}},
+              $ref => $r,
+              $class => {<ClassName::ManakaiDOMHTMLCollection>},
             }__;
             $r->{<Q::ManakaiDOMCore:nodeMatch>} = $chk;
 
@@ -2277,11 +2274,10 @@ IF:
                 return false;
         \#line 1 "DOMHTML.ManakaiDOMHTMLElement.getLinks.#2"
             };
-            __DEEP{
-              $r = $self->{<Q::TreeCore:node>}
-                        -><M::ManakaiDOM:ManakaiDOMNodeObject
-                            ::ManakaiDOM:Perl.newReference>
-                                 (<ClassName::ManakaiDOMHTMLCollection>);
+            __CODE{getNodeRef::
+              $object => {$self->{<Q::TreeCore:node>}},
+              $ref => $r,
+              $class => {<ClassName::ManakaiDOMHTMLCollection>},
             }__;
             $r->{<Q::ManakaiDOMCore:nodeMatch>} = $chk;
 
@@ -2314,11 +2310,10 @@ IF:
                 }
         \#line 1 "DOMHTML.ManakaiDOMHTMLElement.getForms.#2"
             };
-            __DEEP{
-              $r = $self->{<Q::TreeCore:node>}
-                        -><M::ManakaiDOM:ManakaiDOMNodeObject
-                            ::ManakaiDOM:Perl.newReference>
-                                 (<ClassName::ManakaiDOMHTMLCollection>);
+            __CODE{getNodeRef::
+              $object => {$self->{<Q::TreeCore:node>}},
+              $ref => $r,
+              $class => {<ClassName::ManakaiDOMHTMLCollection>},
             }__;
             $r->{<Q::ManakaiDOMCore:nodeMatch>} = $chk;
   @Attr:
@@ -2356,11 +2351,10 @@ IF:
                 return false;
         \#line 1 "DOMHTML.ManakaiDOMHTMLElement.getAnchors.#2"
             };
-            __DEEP{
-              $r = $self->{<Q::TreeCore:node>}
-                        -><M::ManakaiDOM:ManakaiDOMNodeObject
-                            ::ManakaiDOM:Perl.newReference>
-                                 (<ClassName::ManakaiDOMHTMLCollection>);
+            __CODE{getNodeRef::
+              $object => {$self->{<Q::TreeCore:node>}},
+              $ref => $r,
+              $class => {<ClassName::ManakaiDOMHTMLCollection>},
             }__;
             $r->{<Q::ManakaiDOMCore:nodeMatch>} = $chk;
 
@@ -2965,6 +2959,21 @@ ResourceDef:
       }
 
 ResourceDef:
+  @QName: NodeStem
+  @AliasFor: ManakaiNode|NodeStem||ManakaiDOM|Perl
+  @For: ManakaiDOM|Perl
+
+ResourceDef:
+  @QName: NodeRef
+  @AliasFor: ManakaiNode|NodeRef||ManakaiDOM|Perl
+  @For: ManakaiDOM|Perl
+
+ResourceDef:
+  @QName: getNodeRef
+  @AliasFor: ManakaiNode|getNewReference||ManakaiDOM|Perl
+  @For: ManakaiDOM|Perl
+
+ResourceDef:
   @QName: isHTMLElemento
   @rdf:type:
     dis2pm:InlineCode
@@ -2972,8 +2981,7 @@ ResourceDef:
     Tests whether this is an HTML element of the given type or not.
   @Param:
     @@Name: elementNodeo
-    @@Type: 
-      ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+    @@Type: NodeStem
     @@enDesc:
       The element node to test.
   @Param:
@@ -4242,8 +4250,7 @@ IF:
                       -><M::DOMCore:Document.createElementNS>
                             (<Q::xhtml1:>, 'li');
           }__;
-          $self->{<Q::TreeCore:node>}
-               -><M::ManakaiDOM|ManakaiDOMNodeObject||ManakaiDOM|Perl.importTree>
+          $self->{<Q::TreeCore:node>}-><M::NodeStem.importTree>
                     ($r->{<Q::TreeCore:node>});
           $r->{<Q::TreeCore:node>}->{<Q::infoset:parent>}
                 = $self->{<Q::TreeCore:node>};
@@ -4365,13 +4372,11 @@ IF:
             $dd = $od-><M::DOMCore:Document.createElementNS>
                             (<Q::xhtml1:>, 'dd');
           }__;
-          $self->{<Q::TreeCore:node>}
-               -><M::ManakaiDOM|ManakaiDOMNodeObject||ManakaiDOM|Perl.importTree>
+          $self->{<Q::TreeCore:node>}-><M::NodeStem.importTree>
                     ($r->{<Q::TreeCore:node>});
           $r->{<Q::TreeCore:node>}->{<Q::infoset:parent>}
                 = $self->{<Q::TreeCore:node>};
-          $self->{<Q::TreeCore:node>}
-               -><M::ManakaiDOM|ManakaiDOMNodeObject||ManakaiDOM|Perl.importTree>
+          $self->{<Q::TreeCore:node>}-><M::NodeStem.importTree>
                     ($dd->{<Q::TreeCore:node>});
           $dd->{<Q::TreeCore:node>}->{<Q::infoset:parent>}
                 = $self->{<Q::TreeCore:node>};
@@ -4649,10 +4654,10 @@ IF:
   @ClsQName: ManakaiDOMHTMLHeadingElementExtended
   @DOMMain:implementFeature: HTMLExtendedFeature30
 
-  @IFISA: HTMLBlockContainerExtended
+  @IFISA: HTMLStrictlyInlineContainerExtended
   @IFISA: HTMLHeadingElement
 
-  @ClsISA: ManakaiDOMHTMLBlockContainerExtended
+  @ClsISA: ManakaiDOMHTMLStrictlyInlineContainerExtended
   @ClsISA: ManakaiDOMHTMLHeadingElement
 ##HTMLHeadingElementExtended
 

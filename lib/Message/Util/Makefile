@@ -43,11 +43,12 @@ DOMBOOT_DIS_FILE3 = $(DOMLS_DIS_FILE)
 DOMBOOT_DIS_FILE = $(DOMBOOT_DIS_FILE3)
 
 BOOT_DIS_FILES = ManakaiNode.dis DIS.dis PerlCode.dis Error/DOMException.dis
-DIS_FILES = $(BOOT_DIS_FILES) DIS/DISDoc.dis
+DIS_FILES = $(BOOT_DIS_FILES) DIS/DISDoc.dis DIS/DISDump.dis
 
 BOOT_GENERATED_FILES = base.dac min.dac ManakaiNode.pm DIS.pm PerlCode.pm \
   Error/DOMException.pm
-GENERATED_FILES = $(BOOT_GENERATED_FILES) allbase.dac all.dac DIS/DISDoc.pm
+GENERATED_FILES = $(BOOT_GENERATED_FILES) allbase.dac all.dac DIS/DISDoc.pm \
+  DIS/DISDump.pm
 
 all: $(GENERATED_FILES)
 
@@ -55,7 +56,7 @@ boot: $(BOOT_GENERATED_FILES)
 
 all.dac: allbase.dac $(DIS_FILES) $(DAC_PL) \
   $(MANAKAI_LIB_DIR)manakai/NaturalLanguage.dis
-	$(DAC)$@ --input-db-file-name="$<" DIS/DISDoc.dis
+	$(DAC)$@ --input-db-file-name="$<" DIS/DISDump.dis
 
 allbase.dac: min.dac $(DAC_PL) \
   $(MANAKAI_LIB_DIR)Message/DOM/DOMHTML.dis \
@@ -107,6 +108,12 @@ Error/DOMException.pm: min.dac $(DAC2PM_PL)
 DIS/DISDoc.pm: all.dac $(DAC2PM_PL)
 	$(DAC2PM) $< \
 	  --module-uri="$(NS_UTIL_DIS)DISDoc" \
+	  --output-file-path="$@"
+	$(PERL_CHK) $@
+
+DIS/DISDump.pm: all.dac $(DAC2PM_PL)
+	$(DAC2PM) $< \
+	  --module-uri="$(NS_UTIL_DIS)DISDump" \
 	  --output-file-path="$@"
 	$(PERL_CHK) $@
 

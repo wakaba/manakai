@@ -1,11 +1,17 @@
 2005-08-15  Wakaba  <wakaba@suika.fam.cx>
 
+	* ManakaiNode.dis (Util:): Now Perl package name for interfaces
+	is defined.
+
 	* DIS.dis (mediaTypeURI): Returns $defaultMediaType
 	parameter value if dis:ContentType attribute is missing.
 
 	* ManakaiNode.dis (importTree): Use "isa" function
 	to check whether a object is an instance of the manakai
 	node model.
+	(NodeStem, NodeRef): New lightweight variant 
+	of ManakaiDOM:ManakaiDOMNodeObject 
+	and ManakaiDOM:ManakaiDOMNodeReference.
 
 2005-05-29  Wakaba  <wakaba@suika.fam.cx>
 

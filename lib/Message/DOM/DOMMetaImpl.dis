@@ -20,7 +20,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/11 14:07:41 $
+      $Date: 2005/08/18 12:50:49 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1268,7 +1268,7 @@ ResourceDef:
                                      <IFName::DOMCore:DOMImplementation
                                             ::ManakaiDOM:ManakaiDOM>) and
                      UNIVERSAL::isa ($_,
-                                     <ClassName::ManakaiDOM:ManakaiDOMNodeObject
+                                     <IFName::ManakaiNode:NodeRef
                                                ::ManakaiDOM:Perl>)) {
               push @$self, $_;
             } else {
@@ -1754,9 +1754,16 @@ ResourceDef:
 
   @ISA:
     @@@:
+      ManakaiNode:ManakaiNodeRef::ManakaiDOM:Perl
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM ManakaiDOM:ForClass ForDAC
+
+  @ISA:
+    @@@:
       ManakaiDOM:ManakaiDOMNodeReference::ManakaiDOM:Perl
     @@ForCheck:
-      ManakaiDOM:ManakaiDOM ManakaiDOM:ForClass
+      ManakaiDOM:ManakaiDOM ManakaiDOM:ForClass ForCDIS
+
   @ISA:
     @@@:
       ManakaiDOM:ManakaiDOMObject
@@ -1932,9 +1939,11 @@ ResourceDef:
               __CODE{makeClassISAList:: $CLASS => $class}__;
               for my $cls ($class, @{$Message::DOM::ClassISA{$class}}) {
                 if ($Message::DOM::ImplFeature{$class}->{$feature}->{$version}) {
-                  $r = $self->{<Q::TreeCore:node>}
-                            -><M::ManakaiDOM:ManakaiDOMNodeObject
-                                     ::ManakaiDOM:Perl.newReference> ($class);
+                  __CODE{ManakaiNode|getNewReference||ManakaiDOM|Perl::
+                    $object => {$self->{<Q::TreeCore:node>}},
+                    $ref => $r,
+                    $class => $class,
+                  }__;
                   last CLASS;
                 }
               }
@@ -1966,6 +1975,18 @@ ResourceDef:
         @@@@@:
           The newly created DOM implementation object.
       @@@PerlDef:
+        @@@@ForCheck: ForDAC
+        @@@@@:
+          my $node = <ClassM::ManakaiNode:ManakaiNodeRef::ManakaiDOM:Perl.new>;
+          __CODE{ManakaiNode|getNewReference||ManakaiDOM|Perl::
+            $object => $node,
+            $ref => $r,
+            $class => $self,
+          }__;
+          $node->{<Q::ManakaiDOM:implID>} = $node->{<Q::TreeCore:nodeID>};
+      @@@PerlDef:
+        @@@@ForCheck: ForCDIS
+        @@@@@:
         my $node = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                           ::ManakaiDOM:Perl.new>;
         $r = $node-><M::ManakaiDOM:ManakaiDOMNodeObject
