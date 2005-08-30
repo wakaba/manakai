@@ -97,7 +97,8 @@ $(MANAKAI_LIB_DIR)manakai/all.dac: \
   $(MANAKAI_LIB_DIR)manakai/DISIDL.dis \
   $(MANAKAI_LIB_DIR)manakai/DISPerl.dis \
   $(MANAKAI_LIB_DIR)manakai/XML.dis \
-  $(MANAKAI_LIB_DIR)manakai/DISMarkup.dis
+  $(MANAKAI_LIB_DIR)manakai/DISMarkup.dis \
+  $(MANAKAI_LIB_DIR)manakai/NaturalLanguage.dis
 	$(CD) $(MANAKAI_LIB_DIR)manakai/ && \
 	  $(MAKE) all.dac
 

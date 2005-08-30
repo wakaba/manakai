@@ -21,7 +21,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/08/18 12:50:49 $
+      $Date: 2005/08/30 12:30:45 $
     @@ContentType:
       dis:Date.RCS
   
@@ -417,7 +417,7 @@ ClassDef:
           } else {
             my @node = ($self);
             my %checked;
-            NODES: while (my $node = shift @node) {
+            NODES: while (defined (my $node = shift @node)) {
               next unless UNIVERSAL::isa ($node,
                           <ClassName::ManakaiDOM:ManakaiDOMNodeObject>);
               if ($node->{<Q::TreeCore:rc>}) {
@@ -462,7 +462,7 @@ ClassDef:
           } else {
             my @node = ($self);
             my %checked;
-            NODES: while (my $node = shift @node) {
+            NODES: while (defined (my $node = shift @node)) {
               next unless ref $node;
               if ($node->{<Q::TreeCore:rc>}) {
                 $r = true;
@@ -510,7 +510,7 @@ ClassDef:
         @@@@ForCheck: ForFull
         @@@@@:
         my @node = ($self);
-        NODES: while (my $node = shift @node) {
+        NODES: while (defined (my $node = shift @node)) {
               my @n;
               for my $p (@{$node->{<Q::TreeCore:subnode2>}}) {
                 if (ref $node->{$p} eq 'ARRAY') {
@@ -544,7 +544,7 @@ ClassDef:
         @@@@ForCheck: ForCompact
         @@@@@:
         my @node = ($self);
-        NODES: while (my $node = shift @node) {
+        NODES: while (defined (my $node = shift @node)) {
           next unless ref $node and defined $node->{<Q::TreeCore:nodeID>};
           my @n;
               for my $p (@{$node->{<Q::TreeCore:subnode2>}}) {
@@ -599,7 +599,7 @@ ClassDef:
         unless ($node->{<Q::TreeCore:treeID>} eq
                 $self->{<Q::TreeCore:treeID>}) {
           my @node = ($node);
-          NODES: while (my $node = shift @node) {
+          NODES: while (defined (my $node = shift @node)) {
             next unless UNIVERSAL::isa ($node,
                         <ClassName::ManakaiDOM:ManakaiDOMNodeObject>);
               my @n;
@@ -639,7 +639,7 @@ ClassDef:
         @@@@ForCheck: ForCompact
         @@@@@:
           my @node = ($node);
-          NODES: while (my $node = shift @node) {
+          NODES: while (defined (my $node = shift @node)) {
             next unless ref $node;
             next if $node->{<Q::TreeCore:treeID>} eq
                     $self->{<Q::TreeCore:treeID>};
@@ -686,7 +686,7 @@ ClassDef:
         @@@@@:
         unless ($self->{<Q::TreeCore:treeID>} eq $treeID) {
           my @node = ($self);
-          NODES: while (my $node = shift @node) {
+          NODES: while (defined (my $node = shift @node)) {
             next unless UNIVERSAL::isa ($node,
                         <ClassName::ManakaiDOM:ManakaiDOMNodeObject>);
               my @n;
@@ -724,7 +724,7 @@ ClassDef:
         @@@@ForCheck: ForCompact
         @@@@@:
           my @node = ($self);
-          NODES: while (my $node = shift @node) {
+          NODES: while (defined (my $node = shift @node)) {
             next unless ref $node;
             next if $node->{<Q::TreeCore:treeID>} eq $treeID;
               my @n;

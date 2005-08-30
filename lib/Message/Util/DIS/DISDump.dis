@@ -21,7 +21,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/08/18 12:50:49 $
+      $Date: 2005/08/30 12:30:46 $
     @@ContentType:
       dis:Date.RCS
   
@@ -271,6 +271,14 @@ ElementTypeBinding:
       dis:TypeQName
 
 ElementTypeBinding:
+  @Name: AttrQName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ContentType:
+      dis:TypeQName
+
+ElementTypeBinding:
   @Name: IFISA
   @ElementType:
     dis:ISA
@@ -313,12 +321,34 @@ IFClassDef:
   
   @ClsISA: DISDoc|ManakaiDISImplementationDISDoc
 
+  @DOMMetaImpl:provideFeature: DIS|Dump10
+
   @enDesc:
     This interface provides factory methods to create
     <QUOTE::DISDump>-related objects.
 
-  
+  @Method:
+    @@Name: createDISDumpDocument
+    @@PerlName: create_disdump_document
+    @@enDesc:
+      Creates a DISDump document.
+    @@Return:
+      @@@Type: DISDumpDocument
+      @@@enDesc:
+        The newly created DISDump document.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOMLatest
+                         .createDocument> (<Q::dump:>, 'dump:moduleSet');
+        }__;
 ##DISImplementationDISDump
+
+ElementTypeBinding:
+  @Name: PerlName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ContentType: lang|Perl
 
 ElementTypeBinding:
   @Name: PerlDef
@@ -409,15 +439,20 @@ IFClassDef:
       @@@Type: URI
       @@@enDesc:
         The URI to add.
+    @@Param:
+      @@@Name: isAlias
+      @@@Type: boolean
+      @@@enDesc:
+        Whether this is an alias or not.
     @@Return:
       @@@PerlDef: 
         __DEEP{
           unless ($self-><M::DISDumpElementResource.hasURI> ($uri)) {
-            $self-><M::Node.appendChild>
+            my $el = $self-><M::Node.appendChild>
               ($self-><AG::Node.ownerDocument>
                     -><M::Document.createElementNS>
-                         (<Q::dump:>, 'uri'))
-                 -><AS::Node.textContent> ($uri);
+                         (<Q::dump:>, 'uri'));
+            $el-><M::DISDumpElementURI.setURI> ($uri, $isAlias);
           }
         }__;
 
@@ -626,26 +661,69 @@ IFClassDef:
     @@Get:
     @@Set:
     @@DocAttr: actualDataTypeAttr
+
+  @Attr:
+    @@Name: resourceAccess
+    @@enDesc:
+      The accessible scope of this resource.  Currently its value is 
+      restricted to either <CODE::private> or missing (public).
+    @@ReflectCDATA:
+    @@Get:
+    @@Set:
+    @@DocAttr: accessAttr
+
+  @Attr:
+    @@Name: resourceFileNameStem
+    @@enDesc:
+      The main part of the file name corresponding to this resource.
+    @@ReflectCDATA:
+    @@Get:
+    @@Set:
+    @@DocAttr: fileNameStemAttr
+
+  @Attr:
+    @@Name: resourceFilePathStem
+    @@enDesc:
+      The main part of the file path corresponding to this resource.
+    @@ReflectCDATA:
+    @@Get:
+    @@Set:
+    @@DocAttr: filePathStemAttr
 ##DISDumpElementResource
 
 ResourceDef:
+  @QName: fileNameStemAttr
+  @AttrQName: dump|fileNameStem
   @rdf:type: s|Attribute
-  @ATTRQName: dump|namespaceURI
+
+ResourceDef:
+  @QName: filePathStemAttr
+  @AttrQName: dump|filePathStem
+  @rdf:type: s|Attribute
+
+ResourceDef:
+  @QName: accessAttr
+  @AttrQName: dump|access
+  @rdf:type: s|Attribute
+
+ResourceDef:
+  @rdf:type: s|Attribute
+  @AttrQName: dump|namespaceURI
   @QName: namespaceURIAttr
 
 ResourceDef:
   @rdf:type: s|Attribute
-  @ATTRQName: dump|localName
+  @AttrQName: dump|localName
   @QName: localNameAttr
 
 ResourceDef:
   @rdf:type: s|Attribute
-  @ATTRQName: dump|dataType
+  @AttrQName: dump|dataType
   @QName: dataTypeAttr
 
 ResourceDef:
   @rdf:type: s|Attribute
-  @ATTRQName: dump|actualDataType
+  @AttrQName: dump|actualDataType
   @QName: actualDataTypeAttr
 
 ResourceDef:
@@ -659,6 +737,152 @@ ResourceDef:
 ResourceDef:
   @QName: Element
   @AliasFor: DOMCore|Element||ManakaiDOM|ManakaiDOMLatest
+
+ResourceDef:
+  @QName: Attr
+  @AliasFor: DOMCore|Attr||ManakaiDOM|ManakaiDOMLatest
+
+IFClassDef:
+  @IFQName: DISDumpElementURI
+  @ClsQName: ManakaiDOMDISDumpElementURI
+  
+  @IFISA: DISDumpElement
+  @ClsISA: ManakaiDOMDISDumpElement
+
+  @Method:
+    @@Name: setURI
+    @@enDesc:
+      Sets the value of this element.
+    @@Param:
+      @@@Name: uri
+      @@@Type: URI
+      @@@enDesc:
+        The new URI.
+    @@Param:
+      @@@Name: isAlias
+      @@@Type: boolean
+      @@@enDesc:
+        Whether this URI is an alias or not.
+    @@Return:
+      @@@PerlDef:
+        __DEEP{
+          $self-><AS::Node.textContent> ('');
+          $self-><M::Element.setAttributeNS> (<Q::dump:>, 'dump:uri', $uri);
+          $self-><AS::DISDumpElementURI.isAliasURI> ($isAlias);
+          if ($uri =~ /^data:,200411tf\#xmlns\(t=data:,200411tf%23\)
+                                        t:tf\(([^,]*),([^,]*)\)/x) {
+            my ($t, $f) = ($1, $2);
+            require Encode;
+            for my $u ($t, $f) {
+              $u =~ s/%([0-9A-Fa-f][0-9A-Fa-f])/pack 'C', hex $1/ge;
+              $u = Encode::decode ('utf8', $u);
+            }
+            my $od = $self-><AG::Node.ownerDocument>;
+            my $tel = $od-><M::Document.createElementNS> (<Q::dump:>, 'turi');
+            $self-><M::Node.appendChild> ($tel);
+            $tel-><M::DISDumpElementURI.setURI> ($t);
+            my $fel = $od-><M::Document.createElementNS> (<Q::dump:>, 'furi');
+            $self-><M::Node.appendChild> ($fel);
+            $fel-><M::DISDumpElementURI.setURI> ($f);
+            $self-><M::Element.setAttributeNS>
+                   (<Q::dump:>, 'dump:uriType', 'tf');
+          } elsif ($uri =~ /^data:,200411tf\#xmlns\(t=data:,200411tf%23\)
+                                        t:tfp\(([^\)]*)\)/x) {
+            my @u = split /,/, $1;
+            require Encode;
+            for my $u (@u) {
+              $u =~ s/%([0-9A-Fa-f][0-9A-Fa-f])/pack 'C', hex $1/ge;
+              $u = Encode::decode ('utf8', $u);
+            }
+            my $od = $self-><AG::Node.ownerDocument>;
+            my $tel = $od-><M::Document.createElementNS> (<Q::dump:>, 'turi');
+            $self-><M::Node.appendChild> ($tel);
+            $tel-><M::DISDumpElementURI.setURI> (shift @u);
+            my $fel = $od-><M::Document.createElementNS> (<Q::dump:>, 'furi');
+            $self-><M::Node.appendChild> ($fel);
+            $fel-><M::DISDumpElementURI.setURI> (shift @u);
+            my $pel;
+            for my $p (@u) {
+              $pel = $od-><M::Document.createElementNS> (<Q::dump:>, 'puri');
+              $self-><M::Node.appendChild> ($pel);
+              $pel-><M::DISDumpElementURI.setURI> ($p);
+            }
+            $self-><M::Element.setAttributeNS>
+                   (<Q::dump:>, 'dump:uriType', 'tfp');
+          } elsif ($uri =~ /^data:,200411tf\#xmlns\(t=data:,200411tf%23\)
+                                        t:child\(([^,]*),([^,]*)\)/x) {
+            my ($t, $f) = ($1, $2);
+            require Encode;
+            for my $u ($t, $f) {
+              $u =~ s/%([0-9A-Fa-f][0-9A-Fa-f])/pack 'C', hex $1/ge;
+              $u = Encode::decode ('utf8', $u);
+            }
+            my $od = $self-><AG::Node.ownerDocument>;
+            my $tel = $od-><M::Document.createElementNS> (<Q::dump:>, 'turi');
+            $self-><M::Node.appendChild> ($tel);
+            $tel-><M::DISDumpElementURI.setURI> ($t);
+            my $fel = $od-><M::Document.createElementNS>
+                                                    (<Q::dump:>, 'localName');
+            $self-><M::Node.appendChild> ($fel);
+            $fel-><M::Element.setAttributeNS>
+                   (<Q::dump:>, 'dump:value', $f);
+            $self-><M::Element.setAttributeNS>
+                   (<Q::dump:>, 'dump:uriType', 'tl');
+          } else {
+            $self-><M::Element.removeAttributeNS> (<Q::dump:>, 'uriType');
+          }
+        }__;
+
+  @Attr:
+    @@Name: isAliasURI
+    @@enDesc:
+      Whether this is an alias or not.
+    @@ReflectBoolean:
+    @@Get:
+    @@Set:
+    @@DocAttr: isAliasAttr
+##DISDumpElementURI
+
+ResourceDef:
+  @rdf:type: s|Attribute
+  @QName: isAliasAttr
+  @AttrQName: dump|isAlias
+
+IFClassETDef:
+  @IFQName: DISDumpURIElement
+  @ClsQName: ManakaiDOMDISDumpURIElement
+  @ETQName: dump|uri
+
+  @IFISA: DISDumpElementURI
+  @ClsISA: ManakaiDOMDISDumpElementURI
+##DISDumpURIElement
+
+IFClassETDef:
+  @IFQName: DISDumpTURIElement
+  @ClsQName: ManakaiDOMDISDumpTURIElement
+  @ETQName: dump|turi
+  
+  @IFISA: DISDumpElementURI
+  @ClsISA: ManakaiDOMDISDumpElementURI
+##DISDumpTURIElement
+
+IFClassETDef:
+  @IFQName: DISDumpFURIElement
+  @ClsQName: ManakaiDOMDISDumpFURIElement
+  @ETQName: dump|furi
+
+  @IFISA: DISDumpElementURI
+  @ClsISA: ManakaiDOMDISDumpElementURI
+##DISDumpFURIElement
+
+IFClassETDef:
+  @IFQName: DISDumpPURIElement
+  @ClsQName: ManakaiDOMDISDumpPURIElement
+  @ETQName: dump|puri
+
+  @IFISA: DISDumpElementURI
+  @ClsISA: ManakaiDOMDISDumpElementURI
+##DISDumpPURIElement
 
 IFClassETDef:
   @IFQName: DISDumpModuleSetElement
@@ -1006,21 +1230,26 @@ IFClassETDef:
 
   @IFISA: DISDumpElementExtends
   @ClsISA: ManakaiDOMDISDumpElementExtends
+
+  @ATTR:
+    @@DOMName: isExceptionInterface
+    @@ATTRQName: dump|isException
+    @@ReflectBoolean:
+    @@Get:
+    @@Set:
+    @@enDesc:
+      Whether this interface defines an exception interface
+      or a general interface.
 ##DISDumpInterfaceElement
 
-IFClassETDef:
-  @IFQName: DISDumpExceptionInterfaceElement
-  @ClsQName: ManakaiDOMDISDumpExceptionInterfaceElement
-  @ETQName: dump|exceptionInterface
-
-  @IFISA: DISDumpInterfaceElement
-  @ClsISA: ManakaiDOMDISDumpInterfaceElement
-##DISDumpExceptionInterfaceElement
 
 IFClassETDef:
   @IFQName: DISDumpExtendsElement
   @ClsQName: ManakaiDOMDISDumpExtendsElement
   @ETQName: dump|extends
+
+  @IFISA: DISDumpElement
+  @ClsISA: ManakaiDOMDISDumpElement
 
   @IFISA: DISDumpElementExtends
   @ClsISA: ManakaiDOMDISDumpElementExtends
@@ -1031,6 +1260,9 @@ IFClassETDef:
   @ClsQName: ManakaiDOMDISDumpImplementsElement
   @ETQName: dump|implements
 
+  @IFISA: DISDumpElement
+  @ClsISA: ManakaiDOMDISDumpElement
+
   @IFISA: DISDumpElementExtends
   @ClsISA: ManakaiDOMDISDumpElementExtends
 ##DISDumpImplementsElement
@@ -1038,7 +1270,7 @@ IFClassETDef:
 ResourceDef:
   @QName: sourceClassAttr
   @rdf:type: s|Attribute
-  @ATTRName: dump|sourceClass
+  @AttrQName: dump|sourceClass
 
 IFClassDef:
   @IFQName: DISDumpElementClassMember
@@ -1055,10 +1287,10 @@ IFClassDef:
     @@Set:
 
   @Method:
-    @@Name: appendNewOverwrites
+    @@Name: appendNewOverrides
     @@enDesc:
       Adds a reference to a class member resource which belongs to
-      any superclass and which is overwritten by this resource.
+      any superclass and which is overridden by this resource.
     @@Param:
       @@@Name: uri
       @@@Type: URI
@@ -1067,13 +1299,13 @@ IFClassDef:
     @@Return:
       @@@Type: DISDumpElement
       @@@enDesc:
-        The newly created overwrites element.
+        The newly created overrides element.
       @@@PerlDef: 
         __DEEP{
           $r = $self-><M::Node.appendChild>
               ($self-><AG::Node.ownerDocument>
                     -><M::Document.createElementNS>
-                         (<Q::dump:>, 'overwrites'));
+                         (<Q::dump:>, 'overrides'));
           $r-><M::Element.setAttributeNS>
                          (<Q::dump:>, 'dump:uri' => $uri);
         }__;
@@ -1111,6 +1343,45 @@ IFClassETDef:
               $self-><M::Node.appendChild> ($r);
             }
           } # C
+        }__;
+
+  @Method:
+    @@Name: createParameter
+    @@enDesc:
+      Creates an element for a parameter.  If there is already
+      an element for the group, simply that element is returned.
+    @@Param:
+      @@@Name: perlNameArg
+      @@@Type: DOMString
+      @@@enDesc:
+        The Perl name of the group to create, with prefix if non-named
+        parameter, or without prefix if named parameter.
+    @@Param:
+      @@@Name: isNamedParam
+      @@@Type: boolean
+      @@@enDesc:
+        Whether is this parameter is a named parameter or not.
+    @@Return:
+      @@@Type: DISDumpMethodParameterElement
+      @@@enDesc:
+        The newly created or already exist parameter element.
+      @@@PerlDef:
+        my $prefix;
+        if ($perlNameArg =~ s/^([\$\@%&*])//) {
+          $prefix = $1;
+        }
+        __CODE{createChildByPerlName::
+          $namespace => {<Q::dump:>},
+          $localName => 'param',
+          $perlName => $perlNameArg,
+          $parent => $self,
+          $result => $r,
+        }__;
+        __DEEP{
+          $r-><AS::DISDumpMethodParameterElement.isNamedParameter>
+              ($isNamedParam);
+          $r-><M::Element.setAttributeNS> (<Q::dump:>, 'dump:prefix', $prefix)
+            if defined $prefix;
         }__;
 ##DISDumpMethodElement
 
@@ -1172,8 +1443,9 @@ IFClassETDef:
           } # C
         }__;
 
-  @Attr:
-    @@Name: isReadOnlyAttribute
+  @ATTR:
+    @@DOMName: isReadOnlyAttribute
+    @@ATTRQName: dump|isReadOnly
     @@enDesc:
       Returns whether this attribute is read-only or not.
     @@ReflectBoolean:
@@ -1185,6 +1457,17 @@ ResourceDef:
   @QName: boolean
   @AliasFor: DOMMain|boolean||ManakaiDOM|all
 
+
+ResourceDef:
+  @QName: NodeStem
+  @AliasFor: ManakaiNode|NodeStem||ManakaiDOM|Perl
+  @For: ManakaiDOM|Perl
+
+ResourceDef:
+  @QName: NodeRef
+  @AliasFor: ManakaiNode|NodeRef||ManakaiDOM|Perl
+  @For: ManakaiDOM|Perl
+
 ElementTypeBinding:
   @Name: ReflectCDATA
   @ElementType:
@@ -1192,7 +1475,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@@: DOMString
   @ShadowSibling:
-    @@actualType: DOMHTML|CDATADOMString||ManakaiDOM|ManakaiDOMLatest
+    @@actualType: CDATADOMString
 
 ElementTypeBinding:
   @Name: ReflectBoolean
@@ -1201,10 +1484,37 @@ ElementTypeBinding:
   @ShadowContent:
     @@@: DOMMain|boolean||ManakaiDOM|all
   @ShadowSibling:
-    @@actualType: DOMHTML|Boolean||ManakaiDOM|ManakaiDOMLatest
-  @enImplNote:
-    {TODO:: Use 1/0 boolean.
-    }
+    @@actualType: Boolean
+
+IFClassETDef:
+  @IFQName: DISDumpMethodParameterElement
+  @ClsQName: ManakaiDOMDISDumpMethodParameterElement
+  @ETQName: dump|param
+
+  @IFISA: DISDumpElementResource
+  @ClsISA: ManakaiDOMDISDumpElementResource
+
+  @IFISA: DISDumpElementSelectCase
+  @ClsISA: ManakaiDOMDISDumpElementSelectCase
+
+  @ATTR:
+    @@DOMName: isNamedParameter
+    @@ATTRQName: dump|isNamedParameter
+    @@ReflectBoolean:
+    @@enDesc:
+      Whether this parameter is a named parameter or not.
+    @@Get:
+    @@Set:
+
+  @ATTR:
+    @@DOMName: isNullableParameter
+    @@ATTRQName: dump|isNullable
+    @@ReflectBoolean:
+    @@enDesc:
+      Whether this parameter is <DOM::null>able or not.
+    @@Get:
+    @@Set:
+##DISDumpMethodParameterElement
 
 IFClassDef:
   @IFQName: DISDumpElementSelectCase
@@ -1402,7 +1712,7 @@ IFClassETDef:
   @ATTR:
     @@DOMName: groupURI
     @@ReflectCDATA:
-    @@ATTRName: dump|group
+    @@ATTRQName: dump|group
     @@enDesc:
       The URI of the class or interface of the exception.
     @@Get:
@@ -1411,7 +1721,7 @@ IFClassETDef:
   @ATTR:
     @@DOMName: codeURI
     @@ReflectCDATA:
-    @@ATTRName: dump|code
+    @@ATTRQName: dump|code
     @@enDesc:
       The URI or the local name of the exception code.
     @@Get:
@@ -1420,13 +1730,142 @@ IFClassETDef:
   @ATTR:
     @@DOMName: subcodeURI
     @@ReflectCDATA:
-    @@ATTRName: dump|subcode
+    @@ATTRQName: dump|subcode
     @@enDesc:
       The URI of the exception subcode.
     @@Get:
     @@Set:
 ##DISDumpRaisesElement
 
+ReflectTypeDef:
+  @QName: CDATADOMString
+  @enDesc:
+    <IF::DOMMain:DOMString> for DOM attributes reflecting
+    <SGML::CDATA> element attributes.
+  @rdfs:subClassOf: DOMString
+  @ResourceDef:
+    @@rdf:type: DOMMain|ReflectGet
+    @@DefaultValue: \
+    @@enDesc:
+      The DOM attribute returns the current value of the element attribute
+      in a transparent, case-sensitive manner.
+      \
+      If the element attribute is absent, the default value, if any,
+      or the empty string is returned.
+    @@PerlDef:
+      my $ao = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                    ->{$NS_URI_NO_NULL}->{$LOCAL_NAME};
+      if ($ao) {
+        my $attr;
+        __CODE{ManakaiNode:getWeakReference||ManakaiDOM:Perl::
+          $object => $ao, $ref => $attr,
+          $class => {<ClassName::DOMCore:ManakaiDOMAttr
+                               ::ManakaiDOM:ManakaiDOMLatest>},
+        }__;
+        __DEEP{
+          $r = $ao-><AG::Attr.value>;
+        }__;
+      }
+  @ResourceDef:
+    @@QName: CDATADOMStringSet
+    @@rdf:type: DOMMain|ReflectSet
+    @@enDesc:
+      The corresponding element attribute is set to the given value,
+      in a transparent, case-sensitive manner.
+    @@ImplNote:
+      @@@lang:en
+      @@@@: 
+        What will happen if the <DOM::null> value is given?
+    @@PerlDef:
+      my $ao = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                    ->{$NS_URI_NO_NULL}->{$LOCAL_NAME};
+      if ($ao) {
+        my $attr;
+        __CODE{ManakaiNode:getWeakReference||ManakaiDOM:Perl::
+          $object => $ao, $ref => $attr,
+          $class => {<ClassName::DOMCore:ManakaiDOMAttr
+                               ::ManakaiDOM:ManakaiDOMLatest>},
+        }__;
+        __DEEP{
+          $ao-><AS::Attr.value> ($given);
+        }__;
+      } else {
+        __DEEP{
+          $self-><M::Element.setAttributeNS>
+                                               ($NS_URI, $QNAME => $given);
+        }__;
+      }
+
+      
+ReflectTypeDef:
+  @QName: Boolean
+  @enDesc:
+    <IF::DOMMain:boolean::ManakaiDOM:all> for DOM attributes reflecting
+    boolean element attributes.
+  @rdfs:subClassOf: DOMMain|boolean||ManakaiDOM|all
+  @ResourceDef:
+    @@rdf:type: DOMMain|ReflectGet
+    @@DefaultValue: false
+    @@enDesc:
+      The DOM attribute returns <DOM::true> if the element attribute
+      is set and <DOM::false> if it is absent.
+    @@PerlDef:
+      my $ao = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                    ->{$NS_URI_NO_NULL}->{$LOCAL_NAME};
+      if ($ao) {
+        my $attr;
+        __CODE{ManakaiNode:getWeakReference||ManakaiDOM:Perl::
+          $object => $ao, $ref => $attr,
+          $class => {<ClassName::DOMCore:ManakaiDOMAttr
+                               ::ManakaiDOM:ManakaiDOMLatest>},
+        }__;
+        __DEEP{
+          $r = $ao-><AG::Attr.value> =~ /\A\s*(?:tr ue|1)\s*\z/x
+             ? true : false;
+        }__;
+      }
+  @ResourceDef:
+    @@rdf:type: DOMMain|ReflectSet
+    @@enDesc:
+      The element attribute is removed if the DOM attribute
+      is set to <DOM::false> and is set to have the same
+      value as its local name if the DOM attribute is set to <DOM::true>.
+    @@PerlDef:
+      my $ao = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                    ->{$NS_URI_NO_NULL}->{$LOCAL_NAME};
+      if ($ao) {
+        if ($given) {
+          my $attr;
+          __CODE{ManakaiNode:getWeakReference||ManakaiDOM:Perl::
+            $object => $ao, $ref => $attr,
+            $class => {<ClassName::DOMCore:ManakaiDOMAttr
+                                 ::ManakaiDOM:ManakaiDOMLatest>},
+          }__;
+          __DEEP{
+            $ao-><AS::Attr.value> ('tr'.'ue');
+          }__;
+        } else {
+          CORE::delete $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+                            ->{$NS_URI_NO_NULL}->{$LOCAL_NAME};
+          CORE::delete $ao->{<Q::infoset:ownerElement>};
+          $ao-><M::NodeStem.orphanate>;
+        }
+      } else {
+        if ($given) {
+          __DEEP{
+            $self-><M::Element.setAttributeNS>
+                                            ($NS_URI, $QNAME => 'tr'.'ue');
+          }__;
+        }
+      }
+
+ElementTypeBinding:
+  @Name: ReflectTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: ManakaiDOM|DataType
+    @@ForCheck: !ManakaiDOM|IDL
 
 ElementTypeBinding:
   @Name: Attr

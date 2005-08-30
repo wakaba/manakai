@@ -30,7 +30,7 @@ DAC2PM = $(PERL_) $(DAC2PM_PL) $(DAC2PM_OPTIONS)
 CORE_DAC_FILE = $(MANAKAI_LIB_DIR)manakai/all.dac
 
 DIS_FILES = DISCore.dis DISLang.dis DISRDF.dis DISIDL.dis \
-  DISPerl.dis XML.dis DISMarkup.dis
+  DISPerl.dis XML.dis DISMarkup.dis NaturalLanguage.dis
 
 GENERATED_FILES = all.dac
 
@@ -38,8 +38,9 @@ all: $(GENERATED_FILES)
 
 all.dac: $(DIS_FILES) $(DAC_PL)
 	$(DAC).$@.1.tmp DISPerl.dis
-	$(DAC)$@ --input-db-file-name=".$@.1.tmp" DISMarkup.dis
-	$(RM) .$@.1.tmp
+	$(DAC).$@.2.tmp --input-db-file-name=".$@.1.tmp" DISMarkup.dis
+	$(DAC)$@ --input-db-file-name=".$@.2.tmp" NaturalLanguage.dis
+	$(RM) .$@.1.tmp .$@.2.tmp
 
 clean:
 	$(RM) $(GENERATED_FILES) .*.tmp *~ .*~

@@ -29,11 +29,14 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/08/18 12:50:49 $
+      $Date: 2005/08/30 12:30:45 $
     @@ContentType:
       dis:Date.RCS
   
   @Require:
+    @@Module:
+      @@@QName: DISlib|NaturalLanguage
+      @@@WithFor: ManakaiDOM|all
     @@Module:
       @@@QName: Util|DIS
       @@@WithFor: 
@@ -275,6 +278,7 @@ IFClassDef:
   @ClsQName: ManakaiDISImplementationDISDoc
   
   @ClsISA: DIS|ManakaiDISImplementation
+  @ClsISA: DOMHTML|ManakaiDOMHTMLDOMImplementation||ManakaiDOM|ManakaiDOMLatest
 
   @enDesc:
     This interface provides factory methods to create
@@ -458,6 +462,7 @@ IFClassDef:
       @@@nullCase:
         @@@@enDesc:
           No label for this resource.
+      @@@PerlDef:
         __DEEP{
           if ($self->{o}->{src}) {
             my $fn = $self->{o}->{src}
