@@ -26,7 +26,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/23 13:26:55 $
+      $Date: 2005/08/31 13:02:46 $
     @@ContentType:
       dis:Date.RCS
 
@@ -548,16 +548,16 @@ IF:
   @Description:
     @@lang:en
     @@@:
-      A list of nodes representing HTML <HE:option> elements.  
+      A list of nodes representing HTML <HE::option> elements.  
       An individual node may be accessed by either ordinal index 
-      or the <HA:name> or <HA:id> of the node.
+      or the <HA::name> or <HA::id> of the node.
       \
-      <IF:HTMLOptionCollection> objects are <EM:live>; they are 
+      <IF::HTMLOptionCollection> objects are <EM::live>; they are 
       automatically updated when the underlying document 
       is changed.
       \
-      {NOTE:: In DOM Level 1, <IF:HTMLCollection> interface 
-              was used in place of <IF:HTMLOptionsCollection>.
+      {NOTE:: In DOM Level 1, <IF::HTMLCollection> interface 
+              was used in place of <IF::HTMLOptionsCollection>.
       \
       }
       
@@ -603,21 +603,21 @@ IF:
           @@@@lang:en
           @@@@@:
             Ordinal index of the node to retrieve, in the 
-            document order.  The index origin is <DOM:0>.
+            document order.  The index origin is <DOM::0>.
      @@Return:
         @@@Type:  
           DOMCore:Node
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The <P:index>th node.
+            The <P::index>th node.
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The <P:index> is out of range.
+              The <P::index> is out of range.
   @Method:
      @@Name:  namedItem
      @@Description:
@@ -625,10 +625,10 @@ IF:
        @@@@:
          Retrieve a node using a name. 
        \
-         It first searches for a <IF:Node> with a matching <HA:id> 
+         It first searches for a <IF::DOMCore:Node> with a matching <HA::id> 
          attributes.  If it does not find one, it searches for a 
-         <IF:Node> (that are allowed to specify a <HA:name> attribute).
-         with a matching <HA:name> attribute.
+         <IF::DOMCore:Node> (that are allowed to specify a <HA::name> attribute).
+         with a matching <HA::name> attribute.
      @@Param:
         @@@Name:  name
         @@@Type:  DOMString
@@ -644,15 +644,15 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The <IF:Node> with a <HA:name> or <HA:id> whose 
-            value matches with <P:name>.
+            The <IF::DOMCore:Node> with a <HA::name> or <HA::id> whose 
+            value matches with <P::name>.
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              There is no node with such a <P:name>.
+              There is no node with such a <P::name>.
 ##IF:HTMLOptionCollection
 
 ET:
@@ -697,7 +697,7 @@ ET:
          The name of the form.
          \
          {NOTE:: The DOM HTML Specifications does not mention 
-                 to the HTML 4.01 <HA:name> attribute, which is 
+                 to the HTML 4.01 <HA::name> attribute, which is 
                  added for backward compatibility with DOM Level 0.
          \
          }
@@ -737,9 +737,9 @@ ET:
        @@@@:
          Submit the form, as the activation of submit buttons do.
          \
-         {NOTE:: The <HA:onsubmit> or <EV:submit> event handler is not 
+         {NOTE:: The <HA::onsubmit> or <EV::submit> event handler is not 
          guaranteed to be triggered when invoking this method 
-         for historical reasons.  DOM Level 3 <EV:ev:submit> 
+         for historical reasons.  DOM Level 3 <EV::ev:submit> 
          event is defined not to triggered on this method.
          \
          }
@@ -777,13 +777,13 @@ ET:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              <A:HTMLSelectElement.multiple> is <DOM:false>.
+              <A::DOMHTML:HTMLSelectElement.multiple> is <DOM::false>.
         @@@InCase:
           @@@@Value:select-multiple
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              <A:HTMLSelectElement.multiple> is <DOM:true>.
+              <A::DOMHTML:HTMLSelectElement.multiple> is <DOM::true>.
         @@@ImplNote:
           @@@@lang:en
           @@@@@:
@@ -807,7 +807,7 @@ ET:
           @@@@lang:en
           @@@@@:
             The ordinal index of the selected option, starging 
-            from <DOM:0>.  If multiple options are selected, 
+            from <DOM::0>.  If multiple options are selected, 
             the index of the first selected option is returned.
         @@@InCase:
           @@@@Value:-1
@@ -843,7 +843,7 @@ ET:
           @@@@ImplNote:
             @@@@@lang:en
             @@@@@@:
-              The type was <TYPE:long> in DOM Level 1.
+              The type was <TYPE::DOMMain:long> in DOM Level 1.
      @@Set:
         @@@Type:
            DOMMain:unsigned-long
@@ -874,7 +874,7 @@ ET:
      @@Description:
        @@@lang:en
        @@@@:
-         The <HE:form> element containing this control.
+         The <HE::form> element containing this control.
      @@Get:
         @@@Type:  
           DOMHTML:HTMLFormElement
@@ -890,7 +890,7 @@ ET:
      @@Description:
        @@@lang:en
        @@@@:
-         The collection of <HE:option> elements contained 
+         The collection of <HE::option> elements contained 
          by this element.
      @@Get:
         @@@Type:  
@@ -950,7 +950,7 @@ ET:
      @@Description:
        @@@lang:en
        @@@@:
-         Add a new element to the collection of <HE:option> 
+         Add a new element to the collection of <HE::option> 
          elements.
      @@Param:
         @@@Name:  element
@@ -990,8 +990,8 @@ ET:
           @@@@lang:en
           @@@@@:
             This method is the equivalent of the 
-            <M:Node.insertBefore> method on the parent of 
-            <P:before>.
+            <M::DOMCore:Node.insertBefore> method on the parent of 
+            <P::before>.
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
@@ -999,7 +999,7 @@ ET:
             @@@@@lang:en
             @@@@@@:
               This method is the equivalent of the 
-              <M:Node.appendChild> method.
+              <M::DOMCore:Node.appendChild> method.
           @@@@ImplNote:
             @@@@@lang:en
             @@@@@@:
@@ -1013,13 +1013,13 @@ ET:
            @@@@Description:
              @@@@@lang:en
              @@@@@@:
-               The <P:before> node is not a descendant of this element.
+               The <P::before> node is not a descendant of this element.
   @Method:
      @@Name:  remove
      @@Description:
        @@@lang:en
        @@@@:
-         Remove an element from the collection of <HE:option> elements.
+         Remove an element from the collection of <HE::option> elements.
      @@Param:
         @@@Name:  index
         @@@Type:
@@ -1028,7 +1028,7 @@ ET:
           @@@@lang:en
           @@@@@:
             The ordinal index of the item to remove, starting from 
-            <DOM:0>.  If no element has the given index, 
+            <DOM::0>.  If no element has the given index, 
             this method has no effect.
      @@Return:  
   @Method:
@@ -1089,7 +1089,7 @@ ET:
      @@Description:
        @@@lang:en
        @@@@:
-         The <HE:form> element containing this control.
+         The <HE::form> element containing this control.
      @@Get:
         @@@Type:  
           DOMHTML:HTMLFormElement
@@ -1130,7 +1130,7 @@ ET:
      @@Description:
        @@@lang:en
        @@@@:
-         The text contained within the <HE:option> element.
+         The text contained within the <HE::option> element.
      @@Get:
         @@@Type:  DOMString
         @@@Def:
@@ -1143,12 +1143,12 @@ ET:
      @@Description:
        @@@lang:en
        @@@@:
-         The index of this <HE:option> in its parent 
-         <HE:select>, starting from <DOM:0>.
+         The index of this <HE::option> in its parent 
+         <HE::select>, starting from <DOM::0>.
      @@ImplNote:
        @@@lang:en
        @@@@:
-         Should be <QUOTE:ancestor>, not <QUOTE:parent>?
+         Should be <QUOTE::ancestor>, not <QUOTE::parent>?
      @@Get:
         @@@Type:
            DOMMain:long
@@ -1188,7 +1188,7 @@ ET:
          The current state of the corresponding form control. 
          Changing this attribute changes the state of the form 
          control, but does not change the value of the HTML 
-         <HA:selected> attribute.
+         <HA::selected> attribute.
      @@Get:
         @@@Type:
            DOMMain:boolean
@@ -1248,8 +1248,8 @@ ET:
      @@Description:
        @@@lang:en
        @@@@:
-         The initial value of the <HTML:text>, <HTML:file> or 
-         <HTML:password> control.
+         The initial value of the <HTML::text>, <HTML::file> or 
+         <HTML::password> control.
      @@rcdata:
      @@Get:
      @@Set:
@@ -1259,7 +1259,7 @@ ET:
      @@Description:
        @@@lang:en
        @@@@:
-         The initial state of the <HTML:checkbox> or <HTML:radio> 
+         The initial state of the <HTML::checkbox> or <HTML::radio> 
          button control.
      @@rbool:
      @@Get:
@@ -1277,7 +1277,7 @@ ET:
      @@Description:
        @@@lang:en
        @@@@:
-         The <HE:form> element containing this control.
+         The <HE::form> element containing this control.
      @@Get:
         @@@Type:  
           DOMHTML:HTMLFormElement
@@ -1317,19 +1317,19 @@ ET:
        @@@@:
           The current state of the form control.  Changes 
           to this attribute change the state of the control, 
-          but do not change the value of the HTML <HA:checke> 
-          attribute.  (When the <HA:type> is either <HTML:radio> 
-          or <HTML:checkbox>.)
+          but do not change the value of the HTML <HA::checke> 
+          attribute.  (When the <HA::type> is either <HTML::radio> 
+          or <HTML::checkbox>.)
           \
-          {NOTE:: During the handling of a <EV:ev:click> 
+          {NOTE:: During the handling of a <EV::ev:click> 
                   event, some DOM implementations may change 
-                  the <A:checked> status before the event 
+                  the <A::checked> status before the event 
                   is being dispatched.  If the default action 
-                  of the event is canceled, the <A:checked> 
+                  of the event is canceled, the <A::.checked> 
                   state is changed back to the original value. 
                   In other word, the value of this attribute 
-                  during the handling of <EV:ev:click> (or 
-                  e.g. <EV:ev:DOMActivate>) events 
+                  during the handling of <EV::ev:click> (or 
+                  e.g. <EV::ev:DOMActivate>) events 
                   is implementation dependent.
           \
           }
@@ -1440,28 +1440,28 @@ ET:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         The HTML 4 and XHTML 1.0 <HA:usemap> attribute value 
-         is defined as <SGML:%URI;>, while the XHTML m12n 
-         <HA:usemap> value is <XML:IDREF>.
+         The HTML 4 and XHTML 1.0 <HA::usemap> attribute value 
+         is defined as <SGML::%URI;>, while the XHTML m12n 
+         <HA::usemap> value is <XML::IDREF>.
   @Attr:
      @@Name:  value
      @@Description:
        @@@lang:en
        @@@@:
-          The current value of the <HTML:text>, <HTML:file> or 
-          <HTML:password> control.  Changing this attribute 
+          The current value of the <HTML::text>, <HTML::file> or 
+          <HTML::password> control.  Changing this attribute 
           changes the contents of the form control, but does 
-          not change the value of the HTML <HA:value> 
+          not change the value of the HTML <HA::value> 
           attribute.
           \
-          For the <HTML:button>, <HTML:hidden>, <HTML:submit>, 
-          <HTML:reset>, <HTML:image>, <HTML:checkbox> or 
-          <HTML:radio> control, this attribute represents 
-          the HTML <HA:value> attribute.
+          For the <HTML::button>, <HTML::hidden>, <HTML::submit>, 
+          <HTML::reset>, <HTML::image>, <HTML::checkbox> or 
+          <HTML::radio> control, this attribute represents 
+          the HTML <HA::value> attribute.
           \
           {NOTE:: The DOM Level 1 First Edition described that 
-                  this attribute is applied to <HTML:checkbox> 
-                  or <HTML:radio> controls.  It is ammended 
+                  this attribute is applied to <HTML::checkbox> 
+                  or <HTML::radio> controls.  It is ammended 
                   by the DOM Level 1 First Edition Errata.
           \
           }
@@ -1471,7 +1471,7 @@ ET:
           @@@@lang:en
           @@@@@:
             {NOTE:: The actual value may be masked to 
-                    prevent unauthorized use for the <HTML:password> 
+                    prevent unauthorized use for the <HTML::password> 
                     input control.
             \
             }
@@ -1503,7 +1503,7 @@ ET:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            {NOTE:: The <A:value> may be read-only for 
+            {NOTE:: The <A::.value> may be read-only for 
                     the file upload control.
             \
             }
@@ -1548,16 +1548,16 @@ ET:
         @@@lang:en
         @@@@:
           Select the contents of the text area.  (For the 
-          <HTML:text>, <HTML:file> or <HTML:password> control).
+          <HTML::text>, <HTML::file> or <HTML::password> control).
      @@Return:  
   @Method:
      @@Name:  click
      @@Description:
        @@@lang:en
        @@@@:
-         Simulate a mouse click.  (For the <HTML:button>, 
-         <HTML:checkbox>, <HTML:radio>, <HTML:reset> or 
-         <HTML:submit> control.
+         Simulate a mouse click.  (For the <HTML::button>, 
+         <HTML::checkbox>, <HTML::radio>, <HTML::reset> or 
+         <HTML::submit> control.
      @@Return:  
 ##IF:HTMLInputElement
 
@@ -1605,7 +1605,7 @@ ET:
      @@Description:
        @@@lang:en
        @@@@:
-         The <HE:form> element containing this control.
+         The <HE::form> element containing this control.
      @@Get:
         @@@Type:  
           DOMHTML:HTMLFormElement
@@ -1708,7 +1708,7 @@ ET:
           @@@@lang:en
           @@@@@:
             The current value.  If the entirely of the data 
-            cannot fit into a single <TYPE:DOMstring>, 
+            cannot fit into a single <TYPE::DOMstring>, 
             the DOM implementation may truncate the data.
         @@@Def:
           @@@@ContentType:
@@ -1741,7 +1741,7 @@ ET:
      @@Description:
        @@@lang:en
        @@@@:
-         Select the contents of the <HE:textarea>.
+         Select the contents of the <HE::textarea>.
      @@Return:  
 ##IF:DOMHTMLTextAreaElement
 
@@ -1767,7 +1767,7 @@ ET:
      @@Description:
        @@@lang:en
        @@@@:
-         The <HE:form> element containing this control.
+         The <HE::form> element containing this control.
      @@Get:
         @@@Type:  
           DOMHTML:HTMLFormElement
@@ -1841,7 +1841,7 @@ ET:
      @@Description:
        @@@lang:en
        @@@@:
-         The <HE:form> element containing this control.
+         The <HE::form> element containing this control.
      @@Get:
         @@@Type:  
           DOMHTML:HTMLFormElement
@@ -1880,7 +1880,7 @@ ET:
      @@Description:
        @@@lang:en
        @@@@:
-         The <HE:form> element containing this control.
+         The <HE::form> element containing this control.
      @@Get:
         @@@Type:  
           DOMHTML:HTMLFormElement
@@ -1907,7 +1907,7 @@ ET:
      @@Description:
        @@@lang:en
        @@@@:
-         The <HE:form> element containing this control.
+         The <HE::form> element containing this control.
      @@Get:
         @@@Type:  
           DOMHTML:HTMLFormElement

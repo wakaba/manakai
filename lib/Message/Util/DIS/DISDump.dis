@@ -21,7 +21,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/08/30 12:30:46 $
+      $Date: 2005/08/31 13:02:46 $
     @@ContentType:
       dis:Date.RCS
   
@@ -477,7 +477,8 @@ IFClassDef:
                   defined $c-><AG::Node.localName> and
                   $c-><AG::Node.localName> eq 'uri' and
                   $c-><AG::Node.namespaceURI> eq <Q::dump:> and
-                  $c-><AG::Node.textContent> eq $uri) {
+                  $c-><M::Element.getAttributeNS>
+                            (<Q::dump:>, 'uri') eq $uri) {
                 $r = true;
                 last C;
               }
@@ -689,7 +690,37 @@ IFClassDef:
     @@Get:
     @@Set:
     @@DocAttr: filePathStemAttr
+
+  @Attr:
+    @@Name: resourceIsPartial
+    @@enDesc:
+      Whether the element contains only partial description
+      for the resource or not (full).
+    @@ReflectBoolean:
+    @@Get:
+    @@Set:
+    @@DocAttr: isPartialAttr
+
+  @Attr:
+    @@Name: resourceReference
+    @@enDesc:
+      If the attribute has a value, the actual description
+      of the resource is found elsewhere referred by the URI.
+    @@ReflectCDATA:
+    @@Get:
+    @@Set:
+    @@DocAttr: refAttr
 ##DISDumpElementResource
+
+ResourceDef:
+  @QName: isPartialAttr
+  @rdf:type: s|Attribute
+  @AttrQName: dump|isPartial
+
+ResourceDef:
+  @QName: refAttr
+  @rdf:type: s|Attribute
+  @AttrQName: dump|ref
 
 ResourceDef:
   @QName: fileNameStemAttr

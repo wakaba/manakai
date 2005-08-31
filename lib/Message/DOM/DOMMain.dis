@@ -11,9 +11,9 @@ Module:
   @Description:
     @@lang:en
     @@@:
-      The <Module:DOMMain> manakai DOM module defines fundemental 
-      IDL/DOM data types (e.g. <CODE:unsigned long>, <TYPE:DOMString>) 
-      and implements the <IF:DOMImplementationRegistry> object.
+      The <Module::DOMMain> manakai DOM module defines fundemental 
+      IDL/DOM data types (e.g. <CODE::unsigned long>, <TYPE::DOMString>) 
+      and implements the <IF::DOMImplementationRegistry> object.
 
   @Author:
     @@FullName: Wakaba
@@ -22,7 +22,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/08/18 12:50:49 $
+      $Date: 2005/08/31 13:02:46 $
     @@ContentType:
       dis:Date.RCS
   
@@ -64,8 +64,8 @@ Module:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The DOM Core module.  Note that <Module:DOMCore> module in turn
-          requires this (<Module:DOMMain>) module.
+          The DOM Core module.  Note that <Module::DOMCore> module in turn
+          requires this (<Module::DOMMain>) module.
       @@@For: 
         !=ManakaiDOM:ManakaiDOMCommon
   @DefaultFor:
@@ -721,7 +721,7 @@ Const:
   @Description:
     @@lang:en
     @@@:
-       The null value.  Note that <DOM:null> is different from 
+       The null value.  Note that <DOM::null> is different from 
        empty string and number zero.
 
 ResourceTypeDef:
@@ -1424,9 +1424,9 @@ ResourceDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
-            The <P:offset> is negative or greater than
+            The <P::offset> is negative or greater than
             the number of 16-bit units in the string, or the 
-            <P:count> value is negative.
+            <P::count> value is negative.
       @@@Exception:
         @@@@@: 
           MDOMX:MDOM_INDEX_IN_SURROGATE_PAIR
@@ -1602,15 +1602,15 @@ ResourceDef:
       @@@@:
         Whether a string is fully normalized or not.
         \
-        {P:: In DOM Level 3, characters are <DFN:fully normalized> as 
+        {P:: In DOM Level 3, characters are <DFN::fully normalized> as 
         defined in Appendix B of XML 1.1 specification if:
         \
-          - the parameter <CP:normalize-characters> was set to <DOM:true>
+          - the parameter <CP::normalize-characters> was set to <DOM::true>
             while loading the document or the document was certified as 
             defined in XML 1.1 specification or 
-          - the parameter <CP:normalize-characters> was set to <DOM:true>
-            while using the method <M:DOMCore:Document.normalizeDocument> 
-            interface or while using the method <M:DOMCore:Node.normalize>.
+          - the parameter <CP::normalize-characters> was set to <DOM::true>
+            while using the method <M::DOMCore:Document.normalizeDocument> 
+            interface or while using the method <M::DOMCore:Node.normalize>.
         \
         }
     @@Get:
@@ -1737,7 +1737,7 @@ ResourceDef:
   @Description:
     @@lang:en
     @@@:
-      Extensions to a language's native <CODE:String> class or interface.
+      Extensions to a language's native <CODE::String> class or interface.
      \
       {NOTE:: This interface is informatively defined in Appendix 
               of DOM Level 3 Core.
@@ -1768,7 +1768,7 @@ ResourceDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
-            The specified <P:offset32> is negative or greater than
+            The specified <P::offset32> is negative or greater than
             the number of characters (i.e. UTF-32 32-bit code units).
       @@@PerlDef:
         @@@@DefaultValue: $offset32
@@ -1804,7 +1804,7 @@ ResourceDef:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The UTF-32 offset.  If the <P:offset16> value is into middle of a 
+          The UTF-32 offset.  If the <P::offset16> value is into middle of a 
           surrogate pair, the UTF-32 offset at the end of the pair is 
           returned.
       @@@Exception:
@@ -1889,7 +1889,7 @@ StringDataTypeDef:
   @Description:
     @@lang:en
     @@@:
-      A DOM URI.  It is a specialized case of the <TYPE:DOMString> and 
+      A DOM URI.  It is a specialized case of the <TYPE::DOMString> and 
       that met the conditions:
     \
       1. An absolute identifier absolutely identifies a resource on the Web.
@@ -2070,7 +2070,7 @@ StringDataTypeDef:
       A key identifier.
     \
       {NOTE:: A set of key identifiers are defined in the Appendix A 
-              of the <CITE:DOM Level 3 Events> Specification.
+              of the <CITE::DOM Level 3 Events> Specification.
     \
       }
 
@@ -2085,8 +2085,8 @@ StringDataTypeDef:
   @Description:
     @@lang:en
     @@@:
-      Zero or more <TYPE:ManakaiDOM:ManakaiDOMKeyIdentifier> separated 
-      by white space (XML 1.0 <CODE:S>). 
+      Zero or more <TYPE::ManakaiDOM:ManakaiDOMKeyIdentifier> separated 
+      by white space (XML 1.0 <CODE::S>). 
       \
       In the manakai DOM implementations, method parameters and 
       attributes whose actual datatype is 

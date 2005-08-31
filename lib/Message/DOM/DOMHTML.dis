@@ -35,7 +35,7 @@ Module:
       <SRC::DOM Level 2 HTML> and XHTML 1.0 <SRC::DOM Level 2 HTML>. 
       \
       Form related interfaces are provided by a separate
-      module, <Module::DOMWebForms>.
+      module, <Module::MDOM:DOMWebForms>.
 
   @Author:
      @@FullName: Wakaba
@@ -44,7 +44,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/08/18 12:50:49 $
+      $Date: 2005/08/31 13:02:46 $
     @@ContentType:
       dis:Date.RCS
 
@@ -346,8 +346,10 @@ FeatureDef:
       @@@lang:en
       @@@@:
         The DOM Level 2 HTML Specification does not say DOM Level 2 
-        HTML implementations to answer to <M:hasFeature> of 
-        <FeatureVer:1.0> as <DOM:true>.
+        HTML implementations to answer to <M::DOMCore:DOMImplementation
+        ::ManakaiDOM:ManakaiDOM2.hasFeature> of 
+        <FeatureVer::1.0> as <DOM::true>.  In fact, DOM Level 1 and 2
+        are incompatible.
     @@DOMMain:requireFeature:
       DOMCore:CoreFeature10
   @FeatureVerDef:
@@ -909,11 +911,11 @@ ImplNote:
     The DOM Level 2 HTML Specification does not intend to define 
     exactly how a UA will respond to a change to any 
     attribute on an element that directly or indirectly refers 
-    external data, such elements are <IF:HTMLAppletElement>, 
-    <IF:HTMLFrameElement>, <IF:HTMLFrameSetElement>, 
-    <IF:HTMLIFrameElement>, <IF:HTMLImageElement>, <IF:HTMLLinkElement>, 
-    <IF:HTMLObjectElement>, <IF:HTMLParamElement> and
-    <IF:HTMLScriptElement>.
+    external data, such elements are <IF::HTMLAppletElement>, 
+    <IF::HTMLFrameElement>, <IF::HTMLFrameSetElement>, 
+    <IF::HTMLIFrameElement>, <IF::HTMLImageElement>, <IF::HTMLLinkElement>, 
+    <IF::HTMLObjectElement>, <IF::HTMLParamElement> and
+    <IF::HTMLScriptElement>.
   @@For:
     ManakaiDOM:DOM
 
@@ -1418,10 +1420,10 @@ IF:
     @@lang:en
     @@@:
       A list of nodes.  An individual node may be accessed 
-      by either ordinal index or the <HA:name> or <HA:id> 
+      by either ordinal index or the <HA::name> or <HA::id> 
       of the node.
       \
-      <IF:HTMLCollection> objects are <EM:live>; they are 
+      <IF::HTMLCollection> objects are <EM::live>; they are 
       automatically updated when the underlying document 
       is changed.
 
@@ -1455,21 +1457,21 @@ IF:
           @@@@lang:en
           @@@@@:
             The index of the node to retrieve, in the document order. 
-            The index origin is <DOM:0>.
+            The index origin is <DOM::0>.
      @@Return:
         @@@Type:  
           DOMCore:Node
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The <P:index>th node.
+            The <P::index>th node.
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The <P:index> is out of range.
+              The <P::index> is out of range.
         @@@PerlDef:
            $r = $self->{<Q::TreeCore:node>}
                      -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
@@ -1486,14 +1488,14 @@ IF:
           Retrieve a node using a name.  
        \
           With HTML 4 documents, 
-          it first searches for an <IF:Element> with a matching 
-          <HA:name> attribute and if it does not find one, 
-          it searches for an <IF:Element> (that is allowed to specify a 
-          <HA:name> attribute) with a matching <HA:name> attribute. 
+          it first searches for an <IF::DOMCore:Element> with a matching 
+          <HA::name> attribute and if it does not find one, 
+          it searches for an <IF::DOMCore:Element> (that is allowed to specify a 
+          <HA::name> attribute) with a matching <HA::name> attribute. 
           The matching is case-insensitive.
        \
           With XHTML 1.0 documents, it only searches for 
-          an <IF:Element> with a matching <HA:id> attribute. 
+          an <IF::DOMCore:Element> with a matching <HA::id> attribute. 
           The matching is case-sensitive.
      @@ImplNote:
        @@@lang:en
@@ -1507,22 +1509,22 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The name of the <IF:Node> to retrieve.
+            The name of the <IF::DOMCore:Node> to retrieve.
      @@Return:
         @@@Type:  
           DOMCore:Node
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The <IF:Node> with a <HA:name> or <HA:id> whose 
-            value matches with <P:name>.
+            The <IF::DOMCore:Node> with a <HA::name> or <HA::id> whose 
+            value matches with <P::name>.
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              There is no node with such a <P:name>.
+              There is no node with such a <P::name>.
        @@@PerlDef:
          my $node = $self->{<Q::TreeCore:node>};
          $name = "$name";
@@ -1608,7 +1610,7 @@ IF:
 ImplNote:
   @@lang:en
   @@@:
-    <IF:HTMLOptionCollection>: See <Module:DOMWebForms>.
+    <IF::HTMLOptionCollection>: See <Module::MDOM:DOMWebForms>.
 
 IF:
   @Name:
@@ -1653,7 +1655,7 @@ IF:
               there are a number of implementations supporting 
               the <M::HTMLDOMImplementation.createHTMLDocument> method 
               and the DOM Level 3 Core Specification belives:-) that 
-              there is a <M::createHTMLDocument> method. 
+              there is a <M::.createHTMLDocument> method. 
       \
       }
 
@@ -2038,7 +2040,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         The absolute URI <SRC:RFC 2396> of the document.
+         The absolute URI <SRC::RFC 2396> of the document.
      @@Get:
         @@@Type:  DOMString
         @@@actualType:
@@ -2057,13 +2059,13 @@ IF:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         ISSUE: Is returning <HA:frameset> is DOM Level 0 compatible?
+         ISSUE: Is returning <HA::frameset> is DOM Level 0 compatible?
      @@Get:
         @@@Type:  HTMLElement
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The <HA:body> element or the outermost <HA:frameset> element.
+            The <HA::body> element or the outermost <HA::frameset> element.
         @@@nullCase:
           @@@@enDesc:
             The document does not have the <HA::body> element
@@ -2168,9 +2170,9 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         A collection of all the <HA:img> elements in a document.
+         A collection of all the <HA::img> elements in a document.
        \
-         {NOTE:: Only <HA:img> elements are contained for 
+         {NOTE:: Only <HA::img> elements are contained for 
                  backward compatibility.
        \
          }
@@ -2203,15 +2205,15 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         A collection of all <HA:object> elements that include 
-         applets and <HA:applet> elements in the document.
+         A collection of all <HA::object> elements that include 
+         applets and <HA::applet> elements in the document.
      @@ImplNote:
        @@@lang:en
        @@@@:
          There might be compatibility problems, since 
          the two element types has different attribute sets. 
          Old (DOM Level 0) applications might not take 
-         <HA:object> elements into consideration.
+         <HA::object> elements into consideration.
      @@Get:
         @@@Type:  HTMLCollection
         @@@actualType:
@@ -2245,8 +2247,8 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         A collection of all <HA:a> and <HA:area> elements 
-         in a document with a value for the <HA:href> attribute.
+         A collection of all <HA::a> and <HA::area> elements 
+         in a document with a value for the <HA::href> attribute.
      @@Get:
         @@@Type:  HTMLCollection
         @@@actualType:
@@ -2290,8 +2292,8 @@ IF:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         It should be restricted for HTML <HA:form> elements. 
-         Neither <HA:isindex> elements nor non-HTML form elements 
+         It should be restricted for HTML <HA::form> elements. 
+         Neither <HA::isindex> elements nor non-HTML form elements 
          should be contained.
      @@Get:
         @@@Type:  HTMLCollection
@@ -2321,14 +2323,14 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         A collection of all the <HA:a> elements with a value 
-         for the <HA:name> attribute in the document.
+         A collection of all the <HA::a> elements with a value 
+         for the <HA::name> attribute in the document.
          \
          {NOTE:: The collection of this attribute only contains 
-                 those anchors with <HA:name> attributes, 
-                 not with the <HA:id> attributes, for backward 
+                 those anchors with <HA::name> attributes, 
+                 not with the <HA::id> attributes, for backward 
                  compatibility.  XHTML 1.0 deprecates the use 
-                 of the <HA:name> attribute.
+                 of the <HA::name> attribute.
          \
          }
      @@Get:
@@ -2364,7 +2366,7 @@ IF:
        @@@lang:en
        @@@@:
          The cookie, persistent state information associated 
-         with the current frame or document <SRC:RFC 2965>.
+         with the current frame or document <SRC::RFC 2965>.
          \
          {NOTE:: The precise nature of a UA session is not 
                  defined.
@@ -2377,11 +2379,11 @@ IF:
           @@@@lang:en
           @@@@@:
             A single string with each cookie's name-value pair 
-            separated by a <CHAR:SEMICOLON>.
+            separated by a <CHAR::SEMICOLON>.
         @@@ImplNote:
           @@@@lang:en
           @@@@@:
-            It is maybe RFC 2965 <CODE:cookies>.
+            It is maybe RFC 2965 <CODE::cookies>.
         @@@InCase:
           @@@@Value:\
           @@@@Description:
@@ -2395,23 +2397,23 @@ IF:
           @@@@lang:en
           @@@@@:
             A single name-value pair followed by zero or more 
-            cookie attribute values (RFC 2965 <CODE:cookie>). 
+            cookie attribute values (RFC 2965 <CODE::cookie>). 
             \
-            If no <CODE:domain> attribute is specified, 
-            it defaults to the <CODE:host> portion of an 
+            If no <CODE::domain> attribute is specified, 
+            it defaults to the <CODE::host> portion of an 
             RFC 2396 absolute URI of the current frame or document.
             \
-            If no <CODE:path> attribute is specified, it defaults 
-            to the absolute <CODE:path> portion of an 
+            If no <CODE::path> attribute is specified, it defaults 
+            to the absolute <CODE::path> portion of an 
             RFC 2396 absolute URI of the current frame or document.
             \
-            If no <CODE:max-age> attribute is specified, it 
+            If no <CODE::max-age> attribute is specified, it 
             defaults to a UA defined value.
             \
-            If a <CODE:cookie> with the specified name is already 
+            If a <CODE::cookie> with the specified name is already 
             associated, the new value as well as the new attributes 
-            replace the old ones.  If the <CODE:max-age> attribute 
-            value is <CODE:0>, any existing cookies of the specified 
+            replace the old ones.  If the <CODE::max-age> attribute 
+            value is <CODE::0>, any existing cookies of the specified 
             name are removed.
         @@@Exception:
           @@@@@:
@@ -2420,7 +2422,7 @@ IF:
             @@@@@lang:en
             @@@@@@:
               The new value does not adhere to the 
-              RFC 2965 <CODE:cookie>.
+              RFC 2965 <CODE::cookie>.
   @Method:
      @@Name:  open
      @@Description:
@@ -2434,7 +2436,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Close a document stream opened by the <M:open> method 
+         Close a document stream opened by the <M::open> method 
          and force rendering.
      @@Return:  
   @Method:
@@ -2442,7 +2444,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Write a string to a document stream opened by <M:open>.
+         Write a string to a document stream opened by <M::.open>.
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -2462,7 +2464,7 @@ IF:
        @@@lang:en
        @@@@:
          Write a string followed by a newline character 
-         to a document stream opened by the <M:open> method.
+         to a document stream opened by the <M::.open> method.
      @@Param:
         @@@Name:  text
         @@@Type:  DOMString
@@ -2488,27 +2490,27 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The <HA:name> of the element.  The matching is 
+            The <HA::name> of the element.  The matching is 
             case-sensitive.
      @@Return:
         @@@Type:  NodeList
         @@@Description:
           @@@@lang:en
           @@@@@:
-            A collection of the element whose <HA:name> matches 
-            with <P:elementName>.
+            A collection of the element whose <HA::name> matches 
+            with <P::elementName>.
   @Method:
     @@Name:getElementById
     @@Description:
       @@@lang:en
       @@@@:
-        Return the <IF:Element> whose <A:id> is given by 
-        <P:elementId>.  Behavior is not defined if more than 
-        one elements has this <P:elementId>.
+        Return the <IF::DOMCore:Element> whose <A::id> is given by 
+        <P::elementId>.  Behavior is not defined if more than 
+        one elements has this <P::elementId>.
         \
-        {NOTE:: This method was first defined in the <IF:HTMLDocument> 
+        {NOTE:: This method was first defined in the <IF::HTMLDocument> 
                 interface of DOM Level 1 but it has moved to 
-                the <Module:DOMCore> module in DOM Level 2.
+                the <Module::MDOM:DOMCore> module in DOM Level 2.
         \
         }
     @@Param:
@@ -2537,19 +2539,19 @@ IF:
     @@@:
       {P:: The following properties in DOM Level 0 have been deprecated 
       by DOM HTML Specifications in favor of the corresponding 
-      attributes in <IF:HTMLBodyElement> interface:
+      attributes in <IF::HTMLBodyElement> interface:
       \
-        - <A:alinkColor>
+        - <A::alinkColor>
         \
-        - <A:background>
+        - <A::background>
         \
-        - <A:bgColor>
+        - <A::bgColor>
         \
-        - <A:fgColor>
+        - <A::fgColor>
         \
-        - <A:linkColor>
+        - <A::linkColor>
         \
-        - <A:vlinkColor>
+        - <A::vlinkColor>
       \
       }
 ##HTMLDocument
@@ -2618,21 +2620,21 @@ ImplNote:
     \
     {FIG: HTML Data Types and DOM Data Types
        \
-       - <SGML:CDATA>:: <TYPE:DOMString>.
+       - <SGML::CDATA>:: <TYPE::DOMString>.
                         (Default of default: an empty string)
        \
-       - Enumerated values:: <TYPE:DOMString>. 
+       - Enumerated values:: <TYPE::DOMString>. 
                              (Normalized to lowercase in HTML. 
                               Default of default: an empty string)
        \
-       - Boolean:: <TYPE:boolean>. (Default of default: <DOM:false>.
+       - Boolean:: <TYPE::boolean>. (Default of default: <DOM::false>.
        \
-       - <SGML:NUMBER>:: <TYPE:long>. (Default of default: <DOM:0>.)
+       - <SGML::NUMBER>:: <TYPE::long>. (Default of default: <DOM::0>.)
        \
     }
     \
     Element type names in HTML 4 documents (exposed through 
-    such as <A:Element.tagName>) are normalized in 
+    such as <A::DOMCore:Element.tagName>) are normalized in 
     uppercase.  No specification for attribute names - it maybe 
     should be in lowercase for compatibility.
 
@@ -2716,9 +2718,9 @@ IF:
   @ImplNote:
     @@lang:en
     @@@:
-      The DOM Level 1 First and Second Editions said that the <HE:head> 
+      The DOM Level 1 First and Second Editions said that the <HE::head> 
       element belongs to this category - it is considered as 
-      an error, since there is the <IF:HTMLHeadElement>.
+      an error, since there is the <IF::HTMLHeadElement>.
 
   @Attr:
      @@Name:  id
@@ -2734,7 +2736,7 @@ IF:
     @@ImplNote:
       @@@lang:en
       @@@@:
-        Some element in HTML 4/XHTML 1.0 does not have <HA:class> attribute.
+        Some element in HTML 4/XHTML 1.0 does not have <HA::class> attribute.
   @Attr:
      @@Name:  title
      @@DocAttr1:
@@ -2749,7 +2751,7 @@ IF:
     @@ImplNote:
       @@@lang:en
       @@@@:
-        Some element in HTML 4/XHTML 1.0 does not have <HA:class> attribute.
+        Some element in HTML 4/XHTML 1.0 does not have <HA::class> attribute.
   @Attr:
      @@Name:  lang
      @@DocAttr1:
@@ -2764,7 +2766,7 @@ IF:
     @@ImplNote:
       @@@lang:en
       @@@@:
-        Some element in HTML 4/XHTML 1.0 does not have <HA:class> attribute.
+        Some element in HTML 4/XHTML 1.0 does not have <HA::class> attribute.
   @Attr:
      @@Name:  dir
      @@DocAttr1:
@@ -2779,7 +2781,7 @@ IF:
     @@ImplNote:
       @@@lang:en
       @@@@:
-        Some element in HTML 4/XHTML 1.0 does not have <HA:class> attribute.
+        Some element in HTML 4/XHTML 1.0 does not have <HA::class> attribute.
   @Attr:
      @@Name:  className
      @@DocAttr1:
@@ -2794,12 +2796,12 @@ IF:
     @@ImplNote:
       @@@lang:en
       @@@@:
-        Some element in HTML 4/XHTML 1.0 does not have <HA:class> attribute.
+        Some element in HTML 4/XHTML 1.0 does not have <HA::class> attribute.
 
   @ImplNote:
     @@lang:en
     @@@:
-      The <A:HTMLElement.style> is reserved by DOM Level 1 First Edition 
+      The <A::HTMLElement.style> is reserved by DOM Level 1 First Edition 
       for future use.  It is used later in DOM Level 2 CSS Module.
 ##HTMLElement
 
@@ -3294,10 +3296,10 @@ ET:
      @@Description:
        @@@lang:en
        @@@@:
-         The <HE:form> element containing this element.
+         The <HE::form> element containing this element.
          \
-         {NOTE:: Although DOM has this attribute, the <HE:isindex> 
-                 is independent from any <HE:form> by definition.
+         {NOTE:: Although DOM has this attribute, the <HE::isindex> 
+                 is independent from any <HE::form> by definition.
          \
          }
      @@Get:
@@ -4157,11 +4159,11 @@ IF:
 ImplNote:
   @@lang:en
   @@@:
-    <IF:HTMLFormElement>, <IF:HTMLSelectElement>, 
-    <IF:HTMLOptionElement>, <IF:HTMLOptGroupElement>, 
-    <IF:HTMLInputElement>, <IF:HTMLTextAreaElement>, 
-    <IF:HTMLButtonElement>, <IF:HTMLFieldSetElement>, 
-    <IF:HTMLLegendElement>: See <Module:WebForms>.
+    <IF::HTMLFormElement>, <IF::HTMLSelectElement>, 
+    <IF::HTMLOptionElement>, <IF::HTMLOptGroupElement>, 
+    <IF::HTMLInputElement>, <IF::HTMLTextAreaElement>, 
+    <IF::HTMLButtonElement>, <IF::HTMLFieldSetElement>, 
+    <IF::HTMLLegendElement>: See <Module::MDOM:DOMWebForms>.
 
 FeatureDef:
   @QName: HTMLExtendedFeature
@@ -4865,10 +4867,10 @@ IFDef:
   @Description:
     @@lang:en
     @@@:
-      The <IF:HTMLBlockquoteElement> interface was contained 
+      The <IF::HTMLBlockquoteElement> interface was contained 
       in the DOM Level 1 First Edition by error.  The 
-      <IF:HTMLQuoteElement> interface should must used instead. 
-      <SRC:DOM Level 1 Errata>
+      <IF::HTMLQuoteElement> interface should must used instead. 
+      <SRC::DOM Level 1 Errata>
   @Attr:
     @@Name:cite
     @@Get:
@@ -5049,8 +5051,8 @@ ET:
          @@@@lang:en
          @@@@@:
            TODO: Computed value should be returned. 
-           In DOM Level 1, it was <EM:not> the computed value 
-           and the type was <TYPE:DOMString>.
+           In DOM Level 1, it was <EM::not> the computed value 
+           and the type was <TYPE::DOMString>.
      @@Set:
      @@Level[list]:
         1
@@ -5086,7 +5088,7 @@ ET:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         This is <EM:not> the computed size.
+         This is <EM::not> the computed size.
      @@ReflectCDATA:
      @@Get:
      @@Set:
@@ -5349,10 +5351,10 @@ ET:
           The name of the element.
           \
           {NOTE:: This attribute is provided for backwards compatibility. 
-                  Whilst HTML 4.01 added the <HA:name> attribute 
+                  Whilst HTML 4.01 added the <HA::name> attribute 
                   for compatibility, the DOM HTML Specifications 
                   does not address this fact - i.e. HTML's and DOM's 
-                  <CODE:name> attributes are not formally associated.
+                  <CODE::name> attributes are not formally associated.
           \
           }
      @@DocAttr:
@@ -5388,7 +5390,7 @@ ET:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         The type is <TYPE:DOMString> in both DOM Levels 1 and 2.
+         The type is <TYPE::DOMString> in both DOM Levels 1 and 2.
   @ATTR:
      @@Name:  height
      @@Deprecated:
@@ -5447,9 +5449,9 @@ ET:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         The HTML 4 and XHTML 1.0 <HA:usemap> attribute value is 
-         of <SGML:%URI;>, while the XHTML m12n <HA:usemap> value 
-         is <XML:IDREF>.
+         The HTML 4 and XHTML 1.0 <HA::usemap> attribute value is 
+         of <SGML::%URI;>, while the XHTML m12n <HA::usemap> value 
+         is <XML::IDREF>.
   @ATTR:
      @@Name:  vspace
      @@Deprecated:
@@ -5512,7 +5514,7 @@ ET:
      @@Description:
        @@@lang:en
        @@@@:
-         The <HE:form> element containing this control.
+         The <HE::form> element containing this control.
      @@Get:
         @@@Type:  
           DOMHTML:HTMLFormElement
@@ -5619,9 +5621,9 @@ ET:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         In HTML 4 or XHTML 1.0, the <HA:usemap> attribute is 
-         a <SGML:%URI;>.  In XHTML m12n, the <HA:usemap> 
-         is an <XML:IDREF>.
+         In HTML 4 or XHTML 1.0, the <HA::usemap> attribute is 
+         a <SGML::%URI;>.  In XHTML m12n, the <HA::usemap> 
+         is an <XML::IDREF>.
   @ATTR:
      @@Name:  vspace
      @@Deprecated:
@@ -5908,7 +5910,7 @@ ET:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         ISSUE: How interact with <HA:src>?
+         ISSUE: How interact with <HA::src>?
      @@Get:
         @@@Type:  DOMString
      @@Set:
@@ -5919,7 +5921,7 @@ ET:
        @@@lang:en
        @@@@:
          {NOTE:: Reserved for future use by the DOM HTML Specifications. 
-                 The HTML <HA:for> attribute is also reserved 
+                 The HTML <HA::for> attribute is also reserved 
                  by the HTML 4 Specifications.
          \
          }
@@ -5933,7 +5935,7 @@ ET:
        @@@lang:en
        @@@@:
          {NOTE:: Reserved for future use by the DOM HTML Specifications. 
-                 The HTML <HA:event> attribute is also reserved 
+                 The HTML <HA::event> attribute is also reserved 
                  by the HTML 4 Specification.
          \
          }
@@ -5984,14 +5986,14 @@ ET:
      @@Description:
        @@@lang:en
        @@@@:
-         The <HE:caption> of the table.
+         The <HE::caption> of the table.
      @@Get:
         @@@Type:  HTMLTableCaptionElement
         @@@InCase:
           @@@@Label:
             @@@@@lang:en
             @@@@@@:
-              void (= <DOM:null>?)
+              void (= <DOM::null>?)
           @@@@Description:
             @@@@@lang:en
             @@@@@@: There is no caption.
@@ -6003,7 +6005,7 @@ ET:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The given element is not a <HE:caption>.
+              The given element is not a <HE::caption>.
      @@Level[list]:
         1
      @@SpecLevel[list]:
@@ -6014,7 +6016,7 @@ ET:
      @@Description:
        @@@lang:en
        @@@@:
-         The <HE:thead> of this table.
+         The <HE::thead> of this table.
      @@Get:
         @@@Type:  HTMLTableSectionElement
         @@@InCase:
@@ -6023,7 +6025,7 @@ ET:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              There is no <HE:thead>.
+              There is no <HE::thead>.
      @@Set:
         @@@Type:  HTMLTableSectionElement
         @@@Exception:
@@ -6035,7 +6037,7 @@ ET:
            @@@@Description:
              @@@@@lang:en
              @@@@@@: 
-               The given element is not a <HE:thead>.
+               The given element is not a <HE::thead>.
      @@Level[list]:
         1
      @@SpecLevel[list]:
@@ -6046,7 +6048,7 @@ ET:
      @@Description:
        @@@lang:en
        @@@@:
-         The <HE:tfoot> of this table.
+         The <HE::tfoot> of this table.
      @@Get:
         @@@Type:  HTMLTableSectionElement
         @@@InCase:
@@ -6055,7 +6057,7 @@ ET:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              There is no <HE:tfoot>.
+              There is no <HE::tfoot>.
      @@Set:
         @@@Type:  HTMLTableSectionElement
         @@@Exception:
@@ -6068,7 +6070,7 @@ ET:
              @@@@@Description:
                @@@@@@lang:en
                @@@@@@@:
-                 The given element is not a <HE:tfoot>.
+                 The given element is not a <HE::tfoot>.
      @@Level[list]:
         1
      @@SpecLevel[list]:
@@ -6080,7 +6082,7 @@ ET:
        @@@lang:en
        @@@@:
          A collection of all the rows (child or grandchild 
-         <HE:tr> elements) in this table.
+         <HE::tr> elements) in this table.
      @@Get:
         @@@Type:  HTMLCollection
   @Attr:
@@ -6132,7 +6134,7 @@ ET:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         How <HTML:border> is implemented in DOM Level 0?
+         How <HTML::border> is implemented in DOM Level 0?
   @ATTR:
      @@Name:  rules
      @@ReflectEnum:
@@ -6153,40 +6155,40 @@ ET:
      @@Description:
        @@@lang:en
        @@@@:
-         Create the <HE:thead> element (if it does not exist) and 
+         Create the <HE::thead> element (if it does not exist) and 
          return it.
      @@Return:
         @@@Type:  HTMLElement
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The <HE:thead> element.
+            The <HE::thead> element.
   @Method:
      @@Name:  deleteTHead
      @@Description:
        @@@lang:en
        @@@@:
-         Delete the <HE:thead>, if any, from the table.
+         Delete the <HE::thead>, if any, from the table.
      @@Return:  
   @Method:
      @@Name:  createTFoot
      @@Description:
        @@@lang:en
        @@@@:
-         Create the <HE:tfoot> element (if it does not exist) and 
+         Create the <HE::tfoot> element (if it does not exist) and 
          return it.
      @@Return:
         @@@Type:  HTMLElement
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The <HE:tfoot> element.
+            The <HE::tfoot> element.
   @Method:
      @@Name:  deleteTFoot
      @@Description:
        @@@lang:en
        @@@@:
-         Delete the <HE:tfoot>, if any, from the table.
+         Delete the <HE::tfoot>, if any, from the table.
      @@Return:  
   @Method:
      @@Name:  createCaption
@@ -6213,7 +6215,7 @@ ET:
        @@@lang:en
        @@@@:
          Insert a new empty row in this table.  If this table is 
-         empty, a <HE:tbody> is created and the new row is 
+         empty, a <HE::tbody> is created and the new row is 
          inserted into it.
      @@ImplNote:
         @@@lang:en
@@ -6229,10 +6231,10 @@ ET:
           @@@@lang:en
           @@@@@:
             The ordinal index of the row where to insert a new row, 
-            starting from <DOM:0> and relative to the logical 
+            starting from <DOM::0> and relative to the logical 
             order (not the document order).  The new row is 
             inserted immediately before and in the same row group 
-            as the current <P:index>th row.
+            as the current <P::index>th row.
         @@@InCase:
           @@@@Value:-1
           @@@@Description:
@@ -6265,14 +6267,14 @@ ET:
              @@@@@Description:
                @@@@@@lang:en
                @@@@@@@:
-                 The <P:index> is greater than the number of rows 
-                 or less than <DOM:-1>.
+                 The <P::index> is greater than the number of rows 
+                 or less than <DOM::-1>.
             @@@@SpecLevel:2
            @@@@ImplNote:
              @@@@@lang:en
              @@@@@@:
-               <SRC:DOM Level 1 Second Edition HTML, DOM Level 2 HTML> 
-               (<P:index> cannot <DOM:-1> in DOM Level 1.)
+               <SRC::DOM Level 1 Second Edition HTML, DOM Level 2 HTML> 
+               (<P::index> cannot <DOM::-1> in DOM Level 1.)
      @@Level[list]:
         1
         2
@@ -6291,7 +6293,7 @@ ET:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The ordinal index of the row to delete, starting from <DOM:0> 
+            The ordinal index of the row to delete, starting from <DOM::0> 
             and relative to the logical order (not document order).
         @@@InCase:
           @@@@Value:-1
@@ -6303,7 +6305,7 @@ ET:
         @@@ImplNote:
           @@@@lang:en
           @@@@@:
-            In the order of <HE:thead> -> <HE:tbody>s -> <HE:tfoot>?
+            In the order of <HE::thead> -> <HE::tbody>s -> <HE::tfoot>?
      @@Return:
         @@@Exception:
            @@@@Name:  INDEX_SIZE_ERR
@@ -6315,15 +6317,15 @@ ET:
              @@@@@Description:
                @@@@@@lang:en
                @@@@@@@:
-                 The <P:index> is greater than or equal to 
-                 the number of rows or the <P:index> is 
-                 less than <DOM:-1>.
+                 The <P::index> is greater than or equal to 
+                 the number of rows or the <P::index> is 
+                 less than <DOM::-1>.
            @@@@SpecLevel:2
            @@@@ImplNote:
              @@@@@lang:en
              @@@@@@:
-               <SRC:DOM Level 1 Second Edition HTML, DOM Level 2 HTML> 
-               (<P:index> cannot <DOM:-1> in DOM Level 1.)
+               <SRC::DOM Level 1 Second Edition HTML, DOM Level 2 HTML> 
+               (<P::index> cannot <DOM::-1> in DOM Level 1.)
      @@Level[list]:
         1
         2
@@ -6564,9 +6566,9 @@ IF:
           @@@@lang:en
           @@@@@:
             The ordinal index of the row where to insert a new row, 
-            starting from <DOM:0> and relative only to the 
+            starting from <DOM::0> and relative only to the 
             rows contained inside this row group.  The new row 
-            is inserted immediately before the current <P:index>th 
+            is inserted immediately before the current <P::index>th 
             row.
         @@@InCase:
           @@@@Value:-1
@@ -6599,14 +6601,14 @@ IF:
              @@@@@Description:
                @@@@@@lang:en
                @@@@@@@:
-                 The <P:index> is greater than the number 
-                 of rows or less than <DOM:-1>.
+                 The <P::index> is greater than the number 
+                 of rows or less than <DOM::-1>.
            @@@@SpecLevel:2
            @@@@ImplNote:
              @@@@@lang:en
              @@@@@@:
-               <SRC:DOM Level 1 Second Edition HTML, DOM Level 2 HTML> 
-               (<P:index> cannot <DOM:-1> in DOM Level 1.)
+               <SRC::DOM Level 1 Second Edition HTML, DOM Level 2 HTML> 
+               (<P::index> cannot <DOM::-1> in DOM Level 1.)
      @@Level[list]:
         1
         2
@@ -6627,7 +6629,7 @@ IF:
           @@@@lang:en
           @@@@@:
             The ordinal index of the row to delete, starting 
-            from <DOM:0> and relative 
+            from <DOM::0> and relative 
             only to the rows contained inside this row group.
         @@@InCase:
           @@@@Value:-1
@@ -6647,15 +6649,15 @@ IF:
              @@@@@Description:
                @@@@@@lang:en
                @@@@@@@:
-                 The <P:index> is greater than or equal to 
-                 the number of rows or the <P:index> is less 
-                 than <DOM:-1>.
+                 The <P::index> is greater than or equal to 
+                 the number of rows or the <P::index> is less 
+                 than <DOM::-1>.
            @@@@SpecLevel:2
            @@@@ImplNote:
              @@@@@lang:en
              @@@@@@:
-               <SRC:DOM Level 1 Second Edition HTML, DOM Level 2 HTML> 
-               (<P:index> cannot <DOM:-1> in DOM Level 1.)
+               <SRC::DOM Level 1 Second Edition HTML, DOM Level 2 HTML> 
+               (<P::index> cannot <DOM::-1> in DOM Level 1.)
      @@Level[list]:
         1
         2
@@ -6677,12 +6679,12 @@ ET:
      @@Description:
        @@@lang:en
        @@@@:
-         The ordinal index of the row, starting from <DOM:0>, 
+         The ordinal index of the row, starting from <DOM::0>, 
          in the logical order (not the document order). 
          \
          {NOTE:: The logical order take row groups into account; 
-                 placing <HE:thead> rows first, followed by 
-                 <HE:tbody> rows, followed by <HE:tfoot> rows.
+                 placing <HE::thead> rows first, followed by 
+                 <HE::tbody> rows, followed by <HE::tfoot> rows.
          \
          }
      @@Get:
@@ -6703,7 +6705,7 @@ ET:
      @@Description:
        @@@lang:en
        @@@@:
-         The ordinal index of this row, starting from <DOM:0> 
+         The ordinal index of this row, starting from <DOM::0> 
          and relative to this row group.
      @@Get:
         @@@Type:
@@ -6768,7 +6770,7 @@ ET:
      @@Description:
         @@@lang:en
         @@@@:
-          Insert an empty data cell (<HE:td>) into this row.
+          Insert an empty data cell (<HE::td>) into this row.
      @@Param:
         @@@Name:  index
         @@@Type:
@@ -6777,7 +6779,7 @@ ET:
           @@@@lang:en
           @@@@@:
             The index where the new cell is inserted, starting 
-            from <DOM:0>.
+            from <DOM::0>.
         @@@InCase:
           @@@@Value:-1
           @@@@Description:
@@ -6807,14 +6809,14 @@ ET:
              @@@@@Description:
                @@@@@@lang:en
                @@@@@@@:
-                 The <P:index> is greater than the number of 
-                 cells or less than <DOM:-1>.
+                 The <P::index> is greater than the number of 
+                 cells or less than <DOM::-1>.
            @@@@SpecLevel:2
            @@@@ImplNote:
              @@@@@lang:en
              @@@@@@:
-               <SRC:DOM Level 1 Second Edition HTML, DOM Level 2 HTML> 
-               (<P:index> cannot <DOM:-1> in DOM Level 1.)
+               <SRC::DOM Level 1 Second Edition HTML, DOM Level 2 HTML> 
+               (<P::index> cannot <DOM::-1> in DOM Level 1.)
      @@Level[list]:
         1
         2
@@ -6833,7 +6835,7 @@ ET:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The index of the cell to delete, starting from <DOM:0> 
+            The index of the cell to delete, starting from <DOM::0> 
             and in the document order.
         @@@InCase:
           @@@@Value:-1
@@ -6853,14 +6855,14 @@ ET:
              @@@@@Description:
                @@@@@@lang:en
                @@@@@@@:
-                 THe <P:index> is greater than or equal to the number 
-                 of the cells or less than <DOM:-1>.
+                 THe <P::index> is greater than or equal to the number 
+                 of the cells or less than <DOM::-1>.
             @@@@SpecLevel:2
            @@@@ImplNote:
              @@@@@lang:en
              @@@@@@:
-               <SRC:DOM Level 1 Second Edition HTML, DOM Level 2 HTML> 
-               (<P:index> cannot <DOM:-1> in DOM Level 1.)
+               <SRC::DOM Level 1 Second Edition HTML, DOM Level 2 HTML> 
+               (<P::index> cannot <DOM::-1> in DOM Level 1.)
      @@Level[list]:
         1
         2
@@ -6942,7 +6944,7 @@ IF:
        @@@lang:en
        @@@@:
          The ordinal index of this cell in the row, 
-         starting from <DOM:0> and in the document order 
+         starting from <DOM::0> and in the document order 
          (not the display order).
      @@Get:
         @@@Type:

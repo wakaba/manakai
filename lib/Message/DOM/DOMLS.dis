@@ -19,7 +19,7 @@ Module:
     @@lang:en
     @@@:
       A set of interfaces for loading and saving document objects. 
-      The functionality defined in this module (the <DFN:Load and Save>
+      The functionality defined in this module (the <DFN::Load and Save>
       functionality) is sufficient to allow DOM applications to 
       load and save XML content.  The API also allows filtering 
       of XML content using only DOM API calls.
@@ -31,7 +31,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/08/30 12:30:45 $
+      $Date: 2005/08/31 13:02:46 $
     @@ContentType:
       dis:Date.RCS
 
@@ -484,8 +484,8 @@ ExceptionDef:
   @ImplNote:
     @@lang:en
     @@@:
-      Parser or writer may throw an <X:LSException> if the processing 
-      is stopped.  The processing can be stopped due to a <IF:DOMError>.
+      Parser or writer may throw an <IF::LSException> if the processing 
+      is stopped.  The processing can be stopped due to a <IF::DOMCore:DOMError>.
 
   @Attr:
      @@Name:  code
@@ -786,11 +786,11 @@ IF:
   @ImplNote:
     @@lang:en
     @@@:
-      It is expected that an instance of the <IF:DOMImplementationLS> 
+      It is expected that an instance of the <IF::DOMImplementationLS> 
       interface can be obtained by binding-specific casting 
-      methods on an instance of the <IF:DOMImplementation> interface 
-      or <M:DOMImplementation.getFeature> with parameters <Feature:LS> or 
-      <Feature:LS-Async> version <FeatureVer:3.0>.
+      methods on an instance of the <IF::DOMCore:DOMImplementation> interface 
+      or <M::DOMCore:DOMImplementation.getFeature> with parameters 
+      <Feature::LS> or <Feature::LS-Async> version <FeatureVer::3.0>.
     @@ForCheck:
       ManakaiDOM:ForIF
    
@@ -818,7 +818,7 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@: 
-            Create an synchronous <IF:LSParser>.
+            Create an synchronous <IF::LSParser>.
      @@Const:
         @@@Name:  MODE_ASYNCHRONOUS
         @@@Type:
@@ -827,7 +827,7 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@: 
-            Create an asynchronous <IF:LSParser>.
+            Create an asynchronous <IF::LSParser>.
   @Method:
      @@Name:  createLSParser
      @@Description:
@@ -841,18 +841,18 @@ IF:
         @@@actualType: DOMImplementationLSMode
         @@@InCase:
           @@@@Label:
-            <DOM:MODE_SYNCHRONOUS>
+            <XC::MODE_SYNCHRONOUS>
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The <IF:LSParser> created will operate in synchronous mode.
+              The <IF::LSParser> created will operate in synchronous mode.
         @@@InCase:
           @@@@Label:
-            <DOM:MODE_ASYNCHRONOUS>
+            <XC::MODE_ASYNCHRONOUS>
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The <IF:LSParser> created will operate in asynchronous mode.
+              The <IF::LSParser> created will operate in asynchronous mode.
      @@Param:
         @@@Name:  schemaType
         @@@Type: 
@@ -863,15 +863,15 @@ IF:
           @@@@lang:en
           @@@@@:
             An absolute URI representing the type of the schema language 
-            used during the load of a <IF:Document> using the newly 
-            created <IF:LSParser>.
+            used during the load of a <IF::DOMCore:Document> using the newly 
+            created <IF::LSParser>.
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The <IF:LSParser> will be free to use any schema found.
+              The <IF::LSParser> will be free to use any schema found.
      @@Return:
         @@@Type:  LSParser
         @@@Description:
@@ -881,8 +881,8 @@ IF:
         @@@ImplNote:
           @@@@lang:en
           @@@@@:
-            By default, the parameter <DOM:error-handler> of the 
-            <A:LSParser.domConfig> is <DOM:null>.  However, 
+            By default, the parameter <DOM::error-handler> of the 
+            <A::LSParser.domConfig> is <DOM::null>.  However, 
             the DOM implementation may provide a default error handler instead.
         @@@Exception:
            @@@@Name:  NOT_SUPPORTED_ERR
@@ -1131,21 +1131,21 @@ IF:
   @ImplNote:
     @@lang:en
     @@@:
-      {P:: When a document is first made available via the <IF:LSParser>, 
+      {P:: When a document is first made available via the <IF::LSParser>, 
       \
-      - there will never be two adjacent <IF:Text> nodes.
+      - there will never be two adjacent <IF::Text> nodes.
       \
       - there will never be empty text nodes.
       \
-      {LI:: it is expected that <A:Attr.value> initially return XML 1.0 
+      {LI:: it is expected that <A::DOMCore:Attr.value> initially return XML 1.0 
             normalized value.
       \
-        - If the parameter <CP:validate-if-schema> and 
-          <CP:datatype-normalization> are set to <DOM:true>, 
+        - If the parameter <CP::validate-if-schema> and 
+          <CP::datatype-normalization> are set to <DOM::true>, 
           depending on the attribute normalization used, the 
           attribute values may differ from the ones by XML 1.0.
       \
-        - If the parameter <CP:datatype-normalization> is set to <DOM:false>, 
+        - If the parameter <CP::datatype-normalization> is set to <DOM::false>, 
           the XML 1.0 attribute normalization is guaranteed to occur.
       \
       }
@@ -1154,19 +1154,19 @@ IF:
   @ImplNote:
     @@lang:en
     @@@:
-      Asynchronous <IF:LSParser> are expected to also implement 
-      <IF:EventTarget> so that event listeners can be registered.
+      Asynchronous <IF::LSParser> are expected to also implement 
+      <IF::EventTarget> so that event listeners can be registered.
       \
-      {FIG:: Events supported by asyncronous <IF:LSParser> objects
+      {FIG:: Events supported by asyncronous <IF::LSParser> objects
       \
-        - <EV:LSEV:load>:: The <IF:LSParser> finishes to load the document.
-                      (<IF:LSLoadEvent>)
+        - <EV::LSEV:load>:: The <IF::LSParser> finishes to load the document.
+                      (<IF::LSLoadEvent>)
       \
-        - <EV:LSEV:progress>:: The <IF:LSParser> signals progress as 
-                          data is parsed.  When <EV:LSEV:progress> should be 
+        - <EV::LSEV:progress>:: The <IF::LSParser> signals progress as 
+                          data is parsed.  When <EV::LSEV:progress> should be 
                           dispatched is implementation dependent. 
                           The DOM implementation can choose not to 
-                          dispatch at all. (<IF:LSProgressEvent>)
+                          dispatch at all. (<IF::LSProgressEvent>)
       }
   @Attr:
      @@Name:  domConfig
@@ -1178,7 +1178,7 @@ IF:
          Note that this configuration is specific to the parse 
          operation.  No parameter values from this 
          configuration object are passed automatically to the 
-         configuration object on the <IF:Document> that is created, or 
+         configuration object on the <IF::DOMCore:Document> that is created, or 
          used, by the parse operation.
      @@Get:
         @@@Type:  DOMConfiguration
@@ -1198,13 +1198,13 @@ IF:
            @@@@Description:
              @@@@@lang:en
              @@@@@@:
-               This <IF:LSParser> is in asynchronous mode.
+               This <IF::LSParser> is in asynchronous mode.
         @@@InCase:
            @@@@Value:  false
            @@@@Description:
              @@@@@lang:en
              @@@@@@:
-               This <IF:LSParser> is in synchronous mode.
+               This <IF::LSParser> is in synchronous mode.
   @Attr:
      @@Name:  busy
      @@Get:
@@ -1215,7 +1215,7 @@ IF:
            @@@@Description:
              @@@@@lang:en
              @@@@@@:
-               This <IF:LSParser> is currently busy loading a document.
+               This <IF::LSParser> is currently busy loading a document.
         @@@InCase:
            @@@@Value:  false
            @@@@Description:
@@ -1227,28 +1227,28 @@ IF:
        @@@lang:en
        @@@@:
          Parse an XML document from a resource identified by a 
-         <IF:LSInput>.
+         <IF::LSInput>.
      @@Param:
         @@@Name:  input
         @@@Type:  LSInput
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The <IF:LSInput> object from which the source of 
+            The <IF::LSInput> object from which the source of 
             the document is to be read.
      @@Return:
         @@@Type:  Document
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The newly created and populated <IF:Document>.
+            The newly created and populated <IF::DOMCore:Document>.
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The <IF:LSParser> is asynchronous.
+              The <IF::LSParser> is asynchronous.
         @@@Exception:
            @@@@Name:  INVALID_STATE_ERR
            @@@@Type:
@@ -1259,14 +1259,14 @@ IF:
              @@@@@Description:
                @@@@@@lang:en
                @@@@@@@:
-                 <A:LSParser.busy> is <DOM:true>.
+                 <A::LSParser.busy> is <DOM::true>.
         @@@Exception:
            @@@@Name:  PARSE_ERR
            @@@@Type:  LSException
            @@@@Description:
              @@@@@lang:en
              @@@@@@:
-               The <IF:LSParser> was unable to load the XML document. 
+               The <IF::LSParser> was unable to load the XML document. 
            @@@@ImplNote:
              @@@@@lang:en
              @@@@@@:
@@ -1278,7 +1278,7 @@ IF:
        @@@lang:en
        @@@@:
          Parse an XML document from a location identified by a 
-         URI reference <SRC:<CITE:RFC 2396>>.
+         URI reference <SRC::<CITE::RFC 2396>>.
      @@Param:
         @@@Name:  uri
         @@@Type:  DOMString
@@ -1288,7 +1288,7 @@ IF:
           @@@@lang:en
           @@@@@:
             The location of the XML document to be read, 
-            as a URI reference <SRC:<CITE:RFC 2396>>.
+            as a URI reference <SRC::<CITE::RFC 2396>>.
         @@@InCase:
           @@@@Label:
             @@@@@lang:en
@@ -1303,14 +1303,14 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The newly created and populated <IF:Document>.
+            The newly created and populated <IF::DOMCore:Document>.
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The <IF:LSParser> is asynchronous.
+              The <IF::LSParser> is asynchronous.
         @@@Exception:
            @@@@Name:  INVALID_STATE_ERR
            @@@@Type:
@@ -1321,14 +1321,14 @@ IF:
              @@@@@Description:
                @@@@@@lang:en
                @@@@@@@:
-                 <A:LSParser.busy> is <DOM:true>.
+                 <A::LSParser.busy> is <DOM::true>.
         @@@Exception:
            @@@@Name:  PARSE_ERR
            @@@@Type:  LSException
            @@@@Description:
              @@@@@lang:en
              @@@@@@:
-               The <IF:LSParser> was unable to load the XML document. 
+               The <IF::LSParser> was unable to load the XML document. 
            @@@@ImplNote:
              @@@@@lang:en
              @@@@@@:
@@ -1353,7 +1353,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         A set of possible actions for the <M:LSParser.parseWithContext>.
+         A set of possible actions for the <M::LSParser.parseWithContext>.
 
      @@Const:
         @@@Name:  ACTION_APPEND_AS_CHILDREN
@@ -1408,9 +1408,9 @@ IF:
        @@@lang:en
        @@@@:
          Abort the loading of the document that is currently being 
-         loaded by this <IF:LSParser>.
+         loaded by this <IF::LSParser>.
        \
-         If the <IF:LSParser> is currently not busy, this method does nothing.
+         If the <IF::LSParser> is currently not busy, this method does nothing.
      @@Return: 
 ##LSParser
 
@@ -1434,7 +1434,7 @@ IF:
     @@@:
       An input source for data.
       \
-    \  <IF:LSInput> objects belong to DOM applications and the 
+    \  <IF::LSInput> objects belong to DOM applications and the 
       DOM implementation will never modify them.
     \
       With this interface, a DOM application is able to encapsulate 
@@ -1444,27 +1444,27 @@ IF:
     \
       The DOM application can either provide its own objects that 
       implement this interface or it can use the generic factor 
-      method <M:DOMImplementationLS.createLSInput> to create 
+      method <M::DOMImplementationLS.createLSInput> to create 
       objects that implement this interface.
     \
-      {P:: The <IF:LSParser> will use the <IF:LSInput> object to 
+      {P:: The <IF::LSParser> will use the <IF::LSInput> object to 
       determine how to read data.  The first one, in the following 
-      order, that is not <DOM:null> and not an empty string will be used:
+      order, that is not <DOM::null> and not an empty string will be used:
       \
-      = <A:LSInput.characterStream>
+      = <A::LSInput.characterStream>
       \
-      = <A:LSInput.byteStream>
+      = <A::LSInput.byteStream>
       \
-      = <A:LSInput.stringData>
+      = <A::LSInput.stringData>
       \
-      = <A:LSInput.systemId>
+      = <A::LSInput.systemId>
       \
-      = <A:LSInput.publicId>
+      = <A::LSInput.publicId>
       \
       }
       \
-      If all inputs are <DOM:null>, the <IF:LSParser> will report a 
-      <IF:DOMError> (<ERR:no-input-specified>).
+      If all inputs are <DOM::null>, the <IF::LSParser> will report a 
+      <IF::DOMError> (<ERR::no-input-specified>).
   @ImplNote:
     @@lang:en
     @@@: The DOM implementation may make copies and modify it if necessary.
@@ -1477,9 +1477,9 @@ IF:
     @@lang:en
     @@@:
       Properties available:
-      <Q:infoset:publicIdentifier>, <Q:infoset:systemIdentifier>, 
-      <Q:infoset:baseURI>, <Q:infoset:characterEncodingScheme>, 
-      <Q:DOMLS:certifiedText>, <Q:DOMLS:stringData>.
+      <Q::infoset:publicIdentifier>, <Q::infoset:systemIdentifier>, 
+      <Q::infoset:baseURI>, <Q::infoset:characterEncodingScheme>, 
+      <Q::DOMLS:certifiedText>, <Q::DOMLS:stringData>.
       
   @Attr:
      @@Name:  characterStream
@@ -1489,7 +1489,7 @@ IF:
          A sream of 16-bit units.
        \
          The document in the stream need not have an XML declaration. 
-         If an XML declaration is present, the <XML:encoding> 
+         If an XML declaration is present, the <XA::encoding> 
          declaration will be ignored.
        \
          Depending on the binding in use, this attribute may not be
@@ -1524,7 +1524,7 @@ IF:
          String data to parse.
        \
          The document in the data need not have an XML declaration. 
-         If an XML declaration is present, the <XML:encoding> 
+         If an XML declaration is present, the <XA::encoding> 
          declaration will be ignored.
      @@Type:  
        DOMMain:DOMString
@@ -1552,7 +1552,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         The system identifier or a URI reference <SRC:<CITE:RFC 2396>> 
+         The system identifier or a URI reference <SRC::<CITE::RFC 2396>> 
          for this input source.
        \
          Even if other input source is specified, this is still 
@@ -1561,7 +1561,7 @@ IF:
        \
          If the specified system identifier is a relative URI reference, 
          the DOM implementation will attempt to resolve the relative URI 
-         with the <A:baseURI>.  If that fails, the behavior is 
+         with the <A::.baseURI>.  If that fails, the behavior is 
          implementation dependent.
      @@Type:
        DOMMain:DOMString
@@ -1598,10 +1598,10 @@ IF:
        @@@lang:en
        @@@@:
          The base URI to be used for resolving a relative 
-         <P:systemId> to an absolute URI.
+         <P::systemId> to an absolute URI.
         \
          If, when used, the base URI is a relative URI, including 
-         empty string, or <DOM:null>, the behavior is implementation 
+         empty string, or <DOM::null>, the behavior is implementation 
          dependent.
      @@Type:
        DOMMain:DOMString
@@ -1632,7 +1632,7 @@ IF:
         \
          This attribute has no effect when the DOM application provides 
          a character stream or string data.  For other sources, 
-         the <A:encoding> will override any encoding specified in the 
+         the <A::.encoding> will override any encoding specified in the 
          XML or text declaration or higher level protocol.
      @@Type:
        DOMMain:DOMString
@@ -1643,8 +1643,8 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The encoding name acceptable for an XML 1.0 <XML:encoding> 
-            declaration <SRC:<CITE:XML 1.0> 4.3.3 Character Encoding in 
+            The encoding name acceptable for an XML 1.0 <XA::encoding> 
+            declaration <SRC::<CITE::XML 1.0> 4.3.3 Character Encoding in 
             Entities>.
         @@@PerlDef:
           $self->{encoding} = $given;
@@ -1668,7 +1668,7 @@ IF:
              @@@@@lang:en
              @@@@@@:
                Assume that the input is certified 
-               <SRC:<CITE:XML 1.1> 2.13 Normalization Checking> when 
+               <SRC::<CITE::XML 1.1> 2.13 Normalization Checking> when 
                parsing an XML 1.1 document.
         @@@InCase:
            @@@@Value:  false
@@ -1681,13 +1681,13 @@ IF:
     @@Description:
       @@@lang:en
       @@@@:
-        Construct a new instance of the <IF:LSInput>.
+        Construct a new instance of the <IF::LSInput>.
     @@Return:
       @@@Type:ManakaiDOMLSInput
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The newly created <IF:LSInput> object.
+          The newly created <IF::LSInput> object.
       @@@PerlDef:
         $r = bless {}, $self;
 
@@ -2140,55 +2140,55 @@ FeatureDef:
     @@enDesc:
       {P:: To support this feature:
          \
-         - the serializer class <RFC2119:MUST> implement the
+         - the serializer class <RFC2119::MUST> implement the
            <IF::ManakaiDOMSimpleXMLSerializerIF>
-           interface, i.e. it <RFC2119:MUST> have a 
+           interface, i.e. it <RFC2119::MUST> have a 
            <M::ManakaiDOMSimpleXMLSerializerIF.writeToString> method.
          \
          - the <M::ManakaiDOMSimpleXMLSerializerIF.writeToString>
-           method <RFC2119:MUST> accept a <IF::DOMCore:Document>
-           node as its <P::nodeArg> parameter.  It <RFC2119:MAY>
+           method <RFC2119::MUST> accept a <IF::DOMCore:Document>
+           node as its <P::nodeArg> parameter.  It <RFC2119::MAY>
            also accept other type of nodes as the parameter.
          \
-         - the serialization <RFC2119:MUST> support the result
+         - the serialization <RFC2119::MUST> support the result
            being exact one parsed entity, i.e. a document entity without
            any external parsed entity reference. 
          \
-         - the serializer <RFC2119:MUST> support the serialization
+         - the serializer <RFC2119::MUST> support the serialization
            of <IF::DOMCore:Element> nodes, <IF::DOMCore:Attr>
            nodes which support XML Namespaces and which are not
            namespace declaration attributes, and <IF::DOMCore:Text> nodes.
          \
-         - the serializer <RFC2119:MUST> support the serialization
+         - the serializer <RFC2119::MUST> support the serialization
            of <IF::DOMXML:CDATASection> nodes, but it does not have
            to result in XML CDATA sections.  In other word, 
-           the serializer <RFC2119:MAY> serialize a <IF::DOMXML:CDATASection>
+           the serializer <RFC2119::MAY> serialize a <IF::DOMXML:CDATASection>
            as a sequence of characters and/or character references.
          \
-         - the serializer <RFC2119:MAY> ignore <IF::DOMXML:EntityReference>
+         - the serializer <RFC2119::MAY> ignore <IF::DOMXML:EntityReference>
            nodes and serialize their children if the <IF::DOMXML:EntityReference>
-           nodes are expanded.  Otherwise, it <RFC2119:MUST> 
+           nodes are expanded.  Otherwise, it <RFC2119::MUST> 
            serialize them as (unexpanded) general entity references. 
            If the serializer supports the serialization of 
-           document type declarations, it <RFC2119:MAY> generate
+           document type declarations, it <RFC2119::MAY> generate
            general entity declarations.
          \
-         - the serialization <RFC2119:MAY> serialize 
+         - the serialization <RFC2119::MAY> serialize 
            or ignore <IF::DOMCore:Comment>, <IF::DOMXML:ProcessingInstruction>,
            <IF::DOMXML:DocumentType>, <IF::DOMXML:Entity> and
            <IF::DOMXML:Notation> nodes.
          \
          - if the <A::DOMCore:Document.xmlVersion> has a non-<DOM::null>
            value and it is different from <XML::1.0>, then
-           the serializer <RFC2119:MUST> output an XML declaration.
+           the serializer <RFC2119::MUST> output an XML declaration.
          \
          - if the serializer does not support the XML version
            as specified by the <A::DOMCore:Document.xmlVersion>,
-           then the serializer <RFC2119:MAY> report an exception
+           then the serializer <RFC2119::MAY> report an exception
            or error.
          \
-         - the serializer <RFC2119:SHOULD> try to ensure
-           the result is namespace well-formed.  It <RFC2119:MAY>
+         - the serializer <RFC2119::SHOULD> try to ensure
+           the result is namespace well-formed.  It <RFC2119::MAY>
            omit strict error checking.  For example, the serializer
            don't have to test whether an element type name
            is a legal XML <CODE::Name>.
@@ -2201,12 +2201,12 @@ IFDef:
   @Description:
     @@lang:en
     @@@:
-      Serializing (writing) a DOM document or <IF:Node> out into XML. 
+      Serializing (writing) a DOM document or <IF::Node> out into XML. 
       \
-      <IF:LSSerializer> accepts any type of node for serialization. 
-      If the node is a <IF:Document> or <IF:Entity>, a well-formed 
-      XML document or external (respectively) entity will be created 
-      when possible.  For all other types, the serialized form 
+      <IF::LSSerializer> accepts any type of node for serialization. 
+      If the node is a <IF::DOMCore:Document> or <IF::DOMXML:Entity>,
+      a well-formed XML document or external (respectively) entity will
+      be created when possible.  For all other types, the serialized form 
       is implementation dependent.
 
   @DISLang:role: SerializerRole
@@ -2229,33 +2229,34 @@ IFDef:
   @ImplNote:
     @@lang:en
     @@@:
-      {P:: Within a <IF:Document>, <IF:DocumentFragment> or <IF:Entity>:
+      {P:: Within a <IF::DOMCore:Document>, <IF::DOMCore:DocumentFragment> or 
+      <IF::DOMXML:Entity>:
       \
-      - <IF:Document>:: The entire document is written, including the
-        XML declaration (unless <CP:xml-declaration> is set to <DOM:false>) 
+      - <IF::DOMCore:Document>:: The entire document is written, including the
+        XML declaration (unless <CP::xml-declaration> is set to <DOM::false>) 
         and the document type declaration internal subset, if exists. 
       \
-      - <IF:Entity>:: When written directly by <M:LSSerializer.write>, 
+      - <IF::DOMXML:Entity>:: When written directly by <M::LSSerializer.write>, 
         the entity expansion is outputed without namespace fixup.
       \
-      - <IF:EntityReference>:: If <CP:entities> is set to <DOM:true> or 
-        the node is not expanded, the node is serialized as an entity 
+      - <IF::DOMXML:EntityReference>:: If <CP::entities> is set to <DOM::true>
+        or the node is not expanded, the node is serialized as an entity 
         reference.  Child nodes (the expansion) are ignored.  Otherwise, 
         child nodes are serialized.
       \
-      - <IF:CDATASection>:: If the node contains characters 
+      - <IF::DOMXML:CDATASection>:: If the node contains characters 
         that cannot be represented in the specified output encoding 
-        or contains <SGML:MDE> and <CP:split-cdata-sections> 
-        is set to <DOM:true>, <IF:CDATASection> is split and 
+        or contains <CODE::MDE> and <CP::split-cdata-sections> 
+        is set to <DOM::true>, <IF::DOMXML:CDATASection> is split and 
         the unrepresentable characters are serialized as numeric 
-        character references in ordinary <XML:content>.  The exact 
+        character references in ordinary <CODE::content>.  The exact 
         position and number of splits is not specified.  If 
-        <DOM:false> and <CP:well-formed> is set to <DOM:true>, 
-        unrepresented characters are reported as <ERR:wf-invalid-character> 
+        <DOM::false> and <CP::well-formed> is set to <DOM::true>, 
+        unrepresented characters are reported as <ERR::wf-invalid-character> 
         (This error is unrecoverable).
-        (What is happen if <CP:well-formed> is set to <DOM:false>?)
+        (What is happen if <CP::well-formed> is set to <DOM::false>?)
       \
-      - <IF:DocumentFragment>:: Child nodes are serialized.
+      - <IF::DOMCore:DocumentFragment>:: Child nodes are serialized.
       \
       - Other types:: The node is serialized to their corresponding XML 
         form.
@@ -2264,17 +2265,17 @@ IFDef:
       \
       Within character data, any character that cannot be represented 
       directly are replaced with a reference.  Characters 
-      <CHAR:LESS-THAN SIGN> and <CHAR:AMPASAND> are replaced by 
-      the predefined entities <XML:&lt;> and <XML:&amp;> reprectively. 
+      <CHAR::LESS-THAN SIGN> and <CHAR::AMPASAND> are replaced by 
+      the predefined entities <XML::&lt;> and <XML::&amp;> reprectively. 
       The other predefind entities might not be used except where 
-      needed (e.g. <SGML:MSE>).  Any character that cannot be represented 
+      needed (e.g. <CODE::MSE>).  Any character that cannot be represented 
       directly in the output character encoding are serialized as 
       a numeric character reference (hexadecimal representation is 
       encouraged).
       \
-      Within an attribute value, characters <CHAR:APOSTROPHE> and 
-      <CHAR:QUOTATION MARK> may be represented by predefined entities 
-      <XML:&apos;> and <XML:&quot> respectively.  New line characters 
+      Within an attribute value, characters <CHAR::APOSTROPHE> and 
+      <CHAR::QUOTATION MARK> may be represented by predefined entities 
+      <XML::&apos;> and <XML::&quot> respectively.  New line characters 
       and other characters that cannot be represented directly in 
       the output character encoding are serialized as a numeric 
       character reference.
@@ -2282,30 +2283,30 @@ IFDef:
       Within a markup but outside of attributes, any occurence of 
       a character that cannot be represented in the output character 
       encoding is reported as a fatal error (e.g. 
-      <ERR:wf-invalid-character-in-node-name>).
+      <ERR::wf-invalid-character-in-node-name>).
       \
-      When <CP:normalize-characters> on <IF:LSSerializer> is set to 
-      <DOM:true>, character normalization is performed accopding 
+      When <CP::normalize-characters> on <IF::LSSerializer> is set to 
+      <DOM::true>, character normalization is performed accopding 
       the XML 1.1 on all data to be serialized, both markups and 
       character data.
       \
       {P:: DOM implementations are required to support::
       \
-      - <CODE:UTF-8>:: Whether <CHAR:BOM> is generated or not is 
+      - <CODE::UTF-8>:: Whether <CHAR::BOM> is generated or not is 
                        implementation dependent.
       \
-      - <CODE:UTF-16>:: Whether the output is big endian or little endian 
-                        is implementation dependent.  <CHAR:BOM> is required.
+      - <CODE::UTF-16>:: Whether the output is big endian or little endian 
+                        is implementation dependent.  <CHAR::BOM> is required.
       \
-      - <CODE:UTF-16BE>:: <CHAR:BOM> is not generated.
+      - <CODE::UTF-16BE>:: <CHAR::BOM> is not generated.
       \
-      - <CODE:UTF-16LE>:: <CHAR:BOM> is not generated.
+      - <CODE::UTF-16LE>:: <CHAR::BOM> is not generated.
       }
       \
-      If <CHAR:BOM> is not generated, <ERR:byte-order-mark-needed> warning 
+      If <CHAR::BOM> is not generated, <ERR::byte-order-mark-needed> warning 
       is reported.
       \
-      If the <XML:encoding> declaration is generated, it will be the 
+      If the <XA::encoding> declaration is generated, it will be the 
       encoding name used during the serialization.
   
       
@@ -2354,7 +2355,7 @@ IFDef:
        @@@lang:en
        @@@@:
          A filter that will be called out before serializing 
-         each <IF:Node>.  The filter can choose to remove 
+         each <IF::Node>.  The filter can choose to remove 
          the node from the stream or to terminate the serialization early.
       \
          Note that the filter is invoked after the operations 
@@ -2374,23 +2375,23 @@ IFDef:
        @@@@:
          {P:: The encoding is:
          \
-           = <A:LSOutput.encoding>
+           = <A::LSOutput.encoding>
          \
-           = <A:Document.inputEncoding>
+           = <A::DOMCore:Document.inputEncoding>
          \
-           = <A:Document.xmlEncoding>
+           = <A::DOMCore:Document.xmlEncoding>
          \
-           = <CODE:UTF-8>
+           = <CODE::UTF-8>
          }
          If the specified encoding is not supported, the fatal error 
-         <ERR:unsupported-encoding> is raised.
+         <ERR::unsupported-encoding> is raised.
      @@ImplNote:
        @@@lang:en
        @@@@:
          The DOM implementation is responsible of associating the 
          appropriate media type with the serialized data.
        \
-         When writing to an HTTP URI, the <CODE:PUT> method is performed. 
+         When writing to an HTTP URI, the <CODE::PUT> method is performed. 
          For other URI schemes, the mechanism for writing the data is 
          implementation dependent.
      @@Param:
@@ -2415,7 +2416,7 @@ IFDef:
            @@@@Description:
              @@@@@lang:en
              @@@@@@:
-               The <P:nodeArg> was successfully serialized.
+               The <P::nodeArg> was successfully serialized.
         @@@InCase:
            @@@@Value:  false
            @@@@Description:
@@ -2452,7 +2453,7 @@ IFDef:
 #          @@@@Description:
 #            @@@@@lang:en
 #            @@@@@@:
-#              No output is specified in the <P:destination>.
+#              No output is specified in the <P::destination>.
   @Method:
      @@Name:  writeToURI
      @@Description:
@@ -2463,9 +2464,9 @@ IFDef:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         This is a convinience method; it acts as if <M:LSSerializer.write> 
-         was called with a <IF:LSOutput> with no encoding specified 
-         and <A:LSOutput.systemId> set to <P:uri>.
+         This is a convinience method; it acts as if <M::LSSerializer.write> 
+         was called with a <IF::LSOutput> with no encoding specified 
+         and <A::LSOutput.systemId> set to <P::uri>.
      @@Param:
         @@@Name:  nodeArg
         @@@Type:  Node
@@ -2489,7 +2490,7 @@ IFDef:
            @@@@Description:
              @@@@@lang:en
              @@@@@@:
-               The <P:nodeArg> was successfully serialized.
+               The <P::nodeArg> was successfully serialized.
         @@@InCase:
            @@@@Value:  false
            @@@@Description:
@@ -2511,12 +2512,12 @@ IFDef:
         @@@lang:en
         @@@@:
           Serialize the specified node and write it to a 
-          <TYPE:DOMString>.
+          <TYPE::DOMMain:DOMString>.
      @@ImplNote:
        @@@lang:en
        @@@@:
-         The encoding used is the encoding of the <TYPE:DOMString>, 
-         i.e. <CODE:UTF-16>.  No <CHAR:BOM> is generated.
+         The encoding used is the encoding of the <TYPE::DOMMain:DOMString>, 
+         i.e. <CODE::UTF-16>.  No <CHAR::BOM> is generated.
      @@Param:
         @@@Name:  nodeArg
         @@@Type:  Node
@@ -2536,7 +2537,8 @@ IFDef:
            @@@@Description:
              @@@@@lang:en
              @@@@@@:
-               The resulting string is too long to fit in a <TYPE:DOMString>.
+               The resulting string is too long to fit in a
+               <TYPE::DOMMain:DOMString>.
         @@@Exception:
            @@@@Name:  SERIALIZE_ERR
            @@@@Type:  LSException
@@ -2573,31 +2575,31 @@ IF:
       are needed.  The DOM application can either provide 
       its own objects that implements this interface, 
       or it can use the generic factory method 
-      <M:DOMImplementationLS.createLSOutput> to create 
+      <M::DOMImplementationLS.createLSOutput> to create 
       objects that implement this interface.
       \
-      <IF:LSOutput> objects belong to the DOM application and 
+      <IF::LSOutput> objects belong to the DOM application and 
       the DOM implementation will never modify them.
   @ImplNote:
     @@lang:en
     @@@:
-      {P:: The <IF:LSSerializer> will use the <IF:LSOutput> object 
+      {P:: The <IF::LSSerializer> will use the <IF::LSOutput> object 
       in the following order:
       \
-      = <A:LSOutput.characterStream>
+      = <A::LSOutput.characterStream>
       \
-      = <A:LSOutput.byteStream>
+      = <A::LSOutput.byteStream>
       \
-      = <A:LSOutput.systemId>
+      = <A::LSOutput.systemId>
       \
-      The first one that is not <DOM:null> and not an empty string 
+      The first one that is not <DOM::null> and not an empty string 
       will be used.
       \
       }
   @ImplNote:
     @@lang:en
     @@@:
-      The DOM implementation may make copies of the <IF:LSOutput> 
+      The DOM implementation may make copies of the <IF::LSOutput> 
       objects and modify them, if necessary.
   @Attr:
      @@Name:  characterStream
@@ -2677,7 +2679,7 @@ IF:
        @@@@:
          The character encoding to use for the output. 
          The encoding name must be a string acceptable for 
-         an XML 1.0 <XML:encoding> declaration and it is 
+         an XML 1.0 <XA::encoding> declaration and it is 
          recommended that character encodings registered 
          in IANAREG be referred to using their registered names.
      @@Type:
@@ -2695,13 +2697,13 @@ IF:
     @@Description:
       @@@lang:en
       @@@@:
-        Construct a new instance of the <IF:OutInput>.
+        Construct a new instance of the <IF::OutInput>.
     @@Return:
       @@@Type: ManakaiDOMLSOutput
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The newly created <IF:LSOutput> object.
+          The newly created <IF::LSOutput> object.
       @@@PerlDef:
         $r = bless {}, $self;
 ##IF:LSOutput
@@ -2772,9 +2774,9 @@ ImplNote:
   @ImplNote:
     @@lang:en
     @@@:
-      The error <ERR:check-character-normalization-failure> is 
-      also defined for <M:Document.normalizeDocument>; see 
-      the <Module:DOMCore> module.
+      The error <ERR::check-character-normalization-failure> is 
+      also defined for <M::DOMCore:Document.normalizeDocument>; see 
+      the <Module::MDOM:DOMCore> module.
   
   @Error:
     @@Name:doctype-not-allowed
@@ -2782,24 +2784,24 @@ ImplNote:
     @@Description:
       @@@lang:en
       @@@@:
-        The parameter <CP:disallow-doctype> is set to <DOM:true> 
-        and a <IF:DocumentType> is encountered.
+        The parameter <CP::disallow-doctype> is set to <DOM::true> 
+        and a <IF::DOMXML:DocumentType> is encountered.
 
   @Error:
     @@Name: no-input-specified
     @@Description:
       @@@lang:en
       @@@@:
-        No input is specified in the <IF:LSInput> object, 
-        i.e. all inputs are <DOM:null>.
+        No input is specified in the <IF::LSInput> object, 
+        i.e. all inputs are <DOM::null>.
     @@ImplNote:
       @@@lang:en
       @@@@:
         {P:: This error might be reported by:
         \
-        - <M:LSParser.parse>
+        - <M::LSParser.parse>
         \
-        - <M:ManakaiXMLParser2003.parser>
+        - <M::ManakaiXMLParser2003.parser>
         \
         }
     @@Severity:Fatal
@@ -2819,7 +2821,7 @@ ImplNote:
     @@Description:
       @@@lang:en
       @@@@:
-        The parameter <CP:namespaces> is set to <DOM:true> and 
+        The parameter <CP::namespaces> is set to <DOM::true> and 
         an unbound namespace prefix is encountered in the replacement 
         text of an entity.
     @@ImplNote:
@@ -2835,8 +2837,8 @@ ImplNote:
     @@Description:
       @@@lang:en
       @@@@:
-        The parameter <CP:ignore-unknown-character-denormalizations> 
-        is set to <DOM:false> and a character is encountered for 
+        The parameter <CP::ignore-unknown-character-denormalizations> 
+        is set to <DOM::false> and a character is encountered for 
         which the processor cannot determine the normalization 
         properties.
 
@@ -2858,8 +2860,8 @@ ImplNote:
     @@Description:
       @@@lang:en
       @@@@:
-        The parameter <CP:supported-media-types-only> is set to 
-        <DOM:true> and an unsupported media type is encountered.
+        The parameter <CP::supported-media-types-only> is set to 
+        <DOM::true> and an unsupported media type is encountered.
 
 ##Error:LSParser
 
@@ -2886,7 +2888,7 @@ ImplNote:
     @@Description:
       @@@lang:en
       @@@@:
-        The <CHAR:BOM> is not generated; it might be prepended 
+        The <CHAR::BOM> is not generated; it might be prepended 
         by the DOM application before the serialized data is 
         written out to some media.
 
@@ -2896,7 +2898,7 @@ ImplNote:
     @@Description:
       @@@lang:en
       @@@@:
-        No output is specified in the <IF:LSOutput> object.
+        No output is specified in the <IF::LSOutput> object.
   
   @Error:
     @@Name:unbound-prefix-in-entity-reference
@@ -2904,7 +2906,7 @@ ImplNote:
     @@Description:
       @@@lang:en
       @@@@:
-        The parameter <CP:namespaces> is set to <DOM:true> 
+        The parameter <CP::namespaces> is set to <DOM::true> 
         and an entity whose replacement text contains 
         unbound namespace prefixes is referred in a location 
         where there are no bindings for the namespace prefixes.
@@ -2912,11 +2914,11 @@ ImplNote:
   @ImplNote:
     @@lang:en
     @@@:
-      The error <ERR:unsupported-encoding> is defined also for 
+      The error <ERR::unsupported-encoding> is defined also for 
       parsing error.
     \
-      See <Module:DOMCore> for the definition of the error 
-      <ERR:wf-invalid-character-in-node-name>.
+      See <Module::MDOM:DOMCore> for the definition of the error 
+      <ERR::wf-invalid-character-in-node-name>.
 
   @Error:
     @@Name:xml-declaration-needed
@@ -2933,8 +2935,8 @@ ImplNote:
   @Description:
     @@lang:en
     @@@:
-      Additional configuration parameters for <IF:DOMConfiguration> 
-      objects used with <IF:LSSerializer> objects.
+      Additional configuration parameters for <IF::DOMCore:DOMConfiguration> 
+      objects used with <IF::LSSerializer> objects.
 
   @ImplNote:
     @@lang:en
@@ -2945,7 +2947,7 @@ ImplNote:
   @ImplNote:
     @@lang:en
     @@@:
-      <CP:canonical-form>: See <Module:DOMCore>.
+      <CP::canonical-form>: See <Module::MDOM:DOMCore>.
 
   @Param:
     @@Name:discard-default-content
@@ -2957,7 +2959,7 @@ ImplNote:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          Use the <A:Attr.specified> attribute to decide 
+          Use the <A::DOMCore:Attr.specified> attribute to decide 
           what XML attributes should be discarded.
       @@@ImplNote:
         @@@@lang:en
@@ -3017,7 +3019,7 @@ ImplNote:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          Report a <ERR:unknown-character-denormalization> <EM:warning> 
+          Report a <ERR::unknown-character-denormalization> <EM::warning> 
           (not an error) when fully-normalizedness per XML 1.1 is 
           being verified and a cgaracter is encountered for which 
           the normalization properties cannot be determined and 
@@ -3027,13 +3029,13 @@ ImplNote:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          Report a <ERR:unknown-character-denormalization> fatal error 
+          Report a <ERR::unknown-character-denormalization> fatal error 
           if the normalization properties cannot be determined.
 
   @ImplNote:
     @@lang:en
     @@@:
-      <CP:normalize-characters>: See <Module:DOMCore>.
+      <CP::normalize-characters>: See <Module::MDOM:DOMCore>.
 
   @Param:
     @@Name:xml-declaration
@@ -3044,17 +3046,18 @@ ImplNote:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          When <IF:Document>, <IF:Entity> or <IF:DocumentFragment> is 
+          When <IF::DOMCore:Document>, <IF::DOMXML:Entity> or 
+          <IF::DOMCore:DocumentFragment> is 
           serialized, the XML declaration or the text declaration 
           should be included.
       @@@ImplNote:
         @@@@lang:en
         @@@@@:
-          - <XML:version>:: <A:Document.xmlVersion> or <XML:1.0>.
+          - <XA::version>:: <A::DOMCore:Document.xmlVersion> or <XML::1.0>.
           \
-          - <XML:encoding>:: the output encoding.
+          - <XA::encoding>:: the output encoding.
           \
-          - <XML:standalone>:: <A:Document.xmlStandalone>.
+          - <XA::standalone>:: <A::DOMCore:Document.xmlStandalone>.
       @@@SetParam:
         @@@@Name:canonical-form
         @@@@Type:boolean
@@ -3069,8 +3072,8 @@ ImplNote:
       @@@ImplNote:
         @@@@lang:en
         @@@@@:
-          If <XML:version> would be other than <XML:1.0> or 
-          <XML:encoding> would be required, the <ERR:xml-declaration-needed> 
+          If <XA::version> would be other than <XML::1.0> or 
+          <XA::encoding> would be required, the <ERR::xml-declaration-needed> 
           warning is reported. 
 
   @Level:3

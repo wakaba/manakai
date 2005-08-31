@@ -36,8 +36,8 @@ Module:
   @ImplNote:
     @@lang:en
     @@@:
-      The DOM Core Module (<Feature:Core> feature) and the feature 
-      <Feature:XMLVersion> with version <FeatureVer:1.0> must be supported.
+      The DOM Core Module (<Feature::Core> feature) and the feature 
+      <Feature::XMLVersion> with version <FeatureVer::1.0> must be supported.
   
   @Author:
     @@FullName:Wakaba
@@ -46,7 +46,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/08/18 12:50:49 $
+      $Date: 2005/08/31 13:02:46 $
     @@ContentType:
       dis:Date.RCS
 
@@ -512,11 +512,12 @@ IF:
     @@lang:en
     @@@:
       The CDATA section, i.e. the marked section with its effective status 
-      of <XML:CDATA>.
+      of <XML::CDATA>.
   @ImplNote:
     @@lang:en
     @@@: 
-      <IF:CDATASection> is a <IF:Text> is a <IF:CharacterData> is a <IF:Node>.
+      <IF::CDATASection> is a <IF::Text> is a <IF::CharacterData> is a
+      <IF::Node>.
   
   @ReAttr:
     @@Name: nodeName
@@ -538,7 +539,7 @@ IF:
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
-            Always this value for the <IF:CDATASection> node.
+            Always this value for the <IF::CDATASection> node.
       @@@Def:
         @@@@ContentType:
           lang:dis
@@ -559,7 +560,7 @@ IF:
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
-            The node is a <IF:CDATASection>.
+            The node is a <IF::CDATASection>.
       @@@Def:
         @@@@ContentType:
           lang:dis
@@ -571,13 +572,13 @@ IF:
     @@Description:
       @@@lang:en
       @@@@:
-        Construct an object for a new instance of the <IF:CDATASection> node.
+        Construct an object for a new instance of the <IF::CDATASection> node.
     @@Return:
       @@@Type: DOMCore|NodeStem
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The new object for the <IF:CDATASection> node.
+          The new object for the <IF::CDATASection> node.
       @@@PerlDef:
         $r = <ClassM::DOMCore:ManakaiDOMNode.newObject>;
         push @{$r->{<Q::TreeCore:origin>}}, <Q::infoset:parent>;
@@ -586,11 +587,11 @@ IF:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         Other properties required to be a legal <IF:CDATASection> object:
-         <Q:DOMCore:ownerDocument>.
+         Other properties required to be a legal <IF::CDATASection> object:
+         <Q:DOMCore::ownerDocument>.
          \
-         Other available properties: <Q:infoset:parent>, 
-         <Q:infoset:content>.
+         Other available properties: <Q::infoset:parent>, 
+         <Q::infoset:content>.
 
   @Method:
      @@Name:  getFeature
@@ -688,17 +689,17 @@ IF:
   @Description:
     @@lang:en
     @@@:
-      A <IF:Node> corresponding to a document type declaration in the XML 
+      A <IF::Node> corresponding to a document type declaration in the XML 
       document entity or the document type declaration information 
       item of the XML Infoset.
     \
-      DOM Levels 1 to 3 do not support editing <IF:DocumentType> nodes so 
-      that all <IF:DocumentType> nodes are read-only.
+      DOM Levels 1 to 3 do not support editing <IF::DocumentType> nodes so 
+      that all <IF::DocumentType> nodes are read-only.
     \
-      A <IF:DocumentType> node can be a child of the <IF:Document> node. 
-      DOM Levels 2 or higher allows a <IF:DocumentType> node without 
-      any parent.  <IF:DocumentType> nodes are not able to have 
-      their child nodes (<IF:Entity>s and <IF:Notation>s are defined not 
+      A <IF::DocumentType> node can be a child of the <IF::Document> node. 
+      DOM Levels 2 or higher allows a <IF::DocumentType> node without 
+      any parent.  <IF::DocumentType> nodes are not able to have 
+      their child nodes (<IF::Entity>s and <IF::Notation>s are defined not 
       to have any parent node).
   @Attr:
      @@Name:  name
@@ -740,7 +741,7 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            A <IF:NamedNodeMap> containing <IF:Entity>s.
+            A <IF::NamedNodeMap> containing <IF::Entity>s.
       @@@PerlDef:
         __CODE{DOMCore|getNodeRef::
           $object => {$self->{<Q::TreeCore:node>}},
@@ -763,7 +764,7 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            A <IF:NamedNodeMap> containing <IF:Notation>s.
+            A <IF::NamedNodeMap> containing <IF::Notation>s.
       @@@PerlDef:
         __CODE{DOMCore|getNodeRef::
           $object => {$self->{<Q::TreeCore:node>}},
@@ -871,8 +872,8 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              No namespace prefix is found.  Always <DOM:null> 
-              is returned for <IF:DocumentType> nodes.
+              No namespace prefix is found.  Always <DOM::null> 
+              is returned for <IF::DocumentType> nodes.
         @@@PerlDef:
           @@@@@: $r = null;
      @@Level[list]:  3
@@ -909,7 +910,7 @@ IF:
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
-            This node is a <IF:DocumentType>.
+            This node is a <IF::DocumentType>.
       @@@Def:
         @@@@ContentType:
           lang:dis
@@ -935,7 +936,7 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The text content is defined to be <DOM:null>.
+              The text content is defined to be <DOM::null>.
         @@@PerlDef:
           @@@@@: $r = null;
      @@Set:
@@ -963,13 +964,13 @@ IF:
     @@Description:
       @@@lang:en
       @@@@:
-        Construct an object for a new instance of the <IF:DocumentType> node.
+        Construct an object for a new instance of the <IF::DocumentType> node.
     @@Return:
       @@@Type: DOMCore|NodeStem
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The new object for the <IF:DocumentType> node.
+          The new object for the <IF::DocumentType> node.
       @@@PerlDef:
         $r = <ClassM::DOMCore:ManakaiDOMNode.newObject>;
         push @{$r->{<Q::TreeCore:origin>}}, <Q::infoset:parent>;
@@ -977,14 +978,14 @@ IF:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         Properties required for a <IF:Node> to be a legal 
-         <IF:DocumentType>: either <Q:infoset:localName> or 
-         <Q:DOMCore:name>, <Q:DOMCore:implementation>, 
-         <Q:ManakaiDOM:implID>.
+         Properties required for a <IF::Node> to be a legal 
+         <IF::DocumentType>: either <Q::infoset:localName> or 
+         <Q::DOMCore:name>, <Q::DOMCore:implementation>, 
+         <Q::ManakaiDOM:implID>.
          \
-         Other available properties: <Q:infoset:parent>, 
-         <Q:infoset:publicIdentifier>, <Q:infoset:systemIdentifier>, 
-         <Q:infoset:prefix>, <Q:DOMCore:read-only>, <Q:DOMCore:ownerDocument>.
+         Other available properties: <Q::infoset:parent>, 
+         <Q::infoset:publicIdentifier>, <Q::infoset:systemIdentifier>, 
+         <Q::infoset:prefix>, <Q::DOMCore:read-only>, <Q::DOMCore:ownerDocument>.
 
   @Method:
      @@Name:  getFeature
@@ -1088,10 +1089,10 @@ IF:
       A notation declaration in the DTD or 
       the notation information item in the XML Infoset.
     \
-      DOM Levels 1 to 3 do not support editing <IF:Notation> nodes so that 
-      all <IF:Notation> nodes are read-only.
+      DOM Levels 1 to 3 do not support editing <IF::Notation> nodes so that 
+      all <IF::Notation> nodes are read-only.
     \
-      A <IF:Notation> node does not have any parent.
+      A <IF::Notation> node does not have any parent.
   @Attr:
      @@Name:  publicId
      @@Description:
@@ -1144,7 +1145,7 @@ IF:
       @@@@:
         The base URI of this node.
         \
-        For the <IF:Notation> node, it is the <InfosetP:declaration base URI> 
+        For the <IF::Notation> node, it is the <InfosetP::declaration base URI> 
         of the notation information item.
     @@Type:
       DOMMain:DOMString
@@ -1207,8 +1208,8 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              No namespace prefix is found.  Always <DOM:null> 
-              is returned for <IF:Notation> nodes.
+              No namespace prefix is found.  Always <DOM::null> 
+              is returned for <IF::Notation> nodes.
         @@@PerlDef:
           @@@@@: $r = null;
      @@Level[list]:  3
@@ -1248,7 +1249,7 @@ IF:
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
-            This node is a <IF:Notation>.
+            This node is a <IF::Notation>.
       @@@Def:
         @@@@ContentType:
           lang:dis
@@ -1274,7 +1275,7 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The text content is defined to be <DOM:null>.
+              The text content is defined to be <DOM::null>.
         @@@PerlDef:
           @@@@@: $r = null;
      @@Set:
@@ -1298,25 +1299,25 @@ IF:
     @@Description:
       @@@lang:en
       @@@@:
-        Construct an object for a new instance of the <IF:Notation> node.
+        Construct an object for a new instance of the <IF::Notation> node.
     @@Return:
       @@@Type: DOMCore|NodeStem
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The new object for the <IF:Notation> node.
+          The new object for the <IF::Notation> node.
       @@@PerlDef:
         $r = <ClassM::DOMCore:ManakaiDOMNode.newObject>;
         $r->{<Q::DOMCore:nodeType>} = <Q::infoset:Notation>;
      @@ImplNote:
        @@@lang:en
        @@@@:
-         Properties required for a <IF:Node> to be a legal 
-         <IF:Notation>: <Q:DOMCore:name>, <Q:DOMCore:ownerDocument>.
+         Properties required for a <IF::Node> to be a legal 
+         <IF::Notation>: <Q::DOMCore:name>, <Q::DOMCore:ownerDocument>.
          \
-         Other available properties: <Q:infoset:declarationBaseURI>, 
-         <Q:infoset:publicIdentifier>, <Q:infoset:systemIdentifier>, 
-         <Q:DOMCore:read-only>.
+         Other available properties: <Q::infoset:declarationBaseURI>, 
+         <Q::infoset:publicIdentifier>, <Q::infoset:systemIdentifier>, 
+         <Q::DOMCore:read-only>.
 
   @Method:
      @@Name:  getFeature
@@ -1421,17 +1422,17 @@ IF:
       or either internal or external.
     \
       When the replacement text of the entity is available, 
-      the child list of the <IF:Entity> node represents the structure 
+      the child list of the <IF::Entity> node represents the structure 
       of that replacement value (assuming that the replacement text would be 
-      parsed in context of <XML:content>).  Otherwise, the child list is empty.
+      parsed in context of <XML::content>).  Otherwise, the child list is empty.
       Note that if the entity contains an unbound namespace prefix, 
-      the <A:namespaceURI> of the corresponding node in the <IF:Entity> 
-      node subtree is <DOM:null>.
+      the <A::DOMCore:Node.namespaceURI> of the corresponding node in the 
+      <IF::Entity> node subtree is <DOM::null>.
     \
-      DOM Levels 1 to 3 do not support editing <IF:Entity> nodes, so that 
-      all <IF:Entity> nodes and their descendants are read-only.
+      DOM Levels 1 to 3 do not support editing <IF::Entity> nodes, so that 
+      all <IF::Entity> nodes and their descendants are read-only.
     \
-      An <IF:Entity> node does not have any parent.
+      An <IF::Entity> node does not have any parent.
   @Attr:
      @@Name:  publicId
      @@Description:
@@ -1607,9 +1608,9 @@ IF:
        @@@lang:en
        @@@@:
          Need consideration for the internal structure of the 
-         XML and text declarations.  See <A:Document.xmlEncoding> and 
-         <A:Document.xmlVersion> attributes defined in the 
-         <Module:DOMCore> module.
+         XML and text declarations.  See <A::DOMCore:Document.xmlEncoding> and 
+         <A::DOMCore:Document.xmlVersion> attributes defined in the 
+         <Module::MDOM:DOMCore> module.
   
   @ReAttr:
     @@Name: baseURI
@@ -1618,7 +1619,7 @@ IF:
       @@@@:
         The base URI of this node.
         \
-        For the <IF:Entity> node, it is the <InfosetP:declaration base URI> 
+        For the <IF::Entity> node, it is the <InfosetP::declaration base URI> 
         of the unparsed entity information item.
     @@Get:
       @@@Type:
@@ -1681,8 +1682,8 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              No namespace prefix is found.  Always <DOM:null> 
-              is returned for <IF:Entity> nodes.
+              No namespace prefix is found.  Always <DOM::null> 
+              is returned for <IF::Entity> nodes.
         @@@PerlDef:
           @@@@@: $r = null;
      @@Level[list]:  3
@@ -1721,7 +1722,7 @@ IF:
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
-            This node is an <IF:Entity>.
+            This node is an <IF::Entity>.
       @@@Def:
         @@@@ContentType:
           lang:dis
@@ -1733,13 +1734,13 @@ IF:
     @@Description:
       @@@lang:en
       @@@@:
-        Construct an object for a new instance of the <IF:Entity> node.
+        Construct an object for a new instance of the <IF::Entity> node.
     @@Return:
       @@@Type: DOMCore|NodeStem
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The new object for the <IF:Entity> node.
+          The new object for the <IF::Entity> node.
       @@@PerlDef:
         $r = <ClassM::DOMCore:ManakaiDOMNode.newObject>;
         push @{$r->{<Q::TreeCore:subnode>}}, <Q::infoset:children>;
@@ -1752,20 +1753,20 @@ IF:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         Properties required for a <IF:Node> to be a legal 
-         <IF:Entity>: <Q:DOMCore:name>, <Q:DOMCore:ownerDocument>.
+         Properties required for a <IF::Node> to be a legal 
+         <IF::Entity>: <Q::DOMCore:name>, <Q::DOMCore:ownerDocument>.
          \
-         Other available properties: <Q:infoset:declarationBaseURI>, 
-         <Q:DOMCore:read-only>,
-         <Q:ManakaiDOM:isExpanded>, <Q:ManakaiDOM:isExternallyDeclared>, 
-         <Q:ManakaiDOM:isExternalEntity>.
+         Other available properties: <Q::infoset:declarationBaseURI>, 
+         <Q::DOMCore:read-only>,
+         <Q::ManakaiDOM:isExpanded>, <Q::ManakaiDOM:isExternallyDeclared>, 
+         <Q::ManakaiDOM:isExternalEntity>.
          \
          Other available properties (for external entity): 
-         <Q:DOMCore:documentURI>, <Q:infoset:publicIdentifier>,
-         <Q:infoset:systemIdentifier>, <Q:infoset:notationName>,
-         <Q:infoset:version>, <Q:DOMCore:xmlEncoding>,
-         <Q:infoset:characterEncodingScheme>,
-         <Q:infoset:baseURI>.
+         <Q::DOMCore:documentURI>, <Q::infoset:publicIdentifier>,
+         <Q::infoset:systemIdentifier>, <Q::infoset:notationName>,
+         <Q::infoset:version>, <Q::DOMCore:xmlEncoding>,
+         <Q::infoset:characterEncodingScheme>,
+         <Q::infoset:baseURI>.
 
   @Method:
      @@Name:  getFeature
@@ -1866,19 +1867,19 @@ IF:
     @@@:
       An entity reference.
     \
-      When an <IF:EntityReference> node represents a reference to an <IF:Entity> 
-      node, the subtree of the <IF:EntityReference> node is a copy of 
-      the <IF:Entity> node subtree, except that when an entity contains 
-      an unbound namespace prefix, the descendants of the 
-      <IF:EntityReference> node may be bound to different namespace URIs.
+      When an <IF::EntityReference> node represents a reference to an 
+      <IF::Entity> node, the subtree of the <IF::EntityReference> node
+      is a copy of the <IF::Entity> node subtree, except that when an entity
+      contains an unbound namespace prefix, the descendants of the 
+      <IF::EntityReference> node may be bound to different namespace URIs.
     \
-      When an <IF:EntityReference> node represents a reference to an 
+      When an <IF::EntityReference> node represents a reference to an 
       known entity, the node has no child node.
     \
-      In DOM Levels 1 to 3, an <IF:EntityReference> node and all 
+      In DOM Levels 1 to 3, an <IF::EntityReference> node and all 
       descendants are read-only.
     \
-      Note that <IF:EntitiReference> nodes may cause normalization 
+      Note that <IF::EntitiReference> nodes may cause normalization 
       problems when the normalization is performed after 
       entity references are expanded.
   @ImplNote:
@@ -1894,9 +1895,9 @@ IF:
     @@lang:en
     @@@:
       The DOM Level 1 Specifications allow the lazy 
-      evaluation of the children of the <IF:EntityReference>.
-      For example, calling the <A:Node.childNodes> method might trigger the 
-      evaluation.
+      evaluation of the children of the <IF::EntityReference>.
+      For example, calling the <A::DOMCore:Node.childNodes>
+      method might trigger the evaluation.
   
   @ReAttr:
     @@Name: baseURI
@@ -1905,8 +1906,8 @@ IF:
       @@@@:
         The base URI of this node.
         \
-        For the <IF:EntityReference> node, it is the 
-        <InfosetP:declaration base URI> of the unexpanded entity 
+        For the <IF::EntityReference> node, it is the 
+        <InfosetP::declaration base URI> of the unexpanded entity 
         reference information item.
     @@Get:
       @@@Type:
@@ -1965,7 +1966,7 @@ IF:
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
-            This node is an <IF:EntityReference>.
+            This node is an <IF::EntityReference>.
       @@@Def:
         @@@@ContentType:
           lang:dis
@@ -1977,13 +1978,13 @@ IF:
     @@Description:
       @@@lang:en
       @@@@:
-        Construct an object for a new instance of the <IF:EntityReference> node.
+        Construct an object for a new instance of the <IF::EntityReference> node.
     @@Return:
       @@@Type: DOMCore|NodeStem
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The new object for the <IF:EntityReference> node.
+          The new object for the <IF::EntityReference> node.
       @@@PerlDef:
         $r = <ClassM::DOMCore:ManakaiDOMNode.newObject>;
         push @{$r->{<Q::TreeCore:subnode>}}, <Q::infoset:children>;
@@ -1993,17 +1994,17 @@ IF:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         Properties required for a <IF:Node> to be a legal 
-         <IF:EntityReference>: <Q:DOMCore:name>, <Q:DOMCore:ownerDocument>.
+         Properties required for a <IF::Node> to be a legal 
+         <IF::EntityReference>: <Q::DOMCore:name>, <Q::DOMCore:ownerDocument>.
          \
-         Other available properties: <Q:infoset:declarationBaseURI>, 
-         <Q:DOMCore:read-only>, <Q:infoset:parent>, <Q:infoset:children>, 
-         <Q:ManakaiDOM:isExpanded>, <Q:ManakaiDOM:isExternallyDeclared>, 
-         <Q:ManakaiDOM:isExternalEntity>.
+         Other available properties: <Q::infoset:declarationBaseURI>, 
+         <Q::DOMCore:read-only>, <Q::infoset:parent>, <Q::infoset:children>, 
+         <Q::ManakaiDOM:isExpanded>, <Q::ManakaiDOM:isExternallyDeclared>, 
+         <Q::ManakaiDOM:isExternalEntity>.
          \
          Other available properties (for external entity): 
-         <Q:infoset:baseURI>, <Q:DOMCore:documentURI>, 
-         <Q:infoset:publicIdentifier>, <Q:infoset:systemIdentifier>.
+         <Q::infoset:baseURI>, <Q::DOMCore:documentURI>, 
+         <Q::infoset:publicIdentifier>, <Q::infoset:systemIdentifier>.
 # IF:EntityReference
 
 IF:
@@ -2084,12 +2085,12 @@ IF:
         @@@ImplNote:
           @@@@lang:en
           @@@@@:
-            Can <DOM:null> be returned (to represent <XML:<lt>?name?<gt>>)?
+            Can <DOM::null> be returned (to represent <XML::<lt>?name?<gt>>)?
      @@Set:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The content.  It may contain the <SGML:PIC> (<XML:?<gt>>) but such 
+            The content.  It may contain the <CODE::PIC> (<XML::?<gt>>) but such 
             data result the document in unserializable.
         @@@Exception:
           @@@@Type: 
@@ -2148,7 +2149,7 @@ IF:
       @@@Description:
         @@@@lang:en
         @@@@@: 
-          The target name, i.e. same as <A:ProcessingInstruction.target>.
+          The target name, i.e. same as <A::ProcessingInstruction.target>.
       @@@Def:
         @@@@ContentType:
           lang:dis
@@ -2168,7 +2169,7 @@ IF:
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
-            This node is a <IF:ProcessingInstruction>.
+            This node is a <IF::ProcessingInstruction>.
       @@@Def:
         @@@@ContentType:
           lang:dis
@@ -2191,7 +2192,7 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: 
-              The target data, i.e. same as <A:ProcessingInstruction.data>.
+              The target data, i.e. same as <A::ProcessingInstruction.data>.
         @@@Def:
           @@@@ContentType: 
             lang:dis
@@ -2225,9 +2226,9 @@ IF:
      @@@ImplNote:
         @@@@lang:en
         @@@@@:
-          <A:ProcessingInstruction.data> == 
-          <A:ProcessingInstruction.nodeValue> == 
-          <A:ProcessingInstruction.textContent>.
+          <A::ProcessingInstruction.data> == 
+          <A::ProcessingInstruction.nodeValue> == 
+          <A::ProcessingInstruction.textContent>.
      @@Type:  
        DOMMain:DOMString
      @@actualType:
@@ -2236,7 +2237,7 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The text content of this node, i.e. the <A:Node.nodeValue>.
+            The text content of this node, i.e. the <A::DOMCore:Node.nodeValue>.
         @@@Exception:
           @@@@Type: 
             DOMCore:DOMException
@@ -2245,7 +2246,7 @@ IF:
             @@@@@lang:en
             @@@@@@:
               The attribute would return more characters than 
-              fit in a <TYPE:DOMString> variable on the implementation 
+              fit in a <TYPE::DOMMain:DOMString> variable on the implementation 
               platform.
         @@@Def:
           @@@@ContentType: 
@@ -2278,13 +2279,13 @@ IF:
       @@@lang:en
       @@@@:
         Construct an object for a new instance of the 
-        <IF:ProcessingInstruction> node.
+        <IF::ProcessingInstruction> node.
     @@Return:
       @@@Type: DOMCore|NodeStem
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The new object for the <IF:ProcessingInstruction> node.
+          The new object for the <IF::ProcessingInstruction> node.
       @@@PerlDef:
         $r = <ClassM::DOMCore:ManakaiDOMNode.newObject>;
         push @{$r->{<Q::TreeCore:origin>}}, <Q::infoset:parent>;
@@ -2293,12 +2294,12 @@ IF:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         Properties required for a <IF:Node> to be a legal 
-         <IF:ProcessingInstruction>: <Q:infoset:target>, 
-         <Q:DOMCore:ownerDocument>.
+         Properties required for a <IF::DOMCore:Node> to be a legal 
+         <IF::ProcessingInstruction>: <Q::infoset:target>, 
+         <Q::DOMCore:ownerDocument>.
          \
-         Other available properties: <Q:infoset:baseURI>, 
-         <Q:DOMCore:read-only>, <Q:infoset:parent>, <Q:infoset:content>.
+         Other available properties: <Q::infoset:baseURI>, 
+         <Q::DOMCore:read-only>, <Q::infoset:parent>, <Q::infoset:content>.
 
   @Method:
      @@Name:  getFeature

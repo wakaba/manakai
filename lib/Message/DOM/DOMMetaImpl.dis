@@ -20,7 +20,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/08/18 12:50:49 $
+      $Date: 2005/08/31 13:02:46 $
     @@ContentType:
       dis:Date.RCS
   
@@ -141,8 +141,8 @@ ResourceDef:
         and warnings associated to an object are once reported to this method 
         and then delivered to appropriate entities. 
         \
-        If the error is an exception (such as <X::DOMCore:DOMException> or 
-        <X::ManakaiDOM:ManakaiDOMImplementationException>), it is 
+        If the error is an exception (such as <IF::DOMCore:DOMException> or 
+        <IF::ManakaiDOM:ManakaiDOMImplementationException>), it is 
         simply thrown.  If the error is only a warning, it is reported 
         via the <IF::DOMCore:DOMError> interface. 
         \
@@ -226,7 +226,7 @@ StringDataTypeDef:
     @@@: 
       A DOM feature version number. 
       \
-      In most contexts, an empty string and the <DOM:null> value are 
+      In most contexts, an empty string and the <DOM::null> value are 
       also valid values.  Both values indicate that any version of 
       that feature is acceptable.
 
@@ -248,7 +248,7 @@ StringDataTypeDef:
   @FullName:
     @@lang:en
     @@@: 
-      A DOM <P:features>
+      A DOM <P::features>
   @Description:
     @@lang:en
     @@@:
@@ -260,8 +260,8 @@ StringDataTypeDef:
       whose actual datatype is <P::features> also accept a reference 
       to hash whose key is a feature name and value is corresponding 
       a feature version (or an empty string).  Don't forget to quote 
-      version number when its fraction part is <CODE:0> (e.g. 
-      quote <FeatureVer:2.0> like <Perl:'2.0'>).      
+      version number when its fraction part is <CODE::0> (e.g. 
+      quote <FeatureVer::2.0> like <Perl::'2.0'>).      
 
   @ManakaiDOM:inputNormalizer:
     @@ContentType:
@@ -848,7 +848,7 @@ ResourceDef:
         This method is taken from the normative Java binding.
       \
         Note that in this implementation, unlike the Java binding, 
-        <IF:DOMImplementationSource> classes available are not 
+        <IF::DOMImplementationSource> classes available are not 
         instantiated at this stage.
     @@Return:
       @@@Type: 
@@ -856,7 +856,7 @@ ResourceDef:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          A new instance of the <IF:ManakaiDOMImplementationRegistry>.
+          A new instance of the <IF::ManakaiDOMImplementationRegistry>.
       @@@PerlDef:
           $r = bless [@org::w3c::dom::DOMImplementationSourceList], $self;
 
@@ -1195,7 +1195,8 @@ ResourceDef:
      @@Description:
        @@@lang:en
        @@@@:  
-         The number of <IF::DOMImplementation> objects in this collection.
+         The number of <IF::DOMCore:DOMImplementation> objects in
+         this collection.
      @@Spec:
        @@@DOM3:
          http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DOMImplementationList-length
@@ -1226,7 +1227,8 @@ ResourceDef:
     @@Description:
       @@@lang: en
       @@@@:
-        Appends one or more <IF::DOMImplementation> object to this collection.
+        Appends one or more <IF::DOMCore:DOMImplementation> object
+        to this collection.
     @@Param:
       @@@Name: list
       @@@Type: 
@@ -1234,8 +1236,8 @@ ResourceDef:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          A list of <IF::DOMImplementation> and/or 
-          <IF::DOMImplementationList> objects to add.
+          A list of <IF::DOMCore:DOMImplementation> and/or 
+          <IF::DOMCore:DOMImplementationList> objects to add.
     @@Return:
       @@@Type:
         DOMMain:boolean::ManakaiDOM:all
@@ -1912,17 +1914,19 @@ ResourceDef:
           @@@@@:
             An object that implements the specialized APIs of the 
             <P::feature> and <P::version>.  It might or might not 
-            implements the <IF::DOMImplementation> interface. 
+            implements the <IF::DOMCore:DOMImplementation> interface. 
             In addition, the object might or might not part of 
             manakai. 
         @@@ImplNote:
           @@@@lang:en
           @@@@@:
-            If the object implements the <IF::DOMImplementation> interface, 
-            it must delegate to the primary core <IF::DOMImplementation> 
+            If the object implements the <IF::DOMCore:DOMImplementation>
+            interface, 
+            it must delegate to the primary core <IF::DOMCore:DOMImplementation> 
             and must not result incosistent with the primary core 
-            <IF::DOMImplementation> such as <M::DOMImplementation.hasFeature>, 
-            <M::DOMImplementation.getFeature>, etc.
+            <IF::DOMCore:DOMImplementation> such as
+            <M::DOMCore:DOMImplementation.hasFeature>, 
+            <M::DOMCore:DOMImplementation.getFeature>, etc.
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1

@@ -177,9 +177,13 @@ my $impl = $Message::DOM::DOMImplementationRegistry->get_dom_implementation
 
   status_msg qq<Module <$Opt{module_uri}> for <$Opt{For}>...>;
 
+  our %ReferredResource;
+
 sub append_module_documentation (%) {
   my %opt = @_;
   my $section = $opt{result_parent}->create_module ($opt{source_resource}->uri);
+  
+  add_uri ($opt{source_resource} => $section);
 
   my $pl_full_name = $opt{source_resource}->pl_fully_qualified_name;
   if (defined $pl_full_name) {
@@ -189,6 +193,8 @@ sub append_module_documentation (%) {
     $section->resource_file_path_stem ($path);
     $section->set_attribute_ns
       (ExpandedURI q<ddoct:>, 'ddoct:basePath', '../' x ($path =~ tr#/#/#));
+    $pl_full_name =~ s/.*:://g;
+    $section->perl_name ($pl_full_name);
   }
 
   $section->resource_file_name_stem ($opt{source_resource}->pl_file_name_stem);
@@ -196,11 +202,16 @@ sub append_module_documentation (%) {
   append_description (source_resource => $opt{source_resource},
                       result_parent => $section);
 
+  if ($opt{is_partial}) {
+    $section->resource_is_partial (1);
+    return;
+  }
+
   for my $rres (@{$opt{source_resource}->get_property_resource_list
                            (ExpandedURI q<DIS:resource>)}) {
     if ($rres->owner_module eq $opt{source_resource}) { ## Defined in this module
                           ## TODO: Modification required to support modplans
-      print STDERR "*";
+      status_msg_ "*";
       if ($rres->is_type_uri (ExpandedURI q<ManakaiDOM:Class>)) {
         append_class_documentation
           (result_parent => $section,
@@ -214,13 +225,15 @@ sub append_module_documentation (%) {
       # 
     }
   }
-  print STDERR "\n";
+  status_msg "";
 } # append_module_documentation
 
 sub append_interface_documentation (%) {
   my %opt = @_;
   my $section = $opt{result_parent}->create_interface
                                         ($opt{source_resource}->uri);
+  
+  add_uri ($opt{source_resource} => $section);
 
   my $pl_full_name = $opt{source_resource}->pl_fully_qualified_name;
   if (defined $pl_full_name) {
@@ -231,6 +244,8 @@ sub append_interface_documentation (%) {
     $section->set_attribute_ns
       (ExpandedURI q<ddoct:>, 'ddoct:basePath',
        join '', '../' x ($path =~ tr#/#/#));
+    $pl_full_name =~ s/.*:://g;
+    $section->perl_name ($pl_full_name);
   }
 
   $section->resource_file_name_stem ($opt{source_resource}->pl_file_name_stem);
@@ -241,6 +256,11 @@ sub append_interface_documentation (%) {
 
   append_description (source_resource => $opt{source_resource},
                       result_parent => $section);
+
+  if ($opt{is_partial}) {
+    $section->resource_is_partial (1);
+    return;
+  }
 
   ## Inheritance
   append_inheritance (source_resource => $opt{source_resource},
@@ -263,6 +283,8 @@ sub append_interface_documentation (%) {
 sub append_class_documentation (%) {
   my %opt = @_;
   my $section = $opt{result_parent}->create_class ($opt{source_resource}->uri);
+  
+  add_uri ($opt{source_resource} => $section);
 
   my $pl_full_name = $opt{source_resource}->pl_fully_qualified_name;
   if (defined $pl_full_name) {
@@ -272,12 +294,19 @@ sub append_class_documentation (%) {
     $section->resource_file_path_stem ($path);
     $section->set_attribute_ns
       (ExpandedURI q<ddoct:>, 'ddoct:basePath', '../' x ($path =~ tr#/#/#));
+    $pl_full_name =~ s/.*:://g;
+    $section->perl_name ($pl_full_name);
   }
 
   $section->resource_file_name_stem ($opt{source_resource}->pl_file_name_stem);
 
   append_description (source_resource => $opt{source_resource},
                       result_parent => $section);
+
+  if ($opt{is_partial}) {
+    $section->resource_is_partial (1);
+    return;
+  }
 
   ## Inheritance
   append_inheritance (source_resource => $opt{source_resource},
@@ -311,8 +340,8 @@ sub append_method_documentation (%) {
     ## TODO
     return;
   }
-
-  $m->add_uri ($opt{source_resource}->uri);
+  
+  add_uri ($opt{source_resource} => $m);
   
   append_description (source_resource => $opt{source_resource},
                       result_parent => $m);
@@ -323,9 +352,12 @@ sub append_method_documentation (%) {
     my $r = $m->dis_return;
 
     try {
-      $r->resource_data_type ($ret->dis_data_type_resource->uri);
-      $r->resource_actual_data_type ($ret->dis_actual_data_type_resource->uri);
-      
+      $r->resource_data_type (my $u = $ret->dis_data_type_resource->uri);
+      $ReferredResource{$u} ||= 1;
+      $r->resource_actual_data_type
+        ($u = $ret->dis_actual_data_type_resource->uri);
+      $ReferredResource{$u} ||= 1;
+
       append_description (source_resource => $ret,
                           result_parent => $r,
                           has_case => 1);
@@ -362,8 +394,8 @@ sub append_attr_documentation (%) {
     ## TODO
     return;
   }
-
-  $m->add_uri ($opt{source_resource}->uri);
+  
+  add_uri ($opt{source_resource} => $m);
   
   append_description (source_resource => $opt{source_resource},
                       result_parent => $m,
@@ -374,9 +406,12 @@ sub append_attr_documentation (%) {
   if ($ret) {
     my $r = $m->dis_get;
 
-    $r->resource_data_type ($ret->dis_data_type_resource->uri);
-    $r->resource_actual_data_type ($ret->dis_actual_data_type_resource->uri);
-    
+    $r->resource_data_type (my $u = $ret->dis_data_type_resource->uri);
+    $ReferredResource{$u} ||= 1;
+    $r->resource_actual_data_type
+      ($u = $ret->dis_actual_data_type_resource->uri);
+    $ReferredResource{$u} ||= 1;
+
     append_description (source_resource => $ret,
                         result_parent => $r,
                         has_case => 1);
@@ -389,8 +424,10 @@ sub append_attr_documentation (%) {
   if ($set) {
     my $r = $m->dis_set;
 
-    $r->resource_data_type ($set->dis_data_type_resource->uri);
+    $r->resource_data_type (my $u = $set->dis_data_type_resource->uri);
+    $ReferredResource{$u} ||= 1;
     $r->resource_actual_data_type ($set->dis_actual_data_type_resource->uri);
+    $ReferredResource{$u} ||= 1;
     
     append_description (source_resource => $set,
                         result_parent => $r,
@@ -418,10 +455,15 @@ sub append_param_documentation (%) {
   
   my $p = $opt{result_parent}->create_parameter ($perl_name, $is_named_param);
   
+  add_uri ($opt{source_resource} => $p);
+  
   $p->is_nullable_parameter ($opt{source_resource}->pl_is_nullable);
-  $p->resource_data_type ($opt{source_resource}->dis_data_type_resource->uri);
+  $p->resource_data_type
+    (my $u = $opt{source_resource}->dis_data_type_resource->uri);
+  $ReferredResource{$u} ||= 1;
   $p->resource_actual_data_type
-    ($opt{source_resource}->dis_actual_data_type_resource->uri);
+    ($u = $opt{source_resource}->dis_actual_data_type_resource->uri);
+  $ReferredResource{$u} ||= 1;
 
   append_description (source_resource => $opt{source_resource},
                       result_parent => $p,
@@ -430,6 +472,7 @@ sub append_param_documentation (%) {
 
 sub append_description (%) {
   my %opt = @_;
+
   my $od = $opt{result_parent}->owner_document;
   my $resd = $opt{source_resource}->get_feature (ExpandedURI q<DIS:Doc>, '2.0');
   my $doc = $resd->get_description ($od);
@@ -471,6 +514,7 @@ sub append_inheritance (%) {
       (source_resource => $isa,
        result_parent => $opt{result_parent}->append_new_extends ($isa->uri),
        depth => $opt{depth} + 1);
+    $ReferredResource{$isa->uri} ||= 1;
   }
 
   if ($opt{append_implements}) {
@@ -483,9 +527,19 @@ sub append_inheritance (%) {
          result_parent => $opt{result_parent}->append_new_implements
                                                   ($impl->uri),
          depth => $opt{depth});
+      $ReferredResource{$impl->uri} ||= 1;
     }
   }
 } # append_inheritance
+
+sub add_uri ($$;%) {
+  my ($res, $el, %opt) = @_;
+  my $canon_uri = $res->uri;
+  for my $uri (@{$res->uris}) {
+    $el->add_uri ($uri, $canon_uri eq $uri ? 0 : 1);
+    $ReferredResource{$uri} = -1;
+  }
+} # add_uri
 
 my $doc = $impl->create_disdump_document;
 
@@ -494,6 +548,83 @@ my $body = $doc->document_element;
 append_module_documentation
   (result_parent => $body,
    source_resource => $mod);
+
+
+while (my @ruri = grep {$ReferredResource{$_} > 0} keys %ReferredResource) {
+  U: while (defined (my $uri = shift @ruri)) {
+    next U if $ReferredResource{$uri} < 0;  ## Already done
+    my $res = $db->get_resource ($uri);
+    unless ($res->is_defined) {
+      $res = $db->get_module ($uri);
+      unless ($res->is_defined) {
+        $ReferredResource{$uri} = -1;
+        next U;
+      }
+      append_module_documentation
+        (result_parent => $body,
+         source_resource => $res,
+         is_partial => 1);
+    } elsif ($res->is_type_uri (ExpandedURI q<ManakaiDOM:Class>)) {
+      my $mod = $res->owner_module;
+      unless ($ReferredResource{$mod->uri} < 0) {
+        unshift @ruri, $uri;
+        unshift @ruri, $mod->uri;
+        next U;
+      }
+      append_class_documentation
+        (result_parent => $body->create_module ($mod->uri),
+         source_resource => $res,
+         is_partial => 1);
+    } elsif ($res->is_type_uri (ExpandedURI q<ManakaiDOM:IF>)) {
+      my $mod = $res->owner_module;
+      unless ($mod->is_defined) {
+        $ReferredResource{$uri} = -1;
+        next U;
+      } elsif (not ($ReferredResource{$mod->uri} < 0)) {
+        unshift @ruri, $uri;
+        unshift @ruri, $mod->uri;
+        next U;
+      }
+      append_interface_documentation
+        (result_parent => $body->create_module ($mod->uri),
+         source_resource => $res,
+         is_partial => 1);
+    } elsif ($res->is_type_uri (ExpandedURI q<DISLang:AnyMethod>)) {
+      my $cls = $res->get_property_resource
+        (ExpandedURI q<dis2pm:parentResource>);
+      if (not ($ReferredResource{$cls->uri} < 0) and
+          ($cls->is_type_uri (ExpandedURI q<ManakaiDOM:Class>) or
+           $cls->is_type_uri (ExpandedURI q<ManakaiDOM:IF>))) {
+        unshift @ruri, $uri;
+        unshift @ruri, $cls->uri;
+        next U;
+      }
+      my $model = $body->create_module ($cls->owner_module->uri);
+      my $clsel = $cls->is_type_uri (ExpandedURI q<ManakaiDOM:Class>)
+        ? $model->create_class ($cls->uri)
+        : $model->create_interface ($cls->uri);
+      if ($res->is_type_uri (ExpandedURI q<DISLang:Method>)) {
+        append_method_documentation
+          (result_parent => $clsel,
+           source_resource => $res);
+      } else { ## Attribute
+        append_attr_documentation
+          (resource_parent => $clsel,
+           source_resource => $res);
+      }
+    } elsif ($res->is_type_uri (ExpandedURI q<DISLang:MethodParameter>)) {
+      my $m = $res->get_property_resource
+        (ExpandedURI q<dis2pm:parentResource>);
+      if (not ($ReferredResource{$m->uri} < 0) and
+          $m->is_type_uri (ExpandedURI q<DISLang:Method>)) {
+        unshift @ruri, $m->uri;
+        next U;
+      }      
+    } else {  ## Unsupported type
+      $ReferredResource{$uri} = -1;
+    }
+  } # U
+}
 
 my $lsimpl = $impl->get_feature (ExpandedURI q<DOMLS:LS> => '3.0');
 
@@ -539,4 +670,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/08/30 12:30:45 $
+1; # $Date: 2005/08/31 13:02:46 $

@@ -19,7 +19,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/02/19 07:21:13 $
+      $Date: 2005/08/31 13:02:46 $
     @@ContentType:
       dis:Date.RCS
 
@@ -130,18 +130,18 @@ ImplNote:
   @Description:
     @@lang:en
     @@@:
-      Each event is associated with a <DFN:event type>.  The type is 
+      Each event is associated with a <DFN::event type>.  The type is 
       identified by the pair of a DOM URI and a local name. 
       They are case-sensitive.
     \
       Each event type in turn could be part of one or more categories. 
-      An <DFN:event category> is also identified by the pair of 
+      An <DFN::event category> is also identified by the pair of 
       a DOM URI and a local name.
     \
       {NOTE::
          DOM Level 2 Events methods are namespace ignorant; in DOM 
          Level 2 Events, the event type is only represented by 
-         an XML 1.0 <XML:Name>.  While it is safe to use both Level 2 and 
+         an XML 1.0 <CODE::Name>.  While it is safe to use both Level 2 and 
          Level 3 methods when not dealing with namespaces, 
          using them at the same time should be avoided.
       \
@@ -149,15 +149,15 @@ ImplNote:
       \
       {P:: For compatibility, the dispatching of an event will ignore 
       namespace URIs if either the event or the event listener 
-      has a <DOM:null> namespace URI, that is:
+      has a <DOM::null> namespace URI, that is:
       \
-      - If a DOM Level 2 event (<DOM:null> namespace URI) is 
+      - If a DOM Level 2 event (<DOM::null> namespace URI) is 
         dispatched, all event listeners that match the local name 
         will be triggered.
       \
-      - If a DOM Level 3 event (non-<DOM:null> namespace URI) is 
+      - If a DOM Level 3 event (non-<DOM::null> namespace URI) is 
         dispatched, all event listeners with the same local name 
-        that match the namespace URI or whose namespace URI is <DOM:null> 
+        that match the namespace URI or whose namespace URI is <DOM::null> 
         will be triggered.
       \
       }
@@ -207,7 +207,7 @@ ResourceDef:
       @@@@:
         In DOM Level 2, an event type must be an XML 1.0 <CODE::Name>. 
       In DOM Level 2 Events, event type names begin with 
-      <CODE:DOM> (in any case) was reserved.  Third party added 
+      <CODE::DOM> (in any case) was reserved.  Third party added 
       events were strongly recommended to start with 
       some prefix to avoid confusion.
     @@L2:
@@ -248,7 +248,7 @@ ImplNote:
       }
       \
       Some events may not necessarily accomplish the three pharses; 
-      see <A:Event.bubbles>.
+      see <A::Event.bubbles>.
       \
       Ancesotrs are determined before the initial dispatch; even if 
       the target node is removed during the dispatching or if 
@@ -747,16 +747,16 @@ IF:
       Provide contextual information about an event to the listener 
       processing the event.  More specific context information is passed to 
       event listeners by deriving additional interfaces from 
-      <IF:Event>.
+      <IF::Event>.
     \
-      {NOTE:: An object that implements the <IF:Event> interface 
+      {NOTE:: An object that implements the <IF::Event> interface 
               (and additional interfaces, if any) is passed as 
-              the parameter to an <IF:EventListener>.
+              the parameter to an <IF::EventListener>.
     \
       }
     \
-      {NOTE:: To create an instance of the <IF:Event> interface, 
-              use the <M:DocumentEvent.createEvent> method.
+      {NOTE:: To create an instance of the <IF::Event> interface, 
+              use the <M::DocumentEvent.createEvent> method.
     \
       }
 
@@ -830,9 +830,9 @@ IF:
           @@@@@:
             The event type.  This value is case-sensitive.
           \
-            {NOTE:: If the attribute <A:Event.namespaceURI> is 
-                    different from <DOM:null>, the pair of 
-                    <A:namespaceURI> and <A:type> (local name) 
+            {NOTE:: If the attribute <A::Event.namespaceURI> is 
+                    different from <DOM::null>, the pair of 
+                    <A::.namespaceURI> and <A::.type> (local name) 
                     identifies the type of the event.
           \
             }
@@ -859,7 +859,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         The <IF:EventTarget> whose <IF:EventListeners> are 
+         The <IF::EventTarget> whose <IF::EventListeners> are 
          currently being processed.
      @@Get:
         @@@Type:  EventTarget
@@ -962,7 +962,7 @@ IF:
        @@@@:
          Prevent event listeners of the same group to be triggered 
          but its effect is deferred untill all event listeners attached 
-         on the <A:currentTarget> have been triggerred.
+         on the <A::.currentTarget> have been triggerred.
          Multiple calles to this method have no additional effect.
        \
          {NOTE:: This method does not prevent the default action 
@@ -1009,17 +1009,17 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Initialize the value of an <IF:Event> created through 
-         the <M:DocumentEvent.createEvent> method. 
+         Initialize the value of an <IF::Event> created through 
+         the <M::DocumentEvent.createEvent> method. 
          \
          This event 
-         only be called before the <IF:Event> has been dispatched 
-         via the <M:EventTarget.dispatchEvent> method.
+         only be called before the <IF::Event> has been dispatched 
+         via the <M::EventTarget.dispatchEvent> method.
          If this method is called several times before invoking 
-         the <M:EventTarget.dispatchEvent>, only the final invocation 
+         the <M::EventTarget.dispatchEvent>, only the final invocation 
          takes precedence.  This method has no effect if called 
          after the event has been dispatched.  If called from 
-         a subclass of the <IF:Event> interface, only the values 
+         a subclass of the <IF::Event> interface, only the values 
          specified in this method are modified; all other attributes 
          are left unchanged.
      @@DOMEvents:isNSUnaware:1
@@ -1032,10 +1032,10 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The event type.  The <A:Event.type> is set to this value. 
+            The event type.  The <A::Event.type> is set to this value. 
             \
-            {NOTE:: The attribute <A:Event.namespaceURI> is set 
-                    to <DOM:null>.
+            {NOTE:: The attribute <A::Event.namespaceURI> is set 
+                    to <DOM::null>.
             \
             }
      @@Param:
@@ -1045,7 +1045,7 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            Whether the bubbling can be occur.  The <A:Event.bubbles> is set 
+            Whether the bubbling can be occur.  The <A::Event.bubbles> is set 
             to this value.
             This parameter overrides the intrinsic bubbling behavior.
         @@@InCase:
@@ -1057,7 +1057,7 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            Whether the default action is cancelable.  The <A:Event.cancelable> 
+            Whether the default action is cancelable.  The <A::Event.cancelable> 
             is set to this value.
             This parameter overrides the intrinsic cancelabilization.
         @@@Type:
@@ -1095,7 +1095,7 @@ IF:
               The namespace URI is unspecified.
               \
               {NOTE:: For events initialized with a DOM Level 2 Events 
-                      method, the namespace URI is always <DOM:null>.
+                      method, the namespace URI is always <DOM::null>.
               \
               }
         @@@Def:
@@ -1113,7 +1113,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Whether the event implements the <IF:CustomEvent> interface.
+         Whether the event implements the <IF::CustomEvent> interface.
      @@Return:
         @@@Type:
            DOMMain:boolean
@@ -1122,14 +1122,14 @@ IF:
            @@@@Description:
              @@@@@lang:en
              @@@@@@:
-               The event object implements the <IF:CustomEvent> interface.
+               The event object implements the <IF::CustomEvent> interface.
         @@@InCase:
            @@@@Value:  false
            @@@@Description:
              @@@@@lang:en
              @@@@@@:
                The event object does not implement the 
-               <IF:CustomEvent> interface.
+               <IF::CustomEvent> interface.
         @@@PerlDef: \
      @@Level[list]:  3
      @@SpecLevel[list]:  3
@@ -1162,7 +1162,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Whether the <M:Event.preventDefault> method has been called.
+         Whether the <M::Event.preventDefault> method has been called.
      @@Return:
         @@@Type:
            DOMMain:boolean
@@ -1171,13 +1171,13 @@ IF:
            @@@@Description:
              @@@@@lang:en
              @@@@@@:
-               The <M:Event.preventDefault> method has been called.
+               The <M::Event.preventDefault> method has been called.
         @@@InCase:
            @@@@Value:  false
            @@@@Description:
              @@@@@lang:en
              @@@@@@:
-               The <M:Event.preventDefault> method has not been called.
+               The <M::Event.preventDefault> method has not been called.
         @@@Def:
           @@@@ContentType:
             lang:dis
@@ -1193,17 +1193,17 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Initialize the value of an <IF:Event> created through 
-         the <M:DocumentEvent.createEvent> method. 
+         Initialize the value of an <IF::Event> created through 
+         the <M::DocumentEvent.createEvent> method. 
          \
          This event 
-         only be called before the <IF:Event> has been dispatched 
-         via the <M:EventTarget.dispatchEvent> method.
+         only be called before the <IF::Event> has been dispatched 
+         via the <M::EventTarget.dispatchEvent> method.
          If this method is called several times before invoking 
-         the <M:EventTarget.dispatchEvent>, only the final invocation 
+         the <M::EventTarget.dispatchEvent>, only the final invocation 
          takes precedence.  This method has no effect if called 
          after the event has been dispatched.  If called from 
-         a subclass of the <IF:Event> interface, only the values 
+         a subclass of the <IF::Event> interface, only the values 
          specified in this method are modified; all other attributes 
          are left unchanged.
      @@DOMEvents:noNSVariant:.initEvent
@@ -1216,7 +1216,7 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The namespace URI of the event type.  The <A:Event.namespaceURI> 
+            The namespace URI of the event type.  The <A::Event.namespaceURI> 
             is set to this value.
         @@@InCase:
           @@@@Value:
@@ -1231,7 +1231,7 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The local name of the event type.  The <A:Event.type> 
+            The local name of the event type.  The <A::Event.type> 
             is set to this value.
      @@Param:
         @@@Name:  canBubbleArg
@@ -1240,7 +1240,7 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            Whether the bubbling can occur.  The <A:Event.bubbling> 
+            Whether the bubbling can occur.  The <A::Event.bubbling> 
             is set to this value.  This parameter overrides the 
             intrinsic bubbling behavior.
         @@@InCase:
@@ -1254,7 +1254,7 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            Whether the default action is cancelable.  The <A:Event.cancelable> 
+            Whether the default action is cancelable.  The <A::Event.cancelable> 
             is set to this value.  This parameter overrides the 
             intrinsic cancalability.
         @@@InCase:
@@ -1548,11 +1548,11 @@ IF:
       When used with the DOM event flow, this interface is 
       implemented by all target nodes and target ancestors.  
       This interface can be obtained by using binding-specific casting 
-      methods on an instance of the <IF:Node> interface.
+      methods on an instance of the <IF::DOMCore:Node> interface.
     \
-      {NOTE:: Copying a <IF:Node> (with methods such as 
-              <M:Node.cloneNode>) does not copy event listeners 
-              attached to it.  Moving a <IF:Node> does not 
+      {NOTE:: Copying a <IF::DOMCore:Node> (with methods such as 
+              <M::DOMCore:Node.cloneNode>) does not copy event listeners 
+              attached to it.  Moving a <IF::DOMCore:Node> does not 
               affect event listeners.
     \
       }
@@ -1560,8 +1560,8 @@ IF:
   @ImplNote:
     @@lang:en
     @@@:
-      Asynchronous <IF:LSParser> objects are expected to implement 
-      the <IF:EventTarget> interface.  See <Module:DOMLS> module.
+      Asynchronous <IF::LSParser> objects are expected to implement 
+      the <IF::EventTarget> interface.  See <Module::MDOM:DOMLS> module.
 
   @Method:
      @@Name:  addEventListener
@@ -1570,14 +1570,14 @@ IF:
        @@@@:
          Register an event listener in the default group.
          \
-         Invoking <M:addEventListener> or <M:addEventListenerNS> 
-         multiple times on the same <IF:EventTarget> with the 
-         same parameters <A:namespaceURI>, <A:type>, <A:listener> 
-         and <A:useCapture> has no additional effect - it is 
+         Invoking <M::.addEventListener> or <M::.addEventListenerNS> 
+         multiple times on the same <IF::EventTarget> with the 
+         same parameters <A::.namespaceURI>, <A::.type>, <A::.listener> 
+         and <A::.useCapture> has no additional effect - it is 
          independently of the event group.  In order to change 
          the triggering order or to guarantee that an event listener 
          will be added to the event target for the specified 
-         event group, invoke <M:removeEventListenerNS> first.
+         event group, invoke <M::.removeEventListenerNS> first.
      @@DOMEvents:isNSAware:1
      @@DOMEvents:NSVariant:.addEventListenerNS
      @@Param:
@@ -1595,7 +1595,7 @@ IF:
           @@@@@:
             The event listener.  It is an object implemented by 
             the DOM application that implements the 
-            <IF:EventListener> interface.
+            <IF::EventListener> interface.
      @@Param:
         @@@Name:  useCapture
         @@@Type:
@@ -1647,7 +1647,7 @@ IF:
        @@@@:
          Remove an event listener from the default group. 
          If arguments do not identify any currently registered 
-         <IF:EventListener>, the method call has no effect.
+         <IF::EventListener>, the method call has no effect.
      @@ImplNote:
        @@@lang:en
        @@@@: 
@@ -1720,7 +1720,7 @@ IF:
         @@@lang:en
         @@@@:
           Dispatch an event.  The event target of the event dispatched 
-          is the <IF:EventTarget> object on which this method is called.
+          is the <IF::EventTarget> object on which this method is called.
      @@Param:
         @@@Name:  evt
         @@@Type:  Event
@@ -1735,27 +1735,27 @@ IF:
           @@@@lang:en
           @@@@@:
             Whether any of the event listeners called 
-            the <M:Event.preventDefault> method.
+            the <M::Event.preventDefault> method.
         @@@InCase:
            @@@@Value:  true
            @@@@Description:
              @@@@@lang:en
              @@@@@@:
-               The <M:Event.preventDefault> method was not called.
+               The <M::Event.preventDefault> method was not called.
         @@@InCase:
            @@@@Value:  false
            @@@@Description:
              @@@@@lang:en
              @@@@@@:
-               The <M:Event.preventDefault> method was called.
+               The <M::Event.preventDefault> method was called.
         @@@Exception:
            @@@@Name:  UNSPECIFIED_EVENT_TYPE_ERR
            @@@@Type:  EventException
            @@@@Description:
              @@@@@lang:en
              @@@@@@:
-               The <IF:Event.type> is not specified or its value 
-               is <DOM:null> or an empty string.
+               The <IF::Event.type> is not specified or its value 
+               is <DOM::null> or an empty string.
            @@@@SpecLevel:2
         @@@Exception:
           @@@@Name:DISPATCH_REQUEST_ERR
@@ -1763,7 +1763,7 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The <P:evt> is already being dispatched in the tree.
+              The <P::evt> is already being dispatched in the tree.
           @@@@SpecLevel:3
         @@@Exception:
           @@@@Name:NOT_SUPPORTED_ERR
@@ -1774,9 +1774,9 @@ IF:
               @@@@@lang:en
               @@@@@@:
                 While the specification does not say this exception is 
-                in <X:DOMException> nor says that this method 
-                raises a <X:DOMException>, the <X:EventException> 
-                does not have the <X:NOT_SUPPORTED_ERR>.
+                in <IF::DOMCore:DOMException> nor says that this method 
+                raises a <IF::DOMCore:DOMException>, the <IF::EventException> 
+                does not have the <CODE::NOT_SUPPORTED_ERR>.
           @@@@SubType:
             @@@@@QName:
               ManakaiDOMEvents:FOREIGN_EVENT_ERR
@@ -1800,14 +1800,14 @@ IF:
        @@@@:
          Register an event listener in a specified group.
          \
-         Invoking <M:addEventListener> or <M:addEventListenerNS> 
-         multiple times on the same <IF:EventTarget> with the 
-         same parameters <A:namespaceURI>, <A:type>, <A:listener> 
-         and <A:useCapture> has no additional effect - it is 
+         Invoking <M::.addEventListener> or <M::.addEventListenerNS> 
+         multiple times on the same <IF::EventTarget> with the 
+         same parameters <A::.namespaceURI>, <A::.type>, <A::.listener> 
+         and <A::.useCapture> has no additional effect - it is 
          independently of the event group.  In order to change 
          the triggering order or to guarantee that an event listener 
          will be added to the event target for the specified 
-         event group, invoke <M:removeEventListenerNS> first.
+         event group, invoke <M::.removeEventListenerNS> first.
      @@DOMEvents:isNSAware:1
      @@DOMEvents:noNSVariant:.addEventListener
      @@Param:
@@ -1833,7 +1833,7 @@ IF:
           @@@@lang:en
           @@@@@:
             The event listener - an object implemented by the DOM 
-            application that implements the <IF:EventListener> 
+            application that implements the <IF::EventListener> 
             interface.
      @@Param:
         @@@Name:  useCapture
@@ -1905,7 +1905,7 @@ IF:
        @@@@:
          Remove an event listener.
          If arguments do not identify any currently registered 
-         <IF:EventListener>, the method call has no effect.
+         <IF::EventListener>, the method call has no effect.
      @@DOMEvents:isNSAware:1
      @@DOMEvents:noNSVariant:.removeEventListener
      @@Param:
@@ -1986,9 +1986,9 @@ IF:
        @@@lang:en
        @@@@:
          Return whether an event listener, attached to this 
-         <IF:EventTarget> or one of its ancestors, will be 
+         <IF::EventTarget> or one of its ancestors, will be 
          triggered by the specified event type during the 
-         dispatch of the event to this <IF:EventTarget> 
+         dispatch of the event to this <IF::EventTarget> 
          or one of its descendants.
      @@DOMEvents:isNSAware:1
      @@Param:
@@ -2030,7 +2030,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Return whether this <IF:EventTarget> contains an 
+         Return whether this <IF::EventTarget> contains an 
          event listener registered for the specified event type.
      @@DOMEvents:isNSAware:1
      @@Param:
@@ -2290,7 +2290,7 @@ IF:
     @@Description:
       @@@lang:en
       @@@@:
-        Create a new instance of the <IF:EventListener> with a 
+        Create a new instance of the <IF::EventListener> with a 
         code.
     @@Param:
       @@@Name:code
@@ -2301,10 +2301,10 @@ IF:
         @@@@@:
           The code used as an event handler. 
         \
-          In the Perl binding, it is a <Perl:CODE> reference - a reference 
+          In the Perl binding, it is a <Perl::CODE> reference - a reference 
           to the subroutine.
         \
-          {NOTE:: The <P:code> is blessed with the event handler class.
+          {NOTE:: The <P::code> is blessed with the event handler class.
         \
           }
     @@Return:
@@ -2347,18 +2347,19 @@ IF:
     @@lang:en
     @@@:
       Provide a mechanism by which the DOM application 
-      can create an <IF:Event> object.
+      can create an <IF::Event> object.
   @ImplNote:
     @@lang:en
     @@@:
-      If the <IF:Document> object supports the feature 
-      <Feature:Events>, this interface must be implemented on the same object.
+      If the <IF::DOMCore:Document> object supports the feature 
+      <Feature::Events>, this interface must be implemented on the same object.
       \
-      If the <IF:Document> object supports the feature <Feature:Events> 
-      with the prefix of <DOM:+>, an object that supports 
+      If the <IF::DOMCore:Document> object supports the feature 
+      <Feature::Events> 
+      with the prefix of <DOM::+>, an object that supports 
       this interface must be returned by invoking the method 
-      <M:Node.getFeature> with arguements <DOM:+Events> and 
-      <FeatureVer:3.0> on the <IF:Document> object.
+      <M::DOMCore:Node.getFeature> with arguements <DOM::+Events> and 
+      <FeatureVer::3.0> on the <IF::DOMCore:Document> object.
 
   @Method:
      @@Name:  createEvent
@@ -2499,12 +2500,12 @@ IF:
   @Description:
     @@lang:en
     @@@:
-      Provide access to the attributes <A:Event.currentTarget> and 
-      <A:Event.eventPhase>.  It is intended to be used by the 
+      Provide access to the attributes <A::Event.currentTarget> and 
+      <A::Event.eventPhase>.  It is intended to be used by the 
       DOM implementation to access the underlying current target and 
-      event phase while dispatching a custom <IF:Event> in the tree.
+      event phase while dispatching a custom <IF::Event> in the tree.
       \
-      {NOTE:: It is intended to be implemented, and <EM:not used>, 
+      {NOTE:: It is intended to be implemented, and <EM::not used>, 
               by the DOM application.
       \
       }
@@ -2523,7 +2524,7 @@ IF:
       to protect DOM applications from malicious event listeners.
       \
       {NOTE:: An object that implements this interface must have 
-              the <M:Event.isCustom> method returning <DOM:true>.
+              the <M::Event.isCustom> method returning <DOM::true>.
       \
       }
 
@@ -2532,10 +2533,10 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Set the values of attributes <A:Event.currentTarget> 
-         and <A:Event.eventPhase>.  It also reset the states 
-         of <M:Event.isPropagationStopped> and 
-         <M:Event.isImmediatePropagationStopped>.
+         Set the values of attributes <A::Event.currentTarget> 
+         and <A::Event.eventPhase>.  It also reset the states 
+         of <M::Event.isPropagationStopped> and 
+         <M::Event.isImmediatePropagationStopped>.
      @@Param:
         @@@Name:  target
         @@@Type:  EventTarget
@@ -2563,7 +2564,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Return whether the <M:Event.stopPropagation> method has 
+         Return whether the <M::Event.stopPropagation> method has 
          been called.
      @@Return:
         @@@Type:
@@ -2586,7 +2587,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Return whether the method <M:Event.stopImmediatePropagation> 
+         Return whether the method <M::Event.stopImmediatePropagation> 
          has been called for this event.
        \
          {NOTE:: It is intended that this method is used by the DOM 
@@ -2615,7 +2616,7 @@ IF:
     @@Description:
       @@@lang:en
       @@@@:
-        Return whether the object implements the <IF:CustomEvent> interface.
+        Return whether the object implements the <IF::CustomEvent> interface.
     @@Return:
       @@@Type:
         DOMMain:boolean
@@ -2624,7 +2625,7 @@ IF:
       @@@ImplNote:
         @@@@lang:en
         @@@@@:
-          This method must returns <DOM:true>.
+          This method must returns <DOM::true>.
     @@SpecLevel:3
     @@Level:3
     @@For:
