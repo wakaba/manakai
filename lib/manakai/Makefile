@@ -39,6 +39,7 @@ all: $(GENERATED_FILES)
 all.dac: $(DIS_FILES) $(DAC_PL)
 	$(DAC).$@.1.tmp DISPerl.dis
 	$(DAC).$@.2.tmp --input-db-file-name=".$@.1.tmp" DISMarkup.dis
+	$(DAC).$@.3.tmp --input-db-file-name=".$@.2.tmp" DISIDL.dis
 	$(DAC)$@ --input-db-file-name=".$@.2.tmp" NaturalLanguage.dis
 	$(RM) .$@.1.tmp .$@.2.tmp
 

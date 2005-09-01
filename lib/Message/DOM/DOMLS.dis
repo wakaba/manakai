@@ -31,7 +31,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/08/31 13:02:46 $
+      $Date: 2005/09/01 17:07:20 $
     @@ContentType:
       dis:Date.RCS
 
@@ -505,7 +505,10 @@ ExceptionDef:
        @@@ForCheck:
          ManakaiDOM:ForClass
 
-     @@rdfs:subClassOf: DOMMain|unsigned-short
+     @@rdfs:subClassOf:
+       @@@@: DOMMain|unsigned-short||ManakaiDOM|all
+       @@@ForCheck: ManakaiDOM|ForClass
+     @@Type: DOMMain|unsigned-short||ManakaiDOM|all
 
      @@Description:
         @@@lang:en
@@ -805,7 +808,9 @@ IF:
          ManakaiDOM:ForClass
 
      @@rdfs:subClassOf:
-       DOMMain:unsigned-short
+       @@@@: DOMMain|unsigned-short||ManakaiDOM|all
+       @@@ForCheck: ManakaiDOM|ForClass
+     @@Type: DOMMain|unsigned-short||ManakaiDOM|all
 
      @@Description:
        @@@lang:en
@@ -1344,11 +1349,12 @@ IF:
        @@@ForCheck:
          ManakaiDOM:ForClass
 
-     @@ISA:
+     @@rdfs:subClassOf:
        @@@@:
-         DOMMain:unsigned-short
+         DOMMain:unsigned-short||ManakaiDOM|all
        @@@ForCheck:
          ManakaiDOM:ForClass
+     @@Type: DOMMain|unsigned-short||ManakaiDOM|all
 
      @@Description:
        @@@lang:en
@@ -1761,7 +1767,10 @@ IFDef:
         Constants returned by startElement and acceptNode
         @@@lang:  en
      @@Type:
-        DOMMain:short
+        DOMMain:short||ManakaiDOM|all
+     @@rdfs:subClassOf:
+       @@@@: DOMMain|short||ManakaiDOM|all
+       @@@ForCheck: ManakaiDOM|ForClass
      @@Const:
         @@@Name:  FILTER_ACCEPT
         @@@Type:

@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/08/30 12:30:45 $
+      $Date: 2005/09/01 17:07:20 $
     @@ContentType:
       dis:Date.RCS
 
@@ -953,11 +953,11 @@ ExceptionDef:
        @@@@: Integers indicating the type of error generated.
      @@rdfs:subClassOf:
        @@@@:
-         DOMMain:unsigned-short
+         DOMMain:unsigned-short::ManakaiDOM:all
        @@@ForCheck:
          ManakaiDOM:ForClass
      @@Type:
-       DOMMain:unsigned-short
+       DOMMain:unsigned-short::ManakaiDOM:all
      @@XConst:
         @@@Name:  INDEX_SIZE_ERR
         @@@Value:  1
@@ -3174,7 +3174,9 @@ IF:
        @@@ForCheck:
          ManakaiDOM:ForClass
      @@rdfs:subClassOf:
-       DOMMain:unsigned-short||ManakaiDOM|all
+       @@@@: DOMMain|unsigned-short||ManakaiDOM|all
+       @@@ForCheck: ManakaiDOM|ForClass
+     @@Type: DOMMain|unsigned-short||ManakaiDOM|all
      @@Description:
        @@@lang:en
        @@@@: An integer indicating which type of node this is.
@@ -5093,7 +5095,8 @@ IF:
      @@For:
        ManakaiDOM:DOM3
      @@rdfs:subClassOf:
-       DOMMain:unsigned-short::ManakaiDOM:all
+       @@@@: DOMMain|unsigned-short||ManakaiDOM|all
+       @@@ForCheck: ManakaiDOM|ForClass
      @@Type:
        DOMMain:unsigned-short::ManakaiDOM:all
      @@Const:
@@ -5362,11 +5365,13 @@ IF:
             for my $__oc (@__oldChild) {
               CORE::delete $__oc->{<Q::infoset:parent>};
             }
+            $__node->{<Q::infoset:children>} = [];
             my $__textNode = <ClassM::DOMCore:ManakaiDOMText.newObject>;
             $__textNode->{<Q::DOMCore:ownerDocument>}
                                    = $__node->{<Q::DOMCore:ownerDocument>};
             $__node-><M::NodeStem.importTree> ($__textNode);
             $__textNode->{<Q::infoset:content>} = $given;
+            $__textNode->{<Q::infoset:parent>} = $__node;
             $__node->{<Q::infoset:children>} = [$__textNode];
             for my $__oc (@__oldChild) {
               $__oc-><M::NodeStem.orphanate>;
@@ -13771,10 +13776,11 @@ IFDef:
        @@@lang:en
        @@@@:
          A set of possible types of derivation.
-     @@ISA: 
-       DOMMain:unsigned-long
+     @@rdfs:subClassOf: 
+       @@@@: DOMMain|unsigned-long||ManakaiDOM|all
+       @@@ForCheck: ManakaiDOM|ForClass
      @@Type:
-       DOMMain:unsigned-long
+       DOMMain:unsigned-long::ManakaiDOM:all
      @@IsBitMask:1
      @@ImplNote:
        @@@lang:en
@@ -13915,9 +13921,10 @@ IFDef:
   @ConstGroup:
      @@QName:  OperationType
      @@rdfs:subClassOf: 
-       DOMMain:unsigned-short||ManakaiDOM|Perl
+       @@@@: DOMMain|unsigned-short||ManakaiDOM|all
+       @@@ForCheck: ManakaiDOM|ForClass
      @@Type:
-       DOMMain:unsigned-short
+       DOMMain:unsigned-short::ManakaiDOM:all
      @@Description:
        @@@lang:en
        @@@@: The type of operation being performed on a node.
@@ -14089,9 +14096,10 @@ IF:
        @@@ForCheck:
          ManakaiDOM:ForClass
      @@rdfs:subClassOf: 
-       DOMMain:unsigned-short||ManakaiDOM|Perl
+       @@@@: DOMMain|unsigned-short||ManakaiDOM|all
+       @@@ForCheck: ManakaiDOM|ForClass
      @@Type: 
-       DOMMain:unsigned-short
+       DOMMain:unsigned-short::ManakaiDOM:all
      @@Description:
        @@@lang:en
        @@@@: The severity of the error.

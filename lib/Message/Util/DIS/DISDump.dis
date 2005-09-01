@@ -21,7 +21,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/08/31 13:02:46 $
+      $Date: 2005/09/01 17:07:20 $
     @@ContentType:
       dis:Date.RCS
   
@@ -626,6 +626,41 @@ IFClassDef:
           $self-><M::Node.appendChild> ($r);
         } # C
       }__;
+
+  @Method:
+    @@Name: createFullName
+    @@enDesc:
+      Creates a child <Q::dump:fullName> element and returns it.
+      If this element already has the element then the element is returned.
+    @@Return:
+      @@@Type: DISDumpElement
+      @@@enDesc:
+        The child <Q::dump:fullName> element.
+      @@@PerlDef:
+      __DEEP{
+        C: {
+          __CODE{getChildByName::
+            $parent => $self, $result => $r,
+            $namespace => {<Q::dump:>}, $localName => 'fullName',
+            $label => {C},
+          }__;
+          $r = $self-><AG::Node.ownerDocument>
+                    -><M::Document.createElementNS> (<Q::dump:>, 'fullName');
+          $self-><M::Node.appendChild> ($r);
+        } # C
+      }__;
+
+  @Attr:
+    @@Name: hasFullName
+    @@enDesc:
+      Returns whether this element has a full name or not.
+    @@Type: boolean
+    @@Get:
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::DISDumpElementResource.createFullName>
+                    -><M::Node.hasChildNodes>;
+        }__;
 
   @Attr:
     @@Name: resourceNamespaceURI
@@ -2032,5 +2067,8 @@ IFClassETDef:
 
   @IFISA: DISDumpElementResource
   @ClsISA: ManakaiDOMDISDumpElementResource
+
+  @IFISA: DISDumpElementLabel
+  @ClsISA: ManakaiDOMDISDumpElementLabel
 ##DISDumpDataTypeElement
 

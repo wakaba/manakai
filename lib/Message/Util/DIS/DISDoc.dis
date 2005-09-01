@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/08/30 12:30:45 $
+      $Date: 2005/09/01 17:07:20 $
     @@ContentType:
       dis:Date.RCS
   
@@ -356,7 +356,10 @@ IFClassDef:
                       -><M::ManakaiDISElementDISDoc.getDISDocTree>
                               ($ownerDocumentArg, <Q::lang:disdocInline>,
                                for_arg => $self->{o}->{for},
-                               forp_arg => $self->{o}->{forp});
+                               forp_arg => $self->{o}->{forp},
+                               default_name_uri => $self->{o}->{nameURI} ||
+                                            $self->{o}->{<Q::DIS:sourceNodeID>},
+                               default_for_uri => $self->{o}->{for});
             }
           }
         }__;
@@ -422,7 +425,10 @@ IFClassDef:
               my $elr = $el-><M::ManakaiDISElementDISDoc.getDISDocTree>
                               ($ownerDocumentArg, <Q::lang:disdoc>,
                                for_arg => $self->{o}->{for},
-                               forp_arg => $self->{o}->{forp});
+                               forp_arg => $self->{o}->{forp},
+                               default_name_uri => $self->{o}->{nameURI} ||
+                                            $self->{o}->{<Q::DIS:sourceNodeID>},
+                               default_for_uri => $self->{o}->{for});
               $r-><M::Node.appendChild> ($elr) if $elr;
             } # groups
           }
@@ -471,11 +477,15 @@ IFClassDef:
                                   for_arg => $self->{o}->{for},
                                   forp_arg => $self->{o}->{forp});
             if ($fn) {
+              ## TODO: Conneg
               $r = $fn-><M::DIS:ManakaiDISElement.getFeature> (<Q::DIS:Doc>)
                       -><M::ManakaiDISElementDISDoc.getDISDocTree>
                               ($ownerDocumentArg, <Q::lang:disdocInline>,
                                for_arg => $self->{o}->{for},
-                               forp_arg => $self->{o}->{forp});
+                               forp_arg => $self->{o}->{forp},
+                               default_name_uri => $self->{o}->{nameURI} ||
+                                            $self->{o}->{<Q::DIS:sourceNodeID>},
+                               default_for_uri => $self->{o}->{for});
             }
           }
         }__;
@@ -807,6 +817,21 @@ IFClassDef:
           is the default of the default.
     @@ForParam:
     @@ForpParam:
+    @@NamedParam:
+      @@@Name: defaultNameURI
+      @@@Type: DIS|AnyURI
+      @@@enDesc:
+        The default <QUOTE::name URI> used to interpret <Q::dis:TFQNames>.
+      @@@nullCase:
+        @@@@enDesc: No default name.
+    @@NamedParam:
+      @@@Name: defaultForURI
+      @@@Type: DIS|AnyURI
+      @@@enDesc:
+        The default <QUOTE::for URI> used to interpret <Q::dis:TFQNames>.
+      @@@nullCase:
+        @@@@enDesc:
+          Same as <P::forArg>.
     @@Return:
       @@@Type: DocumentFragment
       @@@enDesc:
@@ -834,7 +859,9 @@ IFClassDef:
                                             forp_arg => $forpArg),
                           script_uri => $self-><M::ManakaiDISElementDISDoc
                              .scriptURI> (null, for_arg => $forArg,
-                                            forp_arg => $forpArg));
+                                            forp_arg => $forpArg),
+                          default_name_uri => $defaultNameURI,
+                          default_for_uri => $defaultForURI || $forArg);
           } elsif ($ct-><M::DIS:ManakaiDISResourceDefinition.isSubsetOfURI>
                                 (<Q::lang:disdocInline>)) {
             my $doc = $ownerDocumentArg-><M::Node.getFeature> (<Q::DIS|Doc>);
@@ -846,7 +873,9 @@ IFClassDef:
                                             forp_arg => $forpArg),
                           script_uri => $self-><M::ManakaiDISElementDISDoc
                              .scriptURI> (null, for_arg => $forArg,
-                                            forp_arg => $forpArg));
+                                            forp_arg => $forpArg),
+                          default_name_uri => $defaultNameURI,
+                          default_for_uri => $defaultForURI || $forArg);
           }
         }__;
 
@@ -1089,6 +1118,21 @@ IFClassDef:
         is contained.
       @@@nullCase:
         @@@@enDesc: No script information.
+    @@NamedParam:
+      @@@Name: defaultNameURI
+      @@@Type: DIS|AnyURI
+      @@@enDesc:
+        The default <QUOTE::name URI> used to interpret <Q::dis:TFQNames>.
+      @@@nullCase:
+        @@@@enDesc: No default name.
+    @@NamedParam:
+      @@@Name: defaultForURI
+      @@@Type: DIS|AnyURI
+      @@@enDesc:
+        The default <QUOTE::for URI> used to interpret <Q::dis:TFQNames>.
+      @@@nullCase:
+        @@@@enDesc:
+          No default <QUOTE::for>.
     @@Return:
       @@@Type: DocumentFragment
       @@@enDesc:
@@ -1223,7 +1267,9 @@ IFClassDef:
                          ($self-><M::DocumentDISDoc.parseDISDocInlineText>
                            ($namespaceContext, $1,
                             node => $node, language_uri => null,
-                            script_uri => null));
+                            script_uri => null,
+                            default_name_uri => $defaultNameURI,
+                            default_for_uri => $defaultForURI));
                 $m-><M::Element.setAttributeNS>
                               (<Q::ddel:>, 'ddel:tag' => 'implied');
               }
@@ -1234,7 +1280,9 @@ IFClassDef:
                        ($self-><M::DocumentDISDoc.parseDISDocInlineText>
                          ($namespaceContext, $s,
                           node => $node, language_uri => null,
-                          script_uri => null));
+                          script_uri => null,
+                          default_name_uri => $defaultNameURI,
+                          default_for_uri => $defaultForURI));
               $current-><M::Element.setAttributeNS>
                               (<Q::ddel:>, 'ddel:tag' => 'implied');
             } else {
@@ -1261,7 +1309,9 @@ IFClassDef:
                      ($self-><M::DocumentDISDoc.parseDISDocInlineText>
                        ($namespaceContext, $s,
                         node => $node, language_uri => null,
-                        script_uri => null));
+                        script_uri => null,
+                        default_name_uri => $defaultNameURI,
+                        default_for_uri => $defaultForURI));
             }
             if ($ltypenode) {
               $this-><M::Element.setAttributeNodeNS> ($ltypenode);
@@ -1351,7 +1401,9 @@ IFClassDef:
                          ($self-><M::DocumentDISDoc.parseDISDocInlineText>
                            ($namespaceContext, $1,
                             node => $node, language_uri => null,
-                            script_uri => null));
+                            script_uri => null,
+                            default_name_uri => $defaultNameURI,
+                            default_for_uri => $defaultForURI));
               $m-><M::Element.setAttributeNS>
                               (<Q::ddel:>, 'ddel:tag' => 'implied');
             }
@@ -1362,7 +1414,9 @@ IFClassDef:
                        ($self-><M::DocumentDISDoc.parseDISDocInlineText>
                          ($namespaceContext, $s,
                           node => $node, language_uri => null,
-                          script_uri => null));
+                          script_uri => null,
+                          default_name_uri => $defaultNameURI,
+                          default_for_uri => $defaultForURI));
             $lc-><M::Element.setAttributeNS>
                               (<Q::ddel:>, 'ddel:tag' => 'implied');
           } else {
@@ -1383,7 +1437,9 @@ IFClassDef:
                        ($self-><M::DocumentDISDoc.parseDISDocInlineText>
                          ($namespaceContext, $s,
                           node => $node, language_uri => null,
-                          script_uri => null));
+                          script_uri => null,
+                          default_name_uri => $defaultNameURI,
+                          default_for_uri => $defaultForURI));
           }
         } # for
 
@@ -1598,6 +1654,7 @@ IFClassDef:
               } else { # No explicit lextype
                 push @lextype, {
                   <Q::ddel:A> => <Q::DISPerl:MemRef>,
+                  <Q::ddel:Class> => <Q::dis:TFQNames>,
                   <Q::ddel:CP> => <Q::DISCore:NCNameOrQName>,
                   <Q::ddel:ERR> => <Q::DISCore:NCNameOrQName>,
                   <Q::ddel:EV> => <Q::DISCore:NCNameOrQName>,
@@ -1877,7 +1934,8 @@ IFClassDef:
                                              .lookupNamespaceURI> ($pfx);
                 if (defined $ns and length $ns) {
                   $current-><M::Element.setAttributeNS>
-                                      (<Q::xmlns:>, 'xmlns:'.$pfx => $ns);
+                                      (<Q::xmlns:>, 'xmlns:'.$pfx => $ns)
+                    unless $pfx eq 'xmlns' and $ns eq <Q::xmlns:>;
                 }
                 $current-><M::Element.setAttributeNS>
                                   (<Q::ddel:>, 'ddel:mmParsed' => true);
@@ -1940,7 +1998,7 @@ IFClassDef:
                                : '';
         $__ns = '' unless defined $__ns;
         $newParent-><M::Element.setAttributeNS>
-                                  (<Q::xmlns:>, xmlns => '');
+                                  (<Q::xmlns:>, xmlns => $__ns);
       } else {  ## With prefix
         $newParent-><AS::Node.textContent> (':');
         $newParent-><M::Node.insertBefore>
@@ -1963,7 +2021,8 @@ IFClassDef:
                                              .lookupNamespaceURI> ($__pfx);
         $__ns = '' unless defined $__ns;
         $__pn-><M::Element.setAttributeNS>
-                                   (<Q::xmlns:>, 'xmlns:'.$__pfx => $__ns);
+                                   (<Q::xmlns:>, 'xmlns:'.$__pfx => $__ns)
+          unless $__pfx eq 'xmlns' and $__ns eq <Q::xmlns:>;
         unless ($__ns eq '') {
           $ownerDocument-><AS::Document.xmlVersion> ('1.1')
                if $ownerDocument-><AG::Document.xmlVersion> eq '1.0';

@@ -28,6 +28,7 @@ use Message::DOM::DOMHTML;
 use Message::DOM::DOMLS;
 use Message::Util::DIS::DISDump;
 use Message::Util::QName::Filter {
+  ddel => q<http://suika.fam.cx/~wakaba/archive/2005/disdoc#>,
   ddoct => q<http://suika.fam.cx/~wakaba/archive/2005/8/disdump-xslt#>,
   DIS => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#>,
   dis => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis-->,
@@ -44,6 +45,7 @@ use Message::Util::QName::Filter {
   dump => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#DISDump/>,
   DX => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#>,
   html5 => q<http://www.w3.org/1999/xhtml>,
+  infoset => q<http://www.w3.org/2001/04/infoset#>,
   lang => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#>,
   Perl => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl-->,
   license => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/license#>,
@@ -60,6 +62,7 @@ use Message::Util::QName::Filter {
   xhtml1 => q<http://www.w3.org/1999/xhtml>,
   xhtml2 => q<http://www.w3.org/2002/06/xhtml2>,
   xml => q<http://www.w3.org/XML/1998/namespace>,
+  xmlns => q<http://www.w3.org/2000/xmlns/>,
 };
 
 =head1 OPTIONS
@@ -220,6 +223,10 @@ sub append_module_documentation (%) {
         append_interface_documentation
           (result_parent => $section,
            source_resource => $rres);
+      } elsif ($rres->is_type_uri (ExpandedURI q<DISCore:AbstractDataType>)) {
+        append_datatype_documentation
+          (result_parent => $section,
+           source_resource => $rres);
       }
     } else {  ## Aliases
       # 
@@ -227,6 +234,39 @@ sub append_module_documentation (%) {
   }
   status_msg "";
 } # append_module_documentation
+
+sub append_datatype_documentation (%) {
+  my %opt = @_;
+  my $section = $opt{result_parent}->create_data_type
+                                        ($opt{source_resource}->uri);
+  
+  add_uri ($opt{source_resource} => $section);
+
+  my $uri = $opt{source_resource}->name_uri || 
+            $opt{source_resource}->uri;
+  my @file = map {s/[^\w]/_/g; $_} split m{[/:#?]+}, $uri;
+
+  $section->resource_file_name_stem ($file[-1]);
+  $section->resource_file_path_stem (join '/', @file);
+
+  my $docr = $opt{source_resource}->get_feature (ExpandedURI q<DIS:Doc>, '2.0');
+  my $label = $docr->get_label ($section->owner_document);
+  if ($label) {
+    $section->create_label->append_child (transform_disdoc_tree ($label));
+  }
+
+  append_description (source_resource => $opt{source_resource},
+                      result_parent => $section);
+
+  if ($opt{is_partial}) {
+    $section->resource_is_partial (1);
+    return;
+  }
+
+  ## Inheritance
+  append_inheritance (source_resource => $opt{source_resource},
+                      result_parent => $section);
+} # append_datatype_documentation
 
 sub append_interface_documentation (%) {
   my %opt = @_;
@@ -275,7 +315,8 @@ sub append_interface_documentation (%) {
       append_attr_documentation (source_resource => $memres,
                                  result_parent => $section);
     } elsif ($memres->is_type_uri (ExpandedURI q<ManakaiDOM:ConstGroup>)) {
-
+      append_constgroup_documentation (source_resource => $memres,
+                                       result_parent => $section);
     }
   }
 } # append_interface_documentation
@@ -321,10 +362,10 @@ sub append_class_documentation (%) {
     } elsif ($memres->is_type_uri (ExpandedURI q<DISLang:Attribute>)) {
       append_attr_documentation (source_resource => $memres,
                                  result_parent => $section);
-    } elsif ($memres->is_type_uri (ExpandedURI q<ManakaiDOM:Const>)) {
-
     } elsif ($memres->is_type_uri (ExpandedURI q<ManakaiDOM:ConstGroup>)) {
-
+      append_constgroup_documentation
+        (source_resource => $memres,
+         result_parent => $section);
     }
   }
 } # append_class_documentation
@@ -443,6 +484,77 @@ sub append_attr_documentation (%) {
       (ExpandedURI q<ManakaiDOM:isForInternal>, 0);
 } # append_attr_documentation
 
+sub append_constgroup_documentation (%) {
+  my %opt = @_;
+  my $perl_name = $opt{source_resource}->pl_name;
+  my $m = $opt{result_parent}->create_const_group ($perl_name);
+  
+  add_uri ($opt{source_resource} => $m);
+  
+  append_description (source_resource => $opt{source_resource},
+                      result_parent => $m);
+  
+  $m->resource_data_type
+    (my $u = $opt{source_resource}->dis_data_type_resource->uri);
+  $ReferredResource{$u} ||= 1;
+  $m->resource_actual_data_type
+    ($u = $opt{source_resource}->dis_actual_data_type_resource->uri);
+  $ReferredResource{$u} ||= 1;
+
+
+  for my $cr (@{$opt{source_resource}->get_property_resource_list
+                  (ExpandedURI q<DIS:childResource>)}) {
+    if ($cr->is_type_uri (ExpandedURI q<ManakaiDOM:Const>)) {
+      append_const_documentation (source_resource => $cr,
+                                  result_parent => $m);
+    }
+  }
+} # append_constgroup_documentation
+
+sub append_const_documentation (%) {
+  my %opt = @_;
+  my $perl_name = $opt{source_resource}->pl_name;
+  my $m = $opt{result_parent}->create_const ($perl_name);
+  
+  add_uri ($opt{source_resource} => $m);
+  
+  append_description (source_resource => $opt{source_resource},
+                      result_parent => $m);
+  
+  $m->resource_data_type
+    (my $u = $opt{source_resource}->dis_data_type_resource->uri);
+  $ReferredResource{$u} ||= 1;
+  $m->resource_actual_data_type
+    ($u = $opt{source_resource}->dis_actual_data_type_resource->uri);
+  $ReferredResource{$u} ||= 1;
+
+  my $value = $opt{source_resource}->pl_code_fragment;
+  if ($value) {
+    $m->create_value->text_content ($value->stringify);
+  }
+  
+  for my $cr (@{$opt{source_resource}->get_property_resource_list
+                  (ExpandedURI q<DIS:childResource>)}) {
+    if ($cr->is_type_uri (ExpandedURI q<ManakaiDOM:ExceptionOrWarningSubType>)) {
+      append_xsubtype_documentation (source_resource => $cr,
+                                     result_parent => $m);
+    }
+  }
+  ## TODO: xparam
+} # append_const_documentation
+
+sub append_xsubtype_documentation (%) {
+  my %opt = @_;
+  my $m = $opt{result_parent}->create_exception_sub_code
+    ($opt{source_resource}->uri);  
+  add_uri ($opt{source_resource} => $m);
+  
+  append_description (source_resource => $opt{source_resource},
+                      result_parent => $m);
+  
+  ## TODO: xparam
+} # append_xsubtype_documentation
+
 sub append_param_documentation (%) {
   my %opt = @_;
   
@@ -475,9 +587,15 @@ sub append_description (%) {
 
   my $od = $opt{result_parent}->owner_document;
   my $resd = $opt{source_resource}->get_feature (ExpandedURI q<DIS:Doc>, '2.0');
-  my $doc = $resd->get_description ($od);
+  my $doc = transform_disdoc_tree ($resd->get_description ($od));
   $opt{result_parent}->create_description->append_child ($doc);
   ## TODO: Negotiation
+
+  my $fn = $resd->get_full_name ($od);
+  if ($fn) {
+    $opt{result_parent}->create_full_name
+      ->append_child (transform_disdoc_tree ($fn));
+  }
 
   if ($opt{has_case}) {
     for my $caser (@{$opt{source_resource}->get_property_resource_list
@@ -487,18 +605,103 @@ sub append_description (%) {
         my $cased = $caser->get_feature (ExpandedURI q<DIS:Doc>, '2.0');
         my $label = $cased->get_label ($od);
         if ($label) {
-          $case->create_label->append_child ($label);
+          $case->create_label->append_child (transform_disdoc_tree ($label));
         }
         my $value = $caser->pl_code_fragment;
         if ($value) {
           $case->create_value->text_content ($value->stringify);
         }
+        $case->resource_data_type
+          (my $u = $caser->dis_data_type_resource->uri);
+        $ReferredResource{$u} ||= 1;
+        $case->resource_actual_data_type
+          ($u = $caser->dis_actual_data_type_resource->uri);
+        $ReferredResource{$u} ||= 1;
+        
         append_description (source_resource => $caser,
                             result_parent => $case);
       }
     }
   }
 } # append_description
+
+sub transform_disdoc_tree ($;%) {
+  my ($el, %opt) = @_;
+  my @el = ($el);
+  EL: while (defined (my $el = shift @el)) {
+    if ($el->node_type == $el->ELEMENT_NODE and
+        defined $el->namespace_uri) {
+      my $mmParsed = $el->get_attribute_ns (ExpandedURI q<ddel:>, 'mmParsed');
+      if ($mmParsed) {
+        my $lextype = $el->get_attribute_ns (ExpandedURI q<ddel:>, 'lexType');
+        if ($lextype eq ExpandedURI q<dis:TFQNames>) {
+          my $turi = dd_get_qname_uri ($el->get_elements_by_tag_name_ns
+                                     (ExpandedURI q<ddel:>, 'nameQName')->[0]);
+          my $furi = dd_get_qname_uri ($el->get_elements_by_tag_name_ns
+                                     (ExpandedURI q<ddel:>, 'forQName')->[0]);
+          my $uri = tfuris2uri ($turi, $furi);
+          $el->set_attribute_ns (ExpandedURI q<dump:>, 'dump:uri', $uri);
+          $ReferredResource{$uri} ||= 1;
+          next EL;
+        }
+      }
+      push @el, children_of ($el);
+    } elsif ($el->node_type == $el->DOCUMENT_FRAGMENT_NODE or
+             $el->node_type == $el->DOCUMENT_NODE) {
+      push @el, children_of ($el);
+    }
+  } # EL
+  $el;
+} # transform_disdoc_tree
+
+sub children_of ($) {
+  my $cn = $_[0]->child_nodes;
+  my $len = $cn->length;
+  my @r;
+  for (my $i = 0; $i < $len; $i++) {
+    push @r, my $l = $cn->item ($i);
+  }
+  @r;
+}
+
+sub dd_get_qname_uri ($;%) {
+  my ($el, %opt) = @_;
+  return '' unless $el;
+  my $plel = $el->get_elements_by_tag_name_ns
+    (ExpandedURI q<ddel:>, 'prefix')->[0];
+  my $lnel = $el->get_elements_by_tag_name_ns
+    (ExpandedURI q<ddel:>, 'localName')->[0];
+  my $nsuri = ($plel ? $plel : $el)->lookup_namespace_uri
+    ($plel ? $plel->text_content : undef);
+  $nsuri = '' unless defined $nsuri;
+  if ($plel and $nsuri eq '') {
+    $plel->remove_attribute_ns
+      (ExpandedURI q<xmlns:>, 'xmlns:'.$plel->text_content);
+  }
+  $el->set_attribute_ns (ExpandedURI q<dump:>, 'dump:namespaceURI', $nsuri);
+  if ($lnel) {
+    $nsuri . $lnel->text_content;
+  } else {
+    $el->get_attribute_ns (ExpandedURI q<ddel:>, 'defaultURI');
+  }
+} # dd_get_qname_uri
+
+sub tfuris2uri ($$) {
+  my ($turi, $furi) = @_;
+  my $uri;
+  if ($furi eq <Q::ManakaiDOM:all>) {
+    $uri = $turi;
+  } else {
+    my $__turi = $turi;
+    my $__furi = $furi;
+    for my $__uri ($__turi, $__furi) {
+      $__uri =~ s{([^0-9A-Za-z:;?=_./-])}{sprintf '%%%02X', ord $1}ge;
+    }
+    $uri = qq<data:,200411tf#xmlns(t=data:,200411tf%23)>.
+      qq<t:tf($__turi,$__furi)>;
+  }
+  $uri;
+} # tfuris2uri
 
 sub append_inheritance (%) {
   my %opt = @_;
@@ -539,6 +742,11 @@ sub add_uri ($$;%) {
     $el->add_uri ($uri, $canon_uri eq $uri ? 0 : 1);
     $ReferredResource{$uri} = -1;
   }
+
+  my $nsuri = $res->namespace_uri;
+  $el->resource_namespace_uri ($nsuri) if defined $nsuri;
+  my $lname = $res->local_name;
+  $el->resource_local_name ($lname) if defined $lname;
 } # add_uri
 
 my $doc = $impl->create_disdump_document;
@@ -589,7 +797,21 @@ while (my @ruri = grep {$ReferredResource{$_} > 0} keys %ReferredResource) {
         (result_parent => $body->create_module ($mod->uri),
          source_resource => $res,
          is_partial => 1);
-    } elsif ($res->is_type_uri (ExpandedURI q<DISLang:AnyMethod>)) {
+    } elsif ($res->is_type_uri (ExpandedURI q<DISCore:AbstractDataType>)) {
+      my $mod = $res->owner_module;
+      unless ($mod->is_defined) {
+        $ReferredResource{$uri} = -1;
+        next U;
+      } elsif (not ($ReferredResource{$mod->uri} < 0)) {
+        unshift @ruri, $uri;
+        unshift @ruri, $mod->uri;
+        next U;
+      }
+      append_datatype_documentation
+        (result_parent => $body->create_module ($mod->uri),
+         source_resource => $res);
+    } elsif ($res->is_type_uri (ExpandedURI q<DISLang:AnyMethod>) or
+             $res->is_type_uri (ExpandedURI q<ManakaiDOM:ConstGroup>)) {
       my $cls = $res->get_property_resource
         (ExpandedURI q<dis2pm:parentResource>);
       if (not ($ReferredResource{$cls->uri} < 0) and
@@ -607,9 +829,13 @@ while (my @ruri = grep {$ReferredResource{$_} > 0} keys %ReferredResource) {
         append_method_documentation
           (result_parent => $clsel,
            source_resource => $res);
-      } else { ## Attribute
+      } elsif ($res->is_type_uri (ExpandedURI q<DISLang:Attribute>)) {
         append_attr_documentation
-          (resource_parent => $clsel,
+          (result_parent => $clsel,
+           source_resource => $res);
+      } elsif ($res->is_type_uri (ExpandedURI q<ManakaiDOM:ConstGroup>)) {
+        append_constgroup_documentation
+          (result_parent => $clsel,
            source_resource => $res);
       }
     } elsif ($res->is_type_uri (ExpandedURI q<DISLang:MethodParameter>)) {
@@ -617,6 +843,23 @@ while (my @ruri = grep {$ReferredResource{$_} > 0} keys %ReferredResource) {
         (ExpandedURI q<dis2pm:parentResource>);
       if (not ($ReferredResource{$m->uri} < 0) and
           $m->is_type_uri (ExpandedURI q<DISLang:Method>)) {
+        unshift @ruri, $m->uri;
+        next U;
+      }      
+    } elsif ($res->is_type_uri (ExpandedURI q<ManakaiDOM:Const>)) {
+      my $m = $res->get_property_resource
+        (ExpandedURI q<dis2pm:parentResource>);
+      if (not ($ReferredResource{$m->uri} < 0) and
+          $m->is_type_uri (ExpandedURI q<ManakaiDOM:ConstGroup>)) {
+        unshift @ruri, $m->uri;
+        next U;
+      }      
+    } elsif ($res->is_type_uri
+               (ExpandedURI q<ManakaiDOM:ExceptionOrWarningSubType>)) {
+      my $m = $res->get_property_resource
+        (ExpandedURI q<dis2pm:parentResource>);
+      if (not ($ReferredResource{$m->uri} < 0) and
+          $m->is_type_uri (ExpandedURI q<ManakaiDOM:Const>)) {
         unshift @ruri, $m->uri;
         next U;
       }      
@@ -670,4 +913,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/08/31 13:02:46 $
+1; # $Date: 2005/09/01 17:07:20 $
