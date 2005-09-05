@@ -70,6 +70,7 @@ min.dac: base.dac $(BOOT_DIS_FILES) $(DAC_PL)
 base.dac: $(DAC_PL) \
   $(MANAKAI_LIB_DIR)Message/Markup/SuikaWikiConfig21.dis \
   $(MANAKAI_LIB_DIR)Message/DOM/DOMMetaImpl.dis \
+  $(MANAKAI_LIB_DIR)Message/DOM/DOMFeature.dis \
   $(DOMBOOT_DIS_FILE) $(CORE_DAC_FILE) \
   $(DOMLS_DIS_FILE)
 	$(DAC)$@.1.tmp --input-db-file-name="$(CORE_DAC_FILE)" \

@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/01 17:07:20 $
+      $Date: 2005/09/05 05:21:11 $
     @@ContentType:
       dis:Date.RCS
 
@@ -530,8 +530,20 @@ ElementTypeBinding:
     @@rdf:type:
       ManakaiDOM:DOMMethod
     @@ForCheck:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM ManakaiDOM|ForClass
+    @@ManakaiDOM:isForInternal: 1
+
+ElementTypeBinding:
+  @Name: IntMethodC
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:DOMMethod
+    @@ForCheck:
       ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
     @@ManakaiDOM:isForInternal: 1
+
 ElementTypeBinding:
   @Name: ReMethod
   @ElementType:
@@ -540,7 +552,7 @@ ElementTypeBinding:
     @@rdf:type:
       ManakaiDOM:DOMMethod
     @@ForCheck:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM ManakaiDOM|ForClass
     @@ManakaiDOM:isRedefining: 1
 ElementTypeBinding:
   @Name: Param
@@ -573,7 +585,7 @@ ElementTypeBinding:
     @@rdf:type:
       ManakaiDOM:DOMAttribute
     @@ForCheck:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM ManakaiDOM|ForClass
     @@ManakaiDOM:isForInternal: 1
 ElementTypeBinding:
   @Name: ReAttr
@@ -583,7 +595,7 @@ ElementTypeBinding:
     @@rdf:type:
       ManakaiDOM:DOMAttribute
     @@ForCheck:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM ManakaiDOM|ForClass
     @@ManakaiDOM:isRedefining: 1
 ElementTypeBinding:
   @Name: Get
@@ -649,10 +661,10 @@ ElementTypeBinding:
       @@@For:
         !ManakaiDOM:ManakaiDOM1
     @@Type:
-      DOMMain:unsigned-short
+      DOMMain:unsigned-short||ManakaiDOM|all
     @@rdfs:subClassOf:
       @@@@:
-        DOMMain:unsigned-short||ManakaiDOM|Perl
+        DOMMain:unsigned-short||ManakaiDOM|all
       @@@ForCheck:
         ManakaiDOM:ForClass
 
@@ -927,7 +939,7 @@ ExceptionDef:
      @@Name:  code
      @@Get:
        @@@Type:  
-         DOMMain:unsigned-short
+         DOMMain:unsigned-short||ManakaiDOM|all
        @@@actualType: ExceptionCode
        @@@Description:
          @@@@lang:en
@@ -1113,7 +1125,7 @@ ExceptionDef:
      @@XConst:
         @@@Name:  WRONG_DOCUMENT_ERR
         @@@Type:  
-          DOMMain:unsigned-short
+          DOMMain:unsigned-short||ManakaiDOM|all
         @@@Value:  4
         @@@Description:
           @@@@lang:en
@@ -1136,7 +1148,7 @@ ExceptionDef:
      @@XConst:
         @@@Name:  INVALID_CHARACTER_ERR
         @@@Type:  
-          DOMMain:unsigned-short
+          DOMMain:unsigned-short||ManakaiDOM|all
         @@@Value:  5
         @@@Description:
           @@@@lang:en
@@ -1169,8 +1181,6 @@ ExceptionDef:
               @@@@@@@: The version of XML.
      @@XConst:
         @@@Name:  NO_DATA_ALLOWED_ERR
-        @@@Type:  
-          DOMMain:unsigned-short
         @@@Value:  6
         @@@Description:
           @@@@lang:en
@@ -1185,8 +1195,6 @@ ExceptionDef:
             ManakaiDOM:ForClass
           @@@@ImplNote: Temporary.
         @@@Name:  NO_MODIFICATION_ALLOWED_ERR
-        @@@Type:  
-          DOMMain:unsigned-short
         @@@Value:  7
         @@@Description:
           @@@@lang:en
@@ -1255,8 +1263,6 @@ ExceptionDef:
             This node is read-only
      @@XConst:
         @@@Name:  NOT_FOUND_ERR
-        @@@Type:  
-          DOMMain:unsigned-short
         @@@Value:  8
         @@@Description:
           @@@@lang:en
@@ -1282,8 +1288,6 @@ ExceptionDef:
            The specified node is not a direct child of this node
      @@XConst:
         @@@Name:  NOT_SUPPORTED_ERR
-        @@@Type:  
-          DOMMain:unsigned-short
         @@@Value:  9
         @@@Description:
           @@@@lang:en
@@ -1491,8 +1495,6 @@ ExceptionDef:
          The attribure node is already in use elsewhere
      @@XConst:
         @@@Name:  INVALID_STATE_ERR
-        @@@Type:  
-          DOMMain:unsigned-short
         @@@Value:  11
         @@@Level[list]:  2
         @@@SpecLevel: 2
@@ -1511,8 +1513,6 @@ ExceptionDef:
             @@@@@@: The parser is busy.
      @@XConst:
         @@@Name:  SYNTAX_ERR
-        @@@Type:  
-          DOMMain:unsigned-short
         @@@Value:  12
         @@@Level[list]:  2
         @@@SpecLevel: 2
@@ -1531,8 +1531,6 @@ ExceptionDef:
               cookie value syntax.
      @@XConst:
         @@@Name:  INVALID_MODIFICATION_ERR
-        @@@Type:  
-          DOMMain:unsigned-short
         @@@Value:  13
         @@@Level[list]:  2
         @@@SpecLevel: 2
@@ -1543,8 +1541,6 @@ ExceptionDef:
           @@@@@: An attempt is made to modify the type of underlying object.
      @@XConst:
         @@@Name:  NAMESPACE_ERR
-        @@@Type:  
-          DOMMain:unsigned-short
         @@@Value:  14
         @@@SpecLevel: 2
         @@@Level[list]:  2
@@ -1800,8 +1796,6 @@ ExceptionDef:
             ManakaiDOM:DOMHTMLFeature
      @@XConst:
         @@@Name:  INVALID_ACCESS_ERR
-        @@@Type:  
-          DOMMain:unsigned-short
         @@@Value:  15
         @@@Level[list]:  2
         @@@SpecLevel: 2
@@ -1812,8 +1806,6 @@ ExceptionDef:
             underlying object.
      @@XConst:
         @@@Name:  VALIDATION_ERR
-        @@@Type:  
-          DOMMain:unsigned-short
         @@@Value:  16
         @@@Level[list]:  3
         @@@SpecLevel:3
@@ -1843,6 +1835,337 @@ PropDef:
   @enDesc:
     Lists of features.
   @Type: ManakaiDOM|ManakaiDOMFeatures
+
+
+ElementTypeBinding:
+  @Name: IFCls1Def
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+    @@For: ManakaiDOM|DOM1
+    @@For: =ManakaiDOM|ManakaiDOM
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|IF
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM1||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM2||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM2
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM3||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM3
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+    @@DOMMain:implementFeature: CoreFeature10
+    @@DOMMain:implementFeature:
+      @@@@: CoreFeature20
+      @@@For: ManakaiDOM|DOM2
+    @@DOMMain:implementFeature:
+      @@@@: CoreFeature30
+      @@@For: ManakaiDOM|DOM3
+    @@DOMMain:implementFeature:
+      @@@@: DOMXML|XMLFeature10
+      @@@For: ManakaiDOM|DOM1 ManakaiDOM|DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: DOMXML|XMLFeature20
+      @@@For: ManakaiDOM|DOM2 ManakaiDOM|DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: DOMXML|XMLFeature30
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: DOMXML|XMLVersionFeature10
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: DOMXML|XMLVersionFeature11
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
+
+
+ElementTypeBinding:
+  @Name: IFCls2Def
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+    @@For: ManakaiDOM|DOM2
+    @@For: =ManakaiDOM|ManakaiDOM
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|IF
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM2||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM2
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM3||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM3
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+    @@DOMMain:implementFeature: CoreFeature20
+    @@DOMMain:implementFeature:
+      @@@@: CoreFeature30
+      @@@For: ManakaiDOM|DOM3
+    @@DOMMain:implementFeature:
+      @@@@: DOMXML|XMLFeature20
+      @@@For: ManakaiDOM|DOM2 ManakaiDOM|DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: DOMXML|XMLFeature30
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: DOMXML|XMLVersionFeature10
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: DOMXML|XMLVersionFeature11
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
+
+
+ElementTypeBinding:
+  @Name: IFCls3Def
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+    @@For: ManakaiDOM|DOM3
+    @@For: =ManakaiDOM|ManakaiDOM
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|IF
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM3||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM3
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+    @@DOMMain:implementFeature: CoreFeature30
+    @@DOMMain:implementFeature:
+      @@@@: DOMXML|XMLFeature30
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: DOMXML|XMLVersionFeature10
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: DOMXML|XMLVersionFeature11
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
+
+ElementTypeBinding:
+  @Name: IFQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+IFCls3Def:
+  @IFQName: DOMImplementationList
+  @ClsQName: ManakaiDOMImplementationList
+
+  @ClsISA: DOMFeature|ManakaiImplementationList
+
+  @enDesc:
+    The <IF::DOMImplementationList> interface provides the 
+    abstraction of an ordered collection of DOM implementations.
+
+    {NOTE:: How this collection is implemented is not defined nor
+            constrained.
+    }
+    
+    <EM::Identification of items>.  The items in the collection are
+    accessible via an integral index, starting from <DOM::0>.
+  @enDesc:
+    @@ForCheck: ManakaiDOM|ManakaiDOM
+    @@@:
+      In the manakai implelemntation, the collection is implemented
+      by Perl array reference; the array is <EM::not> <QUOTE::live>.
+
+  @Attr:
+    @@Name: length
+    @@Type: DOMMain|unsigned-long||ManakaiDOM|all
+    @@enDesc:
+      The number of items in the collection.
+    @@Get:
+    @@ForCheck: !ManakaiDOM|ForClass
+
+  @Method:
+    @@Name: item
+    @@enDesc:
+      Returns the <P::index>th item in the collection.
+    @@Type: DOMImplementation
+    @@Param:
+      @@@Name:index
+      @@@Type:DOMMain|unsigned-long||ManakaiDOM|all
+      @@@enDesc: Index in the collection.
+    @@ForCheck: !ManakaiDOM|ForClass
+    @@Return:
+      @@@enDesc:
+        The <IF::DOMImplementation> object at the <P::index>th
+        position in the collection.
+      @@@nullCase:
+        @@@@enDesc:
+          If the <P::index> is greater than or equal to
+          the number of items in the collection.
+
+  @Method:
+    @@Operator:
+      @@@@: DISPerl|NewMethod
+      @@@ContentType: dis|TypeQName
+    @@enDesc:
+      Creates a new instance of the <Class::ManakaiDOMImplementationList>
+      object and returns it.
+    @@Type: ManakaiDOMImplementationList
+    @@ManakaiDOM:isStatic:1
+    @@ManakaiDOM:isForInternal:1
+    @@Return:
+      @@@enDesc: The newly created list.
+      @@@PerlDef:
+        __DEEP{
+          $r = bless $self->SUPER::new,
+                     <ClassName::ManakaiDOMImplementationList>;
+        }__;
+##DOMImplementationList
+
+IFCls3Def:
+  @IFQName: DOMImplementationSource
+  @ClsQName: ManakaiDOMImplementationSource
+
+  @ClsISA: DOMFeature|ManakaiImplementationSource
+
+  @enDesc:
+    The <IF::DOMImplementationSource> interface permits a DOM
+    implementator to supply one or more DOM implementations,
+    based upon requested features and versions.
+
+    Each implemented <IF::DOMImplementationSource> object
+    is listed in the binding-specific list of available sources
+    so that its <IF::DOMImplementation> objects are made available
+    from the <Class::DOMFeature:DOMImplementationRegistry> object.
+
+  @Method:
+    @@Name: getDOMImplementation
+    @@ForCheck: !ManakaiDOM|ForClass
+    @@enDesc:
+      Returns the first DOM implementation that supports the specified
+      features.
+    @@Param:
+      @@@Name: features
+      @@@Type: DOMMain|DOMString
+      @@@actualType: DOMFeature|FeaturesString
+      @@@enDesc:
+        A space-separeted list in which features and versions
+        are specified.
+    @@ReturnValue:
+      @@@Type: DOMImplementation
+      @@@enDesc:
+        The first DOM implementation that supports the desired
+        features.  It is the first item of the list returned
+        by the <M::.getDOMImplementationList> method.
+      @@@nullCase:
+        @@@@enDesc:
+          The source has no DOM implementation that supports the 
+          desired features.
+
+  @Method:
+    @@Name: getDOMImplementationList
+    @@enDesc:
+      Returns a list of DOM implementations that supports the 
+      specified features and versions.
+    @@Param:
+      @@@Name: features
+      @@@Type: DOMMain|DOMString
+      @@@actualType: DOMFeature|FeaturesString
+      @@@enDesc:
+        A space-separeted list in which features and versions
+        are specified.
+    @@Return:
+      @@@Type: DOMImplementationList
+      @@@actualType: ManakaiDOMImplementationList
+      @@@enDesc:
+        A list of DOM implementations that support the desired features.
+      @@@PerlDef:     
+        __DEEP{      ## NOTE: Method name is directly written.
+          $r = bless $self->SUPER::get_dom_implementation_list ($features),
+                     <ClassName::ManakaiDOMImplementationList>;
+        }__;
+##DOMImplementationSource
+
+ElementTypeBinding:
+  @Name: IFISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
 
 IF:
   @Name:
@@ -1888,7 +2211,7 @@ IF:
      @@Param:
         @@@Name:  index
         @@@Type:  
-          DOMMain:unsigned-long
+          DOMMain:unsigned-long||ManakaiDOM|all
         @@@Description:
           @@@@lang:en
           @@@@@: 
@@ -1930,7 +2253,7 @@ IF:
          The number of <TYPE::DOMMain:DOMString> object in this collection.
      @@Get:
         @@@Type:  
-          DOMMain:unsigned-long
+          DOMMain:unsigned-long||ManakaiDOM|all
         @@@Description:
           @@@@lang:en
           @@@@@: 
@@ -2025,7 +2348,7 @@ IF:
      @@Param:
         @@@Name:  index
         @@@Type:  
-          DOMMain:unsigned-long
+          DOMMain:unsigned-long||ManakaiDOM|all
         @@@Description:
           @@@@lang:en
           @@@@@: 
@@ -2065,7 +2388,7 @@ IF:
      @@Param:
         @@@Name:  index
         @@@Type:  
-          DOMMain:unsigned-long
+          DOMMain:unsigned-long||ManakaiDOM|all
         @@@Description:
           @@@@lang:en
           @@@@@: 
@@ -2106,7 +2429,7 @@ IF:
          The number of pairs in this collection.
      @@Get:
         @@@Type:  
-          DOMMain:unsigned-long
+          DOMMain:unsigned-long||ManakaiDOM|all
         @@@Description:
           @@@@lang:en
           @@@@@: 
@@ -2132,7 +2455,7 @@ IF:
             A name to look for.
      @@Return:
         @@@Type:  
-          DOMMain:boolean
+          DOMMain:boolean||ManakaiDOM|all
         @@@InCase:
           @@@@Value: true
           @@@@Description:
@@ -2197,7 +2520,7 @@ IF:
             A name to look for.
      @@Return:
         @@@Type:  
-          DOMMain:boolean
+          DOMMain:boolean||ManakaiDOM|all
         @@@InCase:
           @@@@Value: true
           @@@@Description:
@@ -2225,106 +2548,23 @@ IF:
             }__;
           }
 
-IF:
-  @Name:
-    @@@:
-      DOMImplementation
-    @@ForCheck: 
-      ManakaiDOM:ForIF
-  @Name:
-    @@@:
-      ManakaiDOMImplementation
-    @@ForCheck:
-      ManakaiDOM:ForClass
-    @@For:
-      ManakaiDOM:ManakaiDOM
-  @ImplementLevel1:
-  @ImplementLevel2:
-  @ImplementLevel3:
-  @DOMMain:implementFeature:
-    @@@:
-      DOMMain:ManakaiDOMFeature10
-    @@For:
-      ManakaiDOM:ManakaiDOM
-  @DOMMain:implementFeature:
-    @@@:
-      DOMMain:DOMMainFeature10
-    @@For:
-      ManakaiDOM:ManakaiDOM1
-  @DOMMain:implementFeature:
-    @@@:
-      DOMMain:DOMMainFeature20
-    @@For:
-      ManakaiDOM:ManakaiDOM2
-  @DOMMain:implementFeature:
-    @@@:
-      DOMMain:DOMMainFeature30
-    @@For:
-      ManakaiDOM:ManakaiDOM3
-  @DOMMain:implementFeature:
-    @@@:
-      DOMCore:MDOMCoreFeature10
-    @@For:
-      ManakaiDOM:ManakaiDOM1
-  @DOMMain:implementFeature:
-    @@@:
-      DOMCore:MDOMCoreFeature20
-    @@For:
-      ManakaiDOM:ManakaiDOM2
-  @DOMMain:implementFeature:
-    @@@:
-      DOMCore:MDOMCoreFeature30
-    @@For:
-      ManakaiDOM:ManakaiDOM3
-  @DOMMain:implementFeature:
-    @@@:
-      DOMXML:MDOMXMLFeature10
-    @@For:
-      ManakaiDOM:ManakaiDOM1
-  @DOMMain:implementFeature:
-    @@@:
-      DOMXML:MDOMXMLFeature20
-    @@For:
-      ManakaiDOM:ManakaiDOM2
-  @DOMMain:implementFeature:
-    @@@:
-      DOMXML:MDOMXMLFeature30
-    @@For:
-      ManakaiDOM:ManakaiDOM3
+IFCls1Def:
+  @IFQName: DOMImplementation
+  @ClsQName: ManakaiDOMImplementation
 
-  @Spec:
-    @@DOM3:
-      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-102161490
-  @Description:
-    @@lang:en
-    @@@:
-      This interface provides a number of methods for performing 
-      operations that are independent of any particular instance 
-      of the document object model.
+  @enDesc:
+    The <IF::DOMImplementation> interface provides a number
+    of methods for performing operations that are independent
+    of any particular instance of the document object model.
 
-  ## For DOM Level 3
-  @ISA:
-    @@@:
-      DOMMetaImpl:ManakaiDOMMinimumImplementationIF::ManakaiDOM:ManakaiDOMLatest
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM3 ManakaiDOM:ForIF
-  
-  @ISA:
-    @@@:
-      DOMMetaImpl:ManakaiDOMMinimumImplementation
-    @@ForCheck:
-      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM3
+  @ClsISA:
+    @@@: DOMFeature|ManakaiMinimumImplementation
+    @@For: ManakaiDOM|DOM3
+  @ClsISA:
+    @@@: DOMFeature|ManakaiMinimumImplementation||ManakaiDOM|ManakaiDOMLatest
+    @@For: !ManakaiDOM|DOM3
 
-  ## For DOM Levels 1 and 2
-  @ISA:
-    @@@: ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl
-    @@ForCheck:
-      ManakaiDOM:ForClass !ManakaiDOM:ManakaiDOM3 ManakaiDOM:ManakaiDOM
-  @ISA:
-    @@@:
-      ManakaiDOM:ManakaiDOMObject
-    @@ForCheck:
-      ManakaiDOM:ForClass !ManakaiDOM:ManakaiDOM3 ManakaiDOM:ManakaiDOM
+  @ClsISA: ManakaiDOM|ManakaiDOMObject
 
   @DISLang:role:
     @@@:
@@ -2342,25 +2582,10 @@ IF:
     @@@: CoreFeature30
     @@ForCheck:
       ManakaiDOM:DOM3
-  @DOMMetaImpl:provideFeature:
-    @@@: MDOMCoreFeature10
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM1
-  @DOMMetaImpl:provideFeature:
-    @@@: MDOMCoreFeature20
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM2
-  @DOMMetaImpl:provideFeature:
-    @@@: MDOMCoreFeature30
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM3
 
   @Method:
+    @@ForCheck: !ManakaiDOM|ForClass
      @@Name:  hasFeature
-     @@Spec:
-       @@@DOM3[list]:
-         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-5CED94D7
-         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DOMFeatures
      @@Description:
        @@@lang:en
        @@@@:
@@ -2371,12 +2596,12 @@ IF:
         @@@Name:  feature
         @@@Type:
           DOMMain:DOMString
-        @@@actualType:
-          ManakaiDOM:ManakaiDOMFeatureName
+        @@@actualType: DOMFeature|FeatureNameString
         @@@Description:
           @@@@lang:en
           @@@@@: 
-            A name of feature to test, with an optional <CHAR::PLUS SIGN>.
+            A name of feature to test, with an optional <CHAR::PLUS SIGN>
+            prefix.
         
         @@@ImplNote:
           @@@@lang:en
@@ -2396,14 +2621,19 @@ IF:
               The DOM XML feature.
               This is one of the allowed values in DOM Level 1 First Edition.
         @@@InCase:
-          @@@@Label: XML 1.0 Name
+          @@@@Label:
+            @@@@@@:
+              XML 1.0 <CODE::Name>
+            @@@@@lang:en
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
               Only an XML 1.0 Name is allowed in DOM Level 1 Second Edition 
               and DOM Level 2.
         @@@InCase:
-          @@@@Label: Reversed Internet domain name
+          @@@@Label:
+            @@@@@@: Reversed Internet domain name
+            @@@@@lang:en
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
@@ -2418,9 +2648,7 @@ IF:
           @@@@Label:
             @@@@@lang:en
             @@@@@@:
-              The feature name prepended by the PLUS SIGN ("+")
-          @@@@Type: 
-            DOMMain:DOMString
+              Feature name preceeded by a <CODE::PLUS SIGN>
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
@@ -2477,7 +2705,7 @@ IF:
               DOM Level 3.
      @@Return:
         @@@Type:  
-          DOMMain:boolean
+          DOMMain:boolean||ManakaiDOM|all
         @@@Description:
           @@@@lang:en
           @@@@@: 
@@ -2492,10 +2720,7 @@ IF:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: The feature is not implemented.
-        @@@disDef:
-          @@@@DISPerl:cloneCode:
-            DOMMetaImpl:ManakaiDOMMinimumImplementation
-            ::ManakaiDOM:ManakaiDOMLatest.hasFeature
+
   @Method:
      @@Name:  createDocumentType
      @@Description:
@@ -2632,6 +2857,7 @@ IF:
             lang:dis
           @@@@DOMMain:raiseException:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
+
   @Method:
      @@Name:  createDocument
      @@Description:
@@ -3010,6 +3236,7 @@ IF:
        ManakaiDOM:DOM2
         
   @Method:
+    @@ForCheck: !ManakaiDOM|ForClass
      @@Name:  getFeature
      @@Description:
         @@@lang:en
@@ -3020,8 +3247,7 @@ IF:
         @@@Name:  feature
         @@@Type:
           DOMMain:DOMString
-        @@@actualType:
-          ManakaiDOM:ManakaiDOMFeatureName
+        @@@actualType: FeatureNameString
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -3030,11 +3256,13 @@ IF:
         ## TODO: Move to DOMMain
         @@@InCase: 
           @@@@Label: 
-            The feature name prepended by the <CHAR::PLUS SIGN> (<DOM::+>)
+            @@@@@@:
+              Feature name preceeded by a <CHAR::PLUS SIGN>
+            @@@@@lang:en
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              An <CHAR::PLUS SIGN> before the feature name is ignored.
+              The <CHAR::PLUS SIGN> is ignored.
      @@Param:
         @@@Name:  version
         @@@Type:
@@ -3080,34 +3308,6 @@ IF:
           @@@@@: 
             There is no object available that implements interfaces 
             associated with the <P::feature> and <P::version>. 
-        @@@disDef:
-          @@@@DISPerl:cloneCode:
-            DOMMetaImpl:ManakaiDOMMinimumImplementation
-            ::ManakaiDOM:ManakaiDOMLatest.getFeature
-
-  @IntMethod:
-    @@Name:new
-    @@Description:
-      @@@lang:en
-      @@@@:
-        Constructs a new instance of <Class::ManakaiDOMImplementation> 
-        class. 
-    @@Return:
-      @@@Type: DOMImplementation
-      @@@actualType: ManakaiDOMImplementation
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The newly created DOM implementation object.
-      @@@PerlDef:
-        my $node = <ClassM::ManakaiNode|ManakaiNodeStem||ManakaiDOM|Perl.new>;
-        __CODE{getNodeRef::
-          $object => $node,
-          $ref => $r,
-          $class => {ref $self ? ref $self : $self},
-        }__;
-        $node->{<Q::ManakaiDOM:implID>} = $node->{<Q::TreeCore:nodeID>};
-      
 ##DOMImplementation
 
 ResourceDef:
@@ -3186,7 +3386,7 @@ IF:
      @@Const:
         @@@Name:  ELEMENT_NODE
         @@@Type:  
-          DOMMain:unsigned-short
+          DOMMain:unsigned-short||ManakaiDOM|all
         @@@Value:  1
         @@@Description:
           @@@@lang:en
@@ -3194,8 +3394,6 @@ IF:
             The node is an <IF::Element>.
      @@Const:
         @@@Name:  ATTRIBUTE_NODE
-        @@@Type:  
-          DOMMain:unsigned-short
         @@@Value:  2
         @@@Description:
           @@@@lang:en
@@ -3203,8 +3401,6 @@ IF:
             The node is an <IF::Attr>.
      @@Const:
         @@@Name:  TEXT_NODE
-        @@@Type:  
-          DOMMain:unsigned-short
         @@@Value:  3
         @@@Description:
           @@@@lang:en
@@ -3212,8 +3408,6 @@ IF:
             The node is a <IF::Text>.
      @@Const:
         @@@Name:  CDATA_SECTION_NODE
-        @@@Type:  
-          DOMMain:unsigned-short
         @@@Value:  4
         @@@Description:
           @@@@lang:en
@@ -3221,8 +3415,6 @@ IF:
             The node is a <IF::DOMXML:CDATASection>.
      @@Const:
         @@@Name:  ENTITY_REFERENCE_NODE
-        @@@Type:  
-          DOMMain:unsigned-short
         @@@Value:  5
         @@@Description:
           @@@@lang:en
@@ -3230,8 +3422,6 @@ IF:
             The node is an <IF::DOMXML:EntityReference>.
      @@Const:
         @@@Name:  ENTITY_NODE
-        @@@Type:  
-          DOMMain:unsigned-short
         @@@Value:  6
         @@@Description:
           @@@@lang:en
@@ -3239,8 +3429,6 @@ IF:
             The node is an <IF::DOMXML:Entity>.
      @@Const:
         @@@Name:  PROCESSING_INSTRUCTION_NODE
-        @@@Type:  
-          DOMMain:unsigned-short
         @@@Value:  7
         @@@Description:
           @@@@lang:en
@@ -3248,8 +3436,6 @@ IF:
             The node is a <IF::DOMXML:ProcessingInstruction>.
      @@Const:
         @@@Name:  COMMENT_NODE
-        @@@Type:  
-          DOMMain:unsigned-short
         @@@Value:  8
         @@@Description:
           @@@@lang:en
@@ -3257,8 +3443,6 @@ IF:
             The node is a <IF::Comment>.
      @@Const:
         @@@Name:  DOCUMENT_NODE
-        @@@Type:  
-          DOMMain:unsigned-short
         @@@Value:  9
         @@@Description:
           @@@@lang:en
@@ -3266,8 +3450,6 @@ IF:
             The node is a <IF::Document>.
      @@Const:
         @@@Name:  DOCUMENT_TYPE_NODE
-        @@@Type:  
-          DOMMain:unsigned-short
         @@@Value:  10
         @@@Description:
           @@@@lang:en
@@ -3275,8 +3457,6 @@ IF:
             The node is a <IF::DOMXML:DocumentType>.
      @@Const:
         @@@Name:  DOCUMENT_FRAGMENT_NODE
-        @@@Type:  
-          DOMMain:unsigned-short
         @@@Value:  11
         @@@Description:
           @@@@lang:en
@@ -3284,13 +3464,11 @@ IF:
             The node is a <IF::DocumentFragment>.
      @@Const:
         @@@Name:  NOTATION_NODE
-        @@@Type:  
-          DOMMain:unsigned-short
         @@@Value:  12
         @@@Description:
           @@@@lang:en
           @@@@@: 
-            The node is a <IF::DOMXMLNotation>.
+            The node is a <IF::DOMXML:Notation>.
   @Attr:
      @@Name:  nodeName
      @@Description:
@@ -3370,7 +3548,7 @@ IF:
      @@IsFinal: -1
      @@Get:
         @@@Type:  
-          DOMMain:unsigned-short
+          DOMMain:unsigned-short||ManakaiDOM|all
         @@@actualType: ManakaiDOMNodeType
         @@@Description:
           @@@@lang:en
@@ -4687,7 +4865,7 @@ IF:
        @@@lang:en
        @@@@: Return whether this node has any children.
      @@Return:
-        @@@Type:  
+        @@@Type: 
           DOMMain:boolean::ManakaiDOM:all
         @@@InCase:
           @@@@Value: true
@@ -4805,7 +4983,7 @@ IF:
      @@L2:
      @@Return:
         @@@Type:  
-          DOMMain:boolean
+          DOMMain:boolean||ManakaiDOM|all
         @@@PerlDef:
           my $plus = $feature =~ s/^\+// ? 1 : 0;
           if ($<Class::DOMCore:ManakaiDOMNode
@@ -4985,8 +5163,7 @@ IF:
        @@@@:
          Return whether this node has any attributes.
      @@Return:
-        @@@Type:  
-          DOMMain:boolean
+        @@@Type: DOMMain|boolean||ManakaiDOM|all
         @@@InCase:
           @@@@Value:true
           @@@@Description:
@@ -5148,7 +5325,7 @@ IF:
      @@Name:  compareDocumentPosition
      @@Return:
         @@@Type:  
-          DOMMain:unsigned-short
+          DOMMain:unsigned-short||ManakaiDOM|all
         @@@actualType: ManakaiDOMDocumentPosition
         @@@Exception[list]:  DOMException
      @@Param:
@@ -5401,8 +5578,7 @@ IF:
           @@@@lang:en
           @@@@@: The node to test against.
      @@Return:
-        @@@Type:  
-          DOMMain:boolean
+        @@@Type:  DOMMain|boolean||ManakaiDOM|all
         @@@InCase:
           @@@@Value: true
           @@@@Description:
@@ -5518,8 +5694,7 @@ IF:
           @@@@@:
             The namespace URI to look for.
      @@Return:
-        @@@Type:  
-          DOMMain:boolean
+        @@@Type:  DOMMain|boolean||ManakaiDOM|all
         @@@InCase:
           @@@@Value:true
           @@@@Description:
@@ -5645,8 +5820,7 @@ IF:
               \
             } 
      @@Return:
-        @@@Type:  
-          DOMMain:boolean
+        @@@Type:  DOMMain|boolean||ManakaiDOM|all
         @@@InCase:
           @@@@Value:true
           @@@@Description:
@@ -5843,7 +6017,7 @@ IF:
          \
            Optional properties: <Q::infoset:localName>, <Q::infoset:prefix>,
            <Q::DOMCore:ownerDocument> (required for an <IF::Node> whose 
-           type is other than <IF::Document> and <IF::DocumentType>), 
+           type is other than <IF::Document> and <IF::DOMXML:DocumentType>), 
            <Q::infoset:namespaceName>, <Q::DOMCore:name>,
            <Q::DOMCore:read-only>.
 
@@ -6298,7 +6472,7 @@ ClassDef:
       The extended internal interface for the "ManakaiDOMNodeObject" 
       object used as a "Node".
 
-  @IntMethod:
+  @IntMethodC:
     @@Name: contentBaseURI
     @@Description:
       @@@lang:en
@@ -6307,7 +6481,7 @@ ClassDef:
         this node should be resolved, as per the XML Base Specification.
     @@Param:
       @@@Name:useInfosetProperty
-      @@@Type:boolean
+      @@@Type:DOMMain|boolean||ManakaiDOM|all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -6456,7 +6630,7 @@ ClassDef:
       @@@@:
         ISSUE: More study required for the base URI of document type- 
         or entity-related node types.
-  @IntMethod:
+  @IntMethodC:
     @@Name:htmlBaseURI
     @@Description:
       @@@lang:en
@@ -6556,8 +6730,8 @@ ClassDef:
        @@@@ImplNote:
          @@@@@lang:en
          @@@@@@:
-           ISSUE: How treat base URI of <IF::DocumentType>, ...
-  @IntMethod:
+           ISSUE: How treat base URI of <IF::DOMXML:DocumentType>, ...
+  @IntMethodC:
     @@Name:lookupNamespacePrefix
     @@Description:
       @@@lang:en
@@ -6662,7 +6836,7 @@ ClassDef:
          Before returning found prefix, the algorithm needs to make 
          sure that the prefix is not redefined.  This is why 
          <P::originalElement> is required.
-  @IntMethod:
+  @IntMethodC:
     @@Name:isDefaultNamespace
     @@Description:
       @@@lang:en
@@ -6688,8 +6862,7 @@ ClassDef:
         @@@@lang:en
         @@@@@: The namespace URI to look for.
     @@Return:
-      @@@Type:
-        DOMMain:boolean
+      @@@Type:DOMMain|boolean||ManakaiDOM|all
       @@@PerlDef:
           if ($self->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
             if (not defined $self->{<Q::infoset:prefix>}) {
@@ -6778,7 +6951,7 @@ ClassDef:
               # false
             }
           } # nodeType
-  @IntMethod:
+  @IntMethodC:
     @@Name:lookupNamespaceURI
     @@Description:
       @@@lang:en
@@ -6916,7 +7089,7 @@ ClassDef:
         @@@@lang:en
         @@@@@:
           Non namespace-aware nodes are ignored <SRC:DOM 3>.
-  @IntMethod:
+  @IntMethodC:
     @@Name:getElementBy
     @@Description:
       @@@lang:en
@@ -6999,7 +7172,7 @@ ClassDef:
               last if $$index == -1;
             }
           }
-  @IntMethod:
+  @IntMethodC:
     @@Name:getElementsBy
     @@Description:
       @@@lang:en
@@ -7061,7 +7234,7 @@ ClassDef:
                    ? $DOCOBJ->{<Q::infoset:version>}
                    : '1.0'
              : null)
-  @IntMethod:
+  @IntMethodC:
     @@Name: isEqualNode
     @@Operator:
       @@@@: ==
@@ -7079,8 +7252,7 @@ ClassDef:
         @@@@lang:en
         @@@@@: Another node object to compare.
     @@Return:
-      @@@Type:
-        DOMMain:boolean
+      @@@Type:DOMMain|boolean||ManakaiDOM|all
       @@@InCase:
         @@@@Value:true
         @@@@Description:
@@ -7099,7 +7271,7 @@ ClassDef:
                  <Code::getWeakRef:: $object = $node,
                                                  $class = $nodeclass>);
 
-  @IntMethod:
+  @IntMethodC:
     @@Name:normalizeText
     @@Description:
       @@@lang:en
@@ -7118,8 +7290,7 @@ ClassDef:
         configuration parameter <CP::normalize-characters> turned on.)
      @@Param:
        @@@Name:fullyNormalize
-       @@@Type:
-         DOMMain:boolean
+       @@@Type:DOMMain|boolean||ManakaiDOM|all
        @@@Description:
          @@@@lang:en
          @@@@@:
@@ -7301,6 +7472,13 @@ ClassDef:
         of normalization. 
 ##ManakaiDOMNodeObjectNode
 
+ElementTypeBinding:
+  @Name: actualType
+  @ElementType:
+    dis:actualType
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
 ForDef:
   @QName:
     DOMCore:ForChildNodeList
@@ -7308,6 +7486,7 @@ ForDef:
     @@lang:en
     @@@:
       For <Class::ManakaiDOMCore:ManakaiDOMChildNodeList> class.
+  @ISA: ManakaiDOM|ForClass
 
 ForDef:
   @QName:
@@ -7316,6 +7495,7 @@ ForDef:
     @@lang:en
     @@@:
       For <Class::ManakaiDOMCore:ManakaiDOMGetElementsNodeList> class.
+  @ISA: ManakaiDOM|ForClass
 
 ResourceDef:
   @QName: getWeakRef
@@ -7495,7 +7675,7 @@ ResourceDef:
      @@Param:
         @@@Name:  index
         @@@Type:  
-          DOMMain:unsigned-long
+          DOMMain:unsigned-long||ManakaiDOM|all
         @@@Description:
           @@@@lang:en
           @@@@@: The index of the item into the collection.
@@ -7553,7 +7733,7 @@ ResourceDef:
     @@Param:
       @@@Name:index
       @@@Type:
-        DOMMain:unsigned-long
+        DOMMain:unsigned-long||ManakaiDOM|all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -7658,7 +7838,7 @@ ResourceDef:
     @@Param:
       @@@Name:index
       @@@Type:
-        DOMMain:unsigned-long
+        DOMMain:unsigned-long||ManakaiDOM|all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -7739,7 +7919,7 @@ ResourceDef:
          The number of nodes in the list.
      @@Get:
         @@@Type:  
-          DOMMain:unsigned-long
+          DOMMain:unsigned-long||ManakaiDOM|all
         @@@PerlDef:
           @@@@ForCheck: ForChildNodeList
           @@@@@:
@@ -7762,12 +7942,12 @@ ResourceDef:
     @@Param:
       @@@Name:count
       @@@Type:
-        DOMMain:unsigned-long
+        DOMMain:unsigned-long||ManakaiDOM|all
       @@@Description:
         @@@@lang:en
         @@@@@: 
           The new length of this list.  If the <P::count> 
-          is smaller than the current <A::length>, <P::count>th or 
+          is smaller than the current <A::.length>, <P::count>th or 
           greater index'th items are removed from this list.  Otherwise, 
           no action.
     @@Return:
@@ -7798,14 +7978,13 @@ ResourceDef:
      @@Param:
        @@@Name:index
        @@@Type:
-         DOMMain:unsigned-long
+         DOMMain:unsigned-long||ManakaiDOM|all
        @@@Description:
          @@@@lang:en
          @@@@@:
            The ordinal index of the item to test. 
      @@Return:
-        @@@Type:  
-          DOMMain:boolean
+        @@@Type:  DOMMain|boolean||ManakaiDOM|all
         @@@PerlDef:
           @@@@ForCheck: ForChildNodeList
           @@@@@:
@@ -7838,8 +8017,7 @@ ResourceDef:
         @@@@@:
           The node list to compare equality with.
     @@Return:
-      @@@Type:
-        DOMMain:boolean
+      @@@Type:DOMMain|boolean||ManakaiDOM|all
       @@@PerlDef:
         @@@@ForCheck: ForChildNodeList
         @@@@@:
@@ -8134,6 +8312,7 @@ ForDef:
     @@lang:en
     @@@:
       For <ClassM::ManakaiDOMCore:ManakaiDOMAttributes> class.
+  @ISA: ManakaiDOM|ForClass
 
 ForDef:
   @QName:
@@ -8142,6 +8321,7 @@ ForDef:
     @@lang:en
     @@@:
       For <ClassM::ManakaiDOMXML:ManakaiDOMEntities> class.
+  @ISA: ManakaiDOM|ForClass
 
 ForDef:
   @QName:
@@ -8150,6 +8330,7 @@ ForDef:
     @@lang:en
     @@@:
       For <ClassM::ManakaiDOMXML:ManakaiDOMNotations> class.
+  @ISA: ManakaiDOM|ForClass
 
 ResourceDef:
   @rdf:type:
@@ -8617,7 +8798,7 @@ ResourceDef:
      @@Param:
         @@@Name:  index
         @@@Type:  
-          DOMMain:unsigned-long
+          DOMMain:unsigned-long||ManakaiDOM|all
         @@@Description:
           @@@@lang:en
           @@@@@: The index of the item into this map.
@@ -8667,7 +8848,7 @@ ResourceDef:
        @@@@: The number of nodes in this map.
      @@Get:
         @@@Type:  
-          DOMMain:unsigned-long
+          DOMMain:unsigned-long||ManakaiDOM|all
         @@@PerlDef:
           @@@@ForCheck:ForAttrMap
           @@@@@:
@@ -9105,8 +9286,7 @@ ResourceDef:
         @@@@@:
           The node list to compare equality with.
     @@Return:
-      @@@Type:
-        DOMMain:boolean
+      @@@Type:DOMMain|boolean||ManakaiDOM|all
       @@@PerlDef:
         @@@@ForCheck:ForAttrMap
         @@@@@:
@@ -9240,16 +9420,14 @@ IF:
          The number of 16-bit units of the "data".
      @@Get:
         @@@Type:  
-          DOMMain:unsigned-long
+          DOMMain:unsigned-long||ManakaiDOM|all
         @@@Description:
           @@@@lang:en
           @@@@@: The number of 16-bit units of the "data".
         @@@PerlDef:
-          __DEEP{
-            $r = <ClassM::DOMMain:ManakaiDOMString.length>
-                               (\$self->{<Q::TreeCore:node>}
-                                      ->{<Q::infoset:content>});
-          }__;
+          $r = CORE::length $self->{<Q::TreeCore:node>}->{<Q::infoset:content>};
+          $r++ while $self->{<Q::TreeCore:node>}->{<Q::infoset:content>}
+                       =~ /[\x{10000}-\x{10FFFF}]/g;
   @Method:
      @@Name:  substringData
      @@Description:
@@ -9259,14 +9437,14 @@ IF:
      @@Param:
         @@@Name:  offset
         @@@Type:  
-          DOMMain:unsigned-long
+          DOMMain:unsigned-long||ManakaiDOM|all
         @@@Description:
           @@@@lang:en
           @@@@@: Start offset of substring to extract.
      @@Param:
         @@@Name:  count
         @@@Type:  
-          DOMMain:unsigned-long
+          DOMMain:unsigned-long||ManakaiDOM|all
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -9302,7 +9480,7 @@ IF:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: An attempt is made to break surrogate pair.
-      @@@PerlDef:
+      @@@ImplNote:
         __DEEP{
           $r = <ClassM::DOMMain:ManakaiDOMString.substring>
                    (\$self->{<Q::TreeCore:node>}
@@ -9344,7 +9522,7 @@ IF:
     @@Param:
       @@@Name: offset
       @@@Type: 
-        DOMMain:unsigned-long
+        DOMMain:unsigned-long||ManakaiDOM|all
       @@@Description:
         @@@@lang:en
         @@@@@: The offset from which to insert.
@@ -9377,7 +9555,7 @@ IF:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: An attempt is made to break surrogate pair.
-      @@@PerlDef:
+      @@@ImplNote:
         if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:read-only>}) {
           __EXCEPTION{
             MDOMX:NOMOD_THIS::
@@ -9404,7 +9582,7 @@ IF:
     @@Param:
       @@@Name: count
       @@@Type: 
-        DOMMain:unsigned-long
+        DOMMain:unsigned-long||ManakaiDOM|all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -9436,7 +9614,7 @@ IF:
           @@@@@lang:en
           @@@@@@: 
             An attempt is made to break surrogate pair.
-      @@@PerlDef:
+      @@@ImplNote:
         if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:read-only>}) {
           __EXCEPTION{
             MDOMX:NOMOD_THIS::
@@ -9457,14 +9635,14 @@ IF:
     @@Param:
       @@@Name: offset
       @@@Type: 
-        DOMMain:unsigned-long
+        DOMMain:unsigned-long||ManakaiDOM|all
       @@@Description:
         @@@@lang:en
         @@@@@: The offset from which to start replacing.
     @@Param:
       @@@Name: count
       @@@Type: 
-        DOMMain:unsigned-long
+        DOMMain:unsigned-long||ManakaiDOM|all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -9502,7 +9680,7 @@ IF:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: An attempt is made to break surrogate pair.
-      @@@PerlDef:
+      @@@ImplNote:
         if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:read-only>}) {
           __EXCEPTION{
             MDOMX:NOMOD_THIS::
@@ -9698,8 +9876,7 @@ IF:
        @@@lang:en
        @@@@: Whether this attribute is specified explicitly in the document.
      @@Get:
-        @@@Type:  
-          DOMMain:boolean
+        @@@Type:  DOMMain|boolean||ManakaiDOM|all
         @@@InCase:
           @@@@Description:
             @@@@@lang:en
@@ -9906,8 +10083,7 @@ IF:
          schema languages than DTD and XML Schema may provide 
          ways to determine whether it is a ID attribute.
      @@Get:
-        @@@Type:  
-          DOMMain:boolean
+        @@@Type:  DOMMain|boolean||ManakaiDOM|all
         @@@InCase:
           @@@@Value:true
           @@@@Description:
@@ -10097,7 +10273,7 @@ IF:
       @@@@: The type of this node.
     @@Get:
       @@@Type: 
-        DOMMain:unsigned-short
+        DOMMain:unsigned-short||ManakaiDOM|all
       @@@actualType: ManakaiDOMNodeType
       @@@InCase:
         @@@@Label: ATTRIBUTE_NODE
@@ -10821,7 +10997,7 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The name (<A::nodeName>) of the attribute to retrieve.
+            The name (<A::Node.nodeName>) of the attribute to retrieve.
      @@Return:
         @@@Type:  Attr
         @@@actualType: ManakaiDOMAttr
@@ -12035,8 +12211,7 @@ IF:
           @@@lang:en
           @@@@: The name of the attribute to look for.
      @@Return:
-        @@@Type:  
-          DOMMain:boolean
+        @@@Type:  DOMMain|boolean||ManakaiDOM|all
         @@@InCase:
           @@@@Value:true
           @@@@Description:
@@ -12093,8 +12268,7 @@ IF:
           @@@@lang:en
           @@@@@: The local name of the attribute to look for.
      @@Return:
-        @@@Type:  
-          DOMMain:boolean
+        @@@Type:  DOMMain|boolean||ManakaiDOM|all
         @@@InCase:
           @@@@Value:true
           @@@@Description:
@@ -12176,8 +12350,7 @@ IF:
           @@@@@: The name of the attribute.
      @@Param:
         @@@Name:  isId
-        @@@Type:  
-          DOMMain:boolean
+        @@@Type:  DOMMain|boolean||ManakaiDOM|all
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -12284,8 +12457,7 @@ IF:
           @@@@@: The local name of the attribute.
      @@Param:
         @@@Name:  isId
-        @@@Type:  
-          DOMMain:boolean
+        @@@Type:  DOMMain|boolean||ManakaiDOM|all
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -12388,8 +12560,7 @@ IF:
           @@@@@: The attribute node.
      @@Param:
         @@@Name:  isId
-        @@@Type:  
-          DOMMain:boolean
+        @@@Type:  DOMMain|boolean||ManakaiDOM|all
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -12729,7 +12900,7 @@ IF:
     @@L1:
     @@Get:
       @@@Type: 
-        DOMMain:unsigned-short
+        DOMMain:unsigned-short||ManakaiDOM|all
       @@@actualType:ManakaiDOMNodeType
       @@@InCase:
         @@@@Label: ELEMENT_NODE
@@ -13105,7 +13276,7 @@ IF:
      @@Param:
         @@@Name:  offset
         @@@Type:  
-          DOMMain:unsigned-long
+          DOMMain:unsigned-long||ManakaiDOM|all
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -13138,7 +13309,7 @@ IF:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: An attempt is made to break surrogate pair.
-      @@@PerlDef:
+      @@@ImplNote:
           my $node = $self->{<Q::TreeCore:node>};
           my $parentNode = $node->{<Q::infoset:parent>};
           if ($node->{<Q::DOMCore:read-only>}) {
@@ -13196,8 +13367,7 @@ IF:
        @@@@:
          Whether this text node contains element content whitespaces.
      @@Get:
-        @@@Type:  
-          DOMMain:boolean
+        @@@Type:  DOMMain|boolean||ManakaiDOM|all
         @@@InCase:
           @@@@Value:true
           @@@@Description:
@@ -13229,7 +13399,8 @@ IF:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         The DOM Level 3 Core Specification is unclear about <IF::CDATASection>s.
+         The DOM Level 3 Core Specification is unclear about 
+         <IF::DOMXML:CDATASection>s.
          They should also be included (c.f. the definition for 
          <A::Text.replaceWholeText>).
          \
@@ -13375,7 +13546,7 @@ IF:
     @@L1:
     @@Get:
       @@@Type: 
-        DOMMain:unsigned-short
+        DOMMain:unsigned-short||ManakaiDOM|all
       @@@InCase:
         @@@@Label: TEXT_NODE
         @@@@Description:
@@ -13550,7 +13721,7 @@ IF:
     @@L1:
     @@Get:
       @@@Type: 
-        DOMMain:unsigned-short
+        DOMMain:unsigned-short||ManakaiDOM|all
       @@@InCase:
         @@@@Label: COMMENT_NODE
         @@@@Description:
@@ -13870,7 +14041,7 @@ IFDef:
      @@Param:
         @@@Name:  derivationMethod
         @@@Type:  
-          DOMMain:unsigned-long
+          DOMMain:unsigned-long||ManakaiDOM|all
         @@@actualType: DerivationMethods
         @@@Description:
           @@@@lang:en
@@ -13878,8 +14049,7 @@ IFDef:
             The type of derivation and conditions applied between 
             two types.
      @@Return:
-        @@@Type:  
-          DOMMain:boolean
+        @@@Type:  DOMMain|boolean||ManakaiDOM|all
         @@@InCase:
           @@@@Value:true
           @@@@Description:
@@ -13999,7 +14169,7 @@ IFDef:
      @@Param:
         @@@Name:  operation
         @@@Type:  
-          DOMMain:unsigned-short
+          DOMMain:unsigned-short||ManakaiDOM|all
         @@@actualType: OperationType
         @@@Description:
           @@@@lang:en
@@ -14110,7 +14280,7 @@ IF:
           @@@@lang:en
           @@@@@:
             Warning.  It will not cause the processing stop unless 
-            "DOMErrorHandler.handleError" returns "false".
+            <M::DOMErrorHandler.handleError> returns <DOM::false>.
      @@Const:
         @@@Name:  SEVERITY_ERROR
         @@@Value:  2
@@ -14119,7 +14289,7 @@ IF:
           @@@@@:
             Error.  It may not cause the processing to stop 
             if the error can be recovered, unless 
-            "DOMErrorHandler.handleError" returns "false".
+            <M::DOMErrorHandler.handleError> returns <DOM::false>.
      @@Const:
         @@@Name:  SEVERITY_FATAL_ERROR
         @@@Value:  3
@@ -14127,7 +14297,7 @@ IF:
           @@@@lang:en
           @@@@@:
             Fatal error.  It will cause the normal processing to stop.  
-            The return value of "DOMErrorHandler.handleError" is 
+            The return value of <M::DOMErrorHandler.handleError> is 
             ignored unless the implementation chooses to continue, 
             in which case the behavior becomes undefined.
   @Attr:
@@ -14138,7 +14308,7 @@ IF:
          The severity of the error.
      @@Get:
         @@@Type:  
-          DOMMain:unsigned-short
+          DOMMain:unsigned-short||ManakaiDOM|all
         @@@actualType:ManakaiDOMErrorSeverity
         @@@PerlDef:
           $r = $self->{<Q::MUErrorCore:def>}->{<Q::DOMCore:severity>};
@@ -14203,7 +14373,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         The related "DOMError.type" dependent data if any.
+         The related <A::DOMError.type> dependent data if any.
      @@Get:
         @@@Type:  
           DOMMain:DOMObject
@@ -14248,7 +14418,7 @@ IF:
       @@@ImplNote:
         @@@@lang:en
         @@@@@:
-          This error is also used by DOM Level 3 LS <IF::LSParser>. 
+          This error is also used by DOM Level 3 LS <IF::DOMLS:LSParser>. 
     @@ErrorDef:
       @@@QName:cdata-section-splitted
       @@@ErrName:cdata-section-splitted
@@ -14414,10 +14584,9 @@ IF:
             The error object that describes the error.
           \
             This object may be reused by the DOM implementation 
-            across multiple calls to the method "handleError".
+            across multiple calls to the method <M::.handleError>.
      @@Return:
-        @@@Type:  
-          DOMMain:boolean
+        @@@Type:  DOMMain|boolean||ManakaiDOM|all
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -14484,8 +14653,8 @@ IFDef:
           @@@@ImplNote:
             @@@@@lang:en
             @@@@@@:
-              "Column" in the DOM 3 Specification should be "line"? 
-              Or this is correct?
+              <QUOTE::Column> in the DOM 3 Specification should be 
+              <QUOTE::line>?  Or is this description correct?
   @Attr:
      @@Name:  columnNumber
      @@Description:
@@ -14712,8 +14881,7 @@ IFDef:
             @@@@@@: 
               \ <DOM::true> will be returned.
      @@Return:
-        @@@Type:  
-          DOMMain:boolean
+        @@@Type:  DOMMain|boolean||ManakaiDOM|all
         @@@InCase:
           @@@@Value:true
           @@@@Description:
@@ -14774,22 +14942,26 @@ IF:
 
   @Description:
     @@lang:en
-    @@@: A "lightweight" or "minimal" "Document" object.
+    @@@:
+      A <QUOTE::lightweight> or <QUOTE::minimal>
+      <IF::Document> object.
   @IntMethod:
     @@Name: newObject
     @@Description:
       @@@lang:en
       @@@@:
-        Construct an object for a new instance of the "DocumentFragment".
+        Construct a node stem for a new instance of the
+        <IF::DocumentFragment> object.
       \
-        Note that this method is for the internal use.  DOM 
-        applications must use the "createDocumentFragment" method 
-        of the "Document" interface to create a new "DocumentFragment".
+        Note that this method is for the internal use.  The DOM 
+        applications must use the <A::Node.createDocumentFragment> method 
+        to create a new <IF::DocumentFragment> object.
     @@Return:
       @@@Type: NodeStem
       @@@Description:
         @@@@lang:en
-        @@@@@: The new object for the "DocumentFragment".
+        @@@@@: 
+          The new node stem object of type <IF::DocumentFragment>.
       @@@PerlDef:
           $r = <ClassM::ManakaiDOMNode.newObject>;
           push @{$r->{<Q::TreeCore:origin>}}, <Q::infoset:parent>;
@@ -14833,8 +15005,7 @@ IF:
             @@@@@@:
               Always <DOM::null> will be returned.
         @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
+          @@@@Value:\
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
@@ -14892,12 +15063,14 @@ IF:
       @@@@: The type of this node.
     @@Get:
       @@@Type: 
-        DOMMain:unsigned-short
+        DOMMain:unsigned-short||ManakaiDOM|all
       @@@InCase:
-        @@@@Label: DOCUMENT_FRAGMENT_NODE
+        @@@@Label:
+          <C::DOMNodeType.DOCUMENT_FRAGMENT_NODE>
         @@@@Description:
           @@@@@lang:en
-          @@@@@@: The node is a "DocumentFragment".
+          @@@@@@:
+            The node is a <IF::DocumentFragment>.
       @@@Def:
         @@@@ContentType:
           lang:dis
@@ -15232,7 +15405,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Create a <IF::CDATASection> node.
+         Create a <IF::DOMXML:CDATASection> node.
      @@Param:
         @@@Name:  data
         @@@Type:  
@@ -15247,7 +15420,7 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@: 
-            The new <IF::CDATASection> object.
+            The newly created <IF::DOMXML:CDATASection> node.
         @@@Exception:
           @@@@Type:DOMException
           @@@@Name:NOT_SUPPORTED_ERR
@@ -15288,7 +15461,7 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Create a <IF::ProcessingInstruction> node.
+         Create a <IF::DOMXML:ProcessingInstruction> node.
      @@Param:
         @@@Name:  target
         @@@Type:  
@@ -15321,7 +15494,7 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The new <IF::ProcessingInstruction> object.
+            The new <IF::DOMXML:ProcessingInstruction> object.
         @@@Exception:
           @@@@Type:DOMException
           @@@@Name:INVALID_CHARACTER_ERR
@@ -15428,13 +15601,14 @@ IF:
      @@Description:
        @@@lang:en
        @@@@:
-         Create an <IF::EntityReference> object.  If the entity referred 
-         is known, the child list of the <IF::EntityReference> is 
-         made the same as that of the corresponding <IF::Entity> node.
+         Create an <IF::DOMXML:EntityReference> object.  If the entity referred 
+         is known, the child list of the <IF::DOMXML:EntityReference> is 
+         made the same as that of the corresponding <IF::DOMXML:Entity> node.
        \
-         NOTE: If any descendant of the <IF::Entity> node has an 
+         {NOTE:: If any descendant of the <IF::DOMXML:Entity> node has an 
          unbound namespace prefix, the corresponding descendant of 
-         the <IF::EntityReference> node created is also unbound.
+         the <IF::DOMXML:EntityReference> node created is also unbound.
+         }
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -15459,7 +15633,7 @@ IF:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The new <IF::EntityReference> object.
+            The new <IF::DOMXML:EntityReference> object.
         @@@Exception:
           @@@@Type:DOMException
           @@@@Name:INVALID_CHARACTER_ERR
@@ -15529,7 +15703,7 @@ IF:
          traversal>.  The DOM Level 3 Specifies it by 
          <QUOTE::in document order> and this makes the ambigiousness.
        \
-         Should <IF::Element> nodes in <IF::Entity> nodes be matched?
+         Should <IF::Element> nodes in <IF::DOMXML:Entity> nodes be matched?
      @@Param:
         @@@Name:  tagname
         @@@Type:  
@@ -15599,8 +15773,8 @@ IF:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         Copied: <A::nodeName>, <A::nodeType>, <A::prefix>, 
-         <A::localName>, <A::namespaceURI>, <A::Entity.publicId>, 
+         Copied: <A::Node.nodeName>, <A::Node.nodeType>, <A::Node.prefix>, 
+         <A::Node.localName>, <A::Node.namespaceURI>, <A::Entity.publicId>, 
          <A::Entity.systemId>, <A::Entity.notationName>, 
          <A::Notation.publicId>, <A::Notation.systemId>, 
          <A::ProcessingInstruction.target>, <A::ProcessingInstruction.data>, 
@@ -15611,7 +15785,8 @@ IF:
          be called with the appropriate parameters before this method 
          returns.
        \
-         <A::parentNode> := <DOM::null>.  <A::Attr.ownerElement> := <DOM::null>. 
+         <A::Node.parentNode> := <DOM::null>.
+         <A::Attr.ownerElement> := <DOM::null>. 
          <A::Attr.specified> := <DOM::true>.
          Specified attribute nodes attached to the <IF::Element> node 
          are imported.  Default attributes are created if exists.
@@ -15623,23 +15798,26 @@ IF:
           @@@@@:
             The node to import.
             \
-            Note that <IF::Document> or <IF::DocumentType> nodes cannot 
+            Note that <IF::Document> or <IF::DOMXML:DocumentType> nodes cannot 
             be imported.
      @@Param:
         @@@Name:  deep
-        @@@Type:  
-          DOMMain:boolean
+        @@@Type:  DOMMain|boolean||ManakaiDOM|all
         @@@Description:
           @@@@lang:en
           @@@@@:
             Whether the subtree under the <P::importedNode> 
             is recursively imported or not.
             \
-            This parameter has no effect on <IF::Attr>, <IF::EntityReference>, 
-            <IF::Notation>, <IF::ProcessingInstruction>, <IF::Text>, 
-            <IF::CDATASection> and <IF::Comment> nodes.  The descendants of 
+            This parameter has no effect on <IF::Attr>,
+            <IF::DOMXML:EntityReference>, 
+            <IF::DOMXML:Notation>, <IF::DOMXML:ProcessingInstruction>,
+            <IF::Text>, 
+            <IF::DOMXML:CDATASection> and <IF::Comment> nodes.
+            The descendants of 
             the <IF::Attr> node are 
-            always imported.  The descendants of the <IF::EntityReference> 
+            always imported.  The descendants of the
+            <IF::DOMXML:EntityReference> 
             node are always not imported.
         @@@InCase:
           @@@@Value:true
@@ -15648,7 +15826,7 @@ IF:
             @@@@@@:
               The descendants are recursively imported if the 
               <P::importedNode> is of <IF::DocumentFragment>, <IF::Element> or 
-              <IF::Entity>.
+              <IF::DOMXML:Entity>.
         @@@InCase:
           @@@@Value:false
           @@@@Description:
@@ -15672,9 +15850,10 @@ IF:
             @@@@@lang:en
             @@@@@@:
               Maybe, if this document is not <Feature::XML> and 
-              the node type is either <IF::ProcessingInstruction>, 
-              <IF::Notation>, <IF::EntityReference>, <IF::Entity> or 
-              <IF::CDATASection>.  And if namespaced nodes are imported?
+              the node type is either <IF::DOMXML:ProcessingInstruction>, 
+              <IF::DOMXML:Notation>, <IF::DOMXML:EntityReference>,
+              <IF::DOMXML:Entity> or 
+              <IF::DOMXML:CDATASection>.  And if namespaced nodes are imported?
         @@@Exception:
           @@@@Type:DOMException
           @@@@Name:INVALID_CHARACTER_ERR
@@ -16390,7 +16569,7 @@ IF:
        @@@@: Default false.
      @@Get:
         @@@Type:  
-          DOMMain:boolean
+          DOMMain:boolean||ManakaiDOM|all
         @@@Def:
           @@@@ContentType:
             lang:dis
@@ -16398,7 +16577,7 @@ IF:
             infoset:standalone
      @@Set:
         @@@Type:  
-          DOMMain:boolean
+          DOMMain:boolean||ManakaiDOM|all
         @@@Description:
           @@@@lang:en
           @@@@@: Whether standalone or not.
@@ -16521,7 +16700,7 @@ IF:
          Whether error checking is enforced or not.
      @@Get:
         @@@Type:  
-          DOMMain:boolean
+          DOMMain:boolean||ManakaiDOM|all
         @@@Def:
           @@@@ContentType:
             lang:dis
@@ -16529,7 +16708,7 @@ IF:
             DOMCore:strictErrorChecking
      @@Set:
         @@@Type:  
-          DOMMain:boolean
+          DOMMain:boolean||ManakaiDOM|all
         @@@Description:
           @@@@lang:en
           @@@@@: Whether error checking is enforced or not.
@@ -16642,11 +16821,11 @@ IF:
          Act as if the document was going through a save and 
          load cycle, putting the document in a "normal" form.
        \
-         - Update the replacement tree of <IF::EntityReference> nodes.
+         - Update the replacement tree of <IF::DOMXML:EntityReference> nodes.
        \
          - Normalize <IF::Text> nodes, as the method <M::Node.normalize> does.
        \
-         - Other normalization specified by the <M::Document.domConfig>.
+         - Other normalization specified by the <A::Document.domConfig>.
        \
          Mutation events, when supported, are generated to reflect  
          the changes occuring on the document.
@@ -16929,7 +17108,7 @@ IF:
       @@@@: The type of this node.
     @@Get:
       @@@Type: 
-        DOMMain:unsigned-short
+        DOMMain:unsigned-short||ManakaiDOM|all
       @@@actualType: ManakaiDOMNodeType
       @@@InCase:
         @@@@Label: DOCUMENT_NODE
@@ -17153,11 +17332,6 @@ PropDef:
         \
        }
 
-ResourceDef:
-  @QName: boolean
-  @AliasFor:
-    DOMMain:boolean::ManakaiDOM:all
-
 ConfigParam:
   @Description:
     @@lang:en
@@ -17179,7 +17353,7 @@ ConfigParam:
   @CParam:
     @@Name: canonical-form
     @@IsSupportRequired:1
-    @@Type: boolean
+    @@Type: DOMMain|boolean||ManakaiDOM|all
     @@InCase:
       @@@Value: true
       @@@Target:
@@ -17211,44 +17385,44 @@ ConfigParam:
       ## From DOM Level 3 Core
       @@@SetParam:
         @@@@Name: entities
-        @@@@Type: boolean
+        @@@@Type: DOMMain|boolean||ManakaiDOM|all
         @@@@Value: false
       @@@SetParam:
         @@@@Name: normalize-characters
-        @@@@Type: boolean
+        @@@@Type: DOMMain|boolean||ManakaiDOM|all
         @@@@Value: false
       @@@SetParam:
         @@@@Name: cdata-sections
-        @@@@Type: boolean
+        @@@@Type: DOMMain|boolean||ManakaiDOM|all
         @@@@Value: false
       @@@SetParam:
         @@@@Name: namespaces
-        @@@@Type: boolean
+        @@@@Type: DOMMain|boolean||ManakaiDOM|all
         @@@@Value: true
       @@@SetParam:
         @@@@Name: namespace-declarations
-        @@@@Type: boolean
+        @@@@Type: DOMMain|boolean||ManakaiDOM|all
         @@@@Value: true
       @@@SetParam:
         @@@@Name: well-formed
-        @@@@Type: boolean
+        @@@@Type: DOMMain|boolean||ManakaiDOM|all
         @@@@Value: true
       @@@SetParam:
         @@@@Name: element-content-whitespace
-        @@@@Type: boolean
+        @@@@Type: DOMMain|boolean||ManakaiDOM|all
         @@@@Value: true
       ## From DOM Level 3 LS
       @@@SetParam:
         @@@@Name:format-pretty-print
-        @@@@Type:boolean
+        @@@@Type:DOMMain|boolean||ManakaiDOM|all
         @@@@Value:false
       @@@SetParam:
         @@@@Name:discade-default-content
-        @@@@Type:boolean
+        @@@@Type:DOMMain|boolean||ManakaiDOM|all
         @@@@Value:false
       @@@SetParam:
         @@@@Name:xml-declaration
-        @@@@Type:boolean
+        @@@@Type:DOMMain|boolean||ManakaiDOM|all
         @@@@Value:false
     @@InCase:
       @@@Value: false
@@ -17260,7 +17434,7 @@ ConfigParam:
   @CParam:
     @@Name: cdata-sections
     @@IsSupportRequired:1
-    @@Type:boolean
+    @@Type:DOMMain|boolean||ManakaiDOM|all
     @@InCase:
       @@@Value: true
       @@@IsSupportRequired:1
@@ -17268,10 +17442,10 @@ ConfigParam:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          Keep <IF::CDATASection> nodes in the document.
+          Keep <IF::DOMXML:CDATASection> nodes in the document.
       @@@SetParam:
-        @@@@Name: canonicel-form
-        @@@@Type:boolean
+        @@@@Name: canonical-form
+        @@@@Type:DOMMain|boolean||ManakaiDOM|all
         @@@@Value:false
     @@InCase:
       @@@Value: false
@@ -17279,13 +17453,13 @@ ConfigParam:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          Transform <IF::CDATASection> nodes in the document into 
+          Transform <IF::DOMXML:CDATASection> nodes in the document into 
           <IF::Text> nodes.  The new <IF::Text> node is then 
           combined with any adjacent <IF::Text> node.
   @CParam:
     @@Name: check-character-normalization
     @@IsSupportRequired
-    @@Type:boolean
+    @@Type:DOMMain|boolean||ManakaiDOM|all
     @@InCase:
       @@@Value: true
       @@@Description:
@@ -17307,7 +17481,7 @@ ConfigParam:
   @CParam:
     @@Name: comments
     @@IsSupportRequired:1
-    @@Type:boolean
+    @@Type:DOMMain|boolean||ManakaiDOM|all
     @@InCase:
       @@@Value:true
       @@@IsSupportRequired:1
@@ -17326,7 +17500,7 @@ ConfigParam:
   @CParam:
     @@Name: datatype-normalization
     @@IsSupportRequired:1
-    @@Type:boolean
+    @@Type:DOMMain|boolean||ManakaiDOM|all
     @@InCase:
       @@@Value:true
       @@@Description:
@@ -17351,7 +17525,7 @@ ConfigParam:
   @CParam:
     @@Name: element-content-whitespace
     @@IsSupportRequired:1
-    @@Type:boolean
+    @@Type:DOMMain|boolean||ManakaiDOM|all
     @@InCase:
       @@@Value:true
       @@@IsSupportRequired:1
@@ -17375,11 +17549,11 @@ ConfigParam:
           whether a <IF::Text> node should be discarded.
       @@@SetParam:
         @@@@Name:canonical-form
-        @@@@Type:boolean
+        @@@@Type:DOMMain|boolean||ManakaiDOM|all
         @@@@Value:false
   @CParam:
     @@Name: entities
-    @@Type:boolean
+    @@Type:DOMMain|boolean||ManakaiDOM|all
     @@IsSupportRequired:1
     @@InCase:
       @@@Value:true
@@ -17388,10 +17562,10 @@ ConfigParam:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          Keep <IF::EntityReferences> nodes in the document.
+          Keep <IF::DOMXML:EntityReferences> nodes in the document.
       @@@SetParam:
         @@@@Name:canonical-form
-        @@@@Type:boolean
+        @@@@Type:DOMMain|boolean||ManakaiDOM|all
         @@@@Value:false
     @@InCase:
       @@@Value:false
@@ -17399,7 +17573,7 @@ ConfigParam:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          Remove all <IF::EntityReference> nodes from the document, 
+          Remove all <IF::DOMXML:EntityReference> nodes from the document, 
           putting the entity expansions directly in their place. 
           <IF::Text> nodes are normalized as defined in 
           <M::Node.normalize>.  Only unexpanded entity references 
@@ -17407,7 +17581,7 @@ ConfigParam:
       @@@ImplNote:
         @@@@lang:en
         @@@@@:
-          This parameter does not affect <IF::Entity> nodes.
+          This parameter does not affect <IF::DOMXML:Entity> nodes.
   @CParam:
     @@Name: error-handler
     @@Type: 
@@ -17448,7 +17622,7 @@ ConfigParam:
   @CParam:
     @@Name: infoset
     @@IsSupportRequired:1
-    @@Type:boolean
+    @@Type:DOMMain|boolean||ManakaiDOM|all
     @@InCase:
       @@@Value:true
       @@@IsSupportRequired:1
@@ -17459,39 +17633,39 @@ ConfigParam:
           XML Infoset Specification.
       @@@SetParam:
         @@@@Name: validate-if-schema
-        @@@@Type: boolean
+        @@@@Type: DOMMain|boolean||ManakaiDOM|all
         @@@@Value:false
       @@@SetParam:
         @@@@Name: entities
-        @@@@Type:boolean
+        @@@@Type:DOMMain|boolean||ManakaiDOM|all
         @@@@Value:false
       @@@SetParam:
         @@@@Name:datatype-normalization
-        @@@@Type:boolean
+        @@@@Type:DOMMain|boolean||ManakaiDOM|all
         @@@@Value:false
       @@@SetParam:
         @@@@Name:cdata-sections
-        @@@@Type:boolean
+        @@@@Type:DOMMain|boolean||ManakaiDOM|all
         @@@@Value:false
       @@@SetParam:
         @@@@Name:namespace-declarations
-        @@@@Type:boolean
+        @@@@Type:DOMMain|boolean||ManakaiDOM|all
         @@@@Value:true
       @@@SetParam:
         @@@@Name:well-formed
-        @@@@Type:boolean
+        @@@@Type:DOMMain|boolean||ManakaiDOM|all
         @@@@Value:true
       @@@SetParam:
         @@@@Name:element-content-whitespace
-        @@@@Type:boolean
+        @@@@Type:DOMMain|boolean||ManakaiDOM|all
         @@@@Value:true
       @@@SetParam:
         @@@@Name:comments
-        @@@@Type:boolean
+        @@@@Type:DOMMain|boolean||ManakaiDOM|all
         @@@@Value:true
       @@@SetParam:
         @@@@Name:namespaces
-        @@@@Type:boolean
+        @@@@Type:DOMMain|boolean||ManakaiDOM|all
         @@@@Value:true
       @@@ImplNote:
         @@@@lang:en
@@ -17525,7 +17699,7 @@ ConfigParam:
              ? true : false;
   @CParam:
     @@Name: namespaces
-    @@Type:boolean
+    @@Type:DOMMain|boolean||ManakaiDOM|all
     @@IsSupportRequired:1
     @@InCase:
       @@@Value:true
@@ -17543,12 +17717,12 @@ ConfigParam:
           Do not perform the namespace processing.
       @@@SetParam:
         @@@@Name:canonical-form
-        @@@@Type:boolean
+        @@@@Type:DOMMain|boolean||ManakaiDOM|all
         @@@@Value:false
   @CParam:
     @@Name: namespace-declarations
     @@IsSupportRequired:1
-    @@Type:boolean
+    @@Type:DOMMain|boolean||ManakaiDOM|all
     @@InCase:
       @@@Value:true
       @@@IsSupportRequired:1
@@ -17568,11 +17742,11 @@ ConfigParam:
           prefixes are retained.
       @@@SetParam:
         @@@@Name:canonical-form
-        @@@@Type:boolean
+        @@@@Type:DOMMain|boolean||ManakaiDOM|all
         @@@@Value:false
   @CParam:
     @@Name: normalize-characters
-    @@Type:boolean
+    @@Type:DOMMain|boolean||ManakaiDOM|all
     @@IsSupportRequired:1
     @@InCase:
       @@@Value:true
@@ -17596,7 +17770,7 @@ ConfigParam:
           the Appendix B of the XML 1.1 Specification.
       @@@SetParam:
         @@@@Name:canonical-form
-        @@@@Type:boolean
+        @@@@Type:DOMMain|boolean||ManakaiDOM|all
         @@@@Value:false
     @@InCase:
       @@@Value:false
@@ -17686,7 +17860,7 @@ ConfigParam:
         @@@@@: No value is provided.
   @CParam:
     @@Name: split-cdata-sections
-    @@Type:boolean
+    @@Type:DOMMain|boolean||ManakaiDOM|all
     @@IsSupportRequired:1
     @@InCase:
       @@@Value:true
@@ -17701,19 +17875,19 @@ ConfigParam:
           When CDATA section is split, a warning is issued with 
           a <A::DOMError.type> equals to <DOM::cdata-sections-splitted> 
           and <A::DOMError.relatedData> equals to the first 
-          <IF::CDATASection> node in document order.
+          <IF::DOMXML:CDATASection> node in document order.
     @@InCase:
       @@@Value:false
       @@@IsSupportRequired:1
       @@@Description:
         @@@@lang:en
         @@@@@:
-          Signal an error if <IF::CDATASection> contains an 
+          Signal an error if <IF::DOMXML:CDATASection> contains an 
           unrepresentable character.
   @CParam:
     @@Name:validate
     @@IsSupportRequired:1
-    @@Type:boolean
+    @@Type:DOMMain|boolean||ManakaiDOM|all
     @@InCase:
       @@@Value:true
       @@@Description:
@@ -17744,7 +17918,7 @@ ConfigParam:
           <DOM::well-formed> to <DOM::true>.
       @@@SetParam:
         @@@@Name: validate-if-schema
-        @@@@Type:boolean
+        @@@@Type:DOMMain|boolean||ManakaiDOM|all
         @@@@Value: false
     @@InCase:
       @@@Value:false
@@ -17760,7 +17934,7 @@ ConfigParam:
           <DOM::validate-if-schema> is <DOM::true>.
   @CParam:
     @@Name:validate-if-schema
-    @@Type:boolean
+    @@Type:DOMMain|boolean||ManakaiDOM|all
     @@IsSupportRequired:1
     @@InCase:
       @@@Value:true
@@ -17773,7 +17947,7 @@ ConfigParam:
           <DOM::validate> set to <DOM::true>.
       @@@SetParam:
         @@@@Name:validate
-        @@@@Type:boolean
+        @@@@Type:DOMMain|boolean||ManakaiDOM|all
         @@@@Value:false
     @@InCase:
       @@@Value:false
@@ -17790,7 +17964,7 @@ ConfigParam:
           <DOM::validate> is <DOM::true>.
   @CParam:
     @@Name:well-formed
-    @@Type:boolean
+    @@Type:DOMMain|boolean||ManakaiDOM|all
     @@IsSupportRequired:1
     @@InCase:
       @@@Value:true
@@ -17808,12 +17982,12 @@ ConfigParam:
           with a <DOM::SEVERITY_ERROR> severity, if necessary.
         \
           - Check if the text content inside <IF::Attr>, <IF::Element>, 
-          <IF::Comment>, <IF::Text> and <IF::CDATASection> nodes for 
+          <IF::Comment>, <IF::Text> and <IF::DOMXML:CDATASection> nodes for 
           invalid characters and generate a <IF::DOMError> of type 
           <DOM::wf-invalid-character>, with a 
           <DOM::SEVERITY_ERROR> severity, if necessary.
         \
-          - Check if the data inside <IF::ProcessingInstruction> nodes 
+          - Check if the data inside <IF::DOMXML:ProcessingInstruction> nodes 
           for invalid characters and generate a <IF::DOMError> 
           of type <DOM::wf-invalid-character>, with a
           <DOM::SEVERITY_ERROR> severity, if necessary.
@@ -17824,7 +17998,7 @@ ConfigParam:
         @@@@@: Do not check for XML well-formedness.
       @@@SetParam:
         @@@@Name:canonical-form
-        @@@@Type:boolean
+        @@@@Type:DOMMain|boolean||ManakaiDOM|all
         @@@@Value:false
 ##ConfigParam:Document
 

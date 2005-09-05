@@ -31,7 +31,7 @@ DAC2PM = $(PERL_) $(DAC2PM_PL) $(DAC2PM_OPTIONS)
 CORE_DAC_FILE = $(MANAKAI_LIB_DIR)manakai/all.dac
 UTIL_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Util/all.dac
 
-DIS_FILES_CORE = DOMMain.dis DOMCore.dis DOMXML.dis DOMLS.dis
+DIS_FILES_CORE = DOMMain.dis DOMCore.dis DOMXML.dis DOMLS.dis DOMFeature.dis
 DIS_FILES_HTML = DOMHTML.dis DOMWebForms.dis
 
 DIS_FILES = DOMMetaImpl.dis $(DIS_FILES_CORE) $(DIS_FILES_HTML)
@@ -41,7 +41,7 @@ _DIS_FILES = \
   DOMEvents.dis DOMViews.dis
 
 GENERATED_FILES = core.dac DOMMain.pm DOMCore.pm DOMXML.pm DOMLS.pm \
-  html.dac DOMHTML.pm DOMWebForms.pm
+  html.dac DOMHTML.pm DOMWebForms.pm DOMFeature.pm
 BOOT_GENERATED_FILES = boot.dac DOMMetaImpl.pm
 
 all: $(GENERATED_FILES)
@@ -54,6 +54,10 @@ core.dac: $(DIS_FILES_CORE) $(DAC_PL) $(CORE_DAC_FILE) \
 
 html.dac: $(DIS_FILES_HTML) $(DAC_PL) core.dac
 	$(DAC)$@ --input-db-file-name="core.dac" DOMHTML.dis
+
+DOMFeature.pm: core.dac $(DAC2PM_PL)
+	$(DAC2PM) $< --module-uri="$(NS_MDOM)DOMFeature" --output-file-path="$@"
+	$(PERL_CHK) $@
 
 DOMMain.pm: core.dac $(DAC2PM_PL)
 	$(DAC2PM) $< --module-uri="$(NS_MDOM)DOMMain" --output-file-path="$@"

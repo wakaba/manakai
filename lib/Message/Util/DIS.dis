@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/09/01 17:07:20 $
+      $Date: 2005/09/05 05:21:12 $
     @@ContentType:
       dis:Date.RCS
   
@@ -70,6 +70,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @DOMMetaImpl:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
   @infoset:
     http://www.w3.org/2001/04/infoset#
   @lang:
@@ -6462,21 +6464,13 @@ ClsDef:
                           ($scls => $r);
             }
 
-            for my $el (@{$self->{src}-><M::ManakaiDISElement
-                                            .disChildElements>
-                             (for_arg => $self->{for},
-                              forp_arg => $self->{forp})}) {
-              if ($el-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest.expandedURI>
-                      eq <Q::dis:AppISA> and
-                  $el-><M::ManakaiDISElement.mediaTypeMatch>
-                            (<Q::lang:Perl>, <Q::lang:Perl>,
-                             for_arg => $self->{for},
-                             forp_arg => $self->{forp})) {
-                my $spack_name = $el-><M::SWCFGNode.value>;
-                $r-><M::PLPack.addISAPackage> ($spack_name);
-                $r-><M::MPLCodeFragment.addRequirePerlModuleName>
+            ## dis:AppISA packages
+            for my $spack_name (@{
+              $self-><AG::ManakaiDISResourceDefinition.plAdditionalISAPackages>
+            }) {
+              $r-><M::PLPack.addISAPackage> ($spack_name);
+              $r-><M::MPLCodeFragment.addRequirePerlModuleName>
                                               ($spack_name);                     
-              }
             }
 
             ## - Implementing interfaces
@@ -6508,7 +6502,7 @@ ClsDef:
                 my $op = $cr-><AG::ManakaiDISResourceDefinition
                                   .plMethodOperator>;
                 my $psub = $cr-><AG::ManakaiDISResourceDefinition
-                                  .plCodeFragment>;
+                                  .plCodeFragment>->clone;
                 if (defined $pname) {
                   if ($r-><M::PLPack.getSub> ($pname)) {
                     __UNDEEP{__EXCEPTION{PERL_SUBROUTINE_ALREADY_DEFINED_ERR::
@@ -6705,6 +6699,30 @@ ClsDef:
             $r = $self->{<Q::plCodeFragment>} = null;
           } # rdf:type
         }__;
+
+  @Attr:
+    @@Name: plAdditionalISAPackages
+    @@enDesc:
+      The current snapshot of the list of additional
+      superclass package names (i.e. <Q::dis:AppISA>
+      attributes values for Perl).
+    @@Type: 
+      Perl:ARRAY::ManakaiDOM:all
+    @@Get:
+      @@@PerlDef:
+            for my $el (@{$self->{src}-><M::ManakaiDISElement
+                                            .disChildElements>
+                             (for_arg => $self->{for},
+                              forp_arg => $self->{forp})}) {
+              if ($el-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest.expandedURI>
+                      eq <Q::dis:AppISA> and
+                  $el-><M::ManakaiDISElement.mediaTypeMatch>
+                            (<Q::lang:Perl>, <Q::lang:Perl>,
+                             for_arg => $self->{for},
+                             forp_arg => $self->{forp})) {
+                push @$r, $el-><M::SWCFGNode.value>;
+              }
+            }
 
   @Method:
     @@Name: getChildResourceByType
@@ -8611,7 +8629,7 @@ ResourceDef:
   @rdf:type:
     ManakaiDOM:IF
   @AliasFor:
-    DOMMetaImpl:ManakaiDOMMinimumImplementationIF::ManakaiDOM:ManakaiDOMLatest
+    DOMFeature:GetFeature::ManakaiDOM:ManakaiDOMLatest
 
 ResourceDef:
   @QName: PLPack

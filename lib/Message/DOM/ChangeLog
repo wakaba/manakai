@@ -1,3 +1,18 @@
+2005-09-04  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMFeature.dis: New module.
+
+	* DOMMetaImpl.dis (ManakaiDOM:ManakaiDOMObject): Removed.
+
+	* DOMMain.dis (ManakaiDOM:ManakaiDOMObject): New.
+	(DOMString, DOMTimeStamp): Now they are not interfaces
+	but datatypes.
+	(DOMUserData, DOMObject, DOMUserData): Now they
+	are subtypes rather than aliases of their "real" type in IDL.
+	
+	* DOMCore.dis (DOMImplementationList, DOMImplementationSource):
+	New interfaces and classes.	
+
 2005-09-01  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMCore.dis (setTextNodeContent): Sets the infoset:parent

@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/09/01 17:07:20 $
+      $Date: 2005/09/05 05:21:12 $
     @@ContentType:
       dis:Date.RCS
   
@@ -71,6 +71,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @DOMMetaImpl:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
   @html3:
     urn:x-suika-fam-cx:markup:ietf:html:3:draft:00:
   @html5:
@@ -1302,9 +1304,19 @@ IFClassDef:
                                {
                                  <Q::ddel:NOTE> => 'H3:note',
                                  <Q::ddel:P> => 'p',
-                               }->{$ln.$ln} || $nsp.$ln));
+                               }->{$ns.$ln} || $nsp.$ln));
               $current-><M::Element.setAttributeNS>
                               (<Q::ddel:>, 'ddel:tag' => 'block');
+              if ({
+                <Q::ddel:NOTE> => true,
+                <Q::html3:note> => true,
+              }->{$ns.$ln} and length $s) {
+                $current = $current-><M::Node.appendChild>
+                          ($ownerDocumentArg-><M::Document.createElementNS>
+                             (<Q::html5:>, 'p'));
+                $current-><M::Element.setAttributeNS>
+                                (<Q::ddel:>, 'ddel:tag' => 'implied');
+              }
               $current-><M::Node.appendChild>
                      ($self-><M::DocumentDISDoc.parseDISDocInlineText>
                        ($namespaceContext, $s,
@@ -1661,6 +1673,7 @@ IFClassDef:
                   <Q::ddel:IF> => <Q::dis:TFQNames>,
                   <Q::ddel:Feature> => <Q::DISCore:NCNameOrQName>,
                   <Q::ddel:M> => <Q::DISPerl:MemRef>,
+                  <Q::ddel:Module> => <Q::dis:TFQNames>,
                   <Q::ddel:Q> => <Q::dis:TypeQName>,
                   <Q::ddel:TYPE> => <Q::dis:TFQNames>,
                   <Q::ddel:WARN> => <Q::DOMMain:XCodeRef>,

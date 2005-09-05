@@ -31,7 +31,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/01 17:07:20 $
+      $Date: 2005/09/05 05:21:11 $
     @@ContentType:
       dis:Date.RCS
 
@@ -66,6 +66,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @DOMMetaImpl:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
   @infoset:
      http://www.w3.org/2001/04/infoset#
   @lang:
@@ -491,7 +493,7 @@ ExceptionDef:
      @@Name:  code
      @@Get:
         @@@Type:
-           DOMMain:unsigned-short
+           DOMMain:unsigned-short||ManakaiDOM|all
         @@@actualType: ManakaiDOMLSExceptionCode
      @@ForCheck: ManakaiDOM|ForIF
 
@@ -516,7 +518,7 @@ ExceptionDef:
      @@Const:
         @@@Name:  PARSE_ERR
         @@@Type:
-           DOMMain:unsigned-short
+           DOMMain:unsigned-short||ManakaiDOM|all
         @@@Value:  81
         @@@Description:
           @@@@lang:en
@@ -526,7 +528,7 @@ ExceptionDef:
      @@Const:
         @@@Name:  SERIALIZE_ERR
         @@@Type:
-           DOMMain:unsigned-short
+           DOMMain:unsigned-short||ManakaiDOM|all
         @@@Value:  82
         @@@Description:
           @@@@lang:en
@@ -818,7 +820,7 @@ IF:
      @@Const:
         @@@Name:  MODE_SYNCHRONOUS
         @@@Type:
-           DOMMain:unsigned-short
+           DOMMain:unsigned-short||ManakaiDOM|all
         @@@Value:  1
         @@@Description:
           @@@@lang:en
@@ -827,7 +829,7 @@ IF:
      @@Const:
         @@@Name:  MODE_ASYNCHRONOUS
         @@@Type:
-           DOMMain:unsigned-short
+           DOMMain:unsigned-short||ManakaiDOM|all
         @@@Value:  2
         @@@Description:
           @@@@lang:en
@@ -842,7 +844,7 @@ IF:
      @@Param:
         @@@Name:  mode
         @@@Type: 
-          DOMMain:unsigned-short
+          DOMMain:unsigned-short||ManakaiDOM|all
         @@@actualType: DOMImplementationLSMode
         @@@InCase:
           @@@@Label:
@@ -1197,7 +1199,7 @@ IF:
      @@Name:  async
      @@Get:
         @@@Type:
-           DOMMain:boolean
+           DOMMain:boolean||ManakaiDOM|all
         @@@InCase:
            @@@@Value:  true
            @@@@Description:
@@ -1214,7 +1216,7 @@ IF:
      @@Name:  busy
      @@Get:
         @@@Type:
-           DOMMain:boolean
+           DOMMain:boolean||ManakaiDOM|all
         @@@InCase:
            @@@@Value:  true
            @@@@Description:
@@ -1363,28 +1365,18 @@ IF:
 
      @@Const:
         @@@Name:  ACTION_APPEND_AS_CHILDREN
-        @@@Type:
-           DOMMain:unsigned-short
         @@@Value:  1
      @@Const:
         @@@Name:  ACTION_REPLACE_CHILDREN
-        @@@Type:
-           DOMMain:unsigned-short
         @@@Value:  2
      @@Const:
         @@@Name:  ACTION_INSERT_BEFORE
-        @@@Type:
-           DOMMain:unsigned-short
         @@@Value:  3
      @@Const:
         @@@Name:  ACTION_INSERT_AFTER
-        @@@Type:
-           DOMMain:unsigned-short
         @@@Value:  4
      @@Const:
         @@@Name:  ACTION_REPLACE
-        @@@Type:
-           DOMMain:unsigned-short
         @@@Value:  5
 
   @Method:
@@ -1398,7 +1390,7 @@ IF:
      @@Param:
         @@@Name:  action
         @@@Type:
-           DOMMain:unsigned-short
+           DOMMain:unsigned-short||ManakaiDOM|all
      @@Return:
         @@@Type:  Node
         @@@Exception:
@@ -1658,7 +1650,7 @@ IF:
      @@Name:  certifiedText
      @@Get:
         @@@Type:
-           DOMMain:boolean
+           DOMMain:boolean||ManakaiDOM|all
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
@@ -1667,7 +1659,7 @@ IF:
           $r = $self->{certified_text};
      @@Set:
         @@@Type:
-           DOMMain:boolean
+           DOMMain:boolean||ManakaiDOM|all
         @@@InCase:
            @@@@Value:  true
            @@@@Description:
@@ -1798,7 +1790,7 @@ IFDef:
         @@@Type:  Element
      @@Return:
         @@@Type:
-           DOMMain:unsigned-short
+           DOMMain:unsigned-short||ManakaiDOM|all
   @Method:
      @@Name:  acceptNode
      @@Param:
@@ -1806,12 +1798,12 @@ IFDef:
         @@@Type:  Node
      @@Return:
         @@@Type:
-           DOMMain:unsigned-short
+           DOMMain:unsigned-short||ManakaiDOM|all
   @Attr:
      @@Name:  whatToShow
      @@Get:
         @@@Type:
-           DOMMain:unsigned-long
+           DOMMain:unsigned-long||ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: PropDef
@@ -2419,7 +2411,7 @@ IFDef:
             The destination.
      @@Return:
         @@@Type:
-           DOMMain:boolean
+           DOMMain:boolean||ManakaiDOM|all
         @@@InCase:
            @@@@Value:  true
            @@@@Description:
@@ -2493,7 +2485,7 @@ IFDef:
           @@@@@:The URI to write to.
      @@Return:
         @@@Type:
-           DOMMain:boolean
+           DOMMain:boolean||ManakaiDOM|all
         @@@InCase:
            @@@@Value:  true
            @@@@Description:
@@ -2729,12 +2721,12 @@ IFDef:
      @@Name:  position
      @@Get:
         @@@Type:
-           DOMMain:unsigned-long
+           DOMMain:unsigned-long||ManakaiDOM|all
   @Attr:
      @@Name:  totalSize
      @@Get:
         @@@Type:
-           DOMMain:unsigned-long
+           DOMMain:unsigned-long||ManakaiDOM|all
 IFDef:
   @Name:  LSLoadEvent
 #  @ISA:
@@ -2761,7 +2753,7 @@ IFDef:
      @@Name:  whatToShow
      @@Get:
         @@@Type:
-           DOMMain:unsigned-long
+           DOMMain:unsigned-long||ManakaiDOM|all
 
 ImplNote:
 #ErrorSet:
@@ -2960,7 +2952,7 @@ ImplNote:
 
   @Param:
     @@Name:discard-default-content
-    @@Type:boolean
+    @@Type:DOMMain|boolean||ManakaiDOM|all
     @@InCase:
       @@@Value:true
       @@@IsSupportRequired:1
@@ -2978,7 +2970,7 @@ ImplNote:
           or DTD) to determine what attributes and content to discard.
       @@@SetParam:
         @@@@Name:canonical-form
-        @@@@Type:boolean
+        @@@@Type:DOMMain|boolean||ManakaiDOM|all
         @@@@Value:false
     @@InCase:
       @@@Value:false
@@ -2990,7 +2982,7 @@ ImplNote:
 
   @Param:
     @@Name:format-pretty-print
-    @@Type:boolean
+    @@Type:DOMMain|boolean||ManakaiDOM|all
     @@InCase:
       @@@Value:true
       @@@Description:
@@ -3008,7 +3000,7 @@ ImplNote:
           Validating implementations should preserve validity.
       @@@SetParam:
         @@@@Name:canonical-form
-        @@@@Type:boolean
+        @@@@Type:DOMMain|boolean||ManakaiDOM|all
         @@@@Value:false
     @@InCase:
       @@@Value:false
@@ -3020,7 +3012,7 @@ ImplNote:
 
   @Param:
     @@Name:ignore-unknown-character-denormalizations
-    @@Type:boolean
+    @@Type:DOMMain|boolean||ManakaiDOM|all
     @@InCase:
       @@@Value:true
       @@@IsSupportRequired:1
@@ -3069,7 +3061,7 @@ ImplNote:
           - <XA::standalone>:: <A::DOMCore:Document.xmlStandalone>.
       @@@SetParam:
         @@@@Name:canonical-form
-        @@@@Type:boolean
+        @@@@Type:DOMMain|boolean||ManakaiDOM|all
         @@@@Value:false
     @@InCase:
       @@@Value:false
