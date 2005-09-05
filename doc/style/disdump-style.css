@@ -1,0 +1,164 @@
+@charset 'iso-2022-jp';
+@import 'http://suika.fam.cx/www/style/html/xhtml.css';
+
+html.dump-module-set-doc-menu,
+html.dump-module-doc-menu,
+html.dump-module-set-doc-menu > body,
+html.dump-module-doc-menu > body {
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+html.dump-module-set-doc-menu h1,
+html.dump-module-doc-menu h1 {
+  -moz-binding: none; /* Disables toc */
+}
+
+html.dump-module-set-doc-menu ul,
+html.dump-module-doc-menu ul,
+html.dump-module-set-doc-menu li,
+html.dump-module-doc-menu li {
+  display: block;
+  list-style-item: none;
+  margin-left: 0;
+  margin-right: 0;
+  line-height: 1.2;
+}
+
+div.section {
+  clear: left;
+}
+
+dd {
+  overflow: visible;
+}
+
+dd > dl {
+ margin: 0;
+}
+
+dd > :first-child > :first-child > p:first-child,
+li > :first-child > :first-child > p:first-child {
+  text-indent: 0;
+}
+
+dd div.memo {
+  margin-left: 1em;
+  margin-right: 0;
+}
+
+dd.dump-extends > ol.dump-extends,
+dd.dump-extends > ol.dump-extends > li.dump-extends,
+dd.dump-implements > ol.dump-extends,
+dd.dump-implements > ol.dump-extends > li.dump-extends {
+  display: block;
+  list-style-type: none;
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 0;
+  padding-right: 0;
+  -moz-binding: none;
+}
+
+dd.dump-implements {
+  padding-left: 0;
+}
+
+ol.dump-extends {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+ol.dump-extends > li.dump-extends {
+/*  display: block;
+  list-style-type: none;
+  margin-left: 0;
+  padding-left: 0;*/
+}
+
+dl.dump-info > dt {
+  display: block;
+  list-style-type: none;
+  margin-left: 0;
+  border-style: none;
+  padding-left: 0;
+  clear: left;
+  font-weight: bolder;
+  font-family: sans-serif;
+}
+
+dl.dump-children-param > dt {
+  display: block;
+  list-style-type: none;
+  clear: left;
+  margin-left: 0;
+  padding-left: 0;
+}
+
+dl.dump-children-return > dt {
+  display: block;
+  margin: 0;
+  border-style: none;
+  padding: 0;
+  float: left;
+  clear: left;
+  width: 7em;
+  overflow: auto;
+}
+
+dl.dump-children-return > dt > span.dump-prefix-datatype {
+  display: none;
+}
+
+dl.dump-children-return > dd {
+  display: block;
+  margin: 0;
+  border-style: none;
+  padding: 0 0 0 8em;
+}
+
+dl.dump-children-case {
+  display: block;
+  margin: 0;
+  border-style: none;
+  padding: 0;
+}
+
+dl.dump-children-case > dt {
+  display: block;
+  margin: 0 0 0 1em;
+  border-style: none;
+  padding: 0;
+  float: left;
+  clear: left;
+  line-height: 1.7;
+}
+
+dl.dump-children-case > dd {
+  display: inline;
+  margin: 0;
+  border-style: none;
+  padding: 0;
+}
+
+dl.dump-children-case > dt:after {
+  content: ":";
+  padding-right: 1em;
+}
+
+a.dump-ref-interface, a.dump-ref-data-type {
+  font-style: italic;
+}
+
+div.note:lang(en) a.dump-ref-interface,
+div.note:lang(en) a.dump-ref-data-type,
+div.note:lang(en) a.dump-ref-class,
+div.note:lang(en) a.dump-ref-module {
+  font-style: normal;
+}
+
+code.perl, code.DOM {
+  -moz-binding: url(http://suika.fam.cx/www/style/text/wrap.xbl#wbr-qname);
+}
