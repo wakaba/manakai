@@ -30,7 +30,7 @@ doc.xml:
 	  --module-uri="$(NS_MDOM)DOMCore" \
 	  --module-uri="$(NS_MDOM)DOMMain" \
 	  --module-uri="$(NS_MDOM)DOMFeature" \
-	  --with-implementators-note
+	  --with-implementators-note > $@
 
 doc-filelist.xml.tmp: doc.xml $(DUMP_STYLESHEET_PATH)
 	$(XALAN) -in $< -xsl $(DUMP_STYLESHEET_PATH) -out $@ -param mode list \
