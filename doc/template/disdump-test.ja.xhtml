@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="iso-2022-jp"?>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja" xml:lang="ja">
+<head>
+  <title>disdump.ja.xsl による変換のテスト</title>
+  <link rel="stylesheet" href="../style/disdump-style.css" media="all"/>
+  
+  <script type="text/javascript">
+  <![CDATA[
+    var sourceDocumentURI = '../doc.xml';
+    var stylesheetDocumentURI = '../template/disdump.ja.xsl';
+    var ddlistStylesheetDocumentURI = '../template/ddlist.ja.xsl';
+    
+    function loadDocument (uri, onload) {
+      var doc = document.implementation.createDocument (null, "dummy", null);
+      doc.addEventListener ("load", function () {onload (doc)}, false);
+      doc.load (uri);
+      return doc;
+    }
+    
+    function t (el) {
+      const ddoct = 'http://suika.fam.cx/~wakaba/archive/2005/8/disdump-xslt#';
+      var xp3 = new XSLTProcessor ();
+      xp3.setParameter (null, 'mode', el.getAttributeNS (ddoct, 'mode'));
+      xp3.setParameter (null, 'uri', el.getAttributeNS (ddoct, 'uri'));
+      loadDocument (sourceDocumentURI, function (srcDoc) {
+        loadDocument (stylesheetDocumentURI, function (doc) {
+          xp3.importStylesheet (doc);
+          var tfra = xp3.transformToFragment (srcDoc, document);
+          
+          var r2 = document.getElementById ('result2');
+          r2.textContent = '';
+          r2.appendChild (tfra);
+        });
+      });
+    }
+  ]]>
+  </script>
+</head>
+
+<body>
+  <h1>disdump.ja.xsl による変換のテスト</h1>
+  
+  <div class="section">
+    <h2>変換モード</h2>
+    <div id="result1" lang="" xml:lang=""/>
+  </div>
+  
+  <div class="section">
+    <h2>変換結果</h2>
+    <div id="result2" lang="" xml:lang=""/>
+  </div>
+
+<script type="text/javascript">
+<![CDATA[
+document.SourceDocument = loadDocument (sourceDocumentURI, function (srcDoc) {
+  var xp = new XSLTProcessor ();
+  loadDocument (stylesheetDocumentURI, function (doc) {
+    xp.importStylesheet (doc);
+    
+    xp.setParameter (null, 'mode', 'list');
+    
+    var tdoc = xp.transformToDocument (srcDoc);
+    
+    loadDocument (ddlistStylesheetDocumentURI, function (ddlistt) {
+      var xp2 = new XSLTProcessor ();
+      xp2.importStylesheet (ddlistt);
+      xp2.setParameter (null, 'mode', 'html-list');
+      document.getElementById ('result1')
+              .appendChild (xp2.transformToFragment (tdoc, document));
+    });
+  });
+});
+
+]]>
+</script>
+</body>
+</html>
+
+<!-- Revision: $Date: 2005/09/05 15:09:58 $ -->
+
+<!-- ***** BEGIN LICENSE BLOCK *****
+   - Copyright 2005 Wakaba <w@suika.fam.cx>.  All rights reserved.
+   -
+   - This program is free software; you can redistribute it and/or 
+   - modify it under the same terms as Perl itself.
+   -
+   - Alternatively, the contents of this file may be used 
+   - under the following terms (the "MPL/GPL/LGPL"), 
+   - in which case the provisions of the MPL/GPL/LGPL are applicable instead
+   - of those above. If you wish to allow use of your version of this file only
+   - under the terms of the MPL/GPL/LGPL, and not to allow others to
+   - use your version of this file under the terms of the Perl, indicate your
+   - decision by deleting the provisions above and replace them with the notice
+   - and other provisions required by the MPL/GPL/LGPL. If you do not delete
+   - the provisions above, a recipient may use your version of this file under
+   - the terms of any one of the Perl or the MPL/GPL/LGPL.
+   -
+   - "MPL/GPL/LGPL":
+   -
+   - The contents of this file are subject to the Mozilla Public License Version
+   - 1.1 (the "License"); you may not use this file except in compliance with
+   - the License. You may obtain a copy of the License at
+   - http://www.mozilla.org/MPL/
+   -
+   - Software distributed under the License is distributed on an "AS IS" basis,
+   - WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+   - for the specific language governing rights and limitations under the
+   - License.
+   -
+   - The Original Code is manakai disdump.
+   -
+   - The Initial Developer of the Original Code is
+   - Wakaba <w@suika.fam.cx>.
+   - Portions created by the Initial Developer are Copyright (C) 2005
+   - the Initial Developer. All Rights Reserved.
+   -
+   - Contributor(s):
+   -   Wakaba <w@suika.fam.cx>
+   -
+   - Alternatively, the contents of this file may be used under the terms of
+   - either the GNU General Public License Version 2 or later (the "GPL"), or
+   - the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+   - in which case the provisions of the GPL or the LGPL are applicable instead
+   - of those above. If you wish to allow use of your version of this file only
+   - under the terms of either the GPL or the LGPL, and not to allow others to
+   - use your version of this file under the terms of the MPL, indicate your
+   - decision by deleting the provisions above and replace them with the notice
+   - and other provisions required by the LGPL or the GPL. If you do not delete
+   - the provisions above, a recipient may use your version of this file under
+   - the terms of any one of the MPL, the GPL or the LGPL.
+   -
+   - ***** END LICENSE BLOCK ***** -->

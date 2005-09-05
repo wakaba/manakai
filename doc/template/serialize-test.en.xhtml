@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+
+<head>
+  <title>A test for serialize.js</title>
+  <link rel="stylesheet" href="http://suika.fam.cx/www/style/html/xhtml"
+      media="all"/>
+  <script type="text/javascript" src="serialize.js"></script>
+  <link rel="copyright" href="http://suika.fam.cx/c/pd" title="Public Domain" />
+</head>
+
+<body>
+
+<p> Test</p>
+
+<div id="result"></div>
+
+<script type="text/javascript">
+window.onload=function(){
+  var xs = new SimpleXMLSerializer ();
+  document.getElementById ('result').appendChild
+    (document.createTextNode (xs.writeToString (document)));
+}</script>
+
+</body>
+
+</html>
+<!-- Comment -->
