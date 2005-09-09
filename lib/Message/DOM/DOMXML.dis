@@ -24,21 +24,19 @@ Module:
       http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-BBACDC08
   @Namespace:     
     http://suika.fam.cx/~wakaba/archive/2004/dom/xml#
-  
-  @Description:
-    @@lang:en
-    @@@:
-      The DOM XML Module (known as Extended Interface in DOM Level 1). 
-      The interfaces defined in this module form 
-      part of the DOM Core specification but objects that expose 
-      these interfaces will never be encounted in an HTML-only 
-      DOM implementation.
-  @ImplNote:
-    @@lang:en
-    @@@:
-      The DOM Core Module (<Feature::Core> feature) and the feature 
-      <Feature::XMLVersion> with version <FeatureVer::1.0> must be supported.
-  
+
+  @enDesc:
+    The DOM <DFN::XML Module>, also known as <DFN::Extended Interface>
+    in DOM Core specification, is a set of interfaces specific 
+    to XML document object model.  Objects that expose these interfaces
+    will never encountered in a DOM implementation that deals
+    only with HTML.
+
+    {NOTE:: Objects in XHTML document might implement these interfaces.
+            In addition, more SGML-like HTML implementation might
+            implement some or all of these interfaces in fact.
+    }
+
   @Author:
     @@FullName:Wakaba
     @@Mail:w@suika.fam.cx
@@ -46,7 +44,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/05 05:21:12 $
+      $Date: 2005/09/09 04:26:05 $
     @@ContentType:
       dis:Date.RCS
 
@@ -55,17 +53,21 @@ Module:
   
   @Require:
     @@Module:
-      @@@Name: DOMCore
+      @@@QName: MDOM|DOMCore
 
 Namespace:
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @doc:
+    http://suika.fam.cx/~wakaba/archive/2005/7/tutorial#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @DOMMetaImpl:
     http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
   @infoset:
      http://www.w3.org/2001/04/infoset#
+  @kwd:
+    http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
   @lang:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
@@ -86,79 +88,71 @@ Namespace:
 
 
 ElementTypeBinding:
-  @Name: IF
-  @ElementType:
+  @Name: NodeTypeDef
+  @ElementType: 
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
-      @@@@:
-        ManakaiDOM:IF
-      @@@ForCheck:
-        ManakaiDOM:ForIF
-    @@rdf:type:
-      @@@@:
-        ManakaiDOM:Class
-      @@@ForCheck:
-        ManakaiDOM:ForClass
-    @@rdf:type:
-      @@@@:
-        dis:MultipleResource
-      @@@ForCheck:
-        !ManakaiDOM:ForClass !ManakaiDOM:ForIF
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
     @@resourceFor:
-      ManakaiDOM:ForIF
-    @@resourceFor:
-      @@@@:
-        ManakaiDOM:ForClass
-      @@@ForCheck:
-        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM ManakaiDOM:DOMXMLFeature
-    @@ForCheck:
-      ManakaiDOM:DOM
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+    @@For: ManakaiDOM|DOM1
+    @@For: =ManakaiDOM|ManakaiDOM
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|IF
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+
     @@ISA:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOM3||ManakaiDOM:ForIF
-      @@@ForCheck:
-        ManakaiDOM:ForIF
-      @@@For:
-        ManakaiDOM:ManakaiDOMLatest
-      @@@ContentType: DISCore|TFPQNames
+      @@@@: DOMCore|Node
+      @@@ForCheck: ManakaiDOM|ForIF
     @@ISA:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOM2||ManakaiDOM:ForIF
-      @@@ForCheck:
-        ManakaiDOM:ForIF
-      @@@For:
-        ManakaiDOM:ManakaiDOM3
-      @@@ContentType: DISCore|TFPQNames
-    @@ISA:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOM1||ManakaiDOM:ForIF
-      @@@ForCheck:
-        ManakaiDOM:ForIF
-      @@@For:
-        ManakaiDOM:ManakaiDOM2
-      @@@ContentType: DISCore|TFPQNames
-    @@ISA:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOM||ManakaiDOM:ForIF
-      @@@ForCheck:
-        ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM1
-      @@@ContentType: DISCore|TFPQNames
+      @@@@:DOMCore| ManakaiDOMNode
+      @@@ForCheck: ManakaiDOM|ForClass
+
     @@Implement:
-      @@@@: ||+||ManakaiDOM|ForIF
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM1||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM2||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM2
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM3||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM3
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
 
-ElementTypeBinding:
-  @Name: ClassDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:Class
-    @@For:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
-
+    @@DOMMain:implementFeature:
+      @@@@: DOMXML|XMLFeature10
+      @@@For: ManakaiDOM|DOM1 ManakaiDOM|DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: DOMXML|XMLFeature20
+      @@@For: ManakaiDOM|DOM2 ManakaiDOM|DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: DOMXML|XMLFeature30
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: DOMXML|XMLVersionFeature10
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: DOMXML|XMLVersionFeature11
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
 
 ElementTypeBinding:
   @Name: Method
@@ -177,7 +171,7 @@ ElementTypeBinding:
     @@rdf:type:
       ManakaiDOM:DOMMethod
     @@ForCheck:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM ManakaiDOM|ForClass
     @@ManakaiDOM:isForInternal: 1
 ElementTypeBinding:
   @Name: ReMethod
@@ -187,7 +181,7 @@ ElementTypeBinding:
     @@rdf:type:
       ManakaiDOM:DOMMethod
     @@ForCheck:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM ManakaiDOM|ForClass
     @@ManakaiDOM:isRedefining: 1
 ElementTypeBinding:
   @Name: Param
@@ -196,10 +190,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMMethodParameter
-ElementTypeBinding:
-  @Name: Exception
-  @ElementType:
-    ManakaiDOM:raises
+
 ElementTypeBinding:
   @Name: Warning
   @ElementType:
@@ -228,7 +219,7 @@ ElementTypeBinding:
     @@rdf:type:
       ManakaiDOM:DOMAttribute
     @@ForCheck:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM ManakaiDOM|ForClass
     @@ManakaiDOM:isForInternal: 1
 ElementTypeBinding:
   @Name: ReAttr
@@ -238,7 +229,7 @@ ElementTypeBinding:
     @@rdf:type:
       ManakaiDOM:DOMAttribute
     @@ForCheck:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM ManakaiDOM|ForClass
     @@ManakaiDOM:isRedefining: 1
 ElementTypeBinding:
   @Name: Get
@@ -377,32 +368,6 @@ FeatureDef:
       @@@lang:en
       @@@@: The Extensible Markup Language (XML) 1.1.
 
-FeatureDef:
-  @featureQName:
-    ManakaiDOM:ManakaiDOMXML
-  @QName: MDOMXMLFeature
-  @FeatureVerDef:
-    @@Version: 1.0
-    @@QName: MDOMXMLFeature10
-    @@DOMMetaImpl:instanceFeatureOf: MDOMXMLFeature
-    @@Description:
-      @@@lang:en
-      @@@@: The Manakai DOM XML Module, Level 1.
-  @FeatureVerDef:
-    @@Version: 2.0
-    @@QName: MDOMXMLFeature20
-    @@DOMMetaImpl:extendFeature: MDOMXMLFeature10
-    @@Description:
-      @@@lang:en
-      @@@@: The Manakai DOM XML Module, Level 2.
-  @FeatureVerDef:
-    @@Version: 3.0
-    @@QName: MDOMXMLFeature30
-    @@DOMMetaImpl:extendFeature: MDOMXMLFeature20
-    @@Description:
-      @@@lang:en
-      @@@@: The Manakai DOM XML Module, Level 3.
-
 ElementTypeBinding:
   @Name: L1
   @ElementType:
@@ -469,48 +434,135 @@ ElementTypeBinding:
       @@@For:
         ManakaiDOM:DOM3
 
-IF:
-  @Name:  
-    @@@: CDATASection
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @Name:
-    @@@: ManakaiDOMCDATASection
-    @@ForCheck: 
-      ManakaiDOM:ForClass
-    @@For:
-      ManakaiDOM:ManakaiDOM
-  @ISA:  
-    @@@: 
-      DOMCore:Text
-    @@ForCheck: 
-      ManakaiDOM:ForIF
-  @ISA:
-    @@@:
-      DOMCore:ManakaiDOMText
-    @@ForCheck:
-      ManakaiDOM:ForClass
-  @Spec:
-    @@DOM3[list]:
-      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-667469212
-  @L1:
+
+ElementTypeBinding:
+  @Name: IFISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: IFQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: enImplNote
+  @ElementType:
+    dis:ImplNote
+  @ShadowContent:
+    @@lang:en
+
+ResourceDef:
+  @rdf:type:
+    @@@: dis|MultipleResource
+    @@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+  @resourceFor: ManakaiDOM|ForIF
+  @resourceFor:
+    @@@: ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+  @For: ManakaiDOM|DOM1
+  @For: =ManakaiDOM|ManakaiDOM
+
+  @IFQName: CDATASection
+  @ClsQName: ManakaiDOMCDATASection
+
+  @rdf:type:
+    @@@: ManakaiDOM|IF
+    @@ForCheck: ManakaiDOM|ForIF
+  @rdf:type:
+    @@@: ManakaiDOM|Class
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @IFISA: DOMCore|Text
+  @ClsISA: DOMCore|ManakaiDOMText
+
+  @Implement:
+    @@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+  @Implement:
+    @@@: ||ManakaiDOM|ManakaiDOM1||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
+  @Implement:
+    @@@: ||ManakaiDOM|ManakaiDOM2||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM2
+  @Implement:
+    @@@: ||ManakaiDOM|ManakaiDOM3||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM3
+  @Implement:
+    @@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+  @DOMMain:implementFeature:
+    @@@: DOMXML|XMLFeature10
+    @@For: ManakaiDOM|DOM1 ManakaiDOM|DOMXMLFeature
+  @DOMMain:implementFeature:
+    @@@: DOMXML|XMLFeature20
+    @@For: ManakaiDOM|DOM2 ManakaiDOM|DOMXMLFeature
+  @DOMMain:implementFeature:
+    @@@: DOMXML|XMLFeature30
+    @@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+  @DOMMain:implementFeature:
+    @@@: DOMXML|XMLVersionFeature10
+    @@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+  @DOMMain:implementFeature:
+    @@@: DOMXML|XMLVersionFeature11
+    @@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
 
   @DISLang:role: 
     @@@:
       DOMCore:CDATASectionRole
     @@DISCore:stopISARecursive:1
 
-  @Description:
-    @@lang:en
-    @@@:
-      The CDATA section, i.e. the marked section with its effective status 
-      of <XML::CDATA>.
-  @ImplNote:
-    @@lang:en
-    @@@: 
-      <IF::CDATASection> is a <IF::Text> is a <IF::CharacterData> is a
-      <IF::Node>.
-  
+  @enDesc:
+    The <IF::CDATASection> interface represents <XML::CDATA>
+    sections in XML documents.  A <IF::CDATASection> object
+    corresponds to a <XML::CDATA> section.  Since <XML::CDATA>
+    sections are physical structure rather than logical structure,
+    they are not found in XML information set -- each character
+    in <XML::CDATA> section are modeled as a <InfoItem::character
+    information item>.
+
+    A <SGML::CDATA> section is a marked section whose effective status
+    is <SGML::CDATA>.  It is the only legal effective status 
+    in XML document instances.  In <SGML::CDATA> sections, 
+    no markup delimiter other than <SGML::MSE>, i.e. <XML::]]<gt>>
+    in XML, is recognized.  In other word, they are used
+    to escape markups in contents of elements.
+
+    {NOTE:: The <IF::CDATASection> interface extends the
+            <IF::DOMCore|Text> interface.
+    }
+
   @ReAttr:
     @@Name: nodeName
     @@Description:
@@ -548,7 +600,10 @@ IF:
       @@@Type: 
         DOMMain:unsigned-short||ManakaiDOM|all
       @@@InCase:
-        @@@@Label: CDATA_SECTION_NODE
+        @@@@Label:
+          @@@@@lang:en
+          @@@@@@:
+            <C::DOMCore|Node.CDATA_SECTION_NODE>
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
@@ -580,7 +635,7 @@ IF:
        @@@lang:en
        @@@@:
          Other properties required to be a legal <IF::CDATASection> object:
-         <Q:DOMCore::ownerDocument>.
+         <Q::DOMCore::ownerDocument>.
          \
          Other available properties: <Q::infoset:parent>, 
          <Q::infoset:content>.
@@ -622,7 +677,7 @@ IF:
         @@@enDesc:
           An object implementing the specialized interfaces.
           Note that the specialized object may or may not
-          implement the <IF::Node> interface.
+          implement the <IF::DOMCore|Node> interface.
         @@@nullCase:
           @@@@enDesc:
             There is no object available that implements
@@ -649,55 +704,45 @@ IF:
             }
 ##CDATASection
 
-IF:
-  @Name:  
-    @@@: DocumentType
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @Name:
-    @@@: ManakaiDOMDocumentType
-    @@ForCheck: 
-      ManakaiDOM:ForClass
-    @@For:
-      ManakaiDOM:ManakaiDOM
-  @ISA:  
-    @@@: 
-      DOMCore:Node
-    @@ForCheck: 
-      ManakaiDOM:ForIF
-  @ISA:
-    @@@:
-      DOMCore:ManakaiDOMNode
-    @@ForCheck:
-      ManakaiDOM:ForClass
-  @Spec:
-    @@DOM3[list]:
-      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-412266927
-  @L1:
+NodeTypeDef:
+  @IFQName: DocumentType
+  @ClsQName: ManakaiDOMDocumentType
 
   @DISLang:role: 
     DOMCore:DocumentTypeRole
 
-  @Description:
-    @@lang:en
-    @@@:
-      A <IF::Node> corresponding to a document type declaration in the XML 
-      document entity or the document type declaration information 
-      item of the XML Infoset.
-    \
-      DOM Levels 1 to 3 do not support editing <IF::DocumentType> nodes so 
-      that all <IF::DocumentType> nodes are read-only.
-    \
-      A <IF::DocumentType> node can be a child of the <IF::Document> node. 
-      DOM Levels 2 or higher allows a <IF::DocumentType> node without 
-      any parent.  <IF::DocumentType> nodes are not able to have 
-      their child nodes (<IF::Entity>s and <IF::Notation>s are defined not 
-      to have any parent node).
+  @enDesc:
+    Objects implementing the <IF::DocumentType> interface represents
+    a document type declaration.  It corresponds to 
+    a <InfoItem::document type declaration information item>
+    in XML information set.
+
+    The DOM interfaces do provide little information on document
+    type declaration of the document.  The DOM specification
+    describes that this is because the effect of namespaces
+    and the various schema language efforts on DTD representation
+    are not cleary undersood.  The <IF::DocumentType> interface
+    only provides lists of general parased entities and
+    notations and they are all read-only.
+
+    A <IF::DocumentType> node can be a child of the <IF::DOMCore|Document> node
+    but it <kwd:MUST> be an elder sibling of the document element node, if any.
+    DOM Level 2 introduces the <M::DOMCore|DOMImplementation.createDocumentType>
+    method which creates a <IF::DocumentType> node which does not
+    bind to any <IF::DOMCore|Document> and that makes <IF::DocumentType>
+    nodes without any parent being allowed.  The <IF::DocumentType>
+    nodes themselves cannot have any children; <IF::Entity> and
+    <IF::Notation> nodes are not defined to have parent.
+
   @Attr:
-     @@Name:  name
-     @@Description:
-       @@@lang:en
-       @@@@: The document type name.
+    @@Name: name
+    @@enDesc:
+      The document type name.
+      
+      {NOTE:: In a valid document, the document type name matches
+              to the element type name of the document element.
+      }
+
      @@DOMMain:isNamespaceUnaware:1
      @@Get:
         @@@Type:  
@@ -729,11 +774,13 @@ IF:
         @@@Type:
           DOMCore:NamedNodeMap
         @@@actualType:
-          ManakaiDOMXML:ManakaiDOMEntities
+          @@@@@:
+            ManakaiDOMXML:ManakaiDOMEntities
+          @@@@ForCheck: ManakaiDOM|ForClass
         @@@Description:
           @@@@lang:en
           @@@@@:
-            A <IF::NamedNodeMap> containing <IF::Entity>s.
+            A <IF::DOMCore|NamedNodeMap> containing <IF::Entity>s.
       @@@PerlDef:
         __CODE{DOMCore|getNodeRef::
           $object => {$self->{<Q::TreeCore:node>}},
@@ -752,11 +799,13 @@ IF:
         @@@Type:
           DOMCore:NamedNodeMap
         @@@actualType:
-          ManakaiDOMXML:ManakaiDOMNotations
+          @@@@@:
+            ManakaiDOMXML:ManakaiDOMNotations
+          @@@@ForCheck: ManakaiDOM|ForClass
         @@@Description:
           @@@@lang:en
           @@@@@:
-            A <IF::NamedNodeMap> containing <IF::Notation>s.
+            A <IF::DOMCore|NamedNodeMap> containing <IF::Notation>s.
       @@@PerlDef:
         __CODE{DOMCore|getNodeRef::
           $object => {$self->{<Q::TreeCore:node>}},
@@ -970,7 +1019,7 @@ IF:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         Properties required for a <IF::Node> to be a legal 
+         Properties required for a <IF::DOMCore|Node> to be a legal 
          <IF::DocumentType>: either <Q::infoset:localName> or 
          <Q::DOMCore:name>, <Q::DOMCore:implementation>, 
          <Q::ManakaiDOM:implID>.
@@ -1016,7 +1065,7 @@ IF:
         @@@enDesc:
           An object implementing the specialized interfaces.
           Note that the specialized object may or may not
-          implement the <IF::Node> interface.
+          implement the <IF::DOMCore|Node> interface.
         @@@nullCase:
           @@@@enDesc:
             There is no object available that implements
@@ -1046,31 +1095,9 @@ IF:
             }
 ##DocumentType
 
-IF:
-  @Name:  
-    @@@: Notation
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @Name:
-    @@@: ManakaiDOMNotation
-    @@ForCheck: 
-      ManakaiDOM:ForClass
-    @@For:
-      ManakaiDOM:ManakaiDOM
-  @ISA:  
-    @@@: 
-      DOMCore:Node
-    @@ForCheck: 
-      ManakaiDOM:ForIF
-  @ISA:
-    @@@:
-      DOMCore:ManakaiDOMNode
-    @@ForCheck:
-      ManakaiDOM:ForClass
-  @Spec:
-    @@DOM3[list]:
-      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-5431D1B9
-  @L1:
+NodeTypeDef:
+  @IFQName: Notation
+  @ClsQName: ManakaiDOMNotation
 
   @DISLang:role: 
     DOMCore:NotationRole
@@ -1304,7 +1331,7 @@ IF:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         Properties required for a <IF::Node> to be a legal 
+         Properties required for a <IF::DOMCore|Node> to be a legal 
          <IF::Notation>: <Q::DOMCore:name>, <Q::DOMCore:ownerDocument>.
          \
          Other available properties: <Q::infoset:declarationBaseURI>, 
@@ -1348,7 +1375,7 @@ IF:
         @@@enDesc:
           An object implementing the specialized interfaces.
           Note that the specialized object may or may not
-          implement the <IF::Node> interface.
+          implement the <IF::DOMCore|Node> interface.
         @@@nullCase:
           @@@@enDesc:
             There is no object available that implements
@@ -1378,31 +1405,9 @@ IF:
             }
 ##Notation
 
-IF:
-  @Name:  
-    @@@: Entity
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @Name:
-    @@@: ManakaiDOMEntity
-    @@ForCheck: 
-      ManakaiDOM:ForClass
-    @@For:
-      ManakaiDOM:ManakaiDOM
-  @ISA:  
-    @@@: 
-      DOMCore:Node
-    @@ForCheck: 
-      ManakaiDOM:ForIF
-  @ISA:
-    @@@:
-      DOMCore:ManakaiDOMNode
-    @@ForCheck:
-      ManakaiDOM:ForClass
-  @Spec:
-    @@DOM3[list]:
-      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-527DCFF2
-  @L1:
+NodeTypeDef:
+  @IFQName: Entity
+  @ClsQName: ManakaiDOMEntity
 
   @DISLang:role: 
     DOMCore:EntityRole
@@ -1745,7 +1750,7 @@ IF:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         Properties required for a <IF::Node> to be a legal 
+         Properties required for a <IF::DOMCore|Node> to be a legal 
          <IF::Entity>: <Q::DOMCore:name>, <Q::DOMCore:ownerDocument>.
          \
          Other available properties: <Q::infoset:declarationBaseURI>, 
@@ -1797,7 +1802,7 @@ IF:
         @@@enDesc:
           An object implementing the specialized interfaces.
           Note that the specialized object may or may not
-          implement the <IF::Node> interface.
+          implement the <IF::DOMCore|Node> interface.
         @@@nullCase:
           @@@@enDesc:
             There is no object available that implements
@@ -1827,29 +1832,9 @@ IF:
             }
 ##Entity
 
-IF:
-  @Name:  
-    @@@: EntityReference
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @Name:
-    @@@: ManakaiDOMEntityReference
-    @@ForCheck: 
-      ManakaiDOM:ForClass
-  @ISA:  
-    @@@: 
-      DOMCore:Node
-    @@ForCheck: 
-      ManakaiDOM:ForIF
-  @ISA:
-    @@@:
-      DOMCore:ManakaiDOMNode
-    @@ForCheck:
-      ManakaiDOM:ForClass
-  @Spec:
-    @@DOM3[list]:
-      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-11C98490
-  @L1:
+NodeTypeDef:
+  @IFQName: EntityReference
+  @ClsQName: ManakaiDOMEntityReference
 
   @DISLang:role: 
     DOMCore:EntityReferenceRole
@@ -1986,7 +1971,7 @@ IF:
      @@ImplNote:
        @@@lang:en
        @@@@:
-         Properties required for a <IF::Node> to be a legal 
+         Properties required for a <IF::DOMCore|Node> to be a legal 
          <IF::EntityReference>: <Q::DOMCore:name>, <Q::DOMCore:ownerDocument>.
          \
          Other available properties: <Q::infoset:declarationBaseURI>, 
@@ -1997,31 +1982,11 @@ IF:
          Other available properties (for external entity): 
          <Q::infoset:baseURI>, <Q::DOMCore:documentURI>, 
          <Q::infoset:publicIdentifier>, <Q::infoset:systemIdentifier>.
-# IF:EntityReference
+##EntityReference
 
-IF:
-  @Name:  
-    @@@: ProcessingInstruction
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @Name:
-    @@@: ManakaiDOMProcessingInstruction
-    @@ForCheck: 
-      ManakaiDOM:ForClass
-  @ISA:  
-    @@@: 
-      DOMCore:Node
-    @@ForCheck: 
-      ManakaiDOM:ForIF
-  @ISA:
-    @@@:
-      DOMCore:ManakaiDOMNode
-    @@ForCheck:
-      ManakaiDOM:ForClass
-  @Spec:
-    @@DOM3[list]:
-      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1004215813
-  @L1:
+NodeTypeDef:
+  @IFQName: ProcessingInstruction
+  @ClsQName: ManakaiDOMProcessingInstruction
 
   @DISLang:role: 
     DOMCore:ProcessingInstructionRole
@@ -2084,10 +2049,9 @@ IF:
           @@@@@:
             The content.  It may contain the <CODE::PIC> (<XML::?<gt>>) but such 
             data result the document in unserializable.
-        @@@Exception:
-          @@@@Type: 
-            DOMCore:DOMException
-          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+        @@@ManakaiDOM:raises:
+          @@@@@:
+            DOMCore:DOMException.NO_MODIFICATION_ALLOWED_ERR
           @@@@Description:
             @@@@@lang:en
             @@@@@@: This node is read-only.
@@ -2177,10 +2141,9 @@ IF:
           DOMMain:DOMString
         @@@actualType:
           DOMMain:ManakaiDOMString
-        @@@Exception:
-          @@@@Type: 
-            DOMCore:DOMException
-          @@@@Name: DOMSTRING_SIZE_ERR
+        @@@ManakaiDOM:raises:
+          @@@@@: 
+            DOMCore:DOMException.DOMSTRING_SIZE_ERR
           @@@@Description:
             @@@@@lang:en
             @@@@@@: 
@@ -2194,10 +2157,9 @@ IF:
           DOMMain:DOMString
         @@@actualType:
           DOMMain:ManakaiDOMString
-        @@@Exception:
-          @@@@Type: 
-            DOMCore:DOMException
-          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+        @@@ManakaiDOM:raises:
+          @@@@@:
+            DOMCore:DOMException.NO_MODIFICATION_ALLOWED_ERR
           @@@@Description:
             @@@@@lang:en
             @@@@@@: 
@@ -2230,10 +2192,9 @@ IF:
           @@@@lang:en
           @@@@@:
             The text content of this node, i.e. the <A::DOMCore:Node.nodeValue>.
-        @@@Exception:
-          @@@@Type: 
-            DOMCore:DOMException
-          @@@@Name: DOMSTRING_SIZE_ERR
+        @@@ManakaiDOM:raises:
+          @@@@@: 
+            DOMCore:DOMException.DOMSTRING_SIZE_ERR
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
@@ -2249,10 +2210,9 @@ IF:
           @@@@lang:en
           @@@@@:
             The new text content of the node.
-        @@@Exception:
-          @@@@Type: 
-            DOMCore:DOMException
-          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+        @@@ManakaiDOM:raises:
+          @@@@@: 
+            DOMCore:DOMException.NO_MODIFICATION_ALLOWED_ERR
           @@@@Description:
             @@@@@lang:en
             @@@@@@: This node is read-only.
@@ -2330,7 +2290,7 @@ IF:
         @@@enDesc:
           An object implementing the specialized interfaces.
           Note that the specialized object may or may not
-          implement the <IF::Node> interface.
+          implement the <IF::DOMCore|Node> interface.
         @@@nullCase:
           @@@@enDesc:
             There is no object available that implements
@@ -2360,5 +2320,3 @@ IF:
               }
             }
 ##ProcessingInstruction
-
-## DOMXML.dis ends here

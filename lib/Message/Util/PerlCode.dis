@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/09/05 05:21:12 $
+      $Date: 2005/09/09 04:26:08 $
     @@ContentType:
       dis:Date.RCS
   
@@ -39,15 +39,10 @@ Module:
       @@@WithFor:
         ManakaiDOM:Perl
     @@Module:
-      @@@Name: DOMMetaImpl
       @@@QName:
         MDOM:DOMFeature
       @@@WithFor:
         ManakaiDOM:ManakaiDOMLatest
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        <Module::MDOM:DOMBoot> or its equivalent is also required.
 
   @DefaultFor: 
     ManakaiDOM:Perl
@@ -73,6 +68,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @infoset:
     http://www.w3.org/2001/04/infoset#
+  @kwd:
+    http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
   @lang:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
@@ -149,14 +146,96 @@ FeatureDef:
       @@@@:
         Perl Code Constructor, version 1.0.
 
+ElementTypeBinding:
+  @Name: IFClsDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor: ManakaiDOM|ForClass
+    @@For: ManakaiDOM|Perl
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|IF
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|Perl||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|Perl
+
+    @@DOMMain:implementFeature: CoreFeature10
+
+ElementTypeBinding:
+  @Name: ClsDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+
+    @@resourceFor: ManakaiDOM|ForClass
+    @@For: ManakaiDOM|Perl
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+
+    @@DOMMain:implementFeature: CoreFeature10
+
+ElementTypeBinding:
+  @Name: caType
+  @ElementType:
+    dis:actualType
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: IFQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: IFISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
 ## -- Classes
 
-ClsDef:
+IFClsDef:
+  @IFQName: PerlCode
   @ClsQName: ManakaiPerlCodeFragment
+
   @ClsISA:
     ManakaiDOM:ManakaiDOMNodeReference::ManakaiDOM:Perl
   @ClsISA:
     dx:ManakaiDefaultExceptionHandler::ManakaiDOM:Perl
+
   @enDesc:
     A class on which another Perl code classes are constructed based. 
 
@@ -165,7 +244,8 @@ ClsDef:
     @@enDesc:
       The parent construction of this object. 
     @@Get:
-      @@@Type: ManakaiPerlCodeFragment
+      @@@Type: PerlCode
+      @@@caType: ManakaiPerlCodeFragment
       @@@nullCase:
         @@@@enDesc:
           This object has no parent. 
@@ -177,7 +257,8 @@ ClsDef:
     @@Name: fileNode
     @@enDesc:
       The root <QUOTE::file> node of the tree to which this node belongs.
-    @@Type: ManakaiPerlCodeFragment
+    @@Type: PerlCode
+    @@caType: ManakaiPerlCodeFragment
     @@Get:
       @@@enDesc:
         The <QUOTE::file> node of the tree.
@@ -254,7 +335,8 @@ ClsDef:
       @@@enDesc:
         New value to replace.
       @@@InCase:
-        @@@@Type:ManakaiPerlCodeFragment
+        @@@@Type: PerlCode
+        @@@@caType: ManakaiPerlCodeFragment
         @@@@enDesc:
           New Perl code fragment to replace by.
       @@@InCase:
@@ -404,7 +486,7 @@ ClsDef:
       by this code fragment, including all descendant nodes. 
     @@Return:
       @@@Type:
-        Perl:hash::ManakaiDOM:all
+        Perl:HASH::ManakaiDOM:all
       @@@enDesc:
         A list of module names.  Note that the list is <EM::dead>; 
         any modification to it does not affect to the code fragment
@@ -507,7 +589,7 @@ ClsDef:
           }
         }
         $r = [grep {$list->{$_}} keys %$list];
-##PerlCodeFragment
+##PerlCode
 
 PropDef:
   @QName: useModuleName
@@ -574,9 +656,15 @@ PropDef:
   @enDesc:
     Node type. 
 
-ClsDef:
+IFClsDef:
+  @IFQName: PerlFile
   @ClsQName: ManakaiPerlFile
+
+  @IFISA: PerlCode
+
+  @IFISA: PerlCodeStatements
   @ClsISA: ManakaiPerlStatementContainer
+
   @enDesc:
     Perl source code files.
 
@@ -627,7 +715,8 @@ ClsDef:
       @@@enDesc:
         The fully-qualified name of the package to create. 
     @@Return:
-      @@@Type: ManakaiPerlPackageScope
+      @@@Type: PerlPackage
+      @@@caType: ManakaiPerlPackageScope
       @@@enDesc:
         The newly created package scope object. 
       @@@PerlDef:
@@ -648,7 +737,8 @@ ClsDef:
       Appends a Perl package scope object.
     @@Param:
       @@@Name: codeArg
-      @@@Type: ManakaiPerlPackageScope
+      @@@Type: PerlPackage
+      @@@caType: ManakaiPerlPackageScope
       @@@enDesc:
         The package to append.
     @@Return:
@@ -695,7 +785,8 @@ ClsDef:
         @@@@enDesc:
           Don't make a new object. 
     @@Return:
-      @@@Type: ManakaiPerlPackageScope
+      @@@Type: PerlPackage
+      @@@caType: ManakaiPerlPackageScope
       @@@enDesc:
         The first package scope object whose name is equal to 
         <P::packageName>.
@@ -745,7 +836,8 @@ ClsDef:
         @@@@enDesc:
           Don't make a new object. 
     @@Return:
-      @@@Type: ManakaiPerlPackageScope
+      @@@Type: PerlPackage
+      @@@caType: ManakaiPerlPackageScope
       @@@enDesc:
         The last package scope object whose name is equal to 
         <P::packageName>.
@@ -964,8 +1056,13 @@ PropDef:
   @enDesc:
     The current code chunk (used for stringify). 
 
-ClsDef:
+IFClsDef:
+  @IFQName: PerlPackage
   @ClsQName: ManakaiPerlPackageScope
+
+  @IFISA: PerlCode
+
+  @IFISA: PerlCodeStatements
   @ClsISA: ManakaiPerlStatementContainer
 
   @enDesc:
@@ -983,6 +1080,7 @@ ClsDef:
         @@@@GetProp: packageName
 
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -1038,7 +1136,8 @@ ClsDef:
         Whether a new subroutine object should be created, 
         if it is not exist, or not. 
     @@Return:
-      @@@Type: ManakaiPerlSub
+      @@@Type: PerlSub
+      @@@caType: ManakaiPerlSub
       @@@enDesc:
         The subroutine object. 
       @@@nullCase:
@@ -1080,7 +1179,8 @@ ClsDef:
                 <A::ManakaiPerlSub.localName> of the <P::subArg>.
     @@Param:
       @@@Name: subArg
-      @@@Type: ManakaiPerlSub
+      @@@Type: PerlSub
+      @@@caType: ManakaiPerlSub
       @@@enDesc:
         The subroutine object.
     @@Return:
@@ -1182,7 +1282,8 @@ ClsDef:
         Whether a new subroutine object should be created, 
         if it is not exist, or not. 
     @@Return:
-      @@@Type: ManakaiPerlSub
+      @@@Type: PerlSub
+      @@@caType: ManakaiPerlSub
       @@@enDesc:
         The subroutine object. 
       @@@nullCase:
@@ -1228,7 +1329,8 @@ ClsDef:
         The name of the opeartor to overload. 
     @@Param:
       @@@Name: subArg
-      @@@Type: ManakaiPerlSub
+      @@@Type: PerlSub
+      @@@caType: ManakaiPerlSub
       @@@enDesc:
         The subroutine object.
     @@Return:
@@ -1521,8 +1623,11 @@ ResourceDef:
                     nomethod 1
     ]}
 
-ClsDef:
+IFClsDef:
+  @IFQName: PerlCodeStatements
   @ClsQName: ManakaiPerlStatementContainer
+
+  @IFISA: PerlCodeUnits
   @ClsISA: ManakaiPerlAnyContainer
   @enDesc:
     A base class for node types that contains zero or more
@@ -1598,7 +1703,8 @@ ClsDef:
       Appends a <Class::ManakaiPerlCodeFragment> object. 
     @@Param:
       @@@Name: codeArg
-      @@@Type: ManakaiPerlCodeFragment
+      @@@Type: PerlCode
+      @@@caType: ManakaiPerlCodeFragment
       @@@enDesc:
         A code fragment object. 
     @@Return:
@@ -1648,7 +1754,8 @@ ClsDef:
       @@@enDesc:
         An unparsed Perl code fragment. 
     @@Return:
-      @@@Type: ManakaiPerlUnparsedCode
+      @@@Type: PerlUnparsedCode
+      @@@caType: ManakaiPerlUnparsedCode
       @@@enDesc:
         The newly created Perl code object. 
       @@@PerlDef:
@@ -1713,7 +1820,8 @@ ClsDef:
     @@enDesc:
       Appends a Perl block code.
     @@Return:
-      @@@Type: ManakaiPerlBlock
+      @@@Type: PerlBlock
+      @@@caType: ManakaiPerlBlock
       @@@enDesc:
         The newly created Perl code object. 
       @@@PerlDef:
@@ -1744,7 +1852,8 @@ ClsDef:
         @@@@enDesc:
           No initial content.
     @@Return:
-      @@@Type: ManakaiPerlStatement
+      @@@Type: PerlStatement
+      @@@caType: ManakaiPerlStatement
       @@@enDesc:
         The newly created Perl code object. 
       @@@PerlDef:
@@ -1772,19 +1881,22 @@ ClsDef:
       Appends a newly created <Class::ManakaiPerlIf> object. 
     @@Param:
       @@@Name: conditionArg
-      @@@Type: ManakaiPerlCodeFragment
+      @@@Type: PerlCode
+      @@@caType: ManakaiPerlCodeFragment
       @@@enDesc:
         Conditoon code fragment object.
     @@Param:
       @@@Name: trueArg
-      @@@Type: ManakaiPerlCodeFragment
+      @@@Type: PerlCode
+      @@@caType: ManakaiPerlCodeFragment
       @@@enDesc:
         A true code fragment object. 
       @@@nullCase:
         @@@@enDesc: No true code.
     @@Param:
       @@@Name: falseArg
-      @@@Type: ManakaiPerlCodeFragment
+      @@@Type: PerlCode
+      @@@caType: ManakaiPerlCodeFragment
       @@@enDesc:
         A false code fragment object. 
       @@@nullCase:
@@ -1852,15 +1964,22 @@ ClsDef:
         $self->{<Q::TreeCore:node>}-><M::MNodeObject.importTree> ($assign);
         $assign->{<Q::pc:parent>} = $self->{<Q::TreeCore:node>};
         push @{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}}, $assign;
-##PerlStatementContainer
+##PerlCodeStatements
 
-ClsDef:
+IFClsDef:
+  @IFQName: PerlSub
   @ClsQName: ManakaiPerlSub
+
+  @IFISA: PerlCode
+
+  @IFISA: PerlCodeStatements
   @ClsISA: ManakaiPerlStatementContainer
+
   @enDesc:
     Perl subroutines. 
   
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -2004,7 +2123,6 @@ ClsDef:
           my $cn = <ClassM::ManakaiPerlCodeFragment.getNodeReference> ($cno);
           $r = 0 + $cn;
         }
-
 ##PerlSub
 
 XParamDef:
@@ -2017,13 +2135,18 @@ XParamDef:
   @enDesc:
     Child node. 
 
-ClsDef:
+IFClsDef:
+  @IFQName: PerlUnparsedCode
   @ClsQName: ManakaiPerlUnparsedCode
+
+  @IFISA: PerlCode
   @ClsISA: ManakaiPerlCodeFragment
+
   @enDesc:
     Unparsed Perl code fragments. 
   
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -2141,13 +2264,18 @@ ClsDef:
         }__;
 ##PerlUnparsedCode
 
-ClsDef:
+IFClsDef:
+  @IFQName: PerlInlineUnparsedCode
   @ClsQName: ManakaiPerlInlineUnparsedCode
+
+  @IFISA: PerlCode
   @ClsISA: ManakaiPerlCodeFragment
+
   @enDesc:
     Unparsed Perl inline code fragments. 
   
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -2222,13 +2350,18 @@ ClsDef:
         $r = $node->{<Q::pc:code>};
 ##PerlInlineUnparsedCode
 
-ClsDef:
+IFClsDef:
+  @IFQName: PerlStringLiteral
   @ClsQName: ManakaiPerlStringLiteral
+
+  @IFISA: PerlCode
   @ClsISA: ManakaiPerlCodeFragment
+
   @enDesc:
     Perl string literal.
   
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -2248,13 +2381,13 @@ ClsDef:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
           push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          $node->{<Q::infoset:data>} = '';
+          $node->{<Q::infoset:content>} = '';
           $node->{<Q::pc:nodeType>} = 'string';
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
             Properties: <Q::pc:nodeType>, <Q::pc:useCharClassName>, 
-               <Q::infoset:data>, <Q::pc:useModuleName>, 
+               <Q::infoset:content>, <Q::pc:useModuleName>, 
                <Q::pc:requireResourceURI>, <Q::pc:requireModuleName>.
 
   @IntCloneMethod:
@@ -2265,7 +2398,7 @@ ClsDef:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
           push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          for my $prop (<Q::infoset:data>) {
+          for my $prop (<Q::infoset:content>) {
             $node->{$prop} = $nodeObject->{$prop};
           }
           $node->{<Q::pc:nodeType>} = 'string';
@@ -2288,11 +2421,11 @@ ClsDef:
     @@Get:
       @@@disDef:
         @@@@GetProp: 
-          infoset:data
+          infoset:content
     @@Set:
       @@@disDef:
         @@@@SetProp: 
-          infoset:data
+          infoset:content
 
   @NumValMethod:
     @@Return:
@@ -2301,7 +2434,7 @@ ClsDef:
       @@@enDesc:
         Numeric value of the Perl code. 
       @@@PerlDef:
-        $r = 0 + $self->{<Q::TreeCore:node>}->{<Q::infoset:data>};
+        $r = 0 + $self->{<Q::TreeCore:node>}->{<Q::infoset:content>};
 
   @ToStringMethod:
     @@Return:
@@ -2311,23 +2444,23 @@ ClsDef:
         Perl code. 
       @@@PerlDef:
         my $node = $self->{<Q::TreeCore:node>};
-        $r = $node->{<Q::infoset:data>};
+        $r = $node->{<Q::infoset:content>};
         $r =~ s/(['\\])/\\$1/g;
         $r = q<'> . $r . q<'>;
 ##PerlStringLiteral
 
-## TODO: -> Separate module
-PropDef:
-  @QName:
-    infoset:data
-
-ClsDef:
+IFClsDef:
+  @IFQName: PerlTokens
   @ClsQName: ManakaiPerlBare
+
+  @IFISA: PerlCode
   @ClsISA: ManakaiPerlCodeFragment
+
   @enDesc:
     Unparsed Perl inline code fragments. 
   
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -2402,13 +2535,19 @@ ClsDef:
         $r = $node->{<Q::pc:code>};
 ##PerlBare
 
-ClsDef:
+IFClsDef:
+  @IFQName: PerlAtom
   @ClsQName: ManakaiPerlAtom
+
+  @IFISA: PerlCode
+
   @ClsISA: ManakaiPerlBare
+
   @enDesc:
     Unparsed Perl atomic code fragments (such as numeric literal). 
   
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -2479,9 +2618,13 @@ ClsDef:
         $r = $node->{<Q::pc:code>};
 ##PerlAtom
 
-ClsDef:
+IFClsDef:
+  @IFQName: PerlVariable
   @ClsQName: ManakaiPerlVariable
+
+  @IFISA: PerlCode
   @ClsISA: ManakaiPerlCodeFragment
+
   @enDesc:
     Unparsed Perl variable. 
     \
@@ -2491,6 +2634,7 @@ ClsDef:
     }
   
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -2673,9 +2817,12 @@ PropDef:
   @enDesc:
     Hash key string.
 
-ClsDef:
+IFClsDef:
+  @IFQName: PerlCodeUnits
   @ClsQName: ManakaiPerlAnyContainer
+
   @ClsISA: ManakaiPerlCodeFragment
+
   @enDesc:
     A base class implemented by both inline container and
     block-level container.
@@ -2707,7 +2854,7 @@ ClsDef:
       @@@PerlDef:
         $r = <ClassM::ManakaiPerlStringLiteral.newObject>;
         my $node = $self->{<Q::TreeCore:node>};
-        $r->{<Q::infoset:data>} = $stringArg;
+        $r->{<Q::infoset:content>} = $stringArg;
         $node-><M::ManakaiDOM:ManakaiDOMNodeObject
                  ::ManakaiDOM:Perl.importTree> ($r);
         push @{$node->{<Q::pc:childNodes>}}, $r;
@@ -2835,13 +2982,20 @@ ClsDef:
         push @{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}}, $assign;
 ##PerlAnyContainer
 
-ClsDef:
+IFClsDef:
+  @IFQName: PerlStatement
   @ClsQName: ManakaiPerlStatement
+
+  @IFISA: PerlCode
+
+  @IFISA: PerlCodeInlines
   @ClsISA: ManakaiPerlInlineContainer
+
   @enDesc:
     Perl statements. 
   
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -2914,13 +3068,17 @@ ClsDef:
         $r .= ";\n" if length $r;
 ##PerlStatement
 
-ClsDef:
+IFClsDef:
+  @IFQName: PerlCodeInlines
   @ClsQName: ManakaiPerlInlineContainer
+
   @ClsISA: ManakaiPerlAnyContainer
+
   @enDesc:
     Unparsed Perl inline code block. 
   
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -2988,7 +3146,8 @@ ClsDef:
       Appends a <Class::ManakaiPerlCodeFragment> object. 
     @@Param:
       @@@Name: codeArg
-      @@@Type: ManakaiPerlCodeFragment
+      @@@Type: PerlCode
+      @@@caType: ManakaiPerlCodeFragment
       @@@enDesc:
         A code fragment object. 
     @@Return:
@@ -3036,7 +3195,8 @@ ClsDef:
       @@@enDesc:
         An unparsed Perl code fragment. 
     @@Return:
-      @@@Type: ManakaiPerlInlineUnparsedCode
+      @@@Type: PerlInlineUnparsedCode
+      @@@caType: ManakaiPerlInlineUnparsedCode
       @@@enDesc:
         The newly created Perl code object. 
       @@@PerlDef:
@@ -3072,13 +3232,20 @@ ClsDef:
         }
 ##PerlInlineContainer
 
-ClsDef:
+IFClsDef:
+  @IFQName: PerlBlock
   @ClsQName: ManakaiPerlBlock
+
+  @IFISA: PerlCode
+
+  @IFISA: PerlCodeStatements
   @ClsISA: ManakaiPerlStatementContainer
+
   @enDesc:
     Perl block-level code block. 
   
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -3186,17 +3353,21 @@ ClsDef:
               if length $r;
           }__;
         }
-
 ##PerlBlock
 
-ClsDef:
+IFClsDef:
+  @IFQName: PerlCodeBlocks
   @ClsQName: ManakaiPerlBlockContainer
+
+  @IFISA: PerlCodeStatements
   @ClsISA: ManakaiPerlStatementContainer
+
   @enDesc:
     Perl block-level code container whose content may or may
     not semantically be self-contained. 
   
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -3305,16 +3476,20 @@ ClsDef:
                           $file-><M::ManakaiPerlFile.getNextChunkNumber>);
           }__;
         }
-
 ##PerlBlockContainer
 
-ClsDef:
+IFClsDef:
+  @IFQName: PerlAssignment
   @ClsQName: ManakaiPerlAssignment
+
+  @IFISA: PerlCode
   @ClsISA: ManakaiPerlCodeFragment
+
   @enDesc:
     Perl variable assignment.
   
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -3389,9 +3564,13 @@ ClsDef:
                 ($node->{<Q::pc:right>})->stringify;
 ##PerlAssignment
 
-ClsDef:
+IFClsDef:
+  @IFQName: PerlIF
   @ClsQName: ManakaiPerlIf
+
+  @IFISA: PerlCode
   @ClsISA: ManakaiPerlCodeFragment
+
   @enDesc:
     Perl variable assignment.
   
@@ -3520,8 +3699,10 @@ ElementTypeBinding:
   @ElementType:
     ManakaiDOM:raises
 
-ClsDef:
+IFClsDef:
+  @IFQName: PCImplementation
   @ClsQName: ManakaiPerlCodeImplementation
+
   @enDesc:
     The class that provides factory methods. 
 
@@ -3532,18 +3713,13 @@ ClsDef:
     DOMMetaImpl:ManakaiAnyImplementationRole
   @DOMMetaImpl:provideFeature: CoreFeature10
 
-  @Role:
-    @@@:
-      DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM
-    @@compat:
-      DOMCore:ManakaiDOMImplementation::ManakaiDOM:ManakaiDOMLatest
-
   @Method:
     @@Name: createPerlFile
     @@enDesc:
       Creates a Perl code file. 
     @@Return:
-      @@@Type: ManakaiPerlFile
+      @@@Type: PerlFile
+      @@@caType: ManakaiPerlFile
       @@@enDesc: A newly created Perl source file object. 
       @@@PerlDef:
         $r = <ClassM::ManakaiPerlFile.newObject>;
@@ -3562,7 +3738,8 @@ ClsDef:
       @@@enDesc:
         The fully-qualified name of the package to create. 
     @@Return:
-      @@@Type: ManakaiPerlPackageScope
+      @@@Type: PerlPackage
+      @@@caType: ManakaiPerlPackageScope
       @@@enDesc:
         The newly created package scope object. 
       @@@PerlDef:
@@ -3573,6 +3750,7 @@ ClsDef:
                  $class => {<ClassName::ManakaiPerlPackageScope>}}__;
 
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name: perlComment
     @@ManakaiDOM:isStatic:1
     @@enDesc:
@@ -3596,6 +3774,7 @@ ClsDef:
         $r = q<## > . $r;
 
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name: rfc3339DateTime
     @@ManakaiDOM:isStatic:1
     @@enDesc:
@@ -3617,6 +3796,7 @@ ClsDef:
                      $time[5] + 1900, $time[4] + 1, @time[3,2,1,0];
 
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name: versionDateTime
     @@ManakaiDOM:isStatic:1
     @@enDesc:
@@ -3705,7 +3885,8 @@ ClsDef:
         @@@@enDesc:
           The subroutine created has no name. 
     @@Return:
-      @@@Type:ManakaiPerlSub
+      @@@Type: PerlSub
+      @@@caType: ManakaiPerlSub
       @@@enDesc: 
         Newly created Perl subroutine object. 
       @@@PerlDef:
@@ -3731,7 +3912,8 @@ ClsDef:
         @@@@enDesc:
           The fragment initially has no code. 
     @@Return:
-      @@@Type:ManakaiPerlUnparsedCode
+      @@@Type: PerlUnparsedCode
+      @@@caType: ManakaiPerlUnparsedCode
       @@@enDesc: 
         Newly created Perl code object. 
       @@@PerlDef:
@@ -3748,7 +3930,8 @@ ClsDef:
     @@enDesc:
       Creates a new <Class::ManakaiPerlInlineContainer> object. 
     @@Return:
-      @@@Type:ManakaiPerlInlineContainer
+      @@@Type: PerlCodeInlines
+      @@@caType: ManakaiPerlInlineContainer
       @@@enDesc: 
         Newly created Perl code object. 
       @@@PerlDef:
@@ -3773,7 +3956,8 @@ ClsDef:
         @@@@enDesc:
           The fragment initially has no code. 
     @@Return:
-      @@@Type:ManakaiPerlInlineUnparsedCode
+      @@@Type: PerlInlineUnparsedCode
+      @@@caType: ManakaiPerlInlineUnparsedCode
       @@@enDesc: 
         Newly created Perl code object. 
       @@@PerlDef:
@@ -3797,7 +3981,8 @@ ClsDef:
       @@@enDesc:
         The code fragment. 
     @@Return:
-      @@@Type:ManakaiPerlBare
+      @@@Type: PerlTokens
+      @@@caType: ManakaiPerlBare
       @@@enDesc: 
         Newly created Perl code object. 
       @@@PerlDef:
@@ -3820,7 +4005,8 @@ ClsDef:
       @@@enDesc:
         The code fragment. 
     @@Return:
-      @@@Type:ManakaiPerlAtom
+      @@@Type: PerlAtom
+      @@@caType: ManakaiPerlAtom
       @@@enDesc: 
         Newly created Perl code object. 
       @@@PerlDef:
@@ -3842,7 +4028,8 @@ ClsDef:
         DISLang:String::ManakaiDOM:all
       @@@enDesc: A string.
     @@Return:
-      @@@Type:ManakaiPerlStringLiteral
+      @@@Type: PerlStringLiteral
+      @@@caType: ManakaiPerlStringLiteral
       @@@enDesc: 
         Newly created Perl code object. 
       @@@PerlDef:
@@ -3889,7 +4076,8 @@ ClsDef:
         is <DOM::null>, the <P::localName> value may be prefixed
         by any possible <P::variableType> value.
     @@Return:
-      @@@Type:ManakaiPerlVariable
+      @@@Type: PerlVariable
+      @@@caType: ManakaiPerlVariable
       @@@enDesc: 
         Newly created Perl variable object. 
       @@@PerlDef:
@@ -3912,7 +4100,8 @@ ClsDef:
     @@enDesc:
       Creates a new <Class::ManakaiPerlBlock> object. 
     @@Return:
-      @@@Type:ManakaiPerlBlock
+      @@@Type: PerlBlock
+      @@@caType: ManakaiPerlBlock
       @@@enDesc: 
         Newly created Perl code object. 
       @@@PerlDef:
@@ -3928,7 +4117,8 @@ ClsDef:
     @@enDesc:
       Creates a new <Class::ManakaiPerlBlockContainer> object. 
     @@Return:
-      @@@Type:ManakaiPerlBlockContainer
+      @@@Type: PerlCodeBlocks
+      @@@caType: ManakaiPerlBlockContainer
       @@@enDesc: 
         Newly created Perl code object. 
       @@@PerlDef:
@@ -3953,7 +4143,8 @@ ClsDef:
         @@@@enDesc:
           No initial content.
     @@Return:
-      @@@Type: ManakaiPerlStatement
+      @@@Type: PerlStatement
+      @@@caType: ManakaiPerlStatement
       @@@enDesc:
         The newly created Perl code object. 
       @@@PerlDef:
@@ -3974,25 +4165,29 @@ ClsDef:
       Creates a <Class::ManakaiPerlIf> object. 
     @@Param:
       @@@Name: conditionArg
-      @@@Type: ManakaiPerlCodeFragment
+      @@@Type: PerlCode
+      @@@caType: ManakaiPerlCodeFragment
       @@@enDesc:
         Conditoon code fragment object.
     @@Param:
       @@@Name: trueArg
-      @@@Type: ManakaiPerlCodeFragment
+      @@@Type: PerlCode
+      @@@caType: ManakaiPerlCodeFragment
       @@@enDesc:
         A true code fragment object. 
       @@@nullCase:
         @@@@enDesc: No true code.
     @@Param:
       @@@Name: falseArg
-      @@@Type: ManakaiPerlCodeFragment
+      @@@Type: PerlCode
+      @@@caType: ManakaiPerlCodeFragment
       @@@enDesc:
         A false code fragment object. 
       @@@nullCase:
         @@@@enDesc: No false code.
     @@Return:
-      @@@Type: ManakaiPerlIf
+      @@@Type: PerlIf
+      @@@caType: ManakaiPerlIf
       @@@RaiseException:
         @@@@@:BAD_CHILD_ERR
         @@@@enDesc:
@@ -4062,7 +4257,7 @@ ClsDef:
             $class =>{<ClassName::ManakaiPerlIf>},
           }__;
         }
-##PerlCodeImplementation
+##PCImplementation
 
 ResourceDef:
   @QName: MNodeObject
@@ -4129,16 +4324,57 @@ PropDef:
 
 ## -- Exceptions
 
-ExceptionDef:
+ResourceDef:
+  @rdf:type:
+    @@@: dis|MultipleResource
+    @@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+  @resourceFor: ManakaiDOM|ForIF
+  @resourceFor: ManakaiDOM|ForClass
+
+  @For: ManakaiDOM|Perl
+
+  @rdf:type:
+    @@@: ManakaiDOM|ExceptionIF
+    @@ForCheck: ManakaiDOM|ForIF
+
+  @rdf:type:
+    @@@: ManakaiDOM|ExceptionClass
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @Implement:
+    @@@: ||ManakaiDOM|Perl||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @DOMMain:implementFeature: CoreFeature10
+
+  @Implement:
+    @@@: DOMMain|ManakaiDOMExceptionIF||ManakaiDOM|Perl
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @ISA:
+    @@@: ManakaiDOM|ManakaiDOMException||ManakaiDOM|Perl
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @IFQName: PCException
   @ClsQName: ManakaiPerlCodeException
+
   @enDesc:
-    Exceptions for the <Module::PerlCode> module.
-  @ClsISA:
-    ManakaiDOM:ManakaiDOMException::ManakaiDOM:Perl
-  @XConstGroupDef:
+    Exceptions for the <Module::Util:PerlCode> module.
+
+  @ResourceDef:
+    @@rdf:type: ManakaiDOM|ConstGroup
+
+    @@IFQName: PCExceptionCode
     @@ClsQName: ManakaiPerlCodeExceptionCode
+    @@PerlName: PCExceptionCode
+
     @@enDesc:
-      Exception codes for <Class::ManakaiPerlCodeException>. 
+      Exception codes for <IF::PCException>. 
+
+    @@Type: DOMMain|unsigned-short||ManakaiDOM|all
+    @@rdfs:subClassOf: DOMMain|unsigned-short||ManakaiDOM|all
+
     @@XConstDef:
       @@@Name: HIERARCHY_REQUEST_ERR
       @@@Value:3
@@ -4185,34 +4421,7 @@ ExceptionDef:
             The operator that is not supported. 
         @@@@enMufDef:
           Operator "%p (name => {<Q::pc:operator>});" is not supported
-
-ElementTypeBinding:
-  @Name: ExceptionDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:ExceptionClass
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:Perl
-      @@@For:
-        !=ManakaiDOM:Perl
-    @@ForCheck:
-      ManakaiDOM:Perl
-    @@DOMMain:implementFeature: CoreFeature10
-
-ElementTypeBinding:
-  @Name: XConstGroupDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:ConstGroup
-    @@Type:
-      DOMMain:unsigned-short::ManakaiDOM:all
-    @@rdfs:subClassOf:
-      DOMMain:unsigned-short::ManakaiDOM:all
+##PCException
 
 ElementTypeBinding:
   @Name: XConstDef
@@ -4229,6 +4438,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:ExceptionOrWarningSubType
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: XParam
@@ -4256,33 +4466,6 @@ ElementTypeBinding:
     @@ContentType:
       lang:muf
     @@lang:en
-
-
-ElementTypeBinding:
-  @Name: ClsDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:Class
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:Perl
-      @@@For:
-        !=ManakaiDOM:Perl
-    @@ForCheck:
-      ManakaiDOM:Perl
-    @@DOMMain:implementFeature: CoreFeature10
-
-ElementTypeBinding:
-  @Name: ClsQName
-  @ElementType:
-    dis:QName
-
-ElementTypeBinding:
-  @Name: ClsISA
-  @ElementType:
-    dis:ISA
 
 ElementTypeBinding:
   @Name: Method
@@ -4339,6 +4522,7 @@ ElementTypeBinding:
         Returns the node object of a deep clone of a node object.
     @@ManakaiDOM:isStatic:1
     @@ManakaiDOM:isForInternal:1
+    @@ForCheck: ManakaiDOM|ForClass
     @@ResourceDef:
       @@@rdf:type:
         DISLang:MethodParameter

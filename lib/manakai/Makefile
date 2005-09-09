@@ -41,7 +41,7 @@ all.dac: $(DIS_FILES) $(DAC_PL)
 	$(DAC).$@.2.tmp --input-db-file-name=".$@.1.tmp" DISMarkup.dis
 	$(DAC).$@.3.tmp --input-db-file-name=".$@.2.tmp" DISIDL.dis
 	$(DAC)$@ --input-db-file-name=".$@.2.tmp" NaturalLanguage.dis
-	$(RM) .$@.1.tmp .$@.2.tmp
+	$(RM) .$@.1.tmp .$@.2.tmp .$@.3.tmp
 
 clean:
 	$(RM) $(GENERATED_FILES) .*.tmp *~ .*~

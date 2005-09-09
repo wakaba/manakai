@@ -21,7 +21,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/05 05:21:12 $
+      $Date: 2005/09/09 04:26:10 $
     @@ContentType:
       dis:Date.RCS
   
@@ -29,6 +29,9 @@ Module:
     @@Module:
       @@@QName: DIS|DISDoc
       @@@WithFor: DIS|ForLatest
+    @@Module:
+      @@@QName: MDOM|DOMCore
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
 
   @DefaultFor: 
     DIS:ForLatest
@@ -322,6 +325,7 @@ IFClassDef:
   @ClsQName: ManakaiDISImplementationDISDump
   
   @ClsISA: DISDoc|ManakaiDISImplementationDISDoc
+  @ClsISA: DOMCore|ManakaiDOMImplementation||ManakaiDOM|ManakaiDOMLatest
 
   @DOMMetaImpl:provideFeature: DIS|Dump10
 
@@ -422,6 +426,16 @@ IFClassDef:
               last $label;
             }
           }
+
+  @Attr:
+    @@Name: ref
+    @@enDesc:
+      If the attribute has a value, the actual description
+      of the resource is found elsewhere referred by the URI.
+    @@ReflectCDATA:
+    @@Get:
+    @@Set:
+    @@DocAttr: refAttr
 ##DISDumpElement
 
 IFClassDef:
@@ -430,6 +444,12 @@ IFClassDef:
   
   @IFISA: DISDumpElement
   @ClsISA: ManakaiDOMDISDumpElement
+  
+  @IFISA: DISDumpElementDescription
+  @ClsISA: ManakaiDOMDISDumpElementDescription
+
+  @IFISA: DISDumpElementRDFClass
+  @ClsISA: ManakaiDOMDISDumpElementRDFClass
 
   @Method:
     @@Name: addURI
@@ -550,6 +570,36 @@ IFClassDef:
 
   @ResourceDef:
     @@ForCheck: ManakaiDOM|ForClass
+    @@QName: createChildByRefURI
+    @@rdf:type: dis2pm|BlockCode
+    @@enDesc:
+      Finds a child resource element by its URI and
+      returns it if exist or creates a new child element otherwise.
+      \
+      Parameters: $namespace, $localName, $uri, $parent, $result.
+    @@PerlDef:
+      __DEEP{
+        C: {
+          for my $__c (@{$parent-><AG::Node.childNodes>}) {
+            if ($__c-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE> and
+                defined $__c-><AG::Node.localName> and
+                $__c-><AG::Node.localName> eq $localName and
+                $__c-><AG::Node.namespaceURI> eq $namespace and
+                $__c-><M::Element.getAttributeNS> (<Q::dump:>, 'ref') eq $uri) {
+              $result = $__c;
+              last C;
+            }
+          }
+          $result = $parent-><AG::Node.ownerDocument>
+                           -><M::Document.createElementNS>
+                             ($namespace, $localName);
+          $result-><M::Element.setAttributeNS> (<Q::dump:>, 'dump:ref', $uri);
+          $parent-><M::Node.appendChild> ($result);
+        } # C
+      }__;
+
+  @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForClass
     @@QName: createChildByPerlName
     @@rdf:type: dis2pm|BlockCode
     @@enDesc:
@@ -603,29 +653,6 @@ IFClassDef:
                            -><M::Document.createElementNS>
                              ($namespace, $localName);
           $parent-><M::Node.appendChild> ($result);
-        } # C
-      }__;
-
-  @Method:
-    @@Name: createDescription
-    @@enDesc:
-      Creates a child <Q::dump:description> element and returns it.
-      If this element already has the element then the element is returned.
-    @@Return:
-      @@@Type: DISDumpElement
-      @@@enDesc:
-        The child <Q::dump:description> element.
-      @@@PerlDef:
-      __DEEP{
-        C: {
-          __CODE{getChildByName::
-            $parent => $self, $result => $r,
-            $namespace => {<Q::dump:>}, $localName => 'description',
-            $label => {C},
-          }__;
-          $r = $self-><AG::Node.ownerDocument>
-                    -><M::Document.createElementNS> (<Q::dump:>, 'description');
-          $self-><M::Node.appendChild> ($r);
         } # C
       }__;
 
@@ -737,17 +764,35 @@ IFClassDef:
     @@Get:
     @@Set:
     @@DocAttr: isPartialAttr
-
-  @Attr:
-    @@Name: resourceReference
-    @@enDesc:
-      If the attribute has a value, the actual description
-      of the resource is found elsewhere referred by the URI.
-    @@ReflectCDATA:
-    @@Get:
-    @@Set:
-    @@DocAttr: refAttr
 ##DISDumpElementResource
+
+IFClassDef:
+  @IFQName: DISDumpElementDescription
+  @ClsQName: ManakaiDOMDISDumpElementDescription
+
+  @Method:
+    @@Name: createDescription
+    @@enDesc:
+      Creates a child <Q::dump:description> element and returns it.
+      If this element already has the element then the element is returned.
+    @@Return:
+      @@@Type: DISDumpElement
+      @@@enDesc:
+        The child <Q::dump:description> element.
+      @@@PerlDef:
+      __DEEP{
+        C: {
+          __CODE{getChildByName::
+            $parent => $self, $result => $r,
+            $namespace => {<Q::dump:>}, $localName => 'description',
+            $label => {C},
+          }__;
+          $r = $self-><AG::Node.ownerDocument>
+                    -><M::Document.createElementNS> (<Q::dump:>, 'description');
+          $self-><M::Node.appendChild> ($r);
+        } # C
+      }__;
+##DISDumpElementDescription
 
 ResourceDef:
   @QName: isPartialAttr
@@ -1247,19 +1292,9 @@ IFClassDef:
         }__;
 ##DISDumpElementExtends
 
-IFClassETDef:
-  @IFQName: DISDumpClassElement
-  @ClsQName: ManakaiDOMDISDumpClassElement
-  @ETQName: dump|class
-
-  @IFISA: DISDumpElementResource
-  @ClsISA: ManakaiDOMDISDumpElementResource
-
-  @IFISA: DISDumpElementClass
-  @ClsISA: ManakaiDOMDISDumpElementClass
-
-  @IFISA: DISDumpElementExtends
-  @ClsISA: ManakaiDOMDISDumpElementExtends
+IFClassDef:
+  @IFQName: DISDumpElementImplements
+  @ClsQName: ManakaiDOMDISDumpElementImplements
 
   @Method:
     @@Name: appendNewImplements
@@ -1283,6 +1318,24 @@ IFClassETDef:
           $r-><M::Element.setAttributeNS>
                          (<Q::dump:>, 'dump:uri' => $uri);
         }__;
+##DISDumpElementImplements
+
+IFClassETDef:
+  @IFQName: DISDumpClassElement
+  @ClsQName: ManakaiDOMDISDumpClassElement
+  @ETQName: dump|class
+
+  @IFISA: DISDumpElementResource
+  @ClsISA: ManakaiDOMDISDumpElementResource
+
+  @IFISA: DISDumpElementClass
+  @ClsISA: ManakaiDOMDISDumpElementClass
+
+  @IFISA: DISDumpElementExtends
+  @ClsISA: ManakaiDOMDISDumpElementExtends
+
+  @IFISA: DISDumpElementImplements
+  @ClsISA: ManakaiDOMDISDumpElementImplements
 ##DISDumpClassElement
 
 IFClassETDef:
@@ -1309,6 +1362,50 @@ IFClassETDef:
       Whether this interface defines an exception interface
       or a general interface.
 ##DISDumpInterfaceElement
+
+IFClassDef:
+  @IFQName: DISDumpElementRDFClass
+  @ClsQName: ManakaiDOMDISDumpElementRDFClass
+
+  @enDesc:
+    The <IF::DISDumpElementRDFClass> interface should be 
+    implemented by element node which is an RDF class (<Q::rdf:Class>).
+
+  @Method:
+    @@Name: appendNewSubClassOf
+    @@enDesc:
+      Adds a superclass of this class.
+    @@Param:
+      @@@Name: uri
+      @@@Type: URI
+      @@@enDesc:
+        The URI of the superclass to add.
+    @@Return:
+      @@@Type: DISDumpSubClassOfElement
+      @@@enDesc:
+        The newly created <XE::dump:subClassOf> element.
+      @@@PerlDef: 
+        __DEEP{
+          $r = $self-><M::Node.appendChild>
+              ($self-><AG::Node.ownerDocument>
+                    -><M::Document.createElementNS>
+                         (<Q::dump:>, 'subClassOf'));
+          $r-><M::Element.setAttributeNS>
+                         (<Q::dump:>, 'dump:ref' => $uri);
+        }__;
+##DISDumpElementRDFClass
+
+IFClassETDef:
+  @IFQName: DISDumpSubClassOfElement
+  @ClsQName: ManakaiDOMDISDumpSubClassOfElement
+  @ETQName: dump|subClassOf
+
+  @IFISA: DISDumpElement
+  @ClsISA: ManakaiDOMDISDumpElement
+
+  @IFISA: DISDumpElementRDFClass
+  @ClsISA: ManakaiDOMDISDumpElementRDFClass
+##DISDumpSubClassOfElement
 
 
 IFClassETDef:
@@ -1344,16 +1441,6 @@ IFClassDef:
   @IFQName: DISDumpElementClassMember
   @ClsQName: ManakaiDOMDISDumpElementClassMember
   
-  @Attr:
-    @@Name: sourceClassURI
-    @@ReflectCDATA:
-    @@DocAttr: sourceClassAttr
-    @@enDesc:
-      The URI of the class in which this member is originally defined
-      or declared, or <DOM::null> if it is defined in this class.
-    @@Get:
-    @@Set:
-
   @Method:
     @@Name: appendNewOverrides
     @@enDesc:
@@ -1389,6 +1476,9 @@ IFClassETDef:
 
   @IFISA: DISDumpElementClassMember
   @ClsISA: ManakaiDOMDISDumpElementClassMember
+
+  @IFISA: DISDumpElementImplements
+  @ClsISA: ManakaiDOMDISDumpElementImplements
 
   @Attr:
     @@Name: disReturn
@@ -1464,6 +1554,9 @@ IFClassETDef:
 
   @IFISA: DISDumpElementClassMember
   @ClsISA: ManakaiDOMDISDumpElementClassMember
+
+  @IFISA: DISDumpElementImplements
+  @ClsISA: ManakaiDOMDISDumpElementImplements
 
   @Attr:
     @@Name: disGet
@@ -1610,20 +1703,69 @@ IFClassDef:
   @ClsQName: ManakaiDOMDISDumpElementRaises
 
   @Method:
-    @@Name: appendRaises
+    @@Name: createRaises
     @@enDesc:
       Creates an element for a <QUOTE::raises>.
-    @@Return:
-      @@@Type: DISDumpRaisesElement
+    @@Param:
+      @@@Name: classURI
+      @@@Type: URI
       @@@enDesc:
-        The newly created element.
+        The URI of the resource for the exception interface or class.
+    @@Param:
+      @@@Name: codeURI
+      @@@Type: URI
+      @@@enDesc:
+        The URI of the resource for the exception code.
+      @@@nullCase:
+        @@@@enDesc:
+          No code information.
+    @@Param:
+      @@@Name: subCodeURI
+      @@@Type: URI
+      @@@enDesc:
+        The URI of the resource for the exception subcode.
+      @@@nullCase:
+        @@@@enDesc:
+          No code information.
+    @@Return:
+      @@@Type: DISDumpElement
+      @@@enDesc:
+        The newly created element.  If <P::subCodeURI> is specified,
+        it is a <XE::dump|raisesSubCode> element.  If not specified 
+        but <P::codeURI> is specified, it is a <XE::dump|raisesCode>
+        element.  Otherwise, it is a <XE::dump|raises> element.
       @@@PerlDef:
-        __DEEP{
-          $r = $self-><AG::Node.ownerDocument>
-                    -><M::Document.createElementNS>
-                          (<Q::dump:>, 'raises');
-          $self-><M::Node.appendChild> ($r);
+        my $iel;
+        __CODE{createChildByRefURI::
+          $namespace => {<Q::dump:>},
+          $localName => 'raises',
+          $uri => $classURI,
+          $parent => $self,
+          $result => $iel,
         }__;
+        my $cel;
+        if (defined $codeURI) {
+          __CODE{createChildByRefURI::
+           $namespace => {<Q::dump:>},
+            $localName => 'raisesCode',
+            $uri => $codeURI,
+            $parent => $iel,
+            $result => $cel,
+          }__;
+          if (defined $subCodeURI) {
+            __CODE{createChildByRefURI::
+             $namespace => {<Q::dump:>},
+              $localName => 'raisesSubCode',
+              $uri => $subCodeURI,
+              $parent => $cel,
+              $result => $r,
+            }__;
+          } else {
+            $r = $cel;
+          }
+        } else {
+          $r = $iel;
+        }
 ##DISDumpElementRaises
 
 
@@ -1768,42 +1910,32 @@ IFClassETDef:
   @ClsISA: ManakaiDOMDISDumpElementValue
 ##DISDumpCaseElement
 
-
 IFClassETDef:
   @IFQName: DISDumpRaisesElement
   @ClsQName: ManakaiDOMDISDumpRaisesElement
   @ETQName: dump|raises
 
-  @IFISA: DISDumpElementResource
-  @ClsISA: ManakaiDOMDISDumpElementResource
-
-  @ATTR:
-    @@DOMName: groupURI
-    @@ReflectCDATA:
-    @@ATTRQName: dump|group
-    @@enDesc:
-      The URI of the class or interface of the exception.
-    @@Get:
-    @@Set:
-  
-  @ATTR:
-    @@DOMName: codeURI
-    @@ReflectCDATA:
-    @@ATTRQName: dump|code
-    @@enDesc:
-      The URI or the local name of the exception code.
-    @@Get:
-    @@Set:
-
-  @ATTR:
-    @@DOMName: subcodeURI
-    @@ReflectCDATA:
-    @@ATTRQName: dump|subcode
-    @@enDesc:
-      The URI of the exception subcode.
-    @@Get:
-    @@Set:
+  @IFISA: DISDumpElementDescription
+  @ClsISA: ManakaiDOMDISDumpElementDescription
 ##DISDumpRaisesElement
+
+IFClassETDef:
+  @IFQName: DISDumpRaisesCodeElement
+  @ClsQName: ManakaiDOMDISDumpRaisesCodeElement
+  @ETQName: dump|raisesCode
+
+  @IFISA: DISDumpElementDescription
+  @ClsISA: ManakaiDOMDISDumpElementDescription
+##DISDumpRaisesCodeElement
+
+IFClassETDef:
+  @IFQName: DISDumpRaisesSubCideElement
+  @ClsQName: ManakaiDOMDISDumpRaisesSubCodeElement
+  @ETQName: dump|raisesSubCode
+
+  @IFISA: DISDumpElementDescription
+  @ClsISA: ManakaiDOMDISDumpElementDescription
+##DISDumpRaisesSubCodeElement
 
 ReflectTypeDef:
   @QName: CDATADOMString
@@ -1994,6 +2126,12 @@ IFClassETDef:
   @IFISA: DISDumpElementResource
   @ClsISA: ManakaiDOMDISDumpElementResource
 
+  @IFISA: DISDumpElementImplements
+  @ClsISA: ManakaiDOMDISDumpElementImplements
+
+  @IFISA: DISDumpElementClassMember
+  @ClsISA: ManakaiDOMDISDumpElementClassMember
+
   @Method:
     @@Name: createConst
     @@enDesc:
@@ -2028,6 +2166,9 @@ IFClassETDef:
 
   @IFISA: DISDumpElementValue
   @ClsISA: ManakaiDOMDISDumpElementValue
+
+  @IFISA: DISDumpElementImplements
+  @ClsISA: ManakaiDOMDISDumpElementImplements
 
   @Method:
     @@Name: createExceptionSubCode

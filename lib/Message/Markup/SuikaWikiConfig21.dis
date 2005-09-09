@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/09/05 05:21:12 $
+      $Date: 2005/09/09 04:26:05 $
     @@ContentType:
       dis:Date.RCS
   
@@ -58,16 +58,17 @@ Module:
         ManakaiDOM:all
     @@Module:
       @@@Name: SuikaWikiConfig21
-      @@@WithFor:
-        ManakaiDOM:ManakaiDOM
+      @@@WithFor: swcfg21|ForEmpty
     @@Module:
       @@@Name: SuikaWikiConfig21
       @@@WithFor: 
         swcfg21:ForLatest
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        <Module::MDOM:DOMBoot> or its equivalent is also required.
+    @@Module:
+      @@@QName: MDOM|DOMFeature
+      @@@WithFor: ManakaiDOM|all
+    @@Module:
+      @@@QName: MDOM|DOMLS
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
 
   @DefaultFor: 
     swcfg21:ForLatest
@@ -93,6 +94,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
   @infoset:
     http://www.w3.org/2001/04/infoset#
+  @kwd:
+    http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
   @lang:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
@@ -142,8 +145,8 @@ ResourceDef:
       Message::Markup::IF::
     @@ContentType:
       lang:Perl
-    @@ForCheck: 
-      ManakaiDOM:ForIF
+    @@ForCheck:
+      ManakaiDOM:ForIF ForEmpty
   @AppName:
     @@@:
       Message::Markup::
@@ -151,27 +154,16 @@ ResourceDef:
 
 ## -- "For" definitions
 
-## For one of multiple resources
-
-ForDef:
-  @QName: 
-    swcfg21:ForIF
-  @FullName:
-    @@lang:en
-    @@@: For interface
-  @ISA:
-    ManakaiDOM:ForIF
-
-ForDef:
-  @QName:
-    swcfg21:ForClass
-  @FullName:
-    @@lang:en
-    @@@: For class
-  @ISA:
-    ManakaiDOM:ForClass
-
 ## For a version
+
+ForDef:
+  @QName: swcfg21|ForEmpty
+  @FullName:
+    @@lang:en
+    @@@:
+      For interface of <QUOTE::any> version
+  @ISA:
+    ManakaiDOM:Perl
 
 ForDef:
   @QName:
@@ -179,10 +171,7 @@ ForDef:
   @FullName:
     @@lang:en
     @@@: For latest version
-  @ISA:
-    ManakaiDOM:ManakaiDOM
-  @ISA:
-    ManakaiDOM:Perl
+  @ISA: swcfg21|ForEmpty
 
 ## -- Features and versions
 
@@ -243,21 +232,49 @@ PropDef:
     @@@:
       A namespace unaware variant of the subject method or attribute. 
 
+
+ElementTypeBinding:
+  @Name: IFClsDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ForEmpty !=ForEmpty
+    @@For: ForLatest
+    @@For: =ForEmpty
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|IF
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ForEmpty||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ForEmpty
+    @@Implement:
+      @@@@: ||ForLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ForLatest
+
+    @@DOMMain:implementFeature:
+      @@@@: CoreFeature21
+      @@@For: ForLatest
+
 ## -- Node
 
-IFClassDef:
+IFClsDef:
   @IFQName: SWCFGNode
-  @ClassQName: ManakaiSWCFGNode
-  @IFISA:
-    SWCFGNode::ManakaiDOM:ManakaiDOM
+  @ClsQName: ManakaiSWCFGNode
 
-  @ISA:
-    @@@:
-      ManakaiDOM:ManakaiDOMNodeReference::ManakaiDOM:Perl
-    @@ForCheck: ForClass
-  @Implement:
-    @@@: SWCFGNode
-    @@ForCheck: ForClass
+  @ClsISA: ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl
   
   @Description:
     @@lang:en
@@ -434,17 +451,14 @@ IFClassDef:
 
           if ($node-><AG::SWCFGNode.nodeType> eq '#fragment') {
             $self->{<Q::TreeCore:node>}
-                 -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                                     .importTree> ($node->{<Q::TreeCore:node>});
+                 -><M::NodeStem.importTree> ($node->{<Q::TreeCore:node>});
             for my $cn (@{$node->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
               $cn->{<Q::parent>} = $self->{<Q::TreeCore:node>};
             }
             push @{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}, 
        \         @{$node->{<Q::TreeCore:node>}->{<Q::childNodes>}};
             $node->{<Q::TreeCore:node>}->{<Q::childNodes>} = [];
-            $node->{<Q::TreeCore:node>}
-                 -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                                               .orphanate>;
+            $node->{<Q::TreeCore:node>}-><M::NodeStem.orphanate>;
             $r = $self;
           } else {
             if ($node->{<Q::TreeCore:node>}->{<Q::parent>}) {
@@ -457,8 +471,7 @@ IFClassDef:
                 }
               }
             }
-            $self->{<Q::TreeCore:node>}
-                 -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+            $self->{<Q::TreeCore:node>}-><M::NodeStem
                           .importTree> ($node->{<Q::TreeCore:node>});
             push @{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}},
                  $node->{<Q::TreeCore:node>};
@@ -543,8 +556,7 @@ IFClassDef:
             swcfg21:childNodeType => {$type},
           }__;
         }
-        $self->{<Q::TreeCore:node>}
-             -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+        $self->{<Q::TreeCore:node>}-><M::NodeStem
                           .importTree> ($r->{<Q::TreeCore:node>});
         push @{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}},
              $r->{<Q::TreeCore:node>};
@@ -622,8 +634,7 @@ IFClassDef:
         $self->{<Q::TreeCore:node>}->{<Q::childNodes>}
            = [grep {not $_ eq $n} @{$self->{<Q::TreeCore:node>}
                                          ->{<Q::childNodes>}}];
-        $node->{<Q::TreeCore:node>}
-             -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl.orphanate>;
+        $node->{<Q::TreeCore:node>}-><M::NodeStem.orphanate>;
   @Method:
     @@Name:getAttribute
     @@Description:
@@ -1040,8 +1051,7 @@ IFClassDef:
               $r->{<Q::TreeCore:node>}->{<Q::value>} = $value;
               for my $rcn (@{$r->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
                 CORE::delete $rcn->{<Q::parent>};
-                $rcn-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                             .orphanate>;
+                $rcn-><M::NodeStem.orphanate>;
               }
               $r->{<Q::TreeCore:node>}->{<Q::childNodes>} = [];
               last FIND;
@@ -1123,8 +1133,7 @@ IFClassDef:
               $r->{<Q::TreeCore:node>}->{<Q::value>} = $value;
               for my $rcn (@{$r->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
                 CORE::delete $rcn->{<Q::parent>};
-                $rcn-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                             .orphanate>;
+                $rcn-><M::NodeStem.orphanate>;
               }
               $r->{<Q::TreeCore:node>}->{<Q::childNodes>} = [];
               last FIND;
@@ -1179,10 +1188,9 @@ IFClassDef:
           }
         } @{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}];
         for my $n (@removed) {
-          $n-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                          .orphanate>;
+          $n-><M::NodeStem.orphanate>;
         }
-        true;
+        $r = true;
 
   @Method:
     @@Name: removeAttributeNS
@@ -1235,10 +1243,9 @@ IFClassDef:
           }
         } @{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}];
         for my $n (@removed) {
-          $n-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                          .orphanate>;
+          $n-><M::NodeStem.orphanate>;
         }
-        true;
+        $r = true;
 
   @Attr:
     @@Name: childNodes
@@ -1252,10 +1259,11 @@ IFClassDef:
         <CODE::#comment>, the list is always empty. 
     @@Get:
       @@@PerlDef:
-        $r = $self->{<Q::TreeCore:node>}
-                  -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                            .newReference>
-                        (<ClassName::ManakaiSWCFGChildNodeList>);
+        __CODE{ManakaiNode|getNewReference||ManakaiDOM|Perl::
+          $object => {$self->{<Q::TreeCore:node>}},
+          $ref => {$r},
+          $class => {<ClassName::ManakaiSWCFGChildNodeList>},
+        }__;
 
   @Attr:
     @@Name:localName
@@ -2053,9 +2061,7 @@ IFClassDef:
                            ($self->{<Q::TreeCore:node>}->{$p})->clone;
                 $r->{<Q::TreeCore:node>}->{$p} = $c->{<Q::TreeCore:node>};
                 $r->{<Q::TreeCore:node>}
-                  -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                          .importTree>
-                           ($r->{<Q::TreeCore:node>}->{$p});
+                  -><M::NodeStem.importTree> ($r->{<Q::TreeCore:node>}->{$p});
                 $r->{<Q::TreeCore:node>}->{$p}
                   ->{+{
                         <Q::shadowContent> => <Q::shadowParent>,
@@ -2101,9 +2107,7 @@ IFClassDef:
                   my $cl = <ClassM::ManakaiSWCFGNode.getNodeReference>
                                  ($b->{$p})->clone;
                   $c->{$p} = $cl->{<Q::TreeCore:node>};
-                  $r->{<Q::TreeCore:node>}
-                    -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                          .importTree> ($c->{$p});
+                  $r->{<Q::TreeCore:node>}-><M::NodeStem.importTree> ($c->{$p});
                   my @l = $c->{$p};
                   while (@l) {
                     my $l = shift @l; next unless $l;
@@ -2121,8 +2125,7 @@ IFClassDef:
             for my $cn (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
               my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($cn)->clone;
               $r->{<Q::TreeCore:node>}
-                -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                          .importTree> ($c->{<Q::TreeCore:node>});
+                -><M::NodeStem.importTree> ($c->{<Q::TreeCore:node>});
               my @l = $c->{<Q::TreeCore:node>};
               while (@l) {
                 my $l = shift @l; next unless $l;
@@ -2417,6 +2420,7 @@ IFClassDef:
         }
 
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name:getNodeReference
     @@Description:
       @@@lang:en
@@ -2432,8 +2436,7 @@ IFClassDef:
     @@ManakaiDOM:isStatic:1
     @@Param:
       @@@Name:object
-      @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@Type: NodeStem
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -2461,8 +2464,11 @@ IFClassDef:
                     qq[(ref: "@{[ref $object]}")]},
           }__;
         }
-        $r = $object-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                                  .newReference> ($class);
+        __CODE{ManakaiNode|getNewReference||ManakaiDOM|Perl::
+          $object => $object, 
+          $ref => $r,
+          $class => $class,
+        }__;
   
   @Method:
      @@Name:  isSameNode
@@ -2502,9 +2508,7 @@ IFClassDef:
             @@@@@lang:en
             @@@@@@: The two nodes are not same.
         @@@PerlDef:
-            if (UNIVERSAL::isa ($other,
-                                <ClassName::ManakaiDOM:ManakaiDOMNodeReference
-                                          ::ManakaiDOM:Perl>)
+            if (UNIVERSAL::isa ($other, <IFName::NodeRef>)
                 and $other->{<Q::TreeCore:node>}->{<Q::TreeCore:nodeID>}
                   eq $self->{<Q::TreeCore:node>}->{<Q::TreeCore:nodeID>}) {
               $r = true;
@@ -2512,22 +2516,22 @@ IFClassDef:
 
   @IntMethod:
     @@Name:newObject
+    @@ForCheck: ManakaiDOM|ForClass
     @@ManakaiDOM:isStatic:1
     @@Description:
       @@@lang:en
       @@@@:
         Creates a new instance object for <IF::SWCFGNode>. 
     @@Return:
-      @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@Type: NodeStem
       @@@Description:
         @@@@lang:en
         @@@@@:
           The newly created node object.
       @@@PerlDef:
         @@@@@:
-          my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
-                                        ::ManakaiDOM:Perl.new>;
+          my $node =
+             $r = <ClassM::ManakaiNode|ManakaiNodeStem||ManakaiDOM|Perl.new>;
           push @{$node->{<Q::TreeCore:origin>}}, <Q::parent>;
           push @{$node->{<Q::TreeCore:subnode>}}, <Q::childNodes>;
           push @{$node->{<Q::TreeCore:irefnode>}}, <Q::ownerDocument>;
@@ -2542,6 +2546,7 @@ IFClassDef:
                   <Q::childNodes>, <Q::flag>, <Q::option>. 
 
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Operator:
       @@@@:
         ManakaiDOM:MUErrorHandler
@@ -2631,27 +2636,19 @@ ElementTypeBinding:
   @ElementType:
     ManakaiDOM:raises
   @ShadowContent:
-    @@@: UNDECLARED_NS_PREFIX_ERR
+    @@@: 
+      DIS:UNDECLARED_NS_PREFIX_ERR
     @@Description:
       @@@lang:en
       @@@@:
         The implementation has encounted an undeclared namespace prefix. 
 
-ElementTypeBinding:
-  @Name: ClsImpl
-  @ElementType:
-    dis:Implement
-  @ShadowContent:
-    @@ForCheck: ForClass
+IFClsDef:
+  @IFQName: SWCFGComment
+  @ClsQName: ManakaiSWCFGComment
 
-IFClassDef:
-  @IFQName:SWCFGComment
-  @ClassQName:ManakaiSWCFGComment
-  @IFISA:
-    SWCFGComment::ManakaiDOM:ManakaiDOM
-  @IFISA: SWCFGNode
-  @ClassISA: ManakaiSWCFGNode
-  @ClsImpl: SWCFGComment
+  @ClsISA: ManakaiSWCFGNode
+
   @Description:
     @@lang:en
     @@@:
@@ -2682,6 +2679,7 @@ IFClassDef:
           @@@@@@:This node is a comment node. 
 
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -2689,8 +2687,7 @@ IFClassDef:
       @@@@:
         Creates a new instance object for <IF::SWCFGComment>. 
     @@Return:
-      @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@Type: NodeStem
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -2711,12 +2708,12 @@ IFClassDef:
                   <Q::childNodes>, <Q::flag>, <Q::option>. 
 ##SWCFGComment
 
-IFClassDef:
-  @IFQName:SWCFGElement
-  @ClassQName:ManakaiSWCFGElement
-  @IFISA: SWCFGNode
-  @ClassISA: ManakaiSWCFGNode
-  @ClsImpl: SWCFGElement
+IFClsDef:
+  @IFQName: SWCFGElement
+  @ClsQName: ManakaiSWCFGElement
+
+  @ClsISA: ManakaiSWCFGNode
+
   @Description:
     @@lang:en
     @@@:
@@ -3129,6 +3126,7 @@ IFClassDef:
         }
 
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -3136,8 +3134,7 @@ IFClassDef:
       @@@@:
         Creates a new instance object for <IF::SWCFGElement>. 
     @@Return:
-      @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@Type: NodeStem
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -3168,7 +3165,7 @@ IFClassDef:
       @@@lang:en
       @@@@:
         Expands element type bindings. 
-    @@ForCheck: ForClass
+    @@ForCheck: ManakaiDOM|ForClass
     @@UndeclaredPrefixException:
     @@PerlDef:
       unless ($node->{<Q::etExpanded>}) {
@@ -3211,8 +3208,7 @@ IFClassDef:
             my $__n = $node->{{shadowContent => <Q::shadowContent>,
                                shadowSibling => <Q::shadowSibling>}->{$__p}}
                = $cl->{<Q::TreeCore:node>};
-            $node-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                            .importTree> ($__n);
+            $node-><M::NodeStem.importTree> ($__n);
             $__n->{{shadowContent => <Q::shadowParent>,
                     shadowSibling => <Q::shadowSiblingOf>}->{$__p}} = $node;
           }
@@ -3224,7 +3220,7 @@ IFClassDef:
     @@QName: expandNamespace
     @@rdf:type:
       dis2pm:BlockCode
-    @@ForCheck: ForClass
+    @@ForCheck: ManakaiDOM|ForClass
     @@Description:
       @@@lang:en
       @@@@:
@@ -3251,14 +3247,12 @@ IFClassDef:
       }
 ##SWCFGElement
 
-IFClassDef:
-  @IFQName:SWCFGDocument
-  @ClassQName:ManakaiSWCFGDocument
-  @IFISA: SWCFGNode
-  @ClassISA: ManakaiSWCFGNode
-  @ClsImpl: SWCFGDocument
-  @IFISA:
-    SWCFGDocument::ManakaiDOM:ManakaiDOM
+IFClsDef:
+  @IFQName: SWCFGDocument
+  @ClsQName: ManakaiSWCFGDocument
+
+  @ClsISA: ManakaiSWCFGNode
+
   @Description:
     @@lang:en
     @@@:
@@ -3481,6 +3475,7 @@ IFClassDef:
         @@@@DISLang:nop:
 
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -3488,8 +3483,7 @@ IFClassDef:
       @@@@:
         Creates a new instance object for <IF::SWCFGDocument>. 
     @@Return:
-      @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@Type: NodeStem
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -3514,14 +3508,12 @@ IFClassDef:
                   <Q::defaultETNamespaceURI>. 
 ##SWCFGDocument
 
-IFClassDef:
-  @IFQName:SWCFGDocumentFragment
-  @ClassQName:ManakaiSWCFGDocumentFragment
-  @IFISA: SWCFGNode
-  @ClassISA: ManakaiSWCFGNode
-  @ClsImpl: SWCFGDocumentFragment
-  @IFISA:
-    SWCFGDocumentFragment::ManakaiDOM:ManakaiDOM
+IFClsDef:
+  @IFQName: SWCFGDocumentFragment
+  @ClsQName: ManakaiSWCFGDocumentFragment
+
+  @ClsISA: ManakaiSWCFGNode
+
   @Description:
     @@lang:en
     @@@:
@@ -3568,6 +3560,7 @@ IFClassDef:
           @@@@@@:This node is a document fragment node. 
 
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -3575,8 +3568,7 @@ IFClassDef:
       @@@@:
         Creates a new instance object for <IF::SWCFGDocumentFragment>. 
     @@Return:
-      @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@Type: NodeStem
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -3599,22 +3591,22 @@ IFClassDef:
                   <Q::shadowParent>, <Q::shadowSiblingOf>. 
 ##SWCFGDocumentFragment
 
-IFClassDef:
+IFClsDef:
   @IFQName: SWCFGChildNodeList
-  @ClassQName: ManakaiSWCFGChildNodeList
-  @ClsImpl: SWCFGChildNodeList
-  @IFISA:
-    SWCFGChildNodeList::ManakaiDOM:ManakaiDOM
-  @Description:
-    @@lang:en
-    @@@:
-      A child node list of a node. 
+  @ClsQName: ManakaiSWCFGChildNodeList
+
+  @ClsISA: ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl
   @AppISA:
-    @@ForCheck: ForClass
+    @@ForCheck: ManakaiDOM|ForClass
     @@ContentType:
       lang:Perl
     @@@:
       Tie::Array
+
+  @Description:
+    @@lang:en
+    @@@:
+      A child node list of a node. 
 
   @Attr:
     @@Name:length
@@ -3706,6 +3698,7 @@ IFClassDef:
         $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($r) if $r;
 
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Operator:
       @@@@:TIEARRAY
       @@@ContentType:
@@ -3734,6 +3727,7 @@ IFClassDef:
         $r = $nodeList;
 
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Operator:
       @@@@:@{}
       @@@ContentType:
@@ -3756,6 +3750,7 @@ IFClassDef:
         $r = \@list;
 
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Operator:
       @@@@:DESTROY
       @@@ContentType:
@@ -3764,15 +3759,14 @@ IFClassDef:
       @@@lang:en
       @@@@:
         Redefines destructor for the class
-        <Class::ManakaiDOM:ManakaiDOMNodeReference>, 
+        <Class::ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl>, 
         since the <PerlModule::Tie::Array> also has its own empty destructor. 
     @@Return:
       @@@Def:
         @@@@ContentType:
           lang:dis
         @@@@DISPerl:cloneCode:
-          ManakaiDOM:ManakaiDOMNodeReference::ManakaiDOM:Perl.destroy
-
+          ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl.destroy
 ##SWCFGChildNodeList
 
 PropDef:
@@ -3935,20 +3929,67 @@ PropDef:
 
 ## -- Exceptions
 
-ExceptionDef:
+ResourceDef:
+  @rdf:type:
+    @@@: dis|MultipleResource
+    @@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+  @resourceFor: ManakaiDOM|ForIF
+  @resourceFor:
+    @@@: ManakaiDOM|ForClass
+    @@ForCheck: ForEmpty !=ForEmpty
+  @For: ForLatest
+  @For: =ForEmpty
+
+  @rdf:type:
+    @@@: ManakaiDOM|ExceptionIF
+    @@ForCheck: ManakaiDOM|ForIF
+
+  @rdf:type:
+    @@@: ManakaiDOM|ExceptionClass
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @Implement:
+    @@@: ||ForEmpty||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass ForEmpty
+  @Implement:
+    @@@: ||ForLatest||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass ForLatest
+
+  @DOMMain:implementFeature:
+    @@@: CoreFeature21
+    @@For: ForLatest
+
+  @Implement:
+    @@@: DOMMain|ManakaiDOMExceptionIF||ManakaiDOM|Perl
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @ISA:
+    @@@: ManakaiDOM|ManakaiDOMException||ManakaiDOM|Perl
+    @@ForCheck: ManakaiDOM|ForClass
+
   @IFQName: SWCFGException
-  @ClassQName:ManakaiSWCFGException
+  @ClsQName: ManakaiSWCFGException
+
   @Description:
     @@lang:en
     @@@:
       Exceptions raised if an attempt to make a bad operation has made. 
-  @XConstGroupDef:
+
+  @ResourceDef:
+    @@rdf:type: ManakaiDOM|ConstGroup
+    @@ForCheck: !=ForEmpty
+
     @@IFQName: SWCFGExceptionCode
-    @@ClassQName: ManakaiSWCFGExceptionCode
+    @@ClsQName: ManakaiSWCFGExceptionCode
+    @@PerlName: SWCFGExceptionCode
+
     @@rdfs:subClassOf:
-      DOMMain:unsigned-long::ManakaiDOM:all
+      DOMMain:unsigned-short::ManakaiDOM:all
     @@Type:
-      DOMMain:unsigned-long::ManakaiDOM:all
+      DOMMain:unsigned-short::ManakaiDOM:all
+
     @@XConst:
       @@@Name:HIERARCHY_REQUEST_ERR
       @@@Value:3
@@ -4177,23 +4218,28 @@ XPropDef:
 
 ## -- Datatypes
 
-TypeDef:
-  @QName:SWCFGString
-  @rdfs:subClassOf:
-    DISLang:String::ManakaiDOM:all
-  @Description:
-    @@lang:en
-    @@@:
-      Strings. 
+ResourceDef:
+  @QName: SWCFGString
+  @AliasFor: DOMMain|DOMString||ManakaiDOM|ManakaiDOMLatest
+
+ElementTypeBinding:
+  @Name: PerlName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ContentType: lang|Perl
+    @@For: ManakaiDOM|Perl
 
 ## -- Load
 
-IFClassDef: 
+IFClsDef:
   @IFQName: SWCFGParser
-  @ClassQName: ManakaiSWCFGParser
-  @ClsImpl: SWCFGParser
-  @IFISA:
-    SWCFGParser::ManakaiDOM:ManakaiDOM
+  @ClsQName: ManakaiSWCFGParser
+
+  @ClsISA: DOMException|ManakaiDefaultExceptionHandler||ManakaiDOM|Perl
+
+  @DISLang:role: DOMLS|ParserRole
+
   @Description:
     @@lang:en
     @@@:
@@ -4550,54 +4596,43 @@ IFClassDef:
           $r = $root;
 
   @IntMethod:
-    @@Operator:
-      @@@@:
-        ManakaiDOM:MUErrorHandler
-      @@@ContentType:
-        dis:TypeQName
-    @@Description:
-      @@@lang:en
-      @@@@:
-        This method is a generic error handler; all manakai exceptions 
-        and warnings associated to an object are once reported to this method 
-        and then delivered to appropriate entities. 
-        \
-        If the error is an exception (such as <X::DOMCore:DOMException> or 
-        <X::ManakaiDOM:ManakaiDOMImplementationException>), it is 
-        simply thrown.  If the error is only a warning, it is reported 
-        via the <IF::DOMCore:DOMError> interface. 
-        \
-        See <PerlModule::Message::Util::Error> documentation for more 
-        information on the error reporting mechanism.
-        \
-        {NOTE:: This kind of methods are named as <Perl::___report_error> 
-                in the convention of <PerlModule::Message::Util::Error>. 
-        \
-        }
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Operator: 
+      @@@@: DISPerl|NewMethod
+      @@@ContentType: dis|TypeQName
+    @@ForCheck: ManakaiDOM|ForClass
+    @@enDesc:
+      Creates a new instance of the <IF::SWCFGParser> interface
+      and returns it.
+
+      {NOTE:: This method is compatible with the role <Q::DOMLS:ParserRole>
+              so that this class is accessible via the
+              <M::DOMLS|DOMImplementationLSExtended.createMLSParser>
+              method.
+      }
     @@Param:
-      @@@Name:err
-      @@@Type: 
-        ManakaiDOM:ManakaiDOMExceptionOrWarning::ManakaiDOM:Perl
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          An exception object that describes what kind of error it is 
-          and how it should be recovered. 
-          \
-          {NOTE:: Exception objects in manakai implementation 
-                  inherit the class <PerlModule::Message::Util::Error>, 
-                  that in turn inherits <PerlModule::Error>.
-          \
-          }
+      @@@Name: impl
+      @@@Type: DOMFeature|MinimumImplementation||ManakaiDOM|ManakaiDOMLatest
+      @@@enDesc:
+        An implementation object.  The <M::DOMFeature|GetFeature.getFeature>
+        method with parameter values <Feature::swcfg21|Core> and
+        <FeatureVer::2.1> respectively <kwd:MUST> return
+        an object implementing the <IF::SWCFGImplementation> interface.
+    @@Param:
+      @@@Name: features
+      @@@Type: SWCFGString
+      @@@dis:actualType: DOMFeature|FeaturesString||ManakaiDOM|ManakaiDOMLatest
+      @@@enDesc:
+        A list of requested features.  In the current implementation
+        this parameter is ignored.
     @@Return:
+      @@@Type: DOMMain|Object||ManakaiDOM|all
+      @@@actualType: ManakaiSWCFGParser
+      @@@enDesc: The newly created parser object.
       @@@PerlDef:
-          if ($err->isa (<ClassName::ManakaiDOM:ManakaiDOMException
-                                   ::ManakaiDOM:Perl>)) {
-            $err->throw;
-          } else {
-            \## TODO: Implement warning reporting
-            warn $err->stringify;
-          }
+        $r = bless {<Q::DOMCore:implementation> => $impl},
+                   <ClassName::ManakaiSWCFGParser>;
+##SWCFGParser
 
 PropDef:
   @QName: parent
@@ -4606,12 +4641,14 @@ PropDef:
 
 ## -- Bootstraps
 
-IFClassDef:
+IFClsDef:
   @IFQName: SWCFGImplementation
-  @ClassQName: ManakaiSWCFGImplementation
-  @ClsImpl: SWCFGImplementation
-  @IFISA:
-    SWCFGImplementation::ManakaiDOM:ManakaiDOM
+  @ClsQName: ManakaiSWCFGImplementation
+
+  @ClsISA: DOMFeature|ManakaiMinimumImplementation||ManakaiDOM|ManakaiDOMLatest
+
+  @DOMMetaImpl:provideFeature: CoreFeature21
+
   @Description:
     @@lang:en
     @@@:
@@ -4622,19 +4659,7 @@ IFClassDef:
     @@@:
       This interface should be implemented on the same object that 
       implements <IF::DOMImplementation>. 
-    @@ForCheck: ForIF
-
-  @ClassISA:
-    DOMMetaImpl:ManakaiDOMMinimumImplementation::ManakaiDOM:ManakaiDOMLatest
-
-  @DOMMetaImpl:provideFeature: CoreFeature21
-
-  @Role:
-    @@@:
-      DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM
-    @@compat:
-      DOMCore:ManakaiDOMImplementation::ManakaiDOM:ManakaiDOMLatest
-    @@ForCheck: ForClass
+    @@ForCheck: ManakaiDOM|ForIF
 
   # recognizedVersions : StringList
   
@@ -4729,8 +4754,7 @@ IFClassDef:
         if (defined $versions) {
           __EXCEPTION{SWCFG_VERSION_NOT_SUPPORTED_ERR}__;
         }
-        $r = bless {<Q::DOMCore:implementation> => $self},
-                   <ClassName::ManakaiSWCFGParser>;
+        $r = <ClassName::ManakaiSWCFGParser>->new ($self);
 
 ## -- lang:dis vocabulary
 
@@ -4745,6 +4769,14 @@ TreeElementType:
     @@@:
       Gets the nodal value of a <Class::ManakaiDOM:ManakaiDOMNodeReference> 
       property (actually <Class::ManakaiDOM:ManakaiDOMNodeObject> property). 
+
+ResourceDef:
+  @QName: NodeStem
+  @AliasFor: ManakaiNode|NodeStem||ManakaiDOM|Perl
+
+ResourceDef:
+  @QName: NodeRef
+  @AliasFor: ManakaiNode|NodeRef||ManakaiDOM|Perl
 
 ## -- Syntax sugar
 
@@ -4762,57 +4794,32 @@ ElementTypeBinding:
         !=ManakaiDOM:all
 
 ElementTypeBinding:
-  @Name: IFClassDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      @@@@:
-        dis:MultipleResource
-      @@@ForCheck: !ForClass !ForIF
-    @@rdf:type:
-      @@@@:
-        ManakaiDOM:IF
-      @@@ForCheck: ForIF
-    @@rdf:type:
-      @@@@:
-        ManakaiDOM:Class
-      @@@ForCheck: ForClass
-    @@resourceFor: ForIF
-    @@resourceFor:
-      @@@@: ForClass
-      @@@ForCheck: ForLatest
-    @@DOMMain:implementFeature:
-      @@@@:CoreFeature21
-      @@@ForCheck: ForClass
-
-ElementTypeBinding:
   @Name: IFQName
   @ElementType:
     dis:QName
   @ShadowContent:
-    @@ForCheck: ForIF
+    @@ForCheck: ManakaiDOM|ForIF
 
 ElementTypeBinding:
-  @Name: ClassQName
+  @Name: ClsQName
   @ElementType:
     dis:QName
   @ShadowContent:
-    @@ForCheck: ForClass
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: IFISA
   @ElementType:
     dis:ISA
   @ShadowContent:
-    @@ForCheck: ForIF
+    @@ForCheck: ManakaiDOM|ForIF
 
 ElementTypeBinding:
-  @Name: ClassISA
+  @Name: ClsISA
   @ElementType:
     dis:ISA
   @ShadowContent:
-    @@ForCheck: ForClass
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: Method
@@ -5067,7 +5074,7 @@ ElementTypeBinding:
   @ElementType:
     dis:actualType
   @ShadowContent:
-    @@ForCheck: ForClass
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: Attr
@@ -5174,47 +5181,9 @@ ElementTypeBinding:
         }
 
 ElementTypeBinding:
-  @Name: ExceptionDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      @@@@:
-        dis:MultipleResource
-      @@@ForCheck: !ForClass !ForIF
-    @@rdf:type:
-      @@@@:
-        ManakaiDOM:ExceptionIF
-      @@@ForCheck: ForIF
-    @@rdf:type:
-      @@@@:
-        ManakaiDOM:ExceptionClass
-      @@@ForCheck: ForClass
-    @@resourceFor: ForIF
-    @@resourceFor:
-      @@@@: ForClass
-      @@@ForCheck: ForLatest
-    @@ISA:
-      @@@@:
-        DOMMain:ManakaiDOMExceptionIF::ManakaiDOM:Perl
-      @@@ForCheck: ForIF
-    @@ISA:
-      @@@@:
-        ManakaiDOM:ManakaiDOMException::ManakaiDOM:Perl
-      @@@ForCheck: ForClass
-
-ElementTypeBinding:
   @Name: RaiseException
   @ElementType:
     ManakaiDOM:raises
-
-ElementTypeBinding:
-  @Name: XConstGroupDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:ConstGroup
 
 ElementTypeBinding:
   @Name: XConst
@@ -5231,7 +5200,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:ExceptionOrWarningSubType
-    @@ForCheck: ForClass
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: XParam
@@ -5280,5 +5249,3 @@ ElementTypeBinding:
     @@ContentType:
       lang:muf
     @@lang:en
-
-## SuikaWikiConfig21.dis ends here

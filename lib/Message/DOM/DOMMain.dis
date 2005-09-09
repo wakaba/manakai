@@ -15,12 +15,10 @@ Module:
       This module provides DOM basic types such as <TYPE::DOMString>
       and classes and properties to describe common DOM concept
       such as <TYPE::ManakaiDOM:ManakaiDOMURI> and
-      <TYPE::reflectGet::ManakaiDOM:all>.
-      
-      {NOTE:: The <IF::DOMFeature:DOMImplementationRegistry> object
-              for bootstrapping is found in <Module::MDOM:DOMFeature>
-              module.
-      }
+      <TFQ::reflectGet::ManakaiDOM:all>.  In addition,
+      it provides the <Class::DOMImplementationRegistry>
+      object from which DOM applications can obtain
+      various DOM implementations.
 
   @Author:
     @@FullName: Wakaba
@@ -29,7 +27,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/05 05:21:12 $
+      $Date: 2005/09/09 04:26:05 $
     @@ContentType:
       dis:Date.RCS
   
@@ -101,8 +99,12 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @DOMMetaImpl:
     http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
+  @ecore:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
   @infoset:
     http://www.w3.org/2001/04/infoset#
+  @kwd:
+    http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
   @lang:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
@@ -628,11 +630,6 @@ ElementTypeBinding:
     @@rdf:type:
       ManakaiDOM:InCase
 
-ElementTypeBinding:
-  @Name: Exception
-  @ElementType:
-    ManakaiDOM:raises
-
 ## -- lang:dis vocabulary
 
 TreeElementType:
@@ -929,6 +926,8 @@ ResourceDef:
   @For: 
     ManakaiDOM:ManakaiDOM
 
+  @Implement: ecore|MUErrorTarget||ManakaiDOM|Perl
+
   @Description:
     @@lang:en
     @@@:
@@ -1153,38 +1152,23 @@ ResourceDef:
     @@ForCheck:
       ManakaiDOM:ForClass
 
-  @ISA:
-    @@@: ||ManakaiDOM|ManakaiDOM
-    @@ForCheck:
-      ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM !ManakaiDOM|ManakaiDOM3
-      ManakaiDOM|ForIF
-
-  @ISA:
-    @@@: ||ManakaiDOM|ManakaiDOM3
-    @@ForCheck:
-      ManakaiDOM|ManakaiDOM3 !=ManakaiDOM|ManakaiDOM
-      ManakaiDOM|ForIF
-
   @Implement:
     @@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
     @@ContentType: DISCore|TFPQNames
     @@ForCheck:
-      ManakaiDOM|ManakaiDOM !ManakaiDOM|ManakaiDOM3
-      ManakaiDOM|ForClass
+      ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
 
   @Implement:
     @@@: ||ManakaiDOM|ManakaiDOM3||ManakaiDOM|ForIF
     @@ContentType: DISCore|TFPQNames
     @@ForCheck:
-      ManakaiDOM|ManakaiDOM3 !ManakaiDOM|ManakaiDOMLatest
-      ManakaiDOM|ForClass
+      ManakaiDOM|ManakaiDOM3 ManakaiDOM|ForClass
 
   @Implement:
     @@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
     @@ContentType: DISCore|TFPQNames
     @@ForCheck:
-      ManakaiDOM|ManakaiDOMLatest
-      ManakaiDOM|ForClass
+      ManakaiDOM|ManakaiDOMLatest ManakaiDOM|ForClass
 
   @Description:
     @@lang:en
@@ -1214,10 +1198,9 @@ ResourceDef:
       @@@Description:
         @@@@lang:en
         @@@@@: The UTF-16 offset.
-      @@@Exception:
-        @@@@Type: 
-          DOMCore:DOMException
-        @@@@Name: INDEX_SIZE_ERR
+      @@@ManakaiDOM:raises:
+        @@@@@:
+          DOMCore:DOMException.INDEX_SIZE_ERR
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
@@ -1269,10 +1252,9 @@ ResourceDef:
           The UTF-32 offset.  If the <P::offset16> value is into middle of a 
           surrogate pair, the UTF-32 offset at the end of the pair is 
           returned.
-      @@@Exception:
-        @@@@Type: 
-          DOMCore:DOMException
-        @@@@Name: INDEX_SIZE_ERR
+      @@@ManakaiDOM:raises:
+        @@@@@:
+          DOMCore:DOMException.INDEX_SIZE_ERR
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
@@ -1985,21 +1967,6 @@ ExceptionDef:
     @@lang:en
     @@@:
       A set of manakai DOM implementation-dependent exceptions.
-  @MDOMFeature:
-
-  @Attr:
-     @@Name:  code
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The error code that denotes what kind of exception occures.
-     @@Get:
-       @@@Type:  
-         DOMMain:unsigned-short::ManakaiDOM:all
-       @@@actualType: 
-         ManakaiDOM:ManakaiDOMImplementationExceptionCode
-       @@@PerlDef: 
-         __CODE{ManakaiDOM:getExceptionCode||ManakaiDOM:Perl}__;
 
   @ResourceDef:
     @@QName: 
@@ -2039,21 +2006,6 @@ WarningDef:
     @@@:
       Warnings for the implementation-dependent matters and 
       <QUOTE::no effect> actions.
-  
-  @Attr:
-     @@Name:  code
-     @@Get:
-       @@@Type:  
-         DOMMain:unsigned-short||ManakaiDOM|all
-       @@@actualType:
-         ManakaiDOM:ManakaiDOMImplementationWarningCode
-       @@@Description:
-         @@@@lang:en
-         @@@@@:
-           The warning code from the constant value group
-           ManakaiDOMImplementationWarningCode.
-       @@@PerlDef: 
-         __CODE{ManakaiDOM:getExceptionCode||ManakaiDOM:Perl}__;
 
   @ResourceDef:
     @@QName: 
@@ -2204,3 +2156,129 @@ WarningDef:
           @@@@@lang:en
           @@@@@@:
             The specified URI reference.
+
+## -- Bootstrap DOMImplementationRegistry object
+
+ResourceDef:
+  @QName: 
+    DOMMain:ManakaiDOMImplementationRegistryVar
+  @rdf:type:
+    DISPerl:ScalarVariable
+  @AppName:
+    @@@:
+      Message::DOM::DOMImplementationRegistry
+    @@ContentType:
+      lang:Perl
+  @DefaultValue:
+    @@@:
+      <ClassName::DOMImplementationRegistry::ManakaiDOM:ManakaiDOMLatest>
+    @@ContentType:
+      lang:Perl
+  @Type: DISLang|String||ManakaiDOM|all
+  @For:
+    ManakaiDOM:ManakaiDOMLatest
+
+ResourceDef:
+  @QName: DOMImplementationRegistry
+  @rdf:type: ManakaiDOM|Class
+
+  @For: ManakaiDOM|DOM3
+
+  @Implement: DOMCore|DOMImplementationSource||ManakaiDOM|ManakaiDOM3
+  @Implement:
+    @@@: DOMCore|DOMImplementationSource||ManakaiDOM|ManakaiDOMLatest
+    @@For: ManakaiDOM|ManakaiDOMLatest
+
+  @ISA: DOMFeature|ImplementationRegistry
+
+  @enDesc:
+    The <Class::DOMImplementationRegistry> object provides 
+    two methods to find DOM implementations.
+
+  @Method:
+     @@Name:  getDOMImplementation
+     @@ManakaiDOM:isStatic: 1
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Seeks and returns the first implementation that implements 
+         desired features. 
+     @@Param:
+        @@@Name:  features
+        @@@Type:  DOMMain|DOMString||ManakaiDOM|all
+        @@@actualType: DOMFeature|FeaturesString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: 
+            A list of desired features that must be implemented.
+     @@Return:
+       @@@Type: DOMCore|DOMImplementation
+       @@@enDesc:
+         The first DOM implementation that has the desired features.
+         The object returned by this method <kwd:MUST> implement
+         the <IF::DOMCore:DOMImplementation> interface defined
+         in DOM Level 3 and it <kwd:MUST> has the feature
+         <Feature::Core> version <FeatureVer::3.0>.
+       @@@enDesc:
+         @@@@For: ManakaiDOM|ManakaiDOM
+         @@@@@:
+           {NOTE:: The object returned by this method might not
+                   be a manakai object.
+           }
+       @@@InCase:
+         @@@@Value:
+           @@@@@is-null:1
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@: 
+             No implementation implementing the desired features is found.
+      @@@Def:
+        @@@@ContentType:
+          lang:dis
+        @@@@DISPerl:cloneCode:
+          DOMFeature|ImplementationRegistry.getDOMImplementation
+
+  @Method:
+     @@Name:  getDOMImplementationList
+     @@ManakaiDOM:isStatic: 1
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Returns a list of all the DOM implementations that implement 
+         desired features.
+     @@Param:
+        @@@Name:  features
+        @@@Type:  DISLang|String||ManakaiDOM|all
+        @@@actualType: DOMFeature|FeaturesString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: A list of desired features that must be implemented.
+     @@Return:
+       @@@Type:  DOMCore|DOMImplementationList
+       @@@actualType: DOMCore|ManakaiDOMImplementationList
+       @@@Description:
+         @@@@lang:en
+         @@@@@: 
+           A list of DOM implementations that support the desired features. 
+           The object returned by this method <kwd:MUST> implement
+           the <IF::DOMCore:DOMImplementation> interface defined
+           in DOM Level 3 and it <kwd:MUST> has the feature
+           <Feature::Core> version <FeatureVer::3.0>.
+
+           {NOTE:: Since implementation sources reports the same
+                   implementation, the list <kwd:MAY> contain an implementation
+                   more than one times.
+           }
+       @@@enDesc:
+         @@@@For: ManakaiDOM|ManakaiDOM
+         @@@@@:
+           {NOTE:: Although the list returned by this method itself
+                   is a manakai object, each item in the list might
+                   not a manakai object.
+           }
+       @@@PerlDef:
+         __DEEP{       ## NOTE: Method name directly written
+           $r = bless $self->SUPER::get_dom_implementation_list ($features),
+                      <ClassName::DOMCore|ManakaiDOMImplementationList>;
+         }__;
+##DOMImplementationRegistry

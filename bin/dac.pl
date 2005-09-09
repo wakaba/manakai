@@ -9,13 +9,11 @@ use Message::Util::QName::Filter {
 
 use Getopt::Long;
 use Pod::Usage;
-use Storable qw/nstore retrieve/;
 my %Opt = ();
 GetOptions (
   'db-base-directory-path=s' => \$Opt{db_base_path},
   'for=s' => \$Opt{For},
   'help' => \$Opt{help},
-  'implementation-registry-package=s' => \$Opt{implreg_pack},
   'input-db-file-name=s' => \$Opt{input_file_name},
   'output-file-name=s' => \$Opt{output_file_name},
   'search-path|I=s' => sub {
@@ -65,16 +63,9 @@ pod2usage ({-exitval => 2, -verbose => 0}) unless $Opt{output_file_name};
 $Opt{no_undef_check} = defined $Opt{no_undef_check}
                          ? $Opt{no_undef_check} ? 0 : 1 : 0;
 
-$Opt{implreg_pack} ||= $Message::DOM::DOMImplementationRegistry;
-if ($Opt{implreg_pack} eq
-    'Message::DOM::DOMMetaImpl::ManakaiDOMImplementationRegistryCompat') {
-  unshift @Message::Markup::SuikaWikiConfig21::ManakaiSWCFGImplementation::ISA,
-          'Message::DOM::DOMMetaImpl::ManakaiDOMMinimumImplementationCompat';
-}
-
-use Message::DOM::DOMMetaImpl;
 use Message::Util::DIS;
-my $impl = $Opt{implreg_pack}->get_dom_implementation
+
+my $impl = $Message::DOM::ImplementationRegistry->get_implementation
                            ({ExpandedURI q<ManakaiDOM:Minimum> => '3.0',
                              '+' . ExpandedURI q<DIS:Core> => '1.0'})
                  ->get_feature (ExpandedURI q<DIS:Core> => '1.0');
@@ -133,12 +124,28 @@ $db->load_module ($doc, sub ($$$$$$) {
   }
 });
 
-
-$db->check_undefined_resource unless $Opt{no_undef_check};
-
-$db->pl_store ($Opt{output_file_name});
 print STDERR "\n";
+
+unless ($Opt{no_undef_check}) {
+  print STDERR "Checking undefined resources...";
+  $db->check_undefined_resource;
+  print STDERR "done\n";
+}
+
+print STDERR qq<Writing file "$Opt{output_file_name}"...>;
+$db->pl_store ($Opt{output_file_name});
+print STDERR "done\n";
+
+print STDERR "Closing the database...";
+$db->free;
+undef $db;
+print STDERR "done\n";
+
 exit;
+
+END {
+  $db->free if $db;
+}
 
 ## (db, parser, abs file path, abs base path) -> dis doc obj
 sub dac_load_module_file ($$$;$) {
@@ -163,10 +170,36 @@ __END__
 
 =head1 NAME
 
-...
+dac - Creating "dac" Database File from "dis" Source Files
+
+=head1 SYNOPSIS
+
+  perl path/to/dac.pl ...
+  perl path/to/dac.pl --help
+
+=head1 DESCRIPTION
+
+The C<dac.pl> script loads "dis" source files and
+writes a "dac" database file.
+
+This script is part of manakai.
 
 =head1 OPTIONS
 
 ...
+
+=head1 SEE ALSO
+
+L<bin/dac2pm.pl> - Generating Perl module from "dac" file.
+
+L<lib/Message/Util/DIS.dis> - The actual implementation
+of the "dis" interpretation.
+
+=head1 LICENSE
+
+Copyright 2004-2005 Wakaba <w@suika.fam.cx>.  All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
 =cut

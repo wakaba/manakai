@@ -1,3 +1,27 @@
+2005-09-08  Wakaba  <wakaba@suika.fam.cx>
+
+	* Makefile: Renewaled.
+
+	* ManakaiNode.dis (free): New method.
+
+2005-09-07  Wakaba  <wakaba@suika.fam.cx>
+
+	* DIS.dis: Interfaces added.
+	(free): New method.
+
+	* PerlCode.dis: Interfaces added.
+
+2005-09-06  Wakaba  <wakaba@suika.fam.cx>
+
+	* DIS.dis (plName): Use AppName attribute, if any,
+	for ManakaiDOM:ConstGroup resources.
+
+2005-09-05  Wakaba  <wakaba@suika.fam.cx>
+
+	* DIS.dis (plGeneratePerlModuleFile): Don't generate code for
+	the same class or variable twice whose alias is defined
+	in the same module.
+
 2005-09-04  Wakaba  <wakaba@suika.fam.cx>
 
 	* PerlCode.dis (ManakaiPerlSub.IntClone): Copies pc:localName

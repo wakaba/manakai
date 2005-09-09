@@ -15,7 +15,7 @@ Module:
       be useful for any other frameworks which is friendly for
       DOM application developers.
 
-      The <Class::DOMImplementationRegistry> object
+      The <Class::ImplementationRegistry> object
       is the bootstrap for the DOM implementations; DOM
       applications can ask to return DOM implementations
       which support the desired feature.  This mechanism is
@@ -26,7 +26,7 @@ Module:
       the minimum interface that should be implemented by
       all DOM implementations and other implementations
       that is intended to be accessible via 
-      the manakai <Class::DOMImplementationRegistry>
+      the manakai <Class::ImplementationRegistry>
       object.  The interface contains methods to obtain
       an object which implements particular feature so
       that rich implementations which implement more than
@@ -43,7 +43,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/05 05:21:11 $
+      $Date: 2005/09/09 04:26:05 $
     @@ContentType:
       dis:Date.RCS
   
@@ -514,7 +514,7 @@ ResourceDef:
       its two methods statically callable (i.e. they can be 
       called without any instance of the class).  Any class
       playing this <QUOTE::role> will be contacted when 
-      the <M::DOMMain:ManakaiDOMImplementationRegistry.getDOMImplementationList>
+      the <M::ImplementationRegistry.getDOMImplementationList>
       method is called.
 
 ResourceDef:
@@ -533,7 +533,7 @@ ResourceDef:
       its two methods statically callable (i.e. they can be 
       called without any instance of the class).  Any class
       playing this <QUOTE::role> will be contacted when 
-      the <M::DOMMain:ManakaiDOMImplementationRegistry.getDOMImplementationList>
+      the <M::ImplementationRegistry.getDOMImplementationList>
       method is called.
       \
       {NOTE:: Whether the class implements the 
@@ -632,13 +632,13 @@ PropDef:
             <M::DOMEvents:ManakaiDOMDocumentEvent.createEvent>.
       \
         - <CODE::DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM>::: 
-            Classes that might be available via <IF::DOMImplementationRegistry>, 
+            Classes that might be available via <Class::ImplementationRegistry>, 
             <IF::DOMCore:DOMImplementationSource> or 
             <M::DOMCore:DOMImplementation.getFeature>. 
       \
         - <CODE::DOMCore:DOMImplementationSource::ManakaiDOM:ManakaiDOM>:::
             Classes that should be known to 
-            <Class::ManakaiDOMImplementationRegistry>.
+            <Class::ImplementationRegistry>.
       \
         - <CODE::DOMCore:Node::ManakaiDOM:ManakaiDOM>::: 
             Classes that might be available via <M::DOMCore:Node.getFeature> 
@@ -679,7 +679,7 @@ PropDef:
          - <CODE::DOMCore:ManakaiDOMImplementationSource::ManakaiDOM:ManakaiDOMLatest>:::
              An class that is able to handle as same manner 
              as <M::DOMCore:ManakaiDOMImplementationSource> by 
-             <Class::ManakaiDOMImplementationRegistry>.
+             <Class::ImplementationRegistry>.
          \
          - <CODE::DOMCore:ManakaiDOMNode::ManakaiDOM:ManakaiDOMLatest>:::
              An class that should be available via 
@@ -712,26 +712,7 @@ ResourceDef:
       lang:Perl
   @DefaultValue:
     @@@:
-      <ClassName::DOMImplementationRegistry::ManakaiDOM:ManakaiDOMLatest>
-    @@ContentType:
-      lang:Perl
-  @Type: DISLang|String||ManakaiDOM|all
-  @For:
-    ManakaiDOM:ManakaiDOMLatest
-
-ResourceDef:
-  @QName: 
-    DOMMain:ManakaiDOMImplementationRegistryVar
-  @rdf:type:
-    DISPerl:ScalarVariable
-  @AppName:
-    @@@:
-      Message::DOM::DOMImplementationRegistry
-    @@ContentType:
-      lang:Perl
-  @DefaultValue:
-    @@@:
-      <ClassName::DOMImplementationRegistry::ManakaiDOM:ManakaiDOMLatest>
+      <ClassName::ImplementationRegistry::ManakaiDOM:ManakaiDOMLatest>
     @@ContentType:
       lang:Perl
   @Type: DISLang|String||ManakaiDOM|all
@@ -748,15 +729,19 @@ ElementTypeBinding:
 ## -- The implementation registry object
 
 ResourceDef:
-  @QName: DOMImplementationRegistry
+  @QName: ImplementationRegistry
   @rdf:type: ManakaiDOM|Class
+
   @For: ManakaiDOM|DOM3
-  @Implement: ImplementationSource
+  @Implement: ImplementationSource||ManakaiDOM|ManakaiDOM3
+  @Implement:
+    @@@: ImplementationSource||ManakaiDOM|ManakaiDOMLatest
+    @@For: ManakaiDOM|ManakaiDOMLatest
 
   @Description:
     @@lang:en
     @@@:
-      A binding dependent bootstrap for <IF::DOMCore:DOMImplementation> objects.
+      A binding dependent bootstrap for <IF::MinimumImplementation> objects.
   @Description:
     @@For:
       ManakaiDOM:ManakaiDOM
@@ -764,11 +749,11 @@ ResourceDef:
     @@@:
       A bootstrap class/object from which DOM implementations can be 
       retrieved.  For the manakai
-      <Class::ManakaiDOMImplementationRegistry> 
+      <Class::ImplementationRegistry> 
       implementation, DOM applications can access the registry both 
       via class methods and via object methods.  That is, applications 
       are free, but need not to instantiate a 
-      <Class::ManakaiDOMImplementationRegistry> object to get 
+      <Class::ImplementationRegistry> object to get 
       DOM implementations. 
       \
       {NOTE:: Authors of DOM applications will usually want to access 
@@ -1156,7 +1141,7 @@ minIFClsDef:
   @enDesc:
     The objects implementing <IF::ImplementationSource> interface provides 
     access to available implementations.  The 
-    <Class::DOMImplementationRegistry> object is a special case
+    <Class::ImplementationRegistry> object is a special case
     of the instance of this interface.
 
   @Method:
@@ -1432,6 +1417,8 @@ minIFClsDef:
     @@@ForCheck: ManakaiDOM|ForIF
 
   @DISLang:role: DOMMetaImpl|ManakaiDOMImplementationRole
+
+  @DOMMetaImpl:provideFeature: min30
   
   @Method:
     @@Name:  hasFeature
@@ -1543,7 +1530,7 @@ minIFClsDef:
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
-          @@@@@: 
+          @@@@enDesc:
             There is no object available that implements interfaces 
             associated with the <P::feature> and <P::version>. 
         @@@PerlDef:
@@ -1591,8 +1578,7 @@ minIFClsDef:
 ResourceDef:
   @QName: DOMMetaImpl|ManakaiDOMMinimumImplementation
   @For: ManakaiDOM|ManakaiDOM3
-  @rdf:type: ManakaiDOM|Class
-  @ISA: ManakaiMinimumImplementation
+  @AliasFor: ManakaiMinimumImplementation
   @ImplNote:
     @@lang:en
     @@@:
@@ -1611,7 +1597,7 @@ ResourceDef:
 
   @enDesc:
     The <IF::GetFeature> interface provides the <M::.hasFeature>
-    and <IF::.getFeature> methods to test or to retrieve an object with
+    and <M::.getFeature> methods to test or to retrieve an object with
     specified feature.
 
   @Method:

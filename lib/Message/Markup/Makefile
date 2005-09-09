@@ -27,7 +27,7 @@ DAC2PM_OPTIONS = $(DAC2PM_OPTIONS3)
 DAC2PM_PL = $(MANAKAI_BIN_DIR)dac2pm.pl
 DAC2PM = $(PERL_) $(DAC2PM_PL) $(DAC2PM_OPTIONS)
 
-UTIL_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Util/all.dac
+DOM_CORE_DAC_FILE = $(MANAKAI_LIB_DIR)Message/DOM/core.dac
 
 DIS_FILES = SuikaWikiConfig21.dis
 
@@ -35,8 +35,8 @@ GENERATED_FILES = all.dac SuikaWikiConfig21.pm
 
 all: $(GENERATED_FILES)
 
-all.dac: $(DIS_FILES) $(DAC_PL) $(UTIL_DAC_FILE)
-	$(DAC)$@ --input-db-file-name="$(UTIL_DAC_FILE)" SuikaWikiConfig21.dis
+all.dac: $(DOM_CORE_DAC_FILE) $(DIS_FILES) $(DAC_PL)
+	$(DAC)$@ --input-db-file-name="$<" SuikaWikiConfig21.dis
 
 SuikaWikiConfig21.pm: all.dac $(DAC2PM_PL)
 	$(DAC2PM) $< \
@@ -44,20 +44,11 @@ SuikaWikiConfig21.pm: all.dac $(DAC2PM_PL)
 	  --output-file-path="$@"
 	$(PERL_CHK) $@
 
-# $(UTIL_DAC_FILE)
-$(MANAKAI_LIB_DIR)Message/Util/all.dac: \
-  $(MANAKAI_LIB_DIR)Message/Util/ManakaiNode.dis \
-  $(MANAKAI_LIB_DIR)Message/Util/Error/DOMException.dis \
-  $(MANAKAI_LIB_DIR)manakai/DISCore.dis \
-  $(MANAKAI_LIB_DIR)manakai/DISRDF.dis \
-  $(MANAKAI_LIB_DIR)manakai/DISIDL.dis \
-  $(MANAKAI_LIB_DIR)manakai/DISLang.dis \
-  $(MANAKAI_LIB_DIR)manakai/DISPerl.dis \
-  $(MANAKAI_LIB_DIR)manakai/XML.dis \
-  SuikaWikiConfig21.dis \
-  $(MANAKAI_LIB_DIR)Message/DOM/DOMLS.dis
-	$(CD) $(MANAKAI_LIB_DIR)Message/Util/ && \
-	  $(MAKE) all.dac
+# $(DOM_CORE_DAC_FILE)
+$(MANAKAI_LIB_DIR)Message/DOM/core.dac: dummy
+	$(CD) $(MANAKAI_LIB_DIR)Message/DOM/ && $(MAKE) core.dac
+
+dummy:
 
 clean:
 	$(RM) $(GENERATED_FILES) .*.tmp *~ .*~

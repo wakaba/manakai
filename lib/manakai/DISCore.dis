@@ -21,7 +21,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/01 17:07:20 $
+      $Date: 2005/09/09 04:26:13 $
     @@ContentType:
       dis:Date.RCS
   
@@ -65,10 +65,10 @@ ResourceDef:
   @Description:
     @@lang:en
     @@@:
-      Binds a <CODE:NCName> with global element type name and 
+      Binds a <QUOTE::dis> <CODE::NCName> with global element type name and 
       shadow contents.
       \
-      {NOTE:: Scope of <Q:dis:ElementTypeBinding> is limited to 
+      {NOTE:: Scope of <Q::dis:ElementTypeBinding> is limited to 
               the file in which the element occurs.
       \
       }
@@ -80,8 +80,8 @@ ResourceDef:
   @Description:
     @@lang:en
     @@@:
-      A global element type to which a <CODe:NCName> is bound to.  
-      This type of element is used in <Q:dis:ElementTypeBinding> elements.
+      A global element type to which an <CODE::NCName> is bound to.  
+      This type of element is used in <Q::dis:ElementTypeBinding> elements.
   @rdf:type: ElementType
   @dataType:
     dis:TypeQName
@@ -106,7 +106,7 @@ ResourceDef:
   @Description:
     @@lang:en
     @@@:
-      Binds <CODE:NCName>s (i.e. namespace prefixes) to namespace URI 
+      Binds <CODE::NCName>s (i.e. namespace prefixes) to namespace URI 
       references. 
       \
       {NOTE:: Scope of namespace bindings is limited to the file 
@@ -161,7 +161,7 @@ ResourceDef:
   @Description:
     @@lang:en
     @@@:
-      The <QUOTE:dis> core library.
+      The <QUOTE::dis> core library.
   @noVariant:
 
 ## -- Module defining
@@ -173,7 +173,7 @@ ResourceDef:
   @Description:
     @@lang:en
     @@@:
-      An element that contains information about a <QUOTE:dis> module. 
+      An element that contains information about a <QUOTE::dis> module. 
   @noVariant:
 
 PropDef:
@@ -193,7 +193,7 @@ ResourceDef:
   @Description:
     @@lang:en
     @@@:
-      A <Q:dis:ResourceDef> element defines a resource.
+      A <Q::dis:ResourceDef> element defines a resource.
   @noVariant:
 
 ResourceTypeDef:
@@ -203,7 +203,7 @@ ResourceTypeDef:
     @@lang:en
     @@@:
       An abstract resource - it has zero or more concrete representations, 
-      that are distinguished by <CODE:For> URI references.
+      that are distinguished by <CODE::for> URI references.
   @AliasFor:
     @@@:
       ::ManakaiDOM:all
@@ -219,14 +219,14 @@ PropDef:
   @Description:
     @@lang:en
     @@@:
-      A <CODE:For> URI reference that can identity one representation 
+      A <CODE::for> URI reference that can identity one representation 
       of the resource.
       \
-      {NOTE:: To test <CODE:For> declared with <Q:dis:resourceFor> 
-              element, use <Q:dis:ForCheck> attribute, rather than
-              <Q:dis:For> attribute.  <Q:dis:For> attribute does 
-              not check additional <CODE:For> URI references 
-              declared with <Q:dis:resourceFor> element.
+      {NOTE:: To test <CODE::for> declared with <Q::dis:resourceFor> 
+              element, use <Q::dis:ForCheck> attribute, rather than
+              <Q::dis:For> attribute.  <Q::dis:For> attribute does 
+              not check additional <CODE::For> URI references 
+              declared with <Q::dis:resourceFor> element.
       \
       }
 
@@ -242,7 +242,7 @@ PropDef:
   @Description:
     @@lang:en
     @@@:
-      A <Q:For> for which the resource is used (<QUOTE:OR> filter).
+      A <Q::For> for which the resource is used (<QUOTE::OR> filter).
 PropDef:
   @QName:
     dis:ForCheck
@@ -253,7 +253,7 @@ PropDef:
   @Description:
     @@lang:en
     @@@:
-      A <Q:For> for which the resource is used (<QUOTE:AND> filter).
+      A <Q::For> for which the resource is used (<QUOTE::AND> filter).
 
 ForDef:
   @QName:
@@ -314,6 +314,14 @@ PropDef:
   @ISA:
     rdfs:label
 
+PropDef:
+  @QName: 
+    dis:FileName
+  @Description:
+    @@lang:en
+    @@@:
+      A file name.
+
 ## -- Resource description
 
 PropDef:
@@ -352,14 +360,14 @@ PropDef:
   @Description:
     @@lang:en
     @@@:
-      DOM Level of specification (obsolete) - use <CODE:For> instead.
+      DOM Level of specification (obsolete) - use <CODE::For> instead.
 PropDef:
   @QName:
     dis:Condition
   @Description:
     @@lang:en
     @@@:
-      Condition (obsolete) - use <CODE:For> instead.
+      Condition (obsolete) - use <CODE::For> instead.
 
 ResourceDef:
   @QName:
@@ -445,7 +453,7 @@ PropDef:
   @Description:
     @@lang:en
     @@@:
-      <QUOTE:Implementing> relationship of a resource.
+      <QUOTE::Implementing> relationship of a resource.
   @subsetOf:derivedFrom
   @rdfs:subPropertyOf:derivedFrom
   @dataType:
@@ -482,7 +490,7 @@ PropDef:
   @Description:
     @@lang:en
     @@@:
-      A <QUOTE:dis> processing instruction whether the subject resource 
+      A <QUOTE::dis> processing instruction whether the subject resource 
       should be interpreted as a resource when the subject resource 
       is described as an <Q::dis:aliasFor> another resource.  Any 
       <Q::dis:ResourceDef> that is a child of alias <Q::dis:ResourceDef> 
@@ -710,9 +718,9 @@ DataTypeDef:
       \
       <Q::dis:TypeQName> := [prefix ":"] local-name
       \
-      prefix := *(<any character> - ":")
+      prefix := *(<lt>any character> - ":")
       \
-      local-name := *(<any character> - ":")
+      local-name := *(<lt>any character> - ":")
 
 DataTypeDef:
   @QName: NCNameOrQName
@@ -908,5 +916,3 @@ ResourceDef:
     @@lang:en
     @@@:
       <QUOTE::Same as Perl> or <QUOTE::MPL 1.1/GPL 2.0/LGPL 2.1> license. 
-
-## DISCore.dis ends here

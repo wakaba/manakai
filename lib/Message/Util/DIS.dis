@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/09/05 05:21:12 $
+      $Date: 2005/09/09 04:26:06 $
     @@ContentType:
       dis:Date.RCS
   
@@ -44,9 +44,16 @@ Module:
       @@@WithFor: 
         DIS:ForLatest
     @@Module:
+      @@@Name: DIS
+      @@@WithFor:
+        DIS:ForEmpty
+    @@Module:
       @@@Name: PerlCode
       @@@WithFor:
         ManakaiDOM:Perl
+    @@Module:
+      @@@QName: MDOM|DOMFeature
+      @@@WithFor: ManakaiDOM|all
 
   @DefaultFor: 
     DIS:ForLatest
@@ -72,8 +79,12 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @DOMMetaImpl:
     http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
+  @ecore:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
   @infoset:
     http://www.w3.org/2001/04/infoset#
+  @kwd:
+    http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
   @lang:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
@@ -82,6 +93,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @Markup:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup#
+  @MDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @null:
@@ -111,8 +124,7 @@ ForDef:
     @@lang:en
     @@@:
       For latest version of the <Module::Util:DIS> module implementation
-  @ISA:
-    ManakaiDOM:Perl
+  @ISA: DIS|ForEmpty
 
 ## -- Submodules
 
@@ -226,10 +238,105 @@ RoleDef:
     <M::ManakaiDISDatabase.getFeature> method with
     appropriate feature parameters.
 
+
+ElementTypeBinding:
+  @Name: IFQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: IFISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: IFClsDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ForEmpty !=ForEmpty
+    @@For: ForLatest
+    @@For: =ForEmpty
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|IF
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ForEmpty||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ForEmpty
+    @@Implement:
+      @@@@: ||ForLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ForLatest
+
+    @@DOMMain:implementFeature:
+      @@@@: CoreFeature10
+      @@@For: ForLatest
+
+ElementTypeBinding:
+  @Name: ClsDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ForEmpty !=ForEmpty
+    @@For: ForLatest
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+
+    @@DOMMain:implementFeature:
+      @@@@: CoreFeature10
+      @@@For: ForLatest
+
+ElementTypeBinding:
+  @Name: clsActualType
+  @ElementType:
+    dis:actualType
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
 ## -- SuikaWikiConfig/2.1 extended classes
 
-ClsDef:
+IFClsDef:
+  @IFQName: DISImplementation
   @ClsQName: ManakaiDISImplementation
+
   @ClsISA:
     swcfg21:ManakaiSWCFGImplementation::swcfg21:ForLatest
   @Description:
@@ -242,9 +349,10 @@ ClsDef:
     @@Description:
       @@@lang:en
       @@@@:
-        Creates an empty <Class::ManakaiDISDocument> object. 
+        Creates an empty <IF::DISDocument> node.
     @@Return:
-      @@@Type:ManakaiDISDocument
+      @@@Type: DISDocument
+      @@@clsActualType: ManakaiDISDocument
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -262,9 +370,10 @@ ClsDef:
     @@Description:
       @@@lang:en
       @@@@:
-        Creates a <Class::ManakaiDISParser> object. 
+        Creates a <IF::DISParser> object.
     @@Return:
-      @@@Type: ManakaiDISParser
+      @@@Type: DISParser
+      @@@clsActualType: ManakaiDISParser
       @@@Description:
         @@@@lang:en
         @@@@@: 
@@ -281,7 +390,8 @@ ClsDef:
       @@@@:
         Creates a new <QUOTE::dis> database.
     @@Return:
-      @@@Type:ManakaiDISDatabase
+      @@@Type: DISDatabase
+      @@@clsActualType: ManakaiDISDatabase
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -306,7 +416,7 @@ ClsDef:
       @@@lang:en
       @@@@:
         Converts a pair of name URI reference and <QUOTE::for> URI reference 
-        into a <TYPE::dis:TFQNames>-expanded URI reference. 
+        into a <Q::dis:TFQNames>-expanded URI reference. 
     @@Param:
       @@@Name: typeURI
       @@@Type: NameURI
@@ -341,19 +451,20 @@ ClsDef:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The <TYPE::dis:TFQNames>-expanded URI references.  
+          The <Q::dis:TFQNames>-expanded URI references.  
       @@@PerlDef:
         $typeURI = <Q::DOMMain:any> unless defined $typeURI;
         $forURI = <Q::ManakaiDOM:all> unless defined $forURI;
         __CODE{tfurisToURI:: $turi => $typeURI, $furi => $forURI, $uri => $r}__;
 
   @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForClass
     @@QName: tfurisToURI
     @@rdf:type:
       dis2pm:BlockCode
     @@enDesc:
         Converts a pair of name URI reference and <QUOTE::for> URI reference 
-        into a <TYPE::dis:TFQNames>-expanded URI reference. 
+        into a <Q::dis:TFQNames>-expanded URI reference. 
     @@PerlDef:      
         if ($furi eq <Q::ManakaiDOM:all>) {
           $uri = $turi;
@@ -384,6 +495,7 @@ ClsDef:
     @@enDesc:
         Converts a set of name URI reference and <QUOTE::for> URI reference 
         and <QUOTE::for+> URI references into a URi reference. 
+    @@ForCheck: ManakaiDOM|ForClass
     @@PerlDef:      
         if ($furi eq <Q::ManakaiDOM:all> and @{$forp} == 0) {
           $uri = $turi;
@@ -425,6 +537,7 @@ ClsDef:
     @@enDesc:
       Gets an anonymous URI reference of a child resource of another 
       resource. 
+    @@ForCheck: ManakaiDOM|ForClass
     @@PerlDef:
       my $__parent = $parentURI;
       my $__ln = $localName;
@@ -439,6 +552,7 @@ ClsDef:
     @@enDesc:
       Converts a camelCase name to a underscored_name. 
     @@ManakaiDOM:isStatic:1
+    @@ForCheck: ManakaiDOM|ForClass
     @@Param:
       @@@Name: camelName
       @@@Type:
@@ -462,23 +576,33 @@ ClsDef:
     @@Name: plLoadDISDatabase
     @@enDesc:
       Loads a database from a file that was saved by 
-      <M::ManakaiDISDatabase.plStore>. 
+      <M::DISDatabase.plStore>. 
       \
       {NOTE:: <QUOTE::dis> documents restored from external file
-              would have different <A::ManakaiDISDocument.implementation> 
-              than this <Class::ManakaiDISImplementation>, even if 
+              would have different <A::DISDocument.implementation> 
+              than this <Class::DISImplementation>, even if 
               it has been created by this implementation
               and stored in the same session. 
       \
       }
+
+      Implementation does not have to able to restore a database
+      saved by other implementation.
     @@Param:
       @@@Name:fileName
       @@@Type: 
         DISLang:String::ManakaiDOM:all
       @@@enDesc:
-        An environment-dependent file name. 
+        An environment-dependent file name.  How the relative pathes
+        is interpreted is implementation dependent.
+      @@@enDesc:
+        @@@@ForCheck: ManakaiDOM|ForClass
+        @@@@@:
+          In this implementation, relative pathes are resolved against
+          the current directory of the context.
     @@Return:
-      @@@Type: ManakaiDISDatabase
+      @@@Type: DISDatabase
+      @@@clsActualType: ManakaiDISDatabase
       @@@SimpleException:
       @@@PerlDef:
         use Storable qw/retrieve/;
@@ -511,10 +635,14 @@ ElementTypeBinding:
 
 ## TODO: Formal description required for simple exception
 
-ClsDef:
+IFClsDef:
+  @IFQName: DISParser
   @ClsQName: ManakaiDISParser
+
+  @IFISA: swcfg21|SWCFGParser||swcfg21|ForLatest
   @ClsISA:
     swcfg21:ManakaiSWCFGParser::swcfg21:ForLatest
+
   @Description:
     @@lang:en
     @@@:
@@ -534,14 +662,15 @@ ClsDef:
         @@@@@:
           The input source. 
     @@Return:
-      @@@Type: ManakaiDISDocument
+      @@@Type: DISDocument
+      @@@clsActualType: ManakaiDISDocument
       @@@Description:
         @@@@lang:en
         @@@@@:
           The <QUOTE::dis> document object created from the <P::input>. 
       @@@RaiseException:
         @@@@@:
-          swcfg21:SWCFG_PARSE_ERR
+          swcfg21:SWCFG_PARSE_ERR::swcfg21:ForLatest
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
@@ -562,8 +691,10 @@ ClsDef:
         }
 ##DISParser
 
-ClsDef:
+IFClsDef:
+  @IFQName: DISNode
   @ClsQName: ManakaiDISNode
+
   @Description:
     @@lang:en
     @@@:
@@ -577,6 +708,7 @@ ClsDef:
       inherit it. 
 
   @MethodRedef:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name:lookupNamespacePrefix
     @@Description:
       @@@lang:en
@@ -619,7 +751,8 @@ ClsDef:
           @@@@@@:
             Simply returns the <DOM::null> if no prefix associated. 
     @@Return:
-      @@@Type:
+      @@@Type: swcfg21|SWCFGString||swcfg21|ForLatest
+      @@@actualType:
         DISCore:NamespacePrefix::ManakaiDOM:all
       @@@Description:
         @@@@lang:en
@@ -668,7 +801,7 @@ ClsDef:
             } catch <Class::ManakaiDISException> with {
               my $err = shift;
               $err->throw
-                unless $err->{<Q::MDOMX:subtype>} eq <Q::NO_DB_ASSOCIATED_ERR>;
+                unless $err->{<Q::MDOMX:subtype>} eq <Q::NO_ASSOCIATED_DB_ERR>;
             };
 
             last FIND unless $makeNewBinding;
@@ -718,6 +851,7 @@ ClsDef:
         }
 
   @MethodRedef:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name:lookupNamespaceURI
     @@Description:
       @@@lang:en
@@ -802,7 +936,7 @@ ClsDef:
             } catch <Class::ManakaiDISException> with {
               my $err = shift;
               $err->throw
-                unless $err->{<Q::MDOMX:subtype>} eq <Q::NO_DB_ASSOCIATED_ERR>;
+                unless $err->{<Q::MDOMX:subtype>} eq <Q::NO_ASSOCIATED_DB_ERR>;
             };
             if ($makeNewBinding) {
               $r = $binds->{$prefix} = $prefix;
@@ -819,6 +953,7 @@ ClsDef:
         }
 
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name:getNodeReference
     @@Description:
       @@@lang:en
@@ -827,8 +962,7 @@ ClsDef:
     @@ManakaiDOM:isStatic:1
     @@Param:
       @@@Name:object
-      @@@Type:
-        ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+      @@@Type: ManakaiNode|NodeStem||ManakaiDOM|Perl
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -855,8 +989,11 @@ ClsDef:
                     qq[(ref: "@{[ref $object]}")]},
           }__;
         }
-        $r = $object-><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
-                                  .newReference> ($class);
+        __CODE{ManakaiNode|getNewReference||ManakaiDOM|Perl::
+          $object => $object,
+          $ref => $r,
+          $class => $class,
+        }__;
   
   @Attr:
     @@Name:ownerDISDocument
@@ -865,7 +1002,8 @@ ClsDef:
       @@@@:
         The <QUOTE::dis> document object associated with this node. 
     @@Get:
-      @@@Type:ManakaiDISDocument
+      @@@Type: DISDocument
+      @@@clsActualType: ManakaiDISDocument
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -883,11 +1021,14 @@ ClsDef:
           if $self->{<Q::TreeCore:node>}->{<Q::swcfg21:ownerDocument>};
 ##DISNode
 
-ClsDef:
+IFClsDef:
+  @IFQName: DISElement
   @ClsQName: ManakaiDISElement
+
   @ClsISA: ManakaiDISNode
   @ClsISA:
     swcfg21:ManakaiSWCFGElement::swcfg21:ForLatest
+
   @Description:
     @@lang:en
     @@@:
@@ -1215,11 +1356,11 @@ ClsDef:
         }
 
   @Method:
-    @@QName: qnameToURI
+    @@Name: qnameToURI
     @@Description:
       @@@lang:en
       @@@@:
-        Converts a qualified name (<TYPE::dis:TypeQName>) to 
+        Converts a qualified name (<Q::dis:TypeQName>) to 
         an expanded URI reference. 
     @@Param:
       @@@Name: qname
@@ -1262,11 +1403,11 @@ ClsDef:
         }__;
 
   @Method:
-    @@QName: qnameToPair
+    @@Name: qnameToPair
     @@Description:
       @@@lang:en
       @@@@:
-        Converts a qualified name (<TYPE::dis:TypeQName>) to 
+        Converts a qualified name (<Q::dis:TypeQName>) to 
         a pair of namespace URI and local name. 
     @@Param:
       @@@Name: qname
@@ -1301,7 +1442,7 @@ ClsDef:
     @@Description:
       @@@lang:en
       @@@@:
-        Converts a <TYPE::dis:TFQNames>
+        Converts a <Q::dis:TFQNames>
         into an expanded URI reference. 
     @@Param:
       @@@Name: tfqnames
@@ -1310,7 +1451,7 @@ ClsDef:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          A <TYPE::dis:TFQNames> to identify a resource. 
+          A <Q::dis:TFQNames> to identify a resource. 
     @@Param:
       @@@Name: defaultTypeURI
       @@@Type: NameURI
@@ -1348,7 +1489,7 @@ ClsDef:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The <TYPE::dis:TFQNames>-expanded URI references.  
+          The <Q::dis:TFQNames>-expanded URI references.  
       @@@UndeclaredPrefixException:
       @@@PerlDef:
         my ($typeq, $forq) = split /\s*[:|][:|]\s*/, $tfqnames, 2;
@@ -1382,7 +1523,7 @@ ClsDef:
     @@Description:
       @@@lang:en
       @@@@:
-        Converts a <TYPE::DISCore:TFPQNames>
+        Converts a <Q::DISCore:TFPQNames>
         into an expanded URI reference. 
     @@Param:
       @@@Name: tfpqnames
@@ -1391,7 +1532,7 @@ ClsDef:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          A <TYPE::DISCore:TFPQNames> to identify a resource. 
+          A <Q::DISCore:TFPQNames> to identify a resource. 
     @@Param:
       @@@Name: defaultTypeURI
       @@@Type: NameURI
@@ -1429,7 +1570,7 @@ ClsDef:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The <TYPE::dis:TFQNames>-expanded URI references.  
+          The <Q::dis:TFQNames>-expanded URI references.  
       @@@UndeclaredPrefixException:
       @@@PerlDef:
         my ($typeq, $forq, @forpq) = split /\s*[:|][:|]\s*/, $tfpqnames;
@@ -1481,14 +1622,15 @@ ClsDef:
     @@MediaTypeParam:
     @@MediaTypeDefaultParam:
     @@Return:
-      @@@Type: ManakaiDISElement
+      @@@Type: DISElement
+      @@@clsActualType: ManakaiDISElement
       @@@enDesc:
         The attribute (property) element node. 
       @@@nullCase:
         @@@@enDesc:
           No attribute node found. 
       @@@PerlDef:
-        for my $c (@{$self-><M::ManakaiDISElement.disChildElements>
+        C: for my $c (@{$self-><M::ManakaiDISElement.disChildElements>
                                   (for_arg => $forArg, forp_arg => $forpArg)}) {
           if ($c-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
                                     .expandedURI> eq $attrName and
@@ -1496,7 +1638,7 @@ ClsDef:
                                   ($mediaType, $defaultMediaType,
                                    for_arg => $forArg, forp_arg => $forpArg)) {
             $r = $c;
-            last;
+            last C;
           }
         }
 
@@ -1514,7 +1656,8 @@ ClsDef:
     @@MediaTypeParam:
     @@MediaTypeDefaultParam:
     @@Return:
-      @@@Type: ManakaiDISElementList
+      @@@Type: DISElementList
+      @@@clsActualType: ManakaiDISElementList
       @@@enDesc:
         The attribute (property) element nodes. 
       @@@PerlDef:
@@ -1537,20 +1680,24 @@ ClsDef:
     @@ForParam:
     @@ForpParam:
     @@Return:
-      @@@Type: ManakaiDISElementList
+      @@@Type: DISElementList
+      @@@clsActualType: ManakaiDISElementList
       @@@enDesc:
         The current snapshot of child nodes. 
       @@@PerlDef:
         $r = bless [], <ClassName::ManakaiDISElementList>;    
         __DEEP{
-          for my $cn (@{$self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
+          C: for my $cn (@{$self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
                                                        .childNodes>}) {
             ## $cn is an #element.
-            my $dn = $cn->{<Q::TreeCore:node>}
-                        -><M::ManakaiDOM:ManakaiDOMNodeObject
-                            ::ManakaiDOM:Perl.newReference>
-                                      (<ClassName::ManakaiDISElement>);
-            next unless $dn-><M::ManakaiDISElement.forMatch> ($forArg, $forpArg);
+            my $dn;
+            __CODE{ManakaiNode|getNewReference||ManakaiDOM|Perl::
+              $object => {$cn->{<Q::TreeCore:node>}},
+              $ref => $dn,
+              $class => {<ClassName::ManakaiDISElement>},
+            }__;
+            next C unless $dn-><M::ManakaiDISElement.forMatch>
+                                      ($forArg, $forpArg);
             push @$r, $dn;
           }
         }__;
@@ -1560,7 +1707,8 @@ ClsDef:
     @@enDesc:
       A list of child elements, without <QUOTE::for> check.  
     @@Return:
-      @@@Type: ManakaiDISElementList
+      @@@Type: DISElementList
+      @@@clsActualType: ManakaiDISElementList
       @@@enDesc:
         The current snapshot of child nodes. 
       @@@PerlDef:
@@ -1569,10 +1717,12 @@ ClsDef:
           for my $cn (@{$self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
                                                        .childNodes>}) {
             ## $cn is an #element.
-            my $dn = $cn->{<Q::TreeCore:node>}
-                        -><M::ManakaiDOM:ManakaiDOMNodeObject
-                            ::ManakaiDOM:Perl.newReference>
-                                      (<ClassName::ManakaiDISElement>);
+            my $dn;
+            __CODE{ManakaiNode|getNewReference||ManakaiDOM|Perl::
+              $object => {$cn->{<Q::TreeCore:node>}},
+              $ref => $dn,
+              $class => {<ClassName::ManakaiDISElement>},
+            }__;
             push @$r, $dn;
           }
         }__;
@@ -1580,7 +1730,7 @@ ClsDef:
   @Attr:
     @@Name: qnameValueURI
     @@enDesc:
-      The element value (written as <TYPE::dis:TypeQName>), as URI reference. 
+      The element value (written as <Q::dis:TypeQName>), as URI reference. 
       \
       {NOTE:: What should be if list value?
       \
@@ -1605,7 +1755,7 @@ ClsDef:
     @@Name: qnameValueLocalName
     @@enDesc:
       The local name part of the element value (assumed as 
-      written as <TYPE::dis:TypeQName>). 
+      written as <Q::dis:TypeQName>). 
       \
       {NOTE:: What should be if list value?
       \
@@ -1631,7 +1781,7 @@ ClsDef:
     @@Name: qnameValuePrefix
     @@enDesc:
       The prefix part of the element value (assumed as 
-      written as <TYPE::dis:TypeQName>). 
+      written as <Q::dis:TypeQName>). 
       \
       {NOTE:: What should be if list value?
       \
@@ -1657,7 +1807,7 @@ ClsDef:
     @@Name: qnameValueNamespaceURI
     @@enDesc:
       The namespace URI of the element value (assumed as written 
-      in <TYPE::dis:TypeQName>). 
+      in <Q::dis:TypeQName>). 
       \
       {NOTE:: What should be if list value?
       \
@@ -1683,7 +1833,7 @@ ClsDef:
   @Method:
     @@Name: tfqnamesValueURI
     @@enDesc:
-      The element value (written as <TYPE::dis:TFQNames>),
+      The element value (written as <Q::dis:TFQNames>),
       as URI reference. 
       \
       {NOTE:: What should be if list value?
@@ -1851,7 +2001,7 @@ ClsDef:
       @@@nullCase:
         @@@@enDesc:
           There is no implementation that supports the feature
-          <Feature::Util:PerlCode> version <FeatureVer:1.0>.
+          <Feature::Util:PerlCode> version <FeatureVer::1.0>.
       @@@PerlDef:
             $r = ($self-><AG::SWCFGNode.ownerDocument> or
                         $self)-><AG::SWCFGDoc.implementation>
@@ -1996,7 +2146,7 @@ ClsDef:
                                               (<Q::Perl:ARRAY>)) {
               $r = $plimpl-><M::MPLImpl.createPerlAtom> ('[]');
             } elsif ($dataType-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
-                                              (<Q::Perl:hash>)) {
+                                              (<Q::Perl:HASH>)) {
               $r = $plimpl-><M::MPLImpl.createPerlAtom> ('{}');
             }
           }
@@ -2008,7 +2158,8 @@ ClsDef:
       Converts <Q::lang:dis> into Perl code.
     @@Param:
       @@@Name:disResource
-      @@@Type:ManakaiDISResourceDefinition
+      @@@Type: DISResource
+      @@@clsActualType: ManakaiDISResourceDefinition
       @@@enDesc:
         A <QUOTE::dis> resource with which code is evaluated.
     @@ForParam:
@@ -2325,20 +2476,17 @@ ClsDef:
           interfaces of the specified feature and version.
      @@Param:
         @@@Name:  feature
-        @@@Type:
-          DISLang:String::ManakaiDOM:all
-        @@@actualType:
-          ManakaiDOM:ManakaiDOMFeatureName::ManakaiDOM:ManakaiDOMLatest
+        @@@Type: swcfg21|SWCFGString||swcfg21|ForLatest
+        @@@actualType: DOMFeature|FeatureNameString||ManakaiDOM|ManakaiDOMLatest
         @@@Description:
           @@@@lang:en
           @@@@@:
             A feature name to request.
      @@Param:
         @@@Name:  version
-        @@@Type:
-          DISLang:String::ManakaiDOM:all
+        @@@Type: swcfg21|SWCFGString||swcfg21|ForLatest
         @@@actualType:
-          ManakaiDOM:ManakaiDOMFeatureVersion::ManakaiDOM:ManakaiDOMLatest
+          DOMFeature|FeatureVersionString||ManakaiDOM|ManakaiDOMLatest
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -2363,9 +2511,11 @@ ClsDef:
               $Message::Util::DIS::ManakaiDISElement::CompatClass{$_}
             } keys %Message::Util::DIS::ManakaiDISElement::CompatClass) {
               if ($Message::DOM::ClassFeature{$class}->{$feature}->{$version}) {
-                $r = $self->{<Q::TreeCore:node>}
-                          -><M::ManakaiDOM:ManakaiDOMNodeObject
-                                     ::ManakaiDOM:Perl.newReference> ($class);
+                __CODE{ManakaiNode|getNewReference||ManakaiDOM|Perl::
+                  $object => {$self->{<Q::TreeCore:node>}},
+                  $ref => $r,
+                  $class => $class,
+                }__;
                 last CLASS;
               }
             }
@@ -2424,10 +2574,13 @@ ElementTypeBinding:
         @@@@@:
           An unsupported type of element has appeared.
 
-
-ClsDef:
+IFClsDef:
+  @IFQName: DISModuleElement
   @ClsQName: ManakaiDISModuleElement
+
+  @IFISA: DISElement
   @ClsISA: ManakaiDISElement
+
   @enDesc:
     The <Q::dis:Module> elements. 
 
@@ -2441,7 +2594,8 @@ ClsDef:
     @@enDesc:
       The <Q::dis:Require> child element.  The element is 
       newly created if not exist. 
-    @@Type: ManakaiDISElement
+    @@Type: DISElement
+    @@clsActualType: ManakaiDISElement
     @@Get:
       @@@PerlDef:
         __DEEP{
@@ -2513,8 +2667,10 @@ ClsDef:
         }__;
 ##DISModuleElement
 
-ClsDef:
+IFClsDef:
+  @IFQName: DISElementList
   @ClsQName: ManakaiDISElementList
+
   @enDesc:
     @@lang:en
     @@@:
@@ -2526,33 +2682,42 @@ ClsDef:
       }
 ##DISElementList
 
-ClsDef:
+IFClsDef:
+  @IFQName: DISComment
   @ClsQName: ManakaiDISComment
+
   @ClsISA: ManakaiDISNode
   @ClsISA:
     swcfg21:ManakaiSWCFGComment::swcfg21:ForLatest
+
   @Description:
     @@lang:en
     @@@:
       <QUOTE::dis> comment node objects. 
 ##DISComment
 
-ClsDef:
+IFClsDef:
+  @IFQName: DISDocumentFragment
   @ClsQName: ManakaiDISDocumentFragment
+
   @ClsISA: ManakaiDISNode
   @ClsISA:
     swcfg21:ManakaiSWCFGDocumentFragment::swcfg21:ForLatest
+
   @Description:
     @@lang:en
     @@@:
       <QUOTE::dis> document fragment node objects. 
 ##DISDocumentFragment
 
-ClsDef:
+IFClsDef:
+  @IFQName: DISDocument
   @ClsQName: ManakaiDISDocument
+
   @ClsISA: ManakaiDISNode
   @ClsISA:
     swcfg21:ManakaiSWCFGDocument::swcfg21:ForLatest
+
   @Description:
     @@lang:en
     @@@:
@@ -2563,7 +2728,8 @@ ClsDef:
     @@enDesc:
       The <Q::dis:Module> element in this document.  The element is 
       newly created if not exist. 
-    @@Type: ManakaiDISModuleElement
+    @@Type: DISModuleElement
+    @@clsActualType: ManakaiDISModuleElement
     @@Get:
       @@@PerlDef:
         __DEEP{
@@ -2578,7 +2744,8 @@ ClsDef:
     @@enDesc:
       Associated <QUOTE::dis> database. 
 
-    @@Type: ManakaiDISDatabase
+    @@Type: DISDatabase
+    @@clsActualType: ManakaiDISDatabase
     @@Get:
       @@@NoDBException:
       @@@PerlDef:
@@ -2600,21 +2767,25 @@ ClsDef:
     @@ForParam:
     @@ForpParam:
     @@Return:
-      @@@Type: ManakaiDISElementList
+      @@@Type: DISElementList
+      @@@clsActualType: ManakaiDISElementList
       @@@enDesc:
         The current snapshot of child nodes. 
       @@@PerlDef:
         $r = bless [], <ClassName::ManakaiDISElementList>;    
         __DEEP{
-          for my $cn (@{$self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
+          C: for my $cn (@{$self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
                                                        .childNodes>}) {
-            next unless $cn-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
+            next C unless $cn-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
                                               .nodeType> eq '#element';
-            my $dn = $cn->{<Q::TreeCore:node>}
-                        -><M::ManakaiDOM:ManakaiDOMNodeObject
-                            ::ManakaiDOM:Perl.newReference>
-                                      (<ClassName::ManakaiDISElement>);
-            next unless $dn-><M::ManakaiDISElement.forMatch> ($forArg, $forpArg);
+            my $dn;
+            __CODE{ManakaiNode|getNewReference||ManakaiDOM|Perl::
+              $object => {$cn->{<Q::TreeCore:node>}},
+              $ref => $dn,
+              $class => {<ClassName::ManakaiDISElement>},
+            }__;
+            next C unless $dn-><M::ManakaiDISElement.forMatch>
+                                              ($forArg, $forpArg);
             push @$r, $dn;
           }
         }__;
@@ -2624,20 +2795,23 @@ ClsDef:
     @@enDesc:
       A list of child elements, without <QUOTE::for> checks.  
     @@Return:
-      @@@Type: ManakaiDISElementList
+      @@@Type: DISElementList
+      @@@clsActualType: ManakaiDISElementList
       @@@enDesc:
         The current snapshot of child nodes. 
       @@@PerlDef:
         $r = bless [], <ClassName::ManakaiDISElementList>;    
         __DEEP{
-          for my $cn (@{$self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
+          C: for my $cn (@{$self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
                                                        .childNodes>}) {
-            next unless $cn-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
+            next C unless $cn-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
                                               .nodeType> eq '#element';
-            my $dn = $cn->{<Q::TreeCore:node>}
-                        -><M::ManakaiDOM:ManakaiDOMNodeObject
-                            ::ManakaiDOM:Perl.newReference>
-                                      (<ClassName::ManakaiDISElement>);
+            my $dn;
+            __CODE{ManakaiNode|getNewReference||ManakaiDOM|Perl::
+              $object => {$cn->{<Q::TreeCore:node>}},
+              $ref => $dn,
+              $class => {<ClassName::ManakaiDISElement>},
+            }__;
             push @$r, $dn;
           }
         }__;
@@ -2652,11 +2826,14 @@ PropDef:
 
 ## -- Definition object database
 
-ClsDef:
+IFClsDef:
+  @IFQName: DISDatabase
   @ClsQName: ManakaiDISDatabase
+
+  @ClsISA: ManakaiDISExceptionTarget
+
   @enDesc:
     Resource database created from <QUOTE::dis> source data. 
-  @ClsISA: ManakaiDISExceptionTarget
 
   @DISLang:role: DatabaseRole
 
@@ -2675,7 +2852,8 @@ ClsDef:
           A <QUOTE::dis> module URI reference. 
     @@ForParam:
     @@Return:
-      @@@Type: ManakaiDISModuleDefinition
+      @@@Type: DISModule
+      @@@clsActualType: ManakaiDISModuleDefinition
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -2723,7 +2901,8 @@ ClsDef:
           @@@@@@:
             Defaulted to <Q::ManakaiDOM:all>. 
     @@Return:
-      @@@Type: ManakaiDISForDefinition
+      @@@Type: DISFor
+      @@@clsActualType: ManakaiDISForDefinition
       @@@PerlDef:
         $forURI = <Q::ManakaiDOM:all> unless defined $forURI;
         if (defined $self->{forDef}->{$forURI}) {
@@ -2761,7 +2940,8 @@ ClsDef:
             Defaulted to <Q::DOMMain:any>. 
     @@ForParam:
     @@Return:
-      @@@Type: ManakaiDISResourceDefinition
+      @@@Type: DISResource
+      @@@clsActualType: ManakaiDISResourceDefinition
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -2803,7 +2983,8 @@ ClsDef:
       @@@enDesc:
         A URI reference identifying a file. 
     @@Return:
-      @@@Type: ManakaiDISDocument
+      @@@Type: DISDocument
+      @@@clsActualType: ManakaiDISDocument
       @@@enDesc:
         The <QUOTE::dis> source document. 
       @@@nullCase:
@@ -2823,7 +3004,8 @@ ClsDef:
         source document, then the association has been updated. 
     @@Param:
       @@@Name: doc
-      @@@Type: ManakaiDISDocument
+      @@@Type: DISDocument
+      @@@clsActualType: ManakaiDISDocument
       @@@enDesc:
         The document object to set. 
     @@Return:
@@ -2836,7 +3018,8 @@ ClsDef:
       Loads definitions from a <QUOTE::dis> document. 
     @@Param:
       @@@Name: doc
-      @@@Type:ManakaiDISDocument
+      @@@Type: DISDocument
+      @@@clsActualType: ManakaiDISDocument
       @@@enDesc:
         The source <QUOTE::dis> document object.  Its 
         <A::ManakaiDISDocument.disDatabase> must be this database. 
@@ -3061,12 +3244,13 @@ ClsDef:
       Loads definition of a <QUOTE::for> from a <Q::dis:ForDef> element. 
     @@Param:
       @@@Name: mod
-      @@@Type: ManakaiDISModuleDefinition
+      @@@Type: DISModule
+      @@@clsActualType: ManakaiDISModuleDefinition
       @@@enDesc:
         The module in which the <QUOTE::for> to load is defined. 
     @@Param:
       @@@Name: el
-      @@@Type:ManakaiDISElement
+      @@@Type: DISElement
       @@@enDesc:
         The source <QUOTE::dis> <Q::dis:ForDef> element object. 
     @@Return:
@@ -3139,12 +3323,14 @@ ClsDef:
       <Q::dis:ResourceDef> element. 
     @@Param:
       @@@Name: mod
-      @@@Type: ManakaiDISModuleDefinition
+      @@@Type: DISModule
+      @@@clsActualType: ManakaiDISModuleDefinition
       @@@enDesc:
         The module in which the resource to load is defined. 
     @@Param:
       @@@Name: parentResource
-      @@@Type: ManakaiDISResourceDefinition
+      @@@Type: DISResource
+      @@@clsActualType: ManakaiDISResourceDefinition
       @@@enDesc:
         The (static) parent resource in which the resource to load is defined. 
       @@@nullCase:
@@ -3153,7 +3339,8 @@ ClsDef:
           a direct child of the document node. 
     @@Param:
       @@@Name: dynParent
-      @@@Type: ManakaiDISResourceDefinition
+      @@@Type: DISResource
+      @@@clsActualType: ManakaiDISResourceDefinition
       @@@enDesc:
         The dynamic parent resource of the resource to load. 
       @@@nullCase:
@@ -3162,7 +3349,8 @@ ClsDef:
           a direct child of the document node. 
     @@Param:
       @@@Name: el
-      @@@Type:ManakaiDISElement
+      @@@Type: DISElement
+      @@@clsActualType: ManakaiDISElement
       @@@enDesc:
         The source <QUOTE::dis> <Q::dis:ResourceDef> element object. 
     @@ForParam:
@@ -3453,7 +3641,7 @@ ClsDef:
         Exception code to select.
     @@Param:
       @@@Name: contextNode
-      @@@Type: ManakaiDISElement
+      @@@Type: DISElement
       @@@enDesc:
         A context element node.  Namespace prefixes in 
         <P::xcref> are resolved against this node.
@@ -3549,11 +3737,11 @@ ClsDef:
           }
           if (not $r->[0] or
               not $r->[0]-><M::ManakaiDISResourceDefinition
-                    .isTypeURI> (<Q::DOMException:AnyExceptionClass>)) {
+                    .isTypeURI> (<Q::DOMException:AnyExceptionAnyClass>)) {
             __UNDEEP{__EXCEPTION{RESOURCE_NOT_DEFINED_ERR::
               DIS:uri => {$r->[0]->{uri}},
               DIS:localName => {$r->[0]->{localName}},
-              DIS:expectedType => {<Q::DOMException:AnyExceptionClass>},
+              DIS:expectedType => {<Q::DOMException:AnyExceptionAnyClass>},
               DIS:sourceNode => {$node},
               DIS:sourceCode => {$xcref},
             }__}__;
@@ -3613,6 +3801,22 @@ ClsDef:
               last CLASS;
             }
           }
+
+  @Method:
+    @@Name: free
+    @@enDesc:
+      Marks the database, resources in the database, and source
+      <QUOTE::dis> document trees in the database as no longer used.
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Return:
+      @@@PerlDef:
+        for my $file (values %{$self->{<Q::sourceFile>}}) {
+          $file-><M::ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl.free>
+            if $file;
+        }
+        CORE::delete $self->{modDef};
+        CORE::delete $self->{forDef};
+        CORE::delete $self->{resDef};
 ##DISDatabase
 
 PropDef:
@@ -3694,12 +3898,9 @@ ElementTypeBinding:
         An element has found where it is not allowed. 
 
 IFClsDef:
-  @QName:
-    @@@: DISModuleResolver
-    @@ForCheck: ForIF
-  @QName:
-    @@@: ManakaiDISModuleResolver
-    @@ForCheck: ForClass
+  @IFQName: DISModuleResolver
+  @ClsQName: ManakaiDISModuleResolver
+
   @enDesc:
     Objects implementing <IF::DISModuleResolver> interface 
     are used to convert module name into <QUOTE::dis> document object. 
@@ -3715,7 +3916,8 @@ IFClsDef:
       Returns a <QUOTE::dis> document from module name information. 
     @@Param:
       @@@Name: disDB
-      @@@Type: ManakaiDISDatabase
+      @@@Type: DISDatabase
+      @@@clsActualType: ManakaiDISDatabase
       @@@enDesc:
         The <QUOTE::dis> database. 
     @@Param:
@@ -3745,7 +3947,8 @@ IFClsDef:
       @@@enDesc:
         The <QUOTE::for> URI reference for which the module is defined. 
     @@Return:
-      @@@Type: ManakaiDISDocument
+      @@@Type: DISDocument
+      @@@clsActualType: ManakaiDISDocument
       @@@enDesc:
         The <QUOTE::dis> document.  It don't have to be a newly created
         object. 
@@ -3770,16 +3973,19 @@ PropDef:
   @QName: sourceFile
   @enDesc:
     Source <QUOTE::dis> documents. 
-  @rdfs:domain: ManakaiDISDatabase
-  @rdfs:range: ManakaiDISDocument
+  @rdfs:domain: DISDatabase
+  @rdfs:range: DISDocument
 
-ClsDef:
+IFClsDef:
+  @IFQName: DISModule
   @ClsQName: ManakaiDISModuleDefinition
-  @enDesc:
-    <QUOTE::dis> module definitions. 
+
   @ClsISA: ManakaiDISPropertyAccessor
   @ClsISA: ManakaiDISExceptionTarget
   @ClsISA: ManakaiDISPerlModuleDefinition
+
+  @enDesc:
+    <QUOTE::dis> module definitions. 
 
   @DISLang:role: ModuleRole
   
@@ -3816,7 +4022,7 @@ ClsDef:
       URI references are literally (in character-by-character) equivalent.
     @@Param:
       @@@Name: anotherModule
-      @@@Type: ManakaiDISModuleDefinition
+      @@@Type: DISModule
       @@@enDesc:
         Another <QUOTE::dis> module definition to compare.
     @@Return:
@@ -3924,20 +4130,6 @@ ClsDef:
         }__;
 
   @Attr:
-    @@Name: plFileNameStem
-    @@enDesc:
-      The main part of the Perl module file name.
-    @@Type:
-      DISLang:String::ManakaiDOM:all
-    @@Get:
-      @@@NoPerlModuleNameException:
-      @@@PerlDef:
-        __DEEP{
-          $r = $self-><AG::ManakaiDISModuleDefinition.plFullyQualifiedName>;
-          $r =~ s/.*?:://g;
-        }__;
-
-  @Attr:
     @@Name: plInterfaceName
     @@enDesc:
       The fully-qualified Perl interface package name. 
@@ -3985,7 +4177,12 @@ ClsDef:
     @@enDesc:
       This module itself.
     @@Get:
-      @@@Type: ManakaiDISModuleDefinition
+      @@@Type: DISModule
+      @@@clsActualType: ManakaiDISModuleDefinition
+      @@@nullCase:
+        @@@@enDesc:
+          The resource is not part of any module since
+          its definition is not read (<IF::DISModule.isDefined> is <DOM::false>).
       @@@PerlDef: $r = $self;
 
   @Method:
@@ -4039,7 +4236,7 @@ ClsDef:
               last CLASS;
             }
           }
-##DISModuleDefinition
+##DISModule
 
 ElementTypeBinding:
   @Name: NoPerlModuleNameException
@@ -4053,15 +4250,18 @@ ElementTypeBinding:
         The module group corresponding to the namespace URI
         of this module is not defined. 
 
-ClsDef:
+IFClsDef:
+  @IFQName: DISFor
   @ClsQName: ManakaiDISForDefinition
+
+  @ClsISA: ManakaiDISExceptionTarget
+
+  @DISLang:role: ForRole
+
   @Description:
     @@lang:en
     @@@:
       <QUOTE::dis> <QUOTE::for> definitions. 
-  @ClsISA: ManakaiDISExceptionTarget
-
-  @DISLang:role: ForRole
   
   @Attr:
     @@Name: uri
@@ -4105,7 +4305,7 @@ ClsDef:
         equal as reference. 
     @@Param:
       @@@Name: anotherFor
-      @@@Type: ManakaiDISForDefinition
+      @@@Type: DISFor
       @@@enDesc:
         Another <QUOTE::for> definition to compare.
     @@Return:
@@ -4167,10 +4367,12 @@ ClsDef:
       @@@lang:en
       @@@@:
         Whether this <QUOTE::for> is referred somewhere or not. 
-    @@Type: ManakaiDISElement
+    @@Type: DISElement
+    @@clsActualType: ManakaiDISElement
     @@Get:
       @@@InCase:
-        @@@@Type:ManakaiDISElement
+        @@@@Type: DISElement
+        @@@@clsActualType: ManakaiDISElement
         @@@@enDesc:
           This <QUOTE::for> is referred by the element. 
       @@@nullCase:
@@ -4179,7 +4381,8 @@ ClsDef:
         $r = $self->{<Q::isReferred>};
     @@Set:
       @@@InCase:
-        @@@@Type:ManakaiDISElement
+        @@@@Type: DISElement
+        @@@@clsActualType: ManakaiDISElement
         @@@@enDesc:
           This <QUOTE::for> is referred by the element. 
       @@@PerlDef:
@@ -4192,7 +4395,8 @@ ClsDef:
       @@@lang:en
       @@@@:
         The <QUOTE::dis> module in which this <QUOTE::for> is defined.
-    @@Type: ManakaiDISModuleDefinition
+    @@Type: DISModule
+    @@clsActualType: ManakaiDISModuleDefinition
     @@Get:
       @@@Description:
         @@@@lang:en
@@ -4216,7 +4420,8 @@ ClsDef:
       <QUOTE::for>.
     @@Param:
       @@@Name: superFor
-      @@@Type: ManakaiDISForDefinition
+      @@@Type: DISFor
+      @@@clsActualType: ManakaiDISForDefinition
       @@@enDesc:
         A <QUOTE::for> definition object. 
     @@Return:
@@ -4287,11 +4492,12 @@ ClsDef:
               last CLASS;
             }
           }
+##DISFor
 
-##DISForDefinition
-
-ClsDef:
+IFClsDef:
+  @IFQName: DISPerlModule
   @ClsQName: ManakaiDISPerlModuleDefinition
+
   @enDesc:
     A class inherited by classes whose object might (but not necessarily) define
     a Perl module. 
@@ -4356,11 +4562,16 @@ ClsDef:
           my $thismod_pack = $r-><M::PLFile.getLastPackage>
                                      ($thismod_name, make_new_package => true);
           my %const;
+          my %processed_class;
           for my $cls (@{$self-><M::ManakaiDISPropertyAccessor
                                    .getPropertyResourceList>
                                               (<Q::DIS:resource>)}) {
             if ($cls-><AG::ManakaiDISResourceDefinition.ownerModule>
-                   eq $ownermod) {
+                   eq $ownermod and
+                not $processed_class{$cls-><AG::ManakaiDISResourceDefinition
+                                                                       .uri>}) {
+              $processed_class{$cls-><AG::ManakaiDISResourceDefinition.uri>}
+                = true;
               if ($cls-><M::ManakaiDISResourceDefinition.isTypeURI>
                               (<Q::ManakaiDOM:Class>)) {
                 ## -- Subroutines and variables
@@ -4738,13 +4949,17 @@ ClsDef:
                   }
                 }
               } elsif ($cls-><M::ManakaiDISResourceDefinition.isTypeURI>
+                              (<Q::ManakaiDOM:ExceptionIF>)) {
+                my $pack = $cls-><AG::DISResource.plCodeFragment>;
+                $r-><M::PLFile.appendPackage> ($pack);
+              } elsif ($cls-><M::ManakaiDISResourceDefinition.isTypeURI>
                               (<Q::DISPerl:ScalarVariable>) and
                        not $cls-><M::ManakaiDISPropertyAccessor
                            .getPropertyResource> (<Q::dis2pm:parentResource>)) {
                 $r-><M::PLBlockCon.appendCodeFragment>
                       ($cls-><AG::ManakaiDISResourceDefinition.plCodeFragment>);
               }
-            }
+            } # ownermodule and not alias
           } # Classes
 
           ## -- Exporter (constants)
@@ -4880,8 +5095,7 @@ ClsDef:
           $self->{<Q::DIS:isFeatureImplemented>}->{$featureResourceURI} = $r;
         }
       }__;
-
-##DISPerlModuleDefinition
+##DISPerlModule
 
 PropDef:
   @QName: isFeatureImplemented
@@ -4895,15 +5109,18 @@ ResourceDef:
   @rdf:type:
     rdfs:Class
 
-ClsDef:
+IFClsDef:
+  @IFQName: DISResource
   @ClsQName: ManakaiDISResourceDefinition
-  @enDesc:
-    <QUOTE::dis> resource definitions. 
+
   @ClsISA: ManakaiDISPropertyAccessor
   @ClsISA: ManakaiDISExceptionTarget
   @ClsISA: ManakaiDISPerlModuleDefinition
 
   @DISLang:role: ResourceRole
+
+  @enDesc:
+    <QUOTE::dis> resource definitions. 
 
   @IntMethod:
     @@Operator:
@@ -4916,7 +5133,7 @@ ClsDef:
       literally equal to another's <A::.uri>.
     @@Param:
       @@@Name: anotherResource
-      @@@Type: ManakaiDISResourceDefinition
+      @@@Type: DISResource
       @@@enDesc:
         Another resource definition to compare.
     @@Return:
@@ -5113,7 +5330,8 @@ ClsDef:
       of this <QUOTE::dis> resource. 
     @@Param:
       @@@Name: superRes
-      @@@Type: ManakaiDISResourceDefinition
+      @@@Type: DISResource
+      @@@clsActualType: ManakaiDISResourceDefinition
       @@@enDesc:
         A <QUOTE::dis> resource definition object. 
     @@Return:
@@ -5155,7 +5373,8 @@ ClsDef:
       @@@lang:en
       @@@@:
         Whether this resource is referred or not. 
-    @@Type: ManakaiDISElement
+    @@Type: DISElement
+    @@clsActualType: ManakaiDISElement
     @@Get:
       @@@enDesc:
         An element that referres this resource.
@@ -5176,7 +5395,8 @@ ClsDef:
       @@@lang:en
       @@@@:
         The <QUOTE::dis> module in which this resource is defined.
-    @@Type: ManakaiDISModuleDefinition
+    @@Type: DISModule
+    @@clsActualType: ManakaiDISModuleDefinition
     @@Get:
       @@@Description:
         @@@@lang:en
@@ -5199,7 +5419,8 @@ ClsDef:
       Merges another resource definition as an alias of this resource. 
     @@Param:
       @@@Name: aliasResource
-      @@@Type: ManakaiDISResourceDefinition
+      @@@Type: DISResource
+      @@@clsActualType: ManakaiDISResourceDefinition
       @@@enDesc:
         A resource to merge.
         \
@@ -5362,9 +5583,15 @@ ClsDef:
                                                   .plMethodOperator>) {
                 $r = {
                        <Q::ManakaiDOM:MUErrorHandler> => '___report_error',
+                       <Q::ecore:ErrorDefMethod> => '___error_def',
                        <Q::DISPerl:AsStringMethod> => 'stringify',
                        <Q::DISPerl:NewMethod> => 'new',
                        <Q::DISPerl:CloneMethod> => 'clone',
+                       <Q::DISPerl:ImportMethod> => 'import',
+                       <Q::DISPerl:CanMethod> => 'CAN',
+                       <Q::DISPerl:UnimportMethod> => 'unimport',
+                       <Q::DISPerl:VERSIONMethod> => 'VERSION',
+                       <Q::DISPerl:ISAMethod> => 'isa',
                      }->{$op_uri};
                 $r = $op_uri if $op_uri =~ /^[A-Z]+$/;
             } else {
@@ -5393,16 +5620,46 @@ ClsDef:
             }
           } elsif ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
                               (<Q::ManakaiDOM:ConstGroup>)) {
-            $r = $self->{localName};
-            unless (defined $r) {
-              __UNDEEP{
-                __EXCEPTION{NO_LOCAL_NAME_ERR::
-                  DIS:uri => {$self->{uri}},
-                  DIS:sourceNode => {$self->{src}},
+            my $an_node = $self->{src}-><M::ManakaiDISElement.disGetAttribute>
+                              (<Q::dis:AppName>, for_arg => $self->{for},
+                               forp_arg => $self->{forp},
+                               media_type => <Q::lang:Perl>,
+                               default_media_type => <Q::lang:Perl>);
+            if ($an_node) {
+              $r = $an_node-><M::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
+            } else {
+              $r = $self->{localName};
+              unless (defined $r) {
+                __UNDEEP{
+                  __EXCEPTION{NO_LOCAL_NAME_ERR::
+                    DIS:uri => {$self->{uri}},
+                    DIS:sourceNode => {$self->{src}},
+                  }__;
                 }__;
-              }__;
+              }
             }
-          } else {
+
+          ## -- Method parameter
+          } elsif ($self-><M::DISResource.isTypeURI>
+                                       (<Q::DISLang:MethodParameter>)) {
+            my $pnm_node = $self->{src}-><M::ManakaiDISElement.disGetAttribute>
+                                (<Q::dis:AppName>, 
+                                 for_arg => $self->{for},
+                                 forp_arg => $self->{forp},
+                                 media_type => <Q::lang:Perl>,
+                                 default_media_type => <Q::lang:Perl>);
+            $r = $pnm_node ? $pnm_node-><M::SWCFGNode.value>
+                           : $self->{localName};
+            if (defined $r) {
+              if ($self-><M::ManakaiDISPropertyAccessor.getPropertyBoolean>
+                                 (<Q::DISPerl:isNamedParameter>, false)) {
+                $r = 
+                   <ClassM::ManakaiDISImplementation.camelCaseToUnderscoreName>
+                                                       ($r);
+              }
+            }
+
+          } else {  ## Other types
             $r = null;
           }
           $self->{<Q::dis2pm:name>} = $r;
@@ -5477,56 +5734,6 @@ ClsDef:
             $r = null;
           }
           $self->{<Q::PerlCode:plFullyQualifiedName>} = $r;
-        }__;
-
-  @Attr:
-    @@Name: plFileNameStem
-    @@enDesc:
-      The main part of the file name for the Perl representation
-      of this resource.
-    @@Type:
-      DISLang:String::ManakaiDOM:all
-    @@Get:
-      @@@enDesc:
-        File name fragment.
-        \
-        - <Q::ManakaiDOM:Class>::: Class package local name. 
-        \
-        - <Q::ManakaiDOM:IF>::: Interface package local name. 
-      @@@nullCase:
-        @@@@enDesc:
-          Otherwise. 
-      @@@RaiseException:
-        @@@@@: NO_LOCAL_NAME_ERR
-        @@@@enDesc:
-          The local name of this resource is not defined. 
-      @@@PerlDef:
-        __DEEP{
-          if ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
-                              (<Q::ManakaiDOM:Class>) or
-                   $self-><M::ManakaiDISResourceDefinition.isTypeURI>
-                              (<Q::ManakaiDOM:IF>)) {
-            my $an_node = $self->{src}-><M::ManakaiDISElement.disGetAttribute>
-                              (<Q::dis:AppName>, for_arg => $self->{for},
-                               forp_arg => $self->{forp},
-                               media_type => <Q::lang:Perl>);
-            if ($an_node) {
-              ## NOTE: "lang:Perl" is fully-qualified name by definition
-              $r = $an_node-><M::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
-              $r =~ s/.*?:://g;
-            } else {
-              unless (defined $self->{localName}) {
-                __UNDEEP{
-                  __EXCEPTION{NO_LOCAL_NAME_ERR::
-                    DIS:sourceNode => {$self->{src}},
-                  }__;
-                }__;
-              }
-              $r = $self->{localName};
-            }
-          } else {
-            $r = null;
-          }
         }__;
 
   @Attr:
@@ -5703,7 +5910,8 @@ ClsDef:
     @@enDesc:
       <Q::dis:Type> node for this resource. 
     @@Get:
-      @@@Type: ManakaiDISElement
+      @@@Type: DISElement
+      @@@clsActualType: ManakaiDISElement
       @@@RaiseException:
         @@@@@:NO_DIS_TYPE_ERR
         @@@@enDesc:
@@ -5718,7 +5926,8 @@ ClsDef:
     @@Name: disActualDataTypeResource
     @@enDesc:
       <Q::dis:actualType> attribute value of this resource. 
-    @@Type: ManakaiDISResourceDefinition
+    @@Type: DISResource
+    @@clsActualType: ManakaiDISResourceDefinition
     @@Get:
       @@@RaiseException:
         @@@@@:NO_DIS_TYPE_ERR
@@ -5793,7 +6002,8 @@ ClsDef:
     @@enDesc:
       <Q::dis:actualType> node for this resource. 
     @@Get:
-      @@@Type: ManakaiDISElement
+      @@@Type: DISElement
+      @@@clsActualType: ManakaiDISElement
       @@@RaiseException:
         @@@@@:NO_DIS_TYPE_ERR
         @@@@enDesc:
@@ -5823,7 +6033,7 @@ ClsDef:
       }
     @@Param:
       @@@Name: anotherResource
-      @@@Type: ManakaiDISResourceDefinition
+      @@@Type: DISResource
       @@@enDesc: Another resource to compare.
     @@Return:
       @@@Type:
@@ -6694,6 +6904,18 @@ ClsDef:
                                data_type_uri => $data_type
                                     -><AG::ManakaiDISResourceDefinition.uri>);
 
+          ## -- Exception Interfaces
+          } elsif ($self-><M::ManakaiDISResourceDefinition.isTypeURI>
+                              (<Q::ManakaiDOM:ExceptionIF>)) {
+            my $plimpl = $self-><AG::DISResourceProp.plImplementation>;
+            $r = $plimpl-><M::MPLImpl.createPerlPackage>
+                              ($self-><AG::ManakaiDISResourceDefinition
+                                         .plFullyQualifiedName>);
+            ## - Inheritance
+              $r-><M::PLPack.addISAPackage> ('Message::Util::Error');
+              $r-><M::MPLCodeFragment.addRequirePerlModuleName>
+                                            ('Message::Util::Error');
+
           ## -- Unsupported types
           } else {
             $r = $self->{<Q::plCodeFragment>} = null;
@@ -6739,13 +6961,14 @@ ClsDef:
         ISSUE: Some inheritance tracing required for 
         e.g. <Q::DISLang:InputProcessor> and <Q::DOMMain:ReflectGet>?
     @@Return:
-      @@@Type: ManakaiDISResourceDefinition
+      @@@Type: DISResource
+      @@@clsActualType: ManakaiDISResourceDefinition
       @@@enDesc:
-        The first (by document order) child resource whose 
-        type matches with <P::resType>. 
+        The first child resource (in document order) whose 
+        type matches with <P::typeURI>. 
       @@@nullCase:
         @@@@enDesc:
-          There is no resource whose type is <P::resType>.
+          There is no resource whose type is <P::typeURI>.
       @@@PerlDef:
         __DEEP{
           for my $cr_uri (@{$self->{<Q::DIS:childResource>}}) {
@@ -6774,14 +6997,15 @@ ClsDef:
       @@@enDesc:
         A URI reference identifying a resource type. 
     @@Return:
-      @@@Type: ManakaiDISResourceDefinition
+      @@@Type: DISResource
+      @@@clsActualType: ManakaiDISResourceDefinition
       @@@enDesc:
         The first (by document order) child resource whose 
-        type matches for <P::localName> and <P::resType>. 
+        type matches for <P::localName> and <P::typeURI>. 
       @@@nullCase:
         @@@@enDesc:
           There is no resource whose name is <P::localName> and
-          whose type is <P::resType>.
+          whose type is <P::typeURI>.
       @@@PerlDef:
         __DEEP{
           for my $cr_uri (@{$self->{<Q::DIS:childResource>}}) {
@@ -6807,7 +7031,8 @@ ClsDef:
       @@@enDesc:
         Constant name.
     @@Return:
-      @@@Type: ManakaiDISResourceDefinition
+      @@@Type: DISResource
+      @@@clsActualType: ManakaiDISResourceDefinition
       @@@enDesc:
         The constant resource identified by <P::localName>.
       @@@nullCase:
@@ -6841,6 +7066,7 @@ ClsDef:
         }__;
 
   @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name: RegQNameChar
     @@enDesc:
       A regular expression character class for <Q::dis:TypeQName>
@@ -6855,6 +7081,7 @@ ClsDef:
       DOMMain:any::ManakaiDOM:all
 
   @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name: RegBlockContent
     @@enDesc:
       A regular expression for a block.
@@ -6882,7 +7109,8 @@ ClsDef:
     @@NodeParam:
     @@NamedParam:
       @@@Name:methodResource
-      @@@Type:ManakaiDISResourceDefinition
+      @@@Type: DISResource
+      @@@clsActualType: ManakaiDISResourceDefinition
       @@@enDesc:
         The resource definition of the Perl method to which
         the <P::codeArg> belongs.
@@ -7643,7 +7871,7 @@ ClsDef:
     @@Type: ResourceURI
     @@Get:
       @@@enDesc:
-        The URI reference of the <TYPE::ManakaiDOM:Class> resource.
+        The URI reference of the <Q::ManakaiDOM:Class> resource.
         If this resource is a class, then the URI reference
         of this resource is returned.
       @@@nullCase:
@@ -7670,6 +7898,7 @@ ClsDef:
         }
   
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name: plParsePreprocessParameter
     @@enDesc:
       Parses a parameter specification in preprocessing instruction
@@ -7688,7 +7917,7 @@ ClsDef:
     @@NodeParam:
     @@Return:
       @@@Type:
-        Perl:hash::ManakaiDOM:all
+        Perl:HASH::ManakaiDOM:all
       @@@enDesc:
         Hash containing parameters.  Each hash value is also 
         a hash reference, containing two keys <CODE::type> 
@@ -7761,13 +7990,14 @@ ClsDef:
       }
 
   @IntMethod:
+    @@ManakaiDOM|ForClass
     @@Name: plGetContextParameter
     @@enDesc:
       Returns contextual parameters which describes the <QUOTE::location>
       of this resource.
     @@Return:
       @@@Type:
-        Perl:hash::ManakaiDOM:all
+        Perl:HASH::ManakaiDOM:all
       @@@enDesc:
         Hash of parameters as <M::.plParsePreprocessParameter> returns.
       @@@PerlDef:
@@ -7827,7 +8057,8 @@ ClsDef:
       this resource is a method parameter (<Q::DISLang:MethodParameter>)
       or an attribute setter (<Q::DISLang:AttributeSet>).
     @@Return:
-      @@@Type:ManakaiDISResourceDefinition
+      @@@Type: DISResource
+      @@@clsActualType: ManakaiDISResourceDefinition
       @@@enDesc:
         A <Q::DISLang:InputProcessor> corresponding to 
         the parameter defined by this resource.
@@ -7848,7 +8079,7 @@ ClsDef:
                              .disActualDataTypeResource>;
           $type_node = $self-><AG::ManakaiDISResourceDefinition
                                   .disActualDataTypeNode>;
-        } catch <Class::ManakaiDISException> with {
+        } catch <IF::DISException> with {
           my $err = shift;
           unless ($err->{<Q::MDOMX:subtype>} eq <Q::DIS:NO_DIS_TYPE_ERR>) {
             $err->throw;
@@ -7873,6 +8104,7 @@ ClsDef:
         }
 
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name: plAppendThrow
     @@enDesc:
       Appends a <Perl::report> method call statement for exception reporting.
@@ -7883,17 +8115,20 @@ ClsDef:
       @@@Type: PLBlockCon
     @@Param:
       @@@Name: xclass
-      @@@Type: ManakaiDISResourceDefinition
+      @@@Type: DISResource
+      @@@clsActualType: ManakaiDISResourceDefinition
       @@@enDesc:
         An exception class.
     @@Param:
       @@@Name: xcode
-      @@@Type: ManakaiDISResourceDefinition
+      @@@Type: DISResource
+      @@@clsActualType: ManakaiDISResourceDefinition
       @@@enDesc:
         An exception code constant.
     @@Param:
       @@@Name: xsubtype
-      @@@Type: ManakaiDISResourceDefinition
+      @@@Type: DISResource
+      @@@clsActualType: ManakaiDISResourceDefinition
       @@@enDesc:
         An exception subtype.
       @@@nullCase:
@@ -7902,9 +8137,9 @@ ClsDef:
     @@Param:
       @@@Name: xparam
       @@@Type:
-        Perl:hash::ManakaiDOM:all
+        Perl:HASH::ManakaiDOM:all
       @@@enDesc:
-        A hash containing parameters passed to the <Perl:report> method. 
+        A hash containing parameters passed to the <Perl::report> method. 
         A hash key is to be a parameter name.  Hash values 
         should also be hashes.  A hash value hash has two values: 
         <CODE::type> and <CODE::value>.  A <CODE::value>
@@ -8080,13 +8315,15 @@ ClsDef:
         }
   
   @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name: plAddRequireResource
     @@enDesc:
       Adds a resource to the list of resources that should
       be <Perl::require>d from a Perl code fragment.
     @@Param:
       @@@Name: resourceArg
-      @@@Type: ManakaiDISResourceDefinition
+      @@@Type: DISResource
+      @@@clsActualType: ManakaiDISResourceDefinition
       @@@enDesc:
         A resource that is <Perl::require>d by <P::codeArg>.
     @@Param:
@@ -8103,6 +8340,7 @@ ClsDef:
         }__;
 
   @Attr:
+    @@ForCheck: ManakaiDOM|ForClass
     @@ManakaiDOM:isForInternal:1
     @@Name: plMufDescriptionText
     @@enDesc:
@@ -8376,7 +8614,8 @@ ClsDef:
     @@enDesc:
       An <QUOTE::owner element> resource of the markup vocabulary
       element defined by this resource.
-    @@Type: ManakaiDISResourceDefinition
+    @@Type: DISResource
+    @@clsActualType: ManakaiDISResourceDefinition
     @@Get:
       @@@nullCase:
         @@@@enDesc:
@@ -8448,7 +8687,7 @@ ClsDef:
               last CLASS;
             }
           }
-##DISResourceDefinition
+##DISResource
 
 PropDef:
   @QName: mvLocalName
@@ -8723,8 +8962,10 @@ XParamDef:
   @enDesc:
     A generated name. 
 
-ClsDef:
+IFClsDef:
+  @IFQName: DISResourceProp
   @ClsQName: ManakaiDISPropertyAccessor
+
   @enDesc:
     Accessor methods for resource or module properties. 
   
@@ -8765,7 +9006,8 @@ ClsDef:
       For a <QUOTE::dis> module object, the module itself is the
       <QUOTE::owner>.
     @@Get:
-      @@@Type: ManakaiDISModuleDefinition
+      @@@Type: DISModule
+      @@@clsActualType: ManakaiDISModuleDefinition
       @@@PerlDef: $r = $self;
 
   @Attr:
@@ -8774,9 +9016,11 @@ ClsDef:
       The source <QUOTE::dis> element node from which this 
       definition is read. 
     @@Get:
-      @@@Type: ManakaiDISElement
+      @@@Type: DISElement
+      @@@clsActualType: ManakaiDISElement
       @@@InCase:
-        @@@@Type: ManakaiDISModuleElement
+        @@@@Type: DISModuleElement
+        @@@@clsActualType: ManakaiDISModuleElement
         @@@@enDesc: If this resource is a module.
       @@@PerlDef: $r = $self->{src};
       @@@nullCase:
@@ -8876,7 +9120,8 @@ ClsDef:
         @@@@enDesc:
           Defaulted to <Q::dis:TypeQName>.
     @@Return:
-      @@@Type: ManakaiDISResourceDefinition
+      @@@Type: DISResource
+      @@@clsActualType: ManakaiDISResourceDefinition
       @@@enDesc:
         The property value resource. 
       @@@nullCase:
@@ -9153,7 +9398,8 @@ ClsDef:
     @@PropNameParam:
     @@Param:
       @@@Name: res
-      @@@Type: ManakaiDISResourceDefinition
+      @@@Type: DISResource
+      @@@clsActualType: ManakaiDISResourceDefinition
       @@@enDesc:
         A resource to add. 
     @@Return:
@@ -9269,7 +9515,7 @@ URITypeDef:
 URITypeDef:
   @QName: ModuleURI
   @enDesc:
-    URI references for <QUOET::dis> modules. 
+    URI references for <QUOTE::dis> modules. 
   @rdfs:subClassOf: ResourceURI
 
 URITypeDef:
@@ -9318,16 +9564,70 @@ ResourceDef:
   @AliasFor: 
     DIS:UNDECLARED_NS_PREFIX_ERR::swcfg21:ForLatest
 
-ExceptionDef:
+ResourceDef:
+  @rdf:type:
+    @@@: dis|MultipleResource
+    @@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+  @resourceFor: ManakaiDOM|ForIF
+  @resourceFor:
+    @@@: ManakaiDOM|ForClass
+    @@ForCheck: ForEmpty !=ForEmpty
+  @For: ForLatest
+  @For: =ForEmpty
+
+  @rdf:type:
+    @@@: ManakaiDOM|ExceptionIF
+    @@ForCheck: ManakaiDOM|ForIF
+
+  @rdf:type:
+    @@@: ManakaiDOM|ExceptionClass
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @Implement:
+    @@@: ||ForEmpty||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass ForEmpty
+  @Implement:
+    @@@: ||ForLatest||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass ForLatest
+
+  @DOMMain:implementFeature:
+    @@@: CoreFeature10
+    @@For: ForLatest
+
+  @Implement:
+    @@@: DOMMain|ManakaiDOMExceptionIF||ManakaiDOM|Perl
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @ISA:
+    @@@: ManakaiDOM|ManakaiDOMException||ManakaiDOM|Perl
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @IFQName: DISException
   @ClsQName: ManakaiDISException
-  @enDesc:
-    Exceptions for the <QUOTE::dis> operations. 
-  @ClsISA:
-    ManakaiDOM:ManakaiDOMException::ManakaiDOM:Perl
-  @XConstGroupDef:
+
+  @Description:
+    @@lang:en
+    @@@:
+      Exceptions for the <QUOTE::dis> operations. 
+
+  @ResourceDef:
+    @@rdf:type: ManakaiDOM|ConstGroup
+    @@ForCheck: !=ForEmpty
+
+    @@IFQName: DISExceptionCode
     @@ClsQName: ManakaiDISExceptionCode
+    @@PerlName: DISExceptionCode
+
+    @@rdfs:subClassOf:
+      DOMMain:unsigned-short::ManakaiDOM:all
+    @@Type:
+      DOMMain:unsigned-short::ManakaiDOM:all
+
     @@enDesc:
       Exception codes for <Class::ManakaiDISException>. 
+
     @@XConstDef:
       @@@Name: HIERARCHY_REQUEST_ERR
       @@@Value:3
@@ -9986,8 +10286,12 @@ ElementTypeBinding:
 
 ClsDef:
   @ClsQName: ManakaiDISExceptionTarget
+
+  @Implement: ecore|MUErrorTarget||ManakaiDOM|Perl
+
   @enDesc:
     Objects that is able to be the target of an exception. 
+
   @IntMethod:
     @@Operator:
       @@@@:
@@ -10039,81 +10343,14 @@ ClsDef:
           }
 ##DISExceptionTarget
 
-ForDef:
-  @QName:
-    DIS:ForIF
-ForDef:
-  @QName:
-    DIS:ForClass
 
 ElementTypeBinding:
-  @Name: IFClsDef
+  @Name: PerlName
   @ElementType:
-    dis:ResourceDef
+    dis:AppName
   @ShadowContent:
-    @@rdf:type:
-      @@@@:
-        dis:MultipleResource
-      @@@ForCheck: !ForClass !ForIF
-    @@rdf:type:
-      @@@@:
-        ManakaiDOM:IF
-      @@@ForCheck: ForIF
-    @@rdf:type:
-      @@@@:
-        ManakaiDOM:Class
-      @@@ForCheck: ForClass
-    @@resourceFor: ForIF
-    @@resourceFor:
-      @@@@: ForClass
-      @@@ForCheck: ForLatest
-    @@DOMMain:implementFeature:
-      @@@@:CoreFeature10
-      @@@ForCheck: ForClass
-    @@ForCheck:
-      ManakaiDOM:Perl
-
-ElementTypeBinding:
-  @Name: ClsDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:Class
-    @@AliasFor:
-      @@@@:
-        ::DIS:ForLatest
-      @@@For:
-        !=DIS:ForLatest
-    @@ForCheck:
-      ManakaiDOM:Perl
-    @@DOMMain:implementFeature: CoreFeature10
-
-ElementTypeBinding:
-  @Name: ExceptionDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:ExceptionClass
-    @@AliasFor:
-      @@@@:
-        ::ForLatest
-      @@@For:
-        !=ForLatest
-    @@ForCheck:
-      ManakaiDOM:Perl
-    @@DOMMain:implementFeature: CoreFeature10
-
-ElementTypeBinding:
-  @Name: ClsQName
-  @ElementType:
-    dis:QName
-
-ElementTypeBinding:
-  @Name: ClsISA
-  @ElementType:
-    dis:ISA
+    @@ContentType: lang|Perl
+    @@For: ManakaiDOM|Perl
 
 ElementTypeBinding:
   @Name: Method
@@ -10276,7 +10513,10 @@ ElementTypeBinding:
       DISLang:MethodParameter
     @@DISPerl:isNamedParameter:1
     @@Name: node
-    @@Type: ManakaiDISNode
+    @@Type: DISNode
+    @@actualType:
+      @@@@: ManakaiDISNode
+      @@@ForCheck: ManakaiDOM|ForClass
     @@Description:
       @@@lang:en
       @@@@:
@@ -10411,23 +10651,11 @@ ElementTypeBinding:
   @ElementType:
     ManakaiDOM:raises
   @ShadowContent:
-    @@@: NO_DB_ASSOCIATED_ERR
+    @@@: NO_ASSOCIATED_DB_ERR
     @@Description:
       @@@lang:en
       @@@@:
         No <QUOTE::dis> database is associated to this document. 
-
-ElementTypeBinding:
-  @Name: XConstGroupDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:ConstGroup
-    @@Type:
-      DOMMain:unsigned-short::ManakaiDOM:all
-    @@rdfs:subClassOf:
-      DOMMain:unsigned-short::ManakaiDOM:all
 
 ElementTypeBinding:
   @Name: XConstDef
@@ -10444,6 +10672,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:ExceptionOrWarningSubType
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: XParam

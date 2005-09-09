@@ -1,3 +1,43 @@
+2005-09-09  Wakaba  <wakaba@suika.fam.cx>
+
+	* mkdisdump.pl: Status messages added.
+
+2005-09-08  Wakaba  <wakaba@suika.fam.cx>
+
+	* dac.pl: Use ImplementationRegistry instead of
+	DOMImplementationRegistry.  Status messages added.
+	(--implementation-registry-package): Option removed.
+
+	* dac2pm.pl: : Use ImplementationRegistry instead of
+	DOMImplementationRegistry.  Status messages added.
+	(--implementation-registry-package, --output-module-version): Options
+	removed.
+
+	* mkdisdump.pl: Use ImplementationRegistry instead of
+        DOMImplementationRegistry.
+	(append_module_documentation, append_class_documentation,
+	append_interface_documentation): Uses dis:FileName property
+	if any.
+	(append_inheritance): Adds information on implied
+	inheritance such as UNIVERSAL and Exporter.
+
+2005-09-07  Wakaba  <wakaba@suika.fam.cx>
+
+	* mkdisdump.pl: Writes inheritance information on methods.
+	
+2005-09-06  Wakaba  <wakaba@suika.fam.cx>
+
+	* mkdisdump.pl (--with-implementators-note): New option.
+	(transform_disdoc): Lextypes dis:TypeQName, DISCore:NCNameOrQName,
+	DISPerl:MemRef, DOMMain:XCodeRef supported.
+	(append_subclassof): New function.  (It does not work yet.)
+	(append_raises): New function.
+
+2005-09-05  Wakaba  <wakaba@suika.fam.cx>
+
+	* mkdisdump.pl (append_datatype_documentation): Sets ddoct:basePath
+	attribute to dump:datatype element.
+
 2005-09-04  Wakaba  <wakaba@suika.fam.cx>
 
 	* mkdisdump.pl (append_module_documentation): Don't generate

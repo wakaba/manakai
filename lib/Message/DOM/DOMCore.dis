@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/05 05:21:11 $
+      $Date: 2005/09/09 04:26:04 $
     @@ContentType:
       dis:Date.RCS
 
@@ -90,6 +90,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
   @disPerl:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl--
+  @doc:
+    http://suika.fam.cx/~wakaba/archive/2005/7/tutorial#
   @DOMCore:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @DOMEvents:
@@ -102,8 +104,12 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
   @DOMViews:
     http://suika.fam.cx/~wakaba/archive/2004/dom/views#
+  @ev:
+    http://www.w3.org/2001/xml-events
   @infoset:
     http://www.w3.org/2001/04/infoset#
+  @kwd:
+    http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
   @lang:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
@@ -133,6 +139,8 @@ Namespace:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
+  @sw010:
+    urn:x-suika-fam-cx:markup:suikawiki:0:10:
   @TreeCore: \
   @xhtml1:
     http://www.w3.org/1999/xhtml
@@ -142,115 +150,20 @@ Namespace:
     http://www.w3.org/2000/xmlns/
 
 ElementTypeBinding:
-  @Name: ExceptionDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      @@@@:
-        dis:MultipleResource
-      @@@ForCheck:
-        !ManakaiDOM:ForClass !ManakaiDOM:ForIF
-    @@rdf:type:
-      @@@@:
-        ManakaiDOM:ExceptionIF
-      @@@ForCheck:
-        ManakaiDOM:ForIF
-    @@rdf:type:
-      @@@@:
-        ManakaiDOM:ExceptionClass
-      @@@ForCheck:
-        ManakaiDOM:ForClass
-    @@resourceFor:
-      ManakaiDOM:ForIF
-    @@resourceFor:
-      @@@@:
-        ManakaiDOM:ForClass
-      @@@ForCheck:
-        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
-    @@ForCheck:
-      ManakaiDOM:DOM
-    @@ISA:
-      @@@@:
-        DOMMain:ManakaiDOMExceptionIF::ManakaiDOM:Perl
-      @@@ForCheck:
-        ManakaiDOM:ManakaiDOM ManakaiDOM:ForIF
-    @@ISA:
-      @@@@:
-        ManakaiDOM:ManakaiDOMException::ManakaiDOM:Perl
-      @@@ForCheck:
-        ManakaiDOM:ManakaiDOM
-      @@@ForCheck:
-        ManakaiDOM:ForClass
-    @@ISA:
-      @@@@:
-        ManakaiDOM:ManakaiDOMObject
-      @@@ForCheck:
-        ManakaiDOM:ForClass
-    @@ISA:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOM::ManakaiDOM:ForIF
-      @@@ForCheck:
-        ManakaiDOM:ForIF
-      @@@For:
-        ManakaiDOM:ManakaiDOM1
-      @@@ContentType: DISCore|TFPQNames
-    @@Implement:
-      @@@@: ||+||ManakaiDOM|ForIF
-      @@@ForCheck: ManakaiDOM|ForClass
-      @@@ContentType: DISCore|TFPQNames
-
-ElementTypeBinding:
   @Name: Exception
   @ElementType:
     ManakaiDOM:raises
+  @ShadowContent:
+    @@@For: !ManakaiDOM|all
 ElementTypeBinding:
   @Name: Warning
   @ElementType:
     ManakaiDOM:alwaysWarns
 
 ElementTypeBinding:
-  @Name: IF
+  @Name: raises
   @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      @@@@:
-        dis:MultipleResource
-      @@@ForCheck:
-        !ManakaiDOM:ForClass !ManakaiDOM:ForIF
-    @@rdf:type:
-      @@@@:
-        ManakaiDOM:IF
-      @@@ForCheck:
-        ManakaiDOM:ForIF
-    @@rdf:type:
-      @@@@:
-        ManakaiDOM:Class
-      @@@ForCheck:
-        ManakaiDOM:ForClass
-    @@resourceFor:
-      ManakaiDOM:ForIF
-    @@resourceFor:
-      @@@@:
-        ManakaiDOM:ForClass
-      @@@ForCheck:
-        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
-    @@ForCheck:
-      ManakaiDOM:DOM
-    @@ISA:
-      @@@@:
-        ManakaiDOM:ManakaiDOMObject
-      @@@ForCheck:
-        ManakaiDOM:ForClass
-    @@ISA:
-      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
-      @@@ForCheck: ManakaiDOM|ForIF ManakaiDOM|ManakaiDOM1
-      @@@ContentType: DISCore|TFPQNames
-    @@Implement:
-      @@@@: ||+||ManakaiDOM|ForIF
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
-      @@@ContentType: DISCore|TFPQNames
+    ManakaiDOM:raises
 
 ElementTypeBinding:
   @Name: IFDef
@@ -274,118 +187,6 @@ ElementTypeBinding:
       ManakaiDOM:Class
     @@For:
       ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
-
-ElementTypeBinding:
-  @Name: ImplementLevel3
-  @ElementType:
-    dis:ISA
-  @ShadowContent:
-      @@@:
-        ::ManakaiDOM:ManakaiDOM3||ManakaiDOM:ForIF
-      @@ForCheck:
-        ManakaiDOM:ForIF
-      @@For:
-        ManakaiDOM:ManakaiDOMLatest
-    @@ContentType: DISCore|TFPQNames
-  @ShadowSibling:
-    @@DOMMain:implementFeature:
-      @@@@: CoreFeature30
-      @@@For:
-        ManakaiDOM:DOM3
-    @@DOMMain:implementFeature:
-      @@@@: 
-        DOMXML:XMLFeature30
-      @@@For:
-        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
-    @@DOMMain:implementFeature:
-      @@@@: 
-        DOMXML:XMLVersionFeature10
-      @@@For:
-        ManakaiDOM:DOM3
-    @@DOMMain:implementFeature:
-      @@@@: 
-        DOMXML:XMLVersionFeature11
-      @@@For:
-        ManakaiDOM:DOM3
-ElementTypeBinding:
-  @Name: ImplementLevel2
-  @ElementType:
-    dis:ISA
-  @ShadowContent:
-      @@@:
-        ::ManakaiDOM:ManakaiDOM2||ManakaiDOM|ForIF
-      @@ForCheck:
-        ManakaiDOM:ForIF
-      @@For:
-        ManakaiDOM:ManakaiDOM3
-    @@ContentType: DISCore|TFPQNames
-  @ShadowSibling:
-    @@DOMMain:implementFeature:
-      @@@@: CoreFeature20
-      @@@For:
-        ManakaiDOM:DOM2
-    @@DOMMain:implementFeature:
-      @@@@: 
-        DOMXML:XMLFeature20
-      @@@For:
-        ManakaiDOM:DOM2 ManakaiDOM:DOMXMLFeature
-    @@DOMMain:implementFeature:
-      @@@@: 
-        DOMXML:XMLFeature30
-      @@@For:
-        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
-    @@DOMMain:implementFeature:
-      @@@@: 
-        DOMXML:XMLVersionFeature10
-      @@@For:
-        ManakaiDOM:DOM3
-    @@DOMMain:implementFeature:
-      @@@@: 
-        DOMXML:XMLVersionFeature11
-      @@@For:
-        ManakaiDOM:DOM3
-ElementTypeBinding:
-  @Name: ImplementLevel1
-  @ElementType:
-    dis:ISA
-  @ShadowContent:
-      @@@:
-        ::ManakaiDOM:ManakaiDOM1||ManakaiDOM|ForIF
-      @@ForCheck:
-        ManakaiDOM:ForIF
-      @@For:
-        ManakaiDOM:ManakaiDOM2
-    @@ContentType: DISCore|TFPQNames
-  @ShadowSibling:
-    @@DOMMain:implementFeature:
-      @@@@: CoreFeature10
-      @@@For:
-        ManakaiDOM:DOM1
-    @@DOMMain:implementFeature:
-      @@@@: 
-        DOMXML:XMLFeature10
-      @@@For:
-        ManakaiDOM:DOM1 ManakaiDOM:DOMXMLFeature
-    @@DOMMain:implementFeature:
-      @@@@: 
-        DOMXML:XMLFeature20
-      @@@For:
-        ManakaiDOM:DOM2 ManakaiDOM:DOMXMLFeature
-    @@DOMMain:implementFeature:
-      @@@@: 
-        DOMXML:XMLFeature30
-      @@@For:
-        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
-    @@DOMMain:implementFeature:
-      @@@@: 
-        DOMXML:XMLVersionFeature10
-      @@@For:
-        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
-    @@DOMMain:implementFeature:
-      @@@@: 
-        DOMXML:XMLVersionFeature11
-      @@@For:
-        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
 
 ElementTypeBinding:
   @Name: L1
@@ -630,16 +431,6 @@ ElementTypeBinding:
       ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
 
 ElementTypeBinding:
-  @Name: XConstGroup
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:ConstGroup
-    @@ForCheck:
-      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
-
-ElementTypeBinding:
   @Name: ErrorSet
   @ElementType:
     dis:ResourceDef
@@ -733,9 +524,7 @@ ElementTypeBinding:
     @@rdf:type:
       ManakaiDOM:ExceptionOrWarningSubType
     @@ForCheck:
-      ManakaiDOM:ManakaiDOM
-    @@ForCheck:
-      ManakaiDOM:ForClass
+      ManakaiDOM:ManakaiDOM ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: ErrSubTypeDef
@@ -916,21 +705,86 @@ ElementTypeBinding:
     @@QName:
       MDOMX:param-name
 
-ExceptionDef:
-  @Name:
-    @@@: DOMException
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @Name:
-    @@@: ManakaiDOMException
-    @@ForCheck:
-      ManakaiDOM:ForClass
-  @ImplementLevel1:
-  @ImplementLevel2:
-  @ImplementLevel3:
-  @Spec:
-    @@DOM3:
-      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-17189187
+ResourceDef:
+  @rdf:type:
+    @@@: dis|MultipleResource
+    @@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+  @resourceFor: ManakaiDOM|ForIF
+  @resourceFor:
+    @@@: ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+  @For: ManakaiDOM|DOM1
+  @For: =ManakaiDOM|ManakaiDOM
+
+  @rdf:type:
+    @@@: ManakaiDOM|ExceptionIF
+    @@ForCheck: ManakaiDOM|ForIF
+
+  @rdf:type:
+    @@@: ManakaiDOM|ExceptionClass
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @Implement:
+    @@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+  @Implement:
+    @@@: ||ManakaiDOM|ManakaiDOM1||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
+  @Implement:
+    @@@: ||ManakaiDOM|ManakaiDOM2||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM2
+  @Implement:
+    @@@: ||ManakaiDOM|ManakaiDOM3||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM3
+  @Implement:
+    @@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+  @DOMMain:implementFeature:
+    @@@: CoreFeature10
+    @@For: ManakaiDOM|DOM1
+  @DOMMain:implementFeature:
+    @@@: CoreFeature20
+    @@For: ManakaiDOM|DOM2
+  @DOMMain:implementFeature:
+    @@@: CoreFeature30
+    @@For: ManakaiDOM|DOM3
+
+  @DOMMain:implementFeature:
+    @@@: DOMXML|XMLFeature10
+    @@For: ManakaiDOM|DOM1 ManakaiDOM|DOMXMLFeature
+  @DOMMain:implementFeature:
+    @@@: DOMXML|XMLFeature20
+    @@For: ManakaiDOM|DOM2 ManakaiDOM|DOMXMLFeature
+  @DOMMain:implementFeature:
+    @@@: DOMXML|XMLFeature30
+    @@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+  @DOMMain:implementFeature:
+    @@@: DOMXML|XMLVersionFeature10
+    @@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+  @DOMMain:implementFeature:
+    @@@: DOMXML|XMLVersionFeature11
+    @@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
+
+  @Implement:
+    @@@: DOMMain|ManakaiDOMExceptionIF||ManakaiDOM|Perl
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @ISA:
+    @@@: ManakaiDOM|ManakaiDOMException||ManakaiDOM|Perl
+    @@ForCheck: ManakaiDOM|ForClass
+  @ISA:
+    @@@: ManakaiDOM|ManakaiDOMObject
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @IFQName: DOMException
+  @ClsQName: ManakaiDOMException
+
   @Description:
     @@lang:en
     @@@:
@@ -945,21 +799,16 @@ ExceptionDef:
          @@@@lang:en
          @@@@@: 
            The error code of this object. 
-       @@@PerlDef: 
-         __CODE{ManakaiDOM:getExceptionCode||ManakaiDOM:Perl}__;
+     @@ForCheck: ManakaiDOM|ForIF
 
-  @XConstGroup:
-     @@QName:
-       @@@@: ExceptionCode
-       @@@ForCheck:
-         ManakaiDOM:ForIF
-     @@QName:
-       @@@@: ManakaiDOMExceptionCode
-       @@@ForCheck:
-         ManakaiDOM:ForClass
-     @@Spec:
-       @@@DOM3:
-         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-258A00AF
+  @ResourceDef:
+    @@rdf:type: ManakaiDOM|ConstGroup
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+    @@IFQName: ExceptionCode
+    @@ClsQName: ManakaiDOMExceptionCode
+    @@PerlName: ExceptionCode
+
      @@Description:
        @@@lang:en
        @@@@: Integers indicating the type of error generated.
@@ -1334,7 +1183,7 @@ ExceptionDef:
               in the DOM Level 2 Specification.  The DOM Level 2 
               Errata and the DOM Level 3 Specification define as 
               the DOM implementation raise an exception of code 
-              <X:DOMException.NOT_SUPPORTED_ERR>.
+              <X::DOMException.NOT_SUPPORTED_ERR>.
            \
               This DOM implementation throws the exception in 
               both levels.
@@ -1388,9 +1237,9 @@ ExceptionDef:
         @@@SubTypeDef:
           @@@@QName:
             ManakaiDOMHTML:MDOMHTML_IMPL_NOSUPPORT_SET_SELECT_LENGTH
-          @@@Description:
-            @@@@lang:en
-            @@@@@:
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
               The DOM implementation does not support setting 
               <A::DOMHTML:HTMLSelectElement.length>.
         @@@SubTypeDef:
@@ -1836,6 +1685,81 @@ PropDef:
     Lists of features.
   @Type: ManakaiDOM|ManakaiDOMFeatures
 
+ElementTypeBinding:
+  @Name: NodeTypeDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+    @@For: ManakaiDOM|DOM1
+    @@For: =ManakaiDOM|ManakaiDOM
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|IF
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+
+    @@ISA:
+      @@@@: Node
+      @@@ForCheck: ManakaiDOM|ForIF
+    @@ISA:
+      @@@@: ManakaiDOMNode
+      @@@ForCheck: ManakaiDOM|ForClass
+
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM1||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM2||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM2
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM3||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM3
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+    @@DOMMain:implementFeature:
+      @@@@: CoreFeature10
+      @@@For: ManakaiDOM|DOM1
+    @@DOMMain:implementFeature:
+      @@@@: CoreFeature20
+      @@@For: ManakaiDOM|DOM2
+    @@DOMMain:implementFeature:
+      @@@@: CoreFeature30
+      @@@For: ManakaiDOM|DOM3
+    @@DOMMain:implementFeature:
+      @@@@: DOMXML|XMLFeature10
+      @@@For: ManakaiDOM|DOM1 ManakaiDOM|DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: DOMXML|XMLFeature20
+      @@@For: ManakaiDOM|DOM2 ManakaiDOM|DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: DOMXML|XMLFeature30
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: DOMXML|XMLVersionFeature10
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: DOMXML|XMLVersionFeature11
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
 
 ElementTypeBinding:
   @Name: IFCls1Def
@@ -1960,7 +1884,6 @@ ElementTypeBinding:
       @@@@: DOMXML|XMLVersionFeature11
       @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
 
-
 ElementTypeBinding:
   @Name: IFCls3Def
   @ElementType: 
@@ -1996,7 +1919,9 @@ ElementTypeBinding:
       @@@ContentType: DISCore|TFPQNames
       @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
 
-    @@DOMMain:implementFeature: CoreFeature30
+    @@DOMMain:implementFeature:
+      @@@@: CoreFeature30
+      @@@For: ManakaiDOM|DOM3
     @@DOMMain:implementFeature:
       @@@@: DOMXML|XMLFeature30
       @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
@@ -2026,6 +1951,7 @@ IFCls3Def:
   @ClsQName: ManakaiDOMImplementationList
 
   @ClsISA: DOMFeature|ManakaiImplementationList
+  @ClsISA: ManakaiDOM|ManakaiDOMObject
 
   @enDesc:
     The <IF::DOMImplementationList> interface provides the 
@@ -2094,6 +2020,7 @@ IFCls3Def:
   @ClsQName: ManakaiDOMImplementationSource
 
   @ClsISA: DOMFeature|ManakaiImplementationSource
+  @ClsISA: ManakaiDOM|ManakaiDOMObject
 
   @enDesc:
     The <IF::DOMImplementationSource> interface permits a DOM
@@ -2103,7 +2030,7 @@ IFCls3Def:
     Each implemented <IF::DOMImplementationSource> object
     is listed in the binding-specific list of available sources
     so that its <IF::DOMImplementation> objects are made available
-    from the <Class::DOMFeature:DOMImplementationRegistry> object.
+    from the <Class::DOMMain:DOMImplementationRegistry> object.
 
   @Method:
     @@Name: getDOMImplementation
@@ -2123,7 +2050,7 @@ IFCls3Def:
       @@@enDesc:
         The first DOM implementation that supports the desired
         features.  It is the first item of the list returned
-        by the <M::.getDOMImplementationList> method.
+        by the <M::DOMImplementationSource.getDOMImplementationList> method.
       @@@nullCase:
         @@@@enDesc:
           The source has no DOM implementation that supports the 
@@ -2167,38 +2094,30 @@ ElementTypeBinding:
   @ShadowContent:
     @@ForCheck: ManakaiDOM|ForClass
 
-IF:
-  @Name:
+IFCls3Def:
+  @IFQName: DOMStringList
+  @ClsQName: ManakaiDOMStringList
+
+  @ClsISA: ManakaiDOM|ManakaiDOMObject
+
+  @enDesc:
+    Objects implementing the <IF::DOMStringList> interface are
+    used to represent ordered collection of <TYPE::DOMMain|DOMString>
+    values.
+
+    {NOTE:: How this collection is implemented is neither defined nor
+            constrained.
+    }
+
+    The items in the <IF::DOMStringList> are accessible via an
+    ordinal index, starting from <CODE::0>.
+
+  @enDesc:
+    @@For: ManakaiDOM|ManakaiDOM
     @@@:
-      DOMStringList
-    @@ForCheck: 
-      ManakaiDOM:ForIF
-  @Name:
-    @@@:
-      ManakaiDOMStringList
-    @@ForCheck: 
-      ManakaiDOM:ForClass
-    @@For:
-      ManakaiDOM:ManakaiDOM
-  @ImplementLevel3:
-  @For:
-    ManakaiDOM:DOM3
-  @For:
-    =ManakaiDOM:ManakaiDOM
-  @Level[list]:  3
-  @SpecLevel:3
-  @Spec:
-    @@DOM3:
-      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DOMStringList
-  @Description:
-    @@lang:en
-    @@@:
-      An ordered collection of <TYPE::DOMMain:DOMString> values.
-  @ImplNote:
-    @@lang:en
-    @@@:
-      How the collection is implemented is not defined by the 
-      specification.
+      In the manakai implementation, <IF::DOMStringList> can be 
+      dereferenced as if it is an array reference.
+
   @Method:
      @@Name:  item
      @@Spec:
@@ -2307,35 +2226,34 @@ IF:
               }
             }__;
           }
+##DOMStringList
 
-IF:
-  @Name:
-    @@@: NameList
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @Name:
-    @@@: ManakaiDOMNameList
-    @@ForCheck:
-      ManakaiDOM:ForClass
-    @@For:
-      ManakaiDOM:ManakaiDOM
+IFCls3Def:
+  @IFQName: NameList
+  @ClsQName: ManakaiDOMNameList
 
-  @ImplementLevel3:
+  @ClsISA: ManakaiDOM|ManakaiDOMObject
 
-  @For:
-    ManakaiDOM:DOM3
-  @For:
-    =ManakaiDOM:ManakaiDOM
-  @Spec:
-    @@DOM3:
-      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#NameList
-  @Description:
-    @@lang:en
+  @enDesc:
+    Objects implementing <IF::NameList> interface are used to
+    represent ordered collections of parallel pairs of name
+    and namespace values (which could be <DOM::null> values).
+
+    {NOTE:: How this collection is implemented is neither defined
+            nor constrained. 
+    }
+
+    The items in the <IF::NameList> are accessible via an
+    ordinal index, starting from <CODE::0>.
+
+  @enDesc:
+    @@For: ManakaiDOM|ManakaiDOM
     @@@:
-      An ordered collection of parallel pairs of name and namespace values. 
-  @ImplNote:
-    @@lang:en
-    @@@: How this collection is implemented is not defined by the specification.
+      In the manakai implementation, <IF::NameList> can be
+      dereferenced as if it is an array reference, in which each item
+      is a reference to array whose item <Perl::0> is the namespace
+      URI and whose item <Perl::1> is the name.
+
   @Method:
      @@Name:  getName
      @@Spec:
@@ -2374,7 +2292,7 @@ IF:
               $index > $#$self) {
             $r = null;
           } else {
-            $r = $self->[$index]->{name};
+            $r = $self->[$index]->[1];
           }          
   @Method:
      @@Name:  getNamespaceURI
@@ -2396,7 +2314,7 @@ IF:
      @@Return:
         @@@Type:
           DOMMain:DOMString
-        @@@actualType:
+        @@@dis:actualType:
           ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
@@ -2416,7 +2334,7 @@ IF:
               $index > $#$self) {
             $r = null;
           } else {
-            $r = $self->[$index]->{nsURI};
+            $r = $self->[$index]->[0];
           }          
   @Attr:
      @@Name:  length
@@ -2445,6 +2363,10 @@ IF:
        @@@lang:en
        @@@@: 
          Tests whether a name is one of items in this collection.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         Is namespace URIs ignored in this matching?
      @@Param:
         @@@Name:  str
         @@@Type:  
@@ -2469,24 +2391,30 @@ IF:
             @@@@@@:
               The name <P::str> has not been found in this collection.
         @@@PerlDef:
-          $r = false;
           CHK: {
-            __DEEP{
-              for (@$self) {
-                if ($str eq $_->{name}) {
+            if (defined $str) {
+              for my $item (@$self) {
+                if (defined $item->[1] and $str eq $item->[1]) {
                   $r = true;
                   last CHK;
                 }
               }
-            }__;
-          }
-    @@NSVersion: containsNS
+            } else { # not defined $str
+              for my $item (@$self) {
+                if (not defined $item->[1]) {
+                  $r = true;
+                  last CHK;
+                }
+              }
+            } # $str defined?
+          } # CHK
+    @@NSVersion: .containsNS
   @Method:
      @@Name:  containsNS
      @@Spec:
        @@@DOM3:
          http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#NameList-containsNS
-     @@NoNSVersion: contains
+     @@NoNSVersion: .contains
      @@Description:
        @@@lang:en
        @@@@: 
@@ -2495,7 +2423,7 @@ IF:
         @@@Name:  namespaceURI
         @@@Type:
           DOMMain:DOMString
-        @@@actualType:
+        @@@dis:actualType:
           ManakaiDOM:ManakaiDOMNamespaceURI
         @@@Description:
           @@@@lang:en
@@ -2534,19 +2462,43 @@ IF:
             @@@@@@:
               The pair has not been found in this collection.
         @@@PerlDef:
-          $r = false;
-          CHK: {
-            __DEEP{
-              for (@$self) {
-                if (((defined $namespaceURI and $namespaceURI eq $_->{nsURI}) or
-                     (not defined $namespaceURI and not defined $_->{nsURI})) and
-                    $name eq $_->{name}) {
+          CHKLN: {
+            CHKNS: {
+              if (defined $namespaceURI) {
+                for my $item (@$self) {
+                  if (defined $item->[0] and $namespaceURI eq $item->[0]) {
+                    last CHKNS;
+                  }
+                }
+              } else { # not defined namespaceURI
+                for my $item (@$self) {
+                  if (not defined $item->[0]) {
+                    last CHKNS;
+                  }
+                }
+              } # namespaceURI defined?
+
+              ## namespaceURI does not match
+              last CHKLN;
+            } # CHKNS
+
+            if (defined $name) {
+              for my $item (@$self) {
+                if (defined $item->[1] and $name eq $item->[1]) {
                   $r = true;
-                  last CHK;
+                  last CHKLN;
                 }
               }
-            }__;
-          }
+            } else { # not defined namespaceURI
+              for my $item (@$self) {
+                if (not defined $item->[1]) {
+                  $r = true;
+                  last CHKLN;
+                }
+              }
+            } # name defined?
+          } # CHKLN
+##NameList
 
 IFCls1Def:
   @IFQName: DOMImplementation
@@ -2791,32 +2743,24 @@ IFCls1Def:
         @@@ImplNote:
           @@@@lang:en
           @@@@@:
-            The <P::ownerDocument> attribute is set to <DOM::null>.
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: INVALID_CHARACTER_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: 
-              The <P::qualifiedName> is not an XML Name according to 
-              the XML 1.0 Specification.
+            The <A::Node.ownerDocument> attribute is set to <DOM::null>.
+        @@@raises:
+          @@@@@: DOMException.INVALID_CHARACTER_ERR
+          @@@@enDesc:
+            @@@@@@:
+              The <P::qualifiedName> is not an XML 1.0 <CODE::Name>.
             @@@@@For:
               !ManakaiDOM:ManakaiDOMLatest
-          @@@@Description:
-            @@@@@lang:en
+          @@@@enDesc:
             @@@@@@:
-              The <P::qualifiedName> is not an XML Name according to 
-              the XML 1.1 specification.
+              The <P::qualifiedName> is not an XML 1.1 <CODE::Name>.
             @@@@@For:
               ManakaiDOM:ManakaiDOMLatest
-        @@@Exception:
-          @@@@@:
-            MDOMX:MDOM_NS_MALFORMED_QNAME
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The <P::qualifiedName> is malformed.
-        @@@Exception:
+        @@@raises:
+          @@@@@: MDOMX|MDOM_NS_MALFORMED_QNAME
+          @@@@enDesc:
+            The <P::qualifiedName> is malformed.
+        @@@raises:
           @@@@@:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
           @@@@Description:
@@ -2971,31 +2915,34 @@ IFCls1Def:
                     interface. 
             \
             }
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: INVALID_CHARACTER_ERR
+        @@@raises:
+          @@@@@: DOMException.INVALID_CHARACTER_ERR
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The specified qualified name is not an XML 1.0 Name.
+              The specified qualified name is not an XML 1.0 <CODE::Name>.
             @@@@@For:
               !ManakaiDOM:ManakaiDOMLatest
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The specified qualified name is not an XML 1.1 Name.
+              The specified qualified name is not an XML 1.1 <CODE::Name>.
             @@@@@For:
               ManakaiDOM:ManakaiDOMLatest
           @@@@ImplNote:
             @@@@@lang:en
             @@@@@@:
-              DOM Level 3 specification defines to rely the XML 1.0 
-              specification.  DOM Level 2 specification does not 
-              explicitly defines but the definition for "INVALID_CHARACTER_ERR"
-              refers the XML 1.0 specification.
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: NAMESPACE_ERR
+              The <CITE::DOM Level 2 Core> specification does not
+              explicitly defines the version of the XML for 
+              <CODE::Name>s, but the definition for
+              <X::DOMException.INVALID_CHARACTER_ERR> references
+              the <CITE::XML 1.0> specification.
+
+              The <CITE::DOM Level 3 Core> specification references
+              the <CITE::XML 1.0> specification for the <CODE::Name>
+              definition.
+        @@@raises:
+          @@@@@: DOMException.NAMESPACE_ERR
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
@@ -3021,20 +2968,20 @@ IFCls1Def:
               But this DOM implementation only report a warning on 
               these cases since the specification does not mention 
               to raise any exception.
-        @@@Exception:
+        @@@raises:
           @@@@@: MDOMX_DOCTYPE_ALREADY_USED
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
               The <P::doctype> has already been used with a different 
               document.
-        @@@Exception:
+        @@@raises:
           @@@@@: MDOMX_EXTERNAL_NODE
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
               The <P::doctype> was created from a different DOM implementation.
-        @@@Exception:
+        @@@raises:
           @@@@@:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
           @@@@Description:
@@ -3326,63 +3273,47 @@ ElementTypeBinding:
     @@ContentType:
       lang:dis
 
-IF:
-  @Name:
-    @@@:
-      Node
-    @@ForCheck: 
-      ManakaiDOM:ForIF
-  @Name:
-    @@@:
-      ManakaiDOMNode
-    @@ForCheck: 
-      ManakaiDOM:ForClass
-    @@For:
-      ManakaiDOM:ManakaiDOM
-  @Description:
-    @@lang:en
-    @@@:
-      A single node in a document tree.  This is the primary data 
-      type for the entire Document Object Model.
+IFCls1Def:
+  @IFQName: Node
+  @ClsQName: ManakaiDOMNode
+
+  @enDesc:
+    The <IF::Node> interface is the primary datatype for the entire 
+    document object model.  It represents a single node in the 
+    document tree.
+
+    The <IF::Node> interface is not implemented alone; the <IF::Node>
+    objects are expected to implement one or more additional
+    interfaces according to its node type.  For example, a node
+    whose <A::Node.nodeType> equals to <C::Node.ELEMENT_NODE>
+    would also implement the <IF::Element> interface.
+
   @IsFinal:
     @@@: -1
     @@ForCheck:
       ManakaiDOM:ForClass
-  @ISA:
-    @@@: ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl
-    @@ForCheck:
-      ManakaiDOM:ForClass
-    @@For:
-      ManakaiDOM:ManakaiDOM
-  @ISA:
-    @@@:
-      ManakaiDOM:ManakaiDOMObject
-    @@ForCheck:
-      ManakaiDOM:ForClass ManakaiDOM:ManakaiDOM
 
-  @ImplementLevel1:
-  @ImplementLevel2:
-  @ImplementLevel3:
+  @ClsISA: ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl
+  @ClsISA: ManakaiDOM|ManakaiDOMObject
 
   @ConstGroup:
-     @@QName:
-       @@@@: NodeType
-       @@@ForCheck:
-         ManakaiDOM:ForIF
-     @@QName:
-       @@@@: ManakaiDOMNodeType
-       @@@ForCheck:
-         ManakaiDOM:ForClass
-     @@rdfs:subClassOf:
-       @@@@: DOMMain|unsigned-short||ManakaiDOM|all
-       @@@ForCheck: ManakaiDOM|ForClass
-     @@Type: DOMMain|unsigned-short||ManakaiDOM|all
-     @@Description:
-       @@@lang:en
-       @@@@: An integer indicating which type of node this is.
-     @@ImplNote:
-       @@@lang:en
-       @@@@: Codes <= 200 are reserved to W3C for possible future use.
+    @@IFQName: NodeType
+    @@ClsQName: ManakaiDOMNodeType
+    @@PerlName: NodeType
+
+   @@rdfs:subClassOf:
+     @@@@: DOMMain|unsigned-short||ManakaiDOM|all
+     @@@ForCheck: ManakaiDOM|ForClass
+   @@Type: DOMMain|unsigned-short||ManakaiDOM|all
+
+   @@enDesc:
+     Constant values in this group are integers indicating of which
+     type a node is.
+
+     {NOTE:: Numeric codes up to 200 are reserved to W3C
+             for possible future use <SRC::<CITE::DOM Level 3 Core>>.
+     }
+
      @@Const:
         @@@Name:  ELEMENT_NODE
         @@@Type:  
@@ -5238,7 +5169,7 @@ IF:
          The descriptions in the sections of Base URIs (DOM Level 3 Core 
          1.3.4) and <A::Node.baseURI> (and some readings from XML Base 
          and XML Infoset specifications) is insufficient to understand 
-         and implement this attribute.  The <CITE::Infoset Mapping>, a 
+         and implement this attribute.  The <sw010:csection::Infoset Mapping>, a 
          normative appendix of the DOM Level 3 Core Specification, is 
          useful for this purpose.
      @@ImplNote:
@@ -5262,6 +5193,8 @@ IF:
        @@@@: ManakaiDOMDocumentPosition
        @@@ForCheck:
          ManakaiDOM:ForClass
+     @@PerlName: DocumentPosition
+
      @@Description:
        @@@lang:en
        @@@@:
@@ -5629,8 +5562,7 @@ IF:
             @@@@@@:
               Always <DOM::null> will be returned.
         @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
+          @@@@Value:\
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
@@ -6462,9 +6394,6 @@ ClassDef:
   @QName: 
     ManakaiDOMCore:ManakaiDOMNodeObjectNode
   @ISA: ManakaiNode|ManakaiNodeStem||ManakaiDOM|Perl
-  @DOMMain:implementFeature: MDOMCoreFeature10
-  @DOMMain:implementFeature: MDOMCoreFeature20
-  @DOMMain:implementFeature: MDOMCoreFeature30
 
   @Description:
     @@lang:en
@@ -6742,7 +6671,8 @@ ClassDef:
       @@@lang:en
       @@@@:
         This internal method implements the <DOM::lookupNamespacePrefix> 
-        <SRC:<CITE:DOM Level 3 Core Specification> B.2 Namespace Prefix Lookup>.
+        <SRC::<CITE::DOM Level 3 Core Specification>
+        <sw010:csection::B.2 Namespace Prefix Lookup>>.
     @@Param:
       @@@Name:namespaceURI
       @@@Type:
@@ -6847,7 +6777,8 @@ ClassDef:
       @@@lang:en
       @@@@:
         This internal method implements the <DOM::isDefaultNamespace> 
-        <SRC:<CITE:DOM Level 3 Core Specification> B.3 Default Namespace Lookup>.
+        <SRC::<CITE::DOM Level 3 Core Specification> 
+        <sw010:csection::B.3 Default Namespace Lookup>>.
     @@Param:
       @@@Name:namespaceURI
       @@@Type:
@@ -6961,7 +6892,8 @@ ClassDef:
       @@@lang:en
       @@@@:
         This internal method implements the <DOM::lookupNamespaceURI> 
-        <SRC:<CITE:DOM Level 3 Core Specification> B.4 Namespace URI Lookup>.
+        <SRC::<CITE::DOM Level 3 Core Specification> 
+        <sw010:csection::B.4 Namespace URI Lookup>>.
     @@Param:
       @@@Name:prefix
       @@@Type:
@@ -7088,7 +7020,7 @@ ClassDef:
       @@@ImplNote:
         @@@@lang:en
         @@@@@:
-          Non namespace-aware nodes are ignored <SRC:DOM 3>.
+          Non namespace-aware nodes are ignored <SRC::DOM 3>.
   @IntMethodC:
     @@Name:getElementBy
     @@Description:
@@ -7103,8 +7035,8 @@ ClassDef:
         @@@@lang:en
         @@@@@:
           A code reference.  The code referred is called with a 
-          parameter of this <IF::ManakaiDOMNodeObjectNode> object 
-          when an <IF::Element> node is determined whether it could 
+          parameter of this <Class::ManakaiDOMCore|ManakaiDOMNodeObjectNode>
+          object when an <IF::Element> node is determined whether it could 
           be returned.  The code should return either <DOM::true> or 
           <DOM::false>.
     @@Param:
@@ -7186,8 +7118,8 @@ ClassDef:
         @@@@lang:en
         @@@@@:
           A code reference.  The code referred is called with a 
-          parameter of this <IF::ManakaiDOMNodeObjectNode> object 
-          when an <IF::Element> node is determined whether it could 
+          parameter of this <Class::ManakaiDOMCore|ManakaiDOMNodeObjectNode>
+          object when an <IF::Element> node is determined whether it could 
           be returned.  The code should return either <DOM::true> or 
           <DOM::false>.
     @@Return:
@@ -7281,8 +7213,8 @@ ClassDef:
         to the element nodes, into a <QUOTE::normalized> form where 
         only structure such as XML tags separates text nodes, i.e. 
         there are neither adjacent text nodes nor empty text nodes. 
-        (For the support of DOM Level 1 <M::Element.normalize> and 
-        DOM levels 2 and 3 <M::Node.normalize>.) 
+        (For the support of DOM Level 1 <M::Element||ManakaiDOM|ManakaiDOM1
+        .normalize> and DOM levels 2 and 3 <M::Node.normalize>.) 
         \
         In addition, this method may also normalize text nodes in the subtree, 
         i.e. the characters of the text nodes will be fully normalized. 
@@ -7299,7 +7231,7 @@ ClassDef:
      @@Param:
        @@@Name:isDescendant
        @@@Type:
-         DOMMain:DOMString
+         DOMMain:boolean||ManakaiDOM|all
        @@@Description:
          @@@@lang:en
          @@@@@:
@@ -7516,46 +7448,17 @@ ResourceDef:
       ManakaiDOM:IF
     @@ForCheck:
       ManakaiDOM:ForIF
-  @Name:
-    @@@: NodeList
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @ISA:
-    @@@:
-      ::ManakaiDOM:ManakaiDOM::ManakaiDOM:ForIF
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM1 ManakaiDOM:ForIF
-    @@ContentType: DISCore|TFPQNames
-  @ISA:
-    @@@:
-      ::ManakaiDOM:ManakaiDOM1::ManakaiDOM:ForIF
-    @@ForCheck:
-      ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM2
-    @@ContentType: DISCore|TFPQNames
-  @ISA:
-    @@@:
-      ::ManakaiDOM:ManakaiDOM2::ManakaiDOM:ForIF
-    @@ForCheck:
-      ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM3
-    @@ContentType: DISCore|TFPQNames
-  @ISA:
-    @@@:
-      ::ManakaiDOM:ManakaiDOM3::ManakaiDOM:ForIF
-    @@ForCheck:
-      ManakaiDOM:ForIF ManakaiDOM:ManakaiDOMLatest
-    @@ContentType: DISCore|TFPQNames
+  @IFQName: NodeList
+
   @DOMMain:implementFeature:
-    @@@: CoreFeature
-    @@ForCheck:
-      ManakaiDOM:DOM
+    @@@: CoreFeature10
+    @@ForCheck: ManakaiDOM|DOM1
   @DOMMain:implementFeature:
     @@@: CoreFeature20
-    @@ForCheck:
-      ManakaiDOM:DOM2
+    @@ForCheck: ManakaiDOM|DOM2
   @DOMMain:implementFeature:
     @@@: CoreFeature30
-    @@ForCheck:
-      ManakaiDOM:DOM3
+    @@ForCheck: ManakaiDOM|DOM3
 
   @resourceFor:
     @@@:
@@ -7581,23 +7484,7 @@ ResourceDef:
       ManakaiDOM:ManakaiDOMObject
     @@ForCheck:
       DOMCore:ForChildNodeList
-  @Implement:
-    @@@:
-      DOMCore:NodeList
-    @@ForCheck:
-      DOMCore:ForChildNodeList
-  @DOMMain:implementFeature:
-    @@@: MDOMCoreFeature10
-    @@ForCheck:
-      ForChildNodeList ManakaiDOM:ManakaiDOM1
-  @DOMMain:implementFeature:
-    @@@: MDOMCoreFeature20
-    @@ForCheck:
-      ForChildNodeList ManakaiDOM:ManakaiDOM2
-  @DOMMain:implementFeature:
-    @@@: MDOMCoreFeature30
-    @@ForCheck:
-      ForChildNodeList ManakaiDOM:ManakaiDOM3
+
   @AppISA:
     @@ForCheck:
       ForChildNodeList
@@ -7626,23 +7513,7 @@ ResourceDef:
     @@@:
       ManakaiDOM:ManakaiDOMObject
     @@ForCheck: ForGetNodeList
-  @Implement:
-    @@@:
-      DOMCore:NodeList
-    @@ForCheck:
-      DOMCore:ForGetNodeList
-  @DOMMain:implementFeature:
-    @@@: MDOMCoreFeature10
-    @@ForCheck:
-      ForGetNodeList ManakaiDOM:ManakaiDOM1
-  @DOMMain:implementFeature:
-    @@@: MDOMCoreFeature20
-    @@ForCheck:
-      ForGetNodeList ManakaiDOM:ManakaiDOM2
-  @DOMMain:implementFeature:
-    @@@: MDOMCoreFeature30
-    @@ForCheck:
-      ForGetNodeList ManakaiDOM:ManakaiDOM3
+
   @AppISA:
     @@ForCheck:
       ForGetNodeList
@@ -7651,19 +7522,56 @@ ResourceDef:
     @@@:
       Tie::Array
 
-  @Description:
-    @@lang:en
+  @Implement:
+    @@@: NodeList||ManakaiDOM|ManakaiDOM
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+  @Implement:
+    @@@: NodeList||ManakaiDOM|ManakaiDOM1
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
+  @Implement:
+    @@@: NodeList||ManakaiDOM|ManakaiDOM2
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM2
+  @Implement:
+    @@@: NodeList||ManakaiDOM|ManakaiDOM3
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM3
+  @Implement:
+    @@@: NodeList||ManakaiDOM|ManakaiDOMLatest
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+  @enDesc:
+    Objects implementing the <IF::NodeList> interface are used
+    to represent ordered collections of nodes.
+
+    The <IF::NodeList> objects are live; which means
+    that the <IF::NodeList> objects are always <QUOTE::up-to-date>.
+    For example, a <IF::NodeList> obtained from the 
+    <A::Node.childNodes> attribute of an empty element would 
+    have its <A::NodeList.length> value of <CODE::1> after
+    a <M::Node.appendChild> operation would have appended a node
+    to the element.
+
+    {NOTE:: How this collection is implemented is neither defined
+            nor constrained.
+    }
+
+    The items in the <IF::NodeList> are accessible via
+    an ordinal index, starting from zero.
+
+  @enDesc:
+    @@For: ManakaiDOM|ManakaiDOM
     @@@:
-      An ordered collection of nodes.
-    \
-      Node objects contained in a <IF::NodeList> may be accessed 
-      by an ordinal index, starting from zero.
-    \
-    \ <IF::NodeList> objects are <QUOTE::live>.
-  @ImplNote:
-    @@lang:en
-    @@@:
-      How this collection is implemented is not defined or constrained.
+      In the manakai implementation, <IF::NodeList> can be 
+      dereferenced as if it is an array reference.  For 
+      example, <Perl::@a = @$nodeList> result in the array
+      <Perl::@a> containing all <IF::Node>s in the <Perl::$nodeList>.
+      Please note that <Perl::@a> is just a Perl array and
+      it is <EM::not> live.
+
+  @enDesc:
+    {NOTE:: <IF::NodeList>s are different from <IF::NamedNodeMap>s
+            in that <IF::NodeList>s are <EM::ordered> and
+            <IF::NamedNodeMap>s are not.
+    }
 
   @Method:
      @@Name:  item
@@ -7947,7 +7855,7 @@ ResourceDef:
         @@@@lang:en
         @@@@@: 
           The new length of this list.  If the <P::count> 
-          is smaller than the current <A::.length>, <P::count>th or 
+          is smaller than the current <A::NodeList.length>, <P::count>th or 
           greater index'th items are removed from this list.  Otherwise, 
           no action.
     @@Return:
@@ -8264,13 +8172,14 @@ ResourceDef:
       @@@lang:en
       @@@@:
         Redefines destructor for the class
-        <Class::ManakaiDOM:ManakaiDOMNodeReference>, 
+        <Class::ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl>,
         since the <PerlModule::Tie::Array> also has its own empty destructor. 
     @@Return:
       @@@Def:
         @@@@ContentType:
           lang:dis
-        @@@@DISPerl:cloneCode: NodeRef.destroy
+        @@@@DISPerl:cloneCode:
+          ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl.destroy
 
 ##NodeList
 
@@ -8341,47 +8250,22 @@ ResourceDef:
 
   @resourceFor:
     ManakaiDOM:ForIF
-  @Name:
-    @@@: NamedNodeMap
-    @@ForCheck:
-      ManakaiDOM:ForIF
+  @IFQName: NamedNodeMap
   @rdf:type:
     @@@:
       ManakaiDOM:IF
     @@ForCheck:
       ManakaiDOM:ForIF
-  @ISA:
-    @@@:
-      NamedNodeMap::ManakaiDOM:ManakaiDOM
-    @@ForCheck:
-      ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM1
-  @ISA:
-    @@@:
-      NamedNodeMap::ManakaiDOM:ManakaiDOM1
-    @@ForCheck:
-      ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM2
-  @ISA:
-    @@@:
-      NamedNodeMap::ManakaiDOM:ManakaiDOM2
-    @@ForCheck:
-      ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM3
-  @ISA:
-    @@@:
-      NamedNodeMap::ManakaiDOM:ManakaiDOM3
-    @@ForCheck:
-      ManakaiDOM:ForIF ManakaiDOM:ManakaiDOMLatest
+
   @DOMMain:implementFeature:
-    @@@: CoreFeature
-    @@ForCheck:
-      ManakaiDOM:ForIF ManakaiDOM:DOM
+    @@@: CoreFeature10
+    @@ForCheck: ManakaiDOM|DOM1
   @DOMMain:implementFeature:
     @@@: CoreFeature20
-    @@ForCheck:
-      ManakaiDOM:ForIF ManakaiDOM:DOM2
+    @@ForCheck: ManakaiDOM|DOM2
   @DOMMain:implementFeature:
     @@@: CoreFeature30
-    @@ForCheck:
-      ManakaiDOM:ForIF ManakaiDOM:DOM3
+    @@ForCheck: ManakaiDOM|DOM3
 
   @resourceFor:
     @@@: ForAttrMap
@@ -8403,35 +8287,6 @@ ResourceDef:
     @@@:
       ManakaiDOM:ManakaiDOMObject
     @@ForCheck: ForAttrMap
-  @Implement:
-    @@@:
-      DOMCore:NamedNodeMap
-    @@ForCheck:
-      DOMCore:ForAttrMap
-  @DOMMain:implementFeature:
-    @@@: CoreFeature
-    @@ForCheck:
-      ForAttrMap ManakaiDOM:DOM
-  @DOMMain:implementFeature:
-    @@@: CoreFeature20
-    @@ForCheck:
-      ForAttrMap ManakaiDOM:DOM2
-  @DOMMain:implementFeature:
-    @@@: CoreFeature30
-    @@ForCheck:
-      ForAttrMap ManakaiDOM:DOM3
-  @DOMMain:implementFeature:
-    @@@: MDOMCoreFeature10
-    @@ForCheck:
-      ForAttrMap ManakaiDOM:ManakaiDOM1
-  @DOMMain:implementFeature:
-    @@@: MDOMCoreFeature20
-    @@ForCheck:
-      ForAttrMap ManakaiDOM:ManakaiDOM2
-  @DOMMain:implementFeature:
-    @@@: MDOMCoreFeature30
-    @@ForCheck:
-      ForAttrMap ManakaiDOM:ManakaiDOM3
 
   @resourceFor:
     @@@: ForEntityMap
@@ -8453,11 +8308,7 @@ ResourceDef:
     @@@:
       ManakaiDOM:ManakaiDOMObject
     @@ForCheck: ForEntityMap
-  @Implement:
-    @@@:
-      DOMCore:NamedNodeMap
-    @@ForCheck:
-      DOMCore:ForEntityMap
+
   @DOMMain:implementFeature:
     @@@: 
       DOMXML:XMLFeature10
@@ -8473,21 +8324,6 @@ ResourceDef:
       DOMXML:XMLFeature30
     @@ForCheck:
       ForEntityMap ManakaiDOM:DOM3
-  @DOMMain:implementFeature:
-    @@@: 
-      DOMXML:MDOMXMLFeature10
-    @@ForCheck:
-      ForEntityMap ManakaiDOM:ManakaiDOM1
-  @DOMMain:implementFeature:
-    @@@: 
-      DOMXML:MDOMXMLFeature20
-    @@ForCheck:
-      ForEntityMap ManakaiDOM:ManakaiDOM2
-  @DOMMain:implementFeature:
-    @@@: 
-      DOMXML:MDOMXMLFeature30
-    @@ForCheck:
-      ForEntityMap ManakaiDOM:ManakaiDOM3
 
   @resourceFor:
     @@@: ForNotationMap
@@ -8509,11 +8345,7 @@ ResourceDef:
     @@@:
       ManakaiDOM:ManakaiDOMObject
     @@ForCheck: ForNotationMap
-  @Implement:
-    @@@:
-      DOMCore:NamedNodeMap
-    @@ForCheck:
-      DOMCore:ForNotationMap
+
   @DOMMain:implementFeature:
     @@@: 
       DOMXML:XMLFeature10
@@ -8529,52 +8361,59 @@ ResourceDef:
       DOMXML:XMLFeature30
     @@ForCheck:
       ForNotationMap ManakaiDOM:DOM3
-  @DOMMain:implementFeature:
-    @@@: 
-      DOMXML:MDOMXMLFeature10
-    @@ForCheck:
-      ForNotationMap ManakaiDOM:ManakaiDOM1
-  @DOMMain:implementFeature:
-    @@@: 
-      DOMXML:MDOMXMLFeature20
-    @@ForCheck:
-      ForNotationMap ManakaiDOM:ManakaiDOM2
-  @DOMMain:implementFeature:
-    @@@: 
-      DOMXML:MDOMXMLFeature30
-    @@ForCheck:
-      ForNotationMap ManakaiDOM:ManakaiDOM3
 
-  @Description:
-    @@lang:en
-    @@@:
-      A unordered collection of nodes that can be accessed by name. 
-    \
-      Node objects contained in a <IF::NamedNodeMap> may also 
-      be accessed by an ordinal index, starting from zero. 
-      However, this is simply to allow convenient enumeration of 
-      a <IF::NamedNodeMap>.
-    \
-    \ <IF::NamedNodeMap> objects are <QUOTE::live>.
+  @Implement:
+    @@@: NamedNodeMap||ManakaiDOM|ManakaiDOM
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+  @Implement:
+    @@@: NamedNodeMap||ManakaiDOM|ManakaiDOM1
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
+  @Implement:
+    @@@: NamedNodeMap||ManakaiDOM|ManakaiDOM2
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM2
+  @Implement:
+    @@@: NamedNodeMap||ManakaiDOM|ManakaiDOM3
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM3
+  @Implement:
+    @@@: NamedNodeMap||ManakaiDOM|ManakaiDOMLatest
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
 
-  @Description:
-    @@lang:en
+  @enDesc:
+    Objects implementing the <IF::NamedNodeMap> interface are 
+    used to represent collections of nodes that can be
+    accessed by name.
+
+    <IF::NamedNodeMap>s do not maintain any particular order
+    of <IF::Node>s, which is different from <IF::NodeList>s.
+    Although <IF::Node>s in <IF::NamedNodeMap> may also be 
+    accessed by an ordinal index, starting from <CODE::0>, 
+    this is simply to allow convenient enumeration.
+
+    <IF::NamedNodeMap>s are live.
+
+  @enDesc:
+    @@ForCheck: ForEntityMap
     @@@:
-      A collection of the general entities, both external and internal, 
-      declared in the DTD.  Parameter entities and duplicating 
-      declarations are not contained.
-    @@ForCheck:ForEntityMap
+      The <Class::ManakaiDOMXML|ManakaiDOMEntities> class represents
+      a collection of the general entities, both external and internal
+      and both parsed and unparsed, declared in the DTD of the document.
+
+      {NOTE:: Parameter entities and dupulicating (so that ignored) 
+              entity declarations are not part of the collection.
+      }
+
   @ImplNote:
     @@lang:en
     @@@:
       This interface is used by the attribute "DocumentType.entities". 
     @@ForCheck:ForEntityMap
 
-  @Description:
-    @@lang:en
+  @enDesc:
+    @@ForCheck: ForNotationMap
     @@@:
-      A collection of notations declared in the DTD.
-    @@ForCheck:ForNotationMap
+      The <Class::ManakaiDOMXML|ManakaiDOMNotations> class represents
+      a collection of notations declared in the DTD of the document.
+
   @ImplNote:
     @@lang:en
     @@@:
@@ -8591,8 +8430,24 @@ ResourceDef:
       that all methods that access a named item by its <A::Node.nodeName> 
       will access the same item, and all methods by its namespace URI
       and local name will access the same item. 
-      <SRC::<CITE::DOM Level 2 Core> 1.4.8 XML Namespaces,
-      <CITE::DOM Level 3 Core> 1.3.3 XML Namespaces>
+      <SRC::<CITE::DOM Level 2 Core> <sw010:csection::1.4.8 XML Namespaces>,
+      <CITE::DOM Level 3 Core> <sw010:csection::1.3.3 XML Namespaces>>
+
+  @enDesc:
+    @@For: ManakaiDOM|ManakaiDOM
+    @@@:
+      In the manakai implementation, <IF::NamedNodeMap>s can be 
+      dereferenced as if it is an array reference or a hash reference.
+      Dereferencing as an array reference provides an access to
+      items by ordinal index, like <M::.item> method; 
+      Dereferencing as a hash reference
+      provides by name, like <M::.getNamedItem> method.
+
+      {TODO:: How namespace-aware node can be accessed?
+      }
+
+      {TODO:: This is <EM::not> implemented yet!
+      }
 
   @Method:
      @@Name:  getNamedItem
@@ -8716,7 +8571,7 @@ ResourceDef:
          with existing "NS" node?
          \
               It is unclear whether the node should be returned if 
-              the node is <QUOTE:replaced> by itself.
+              the node is <QUOTE::replaced> by itself.
   @Method:
      @@Name:  removeNamedItem
      @@Description:
@@ -8953,7 +8808,7 @@ ResourceDef:
          The DOM Level 2 Specification said that the HTML-only DOM 
          implenentations do not need to implement this method. 
          The DOM Level 2 Errata and the DOM Level 3 Specification 
-         says that the <Q::NOT_SUPPORTED_ERR> should be raised.
+         says that the <X::DOMException.NOT_SUPPORTED_ERR> should be raised.
   @Method:
      @@Name:  setNamedItemNS
      @@Description:
@@ -9107,7 +8962,7 @@ ResourceDef:
             @@@@@lang:en
             @@@@@@:
               It is unclear whether the node should be returned if 
-              the node is <QUOTE:replaced> by itself.
+              the node is <QUOTE::replaced> by itself.
              \
               This code is almost same as <M::Element.setAttributeNodeNS>
               without some points.
@@ -9335,50 +9190,45 @@ ResourceDef:
         See: <M::Node.isEqualNode>.
 ##NamedNodeMap
 
-IF:
-  @Name:
-    @@@:
-      CharacterData
-    @@ForCheck: 
-      ManakaiDOM:ForIF
-  @Name:
-    @@@:
-      ManakaiDOMCharacterData
-    @@ForCheck: 
-      ManakaiDOM:ForClass
-    @@For:
-      ManakaiDOM:ManakaiDOM
-  @ISA: 
-    @@@: Node
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @ISA:
-    @@@: ManakaiDOMNode
-    @@ForCheck:
-      ManakaiDOM:ForClass
-    @@For:
-      ManakaiDOM:ManakaiDOM
-  
-  @ImplementLevel1:
-  @ImplementLevel2:
-  @ImplementLevel3:
+NodeTypeDef:
+  @IFQName: CharacterData
+  @ClsQName: ManakaiDOMCharacterData
 
-  @ImplNote:
-    @@lang:en
-    @@@:
-      The DOM implementation may not put arbitary limits on the 
-      amount of the data that may be stored in a "CharacterData" node. 
-      However, the implementation limits may mean that the entirety of 
-      a node's data may not fit into a single "DOMString".
-  @ImplNote:
-    @@lang:en
-    @@@:
-      "Comment" and "Text" are "CharacterData".  "CDATASection" is a "Text".
+  @enDesc:
+    The <IF::CharacterData> interface extends the <IF::Node>
+    interface with a set of attributes and methods for
+    accessing character data in the DOM.  No DOM objects correspond 
+    directly to the <IF::CharacterData> interface -- the
+    <IF::Text> interface and the <IF::Comment> interface
+    inherits this interface.
+
+    {ps:: <doc:caption::Positions in character data>
+
+    All <CODE::offset>s in this interface start from <CODE::0>.  Since strings in
+    the DOM are represented in UTF-16, indexing
+    on <IF::CharacterData> is done in 16-bit units, i.e. characters
+    allocated in the range <CODE::U+10000> to <CODE::U+10FFFF>
+    (inclusive) are counted as two units.
+    }
+
+    {NOTE:: DOM implementations may not put arbitary limits on 
+            the amount of the data that may be stored in a 
+            <IF::CharacterData> node.  This might make a node's
+            data cannot fit into a single <TYPE::DOMMain:DOMString>.
+            See also <X::DOMException.DOMSTRING_SIZE_ERR>.
+    }
+
   @Attr:
-     @@Name:  data
-     @@Description:
-       @@@lang:en
-       @@@@: The character data of the node.
+    @@Name: data
+    @@enDesc:
+      The character data of the node.
+
+      If the node is a <IF::DOMXML|CDATASection>, it is the
+      content of the <XML::CDATA> section.  Since DOM implementation
+      does no lexical check on the content of the <XML::CDATA>
+      section, <A::CharacterData.data> might include the character
+      sequence equals to <SGML::MSE> (i.e. <XML::]]<gt>> in XML).
+
      @@Get:
         @@@Type:  
           DOMMain:DOMString
@@ -9483,8 +9333,8 @@ IF:
       @@@ImplNote:
         __DEEP{
           $r = <ClassM::DOMMain:ManakaiDOMString.substring>
-                   (\$self->{<Q::TreeCore:node>}
-                          ->{<Q::infoset:content>}, $offset, $count);
+                   (\$self->{ Q::TreeCore:node>}
+                          ->{ Q::infoset:content>}, $offset, $count);
         }__;
   @Method:
      @@Name:  appendData
@@ -9556,15 +9406,15 @@ IF:
           @@@@@lang:en
           @@@@@@: An attempt is made to break surrogate pair.
       @@@ImplNote:
-        if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:read-only>}) {
+        if ($self->{ Q::TreeCore:node>}->{ Q::DOMCore:read-only>}) {
           __EXCEPTION{
             MDOMX:NOMOD_THIS::
           }__;
         }
         __DEEP{
           <ClassM::DOMMain:ManakaiDOMString.insert>
-                   (\$self->{<Q::TreeCore:node>}
-                          ->{<Q::infoset:content>}, $offset, $arg);
+                   (\$self->{ Q::TreeCore:node>}
+                          ->{ Q::infoset:content>}, $offset, $arg);
         }__;
   @Method:
      @@Name:  deleteData
@@ -9615,15 +9465,15 @@ IF:
           @@@@@@: 
             An attempt is made to break surrogate pair.
       @@@ImplNote:
-        if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:read-only>}) {
+        if ($self->{ Q::TreeCore:node>}->{ Q::DOMCore:read-only>}) {
           __EXCEPTION{
             MDOMX:NOMOD_THIS::
           }__;
         }
         __DEEP{
           <ClassM::DOMMain:ManakaiDOMString.delete>
-                   (\$self->{<Q::TreeCore:node>}
-                          ->{<Q::infoset:content>}, $offset, $count);
+                   (\$self->{ Q::TreeCore:node>}
+                          ->{ Q::infoset:content>}, $offset, $count);
         }__;
   @Method:
     @@Name:  replaceData
@@ -9681,15 +9531,15 @@ IF:
           @@@@@lang:en
           @@@@@@: An attempt is made to break surrogate pair.
       @@@ImplNote:
-        if ($self->{<Q::TreeCore:node>}->{<Q::DOMCore:read-only>}) {
+        if ($self->{ Q::TreeCore:node>}->{ Q::DOMCore:read-only>}) {
           __EXCEPTION{
             MDOMX:NOMOD_THIS::
           }__;
         }
         __DEEP{
           <ClassM::DOMMain:ManakaiDOMString.replace>
-                   (\$self->{<Q::TreeCore:node>}
-                          ->{<Q::infoset:content>}, $offset, $count, $arg);
+                   (\$self->{ Q::TreeCore:node>}
+                          ->{ Q::infoset:content>}, $offset, $count, $arg);
         }__;
   @ReAttr:
      @@Name:  nodeValue
@@ -9795,33 +9645,9 @@ IF:
        ManakaiDOM:DOM3
 ##CharacterData
 
-IF:
-  @Name:
-    @@@:
-      Attr
-    @@ForCheck: 
-      ManakaiDOM:ForIF
-  @Name:
-    @@@:
-      ManakaiDOMAttr
-    @@ForCheck: 
-      ManakaiDOM:ForClass
-    @@For:
-      ManakaiDOM:ManakaiDOM
-  @ISA:
-    @@@: Node
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @ISA:
-    @@@: ManakaiDOMNode
-    @@ForCheck:
-      ManakaiDOM:ForClass
-    @@For: 
-      ManakaiDOM:ManakaiDOM
-
-  @ImplementLevel1:
-  @ImplementLevel2:
-  @ImplementLevel3:
+NodeTypeDef:
+  @IFQName: Attr
+  @ClsQName: ManakaiDOMAttr
 
   @DISLang:role: AttributeRole
 
@@ -10583,32 +10409,10 @@ IF:
             }
 ##Attr
 
-IF:
-  @Name:
-    @@@: Element
-    @@ForCheck: 
-      ManakaiDOM:ForIF
-  @Name:
-    @@@: ManakaiDOMElement
-    @@ForCheck: 
-      ManakaiDOM:ForClass
-    @@For:
-      ManakaiDOM:ManakaiDOM
-  @ISA:
-    @@@: Node
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @ISA:
-    @@@: ManakaiDOMNode
-    @@ForCheck:
-      ManakaiDOM:ForClass
-    @@For: 
-      ManakaiDOM:ManakaiDOM
+NodeTypeDef:
+  @IFQName: Element
+  @ClsQName: ManakaiDOMElement
 
-  @ImplementLevel1:
-  @ImplementLevel2:
-  @ImplementLevel3:
-  
   @DISLang:role: ElementRole
 
   @Description:
@@ -12013,7 +11817,7 @@ IF:
             @@@@@lang:en
             @@@@@@:
               It is unclear whether the node should be returned if 
-              the node is <QUOTE:replaced> by itself.
+              the node is <QUOTE::replaced> by itself.
         @@@Def:
           @@@@ForCheck:
             !ManakaiDOM:DOMXMLFeature
@@ -12092,10 +11896,10 @@ IF:
           @@@@ImplNote:
             @@@@@lang:en
             @@@@@@:
-              The <CITE:DOM Level 2 Core Specification> was stated 
+              The <CITE::DOM Level 2 Core Specification> was stated 
               that HTML-only DOM implementations were not required 
               to implement this method.  Its Errata and the 
-              <CITE:DOM Level 3 Core Specification> ammend it to 
+              <CITE::DOM Level 3 Core Specification> ammend it to 
               throw an exception.
         @@@Description:
           @@@@lang:en
@@ -12646,11 +12450,15 @@ IF:
          into a <QUOTE::normal> form where only structure separates 
          <IF::Text> nodes, i.e. there are neither adjacent <IF::Text> 
          nodes nor empty <IF::Text> nodes. 
+
+      Although the <IF::DOMXML:CDATASection> interface implements the
+      <IF::Text> interface, the <M::Node.normalize> method does 
+      not merge adjacent <IF::DOMXML:CDATASection> nodes.
     @@ImplNote:
       @@@lang:en
       @@@@:
         DOM level 2 and 3 defines <M::Node.normalize> instead 
-        of <M::Element.normalize>. 
+        of <M::Element::ManakaiDOM|ManakaiDOM1.normalize>. 
     @@DOMMain:implementFeature: CoreFeature10
     @@For:
       ManakaiDOM:DOM1 !ManakaiDOM:DOM2
@@ -13219,31 +13027,12 @@ ElementTypeBinding:
   @ShadowContent:
     @@lang:en
 
-IF:
-  @Name:
-    @@@: Text
-    @@ForCheck: 
-      ManakaiDOM:ForIF
-  @Name:
-    @@@: ManakaiDOMText
-    @@ForCheck: 
-      ManakaiDOM:ForClass
-    @@For:
-      ManakaiDOM:ManakaiDOM
-  @ISA:
-    @@@: CharacterData
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @ISA:
-    @@@: ManakaiDOMCharacterData
-    @@ForCheck:
-      ManakaiDOM:ForClass
-    @@For: 
-      ManakaiDOM:ManakaiDOM
+IFCls1Def:
+  @IFQName: Text
+  @ClsQName: ManakaiDOMText
 
-  @ImplementLevel1:
-  @ImplementLevel2:
-  @ImplementLevel3:
+  @IFISA: CharacterData
+  @ClsISA: ManakaiDOMCharacterData
   
   @DISLang:role: TextRole
 
@@ -13309,7 +13098,9 @@ IF:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: An attempt is made to break surrogate pair.
-      @@@ImplNote:
+      @@@PerlDef:
+        @@@@For:!ManakaiDOM|all
+        @@@@@:
           my $node = $self->{<Q::TreeCore:node>};
           my $parentNode = $node->{<Q::infoset:parent>};
           if ($node->{<Q::DOMCore:read-only>}) {
@@ -13414,7 +13205,7 @@ IF:
           @@@@@:
             my $parent = $self-><AG::DOMCore:Node.parentNode>;
             if ($parent-><AG::DOMCore:Node.nodeType> !=
-                <X::DOMCore:Node.ENTITY_REFERENCE_NODE>) {
+                <C::DOMCore:Node.ENTITY_REFERENCE_NODE>) {
               my $start = -1;
               my $end = -1;
               my $mfound = 0;
@@ -13427,8 +13218,8 @@ IF:
                   $end = $i;
                   $mfound = 1;
                 } elsif ({
-                           <X::Node.TEXT_NODE> => 1,
-                           <X::Node.CDATA_SECTION_NODE> => 1,
+                           <C::Node.TEXT_NODE> => 1,
+                           <C::Node.CDATA_SECTION_NODE> => 1,
                          }->{$sib-><AG::DOMCore:Node.nodeType>}) {
                   if ($mfound) {
                     $end = $i;
@@ -13436,7 +13227,7 @@ IF:
                     $start = $end = $i;
                   }
                 } elsif ($sib-><AG::DOMCore:Node.nodeType> ==
-                         <X::Node.ENTITY_REFERENCE_NODE>) {
+                         <C::Node.ENTITY_REFERENCE_NODE>) {
                   if ($mfound) {
                     
                   } else {
@@ -13647,31 +13438,12 @@ IF:
             }
 ##Text
 
-IF:
-  @Name:
-    @@@: Comment
-    @@ForCheck: 
-      ManakaiDOM:ForIF
-  @Name:
-    @@@: ManakaiDOMComment
-    @@ForCheck: 
-      ManakaiDOM:ForClass
-    @@For:
-      ManakaiDOM:ManakaiDOM
-  @ISA:
-    @@@: CharacterData
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @ISA:
-    @@@: ManakaiDOMCharacterData
-    @@ForCheck:
-      ManakaiDOM:ForClass
-    @@For: 
-      ManakaiDOM:ManakaiDOM
+IFCls1Def:
+  @IFQName: Comment
+  @ClsQName: ManakaiDOMComment
 
-  @ImplementLevel1:
-  @ImplementLevel2:
-  @ImplementLevel3:
+  @IFISA: CharacterData
+  @ClsISA: ManakaiDOMCharacterData
   
   @DISLang:role: CommentRole
 
@@ -13943,6 +13715,7 @@ IFDef:
        @@@@: Is this namespace *URI*?
   @ConstGroup:
      @@QName: DerivationMethods
+     @@PerlName: DerivationMethods
      @@Description:
        @@@lang:en
        @@@@:
@@ -13998,9 +13771,9 @@ IFDef:
         @@@ImplNote:
           @@@@lang:en
           @@@@@:
-            Other type definition --derive<DERIVATION_RESTRICTION>--> T2 
+            Other type definition --derive[DERIVATION_RESTRICTION]--> T2 
             or other type definition = T2,
-            T1 --derive<DERIVATION_RESTRICTION or DERIVATION_EXTENSION>--> 
+            T1 --derive[DERIVATION_RESTRICTION or DERIVATION_EXTENSION]--> 
             reference type definition or T1 = reference type definition, 
             T1.{variety} = union and T1.{member type definition} = T2.
      @@Const:
@@ -14012,9 +13785,9 @@ IFDef:
         @@@ImplNote:
           @@@@lang:en
           @@@@@: 
-            Other type definition --derive<DERIVATION_RESTRICTION>--> T2 
+            Other type definition --derive[DERIVATION_RESTRICTION]--> T2 
             or other type definition = T2,
-            T1 --derive<DERIVATION_RESTRICTION or DERIVATION_EXTENSION>--> 
+            T1 --derive[DERIVATION_RESTRICTION or DERIVATION_EXTENSION]--> 
             reference type definition or T1 = reference type definition, 
             T1.{variety} = list and T1.{item type definition} = T2.
   @Method:
@@ -14090,6 +13863,7 @@ IFDef:
     ManakaiDOM:DOM3
   @ConstGroup:
      @@QName:  OperationType
+     @@PerlName: OperationType
      @@rdfs:subClassOf: 
        @@@@: DOMMain|unsigned-short||ManakaiDOM|all
        @@@ForCheck: ManakaiDOM|ForClass
@@ -14215,56 +13989,30 @@ IFDef:
             @@@@@@: No node is newly created.
       @@Return:
 
-IF:
-  @QName:
-    @@@: DOMError
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @AppISA:
-    @@@:
-      Message::Util::Error
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM ManakaiDOM:ForIF
-    @@ContentType:
-      lang:Perl
+IFCls3Def:
+  @IFQName: DOMError
+  @ClsQName: ManakaiDOMError
 
-  @QName:
-    @@@: ManakaiDOMError
-    @@ForCheck:
-      ManakaiDOM:ForClass
   @rdf:type:
     @@@:
       DOMMain:ErrorClass
     @@ForCheck:
       ManakaiDOM:ForClass
-  @ISA:
-    @@@:
-      ManakaiDOM:ManakaiDOMExceptionOrWarning::ManakaiDOM:Perl
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM ManakaiDOM:ForClass
+
+  @ClsISA:
+    @@@: ManakaiDOM|ManakaiDOMExceptionOrWarning||ManakaiDOM|Perl
+    @@ForCheck: ManakaiDOM|ForClass
+  @ClsISA: ManakaiDOM|ManakaiDOMObject
 
   @Description:
     @@lang:en
     @@@: Describes an error.
 
-  @Level[list]:  3
-  @SpecLevel:3
-  @ImplementLevel3:
-  @For:
-    ManakaiDOM:DOM3
-  @For:
-    =ManakaiDOM:ManakaiDOM
-
   @ConstGroup:
-     @@QName:
-       @@@@:  ErrorSeverity
-       @@@ForCheck:
-         ManakaiDOM:ForIF
-
-     @@QName:
-       @@@@:ManakaiDOMErrorSeverity
-       @@@ForCheck:
-         ManakaiDOM:ForClass
+    @@IFQName: ErrorSeverity
+    @@ClsQName: ManakaiDOMErrorSeverity
+    @@PerlName: ErrorSeverity
+  
      @@rdfs:subClassOf: 
        @@@@: DOMMain|unsigned-short||ManakaiDOM|all
        @@@ForCheck: ManakaiDOM|ForClass
@@ -14364,7 +14112,7 @@ IF:
          The related platform dependent exception if any. 
          \
          An example would be an <CODE::IOException> or 
-         <CODE::SecurityException> when using the <IF::DOMLS::LSParser>. 
+         <CODE::SecurityException> when using the <IF::DOMLS:LSParser>. 
      @@Get:
         @@@Type:  
           DOMMain:DOMObject
@@ -14480,7 +14228,7 @@ IF:
           invalid character, while the parameter <CP::well-formed>
           is set to <DOM::true>. 
       @@@DOMCore:severity:Error
-## Error:normalizeDocument
+##DOMError
 
 ElementTypeBinding:
   @Name: FormatDef
@@ -14519,44 +14267,34 @@ PropDef:
   @rdfs:range:
     DOMCore:DOMErrorType
 
-IF:
-  @QName:
-    @@@: DOMErrorHandler
-    @@ForCheck:
-      ManakaiDOM:ForIF
+IFCls3Def:
+  @IFQName: DOMErrorHandler
+  @ClsQName: ManakaiDOMErrorHandler
 
-  @QName:
-    @@@: ManakaiDOMErrorHandler
-    @@ForCheck:
-      ManakaiDOM:ForClass
+  @ClsISA: ManakaiDOM|ManakaiDOMObject
 
-  @Description:
-    @@lang:en
+  @enDesc:
+    The <IF::DOMErrorHandler> is a callback interface that the DOM
+    implementation can call when reporting errors that happens
+    while processing (e.g. parsing an XML entity or validating a 
+    document).
+
+    A <IF::DOMErrorHandler> object can be attached to a <IF::Document>
+    using the <CP::error-handler> parameter on the <A::Document.domConfig>
+    object.  DOM applications can create their own 
+    <IF::DOMErrorHandler> objects to process reported errors.
+
+    If more than one error need to be reported during an operation,
+    the sequence and numbers of the errors passed to the error
+    handler are implementation dependent <SRC::<CITE::DOM Level 3 Core>>.
+
+  @enDesc:
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
     @@@:
-      A callback interface that the DOM implementation can call when 
-      reporting errors that happens while processing XML data or 
-      when doing some other processing.
-    \
-      A "DOMErrorHandler" object can be attached to a "Document" using 
-      the "error-handler" on the "DOMConfiguration" interface.
-    \
-      If more than one error needs to be reported during an operation, 
-      the sequence and numbers of the errors passed to the error handler 
-      are implementation dependent.
-      \
-      {NOTE:: In the manakai DOM implementation, any Perl 
-              <Perl::CODE> reference is able to register 
-              as an error handler.
-      \
-      }
-
-  @ImplementLevel3:
-  @Level[list]:  3
-  @SpecLevel:3
-  @For:
-    ManakaiDOM:DOM3
-  @For:
-    =ManakaiDOM:ManakaiDOM
+      In the manakai implementation, any Perl reference to
+      <Perl::CODE> can be used as if it implements the 
+      <IF::DOMErrorHandler> interface and its <M::DOMErrorHandler
+      .handleError> method is the <Perl::CODE> itself.
 
   @ManakaiDOM:inputNormalizer:
     @@ContentType:
@@ -14571,10 +14309,8 @@ IF:
 
   @Method:
      @@Name:  handleError
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Called when an error occurs.
+     @@enDesc:
+       DOM implementation calls this method when an error occurs.
      @@Param:
         @@@Name:  error
         @@@Type:  DOMError
@@ -14584,7 +14320,7 @@ IF:
             The error object that describes the error.
           \
             This object may be reused by the DOM implementation 
-            across multiple calls to the method <M::.handleError>.
+            across multiple calls to the method <M::DOMErrorHandler.handleError>.
      @@Return:
         @@@Type:  DOMMain|boolean||ManakaiDOM|all
         @@@Description:
@@ -14692,6 +14428,7 @@ IFDef:
             @@@@@@: There is no byte offset available.
   @Attr:
      @@Name:  utf16Offset
+     @@PerlName: utf16_offset
      @@Description:
        @@@lang:en
        @@@@:
@@ -14744,6 +14481,14 @@ IFDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: There is no URI is available.
+
+ElementTypeBinding:
+  @Name: PerlName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ContentType: lang|Perl
+    @@For: ManakaiDOM|Perl
 
 IFDef:
   @Name:  DOMConfiguration
@@ -14912,39 +14657,23 @@ IFDef:
      @@Get:
         @@@Type:  DOMStringList
 
-IF:
-  @Name:
-    @@@: DocumentFragment
-    @@ForCheck: 
-      ManakaiDOM:ForIF
-  @Name:
-    @@@: ManakaiDOMDocumentFragment
-    @@ForCheck: 
-      ManakaiDOM:ForClass
-    @@For:
-      ManakaiDOM:ManakaiDOM
-  @ISA:
-    @@@: Node
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @ISA:
-    @@@: ManakaiDOMNode
-    @@ForCheck:
-      ManakaiDOM:ForClass
-    @@For: 
-      ManakaiDOM:ManakaiDOM
-
-  @ImplementLevel1:
-  @ImplementLevel2:
-  @ImplementLevel3:
+NodeTypeDef:
+  @IFQName: DocumentFragment
+  @ClsQName: ManakaiDOMDocumentFragment
   
   @DISLang:role: DocumentFragmentRole
 
-  @Description:
-    @@lang:en
-    @@@:
-      A <QUOTE::lightweight> or <QUOTE::minimal>
-      <IF::Document> object.
+  @enDesc:
+    <IF::DocumentFragment> is a <QUOTE::lightweight> or <QUOTE::minimal>
+    <IF::Document> object.  It is useful to extract a portion of
+    a document tree or to create a new fragment of a document.
+
+    In various operations, such as inserting nodes as children
+    of another <IF::Node> by <IF::Node.appendChild>, 
+    a <IF::DocumentFragment> node is treated <QUOTE::transparent> - 
+    it results in all the child nodes of the <IF::DocumentFragment>
+    being moved to the child list of that <IF::Node>.
+
   @IntMethod:
     @@Name: newObject
     @@Description:
@@ -14954,7 +14683,7 @@ IF:
         <IF::DocumentFragment> object.
       \
         Note that this method is for the internal use.  The DOM 
-        applications must use the <A::Node.createDocumentFragment> method 
+        applications must use the <A::Document.createDocumentFragment> method 
         to create a new <IF::DocumentFragment> object.
     @@Return:
       @@@Type: NodeStem
@@ -15066,7 +14795,7 @@ IF:
         DOMMain:unsigned-short||ManakaiDOM|all
       @@@InCase:
         @@@@Label:
-          <C::DOMNodeType.DOCUMENT_FRAGMENT_NODE>
+          <C::Node.DOCUMENT_FRAGMENT_NODE>
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
@@ -15139,43 +14868,31 @@ IF:
                 }
               }
             }
-
 ##DocumentFragment
 
-IF:
-  @Name:
-    @@@: Document
-    @@ForCheck: 
-      ManakaiDOM:ForIF
-  @Name:
-    @@@: ManakaiDOMDocument
-    @@ForCheck: 
-      ManakaiDOM:ForClass
-    @@For:
-      ManakaiDOM:ManakaiDOM
-  @ISA:
-    @@@: Node
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @ISA:
-    @@@: ManakaiDOMNode
-    @@ForCheck:
-      ManakaiDOM:ForClass
-    @@For: 
-      ManakaiDOM:ManakaiDOM
-
-  @ImplementLevel1:
-  @ImplementLevel2:
-  @ImplementLevel3:
+NodeTypeDef:
+  @IFQName: Document
+  @ClsQName: ManakaiDOMDocument
   
   @DISLang:role: DocumentRole
 
-  @Description:
-    @@lang:en
-    @@@: 
-      The entire document.  It is conceptually the root of the 
-      document tree and it provides the primary access to the 
-      document's data.
+  @enDesc:
+    A <IF::Document> object represents the entire HTML or XML document.
+    It is conceptually the root of the document tree and
+    corresponding to the <InfoItem::Document Information Item>
+    in XML information set.
+
+    Since nodes of type element, text, comment, etc. cannot exists
+    outside the context of a <IF::Document>, the <IF::Document>
+    interface also contains the factory methods needed to
+    create these objects.
+
+    {NOTE:: A <IF::DocumentType> node can be created by
+            <M::DOMImplementation.createDocumentType> method.
+            A <IF::Document> node can be created by 
+            <M::DOMImplementation.createDocument> method.
+    }
+
   @Attr:
      @@Name:  doctype
      @@Description:
@@ -15436,8 +15153,8 @@ IF:
             @@@@@@:
               HTML-only DOM implementations must also implement this method. 
               The DOM Level 3 Core Specification should have changed 
-              the description from <QUOTE:if this document is an HTML document> 
-              to <QUOTE:if this document does not support the <Feature::XML> 
+              the description from <QUOTE::if this document is an HTML document> 
+              to <QUOTE::if this document does not support the <Feature::XML> 
               feature> for consistency with other non-HTML methods.
         @@@PerlDef:
             my $docNode = $self->{<Q::TreeCore:node>};
@@ -16319,7 +16036,7 @@ IF:
             For <M::Element.getElementsByTagNameNS>, DOM Level 2 allows 
             HTML-only DOM implementations not to implement that method 
             and its Errata and DOM Level 3 say to raise 
-            <X:NOT_SUPPORTED_ERROR> if it is called.  
+            <X::DOMException.NOT_SUPPORTED_ERROR> if it is called.  
             <M::Document.getElementsByTagNameNS> should also raise the 
             exception, shouldn't it?
         @@@PerlDef:
@@ -16614,7 +16331,7 @@ IF:
         @@@ImplNote:
           @@@@lang:en
           @@@@@:
-            Isn't <X:DOMException.NO_MODIFICATION_ALLOWED_ERR> raised?
+            Isn't <X::DOMException.NO_MODIFICATION_ALLOWED_ERR> raised?
             (Since DOM Level 1-3 does not have read-only <IF::Document> node?)
      @@Level[list]:  3
      @@SpecLevel:3
@@ -17171,7 +16888,7 @@ IF:
       @@@lang:en
       @@@@:
         The caller of this internal method MUST ensure to set 
-        the attributes: <Q::TreeCore:implementation>.
+        the attributes: <CODE::TreeCore:implementation>.
     @@Return:
       @@@Type: NodeStem
       @@@Description:
@@ -17762,7 +17479,7 @@ ConfigParam:
           @@@@@lang:en
           @@@@@@:
             The default is <DOM::true> but fully-normalization is 
-            not required to be supported <SRC:DOM Level 3 LS>.
+            not required to be supported <SRC::DOM Level 3 LS>.
       @@@Description:
         @@@@lang:en
         @@@@@: 
@@ -18020,6 +17737,3 @@ PropDef:
   @Description:
     @@lang:en
     @@@: A related data.
-
-
-## DOMCore.dis ends here

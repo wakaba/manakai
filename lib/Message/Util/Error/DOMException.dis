@@ -22,7 +22,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/11 14:07:41 $
+      $Date: 2005/09/09 04:26:12 $
     @@ContentType:
       dis:Date.RCS
   
@@ -43,6 +43,9 @@ Module:
       @@@Name: DOMException
       @@@WithFor:
         ManakaiDOM:Perl
+    @@Module:
+      @@@QName: Err|Core
+      @@@WithFor: ManakaiDOM|Perl
   @DefaultFor:
     ManakaiDOM:Perl
 
@@ -57,8 +60,12 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @ecore:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
   @Err:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/
+  @kwd:
+    http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
   @lang:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
@@ -77,18 +84,6 @@ Namespace:
     http://www.w3.org/2000/01/rdf-schema#
   @TreeCore:\
 
-ResourceDef:
-  @QName:
-    Err:
-  @rdf:type:
-    dis:ModuleGroup
-  @FullName:
-    @@lang:en
-    @@@:
-      The manakai error reporting modules
-  @AppName:
-    Message::Util::Error::
-
 ElementTypeBinding:
   @Name: enDesc
   @ElementType:
@@ -97,6 +92,21 @@ ElementTypeBinding:
     @@lang:en
 
 ## -- Resource types
+
+ResourceTypeDef:
+  @QName: AnyExceptionAnyClass
+  @FullName:
+    @@lang:en
+    @@@:
+      Any <QUOTE::exception> class or interface
+  @Description:
+    @@lang:en
+    @@@:
+      Concrete implementations of any type of <QUOTE::exception>,
+      including <QUOTE::error> and <QUOTE::warning>.
+  @rdfs:subClassOf: 
+    DISLang:AnyClass::ManakaiDOM:all
+  @rdfs:subClassOf: Err|MUErrorAny
 
 ResourceTypeDef:
   @QName: 
@@ -109,7 +119,8 @@ ResourceTypeDef:
     @@@:
       An exception type.
   @rdfs:subClassOf:
-    ManakaiDOM:IF::ManakaiDOM:all
+    AnyExceptionAnyClass::ManakaiDOM:all
+  @rdfs:subClassOf: Err|MUErrorInterface
 
 ResourceTypeDef:
   @QName: AnyExceptionClass
@@ -123,7 +134,8 @@ ResourceTypeDef:
       Concrete implementations of any type of <QUOTE::exception>,
       including <QUOTE::error> and <QUOTE::warning>.
   @rdfs:subClassOf:
-    ManakaiDOM:Class::ManakaiDOM:all
+    AnyExceptionAnyClass::ManakaiDOM:all
+  @rdfs:subClassOf: Err|MUErrorClass
 
 ResourceTypeDef:
   @QName: 
@@ -204,17 +216,6 @@ ElementTypeBinding:
       @@@For:
         !=ManakaiDOM:all
 
-ResourceDef:
-  @QName:
-    ManakaiDOM:MUErrorHandler
-  @rdf:type: 
-    DOMMain:Operator
-  @Description:
-    @@lang:en
-    @@@:
-      A Perl <Perl::___report_error> subroutine called by 
-      <PerlModule::Message::Util::Error> exception reporting. 
-
 ## -- Throwing of exceptions
 
 PropDef:
@@ -287,18 +288,18 @@ FormatDef:
       \
       - FQXCodeRef := xref "." coderef ["." subcoderef]
       \
-      - xref := <A dis:TFQNames referring an exception or 
+      - xref := <lt>A dis:TFQNames referring an exception or 
                  warning interface or class>
       \
       - coderef := codeq / codenc
       \
-      - codeq := <A dis:TFQNames with a prefixed "Type" QName,
+      - codeq := <lt>A dis:TFQNames with a prefixed "Type" QName,
                   referring an exception or warning code>
       \
-      - codenc := <An unprefixed dis:TypeQName identifying a code 
+      - codenc := <lt>An unprefixed dis:TypeQName identifying a code 
                    in the null namespace>
       \
-      - subcoderef := <A dis:TFQNames referring an exception or warning subcode;
+      - subcoderef := <lt>A dis:TFQNames referring an exception or warning subcode;
                        it should be prefixed>
 
 ElementTypeBinding:
@@ -319,11 +320,17 @@ ResourceDef:
   @QName: 
     ManakaiDOM:ManakaiDOMExceptionOrWarning
   @rdf:type: AnyExceptionClass
+
+  @Implement: ecore|MUErrorInterface
   @AppISA:
     @@ContentType:
       lang:Perl
     @@@:
       Message::Util::Error
+    @@ImplNote: 
+      @@@lang:en
+      @@@@:
+        <Q::ecore|MUErrorClass>.
   @For:
     ManakaiDOM:Perl
 
@@ -435,18 +442,49 @@ ResourceDef:
       @@@PerlDef:
         $r = $self->{<Q::MUErrorCore:def>}->{<Q::DOMCore:code>};
 
-  @ResourceDef:
-    @@QName:
-      ManakaiDOM:getExceptionCode
-    @@rdf:type:
-      dis2pm:BlockCode
-    @@aliasChild:1
-    @@PerlDef:
-      $r = $self->{<Q::MUErrorCore:def>}->{<Q::DOMCore:code>};
-    @@Description:
-      @@@lang:en
-      @@@@:
-        Returns the numeric exception code of the object. 
+  @Attr:
+    @@Name: value
+    @@Operator:
+      @@@@: 0+
+      @@@ContentType: lang|Perl
+    @@enDesc:
+      A numeric exception code that identifies the kind of 
+      the error.
+
+      {NOTE:: This attribute always has the same value as 
+              <A::ManakaiDOM:ManakaiDOMExceptionOrWarning.code>.
+      }
+    @@Type: DOMMain|unsigned-short||ManakaiDOM|all
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{<Q::MUErrorCore:def>}->{<Q::DOMCore:code>};
+
+  @Attr:
+    @@Name: type
+    @@enDesc:
+      The type of the error, i.e. the local name of the constant
+      function whose value is the numeric exception code of the error.
+    @@Type: DISLang|String||ManakaiDOM|all
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{-type};
+
+  @Attr:
+    @@Name: subtype
+    @@enDesc:
+      The subtype of the error.
+    @@Type: DISLang|String||ManakaiDOM|all
+    @@Get:
+      @@@enDesc:
+        A URI reference that identifies the subtype.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@enDesc:
+          The error has no subtype information.
+      @@@PerlDef:
+        $r = $self->{<Q::MDOMX:subtype>};
+##ManakaiDOMExceptionOrWarning
 
 ResourceDef:
   @QName: 
@@ -455,16 +493,7 @@ ResourceDef:
     ManakaiDOM:ExceptionIF
   @For:
     ManakaiDOM:Perl
-  @Description:
-    @@lang:en
-    @@@:
-      An exception interface that all manakai DOM-style exception interfaces 
-      should inherit. 
-  @AppISA:
-    @@ContentType:
-      lang:Perl
-    @@@:
-      Message::Util::Error
+##ManakaiDOMExceptionIF
 
 ResourceDef:
   @QName: 
@@ -481,6 +510,7 @@ ResourceDef:
     @@@:
       An abstract class that is inherited by all manakai DOM-style
       exception classes.
+##ManakaiDOMException
 
 ResourceDef:
   @QName: 
@@ -531,11 +561,11 @@ ResourceDef:
           reported.  If the implementation has a bug and 
           something unexpected is occur, this exception is raised. 
         \
-          Applications MUST NOT try to catch this exception. 
+          Applications <kwd:MUST-NOT> try to catch this exception. 
           If this exception is raised, please report to the 
           author of that module.
           \
-          {NOTE:: New assertion mechanism and subtype <X::ASSERTION_ERR> 
+          {NOTE:: New assertion mechanism and subtype <X::DOMMain|ASSERTION_ERR> 
                   has been introduced; it should be used instead of 
                   throwing <X::MDOMX:MDOM_DEBUG_BUG> directly. 
           \
@@ -688,6 +718,7 @@ ResourceDef:
           @@@@enMufDef:
               The method "%p (name => {<Q::MDOMX:class>}, suffix => {.}
               );%p (name => {<Q::MDOMX:method>});" has not been implemented yet
+##CoreException
 
 ElementTypeBinding:
   @Name: Method
@@ -823,6 +854,7 @@ ResourceDef:
     ManakaiDOM:Class
   @ForCheck:
     ManakaiDOM:Perl
+  @Implement: ecore|MUErrorTarget
 
   @ResourceDef:
     @@rdf:type:
@@ -876,8 +908,6 @@ ResourceDef:
             warn $err->stringify;
           }
 ##ManakaiDefaultExceptionHandler
-
-## DOMException.dis ends here
 
 ResourceDef:
   @QName:

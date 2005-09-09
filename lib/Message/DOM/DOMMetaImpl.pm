@@ -1089,7 +1089,7 @@ for my $fname (keys %$features) {
 
     for my $cls ($class, @{$Message::DOM::ClassISA{$class}}) {
       print STDERR "      clsss $cls..\n",
-        join "\t", %{$Message::DOM::ImplFeature{$cls}}, "\n" if $fname eq 'core';
+        join "\t", %{$Message::DOM::ImplFeature{$cls}||{}}, "\n" if $fname eq 'core';
       if ($Message::DOM::ImplFeature{$class}->{$fname}->{$fver} ||=
           ## (Caching)
           $Message::DOM::ImplFeature{$cls}->{$fname}->{$fver}) {

@@ -1,0 +1,508 @@
+Module:
+  @QName:
+    Err:Core
+  @FullName:
+    @@lang: en
+    @@@:
+      Manakai Error Implementation
+
+  @AppName:
+    @@@:
+      Message::Util::Error
+    @@ContentType: lang|Perl
+    @@For: ManakaiDOM|Perl
+
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
+  
+  @Description:
+    @@lang:en
+    @@@:
+      This module provides the manakai implementation of
+      error reporting system.
+
+  @Author:
+    @@FullName: Wakaba
+    @@Mail: w@suika.fam.cx
+  @License:
+     license:Perl+MPL
+  @Date:
+    @@@:
+      $Date: 2005/09/09 04:26:11 $
+    @@ContentType:
+      dis:Date.RCS
+  
+  @Require:
+    @@Module:
+      @@@Name: DISPerl
+      @@@QName:
+        DISlib:DISIDL
+      @@@WithFor:
+        ManakaiDOM:all
+    @@Module:
+      @@@Name: DISIDL
+      @@@QName:
+        DISlib:DISIDL
+      @@@WithFor:
+        ManakaiDOM:all
+    @@Module:
+      @@@QName: Err|Core
+      @@@WithFor:
+        ManakaiDOM:Perl
+  @DefaultFor:
+    ManakaiDOM:Perl
+
+Namespace:
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @dis2pm:
+    http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
+  @DISlib:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @DOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @DOMMain:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @Err:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/
+  @ecore:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
+  @kwd:
+    http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
+  @lang:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @MDOMX:
+    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @MUError:\
+  @MUErrorCore:-
+  @Perl:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @TreeCore:\
+
+ResourceDef:
+  @QName:
+    Err:
+  @rdf:type:
+    dis:ModuleGroup
+  @FullName:
+    @@lang:en
+    @@@:
+      The manakai error reporting modules
+  @AppName:
+    Message::Util::Error::
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+
+
+ElementTypeBinding:
+  @Name: IFQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: IFISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+## -- The "Error"
+
+ResourceDef:
+  @QName: Err|ErrorAny
+  @enDesc:
+    <Q::Err|ErrorClass> and <Q::Err|ErrorInterface>.
+  @For: =ManakaiDOM|all
+  @rdfs:subClassOf: DISLang|AnyClass||ManakaiDOM|all
+
+ResourceDef:
+  @QName: Err|ErrorClass
+  @enDesc:
+    An <Q::Err|ErrorClass> is a class that inherits the <Perl::Error>
+    class or the <Perl::Error> itself.
+  @For: =ManakaiDOM|all
+  @rdfs:subClassOf: Err|ErrorAny
+  @rdfs:subClassOf: ManakaiDOM|Class
+
+ResourceDef:
+  @QName: Err|ErrorInterface
+  @enDesc:
+    The <Q::Err|ErrorInterface> is an interface that shows what
+    a <Q::Err|ErrorClass> <kwd:MUST> implement.
+  @For: =ManakaiDOM|all
+  @rdfs:subClassOf: Err|ErrorAny
+  @rdfs:subClassOf: ManakaiDOM|IF
+
+ResourceDef:
+  @rdf:type:
+    @@@@: dis|MultipleResource
+    @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+  @resourceFor: ManakaiDOM|ForIF
+  @resourceFor: ManakaiDOM|ForClass
+
+  @rdf:type:
+    @@@: Err|ErrorInterface
+    @@ForCheck: ManakaiDOM|ForIF
+
+  @rdf:type:
+    @@@: Err|ErrorClass
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @Implement:
+    @@@: ||+||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @For: ManakaiDOM|Perl
+
+  @IFQName: ErrorInterface
+  @ClsQName: Error
+
+  @IFPackName: Error
+  @ClsPackName: Error
+
+  @IFFileName: Error-interface
+  @ClsFileName: Error
+
+  @enDesc:
+    <PerlModule::Error>.
+
+  @Method:
+    @@Name: stacktrace
+    @@enDesc:
+      Returns a stacktrace string.
+    @@Return:
+      @@@Type: DISLang|String||ManakaiDOM|all
+      @@@enDesc:
+        A stacktrace string.  The value of the variable
+        <Perl::$Error::Debug> at the time of the creation of the error
+        controls the content.
+      @@@InCase:
+        @@@@Label:
+          @@@@@lang:en
+          @@@@@@:
+            <Perl::$Error::Debug> is non-<Perl::0>
+        @@@@enDesc:
+          A string created by calling <Perl::Carp::longmess>.
+      @@@InCase:
+        @@@@Label:
+          @@@@@lang:en
+          @@@@@@:
+            <Perl::$Error::Debug> is <Perl::0>
+        @@@@enDesc:
+          The text of the error appended with the file name and
+          line number where the error was created, providing the 
+          text does not end with a newline.
+  @Attr:
+    @@Name: object
+    @@enDesc: The object the error is associated with.
+    @@Get:
+    @@Type: DOMMain|Object||ManakaiDOM|all
+  @Attr:
+    @@Name: file
+    @@enDesc: The file where the error was created.
+    @@Type: DISLang|String||ManakaiDOM|all
+    @@Get:
+  @Attr:
+    @@Name: line
+    @@enDesc: The line where the error was created.
+    @@Type: DISLang|String||ManakaiDOM|all
+    @@Get:
+  @Attr:
+    @@Name: text
+    @@enDesc: The textual description of the error.
+    @@Type: DISLang|String||ManakaiDOM|all
+    @@Get:
+
+  @Method:
+    @@Operator:
+      @@@ContentType: dis|TypeQName
+      @@@@: DISPerl|AsStringMethod
+    @@enDesc:
+      Converts the object into a string.  This method <kwd:MAY>
+      simple return the same as the <A::Error.text> method or 
+      it <kwd:MAY> append more information such as file name
+      and line number.
+    @@Return:
+
+  @Method:
+    @@Operator:
+      @@@ContentType: lang|Perl
+      @@@@: 0+
+    @@Name: value
+    @@enDesc:
+      Returns a value that can be associated with the error.
+
+      {eg:: If an error was created due to the failure of a 
+            system call, then this method may return the
+            numeric value of <Perl::$!> at the time.
+      }
+    @@Return:
+##Error
+
+
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Attribute
+
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|AttributeGet
+
+ElementTypeBinding:
+  @Name: Set
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|AttributeSet
+
+ElementTypeBinding:
+  @Name: IFPackName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+    @@ContentType: lang|Perl
+
+ElementTypeBinding:
+  @Name: ClsPackName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@ContentType: lang|Perl
+
+ElementTypeBinding:
+  @Name: IFFileName
+  @ElementType:
+    dis:FileName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsFileName
+  @ElementType:
+    dis:FileName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Method
+
+
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodReturn
+
+ElementTypeBinding:
+  @Name: nullCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@is-null:1
+
+ElementTypeBinding:
+  @Name: trueCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:true
+    @@Type:
+      DOMMain:boolean::ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: falseCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:false
+    @@Type:
+      DOMMain:boolean::ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: InCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+
+## -- The "Message::Util::Error"
+
+ResourceDef:
+  @QName: Err|MUErrorAny
+  @enDesc:
+    <Q::Err|MUErrorClass> and <Q::Err|MUErrorInterface>.
+  @For: =ManakaiDOM|all
+  @rdfs:subClassOf: Err|ErrorAny
+
+ResourceDef:
+  @QName: Err|MUErrorClass
+  @enDesc:
+    An <Q::Err|MUErrorClass> is a class that inherits the
+    <Perl::Message::Util::Error> class or the <Perl::Error> itself.
+  @For: =ManakaiDOM|all
+  @rdfs:subClassOf: Err|MUErrorAny
+  @rdfs:subClassOf: Err|ErrorClass
+
+ResourceDef:
+  @QName: Err|MUErrorInterface
+
+  @For: =ManakaiDOM|all
+  @rdfs:subClassOf: Err|MUErrorAny
+  @rdfs:subClassOf: Err|ErrorInterface
+
+ResourceDef:
+  @rdf:type:
+    @@@@: dis|MultipleResource
+    @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+  @resourceFor: ManakaiDOM|ForIF
+  @resourceFor: ManakaiDOM|ForClass
+
+  @rdf:type:
+    @@@: Err|MUErrorInterface
+    @@ForCheck: ManakaiDOM|ForIF
+
+  @rdf:type:
+    @@@: Err|MUErrorClass
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @Implement:
+    @@@: ||+||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @For: ManakaiDOM|Perl
+
+  @IFQName: MUErrorInterface
+  @ClsQName: MUError
+
+  @IFPackName:
+    Message::Util::Error
+  @ClsPackName: 
+    Message::Util::Error
+
+  @IFISA: ErrorInterface
+  @ClsISA: Error
+
+  @IFFileName: Message/Util/Error/module-interface
+  @ClsFileName: Message/Util/Error/module-class
+
+  @Method:
+    @@Operator:
+      @@@@: ErrorDefMethod
+      @@@ContentType: dis|TypeQName
+    @@enDesc:
+      This method <kwd:MUST> be a contant function that returns
+      a reference to the hash that contains the definitions 
+      of errors.
+    @@Return:
+      @@@Type: Perl|HASH||ManakaiDOM|all
+      @@@enDesc:
+        A hash reference containing error definitions.
+
+        Hash keys are the names of errors and
+        hash values are their definition respectively.
+        A hash value is also a hash reference which
+        contains property name-value pairs.
+##MUError
+
+ResourceDef:
+  @For: ManakaiDOM|Perl
+
+  @QName: MUErrorTarget
+
+  @rdf:type: ManakaiDOM|IF
+
+  @enDesc:
+    The <Perl::report> statement of the
+    <Perl::Message::Util::Error> module calls back the
+    <Perl::___report_error> method of the object specified
+    in <Perl::-object> named parameter.  The object <kwd:MAY> choose to
+    throw an exception based on the information given to
+    the method, to report the error in some application dependent manner,
+    or to simply ignore it.
+
+  @Method:
+    @@Operator: 
+      @@@@: ManakaiDOM|MUErrorHandler
+      @@@ContentType: dis|TypeQName
+    @@enDesc:
+      This method is called when a <Perl::report> 
+      is called on this object.
+    @@Return:
+##MUErrorTarget
+
+
+ResourceDef:
+  @QName:
+    ManakaiDOM:MUErrorHandler
+  @rdf:type: 
+    DOMMain:Operator
+  @Description:
+    @@lang:en
+    @@@:
+      A Perl <Perl::___report_error> subroutine called by 
+      <PerlModule::Message::Util::Error> exception reporting. 
+  @For: =ManakaiDOM|all
+
+ResourceDef:
+  @QName: ErrorDefMethod
+  @PerlName: ___error_def
+  @enDesc:
+    Objects implementimg the <IF::MessageUtilError::ManakaiDOM:Perl>
+    interface <kwd:MUST> provide a constant method whose name is 
+    <Perl::___error_def> and which returns a reference to hash
+    that contains definitions of errors.
+  @For: =ManakaiDOM|all

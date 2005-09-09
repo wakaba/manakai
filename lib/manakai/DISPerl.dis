@@ -15,7 +15,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/01 17:07:20 $
+      $Date: 2005/09/09 04:26:13 $
     @@ContentType:
       dis:Date.RCS
   
@@ -37,6 +37,10 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
   @disPerl:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl--
+  @DOMMain:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @html5:
+    http://www.w3.org/1999/xhtml
   @lang:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
@@ -170,11 +174,19 @@ DataTypeDef:
 
 DataTypeDef:
   @QName:
-    Perl:hash
+    Perl:HASH
   @FullName:
     @@lang:en
     @@@: Perl hash reference
   @rdfs:subClassOf: Reference
+
+ResourceDef:
+  @QName: Perl|hash
+  @AliasFor: Perl|HASH
+  @ImplNote:
+    @@lang:en
+    @@@:
+      <Q::Perl:hash> is obsolete; use <Q::Perl:HASH> instead.
 
 DataTypeDef:
   @QName:
@@ -237,11 +249,51 @@ ResourceDef:
   @FullName:
     @@lang:en
     @@@:Methods to make a clone of an object. 
-  @AliasFor:
+
+ResourceDef:
+  @QName: ImportMethod
+  @rdf:type:
+    rdfs:Class
+  @FullName:
+    @@lang:en
     @@@:
-      ::ManakaiDOM:all
-    @@For:
-      !=ManakaiDOM:all
+      The <Perl::import> method.
+
+ResourceDef:
+  @QName: UnimportMethod
+  @rdf:type:
+    rdfs:Class
+  @FullName:
+    @@lang:en
+    @@@:
+      The <Perl::unimport> method.
+
+ResourceDef:
+  @QName: ISAMethod
+  @rdf:type:
+    rdfs:Class
+  @FullName:
+    @@lang:en
+    @@@:
+      The <Perl::isa> method.
+
+ResourceDef:
+  @QName: CanMethod
+  @rdf:type:
+    rdfs:Class
+  @FullName:
+    @@lang:en
+    @@@:
+      The <Perl::can> method.
+
+ResourceDef:
+  @QName: VERSIONMethod
+  @rdf:type:
+    rdfs:Class
+  @FullName:
+    @@lang:en
+    @@@:
+      The <Perl::VERSION> method.
 
 ## -- Perl construct properties
 
@@ -336,7 +388,7 @@ FormatDef:
       \
       MemRef := [dis:TFQNames] "." NCName
       \
-      The optional C<dis:TFQNames> identifiers the class to which the 
+      The optional <Q::dis:TFQNames> identifiers the class to which the 
       member referred belongs.  The NCName is the name of 
       the member (either a method name or a capitalized attribute 
       name prefixed with "get" or "set").
@@ -807,4 +859,521 @@ ElementTypeBinding:
     @@subsetOf:
       rdfs:Class
 
-## DISPerl.dis ends here
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+
+## -- Interface for standard Perl modules
+
+ICDef:
+  @IFQName: UNIVERSALInterface
+  @ClsQName: UNIVERSAL
+
+  @IFPackName: UNIVERSAL
+  @ClsPackName: UNIVERSAL
+
+  @IFFileName: UNIVERSAL-interface
+  @ClsFileName: UNIVERSAL
+
+  @enDesc:
+    The <Class::UNIVERSAL> class is a base class for <EM::all>
+    classes (blessed references).
+
+  @Method:
+    @@Operator:
+      @@@@: ISAMethod
+      @@@ContentType: dis|TypeQName
+    @@enDesc:
+      Returns whether the class or object is an instance of a class or interface.
+    @@Param:
+      @@@Name: typeArg
+      @@@Type: DISLang|String
+      @@@enDesc:
+        The name of the package.
+    @@Return:
+      @@@Type: DOMMain|boolean||ManakaiDOM|all
+      @@@trueCase:
+        @@@@enDesc:
+          The class or object is an instance of <P::typeArg>.
+      @@@falseCase:
+        @@@@enDesc:
+          The class or object is <EM::not> an instance of <P::typeArg>.
+  @Method:
+    @@Operator:
+      @@@@: CanMethod
+      @@@ContentType: dis|TypeQName
+    @@enDesc:
+      Checks if the object or class has a method.
+      
+      {NOTE:: This method does not function for manakai interfaces,
+              since they does not have method definitions in source code.
+      }
+
+      {NOTE:: This method cannot check whether an object will be
+              able to provide a method through <Perl::AUTOLOAD>.
+      }
+    @@Param:
+      @@@Name: methodArg
+      @@@Type: DISLang|String
+      @@@enDesc: The name of the method.
+    @@Return:
+      @@@Type: Perl|CODE
+      @@@enDesc:
+        A reference to the <Perl::sub>.
+      @@@nullCase:
+        @@@@enDesc:
+          There is no method called <P::methodArg>.
+  @Method:
+    @@Operator:
+      @@@@: VERSIONMethod
+      @@@ContentType: dis|TypeQName
+    @@enDesc:
+      Returns the package version, i.e. the value of the variable
+      <Perl::$VERSION> in the package the object is blessed into.
+    @@Param:
+      @@@Name: requireArg
+      @@@Type: DOMMain|any
+      @@@enDesc:
+        The required version.  It will be compared to the package version
+        and if the package version is not greater than or equal
+        to <P::requireArg>, then <Perl::die>s.
+      @@@nullCase:
+        @@@@enDesc:
+          No comparison and <Perl::die>ing is done.
+    @@Return:
+      @@@Type: DOMMain|any
+      @@@enDesc:
+        The value of the <Perl::$VERSION>.
+      @@@nullCase:
+        @@@@enDesc: 
+          No package version information.
+##UNIVERSAL
+
+CDef:
+  @ClsQName: Exporter
+
+  @ClsPackName: Exporter
+
+  @enDesc:
+    The <Class::Exporter> module implements default <M::.import>
+    method for modules.
+
+  @Method:
+    @@Operator:
+      @@@@: ImportMethod
+      @@@ContentType: dis|TypeQName
+    @@Param:
+      @@@Name: names
+      @@@Type: Perl|Array
+      @@@enDesc:
+        A list of names of functions, variables and / or tags to export.
+    @@Return:
+##Exporter
+
+CDef:
+  @ClsQName: TieArray
+
+  @IFPackName: 
+    Tie::Array
+  @ClsPackName:
+    Tie::Array
+
+  @enDesc:
+    The <Perl::Tie::Array> module is a base class for tied arrays.
+
+  @Method:
+    @@ManakaiDOM:isForInternal:1
+    @@Operator:
+      @@@@: TIEARRAY
+      @@@ContentType: lang|Perl
+    @@ManakaiDOM:isStatic:1
+    @@enDesc:
+      Associates an array instance with the class.
+    @@Param:
+      @@@Name: list
+      @@@Type: Perl|Array
+      @@@enDesc:
+        Additional arguments needed to complete the association.
+    @@Return:
+      @@@Type: DOMMain|Object||ManakaiDOM|all
+      @@@enDesc:
+        An object of a class which provides the other methods.
+  @Method:
+    @@ManakaiDOM:isForInternal:1
+    @@Operator:
+      @@@@: STORE
+      @@@ContentType: lang|Perl
+    @@enDesc:
+      Stores datum <P::value> into <P::index> for the tied array
+      associated with the object.  If this makes the array larger
+      then class's mapping of <DOM::null> should be returned
+      for new positions.
+    @@Param:
+      @@@Name: index
+      @@@Type: DOMMain|long
+      @@@enDesc:
+        The position to store <P::value>.
+    @@Param:
+      @@@Name: value
+      @@@Type: DOMMain|any
+      @@@enDesc:
+        The data to store.
+     @@Return:
+  
+  @Method:
+    @@ManakaiDOM:isForInternal:1
+    @@Operator:
+      @@@@: FETCH
+      @@@ContentType: lang|Perl
+    @@enDesc:
+      Retrieves the datum in <P::index> for the tied array
+      associated with the object.
+    @@Param:
+      @@@Name: index
+      @@@Type: DOMMain|long
+      @@@enDesc:
+        The index in the array.
+    @@Return:
+      @@Type: DOMMain|any
+      @@enDesc:
+        The data at <P::index>.
+
+  @Method:
+    @@ManakaiDOM:isForInternal:1
+    @@Operator:
+      @@@@: FETCHSIZE
+      @@@ContentType: lang|Perl
+    @@enDesc:
+      Returns the total number of items in the tied array
+      associated with the object, i.e. <Perl::scalar <html5:var::@array>>.
+    @@Return:
+      @@@Type: DOMMain|long
+      @@@enDesc:
+        The number of items.
+
+  @Method:
+    @@ManakaiDOM:isForInternal:1
+    @@Operator:
+      @@@@: STORESIZE
+      @@@ContentType: lang|Perl
+    @@enDesc:
+      Sets the total number of items in the tied array
+      associated with the object.  If this makes the array
+      larger then class's mapping of <DOM::null> should
+      be returned for new positions.  If the array becomes
+      smaller then entries beyond <P::count> should be removed.
+    @@Param:
+      @@@Name: count
+      @@@Type: DOMMain|long
+      @@@enDesc:
+        The new total number of items.
+    @@Return:
+
+  @Method:
+    @@ManakaiDOM:isForInternal:1
+    @@Operator:
+      @@@@: EXTEND
+      @@@ContentType: lang|Perl
+    @@enDesc:
+      Tells that the array is likely to grow to have <P::count>
+      entries.  This information can be used to optimize allocation.
+      
+      This method need do nothing.
+    @@Param:
+      @@@Name: count
+      @@@Type: DOMMain|long
+      @@@enDesc: New size.
+    @@Return:
+
+  @Method:
+    @@ManakaiDOM:isForInternal:1
+    @@Operator:
+      @@@@: EXISTS
+      @@@ContentType: lang|Perl
+    @@enDesc:
+      Verifies that the <P::key>th item exists in the tied
+      array associated with the object.
+    @@Param:
+      @@@Name: key
+      @@@Type: DOMMain|long
+      @@@enDesc: The index of the item.
+    @@Return:
+      @@@Type: DOMMain|boolean
+      @@@trueCase:
+        @@@@enDesc:
+          There is <P::key>th item.
+      @@@falseCase:
+        @@@@enDesc:
+          There is <EM::no> <P::key>th item.
+
+  @Method:
+    @@ManakaiDOM:isForInternal:1
+    @@Operator:
+      @@@@: DELETE
+      @@@ContentType: lang|Perl
+    @@enDesc:
+      Removes the <P::key>th item from the tied array associated
+      with the object.
+    @@Param:
+      @@@Name: key
+      @@@Type: DOMMain|long
+      @@@enDesc:
+        The index of the item.
+    @@Return:
+
+  @Method:
+    @@ManakaiDOM:isForInternal:1
+    @@Operator:
+      @@@@: CLEAR
+      @@@ContentType: lang|Perl
+    @@enDesc:
+      Clears all values from the tied array assocaited with the object.
+    @@Return:
+
+  @Method:
+    @@ManakaiDOM:isForInternal:1
+    @@Operator:
+      @@@@: DESTROY
+      @@@ContentType: lang|Perl
+    @@enDesc:
+      Normal object destructor method.
+    @@Return:
+
+  @Method:
+    @@ManakaiDOM:isForInternal:1
+    @@Operator:
+      @@@@: PUSH
+      @@@ContentType: lang|Perl
+    @@enDesc:
+      Appends items to the tied array associated with the object.
+    @@Param:
+      @@@Name: list
+      @@@Type: Perl|Array
+      @@@enDesc: 
+        Items to add.
+    @@Return:
+
+  @Method:
+    @@ManakaiDOM:isForInternal:1
+    @@Operator:
+      @@@@: POP
+      @@@ContentType: lang|Perl
+    @@enDesc:
+      Removes the last item of the tied array associated with the object
+      and returns the item.
+    @@Return:
+      @@@Type: DOMMain|any
+      @@@enDesc: The removed item.
+
+  @Method:
+    @@ManakaiDOM:isForInternal:1
+    @@Operator:
+      @@@@: SHIFT
+      @@@ContentType: lang|Perl
+    @@enDesc:
+      Removes the first item of the tied array associated with the object
+      and returns the item.
+    @@Return:
+      @@@Type: DOMMain|any
+      @@@enDesc: The removed item.
+
+  @Method:
+    @@ManakaiDOM:isForInternal:1
+    @@Operator:
+      @@@@: UNSHIFT
+      @@@ContentType: lang|Perl
+    @@enDesc:
+      Inserts items at the beginning of the tied array associated with
+      the object.
+    @@Param:
+      @@@Name: list
+      @@@Type: Perl|Array
+      @@@enDesc: Items to add.
+    @@Return:
+
+  @Method:
+    @@ManakaiDOM:isForInternal:1
+    @@Operator:
+      @@@@: SPLICE
+      @@@ContentType: lang|Perl
+    @@enDesc:
+      Performes the equivalent operation of <Perl::splice> on the
+      tied array associated with the object.
+    @@Param:
+      @@@Name: offset
+      @@@Type: DOMMain|long
+      @@@enDesc:
+        The offset.  The default is <Perl::0>.
+    @@Param:
+      @@@Name: length
+      @@@Type: DOMMain|long
+      @@@enDesc:
+       The length.  The default is the rest of the array.
+    @@Param:
+      @@@Name: list
+      @@@Type: Perl|Array
+      @@@enDesc:
+        The item to replace by.
+    @@Return:
+      @@@Type: Perl|Array
+      @@@enDesc:
+        A list of the original <P::length> items at <P::offset>.
+##TieArray
+
+ElementTypeBinding:
+  @Name: IFQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: IFISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: IFPackName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+    @@ContentType: lang|Perl
+
+ElementTypeBinding:
+  @Name: ClsPackName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@ContentType: lang|Perl
+
+ElementTypeBinding:
+  @Name: IFFileName
+  @ElementType:
+    dis:FileName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsFileName
+  @ElementType:
+    dis:FileName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: ICDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor: ManakaiDOM|ForClass
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|IF
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+
+    @@Implement:
+      @@@@: ||+||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: CDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+
+    @@resourceFor: ManakaiDOM|ForClass
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Method
+
+
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodReturn
+
+ElementTypeBinding:
+  @Name: nullCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@is-null:1
+
+ElementTypeBinding:
+  @Name: trueCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:true
+    @@Type:
+      DOMMain:boolean::ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: falseCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:false
+    @@Type:
+      DOMMain:boolean::ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en

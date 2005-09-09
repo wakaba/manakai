@@ -1,3 +1,18 @@
+2005-09-08  Wakaba  <wakaba@suika.fam.cx>
+
+	* Makefile: Rules changed so that ../DOM/core.dac is
+	used to construct SuikaWikiConfig21.pm.
+
+	* SuikaWikiConfig21.dis (SWCFGElement, SWCFGDocument,
+	SWCFGComment, SWCFGDocumentFragment): They no longer
+	inherits the SWCFGNode interface to avoid diamond
+	inheritance in DIS interfaces.
+
+2005-09-06  Wakaba  <wakaba@suika.fam.cx>
+
+	* SuikaWikiConfig21.dis: Now based on ManakaiNode NodeStem
+	framework.
+
 2005-03-06  Wakaba  <wakaba@suika.fam.cx>
 
 	* SuikaWikiConfig21.dis (ExceptionDef): "DIS:UNDECLARED_NS_PREFIX_ERR"

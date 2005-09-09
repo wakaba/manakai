@@ -1,15 +1,13 @@
-use lib qw[../..];
-
 #!/usr/bin/perl -w 
 use strict;
 
 =head1 NAME
 
-cdis2pm - Generating Perl Module from a Compiled "dis"
+mkdisdump.pl - Generating Perl Module Documentation Source
 
 =head1 SYNOPSIS
 
-  perl path/to/cdis2pm.pl input.cdis \
+  perl path/to/mkdisdump.pl input.cdis \
             {--module-name=ModuleName | --module-uri=module-uri} \
             [--for=for-uri] [options] > ModuleName.pm
   perl path/to/cdis2pm.pl --help
@@ -24,7 +22,6 @@ This script is part of manakai.
 
 =cut
 
-use Message::DOM::DOMHTML;
 use Message::DOM::DOMLS;
 use Message::Util::DIS::DISDump;
 use Message::Util::QName::Filter {
@@ -44,6 +41,7 @@ use Message::Util::QName::Filter {
   DOMXML => q<http://suika.fam.cx/~wakaba/archive/2004/dom/xml#>,
   dump => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#DISDump/>,
   DX => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#>,
+  ecore => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/>,
   html5 => q<http://www.w3.org/1999/xhtml>,
   infoset => q<http://www.w3.org/2001/04/infoset#>,
   lang => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#>,
@@ -69,10 +67,6 @@ use Message::Util::QName::Filter {
 
 =over 4
 
-=item --enable-assertion / --noenable-assertion (default)
-
-Whether assertion codes should be outputed or not. 
-
 =item --for=I<for-uri> (Optional)
 
 Specifies the "For" URI reference for which the outputed module is. 
@@ -83,30 +77,19 @@ for the module, if any, or the C<ManakaiDOM:all> is assumed.
 
 Shows the help message. 
 
-=item --module-name=I<ModuleName>
-
-The name of module to output.  It is the local name part of 
-the C<Module> C<QName> in the source "dis" file.  Either 
-C<--module-name> or C<--module-uri> is required. 
-
 =item --module-uri=I<module-uri>
 
 A URI reference that identifies a module to output.  Either 
 C<--module-name> or C<--module-uri> is required. 
 
-=item --output-file-path=I<perl-module-file-path> (default: C<STDOUT>)
-
-A platform-dependent file name path for the output.
-If it is not specified, then the generated Perl module
-content is outputed to the standard output.
-
-=item --output-module-version (default) / --nooutput-module-version
-
-Whether the C<$VERSION> special variable should be generated or not. 
-
 =item --verbose / --noverbose (default)
 
 Whether a verbose message mode should be selected or not. 
+
+=item --with-implementators-note / --nowith-implementators-note (default)
+
+Whether the implemetator's notes should also be included
+in the result or not.
 
 =back
 
@@ -126,7 +109,7 @@ GetOptions (
     shift;
     $Opt{module_uri}->{+shift} = 1;
   },
-  'output-file-path=s' => \$Opt{output_file_name},
+  'with-implementators-note' => \$Opt{with_impl_note},
 ) or pod2usage (2);
 pod2usage ({-exitval => 0, -verbose => 1}) if $Opt{help};
 $Opt{file_name} = shift;
@@ -155,10 +138,9 @@ sub verbose_msg_ ($) {
   print STDERR $s;
 }
 
-my $impl = $Message::DOM::DOMImplementationRegistry->get_dom_implementation
+my $impl = $Message::DOM::ImplementationRegistry->get_implementation
                ({
                  ExpandedURI q<ManakaiDOM:Minimum> => '3.0',
-#                 ExpandedURI q<ManakaiDOM:HTML> => '', # 3.0
                  '+' . ExpandedURI q<DOMLS:LS> => '3.0',
                  '+' . ExpandedURI q<DIS:Doc> => '2.0',
                  ExpandedURI q<DIS:Dump> => '1.0',
@@ -166,11 +148,15 @@ my $impl = $Message::DOM::DOMImplementationRegistry->get_dom_implementation
 
 ## -- Load input dac database file
   status_msg_ qq<Opening dac file "$Opt{file_name}"...>;
-  my $db = $impl->get_feature (ExpandedURI q<DIS:Core> => '1.0')
-                ->pl_load_dis_database ($Opt{file_name});
+  our $db = $impl->get_feature (ExpandedURI q<DIS:Core> => '1.0')
+                 ->pl_load_dis_database ($Opt{file_name});
   status_msg qq<done\n>;
 
   our %ReferredResource;
+  our %ClassMembers;
+  our %ClassInheritance;
+  our @ClassInheritance;
+  our %ClassImplements;
 
 sub append_module_documentation (%) {
   my %opt = @_;
@@ -181,16 +167,17 @@ sub append_module_documentation (%) {
   my $pl_full_name = $opt{source_resource}->pl_fully_qualified_name;
   if (defined $pl_full_name) {
     $section->perl_package_name ($pl_full_name);
-    my $path = $pl_full_name;
+
+    my $path = $opt{source_resource}->get_property_text
+                 (ExpandedURI q<dis:FileName>, $pl_full_name);
     $path =~ s#::#/#g;
     $section->resource_file_path_stem ($path);
+
     $section->set_attribute_ns
       (ExpandedURI q<ddoct:>, 'ddoct:basePath', '../' x ($path =~ tr#/#/#));
     $pl_full_name =~ s/.*:://g;
     $section->perl_name ($pl_full_name);
   }
-
-  $section->resource_file_name_stem ($opt{source_resource}->pl_file_name_stem);
 
   append_description (source_resource => $opt{source_resource},
                       result_parent => $section);
@@ -246,8 +233,9 @@ sub append_datatype_documentation (%) {
   $uri =~ s#\b(\d\d\d\d+)/(\d\d?)/(\d\d?)#sprintf '%04d%02d%02d', $1, $2, $3#ge;
   my @file = map {s/[^\w-]/_/g; $_} split m{[/:#?]+}, $uri;
 
-  $section->resource_file_name_stem ($file[-1]);
   $section->resource_file_path_stem (join '/', @file);
+  $section->set_attribute_ns
+      (ExpandedURI q<ddoct:>, 'ddoct:basePath', '../' x (@file - 1));
 
   my $docr = $opt{source_resource}->get_feature (ExpandedURI q<DIS:Doc>, '2.0');
   my $label = $docr->get_label ($section->owner_document);
@@ -263,32 +251,33 @@ sub append_datatype_documentation (%) {
     return;
   }
 
-  ## Inheritance
-  append_inheritance (source_resource => $opt{source_resource},
-                      result_parent => $section);
+  append_subclassof (source_resource => $opt{source_resource},
+                     result_parent => $section);
 } # append_datatype_documentation
 
 sub append_interface_documentation (%) {
   my %opt = @_;
   my $section = $opt{result_parent}->create_interface
-                                        ($opt{source_resource}->uri);
+                                 (my $class_uri = $opt{source_resource}->uri);
+  push @ClassInheritance, $class_uri;
   
   add_uri ($opt{source_resource} => $section);
 
   my $pl_full_name = $opt{source_resource}->pl_fully_qualified_name;
   if (defined $pl_full_name) {
     $section->perl_package_name ($pl_full_name);
-    my $path = $pl_full_name;
+
+    my $path = $opt{source_resource}->get_property_text
+                   (ExpandedURI q<dis:FileName>, $pl_full_name);
     $path =~ s#::#/#g;
     $section->resource_file_path_stem ($path);
+
     $section->set_attribute_ns
       (ExpandedURI q<ddoct:>, 'ddoct:basePath',
        join '', '../' x ($path =~ tr#/#/#));
     $pl_full_name =~ s/.*:://g;
     $section->perl_name ($pl_full_name);
   }
-
-  $section->resource_file_name_stem ($opt{source_resource}->pl_file_name_stem);
 
   $section->is_exception_interface (1)
     if $opt{source_resource}->is_type_uri
@@ -304,42 +293,49 @@ sub append_interface_documentation (%) {
 
   ## Inheritance
   append_inheritance (source_resource => $opt{source_resource},
-                      result_parent => $section);
+                      result_parent => $section,
+                      class_uri => $class_uri);
 
   for my $memres (@{$opt{source_resource}->get_property_resource_list
                               (ExpandedURI q<DIS:childResource>)}) {
     if ($memres->is_type_uri (ExpandedURI q<DISLang:Method>)) {
       append_method_documentation (source_resource => $memres,
-                                   result_parent => $section);
+                                   result_parent => $section,
+                                   class_uri => $class_uri);
     } elsif ($memres->is_type_uri (ExpandedURI q<DISLang:Attribute>)) {
       append_attr_documentation (source_resource => $memres,
-                                 result_parent => $section);
+                                 result_parent => $section,
+                                 class_uri => $class_uri);
     } elsif ($memres->is_type_uri (ExpandedURI q<ManakaiDOM:ConstGroup>)) {
       append_constgroup_documentation (source_resource => $memres,
-                                       result_parent => $section);
+                                       result_parent => $section,
+                                       class_uri => $class_uri);
     }
   }
 } # append_interface_documentation
 
 sub append_class_documentation (%) {
   my %opt = @_;
-  my $section = $opt{result_parent}->create_class ($opt{source_resource}->uri);
+  my $section = $opt{result_parent}->create_class
+    (my $class_uri = $opt{source_resource}->uri);
+  push @ClassInheritance, $class_uri;
   
   add_uri ($opt{source_resource} => $section);
 
   my $pl_full_name = $opt{source_resource}->pl_fully_qualified_name;
   if (defined $pl_full_name) {
     $section->perl_package_name ($pl_full_name);
-    my $path = $pl_full_name;
+
+    my $path = $opt{source_resource}->get_property_text 
+                 (ExpandedURI q<dis:FileName>, $pl_full_name);
     $path =~ s#::#/#g;
+
     $section->resource_file_path_stem ($path);
     $section->set_attribute_ns
       (ExpandedURI q<ddoct:>, 'ddoct:basePath', '../' x ($path =~ tr#/#/#));
     $pl_full_name =~ s/.*:://g;
     $section->perl_name ($pl_full_name);
   }
-
-  $section->resource_file_name_stem ($opt{source_resource}->pl_file_name_stem);
 
   append_description (source_resource => $opt{source_resource},
                       result_parent => $section);
@@ -349,25 +345,34 @@ sub append_class_documentation (%) {
     return;
   }
 
-  ## Inheritance
-  append_inheritance (source_resource => $opt{source_resource},
-                      result_parent => $section,
-                      append_implements => 1);
-
+  my $has_const = 0;
   for my $memres (@{$opt{source_resource}->get_property_resource_list
                               (ExpandedURI q<DIS:childResource>)}) {
     if ($memres->is_type_uri (ExpandedURI q<DISLang:Method>)) {
       append_method_documentation (source_resource => $memres,
-                                   result_parent => $section);
+                                   result_parent => $section,
+                                   class_uri => $class_uri);
     } elsif ($memres->is_type_uri (ExpandedURI q<DISLang:Attribute>)) {
       append_attr_documentation (source_resource => $memres,
-                                 result_parent => $section);
+                                 result_parent => $section,
+                                 class_uri => $class_uri);
     } elsif ($memres->is_type_uri (ExpandedURI q<ManakaiDOM:ConstGroup>)) {
+      $has_const = 1;
       append_constgroup_documentation
         (source_resource => $memres,
-         result_parent => $section);
+         result_parent => $section,
+         class_uri => $class_uri);
     }
   }
+
+  ## Inheritance
+  append_inheritance (source_resource => $opt{source_resource},
+                      result_parent => $section,
+                      append_implements => 1,
+                      class_uri => $class_uri,
+                      has_const => $has_const,
+                      is_class => 1);
+
 } # append_class_documentation
 
 sub append_method_documentation (%) {
@@ -376,6 +381,11 @@ sub append_method_documentation (%) {
   my $m;
   if (defined $perl_name) {
     $m = $opt{result_parent}->create_method ($perl_name);
+    $ClassMembers{$opt{class_uri}}->{$perl_name}
+      = {
+         resource => $opt{source_resource},
+         type => 'method',
+        };
     
   } else {  ## Anonymous
     ## TODO
@@ -409,6 +419,10 @@ sub append_method_documentation (%) {
                         result_parent => $r,
                         has_case => 1,
                         method_resource => $opt{source_resource});
+
+    append_raises (source_resource => $ret,
+                   result_parent => $r,
+                   method_resource => $opt{source_resource});
   }
 
   for my $cr (@{$opt{source_resource}->get_property_resource_list
@@ -419,8 +433,6 @@ sub append_method_documentation (%) {
                                   method_resource => $opt{source_resource});
     }
   }
-
-  ## TODO: raises
 
   $m->resource_access ('private')
     if $opt{source_resource}->get_property_boolean
@@ -433,6 +445,11 @@ sub append_attr_documentation (%) {
   my $m;
   if (defined $perl_name) {
     $m = $opt{result_parent}->create_attribute ($perl_name);
+    $ClassMembers{$opt{class_uri}}->{$perl_name}
+      = {
+         resource => $opt{source_resource},
+         type => 'attr',
+        };
     
   } else {  ## Anonymous
     ## TODO
@@ -460,7 +477,8 @@ sub append_attr_documentation (%) {
                         result_parent => $r,
                         has_case => 1);
 
-    ## TODO: Exceptions
+    append_raises (source_resource => $ret,
+                   result_parent => $r);
   }
 
   my $set = $opt{source_resource}->get_child_resource_by_type
@@ -477,7 +495,8 @@ sub append_attr_documentation (%) {
                         result_parent => $r,
                         has_case => 1);
 
-    ## TODO: InCase, Exceptions
+    append_raises (source_resource => $set,
+                   result_parent => $r);
   } else {
     $m->is_read_only_attribute (1);
   }
@@ -491,6 +510,11 @@ sub append_constgroup_documentation (%) {
   my %opt = @_;
   my $perl_name = $opt{source_resource}->pl_name;
   my $m = $opt{result_parent}->create_const_group ($perl_name);
+  $ClassMembers{$opt{class_uri}}->{$perl_name}
+      = {
+         resource => $opt{source_resource},
+         type => 'const-group',
+        };
   
   add_uri ($opt{source_resource} => $m);
   
@@ -504,6 +528,8 @@ sub append_constgroup_documentation (%) {
     ($u = $opt{source_resource}->dis_actual_data_type_resource->uri);
   $ReferredResource{$u} ||= 1;
 
+  append_subclassof (source_resource => $opt{source_resource},
+                     result_parent => $m);
 
   for my $cr (@{$opt{source_resource}->get_property_resource_list
                   (ExpandedURI q<DIS:childResource>)}) {
@@ -591,8 +617,12 @@ sub append_description (%) {
 
   my $od = $opt{result_parent}->owner_document;
   my $resd = $opt{source_resource}->get_feature (ExpandedURI q<DIS:Doc>, '2.0');
-  my $doc = transform_disdoc_tree ($resd->get_description ($od),
-                                   method_resource => $opt{method_resource});
+  my $doc = transform_disdoc_tree
+              ($resd->get_description
+                        ($od, undef,
+                         $Opt{with_impl_note},
+                         parent_element_arg => $opt{source_element}),
+               method_resource => $opt{method_resource});
   $opt{result_parent}->create_description->append_child ($doc);
   ## TODO: Negotiation
 
@@ -650,12 +680,28 @@ sub transform_disdoc_tree ($;%) {
             $ReferredResource{$uri} ||= 1;
             next EL;
           }
-        } elsif ($lextype eq ExpandedURI q<DISPerl:MemRef>) {
+        } elsif ($lextype eq ExpandedURI q<dis:TypeQName> or
+                 $lextype eq ExpandedURI q<DISCore:NCNameOrQName>) {
+          my $uri = dd_get_qname_uri ($el);
+          if (defined $uri) {
+            $ReferredResource{$uri} ||= 1;
+            next EL;
+          }
+        } elsif ($lextype eq ExpandedURI q<DISPerl:MemRef> or
+                 $lextype eq ExpandedURI q<DOMMain:XCodeRef>) {
           my @nm = @{$el->get_elements_by_tag_name_ns
                              (ExpandedURI q<ddel:>, 'name')};
           if (@nm == 1) {
-            my $uri = dd_get_tfqnames_uri ($el);
+            my $uri = dd_get_tfqnames_uri ($nm[0]);
             if (defined $uri) {
+              $el->set_attribute_ns (ExpandedURI q<dump:>, 'dump:uri', $uri);
+              $ReferredResource{$uri} ||= 1;
+              next EL;
+            }
+          } elsif (@nm == 3) {
+            my $uri = dd_get_tfqnames_uri ($nm[2]);
+            if (defined $uri) {
+              $el->set_attribute_ns (ExpandedURI q<dump:>, 'dump:uri', $uri);
               $ReferredResource{$uri} ||= 1;
               next EL;
             }
@@ -671,10 +717,21 @@ sub transform_disdoc_tree ($;%) {
               my $lnel = $nm[1]->get_elements_by_tag_name_ns
                                   (ExpandedURI q<ddel:>, 'localName')->[0];
               my $lname = $lnel ? $lnel->text_content : '';
-                        ## NOTE: $db
-              my $res = $db->get_resource ($uri)
-                           ->get_child_resource_by_name_and_type
+              my $res;
+              if ($lextype eq ExpandedURI q<DOMMain:XCodeRef> or
+                  {
+                   ExpandedURI q<ddel:C> => 1,
+                   ExpandedURI q<ddel:X> => 1,
+                  }->{$el->namespace_uri . $el->local_name}) {
+                       ## NOTE: $db
+                $res = $db->get_resource ($uri)
+                          ->get_const_resource_by_name ($lname);
+              } else {
+                      ## NOTE: $db
+                $res = $db->get_resource ($uri)
+                          ->get_child_resource_by_name_and_type
                                ($lname, ExpandedURI q<DISLang:AnyMethod>);
+              }
               if ($res) {
                 $el->set_attribute_ns
                         (ExpandedURI q<dump:>, 'dump:uri', $res->uri);
@@ -748,7 +805,7 @@ sub dd_get_qname_uri ($;%) {
 sub tfuris2uri ($$) {
   my ($turi, $furi) = @_;
   my $uri;
-  if ($furi eq <Q::ManakaiDOM:all>) {
+  if ($furi eq ExpandedURI q<ManakaiDOM:all>) {
     $uri = $turi;
   } else {
     my $__turi = $turi;
@@ -768,31 +825,156 @@ sub append_inheritance (%) {
     warn "<".$opt{source_resource}->uri.">: Loop in inheritance";
     return;
   }
+
+  my $has_isa = 0;
   
   for my $isa (@{$opt{source_resource}->get_property_resource_list
                    (ExpandedURI q<dis:ISA>,
                     default_media_type => ExpandedURI q<dis:TFQNames>)}) {
+    $has_isa = 1;
     append_inheritance
       (source_resource => $isa,
        result_parent => $opt{result_parent}->append_new_extends ($isa->uri),
-       depth => $opt{depth} + 1);
+       depth => $opt{depth} + 1,
+       is_class => $opt{is_class});
     $ReferredResource{$isa->uri} ||= 1;
+    if ($opt{class_uri}) {
+      unshift @ClassInheritance, $isa->uri;
+      push @{$ClassInheritance{$opt{class_uri}} ||= []}, $isa->uri;
+    }
+  }
+
+  if ($opt{source_resource}->is_defined) {
+  for my $isa_pack (@{$opt{source_resource}->pl_additional_isa_packages}) {
+    my $isa;
+    if ($isa_pack eq 'Message::Util::Error') {
+                   ## NOTE: $db
+      $isa = $db->get_resource (ExpandedURI q<ecore:MUError>,
+                                for_arg => ExpandedURI q<ManakaiDOM:Perl>);
+    } elsif ($isa_pack eq 'Tie::Array') {
+                   ## NOTE: $db
+      $isa = $db->get_resource (ExpandedURI q<DISPerl:TieArray>);
+    } elsif ($isa_pack eq 'Error') {
+                   ## NOTE: $db
+      $isa = $db->get_resource (ExpandedURI q<ecore:Error>,
+                                for_arg => ExpandedURI q<ManakaiDOM:Perl>);
+    } else {
+      ## TODO: What to do?
+    }
+    if ($isa) {
+      $has_isa = 1;
+      append_inheritance
+        (source_resource => $isa,
+         result_parent => $opt{result_parent}->append_new_extends ($isa->uri),
+         depth => $opt{depth} + 1,
+         is_class => $opt{is_class});
+      $ReferredResource{$isa->uri} ||= 1;
+      if ($opt{class_uri}) {
+        unshift @ClassInheritance, $isa->uri;
+        push @{$ClassInheritance{$opt{class_uri}} ||= []}, $isa->uri;
+      }
+    }
+  }} # AppISA
+
+  if ($opt{has_const}) {
+                    ## NOTE: $db
+    my $isa = $db->get_resource (ExpandedURI q<DISPerl:Exporter>);
+    append_inheritance
+        (source_resource => $isa,
+         result_parent => $opt{result_parent}->append_new_extends ($isa->uri),
+         depth => $opt{depth} + 1,
+         is_class => $opt{is_class});
+    $ReferredResource{$isa->uri} ||= 1;
+    if ($opt{class_uri}) {
+      unshift @ClassInheritance, $isa->uri;
+      push @{$ClassInheritance{$opt{class_uri}} ||= []}, $isa->uri;
+    }
+  }
+
+  if (not $has_isa and $opt{is_class} and
+      $opt{source_resource}->uri ne ExpandedURI q<DISPerl:UNIVERSAL>) {
+                    ## NOTE: $db
+    my $isa = $db->get_resource (ExpandedURI q<DISPerl:UNIVERSAL>);
+    append_inheritance
+        (source_resource => $isa,
+         result_parent => $opt{result_parent}->append_new_extends ($isa->uri),
+         depth => $opt{depth} + 1,
+         is_class => $opt{is_class});
+    $ReferredResource{$isa->uri} ||= 1;
+    if ($opt{class_uri}) {
+      unshift @ClassInheritance, $isa->uri;
+      push @{$ClassInheritance{$opt{class_uri}} ||= []}, $isa->uri;
+    }
   }
 
   if ($opt{append_implements}) {
+            ## NOTE: $db
+    my $u = $db->get_resource (ExpandedURI q<DISPerl:UNIVERSALInterface>);
     for my $impl (@{$opt{source_resource}->get_property_resource_list
                       (ExpandedURI q<dis:Implement>,
                        default_media_type => ExpandedURI q<dis:TFQNames>,
-                       isa_recursive => 1)}) {
+                       isa_recursive => 1)}, $u) {
       append_inheritance
         (source_resource => $impl,
          result_parent => $opt{result_parent}->append_new_implements
                                                   ($impl->uri),
          depth => $opt{depth});
       $ReferredResource{$impl->uri} ||= 1;
+      $ClassImplements{$opt{class_uri}}->{$impl->uri} = 1
+        if $opt{class_uri};
     }
   }
 } # append_inheritance
+
+sub append_subclassof (%) {
+  my %opt = @_;
+
+  ## NOTE: This subroutine directly access to internal structure
+  ##       of ManakaiDISResourceDefinition
+  
+  my $a;
+  $a = sub ($$) {
+    my ($gdb, $s) = @_;
+    my %s = keys %$s;
+    while (my $i = [keys %s]->[0]) {
+      ## Removes itself
+      delete $s->{$i};
+#warn $i;
+      
+      my $ires = $gdb->get_resource ($i);
+      for my $j (keys %$s) {
+        next if $i eq $j;
+        if ($ires->{subOf}->{$j}) {
+          $s->{$i}->{$j} = $s->{$j};
+          delete $s->{$j};
+          delete $s{$j};
+        }
+      }
+      
+      delete $s{$i};
+    } # %s
+    
+    for my $i (keys %$s) {
+      $a->($s->{$i}) if keys %{$s->{$i}};
+    }
+  };
+              
+  my $b;
+  $b = sub ($$) {
+    my ($s, $p) = @_;
+    for my $i (keys %$s) {
+      my $el = $p->append_new_sub_class_of ($i);
+      $b->($s->{$i}, $el) if keys %{$s->{$i}};
+    }
+  };
+
+
+  my $sub = {$opt{source_resource}->uri =>
+             {map {$_ => {}} keys %{$opt{source_resource}->{subOf}}}};
+       ## NOTE: $db
+  $a->($db, $sub);
+  $b->($sub, $opt{result_parent});        
+} # append_subclassof
 
 sub add_uri ($$;%) {
   my ($res, $el, %opt) = @_;
@@ -808,6 +990,30 @@ sub add_uri ($$;%) {
   $el->resource_local_name ($lname) if defined $lname;
 } # add_uri
 
+sub append_raises (%) {
+  my %opt = @_;
+  my $parent = $opt{source_resource}->source_element;
+  return unless $parent;
+
+  for my $el (@{$parent->dis_child_elements 
+                  (for_arg => $opt{source_resource}->for_uri,
+                   forp_arg => $opt{source_resource}->forp_uri)}) {
+    if ($el->expanded_uri eq ExpandedURI q<ManakaiDOM:raises>) {
+                        ## NOTE: $db is used
+      my ($a, $b, $c) = @{$db->xcref_to_resource
+                                ($el->value, $el,
+                                 for_arg => $opt{source_resource}->for_uri)};
+
+      my $rel = $opt{result_parent}->create_raises
+                           ($a->uri, $b ? $b->uri : undef, $c ? $c->uri : undef);
+      
+      append_description (source_resource => $opt{source_resource},
+                          source_element => $el,
+                          result_parent => $rel,
+                          method_resource => $opt{method_resource});
+    }
+  }
+} # append_raises
 
 
 my $doc = $impl->create_disdump_document;
@@ -818,30 +1024,36 @@ my $body = $doc->document_element;
 ## -- Outputs requested modules
 
 for my $mod_uri (keys %{$Opt{module_uri}}) {
-  my $mod = $db->get_module ($mod_uri, for_arg => $Opt{For});
-  unless ($Opt{For}) {
+  my $mod_for = $Opt{For};
+  my $mod = $db->get_module ($mod_uri, for_arg => $mod_for);
+  unless ($mod_for) {
     my $el = $mod->source_element;
     if ($el) {
-      $Opt{For} = $el->default_for_uri;
-      $mod = $db->get_module ($mod_uri, for_arg => $Opt{For});
+      $mod_for = $el->default_for_uri;
+      $mod = $db->get_module ($mod_uri, for_arg => $mod_for);
     }
   }
   unless ($mod->is_defined) {
-    die qq<$0: Module <$mod_uri> for <$Opt{For}> is not defined>;
+    die qq<$0: Module <$mod_uri> for <$mod_for> is not defined>;
   }
 
-  status_msg qq<Module <$mod_uri> for <$Opt{For}>...>;
+  status_msg qq<Module <$mod_uri> for <$mod_for>...>;
 
   append_module_documentation
     (result_parent => $body,
      source_resource => $mod);
+
+  status_msg qq<done>;
 } # mod_uri
 
 ## -- Outputs referenced resources in external modules
 
+status_msg q<Other modules...>;
+
 while (my @ruri = grep {$ReferredResource{$_} > 0} keys %ReferredResource) {
   U: while (defined (my $uri = shift @ruri)) {
     next U if $ReferredResource{$uri} < 0;  ## Already done
+    status_msg_ q<*>;
     my $res = $db->get_resource ($uri);
     unless ($res->is_defined) {
       $res = $db->get_module ($uri);
@@ -953,33 +1165,117 @@ while (my @ruri = grep {$ReferredResource{$_} > 0} keys %ReferredResource) {
   } # U
 }
 
-my $lsimpl = $impl->get_feature (ExpandedURI q<DOMLS:LS> => '3.0');
+status_msg q<done>;
 
-status_msg_ qq<Writing file ""...>;
+## -- Inheriting methods information
 
-use Encode;
-my $serializer = $lsimpl->create_mls_serializer
+{
+  verbose_msg_ q<Adding inheritance information...>;
+  my %class_done;
+  for my $class_uri (@ClassInheritance) {
+    next if $class_done{$class_uri};
+    $class_done{$class_uri};
+    for my $sclass_uri (@{$ClassInheritance{$class_uri}}) {
+      for my $scm_name (keys %{$ClassMembers{$sclass_uri}}) {
+        if ($ClassMembers{$class_uri}->{$scm_name}) {
+          $ClassMembers{$class_uri}->{$scm_name}->{overrides}
+            ->{$ClassMembers{$sclass_uri}->{$scm_name}->{resource}->uri} = 1;
+        } else {
+          $ClassMembers{$class_uri}->{$scm_name}
+            = {
+               %{$ClassMembers{$sclass_uri}->{$scm_name}},
+               is_inherited => 1,
+              };
+        }
+      }
+    } # superclasses
+  } # classes
+
+  for my $class_uri (keys %ClassImplements) {
+    for my $if_uri (keys %{$ClassImplements{$class_uri}||{}}) {
+      for my $mem_name (keys %{$ClassMembers{$if_uri}}) {
+        unless ($ClassMembers{$class_uri}->{$mem_name}) {
+          ## Not defined - error
+          $ClassMembers{$class_uri}->{$mem_name}
+            = {
+               %{$ClassMembers{$if_uri}->{$mem_name}},
+               is_inherited => 1,
+              };
+        }
+        $ClassMembers{$class_uri}->{$mem_name}->{implements}
+          ->{$ClassMembers{$if_uri}->{$mem_name}->{resource}->uri} = 1;
+      }
+    } # interfaces
+  } # classes
+
+  for my $class_uri (keys %ClassMembers) {
+    my $cls_res = $db->get_resource ($class_uri);
+    next unless $cls_res->is_defined;
+    verbose_msg_ q<.>;
+    my $cls_el = $body->create_module ($cls_res->owner_module->uri);
+    if ($cls_res->is_type_uri (ExpandedURI q<ManakaiDOM:IF>)) {
+      $cls_el = $cls_el->create_interface ($class_uri);
+    } else {
+      $cls_el = $cls_el->create_class ($class_uri);
+    }
+    for my $mem_name (keys %{$ClassMembers{$class_uri}}) {
+      my $mem_info = $ClassMembers{$class_uri}->{$mem_name};
+      my $el;
+      if ($mem_info->{type} eq 'const-group') {
+        $el = $cls_el->create_const_group ($mem_name);
+      } elsif ($mem_info->{type} eq 'attr') {
+        $el = $cls_el->create_attribute ($mem_name);
+      } else {
+        $el = $cls_el->create_method ($mem_name);
+      }
+      if ($mem_info->{is_inherited}) {
+        $el->ref ($mem_info->{resource}->uri);
+      }
+      for my $or (keys %{$mem_info->{overrides}||{}}) {
+        $el->append_new_overrides ($or);
+      }
+      for my $or (keys %{$mem_info->{implements}||{}}) {
+        $el->append_new_implements ($or);
+      }
+    } # members
+  } # classes
+
+  verbose_msg q<done>;
+  undef %ClassMembers;
+}
+
+{
+  status_msg_ qq<Writing file ""...>;
+
+  require Encode;
+  my $lsimpl = $impl->get_feature (ExpandedURI q<DOMLS:LS> => '3.0');
+  my $serializer = $lsimpl->create_mls_serializer
                         ({ExpandedURI q<DOMLS:SerializeDocumentInstance> => ''});
-print Encode::encode ('utf8', $serializer->write_to_string ($doc));
-
-status_msg qq<done>;
+  my $serialized = $serializer->write_to_string ($doc);
+  print STDOUT Encode::encode ('utf8', $serialized);
+  close STDOUT;
+  status_msg qq<done>;
+}
 
 verbose_msg_ qq<Checking undefined resources...>;
-
 $db->check_undefined_resource;
-
 verbose_msg qq<done>;
 
 verbose_msg_ qq<Closing database...>;
+$db->free;
 undef $db;
 verbose_msg qq<done>;
+
+END {
+  $db->free if $db;
+}
 
 =head1 SEE ALSO
 
 L<lib/manakai/dis.pl> and L<bin/cdis2pm.pl> - Old version of 
 this script.
 
-L<lib/Message/Util/DIS.dis> - The <QUOTE::dis> object implementation.
+L<lib/Message/Util/DIS.dis> - The I<dis> object implementation.
 
 L<lib/Message/Util/PerlCode.dis> - The Perl code generator.
 
@@ -997,4 +1293,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/09/05 05:21:11 $
+1; # $Date: 2005/09/09 04:26:04 $

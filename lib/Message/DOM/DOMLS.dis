@@ -31,7 +31,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/05 05:21:11 $
+      $Date: 2005/09/09 04:26:05 $
     @@ContentType:
       dis:Date.RCS
 
@@ -419,75 +419,71 @@ ElementTypeBinding:
     @@ContentType:
       lang:Perl
 
-ElementTypeBinding:
-  @Name: ExceptionDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      @@@@:
-        dis:MultipleResource
-      @@@ForCheck:
-        !ManakaiDOM:ForClass !ManakaiDOM:ForIF
-    @@rdf:type:
-      @@@@:
-        ManakaiDOM:ExceptionIF
-      @@@ForCheck:
-        ManakaiDOM:ForIF
-    @@rdf:type:
-      @@@@:
-        ManakaiDOM:ExceptionClass
-      @@@ForCheck:
-        ManakaiDOM:ForClass
-    @@resourceFor:
-      ManakaiDOM:ForIF
-    @@resourceFor:
-      @@@@:
-        ManakaiDOM:ForClass
-      @@@ForCheck:
-        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
-    @@ForCheck:
-      ManakaiDOM:DOM
+ResourceDef:
+  @rdf:type:
+    @@@: dis|MultipleResource
+    @@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+  @resourceFor: ManakaiDOM|ForIF
+  @resourceFor:
+    @@@: ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+  @For: ManakaiDOM|DOM3
+  @For: =ManakaiDOM|ManakaiDOM
 
-    @@ISA:
-      @@@@:
-        DOMMain:ManakaiDOMExceptionIF::ManakaiDOM:Perl
-      @@@ForCheck:
-        ManakaiDOM:ManakaiDOM ManakaiDOM:ForIF
-    @@ISA:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOM
-      @@@ForCheck:
-        ManakaiDOM:ForIF
-      @@@For:
-        ManakaiDOM:ManakaiDOM1
+  @rdf:type:
+    @@@: ManakaiDOM|ExceptionIF
+    @@ForCheck: ManakaiDOM|ForIF
 
-    @@ISA:
-      @@@@:
-        ManakaiDOM:ManakaiDOMException::ManakaiDOM:Perl
-      @@@ForCheck:
-        ManakaiDOM:ManakaiDOM
-    @@Implement:
-      @@@@: ||+||ManakaiDOM|ForClass
-      @@@ForCheck: ManakaiDOM|ForClass
-      @@@ContentType: DISCore|TFPQNames
+  @rdf:type:
+    @@@: ManakaiDOM|ExceptionClass
+    @@ForCheck: ManakaiDOM|ForClass
 
-ExceptionDef:
-  @Name:  
-    @@@: LSException
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @QName:
-    @@@: ManakaiDOMLSException
-    @@ForCheck:
-      ManakaiDOM:ForClass
-  @L3:
+  @Implement:
+    @@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+  @Implement:
+    @@@: ||ManakaiDOM|ManakaiDOM3||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM3
+  @Implement:
+    @@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
 
-  @ImplNote:
-    @@lang:en
-    @@@:
-      Parser or writer may throw an <IF::LSException> if the processing 
-      is stopped.  The processing can be stopped due to a <IF::DOMCore:DOMError>.
+  @DOMMain:implementFeature:
+    @@@: LSFeature30
+    @@For: ManakaiDOM|DOM3
+  @DOMMain:implementFeature:
+    @@@: LSAsyncFeature30
+    @@For: ManakaiDOM|DOM3
+
+  @Implement:
+    @@@: DOMMain|ManakaiDOMExceptionIF||ManakaiDOM|Perl
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @ISA:
+    @@@: ManakaiDOM|ManakaiDOMException||ManakaiDOM|Perl
+    @@ForCheck: ManakaiDOM|ForClass
+  @ISA:
+    @@@: ManakaiDOM|ManakaiDOMObject
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @IFQName: LSException
+  @ClsQName: ManakaiDOMLSException
+
+  @enDesc:
+    Parser or serializer may throw a <IF::LSException> if the processing
+    is stopped.  The processing can be stopped due to a <IF::DOMCore|DOMError>
+    with a <A::DOMCore|DOMError.severity> of 
+    <C::DOMCore|DOMError.SEVERITY_FATAL_ERROR> or a non-recovered
+    <C::DOMCore|DOMError.SEVERITY_ERROR>, or if 
+    <M::DOMCore|DOMErrorHandler.handleError> method returned <DOM::false>.
+
+    {NOTE:: A DOM implementation may choose to continue processing
+            after a fatal error, but the result is then 
+            implementation dependent.
+    }
 
   @Attr:
      @@Name:  code
@@ -497,28 +493,24 @@ ExceptionDef:
         @@@actualType: ManakaiDOMLSExceptionCode
      @@ForCheck: ManakaiDOM|ForIF
 
-  @ConstGroup:
-     @@QName:  
-       @@@@: LSExceptionCode
-       @@@ForCheck:
-         ManakaiDOM:ForIF
-     @@QName:
-       @@@@: ManakaiDOMLSExceptionCode
-       @@@ForCheck:
-         ManakaiDOM:ForClass
+  @ResourceDef:
+    @@rdf:type: ManakaiDOM|ConstGroup
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+    @@IFQName: LSExceptionCode
+    @@ClsQName: ManakaiDOMLSExceptionCode
+    @@PerlName: LSExceptionCode
 
      @@rdfs:subClassOf:
        @@@@: DOMMain|unsigned-short||ManakaiDOM|all
        @@@ForCheck: ManakaiDOM|ForClass
      @@Type: DOMMain|unsigned-short||ManakaiDOM|all
 
-     @@Description:
-        @@@lang:en
-        @@@@: The type of error generated.
+   @@enDesc:
+     An integer indicating the type of error generated.
+
      @@Const:
         @@@Name:  PARSE_ERR
-        @@@Type:
-           DOMMain:unsigned-short||ManakaiDOM|all
         @@@Value:  81
         @@@Description:
           @@@@lang:en
@@ -527,62 +519,121 @@ ExceptionDef:
             using <IF::LSParser> and the processing has been stopped.
      @@Const:
         @@@Name:  SERIALIZE_ERR
-        @@@Type:
-           DOMMain:unsigned-short||ManakaiDOM|all
         @@@Value:  82
         @@@Description:
           @@@@lang:en
           @@@@@:
             An attempt was made to serialize a <IF::DOMCore:Node> using 
             <IF::LSSerializer> and the processing has been stop.
+##LSException
+
 
 ElementTypeBinding:
-  @Name: IF
+  @Name: IFQName
   @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+
+ElementTypeBinding:
+  @Name: IFISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+
+ElementTypeBinding:
+  @Name: IFCls3Def
+  @ElementType: 
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
-      @@@@:
-        dis:MultipleResource
-      @@@ForCheck:
-        !ManakaiDOM:ForClass !ManakaiDOM:ForIF
-    @@rdf:type:
-      @@@@:
-        ManakaiDOM:IF
-      @@@ForCheck:
-        ManakaiDOM:ForIF
-    @@rdf:type:
-      @@@@:
-        ManakaiDOM:Class
-      @@@ForCheck:
-        ManakaiDOM:ForClass
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
     @@resourceFor:
-      ManakaiDOM:ForIF
-    @@resourceFor:
-      @@@@:
-        ManakaiDOM:ForClass
-      @@@ForCheck:
-        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
-    @@For:
-      =ManakaiDOM:ManakaiDOM
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+    @@For: ManakaiDOM|DOM3
+    @@For: =ManakaiDOM|ManakaiDOM
 
-    @@ISA:
-      @@@@:
-        ManakaiDOM:ManakaiDOMObject
-      @@@ForCheck:
-        ManakaiDOM:ForClass
-    @@Implement:
-      @@@@: ||+||ManakaiDOM|ForIF
+    @@rdf:type:
+      @@@@: ManakaiDOM|IF
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|Class
       @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM3||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM3
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
 
-    @@ISA:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOM
-      @@@ForCheck:
-        ManakaiDOM:ForIF
-      @@@For:
-        ManakaiDOM:ManakaiDOM3
+    @@DOMMain:implementFeature:
+      @@@@: LSFeature30
+      @@@For: ManakaiDOM|DOM3
+    @@DOMMain:implementFeature:
+      @@@@: LSAsyncFeature30
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: IFClsXDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+    @@For: ManakaiDOM|ManakaiDOMLatest
+    @@For: =ManakaiDOM|ManakaiDOM
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|IF
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+    @@DOMMain:implementFeature:
+      @@@@: LSExtendedFeature30
+      @@@For: ManakaiDOM|ManakaiDOMLatest
 
 ElementTypeBinding:
   @Name: IFDef
@@ -631,7 +682,7 @@ ElementTypeBinding:
       ManakaiDOM:DOMMethodParameter
 
 ElementTypeBinding:
-  @Name: Exception
+  @Name: RaiseException
   @ElementType:
     ManakaiDOM:raises
 
@@ -698,43 +749,6 @@ ElementTypeBinding:
       ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
 
 ElementTypeBinding:
-  @Name: XConstGroup
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:ConstGroup
-    @@ForCheck:
-      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
-    @@aliasChild:
-      @@@@: 1
-      @@@For:
-        ManakaiDOM:ManakaiDOM
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOMLatest
-      @@@For:
-        !ManakaiDOM:ManakaiDOM1
-
-ElementTypeBinding:
-  @Name: XConst
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: 
-      ManakaiDOM:Const
-    @@ForCheck:
-      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
-    @@aliasChild:
-      @@@@: 1
-      @@@For:
-        ManakaiDOM:ManakaiDOM
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOMLatest
-      @@@For:
-        !ManakaiDOM:ManakaiDOM1
-ElementTypeBinding:
   @Name: XParam
   @ElementType:
     ManakaiDOM:exceptionOrWarningParameter
@@ -759,55 +773,36 @@ ElementTypeBinding:
       @@@For:
         !ManakaiDOM:ManakaiDOM1
 
+IFCls3Def:
+  @IFQName: DOMImplementationLS
+  @ClsQName: ManakaiDOMImplementationLS
 
-IF:
-  @Name:
-    @@@: DOMImplementationLS
-    @@ForCheck:
-      ManakaiDOM:ForIF
-
-  @QName:
-    @@@: ManakaiDOMImplementationLS
-    @@ForCheck:
-      ManakaiDOM:ForClass
-  @ISA:
-    @@@: 
-      DOMCore:ManakaiDOMImplementation
-    @@ForCheck:
-      ManakaiDOM:ForClass
-
-  @L3:
-  @For:
-    ManakaiDOM:DOM3
+  @ClsISA: DOMCore|ManakaiDOMImplementation
 
   @DOMMetaImpl:provideFeature: LSFeature30
-  @DOMMain:implementFeature: LSFeature30
 
-  @Description:
-    @@lang:en
-    @@@:
-      The factory methods for creating the objects 
-      required for loading and saving.
-  @ImplNote:
-    @@lang:en
+  @DOMMain:implementFeature:
+    @@@@: LSAsyncFeature30
+    @@@For: ManakaiDOM|DOM3
+
+  @enDesc:
+    The <IF::DOMImplementationLS> interface contains factory methods
+    for creating objects for load and save.
+
+  @enDesc:
+    @@ForCheck: ManakaiDOM|ForIF
     @@@:
       It is expected that an instance of the <IF::DOMImplementationLS> 
-      interface can be obtained by binding-specific casting 
-      methods on an instance of the <IF::DOMCore:DOMImplementation> interface 
-      or <M::DOMCore:DOMImplementation.getFeature> with parameters 
-      <Feature::LS> or <Feature::LS-Async> version <FeatureVer::3.0>.
-    @@ForCheck:
-      ManakaiDOM:ForIF
+      interface can be obtained by using binding-specific casting 
+      methods on an instance of the <IF::DOMCore|DOMImplementation>
+      interface or by using the <M::DOMCore|DOMImplementation.getFeature>
+      method with parameter values <Feature::LS> or <Feature::LS-Async>
+      and <FeatureVer::3.0> respectively.
    
   @ConstGroup:
-     @@QName:
-       @@@@: DOMImplementationLSMode
-       @@@ForCheck:
-         ManakaiDOM:ForIF
-     @@QName:
-       @@@@: ManakaiDOMImplementationLSMode
-       @@@ForCheck:
-         ManakaiDOM:ForClass
+    @@IFQName: DOMImplementationLSMode
+    @@ClsQName: ManakaiDOMImplementationLSMode
+    @@PerlName: DOMImplementationLSMode
 
      @@rdfs:subClassOf:
        @@@@: DOMMain|unsigned-short||ManakaiDOM|all
@@ -819,8 +814,6 @@ IF:
        @@@@:The mode of the parser.
      @@Const:
         @@@Name:  MODE_SYNCHRONOUS
-        @@@Type:
-           DOMMain:unsigned-short||ManakaiDOM|all
         @@@Value:  1
         @@@Description:
           @@@@lang:en
@@ -828,8 +821,6 @@ IF:
             Create an synchronous <IF::LSParser>.
      @@Const:
         @@@Name:  MODE_ASYNCHRONOUS
-        @@@Type:
-           DOMMain:unsigned-short||ManakaiDOM|all
         @@@Value:  2
         @@@Description:
           @@@@lang:en
@@ -891,22 +882,13 @@ IF:
             By default, the parameter <DOM::error-handler> of the 
             <A::LSParser.domConfig> is <DOM::null>.  However, 
             the DOM implementation may provide a default error handler instead.
-        @@@Exception:
-           @@@@Name:  NOT_SUPPORTED_ERR
-           @@@@Type:
-              DOMCore:DOMException
-           @@@@SubType:
-             @@@@@QName:
-               ManakaiDOMLS:MDOMLS_IMPL_NOSUPPORT_MODE
-             @@@@@Description:
-               @@@@@@lang:en
-               @@@@@@@: The requested mode is not supported.
-           @@@@SubType:
-             @@@@@QName:
-               MDOMX:MDOM_IMPL_NOSUPPORT_SCHEMA
-             @@@@@Description:
-               @@@@@@lang:en
-               @@@@@@@: The requested schema language is not supported.
+        @@@ManakaiDOM:raises:
+          @@@@@: ManakaiDOMLS|MDOMLS_IMPL_NOSUPPORT_MODE
+          @@@@enDesc: The requested mode is not supported.
+        @@@ManakaiDOM:raises:
+          @@@@@: MDOMX|MDOM_IMPL_NOSUPPORT_SCHEMA
+          @@@@enDesc: The requested schema language is not supported.
+
   @Method:
      @@Name:  createLSSerializer
      @@Description:
@@ -948,6 +930,14 @@ IF:
          $r = <ClassM::ManakaiDOMLSOutput.new>;
 ##DOMImplementationLS
 
+ElementTypeBinding:
+  @Name: PerlName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ContentType: lang|Perl
+    @@For: ManakaiDOM|Perl
+
 FeatureDef:
   @QName: LSExtendedFeature
   @FeatureVerDef:
@@ -959,26 +949,30 @@ FeatureDef:
       The <IF::DOMImplementationLSExtended
              ::ManakaiDOM:ManakaiDOMLatest> interface.
 
-IF:
-  @QName:
-    @@@: DOMImplementationLSExtendedIF
-    @@ForCheck: ManakaiDOM|ForIF
+IFClsXDef:
+  @IFQName: DOMImplementationLSExtended
+  @ClsQName: ManakaiDOMImplementationLSExtended
 
-  @QName:
-    @@@: ManakaiDOMImplementationLSExtended
-    @@ForCheck: ManakaiDOM|ForClass
-
-  @For: ManakaiDOM|ManakaiDOMLatest
+  @IFISA: DOMImplementationLS
+  @ClsISA: ManakaiDOMImplementationLS
 
   @DOMMetaImpl:provideFeature: LSExtendedFeature30
-  @DOMMain:implementFeature: LSExtendedFeature30
 
-  @ISA:
-    @@@: DOMImplementationLS
+  @enDesc:
+    The <IF::DOMImplementationLSExtended> interface provides
+    factory methods taking <TYPE::DOMFeatures|FeaturesString>
+    as a parameter to specify desired features that should be
+    implemented by parser or serializer.
+
+  @enDesc:
     @@ForCheck: ManakaiDOM|ForIF
-  @ISA:
-    @@@: ManakaiDOMImplementationLS
-    @@ForCheck: ManakaiDOM|ForClass
+    @@@:
+      It is expected that an instance of the <IF::DOMImplementationLSExtended>
+      interface can be obtained by using binding-specific casting
+      methods on an instance of the <IF::DOMCore|DOMImplementation>
+      interface or by using the <M::DOMCore|DOMImplementation.getFeature>
+      method with parameter values <Feature::DOMLS|LS> and
+      <FeatureVer::3.0> respectively.
 
   @Method:
     @@Name: createMLSParser
@@ -1029,7 +1023,7 @@ IF:
               } # FNAME
 
               ## Class found
-              $r = $class->new;
+              $r = $class->new ($self, $features);
               last CLS;    ## NOTE: Method name directly written
             } # CLS
 
@@ -1083,7 +1077,7 @@ IF:
               } # FNAME
 
               ## Class found
-              $r = $class->new;
+              $r = $class->new ($self, $features);
               last CLS;    ## NOTE: Method name directly written
             } # CLS
 ##DOMImplementationLSExtended
@@ -1113,18 +1107,10 @@ ElementTypeBinding:
   @ShadowContent:
     @@lang:en
 
-IF:
+IFDef:
   @Name:
     @@@: LSParser
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  
-  @QName:
-    @@@: ManakaiDOMLSParser
-    @@ForCheck:
-      ManakaiDOM:ForClass
 
-  @L3:
   @For:
     ManakaiDOM:DOM3
 
@@ -1344,12 +1330,6 @@ IF:
   @ConstGroup:
      @@QName:  
        @@@@: ACTION_TYPES
-       @@@ForCheck:
-         ManakaiDOM:ForIF
-     @@QName:
-       @@@@: ManakaiDOMActionTypes
-       @@@ForCheck:
-         ManakaiDOM:ForClass
 
      @@rdfs:subClassOf:
        @@@@:
@@ -1412,20 +1392,13 @@ IF:
      @@Return: 
 ##LSParser
 
-IF:
-  @Name:
-    @@@: LSInput
-    @@ForCheck:
-      ManakaiDOM:ForIF
+IFCls3Def:
+  @IFQName: LSInput
+  @ClsQName: ManakaiDOMLSInput
 
-  @QName:
-    @@@: ManakaiDOMLSInput
-    @@ForCheck:
-      ManakaiDOM:ForClass
+  @ClsISA: ManakaiDOM|ManakaiDOMObject
 
-  @L3:
-  @For:
-    ManakaiDOM:DOM3
+  @DOMMain:implementFeature: LSAsyncFeature30
 
   @Description:
     @@lang:en
@@ -1535,7 +1508,7 @@ IF:
      @@Set:
        @@@InCase:
          @@@@Type:
-           Perl:SCALAR
+           Perl:SCALAR::ManakaiDOM:all
          @@@@Description:
            @@@@@lang:en
            @@@@@@:
@@ -1813,15 +1786,11 @@ ElementTypeBinding:
     @@rdf:type:
       rdf:Property
 
-IF:
-  @QName:
-    @@@: ManakaiDOMSimpleXMLSerializerIF
-    @@ForCheck: ManakaiDOM|ForIF
-  @QName:
-    @@@: ManakaiDOMSimpleXMLSerializer
-    @@ForCheck: ManakaiDOM|ForClass
+IFClsXDef:
+  @IFQName: SimpleXMLSerializer
+  @ClsQName: ManakaiDOMSimpleXMLSerializer
 
-  @For: ManakaiDOM|ManakaiDOMLatest
+  @ClsISA: ManakaiDOM|ManakaiDOMObject
 
   @enDesc:
     A simple XML serializer that only (or at least) supports
@@ -2119,7 +2088,6 @@ IF:
             $r .= $src;
           }
         }
-
 ##SimpleXMLSerializer
 
 PropDef:
@@ -2548,19 +2516,11 @@ IFDef:
              @@@@@@:
                The serializer was unable to serialize the node.
 
-IF:
-  @QName:
-    @@@: LSOutput
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @QName:
-    @@@: ManakaiDOMLSOutput
-    @@ForCheck:
-      ManakaiDOM:ForClass
-
-  @L3:
-  @For:
-    ManakaiDOM:DOM3
+IFCls3Def:
+  @IFQName: LSOutput
+  @ClsQName: ManakaiDOMLSOutput
+  
+  @ClsISA: ManakaiDOM|ManakaiDOMObject
 
   @Description:
     @@lang:en
@@ -2707,7 +2667,7 @@ IF:
           The newly created <IF::LSOutput> object.
       @@@PerlDef:
         $r = bless {}, $self;
-##IF:LSOutput
+##LSOutput
 
 IFDef:
   @Name:  LSProgressEvent
@@ -3080,6 +3040,4 @@ ImplNote:
   @Level:3
   @SpecLevel:3
 ##ConfigParam:LSSerializer
-
-## DOMLS.dis ends here
 

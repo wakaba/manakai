@@ -17,36 +17,68 @@ MKDISDUMP = $(PERL) -I$(MANAKAI_LIB_DIR) $(MKDISDUMP_PL)
 DUMP_STYLESHEET_PATH = template/disdump.ja.xsl
 DDLIST_STYLESHEET_PATH = template/ddlist.ja.xsl
 
-MODULES_FILE_PATH_PREFIX = core-modules
+MODULES_FILE_PATH_PREFIX = NAME-modules
 HTML_CSS_STYLE_SHEET_URI = style/disdump-style.css
 
+NS_DIS = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS\#
+NS_DISLIB = http://suika.fam.cx/~wakaba/archive/2004/dis/
+NS_ERROR = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/
+NS_MARKUP = http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup\#
 NS_MDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#ManakaiDOM.
+NS_UTIL = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 
-all: doc-filelist.pl.tmp doc.xml $(DUMP_STYLESHEET_PATH)
-	$(PERL) doc-filelist.pl.tmp
+ALL_HTML = dom.html util.html
 
-doc.xml:
-	$(MKDISDUMP) $(MANAKAI_LIB_DIR)Message/DOM/core.dac \
-	  --module-uri="$(NS_MDOM)DOMCore" \
-	  --module-uri="$(NS_MDOM)DOMMain" \
-	  --module-uri="$(NS_MDOM)DOMFeature" \
-	  --with-implementators-note > $@
+DOM_DAC_FILE = $(MANAKAI_LIB_DIR)Message/DOM/core.dac
+UTIL_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Util/discore.dac
 
-doc-filelist.xml.tmp: doc.xml $(DUMP_STYLESHEET_PATH)
-	$(XALAN) -in $< -xsl $(DUMP_STYLESHEET_PATH) -out $@ -param mode list \
-	  -param modules-file-path-prefix $(MODULES_FILE_PATH_PREFIX)
+all: $(ALL_HTML)
 
-doc-filelist.pl.tmp: doc-filelist.xml.tmp $(DDLIST_STYLESHEET_PATH)
+$(ALL_HTML): %.html: %-list.pl.tmp $(DUMP_STYLESHEET_PATH)
+	$(PERL) $<
+
+$(ALL_HTML:.html=-list.pl.tmp): %.pl.tmp: %.xml.tmp $(DDLIST_STYLESHEET_PATH)
 	$(XALAN) -in $< -xsl $(DDLIST_STYLESHEET_PATH) -out $@ -text \
 	  -param mode perl-script \
 	  -param xalan-command "$(XALAN)" \
-	  -param modules-file-path-prefix $(MODULES_FILE_PATH_PREFIX) \
+	  -param modules-file-path-prefix \
+                 $(MODULES_FILE_PATH_PREFIX:NAME-%=$(<:-list.xml.tmp=)-%) \
 	  -param html-style-sheet-uri $(HTML_CSS_STYLE_SHEET_URI) \
-	  -param source-file-path doc.xml \
+          -param source-file-path $(<:-list.xml.tmp=.xml) \
 	  -param disdump-stylesheet-file-path $(DUMP_STYLESHEET_PATH)
 
+$(ALL_HTML:.html=-list.xml.tmp): %-list.xml.tmp: %.xml $(DUMP_STYLESHEET_PATH)
+	$(XALAN) -in $< -xsl $(DUMP_STYLESHEET_PATH) -out $@ -param mode list \
+	  -param modules-file-path-prefix \
+                 $(MODULES_FILE_PATH_PREFIX:NAME-%=$(<:.xml=)-%)
+
+dom.xml: $(DOM_DAC_FILE)
+	$(MKDISDUMP) $< \
+	  --module-uri="$(NS_MDOM)DOMFeature" \
+	  --module-uri="$(NS_MDOM)DOMMain" \
+	  --module-uri="$(NS_MDOM)DOMCore" \
+	  --module-uri="$(NS_MDOM)DOMXML" \
+	  --with-implementators-note > $@
+
+util.xml: $(UTIL_DAC_FILE)
+	$(MKDISDUMP) $< \
+	  --module-uri="$(NS_DISLIB)DISCore" \
+	  --module-uri="$(NS_DISLIB)DISRDF" \
+	  --module-uri="$(NS_DISLIB)DISIDL" \
+	  --module-uri="$(NS_DISLIB)DISLang" \
+	  --module-uri="$(NS_DISLIB)DISPerl" \
+	  --module-uri="$(NS_UTIL)ManakaiNode" \
+	  --module-uri="$(NS_ERROR)Core" \
+	  --module-uri="$(NS_ERROR)DOMException" \
+	  --module-uri="$(NS_MARKUP)SuikaWikiConfig21" \
+	  --module-uri="$(NS_UTIL)DIS" \
+	  --module-uri="$(NS_DIS)DISoc" \
+	  --module-uri="$(NS_DIS)DISDump" \
+	  --with-implementators-note > $@
+
 clean:
-	$(RM) doc-filelist.pl.tmp doc-filelist.xml.tmp
+	$(RM) $(ALL_HTML:.html=-list.pl.tmp) $(ALL_HTML:.html=-list.xml.tmp) \
+	  $(ALL_HTML:.html=.xml)
 	$(RM) *~ .*~ *.BAK .*.BAK
 
 distclean: clean

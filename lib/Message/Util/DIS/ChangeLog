@@ -1,3 +1,41 @@
+2005-09-08  Wakaba  <wakaba@suika.fam.cx>
+
+	* DISDoc.dis: Don't require MDOM:DOMHTML - now it requires
+	only MDOM:DOMCore.
+	(parseDISDocInlineText): Don't recognize as stago if a
+	LESS-THAN SIGN is followed by a white space character.
+
+2005-09-07  Wakaba  <wakaba@suika.fam.cx>
+
+	* DISDoc.dis (parseDISDocInlineText): ddel:TFQ and ddel:C added to
+	the list of element types which have implied lextype.
+
+	* DISDump.dis (ref): DISDumpElementResource.resourceReference
+	is moved to DISDumpElement.ref.
+	(createChildByRefURI): New code fragment.
+	(DISDumpElementDescription): New interface and class.
+	The createDescription method is moved here.
+	(DISDumpElementImplements): New interface and class.
+	The appendNewImplements method is moved here.
+	(DISDumpElementRDFClass): New interface and class.
+	(DISDumpSubClassOfElement): New interface and class and element type.
+	(DISDumpRaisesElement): Attributes are removed.
+	(DISDumpRaisesCodeElement, DISDumpRaisesSubCodeElement):
+	New interfaces, classes and element types.
+
+2005-09-06  Wakaba  <wakaba@suika.fam.cx>
+
+	* DISDoc.dis (documentationGroupID): Returns a string even
+	if the documentation element does not has the dd:id attribute.
+	(parseDISDocText): ddel:TODO element type added 
+	to the list of element types in whose element a html5:p
+	start tag can be implied.
+
+2005-09-05  Wakaba  <wakaba@suika.fam.cx>
+
+	* DISDoc.dis (parseDISDocText, parseDISDocInlineText): Removes
+	leading and trailing spaces in start-tags.
+
 2005-09-01  Wakaba  <wakaba@suika.fam.cx>
 
 	* DISDump.dis (createFullName, hasFullName): New methods.

@@ -21,7 +21,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/05/04 13:49:27 $
+      $Date: 2005/09/09 04:26:13 $
     @@ContentType:
       dis:Date.RCS
   
@@ -671,8 +671,8 @@ InfoPropDef:
     this element information item.  
     \
     This set always contains a namespace information item
-    with the <InfoProp:prefix> of <XML::xml> that is implicitly 
-    bound to the <InfoProp:namespace name> 
+    with the <InfoProp::prefix> of <XML::xml> that is implicitly 
+    bound to the <InfoProp::namespace name> 
     <URI::http://www.w3.org/XML/1998/namespace>.
     It does not contain a namespace information item
     with prefix <XML::xmlns>.
@@ -811,7 +811,7 @@ InfoPropDef:
       the <InfoItem::document information item> is <CODE::true>.
       \
       Applications should treat <CODE::no value> as equivalent to
-      a value of <CODE::CDATA>.
+      a value of <XML::CDATA>.
   @unknownCase:
     @@enDesc:
       There is no declaration for the attribute has been read but the
@@ -904,12 +904,12 @@ InfoPropDef:
     @@enLabel:
       An ordered list of the <InfoItem::element information items>.
     @@enDesc:
-      The <InfoProp::attribute type> is <CODE::IDREF> or <CODE::IDREFS>.
+      The <InfoProp::attribute type> is <XML::IDREF> or <XML::IDREFS>.
   @InCase:
     @@enLabel:
       An ordered list of the <InfoItem::unparsed entity information items>.
     @@enDesc:
-      The <InfoProp::attribute type> is <CODE::ENTITY> or <CODE::ENTITIES>.
+      The <InfoProp::attribute type> is <XML::ENTITY> or <XML::ENTITIES>.
   @InCase:
     @@enLabel:
       An ordered list of the <InfoItem::notation information items>.
@@ -917,46 +917,46 @@ InfoPropDef:
       The <InfoProp::attribute type> is <CODE::NOTATION>.
   @noValueCase:
     @@enDesc:
-      The <InfoProp::attribute type> is <CODE::ID>, <CODE::NMTOKEN>,
-      <CODE::NMTOKENS>, <CODE::CDATA>, <CODE::ENUMERATION> or
+      The <InfoProp::attribute type> is <XML::ID>, <XML::NMTOKEN>,
+      <XML::NMTOKENS>, <XML::CDATA>, <CODE::ENUMERATION> or
       <CODE::no value>.
   @noValueCase:
     @@enDesc:
       The attribute value is syntactically invalid.
   @noValueCase:
     @@enDesc:
-      The <InfoProp::attribute type> is <CODE::IDREF> or <CODE::IDREFS>
+      The <InfoProp::attribute type> is <XML::IDREF> or <XML::IDREFS>
       and any of the identifiers does not appear as the value of 
       an ID attribute in the document and the
       <InfoProp::all declarations processed> property of 
-      the <InfoItem::document information item> is <CODE::true>.
+      the <InfoItem::document information item> is <XML::true>.
   @noValueCase:
     @@enDesc:
-      The <InfoProp::attribute type> is <CODE::ENTITY>, <CODE::ENTITIES>
-      or <CODE::NOTATION> and there is no declaration for any of the 
+      The <InfoProp::attribute type> is <XML::ENTITY>, <XML::ENTITIES>
+      or <XML::NOTATION> and there is no declaration for any of the 
       entities or the notation and the
       <InfoProp::all declarations processed> property of 
       the <InfoItem::document information item> is <CODE::true>.
   @noValueCase:
     @@enDesc:
-      The <InfoProp::attribute type> is <CODE::IDREF> or <CODE::IDREFS>
+      The <InfoProp::attribute type> is <XML::IDREF> or <XML::IDREFS>
       and any of the identifiers appears as the value of
       more than one ID attribute in the document.
   @noValueCase:
     @@enDesc:
-      The <InfoProp::attribute type> is <CODE::NOTATION> and
+      The <InfoProp::attribute type> is <XML::NOTATION> and
       there are multiple declarations for the notation.
   @unknownCase:
     @@enDesc:
-      The <InfoProp::attribute type> is <CODE::IDREF> or <CODE::IDREFS>
+      The <InfoProp::attribute type> is <XML::IDREF> or <XML::IDREFS>
       and any of the identifiers does not appear as the value of 
       an ID attribute in the document but the
       <InfoProp::all declarations processed> property of 
       the <InfoItem::document information item> is <CODE::false>.
   @unknownCase:
     @@enDesc:
-      The <InfoProp::attribute type> is <CODE::ENTITY>, <CODE::ENTITIES>
-      or <CODE::NOTATION> and there is no declaration for any of the 
+      The <InfoProp::attribute type> is <XML::ENTITY>, <XML::ENTITIES>
+      or <XML::NOTATION> and there is no declaration for any of the 
       entities or the notation but the
       <InfoProp::all declarations processed> property of 
       the <InfoItem::document information item> is <CODE::false>.

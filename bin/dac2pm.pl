@@ -3,27 +3,27 @@ use strict;
 
 =head1 NAME
 
-cdis2pm - Generating Perl Module from a Compiled "dis"
+dac2pm - Generating Perl Module from "dac" File
 
 =head1 SYNOPSIS
 
-  perl path/to/cdis2pm.pl input.cdis \
-            {--module-name=ModuleName | --module-uri=module-uri} \
-            [--for=for-uri] [options] > ModuleName.pm
-  perl path/to/cdis2pm.pl --help
+  perl path/to/dac2pm.pl input.dac \
+            --module-uri=module-uri [--for=for-uri] [options] > ModuleName.pm
+  perl path/to/dac2pm.pl input.dac \
+            --module-uri=module-uri [--for=for-uri] [options] \
+            --output-file-path=ModuleName.pm
+  perl path/to/dac2pm.pl --help
 
 =head1 DESCRIPTION
 
-The C<cdis2pm> script generates a Perl module from a compiled "dis"
-("cdis") file.  It is intended to be used to generate a manakai 
-DOM Perl module files, although it might be useful for other purpose. 
+The C<dac2pm> script generates a Perl module from a "dac" file.
 
 This script is part of manakai. 
 
 =cut
 
 use strict;
-use Message::DOM::DOMMetaImpl;
+use Message::Util::DIS;
 use Message::Util::QName::Filter {
   DIS => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#>,
   dis => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis-->,
@@ -51,8 +51,6 @@ use Message::Util::QName::Filter {
   TreeCore => q<>,
   Util => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/>,
 };
-use Message::Util::DIS;
-use Message::Util::PerlCode;
 
 =head1 OPTIONS
 
@@ -66,32 +64,22 @@ Whether assertion codes should be outputed or not.
 
 Specifies the "For" URI reference for which the outputed module is. 
 If this parameter is ommitted, the default "For" URI reference 
-for the module, if any, or the C<ManakaiDOM:all> is assumed. 
+for the module specified by the C<dis:DefaultFor> attribute
+of the C<dis:Module> element, if any, or C<ManakaiDOM:all> is assumed. 
 
 =item --help
 
 Shows the help message. 
 
-=item --module-name=I<ModuleName>
-
-The name of module to output.  It is the local name part of 
-the C<Module> C<QName> in the source "dis" file.  Either 
-C<--module-name> or C<--module-uri> is required. 
-
 =item --module-uri=I<module-uri>
 
-A URI reference that identifies a module to output.  Either 
-C<--module-name> or C<--module-uri> is required. 
+A URI reference that identifies a module from which a Perl
+module file is generated.  This argument is I<required>.
 
-=item --output-file-path=I<perl-module-file-path> (default: C<STDOUT>)
+=item --output-file-path=I<perl-module-file-path> (default: the standard output)
 
-A platform-dependent file name path for the output.
-If it is not specified, then the generated Perl module
-content is outputed to the standard output.
-
-=item --output-module-version (default) / --nooutput-module-version
-
-Whether the C<$VERSION> special variable should be generated or not. 
+A platform-dependent file path to which the Perl module
+is written down.
 
 =item --verbose / --noverbose (default)
 
@@ -103,16 +91,13 @@ Whether a verbose message mode should be selected or not.
 
 use Getopt::Long;
 use Pod::Usage;
-use Storable;
 my %Opt;
 GetOptions (
   'enable-assertion!' => \$Opt{outputAssertion},
   'for=s' => \$Opt{For},
   'help' => \$Opt{help},
-  'implementation-registry-package=s' => \$Opt{implreg_pack},
   'module-uri=s' => \$Opt{module_uri},
   'output-file-path=s' => \$Opt{output_file_name},
-  'output-module-version!' => \$Opt{outputModuleVersion},
   'verbose!' => $Opt{verbose},
 ) or pod2usage (2);
 pod2usage ({-exitval => 0, -verbose => 1}) if $Opt{help};
@@ -120,21 +105,11 @@ $Opt{file_name} = shift;
 pod2usage ({-exitval => 2, -verbose => 0}) unless $Opt{file_name};
 pod2usage (2) unless $Opt{module_uri};
 
-## TODO:
-$Opt{outputModuleVersion} = 1 unless defined $Opt{outputModuleVersion};
-
 ## TODO: Assertion control
 
 ## TODO: Verbose mode
 
-$Opt{implreg_pack} ||= $Message::DOM::DOMImplementationRegistry;
-if ($Opt{implreg_pack} eq
-    'Message::DOM::DOMMetaImpl::ManakaiDOMImplementationRegistryCompat') {
-  unshift @Message::Markup::SuikaWikiConfig21::ManakaiSWCFGImplementation::ISA,
-          'Message::DOM::DOMMetaImpl::ManakaiDOMMinimumImplementationCompat';
-}
-
-my $impl = $Opt{implreg_pack}->get_dom_implementation
+my $impl = $Message::DOM::ImplementationRegistry->get_implementation
                ({
                  ExpandedURI q<ManakaiDOM:Minimum> => '3.0',
                  '+' . ExpandedURI q<DIS:Core> => '1.0',
@@ -143,7 +118,9 @@ my $impl = $Opt{implreg_pack}->get_dom_implementation
 my $pc = $impl->get_feature (ExpandedURI q<Util:PerlCode> => '1.0');
 my $di = $impl->get_feature (ExpandedURI q<DIS:Core> => '1.0');
 
+print STDERR "Loading the database...";
 my $db = $di->pl_load_dis_database ($Opt{file_name});
+print STDERR "done\n";
 
 my $mod = $db->get_module ($Opt{module_uri}, for_arg => $Opt{For});
 unless ($Opt{For}) {
@@ -165,14 +142,21 @@ defined $Opt{output_file_name}
            or die "$0: $Opt{output_file_name}: $!")
       : ($output = \*STDOUT);
 
+printf STDERR qq<Writing file "%s"...>,
+  defined $Opt{output_file_name} ? $Opt{output_file_name} : '';
 print $output $pl->stringify;
+close $output;
+print STDERR "done\n";
 
+print STDERR "Checking undefined resources...";
 $db->check_undefined_resource;
+print STDERR "done\n";
+
+print STDERR "Closing the database...";
+$db->free;
+print STDERR "done\n";
 
 =head1 SEE ALSO
-
-L<lib/manakai/dis.pl> and L<bin/cdis2pm.pl> - Old version of 
-this script.
 
 L<lib/Message/Util/DIS.dis> - The <QUOTE::dis> object implementation.
 
@@ -183,6 +167,8 @@ L<lib/manakai/DISCore.dis> - The definition for the "dis" format.
 L<lib/manakai/DISPerl.dis> - The definition for the "dis" Perl-specific 
 vocabulary. 
 
+L<bin/dac.pl> - The "dac" database generator.
+
 =head1 LICENSE
 
 Copyright 2004-2005 Wakaba <w@suika.fam.cx>.  All rights reserved.
@@ -192,4 +178,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/05/07 13:56:36 $
+1; # $Date: 2005/09/09 04:26:04 $
