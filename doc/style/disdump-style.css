@@ -31,6 +31,17 @@ div.section {
   clear: left;
 }
 
+dl {
+  overflow: visible;
+}
+
+dt {
+  display: block;
+  list-style-type: none;
+  margin-left: 0;
+  padding-left: 0;
+}
+
 dd {
   overflow: visible;
 }
@@ -97,36 +108,49 @@ dl.dump-children-param > dt {
   padding-left: 0;
 }
 
-dl.dump-children-return > dt {
+dl.dump-children-return > dt,
+dl.dump-children-raises > dt {
   display: block;
   margin: 0;
   border-style: none;
   padding: 0;
   float: left;
   clear: left;
-  width: 7em;
+  width: 9em;
   overflow: auto;
+  font-size: 85%;
 }
 
-dl.dump-children-return > dt > span.dump-prefix-datatype {
+dl.dump-children-return > dt > span.dump-prefix-datatype,
+dl.dump-children-case > dt > span.dump-prefix-datatype {
   display: none;
 }
 
-dl.dump-children-return > dd {
+dl.dump-children-return > dd,
+dl.dump-children-raises > dd {
   display: block;
   margin: 0;
   border-style: none;
-  padding: 0 0 0 8em;
+  padding: 0 0 0 9em;
 }
 
-dl.dump-children-case {
+dl.dump-children-case,
+dl.dump-children-raises-code,
+dl.dump-children-raises-sub-code {
   display: block;
   margin: 0;
   border-style: none;
   padding: 0;
 }
 
-dl.dump-children-case > dt {
+dl.dump-children-raises-sub-code {
+  margin-left: 1em;
+  clear: left;
+}
+
+dl.dump-children-case > dt,
+dl.dump-children-raises-code > dt,
+dl.dump-children-raises-sub-code > dt {
   display: block;
   margin: 0 0 0 1em;
   border-style: none;
@@ -136,19 +160,35 @@ dl.dump-children-case > dt {
   line-height: 1.7;
 }
 
-dl.dump-children-case > dd {
-  display: inline;
+dl.dump-children-case > dd,
+dl.dump-children-raises-code > dd,
+dl.dump-children-raises-sub-code > dd {
+  display: block;
   margin: 0;
   border-style: none;
   padding: 0;
 }
 
-dl.dump-children-case > dt:after {
+dl.dump-children-case > dt:after,
+dl.dump-children-raises-code > dt:after,
+dl.dump-children-raises-sub-code > dt:after {
   content: ":";
   padding-right: 1em;
 }
 
-a.dump-ref-interface, a.dump-ref-data-type {
+dl.dump-children-const > dt {
+  display: block;
+  list-style-type: none;
+  margin-left: 0;
+  padding-left: 0;
+}
+dl.dump-children-exception-sub-code > dt {
+  font-weight: bolder;
+}
+
+a.dump-ref-interface, a.dump-ref-data-type,
+dd.dump-member-implements a,
+html.dump-interface-doc dd.dump-member-overrides a {
   font-style: italic;
 }
 
