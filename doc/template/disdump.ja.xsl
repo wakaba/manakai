@@ -27,6 +27,12 @@
   <t:param name="html-style-sheet-uri"
       select="'http://suika.fam.cx/www/style/html/xhtml'"/>
   <t:param name="is-html-style-sheet-uri-relative" select="false ()"/>
+  
+  <t:variable name="allClass"
+        select="/child::dump:moduleSet/child::dump:module/child::dump:class"/>
+  <t:variable name="anyClass"
+        select="$allClass |
+                /child::dump:moduleSet/child::dump:module/child::dump:interface"/>
 
   <t:template name="global-lang-attr">
     <t:attribute name="lang">ja</t:attribute>
@@ -104,6 +110,21 @@
     <span lang="ja" xml:lang="ja" class="weak">(属性)</span>
   </t:template>
   
+  <t:template name="suffix-empty-string">
+    <t:value-of select="' '"/>
+    <span lang="ja" xml:lang="ja" class="weak">(空文字列)</span>
+  </t:template>
+  
+  <t:template name="suffix-inherited">
+    <t:value-of select="' '"/>
+    <span lang="ja" xml:lang="ja" class="weak">(継承)</span>
+  </t:template>
+  
+  <t:template name="suffix-inherited-private">
+    <t:value-of select="' '"/>
+    <span lang="ja" xml:lang="ja" class="weak">(継承、内部用)</span>
+  </t:template>
+  
   <t:template name="suffix-private">
     <t:value-of select="' '"/>
     <span lang="ja" xml:lang="ja" class="weak">(内部用)</span>
@@ -127,8 +148,21 @@
     <span lang="ja" xml:lang="ja">輸出可能定数札</span>
   </t:template>
   
+  <t:template name="label-exception-sub-code">
+    <span lang="ja" xml:lang="ja" class="dump-label-sub-code"
+    >例外の詳細</span>
+  </t:template>
+  
+  <t:template name="label-exports-const-group">
+    <span lang="ja" xml:lang="ja">この定数群をすべて輸出する</span>
+  </t:template>
+  
   <t:template name="label-consts">
     <span lang="ja" xml:lang="ja">定数</span>
+  </t:template>
+  
+  <t:template name="label-exports-const">
+    <span lang="ja" xml:lang="ja">この定数を輸出する</span>
   </t:template>
   
   <t:template name="label-classes">
@@ -137,6 +171,10 @@
   
   <t:template name="label-datatypes">
     <span lang="ja" xml:lang="ja">型</span>
+  </t:template>
+  
+  <t:template name="label-examples">
+    <span lang="ja" xml:lang="ja">例</span>
   </t:template>
   
   <t:template name="label-exceptions">
@@ -156,16 +194,41 @@
   </t:template>
   
   <t:template name="label-implements">
-    <span lang="ja" xml:lang="ja">実装</span>
+    <span lang="ja" xml:lang="ja">実装する界面</span>
+  </t:template>
+  
+  <t:template name="label-check-implements">
+    <span lang="ja" xml:lang="ja">この界面を実装しているか確認する</span>
+  </t:template>
+  
+  <t:template name="label-implemented-by">
+    <span lang="ja" xml:lang="ja">既知の実装クラス</span>
+  </t:template>
+  
+  <t:template name="label-member-implements">
+    <span lang="ja" xml:lang="ja">定義されている界面</span>
+  </t:template>
+  
+  <t:template name="label-inherited-by">
+    <span lang="ja" xml:lang="ja">既知の継承クラス</span>
   </t:template>
   
   <t:template name="label-interfaces">
     <span lang="ja" xml:lang="ja">界面</span>
   </t:template>
   
+  <t:template name="label-is-interface-implemented">
+    <span lang="ja" xml:lang="ja">実装されています</span>
+  </t:template>
+  
+  <t:template name="label-is-interface-not-implemented">
+    <span lang="ja" xml:lang="ja">実装されていません</span>
+  </t:template>
+  
   <t:template name="label-label">
     <span lang="ja" xml:lang="ja">名前</span>
   </t:template>
+  
   
   <t:template name="label-methods">
     <span lang="ja" xml:lang="ja">メソッド</span>
@@ -185,12 +248,33 @@
   </t:template>
   <t:template name="label-in-modules-attr">クラス, 界面, 型</t:template>
   
+  <t:template name="label-load-module">
+    <span lang="ja" xml:lang="ja">このモジュールを読込む</span>
+  </t:template>
+  
+  <t:template name="label-load-module-for-class">
+    <span lang="ja" xml:lang="ja"
+    >このクラスを使うために必要なモジュールを読込む</span>
+  </t:template>
+  
+  <t:template name="label-member-overrides">
+    <span lang="ja" xml:lang="ja">上書きされている定義</span>
+  </t:template>
+  
   <t:template name="label-parameters">
     <span lang="ja" xml:lang="ja">引数</span>
   </t:template>
   
   <t:template name="label-no-parameter">
     <span lang="ja" xml:lang="ja">引数なし</span>
+  </t:template>
+  
+  <t:template name="label-param-is-named">
+    <span lang="ja" xml:lang="ja">名前付き引数</span>
+  </t:template>
+  
+  <t:template name="label-param-is-optional">
+    <span lang="ja" xml:lang="ja">省略可能</span>
   </t:template>
   
   <t:template name="label-return-value">
@@ -230,10 +314,6 @@
   <t:template name="label-perl-name">
     <span lang="ja" xml:lang="ja"><span lang="en" xml:lang="en">Perl</span>
     名</span>
-  </t:template>
-  
-  <t:template name="label-param-is-optional">
-    <span lang="ja" xml:lang="ja">省略可能</span>
   </t:template>
 
   <t:template name="label-sep">
@@ -469,10 +549,15 @@
       <t:apply-templates select="self::node ()" mode="dl-datatypes"/>
       <t:apply-templates select="self::node ()" mode="dl-interfaces"/>
       <t:apply-templates select="self::node ()" mode="dl-classes"/>
+      <t:apply-templates select="self::node ()" mode="dl-examples"/>
     </dl>
   </t:template>
   <t:template match="dump:module" mode="h2">
-    <div class="section">
+    <div>
+      <t:attribute name="class">
+        <t:text>section</t:text>
+        <t:if test="string (@dump:access) = 'private'"> dump-access-private</t:if>
+      </t:attribute>
       <t:apply-templates select="self::node ()" mode="h2-heading"/>
       <t:apply-templates select="child::dump:description"/>
       <dl class="dump-info dump-info-module">
@@ -727,6 +812,16 @@
     </html>
   </t:template>
   
+  <t:template match="dump:module" mode="dl-examples">
+    <dt><t:call-template name="label-examples"/></dt>
+    <dd>
+      <div class="example has-caption">
+        <div class="caption"><t:call-template name="label-load-module"/></div>
+        <pre><code class="perl" lang="en" xml:lang="en">require <t:apply-templates
+        select="child::dump:perlPackageName" mode="human-module-name"/>;</code></pre>
+      </div>
+    </dd>
+  </t:template>
   
   <t:template match="dump:class" mode="h1b">
     <t:apply-templates select="self::node ()" mode="h1-heading"/>
@@ -741,12 +836,18 @@
       </t:apply-templates>
       <t:apply-templates select="self::node ()" mode="dl-inheritance"/>
       <t:apply-templates select="self::node ()" mode="dl-interfaces"/>
+      <t:apply-templates select="self::node ()" mode="dl-inherited"/>
       <t:apply-templates select="self::node ()" mode="dl-constants"/>
       <t:apply-templates select="self::node ()" mode="dl-methods"/>
+      <t:apply-templates select="self::node ()" mode="dl-examples"/>
     </dl>
   </t:template>
   <t:template match="dump:class" mode="h3">
-    <div class="section">
+    <div>
+      <t:attribute name="class">
+        <t:text>section</t:text>
+        <t:if test="string (@dump:access) = 'private'"> dump-access-private</t:if>
+      </t:attribute>
       <t:apply-templates select="self::node ()" mode="h3-heading"/>
       <t:apply-templates select="child::dump:description"/>
       <dl class="dump-info dump-info-class">
@@ -764,9 +865,10 @@
         <t:apply-templates select="self::node ()" mode="dl-constants"/>
         <t:apply-templates select="self::node ()" mode="dl-methods"/>
       </dl>
-      <t:apply-templates select="child::dump:constGroup |
-                                 child::dump:attribute |
-                                 child::dump:method" mode="h4"/>
+      <t:apply-templates select="(child::dump:constGroup |
+                                  child::dump:attribute |
+                                  child::dump:method)
+                                 [not (@dump:ref)]" mode="h4"/>
     </div>
   </t:template>
   <t:template match="dump:class" mode="h1-heading">
@@ -909,9 +1011,10 @@
       </head>
       <body>
         <t:apply-templates select="self::node ()" mode="h1b"/>
-        <t:apply-templates select="child::dump:constGroup |
-                                   child::dump:attribute |
-                                   child::dump:method" mode="h2"/>
+        <t:apply-templates select="(child::dump:constGroup |
+                                    child::dump:attribute |
+                                    child::dump:method)
+                                   [not (@dump:ref)]" mode="h2"/>
       </body>
     </html>
   </t:template>
@@ -966,6 +1069,43 @@
       </t:for-each>
     </t:if>
   </t:template>
+  <t:template match="dump:class" mode="dl-inherited">
+    <t:param name="ddoct:basePath">
+      <t:apply-templates select="self::node ()" mode="base-path"/>
+    </t:param>
+    <t:variable name="subclass" select="$allClass
+        [child::dump:extends/descendant-or-self::dump:extends/@dump:uri
+          = current ()/child::dump:uri/@dump:uri]"/>
+    <t:if test="$subclass">
+      <dt><t:call-template name="label-inherited-by"/></dt>
+      <dd>
+        <t:apply-templates select="$subclass[position () = 1]" mode="ref">
+          <t:with-param name="short" select="true ()"/>
+          <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+        </t:apply-templates>
+        <t:for-each select="$subclass[position () != 1]">
+          <t:call-template name="label-sep"/>
+          <t:apply-templates select="self::node ()" mode="ref">
+            <t:with-param name="short" select="true ()"/>
+            <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+          </t:apply-templates>
+        </t:for-each>
+      </dd>
+    </t:if>
+  </t:template>
+  
+  <t:template match="dump:class" mode="dl-examples">
+    <dt><t:call-template name="label-examples"/></dt>
+    <dd>
+      <div class="example has-caption">
+        <div class="caption">
+          <t:call-template name="label-load-module-for-class"/>
+        </div>
+        <pre><code class="perl" lang="en" xml:lang="en">require <t:apply-templates
+        select="parent::dump:module" mode="human-module-name"/>;</code></pre>
+      </div>
+    </dd>
+  </t:template>
   
   <t:template match="dump:interface" mode="h1b">
     <t:apply-templates select="self::node ()" mode="h1-heading"/>
@@ -979,8 +1119,10 @@
         </t:with-param>
       </t:apply-templates>
       <t:apply-templates select="self::node ()" mode="dl-inheritance"/>
+      <t:apply-templates select="self::node ()" mode="dl-implemented"/>
       <t:apply-templates select="self::node ()" mode="dl-constants"/>
       <t:apply-templates select="self::node ()" mode="dl-methods"/>
+      <t:apply-templates select="self::node ()" mode="dl-examples"/>
     </dl>
   </t:template>
   <t:template match="dump:interface" mode="heading-content">
@@ -1123,9 +1265,10 @@
       </head>
       <body>
         <t:apply-templates select="self::node ()" mode="h1b"/>
-        <t:apply-templates select="child::dump:constGroup |
-                                   child::dump:attribute |
-                                   child::dump:method" mode="h2"/>
+        <t:apply-templates select="(child::dump:constGroup |
+                                    child::dump:attribute |
+                                    child::dump:method)
+                                   [not (@dump:ref)]" mode="h2"/>
       </body>
     </html>
   </t:template>
@@ -1165,6 +1308,48 @@
         </dd>
     </t:if>
   </t:template>
+  
+  <t:template match="dump:interface" mode="dl-examples">
+    <dt><t:call-template name="label-examples"/></dt>
+    <dd>
+      <div class="example has-caption">
+        <div class="caption"><t:call-template name="label-check-implements"/></div>
+        <pre><code class="perl" lang="en" xml:lang="en"
+        >if (<var>$object</var>->isa ("<t:apply-templates
+        select="child::dump:perlPackageName" mode="human-module-name"
+        />")) {
+<!-- -->  ## <t:call-template name="label-is-interface-implemented"/>
+<!-- -->} else {
+<!-- -->  ## <t:call-template name="label-is-interface-not-implemented"/>
+<!-- -->}</code></pre>
+      </div>
+    </dd>
+  </t:template>
+
+  <t:template match="dump:interface" mode="dl-implemented">
+    <t:param name="ddoct:basePath">
+      <t:apply-templates select="self::node ()" mode="base-path"/>
+    </t:param>
+    <t:variable name="subclass" select="$allClass
+        [child::dump:implements/descendant-or-self::dump:*/@dump:uri
+          = current ()/child::dump:uri/@dump:uri]"/>
+    <t:if test="$subclass">
+      <dt><t:call-template name="label-implemented-by"/></dt>
+      <dd>
+        <t:apply-templates select="$subclass[position () = 1]" mode="ref">
+          <t:with-param name="short" select="true ()"/>
+          <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+        </t:apply-templates>
+        <t:for-each select="$subclass[position () != 1]">
+          <t:call-template name="label-sep"/>
+          <t:apply-templates select="self::node ()" mode="ref">
+            <t:with-param name="short" select="true ()"/>
+            <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+          </t:apply-templates>
+        </t:for-each>
+      </dd>
+    </t:if>
+  </t:template>
 
   <t:template match="dump:dataType" mode="h1b">
     <t:apply-templates select="self::node ()" mode="h1-heading"/>
@@ -1185,6 +1370,7 @@
         </t:with-param>
       </t:apply-templates>
       <t:apply-templates select="self::node ()" mode="dl-superclasses"/>
+      <t:apply-templates select="self::node ()" mode="dl-examples"/>
     </dl>
   </t:template>
   <t:template match="dump:dataType" mode="heading-content">
@@ -1341,12 +1527,17 @@
   </t:template>
   
   <t:template match="dump:constGroup" mode="h2">
-    <div class="section">
+    <div>
+      <t:attribute name="class">
+        <t:text>section</t:text>
+        <t:if test="string (@dump:access) = 'private'"> dump-access-private</t:if>
+      </t:attribute>
       <t:apply-templates select="self::node ()" mode="id-attr"/>
       <t:apply-templates select="self::node ()" mode="h2-heading"/>
       <t:apply-templates select="child::dump:description"/>
       <dl class="dump-info dump-info-const-group">
         <t:apply-templates select="child::dump:perlName" mode="dl"/>
+        <t:apply-templates select="self::node ()" mode="dl-examples"/>
         <t:if test="child::dump:const">
           <dt><t:call-template name="label-consts"/></dt>
           <dd>
@@ -1392,6 +1583,9 @@
           </t:choose>
         </t:with-param>
       </t:apply-templates>
+      <t:if test="@dump:ref">
+        <t:call-template name="suffix-inherited"/>
+      </t:if>
     </dd>
   </t:template>
   <t:template match="dump:constGroup" mode="human-module-title">
@@ -1452,6 +1646,22 @@
     <t:apply-templates select="self::node ()" mode="id"/>
   </t:template>
   
+  <t:template match="dump:class/dump:constGroup" mode="dl-examples">
+    <dt><t:call-template name="label-examples"/></dt>
+    <dd>
+      <div class="example has-caption">
+        <div class="caption">
+          <t:call-template name="label-exports-const-group"/>
+        </div>
+        <pre><code class="perl" lang="en" xml:lang="en">use <t:apply-templates
+        select="parent::*/parent::dump:module/child::dump:perlPackageName"
+        mode="human-module-name"/> qw/:<t:apply-templates
+        select="child::dump:perlName"
+        mode="human-module-name"/>/;</code></pre>
+      </div>
+    </dd>
+  </t:template>
+  
   <t:template match="dump:const" mode="ref">
     <t:param name="ddoct:basePath" select="''"/>
     <a class="dump-ref dump-ref-const">
@@ -1502,7 +1712,7 @@
   <t:template match="dump:const" mode="uri">
     <t:param name="ddoct:basePath" select="''"/>
     <t:copy-of select="$ddoct:basePath"/>
-    <t:apply-templates select="parent::dump:*" mode="uri"/>
+    <t:apply-templates select="parent::dump:constGroup/parent::dump:*" mode="uri"/>
     <t:value-of select="'#'"/>
     <t:apply-templates select="self::node ()" mode="id"/>
   </t:template>
@@ -1521,11 +1731,115 @@
     </dt>
     <dd>
       <t:apply-templates select="self::node ()" mode="value-description"/>
+      <t:apply-templates select="self::node ()" mode="examples"/>
+      <t:apply-templates select="self::node ()" mode="xsubcodes"/>
     </dd>
   </t:template>
   
+  <t:template match="dump:class/dump:constGroup/dump:const" mode="examples">
+    <div class="example has-caption">
+      <div class="caption">
+        <t:call-template name="label-exports-const"/>
+      </div>
+      <pre><code class="perl" lang="en" xml:lang="en">use <t:apply-templates
+        select="parent::dump:constGroup/parent::*/parent::dump:module
+                /child::dump:perlPackageName"
+        mode="human-module-name"/> qw/<t:apply-templates select="child::dump:perlName"
+        mode="human-module-name"/>/;</code></pre>
+    </div>
+  </t:template>
+  
+  <t:template match="dump:const" mode="xsubcodes">
+    <t:if test="child::dump:exceptionSubCode">
+      <dl class="dump-children dump-children-exception-sub-code">
+        <dt><t:call-template name="label-exception-sub-code"/></dt>
+        <dd>
+          <dl>
+            <t:apply-templates select="child::dump:exceptionSubCode" mode="dl"/>
+          </dl>
+        </dd>
+      </dl>
+    </t:if>
+  </t:template>
+  
+  <t:template match="dump:exceptionSubCode" mode="dl">
+    <dt>
+      <dfn>
+        <t:apply-templates select="self::node ()" mode="human-module-name"/>
+      </dfn>
+    </dt>
+    <dd>
+      <t:apply-templates select="self::node ()" mode="value-description"/>
+      <t:apply-templates select="self::node ()" mode="examples"/>
+    </dd>
+  </t:template>
+  <t:template match="dump:exceptionSubCode" mode="ref">
+    <t:param name="ddoct:basePath" select="''"/>
+    <t:param name="short" select="false ()"/>
+    <a class="dump-ref dump-ref-exception-sub-code">
+      <t:attribute name="href">
+        <t:apply-templates select="self::node ()" mode="uri">
+          <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+        </t:apply-templates>
+      </t:attribute>
+      <t:apply-templates select="self::node ()" mode="human-module-name-text">
+        <t:with-param name="short" select="$short"/>
+      </t:apply-templates>
+    </a>
+  </t:template>
+  <t:template match="dump:exceptionSubCode" mode="human-module-name">
+    <t:choose>
+    <t:when test="@dump:localName">
+      <t:apply-templates select="@dump:localName" mode="human-module-name"/>
+    </t:when>
+    <t:when test="child::dump:uri">
+      <t:apply-templates select="child::dump:uri[not (@dump:isAlias)]"
+          mode="human-module-name-text"/>
+    </t:when>
+    <t:otherwise>
+      <t:call-template name="name-anonymous"/>
+    </t:otherwise>
+    </t:choose>
+  </t:template>
+  <t:template match="dump:exceptionSubCode" mode="human-module-name-text">
+    <t:param name="short" select="false ()"/>
+    <t:choose>
+    <t:when test="@dump:localName">
+      <t:apply-templates select="@dump:localName" mode="human-module-name-text">
+        <t:with-param name="short" select="$short"/>
+      </t:apply-templates>
+    </t:when>
+    <t:when test="child::dump:uri">
+      <t:apply-templates select="child::dump:uri[not (@dump:isAlias)]"
+          mode="human-module-name-text"/>
+    </t:when>
+    <t:otherwise>
+      <t:call-template name="name-anonymous"/>
+    </t:otherwise>
+    </t:choose>
+  </t:template>
+  <t:template match="dump:exceptionSubCode" mode="id">
+    <t:if test="@dump:localName">
+      <t:value-of select="'xsubtype-'"/>
+      <t:value-of select="@dump:localName"/>
+    </t:if>
+  </t:template>
+  <t:template match="dump:exceptionSubCode" mode="uri">
+    <t:param name="ddoct:basePath" select="''"/>
+    <t:copy-of select="$ddoct:basePath"/>
+    <t:apply-templates
+        select="parent::dump:const/parent::dump:constGroup/parent::dump:*"
+        mode="uri"/>
+    <t:value-of select="'#'"/>
+    <t:apply-templates select="self::node ()" mode="id"/>
+  </t:template>
+  
   <t:template match="dump:method" mode="h2">
-    <div class="section">
+    <div>
+      <t:attribute name="class">
+        <t:text>section</t:text>
+        <t:if test="string (@dump:access) = 'private'"> dump-access-private</t:if>
+      </t:attribute>
       <t:apply-templates select="self::node ()" mode="id-attr"/>
       <t:apply-templates select="self::node ()" mode="h2-heading"/>
       <t:apply-templates select="child::dump:description"/>
@@ -1534,11 +1848,17 @@
         <t:apply-templates select="self::node ()" mode="dl-parameters"/>
         <t:apply-templates select="self::node ()" mode="dl-return-value"/>
         <t:apply-templates select="self::node ()" mode="dl-exceptions"/>
+        <t:apply-templates select="self::node ()" mode="dl-overrides-implements"/>
+        <t:apply-templates select="self::node ()" mode="dl-examples"/>
       </dl>
     </div>
   </t:template>
   <t:template match="dump:method" mode="h4">
-    <div class="section">
+    <div>
+      <t:attribute name="class">
+        <t:text>section</t:text>
+        <t:if test="string (@dump:access) = 'private'"> dump-access-private</t:if>
+      </t:attribute>
       <t:apply-templates select="self::node ()" mode="h4-heading"/>
       <t:apply-templates select="child::dump:description"/>
       <dl class="dump-info dump-info-method">
@@ -1546,6 +1866,8 @@
         <t:apply-templates select="self::node ()" mode="dl-parameters"/>
         <t:apply-templates select="self::node ()" mode="dl-return-value"/>
         <t:apply-templates select="self::node ()" mode="dl-exceptions"/>
+        <t:apply-templates select="self::node ()" mode="dl-overrides-implements"/>
+        <t:apply-templates select="self::node ()" mode="dl-examples"/>
       </dl>
     </div>
   </t:template>
@@ -1576,6 +1898,20 @@
       </code>
     </a>
   </t:template>
+  <t:template match="dump:method[@dump:ref] | dump:attribute[@dump:ref] |
+                     dump:constGroup[@dump:ref]" mode="ref">
+    <t:param name="ddoct:basePath" select="''"/>
+    <t:param name="short" select="false ()"/>
+    <t:param name="with-class" select="false ()"/>
+    <t:param name="def"
+        select="$anyClass/child::dump:*[local-name () = local-name (current ())]
+                [child::dump:uri/@dump:uri = string (current ()/@dump:ref)]"/>
+    <t:apply-templates select="$def" mode="ref">
+      <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+      <t:with-param name="short" select="$short"/>
+      <t:with-param name="with-class" select="$with-class"/>
+    </t:apply-templates>
+  </t:template>
   <t:template match="dump:method" mode="dd">
     <t:param name="ddoct:basePath" select="''"/>
     <dd>
@@ -1596,18 +1932,59 @@
       </t:if>
     </dd>
   </t:template>
+  <t:template match="dump:method[@dump:ref]" mode="dd">
+    <t:param name="ddoct:basePath" select="''"/>
+    <t:param name="def"
+        select="$anyClass/child::dump:*[local-name () = local-name (current ())]
+                [child::dump:uri/@dump:uri = string (current ()/@dump:ref)]"/>
+    <dd>
+      <t:apply-templates select="self::node ()" mode="ref">
+        <t:with-param name="ddoct:basePath">
+          <t:choose>
+          <t:when test="$ddoct:basePath">
+            <t:copy-of select="$ddoct:basePath"/>
+          </t:when>
+          <t:otherwise>
+            <t:apply-templates select="self::node ()" mode="base-path"/>
+          </t:otherwise>
+          </t:choose>
+        </t:with-param>
+        <t:with-param name="def" select="$def"/>
+      </t:apply-templates>
+      <t:choose>
+      <t:when test="$def/@dump:access = 'private'">
+        <t:call-template name="suffix-inherited-private"/>
+      </t:when>
+      <t:otherwise>
+        <t:call-template name="suffix-inherited"/>
+      </t:otherwise>
+      </t:choose>
+    </dd>
+  </t:template>
   <t:template match="dump:method" mode="human-module-title">
     <t:choose>
     <t:when test="child::dump:perlName">
       <code class="perl">
         <t:apply-templates select="child::dump:perlName" mode="human-module-title"/>
         <t:value-of select="' ('"/>
-        <t:apply-templates select="child::dump:param[position () = 1]"
-            mode="human-module-title"/>
-        <t:for-each select="child::dump:param[position () != 1]">
-          <t:value-of select="', '"/>
-          <t:apply-templates select="self::node ()" mode="human-module-title"/>
-        </t:for-each>
+        <t:choose>
+        <t:when test="child::dump:param[position () = 1][@dump:isNamedParameter]">
+          <t:apply-templates select="self::node ()" mode="named-params-param"/>
+        </t:when>
+        <t:otherwise>
+          <t:apply-templates select="child::dump:param[position () = 1]"
+              mode="human-module-title"/>
+          <t:for-each select="child::dump:param[position () != 1]
+                                               [not (@dump:isNamedParameter)]">
+            <t:value-of select="', '"/>
+            <t:apply-templates select="self::node ()" mode="human-module-title"/>
+          </t:for-each>
+          <t:if test="child::dump:param/@dump:isNamedParameter">
+            <t:value-of select="', '"/>
+            <t:apply-templates select="self::node ()" mode="named-params-param"/>
+          </t:if>
+        </t:otherwise>
+        </t:choose>
         <t:value-of select="')'"/>
       </code>
     </t:when>
@@ -1690,11 +2067,12 @@
   </t:template>
   <t:template match="dump:method" mode="dl-exceptions">
     <t:choose>
-    <t:when test="child::dump:parameter">@@
+    <t:when test="child::dump:return/child::dump:raises">
       <dt><t:call-template name="label-exceptions"/></dt>
       <dd>
-        <dl class="dump-child dump-child-raises">
-          @@
+        <dl class="dump-children dump-children-raises">
+          <t:apply-templates select="child::dump:return/child::dump:raises"
+              mode="dl"/>
         </dl>
       </dd>
     </t:when>
@@ -1716,22 +2094,98 @@
     <t:value-of select="'#'"/>
     <t:apply-templates select="self::node ()" mode="id"/>
   </t:template>
+  <t:template match="dump:method | dump:attribute" mode="dl-overrides-implements">
+    <t:param name="ddoct:basePath">
+      <t:apply-templates select="self::node ()" mode="base-path"/>
+    </t:param>
+    <t:if test="child::dump:overrides">
+      <dt><t:call-template name="label-member-overrides"/></dt>
+      <dd class="dump-member-overrides">
+        <t:apply-templates select="child::dump:overrides[position () = 1]">
+          <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+        </t:apply-templates>
+        <t:for-each select="child::dump:overrides[position () != 1]">
+          <t:call-template name="label-sep"/>
+          <t:apply-templates select="self::node ()">
+            <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+          </t:apply-templates>
+        </t:for-each>
+      </dd>
+    </t:if>
+    <t:if test="child::dump:implements">
+      <dt><t:call-template name="label-member-implements"/></dt>
+      <dd class="dump-member-implements">
+        <t:apply-templates select="child::dump:implements[position () = 1]">
+          <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+        </t:apply-templates>
+        <t:for-each select="child::dump:implements[position () != 1]">
+          <t:call-template name="label-sep"/>
+          <t:apply-templates select="self::node ()">
+            <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+          </t:apply-templates>
+        </t:for-each>
+      </dd>
+    </t:if>
+  </t:template>
+  <t:template match="dump:method" mode="named-params-param">
+    <code class="perl" lang="en" xml:lang="en">%named_params</code>
+  </t:template>
+  <t:template match="dump:method" mode="named-params-param-ref">
+    <t:param name="ddoct:basePath" select="''"/>
+    <a>
+      <t:attribute name="href">
+        <t:apply-templates select="self::node ()" mode="named-params-param-uri">
+          <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+        </t:apply-templates>
+      </t:attribute>
+      <t:apply-templates select="self::node ()" mode="named-params-param"/>
+    </a>
+  </t:template>
+  <t:template match="dump:method" mode="named-params-param-id">
+    <t:if test="child::dump:perlName">
+      <t:apply-templates select="self::node ()" mode="id"/>
+      <t:value-of select="'-param-named_params'"/>
+    </t:if>
+  </t:template>
+  <t:template match="dump:method" mode="named-params-param-id-attr">
+    <t:attribute name="id">
+      <t:apply-templates select="self::node ()" mode="named-params-param-id"/>
+    </t:attribute>
+  </t:template>
+  <t:template match="dump:method" mode="named-params-param-uri">
+    <t:param name="ddoct:basePath" select="''"/>
+    <t:copy-of select="$ddoct:basePath"/>
+    <t:apply-templates select="parent::dump:*" mode="uri"/>
+    <t:value-of select="'#'"/>
+    <t:apply-templates select="self::node ()" mode="named-params-param-id"/>
+  </t:template>
   
   <t:template match="dump:attribute" mode="h2">
-    <div class="section">
+    <div>
+      <t:attribute name="class">
+        <t:text>section</t:text>
+        <t:if test="string (@dump:access) = 'private'"> dump-access-private</t:if>
+      </t:attribute>
       <t:apply-templates select="self::node ()" mode="id-attr"/>
       <t:apply-templates select="self::node ()" mode="h2-heading"/>
       <t:apply-templates select="self::node ()" mode="hb"/>
     </div>
   </t:template>
   <t:template match="dump:attribute" mode="h4">
-    <div class="section">
+    <div>
+      <t:attribute name="class">
+        <t:text>section</t:text>
+        <t:if test="string (@dump:access) = 'private'"> dump-access-private</t:if>
+      </t:attribute>
       <t:apply-templates select="self::node ()" mode="h4-heading"/>
       <t:apply-templates select="self::node ()" mode="hb"/>
     </div>
   </t:template>
   
   <t:template match="dump:attribute" mode="hb">
+    <t:param name="ddoct:basePath">
+      <t:apply-templates select="self::node ()" mode="base-path"/>
+    </t:param>
     <t:apply-templates select="child::dump:description"/>
     <dl class="dump-info dump-info-attribute">
       <t:apply-templates select="child::dump:perlName" mode="dl"/>
@@ -1744,9 +2198,7 @@
               <dt>
                 <t:apply-templates select="child::dump:get"
                     mode="human-datatype-name">
-                  <t:with-param name="ddoct:basePath">
-                    <t:apply-templates select="self::node ()" mode="base-path"/>
-                  </t:with-param>
+                  <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
                 </t:apply-templates>
               </dt>
               <dd><t:apply-templates select="child::dump:get"
@@ -1765,9 +2217,7 @@
                 <t:call-template name="label-sep"/>
                 <t:apply-templates select="child::dump:set"
                     mode="human-datatype-name">
-                  <t:with-param name="ddoct:basePath">
-                    <t:apply-templates select="self::node ()" mode="base-path"/>
-                  </t:with-param>
+                  <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
                 </t:apply-templates>
                 <t:call-template name="label-sep"/>
                 <t:call-template name="label-param-is-optional"/>
@@ -1782,9 +2232,7 @@
               <dt>
                 <t:apply-templates select="child::dump:get"
                     mode="human-datatype-name">
-                  <t:with-param name="ddoct:basePath">
-                    <t:apply-templates select="self::node ()" mode="base-path"/>
-                  </t:with-param>
+                  <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
                 </t:apply-templates>
               </dt>
               <dd>
@@ -1792,7 +2240,10 @@
                   <t:call-template name="if-is-not-specified">
                     <t:with-param name="param">
                       <t:apply-templates select="self::node ()"
-                        mode="new-value-param-ref"/>
+                        mode="new-value-param-ref">
+                        <t:with-param name="ddoct:basePath"
+                            select="$ddoct:basePath"/>
+                      </t:apply-templates>
                     </t:with-param>
                   </t:call-template>
                   <t:apply-templates select="child::dump:get"
@@ -1805,7 +2256,10 @@
                   <t:call-template name="if-is-specified">
                     <t:with-param name="param">
                       <t:apply-templates select="self::node ()"
-                        mode="new-value-param-ref"/>
+                          mode="new-value-param-ref">
+                        <t:with-param name="ddoct:basePath"
+                            select="$ddoct:basePath"/>
+                      </t:apply-templates>
                     </t:with-param>
                   </t:call-template>
                 </p>
@@ -1815,6 +2269,8 @@
       </t:otherwise>
       </t:choose>
       <t:apply-templates select="self::node ()" mode="dl-exceptions"/>
+      <t:apply-templates select="self::node ()" mode="dl-overrides-implements"/>
+      <t:apply-templates select="self::node ()" mode="dl-examples"/>
     </dl>
   </t:template>
   <t:template match="dump:attribute" mode="h2-heading">
@@ -1908,9 +2364,49 @@
         <t:call-template name="suffix-attr"/>
       </t:otherwise>
       </t:choose>
+      <t:if test="@dump:ref">
+        <t:call-template name="suffix-inherited"/>
+      </t:if>
       <t:if test="@dump:access = 'private'">
         <t:call-template name="suffix-private"/>
       </t:if>
+    </dd>
+  </t:template>
+  <t:template match="dump:attribute[@dump:ref]" mode="dd">
+    <t:param name="ddoct:basePath" select="''"/>
+    <t:param name="def"
+        select="$anyClass/child::dump:*[local-name () = local-name (current ())]
+                [child::dump:uri/@dump:uri = string (current ()/@dump:ref)]"/>
+    <dd>
+      <t:apply-templates select="self::node ()" mode="ref">
+        <t:with-param name="ddoct:basePath">
+          <t:choose>
+          <t:when test="$ddoct:basePath">
+            <t:copy-of select="$ddoct:basePath"/>
+          </t:when>
+          <t:otherwise>
+            <t:apply-templates select="self::node ()" mode="base-path"/>
+          </t:otherwise>
+          </t:choose>
+        </t:with-param>
+        <t:with-param name="def" select="$def"/>
+      </t:apply-templates>
+      <t:choose>
+      <t:when test="$def/@dump:isReadOnly">
+        <t:call-template name="suffix-read-only-attr"/>
+      </t:when>
+      <t:otherwise>
+        <t:call-template name="suffix-attr"/>
+      </t:otherwise>
+      </t:choose>
+      <t:choose>
+      <t:when test="$def/@dump:access = 'private'">
+        <t:call-template name="suffix-inherited-private"/>
+      </t:when>
+      <t:otherwise>
+        <t:call-template name="suffix-inherited"/>
+      </t:otherwise>
+      </t:choose>
     </dd>
   </t:template>
   <t:template match="dump:attribute" mode="human-module-name-text">
@@ -1929,7 +2425,22 @@
     </t:choose>
   </t:template>
   <t:template match="dump:attribute" mode="dl-exceptions">
-    @@ exceptions
+    <t:choose>
+    <t:when test="child::dump:get/child::dump:raises or
+                  child::dump:set/child::dump:raises">
+      <dt><t:call-template name="label-exceptions"/></dt>
+      <dd>
+        <dl class="dump-children dump-children-raises">
+          <t:apply-templates
+              select="child::dump:get/child::dump:raises |
+                      child::dump:set/child::dump:raises" mode="dl"/>
+        </dl>
+      </dd>
+    </t:when>
+    <t:otherwise>
+      <dt><t:call-template name="label-no-exception"/></dt>
+    </t:otherwise>
+    </t:choose>
   </t:template>
   <t:template match="dump:attribute" mode="id">
     <t:if test="child::dump:perlName">
@@ -1989,6 +2500,10 @@
           <t:apply-templates select="self::node ()" mode="base-path"/>
         </t:with-param>
       </t:apply-templates>
+      <t:if test="@dump:isNamedParameter">
+        <t:call-template name="label-sep"/>
+        <t:call-template name="label-param-is-named"/>
+      </t:if>
       <t:if test="@dump:isNullable and
                   not (following-sibling::dump:param[not (@dump:isNullable)])">
         <t:call-template name="label-sep"/>
@@ -1997,6 +2512,7 @@
     </dt>
     <dd>
       <t:apply-templates select="self::node ()" mode="value-description"/>
+      <t:apply-templates select="self::node ()" mode="examples"/>
     </dd>
   </t:template>
   <t:template match="dump:param" mode="human-module-name">
@@ -2078,6 +2594,109 @@
       </t:attribute>
       <t:apply-templates select="self::node ()" mode="human-module-name-text"/>
     </a>
+  </t:template>
+  
+  <t:template match="dump:raises" mode="dl">
+    <t:param name="ddoct:basePath">
+      <t:apply-templates select="self::node ()" mode="base-path"/>
+    </t:param>
+    <t:variable name="def"
+        select="$anyClass
+                [child::dump:uri/@dump:uri = string (current ()/@dump:ref)]"/>
+    <dt>
+      <t:apply-templates select="$def" mode="ref">
+        <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+        <t:with-param name="short" select="true ()"/>
+      </t:apply-templates>
+    </dt>
+    <dd>
+      <t:choose>
+      <t:when test="parent::dump:get and parent::*
+                    /parent::dump:attribute/@dump:isReadOnly">
+        <p>
+          <t:call-template name="if-is-not-specified">
+            <t:with-param name="param">
+              <t:apply-templates select="parent::node ()/parent::node ()"
+                  mode="new-value-param-ref">
+                <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+              </t:apply-templates>
+            </t:with-param>
+          </t:call-template>
+        </p>
+      </t:when>
+      <t:when test="parent::dump:set">
+        <p>
+          <t:call-template name="if-is-specified">
+            <t:with-param name="param">
+              <t:apply-templates select="parent::node ()/parent::node ()"
+                  mode="new-value-param-ref">
+                <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+              </t:apply-templates>
+            </t:with-param>
+          </t:call-template>
+        </p>
+      </t:when>
+      </t:choose>
+      <t:apply-templates select="self::node ()" mode="value-description"/>
+      <t:apply-templates select="self::node ()" mode="examples"/>
+      <t:if test="child::dump:raisesCode">
+        <dl class="dump-children dump-children-raises-code">
+          <t:apply-templates select="child::dump:raisesCode" mode="dl">
+            <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+            <t:with-param name="exception" select="$def"/>
+          </t:apply-templates>
+        </dl>
+      </t:if>
+    </dd>
+  </t:template>
+  
+  <t:template match="dump:raisesCode" mode="dl">
+    <t:param name="ddoct:basePath">
+      <t:apply-templates select="self::node ()" mode="base-path"/>
+    </t:param>
+    <t:param name="exception" select="$anyClass"/>
+    <t:variable name="def"
+        select="$exception/child::dump:constGroup/child::dump:const
+                    [child::dump:uri/@dump:uri = string (current ()/@dump:ref)]"/>
+    <dt>
+      <t:apply-templates select="$def" mode="ref">
+        <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+        <t:with-param name="short" select="true ()"/>
+      </t:apply-templates>
+    </dt>
+    <dd>
+      <t:apply-templates select="self::node ()" mode="value-description"/>
+      <t:apply-templates select="self::node ()" mode="examples"/>
+      <t:if test="child::dump:raisesSubCode">
+        <dl class="dump-children dump-children-raises-sub-code">
+          <t:apply-templates select="child::dump:raisesSubCode" mode="dl">
+            <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+            <t:with-param name="exceptionCode" select="$def"/>
+          </t:apply-templates>
+        </dl>
+      </t:if>
+    </dd>
+  </t:template>
+  
+  <t:template match="dump:raisesSubCode" mode="dl">
+    <t:param name="ddoct:basePath">
+      <t:apply-templates select="self::node ()" mode="base-path"/>
+    </t:param>
+    <t:param name="exceptionCode"
+        select="$anyClass/child::dump:constGroup/child::dump:const"/>
+    <t:variable name="def"
+        select="$exceptionCode/child::dump:exceptionSubCode
+                    [child::dump:uri/@dump:uri = string (current ()/@dump:ref)]"/>
+    <dt>
+      <t:apply-templates select="$def" mode="ref">
+        <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+        <t:with-param name="short" select="true ()"/>
+      </t:apply-templates>
+    </dt>
+    <dd>
+      <t:apply-templates select="self::node ()" mode="value-description"/>
+      <t:apply-templates select="self::node ()" mode="examples"/>
+    </dd>
   </t:template>
   
   <t:template match="dump:*" mode="human-datatype-name">
@@ -2191,6 +2810,9 @@
   </t:template>
   
   <t:template match="dump:case" mode="dl">
+    <t:param name="ddoct:basePath">
+      <t:apply-templates select="self::node ()" mode="base-path"/>
+    </t:param>
     <dt>
       <t:choose>
       <t:when test="child::dump:label">
@@ -2212,11 +2834,19 @@
         <t:if test="child::dump:label | child::dump:value | child::dump:fullName">
           <t:call-template name="label-sep"/>
         </t:if>
-        <t:apply-templates select="self::node ()" mode="human-datatype-name">
-          <t:with-param name="ddoct:basePath">
-            <t:apply-templates select="self::node ()" mode="base-path"/>
-          </t:with-param>
-        </t:apply-templates>
+        <t:choose>
+        <t:when test="string (@dump:dataType) =
+                      string (parent::node ()/@dump:dataType)">
+          <t:apply-templates select="@actualDataType" mode="human-datatype-name">
+            <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+          </t:apply-templates>
+        </t:when>
+        <t:otherwise>
+          <t:apply-templates select="self::node ()" mode="human-datatype-name">
+            <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+          </t:apply-templates>
+        </t:otherwise>
+        </t:choose>
       </t:if>
     </dt>
     <dd>
@@ -2324,6 +2954,18 @@
     <code class="perl" lang="en" xml:lang="en"><var>$object</var
     >-><t:apply-templates/></code>
   </t:template>
+  <t:template match="dump:method/dump:perlName |
+                     dump:attribute/dump:perlName" mode="human-module-name-text">
+    <code class="perl" lang="en" xml:lang="en">
+      <t:attribute name="title">
+        <t:apply-templates select="parent::node ()/parent::node ()"
+            mode="human-module-name-text"/>
+        <t:text>::</t:text>
+        <t:value-of select="self::node ()"/>
+      </t:attribute>
+      <t:apply-templates/>
+    </code>
+  </t:template>
   
   <t:template match="dump:constGroup/dump:perlName" mode="human-module-title">
     <code class="perl" lang="en" xml:lang="en">:<t:apply-templates/></code>
@@ -2389,6 +3031,59 @@
     <t:if test="parent::node ()/@dump:namespaceURI">&lt;<t:value-of
         select="parent::node ()/@dump:namespaceURI"/>&gt;</t:if>
     <t:value-of select="self::node ()"/>
+  </t:template>
+
+  <t:template match="dump:exceptionSubCode/@dump:localName" mode="human-module-name">
+    <code lang="en" xml:lang="en">
+      <t:choose>
+      <t:when test="parent::node ()/@dump:namespaceURI">
+        <t:attribute name="class">uri</t:attribute>
+        <t:text>&lt;</t:text>
+        <a href="{parent::node ()/@dump:namespaceURI}{string (self::node ())}">
+          <t:value-of select="parent::node ()/@dump:namespaceURI"/>
+          <t:value-of select="self::node ()"/>
+        </a>
+        <t:text>&gt;</t:text>
+      </t:when>
+      <t:otherwise>
+        <t:attribute name="class">DOM</t:attribute>
+        <t:value-of select="self::node ()"/>
+      </t:otherwise>
+      </t:choose>
+    </code>
+  </t:template>
+  <t:template match="dump:exceptionSubCode/@dump:localName"
+      mode="human-module-name-text">
+    <t:param name="short" select="false ()"/>
+    <code lang="en" xml:lang="en">
+      <t:choose>
+      <t:when test="parent::node ()/@dump:namespaceURI">
+        <t:choose>
+        <t:when test="$short">
+          <t:attribute name="class">DOM</t:attribute>
+          <t:attribute name="title">&lt;<t:value-of
+              select="parent::node ()/@dump:namespaceURI"
+              /><t:value-of select="self::node ()"/>&gt;</t:attribute>
+        </t:when>
+        <t:otherwise>
+          <t:attribute name="class">uri</t:attribute>
+          <t:text>&lt;</t:text>
+          <t:value-of select="parent::node ()/@dump:namespaceURI"/>
+          <t:value-of select="self::node ()"/>
+          <t:text>&gt;</t:text>
+        </t:otherwise>
+        </t:choose>
+      </t:when>
+      </t:choose>
+      <t:value-of select="self::node ()"/>
+    </code>
+  </t:template>
+  <t:template match="dump:exceptionSubCode/@dump:localName"
+      mode="human-module-name-attr">
+    <t:if test="parent::node ()/@dump:namespaceURI">&lt;<t:value-of
+        select="parent::node ()/@dump:namespaceURI"/></t:if>
+    <t:value-of select="self::node ()"/>
+    <t:if test="parent::node ()/@dump:namespaceURI">&gt;</t:if>
   </t:template>
   
   <t:template match="dump:extends" mode="li">
@@ -2471,6 +3166,30 @@
       </t:otherwise>
       </t:choose>
     </dd>
+  </t:template>
+  
+  <t:template match="dump:overrides |
+                     dump:method/dump:implements |
+                     dump:attribute/dump:implements |
+                     dump:constGroup/dump:implements">
+    <t:param name="ddoct:basePath" select="''"/>
+    <t:param name="def"
+        select="$anyClass/child::dump:*
+                [child::dump:uri/@dump:uri = string (current ()/@dump:uri)]
+                [position () = 1]"/>
+    <a href="dump-{local-name ()}-ref">
+      <t:attribute name="href">
+        <t:apply-templates select="$def" mode="uri">
+          <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+        </t:apply-templates>
+      </t:attribute>
+      <t:attribute name="title">
+        <t:apply-templates select="$def" mode="human-module-name-attr"/>
+      </t:attribute>
+      <t:apply-templates select="$def/parent::dump:*" mode="human-module-name-text">
+        <t:with-param name="short" select="true ()"/>
+      </t:apply-templates>
+    </a>
   </t:template>
   
   <t:template match="*" mode="base-path">
@@ -2588,6 +3307,15 @@
   
   <t:template match="html5:ol/html5:li/@ddel:ordered"/>
   
+  <t:template match="html5:ul[child::*/ddel:listMarker] |
+                     html5:ol[child::*/ddel:listMarker]">
+    <t:element name="{local-name ()}">
+      <t:apply-templates select="@*"/>
+      <t:attribute name="class">has-marker</t:attribute>
+      <t:apply-templates select="child::node ()"/>
+    </t:element>
+  </t:template>
+  
   <t:template match="html3:note">
     <div class="{local-name ()} memo">
       <t:apply-templates select="@*"/>
@@ -2595,6 +3323,19 @@
     </div>
   </t:template>
   
+  <t:template match="ddel:TODO">
+    <div class="todo ed memo">
+      <t:apply-templates select="@*"/>
+      <t:apply-templates select="child::node ()"/>
+    </div>
+  </t:template>
+  
+  <t:template match="ddel:listMarker">
+    <span class="marker">
+      <t:apply-templates select="@*"/>
+      <t:apply-templates select="child::node ()"/>
+    </span>
+  </t:template>
   <t:template match="ddel:listContent">
     <span class="list-content">
       <t:apply-templates select="@*"/>
@@ -2602,7 +3343,7 @@
     </span>
   </t:template>
   
-  <t:template match="ddel:DOM | ddel:SGML | ddel:XML">
+  <t:template match="ddel:DOM | ddel:SGML | ddel:XML | ddel:InfoItem">
     <code class="{local-name ()}">
       <t:apply-templates select="@*"/>
       <t:apply-templates select="child::node ()"/>
@@ -2639,12 +3380,54 @@
       </t:if>
       <t:apply-templates select="child::node ()"/>
     </code>
+    
+    <t:variable name="name" select="string (self::node ())"/>
+    <t:choose>
+    <t:when test="$name = 'PLUS SIGN'">
+      <t:text> </t:text>
+      (<code class="char">+</code>)
+    </t:when>
+    </t:choose>
   </t:template>
   
   <t:template match="ddel:Perl | ddel:PerlModule">
     <code class="perl">
       <t:apply-templates select="@*"/>
       <t:apply-templates select="child::node ()"/>
+    </code>
+  </t:template>
+  
+  <t:template match="ddel:Perl[string (self::node ()) = &quot;''&quot;] |
+                     dump:value[string (self::node ()) = &quot;''&quot;]">
+    <code class="perl">
+      <t:apply-templates select="@*"/>
+      <t:apply-templates select="child::node ()"/>
+    </code>
+    <t:call-template name="suffix-empty-string"/>
+  </t:template>
+  
+  <t:template match="ddel:HE">
+    <code class="HTMLe" lang="en" xml:lang="en">
+      <t:apply-templates select="@*"/>
+      <t:apply-templates select="child::node ()"/>
+    </code>
+  </t:template>
+  
+  <t:template match="ddel:HA">
+    <code class="HTMLa" lang="en" xml:lang="en">
+      <t:apply-templates select="@*"/>
+      <t:apply-templates select="child::node ()"/>
+    </code>
+  </t:template>
+  
+  <t:template match="ddel:URI">
+    <code class="uri" lang="en" xml:lang="en">
+      <t:apply-templates select="@*"/>
+      <t:text>&lt;</t:text>
+      <a href="{string (self::node ())}">
+        <t:apply-templates select="child::node ()"/>
+      </a>
+      <t:text>&gt;</t:text>
     </code>
   </t:template>
   
@@ -2721,10 +3504,7 @@
   
   <t:template match="ddel:A[@dump:uri]">
     <t:param name="ddoct:basePath" select="''"/>
-    <t:variable name="defParent"
-        select="/child::dump:moduleSet/child::dump:module/child::dump:class |
-                /child::dump:moduleSet/child::dump:module/child::dump:interface"/>
-    <t:variable name="def" select="$defParent/child::dump:attribute
+    <t:variable name="def" select="$anyClass/child::dump:attribute
                        [child::dump:uri/@dump:uri = string (current ()/@dump:uri)]"/>
     <t:apply-templates select="self::node ()" mode="memref">
       <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
@@ -2732,7 +3512,7 @@
     </t:apply-templates>
   </t:template>
   
-  <t:template match="ddel:M | ddel:A" mode="memref">
+  <t:template match="*" mode="memref">
     <t:param name="ddoct:basePath" select="''"/>
     <t:param name="def" select="/parent::node ()"/>
     <t:choose>
@@ -2794,11 +3574,140 @@
     </t:choose>
   </t:template>
   
-  <t:template match="ddel:XA">
-    <code class="XMLa">
+  <t:template match="ddel:C[@dump:uri]">
+    <t:param name="ddoct:basePath" select="''"/>
+    <t:variable name="defParent"
+        select="/child::dump:moduleSet/child::dump:module/child::dump:class |
+                /child::dump:moduleSet/child::dump:module/child::dump:interface"/>
+    <t:variable name="def"
+        select="$defParent/child::dump:constGroup/child::dump:const
+                       [child::dump:uri/@dump:uri = string (current ()/@dump:uri)]"/>
+    <t:apply-templates select="self::node ()" mode="memref">
+      <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+      <t:with-param name="def" select="$def"/>
+    </t:apply-templates>
+  </t:template>
+  
+  <t:template match="ddel:X[@dump:uri]">
+    <t:param name="ddoct:basePath" select="''"/>
+    <t:variable name="defGParent"
+        select="/child::dump:moduleSet/child::dump:module/child::dump:class |
+                /child::dump:moduleSet/child::dump:module/child::dump:interface"/>
+    <t:variable name="defParent"
+        select="$defGParent/child::dump:constGroup/child::dump:const"/>
+    <t:variable name="def"
+        select="($defParent | $defParent/child::dump:exceptionSubCode)
+                       [child::dump:uri/@dump:uri = string (current ()/@dump:uri)]"/>
+    <t:apply-templates select="self::node ()" mode="memref">
+      <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+      <t:with-param name="def" select="$def"/>
+    </t:apply-templates>
+  </t:template>
+  
+  <t:template match="ddel:XE[@ddel:lexType =
+              'http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--TypeQName' or
+              @ddel:lexType =
+              'http://suika.fam.cx/~wakaba/archive/2004/dis/Core#NCNameOrQName'] |
+              ddel:XA[@ddel:lexType =
+              'http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--TypeQName' or
+              @ddel:lexType =
+              'http://suika.fam.cx/~wakaba/archive/2004/dis/Core#NCNameOrQName']">
+    <code>
+      <t:attribute name="class">
+        <t:text>qname </t:text>
+        <t:choose>
+        <t:when test="self::ddel:XE">XMLe</t:when>
+        <t:when test="self::ddel:XA">XMLa</t:when>
+        </t:choose>
+      </t:attribute>
+      <t:apply-templates select="@*"/>
+      <t:if test="child::ddel:prefix">
+        <t:apply-templates select="child::ddel:prefix"/>
+        <t:text>:</t:text>
+      </t:if>
+      <t:apply-templates select="child::ddel:localName"/>
+    </code>
+  </t:template>
+  <t:template match="ddel:XE/@ddel:lexType"/>
+  <t:template match="ddel:XE/@ddel:lexTypeImplied"/>
+  <t:template match="ddel:XA/@ddel:lexType"/>
+  <t:template match="ddel:XA/@ddel:lexTypeImplied"/>
+  
+  <t:template match="ddel:Q[@ddel:lexType =
+              'http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--TypeQName']">
+    <code class="qname">
+      <t:apply-templates select="@*"/>
+      <t:if test="child::ddel:prefix">
+        <t:apply-templates select="child::ddel:prefix"/>
+        <t:text>:</t:text>
+      </t:if>
+      <t:apply-templates select="child::ddel:localName"/>
+    </code>
+  </t:template>
+  <t:template match="ddel:Q/@ddel:lexType"/>
+  <t:template match="ddel:Q/@ddel:lexTypeImplied"/>
+  <t:template match="ddel:Q/@dump:namespaceURI |
+                     ddel:XE/@dump:namespaceURI |
+                     ddel:XA/@dump:namespaceURI">
+    <t:attribute name="title">
+      <t:text>&lt;</t:text>
+      <t:value-of select="self::node ()"/>
+      <t:text>&gt;</t:text>
+    </t:attribute>
+  </t:template>
+  <t:template match="ddel:prefix">
+    <code class="qname-prefix">
       <t:apply-templates select="@*"/>
       <t:apply-templates select="child::node ()"/>
     </code>
+  </t:template>
+  <t:template match="ddel:localName">
+    <code class="qname-local-name">
+      <t:apply-templates select="@*"/>
+      <t:apply-templates select="child::node ()"/>
+    </code>
+  </t:template>
+  
+  <t:template match="child::ddel:ps">
+    <div class="paragraphs">
+      <t:apply-templates select="@*"/>
+      <t:apply-templates/>
+    </div>
+  </t:template>
+  
+  <t:template match="child::ddel:eg">
+    <div class="example">
+      <t:apply-templates select="@*"/>
+      <t:apply-templates/>
+    </div>
+  </t:template>
+  
+  <t:template match="child::doc:fig">
+    <div class="fig">
+      <t:apply-templates select="@*"/>
+      <t:apply-templates/>
+    </div>
+  </t:template>
+  
+  <t:template match="child::doc:example">
+    <div class="fig example">
+      <t:apply-templates select="@*"/>
+      <t:apply-templates/>
+    </div>
+  </t:template>
+  
+  <t:template match="child::doc:figBody">
+    <div class="fig-body">
+      <t:apply-templates select="@*"/>
+      <t:apply-templates/>
+    </div>
+  </t:template>
+  
+  <t:template match="child::doc:caption">
+    <div class="caption">
+      <t:apply-templates select="@*"/>
+      <t:apply-templates/>
+    </div>
   </t:template>
   
   <t:template match="sw010:src">
@@ -2810,10 +3719,29 @@
     </cite>
   </t:template>
   
+  <t:template match="sw010:csection">
+    <cite class="section">
+      <t:apply-templates select="@*"/>
+      <t:apply-templates select="child::node ()"/>
+    </cite>
+  </t:template>
+  
   <t:template match="rfc2119:*[string-length () = 0]">
     <em class="rfc2119" lang="en" xml:lang="en">
       <t:value-of select="local-name ()"/>
     </em>
+  </t:template>
+  <t:template match="rfc2119:MUST-NOT[string-length () = 0]">
+    <em class="rfc2119" lang="en" xml:lang="en">MUST NOT</em>
+  </t:template>
+  <t:template match="rfc2119:SHOULD-NOT[string-length () = 0]">
+    <em class="rfc2119" lang="en" xml:lang="en">SHOULD NOT</em>
+  </t:template>
+  <t:template match="rfc2119:MAY-NOT[string-length () = 0]">
+    <em class="rfc2119" lang="en" xml:lang="en">MAY NOT</em>
+  </t:template>
+  <t:template match="rfc2119:SHALL-NOT[string-length () = 0]">
+    <em class="rfc2119" lang="en" xml:lang="en">SHALL NOT</em>
   </t:template>
   
   <t:template match="@xml:lang">
@@ -3048,6 +3976,9 @@
     <t:apply-templates select="self::node ()" mode="unknown"/>
   </t:template>
   
+  <t:template match="*" mode="dl-examples"/>
+  <t:template match="*" mode="examples"/>
+  
   <t:template match="@*" mode="unknown">
     <span>
       <code>
@@ -3068,7 +3999,7 @@
   </t:template>
 </t:stylesheet>
 
-<!-- Revision: $Date: 2005/09/05 15:09:58 $ -->
+<!-- Revision: $Date: 2005/09/09 04:20:51 $ -->
 
 <!-- ***** BEGIN LICENSE BLOCK *****
    - Copyright 2005 Wakaba <w@suika.fam.cx>.  All rights reserved.
