@@ -44,7 +44,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/09 04:26:05 $
+      $Date: 2005/09/17 15:03:02 $
     @@ContentType:
       dis:Date.RCS
 
@@ -245,6 +245,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:DOMAttrSet
+
 ElementTypeBinding:
   @Name: InCase
   @ElementType:
@@ -252,6 +253,16 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:InCase
+
+ElementTypeBinding:
+  @Name: nullCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@is-null:1
 
 ElementTypeBinding:
   @Name: PerlDef
@@ -1106,7 +1117,7 @@ NodeTypeDef:
     @@lang:en
     @@@:
       A notation declaration in the DTD or 
-      the notation information item in the XML Infoset.
+      the <InfoItem::notation information item> in the XML Infoset.
     \
       DOM Levels 1 to 3 do not support editing <IF::Notation> nodes so that 
       all <IF::Notation> nodes are read-only.
@@ -1165,7 +1176,7 @@ NodeTypeDef:
         The base URI of this node.
         \
         For the <IF::Notation> node, it is the <InfosetP::declaration base URI> 
-        of the notation information item.
+        of the <InfoItem::notation information item>.
     @@Type:
       DOMMain:DOMString
     @@actualType:
@@ -1485,7 +1496,7 @@ NodeTypeDef:
         @@@Description:
           @@@@lang:en
           @@@@@: The notation name.
-        @@@ImplNote:
+        @@@InCase:
           @@@@Value:
             @@@@@is-null:1
           @@@@Description:
@@ -1617,7 +1628,7 @@ NodeTypeDef:
         The base URI of this node.
         \
         For the <IF::Entity> node, it is the <InfosetP::declaration base URI> 
-        of the unparsed entity information item.
+        of the <InfoItem::unparsed entity information item>.
     @@Get:
       @@@Type:
         DOMMain:DOMString
@@ -1856,7 +1867,7 @@ NodeTypeDef:
       In DOM Levels 1 to 3, an <IF::EntityReference> node and all 
       descendants are read-only.
     \
-      Note that <IF::EntitiReference> nodes may cause normalization 
+      Note that <IF::EntityReference> nodes may cause normalization 
       problems when the normalization is performed after 
       entity references are expanded.
   @ImplNote:
@@ -1884,8 +1895,8 @@ NodeTypeDef:
         The base URI of this node.
         \
         For the <IF::EntityReference> node, it is the 
-        <InfosetP::declaration base URI> of the unexpanded entity 
-        reference information item.
+        <InfosetP::declaration base URI> of the <InfoItem::unexpanded entity 
+        reference information item>.
     @@Get:
       @@@Type:
         DOMMain:DOMString

@@ -27,7 +27,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/09 04:26:05 $
+      $Date: 2005/09/17 15:03:02 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1450,7 +1450,8 @@ StringDataTypeDef:
       <TYPE::ManakaiDOMNamespaceURI>, the Perl code to check the empty 
       string is outputed as part of the implementation.
 
-  @DISLang:InputProcessor:
+  @ResourceDef:
+    @@rdf:type: DISLang|InputProcessor
     @@PerlDef:
       if (CORE::defined $INPUT and CORE::length $INPUT == 0) {
         __WARNING{MDOMX:MDOM_NS_EMPTY_URI::
@@ -1548,7 +1549,8 @@ StringDataTypeDef:
       to an array whose items are key identifier strings as well as 
       a plain string of identifiers.
 
-  @DISLang:InputProcessor:
+  @ResourceDef:
+    @@rdf:type: DISLang|InputProcessor
     @@PerlDef:
       if (CORE::defined $INPUT) {
         unless (CORE::ref $INPUT) {
@@ -1563,7 +1565,8 @@ StringDataTypeDef:
   @FullName:
     @@lang:en
     @@@: XML Name
-  @DISLang:InputProcessor:
+  @ResourceDef:
+    @@rdf:type: DISLang|InputProcessor
     @@PerlDef: \
 
   @ResourceDef:
@@ -1637,7 +1640,8 @@ StringDataTypeDef:
     @@lang:en
     @@@: XML NCName
 
-  @DISLang:InputProcessor:
+  @ResourceDef:
+    @@rdf:type: DISLang|InputProcessor
     @@PerlDef:\
 
   @ResourceDef:
@@ -1830,7 +1834,8 @@ StringDataTypeDef:
   @enLabel:
     XML 1.0 QName
   
-  @DISLang:InputProcessor:
+  @ResourceDef:
+    @@rdf:type: DISLang|InputProcessor
     @@PerlDef:
       unless (<Code::DOMMain:testXML10Name:: $INPUT = $INPUT>) {
         __EXCEPTION{MDOMX:MDOM_BAD_NAME::
@@ -1874,7 +1879,8 @@ StringDataTypeDef:
   @enLabel:
     XML 1.1 QName
   
-  @DISLang:InputProcessor:
+  @ResourceDef:
+    @@rdf:type: DISLang|InputProcessor
     @@PerlDef:
       unless (<Code::DOMMain:testXML11Name:: $INPUT = $INPUT>) {
         __EXCEPTION{MDOMX:MDOM_BAD_NAME::

@@ -2,6 +2,9 @@ MANAKAI_ROOT_DIR = ../../../
 MANAKAI_BIN_DIR = $(MANAKAI_ROOT_DIR)bin/
 MANAKAI_LIB_DIR = $(MANAKAI_ROOT_DIR)lib/
 
+DAC_SUFFIX = .dac
+PM_SUFFIX = .pm
+
 CD = cd
 MAKE = make
 RM = rm
@@ -27,26 +30,26 @@ DAC2PM_OPTIONS = $(DAC2PM_OPTIONS3)
 DAC2PM_PL = $(MANAKAI_BIN_DIR)dac2pm.pl
 DAC2PM = $(PERL_) $(DAC2PM_PL) $(DAC2PM_OPTIONS)
 
-DOM_CORE_DAC_FILE = $(MANAKAI_LIB_DIR)Message/DOM/core.dac
+DOM_CORE_DAC_FILE = $(MANAKAI_LIB_DIR)Message/DOM/core$(DAC_SUFFIX)
 
 DIS_FILES = SuikaWikiConfig21.dis
 
-GENERATED_FILES = all.dac SuikaWikiConfig21.pm
+GENERATED_FILES = all$(DAC_SUFFIX) SuikaWikiConfig21$(PM_SUFFIX)
 
 all: $(GENERATED_FILES)
 
-all.dac: $(DOM_CORE_DAC_FILE) $(DIS_FILES) $(DAC_PL)
+all$(DAC_SUFFIX): $(DOM_CORE_DAC_FILE) $(DIS_FILES) $(DAC_PL)
 	$(DAC)$@ --input-db-file-name="$<" SuikaWikiConfig21.dis
 
-SuikaWikiConfig21.pm: all.dac $(DAC2PM_PL)
+SuikaWikiConfig21$(PM_SUFFIX): all$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< \
 	  --module-uri="$(NS_MARKUP)SuikaWikiConfig21" \
 	  --output-file-path="$@"
 	$(PERL_CHK) $@
 
 # $(DOM_CORE_DAC_FILE)
-$(MANAKAI_LIB_DIR)Message/DOM/core.dac: dummy
-	$(CD) $(MANAKAI_LIB_DIR)Message/DOM/ && $(MAKE) core.dac
+$(MANAKAI_LIB_DIR)Message/DOM/core$(DAC_SUFFIX): dummy
+	$(CD) $(MANAKAI_LIB_DIR)Message/DOM/ && $(MAKE) core$(DAC_SUFFIX)
 
 dummy:
 

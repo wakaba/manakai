@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/09/09 04:26:09 $
+      $Date: 2005/09/17 15:03:04 $
     @@ContentType:
       dis:Date.RCS
   
@@ -72,6 +72,10 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @DOMMetaImpl:
     http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
+  @dp:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Perl/
+  @dv:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Value/
   @html3:
     urn:x-suika-fam-cx:markup:ietf:html:3:draft:00:
   @html5:
@@ -332,22 +336,19 @@ IFClassDef:
           No full name for this resource.
       @@@PerlDef:
         __DEEP{
-          if ($self->{o}->{src}) {
-            my $fn = $self->{o}->{src}
-                          -><M::DIS:ManakaiDISElement.disGetAttribute>
-                                 (<Q::dis:FullName>,
-                                  for_arg => $self->{o}->{for},
-                                  forp_arg => $self->{o}->{forp});
-            if ($fn) {
-              $r = $fn-><M::DIS:ManakaiDISElement.getFeature> (<Q::DIS:Doc>)
-                      -><M::ManakaiDISElementDISDoc.getDISDocTree>
+          my $fn = $self->{o}-><M::DIS|DISResourceProp.getPropertyValue>
+                                   (<Q::dis:FullName>);
+          if ($fn) {
+            $r = $fn-><AG::dv|DVValue.value>
+                    -><M::DIS|DOMMinImpl.getFeature> (<Q::DIS:Doc>)
+                    -><M::DISElementDISDoc.getDISDocTree>
                               ($ownerDocumentArg, <Q::lang:disdocInline>,
+                               $self->{o}-><M::DIS|DISAnyResource.database>,
                                for_arg => $self->{o}->{for},
                                forp_arg => $self->{o}->{forp},
                                default_name_uri => $self->{o}->{nameURI} ||
                                             $self->{o}->{<Q::DIS:sourceNodeID>},
                                default_for_uri => $self->{o}->{for});
-            }
           }
         }__;
 
@@ -369,11 +370,11 @@ IFClassDef:
         @@@@enDesc:
           The result will not contains any implementor's notes.
     @@NamedParam:
-      @@@Name: parentElementArg
+      @@@Name: parentValueArg
       @@@enDesc:
         The <QUOTE::dis> element node in which description elements
         might be contained.
-      @@@Type: DIS|ManakaiDISElement
+      @@@Type: dv|DVValue
       @@@nullCase:
         @@@@enDesc:
           The <QUOTE::natural> element node is selected.
@@ -386,29 +387,31 @@ IFClassDef:
       @@@PerlDef:
         __DEEP{
           $r = $ownerDocumentArg-><M::Document.createDocumentFragment>;
-          $parentElementArg ||= $self->{o}->{src};
-          if ($parentElementArg) {
             my @el = ([]); # $el[0] is dummy
             my %el;
-            for my $c (@{$parentElementArg
-                              -><M::DIS:ManakaiDISElement.disChildElements>
-                                  (for_arg => $self->{o}->{for},
-                                   forp_arg => $self->{o}->{forp})}) {
-              if ($c-><M::DIS:ManakaiDISElement.elementTypeMatch>
-                                  (<Q::dis:Description>) or
-                  ($withImplNote and
-                   $c-><M::DIS:ManakaiDISElement.elementTypeMatch>
-                                  (<Q::dis:ImplNote>))) {
-                my $d = $c-><M::DIS:ManakaiDISElement.getFeature> (<Q::DIS:Doc>);
-                my $id = $d-><M::ManakaiDISElementDISDoc.documentationGroupId>
+            my @c;
+            if ($parentValueArg) {
+              push @c, @{$parentValueArg-><M::dv|DVValue.getProperty>
+                                   (<Q::dis:Description>) || []};
+              push @c, @{$parentValueArg-><M::dv|DVValue.getProperty>
+                                   (<Q::dis:ImplNote>) || []} if $withImplNote;
+            } else {
+              push @c, @{$self-><M::DIS|DISResourceProp.getPropertyValueList>
+                                   (<Q::dis:Descriotion>)};
+              push @c, @{$self-><M::DIS|DISResourceProp.getPropertyValueList>
+                                   (<Q::dis:ImplNote>)} if $withImplNote;
+            }
+            for my $c (@c) {
+              my $d = $c-><AG::dv|DVValue.value>
+                        -><M::DIS:ManakaiDISElement.getFeature> (<Q::DIS:Doc>);
+              my $id = $d-><M::ManakaiDISElementDISDoc.documentationGroupId>
                                   (for_arg => $self->{o}->{for},
                                    forp_arg => $self->{o}->{forp});
-                if ($el{$id}) {
-                  push @{$el[$el{$id}]}, $d;
-                } else {
-                  $el{$id} = @el;
-                  push @el, [$d];
-                }
+              if ($el{$id}) {
+                push @{$el[$el{$id}]}, $d;
+              } else {
+                $el{$id} = @el;
+                push @el, [$d];
               }
             } # children
 
@@ -421,6 +424,7 @@ IFClassDef:
               next unless $el;
               my $elr = $el-><M::ManakaiDISElementDISDoc.getDISDocTree>
                               ($ownerDocumentArg, <Q::lang:disdoc>,
+                               $self->{o}-><M::DIS|DISAnyResource.database>,
                                for_arg => $self->{o}->{for},
                                forp_arg => $self->{o}->{forp},
                                default_name_uri => $self->{o}->{nameURI} ||
@@ -444,7 +448,7 @@ IFClassDef:
                 $r-><M::Node.appendChild> ($elr);
               }
             } # groups
-          }
+
         }__;
 ##DISAnyResourceDoc
 
@@ -483,23 +487,19 @@ IFClassDef:
           No label for this resource.
       @@@PerlDef:
         __DEEP{
-          if ($self->{o}->{src}) {
-            my $fn = $self->{o}->{src}
-                          -><M::DIS:ManakaiDISElement.disGetAttribute>
-                                 (<Q::dis:Label>,
-                                  for_arg => $self->{o}->{for},
-                                  forp_arg => $self->{o}->{forp});
-            if ($fn) {
-              ## TODO: Conneg
-              $r = $fn-><M::DIS:ManakaiDISElement.getFeature> (<Q::DIS:Doc>)
-                      -><M::ManakaiDISElementDISDoc.getDISDocTree>
+          my $fn = $self->{o}-><M::DIS|DISResourceProp.getPropertyValue>
+                                   (<Q::dis:Label>);
+          if ($fn) {
+            $r = $fn-><AG::dv|DVValue.value>
+                    -><M::DIS|DOMMinImpl.getFeature> (<Q::DIS:Doc>)
+                    -><M::DISElementDISDoc.getDISDocTree>
                               ($ownerDocumentArg, <Q::lang:disdocInline>,
+                               $self->{o}-><M::DIS|DISAnyResource.database>,
                                for_arg => $self->{o}->{for},
                                forp_arg => $self->{o}->{forp},
                                default_name_uri => $self->{o}->{nameURI} ||
                                             $self->{o}->{<Q::DIS:sourceNodeID>},
                                default_for_uri => $self->{o}->{for});
-            }
           }
         }__;
 ##DISResourceDISDoc
@@ -639,7 +639,7 @@ IFClassDef:
         if ($lang) {
           my $v = $lang-><M::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
           if (defined $v and not ref $v eq 'ARRAY') {
-            $r = $lang-><M::DIS|ManakaiDISElement.qnameToURI>
+            $r = $lang-><M::DIS|NSResolverDIS.qnameToURI>
                              ($v, node => $self,
                               default_namespace_uri => <Q::ilang:>);
           } else {
@@ -689,7 +689,7 @@ IFClassDef:
         if ($lang) {
           my $v = $lang-><M::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
           if (defined $v and not ref $v eq 'ARRAY') {
-            $r = $lang-><M::DIS|ManakaiDISElement.qnameToURI>
+            $r = $lang-><M::DIS|NSResolverDIS.qnameToURI>
                              ($v, node => $self,
                               default_namespace_uri => <Q::script:>);
           } else {
@@ -723,6 +723,11 @@ IFClassDef:
         does not have the language information.
       @@@nullCase:
         @@@@enDesc: No default language.
+    @@Param:
+      @@@Name: disDatabase
+      @@@Type: DIS|DISDatabase
+      @@@enDesc:
+        A <QUOTE::dis> database.
     @@ForParam:
     @@ForpParam:
     @@Return:
@@ -739,10 +744,11 @@ IFClassDef:
             unless (defined $ct) {
               $r = false;
             } else {
-              my $res = $self-><AG::DIS|ManakaiDISNode.ownerDISDocument>
-                                 -><AG::DIS|ManakaiDISDocument.disDatabase>
+              my $res = ($disDatabase ||
+                         $self-><AG::DIS|ManakaiDISNode.ownerDISDocument>
+                                 -><AG::DIS|ManakaiDISDocument.disDatabase>)
                                  -><M::DIS|ManakaiDISDatabase.getResource> ($ct);
-              $res-><AS::DIS|ManakaiDISResourceDefinition.isReferred> ($self);
+              $res-><AS::DIS|DISAnyResource.isReferred> ($self);
               unless ($res-><M::DIS:ManakaiDISResourceDefinition
                                                .isSubsetOfURI> ($langURI)) {
                 $r = false;
@@ -780,6 +786,11 @@ IFClassDef:
       @@@nullCase:
         @@@@enDesc:
           No default script information.
+    @@Param:
+      @@@Name: disDatabase
+      @@@Type: DIS|DISDatabase
+      @@@enDesc:
+        A <QUOTE::dis> database.
     @@ForParam:
     @@ForpParam:
     @@Return:
@@ -796,10 +807,11 @@ IFClassDef:
             unless (defined $ct) {
               $r = false;
             } else {
-              my $res = $self-><AG::DIS|ManakaiDISNode.ownerDISDocument>
-                                 -><AG::DIS|ManakaiDISDocument.disDatabase>
+              my $res = ($disDatabase ||
+                         $self-><AG::DIS|ManakaiDISNode.ownerDISDocument>
+                                 -><AG::DIS|ManakaiDISDocument.disDatabase>)
                                  -><M::DIS|ManakaiDISDatabase.getResource> ($ct);
-              $res-><AS::DIS|ManakaiDISResourceDefinition.isReferred> ($self);
+              $res-><AS::DIS|DISAnyResource.isReferred> ($self);
               unless ($res-><M::DIS:ManakaiDISResourceDefinition
                                                .isSubsetOfURI> ($scriptURI)) {
                 $r = false;
@@ -828,6 +840,11 @@ IFClassDef:
         @@@@enDesc:
           The <QUOTE::disdoc> documentation language, i.e. <Q::lang:disdoc>,
           is the default of the default.
+    @@Param:
+      @@@Name: disDatabase
+      @@@Type: DIS|DISDatabase
+      @@@enDesc:
+        A <QUOTE::dis> database to evaluate the content.
     @@ForParam:
     @@ForpParam:
     @@NamedParam:
@@ -858,14 +875,15 @@ IFClassDef:
                                 (default_media_type => $defaultMediaType,
                                  for_arg => $forArg,
                                  forp_arg => $forpArg);
-          my $ct = $self-><AG::DIS|ManakaiDISNode.ownerDISDocument>
-                                -><AG::DIS|ManakaiDISDocument.disDatabase>
+          my $ct = ($disDatabase ||
+                    $self-><AG::DIS|ManakaiDISNode.ownerDISDocument>
+                                -><AG::DIS|ManakaiDISDocument.disDatabase>)
                                 -><M::DIS|ManakaiDISDatabase.getResource> ($ctu);
           if ($ct-><M::DIS:ManakaiDISResourceDefinition.isSubsetOfURI>
                                 (<Q::lang:disdoc>)) {
             my $doc = $ownerDocumentArg-><M::Node.getFeature> (<Q::DIS|Doc>);
             $r = $doc-><M::ManakaiDOMDocumentDISDoc.parseDISDocText>
-                         ($self, $self-><M::SWCFGNode.value>,
+                         ($self, $self-><M::SWCFGNode.value>, $disDatabase,
                           node => $self,
                           language_uri => $self-><M::ManakaiDISElementDISDoc
                              .languageURI> (null, for_arg => $forArg,
@@ -879,7 +897,7 @@ IFClassDef:
                                 (<Q::lang:disdocInline>)) {
             my $doc = $ownerDocumentArg-><M::Node.getFeature> (<Q::DIS|Doc>);
             $r = $doc-><M::ManakaiDOMDocumentDISDoc.parseDISDocInlineText>
-                             ($self, $self-><M::SWCFGNode.value>,
+                             ($self, $self-><M::SWCFGNode.value>, $disDatabase,
                           node => $self,
                           language_uri => $self-><M::ManakaiDISElementDISDoc
                              .languageURI> (null, for_arg => $forArg,
@@ -956,11 +974,16 @@ IFClassDef:
     @@Type: DIS|AnyURI
     @@Get:
       @@@PerlDef:
-          __DEEP{
+        __DEEP{
+          if (defined $self->{<Q::TreeCore:node>}
+                           ->{<Q::DIS|defaultNamespaceURI>}) {
+            $r = $self->{<Q::TreeCore:node>}->{<Q::DIS|defaultNamespaceURI>};
+          } else {
             $r = ($self-><AG::DIS|ManakaiDISNode.ownerDISDocument> || $self)
                        -><AG::DIS|ManakaiDISDocument.moduleElement>
                        -><AG::DIS|ManakaiDISModuleElement.definingNamespaceURI>;
-          }__;
+          }
+        }__;
 
   @Attr:
     @@ForCheck: ManakaiDOM|ForClass
@@ -1108,6 +1131,11 @@ IFClassDef:
       @@@Type: disdocBlocks
       @@@enDesc:
         A <QUOTE::disdoc> block-level fragment.
+    @@Param:
+      @@@Name: disDatabase
+      @@@Type: DIS|DISDatabase
+      @@@enDesc:
+        A <QUOTE::dis> database.
     @@NamedParam:
       @@@Name: node
       @@@Type: DIS|ManakaiDISElement
@@ -1158,11 +1186,13 @@ IFClassDef:
         @@@@enDesc:
           An end tag is not found where it is required.
       @@@RaiseException:
-        @@@@@:DOMCore|DOMException.INVALID_CHARACTER_ERR
+        @@@@@:
+          DOMCore|DOMException||ManakaiDOM|ManakaiDOMLatest.INVALID_CHARACTER_ERR
         @@@@enDesc:
           An illegular element type name is specified.
       @@@RaiseException:
-        @@@@@:DOMCore|DOMException.NAMESPACE_ERR
+        @@@@@:
+          DOMCore|DOMException||ManakaiDOM|ManakaiDOMLatest.NAMESPACE_ERR
         @@@@enDesc:
           An illegular element type name is specified.
       @@@PerlDef:
@@ -1178,7 +1208,8 @@ IFClassDef:
                             ($ownerDocumentArg-><M::Document.createElementNS>
                                                   (<Q::ddel:>, 'disdocBlocks'));
         if ($node) {
-          my $db = $node-><AG::DIS|ManakaiDISNode.ownerDISDocument>
+          my $db = $disDatabase ||
+                   $node-><AG::DIS|ManakaiDISNode.ownerDISDocument>
                         -><AG::DIS|ManakaiDISDocument.disDatabase>;
           if (defined $languageURI) {
             my $lang = $db-><M::DIS|ManakaiDISDatabase
@@ -1282,7 +1313,7 @@ IFClassDef:
                                   (<Q::ddel:>, 'ddel:listMarker'));
                 $m-><M::Node.appendChild>
                          ($self-><M::DocumentDISDoc.parseDISDocInlineText>
-                           ($namespaceContext, $1,
+                           ($namespaceContext, $1, $disDatabase,
                             node => $node, language_uri => null,
                             script_uri => null,
                             default_name_uri => $defaultNameURI,
@@ -1295,7 +1326,7 @@ IFClassDef:
                                   (<Q::ddel:>, 'ddel:listContent'));
               $current-><M::Node.appendChild>
                        ($self-><M::DocumentDISDoc.parseDISDocInlineText>
-                         ($namespaceContext, $s,
+                         ($namespaceContext, $s, $disDatabase,
                           node => $node, language_uri => null,
                           script_uri => null,
                           default_name_uri => $defaultNameURI,
@@ -1315,10 +1346,12 @@ IFClassDef:
                               ({
                                  <Q::ddel:NOTE> => <Q::html3:>,
                                  <Q::ddel:P> => <Q::html5:>,
+                                 <Q::ddel:VAR> => <Q::html5:>,
                                }->{$ns.$ln} || $ns,
                                {
                                  <Q::ddel:NOTE> => 'H3:note',
                                  <Q::ddel:P> => 'p',
+                                 <Q::ddel:VAR> => 'var',
                                }->{$ns.$ln} || $nsp.$ln));
               $current-><M::Element.setAttributeNS>
                               (<Q::ddel:>, 'ddel:tag' => 'block');
@@ -1326,6 +1359,7 @@ IFClassDef:
               ## Implied "p" start
               if ({
                 <Q::ddel:eg> => true,
+                <Q::ddel:ISSUE> => true,
                 <Q::ddel:NOTE> => true,
                 <Q::html3:note> => true,
                 <Q::ddel:TODO> => true,
@@ -1338,7 +1372,7 @@ IFClassDef:
               }
               $current-><M::Node.appendChild>
                      ($self-><M::DocumentDISDoc.parseDISDocInlineText>
-                       ($namespaceContext, $s,
+                       ($namespaceContext, $s, $disDatabase,
                         node => $node, language_uri => null,
                         script_uri => null,
                         default_name_uri => $defaultNameURI,
@@ -1430,7 +1464,7 @@ IFClassDef:
                                   (<Q::ddel:>, 'ddel:listMarker'));
               $m-><M::Node.appendChild>
                          ($self-><M::DocumentDISDoc.parseDISDocInlineText>
-                           ($namespaceContext, $1,
+                           ($namespaceContext, $1, $disDatabase,
                             node => $node, language_uri => null,
                             script_uri => null,
                             default_name_uri => $defaultNameURI,
@@ -1443,7 +1477,7 @@ IFClassDef:
                                   (<Q::ddel:>, 'ddel:listContent'));
             $lc-><M::Node.appendChild>
                        ($self-><M::DocumentDISDoc.parseDISDocInlineText>
-                         ($namespaceContext, $s,
+                         ($namespaceContext, $s, $disDatabase,
                           node => $node, language_uri => null,
                           script_uri => null,
                           default_name_uri => $defaultNameURI,
@@ -1466,7 +1500,7 @@ IFClassDef:
                                 (<Q::ddel:>, 'ddel:tag' => 'implied');
             $p-><M::Node.appendChild>
                        ($self-><M::DocumentDISDoc.parseDISDocInlineText>
-                         ($namespaceContext, $s,
+                         ($namespaceContext, $s, $disDatabase,
                           node => $node, language_uri => null,
                           script_uri => null,
                           default_name_uri => $defaultNameURI,
@@ -1504,6 +1538,11 @@ IFClassDef:
       @@@Type: lang|disdocInline||ManakaiDOM|all
       @@@enDesc:
         A <QUOTE::disdoc> inline-level fragment.
+    @@Param:
+      @@@Name: disDatabase
+      @@@Type: DIS|DISDatabase
+      @@@enDesc:
+        A <QUOTE::dis> database.
     @@NamedParam:
       @@@Name: node
       @@@Type: DIS|ManakaiDISElement
@@ -1552,11 +1591,13 @@ IFClassDef:
         @@@@enDesc:
           An end tag is not found where it is required.
       @@@RaiseException:
-        @@@@@:DOMCore|DOMException.INVALID_CHARACTER_ERR
+        @@@@@:
+          DOMCore|DOMException||ManakaiDOM|ManakaiDOMLatest.INVALID_CHARACTER_ERR
         @@@@enDesc:
           An illegular element type name is specified.
       @@@RaiseException:
-        @@@@@:DOMCore|DOMException.NAMESPACE_ERR
+        @@@@@:
+          DOMCore|DOMException||ManakaiDOM|ManakaiDOMLatest.NAMESPACE_ERR
         @@@@enDesc:
           An illegular element type name is specified.
       @@@PrefixException:
@@ -1578,7 +1619,8 @@ IFClassDef:
                            (<Q::ddel:>, 'ddel:tag' => 'entity');
         }
         if ($node) {
-          my $db = $node-><AG::DIS|ManakaiDISNode.ownerDISDocument>
+          my $db = $disDatabase ||
+                   $node-><AG::DIS|ManakaiDISNode.ownerDISDocument>
                         -><AG::DIS|ManakaiDISDocument.disDatabase>;
           if (defined $languageURI) {
             my $lang = $db-><M::DIS|ManakaiDISDatabase

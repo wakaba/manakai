@@ -31,7 +31,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/09 04:26:05 $
+      $Date: 2005/09/17 15:03:02 $
     @@ContentType:
       dis:Date.RCS
 
@@ -1242,24 +1242,14 @@ IFDef:
             @@@@@lang:en
             @@@@@@:
               The <IF::LSParser> is asynchronous.
-        @@@Exception:
-           @@@@Name:  INVALID_STATE_ERR
-           @@@@Type:
-              DOMCore:DOMException
-           @@@@SubType:
-             @@@@@QName:
-               ManakaiDOMLS:MDOMLS_BUSY
-             @@@@@Description:
-               @@@@@@lang:en
-               @@@@@@@:
-                 <A::LSParser.busy> is <DOM::true>.
-        @@@Exception:
-           @@@@Name:  PARSE_ERR
-           @@@@Type:  LSException
-           @@@@Description:
-             @@@@@lang:en
-             @@@@@@:
-               The <IF::LSParser> was unable to load the XML document. 
+        @@@ManakaiDOM:raises:
+          @@@@@: ManakaiDOMLS|MDOMLS_BUSY
+          @@@@enDesc:
+            <A::LSParser.busy> is <DOM::true>.
+        @@@ManakaiDOM:raises:
+          @@@@@: LSException.PARSE_ERR
+          @@@@enDesc:
+            The <IF::LSParser> was unable to load the XML document. 
            @@@@ImplNote:
              @@@@@lang:en
              @@@@@@:
@@ -1304,24 +1294,15 @@ IFDef:
             @@@@@lang:en
             @@@@@@:
               The <IF::LSParser> is asynchronous.
-        @@@Exception:
-           @@@@Name:  INVALID_STATE_ERR
-           @@@@Type:
-              DOMCore:DOMException
-           @@@@SubType:
-             @@@@@QName:
-               ManakaiDOMLS:MDOMLS_BUSY
-             @@@@@Description:
-               @@@@@@lang:en
-               @@@@@@@:
-                 <A::LSParser.busy> is <DOM::true>.
-        @@@Exception:
-           @@@@Name:  PARSE_ERR
-           @@@@Type:  LSException
-           @@@@Description:
-             @@@@@lang:en
-             @@@@@@:
-               The <IF::LSParser> was unable to load the XML document. 
+        @@@ManakaiDOM:raises:
+          @@@@@:
+            ManakaiDOMLS:MDOMLS_BUSY
+          @@@@enDesc:
+            <A::LSParser.busy> is <DOM::true>.
+        @@@ManakaiDOM:raises:
+          @@@@@: LSException.PARSE_ERR
+          @@@@enDesc:
+            The <IF::LSParser> was unable to load the XML document. 
            @@@@ImplNote:
              @@@@@lang:en
              @@@@@@:
@@ -1373,13 +1354,10 @@ IFDef:
            DOMMain:unsigned-short||ManakaiDOM|all
      @@Return:
         @@@Type:  Node
-        @@@Exception:
-           @@@@Name:  ** TBD **
-           @@@@Type:
-              DOMCore:DOMException
-        @@@Exception:
-           @@@@Name:  ** TBD **
-           @@@@Type:  LSException
+        @@@ImplNote:
+           DOMCore:DOMException.***_ERR
+        @@@ImplNote:
+           LSException.***_ERR
   @Method:
      @@Name:  abort
      @@Description:
@@ -2395,13 +2373,10 @@ IFDef:
                implementation kept serializing the document; 
                the result of the serialization being 
                implementation dependent then.
-        @@@Exception:
-           @@@@Name:  SERIALIZE_ERR
-           @@@@Type:  LSException
-           @@@@Description:
-             @@@@@lang:en
-             @@@@@@:
-               The serializer was unable to serialize the node. 
+        @@@ManakaiDOM:raises:
+          @@@@@: LSException.SERIALIZE_ERR
+          @@@@enDesc:
+            The serializer was unable to serialize the node. 
            @@@@ImplNote:
              @@@@@lang:en
              @@@@@@:
@@ -2468,13 +2443,10 @@ IFDef:
                The normal processing was stopped but the implementation 
                kept serializing the document; the result of the serialization 
                is implementation dependent then.
-        @@@Exception:
-           @@@@Name:  SERIALIZATION_ERR
-           @@@@Type:  LSException
-           @@@@Description:
-             @@@@@lang:en
-             @@@@@@:
-               The serializer was unable to serialize the node.
+        @@@ManakaiDOM:raises:
+          @@@@@: LSException.SERIALIZE_ERR
+          @@@@enDesc:
+            The serializer was unable to serialize the node.
   @Method:
      @@Name:  writeToString
      @@Description:
@@ -2499,22 +2471,15 @@ IFDef:
         @@@Description:
           @@@@lang:en
           @@@@@: The serialized data.
-        @@@Exception:
-           @@@@Name:  DOMSTRING_SISE_ERR
-           @@@@Type:
-              DOMCore:DOMException
-           @@@@Description:
-             @@@@@lang:en
-             @@@@@@:
-               The resulting string is too long to fit in a
-               <TYPE::DOMMain:DOMString>.
-        @@@Exception:
-           @@@@Name:  SERIALIZE_ERR
-           @@@@Type:  LSException
-           @@@@Description:
-             @@@@@lang:en
-             @@@@@@:
-               The serializer was unable to serialize the node.
+        @@@ManakaiDOM:raises:
+          @@@@@: DOMCore|DOMException.DOMSTRING_SIZE_ERR
+          @@@@enDesc:
+            The resulting string is too long to fit in a
+            <TYPE::DOMMain:DOMString>.
+        @@@ManakaiDOM:raises:
+          @@@@@: LSException.SERIALIZE_ERR
+          @@@@enDesc:
+            The serializer was unable to serialize the node.
 
 IFCls3Def:
   @IFQName: LSOutput

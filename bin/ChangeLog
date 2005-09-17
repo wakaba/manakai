@@ -1,6 +1,12 @@
+2005-09-15  Wakaba  <wakaba@suika.fam.cx>
+
+	* dac.pl: Calls "read_properties" method on database before
+	closure of it.
+
 2005-09-09  Wakaba  <wakaba@suika.fam.cx>
 
-	* mkdisdump.pl: Status messages added.
+	* dac.pl: Writes the database file before checking undefined
+	resoruces.
 
 2005-09-08  Wakaba  <wakaba@suika.fam.cx>
 
@@ -14,7 +20,7 @@
 	removed.
 
 	* mkdisdump.pl: Use ImplementationRegistry instead of
-        DOMImplementationRegistry.
+        DOMImplementationRegistry.  Status messages added.
 	(append_module_documentation, append_class_documentation,
 	append_interface_documentation): Uses dis:FileName property
 	if any.

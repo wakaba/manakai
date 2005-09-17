@@ -21,7 +21,7 @@ Module:
    license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/08/30 12:30:46 $
+      $Date: 2005/09/17 15:03:04 $
     @@ContentType:
       dis:Date.RCS
 
@@ -94,12 +94,16 @@ PropDef:
   @enDesc:
     A language tag as defined in RFC 3066 or its successor.
   @rdfs:domain: Language
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|UnorderedList
 
 PropDef:
   @QName: ietfPreferredTag
   @enDesc:
     An IETF language tag, preferred to other possible tags.
   @rdfs:subPropertyOf: ietfTag
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|UnorderedList
 
 ElementTypeBinding:
   @Name: PropDef

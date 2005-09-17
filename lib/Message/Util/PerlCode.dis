@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/09/09 04:26:08 $
+      $Date: 2005/09/17 15:03:03 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1177,6 +1177,8 @@ IFClsDef:
         \
         {NOTE:: The <P::subName> value must be equal to the 
                 <A::ManakaiPerlSub.localName> of the <P::subArg>.
+
+        }
     @@Param:
       @@@Name: subArg
       @@@Type: PerlSub
@@ -1559,7 +1561,7 @@ IFClsDef:
   @Method:
     @@Name: addExport
     @@enDesc:
-      Adds a name to the list of exported items (<Perl::@EXPORT_OK).
+      Adds a name to the list of exported items (<Perl::@EXPORT_OK>).
     @@Param:
       @@@Name: exportTag
       @@@Type:
@@ -3565,7 +3567,7 @@ IFClsDef:
 ##PerlAssignment
 
 IFClsDef:
-  @IFQName: PerlIF
+  @IFQName: PerlIf
   @ClsQName: ManakaiPerlIf
 
   @IFISA: PerlCode
@@ -3706,11 +3708,11 @@ IFClsDef:
   @enDesc:
     The class that provides factory methods. 
 
+  @ClsISA: DOMFeature|ManakaiMinimumImplementation||ManakaiDOM|ManakaiDOMLatest
   @ClsISA:
     dx:ManakaiDefaultExceptionHandler::ManakaiDOM:Perl
 
-  @DISLang:role:
-    DOMMetaImpl:ManakaiAnyImplementationRole
+
   @DOMMetaImpl:provideFeature: CoreFeature10
 
   @Method:
@@ -4618,6 +4620,14 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       DISLang:MethodParameter
+
+ElementTypeBinding:
+  @Name: PerlName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
 
 ElementTypeBinding:
   @Name: PerlDef

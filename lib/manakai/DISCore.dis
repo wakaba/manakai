@@ -21,7 +21,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/09 04:26:13 $
+      $Date: 2005/09/17 15:03:04 $
     @@ContentType:
       dis:Date.RCS
   
@@ -37,6 +37,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @DOMMain:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @lang:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
@@ -73,7 +75,7 @@ ResourceDef:
       \
       }
   @rdf:type: ElementType
-  @noVariant:
+
 ResourceDef:
   @QName:
     dis:ElementType
@@ -86,7 +88,7 @@ ResourceDef:
   @dataType:
     dis:TypeQName
   @rdfs:range: ElementType
-  @noVariant:
+
 ResourceDef:
   @QName:
     dis:ShadowContent
@@ -98,7 +100,6 @@ ResourceDef:
   @rdf:type: ElementType
   @dataType:
     lang:dis
-  @noVariant:
 
 ResourceDef:
   @QName:
@@ -114,7 +115,7 @@ ResourceDef:
       \
       }
   @rdf:type: ElementType
-  @noVariant:
+  @rdf:type: rdf|Property
 
 ElementTypeBinding:
   @Name: ResourceTypeDef
@@ -125,11 +126,6 @@ ElementTypeBinding:
       rdfs:Class
     @@ISA:
       rdfs:Class
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
 
 ElementTypeBinding:
   @Name: PropDef
@@ -138,11 +134,20 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       rdf:Property
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: dataType
+  @ElementType:
+    dis:dataType
+  @ShadowContent:
+    @@ContentType: dis|TypeQName
+
+ElementTypeBinding:
+  @Name: multipleProperties
+  @ElementType:
+    dis:multipleProperties
+  @ShadowContent:
+    @@ContentType: dis|TypeQName
 
 ## -- Module group defining
 
@@ -162,7 +167,6 @@ ResourceDef:
     @@lang:en
     @@@:
       The <QUOTE::dis> core library.
-  @noVariant:
 
 ## -- Module defining
 
@@ -174,7 +178,6 @@ ResourceDef:
     @@lang:en
     @@@:
       An element that contains information about a <QUOTE::dis> module. 
-  @noVariant:
 
 PropDef:
   @QName:
@@ -183,6 +186,7 @@ PropDef:
     @@lang:en
     @@@: 
       References to external modules.
+  @multipleProperties: Single
 
 ## -- Resource defining
 
@@ -194,7 +198,6 @@ ResourceDef:
     @@lang:en
     @@@:
       A <Q::dis:ResourceDef> element defines a resource.
-  @noVariant:
 
 ResourceTypeDef:
   @QName: 
@@ -209,6 +212,7 @@ ResourceTypeDef:
       ::ManakaiDOM:all
     @@For:
       ManakaiDOM:all !=ManakaiDOM:all
+
 PropDef:
   @QName:
     dis:resourceFor
@@ -229,6 +233,8 @@ PropDef:
               declared with <Q::dis:resourceFor> element.
       \
       }
+  @multipleProperties: UnorderedList
+  @dataType: dis|TypeQName
 
 ## -- Definition for
 
@@ -243,6 +249,8 @@ PropDef:
     @@lang:en
     @@@:
       A <Q::For> for which the resource is used (<QUOTE::OR> filter).
+  @multipleProperties: UnorderedList
+
 PropDef:
   @QName:
     dis:ForCheck
@@ -254,6 +262,16 @@ PropDef:
     @@lang:en
     @@@:
       A <Q::For> for which the resource is used (<QUOTE::AND> filter).
+  @multipleProperties: UnorderedList
+
+PropDef:
+  @QName: dis|DefaultFor
+  @Description:
+    @@lang:en
+    @@@:
+      The default <QUOTE::for> for the module.
+  @dataType: dis|TypeQName
+  @multipleProperties: Single
 
 ForDef:
   @QName:
@@ -261,16 +279,6 @@ ForDef:
   @FullName:
     @@lang:en
     @@@: For all
-
-ElementTypeBinding:
-  @Name: noVariant
-  @ElementType:
-    dis:AliasFor
-  @ShadowContent:
-    @@@:
-      ::ManakaiDOM:all
-    @@For:
-      !=ManakaiDOM:all
 
 ## -- Resource naming
 
@@ -281,6 +289,9 @@ PropDef:
     @@lang:en
     @@@:
       A name of a resource.
+  @dataType: String
+  @multipleProperties: Single
+
 PropDef:
   @QName:
     dis:QName
@@ -288,12 +299,17 @@ PropDef:
     @@lang:en
     @@@:
       A qualified name of a resource.
+  @dataType: dis|TypeQName
+  @multipleProperties: Single
+
 PropDef:
   @QName:
     dis:AppName
   @Description:
     @@lang:en
     @@@: An application (binding) dependent name of a resource.
+  @dataType: String
+  @multipleProperties: UnorderedList
 
 PropDef:
   @QName:
@@ -304,6 +320,9 @@ PropDef:
       A human-readable name of a resource.
   @ISA:
     rdfs:label
+  @dataType: lang|disdocInline
+  @multipleProperties: Single
+
 PropDef:
   @QName:
     dis:Label
@@ -313,6 +332,8 @@ PropDef:
       A human-readable simple header of a resource.
   @ISA:
     rdfs:label
+  @dataType: lang|disdocInline
+  @multipleProperties: Single
 
 PropDef:
   @QName: 
@@ -321,6 +342,8 @@ PropDef:
     @@lang:en
     @@@:
       A file name.
+  @dataType: String
+  @multipleProperties: Single
 
 ## -- Resource description
 
@@ -333,6 +356,9 @@ PropDef:
       A human-readable description of a resource.
   @ISA:
     rdfs:comment
+  @dataType: lang|disdoc
+  @multipleProperties: OrderedList
+
 PropDef:
   @QName:
     dis:ImplNote
@@ -340,6 +366,9 @@ PropDef:
     @@lang:en
     @@@:
       An implementor's node about resource.
+  @dataType: lang|disdoc
+  @multipleProperties: OrderedList
+
 PropDef:
   @QName:
     dis:Spec
@@ -395,6 +424,8 @@ PropDef:
     rdfs:Resource
   @rdfs:range:
     rdfs:Resource
+  @dataType: dis|TFQNames
+  @multipleProperties: OrderedList
 
 PropDef:
   @QName:
@@ -411,6 +442,7 @@ PropDef:
   @rdfs:subPropertyOf:derivedFrom
   @dataType:
     dis:TFQNames
+  @multipleProperties: UnorderedList
 
 PropDef:
   @QName:
@@ -424,6 +456,8 @@ PropDef:
               not be directly specified in the <Q::dis> files.
       \
       }
+  @dataType: dis|TFQNames
+  @multipleProperties: UnorderedList
 
 PropDef:
   @QName:
@@ -436,6 +470,7 @@ PropDef:
   @rdfs:subPropertyOf:derivedFrom
   @dataType:
     dis:TFQNames
+  @multipleProperties: OrderedList
 
 PropDef:
   @QName:
@@ -446,6 +481,8 @@ PropDef:
       Application dependent is-a relationship.
   @subsetOf: derivedFrom
   @rdfs:subPropertyOf:derivedFrom
+  @multipleProperties: OrderedList
+  @dataType: String
 
 PropDef:
   @QName:
@@ -458,6 +495,7 @@ PropDef:
   @rdfs:subPropertyOf:derivedFrom
   @dataType:
     dis:TFQNames
+  @multipleProperties: UnorderedList
 
 PropDef:
   @QName:
@@ -483,6 +521,7 @@ PropDef:
     rdfs:Resource
   @dataType:
     dis:TFQNames
+  @multipleProperties: Single
 
 PropDef:
   @QName:
@@ -500,6 +539,7 @@ PropDef:
     dis:ResourceDef
   @dataType: 
     dis:Boolean
+  @multipleProperties: Single
 
 PropDef:
   @QName:
@@ -512,6 +552,7 @@ PropDef:
       Whether the subject resource (such as method or attribute) 
       redefines another resource defined in one of ancestor inheriting 
       class or not.
+  @multipleProperties: Single
 
 PropDef:
   @QName:
@@ -522,6 +563,8 @@ PropDef:
       Whether the resource is defined abstractly or concretly. 
       Abstractly defined resource must be concretly overloaded 
       by inheriting class.
+  @dataType: dis|Boolean
+  @multipleProperties: Single
 
 PropDef:
   @QName:
@@ -538,9 +581,10 @@ PropDef:
       - <CODE::1>  :: The subject resource is unable to be overrided.
   @dataType:
     DISCore:Tristate
+  @multipleProperties: Single
 
 PropDef:
-  @QName: stopISARecusrive
+  @QName: stopISARecursive
   @Description:
     @@lang:en
     @@@:
@@ -549,6 +593,7 @@ PropDef:
        should be stopped or not.
   @dataType:
     dis:Boolean
+  @multipleProperties: Single
 
 ## --- Datatype
 
@@ -565,9 +610,10 @@ PropDef:
     rdf:Property
   @dataType:
     dis:TypeQName
+  @multipleProperties: Single
 
 ResourceDef:
-  @QName: AbstractDataType
+  @QName: AnyType
   @rdf:type:
     rdfs:Class
   @subsetOf:
@@ -580,26 +626,27 @@ ResourceDef:
       A data type, including programming language data types, 
       programming language classes, markup language data types, 
       string formats, and so on. 
-      \
-      {NOTE:: It is different from the <QUOTE::abstract datatypes> 
-              as in the programming languages such as Ada. 
-      \
-      }
-  @noVariant: 
 
 ResourceDef:
-  @QName: StringDataType
+  @QName: AbstractDataType
+  @AliasFor: AnyType
+  @enDesc: 
+    The name of <QUOTE::abstract data type> was incorrect.
+
+ResourceDef:
+  @QName: LexicalType
   @rdf:type:
     rdfs:Class
-  @subsetOf:
-    AbstractDataType
-  @rdfs:subClassOf:
-    AbstractDataType
+  @subsetOf: AnyType
+  @rdfs:subClassOf: AnyType
   @Description:
     @@lang:en
     @@@:
-      A string data format. 
-  @noVariant:
+      Lexical data formats.
+
+ResourceDef:
+  @QName: StringDataType
+  @AliasFor: LexicalType
 
 ElementTypeBinding:
   @Name: DataTypeDef
@@ -608,11 +655,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       rdfs:Datatype
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
 
 ResourceDef:
   @QName: 
@@ -623,23 +665,22 @@ ResourceDef:
       A programming language data type.
   @rdf:type:
     rdfs:Class
-  @subsetOf: AbstractDataType
-  @rdfs:subClassOf: AbstractDataType
-  @noVariant:
+  @subsetOf: AnyType
+  @rdfs:subClassOf: AnyType
 
 PropDef:
   @QName:
     dis:ContentType
   @rdfs:domain:
     DOMMain:any
-  @rdfs:range:
-    ManakaiDOM:DataType
+  @rdfs:range: LexicalType
   @dataType:
     dis:TypeQName
   @Description:
     @@lang:en
     @@@:
       The media type (content type) of the content.
+  @multipleProperties: Single
 
 PropDef:
   @QName:
@@ -651,6 +692,7 @@ PropDef:
     @@@:
       The natural language in which the content is written.
   @dataType: LanguageTag
+  @multipleProperties: Single
 
 PropDef:
   @QName:
@@ -662,6 +704,7 @@ PropDef:
     @@@:
       The writting script in which the content is written.
   @dataType: ScriptTag
+  @multipleProperties: Single
 
 DataTypeDef:
   @QName:
@@ -685,6 +728,8 @@ DataTypeDef:
     @@lang:en
     @@@:
       <QUOTE::dis> NCName
+  @subsetOf: String
+  @rdfs:subClassOf: String
 
 DataTypeDef:
   @QName: NamespacePrefix
@@ -703,6 +748,8 @@ DataTypeDef:
       <QUOTE::dis> Local Name
   @subsetOf: NCName
   @rdfs:subClassOf: NCName
+  @subsetOf: dis|TypeQName
+  @rdfs:subClassOf: dis|TypeQName
 
 DataTypeDef:
   @QName:
@@ -730,6 +777,8 @@ DataTypeDef:
       A QName with or without <CHAR::COLON>.  If
       it does not contain a <CHAR::COLON>, it is namespace-unaware
       or in the null namespace.
+  @subsetOf: dis|TypeQName
+  @rdfs:subClassOf: dis|TypeQName
 
 DataTypeDef:
   @QName: LanguageTag
@@ -772,11 +821,22 @@ DataTypeDef:
       and zero or more <QUOTE::For+> QNames.
 
 DataTypeDef:
+  @QName: URI
+  @Description:
+    @@lang:en
+    @@@:
+      Any string that identifies a resource.
+  @subsetOf: String
+  @rdfs:subClassOf: String
+
+DataTypeDef:
   @QName: TFURI
   @Description:
     @@lang:en
     @@@:
       <Q::dis:TFQNames>-expanded URI references. 
+  @rdfs:subClassOf: URI
+  @subsetOf: URI
 
 DataTypeDef:
   @QName:
@@ -819,12 +879,79 @@ DataTypeDef:
     dis:String
   @AliasFor: String
 
+PropDef:
+  @QName: dis|Author
+  @FullName:
+    @@lang:en
+    @@@: Author
+  @dataType: String
+  @multipleProperties: OrderedList
+
+PropDef:
+  @QName: dis|Mail
+  @FullName:
+    @@lang:en
+    @@@: Internet mail address
+  @dataType: String
+  @multipleProperties: UnorderedList
+
+PropDef:
+  @QName: dis|Date
+  @FullName:
+    @@lang:en
+    @@@: Date
+  @dataType: dis|Date.RCS
+  @multipleProperties: Single
+  
 DataTypeDef:
   @QName:
     dis:Date.RCS
   @FullName:
     @@lang:en
     @@@: RCS tag-style date and time specification
+
+## -- Properties
+
+PropDef:
+  @QName: dis|multipleProperties
+  @Description:
+    @@lang:en
+    @@@:
+      This attribute defines that how the values should be interpreted
+      if a property is described as multiple attributes in
+      <QUOTE::dis> source tree.
+  @rdfs:domain: rdf|Property
+  @rdfs:range: rdfs|Resource
+  @dataType: dis|TypeQName
+  @multipleProperties: Single
+
+ResourceDef:
+  @QName: OrderedList
+  @Description:
+    @@lang:en
+    @@@:
+      If multiple values are specified to a property, then
+      they makes up an ordered collection of values in document
+      order.
+  @rdf:type: rdfs|Resource
+
+ResourceDef:
+  @QName: UnorderedList
+  @Description:
+    @@lang:en
+    @@@:
+      If multiple valus are specified to a property, then
+      they makes up an unordered collection of values.
+  @rdf:type: rdfs|Resource
+
+ResourceDef:
+  @QName: SingleValue
+  @Description:
+    @@lang:en
+    @@@:
+      Only a value is allowed for the property; if there
+      are more than one attributes in the source tree, it is an error.
+  @rdf:type: rdfs|Resource
 
 ## -- Definitions
 
@@ -835,12 +962,31 @@ PropDef:
     @@lang:en
     @@@:
       A value of the resource.
+  @dataType: lang|dis
+  @multipleProperties: Single
+
 PropDef:
   @QName:
     dis:DefaultValue
   @Description:
     @@lang:en
     @@@: The default value of the resource.
+  @dataType: String
+  @multipleProperties: Single
+
+PropDef:
+  @QName: dis|is-null
+  @Description:
+    @@lang:en
+    @@@:
+      Whether the value is <DOM::null> or not.
+  @FullName:
+    @@lang:en
+    @@@:
+      Is <DOM::null> value
+  @dataType: dis|Boolean
+  @multipleProperties: Single
+
 PropDef:
   @QName:
     dis:Def
@@ -848,6 +994,8 @@ PropDef:
     @@lang:en
     @@@:
       A definition of the resource.
+  @dataType: String
+  @multipleProperties: OrderedList
 
 ResourceTypeDef:
   @QName: AnyDefContainer
@@ -869,6 +1017,7 @@ PropDef:
       Whether the subject resource is prepared for the internal use.  
       In other word, the subject resource is a public member or 
       a private member.
+  @multipleProperties: Single
 
 ## -- Status
 
@@ -880,6 +1029,7 @@ PropDef:
     @@lang:en
     @@@:
       Whether the use of the subject resource is deprecated or not. 
+  @multipleProperties: Single
 
 PropDef:
   @QName: alt
@@ -892,6 +1042,7 @@ PropDef:
       \
       This property is specified as a child element of 
       <Q::isDeprecated> property element.
+  @multipleProperties: OrderedList
 
 ## -- License
 
@@ -906,6 +1057,7 @@ PropDef:
       License term.
   @dataType: 
     dis:TypeQName
+  @multipleProperties: Single
 
 ResourceDef:
   @QName:
@@ -916,3 +1068,15 @@ ResourceDef:
     @@lang:en
     @@@:
       <QUOTE::Same as Perl> or <QUOTE::MPL 1.1/GPL 2.0/LGPL 2.1> license. 
+
+PropDef:
+  @QName: dis|Original
+  @FullName:
+    @@lang:en
+    @@@:
+      Original work
+  @multipleProperties: OrderedList
+
+PropDef:
+  @QName: dis|Year
+  @multipleProperties: Single

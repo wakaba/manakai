@@ -21,7 +21,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/09 04:26:08 $
+      $Date: 2005/09/17 15:03:03 $
     @@ContentType:
       dis:Date.RCS
   
@@ -51,6 +51,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
   @doc:
     http://suika.fam.cx/~wakaba/archive/2005/7/tutorial#
+  @DOMMain:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @lang:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
@@ -97,6 +99,17 @@ ResourceDef:
       ManakaiDOM:ForIF DIS|ForEmpty
   @AppName:
     Message::Util::
+  @DISPerl:classPackage:
+    Message::Util::
+  @DISPerl:interfacePackage:
+    @@@:
+      Message::Util::IF::
+    @@For: !DIS|ForEmpty
+    @@For: =DIS|ForEmpty
+  @DISPerl:interfacePackage:
+    @@@:
+      Message::Util::IFLatest::
+    @@ForCheck: DIS|ForEmpty
 
 ForDef:
   @QName: DIS|ForEmpty

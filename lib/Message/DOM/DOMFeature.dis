@@ -43,7 +43,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/09 04:26:05 $
+      $Date: 2005/09/17 15:03:02 $
     @@ContentType:
       dis:Date.RCS
   
@@ -386,6 +386,8 @@ PropDef:
     @@@:
       A version number of a feature to define.
   @rdfs:domain: Feature
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|UnorderedList
 
 ResourceDef:
   @QName:
@@ -401,6 +403,8 @@ PropDef:
       The subject resource intends to provide a part 
       of the object feature. 
   @rdfs:domain: Feature
+  @dataType: dis|TypeQName
+  @multipleProperties: DISCore|UnorderedList
 
 ResourceDef:
   @QName: DOMMetaImpl|provideFeature
@@ -420,6 +424,8 @@ PropDef:
       the <Q::providedThrough> class.
   @rdfs:domain:
     ManakaiDOM:Class
+  @dataType: dis|TFQNames
+  @multipleProperties: DISCore|UnorderedList
 
 ResourceDef:
   @QName: DOMMetaImpl|providedThrough
@@ -435,6 +441,7 @@ PropDef:
   @rdfs:range: Feature
   @dataType: 
     dis:TypeQName
+  @multipleProperties: DISCore|UnorderedList
 
 ResourceDef:
   @QName:
@@ -450,6 +457,8 @@ PropDef:
       The subject feature is an instance of the object feature set.
   @rdfs:range: Feature
   @rdfs:domain: Feature
+  @dataType: dis|TypeQName
+  @multipleProperties: DISCore|UnorderedList
 
 ResourceDef:
   @QName: DOMMetaImpl|instanceFeatureOf
@@ -464,6 +473,8 @@ PropDef:
       The subject feature extends the object feature.
   @rdfs:range: Feature
   @rdfs:domain: Feature
+  @dataType: dis|TypeQName
+  @multipleProperties: DISCore|UnorderedList
 
 ResourceDef:
   @QName: DOMMetaImpl|extendFeature
@@ -479,6 +490,7 @@ PropDef:
   @rdfs:range: Feature
   @dataType:
     dis:TypeQName
+  @multipleProperties: DISCore|UnorderedList
 
 ResourceDef:
   @QName: 
@@ -655,8 +667,8 @@ PropDef:
     ManakaiDOM:Class
   @rdfs:range:
     ManakaiDOM:IF
-  @dataType:
-    dis:TypeForQNames
+  @dataType: dis|TFQNames
+  @multipleProperties: DISCore|UnorderedList
 
 PropDef:
   @QName:
@@ -696,8 +708,8 @@ PropDef:
     ManakaiDOM:Class
   @rdfs:range:
     ManakaiDOM:Class
-  @dataType:
-    dis:TypeForQNames
+  @dataType: dis|TFQNames
+  @multipleProperties: DISCore|UnorderedList
 
 ## -- The bootstrap object
 
@@ -1381,7 +1393,7 @@ ResourceDef:
       while (my $__chk = shift @__chk) {
         $__class{$__chk} = true;
         for my $__isa (@{$__chk . '::ISA'}) {
-          if ($__isa !~ /::IF::/ and 
+          if ($__isa !~ /::IF(?:Level.|Latest)?::/ and 
               not $__class{$__isa}) {
             push @__chk, $__isa;
           }

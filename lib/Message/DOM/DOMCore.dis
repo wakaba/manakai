@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/09 04:26:04 $
+      $Date: 2005/09/17 15:03:02 $
     @@ContentType:
       dis:Date.RCS
 
@@ -172,11 +172,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:IF
-    @@ISA:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOM
-      @@@For:
-        ManakaiDOM:ManakaiDOM1
 
 ElementTypeBinding:
   @Name: ClassDef
@@ -295,8 +290,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       dis2pm:BlockCode
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM
 
 ElementTypeBinding:
   @Name: ConfigParam
@@ -319,17 +312,15 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethod
-    @@ForCheck:
-      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+    @@rdf:type: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
 ElementTypeBinding:
   @Name: IntMethod
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethod
+    @@rdf:type: DISLang|Method
     @@ForCheck:
       ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM ManakaiDOM|ForClass
     @@ManakaiDOM:isForInternal: 1
@@ -339,8 +330,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethod
+    @@rdf:type: DISLang|Method
     @@ForCheck:
       ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
     @@ManakaiDOM:isForInternal: 1
@@ -350,68 +340,63 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethod
+    @@rdf:type: DISLang|Method
     @@ForCheck:
       ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM ManakaiDOM|ForClass
-    @@ManakaiDOM:isRedefining: 1
+
 ElementTypeBinding:
   @Name: Param
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethodParameter
+    @@rdf:type: DISLang|MethodParameter
+
 ElementTypeBinding:
   @Name: Return
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethodReturn
+    @@rdf:type: DISLang|MethodReturn
+
 ElementTypeBinding:
   @Name: Attr
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttribute
-    @@ForCheck:
-      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
 ElementTypeBinding:
   @Name: IntAttr
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttribute
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM ManakaiDOM|ForClass
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: ManakaiDOM|ForClass
     @@ManakaiDOM:isForInternal: 1
+
 ElementTypeBinding:
   @Name: ReAttr
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttribute
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM ManakaiDOM|ForClass
-    @@ManakaiDOM:isRedefining: 1
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: ManakaiDOM|ForClass
+
 ElementTypeBinding:
   @Name: Get
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttrGet
+    @@rdf:type: DISLang|AttributeGet
+
 ElementTypeBinding:
   @Name: Set
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttrSet
+    @@rdf:type: DISLang|AttributeSet
+
 ElementTypeBinding:
   @Name: InCase
   @ElementType:
@@ -421,14 +406,23 @@ ElementTypeBinding:
       ManakaiDOM:InCase
 
 ElementTypeBinding:
+  @Name: nullCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@is-null:1
+
+ElementTypeBinding:
   @Name: ConstGroup
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:ConstGroup
-    @@ForCheck:
-      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: ErrorSet
@@ -440,17 +434,11 @@ ElementTypeBinding:
         ManakaiDOM:ConstGroup
       @@@ForCheck:
         ManakaiDOM:ForClass
-    @@ForCheck:
-      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM ManakaiDOM:ForClass
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
     @@aliasChild:
       @@@@: 1
       @@@For:
         ManakaiDOM:ManakaiDOM
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOMLatest
-      @@@For:
-        !ManakaiDOM:ManakaiDOM1
     @@Type:
       DOMMain:unsigned-short||ManakaiDOM|all
     @@rdfs:subClassOf:
@@ -466,8 +454,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: 
       ManakaiDOM:Const
-    @@ForCheck:
-      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+
 ElementTypeBinding:
   @Name: XConst
   @ElementType:
@@ -475,8 +462,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: 
       ManakaiDOM:Const
-    @@ForCheck:
-      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
 
 ElementTypeBinding:
   @Name: ErrorDef
@@ -512,9 +497,6 @@ ElementTypeBinding:
   @Name: XParam
   @ElementType:
     ManakaiDOM:exceptionOrWarningParameter
-  @ShadowContent:
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM
 
 ElementTypeBinding:
   @Name: SubTypeDef
@@ -652,37 +634,6 @@ FeatureDef:
     @@Description:
       @@@lang:en
       @@@@: The DOM Core Module, Level 3.
-
-FeatureDef:
-  @featureQName:
-    ManakaiDOM:ManakaiDOMCore
-  @QName: MDOMCoreFeature
-  @FeatureVerDef:
-    @@Version: 1.0
-    @@QName: MDOMCoreFeature10
-    @@DOMMetaImpl:instanceFeatureOf: MDOMCoreFeature
-    @@DOMMain:requireFeature: CoreFeature10
-    @@Description:
-      @@@lang:en
-      @@@@: The Manakai DOM Core Module, Level 1.
-  @FeatureVerDef:
-    @@Version: 2.0
-    @@QName: MDOMCoreFeature20
-    @@DOMMetaImpl:instanceFeatureOf: MDOMCoreFeature
-    @@DOMMain:requireFeature: CoreFeature20
-    @@DOMMetaImpl:extendFeature: MDOMCoreFeature10
-    @@Description:
-      @@@lang:en
-      @@@@: The Manakai DOM Core Module, Level 2.
-  @FeatureVerDef:
-    @@Version: 3.0
-    @@QName: MDOMCoreFeature30
-    @@DOMMetaImpl:instanceFeatureOf: MDOMCoreFeature
-    @@DOMMain:requireFeature: CoreFeature30
-    @@DOMMetaImpl:extendFeature: MDOMCoreFeature20
-    @@Description:
-      @@@lang:en
-      @@@@: The Manakai DOM Core Module, Level 3.
 
 ## -- Exception
 
@@ -2045,7 +1996,7 @@ IFCls3Def:
       @@@enDesc:
         A space-separeted list in which features and versions
         are specified.
-    @@ReturnValue:
+    @@Return:
       @@@Type: DOMImplementation
       @@@enDesc:
         The first DOM implementation that supports the desired
@@ -2193,7 +2144,7 @@ IFCls3Def:
         @@@Type:  
           DOMMain:DOMString
         @@@Description:
-          @@@@labg:en
+          @@@@lang:en
           @@@@@: 
             A string to look for.
      @@Return:
@@ -2687,15 +2638,11 @@ IFCls1Def:
           DOMMain:DOMString
         @@@actualType:
           @@@@@:
-            DOMMain:ManakaiDOMXMLQName
-          @@@@infoset:version:
-            @@@@@@: 1.1
-            @@@@@For:
-              ManakaiDOM:ManakaiDOMLatest
-          @@@@infoset:version:
-            @@@@@@: 1.0
-            @@@@@For:
-              !ManakaiDOM:ManakaiDOMLatest
+            DOMMain:ManakaiDOMXML11QName
+          @@@@For: ManakaiDOM|ManakaiDOMLatest
+        @@@actualType:
+          @@@@@: DOMMain|ManakaiDOMXML10QName
+          @@@@For: !ManakaiDOM|ManakaiDOMLatest
         @@@Description:
           @@@@lang:en
           @@@@@: The qualified name of the document type to be created.
@@ -6283,6 +6230,10 @@ IFCls1Def:
           }__;
 ##Node
 
+PropDef:
+  @QName: dis|DOM3
+  @ImplNote: Temporary.
+
 ElementTypeBinding:
   @Name: RoleDef
   @ElementType:
@@ -7047,8 +6998,8 @@ ClassDef:
         @@@@lang:en
         @@@@@:
           A reference to the ordinal index of the element to return.
-      @@@Write:1
-      @@@Read:
+      @@@In:1
+      @@@Out:
         @@@@@:1
         @@@@Description:
           @@@@@lang:en
@@ -9227,7 +9178,7 @@ NodeTypeDef:
       content of the <XML::CDATA> section.  Since DOM implementation
       does no lexical check on the content of the <XML::CDATA>
       section, <A::CharacterData.data> might include the character
-      sequence equals to <SGML::MSE> (i.e. <XML::]]<gt>> in XML).
+      sequence equals to <SGML::MSE>, i.e. <XML::]]<gt>> in XML.
 
      @@Get:
         @@@Type:  
@@ -11632,12 +11583,12 @@ NodeTypeDef:
           @@@@lang:en
           @@@@@:
             The <IF::Attr> node.
-        @@@@InCase:
-          @@@@@Value:
-            @@@@@@is-null:1
-          @@@@@Description:
-            @@@@@@lang:en
-            @@@@@@@: There is no such attribute.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: There is no such attribute.
         @@@Exception:
           @@@@Type:DOMException
           @@@@Name:NOT_SUPPORTED_ERR
@@ -14296,10 +14247,9 @@ IFCls3Def:
       <IF::DOMErrorHandler> interface and its <M::DOMErrorHandler
       .handleError> method is the <Perl::CODE> itself.
 
-  @ManakaiDOM:inputNormalizer:
-    @@ContentType:
-      lang:Perl
-    @@@:
+  @ResourceDef:
+    @@rdf:type: DISLang|InputProcessor
+    @@PerlDef:
       $INPUT = bless $INPUT, __PACKAGE__ if ref $INPUT eq 'CODE';
     @@ImplNote:
       @@@lang:en
@@ -14669,8 +14619,8 @@ NodeTypeDef:
     a document tree or to create a new fragment of a document.
 
     In various operations, such as inserting nodes as children
-    of another <IF::Node> by <IF::Node.appendChild>, 
-    a <IF::DocumentFragment> node is treated <QUOTE::transparent> - 
+    of another <IF::Node> by <M::Node.appendChild>, 
+    a <IF::DocumentFragment> node is treated <QUOTE::transparent> -- 
     it results in all the child nodes of the <IF::DocumentFragment>
     being moved to the child list of that <IF::Node>.
 
@@ -14683,7 +14633,7 @@ NodeTypeDef:
         <IF::DocumentFragment> object.
       \
         Note that this method is for the internal use.  The DOM 
-        applications must use the <A::Document.createDocumentFragment> method 
+        applications must use the <M::Document.createDocumentFragment> method 
         to create a new <IF::DocumentFragment> object.
     @@Return:
       @@@Type: NodeStem
@@ -17050,6 +17000,8 @@ PropDef:
        }
 
 ConfigParam:
+  @ForCheck: !ManakaiDOM|all
+
   @Description:
     @@lang:en
     @@@:

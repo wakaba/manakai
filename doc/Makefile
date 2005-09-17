@@ -10,9 +10,10 @@ JAVA_JAR = $(JAVA) -jar
 XALAN_PATH = d:/Program_Files/xalan/xalan.jar
 XALAN = $(JAVA) -cp $(XALAN_PATH) org.apache.xalan.xslt.Process
 
+PERL_OPTIONS = -I$(MANAKAI_LIB_DIR)
 PERL = perl
 MKDISDUMP_PL = $(MANAKAI_BIN_DIR)mkdisdump.pl
-MKDISDUMP = $(PERL) -I$(MANAKAI_LIB_DIR) $(MKDISDUMP_PL)
+MKDISDUMP = $(PERL) $(PERL_OPTIONS) $(MKDISDUMP_PL)
 
 DUMP_STYLESHEET_PATH = template/disdump.ja.xsl
 DDLIST_STYLESHEET_PATH = template/ddlist.ja.xsl
@@ -30,6 +31,7 @@ NS_UTIL = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 ALL_HTML = dom.html util.html
 
 DOM_DAC_FILE = $(MANAKAI_LIB_DIR)Message/DOM/core.dac
+#UTIL_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Util/disdoc.dac
 UTIL_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Util/discore.dac
 
 all: $(ALL_HTML)
@@ -58,6 +60,7 @@ dom.xml: $(DOM_DAC_FILE)
 	  --module-uri="$(NS_MDOM)DOMMain" \
 	  --module-uri="$(NS_MDOM)DOMCore" \
 	  --module-uri="$(NS_MDOM)DOMXML" \
+	  --module-uri="$(NS_MDOM)DOMLS" \
 	  --with-implementators-note > $@
 
 util.xml: $(UTIL_DAC_FILE)
@@ -71,10 +74,13 @@ util.xml: $(UTIL_DAC_FILE)
 	  --module-uri="$(NS_ERROR)Core" \
 	  --module-uri="$(NS_ERROR)DOMException" \
 	  --module-uri="$(NS_MARKUP)SuikaWikiConfig21" \
+	  --module-uri="$(NS_UTIL)PerlCode" \
 	  --module-uri="$(NS_UTIL)DIS" \
-	  --module-uri="$(NS_DIS)DISoc" \
-	  --module-uri="$(NS_DIS)DISDump" \
+	  --module-uri="$(NS_DIS)Perl" \
+	  --module-uri="$(NS_DIS)Value" \
 	  --with-implementators-note > $@
+#	  --module-uri="$(NS_DIS)DISDoc" \
+#	  --module-uri="$(NS_DIS)DISDump" \
 
 clean:
 	$(RM) $(ALL_HTML:.html=-list.pl.tmp) $(ALL_HTML:.html=-list.xml.tmp) \

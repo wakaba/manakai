@@ -15,7 +15,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/09 04:26:13 $
+      $Date: 2005/09/17 15:03:04 $
     @@ContentType:
       dis:Date.RCS
   
@@ -109,11 +109,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       rdf:Property
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
 
 PropDef:
   @QName: elementType
@@ -124,6 +119,7 @@ PropDef:
   @rdfs:domain: AnyElementInNS
   @dataType:
     dis:TFQNames
+  @multipleProperties: DISCore|UnorderedList
 
 PropDef:
   @QName: rootElementType
@@ -133,6 +129,7 @@ PropDef:
   @rdfs:domain: AnyElementInNS
   @dataType:
     dis:TFQNames
+  @multipleProperties: DISCore|UnorderedList
 
 PropDef:
   @QName:
@@ -144,6 +141,7 @@ PropDef:
   @rdfs:domain: Attribute
   @dataType:
     dis:TFQNames
+  @multipleProperties: DISCore|UnorderedList
 
 ## -- "For markup" definitions
 
@@ -162,5 +160,3 @@ ForDef:
     @@lang:en
     @@@:
       For an element type
-
-## DISMarkup.dis ends here.

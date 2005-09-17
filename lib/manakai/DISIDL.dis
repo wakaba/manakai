@@ -28,7 +28,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/09 04:26:13 $
+      $Date: 2005/09/17 15:03:04 $
     @@ContentType:
       dis:Date.RCS
   
@@ -91,11 +91,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: IDLDataType
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For: 
-        ManakaiDOM:all !=ManakaiDOM:all
 
 ResourceDef:
   @QName: AnyRealNumber
@@ -267,4 +262,21 @@ IDLDataTypeDef:
     @@@: Unsigned long long integer
   @rdfs:subClassOf: AnyRealNumber
 
-## DISIDL.dis ends here
+ResourceDef:
+  @QName: lang|IDL
+  @rdf:type: rdfs|Class
+  @FullName:
+    @@lang:en
+    @@@: IDL
+
+ResourceDef:
+  @QName: lang|IDL-DOM
+  @rdf:type: rdfs|Class
+  @FullName:
+    @@lang:en
+    @@@: IDL for DOM
+  @Description:
+    @@lang:en
+    @@@:
+      The IDL format as used in W3C DOM specifications.
+  @rdfs:subClassOf: lang|IDL

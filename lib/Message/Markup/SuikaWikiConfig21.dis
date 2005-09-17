@@ -22,14 +22,14 @@ Module:
       license:Perl+MPL
     @@Original:
       @@@FullName:
-        SuikaWiki <PerlModule::SuikaWiki::Markup::SuikaWikiConfig20>
+        SuikaWiki <PerlModule::SuikaWiki::Markup::SuikaWikiConfig20> Module
       @@@Year:2003
       @@@Author:
         @@@@FullName:Wakaba
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/09/09 04:26:05 $
+      $Date: 2005/09/17 15:03:02 $
     @@ContentType:
       dis:Date.RCS
   
@@ -151,6 +151,14 @@ ResourceDef:
     @@@:
       Message::Markup::
     @@ForCheck: ForLatest
+  @DISPerl:interfacePackage:
+    @@@:
+      Message::Markup::IFLatest::
+    @@ForCheck: ForLatest
+  @DISPerl:interfacePackage:
+    @@@:
+      Message::Markup::IF::
+    @@ForCheck: ForEmpty
 
 ## -- "For" definitions
 
@@ -676,7 +684,7 @@ IFClsDef:
                     ? @{$node->{<Q::shadowContent>}
                              ->{<Q::childNodes>}} : ()));
           while (@c) {
-            my $c = <ClassM::ManakaiSWCFGNode.getNodeReference>
+            my $c = $self-><M::ManakaiSWCFGNode.getNodeReference>
                                                   (my $cn = shift @c);
             if ($c-><AG::SWCFGNode.nodeType> eq '#element' and
                 $c-><AG::SWCFGNode.localName> eq $localName) {
@@ -754,7 +762,7 @@ IFClsDef:
                     ? @{$node->{<Q::shadowContent>}
                              ->{<Q::childNodes>}} : ()));
           while (@c) {
-            my $c = <ClassM::ManakaiSWCFGNode.getNodeReference>
+            my $c = $self-><M::ManakaiSWCFGNode.getNodeReference>
                                                (my $cn = shift @c);
             if ($c-><AG::SWCFGNode.nodeType> eq '#element' and
                 ((not defined $namespaceURI and 
@@ -966,7 +974,7 @@ IFClsDef:
                       ? @{$node->{<Q::shadowContent>}
                                ->{<Q::childNodes>}} : ()));
             while (@c) {
-              my $this = <ClassM::ManakaiSWCFGNode.getNodeReference>
+              my $this = $self-><M::ManakaiSWCFGNode.getNodeReference>
                               (my $t = shift @c);
               if ($t->{<Q::nodeType>} eq '#element' and
                   $code->($self, $this, %opt)) {
@@ -1044,7 +1052,7 @@ IFClsDef:
 
         FIND: {
           for my $cn (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
-            my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($cn);
+            my $c = $self-><M::ManakaiSWCFGNode.getNodeReference> ($cn);
             if ($c-><AG::SWCFGNode.nodeType> eq '#element' and
                 $c-><AG::SWCFGNode.localName> eq $localName) {
               $r = $c;
@@ -1121,7 +1129,7 @@ IFClsDef:
 
         FIND: {
           for my $cn (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
-            my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($cn);
+            my $c = $self-><M::ManakaiSWCFGNode.getNodeReference> ($cn);
             my $cnsuri = $c-><AG::SWCFGNode.namespaceURI>;
             if ($c-><AG::SWCFGNode.nodeType> eq '#element' and
                 ((not defined $namespaceURI and 
@@ -1177,7 +1185,7 @@ IFClsDef:
       @@@PerlDef:
         my @removed;
         $self->{<Q::TreeCore:node>}->{<Q::childNodes>} = [grep {
-          my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
+          my $c = $self-><M::ManakaiSWCFGNode.getNodeReference> ($_);
           if ($c-><AG::SWCFGNode.nodeType> eq '#element' and
               $c-><AG::SWCFGNode.localName> eq $localName) {
             push @removed, $_;
@@ -1228,7 +1236,7 @@ IFClsDef:
       @@@PerlDef:
         my @removed;
         $self->{<Q::TreeCore:node>}->{<Q::childNodes>} = [grep {
-          my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($_);
+          my $c = $self-><M::ManakaiSWCFGNode.getNodeReference> ($_);
           my $cnsuri = $c-><AG::SWCFGNode.namespaceURI>;
           if ($c-><AG::SWCFGNode.nodeType> eq '#element' and
               ((not defined $namespaceURI and not defined $cnsuri) or
@@ -1264,6 +1272,7 @@ IFClsDef:
           $ref => {$r},
           $class => {<ClassName::ManakaiSWCFGChildNodeList>},
         }__;
+        $r->{nodeClass} = ref $self;
 
   @Attr:
     @@Name:localName
@@ -1405,7 +1414,7 @@ IFClsDef:
             $r = $r->{<Q::shadowSiblingOf>}->{<Q::parent>};
           }
         }
-        $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($r) if $r;
+        $r = $self-><M::ManakaiSWCFGNode.getNodeReference> ($r) if $r;
 
   @Attr:
     @@Name:realParentNode
@@ -1610,7 +1619,7 @@ IFClsDef:
           the current node value is returned as is.  If the <P::asArray> 
           value is <DOM::true> and the node value is a simple string, 
           then an array reference containing the value as an only item 
-          is returned.  If <P::true> and the node value is not defined, 
+          is returned.  If <DOM::true> and the node value is not defined, 
           then an empty array reference is returned. 
       @@@UndeclaredPrefixException:
       @@@PerlDef:
@@ -1686,7 +1695,7 @@ IFClsDef:
             }
             for my $cn (@{$node->{<Q::childNodes>}}) {
               next unless $cn->{<Q::nodeType>} eq '#element';
-              my $rc = <ClassM::ManakaiSWCFGNode.getNodeReference> ($cn)
+              my $rc = $self-><M::ManakaiSWCFGNode.getNodeReference> ($cn)
                          ->stringify;
               $rc =~ s/\x0A  /\x0A     /gs;
               $rc =~ s/(\x0A +\@)/$1\@/gs;
@@ -1709,7 +1718,7 @@ IFClsDef:
           
           for my $cn (@{$node->{<Q::childNodes>}}) {
             $r .= "\x0A";
-            $r .= <ClassM::ManakaiSWCFGNode.getNodeReference> ($cn)->stringify;
+            $r .= $self-><M::ManakaiSWCFGNode.getNodeReference> ($cn)->stringify;
           }
 
           ## Element Type Binding
@@ -1736,7 +1745,7 @@ IFClsDef:
             for my $p (qw/shadowContent shadowSibling/) {
               next unless $b->{$p};
               $eb .= '  @' . ucfirst ($p) . ":\x0A";
-              my $rc = <ClassM::ManakaiSWCFGNode.getNodeReference> ($b->{$p});
+              my $rc = $self-><M::ManakaiSWCFGNode.getNodeReference> ($b->{$p});
               my $ebc = $rc->stringify;
               $ebc =~ s/\x0A  /\x0A       /gs;
               $ebc =~ s/(\x0A +\@)/$1\@\@/gs;
@@ -1786,7 +1795,7 @@ IFClsDef:
           $r = '#' . $r . "\n";
         } elsif ($nt eq '#fragment') {
           for my $cn (@{$node->{<Q::childNodes>}}) {
-            $r .= <ClassM::ManakaiSWCFGNode.getNodeReference> ($cn)->stringify;
+            $r .= $self-><M::ManakaiSWCFGNode.getNodeReference> ($cn)->stringify;
           }
         } else {
           __ASSERT{DISPerl:invariant::
@@ -1820,7 +1829,7 @@ IFClsDef:
             $r = $r->{<Q::ownerDocument>};
           }
         }
-        $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($r);
+        $r = $self-><M::ManakaiSWCFGNode.getNodeReference> ($r);
 
   @Method:
     @@Name:nodePath
@@ -2042,7 +2051,7 @@ IFClsDef:
           my $od = $self-><AG::SWCFGNode.ownerDocument> || $self;
           my $nt = $self-><AG::SWCFGNode.nodeType>;
           if ($nt eq '#element') {
-            $r = <ClassM::ManakaiSWCFGNode.getNodeReference>
+            $r = $self-><M::ManakaiSWCFGNode.getNodeReference>
                       (<ClassM::ManakaiSWCFGElement.newObject>);
             for my $p (<Q::shadowLocalName>, <Q::shadowNamespaceURI>,
                        <Q::localName>, <Q::namespaceURI>,
@@ -2057,7 +2066,7 @@ IFClsDef:
                   : $self->{<Q::TreeCore:node>}->{<Q::value>} : null;
             for my $p (<Q::shadowContent>, <Q::shadowSibling>) {
               if ($self->{<Q::TreeCore:node>}->{$p}) {
-                my $c = <ClassM::ManakaiSWCFGNode.getNodeReference>
+                my $c = $self-><M::ManakaiSWCFGNode.getNodeReference>
                            ($self->{<Q::TreeCore:node>}->{$p})->clone;
                 $r->{<Q::TreeCore:node>}->{$p} = $c->{<Q::TreeCore:node>};
                 $r->{<Q::TreeCore:node>}
@@ -2070,7 +2079,7 @@ IFClsDef:
               }
             }
             for my $cn (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
-              my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($cn);
+              my $c = $self-><M::ManakaiSWCFGNode.getNodeReference> ($cn);
               $r-><M::SWCFGNode.appendNode> ($c->clone);
             }
           } elsif ($nt eq '#comment') {
@@ -2080,7 +2089,7 @@ IFClsDef:
             $r = $od-><M::SWCFGDocument.createDocumentFragment>;
             ## swcfg21:isShadowMaster property is not copied
             for my $cn (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
-              my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($cn);
+              my $c = $self-><M::ManakaiSWCFGNode.getNodeReference> ($cn);
               $r-><M::SWCFGNode.appendNode> ($c->clone);
             }
             $r->{<Q::TreeCore:node>}->{<Q::value>}
@@ -2104,7 +2113,7 @@ IFClsDef:
               };
               for my $p (qw/shadowContent shadowSibling/) {
                 if ($b->{$p}) {
-                  my $cl = <ClassM::ManakaiSWCFGNode.getNodeReference>
+                  my $cl = $self-><M::ManakaiSWCFGNode.getNodeReference>
                                  ($b->{$p})->clone;
                   $c->{$p} = $cl->{<Q::TreeCore:node>};
                   $r->{<Q::TreeCore:node>}-><M::NodeStem.importTree> ($c->{$p});
@@ -2123,7 +2132,7 @@ IFClsDef:
               }
             }
             for my $cn (@{$self->{<Q::TreeCore:node>}->{<Q::childNodes>}}) {
-              my $c = <ClassM::ManakaiSWCFGNode.getNodeReference> ($cn)->clone;
+              my $c = $self-><M::ManakaiSWCFGNode.getNodeReference> ($cn)->clone;
               $r->{<Q::TreeCore:node>}
                 -><M::NodeStem.importTree> ($c->{<Q::TreeCore:node>});
               my @l = $c->{<Q::TreeCore:node>};
@@ -3171,7 +3180,7 @@ IFClsDef:
       unless ($node->{<Q::etExpanded>}) {
         my $__qn;
         if ($node->{<Q::namespaceExpanded>}) {
-          $__qn = <ClassM::ManakaiSWCFGNode.getNodeReference> ($node)
+          $__qn = $self-><M::ManakaiSWCFGNode.getNodeReference> ($node)
                   -><AG::SWCFGElement.realQualifiedName>;
         } else {
           $__qn = $node->{<Q::localName>};
@@ -3191,7 +3200,7 @@ IFClsDef:
               my $__prefix = $1;
               __DEEP{
                 $b->{shadowNamespaceURI}
-                   = <ClassM::ManakaiSWCFGNode.getNodeReference> ($__od)
+                   = $self-><M::ManakaiSWCFGNode.getNodeReference> ($__od)
                            -><M::SWCFGNode.lookupNamespaceURI>
                                  ($__prefix, make_new_binding => false,
                                   raise_prefix_exception => true);
@@ -3203,7 +3212,7 @@ IFClsDef:
           $node->{<Q::shadowLocalName>} = $b->{shadowLocalName};
           for my $__p (qw/shadowContent shadowSibling/) {
             next unless $b->{$__p};
-            my $cl = <ClassM::ManakaiSWCFGNode.getNodeReference> ($b->{$__p})
+            my $cl = $self-><M::ManakaiSWCFGNode.getNodeReference> ($b->{$__p})
                         ->clone;
             my $__n = $node->{{shadowContent => <Q::shadowContent>,
                                shadowSibling => <Q::shadowSibling>}->{$__p}}
@@ -3310,7 +3319,7 @@ IFClsDef:
         $r->{<Q::localName>} = $localName;
         $r->{<Q::namespaceExpanded>} = true;
         $r->{<Q::etExpanded>} = true;
-        $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($r);
+        $r = $self-><M::ManakaiSWCFGNode.getNodeReference> ($r);
 
   @Method:
     @@Name:createComment
@@ -3344,7 +3353,7 @@ IFClsDef:
         $r = <ClassM::ManakaiSWCFGComment.newObject>;
         $r->{<Q::ownerDocument>} = $self->{<Q::TreeCore:node>};
         $r->{<Q::value>} = defined $data ? $data : '';
-        $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($r);
+        $r = $self-><M::ManakaiSWCFGNode.getNodeReference> ($r);
 
   @Method:
     @@Name:createDocumentFragment
@@ -3362,7 +3371,7 @@ IFClsDef:
       @@@PerlDef:
         $r = <ClassM::ManakaiSWCFGDocumentFragment.newObject>;
         $r->{<Q::ownerDocument>} = $self->{<Q::TreeCore:node>};
-        $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($r);
+        $r = $self-><M::ManakaiSWCFGNode.getNodeReference> ($r);
 
   @Attr:
     @@Name: defaultElementTypeNamespaceURI
@@ -3625,12 +3634,14 @@ IFClsDef:
       @@@PerlDef:
         my $node = $self->{<Q::TreeCore:node>};
         $r = @{$node->{<Q::childNodes>}};
-        __CODE{expandETBinding:: $node => $node}__;
+        __CODE{expandETBinding:: $node => $node,
+                                   $self => {$self->{nodeClass}}}__;
         if ($node->{<Q::shadowContent>}) {
           $r += @{$node->{<Q::shadowContent>}->{<Q::childNodes>}};
         }
         for my $c (@{$node->{<Q::childNodes>}}) {
-          __CODE{expandETBinding:: $node => $c}__;
+          __CODE{expandETBinding:: $node => $c,
+                                   $self => {$self->{nodeClass}}}__;
           $r += @{$c->{<Q::shadowSibling>}->{<Q::childNodes>}}
              if $c->{<Q::shadowSibling>};
         }
@@ -3678,7 +3689,8 @@ IFClsDef:
         $r = $node->{<Q::childNodes>}->[$index];
         unless ($r) {
           $index -= @{$node->{<Q::childNodes>}};
-          __CODE{expandETBinding:: $node => $node}__;
+          __CODE{expandETBinding:: $node => $node,
+                                   $self => {$self->{nodeClass}}}__;
           $r = $node->{<Q::shadowContent>}->{<Q::childNodes>}->[$index]
             if $node->{<Q::shadowContent>};
           unless ($r) {
@@ -3686,7 +3698,8 @@ IFClsDef:
               $index -= @{$node->{<Q::shadowContent>}->{<Q::childNodes>}};
             }
             for my $c (@{$node->{<Q::childNodes>}}) {
-              __CODE{expandETBinding:: $node => $c}__;
+              __CODE{expandETBinding:: $node => $c,
+                                   $self => {$self->{nodeClass}}}__;
               if ($c->{<Q::shadowSibling>}) {
                 $r = $c->{<Q::shadowSibling>}->{<Q::childNodes>}->[$index];
                 last if $r;
@@ -3695,7 +3708,8 @@ IFClsDef:
             }
           }
         }
-        $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($r) if $r;
+        $r = $self->{nodeClass}
+                  -><M::ManakaiSWCFGNode.getNodeReference> ($r) if $r;
 
   @IntMethod:
     @@ForCheck: ManakaiDOM|ForClass
@@ -4837,6 +4851,7 @@ ElementTypeBinding:
     @@rdf:type:
       DISLang:Method
     @@ManakaiDOM:isForInternal:1
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: RedefMethod
@@ -4846,6 +4861,7 @@ ElementTypeBinding:
     @@rdf:type:
       DISLang:Method
     @@ManakaiDOM:isRedefining:1
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: Return
@@ -5092,6 +5108,7 @@ ElementTypeBinding:
     @@rdf:type:
       DISLang:Attribute
     @@ManakaiDOM:isRedefining:1
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: Get

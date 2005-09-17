@@ -15,7 +15,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/09 04:26:13 $
+      $Date: 2005/09/17 15:03:04 $
     @@ContentType:
       dis:Date.RCS
   
@@ -55,13 +55,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DISCore:AbstractDataType
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
+    @@rdf:type: DISCore|AnyType
 
 ElementTypeBinding:
   @Name: PropDef
@@ -70,24 +64,13 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       rdf:Property
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
 
 ElementTypeBinding:
   @Name: FormatDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DISCore:StringDataType
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
+    @@rdf:type: DISCore|LexicalType
     @@rdfs:subClassOf:
       DISCore:String
 
@@ -98,11 +81,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       rdfs:Class
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
     @@rdfs:subClassOf:
       rdfs:Class
 
@@ -255,26 +233,7 @@ PropDef:
       no code is inserted. 
   @dataType:
     dis:Boolean
-
-PropDef:
-  @QName:
-    ManakaiDOM:inputNormalizer
-  @Description:
-    @@lang:en
-    @@@:
-      A code fragment that normalizes inputs, including method parameter 
-      values and new attribute values. 
-      \
-      If the code is written in Perl (<TYPE::lang:Perl>), any occurence 
-      of <Perl::$INPUT> in the code is replaced by the variable name 
-      containing the input. 
-      \
-      This property is <EM::obsolete> but not removed for compatibility
-      with <FILE::cdis2pm.pl>.
-  @rdfs:domain:
-    ManakaiDOM:DataType
-  @rdf:type:
-    owl:DeprecatedProperty
+  @multipleProperties: DISCore|Single
 
 PropDef:
   @QName:
@@ -284,6 +243,8 @@ PropDef:
     @@@:
       Whether it is an input (data is passed from the caller
       to the callee) or not.
+  @dataType: dis|Boolean
+  @multipleProperties: DISCore|Single
 
 PropDef:
   @QName:
@@ -293,6 +254,8 @@ PropDef:
     @@@:
       Whether it is an output (data is passed from the callee
       to the caller) or not.
+  @dataType: dis|Boolean
+  @multipleProperties: DISCore|Single
 
 PropDef:
   @QName:
@@ -310,6 +273,8 @@ PropDef:
       that a method is static does not means the method should not 
       be called via an object.  Inappropriateness of the use as an 
       object method should be indicated by other property.
+  @dataType: dis|Boolean
+  @multipleProperties: DISCore|Single
 
 ## - Types of structures
 
@@ -325,6 +290,8 @@ PropDef:
     @@@:
       The data type of the resource defined, including 
       class attribute type and method return value type.
+  @dataType: dis|TFQNames
+  @multipleProperties: DISCore|Single
 
 DataTypeDef:
   @QName: String
@@ -334,6 +301,12 @@ DataTypeDef:
     @@lang:en
     @@@:
       Any programming language <QUOTE::String> datatype. 
+
+      {NOTE:: This type different from <Q::DISCore:String>
+              where <Q::DISCore:String> is a lexical type
+              while <Q::DISLang:String> is a programing language 
+              data type.
+      }
 
 PropDef:
   @QName:
@@ -347,6 +320,8 @@ PropDef:
     @@@:
       The actual data type of the resource defined, including 
       class attribute type and method return value type. 
+  @dataType: dis|TFQNames
+  @multipleProperties: DISCore|Single
 
 ## - Operator
 
@@ -361,6 +336,9 @@ PropDef:
       is of a class to which the subject resource belongs.
   @rdfs:range: 
     DOMMain:Operator
+  @rdfs:domain: AnyMethod
+  @dataType: dis|TypeQName
+  @multipleProperties: DISCore|UnorderedList
 
 ResourceDef:
   @QName: 
@@ -406,6 +384,7 @@ PropDef:
     ManakaiDOM:ConstGroup
   @dataType:
     dis:Boolean
+  @multipleProperties: DISCore|Single
 
 ## -- "Role" properties
 
@@ -426,6 +405,7 @@ PropDef:
   @rdfs:range: Role
   @dataType:
     dis:TypeQName
+  @multipleProperties: UnorderedList
 
 ResourceTypeDef:
   @QName: Role
@@ -462,11 +442,6 @@ ResourceDef:
     @@lang:en
     @@@:
       A <Q::lang:dis> tree vocabulary element type.
-  @AliasFor:
-    @@@:
-      ::ManakaiDOM:all
-    @@For:
-      !=ManakaiDOM:all
 
 ElementTypeBinding:
   @Name: TreeElementType
@@ -474,11 +449,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: TreeElementType
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
 
 TreeElementType:
   @QName: nop
@@ -597,5 +567,3 @@ ForDef:
   @FullName:
     @@lang:en
     @@@: For ECMAScript binding
-
-## DISLang.dis ends here

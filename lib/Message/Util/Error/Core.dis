@@ -28,7 +28,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/09 04:26:11 $
+      $Date: 2005/09/17 15:03:04 $
     @@ContentType:
       dis:Date.RCS
   
@@ -98,6 +98,8 @@ ResourceDef:
       The manakai error reporting modules
   @AppName:
     Message::Util::Error::
+  @DISPerl:interfacePackage:
+    Message::Util::IF::
 
 ElementTypeBinding:
   @Name: enDesc
@@ -195,6 +197,12 @@ ResourceDef:
 
   @enDesc:
     <PerlModule::Error>.
+
+  @Method:
+    @@Name: throw
+    @@enDesc:
+      Throws (or rethrows) the error.
+    @@Return:
 
   @Method:
     @@Name: stacktrace
@@ -506,3 +514,10 @@ ResourceDef:
     <Perl::___error_def> and which returns a reference to hash
     that contains definitions of errors.
   @For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: PerlName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ContentType: lang|Perl

@@ -118,16 +118,21 @@ my $impl = $Message::DOM::ImplementationRegistry->get_implementation
 my $pc = $impl->get_feature (ExpandedURI q<Util:PerlCode> => '1.0');
 my $di = $impl->get_feature (ExpandedURI q<DIS:Core> => '1.0');
 
-print STDERR "Loading the database...";
+print STDERR qq<Loading the database "$Opt{file_name}"...>;
 my $db = $di->pl_load_dis_database ($Opt{file_name});
 print STDERR "done\n";
 
 my $mod = $db->get_module ($Opt{module_uri}, for_arg => $Opt{For});
 unless ($Opt{For}) {
-  my $el = $mod->source_element;
-  if ($el) {
-    $Opt{For} = $el->default_for_uri;
+  $Opt{For} = $mod->get_property_text (ExpandedURI q<dis:DefaultFor>, undef);
+  if (defined $Opt{For}) {
     $mod = $db->get_module ($Opt{module_uri}, for_arg => $Opt{For});
+  } else {
+    my $el = $mod->source_element;
+    if ($el) {
+      $Opt{For} = $el->default_for_uri;
+      $mod = $db->get_module ($Opt{module_uri}, for_arg => $Opt{For});
+    }
   }
 }
 unless ($mod->is_defined) {
@@ -178,4 +183,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/09/09 04:26:04 $
+1; # $Date: 2005/09/17 15:03:02 $

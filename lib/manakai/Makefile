@@ -2,6 +2,8 @@ MANAKAI_ROOT_DIR = ../../
 MANAKAI_BIN_DIR = $(MANAKAI_ROOT_DIR)bin/
 MANAKAI_LIB_DIR = $(MANAKAI_ROOT_DIR)lib/
 
+DAC_SUFFIX = .dac
+
 CD = cd
 MAKE = make
 RM = rm
@@ -27,16 +29,16 @@ DAC2PM_OPTIONS = $(DAC2PM_OPTIONS2)
 DAC2PM_PL = $(MANAKAI_BIN_DIR)dac2pm.pl
 DAC2PM = $(PERL_) $(DAC2PM_PL) $(DAC2PM_OPTIONS)
 
-CORE_DAC_FILE = $(MANAKAI_LIB_DIR)manakai/all.dac
+CORE_DAC_FILE = $(MANAKAI_LIB_DIR)manakai/all$(DAC_SUFFIX)
 
 DIS_FILES = DISCore.dis DISLang.dis DISRDF.dis DISIDL.dis \
   DISPerl.dis XML.dis DISMarkup.dis NaturalLanguage.dis
 
-GENERATED_FILES = all.dac
+GENERATED_FILES = all$(DAC_SUFFIX)
 
 all: $(GENERATED_FILES)
 
-all.dac: $(DIS_FILES) $(DAC_PL)
+all$(DAC_SUFFIX): $(DIS_FILES) $(DAC_PL)
 	$(DAC).$@.1.tmp DISPerl.dis
 	$(DAC).$@.2.tmp --input-db-file-name=".$@.1.tmp" DISMarkup.dis
 	$(DAC).$@.3.tmp --input-db-file-name=".$@.2.tmp" DISIDL.dis

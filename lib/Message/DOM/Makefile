@@ -2,6 +2,9 @@ MANAKAI_ROOT_DIR = ../../../
 MANAKAI_BIN_DIR = $(MANAKAI_ROOT_DIR)bin/
 MANAKAI_LIB_DIR = $(MANAKAI_ROOT_DIR)lib/
 
+DAC_SUFFIX = .dac
+PM_SUFFIX = .pm
+
 CD = cd
 MAKE = make
 RM = rm
@@ -28,7 +31,7 @@ DAC2PM_OPTIONS = $(DAC2PM_OPTIONS3)
 DAC2PM_PL = $(MANAKAI_BIN_DIR)dac2pm.pl
 DAC2PM = $(PERL_) $(DAC2PM_PL) $(DAC2PM_OPTIONS)
 
-UTIL_CORE_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Util/core.dac
+UTIL_CORE_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Util/core$(DAC_SUFFIX)
 
 DOM_CORE_DIS_FILES = DOMFeature.dis DOMMain.dis DOMCore.dis DOMXML.dis DOMLS.dis
 DOM_HTML_DIS_FILES = DOMHTML.dis DOMWebForms.dis
@@ -39,28 +42,30 @@ _DIS_FILES = \
   DOMEvents.dis DOMViews.dis
 
 GENERATED_FILES = \
-  core.dac DOMFeature.pm DOMMain.pm DOMCore.pm DOMXML.pm DOMLS.pm \
-  html.dac DOMHTML.pm DOMWebForms.pm
+  core$(DAC_SUFFIX)  DOMFeature$(PM_SUFFIX) DOMMain$(PM_SUFFIX) \
+                     DOMCore$(PM_SUFFIX) DOMXML$(PM_SUFFIX) DOMLS$(PM_SUFFIX) \
+  html$(DAC_SUFFIX)  DOMHTML$(PM_SUFFIX) DOMWebForms$(PM_SUFFIX)
 
 all: $(GENERATED_FILES)
 
-core.dac: $(UTIL_CORE_DAC_FILE) $(DOM_CORE_DIS_FILES) $(DAC_PL)
+core$(DAC_SUFFIX): $(UTIL_CORE_DAC_FILE) $(DOM_CORE_DIS_FILES) $(DAC_PL)
 	$(DAC)$@ --input-db-file-name="$<" DOMLS.dis
 
-html.dac: core.dac $(DOM_HTML_DIS_FILES) $(DAC_PL)
+html$(DAC_SUFFIX): core$(DAC_SUFFIX) $(DOM_HTML_DIS_FILES) $(DAC_PL)
 	$(DAC)$@ --input-db-file-name="$<" DOMHTML.dis
 
-$(DOM_CORE_DIS_FILES:.dis=.pm): core.dac $(DAC2PM_PL)
-	$(DAC2PM) $< --module-uri="$(NS_MDOM)$(@:.pm=)" --output-file-path="$@"
+$(DOM_CORE_DIS_FILES:.dis=$(PM_SUFFIX)): core$(DAC_SUFFIX) $(DAC2PM_PL)
+	$(DAC2PM) $< --module-uri="$(NS_MDOM)$(@:$(PM_SUFFIX)=)" \
+	  --output-file-path="$@"
 	$(PERL_CHK) $@
 
-$(DOM_HTML_DIS_FILES:.dis=.pm): html.dac $(DAC2PM_PL)
-	$(DAC2PM) $< --module-uri="$(NS_MDOM)$(@:.pm=)" > $@
+$(DOM_HTML_DIS_FILES:.dis=$(PM_SUFFIX)): html$(DAC_SUFFIX) $(DAC2PM_PL)
+	$(DAC2PM) $< --module-uri="$(NS_MDOM)$(@:$(PM_SUFFIX)=)" > $@
 	$(PERL_CHK) $@
 
 # $(UTIL_CORE_DAC_FILE)
-$(MANAKAI_LIB_DIR)Message/Util/core.dac: dummy
-	$(CD) $(MANAKAI_LIB_DIR)Message/Util/ && $(MAKE) core.dac
+$(MANAKAI_LIB_DIR)Message/Util/core$(DAC_SUFFIX): dummy
+	$(CD) $(MANAKAI_LIB_DIR)Message/Util/ && $(MAKE) core$(DAC_SUFFIX)
 
 dummy:
 

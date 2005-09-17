@@ -1252,7 +1252,10 @@ status_msg q<done>;
   my $serializer = $lsimpl->create_mls_serializer
                         ({ExpandedURI q<DOMLS:SerializeDocumentInstance> => ''});
   my $serialized = $serializer->write_to_string ($doc);
-  print STDOUT Encode::encode ('utf8', $serialized);
+  verbose_msg_ qq< serialized, >;
+  my $encoded = Encode::encode ('utf8', $serialized);
+  verbose_msg_ qq<bytenized, and >;
+  print STDOUT $encoded;
   close STDOUT;
   status_msg qq<done>;
 }
@@ -1293,4 +1296,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/09/09 04:26:04 $
+1; # $Date: 2005/09/17 15:03:02 $

@@ -126,15 +126,31 @@ $db->load_module ($doc, sub ($$$$$$) {
 
 print STDERR "\n";
 
-unless ($Opt{no_undef_check}) {
-  print STDERR "Checking undefined resources...";
-  $db->check_undefined_resource;
-  print STDERR "done\n";
+## TODO:
+if ($db->can('read_properties')) {
+
+print STDERR qq<Reading properties...\n>;
+$ResourceCount = 0;
+$db->read_properties (on_resource_read => sub ($$) {
+  if ((++$ResourceCount % 10) == 0) {
+    print STDERR "*";
+    print STDERR " " if ($ResourceCount % (10 * 10)) == 0;
+    print STDERR "\n" if ($ResourceCount % (10 * 50)) == 0;
+  }
+});
+print STDERR "\ndone\n";
+
 }
 
 print STDERR qq<Writing file "$Opt{output_file_name}"...>;
 $db->pl_store ($Opt{output_file_name});
 print STDERR "done\n";
+
+unless ($Opt{no_undef_check}) {
+  print STDERR "Checking undefined resources...";
+  $db->check_undefined_resource;
+  print STDERR "done\n";
+}
 
 print STDERR "Closing the database...";
 $db->free;

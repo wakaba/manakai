@@ -3,6 +3,9 @@ MANAKAI_BIN_DIR = $(MANAKAI_ROOT_DIR)bin/
 MANAKAI_LIB_DIR = $(MANAKAI_ROOT_DIR)lib/
 MANAKAI_LIB_MANAKAI_DIR = $(MANAKAI_LIB_DIR)manakai/
 
+DAC_SUFFIX = .dac
+PM_SUFFIX = .pm
+
 CD = cd
 MAKE = make
 RM = rm
@@ -32,76 +35,81 @@ DAC2PM_OPTIONS = $(DAC2PM_OPTIONS3)
 DAC2PM_PL = $(MANAKAI_BIN_DIR)dac2pm.pl
 DAC2PM = $(PERL_) $(DAC2PM_PL) $(DAC2PM_OPTIONS)
 
-CORE_DAC_FILE = $(MANAKAI_LIB_DIR)manakai/all.dac
-SWCFG_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Markup/all.dac
+CORE_DAC_FILE = $(MANAKAI_LIB_DIR)manakai/all$(DAC_SUFFIX)
+SWCFG_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Markup/all$(DAC_SUFFIX)
 
 UTIL_CORE_DIS_FILES = ManakaiNode.dis Error/DOMException.dis Error/Core.dis
-DIS_CORE_DIS_FILES = DIS.dis PerlCode.dis
+DIS_CORE_DIS_FILES_    = DIS.dis PerlCode.dis
+DIS_CORE_DIS_FILES_DIS = DIS/Perl.dis DIS/Value.dis
+DIS_CORE_DIS_FILES     = $(DIS_CORE_DIS_FILES_) $(DIS_CORE_DIS_FILES_DIS)
 DIS_DOC_DIS_FILES = DIS/DISDoc.dis DIS/DISDump.dis
 DIS_FILES = $(UTIL_CORE_DIS_FILES) $(DIS_CORE_DIS_FILES) \
   $(DIS_DOC_DIS_FILES)
 
 GENERATED_FILES = \
-  core.dac     ManakaiNode.pm Error/DOMException.pm \
-  discore.dac  DIS.pm PerlCode.pm \
-  disdoc.dac   DIS/DISDoc.pm DIS/DISDump.pm
+  core$(DAC_SUFFIX)     ManakaiNode$(PM_SUFFIX) Error/DOMException$(PM_SUFFIX) \
+  discore$(DAC_SUFFIX)  DIS$(PM_SUFFIX) PerlCode$(PM_SUFFIX) \
+                        DIS/Perl$(PM_SUFFIX) DIS/Value$(PM_SUFFIX) \
+  disdoc$(DAC_SUFFIX)   DIS/DISDoc$(PM_SUFFIX) DIS/DISDump$(PM_SUFFIX)
 
 all: $(GENERATED_FILES)
 
-core.dac: $(CORE_DAC_FILE) $(UTIL_CORE_DIS_FILES) $(DAC_PL)
+core$(DAC_SUFFIX): $(CORE_DAC_FILE) $(UTIL_CORE_DIS_FILES) $(DAC_PL)
 	$(DAC)$@.1.tmp --input-db-file-name="$<" ManakaiNode.dis
 	$(DAC)$@ --input-db-file-name="$@.1.tmp" Error/DOMException.dis
 	$(RM) $@.1.tmp
 
-discore.dac: $(SWCFG_DAC_FILE) $(DIS_CORE_DIS_FILES) $(DAC_PL)
+discore$(DAC_SUFFIX): $(SWCFG_DAC_FILE) $(DIS_CORE_DIS_FILES) $(DAC_PL)
 	$(DAC)$@ --input-db-file-name="$<" DIS.dis
 
-disdoc.dac: discore.dac $(DIS_DOC_DIS_FILES) $(DAC_PL)
+disdoc$(DAC_SUFFIX): discore$(DAC_SUFFIX) $(DIS_DOC_DIS_FILES) $(DAC_PL)
 	$(DAC)$@ --input-db-file-name="$<" DIS/DISDump.dis
 
-ManakaiNode.pm: core.dac $(DAC2PM_PL)
+ManakaiNode$(PM_SUFFIX): core$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< \
 	  --module-uri="$(NS_UTIL)ManakaiNode" \
 	  --output-file-path="$@"
 	$(PERL_CHK) $@
 
-DIS.pm: discore.dac $(DAC2PM_PL)
-	$(DAC2PM) $< \
-	  --module-uri="$(NS_UTIL)DIS" \
-	  --output-file-path="$@"
-	$(PERL_CHK) $@
-
-PerlCode.pm: discore.dac $(DAC2PM_PL)
-	$(DAC2PM) $< \
-	  --module-uri="$(NS_UTIL)PerlCode" \
-	  --output-file-path="$@"
-	$(PERL_CHK) $@
-
-Error/DOMException.pm: core.dac $(DAC2PM_PL)
+Error/DOMException$(PM_SUFFIX): core$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< \
 	  --module-uri="$(NS_UTIL_ERR)DOMException" \
 	  --output-file-path="$@"
 	$(PERL_CHK) $@
 
-DIS/DISDoc.pm: disdoc.dac $(DAC2PM_PL)
+$(DIS_CORE_DIS_FILES_:.dis=$(PM_SUFFIX)): %$(PM_SUFFIX): discore$(DAC_SUFFIX) \
+  $(DAC2PM_PL)
+	$(DAC2PM) $< \
+	  --module-uri="$(NS_UTIL)$*" \
+	  --output-file-path="$@"
+	$(PERL_CHK) $@
+
+$(DIS_CORE_DIS_FILES_DIS:.dis=$(PM_SUFFIX)): %$(PM_SUFFIX): \
+  discore$(DAC_SUFFIX) $(DAC2PM_PL)
+	$(DAC2PM) $< \
+	  --module-uri="$(NS_UTIL_DIS)$(*:DIS/%=%)" \
+	  --output-file-path="$@"
+	$(PERL_CHK) $@
+
+DIS/DISDoc$(PM_SUFFIX): disdoc$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< \
 	  --module-uri="$(NS_UTIL_DIS)DISDoc" \
 	  --output-file-path="$@"
 	$(PERL_CHK) $@
 
-DIS/DISDump.pm: disdoc.dac $(DAC2PM_PL)
+DIS/DISDump$(PM_SUFFIX): disdoc$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< \
 	  --module-uri="$(NS_UTIL_DIS)DISDump" \
 	  --output-file-path="$@"
 	$(PERL_CHK) $@
 
 # $(CORE_DAC_FILE)
-$(MANAKAI_LIB_DIR)manakai/all.dac: dummy
-	$(CD) $(MANAKAI_LIB_DIR)manakai/ && $(MAKE) all.dac
+$(MANAKAI_LIB_DIR)manakai/all$(DAC_SUFFIX): dummy
+	$(CD) $(MANAKAI_LIB_DIR)manakai/ && $(MAKE) all$(DAC_SUFFIX)
 
 # $(SWCFG_DAC_FILE)
-$(MANAKAI_LIB_DIR)Message/Markup/all.dac: dummy
-	$(CD) $(MANAKAI_LIB_DIR)Message/Markup/ && $(MAKE) all.dac
+$(MANAKAI_LIB_DIR)Message/Markup/all$(DAC_SUFFIX): dummy
+	$(CD) $(MANAKAI_LIB_DIR)Message/Markup/ && $(MAKE) all$(DAC_SUFFIX)
 
 dummy:
 
