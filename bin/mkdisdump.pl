@@ -138,6 +138,21 @@ sub verbose_msg_ ($) {
   print STDERR $s;
 }
 
+{
+my $ResourceCount = 0;
+sub progress_inc () {
+  if ((++$ResourceCount % 10) == 0) {
+    print STDERR "*";
+    print STDERR " " if ($ResourceCount % (10 * 10)) == 0;
+    print STDERR "\n" if ($ResourceCount % (10 * 50)) == 0;
+  }
+}
+
+sub progress_reset () {
+  $ResourceCount = 0;
+}
+}
+
 my $impl = $Message::DOM::ImplementationRegistry->get_implementation
                ({
                  ExpandedURI q<ManakaiDOM:Minimum> => '3.0',
@@ -192,7 +207,7 @@ sub append_module_documentation (%) {
     if ($rres->owner_module eq $opt{source_resource} and## Defined in this module
         not ($ReferredResource{$rres->uri} < 0)) {
                           ## TODO: Modification required to support modplans
-      status_msg_ "*";
+      progress_inc;
       if ($rres->is_type_uri (ExpandedURI q<ManakaiDOM:Class>)) {
         append_class_documentation
           (result_parent => $section,
@@ -1038,6 +1053,7 @@ for my $mod_uri (keys %{$Opt{module_uri}}) {
   }
 
   status_msg qq<Module <$mod_uri> for <$mod_for>...>;
+  progress_reset;
 
   append_module_documentation
     (result_parent => $body,
@@ -1049,11 +1065,12 @@ for my $mod_uri (keys %{$Opt{module_uri}}) {
 ## -- Outputs referenced resources in external modules
 
 status_msg q<Other modules...>;
+progress_reset;
 
 while (my @ruri = grep {$ReferredResource{$_} > 0} keys %ReferredResource) {
   U: while (defined (my $uri = shift @ruri)) {
     next U if $ReferredResource{$uri} < 0;  ## Already done
-    status_msg_ q<*>;
+    progress_inc;
     my $res = $db->get_resource ($uri);
     unless ($res->is_defined) {
       $res = $db->get_module ($uri);
@@ -1296,4 +1313,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/09/17 15:03:02 $
+1; # $Date: 2005/09/19 16:17:50 $

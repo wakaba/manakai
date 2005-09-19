@@ -62,6 +62,9 @@ core$(DAC_SUFFIX): $(CORE_DAC_FILE) $(UTIL_CORE_DIS_FILES) $(DAC_PL)
 discore$(DAC_SUFFIX): $(SWCFG_DAC_FILE) $(DIS_CORE_DIS_FILES) $(DAC_PL)
 	$(DAC)$@ --input-db-file-name="$<" DIS.dis
 
+dn$(DAC_SUFFIX): discore$(DAC_SUFFIX) DIS/DNLite.dis $(DAC_PL)
+	$(DAC)$@ --input-db-file-name="$<" DIS/DNLite.dis
+
 disdoc$(DAC_SUFFIX): discore$(DAC_SUFFIX) $(DIS_DOC_DIS_FILES) $(DAC_PL)
 	$(DAC)$@ --input-db-file-name="$<" DIS/DISDump.dis
 
@@ -88,6 +91,12 @@ $(DIS_CORE_DIS_FILES_DIS:.dis=$(PM_SUFFIX)): %$(PM_SUFFIX): \
   discore$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< \
 	  --module-uri="$(NS_UTIL_DIS)$(*:DIS/%=%)" \
+	  --output-file-path="$@"
+	$(PERL_CHK) $@
+
+DIS/DNLite$(PM_SUFFIX): dn$(DAC_SUFFIX) $(DAC2PM_PL)
+	$(DAC2PM) $< \
+	  --module-uri="$(NS_UTIL_DIS)DNLite" \
 	  --output-file-path="$@"
 	$(PERL_CHK) $@
 

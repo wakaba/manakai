@@ -44,7 +44,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/17 15:03:02 $
+      $Date: 2005/09/19 16:17:51 $
     @@ContentType:
       dis:Date.RCS
 
@@ -159,92 +159,83 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethod
-    @@ForCheck:
-      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+    @@rdf:type: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
 ElementTypeBinding:
   @Name: IntMethod
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethod
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM ManakaiDOM|ForClass
+    @@rdf:type: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
     @@ManakaiDOM:isForInternal: 1
+
 ElementTypeBinding:
   @Name: ReMethod
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethod
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM ManakaiDOM|ForClass
-    @@ManakaiDOM:isRedefining: 1
+    @@rdf:type: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
+
 ElementTypeBinding:
   @Name: Param
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethodParameter
+    @@rdf:type: DISLang|MethodParameter
 
 ElementTypeBinding:
   @Name: Warning
   @ElementType:
     ManakaiDOM:alwaysWarns
+
 ElementTypeBinding:
   @Name: Return
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethodReturn
+    @@rdf:type: DISLang|MethodReturn
+
 ElementTypeBinding:
   @Name: Attr
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttribute
-    @@ForCheck:
-      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
 ElementTypeBinding:
   @Name: IntAttr
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttribute
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM ManakaiDOM|ForClass
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
     @@ManakaiDOM:isForInternal: 1
+
 ElementTypeBinding:
   @Name: ReAttr
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttribute
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM ManakaiDOM|ForClass
-    @@ManakaiDOM:isRedefining: 1
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
+
 ElementTypeBinding:
   @Name: Get
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttrGet
+    @@rdf:type: DISLang|AttributeGet
+
 ElementTypeBinding:
   @Name: Set
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttrSet
+    @@rdf:type: DISLang|AttributeSet
 
 ElementTypeBinding:
   @Name: InCase
@@ -271,6 +262,16 @@ ElementTypeBinding:
   @ShadowContent:
     @@ContentType:
       lang:Perl
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: disDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:dis
+    @@ForCheck: ManakaiDOM|ForClass
 
 ## -- Feature
 
@@ -281,11 +282,8 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       DOMMain:DOMFeature
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
+    @@For: =ManakaiDOM|all
+
 ElementTypeBinding:
   @Name: FeatureVerDef
   @ElementType:
@@ -299,8 +297,8 @@ ElementTypeBinding:
   @ElementType:
     dis:AppName
   @ShadowContent:
-    @@ContentType:
-      dis:String
+    @@ContentType: DISCore|String
+
 ElementTypeBinding:
   @Name: featureQName
   @ElementType:
@@ -595,9 +593,7 @@ ResourceDef:
           @@@@@lang:en
           @@@@@@:
             Always this value for the <IF::CDATASection> node.
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@DISLang:value:
           @@@@@@: \#cdata-section
           @@@@@ContentType:
@@ -619,9 +615,7 @@ ResourceDef:
           @@@@@lang:en
           @@@@@@:
             The node is a <IF::CDATASection>.
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@DISLang:constValue:
           DOMCore:Node.CDATA_SECTION_NODE
 
@@ -836,9 +830,7 @@ NodeTypeDef:
         @@@Description:
           @@@@lang:en
           @@@@@: The public identifier.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetProp:
             infoset:publicIdentifier
      @@Level[list]:  2
@@ -855,9 +847,7 @@ NodeTypeDef:
         @@@Description:
           @@@@lang:en
           @@@@@: The system identifier.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetProp:
             infoset:systemIdentifier
      @@Level[list]:  2
@@ -943,9 +933,7 @@ NodeTypeDef:
       @@@Description:
         @@@@lang:en
         @@@@@: The document type name.
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@DISPerl:cloneCode: .name.get
   @ReAttr:
     @@Name: nodeType
@@ -963,9 +951,7 @@ NodeTypeDef:
           @@@@@lang:en
           @@@@@@:
             This node is a <IF::DocumentType>.
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@DISLang:constValue:
           DOMCore:Node.DOCUMENT_TYPE_NODE
   @ReAttr:
@@ -1140,9 +1126,7 @@ NodeTypeDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: The public identifier was not specified.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetProp:
             infoset:publicIdentifier
   @Attr:
@@ -1162,9 +1146,7 @@ NodeTypeDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: The system identifier was not specified.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetProp:
             infoset:systemIdentifier
   
@@ -1194,9 +1176,7 @@ NodeTypeDef:
           @@@@@@:
             The DOM implementation was not able to 
             obtain an absolute URI.
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@GetProp:
           infoset:declarationBaseURI
     @@SpecLevel:3
@@ -1259,9 +1239,7 @@ NodeTypeDef:
       @@@Description:
         @@@@lang:en
         @@@@@: The notation name.
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@GetProp:
           DOMCore:name
   @ReAttr:
@@ -1280,9 +1258,7 @@ NodeTypeDef:
           @@@@@lang:en
           @@@@@@:
             This node is a <IF::Notation>.
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@DISLang:constValue: 
           DOMCore:Node.NOTATION_NODE
   @ReAttr:
@@ -1458,9 +1434,7 @@ NodeTypeDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: The public identifier is not specified.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetProp:
             infoset:publicIdentifier
   @Attr:
@@ -1480,9 +1454,7 @@ NodeTypeDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: The system identifier is not specified.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetProp:
             infoset:systemIdentifier
   @Attr:
@@ -1502,9 +1474,7 @@ NodeTypeDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: This entity is a parsed entity.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetProp:
             infoset:notationName
   @Attr:
@@ -1532,9 +1502,7 @@ NodeTypeDef:
             @@@@@@:
               Is it mean that even the internal entity declared in the external 
               entity might have the input encoding!?
-         @@@Def:
-           @@@@ContentType:
-             lang:dis
+         @@@disDef:
            @@@@GetProp:
              infoset:characterEncodingScheme
      @@Level[list]:  3
@@ -1564,9 +1532,7 @@ NodeTypeDef:
           @@@@@: 
             The encoding declaration is required if the text declaration 
             is used, but the text declaration itself is not required. 
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetProp:
             DOMCore:xmlEncoding
      @@Level[list]:  3
@@ -1605,9 +1571,7 @@ NodeTypeDef:
             The XML Specifications allows the text declaration omitted. 
             Does the DOM implementation need to provide the default value? 
             What's the default value?
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetProp:
             infoset:version
      @@Level[list]:  3
@@ -1646,9 +1610,7 @@ NodeTypeDef:
           @@@@@@:
             The DOM implementation was not able to 
             obtain an absolute URI.
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@GetProp:
           infoset:declarationBaseURI
     @@SpecLevel:3
@@ -1709,9 +1671,7 @@ NodeTypeDef:
       @@@Description:
         @@@@lang:en
         @@@@@: The entity name.
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@GetProp:
           DOMCore:name
     @@Redefine: Node
@@ -1731,9 +1691,7 @@ NodeTypeDef:
           @@@@@lang:en
           @@@@@@:
             This node is an <IF::Entity>.
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@DISLang:constValue:
           DOMCore:Node.ENTITY_NODE
 
@@ -1914,9 +1872,7 @@ NodeTypeDef:
           @@@@@@:
             The DOM implementation was not able to 
             obtain an absolute URI.
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@GetProp:
           infoset:declarationBaseURI
     @@SpecLevel:3
@@ -1934,9 +1890,7 @@ NodeTypeDef:
       @@@Description:
         @@@@lang:en
         @@@@@: The name of the entity referred.
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@GetProp:
           DOMCore:name
   @ReAttr:
@@ -1955,9 +1909,7 @@ NodeTypeDef:
           @@@@@lang:en
           @@@@@@:
             This node is an <IF::EntityReference>.
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@DISLang:constValue:
           DOMCore:Node.ENTITY_REFERENCE_NODE
 
@@ -2023,9 +1975,7 @@ NodeTypeDef:
         @@@Description:
           @@@@lang:en
           @@@@@: The target name.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetProp:
             infoset:target
   @Attr:
@@ -2045,9 +1995,7 @@ NodeTypeDef:
         @@@Description:
           @@@@lang:en
           @@@@@: The content.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetProp:
             infoset:content
         @@@ImplNote:
@@ -2066,9 +2014,7 @@ NodeTypeDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: This node is read-only.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@SetProp:
             @@@@@@:
               infoset:content
@@ -2117,9 +2063,7 @@ NodeTypeDef:
         @@@@lang:en
         @@@@@: 
           The target name, i.e. same as <A::ProcessingInstruction.target>.
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@DISPerl:cloneCode: .target.get
   @ReAttr:
     @@Name: nodeType
@@ -2137,9 +2081,7 @@ NodeTypeDef:
           @@@@@lang:en
           @@@@@@:
             This node is a <IF::ProcessingInstruction>.
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@DISLang:constValue:
           DOMCore:Node.PROCESSING_INSTRUCTION_NODE
   @ReAttr:
@@ -2159,9 +2101,7 @@ NodeTypeDef:
             @@@@@lang:en
             @@@@@@: 
               The target data, i.e. same as <A::ProcessingInstruction.data>.
-        @@@Def:
-          @@@@ContentType: 
-            lang:dis
+        @@@disDef:
           @@@@DISPerl:cloneCode:.data.get
      @@Set:
         @@@Type:  
@@ -2179,9 +2119,7 @@ NodeTypeDef:
           @@@@lang:en
           @@@@@:
             New node value.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@DISPerl:cloneCode: .data.set
   @ReAttr:
      @@Name:  textContent
@@ -2212,9 +2150,7 @@ NodeTypeDef:
               The attribute would return more characters than 
               fit in a <TYPE::DOMMain:DOMString> variable on the implementation 
               platform.
-        @@@Def:
-          @@@@ContentType: 
-            lang:dis
+        @@@disDef:
           @@@@DISPerl:cloneCode: .data.get
      @@Set:
         @@@Description:
@@ -2227,9 +2163,7 @@ NodeTypeDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: This node is read-only.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@DISPerl:cloneCode:.data.set
      @@Level[list]:
         3

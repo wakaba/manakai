@@ -2,6 +2,8 @@ MANAKAI_ROOT_DIR = ../
 MANAKAI_BIN_DIR = $(MANAKAI_ROOT_DIR)bin/
 MANAKAI_LIB_DIR = $(MANAKAI_ROOT_DIR)lib/
 
+DAC_SUFFIX = .dac
+
 RM = rm -f
 
 JAVA = java
@@ -30,9 +32,9 @@ NS_UTIL = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 
 ALL_HTML = dom.html util.html
 
-DOM_DAC_FILE = $(MANAKAI_LIB_DIR)Message/DOM/core.dac
-#UTIL_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Util/disdoc.dac
-UTIL_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Util/discore.dac
+DOM_DAC_FILE = $(MANAKAI_LIB_DIR)Message/DOM/core$(DAC_SUFFIX)
+#UTIL_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Util/disdoc$(DAC_SUFFIX)
+UTIL_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Util/discore$(DAC_SUFFIX)
 
 all: $(ALL_HTML)
 
@@ -90,4 +92,5 @@ clean:
 distclean: clean
 	$(RMR) ./Message ./http
 
+## $Date: 2005/09/19 16:17:50 $
 ## License: Public Domain

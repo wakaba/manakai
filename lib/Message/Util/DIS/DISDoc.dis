@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/09/17 15:03:04 $
+      $Date: 2005/09/19 16:17:52 $
     @@ContentType:
       dis:Date.RCS
   
@@ -346,7 +346,7 @@ IFClassDef:
                                $self->{o}-><M::DIS|DISAnyResource.database>,
                                for_arg => $self->{o}->{for},
                                forp_arg => $self->{o}->{forp},
-                               default_name_uri => $self->{o}->{nameURI} ||
+                               default_name_uri => $self->{o}-><AG::DIS|DISAnyResource.nameURI> ||
                                             $self->{o}->{<Q::DIS:sourceNodeID>},
                                default_for_uri => $self->{o}->{for});
           }
@@ -427,7 +427,7 @@ IFClassDef:
                                $self->{o}-><M::DIS|DISAnyResource.database>,
                                for_arg => $self->{o}->{for},
                                forp_arg => $self->{o}->{forp},
-                               default_name_uri => $self->{o}->{nameURI} ||
+                               default_name_uri => $self->{o}-><AG::DIS|DISAnyResource.nameURI> ||
                                             $self->{o}->{<Q::DIS:sourceNodeID>},
                                default_for_uri => $self->{o}->{for});
               if ($elr) {
@@ -497,7 +497,7 @@ IFClassDef:
                                $self->{o}-><M::DIS|DISAnyResource.database>,
                                for_arg => $self->{o}->{for},
                                forp_arg => $self->{o}->{forp},
-                               default_name_uri => $self->{o}->{nameURI} ||
+                               default_name_uri => $self->{o}-><AG::DIS|DISAnyResource.nameURI> ||
                                             $self->{o}->{<Q::DIS:sourceNodeID>},
                                default_for_uri => $self->{o}->{for});
           }
@@ -634,8 +634,8 @@ IFClassDef:
           parameter is not specified. 
       @@@PerlDef:
       __DEEP{
-        my $lang = $self-><M::DIS:ManakaiDISElement.disGetAttribute>
-                       (<Q::dis:lang>, for_arg => $forArg, forp_arg => $forpArg);
+        my $lang = $self-><M::DIS|SWCFGNode.getAttributeNS>
+                       (<Q::dis:>, 'lang');
         if ($lang) {
           my $v = $lang-><M::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
           if (defined $v and not ref $v eq 'ARRAY') {
@@ -684,8 +684,8 @@ IFClassDef:
           parameter is not specified. 
       @@@PerlDef:
       __DEEP{
-        my $lang = $self-><M::DIS:ManakaiDISElement.disGetAttribute>
-                     (<Q::dis:script>, for_arg => $forArg, forp_arg => $forpArg);
+        my $lang = $self-><M::DIS|SWCFGNode.getAttributeNS>
+                     (<Q::dis:>, 'script');
         if ($lang) {
           my $v = $lang-><M::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
           if (defined $v and not ref $v eq 'ARRAY') {
@@ -942,9 +942,8 @@ IFClassDef:
         __DEEP{
           my $eturi = $self-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
                                   .expandedURI>;
-          my $ddid = $self-><M::DIS|ManakaiDISElement.disGetAttribute>
-                                  (<Q::dd:id>, for_arg => $forArg, 
-                                   forp_arg => $forpArg);
+          my $ddid = $self-><M::DIS|SWCFGNode.getAttributeNS>
+                                  (<Q::dd:>, 'id');
           my $ddidv = $ddid ? $ddid-><M::SWCFGNode.value> : 0;
           if ($ddidv) {
             for my $__uri ($ddidv, $eturi) {

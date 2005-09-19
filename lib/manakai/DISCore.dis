@@ -21,7 +21,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/17 15:03:04 $
+      $Date: 2005/09/19 16:17:53 $
     @@ContentType:
       dis:Date.RCS
   
@@ -839,8 +839,7 @@ DataTypeDef:
   @subsetOf: URI
 
 DataTypeDef:
-  @QName:
-    dis:Boolean
+  @QName: Boolean
   @FullName:
     @@lang:en
     @@@: Boolean truth
@@ -850,6 +849,10 @@ DataTypeDef:
       A boolean truth value, i.e. true or false. 
       \
       <Q:dis:Boolean> := "1" / "0"
+
+ResourceDef:
+  @QName: dis|Boolean
+  @AliasFor: Boolean
 
 DataTypeDef:
   @Name: Tristate
@@ -878,6 +881,13 @@ DataTypeDef:
   @QName:
     dis:String
   @AliasFor: String
+
+DataTypeDef:
+  @QName: Integer
+  @FullName:
+    @@lang:en
+    @@@:
+      Integer
 
 PropDef:
   @QName: dis|Author
@@ -945,7 +955,7 @@ ResourceDef:
   @rdf:type: rdfs|Resource
 
 ResourceDef:
-  @QName: SingleValue
+  @QName: Single
   @Description:
     @@lang:en
     @@@:
@@ -962,7 +972,7 @@ PropDef:
     @@lang:en
     @@@:
       A value of the resource.
-  @dataType: lang|dis
+  @dataType: String
   @multipleProperties: Single
 
 PropDef:

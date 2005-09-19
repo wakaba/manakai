@@ -27,7 +27,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/17 15:03:02 $
+      $Date: 2005/09/19 16:17:51 $
     @@ContentType:
       dis:Date.RCS
   
@@ -101,6 +101,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
   @ecore:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
+  @html5:
+    http://www.w3.org/1999/xhtml
   @infoset:
     http://www.w3.org/2001/04/infoset#
   @kwd:
@@ -206,11 +208,54 @@ ResourceDef:
     @@ManakaiDOM:moduleSuffix: Level1
     @@For: 
       ManakaiDOM:ManakaiDOM1
-  @AppName:
+  @DISPerl:interfacePackage:
+    @@@:
+      Message::DOM::IFLatest::
+    @@For:
+      ManakaiDOM:ManakaiDOMLatest
+  @DISPerl:interfacePackage:
+    @@@:
+      Message::DOM::IFLevel3::
+    @@For:
+      ManakaiDOM:ManakaiDOM3
+  @DISPerl:interfacePackage:
+    @@@:
+      Message::DOM::IFLevel2::
+    @@For:
+      ManakaiDOM:ManakaiDOM2
+  @DISPerl:interfacePackage:
+    @@@:
+      Message::DOM::IFLevel1::
+    @@For:
+      ManakaiDOM:ManakaiDOM1
+  @DISPerl:interfacePackage:
+    @@@:
+      Message::DOM::IF::
+    @@For:
+      ManakaiDOM:ManakaiDOM
+  @DISPerl:classPackage:
     @@@:
       Message::DOM::
     @@For:
-      ManakaiDOM:ManakaiDOMCommon
+      ManakaiDOM:ManakaiDOMLatest
+  @DISPerl:classPackage:
+    @@@:
+      Message::DOM::
+    @@ManakaiDOM:moduleSuffix: Level3
+    @@For: 
+      ManakaiDOM:ManakaiDOM3
+  @DISPerl:classPackage:
+    @@@:
+      Message::DOM::
+    @@ManakaiDOM:moduleSuffix: Level2
+    @@For: 
+      ManakaiDOM:ManakaiDOM2
+  @DISPerl:classPackage:
+    @@@:
+      Message::DOM::
+    @@ManakaiDOM:moduleSuffix: Level1
+    @@For: 
+      ManakaiDOM:ManakaiDOM1
 
 ## -- "For" definitions
 
@@ -387,11 +432,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       DISLang:TreeElementType
-    @@AliasFor:
-      @@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
+    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: ExceptionDef
@@ -465,59 +506,28 @@ ElementTypeBinding:
     @@rdf:type: 
       ManakaiDOM:Const
 
-ResourceTypeDef:
-  @QName:
-    ManakaiDOM:DOMAttribute
-  @FullName:
-    @@lang:en
-    @@@: DOM attribute
-  @Description:
-    @@lang:en
-    @@@: A DOM attribute.
-  @rdfs:subClassOf:
-    DISLang:Attribute
-
 ElementTypeBinding:
   @Name: Attr
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttribute
+    @@rdf:type: DISLang|Attribute
     @@ForCheck:
-      ManakaiDOM:DOM
+      ManakaiDOM:DOM !=ManakaiDOM|ManakaiDOM
 
-ResourceTypeDef:
-  @QName: 
-    ManakaiDOM:DOMAttrGet
-  @Description:
-    @@lang:en
-    @@@: A DOM attribute getter.
-  @rdfs:subClassOf:
-    DISLang:AttributeGet
 ElementTypeBinding:
   @Name: Get
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttrGet
+    @@rdf:type: DISLang|AttributeGet
 
-ResourceTypeDef:
-  @QName:
-    ManakaiDOM:DOMAttrSet
-  @Description:
-    @@lang:en
-    @@@: A DOM attribute setter.
-  @rdfs:subClassOf:
-    DISLang:AttributeSet
 ElementTypeBinding:
   @Name: Set
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttrSet
+    @@rdf:type: DISLang|AttributeSet
 
 ResourceTypeDef:
   @QName: ReflectGet
@@ -549,52 +559,28 @@ PropDef:
   @dataType: dis|TFQNames
   @rdfs:range: ReflectSet
 
-ResourceTypeDef:
-  @QName:
-    ManakaiDOM:DOMMethod
-  @Description:
-    @@lang:en
-    @@@: A DOM method.
-  @rdfs:subClassOf:
-    DISLang:Method
 ElementTypeBinding:
   @Name: Method
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethod
-    @@ForCheck:
-      ManakaiDOM:DOM
+    @@rdf:type: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
-ResourceTypeDef:
-  @QName:
-    ManakaiDOM:DOMMethodParameter
-  @Description:
-    @@lang:en
-    @@@: A DOM method parameter.
-  @rdfs:subClassOf:
-    DISLang:MethodParameter
 ElementTypeBinding:
   @Name: Param
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethodParameter
+    @@rdf:type: DISLang|MethodParameter
 
 ElementTypeBinding:
   @Name: FormatDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DISCore:StringDataType
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
+    @@rdf:type: DISCore|LexicalType
+    @@For: =ManakaiDOM|all
     @@rdfs:subClassOf:
       DISCore:String::ManakaiDOM:all
 
@@ -605,22 +591,12 @@ FormatDef:
     @@@:
       A DOM method parameter name. 
 
-ResourceTypeDef:
-  @QName:
-    ManakaiDOM:DOMMethodReturn
-  @Description:
-    @@lang:en
-    @@@: A DOM method return value.
-  @rdfs:subClassOf:
-    DISLang:MethodReturn
 ElementTypeBinding:
   @Name: Return
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethodReturn
-
+    @@rdf:type: DISLang|MethodReturn
 
 ElementTypeBinding:
   @Name: InCase
@@ -934,8 +910,7 @@ ResourceDef:
       The common class that is inherited by all manakai DOM object classes.
   
   @ResourceDef:
-    @@rdf:type:
-      ManakaiDOM:DOMMethod
+    @@rdf:type: DISLang|Method
     @@ForCheck:
       ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
     @@ManakaiDOM:isForInternal: 1
@@ -1038,15 +1013,6 @@ ResourceDef:
     @@ForCheck: ManakaiDOM|ManakaiDOM
 ##DOMTimeStamp
 
-ResourceDef:
-  @QName: ManakaiDOMTimeStamp
-  @AliasFor: DOMTimeStamp
-  @ImplNote:
-    @@lang:en
-    @@@:
-      This is a historical alias name for <TYPE::DOMTimeStamp>.
-  @For: ManakaiDOM|DOM2
-
 DOMDataTypeDef:
   @QName: DOMUserData
   @For: ManakaiDOM|DOM3
@@ -1112,10 +1078,11 @@ ResourceDef:
     @@lang:en
     @@@:
       This is a historical variant for <TYPE::DOMString>.
+  @For: ManakaiDOM|ManakaiDOM
 
 ResourceDef:
   @For: 
-    ManakaiDOM:DOM3
+    ManakaiDOM:DOM2
   @For:
     =ManakaiDOM:ManakaiDOM
 
@@ -1157,13 +1124,16 @@ ResourceDef:
     @@ContentType: DISCore|TFPQNames
     @@ForCheck:
       ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
-
+  @Implement:
+    @@@: ||ManakaiDOM|ManakaiDOM2||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck:
+      ManakaiDOM|ManakaiDOM2 ManakaiDOM|ForClass
   @Implement:
     @@@: ||ManakaiDOM|ManakaiDOM3||ManakaiDOM|ForIF
     @@ContentType: DISCore|TFPQNames
     @@ForCheck:
       ManakaiDOM|ManakaiDOM3 ManakaiDOM|ForClass
-
   @Implement:
     @@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
     @@ContentType: DISCore|TFPQNames
@@ -1175,8 +1145,9 @@ ResourceDef:
     @@@:
       Extensions to a language's native <CODE::String> class or interface.
      \
-      {NOTE:: This interface is defined in the informative Appendix E
-              of the DOM Level 3 Core specification.
+      {NOTE:: This interface is defined in the informative Appendix B
+              of the <CITE::DOM Level 2 Core> specification and Appendix E
+              of the <CITE::DOM Level 3 Core> specification.
       }
 
   @Method:
@@ -1185,34 +1156,53 @@ ResourceDef:
     @@Description:
       @@@lang:en
       @@@@: 
-        Returns the UTF-16 offset that corresponding to a UTF-32 offset.
-        Unmatched surrogate is counted as a single UTF-16 value.
+        Returns the UTF-16 offset corresponding to a UTF-32 offset.
+
+        {NOTE:: Applications can always round-trip from a 
+                UTF-32 offset to a UTF-16 offset and back.
+                Applications can round-trip from UTF-16
+                offset to a UTF-32 offset and back, however, if
+                and only if the UTF-16 offset is not in the middle
+                of a surrogate pair.  Unmatched surrogates
+                count as a single UTF-16 value.
+        }
     @@Param:
       @@@Name: offset32
-      @@@Type: unsigned-long||ManakaiDOM|all
+      @@@Type:
+        @@@@@: DOMMain|unsigned-long||ManakaiDOM|all
+        @@@@ImplNote:
+          @@@@@lang:en
+          @@@@@@:
+            <CODE::int> in spec.
       @@@Description:
         @@@@lang:en
         @@@@@: The UTF-32 offset.
     @@Return:
-      @@@Type: unsigned-long||ManakaiDOM|all
+      @@@Type:
+        @@@@@: DOMMain|unsigned-long||ManakaiDOM|all
+        @@@@ImplNote:
+          @@@@@lang:en
+          @@@@@@:
+            <CODE::int> in spec.
       @@@Description:
         @@@@lang:en
         @@@@@: The UTF-16 offset.
       @@@ManakaiDOM:raises:
-        @@@@@:
-          DOMCore:DOMException.INDEX_SIZE_ERR
+        @@@@@: StringIndexOutOfBoundsException
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
             The specified <P::offset32> is negative or greater than
-            the number of characters (i.e. UTF-32 32-bit code units).
+            the number of characters, i.e. the number of UTF-32 32-bit
+            code units.
       @@@PerlDef:
         @@@@DefaultValue: $offset32
+        @@@@ForCheck: ManakaiDOM|ForClass
         @@@@@:
           my $s = ref $self eq 'SCALAR' ? $self : \$self;
           if (not defined $offset32 or $offset32 < 0 or
               CORE::length ($$s) < $offset32) {
-            __EXCEPTION{DOMCore:ManakaiDOMException.INDEX_SIZE_ERR::
+            __EXCEPTION{ManakaiDOMStringIndexOutOfBoundsException::
               MDOMX:param-name => 'offset32',
             }__;
           }
@@ -1228,8 +1218,32 @@ ResourceDef:
     @@Description:
       @@@lang:en
       @@@@:
-        Returns the UTF-32 offset corresponding to a UTF-16 offset.
-        Unmatched surrogate is counted as a single UTF-16 value.
+        Returns the UTF-32 offset corresponding to a UTF-16
+        offset.
+
+        {NOTE:: If the UTF-16 offset is into the middle of a 
+                surrogate pair, then the UTF-32 offset of 
+                the <EM::end> of the pair, i.e.
+                the index of the character after the end of the pair
+                is returned.  While applications can always
+                round-trip from a UTF-32 offset to a UTF-16 offset
+                and back, they can round-trip from a UTF-16 offset
+                to a UTF-32 offset and back if and only if
+                the UTF-16 offset is not in the middle of a
+                surrogate pair.  Unmatched surrogates count
+                as a single UTF-16 value.
+        }
+
+        {eg::  
+          {P:: A pseudo-code
+
+             {CODE::<html5:var::len32> = findOffset32 (<html5:var
+                    ::str>, <html5:var::str>.length);}
+
+               would return the number of characters in
+               the string <html5:var::str>.
+          }
+        }
     @@enDesc:
       @@@@:
         {NOTE:: This function is implemented in a way that
@@ -1253,20 +1267,20 @@ ResourceDef:
           surrogate pair, the UTF-32 offset at the end of the pair is 
           returned.
       @@@ManakaiDOM:raises:
-        @@@@@:
-          DOMCore:DOMException.INDEX_SIZE_ERR
+        @@@@@: StringIndexOutOfBoundsException
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
-            The specified <P::offset32> is negative or greater than
-            the number of characters (i.e. UTF-32's 32-bit code units).
+            The specified <P::offset16> is negative or greater than
+            the number of UTF-16 16-bit code-units.
       @@@PerlDef:
         @@@@DefaultValue: $offset16
+        @@@@ForCheck: ManakaiDOM|ForClass
         @@@@@:
           my $s = ref $self eq 'SCALAR' ? $self : \$self;
           if (not defined $offset16 or $offset16 < 0 or
               CORE::length ($$s) * 2 < $offset16) {
-            __EXCEPTION{DOMCore:ManakaiDOMException.INDEX_SIZE_ERR::
+            __EXCEPTION{ManakaiDOMStringIndexOutOfBoundsException::
               MDOMX:param-name => 'offset16',
             }__;
           }
@@ -1289,12 +1303,69 @@ ResourceDef:
             }
           }
           if ($offset16 > 0) {
-            __EXCEPTION{DOMCore:ManakaiDOMException.INDEX_SIZE_ERR::
+            __EXCEPTION{ManakaiDOMStringIndexOutOfBoundsException::
               MDOMX:param-name => 'offset16',
             }__;
           }
           $r = pos ($$s);
 ##StringExtended
+
+ResourceDef:
+  @rdf:type:
+    @@@: dis|MultipleResource
+    @@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+  @resourceFor: ManakaiDOM|ForIF
+  @resourceFor:
+    @@@: ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+  @For: ManakaiDOM|DOM2
+  @For: =ManakaiDOM|ManakaiDOM
+
+  @rdf:type:
+    @@@: ManakaiDOM|ExceptionIF
+    @@ForCheck: ManakaiDOM|ForIF
+
+  @rdf:type:
+    @@@: ManakaiDOM|ExceptionClass
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @Implement:
+    @@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+  @Implement:
+    @@@: ||ManakaiDOM|ManakaiDOM2||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM2
+  @Implement:
+    @@@: ||ManakaiDOM|ManakaiDOM3||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM3
+  @Implement:
+    @@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+  @Implement:
+    @@@: DOMMain|ManakaiDOMExceptionIF||ManakaiDOM|Perl
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @ISA:
+    @@@: ManakaiDOM|ManakaiDOMException||ManakaiDOM|Perl
+    @@ForCheck: ManakaiDOM|ForClass
+  @ISA:
+    @@@: ManakaiDOM|ManakaiDOMObject
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @QName:
+    @@@: StringIndexOutOfBoundsException
+    @@ForCheck:
+      ManakaiDOM:ForIF
+  @QName:
+    @@@: ManakaiDOMStringIndexOutOfBoundsException
+    @@ForCheck:
+      ManakaiDOM:ForClass
+##StringIndexOutOfBoundsException
 
 ElementTypeBinding:
   @Name: PerlName
@@ -1487,7 +1558,9 @@ StringDataTypeDef:
     ManakaiDOM:ManakaiDOMURI
   @InCase:
     @@Value:
-      http://www.w3.org/2001/XMLSchema
+      @@@@:
+        http://www.w3.org/2001/XMLSchema
+      @@@ContentType: DISCore|URI
     @@Description:
       @@@lang:en
       @@@@:
@@ -1497,7 +1570,9 @@ StringDataTypeDef:
               <M::DOMLS:DOMImplementationLS.createLSParser>>.
   @InCase:
     @@Value:
-      http://www.w3.org/TR/REC-xml
+      @@@@:
+        http://www.w3.org/TR/REC-xml
+      @@@ContentType: DISCore|URI
     @@Description:
       @@@lang:en
       @@@@:
@@ -1987,7 +2062,9 @@ ExceptionDef:
     @@XConst:
       @@@QName: 
         MDOMX:MDOM_DOMSTRING_INDEX_IN_SURROGATE_PAIR
-      @@@Value: 2
+      @@@Value:
+        @@@@@: 2
+        @@@@ContentType: DISCore|Integer
       @@@Description:
         @@@@lang:en
         @@@@@: 
@@ -2025,7 +2102,9 @@ WarningDef:
     @@XConst:
       @@@QName: 
         MDOMX:ATTR_SET_NO_EFFECT
-      @@@Value: 0
+      @@@Value:
+        @@@@@: 0
+        @@@@ContentType: DISCore|Integer
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -2048,7 +2127,9 @@ WarningDef:
     @@XConst:
       @@@QName: 
         MDOMX:MDOM_NEWCHILD_IS_REFCHILD
-      @@@Value: 1
+      @@@Value:
+        @@@@@: 1
+        @@@@ContentType: DISCore|Integer
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -2069,7 +2150,9 @@ WarningDef:
     @@XConst:
       @@@QName: 
         MDOMX:MDOM_REPLACE_BY_ITSELF_NO_EFFECT
-      @@@Value:2
+      @@@Value:
+        @@@@@: 2
+        @@@@ContentType: DISCore|Integer
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -2078,7 +2161,9 @@ WarningDef:
 
     @@XConst:
       @@@QName: MDOMX_EMPTY_NS_PREFIX
-      @@@Value: 3
+      @@@Value:
+        @@@@@: 3
+        @@@@ContentType: DISCore|Integer
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -2088,7 +2173,9 @@ WarningDef:
     @@XConst:
       @@@QName: 
         MDOMX:MDOM_NS_EMPTY_URI
-      @@@Value: 4
+      @@@Value:
+        @@@@@: 4
+        @@@@ContentType: DISCore|Integer
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -2115,7 +2202,9 @@ WarningDef:
     @@XConst:
       @@@QName:
         MDOMX:BAD_BASE_URI
-      @@@Value:5
+      @@@Value:
+        @@@@@: 5
+        @@@@ContentType: DISCore|Integer
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -2147,7 +2236,9 @@ WarningDef:
     @@XConst:
       @@@QName:
         MDOMX:RELATIVE_URI
-      @@@Value: 6
+      @@@Value:
+        @@@@@: 6
+        @@@@ContentType: DISCore|Integer
       @@@Description:
         @@@@lang:en
         @@@@@:

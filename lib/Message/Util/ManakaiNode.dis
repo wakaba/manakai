@@ -21,7 +21,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/17 15:03:03 $
+      $Date: 2005/09/19 16:17:52 $
     @@ContentType:
       dis:Date.RCS
   
@@ -431,18 +431,18 @@ ClassDef:
       @@@Type: 
         DISPerl:Boolean::ManakaiDOM:all
       @@@InCase:
-        @@@@Value: true
-        @@@@Type:
-          DISPerl:Boolean::ManakaiDOM:all
+        @@@@Value:
+          @@@@@@:1
+          @@@@@ContentType: DISCore|Boolean
         @@@@Description:
           @@@@@lang:en
           @@@@@@: 
             There is one or more nodes in the tree that has been 
             referred via <Class::ManakaiDOM:ManakaiDOMNodeReference> objects.
       @@@InCase:
-        @@@@Value: false
-        @@@@Type:
-          DISPerl:Boolean::ManakaiDOM:all
+        @@@@Value:
+          @@@@@@:0
+          @@@@@ContentType: DISCore|Boolean
         @@@@Description:
           @@@@@lang:en
           @@@@@@: No external reference found.

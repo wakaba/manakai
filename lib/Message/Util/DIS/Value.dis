@@ -20,7 +20,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/17 15:03:04 $
+      $Date: 2005/09/19 16:17:53 $
     @@ContentType:
       dis:Date.RCS
   
@@ -64,6 +64,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Perl/
   @dump:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#DISDump/
+  @dx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @ecore:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
   @html3:
@@ -153,7 +155,7 @@ FeatureDef:
   @FeatureVerDef:
     @@QName: DIS|Value10
     @@Version: 1.0
-    @@DOMMetaImpl:instanceFeatureOf: DIS|Vale
+    @@DOMMetaImpl:instanceFeatureOf: DIS|Value
     @@DOMMain:requireFeature: DIS|CoreFeature10
     @@FullName:
       @@@lang:en
@@ -314,7 +316,7 @@ IFClsDef:
       Creates a <IF::DVValue> object.
     @@Param:
       @@@Name: dataType
-      @@Type: DISString
+      @@@Type: DISString
       @@@enDesc:
         The canonical URI of the data type of the value.
     @@Param:
@@ -345,13 +347,15 @@ IFClsDef:
           $class = {
             <Q::dis:TypeQName> => <ClassName::ManakaiDVQNameValue>,
             <Q::DISCore:URI> => <ClassName::ManakaiDVURIValue>,
-            <Q::lang:Perl> => <ClassName::ManakaiDVSWCFGElement>,
+            <Q::lang:Perl> => <ClassName::ManakaiDVNSValue>,
             <Q::lang:dis> => <ClassName::ManakaiDVSWCFGElement>,
+            <Q::lang:muf> => <ClassName::ManakaiDVNSValue>,
+            <Q::lang:disdoc> => <ClassName::ManakaiDVNSValue>,
+            <Q::lang:disdocInline> => <ClassName::ManakaiDVNSValue>,
           }->{$_} || $class;
         }
         $r = bless \ {
           type => $dataType,          
-          prop => {},
         }, $class;
         __DEEP{
           $r-><AS::DVValue.value> ($value);
@@ -385,11 +389,15 @@ IFClsDef:
           $class = {
             <Q::dis:TypeQName> => <ClassName::ManakaiDVQNameOrderedList>,
             <Q::DISCore:URI> => <ClassName::ManakaiDVURIOrderedList>,
+            <Q::lang:dis> => <ClassName::ManakaiDVSWCFGElementOrderedList>,
+            <Q::lang:Perl> => <ClassName::ManakaiDVNSOrderedList>,
+            <Q::lang:muf> => <ClassName::ManakaiDVNSOrderedList>,
+            <Q::lang:disdoc> => <ClassName::ManakaiDVNSOrderedList>,
+            <Q::lang:disdocInline> => <ClassName::ManakaiDVNSOrderedList>,
           }->{$_} || $class;
         }
         $r = bless \ {
           array => [],
-          prop => {},
         }, $class;
 
   @Method:
@@ -424,7 +432,6 @@ IFClsDef:
         }
         $r = bless \ {
           hash => {},
-          prop => {},
         }, $class;
 
   @ResourceDef:
@@ -462,6 +469,9 @@ IFClsDef:
   @ClsQName: ManakaiDVValue
 
   @ClsISA: dp|ManakaiDVValuePerl
+
+  @ClsISA:
+    dx:ManakaiDefaultExceptionHandler::ManakaiDOM:Perl
 
   @enDesc:
     A <IF::DVValue> object represents a value in <QUOTE::dis> model.
@@ -528,7 +538,11 @@ IFClsDef:
         @@@@enDesc:
           The new value is <CODE::null>.
       @@@PerlDef:
-        $$self->{value} = $given;
+        if (defined $given) {
+          $$self->{value} = $given;
+        } else {
+          CORE::delete $$self->{value};
+        }
 
   @Attr:
     @@Name: isNull
@@ -543,7 +557,10 @@ IFClsDef:
         @@@@enDesc:
           The value is <EM::not> <CODE::null>.
       @@@PerlDef:
-        $r = defined $$self->{value} ? false : true;
+        __DEEP{
+          my $in = $self-><M::DVValue.getProperty> (<Q::dis:is-null>);
+          $r = ($in and $in-><AG::DVValue.value>);
+        }__;
 
   @Method:
     @@ForCheck: ManakaiDOM|ForClass
@@ -702,6 +719,14 @@ IFClsDef:
         } else {
           CORE::delete $$self->{prop}->{$propName};
         }
+
+  @Attr:
+    @@Name: sourceNodePath
+    @@Type: DISString
+    @@Get:
+      @@@PerlDef: $r = $$self->{nodePath};
+    @@Set:
+      @@@PerlDef: $$self->{nodePath} = $given;
 ##DVValue
 
 ElementTypeBinding:
@@ -713,6 +738,143 @@ ElementTypeBinding:
       DISLang:Method
     @@ManakaiDOM:isForInternal:1
     @@ForCheck: ManakaiDOM|ForClass
+
+## -- Value with namespace context
+
+IFClsDef:
+  @IFQName: DVNSValue
+  @ClsQName: ManakaiDVNSValue
+
+  @IFISA: DVValue
+  @ClsISA: ManakaiDVValue
+
+  @IFISA: DIS|NSResolverDIS
+  @ClsISA: DIS|ManakaiNSResolverDIS
+
+  @enDesc:
+    Value with namespace context.
+
+  @Attr:
+    @@Name: namespaceBindingList
+    @@Type: pl|HASH||ManakaiDOM|all
+    @@enDesc:
+      The <QUOTE::live> hash reference of namespace bindings.
+    @@Get:
+      @@@PerlDef: $r = $$self->{ns};
+    @@Set:
+      @@@PerlDef: $$self->{ns} = $given;
+
+  @Method:
+    @@Name: lookupNamespaceURI
+    @@Param:
+      @@@Name: prefix
+      @@@Type: DISString
+      @@@nullCase:
+        @@@@enDesc:
+          The default namespace.
+    @@Return:
+      @@@Type: DISString
+      @@@nullCase:
+        @@@@enDesc: No namespace.
+      @@@PerlDef:
+        if (defined $prefix) {
+          $r = $$self->{ns}->{$prefix};
+          if (not defined $prefix and $$self->{ns}->{'###db'}) {
+            my $db = $$self->{ns}->{'###db'};
+            FIND: for my $mod_uri (keys %{$db->{modDef}}) {
+              my $mod = $db-><M::DIS|DISDatabase.getModule> ($mod_uri);
+              if ($mod-><AG::DIS|DISAnyResource.localName> eq $prefix) {
+                $r = $mod-><M::DIS|DISResourceProp.getPropertyText>
+                                                   (<Q::dis:Namespace>, null);
+                last FIND;
+              }
+            }
+          }
+        } else {
+          $r = ${$$self->{defaultNS}};
+        }
+
+  @Method:
+    @@Name: prefixToURI
+    @@Param:
+      @@@Name: prefix
+      @@@Type: DISString
+      @@@nullCase:
+        @@@@enDesc:
+          The default namespace.
+    @@NodeParam:
+    @@Return:
+      @@@Type: DISString
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The URI references associated. 
+      @@@UndeclaredPrefixException:
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::DVNSValue.lookupNamespaceURI> ($prefix);
+        }__;
+        unless (defined $r) {
+          __EXCEPTION{DIS|UNDECLARED_NS_PREFIX_ERR::
+            infoset:prefix => {$prefix},
+            DIS:sourceNode => {$node},
+            MDOMX:param-name => 'prefix',
+          }__;
+        }
+
+  @Attr:
+    @@Name: defaultNamespaceURI
+    @@Type: DISString
+    @@nullCase:
+      @@@enDesc: No namespace.
+    @@Get:
+      @@@PerlDef: $r = ${$$self->{defaultNS}};
+    @@Set:
+      @@@PerlDef: $$self->{defaultNS} = \$given;
+
+  @Attr:
+    @@Name: defaultNamespaceURIRef
+    @@Type: pl|SCALAR||ManakaiDOM|all
+    @@Get:
+      @@@PerlDef: $r = $$self->{defaultNS};
+    @@Set:
+      @@@PerlDef: $$self->{defaultNS} = $given;
+##DVNSValue
+
+ElementTypeBinding:
+  @Name: NodeParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1
+    @@Name: node
+    @@Type: DIS|DISNode
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The node in which the name has occurred.  It is intended 
+        to be reported when an exception had been raised. 
+    @@ResourceDef:
+      @@@rdf:type:
+        ManakaiDOM:InCase
+      @@@Value:
+        @@@@is-null:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The source of the name is not a node. 
+
+ElementTypeBinding:
+  @Name: UndeclaredPrefixException
+  @ElementType:
+    ManakaiDOM:raises
+  @ShadowContent:
+    @@@: DIS|UNDECLARED_NS_PREFIX_ERR
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The implementation has encounted an undeclared namespace prefix. 
 
 IFClsDef:
   @IFQName: DVList
@@ -728,15 +890,6 @@ IFClsDef:
     @@Type: DOMMain|unsigned-long||ManakaiDOM|all
     @@Get:
 
-  @Attr:
-    @@Name: isNull
-    @@enDesc:
-      Whether the value is <CODE::null> or not. 
-    @@Type: DOMMain|boolean||ManakaiDOM|all
-    @@Get:
-      @@@PerlDef:
-        $r = false;
-
   @Method:
     @@Name: addItem
     @@enDesc:
@@ -747,6 +900,54 @@ IFClsDef:
       @@@enDesc:
         An item.
     @@Return:
+
+  @Method:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: getProperty
+    @@enDesc:
+      Returns the value of a property.
+    @@Param:
+      @@@Name: propName
+      @@@Type: DISString
+      @@@enDesc:
+        A URI that identifies the URI.  The matching is done
+        as strings; aliases and subproperties are not taken into account.
+    @@Return:
+      @@@Type: DVValue
+      @@@enDesc:
+        The property value.
+      @@@nullCase:
+        @@@@enDesc: No value.
+      @@@PerlDef:
+        __DEEP{
+          my $v = $self->[0];
+          $r = $v-><M::DVValue.getProperty> ($propName)
+            if $v;
+        }__;
+
+  @Method:
+    @@Name: setProperty
+    @@enDesc:
+      Sets a property value.
+    @@Param:
+      @@@Name: propName
+      @@@Type: DISString
+      @@@enDesc:
+        A URI identifying a property.
+    @@Param:
+      @@@Name: newValue
+      @@@Type: DVValue
+      @@@enDesc:
+        New property value.
+      @@@nullCase:
+        @@@@enDesc: The property has removed.
+    @@Return:
+      @@@PerlDef:
+        __DEEP{
+          my $v = $self->[0];
+          $v-><M::DVValue.setProperty> ($propName => $newValue)
+            if $v;
+        }__;
 ##DVList
 
 IFClsDef:
@@ -1063,6 +1264,14 @@ IFClsDef:
 ##DVURIValue
 
 ClsDef:
+  @ClsQName: ManakaiDVSWCFGElementOrderedList
+
+  @ClsISA: ManakaiDVOrderedList
+
+  @ClsISA: ManakaiDVSWCFGElement
+##DVSWCFGElementOrderedList
+
+ClsDef:
   @ClsQName: ManakaiDVURIOrderedList
 
   @ClsISA: ManakaiDVOrderedList
@@ -1086,6 +1295,50 @@ ClsDef:
   @ClsISA: ManakaiDVURIValue
 ##DVURIUnorderedList
 
+ClsDef:
+  @ClsQName: ManakaiDVNSOrderedList
+
+  @ClsISA: ManakaiDVOrderedList
+ 
+  @ClsISA: ManakaiDVNSValue
+
+  @Attr:
+    @@Name: namespaceBindingList
+    @@Type: pl|HASH||ManakaiDOM|all
+    @@Get:
+      @@@PerlDef:
+        __DEEP{
+          my $v = $self->[0];
+          $r = $v-><AG::DVNSValue.namespaceBindingList>
+            if $v;
+        }__;
+    @@Set:
+      @@@PerlDef:
+        __DEEP{
+          my $v = $self->[0];
+          $v-><AS::DVNSValue.namespaceBindingList> ($given)
+            if $v;
+        }__;
+
+  @Attr:
+    @@Name: defaultNamespaceURI
+    @@Type: DISString
+    @@Get:
+      @@@PerlDef:
+        __DEEP{
+          my $v = $self->[0];
+          $r = $v-><AG::DVNSValue.defaultNamespaceURI>
+            if $v;
+        }__;
+    @@Set:
+      @@@PerlDef:
+        __DEEP{
+          my $v = $self->[0];
+          $v-><AS::DVNSValue.defaultNamespaceURI> ($given)
+            if $v;
+        }__;
+##DVNSOrderedList
+
 IFClsDef:
   @IFQName: DVQNameValue
   @ClsQName: ManakaiDVQNameValue
@@ -1104,7 +1357,11 @@ IFClsDef:
         $r = $$self->{prefix};
     @@Set:
       @@@PerlDef:
-        $$self->{prefix} = $given;
+        if (defined $given) {
+          $$self->{prefix} = $given;
+        } else {
+          CORE::delete $$self->{prefix};
+        }
   
   @Attr:
     @@Name: localName
@@ -1129,7 +1386,11 @@ IFClsDef:
         $r = $$self->{namespaceURI};
     @@Set:
       @@@PerlDef:
-        $$self->{namespaceURI} = $given;
+        if (defined $given) {
+          $$self->{namespaceURI} = $given;
+        } else {
+          CORE::delete $$self->{namespaceURI};
+        }
 
   @Attr:
     @@ForCheck: ManakaiDOM|ForClass
@@ -1261,7 +1522,7 @@ ElementTypeBinding:
 ResourceDef:
   @QName: DISString
   @AliasFor: DISLang|String||ManakaiDOM|all
-
+  @For: DIS|ForEmpty
 
 ElementTypeBinding:
   @Name: PerlDef
@@ -1270,14 +1531,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@ContentType:
       lang:Perl
-
-ElementTypeBinding:
-  @Name: disDef
-  @ElementType:
-    dis:Def
-  @ShadowContent:
-    @@ContentType:
-      lang:dis
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: InCase
@@ -1304,7 +1558,9 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:InCase
-    @@Value:true
+    @@Value:
+      @@@@:1
+      @@@ContentType: DISCore|Boolean
     @@Type:
       DOMMain:boolean::ManakaiDOM:all
 
@@ -1316,6 +1572,8 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:InCase
-    @@Value:false
+    @@Value:
+      @@@@:0
+      @@@ContentType: DISCore|Boolean
     @@Type:
       DOMMain:boolean::ManakaiDOM:all

@@ -8,7 +8,7 @@
 use strict;
 require Message::Util::Error::DOMException;
 require Message::DOM::DOMCore;
-require Message::DOM::DOMMetaImpl;
+require Message::DOM::DOMFeature;
 package Message::DOM::DOMLS;
 our $VERSION = 20050529.1022;
 sub ACTION_REPLACE ();

@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/09/17 15:03:02 $
+      $Date: 2005/09/19 16:17:51 $
     @@ContentType:
       dis:Date.RCS
   
@@ -159,6 +159,8 @@ ResourceDef:
     @@@:
       Message::Markup::IF::
     @@ForCheck: ForEmpty
+  @DISPerl:classPackage:
+    Message::Markup::
 
 ## -- "For" definitions
 
@@ -342,7 +344,9 @@ IFClsDef:
         @@@@@:
           Whether a string input should be accepted or not. 
       @@@InCase:
-        @@@@Value:true
+        @@@@Value:
+          @@@@@:1
+          @@@@ContentType: DISCore|Boolean
         @@@@Type:
           DOMMain:boolean::ManakaiDOM:all
         @@@@Description:
@@ -351,7 +355,9 @@ IFClsDef:
             A <TYPE::SWCFGString> is accepted as a <P::node> parameter 
             value. 
       @@@InCase:
-        @@@@Value:false
+        @@@@Value:
+          @@@@@:0
+          @@@@ContentType: DISCore|Boolean
         @@@@Type:
           DOMMain:boolean::ManakaiDOM:all
         @@@@Description:
@@ -1593,7 +1599,9 @@ IFClsDef:
           Whether the value should be returned as an array reference 
           even if the node value is a simple string. 
       @@@InCase:
-        @@@@Value:true
+        @@@@Value:
+          @@@@@@:1
+          @@@@@ContentType: DISCore|Boolean
         @@@@Type:
           DOMMain:boolean::ManakaiDOM:all
         @@@@Description:
@@ -1601,7 +1609,9 @@ IFClsDef:
           @@@@@@:
             The node value is always returned as an array reference. 
       @@@InCase:
-        @@@@Value:false
+        @@@@Value:
+          @@@@@@:0
+          @@@@@ContentType: DISCore|Boolean
         @@@@Type:
           DOMMain:boolean::ManakaiDOM:all
         @@@@Description:
@@ -2214,13 +2224,17 @@ IFClsDef:
           Whether a new namespace prefix should be bound when 
           no namespace URI has been associated yet. 
       @@@InCase:
-        @@@@Value:true
+        @@@@Value:
+          @@@@@@:1
+          @@@@@ContentType: DISCore|Boolean
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
             New binding is made if no prefix associated. 
       @@@InCase:
-        @@@@Value:false
+        @@@@Value:
+          @@@@@@:0
+          @@@@@ContentType: DISCore|Boolean
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
@@ -2324,7 +2338,9 @@ IFClsDef:
           Whether a new binding should be created if no namespace URI 
           is associated with the <P::prefix> or not. 
       @@@InCase:
-        @@@@Value:true
+        @@@@Value:
+          @@@@@@:1
+          @@@@@ContentType: DISCore|Boolean
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
@@ -2332,7 +2348,9 @@ IFClsDef:
             exactly same as <P::prefix> is created 
             if no binding found. 
       @@@InCase:
-        @@@@Value:false
+        @@@@Value:
+          @@@@@@:0
+          @@@@@ContentType: DISCore|Boolean
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
@@ -2506,13 +2524,17 @@ IFClsDef:
         @@@Type:  
           DOMMain:boolean::ManakaiDOM:all
         @@@InCase:
-          @@@@Value: true
+          @@@@Value:
+            @@@@@@:1
+            @@@@@ContentType: DISCore|Boolean
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
               The two nodes are the same.
         @@@InCase:
-          @@@@Value: false
+          @@@@Value:
+            @@@@@@:0
+            @@@@@ContentType: DISCore|Boolean
           @@@@Description:
             @@@@@lang:en
             @@@@@@: The two nodes are not same.
@@ -4006,7 +4028,9 @@ ResourceDef:
 
     @@XConst:
       @@@Name:HIERARCHY_REQUEST_ERR
-      @@@Value:3
+      @@@Value:
+        @@@@@:3
+        @@@@ContentType: DISCore|Integer
       @@@Description:
         @@@@lang:en
         @@@@@: 
@@ -4062,7 +4086,9 @@ ResourceDef:
               The type of the node to which the value is attempted to set. 
     @@XConst:
       @@@Name:WRONG_DOCUMENT_ERR
-      @@@Value:4
+      @@@Value:
+        @@@@@:4
+        @@@@ContentType: DISCore|Integer
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -4078,7 +4104,9 @@ ResourceDef:
           An attempt is made to append a node created for another document
     @@XConst:
       @@@Name:TYPE_MISMATCH_ERR
-      @@@Value:17
+      @@@Value:
+        @@@@@:17
+        @@@@ContentType: DISCore|Integer
       @@@Description:
         @@@@lang:en
         @@@@@: 
@@ -4119,7 +4147,9 @@ ResourceDef:
              An attempt is made to append a <DOM::null> value. 
     @@XConst:
       @@@Name: NOT_SUPPORTED_ERR
-      @@@Value: 9
+      @@@Value:
+        @@@@@: 9
+        @@@@ContentType: DISCore|Integer
       @@@XSubTypeDef:
         @@@@QName:SWCFG_VERSION_NOT_SUPPORTED_ERR
         @@@@Description:
@@ -4136,7 +4166,9 @@ ResourceDef:
               does not support. 
     @@XConst:
       @@@Name: NAMESPACE_ERR
-      @@@Value:14
+      @@@Value:
+        @@@@@:14
+        @@@@ContentType: DISCore|Integer
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -4158,7 +4190,9 @@ ResourceDef:
           not declared
     @@XConst:
       @@@Name:PARSE_ERR
-      @@@Value:81
+      @@@Value:
+        @@@@@:81
+        @@@@ContentType: DISCore|Integer
       @@@XSubTypeDef:
         @@@@QName:SWCFG_PARSE_ERR
         @@@@Description:
@@ -4906,7 +4940,9 @@ ElementTypeBinding:
     @@ResourceDef:
       @@@rdf:type:
         ManakaiDOM:InCase
-      @@@Value:true
+      @@@Value:
+        @@@@@:1
+        @@@@ContentType: DISCore|Boolean
       @@@Type:
         DOMMain:boolean::ManakaiDOM:all
       @@@Description:
@@ -4915,7 +4951,9 @@ ElementTypeBinding:
     @@ResourceDef:
       @@@rdf:type:
         ManakaiDOM:InCase
-      @@@Value:false
+      @@@Value:
+        @@@@@:0
+        @@@@ContentType: DISCore|Boolean
       @@@Type:
         DOMMain:boolean::ManakaiDOM:all
       @@@Description:

@@ -1,0 +1,1472 @@
+Module:
+  @QName:
+    DIS:DNLite
+  @FullName:
+    @@lang: en
+    @@@:
+      Simplified <QUOTE::dis> Node Module
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#DNLite/
+  
+  @Description:
+    @@lang:en
+    @@@:
+      This module provides a simplified implementation of
+      <QUOTE::dis> node object model.
+
+  @Author:
+    @@FullName: Wakaba
+    @@Mail: w@suika.fam.cx
+  @License:
+    license:Perl+MPL
+  @Date:
+    @@@:
+      $Date: 2005/09/19 16:17:52 $
+    @@ContentType:
+      dis:Date.RCS
+  
+  @Require:
+    @@Module:
+      @@@QName: Util|DIS
+      @@@WithFor: DIS|ForLatest
+
+  @DefaultFor: 
+    DIS:ForLatest
+
+Namespace:
+  @dd:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#DISDoc/
+  @ddel:
+    http://suika.fam.cx/~wakaba/archive/2005/disdoc#
+  @DIS:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @dis2pm:
+    http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
+  @DISlib:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @disPerl:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl--
+  @DOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @DOMException:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
+  @DOMLS:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
+  @DOMMain:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @DOMMetaImpl:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
+  @dp:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Perl/
+  @dv:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Value/
+  @dump:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#DISDump/
+  @ecore:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
+  @html3:
+    urn:x-suika-fam-cx:markup:ietf:html:3:draft:00:
+  @html5:
+    http://www.w3.org/1999/xhtml
+  @ilang:
+    urn:x-suika-fam-cx:lang:
+  @infoset:
+    http://www.w3.org/2001/04/infoset#
+  @kwd:
+    http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
+  @lang:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @Markup:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup#
+  @MDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
+  @MDOMX:
+    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @nl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/NaturalLanguage#
+  @owl:
+    http://www.w3.org/2002/07/owl#
+  @pl:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @s:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
+  @script:
+    http://suika.fam.cx/~wakaba/archive/2005/5/script#
+  @sw010:
+    urn:x-suika-fam-cx:markup:suikawiki:0:10:
+  @swcfg21:
+    http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
+  @TreeCore:\
+  @Util:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
+  @xhtml1:
+    http://www.w3.org/1999/xhtml
+  @xhtml2:
+    http://www.w3.org/2002/06/xhtml2/
+  @xml:
+    http://www.w3.org/XML/1998/namespace
+  @xmlns:
+    http://www.w3.org/2000/xmlns/
+  @xsi:
+    http://www.w3.org/2001/XMLSchema-instance
+
+## -- Features
+
+ElementTypeBinding:
+  @Name: FeatureDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DOMMain:DOMFeature
+    @@ForCheck:
+      ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: FeatureVerDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DOMMain:DOMFeature
+
+ElementTypeBinding:
+  @Name: featureQName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ContentType:
+      dis:TypeQName
+
+FeatureDef:
+  @QName: DIS|DNLite
+  @FeatureVerDef:
+    @@QName: DIS|DNLite10
+    @@Version: 1.0
+    @@DOMMetaImpl:instanceFeatureOf: DIS|DNLite
+    @@DOMMain:requireFeature: DIS|CoreFeature10
+    @@FullName:
+      @@@lang:en
+      @@@@:
+        <QUOTE::dis> Simplified Node Module version 1.0
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType: 
+    dis:Description
+  @ShadowContent: 
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: IFClsDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor: ManakaiDOM|ForClass
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|IF
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||+||ManakaiDOM|ForIF
+      @@@ForCheck: ManakaiDOM|ForClass
+      @@@ContentType: DISCore|TFPQNames
+
+    @@DOMMain:implementFeature: DIS|DNLite10
+
+ElementTypeBinding:
+  @Name: IFDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|IF
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@DOMMain:implementFeature: DIS|DNLite10
+
+ElementTypeBinding:
+  @Name: ClsDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForClass
+
+    @@rdf:type:
+      @@@@: ManakaiDOM|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+
+    @@DOMMain:implementFeature: DIS|DNLite10
+
+ElementTypeBinding:
+  @Name: IFQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: IFISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Method
+
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|MethodReturn
+
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|MethodParameter
+
+
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Attribute
+
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|AttributeGet
+
+ElementTypeBinding:
+  @Name: Set
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|AttributeSet
+
+## -- Implementation
+
+IFClsDef:
+  @IFQName: DISImplementationDNLite
+  @ClsQName: ManakaiDISImplementationDNLite
+
+  @DOMMetaImpl:provideFeature: DIS|DNLite10
+
+  @enDesc:
+    The object implementing the <IF::DISImplementationDNLite>
+    interface <kwd:MUST> also implement the <IF::DIS|DISImplementation>
+    interface.
+
+  @Method:
+    @@Name: convertDISDocumentToDNLDocument
+    @@Param:
+      @@@Name: originalDocument
+      @@@Type: DDoc
+      @@@enDesc:
+        The original node.
+    @@NamedParam:
+      @@@Name: databaseArg
+      @@@Type: DIS|DISDatabase
+      @@@nullCase:
+    @@Return:
+      @@@Type: DNLDocument
+      @@@caType: ManakaiDNLDocument
+      @@@enDesc:
+        The newly created node.
+      @@@PerlDef:
+        my $cn;
+        $cn = sub ($$;$) {
+          my ($self, $source_node => $result_parent) = @_;
+          __DEEP{
+            my $xu = $source_node-><AG::SEl.expandedURI>;
+            if ($xu eq <Q::dis:For>) {
+              push @{$source_node->{for}}, my $pr = {};
+              for my $q (grep {length $_}
+                         split /\s+/, $source_node-><M::SNode.value>) {
+                my $p = '-';
+                $p = $1 if $q =~ s/^(!=?|=)//;
+                $pr->{my $uri = $source_node-><M::DIS|NSResolverDIS.qnameToURI>
+                                     ($q)} = $p;
+                $databaseArg-><M::DIS|DISDatabase.getFor> ($uri)
+                            -><AS::DIS|DISAnyResource.isReferred> ($source_node);
+              }
+            } elsif ($xu eq <Q::dis:ForCheck>) {
+              for my $q (grep {length $_}
+                         split /\s+/, $source_node-><M::SNode.value>) {
+                my $p = '-';
+                $p = $1 if $q =~ s/^(!=?|=)//;
+                my $uri = $source_node-><M::DIS|NSResolverDIS.qnameToURI> ($q);
+                $result_parent->{forp}->{$uri} = {
+                  '' => {$p => $p},
+                  '-' => {$p => $p},
+                  '!' => {'-' => '!', '!' => '!', '=' => '!', '!=' => '!='},
+                  '=' => {'-' => '=', '!' => '!', '=' => '=', '!=' => '!='},
+                  '!=' => {$p => '!='},
+                }->{$result_parent->{forp}->{$uri} or ''}->{$p};
+                $databaseArg-><M::DIS|DISDatabase.getFor> ($uri)
+                            -><AS::DIS|DISAnyResource.isReferred> ($source_node);
+              }
+            } elsif ($xu eq <Q::dis:ContentType>) {
+              $result_parent->{mt} = $source_node-><AG::DEl.qnameValueURI>;
+              $databaseArg-><M::DIS|DISDatabase.getResource>
+                                                       ($result_parent->{mt})
+                          -><AS::DIS|DISAnyResource.isReferred> ($source_node);
+            } else {
+              my $np;
+              my $a = bless {
+                child => [],
+                for => [],
+                uri => $xu,
+                value => $source_node-><M::SNode.value>,
+                ns => $a->{ns},
+                defaultNS => $a->{defaultNS},
+                nodeID => $source_node->{<Q::TreeCore:node>}
+                                      ->{<Q::TreeCore:nodeID>},
+                parentNodePath => [@{$a->{parentNodePath}}, $a->{nodePath}],
+                nodePath => \$np,
+              }, <ClassName::DNLElement>;
+              push @{$result_parent->{child}}, $a;
+              $r->{nodeID} = $source_node->{<Q::TreeCore:node>}
+                                         ->{<Q::TreeCore:nodeID>}
+                if $a->{uri} eq <Q::dis:ResourceFor>;
+              my @source_child = @{$source_node-><AG::SNode.childNodes>};
+              __DEEP{
+                for my $source_child (@source_child) {
+                  $cn->($self, $source_child => $a);
+                }
+              }__;
+              $np = $source_node-><AG::SEl.realQualifiedName>;
+              CEL: for my $cel (@{$r->{child}}) {
+                ET: for my $et (
+                  [<Q::dis:QName> => 'QName'],
+                  [<Q::dis:Name> => 'Name'],
+                  [<Q::dis:Type> => 'Type'],
+                  [<Q::rdf:type> => 'rdf:type'],
+                ) {
+                  if ($cel->{uri} eq $et->[0]) {
+                    $np .= '[@'.$et->[1].'='.$cel->{value}.']';
+                    next CEL;
+                  }
+                } # ET
+              } # CEL
+            }
+            return;
+          }__;
+        };
+        __DEEP{
+          $r = bless {
+            ns => $originalDocument->{<Q::TreeCore:node>}
+                                   ->{<Q::swcfg21:nsBinding>},
+            child => [],
+            for => [],
+            defaultNS => \($originalDocument-><AG::DDoc.moduleElement>
+                              -><AG::DIS|DISModuleElement.definingNamespaceURI>),
+            fileName => $originalDocument->{<Q::TreeCore:node>}
+                                         ->{<Q::swcfg21:flag>}
+                                         ->{<Q::swcfg21:fileName>},
+            parentNodePath => [\''],
+          }, <ClassName::DNLDocument>;
+          $r->{nodePath} = \ ('document ('.$r->{fileName}.')');
+          if ($originalDocument->{<Q::TreeCore:node>}->{<Q::DIS|db>}) {
+            $r-><AS::DNLDocument.disDatabase>
+                   ($originalDocument->{<Q::TreeCore:node>}->{<Q::DIS|db>});
+          }
+          for my $source_child (@{$originalDocument-><AG::SNode.childNodes>}) {
+            $cn->($self, $source_child => $r);
+          }
+        }__;
+##DISImplementationDNLite
+
+ResourceDef:
+  @QName: SNode
+  @AliasFor: swcfg21|SWCFGNode||swcfg21|ForLatest
+  @For: DIS|ForEmpty
+ResourceDef:
+  @QName: SEl
+  @AliasFor: swcfg21|SWCFGElement||swcfg21|ForLatest
+  @For: DIS|ForEmpty
+ResourceDef:
+  @QName: DNode
+  @AliasFor: DIS|DISNode||DIS|ForLatest
+  @For: DIS|ForEmpty
+ResourceDef:
+  @QName: DDoc
+  @AliasFor: DIS|DISDocument||DIS|ForLatest
+  @For: DIS|ForEmpty
+ResourceDef:
+  @QName: DEl
+  @AliasFor: DIS|DISElement||DIS|ForLatest
+  @For: DIS|ForEmpty
+
+ElementTypeBinding:
+  @Name: caType
+  @ElementType:
+    dis:actualType
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+## -- Any Value
+
+IFClsDef:
+  @IFQName: DNLNode
+  @ClsQName: ManakaiDNLNode
+
+  @IFISA: DIS|NSResolverDIS
+  @ClsISA: DIS|ManakaiNSResolverDIS
+
+  @Attr:
+    @@Name: childNodes
+    @@Get:
+      @@@Type: pl|ARRAY||ManakaiDOM|all
+      @@@enDesc:
+        The list of child elements.
+
+        {NOTE:: The list is <EM::live>.
+        }
+      @@@PerlDef:
+        $r = $self->{child};
+
+  @Method:
+    @@Operator:
+      @@@@: DISPerl|CloneMethod
+      @@@ContentType: dis|TypeQName
+    @@Return:
+      @@@Type: DNLNode
+      @@@PerlDef:
+        $r = bless {%$self, child => []}, ref $self;
+        __DEEP{
+          for my $child (@{$self->{child}}) {
+            push @{$r->{child}}, $child->clone;
+          }
+        }__;
+
+  @Method:
+    @@Name: lookupNamespaceURI
+    @@Param:
+      @@@Name: prefix
+      @@@Type: DISString
+      @@@nullCase:
+        @@@@enDesc:
+          The default namespace.
+    @@Return:
+      @@@Type: DISString
+      @@@nullCase:
+        @@@@enDesc: No namespace.
+      @@@PerlDef:
+        if (defined $prefix) {
+          $r = $self->{ns}->{$prefix};
+          if (not defined $prefix and $self->{ns}->{'###db'}) {
+            my $db = $self->{ns}->{'###db'};
+            FIND: for my $mod_uri (keys %{$db->{modDef}}) {
+              my $mod = $db-><M::DIS|DISDatabase.getModule> ($mod_uri);
+              if ($mod-><AG::DIS|DISAnyResource.localName> eq $prefix) {
+                $r = $mod-><M::DIS|DISResourceProp.getPropertyText>
+                                                   (<Q::dis:Namespace>, null);
+                last FIND;
+              }
+            }
+          }
+        } else {
+          $r = ${$self->{defaultNS}};
+        }
+
+  @Attr:
+    @@Name: nodeID
+    @@Get:
+      @@@Type: DISString
+      @@@PerlDef: $r = $self->{nodeID};
+
+  @Method:
+    @@Name: nodePath
+    @@Param:
+      @@@Name: key
+      @@@DISPerl:isNamedParameter:1
+      @@@Type: DOMMain|any||ManakaiDOM|all
+      @@@enDesc: Ignored.
+    @@Return:
+      @@@Type: DISString
+      @@@PerlDef:
+        $r = join '/', map {$$_} (@{$self->{parentNodePath}}, $self->{nodePath});
+
+  @Attr:
+    @@Name: nodeType
+    @@Type: DISString
+    @@Get:
+      @@@PerlDef: $r = '#element';
+
+  @Attr:
+    @@Name: ownerDocument
+    @@Type: DNLDocument
+    @@Get: 
+      @@@nullCase:
+        @@@@enDesc:
+          Always <DOM::null>.
+      @@@PerlDef:
+
+  @Method:
+    @@Name: disChildElements
+    @@enDesc:
+      A list of child elements, with <QUOTE::for> checks.
+    @@ForParam:
+    @@ForpParam:
+    @@Return:
+      @@@Type: pl|ARRAY||ManakaiDOM|all
+      @@@enDesc:
+        The current snapshot of child nodes.
+      @@@PerlDef:
+        $r = [];
+        __DEEP{
+          for my $cn (@{$self->{child}}) {
+            if ($cn-><M::DNLElement.forMatch> ($forArg, $forpArg)) {
+              push @$r, $cn;
+            }
+          }
+        }__;
+
+  @Method:
+    @@Name: disAllChildElements
+    @@Return:
+      @@@Type: pl|ARRAY||ManakaiDOM|all
+      @@@PerlDef:
+        $r = [@{$self->{child}}];
+
+  @Method:
+    @@Name: getAttributeNS
+    @@Param:
+      @@@Name: namespaceURI
+      @@@Type: DISString
+    @@Param:
+      @@@Name: localName
+      @@@Type: DISString
+    @@Return:
+      @@@Type: DNLElement
+      @@@nullCase:
+        @@@@enDesc: No such attribute.
+      @@@PerlDef:
+        my $nm = $namespaceURI . $localName;
+        C: for my $cn (@{$self->{child}}) {
+          if ($cn->{uri} eq $nm) {
+            $r = $cn;
+            last C;
+          }
+        }
+
+  @Method:
+    @@Name: flag
+    @@enDesc:
+      Returns a flag value.
+    @@Param:
+      @@@Name: name
+      @@@Type: DISString
+      @@@enDesc:
+        Either <Q::swcfg21:fileName> or <CODE::nodePath>.
+    @@Return:
+      @@@Type: DISString
+      @@@PerlDef:
+        if ($name eq 'nodePath') {
+          __DEEP{
+            $r = $self-><M::DNLNode.nodePath>;
+          }__;
+        } else {
+          $r = $self->{fileName};
+        }
+
+  @Method:
+    @@Name: value
+    @@Type: DISString
+    @@Return:
+      @@@PerlDef: $r = $self->{value};
+
+  @Attr:
+    @@Name: ownerDISDocument
+    @@Type: DNLDocument
+    @@nullCase:
+      @@@enDesc:
+        Always <DOM::null>.
+    @@Get:
+      @@@PerlDef:
+
+  @Method:
+    @@Name: prefixToURI
+    @@Param:
+      @@@Name: prefix
+      @@@Type: DISString
+      @@@nullCase:
+        @@@@enDesc:
+          The default namespace.
+    @@NodeParam:
+    @@Return:
+      @@@Type: DISString
+      @@@Description:
+        @@@@lang:en
+        @@@@@: The URI references associated. 
+      @@@UndeclaredPrefixException:
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::DNLNode.lookupNamespaceURI> ($prefix);
+        }__;
+        unless (defined $r) {
+          __EXCEPTION{DIS|UNDECLARED_NS_PREFIX_ERR::
+            infoset:prefix => $prefix,
+            DIS:sourceNode => $node,
+            MDOMX:param-name => 'prefix',
+          }__;
+        }
+
+  @Attr:
+    @@Name: qnameValueURI
+    @@Type: DISString
+    @@Get:
+      @@@UndeclaredPrefixException:
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::DIS|NSResolverDIS.qnameToURI> ($self->{value});
+        }__;
+
+  @Attr:
+    @@Name: qnameValueLocalName
+    @@Type: DISString
+    @@Get:
+      @@@PerlDef:
+        __DEEP{
+          my $v = $self-><M::SNode.value>;
+          if (defined $v and not ref $v eq 'ARRAY') {
+            my ($n, $v) = split /\s*[:|]\s*/, $v, 2;
+            $r = defined $v ? $v : $n;
+          } else {
+            $r = null;
+          }
+        }__;
+
+  @Attr:
+    @@Name: qnameValuePrefix
+    @@enDesc:
+      The prefix part of the element value (assumed as 
+      written as <Q::dis:TypeQName>). 
+      \
+      {NOTE:: What should be if list value?
+      \
+      }
+    @@Get:
+      @@@Type:
+        DISCore:NamespacePrefix::ManakaiDOM:all
+      @@@nullCase:
+        @@@@enDesc:
+          No value. 
+      @@@PerlDef:
+        __DEEP{
+          my $v = $self-><M::SNode.value>;
+          if (defined $v and not ref $v eq 'ARRAY') {
+            my ($p, $l) = split /\s*[:|]\s*/, $v, 2;
+            $r = defined $l ? $p : null;
+          } else {
+            $r = null;
+          }
+        }__;
+
+  @Attr:
+    @@Name: qnameValueNamespaceURI
+    @@enDesc:
+      The namespace URI of the element value (assumed as written 
+      in <Q::dis:TypeQName>). 
+      \
+      {NOTE:: What should be if list value?
+      \
+      }
+    @@Get:
+      @@@Type: DIS|AnyURI
+      @@@nullCase:
+        @@@@enDesc:
+          No value. 
+      @@@UndeclaredPrefixException:
+      @@@PerlDef:
+        __DEEP{
+          my $v = $self-><M::SNode.value>;
+          if (defined $v and not ref $v eq 'ARRAY') {
+            my ($p, $v) = split /\s*[:|]\s*/, $v, 2;
+            $r = $self-><M::DIS|NSResolverDIS.prefixToURI>
+                                            (defined $v ? $p : null);
+          } else {
+            $r = null;
+          }
+        }__;
+
+  @Method:
+    @@Name: tfqnamesValueURI
+    @@enDesc:
+      The element value (written as <Q::dis:TFQNames>),
+      as URI reference. 
+      \
+      {NOTE:: What should be if list value?
+      \
+      }
+    @@Param:
+      @@@Name: defaultTypeURI
+      @@@Type: DIS|NameURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A name URI reference used if it is missing from 
+          <P::tfqnames>. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Equivalent to <Q::DOMMain:any>. 
+    @@Param:
+      @@@Name: defaultForURI
+      @@@Type: DIS|ForURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A <QUOTE::for> URI reference used if it is missing from 
+          <P::tfqnames>. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Equivalent to <QUOTE::for all>, i.e. <Q::ManakaiDOM:all>. 
+    @@ForParam:
+    @@ForpParam:
+    @@Return:
+      @@@Type: DIS|ResourceURI
+      @@@nullCase:
+        @@@@enDesc:
+          No value. 
+      @@@UndeclaredPrefixException:
+      @@@PerlDef:
+        my $v = $self-><M::SNode.value>;
+        if (defined $v and not ref $v eq 'ARRAY') {
+          __DEEP{
+            if ($self-><M::DNLElement.mediaTypeMatch>
+                                 (<Q::DISCore:TFPQNames>, <Q::DISCore:TFPQNames>,
+                                  for_arg => $forArg, forp_arg => $forpArg)) {
+              $r = $self-><M::DIS|NSResolverDIS.tfpqnamesToURI>
+                                  ($v, $defaultTypeURI, $defaultForURI,
+                                   node => $self);
+            } else {
+              $r = $self-><M::DIS|NSResolverDIS.tfqnamesToURI>
+                                  ($v, $defaultTypeURI, $defaultForURI,
+                                   node => $self);
+            }
+          }__;
+        } else {
+          $r = null;
+        }
+
+  @Method:
+    @@Name: elementTypeMatch
+    @@enDesc:
+      Returns whether the element type of this element matches 
+      with another element type (either the same element type or
+      this type is a subtype of another type). 
+    @@Param:
+      @@@Name: etype
+      @@@Type: DIS|ResourceURI
+      @@@enDesc:
+        An element type name URI reference to test. 
+    @@NamedParam:
+      @@@Name: databaseArg
+      @@@Type: DIS|DISDatabase
+      @@@nullCase:
+    @@Return:
+      @@@Type:
+        DOMMain:boolean::ManakaiDOM:all
+      @@@TrueCase:
+        @@@@enDesc:
+          Either the element type expanded URI reference of this element is 
+          same as <P::etype> or it is a sub-element type of <P::etype>. 
+      @@@FalseCase:
+        @@@@enDesc:
+          This element is not of <P::etype>. 
+      @@@NoDBException:
+      @@@PerlDef:
+        __DEEP{
+          my $et = $self-><AG::SEl.expandedURI>;
+          my $rdef = $databaseArg-><M::DIS|DISDatabase.getResource> ($et);
+          $r = $rdef-><M::DIS|DISResource.isSubsetOfURI> ($etype);
+        }__;
+
+  @Attr:
+    @@Name: isResourceElement
+    @@enDesc:
+      Whether this element defines a resource or not. 
+      \
+      {NOTE:: An element defines a resource if its element type is 
+              <Q::dis:ResourceDef> or its subtype.
+      \
+      }
+    @@Get:
+      @@@Type:
+        DOMMain:boolean::ManakaiDOM:all
+      @@@TrueCase:
+        @@@@enDesc:
+          This element defines a resource. 
+      @@@FalseCase:
+        @@@@enDesc:
+          This element does not define any resource.
+      @@@NoDBException:
+      @@@PerlDef:
+        __DEEP{
+          $r = ($self->{uri} eq <Q::dis:ResourceDef>);
+        }__;
+
+  @Method:
+    @@Name: isPropertyElement
+    @@enDesc:
+      Whether this element is a property or not. 
+      \
+      {NOTE:: An element is a property if its element type is
+              <Q::rdf:type> or if its element type's <Q::rdf:type> 
+              property is <Q::rdf:Property> or is <Q::dis:subsetOf> 
+              <Q::rdf:Property>. 
+      \
+      }
+    @@NamedParam:
+      @@@Name: databaseArg
+      @@@Type: DIS|DISDatabase
+    @@Return:
+      @@@Type:
+        DOMMain:boolean::ManakaiDOM:all
+      @@@TrueCase:
+        @@@@enDesc:
+          This element is a property.
+      @@@FalseCase:
+        @@@@enDesc:
+          This element is not a property. 
+      @@@NoDBException:
+      @@@PerlDef:
+        __DEEP{
+          my $xn = $self-><AG::SEl.expandedURI>;
+          if ($xn eq <Q::rdf:type>) {
+            $r = true;
+          } else {
+            my $rdef = $databaseArg-><M::DIS|DISDatabase.getResource> ($xn);
+            $r = $rdef-><M::DIS|DISResource.isTypeURI> (<Q::rdf:Property>);
+          }
+        }__;
+
+  @Method:
+    @@Name: unlinkFromDocument
+    @@enDesc:
+      Removes any relationship to this node from the owner document tree.
+      In addition, namespace bindings are copied from the document.
+      The node <kwd:MUST> be a cloned one (or just newly created one)
+      so that it does not have any parent-child relationship.
+    
+      {NOTE:: Once a subtree has removed from the document, the nodes
+              belongs to the subtree can't be part of any document anymore.
+      }
+    @@Param:
+      @@@Name: databaseArg
+      @@@Type: DIS|DISDatabase
+      @@@enDesc:
+        The <QUOTE::dis> database.
+    @@Return:
+      @@@PerlDef:
+        __DEEP{
+          if ($self->{ns}->{'###db'}) {
+            $databaseArg ||= $self->{ns}->{'###db'};
+            CORE::delete $self->{ns}->{'###db'};
+            if ($databaseArg) {
+              for my $mod_uri (keys %{$databaseArg->{modDef}}) {
+                my $mod = $databaseArg-><M::DIS|DISDatabase.getModule>
+                                                ($mod_uri);
+                my $prefix = $mod-><AG::DIS|DISAnyResource.localName>;
+                $self->{ns}->{$prefix}
+                  = $mod-><M::DIS|DISResourceProp.getPropertyText>
+                      (<Q::dis:Namespace>, null)
+                  unless defined $self->{ns}->{$prefix};
+              }
+            }
+          }
+        }__;
+
+  @Method:
+    @@Name: preserveNodePath
+    @@Return:
+##DNLNode
+
+ElementTypeBinding:
+  @Name: IntMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Method
+    @@ManakaiDOM:isForInternal:1
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: UndeclaredPrefixException
+  @ElementType:
+    ManakaiDOM:raises
+  @ShadowContent:
+    @@@: DIS|UNDECLARED_NS_PREFIX_ERR
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The implementation has encounted an undeclared namespace prefix. 
+
+IFClsDef:
+  @IFQName: DNLDocument
+  @ClsQName: ManakaiDNLDocument
+
+  @IFISA: DNLNode
+  @ClsISA: ManakaiDNLNode
+
+  @Attr:
+    @@Name: nodeType
+    @@Type: DISString
+    @@Get:
+      @@@PerlDef: $r = '#document';
+
+  @Attr:
+    @@Name: moduleElement
+    @@Get:
+      @@@Type: DNLElement
+      @@@PerlDef:
+        M: for my $n (@{$self->{child}}) {
+          if ($n->{uri} eq <Q::dis:Module>) {
+            $r = $n;
+            last M;
+          }
+        }
+
+  @Attr:
+    @@Name: disDatabase
+    @@Type: DIS|DISDatabase
+    @@Get:
+      @@@ManakaiDOM:raises:
+        @@@@@: DIS|NO_ASSOCIATED_DB_ERR
+      @@@PerlDef:
+        $r = $self->{db} or do {
+          __EXCEPTION{DIS|NO_ASSOCIATED_DB_ERR}__;
+        };
+    @@Set:
+      @@@PerlDef:
+        $self->{db} = $given;
+        $self->{ns}->{'###db'} = $given;
+        require Scalar::Util;
+        Scalar::Util::weaken ($self->{db});
+        Scalar::Util::weaken ($self->{ns}->{'###db'});
+##DNLDocument
+
+IFClsDef:
+  @IFQName: DNLElement
+  @ClsQName: ManakaiDNLElement
+
+  @IFISA: DNLNode
+  @ClsISA: ManakaiDNLNode
+
+  @Method:
+    @@Name: preserveNodePath
+    @@Return:
+
+  @Attr:
+    @@Name: requireElement
+    @@Get:
+      @@@Type: DNLElement
+      @@@PerlDef:
+        M: for my $n (@{$self->{child}}) {
+          if ($n->{uri} eq <Q::dis:Require>) {
+            $r = $n;
+            last M;
+          }
+        }
+
+  @Attr:
+    @@Name: defaultForURI
+    @@Get: 
+      @@@Type: DISString
+      @@@PerlDef:
+        M: for my $n (@{$self->{child}}) {
+          if ($n->{uri} eq <Q::dis:DefaultFor>) {
+            $r = $n->{value};
+            last M;
+          }
+        }
+
+  @Attr:
+    @@Name: definingNamespaceURI
+    @@Get:
+      @@@Type: DISString
+      @@@PerlDef:
+        M: for my $n (@{$self->{child}}) {
+          if ($n->{uri} eq <Q::dis:Namespace>) {
+            $r = $n->{value};
+            last M;
+          }
+        }
+
+  @Method:
+    @@Name: forMatch
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Tests whether this element is for a <QUOTE::for> or not. 
+    @@Param:
+      @@@Name: forArg
+      @@@Type: DIS|ForURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The <QUOTE::For> URI reference to test against. 
+    @@Param:
+      @@@Name: forpArg
+      @@@Type: DIS|ForURIList
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The <QUOTE::For+> URI references to test against. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            No additional <QUOTE::For> URI reference. 
+            Equivalent to an empty array reference. 
+    @@NamedParam:
+      @@@Name: databaseArg
+      @@@Type: DIS|DISDatabase
+      @@@enDesc:
+        A <QUOTE::dis> database.
+      @@@nullCase:
+        @@@@enDesc:
+          The database associated to the document is used.
+    @@Return:
+      @@@Type:
+        DOMMain:boolean::ManakaiDOM:all
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Whether this element is for <P::forArg> and <P::forpArg> or not. 
+      @@@UndeclaredPrefixException:
+      @@@NoDBException:
+      @@@PerlDef:
+        $forArg = <Q::ManakaiDOM:all> unless defined $forArg;
+        $forpArg ||= [];
+
+        FORMATCH: {
+          __DEEP{
+            my $for_res = $databaseArg-><M::DIS|DISDatabase.getFor> ($forArg);
+            my $forp_res = [map {
+                                  $databaseArg-><M::DIS|DISDatabase.getFor> ($_)
+                                } @{$forpArg}];
+
+            FCs: for my $uri (keys %{$self->{forp}||{}}) {
+              my $p = $self->{forp}->{$uri};
+              if ($p eq '-') {
+                for my $arg_res ($for_res, @{$forp_res}) {
+                  if ($arg_res-><M::DIS|DISFor.isaURI> ($uri)) {
+                    next FCs;
+                  }
+                }
+                last FORMATCH;
+              } elsif ($p eq '!') {
+                for my $arg_res ($for_res, @{$forp_res}) {
+                  if ($arg_res-><M::DIS|DISFor.isaURI> ($uri)) {
+                    last FORMATCH;
+                  }
+                }
+              } elsif ($p eq '=') {
+                my $for = $databaseArg-><M::DIS|DISDatabase.getFor> ($uri);
+                for my $arg_res ($for_res, @{$forp_res}) {
+                  if ($arg_res eq $for) {
+                    next FCs;
+                  }
+                }
+                last FORMATCH;
+              } elsif ($p eq '!=') {
+                my $for = $databaseArg-><M::DIS|DISDatabase.getFor> ($uri);
+                for my $arg_res ($for_res, @{$forp_res}) {
+                  if ($arg_res eq $for) {
+                    last FORMATCH;
+                  }
+                }
+              }
+            } # FCs
+
+            for my $fors (@{$self->{for}||[]}) {
+              my $ok = true;
+              AFOR: for my $uri (keys %{$fors}) {
+                my $p = $fors->{$uri};
+                if ($p eq '-') {
+                  unless ($for_res-><M::DIS|DISFor.isaURI> ($uri)) {
+                    $ok = false;
+                    last AFOR;
+                  }
+                } elsif ($p eq '!') {
+                  if ($for_res-><M::DIS|DISFor.isaURI> ($uri)) {
+                    $ok = false;
+                    last AFOR;
+                  }
+                } elsif ($p eq '=') {
+                  my $for = $databaseArg-><M::DIS|DISDatabase.getFor> ($uri);
+                  unless ($for_res eq $for) {
+                    $ok = false;
+                    last AFOR;
+                  }
+                } elsif ($p eq '!=') {
+                  my $for = $databaseArg-><M::DIS|DISDatabase.getFor> ($uri);
+                  if ($for_res eq $for) {
+                    $ok = false;
+                    last AFOR;
+                  }
+                }
+              } # AFOR
+              if ($ok) {
+                $r = true;
+                last FORMATCH;
+              }
+            } # fors
+            $r = @{$self->{for}||[]} ? false : true;
+          }__;
+        } # FORMATCH
+
+  @Method:
+    @@Name: mediaTypeMatch
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Tests whether the content media type of this element matches to 
+        a type or not. 
+    @@Param:
+      @@@Name: mediaType
+      @@@Type: DIS|MediaTypeURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A media type URI reference to test against. 
+    @@Param:
+      @@@Name: defaultMediaType
+      @@@Type: DIS|MediaTypeURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The default media type for this element. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            No default type provided.  All <P::mediaType> will match. 
+    @@ForParam:
+    @@ForpParam:
+    @@NamedParam:
+      @@@Name: databaseArg
+      @@@Type: DIS|DISDatabase
+      @@@enDesc:
+        A <QUOTE::dis> database.
+    @@Return:
+      @@@Type:
+        DOMMain:boolean::ManakaiDOM:all
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Whether this element is of <P::mediaType> or not. 
+      @@@PerlDef:
+        if (defined $mediaType) {
+          __DEEP{
+            my $res = $databaseArg-><M::DIS|DISDatabase.getResource>
+                         (defined $self->{mt} ? $self->{mt} : $defaultMediaType);
+            $r = $res-><M::DIS|DISResource.isSubsetOfURI> ($mediaType);
+          }__;
+        } else {
+          $r = true;
+        }
+
+  @Method:
+    @@Name:mediaTypeURI
+    @@enDesc:
+      The URI reference of the media type of this element. 
+    @@Type: DIS|MediaTypeURI
+    @@NamedParam:
+      @@@Name:defaultMediaType
+      @@@Type: DIS|MediaTypeURI
+      @@@enDesc:
+        The default media type URI reference. 
+      @@@nullCase:
+        @@@@enDesc:
+          No default is specified. 
+    @@ForParam:
+    @@ForpParam:
+    @@Return:
+      @@@enDesc:
+        The media type URI reference of this element. 
+      @@@nullCase:
+        @@@@enDesc:
+          This element has no media type information and 
+          <P::defaultMediaType> parameter is not provided. 
+      @@@UndeclaredPrefixException:
+      @@@PerlDef:
+        $r = $self->{mt};
+        $r = $defaultMediaType unless defined $r;
+##DNLElement
+
+
+ElementTypeBinding:
+  @Name: NamedParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1
+
+ElementTypeBinding:
+  @Name: NodeParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1
+    @@Name: node
+    @@Type: DIS|DISNode
+    @@actualType:
+      @@@@: DIS|ManakaiDISNode
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The node in which the name has occurred.  It is intended 
+        to be reported when an exception had been raised. 
+    @@ResourceDef:
+      @@@rdf:type:
+        ManakaiDOM:InCase
+      @@@Value:
+        @@@@is-null:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The source of the name is not a node. 
+
+ElementTypeBinding:
+  @Name: ForParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1
+    @@Name: forArg
+    @@Type: DIS|ForURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The <QUOTE::for> URI reference. 
+    @@ResourceDef:
+      @@@rdf:type:
+        ManakaiDOM:InCase
+      @@@Value:
+        @@@@is-null:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Equivalent to <Q::ManakaiDOM:all>, i.e. <QUOTE::for all>. 
+
+ElementTypeBinding:
+  @Name: ForpParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1
+    @@Name: forpArg
+    @@Type: DIS|ForURIList
+    @@Description:
+      @@@lang:en
+      @@@@:
+        An array reference containing additional <QUOTE::for> 
+        constraints (<QUOTE::For+> list).
+    @@ResourceDef:
+      @@@rdf:type:
+        ManakaiDOM:InCase
+      @@@Value:
+        @@@@is-null:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Equivalent to the empty array reference. 
+
+ElementTypeBinding:
+  @Name: MediaTypeParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1
+    @@Name: mediaType
+    @@Type: DIS|MediaTypeURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The URI reference identifying a media type. 
+    @@ResourceDef:
+      @@@rdf:type:
+        ManakaiDOM:InCase
+      @@@Value:
+        @@@@is-null:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          No media type specified. 
+
+ElementTypeBinding:
+  @Name: MediaTypeDefaultParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1
+    @@Name: defaultMediaType
+    @@Type: DIS|MediaTypeURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The default media type, i.e. the type used when no explicit 
+        specification is not found in the source tree. 
+    @@ResourceDef:
+      @@@rdf:type:
+        ManakaiDOM:InCase
+      @@@Value:
+        @@@@is-null:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          Defaulted to <Q::DOMMain:any>. 
+
+ElementTypeBinding:
+  @Name: RaiseException
+  @ElementType:
+    ManakaiDOM:raises
+
+ElementTypeBinding:
+  @Name: NoDBException
+  @ElementType:
+    ManakaiDOM:raises
+  @ShadowContent:
+    @@@: DIS|NO_ASSOCIATED_DB_ERR
+    @@Description:
+      @@@lang:en
+      @@@@:
+        No <QUOTE::dis> database is associated to this document. 
+
+ResourceDef:
+  @QName: DISString
+  @AliasFor: DISLang|String||ManakaiDOM|all
+  @For: DIS|ForEmpty
+
+ElementTypeBinding:
+  @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: InCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+
+ElementTypeBinding:
+  @Name: nullCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@is-null:1
+
+ElementTypeBinding:
+  @Name: TrueCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@@:1
+      @@@ContentType: DISCore|Boolean
+    @@Type:
+      DOMMain:boolean::ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: FalseCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@@:0
+      @@@ContentType: DISCore|Boolean
+    @@Type:
+      DOMMain:boolean::ManakaiDOM:all

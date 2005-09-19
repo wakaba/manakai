@@ -1,3 +1,14 @@
+2005-09-19  Wakaba  <wakaba@suika.fam.cx>
+
+	* DIS.dis: Parameter "databaseArg" added to various
+	methods to support objects that have no associated
+	database.
+	(getNamespaceBindingList, getDefaultNamespaceURIRef): New
+	methods.
+	(NO_RDF_TYPE_ERR): New error type.
+	(loadResource): Throws NO_RDF_TYPE_ERR if no rdf:type
+	attribute specified for a resource definition.
+
 2005-09-16  Wakaba  <wakaba@suika.fam.cx>
 
 	* DIS.dis (DISResourceProp): Methods reimplemented to

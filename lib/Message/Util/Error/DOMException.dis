@@ -22,25 +22,23 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/17 15:03:04 $
+      $Date: 2005/09/19 16:17:53 $
     @@ContentType:
       dis:Date.RCS
   
   @Require:
     @@Module:
-      @@@Name: DISPerl
+      @@@QName:
+        DISlib:DISPerl
+      @@@WithFor:
+        ManakaiDOM:all
+    @@Module:
       @@@QName:
         DISlib:DISIDL
       @@@WithFor:
         ManakaiDOM:all
     @@Module:
-      @@@Name: DISIDL
-      @@@QName:
-        DISlib:DISIDL
-      @@@WithFor:
-        ManakaiDOM:all
-    @@Module:
-      @@@Name: DOMException
+      @@@QName: Err|DOMException
       @@@WithFor:
         ManakaiDOM:Perl
     @@Module:
@@ -82,7 +80,6 @@ Namespace:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
-  @TreeCore:\
 
 ElementTypeBinding:
   @Name: enDesc
@@ -210,11 +207,7 @@ ElementTypeBinding:
       rdfs:Class::ManakaiDOM:all
     @@subsetOf:
       rdfs:Class::ManakaiDOM:all
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
+    @@For: =ManakaiDOM|all
 
 ## -- Throwing of exceptions
 
@@ -246,11 +239,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       rdf:Property
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
+    @@For: =ManakaiDOM|all
 
 ## -- lang:dis vocabulary
 
@@ -553,7 +542,9 @@ ResourceDef:
         MDOMX:MDOM_DEBUG_BUG
       @@@rdf:type:
         ManakaiDOM:Const
-      @@@Value: 3
+      @@@Value:
+        @@@@@: 3
+        @@@@ContentType: DISCore|Integer
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -632,7 +623,9 @@ ResourceDef:
       @@@QName: NO_MODIFICATION_ALLOWED_ERR
       @@@rdf:type:
         ManakaiDOM:Const
-      @@@Value:7
+      @@@Value:
+        @@@@@:7
+        @@@@ContentType: DISCore|Integer
       @@@Description:
         @@@@lang:en
         @@@@@: An attempt is made to modify read-only object.
@@ -650,7 +643,9 @@ ResourceDef:
       @@@QName: NOT_SUPPORTED_ERR
       @@@rdf:type:
         ManakaiDOM:Const
-      @@@Value:9
+      @@@Value:
+        @@@@@:9
+        @@@@ContentType: DISCore|Integer
       @@@Description:
         @@@@lang:en
         @@@@@: The implementation does not support the action. 
@@ -680,12 +675,16 @@ ResourceDef:
             @@@@@QName:
               MDOMX:on
             @@@@@InCase:
-              @@@@@@Value:get
+              @@@@@@Value:
+                @@@@@@@@: get
+                @@@@@@@ContentType: DISCore|String
               @@@@@@Description:
                 @@@@@@@lang:en
                 @@@@@@@@: Getting this attribute is not implemented.
             @@@@@InCase:
-              @@@@@@Value:set
+              @@@@@@Value:
+                @@@@@@@@: set
+                @@@@@@@ContentType: DISCore|String
               @@@@@@Description:
                 @@@@@@@lang:en
                 @@@@@@@@: Setting this attribute is not implemented.

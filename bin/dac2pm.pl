@@ -159,6 +159,7 @@ print STDERR "done\n";
 
 print STDERR "Closing the database...";
 $db->free;
+undef $db;
 print STDERR "done\n";
 
 =head1 SEE ALSO
@@ -183,4 +184,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/09/17 15:03:02 $
+1; # $Date: 2005/09/19 16:17:50 $

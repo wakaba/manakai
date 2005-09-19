@@ -1,3 +1,14 @@
+2005-09-19  Wakaba  <wakaba@suika.fam.cx>
+
+	* Value.dis (sourceNodePath): New attribute.
+	(DVNSValue, DVNSOrderedList): New interfaces and classes.
+
+	* Perl.dis: Some alias definitions moved from ../DIS.dis.
+	The "namespaceContext" parameters added to some methods.
+	(plCodeFragment): Now Perl'ize new DISCore:Integer typed string.
+	(plImplementation): Directly instantiates PCImplementation
+	to reduce overheads to find an implementation by ImplementationRegistry.
+
 2005-09-15  Wakaba  <wakaba@suika.fam.cx>
 
 	* DISDoc.dis: Some code modified to support new DIS.dis

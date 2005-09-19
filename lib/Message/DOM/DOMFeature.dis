@@ -43,7 +43,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/17 15:03:02 $
+      $Date: 2005/09/19 16:17:51 $
     @@ContentType:
       dis:Date.RCS
   
@@ -355,11 +355,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: Feature
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
+    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: FeatureVerDef
@@ -1086,7 +1082,7 @@ minIFClsDef:
             @@@@@lang:en
             @@@@@@:
               There is no <P::index>th implementation in the collection.
-        @@@PerlDef:
+        @@@PerlCDef:
           if (not defined $index or
               $index < 0 or
               $index > $#$self) {
@@ -1103,7 +1099,7 @@ minIFClsDef:
      @@Get:
         @@@Type:  
           DOMMain:unsigned-long::ManakaiDOM:all
-        @@@PerlDef:
+        @@@PerlCDef:
             $r = @$self;
 
   @Method:
@@ -1136,7 +1132,7 @@ minIFClsDef:
           In the Perl binding, the parameter value <kwd:MAY> be 
           a <IF::MinimumImplementation> object.
     @@Return:
-      @@@PerlDef:
+      @@@PerlCDef:
         if ($list->isa (<IFName::ImplementationList>)) {
           push @$self, @$list;
         } else {
@@ -1187,7 +1183,7 @@ minIFClsDef:
             @@@@@@: 
               This source has no implementation that supports the 
               desired features and versions.
-        @@@PerlDef:
+        @@@PerlCDef:
             CLS: for my $class (grep {
               $Message::DOM::ManakaiDOMImplementationSource::SourceClass{$_}
             } keys %Message::DOM::ManakaiDOMImplementationSource::SourceClass) {
@@ -1268,7 +1264,7 @@ minIFClsDef:
             @@@@@@: 
               This source has no DOM implementation that supports the 
               desired features and versions.
-        @@@PerlDef:
+        @@@PerlCDef:
           $features->{'core'}->{'3.0'} = true;
           __DEEP{
             $r = $self-><M::ImplementationSource.getImplementation> ($features);
@@ -1297,7 +1293,7 @@ minIFClsDef:
           @@@@@:
             A list of implementations that support the desired 
             features and versions.
-        @@@PerlDef:
+        @@@PerlCDef:
             $r = <ClassName::ManakaiImplementationList>->new;
             CLS: for my $class (grep {
               $Message::DOM::ManakaiDOMImplementationSource::SourceClass{$_}
@@ -1371,7 +1367,7 @@ minIFClsDef:
           @@@@@:
             A list of DOM implementations that support the desired 
             features and versions.
-        @@@PerlDef:
+        @@@PerlCDef:
           __DEEP{
             $features->{core}->{'3.0'} = true;
             $r = $self-><M::ImplementationSource
@@ -1401,6 +1397,7 @@ ResourceDef:
       }
       $Message::DOM::ClassISA{$CLASS} = [keys %__class];
     }
+  @For: ManakaiDOM|ManakaiDOM3
 
 ## -- Simplified DOMImplementation interface
 
@@ -1465,17 +1462,21 @@ minIFClsDef:
         @@@@@: 
           Whether the feature and version is implemented or not.
       @@@InCase:
-        @@@@Value: true
+        @@@@Value: 
+          @@@@@@:1
+          @@@@@ContentType: DISCore|Boolean
         @@@@Description:
           @@@@@lang:en
           @@@@@@: 
             The <P::feature> is implemented in the specified <P::version>.
       @@@InCase:
-        @@@@Value: false
+        @@@@Value: 
+          @@@@@@:0
+          @@@@@ContentType: DISCore|Boolean
         @@@@Description:
           @@@@@lang:en
           @@@@@@: The feature is not implemented.
-        @@@PerlDef:
+        @@@PerlCDef:
             my $plus = $feature =~ s/^\+// ? 1 : 0;
             my $class = ref $self;
             __CODE{makeClassISAList:: $CLASS => $class}__;
@@ -1545,7 +1546,7 @@ minIFClsDef:
           @@@@enDesc:
             There is no object available that implements interfaces 
             associated with the <P::feature> and <P::version>. 
-        @@@PerlDef:
+        @@@PerlCDef:
             $feature =~ s/^\+//;
             CLASS: for my $class (grep {
               $Message::DOM::ManakaiDOMImplementation::CompatClass{$_}
@@ -1644,13 +1645,17 @@ ResourceDef:
         @@@@@: 
           Whether the feature and version is implemented or not.
       @@@InCase:
-        @@@@Value: true
+        @@@@Value:
+          @@@@@@:1
+          @@@@@ContentType: DISCore|Boolean
         @@@@Description:
           @@@@@lang:en
           @@@@@@: 
             The <P::feature> is implemented in the specified <P::version>.
       @@@InCase:
-        @@@@Value: false
+        @@@@Value:
+          @@@@@@:0
+          @@@@@ContentType: DISCore|Boolean
         @@@@Description:
           @@@@@lang:en
           @@@@@@: The feature is not implemented.
@@ -1719,6 +1724,15 @@ ElementTypeBinding:
       lang:Perl
 
 ElementTypeBinding:
+  @Name: PerlCDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
   @Name: PropDef
   @ElementType:
     dis:ResourceDef
@@ -1732,8 +1746,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttribute
+    @@rdf:type: DISLang|Attribute
     @@ForCheck:
       ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
 
@@ -1742,24 +1755,21 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttrGet
+    @@rdf:type: DISLang|AttributeGet
 
 ElementTypeBinding:
   @Name: Set
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttrSet
+    @@rdf:type: DISLang|AttributeSet
 
 ElementTypeBinding:
   @Name: Method
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethod
+    @@rdf:type: DISLang|Method
     @@ForCheck:
       ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
 
@@ -1768,16 +1778,14 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethodParameter
+    @@rdf:type: DISLang|MethodParameter
 
 ElementTypeBinding:
   @Name: Return
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethodReturn
+    @@rdf:type: DISLang|MethodReturn
 
 ElementTypeBinding:
   @Name: InCase

@@ -28,19 +28,17 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/17 15:03:04 $
+      $Date: 2005/09/19 16:17:53 $
     @@ContentType:
       dis:Date.RCS
   
   @Require:
     @@Module:
-      @@@Name: DISPerl
       @@@QName:
-        DISlib:DISIDL
+        DISlib:DISPerl
       @@@WithFor:
         ManakaiDOM:all
     @@Module:
-      @@@Name: DISIDL
       @@@QName:
         DISlib:DISIDL
       @@@WithFor:
@@ -59,8 +57,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
   @DISlib:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
-  @DOMCore:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @Err:
@@ -75,8 +71,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
   @ManakaiDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
-  @MDOMX:
-    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @MUError:\
   @MUErrorCore:-
   @Perl:
@@ -85,7 +79,6 @@ Namespace:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
-  @TreeCore:\
 
 ResourceDef:
   @QName:
@@ -97,6 +90,8 @@ ResourceDef:
     @@@:
       The manakai error reporting modules
   @AppName:
+    Message::Util::Error::
+  @DISPerl:classPackage:
     Message::Util::Error::
   @DISPerl:interfacePackage:
     Message::Util::IF::
@@ -145,6 +140,7 @@ ResourceDef:
     <Q::Err|ErrorClass> and <Q::Err|ErrorInterface>.
   @For: =ManakaiDOM|all
   @rdfs:subClassOf: DISLang|AnyClass||ManakaiDOM|all
+  @rdf:type: rdfs|Class
 
 ResourceDef:
   @QName: Err|ErrorClass
@@ -154,6 +150,7 @@ ResourceDef:
   @For: =ManakaiDOM|all
   @rdfs:subClassOf: Err|ErrorAny
   @rdfs:subClassOf: ManakaiDOM|Class
+  @rdf:type: rdfs|Class
 
 ResourceDef:
   @QName: Err|ErrorInterface
@@ -163,6 +160,7 @@ ResourceDef:
   @For: =ManakaiDOM|all
   @rdfs:subClassOf: Err|ErrorAny
   @rdfs:subClassOf: ManakaiDOM|IF
+  @rdf:type: rdfs|Class
 
 ResourceDef:
   @rdf:type:
@@ -277,7 +275,6 @@ ResourceDef:
     @@Return:
 ##Error
 
-
 ElementTypeBinding:
   @Name: Attr
   @ElementType:
@@ -337,7 +334,6 @@ ElementTypeBinding:
     @@rdf:type:
       DISLang:Method
 
-
 ElementTypeBinding:
   @Name: Return
   @ElementType:
@@ -357,28 +353,6 @@ ElementTypeBinding:
       @@@is-null:1
 
 ElementTypeBinding:
-  @Name: trueCase
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:InCase
-    @@Value:true
-    @@Type:
-      DOMMain:boolean::ManakaiDOM:all
-
-ElementTypeBinding:
-  @Name: falseCase
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:InCase
-    @@Value:false
-    @@Type:
-      DOMMain:boolean::ManakaiDOM:all
-
-ElementTypeBinding:
   @Name: InCase
   @ElementType:
     dis:ResourceDef
@@ -394,6 +368,7 @@ ResourceDef:
     <Q::Err|MUErrorClass> and <Q::Err|MUErrorInterface>.
   @For: =ManakaiDOM|all
   @rdfs:subClassOf: Err|ErrorAny
+  @rdf:type: rdfs|Class
 
 ResourceDef:
   @QName: Err|MUErrorClass
@@ -403,6 +378,7 @@ ResourceDef:
   @For: =ManakaiDOM|all
   @rdfs:subClassOf: Err|MUErrorAny
   @rdfs:subClassOf: Err|ErrorClass
+  @rdf:type: rdfs|Class
 
 ResourceDef:
   @QName: Err|MUErrorInterface
@@ -410,6 +386,7 @@ ResourceDef:
   @For: =ManakaiDOM|all
   @rdfs:subClassOf: Err|MUErrorAny
   @rdfs:subClassOf: Err|ErrorInterface
+  @rdf:type: rdfs|Class
 
 ResourceDef:
   @rdf:type:
@@ -492,7 +469,6 @@ ResourceDef:
     @@Return:
 ##MUErrorTarget
 
-
 ResourceDef:
   @QName:
     ManakaiDOM:MUErrorHandler
@@ -514,6 +490,7 @@ ResourceDef:
     <Perl::___error_def> and which returns a reference to hash
     that contains definitions of errors.
   @For: =ManakaiDOM|all
+  @rdf:type: DOMMain|Operator
 
 ElementTypeBinding:
   @Name: PerlName

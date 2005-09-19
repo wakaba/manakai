@@ -31,7 +31,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/17 15:03:02 $
+      $Date: 2005/09/19 16:17:51 $
     @@ContentType:
       dis:Date.RCS
 
@@ -39,8 +39,9 @@ Module:
     ManakaiDOM:ManakaiDOMLatest
 
   @Require:
-     @@Module:
-        @@@Name:  DOMCore
+    @@Module:
+      @@@QName: MDOM|DOMCore
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
 #     @@Module:
 #        @@@Name:  DOMEvents
 ## TODO: Implement these modules
@@ -113,11 +114,8 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       DOMMain:DOMFeature
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
+    @@For: =ManakaiDOM|all
+
 ElementTypeBinding:
   @Name: FeatureVerDef
   @ElementType:
@@ -511,7 +509,7 @@ ResourceDef:
 
      @@Const:
         @@@Name:  PARSE_ERR
-        @@@Value:  81
+        @@@intValue: 81
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -519,7 +517,7 @@ ResourceDef:
             using <IF::LSParser> and the processing has been stopped.
      @@Const:
         @@@Name:  SERIALIZE_ERR
-        @@@Value:  82
+        @@@intValue:  82
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -642,11 +640,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:IF
-    @@ISA:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOM
-      @@@For:
-        ManakaiDOM:ManakaiDOM3
     @@For:
       ManakaiDOM:DOM3
     @@For:
@@ -657,20 +650,16 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethod
-    @@ForCheck:
-      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+    @@rdf:type: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: IntMethod
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethod
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@rdf:type: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
     @@ManakaiDOM:isForInternal: 1
 
 ElementTypeBinding:
@@ -678,8 +667,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethodParameter
+    @@rdf:type: DISLang|MethodParameter
 
 ElementTypeBinding:
   @Name: RaiseException
@@ -691,34 +679,29 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethodReturn
+    @@rdf:type: DISLang|MethodReturn
 
 ElementTypeBinding:
   @Name: Attr
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttribute
-    @@ForCheck:
-      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Get
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttrGet
+    @@rdf:type: DISLang|AttributeGet
 
 ElementTypeBinding:
   @Name: Set
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttrSet
+    @@rdf:type: DISLang|AttributeSet
 
 ElementTypeBinding:
   @Name: InCase
@@ -735,8 +718,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:ConstGroup
-    @@ForCheck:
-      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Const
@@ -745,8 +727,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: 
       ManakaiDOM:Const
-    @@ForCheck:
-      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
 
 ElementTypeBinding:
   @Name: XParam
@@ -767,11 +747,6 @@ ElementTypeBinding:
     @@ForCheck:
       ManakaiDOM:ForClass
     @@aliasChild:1
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOMLatest
-      @@@For:
-        !ManakaiDOM:ManakaiDOM1
 
 IFCls3Def:
   @IFQName: DOMImplementationLS
@@ -814,14 +789,14 @@ IFCls3Def:
        @@@@:The mode of the parser.
      @@Const:
         @@@Name:  MODE_SYNCHRONOUS
-        @@@Value:  1
+        @@@intValue:  1
         @@@Description:
           @@@@lang:en
           @@@@@: 
             Create an synchronous <IF::LSParser>.
      @@Const:
         @@@Name:  MODE_ASYNCHRONOUS
-        @@@Value:  2
+        @@@intValue:  2
         @@@Description:
           @@@@lang:en
           @@@@@: 
@@ -1326,19 +1301,19 @@ IFDef:
 
      @@Const:
         @@@Name:  ACTION_APPEND_AS_CHILDREN
-        @@@Value:  1
+        @@@intValue:  1
      @@Const:
         @@@Name:  ACTION_REPLACE_CHILDREN
-        @@@Value:  2
+        @@@intValue:  2
      @@Const:
         @@@Name:  ACTION_INSERT_BEFORE
-        @@@Value:  3
+        @@@intValue:  3
      @@Const:
         @@@Name:  ACTION_INSERT_AFTER
-        @@@Value:  4
+        @@@intValue:  4
      @@Const:
         @@@Name:  ACTION_REPLACE
-        @@@Value:  5
+        @@@intValue:  5
 
   @Method:
      @@Name:  parseWithContext
@@ -1718,22 +1693,22 @@ IFDef:
         @@@Name:  FILTER_ACCEPT
         @@@Type:
            DOMMain:short
-        @@@Value:  1
+        @@@intValue:  1
      @@Const:
         @@@Name:  FILTER_REJECT
         @@@Type:
            DOMMain:short
-        @@@Value:  2
+        @@@intValue:  2
      @@Const:
         @@@Name:  FILTER_SKIP
         @@@Type:
            DOMMain:short
-        @@@Value:  3
+        @@@intValue:  3
      @@Const:
         @@@Name:  FILTER_INTERRUPT
         @@@Type:
            DOMMain:short
-        @@@Value:  4
+        @@@intValue:  4
   @Method:
      @@Name:  startElement
      @@Param:
@@ -2855,6 +2830,13 @@ ImplNote:
         The XML declaration or the text declaration is not outputed 
         but it was required.
 ##Error:LSSerializer
+
+ElementTypeBinding:
+  @Name: intValue
+  @ElementType:
+    dis:Value
+  @ShadowContent:
+    @@ContentType: DISCore|Integer
 
 ImplNote:
 #ConfigParam:

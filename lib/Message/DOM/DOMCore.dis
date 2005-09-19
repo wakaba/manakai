@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/17 15:03:02 $
+      $Date: 2005/09/19 16:17:50 $
     @@ContentType:
       dis:Date.RCS
 
@@ -479,11 +479,7 @@ ElementTypeBinding:
       @@@@: 1
       @@@For:
         ManakaiDOM:ManakaiDOM
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOMLatest
-      @@@For:
-        !ManakaiDOM:ManakaiDOM1
+    @@ForCheck: !ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: ErrName
@@ -520,14 +516,19 @@ ElementTypeBinding:
     @@ForCheck:
       ManakaiDOM:ForClass
     @@aliasChild:1
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOMLatest
-      @@@For:
-        !ManakaiDOM:ManakaiDOM1
+    @@ForCheck: !ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: PerlDefC
   @ElementType:
     dis:Def
   @ShadowContent:
@@ -564,11 +565,8 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       DOMMain:DOMFeature
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
+    @@For: =ManakaiDOM|all
+
 ElementTypeBinding:
   @Name: FeatureVerDef
   @ElementType:
@@ -772,7 +770,7 @@ ResourceDef:
        DOMMain:unsigned-short::ManakaiDOM:all
      @@XConst:
         @@@Name:  INDEX_SIZE_ERR
-        @@@Value:  1
+        @@@intValue:  1
         @@@Description:
           @@@@lang:en
           @@@@@: 
@@ -823,7 +821,7 @@ ResourceDef:
            );) is greater than an upper bound. 
      @@XConst:
         @@@Name:  DOMSTRING_SIZE_ERR
-        @@@Value:  2
+        @@@intValue:  2
         @@@Description:
           @@@@lang:en
           @@@@@: 
@@ -840,7 +838,7 @@ ResourceDef:
             ManakaiDOM:ManakaiDOM
      @@XConst:
         @@@Name:  HIERARCHY_REQUEST_ERR
-        @@@Value:  3
+        @@@intValue:  3
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -926,7 +924,7 @@ ResourceDef:
         @@@Name:  WRONG_DOCUMENT_ERR
         @@@Type:  
           DOMMain:unsigned-short||ManakaiDOM|all
-        @@@Value:  4
+        @@@intValue:  4
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -949,7 +947,7 @@ ResourceDef:
         @@@Name:  INVALID_CHARACTER_ERR
         @@@Type:  
           DOMMain:unsigned-short||ManakaiDOM|all
-        @@@Value:  5
+        @@@intValue:  5
         @@@Description:
           @@@@lang:en
           @@@@@: An invalid or illegal character is specified.
@@ -981,7 +979,7 @@ ResourceDef:
               @@@@@@@: The version of XML.
      @@XConst:
         @@@Name:  NO_DATA_ALLOWED_ERR
-        @@@Value:  6
+        @@@intValue:  6
         @@@Description:
           @@@@lang:en
           @@@@@: Data is specified for a node that does not support data.
@@ -995,7 +993,7 @@ ResourceDef:
             ManakaiDOM:ForClass
           @@@@ImplNote: Temporary.
         @@@Name:  NO_MODIFICATION_ALLOWED_ERR
-        @@@Value:  7
+        @@@intValue:  7
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -1063,7 +1061,7 @@ ResourceDef:
             This node is read-only
      @@XConst:
         @@@Name:  NOT_FOUND_ERR
-        @@@Value:  8
+        @@@intValue:  8
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -1088,7 +1086,7 @@ ResourceDef:
            The specified node is not a direct child of this node
      @@XConst:
         @@@Name:  NOT_SUPPORTED_ERR
-        @@@Value:  9
+        @@@intValue:  9
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -1276,7 +1274,7 @@ ResourceDef:
            MDOMX:MDOM_IMPL_BY_APP
          @@@@Type: 
            DOMMain:unsigned-short::ManakaiDOM:all
-         @@@@Value: 4
+         @@@@intValue: 4
          @@@@enDesc:
            A method or attribute is not implemented; it is expected
            that a DOM application implements it.
@@ -1285,7 +1283,7 @@ ResourceDef:
         @@@Name:  INUSE_ATTRIBUTE_ERR
         @@@Type:  
           DOMMain:unsigned-short::ManakaiDOM:all
-        @@@Value:  10
+        @@@intValue:  10
         @@@Description:
           @@@@lang:en
           @@@@@: 
@@ -1295,7 +1293,7 @@ ResourceDef:
          The attribure node is already in use elsewhere
      @@XConst:
         @@@Name:  INVALID_STATE_ERR
-        @@@Value:  11
+        @@@intValue:  11
         @@@Level[list]:  2
         @@@SpecLevel: 2
         @@@For:
@@ -1313,7 +1311,7 @@ ResourceDef:
             @@@@@@: The parser is busy.
      @@XConst:
         @@@Name:  SYNTAX_ERR
-        @@@Value:  12
+        @@@intValue:  12
         @@@Level[list]:  2
         @@@SpecLevel: 2
         @@@For:
@@ -1331,7 +1329,7 @@ ResourceDef:
               cookie value syntax.
      @@XConst:
         @@@Name:  INVALID_MODIFICATION_ERR
-        @@@Value:  13
+        @@@intValue:  13
         @@@Level[list]:  2
         @@@SpecLevel: 2
         @@@For:
@@ -1341,7 +1339,7 @@ ResourceDef:
           @@@@@: An attempt is made to modify the type of underlying object.
      @@XConst:
         @@@Name:  NAMESPACE_ERR
-        @@@Value:  14
+        @@@intValue:  14
         @@@SpecLevel: 2
         @@@Level[list]:  2
         @@@For:
@@ -1596,7 +1594,7 @@ ResourceDef:
             ManakaiDOM:DOMHTMLFeature
      @@XConst:
         @@@Name:  INVALID_ACCESS_ERR
-        @@@Value:  15
+        @@@intValue:  15
         @@@Level[list]:  2
         @@@SpecLevel: 2
         @@@Description:
@@ -1606,7 +1604,7 @@ ResourceDef:
             underlying object.
      @@XConst:
         @@@Name:  VALIDATION_ERR
-        @@@Value:  16
+        @@@intValue:  16
         @@@Level[list]:  3
         @@@SpecLevel:3
         @@@For:
@@ -1619,7 +1617,7 @@ ResourceDef:
 
      @@XConst:
         @@@Name:  TYPE_MISMATCH_ERR
-        @@@Value:  17
+        @@@intValue:  17
         @@@Level[list]:  3
         @@@SpecLevel:3
         @@@For:
@@ -2154,14 +2152,12 @@ IFCls3Def:
           @@@@lang:en
           @@@@@: 
             Whether the <P::str> is part of this collection or not.
-        @@@InCase:
-          @@@@Value: true
+        @@@TrueCase:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: 
               The <P::str> has been found in this collection.
-        @@@InCase:
-          @@@@Value: false
+        @@@FalseCase:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:  
@@ -2329,14 +2325,12 @@ IFCls3Def:
      @@Return:
         @@@Type:  
           DOMMain:boolean||ManakaiDOM|all
-        @@@InCase:
-          @@@@Value: true
+        @@@TrueCase:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
               The name <P::str> has been found in this collection.
-        @@@InCase:
-          @@@@Value: false
+        @@@FalseCase:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
@@ -2400,14 +2394,12 @@ IFCls3Def:
      @@Return:
         @@@Type:  
           DOMMain:boolean||ManakaiDOM|all
-        @@@InCase:
-          @@@@Value: true
+        @@@TrueCase:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
               The pair has been found in this collection.
-        @@@InCase:
-          @@@@Value: false
+        @@@FalseCase:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
@@ -2613,13 +2605,11 @@ IFCls1Def:
           @@@@lang:en
           @@@@@: 
             Whether the feature and version is implemented or not.
-        @@@InCase:
-          @@@@Value: true
+        @@@TrueCase:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: The feature is implemented in the specified version.
-        @@@InCase:
-          @@@@Value: false
+        @@@FalseCase:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: The feature is not implemented.
@@ -2741,11 +2731,9 @@ IFCls1Def:
             $node->{<Q::ManakaiDOM:implID>}
                         = $self->{<Q::TreeCore:node>}->{<Q::ManakaiDOM:implID>};
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node);
-        @@@Def:
+        @@@disDef:
           @@@@ForCheck:
             !ManakaiDOM:DOMXMLFeature
-          @@@@ContentType:
-            lang:dis
           @@@@DOMMain:raiseException:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
 
@@ -3114,11 +3102,9 @@ IFCls1Def:
               push @{$node->{<Q::infoset:children>}}, $docElObj;
             }
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node);
-        @@@Def:
+        @@@disDef:
           @@@@ForCheck:
             !ManakaiDOM:DOMXMLFeature
-          @@@@ContentType:
-            lang:dis
           @@@@DOMMain:raiseException:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
      @@SpecLevel:2
@@ -3207,10 +3193,12 @@ IFCls1Def:
 ResourceDef:
   @QName: NodeStem
   @AliasFor: ManakaiNode|NodeStem||ManakaiDOM|Perl
+  @For: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
 
 ResourceDef:
   @QName: NodeRef
   @AliasFor: ManakaiNode|NodeRef||ManakaiDOM|Perl
+  @For: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: disDef
@@ -3219,6 +3207,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@ContentType:
       lang:dis
+    @@ForCheck: ManakaiDOM|ForClass
 
 IFCls1Def:
   @IFQName: Node
@@ -3265,84 +3254,84 @@ IFCls1Def:
         @@@Name:  ELEMENT_NODE
         @@@Type:  
           DOMMain:unsigned-short||ManakaiDOM|all
-        @@@Value:  1
+        @@@intValue:  1
         @@@Description:
           @@@@lang:en
           @@@@@: 
             The node is an <IF::Element>.
      @@Const:
         @@@Name:  ATTRIBUTE_NODE
-        @@@Value:  2
+        @@@intValue:  2
         @@@Description:
           @@@@lang:en
           @@@@@: 
             The node is an <IF::Attr>.
      @@Const:
         @@@Name:  TEXT_NODE
-        @@@Value:  3
+        @@@intValue:  3
         @@@Description:
           @@@@lang:en
           @@@@@: 
             The node is a <IF::Text>.
      @@Const:
         @@@Name:  CDATA_SECTION_NODE
-        @@@Value:  4
+        @@@intValue:  4
         @@@Description:
           @@@@lang:en
           @@@@@: 
             The node is a <IF::DOMXML:CDATASection>.
      @@Const:
         @@@Name:  ENTITY_REFERENCE_NODE
-        @@@Value:  5
+        @@@intValue:  5
         @@@Description:
           @@@@lang:en
           @@@@@: 
             The node is an <IF::DOMXML:EntityReference>.
      @@Const:
         @@@Name:  ENTITY_NODE
-        @@@Value:  6
+        @@@intValue:  6
         @@@Description:
           @@@@lang:en
           @@@@@: 
             The node is an <IF::DOMXML:Entity>.
      @@Const:
         @@@Name:  PROCESSING_INSTRUCTION_NODE
-        @@@Value:  7
+        @@@intValue:  7
         @@@Description:
           @@@@lang:en
           @@@@@: 
             The node is a <IF::DOMXML:ProcessingInstruction>.
      @@Const:
         @@@Name:  COMMENT_NODE
-        @@@Value:  8
+        @@@intValue:  8
         @@@Description:
           @@@@lang:en
           @@@@@: 
             The node is a <IF::Comment>.
      @@Const:
         @@@Name:  DOCUMENT_NODE
-        @@@Value:  9
+        @@@intValue:  9
         @@@Description:
           @@@@lang:en
           @@@@@: 
             The node is a <IF::Document>.
      @@Const:
         @@@Name:  DOCUMENT_TYPE_NODE
-        @@@Value:  10
+        @@@intValue:  10
         @@@Description:
           @@@@lang:en
           @@@@@: 
             The node is a <IF::DOMXML:DocumentType>.
      @@Const:
         @@@Name:  DOCUMENT_FRAGMENT_NODE
-        @@@Value:  11
+        @@@intValue:  11
         @@@Description:
           @@@@lang:en
           @@@@@: 
             The node is a <IF::DocumentFragment>.
      @@Const:
         @@@Name:  NOTATION_NODE
-        @@@Value:  12
+        @@@intValue:  12
         @@@Description:
           @@@@lang:en
           @@@@@: 
@@ -3456,9 +3445,7 @@ IFCls1Def:
               <IF::DOMXML:Notation>, this node has just been created 
               and not yet added to any tree, or it has been removed 
               from the tree. 
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetPropNode:
             infoset:parent
     @@Level[list]:
@@ -3674,9 +3661,7 @@ IFCls1Def:
               Either this node is a <IF::Document> or this node is 
               a <IF::DOMXML:DocumentType> that has just been created 
               and not yet used in any document. 
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetPropNode:
             DOMCore:ownerDocument
      @@SpecLevel[list]:
@@ -4548,9 +4533,7 @@ IFCls1Def:
               the DOM implementation does not support the removal of 
               the "DocumentType" or "Element" child node from the 
               "Document" node.
-        @@@Def:
-          @@@@ContentType:
-            lang:Perl
+        @@@PerlDef:
           @@@@@:
             my $node;
             my $newNode;
@@ -4745,20 +4728,15 @@ IFCls1Def:
      @@Return:
         @@@Type: 
           DOMMain:boolean::ManakaiDOM:all
-        @@@InCase:
-          @@@@Value: true
+        @@@TrueCase:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: This node has any child nodes.
-        @@@InCase:
-          @@@@Value: false
+        @@@FalseCase:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: This node does not have any child node.
-        @@@Def:
-          @@@@ContentType:
-            lang:Perl
-          @@@@@:
+        @@@PerlDef:
             $r = @{$self->{<Q::TreeCore:node>}->{<Q::infoset:children>}}
                    ? true : false;
   @Method:
@@ -5042,14 +5020,12 @@ IFCls1Def:
          Return whether this node has any attributes.
      @@Return:
         @@@Type: DOMMain|boolean||ManakaiDOM|all
-        @@@InCase:
-          @@@@Value:true
+        @@@TrueCase:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
               This node is an <IF::Element> and has any attributes.
-        @@@InCase:
-          @@@@Value:false
+        @@@FalseCase:
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
@@ -5158,7 +5134,7 @@ IFCls1Def:
        DOMMain:unsigned-short::ManakaiDOM:all
      @@Const:
         @@@Name:  DOCUMENT_POSITION_DISCONNECTED
-        @@@Value:  0x01
+        @@@intValue:  0x01
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -5166,20 +5142,20 @@ IFCls1Def:
             is always implementation-specific.
      @@Const:
         @@@Name:  DOCUMENT_POSITION_PRECEDING
-        @@@Value:  0x02
+        @@@intValue:  0x02
         @@@Description:
           @@@@lang:en
           @@@@@:
             The node precedes the reference node.
      @@Const:
         @@@Name:  DOCUMENT_POSITION_FOLLOWING
-        @@@Value:  0x04
+        @@@intValue:  0x04
         @@@Description:
           @@@@lang:en
           @@@@@: The node fllows the reference node.
      @@Const:
         @@@Name:  DOCUMENT_POSITION_CONTAINS
-        @@@Value:  0x08
+        @@@intValue:  0x08
         @@@Description: 
           @@@@lang:en
           @@@@@:
@@ -5187,7 +5163,7 @@ IFCls1Def:
             contains is always preceding, too.
      @@Const:
         @@@Name:  DOCUMENT_POSITION_CONTAINED_BY
-        @@@Value:  0x10
+        @@@intValue:  0x10
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -5195,7 +5171,7 @@ IFCls1Def:
             A node that is contained is always following, too.
      @@Const:
         @@@Name:  DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC
-        @@@Value:  0x20
+        @@@intValue:  0x20
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -5402,7 +5378,6 @@ IFCls1Def:
 
   @ResourceDef:
     @@QName: setNodeTextContent
-    @@aliasChild:1
     @@rdf:type:
       dis2pm:BlockCode
     @@Description:
@@ -6381,7 +6356,7 @@ ClassDef:
           @@@@@lang:en
           @@@@@@:
             The DOM implementation is unable to obtain an absolute URI.
-      @@@PerlDef:
+      @@@PerlDefC:
           $r = null;
           if ($useInfosetProperty and defined $self->{<Q::infoset:baseURI>}) {
             ## Note: In XML Infoset, infoset:Document, 
@@ -6538,7 +6513,7 @@ ClassDef:
           @@@@@@:
             The DOM implementation was not able to obtain an 
             absolute URI.
-      @@@PerlDef:
+      @@@PerlDefC:
           $r = null;
           my $doc = $self->{<Q::TreeCore:node>}->{<Q::DOMCore:ownerDocument>};
           if ($doc and $doc->{<Q::DOMCore:hasFeature>}->{HTML}) {
@@ -6668,7 +6643,7 @@ ClassDef:
           @@@@@lang:en
           @@@@@@:
             The associated namespace prefix does not found.
-      @@@PerlDef:
+      @@@PerlDefC:
           $r = null;
           FIND: {
           if ($originalElement) {
@@ -6745,7 +6720,7 @@ ClassDef:
         @@@@@: The namespace URI to look for.
     @@Return:
       @@@Type:DOMMain|boolean||ManakaiDOM|all
-      @@@PerlDef:
+      @@@PerlDefC:
           if ($self->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
             if (not defined $self->{<Q::infoset:prefix>}) {
               if (defined $namespaceURI and
@@ -6876,7 +6851,7 @@ ClassDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: No namespace URI associated.
-      @@@PerlDef:
+      @@@PerlDefC:
           $r = null;
           FIND: {
           if ($self->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
@@ -7015,7 +6990,7 @@ ClassDef:
             <P::index> would be <CODE:-1> and the return value would be 
             the fiveth matching node.
       @@@InCase:
-        @@@@Value:0
+        @@@@intValue:0
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
@@ -7034,7 +7009,7 @@ ClassDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@:There is no such node.
-      @@@PerlDef:
+      @@@PerlDefC:
           for (@{$self->{<Q::infoset:children>}||[]}) {
             last if $$index < 0;
             if ($_->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
@@ -7080,7 +7055,7 @@ ClassDef:
         @@@@lang:en
         @@@@@:
           An array reference to the <IF::Element> nodes that meet the condition.
-      @@@PerlDef:
+      @@@PerlDefC:
           $r = [];
           for (@{$self->{<Q::infoset:children>}||[]}) {
             if ($_->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
@@ -7111,12 +7086,13 @@ ClassDef:
           Returns the XML version of a document.  If the document 
           does not support the <Feature::XML> feature, 
           <DOM::null> is returned.
-      @@PerlDef:
+      @@PerlDefC:
         ($DOCOBJ->{<Q::DOMCore:hasFeature>}->{XML}
              ? CORE::defined $DOCOBJ->{<Q::infoset:version>}
                    ? $DOCOBJ->{<Q::infoset:version>}
                    : '1.0'
              : null)
+
   @IntMethodC:
     @@Name: isEqualNode
     @@Operator:
@@ -7146,7 +7122,7 @@ ClassDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: Two nodes are not equal.
-      @@@PerlDef:
+      @@@PerlDefC:
          my $nodeclass = <ClassName::ManakaiDOMNode>;
          $r = <M::DOMCore:ManakaiDOMNode.isEqualNode>
                 (<Code::getWeakRef:: $object = $self,
@@ -7215,7 +7191,7 @@ ClassDef:
            @@@@@lang:en
            @@@@@@:
              One of descendant (or attribute) is read-only. 
-     @@@PerlDef:
+     @@@PerlDefC:
        @@@@@:
          if (@{$self->{<Q::infoset:children>}||[]}) {
            my @new;
@@ -7384,6 +7360,7 @@ ResourceDef:
   @QName: getWeakRef
   @AliasFor:
     ManakaiNode:getWeakRef::ManakaiDOM:Perl
+  @For: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
 
 ResourceDef:
   @rdf:type:
@@ -7628,9 +7605,7 @@ ResourceDef:
             A <IF::NodeList> returned by <M::Document.getElementsByTagNameNS> 
             or like is unable to be edited. 
         @@@@ForCheck:ForGetNodeList
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@DOMMain:raiseException:NOMOD_NODELIST_ERR
       @@@Exception:
         @@@@ForCheck:ForChildNodeList
@@ -7726,9 +7701,7 @@ ResourceDef:
             A <IF::NodeList> returned by <M::Document.getElementsByTagNameNS> 
             or like is unable to be edited. 
         @@@@ForCheck:ForGetNodeList
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@DOMMain:raiseException:NOMOD_NODELIST_ERR
       @@@Exception:
         @@@@ForCheck:ForChildNodeList
@@ -7946,9 +7919,7 @@ ResourceDef:
             A <IF::NodeList> returned by <M::Document.getElementsByTagNameNS> 
             or like is unable to be edited. 
         @@@@ForCheck:ForGetNodeList
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@DOMMain:raiseException:NOMOD_NODELIST_ERR
       @@@Exception:
         @@@@ForCheck:ForChildNodeList
@@ -8126,9 +8097,7 @@ ResourceDef:
         <Class::ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl>,
         since the <PerlModule::Tie::Array> also has its own empty destructor. 
     @@Return:
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@DISPerl:cloneCode:
           ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl.destroy
 
@@ -8149,9 +8118,7 @@ ElementTypeBinding:
           A <IF::NodeList> returned by <M::Document.getElementsByTagNameNS> 
           or like is unable to be edited. 
       @@@ForCheck:ForGetNodeList
-    @@Def:
-      @@@ContentType:
-        lang:dis
+    @@disDef:
       @@@DOMMain:raiseException:NOMOD_NODELIST_ERR
 
 
@@ -8432,10 +8399,8 @@ ResourceDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: The "name" does not identify any node in this map.
-         @@@Def:
+         @@@disDef:
            @@@@ForCheck: ForAttrMap
-           @@@@ContentType: 
-             lang:dis
            @@@@DISPerl:cloneCode:
              ManakaiDOMElement.getAttributeNode
   @Method:
@@ -8719,18 +8684,14 @@ ResourceDef:
               The DOM implementation does not support the feature "XML" and 
               the language exposed through the "Document" does not 
               support XML Namespaces.
-       @@@Def:
+       @@@disDef:
          @@@@ForCheck:
            ForAttrMap ManakaiDOM:DOMXMLFeature
-         @@@@ContentType:
-           lang:dis
          @@@@DISPerl:cloneCode:
            ManakaiDOMElement.getAttributeNodeNS
-        @@@Def:
+        @@@disDef:
           @@@@ForCheck:
             !ManakaiDOM:DOMXMLFeature
-          @@@@ContentType:
-            lang:dis
           @@@@DOMMain:raiseException:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
      @@DOMMain:implementFeature:
@@ -8917,11 +8878,9 @@ ResourceDef:
              \
               This code is almost same as <M::Element.setAttributeNodeNS>
               without some points.
-        @@@Def:
+        @@@disDef:
           @@@@ForCheck:
             !ManakaiDOM:DOMXMLFeature
-          @@@@ContentType:
-            lang:dis
           @@@@DOMMain:raiseException:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
      @@DOMMain:implementFeature:
@@ -9037,11 +8996,9 @@ ResourceDef:
                 ManakaiDOMException.NOT_FOUND_ERR::
               }__;
             }
-        @@@Def:
+        @@@disDef:
           @@@@ForCheck:
             !ManakaiDOM:DOMXMLFeature
-          @@@@ContentType:
-            lang:dis
           @@@@DOMMain:raiseException:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
      @@DOMMain:implementFeature:
@@ -9192,9 +9149,7 @@ NodeTypeDef:
               The attribute would return more characters than 
               fit in a "DOMString" variable on the implementation 
               platform.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetProp:
             infoset:content
      @@Set:
@@ -9206,9 +9161,7 @@ NodeTypeDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: The node is read-only.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@SetProp:
             @@@@@@:
               infoset:content
@@ -9507,9 +9460,7 @@ NodeTypeDef:
             @@@@@lang:en
             @@@@@@: 
               The node value, i.e. same as "data".
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@DISPerl:cloneCode: .data.get
      @@Set:
         @@@Type:  
@@ -9525,9 +9476,7 @@ NodeTypeDef:
           @@@@lang:en
           @@@@@:
             New node value.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@DISPerl:cloneCode: .data.set
     @@Level[list]:
       1
@@ -9560,9 +9509,7 @@ NodeTypeDef:
               The attribute would return more characters than 
               fit in a "DOMString" variable on the implementation 
               platform.
-        @@@Def:
-          @@@@ContentType: 
-            lang:dis
+        @@@disDef:
           @@@@DISPerl:cloneCode: .data.get
      @@Set:
         @@@Type:  
@@ -9585,9 +9532,7 @@ NodeTypeDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: This node is read-only.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@DISPerl:cloneCode: .data.set
      @@Level[list]:
         3
@@ -9666,9 +9611,7 @@ NodeTypeDef:
             @@@@@@:
               This attribute is not explicitly given a value in the 
               instance document.
-        @@@Def:
-          @@@@ContentType:
-             lang:dis
+        @@@disDef:
           @@@@GetProp:
              infoset:specified
     @@ImplNote:
@@ -9714,9 +9657,7 @@ NodeTypeDef:
           @@@@lang:en
           @@@@@:
             The attribute value as a string.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@DISPerl:cloneCode: 
             DOMCore:ManakaiDOMNode.textContent.get
           @@@@ImplNote:
@@ -9774,9 +9715,7 @@ NodeTypeDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: This attribute is not in use.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetPropNode:
             infoset:ownerElement
      @@Level[list]:  
@@ -9913,9 +9852,7 @@ NodeTypeDef:
             @@@@@lang:en
             @@@@@@:
               The node is created with a DOM Level 1 methods.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetProp:
             infoset:localName
      @@Level[list]:  2
@@ -10015,9 +9952,7 @@ NodeTypeDef:
               The namespace URI is unspecified (the attribute in a 
               per-element-type partition) or 
               the node is created with a DOM Level 1 methods.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetProp:
             infoset:namespaceName
      @@For:
@@ -10038,9 +9973,7 @@ NodeTypeDef:
         @@@@@:
           The attribute name.  It is same as the value of the "name" 
           attribute.
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@DISPerl:cloneCode:
           .name.get
   @ReAttr:
@@ -10057,9 +9990,7 @@ NodeTypeDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: The node is an "Attr".
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@DISLang:constValue: 
           Node.ATTRIBUTE_NODE
   @ReAttr:
@@ -10077,9 +10008,7 @@ NodeTypeDef:
             @@@@@lang:en
             @@@@@@: 
               The attribute value, i.e. same as "value".
-        @@@Def:
-          @@@@ContentType: 
-            lang:dis
+        @@@disDef:
           @@@@DISPerl:cloneCode:
             ManakaiDOMAttr.value.get
      @@Set:
@@ -10096,9 +10025,7 @@ NodeTypeDef:
           @@@@lang:en
           @@@@@:
             New node value.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@DISPerl:cloneCode: ManakaiDOMAttr.value.set
     @@Level[list]:
         1
@@ -10127,9 +10054,7 @@ NodeTypeDef:
             @@@@@@:
               Either the namespace prefix is unspecified or the node 
               is created with a DOM Level 1 method.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetProp:
             infoset:prefix
      @@Set:
@@ -11199,11 +11124,9 @@ NodeTypeDef:
             }
           @@@@For:
             ManakaiDOM:DOMXMLFeature
-        @@@Def:
+        @@@disDef:
           @@@@ForCheck:
             !ManakaiDOM:DOMXMLFeature
-          @@@@ContentType:
-            lang:dis
           @@@@DOMMain:raiseException:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
      @@For:
@@ -11438,11 +11361,9 @@ NodeTypeDef:
             $text->{<Q::infoset:parent>} = $r;
             $r->{<Q::infoset:children>} = [$text];
             $r->{<Q::infoset:specified>} = true;
-        @@@Def:
+        @@@disDef:
           @@@@ForCheck:
             !ManakaiDOM:DOMXMLFeature
-          @@@@ContentType:
-            lang:dis
           @@@@DOMMain:raiseException:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
      @@For:
@@ -11536,11 +11457,9 @@ NodeTypeDef:
              TODO: default attribute
            \
              Almost same as <M::ManakaiDOMAttributes.removeNamedItemNS>.
-        @@@Def:
+        @@@disDef:
           @@@@ForCheck:
             !ManakaiDOM:DOMXMLFeature
-          @@@@ContentType:
-            lang:dis
           @@@@DOMMain:raiseException:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
      @@For:
@@ -11607,11 +11526,9 @@ NodeTypeDef:
             if ($obj) {
               $r = <ClassM::ManakaiDOMNode.getNodeReference> ($obj);
             }
-        @@@Def:
+        @@@disDef:
           @@@@ForCheck:
             !ManakaiDOM:DOMXMLFeature
-          @@@@ContentType:
-            lang:dis
           @@@@DOMMain:raiseException:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
      @@Level[list]:
@@ -11769,11 +11686,9 @@ NodeTypeDef:
             @@@@@@:
               It is unclear whether the node should be returned if 
               the node is <QUOTE::replaced> by itself.
-        @@@Def:
+        @@@disDef:
           @@@@ForCheck:
             !ManakaiDOM:DOMXMLFeature
-          @@@@ContentType:
-            lang:dis
           @@@@DOMMain:raiseException:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
      @@Level[list]:  
@@ -11932,11 +11847,9 @@ NodeTypeDef:
               },
             }__;
             $r->{<Q::ManakaiDOMCore:nodeMatch>} = $chk;
-        @@@Def:
+        @@@disDef:
           @@@@ForCheck:
             !ManakaiDOM:DOMXMLFeature
-          @@@@ContentType:
-            lang:dis
           @@@@DOMMain:raiseException:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
      @@Level[list]:  
@@ -12054,11 +11967,9 @@ NodeTypeDef:
           @@@@@:
             __CODE{selectAttrNodeObjectNS}__;
             $r = $r ? true : false;
-        @@@Def:
+        @@@disDef:
           @@@@ForCheck:
             !ManakaiDOM:DOMXMLFeature
-          @@@@ContentType:
-            lang:dis
           @@@@DOMMain:raiseException:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
      @@Level[list]:  2
@@ -12283,11 +12194,9 @@ NodeTypeDef:
               }__;
             }
             $r->{<Q::DOMCore:userDeterminedId>} = $isId;
-        @@@Def:
+        @@@disDef:
           @@@@ForCheck:
             !ManakaiDOM:DOMXMLFeature
-          @@@@ContentType:
-            lang:dis
           @@@@DOMMain:raiseException:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
      @@L3:
@@ -12522,9 +12431,7 @@ NodeTypeDef:
             @@@@@lang:en
             @@@@@@:
               The node is created with a DOM Level 1 methods.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetProp:
             infoset:localName
      @@Level[list]:  2
@@ -12624,9 +12531,7 @@ NodeTypeDef:
             @@@@@@:
               The namespace URI is unspecified (the "null" namespace) or 
               the node is created with a DOM Level 1 methods.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetProp:
             infoset:namespaceName
      @@Level[list]:  2
@@ -12647,9 +12552,7 @@ NodeTypeDef:
       @@@Description:
         @@@@lang:en
         @@@@@: The element type name, i.e. same as "tagName" attribute.
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@DISPerl:cloneCode:.tagName.get
   @ReAttr:
     @@Name: nodeType
@@ -12666,9 +12569,7 @@ NodeTypeDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: The node is an "Element".
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@DISLang:constValue: Node.ELEMENT_NODE
   @ReAttr:
      @@Name:  prefix
@@ -12690,9 +12591,7 @@ NodeTypeDef:
             @@@@@@:
               Either the namespace prefix is unspecified or the node 
               is created with a DOM Level 1 method.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetProp:
             infoset:prefix
      @@Set:
@@ -12954,9 +12853,44 @@ NodeTypeDef:
             }
 ##Element
 
+
+ElementTypeBinding:
+  @Name: TrueCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@@: 1
+      @@@ContentType: DISCore|Boolean
+    @@Type:
+      DOMMain:boolean::ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: FalseCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@@: 0
+      @@@ContentType: DISCore|Boolean
+    @@Type:
+      DOMMain:boolean::ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: intValue
+  @ElementType:
+    dis:Value
+  @ShadowContent:
+    @@ContentType: DISCore|Integer
+
 ResourceDef:
   @QName: getNodeRef
   @AliasFor: ManakaiNode|getNewReference||ManakaiDOM|Perl
+  @For: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
 
 ForDef:
   @QName:
@@ -13122,9 +13056,7 @@ IFCls1Def:
             @@@@@@:
               This text node contains element content whitespaces or 
               no validation occurs so that it is unknown.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetProp:
             infoset:elementContentWhitespace
      @@Level[list]:  3
@@ -13276,9 +13208,7 @@ IFCls1Def:
         @@@@@: \#text
         @@@@ContentType:
           DISCore:String
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@DISLang:nop:
   @ReAttr:
     @@Name: nodeType
@@ -13294,9 +13224,7 @@ IFCls1Def:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: The node is a "Text".
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@DISLang:constValue:Node.TEXT_NODE
 
   @IntMethod:
@@ -13429,9 +13357,7 @@ IFCls1Def:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: Always this value for the "Comment" node.
-      @@@Def: 
-        @@@@ContentType:
-          lang:dis
+      @@@disDef: 
         @@@@DISLang:value:
           @@@@@@: \#comment
           @@@@@ContentType:
@@ -13450,9 +13376,7 @@ IFCls1Def:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: The node is a "Comment".
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@DISLang:constValue: Node.COMMENT_NODE
 
   @IntMethod:
@@ -14186,13 +14110,8 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DISCore:StringDataType
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
+    @@rdf:type: DISCore|LexicalType
+    @@For: =ManakaiDOM|all
     @@rdfs:subClassOf:
       DISCore:String::ManakaiDOM:all
 
@@ -14249,7 +14168,7 @@ IFCls3Def:
 
   @ResourceDef:
     @@rdf:type: DISLang|InputProcessor
-    @@PerlDef:
+    @@PerlDefC:
       $INPUT = bless $INPUT, __PACKAGE__ if ref $INPUT eq 'CODE';
     @@ImplNote:
       @@@lang:en
@@ -14728,9 +14647,7 @@ NodeTypeDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: Always this value for the "DocumentFragment" node.
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@DISLang:value:
           @@@@@@: \#document-fragment
           @@@@@ContentType:
@@ -14750,9 +14667,7 @@ NodeTypeDef:
           @@@@@lang:en
           @@@@@@:
             The node is a <IF::DocumentFragment>.
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@DISLang:constValue: Node.DOCUMENT_FRAGMENT_NODE
 
 
@@ -14897,9 +14812,7 @@ NodeTypeDef:
          The "DOMImplementation" object that handles the "Document".
      @@Get:
         @@@Type:  DOMImplementation
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetProp:
             DOMCore:implementation
   @Attr:
@@ -15714,11 +15627,9 @@ NodeTypeDef:
             @@@@@lang:en
             @@@@@@:
               TODO: Default attribute should be implemented.
-        @@@Def:
+        @@@disDef:
           @@@@ForCheck:
             !ManakaiDOM:DOMXMLFeature
-          @@@@ContentType:
-            lang:dis
           @@@@DOMMain:raiseException:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
     @@L2:
@@ -15897,11 +15808,9 @@ NodeTypeDef:
             $node->{<Q::infoset:prefix>} = $prefix;
             $node->{<Q::infoset:specified>} = true;
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node);
-        @@@Def:
+        @@@disDef:
           @@@@ForCheck:
             !ManakaiDOM:DOMXMLFeature
-          @@@@ContentType:
-            lang:dis
           @@@@DOMMain:raiseException:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
     @@SpecLevel:2
@@ -16064,11 +15973,9 @@ NodeTypeDef:
               },
             }__;
             $r->{<Q::ManakaiDOMCore:nodeMatch>} = $chk;
-        @@@Def:
+        @@@disDef:
           @@@@ForCheck:
             !ManakaiDOM:DOMXMLFeature
-          @@@@ContentType:
-            lang:dis
           @@@@DOMMain:raiseException:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
      @@Level[list]:  
@@ -16179,9 +16086,7 @@ NodeTypeDef:
             @@@@@lang:en
             @@@@@@:
               The input encoding is not known.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetProp:
             infoset:characterEncodingScheme
      @@Level[list]:  3
@@ -16212,9 +16117,7 @@ NodeTypeDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: The encoding is not specified or not known.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetProp:
             DOMCore:xmlEncoding
      @@Level[list]:  3
@@ -16237,9 +16140,7 @@ NodeTypeDef:
      @@Get:
         @@@Type:  
           DOMMain:boolean||ManakaiDOM|all
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetProp:
             infoset:standalone
      @@Set:
@@ -16273,9 +16174,7 @@ NodeTypeDef:
               @@@@@@@:
                 The current document does not support the <Feature::XML> 
                 feature.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@SetProp:
             infoset:standalone
         @@@ImplNote:
@@ -16318,9 +16217,7 @@ NodeTypeDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: The document does not support the "XML" feature.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetProp:
             infoset:version
      @@Set:
@@ -16368,9 +16265,7 @@ NodeTypeDef:
      @@Get:
         @@@Type:  
           DOMMain:boolean||ManakaiDOM|all
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetProp:
             DOMCore:strictErrorChecking
      @@Set:
@@ -16387,9 +16282,7 @@ NodeTypeDef:
             "DOMException" on DOM operations or report error 
             while using method "normalizeDocument".  In case of error, 
             the behavior is undefined.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@SetProp:
             DOMCore:strictErrorChecking
      @@Level[list]:  3
@@ -16422,9 +16315,7 @@ NodeTypeDef:
             @@@@@@:
               The location is undefined or the "Document" was created using 
               the method "createDocument".
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetProp:
             DOMCore:documentURI
      @@Set:
@@ -16441,9 +16332,7 @@ NodeTypeDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: The location is undefined.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@SetProp:
             DOMCore:documentURI
   @Method:
@@ -16469,9 +16358,7 @@ NodeTypeDef:
         @@@Description:
           @@@@lang:en
           @@@@@: The DOM configuration object.
-        @@@Def:
-          @@@@ContentType:
-            lang:dis
+        @@@disDef:
           @@@@GetProp:
             DOMCore:domConfig
      @@For:
@@ -16761,9 +16648,7 @@ NodeTypeDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: Always this value for the "Document" node.
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@DISLang:value:
           @@@@@@: \#document
           @@@@@ContentType:
@@ -16782,9 +16667,7 @@ NodeTypeDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: The node is a "Document".
-      @@@Def:
-        @@@@ContentType:
-          lang:dis
+      @@@disDef:
         @@@@DISLang:constValue: Node.DOCUMENT_NODE
   @ReAttr:
      @@Name:  textContent
@@ -17352,9 +17235,7 @@ ConfigParam:
         @@@@@:
           Setting <DOM::infoset> to <DOM::false> has no effect.
     @@Get:
-      @@@Def:
-        @@@@ContentType:
-          lang:Perl
+      @@@PerlDef:
         @@@@@:
           $r = !$cfg->{<Q::DOMCoreParam:validate-if-schema>} &&
                !$cfg->{<Q::DOMCoreParam:entities>} &&

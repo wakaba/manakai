@@ -47,3 +47,6 @@ all$(DAC_SUFFIX): $(DIS_FILES) $(DAC_PL)
 
 clean:
 	$(RM) $(GENERATED_FILES) .*.tmp *~ .*~
+
+## $Date: 2005/09/19 16:17:53 $
+## License: Public Domain.

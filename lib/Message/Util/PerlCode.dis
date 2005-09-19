@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/09/17 15:03:03 $
+      $Date: 2005/09/19 16:17:52 $
     @@ContentType:
       dis:Date.RCS
   
@@ -107,11 +107,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       DOMMain:DOMFeature
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
+    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: FeatureVerDef
@@ -1229,6 +1225,7 @@ IFClsDef:
           The specified name is used. 
       @@@InCase:
         @@@@Value:\#CODE
+        @@@@ContentType: DISCore|String
         @@@@enDesc:
           The specified name is not an alias. 
       @@@PerlDef:
@@ -4263,10 +4260,9 @@ IFClsDef:
 
 ResourceDef:
   @QName: MNodeObject
-  @rdf:type:
-    ManakaiDOM:Class
   @AliasFor:
     ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
+  @For: ManakaiDOM|Perl
 
 PropDef:
   @QName: code
@@ -4379,7 +4375,9 @@ ResourceDef:
 
     @@XConstDef:
       @@@Name: HIERARCHY_REQUEST_ERR
-      @@@Value:3
+      @@@Value:
+        @@@@@:3
+        @@@@ContentType: DISCore|Integer
       @@@enDesc:
         An attempt is made to break the hierarchy. 
       @@@XSubTypeDef:
@@ -4410,7 +4408,9 @@ ResourceDef:
             The parent node of the <XP::childNode>. 
     @@XConstDef:
       @@@Name: NOT_SUPPORTED_ERR
-      @@@Value:9
+      @@@Value:
+        @@@@@:9
+        @@@@ContentType: DISCore|Integer
       @@@enDesc:
         An attempt is made to do something the implementation does not support. 
       @@@XSubTypeDef:
@@ -4454,11 +4454,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: 
       DOMMain:XWParameter
-    @@AliasFor:
-      @@@For:
-        !=ManakaiDOM:all
-      @@@@:
-        ::ManakaiDOM:all
+    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: enMufDef
@@ -4561,6 +4557,7 @@ ElementTypeBinding:
             \
             }
         @@@@Def:
+          @@@@@ForCheck: ManakaiDOM|ForClass
           @@@@@ContentType:
             lang:Perl
           @@@@@@:
@@ -4636,6 +4633,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@ContentType:
       lang:Perl
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: disDef
@@ -4644,6 +4642,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@ContentType:
       lang:dis
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: InCase
@@ -4670,7 +4669,9 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:InCase
-    @@Value:true
+    @@Value:
+      @@@@:1
+      @@@ContentType: DISCore|Boolean
     @@Type:
       DOMMain:boolean::ManakaiDOM:all
 
@@ -4682,7 +4683,9 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:InCase
-    @@Value:false
+    @@Value:
+      @@@@:0
+      @@@ContentType: DISCore|Boolean
     @@Type:
       DOMMain:boolean::ManakaiDOM:all
 
@@ -4700,11 +4703,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       rdf:Property
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
+    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: NamedParam
