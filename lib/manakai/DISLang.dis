@@ -15,7 +15,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/19 16:17:53 $
+      $Date: 2005/09/20 12:21:51 $
     @@ContentType:
       dis:Date.RCS
   
@@ -43,8 +43,6 @@ Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
   @ManakaiDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
-  @owl:
-    http://www.w3.org/2002/07/owl#
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
@@ -55,7 +53,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: DISCore|AnyType
+    @@rdf:type: DISLang|DataType
 
 ElementTypeBinding:
   @Name: PropDef
@@ -66,13 +64,11 @@ ElementTypeBinding:
       rdf:Property
 
 ElementTypeBinding:
-  @Name: FormatDef
+  @Name: LexTypeDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISCore|LexicalType
-    @@rdfs:subClassOf:
-      DISCore:String
 
 ElementTypeBinding:
   @Name: ResourceTypeDef
@@ -83,43 +79,74 @@ ElementTypeBinding:
       rdfs:Class
     @@rdfs:subClassOf:
       rdfs:Class
+    @@subsetOf: rdfs|Class
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: enFN
+  @ElementType:
+    dis:FullName
+  @ShadowContent:
+    @@lang:en
 
 ## -- Common Programming Language Constructs
 
 ResourceTypeDef:
-  @QName: AnyClass
-  @FullName:
-    @@lang:en
-    @@@:
-      Class or Interface
-  @Description:
-    @@lang:en
-    @@@:
-      Any kind of class or something similar to it, including interface.
+  @QName: DISLang|AnyDataType
+  @enFN: Data type / class / interface
+  @enDesc:
+    Data type or object type in programming languages.
+  @rdfs:subClassOf: DISCore|AnyType
+  @subsetOf: DISCore|AnyType
 
 ResourceTypeDef:
-  @QName: 
-    ManakaiDOM:IF
-  @FullName:
-    @@lang:en
-    @@@: Interface
-  @Description:
-    @@lang:en
-    @@@:
-      Interfaces in programming languages. 
-  @rdfs:subClassOf: AnyClass
+  @QName: DISLang|DataType
+  @enFN: Data type
+  @enDesc:
+    Data type in programming languages.
+  @rdfs:subClassOf: DISLang|AnyDataType
+  @subsetOf: DISLang|AnyDataType
+
+ResourceDef:
+  @QName: ManakaiDOM|DataType
+  @AliasFor: DISLang|DataType
 
 ResourceTypeDef:
-  @QName: 
-    ManakaiDOM:Class
-  @FullName:
-    @@lang:en
-    @@@: Class
-  @Description:
-    @@lang:en
-    @@@:
-      Classes in programming languages. 
-  @rdfs:subClassOf: AnyClass
+  @QName: DISLang|AnyClass
+  @enFN: Class / interface
+  @enDesc:
+    Type of objects, such as class or interface.
+  @rdfs:subClassOf: DISLang|AnyDataType
+  @subsetOf: DISLang|AnyDataType
+
+ResourceTypeDef:
+  @QName: DISLang|Interface
+  @enFN: Interface
+  @enDesc:
+    Interface in programming languages.
+  @rdfs:subClassOf: DISLang|AnyClass
+  @subsetOf: DISLang|AnyClass
+
+ResourceDef:
+  @QName: ManakaiDOM|IF
+  @AliasFor: DISLang|Interface
+
+ResourceTypeDef:
+  @QName: DISLang|Class
+  @enFN: Class
+  @enDesc: Class in programming languages.
+  @rdfs:subClassOf: DISLang|AnyClass
+  @subsetOf: DISLang|AnyClass
+
+ResourceDef:
+  @QName: ManakaiDOM|Class
+  @AliasFor: DISLang|Class
 
 ForDef:
   @QName:
@@ -145,8 +172,8 @@ ResourceTypeDef:
       \
       <QUOTE::PrimitiveTypeClass> may or may not have its instance object; 
       it is typically accessed via class method, not via object method.
-  @rdfs:subClassOf: 
-    ManakaiDOM:Class
+  @rdfs:subClassOf: DISLang|Class
+  @subsetOf: DISLang|Class
 
 ResourceTypeDef:
   @QName: AnyMethod
@@ -166,7 +193,8 @@ ResourceTypeDef:
     @@lang:en
     @@@:
       A programming language attribute of a structure such as class. 
-  @rdfs:subClassOf: AnyMethod
+  @rdfs:subClassOf: DISLang|AnyMethod
+  @subsetOf: DISLang|AnyMethod
 
 ResourceTypeDef:
   @QName: AttributeGet
@@ -174,8 +202,8 @@ ResourceTypeDef:
     @@lang:en
     @@@:
       A programming language attribute getter. 
-  @rdfs:subClassOf:
-    DISCore:AnyDefContainer
+  @rdfs:subClassOf: DISCore|AnyDefContainer
+  @subsetOf: DISCore|AnyDefContainer
 
 ResourceTypeDef:
   @QName: AttributeSet
@@ -183,8 +211,8 @@ ResourceTypeDef:
     @@lang:en
     @@@: 
       A programming language attribute setter. 
-  @rdfs:subClassOf:
-    DISCore:AnyDefContainer
+  @rdfs:subClassOf: DISCore|AnyDefContainer
+  @subsetOf: DISCore|AnyDefContainer
 
 ResourceTypeDef:
   @QName: Method
@@ -192,7 +220,8 @@ ResourceTypeDef:
     @@lang:en
     @@@:
       Methods in programming languages. 
-  @rdfs:subClassOf: AnyMethod
+  @rdfs:subClassOf: DISLang|AnyMethod
+  @subsetOf: DISLang|AnyMethod
 
 ResourceTypeDef:
   @QName: MethodReturn
@@ -200,8 +229,14 @@ ResourceTypeDef:
     @@lang:en
     @@@:
       Method return values (or returning subroutines). 
-  @rdfs:subClassOf:
-    DISCore:AnyDefContainer
+  @rdfs:subClassOf: DISCore|AnyDefContainer
+  @subsetOf: DISCore|AnyDefContainer
+
+ResourceTypeDef:
+  @QName: AnyParameter
+  @enFN: Parameter
+  @enDesc:
+    Any kind of parameter in programming language.
 
 ResourceTypeDef:
   @QName: MethodParameter
@@ -209,6 +244,8 @@ ResourceTypeDef:
     @@lang:en
     @@@:
       Method parameters. 
+  @rdfs:subClassOf: DISLang|AnyParameter
+  @subsetOf: DISLang|AnyParameter
 
 ResourceTypeDef:
   @QName: InputProcessor
@@ -217,8 +254,8 @@ ResourceTypeDef:
     @@@:
       Processors checking or normalizing a method or attribute input
       before the execution of the body of it.
-  @rdfs:subClassOf:
-    DISCore:AnyDefContainer
+  @rdfs:subClassOf: DISCore|AnyDefContainer
+  @subsetOf: DISCore|AnyDefContainer
 
 PropDef:
   @QName:
@@ -231,8 +268,7 @@ PropDef:
       (<Q::ManakaiDOM:inputNormalizer>) is defined, it is inserted 
       between input (parameter) declaration and actual code.  Otherwise, 
       no code is inserted. 
-  @dataType:
-    dis:Boolean
+  @dataType: DISCore|Boolean
   @multipleProperties: DISCore|Single
 
 PropDef:
@@ -245,6 +281,7 @@ PropDef:
       to the callee) or not.
   @dataType: dis|Boolean
   @multipleProperties: DISCore|Single
+  @rdfs:domain: DISLang|AnyParameter
 
 PropDef:
   @QName:
@@ -256,6 +293,7 @@ PropDef:
       to the caller) or not.
   @dataType: dis|Boolean
   @multipleProperties: DISCore|Single
+  @rdfs:domain: DISLang|AnyParameter
 
 PropDef:
   @QName:
@@ -276,52 +314,123 @@ PropDef:
   @dataType: dis|Boolean
   @multipleProperties: DISCore|Single
 
-## - Types of structures
+  @ImplNote:
+    @@lang:en
+    @@@:
+      {ISSUE:: How methods that can be called both as class method
+               and as object method should be represented?
+      }
+
+ResourceTypeDef:
+  @QName: DISLang|ConstGroup
+  @FullName:
+    @@lang:en
+    @@@: Constant group
+  @Description:
+    @@lang:en
+    @@@:
+      A set of constant values.
+  @rdfs:subClassOf: DISLang|AnyDataType
+  @subsetOf: DISLang|AnyDataType
+
+ResourceDef:
+  @QName: ManakaiDOM|ConstGroup
+  @AliasFor: DISLang|ConstGroup
+
+ResourceTypeDef:
+  @QName: DISLang|Const
+  @FullName:
+    @@lang:en
+    @@@: Constant value
+  @Description:
+    @@lang:en
+    @@@: A constant value.
+
+ResourceDef:
+  @QName: ManakaiDOM|Const
+  @AliasFor: DISLang|Const
+
+PropDef:
+  @QName: 
+    dis:IsBitMask
+  @Description:
+    @@lang:en
+    @@@:
+      Whether the constant group is defined as bitmask values or not.
+  @rdfs:domain: DISLang|ConstGroup
+  @dataType: DISCore|Boolean
+  @multipleProperties: DISCore|Single
+
+LexTypeDef:
+  @QName: MemberRef
+  @enFN: Class member reference
+  @Description:
+    @@lang:en
+    @@@:
+      A reference to a member of a class. 
+      \
+      MemRef := [dis:TFQNames] "." NCName
+      \
+      The optional <Q::dis:TFQNames> identifiers the class to which the 
+      member referred belongs.  The NCName is the name of 
+      the member (either a method name or a capitalized attribute 
+      name prefixed with "get" or "set").
+  @rdfs:subClassOf: DISCore|NSString
+  @subsetOf: DISCore|NSString
+
+ResourceDef:
+  @QName: DISPerl|MemRef
+  @AliasFor: DISLang|MemberRef
+
+## - Type properties
 
 PropDef:
   @QName:
     dis:Type
-  @rdfs:domain:
-    rdfs:Resource
-  @rdfs:range:
-    ManakaiDOM:DataType
+  @enFN: Type
   @Description:
     @@lang:en
     @@@:
       The data type of the resource defined, including 
       class attribute type and method return value type.
-  @dataType: dis|TFQNames
+  @dataType: DISCore|TFQNames
   @multipleProperties: DISCore|Single
+  @rdfs:range: DISLang|AnyDataType
 
-DataTypeDef:
-  @QName: String
-  @rdf:type:
-    ManakaiDOM:DataType
+PropDef:
+  @QName:
+    dis:actualType
+  @enFN: Actual type
   @Description:
     @@lang:en
     @@@:
-      Any programming language <QUOTE::String> datatype. 
+      The actual data type of the resource defined, including 
+      class attribute type and method return value type. 
+  @dataType: DISCore|TFQNames
+  @multipleProperties: DISCore|Single
+  @rdfs:range: DISLang|AnyDataType
+
+## - Type instances
+
+DataTypeDef:
+  @QName: DISLang|Any
+  @enFN: Any
+  @enDesc:
+    Any data type in programming languages.
+
+DataTypeDef:
+  @QName: DISLang|String
+  @enFN: String
+  @enDesc:
+    String in programming languages.
 
       {NOTE:: This type different from <Q::DISCore:String>
               where <Q::DISCore:String> is a lexical type
               while <Q::DISLang:String> is a programing language 
               data type.
       }
-
-PropDef:
-  @QName:
-    dis:actualType
-  @rdfs:domain:
-    rdfs:Resource
-  @rdfs:range:
-    rdfs:Resource
-  @Description:
-    @@lang:en
-    @@@:
-      The actual data type of the resource defined, including 
-      class attribute type and method return value type. 
-  @dataType: dis|TFQNames
-  @multipleProperties: DISCore|Single
+  @rdfs:subClassOf: DISLang|Any
+  @subsetOf: DISLang|Any
 
 ## - Operator
 
@@ -334,57 +443,20 @@ PropDef:
       An operator the subject resource (either method or attribute) 
       is to be used to evaluate an expression whose at least one operand object 
       is of a class to which the subject resource belongs.
-  @rdfs:range: 
-    DOMMain:Operator
-  @rdfs:domain: AnyMethod
-  @dataType: dis|TypeQName
+  @rdfs:range: DISLang|Operator
+  @rdfs:domain: DISLang|AnyMethod
+  @dataType: DISCore|QName
   @multipleProperties: DISCore|UnorderedList
 
+ResourceTypeDef:
+  @QName: DISLang|Operator
+  @enFN: Operator
+  @enDesc:
+    Operator in programming languages.
+
 ResourceDef:
-  @QName: 
-    DOMMain:Operator
-  @Description:
-    @@lang:en
-    @@@:
-      A resource that might be an object of <Q::dis:Operator> property. 
-  @rdf:type:
-    rdfs:Class
-  @rdfs:subClassOf:
-    rdfs:Class
-
-ResourceTypeDef:
-  @QName: 
-    ManakaiDOM:ConstGroup
-  @FullName:
-    @@lang:en
-    @@@: Constant group
-  @Description:
-    @@lang:en
-    @@@:
-      A set of constant values.
-
-ResourceTypeDef:
-  @QName: 
-    ManakaiDOM:Const
-  @FullName:
-    @@lang:en
-    @@@: Constant value
-  @Description:
-    @@lang:en
-    @@@: A constant value.
-
-PropDef:
-  @QName: 
-    dis:IsBitMask
-  @Description:
-    @@lang:en
-    @@@:
-      Whether the constant group is defined as bitmask values or not.
-  @rdfs:domain:
-    ManakaiDOM:ConstGroup
-  @dataType:
-    dis:Boolean
-  @multipleProperties: DISCore|Single
+  @QName: DOMMain|Operator
+  @AliasFor: DISLang|Operator
 
 ## -- "Role" properties
 
@@ -400,11 +472,9 @@ PropDef:
             may allow other types of objects as the domain.
     \
     }
-  @rdfs:domain:
-    ManakaiDOM:Class
-  @rdfs:range: Role
-  @dataType:
-    dis:TypeQName
+  @rdfs:domain: DISLang|AnyClass
+  @rdfs:range: DISLang|Role
+  @dataType: DISCore|QName
   @multipleProperties: DISCore|UnorderedList
 
 ResourceTypeDef:
@@ -424,20 +494,21 @@ ResourceDef:
 
 ## -- The lang:dis tree language vocabulary
 
-DataTypeDef:
+ResourceDef:
   @QName:
     lang:dis
+  @rdf:type: DISCore|AnyType
   @FullName:
     @@lang:en
     @@@:
       The <QUOTE::dis> format
 
 ResourceDef:
-  @Name: TreeElementType
+  @QName: TreeElementType
   @rdf:type:
     rdfs:Class
-  @rdfs:subClassOf:
-    dis:ElementType
+  @rdfs:subClassOf: DISCore|ElementType
+  @subsetOf: DISCore|ElementType
   @Description:
     @@lang:en
     @@@:
@@ -458,29 +529,26 @@ TreeElementType:
       No operation
 
 TreeElementType:
-  @Name: constValue
+  @QName: constValue
   @Description:
     @@lang:en
     @@@:
       Returns a constant value.
 
 TreeElementType:
-  @Name: dataTypeAliasFor
+  @QName: dataTypeAliasFor
   @rdf:type:
     rdf:Property
   @Description:
     @@lang:en
     @@@:
       Declares the subject resource is an alias for the object resource.
-  @rdfs:range:
-    DISCore:AbstractDataType
-  @rdfs:domain:
-    DISCore:AbstractDataType
-  @dataType: 
-    dis:TFQNames
+  @rdfs:range: DISLang|AnyDataType
+  @rdfs:domain: DISLang|AnyDataType
+  @dataType: DISCore|TFQNames
 
 TreeElementType:
-  @Name: value
+  @QName: value
   @Description:
     @@lang:en
     @@@: Returns a value.
@@ -540,19 +608,23 @@ TreeElementType:
 
 ## NOTE: These definitions may be moved to another modules in future revision.
 
-DataTypeDef:
+LexTypeDef:
   @QName:
     lang:Java
   @FullName:
     @@lang:en
     @@@: Java code
+  @rdfs:subClassOf: DISCore|String
+  @subsetOf: DISCore|String
 
-DataTypeDef:
+LexTypeDef:
   @QName:
     lang:ECMAScript
   @FullName:
     @@lang:en
     @@@: ECMAScript code
+  @rdfs:subClassOf: DISCore|String
+  @subsetOf: DISCore|String
 
 ForDef:
   @QName:

@@ -1,3 +1,15 @@
+2005-09-20  Wakaba  <wakaba@suika.fam.cx>
+
+	* Value.dis (createDVValueRef): New method.  Now
+	values are hold as scalar reference in ManakaiDVValue.
+	(valueRef): New attribute.
+
+	* DNLite.dis (ManakaiDISImplementationDNLite): Now extends
+	class ManakaiDISImplementation.
+	(convertDISDocumentToDNLDocument): Typo in class names fixed.
+	For nodes, {child} property is now optional.
+	(nodeIDRef, valueRef): New attributes.
+
 2005-09-19  Wakaba  <wakaba@suika.fam.cx>
 
 	* Value.dis (sourceNodePath): New attribute.

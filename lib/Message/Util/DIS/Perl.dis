@@ -21,7 +21,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/19 16:17:52 $
+      $Date: 2005/09/20 12:21:50 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2303,7 +2303,8 @@ IFClsDef:
               my $dt = $self-><AG::DIS|DISResource
                                  .disActualDataTypeResource>;
               if ($dt-><M::DIS|DISResource.isSubsetOfURI>
-                                                       (<Q::pl:Array>)) {
+                                                       (<Q::pl:Array>) or
+                  $dt-><M::DIS|DISResource.isSubsetOfURI> (<Q::DISPerl:List>)) {
                 $r = '@' . $r;
               } elsif ($dt-><M::DIS|DISResource.isSubsetOfURI>
                                                        (<Q::pl:Hash>)) {
@@ -3827,7 +3828,7 @@ IFClsDef:
                     }__}__;
                   }
                   $class-><AS::DIS|DISAnyResource.isReferred>
-                                                   ($node || $self->{src});
+                                 ($node || $self->{src} || $self->{uri});
                   if ($et eq <Q::disPerl::ClassM> and
                       $class-><M::DIS|DISResource.isTypeURI>
                                      (<Q::ManakaiDOM:IF>)) {
@@ -3891,7 +3892,7 @@ IFClsDef:
                   my $class = $self->{db}-><M::DIS|DISDatabase.getResource>
                                                    ($class_uri);
                   $class-><AS::DIS|DISAnyResource.isReferred>
-                                                   ($node || $self->{src});
+                                         ($node || $self->{src} || $self->{uri});
                   my $pack = $class-><AG::DISResourcePerl.plFullyQualifiedName>;
                   unless ($pack) {
                     __UNDEEP{__EXCEPTION{DIS|NO_PERL_PACKAGE_NAME_ERR::
@@ -3939,7 +3940,7 @@ IFClsDef:
                   my $code = $self->{db}-><M::DIS|DISDatabase.getResource>
                                            ($code_uri);
                   $code-><AS::DIS|DISAnyResource.isReferred>
-                                           ($node || $self->{src});
+                                         ($node || $self->{src} || $self->{uri});
                   unless ($code-><M::DIS|DISResource.isTypeURI>
                                            (<Q::dis2pm:InlineCode>)) {
                     __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
@@ -3989,7 +3990,7 @@ IFClsDef:
                   my $class = $self->{db}-><M::DIS|DISDatabase.getResource>
                                                    ($class_uri);
                   $class-><AS::DIS|DISAnyResource.isReferred>
-                                                   ($node || $self->{src});
+                                        ($node || $self->{src} || $self->{uri});
                   my $const = $class-><M::DIS|DISResource
                                          .getConstResourceByName> ($const_name);
                   unless (defined $const) {
@@ -4000,7 +4001,8 @@ IFClsDef:
                       DIS:expectedType => {<Q::ManakaiDOM:Const>},
                     }__}__;
                   }
-                  $const-><AS::DIS|DISAnyResource.isReferred> ($node);
+                  $const-><AS::DIS|DISAnyResource.isReferred>
+                                                 ($node || $self->{uri});
 
                   my $data_type = $const-><AG::DIS|DISResource
                                        .disActualDataTypeResource>;
@@ -4360,7 +4362,8 @@ IFClsDef:
             DIS:expectedType => {<Q::DOMException:AnyExceptionClass>},
           }__;
         }
-        $xclass-><AS::DIS|DISAnyResource.isReferred> ($self->{src});
+        $xclass-><AS::DIS|DISAnyResource.isReferred>
+           ($self->{src} || $self->{uri});
         $self-><M::ManakaiDISResourcePerl.plAddRequireResource>
                                ($xclass_module => $statement);
         $xparam->{-type} = {type => 'quoted',

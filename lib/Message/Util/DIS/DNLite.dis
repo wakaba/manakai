@@ -21,7 +21,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/19 16:17:52 $
+      $Date: 2005/09/20 12:21:50 $
     @@ContentType:
       dis:Date.RCS
   
@@ -302,6 +302,7 @@ IFClsDef:
   @ClsQName: ManakaiDISImplementationDNLite
 
   @DOMMetaImpl:provideFeature: DIS|DNLite10
+  @ClsISA: DIS|ManakaiDISImplementation
 
   @enDesc:
     The object implementing the <IF::DISImplementationDNLite>
@@ -326,8 +327,8 @@ IFClsDef:
         The newly created node.
       @@@PerlDef:
         my $cn;
-        $cn = sub ($$;$) {
-          my ($self, $source_node => $result_parent) = @_;
+        $cn = sub ($$$;$) {
+          my ($self, $db, $source_node => $result_parent) = @_;
           __DEEP{
             my $xu = $source_node-><AG::SEl.expandedURI>;
             if ($xu eq <Q::dis:For>) {
@@ -338,8 +339,8 @@ IFClsDef:
                 $p = $1 if $q =~ s/^(!=?|=)//;
                 $pr->{my $uri = $source_node-><M::DIS|NSResolverDIS.qnameToURI>
                                      ($q)} = $p;
-                $databaseArg-><M::DIS|DISDatabase.getFor> ($uri)
-                            -><AS::DIS|DISAnyResource.isReferred> ($source_node);
+                $db-><M::DIS|DISDatabase.getFor> ($uri)
+                   -><AS::DIS|DISAnyResource.isReferred> ($source_node);
               }
             } elsif ($xu eq <Q::dis:ForCheck>) {
               for my $q (grep {length $_}
@@ -354,29 +355,27 @@ IFClsDef:
                   '=' => {'-' => '=', '!' => '!', '=' => '=', '!=' => '!='},
                   '!=' => {$p => '!='},
                 }->{$result_parent->{forp}->{$uri} or ''}->{$p};
-                $databaseArg-><M::DIS|DISDatabase.getFor> ($uri)
-                            -><AS::DIS|DISAnyResource.isReferred> ($source_node);
+                $db-><M::DIS|DISDatabase.getFor> ($uri)
+                   -><AS::DIS|DISAnyResource.isReferred> ($source_node);
               }
             } elsif ($xu eq <Q::dis:ContentType>) {
               $result_parent->{mt} = $source_node-><AG::DEl.qnameValueURI>;
-              $databaseArg-><M::DIS|DISDatabase.getResource>
-                                                       ($result_parent->{mt})
-                          -><AS::DIS|DISAnyResource.isReferred> ($source_node);
+              $db-><M::DIS|DISDatabase.getResource> ($result_parent->{mt})
+                 -><AS::DIS|DISAnyResource.isReferred> ($source_node);
             } else {
               my $np;
               my $a = bless {
-                child => [],
-                for => [],
                 uri => $xu,
                 value => $source_node-><M::SNode.value>,
-                ns => $a->{ns},
-                defaultNS => $a->{defaultNS},
+                ns => $result_parent->{ns},
+                defaultNS => $result_parent->{defaultNS},
                 nodeID => $source_node->{<Q::TreeCore:node>}
                                       ->{<Q::TreeCore:nodeID>},
-                parentNodePath => [@{$a->{parentNodePath}}, $a->{nodePath}],
+                parentNodePath => [@{$result_parent->{parentNodePath}},
+                                     $result_parent->{nodePath}],
                 nodePath => \$np,
-              }, <ClassName::DNLElement>;
-              push @{$result_parent->{child}}, $a;
+              }, <ClassName::ManakaiDNLElement>;
+              push @{$result_parent->{child}||=[]}, $a;
               $r->{nodeID} = $source_node->{<Q::TreeCore:node>}
                                          ->{<Q::TreeCore:nodeID>}
                 if $a->{uri} eq <Q::dis:ResourceFor>;
@@ -387,7 +386,7 @@ IFClsDef:
                 }
               }__;
               $np = $source_node-><AG::SEl.realQualifiedName>;
-              CEL: for my $cel (@{$r->{child}}) {
+              CEL: for my $cel (@{$r->{child}||[]}) {
                 ET: for my $et (
                   [<Q::dis:QName> => 'QName'],
                   [<Q::dis:Name> => 'Name'],
@@ -408,22 +407,21 @@ IFClsDef:
           $r = bless {
             ns => $originalDocument->{<Q::TreeCore:node>}
                                    ->{<Q::swcfg21:nsBinding>},
-            child => [],
-            for => [],
             defaultNS => \($originalDocument-><AG::DDoc.moduleElement>
                               -><AG::DIS|DISModuleElement.definingNamespaceURI>),
             fileName => $originalDocument->{<Q::TreeCore:node>}
                                          ->{<Q::swcfg21:flag>}
                                          ->{<Q::swcfg21:fileName>},
             parentNodePath => [\''],
-          }, <ClassName::DNLDocument>;
+          }, <ClassName::ManakaiDNLDocument>;
           $r->{nodePath} = \ ('document ('.$r->{fileName}.')');
           if ($originalDocument->{<Q::TreeCore:node>}->{<Q::DIS|db>}) {
             $r-><AS::DNLDocument.disDatabase>
                    ($originalDocument->{<Q::TreeCore:node>}->{<Q::DIS|db>});
           }
           for my $source_child (@{$originalDocument-><AG::SNode.childNodes>}) {
-            $cn->($self, $source_child => $r);
+            $cn->($self, $databaseArg, $source_child => $r)
+              if $source_child-><AG::SNode.nodeType> eq '#element';
           }
         }__;
 ##DISImplementationDNLite
@@ -472,10 +470,10 @@ IFClsDef:
       @@@enDesc:
         The list of child elements.
 
-        {NOTE:: The list is <EM::live>.
+        {NOTE:: Applications <kwd:MUST-NOT> try to modify the list directly.
         }
       @@@PerlDef:
-        $r = $self->{child};
+        $r = $self->{child} || [];
 
   @Method:
     @@Operator:
@@ -484,10 +482,13 @@ IFClsDef:
     @@Return:
       @@@Type: DNLNode
       @@@PerlDef:
-        $r = bless {%$self, child => []}, ref $self;
+        $r = bless {%$self}, ref $self;
         __DEEP{
-          for my $child (@{$self->{child}}) {
-            push @{$r->{child}}, $child->clone;
+          if ($self->{child}) {
+            $self->{child} = [];
+            for my $child (@{$self->{child}}) {
+              push @{$r->{child}}, $child->clone;
+            }
           }
         }__;
 
@@ -526,6 +527,12 @@ IFClsDef:
     @@Get:
       @@@Type: DISString
       @@@PerlDef: $r = $self->{nodeID};
+
+  @Attr:
+    @@Name: nodeIDRef
+    @@Get:
+      @@@Type: DISPerl|SCALAR||ManakaiDOM|all
+      @@@PerlDef: $r = \ ($self->{nodeID});
 
   @Method:
     @@Name: nodePath
@@ -567,7 +574,7 @@ IFClsDef:
       @@@PerlDef:
         $r = [];
         __DEEP{
-          for my $cn (@{$self->{child}}) {
+          for my $cn (@{$self->{child}||[]}) {
             if ($cn-><M::DNLElement.forMatch> ($forArg, $forpArg)) {
               push @$r, $cn;
             }
@@ -579,7 +586,7 @@ IFClsDef:
     @@Return:
       @@@Type: pl|ARRAY||ManakaiDOM|all
       @@@PerlDef:
-        $r = [@{$self->{child}}];
+        $r = [@{$self->{child}||[]}];
 
   @Method:
     @@Name: getAttributeNS
@@ -595,7 +602,7 @@ IFClsDef:
         @@@@enDesc: No such attribute.
       @@@PerlDef:
         my $nm = $namespaceURI . $localName;
-        C: for my $cn (@{$self->{child}}) {
+        C: for my $cn (@{$self->{child}||[]}) {
           if ($cn->{uri} eq $nm) {
             $r = $cn;
             last C;
@@ -627,6 +634,12 @@ IFClsDef:
     @@Type: DISString
     @@Return:
       @@@PerlDef: $r = $self->{value};
+
+  @Method:
+    @@Name: valueRef
+    @@Type: DISPerl|SCALAR||ManakaiDOM|all
+    @@Return:
+      @@@PerlDef: $r = \ ($self->{value});
 
   @Attr:
     @@Name: ownerDISDocument
@@ -981,7 +994,7 @@ IFClsDef:
     @@Get:
       @@@Type: DNLElement
       @@@PerlDef:
-        M: for my $n (@{$self->{child}}) {
+        M: for my $n (@{$self->{child}||[]}) {
           if ($n->{uri} eq <Q::dis:Module>) {
             $r = $n;
             last M;
@@ -1023,7 +1036,7 @@ IFClsDef:
     @@Get:
       @@@Type: DNLElement
       @@@PerlDef:
-        M: for my $n (@{$self->{child}}) {
+        M: for my $n (@{$self->{child}||[]}) {
           if ($n->{uri} eq <Q::dis:Require>) {
             $r = $n;
             last M;
@@ -1035,7 +1048,7 @@ IFClsDef:
     @@Get: 
       @@@Type: DISString
       @@@PerlDef:
-        M: for my $n (@{$self->{child}}) {
+        M: for my $n (@{$self->{child}||[]}) {
           if ($n->{uri} eq <Q::dis:DefaultFor>) {
             $r = $n->{value};
             last M;
@@ -1047,7 +1060,7 @@ IFClsDef:
     @@Get:
       @@@Type: DISString
       @@@PerlDef:
-        M: for my $n (@{$self->{child}}) {
+        M: for my $n (@{$self->{child}||[]}) {
           if ($n->{uri} eq <Q::dis:Namespace>) {
             $r = $n->{value};
             last M;

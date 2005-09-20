@@ -21,7 +21,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/09 04:26:13 $
+      $Date: 2005/09/20 12:21:51 $
     @@ContentType:
       dis:Date.RCS
   
@@ -53,8 +53,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @infoset:
     http://www.w3.org/2001/04/infoset#
-  @owl:
-    http://www.w3.org/2002/07/owl#
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
@@ -204,8 +202,7 @@ ElementTypeBinding:
     @@Value:
       @@@@:
         infoset:NoValue.noValue
-      @@@ContentType:
-        dis:TypeQName
+      @@@ContentType: DISCore|QName
 
 ResourceDef:
   @QName:
@@ -504,8 +501,7 @@ ElementTypeBinding:
     @@Value:
       @@@@:
         infoset:Boolean.true
-      @@@ContentType:
-        dis:TypeQName
+      @@@ContentType: DISCore|QName
 
 ElementTypeBinding:
   @Name: falseCase
@@ -517,8 +513,7 @@ ElementTypeBinding:
     @@Value:
       @@@@:
         infoset:Boolean.false
-      @@@ContentType:
-        dis:TypeQName
+      @@@ContentType: DISCore|QName
 
 InfoItemDef:
   @QName:
@@ -1800,8 +1795,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DISCore:StringDataType
+    @@rdf:type: DISCore|LexicalType
     @@rdfs:subClassOf:
       DISCore:String::ManakaiDOM:all
 

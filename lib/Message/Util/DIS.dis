@@ -28,7 +28,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/09/19 16:17:51 $
+      $Date: 2005/09/20 12:21:49 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2535,8 +2535,6 @@ IFClsDef:
              = bless {
                  uri => $resURI,
                  aliasURI => {$resURI => true},
-                 subOf => {},
-                 supOf => {},
                  db => $self,
                  for => <Q::ManakaiDOM:all>,
                  forp => [],
@@ -2948,9 +2946,9 @@ IFClsDef:
           ## -- Node names
 
           ## Unique resource identifier generated from node id
-          my $node_id = $el-><AG::SWCFGNode.nodeID>;
+          my $node_id = $el-><AG::SWCFGNode.nodeIDRef>;
           my $node_uri;
-          __CODE{tfpurisToURI:: $turi => $node_id, $furi => $forArg,
+          __CODE{tfpurisToURI:: $turi => {$$node_id}, $furi => $forArg,
                                 $forp => $forpArg, $uri => $node_uri}__;
 
           ## User defined resource identifiers
@@ -3043,7 +3041,7 @@ IFClsDef:
           }
           $res->{<Q::DIS|isDefined>} = true;
           $res->{seq} = $self->{seq}++;
-          $res->{<Q::DIS|sourceNodeID>} = $node_id;
+          $res-><AS::DISAnyResource.sourceNodeIDRef> ($node_id);
           
           ## -- Alias
           my $al_node = $el-><M::DISElement.disGetAttribute>
@@ -3052,7 +3050,7 @@ IFClsDef:
                                        database_arg => $self);
           if ($al_node) {
             my $canon_uri = $al_node-><M::DISElement.tfqnamesValueURI>
-                                   ($node_id, $forArg,
+                                   ($$node_id, $forArg,
                                     for_arg => $self->{for},
                                     forp_arg => $self->{forp},
                                     database_arg => $self);
@@ -3096,7 +3094,7 @@ IFClsDef:
                                          database_arg => $self)) {
               my $sres = $self-><M::DISDatabase.getResource>
                                   ($ce-><M::DISElement.tfqnamesValueURI>
-                                                    ($node_id, $forArg,
+                                                    ($$node_id, $forArg,
                                     for_arg => $forArg, forp_arg => $forpArg,
                                     database_arg => $self));
               $res-><M::DISResource.addSuperResource> ($sres);
@@ -3257,7 +3255,7 @@ IFClsDef:
         Exception code to select.
     @@Param:
       @@@Name: contextNode
-      @@@Type: DISElement
+      @@@Type: NSResolverDIS
       @@@enDesc:
         A context element node.  Namespace prefixes in 
         <P::xcref> are resolved against this node.
@@ -3881,9 +3879,13 @@ IFClsDef:
       @@@PerlDef:
         if (defined $given) {
           if (ref $given) {
-            $given = $given-><M::SWCFGNode.flag> ('nodePath') ||
-                     $given-><M::SWCFGNode.nodePath>
+            if ($given->isa (<IFName::dv|DVValue>)) {
+              $given = $given-><AG::dv|DVValue.sourceNodePath>;
+            } else {
+              $given = $given-><M::SWCFGNode.flag> ('nodePath') ||
+                       $given-><M::SWCFGNode.nodePath>
                           (key => [qw/QName Name type Type AppName/]);
+            }
           }
           $self->{<Q::DIS|isReferred>} = $given;
         }
@@ -3903,10 +3905,42 @@ IFClsDef:
         @@@@enDesc:
           The resource is not (yet) associated with any source node.
       @@@PerlDef:
+        if (defined $self->{<Q::DIS:sourceNodeID>}) {
+          $r = ${$self->{<Q::DIS:sourceNodeID>}};
+        } else {
+          $r = null;
+        }
+    @@Set:
+      @@@PerlDef:
+        if (defined $given) {
+          $self->{<Q::DIS:sourceNodeID>} = \$given;
+        } else {
+          CORE::delete $self->{<Q::DIS:sourceNodeID>};
+        }
+
+  @Attr:
+    @@Name: sourceNodeIDRef
+    @@enDesc:
+      The identifier URI reference of the source node. 
+    @@enDesc:
+      @@@ForCheck: ManakaiDOM|ForClass
+      @@@@:
+        Modules and <QUOTE::for>s does not have source node identifier
+        in the current implementation.
+    @@Type: pl|SCALAR||ManakaiDOM|all
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          The resource is not (yet) associated with any source node.
+      @@@PerlDef:
         $r = $self->{<Q::DIS:sourceNodeID>};
     @@Set:
       @@@PerlDef:
-        $self->{<Q::DIS:sourceNodeID>} = $given;
+        if (defined $given) {
+          $self->{<Q::DIS:sourceNodeID>} = $given;
+        } else {
+          CORE::delete $self->{<Q::DIS:sourceNodeID>};
+        }
 
   @Attr:
     @@Name: isAnonymous
@@ -4010,6 +4044,7 @@ IFClsDef:
                   my $new_value;
                   my $base_type;
                   my $copy_tree = false;
+                  my $new_value_type = $el-><M::DISElement.mediaTypeURI>(%mtopt);
                   
                   my %mtopt = (for_arg => $for,
                                forp_arg => $forp,
@@ -4021,7 +4056,7 @@ IFClsDef:
                     __CODE{dv|createValue::
                       $value => {null},
                       $base_type => {$base_type = <Q::dis:TypeQName>},
-                      $type => {$el-><M::DISElement.mediaTypeURI> (%mtopt)},
+                      $type => {$new_value_type},
                       $result => $new_value,
                     }__;
                     $new_value-><AS::dv|DVQNameValue.localName>
@@ -4062,14 +4097,15 @@ IFClsDef:
                       $result => $new_value,
                     }__;
                     ## TODO: Check whether defined
+                    $new_value_type = <Q::DISCore:URI>;
                   } elsif ($el-><M::DISElement.mediaTypeMatch>
                                      (<Q::lang:Perl>, $mtopt{default_media_type},
                                       %mtopt)) {
                     $el-><M::DISElement.preserveNodePath>;
-                    __CODE{dv|createValue::
-                      $value => {$el-><M::SWCFGNode.value>},
+                    __CODE{dv|createValueRef::
+                      $value_ref => {$el-><AG::SWCFGNode.valueRef>},
                       $base_type => {$base_type = <Q::lang:Perl>},
-                      $type => {$el-><M::DISElement.mediaTypeURI> (%mtopt)},
+                      $type => {$new_value_type},
                       $result => $new_value,
                     }__;
                     for my $p (<Q::dis:Type>, <Q::dis:actualType>) {
@@ -4098,10 +4134,10 @@ IFClsDef:
                                      (<Q::lang:muf>, $mtopt{default_media_type},
                                       %mtopt)) {
                     $el-><M::DISElement.preserveNodePath>;
-                    __CODE{dv|createValue::
-                      $value => {$el-><M::SWCFGNode.value>},
+                    __CODE{dv|createValueRef::
+                      $value_ref => {$el-><AG::SWCFGNode.valueRef>},
                       $base_type => {$base_type = <Q::lang:disdoc>},
-                      $type => {$el-><M::DISElement.mediaTypeURI> (%mtopt)},
+                      $type => $new_value_type,
                       $result => $new_value,
                     }__;
                     $new_value-><AS::dv|DVNSValue.defaultNamespaceURIRef>
@@ -4119,7 +4155,7 @@ IFClsDef:
                     __CODE{dv|createValue::
                       $value => {$elc},
                       $base_type => {$base_type = <Q::lang:dis>},
-                      $type => {$el-><M::DISElement.mediaTypeURI> (%mtopt)},
+                      $type => $new_value_type,
                       $result => $new_value,
                     }__;
                     for my $p (<Q::dis:Type>, <Q::dis:actualType>) {
@@ -4137,7 +4173,7 @@ IFClsDef:
                     __CODE{dv|createValue::
                       $value => {$el-><M::SWCFGNode.value>},
                       $base_type => {$base_type = <Q::DISCore:String>},
-                      $type => {$el-><M::DISElement.mediaTypeURI> (%mtopt)},
+                      $type => $new_value_type,
                       $result => $new_value,
                     }__;
                   }
@@ -4197,7 +4233,8 @@ IFClsDef:
                   }} # copy_tree
 
                   {new_value => $new_value, base_type => $base_type,
-                   prop_uri => $prop_uri, prop_mult => $prop_mult};
+                   prop_uri => $prop_uri, prop_mult => $prop_mult,
+                   new_value_type => $new_value_type};
                 };
                 
                 my $pr;
@@ -4208,7 +4245,7 @@ IFClsDef:
                   if (not $self->{$pr->{prop_uri}}) {
                     __CODE{dv|createOrderedList::
                       $result => {$self->{$pr->{prop_uri}}},
-                      $type => {$pr->{new_value}-><AG::dv|DVValue.dataType>},
+                      $type => {$pr->{new_value_type}},
                       $base_type => {$pr->{base_type} || <Q::DISCore:String>},
                     }__;
                   }
@@ -4218,7 +4255,7 @@ IFClsDef:
                   if (not $self->{$pr->{prop_uri}}) {
                     __CODE{dv|createUnorderedList::
                       $result => {$self->{$pr->{prop_uri}}},
-                      $type => {$pr->{new_value}-><AG::dv|DVValue.dataType>},
+                      $type => {$pr->{new_value_type}},
                       $base_type => {$pr->{base_type} || <Q::DISCore:String>},
                     }__;
                   }
@@ -4648,9 +4685,9 @@ IFClsDef:
     @@Return:
       @@@PerlDef:
         my @from = ($self->{uri},
-                    grep {$self->{supOf}->{$_}} keys %{$self->{supOf}});
+                    grep {$self->{supOf}->{$_}} keys %{$self->{supOf}||{}});
         my @to = ($superRes->{uri},
-                  grep {$superRes->{subOf}->{$_}} keys %{$superRes->{subOf}});
+                 grep {$superRes->{subOf}->{$_}} keys %{$superRes->{subOf}||{}});
         __DEEP{
           for my $from (@from) {
             for my $to (@to) {
@@ -4699,15 +4736,15 @@ IFClsDef:
           $self->{supOf}->{$uri} = true;
         }
         for my $uri (grep {$aliasResource->{subOf}->{$_}}
-                          keys %{$aliasResource->{subOf}}) {
+                          keys %{$aliasResource->{subOf}||{}}) {
           $self->{subOf}->{$uri} = true;
         }
         for my $uri (grep {$aliasResource->{supOf}->{$_}}
-                          keys %{$aliasResource->{supOf}}) {
+                          keys %{$aliasResource->{supOf}||{}}) {
           $self->{supOf}->{$uri} = true;
         }
-        my @from = grep {$self->{supOf}->{$_}} keys %{$self->{supOf}};
-        my @to   = grep {$self->{subOf}->{$_}} keys %{$self->{subOf}};
+        my @from = grep {$self->{supOf}->{$_}} keys %{$self->{supOf}||{}};
+        my @to   = grep {$self->{subOf}->{$_}} keys %{$self->{subOf}||{}};
         __DEEP{
           for my $from (@from) {
             for my $to (@to) {
@@ -5550,7 +5587,7 @@ IFClsDef:
               grep {defined $_}
               map {$self->{$_}}
               grep {$pr->{aliasURI}->{$_} or $pr->{subOf}->{$_}}
-              (keys %{$pr->{aliasURI}}, keys %{$pr->{subOf}})];
+              (keys %{$pr->{aliasURI}}, keys %{$pr->{subOf}||{}})];
 
   @Method:
     @@Name: getPropertyBoolean
@@ -5579,7 +5616,7 @@ IFClsDef:
           C: {
             for (map {$self->{$_}}
                  grep {$pr->{aliasURI}->{$_} or $pr->{subOf}->{$_}}
-                 (keys %{$pr->{aliasURI}}, keys %{$pr->{subOf}})) {
+                 (keys %{$pr->{aliasURI}}, keys %{$pr->{subOf}||{}})) {
               if (defined $_) {
                 $r = $_-><AG::dv|DVValue.value> ? true : false;
                 last C;
@@ -5623,7 +5660,7 @@ IFClsDef:
           C: {
             for (map {$self->{$_}}
                  grep {$pr->{aliasURI}->{$_} or $pr->{subOf}->{$_}}
-                 (keys %{$pr->{aliasURI}}, keys %{$pr->{subOf}})) {
+                 (keys %{$pr->{aliasURI}}, keys %{$pr->{subOf}||{}})) {
               if (defined $_) {
                 $r = $_-><AG::dv|DVValue.stringValue>;
                 last C;
@@ -5656,7 +5693,7 @@ IFClsDef:
               grep {$_}
               map {$self->{$_}}
               grep {$pr->{aliasURI}->{$_} or $pr->{subOf}->{$_}}
-              (keys %{$pr->{aliasURI}}, keys %{$pr->{subOf}})];
+              (keys %{$pr->{aliasURI}}, keys %{$pr->{subOf}||{}})];
 
   @Method:
     @@Name: getPropertyResource

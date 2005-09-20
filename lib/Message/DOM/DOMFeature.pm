@@ -851,7 +851,7 @@ for my $class (grep {
 } keys %Message::DOM::ManakaiDOMImplementationSource::SourceClass) {
   
 #line 1 "lib/Message/DOM/DOMFeature.dis [/u] (Chunk #230)"
-
+print STDERR "Class $class:\n";
 #line 1 "lib/Message/DOM/DOMFeature.dis [/bc] (Chunk #232)"
 
 {
@@ -901,12 +901,22 @@ unless
 0
 #line 7 "/document (lib/Message/DOM/DOMFeature.dis)/minIFClsDef[@QName=ImplementationSource][@type=dis|MultipleResource]/Method[@Name=getImplementation][@type=ManakaiDOM:DOMMethod]/Return[@Type=MinimumImplementation][@type=ManakaiDOM:DOMMethodReturn]/PerlDef [u] (Chunk #245)"
 ;
+print STDERR "  Feature $fkey ($plus)\n";
+
     FVER: for my $fver (grep {$features->{$fkey}->{$_}}
                            keys %{$features->{$fkey}}) {
+
+print STDERR "    Version $fver\n" ;
+
       for my $cls ($class, @{$Message::DOM::ClassISA{$class}}) {
+
+print STDERR "      clsss $cls..\n",
+  join "\t", %{$Message::DOM::ImplFeature{$cls}||{}}, "\n" if $fname eq 'core';
+
         if ($Message::DOM::ImplFeature{$class}->{$fname}->{$fver} ||=
                ## (Caching)
             $Message::DOM::ImplFeature{$cls}->{$fname}->{$fver}) {
+print STDERR "      found in $cls\n";
           next FVER; # Feature/version found
         }
       }
@@ -978,6 +988,7 @@ unless
           }
         }
       }
+print STDERR "    ver Not found\n";
       next CLS; # Not found
     } # FVER
   } # FNAME

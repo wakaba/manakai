@@ -6,11 +6,10 @@ Module:
     @@@:
       Manakai Error Implementation
 
-  @AppName:
-    @@@:
-      Message::Util::Error
-    @@ContentType: lang|Perl
-    @@For: ManakaiDOM|Perl
+  @DISPerl:classPackage:
+    Message::Util::Error
+  @DISPerl:interfacePackage:
+    Message::Util::Error
 
   @Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
@@ -28,7 +27,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/19 16:17:53 $
+      $Date: 2005/09/20 12:21:51 $
     @@ContentType:
       dis:Date.RCS
   
@@ -57,6 +56,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
   @DISlib:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @DISPerl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @Err:
@@ -149,7 +150,7 @@ ResourceDef:
     class or the <Perl::Error> itself.
   @For: =ManakaiDOM|all
   @rdfs:subClassOf: Err|ErrorAny
-  @rdfs:subClassOf: ManakaiDOM|Class
+  @rdfs:subClassOf: DISLang|Class
   @rdf:type: rdfs|Class
 
 ResourceDef:
@@ -159,7 +160,7 @@ ResourceDef:
     a <Q::Err|ErrorClass> <kwd:MUST> implement.
   @For: =ManakaiDOM|all
   @rdfs:subClassOf: Err|ErrorAny
-  @rdfs:subClassOf: ManakaiDOM|IF
+  @rdfs:subClassOf: DISLang|Interface
   @rdf:type: rdfs|Class
 
 ResourceDef:
@@ -232,16 +233,16 @@ ResourceDef:
     @@Name: object
     @@enDesc: The object the error is associated with.
     @@Get:
-    @@Type: DOMMain|Object||ManakaiDOM|all
+    @@Type: DISPerl|BlessedRef||ManakaiDOM|all
   @Attr:
     @@Name: file
     @@enDesc: The file where the error was created.
-    @@Type: DISLang|String||ManakaiDOM|all
+    @@Type: DISPerl|String||ManakaiDOM|all
     @@Get:
   @Attr:
     @@Name: line
     @@enDesc: The line where the error was created.
-    @@Type: DISLang|String||ManakaiDOM|all
+    @@Type: DISPerl|Number||ManakaiDOM|all
     @@Get:
   @Attr:
     @@Name: text
@@ -251,7 +252,7 @@ ResourceDef:
 
   @Method:
     @@Operator:
-      @@@ContentType: dis|TypeQName
+      @@@ContentType: DISCore|QName
       @@@@: DISPerl|AsStringMethod
     @@enDesc:
       Converts the object into a string.  This method <kwd:MAY>
@@ -262,7 +263,7 @@ ResourceDef:
 
   @Method:
     @@Operator:
-      @@@ContentType: lang|Perl
+      @@@ContentType: DISPerl|Perl
       @@@@: 0+
     @@Name: value
     @@enDesc:
@@ -462,7 +463,7 @@ ResourceDef:
   @Method:
     @@Operator: 
       @@@@: ManakaiDOM|MUErrorHandler
-      @@@ContentType: dis|TypeQName
+      @@@ContentType: DISCore|QName
     @@enDesc:
       This method is called when a <Perl::report> 
       is called on this object.
@@ -472,8 +473,7 @@ ResourceDef:
 ResourceDef:
   @QName:
     ManakaiDOM:MUErrorHandler
-  @rdf:type: 
-    DOMMain:Operator
+  @rdf:type: DISLang|Operator
   @Description:
     @@lang:en
     @@@:
@@ -490,7 +490,7 @@ ResourceDef:
     <Perl::___error_def> and which returns a reference to hash
     that contains definitions of errors.
   @For: =ManakaiDOM|all
-  @rdf:type: DOMMain|Operator
+  @rdf:type: DISLang|Operator
 
 ElementTypeBinding:
   @Name: PerlName

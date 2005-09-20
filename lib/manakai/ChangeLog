@@ -1,3 +1,15 @@
+2005-09-20  Wakaba  <wakaba@suika.fam.cx>
+
+	* DISIDL.dis: Full names are given to data types.
+
+	* DISCore.dis, DISLang.dis, DISPerl.dis: Refactored so
+	that some resources has made its canonical URI changed.
+	Lexical types (DISCore:LexicalType) and programming
+	language data types (DISLang:AnyDataType) is now
+	clearly separated.  New name given for, 
+	e.g., dis:TypeQName (now DISCore:QName), Perl:ARRAY (now
+	DISPerl:ARRAY), and so on.
+
 2005-09-19  Wakaba  <wakaba@suika.fam.cx>
 
 	* DISCore.dis (DISCore:Boolean): New preferred name

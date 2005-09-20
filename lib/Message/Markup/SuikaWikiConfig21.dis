@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/09/19 16:17:51 $
+      $Date: 2005/09/20 12:21:48 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1648,6 +1648,42 @@ IFClsDef:
           $r = $v;
         }
 
+  @Attr:
+    @@Name:valueRef
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A reference to the value of this node. 
+    @@NewIn21:
+    @@Get:
+      @@@Type:
+        Perl|SCALAR::ManakaiDOM:all
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A reference to the node value.  If the value is a list,
+          the value is <EM::unspecified>.
+
+          {NOTE:: Applications <kwd:SHOULD-NOT> try to modify
+                  the value via the reference; such operations
+                  might result in broken object model.
+          }
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+          @@@@@enDesc:
+            The node has no value.
+      @@@UndeclaredPrefixException:
+      @@@PerlDef:
+        my $node = $self->{<Q::TreeCore:node>};
+        if (defined $node->{<Q::value>}) {
+          $r = \ ($node->{<Q::value>});
+        } else {
+          __CODE{expandETBinding:: $node => $node}__;
+          $r = defined $node->{<Q::shadowContent>}
+                     ? \ ($node->{<Q::shadowContent>}->{<Q::value>}) : null;
+        }
+
   @Method:
     @@Operator:
       @@@ContentType:
@@ -2639,10 +2675,21 @@ IFClsDef:
                 same document would have different node IDs. 
         \
         }
+    @@NewIn21:
     @@Get:
       @@@Type: SWCFGString
       @@@PerlDef:
         $r = $self->{<Q::TreeCore:node>}->{<Q::TreeCore:nodeID>};
+
+  @Attr:
+    @@Name: nodeIDRef
+    @@enDesc:
+      A reference to the node identifier.
+    @@NewIn21:
+    @@Get:
+      @@@Type: Perl|SCALAR||ManakaiDOM|all
+      @@@PerlDef:
+        $r = \($self->{<Q::TreeCore:node>}->{<Q::TreeCore:nodeID>});
 ##SWCFGNode
 
 ElementTypeBinding:

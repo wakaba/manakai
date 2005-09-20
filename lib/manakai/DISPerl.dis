@@ -15,7 +15,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/17 15:03:04 $
+      $Date: 2005/09/20 12:21:51 $
     @@ContentType:
       dis:Date.RCS
   
@@ -35,10 +35,10 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @dis2pm:
     http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
+  @DISPerl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
   @disPerl:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl--
-  @DOMMain:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @html5:
     http://www.w3.org/1999/xhtml
   @lang:
@@ -47,9 +47,7 @@ Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
   @ManakaiDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
-  @owl:
-    http://www.w3.org/2002/07/owl#
-  @Perl:
+  @pl:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
@@ -61,16 +59,14 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: DISCore|AnyType
+    @@rdf:type: DISLang|DataType
 
 ElementTypeBinding:
-  @Name: FormatDef
+  @Name: LexTypeDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISCore|LexicalType
-    @@rdfs:subClassOf:
-      DISCore:String
 
 ElementTypeBinding:
   @Name: PropDef
@@ -89,120 +85,251 @@ ForDef:
     @@lang:en
     @@@: For Perl 5 binding
 
-## -- Perl datatypes
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
 
-FormatDef:
-  @QName:
-    lang:Perl
+ElementTypeBinding:
+  @Name: enFN
+  @ElementType:
+    dis:FullName
+  @ShadowContent:
+    @@lang:en
+
+## -- Perl lexical types
+
+LexTypeDef:
+  @QName: DISPerl|Perl
+  @enFN: Perl 5 code
+  @rdfs:subClassOf: DISCore|String
+  @subsetOf: DISCore|String
+
+LexTypeDef:
+  @QName: DISPerl|PackageName
+  @enFN: Perl package name
+  @Description:
+    @@lang:en
+    @@@:
+      A fully qualified Perl package name. 
+  @rdfs:subClassOf: DISPerl|Perl
+  @subsetOf: DISPerl|Perl
+
+ResourceDef:
+  @QName: pl|package-name
+  @AliasFor: DISPerl|PackageName
+
+LexTypeDef:
+  @QName: DISPerl|SubName
   @FullName:
     @@lang:en
-    @@@: Perl 5 code
+    @@@: Perl subroutine name
+  @rdfs:subClassOf: DISPerl|Perl
+  @subsetOf: DISPerl|Perl
+
+LexTypeDef:
+  @QName: DISPerl|MethodName
+  @FullName:
+    @@lang:en
+    @@@:
+      Perl method name
+  @Description:
+    @@lang:en
+    @@@:
+      Perl (unqualified) method names. 
+  @rdfs:subClassOf: DISPerl|SubName
+  @subsetOf: DISPerl|SubName
+
+LexTypeDef:
+  @QName: DISPerl|SubPrototype
+  @FullName:
+    @@lang:en
+    @@@:
+      Perl subroutine prototype 
+  @rdfs:subClassOf: DISPerl|Perl
+  @subsetOf: DISPerl|Perl
+
+## -- Perl datatypes
 
 DataTypeDef:
-  @QName:
-    Perl:Scalar
+  @QName: DISPerl|Any
+  @enFN: Any
+  @rdfs:subClassOf: DISLang|Any
+
+DataTypeDef:
+  @QName: DISPerl|Scalar
   @FullName:
     @@lang:en
     @@@: Perl Scalar Value
+  @rdfs:subClassOf: DISPerl|Any
+
+ResourceDef:
+  @QName: pl|Scalar
+  @AliasFor: DISPerl|Scalar
 
 DataTypeDef:
-  @QName: String
+  @QName: DISPerl|String
   @FullName:
     @@lang:en
-    @@@: Perl String Value
+    @@@: Perl string value
   @rdfs:subClassOf: DISLang|String
+  @rdfs:subClassOf: DISPerl|Scalar
   @subsetOf: DISLang|String
-  @rdfs:subClassOf: Perl|Scalar
-  @subsetOf: Perl|Scalar
+  @subsetOf: DISPerl|Scalar
 
 DataTypeDef:
-  @QName: Boolean
+  @QName: DISPerl|Number
+  @enFN: Perl number value
+  @rdfs:subClassOf: DISPerl|Scalar
+  @subsetOf: DISPerl|Scalar
+
+DataTypeDef:
+  @QName: DISPerl|Boolean
   @FullName:
     @@lang:en
     @@@: Perl Boolean Value
-  @rdfs:subClassOf: Perl|Scalar
-  @subsetOf: Perl|Scalar
+  @rdfs:subClassOf: DISPerl|Scalar
+  @subsetOf: DISPerl|Scalar
 
 DataTypeDef:
-  @QName: Reference
+  @QName: DISPerl|Ref
   @FullName:
     @@lang:en
     @@@: Perl reference
-  @rdfs:subClassOf: 
-    Perl:Scalar
-  @subsetOf: Perl|Scalar
+  @rdfs:subClassOf: DISPerl|Scalar
+  @subsetOf: DISPerl|Scalar
+
+ResourceDef:
+  @QName: DISPerl|Reference
+  @AliasFor: DISPerl|Ref
 
 DataTypeDef:
-  @QName:
-    Perl:SCALAR
+  @QName: DISPerl|BlessedRef
+  @enFN:
+    Perl <Perl::bless>ed reference
+  @rdfs:subClassOf: DISPerl|Ref
+  @subsetOf: DISPerl|Ref
+
+DataTypeDef:
+  @QName: DISPerl|REF
+  @enFN: Perl reference to reference
+  @rdfs:subClassOf: DISPerl|Ref
+  @subsetOf: DISPerl|Ref
+
+DataTypeDef:
+  @QName: DISPerl|SCALAR
   @FullName:
     @@lang:en
     @@@: Perl reference to scalar
-  @rdfs:subClassOf: Reference
+  @rdfs:subClassOf: DISPerl|Ref
+  @subsetOf: DISPerl|Ref
+
+ResourceDef:
+  @QName: pl|SCALAR
+  @AliasFor: DISPerl|SCALAR
 
 DataTypeDef:
-  @QName:
-    Perl:Array
+  @QName: DISPerl|Array
   @FullName:
     @@lang:en
     @@@: Perl Array
+  @rdfs:subClassOf: DISPerl|Any
+  @subsetOf: DISPerl|Any
+
+ResourceDef:
+  @QName: pl|Array
+  @AliasFor: DISPerl|Array
 
 DataTypeDef:
-  @QName:
-    Perl:ARRAY
+  @QName: DISPerl|ARRAY
   @FullName:
     @@lang:en
     @@@: Perl array reference
-  @rdfs:subClassOf: Reference
+  @rdfs:subClassOf: DISPerl|Ref
+  @subsetOf: DISPerl|Ref
+
+ResourceDef:
+  @QName: pl|ARRAY
+  @AliasFor: DISPerl|ARRAY
 
 DataTypeDef:
-  @QName:
-    Perl:Hash
+  @QName: DISPerl|Hash
   @FullName:
     @@lang:en
     @@@: Perl Hash
+  @rdfs:subClassOf: DISPerl|Any
+  @subsetOf: DISPerl|Any
+
+ResourceDef:
+  @QName: pl|Hash
+  @AliasFor: DISPerl|Hash
 
 DataTypeDef:
-  @QName:
-    Perl:HASH
+  @QName: DISPerl|HASH
   @FullName:
     @@lang:en
     @@@: Perl hash reference
-  @rdfs:subClassOf: Reference
+  @rdfs:subClassOf: DISPerl|Ref
+  @subsetOf: DISPerl|Ref
 
 ResourceDef:
-  @QName: Perl|hash
-  @AliasFor: Perl|HASH
+  @QName: pl|HASH
+  @AliasFor: DISPerl|HASH
+
+ResourceDef:
+  @QName: pl|hash
+  @AliasFor: DISPerl|HASH
   @ImplNote:
     @@lang:en
     @@@:
       <Q::Perl:hash> is obsolete; use <Q::Perl:HASH> instead.
 
 DataTypeDef:
-  @QName:
-    Perl:CODE
+  @QName: DISPerl|CODE
   @FullName:
     @@lang:en
     @@@: Perl code reference
-  @rdfs:subClassOf: Reference
+  @rdfs:subClassOf: DISPerl|Ref
+  @subsetOf: DISPerl|Ref
+
+ResourceDef:
+  @QName: pl|CODE
+  @AliasFor: DISPerl|CODE
 
 ## -- Perl constructs
 
-ResourceDef:
-  @QName: ScalarVariable
-  @rdf:type:
-    rdfs:Class
-  @rdfs:subClassOf:
-    rdfs:Class
-  @FullName:
-    @@lang:en
-    @@@:
-      Scalar variable
+ResourceTypeDef:
+  @QName: DISPerl|Variable
+  @enFN: Perl variable
+
+ResourceTypeDef:
+  @QName: DISPerl|ScalarVariable
+  @enFN: Perl scalar variable
+  @rdfs:subClassOf: DISPerl|Variable
+  @subsetOf: DISPerl|Variable
+
+ResourceTypeDef:
+  @QName: DISPerl|ArrayVariable
+  @enFN: Perl array variable
+  @rdfs:subClassOf: DISPerl|Variable
+  @subsetOf: DISPerl|Variable
+
+ResourceTypeDef:
+  @QName: DISPerl|HashVariable
+  @enFN: Perl hash variable
+  @rdfs:subClassOf: DISPerl|Variable
+  @subsetOf: DISPerl|Variable
+
+ResourceTypeDef:
+  @QName: DISPerl|List
+  @enFN: Perl list
+  @rdf:type: DISLang|AnyDataType
 
 ResourceDef:
   @QName: AsStringMethod
-  @rdf:type:
-    rdfs:Class
+  @rdf:type: DISLang|Operator
   @FullName:
     @@lang:en
     @@@:
@@ -210,8 +337,7 @@ ResourceDef:
 
 ResourceDef:
   @QName: NewMethod
-  @rdf:type:
-    rdfs:Class
+  @rdf:type: DISLang|Operator
   @FullName:
     @@lang:en
     @@@:
@@ -219,16 +345,14 @@ ResourceDef:
 
 ResourceDef:
   @QName:CloneMethod
-  @rdf:type:
-    rdfs:Class
+  @rdf:type: DISLang|Operator
   @FullName:
     @@lang:en
     @@@:Methods to make a clone of an object. 
 
 ResourceDef:
   @QName: ImportMethod
-  @rdf:type:
-    rdfs:Class
+  @rdf:type: DISLang|Operator
   @FullName:
     @@lang:en
     @@@:
@@ -236,8 +360,7 @@ ResourceDef:
 
 ResourceDef:
   @QName: UnimportMethod
-  @rdf:type:
-    rdfs:Class
+  @rdf:type: DISLang|Operator
   @FullName:
     @@lang:en
     @@@:
@@ -245,8 +368,7 @@ ResourceDef:
 
 ResourceDef:
   @QName: ISAMethod
-  @rdf:type:
-    rdfs:Class
+  @rdf:type: DISLang|Operator
   @FullName:
     @@lang:en
     @@@:
@@ -254,8 +376,7 @@ ResourceDef:
 
 ResourceDef:
   @QName: CanMethod
-  @rdf:type:
-    rdfs:Class
+  @rdf:type: DISLang|Operator
   @FullName:
     @@lang:en
     @@@:
@@ -263,8 +384,7 @@ ResourceDef:
 
 ResourceDef:
   @QName: VERSIONMethod
-  @rdf:type:
-    rdfs:Class
+  @rdf:type: DISLang|Operator
   @FullName:
     @@lang:en
     @@@:
@@ -279,8 +399,7 @@ PropDef:
     @@@:
       Whether a subject resource should be listed in <Perl::@EXPORT_OK> 
       or not.
-  @dataType:
-    dis:Boolean
+  @dataType: DISCore|Boolean
   @multipleProperties: DISCore|Single
 
 PropDef:
@@ -290,8 +409,7 @@ PropDef:
     @@@:
       Whether the method parameter should be passed by named parameter 
       (hash) style or not. 
-  @dataType:
-    dis:Boolean
+  @dataType: DISCore|Boolean
   @rdfs:domain:
     DISLang:MethodParameter
   @multipleProperties: DISCore|Single
@@ -302,25 +420,8 @@ PropDef:
     @@lang:en
     @@@:
       Whether the <Q::dis:DefaultValue> has a reference to itself or not.
-  @dataType:
-    dis:Boolean
+  @dataType: DISCore|Boolean
   @multipleProperties: DISCore|Single
-
-## -- Perl names
-
-FormatDef:
-  @QName:
-    Perl:package-name
-  @FullName:
-    @@lang:en
-    @@@:
-      Perl package name
-  @Description:
-    @@lang:en
-    @@@:
-      A fully qualified Perl package name. 
-  @rdfs:subClassOf:
-    lang:Perl
 
 PropDef:
   @QName: interfacePackage
@@ -329,7 +430,8 @@ PropDef:
     @@@:
       Perl interface package name
   @rdfs:subPropertyOf: dis|AppName
-  @dataType: DISCore|String
+  @subsetOf: dis|AppName
+  @dataType: DISPerl|PackageName
   @multipleProperties: DISCore|Single
 
 PropDef:
@@ -339,43 +441,36 @@ PropDef:
     @@@:
       Perl class package name
   @rdfs:subPropertyOf: dis|AppName
-  @dataType: DISCore|String
+  @subsetOf: dis|AppName
+  @dataType: DISPerl|PackageName
   @multipleProperties: DISCore|Single
 
-FormatDef:
-  @QName: SubName
-  @FullName:
-    @@lang:en
-    @@@: Perl subroutine name
-  @rdfs:subClassOf:
-    lang:Perl
+PropDef:
+  @QName: DISPerl|subName
+  @enFN: Perl subroutine name
+  @rdfs:subPropertyOf: dis|AppName
+  @subsetOf: dis|AppName
+  @dataType: DISPerl|SubName
+  @multipleProperties: DISCore|Single
 
-FormatDef:
-  @QName: MethodName
-  @FullName:
-    @@lang:en
-    @@@:
-      Perl method name
-  @Description:
-    @@lang:en
-    @@@:
-      Perl (unqualified) method names. 
-  @rdfs:subClassOf: SubName
-
-FormatDef:
-  @QName: SubPrototype
-  @FullName:
-    @@lang:en
-    @@@:
-      Perl subroutine prototype 
-  @rdfs:subClassOf:
-    lang:Perl
+PropDef:
+  @QName: DISPerl|methodName
+  @enFN: Perl method name
+  @rdfs:subPropertyOf: DISPerl|subName
+  @subsetOf: DISPerl|subName
+  @multipleProperties: DISCore|Single
 
 ## -- Perl binding specific properties and datatypes
 
-PropDef:
+LexTypeDef:
   @QName:
-    ManakaiDOM:moduleSuffix
+    lang:Perl
+  @enFN:
+    Perl 5 code with <QUOTE::dis> preprocessing instructions
+  @rdfs:subClassOf: DISCore|NSString
+
+PropDef:
+  @QName: DISPerl|moduleSuffix
   @Description:
     @@lang:en
     @@@:
@@ -383,38 +478,32 @@ PropDef:
   @dataType: DISCore|String
   @multipleProperties: DISCore|Single
 
-FormatDef:
-  @QName: MemRef
-  @Description:
-    @@lang:en
-    @@@:
-      A reference to a member of a class. 
-      \
-      MemRef := [dis:TFQNames] "." NCName
-      \
-      The optional <Q::dis:TFQNames> identifiers the class to which the 
-      member referred belongs.  The NCName is the name of 
-      the member (either a method name or a capitalized attribute 
-      name prefixed with "get" or "set").
+ResourceDef:
+  @QName:
+    ManakaiDOM:moduleSuffix
+  @AliasFor: DISPerl|moduleSuffix
 
 ## -- The dis:Perl tree language vocabulary
 
-DataTypeDef:
+ResourceDef:
   @QName:
     dis:Perl
   @FullName:
     @@lang:en
     @@@: 
      <QUOTE::dis> tree fragment generating Perl code
+  @rdf:type: DISCore|AnyType
   @rdfs:subClassOf: 
     lang:dis
+  @subsetOf: lang|dis
 
 ResourceDef:
-  @Name: TreeElementType
+  @QName: TreeElementType
   @rdf:type:
     rdfs:Class
   @rdfs:subClassOf:
     DISLang:TreeElementType
+  @subsetOf: DISLang|TreeElementType
   @Description:
     @@lang:en
     @@@:
@@ -428,7 +517,7 @@ ElementTypeBinding:
     @@rdf:type: TreeElementType
 
 TreeElementType:
-  @Name: cloneCode
+  @QName: cloneCode
   @Description:
     @@lang:en
     @@@:
@@ -437,12 +526,9 @@ TreeElementType:
 
 ## -- The dis:Perl block preprocessing vocabulary
 
-ResourceDef:
-  @Name: BlockElementType
-  @rdf:type:
-    rdfs:Class
-  @rdfs:subClassOf:
-    rdfs:Class
+ResourceTypeDef:
+  @QName: BlockElementType
+  @enDesc: Block-level element type
   @Description:
     @@lang:en
     @@@:
@@ -470,8 +556,7 @@ BlockElementType:
     @@lang:en
     @@@:
       A block code fragment. 
-  @dataType:
-    dis:TypeQName
+  @dataType: DISCore|QName
 
 BlockElementType:
   @QName:
@@ -482,6 +567,7 @@ BlockElementType:
       Sets the method call stack level deeper.  Currently it is 
       used to set the depth for reporting the position where
       an exception has thrown.
+  @dataType: DISPerl|Perl
 
 BlockElementType:
   @QName:
@@ -490,32 +576,7 @@ BlockElementType:
     @@lang:en
     @@@:
       Sets the method call stack level shallwer. 
-
-FormatDef:
-  @QName: XWSpecification
-  @Description:
-    @@lang:en
-    @@@:
-      A reference to an exception or warning code and 
-      optional parameter specification list. 
-
-BlockElementType:
-  @QName:
-    disPerl:EXCEPTION
-  @Description:
-    @@lang:en
-    @@@:
-      Throws an exception. 
-  @dataType: XWSpecification
-
-BlockElementType:
-  @QName:
-    disPerl:WARNING
-  @Description:
-    @@lang:en
-    @@@:
-      Reports a warning. 
-  @dataType: XWSpecification
+  @dataType: DISPerl|Perl
 
 BlockElementType:
   @QName:
@@ -562,12 +623,9 @@ BlockElementType:
 
 ## -- The dis:Perl inline preprocessing vocabulary
 
-ResourceDef:
-  @Name: InlineElementType
-  @rdf:type:
-    rdfs:Class
-  @rdfs:subClassOf:
-    rdfs:Class
+ResourceTypeDef:
+  @QName: InlineElementType
+  @enFN: Inline element type
   @Description:
     @@lang:en
     @@@:
@@ -588,13 +646,12 @@ InlineElementType:
     @@@:
       A qualified name (QName).  It is replaced by a string literal 
       it value is a URI reference expanded from the QName.
-  @dataType: 
-    dis:TypeQName
+  @dataType: DISCore|QName
 
 InlineElementType:
   @QName:
     disPerl:M
-  @dataType: MemRef
+  @dataType: DISLang|MemberRef
   @Description:
     @@lang:en
     @@@:
@@ -603,7 +660,7 @@ InlineElementType:
 InlineElementType:
   @QName:
     disPerl:ClassM
-  @dataType: MemRef
+  @dataType: DISLang|MemberRef
   @Description:
     @@lang:en
     @@@:
@@ -616,7 +673,7 @@ InlineElementType:
     @@lang:en
     @@@:
       An attribute getting.
-  @dataType: MemRef
+  @dataType: DISLang|MemberRef
 
 InlineElementType:
   @QName:
@@ -625,13 +682,12 @@ InlineElementType:
     @@lang:en
     @@@:
       An attribute setting.
-  @dataType: MemRef
+  @dataType: DISLang|MemberRef
 
 InlineElementType:
   @QName:
     disPerl:Class
-  @dataType:
-    dis:TFQNames
+  @dataType: DISCore|TFQNames
   @Description:
     @@lang:en
     @@@:
@@ -640,8 +696,7 @@ InlineElementType:
 InlineElementType:
   @QName:
     disPerl:ClassName
-  @dataType:
-    dis:TFQNames
+  @dataType: DISCore|TFQNames
   @Description:
     @@lang:en
     @@@:
@@ -650,8 +705,7 @@ InlineElementType:
 InlineElementType:
   @QName:
     disPerl:IF
-  @dataType:
-    dis:TFQNames
+  @dataType: DISCore|TFQNames
   @Description:
     @@lang:en
     @@@:
@@ -660,8 +714,7 @@ InlineElementType:
 InlineElementType:
   @QName:
     disPerl:IFName
-  @dataType:
-    dis:TFQNames
+  @dataType: DISCore|TFQNames
   @Description:
     @@lang:en
     @@@:
@@ -670,7 +723,7 @@ InlineElementType:
 InlineElementType:
   @QName:
     disPerl:C
-  @dataType: MemRef
+  @dataType: DISLang|MemberRef
   @Description:
     @@lang:en
     @@@: 
@@ -679,8 +732,6 @@ InlineElementType:
 InlineElementType:
   @QName:
     disPerl:Code
-  @dataType:
-    dis:TypeQName
   @Description:
     @@lang:en
     @@@:
@@ -689,8 +740,8 @@ InlineElementType:
 ## -- Predefined code templates
 
 ResourceTypeDef:
-  @QName:
-    dis2pm:InlineCode
+  @QName: DISPerl|InlineCode
+  @enFN: Inline code fragment
   @Description:
     @@lang:en
     @@@:
@@ -705,10 +756,15 @@ ResourceTypeDef:
       }
   @rdfs:subClassOf:
     DISCore:AnyDefContainer
+  @subsetOf: DISCore|AnyDefContainer
+
+ResourceDef:
+  @QName: dis2pm|InlineCode
+  @AliasFor: DISPerl|InlineCode
 
 ResourceTypeDef:
-  @QName:
-    dis2pm:BlockCode
+  @QName: DISPerl|BlockCode
+  @enFN: Block-level code fragment
   @Description:
     @@lang:en
     @@@:
@@ -716,6 +772,11 @@ ResourceTypeDef:
       preprocessed block.
   @rdfs:subClassOf:
     DISCore:AnyDefContainer
+  @subsetOf: DISCore|AnyDefContainer
+
+ResourceDef:
+  @QName: dis2pm|BlockCode
+  @AliasFor: DISPerl|BlockCode
 
 ResourceTypeDef:
   @QName: CodeParameter
@@ -742,6 +803,8 @@ ResourceTypeDef:
                             The default is <CODE::any>.
           \
       }
+  @rdfs:subClassOf: DISLang|AnyParameter
+  @subsetOf: DISLang|AnyParameter
 
 PropDef:
   @QName: paramStyle
@@ -764,12 +827,8 @@ ResourceTypeDef:
 
 ## -- Assertion types for disPerl:ASSERT
 
-ResourceDef:
-  @Name: AssertionType
-  @rdf:type:
-    rdfs:Class
-  @rdfs:subClassOf:
-    rdfs:Class
+ResourceTypeDef:
+  @QName: AssertionType
   @Description:
     @@lang:en
     @@@:
@@ -850,16 +909,16 @@ ICDef:
   @Method:
     @@Operator:
       @@@@: ISAMethod
-      @@@ContentType: dis|TypeQName
+      @@@ContentType: DISCore|QName
     @@enDesc:
       Returns whether the class or object is an instance of a class or interface.
     @@Param:
       @@@Name: typeArg
-      @@@Type: DISLang|String
+      @@@Type: DISPerl|String
       @@@enDesc:
         The name of the package.
     @@Return:
-      @@@Type: DOMMain|boolean||ManakaiDOM|all
+      @@@Type: DISPerl|Boolean
       @@@trueCase:
         @@@@enDesc:
           The class or object is an instance of <P::typeArg>.
@@ -869,7 +928,7 @@ ICDef:
   @Method:
     @@Operator:
       @@@@: CanMethod
-      @@@ContentType: dis|TypeQName
+      @@@ContentType: DISCore|QName
     @@enDesc:
       Checks if the object or class has a method.
       
@@ -882,10 +941,10 @@ ICDef:
       }
     @@Param:
       @@@Name: methodArg
-      @@@Type: DISLang|String
+      @@@Type: DISPerl|String
       @@@enDesc: The name of the method.
     @@Return:
-      @@@Type: Perl|CODE
+      @@@Type: DISPerl|CODE
       @@@enDesc:
         A reference to the <Perl::sub>.
       @@@nullCase:
@@ -894,13 +953,13 @@ ICDef:
   @Method:
     @@Operator:
       @@@@: VERSIONMethod
-      @@@ContentType: dis|TypeQName
+      @@@ContentType: DISCore|QName
     @@enDesc:
       Returns the package version, i.e. the value of the variable
       <Perl::$VERSION> in the package the object is blessed into.
     @@Param:
       @@@Name: requireArg
-      @@@Type: DOMMain|any
+      @@@Type: DISPerl|Scalar
       @@@enDesc:
         The required version.  It will be compared to the package version
         and if the package version is not greater than or equal
@@ -909,7 +968,7 @@ ICDef:
         @@@@enDesc:
           No comparison and <Perl::die>ing is done.
     @@Return:
-      @@@Type: DOMMain|any
+      @@@Type: DISPerl|Scalar
       @@@enDesc:
         The value of the <Perl::$VERSION>.
       @@@nullCase:
@@ -929,10 +988,10 @@ CDef:
   @Method:
     @@Operator:
       @@@@: ImportMethod
-      @@@ContentType: dis|TypeQName
+      @@@ContentType: DISCore|QName
     @@Param:
       @@@Name: names
-      @@@Type: Perl|Array
+      @@@Type: DISPerl|List
       @@@enDesc:
         A list of names of functions, variables and / or tags to export.
     @@Return:
@@ -953,24 +1012,24 @@ CDef:
     @@ManakaiDOM:isForInternal:1
     @@Operator:
       @@@@: TIEARRAY
-      @@@ContentType: lang|Perl
+      @@@ContentType: DISPerl|Perl
     @@ManakaiDOM:isStatic:1
     @@enDesc:
       Associates an array instance with the class.
     @@Param:
       @@@Name: list
-      @@@Type: Perl|Array
+      @@@Type: DISPerl|List
       @@@enDesc:
         Additional arguments needed to complete the association.
     @@Return:
-      @@@Type: DOMMain|Object||ManakaiDOM|all
+      @@@Type: DISPerl|BlessedRef
       @@@enDesc:
         An object of a class which provides the other methods.
   @Method:
     @@ManakaiDOM:isForInternal:1
     @@Operator:
       @@@@: STORE
-      @@@ContentType: lang|Perl
+      @@@ContentType: DISPerl|Perl
     @@enDesc:
       Stores datum <P::value> into <P::index> for the tied array
       associated with the object.  If this makes the array larger
@@ -978,12 +1037,12 @@ CDef:
       for new positions.
     @@Param:
       @@@Name: index
-      @@@Type: DOMMain|long
+      @@@Type: DISPerl|Number
       @@@enDesc:
         The position to store <P::value>.
     @@Param:
       @@@Name: value
-      @@@Type: DOMMain|any
+      @@@Type: DISPerl|Scalar
       @@@enDesc:
         The data to store.
      @@Return:
@@ -992,17 +1051,17 @@ CDef:
     @@ManakaiDOM:isForInternal:1
     @@Operator:
       @@@@: FETCH
-      @@@ContentType: lang|Perl
+      @@@ContentType: DISPerl|Perl
     @@enDesc:
       Retrieves the datum in <P::index> for the tied array
       associated with the object.
     @@Param:
       @@@Name: index
-      @@@Type: DOMMain|long
+      @@@Type: DISPerl|Number
       @@@enDesc:
         The index in the array.
     @@Return:
-      @@Type: DOMMain|any
+      @@Type: DISPerl|Scalar
       @@enDesc:
         The data at <P::index>.
 
@@ -1010,12 +1069,12 @@ CDef:
     @@ManakaiDOM:isForInternal:1
     @@Operator:
       @@@@: FETCHSIZE
-      @@@ContentType: lang|Perl
+      @@@ContentType: DISPerl|Perl
     @@enDesc:
       Returns the total number of items in the tied array
       associated with the object, i.e. <Perl::scalar <html5:var::@array>>.
     @@Return:
-      @@@Type: DOMMain|long
+      @@@Type: DISPerl|Number
       @@@enDesc:
         The number of items.
 
@@ -1023,7 +1082,7 @@ CDef:
     @@ManakaiDOM:isForInternal:1
     @@Operator:
       @@@@: STORESIZE
-      @@@ContentType: lang|Perl
+      @@@ContentType: DISPerl|Perl
     @@enDesc:
       Sets the total number of items in the tied array
       associated with the object.  If this makes the array
@@ -1032,7 +1091,7 @@ CDef:
       smaller then entries beyond <P::count> should be removed.
     @@Param:
       @@@Name: count
-      @@@Type: DOMMain|long
+      @@@Type: DISPerl|Number
       @@@enDesc:
         The new total number of items.
     @@Return:
@@ -1041,7 +1100,7 @@ CDef:
     @@ManakaiDOM:isForInternal:1
     @@Operator:
       @@@@: EXTEND
-      @@@ContentType: lang|Perl
+      @@@ContentType: DISPerl|Perl
     @@enDesc:
       Tells that the array is likely to grow to have <P::count>
       entries.  This information can be used to optimize allocation.
@@ -1049,7 +1108,7 @@ CDef:
       This method need do nothing.
     @@Param:
       @@@Name: count
-      @@@Type: DOMMain|long
+      @@@Type: DISPerl|Number
       @@@enDesc: New size.
     @@Return:
 
@@ -1057,16 +1116,16 @@ CDef:
     @@ManakaiDOM:isForInternal:1
     @@Operator:
       @@@@: EXISTS
-      @@@ContentType: lang|Perl
+      @@@ContentType: DISPerl|Perl
     @@enDesc:
       Verifies that the <P::key>th item exists in the tied
       array associated with the object.
     @@Param:
       @@@Name: key
-      @@@Type: DOMMain|long
+      @@@Type: DISPerl|Number
       @@@enDesc: The index of the item.
     @@Return:
-      @@@Type: DOMMain|boolean
+      @@@Type: DISPerl|Boolean
       @@@trueCase:
         @@@@enDesc:
           There is <P::key>th item.
@@ -1078,13 +1137,13 @@ CDef:
     @@ManakaiDOM:isForInternal:1
     @@Operator:
       @@@@: DELETE
-      @@@ContentType: lang|Perl
+      @@@ContentType: DISPerl|Perl
     @@enDesc:
       Removes the <P::key>th item from the tied array associated
       with the object.
     @@Param:
       @@@Name: key
-      @@@Type: DOMMain|long
+      @@@Type: DISPerl|Number
       @@@enDesc:
         The index of the item.
     @@Return:
@@ -1093,7 +1152,7 @@ CDef:
     @@ManakaiDOM:isForInternal:1
     @@Operator:
       @@@@: CLEAR
-      @@@ContentType: lang|Perl
+      @@@ContentType: DISPerl|Perl
     @@enDesc:
       Clears all values from the tied array assocaited with the object.
     @@Return:
@@ -1102,7 +1161,7 @@ CDef:
     @@ManakaiDOM:isForInternal:1
     @@Operator:
       @@@@: DESTROY
-      @@@ContentType: lang|Perl
+      @@@ContentType: DISPerl|Perl
     @@enDesc:
       Normal object destructor method.
     @@Return:
@@ -1111,12 +1170,12 @@ CDef:
     @@ManakaiDOM:isForInternal:1
     @@Operator:
       @@@@: PUSH
-      @@@ContentType: lang|Perl
+      @@@ContentType: DISPerl|Perl
     @@enDesc:
       Appends items to the tied array associated with the object.
     @@Param:
       @@@Name: list
-      @@@Type: Perl|Array
+      @@@Type: DISPerl|List
       @@@enDesc: 
         Items to add.
     @@Return:
@@ -1125,37 +1184,37 @@ CDef:
     @@ManakaiDOM:isForInternal:1
     @@Operator:
       @@@@: POP
-      @@@ContentType: lang|Perl
+      @@@ContentType: DISPerl|Perl
     @@enDesc:
       Removes the last item of the tied array associated with the object
       and returns the item.
     @@Return:
-      @@@Type: DOMMain|any
+      @@@Type: DISPerl|Scalar
       @@@enDesc: The removed item.
 
   @Method:
     @@ManakaiDOM:isForInternal:1
     @@Operator:
       @@@@: SHIFT
-      @@@ContentType: lang|Perl
+      @@@ContentType: DISPerl|Perl
     @@enDesc:
       Removes the first item of the tied array associated with the object
       and returns the item.
     @@Return:
-      @@@Type: DOMMain|any
+      @@@Type: DISPerl|Scalar
       @@@enDesc: The removed item.
 
   @Method:
     @@ManakaiDOM:isForInternal:1
     @@Operator:
       @@@@: UNSHIFT
-      @@@ContentType: lang|Perl
+      @@@ContentType: DISPerl|Perl
     @@enDesc:
       Inserts items at the beginning of the tied array associated with
       the object.
     @@Param:
       @@@Name: list
-      @@@Type: Perl|Array
+      @@@Type: DISPerl|List
       @@@enDesc: Items to add.
     @@Return:
 
@@ -1163,27 +1222,27 @@ CDef:
     @@ManakaiDOM:isForInternal:1
     @@Operator:
       @@@@: SPLICE
-      @@@ContentType: lang|Perl
+      @@@ContentType: DISPerl|Perl
     @@enDesc:
       Performes the equivalent operation of <Perl::splice> on the
       tied array associated with the object.
     @@Param:
       @@@Name: offset
-      @@@Type: DOMMain|long
+      @@@Type: DISPerl|Number
       @@@enDesc:
         The offset.  The default is <Perl::0>.
     @@Param:
       @@@Name: length
-      @@@Type: DOMMain|long
+      @@@Type: DISPerl|Number
       @@@enDesc:
        The length.  The default is the rest of the array.
     @@Param:
       @@@Name: list
-      @@@Type: Perl|Array
+      @@@Type: DISPerl|List
       @@@enDesc:
         The item to replace by.
     @@Return:
-      @@@Type: Perl|Array
+      @@@Type: DISPerl|List
       @@@enDesc:
         A list of the original <P::length> items at <P::offset>.
 ##TieArray
@@ -1219,18 +1278,18 @@ ElementTypeBinding:
 ElementTypeBinding:
   @Name: IFPackName
   @ElementType:
-    dis:AppName
+    DISPerl:interfacePackage
   @ShadowContent:
     @@ForCheck: ManakaiDOM|ForIF
-    @@ContentType: lang|Perl
+    @@ContentType: DISPerl|PackageName
 
 ElementTypeBinding:
   @Name: ClsPackName
   @ElementType:
-    dis:AppName
+    DISPerl:classPackage
   @ShadowContent:
     @@ForCheck: ManakaiDOM|ForClass
-    @@ContentType: lang|Perl
+    @@ContentType: DISPerl|PackageName
 
 ElementTypeBinding:
   @Name: IFFileName
@@ -1321,8 +1380,7 @@ ElementTypeBinding:
     @@rdf:type:
       ManakaiDOM:InCase
     @@Value:true
-    @@Type:
-      DOMMain:boolean::ManakaiDOM:all
+    @@Type: DISPerl|Boolean
 
 ElementTypeBinding:
   @Name: falseCase
@@ -1332,8 +1390,7 @@ ElementTypeBinding:
     @@rdf:type:
       ManakaiDOM:InCase
     @@Value:false
-    @@Type:
-      DOMMain:boolean::ManakaiDOM:all
+    @@Type: DISPerl|Boolean
 
 ElementTypeBinding:
   @Name: enDesc

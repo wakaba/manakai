@@ -27,7 +27,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/17 15:03:04 $
+      $Date: 2005/09/20 12:21:51 $
     @@ContentType:
       dis:Date.RCS
   
@@ -36,11 +36,9 @@ Module:
 
   @Require:
     @@Module:
-      @@@Name: DISCore
       @@@QName:
         DIS:DISCore
     @@Module:
-      @@@Name: XML
       @@@QName:
         DIS:XML
 
@@ -152,8 +150,9 @@ ResourceDef:
     rdfs:Datatype
   @rdf:type:
     rdfs:Class
-  @ISA:
+  @rdfs:subClassOf:
     rdfs:Class
+  @subsetOf: rdfs|Class
 
 ResourceDef:
   @QName:
@@ -197,7 +196,7 @@ PropDef:
     rdfs:Resource
   @rdfs:range:
     rdfs:Class
-  @dataType: dis|TypeQName
+  @dataType: DISCore|QName
   @multipleProperties: DISCore|UnorderedList
 
 PropDef:
@@ -213,7 +212,7 @@ PropDef:
     rdfs:Class
   @subsetOf:
     dis:subsetOf
-  @dataType: dis|TFQNames
+  @dataType: DISCore|TFQNames
   @multipleProperties: DISCore|UnorderedList
 
 PropDef:
@@ -229,7 +228,7 @@ PropDef:
     rdf:Property
   @subsetOf:
     dis:subsetOf
-  @dataType: dis|TFQNames
+  @dataType: DISCore|TFQNames
   @multipleProperties: DISCore|UnorderedList
 
 PropDef:
@@ -239,7 +238,7 @@ PropDef:
     @@lang:en
     @@@:
       The subject is same as the object.
-  @dataType: dis|TFQNames
+  @dataType: DISCore|TFQNames
   @multipleProperties: DISCore|UnorderedList
 
 PropDef:
@@ -249,7 +248,7 @@ PropDef:
     rdf:Property
   @rdfs:range:
     rdfs:Class
-  @dataType: dis|TFQNames
+  @dataType: DISCore|TFQNames
   @multipleProperties: DISCore|UnorderedList
 
 PropDef:
@@ -259,7 +258,7 @@ PropDef:
     rdf:Property
   @rdfs:range:
     rdfs:Class
-  @dataType: dis|TFQNames
+  @dataType: DISCore|TFQNames
   @multipleProperties: DISCore|UnorderedList
 
 PropDef:
@@ -313,7 +312,7 @@ PropDef:
     rdf:Statement
   @rdfs:range:
     rdfs:Resource
-  @dataType: dis|TFQNames
+  @dataType: DISCore|TFQNames
   @multipleProperties: DISCore|Single
 
 PropDef:
@@ -327,7 +326,7 @@ PropDef:
     rdf:Statement
   @rdfs:range:
     rdfs:Resource
-  @dataType: dis|TFQNames
+  @dataType: DISCore|TFQNames
   @multipleProperties: DISCore|Single
 
 PropDef:
@@ -341,7 +340,7 @@ PropDef:
     rdf:Statement
   @rdfs:range:
     rdfs:Resource
-  @dataType: dis|TFQNames
+  @dataType: DISCore|TFQNames
   @multipleProperties: DISCore|Single
 
 PropDef:
@@ -355,7 +354,7 @@ PropDef:
     rdfs:Resource
   @rdfs:range:
     rdfs:Resource
-  @dataType: dis|TFQNames
+  @dataType: DISCore|TFQNames
   @multipleProperties: DISCore|OrderedList
 
 PropDef:
@@ -369,7 +368,7 @@ PropDef:
     rdfs:Resource
   @rdfs:range:
     rdfs:Resource
-  @dataType: dis|TFQNames
+  @dataType: DISCore|TFQNames
   @multipleProperties: DISCore|OrderedList
 
 PropDef:

@@ -20,7 +20,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/19 16:17:53 $
+      $Date: 2005/09/20 12:21:51 $
     @@ContentType:
       dis:Date.RCS
   
@@ -362,6 +362,57 @@ IFClsDef:
         }__;
 
   @Method:
+    @@Name: createDVValueRef
+    @@enDesc:
+      Creates a <IF::DVValue> object.
+    @@Param:
+      @@@Name: dataType
+      @@@Type: DISString
+      @@@enDesc:
+        The canonical URI of the data type of the value.
+    @@Param:
+      @@@Name: valueRef
+      @@@Type: pl|SCALAR||ManakaiDOM|all
+      @@@enDesc:
+        The value of the object.  It is equivalent to
+        set a value to <A::DVValue.value> attribute of the value.
+      @@@nullCase:
+        @@@@enDesc: 
+          The initial value is <CODE::null>.
+    @@Param:
+      @@@DISPerl:isNamedParameter:1
+      @@@Name: baseType
+      @@@Type: DISString
+      @@@enDesc:
+        A base type of <P::dataType>.
+      @@@nullCase:
+        @@@@enDesc: No base type.
+    @@Return:
+      @@@Type: DVValue
+      @@@caType: ManakaiDVValue
+      @@@enDesc:
+        The newly created value.
+      @@@PerlDef:
+        my $class = <ClassName::ManakaiDVValue>;
+        for ($baseType, $dataType) {
+          $class = {
+            <Q::dis:TypeQName> => <ClassName::ManakaiDVQNameValue>,
+            <Q::DISCore:URI> => <ClassName::ManakaiDVURIValue>,
+            <Q::lang:Perl> => <ClassName::ManakaiDVNSValue>,
+            <Q::lang:dis> => <ClassName::ManakaiDVSWCFGElement>,
+            <Q::lang:muf> => <ClassName::ManakaiDVNSValue>,
+            <Q::lang:disdoc> => <ClassName::ManakaiDVNSValue>,
+            <Q::lang:disdocInline> => <ClassName::ManakaiDVNSValue>,
+          }->{$_} || $class;
+        }
+        $r = bless \ {
+          type => $dataType,          
+        }, $class;
+        __DEEP{
+          $r-><AS::DVValue.valueRef> ($valueRef);
+        }__;
+
+  @Method:
     @@Name: createDVOrderedList
     @@enDesc:
       Creates a new <IF::DVOrderedList> object.
@@ -443,6 +494,16 @@ IFClsDef:
     @@PerlDef:
       $result = <ClassM::ManakaiDISImplementationValue.createDVValue>
                       ($type, $value, base_type => $base_type);
+
+  @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@QName: createValueRef
+    @@rdf:type: dis2pm|BlockCode
+    @@enDesc:
+      Creates a value object whose type is URI.
+    @@PerlDef:
+      $result = <ClassM::ManakaiDISImplementationValue.createDVValueRef>
+                      ($type, $value_ref, base_type => $base_type);
 
   @ResourceDef:
     @@ForCheck: ManakaiDOM|ForClass
@@ -532,17 +593,45 @@ IFClsDef:
         @@@@enDesc:
           The value is <CODE::null>.
       @@@PerlDef:
-        $r = $$self->{value};
+        if (defined $$self->{value}) {
+          $r = ${$$self->{value}};
+        } else {
+          $r = null;
+        }
     @@Set:
       @@@nullCase:
         @@@@enDesc:
           The new value is <CODE::null>.
       @@@PerlDef:
         if (defined $given) {
-          $$self->{value} = $given;
+          $$self->{value} = \ $given;
         } else {
           CORE::delete $$self->{value};
         }
+
+  @Attr:
+    @@Name: valueRef
+    @@enDesc:
+      A reference to the value.
+
+      {NOTE:: Applications <kwd:SHOULD-NOT> try to modify 
+              the value via the reference unless it is
+              known to safe.
+      }
+    @@Type: pl|SCALAR||ManakaiDOM|all
+    @@nullCase:
+      @@@enDesc:
+        The value is <DOM::null>.
+    @@Get:
+      @@@PerlDef:
+        $r = $$self->{value};
+    @@Set:
+      @@@PerlDef:
+        if (defined $given) {
+          $$self->{value} = $given;
+        } else {
+          CORE::delete $$self->{value};
+        }    
 
   @Attr:
     @@Name: isNull
@@ -1021,11 +1110,29 @@ IFClsDef:
     @@Type: DISString
     @@nullCase:
       @@@enDesc:
-        The value.
+        The value is <DOM::null>.
     @@Get:
       @@@PerlDef:
         if ($$self->{array}->[0]) {
           $r = $$self->{array}->[0]-><AG::DVValue.value>;
+        } else {
+          $r = null;
+        }
+
+  @Attr:
+    @@Name: valueRef
+    @@ForCheck: ManakaiDOM|ForClass
+    @@enDesc:
+      The value.  For an ordered list, 
+      it is the value of the first item, if any, or <DOM::null>.
+    @@Type: DISString
+    @@nullCase:
+      @@@enDesc:
+        The value is <DOM::null>.
+    @@Get:
+      @@@PerlDef:
+        if ($$self->{array}->[0]) {
+          $r = $$self->{array}->[0]-><AG::DVValue.valueRef>;
         } else {
           $r = null;
         }
@@ -1133,12 +1240,31 @@ IFClsDef:
     @@Type: DISString
     @@nullCase:
       @@@enDesc:
-        The value.
+        The value is <DOM::null>.
     @@Get:
       @@@PerlDef:
         if (keys %{$$self->{hash}}) {
           $r = $$self->{hash}->{[sort keys %{$$self->{hash}}]->[0]}
                      -><AG::DVValue.value>;
+        } else {
+          $r = null;
+        }
+
+  @Attr:
+    @@Name: valueRef
+    @@ForCheck: ManakaiDOM|ForClass
+    @@enDesc:
+      The value.  For an unordered list, 
+      it is the value of a randomly selected item, if any, or <DOM::null>.
+    @@Type: DISString
+    @@nullCase:
+      @@@enDesc:
+        The value is <DOM::null>.
+    @@Get:
+      @@@PerlDef:
+        if (keys %{$$self->{hash}}) {
+          $r = $$self->{hash}->{[sort keys %{$$self->{hash}}]->[0]}
+                     -><AG::DVValue.valueRef>;
         } else {
           $r = null;
         }
@@ -1406,6 +1532,26 @@ IFClsDef:
     @@Set:
       @@@PerlDef:
         $$self->{namespaceURI} = $given;
+        $$self->{value} = '';
+
+  @Attr:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: valueRef
+    @@Type: DISString
+    @@enDesc:
+      The expanded URI of the value.
+    @@Get:
+      @@@PerlDef:
+        $r = defined $$self->{namespaceURI}
+           ? \ ($$self->{namespaceURI} . $$self->{value})
+           : \ ($$self->{value});
+    @@Set:
+      @@@PerlDef:
+        if (defined $given) {
+          $$self->{namespaceURI} = $given;
+        } else {
+          CORE::delete $$self->{namespaceURI};
+        }
         $$self->{value} = '';
 ##DVQNameValue
 

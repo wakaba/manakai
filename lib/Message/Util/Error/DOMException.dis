@@ -22,7 +22,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/19 16:17:53 $
+      $Date: 2005/09/20 12:21:51 $
     @@ContentType:
       dis:Date.RCS
   
@@ -54,10 +54,14 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
   @DISlib:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @disPerl:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl--
   @DOMCore:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @dx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @ecore:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
   @Err:
@@ -88,6 +92,13 @@ ElementTypeBinding:
   @ShadowContent:
     @@lang:en
 
+ElementTypeBinding:
+  @Name: enFN
+  @ElementType:
+    dis:FullName
+  @ShadowContent:
+    @@lang:en
+
 ## -- Resource types
 
 ResourceTypeDef:
@@ -101,16 +112,13 @@ ResourceTypeDef:
     @@@:
       Concrete implementations of any type of <QUOTE::exception>,
       including <QUOTE::error> and <QUOTE::warning>.
-  @rdfs:subClassOf: 
-    DISLang:AnyClass::ManakaiDOM:all
+  @rdfs:subClassOf: DISLang|AnyClass
   @rdfs:subClassOf: Err|MUErrorAny
 
 ResourceTypeDef:
-  @QName: 
-    ManakaiDOM:ExceptionIF
-  @FullName:
-    @@lang:en
-    @@@: Exception interface
+  @QName: dx|Interface
+  @enFN:
+    DOM-style exception interface
   @Description:
     @@lang:en
     @@@:
@@ -118,6 +126,11 @@ ResourceTypeDef:
   @rdfs:subClassOf:
     AnyExceptionAnyClass::ManakaiDOM:all
   @rdfs:subClassOf: Err|MUErrorInterface
+
+ResourceDef:
+  @QName: ManakaiDOM|ExceptionIF
+  @AliasFor: dx|Interface
+  @For: =ManakaiDOM|all
 
 ResourceTypeDef:
   @QName: AnyExceptionClass
@@ -135,17 +148,19 @@ ResourceTypeDef:
   @rdfs:subClassOf: Err|MUErrorClass
 
 ResourceTypeDef:
-  @QName: 
-    ManakaiDOM:ExceptionClass
-  @FullName:
-    @@lang:en
-    @@@: Exception class
+  @QName: dx|Class
+  @enFN: DOM-style exception class
   @Description:
     @@lang:en
     @@@:
       A concrete implementation of an exception type.
   @rdfs:subClassOf:
     AnyExceptionClass::ManakaiDOM:all
+
+ResourceDef:
+  @QName: ManakaiDOM|ExceptionClass
+  @AliasFor: dx|Class
+  @For: =ManakaiDOM|all
 
 ResourceTypeDef:
   @QName: 
@@ -203,21 +218,22 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       rdfs:Class
-    @@rdfs:subClassOf:
-      rdfs:Class::ManakaiDOM:all
-    @@subsetOf:
-      rdfs:Class::ManakaiDOM:all
+    @@rdfs:subClassOf: rdfs|Class
     @@For: =ManakaiDOM|all
 
 ## -- Throwing of exceptions
 
 PropDef:
-  @QName: 
-    ManakaiDOM:raises
+  @QName: dx|raises
   @Description:
     @@lang:en
     @@@:
       An exception the method or attribute might raise.
+
+ResourceDef:
+  @QName: ManakaiDOM|raises
+  @AliasFor: dx|raises
+  @For: =ManakaiDOM|all
 
 PropDef:
   @QName: 
@@ -241,6 +257,43 @@ ElementTypeBinding:
       rdf:Property
     @@For: =ManakaiDOM|all
 
+## -- lang:Perl vocabulary
+
+ElementTypeBinding:
+  @Name: BlockElementType
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISPerl|BlockElementType
+    @@For: =ManakaiDOM|all
+
+LexTypeDef:
+  @QName: DISPerl|XWSpecification
+  @Description:
+    @@lang:en
+    @@@:
+      A reference to an exception or warning code and 
+      optional parameter specification list. 
+  @rdfs:subClassOf: DISCore|NSString
+
+BlockElementType:
+  @QName:
+    disPerl:EXCEPTION
+  @Description:
+    @@lang:en
+    @@@:
+      Throws an exception. 
+  @dataType: DISPerl|XWSpecification
+
+BlockElementType:
+  @QName:
+    disPerl:WARNING
+  @Description:
+    @@lang:en
+    @@@:
+      Reports a warning. 
+  @dataType: DISPerl|XWSpecification
+
 ## -- lang:dis vocabulary
 
 TreeElementType:
@@ -257,17 +310,13 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       DISLang:TreeElementType
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
+    @@For: =ManakaiDOM|all
 
 ## -- References to Exception
 
-FormatDef:
-  @QName: 
-    DOMMain:XCodeRef
+LexTypeDef:
+  @QName: dx|XCRef
+  @enFN: Exception code reference
   @Description:
     @@lang:en
     @@@:
@@ -290,18 +339,21 @@ FormatDef:
       \
       - subcoderef := <lt>A dis:TFQNames referring an exception or warning subcode;
                        it should be prefixed>
+  @rdfs:subClassOf: DISCore|NSString
+
+ResourceDef:
+  @QName: 
+    DOMMain:XCodeRef
+  @AliasFor: dx|XCRef
+  @For: =ManakaiDOM|all
 
 ElementTypeBinding:
-  @Name: FormatDef
+  @Name: LexTypeDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DISCore:StringDataType
-    @@ForCheck:
-      ManakaiDOM:all
-    @@rdfs:subClassOf:
-      DISCore:String::ManakaiDOM:all
+    @@rdf:type: DISCore|LexicalType
+    @@For: =ManakaiDOM|all
 
 ## -- Exception classes
 
@@ -517,9 +569,8 @@ ResourceDef:
       An abstract class that is inherited by all manakai warning classes.
 
 ResourceDef:
-  @QName: CoreException
-  @rdf:type:
-    ManakaiDOM:ExceptionClass
+  @QName: dx|CoreException
+  @rdf:type: dx|Class
   @ISA:
     ManakaiDOM:ManakaiDOMException
   @Description:
@@ -529,9 +580,8 @@ ResourceDef:
   @For:
     ManakaiDOM:Perl
   @ResourceDef:
-    @@QName: CoreExceptionCode
-    @@rdf:type:
-      ManakaiDOM:ConstGroup
+    @@QName: dx|CoreExceptionCode
+    @@rdf:type: DISLang|ConstGroup
     @@Type:
       DOMMain:unsigned-short::ManakaiDOM:all
     @@rdfs:subClassOf:
@@ -838,11 +888,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: 
       DOMMain:XWParameter
-    @@AliasFor:
-      @@@For:
-        !=ManakaiDOM:all
-      @@@@:
-        ::ManakaiDOM:all
+    @@For: =ManakaiDOM|all
 
 ## -- Exception target
 
@@ -850,8 +896,7 @@ ResourceDef:
   @QName: ManakaiDefaultExceptionHandler
   @enDesc:
     This class provides a default exception handler.
-  @rdf:type:
-    ManakaiDOM:Class
+  @rdf:type: DISLang|Class
   @ForCheck:
     ManakaiDOM:Perl
   @Implement: ecore|MUErrorTarget
@@ -862,8 +907,7 @@ ResourceDef:
     @@Operator:
       @@@@:
         ManakaiDOM:MUErrorHandler
-      @@@ContentType:
-        dis:TypeQName
+      @@@ContentType: DISCore|QName
     @@Description:
       @@@lang:en
       @@@@:
@@ -909,11 +953,10 @@ ResourceDef:
           }
 ##ManakaiDefaultExceptionHandler
 
-ResourceDef:
+LexTypeDef:
   @QName:
     lang:muf
-  @rdf:type:
-    rdfs:Class
+  @rdfs:subClassOf: DISCore|NSString
   @ImplNote:
     @@lang:en
     @@@:

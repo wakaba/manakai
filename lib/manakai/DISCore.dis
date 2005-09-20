@@ -21,7 +21,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/19 16:17:53 $
+      $Date: 2005/09/20 12:21:51 $
     @@ContentType:
       dis:Date.RCS
   
@@ -37,8 +37,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
-  @DOMMain:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @lang:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
@@ -207,11 +205,6 @@ ResourceTypeDef:
     @@@:
       An abstract resource - it has zero or more concrete representations, 
       that are distinguished by <CODE::for> URI references.
-  @AliasFor:
-    @@@:
-      ::ManakaiDOM:all
-    @@For:
-      ManakaiDOM:all !=ManakaiDOM:all
 
 PropDef:
   @QName:
@@ -544,14 +537,13 @@ PropDef:
 PropDef:
   @QName:
     ManakaiDOM:isRedefining
-  @dataType:
-    dis:Boolean
+  @dataType: DISCore|Boolean
   @Description:
     @@lang:en
     @@@:
       Whether the subject resource (such as method or attribute) 
       redefines another resource defined in one of ancestor inheriting 
-      class or not.
+      class or not.  (Obsolete)
   @multipleProperties: Single
 
 PropDef:
@@ -591,26 +583,10 @@ PropDef:
       Whether the <Q::dis:ISA>-recursive property search
       (i.e. <M::DIS:ManakaiDISPropertyAccessor.getPropertyResourceList>)
        should be stopped or not.
-  @dataType:
-    dis:Boolean
+  @dataType: DISCore|Boolean
   @multipleProperties: Single
 
 ## --- Datatype
-
-PropDef:
-  @QName:
-    dis:dataType
-  @Description:
-    @@lang:en
-    @@@:
-      Lexical data type of the property object.
-  @rdfs:domain:
-    rdf:Property
-  @rdfs:range:
-    rdf:Property
-  @dataType:
-    dis:TypeQName
-  @multipleProperties: Single
 
 ResourceDef:
   @QName: AnyType
@@ -648,38 +624,30 @@ ResourceDef:
   @QName: StringDataType
   @AliasFor: LexicalType
 
-ElementTypeBinding:
-  @Name: DataTypeDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      rdfs:Datatype
-
-ResourceDef:
-  @QName: 
-    ManakaiDOM:DataType
+PropDef:
+  @QName:
+    dis:dataType
   @Description:
     @@lang:en
     @@@:
-      A programming language data type.
-  @rdf:type:
-    rdfs:Class
-  @subsetOf: AnyType
-  @rdfs:subClassOf: AnyType
+      Lexical data type of the property object.
+  @rdfs:domain:
+    rdf:Property
+  @rdfs:range: DISCore|LexicalType
+  @dataType:
+    dis:TypeQName
+  @multipleProperties: Single
 
 PropDef:
   @QName:
     dis:ContentType
-  @rdfs:domain:
-    DOMMain:any
   @rdfs:range: LexicalType
   @dataType:
     dis:TypeQName
   @Description:
     @@lang:en
     @@@:
-      The media type (content type) of the content.
+      The lexical data type of the content of e.g. a <QUOTE::dis> element.
   @multipleProperties: Single
 
 PropDef:
@@ -706,54 +674,207 @@ PropDef:
   @dataType: ScriptTag
   @multipleProperties: Single
 
-DataTypeDef:
-  @QName:
-    lang:disdoc
-  @FullName:
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
     @@lang:en
-    @@@: 
-      The <QUOTE::disdoc> text format
 
-DataTypeDef:
-  @QName: 
-    lang:disdocInline
-  @FullName:
+ElementTypeBinding:
+  @Name: enFN
+  @ElementType:
+    dis:FullName
+  @ShadowContent:
+    @@lang:en
+
+## -- Lexical type instances
+
+ElementTypeBinding:
+  @Name: LexTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISCore|LexicalType
+
+LexTypeDef:
+  @QName: DISCore|AnyString
+  @enFN: Context-dependent string
+  @enDesc:
+    String, i.e. unconstranted sequence of zero or more characters,
+    which might or might not depend on context such as namespace bindings.
+
+LexTypeDef:
+  @QName: DISCore|String
+  @enFN: String
+  @enDesc:
+    String, i.e. unconstrainted sequence of zero or more characters,
+    which does not depend on context such as namespace bindings.
+  @rdfs:subClassOf: DISCore|AnyString
+  @subsetOf: DISCore|AnyString
+
+ResourceDef:
+  @QName: dis|String
+  @AliasFor: DISCore|String
+
+LexTypeDef:
+  @QName: DISCore|Text
+  @enFN: Text
+  @enDesc:
+    Human readable plain-text.
+  @rdfs:subClassOf: DISCore|String
+  @subsetOf: DISCore|String
+
+LexTypeDef:
+  @QName: DISCore|URI
+  @enFN: DOM URI
+  @enDesc:
+    URI-like string that identifies a resource <SRC::<CITE::DOM Level 3 Core>>.
+  @rdfs:subClassOf: DISCore|String
+  @subsetOf: DISCore|String
+
+LexTypeDef:
+  @QName: DISCore|TFURI
+  @enFN:
+    <Q::DISCore|TFQNames>-expanded URI
+  @Description:
     @@lang:en
     @@@:
-      The <QUOTE::disdoc> text format, inline context
+      <Q::dis:TFQNames>-expanded URI references. 
+  @rdfs:subClassOf: DISCore|URI
+  @subsetOf: DISCore|URI
 
-DataTypeDef:
-  @QName: NCName
+LexTypeDef:
+  @QName: DISCore|TFPURI
+  @enFN:
+    <Q::DISCore|TFPQNames>-expanded URI
+  @rdfs:subClassOf: DISCore|URI
+  @subsetOf: DISCore|URI
+
+LexTypeDef:
+  @QName: Boolean
+  @enFN: Boolean
+  @Description:
+    @@lang:en
+    @@@: 
+      A boolean truth value, i.e. true or false. 
+      \
+      <Q:dis:Boolean> := "1" / "0"
+  @rdfs:subClassOf: DISCore|String
+  @subsetOf: DISCore|String
+
+ResourceDef:
+  @QName: dis|Boolean
+  @AliasFor: Boolean
+
+LexTypeDef:
+  @QName: DISCore|Tristate
+  @enFN: Tristate
+  @Description:
+    @@lang:en
+    @@@:
+      A tristate value. 
+      \
+      <Q::Tristate> := "-1" / "0" / "1".
+      \
+      {NOTE:: What a <Q::Tristate> value means depends on the 
+              context where the value is used. 
+      \
+      }
+  @rdfs:subClassOf: DISCore|String
+  @subsetOf: DISCore|String
+
+LexTypeDef:
+  @QName: DISCore|Integer
+  @enFN: Integer
+  @rdfs:subClassOf: DISCore|String
+  @subsetOf: DISCore|String
+
+LexTypeDef:
+  @QName: dis|Date.RCS
+  @FullName:
+    @@lang:en
+    @@@: RCS tag-style date and time specification
+  @rdfs:subClassOf: DISCore|String
+  @subsetOf: DISCore|String
+
+LexTypeDef:
+  @QName: DISCore|MailAddress
+  @enFN: Internet mail address
+  @rdfs:subClassOf: DISCore|String
+  @subsetOf: DISCore|String
+
+LexTypeDef:
+  @QName: DISCore|NSString
+  @enFN: Namespace-binding-dependent string
+  @enDesc:
+    String, i.e. unconstrainted sequence of zero or more characters,
+    which depends on namespace bindings.
+  @rdfs:subClassOf: DISCore|AnyString
+  @subsetOf: DISCore|AnyString
+
+LexTypeDef:
+  @QName: DISCore|AnyDISDoc
+  @enFN:
+    Any <QUOTE::disdoc> text
+  @enDesc:
+    The <QUOTE::disdoc> text format, either block context or inline context.
+  @rdfs:subClassOf: DISCore|NSString
+  @subsetOf: DISCore|NSString
+
+LexTypeDef:
+  @QName:
+    lang:disdoc
+  @enFN: 
+    <QUOTE::disdoc> text
+  @enDesc:
+    The <QUOTE::disdoc> text format, block context.
+  @rdfs:subClassOf: DISCore|AnyDISDoc
+  @subsetOf: DISCore|AnyDISDoc
+
+LexTypeDef:
+  @QName: 
+    lang:disdocInline
+  @enFN:
+    <QUOTE::disdoc> inline text
+  @enDesc:
+    The <QUOTE::disdoc> text format, inline context.
+  @rdfs:subClassOf: DISCore|AnyDISDoc
+  @subsetOf: DISCore|AnyDISDoc
+
+LexTypeDef:
+  @QName: DISCore|NCName
   @FullName:
     @@lang:en
     @@@:
       <QUOTE::dis> NCName
-  @subsetOf: String
-  @rdfs:subClassOf: String
+  @rdfs:subClassOf: DISCore|AnyString
+  @subsetOf: DISCore|AnyString
 
-DataTypeDef:
-  @QName: NamespacePrefix
+LexTypeDef:
+  @QName: DISCore|NamespacePrefix
   @FullName:
     @@lang:en
     @@@:
       <QUOTE::dis> Namespace Prefix
-  @subsetOf: NCName
-  @rdfs:subClassOf: NCName
+  @rdfs:subClassOf: DISCore|NCName
+  @rdfs:subClassOf: DISCore|NSString
+  @subsetOf: DISCore|NCName
+  @subsetOf: DISCore|NSString
 
-DataTypeDef:
+LexTypeDef:
   @QName: LocalName
   @FullName:
     @@lang:en
     @@@:
       <QUOTE::dis> Local Name
-  @subsetOf: NCName
-  @rdfs:subClassOf: NCName
-  @subsetOf: dis|TypeQName
-  @rdfs:subClassOf: dis|TypeQName
+  @rdfs:subClassOf: DISCore|NCName
+  @rdfs:subClassOf: DISCore|String
+  @subsetOf: DISCore|NCName
+  @subsetOf: DISCore|String
 
-DataTypeDef:
-  @QName:
-    dis:TypeQName
+LexTypeDef:
+  @QName: DISCore|QName
   @FullName:
     @@lang:en
     @@@: 
@@ -768,157 +889,76 @@ DataTypeDef:
       prefix := *(<lt>any character> - ":")
       \
       local-name := *(<lt>any character> - ":")
+  @rdfs:subClassOf: DISCore|NSString
+  @subsetOf: DISCore|NSString
 
-DataTypeDef:
-  @QName: NCNameOrQName
+ResourceDef:
+  @QName: dis|TypeQName
+  @AliasFor: DISCore|QName
+
+LexTypeDef:
+  @QName: DISCore|NCNameOrQName
+  @enFN:
+    <QUOTE::dis> NCName or <QUOTE::dis> QName with prefix
   @Description:
     @@lang:en
     @@@:
       A QName with or without <CHAR::COLON>.  If
       it does not contain a <CHAR::COLON>, it is namespace-unaware
       or in the null namespace.
-  @subsetOf: dis|TypeQName
-  @rdfs:subClassOf: dis|TypeQName
+  @rdfs:subClassOf: DISCore|QName
+  @subsetOf: DISCore|QName
 
-DataTypeDef:
-  @QName: LanguageTag
+LexTypeDef:
+  @QName: DISCore|LanguageTag
+  @enFN:
+    <QUOTE::dis> language tag
   @Description:
     @@lang:en
     @@@:
       A qualified name whose default namespace bound to
       the language tag namespace.  See <Module::DIS:NaturalLanguage> module.
-  @rdfs:subClassOf:
-    dis:TypeQName
-  @subsetOf:
-    dis:TypeQName
+  @rdfs:subClassOf: DISCore|QName
+  @subsetOf: DISCore|QName
 
-DataTypeDef:
-  @QName: ScriptTag
+LexTypeDef:
+  @QName: DISCore|ScriptTag
+  @enFN:
+    <QUOTE::dis> script tag
   @Description:
     @@lang:en
     @@@:
       A qualified name whose default namespace bound to
       the script tag namespace.  See <Module::DIS:NaturalLanguage> module.
-  @rdfs:subClassOf:
-    dis:TypeQName
-  @subsetOf:
-    dis:TypeQName
+  @rdfs:subClassOf: DISCore|QName
+  @subsetOf: DISCore|QName
 
-DataTypeDef:
-  @QName: 
-    dis:TFQNames
+LexTypeDef:
+  @QName: DISCore|TFQNames
+  @enDesc:
+    <QUOTE::dis> T & F QName pair
   @Description:
     @@lang:en
     @@@:
       A pair of resource QName and optional <QUOTE::For> QName.
+  @rdfs:subClassOf: DISCore|NSString
+  @subsetOf: DISCore|NSString
 
-DataTypeDef:
-  @QName: TFPQNames
+ResourceDef:
+  @QName: dis|TFQNames
+  @AliasFor: DISCore|TFQNames
+
+LexTypeDef:
+  @QName: DISCore|TFPQNames
+  @enFN:
+    <QUOTE::dis> T & F & P QName triplet
   @Description:
     @@lang:en
     @@@:
       A triplet of resource QName and optional <QUOTE::For> QName
       and zero or more <QUOTE::For+> QNames.
-
-DataTypeDef:
-  @QName: URI
-  @Description:
-    @@lang:en
-    @@@:
-      Any string that identifies a resource.
-  @subsetOf: String
-  @rdfs:subClassOf: String
-
-DataTypeDef:
-  @QName: TFURI
-  @Description:
-    @@lang:en
-    @@@:
-      <Q::dis:TFQNames>-expanded URI references. 
-  @rdfs:subClassOf: URI
-  @subsetOf: URI
-
-DataTypeDef:
-  @QName: Boolean
-  @FullName:
-    @@lang:en
-    @@@: Boolean truth
-  @Description:
-    @@lang:en
-    @@@: 
-      A boolean truth value, i.e. true or false. 
-      \
-      <Q:dis:Boolean> := "1" / "0"
-
-ResourceDef:
-  @QName: dis|Boolean
-  @AliasFor: Boolean
-
-DataTypeDef:
-  @Name: Tristate
-  @FullName:
-    @@lang:en
-    @@@: Tristate value
-  @Description:
-    @@lang:en
-    @@@:
-      A tristate value. 
-      \
-      <Q::Tristate> := "-1" / "0" / "1".
-      \
-      {NOTE:: What a <Q::Tristate> value means depends on the 
-              context where the value is used. 
-      \
-      }
-
-DataTypeDef:
-  @Name: String
-  @FullName:
-    @@lang:en
-    @@@: String
-
-DataTypeDef:
-  @QName:
-    dis:String
-  @AliasFor: String
-
-DataTypeDef:
-  @QName: Integer
-  @FullName:
-    @@lang:en
-    @@@:
-      Integer
-
-PropDef:
-  @QName: dis|Author
-  @FullName:
-    @@lang:en
-    @@@: Author
-  @dataType: String
-  @multipleProperties: OrderedList
-
-PropDef:
-  @QName: dis|Mail
-  @FullName:
-    @@lang:en
-    @@@: Internet mail address
-  @dataType: String
-  @multipleProperties: UnorderedList
-
-PropDef:
-  @QName: dis|Date
-  @FullName:
-    @@lang:en
-    @@@: Date
-  @dataType: dis|Date.RCS
-  @multipleProperties: Single
-  
-DataTypeDef:
-  @QName:
-    dis:Date.RCS
-  @FullName:
-    @@lang:en
-    @@@: RCS tag-style date and time specification
+  @rdfs:subClassOf: DISCore|NSString
+  @subsetOf: DISCore|NSString
 
 ## -- Properties
 
@@ -1033,8 +1073,7 @@ PropDef:
 
 PropDef:
   @QName: isDeprecated
-  @dataType:
-    dis:Boolean
+  @dataType: DISCore|Boolean
   @Description:
     @@lang:en
     @@@:
@@ -1043,8 +1082,7 @@ PropDef:
 
 PropDef:
   @QName: alt
-  @dataType:
-    dis:TFQNames
+  @dataType: DISCore|TFQNames
   @Description:
     @@lang:en
     @@@:
@@ -1054,30 +1092,65 @@ PropDef:
       <Q::isDeprecated> property element.
   @multipleProperties: OrderedList
 
-## -- License
+## -- Properties describing authors and licenses
 
-## TODO: Move to separate module
+PropDef:
+  @QName: dis|Author
+  @FullName:
+    @@lang:en
+    @@@: Author
+  @dataType: DISCore|Text
+  @multipleProperties: OrderedList
+
+PropDef:
+  @QName: dis|Mail
+  @FullName:
+    @@lang:en
+    @@@: Internet mail address
+  @dataType: DISCore|MailAddress
+  @multipleProperties: UnorderedList
+
+PropDef:
+  @QName: dis|Date
+  @FullName:
+    @@lang:en
+    @@@: Date
+  @dataType: dis|Date.RCS
+  @multipleProperties: Single
+
+ResourceTypeDef:
+  @QName: DISCore|License
+  @enFN: License
+  @enDesc:
+    License term.  It includes, but is not limited to,
+    the copyright statement.
 
 PropDef:
   @QName:
     dis:License
-  @Description:
-    @@lang:en
-    @@@:
-      License term.
-  @dataType: 
-    dis:TypeQName
+  @enFN: License
+  @enDesc:
+    The license term for the resource.  It includes but not limited
+    to the copyright statement.
+  @dataType: DISCore|QName
   @multipleProperties: Single
+  @rdfs:range: DISCore|License
 
 ResourceDef:
   @QName:
     license:Perl+MPL
-  @rdf:type:
-    rdfs:Resource
+  @rdf:type: DISCore|License
+  @enFN:
+    Perl / MPL / GPL / LGPL
   @Description:
     @@lang:en
     @@@:
       <QUOTE::Same as Perl> or <QUOTE::MPL 1.1/GPL 2.0/LGPL 2.1> license. 
+  @ImplNote:
+    @@lang:en
+    @@@:
+      {TODO:: Full text is required.
+      }
 
 PropDef:
   @QName: dis|Original
@@ -1089,4 +1162,5 @@ PropDef:
 
 PropDef:
   @QName: dis|Year
+  @dataType: DISCore|Integer
   @multipleProperties: Single

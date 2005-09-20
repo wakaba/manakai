@@ -28,7 +28,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/17 15:03:04 $
+      $Date: 2005/09/20 12:21:51 $
     @@ContentType:
       dis:Date.RCS
   
@@ -72,18 +72,33 @@ ForDef:
     @@@:
       For OMG IDL definitions, with the style of W3C DOM Working Group. 
 
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: enFN
+  @ElementType:
+    dis:FullName
+  @ShadowContent:
+    @@lang:en
+
 ## -- IDL datatypes
 
 ResourceDef:
   @Name: IDLDataType
+  @enFN: IDL data type
   @Description:
     @@lang:en
     @@@:
       A CORBA IDL data type.
   @rdf:type:
     rdfs:Class
-  @rdfs:subClassOf:
-    ManakaiDOM:DataType
+  @subsetOf: DISLang|DataType
+  @rdfs:subClassOf: DISLang|DataType
 
 ElementTypeBinding:
   @Name: IDLDataTypeDef
@@ -94,6 +109,7 @@ ElementTypeBinding:
 
 ResourceDef:
   @QName: AnyRealNumber
+  @enFN: Real number
   @Description:
     @@lang:en
     @@@:
@@ -104,31 +120,33 @@ ResourceDef:
 IDLDataTypeDef:
   @QName: 
     DOMMain:long
+  @enFN: Long integer
   @Description:
     @@lang:en
     @@@:
       Long signed integer representing the range -2^31 ... 2^31 - 1. 
   @rdfs:subClassOf: AnyRealNumber
+  @subsetOf: DISIDL|AnyRealNumber
 
 IDLDataTypeDef:
   @QName: 
     DOMMain:unsigned-long
+  @enFN: Unsigned long integer
   @Def:
     @@ContentType: 
       lang:IDL-DOM
     @@@: unsigned long
-  @Label:
-    @@@: unsigned long
-    @@lang:en
   @Description:
     @@lang:en
     @@@: 
       Long unsigned integer representing the range 0 ... 2^32 - 1. 
   @rdfs:subClassOf: AnyRealNumber
+  @subsetOf: DISIDL|AnyRealNumber
 
 IDLDataTypeDef:
   @QName: 
     DOMMain:short
+  @enFN: Short integer
   @Def:
     @@ContentType:
       lang:IDL-DOM
@@ -138,26 +156,28 @@ IDLDataTypeDef:
     @@@: 
       Short signed integer representing the range -2^15 ... 2^15 - 1.
   @rdfs:subClassOf: AnyRealNumber
+  @subsetOf: DISIDL|AnyRealNumber
 
 IDLDataTypeDef:
   @QName: 
     DOMMain:unsigned-short
+  @enFN: Unsigned short integer
   @Def:
     @@ContentType: 
       lang:IDL-DOM
-    @@@: unsigned short
-  @Label:
-    @@lang:en
     @@@: unsigned short
   @Description:
     @@lang:en
     @@@: 
       Short unsigned integer representing the range 0 ... 2^16 - 1.
   @rdfs:subClassOf: AnyRealNumber
+  @subsetOf: DISIDL|AnyRealNumber
 
 IDLDataTypeDef:
   @QName:
     DOMMain:float
+  @enFN:
+    Single-precision floating point number
   @Description:
     @@lang:en
     @@@:
@@ -171,10 +191,12 @@ IDLDataTypeDef:
       \
       }
   @rdfs:subClassOf: AnyRealNumber
+  @subsetOf: DISIDL|AnyRealNumber
 
 IDLDataTypeDef:
   @QName: 
     DOMMain:double
+  @enFN: Double-precision floating point number
   @Description:
     @@lang:en
     @@@:
@@ -188,13 +210,12 @@ IDLDataTypeDef:
       \
       }
   @rdfs:subClassOf: AnyRealNumber
+  @subsetOf: DISIDL|AnyRealNumber
 
 IDLDataTypeDef:
   @QName: 
     DOMMain:char
-  @FullName:
-    @@lang:en
-    @@@: Char Type
+  @enFN: ISO/IEC 8859-1 character
   @Description:
     @@lang:en
     @@@:
@@ -207,10 +228,7 @@ IDLDataTypeDef:
 IDLDataTypeDef:
   @QName:
     DOMMain:boolean
-  @FullName:
-    @@lang:en
-    @@@:
-      Boolean
+  @enFN: Boolean
   @Description:
     @@lang:en
     @@@:
@@ -219,9 +237,7 @@ IDLDataTypeDef:
 IDLDataTypeDef:
   @QName:
     DOMMain:octet
-  @FullName:
-    @@lang:en
-    @@@: Octet Type
+  @enFN: Octet
   @Description:
     @@lang:en
     @@@:
@@ -231,9 +247,7 @@ IDLDataTypeDef:
 IDLDataTypeDef:
   @QName: 
     DOMMain:any
-  @FullName:
-    @@lang:en
-    @@@: Any Type
+  @enFN: Any IDL type
   @Description:
     @@lang:en
     @@@:
@@ -243,6 +257,7 @@ IDLDataTypeDef:
 IDLDataTypeDef: 
   @QName: 
     DOMMain:Object
+  @enFN: Object
   @Description:
     @@lang:en
     @@@: An object.
@@ -250,6 +265,7 @@ IDLDataTypeDef:
 IDLDataTypeDef:
   @QName: 
     DOMMain:unsigned-long-long
+  @enFN: Unsigned long long integer
   @Def:
     @@ContentType: 
       lang:IDL-DOM
@@ -261,17 +277,20 @@ IDLDataTypeDef:
     @@lang:en
     @@@: Unsigned long long integer
   @rdfs:subClassOf: AnyRealNumber
+  @subsetOf: DISIDL|AnyRealNumber
 
 ResourceDef:
   @QName: lang|IDL
-  @rdf:type: rdfs|Class
+  @rdf:type: DISCore|LexicalType
   @FullName:
     @@lang:en
     @@@: IDL
+  @rdfs:subClassOf: DISCore|String
+  @subsetOf: DISCore|String
 
 ResourceDef:
   @QName: lang|IDL-DOM
-  @rdf:type: rdfs|Class
+  @rdf:type: DISCore|LexicalType
   @FullName:
     @@lang:en
     @@@: IDL for DOM
@@ -280,3 +299,5 @@ ResourceDef:
     @@@:
       The IDL format as used in W3C DOM specifications.
   @rdfs:subClassOf: lang|IDL
+  @subsetOf: lang|IDL
+
