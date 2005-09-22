@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/19 16:17:50 $
+      $Date: 2005/09/22 11:02:31 $
     @@ContentType:
       dis:Date.RCS
 
@@ -503,6 +503,11 @@ ElementTypeBinding:
       ManakaiDOM:ExceptionOrWarningSubType
     @@ForCheck:
       ManakaiDOM:ManakaiDOM ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: SubType
+  @ElementType:
+    dis:ImplNote
 
 ElementTypeBinding:
   @Name: ErrSubTypeDef
@@ -2477,6 +2482,26 @@ IFCls1Def:
     @@@: CoreFeature30
     @@ForCheck:
       ManakaiDOM:DOM3
+  @DOMMetaImpl:provideFeature:
+    @@@: DOMXML|XMLFeature10
+    @@ForCheck:
+      ManakaiDOM:DOM1 ManakaiDOM|DOMXMLFeature
+  @DOMMetaImpl:provideFeature:
+    @@@: DOMXML|XMLFeature20
+    @@ForCheck:
+      ManakaiDOM:DOM2 ManakaiDOM|DOMXMLFeature
+  @DOMMetaImpl:provideFeature:
+    @@@: DOMXML|XMLFeature30
+    @@ForCheck:
+      ManakaiDOM:DOM3 ManakaiDOM|DOMXMLFeature
+  @DOMMetaImpl:provideFeature:
+    @@@: DOMXML|XMLVersionFeature10
+    @@ForCheck:
+      ManakaiDOM:DOM3 ManakaiDOM|DOMXMLFeature
+  @DOMMetaImpl:provideFeature:
+    @@@: DOMXML|XMLVersionFeature11
+    @@ForCheck:
+      ManakaiDOM:DOM3 ManakaiDOM|DOMXMLFeatureXML11
 
   @Method:
     @@ForCheck: !ManakaiDOM|ForClass

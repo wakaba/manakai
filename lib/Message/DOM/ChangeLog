@@ -1,3 +1,14 @@
+2005-09-21  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMCore.pm (DOMImplementation): Provides "XML" and "XMLVersion"
+	features if it is "for" ManakaiDOM:DOMXMLFeature.
+
+	* DOMMain.pm (StringExtended): Code portions of raising
+	StringOutOfBoundsException is temporary disabled since
+	it is not a DOM-style exception supported by 
+	current implementation of ManakaiNode - it will be 
+	recovered in later revision.
+
 2005-09-20  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMFeature.pm: Debug output code copied 

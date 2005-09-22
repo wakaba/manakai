@@ -21,7 +21,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/20 12:21:50 $
+      $Date: 2005/09/22 11:02:34 $
     @@ContentType:
       dis:Date.RCS
   
@@ -336,7 +336,10 @@ IFClsDef:
         ## Restores weak references
         require Scalar::Util;
         for my $doc (values %{$r->{<Q::DIS:sourceFile>}}) {
-          Scalar::Util::weaken ($doc->{<Q::TreeCore:node>}->{<Q::DIS:db>});
+          Scalar::Util::weaken ($doc->{<Q::TreeCore:node>}->{<Q::DIS:db>})
+            if $doc->{<Q::TreeCore:node>}->{<Q::DIS:db>};
+          Scalar::Util::weaken ($doc->{db}) if $doc->{db};
+          Scalar::Util::weaken ($doc->{ns}->{'###db'}) if $doc->{ns}->{'###db'};
         }
         for my $def (values %{$r->{modDef}},
                      values %{$r->{forDef}},
@@ -531,7 +534,7 @@ IFClsDef:
         }__;
 
   @Method:
-    @@Name:plCodeFragment
+    @@Name: plCodeFragment
     @@enDesc:
       Converts <Q::lang:dis> into Perl code.
     @@Param:
@@ -548,6 +551,11 @@ IFClsDef:
         DOMMain:boolean::ManakaiDOM:all
       @@@enDesc:
         Whether the code is block-level or inline-level.
+    @@NamedParam:
+      @@@Name: databaseArg
+      @@@Type: DIS|DISDatabase
+      @@@nullCase:
+        @@@@enDesc: Implied one.
     @@Return:
       @@@Type: DIS|MPLCodeFragment
       @@@enDesc:
@@ -567,11 +575,13 @@ IFClsDef:
             }
             $r = $plimpl-><M::DIS|MPLImpl.createPerlBlockContainer>;
             for my $c (@{$self-><M::DIS|DISElement.disChildElements>
-                                  (for_arg => $forArg, forp_arg => $forpArg)}) {
+                                  (for_arg => $forArg, forp_arg => $forpArg,
+                                   database_arg => $databaseArg)}) {
               my $ccode = $c-><M::DISElementPerl.plCodeFragment>
                                   ($disResource,
                                    for_arg => $forArg, forp_arg => $forpArg,
-                                   contains_statements => $containsStatements);
+                                   contains_statements => $containsStatements,
+                                   database_arg => $databaseArg);
               $r-><M::DIS|PLBlockCon.appendCodeFragment> ($ccode->clone)
                 if $ccode;
             }
@@ -636,7 +646,8 @@ IFClsDef:
               my $val = $const->{<Q::dis:Value>}-><M::DVValuePerl.plCodeFragment>
                             ($disResource,
                              data_type_uri => $data_type
-                                    -><AG::DIS|DISAnyResource.uri>)
+                                    -><AG::DIS|DISAnyResource.uri>,
+                                   database_arg => $databaseArg)
                 if $const->{<Q::dis:Value>};
               unless (defined $val) {
                 __UNDEEP{__EXCEPTION{DIS|NO_CONST_VALUE_ERR::
@@ -700,14 +711,14 @@ IFClsDef:
                 __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
                   DIS:uri => {$const->{uri}},
                   DIS:localName => {$const->{localName}},
-                  DIS:sourceNode => {$self->{src}},
+                  DIS:sourceNode => {$self},
                   DIS:expectedType => {<Q::ManakaiDOM:Const>},
                 }__}__;
               } else {  # DISPerl:cloneCode
                 __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
                   DIS:uri => {$const->{uri}},
                   DIS:localName => {$const->{localName}},
-                  DIS:sourceNode => {$self->{src}},
+                  DIS:sourceNode => {$self},
                   DIS:expectedType => {<Q::DISLang:AnyMethod>},
                 }__}__;
               }
@@ -716,7 +727,8 @@ IFClsDef:
             my $val = $self-><M::DISElementPerl.plValueCodeFragment>
                             (null, $disResource,
                              for_arg => $forArg,
-                             forp_arg => $forpArg);
+                             forp_arg => $forpArg,
+                                   database_arg => $databaseArg);
             $r = $plimpl-><M::DIS|MPLImpl.createPerlStatement>;
             my $rvar = $plimpl-><M::DIS|MPLImpl.createPerlVariable>
                                                  ('$', null, 'r');
@@ -999,7 +1011,7 @@ IFClsDef:
                              .plPreprocessPerlStatement>
                             ($self-><AG::dv|DVValue.stringValue>,
                              contains_statements => false,
-                             namespace_context => $self-><AG::dv|DVValue.value>);
+                             namespace_context => $self);
             } elsif ($vnode_type-><M::DIS|DISResource.isSubsetOfURI>
                                         (<Q::DISCore:Integer>)) {
               $r = $plimpl-><M::DIS|MPLImpl.createPerlAtom>
@@ -1413,7 +1425,8 @@ IFClsDef:
         __DEEP{
           my $mg = $self-><AG::DIS|DISAnyResource.database>
                         -><M::DIS|DISDatabase.getResource>
-                                ($self-><AG::DIS|DISAnyResource.namespaceURI>);
+                             ($self-><AG::DIS|DISAnyResource.namespaceURI>,
+                              for_arg => $self-><AG::DIS|DISAnyResource.forURI>);
           unless ($self-><AG::DIS|DISAnyResource.isDefined>) {
             __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
               DIS:uri => {$self-><AG::DIS|DISAnyResource.namespaceURI>},
@@ -1421,7 +1434,7 @@ IFClsDef:
             }__}__;
           }
           my $an = $mg-><M::DIS|DISResourceProp.getPropertyValue>
-                             (<Q::dis:AppName>);
+                             (<Q::DISPerl:packageName>);
           $r = $an ? $an-><AG::dv|DVValue.stringValue>
                    : $mg-><AG::DIS|DISAnyResource.localName> || 'main';
           $r =~ s/::$//g;
@@ -1443,7 +1456,8 @@ IFClsDef:
         __DEEP{
           my $mg = $self-><AG::DIS|DISAnyResource.database>
                         -><M::DIS|DISDatabase.getResource>
-                                ($self-><AG::DIS|DISAnyResource.namespaceURI>);
+                             ($self-><AG::DIS|DISAnyResource.namespaceURI>,
+                              for_arg => $self-><AG::DIS|DISAnyResource.forURI>);
           unless ($self-><AG::DIS|DISAnyResource.isDefined>) {
             __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
               DIS:uri => {$self-><AG::DIS|DISAnyResource.namespaceURI>},
@@ -1451,7 +1465,7 @@ IFClsDef:
             }__}__;
           }
           my $an = $mg-><M::DIS|DISResourceProp.getPropertyValue>
-                             (<Q::DISPerl:interfacePackage>);
+                             (<Q::DISPerl:interfacePackageName>);
           if ($an) {
             $r = $an-><AG::dv|DVValue.stringValue>;
             $r =~ s/::$//g;
@@ -1557,7 +1571,7 @@ IFClsDef:
                               (<Q::ManakaiDOM:Class>)) {
                 ## -- Subroutines and variables
                 my $pack = $cls-><AG::DISResourcePerl.plCodeFragment>;
-                $r-><M::DIS|PLFile.appendPackage> ($pack);
+                 $r-><M::DIS|PLFile.appendPackage> ($pack);
                 my $pack_name = $cls-><AG::DISResourcePerl
                                           .plFullyQualifiedName>;
 
@@ -1592,7 +1606,7 @@ IFClsDef:
                 ## -- Features
                 my %feature;
                 for my $v (@{$cls-><M::DIS|DISResourceProp.getPropertyValueList>
-                                      (<Q::DOMMetaImpl.provideFeature>)}) {
+                                      (<Q::DOMMetaImpl:provideFeature>)}) {
                   my $f = $self-><AG::DIS|DISAnyResource.database>
                                -><M::DIS|DISDatabase.getResource>
                                      ($v->isa (<IFName::dv|DVURIValue>)
@@ -2488,7 +2502,8 @@ IFClsDef:
                        -><M::DISElementPerl.plCodeFragment>
                             ($self, for_arg => $self->{for},
                              forp_arg => $self->{forp},
-                             contains_statements => not $is_inline); 
+                             contains_statements => not $is_inline,
+                      database_arg => $self-><AG::DIS|DISAnyResource.database>); 
             } else {
               __UNDEEP{
                 __EXCEPTION{DIS|UNSUPPORTED_MEDIA_TYPE_ERR::
@@ -2533,6 +2548,10 @@ IFClsDef:
                 if ($param-><M::DIS|DISResourceProp.getPropertyBoolean>
                                  (<Q::DISPerl:isNamedParameter>, false)) {
                   $is_named_param = true;
+                  if (not $is_optional_param and
+                      not $param-><AG::DISResourcePerl.plIsNullable>) {
+                    $prototype .= ';'
+                  }
                   $is_optional_param = true;
                   push @param_variables, ['%opt'];
                   $prototype .= '%';
@@ -2543,6 +2562,9 @@ IFClsDef:
                   if ($param-><AG::DISResourcePerl.plIsNullable>) {
                     $prototype .= ';' unless $is_optional_param;
                     $is_optional_param = true;
+                  } elsif ($is_optional_param) {
+                    $prototype =~ tr/;//d;
+                    $is_optional_param = false;
                   }
                   $prototype .= $param-><AG::DISResourcePerl.plPrototype>;
                   my $param_processor
@@ -2566,6 +2588,8 @@ IFClsDef:
                     DIS:uri => {$param->{uri}},
                     DIS:localName => {$param->{localName}},
                   }__}__;
+                } elsif ($param-><AG::DISResourcePerl.plIsNullable>) {
+                  $prototype =~ s/;%$/%/;
                 }
               }
               if ($is_named_param) {
@@ -3491,7 +3515,7 @@ IFClsDef:
                     }__;}__;
                   }
                   my $pc = $code-><AG::DISResourcePerl
-                                       .plCodeFragment>->clone;
+                                       .plCodeFragment>;
                   unless (defined $pc) {
                     __UNDEEP{__EXCEPTION{DIS|PERL_CODE_NOT_DEFINED_ERR::
                       DIS:sourceNode => {$node},
@@ -3499,6 +3523,7 @@ IFClsDef:
                       DIS:uri => {$code_uri},
                     }__}__;
                   }
+                  $pc = $pc->clone;
                   for my $var (grep {/^\$/} keys %$param) {
                     my $value;
                     if ($param->{$var}->{type} eq 'variable') {
@@ -4709,14 +4734,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@ContentType:
       lang:Perl
-
-ElementTypeBinding:
-  @Name: disDef
-  @ElementType:
-    dis:Def
-  @ShadowContent:
-    @@ContentType:
-      lang:dis
 
 ElementTypeBinding:
   @Name: InCase

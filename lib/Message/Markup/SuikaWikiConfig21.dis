@@ -29,49 +29,37 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/09/20 12:21:48 $
+      $Date: 2005/09/22 11:02:32 $
     @@ContentType:
       dis:Date.RCS
   
   @Require:
     @@Module:
-      @@@Name: ManakaiNode
-      @@@QName:
-        Util:ManakaiNode
-      @@@WithFor:
-        ManakaiDOM:all
+      @@@QName: Util|ManakaiNode
+      @@@WithFor: ManakaiDOM|Perl
     @@Module:
-      @@@Name: DISIDL
-      @@@QName:
-        DISlib:DISIDL
-      @@@WithFor:
-        ManakaiDOM:all
+      @@@QName: DISlib|DISIDL
+      @@@WithFor: ManakaiDOM|all
     @@Module:
-      @@@Name: DOMException
-      @@@QName:
-        UtilError:DOMException
-      @@@WithFor:
-        ManakaiDOM:all
+      @@@QName: UtilError|DOMException
+      @@@WithFor: ManakaiDOM|Perl
     @@Module:
-      @@@Name: SuikaWikiConfig21
-      @@@WithFor:
-        ManakaiDOM:all
+      @@@QName: Markup|SuikaWikiConfig21
+      @@@WithFor: ManakaiDOM|all
     @@Module:
-      @@@Name: SuikaWikiConfig21
+      @@@QName: Markup|SuikaWikiConfig21
       @@@WithFor: swcfg21|ForEmpty
     @@Module:
-      @@@Name: SuikaWikiConfig21
-      @@@WithFor: 
-        swcfg21:ForLatest
+      @@@QName: Markup|SuikaWikiConfig21
+      @@@WithFor: swcfg21|ForLatest
     @@Module:
       @@@QName: MDOM|DOMFeature
-      @@@WithFor: ManakaiDOM|all
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: MDOM|DOMLS
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
 
-  @DefaultFor: 
-    swcfg21:ForLatest
+  @DefaultFor: swcfg21|ForLatest
 
 Namespace:
   @DIS:
@@ -151,16 +139,16 @@ ResourceDef:
     @@@:
       Message::Markup::
     @@ForCheck: ForLatest
-  @DISPerl:interfacePackage:
+  @DISPerl:packageName:
+    Message::Markup::
+  @DISPerl:interfacePackageName:
     @@@:
       Message::Markup::IFLatest::
     @@ForCheck: ForLatest
-  @DISPerl:interfacePackage:
+  @DISPerl:interfacePackageName:
     @@@:
       Message::Markup::IF::
-    @@ForCheck: ForEmpty
-  @DISPerl:classPackage:
-    Message::Markup::
+    @@ForCheck: ForEmpty !ForLatest
 
 ## -- "For" definitions
 

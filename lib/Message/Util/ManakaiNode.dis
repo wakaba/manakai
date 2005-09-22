@@ -21,7 +21,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/20 12:21:50 $
+      $Date: 2005/09/22 11:02:33 $
     @@ContentType:
       dis:Date.RCS
   
@@ -81,37 +81,23 @@ ResourceDef:
     @@@:
       Message::Util::IF::
     @@ForCheck:
-      ManakaiDOM:ForIF !DIS|ForEmpty
+      ManakaiDOM:ForIF
   @AppName:
     @@@:
       Message::Util::IF::
     @@ForCheck:
-      ManakaiDOM:ForIF =DIS|ForEmpty
+      ManakaiDOM:ForIF
   @AppName:
     @@@:
       Message::Util::IFLatest::
     @@ForCheck:
-      ManakaiDOM:ForIF DIS|ForEmpty
+      ManakaiDOM:ForIF
   @AppName:
     Message::Util::
-  @DISPerl:classPackage:
+  @DISPerl:packageName:
     Message::Util::
-  @DISPerl:interfacePackage:
-    @@@:
-      Message::Util::IF::
-    @@For: !DIS|ForEmpty
-    @@For: =DIS|ForEmpty
-  @DISPerl:interfacePackage:
-    @@@:
-      Message::Util::IFLatest::
-    @@ForCheck: DIS|ForEmpty
-
-ForDef:
-  @QName: DIS|ForEmpty
-  @enDesc:
-    For any version
-  @ISA:
-    ManakaiDOM:Perl
+  @DISPerl:interfacePackageName:
+    Message::Util::IF::
 
 ## -- Internal node object
 

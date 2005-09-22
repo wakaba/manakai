@@ -12,43 +12,26 @@ dac2pm - Generating Perl Module from "dac" File
   perl path/to/dac2pm.pl input.dac \
             --module-uri=module-uri [--for=for-uri] [options] \
             --output-file-path=ModuleName.pm
+  perl path/to/dac2pm.pl input.dac \
+            --create-perl-module="module-uri ModuleName.pm [for-uri]" \
+            [--create-perl-module="..." ...]
   perl path/to/dac2pm.pl --help
 
 =head1 DESCRIPTION
 
-The C<dac2pm> script generates a Perl module from a "dac" file.
+The C<dac2pm.pl> script generates Perl modules from a "dac" database file
+created by C<dac.pl>.
 
 This script is part of manakai. 
 
 =cut
 
 use strict;
-use Message::Util::DIS;
 use Message::Util::QName::Filter {
   DIS => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#>,
   dis => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis-->,
-  dis2pm => q<http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#>,
-  DISCore => q<http://suika.fam.cx/~wakaba/archive/2004/dis/Core#>,
-  DISLang => q<http://suika.fam.cx/~wakaba/archive/2004/dis/Lang#>,
-  DISPerl => q<http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#>,
-  disPerl => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl-->,
-  DOMCore => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#>,
-  DOMEvents => q<http://suika.fam.cx/~wakaba/archive/2004/dom/events#>,
-  DOMMain => q<http://suika.fam.cx/~wakaba/archive/2004/dom/main#>,
-  DOMXML => q<http://suika.fam.cx/~wakaba/archive/2004/dom/xml#>,
-  DX => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#>,
-  lang => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#>,
-  Perl => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl-->,
-  license => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/license#>,
   ManakaiDOM => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#>,
   Markup => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup#>,
-  MDOMX => q<http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#>,
-  owl => q<http://www.w3.org/2002/07/owl#>,
-  pc => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/PerlCode#>,
-  rdf => q<http://www.w3.org/1999/02/22-rdf-syntax-ns#>,
-  rdfs => q<http://www.w3.org/2000/01/rdf-schema#>,
-  swcfg21 => q<http://suika.fam.cx/~wakaba/archive/2005/swcfg21#>,
-  TreeCore => q<>,
   Util => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/>,
 };
 
@@ -59,6 +42,21 @@ use Message::Util::QName::Filter {
 =item --enable-assertion / --noenable-assertion (default)
 
 Whether assertion codes should be outputed or not. 
+
+=item --create-perl-module="I<module-uri> I<ModuleName.pm> [I<for-uri>]" (Zero or more)
+
+The C<--create-perl-module> option can be used to specify
+I<--module-uri>, I<--output-file-path>, and I<--for> options
+once.  Its value is a space-separated triplet of "dis" module name URI,
+Perl module file path (environment dependent), and optional
+"dis" module "for" URI.
+
+This option can be specified more than once; it would
+make multiple Perl module files to be created.  If 
+both I<--module-uri> and this options are specified,
+I<--module-uri>, I<--output-file-path>, and I<--for>
+options are treated as if there is another I<--create-perl-module>
+option specified.
 
 =item --for=I<for-uri> (Optional)
 
@@ -91,8 +89,14 @@ Whether a verbose message mode should be selected or not.
 
 use Getopt::Long;
 use Pod::Usage;
-my %Opt;
+my %Opt = (
+  create_module => [],
+);
 GetOptions (
+  'create-perl-module=s' => sub {
+    shift;
+    push @{$Opt{create_module}}, [split /\s+/, shift, 3];
+  },
   'enable-assertion!' => \$Opt{outputAssertion},
   'for=s' => \$Opt{For},
   'help' => \$Opt{help},
@@ -103,11 +107,39 @@ GetOptions (
 pod2usage ({-exitval => 0, -verbose => 1}) if $Opt{help};
 $Opt{file_name} = shift;
 pod2usage ({-exitval => 2, -verbose => 0}) unless $Opt{file_name};
-pod2usage (2) unless $Opt{module_uri};
+
+if ($Opt{module_uri}) {
+  push @{$Opt{create_module}},
+       [$Opt{module_uri}, $Opt{output_file_name}, $Opt{For}];
+}
+
+pod2usage (2) unless @{$Opt{create_module}};
+
+sub status_msg ($) {
+  my $s = shift;
+  $s .= "\n" unless $s =~ /\n$/;
+  print STDERR $s;
+}
+
+sub status_msg_ ($) {
+  my $s = shift;
+  print STDERR $s;
+}
+
+sub verbose_msg ($) {
+  my $s = shift;
+  $s .= "\n" unless $s =~ /\n$/;
+  print STDERR $s if $Opt{verbose};
+}
+
+sub verbose_msg_ ($) {
+  my $s = shift;
+  print STDERR $s if $Opt{verbose};
+}
 
 ## TODO: Assertion control
 
-## TODO: Verbose mode
+use Message::Util::DIS::DNLite;
 
 my $impl = $Message::DOM::ImplementationRegistry->get_implementation
                ({
@@ -118,53 +150,57 @@ my $impl = $Message::DOM::ImplementationRegistry->get_implementation
 my $pc = $impl->get_feature (ExpandedURI q<Util:PerlCode> => '1.0');
 my $di = $impl->get_feature (ExpandedURI q<DIS:Core> => '1.0');
 
-print STDERR qq<Loading the database "$Opt{file_name}"...>;
+status_msg_ qq<Loading the database "$Opt{file_name}"...>;
 my $db = $di->pl_load_dis_database ($Opt{file_name});
-print STDERR "done\n";
+status_msg q<done>;
 
-my $mod = $db->get_module ($Opt{module_uri}, for_arg => $Opt{For});
-unless ($Opt{For}) {
-  $Opt{For} = $mod->get_property_text (ExpandedURI q<dis:DefaultFor>, undef);
-  if (defined $Opt{For}) {
-    $mod = $db->get_module ($Opt{module_uri}, for_arg => $Opt{For});
-  } else {
-    my $el = $mod->source_element;
-    if ($el) {
-      $Opt{For} = $el->default_for_uri;
-      $mod = $db->get_module ($Opt{module_uri}, for_arg => $Opt{For});
+for (@{$Opt{create_module}}) {
+  my ($mod_uri, $out_file_path, $mod_for) = @$_;
+  
+  my $mod = $db->get_module ($mod_uri, for_arg => $mod_for);
+  unless ($mod_for) {
+    $mod_for = $mod->get_property_text (ExpandedURI q<dis:DefaultFor>, undef);
+    if (defined $mod_for) {
+      $mod = $db->get_module ($mod_uri, for_arg => $mod_for);
     }
   }
-}
-unless ($mod->is_defined) {
-  die qq<$0: Module <$Opt{module_uri}> for <$Opt{For}> is not defined>;
-}
+  unless ($mod->is_defined) {
+    die qq<$0: Module <$mod_uri> for <$mod_for> is not defined>;
+  }
 
-my $pl = $mod->pl_generate_perl_module_file;
-
-my $output;
-defined $Opt{output_file_name} 
-      ? (open $output, '>', $Opt{output_file_name}
-           or die "$0: $Opt{output_file_name}: $!")
+  status_msg_ qq<Generating Perl module from <$mod_uri> for <$mod_for>...>;
+  my $pl = $mod->pl_generate_perl_module_file;
+  status_msg qq<done>;
+  
+  my $output;
+  defined $out_file_path
+      ? (open $output, '>', $out_file_path or die "$0: $out_file_path: $!")
       : ($output = \*STDOUT);
+  
+  status_msg_ sprintf qq<Writing Perl module %s...>,
+                      defined $out_file_path
+                        ? q<">.$out_file_path.q<">
+                        : 'to stdout';
+  print $output $pl->stringify;
+  close $output;
+  status_msg q<done>;
+} # create_module
 
-printf STDERR qq<Writing file "%s"...>,
-  defined $Opt{output_file_name} ? $Opt{output_file_name} : '';
-print $output $pl->stringify;
-close $output;
-print STDERR "done\n";
-
-print STDERR "Checking undefined resources...";
+status_msg_ "Checking undefined resources...";
 $db->check_undefined_resource;
-print STDERR "done\n";
+status_msg q<done>;
 
-print STDERR "Closing the database...";
+status_msg_ "Closing the database...";
 $db->free;
 undef $db;
-print STDERR "done\n";
+status_msg q<done>;
 
 =head1 SEE ALSO
 
 L<lib/Message/Util/DIS.dis> - The <QUOTE::dis> object implementation.
+
+L<lib/Message/Util/DIS/Perl.dis> - The <QUOTE::dis> object implementation,
+submodule for Perl modules.
 
 L<lib/Message/Util/PerlCode.dis> - The Perl code generator.
 
@@ -184,4 +220,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/09/19 16:17:50 $
+1; # $Date: 2005/09/22 11:02:31 $

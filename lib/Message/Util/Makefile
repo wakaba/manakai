@@ -40,7 +40,7 @@ SWCFG_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Markup/all$(DAC_SUFFIX)
 
 UTIL_CORE_DIS_FILES = ManakaiNode.dis Error/DOMException.dis Error/Core.dis
 DIS_CORE_DIS_FILES_    = DIS.dis PerlCode.dis
-DIS_CORE_DIS_FILES_DIS = DIS/Perl.dis DIS/Value.dis
+DIS_CORE_DIS_FILES_DIS = DIS/Perl.dis DIS/Value.dis DIS/DNLite.dis
 DIS_CORE_DIS_FILES     = $(DIS_CORE_DIS_FILES_) $(DIS_CORE_DIS_FILES_DIS)
 DIS_DOC_DIS_FILES = DIS/DISDoc.dis DIS/DISDump.dis
 DIS_FILES = $(UTIL_CORE_DIS_FILES) $(DIS_CORE_DIS_FILES) \
@@ -50,9 +50,11 @@ GENERATED_FILES = \
   core$(DAC_SUFFIX)     ManakaiNode$(PM_SUFFIX) Error/DOMException$(PM_SUFFIX) \
   discore$(DAC_SUFFIX)  DIS$(PM_SUFFIX) PerlCode$(PM_SUFFIX) \
                         DIS/Perl$(PM_SUFFIX) DIS/Value$(PM_SUFFIX) \
+                        DIS/DNLite$(PM_SUFFIX) \
   disdoc$(DAC_SUFFIX)   DIS/DISDoc$(PM_SUFFIX) DIS/DISDump$(PM_SUFFIX)
+GENERATED_DAC_FILES = core$(DAC_SUFFIX) discore$(DAC_SUFFIX) disdoc$(DAC_SUFFIX)
 
-all: $(GENERATED_FILES)
+all: $(GENERATED_DAC_FILES) discore$(PM_SUFFIX) disdoc$(PM_SUFFIX)
 
 core$(DAC_SUFFIX): $(CORE_DAC_FILE) $(UTIL_CORE_DIS_FILES) $(DAC_PL)
 	$(DAC)$@.1.tmp --input-db-file-name="$<" ManakaiNode.dis
@@ -60,9 +62,6 @@ core$(DAC_SUFFIX): $(CORE_DAC_FILE) $(UTIL_CORE_DIS_FILES) $(DAC_PL)
 	$(RM) $@.1.tmp
 
 discore$(DAC_SUFFIX): $(SWCFG_DAC_FILE) $(DIS_CORE_DIS_FILES) $(DAC_PL)
-	$(DAC)$@ --input-db-file-name="$<" DIS.dis
-
-dn$(DAC_SUFFIX): discore$(DAC_SUFFIX) DIS/DNLite.dis $(DAC_PL)
 	$(DAC)$@ --input-db-file-name="$<" DIS/DNLite.dis
 
 disdoc$(DAC_SUFFIX): discore$(DAC_SUFFIX) $(DIS_DOC_DIS_FILES) $(DAC_PL)
@@ -94,11 +93,18 @@ $(DIS_CORE_DIS_FILES_DIS:.dis=$(PM_SUFFIX)): %$(PM_SUFFIX): \
 	  --output-file-path="$@"
 	$(PERL_CHK) $@
 
-DIS/DNLite$(PM_SUFFIX): dn$(DAC_SUFFIX) $(DAC2PM_PL)
+discore$(PM_SUFFIX): discore$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< \
-	  --module-uri="$(NS_UTIL_DIS)DNLite" \
-	  --output-file-path="$@"
-	$(PERL_CHK) $@
+	  --create-perl-module="$(NS_UTIL)DIS       DIS$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_UTIL)PerlCode  PerlCode$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_UTIL_DIS)Value DIS/Value$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_UTIL_DIS)Perl  DIS/Perl$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_UTIL_DIS)DNLite DIS/DNLite$(PM_SUFFIX)"
+	$(PERL_CHK) DIS$(PM_SUFFIX)
+	$(PERL_CHK) PerlCode$(PM_SUFFIX)
+	$(PERL_CHK) DIS/Value$(PM_SUFFIX)
+	$(PERL_CHK) DIS/Perl$(PM_SUFFIX)
+	$(PERL_CHK) DIS/DNLite$(PM_SUFFIX)
 
 DIS/DISDoc$(PM_SUFFIX): disdoc$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< \
@@ -111,6 +117,13 @@ DIS/DISDump$(PM_SUFFIX): disdoc$(DAC_SUFFIX) $(DAC2PM_PL)
 	  --module-uri="$(NS_UTIL_DIS)DISDump" \
 	  --output-file-path="$@"
 	$(PERL_CHK) $@
+
+disdoc$(PM_SUFFIX): disdoc$(DAC_SUFFIX) $(DAC2PM_PL)
+	$(DAC2PM) $< \
+	  --create-perl-module="$(NS_UTIL_DIS)DISDoc  DIS/DISDoc$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_UTIL_DIS)DISDump DIS/DISDump$(PM_SUFFIX)"
+	$(PERL_CHK) DIS/DISDoc$(PM_SUFFIX)
+	$(PERL_CHK) DIS/DISDump$(PM_SUFFIX)
 
 # $(CORE_DAC_FILE)
 $(MANAKAI_LIB_DIR)manakai/all$(DAC_SUFFIX): dummy

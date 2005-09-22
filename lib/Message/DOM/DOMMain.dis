@@ -27,7 +27,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/19 16:17:51 $
+      $Date: 2005/09/22 11:02:32 $
     @@ContentType:
       dis:Date.RCS
   
@@ -208,54 +208,54 @@ ResourceDef:
     @@ManakaiDOM:moduleSuffix: Level1
     @@For: 
       ManakaiDOM:ManakaiDOM1
-  @DISPerl:interfacePackage:
-    @@@:
-      Message::DOM::IFLatest::
-    @@For:
-      ManakaiDOM:ManakaiDOMLatest
-  @DISPerl:interfacePackage:
-    @@@:
-      Message::DOM::IFLevel3::
-    @@For:
-      ManakaiDOM:ManakaiDOM3
-  @DISPerl:interfacePackage:
-    @@@:
-      Message::DOM::IFLevel2::
-    @@For:
-      ManakaiDOM:ManakaiDOM2
-  @DISPerl:interfacePackage:
-    @@@:
-      Message::DOM::IFLevel1::
-    @@For:
-      ManakaiDOM:ManakaiDOM1
-  @DISPerl:interfacePackage:
-    @@@:
-      Message::DOM::IF::
-    @@For:
-      ManakaiDOM:ManakaiDOM
-  @DISPerl:classPackage:
+  @DISPerl:packageName:
     @@@:
       Message::DOM::
     @@For:
       ManakaiDOM:ManakaiDOMLatest
-  @DISPerl:classPackage:
+  @DISPerl:packageName:
     @@@:
       Message::DOM::
     @@ManakaiDOM:moduleSuffix: Level3
     @@For: 
-      ManakaiDOM:ManakaiDOM3
-  @DISPerl:classPackage:
+      ManakaiDOM:ManakaiDOM3 !ManakaiDOM|ManakaiDOMLatest
+  @DISPerl:packageName:
     @@@:
       Message::DOM::
     @@ManakaiDOM:moduleSuffix: Level2
     @@For: 
-      ManakaiDOM:ManakaiDOM2
-  @DISPerl:classPackage:
+      ManakaiDOM:ManakaiDOM2 !ManakaiDOM|ManakaiDOM3
+  @DISPerl:packageName:
     @@@:
       Message::DOM::
     @@ManakaiDOM:moduleSuffix: Level1
     @@For: 
-      ManakaiDOM:ManakaiDOM1
+      ManakaiDOM:ManakaiDOM1 !ManakaiDOM|ManakaiDOM2
+  @DISPerl:interfacePackageName:
+    @@@:
+      Message::DOM::IFLatest::
+    @@For:
+      ManakaiDOM:ManakaiDOMLatest
+  @DISPerl:interfacePackageName:
+    @@@:
+      Message::DOM::IFLevel3::
+    @@For:
+      ManakaiDOM:ManakaiDOM3 !ManakaiDOM|ManakaiDOMLatest
+  @DISPerl:interfacePackageName:
+    @@@:
+      Message::DOM::IFLevel2::
+    @@For:
+      ManakaiDOM:ManakaiDOM2 !ManakaiDOM|ManakaiDOM3
+  @DISPerl:interfacePackageName:
+    @@@:
+      Message::DOM::IFLevel1::
+    @@For:
+      ManakaiDOM:ManakaiDOM1 !ManakaiDOM|ManakaiDOM2
+  @DISPerl:interfacePackageName:
+    @@@:
+      Message::DOM::IF::
+    @@For:
+      ManakaiDOM:ManakaiDOM !ManakaiDOM|ManakaiDOM1
 
 ## -- "For" definitions
 
@@ -382,6 +382,7 @@ ForDef:
     ManakaiDOM:DOM3
   @ISA:
     ManakaiDOM:ManakaiDOM2
+  @ISA: ManakaiDOM|DOMXMLFeatureXML11
 ForDef:
   @QName:
     ManakaiDOM:ManakaiDOMLatest
@@ -392,16 +393,6 @@ ForDef:
     ManakaiDOM:DOMLatest
   @ISA:
     ManakaiDOM:ManakaiDOM3
-ForDef:
-  @QName:
-    ManakaiDOM:ManakaiDOMCommon
-  @FullName:
-    @@lang:en
-    @@@: For the manakai implementation of DOM, level/feature independent
-  @Implement:
-    ManakaiDOM:DOM
-  @ISA:
-    ManakaiDOM:ManakaiDOM
 
 ## -- Abstract programming language "object" types
 
@@ -416,6 +407,7 @@ ElementTypeBinding:
       rdfs:Class::ManakaiDOM:all
     @@subsetOf:
       rdfs:Class::ManakaiDOM:all
+    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: PropDef
@@ -424,6 +416,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       rdf:Property
+    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: TreeElementType
@@ -1187,14 +1180,14 @@ ResourceDef:
       @@@Description:
         @@@@lang:en
         @@@@@: The UTF-16 offset.
-      @@@ManakaiDOM:raises:
-        @@@@@: StringIndexOutOfBoundsException
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            The specified <P::offset32> is negative or greater than
-            the number of characters, i.e. the number of UTF-32 32-bit
-            code units.
+#      @@@ManakaiDOM:raises:
+#        @@@@@: StringIndexOutOfBoundsException
+#        @@@@Description:
+#          @@@@@lang:en
+#          @@@@@@:
+#            The specified <P::offset32> is negative or greater than
+#            the number of characters, i.e. the number of UTF-32 32-bit
+#            code units.
       @@@PerlDef:
         @@@@DefaultValue: $offset32
         @@@@ForCheck: ManakaiDOM|ForClass
@@ -1202,9 +1195,9 @@ ResourceDef:
           my $s = ref $self eq 'SCALAR' ? $self : \$self;
           if (not defined $offset32 or $offset32 < 0 or
               CORE::length ($$s) < $offset32) {
-            __EXCEPTION{ManakaiDOMStringIndexOutOfBoundsException::
-              MDOMX:param-name => 'offset32',
-            }__;
+#            __EXCEPTION{ManakaiDOMStringIndexOutOfBoundsException::
+#              MDOMX:param-name => 'offset32',
+#            }__;
           }
           my $ss = substr $$s, 0, $offset32;
           if ($ss =~ /[\x{10000}-\x{10FFFF}]/) {
@@ -1266,13 +1259,13 @@ ResourceDef:
           The UTF-32 offset.  If the <P::offset16> value is into middle of a 
           surrogate pair, the UTF-32 offset at the end of the pair is 
           returned.
-      @@@ManakaiDOM:raises:
-        @@@@@: StringIndexOutOfBoundsException
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            The specified <P::offset16> is negative or greater than
-            the number of UTF-16 16-bit code-units.
+#      @@@ManakaiDOM:raises:
+#        @@@@@: StringIndexOutOfBoundsException
+#        @@@@Description:
+#          @@@@@lang:en
+#          @@@@@@:
+#            The specified <P::offset16> is negative or greater than
+#            the number of UTF-16 16-bit code-units.
       @@@PerlDef:
         @@@@DefaultValue: $offset16
         @@@@ForCheck: ManakaiDOM|ForClass
@@ -1280,9 +1273,9 @@ ResourceDef:
           my $s = ref $self eq 'SCALAR' ? $self : \$self;
           if (not defined $offset16 or $offset16 < 0 or
               CORE::length ($$s) * 2 < $offset16) {
-            __EXCEPTION{ManakaiDOMStringIndexOutOfBoundsException::
-              MDOMX:param-name => 'offset16',
-            }__;
+#            __EXCEPTION{ManakaiDOMStringIndexOutOfBoundsException::
+#              MDOMX:param-name => 'offset16',
+#            }__;
           }
           pos ($$s) = 0;
           use integer;
@@ -1303,9 +1296,9 @@ ResourceDef:
             }
           }
           if ($offset16 > 0) {
-            __EXCEPTION{ManakaiDOMStringIndexOutOfBoundsException::
-              MDOMX:param-name => 'offset16',
-            }__;
+#            __EXCEPTION{ManakaiDOMStringIndexOutOfBoundsException::
+#              MDOMX:param-name => 'offset16',
+#            }__;
           }
           $r = pos ($$s);
 ##StringExtended

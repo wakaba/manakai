@@ -21,7 +21,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/20 12:21:50 $
+      $Date: 2005/09/22 11:02:34 $
     @@ContentType:
       dis:Date.RCS
   
@@ -62,6 +62,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Perl/
   @dv:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Value/
+  @dx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @dump:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#DISDump/
   @ecore:
@@ -332,7 +334,7 @@ IFClsDef:
           __DEEP{
             my $xu = $source_node-><AG::SEl.expandedURI>;
             if ($xu eq <Q::dis:For>) {
-              push @{$source_node->{for}}, my $pr = {};
+              push @{$result_parent->{for}}, my $pr = {};
               for my $q (grep {length $_}
                          split /\s+/, $source_node-><M::SNode.value>) {
                 my $p = '-';
@@ -366,27 +368,26 @@ IFClsDef:
               my $np;
               my $a = bless {
                 uri => $xu,
-                value => $source_node-><M::SNode.value>,
                 ns => $result_parent->{ns},
                 defaultNS => $result_parent->{defaultNS},
-                nodeID => $source_node->{<Q::TreeCore:node>}
-                                      ->{<Q::TreeCore:nodeID>},
                 parentNodePath => [@{$result_parent->{parentNodePath}},
                                      $result_parent->{nodePath}],
                 nodePath => \$np,
               }, <ClassName::ManakaiDNLElement>;
               push @{$result_parent->{child}||=[]}, $a;
-              $r->{nodeID} = $source_node->{<Q::TreeCore:node>}
-                                         ->{<Q::TreeCore:nodeID>}
-                if $a->{uri} eq <Q::dis:ResourceFor>;
+              for ($source_node-><AG::SNode.valueRef>) {
+                $a->{value} = $_ if defined $_;
+              }
+              $a->{nodeID} = $source_node-><AG::SNode.nodeIDRef>
+                if $a->{uri} eq <Q::dis:ResourceDef>;
               my @source_child = @{$source_node-><AG::SNode.childNodes>};
               __DEEP{
                 for my $source_child (@source_child) {
-                  $cn->($self, $source_child => $a);
+                  $cn->($self, $db, $source_child => $a);
                 }
               }__;
               $np = $source_node-><AG::SEl.realQualifiedName>;
-              CEL: for my $cel (@{$r->{child}||[]}) {
+              CEL: for my $cel (@{$a->{child}||[]}) {
                 ET: for my $et (
                   [<Q::dis:QName> => 'QName'],
                   [<Q::dis:Name> => 'Name'],
@@ -394,7 +395,8 @@ IFClsDef:
                   [<Q::rdf:type> => 'rdf:type'],
                 ) {
                   if ($cel->{uri} eq $et->[0]) {
-                    $np .= '[@'.$et->[1].'='.$cel->{value}.']';
+                    $np .= '[@'.$et->[1].'='.
+                           (defined $cel->{value} ? ${$cel->{value}} : '').']';
                     next CEL;
                   }
                 } # ET
@@ -463,6 +465,9 @@ IFClsDef:
   @IFISA: DIS|NSResolverDIS
   @ClsISA: DIS|ManakaiNSResolverDIS
 
+  @ClsISA:
+    dx:ManakaiDefaultExceptionHandler::ManakaiDOM:Perl
+
   @Attr:
     @@Name: childNodes
     @@Get:
@@ -485,7 +490,7 @@ IFClsDef:
         $r = bless {%$self}, ref $self;
         __DEEP{
           if ($self->{child}) {
-            $self->{child} = [];
+            $r->{child} = [];
             for my $child (@{$self->{child}}) {
               push @{$r->{child}}, $child->clone;
             }
@@ -507,7 +512,7 @@ IFClsDef:
       @@@PerlDef:
         if (defined $prefix) {
           $r = $self->{ns}->{$prefix};
-          if (not defined $prefix and $self->{ns}->{'###db'}) {
+          if (not defined $r and $self->{ns}->{'###db'}) {
             my $db = $self->{ns}->{'###db'};
             FIND: for my $mod_uri (keys %{$db->{modDef}}) {
               my $mod = $db-><M::DIS|DISDatabase.getModule> ($mod_uri);
@@ -526,13 +531,18 @@ IFClsDef:
     @@Name: nodeID
     @@Get:
       @@@Type: DISString
-      @@@PerlDef: $r = $self->{nodeID};
+      @@@nullCase:
+        @@@@enDesc: No node identifier.
+      @@@PerlDef:
+        $r = defined $self->{nodeID} ? ${$self->{nodeID}} : null;
 
   @Attr:
     @@Name: nodeIDRef
     @@Get:
       @@@Type: DISPerl|SCALAR||ManakaiDOM|all
-      @@@PerlDef: $r = \ ($self->{nodeID});
+      @@@nullCase:
+        @@@@enDesc: No node identifier.
+      @@@PerlDef: $r = $self->{nodeID};
 
   @Method:
     @@Name: nodePath
@@ -567,6 +577,9 @@ IFClsDef:
       A list of child elements, with <QUOTE::for> checks.
     @@ForParam:
     @@ForpParam:
+    @@NamedParam:
+      @@@Name: databaseArg
+      @@@Type: DIS|DISDatabase
     @@Return:
       @@@Type: pl|ARRAY||ManakaiDOM|all
       @@@enDesc:
@@ -575,7 +588,8 @@ IFClsDef:
         $r = [];
         __DEEP{
           for my $cn (@{$self->{child}||[]}) {
-            if ($cn-><M::DNLElement.forMatch> ($forArg, $forpArg)) {
+            if ($cn-><M::DNLElement.forMatch> ($forArg, $forpArg,
+                                               database_arg => $databaseArg)) {
               push @$r, $cn;
             }
           }
@@ -633,13 +647,18 @@ IFClsDef:
     @@Name: value
     @@Type: DISString
     @@Return:
-      @@@PerlDef: $r = $self->{value};
+      @@@nullCase:
+        @@@@enDesc: No value.
+      @@@PerlDef:
+        $r = defined $self->{value} ? ${$self->{value}} : null;
 
   @Method:
     @@Name: valueRef
     @@Type: DISPerl|SCALAR||ManakaiDOM|all
     @@Return:
-      @@@PerlDef: $r = \ ($self->{value});
+      @@@nullCase:
+        @@@@enDesc: No value.
+      @@@PerlDef: $r = $self->{value};
 
   @Attr:
     @@Name: ownerDISDocument
@@ -671,8 +690,8 @@ IFClsDef:
         }__;
         unless (defined $r) {
           __EXCEPTION{DIS|UNDECLARED_NS_PREFIX_ERR::
-            infoset:prefix => $prefix,
-            DIS:sourceNode => $node,
+            infoset:prefix => {$prefix},
+            DIS:sourceNode => {$node},
             MDOMX:param-name => 'prefix',
           }__;
         }
@@ -682,9 +701,15 @@ IFClsDef:
     @@Type: DISString
     @@Get:
       @@@UndeclaredPrefixException:
+      @@@nullCase:
+        @@@@enDesc: No value.
       @@@PerlDef:
         __DEEP{
-          $r = $self-><M::DIS|NSResolverDIS.qnameToURI> ($self->{value});
+          if (defined $self->{value}) {
+            $r = $self-><M::DIS|NSResolverDIS.qnameToURI> (${$self->{value}});
+          } else {
+            $r = null;
+          }
         }__;
 
   @Attr:
@@ -796,6 +821,9 @@ IFClsDef:
             Equivalent to <QUOTE::for all>, i.e. <Q::ManakaiDOM:all>. 
     @@ForParam:
     @@ForpParam:
+    @@NamedParam:
+      @@@Name: databaseArg
+      @@@Type: DIS|DISDatabase
     @@Return:
       @@@Type: DIS|ResourceURI
       @@@nullCase:
@@ -808,7 +836,8 @@ IFClsDef:
           __DEEP{
             if ($self-><M::DNLElement.mediaTypeMatch>
                                  (<Q::DISCore:TFPQNames>, <Q::DISCore:TFPQNames>,
-                                  for_arg => $forArg, forp_arg => $forpArg)) {
+                                  for_arg => $forArg, forp_arg => $forpArg,
+                                  database_arg => $databaseArg)) {
               $r = $self-><M::DIS|NSResolverDIS.tfpqnamesToURI>
                                   ($v, $defaultTypeURI, $defaultForURI,
                                    node => $self);
@@ -836,7 +865,6 @@ IFClsDef:
     @@NamedParam:
       @@@Name: databaseArg
       @@@Type: DIS|DISDatabase
-      @@@nullCase:
     @@Return:
       @@@Type:
         DOMMain:boolean::ManakaiDOM:all
@@ -953,6 +981,70 @@ IFClsDef:
   @Method:
     @@Name: preserveNodePath
     @@Return:
+      @@@PerlDef:
+
+  @Method:
+    @@Name: free
+    @@Return:
+      @@@PerlDef:
+
+  @Method:
+    @@Name: addNamespaceBinding
+    @@Param:
+      @@@Name: prefix
+      @@@Type: DISString
+    @@Param:
+      @@@Name: namespaceURI
+      @@@Type: DISString
+      @@@nullCase:
+    @@Return:
+      @@@PerlDef:
+        if (defined $namespaceURI) {
+          $self->{ns}->{$prefix} = $namespaceURI;
+        } else {
+          CORE::delete $self->{ns}->{$prefix};
+        }
+
+  @Method:
+    @@Name: getDefaultNamespaceURIRef
+    @@enDesc: A reference to the URI of the default namespace.
+    @@Type: DISPerl|SCALAR||ManakaiDOM|all
+    @@nullCase:
+      @@@enDesc: No namespace.
+    @@Return:
+      @@@PerlDef:
+        $r = $self->{defaultNS};
+
+  @Method:
+    @@Name: getNamespaceBindingList
+    @@enDesc:
+      Returns the <QUOTE::live> hash reference of namespace bindings.      
+    @@Type: DISPerl|HASH||ManakaiDOM|all
+    @@Param:
+      @@@Name: databaseArg
+      @@@Type: DIS|DISDatabase
+      @@@enDesc:
+        The <QUOTE::dis> database.
+    @@Return:
+      @@@PerlDef:
+        __DEEP{
+          if ($self->{ns}->{'###db'}) {
+            $databaseArg ||= $self->{ns}->{'###db'};
+            CORE::delete $self->{ns}->{'###db'};
+            if ($databaseArg) {
+              for my $mod_uri (keys %{$databaseArg->{modDef}}) {
+                my $mod = $databaseArg-><M::DIS|DISDatabase.getModule>
+                                                ($mod_uri);
+                my $prefix = $mod-><AG::DIS|DISAnyResource.localName>;
+                $self->{ns}->{$prefix}
+                  = $mod-><M::DIS|DISResourceProp.getPropertyText>
+                      (<Q::dis:Namespace>, null)
+                  unless defined $self->{ns}->{$prefix};
+              }
+            }
+          }
+        }__;
+        $r = $self->{ns};
 ##DNLNode
 
 ElementTypeBinding:
@@ -1013,11 +1105,16 @@ IFClsDef:
         };
     @@Set:
       @@@PerlDef:
-        $self->{db} = $given;
-        $self->{ns}->{'###db'} = $given;
-        require Scalar::Util;
-        Scalar::Util::weaken ($self->{db});
-        Scalar::Util::weaken ($self->{ns}->{'###db'});
+        if (defined $given) {
+          $self->{db} = $given;
+          $self->{ns}->{'###db'} = $given;
+          require Scalar::Util;
+          Scalar::Util::weaken ($self->{db});
+          Scalar::Util::weaken ($self->{ns}->{'###db'});
+        } else {
+          CORE::delete $self->{db};
+          CORE::delete $self->{ns}->{'###db'};
+        }
 ##DNLDocument
 
 IFClsDef:
@@ -1027,9 +1124,12 @@ IFClsDef:
   @IFISA: DNLNode
   @ClsISA: ManakaiDNLNode
 
+  @ClsISA: dp|ManakaiDISElementPerl
+
   @Method:
     @@Name: preserveNodePath
     @@Return:
+      @@@PerlDef:
 
   @Attr:
     @@Name: requireElement
@@ -1050,7 +1150,9 @@ IFClsDef:
       @@@PerlDef:
         M: for my $n (@{$self->{child}||[]}) {
           if ($n->{uri} eq <Q::dis:DefaultFor>) {
-            $r = $n->{value};
+            __DEEP{
+              $r = $n-><AG::DNLNode.qnameValueURI> if defined $n->{value};
+            }__;
             last M;
           }
         }
@@ -1062,7 +1164,7 @@ IFClsDef:
       @@@PerlDef:
         M: for my $n (@{$self->{child}||[]}) {
           if ($n->{uri} eq <Q::dis:Namespace>) {
-            $r = $n->{value};
+            $r = ${$n->{value}} if defined $n->{value};
             last M;
           }
         }
@@ -1272,6 +1374,69 @@ IFClsDef:
       @@@PerlDef:
         $r = $self->{mt};
         $r = $defaultMediaType unless defined $r;
+
+  @Attr:
+    @@Name: expandedURI
+    @@Get:
+      @@@Type: DISString
+      @@@PerlDef:
+        $r = $self->{uri};
+
+  @Method:
+    @@Name: disGetAttribute
+    @@enDesc:
+      Gets an attribute node. 
+    @@Param:
+      @@@Name: attrName
+      @@@Type: DIS|AnyURI
+      @@@enDesc:
+        The name expanded URI of the node to retrieve. 
+    @@ForParam:
+    @@ForpParam:
+    @@MediaTypeParam:
+    @@MediaTypeDefaultParam:
+    @@NamedParam:
+      @@@Name: databaseArg
+      @@@Type: DIS|DISDatabase
+      @@@enDesc:
+        A <QUOTE::dis> database.
+    @@Return:
+      @@@Type: DNLElement
+      @@@enDesc:
+        The attribute (property) element node. 
+      @@@nullCase:
+        @@@@enDesc:
+          No attribute node found. 
+      @@@PerlDef:
+        C: for my $c (@{$self-><M::DNLNode.disChildElements>
+                                  (for_arg => $forArg, forp_arg => $forpArg,
+                                   database_arg => $databaseArg)}) {
+          if ($c->{uri} eq $attrName and
+              $c-><M::DNLElement.mediaTypeMatch>
+                                  ($mediaType, $defaultMediaType,
+                                   for_arg => $forArg, forp_arg => $forpArg,
+                                   database_arg => $databaseArg)) {
+            $r = $c;
+            last C;
+          }
+        }
+
+  @Attr:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: plImplementation
+    @@enDesc:
+      The implementation object, which the object belongs to and
+      which implements the feature <Feature::Util|PerlCode>
+      version <FeatureVer::1.0>.
+    @@Type:
+      PerlCode:PCImplementation::ManakaiDOM:Perl
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          There is no implementation that supports the feature
+          <Feature::Util:PerlCode> version <FeatureVer::1.0>.
+      @@@PerlDef:
+        $r = <Class::dp|PLImplClass>->_new;
 ##DNLElement
 
 

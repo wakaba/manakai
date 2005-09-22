@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/09/19 16:17:52 $
+      $Date: 2005/09/22 11:02:33 $
     @@ContentType:
       dis:Date.RCS
   
@@ -603,12 +603,13 @@ PropDef:
     The list of resources.
 
 ResourceDef:
+  @For: ManakaiDOM|Perl
   @QName: nodeTypeToPackageName
   @rdf:type:
     dis2pm:BlockCode
   @enDesc:
     Gets Perl class package name from a node type string.
-  @PerlDef:
+  @PerlCDef:
         if ($nodeType eq 'unparsed') {
           $packageName = <ClassName::ManakaiPerlUnparsedCode>;
         } elsif ($nodeType eq 'bare') {
@@ -1604,12 +1605,13 @@ XParamDef:
     An operator to overload. 
 
 ResourceDef:
+  @For: ManakaiDOM|Perl
   @QName: operatorNameList
   @enDesc:
     The list of valid operators for <PerlModule::operator> pragma. 
   @rdf:type:
     dis2pm:InlineCode
-  @PerlDef:
+  @PerlCDef:
     {qw[
                     +  1 -  1 *  1 /  1 %  1 **  1 <<  1 >>  1 x  1 .  1
                     += 1 -= 1 *= 1 /= 1 %= 1 **= 1 <<= 1 >>= 1 x= 1 .= 1
@@ -4634,6 +4636,14 @@ ElementTypeBinding:
     @@ContentType:
       lang:Perl
     @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: PerlCDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
 
 ElementTypeBinding:
   @Name: disDef

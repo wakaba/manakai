@@ -21,7 +21,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/17 15:03:04 $
+      $Date: 2005/09/22 11:02:34 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1771,7 +1771,14 @@ IFClassDef:
         }
 ##DISDumpElementRaises
 
-
+ElementTypeBinding:
+  @Name: nullCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: ManakaiDOM|InCase
+    @@Value:
+      @@@is-null:1
 
 IFClassETDef:
   @IFQName: DISDumpMethodReturnElement

@@ -15,7 +15,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/20 12:21:51 $
+      $Date: 2005/09/22 11:02:34 $
     @@ContentType:
       dis:Date.RCS
   
@@ -35,6 +35,10 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @dis2pm:
     http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
+  @DISCore:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Core#
+  @DISLang:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Lang#
   @DISPerl:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
   @disPerl:
@@ -424,24 +428,35 @@ PropDef:
   @multipleProperties: DISCore|Single
 
 PropDef:
-  @QName: interfacePackage
+  @QName: DISPerl|packageName
+  @FullName:
+    @@lang:en
+    @@@:
+      Perl package name
+  @rdfs:subPropertyOf: dis|AppName
+  @subsetOf: dis|AppName
+  @dataType: DISPerl|PackageName
+  @multipleProperties: DISCore|UnorderedList
+
+PropDef:
+  @QName: DISPerl|interfacePackageName
   @FullName:
     @@lang:en
     @@@:
       Perl interface package name
-  @rdfs:subPropertyOf: dis|AppName
-  @subsetOf: dis|AppName
+  @rdfs:subPropertyOf: DISPerl|packageName
+  @subsetOf: DISPerl|packageName
   @dataType: DISPerl|PackageName
   @multipleProperties: DISCore|Single
 
 PropDef:
-  @QName: classPackage
+  @QName: DISPerl|classPackageName
   @FullName:
     @@lang:en
     @@@:
       Perl class package name
-  @rdfs:subPropertyOf: dis|AppName
-  @subsetOf: dis|AppName
+  @rdfs:subPropertyOf: DISPerl|packageName
+  @subsetOf: DISPerl|packageName
   @dataType: DISPerl|PackageName
   @multipleProperties: DISCore|Single
 
@@ -1278,7 +1293,7 @@ ElementTypeBinding:
 ElementTypeBinding:
   @Name: IFPackName
   @ElementType:
-    DISPerl:interfacePackage
+    DISPerl:interfacePackageName
   @ShadowContent:
     @@ForCheck: ManakaiDOM|ForIF
     @@ContentType: DISPerl|PackageName
@@ -1286,7 +1301,7 @@ ElementTypeBinding:
 ElementTypeBinding:
   @Name: ClsPackName
   @ElementType:
-    DISPerl:classPackage
+    DISPerl:classPackageName
   @ShadowContent:
     @@ForCheck: ManakaiDOM|ForClass
     @@ContentType: DISPerl|PackageName

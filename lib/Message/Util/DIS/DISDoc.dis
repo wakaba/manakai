@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/09/19 16:17:52 $
+      $Date: 2005/09/22 11:02:33 $
     @@ContentType:
       dis:Date.RCS
   
@@ -343,7 +343,7 @@ IFClassDef:
                     -><M::DIS|DOMMinImpl.getFeature> (<Q::DIS:Doc>)
                     -><M::DISElementDISDoc.getDISDocTree>
                               ($ownerDocumentArg, <Q::lang:disdocInline>,
-                               $self->{o}-><M::DIS|DISAnyResource.database>,
+                               $self->{o}-><AG::DIS|DISAnyResource.database>,
                                for_arg => $self->{o}->{for},
                                forp_arg => $self->{o}->{forp},
                                default_name_uri => $self->{o}-><AG::DIS|DISAnyResource.nameURI> ||
@@ -424,7 +424,7 @@ IFClassDef:
               next unless $el;
               my $elr = $el-><M::ManakaiDISElementDISDoc.getDISDocTree>
                               ($ownerDocumentArg, <Q::lang:disdoc>,
-                               $self->{o}-><M::DIS|DISAnyResource.database>,
+                               $self->{o}-><AG::DIS|DISAnyResource.database>,
                                for_arg => $self->{o}->{for},
                                forp_arg => $self->{o}->{forp},
                                default_name_uri => $self->{o}-><AG::DIS|DISAnyResource.nameURI> ||
@@ -494,7 +494,7 @@ IFClassDef:
                     -><M::DIS|DOMMinImpl.getFeature> (<Q::DIS:Doc>)
                     -><M::DISElementDISDoc.getDISDocTree>
                               ($ownerDocumentArg, <Q::lang:disdocInline>,
-                               $self->{o}-><M::DIS|DISAnyResource.database>,
+                               $self->{o}-><AG::DIS|DISAnyResource.database>,
                                for_arg => $self->{o}->{for},
                                forp_arg => $self->{o}->{forp},
                                default_name_uri => $self->{o}-><AG::DIS|DISAnyResource.nameURI> ||
@@ -554,6 +554,32 @@ ElementTypeBinding:
     @@rdf:type: ManakaiDOM|InCase
     @@Value:
       @@@is-null:1
+
+ElementTypeBinding:
+  @Name: trueCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@@: 1
+      @@@ContentType: DISCore|Boolean
+    @@Type:
+      DOMMain:boolean::ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: falseCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@@: 0
+      @@@ContentType: DISCore|Boolean
+    @@Type:
+      DOMMain:boolean::ManakaiDOM:all
 
 ElementTypeBinding:
   @Name: NegoParam

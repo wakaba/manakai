@@ -1,3 +1,15 @@
+2005-09-21  Wakaba  <wakaba@suika.fam.cx>
+
+	* Value.dis (DVValue): Extends DIS|NSResolverDIS.
+
+	* DNLite.dis: "databaseArg" parameter added to some methods.
+	(free, addNamespaceBinding, getDefaultNamespaceURIRef,
+	getNamespaceBindingList): New methods.
+	(DNLElement): Inherits DIS/Perl|DISElementPerl.
+	(expandedURI, disGetAttribute, plImplementation): New.
+
+	* Perl.dis (plCodeFragment): "databaseArg" parameter added.
+
 2005-09-20  Wakaba  <wakaba@suika.fam.cx>
 
 	* Value.dis (createDVValueRef): New method.  Now
