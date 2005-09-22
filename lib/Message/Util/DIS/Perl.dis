@@ -21,7 +21,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/22 11:02:34 $
+      $Date: 2005/09/22 14:25:48 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2502,7 +2502,7 @@ IFClsDef:
                        -><M::DISElementPerl.plCodeFragment>
                             ($self, for_arg => $self->{for},
                              forp_arg => $self->{forp},
-                             contains_statements => not $is_inline,
+                             contains_statements => (not $is_inline),
                       database_arg => $self-><AG::DIS|DISAnyResource.database>); 
             } else {
               __UNDEEP{

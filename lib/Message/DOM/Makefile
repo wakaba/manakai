@@ -2,7 +2,7 @@ MANAKAI_ROOT_DIR = ../../../
 MANAKAI_BIN_DIR = $(MANAKAI_ROOT_DIR)bin/
 MANAKAI_LIB_DIR = $(MANAKAI_ROOT_DIR)lib/
 
-DAC_SUFFIX = .dac
+DAC_SUFFIX = .dad
 PM_SUFFIX = .pm
 
 CD = cd
@@ -16,6 +16,7 @@ PERLC = $(PERL) -c -w
 PERLC_OPTIONS3 = $(PERL_OPTIONS)
 PERLC_OPTIONS = $(PERLC_OPTIONS3)
 PERL_CHK = $(PERLC) $(PERLC_OPTIONS)
+TOUCH = touch
 
 NS_MDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#ManakaiDOM.
 NS_MANAKAIDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#
@@ -45,8 +46,9 @@ GENERATED_FILES = \
   core$(DAC_SUFFIX)  DOMFeature$(PM_SUFFIX) DOMMain$(PM_SUFFIX) \
                      DOMCore$(PM_SUFFIX) DOMXML$(PM_SUFFIX) DOMLS$(PM_SUFFIX) \
   html$(DAC_SUFFIX)  DOMHTML$(PM_SUFFIX) DOMWebForms$(PM_SUFFIX)
+GENERATED_DAC_FILES = core$(DAC_SUFFIX) html$(DAC_SUFFIX)
 
-all: $(GENERATED_FILES)
+all: .core$(PM_SUFFIX) .html$(PM_SUFFIX) $(GENERATED_DAC_FILES)
 
 core$(DAC_SUFFIX): $(UTIL_CORE_DAC_FILE) $(DOM_CORE_DIS_FILES) $(DAC_PL)
 	$(DAC)$@ --input-db-file-name="$<" DOMLS.dis
@@ -59,9 +61,31 @@ $(DOM_CORE_DIS_FILES:.dis=$(PM_SUFFIX)): core$(DAC_SUFFIX) $(DAC2PM_PL)
 	  --output-file-path="$@"
 	$(PERL_CHK) $@
 
+.core$(PM_SUFFIX): core$(DAC_SUFFIX) $(DAC2PM_PL)
+	$(DAC2PM) $< \
+	  --create-perl-module="$(NS_MDOM)DOMFeature DOMFeature$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)DOMMain    DOMMain$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)DOMCore    DOMCore$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)DOMXML     DOMXML$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)DOMLS      DOMLS$(PM_SUFFIX)"
+	$(PERL_CHK) DOMFeature$(PM_SUFFIX)
+	$(PERL_CHK) DOMMain$(PM_SUFFIX)
+	$(PERL_CHK) DOMCore$(PM_SUFFIX)
+	$(PERL_CHK) DOMXML$(PM_SUFFIX)
+	$(PERL_CHK) DOMLS$(PM_SUFFIX)
+	$(TOUCH) $@
+
 $(DOM_HTML_DIS_FILES:.dis=$(PM_SUFFIX)): html$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< --module-uri="$(NS_MDOM)$(@:$(PM_SUFFIX)=)" > $@
 	$(PERL_CHK) $@
+
+.html$(PM_SUFFIX): html$(DAC_SUFFIX) $(DAC2PM_PL)
+	$(DAC2PM) $< \
+	  --create-perl-module="$(NS_MDOM)DOMHTML     DOMHTML$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)DOMWebForms DOMWebForms$(PM_SUFFIX)"
+	$(PERL_CHK) DOMHTML$(PM_SUFFIX)
+	$(PERL_CHK) DOMWebForms$(PM_SUFFIX)
+	$(TOUCH) $@
 
 # $(UTIL_CORE_DAC_FILE)
 $(MANAKAI_LIB_DIR)Message/Util/core$(DAC_SUFFIX): dummy
@@ -70,5 +94,8 @@ $(MANAKAI_LIB_DIR)Message/Util/core$(DAC_SUFFIX): dummy
 dummy:
 
 clean:
-	$(RM) $(GENERATED_FILES) .*.tmp *~ .*~ *.BAK .*.BAK
+	$(RM) $(GENERATED_FILES)
+	$(RM) .*.tmp *~ .*~ *.BAK .*.BAK .core$(PM_SUFFIX) .html$(PM_SUFFIX)
 
+## $Date: 2005/09/22 14:25:47 $
+## License: Public Domain.

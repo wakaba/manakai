@@ -2,7 +2,7 @@ MANAKAI_ROOT_DIR = ../../
 MANAKAI_BIN_DIR = $(MANAKAI_ROOT_DIR)bin/
 MANAKAI_LIB_DIR = $(MANAKAI_ROOT_DIR)lib/
 
-DAC_SUFFIX = .dac
+DAC_SUFFIX = .dad
 
 CD = cd
 MAKE = make
@@ -48,5 +48,5 @@ all$(DAC_SUFFIX): $(DIS_FILES) $(DAC_PL)
 clean:
 	$(RM) $(GENERATED_FILES) .*.tmp *~ .*~
 
-## $Date: 2005/09/19 16:17:53 $
+## $Date: 2005/09/22 14:25:49 $
 ## License: Public Domain.

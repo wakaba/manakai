@@ -3,7 +3,7 @@ MANAKAI_BIN_DIR = $(MANAKAI_ROOT_DIR)bin/
 MANAKAI_LIB_DIR = $(MANAKAI_ROOT_DIR)lib/
 MANAKAI_LIB_MANAKAI_DIR = $(MANAKAI_LIB_DIR)manakai/
 
-DAC_SUFFIX = .dac
+DAC_SUFFIX = .dad
 PM_SUFFIX = .pm
 
 CD = cd
@@ -17,6 +17,7 @@ PERLC = $(PERL) -c -w
 PERLC_OPTIONS3 = $(PERL_OPTIONS)
 PERLC_OPTIONS = $(PERLC_OPTIONS3)
 PERL_CHK = $(PERLC) $(PERLC_OPTIONS)
+TOUCH = touch
 
 NS_MANAKAIDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#
 NS_DIS        = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS\#
@@ -54,7 +55,7 @@ GENERATED_FILES = \
   disdoc$(DAC_SUFFIX)   DIS/DISDoc$(PM_SUFFIX) DIS/DISDump$(PM_SUFFIX)
 GENERATED_DAC_FILES = core$(DAC_SUFFIX) discore$(DAC_SUFFIX) disdoc$(DAC_SUFFIX)
 
-all: $(GENERATED_DAC_FILES) discore$(PM_SUFFIX) disdoc$(PM_SUFFIX)
+all: .discore$(PM_SUFFIX) .disdoc$(PM_SUFFIX) $(GENERATED_DAC_FILES)
 
 core$(DAC_SUFFIX): $(CORE_DAC_FILE) $(UTIL_CORE_DIS_FILES) $(DAC_PL)
 	$(DAC)$@.1.tmp --input-db-file-name="$<" ManakaiNode.dis
@@ -93,7 +94,7 @@ $(DIS_CORE_DIS_FILES_DIS:.dis=$(PM_SUFFIX)): %$(PM_SUFFIX): \
 	  --output-file-path="$@"
 	$(PERL_CHK) $@
 
-discore$(PM_SUFFIX): discore$(DAC_SUFFIX) $(DAC2PM_PL)
+.discore$(PM_SUFFIX): discore$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< \
 	  --create-perl-module="$(NS_UTIL)DIS       DIS$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_UTIL)PerlCode  PerlCode$(PM_SUFFIX)" \
@@ -105,6 +106,7 @@ discore$(PM_SUFFIX): discore$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(PERL_CHK) DIS/Value$(PM_SUFFIX)
 	$(PERL_CHK) DIS/Perl$(PM_SUFFIX)
 	$(PERL_CHK) DIS/DNLite$(PM_SUFFIX)
+	$(TOUCH) $@
 
 DIS/DISDoc$(PM_SUFFIX): disdoc$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< \
@@ -118,12 +120,13 @@ DIS/DISDump$(PM_SUFFIX): disdoc$(DAC_SUFFIX) $(DAC2PM_PL)
 	  --output-file-path="$@"
 	$(PERL_CHK) $@
 
-disdoc$(PM_SUFFIX): disdoc$(DAC_SUFFIX) $(DAC2PM_PL)
+.disdoc$(PM_SUFFIX): disdoc$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< \
 	  --create-perl-module="$(NS_UTIL_DIS)DISDoc  DIS/DISDoc$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_UTIL_DIS)DISDump DIS/DISDump$(PM_SUFFIX)"
 	$(PERL_CHK) DIS/DISDoc$(PM_SUFFIX)
 	$(PERL_CHK) DIS/DISDump$(PM_SUFFIX)
+	$(TOUCH) $@
 
 # $(CORE_DAC_FILE)
 $(MANAKAI_LIB_DIR)manakai/all$(DAC_SUFFIX): dummy
@@ -136,4 +139,4 @@ $(MANAKAI_LIB_DIR)Message/Markup/all$(DAC_SUFFIX): dummy
 dummy:
 
 clean:
-	$(RM) $(GENERATED_FILES) .*.tmp
+	$(RM) $(GENERATED_FILES) .*.tmp .discore$(PM_SUFFIX) .disdoc$(PM_SUFFIX)
