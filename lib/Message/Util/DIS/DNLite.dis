@@ -21,7 +21,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/22 14:25:48 $
+      $Date: 2005/09/23 18:25:06 $
     @@ContentType:
       dis:Date.RCS
   
@@ -129,26 +129,22 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DOMMain:DOMFeature
-    @@ForCheck:
-      ManakaiDOM:all
+    @@rdf:type: DOMFeature|Feature
+    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: FeatureVerDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DOMMain:DOMFeature
+    @@rdf:type: DOMFeature|Feature
 
 ElementTypeBinding:
   @Name: featureQName
   @ElementType:
-    dis:AppName
+    DOMFeature:name
   @ShadowContent:
-    @@ContentType:
-      dis:TypeQName
+    @@ContentType: DISCore|QName
 
 FeatureDef:
   @QName: DIS|DNLite
@@ -194,6 +190,8 @@ ElementTypeBinding:
 
     @@DOMMain:implementFeature: DIS|DNLite10
 
+    @@ForCheck: DIS|ForEmpty
+
 ElementTypeBinding:
   @Name: IFDef
   @ElementType:
@@ -210,6 +208,8 @@ ElementTypeBinding:
 
     @@DOMMain:implementFeature: DIS|DNLite10
 
+    @@ForCheck: DIS|ForEmpty
+
 ElementTypeBinding:
   @Name: ClsDef
   @ElementType:
@@ -225,6 +225,8 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ForClass
 
     @@DOMMain:implementFeature: DIS|DNLite10
+
+    @@ForCheck: DIS|ForEmpty
 
 ElementTypeBinding:
   @Name: IFQName
@@ -260,6 +262,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
+    @@For: !=DIS|ForEmpty
 
 ElementTypeBinding:
   @Name: Return
@@ -275,13 +278,13 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: DISLang|MethodParameter
 
-
 ElementTypeBinding:
   @Name: Attr
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
+    @@For: !=DIS|ForEmpty
 
 ElementTypeBinding:
   @Name: Get
@@ -380,9 +383,14 @@ IFClsDef:
               }
               $a->{nodeID} = $source_node-><AG::SNode.nodeIDRef>
                 if $a->{uri} eq <Q::dis:ResourceDef>;
-              my @source_child = @{$source_node-><AG::SNode.childNodes>};
+              my $source_childs = $source_node-><AG::SNode.childNodes>;
               __DEEP{
-                for my $source_child (@source_child) {
+                for (my $i = 0;
+                     $i < $source_childs-><AG::swcfg21:SWCFGChildNodeList
+                                             ::swcfg21:ForLatest.length>; $i++) {
+                  my $source_child = $source_childs
+                                     -><M::swcfg21:SWCFGChildNodeList
+                                         ::swcfg21:ForLatest.item> ($i);
                   $cn->($self, $db, $source_child => $a);
                 }
               }__;

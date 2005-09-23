@@ -8,14 +8,12 @@ Module:
   @Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
   
-  @Author:
-    @@FullName:Wakaba
-    @@Mail:w@suika.fam.cx
+  @DISCore:author: DISCore|Wakaba
   @License:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/22 11:02:34 $
+      $Date: 2005/09/23 18:25:10 $
     @@ContentType:
       dis:Date.RCS
   
@@ -428,13 +426,21 @@ PropDef:
   @multipleProperties: DISCore|Single
 
 PropDef:
+  @QName: DISPerl|name
+  @enFN: Perl name (or any identifying string)
+  @rdfs:subPropertyOf: dis|AppName
+  @subsetOf: dis|AppName
+  @dataType: DISPerl|Perl
+  @multipleProperties: DISCore|UnorderedList
+
+PropDef:
   @QName: DISPerl|packageName
   @FullName:
     @@lang:en
     @@@:
       Perl package name
-  @rdfs:subPropertyOf: dis|AppName
-  @subsetOf: dis|AppName
+  @rdfs:subPropertyOf: DISPerl|name
+  @subsetOf: DISPerl|name
   @dataType: DISPerl|PackageName
   @multipleProperties: DISCore|UnorderedList
 
@@ -473,6 +479,39 @@ PropDef:
   @enFN: Perl method name
   @rdfs:subPropertyOf: DISPerl|subName
   @subsetOf: DISPerl|subName
+  @dataType: DISPerl|SubName
+  @multipleProperties: DISCore|Single
+
+PropDef:
+  @QName: DISPerl|constName
+  @enFN: Perl constant function name
+  @rdfs:subPropertyOf: DISPerl|subName
+  @subsetOf: DISPerl|subName
+  @dataType: DISPerl|SubName
+  @multipleProperties: DISCore|Single
+
+PropDef:
+  @QName: DISPerl|exportTagName
+  @enFN: Perl export tag name
+  @rdfs:subPropertyOf: DISPerl|name
+  @subsetOf: DISPerl|name
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|Single
+
+PropDef:
+  @QName: DISPerl|variableName
+  @enFN: Perl variable name without type prefix
+  @rdfs:subPropertyOf: DISPerl|name
+  @subsetOf: DISPerl|name
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|Single
+
+PropDef:
+  @QName: DISPerl|paramName
+  @enFN: Perl parameter name without type prefix
+  @rdfs:subPropertyOf: DISPerl|variableName
+  @subsetOf: DISPerl|variableName
+  @dataType: DISCore|String
   @multipleProperties: DISCore|Single
 
 ## -- Perl binding specific properties and datatypes
@@ -1301,7 +1340,7 @@ ElementTypeBinding:
 ElementTypeBinding:
   @Name: ClsPackName
   @ElementType:
-    DISPerl:classPackageName
+    DISPerl:packageName
   @ShadowContent:
     @@ForCheck: ManakaiDOM|ForClass
     @@ContentType: DISPerl|PackageName

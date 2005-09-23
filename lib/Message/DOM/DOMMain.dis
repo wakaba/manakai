@@ -20,14 +20,12 @@ Module:
       object from which DOM applications can obtain
       various DOM implementations.
 
-  @Author:
-    @@FullName: Wakaba
-    @@Mail: w@suika.fam.cx
+  @DISCore:author: DISCore|Wakaba
   @License:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/22 11:02:32 $
+      $Date: 2005/09/23 18:24:56 $
     @@ContentType:
       dis:Date.RCS
   
@@ -101,6 +99,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
   @ecore:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
+  @f:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @html5:
     http://www.w3.org/1999/xhtml
   @infoset:
@@ -130,269 +130,6 @@ Namespace:
     http://www.w3.org/XML/1998/namespace
   @xmlns:
     http://www.w3.org/2000/xmlns/
-
-ResourceDef:
-  @QName:
-    MDOM:
-  @rdf:type:
-    dis:ModuleGroup
-  @FullName:
-    @@lang:en
-    @@@:
-      The manakai DOM modules
-  @AppName:
-    @@@:
-      Message::DOM::IFLatest::
-    @@ContentType:
-      lang:Perl
-    @@For:
-      ManakaiDOM:ManakaiDOMLatest
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @AppName:
-    @@@:
-      Message::DOM::IFLevel3::
-    @@ContentType:
-      lang:Perl
-    @@For:
-      ManakaiDOM:ManakaiDOM3
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @AppName:
-    @@@:
-      Message::DOM::IFLevel2::
-    @@ContentType:
-      lang:Perl
-    @@For:
-      ManakaiDOM:ManakaiDOM2
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @AppName:
-    @@@:
-      Message::DOM::IFLevel1::
-    @@ContentType:
-      lang:Perl
-    @@For:
-      ManakaiDOM:ManakaiDOM1
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @AppName:
-    @@@:
-      Message::DOM::IF::
-    @@ContentType:
-      lang:Perl
-    @@For:
-      ManakaiDOM:ManakaiDOM
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @AppName:
-    @@@:
-      Message::DOM::
-    @@For:
-      ManakaiDOM:ManakaiDOMLatest
-  @AppName:
-    @@@:
-      Message::DOM::
-    @@ManakaiDOM:moduleSuffix: Level3
-    @@For: 
-      ManakaiDOM:ManakaiDOM3
-  @AppName:
-    @@@:
-      Message::DOM::
-    @@ManakaiDOM:moduleSuffix: Level2
-    @@For: 
-      ManakaiDOM:ManakaiDOM2
-  @AppName:
-    @@@:
-      Message::DOM::
-    @@ManakaiDOM:moduleSuffix: Level1
-    @@For: 
-      ManakaiDOM:ManakaiDOM1
-  @DISPerl:packageName:
-    @@@:
-      Message::DOM::
-    @@For:
-      ManakaiDOM:ManakaiDOMLatest
-  @DISPerl:packageName:
-    @@@:
-      Message::DOM::
-    @@ManakaiDOM:moduleSuffix: Level3
-    @@For: 
-      ManakaiDOM:ManakaiDOM3 !ManakaiDOM|ManakaiDOMLatest
-  @DISPerl:packageName:
-    @@@:
-      Message::DOM::
-    @@ManakaiDOM:moduleSuffix: Level2
-    @@For: 
-      ManakaiDOM:ManakaiDOM2 !ManakaiDOM|ManakaiDOM3
-  @DISPerl:packageName:
-    @@@:
-      Message::DOM::
-    @@ManakaiDOM:moduleSuffix: Level1
-    @@For: 
-      ManakaiDOM:ManakaiDOM1 !ManakaiDOM|ManakaiDOM2
-  @DISPerl:interfacePackageName:
-    @@@:
-      Message::DOM::IFLatest::
-    @@For:
-      ManakaiDOM:ManakaiDOMLatest
-  @DISPerl:interfacePackageName:
-    @@@:
-      Message::DOM::IFLevel3::
-    @@For:
-      ManakaiDOM:ManakaiDOM3 !ManakaiDOM|ManakaiDOMLatest
-  @DISPerl:interfacePackageName:
-    @@@:
-      Message::DOM::IFLevel2::
-    @@For:
-      ManakaiDOM:ManakaiDOM2 !ManakaiDOM|ManakaiDOM3
-  @DISPerl:interfacePackageName:
-    @@@:
-      Message::DOM::IFLevel1::
-    @@For:
-      ManakaiDOM:ManakaiDOM1 !ManakaiDOM|ManakaiDOM2
-  @DISPerl:interfacePackageName:
-    @@@:
-      Message::DOM::IF::
-    @@For:
-      ManakaiDOM:ManakaiDOM !ManakaiDOM|ManakaiDOM1
-
-## -- "For" definitions
-
-## For the Document Object Model
-
-ForDef:
-  @QName:
-    ManakaiDOM:DOM
-  @FullName:
-    @@lang:en
-    @@@: For DOM
-ForDef:
-  @QName:
-    ManakaiDOM:DOM1
-  @FullName:
-    @@lang:en
-    @@@: For DOM Level 1
-  @ISA:
-    ManakaiDOM:DOM
-ForDef:
-  @QName:
-    ManakaiDOM:DOM2
-  @FullName:
-    @@lang:en
-    @@@: For DOM Level 2
-  @ISA:
-    ManakaiDOM:DOM1
-ForDef:
-  @QName:
-    ManakaiDOM:DOM3
-  @FullName:
-    @@lang:en
-    @@@: For DOM Level 3
-  @ISA:
-    ManakaiDOM:DOM2
-ForDef:
-  @QName:
-    ManakaiDOM:DOMLatest
-  @FullName:
-    @@lang:en
-    @@@: For the latest level of DOM
-  @ISA:
-    ManakaiDOM:DOM3
-
-ForDef:
-  @QName: 
-    ManakaiDOM:DOMHTMLFeature
-  @FullName:
-    @@lang:en
-    @@@: For DOM HTML feature, any version
-  @ISA:
-    ManakaiDOM:DOM
-
-ForDef:
-  @QName: 
-    ManakaiDOM:DOMXMLFeature
-  @FullName:
-    @@lang:en
-    @@@: For DOM XML feature, any version
-  @ISA:
-    ManakaiDOM:DOM
-
-ForDef:
-  @QName: ManakaiDOM|DOMXMLFeatureXML11
-  @FullName:
-    @@lang:en
-    @@@: For DOM XML feature, any version, with XML 1.1 support
-  @ISA: ManakaiDOM|DOMXMLFeature
-
-ForDef:
-  @QName:
-    ManakaiDOM:DOMEventsFeature
-  @FullName:
-    @@lang:en
-    @@@:  For DOM Events feature, any version
-  @ISA:
-    ManakaiDOM:DOM
-
-## For the manakai DOM implementation
-
-ForDef:
-  @QName:
-    ManakaiDOM:ManakaiDOM
-  @FullName:
-    @@lang:en
-    @@@: For the manakai DOM implementation
-  @Implement:
-    ManakaiDOM:DOM
-  @ISA:
-    ManakaiDOM:Perl
-ForDef:
-  @QName:
-    ManakaiDOM:ManakaiDOM1
-  @FullName:
-    @@lang:en
-    @@@: For the manakai DOM Level 1 implementation
-  @Implement:
-    ManakaiDOM:DOM1
-  @Implement: 
-    ManakaiDOM:DOMXMLFeature
-  @Implement: 
-    ManakaiDOM:DOMHTMLFeature
-  @Implement:
-    ManakaiDOM:DOMEventsFeature
-  @ISA:
-    ManakaiDOM:ManakaiDOM
-ForDef:
-  @QName:
-    ManakaiDOM:ManakaiDOM2
-  @FullName:
-    @@lang:en
-    @@@: For the manakai DOM Level 2 implementation
-  @Implement:
-    ManakaiDOM:DOM2
-  @ISA:
-    ManakaiDOM:ManakaiDOM1
-ForDef:
-  @QName:
-    ManakaiDOM:ManakaiDOM3
-  @FullName:
-    @@lang:en
-    @@@: For the manakai DOM Level 3 implementation
-  @Implement:
-    ManakaiDOM:DOM3
-  @ISA:
-    ManakaiDOM:ManakaiDOM2
-  @ISA: ManakaiDOM|DOMXMLFeatureXML11
-ForDef:
-  @QName:
-    ManakaiDOM:ManakaiDOMLatest
-  @FullName:
-    @@lang:en
-    @@@: For the manakai implementation of the latest level of DOM
-  @Implement:
-    ManakaiDOM:DOMLatest
-  @ISA:
-    ManakaiDOM:ManakaiDOM3
 
 ## -- Abstract programming language "object" types
 
@@ -756,31 +493,6 @@ ElementTypeBinding:
 
 ## -- DOM Feature
 
-ElementTypeBinding:
-  @Name: MDOMFeature
-  @ElementType:
-    DOMMain:implementFeature
-  @ShadowContent:
-    @@@: ManakaiDOMFeature10
-
-ElementTypeBinding:
-  @Name: DOMMFeature
-  @ElementType:
-    DOMMain:implementFeature
-  @ShadowContent:
-    @@@: DOMMainFeature10
-    @@For:
-      ManakaiDOM:DOM1
-  @ShadowSibling:
-    @@DOMMain:implementFeature:
-      @@@@: DOMMainFeature20
-      @@@For:
-        ManakaiDOM:DOM2
-    @@DOMMain:implementFeature:
-      @@@@: DOMMainFeature30
-      @@@For:
-        ManakaiDOM:DOM3
-
 ResourceDef:
   @QName: 
     DOMMain:docSupportsXMLFeature
@@ -798,92 +510,22 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DOMMain:DOMFeature
-    @@ForCheck:
-      ManakaiDOM:all
+    @@rdf:type: DOMFeature|Feature
+    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: FeatureVerDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DOMMain:DOMFeature
+    @@rdf:type: DOMFeature|Feature
 
 ElementTypeBinding:
   @Name: featureQName
   @ElementType:
-    dis:AppName
+    f:name
   @ShadowContent:
-    @@ContentType:
-      dis:TypeQName
-
-FeatureDef:
-  @QName: 
-    DOMMain:ManakaiDOMFeature
-  @featureQName:
-    ManakaiDOM:ManakaiDOM
-  @FeatureVerDef:
-    @@QName: 
-      DOMMain:ManakaiDOMFeature10
-    @@Version: 1.0
-    @@DOMMetaImpl:instanceFeatureOf: 
-      DOMMain:ManakaiDOMFeature
-    @@FullName:
-      @@@lang:en
-      @@@@:
-        The Manakai DOM Implementation Main Module, version 1.0
-    @@Description:
-      @@@lang:en
-      @@@@:
-        The manakai DOM implementation main module, version 1.0. 
-        It includes basic classes internally used in the implementations. 
-        \
-        {NOTE:: Previous versions of manakai DOM implementation has 
-                a separate <Module::MDOM:ManakaiDOMMain> module and 
-                it provides this feature; 
-                it has been merged into the <Module::MDOM:DOMMain> module.
-        \
-        }
-
-FeatureDef:
-  @QName: 
-    ManakaiDOM:DOMMain
-  @FullName:
-    @@lang:en
-    @@@:
-      The manakai DOM implementation <Module::DOMMain> module
-  @FeatureVerDef:
-    @@Version: 1.0
-    @@FullName:
-      @@@lang:en
-      @@@@:
-        The manakai DOM implementation <Module::DOMMain> module, level 1
-    @@QName: 
-      DOMMain:DOMMainFeature10
-    @@DOMMetaImpl:instanceFeatureOf:
-      ManakaiDOM:DOMMain
-  @FeatureVerDef:
-    @@Version: 2.0
-    @@FullName:
-      @@@lang:en
-      @@@@:
-        The manakai DOM implementation <Module::DOMMain> module, level 2
-    @@QName: 
-      DOMMain:DOMMainFeature20
-    @@DOMMetaImpl:instanceFeatureOf: 
-      DOMMain:DOMMainFeature10
-  @FeatureVerDef:
-    @@Version: 3.0
-    @@FullName:
-      @@@lang:en
-      @@@@:
-        The manakai DOM implementation <Module::DOMMain> module, level 3
-    @@QName: 
-      DOMMain:DOMMainFeature30
-    @@DOMMetaImpl:instanceFeatureOf: 
-      DOMMain:DOMMainFeature20
+    @@ContentType: DISCore|QName
 
 ## -- Manakai object
 
@@ -966,8 +608,9 @@ ResourceDef:
       A DOM data type.
   @rdf:type:
     rdfs:Class
-  @rdfs:subClassOf:
-    ManakaiDOM:DataType
+  @rdfs:subClassOf: DISLang|DataType
+  @For: =ManakaiDOM|all
+
 ElementTypeBinding:
   @Name: DOMDataTypeDef
   @ElementType:
@@ -1145,7 +788,7 @@ ResourceDef:
 
   @Method:
     @@Name: findOffset16
-    @@PerlName: find_offset_16
+    @@plMName: find_offset_16
     @@Description:
       @@@lang:en
       @@@@: 
@@ -1207,7 +850,7 @@ ResourceDef:
           }
   @Method:
     @@Name: findOffset32
-    @@PerlName: find_offset_32
+    @@plMName: find_offset_32
     @@Description:
       @@@lang:en
       @@@@:
@@ -1231,7 +874,8 @@ ResourceDef:
           {P:: A pseudo-code
 
              {CODE::<html5:var::len32> = findOffset32 (<html5:var
-                    ::str>, <html5:var::str>.length);}
+                    ::str>, <html5:var::str>.length);
+             }
 
                would return the number of characters in
                the string <html5:var::str>.
@@ -1361,11 +1005,10 @@ ResourceDef:
 ##StringIndexOutOfBoundsException
 
 ElementTypeBinding:
-  @Name: PerlName
+  @Name: plMName
   @ElementType:
-    dis:AppName
+    DISPerl:methodName
   @ShadowContent:
-    @@ContentType: lang|Perl
     @@For: ManakaiDOM|Perl
 
 ## -- DOM specialized string types
@@ -2075,7 +1718,6 @@ ExceptionDef:
 WarningDef:
   @QName: 
     ManakaiDOM:ManakaiDOMImplementationWarning
-  @MDOMFeature:
 
   @Description:
     @@lang:en
@@ -2254,11 +1896,8 @@ ResourceDef:
     DOMMain:ManakaiDOMImplementationRegistryVar
   @rdf:type:
     DISPerl:ScalarVariable
-  @AppName:
-    @@@:
-      Message::DOM::DOMImplementationRegistry
-    @@ContentType:
-      lang:Perl
+  @DISPerl:variableName:
+    Message::DOM::DOMImplementationRegistry
   @DefaultValue:
     @@@:
       <ClassName::DOMImplementationRegistry::ManakaiDOM:ManakaiDOMLatest>

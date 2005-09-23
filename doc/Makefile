@@ -2,7 +2,7 @@ MANAKAI_ROOT_DIR = ../
 MANAKAI_BIN_DIR = $(MANAKAI_ROOT_DIR)bin/
 MANAKAI_LIB_DIR = $(MANAKAI_ROOT_DIR)lib/
 
-DAC_SUFFIX = .dac
+DAC_SUFFIX = .dad
 
 RM = rm -f
 
@@ -15,7 +15,8 @@ XALAN = $(JAVA) -cp $(XALAN_PATH) org.apache.xalan.xslt.Process
 PERL_OPTIONS = -I$(MANAKAI_LIB_DIR)
 PERL = perl
 MKDISDUMP_PL = $(MANAKAI_BIN_DIR)mkdisdump.pl
-MKDISDUMP = $(PERL) $(PERL_OPTIONS) $(MKDISDUMP_PL)
+MKDISDUMP_OPTIONS =
+MKDISDUMP = $(PERL) $(PERL_OPTIONS) $(MKDISDUMP_PL) $(MKDISDUMP_OPTIONS)
 
 DUMP_STYLESHEET_PATH = template/disdump.ja.xsl
 DDLIST_STYLESHEET_PATH = template/ddlist.ja.xsl
@@ -33,8 +34,8 @@ NS_UTIL = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 ALL_HTML = dom.html util.html
 
 DOM_DAC_FILE = $(MANAKAI_LIB_DIR)Message/DOM/core$(DAC_SUFFIX)
-#UTIL_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Util/disdoc$(DAC_SUFFIX)
-UTIL_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Util/discore$(DAC_SUFFIX)
+UTIL_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Util/core$(DAC_SUFFIX)
+DIS_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Util/disdoc$(DAC_SUFFIX)
 
 all: $(ALL_HTML)
 
@@ -63,6 +64,7 @@ dom.xml: $(DOM_DAC_FILE)
 	  --module-uri="$(NS_MDOM)DOMCore" \
 	  --module-uri="$(NS_MDOM)DOMXML" \
 	  --module-uri="$(NS_MDOM)DOMLS" \
+	  --module-uri="$(NS_MDOM)GenericLS" \
 	  --with-implementators-note > $@
 
 util.xml: $(UTIL_DAC_FILE)
@@ -72,17 +74,25 @@ util.xml: $(UTIL_DAC_FILE)
 	  --module-uri="$(NS_DISLIB)DISIDL" \
 	  --module-uri="$(NS_DISLIB)DISLang" \
 	  --module-uri="$(NS_DISLIB)DISPerl" \
+	  --module-uri="$(NS_DISLIB)DISMarkup" \
+	  --module-uri="$(NS_DISLIB)XML" \
+	  --module-uri="$(NS_DISLIB)NaturalLanguage" \
 	  --module-uri="$(NS_UTIL)ManakaiNode" \
 	  --module-uri="$(NS_ERROR)Core" \
 	  --module-uri="$(NS_ERROR)DOMException" \
+	  --with-implementators-note > $@
+
+dis.xml: $(DIS_DAC_FILE)
+	$(MKDISDUMP) $< \
 	  --module-uri="$(NS_MARKUP)SuikaWikiConfig21" \
 	  --module-uri="$(NS_UTIL)PerlCode" \
 	  --module-uri="$(NS_UTIL)DIS" \
 	  --module-uri="$(NS_DIS)Perl" \
 	  --module-uri="$(NS_DIS)Value" \
+	  --module-uri="$(NS_DIS)DNLite" \
+	  --module-uri="$(NS_DIS)DISDoc" \
+	  --module-uri="$(NS_DIS)DISDump" \
 	  --with-implementators-note > $@
-#	  --module-uri="$(NS_DIS)DISDoc" \
-#	  --module-uri="$(NS_DIS)DISDump" \
 
 clean:
 	$(RM) $(ALL_HTML:.html=-list.pl.tmp) $(ALL_HTML:.html=-list.xml.tmp) \
@@ -92,5 +102,5 @@ clean:
 distclean: clean
 	$(RMR) ./Message ./http
 
-## $Date: 2005/09/19 16:17:50 $
+## $Date: 2005/09/23 18:24:52 $
 ## License: Public Domain

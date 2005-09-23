@@ -27,7 +27,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/09/22 11:02:32 $
+      $Date: 2005/09/23 18:24:59 $
     @@ContentType:
       dis:Date.RCS
   
@@ -81,6 +81,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Perl/
   @dv:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Value/
+  @dx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @ecore:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
   @infoset:
@@ -171,13 +173,6 @@ ResourceDef:
     @@lang:en
     @@@:
       <QUOTE::dis> modules
-  @AppName:
-    @@@:
-      Message::Util::IF::
-    @@ForCheck: 
-      ManakaiDOM:ForIF
-  @AppName:
-    Message::Util::DIS::
   @DISPerl:packageName:
     Message::Util::DIS::
   @DISPerl:interfacePackageName:
@@ -190,8 +185,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DOMMain:DOMFeature
+    @@rdf:type: DOMFeature|Feature
     @@ForCheck:
       =ManakaiDOM:all
 
@@ -200,16 +194,14 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DOMMain:DOMFeature
+    @@rdf:type: DOMFeature|Feature
 
 ElementTypeBinding:
   @Name: featureQName
   @ElementType:
-    dis:AppName
+    DOMFeature:name
   @ShadowContent:
-    @@ContentType:
-      dis:TypeQName
+    @@ContentType: DISCore|QName
 
 FeatureDef:
   @QName: Core
@@ -666,6 +658,49 @@ IFClsDef:
                                         .defaultElementTypeNamespaceURI>
                     (<Q::dis:>);
         }
+
+  @IntMethod:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Operator: 
+      @@@@: DISPerl|NewMethod
+      @@@ContentType: DISCore|QName
+    @@ForCheck: ManakaiDOM|ForClass
+    @@enDesc:
+      Creates a new instance of the <IF::DISParser> interface
+      and returns it.
+
+      {NOTE:: This method is compatible with the role <Q::DOMLS:ParserRole>
+              so that this class is accessible via the
+              <M::DOMLS|DOMImplementationLSExtended.createMLSParser>
+              method.
+      }
+    @@Param:
+      @@@Name: impl
+      @@@Type: DOMFeature|MinimumImplementation||ManakaiDOM|ManakaiDOMLatest
+      @@@enDesc:
+        An implementation object.  The <M::DOMFeature|GetFeature.getFeature>
+        method with parameter values <Feature::DIS|Core> and
+        <FeatureVer::1.0> respectively <kwd:MUST> return
+        an object implementing the <IF::DISImplementation> interface.
+    @@Param:
+      @@@Name: features
+      @@@Type: DISLang|String||ManakaiDOM|all
+      @@@dis:actualType: DOMFeature|FeaturesString||ManakaiDOM|ManakaiDOMLatest
+      @@@enDesc:
+        A list of requested features.  In the current implementation
+        this parameter is ignored.
+    @@Return:
+      @@@Type: DOMMain|Object||ManakaiDOM|all
+      @@@actualType: ManakaiDISParser
+      @@@enDesc: The newly created parser object.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self->SUPER::new
+                       ($impl-><M::DOMFeature|GetFeature
+                                 ||ManakaiDOM|ManakaiDOMLatest.getFeature>
+                           (<Q::swcfg21:Core> => '2.1'),
+                        $features);
+        }__;
 ##DISParser
 
 IFClsDef:
@@ -3634,6 +3669,8 @@ IFClsDef:
   @IFQName: DISAnyResource
   @ClsQName: ManakaiDISAnyResource
 
+  @ClsISA: DOMFeature|ManakaiHasFeatureByGetFeature||ManakaiDOM|ManakaiDOMLatest
+
   @enDesc:
     {P:: A <IF::DISAnyResource> object represents a resource defined
     in <QUOTE::dis> files.  In <QUOTE::dis> model, resources are
@@ -3859,45 +3896,6 @@ IFClsDef:
                            (${$self->{<Q::DIS|definingModule>}})
            if defined $self->{<Q::DIS|definingModule>};
 
-  @Method:
-    @@ForCheck: ManakaiDOM|ForClass
-    @@Name:  hasFeature
-    @@enDesc:
-      Returns whether a specific feature is implemented by theobject or not.
-    @@Param:
-        @@@Name:  feature
-        @@@Type:
-          DISLang:String::ManakaiDOM:all
-        @@@actualType: DOMFeature|FeatureNameString||ManakaiDOM|ManakaiDOMLatest
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A feature name to request.
-     @@Param:
-        @@@Name:  version
-        @@@Type:
-          DISLang:String::ManakaiDOM:all
-        @@@actualType:
-          DOMFeature|FeatureVersionString||ManakaiDOM|ManakaiDOMLatest
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A feature version number to request.
-     @@Return:
-        @@@Type: 
-          DOMMain:boolean::ManakaiDOM:all
-        @@@enDesc: Whether the feature is implemented or not.
-        @@@TrueCase:
-          @@@@enDesc: The feature is implemented.
-        @@@FalseCase:
-          @@@@enDesc:
-            The feature is <EM::not> implemented.
-        @@@PerlDef:
-          __DEEP{
-            $r = $self-><M::DOMMinImpl.getFeature> ($feature, $version)
-               ? true : false;
-          }__;
-
   @Attr:
     @@Name: isReferred
     @@Description:
@@ -3930,7 +3928,7 @@ IFClsDef:
             } else {
               $given = $given-><M::SWCFGNode.flag> ('nodePath') ||
                        $given-><M::SWCFGNode.nodePath>
-                          (key => [qw/QName Name type Type AppName/]);
+                          (key => [qw/QName Name type Type/]);
             }
           }
           $self->{<Q::DIS|isReferred>} = $given;
@@ -4193,6 +4191,79 @@ IFClsDef:
                       ($el-><M::DISElement.getNamespaceBindingList> ($db));
                     $new_value-><AS::dv|DVValue.sourceNodePath>
                       ($el-><M::SWCFGNode.flag> ('nodePath'));
+                  } elsif ($el-><M::DISElement.mediaTypeMatch>
+                             (<Q::dx|XCRef>,
+                              $mtopt{default_media_type}, %mtopt)) {
+                    my $x = $db-><M::DISDatabase.xcrefToResource>
+                                 ($el-><M::SWCFGNode.value>,
+                                  $el, node => $el, for_arg => $self->{for});
+                    __CODE{dv|createURI::
+                      $uri => {($x->[2] or $x->[1] or $x->[0])
+                               -><AG::DISAnyResource.uri>},
+                      $result => $new_value,
+                    }__;
+                    $new_value-><M::dv|DVURIValue.getResource> ($db)
+                              -><AS::DISAnyResource.isReferred> ($el);
+                    $new_value_type = <Q::DISCore:URI>;
+                  } elsif ($el-><M::DISElement.mediaTypeMatch>
+                             (<Q::DISLang|MemberRef>,
+                              $mtopt{default_media_type}, %mtopt)) {
+                    my $v = $el-><M::SWCFGNode.value>;
+                    $v =~ s/^\s+//;  $v =~ s/\s+$//;
+                    my ($clsq, $mem, $gs) = split /\s*\.\s*/, $v, 3;
+                    my $res;
+                    if (defined $mem) {
+                      my $cls = $db-><M::DISDatabase.getResource>
+                                     ($el-><M::DISElement.tfqnamesValueURI>
+                              ($clsq, $self-><AG::DISAnyResource.sourceNodeID>,
+                               $self-><AG::DISAnyResource.forURI>, node => $el));
+                      $cls-><AS::DISAnyResource.isReferred> ($el);
+                      $res = $cls-><M::DISResource.getChildResourceByNameAndType>
+                                     ($mem, <Q::DISLang:AnyMethod>);
+                      unless ($res) {
+                        __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
+                          DIS:localName => {$mem},
+                          DIS:parentURI => {$cls-><AG::DISAnyResource.uri>},
+                          DIS:elementType => {$el-><AG::SWCFGElement
+                                                             .expandedURI>},
+                          DIS:sourceNode => {$el},
+                          DIS:sourceCode => {$v},
+                          DIS:expectedType => {
+                            defined $gs ? <Q::DISLang:Attribute>
+                                        : <Q::DISLang:Method>
+                          },
+                        }__}__;
+                      }
+                      if (defined $gs) {
+                        $res = $res-><M::DISResource.getChildResourceByType>
+                                 ($gs eq 'get' ? <Q::DISLang|AttributeGet>
+                                               : <Q::DISLang|AttributeSet>);
+                        unless ($res) {
+                          __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
+                            DIS:parentURI => {$res-><AG::DISAnyResource.uri>},
+                            DIS:elementType => {$el-><AG::SWCFGElement
+                                                               .expandedURI>},
+                            DIS:sourceNode => {$el},
+                            DIS:sourceCode => {$v},
+                            DIS:expectedType => {
+                              $gs eq 'get' ? <Q::DISLang:AttributeGet>
+                                           : <Q::DISLang:AttributeSet>
+                            },
+                          }__}__;
+                        }                        
+                      }
+                    } else {
+                      $res = $db-><M::DISDatabase.getResource>
+                                     ($el-><M::DISElement.tfqnamesValueURI>
+                              ($clsq, $self-><AG::DISAnyResource.sourceNodeID>,
+                               $self-><AG::DISAnyResource.forURI>, node => $el));
+                    }
+                    $res-><AS::DISAnyResource.isReferred> ($el);
+                    __CODE{dv|createURI::
+                      $uri => {$el-><AG::DISAnyResource.uri>},
+                      $result => $new_value,
+                    }__;
+                    $new_value_type = <Q::DISCore:URI>;
                   } elsif ($el-><M::DISElement.mediaTypeMatch>
                                      (<Q::lang:dis>, $mtopt{default_media_type},
                                       %mtopt)) {
@@ -5268,15 +5339,13 @@ IFClsDef:
       @@@PerlDef:
         __DEEP{
           $r = [map {lc} @{$self-><M::DISResourceProp.getPropertyTextList>
-                            (<Q::dis:AppName>,
-                             default_media_type => <Q::dis:String>)}];
+                            (<Q::DOMFeature:name>)}];
           unless (@$r) {
             ## TODO: instance feature
             my $pr = $self-><M::DISResourceProp
                               .getPropertyResource> (<Q::dis2pm:parentResource>);
             if ($pr) {
-              if ($pr-><M::DISResource.isTypeURI>
-                            (<Q::DOMMain:DOMFeature>) and
+              if ($pr-><M::DISResource.isTypeURI> (<Q::DOMFeature:Feature>) and
                   not $pr-><AG::DISAnyResource.isAnonymous>) {
                 push @$r, @{$pr-><AG::DISResource.featureNameList>};
               }
@@ -5510,16 +5579,6 @@ PropDef:
     (<QUOTE::dis> resource URI reference).
 
 PropDef:
-  @QName: plFullyQualifiedName
-  @enDesc:
-    Fully qualified name.
-
-PropDef:
-  @QName:plDefined
-  @enDesc:
-    Whether a Perl definition for this resource is implemented or not.
-
-PropDef:
   @QName: ownerClass
   @enDesc:
     The class to which this resource belongs.
@@ -5587,7 +5646,20 @@ IFClsDef:
         @@@@enDesc:
           The property has no value.
       @@@PerlDef:
-        $r = $self->{$propName};
+        if ($self->{$propName}) {
+          $r = $self->{$propName};
+        } else {
+          my $pr = $self-><AG::DISAnyResource.database>
+                        -><M::DISDatabase.getResource> ($propName);
+          A: for (grep {$pr->{aliasURI}->{$_} or $pr->{subOf}->{$_}}
+                  (keys %{$pr->{aliasURI}}, keys %{$pr->{subOf}||{}})) {
+            my $v = $self->{$_};
+            if ($v) {
+              $r = $v->[0];
+              last A;
+            }
+          }
+        }
 
   @Method:
     @@Name: getPropertyValueList
@@ -5941,7 +6013,7 @@ IFClsDef:
 
   @Method:
     @@Name: addPropertyResourceUList
-    @@PerlName: add_property_resource_ulist
+    @@plMName: add_property_resource_ulist
     @@enDesc:
       Adds a resource to a resource-list property value. 
       \
@@ -5989,7 +6061,7 @@ IFClsDef:
 
   @Method:
     @@Name: addPropertyURIUList
-    @@PerlName: add_peoperty_uri_ulist
+    @@plMName: add_peoperty_uri_ulist
     @@enDesc:
       Adds a resource to a resource-list property value. 
       \
@@ -6238,7 +6310,7 @@ ResourceDef:
 
     @@IFQName: DISExceptionCode
     @@ClsQName: ManakaiDISExceptionCode
-    @@PerlName: DISExceptionCode
+    @@plCName: DISExceptionCode
 
     @@rdfs:subClassOf:
       DOMMain:unsigned-short::ManakaiDOM:all
@@ -6935,70 +7007,23 @@ ElementTypeBinding:
       @@@@:
         The source code in which an error has occurred. 
 
-ClsDef:
-  @ClsQName: ManakaiDISExceptionTarget
-
-  @Implement: ecore|MUErrorTarget||ManakaiDOM|Perl
-
-  @enDesc:
-    Objects that is able to be the target of an exception. 
-
-  @IntMethod:
-    @@Operator:
-      @@@@:
-        ManakaiDOM:MUErrorHandler
-      @@@ContentType:
-        dis:TypeQName
-    @@Description:
-      @@@lang:en
-      @@@@:
-        This method is a generic error handler; all manakai exceptions 
-        and warnings associated to an object are once reported to this method 
-        and then delivered to appropriate entities. 
-        \
-        If the error is an exception (such as <X::DOMCore:DOMException> or 
-        <X::ManakaiDOM:ManakaiDOMImplementationException>), it is 
-        simply thrown.  If the error is only a warning, it is reported 
-        via the <IF::DOMCore:DOMError> interface. 
-        \
-        See <PerlModule::Message::Util::Error> documentation for more 
-        information on the error reporting mechanism.
-        \
-        {NOTE:: This kind of methods are named as <Perl::___report_error> 
-                in the convention of <PerlModule::Message::Util::Error>. 
-        \
-        }
-    @@Param:
-      @@@Name:err
-      @@@Type: 
-        ManakaiDOM:ManakaiDOMExceptionOrWarning::ManakaiDOM:Perl
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          An exception object that describes what kind of error it is 
-          and how it should be recovered. 
-          \
-          {NOTE:: Exception objects in manakai implementation 
-                  inherit the class <PerlModule::Message::Util::Error>, 
-                  that in turn inherits <PerlModule::Error>.
-          \
-          }
-    @@Return:
-      @@@PerlDef:
-          if ($err->isa (<ClassName::ManakaiDOM:ManakaiDOMException
-                                   ::ManakaiDOM:Perl>)) {
-            $err->throw;
-          } else {
-            \## TODO: Implement warning reporting
-            warn $err->stringify;
-          }
-##DISExceptionTarget
-
+ResourceDef:
+  @QName: ManakaiDISExceptionTarget
+  @AliasFor: dx|ManakaiDefaultExceptionHandler||ManakaiDOM|Perl
+  @For: DIS|ForEmpty
 
 ElementTypeBinding:
-  @Name: PerlName
+  @Name: plMName
   @ElementType:
-    dis:AppName
+    DISPerl:methodName
+  @ShadowContent:
+    @@ContentType: lang|Perl
+    @@For: ManakaiDOM|Perl
+
+ElementTypeBinding:
+  @Name: plCName
+  @ElementType:
+    DISPerl:exportTagName
   @ShadowContent:
     @@ContentType: lang|Perl
     @@For: ManakaiDOM|Perl
@@ -7010,6 +7035,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       DISLang:Method
+    @@For: !=ForEmpty
 
 ElementTypeBinding:
   @Name: IntMethod
@@ -7019,6 +7045,7 @@ ElementTypeBinding:
     @@rdf:type:
       DISLang:Method
     @@ManakaiDOM:isForInternal:1
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: Attr
@@ -7027,6 +7054,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       DISLang:Attribute
+    @@For: !=ForEmpty
 
 ElementTypeBinding:
   @Name: Return

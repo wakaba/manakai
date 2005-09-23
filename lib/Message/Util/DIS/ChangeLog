@@ -1,3 +1,26 @@
+2005-09-23  Wakaba  <wakaba@suika.fam.cx>
+
+	* DISDoc.dis: Modified to support new "dad" implementation.
+	(DISElementDISDoc): Removed.
+	(DVValueDISDoc): New.
+	(documentionGroupId): This attribute values now 
+	do not include element type names.
+
+	* DNLite.dis (convertDISDocumentToDNLDocument): Fixed
+	not to "tie" happens to cause strange segmentation fault.
+
+	* Perl.dis (plCodeFragment): Support for the
+	role "dv:ValurRole" added.  Property name "dis:AppName"
+	is changed to more specific property names.  Throws
+	an exception if an input processor has no Perl code
+	definition.  A parameter value to "getPropertyValue"
+	was missing.
+
+	* Value.dis (dv:ValueRole): New role.
+	(DVValue.getFeature): New method.
+	(DVValue): Now extends DOMFeature:ManakaiHasFeatureByGetFeature
+	so that it implements DOMFeature:GetFeature.
+
 2005-09-21  Wakaba  <wakaba@suika.fam.cx>
 
 	* Value.dis (DVValue): Extends DIS|NSResolverDIS.

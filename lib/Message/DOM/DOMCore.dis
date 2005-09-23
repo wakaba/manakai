@@ -35,14 +35,12 @@ Module:
       in those specifications, must be fully implemented by all 
       conforming DOM implementations.
   
-  @Author:
-    @@FullName:Wakaba
-    @@Mail:w@suika.fam.cx
+  @DISCore:author: DISCore|Wakaba
   @License:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/22 11:02:31 $
+      $Date: 2005/09/23 18:24:53 $
     @@ContentType:
       dis:Date.RCS
 
@@ -106,6 +104,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/views#
   @ev:
     http://www.w3.org/2001/xml-events
+  @f:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @infoset:
     http://www.w3.org/2001/04/infoset#
   @kwd:
@@ -154,11 +154,13 @@ ElementTypeBinding:
   @ElementType:
     ManakaiDOM:raises
   @ShadowContent:
-    @@@For: !ManakaiDOM|all
+    @@For: !ManakaiDOM|all
 ElementTypeBinding:
   @Name: Warning
   @ElementType:
     ManakaiDOM:alwaysWarns
+  @ShadowContent:
+    @@For: !ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: raises
@@ -583,17 +585,16 @@ ElementTypeBinding:
 ElementTypeBinding:
   @Name: featureName
   @ElementType:
-    dis:AppName
+    f:name
   @ShadowContent:
-    @@ContentType:
-      dis:String
+    @@ContentType: DISCore|String
+
 ElementTypeBinding:
   @Name: featureQName
   @ElementType:
-    dis:AppName
+    f:name
   @ShadowContent:
-    @@ContentType:
-      dis:TypeQName
+    @@ContentType: DISCore|QName
 
 FeatureDef:
   @featureName: Core
@@ -761,7 +762,7 @@ ResourceDef:
 
     @@IFQName: ExceptionCode
     @@ClsQName: ManakaiDOMExceptionCode
-    @@PerlName: ExceptionCode
+    @@plCName: ExceptionCode
 
      @@Description:
        @@@lang:en
@@ -3260,7 +3261,7 @@ IFCls1Def:
   @ConstGroup:
     @@IFQName: NodeType
     @@ClsQName: ManakaiDOMNodeType
-    @@PerlName: NodeType
+    @@plCName: NodeType
 
    @@rdfs:subClassOf:
      @@@@: DOMMain|unsigned-short||ManakaiDOM|all
@@ -5141,7 +5142,7 @@ IFCls1Def:
        @@@@: ManakaiDOMDocumentPosition
        @@@ForCheck:
          ManakaiDOM:ForClass
-     @@PerlName: DocumentPosition
+     @@plCName: DocumentPosition
 
      @@Description:
        @@@lang:en
@@ -7393,6 +7394,7 @@ ResourceDef:
       dis:MultipleResource
     @@ForCheck:
       !ManakaiDOM:ForIF !DOMCore:ForChildNodeList !DOMCore:ForGetNodeList
+  @ForCheck: ManakaiDOM|DOM
 
   @resourceFor:
     ManakaiDOM:ForIF
@@ -8190,6 +8192,7 @@ ResourceDef:
       dis:MultipleResource
     @@ForCheck:
       !ManakaiDOM:ForIF !ForAttrMap !ForEntityMap !ForNotationMap
+  @ForCheck: ManakaiDOM|DOM
 
   @resourceFor:
     ManakaiDOM:ForIF
@@ -13615,7 +13618,7 @@ IFDef:
        @@@@: Is this namespace *URI*?
   @ConstGroup:
      @@QName: DerivationMethods
-     @@PerlName: DerivationMethods
+     @@plCName: DerivationMethods
      @@Description:
        @@@lang:en
        @@@@:
@@ -13763,7 +13766,7 @@ IFDef:
     ManakaiDOM:DOM3
   @ConstGroup:
      @@QName:  OperationType
-     @@PerlName: OperationType
+     @@plCName: OperationType
      @@rdfs:subClassOf: 
        @@@@: DOMMain|unsigned-short||ManakaiDOM|all
        @@@ForCheck: ManakaiDOM|ForClass
@@ -13911,7 +13914,7 @@ IFCls3Def:
   @ConstGroup:
     @@IFQName: ErrorSeverity
     @@ClsQName: ManakaiDOMErrorSeverity
-    @@PerlName: ErrorSeverity
+    @@plCName: ErrorSeverity
   
      @@rdfs:subClassOf: 
        @@@@: DOMMain|unsigned-short||ManakaiDOM|all
@@ -14322,7 +14325,7 @@ IFDef:
             @@@@@@: There is no byte offset available.
   @Attr:
      @@Name:  utf16Offset
-     @@PerlName: utf16_offset
+     @@plMName: utf16_offset
      @@Description:
        @@@lang:en
        @@@@:
@@ -14377,11 +14380,17 @@ IFDef:
             @@@@@@: There is no URI is available.
 
 ElementTypeBinding:
-  @Name: PerlName
+  @Name: plCName
   @ElementType:
-    dis:AppName
+    DISPerl:exportTagName
   @ShadowContent:
-    @@ContentType: lang|Perl
+    @@For: ManakaiDOM|Perl
+
+ElementTypeBinding:
+  @Name: plMName
+  @ElementType:
+    DISPerl:methodName
+  @ShadowContent:
     @@For: ManakaiDOM|Perl
 
 IFDef:

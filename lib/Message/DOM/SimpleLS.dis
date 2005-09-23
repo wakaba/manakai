@@ -1,0 +1,643 @@
+Module:
+  @QName: MDOM|SimpleLS
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/sls#
+
+  @enFN: Simple Load and Save Module
+
+  @enDesc:
+    The <Module::MDOM|SimpleLS> module provides a simplified
+    XML and HTML 5 parsers and serializers, which are 
+    available to applications via <Module::MDOM|GenericLS>
+    factory methods.
+
+  @DISCore:author: DISCore|Wakaba
+  @License: license|Perl+MPL
+  @Date:
+    @@@:
+      $Date: 2005/09/23 18:24:57 $
+    @@ContentType: dis|Date.RCS
+
+  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
+
+  @Require:
+    @@Module:
+      @@@QName: MDOM|GenericLS
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName: MDOM|SimpleLS
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+
+Namespace:
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @DOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @DOMMain:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @DOMMetaImpl:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
+  @f:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @infoset:
+     http://www.w3.org/2001/04/infoset#
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @kwd:
+    http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @ManakaiDOMLS2003:
+    http://suika.fam.cx/~wakaba/archive/2004/9/27/mdom-old-ls#
+  @MDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
+  @null:
+    http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @TreeCore: \
+  @undef:
+    http://suika.fam.cx/~wakaba/-temp/2003/09/27/undef
+  @xml:
+    http://www.w3.org/XML/1998/namespace
+  @xmlns:
+    http://www.w3.org/2000/xmlns/
+
+ElementTypeBinding:
+  @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: FeatureDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DOMFeature|Feature
+    @@For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: FeatureVerDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DOMFeature|Feature
+
+ElementTypeBinding:
+  @Name: featureQName
+  @ElementType:
+    f:name
+  @ShadowContent:
+    @@ContentType: DISCore|QName
+
+ElementTypeBinding:
+  @Name: IFQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: IFISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: IFClsXDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+    @@For: ManakaiDOM|ManakaiDOMLatest
+    @@For: =ManakaiDOM|ManakaiDOM
+
+    @@rdf:type:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+    @@DOMMain:implementFeature:
+      @@@@: DOMLS|LSExtendedFeature30
+      @@@For: ManakaiDOM|ManakaiDOMLatest
+
+ElementTypeBinding:
+  @Name: IFDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Interface
+    @@For: =ManakaiDOM|ManakaiDOM
+    @@For: ManakaiDOM|ManakaiDOMLatest
+
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: IntMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
+    @@ManakaiDOM:isForInternal: 1
+
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|MethodParameter
+
+ElementTypeBinding:
+  @Name: RaiseException
+  @ElementType:
+    ManakaiDOM:raises
+
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|MethodReturn
+
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|AttributeGet
+
+ElementTypeBinding:
+  @Name: Set
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|AttributeSet
+
+ElementTypeBinding:
+  @Name: InCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: enFN
+  @ElementType:
+    dis:FullName
+  @ShadowContent:
+    @@lang:en
+
+## -- Parsers
+
+
+
+## -- Serializers
+
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdf:Property
+
+FeatureDef:
+  @QName: DOMLS|SerializeDocumentInstance
+  @FeatureVerDef:
+    @@QName: DOMLS|SerializeDocumentInstance10
+    @@Version: 1.0
+    @@DOMMetaImpl:instanceFeatureOf: DOMLS|SerializeDocumentInstance
+    @@DOMMain:requireFeature: DOMXML|XMLVersionFeature10
+    @@enDesc:
+      {P:: To support this feature:
+         \
+         - the serializer class <kwd:MUST> implement the
+           <IF::DOMLS|SimpleXMLSerializer>
+           interface, i.e. it <kwd:MUST> have a 
+           <M::DOMLS|SimpleXMLSerializer.writeToString> method.
+         \
+         - the <M::DOMLS|SimpleXMLSerializer.writeToString>
+           method <kwd:MUST> accept a <IF::DOMCore:Document>
+           node as its <P::nodeArg> parameter.  It <kwd:MAY>
+           also accept other type of nodes as the parameter.
+         \
+         - the serialization <kwd:MUST> support the result
+           being exact one parsed entity, i.e. a document entity without
+           any external parsed entity reference. 
+         \
+         - the serializer <kwd:MUST> support the serialization
+           of <IF::DOMCore:Element> nodes, <IF::DOMCore:Attr>
+           nodes which support XML Namespaces and which are not
+           namespace declaration attributes, and <IF::DOMCore:Text> nodes.
+         \
+         - the serializer <kwd:MUST> support the serialization
+           of <IF::DOMXML:CDATASection> nodes, but it does not have
+           to result in XML <XML::CDATA> sections.  In other word, 
+           the serializer <kwd:MAY> serialize a <IF::DOMXML:CDATASection>
+           as a sequence of characters and/or character references.
+         \
+         - the serializer <kwd:MAY> ignore <IF::DOMXML:EntityReference>
+           nodes and serialize their children if the <IF::DOMXML:EntityReference>
+           nodes are expanded.  Otherwise, it <kwd:MUST> 
+           serialize them as (unexpanded) general entity references. 
+           If the serializer supports the serialization of 
+           document type declarations, it <kwd:MAY> generate
+           general entity declarations.
+         \
+         - the serialization <kwd:MAY> serialize 
+           or ignore <IF::DOMCore:Comment>, <IF::DOMXML:ProcessingInstruction>,
+           <IF::DOMXML:DocumentType>, <IF::DOMXML:Entity> and
+           <IF::DOMXML:Notation> nodes.
+         \
+         - if the <A::DOMCore:Document.xmlVersion> has a non-<DOM::null>
+           value and it is different from <XML::1.0>, then
+           the serializer <kwd:MUST> output an XML declaration.
+         \
+         - if the serializer does not support the XML version
+           as specified by the <A::DOMCore:Document.xmlVersion>,
+           then the serializer <kwd:MAY> report an exception
+           or error.
+         \
+         - the serializer <kwd:SHOULD> try to ensure
+           the result is namespace well-formed.  It <kwd:MAY>
+           omit strict error checking.  For example, the serializer
+           don't have to test whether an element type name
+           is a legal XML <CODE::Name>.
+         \
+       }
+
+IFClsXDef:
+  @IFQName: DOMLS|SimpleXMLSerializer
+  @ClsQName: DOMLS|ManakaiDOMSimpleXMLSerializer
+
+  @ClsISA: ManakaiDOM|ManakaiDOMObject
+
+  @enDesc:
+    A simple XML serializer that only (or at least) supports
+    document instance constructions such as elements and attributes.
+
+  @DISLang:role: DOMLS|SerializerRole
+
+  @DOMMain:implementFeature: DOMLS|SerializeDocumentInstance10
+
+  @Method:
+    @@Operator:
+      @@@@:DISPerl|NewMethod
+      @@@ContentType: DISCore|QName
+    @@Return:
+      @@@Type: DOMLS|ManakaiDOMSimpleXMLSerializer
+      @@@enDesc: Newly created serializer.
+      @@@PerlDef:
+        $r = <ClassName::DOMLS|ManakaiDOMSimpleXMLSerializer>;
+
+  @Method:
+    @@Name: writeToString
+    @@enDesc:
+      Serializes a document as an XML document entity.
+    @@Param:
+      @@@Name: nodeArg
+      @@@Type: DOMCore|Node
+      @@@actualType:  DOMCore|ManakaiDOMDocument
+      @@@enDesc:
+        The document node to serialize.
+    @@Return:
+      @@@Type: DOMMain|DOMString
+      @@@enDesc:
+        An XML document entity string created from <P::nodeArg>.
+        \
+        {NOTE:: This string might not namespace well-formed
+                (or even well-formed) if the original <P::nodeArg>
+                contains ill-formed information property,
+                e.g. illegal element type name.
+        \
+        }
+      @@@PerlDef:
+        my @src = ($nodeArg->{<Q::TreeCore:node>});
+        my $nsbind = [{'' => '', xml => <Q::xml:>, xmlns => <Q::undef:>}];
+        my $xescape = sub ($) {
+          my $s = shift;
+          $s =~ s/&/&amp;/g;
+          $s =~ s/</&lt;/g;
+          $s =~ s/>/&gt;/g;
+          $s =~ s/"/&quot;/g;
+          return $s;
+        };
+        while (my $src = shift @src) {
+          if (ref $src eq 'ARRAY') {
+            pop @$nsbind;  ## End tag
+          } elsif (ref $src) {
+            if ($src->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
+              my @csrc;
+              my $etag;
+              push @$nsbind, my $ns = {%{$nsbind->[-1]}};
+              my %attrr;
+
+              ## Non-namespace attributes
+              for my $ao (values %{$src->{<Q::infoset:attributes>}
+                                       ->{<Q::ManakaiDOM:noNS>}||{}}) {
+                $attrr{$ao->{<Q::DOMCore:name>}}
+                      = [@{$ao->{<Q::infoset:children>}}];
+              }
+
+              ## Namespace attributes
+              for my $xmlnso (values %{$src->{<Q::infoset:attributes>}
+                                           ->{<Q::xmlns:>}||{}}) {
+                my $xmlns;
+                __CODE{ManakaiNode:getWeakReference||ManakaiDOM:Perl::
+                  $object => $xmlnso, $ref => $xmlns,
+                  $class => {<ClassName::DOMCore:ManakaiDOMAttr>},
+                }__;
+                my $nsuri = $xmlns-><AG::DOMCore:Attr.value>;
+                if ($xmlnso->{<Q::infoset:localName>} eq 'xmlns') {
+                  $ns->{''} = $nsuri;
+                  $attrr{'xmlns'} = [@{$xmlnso->{<Q::infoset:children>}}];
+                } else {
+                  if (length $nsuri) {
+                    $ns->{$xmlnso->{<Q::infoset:localName>}} = $nsuri;
+                  } else {
+                    $ns->{$xmlnso->{<Q::infoset:localName>}} = <Q::undef:>;
+                  }
+                  $attrr{'xmlns:'.$xmlnso->{<Q::infoset:localName>}}
+                                  = [@{$xmlnso->{<Q::infoset:children>}}];
+                }
+              }
+
+              ## Per-element partition attributes
+              for my $ano (values %{$src->{<Q::infoset:attributes>}
+                                        ->{<Q::null:>}||{}}) {
+                $attrr{$ano->{<Q::infoset:localName>}}
+                                  = [@{$ano->{<Q::infoset:children>}}];
+              }
+
+              ## Global partition attributes
+              for my $ans (keys %{$src->{<Q::infoset:attributes>}}) {
+                next if $ans eq <Q::xmlns:>;
+                next if $ans eq <Q::null:>;
+                next if $ans eq <Q::ManakaiDOM:noNS>;
+                my $defpfx;
+                my $ansao = [];
+                for my $ao (values %{$src->{<Q::infoset:attributes>}
+                                         ->{$ans}||{}}) {
+                  my $pfx;
+                  PFX: {
+                    if (defined $ao->{<Q::infoset:prefix>}) {
+                      if (defined $ns->{$ao->{<Q::infoset:prefix>}}) {
+                        if ($ns->{$ao->{<Q::infoset:prefix>}} eq $ans) {
+                          ## Namespace already defined
+                          $defpfx ||= $pfx = $ao->{<Q::infoset:prefix>};
+                          last PFX;
+                        }
+                      } else {
+                        ## Namespace prefix not defined yet
+                        $defpfx ||= $pfx = $ao->{<Q::infoset:prefix>};
+                        $ns->{$pfx} = $ans;
+                        $attrr{'xmlns:'.$pfx} = [$xescape->($ans)];
+                        last PFX;
+                      }
+                    }
+                    if (defined $defpfx) {
+                      $pfx = $defpfx;
+                      last PFX;
+                    }
+                  } # PFX
+                  push @$ansao, [$pfx, $ao];
+                }
+                next unless @$ansao;  ## No attribute in this namespace.
+
+                PFX: {
+                  last PFX if defined $defpfx;
+
+                  ## No prefix available from attribute nodes
+
+                  ## Available from already defined namespaces?
+                  for my $pfx (keys %$ns) {
+                    next unless $ns->{$pfx} eq $ans;
+                    if (length $pfx) {
+                      $defpfx = $pfx;
+                      last;
+                    }
+                  }
+                  last PFX if defined $defpfx;
+
+                  ## Available from element itself?
+                  if (defined $src->{<Q::infoset:namespaceName>} and
+                      $src->{<Q::infoset:namespaceName>} eq $ans and
+                      defined $src->{<Q::infoset:prefix>}) {
+                    if (defined $ns->{$src->{<Q::infoset:prefix>}}) {
+                      if ($ns->{$src->{<Q::infoset:prefix>}} eq $ans) {
+                        ## Namespace already defined
+                        $defpfx = $src->{<Q::infoset:prefix>};
+                        last PFX;
+                      }
+                    } else {
+                      ## Namespace not defined yet
+                      $defpfx = $src->{<Q::infoset:prefix>};
+                      $ns->{$defpfx} = $ans;
+                      $attrr{'xmlns:'.$defpfx} = [$xescape->($ans)];
+                      last PFX;
+                    }
+                  }
+
+                  ## Prefix is not defined anywhere
+                  my $i = 1;
+                  $i++ while (exists $ns->{'ns'.$i});
+                  $ns->{$defpfx = 'ns'.$i} = $ans;
+                  $attrr{'xmlns:ns'.$i} = [$xescape->($ans)];
+                } # PFX
+
+                for my $ansno (@$ansao) {
+                  $attrr{($ansno->[0] || $defpfx) . ':' .
+                         $ansno->[1]->{<Q::infoset:localName>}}
+                     = [@{$ansno->[1]->{<Q::infoset:children>}}];
+                }
+              }
+
+              ## Element type name
+              if (defined $src->{<Q::infoset:localName>}) {
+                if (defined $src->{<Q::infoset:namespaceName>}) {
+                  if (defined $src->{<Q::infoset:prefix>} and
+                      defined $ns->{$src->{<Q::infoset:prefix>}} and
+                      $ns->{$src->{<Q::infoset:prefix>}}
+                         eq $src->{<Q::infoset:namespaceName>}) {
+                    ## Non-NULL namespace and prefix is defined
+                    $r .= '<' . $src->{<Q::infoset:prefix>} . ':'
+                       .  $src->{<Q::infoset:localName>};
+                    $etag = '</' . $src->{<Q::infoset:prefix>} . ':'
+                       .  $src->{<Q::infoset:localName>} . '>';
+                  } elsif (defined $src->{<Q::infoset:prefix>} and
+                           not defined $ns->{$src->{<Q::infoset:prefix>}}) {
+                    $attrr{'xmlns:'.$src->{<Q::infoset:prefix>}}
+                      = [$xescape->($src->{<Q::infoset:namespaceName>})];
+                    $ns->{$src->{<Q::infoset:prefix>}}
+                      = $src->{<Q::infoset:namespaceName>};
+                    $r .= '<' . $src->{<Q::infoset:prefix>} . ':'
+                       .  $src->{<Q::infoset:localName>};
+                    $etag = '</' . $src->{<Q::infoset:prefix>} . ':'
+                       .  $src->{<Q::infoset:localName>} . '>';
+                  } else {
+                    PFX: {
+                      ## Non-NULL namespace and prefix is not defined
+                      ## but already declared as namespace attribute
+                      for my $pfx (keys %$ns) {
+                        next unless $ns->{$pfx}
+                                      eq $src->{<Q::infoset:namespaceName>};
+                        if (length $pfx) {
+                          $r .= '<' . $pfx . ':'
+                             .  $src->{<Q::infoset:localName>};
+                          $etag = '</' . $pfx . ':'
+                                .  $src->{<Q::infoset:localName>} . '>';
+                        } else {
+                          $r .= '<' . $src->{<Q::infoset:localName>};
+                          $etag = '</' . $src->{<Q::infoset:localName>} . '>';
+                        }
+                        last PFX;
+                      }
+
+                      ## Non-NULL namespace and prefix is not defined anywhere
+                      my $i = 1;
+                      $i++ while (exists $ns->{'ns'.$i});
+                      $ns->{'ns'.$i} = $src->{<Q::infoset:namespaceName>};
+                      $attrr{'xmlns:ns'.$i} = [$xescape->($ns->{'ns'.$i})];
+                      $r .= '<'.'ns' . $i . ':' . $src->{<Q::infoset:localName>};
+                      $etag = '</ns'.$i.':'.$src->{<Q::infoset:localName>} . '>';
+                    }
+                  }
+                } else {
+                  ## Null-namespace
+                  unless ($ns->{''} eq '') {
+                    ## Default namespace is not the NULL-namespace
+                    $ns->{''} = '';
+                    $attrr{'xmlns'} = [''];
+                  }
+                  $r .= '<' . $src->{<Q::infoset:localName>};
+                  $etag = '</' . $src->{<Q::infoset:localName>} . '>';
+                }
+              } else {
+                ## Non-namespace node
+                $r .= '<' . $src->{<Q::DOMCore:name>};
+                $etag = '</' . $src->{<Q::DOMCore:name>} . '>';
+              }
+              
+              ## Attribute specifications
+              for my $an (sort keys %attrr) {
+                push @csrc, ' ' . $an . '="', @{$attrr{$an}}, '"';
+              }
+
+              ## Children
+              if (@{$src->{<Q::infoset:children>}}) {
+                push @csrc, '>', @{$src->{<Q::infoset:children>}}, $etag, [];
+              } elsif ($src->{<Q::ManakaiDOMLS2003:use_EmptyElemTag>}) {
+                push @csrc, ' />';
+                shift @$nsbind;
+              } else {
+                push @csrc, '>' . $etag, [];
+              }
+              unshift @src, @csrc;
+            } elsif ($src->{<Q::DOMCore:nodeType>} eq <Q::DOMCore:Text>) {
+              $r .= $xescape->($src->{<Q::infoset:content>});
+            } elsif ($src->{<Q::DOMCore:nodeType>} eq <Q::DOMXML:CDATASection>) {
+              my $text = $src->{<Q::infoset:content>};
+              $text =~ s/]]>/]]]]>&gt;<![CDATA[/g;
+              $r .= '<![CDATA[' . $text . ']]>';
+            } elsif ($src->{<Q::DOMCore:nodeType>}
+                        eq <Q::DOMXML:EntityReference>) {
+              if ($src->{<Q::ManakaiDOM:isExpanded>}) {
+                push @src, @{$src->{<Q::infoset:children>}};
+              } else {
+                $r .= '&' . $src->{<Q::DOMCore:name>} . ';';
+              }
+            } elsif ($src->{<Q::DOMCore:nodeType>}
+                        eq <Q::infoset:ProcessingInstruction>) {
+              $r .= '<?' . $src->{<Q::infoset:target>};
+              if (defined $src->{<Q::infoset:content>} and
+                  length $src->{<Q::infoset:content>}) {
+                my $data = $src->{<Q::infoset:content>};
+                $data =~ s/\?>/?&gt;/g;
+                $r .= ' ' . $data;
+              }
+              $r .= '?>';
+            } elsif ($src->{<Q::DOMCore:nodeType>} eq <Q::infoset:Comment>) {
+              my $data = $src->{<Q::infoset:content>};
+              $data =~ s/--/- - /g;
+              $r .= '<!--' . $data . '-->';
+            } elsif ($src->{<Q::DOMCore:nodeType>} eq <Q::infoset:Document>) {
+              unshift @src, map {$_, "\x0A"} @{$src->{<Q::infoset:children>}};
+            }
+          } else {
+            $r .= $src;
+          }
+        }
+##SimpleXMLSerializer
+
+PropDef:
+  @QName:
+    ManakaiDOMLS2003:use_EmptyElemTag
+  @enDesc:
+    Whether the <CODE::EmptyElemTag> syntax should be used
+    if the content of an element is empty or not.
+  @Type:
+    DOMMain:boolean::ManakaiDOM:all

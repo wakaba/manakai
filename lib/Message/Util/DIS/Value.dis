@@ -20,7 +20,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/20 12:21:51 $
+      $Date: 2005/09/23 18:25:09 $
     @@ContentType:
       dis:Date.RCS
   
@@ -129,26 +129,22 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DOMMain:DOMFeature
-    @@ForCheck:
-      ManakaiDOM:all
+    @@rdf:type: DOMFeature|Feature
+    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: FeatureVerDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DOMMain:DOMFeature
+    @@rdf:type: DOMFeature|Feature
 
 ElementTypeBinding:
   @Name: featureQName
   @ElementType:
-    dis:AppName
+    DOMFeature:name
   @ShadowContent:
-    @@ContentType:
-      dis:TypeQName
+    @@ContentType: DISCore|QName
 
 FeatureDef:
   @QName: DIS|Value
@@ -194,6 +190,8 @@ ElementTypeBinding:
 
     @@DOMMain:implementFeature: DIS|Value10
 
+    @@ForCheck: DIS|ForEmpty
+
 ElementTypeBinding:
   @Name: IFDef
   @ElementType:
@@ -209,6 +207,8 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ForIF
 
     @@DOMMain:implementFeature: DIS|Value10
+
+    @@ForCheck: DIS|ForEmpty
 
 ElementTypeBinding:
   @Name: ClsDef
@@ -260,6 +260,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
+    @@For: !=DIS|ForEmpty
 
 ElementTypeBinding:
   @Name: Return
@@ -275,13 +276,13 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: DISLang|MethodParameter
 
-
 ElementTypeBinding:
   @Name: Attr
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
+    @@For: !=DIS|ForEmpty
 
 ElementTypeBinding:
   @Name: Get
@@ -525,11 +526,32 @@ ElementTypeBinding:
 
 ## -- Any Value
 
+RoleDef:
+  @QName: ValueRole
+  @enDesc:
+    A class implementing the <Q::ValueRole> is compatible with
+    the <Class::ManakaiDVValue> class.
+
+ElementTypeBinding:
+  @Name: RoleDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Role
+    @@ForCheck:
+      =ManakaiDOM:all
+
 IFClsDef:
   @IFQName: DVValue
   @ClsQName: ManakaiDVValue
 
   @ClsISA: dp|ManakaiDVValuePerl
+
+  @Implement:
+    DOMFeature|GetFeature||ManakaiDOM|ManakaiDOMLatest
+  @ClsISA:
+    DOMFeature|ManakaiHasFeatureByGetFeature||ManakaiDOM|ManakaiDOMLatest
 
   @ClsISA:
     dx:ManakaiDefaultExceptionHandler::ManakaiDOM:Perl
@@ -816,6 +838,54 @@ IFClsDef:
       @@@PerlDef: $r = $$self->{nodePath};
     @@Set:
       @@@PerlDef: $$self->{nodePath} = $given;
+
+  @Method:
+    @@ForCheck: ManakaiDOM|ForClass
+     @@Name:  getFeature
+     @@Description:
+        @@@lang:en
+        @@@@:
+          Returns a specialized object that implements the specialized 
+          interfaces of the specified feature and version.
+     @@Param:
+        @@@Name:  feature
+        @@@Type: DISString
+        @@@actualType: DOMFeature|FeatureNameString||ManakaiDOM|ManakaiDOMLatest
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A feature name to request.
+     @@Param:
+        @@@Name:  version
+        @@@Type: DISString
+        @@@actualType:
+          DOMFeature|FeatureVersionString||ManakaiDOM|ManakaiDOMLatest
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A feature version number to request.
+     @@Return:
+        @@@Type: 
+          DOMMain:Object::ManakaiDOM:all
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An object that implements the specialized APIs of the 
+            <P::feature> and <P::version>. 
+        @@@nullCase:
+          @@@@enDesc: 
+            There is no object available that implements interfaces 
+            associated with the <P::feature> and <P::version>. 
+        @@@PerlDef:
+          $feature =~ s/^\+//;
+          CLASS: for my $class (grep {
+            $Message::Util::DIS::Value::ManakaiDVValue::CompatClass{$_}
+          } keys %Message::Util::DIS::Value::ManakaiDVValue::CompatClass) {
+            if ($Message::DOM::ClassFeature{$class}->{$feature}->{$version}) {
+              $r = bless {o => $self}, $class;
+              last CLASS;
+            }
+          }
 ##DVValue
 
 ElementTypeBinding:

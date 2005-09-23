@@ -37,14 +37,12 @@ Module:
             implement some or all of these interfaces in fact.
     }
 
-  @Author:
-    @@FullName:Wakaba
-    @@Mail:w@suika.fam.cx
+  @DISCore:author: DISCore|Wakaba
   @License:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/19 16:17:51 $
+      $Date: 2005/09/23 18:24:56 $
     @@ContentType:
       dis:Date.RCS
 
@@ -64,6 +62,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @DOMMetaImpl:
     http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
+  @f:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @infoset:
      http://www.w3.org/2001/04/infoset#
   @kwd:
@@ -190,6 +190,8 @@ ElementTypeBinding:
   @Name: Warning
   @ElementType:
     ManakaiDOM:alwaysWarns
+  @ShadowContent:
+    @@ForCheck: !ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: Return
@@ -280,8 +282,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DOMMain:DOMFeature
+    @@rdf:type: f|Feature
     @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
@@ -289,23 +290,21 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DOMMain:DOMFeature
+    @@rdf:type: f|Feature
 
 ElementTypeBinding:
   @Name: featureName
   @ElementType:
-    dis:AppName
+    f:name
   @ShadowContent:
     @@ContentType: DISCore|String
 
 ElementTypeBinding:
   @Name: featureQName
   @ElementType:
-    dis:AppName
+    f:name
   @ShadowContent:
-    @@ContentType:
-      dis:TypeQName
+    @@ContentType: DISCore|QName
 
 FeatureDef:
   @featureName: XML

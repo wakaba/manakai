@@ -15,14 +15,12 @@ Module:
       error reporting system build on the top of the 
       <PerlModule::Message::Util::Error>. 
 
-  @Author:
-    @@FullName: Wakaba
-    @@Mail: w@suika.fam.cx
+  @DISCore:author: DISCore|Wakaba
   @License:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/20 12:21:51 $
+      $Date: 2005/09/23 18:25:09 $
     @@ContentType:
       dis:Date.RCS
   
@@ -229,6 +227,8 @@ PropDef:
     @@lang:en
     @@@:
       An exception the method or attribute might raise.
+  @multipleProperties: DISCore|OrderedList
+  @dataType: dx|XCRef
 
 ResourceDef:
   @QName: ManakaiDOM|raises
@@ -247,6 +247,8 @@ PropDef:
               reported.
       \
       }
+  @multipleProperties: DISCore|OrderedList
+  @dataType: dx|XCRef
 
 ElementTypeBinding:
   @Name: PropDef

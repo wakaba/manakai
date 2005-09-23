@@ -1,3 +1,13 @@
+2005-09-23  Wakaba  <wakaba@suika.fam.cx>
+
+	* DIS.dis (DISParser.new): New method.
+	(hasFeature): Removed.  ManakaiDISAnyResource now
+	extends DOMFeature:ManakaiHasFeatureByGetFeature.
+	(readProperties): Support for property value data
+	types DISLang:MemberRef and dx:XCRef added.
+	(ManakaiDISExceptionTarget): It is now an alias
+	for dx:ManakaiDefaultExceptionHandler.
+
 2005-09-22  Wakaba  <wakaba@suika.fam.cx>
 
 	* Makefile: DAC_SUFFIX changed to ".dad".

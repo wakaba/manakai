@@ -34,6 +34,7 @@ use Pod::Usage;
 my %Opt = ();
 GetOptions (
   'db-base-directory-path=s' => \$Opt{db_base_path},
+  'debug' => \$Opt{debug},
   'for=s' => \$Opt{For},
   'help' => \$Opt{help},
   'input-db-file-name=s' => \$Opt{input_file_name},
@@ -84,16 +85,17 @@ pod2usage ({-exitval => 2, -verbose => 0}) unless $Opt{file_name};
 pod2usage ({-exitval => 2, -verbose => 0}) unless $Opt{output_file_name};
 $Opt{no_undef_check} = defined $Opt{no_undef_check}
                          ? $Opt{no_undef_check} ? 0 : 1 : 0;
+$Message::DOM::DOMFeature::DEBUG = 1 if $Opt{debug};
 
 my $start_time;
 BEGIN { $start_time = time }
 
 use Message::Util::DIS::DNLite;
 
-my $impl = $Message::DOM::ImplementationRegistry->get_implementation
+my $limpl = $Message::DOM::ImplementationRegistry->get_implementation
                            ({ExpandedURI q<ManakaiDOM:Minimum> => '3.0',
-                             '+' . ExpandedURI q<DIS:DNLite> => '1.0'})
-                 ->get_feature (ExpandedURI q<DIS:Core> => '1.0');
+                             '+' . ExpandedURI q<DIS:DNLite> => '1.0'});
+my $impl = $limpl->get_feature (ExpandedURI q<DIS:Core> => '1.0');
 my $parser = $impl->create_dis_parser;
 our $DNi = $impl->get_feature (ExpandedURI q<DIS:DNLite> => '1.0');
 
@@ -113,13 +115,13 @@ my $doc = dac_load_module_file ($db, $parser, $file_name, $base_path);
 my $for = $Opt{For};
 $for = $doc->module_element->default_for_uri unless length $for;
 $db->get_for ($for)->is_referred ($doc);
-status_msg qq<Loading definition of "$file_name" for <$for>...>;
+status_msg qq<Loading module in file "$file_name" for <$for>...>;
 
 my $ResourceCount = 0;
 $db->load_module ($doc, sub ($$$$$$) {
   my ($self, $db, $uri, $ns, $ln, $for) = @_;
   status_msg '';
-  status_msg qq<Loading definition of "$ln" for <$for>...>;
+  status_msg qq<Loading module "$ln" for <$for>...>;
   $ResourceCount = 0;
 
   ## -- Already in database
@@ -190,7 +192,7 @@ undef $DNi;
 {
   use integer;
   my $time = time - $start_time;
-  status_msg sprintf qq<%d'%d''>, $time / 60, $time % 60;
+  status_msg sprintf qq<%d'%02d''>, $time / 60, $time % 60;
 }
 exit;
 
@@ -225,11 +227,12 @@ sub dac_load_module_file ($$$;$) {
       }
     }
 
+    my $old_dis = $dis;
     status_msg_ qq<...>;
     $dis = $DNi->convert_dis_document_to_dnl_document
-      ($dis, database_arg => $db);
+      ($old_dis, database_arg => $db);
     push @Document, $dis;
-    $dis->free;
+    $old_dis->free;
 
     $db->set_source_file ($file_uri => $dis);
     status_msg qq<done>;

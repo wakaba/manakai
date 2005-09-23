@@ -7033,11 +7033,15 @@ local $Error::Depth = $Error::Depth + 1;
 
 #line 6 "/document (lib/Message/Markup/SuikaWikiConfig21.dis)/IFClsDef[@QName=SWCFGElement][@QName=ManakaiSWCFGElement][@rdf:type=dis|MultipleResource][@rdf:type=ManakaiDOM|IF][@rdf:type=ManakaiDOM|Class]/ResourceDef[@QName=expandNamespace][@rdf:type=dis2pm:BlockCode]/PerlDef [u] (Chunk #2545)"
 
+
+
       $__node->{
 #line 1 "lib/Message/Markup/SuikaWikiConfig21.dis [/u] (Chunk #2546)"
 'http://suika.fam.cx/~wakaba/archive/2005/swcfg21#namespaceURI'
 #line 7 "/document (lib/Message/Markup/SuikaWikiConfig21.dis)/IFClsDef[@QName=SWCFGElement][@QName=ManakaiSWCFGElement][@rdf:type=dis|MultipleResource][@rdf:type=ManakaiDOM|IF][@rdf:type=ManakaiDOM|Class]/ResourceDef[@QName=expandNamespace][@rdf:type=dis2pm:BlockCode]/PerlDef [u] (Chunk #2547)"
 }
+
+
            = $self->
 #line 1 "lib/Message/Markup/SuikaWikiConfig21.dis [/u] (Chunk #2548)"
 lookup_namespace_uri
@@ -7053,6 +7057,8 @@ lookup_namespace_uri
 1
 #line 10 "/document (lib/Message/Markup/SuikaWikiConfig21.dis)/IFClsDef[@QName=SWCFGElement][@QName=ManakaiSWCFGElement][@rdf:type=dis|MultipleResource][@rdf:type=ManakaiDOM|IF][@rdf:type=ManakaiDOM|Class]/ResourceDef[@QName=expandNamespace][@rdf:type=dis2pm:BlockCode]/PerlDef [u] (Chunk #2553)"
 );
+
+
     
 #line 1 "lib/Message/Markup/SuikaWikiConfig21.dis [/u] (Chunk #2554)"
 
@@ -12037,6 +12043,8 @@ $Message::DOM::ClassPoint{q<Message::Markup::SuikaWikiConfig21::ManakaiSWCFGDocu
 package Message::Markup::SuikaWikiConfig21::ManakaiSWCFGChildNodeList;
 our $VERSION = 20050922.1237;
 push our @ISA, 'Message::Util::ManakaiNode::ManakaiNodeRef', 'Tie::Array', 'Message::Markup::IF::SWCFGChildNodeList', 'Message::Markup::IFLatest::SWCFGChildNodeList';
+
+
 sub length ($;$) {
 if (@_ == 1) {
 #line 1 "lib/Message/Markup/SuikaWikiConfig21.dis [bc] (Chunk #4653)"
@@ -13092,6 +13100,7 @@ _get_node_reference
 
 #line 1 "lib/Message/Markup/SuikaWikiConfig21.dis [/b] (Chunk #4860)"
 }
+
 $r}
 sub DESTROY ($) {
 my ($self) = @_;
@@ -13151,6 +13160,8 @@ sub TIEARRAY ($$) {
 my ($self, $nodeList) = @_;
 my $r;
 
+
+
 {
 #line 1 "/document (lib/Message/Markup/SuikaWikiConfig21.dis)/IFClsDef[@QName=SWCFGChildNodeList][@QName=ManakaiSWCFGChildNodeList][@rdf:type=dis|MultipleResource][@rdf:type=ManakaiDOM|IF][@rdf:type=ManakaiDOM|Class]/IntMethod[@rdf:type=DISLang:Method]/Return[@Type=SWCFGChildNodeList][@rdf:type=DISLang:MethodReturn]/PerlDef [b] (Chunk #4883)"
 
@@ -13164,6 +13175,8 @@ $r = $nodeList;
 
 #line 1 "lib/Message/Markup/SuikaWikiConfig21.dis [/b] (Chunk #4884)"
 }
+
+
 $r}
 use overload bool => sub () {1}, '@{}' => sub ($) {
 my ($self) = @_;
@@ -13183,6 +13196,7 @@ $r = \@list;
 
 #line 1 "lib/Message/Markup/SuikaWikiConfig21.dis [/b] (Chunk #4890)"
 }
+
 $r}
 , fallback => 1;
 $Message::DOM::ClassFeature{q<Message::Markup::SuikaWikiConfig21::ManakaiSWCFGChildNodeList>} = {'http://suika.fam.cx/~wakaba/archive/2005/swcfg21#core', {'', '1', '2.1', '1'}};
@@ -14235,10 +14249,10 @@ $r = bless {
 #line 1 "lib/Message/Markup/SuikaWikiConfig21.dis [/u] (Chunk #5222)"
 'http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#implementation'
 #line 1 "/document (lib/Message/Markup/SuikaWikiConfig21.dis)/IFClsDef[@QName=SWCFGParser][@QName=ManakaiSWCFGParser][@rdf:type=dis|MultipleResource][@rdf:type=ManakaiDOM|IF][@rdf:type=ManakaiDOM|Class]/IntMethod[@rdf:type=DISLang:Method]/Return[@Type=DOMMain|Object||ManakaiDOM|all][@rdf:type=DISLang:MethodReturn]/PerlDef [u] (Chunk #5223)"
- => $impl},
+ => $impl->get_feature ('http://suika.fam.cx/~wakaba/archive/2005/swcfg21#core'=>'2.1')},
            
 #line 1 "lib/Message/Markup/SuikaWikiConfig21.dis [/u] (Chunk #5224)"
-'Message::Markup::SuikaWikiConfig21::ManakaiSWCFGParser'
+$self
 #line 2 "/document (lib/Message/Markup/SuikaWikiConfig21.dis)/IFClsDef[@QName=SWCFGParser][@QName=ManakaiSWCFGParser][@rdf:type=dis|MultipleResource][@rdf:type=ManakaiDOM|IF][@rdf:type=ManakaiDOM|Class]/IntMethod[@rdf:type=DISLang:Method]/Return[@Type=DOMMain|Object||ManakaiDOM|all][@rdf:type=DISLang:MethodReturn]/PerlDef [u] (Chunk #5225)"
 ;
 #line 1 "lib/Message/Markup/SuikaWikiConfig21.dis [/u] (Chunk #5226)"

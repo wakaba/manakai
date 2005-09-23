@@ -29,7 +29,7 @@ Module:
         @@@@Mail:w@suika.fam.cx
   @Date:
     @@@:
-      $Date: 2005/09/22 11:02:33 $
+      $Date: 2005/09/23 18:25:05 $
     @@ContentType:
       dis:Date.RCS
   
@@ -105,8 +105,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DOMMain:DOMFeature
+    @@rdf:type: DOMFeature|Feature
     @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
@@ -114,16 +113,14 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DOMMain:DOMFeature
+    @@rdf:type: DOMFeature|Feature
 
 ElementTypeBinding:
   @Name: featureQName
   @ElementType:
-    dis:AppName
+    DOMFeature:name
   @ShadowContent:
-    @@ContentType:
-      dis:TypeQName
+    @@ContentType: DISCore|QName
 
 FeatureDef:
   @QName: CoreFeature
@@ -4367,7 +4364,7 @@ ResourceDef:
 
     @@IFQName: PCExceptionCode
     @@ClsQName: ManakaiPerlCodeExceptionCode
-    @@PerlName: PCExceptionCode
+    @@plCName: PCExceptionCode
 
     @@enDesc:
       Exception codes for <IF::PCException>. 
@@ -4621,12 +4618,9 @@ ElementTypeBinding:
       DISLang:MethodParameter
 
 ElementTypeBinding:
-  @Name: PerlName
+  @Name: plCName
   @ElementType:
-    dis:AppName
-  @ShadowContent:
-    @@ContentType:
-      lang:Perl
+    DISPerl:exportTagName
 
 ElementTypeBinding:
   @Name: PerlDef

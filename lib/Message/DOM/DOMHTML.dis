@@ -10,7 +10,7 @@ Module:
         lang:IDL-DOM
      @@prefix:  dom.w3c.org
      @@For:
-       ManakaiDOM:IDL ManakaiDOM:DOM1
+       ManakaiDOM:IDL ManakaiDOM:DOM1 !ManakaiDOM|DOM2
   @AppName:
      @@@:  html2
      @@ContentType:
@@ -37,14 +37,12 @@ Module:
       Form related interfaces are provided by a separate
       module, <Module::MDOM:DOMWebForms>.
 
-  @Author:
-     @@FullName: Wakaba
-     @@Mail:  w@suika.fam.cx
+  @DISCore:author: DISCore|Wakaba
   @License:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/05 05:21:11 $
+      $Date: 2005/09/23 18:24:55 $
     @@ContentType:
       dis:Date.RCS
 
@@ -57,44 +55,33 @@ Module:
         DISlib:DISMarkup
       @@@WithFor:
         ManakaiDOM:all
-     @@Module:
-        @@@Name:  DOMXML
-        @@@WithFor:
-          ManakaiDOM:ManakaiDOMLatest
-     @@Module:
-        @@@Name:  DOMWebForms
     @@Module:
-      @@@Name: DOMHTML
-      @@@WithFor:
-        ManakaiDOM:ManakaiDOM
+      @@@QName: MDOM|DOMXML
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
-      @@@Name: DOMHTML
-      @@@WithFor:
-        ManakaiDOM:ManakaiDOM1
+      @@@QName: MDOM|DOMWebForms
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
-      @@@Name: DOMHTML
-      @@@WithFor:
-        ManakaiDOM:ManakaiDOM2
+      @@@QName: MDOM|DOMHTML
+      @@@WithFor: ManakaiDOM|ManakaiDOM
     @@Module:
-      @@@Name: DOMHTML
-      @@@WithFor:
-        ManakaiDOM:ManakaiDOMLatest
+      @@@QName: MDOM|DOMHTML
+      @@@WithFor: ManakaiDOM|ManakaiDOM1
     @@Module:
-      @@@Name: DOMHTML
-      @@@WithFor:
-        DOMHTML:ForHTML40SE
+      @@@QName: MDOM|DOMHTML
+      @@@WithFor: ManakaiDOM|ManakaiDOM2
     @@Module:
-      @@@Name: DOMHTML
-      @@@WithFor:
-        DOMHTML:ForHTML401
+      @@@QName: MDOM|DOMHTML
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
-      @@@Name: DOMHTML
-      @@@WithFor:
-        DOMHTML:ForXHTML10SE
+      @@@QName: MDOM|DOMHTML
+      @@@WithFor: DOMHTML|ForHTML40SE
     @@Module:
-      @@@Name: DOMHTML
-      @@@WithFor:
-        DOMHTML:ForHTML5
+      @@@QName: MDOM|DOMHTML
+      @@@WithFor: DOMHTML|ForHTML401
+    @@Module:
+      @@@QName: MDOM|DOMHTML
+      @@@WithFor: DOMHTML|ForXHTML10SE
 
 Namespace:
   @dis:
@@ -109,12 +96,18 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @DOMMetaImpl:
     http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
+  @f:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @html5:
+    http://www.w3.org/1999/xhtml
   @infoset:
-     http://www.w3.org/2001/04/infoset#
+    http://www.w3.org/2001/04/infoset#
+  @kwd:
+    http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
   @lang:
-     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
-     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
   @ManakaiDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @ManakaiDOMCore:
@@ -127,8 +120,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @null:
     http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
-  @Perl:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
@@ -175,10 +166,21 @@ ForDef:
       For non-XML-based HTML, any version
 
 ForDef:
+  @QName: DOMHTML|ForSGMLHTML
+  @ISA: DOMHTML|ForClassicHTML
+  @enFN: For SGML-based HTML, any version
+
+ElementTypeBinding:
+  @Name: enFN
+  @ElementType: 
+    dis:FullName
+  @ShadowContent:
+    @@lang:en
+
+ForDef:
   @QName:
     DOMHTML:ForHTML4
-  @ISA:
-    DOMHTML:ForHTML
+  @ISA: DOMHTML|ForSGMLHTML
   @FullName:
     @@lang:en
     @@@: For HTML 4
@@ -305,34 +307,29 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DOMMain:DOMFeature
-    @@ForCheck:
-      ManakaiDOM:all
+    @@rdf:type: f|Feature
+    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: FeatureVerDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DOMMain:DOMFeature
+    @@rdf:type: f|Feature
 
 ElementTypeBinding:
   @Name: featureName
   @ElementType:
-    dis:AppName
+    f:name
   @ShadowContent:
-    @@ContentType:
-      dis:String
+    @@ContentType: DISCore|String
 
 ElementTypeBinding:
   @Name: featureQName
   @ElementType:
-    dis:AppName
+    f:name
   @ShadowContent:
-    @@ContentType:
-      dis:TypeQName
+    @@ContentType: DISCore|QName
 
 FeatureDef:
   @featureName:  HTML
@@ -361,6 +358,9 @@ FeatureDef:
     @@FullName:
       @@@@: DOM Level 2 HTML
       @@@lang:en
+    @@enDesc:
+      Note that the <Feature::HTML> feature version <FeatureVer::2.0>
+      is <EM::incompatible> with <FeatureVer::1.0>.
     @@DOMMain:requireFeature:
       DOMCore:CoreFeature20
 
@@ -391,10 +391,8 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DataType
-    @@ForCheck:
-      ManakaiDOM:DOM
+    @@rdf:type: DISLang|AnyDataType
+    @@ForCheck: ManakaiDOM|DOM
 
 DataTypeAlias:
   @Name:  DOMString
@@ -476,8 +474,9 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: ManakaiDOM|DataType
+    @@rdf:type: DISLang|AnyDataType
     @@ForCheck: !ManakaiDOM|IDL
+    @@For: ManakaiDOM|DOM
 
 ReflectTypeDef:
   @QName: CDATADOMString
@@ -494,7 +493,7 @@ ReflectTypeDef:
       \
       If the element attribute is absent, the default value, if any,
       or the empty string is returned.
-    @@PerlDef:
+    @@PerlCDef:
       my $ao = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
                     ->{<Q::null:>}->{$LOCAL_NAME} ||
                $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
@@ -519,7 +518,7 @@ ReflectTypeDef:
       @@@lang:en
       @@@@: 
         What will happen if the <DOM::null> value is given?
-    @@PerlDef:
+    @@PerlCDef:
       my $ao = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
                     ->{<Q::null:>}->{$LOCAL_NAME} ||
                $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
@@ -561,7 +560,7 @@ ReflectTypeDef:
       \
       If the element attribute is absent, the default value, if any,
       or the empty string is returned.
-    @@PerlDef:
+    @@PerlCDef:
       my $ao = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
                     ->{<Q::null:>}->{$LOCAL_NAME} ||
                $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
@@ -585,7 +584,7 @@ ReflectTypeDef:
       @@@lang:en
       @@@@: 
         What will happen if the <DOM::null> value is given?
-    @@disDef:
+    @@disCDef:
       @@@DISPerl:cloneCode: CDATADOMStringSet
 
 ReflectTypeDef:
@@ -609,7 +608,7 @@ ReflectTypeDef:
         {TODO:: Resolving.
         \
         }
-    @@PerlDef:
+    @@PerlCDef:
       my $ao = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
                     ->{<Q::null:>}->{$LOCAL_NAME} ||
                $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
@@ -632,7 +631,7 @@ ReflectTypeDef:
       @@@lang:en
       @@@@: 
         What will happen if the <DOM::null> value is given?
-    @@disDef:
+    @@disCDef:
       @@@DISPerl:cloneCode: CDATADOMStringSet
       
 ReflectTypeDef:
@@ -647,7 +646,7 @@ ReflectTypeDef:
     @@enDesc:
       The DOM attribute returns <DOM::true> if the element attribute
       is set and <DOM::false> if it is absent.
-    @@PerlDef:
+    @@PerlCDef:
       my $ao = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
                     ->{<Q::null:>}->{$LOCAL_NAME} ||
                $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
@@ -659,7 +658,7 @@ ReflectTypeDef:
       The element attribute is removed if the DOM attribute
       is set to <DOM::false> and is set to have the same
       value as its local name if the DOM attribute is set to <DOM::true>.
-    @@PerlDef:
+    @@PerlCDef:
       my $ao = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
                     ->{<Q::null:>}->{$LOCAL_NAME} ||
                $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
@@ -716,7 +715,7 @@ ReflectTypeDef:
       fails or if the element attribute is absent, then
       the default value is returned or <DOM::0> if there is 
       no default value. 
-    @@PerlDef:
+    @@PerlCDef:
       my $ao = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
                     ->{<Q::null:>}->{$LOCAL_NAME} ||
                $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
@@ -749,7 +748,7 @@ ReflectTypeDef:
       the number in decimal (base ten) and then that
       string is set to the element attribute.
     @@QName: NumericSet
-    @@PerlDef:
+    @@PerlCDef:
       my $ao = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
                     ->{<Q::null:>}->{$LOCAL_NAME} ||
                $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
@@ -821,7 +820,7 @@ ReflectTypeDef:
         and section 7.2 <sw10:csection::White Space> 
         cites Unicode without version number, while section 6
         <sw10:csection::Source Text> refers Unicode 2.1 or later.
-    @@PerlDef:
+    @@PerlCDef:
       if ($original =~ m{
         \A  [\x09\x0A\x0C\x0D\x20\u{00A0}\u{2028}\u{2029}\pZs]*
 
@@ -871,7 +870,7 @@ ReflectTypeDef:
       fails or if the element attribute is absent, then
       the default value is returned or <DOM::0> if there is 
       no default value. 
-    @@PerlDef:
+    @@PerlCDef:
       my $ao = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
                     ->{<Q::null:>}->{$LOCAL_NAME} ||
                $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
@@ -904,7 +903,7 @@ ReflectTypeDef:
       The given value is converted to a string representing
       the number in decimal (base ten) and then that
       string is set to the element attribute.
-    @@disDef:
+    @@disCDef:
       @@@DISPerl:cloneCode: NumericSet
 
 ImplNote:
@@ -999,6 +998,112 @@ ElementTypeBinding:
   @ShadowContent:
     @@ContentType:
       lang:Perl
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: PerlCDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
+
+ElementTypeBinding:
+  @Name: IFDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@ForCheck: ManakaiDOM|DOM
+
+    @@rdf:type:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: IFCls1Def
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+    @@For: ManakaiDOM|DOM1
+    @@For: =ManakaiDOM|ManakaiDOM
+
+    @@rdf:type:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM1||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM2||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM2
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+    @@DOMMain:implementFeature:
+      @@@@: HTMLFeature10
+      @@@For: ManakaiDOM|DOM1 
+    @@DOMMain:implementFeature:
+      @@@@: HTMLFeature20
+      @@@For: ManakaiDOM|DOM2
+
+ElementTypeBinding:
+  @Name: IFClsXDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+    @@For: ManakaiDOM|DOM1
+    @@For: =ManakaiDOM|ManakaiDOM
+
+    @@rdf:type:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+    @@DOMMain:implementFeature:
+      @@@@: HTMLExtendedFeature30
+      @@@For: ManakaiDOM|ManakaiDOMLatest
+
 
 ElementTypeBinding:
   @Name: IF
@@ -1011,13 +1116,11 @@ ElementTypeBinding:
       @@@ForCheck:
         !ManakaiDOM:ForClass !ManakaiDOM:ForIF !ForHTML
     @@rdf:type:
-      @@@@:
-        ManakaiDOM:IF
+      @@@@: DISLang|Interface
       @@@ForCheck:
         ManakaiDOM:ForIF
     @@rdf:type:
-      @@@@:
-        ManakaiDOM:Class
+      @@@@: DISLang|Class
       @@@ForCheck:
         ManakaiDOM:ForClass
     @@resourceFor:
@@ -1039,12 +1142,6 @@ ElementTypeBinding:
         ManakaiDOM:ManakaiDOMObject
       @@@ForCheck:
         ManakaiDOM:ForClass
-    @@ISA:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOM||ManakaiDOM:ForIF
-      @@@ForCheck:
-        ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM1
-      @@@ContentType: DISCore|TFPQNames
     @@Implement:
       @@@@: ||+||ManakaiDOM|ForIF
       @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
@@ -1078,62 +1175,60 @@ ElementTypeBinding:
         ManakaiDOM:ForClass
 
 ElementTypeBinding:
-  @Name: ET
-  @ElementType:
+  @Name: IFCls12ETDef
+  @ElementType: 
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
-      @@@@:
-        dis:MultipleResource
-      @@@ForCheck:
-        !ManakaiDOM:ForClass !ManakaiDOM:ForIF !ForHTML
-    @@rdf:type:
-      @@@@:
-        ManakaiDOM:IF
-      @@@ForCheck:
-        ManakaiDOM:ForIF
-    @@rdf:type:
-      @@@@:
-        ManakaiDOM:Class
-      @@@ForCheck:
-        ManakaiDOM:ForClass
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass !ForHTML
+    @@resourceFor: ManakaiDOM|ForIF
     @@resourceFor:
-      @@@@:
-        ManakaiDOM:ForIF
-      @@@ForCheck:
-        ManakaiDOM:DOM
-      @@@For:
-        ManakaiDOM:DOMHTMLFeature
-      @@@For:
-        =ManakaiDOM:ManakaiDOM
-    @@resourceFor:
-      @@@@:
-        ManakaiDOM:ForClass
-      @@@ForCheck:
-        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM ManakaiDOM:DOMHTMLFeature
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+    @@For: ManakaiDOM|DOM1
+    @@For: =ManakaiDOM|ManakaiDOM
+    @@For: ForHTML
 
     @@rdf:type:
-      @@@@:
-        s:ElementType
-      @@@ForCheck:
-        ForHTML
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
 
-    @@ISA:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOM||ManakaiDOM:ForIF
-      @@@ForCheck:
-        ManakaiDOM:ForIF ManakaiDOM:ManakaiDOM1
-      @@@ContentType: DISCore|TFPQNames
+    @@rdf:type:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
     @@Implement:
-      @@@@: ||+||ManakaiDOM|ForIF
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
-
-    @@DISMarkup:elementType:
-      @@@@:
-        ::ForHTML40SE
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM1||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
       @@@ForCheck:
-        ManakaiDOM:DOM1 !ManakaiDOM:DOM2
+        ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1 !ManakaiDOM|ManakaiDOM2
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM2||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM2
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+    @@DOMMain:implementFeature:
+      @@@@: HTMLFeature10
+      @@@For: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
+    @@DOMMain:implementFeature:
+      @@@@: HTMLFeature20
+      @@@For: ManakaiDOM|DOM2
+
+    @@rdf:type:
+      @@@: s|ElementType
+      @@ForCheck: ForHTML
+
+    @@s:elementType:
+      @@@@: ||ForHTML40SE
+      @@@ForCheck: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
       @@@ImplNote:
         @@@@lang:en
         @@@@@:
@@ -1141,23 +1236,139 @@ ElementTypeBinding:
           HTML 4.0 while Second Edition refers the second edition of 
           HTML 4.0. 
       @@@DISCore:stopISARecursive:1
-    @@DISMarkup:elementType:
-      @@@@:
-        ::ForHTML401
-      @@@ForCheck:
-        ManakaiDOM:DOM2
-    @@DISMarkup:elementType:
-      @@@@:
-        ::ForXHTML10SE
-      @@@ForCheck:
-        ManakaiDOM:DOM2
+    @@s:elementType:
+      @@@@: ||ForHTML401
+      @@@ForCheck: ManakaiDOM|DOM2
+    @@s:elementType:
+      @@@@: ||ForXHTML10SE
+      @@@ForCheck: ManakaiDOM|DOM2
       @@@DISCore:stopISARecursive:1
+
+ElementTypeBinding:
+  @Name: IFCls1ETDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass !ForHTML
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+    @@For: ManakaiDOM|DOM1
+    @@For: =ManakaiDOM|ManakaiDOM
+    @@For: ForHTML
+
+    @@rdf:type:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM1||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck:
+        ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM2||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM2
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+    @@DOMMain:implementFeature:
+      @@@@: HTMLFeature10
+      @@@For: ManakaiDOM|DOM1
+    @@DOMMain:implementFeature:
+      @@@@: HTMLFeature20
+      @@@For: ManakaiDOM|DOM2
+
+    @@rdf:type:
+      @@@: s|ElementType
+      @@ForCheck: ForHTML
+
+    @@s:elementType:
+      @@@@: ||ForHTML40SE
+      @@@ForCheck: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          DOM Level 1 First Edition refers the latest version of 
+          HTML 4.0 while Second Edition refers the second edition of 
+          HTML 4.0. 
+      @@@DISCore:stopISARecursive:1
+    @@s:elementType:
+      @@@@: ||ForHTML401
+      @@@ForCheck: ManakaiDOM|DOM2
+    @@s:elementType:
+      @@@@: ||ForXHTML10SE
+      @@@ForCheck: ManakaiDOM|DOM2
+      @@@DISCore:stopISARecursive:1
+
+ElementTypeBinding:
+  @Name: IFCls1ETsDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass !ForHTML
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+    @@For: ManakaiDOM|DOM1
+    @@For: =ManakaiDOM|ManakaiDOM
+    @@For: ForHTML
+
+    @@rdf:type:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM1||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck:
+        ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM2||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM2
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+    @@DOMMain:implementFeature:
+      @@@@: HTMLFeature10
+      @@@For: ManakaiDOM|DOM1
+    @@DOMMain:implementFeature:
+      @@@@: HTMLFeature20
+      @@@For: ManakaiDOM|DOM2
 
 ElementTypeBinding:
   @Name: H5ETX
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
+    @@ForCheck: !=ManakaiDOM|all
+
     @@rdf:type:
       @@@@:
         dis:MultipleResource
@@ -1221,37 +1432,33 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethod
-    @@ForCheck:
-      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+    @@rdf:type: DISLang|Method
+    @@ForCheck: ManakaiDOM|DOM !=ManakaiDOM|ManakaiDOM
+
 ElementTypeBinding:
   @Name: IntMethod
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethod
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@rdf:type: DISLang|Method
+    @@ForCheck: ManakaiDOM|ForClass
     @@ManakaiDOM:isForInternal: 1
+
 ElementTypeBinding:
   @Name: ReMethod
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethod
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
-    @@ManakaiDOM:isRedefining: 1
+    @@rdf:type: DISLang|Method
+    @@ForCheck: ManakaiDOM|ForClass
+
 ElementTypeBinding:
   @Name: Param
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethodParameter
+    @@rdf:type: DISLang|MethodParameter
+
 ElementTypeBinding:
   @Name: Exception
   @ElementType:
@@ -1262,18 +1469,15 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethodReturn
+    @@rdf:type: DISLang|MethodReturn
 
 ElementTypeBinding:
   @Name: Attr
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttribute
-    @@ForCheck:
-      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: ManakaiDOM|DOM !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Attrs
@@ -1281,7 +1485,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
-      @@@@: ManakaiDOM|DOMAttribute
+      @@@@: DISLang|Attribute
       @@@ForCheck: ManakaiDOM|DOM
     @@ForCheck: !=ManakaiDOM|ManakaiDOM
     @@For: ManakaiDOM|ManakaiDOM
@@ -1298,20 +1502,14 @@ ElementTypeBinding:
     @@ForCheck:
       !=ManakaiDOM:ManakaiDOM
     @@rdf:type:
-      @@@@:
-        ManakaiDOM:DOMAttribute
-      @@@ForCheck:
-        ManakaiDOM:DOM
+      @@@@: DISLang|Attribute
+      @@@ForCheck: ManakaiDOM|DOM
     @@rdf:type:
-      @@@@:
-        s:Attribute
-      @@@ForCheck:
-        ForHTML
+      @@@@: s|Attribute
+      @@@ForCheck: ForHTML
     @@DocAttr:
-      @@@@:
-        ::ForHTML40SE
-      @@@ForCheck:
-        ManakaiDOM:DOM1 !ManakaiDOM:DOM2
+      @@@@: ||ForHTML40SE
+      @@@ForCheck: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
       @@@ImplNote:
         @@@@lang:en
         @@@@@:
@@ -1319,44 +1517,36 @@ ElementTypeBinding:
           HTML 4.0 while Second Edition refers the second edition of 
           HTML 4.0. 
     @@DocAttr:
-      @@@@:
-        ::ForHTML401
-      @@@ForCheck:
-        ManakaiDOM:DOM2
+      @@@@: ||ForHTML401
+      @@@ForCheck: ManakaiDOM|DOM2
     @@DocAttr:
-      @@@@:
-        ::ForXHTML10SE
-      @@@ForCheck:
-        ManakaiDOM:DOM2
+      @@@@: ||ForXHTML10SE
+      @@@ForCheck: ManakaiDOM|DOM2
 
 ElementTypeBinding:
   @Name: ReAttr
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttribute
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
-    @@ManakaiDOM:isRedefining: 1
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: ManakaiDOM|ForClass
+
 ElementTypeBinding:
   @Name: Get
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttrGet
-    @@ForCheck:
-      ManakaiDOM:DOM
+    @@rdf:type: DISLang|AttributeGet
+    @@ForCheck: ManakaiDOM|DOM
+
 ElementTypeBinding:
   @Name: Set
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttrSet
-    @@ForCheck:
-      ManakaiDOM:DOM
+    @@rdf:type: DISLang|AttributeSet
+    @@ForCheck: ManakaiDOM|DOM
+
 ElementTypeBinding:
   @Name: InCase
   @ElementType:
@@ -1370,20 +1560,16 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:ConstGroup
-    @@ForCheck:
-      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+    @@rdf:type: DISLang|ConstGroup
+    @@ForCheck: ManakaiDOM|DOM !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Const
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: 
-      ManakaiDOM:Const
-    @@ForCheck:
-      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+    @@rdf:type: DISLang|Const
+    @@ForCheck: ManakaiDOM|DOM !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Deprecated
@@ -1399,24 +1585,14 @@ PropDef:
     @@lang:en
     @@@:
       Whether a subject resource is deprecated by HTML 4 or not. 
-  @dataType: 
-    dis:Boolean
+  @dataType: DISCore|Boolean
+  @multipleProperties: DISCore|Single
 
-IF:
-  @Name:
-    @@@: HTMLCollection
-    @@ForCheck:
-      ManakaiDOM:ForIF
+IFCls1Def:
+  @IFQName: HTMLCollection
+  @ClsQName: ManakaiDOMHTMLCollection
 
-  @QName:
-    @@@: ManakaiDOMHTMLCollection
-    @@ForCheck:
-      ManakaiDOM:ForClass
-  @ISA:
-    @@@: NodeRef
-    @@ForCheck:
-      ManakaiDOM:ForClass
-  @L2ISAL1:
+  @ClsISA: NodeRef
 
   @Description:
     @@lang:en
@@ -1429,16 +1605,13 @@ IF:
       automatically updated when the underlying document 
       is changed.
 
-  @L1IF:
-
   @Attr:
      @@Name:  length
      @@Description:
        @@@lang:en
        @@@@: The length of the list.
      @@Get:
-        @@@Type:
-           DOMMain:unsigned-long
+        @@@Type: ulong
         @@@PerlDef:
             my $l = $self->{<Q::TreeCore:node>}
                          -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
@@ -1453,8 +1626,7 @@ IF:
          Retrieve a node specified by ordinal index. 
      @@Param:
         @@@Name:  index
-        @@@Type:
-           DOMMain:unsigned-long
+        @@@Type: ulong
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -1614,7 +1786,14 @@ ImplNote:
   @@@:
     <IF::HTMLOptionCollection>: See <Module::MDOM:DOMWebForms>.
 
+ResourceDef:
+  @QName: ulong
+  @For: ManakaiDOM|DOM
+  @AliasFor: DOMMain|unsigned-long||ManakaiDOM|all
+
 IF:
+  @ForCheck: !=ManakaiDOM|all
+
   @Name:
     @@@: ManakaiDOMHTMLDOMImplementationIF
     @@ForCheck:
@@ -1792,29 +1971,14 @@ ResourceDef:
   @QName: getWeakRef
   @AliasFor:
     ManakaiNode:getWeakRef::ManakaiDOM:Perl
+  @For: ManakaiDOM|ManakaiDOM
 
-IF:
-  @Name:
-    @@@: HTMLDocument
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @ISA:
-    @@@:
-      DOMCore:Document
-    @@ForCheck:
-      ManakaiDOM:ForIF
+IFCls1Def:
+  @IFQName: HTMLDocument
+  @ClsQName: ManakaiHTMLDocument
 
-  @QName:
-    @@@: ManakaiDOMHTMLDocument
-    @@ForCheck:
-      ManakaiDOM:ForClass
-  @ISA:
-    @@@:
-      DOMCore:ManakaiDOMDocument
-    @@ForCheck:
-      ManakaiDOM:ForClass
-
-  @L1IF:
+  @IFISA: DOMCore|Document
+  @ClsISA: DOMCore|ManakaiDOMDocument
 
   @Description:
     @@lang:en
@@ -2565,19 +2729,13 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       rdf:Property
-    @@AliasFor: 
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
+    @@For: =ManakaiDOM|all
 
 PropDef:
   @QName: isApplet
   @FullName:
     @@lang:en
     @@@: Is a Java applet
-  @rdfs:domain:
-    xhtml:object
   @Description:
     @@lang:en
     @@@:
@@ -2588,13 +2746,13 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DataType
+    @@rdf:type: DISLang|DataType
+    @@For: ManakaiDOM|DOM
+    @@For: =ManakaiDOM|all
+    @@rdfs:subClassOf: DOMMain|DOMString
     @@AliasFor: 
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
+      @@@@: ||ManakaiDOM|all
+      @@@For: !=ManakaiDOM|all
 
 StringDataTypeDef:
   @QName: RFC2965Cookies
@@ -2640,28 +2798,12 @@ ImplNote:
     uppercase.  No specification for attribute names - it maybe 
     should be in lowercase for compatibility.
 
-IF:
-  @Name:
-    @@@: HTMLElement
-    @@ForCheck:
-      ManakaiDOM:ForIF
-  @ISA:
-    @@@: 
-      DOMCore:Element
-    @@ForCheck:
-      ManakaiDOM:ForIF
+IFCls1Def:
+  @IFQName: HTMLElement
+  @ClsQName: ManakaiDOMHTMLElement
 
-  @L1IF:
-
-  @QName:
-    @@@: ManakaiDOMHTMLElement
-    @@ForCheck:
-      ManakaiDOM:ForClass
-  @ISA:
-    @@@:
-      DOMCore:ManakaiDOMElement
-    @@ForCheck:
-      ManakaiDOM:ForClass
+  @IFISA: DOMCore|Element
+  @ClsISA: DOMCore|ManakaiDOMElement
 
   @Description:
     @@lang:en
@@ -2909,6 +3051,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       s:Attribute
+    @@ForCheck: ForHTML
 
 ResourceDef:
   @QName: isHTMLElement
@@ -2928,7 +3071,7 @@ ResourceDef:
       DOMMain:DOMString
     @@enDesc:
       The element type name to test.
-  @PerlDef:
+  @PerlCDef:
       do {
           my $__ln = $elementNode->{<Q::TreeCore:node>}
                                  ->{<Q::infoset:localName>};
@@ -2994,7 +3137,7 @@ ResourceDef:
       DOMMain:DOMString
     @@enDesc:
       The element type name to test.
-  @PerlDef:
+  @PerlCDef:
       do {
           my $__ln = $elementNodeo->{<Q::infoset:localName>};
           if (defined $__ln) {  ## Namespace-aware node
@@ -3039,7 +3182,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@lang:en
 
-ET:
+IFCls1ETDEf:
   @ETQName:
     xhtml1:html
   @QName:
@@ -3051,7 +3194,6 @@ ET:
   @ClsQName:
     @@@: ManakaiDOMHTMLHtmlElement
   @ISAHTMLElement:
-  @L1IF:
 
   @ATTR:
      @@Name:  version
@@ -3060,7 +3202,7 @@ ET:
      @@Get:
      @@Set:
 
-ET:
+IFCls1ETDef:
   @ETQName:
     xhtml1:head
   @IFQName:
@@ -3068,7 +3210,6 @@ ET:
   @ClsQName:
     @@@: ManakaiDOMHTMLHeadElement
   @ISAHTMLElement:
-  @L1IF:
 
   @ATTR:
      @@Name:  profile
@@ -3076,7 +3217,7 @@ ET:
      @@Get:
      @@Set:
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:link
   @IFQName:  
@@ -3084,7 +3225,6 @@ ET:
   @ClsQName:
     @@@: ManakaiDOMHTMLLinkElement
   @ISAHTMLElement:
-  @L1IF:
 
   @Attr:
      @@Name:  disabled
@@ -3178,9 +3318,9 @@ ET:
      @@ReflectCDATA:
      @@Get:
      @@Set:
-##IF:HTMLLinkElement
+##HTMLLinkElement
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:title
   @IFQName:
@@ -3188,7 +3328,7 @@ ET:
   @ClsQName:
     @@@: ManakaiDOMHTMLTitleElement
   @ISAHTMLElement:
-  @L1IF:
+
 
   @Attr:
      @@Name:  text
@@ -3210,9 +3350,9 @@ ET:
             lang:dis
           @@@@DISPerl:cloneCode:
             DOMCore:ManakaiDOMNode::ManakaiDOM:ManakaiDOMLatest.textContent.set
-##IF:HTMLTitleElement
+##HTMLTitleElement
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:meta
   @IFQName:
@@ -3220,7 +3360,6 @@ ET:
   @ClsQName:
     @@@: ManakaiDOMHTMLMetaElement
   @ISAHTMLElement:
-  @L1IF:
 
   @ATTR:
      @@Name:  content
@@ -3246,7 +3385,7 @@ ET:
      @@Get:
      @@Set:
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:base
   @IFQName:
@@ -3254,7 +3393,6 @@ ET:
   @ClsQName:
     @@@: ManakaiDOMHTMLBaseElement
   @ISAHTMLElement:
-  @L1IF:
 
   @ATTR:
      @@Name:  href
@@ -3281,7 +3419,7 @@ ElementTypeBinding:
       @@@ForCheck:
         ManakaiDOM:ForClass
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:isindex
   @IFQName:
@@ -3289,7 +3427,6 @@ ET:
   @ClsQName:
     @@@: ManakaiDOMHTMLIsIndexElement
   @ISAHTMLElement:
-  @L1IF:
 
   @ForCheck: !ForXHTML11
 
@@ -3330,6 +3467,15 @@ ElementTypeBinding:
   @ShadowContent:
     @@ContentType:
       lang:dis
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: disCDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:dis
 
 ElementTypeBinding:
   @Name: ETQName
@@ -3338,8 +3484,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@ForCheck:
       s:ForML
-    @@ContentType:
-      dis:TypeQName
+    @@ContentType: DISCore|QName
 
 ElementTypeBinding:
   @Name: IFQName
@@ -3356,13 +3501,12 @@ ElementTypeBinding:
     @@ForCheck:
       ManakaiDOM:ForClass
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:style
   @IFQName: HTMLStyleElement
   @ClsQName: ManakaiDOMHTMLStyleElement
   @ISAHTMLElement:
-  @L1IF:
 
   @Attr:
      @@Name:  disabled
@@ -3427,17 +3571,26 @@ ElementTypeBinding:
   @ElementType:
     dis:Name
   @ShadowContent:
-    @@ForCheck:
-      ManakaiDOM:DOM
+    @@ForCheck: ManakaiDOM|DOM
+
 ElementTypeBinding:
   @Name: AName
   @ElementType:
     dis:Name
   @ShadowContent:
-    @@ForCheck:
-      s:ForML
+    @@ForCheck: s|ForML
+
+ElementTypeBinding:
+  @Name: plAName
+  @ElementType:
+    DISPerl:methodName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|DOM
+    @@ContentType: lang|Perl
 
 IF:
+  @ForCheck: !ManakaiDOM|all
+
   @IFQName: HTMLStrictlyInlineContainerExtended
   @ClsQName: ManakaiDOMHTMLStrictlyInlineContainerExtended
   @DOMMain:implementFeature: HTMLExtendedFeature30
@@ -3699,6 +3852,8 @@ IF:
 ##HTMLStrictlyInlineContainerExtended
 
 ClsOnly:
+  @ForCheck: !ManakaiDOM|all
+
   @For: ManakaiDOM|ManakaiDOMLatest
   @ClsQName: ManakaiDOMHTMLStrictlyInlineElementExtended
   @ClsISA: ManakaiDOMHTMLStrictlyInlineContainerExtended
@@ -3785,6 +3940,8 @@ ResourceDef:
   @ETQName: xhtml1|dfn
 
 IF:
+  @ForCheck: !ManakaiDOM|all
+
   @IFQName: HTMLStructuredInlineContainerExtended
   @ClsQName: ManakaiDOMHTMLStructuredInlineContainerExtended
   @DOMMain:implementFeature: HTMLExtendedFeature30
@@ -3862,6 +4019,8 @@ IF:
 ##StructuredInlineContainerExtended
 
 IF:
+  @ForCheck: !ManakaiDOM|all
+
   @IFQName: HTMLInlineContainerExtended
   @ClsQName: ManakaiDOMHTMLInlineContainerExtended
   @DOMMain:implementFeature: HTMLExtendedFeature30
@@ -3874,6 +4033,8 @@ IF:
 ##HTMLInlineContainerExtended
 
 ClsOnly:
+  @ForCheck: !ManakaiDOM|all
+
   @For: ManakaiDOM|ManakaiDOMLatest
   @ClsQName: ManakaiDOMHTMLInlineElementExtended
   @ClsISA: ManakaiDOMHTMLInlineContainerExtended
@@ -3912,6 +4073,8 @@ ResourceDef:
   @ETQName: xhtml1|span
 
 IF:
+  @ForCheck: !ManakaiDOM|all
+
   @IFQName: HTMLBlockContainerExtended
   @ClsQName: ManakaiDOMHTMLBlockContainerExtended
   @DOMMain:implementFeature: HTMLExtendedFeature30
@@ -3941,6 +4104,8 @@ IF:
 ##HTMLBlockContainerExtended
 
 IF:
+  @ForCheck: !ManakaiDOM|all
+
   @IFQName: HTMLSectioningElementExtended
   @ClsQName: ManakaiDOMHTMLSectioningElementExtended
   @DOMMain:implementFeature: HTMLExtendedFeature30
@@ -4100,17 +4265,17 @@ ElementTypeBinding:
     @@Value:
       @@@is-null:1
 
-ET:
+IFCls1ETDef:
   @ETQName:
     xhtml1:body
   @IFQName:  HTMLBodyElement
   @ClsQName: ManakaiDOMHTMLBodyElement
   @ISAHTMLElement:
-  @L1IF:
 
   @ATTR:
      @@AName: alink
      @@DOMAName:  aLink
+     @@plAName: alink
      @@Deprecated:
      @@ReflectCDATA:
      @@Get:
@@ -4124,6 +4289,7 @@ ET:
   @ATTR:
      @@DOMAName:  bgColor
      @@AName: bgcolor
+     @@plAName: bgcolor
      @@Deprecated:
      @@ReflectCDATA:
      @@Get:
@@ -4143,6 +4309,7 @@ ET:
   @Attr:
      @@DOMAName:  vLink
      @@AName: vlink
+     @@plAName: vlink
      @@Deprecated:
      @@ReflectCDATA:
      @@Get:
@@ -4150,6 +4317,8 @@ ET:
 ##HTMLBodyElement
 
 IF:
+  @ForCheck: !ManakaiDOM|all
+
   @IFQName: HTMLBodyElementExtended
   @ClsQName: ManakaiDOMHTMLBodyElementExtended
   
@@ -4180,6 +4349,8 @@ FeatureDef:
     @@Version: 3.0
 
 IF:
+  @ForCheck: !ManakaiDOM|all
+
   @IFQName: HTMLListElementExtended
   @ClsQName: ManakaiDOMHTMLListElementExtended
   @DOMMain:implementFeature: HTMLExtendedFeature30
@@ -4278,6 +4449,8 @@ ElementTypeBinding:
     @@ForCheck: ManakaiDOM|ForClass
 
 IF:
+  @For: !=ManakaiDOM|all
+
   @IFQName: HTMLUListElementExtended
   @ClsQName: ManakaiDOMHTMLUListElementExtended
   @DOMMain:implementFeature: HTMLExtendedFeature30
@@ -4289,6 +4462,8 @@ IF:
 ##HTMLUListElementExtended
 
 IF:
+  @For: !ManakaiDOM|all
+
   @IFQName: HTMLOListElementExtended
   @ClsQName: ManakaiDOMHTMLOListElementExtended
   @DOMMain:implementFeature: HTMLExtendedFeature30
@@ -4300,6 +4475,8 @@ IF:
 ##HTMLOListElementExtended
 
 IF:
+  @For: !ManakaiDOM|all
+
   @IFQName: HTMLDListElementExtended
   @ClsQName: ManakaiDOMHTMLDListElementExtended
   @DOMMain:implementFeature: HTMLExtendedFeature30
@@ -4397,7 +4574,7 @@ ResourceDef:
     Splits a child node list into two groups: nodes before
     <P::index>th <P::elementType> element node (not inclusive) and
     any remind nodes.
-  @PerlDef:
+  @PerlCDef:
           my $__i = 0;
           $before = [];
           $after = $children;
@@ -4427,7 +4604,7 @@ ResourceDef:
               MDOMX:param-name => 'index',
             }__
           } # FIND
-
+  @For: ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: enLabel
@@ -4436,13 +4613,12 @@ ElementTypeBinding:
   @ShadowContent:
     @@lang:en
 
-ET:
+IfCls1ETDef:
   @ETQName: 
     xhtml1:ul
   @IFQName:  HTMLUListElement
   @ClsQName: ManakaiDOMHTMLUListElement
   @ISAHTMLElement:
-  @L1IF:
 
   @ATTR:
      @@Name:  compact
@@ -4465,13 +4641,12 @@ ET:
      @@Get:
      @@Set:
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:ol
   @IFQName:  HTMLOListElement
   @ClsQName:ManakaiDOMHTMLOListElement
   @ISAHTMLElement:
-  @L1IF:
 
   @ATTR:
      @@Name:  compact
@@ -4500,13 +4675,12 @@ ET:
      @@Get:
      @@Set:
 
-ET:
+IfCls1ETDef:
   @ETQName: 
     xhtml1:dl
   @IFQName:  HTMLDListElement
   @ClsQName: ManakaiDOMHTMLDListElement
   @ISAHTMLElement:
-  @L1IF:
 
   @ATTR:
      @@Name:  compact
@@ -4523,13 +4697,12 @@ ET:
         @@@InCase:
            @@@@Value:  false
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:dir
   @IFQName:  HTMLDirectoryElement
   @ClsQName: ManakaiDOMHTMLDirectoryElement
   @ISAHTMLElement:
-  @L1IF:
   @Deprecated:
 
   @Attr:
@@ -4547,13 +4720,12 @@ ET:
         @@@InCase:
            @@@@Value:  false
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:menu
   @IFQName:  HTMLMenuElement
   @ClsQName: ManakaiDOMHTMLMenuElement
   @ISAHTMLElement:
-  @L1IF:
   @Deprecated:
 
   @ATTR:
@@ -4571,13 +4743,12 @@ ET:
         @@@InCase:
            @@@@Value:  false
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:li
   @IFQName:  HTMLLIElement
   @ClsQName: ManakaiDOMHTMLLIElement
   @ISAHTMLElement:
-  @L1IF:
 
   @ATTR:
      @@Name:  type
@@ -4592,13 +4763,12 @@ ET:
      @@Get:
      @@Set:
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:div
   @IFQName:  HTMLDivElement
   @ClsQName: ManakaiDOMHTMLDivElement
   @ISAHTMLElement:
-  @L1IF:
 
   @ATTR:
      @@Name:  align
@@ -4607,13 +4777,12 @@ ET:
      @@Get:
      @@Set:
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:p
   @IFQName:  HTMLParagraphElement
   @ClsQName: ManakaiDOMHTMLParagraphElement
   @ISAHTMLElement:
-  @L1IF:
 
   @ATTR:
      @@Name:  align
@@ -4623,25 +4792,35 @@ ET:
      @@Set:
 
 ForDef:
+  @QName: DOMHTML|ForAnET
+ForDef:
   @QName:
     DOMHTML:ForH1
+  @ISA: DOMHTML|ForAnET
 ForDef:
   @QName:
     DOMHTML:ForH2
+  @ISA: DOMHTML|ForAnET
 ForDef:
   @QName:
     DOMHTML:ForH3
+  @ISA: DOMHTML|ForAnET
 ForDef:
   @QName:
     DOMHTML:ForH4
+  @ISA: DOMHTML|ForAnET
 ForDef:
   @QName:
     DOMHTML:ForH5
+  @ISA: DOMHTML|ForAnET
 ForDef:
   @QName:
     DOMHTML:ForH6
+  @ISA: DOMHTML|ForAnET
 
 IF:
+  @For: !ManakaiDOM|all
+
   @IFQName: HTMLParagraphElementExtended
   @ClsQName: ManakaiDOMHTMLParagraphElementExtended
   @DOMMain:implementFeature: HTMLExtendedFeature30
@@ -4654,6 +4833,8 @@ IF:
 ##HTMLParagraphElementExtended
 
 IF:
+  @For: !ManakaiDOM|all
+
   @IFQName: HTMLHeadingElementExtended
   @ClsQName: ManakaiDOMHTMLHeadingElementExtended
   @DOMMain:implementFeature: HTMLExtendedFeature30
@@ -4665,8 +4846,7 @@ IF:
   @ClsISA: ManakaiDOMHTMLHeadingElement
 ##HTMLHeadingElementExtended
 
-IF:
-  @For: ForHTML
+IFCls1ETsDef:
   @rdf:type:
     @@@:
       dis:MultipleResource
@@ -4693,9 +4873,8 @@ IF:
     @@@: ForH6
     @@For: ForHTML
   @rdf:type:
-    @@@:
-      s:ElementType
-    @@For:ForHTML
+    @@@: s|ElementType
+    @@ForCheck: ForAnET
   
   @ETQName:
     @@@:
@@ -4801,7 +4980,6 @@ IF:
   @IFQName:  HTMLHeadingElement
   @ClsQName: ManakaiDOMHTMLHeadingElement
   @ISAHTMLElement:
-  @L1IF:
 
   @Attrs:
      @@Name:  align
@@ -4850,22 +5028,10 @@ ElementTypeBinding:
     @@ForCheck: ManakaiDOM|DOM2
     @@ContentType: DISCore|TFPQNames
 
-ElementTypeBinding:
-  @Name: IFDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:IF
-    @@ISA:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOM
-      @@@For:
-        ManakaiDOM:ManakaiDOM1
-
 IFDef:
-  @Name:HTMLBlockquoteElement
-  @ISA:HTMLElement
+  @IFQName: HTMLBlockquoteElement
+  @IFISA: HTMLElement
+
   @Description:
     @@lang:en
     @@@:
@@ -4887,12 +5053,13 @@ IFDef:
 ForDef:
   @QName:
     DOMHTML:ForBlockquote
+  @ISA: DOMHTML|ForAnET
 ForDef:
   @QName:
     DOMHTML:ForQ
+  @ISA: DOMHTML|ForAnET
 
-IF:
-  @For:ForHTML
+IFCls1ETsDef:
   @rdf:type:
     @@@:
       dis:MultipleResource
@@ -4907,9 +5074,8 @@ IF:
     @@@:ForQ
     @@ForCheck:ForHTML
   @rdf:type:
-    @@@:
-      s:ElementType
-    @@For:ForHTML
+    @@@: s|ElementType
+    @@ForCheck: ForAnET
 
   @ETQName:
     @@@:
@@ -4923,7 +5089,6 @@ IF:
   @IFQName:  HTMLQuoteElement
   @ClsQName: ManakaiDOMHTMLQuoteElement
   @ISAHTMLElement:
-  @L1IF:
 
   @s:elementType:
     @@@: ||ForHTML40SE||ForBlockquote
@@ -4973,13 +5138,12 @@ ElementTypeBinding:
   @ShadowContent:
     @@DISCore:stopISARecursive:1
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:pre
   @IFQName:  HTMLPreElement
   @ClsQName: ManakaiDOMHTMLPreElement
   @ISAHTMLElement:
-  @L1IF:
 
   @ATTR:
      @@Name:  width
@@ -4988,13 +5152,12 @@ ET:
      @@Get:
      @@Set:
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:br
   @IFQName:  HTMLBRElement
   @ClsQName:ManakaiDOMHTMLBRElement
   @ISAHTMLElement:
-  @L1IF:
 
   @ATTR:
      @@Name:  clear
@@ -5003,13 +5166,12 @@ ET:
      @@Get:
      @@Set:
 
-ET:
+IfCls12ETDef:
   @ETQName: 
     xhtml1:basefont
   @IFQName:  HTMLBaseFontElement
   @ClsQName:ManakaiDOMHTMLBaseFontElement
   @ISAHTMLElement:
-  @L1IF:
   @Deprecated:
 
   @ATTR:
@@ -5063,14 +5225,13 @@ ET:
         1
         2
 
-ET:
+IfCls1ETDef:
   @ETQName: 
     xhtml1:font
   @IFQName:  HTMLFontElement
   @ClsQName:ManakaiDOMHTMLFontElement
   @ISAHTMLElement:
   @Deprecated:
-  @L1IF:
 
   @ATTR:
      @@Name:  color
@@ -5095,13 +5256,12 @@ ET:
      @@Get:
      @@Set:
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:hr
   @IFQName:  HTMLHRElement
   @ClsQName:ManakaiDOMHTMLHRElement
   @ISAHTMLElement:
-  @L1IF:
 
   @ATTR:
      @@Name:  align
@@ -5112,6 +5272,7 @@ ET:
   @ATTR:
      @@AName:noshade
      @@DOMAName:  noShade
+     @@plAName: noshade
      @@Deprecated:
      @@ReflectBoolean:
      @@Get:
@@ -5140,12 +5301,13 @@ ET:
 ForDef:
   @QName:
     DOMHTML:ForIns
+  @ISA: DOMHTML|ForAnET
 ForDef:
   @QName:
     DOMHTML:ForDel
+  @ISA: DOMHTML|ForAnET
 
-IF:
-  @For:ForHTML
+IFCls1ETsDef:
   @rdf:type:
     @@@: 
       dis:MultipleResource
@@ -5162,7 +5324,7 @@ IF:
   @rdf:type:
     @@@:
       s:ElementType
-    @@For:ForHTML
+    @@ForCheck: ForAnET
 
   @ETQName:
     @@@:
@@ -5202,7 +5364,6 @@ IF:
   @IFQName:  HTMLModElement
   @ClsQName:ManakaiDOMHTMLModElement
   @ISAHTMLElement:
-  @L1IF:
 
   @Attrs:
      @@Name:  cite
@@ -5228,17 +5389,17 @@ IF:
      @@docAttrP2S: ||ForHTML401||ForDel
      @@docAttrP2X: ||ForXHTML10SE||ForDel
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:a
   @IFQName:  HTMLAnchorElement
   @ClsQName:ManakaiDOMHTMLAnchorElement
   @ISAHTMLElement:
-  @L1IF:
 
   @ATTR:
      @@AName:accesskey
      @@DOMAName:  accessKey
+     @@plAName: accesskey
      @@ReflectCDATA:
      @@Get:
      @@Set:
@@ -5285,6 +5446,7 @@ ET:
   @ATTR:
      @@AName:tabindex
      @@DOMAName:  tabIndex
+     @@plAName: tabindex
      @@ReflectNumeric:
      @@Get:
      @@Set:
@@ -5310,9 +5472,11 @@ ET:
        @@@lang:en
        @@@@:Give the focus to this element.
      @@Return:  
-##IF:HTMLAnchorElement
+##HTMLAnchorElement
 
 IF:
+  @For: !ManakaiDOM|all
+
   @IFQName: HTMLAnchorElementExtended
   @ClsQName: ManakaiDOMHTMLAnchorElementExtended
   
@@ -5323,17 +5487,16 @@ IF:
   @ClsISA: ManakaiDOMHTMLStrictlyInlineContainerExtended
 ##HTMLAnchorElementExtended
 
-ET:
+IfCls12ETDef:
   @ETQName:
     xhtml1:img
   @IFQName:  HTMLImageElement
   @ClsQName:ManakaiDOMHTMLImageElement
   @ISAHTMLElement:
-  @L1IF:
 
   @ResourceDef:
     @@rdf:type:
-      @@@@: ManakaiDOM|DOMAttribute
+      @@@@: DISLang|Attribute
       @@@ForCheck: ManakaiDOM|DOM
 
     @@For: ManakaiDOM|DOM1
@@ -5420,6 +5583,7 @@ ET:
   @ATTR:
      @@AName:ismap
      @@DOMAName:  isMap
+     @@plAName: ismap
      @@ReflectBoolean:
      @@Get:
         @@@InCase:
@@ -5434,6 +5598,7 @@ ET:
   @ATTR:
      @@AName:longdesc
      @@DOMAName:  longDesc
+     @@plAName: longdesc
      @@ReflectURI:
      @@Get:
      @@Set:
@@ -5445,6 +5610,7 @@ ET:
   @ATTR:
      @@AName:usemap
      @@DOMAName:  useMap
+     @@plAName: usemap
      @@ReflectURI:
      @@Get:
      @@Set:
@@ -5478,7 +5644,7 @@ ET:
      @@SpecLevel[list]:
         1
         2
-##IF:HTMLImageElement
+##HTMLImageElement
 
 ElementTypeBinding:
   @Name: ReflectStringLong
@@ -5498,13 +5664,12 @@ ElementTypeBinding:
       @@@@: CDATADOMString
       @@@For: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
 
-ET:
+IFCls1ETDef:
   @ETQName:
     xhtml1:object
   @IFQName:  HTMLObjectElement
   @ClsQName:ManakaiDOMHTMLObjectElement
   @ISAHTMLElement:
-  @L1IF:
 
   @ImplNote:
     @@lang:en
@@ -5552,12 +5717,14 @@ ET:
   @ATTR:
      @@AName:codebase
      @@DOMAName:  codeBase
+     @@plAName: codebase
      @@ReflectURI:
      @@Get:
      @@Set:
   @ATTR:
      @@AName:codetype
      @@DOMAName:  codeType
+     @@plAName: codetype
      @@ReflectCDATA:
      @@Get:
      @@Set:
@@ -5617,6 +5784,7 @@ ET:
   @Attr:
      @@AName:usemap
      @@DOMAName:  useMap
+     @@plAName: usemap
      @@ReflectURI:
      @@Get:
      @@Set:
@@ -5661,7 +5829,7 @@ ET:
      @@Level[list]:  2
      @@SpecLevel[list]:  2
      @@L2:
-##IF:HTMLObjectElement
+##HTMLObjectElement
 
 PropDef:
   @QName: referrer
@@ -5677,13 +5845,12 @@ PropDef:
     @@@:
       An (external) <IF::Document> node object referred from an element. 
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:param
   @IFQName:  HTMLParamElement
   @ClsQName:ManakaiDOMHTMLParamElement
   @ISAHTMLElement:
-  @L1IF:
 
   @ATTR:
      @@Name:  name
@@ -5703,17 +5870,17 @@ ET:
   @ATTR:
      @@AName:valuetype
      @@DOMAName:  valueType
+     @@plAName: valuetype
      @@ReflectCDATA:
      @@Get:
      @@Set:
 
-ET:
+IfCls12ETDef:
   @ETQName:
     xhtml1:applet
   @IFQName:  HTMLAppletElement
   @ClsQName:ManakaiDOMHTMLAppletElement
   @ISAHTMLElement:
-  @L1IF:
   @Deprecated:
 
   @ATTR:
@@ -5744,6 +5911,7 @@ ET:
   @ATTR:
      @@AName:codebase
      @@DOMAName:  codeBase
+     @@plAName: codebase
      @@Deprecated:
      @@ReflectURI:
      @@Get:
@@ -5801,7 +5969,7 @@ ET:
      @@ReflectCDATA:
      @@Get:
      @@Set:
-##IF:HTMLAppletElement
+##HTMLAppletElement
 
 ResourceDef:
   @QName:
@@ -5810,14 +5978,14 @@ ResourceDef:
     DOMMain:long::ManakaiDOM:all
   @ForCheck:
     !=ManakaiDOM:all
+  @For: ManakaiDOM|DOM
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:map
   @IFQName:  HTMLMapElement
   @ClsQName:ManakaiDOMHTMLMapElement
   @ISAHTMLElement:
-  @L1IF:
 
   @Attr:
      @@Name:  areas
@@ -5832,19 +6000,19 @@ ET:
      @@ReflectCDATA:
      @@Get:
      @@Set:
-##IF:HTMLMapElement
+##HTMLMapElement
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:area
   @IFQName:  HTMLAreaElement
   @ClsQName:ManakaiDOMAreaElement
   @ISAHTMLElement:
-  @L1IF:
 
   @ATTR:
      @@AName: accesskey
      @@DOMAName:  accessKey
+     @@plAName: accesskey
      @@ReflectCDATA:
      @@Get:
      @@Set:
@@ -5866,6 +6034,7 @@ ET:
   @ATTR:
      @@AName:nohref
      @@DOMAName:  noHref
+     @@plAName: nohref
      @@ReflectBoolean:
      @@Get:
         @@@InCase:
@@ -5893,15 +6062,14 @@ ET:
      @@ReflectCDATA:
      @@Get:
      @@Set:
-##IF:HTMLAreaElement
+##HTMLAreaElement
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:script
   @IFQName:  HTMLScriptElement
   @ClsQName:ManakaiDOMHTMLScriptElement
   @ISAHTMLElement:
-  @L1IF:
 
   @Attr:
      @@Name:  text
@@ -5973,15 +6141,14 @@ ET:
      @@ReflectCDATA:
      @@Get:
      @@Set:
-##IF:HTMLScriptElement
+##HTMLScriptElement
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:table
   @IFQName:  HTMLTableElement
   @ClsQName:ManakaiDOMHTMLTableElement
   @ISAHTMLElement:
-  @L1IF:
 
   @Attr:
      @@Name:  caption
@@ -6015,6 +6182,7 @@ ET:
         2
   @Attr:
      @@Name:  tHead
+     @@plAName: thead
      @@Description:
        @@@lang:en
        @@@@:
@@ -6047,6 +6215,7 @@ ET:
         2
   @Attr:
      @@Name:  tFoot
+     @@plAName: tfoot
      @@Description:
        @@@lang:en
        @@@@:
@@ -6089,6 +6258,7 @@ ET:
         @@@Type:  HTMLCollection
   @Attr:
      @@Name:  tBodies
+     @@plAName: tbodies
      @@Description:
        @@@lang:en
        @@@@:
@@ -6108,6 +6278,7 @@ ET:
   @ATTR:
      @@AName:bgcolor
      @@DOMAName:  bgColor
+     @@plAName: bgcolor
      @@ReflectCDATA:
      @@Get:
      @@Set:
@@ -6119,12 +6290,14 @@ ET:
   @ATTR:
      @@AName:cellpadding
      @@DOMAName:  cellPadding
+     @@plAName: cellpadding
      @@ReflectCDATA:
      @@Get:
      @@Set:
   @ATTR:
      @@AName:cellspacing
      @@DOMAName:  cellSpacing
+     @@plAName: cellspacing
      @@ReflectCDATA:
      @@Get:
      @@Set:
@@ -6154,6 +6327,7 @@ ET:
      @@Set:
   @Method:
      @@Name:  createTHead
+     @@plAName: create_thead
      @@Description:
        @@@lang:en
        @@@@:
@@ -6167,6 +6341,7 @@ ET:
             The <HE::thead> element.
   @Method:
      @@Name:  deleteTHead
+     @@plAName: delete_thead
      @@Description:
        @@@lang:en
        @@@@:
@@ -6174,6 +6349,7 @@ ET:
      @@Return:  
   @Method:
      @@Name:  createTFoot
+     @@plAName: create_tfoot
      @@Description:
        @@@lang:en
        @@@@:
@@ -6187,6 +6363,7 @@ ET:
             The <HE::tfoot> element.
   @Method:
      @@Name:  deleteTFoot
+     @@plAName: delete_tfoot
      @@Description:
        @@@lang:en
        @@@@:
@@ -6334,15 +6511,14 @@ ET:
      @@SpecLevel[list]:
         1
         2
-##IF:HTMLTableElement
+##HTMLTableElement
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:caption
   @IFQName:  HTMLTableCaptionElement
   @ClsQName:ManakaiDOMHTMLTableCaptionElement
   @ISAHTMLElement:
-  @L1IF:
 
   @ATTR:
      @@Name:  align
@@ -6350,15 +6526,14 @@ ET:
      @@ReflectEnum:
      @@Get:
      @@Set:
-##IF:HTMLTableCaptionElement
+##HTMLTableCaptionElement
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:col
   @IFQName:  HTMLTableColElement
   @ClsQName:ManakaiDOMHTMLTableColElement
   @ISAHTMLElement:
-  @L1IF:
 
   @ATTR:
      @@Name:  align
@@ -6368,12 +6543,14 @@ ET:
   @ATTR:
      @@AName:char
      @@DOMAName:  ch
+     @@plAName: char
      @@ReflectCDATA:
      @@Get:
      @@Set:
   @ATTR:
      @@AName:charoff
      @@DOMAName:  chOff
+     @@plAName: charoff
      @@ReflectCDATA:
      @@Get:
      @@Set:
@@ -6385,6 +6562,7 @@ ET:
   @ATTR:
      @@AName:valign
      @@DOMAName:  vAlign
+     @@plAName: valign
      @@ReflectCDATA:
      @@Get:
      @@Set:
@@ -6393,20 +6571,22 @@ ET:
      @@ReflectCDATA:
      @@Get:
      @@Set:
-##IF:HTMLTableColElement
+##HTMLTableColElement
 
 ForDef:
   @QName:
     DOMHTML:ForTbody
+  @ISA: DOMHTML|ForAnET
 ForDef:
   @QName:
     DOMHTML:ForThead
+  @ISA: DOMHTML|ForAnET
 ForDef:
   @QName:
     DOMHTML:ForTfoot
+  @ISA: DOMHTML|ForAnET
 
-IF:
-  @For:ForHTML
+IFCls1ETsDef:
   @rdf:type:
     @@@:
       dis:MultipleResource
@@ -6426,7 +6606,7 @@ IF:
   @rdf:type:
     @@@:
       s:ElementType
-    @@For:ForHTML
+    @@ForCheck: ForAnET
 
   @ETQName:
     @@@:
@@ -6485,7 +6665,6 @@ IF:
   @IFQName:  HTMLTableSectionElement
   @ClsQName:ManakaiDOMHTMLTableSectionElement
   @ISAHTMLElement:
-  @L1IF:
 
   @Attrs:
      @@Name:  align
@@ -6504,6 +6683,7 @@ IF:
   @Attrs: 
      @@AName: char
      @@DOMAName:  ch
+     @@plAName: char
      @@ReflectCDATA:
      @@Get:
      @@Set:
@@ -6519,6 +6699,7 @@ IF:
   @Attrs:
      @@AName:charoff
      @@DOMAName:  chOff
+     @@plAName: charoff
      @@ReflectCDATA:
      @@Get:
      @@Set:
@@ -6534,6 +6715,7 @@ IF:
   @Attrs:
      @@AName:valign
      @@DOMAName:  vAlign
+     @@plAName: valign
      @@ReflectEnum:
      @@Get:
      @@Set:
@@ -6666,15 +6848,14 @@ IF:
      @@SpecLevel[list]:
         1
         2
-##IF:HTMLTableSectionElement
+##HTMLTableSectionElement
 
-ET:
+IfCls12ETDef:
   @ETQName:
     xhtml1:tr
   @IFQName:  HTMLTableRowElement
   @ClsQName:ManakaiDOMHTMLTableRowElement
   @ISAHTMLElement:
-  @L1IF:
 
   @Attr:
      @@Name:  rowIndex
@@ -6745,6 +6926,7 @@ ET:
   @ATTR:
      @@AName:bgcolor
      @@DOMAName:  bgColor
+     @@plAName: bgcolor
      @@Deprecated:
      @@ReflectCDATA:
      @@Get:
@@ -6752,18 +6934,21 @@ ET:
   @ATTR:
      @@AName:char
      @@DOMAName:  ch
+     @@plAName: char
      @@ReflectCDATA:
      @@Get:
      @@Set:
   @ATTR:
      @@AName:charoff
      @@DOMAName:  chOff
+     @@plAName: charoff
      @@ReflectCDATA:
      @@Get:
      @@Set:
   @ATTR:
      @@AName:valign
      @@DOMAName:  vAlign
+     @@plAName: valign
      @@ReflectEnum:
      @@Get:
      @@Set:
@@ -6871,17 +7056,18 @@ ET:
      @@SpecLevel[list]:
         1
         2
-##IF:HTMLTableRowElement
+##HTMLTableRowElement
 
 ForDef:
   @QName:
     DOMHTML:ForTd
+  @ISA: DOMHTML|ForAnET
 ForDef:
   @QName:
     DOMHTML:ForTh
+  @ISA: DOMHTML|ForAnET
 
-IF:
-  @For:ForHTML
+IFCls1ETsDef:
   @rdf:type:
     @@@:
       dis:MultipleResource
@@ -6898,7 +7084,7 @@ IF:
   @rdf:type:
     @@@:
       s:ElementType
-    @@For:ForHTML
+    @@ForCheck: ForAnET
 
   @ETQName:
     @@@:
@@ -6938,7 +7124,6 @@ IF:
   @IFQName:  HTMLTableCellElement
   @ClsQName:ManakaiDOMHTMLTableCellElement
   @ISAHTMLElement:
-  @L1IF:
 
   @Attr:
      @@Name:  cellIndex
@@ -6991,6 +7176,7 @@ IF:
   @Attrs:
      @@AName:bgcolor
      @@DOMAName:  bgColor
+     @@plAName: bgcolor
      @@Deprecated:
      @@ReflectCDATA:
      @@Get:
@@ -7004,6 +7190,7 @@ IF:
   @Attrs:
      @@AName:char
      @@DOMAName:  ch
+     @@plAName: char
      @@ReflectCDATA:
      @@Get:
      @@Set:
@@ -7016,6 +7203,7 @@ IF:
   @Attrs:
      @@AName:charoff
      @@DOMAName:  chOff
+     @@plAName: charoff
      @@ReflectCDATA:
      @@Get:
      @@Set:
@@ -7028,6 +7216,7 @@ IF:
   @Attrs:
      @@AName:colspan
      @@DOMAName:  colSpan
+     @@plAName: colspan
      @@ReflectNumeric:
      @@Get:
      @@Set:
@@ -7063,6 +7252,7 @@ IF:
   @Attrs:
      @@AName:nowrap
      @@DOMAName:  noWrap
+     @@plAName: nowrap
      @@Deprecated:
      @@ReflectBoolean:
      @@Get:
@@ -7084,6 +7274,7 @@ IF:
   @Attrs:
      @@AName:rowspan
      @@DOMAName:  rowSpan
+     @@plAName: rowspan
      @@ReflectNumeric:
      @@Get:
      @@Set:
@@ -7107,6 +7298,7 @@ IF:
   @Attrs:
      @@AName:valign
      @@DOMAName:  vAlign
+     @@plAName: valign
      @@ReflectEnum:
      @@Get:
      @@Set:
@@ -7128,15 +7320,14 @@ IF:
      @@docAttrP1S: ||ForHTML40SE||ForTd
      @@docAttrP2S: ||ForHTML401||ForTd
      @@docAttrP2X: ||ForXHTML10SE||ForTd
-##IF:HTMLTableCellElement
+##HTMLTableCellElement
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:frameset
   @IFQName:  HTMLFrameSetElement
   @ClsQName:ManakaiDOMHTMLFrameSetElement
   @ISAHTMLElement:
-  @L1IF:
 
   @ForCheck: !ForXHTML11
 
@@ -7150,39 +7341,42 @@ ET:
      @@ReflectCDATA:
      @@Get:
      @@Set:
-##IF:HTMLFrameSetElement
+##HTMLFrameSetElement
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:frame
   @IFQName:  HTMLFrameElement
   @ClsQName:ManakaiDOMHTMLFrameElement
   @ISAHTMLElement:
-  @L1IF:
 
   @ForCheck: !ForXHTML11
 
   @ATTR:
      @@AName:frameborder
      @@DOMAName:  frameBorder
+     @@plAName: frameborder
      @@ReflectCDATA:
      @@Get:
      @@Set:
   @ATTR:
      @@AName:longdesc
      @@DOMAName:  longDesc
+     @@plAName: longdesc
      @@ReflectURI:
      @@Get:
      @@Set:
   @ATTR:
      @@AName:marginheight
      @@DOMAName:  marginHeight
+     @@plAName: marginheight
      @@ReflectCDATA:
      @@Get:
      @@Set:
   @ATTR:
      @@AName:marginwidth
      @@DOMAName:  marginWidth
+     @@plAName: marginwidth
      @@ReflectCDATA:
      @@Get:
      @@Set:
@@ -7194,6 +7388,7 @@ ET:
   @ATTR:
      @@AName:noresize
      @@DOMAName:  noResize
+     @@plAName: noresize
      @@ReflectBoolean:
      @@Get:
         @@@InCase:
@@ -7238,15 +7433,14 @@ ET:
      @@Level[list]:  2
      @@SpecLevel[list]:  2
      @@L2:
-##IF:HTMLFrameElement
+##HTMLFrameElement
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:iframe
   @IFQName:  HTMLIFrameElement
   @ClsQName:ManakaiDOMHTMLIFrameElement
   @ISAHTMLElement:
-  @L1IF:
 
   @ForCheck: !ForXHTML11
 
@@ -7259,6 +7453,7 @@ ET:
   @ATTR:
      @@AName:frameborder
      @@DOMAName:  frameBorder
+     @@plAName: frameborder
      @@ReflectCDATA:
      @@Get:
      @@Set:
@@ -7270,18 +7465,21 @@ ET:
   @ATTR:
      @@AName:longdesc
      @@DOMAName:  longDesc
+     @@plAName: longdesc
      @@ReflectURI:
      @@Get:
      @@Set:
   @ATTR:
      @@AName:marginheight
      @@DOMAName:  marginHeight
+     @@plAName: marginheight
      @@ReflectCDATA:
      @@Get:
      @@Set:
   @ATTR:
      @@AName:marginwidth
      @@DOMAName:  marginWidth
+     @@plAName: marginwidth
      @@ReflectCDATA:
      @@Get:
      @@Set:
@@ -7325,7 +7523,6 @@ ET:
      @@Level[list]:  2
      @@SpecLevel[list]:  2
      @@L2:
-##IF:HTMLIFrameElement
+##HTMLIFrameElement
 
-## DOMHTML.dis ends here
 

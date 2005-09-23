@@ -21,7 +21,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/22 11:02:34 $
+      $Date: 2005/09/23 18:25:06 $
     @@ContentType:
       dis:Date.RCS
   
@@ -122,26 +122,22 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DOMMain:DOMFeature
-    @@ForCheck:
-      ManakaiDOM:all
+    @@rdf:type: DOMFeature|Feature
+    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: FeatureVerDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DOMMain:DOMFeature
+    @@rdf:type: DOMFeature|Feature
 
 ElementTypeBinding:
   @Name: featureQName
   @ElementType:
-    dis:AppName
+    DOMFeature:name
   @ShadowContent:
-    @@ContentType:
-      dis:TypeQName
+    @@ContentType: DISCore|QName
 
 FeatureDef:
   @QName: DIS|Dump
@@ -226,6 +222,8 @@ ElementTypeBinding:
 
     @@DOMMain:implementFeature: DIS|Dump10
 
+    @@ForCheck: DIS|ForEmpty
+
 ElementTypeBinding:
   @Name: IFDef
   @ElementType:
@@ -239,6 +237,8 @@ ElementTypeBinding:
     @@rdf:type:
       @@@@: ManakaiDOM|IF
       @@@ForCheck: ManakaiDOM|ForIF
+
+    @@ForCheck: DIS|ForEmpty
 
 ElementTypeBinding:
   @Name: IFQName
@@ -263,7 +263,6 @@ ElementTypeBinding:
       s:ForML
     @@ContentType:
       dis:TypeQName
-
 
 ElementTypeBinding:
   @Name: ATTRQName
@@ -303,6 +302,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
+    @@For: !=DIS|ForEmpty
 
 ElementTypeBinding:
   @Name: Return
@@ -335,7 +335,7 @@ IFClassDef:
 
   @Method:
     @@Name: createDISDumpDocument
-    @@PerlName: create_disdump_document
+    @@plMName: create_disdump_document
     @@enDesc:
       Creates a DISDump document.
     @@Return:
@@ -350,11 +350,9 @@ IFClassDef:
 ##DISImplementationDISDump
 
 ElementTypeBinding:
-  @Name: PerlName
+  @Name: plMName
   @ElementType:
-    dis:AppName
-  @ShadowContent:
-    @@ContentType: lang|Perl
+    DISPerl:methodName
 
 ElementTypeBinding:
   @Name: PerlDef
@@ -2083,6 +2081,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
+    @@For: !=DIS|ForEmpty
 
 ElementTypeBinding:
   @Name: Get
@@ -2120,6 +2119,7 @@ ElementTypeBinding:
       @@@@: ||+||s|ForML
       @@@ContentType: DISCore|TFPQNames
       @@@ForCheck: ManakaiDOM|ForIF
+    @@ForCheck: !=DIS|ForEmpty
 
 ElementTypeBinding:
   @Name: DOMName

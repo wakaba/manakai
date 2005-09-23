@@ -97,6 +97,7 @@ GetOptions (
     shift;
     push @{$Opt{create_module}}, [split /\s+/, shift, 3];
   },
+  'debug' => \$Opt{debug},
   'enable-assertion!' => \$Opt{outputAssertion},
   'for=s' => \$Opt{For},
   'help' => \$Opt{help},
@@ -107,6 +108,7 @@ GetOptions (
 pod2usage ({-exitval => 0, -verbose => 1}) if $Opt{help};
 $Opt{file_name} = shift;
 pod2usage ({-exitval => 2, -verbose => 0}) unless $Opt{file_name};
+$Message::DOM::DOMFeature::DEBUG = 1 if $Opt{debug};
 
 if ($Opt{module_uri}) {
   push @{$Opt{create_module}},
@@ -220,4 +222,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/09/22 11:02:31 $
+1; # $Date: 2005/09/23 18:24:52 $

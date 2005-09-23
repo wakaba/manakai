@@ -18,14 +18,12 @@ Module:
       This module provides the manakai implementation of
       error reporting system.
 
-  @Author:
-    @@FullName: Wakaba
-    @@Mail: w@suika.fam.cx
+  @DISCore:author: DISCore|Wakaba
   @License:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/22 11:02:34 $
+      $Date: 2005/09/23 18:25:09 $
     @@ContentType:
       dis:Date.RCS
   
@@ -88,8 +86,6 @@ ResourceDef:
     @@lang:en
     @@@:
       The manakai error reporting modules
-  @AppName:
-    Message::Util::Error::
   @DISPerl:packageName:
     Message::Util::Error::
   @DISPerl:interfacePackageName:
@@ -298,7 +294,7 @@ ElementTypeBinding:
 ElementTypeBinding:
   @Name: IFPackName
   @ElementType:
-    dis:AppName
+    DISPerl:interfacePackageName
   @ShadowContent:
     @@ForCheck: ManakaiDOM|ForIF
     @@ContentType: lang|Perl
@@ -306,7 +302,7 @@ ElementTypeBinding:
 ElementTypeBinding:
   @Name: ClsPackName
   @ElementType:
-    dis:AppName
+    DISPerl:packageName
   @ShadowContent:
     @@ForCheck: ManakaiDOM|ForClass
     @@ContentType: lang|Perl

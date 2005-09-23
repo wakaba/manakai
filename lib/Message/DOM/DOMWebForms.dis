@@ -19,14 +19,12 @@ Module:
       \
       }
 
-  @Author:
-     @@FullName: Wakaba
-     @@Mail:  w@suika.fam.cx
+  @DISCore:author: DISCore|Wakaba
   @License:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/08/31 13:02:46 $
+      $Date: 2005/09/23 18:24:56 $
     @@ContentType:
       dis:Date.RCS
 
@@ -34,24 +32,30 @@ Module:
     ManakaiDOM:ManakaiDOMLatest
 
   @Require:
-     @@Module:
-        @@@Name:  DOMHTML
-     @@Module:
-       @@@Name: DOMWebForms
-       @@@WithFor:
-         ManakaiDOM:ManakaiDOM
-     @@Module:
-       @@@Name: DOMWebForms
-       @@@WithFor:
-         ManakaiDOM:ManakaiDOM1
-     @@Module:
-       @@@Name: DOMWebForms
-       @@@WithFor:
-         ManakaiDOM:ManakaiDOM2
-     @@Module:
-       @@@Name: DOMWebForms
-       @@@WithFor:
-         ManakaiDOM:ManakaiDOMLatest
+    @@Module:
+      @@@QName: MDOM|DOMHTML
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName: MDOM|DOMWebForms
+      @@@WithFor: ManakaiDOM|ManakaiDOM
+    @@Module:
+      @@@QName: MDOM|DOMWebForms
+      @@@WithFor: ManakaiDOM|ManakaiDOM1
+    @@Module:
+      @@@QName: MDOM|DOMWebForms
+      @@@WithFor: ManakaiDOM|ManakaiDOM2
+    @@Module:
+      @@@QName: MDOM|DOMWebForms
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName: MDOM|DOMWebForms
+      @@@WithFor: DOMHTML|ForHTML40SE
+    @@Module:
+      @@@QName: MDOM|DOMWebForms
+      @@@WithFor: DOMHTML|ForHTML401
+    @@Module:
+      @@@QName: MDOM|DOMWebForms
+      @@@WithFor: DOMHTML|ForXHTML10SE
 
 Namespace:
   @dis:
@@ -174,125 +178,110 @@ ElementTypeBinding:
   @ShadowContent:
     @@ContentType:
       lang:Perl
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
-  @Name: IF
+  @Name: PerlCDef
   @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
+
+ElementTypeBinding:
+  @Name: IFCls2Def
+  @ElementType: 
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
-      @@@@:
-        dis:MultipleResource
-      @@@ForCheck:
-        !ManakaiDOM:ForClass !ManakaiDOM:ForIF !DOMHTML:ForHTML
-    @@rdf:type:
-      @@@@:
-        ManakaiDOM:IF
-      @@@ForCheck:
-        ManakaiDOM:ForIF
-    @@rdf:type:
-      @@@@:
-        ManakaiDOM:Class
-      @@@ForCheck:
-        ManakaiDOM:ForClass
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
     @@resourceFor:
-      @@@@:
-        ManakaiDOM:ForIF
-      @@@For:
-        =ManakaiDOM:ManakaiDOM
-      @@@For:
-        ManakaiDOM:DOMHTMLFeature
-      @@@ForCheck:
-        !DOMHTML:ForHTML
-    @@resourceFor:
-      @@@@:
-        ManakaiDOM:ForClass
-      @@@ForCheck:
-        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM ManakaiDOM:DOMHTMLFeature
-        !DOMHTML:ForHTML
-    @@ISA:
-      @@@@:
-        ManakaiDOM:ManakaiDOMObject
-      @@@ForCheck:
-        ManakaiDOM:ForClass
-    @@ISA:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOM||ManakaiDOM|ForIF
-      @@@ForCheck:
-        ManakaiDOM:ForIF
-      @@@For:
-        ManakaiDOM:ManakaiDOM2
-      @@@ContentType: DISCore|TFPQNames
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+    @@For: ManakaiDOM|DOM2
+    @@For: =ManakaiDOM|ManakaiDOM
+
+    @@rdf:type:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
     @@Implement:
-      @@@@: ||+||ManakaiDOM|ForIF
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM2||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM2
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+    @@DOMMain:implementFeature:
+      @@@@: DOMHTML|HTMLFeature20
+      @@@For: ManakaiDOM|DOM2
 
 ElementTypeBinding:
-  @Name: ET
-  @ElementType:
+  @Name: IFCls1ETDef
+  @ElementType: 
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
-      @@@@:
-        dis:MultipleResource
-      @@@ForCheck:
-        !ManakaiDOM:ForClass !ManakaiDOM:ForIF !DOMHTML:ForHTML
-    @@rdf:type:
-      @@@@:
-        ManakaiDOM:IF
-      @@@ForCheck:
-        ManakaiDOM:ForIF
-    @@rdf:type:
-      @@@@:
-        ManakaiDOM:Class
-      @@@ForCheck:
-        ManakaiDOM:ForClass
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass !DOMHTML|ForHTML
+    @@resourceFor: ManakaiDOM|ForIF
     @@resourceFor:
-      @@@@:
-        ManakaiDOM:ForIF
-      @@@ForCheck:
-        ManakaiDOM:DOM
-      @@@For:
-        =ManakaiDOM:ManakaiDOM
-      @@@For:
-        ManakaiDOM:DOMHTMLFeature
-    @@resourceFor:
-      @@@@:
-        ManakaiDOM:ForClass
-      @@@ForCheck:
-        ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
-        ManakaiDOM:DOMHTMLFeature
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+    @@For: ManakaiDOM|DOM1
+    @@For: =ManakaiDOM|ManakaiDOM
+    @@For: DOMHTML|ForHTML
 
     @@rdf:type:
-      @@@@:
-        s:ElementType
-      @@@ForCheck:
-        DOMHTML:ForHTML
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
 
-    @@ISA:
-      @@@@:
-        ManakaiDOM:ManakaiDOMObject
-      @@@ForCheck:
-        ManakaiDOM:ForClass
-    @@ISA:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOM||ManakaiDOM|ForIF
-      @@@ForCheck:
-        ManakaiDOM:ForIF
-      @@@For:
-        ManakaiDOM:ManakaiDOM2
-      @@@ContentType: DISCore|TFPQNames
+    @@rdf:type:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
     @@Implement:
-      @@@@: ||+||ManakaiDOM|ForIF
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
-
-    @@DISMarkup:elementType:
-      @@@@:
-        ::DOMHTML:ForHTML40SE
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM1||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
       @@@ForCheck:
-        ManakaiDOM:DOM1 !ManakaiDOM:DOM2
+        ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM2||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM2
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+    @@DOMMain:implementFeature:
+      @@@@: DOMHTML|HTMLFeature10
+      @@@For: ManakaiDOM|DOM1
+    @@DOMMain:implementFeature:
+      @@@@: DOMHTML|HTMLFeature20
+      @@@For: ManakaiDOM|DOM2
+
+    @@rdf:type:
+      @@@: s|ElementType
+      @@ForCheck: DOMHTML|ForHTML
+
+    @@s:elementType:
+      @@@@: ||DOMHTML|ForHTML40SE
+      @@@ForCheck: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
       @@@ImplNote:
         @@@@lang:en
         @@@@@:
@@ -300,17 +289,12 @@ ElementTypeBinding:
           HTML 4.0 while Second Edition refers the second edition of 
           HTML 4.0. 
       @@@DISCore:stopISARecursive:1
-    @@DISMarkup:elementType:
-      @@@@:
-        ::DOMHTML:ForHTML401
-      @@@ForCheck:
-        ManakaiDOM:DOM2
-      @@@DISCore:stopISARecursive:1
-    @@DISMarkup:elementType:
-      @@@@:
-        ::DOMHTML:ForXHTML10SE
-      @@@ForCheck:
-        ManakaiDOM:DOM2
+    @@s:elementType:
+      @@@@: ||DOMHTML|ForHTML401
+      @@@ForCheck: ManakaiDOM|DOM2
+    @@s:elementType:
+      @@@@: ||DOMHTML|ForXHTML10SE
+      @@@ForCheck: ManakaiDOM|DOM2
       @@@DISCore:stopISARecursive:1
 
 ElementTypeBinding:
@@ -318,37 +302,33 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethod
-    @@ForCheck:
-      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+    @@rdf:type: DISLang|Method
+    @@ForCheck: ManakaiDOM|DOM !=ManakaiDOM|ManakaiDOM
+
 ElementTypeBinding:
   @Name: IntMethod
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethod
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@rdf:type: DISLang|Method
+    @@ForCheck: ManakaiDOM|ForClass
     @@ManakaiDOM:isForInternal: 1
+
 ElementTypeBinding:
   @Name: ReMethod
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethod
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
-    @@ManakaiDOM:isRedefining: 1
+    @@rdf:type: DISLang|Method
+    @@ForCheck: ManakaiDOM|ForClass
+
 ElementTypeBinding:
   @Name: Param
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethodParameter
+    @@rdf:type: DISLang|MethodParameter
+
 ElementTypeBinding:
   @Name: Exception
   @ElementType:
@@ -359,18 +339,15 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethodReturn
+    @@rdf:type: DISLang|MethodReturn
 
 ElementTypeBinding:
   @Name: Attr
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttribute
-    @@ForCheck:
-      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: ManakaiDOM|DOM !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: ATTR
@@ -378,20 +355,14 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
-      @@@@:
-        ManakaiDOM:DOMAttribute
-      @@@ForCheck:
-        ManakaiDOM:DOM
+      @@@@: DISLang|Attribute
+      @@@ForCheck: ManakaiDOM|DOM
     @@rdf:type:
-      @@@@:
-        s:Attribute
-      @@@ForCheck:
-        DOMHTML:ForHTML
+      @@@@: s|Attribute
+      @@@ForCheck: DOMHTML|ForHTML
     @@DocAttr:
-      @@@@:
-        ::DOMHTML:ForHTML40SE
-      @@@ForCheck:
-        ManakaiDOM:DOM1 !ManakaiDOM:DOM2
+      @@@@: ||DOMHTML|ForHTML40SE
+      @@@ForCheck: ManakaIDOM|DOM1 !ManakaiDOM|DOM2
       @@@ImplNote:
         @@@@lang:en
         @@@@@:
@@ -399,44 +370,36 @@ ElementTypeBinding:
           HTML 4.0 while Second Edition refers the second edition of 
           HTML 4.0. 
     @@DocAttr:
-      @@@@:
-        ::DOMHTML:ForHTML401
-      @@@ForCheck:
-        ManakaiDOM:DOM2
+      @@@@: ||DOMHTML|ForHTML401
+      @@@ForCheck: ManakaiDOM|DOM2
     @@DocAttr:
-      @@@@:
-        ::DOMHTML:ForXHTML10SE
-      @@@ForCheck:
-        ManakaiDOM:DOM2
+      @@@@: ||DOMHTML|ForXHTML10SE
+      @@@ForCheck: ManakaiDOM|DOM2
 
 ElementTypeBinding:
   @Name: ReAttr
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttribute
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
-    @@ManakaiDOM:isRedefining: 1
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: ManakaiDOM|ForClass
+
 ElementTypeBinding:
   @Name: Get
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttrGet
-    @@ForCheck:
-      ManakaiDOM:DOM
+    @@rdf:type: DISLang|AttributeGet
+    @@For: ManakaiDOM|DOM
+
 ElementTypeBinding:
   @Name: Set
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttrSet
-    @@ForCheck:
-      ManakaiDOM:DOM
+    @@rdf:type: DISLang|AttributeSet
+    @@For: ManakaiDOM|DOM
+
 ElementTypeBinding:
   @Name: InCase
   @ElementType:
@@ -450,20 +413,15 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:ConstGroup
-    @@ForCheck:
-      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+    @@rdf:type: DISLang|ConstGroup
+    @@ForCheck: ManakaiDOM|DOM !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Const
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: 
-      ManakaiDOM:Const
-    @@ForCheck:
-      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+    @@rdf:type: DISLang|Const
 
 ElementTypeBinding:
   @Name: Deprecated
@@ -481,11 +439,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       rdf:Property
-    @@AliasFor: 
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
+    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: ISAHTMLElement
@@ -508,9 +462,9 @@ ElementTypeBinding:
   @ElementType:
     dis:AppName
   @ShadowContent:
-    @@ForCheck:
-      s:ForML
-    @@ContentType: dis|TypeQName
+    @@ForCheck: s|ForML
+    @@ContentType: DISCore|QName
+
 ElementTypeBinding:
   @Name: IFQName
   @ElementType:
@@ -518,6 +472,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@ForCheck:
       ManakaiDOM:ForIF
+
 ElementTypeBinding:
   @Name: ClsQName
   @ElementType:
@@ -533,6 +488,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@ForCheck:
       ManakaiDOM:DOM
+
 ElementTypeBinding:
   @Name: AName
   @ElementType:
@@ -541,10 +497,19 @@ ElementTypeBinding:
     @@ForCheck:
       DOMHTML:ForHTML
 
-IF:
+ElementTypeBinding:
+  @Name: plAName
+  @ElementType:
+    DISPerl:methodName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|Perl
+    @@ContentType: lang|Perl
+
+IFCls2Def:
   @IFQName:  
     DOMHTML:HTMLOptionsCollection
   @ClsQName:ManakaiDOMHTMLOptionsCollection
+
   @Description:
     @@lang:en
     @@@:
@@ -561,10 +526,6 @@ IF:
       \
       }
       
-  @Level[list]:  2
-  @SpecLevel[list]:  2
-  @L2IF:
-
   @Attr:
      @@Name:  length
      @@Description:
@@ -653,16 +614,15 @@ IF:
             @@@@@lang:en
             @@@@@@:
               There is no node with such a <P::name>.
-##IF:HTMLOptionCollection
+##HTMLOptionCollection
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:form
   @IFQName:  
     DOMHTML:HTMLFormElement
   @ClsQName:ManakaiDOMHTMLFormElement
   @ISAHTMLElement:
-  @L1IF:
 
   @Description:
     @@lang:en
@@ -752,16 +712,15 @@ ET:
          Restore current values of form controls to initial values, 
          as the activation of reset buttons do.
      @@Return:  
-##IF:HTMLFormElement
+##HTMLFormElement
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:select
   @IFQName:  
     DOMHTML:HTMLSelectElement
   @ClsQName: ManakaiDOMHTMLSelectElement
   @ISAHTMLElement: 
-  @L1IF:
 
   @Attr:
      @@Name:  type
@@ -942,6 +901,7 @@ ET:
   @ATTR:
      @@AName:tabindex
      @@DOMAName:  tabIndex
+     @@plAName: tabindex
      @@rlong:
      @@Get:
      @@Set:
@@ -1043,16 +1003,15 @@ ET:
        @@@lang:en
        @@@@:Give forcus to this element.
      @@Return:  
-##IF:HTMLSelectElement
+##HTMLSelectElement
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:optgroup
   @IFQName:  
     DOMHTML:HTMLOptGroupElement
   @ClsQName:ManakaiDOMHTMLOptGroupElement
   @ISAHTMLElement: 
-  @L1IF:
 
   @ATTR:
      @@Name:  disabled
@@ -1072,9 +1031,9 @@ ET:
      @@rcdata:
      @@Get:
      @@Set:
-##IF:HTMLOptGroupElement
+##HTMLOptGroupElement
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:option
   @IFQName:
@@ -1082,7 +1041,6 @@ ET:
   @ClsQName:
     ManakaiDOMHTMLOptionElement
   @ISAHTMLElement:  
-  @L1IF:
 
   @Attr:
      @@Name:  form
@@ -1223,7 +1181,7 @@ ET:
      @@rcdata:
      @@Get:
      @@Set:
-##IF:HTMLOptionElement
+##HTMLOptionElement
 
 PropDef:
   @QName:
@@ -1233,14 +1191,13 @@ PropDef:
     @@@:
       Whether a subject option element is selected or not. 
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:input
   @IFQName:  
     DOMHTML:HTMLInputElement
   @ClsQName:ManakaiDOMHTMLInputElement
   @ISAHTMLElement: 
-  @L1IF:
 
   @ATTR:
      @@AName:value
@@ -1296,6 +1253,7 @@ ET:
   @ATTR:
      @@AName:accesskey
      @@DOMAName:  accessKey
+     @@plAName: accesskey
      @@rcdata:
      @@Get:
      @@Set:
@@ -1363,6 +1321,7 @@ ET:
   @ATTR:
      @@AName:maxlength
      @@DOMAName:  maxLength
+     @@plAName: maxlength
      @@rlong:
      @@Get:
      @@Set:
@@ -1374,6 +1333,7 @@ ET:
   @ATTR:
      @@AName:readonly
      @@DOMAName:  readOnly
+     @@plAname: readonly
      @@rbool:
      @@Get:
         @@@InCase:
@@ -1434,6 +1394,7 @@ ET:
   @ATTR:
      @@AName:usemap
      @@DOMAName:  useMap
+     @@plAName: usemap
      @@ruri:
      @@Get:
      @@Set:
@@ -1559,16 +1520,15 @@ ET:
          <HTML::checkbox>, <HTML::radio>, <HTML::reset> or 
          <HTML::submit> control.
      @@Return:  
-##IF:HTMLInputElement
+##HTMLInputElement
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:textarea
   @IFQName:  
     DOMHTML:HTMLTextAreaElement
   @ClsQName:ManakaiDOMHTMLTextAreaElement
   @ISAHTMLElement:
-  @L1IF:
 
   @Attr:
      @@Name:  defaultValue
@@ -1619,6 +1579,7 @@ ET:
   @ATTR:
      @@AName:accesskey
      @@DOMAName:  accessKey
+     @@plAName: accesskey
      @@rcdata:
      @@Get:
      @@Set:
@@ -1648,6 +1609,7 @@ ET:
   @ATTR:
      @@AName:readonly
      @@DOMAName:  readOnly
+     @@plAName: readonly
      @@rbool:
      @@Get:
         @@@InCase:
@@ -1667,6 +1629,7 @@ ET:
   @ATTR:
      @@AName:tabindex
      @@DOMAName:  tabIndex
+     @@plAName: tabindex
      @@rlong:
      @@Get:
      @@Set:
@@ -1743,7 +1706,7 @@ ET:
        @@@@:
          Select the contents of the <HE::textarea>.
      @@Return:  
-##IF:DOMHTMLTextAreaElement
+##DOMHTMLTextAreaElement
 
 PropDef:
   @QName:
@@ -1753,14 +1716,13 @@ PropDef:
     @@@:
       The current value of a subject form control.
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:button
   @IFQName:
     DOMHTML:HTMLButtonElement
   @ClsQName:ManakaiDOMHTMLButtonElement
   @ISAHTMLElement:
-  @L1IF:
 
   @Attr:
      @@Name:  form
@@ -1781,6 +1743,7 @@ ET:
   @ATTR:
      @@AName:accesskey
      @@DOMAName:  accessKey
+     @@plAName: accesskey
      @@rcdata:
      @@Get:
      @@Set:
@@ -1805,6 +1768,7 @@ ET:
   @ATTR:
      @@AName:tabindex
      @@DOMAName:  tabIndex
+     @@plAName: tabindex
      @@rlong:
      @@Get:
      @@Set:
@@ -1817,7 +1781,7 @@ ET:
      @@rcdata:
      @@Get:
      @@Set:
-##IF:HTMLButtonElement
+##HTMLButtonElement
 
 ResourceDef:
   @QName: DOMString
@@ -1826,7 +1790,7 @@ ResourceDef:
   @ForCheck:
     ManakaiDOM:ManakaiDOM
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:label
   @IFQName:
@@ -1834,7 +1798,6 @@ ET:
   @ClsQName:
     ManakaiDOMHTMLLabelElement
   @ISAHTMLElement:
-  @L1IF:
 
   @Attr:
      @@Name:  form
@@ -1855,6 +1818,7 @@ ET:
   @ATTR:
      @@AName:accesskey
      @@DOMAName:  accessKey
+     @@plAName: accesskey
      @@rcdata:
      @@Get:
      @@Set:
@@ -1864,16 +1828,15 @@ ET:
      @@rcdata:
      @@Get:
      @@Set:
-##IF:HTMLLabelElement
+##HTMLLabelElement
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:fieldset
   @IFQName:  
     DOMHTML:HTMLFieldSetElement
   @ClsQName:ManakaiDOMHTMLFieldSetElement
   @ISAHTMLElement:
-  @L1IF:
 
   @Attr:
      @@Name:  form
@@ -1891,16 +1854,15 @@ ET:
             @@@@@lang:en
             @@@@@@:
               This control is not within the context of a form.
-##IF:HTMLFieldSetElement
+##HTMLFieldSetElement
 
-ET:
+IfCls1ETDef:
   @ETQName:
     xhtml1:legend
   @IFQName:
     DOMHTML:HTMLLegendElement
   @ClsQName:  ManakaiDOMHTMLLegendElement
   @ISAHTMLElement:
-  @L1IF:
 
   @Attr:
      @@Name:  form
@@ -1921,6 +1883,7 @@ ET:
   @ATTR:
      @@AName:accesskey
      @@DOMAName:  accessKey
+     @@plAName: accesskey
      @@rcdata:
      @@Get:
      @@Set:
@@ -1930,7 +1893,7 @@ ET:
      @@renum:
      @@Get:
      @@Set:
-##IF:HTMLLegendElement
+##HTMLLegendElement
 
 ElementTypeBinding:
   @Name: rcdata
@@ -1971,5 +1934,3 @@ ElementTypeBinding:
   @ShadowContent: DOMMain|long||ManakaiDOM|all
   @ShadowSibling:
     @@actualType: DOMHTML|Numeric
-
-## DOMWebForms.dis ends here

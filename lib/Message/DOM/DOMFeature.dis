@@ -36,14 +36,12 @@ Module:
       <IF::DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM3>
       interface.
 
-  @Author:
-    @@FullName: Wakaba
-    @@Mail: w@suika.fam.cx
+  @DISCore:author: DISCore|Wakaba
   @License:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/19 16:17:51 $
+      $Date: 2005/09/23 18:24:55 $
     @@ContentType:
       dis:Date.RCS
   
@@ -108,6 +106,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
   @DOMXML:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xml#
+  @f:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @infoset:
     http://www.w3.org/2001/04/infoset#
   @kwd:
@@ -139,6 +139,186 @@ Namespace:
     http://www.w3.org/XML/1998/namespace
   @xmlns:
     http://www.w3.org/2000/xmlns/
+
+ResourceDef:
+  @QName:
+    MDOM:
+  @rdf:type:
+    dis:ModuleGroup
+  @FullName:
+    @@lang:en
+    @@@:
+      The manakai DOM modules
+  @DISPerl:packageName:
+    @@@:
+      Message::DOM::
+    @@For: ManakaiDOM|ManakaiDOM
+    @@ManakaiDOM:moduleSuffix:
+      @@@@: Level3
+      @@@For: ManakaiDOM|ManakaiDOM3 !ManakaiDOM|ManakaiDOMLatest
+    @@ManakaiDOM:moduleSuffix:
+      @@@@: Level2
+      @@@For: ManakaiDOM|ManakaiDOM2 !ManakaiDOM|ManakaiDOM3
+    @@ManakaiDOM:moduleSuffix:
+      @@@@: Level1
+      @@@For: ManakaiDOM|ManakaiDOM1 !ManakaiDOM|ManakaiDOM2
+  @DISPerl:interfacePackageName:
+    @@@:
+      Message::DOM::IFLatest::
+    @@For: ManakaiDOM|ManakaiDOMLatest
+  @DISPerl:interfacePackageName:
+    @@@:
+      Message::DOM::IFLevel3::
+    @@For: ManakaiDOM|ManakaiDOM3 !ManakaiDOM|ManakaiDOMLatest
+  @DISPerl:interfacePackageName:
+    @@@:
+      Message::DOM::IFLevel2::
+    @@For: ManakaiDOM|ManakaiDOM2 !ManakaiDOM|ManakaiDOM3
+  @DISPerl:interfacePackageName:
+    @@@:
+      Message::DOM::IFLevel1::
+    @@For: ManakaiDOM|ManakaiDOM1 !ManakaiDOM|ManakaiDOM2
+  @DISPerl:interfacePackageName:
+    @@@:
+      Message::DOM::IF::
+    @@For: ManakaiDOM|ManakaiDOM !ManakaiDOM|ManakaiDOM1
+
+## -- "For" definitions
+
+## For the Document Object Model
+
+ForDef:
+  @QName:
+    ManakaiDOM:DOM
+  @FullName:
+    @@lang:en
+    @@@: For DOM
+ForDef:
+  @QName:
+    ManakaiDOM:DOM1
+  @FullName:
+    @@lang:en
+    @@@: For DOM Level 1
+  @ISA:
+    ManakaiDOM:DOM
+ForDef:
+  @QName:
+    ManakaiDOM:DOM2
+  @FullName:
+    @@lang:en
+    @@@: For DOM Level 2
+  @ISA:
+    ManakaiDOM:DOM1
+ForDef:
+  @QName:
+    ManakaiDOM:DOM3
+  @FullName:
+    @@lang:en
+    @@@: For DOM Level 3
+  @ISA:
+    ManakaiDOM:DOM2
+ForDef:
+  @QName:
+    ManakaiDOM:DOMLatest
+  @FullName:
+    @@lang:en
+    @@@: For the latest level of DOM
+  @ISA:
+    ManakaiDOM:DOM3
+
+ForDef:
+  @QName: 
+    ManakaiDOM:DOMHTMLFeature
+  @FullName:
+    @@lang:en
+    @@@: For DOM HTML feature, any version
+  @ISA:
+    ManakaiDOM:DOM
+
+ForDef:
+  @QName: 
+    ManakaiDOM:DOMXMLFeature
+  @FullName:
+    @@lang:en
+    @@@: For DOM XML feature, any version
+  @ISA:
+    ManakaiDOM:DOM
+
+ForDef:
+  @QName: ManakaiDOM|DOMXMLFeatureXML11
+  @FullName:
+    @@lang:en
+    @@@: For DOM XML feature, any version, with XML 1.1 support
+  @ISA: ManakaiDOM|DOMXMLFeature
+
+ForDef:
+  @QName:
+    ManakaiDOM:DOMEventsFeature
+  @FullName:
+    @@lang:en
+    @@@:  For DOM Events feature, any version
+  @ISA:
+    ManakaiDOM:DOM
+
+## For the manakai DOM implementation
+
+ForDef:
+  @QName:
+    ManakaiDOM:ManakaiDOM
+  @FullName:
+    @@lang:en
+    @@@: For the manakai DOM implementation
+  @Implement:
+    ManakaiDOM:DOM
+  @ISA:
+    ManakaiDOM:Perl
+ForDef:
+  @QName:
+    ManakaiDOM:ManakaiDOM1
+  @FullName:
+    @@lang:en
+    @@@: For the manakai DOM Level 1 implementation
+  @Implement:
+    ManakaiDOM:DOM1
+  @Implement: 
+    ManakaiDOM:DOMXMLFeature
+  @Implement: 
+    ManakaiDOM:DOMHTMLFeature
+  @Implement:
+    ManakaiDOM:DOMEventsFeature
+  @ISA:
+    ManakaiDOM:ManakaiDOM
+ForDef:
+  @QName:
+    ManakaiDOM:ManakaiDOM2
+  @FullName:
+    @@lang:en
+    @@@: For the manakai DOM Level 2 implementation
+  @Implement:
+    ManakaiDOM:DOM2
+  @ISA:
+    ManakaiDOM:ManakaiDOM1
+ForDef:
+  @QName:
+    ManakaiDOM:ManakaiDOM3
+  @FullName:
+    @@lang:en
+    @@@: For the manakai DOM Level 3 implementation
+  @Implement:
+    ManakaiDOM:DOM3
+  @ISA:
+    ManakaiDOM:ManakaiDOM2
+  @ISA: ManakaiDOM|DOMXMLFeatureXML11
+ForDef:
+  @QName:
+    ManakaiDOM:ManakaiDOMLatest
+  @FullName:
+    @@lang:en
+    @@@: For the manakai implementation of the latest level of DOM
+  @Implement:
+    ManakaiDOM:DOMLatest
+  @ISA:
+    ManakaiDOM:ManakaiDOM3
 
 ## -- The DOM "feature" system
 
@@ -367,10 +547,18 @@ ElementTypeBinding:
 ElementTypeBinding:
   @Name: featureQName
   @ElementType:
-    dis:AppName
+    f:name
   @ShadowContent:
-    @@ContentType:
-      dis:TypeQName
+    @@ContentType: DISCore|QName
+
+PropDef:
+  @QName: DOMFeature|name
+  @FullName:
+    @@lang:en
+    @@@: Feature name
+  @rdfs:domain: DOMFeature|Feature
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|UnorderedList
 
 PropDef:
   @QName: version
@@ -713,11 +901,8 @@ ResourceDef:
   @QName: ImplementationRegistryVar
   @rdf:type:
     DISPerl:ScalarVariable
-  @AppName:
-    @@@:
-      Message::DOM::ImplementationRegistry
-    @@ContentType:
-      lang:Perl
+  @DISPerl:variableName:
+    Message::DOM::ImplementationRegistry
   @DefaultValue:
     @@@:
       <ClassName::ImplementationRegistry::ManakaiDOM:ManakaiDOMLatest>
@@ -726,6 +911,22 @@ ResourceDef:
   @Type: DISLang|String||ManakaiDOM|all
   @For:
     ManakaiDOM:ManakaiDOMLatest
+
+ResourceDef:
+  @QName: DEBUG
+  @rdf:type: DISPerl|ScalarVariable
+  @DISPerl:variableName:
+    Message::DOM::DOMFeature::DEBUG
+  @Type: DISPerl|Boolean||ManakaiDOM|all
+  @For: ManakaiDOM|ManakaiDOMLatest
+  @enDesc:
+    The variable <Perl::$Message::DOM::DOMFeature::DEBUG> controls
+    whether <M::ManakaiImplementationSource.getImplementation>
+    should print debug message to the standard error output or not.
+    If the variable is set to <DOM::true>, the process to find
+    an implementation is shown so application developers can
+    known what module should be loaded or what class is actually in use.
+  @ForCheck: !ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: enDesc
@@ -1015,11 +1216,11 @@ ElementTypeBinding:
     @@For: =ManakaiDOM|ManakaiDOM
 
     @@rdf:type:
-      @@@@: ManakaiDOM|IF
+      @@@@: DISLang|Interface
       @@@ForCheck: ManakaiDOM|ForIF
 
     @@rdf:type:
-      @@@@: ManakaiDOM|Class
+      @@@@: DISLang|Class
       @@@ForCheck: ManakaiDOM|ForClass
     @@Implement:
       @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
@@ -1184,19 +1385,26 @@ minIFClsDef:
               This source has no implementation that supports the 
               desired features and versions.
         @@@PerlCDef:
+            my $debug = $Message::DOM::DOMFeature::DEBUG
+                      ? sub ($@) { print STDERR (('  ' x shift), @_) }
+                      : sub ($@) {};
             CLS: for my $class (grep {
               $Message::DOM::ManakaiDOMImplementationSource::SourceClass{$_}
             } keys %Message::DOM::ManakaiDOMImplementationSource::SourceClass) {
+              $debug->(1, qq<Class "$class"...\n>);
               __CODE{makeClassISAList:: $CLASS => $class}__;
               for my $fname (keys %$features) {
                 my $fkey = $fname;
                 my $plus = $fname =~ s/^\+// ? true : false;
+                $debug->(2, qq<Feature "$fname">, ($plus?'+':''), qq<,\n>);
                 FVER: for my $fver (grep {$features->{$fkey}->{$_}}
                                        keys %{$features->{$fkey}}) {
+                  $debug->(3, qq<version "$fver"...\n>);
                   for my $cls ($class, @{$Message::DOM::ClassISA{$class}}) {
                     if ($Message::DOM::ImplFeature{$class}->{$fname}->{$fver} ||=
                            ## (Caching)
                         $Message::DOM::ImplFeature{$cls}->{$fname}->{$fver}) {
+                      $debug->(4, qq<found in "$cls"\n>);
                       next FVER; # Feature/version found
                     }
                   }
@@ -1219,11 +1427,13 @@ minIFClsDef:
                       for my $cls (keys %compat_cls) {
                         if ($Message::DOM::ImplFeature{$cls}
                               ->{$fname}->{$fver}) {
+                          $debug->(4, qq<found+ in "$cls"\n>);
                           next FVER; # +Feature/ver found
                         }
                       }
                     }
                   }
+                  $debug->(2, qq<not found\n>);
                   next CLS; # Not found
                 } # FVER
               } # FNAME
@@ -1603,15 +1813,42 @@ ResourceDef:
   @AliasFor: MinimumImplementation
 
 ResourceDef:
-  @rdf:type: ManakaiDOM|IF
   @For: ManakaiDOM|DOM3
   @For: =ManakaiDOM|ManakaiDOM
-  @QName: GetFeature
+  @rdf:type:
+    @@@: dis|MultipleResource
+    @@ForCheck: !ManakaiDOM|ForClass !ManakaiDOM|ForIF
+  @resourceFor: ManakaiDOM|ForIF
+  @resourceFor:
+    @@@: ManakaiDOM|ForClass
+    @@For: ManakaiDOM|ManakaiDOM3
+
+  @rdf:type:
+    @@@: DISLang|Interface
+    @@ForCheck: ManakaiDOM|ForIF
+  @IFQName: GetFeature
+
+  @rdf:type:
+    @@@: DISLang|Class
+    @@ForCheck: ManakaiDOM|ForClass
+  @ClsQName: ManakaiHasFeatureByGetFeature
 
   @enDesc:
     The <IF::GetFeature> interface provides the <M::.hasFeature>
     and <M::.getFeature> methods to test or to retrieve an object with
     specified feature.
+
+  @enDesc:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@@:
+      The class <Class::ManakaiHasFeatureByGetFeature> provides
+      a method, <M::.hasFeature>, which is implemented by
+      calling the <M::.getFeature> method and testing if 
+      the method returns non-<DOM::null> value or not.
+      A class that only implements the <M::GetFeature.getFeature>
+      method can claim that it is implementing the <IF::GetFeature>
+      interface by inheriting the <Class::ManakaiHasFeatureByGetFeauture>
+      class.
 
   @Method:
     @@Name:  hasFeature
@@ -1659,8 +1896,14 @@ ResourceDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: The feature is not implemented.
+        @@@PerlCDef:
+          __DEEP{
+            $r = defined $self-><M::GetFeature.getFeature> ($feature, $version)
+                 ? true : false;
+          }__;
 
   @Method:
+    @@ForCheck: ManakaiDOM|ForIF
      @@Name:  getFeature
      @@Description:
         @@@lang:en

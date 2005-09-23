@@ -22,8 +22,6 @@ This script is part of manakai.
 
 =cut
 
-use Message::DOM::DOMLS;
-use Message::Util::DIS::DISDump;
 use Message::Util::QName::Filter {
   ddel => q<http://suika.fam.cx/~wakaba/archive/2005/disdoc#>,
   ddoct => q<http://suika.fam.cx/~wakaba/archive/2005/8/disdump-xslt#>,
@@ -33,32 +31,14 @@ use Message::Util::QName::Filter {
   DISCore => q<http://suika.fam.cx/~wakaba/archive/2004/dis/Core#>,
   DISLang => q<http://suika.fam.cx/~wakaba/archive/2004/dis/Lang#>,
   DISPerl => q<http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#>,
-  disPerl => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl-->,
-  DOMCore => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#>,
-  DOMEvents => q<http://suika.fam.cx/~wakaba/archive/2004/dom/events#>,
   DOMLS => q<http://suika.fam.cx/~wakaba/archive/2004/dom/ls#>,
-  DOMMain => q<http://suika.fam.cx/~wakaba/archive/2004/dom/main#>,
-  DOMXML => q<http://suika.fam.cx/~wakaba/archive/2004/dom/xml#>,
   dump => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#DISDump/>,
-  DX => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#>,
+  dx => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#>,
   ecore => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/>,
-  html5 => q<http://www.w3.org/1999/xhtml>,
   infoset => q<http://www.w3.org/2001/04/infoset#>,
-  lang => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#>,
-  Perl => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl-->,
-  license => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/license#>,
   ManakaiDOM => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#>,
   Markup => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup#>,
-  MDOMX => q<http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#>,
-  owl => q<http://www.w3.org/2002/07/owl#>,
-  pc => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/PerlCode#>,
-  rdf => q<http://www.w3.org/1999/02/22-rdf-syntax-ns#>,
-  rdfs => q<http://www.w3.org/2000/01/rdf-schema#>,
-  swcfg21 => q<http://suika.fam.cx/~wakaba/archive/2005/swcfg21#>,
-  TreeCore => q<>,
   Util => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/>,
-  xhtml1 => q<http://www.w3.org/1999/xhtml>,
-  xhtml2 => q<http://www.w3.org/2002/06/xhtml2>,
   xml => q<http://www.w3.org/XML/1998/namespace>,
   xmlns => q<http://www.w3.org/2000/xmlns/>,
 };
@@ -103,6 +83,7 @@ my %Opt = (
   module_uri => {},
 );
 GetOptions (
+  'debug' => \$Opt{debug},
   'for=s' => \$Opt{For},
   'help' => \$Opt{help},
   'module-uri=s' => sub {
@@ -115,6 +96,7 @@ pod2usage ({-exitval => 0, -verbose => 1}) if $Opt{help};
 $Opt{file_name} = shift;
 pod2usage ({-exitval => 2, -verbose => 0}) unless $Opt{file_name};
 pod2usage (2) unless keys %{$Opt{module_uri}};
+$Message::DOM::DOMFeature::DEBUG = 1 if $Opt{debug};
 
 sub status_msg ($) {
   my $s = shift;
@@ -140,8 +122,9 @@ sub verbose_msg_ ($) {
 
 {
 my $ResourceCount = 0;
-sub progress_inc () {
-  if ((++$ResourceCount % 10) == 0) {
+sub progress_inc (;$) {
+  $ResourceCount += (shift || 1);
+  if (($ResourceCount % 10) == 0) {
     print STDERR "*";
     print STDERR " " if ($ResourceCount % (10 * 10)) == 0;
     print STDERR "\n" if ($ResourceCount % (10 * 50)) == 0;
@@ -153,17 +136,26 @@ sub progress_reset () {
 }
 }
 
+my $start_time;
+BEGIN { $start_time = time }
+
+use Message::DOM::GenericLS;
+use Message::DOM::SimpleLS;
+use Message::Util::DIS::DISDump;
+use Message::Util::DIS::DNLite;
+
 my $impl = $Message::DOM::ImplementationRegistry->get_implementation
                ({
                  ExpandedURI q<ManakaiDOM:Minimum> => '3.0',
                  '+' . ExpandedURI q<DOMLS:LS> => '3.0',
                  '+' . ExpandedURI q<DIS:Doc> => '2.0',
+                 '+' . ExpandedURI q<DIS:DNLite> => '1.0',
                  ExpandedURI q<DIS:Dump> => '1.0',
                 });
 
 ## -- Load input dac database file
   status_msg_ qq<Opening dac file "$Opt{file_name}"...>;
-  our $db = $impl->get_feature (ExpandedURI q<DIS:Core> => '1.0')
+  our $db = $impl->get_feature (ExpandedURI q<DIS:DNLite> => '1.0')
                  ->pl_load_dis_database ($Opt{file_name});
   status_msg qq<done\n>;
 
@@ -208,15 +200,15 @@ sub append_module_documentation (%) {
         not ($ReferredResource{$rres->uri} < 0)) {
                           ## TODO: Modification required to support modplans
       progress_inc;
-      if ($rres->is_type_uri (ExpandedURI q<ManakaiDOM:Class>)) {
+      if ($rres->is_type_uri (ExpandedURI q<DISLang:Class>)) {
         append_class_documentation
           (result_parent => $section,
            source_resource => $rres);
-      } elsif ($rres->is_type_uri (ExpandedURI q<ManakaiDOM:IF>)) {
+      } elsif ($rres->is_type_uri (ExpandedURI q<DISLang:Interface>)) {
         append_interface_documentation
           (result_parent => $section,
            source_resource => $rres);
-      } elsif ($rres->is_type_uri (ExpandedURI q<DISCore:AbstractDataType>)) {
+      } elsif ($rres->is_type_uri (ExpandedURI q<DISCore:AnyDataType>)) {
         append_datatype_documentation
           (result_parent => $section,
            source_resource => $rres);
@@ -295,8 +287,7 @@ sub append_interface_documentation (%) {
   }
 
   $section->is_exception_interface (1)
-    if $opt{source_resource}->is_type_uri
-                                 (ExpandedURI q<ManakaiDOM:ExceptionIF>);
+    if $opt{source_resource}->is_type_uri (ExpandedURI q<dx:Interface>);
 
   append_description (source_resource => $opt{source_resource},
                       result_parent => $section);
@@ -321,7 +312,7 @@ sub append_interface_documentation (%) {
       append_attr_documentation (source_resource => $memres,
                                  result_parent => $section,
                                  class_uri => $class_uri);
-    } elsif ($memres->is_type_uri (ExpandedURI q<ManakaiDOM:ConstGroup>)) {
+    } elsif ($memres->is_type_uri (ExpandedURI q<DISLang:ConstGroup>)) {
       append_constgroup_documentation (source_resource => $memres,
                                        result_parent => $section,
                                        class_uri => $class_uri);
@@ -371,7 +362,7 @@ sub append_class_documentation (%) {
       append_attr_documentation (source_resource => $memres,
                                  result_parent => $section,
                                  class_uri => $class_uri);
-    } elsif ($memres->is_type_uri (ExpandedURI q<ManakaiDOM:ConstGroup>)) {
+    } elsif ($memres->is_type_uri (ExpandedURI q<DISLang:ConstGroup>)) {
       $has_const = 1;
       append_constgroup_documentation
         (source_resource => $memres,
@@ -636,7 +627,7 @@ sub append_description (%) {
               ($resd->get_description
                         ($od, undef,
                          $Opt{with_impl_note},
-                         parent_element_arg => $opt{source_element}),
+                         parent_value_arg => $opt{source_value}),
                method_resource => $opt{method_resource});
   $opt{result_parent}->create_description->append_child ($doc);
   ## TODO: Negotiation
@@ -689,21 +680,21 @@ sub transform_disdoc_tree ($;%) {
       my $mmParsed = $el->get_attribute_ns (ExpandedURI q<ddel:>, 'mmParsed');
       if ($mmParsed) {
         my $lextype = $el->get_attribute_ns (ExpandedURI q<ddel:>, 'lexType');
-        if ($lextype eq ExpandedURI q<dis:TFQNames>) {
+        if ($lextype eq ExpandedURI q<DISCore:TFQNames>) {
           my $uri = dd_get_tfqnames_uri ($el);
           if (defined $uri) {
             $ReferredResource{$uri} ||= 1;
             next EL;
           }
-        } elsif ($lextype eq ExpandedURI q<dis:TypeQName> or
+        } elsif ($lextype eq ExpandedURI q<DISCore:QName> or
                  $lextype eq ExpandedURI q<DISCore:NCNameOrQName>) {
           my $uri = dd_get_qname_uri ($el);
           if (defined $uri) {
             $ReferredResource{$uri} ||= 1;
             next EL;
           }
-        } elsif ($lextype eq ExpandedURI q<DISPerl:MemRef> or
-                 $lextype eq ExpandedURI q<DOMMain:XCodeRef>) {
+        } elsif ($lextype eq ExpandedURI q<DISLang:MemberRef> or
+                 $lextype eq ExpandedURI q<dx:XCRef>) {
           my @nm = @{$el->get_elements_by_tag_name_ns
                              (ExpandedURI q<ddel:>, 'name')};
           if (@nm == 1) {
@@ -733,7 +724,7 @@ sub transform_disdoc_tree ($;%) {
                                   (ExpandedURI q<ddel:>, 'localName')->[0];
               my $lname = $lnel ? $lnel->text_content : '';
               my $res;
-              if ($lextype eq ExpandedURI q<DOMMain:XCodeRef> or
+              if ($lextype eq ExpandedURI q<dx:XCRef> or
                   {
                    ExpandedURI q<ddel:C> => 1,
                    ExpandedURI q<ddel:X> => 1,
@@ -845,7 +836,7 @@ sub append_inheritance (%) {
   
   for my $isa (@{$opt{source_resource}->get_property_resource_list
                    (ExpandedURI q<dis:ISA>,
-                    default_media_type => ExpandedURI q<dis:TFQNames>)}) {
+                    default_media_type => ExpandedURI q<DISCore:TFQNames>)}) {
     $has_isa = 1;
     append_inheritance
       (source_resource => $isa,
@@ -927,7 +918,7 @@ sub append_inheritance (%) {
     my $u = $db->get_resource (ExpandedURI q<DISPerl:UNIVERSALInterface>);
     for my $impl (@{$opt{source_resource}->get_property_resource_list
                       (ExpandedURI q<dis:Implement>,
-                       default_media_type => ExpandedURI q<dis:TFQNames>,
+                       default_media_type => ExpandedURI q<DISCore:TFQNames>,
                        isa_recursive => 1)}, $u) {
       append_inheritance
         (source_resource => $impl,
@@ -1007,26 +998,29 @@ sub add_uri ($$;%) {
 
 sub append_raises (%) {
   my %opt = @_;
-  my $parent = $opt{source_resource}->source_element;
-  return unless $parent;
 
-  for my $el (@{$parent->dis_child_elements 
-                  (for_arg => $opt{source_resource}->for_uri,
-                   forp_arg => $opt{source_resource}->forp_uri)}) {
-    if ($el->expanded_uri eq ExpandedURI q<ManakaiDOM:raises>) {
-                        ## NOTE: $db is used
-      my ($a, $b, $c) = @{$db->xcref_to_resource
-                                ($el->value, $el,
-                                 for_arg => $opt{source_resource}->for_uri)};
-
-      my $rel = $opt{result_parent}->create_raises
+  for my $el (@{$opt{source_resource}->get_property_value_list
+                  (ExpandedURI q<dx:raises>)}) {
+    next unless $el->isa ('Message::Util::IF::DVURIValue');
+    my $e = $el->get_resource ($db);
+    my ($a, $b, $c);           ## NOTE: $db
+    if ($e->is_type_uri (ExpandedURI q<ManakaiDOM:ExceptionOrWarningSubType>)) {
+      $c = $e;
+      $b = $c->get_property_resource (ExpandedURI q<dis2pm:parentResource>);
+      $a = $b->get_property_resource (ExpandedURI q<dis2pm:parentResource>);
+    } elsif ($e->is_type_uri (ExpandedURI q<DISLang:Const>)) {
+      $b = $e;
+      $a = $b->get_property_resource (ExpandedURI q<dis2pm:parentResource>);
+    } else {
+      $a = $e;
+    }
+    my $rel = $opt{result_parent}->create_raises
                            ($a->uri, $b ? $b->uri : undef, $c ? $c->uri : undef);
       
-      append_description (source_resource => $opt{source_resource},
-                          source_element => $el,
-                          result_parent => $rel,
-                          method_resource => $opt{method_resource});
-    }
+    append_description (source_resource => $opt{source_resource},
+                        source_value => $el,
+                        result_parent => $rel,
+                        method_resource => $opt{method_resource});
   }
 } # append_raises
 
@@ -1041,10 +1035,9 @@ my $body = $doc->document_element;
 for my $mod_uri (keys %{$Opt{module_uri}}) {
   my $mod_for = $Opt{For};
   my $mod = $db->get_module ($mod_uri, for_arg => $mod_for);
-  unless ($mod_for) {
-    my $el = $mod->source_element;
-    if ($el) {
-      $mod_for = $el->default_for_uri;
+  unless (defined $mod_for) {
+    $mod_for = $mod->get_property_text (ExpandedURI q<dis:DefaultFor>);
+    if (defined $mod_for) {
       $mod = $db->get_module ($mod_uri, for_arg => $mod_for);
     }
   }
@@ -1082,7 +1075,7 @@ while (my @ruri = grep {$ReferredResource{$_} > 0} keys %ReferredResource) {
         (result_parent => $body,
          source_resource => $res,
          is_partial => 1);
-    } elsif ($res->is_type_uri (ExpandedURI q<ManakaiDOM:Class>)) {
+    } elsif ($res->is_type_uri (ExpandedURI q<DISLang:Class>)) {
       my $mod = $res->owner_module;
       unless ($ReferredResource{$mod->uri} < 0) {
         unshift @ruri, $uri;
@@ -1093,7 +1086,7 @@ while (my @ruri = grep {$ReferredResource{$_} > 0} keys %ReferredResource) {
         (result_parent => $body->create_module ($mod->uri),
          source_resource => $res,
          is_partial => 1);
-    } elsif ($res->is_type_uri (ExpandedURI q<ManakaiDOM:IF>)) {
+    } elsif ($res->is_type_uri (ExpandedURI q<DISLang:Interface>)) {
       my $mod = $res->owner_module;
       unless ($mod->is_defined) {
         $ReferredResource{$uri} = -1;
@@ -1107,7 +1100,7 @@ while (my @ruri = grep {$ReferredResource{$_} > 0} keys %ReferredResource) {
         (result_parent => $body->create_module ($mod->uri),
          source_resource => $res,
          is_partial => 1);
-    } elsif ($res->is_type_uri (ExpandedURI q<DISCore:AbstractDataType>)) {
+    } elsif ($res->is_type_uri (ExpandedURI q<DISLang:AnyDataType>)) {
       my $mod = $res->owner_module;
       unless ($mod->is_defined) {
         $ReferredResource{$uri} = -1;
@@ -1121,18 +1114,18 @@ while (my @ruri = grep {$ReferredResource{$_} > 0} keys %ReferredResource) {
         (result_parent => $body->create_module ($mod->uri),
          source_resource => $res);
     } elsif ($res->is_type_uri (ExpandedURI q<DISLang:AnyMethod>) or
-             $res->is_type_uri (ExpandedURI q<ManakaiDOM:ConstGroup>)) {
+             $res->is_type_uri (ExpandedURI q<DISLang:ConstGroup>)) {
       my $cls = $res->get_property_resource
         (ExpandedURI q<dis2pm:parentResource>);
       if (not ($ReferredResource{$cls->uri} < 0) and
-          ($cls->is_type_uri (ExpandedURI q<ManakaiDOM:Class>) or
-           $cls->is_type_uri (ExpandedURI q<ManakaiDOM:IF>))) {
+          ($cls->is_type_uri (ExpandedURI q<DISLang:Class>) or
+           $cls->is_type_uri (ExpandedURI q<DISLang:Interface>))) {
         unshift @ruri, $uri;
         unshift @ruri, $cls->uri;
         next U;
       }
       my $model = $body->create_module ($cls->owner_module->uri);
-      my $clsel = $cls->is_type_uri (ExpandedURI q<ManakaiDOM:Class>)
+      my $clsel = $cls->is_type_uri (ExpandedURI q<DISLang:Class>)
         ? $model->create_class ($cls->uri)
         : $model->create_interface ($cls->uri);
       if ($res->is_type_uri (ExpandedURI q<DISLang:Method>)) {
@@ -1143,10 +1136,12 @@ while (my @ruri = grep {$ReferredResource{$_} > 0} keys %ReferredResource) {
         append_attr_documentation
           (result_parent => $clsel,
            source_resource => $res);
-      } elsif ($res->is_type_uri (ExpandedURI q<ManakaiDOM:ConstGroup>)) {
+      } elsif ($res->is_type_uri (ExpandedURI q<DISLang:ConstGroup>)) {
         append_constgroup_documentation
           (result_parent => $clsel,
            source_resource => $res);
+      } else {
+        $ReferredResource{$res->uri} = -1;
       }
     } elsif ($res->is_type_uri (ExpandedURI q<DISLang:MethodParameter>)) {
       my $m = $res->get_property_resource
@@ -1157,31 +1152,38 @@ while (my @ruri = grep {$ReferredResource{$_} > 0} keys %ReferredResource) {
         $ReferredResource{$res->uri} = -1;
         next U;
       }      
-    } elsif ($res->is_type_uri (ExpandedURI q<ManakaiDOM:Const>)) {
+    } elsif ($res->is_type_uri (ExpandedURI q<DISLang:Const>)) {
       my $m = $res->get_property_resource
         (ExpandedURI q<dis2pm:parentResource>);
       if (not ($ReferredResource{$m->uri} < 0) and
-          $m->is_type_uri (ExpandedURI q<ManakaiDOM:ConstGroup>)) {
+          $m->is_type_uri (ExpandedURI q<DISLang:ConstGroup>)) {
         unshift @ruri, $m->uri;
         $ReferredResource{$res->uri} = -1;
         next U;
-      }      
+      } else {
+        $ReferredResource{$res->uri} = -1;
+        next U;
+      }
     } elsif ($res->is_type_uri
                (ExpandedURI q<ManakaiDOM:ExceptionOrWarningSubType>)) {
       my $m = $res->get_property_resource
         (ExpandedURI q<dis2pm:parentResource>);
       if (not ($ReferredResource{$m->uri} < 0) and
-          $m->is_type_uri (ExpandedURI q<ManakaiDOM:Const>)) {
+          $m->is_type_uri (ExpandedURI q<DISLang:Const>)) {
         unshift @ruri, $m->uri;
         $ReferredResource{$res->uri} = -1;
         next U;
-      }      
+      } else {
+        $ReferredResource{$res->uri} = -1;
+        next U;
+      }
     } else {  ## Unsupported type
       $ReferredResource{$uri} = -1;
     }
   } # U
 }
 
+status_msg '';
 status_msg q<done>;
 
 ## -- Inheriting methods information
@@ -1208,6 +1210,8 @@ status_msg q<done>;
     } # superclasses
   } # classes
 
+  verbose_msg_ q<...>;
+
   for my $class_uri (keys %ClassImplements) {
     for my $if_uri (keys %{$ClassImplements{$class_uri}||{}}) {
       for my $mem_name (keys %{$ClassMembers{$if_uri}}) {
@@ -1225,12 +1229,14 @@ status_msg q<done>;
     } # interfaces
   } # classes
 
+  verbose_msg_ q<...>;
+
   for my $class_uri (keys %ClassMembers) {
     my $cls_res = $db->get_resource ($class_uri);
     next unless $cls_res->is_defined;
     verbose_msg_ q<.>;
     my $cls_el = $body->create_module ($cls_res->owner_module->uri);
-    if ($cls_res->is_type_uri (ExpandedURI q<ManakaiDOM:IF>)) {
+    if ($cls_res->is_type_uri (ExpandedURI q<DISLang:Interface>)) {
       $cls_el = $cls_el->create_interface ($class_uri);
     } else {
       $cls_el = $cls_el->create_class ($class_uri);
@@ -1286,6 +1292,13 @@ $db->free;
 undef $db;
 verbose_msg qq<done>;
 
+
+{
+  use integer;
+  my $time = time - $start_time;
+  status_msg sprintf qq<%d'%02d''>, $time / 60, $time % 60;
+}
+
 END {
   $db->free if $db;
 }
@@ -1313,4 +1326,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/09/19 16:17:50 $
+1; # $Date: 2005/09/23 18:24:52 $

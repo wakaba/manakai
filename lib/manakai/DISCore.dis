@@ -14,14 +14,12 @@ Module:
       This module introduces the basic <QUOTE::dis> language 
       vocabulary that is common to <QUOTE::dis> format. 
   
-  @Author:
-    @@FullName:Wakaba
-    @@Mail:w@suika.fam.cx
+  @DISCore:author: DISCore|Wakaba
   @License:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/22 11:02:34 $
+      $Date: 2005/09/23 18:25:10 $
     @@ContentType:
       dis:Date.RCS
   
@@ -316,7 +314,7 @@ PropDef:
   @ISA:
     rdfs:label
   @dataType: lang|disdocInline
-  @multipleProperties: Single
+  @multipleProperties: UnorderedList
 
 PropDef:
   @QName:
@@ -328,7 +326,7 @@ PropDef:
   @ISA:
     rdfs:label
   @dataType: lang|disdocInline
-  @multipleProperties: Single
+  @multipleProperties: UnorderedList
 
 PropDef:
   @QName: 
@@ -761,7 +759,7 @@ LexTypeDef:
     @@@: 
       A boolean truth value, i.e. true or false. 
       \
-      <Q:dis:Boolean> := "1" / "0"
+      <Q::dis:Boolean> := "1" / "0"
   @rdfs:subClassOf: DISCore|String
   @subsetOf: DISCore|String
 
@@ -1096,11 +1094,25 @@ PropDef:
 
 ## -- Properties describing authors and licenses
 
+ResourceDef:
+  @QName: Wakaba
+  @FullName:
+    @@lang:ja
+    @@@: Wakaba
+  @rdf:type: rdfs|Resource
+  @Mail: w@suika.fam.cx
+
+PropDef:
+  @QName: DISCore|author
+  @enFN: Author
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|OrderedList
+
 PropDef:
   @QName: dis|Author
   @FullName:
     @@lang:en
-    @@@: Author
+    @@@: Author (obsolete)
   @dataType: DISCore|Text
   @multipleProperties: OrderedList
 

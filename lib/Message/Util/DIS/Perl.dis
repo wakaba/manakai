@@ -21,7 +21,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/22 14:25:48 $
+      $Date: 2005/09/23 18:25:07 $
     @@ContentType:
       dis:Date.RCS
   
@@ -132,26 +132,22 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DOMMain:DOMFeature
-    @@ForCheck:
-      ManakaiDOM:all
+    @@rdf:type: DOMFeature|Feature
+    @@For: ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: FeatureVerDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DOMMain:DOMFeature
+    @@rdf:type: DOMFeature|Feature
 
 ElementTypeBinding:
   @Name: featureQName
   @ElementType:
-    dis:AppName
+    DOMFeature:name
   @ShadowContent:
-    @@ContentType:
-      dis:TypeQName
+    @@ContentType: DISCore|QName
 
 FeatureDef:
   @QName: DIS|Perl
@@ -197,6 +193,8 @@ ElementTypeBinding:
 
     @@DOMMain:implementFeature: DIS|Perl10
 
+    @@ForCheck: DIS|ForEmpty
+
 ElementTypeBinding:
   @Name: IFDef
   @ElementType:
@@ -212,6 +210,8 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ForIF
 
     @@DOMMain:implementFeature: DIS|Perl10
+
+    @@ForCheck: DIS|ForEmpty
 
 ElementTypeBinding:
   @Name: IFQName
@@ -247,6 +247,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
+    @@For: !=DIS|ForEmpty
 
 ElementTypeBinding:
   @Name: Return
@@ -262,13 +263,13 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: DISLang|MethodParameter
 
-
 ElementTypeBinding:
   @Name: Attr
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
+    @@For: !=DIS|ForEmpty
 
 ElementTypeBinding:
   @Name: Get
@@ -947,6 +948,16 @@ PropDef:
   @QName: DIS|plCodeFragment
   @enDesc:
     Cache for <A::ManakaiDISResourceDefinition.plCodeFragment>.
+
+PropDef:
+  @QName: DIS|plDefined
+  @enDesc:
+    Whether a Perl definition for this resource is implemented or not.
+
+PropDef:
+  @QName: plFullyQualifiedName
+  @enDesc:
+    Fully qualified name.
 
 ElementTypeBinding:
   @Name: PropDef
@@ -1923,6 +1934,12 @@ IFClsDef:
                           ('$Message::Util::DIS::ManakaiDISDatabase'.
                            '::CompatClass{q<' . $pack_name . '>} = 1');
                   }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::dv|ValueRole>)) {
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::Util::DIS::Value::ManakaiDVValue'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
                 }
               } elsif ($cls-><M::DIS|DISResource.isTypeURI>
                               (<Q::ManakaiDOM:ExceptionIF>)) {
@@ -2118,7 +2135,7 @@ IFClsDef:
                               (<Q::DISLang:AnyMethod>)) {
             
             $r = $self-><M::DIS|DISResourceProp.getPropertyText>
-                              (<Q::dis:AppName>, null);
+                              (<Q::DISPerl:methodName>, null);
             if (defined $r) {
               if ($self-><M::DIS|DISResourceProp.getPropertyBoolean>
                                 (<Q::ManakaiDOM:isForInternal>, false)) {
@@ -2195,7 +2212,7 @@ IFClsDef:
           } elsif ($self-><M::DIS|DISResource.isTypeURI>
                               (<Q::ManakaiDOM:ConstGroup>)) {
             $r = $self-><M::DIS|DISResourceProp.getPropertyText>
-                              (<Q::dis:AppName>,
+                              (<Q::DISPerl:exportTagName>,
                                $self-><AG::DIS|DISAnyResource.localName>);
             unless (defined $r) {
               __UNDEEP{__EXCEPTION{DIS|NO_LOCAL_NAME_ERR::
@@ -2208,7 +2225,7 @@ IFClsDef:
           } elsif ($self-><M::DIS|DISResource.isTypeURI>
                                        (<Q::DISLang:MethodParameter>)) {
             $r = $self-><M::DIS|DISResourceProp.getPropertyText>
-                                (<Q::dis:AppName>,
+                                (<Q::DISPerl:paramName>,
                                  $self-><AG::DIS|DISAnyResource.localName>);
             if (defined $r) {
               if ($self-><M::DIS|DISResourceProp.getPropertyBoolean>
@@ -2258,7 +2275,7 @@ IFClsDef:
                    $self-><M::DIS|DISResource.isTypeURI>
                               (<Q::DISPerl:ScalarVariable>)) {
             $r = $self-><M::DIS|DISResourceProp.getPropertyText>
-                              (<Q::dis:AppName>);
+                              (<Q::DISPerl:packageName>);
             if (defined $r) {
               ## NOTE: "lang:Perl" is fully-qualified name by definition
             } else {
@@ -2281,7 +2298,7 @@ IFClsDef:
               }
             }
           } elsif ($self-><M::DIS|DISResource.isTypeURI>
-                              (<Q::ManakaiDOM:Const>)) {
+                              (<Q::DISLang:Const>)) {
             $r = $self-><AG::DIS|DISAnyResource.ownerModule>
                       -><AG::DISModulePerl.plFullyQualifiedName>
                . '::' . $self-><AG::DISResourcePerl.plName>;
@@ -2303,7 +2320,7 @@ IFClsDef:
           This resource does not define any Perl variable.
       @@@PerlDef:
         $r = $self-><M::DIS|DISResourceProp.getPropertyText>
-                      (<Q::dis:AppName>,
+                      (<Q::DISPerl:variableName>,
                        $self-><AG::DIS|DISAnyResource.localName>);
         if (defined $r) {
           __DEEP{
@@ -2317,11 +2334,11 @@ IFClsDef:
               my $dt = $self-><AG::DIS|DISResource
                                  .disActualDataTypeResource>;
               if ($dt-><M::DIS|DISResource.isSubsetOfURI>
-                                                       (<Q::pl:Array>) or
+                                                       (<Q::DISPerl:Array>) or
                   $dt-><M::DIS|DISResource.isSubsetOfURI> (<Q::DISPerl:List>)) {
                 $r = '@' . $r;
               } elsif ($dt-><M::DIS|DISResource.isSubsetOfURI>
-                                                       (<Q::pl:Hash>)) {
+                                                       (<Q::DISPerl:Hash>)) {
                 $r = '%' . $r;
               } else {
                 $r = '$' . $r;
@@ -2573,7 +2590,14 @@ IFClsDef:
                   if ($param_processor) {
                     $param_variables[-1]->[1]
                         = $param_processor-><AG::DISResourcePerl
-                                                 .plCodeFragment>->clone;
+                                                 .plCodeFragment>;
+                    unless ($param_variables[-1]->[1]) {
+                     __UNDEEP{__EXCEPTION{DIS|PERL_CODE_NOT_DEFINED_ERR::
+                        DIS:sourceNode => {$param->{src}},
+                        DIS:uri => {$param->{uri}},
+                      }__}__;
+                    }
+                    $param_variables[-1]->[1] = $param_variables[-1]->[1]->clone;
                     $param_variables[-1]->[1]
                                    -><M::DIS|MPLCodeFragment.replaceVariable>
                                          ('$INPUT' => $param_variables[-1]->[0]);
@@ -2604,7 +2628,15 @@ IFClsDef:
                 if ($param_processor) {
                   $named_param_variables[-1]->[1]
                         = $param_processor-><AG::DISResourcePerl
-                                                 .plCodeFragment>->clone;
+                                                 .plCodeFragment>;
+                  unless ($param_variables[-1]->[1]) {
+                   __UNDEEP{__EXCEPTION{DIS|PERL_CODE_NOT_DEFINED_ERR::
+                      DIS:sourceNode => {$param->{src}},
+                      DIS:uri => {$param->{uri}},
+                    }__}__;
+                  }
+                  $named_param_variables[-1]->[1]
+                    = $named_param_variables[-1]->[1]->clone;
                   $named_param_variables[-1]->[1]
                                    -><M::DIS|MPLCodeFragment.replaceVariable>
                                          ('$INPUT' => $param_variables[-1]->[0]);
@@ -2779,7 +2811,8 @@ IFClsDef:
             }
             if ($code) {
               ## Default value
-              my $def = $get-><M::DIS|DISResourceProp.getPropertyValue>;
+              my $def = $get-><M::DIS|DISResourceProp.getPropertyValue>
+                                   (<Q::dis:DefaultValue>);
               if ($def) {
                 $def = $def-><M::DVValuePerl.plCodeFragment>
                             ($self,

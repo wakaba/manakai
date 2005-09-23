@@ -14,9 +14,7 @@ Module:
       The <Module::SuikaWikiConfig21> module provides an object model 
       for SuikaWikiConfig/2.1 document format.  
 
-  @Author:
-    @@FullName: Wakaba
-    @@Mail: w@suika.fam.cx
+  @DISCore:author: DISCore|Wakaba
   @License:
     @@@:
       license:Perl+MPL
@@ -24,12 +22,10 @@ Module:
       @@@FullName:
         SuikaWiki <PerlModule::SuikaWiki::Markup::SuikaWikiConfig20> Module
       @@@Year:2003
-      @@@Author:
-        @@@@FullName:Wakaba
-        @@@@Mail:w@suika.fam.cx
+      @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/09/22 11:02:32 $
+      $Date: 2005/09/23 18:24:57 $
     @@ContentType:
       dis:Date.RCS
   
@@ -121,24 +117,6 @@ ResourceDef:
     @@lang:en
     @@@:
       The manakai Markup Language support modules
-  @AppName:
-    @@@:
-      Message::Markup::IFLatest::
-    @@ContentType:
-      lang:Perl
-    @@ForCheck: 
-      ManakaiDOM:ForIF ForLatest
-  @AppName:
-    @@@:
-      Message::Markup::IF::
-    @@ContentType:
-      lang:Perl
-    @@ForCheck:
-      ManakaiDOM:ForIF ForEmpty
-  @AppName:
-    @@@:
-      Message::Markup::
-    @@ForCheck: ForLatest
   @DISPerl:packageName:
     Message::Markup::
   @DISPerl:interfacePackageName:
@@ -178,26 +156,22 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DOMMain:DOMFeature
-    @@ForCheck:
-      ManakaiDOM:all
+    @@rdf:type: DOMFeature|Feature
+    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: FeatureVerDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DOMMain:DOMFeature
+    @@rdf:type: DOMFeature|Feature
 
 ElementTypeBinding:
   @Name: featureQName
   @ElementType:
-    dis:AppName
+    DOMFeature:name
   @ShadowContent:
-    @@ContentType:
-      dis:TypeQName
+    @@ContentType: DISCore|QName
 
 FeatureDef:
   @QName: CoreFeature
@@ -4054,7 +4028,7 @@ ResourceDef:
 
     @@IFQName: SWCFGExceptionCode
     @@ClsQName: ManakaiSWCFGExceptionCode
-    @@PerlName: SWCFGExceptionCode
+    @@plCName: SWCFGExceptionCode
 
     @@rdfs:subClassOf:
       DOMMain:unsigned-short::ManakaiDOM:all
@@ -4306,11 +4280,10 @@ ResourceDef:
   @AliasFor: DOMMain|DOMString||ManakaiDOM|ManakaiDOMLatest
 
 ElementTypeBinding:
-  @Name: PerlName
+  @Name: plCName
   @ElementType:
-    dis:AppName
+    DISPerl:exportTagName
   @ShadowContent:
-    @@ContentType: lang|Perl
     @@For: ManakaiDOM|Perl
 
 ## -- Load
@@ -4713,8 +4686,11 @@ IFClsDef:
       @@@actualType: ManakaiSWCFGParser
       @@@enDesc: The newly created parser object.
       @@@PerlDef:
-        $r = bless {<Q::DOMCore:implementation> => $impl},
-                   <ClassName::ManakaiSWCFGParser>;
+        $r = bless {<Q::DOMCore:implementation> =>
+                       $impl-><M::DOMFeature|MinimumImplementation
+                                ||ManakaiDOM|ManakaiDOMLatest.getFeature>
+                          (<Q::swcfg21:Core> => '2.1')},
+                   $self;
 ##SWCFGParser
 
 PropDef:
@@ -4911,6 +4887,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       DISLang:Method
+    @@For: !=ForEmpty
 
 ElementTypeBinding:
   @Name: IntMethod
@@ -5172,6 +5149,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       DISLang:Attribute
+    @@For: !=ForEmpty
 
 ElementTypeBinding:
   @Name: RedefAttr
