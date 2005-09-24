@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/24 11:57:19 $
+      $Date: 2005/09/24 13:50:50 $
     @@ContentType:
       dis:Date.RCS
 
@@ -3014,8 +3014,8 @@ IFCls1Def:
                 }__;
               }
               my $doctypeNode = $doctype->{<H::mn:node>};
-              if ($node->{<H::mn:treeID>} ne
-                  $doctypeNode->{<H::mn:treeID>} or
+              if (${$node->{<H::mn:treeID>}} ne
+                  ${$doctypeNode->{<H::mn:treeID>}} or
                   $doctypeNode->{<H::DOMCore:ownerDocument>} or
                   $doctypeNode->{<H::ManakaiDOM:implID>} ne 
                     $node->{<H::ManakaiDOM:implID>}) {
@@ -3097,8 +3097,8 @@ IFCls1Def:
                 }__;
               }
               my $doctypeNode = $doctype->{<H::mn:node>};
-              if ($node->{<H::mn:treeID>} ne
-                  $doctypeNode->{<H::mn:treeID>} or
+              if (${$node->{<H::mn:treeID>}} ne
+                  ${$doctypeNode->{<H::mn:treeID>}} or
                   $doctypeNode->{<H::DOMCore:ownerDocument>} or
                   $doctypeNode->{<H::ManakaiDOM:implID>} ne 
                     $node->{<H::ManakaiDOM:implID>}) {
@@ -3962,8 +3962,8 @@ IFCls1Def:
               } # CHKTYPE
               
               ## Check $newNode (not $newNode[0]) = ancestor-or-self::node()
-              if ($node->{<H::mn:treeID>} eq
-                  $newNode->{<H::mn:treeID>}) {
+              if (${$node->{<H::mn:treeID>}} eq
+                  ${$newNode->{<H::mn:treeID>}}) {
                 my $n = $node;
                 {
                   if ($newNode->{<H::mn:nodeID>} eq
@@ -4296,8 +4296,8 @@ IFCls1Def:
               } # CHKTYPE
               
               ## Check $newNode (not $newNode[0]) = ancestor-or-self::node()
-              if ($node->{<H::mn:treeID>} eq
-                  $newNode->{<H::mn:treeID>}) {
+              if (${$node->{<H::mn:treeID>}} eq
+                  ${$newNode->{<H::mn:treeID>}}) {
                 my $n = $node;
                 {
                   if ($newNode->{<H::mn:nodeID>} eq
@@ -4699,8 +4699,8 @@ IFCls1Def:
               } # CHKTYPE
               
               ## Check $newNode (not $newNode[0]) = ancestor-or-self::node()
-              if ($node->{<H::mn:treeID>} eq
-                  $newNode->{<H::mn:treeID>}) {
+              if (${$node->{<H::mn:treeID>}} eq
+                  ${$newNode->{<H::mn:treeID>}}) {
                 my $n = $node;
                 P: {
                   if ($newNode->{<H::mn:nodeID>} eq

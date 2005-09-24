@@ -19,7 +19,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/24 11:57:25 $
+      $Date: 2005/09/24 13:50:57 $
     @@ContentType:
       dis:Date.RCS
   
@@ -136,15 +136,6 @@ ClassDef:
 
          {doc:figBody::
          \
-         - <CODE::TreeCore:nodeID>::: The global-unique identifier for 
-                                      this node object. 
-         \
-         - <CODE::TreeCore:treeID>::: The global-unique identifier for the 
-                                      tree containing this node object. 
-         \
-         - <CODE::TreeCore:rc>::: The number that denotes how many reference 
-                                  to this node there are. 
-         \
          - <CODE::TreeCore:origin>::: An array reference, containing 
                                   hash key names of <DFN::origin> 
                                   properties for this node. 
@@ -189,6 +180,8 @@ ClassDef:
         @@@@@: 
           The newly created <Class::ManakaiDOM:ManakaiDOMNodeObject> instance.
       @@@PerlDef: 
+        @@@@ForCheck: ForFull
+        @@@@@:
           $r = bless {
             <Q::TreeCore:origin> => [],
             <Q::TreeCore:subnode0> => [],
@@ -199,6 +192,21 @@ ClassDef:
             <Q::TreeCore:anydata2> => [],
             <H::mn:rc> => 0,
             <H::mn:treeID> => <Code::ManakaiDOM:generateUniqueID>,
+            <H::mn:nodeID> => <Code::ManakaiDOM:generateUniqueID>,
+          }, ref $self || $self;
+      @@@PerlDef: 
+        @@@@ForCheck: ForCompact
+        @@@@@:
+          $r = bless {
+            <Q::TreeCore:origin> => [],
+            <Q::TreeCore:subnode0> => [],
+            <Q::TreeCore:subnode> => [],
+            <Q::TreeCore:subnode2> => [],
+            <Q::TreeCore:irefnode> => [],
+            <Q::TreeCore:anydata> => [],
+            <Q::TreeCore:anydata2> => [],
+            <H::mn:rc> => 0,
+            <H::mn:treeID> => \ (<Code::ManakaiDOM:generateUniqueID>),
             <H::mn:nodeID> => <Code::ManakaiDOM:generateUniqueID>,
           }, ref $self || $self;
 
@@ -240,7 +248,7 @@ ClassDef:
     @@QName: getNewReference
     @@rdf:type:
       dis2pm:BlockCode
-    @@ForCheck: ForFull
+    @@ForCheck: ForCompact
     @@Description:
       @@@lang:en
       @@@@:
@@ -284,7 +292,7 @@ ClassDef:
     @@QName: getWeakReference
     @@rdf:type:
       dis2pm:BlockCode
-    @@ForCheck: ForFull
+    @@ForCheck: ForCompact
     @@Description:
       @@@lang:en
       @@@@:
@@ -640,8 +648,8 @@ ClassDef:
           my @node = ($node);
           NODES: while (defined (my $node = shift @node)) {
             next unless ref $node;
-            next if $node->{<H::mn:treeID>} eq
-                    $self->{<H::mn:treeID>};
+            next if ${$node->{<H::mn:treeID>}} eq
+                    ${$self->{<H::mn:treeID>}};
             my @n;
               for my $p (@{$node->{<Q::TreeCore:subnode2>}}) {
                 if (ref $node->{$p} eq 'ARRAY') {
@@ -679,6 +687,11 @@ ClassDef:
         @@@@lang:en
         @@@@@:
           The new tree identifier. 
+       @@@InCase:
+        @@@@Type: DISPerl|SCALAR
+        @@@@enDesc:
+          A reference to the new tree identifier.
+          The tree will reference the identifier as it.
     @@Return:
       @@@PerlDef:
         @@@@ForCheck: ForFull
@@ -722,10 +735,11 @@ ClassDef:
       @@@PerlDef:
         @@@@ForCheck: ForCompact
         @@@@@:
+          my $tid = ref $treeID ? $treeID : \$treeID;
           my @node = ($self);
           NODES: while (defined (my $node = shift @node)) {
             next unless ref $node;
-            next if $node->{<H::mn:treeID>} eq $treeID;
+            next if ${$node->{<H::mn:treeID>}} eq $$tid;
               my @n;
               for my $p (@{$node->{<Q::TreeCore:subnode2>}}) {
                 if (ref $node->{$p} eq 'ARRAY') {
@@ -746,7 +760,7 @@ ClassDef:
        \               @{$node->{<Q::TreeCore:subnode0>}}) {
               push @node, $node->{$p};
             }
-            $node->{<H::mn:treeID>} = $treeID;
+            $node->{<H::mn:treeID>} = $tid;
           }
 
   @IntMethod:
@@ -815,12 +829,23 @@ ClassDef:
         }
     @@Return:
       @@@PerlDef:
-        if ($self-><M::NodeStem.isExternallyReferred>) {
-          $self-><M::NodeStem.changeTreeID>
-                       (<Code::ManakaiDOM:generateUniqueID>);
-        } else {
-          $self-><M::NodeStem.destroy>;
-        }
+        @@@@ForCheck: ForFull
+        @@@@@:
+          if ($self-><M::NodeStem.isExternallyReferred>) {
+            $self-><M::NodeStem.changeTreeID>
+                         (<Code::ManakaiDOM:generateUniqueID>);
+          } else {
+            $self-><M::NodeStem.destroy>;
+          }
+      @@@PerlDef:
+        @@@@ForCheck: ForCompact
+        @@@@@:
+          if ($self-><M::NodeStem.isExternallyReferred>) {
+            $self-><M::NodeStem.changeTreeID>
+                         (\(<Code::ManakaiDOM:generateUniqueID>));
+          } else {
+            $self-><M::NodeStem.destroy>;
+          }
 ##NodeStem
 
 ## -- Public node object
