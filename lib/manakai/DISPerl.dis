@@ -13,7 +13,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/23 18:25:10 $
+      $Date: 2005/09/24 11:57:30 $
     @@ContentType:
       dis:Date.RCS
   
@@ -536,6 +536,15 @@ ResourceDef:
   @QName:
     ManakaiDOM:moduleSuffix
   @AliasFor: DISPerl|moduleSuffix
+
+PropDef:
+  @QName: DISPerl|propHashKey
+  @enFN: Internal hash key name
+  @enDesc:
+    An abbreviated name of the property used when it
+    is being a hash key.
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|Single
 
 ## -- The dis:Perl tree language vocabulary
 
@@ -1332,7 +1341,7 @@ ElementTypeBinding:
 ElementTypeBinding:
   @Name: IFPackName
   @ElementType:
-    DISPerl:interfacePackageName
+    DISPerl:packageName
   @ShadowContent:
     @@ForCheck: ManakaiDOM|ForIF
     @@ContentType: DISPerl|PackageName
@@ -1371,11 +1380,11 @@ ElementTypeBinding:
     @@resourceFor: ManakaiDOM|ForClass
 
     @@rdf:type:
-      @@@@: ManakaiDOM|IF
+      @@@@: DISLang|Interface
       @@@ForCheck: ManakaiDOM|ForIF
 
     @@rdf:type:
-      @@@@: ManakaiDOM|Class
+      @@@@: DISLang|Class
       @@@ForCheck: ManakaiDOM|ForClass
 
     @@Implement:
@@ -1395,7 +1404,7 @@ ElementTypeBinding:
     @@resourceFor: ManakaiDOM|ForClass
 
     @@rdf:type:
-      @@@@: ManakaiDOM|Class
+      @@@@: DISLang|Class
       @@@ForCheck: ManakaiDOM|ForClass
 
 

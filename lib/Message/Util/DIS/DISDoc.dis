@@ -14,9 +14,7 @@ Module:
       This module provides an object model for <QUOTE::disdoc>
       documentation format.  
 
-  @Author:
-    @@FullName: Wakaba
-    @@Mail: w@suika.fam.cx
+  @DISCore:author: DISCore|Wakaba
   @License:
     @@@:
       license:Perl+MPL
@@ -24,12 +22,10 @@ Module:
       @@@FullName:
         manakai <CODE::lib/manakai/dis.pl>
       @@@Year:2004
-      @@@Author:
-        @@@@FullName:Wakaba
-        @@@@Mail:w@suika.fam.cx
+      @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/09/23 18:25:06 $
+      $Date: 2005/09/24 11:57:27 $
     @@ContentType:
       dis:Date.RCS
   
@@ -102,6 +98,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @mn:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
   @nl:
     http://suika.fam.cx/~wakaba/archive/2004/dis/NaturalLanguage#
   @owl:
@@ -120,7 +118,6 @@ Namespace:
     urn:x-suika-fam-cx:markup:suikawiki:0:10:
   @swcfg21:
     http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
-  @TreeCore:\
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
   @xhtml1:
@@ -507,7 +504,7 @@ IFClassDef:
                                for_arg => $self->{o}->{for},
                                forp_arg => $self->{o}->{forp},
                                default_name_uri => $self->{o}-><AG::DIS|DISAnyResource.nameURI> ||
-                                            $self->{o}->{<Q::DIS:sourceNodeID>},
+                                            $self->{o}->{<H::DIS:sourceNodeID>},
                                default_for_uri => $self->{o}->{for});
           }
         }__;
@@ -990,10 +987,10 @@ IFClassDef:
       @@@enDesc: No type information.
     @@Get:
       @@@PerlDef:
-        $r = $self->{o}->{<Q::dd|type>};
+        $r = $self->{o}->{<H::dd|type>};
     @@Set:
       @@@PerlDef:
-        $self->{o}->{<Q::dd|type>} = $given;
+        $self->{o}->{<H::dd|type>} = $given;
 ##DVValueDISDoc
 
 PropDef:
@@ -1802,7 +1799,7 @@ IFClassDef:
                   $lextype eq <Q::DISCore:NCNameOrQName>) {
                 __CODE{qnameToElement::
                   $container => $current,
-                  $useDefaultNamespace => {$lextype eq <Q::DISCore:QName>},
+                  $useDefaultNamespace => {($lextype eq <Q::DISCore:QName>)},
                   $newParent => $current,
                   $ownerDocument => $ownerDocumentArg,
                   $namespaceContext => $namespaceContext,

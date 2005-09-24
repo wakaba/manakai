@@ -19,7 +19,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/23 18:25:05 $
+      $Date: 2005/09/24 11:57:25 $
     @@ContentType:
       dis:Date.RCS
   
@@ -197,9 +197,9 @@ ClassDef:
             <Q::TreeCore:irefnode> => [],
             <Q::TreeCore:anydata> => [],
             <Q::TreeCore:anydata2> => [],
-            <Q::TreeCore:rc> => 0,
-            <Q::TreeCore:treeID> => <Code::ManakaiDOM:generateUniqueID>,
-            <Q::TreeCore:nodeID> => <Code::ManakaiDOM:generateUniqueID>,
+            <H::mn:rc> => 0,
+            <H::mn:treeID> => <Code::ManakaiDOM:generateUniqueID>,
+            <H::mn:nodeID> => <Code::ManakaiDOM:generateUniqueID>,
           }, ref $self || $self;
 
   @IntMethod:
@@ -231,10 +231,10 @@ ClassDef:
           The newly created node reference.
       @@@PerlDef:
           $r = bless {
-            <Q::TreeCore:node> => $self,
+            <H::mn:node> => $self,
           }, ref $class ? ref $class : defined $class ? $class :
              <ClassName::ManakaiDOM:ManakaiDOMNodeReference>;
-          $self->{<Q::TreeCore:rc>}++;
+          $self->{<H::mn:rc>}++;
 
   @ResourceDef:
     @@QName: getNewReference
@@ -275,9 +275,9 @@ ClassDef:
       @@@In:1
       @@@DISPerl:paramStyle: any
     @@PerlDef:
-      $object->{<Q::TreeCore:rc>}++;
+      $object->{<H::mn:rc>}++;
       $ref = bless {
-        <Q::TreeCore:node> => $object,
+        <H::mn:node> => $object,
       }, $class;
 
   @ResourceDef:
@@ -332,8 +332,8 @@ ClassDef:
       @@@DISPerl:paramStyle: any
     @@PerlDef:
       $ref = bless {
-        <Q::TreeCore:node> => $object,
-        <Q::TreeCore:isWeak> => true,
+        <H::mn:node> => $object,
+        <H::mn:isWeak> => true,
       }, $class;
 
   @ResourceDef:
@@ -378,8 +378,8 @@ ClassDef:
       @@@DISPerl:paramStyle: any
     @@PerlDef:
       (bless {
-        <Q::TreeCore:node> => $object,
-        <Q::TreeCore:isWeak> => true,
+        <H::mn:node> => $object,
+        <H::mn:isWeak> => true,
       }, $class)
 
   @IntMethod:
@@ -411,7 +411,7 @@ ClassDef:
       @@@PerlDef:
         @@@@ForCheck: ForFull
         @@@@@:
-          if ($self->{<Q::TreeCore:rc>}) {
+          if ($self->{<H::mn:rc>}) {
             $r = true;
           } else {
             my @node = ($self);
@@ -419,10 +419,10 @@ ClassDef:
             NODES: while (defined (my $node = shift @node)) {
               next unless UNIVERSAL::isa ($node,
                           <ClassName::ManakaiDOM:ManakaiDOMNodeObject>);
-              if ($node->{<Q::TreeCore:rc>}) {
+              if ($node->{<H::mn:rc>}) {
                 $r = true;
                 last NODES;
-              } elsif ($checked{$node->{<Q::TreeCore:nodeID>}}) {
+              } elsif ($checked{$node->{<H::mn:nodeID>}}) {
                 next NODES;
               }
               my @n;
@@ -450,23 +450,23 @@ ClassDef:
               for my $p (@{$node->{<Q::TreeCore:subnode0>}}) {
                 push @node, $node->{$p} if $node->{$p};
               }
-              $checked{$node->{<Q::TreeCore:nodeID>}} = 1;
+              $checked{$node->{<H::mn:nodeID>}} = true;
             }
           }
       @@@PerlDef:
         @@@@ForCheck: ForCompact
         @@@@@:
-          if ($self->{<Q::TreeCore:rc>}) {
+          if ($self->{<H::mn:rc>}) {
             $r = true;
           } else {
             my @node = ($self);
             my %checked;
             NODES: while (defined (my $node = shift @node)) {
               next unless ref $node;
-              if ($node->{<Q::TreeCore:rc>}) {
+              if ($node->{<H::mn:rc>}) {
                 $r = true;
                 last NODES;
-              } elsif ($checked{$node->{<Q::TreeCore:nodeID>}}) {
+              } elsif ($checked{$node->{<H::mn:nodeID>}}) {
                 next NODES;
               }
               my @n;
@@ -494,7 +494,7 @@ ClassDef:
               for my $p (@{$node->{<Q::TreeCore:subnode0>}}) {
                 push @node, $node->{$p} if $node->{$p};
               }
-              $checked{$node->{<Q::TreeCore:nodeID>}} = 1;
+              $checked{$node->{<H::mn:nodeID>}} = 1;
             }
           }
 
@@ -523,11 +523,11 @@ ClassDef:
                 if (ref $p eq 'ARRAY') {
                   push @node, grep {UNIVERSAL::isa ($_,
                                     <ClassName::ManakaiDOM:ManakaiDOMNodeObject>)
-                                    and defined $_->{<Q::TreeCore:nodeID>}} @$p;
+                                    and defined $_->{<H::mn:nodeID>}} @$p;
                 } elsif (ref $p eq 'HASH') {
                   push @node, grep {UNIVERSAL::isa ($_,
                                     <ClassName::ManakaiDOM:ManakaiDOMNodeObject>)
-                                    and defined $_->{<Q::TreeCore:nodeID>}}
+                                    and defined $_->{<H::mn:nodeID>}}
                                values %$p;
                 }
               }
@@ -535,7 +535,7 @@ ClassDef:
            \             @{$node->{<Q::TreeCore:subnode0>}}) {
                 push @node, $node->{$p}
                   if defined $node->{$p} and
-                     defined $node->{$p}->{<Q::TreeCore:nodeID>};
+                     defined $node->{$p}->{<H::mn:nodeID>};
               }
           %$node = ();
         }
@@ -544,7 +544,7 @@ ClassDef:
         @@@@@:
         my @node = ($self);
         NODES: while (defined (my $node = shift @node)) {
-          next unless ref $node and defined $node->{<Q::TreeCore:nodeID>};
+          next unless ref $node and defined $node->{<H::mn:nodeID>};
           my @n;
               for my $p (@{$node->{<Q::TreeCore:subnode2>}}) {
                 if (ref $node->{$p} eq 'ARRAY') {
@@ -595,8 +595,8 @@ ClassDef:
       @@@PerlDef:
         @@@@ForCheck: ForFull
         @@@@@:
-        unless ($node->{<Q::TreeCore:treeID>} eq
-                $self->{<Q::TreeCore:treeID>}) {
+        unless ($node->{<H::mn:treeID>} eq
+                $self->{<H::mn:treeID>}) {
           my @node = ($node);
           NODES: while (defined (my $node = shift @node)) {
             next unless UNIVERSAL::isa ($node,
@@ -614,13 +614,13 @@ ClassDef:
                 if (ref $p eq 'ARRAY') {
                   push @node, grep {UNIVERSAL::isa ($_,
                                     <ClassName::ManakaiDOM:ManakaiDOMNodeObject>)
-                                    and $_->{<Q::TreeCore:treeID>} ne
-                                    $self->{<Q::TreeCore:treeID>}} @$p;
+                                    and $_->{<H::mn:treeID>} ne
+                                    $self->{<H::mn:treeID>}} @$p;
                 } elsif (ref $p eq 'HASH') {
                   push @node, grep {UNIVERSAL::isa ($_,
                                     <ClassName::ManakaiDOM:ManakaiDOMNodeObject>)
-                                    and $_->{<Q::TreeCore:treeID>} ne
-                                    $self->{<Q::TreeCore:treeID>}}
+                                    and $_->{<H::mn:treeID>} ne
+                                    $self->{<H::mn:treeID>}}
                               values %$p;
                 }
               }
@@ -628,10 +628,10 @@ ClassDef:
            \           @{$node->{<Q::TreeCore:subnode0>}}) {
               push @node, $node->{$p}
                 if defined $node->{$p} and
-                   $node->{$p}->{<Q::TreeCore:treeID>} ne
-                   $self->{<Q::TreeCore:treeID>};
+                   $node->{$p}->{<H::mn:treeID>} ne
+                   $self->{<H::mn:treeID>};
             }
-            $node->{<Q::TreeCore:treeID>} = $self->{<Q::TreeCore:treeID>};
+            $node->{<H::mn:treeID>} = $self->{<H::mn:treeID>};
           }
         }
       @@@PerlDef:
@@ -640,8 +640,8 @@ ClassDef:
           my @node = ($node);
           NODES: while (defined (my $node = shift @node)) {
             next unless ref $node;
-            next if $node->{<Q::TreeCore:treeID>} eq
-                    $self->{<Q::TreeCore:treeID>};
+            next if $node->{<H::mn:treeID>} eq
+                    $self->{<H::mn:treeID>};
             my @n;
               for my $p (@{$node->{<Q::TreeCore:subnode2>}}) {
                 if (ref $node->{$p} eq 'ARRAY') {
@@ -662,7 +662,7 @@ ClassDef:
            \           @{$node->{<Q::TreeCore:subnode0>}}) {
               push @node, $node->{$p};
             }
-            $node->{<Q::TreeCore:treeID>} = $self->{<Q::TreeCore:treeID>};
+            $node->{<H::mn:treeID>} = $self->{<H::mn:treeID>};
           }
 
   @IntMethod:
@@ -683,7 +683,7 @@ ClassDef:
       @@@PerlDef:
         @@@@ForCheck: ForFull
         @@@@@:
-        unless ($self->{<Q::TreeCore:treeID>} eq $treeID) {
+        unless ($self->{<H::mn:treeID>} eq $treeID) {
           my @node = ($self);
           NODES: while (defined (my $node = shift @node)) {
             next unless UNIVERSAL::isa ($node,
@@ -702,11 +702,11 @@ ClassDef:
                   push @node, grep {UNIVERSAL::isa ($_,
                                     <ClassName::ManakaiDOM:ManakaiDOMNodeObject>)
                                     and
-                                    $_->{<Q::TreeCore:treeID>} ne $treeID} @$p;
+                                    $_->{<H::mn:treeID>} ne $treeID} @$p;
                 } elsif (ref $p eq 'HASH') {
                   push @node, grep {UNIVERSAL::isa ($_,
                                     <ClassName::ManakaiDOM:ManakaiDOMNodeObject>)
-                                    and $_->{<Q::TreeCore:treeID>} ne $treeID}
+                                    and $_->{<H::mn:treeID>} ne $treeID}
                               values %$p;
                 }
               }
@@ -714,9 +714,9 @@ ClassDef:
        \               @{$node->{<Q::TreeCore:subnode0>}}) {
               push @node, $node->{$p}
                 if defined $node->{$p} and
-                   $node->{$p}->{<Q::TreeCore:treeID>} ne $treeID;
+                   $node->{$p}->{<H::mn:treeID>} ne $treeID;
             }
-            $node->{<Q::TreeCore:treeID>} = $treeID;
+            $node->{<H::mn:treeID>} = $treeID;
           }
         }
       @@@PerlDef:
@@ -725,7 +725,7 @@ ClassDef:
           my @node = ($self);
           NODES: while (defined (my $node = shift @node)) {
             next unless ref $node;
-            next if $node->{<Q::TreeCore:treeID>} eq $treeID;
+            next if $node->{<H::mn:treeID>} eq $treeID;
               my @n;
               for my $p (@{$node->{<Q::TreeCore:subnode2>}}) {
                 if (ref $node->{$p} eq 'ARRAY') {
@@ -746,7 +746,7 @@ ClassDef:
        \               @{$node->{<Q::TreeCore:subnode0>}}) {
               push @node, $node->{$p};
             }
-            $node->{<Q::TreeCore:treeID>} = $treeID;
+            $node->{<H::mn:treeID>} = $treeID;
           }
 
   @IntMethod:
@@ -783,7 +783,7 @@ ClassDef:
           if (ref $node and
               UNIVERSAL::isa ($node,
                               <ClassName::ManakaiDOM:ManakaiDOMNodeObject>) and
-              $node->{<Q::TreeCore:nodeID>} eq $self->{<Q::TreeCore:nodeID>}) {
+              $node->{<H::mn:nodeID>} eq $self->{<H::mn:nodeID>}) {
             $r = true;
           }
       @@@PerlDef:
@@ -791,7 +791,7 @@ ClassDef:
         @@@@@:
           if (ref $node and
               UNIVERSAL::isa ($node, <ClassName::NodeStem>) and
-              $node->{<Q::TreeCore:nodeID>} eq $self->{<Q::TreeCore:nodeID>}) {
+              $node->{<H::mn:nodeID>} eq $self->{<H::mn:nodeID>}) {
             $r = true;
           }
   @IntMethod:
@@ -884,7 +884,7 @@ ClassDef:
     @@ForCheck: ForCompact
     @@Return:
       @@@PerlDef:
-        $self->{<Q::TreeCore:node>}-><M::NodeStem.destroy>;
+        $self->{<H::mn:node>}-><M::NodeStem.destroy>;
 
   @IntMethod:
     @@Name: destroy
@@ -898,11 +898,11 @@ ClassDef:
     @@Return:
       @@@PerlDef:
         @@@@@:
-          my $node = $self->{<Q::TreeCore:node>};
+          my $node = $self->{<H::mn:node>};
           if ($node) {
-            CORE::delete $self->{<Q::TreeCore:node>};
-            unless ($self->{<Q::TreeCore:isWeak>}) {
-              $node->{<Q::TreeCore:rc>}--;
+            CORE::delete $self->{<H::mn:node>};
+            unless ($self->{<H::mn:isWeak>}) {
+              $node->{<H::mn:rc>}--;
               unless ($node-><M::NodeStem.isExternallyReferred>) {
                 $node-><M::NodeStem.destroy>;
               }
@@ -941,12 +941,57 @@ ClassDef:
 ##NodeRef
 
 PropDef:
-  @QName: isWeak
+  @QName: mn|nodeID
+  @enDesc:
+    The globally unique identifier of the node.
+  @mn:stemName: nid
+
+PropDef:
+  @QName: mn|treeID
+  @enDesc:
+    The globally unique identifier of the grove to which the
+    node belongs.
+  @mn:stemName: tid
+
+PropDef:
+  @QName: mn|rc
+  @enDesc:
+    The number of the reference that points the node.
+  @mn:stemName: rc
+
+PropDef:
+  @QName: mn|node
+  @mn:refName: node
+  @rdfs:domain: mn|NodeRef||ManakaiDOM|Perl
+  @rdfs:range: mn|NodeStem||ManakaiDOM|Perl
+
+PropDef:
+  @QName: mn|isWeak
   @enDesc:
     Whether a reference is weak or not. 
-  @rdfs:range:
-    ManakaiDOM:ManakaiDONNodeReference
+  @rdfs:domain: mn|NodeRef||ManakaiDOM|Perl
   @Type: DISPerl|Boolean
+  @mn:refName: w
+
+PropDef:
+  @QName: mn|stemName
+  @enDesc:
+    The key name of the property when it is used in <Class::ManakaiNodeStem
+    ::ManakaiDOM:Perl>.
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|Single
+  @rdfs:domain: rdfs|Property
+  @rdfs:subPropertyOf: DISPerl|propHashKey
+
+PropDef:
+  @QName: mn|refName
+  @enDesc:
+    The key name of the property when it is used in <Class::ManakaiNodeRef
+    ::ManakaiDOM:Perl>.
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|Single
+  @rdfs:domain: rdfs|Property
+  @rdfs:subPropertyOf: DISPerl|propHashKey
 
 ElementTypeBinding:
   @Name:PropDef

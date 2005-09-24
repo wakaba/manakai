@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/23 18:24:56 $
+      $Date: 2005/09/24 11:57:22 $
     @@ContentType:
       dis:Date.RCS
 
@@ -80,6 +80,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/mdom-xml#
   @MDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
+  @mn:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
@@ -632,9 +634,9 @@ ResourceDef:
           The new object for the <IF::CDATASection> node.
       @@@PerlDef:
         $r = <ClassM::DOMCore:ManakaiDOMNode.newObject>;
-        push @{$r->{<Q::TreeCore:origin>}}, <Q::infoset:parent>;
-        $r->{<Q::DOMCore:nodeType>} = <Q::DOMXML:CDATASection>;
-        $r->{<Q::infoset:content>} = '';
+        push @{$r->{<Q::TreeCore:origin>}}, <H::infoset:parent>;
+        $r->{<H::DOMCore:nodeType>} = <H::DOMXML:CDATASectionNode>;
+        $r->{<H::infoset:content>} = '';
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -698,7 +700,7 @@ ResourceDef:
                 if ($Message::DOM::ClassFeature{$class}
                             ->{$feature}->{$version}) {
                   __CODE{DOMCore|getNodeRef::
-                    $object => {$self->{<Q::TreeCore:node>}},
+                    $object => {$self->{<H::mn:node>}},
                     $ref => $r,
                     $class => $class,
                   }__;
@@ -707,6 +709,43 @@ ResourceDef:
               }
             }
 ##CDATASection
+
+PropDef:
+  @QName: ManakaiDOM|isExpanded
+  @enDesc:
+    Whether an entity reference is expanded or not.
+
+PropDef:
+  @QName: ManakaiDOM|isExternalEntity
+  @enDesc:
+    Whether an entity is external entity or not.
+
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdf:Property
+    @@For: =ManakaiDOM|all
+
+ResourceDef:
+  @For: =ManakaiDOM|all
+  @rdf:type: rdfs|Resource
+  @QName: DOMXML|EntityNode
+  @DISPerl:propHashKey: ent
+
+ResourceDef:
+  @For: =ManakaiDOM|all
+  @rdf:type: rdfs|Resource
+  @QName: DOMXML|EntityReferenceNode
+  @DISPerl:propHashKey: entr
+
+ResourceDef:
+  @For: =ManakaiDOM|all
+  @rdf:type: rdfs|Resource
+  @QName: DOMXML|CDATASectionNode
+  @DISPerl:propHashKey: cdsect
 
 NodeTypeDef:
   @IFQName: DocumentType
@@ -757,13 +796,13 @@ NodeTypeDef:
           @@@@lang:en
           @@@@@: The document type name.
         @@@PerlDef:
-            my $node = $self->{<Q::TreeCore:node>};
-            if (defined $node->{<Q::infoset:localName>}) {
-              $r = (defined $node->{<Q::infoset:prefix>} ?
-                   $node->{<Q::infoset:prefix>} . ':' : '') . 
-                   $node->{<Q::infoset:localName>};
+            my $node = $self->{<H::mn:node>};
+            if (defined $node->{<H::infoset:localName>}) {
+              $r = (defined $node->{<H::infoset:prefix>} ?
+                   $node->{<H::infoset:prefix>} . ':' : '') . 
+                   $node->{<H::infoset:localName>};
             } else {
-              $r = $node->{<Q::DOMCore:name>};
+              $r = $node->{<H::DOMCore:name>};
             }
             
   @Attr:
@@ -787,7 +826,7 @@ NodeTypeDef:
             A <IF::DOMCore|NamedNodeMap> containing <IF::Entity>s.
       @@@PerlDef:
         __CODE{DOMCore|getNodeRef::
-          $object => {$self->{<Q::TreeCore:node>}},
+          $object => {$self->{<H::mn:node>}},
           $ref => $r,
           $class => {
             <ClassName::ManakaiDOMXML:ManakaiDOMEntities>
@@ -812,7 +851,7 @@ NodeTypeDef:
             A <IF::DOMCore|NamedNodeMap> containing <IF::Notation>s.
       @@@PerlDef:
         __CODE{DOMCore|getNodeRef::
-          $object => {$self->{<Q::TreeCore:node>}},
+          $object => {$self->{<H::mn:node>}},
           $ref => $r,
           $class => {
             <ClassName::ManakaiDOMXML:ManakaiDOMNotations>
@@ -1010,8 +1049,8 @@ NodeTypeDef:
           The new object for the <IF::DocumentType> node.
       @@@PerlDef:
         $r = <ClassM::DOMCore:ManakaiDOMNode.newObject>;
-        push @{$r->{<Q::TreeCore:origin>}}, <Q::infoset:parent>;
-        $r->{<Q::DOMCore:nodeType>} = <Q::infoset:DocumentTypeDeclaration>;
+        push @{$r->{<Q::TreeCore:origin>}}, <H::infoset:parent>;
+        $r->{<H::DOMCore:nodeType>} = <H::infoset:DocumentTypeDeclaration>;
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -1081,7 +1120,7 @@ NodeTypeDef:
                 if ($Message::DOM::ClassFeature{$class}
                             ->{$feature}->{$version}) {
                   __CODE{DOMCore|getNodeRef::
-                    $object => {$self->{<Q::TreeCore:node>}},
+                    $object => {$self->{<H::mn:node>}},
                     $ref => $r,
                     $class => $class,
                   }__;
@@ -1313,7 +1352,7 @@ NodeTypeDef:
           The new object for the <IF::Notation> node.
       @@@PerlDef:
         $r = <ClassM::DOMCore:ManakaiDOMNode.newObject>;
-        $r->{<Q::DOMCore:nodeType>} = <Q::infoset:Notation>;
+        $r->{<H::DOMCore:nodeType>} = <H::infoset:Notation>;
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -1381,7 +1420,7 @@ NodeTypeDef:
                 if ($Message::DOM::ClassFeature{$class}
                             ->{$feature}->{$version}) {
                   __CODE{DOMCore|getNodeRef::
-                    $object => {$self->{<Q::TreeCore:node>}},
+                    $object => {$self->{<H::mn:node>}},
                     $ref => $r,
                     $class => $class,
                   }__;
@@ -1708,9 +1747,9 @@ NodeTypeDef:
           The new object for the <IF::Entity> node.
       @@@PerlDef:
         $r = <ClassM::DOMCore:ManakaiDOMNode.newObject>;
-        push @{$r->{<Q::TreeCore:subnode>}}, <Q::infoset:children>;
-        $r->{<Q::infoset:children>} = [];
-        $r->{<Q::DOMCore:nodeType>} = <Q::DOMXML:Entity>;
+        push @{$r->{<Q::TreeCore:subnode>}}, <H::infoset:children>;
+        $r->{<H::infoset:children>} = [];
+        $r->{<H::DOMCore:nodeType>} = <H::DOMXML:EntityNode>;
      @@Level[list]:
        1
        2
@@ -1790,7 +1829,7 @@ NodeTypeDef:
                 if ($Message::DOM::ClassFeature{$class}
                             ->{$feature}->{$version}) {
                   __CODE{DOMCore|getNodeRef::
-                    $object => {$self->{<Q::TreeCore:node>}},
+                    $object => {$self->{<H::mn:node>}},
                     $ref => $r,
                     $class => $class,
                   }__;
@@ -1926,10 +1965,10 @@ NodeTypeDef:
           The new object for the <IF::EntityReference> node.
       @@@PerlDef:
         $r = <ClassM::DOMCore:ManakaiDOMNode.newObject>;
-        push @{$r->{<Q::TreeCore:subnode>}}, <Q::infoset:children>;
-        $r->{<Q::infoset:children>} = [];
-        push @{$r->{<Q::TreeCore:origin>}}, <Q::infoset:parent>;
-        $r->{<Q::DOMCore:nodeType>} = <Q::DOMXML:EntityReference>;
+        push @{$r->{<Q::TreeCore:subnode>}}, <H::infoset:children>;
+        $r->{<H::infoset:children>} = [];
+        push @{$r->{<Q::TreeCore:origin>}}, <H::infoset:parent>;
+        $r->{<H::DOMCore:nodeType>} = <H::DOMXML:EntityReferenceNode>;
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -2043,7 +2082,7 @@ NodeTypeDef:
             The DOM implementation was not able to 
             obtain an absolute URI.
       @@@PerlDef:
-        $r = $self->{<Q::TreeCore:node>}
+        $r = $self->{<H::mn:node>}
                   -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode.contentBaseURI>
                                                                       (false);
     @@SpecLevel:3
@@ -2184,9 +2223,9 @@ NodeTypeDef:
           The new object for the <IF::ProcessingInstruction> node.
       @@@PerlDef:
         $r = <ClassM::DOMCore:ManakaiDOMNode.newObject>;
-        push @{$r->{<Q::TreeCore:origin>}}, <Q::infoset:parent>;
-        $r->{<Q::DOMCore:nodeType>} = <Q::infoset:ProcessingInstruction>;
-        $r->{<Q::infoset:content>} = '';
+        push @{$r->{<Q::TreeCore:origin>}}, <H::infoset:parent>;
+        $r->{<H::DOMCore:nodeType>} = <H::infoset:ProcessingInstruction>;
+        $r->{<H::infoset:content>} = '';
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -2255,7 +2294,7 @@ NodeTypeDef:
                 if ($Message::DOM::ClassFeature{$class}
                             ->{$feature}->{$version}) {
                   __CODE{DOMCore|getNodeRef::
-                    $object => {$self->{<Q::TreeCore:node>}},
+                    $object => {$self->{<H::mn:node>}},
                     $ref => $r,
                     $class => $class,
                   }__;

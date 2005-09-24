@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/23 18:24:57 $
+      $Date: 2005/09/24 11:57:22 $
     @@ContentType: dis|Date.RCS
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
@@ -53,13 +53,14 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/9/27/mdom-old-ls#
   @MDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
+  @mn:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
   @null:
     http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
-  @TreeCore: \
   @undef:
     http://suika.fam.cx/~wakaba/-temp/2003/09/27/undef
   @xml:
@@ -376,7 +377,7 @@ IFClsXDef:
         \
         }
       @@@PerlDef:
-        my @src = ($nodeArg->{<Q::TreeCore:node>});
+        my @src = ($nodeArg->{<H::mn:node>});
         my $nsbind = [{'' => '', xml => <Q::xml:>, xmlns => <Q::undef:>}];
         my $xescape = sub ($) {
           my $s = shift;
@@ -390,21 +391,21 @@ IFClsXDef:
           if (ref $src eq 'ARRAY') {
             pop @$nsbind;  ## End tag
           } elsif (ref $src) {
-            if ($src->{<Q::DOMCore:nodeType>} eq <Q::infoset:Element>) {
+            if ($src->{<H::DOMCore:nodeType>} eq <H::infoset:Element>) {
               my @csrc;
               my $etag;
               push @$nsbind, my $ns = {%{$nsbind->[-1]}};
               my %attrr;
 
               ## Non-namespace attributes
-              for my $ao (values %{$src->{<Q::infoset:attributes>}
+              for my $ao (values %{$src->{<H::infoset:attributes>}
                                        ->{<Q::ManakaiDOM:noNS>}||{}}) {
-                $attrr{$ao->{<Q::DOMCore:name>}}
-                      = [@{$ao->{<Q::infoset:children>}}];
+                $attrr{$ao->{<H::DOMCore:name>}}
+                      = [@{$ao->{<H::infoset:children>}}];
               }
 
               ## Namespace attributes
-              for my $xmlnso (values %{$src->{<Q::infoset:attributes>}
+              for my $xmlnso (values %{$src->{<H::infoset:attributes>}
                                            ->{<Q::xmlns:>}||{}}) {
                 my $xmlns;
                 __CODE{ManakaiNode:getWeakReference||ManakaiDOM:Perl::
@@ -412,48 +413,48 @@ IFClsXDef:
                   $class => {<ClassName::DOMCore:ManakaiDOMAttr>},
                 }__;
                 my $nsuri = $xmlns-><AG::DOMCore:Attr.value>;
-                if ($xmlnso->{<Q::infoset:localName>} eq 'xmlns') {
+                if ($xmlnso->{<H::infoset:localName>} eq 'xmlns') {
                   $ns->{''} = $nsuri;
-                  $attrr{'xmlns'} = [@{$xmlnso->{<Q::infoset:children>}}];
+                  $attrr{'xmlns'} = [@{$xmlnso->{<H::infoset:children>}}];
                 } else {
                   if (length $nsuri) {
-                    $ns->{$xmlnso->{<Q::infoset:localName>}} = $nsuri;
+                    $ns->{$xmlnso->{<H::infoset:localName>}} = $nsuri;
                   } else {
-                    $ns->{$xmlnso->{<Q::infoset:localName>}} = <Q::undef:>;
+                    $ns->{$xmlnso->{<H::infoset:localName>}} = <Q::undef:>;
                   }
-                  $attrr{'xmlns:'.$xmlnso->{<Q::infoset:localName>}}
-                                  = [@{$xmlnso->{<Q::infoset:children>}}];
+                  $attrr{'xmlns:'.$xmlnso->{<H::infoset:localName>}}
+                                  = [@{$xmlnso->{<H::infoset:children>}}];
                 }
               }
 
               ## Per-element partition attributes
-              for my $ano (values %{$src->{<Q::infoset:attributes>}
+              for my $ano (values %{$src->{<H::infoset:attributes>}
                                         ->{<Q::null:>}||{}}) {
-                $attrr{$ano->{<Q::infoset:localName>}}
-                                  = [@{$ano->{<Q::infoset:children>}}];
+                $attrr{$ano->{<H::infoset:localName>}}
+                                  = [@{$ano->{<H::infoset:children>}}];
               }
 
               ## Global partition attributes
-              for my $ans (keys %{$src->{<Q::infoset:attributes>}}) {
+              for my $ans (keys %{$src->{<H::infoset:attributes>}}) {
                 next if $ans eq <Q::xmlns:>;
                 next if $ans eq <Q::null:>;
                 next if $ans eq <Q::ManakaiDOM:noNS>;
                 my $defpfx;
                 my $ansao = [];
-                for my $ao (values %{$src->{<Q::infoset:attributes>}
+                for my $ao (values %{$src->{<H::infoset:attributes>}
                                          ->{$ans}||{}}) {
                   my $pfx;
                   PFX: {
-                    if (defined $ao->{<Q::infoset:prefix>}) {
-                      if (defined $ns->{$ao->{<Q::infoset:prefix>}}) {
-                        if ($ns->{$ao->{<Q::infoset:prefix>}} eq $ans) {
+                    if (defined $ao->{<H::infoset:prefix>}) {
+                      if (defined $ns->{$ao->{<H::infoset:prefix>}}) {
+                        if ($ns->{$ao->{<H::infoset:prefix>}} eq $ans) {
                           ## Namespace already defined
-                          $defpfx ||= $pfx = $ao->{<Q::infoset:prefix>};
+                          $defpfx ||= $pfx = $ao->{<H::infoset:prefix>};
                           last PFX;
                         }
                       } else {
                         ## Namespace prefix not defined yet
-                        $defpfx ||= $pfx = $ao->{<Q::infoset:prefix>};
+                        $defpfx ||= $pfx = $ao->{<H::infoset:prefix>};
                         $ns->{$pfx} = $ans;
                         $attrr{'xmlns:'.$pfx} = [$xescape->($ans)];
                         last PFX;
@@ -484,18 +485,18 @@ IFClsXDef:
                   last PFX if defined $defpfx;
 
                   ## Available from element itself?
-                  if (defined $src->{<Q::infoset:namespaceName>} and
-                      $src->{<Q::infoset:namespaceName>} eq $ans and
-                      defined $src->{<Q::infoset:prefix>}) {
-                    if (defined $ns->{$src->{<Q::infoset:prefix>}}) {
-                      if ($ns->{$src->{<Q::infoset:prefix>}} eq $ans) {
+                  if (defined $src->{<H::infoset:namespaceName>} and
+                      $src->{<H::infoset:namespaceName>} eq $ans and
+                      defined $src->{<H::infoset:prefix>}) {
+                    if (defined $ns->{$src->{<H::infoset:prefix>}}) {
+                      if ($ns->{$src->{<H::infoset:prefix>}} eq $ans) {
                         ## Namespace already defined
-                        $defpfx = $src->{<Q::infoset:prefix>};
+                        $defpfx = $src->{<H::infoset:prefix>};
                         last PFX;
                       }
                     } else {
                       ## Namespace not defined yet
-                      $defpfx = $src->{<Q::infoset:prefix>};
+                      $defpfx = $src->{<H::infoset:prefix>};
                       $ns->{$defpfx} = $ans;
                       $attrr{'xmlns:'.$defpfx} = [$xescape->($ans)];
                       last PFX;
@@ -511,48 +512,48 @@ IFClsXDef:
 
                 for my $ansno (@$ansao) {
                   $attrr{($ansno->[0] || $defpfx) . ':' .
-                         $ansno->[1]->{<Q::infoset:localName>}}
-                     = [@{$ansno->[1]->{<Q::infoset:children>}}];
+                         $ansno->[1]->{<H::infoset:localName>}}
+                     = [@{$ansno->[1]->{<H::infoset:children>}}];
                 }
               }
 
               ## Element type name
-              if (defined $src->{<Q::infoset:localName>}) {
-                if (defined $src->{<Q::infoset:namespaceName>}) {
-                  if (defined $src->{<Q::infoset:prefix>} and
-                      defined $ns->{$src->{<Q::infoset:prefix>}} and
-                      $ns->{$src->{<Q::infoset:prefix>}}
-                         eq $src->{<Q::infoset:namespaceName>}) {
+              if (defined $src->{<H::infoset:localName>}) {
+                if (defined $src->{<H::infoset:namespaceName>}) {
+                  if (defined $src->{<H::infoset:prefix>} and
+                      defined $ns->{$src->{<H::infoset:prefix>}} and
+                      $ns->{$src->{<H::infoset:prefix>}}
+                         eq $src->{<H::infoset:namespaceName>}) {
                     ## Non-NULL namespace and prefix is defined
-                    $r .= '<' . $src->{<Q::infoset:prefix>} . ':'
-                       .  $src->{<Q::infoset:localName>};
-                    $etag = '</' . $src->{<Q::infoset:prefix>} . ':'
-                       .  $src->{<Q::infoset:localName>} . '>';
-                  } elsif (defined $src->{<Q::infoset:prefix>} and
-                           not defined $ns->{$src->{<Q::infoset:prefix>}}) {
-                    $attrr{'xmlns:'.$src->{<Q::infoset:prefix>}}
-                      = [$xescape->($src->{<Q::infoset:namespaceName>})];
-                    $ns->{$src->{<Q::infoset:prefix>}}
-                      = $src->{<Q::infoset:namespaceName>};
-                    $r .= '<' . $src->{<Q::infoset:prefix>} . ':'
-                       .  $src->{<Q::infoset:localName>};
-                    $etag = '</' . $src->{<Q::infoset:prefix>} . ':'
-                       .  $src->{<Q::infoset:localName>} . '>';
+                    $r .= '<' . $src->{<H::infoset:prefix>} . ':'
+                       .  $src->{<H::infoset:localName>};
+                    $etag = '</' . $src->{<H::infoset:prefix>} . ':'
+                       .  $src->{<H::infoset:localName>} . '>';
+                  } elsif (defined $src->{<H::infoset:prefix>} and
+                           not defined $ns->{$src->{<H::infoset:prefix>}}) {
+                    $attrr{'xmlns:'.$src->{<H::infoset:prefix>}}
+                      = [$xescape->($src->{<H::infoset:namespaceName>})];
+                    $ns->{$src->{<H::infoset:prefix>}}
+                      = $src->{<H::infoset:namespaceName>};
+                    $r .= '<' . $src->{<H::infoset:prefix>} . ':'
+                       .  $src->{<H::infoset:localName>};
+                    $etag = '</' . $src->{<H::infoset:prefix>} . ':'
+                       .  $src->{<H::infoset:localName>} . '>';
                   } else {
                     PFX: {
                       ## Non-NULL namespace and prefix is not defined
                       ## but already declared as namespace attribute
                       for my $pfx (keys %$ns) {
                         next unless $ns->{$pfx}
-                                      eq $src->{<Q::infoset:namespaceName>};
+                                      eq $src->{<H::infoset:namespaceName>};
                         if (length $pfx) {
                           $r .= '<' . $pfx . ':'
-                             .  $src->{<Q::infoset:localName>};
+                             .  $src->{<H::infoset:localName>};
                           $etag = '</' . $pfx . ':'
-                                .  $src->{<Q::infoset:localName>} . '>';
+                                .  $src->{<H::infoset:localName>} . '>';
                         } else {
-                          $r .= '<' . $src->{<Q::infoset:localName>};
-                          $etag = '</' . $src->{<Q::infoset:localName>} . '>';
+                          $r .= '<' . $src->{<H::infoset:localName>};
+                          $etag = '</' . $src->{<H::infoset:localName>} . '>';
                         }
                         last PFX;
                       }
@@ -560,10 +561,10 @@ IFClsXDef:
                       ## Non-NULL namespace and prefix is not defined anywhere
                       my $i = 1;
                       $i++ while (exists $ns->{'ns'.$i});
-                      $ns->{'ns'.$i} = $src->{<Q::infoset:namespaceName>};
+                      $ns->{'ns'.$i} = $src->{<H::infoset:namespaceName>};
                       $attrr{'xmlns:ns'.$i} = [$xescape->($ns->{'ns'.$i})];
-                      $r .= '<'.'ns' . $i . ':' . $src->{<Q::infoset:localName>};
-                      $etag = '</ns'.$i.':'.$src->{<Q::infoset:localName>} . '>';
+                      $r .= '<'.'ns' . $i . ':' . $src->{<H::infoset:localName>};
+                      $etag = '</ns'.$i.':'.$src->{<H::infoset:localName>} . '>';
                     }
                   }
                 } else {
@@ -573,13 +574,13 @@ IFClsXDef:
                     $ns->{''} = '';
                     $attrr{'xmlns'} = [''];
                   }
-                  $r .= '<' . $src->{<Q::infoset:localName>};
-                  $etag = '</' . $src->{<Q::infoset:localName>} . '>';
+                  $r .= '<' . $src->{<H::infoset:localName>};
+                  $etag = '</' . $src->{<H::infoset:localName>} . '>';
                 }
               } else {
                 ## Non-namespace node
-                $r .= '<' . $src->{<Q::DOMCore:name>};
-                $etag = '</' . $src->{<Q::DOMCore:name>} . '>';
+                $r .= '<' . $src->{<H::DOMCore:name>};
+                $etag = '</' . $src->{<H::DOMCore:name>} . '>';
               }
               
               ## Attribute specifications
@@ -588,44 +589,44 @@ IFClsXDef:
               }
 
               ## Children
-              if (@{$src->{<Q::infoset:children>}}) {
-                push @csrc, '>', @{$src->{<Q::infoset:children>}}, $etag, [];
-              } elsif ($src->{<Q::ManakaiDOMLS2003:use_EmptyElemTag>}) {
+              if (@{$src->{<H::infoset:children>}}) {
+                push @csrc, '>', @{$src->{<H::infoset:children>}}, $etag, [];
+              } elsif ($src->{<H::ManakaiDOMLS2003:use_EmptyElemTag>}) {
                 push @csrc, ' />';
                 shift @$nsbind;
               } else {
                 push @csrc, '>' . $etag, [];
               }
               unshift @src, @csrc;
-            } elsif ($src->{<Q::DOMCore:nodeType>} eq <Q::DOMCore:Text>) {
-              $r .= $xescape->($src->{<Q::infoset:content>});
-            } elsif ($src->{<Q::DOMCore:nodeType>} eq <Q::DOMXML:CDATASection>) {
-              my $text = $src->{<Q::infoset:content>};
+            } elsif ($src->{<H::DOMCore:nodeType>} eq <H::DOMCore:Text>) {
+              $r .= $xescape->($src->{<H::infoset:content>});
+            } elsif ($src->{<H::DOMCore:nodeType>} eq <H::DOMXML:CDATASectionNode>) {
+              my $text = $src->{<H::infoset:content>};
               $text =~ s/]]>/]]]]>&gt;<![CDATA[/g;
               $r .= '<![CDATA[' . $text . ']]>';
-            } elsif ($src->{<Q::DOMCore:nodeType>}
-                        eq <Q::DOMXML:EntityReference>) {
-              if ($src->{<Q::ManakaiDOM:isExpanded>}) {
-                push @src, @{$src->{<Q::infoset:children>}};
+            } elsif ($src->{<H::DOMCore:nodeType>}
+                        eq <H::DOMXML:EntityReferenceNode>) {
+              if ($src->{<H::ManakaiDOM:isExpanded>}) {
+                push @src, @{$src->{<H::infoset:children>}};
               } else {
-                $r .= '&' . $src->{<Q::DOMCore:name>} . ';';
+                $r .= '&' . $src->{<H::DOMCore:name>} . ';';
               }
-            } elsif ($src->{<Q::DOMCore:nodeType>}
-                        eq <Q::infoset:ProcessingInstruction>) {
-              $r .= '<?' . $src->{<Q::infoset:target>};
-              if (defined $src->{<Q::infoset:content>} and
-                  length $src->{<Q::infoset:content>}) {
-                my $data = $src->{<Q::infoset:content>};
+            } elsif ($src->{<H::DOMCore:nodeType>}
+                        eq <H::infoset:ProcessingInstruction>) {
+              $r .= '<?' . $src->{<H::infoset:target>};
+              if (defined $src->{<H::infoset:content>} and
+                  length $src->{<H::infoset:content>}) {
+                my $data = $src->{<H::infoset:content>};
                 $data =~ s/\?>/?&gt;/g;
                 $r .= ' ' . $data;
               }
               $r .= '?>';
-            } elsif ($src->{<Q::DOMCore:nodeType>} eq <Q::infoset:Comment>) {
-              my $data = $src->{<Q::infoset:content>};
+            } elsif ($src->{<H::DOMCore:nodeType>} eq <H::infoset:Comment>) {
+              my $data = $src->{<H::infoset:content>};
               $data =~ s/--/- - /g;
               $r .= '<!--' . $data . '-->';
-            } elsif ($src->{<Q::DOMCore:nodeType>} eq <Q::infoset:Document>) {
-              unshift @src, map {$_, "\x0A"} @{$src->{<Q::infoset:children>}};
+            } elsif ($src->{<H::DOMCore:nodeType>} eq <H::infoset:Document>) {
+              unshift @src, map {$_, "\x0A"} @{$src->{<H::infoset:children>}};
             }
           } else {
             $r .= $src;

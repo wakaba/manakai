@@ -12,9 +12,7 @@ Module:
     @@@:
       This module provides an object model for <QUOTE::dis> document format.  
 
-  @Author:
-    @@FullName: Wakaba
-    @@Mail: w@suika.fam.cx
+  @DISCore:author: DISCore|Wakaba
   @License:
     @@@:
       license:Perl+MPL
@@ -22,12 +20,10 @@ Module:
       @@@FullName:
         manakai <CODE::lib/manakai/dis.pl> and <CODE::bin/cdis2pm.pl>
       @@@Year:2004
-      @@@Author:
-        @@@@FullName:Wakaba
-        @@@@Mail:w@suika.fam.cx
+      @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/09/23 18:24:59 $
+      $Date: 2005/09/24 11:57:23 $
     @@ContentType:
       dis:Date.RCS
   
@@ -101,6 +97,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @mn:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
   @null:
     http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
   @owl:
@@ -117,7 +115,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
   @swcfg21:
     http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
-  @TreeCore:\
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 
@@ -777,7 +774,7 @@ IFClsDef:
         $r = null;
         my $od = $self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
                                           .ownerDocument> || $self;
-        my $binds = $od->{<Q::TreeCore:node>}->{<Q::swcfg21:nsBinding>};
+        my $binds = $od->{<H::mn:node>}->{<H::swcfg21:nsBinding>};
         if (defined $namespaceURI) {
           FIND: {
             for my $prefix (keys %$binds) {
@@ -915,7 +912,7 @@ IFClsDef:
       @@@UndeclaredPrefixException:
       @@@PerlDef:
         my $od = $self-><AG::DISNode.ownerDISDocument> || $self;
-        my $binds = $od->{<Q::TreeCore:node>}->{<Q::swcfg21:nsBinding>};
+        my $binds = $od->{<H::mn:node>}->{<H::swcfg21:nsBinding>};
         if (exists $binds->{$prefix}) {
           $r = $binds->{$prefix};
         } else {
@@ -974,17 +971,17 @@ IFClsDef:
           A newly created reference.
       @@@PerlDef:
         my $class;
-        if ($object->{<Q::swcfg21:nodeType>} eq '#element') {
+        if ($object->{<H::swcfg21:nodeType>} eq '#element') {
           $class = <ClassName::ManakaiDISElement>;
-        } elsif ($object->{<Q::swcfg21:nodeType>} eq '#comment') {
+        } elsif ($object->{<H::swcfg21:nodeType>} eq '#comment') {
           $class = <ClassName::ManakaiDISComment>;
-        } elsif ($object->{<Q::swcfg21:nodeType>} eq '#document') {
+        } elsif ($object->{<H::swcfg21:nodeType>} eq '#document') {
           $class = <ClassName::ManakaiDISDocument>;
-        } elsif ($object->{<Q::swcfg21:nodeType>} eq '#fragment') {
+        } elsif ($object->{<H::swcfg21:nodeType>} eq '#fragment') {
           $class = <ClassName::ManakaiDISDocumentFragment>;
         } else {
           __ASSERT{DISPerl:invariant::
-            msg => {qq[Node type: "$object->{<Q::swcfg21:nodeType>}" ].
+            msg => {qq[Node type: "$object->{<H::swcfg21:nodeType>}" ].
                     qq[(ref: "@{[ref $object]}")]},
           }__;
         }
@@ -1014,8 +1011,8 @@ IFClsDef:
             This node is a document node. 
       @@@PerlDef:
         $r = <ClassM::ManakaiDISNode.getNodeReference>
-                ($self->{<Q::TreeCore:node>}->{<Q::swcfg21:ownerDocument>})
-          if $self->{<Q::TreeCore:node>}->{<Q::swcfg21:ownerDocument>};
+                ($self->{<H::mn:node>}->{<H::swcfg21:ownerDocument>})
+          if $self->{<H::mn:node>}->{<H::swcfg21:ownerDocument>};
 ##DISNode
 
 IFClsDef:
@@ -1061,9 +1058,9 @@ IFClsDef:
               DIS:sourceNode => {$node},
             }__;
           }
-        } elsif (defined $self->{<Q::TreeCore:node>}
-                              ->{<Q::DIS|defaultNamespaceURI>}) {
-          $r = $self->{<Q::TreeCore:node>}->{<Q::DIS|defaultNamespaceURI>};
+        } elsif (defined $self->{<H::mn:node>}
+                              ->{<H::DIS|defaultNamespaceURI>}) {
+          $r = $self->{<H::mn:node>}->{<H::DIS|defaultNamespaceURI>};
         } else {  ## Default namespace
           __DEEP{
             $r = ($self-><AG::ManakaiDISNode.ownerDISDocument> || $self)
@@ -1715,7 +1712,7 @@ IFClsDef:
             ## $cn is an #element.
             my $dn;
             __CODE{ManakaiNode|getNewReference||ManakaiDOM|Perl::
-              $object => {$cn->{<Q::TreeCore:node>}},
+              $object => {$cn->{<H::mn:node>}},
               $ref => $dn,
               $class => {<ClassName::ManakaiDISElement>},
             }__;
@@ -1743,7 +1740,7 @@ IFClsDef:
             ## $cn is an #element.
             my $dn;
             __CODE{ManakaiNode|getNewReference||ManakaiDOM|Perl::
-              $object => {$cn->{<Q::TreeCore:node>}},
+              $object => {$cn->{<H::mn:node>}},
               $ref => $dn,
               $class => {<ClassName::ManakaiDISElement>},
             }__;
@@ -2059,7 +2056,7 @@ IFClsDef:
             } keys %Message::Util::DIS::ManakaiDISElement::CompatClass) {
               if ($Message::DOM::ClassFeature{$class}->{$feature}->{$version}) {
                 __CODE{ManakaiNode|getNewReference||ManakaiDOM|Perl::
-                  $object => {$self->{<Q::TreeCore:node>}},
+                  $object => {$self->{<H::mn:node>}},
                   $ref => $r,
                   $class => $class,
                 }__;
@@ -2086,19 +2083,19 @@ IFClsDef:
     @@Return:
       @@@PerlDef:
         __DEEP{
-          my $ods = $self->{<Q::TreeCore:node>}->{<Q::swcfg21:ownerDocument>};
-          $self->{<Q::TreeCore:node>}->{<Q::swcfg21:nsBinding>}
+          my $ods = $self->{<H::mn:node>}->{<H::swcfg21:ownerDocument>};
+          $self->{<H::mn:node>}->{<H::swcfg21:nsBinding>}
             = $self-><M::DISElement.getNamespaceBindingList> ($databaseArg);
-          $self->{<Q::TreeCore:node>}->{<Q::DIS|defaultNamespaceURI>}
+          $self->{<H::mn:node>}->{<H::DIS|defaultNamespaceURI>}
             = ${$self-><M::DISElement.getDefaultNamespaceURIRef>};
-          my @nodes = ($self->{<Q::TreeCore:node>});
+          my @nodes = ($self->{<H::mn:node>});
           while (defined (my $node = shift @nodes)) {
-            CORE::delete $node->{<Q::swcfg21:ownerDocument>};
-            push @nodes, grep {$_} @{$node->{<Q::swcfg21:childNodes>}},
-                                   $node->{<Q::swcfg21:shadowContent>},
-                                   $node->{<Q::swcfg21:shadowSibling>};
+            CORE::delete $node->{<H::swcfg21:ownerDocument>};
+            push @nodes, grep {$_} @{$node->{<H::swcfg21:childNodes>}},
+                                   $node->{<H::swcfg21:shadowContent>},
+                                   $node->{<H::swcfg21:shadowSibling>};
           }
-          $self->{<Q::TreeCore:node>}
+          $self->{<H::mn:node>}
                -><M::ManakaiNode|NodeStem||ManakaiDOM|Perl.orphanate>;
         }__;
 
@@ -2114,24 +2111,24 @@ IFClsDef:
         The <QUOTE::dis> database.
     @@Return:
       @@@PerlDef:
-        my $ods = $self->{<Q::TreeCore:node>}->{<Q::swcfg21:ownerDocument>};
-        if ($ods->{<Q::DIS|allNSBindings>}) {
-          $r = $ods->{<Q::DIS|allNSBindings>};
+        my $ods = $self->{<H::mn:node>}->{<H::swcfg21:ownerDocument>};
+        if ($ods->{<H::DIS|allNSBindings>}) {
+          $r = $ods->{<H::DIS|allNSBindings>};
         } else {
           if ($databaseArg) {
             for my $mod_uri (keys %{$databaseArg->{modDef}}) {
               my $mod = $databaseArg-><M::DISDatabase.getModule> ($mod_uri);
-              $ods->{<Q::DIS|allNSBindings>}
+              $ods->{<H::DIS|allNSBindings>}
                   ->{$mod-><AG::DISAnyResource.localName>}
                 = $mod-><M::DISResourceProp.getPropertyText>
                       (<Q::dis:Namespace>, null);
             }
           }
-          for my $prefix (keys %{$ods->{<Q::swcfg21:nsBinding>}}) {
-            $ods->{<Q::DIS|allNSBindings>}->{$prefix}
-                = $ods->{<Q::swcfg21:nsBinding>}->{$prefix};
+          for my $prefix (keys %{$ods->{<H::swcfg21:nsBinding>}}) {
+            $ods->{<H::DIS|allNSBindings>}->{$prefix}
+                = $ods->{<H::swcfg21:nsBinding>}->{$prefix};
           }
-          $r = $ods->{<Q::DIS|allNSBindings>};
+          $r = $ods->{<H::DIS|allNSBindings>};
         }
 
   @Method:
@@ -2140,12 +2137,12 @@ IFClsDef:
     @@Type: DISPerl|SCALAR||ManakaiDOM|all
     @@Return:
       @@@PerlDef:
-        my $ods = $self->{<Q::TreeCore:node>}->{<Q::swcfg21:ownerDocument>};
-        if ($ods->{<Q::DIS|defaultNamespaceURI>}) {
-          $r = \ ($ods->{<Q::DIS|defaultNamespaceURI>});
+        my $ods = $self->{<H::mn:node>}->{<H::swcfg21:ownerDocument>};
+        if ($ods->{<H::DIS|defaultNamespaceURI>}) {
+          $r = \ ($ods->{<H::DIS|defaultNamespaceURI>});
         } else {
           __DEEP{
-            $r = \($ods->{<Q::DIS|defaultNamespaceURI>}
+            $r = \($ods->{<H::DIS|defaultNamespaceURI>}
                = $self-><AG::DISNode.ownerDISDocument>
                       -><AG::DISDocument.moduleElement>
                       -><AG::DISModuleElement.definingNamespaceURI>);
@@ -2368,16 +2365,16 @@ IFClsDef:
     @@Get:
       @@@NoDBException:
       @@@PerlDef:
-        if ($self->{<Q::TreeCore:node>}->{<Q::db>}) {
-          $r = $self->{<Q::TreeCore:node>}->{<Q::db>};
+        if ($self->{<H::mn:node>}->{<H::DIS|db>}) {
+          $r = $self->{<H::mn:node>}->{<H::DIS|db>};
         } else {
           __EXCEPTION{NO_ASSOCIATED_DB_ERR}__;
         }
     @@Set:
       @@@PerlDef:
-        $self->{<Q::TreeCore:node>}->{<Q::db>} = $given;
+        $self->{<H::mn:node>}->{<H::DIS|db>} = $given;
         require Scalar::Util;
-        Scalar::Util::weaken ($self->{<Q::TreeCore:node>}->{<Q::db>});
+        Scalar::Util::weaken ($self->{<H::mn:node>}->{<H::DIS|db>});
 
   @Method:
     @@Name: disChildElements
@@ -2407,7 +2404,7 @@ IFClsDef:
                                               .nodeType> eq '#element';
             my $dn;
             __CODE{ManakaiNode|getNewReference||ManakaiDOM|Perl::
-              $object => {$cn->{<Q::TreeCore:node>}},
+              $object => {$cn->{<H::mn:node>}},
               $ref => $dn,
               $class => {<ClassName::ManakaiDISElement>},
             }__;
@@ -2436,7 +2433,7 @@ IFClsDef:
                                               .nodeType> eq '#element';
             my $dn;
             __CODE{ManakaiNode|getNewReference||ManakaiDOM|Perl::
-              $object => {$cn->{<Q::TreeCore:node>}},
+              $object => {$cn->{<H::mn:node>}},
               $ref => $dn,
               $class => {<ClassName::ManakaiDISElement>},
             }__;
@@ -2456,10 +2453,10 @@ IFClsDef:
     @@Return:
       @@@PerlDef:
         if (defined $namespaceURI) {
-          $self->{<Q::TreeCore:node>}->{<Q::swcfg21:nsBinding>}->{$prefix}
+          $self->{<H::mn:node>}->{<H::swcfg21:nsBinding>}->{$prefix}
             = $namespaceURI;
         } else {
-          CORE::delete $self->{<Q::TreeCore:node>}->{<Q::swcfg21:nsBinding>}
+          CORE::delete $self->{<H::mn:node>}->{<H::swcfg21:nsBinding>}
                             ->{$prefix};
         }
 ##DISDocument
@@ -2635,7 +2632,7 @@ IFClsDef:
         @@@@enDesc:
           No document associated with that <P::fileName>. 
       @@@PerlDef:
-        $r = $self->{<Q::sourceFile>}->{$fileName};
+        $r = $self->{<H::DIS|sourceFile>}->{$fileName};
   @Method:
     @@Name: setSourceFile
     @@enDesc:
@@ -2654,7 +2651,7 @@ IFClsDef:
         The document object to set. 
     @@Return:
       @@@PerlDef:
-        $self->{<Q::sourceFile>}->{$fileName} = $doc;
+        $self->{<H::DIS|sourceFile>}->{$fileName} = $doc;
 
   @Method:
     @@Name: loadModule
@@ -2925,8 +2922,8 @@ IFClsDef:
           unless ($for-><AG::DISAnyResource.isDefined>) {
             ## -- Initializes "For" Definition Object
             $for->{src} = $el;
-            $for->{<Q::DIS|isDefined>} = true;
-            $for->{<Q::DIS|definingModule>} = \ ($mod->{uri});
+            $for->{<H::DIS|isDefined>} = true;
+            $for->{<H::DIS|definingModule>} = \ ($mod->{uri});
 
             for my $ce (@{$el-><M::ManakaiDISElement.disAllChildElements>}) {
               my $xn = $ce-><AG::SWCFGElement.expandedURI>;
@@ -3072,7 +3069,7 @@ IFClsDef:
                 $res = $self-><M::ManakaiDISDatabase.getResource>
                                     ($ru, for_arg => $forArg);
                 $res->{localName} = $n_node-><M::SWCFGNode.value>;
-                $res->{<Q::DIS|isAnon>} = true;
+                $res->{<H::DIS|isAnon>} = true;
               } else {  ## Root local name resource
                 my $ln = $n_node-><M::SWCFGNode.value>;
                 my $ns_uri = $mod-><AG::DISAnyResource.sourceElement>
@@ -3095,13 +3092,13 @@ IFClsDef:
               }
             } else {
               $res = $self-><M::DISDatabase.getResource> ($node_uri);
-              $res->{<Q::DIS|isAnon>} = true;
+              $res->{<H::DIS|isAnon>} = true;
             }
           } # anon
           $res->{for} = $forArg;
           $res->{forp} = $forpArg;
           $res->{src} = $el;
-          $res->{<Q::DIS|definingModule>} = \ ($mod->{uri});
+          $res->{<H::DIS|definingModule>} = \ ($mod->{uri});
           $mod-><M::ManakaiDISPropertyAccessor.addPropertyResourceList>
                                             (<Q::DIS:resource>, $res);
           if ($parentResource) {
@@ -3120,7 +3117,7 @@ IFClsDef:
             my $nu_res = $self-><M::DISDatabase.getResource> ($node_uri);
             $res-><M::DISResource.mergeAsAlias> ($nu_res);
           }
-          $res->{<Q::DIS|isDefined>} = true;
+          $res->{<H::DIS|isDefined>} = true;
           $res->{seq} = $self->{seq}++;
           $res-><AS::DISAnyResource.sourceNodeIDRef> ($node_id);
           
@@ -3287,7 +3284,7 @@ IFClsDef:
                 (on_resource_read => $onResourceRead);
             }
           }
-          CORE::delete $self->{<Q::DIS|sourceFile>};
+          CORE::delete $self->{<H::DIS|sourceFile>};
         }__;
 
   @Method:
@@ -3503,7 +3500,7 @@ IFClsDef:
     @@ForCheck: ManakaiDOM|ForClass
     @@Return:
       @@@PerlDef:
-        for my $file (values %{$self->{<Q::sourceFile>}}) {
+        for my $file (values %{$self->{<H::DIS|sourceFile>}}) {
           $file-><M::ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl.free>
             if $file;
         }
@@ -3873,7 +3870,7 @@ IFClsDef:
       DOMMain:boolean::ManakaiDOM:all
     @@Get:
       @@@PerlDef:
-        $r = $self->{<Q::DIS|isDefined>};
+        $r = $self->{<H::DIS|isDefined>};
 
   @Attr:
     @@Name: ownerModule
@@ -3893,8 +3890,8 @@ IFClsDef:
       @@@PerlDef:
         $r = $self->{db}
                   -><M::DISDatabase.getModule>
-                           (${$self->{<Q::DIS|definingModule>}})
-           if defined $self->{<Q::DIS|definingModule>};
+                           (${$self->{<H::DIS|definingModule>}})
+           if defined $self->{<H::DIS|definingModule>};
 
   @Attr:
     @@Name: isReferred
@@ -3910,7 +3907,7 @@ IFClsDef:
       @@@nullCase:
         The resource is not referred. 
       @@@PerlDef:
-        $r = $self->{<Q::DIS|isReferred>};
+        $r = $self->{<H::DIS|isReferred>};
     @@Set:
       @@@enDesc:
         A node path string that identifies the node from
@@ -3931,7 +3928,7 @@ IFClsDef:
                           (key => [qw/QName Name type Type/]);
             }
           }
-          $self->{<Q::DIS|isReferred>} = $given;
+          $self->{<H::DIS|isReferred>} = $given;
         }
 
   @Attr:
@@ -3949,17 +3946,17 @@ IFClsDef:
         @@@@enDesc:
           The resource is not (yet) associated with any source node.
       @@@PerlDef:
-        if (defined $self->{<Q::DIS:sourceNodeID>}) {
-          $r = ${$self->{<Q::DIS:sourceNodeID>}};
+        if (defined $self->{<H::DIS:sourceNodeID>}) {
+          $r = ${$self->{<H::DIS:sourceNodeID>}};
         } else {
           $r = null;
         }
     @@Set:
       @@@PerlDef:
         if (defined $given) {
-          $self->{<Q::DIS:sourceNodeID>} = \$given;
+          $self->{<H::DIS:sourceNodeID>} = \$given;
         } else {
-          CORE::delete $self->{<Q::DIS:sourceNodeID>};
+          CORE::delete $self->{<H::DIS:sourceNodeID>};
         }
 
   @Attr:
@@ -3977,13 +3974,13 @@ IFClsDef:
         @@@@enDesc:
           The resource is not (yet) associated with any source node.
       @@@PerlDef:
-        $r = $self->{<Q::DIS:sourceNodeID>};
+        $r = $self->{<H::DIS:sourceNodeID>};
     @@Set:
       @@@PerlDef:
         if (defined $given) {
-          $self->{<Q::DIS:sourceNodeID>} = $given;
+          $self->{<H::DIS:sourceNodeID>} = $given;
         } else {
-          CORE::delete $self->{<Q::DIS:sourceNodeID>};
+          CORE::delete $self->{<H::DIS:sourceNodeID>};
         }
 
   @Attr:
@@ -4002,7 +3999,7 @@ IFClsDef:
         generated from the name and the <QUOTE::for> URI reference 
         of this resource. 
       @@@PerlDef:
-        $r = $self->{<Q::isAnon>};
+        $r = $self->{<H::DIS|isAnon>};
 
   @Attr:
     @@Name: sourceElement
@@ -4371,6 +4368,13 @@ IFClsDef:
                     ($pr->{new_value});
                 } else {
                   $self->{$pr->{prop_uri}} = $pr->{new_value};
+                }
+                
+                if ($el-><M::DISElement.elementTypeMatch>
+                           (<Q::DISPerl:propHashKey>, database_arg => $db)) {
+                  $db-><M::dp|DISDatabasePerl.plAddHashKey>
+                           ($xu => $pr->{new_value}-><AG::dv|DVValue.stringValue>
+                                => $self);
                 }
               } elsif ($el-><AG::DISElement.isResourceElement>) {
                 ## TODO: Should rdf:type be validated?
@@ -5209,8 +5213,8 @@ IFClsDef:
         @@@@enDesc:
           This resource does not belong to any class.
       @@@PerlDef:
-        if (exists $self->{<Q::DIS:ownerClass>}) {
-          $r = $self->{<Q::DIS:ownerClass>};
+        if (exists $self->{<H::DIS:ownerClass>}) {
+          $r = $self->{<H::DIS:ownerClass>};
         } else {
           my $res = $self;
           __DEEP{
@@ -5225,7 +5229,7 @@ IFClsDef:
               }
             }
           }__;
-          $self->{<Q::DIS:ownerClass>} = $r;
+          $self->{<H::DIS:ownerClass>} = $r;
         }
 
   @Attr:
@@ -5501,9 +5505,9 @@ IFClsDef:
           unless (defined $r) {
             my $nsuri = $self-><AG::DISResourceMV.mvNamespaceURI>;
             if (defined $nsuri and $nsuri =~ /([A-Za-z]\w*)\W*$/) {
-              $r = $self->{<Q::mvPrefix>} = $1;
+              $r = $1;
             } elsif (defined $nsuri) {
-              $r = $self->{<Q::mvPrefix>} = 'ns';
+              $r = 'ns';
             }
           }
         }__;
@@ -5543,16 +5547,16 @@ IFClsDef:
           or it does define an element but it does not have an owner.
       @@@PerlDef:
         __DEEP{
-          if (exists $self->{<Q::DIS:mvOwnerElementURI>}) {
+          if (exists $self->{<H::DIS:mvOwnerElementURI>}) {
             $r = $self->{db}-><M::ManakaiDISDatabase.getResource>
-                                ($self->{<Q::DIS:mvOwnerElementURI>})
-              if defined $self->{<Q::DIS:mvOwnerElementURI>};
+                                ($self->{<H::DIS:mvOwnerElementURI>})
+              if defined $self->{<H::DIS:mvOwnerElementURI>};
           } elsif (defined $self->{<Q::dis2pm:parentResource>}) {
             $r = $self->{db}-><M::ManakaiDISDatabase.getResource>
                                 ($self->{<Q::dis2pm:parentResource>});
             undef $r unless $r-><M::ManakaiDISResourceDefinition
                                    .isTypeURI> (<Q::s:AnyOwnerElement>);
-            $self->{<Q::DIS:mvOwnerElementURI>} = $r->{uri} if $r;
+            $self->{<H::DIS:mvOwnerElementURI>} = $r->{uri} if $r;
           }
         }__;
 ##DISResourceMV
@@ -5651,8 +5655,8 @@ IFClsDef:
         } else {
           my $pr = $self-><AG::DISAnyResource.database>
                         -><M::DISDatabase.getResource> ($propName);
-          A: for (grep {$pr->{aliasURI}->{$_} or $pr->{subOf}->{$_}}
-                  (keys %{$pr->{aliasURI}}, keys %{$pr->{subOf}||{}})) {
+          A: for (grep {$pr->{aliasURI}->{$_} or $pr->{supOf}->{$_}}
+                  (keys %{$pr->{aliasURI}}, keys %{$pr->{supOf}||{}})) {
             my $v = $self->{$_};
             if ($v) {
               $r = $v->[0];
@@ -5675,8 +5679,8 @@ IFClsDef:
         $r = [map {@$_}
               grep {defined $_}
               map {$self->{$_}}
-              grep {$pr->{aliasURI}->{$_} or $pr->{subOf}->{$_}}
-              (keys %{$pr->{aliasURI}}, keys %{$pr->{subOf}||{}})];
+              grep {$pr->{aliasURI}->{$_} or $pr->{supOf}->{$_}}
+              (keys %{$pr->{aliasURI}}, keys %{$pr->{supOf}||{}})];
 
   @Method:
     @@Name: getPropertyBoolean
@@ -5704,8 +5708,8 @@ IFClsDef:
                         -><M::DISDatabase.getResource> ($propName);
           C: {
             for (map {$self->{$_}}
-                 grep {$pr->{aliasURI}->{$_} or $pr->{subOf}->{$_}}
-                 (keys %{$pr->{aliasURI}}, keys %{$pr->{subOf}||{}})) {
+                 grep {$pr->{aliasURI}->{$_} or $pr->{supOf}->{$_}}
+                 (keys %{$pr->{aliasURI}}, keys %{$pr->{supOf}||{}})) {
               if (defined $_) {
                 $r = $_-><AG::dv|DVValue.value> ? true : false;
                 last C;
@@ -5748,8 +5752,8 @@ IFClsDef:
                         -><M::DISDatabase.getResource> ($propName);
           C: {
             for (map {$self->{$_}}
-                 grep {$pr->{aliasURI}->{$_} or $pr->{subOf}->{$_}}
-                 (keys %{$pr->{aliasURI}}, keys %{$pr->{subOf}||{}})) {
+                 grep {$pr->{aliasURI}->{$_} or $pr->{supOf}->{$_}}
+                 (keys %{$pr->{aliasURI}}, keys %{$pr->{supOf}||{}})) {
               if (defined $_) {
                 $r = $_-><AG::dv|DVValue.stringValue>;
                 last C;
@@ -5781,8 +5785,8 @@ IFClsDef:
               map {@$_}
               grep {$_}
               map {$self->{$_}}
-              grep {$pr->{aliasURI}->{$_} or $pr->{subOf}->{$_}}
-              (keys %{$pr->{aliasURI}}, keys %{$pr->{subOf}||{}})];
+              grep {$pr->{aliasURI}->{$_} or $pr->{supOf}->{$_}}
+              (keys %{$pr->{aliasURI}}, keys %{$pr->{supOf}||{}})];
 
   @Method:
     @@Name: getPropertyResource
@@ -6934,11 +6938,55 @@ ResourceDef:
         @@@@enMufDef:
           Resource%p (name => {<Q::DIS:uri>}, prefix => { "},
           suffix => {"}); does not have "rdf:type" attribute
+      @@@XSubTypeDef:
+        @@@@QName: PERL_HASH_KEY_ALREADY_DEFINED_ERR
+        @@@@enDesc:
+          A hash key is already defined.
+        @@@@XSourceNodeParam:
+        @@@@XParam:
+          @@@@@@:uri
+          @@@@@enDesc:
+            The URI of the resource tried to register.
+        @@@@XParam:
+          @@@@@@:anotherURI
+          @@@@@enDesc:
+            The URI of the already registered resource.
+        @@@@XParam:
+          @@@@@@:hashKeyName
+          @@@@@enDesc:
+            Hash key.
+        @@@@XParam:
+          @@@@@@:hashKeyScope
+          @@@@@enDesc:
+            Hash key scope.
+        @@@@enMufDef:
+          <%p (name => {<Q::DIS:uri>});>:
+          Hash key %p (name => {<Q::DIS:hashKeyName>}); in
+          <%p (mame => {<Q::DIS:hashKeyScope>});> is already
+          defined for %p (name => {<Q::DIS:anotherURI>});
   @ImplNote:
     @@lang:en
     @@@:
       ISSUE: Too many subtypes for a type!  New type should be added?
 ##DISException
+
+XParamDef:
+  @QName: hashKeyName
+  @Type: DISLang|String
+  @enDesc:
+    See <M::dp|DISDatabasePerl.plAddHashKey>.
+
+XParamDef:
+  @QName: hashKeyScope
+  @Type: AnyURI
+  @enDesc:
+    See <M::dp|DISDatabasePerl.plAddHashKey>.
+
+XParamDef:
+  @QName: anotherURI
+  @Type: ResourceURI
+  @enDesc:
+    A URI of another related resource.
 
 XParamDef:
   @QName:expectedType

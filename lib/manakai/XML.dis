@@ -19,7 +19,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/23 18:25:10 $
+      $Date: 2005/09/24 11:57:31 $
     @@ContentType:
       dis:Date.RCS
   
@@ -28,7 +28,7 @@ Module:
 
   @Require:
     @@Module:
-      @@@Name: DISRDF
+      @@@QName: DIS|DISPerl
 
 Namespace:
   @DIS:
@@ -37,8 +37,12 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @DISCore:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Core#
+  @DISPerl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @dp:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
   @dx:
     http://suika.fam.cx/~wakaba/archive/2004/dis/XML#
   @is:
@@ -110,6 +114,8 @@ ResourceDef:
   @rdfs:domain: 
     infoset:InfoItem
   @rdfs:range: InfosetProperty
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|UnorderedList
 
 ElementTypeBinding:
   @Name: InfoPropDef
@@ -242,6 +248,7 @@ InfoItemDef:
   @QName:
     infoset:Document
   @InfosetName: document
+  @DISPerl:propHashKey: doc
   @enDesc:
     There is exactly one document information item in the information
     set for an XML document and all other information items are
@@ -270,6 +277,7 @@ InfoPropDef:
   @QName:
     infoset:children
   @InfosetName: children
+  @DISPerl:propHashKey: child
   @enDesc:
     An ordered list of child information items, in document order. 
     \
@@ -355,6 +363,7 @@ InfoPropDef:
   @QName:
     infoset:baseURI
   @InfosetName: base URI
+  @DISPerl:propHashKey: buri
   @enDesc:
     The base URI computed according to the XML Base specification. 
     The value does not reflect any URI percent-encoding that may be
@@ -391,6 +400,7 @@ InfoPropDef:
   @QName:
     infoset:characterEncodingScheme
   @InfosetName: character encoding scheme
+  @DISPerl:propHashKey: ces
   @enDesc:
     The name of the character encoding scheme in which the 
     document entity is expressed.
@@ -519,6 +529,7 @@ InfoItemDef:
   @QName:
     infoset:Element
   @InfosetName: element
+  @DISPerl:propHashKey: el
   @enDesc:
     An element in the XML document.
   @is:hasProperty:
@@ -539,13 +550,14 @@ InfoItemDef:
     infoset:baseURI
   @is:hasProperty:
     infoset:parent
-  @is:hasProperty: includedHistory
+  @is:hasProperty: includeHistory
   @is:hasProperty: language
 
 InfoPropDef:
   @QName:
     infoset:namespaceName
   @InfosetName: namespace name
+  @DISPerl:propHashKey: ns
   @enDesc:
     - <InfoItem::Element information items>:::
          The namespace name of the element type.
@@ -581,6 +593,7 @@ InfoPropDef:
   @QName:
     infoset:localName
   @InfosetName: local name
+  @DISPerl:propHashKey: ln
   @enDesc:
     The local part of the element type name or the attribute name. 
   @rdfs:domain:
@@ -592,6 +605,7 @@ InfoPropDef:
   @QName:
     infoset:prefix
   @InfosetName: prefix
+  @DISPerl:propHashKey: pfx
   @enDesc:
     - <InfoItem::Element information items>:::
         The namespace prefix part of the element type name.
@@ -636,6 +650,7 @@ InfoPropDef:
   @QName:
     infoset:attributes
   @InfosetName: attributes
+  @DISPerl:propHashKey: attr
   @enDesc:
     An unordered set of attribute information items,
     corresponding to the attributes of this element,
@@ -692,6 +707,7 @@ InfoPropDef:
   @QName:
     infoset:parent
   @InfosetName: parent
+  @DISPerl:propHashKey: parent
   @enDesc:
     <InfoItem::Element information items>::: The 
     <InfoItem::document information item> or 
@@ -729,6 +745,7 @@ InfoItemDef:
   @QName:
     infoset:Attribute
   @InfosetName: attribute
+  @DISPerl:propHashKey: a
   @enDesc:
     Attributes of elements in the document, including 
     those which are namespace declarations. 
@@ -764,6 +781,7 @@ InfoPropDef:
   @QName:
     infoset:specified
   @InfosetName: specified
+  @DISPerl:propHashKey: specified
   @enDesc:
     A flag indicating whether this attribute was acutally specified
     in the start-tag of the element or was defaulted from the DTD.
@@ -969,6 +987,7 @@ InfoPropDef:
   @QName:
     infoset:ownerElement
   @InfosetName: owner element
+  @DISPerl:propHashKey: owner
   @enDesc:
     The element information item that contains this attribute
     information item in its <InfoProp::attributes> or
@@ -982,6 +1001,7 @@ InfoItemDef:
   @QName:
     infoset:ProcessingInstruction
   @InfosetName: processing instruction
+  @DISPerl:propHashKey: pi
   @enDesc:
     Processing instructions in the document. 
     \
@@ -1003,6 +1023,7 @@ InfoPropDef:
   @QName:
     infoset:target
   @InfosetName: target
+  @DISPerl:propHashKey: target
   @enDesc:
     A string representing the target part of the processing instruction.
   @rdfs:domain:
@@ -1014,6 +1035,7 @@ InfoPropDef:
   @QName: 
     infoset:content
   @InfosetName: content
+  @DISPerl:propHashKey: con
   @enDesc:
     - <InfoItem::Processing instruction information items>:::
          A string representing the content of the processing instruction
@@ -1076,6 +1098,7 @@ InfoPropDef:
   @QName:
     infoset:name
   @InfosetName: name
+  @DISPerl:propHashKey: xname
   @enDesc:
     - <InfoItem::Unparsed entity reference information items>:::
            The name of the entity referenced.
@@ -1094,6 +1117,7 @@ InfoPropDef:
   @QName:
     infoset:systemIdentifier
   @InfosetName: system identifier
+  @DISPerl:propHashKey: sysid
   @enDesc:
     The system identifier, as it appears in the declaration,
     without URI percent-encoding applied by the XML processor.
@@ -1138,6 +1162,7 @@ InfoPropDef:
   @QName:
     infoset:publicIdentifier
   @InfosetName: public identifier
+  @DISPerl:propHashKey: pubid
   @enDesc:
     The normalized public identifier.
     \
@@ -1185,6 +1210,7 @@ InfoPropDef:
   @QName:
     infoset:declarationBaseURI
   @InfosetName: declaration base URI
+  @DISPerl:propHashKey: dbaseuri
   @enDesc:
     The base URI relative to which the <InfoProp::system identifier>
     should be resolved. 
@@ -1261,6 +1287,7 @@ InfoPropDef:
   @QName:
     infoset:elementContentWhitespace
   @InfosetName: element content whitespace
+  @DISPerl:propHashKey: ecws
   @enDesc:
     A boolean indicating whether the character is white space
     appearing within element content or not. 
@@ -1298,6 +1325,7 @@ InfoItemDef:
   @QName:
     infoset:Comment
   @InfosetName: comment
+  @DISPerl:propHashKey: com
   @enDesc:
     An XML comment.
   @is:hasProperty:
@@ -1310,6 +1338,7 @@ InfoItemDef:
   @QName:
     infoset:DocumentTypeDeclaration
   @InfosetName: document type declaration
+  @DISPerl:propHashKey: dtdecl
   @enDesc:
     A document type declaration.
     \
@@ -1329,6 +1358,7 @@ InfoItemDef:
   @QName:
     infoset:UnparsedEntity
   @InfosetName: unparsed entity
+  @DISPerl:propHashKey: uent
   @enDesc:
     An unparsed entity declared in the DTD.
   @is:hasProperty:
@@ -1387,6 +1417,7 @@ InfoItemDef:
   @QName:
     infoset:Notation
   @InfosetName: notation
+  @DISPerl:propHashKey: not
   @enDesc:
     A notation declared in the DTD.
   @is:hasProperty:
@@ -1402,6 +1433,7 @@ InfoItemDef:
   @QName:
     infoset:Namespace
   @InfosetName: namespace
+  @DISPerl:propHashKey: ins
   @enDesc:
     A namespace that is in scope for an element.
   @is:hasProperty:
@@ -1505,6 +1537,7 @@ InfoPropDef:
     infoset:InfoItem
   @rdfs:range:
     XIncludeElementSeq
+  @rdf:type: InfosetProperty
 
 ResourceDef:
   @QName: ElementSeq

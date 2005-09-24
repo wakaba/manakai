@@ -14,14 +14,12 @@ Module:
       This module provides an object model for <QUOTE::DISDump>
       serialization format.  
 
-  @Author:
-    @@FullName: Wakaba
-    @@Mail: w@suika.fam.cx
+  @DISCore:author: DISCore|Wakaba
   @License:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/23 18:25:06 $
+      $Date: 2005/09/24 11:57:27 $
     @@ContentType:
       dis:Date.RCS
   
@@ -83,6 +81,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @mn:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
   @nl:
     http://suika.fam.cx/~wakaba/archive/2004/dis/NaturalLanguage#
   @owl:
@@ -101,13 +101,8 @@ Namespace:
     urn:x-suika-fam-cx:markup:suikawiki:0:10:
   @swcfg21:
     http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
-  @TreeCore:\
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
-  @xhtml1:
-    http://www.w3.org/1999/xhtml
-  @xhtml2:
-    http://www.w3.org/2002/06/xhtml2/
   @xml:
     http://www.w3.org/XML/1998/namespace
   @xmlns:
@@ -171,7 +166,7 @@ ElementTypeBinding:
     @@resourceFor: s|ForML
 
     @@rdf:type:
-      @@@@: ManakaiDOM|IF
+      @@@@: DISLang|Interface
       @@@ForCheck: ManakaiDOM|ForIF
     @@s:elementType:
       @@@@: ||+||s|ForML
@@ -179,7 +174,7 @@ ElementTypeBinding:
       @@@ContentType: DISCore|TFPQNames
 
     @@rdf:type:
-      @@@@: ManakaiDOM|Class
+      @@@@: DISLang|Class
       @@@ForCheck: ManakaiDOM|ForClass
     @@Implement:
       @@@@: ||+||ManakaiDOM|ForIF
@@ -209,11 +204,11 @@ ElementTypeBinding:
     @@resourceFor: ManakaiDOM|ForClass
 
     @@rdf:type:
-      @@@@: ManakaiDOM|IF
+      @@@@: DISLang|Interface
       @@@ForCheck: ManakaiDOM|ForIF
 
     @@rdf:type:
-      @@@@: ManakaiDOM|Class
+      @@@@: DISLang|Class
       @@@ForCheck: ManakaiDOM|ForClass
     @@Implement:
       @@@@: ||+||ManakaiDOM|ForIF
@@ -235,7 +230,7 @@ ElementTypeBinding:
     @@resourceFor: ManakaiDOM|ForIF
 
     @@rdf:type:
-      @@@@: ManakaiDOM|IF
+      @@@@: DISLang|Interface
       @@@ForCheck: ManakaiDOM|ForIF
 
     @@ForCheck: DIS|ForEmpty
@@ -261,8 +256,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@ForCheck:
       s:ForML
-    @@ContentType:
-      dis:TypeQName
+    @@ContentType: DISCore|QName
 
 ElementTypeBinding:
   @Name: ATTRQName
@@ -271,16 +265,14 @@ ElementTypeBinding:
   @ShadowContent:
     @@ForCheck:
       s:ForML
-    @@ContentType:
-      dis:TypeQName
+    @@ContentType: DISCore|QName
 
 ElementTypeBinding:
   @Name: AttrQName
   @ElementType:
     dis:AppName
   @ShadowContent:
-    @@ContentType:
-      dis:TypeQName
+    @@ContentType: DISCore|QName
 
 ElementTypeBinding:
   @Name: IFISA
@@ -391,7 +383,7 @@ ResourceDef:
   @QName: AnyDISDumpElement
   @AppName:
     @@@: dump|*
-    @@ContentType: dis|TypeQName
+    @@ContentType: DISCore|QName
   @enDesc:
     Any element type in the <URI^^dis|TypeQName::dump:> namespace.
   @rdf:type: s|AnyElementInNS
@@ -1961,7 +1953,7 @@ ReflectTypeDef:
       If the element attribute is absent, the default value, if any,
       or the empty string is returned.
     @@PerlDef:
-      my $ao = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+      my $ao = $self->{<H::mn:node>}->{<H::infoset:attributes>}
                     ->{$NS_URI_NO_NULL}->{$LOCAL_NAME};
       if ($ao) {
         my $attr;
@@ -1985,7 +1977,7 @@ ReflectTypeDef:
       @@@@: 
         What will happen if the <DOM::null> value is given?
     @@PerlDef:
-      my $ao = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+      my $ao = $self->{<H::mn:node>}->{<H::infoset:attributes>}
                     ->{$NS_URI_NO_NULL}->{$LOCAL_NAME};
       if ($ao) {
         my $attr;
@@ -2018,7 +2010,7 @@ ReflectTypeDef:
       The DOM attribute returns <DOM::true> if the element attribute
       is set and <DOM::false> if it is absent.
     @@PerlDef:
-      my $ao = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+      my $ao = $self->{<H::mn:node>}->{<H::infoset:attributes>}
                     ->{$NS_URI_NO_NULL}->{$LOCAL_NAME};
       if ($ao) {
         my $attr;
@@ -2039,7 +2031,7 @@ ReflectTypeDef:
       is set to <DOM::false> and is set to have the same
       value as its local name if the DOM attribute is set to <DOM::true>.
     @@PerlDef:
-      my $ao = $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+      my $ao = $self->{<H::mn:node>}->{<H::infoset:attributes>}
                     ->{$NS_URI_NO_NULL}->{$LOCAL_NAME};
       if ($ao) {
         if ($given) {
@@ -2053,9 +2045,9 @@ ReflectTypeDef:
             $attr-><AS::Attr.value> ('tr'.'ue');
           }__;
         } else {
-          CORE::delete $self->{<Q::TreeCore:node>}->{<Q::infoset:attributes>}
+          CORE::delete $self->{<H::mn:node>}->{<H::infoset:attributes>}
                             ->{$NS_URI_NO_NULL}->{$LOCAL_NAME};
-          CORE::delete $ao->{<Q::infoset:ownerElement>};
+          CORE::delete $ao->{<H::infoset:ownerElement>};
           $ao-><M::NodeStem.orphanate>;
         }
       } else {

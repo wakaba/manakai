@@ -220,7 +220,8 @@ sub dac_load_module_file ($$$;$) {
       my $qn = $mod->get_attribute_ns (ExpandedURI q<dis:>, 'QName');
       if ($qn) {
         my $prefix = $qn->value;
-        $prefix =~ s/^[^:]*://;
+        $prefix =~ s/^[^:|]*[:|]\s*//;
+        $prefix =~ s/\s+$//;
         unless (defined $dis->lookup_namespace_uri ($prefix)) {
           $dis->add_namespace_binding ($prefix => $mod->defining_namespace_uri);
         }

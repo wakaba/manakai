@@ -14,14 +14,12 @@ Module:
       This module provides interfaces for generating Perl modules
       from <QUOTE::dis> files.
 
-  @Author:
-    @@FullName: Wakaba
-    @@Mail: w@suika.fam.cx
+  @DISCore:author: DISCore|Wakaba
   @License:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/23 18:25:07 $
+      $Date: 2005/09/24 11:57:27 $
     @@ContentType:
       dis:Date.RCS
   
@@ -91,6 +89,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @mn:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
   @nl:
     http://suika.fam.cx/~wakaba/archive/2004/dis/NaturalLanguage#
   @null:
@@ -111,7 +111,6 @@ Namespace:
     urn:x-suika-fam-cx:markup:suikawiki:0:10:
   @swcfg21:
     http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
-  @TreeCore:\
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
   @xhtml1:
@@ -336,9 +335,9 @@ IFClsDef:
 
         ## Restores weak references
         require Scalar::Util;
-        for my $doc (values %{$r->{<Q::DIS:sourceFile>}}) {
-          Scalar::Util::weaken ($doc->{<Q::TreeCore:node>}->{<Q::DIS:db>})
-            if $doc->{<Q::TreeCore:node>}->{<Q::DIS:db>};
+        for my $doc (values %{$r->{<H::DIS:sourceFile>}}) {
+          Scalar::Util::weaken ($doc->{<H::mn:node>}->{<H::DIS:db>})
+            if $doc->{<H::mn:node>}->{<H::DIS:db>};
           Scalar::Util::weaken ($doc->{db}) if $doc->{db};
           Scalar::Util::weaken ($doc->{ns}->{'###db'}) if $doc->{ns}->{'###db'};
         }
@@ -740,13 +739,21 @@ IFClsDef:
             <Q::swcfg21:GetPropNode> => true,
           }->{$et}) {
             my $prop_uri = $self-><AG::DIS|DISElement.qnameValueURI>;
-            $disResource->{db}
-                     -><M::DIS|DISDatabase.getResource> ($prop_uri)
-                     -><AS::DIS|DISAnyResource.isReferred> ($self);
+            my $prop_res = $disResource->{db}
+                     -><M::DIS|DISDatabase.getResource> ($prop_uri);
+            $prop_res-><AS::DIS|DISAnyResource.isReferred> ($self);
+            my $prop_name = $prop_res-><M::DIS|DISResourceProp.getPropertyText>
+                       (<Q::DISPerl:propHashKey>, $prop_uri);
             $r = $plimpl-><M::DIS|MPLImpl.createPerlStatement>;
+            my $node_prop_name = $disResource->{db}
+                     -><M::DIS|DISDatabase.getResource> (<Q::mn:node>)
+                     -><M::DIS|DISResourceProp.getPropertyText>
+                       (<Q::DISPerl:propHashKey>, <Q::mn:node>);
             my $val = $plimpl-><M::DIS|MPLImpl.createPerlInlineContainer>;
-            $val-><M::DIS|PLInCon.appendCode> ('$self->{node}->{');
-            $val-><M::DIS|PLAnyCon.appendStringLiteral> ($prop_uri);
+            $val-><M::DIS|PLInCon.appendCode> ('$self->{');
+            $val-><M::DIS|PLAnyCon.appendStringLiteral> ($node_prop_name);
+            $val-><M::DIS|PLInCon.appendCode> ('}->{');
+            $val-><M::DIS|PLAnyCon.appendStringLiteral> ($prop_name);
             $val-><M::DIS|PLInCon.appendCode> ('}');
             my $rvar = $plimpl-><M::DIS|MPLImpl.createPerlVariable>
                                                ('$', null, 'r');
@@ -779,13 +786,21 @@ IFClsDef:
             }
           } elsif ($et eq <Q::dis:SetProp>) {
             my $prop_uri = $self-><AG::DIS|DISElement.qnameValueURI>;
-            $disResource->{db}
-                     -><M::DIS|DISDatabase.getResource> ($prop_uri)
-                     -><AS::DIS|DISAnyResource.isReferred> ($self);
+            my $prop_res = $disResource->{db}
+                     -><M::DIS|DISDatabase.getResource> ($prop_uri);
+            $prop_res-><AS::DIS|DISAnyResource.isReferred> ($self);
+            my $prop_name = $prop_res-><M::DIS|DISResourceProp.getPropertyText>
+                       (<Q::DISPerl:propHashKey>, $prop_uri);
             $r = $plimpl-><M::DIS|MPLImpl.createPerlStatement>;
+            my $node_prop_name = $disResource->{db}
+                     -><M::DIS|DISDatabase.getResource> (<Q::mn:node>)
+                     -><M::DIS|DISResourceProp.getPropertyText>
+                       (<Q::DISPerl:propHashKey>, <Q::mn:node>);
             my $val = $plimpl-><M::DIS|MPLImpl.createPerlInlineContainer>;
-            $val-><M::DIS|PLInCon.appendCode> ('$self->{node}->{');
-            $val-><M::DIS|PLAnyCon.appendStringLiteral> ($prop_uri);
+            $val-><M::DIS|PLInCon.appendCode> ('$self->{');
+            $val-><M::DIS|PLAnyCon.appendStringLiteral> ($node_prop_name);
+            $val-><M::DIS|PLInCon.appendCode> ('}->{');
+            $val-><M::DIS|PLAnyCon.appendStringLiteral> ($prop_name);
             $val-><M::DIS|PLInCon.appendCode> ('}');
             my $rvar = $plimpl-><M::DIS|MPLImpl.createPerlVariable>
                                                ('$', null, 'given');
@@ -799,9 +814,14 @@ IFClsDef:
               my $q = $plimpl-><M::DIS|MPLImpl.createPerlIf>
                    (my $qc = $plimpl-><M::DIS|MPLImpl.createPerlInlineContainer>,
                     my $qt = $plimpl-><M::DIS|MPLImpl.createPerlBlockContainer>);
-              $qc-><M::DIS|PLInCon.appendCode> ('$self->{node}->{');
-              $qc-><M::DIS|PLAnyCon.appendStringLiteral>
-                                               (<Q::DOMCore:read-only>);
+              my $ro_prop_name = $disResource->{db}
+                     -><M::DIS|DISDatabase.getResource> (<Q::DOMCore:read-only>)
+                     -><M::DIS|DISResourceProp.getPropertyText>
+                       (<Q::DISPerl:propHashKey>, <Q::DOMCore:read-only>);
+              $qc-><M::DIS|PLInCon.appendCode> ('$self->{');
+              $qc-><M::DIS|PLAnyCon.appendStringLiteral> ($node_prop_name);
+              $qc-><M::DIS|PLInCon.appendCode> ('}->{');
+              $qc-><M::DIS|PLAnyCon.appendStringLiteral> ($ro_prop_name);
               $qc-><M::DIS|PLInCon.appendCode> ('}');
 
               my $for_uri = $disResource->{db}-><M::DIS|DISDatabase.getFor>
@@ -1292,8 +1312,57 @@ IFClsDef:
         use Storable qw/nstore/;
         local $Carp::CarpLevel = $Carp::CarpLevel + 1;
         nstore $self, $fileName;
+
+  @Method:
+    @@Name: plAddHashKey
+    @@enDesc:
+      Adds a binding of hash key and resource.
+    @@Param:
+      @@@Name: keyScope
+      @@@Type: DIS|AnyURI
+      @@@enDesc:
+        An identifier to define the scope of hash key.
+    @@Param:
+      @@@Name: keyName
+      @@@Type: DISLang|String||ManakaiDOM|all
+      @@@enDesc:
+        Hash key value to register.
+    @@Param:
+      @@@Name: disResource
+      @@@Type: DIS|DISResource
+      @@@enDesc:
+        A <QUOTE::dis> resource associated to <P::keyName>.
+    @@Return:
+      @@@RaiseException:
+        @@@@@: DIS|PERL_HASH_KEY_ALREADY_DEFINED_ERR
+        @@@@enDesc:
+          The pair of <P::keyScope> and <P::keyName> is 
+          already registered for other resource.
+      @@@PerlDef:
+        __DEEP{
+          my $ks = $self-><M::DIS|DISDatabase.getResource> ($keyScope);
+          $ks-><AS::DIS|DISAnyResource.isReferred> ($keyName);
+          for my $ks_uri (keys %{$ks->{aliasURI}}, keys %{$ks->{subOf}}) {
+            if (defined $self->{<Q::dp|plHashKey>}->{$ks_uri} and
+                defined $self->{<Q::dp|plHashKey>}->{$ks_uri}->{$keyName}) {
+              __UNDEEP{__EXCEPTION{DIS|PERL_HASH_KEY_ALREADY_DEFINED_ERR::
+                DIS:uri => {$disResource-><AG::DIS|DISAnyResource.uri>},
+                DIS:anotherURI => {$self->{<Q::dp|plHashKey>}
+                                        ->{$ks_uri}->{$keyName}},
+                DIS:hashKeyScope => {$ks_uri},
+                DIS:hashKeyName => {$keyName},
+              }__}__;
+            }
+          }
+          $self->{<Q::dp|plHashKey>}->{$keyScope}->{$keyName}
+            = $disResource-><AG::DIS|DISAnyResource.uri>;
+        }__;
 ##DISDatabasePerl
 
+PropDef:
+  @QName: dp|plHashKey
+  @enDesc:
+    See <M::DISDatabasePerl.plAddHashKey>.
 
 ElementTypeBinding:
   @Name: SimpleException
@@ -2029,9 +2098,9 @@ IFClsDef:
         Whether the feature is implemented or not.
       @@@PerlDef:
       __DEEP{
-        if (defined $self->{<Q::DIS:isFeatureImplemented>}
+        if (defined $self->{<H::DIS:isFeatureImplemented>}
                          ->{$featureResourceURI}) {
-          $r = $self->{<Q::DIS:isFeatureImplemented>}
+          $r = $self->{<H::DIS:isFeatureImplemented>}
                          ->{$featureResourceURI};
         } elsif ($self->isa (<ClassName::DIS|ManakaiDISModuleDefinition>)) {
           $r = true;
@@ -2049,7 +2118,7 @@ IFClsDef:
             }                
             ## NOTE: DISPerl:ScalarVariable's are always implemented
           }
-          $self->{<Q::DIS:isFeatureImplemented>}
+          $self->{<H::DIS:isFeatureImplemented>}
                          ->{$featureResourceURI} = $r;
         } else { ## Resource definition
           ## TODO: Custom module definition
@@ -2083,7 +2152,7 @@ IFClsDef:
           } else {
             $r = true;
           }
-          $self->{<Q::DIS:isFeatureImplemented>}->{$featureResourceURI} = $r;
+          $self->{<H::DIS:isFeatureImplemented>}->{$featureResourceURI} = $r;
         }
       }__;
 ##DISResourcePerlModule
@@ -2129,8 +2198,8 @@ IFClsDef:
           result in a reserved name. 
       @@@PerlDef:
         __DEEP{
-          if (exists $self->{<Q::dis2pm:name>}) {
-            $r = $self->{<Q::dis2pm:name>};
+          if (exists $self->{<H::dis2pm:name>}) {
+            $r = $self->{<H::dis2pm:name>};
           } elsif ($self-><M::DIS|DISResource.isTypeURI>
                               (<Q::DISLang:AnyMethod>)) {
             
@@ -2239,7 +2308,7 @@ IFClsDef:
           } else {  ## Other types
             $r = null;
           }
-          $self->{<Q::dis2pm:name>} = $r;
+          $self->{<H::dis2pm:name>} = $r;
         }__;
 
   @Attr:
@@ -2268,8 +2337,8 @@ IFClsDef:
           The local name of this resource is not defined. 
       @@@PerlDef:
         __DEEP{
-          if (exists $self->{<Q::PerlCode:plFullyQualifiedName>}) {
-            $r = $self->{<Q::PerlCode:plFullyQualifiedName>};
+          if (exists $self->{<H::PerlCode:plFullyQualifiedName>}) {
+            $r = $self->{<H::PerlCode:plFullyQualifiedName>};
           } elsif ($self-><M::DIS|DISResource.isTypeURI>
                               (<Q::DISLang:AnyClass>) or
                    $self-><M::DIS|DISResource.isTypeURI>
@@ -2305,7 +2374,7 @@ IFClsDef:
           } else {
             $r = null;
           }
-          $self->{<Q::PerlCode:plFullyQualifiedName>} = $r;
+          $self->{<H::PerlCode:plFullyQualifiedName>} = $r;
         }__;
 
   @Attr:
@@ -2463,8 +2532,8 @@ IFClsDef:
           but no reflecting attribute setter template is defined.
       @@@PerlDef:
         __DEEP{
-          if (exists $self->{<Q::DIS|plCodeFragment>}) {
-            $r = $self->{<Q::DIS|plCodeFragment>};
+          if (exists $self->{<H::DIS|plCodeFragment>}) {
+            $r = $self->{<H::DIS|plCodeFragment>};
           } elsif ($self-><M::DIS|DISResource.isTypeURI>
                                 (<Q::DISLang:MethodReturn>) or
                    $self-><M::DIS|DISResource.isTypeURI>
@@ -2492,7 +2561,7 @@ IFClsDef:
             } elsif ($def-><AG::dv|DVValue.dataType> eq <Q::lang:Perl>) {
               my $source_code = $def-><AG::dv|DVValue.stringValue>;
               my $source_node = $def-><AG::dv|DVValue.sourceNodePath>;
-              $r = $self->{<Q::DIS|plCodeFragment>}
+              $r = $self->{<H::DIS|plCodeFragment>}
                  = $is_inline
                      ? $self-><M::DISResourcePerl.plPreprocessPerlStatement>
                                            ($source_code,
@@ -2514,7 +2583,7 @@ IFClsDef:
                                 source_line => 1,
                                             namespace_context => $def);
             } elsif ($def-><AG::dv|DVValue.dataType> eq <Q::lang:dis>) {
-              $r = $self->{<Q::DIS|plCodeFragment>}
+              $r = $self->{<H::DIS|plCodeFragment>}
                  = $def-><AG::dv|DVValue.value>
                        -><M::DISElementPerl.plCodeFragment>
                             ($self, for_arg => $self->{for},
@@ -2531,7 +2600,7 @@ IFClsDef:
             } # media type
           } elsif ($self-><M::DIS|DISResource.isTypeURI>
                                 (<Q::DISLang:Method>)) {
-            $self->{<Q::DIS|plCodeFragment>} = null;  ## To avoid loop
+            $self->{<H::DIS|plCodeFragment>} = null;  ## To avoid loop
             my $ret = $self-><M::DIS|DISResource
                             .getChildResourceByType> (<Q::DISLang:MethodReturn>);
             unless ($ret) { 
@@ -2545,7 +2614,7 @@ IFClsDef:
               }__;
             }
             my $plimpl = $self-><AG::DISAnyResourcePerl.plImplementation>;
-            $r = $self->{<Q::DIS|plCodeFragment>}
+            $r = $self->{<H::DIS|plCodeFragment>}
                = $plimpl-><M::DIS|MPLImpl.createPerlSub>
                             ($self-><AG::DISResourcePerl.plName>);
             
@@ -2706,8 +2775,8 @@ IFClsDef:
               }
               $r-><M::DIS|MPLSS.appendCodeFragment> ($code);
 
-              $ret->{<Q::DIS:plDefined>} = true;
-              $self->{<Q::DIS:plDefined>} = true;
+              $ret->{<H::DIS:plDefined>} = true;
+              $self->{<H::DIS:plDefined>} = true;
             } else {  ## Method code not defined
               my $cls = $self->{db}-><M::DIS|DISDatabase.getResource>
                                               (<Q::DOMException:CoreException>,
@@ -2725,8 +2794,8 @@ IFClsDef:
               $self-><M::ManakaiDISResourcePerl.plAppendThrow>
                                ($r, $cls, $const, $subtype,
                                 {%$context_param});
-              $ret->{<Q::DIS:plDefined>} = false;
-              $self->{<Q::DIS:plDefined>} = false;
+              $ret->{<H::DIS:plDefined>} = false;
+              $self->{<H::DIS:plDefined>} = false;
             }
 
             if ($data_type) {
@@ -2736,7 +2805,7 @@ IFClsDef:
             }
           } elsif ($self-><M::DIS|DISResource.isTypeURI>
                                 (<Q::DISLang:Attribute>)) {  
-            $self->{<Q::DIS|plCodeFragment>} = null;  ## To avoid loop
+            $self->{<H::DIS|plCodeFragment>} = null;  ## To avoid loop
             my $get = $self-><M::DIS|DISResource
                             .getChildResourceByType> (<Q::DISLang:AttributeGet>);
             unless ($get) { 
@@ -2843,7 +2912,7 @@ IFClsDef:
               ## Return value
               $get_code-><M::DIS|PLBlockCon.appendStatement> (q<$r>);
 
-              $get->{<Q::DIS:plDefined>} = true;
+              $get->{<H::DIS:plDefined>} = true;
             } else {  ## Getter code not defined
               my $cls = $self->{db}-><M::DIS|DISDatabase.getResource>
                                               (<Q::DOMException:CoreException>,
@@ -2861,8 +2930,8 @@ IFClsDef:
               $self-><M::ManakaiDISResourcePerl.plAppendThrow>
                                ($get_code, $cls, $const, $subtype,
                                 {%$context_param});
-              $get->{<Q::DIS:plDefined>} = false;
-              $self->{<Q::DIS:plDefined>} = false;
+              $get->{<H::DIS:plDefined>} = false;
+              $self->{<H::DIS:plDefined>} = false;
             }
 
             my $set = $self-><M::DIS|DISResource
@@ -2943,8 +3012,8 @@ IFClsDef:
                 ## Main code
                 $set_code-><M::DIS|PLBlockCon.appendCodeFragment> ($code);
 
-                $set->{<Q::DIS:plDefined>} = true;
-                $self->{<Q::DIS:plDefined>} = $get->{<Q::DIS:plDefined>};
+                $set->{<H::DIS:plDefined>} = true;
+                $self->{<H::DIS:plDefined>} = $get->{<H::DIS:plDefined>};
               } else { ## Setter code not defined
                 $set_code-><M::DIS|PLBlockCon.appendStatement>
                                               (q<my ($self) = @_>);
@@ -2964,8 +3033,8 @@ IFClsDef:
                 $self-><M::ManakaiDISResourcePerl.plAppendThrow>
                                ($set_code, $cls, $const, $subtype,
                                 {%$context_param});
-                $set->{<Q::DIS:plDefined>} = false;
-                $self->{<Q::DIS:plDefined>} = false;
+                $set->{<H::DIS:plDefined>} = false;
+                $self->{<H::DIS:plDefined>} = false;
               }
             } else {  ## No attribute setter
               $set_code-><M::DIS|PLBlockCon.appendStatement>
@@ -2986,10 +3055,10 @@ IFClsDef:
               $self-><M::ManakaiDISResourcePerl.plAppendThrow>
                                ($set_code, $cls, $const, $subtype,
                                 {%$context_param});
-              $self->{<Q::DIS:plDefined>} = $get->{<Q::DIS:plDefined>};
+              $self->{<H::DIS:plDefined>} = $get->{<H::DIS:plDefined>};
             }
 
-            $r = $self->{<Q::DIS|plCodeFragment>}
+            $r = $self->{<H::DIS|plCodeFragment>}
                = $plimpl-><M::DIS|MPLImpl.createPerlSub>
                             ($self-><AG::DISResourcePerl.plName>);
             $r-><AS::DIS|MPLSub.prototype> (q<$;$>);
@@ -3316,7 +3385,7 @@ IFClsDef:
 
           ## -- Unsupported types
           } else {
-            $r = $self->{<Q::DIS|plCodeFragment>} = null;
+            $r = $self->{<H::DIS|plCodeFragment>} = null;
           } # rdf:type
         }__;
 
@@ -3822,6 +3891,7 @@ IFClsDef:
           my $nsr = $namespaceContext || $node || $self->{src};
           our $RegQNameChar;
           my $plimpl = $self-><AG::DISAnyResourcePerl.plImplementation>;
+          my $db = $self-><AG::DIS|DISAnyResource.database>;
           if ($containsStatements) {
             $r = $plimpl-><M::DIS|MPLImpl.createPerlBlockContainer>;
             if (defined $sourceLine) {
@@ -3859,6 +3929,14 @@ IFClsDef:
                   $r-><M::DIS|PLAnyCon.appendStringLiteral>
                               ($nsr-><M::DIS|NSResolverDIS.qnameToURI>
                                            ($source_code, node => $node));
+                } elsif ($et eq <Q::disPerl:H>) {
+                  my $uri = $nsr-><M::DIS|NSResolverDIS.qnameToURI>
+                                           ($source_code, node => $node);
+                  my $prop_res = $db-><M::DIS|DISDatabase.getResource> ($uri);
+                  $prop_res-><AS::DIS|DISAnyResource.isReferred> ($node);
+                  my $pname = $prop_res-><M::DIS|DISResourceProp.getPropertyText>
+                                           (<Q::DISPerl:propHashKey>, $uri);
+                  $r-><M::DIS|PLAnyCon.appendStringLiteral> ($pname);
                 } elsif ({
                   <Q::disPerl:M> => 1,
                   <Q::disPerl:ClassM> => 1,
@@ -4500,8 +4578,8 @@ IFClsDef:
           Either this resource does not have any Perl definition
           or it does have but it is not implemented yet.
       @@@PerlDef:
-        if (exists $self->{<Q::DIS:plDefined>}) {
-          $r = $self->{<Q::DIS:plDefined>};
+        if (exists $self->{<H::DIS:plDefined>}) {
+          $r = $self->{<H::DIS:plDefined>};
         } else {
           __DEEP{
             my $typeuri = {
@@ -4534,7 +4612,7 @@ IFClsDef:
               }
             } # OUTMOST
           }__;
-          $self->{<Q::DIS:plDefined>} = $r;
+          $self->{<H::DIS:plDefined>} = $r;
         }
   
   @IntMethod:

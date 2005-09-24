@@ -14,9 +14,7 @@ Module:
       This module provides an object-oriented interface to construct 
       Perl code. 
 
-  @Author:
-    @@FullName: Wakaba
-    @@Mail: w@suika.fam.cx
+  @DISCore:author: DISCore|Wakaba
   @License:
     @@@:
       license:Perl+MPL
@@ -24,12 +22,10 @@ Module:
       @@@FullName:
         manakai <CODE::lib/manakai/genlib.pl>
       @@@Year:2004
-      @@@Author:
-        @@@@FullName:Wakaba
-        @@@@Mail:w@suika.fam.cx
+      @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/09/23 18:25:05 $
+      $Date: 2005/09/24 11:57:26 $
     @@ContentType:
       dis:Date.RCS
   
@@ -82,6 +78,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @mn:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
   @owl:
     http://www.w3.org/2002/07/owl#
   @pc:
@@ -243,7 +241,7 @@ IFClsDef:
         @@@@enDesc:
           This object has no parent. 
       @@@PerlDef:
-        $r = $self->{<Q::TreeCore:node>}->{<Q::pc:parent>};
+        $r = $self->{<H::mn:node>}->{<H::pc:parent>};
         $r = <ClassM::ManakaiPerlCodeFragment.getNodeReference> ($r) if $r;
 
   @Attr:
@@ -259,22 +257,22 @@ IFClsDef:
         @@@@enDesc:
           This node does not belong to any file tree.
       @@@PerlDef:
-        $r = $self->{<Q::TreeCore:node>}->{<Q::pc:parent>};
+        $r = $self->{<H::mn:node>}->{<H::pc:parent>};
         {
-          if ($r->{<Q::pc:parent>}) {
-            $r = $r->{<Q::pc:parent>};
+          if ($r->{<H::pc:parent>}) {
+            $r = $r->{<H::pc:parent>};
             redo;
           }
         };
         if ($r) {
-          if ($r->{<Q::pc:nodeType>} eq 'file') {
+          if ($r->{<H::pc:nodeType>} eq 'file') {
             __DEEP{
               $r = <ClassM::ManakaiPerlCodeFragment.getNodeReference> ($r);
             }__;
           } else {
             $r = null;
           }
-        } elsif ($self->{<Q::TreeCore:node>}->{<Q::pc:nodeType>} eq 'file') {
+        } elsif ($self->{<H::mn:node>}->{<H::pc:nodeType>} eq 'file') {
           $r = $self;
         }
 
@@ -293,7 +291,7 @@ IFClsDef:
       @@@Type:
         ManakaiDOM:ManakaiDOMNodeReference::ManakaiDOM:Perl
       @@@PerlDef:
-        my $nt = $object->{<Q::pc:nodeType>};
+        my $nt = $object->{<H::pc:nodeType>};
         my $pack;
         __CODE{pc:nodeTypeToPackageName::
                  $nodeType => $nt, $packageName => $pack, $object => $object}__;
@@ -339,31 +337,31 @@ IFClsDef:
           Inline Perl code fragment string to replace by.
     @@Return:
       @@@PerlDef:
-        my $node = $self->{<Q::TreeCore:node>};
-        if ($node->{<Q::pc:nodeType>} eq 'unparsed' or
-            $node->{<Q::pc:nodeType>} eq 'inunparsed') {
+        my $node = $self->{<H::mn:node>};
+        if ($node->{<H::pc:nodeType>} eq 'unparsed' or
+            $node->{<H::pc:nodeType>} eq 'inunparsed') {
           my $newVariable = ref $newValue ? $newValue->stringify : ''.$newValue;
-          $node->{<Q::pc:code>} =~ s/\Q$originalVariable\E\b/$newVariable/g;
-        } elsif ($node->{<Q::pc:childNodes>}) {
+          $node->{<H::pc:code>} =~ s/\Q$originalVariable\E\b/$newVariable/g;
+        } elsif ($node->{<H::pc:childNodes>}) {
           __DEEP{
-            for my $cnoi (0..$#{$node->{<Q::pc:childNodes>}}) {
-              my $cno = $node->{<Q::pc:childNodes>}->[$cnoi];
-              if ($cno->{<Q::pc:nodeType>} eq 'variable') {
+            for my $cnoi (0..$#{$node->{<H::pc:childNodes>}}) {
+              my $cno = $node->{<H::pc:childNodes>}->[$cnoi];
+              if ($cno->{<H::pc:nodeType>} eq 'variable') {
                 if (substr ($originalVariable, 0, 1)
-                                  eq $cno->{<Q::pc:variableType>} and
-                    not $cno->{<Q::pc:packageName>} and
+                                  eq $cno->{<H::pc:variableType>} and
+                    not $cno->{<H::pc:packageName>} and
                     substr ($originalVariable, 1)
-                                  eq $cno->{<Q::pc:localName>} and
-                    not $cno->{<Q::pc:hashKey>}) {
+                                  eq $cno->{<H::pc:localName>} and
+                    not $cno->{<H::pc:hashKey>}) {
                   if (ref $newValue) {
-                    CORE::delete $cno->{<Q::pc:parent>};
+                    CORE::delete $cno->{<H::pc:parent>};
                     $cno-><M::ManakaiDOM:ManakaiDOMNodeObject
                             ::ManakaiDOM:Perl.orphanate>;
-                    my $newnode = $newValue->{<Q::TreeCore:node>};
+                    my $newnode = $newValue->{<H::mn:node>};
                     $node-><M::ManakaiDOM:ManakaiDOMNodeObject
                                 ::ManakaiDOM:Perl.importTree> ($newnode);
-                    $newnode->{<Q::pc:parent>} = $node;
-                    $node->{<Q::pc:childNodes>}->[$cnoi] = $newnode;
+                    $newnode->{<H::pc:parent>} = $node;
+                    $node->{<H::pc:childNodes>}->[$cnoi] = $newnode;
                   } else {
                     my $cn;
                     __CODE{ManakaiNode:getWeakReference::
@@ -400,7 +398,7 @@ IFClsDef:
         The name of the module package that should be <Perl::use>d.
     @@Return:
       @@@PerlDef:
-        $self->{<Q::TreeCore:node>}->{<Q::pc:useModuleName>}
+        $self->{<H::mn:node>}->{<H::pc:useModuleName>}
              ->{$moduleName} = true;
 
   @Method:
@@ -422,7 +420,7 @@ IFClsDef:
         The name of the character class.
     @@Return:
       @@@PerlDef:
-        $self->{<Q::TreeCore:node>}->{<Q::pc:useCharClassName>}
+        $self->{<H::mn:node>}->{<H::pc:useCharClassName>}
              ->{$moduleName}->{$charClassName} = true;
 
   @Method:
@@ -438,7 +436,7 @@ IFClsDef:
         The name of the module package that should be <Perl::require>d.
     @@Return:
       @@@PerlDef:
-        $self->{<Q::TreeCore:node>}->{<Q::pc:requireModuleName>}
+        $self->{<H::mn:node>}->{<H::pc:requireModuleName>}
              ->{$moduleName} = true;
 
   @Method:
@@ -455,11 +453,11 @@ IFClsDef:
         and vice versa.
       @@@PerlDef:
         my $list = {};
-        my @node = ($self->{<Q::TreeCore:node>});
+        my @node = ($self->{<H::mn:node>});
         while (my $node = shift @node) {
           next unless ref $node;
-          for my $mname (keys %{$node->{<Q::pc:useModuleName>} || {}}) {
-            $list->{$mname} ||= $node->{<Q::pc:useModuleName>}->{$mname};
+          for my $mname (keys %{$node->{<H::pc:useModuleName>} || {}}) {
+            $list->{$mname} ||= $node->{<H::pc:useModuleName>}->{$mname};
           }
           push @node, $node->{$_} for @{$node->{<Q::TreeCore:subnode0>}};
           my @n;
@@ -485,14 +483,14 @@ IFClsDef:
         any modification to it does not affect to the code fragment
         and vice versa.
       @@@PerlDef:
-        my @node = ($self->{<Q::TreeCore:node>});
+        my @node = ($self->{<H::mn:node>});
         while (my $node = shift @node) {
           next unless ref $node;
-          for my $mname (keys %{$node->{<Q::pc:useCharClassName>} || {}}) {
-            for my $cname (keys %{$node->{<Q::pc:useCharClassName>}
+          for my $mname (keys %{$node->{<H::pc:useCharClassName>} || {}}) {
+            for my $cname (keys %{$node->{<H::pc:useCharClassName>}
                                        ->{$mname}}) {
               $r->{$mname}->{$cname}
-                  ||= $node->{<Q::pc:useCharClassName>}->{$mname}->{$cname};
+                  ||= $node->{<H::pc:useCharClassName>}->{$mname}->{$cname};
             }
           }
           push @node, $node->{$_} for @{$node->{<Q::TreeCore:subnode0>}};
@@ -519,11 +517,11 @@ IFClsDef:
         and vice versa.
       @@@PerlDef:
         my $list = {};
-        my @node = ($self->{<Q::TreeCore:node>});
+        my @node = ($self->{<H::mn:node>});
         while (my $node = shift @node) {
           next unless ref $node;
-          for my $mname (keys %{$node->{<Q::pc:requireModuleName>} || {}}) {
-            $list->{$mname} ||= $node->{<Q::pc:requireModuleName>}->{$mname};
+          for my $mname (keys %{$node->{<H::pc:requireModuleName>} || {}}) {
+            $list->{$mname} ||= $node->{<H::pc:requireModuleName>}->{$mname};
           }
           push @node, $node->{$_} for @{$node->{<Q::TreeCore:subnode0>}};
           my @n;
@@ -549,7 +547,7 @@ IFClsDef:
         The URI reference of the resource to add.
     @@Return:
       @@@PerlDef:
-        $self->{<Q::TreeCore:node>}->{<Q::pc:requireResourceURI>}
+        $self->{<H::mn:node>}->{<H::pc:requireResourceURI>}
              ->{$uriArg} = true;
 
   @Method:
@@ -566,11 +564,11 @@ IFClsDef:
         and vice versa.
       @@@PerlDef:
         my $list = {};
-        my @node = ($self->{<Q::TreeCore:node>});
+        my @node = ($self->{<H::mn:node>});
         while (my $node = shift @node) {
           next unless ref $node;
-          for my $mname (keys %{$node->{<Q::pc:requireResourceURI>} || {}}) {
-            $list->{$mname} ||= $node->{<Q::pc:requireResourceURI>}->{$mname};
+          for my $mname (keys %{$node->{<H::pc:requireResourceURI>} || {}}) {
+            $list->{$mname} ||= $node->{<H::pc:requireResourceURI>}->{$mname};
           }
           push @node, $node->{$_} for @{$node->{<Q::TreeCore:subnode0>}};
           my @n;
@@ -680,14 +678,14 @@ IFClsDef:
         @@@@@:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:subnode>}}, <Q::pc:childNodes>;
-          $node->{<Q::pc:childNodes>} = [];
-          $node->{<Q::pc:sourceFile>} = '';
-          $node->{<Q::pc:sourceModule>} = '';
-          $node->{<Q::pc:sourceFor>} = '';
-          $node->{<Q::pc:currentPackage>} = 'main';
-          $node->{<Q::pc:currentChunk>} = 0;
-          $node->{<Q::pc:nodeType>} = 'file';
+          push @{$node->{<Q::TreeCore:subnode>}}, <H::pc:childNodes>;
+          $node->{<H::pc:childNodes>} = [];
+          $node->{<H::pc:sourceFile>} = '';
+          $node->{<H::pc:sourceModule>} = '';
+          $node->{<H::pc:sourceFor>} = '';
+          $node->{<H::pc:currentPackage>} = 'main';
+          $node->{<H::pc:currentChunk>} = 0;
+          $node->{<H::pc:nodeType>} = 'file';
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
@@ -715,12 +713,12 @@ IFClsDef:
         The newly created package scope object. 
       @@@PerlDef:
         $r = <ClassM::ManakaiPerlPackageScope.newObject>;
-        $r->{<Q::pc:packageName>} = $packageName;
-        $self->{<Q::TreeCore:node>}
+        $r->{<H::pc:packageName>} = $packageName;
+        $self->{<H::mn:node>}
              -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
                             .importTree> ($r);
-        push @{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}}, $r;
-        $r->{<Q::pc:parent>} = $self->{<Q::TreeCore:node>};
+        push @{$self->{<H::mn:node>}->{<H::pc:childNodes>}}, $r;
+        $r->{<H::pc:parent>} = $self->{<H::mn:node>};
         __CODE{ManakaiNode:getNewReference::
                  $object => $r, $ref => $r,
                  $class => {<ClassName::ManakaiPerlPackageScope>}}__;
@@ -742,18 +740,18 @@ IFClsDef:
           An attempt is made to set a subroutine that is 
           already used elsewhere. 
       @@@PerlDef:
-        my $packobj = $codeArg->{<Q::TreeCore:node>};
-        if ($packobj->{<Q::pc:parent>}) {
+        my $packobj = $codeArg->{<H::mn:node>};
+        if ($packobj->{<H::pc:parent>}) {
           __EXCEPTION{IN_USE_NODE_ERR::
             pc:childNode => {$codeArg},
             MDOMX:param-name => 'codeArg',
           }__;
         }
-        $self->{<Q::TreeCore:node>}
+        $self->{<H::mn:node>}
              -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl
                             .importTree> ($packobj);
-        push @{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}}, $packobj;
-        $packobj->{<Q::pc:parent>} = $self->{<Q::TreeCore:node>};
+        push @{$self->{<H::mn:node>}->{<H::pc:childNodes>}}, $packobj;
+        $packobj->{<H::pc:parent>} = $self->{<H::mn:node>};
 
   @Method:
     @@Name: getFirstPackage
@@ -789,9 +787,9 @@ IFClsDef:
           There is no <P::packageName> package object and 
           the <P::makeNewPackage> parameter is set to <DOM::false>. 
       @@@PerlDef:
-        for my $cn (@{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}}) {
-          if ($cn->{<Q::pc:nodeType>} eq 'package' and
-              $cn->{<Q::pc:packageName>} eq $packageName) {
+        for my $cn (@{$self->{<H::mn:node>}->{<H::pc:childNodes>}}) {
+          if ($cn->{<H::pc:nodeType>} eq 'package' and
+              $cn->{<H::pc:packageName>} eq $packageName) {
             $r = $cn;
             last;
           }
@@ -840,10 +838,10 @@ IFClsDef:
           There is no <P::packageName> package object and 
           the <P::makeNewPackage> parameter is set to <DOM::false>. 
       @@@PerlDef:
-        for my $cn (reverse @{$self->{<Q::TreeCore:node>}
-                                   ->{<Q::pc:childNodes>}}) {
-          if ($cn->{<Q::pc:nodeType>} eq 'package' and
-              $cn->{<Q::pc:packageName>} eq $packageName) {
+        for my $cn (reverse @{$self->{<H::mn:node>}
+                                   ->{<H::pc:childNodes>}}) {
+          if ($cn->{<H::pc:nodeType>} eq 'package' and
+              $cn->{<H::pc:packageName>} eq $packageName) {
             $r = $cn;
             last;
           }
@@ -913,7 +911,7 @@ IFClsDef:
         The Perl code generated. 
       @@@PerlDef:
         __DEEP{
-          my $node = $self->{<Q::TreeCore:node>};
+          my $node = $self->{<H::mn:node>};
           ## -- Header
           $r = qq<#!/usr/bin/perl \n>;
           $r .= <ClassM::ManakaiPerlCodeImplementation.perlComment>
@@ -922,11 +920,11 @@ IFClsDef:
                  (q<	at >.<ClassM::ManakaiPerlCodeImplementation
                                            .rfc3339DateTime> (time).q<,>);
           $r .= <ClassM::ManakaiPerlCodeImplementation.perlComment>
-                  (q<	from file ">.$node->{<Q::sourceFile>}.q<",>);
+                  (q<	from file ">.$node->{<H::pc:sourceFile>}.q<",>);
           $r .= <ClassM::ManakaiPerlCodeImplementation.perlComment>
-                  (q[	module <].$node->{<Q::sourceModule>}.q[>,]);
+                  (q[	module <].$node->{<H::pc:sourceModule>}.q[>,]);
           $r .= <ClassM::ManakaiPerlCodeImplementation.perlComment>
-                  (q[	for <].$node->{<Q::sourceFor>}.q[>.]);
+                  (q[	for <].$node->{<H::pc:sourceFor>}.q[>.]);
           $r .= <ClassM::ManakaiPerlCodeImplementation.perlComment>
                   (q<Don't edit by hand!>);
           $r .= qq<use strict;\n>;
@@ -942,14 +940,14 @@ IFClsDef:
 
           ## -- Packages and global objects
           my $pack = {};
-          for my $cno (@{$node->{<Q::pc:childNodes>}}) {
+          for my $cno (@{$node->{<H::pc:childNodes>}}) {
             my $cn = <ClassM::ManakaiPerlCodeFragment.getNodeReference> ($cno);
             $r .= $cn->stringify;
-            if ($cno->{<Q::pc:nodeType>} eq 'package') {
-              for my $ipack (keys %{$cno->{<Q::dis:Implement>}}) {
+            if ($cno->{<H::pc:nodeType>} eq 'package') {
+              for my $ipack (keys %{$cno->{<H::dis:Implement>}}) {
                 $pack->{$ipack} ||= true; # not defined
               }
-              $pack->{$cno->{<Q::pc:packageName>}} = []; # defined
+              $pack->{$cno->{<H::pc:packageName>}} = []; # defined
             }
           }
 
@@ -961,7 +959,7 @@ IFClsDef:
 
           ## -- Footer
           $r .= <ClassM::ManakaiPerlCodeImplementation.perlComment>
-                  (q[License: <].$node->{<Q::dis:License>}.qq[>\n]);
+                  (q[License: <].$node->{<H::dis:License>}.qq[>\n]);
           $r .= qq<1;\n>;
         }__;
 
@@ -1002,7 +1000,7 @@ IFClsDef:
       @@@enDesc:
         The next chunk number.
       @@@PerlDef:
-        $r = ++$self->{<Q::TreeCore:node>}->{<Q::pc:currentChunk>};
+        $r = ++$self->{<H::mn:node>}->{<H::pc:currentChunk>};
   
   @Attr:
     @@Name: licenseURI
@@ -1092,16 +1090,16 @@ IFClsDef:
         @@@@@:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:subnode>}}, <Q::pc:sub>,
-                                                 <Q::dis2pm:operator>,
-                                                 <Q::pc:childNodes>;
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          $node->{<Q::pc:sub>} = {};
-          $node->{<Q::dis2pm:operator>} = {};
-          $node->{<Q::dis:ISA>} = [];
-          $node->{<Q::dis:Implement>} = {};
-          $node->{<Q::pc:nodeType>} = 'package';
-          $node->{<Q::pc:childNodes>} = [];
+          push @{$node->{<Q::TreeCore:subnode>}}, <H::pc:sub>,
+                                                 <H::dis2pm:operator>,
+                                                 <H::pc:childNodes>;
+          push @{$node->{<Q::TreeCore:origin>}}, <H::pc:parent>;
+          $node->{<H::pc:sub>} = {};
+          $node->{<H::dis2pm:operator>} = {};
+          $node->{<H::dis:ISA>} = [];
+          $node->{<H::dis:Implement>} = {};
+          $node->{<H::pc:nodeType>} = 'package';
+          $node->{<H::pc:childNodes>} = [];
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
@@ -1140,17 +1138,17 @@ IFClsDef:
           the <P::makeNewNode> parameter is set to <DOM::false> or
           the subroutine is defined as an alias. 
       @@@PerlDef:
-        if ($self->{<Q::TreeCore:node>}->{<Q::pc:sub>}->{$subName}) {
-          $r = ref $self->{<Q::TreeCore:node>}->{<Q::pc:sub>}->{$subName}
-             ? $self->{<Q::TreeCore:node>}->{<Q::pc:sub>}->{$subName} : null;
+        if ($self->{<H::mn:node>}->{<H::pc:sub>}->{$subName}) {
+          $r = ref $self->{<H::mn:node>}->{<H::pc:sub>}->{$subName}
+             ? $self->{<H::mn:node>}->{<H::pc:sub>}->{$subName} : null;
         } elsif ($makeNewNode) {
-          $r = $self->{<Q::TreeCore:node>}->{<Q::pc:sub>}->{$subName}
+          $r = $self->{<H::mn:node>}->{<H::pc:sub>}->{$subName}
              = <ClassM::ManakaiPerlSub.newObject>;
-          $self->{<Q::TreeCore:node>}
+          $self->{<H::mn:node>}
                -><M::ManakaiDOM:ManakaiDOMNodeObject
                    ::ManakaiDOM:Perl.importTree> ($r);
-          $r->{<Q::pc:parent>} = $self->{<Q::TreeCore:node>};
-          $r->{<Q::pc:localName>} = $subName;
+          $r->{<H::pc:parent>} = $self->{<H::mn:node>};
+          $r->{<H::pc:localName>} = $subName;
         }
         if ($r) {
           __CODE{ManakaiNode:getNewReference::
@@ -1186,22 +1184,22 @@ IFClsDef:
           An attempt is made to set a subroutine that is 
           already used elsewhere. 
       @@@PerlDef:
-        my $ops = $self->{<Q::TreeCore:node>}->{<Q::pc:sub>};
+        my $ops = $self->{<H::mn:node>}->{<H::pc:sub>};
         if (ref $ops->{$subName}) {
-          CORE::delete $ops->{<Q::pc:parent>};
+          CORE::delete $ops->{<H::pc:parent>};
           $ops->{$subName}
               -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl.orphanate>;
         }
-        if ($subArg->{<Q::TreeCore:node>}->{<Q::pc:parent>}) {
+        if ($subArg->{<H::mn:node>}->{<H::pc:parent>}) {
           __EXCEPTION{IN_USE_NODE_ERR::
             pc:childNode => {$subArg},
           }__;
         }
-        $self->{<Q::TreeCore:node>}-><M::MNodeObject.importTree>
-                                          ($subArg->{<Q::TreeCore:node>});
-        $ops->{$subName} = $subArg->{<Q::TreeCore:node>};
-        $subArg->{<Q::TreeCore:node>}->{<Q::pc:parent>}
-                         = $self->{<Q::TreeCore:node>};
+        $self->{<H::mn:node>}-><M::MNodeObject.importTree>
+                                          ($subArg->{<H::mn:node>});
+        $ops->{$subName} = $subArg->{<H::mn:node>};
+        $subArg->{<H::mn:node>}->{<H::pc:parent>}
+                         = $self->{<H::mn:node>};
 
   @Method:
     @@Name: getSubAliasName
@@ -1227,11 +1225,11 @@ IFClsDef:
         @@@@enDesc:
           The specified name is not an alias. 
       @@@PerlDef:
-        if ($self->{<Q::TreeCore:node>}->{<Q::sub>}->{$subName}) {
-          $r = ref $self->{<Q::TreeCore:node>}
-                        ->{<Q::sub>}->{$subName}
-             ? q<#CODE> : $self->{<Q::TreeCore:node>}
-                           ->{<Q::sub>}->{$subName};
+        if ($self->{<H::mn:node>}->{<H::pc:sub>}->{$subName}) {
+          $r = ref $self->{<H::mn:node>}
+                        ->{<H::pc:sub>}->{$subName}
+             ? q<#CODE> : $self->{<H::mn:node>}
+                           ->{<H::pc:sub>}->{$subName};
         }
 
   @Method:
@@ -1253,9 +1251,9 @@ IFClsDef:
     @@Return:
       @@@UnknownOperatorException:
       @@@PerlDef:
-        my $ops = $self->{<Q::TreeCore:node>}->{<Q::sub>};
+        my $ops = $self->{<H::mn:node>}->{<H::pc:sub>};
         if (ref $ops->{$aliasName}) {
-          CORE::delete $ops->{<Q::pc:parent>};
+          CORE::delete $ops->{<H::pc:parent>};
           $ops->{$aliasName}
               -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl.orphanate>;
         }
@@ -1295,18 +1293,18 @@ IFClsDef:
             pc:operator => {$opName},
           }__;
         }
-        if ($self->{<Q::TreeCore:node>}->{<Q::dis2pm:operator>}->{$opName}) {
-          $r = ref $self->{<Q::TreeCore:node>}
-                        ->{<Q::dis2pm:operator>}->{$opName}
-             ? $self->{<Q::TreeCore:node>}
-                        ->{<Q::dis2pm:operator>}->{$opName} : null;
+        if ($self->{<H::mn:node>}->{<H::dis2pm:operator>}->{$opName}) {
+          $r = ref $self->{<H::mn:node>}
+                        ->{<H::dis2pm:operator>}->{$opName}
+             ? $self->{<H::mn:node>}
+                        ->{<H::dis2pm:operator>}->{$opName} : null;
         } elsif ($makeNewNode) {
-          $r = $self->{<Q::TreeCore:node>}->{<Q::dis2pm:operator>}->{$opName}
+          $r = $self->{<H::mn:node>}->{<H::dis2pm:operator>}->{$opName}
              = <ClassM::ManakaiPerlSub.newObject>;
-          $self->{<Q::TreeCore:node>}
+          $self->{<H::mn:node>}
                -><M::ManakaiDOM:ManakaiDOMNodeObject
                    ::ManakaiDOM:Perl.importTree> ($r);
-          $r->{<Q::pc:parent>} = $self->{<Q::TreeCore:node>};
+          $r->{<H::pc:parent>} = $self->{<H::mn:node>};
         }
         if ($r) {
           __CODE{ManakaiNode:getNewReference::
@@ -1343,23 +1341,23 @@ IFClsDef:
             pc:operator => {$opName},
           }__;
         }
-        my $ops = $self->{<Q::TreeCore:node>}->{<Q::dis2pm:operator>};
+        my $ops = $self->{<H::mn:node>}->{<H::dis2pm:operator>};
         if (ref $ops->{$opName}) {
-          CORE::delete $ops->{<Q::pc:parent>};
+          CORE::delete $ops->{<H::pc:parent>};
           $ops->{$opName}
               -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl.orphanate>;
         }
-        if ($subArg->{<Q::TreeCore:node>}->{<Q::pc:parent>}) {
+        if ($subArg->{<H::mn:node>}->{<H::pc:parent>}) {
           __EXCEPTION{IN_USE_NODE_ERR::
             pc:parentNode => {$self},
             pc:childNode => {$subArg},
           }__;
         }
-        $self->{<Q::TreeCore:node>}-><M::MNodeObject.importTree>
-                                          ($subArg->{<Q::TreeCore:node>});
-        $ops->{$opName} = $subArg->{<Q::TreeCore:node>};
-        $subArg->{<Q::TreeCore:node>}->{<Q::pc:parent>}
-                         = $self->{<Q::TreeCore:node>};
+        $self->{<H::mn:node>}-><M::MNodeObject.importTree>
+                                          ($subArg->{<H::mn:node>});
+        $ops->{$opName} = $subArg->{<H::mn:node>};
+        $subArg->{<H::mn:node>}->{<H::pc:parent>}
+                         = $self->{<H::mn:node>};
 
 
   @Method:
@@ -1385,11 +1383,11 @@ IFClsDef:
         @@@@enDesc:
           The operator is overloaded by an anonymous subroutine. 
       @@@PerlDef:
-        if ($self->{<Q::TreeCore:node>}->{<Q::dis2pm:operator>}->{$opName}) {
-          $r = ref $self->{<Q::TreeCore:node>}
-                        ->{<Q::dis2pm:operator>}->{$opName}
-             ? q<#CODE> : $self->{<Q::TreeCore:node>}
-                           ->{<Q::dis2pm:operator>}->{$opName};
+        if ($self->{<H::mn:node>}->{<H::dis2pm:operator>}->{$opName}) {
+          $r = ref $self->{<H::mn:node>}
+                        ->{<H::dis2pm:operator>}->{$opName}
+             ? q<#CODE> : $self->{<H::mn:node>}
+                           ->{<H::dis2pm:operator>}->{$opName};
         }
 
   @Method:
@@ -1420,9 +1418,9 @@ IFClsDef:
             pc:operator => {$opName},
           }__;
         }
-        my $ops = $self->{<Q::TreeCore:node>}->{<Q::dis2pm:operator>};
+        my $ops = $self->{<H::mn:node>}->{<H::dis2pm:operator>};
         if (ref $ops->{$opName}) {
-          CORE::delete $ops->{<Q::pc:parent>};
+          CORE::delete $ops->{<H::pc:parent>};
           $ops->{$opName}
               -><M::ManakaiDOM:ManakaiDOMNodeObject::ManakaiDOM:Perl.orphanate>;
         }
@@ -1440,7 +1438,7 @@ IFClsDef:
         The name of package to add. 
     @@Return:
       @@@PerlDef:
-        push @{$self->{<Q::TreeCore:node>}->{<Q::dis:ISA>}}, $packageName;
+        push @{$self->{<H::mn:node>}->{<H::dis:ISA>}}, $packageName;
 
   @Method:
     @@Name: addImplementPackage
@@ -1454,7 +1452,7 @@ IFClsDef:
         The name of package to add.
     @@Return:
       @@@PerlDef:
-        $self->{<Q::TreeCore:node>}->{<Q::dis:Implement>}->{$packageName} = true;
+        $self->{<H::mn:node>}->{<H::dis:Implement>}->{$packageName} = true;
 
   @ToStringMethod:
     @@Return:
@@ -1464,10 +1462,10 @@ IFClsDef:
         Perl code. 
       @@@PerlDef:
         my $file = $self-><AG::ManakaiPerlCodeFragment.parentNode>;
-        my $node = $self->{<Q::TreeCore:node>};
+        my $node = $self->{<H::mn:node>};
 
         ## Package name
-        my $pn = $node->{<Q::pc:packageName>};
+        my $pn = $node->{<H::pc:packageName>};
         $r .= q<package > . $pn . ";\n";
 
         ## Package version
@@ -1479,8 +1477,8 @@ IFClsDef:
         }__;
 
         ## Inheritance
-        my @isa = (@{$node->{<Q::dis:ISA>}},
-                   sort keys %{$node->{<Q::dis:Implement>}});
+        my @isa = (@{$node->{<H::dis:ISA>}},
+                   sort keys %{$node->{<H::dis:Implement>}});
         if (@isa) {
           $r .= 'push our @ISA, ' .
                 <ClassM::ManakaiPerlCodeImplementation.perlList> (\@isa) .
@@ -1501,14 +1499,14 @@ IFClsDef:
         }
 
         ## Package-scope objects
-        for my $cno (@{$node->{<Q::pc:childNodes>}}) {
+        for my $cno (@{$node->{<H::pc:childNodes>}}) {
           my $cn = <ClassM::ManakaiPerlCodeFragment.getNodeReference> ($cno);
           $r .= $cn->stringify;
         }
 
         ## Subroutines
-        for my $cnk (keys %{$node->{<Q::pc:sub>}}) {
-          my $cno = $node->{<Q::pc:sub>}->{$cnk};
+        for my $cnk (keys %{$node->{<H::pc:sub>}}) {
+          my $cno = $node->{<H::pc:sub>}->{$cnk};
           if (ref $cno) {
             my $cn;
             __CODE{ManakaiNode:getWeakReference::
@@ -1522,8 +1520,8 @@ IFClsDef:
 
         ## Operators
         my $op = '';
-        for my $cnk (keys %{$node->{<Q::dis2pm:operator>}}) {
-          my $cno = $node->{<Q::dis2pm:operator>}->{$cnk};
+        for my $cnk (keys %{$node->{<H::dis2pm:operator>}}) {
+          my $cno = $node->{<H::dis2pm:operator>}->{$cnk};
           if (ref $cno) {
             my $cn;
             __CODE{ManakaiNode:getWeakReference::
@@ -1541,15 +1539,15 @@ IFClsDef:
 
 
         ## -- Exports
-        if (keys %{$node->{<Q::pc:export>} || {}}) {
+        if (keys %{$node->{<H::pc:export>} || {}}) {
           $r .= q[our %EXPORT_TAG = (] . 
                   <ClassM::ManakaiPerlCodeImplementation.perlList>
-                     ([map {$_ => [keys %{$node->{<Q::pc:export>}->{$_}}]}
-                       grep {$_} keys %{$node->{<Q::pc:export>}}]) . qq[);\n];
+                     ([map {$_ => [keys %{$node->{<H::pc:export>}->{$_}}]}
+                       grep {$_} keys %{$node->{<H::pc:export>}}]) . qq[);\n];
           $r .= q[our @EXPORT_OK = (] .
                   <ClassM::ManakaiPerlCodeImplementation.perlList>
-                     ([map {keys %{$node->{<Q::pc:export>}->{$_}}}
-                       keys %{$node->{<Q::pc:export>}}]) . qq[);\n];
+                     ([map {keys %{$node->{<H::pc:export>}->{$_}}}
+                       keys %{$node->{<H::pc:export>}}]) . qq[);\n];
           $r .= q[use Exporter; push our @ISA, 'Exporter';] . qq[\n];
         }
 
@@ -1576,7 +1574,7 @@ IFClsDef:
         The name to be exported.
     @@Return:
       @@@PerlDef:
-        $self->{<Q::TreeCore:node>}->{<Q::pc:export>}
+        $self->{<H::mn:node>}->{<H::pc:export>}
              ->{defined $exportTag ? $exportTag : ''}->{$exportName} = true;
 ##PerlPackageScope
 
@@ -1722,18 +1720,18 @@ IFClsDef:
           blockcontainer => true,
           inunparsed => 1, variable => 1, bare => 1, atom => 1,
           incontainer => 1, string => 1, assign => 1,
-        }->{$codeArg->{<Q::TreeCore:node>}->{<Q::pc:nodeType>}}) {
-          if ($codeArg->{<Q::TreeCore:node>}->{<Q::pc:parent>}) {
+        }->{$codeArg->{<H::mn:node>}->{<H::pc:nodeType>}}) {
+          if ($codeArg->{<H::mn:node>}->{<H::pc:parent>}) {
             __EXCEPTION{IN_USE_NODE_ERR::
               pc:childNode => {$codeArg},
             }__;
           }
-          $self->{<Q::TreeCore:node>}-><M::MNodeObject.importTree>
-                                          ($codeArg->{<Q::TreeCore:node>});
-          push @{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}},
-               $codeArg->{<Q::TreeCore:node>};
-          $codeArg->{<Q::TreeCore:node>}->{<Q::pc:parent>}
-                                         = $self->{<Q::TreeCore:node>};
+          $self->{<H::mn:node>}-><M::MNodeObject.importTree>
+                                          ($codeArg->{<H::mn:node>});
+          push @{$self->{<H::mn:node>}->{<H::pc:childNodes>}},
+               $codeArg->{<H::mn:node>};
+          $codeArg->{<H::mn:node>}->{<H::pc:parent>}
+                                         = $self->{<H::mn:node>};
         } else {
           __EXCEPTION{BAD_CHILD_ERR::
             pc:parentNode => {$self},
@@ -1758,15 +1756,15 @@ IFClsDef:
         The newly created Perl code object. 
       @@@PerlDef:
         $r = <ClassM::ManakaiPerlUnparsedCode.newObject>;
-        my $node = $self->{<Q::TreeCore:node>};
-        $r->{<Q::sourceFile>} = $node->{<Q::pc:currentSourceFile>};
-        $r->{<Q::sourceLine>} = $node->{<Q::pc:currentSourceLine>};
-        $r->{<Q::code>} = $codeArg;
-        $node->{<Q::pc:currentSourceLine>} += ($codeArg =~ tr/\x0A/\x0A/);
+        my $node = $self->{<H::mn:node>};
+        $r->{<H::pc:sourceFile>} = $node->{<H::pc:currentSourceFile>};
+        $r->{<H::pc:sourceLine>} = $node->{<H::pc:currentSourceLine>};
+        $r->{<H::pc:code>} = $codeArg;
+        $node->{<H::pc:currentSourceLine>} += ($codeArg =~ tr/\x0A/\x0A/);
         $node-><M::ManakaiDOM:ManakaiDOMNodeObject
                  ::ManakaiDOM:Perl.importTree> ($r);
-        push @{$node->{<Q::pc:childNodes>}}, $r;
-        $r->{<Q::pc:parent>} = $node;
+        push @{$node->{<H::pc:childNodes>}}, $r;
+        $r->{<H::pc:parent>} = $node;
         __CODE{ManakaiNode:getNewReference::
           $object => $r, $ref => $r,
           $class =>{<ClassName::ManakaiPerlUnparsedCode>},
@@ -1784,7 +1782,7 @@ IFClsDef:
         A code fragment, which is counted lines. 
     @@Return:
       @@@PerlDef:
-        $self->{<Q::TreeCore:node>}->{<Q::pc:currentSourceLine>}
+        $self->{<H::mn:node>}->{<H::pc:currentSourceLine>}
                             += ($codeArg =~ tr/\x0A/\x0A/);
 
   @ImplNote:
@@ -1824,11 +1822,11 @@ IFClsDef:
         The newly created Perl code object. 
       @@@PerlDef:
         $r = <ClassM::ManakaiPerlBlock.newObject>;
-        my $node = $self->{<Q::TreeCore:node>};
+        my $node = $self->{<H::mn:node>};
         $node-><M::ManakaiDOM:ManakaiDOMNodeObject
                  ::ManakaiDOM:Perl.importTree> ($r);
-        push @{$node->{<Q::pc:childNodes>}}, $r;
-        $r->{<Q::pc:parent>} = $node;
+        push @{$node->{<H::pc:childNodes>}}, $r;
+        $r->{<H::pc:parent>} = $node;
         if (defined wantarray) {
           __CODE{ManakaiNode:getNewReference::
             $object => $r, $ref => $r,
@@ -1856,11 +1854,11 @@ IFClsDef:
         The newly created Perl code object. 
       @@@PerlDef:
         $r = <ClassM::ManakaiPerlStatement.newObject>;
-        my $node = $self->{<Q::TreeCore:node>};
+        my $node = $self->{<H::mn:node>};
         $node-><M::ManakaiDOM:ManakaiDOMNodeObject
                  ::ManakaiDOM:Perl.importTree> ($r);
-        push @{$node->{<Q::pc:childNodes>}}, $r;
-        $r->{<Q::pc:parent>} = $node;
+        push @{$node->{<H::pc:childNodes>}}, $r;
+        $r->{<H::pc:parent>} = $node;
         if (defined wantarray or defined $codeArg) {
           __CODE{ManakaiNode:getNewReference::
             $object => $r, $ref => $r,
@@ -1915,8 +1913,8 @@ IFClsDef:
           if ({
             atom => 1, bare => 1, incontainer => 1, assign => true,
             inunparsed => 1, variable => 1, string => true,
-          }->{$arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:nodeType>}}) {
-            if ($arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:parent>}) {
+          }->{$arg->[1]->{<H::mn:node>}->{<H::pc:nodeType>}}) {
+            if ($arg->[1]->{<H::mn:node>}->{<H::pc:parent>}) {
               __EXCEPTION{IN_USE_NODE_ERR::
                 pc:childNode => {$arg->[1]},
                 MDOMX:param-name => {$arg->[0]},
@@ -1936,8 +1934,8 @@ IFClsDef:
           next unless $arg->[1];
           if ({
                 blockcontainer => true,
-              }->{$arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:nodeType>}}) {
-            if ($arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:parent>}) {
+              }->{$arg->[1]->{<H::mn:node>}->{<H::pc:nodeType>}}) {
+            if ($arg->[1]->{<H::mn:node>}->{<H::pc:parent>}) {
               __EXCEPTION{IN_USE_NODE_ERR::
                 pc:childNode => {$arg->[1]},
                 MDOMX:param-name => {$arg->[0]},
@@ -1953,15 +1951,15 @@ IFClsDef:
         } # t/f
 
         my $assign = <ClassM::ManakaiPerlIf.newObject>;
-        $assign->{<Q::pc:condition>} = $conditionArg->{<Q::TreeCore:node>};
-        $assign->{<Q::pc:true>} = $trueArg->{<Q::TreeCore:node>} if $trueArg;
-        $assign->{<Q::pc:false>} = $falseArg->{<Q::TreeCore:node>} if $falseArg;
-        $conditionArg->{<Q::TreeCore:node>}->{<Q::pc:parent>} = $assign;
-        $trueArg->{<Q::TreeCore:node>}->{<Q::pc:parent>} = $assign if $trueArg;
-        $falseArg->{<Q::TreeCore:node>}->{<Q::pc:parent>} = $assign if $falseArg;
-        $self->{<Q::TreeCore:node>}-><M::MNodeObject.importTree> ($assign);
-        $assign->{<Q::pc:parent>} = $self->{<Q::TreeCore:node>};
-        push @{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}}, $assign;
+        $assign->{<H::pc:condition>} = $conditionArg->{<H::mn:node>};
+        $assign->{<H::pc:true>} = $trueArg->{<H::mn:node>} if $trueArg;
+        $assign->{<H::pc:false>} = $falseArg->{<H::mn:node>} if $falseArg;
+        $conditionArg->{<H::mn:node>}->{<H::pc:parent>} = $assign;
+        $trueArg->{<H::mn:node>}->{<H::pc:parent>} = $assign if $trueArg;
+        $falseArg->{<H::mn:node>}->{<H::pc:parent>} = $assign if $falseArg;
+        $self->{<H::mn:node>}-><M::MNodeObject.importTree> ($assign);
+        $assign->{<H::pc:parent>} = $self->{<H::mn:node>};
+        push @{$self->{<H::mn:node>}->{<H::pc:childNodes>}}, $assign;
 ##PerlCodeStatements
 
 IFClsDef:
@@ -1995,11 +1993,11 @@ IFClsDef:
         @@@@@:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:subnode>}}, <Q::pc:childNodes>;
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          $node->{<Q::pc:childNodes>} = [];
-          $node->{<Q::pc:sourceLine>} = 0;
-          $node->{<Q::pc:nodeType>} = 'sub';
+          push @{$node->{<Q::TreeCore:subnode>}}, <H::pc:childNodes>;
+          push @{$node->{<Q::TreeCore:origin>}}, <H::pc:parent>;
+          $node->{<H::pc:childNodes>} = [];
+          $node->{<H::pc:sourceLine>} = 0;
+          $node->{<H::pc:nodeType>} = 'sub';
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
@@ -2016,32 +2014,32 @@ IFClsDef:
       @@@PerlDef:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          $node->{<Q::pc:nodeType>} = 'sub';
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          push @{$node->{<Q::TreeCore:subnode>}}, <Q::pc:childNodes>;
-          for my $prop (<Q::pc:sourceFile>, <Q::pc:sourceLine>,
-                        <Q::pc:localName>, <Q::pc:prototype>) {
+          $node->{<H::pc:nodeType>} = 'sub';
+          push @{$node->{<Q::TreeCore:origin>}}, <H::pc:parent>;
+          push @{$node->{<Q::TreeCore:subnode>}}, <H::pc:childNodes>;
+          for my $prop (<H::pc:sourceFile>, <H::pc:sourceLine>,
+                        <H::pc:localName>, <H::pc:prototype>) {
             $node->{$prop} = $nodeObject->{$prop};
           }
-          $node->{<Q::pc:requireResourceURI>}
-             = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
-          $node->{<Q::pc:useModuleName>}
-             = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
-          $node->{<Q::pc:useCharClassName>}
-             = {map {$_ => {%{$nodeObject->{<Q::pc:useCharClassName>}->{$_}}}}
-                keys %{$nodeObject->{<Q::pc:useCharClassName>} || {}}};
-          $node->{<Q::pc:requireModuleName>}
-             = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
-          $node->{<Q::pc:childNodes>} = [];
-          for my $cno (@{$nodeObject->{<Q::pc:childNodes>}}) {
+          $node->{<H::pc:requireResourceURI>}
+             = {%{$nodeObject->{<H::pc:requireResourceURI>} || {}}};
+          $node->{<H::pc:useModuleName>}
+             = {%{$nodeObject->{<H::pc:useModuleName>} || {}}};
+          $node->{<H::pc:useCharClassName>}
+             = {map {$_ => {%{$nodeObject->{<H::pc:useCharClassName>}->{$_}}}}
+                keys %{$nodeObject->{<H::pc:useCharClassName>} || {}}};
+          $node->{<H::pc:requireModuleName>}
+             = {%{$nodeObject->{<H::pc:requireModuleName>} || {}}};
+          $node->{<H::pc:childNodes>} = [];
+          for my $cno (@{$nodeObject->{<H::pc:childNodes>}}) {
             my $pack;
-            my $nt = $cno->{<Q::pc:nodeType>};
+            my $nt = $cno->{<H::pc:nodeType>};
             __CODE{pc:nodeTypeToPackageName::
                      $nodeType => $nt, $packageName => $pack, $object => $cno}__;
                                  ## NOTE: Method name written directly
             my $cno_clone = $pack->_make_clone_object ($cno);
-            push @{$node->{<Q::pc:childNodes>}}, $cno_clone;
-            $cno_clone->{<Q::pc:parent>} = $node;
+            push @{$node->{<H::pc:childNodes>}}, $cno_clone;
+            $cno_clone->{<H::pc:parent>} = $node;
             ## NOTE: Tree ID is not updated yet.
           }
 
@@ -2098,14 +2096,14 @@ IFClsDef:
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
-        my $node = $self->{<Q::TreeCore:node>};
+        my $node = $self->{<H::mn:node>};
         $r = q<sub>;
-        $r .= ' ' . $node->{<Q::pc:localName>}
-                if defined $node->{<Q::pc:localName>};
-        $r .= ' (' . $node->{<Q::pc:prototype>} . ')'
-                if defined $node->{<Q::pc:prototype>};
+        $r .= ' ' . $node->{<H::pc:localName>}
+                if defined $node->{<H::pc:localName>};
+        $r .= ' (' . $node->{<H::pc:prototype>} . ')'
+                if defined $node->{<H::pc:prototype>};
         $r .= " {\n";
-        for my $cno (@{$node->{<Q::pc:childNodes>}}) {
+        for my $cno (@{$node->{<H::pc:childNodes>}}) {
           my $cn = <ClassM::ManakaiPerlCodeFragment.getNodeReference> ($cno);
           $r .= $cn->stringify;
         }
@@ -2116,7 +2114,7 @@ IFClsDef:
       @@@Type:
         DISIDL:AnyRealNumber::ManakaiDOM:all
       @@@PerlDef:
-        my $cno = $self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}->[-1];
+        my $cno = $self->{<H::mn:node>}->{<H::pc:childNodes>}->[-1];
         if ($cno) {
           my $cn = <ClassM::ManakaiPerlCodeFragment.getNodeReference> ($cno);
           $r = 0 + $cn;
@@ -2162,9 +2160,9 @@ IFClsDef:
         @@@@@:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          $node->{<Q::pc:code>} = '';
-          $node->{<Q::pc:nodeType>} = 'unparsed';
+          push @{$node->{<Q::TreeCore:origin>}}, <H::pc:parent>;
+          $node->{<H::pc:code>} = '';
+          $node->{<H::pc:nodeType>} = 'unparsed';
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
@@ -2180,20 +2178,20 @@ IFClsDef:
       @@@PerlDef:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          for my $prop (<Q::pc:sourceFile>, <Q::pc:sourceLine>, <Q::pc:code>) {
+          push @{$node->{<Q::TreeCore:origin>}}, <H::pc:parent>;
+          for my $prop (<H::pc:sourceFile>, <H::pc:sourceLine>, <H::pc:code>) {
             $node->{$prop} = $nodeObject->{$prop};
           }
-          $node->{<Q::pc:nodeType>} = 'unparsed';
-          $node->{<Q::pc:requireResourceURI>}
-             = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
-          $node->{<Q::pc:useModuleName>}
-             = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
-          $node->{<Q::pc:useCharClassName>}
-             = {map {$_ => {%{$nodeObject->{<Q::pc:useCharClassName>}->{$_}}}}
-                keys %{$nodeObject->{<Q::pc:useCharClassName>} || {}}};
-          $node->{<Q::pc:requireModuleName>}
-             = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
+          $node->{<H::pc:nodeType>} = 'unparsed';
+          $node->{<H::pc:requireResourceURI>}
+             = {%{$nodeObject->{<H::pc:requireResourceURI>} || {}}};
+          $node->{<H::pc:useModuleName>}
+             = {%{$nodeObject->{<H::pc:useModuleName>} || {}}};
+          $node->{<H::pc:useCharClassName>}
+             = {map {$_ => {%{$nodeObject->{<H::pc:useCharClassName>}->{$_}}}}
+                keys %{$nodeObject->{<H::pc:useCharClassName>} || {}}};
+          $node->{<H::pc:requireModuleName>}
+             = {%{$nodeObject->{<H::pc:requireModuleName>} || {}}};
 
   @Attr:
     @@Name: code
@@ -2247,15 +2245,15 @@ IFClsDef:
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
-        my $node = $self->{<Q::TreeCore:node>};
+        my $node = $self->{<H::mn:node>};
         __DEEP{
           my $file = $self-><AG::ManakaiPerlCodeFragment.fileNode>;
           $r = sprintf (qq<\n#line %d "%s [u] (Chunk #%d)"\n>,
-                        $node->{<Q::pc:sourceLine>} || 1,
-                        $node->{<Q::pc:sourceFile>} ||
+                        $node->{<H::pc:sourceLine>} || 1,
+                        $node->{<H::pc:sourceFile>} ||
                           $file-><AG::ManakaiPerlFile.sourceFile>,
                         $file-><M::ManakaiPerlFile.getNextChunkNumber>)
-             . $node->{<Q::pc:code>}
+             . $node->{<H::pc:code>}
              . sprintf (qq<\n#line 1 "%s [/u] (Chunk #%d)"\n>,
                         $file-><AG::ManakaiPerlFile.sourceFile>,
                         $file-><M::ManakaiPerlFile.getNextChunkNumber>);
@@ -2292,9 +2290,9 @@ IFClsDef:
         @@@@@:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          $node->{<Q::pc:code>} = '';
-          $node->{<Q::pc:nodeType>} = 'inunparsed';
+          push @{$node->{<Q::TreeCore:origin>}}, <H::pc:parent>;
+          $node->{<H::pc:code>} = '';
+          $node->{<H::pc:nodeType>} = 'inunparsed';
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
@@ -2309,20 +2307,20 @@ IFClsDef:
       @@@PerlDef:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          for my $prop (<Q::pc:code>) {
+          push @{$node->{<Q::TreeCore:origin>}}, <H::pc:parent>;
+          for my $prop (<H::pc:code>) {
             $node->{$prop} = $nodeObject->{$prop};
           }
-          $node->{<Q::pc:nodeType>} = 'inunparsed';
-          $node->{<Q::pc:requireResourceURI>}
-             = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
-          $node->{<Q::pc:useModuleName>}
-             = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
-          $node->{<Q::pc:useCharClassName>}
-             = {map {$_ => {%{$nodeObject->{<Q::pc:useCharClassName>}->{$_}}}}
-                keys %{$nodeObject->{<Q::pc:useCharClassName>} || {}}};
-          $node->{<Q::pc:requireModuleName>}
-             = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
+          $node->{<H::pc:nodeType>} = 'inunparsed';
+          $node->{<H::pc:requireResourceURI>}
+             = {%{$nodeObject->{<H::pc:requireResourceURI>} || {}}};
+          $node->{<H::pc:useModuleName>}
+             = {%{$nodeObject->{<H::pc:useModuleName>} || {}}};
+          $node->{<H::pc:useCharClassName>}
+             = {map {$_ => {%{$nodeObject->{<H::pc:useCharClassName>}->{$_}}}}
+                keys %{$nodeObject->{<H::pc:useCharClassName>} || {}}};
+          $node->{<H::pc:requireModuleName>}
+             = {%{$nodeObject->{<H::pc:requireModuleName>} || {}}};
 
   @Attr:
     @@Name: code
@@ -2344,8 +2342,8 @@ IFClsDef:
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
-        my $node = $self->{<Q::TreeCore:node>};
-        $r = $node->{<Q::pc:code>};
+        my $node = $self->{<H::mn:node>};
+        $r = $node->{<H::pc:code>};
 ##PerlInlineUnparsedCode
 
 IFClsDef:
@@ -2378,9 +2376,9 @@ IFClsDef:
         @@@@@:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          $node->{<Q::infoset:content>} = '';
-          $node->{<Q::pc:nodeType>} = 'string';
+          push @{$node->{<Q::TreeCore:origin>}}, <H::pc:parent>;
+          $node->{<H::infoset:content>} = '';
+          $node->{<H::pc:nodeType>} = 'string';
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
@@ -2395,20 +2393,20 @@ IFClsDef:
       @@@PerlDef:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          for my $prop (<Q::infoset:content>) {
+          push @{$node->{<Q::TreeCore:origin>}}, <H::pc:parent>;
+          for my $prop (<H::infoset:content>) {
             $node->{$prop} = $nodeObject->{$prop};
           }
-          $node->{<Q::pc:nodeType>} = 'string';
-          $node->{<Q::pc:requireResourceURI>}
-             = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
-          $node->{<Q::pc:useModuleName>}
-             = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
-          $node->{<Q::pc:useCharClassName>}
-             = {map {$_ => {%{$nodeObject->{<Q::pc:useCharClassName>}->{$_}}}}
-                keys %{$nodeObject->{<Q::pc:useCharClassName>} || {}}};
-          $node->{<Q::pc:requireModuleName>}
-             = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
+          $node->{<H::pc:nodeType>} = 'string';
+          $node->{<H::pc:requireResourceURI>}
+             = {%{$nodeObject->{<H::pc:requireResourceURI>} || {}}};
+          $node->{<H::pc:useModuleName>}
+             = {%{$nodeObject->{<H::pc:useModuleName>} || {}}};
+          $node->{<H::pc:useCharClassName>}
+             = {map {$_ => {%{$nodeObject->{<H::pc:useCharClassName>}->{$_}}}}
+                keys %{$nodeObject->{<H::pc:useCharClassName>} || {}}};
+          $node->{<H::pc:requireModuleName>}
+             = {%{$nodeObject->{<H::pc:requireModuleName>} || {}}};
 
   @Attr:
     @@Name: data
@@ -2432,7 +2430,7 @@ IFClsDef:
       @@@enDesc:
         Numeric value of the Perl code. 
       @@@PerlDef:
-        $r = 0 + $self->{<Q::TreeCore:node>}->{<Q::infoset:content>};
+        $r = 0 + $self->{<H::mn:node>}->{<H::infoset:content>};
 
   @ToStringMethod:
     @@Return:
@@ -2441,8 +2439,8 @@ IFClsDef:
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
-        my $node = $self->{<Q::TreeCore:node>};
-        $r = $node->{<Q::infoset:content>};
+        my $node = $self->{<H::mn:node>};
+        $r = $node->{<H::infoset:content>};
         $r =~ s/(['\\])/\\$1/g;
         $r = q<'> . $r . q<'>;
 ##PerlStringLiteral
@@ -2477,9 +2475,9 @@ IFClsDef:
         @@@@@:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          $node->{<Q::pc:code>} = '';
-          $node->{<Q::pc:nodeType>} = 'bare';
+          push @{$node->{<Q::TreeCore:origin>}}, <H::pc:parent>;
+          $node->{<H::pc:code>} = '';
+          $node->{<H::pc:nodeType>} = 'bare';
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
@@ -2494,20 +2492,20 @@ IFClsDef:
       @@@PerlDef:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          for my $prop (<Q::pc:code>) {
+          push @{$node->{<Q::TreeCore:origin>}}, <H::pc:parent>;
+          for my $prop (<H::pc:code>) {
             $node->{$prop} = $nodeObject->{$prop};
           }
-          $node->{<Q::pc:nodeType>} = 'bare';
-          $node->{<Q::pc:requireResourceURI>}
-             = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
-          $node->{<Q::pc:useModuleName>}
-             = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
-          $node->{<Q::pc:useCharClassName>}
-             = {map {$_ => {%{$nodeObject->{<Q::pc:useCharClassName>}->{$_}}}}
-                keys %{$nodeObject->{<Q::pc:useCharClassName>} || {}}};
-          $node->{<Q::pc:requireModuleName>}
-             = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
+          $node->{<H::pc:nodeType>} = 'bare';
+          $node->{<H::pc:requireResourceURI>}
+             = {%{$nodeObject->{<H::pc:requireResourceURI>} || {}}};
+          $node->{<H::pc:useModuleName>}
+             = {%{$nodeObject->{<H::pc:useModuleName>} || {}}};
+          $node->{<H::pc:useCharClassName>}
+             = {map {$_ => {%{$nodeObject->{<H::pc:useCharClassName>}->{$_}}}}
+                keys %{$nodeObject->{<H::pc:useCharClassName>} || {}}};
+          $node->{<H::pc:requireModuleName>}
+             = {%{$nodeObject->{<H::pc:requireModuleName>} || {}}};
 
   @Attr:
     @@Name: code
@@ -2529,8 +2527,8 @@ IFClsDef:
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
-        my $node = $self->{<Q::TreeCore:node>};
-        $r = $node->{<Q::pc:code>};
+        my $node = $self->{<H::mn:node>};
+        $r = $node->{<H::pc:code>};
 ##PerlBare
 
 IFClsDef:
@@ -2564,9 +2562,9 @@ IFClsDef:
         @@@@@:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          $node->{<Q::pc:code>} = '';
-          $node->{<Q::pc:nodeType>} = 'atom';
+          push @{$node->{<Q::TreeCore:origin>}}, <H::pc:parent>;
+          $node->{<H::pc:code>} = '';
+          $node->{<H::pc:nodeType>} = 'atom';
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
@@ -2581,20 +2579,20 @@ IFClsDef:
       @@@PerlDef:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          for my $prop (<Q::pc:code>) {
+          push @{$node->{<Q::TreeCore:origin>}}, <H::pc:parent>;
+          for my $prop (<H::pc:code>) {
             $node->{$prop} = $nodeObject->{$prop};
           }
-          $node->{<Q::pc:nodeType>} = 'atom';
-          $node->{<Q::pc:requireResourceURI>}
-             = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
-          $node->{<Q::pc:useModuleName>}
-             = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
-          $node->{<Q::pc:useCharClassName>}
-             = {map {$_ => {%{$nodeObject->{<Q::pc:useCharClassName>}->{$_}}}}
-                keys %{$nodeObject->{<Q::pc:useCharClassName>} || {}}};
-          $node->{<Q::pc:requireModuleName>}
-             = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
+          $node->{<H::pc:nodeType>} = 'atom';
+          $node->{<H::pc:requireResourceURI>}
+             = {%{$nodeObject->{<H::pc:requireResourceURI>} || {}}};
+          $node->{<H::pc:useModuleName>}
+             = {%{$nodeObject->{<H::pc:useModuleName>} || {}}};
+          $node->{<H::pc:useCharClassName>}
+             = {map {$_ => {%{$nodeObject->{<H::pc:useCharClassName>}->{$_}}}}
+                keys %{$nodeObject->{<H::pc:useCharClassName>} || {}}};
+          $node->{<H::pc:requireModuleName>}
+             = {%{$nodeObject->{<H::pc:requireModuleName>} || {}}};
 
   @NumValMethod:
     @@Return:
@@ -2603,7 +2601,7 @@ IFClsDef:
       @@@enDesc:
         Numeric value of the Perl code. 
       @@@PerlDef:
-        $r = 0 + $self->{<Q::TreeCore:node>}->{<Q::pc:code>};
+        $r = 0 + $self->{<H::mn:node>}->{<H::pc:code>};
 
   @ToStringMethod:
     @@Return:
@@ -2612,8 +2610,8 @@ IFClsDef:
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
-        my $node = $self->{<Q::TreeCore:node>};
-        $r = $node->{<Q::pc:code>};
+        my $node = $self->{<H::mn:node>};
+        $r = $node->{<H::pc:code>};
 ##PerlAtom
 
 IFClsDef:
@@ -2651,9 +2649,9 @@ IFClsDef:
         @@@@@:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          $node->{<Q::pc:variableType>} = '';
-          $node->{<Q::pc:nodeType>} = 'variable';
+          push @{$node->{<Q::TreeCore:origin>}}, <H::pc:parent>;
+          $node->{<H::pc:variableType>} = '';
+          $node->{<H::pc:nodeType>} = 'variable';
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
@@ -2670,21 +2668,21 @@ IFClsDef:
       @@@PerlDef:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          for my $prop (<Q::pc:variableType>, <Q::packageName>,
-                        <Q::localName>, <Q::variableScope>, <Q::hashKey>) {
+          push @{$node->{<Q::TreeCore:origin>}}, <H::pc:parent>;
+          for my $prop (<H::pc:variableType>, <H::pc:packageName>,
+                        <H::pc:localName>, <H::pc:variableScope>, <H::pc:hashKey>) {
             $node->{$prop} = $nodeObject->{$prop};
           }
-          $node->{<Q::pc:nodeType>} = 'variable';
-          $node->{<Q::pc:requireResourceURI>}
-             = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
-          $node->{<Q::pc:useModuleName>}
-             = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
-          $node->{<Q::pc:useCharClassName>}
-             = {map {$_ => {%{$nodeObject->{<Q::pc:useCharClassName>}->{$_}}}}
-                keys %{$nodeObject->{<Q::pc:useCharClassName>} || {}}};
-          $node->{<Q::pc:requireModuleName>}
-             = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
+          $node->{<H::pc:nodeType>} = 'variable';
+          $node->{<H::pc:requireResourceURI>}
+             = {%{$nodeObject->{<H::pc:requireResourceURI>} || {}}};
+          $node->{<H::pc:useModuleName>}
+             = {%{$nodeObject->{<H::pc:useModuleName>} || {}}};
+          $node->{<H::pc:useCharClassName>}
+             = {map {$_ => {%{$nodeObject->{<H::pc:useCharClassName>}->{$_}}}}
+                keys %{$nodeObject->{<H::pc:useCharClassName>} || {}}};
+          $node->{<H::pc:requireModuleName>}
+             = {%{$nodeObject->{<H::pc:requireModuleName>} || {}}};
 
   @Attr:
     @@Name: variableType
@@ -2760,17 +2758,17 @@ IFClsDef:
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
-        my $node = $self->{<Q::TreeCore:node>};
-        if ($node->{<Q::pc:variableScope>}) {
-          $r = $node->{<Q::pc:variableScope>} . ' ';
+        my $node = $self->{<H::mn:node>};
+        if ($node->{<H::pc:variableScope>}) {
+          $r = $node->{<H::pc:variableScope>} . ' ';
         }
-        $r .= $node->{<Q::pc:variableType>};
-        $r .= $node->{<Q::pc:packageName>} . '::'
-          if defined $node->{<Q::pc:packageName>};
-        $r .= $node->{<Q::pc:localName>};
-        if ($node->{<Q::pc:variableType>} eq '$' and
-            defined $node->{<Q::pc:hashKey>}) {
-          my $hashKey = $node->{<Q::pc:hashKey>};
+        $r .= $node->{<H::pc:variableType>};
+        $r .= $node->{<H::pc:packageName>} . '::'
+          if defined $node->{<H::pc:packageName>};
+        $r .= $node->{<H::pc:localName>};
+        if ($node->{<H::pc:variableType>} eq '$' and
+            defined $node->{<H::pc:hashKey>}) {
+          my $hashKey = $node->{<H::pc:hashKey>};
           $hashKey =~ s/(['\\])/\\$1/g;
           $r .= q<{'> . $hashKey . q<'}>;
         }
@@ -2833,7 +2831,7 @@ IFClsDef:
       DOMMain:unsigned-long::ManakaiDOM:all
     @@Get:
       @@@PerlDef:
-        $r = @{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}};
+        $r = @{$self->{<H::mn:node>}->{<H::pc:childNodes>}};
 
   @Method:
     @@Name: appendStringLiteral
@@ -2851,12 +2849,12 @@ IFClsDef:
         The newly created Perl string literal object. 
       @@@PerlDef:
         $r = <ClassM::ManakaiPerlStringLiteral.newObject>;
-        my $node = $self->{<Q::TreeCore:node>};
-        $r->{<Q::infoset:content>} = $stringArg;
+        my $node = $self->{<H::mn:node>};
+        $r->{<H::infoset:content>} = $stringArg;
         $node-><M::ManakaiDOM:ManakaiDOMNodeObject
                  ::ManakaiDOM:Perl.importTree> ($r);
-        push @{$node->{<Q::pc:childNodes>}}, $r;
-        $r->{<Q::pc:parent>} = $node;
+        push @{$node->{<H::pc:childNodes>}}, $r;
+        $r->{<H::pc:parent>} = $node;
         if (defined wantarray) {
           __CODE{ManakaiNode:getNewReference::
             $object => $r, $ref => $r,
@@ -2881,12 +2879,12 @@ IFClsDef:
         The newly created Perl code object. 
       @@@PerlDef:
         $r = <ClassM::ManakaiPerlAtom.newObject>;
-        my $node = $self->{<Q::TreeCore:node>};
-        $r->{<Q::pc:code>} = $codeArg;
+        my $node = $self->{<H::mn:node>};
+        $r->{<H::pc:code>} = $codeArg;
         $node-><M::ManakaiDOM:ManakaiDOMNodeObject
                  ::ManakaiDOM:Perl.importTree> ($r);
-        push @{$node->{<Q::pc:childNodes>}}, $r;
-        $r->{<Q::pc:parent>} = $node;
+        push @{$node->{<H::pc:childNodes>}}, $r;
+        $r->{<H::pc:parent>} = $node;
         if (defined wantarray) {
           __CODE{ManakaiNode:getNewReference::
             $object => $r, $ref => $r,
@@ -2911,12 +2909,12 @@ IFClsDef:
         The newly created Perl code object. 
       @@@PerlDef:
         $r = <ClassM::ManakaiPerlBare.newObject>;
-        my $node = $self->{<Q::TreeCore:node>};
-        $r->{<Q::pc:code>} = $codeArg;
+        my $node = $self->{<H::mn:node>};
+        $r->{<H::pc:code>} = $codeArg;
         $node-><M::ManakaiDOM:ManakaiDOMNodeObject
                  ::ManakaiDOM:Perl.importTree> ($r);
-        push @{$node->{<Q::pc:childNodes>}}, $r;
-        $r->{<Q::pc:parent>} = $node;
+        push @{$node->{<H::pc:childNodes>}}, $r;
+        $r->{<H::pc:parent>} = $node;
         if (defined wantarray) {
           __CODE{ManakaiNode:getNewReference::
             $object => $r, $ref => $r,
@@ -2954,8 +2952,8 @@ IFClsDef:
           if ({
             atom => 1, bare => 1, incontainer => 1, assign => true,
             inunparsed => 1, variable => 1, string => true,
-          }->{$arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:nodeType>}}) {
-            if ($arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:parent>}) {
+          }->{$arg->[1]->{<H::mn:node>}->{<H::pc:nodeType>}}) {
+            if ($arg->[1]->{<H::mn:node>}->{<H::pc:parent>}) {
               __EXCEPTION{IN_USE_NODE_ERR::
                 pc:childNode => {$arg->[1]},
                 MDOMX:param-name => {$arg->[0]},
@@ -2971,13 +2969,13 @@ IFClsDef:
         } # left/right
 
         my $assign = <ClassM::ManakaiPerlAssignment.newObject>;
-        $assign->{<Q::pc:left>} = $leftArg->{<Q::TreeCore:node>};
-        $assign->{<Q::pc:right>} = $rightArg->{<Q::TreeCore:node>};
-        $leftArg->{<Q::TreeCore:node>}->{<Q::pc:parent>} = $assign;
-        $rightArg->{<Q::TreeCore:node>}->{<Q::pc:parent>} = $assign;
-        $self->{<Q::TreeCore:node>}-><M::MNodeObject.importTree> ($assign);
-        $assign->{<Q::pc:parent>} = $self->{<Q::TreeCore:node>};
-        push @{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}}, $assign;
+        $assign->{<H::pc:left>} = $leftArg->{<H::mn:node>};
+        $assign->{<H::pc:right>} = $rightArg->{<H::mn:node>};
+        $leftArg->{<H::mn:node>}->{<H::pc:parent>} = $assign;
+        $rightArg->{<H::mn:node>}->{<H::pc:parent>} = $assign;
+        $self->{<H::mn:node>}-><M::MNodeObject.importTree> ($assign);
+        $assign->{<H::pc:parent>} = $self->{<H::mn:node>};
+        push @{$self->{<H::mn:node>}->{<H::pc:childNodes>}}, $assign;
 ##PerlAnyContainer
 
 IFClsDef:
@@ -3012,10 +3010,10 @@ IFClsDef:
         @@@@@:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          push @{$node->{<Q::TreeCore:subnode>}}, <Q::pc:childNodes>;
-          $node->{<Q::pc:childNodes>} = [];
-          $node->{<Q::pc:nodeType>} = 'statement';
+          push @{$node->{<Q::TreeCore:origin>}}, <H::pc:parent>;
+          push @{$node->{<Q::TreeCore:subnode>}}, <H::pc:childNodes>;
+          $node->{<H::pc:childNodes>} = [];
+          $node->{<H::pc:nodeType>} = 'statement';
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
@@ -3030,30 +3028,30 @@ IFClsDef:
       @@@PerlDef:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          $node->{<Q::pc:nodeType>} = 'statement';
-          push @{$node->{<Q::TreeCore:subnode>}}, <Q::pc:childNodes>;
-          $node->{<Q::pc:childNodes>} = [];
-          for my $cno (@{$nodeObject->{<Q::pc:childNodes>}}) {
+          push @{$node->{<Q::TreeCore:origin>}}, <H::pc:parent>;
+          $node->{<H::pc:nodeType>} = 'statement';
+          push @{$node->{<Q::TreeCore:subnode>}}, <H::pc:childNodes>;
+          $node->{<H::pc:childNodes>} = [];
+          for my $cno (@{$nodeObject->{<H::pc:childNodes>}}) {
             my $pack;
-            my $nt = $cno->{<Q::pc:nodeType>};
+            my $nt = $cno->{<H::pc:nodeType>};
             __CODE{pc:nodeTypeToPackageName::
                      $nodeType => $nt, $packageName => $pack, $object => $cno}__;
                                  ## NOTE: Method name written directly
             my $cno_clone = $pack->_make_clone_object ($cno);
-            push @{$node->{<Q::pc:childNodes>}}, $cno_clone;
-            $cno_clone->{<Q::pc:parent>} = $node;
+            push @{$node->{<H::pc:childNodes>}}, $cno_clone;
+            $cno_clone->{<H::pc:parent>} = $node;
             ## NOTE: Tree ID is not updated yet.
           }
-          $node->{<Q::pc:requireResourceURI>}
-             = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
-          $node->{<Q::pc:useModuleName>}
-             = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
-          $node->{<Q::pc:useCharClassName>}
-             = {map {$_ => {%{$nodeObject->{<Q::pc:useCharClassName>}->{$_}}}}
-                keys %{$nodeObject->{<Q::pc:useCharClassName>} || {}}};
-          $node->{<Q::pc:requireModuleName>}
-             = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
+          $node->{<H::pc:requireResourceURI>}
+             = {%{$nodeObject->{<H::pc:requireResourceURI>} || {}}};
+          $node->{<H::pc:useModuleName>}
+             = {%{$nodeObject->{<H::pc:useModuleName>} || {}}};
+          $node->{<H::pc:useCharClassName>}
+             = {map {$_ => {%{$nodeObject->{<H::pc:useCharClassName>}->{$_}}}}
+                keys %{$nodeObject->{<H::pc:useCharClassName>} || {}}};
+          $node->{<H::pc:requireModuleName>}
+             = {%{$nodeObject->{<H::pc:requireModuleName>} || {}}};
 
   @ToStringMethod:
     @@Return:
@@ -3095,10 +3093,10 @@ IFClsDef:
         @@@@@:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          push @{$node->{<Q::TreeCore:subnode>}}, <Q::pc:childNodes>;
-          $node->{<Q::pc:childNodes>} = [];
-          $node->{<Q::pc:nodeType>} = 'incontainer';
+          push @{$node->{<Q::TreeCore:origin>}}, <H::pc:parent>;
+          push @{$node->{<Q::TreeCore:subnode>}}, <H::pc:childNodes>;
+          $node->{<H::pc:childNodes>} = [];
+          $node->{<H::pc:nodeType>} = 'incontainer';
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
@@ -3113,30 +3111,30 @@ IFClsDef:
       @@@PerlDef:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          push @{$node->{<Q::TreeCore:subnode>}}, <Q::pc:childNodes>;
-          $node->{<Q::pc:nodeType>} = 'incontainer';
-          $node->{<Q::pc:childNodes>} = [];
-          for my $cno (@{$nodeObject->{<Q::pc:childNodes>}}) {
+          push @{$node->{<Q::TreeCore:origin>}}, <H::pc:parent>;
+          push @{$node->{<Q::TreeCore:subnode>}}, <H::pc:childNodes>;
+          $node->{<H::pc:nodeType>} = 'incontainer';
+          $node->{<H::pc:childNodes>} = [];
+          for my $cno (@{$nodeObject->{<H::pc:childNodes>}}) {
             my $pack;
-            my $nt = $cno->{<Q::pc:nodeType>};
+            my $nt = $cno->{<H::pc:nodeType>};
             __CODE{pc:nodeTypeToPackageName::
                      $nodeType => $nt, $packageName => $pack, $object => $cno}__;
                                  ## NOTE: Method name written directly
             my $cno_clone = $pack->_make_clone_object ($cno);
-            push @{$node->{<Q::pc:childNodes>}}, $cno_clone;
-            $cno_clone->{<Q::pc:parent>} = $node;
+            push @{$node->{<H::pc:childNodes>}}, $cno_clone;
+            $cno_clone->{<H::pc:parent>} = $node;
             ## NOTE: Tree ID is not updated yet.
           }
-          $node->{<Q::pc:requireResourceURI>}
-             = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
-          $node->{<Q::pc:useModuleName>}
-             = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
-          $node->{<Q::pc:useCharClassName>}
-             = {map {$_ => {%{$nodeObject->{<Q::pc:useCharClassName>}->{$_}}}}
-                keys %{$nodeObject->{<Q::pc:useCharClassName>} || {}}};
-          $node->{<Q::pc:requireModuleName>}
-             = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
+          $node->{<H::pc:requireResourceURI>}
+             = {%{$nodeObject->{<H::pc:requireResourceURI>} || {}}};
+          $node->{<H::pc:useModuleName>}
+             = {%{$nodeObject->{<H::pc:useModuleName>} || {}}};
+          $node->{<H::pc:useCharClassName>}
+             = {map {$_ => {%{$nodeObject->{<H::pc:useCharClassName>}->{$_}}}}
+                keys %{$nodeObject->{<H::pc:useCharClassName>} || {}}};
+          $node->{<H::pc:requireModuleName>}
+             = {%{$nodeObject->{<H::pc:requireModuleName>} || {}}};
 
   @Method:
     @@Name: appendCodeFragment
@@ -3163,18 +3161,18 @@ IFClsDef:
         if ({
           atom => 1, bare => 1, incontainer => 1, assign => true,
           inunparsed => 1, variable => 1, string => 1,
-        }->{$codeArg->{<Q::TreeCore:node>}->{<Q::pc:nodeType>}}) {
-          if ($codeArg->{<Q::TreeCore:node>}->{<Q::pc:parent>}) {
+        }->{$codeArg->{<H::mn:node>}->{<H::pc:nodeType>}}) {
+          if ($codeArg->{<H::mn:node>}->{<H::pc:parent>}) {
             __EXCEPTION{IN_USE_NODE_ERR::
               pc:childNode => {$codeArg},
             }__;
           }
-          $self->{<Q::TreeCore:node>}-><M::MNodeObject.importTree>
-                                          ($codeArg->{<Q::TreeCore:node>});
-          push @{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}},
-               $codeArg->{<Q::TreeCore:node>};
-          $codeArg->{<Q::TreeCore:node>}->{<Q::pc:parent>}
-                                         = $self->{<Q::TreeCore:node>};
+          $self->{<H::mn:node>}-><M::MNodeObject.importTree>
+                                          ($codeArg->{<H::mn:node>});
+          push @{$self->{<H::mn:node>}->{<H::pc:childNodes>}},
+               $codeArg->{<H::mn:node>};
+          $codeArg->{<H::mn:node>}->{<H::pc:parent>}
+                                         = $self->{<H::mn:node>};
         } else {
           __EXCEPTION{BAD_CHILD_ERR::
             pc:parentNode => {$self},
@@ -3199,12 +3197,12 @@ IFClsDef:
         The newly created Perl code object. 
       @@@PerlDef:
         $r = <ClassM::ManakaiPerlInlineUnparsedCode.newObject>;
-        my $node = $self->{<Q::TreeCore:node>};
-        $r->{<Q::code>} = $codeArg;
+        my $node = $self->{<H::mn:node>};
+        $r->{<H::pc:code>} = $codeArg;
         $node-><M::ManakaiDOM:ManakaiDOMNodeObject
                  ::ManakaiDOM:Perl.importTree> ($r);
-        push @{$node->{<Q::pc:childNodes>}}, $r;
-        $r->{<Q::pc:parent>} = $node;
+        push @{$node->{<H::pc:childNodes>}}, $r;
+        $r->{<H::pc:parent>} = $node;
         if (defined wantarray) {
           __CODE{ManakaiNode:getNewReference::
             $object => $r, $ref => $r,
@@ -3219,10 +3217,10 @@ IFClsDef:
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
-        for my $cno (@{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}}) {
+        for my $cno (@{$self->{<H::mn:node>}->{<H::pc:childNodes>}}) {
           my $cn = <ClassM::ManakaiPerlCodeFragment.getNodeReference> ($cno);
-          if ($cno->{<Q::pc:nodeType>} eq 'incontainer' and
-   \          @{$self->{<Q::TreeCore:node>}->{<Q::pc:childNodes>}} == 1) {
+          if ($cno->{<H::pc:nodeType>} eq 'incontainer' and
+   \          @{$self->{<H::mn:node>}->{<H::pc:childNodes>}} == 1) {
             $r .= '(' . $cn->stringify . ')';
           } else {
             $r .= $cn->stringify;
@@ -3262,10 +3260,10 @@ IFClsDef:
         @@@@@:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          push @{$node->{<Q::TreeCore:subnode>}}, <Q::pc:childNodes>;
-          $node->{<Q::pc:childNodes>} = [];
-          $node->{<Q::pc:nodeType>} = 'block';
+          push @{$node->{<Q::TreeCore:origin>}}, <H::pc:parent>;
+          push @{$node->{<Q::TreeCore:subnode>}}, <H::pc:childNodes>;
+          $node->{<H::pc:childNodes>} = [];
+          $node->{<H::pc:nodeType>} = 'block';
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
@@ -3282,34 +3280,34 @@ IFClsDef:
       @@@PerlDef:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          push @{$node->{<Q::TreeCore:subnode>}}, <Q::pc:childNodes>;
-          $node->{<Q::pc:nodeType>} = 'block';
-          $node->{<Q::pc:childNodes>} = [];
-          for my $cno (@{$nodeObject->{<Q::pc:childNodes>}}) {
+          push @{$node->{<Q::TreeCore:origin>}}, <H::pc:parent>;
+          push @{$node->{<Q::TreeCore:subnode>}}, <H::pc:childNodes>;
+          $node->{<H::pc:nodeType>} = 'block';
+          $node->{<H::pc:childNodes>} = [];
+          for my $cno (@{$nodeObject->{<H::pc:childNodes>}}) {
             my $pack;
-            my $nt = $cno->{<Q::pc:nodeType>};
+            my $nt = $cno->{<H::pc:nodeType>};
             __CODE{pc:nodeTypeToPackageName::
                      $nodeType => $nt, $packageName => $pack, $object => $cno}__;
                                  ## NOTE: Method name written directly
             my $cno_clone = $pack->_make_clone_object ($cno);
-            push @{$node->{<Q::pc:childNodes>}}, $cno_clone;
-            $cno_clone->{<Q::pc:parent>} = $node;
+            push @{$node->{<H::pc:childNodes>}}, $cno_clone;
+            $cno_clone->{<H::pc:parent>} = $node;
             ## NOTE: Tree ID is not updated yet.
           }
-          for my $prop (<Q::pc:label>, <Q::pc:sourceFile>, <Q::pc:sourceLine>,
-                        <Q::pc:currentSourceFile>, <Q::pc:currentSourceLine>) {
+          for my $prop (<H::pc:label>, <H::pc:sourceFile>, <H::pc:sourceLine>,
+                        <H::pc:currentSourceFile>, <H::pc:currentSourceLine>) {
             $node->{$prop} = $nodeObject->{$prop};
           }
-          $node->{<Q::pc:requireResourceURI>}
-             = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
-          $node->{<Q::pc:useModuleName>}
-             = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
-          $node->{<Q::pc:useCharClassName>}
-             = {map {$_ => {%{$nodeObject->{<Q::pc:useCharClassName>}->{$_}}}}
-                keys %{$nodeObject->{<Q::pc:useCharClassName>} || {}}};
-          $node->{<Q::pc:requireModuleName>}
-             = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
+          $node->{<H::pc:requireResourceURI>}
+             = {%{$nodeObject->{<H::pc:requireResourceURI>} || {}}};
+          $node->{<H::pc:useModuleName>}
+             = {%{$nodeObject->{<H::pc:useModuleName>} || {}}};
+          $node->{<H::pc:useCharClassName>}
+             = {map {$_ => {%{$nodeObject->{<H::pc:useCharClassName>}->{$_}}}}
+                keys %{$nodeObject->{<H::pc:useCharClassName>} || {}}};
+          $node->{<H::pc:requireModuleName>}
+             = {%{$nodeObject->{<H::pc:requireModuleName>} || {}}};
 
   @ToStringMethod:
     @@Return:
@@ -3318,20 +3316,20 @@ IFClsDef:
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
-        my $node = $self->{<Q::TreeCore:node>};
-        if (@{$node->{<Q::pc:childNodes>}} == 1 and
-            $node->{<Q::pc:childNodes>}->[0]->{<Q::pc:nodeType>} eq 'block') {
+        my $node = $self->{<H::mn:node>};
+        if (@{$node->{<H::pc:childNodes>}} == 1 and
+            $node->{<H::pc:childNodes>}->[0]->{<H::pc:nodeType>} eq 'block') {
           my $cn;
           __CODE{ManakaiNode:getWeakReference::
-                     $object => {$node->{<Q::pc:childNodes>}->[0]},
+                     $object => {$node->{<H::pc:childNodes>}->[0]},
                      $ref => $cn,
                      $class => {<ClassName::ManakaiPerlBlock>}}__;
           $r = $cn->stringify;
         } else {
-          for my $cno (@{$node->{<Q::pc:childNodes>}}) {
+          for my $cno (@{$node->{<H::pc:childNodes>}}) {
             my $cn = <ClassM::ManakaiPerlCodeFragment.getNodeReference> ($cno);
-            if ($cno->{<Q::pc:nodeType>} eq 'incontainer' and
-   \            @{$node->{<Q::pc:childNodes>}} == 1) {
+            if ($cno->{<H::pc:nodeType>} eq 'incontainer' and
+   \            @{$node->{<H::pc:childNodes>}} == 1) {
               $r .= '(' . $cn->stringify . ')';
             } else {
               $r .= $cn->stringify;
@@ -3340,8 +3338,8 @@ IFClsDef:
           __DEEP{
             my $file = $self-><AG::ManakaiPerlCodeFragment.fileNode>;
             $r = sprintf (qq<\n{\n#line %d "%s [b] (Chunk #%d)"\n>,
-                          $node->{<Q::pc:sourceLine>} || 1,
-                          $node->{<Q::pc:sourceFile>} ||
+                          $node->{<H::pc:sourceLine>} || 1,
+                          $node->{<H::pc:sourceFile>} ||
                             $file-><AG::ManakaiPerlFile.sourceFile>,
                           $file-><M::ManakaiPerlFile.getNextChunkNumber>)
                . $r
@@ -3384,10 +3382,10 @@ IFClsDef:
         @@@@@:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          push @{$node->{<Q::TreeCore:subnode>}}, <Q::pc:childNodes>;
-          $node->{<Q::pc:childNodes>} = [];
-          $node->{<Q::pc:nodeType>} = 'blockcontainer';
+          push @{$node->{<Q::TreeCore:origin>}}, <H::pc:parent>;
+          push @{$node->{<Q::TreeCore:subnode>}}, <H::pc:childNodes>;
+          $node->{<H::pc:childNodes>} = [];
+          $node->{<H::pc:nodeType>} = 'blockcontainer';
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
@@ -3404,34 +3402,34 @@ IFClsDef:
       @@@PerlDef:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          push @{$node->{<Q::TreeCore:subnode>}}, <Q::pc:childNodes>;
-          $node->{<Q::pc:nodeType>} = 'blockcontainer';
-          $node->{<Q::pc:childNodes>} = [];
-          for my $cno (@{$nodeObject->{<Q::pc:childNodes>}}) {
+          push @{$node->{<Q::TreeCore:origin>}}, <H::pc:parent>;
+          push @{$node->{<Q::TreeCore:subnode>}}, <H::pc:childNodes>;
+          $node->{<H::pc:nodeType>} = 'blockcontainer';
+          $node->{<H::pc:childNodes>} = [];
+          for my $cno (@{$nodeObject->{<H::pc:childNodes>}}) {
             my $pack;
-            my $nt = $cno->{<Q::pc:nodeType>};
+            my $nt = $cno->{<H::pc:nodeType>};
             __CODE{pc:nodeTypeToPackageName::
                      $nodeType => $nt, $packageName => $pack, $object => $cno}__;
                                  ## NOTE: Method name written directly
             my $cno_clone = $pack->_make_clone_object ($cno);
-            push @{$node->{<Q::pc:childNodes>}}, $cno_clone;
-            $cno_clone->{<Q::pc:parent>} = $node;
+            push @{$node->{<H::pc:childNodes>}}, $cno_clone;
+            $cno_clone->{<H::pc:parent>} = $node;
             ## NOTE: Tree ID is not updated yet.
           }
-          for my $prop (<Q::pc:sourceFile>, <Q::pc:sourceLine>,
-                        <Q::pc:currentSourceFile>, <Q::pc:currentSourceLine>) {
+          for my $prop (<H::pc:sourceFile>, <H::pc:sourceLine>,
+                        <H::pc:currentSourceFile>, <H::pc:currentSourceLine>) {
             $node->{$prop} = $nodeObject->{$prop};
           }
-          $node->{<Q::pc:requireResourceURI>}
-             = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
-          $node->{<Q::pc:useModuleName>}
-             = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
-          $node->{<Q::pc:useCharClassName>}
-             = {map {$_ => {%{$nodeObject->{<Q::pc:useCharClassName>}->{$_}}}}
-                keys %{$nodeObject->{<Q::pc:useCharClassName>} || {}}};
-          $node->{<Q::pc:requireModuleName>}
-             = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
+          $node->{<H::pc:requireResourceURI>}
+             = {%{$nodeObject->{<H::pc:requireResourceURI>} || {}}};
+          $node->{<H::pc:useModuleName>}
+             = {%{$nodeObject->{<H::pc:useModuleName>} || {}}};
+          $node->{<H::pc:useCharClassName>}
+             = {map {$_ => {%{$nodeObject->{<H::pc:useCharClassName>}->{$_}}}}
+                keys %{$nodeObject->{<H::pc:useCharClassName>} || {}}};
+          $node->{<H::pc:requireModuleName>}
+             = {%{$nodeObject->{<H::pc:requireModuleName>} || {}}};
 
   @ToStringMethod:
     @@Return:
@@ -3440,22 +3438,22 @@ IFClsDef:
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
-        my $node = $self->{<Q::TreeCore:node>};
-        if (@{$node->{<Q::pc:childNodes>}} == 1 and
+        my $node = $self->{<H::mn:node>};
+        if (@{$node->{<H::pc:childNodes>}} == 1 and
             {
               block => true, blockcontainer => true,
-            }->{$node->{<Q::pc:childNodes>}->[0]->{<Q::pc:nodeType>}}) {
+            }->{$node->{<H::pc:childNodes>}->[0]->{<H::pc:nodeType>}}) {
           my $cn;
           __CODE{ManakaiNode:getWeakReference::
-                     $object => {$node->{<Q::pc:childNodes>}->[0]},
+                     $object => {$node->{<H::pc:childNodes>}->[0]},
                      $ref => $cn,
                      $class => {<ClassName::ManakaiPerlBlock>}}__;
           $r = $cn->stringify;
         } else {
-          for my $cno (@{$node->{<Q::pc:childNodes>}}) {
+          for my $cno (@{$node->{<H::pc:childNodes>}}) {
             my $cn = <ClassM::ManakaiPerlCodeFragment.getNodeReference> ($cno);
-            if ($cno->{<Q::pc:nodeType>} eq 'incontainer' and
-   \            @{$node->{<Q::pc:childNodes>}} == 1) {
+            if ($cno->{<H::pc:nodeType>} eq 'incontainer' and
+   \            @{$node->{<H::pc:childNodes>}} == 1) {
               $r .= '(' . $cn->stringify . ')';
             } else {
               $r .= $cn->stringify;
@@ -3464,8 +3462,8 @@ IFClsDef:
           __DEEP{
             my $file = $self-><AG::ManakaiPerlCodeFragment.fileNode>;
             $r = sprintf (qq<\n#line %d "%s [bc] (Chunk #%d)"\n>,
-                          $node->{<Q::pc:sourceLine>} || 1,
-                          $node->{<Q::pc:sourceFile>} ||
+                          $node->{<H::pc:sourceLine>} || 1,
+                          $node->{<H::pc:sourceFile>} ||
                             $file-><AG::ManakaiPerlFile.sourceFile>,
                           $file-><M::ManakaiPerlFile.getNextChunkNumber>)
                . $r
@@ -3506,9 +3504,9 @@ IFClsDef:
         @@@@@:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          push @{$node->{<Q::TreeCore:subnode0>}}, <Q::pc:left>, <Q::pc:right>;
-          $node->{<Q::pc:nodeType>} = 'assign';
+          push @{$node->{<Q::TreeCore:origin>}}, <H::pc:parent>;
+          push @{$node->{<Q::TreeCore:subnode0>}}, <H::pc:left>, <H::pc:right>;
+          $node->{<H::pc:nodeType>} = 'assign';
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
@@ -3523,30 +3521,30 @@ IFClsDef:
       @@@PerlDef:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          push @{$node->{<Q::TreeCore:subnode0>}}, <Q::pc:left>, <Q::pc:right>;
-          $node->{<Q::pc:nodeType>} = 'assign';
-          for my $prop (<Q::pc:left>, <Q::pc:right>) {
+          push @{$node->{<Q::TreeCore:origin>}}, <H::pc:parent>;
+          push @{$node->{<Q::TreeCore:subnode0>}}, <H::pc:left>, <H::pc:right>;
+          $node->{<H::pc:nodeType>} = 'assign';
+          for my $prop (<H::pc:left>, <H::pc:right>) {
             my $pack;
             my $cno = $nodeObject->{$prop};
-            my $nt = $cno->{<Q::pc:nodeType>};
+            my $nt = $cno->{<H::pc:nodeType>};
             __CODE{pc:nodeTypeToPackageName::
                      $nodeType => $nt, $packageName => $pack, $object => $cno}__;
                                  ## NOTE: Method name written directly
             my $cno_clone = $pack->_make_clone_object ($cno);
             $node->{$prop} = $cno_clone;
-            $cno_clone->{<Q::pc:parent>} = $node;
+            $cno_clone->{<H::pc:parent>} = $node;
             ## NOTE: Tree ID is not updated yet.
           }
-          $node->{<Q::pc:requireResourceURI>}
-             = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
-          $node->{<Q::pc:useModuleName>}
-             = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
-          $node->{<Q::pc:useCharClassName>}
-             = {map {$_ => {%{$nodeObject->{<Q::pc:useCharClassName>}->{$_}}}}
-                keys %{$nodeObject->{<Q::pc:useCharClassName>} || {}}};
-          $node->{<Q::pc:requireModuleName>}
-             = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
+          $node->{<H::pc:requireResourceURI>}
+             = {%{$nodeObject->{<H::pc:requireResourceURI>} || {}}};
+          $node->{<H::pc:useModuleName>}
+             = {%{$nodeObject->{<H::pc:useModuleName>} || {}}};
+          $node->{<H::pc:useCharClassName>}
+             = {map {$_ => {%{$nodeObject->{<H::pc:useCharClassName>}->{$_}}}}
+                keys %{$nodeObject->{<H::pc:useCharClassName>} || {}}};
+          $node->{<H::pc:requireModuleName>}
+             = {%{$nodeObject->{<H::pc:requireModuleName>} || {}}};
 
   @ToStringMethod:
     @@Return:
@@ -3555,11 +3553,11 @@ IFClsDef:
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
-        my $node = $self->{<Q::TreeCore:node>};
+        my $node = $self->{<H::mn:node>};
         $r = <ClassM::ManakaiPerlCodeFragment.getNodeReference>
-                ($node->{<Q::pc:left>})->stringify . ' = ' .
+                ($node->{<H::pc:left>})->stringify . ' = ' .
              <ClassM::ManakaiPerlCodeFragment.getNodeReference>
-                ($node->{<Q::pc:right>})->stringify;
+                ($node->{<H::pc:right>})->stringify;
 ##PerlAssignment
 
 IFClsDef:
@@ -3591,10 +3589,10 @@ IFClsDef:
         @@@@@:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          push @{$node->{<Q::TreeCore:subnode0>}}, <Q::pc:condition>,
-                     <Q::pc:true>, <Q::pc:false>;
-          $node->{<Q::pc:nodeType>} = 'if';
+          push @{$node->{<Q::TreeCore:origin>}}, <H::pc:parent>;
+          push @{$node->{<Q::TreeCore:subnode0>}}, <H::pc:condition>,
+                     <H::pc:true>, <H::pc:false>;
+          $node->{<H::pc:nodeType>} = 'if';
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
@@ -3610,32 +3608,32 @@ IFClsDef:
       @@@PerlDef:
           my $node = $r = <ClassM::ManakaiDOM:ManakaiDOMNodeObject
                                         ::ManakaiDOM:Perl.new>;
-          push @{$node->{<Q::TreeCore:origin>}}, <Q::pc:parent>;
-          push @{$node->{<Q::TreeCore:subnode0>}}, <Q::pc:condition>,
-                     <Q::pc:true>, <Q::pc:false>;
-          $node->{<Q::pc:nodeType>} = 'if';
-          for my $prop (<Q::pc:true>, <Q::pc:false>, <Q::pc:condition>) {
+          push @{$node->{<Q::TreeCore:origin>}}, <H::pc:parent>;
+          push @{$node->{<Q::TreeCore:subnode0>}}, <H::pc:condition>,
+                     <H::pc:true>, <H::pc:false>;
+          $node->{<H::pc:nodeType>} = 'if';
+          for my $prop (<H::pc:true>, <H::pc:false>, <H::pc:condition>) {
             my $pack;
             my $cno = $nodeObject->{$prop};
             next unless $cno;
-            my $nt = $cno->{<Q::pc:nodeType>};
+            my $nt = $cno->{<H::pc:nodeType>};
             __CODE{pc:nodeTypeToPackageName::
                      $nodeType => $nt, $packageName => $pack, $object => $cno}__;
                                  ## NOTE: Method name written directly
             my $cno_clone = $pack->_make_clone_object ($cno);
             $node->{$prop} = $cno_clone;
-            $cno_clone->{<Q::pc:parent>} = $node;
+            $cno_clone->{<H::pc:parent>} = $node;
             ## NOTE: Tree ID is not updated yet.
           }
-          $node->{<Q::pc:requireResourceURI>}
-             = {%{$nodeObject->{<Q::pc:requireResourceURI>} || {}}};
-          $node->{<Q::pc:useModuleName>}
-             = {%{$nodeObject->{<Q::pc:useModuleName>} || {}}};
-          $node->{<Q::pc:useCharClassName>}
-             = {map {$_ => {%{$nodeObject->{<Q::pc:useCharClassName>}->{$_}}}}
-                keys %{$nodeObject->{<Q::pc:useCharClassName>} || {}}};
-          $node->{<Q::pc:requireModuleName>}
-             = {%{$nodeObject->{<Q::pc:requireModuleName>} || {}}};
+          $node->{<H::pc:requireResourceURI>}
+             = {%{$nodeObject->{<H::pc:requireResourceURI>} || {}}};
+          $node->{<H::pc:useModuleName>}
+             = {%{$nodeObject->{<H::pc:useModuleName>} || {}}};
+          $node->{<H::pc:useCharClassName>}
+             = {map {$_ => {%{$nodeObject->{<H::pc:useCharClassName>}->{$_}}}}
+                keys %{$nodeObject->{<H::pc:useCharClassName>} || {}}};
+          $node->{<H::pc:requireModuleName>}
+             = {%{$nodeObject->{<H::pc:requireModuleName>} || {}}};
 
   @ToStringMethod:
     @@Return:
@@ -3644,13 +3642,13 @@ IFClsDef:
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
-        my $node = $self->{<Q::TreeCore:node>};
+        my $node = $self->{<H::mn:node>};
         $r = <ClassM::ManakaiPerlCodeFragment.getNodeReference>
-                ($node->{<Q::pc:condition>})->stringify;
+                ($node->{<H::pc:condition>})->stringify;
         my $true_code = <ClassM::ManakaiPerlCodeFragment.getNodeReference>
-                     ($node->{<Q::pc:true>})->stringify if $node->{<Q::pc:true>};
+                     ($node->{<H::pc:true>})->stringify if $node->{<H::pc:true>};
         my $false_code = <ClassM::ManakaiPerlCodeFragment.getNodeReference>
-                   ($node->{<Q::pc:false>})->stringify if $node->{<Q::pc:false>};
+                   ($node->{<H::pc:false>})->stringify if $node->{<H::pc:false>};
         if (defined $true_code) {
           if (defined $false_code) {
             $r = q<if (> . $r . q<) {> . $true_code .
@@ -3742,7 +3740,7 @@ IFClsDef:
         The newly created package scope object. 
       @@@PerlDef:
         $r = <ClassM::ManakaiPerlPackageScope.newObject>;
-        $r->{<Q::pc:packageName>} = $packageName;
+        $r->{<H::pc:packageName>} = $packageName;
         __CODE{ManakaiNode:getNewReference::
                  $object => $r, $ref => $r,
                  $class => {<ClassName::ManakaiPerlPackageScope>}}__;
@@ -4201,8 +4199,8 @@ IFClsDef:
           if ({
             atom => 1, bare => 1, incontainer => 1, assign => true,
             inunparsed => 1, variable => 1, string => true,
-          }->{$arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:nodeType>}}) {
-            if ($arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:parent>}) {
+          }->{$arg->[1]->{<H::mn:node>}->{<H::pc:nodeType>}}) {
+            if ($arg->[1]->{<H::mn:node>}->{<H::pc:parent>}) {
               __EXCEPTION{IN_USE_NODE_ERR::
                 pc:childNode => {$arg->[1]},
                 MDOMX:param-name => {$arg->[0]},
@@ -4222,8 +4220,8 @@ IFClsDef:
           next unless $arg->[1];
           if ({
                 blockcontainer => true,
-              }->{$arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:nodeType>}}) {
-            if ($arg->[1]->{<Q::TreeCore:node>}->{<Q::pc:parent>}) {
+              }->{$arg->[1]->{<H::mn:node>}->{<H::pc:nodeType>}}) {
+            if ($arg->[1]->{<H::mn:node>}->{<H::pc:parent>}) {
               __EXCEPTION{IN_USE_NODE_ERR::
                 pc:childNode => {$arg->[1]},
                 MDOMX:param-name => {$arg->[0]},
@@ -4239,16 +4237,16 @@ IFClsDef:
         } # t/f
 
         my $assign = <ClassM::ManakaiPerlIf.newObject>;
-        $assign->{<Q::pc:condition>} = $conditionArg->{<Q::TreeCore:node>};
-        $assign->{<Q::pc:true>} = $trueArg->{<Q::TreeCore:node>} if $trueArg;
-        $assign->{<Q::pc:false>} = $falseArg->{<Q::TreeCore:node>} if $falseArg;
+        $assign->{<H::pc:condition>} = $conditionArg->{<H::mn:node>};
+        $assign->{<H::pc:true>} = $trueArg->{<H::mn:node>} if $trueArg;
+        $assign->{<H::pc:false>} = $falseArg->{<H::mn:node>} if $falseArg;
         $assign-><M::MNodeObject.importTree> ($_)
            for (grep {$_}
-                  $assign->{<Q::pc:condition>}, $assign->{<Q::pc:true>},
-                  $assign->{<Q::pc:false>});
-        $conditionArg->{<Q::TreeCore:node>}->{<Q::pc:parent>} = $assign;
-        $trueArg->{<Q::TreeCore:node>}->{<Q::pc:parent>} = $assign if $trueArg;
-        $falseArg->{<Q::TreeCore:node>}->{<Q::pc:parent>} = $assign if $falseArg;
+                  $assign->{<H::pc:condition>}, $assign->{<H::pc:true>},
+                  $assign->{<H::pc:false>});
+        $conditionArg->{<H::mn:node>}->{<H::pc:parent>} = $assign;
+        $trueArg->{<H::mn:node>}->{<H::pc:parent>} = $assign if $trueArg;
+        $falseArg->{<H::mn:node>}->{<H::pc:parent>} = $assign if $falseArg;
         if (defined wantarray) {
           __CODE{ManakaiNode:getNewReference::
             $object => $assign, $ref => $r,
@@ -4561,7 +4559,7 @@ ElementTypeBinding:
             lang:Perl
           @@@@@@:
                             ## NOTE: Method name directly written
-            my $ro = $self->_make_clone_object ($self->{<Q::TreeCore:node>});
+            my $ro = $self->_make_clone_object ($self->{<H::mn:node>});
             $ro-><M::ManakaiDOM:ManakaiDOMNodeObject
                    ::ManakaiDOM:Perl.changeTreeID>
                                  (<Code::ManakaiDOM:generateUniqueID

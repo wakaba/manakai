@@ -41,7 +41,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/23 18:24:55 $
+      $Date: 2005/09/24 11:57:20 $
     @@ContentType:
       dis:Date.RCS
   
@@ -122,6 +122,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @mn:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
   @owl:
     http://www.w3.org/2002/07/owl#
   @Perl:
@@ -130,7 +132,6 @@ Namespace:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
-  @TreeCore:\
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
   @UtilError:
@@ -182,6 +183,11 @@ ResourceDef:
     @@@:
       Message::DOM::IF::
     @@For: ManakaiDOM|ManakaiDOM !ManakaiDOM|ManakaiDOM1
+  @ImplNote:
+    @@lang:en
+    @@@:
+      This resource is also defined in <Module::MDOM|DOMMain>
+      module for <Q::ManakaiDOM|ManakaiDOM1> and <Q::ManakaiDOM|ManakaiDOM2>.
 
 ## -- "For" definitions
 
@@ -1765,7 +1771,7 @@ minIFClsDef:
               for my $cls ($class, @{$Message::DOM::ClassISA{$class}}) {
                 if ($Message::DOM::ImplFeature{$class}->{$feature}->{$version}) {
                   __CODE{ManakaiNode|getNewReference||ManakaiDOM|Perl::
-                    $object => {$self->{<Q::TreeCore:node>}},
+                    $object => {$self->{<H::mn:node>}},
                     $ref => $r,
                     $class => $class,
                   }__;
@@ -1795,8 +1801,16 @@ minIFClsDef:
             $ref => $r,
             $class => $self,
           }__;
-          $node->{<Q::ManakaiDOM:implID>} = $node->{<Q::TreeCore:nodeID>};
+          $node->{<H::ManakaiDOM:implID>} = $node->{<H::mn:nodeID>};
 ##MinimumImplementation
+
+PropDef:
+  @QName: ManakaiDOM|implID
+  @enDesc:
+    The identifier of an implementation.
+  @Type: DISPerl|String
+  @ManakaiNode:stemName: implid
+  @rdfs:domain: DOMFeature|MinimumImplementation||ManakaiDOM|ManakaiDOM
 
 ResourceDef:
   @QName: DOMMetaImpl|ManakaiDOMMinimumImplementation

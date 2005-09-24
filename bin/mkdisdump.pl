@@ -1281,6 +1281,7 @@ status_msg q<done>;
   print STDOUT $encoded;
   close STDOUT;
   status_msg qq<done>;
+  $doc->free;
 }
 
 verbose_msg_ qq<Checking undefined resources...>;
@@ -1326,4 +1327,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/09/23 18:24:52 $
+1; # $Date: 2005/09/24 11:57:19 $

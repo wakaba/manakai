@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/23 18:24:55 $
+      $Date: 2005/09/24 11:57:20 $
     @@ContentType:
       dis:Date.RCS
 
@@ -374,8 +374,8 @@ FeatureDef:
       @@@lang:en
     @@QName: XHTMLFeature20
     @@DOMMetaImpl:instanceFeatureOf: XHTMLFeature
-    @@DOMMain:extendFeature: HTMLFeature20
-    @@DOMMain:extendFeature:
+    @@DOMFeature:extends: HTMLFeature20
+    @@DOMFeature:extends:
       DOMXML:XMLFeature20
     @@Description:
       @@@lang:en
@@ -1024,7 +1024,7 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ForIF
 
 ElementTypeBinding:
-  @Name: IFCls1Def
+  @Name: IfCls1Def
   @ElementType: 
     dis:ResourceDef
   @ShadowContent:
@@ -1070,7 +1070,7 @@ ElementTypeBinding:
       @@@For: ManakaiDOM|DOM2
 
 ElementTypeBinding:
-  @Name: IFClsXDef
+  @Name: IfClsXDef
   @ElementType: 
     dis:ResourceDef
   @ShadowContent:
@@ -1175,7 +1175,7 @@ ElementTypeBinding:
         ManakaiDOM:ForClass
 
 ElementTypeBinding:
-  @Name: IFCls12ETDef
+  @Name: IfCls12ETDef
   @ElementType: 
     dis:ResourceDef
   @ShadowContent:
@@ -1245,7 +1245,7 @@ ElementTypeBinding:
       @@@DISCore:stopISARecursive:1
 
 ElementTypeBinding:
-  @Name: IFCls1ETDef
+  @Name: IfCls1ETDef
   @ElementType: 
     dis:ResourceDef
   @ShadowContent:
@@ -1315,7 +1315,7 @@ ElementTypeBinding:
       @@@DISCore:stopISARecursive:1
 
 ElementTypeBinding:
-  @Name: IFCls1ETsDef
+  @Name: IfCls1ETsDef
   @ElementType: 
     dis:ResourceDef
   @ShadowContent:
@@ -1367,7 +1367,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@ForCheck: !=ManakaiDOM|all
+    @@ForCheck: !ManakaiDOM|all
 
     @@rdf:type:
       @@@@:
@@ -1463,6 +1463,13 @@ ElementTypeBinding:
   @Name: Exception
   @ElementType:
     ManakaiDOM:raises
+  @ForCheck: !ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: RaiseException
+  @ElementType:
+    ManakaiDOM:raises
+  @ForCheck: !ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: Return
@@ -1588,7 +1595,7 @@ PropDef:
   @dataType: DISCore|Boolean
   @multipleProperties: DISCore|Single
 
-IFCls1Def:
+IfCls1Def:
   @IFQName: HTMLCollection
   @ClsQName: ManakaiDOMHTMLCollection
 
@@ -1792,7 +1799,7 @@ ResourceDef:
   @AliasFor: DOMMain|unsigned-long||ManakaiDOM|all
 
 IF:
-  @ForCheck: !=ManakaiDOM|all
+  @ForCheck: !ManakaiDOM|all
 
   @Name:
     @@@: ManakaiDOMHTMLDOMImplementationIF
@@ -1973,7 +1980,7 @@ ResourceDef:
     ManakaiNode:getWeakRef::ManakaiDOM:Perl
   @For: ManakaiDOM|ManakaiDOM
 
-IFCls1Def:
+IfCls1Def:
   @IFQName: HTMLDocument
   @ClsQName: ManakaiHTMLDocument
 
@@ -1996,6 +2003,7 @@ IFCls1Def:
     @@ForCheck: ManakaiDOM|DOM2
 
   @ImplNote:
+    @@For: !ManakaiDOM|all
     @@doctype-public:
       -//W3C//DTD HTML 4.0//EN
     @@doctype-public:
@@ -2557,6 +2565,7 @@ IFCls1Def:
             @@@@@@:
               No cookie is available for the current frame or document.
      @@Set:
+        @@@For: ManakaiDOM|DOM2
         @@@Type:  DOMString
         @@@actualType: RFC2965Cookie
         @@@Description:
@@ -2798,7 +2807,7 @@ ImplNote:
     uppercase.  No specification for attribute names - it maybe 
     should be in lowercase for compatibility.
 
-IFCls1Def:
+IfCls1Def:
   @IFQName: HTMLElement
   @ClsQName: ManakaiDOMHTMLElement
 
@@ -2828,6 +2837,7 @@ IFCls1Def:
       ManakaiDOM:DOM2
 
   @ImplNote:
+    @@For: !ManakaiDOM|all
     @@QName:
       xhtml1:sub
   \##TODO: rewrite this
@@ -3037,8 +3047,8 @@ ResourceDef:
     @@QName: id
   @AttrDef:
     @@QName: lang
-    @@DeprecatedBy:
-      DOMHTML:XHTML1.0
+#    @@DeprecatedBy:
+#      DOMHTML:XHTML1.0
   @AttrDef:
     @@QName: class
   @AttrDef:
@@ -3182,7 +3192,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@lang:en
 
-IFCls1ETDEf:
+IfCls1ETDef:
   @ETQName:
     xhtml1:html
   @QName:
@@ -3202,7 +3212,7 @@ IFCls1ETDEf:
      @@Get:
      @@Set:
 
-IFCls1ETDef:
+IfCls1ETDef:
   @ETQName:
     xhtml1:head
   @IFQName:
@@ -4265,7 +4275,7 @@ ElementTypeBinding:
     @@Value:
       @@@is-null:1
 
-IFCls1ETDef:
+IfCls1ETDef:
   @ETQName:
     xhtml1:body
   @IFQName:  HTMLBodyElement
@@ -4449,7 +4459,7 @@ ElementTypeBinding:
     @@ForCheck: ManakaiDOM|ForClass
 
 IF:
-  @For: !=ManakaiDOM|all
+  @For: !ManakaiDOM|all
 
   @IFQName: HTMLUListElementExtended
   @ClsQName: ManakaiDOMHTMLUListElementExtended
@@ -4846,7 +4856,7 @@ IF:
   @ClsISA: ManakaiDOMHTMLHeadingElement
 ##HTMLHeadingElementExtended
 
-IFCls1ETsDef:
+IfCls1ETsDef:
   @rdf:type:
     @@@:
       dis:MultipleResource
@@ -5014,7 +5024,7 @@ ElementTypeBinding:
     @@ForCheck: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
     @@ContentType: DISCore|TFPQNames
 ElementTypeBinding:
-  @Name: docAttrP2
+  @Name: docAttrP2S
   @ElementType:
     dis:DocAttr
   @ShadowContent:
@@ -5059,7 +5069,7 @@ ForDef:
     DOMHTML:ForQ
   @ISA: DOMHTML|ForAnET
 
-IFCls1ETsDef:
+IfCls1ETsDef:
   @rdf:type:
     @@@:
       dis:MultipleResource
@@ -5307,7 +5317,7 @@ ForDef:
     DOMHTML:ForDel
   @ISA: DOMHTML|ForAnET
 
-IFCls1ETsDef:
+IfCls1ETsDef:
   @rdf:type:
     @@@: 
       dis:MultipleResource
@@ -5664,7 +5674,7 @@ ElementTypeBinding:
       @@@@: CDATADOMString
       @@@For: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
 
-IFCls1ETDef:
+IfCls1ETDef:
   @ETQName:
     xhtml1:object
   @IFQName:  HTMLObjectElement
@@ -6586,7 +6596,7 @@ ForDef:
     DOMHTML:ForTfoot
   @ISA: DOMHTML|ForAnET
 
-IFCls1ETsDef:
+IfCls1ETsDef:
   @rdf:type:
     @@@:
       dis:MultipleResource
@@ -7067,7 +7077,7 @@ ForDef:
     DOMHTML:ForTh
   @ISA: DOMHTML|ForAnET
 
-IFCls1ETsDef:
+IfCls1ETsDef:
   @rdf:type:
     @@@:
       dis:MultipleResource

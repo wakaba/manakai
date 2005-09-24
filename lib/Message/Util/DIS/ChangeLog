@@ -1,3 +1,17 @@
+2005-09-24  Wakaba  <wakaba@suika.fam.cx>
+
+	* Perl.dis (plCodeFragment): Takes hash key name
+	from the database for "mn:node" and "DOMCore:read-only",
+	where they were hardcoded.  For GetProp and SetProp
+	dis tree element instructions, hash key name
+	is shorten if shorter version is defined by "DISPerl:propHashKey"
+	property of the corresponding resource in the database.
+	(plAddHashKey): New method to check hash key name dupulication.
+	(dp:plHashKey): New property.
+
+	* Perl.dis, DNLite.dis, DISDoc.dis, DISDump.dis:
+	Use "disPerl:H" instead of "disPerl:Q" for hash keys.
+
 2005-09-23  Wakaba  <wakaba@suika.fam.cx>
 
 	* DISDoc.dis: Modified to support new "dad" implementation.

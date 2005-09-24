@@ -20,6 +20,8 @@ PERL_CHK = $(PERLC) $(PERLC_OPTIONS)
 TOUCH = touch
 
 NS_MANAKAIDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#
+NS_MDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#ManakaiDOM.
+NS_MARKUP     = http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup\#
 NS_DIS        = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS\#
 NS_UTIL       = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 NS_UTIL_ERR   = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/
@@ -108,6 +110,31 @@ $(DIS_CORE_DIS_FILES_DIS:.dis=$(PM_SUFFIX)): %$(PM_SUFFIX): \
 	$(PERL_CHK) DIS/DNLite$(PM_SUFFIX)
 	$(TOUCH) $@
 
+.discore-all$(PM_SUFFIX): discore$(DAC_SUFFIX) $(DAC2PM_PL)
+	$(DAC2PM) $< \
+	  --create-perl-module="$(NS_UTIL)ManakaiNode ManakaiNode$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_UTIL_ERR)DOMException Error/DOMException$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)DOMFeature ../DOM/DOMFeature$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)DOMFeature ../DOM/DOMFeature$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)DOMMain    ../DOM/DOMMain$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)DOMCore    ../DOM/DOMCore$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)DOMXML     ../DOM/DOMXML$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)DOMLS      ../DOM/DOMLS$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)GenericLS  ../DOM/GenericLS$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MARKUP)SuikaWikiConfig21 ../Markup/SuikaWikiConfig21$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_UTIL)DIS        DIS$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_UTIL)PerlCode   PerlCode$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_UTIL_DIS)Value  DIS/Value$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_UTIL_DIS)Perl   DIS/Perl$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_UTIL_DIS)DNLite DIS/DNLite$(PM_SUFFIX)"
+	$(PERL_CHK) ../Markup/SuikaWikiConfig21$(PM_SUFFIX)
+	$(PERL_CHK) DIS$(PM_SUFFIX)
+	$(PERL_CHK) PerlCode$(PM_SUFFIX)
+	$(PERL_CHK) DIS/Value$(PM_SUFFIX)
+	$(PERL_CHK) DIS/Perl$(PM_SUFFIX)
+	$(PERL_CHK) DIS/DNLite$(PM_SUFFIX)
+	$(TOUCH) $@
+
 DIS/DISDoc$(PM_SUFFIX): disdoc$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< \
 	  --module-uri="$(NS_UTIL_DIS)DISDoc" \
@@ -139,4 +166,6 @@ $(MANAKAI_LIB_DIR)Message/Markup/all$(DAC_SUFFIX): dummy
 dummy:
 
 clean:
-	$(RM) $(GENERATED_FILES) .*.tmp .discore$(PM_SUFFIX) .disdoc$(PM_SUFFIX)
+	$(RM) $(GENERATED_FILES)
+	$(RM) .*.tmp .discore$(PM_SUFFIX) .disdoc$(PM_SUFFIX) \
+	  .discore-all$(PM_SUFFIX)
