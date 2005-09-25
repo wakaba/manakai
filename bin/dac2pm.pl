@@ -97,18 +97,58 @@ GetOptions (
     shift;
     push @{$Opt{create_module}}, [split /\s+/, shift, 3];
   },
+  'dis-file-suffix=s' => \$Opt{dis_suffix},
+  'daem-file-suffix=s' => \$Opt{daem_suffix},
   'debug' => \$Opt{debug},
   'enable-assertion!' => \$Opt{outputAssertion},
   'for=s' => \$Opt{For},
   'help' => \$Opt{help},
   'module-uri=s' => \$Opt{module_uri},
   'output-file-path=s' => \$Opt{output_file_name},
-  'verbose!' => $Opt{verbose},
+  'search-path|I=s' => sub {
+    shift;
+    my @value = split /\s+/, shift;
+    while (my ($ns, $path) = splice @value, 0, 2, ()) {
+      unless (defined $path) {
+        die qq[$0: Search-path parameter without path: "$ns"];
+      }
+      push @{$Opt{input_search_path}->{$ns} ||= []}, $path;
+    }
+  },
+  'search-path-catalog-file-name=s' => sub {
+    shift;
+    require File::Spec;
+    my $path = my $path_base = shift;
+    $path_base =~ s#[^/]+$##;
+    $Opt{search_path_base} = $path_base;
+    open my $file, '<', $path or die "$0: $path: $!";
+    while (<$file>) {
+      if (s/^\s*\@//) {     ## Processing instruction
+        my ($target, $data) = split /\s+/;
+        if ($target eq 'base') {
+          $Opt{search_path_base} = File::Spec->rel2abs ($data, $path_base);
+        } else {
+          die "$0: $target: Unknown target";
+        }
+      } elsif (/^\s*\#/) {  ## Comment
+        #
+      } elsif (/\S/) {      ## Catalog entry
+        s/^\s+//;
+        my ($ns, $path) = split /\s+/;
+        push @{$Opt{input_search_path}->{$ns} ||= []},
+             File::Spec->rel2abs ($path, $Opt{search_path_base});
+      }
+    }
+    ## NOTE: File paths with SPACEs are not supported
+    ## NOTE: Future version might use file: URI instead of file path.
+  },
+  'verbose!' => \$Opt{verbose},
 ) or pod2usage (2);
 pod2usage ({-exitval => 0, -verbose => 1}) if $Opt{help};
 $Opt{file_name} = shift;
 pod2usage ({-exitval => 2, -verbose => 0}) unless $Opt{file_name};
 $Message::DOM::DOMFeature::DEBUG = 1 if $Opt{debug};
+$Opt{daem_suffix} = '.daem' unless defined $Opt{daem_suffix};
 
 if ($Opt{module_uri}) {
   push @{$Opt{create_module}},
@@ -152,9 +192,20 @@ my $impl = $Message::DOM::ImplementationRegistry->get_implementation
 my $pc = $impl->get_feature (ExpandedURI q<Util:PerlCode> => '1.0');
 my $di = $impl->get_feature (ExpandedURI q<DIS:Core> => '1.0');
 
-status_msg_ qq<Loading the database "$Opt{file_name}"...>;
-my $db = $di->pl_load_dis_database ($Opt{file_name});
-status_msg q<done>;
+  status_msg_ qq<Loading the database "$Opt{file_name}"...>;
+  my $db = $di->pl_load_dis_database ($Opt{file_name}, sub ($$) {
+    my ($db, $mod) = @_;
+    my $ns = $mod->namespace_uri;
+    my $ln = $mod->local_name;
+    verbose_msg qq<Database module <$ns$ln> is requested>;
+    my $name = dac_search_file_path_stem ($ns, $ln, $Opt{daem_suffix});
+    if (defined $name) {
+      return $name.$Opt{daem_suffix};
+    } else {
+      return $ln.$Opt{daem_suffix};
+    }
+  });
+  status_msg q<done>;
 
 for (@{$Opt{create_module}}) {
   my ($mod_uri, $out_file_path, $mod_for) = @$_;
@@ -196,6 +247,22 @@ status_msg_ "Closing the database...";
 $db->free;
 undef $db;
 status_msg q<done>;
+exit;
+
+sub dac_search_file_path_stem ($$$) {
+  my ($ns, $ln, $suffix) = @_;
+  require Cwd;
+  require File::Spec;
+  for my $dir ('.', @{$Opt{input_search_path}->{$ns}||[]}) {
+    my $name = Cwd::abs_path
+        (File::Spec->canonpath
+         (File::Spec->catfile ($dir, $ln)));
+    if (-f $name.$suffix) {
+      return $name;
+    }
+  }
+  return undef;
+} # dac_search_file_path_stem;
 
 =head1 SEE ALSO
 
@@ -222,4 +289,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/09/23 18:24:52 $
+1; # $Date: 2005/09/25 14:53:02 $

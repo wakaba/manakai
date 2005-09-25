@@ -2,7 +2,9 @@ MANAKAI_ROOT_DIR = ../
 MANAKAI_BIN_DIR = $(MANAKAI_ROOT_DIR)bin/
 MANAKAI_LIB_DIR = $(MANAKAI_ROOT_DIR)lib/
 
-DAC_SUFFIX = .dad
+DIS_SUFFIX = .dis
+DAC_SUFFIX = .dae
+DAEM_SUFFIX = .daem
 
 RM = rm -f
 
@@ -12,11 +14,19 @@ JAVA_JAR = $(JAVA) -jar
 XALAN_PATH = d:/Program_Files/xalan/xalan.jar
 XALAN = $(JAVA) -cp $(XALAN_PATH) org.apache.xalan.xslt.Process
 
-PERL_OPTIONS = -I$(MANAKAI_LIB_DIR)
+PERL_OPTIONS =
 PERL = perl
+PERL_ = $(PERL) $(PERL_OPTIONS) -I$(MANAKAI_LIB_DIR)
+
+DIS_OPTIONS = 
+DIS_OPTIONS_ALL = $(DIS_OPTIONS) \
+  --search-path-catalog-file-name="$(MANAKAI_LIB_DIR)manakai/dis-catalog" \
+  --dis-file-suffix="$(DIS_SUFFIX)" \
+  --daem-file-suffix="$(DAEM_SUFFIX)"
+
 MKDISDUMP_PL = $(MANAKAI_BIN_DIR)mkdisdump.pl
 MKDISDUMP_OPTIONS =
-MKDISDUMP = $(PERL) $(PERL_OPTIONS) $(MKDISDUMP_PL) $(MKDISDUMP_OPTIONS)
+MKDISDUMP = $(PERL_) $(MKDISDUMP_PL) $(MKDISDUMP_OPTIONS) $(DIS_OPTIONS_ALL)
 
 DUMP_STYLESHEET_PATH = template/disdump.ja.xsl
 DDLIST_STYLESHEET_PATH = template/ddlist.ja.xsl
@@ -102,5 +112,5 @@ clean:
 distclean: clean
 	$(RMR) ./Message ./http
 
-## $Date: 2005/09/23 18:24:52 $
+## $Date: 2005/09/25 14:53:02 $
 ## License: Public Domain

@@ -84,19 +84,61 @@ my %Opt = (
 );
 GetOptions (
   'debug' => \$Opt{debug},
+  'dis-file-suffix=s' => \$Opt{dis_suffix},
+  'daem-file-suffix=s' => \$Opt{daem_suffix},
   'for=s' => \$Opt{For},
   'help' => \$Opt{help},
   'module-uri=s' => sub {
     shift;
     $Opt{module_uri}->{+shift} = 1;
   },
+  'search-path|I=s' => sub {
+    shift;
+    my @value = split /\s+/, shift;
+    while (my ($ns, $path) = splice @value, 0, 2, ()) {
+      unless (defined $path) {
+        die qq[$0: Search-path parameter without path: "$ns"];
+      }
+      push @{$Opt{input_search_path}->{$ns} ||= []}, $path;
+    }
+  },
+  'search-path-catalog-file-name=s' => sub {
+    shift;
+    require File::Spec;
+    my $path = my $path_base = shift;
+    $path_base =~ s#[^/]+$##;
+    $Opt{search_path_base} = $path_base;
+    open my $file, '<', $path or die "$0: $path: $!";
+    while (<$file>) {
+      if (s/^\s*\@//) {     ## Processing instruction
+        my ($target, $data) = split /\s+/;
+        if ($target eq 'base') {
+          $Opt{search_path_base} = File::Spec->rel2abs ($data, $path_base);
+        } else {
+          die "$0: $target: Unknown target";
+        }
+      } elsif (/^\s*\#/) {  ## Comment
+        #
+      } elsif (/\S/) {      ## Catalog entry
+        s/^\s+//;
+        my ($ns, $path) = split /\s+/;
+        push @{$Opt{input_search_path}->{$ns} ||= []},
+             File::Spec->rel2abs ($path, $Opt{search_path_base});
+      }
+    }
+    ## NOTE: File paths with SPACEs are not supported
+    ## NOTE: Future version might use file: URI instead of file path.
+  },
   'with-implementators-note' => \$Opt{with_impl_note},
+  'verbose!' => \$Opt{verbose},
 ) or pod2usage (2);
 pod2usage ({-exitval => 0, -verbose => 1}) if $Opt{help};
 $Opt{file_name} = shift;
 pod2usage ({-exitval => 2, -verbose => 0}) unless $Opt{file_name};
 pod2usage (2) unless keys %{$Opt{module_uri}};
 $Message::DOM::DOMFeature::DEBUG = 1 if $Opt{debug};
+$Opt{dis_suffix} = '.dis' unless defined $Opt{dis_suffix};
+$Opt{daem_suffix} = '.daem' unless defined $Opt{daem_suffix};
 
 sub status_msg ($) {
   my $s = shift;
@@ -112,12 +154,12 @@ sub status_msg_ ($) {
 sub verbose_msg ($) {
   my $s = shift;
   $s .= "\n" unless $s =~ /\n$/;
-  print STDERR $s;
+  print STDERR $s if $Opt{verbose};
 }
 
 sub verbose_msg_ ($) {
   my $s = shift;
-  print STDERR $s;
+  print STDERR $s if $Opt{verbose};
 }
 
 {
@@ -156,7 +198,18 @@ my $impl = $Message::DOM::ImplementationRegistry->get_implementation
 ## -- Load input dac database file
   status_msg_ qq<Opening dac file "$Opt{file_name}"...>;
   our $db = $impl->get_feature (ExpandedURI q<DIS:DNLite> => '1.0')
-                 ->pl_load_dis_database ($Opt{file_name});
+                 ->pl_load_dis_database ($Opt{file_name}, sub ($$) {
+    my ($db, $mod) = @_;
+    my $ns = $mod->namespace_uri;
+    my $ln = $mod->local_name;
+    verbose_msg qq<Database module <$ns$ln> is requested>;
+    my $name = dac_search_file_path_stem ($ns, $ln, $Opt{daem_suffix});
+    if (defined $name) {
+      return $name.$Opt{daem_suffix};
+    } else {
+      return $ln.$Opt{daem_suffix};
+    }
+  });
   status_msg qq<done\n>;
 
   our %ReferredResource;
@@ -294,6 +347,7 @@ sub append_interface_documentation (%) {
 
   if ($opt{is_partial}) {
     $section->resource_is_partial (1);
+    ## TODO: classmemeber
     return;
   }
 
@@ -1006,11 +1060,11 @@ sub append_raises (%) {
     my ($a, $b, $c);           ## NOTE: $db
     if ($e->is_type_uri (ExpandedURI q<ManakaiDOM:ExceptionOrWarningSubType>)) {
       $c = $e;
-      $b = $c->get_property_resource (ExpandedURI q<dis2pm:parentResource>);
-      $a = $b->get_property_resource (ExpandedURI q<dis2pm:parentResource>);
+      $b = $c->parent_resource;
+      $a = $b->parent_resource->parent_resource;
     } elsif ($e->is_type_uri (ExpandedURI q<DISLang:Const>)) {
       $b = $e;
-      $a = $b->get_property_resource (ExpandedURI q<dis2pm:parentResource>);
+      $a = $b->parent_resource->parent_resource;
     } else {
       $a = $e;
     }
@@ -1028,7 +1082,6 @@ sub append_raises (%) {
 my $doc = $impl->create_disdump_document;
 
 my $body = $doc->document_element;
-
 
 ## -- Outputs requested modules
 
@@ -1060,9 +1113,14 @@ for my $mod_uri (keys %{$Opt{module_uri}}) {
 status_msg q<Other modules...>;
 progress_reset;
 
+my %debug_res_list;
 while (my @ruri = grep {$ReferredResource{$_} > 0} keys %ReferredResource) {
   U: while (defined (my $uri = shift @ruri)) {
     next U if $ReferredResource{$uri} < 0;  ## Already done
+    if ($Opt{debug}) {
+      warn "Resource <$uri>: $debug_res_list{$uri} times\n"
+        if ++$debug_res_list{$uri} > 10;
+    }
     progress_inc;
     my $res = $db->get_resource ($uri);
     unless ($res->is_defined) {
@@ -1100,7 +1158,7 @@ while (my @ruri = grep {$ReferredResource{$_} > 0} keys %ReferredResource) {
         (result_parent => $body->create_module ($mod->uri),
          source_resource => $res,
          is_partial => 1);
-    } elsif ($res->is_type_uri (ExpandedURI q<DISLang:AnyDataType>)) {
+    } elsif ($res->is_type_uri (ExpandedURI q<DISCore:AnyDataType>)) {
       my $mod = $res->owner_module;
       unless ($mod->is_defined) {
         $ReferredResource{$uri} = -1;
@@ -1115,8 +1173,7 @@ while (my @ruri = grep {$ReferredResource{$_} > 0} keys %ReferredResource) {
          source_resource => $res);
     } elsif ($res->is_type_uri (ExpandedURI q<DISLang:AnyMethod>) or
              $res->is_type_uri (ExpandedURI q<DISLang:ConstGroup>)) {
-      my $cls = $res->get_property_resource
-        (ExpandedURI q<dis2pm:parentResource>);
+      my $cls = $res->parent_resource;
       if (not ($ReferredResource{$cls->uri} < 0) and
           ($cls->is_type_uri (ExpandedURI q<DISLang:Class>) or
            $cls->is_type_uri (ExpandedURI q<DISLang:Interface>))) {
@@ -1144,17 +1201,17 @@ while (my @ruri = grep {$ReferredResource{$_} > 0} keys %ReferredResource) {
         $ReferredResource{$res->uri} = -1;
       }
     } elsif ($res->is_type_uri (ExpandedURI q<DISLang:MethodParameter>)) {
-      my $m = $res->get_property_resource
-        (ExpandedURI q<dis2pm:parentResource>);
+      my $m = $res->parent_resource;
       if (not ($ReferredResource{$m->uri} < 0) and
           $m->is_type_uri (ExpandedURI q<DISLang:Method>)) {
         unshift @ruri, $m->uri;
         $ReferredResource{$res->uri} = -1;
         next U;
-      }      
+      } else {
+        $ReferredResource{$res->uri} = -1;
+      }
     } elsif ($res->is_type_uri (ExpandedURI q<DISLang:Const>)) {
-      my $m = $res->get_property_resource
-        (ExpandedURI q<dis2pm:parentResource>);
+      my $m = $res->parent_resource;
       if (not ($ReferredResource{$m->uri} < 0) and
           $m->is_type_uri (ExpandedURI q<DISLang:ConstGroup>)) {
         unshift @ruri, $m->uri;
@@ -1166,8 +1223,7 @@ while (my @ruri = grep {$ReferredResource{$_} > 0} keys %ReferredResource) {
       }
     } elsif ($res->is_type_uri
                (ExpandedURI q<ManakaiDOM:ExceptionOrWarningSubType>)) {
-      my $m = $res->get_property_resource
-        (ExpandedURI q<dis2pm:parentResource>);
+      my $m = $res->parent_resource;
       if (not ($ReferredResource{$m->uri} < 0) and
           $m->is_type_uri (ExpandedURI q<DISLang:Const>)) {
         unshift @ruri, $m->uri;
@@ -1274,11 +1330,7 @@ status_msg q<done>;
   my $lsimpl = $impl->get_feature (ExpandedURI q<DOMLS:LS> => '3.0');
   my $serializer = $lsimpl->create_mls_serializer
                         ({ExpandedURI q<DOMLS:SerializeDocumentInstance> => ''});
-  my $serialized = $serializer->write_to_string ($doc);
-  verbose_msg_ qq< serialized, >;
-  my $encoded = Encode::encode ('utf8', $serialized);
-  verbose_msg_ qq<bytenized, and >;
-  print STDOUT $encoded;
+  print STDOUT Encode::encode ('utf8', $serializer->write_to_string ($doc));
   close STDOUT;
   status_msg qq<done>;
   $doc->free;
@@ -1293,16 +1345,32 @@ $db->free;
 undef $db;
 verbose_msg qq<done>;
 
-
 {
   use integer;
   my $time = time - $start_time;
   status_msg sprintf qq<%d'%02d''>, $time / 60, $time % 60;
 }
 
+exit;
+
 END {
   $db->free if $db;
 }
+
+sub dac_search_file_path_stem ($$$) {
+  my ($ns, $ln, $suffix) = @_;
+  require Cwd;
+  require File::Spec;
+  for my $dir ('.', @{$Opt{input_search_path}->{$ns}||[]}) {
+    my $name = Cwd::abs_path
+        (File::Spec->canonpath
+         (File::Spec->catfile ($dir, $ln)));
+    if (-f $name.$suffix) {
+      return $name;
+    }
+  }
+  return undef;
+} # dac_search_file_path_stem;
 
 =head1 SEE ALSO
 
@@ -1327,4 +1395,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/09/24 11:57:19 $
+1; # $Date: 2005/09/25 14:53:02 $

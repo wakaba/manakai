@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/09/24 11:57:23 $
+      $Date: 2005/09/25 14:53:03 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2589,6 +2589,11 @@ IFClsDef:
         @@@@lang:en
         @@@@@:
           The resource definition. 
+      @@@RaiseException:
+        @@@@@: DIS|RESOURCE_NOT_DEFINED_ERR
+        @@@@enDesc:
+          The resource should be included in database submodule but
+          it is not.
       @@@PerlDef:
         $resourceURI = <Q::DOMMain:any> unless defined $resourceURI;
         my $resURI;
@@ -2598,7 +2603,22 @@ IFClsDef:
         } else {
           $resURI = $resourceURI;
         }
+
         if (defined $self->{resDef}->{$resURI}) {
+          $r = $self->{resDef}->{$resURI};
+        } elsif (defined $self->{<H::DIS|resourceModuleMap>}->{$resURI}) {
+          __DEEP{
+            $self-><M::dp|ManakaiDISDatabasePerl.plLoadDISDatabaseModule>
+              ($self-><M::DIS|DISDatabase.getModule>
+                 (${$self->{<H::DIS|resourceModuleMap>}->{$resURI}}));
+          }__;
+          unless (defined $self->{resDef}->{$resURI}) {
+            __EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
+              DIS:uri => {$resURI},
+              DIS:moduleURI => {${$self->{<H::DIS|resourceModuleMap>}
+                                       ->{$resURI}}},
+            }__;
+          }
           $r = $self->{resDef}->{$resURI};
         } else {
           $r = $self->{resDef}->{$resURI}
@@ -3029,20 +3049,36 @@ IFClsDef:
           __CODE{tfpurisToURI:: $turi => {$$node_id}, $furi => $forArg,
                                 $forp => $forpArg, $uri => $node_uri}__;
 
+          my $al_node = $el-><M::DISElement.disGetAttribute>
+                                      (<Q::dis:AliasFor>, for_arg => $forArg,
+                                       forp_arg => $forpArg,
+                                       database_arg => $self);
+          my $al_canon_uri;
+          if ($al_node) {
+            $al_canon_uri = $al_node-><M::DISElement.tfqnamesValueURI>
+                                   ($$node_id, $forArg,
+                                    for_arg => $self->{for},
+                                    forp_arg => $self->{forp},
+                                    database_arg => $self);
+          }
+
           ## User defined resource identifiers
           my $qn_node = $el-><M::ManakaiDISElement.disGetAttribute>
                                       (<Q::dis:QName>, for_arg => $forArg,
                                        forp_arg => $forpArg, 
                                        database_arg => $self);
           my $res;
+          ALD: {
           if ($qn_node) {
             my $qn_uri = $qn_node-><AG::ManakaiDISElement.qnameValueURI>;
             $res = $self-><M::ManakaiDISDatabase.getResource>
                                 ($qn_uri, for_arg => $forArg);
             if ($res-><AG::DISAnyResource.isDefined>) {
+              last ALD if defined $al_canon_uri and
+                          $res->{aliasURI}->{$al_canon_uri};
               __UNDEEP{
                 __EXCEPTION{RESOURCE_ALREADY_DEFINED_ERR::
-                  DIS:uri => {$res->{uri}},
+                  DIS:uri => {$qn_uri},
                   DIS:sourceNode => {$qn_node},
                   DIS:anotherSourceNode => {$res->{src}},
                 }__;
@@ -3101,18 +3137,10 @@ IFClsDef:
           $res->{<H::DIS|definingModule>} = \ ($mod->{uri});
           $mod-><M::ManakaiDISPropertyAccessor.addPropertyResourceList>
                                             (<Q::DIS:resource>, $res);
-          if ($parentResource) {
-            __CODE{dv|createURI::
-              $result => {$res->{<Q::dis2pm:parentResource>}},
-              $uri => {$parentResource-><AG::DISAnyResource.uri>},
-            }__;
-          }
-          if ($dynParent) {
-            __CODE{dv|createURI::
-              $result => {$res->{<Q::DIS|dynamicParentResource>}},
-              $uri => {$dynParent-><AG::DISAnyResource.uri>},
-            }__;
-          }
+          $res-><AS::DIS|ManakaiDISResourceDefinition.parentResource>
+            ($parentResource) if $parentResource;
+          $res-><AS::DIS|ManakaiDISResourceDefinition.dynamicParentResource>
+            ($dynParent) if $dynParent;
           unless ($res->{uri} eq $node_uri) {
             my $nu_res = $self-><M::DISDatabase.getResource> ($node_uri);
             $res-><M::DISResource.mergeAsAlias> ($nu_res);
@@ -3122,28 +3150,20 @@ IFClsDef:
           $res-><AS::DISAnyResource.sourceNodeIDRef> ($node_id);
           
           ## -- Alias
-          my $al_node = $el-><M::DISElement.disGetAttribute>
-                                      (<Q::dis:AliasFor>, for_arg => $forArg,
-                                       forp_arg => $forpArg,
-                                       database_arg => $self);
           if ($al_node) {
-            my $canon_uri = $al_node-><M::DISElement.tfqnamesValueURI>
-                                   ($$node_id, $forArg,
-                                    for_arg => $self->{for},
-                                    forp_arg => $self->{forp},
-                                    database_arg => $self);
-            my $canon_res = $self-><M::DISDatabase.getResource> ($canon_uri);
+            my $canon_res = $self-><M::DISDatabase.getResource> ($al_canon_uri);
             $canon_res-><AS::DISAnyResource.isReferred> ($al_node);
             $canon_res-><M::DISResource.mergeAsAlias> ($res, node => $al_node);
             $res = $canon_res;
           }
+          } # ALD
 
           ## -- Registers as child
-          $parentResource-><M::DISResourceProp.addPropertyResourceList>
-                                      (<Q::DIS:childResource>, $res)
+          $parentResource-><M::DIS|ManakaiDISResourceDefinition
+                                  .addChildResource> ($res)
              if $parentResource;
-          $dynParent-><M::DISResourceProp.addPropertyResourceList>
-                                      (<Q::DIS:dynamicChildResource>, $res)
+          $dynParent-><M::DIS|ManakaiDISResourceDefinition
+                                  .addDynamicChildResource> ($res)
              if $dynParent;
 
           my $is_multires = false;
@@ -3362,9 +3382,7 @@ IFClsDef:
             $r->[2] = $self-><M::ManakaiDISDatabase.getResource>
                          ($contextNode-><M::NSResolverDIS.tfqnamesToURI>
                                           ($q3, null, $forArg, node => $node));
-            $r->[1] = $r->[2]-><M::ManakaiDISPropertyAccessor
-                                       .getPropertyResource>
-                                          (<Q::dis2pm:parentResource>);
+            $r->[1] = $r->[2]-><AG::DIS|DISResource.parentResource>;
           } elsif (defined $q2) {
             if ($q2 =~ /:/) {
               $r->[1] = $self-><M::ManakaiDISDatabase.getResource>
@@ -3383,9 +3401,7 @@ IFClsDef:
                                           ($q1, null, $forArg, node => $node));
             if ($r->[2]-><M::ManakaiDISResourceDefinition
                       .isTypeURI> (<Q::ManakaiDOM:ExceptionOrWarningSubType>)) {
-              $r->[1] = $r->[2]-><M::ManakaiDISPropertyAccessor
-                                       .getPropertyResource>
-                                          (<Q::dis2pm:parentResource>);
+              $r->[1] = $r->[2]-><AG::DIS|DISResource.parentResource>;
             } else {
               $r->[1] = $r->[2]; CORE::delete $r->[2];
             }
@@ -3420,12 +3436,8 @@ IFClsDef:
                                                ($node or $contextNode);
 
           unless ($r->[0]) {
-            my $cg = $r->[1]-><M::ManakaiDISPropertyAccessor
-                                       .getPropertyResource>
-                                          (<Q::dis2pm:parentResource>);
-            $r->[0] = $cg-><M::ManakaiDISPropertyAccessor
-                                       .getPropertyResource>
-                                          (<Q::dis2pm:parentResource>) if $cg;
+            my $cg = $r->[1]-><AG::DIS|DISResource.parentResource>;
+            $r->[0] = $cg-><AG::DIS|DISResource.parentResource> if $cg;
           }
           if (not $r->[0] or
               not $r->[0]-><M::ManakaiDISResourceDefinition
@@ -3510,6 +3522,13 @@ IFClsDef:
 ##DISDatabase
 
 PropDef:
+  @QName: DIS|resourceModuleMap
+  @enDesc:
+    Resource-module mapping table.
+  @DIS:key: rm
+  @Type: DISPerl|HASH
+
+PropDef:
   @QName: sourceNodeID
   @enDesc:
     The URI reference of the source node identifier. 
@@ -3523,25 +3542,49 @@ PropDef:
   @rdfs:domain: ManakaiDISModuleDefinition
 
 PropDef:
-  @QName:
-    dis2pm:parentResource
+  @QName: DIS|parentResource
   @enDesc:
     Static parent resource.  No parent for root resources.
+  @DIS:key: puri
 
 PropDef:
-  @QName: dynamicParentResource
+  @QName: DIS|dynamicParentResource
   @enDesc:
     Dynamic parent resource.   No parent for root resources. 
+  @DIS:key: dpuri
 
 PropDef:
-  @QName: childResource
+  @QName: DIS|childResource
   @enDesc:
     Static child resources.
+  @DIS:key: curis
 
 PropDef:
-  @QName: dynamicChildResource
+  @QName: DIS|dynamicChildResource
   @enDesc:
     Dynamic child resources.
+  @DIS:key: dcuris
+
+PropDef:
+  @QName: DIS|key
+  @enDesc:
+    Property name in resource objects.
+  @rdfs:subPropertyOf: DISPerl|propHashKey
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|Single
+
+ResourceDef:
+  @QName: DIS|DISResourceList
+  @enDesc:
+    A reference to array whose items are resource 
+    (<IF::DIS|DISAnyResource||DIS|ForEmpty>) objects.
+  @rdfs:subClassOf: DISPerl|ARRAY
+  @For: =ManakaiDOM|all
+  @rdf:type: DISLang|DataType
+  @For: DIS|ForEmpty !=DIS|ForEmpty
+  @AliasFor:
+    @@@@: ||ManakaiDOM|all
+    @@@For: DIS|ForEmpty
 
 ElementTypeBinding:
   @Name: ForDefDupException
@@ -3708,6 +3751,18 @@ IFClsDef:
         }
       @@@PerlDef:
         $r = $self->{uri};
+
+  @Attr:
+    @@Name: uriRef
+    @@Type: DISPerl|SCALAR||ManakaiDOM|all
+    @@enDesc:
+      A reference to the URI of the resource.
+
+      {NOTE:: Applications <kwd:MUST-NOT> modify the referenced
+              value directly.
+      }
+    @@Get:
+      @@@PerlDef: $r = \ ($self->{uri});
   
   @Attr:
     @@Name: uris
@@ -3892,6 +3947,34 @@ IFClsDef:
                   -><M::DISDatabase.getModule>
                            (${$self->{<H::DIS|definingModule>}})
            if defined $self->{<H::DIS|definingModule>};
+
+  @Attr:
+    @@Name: ownerModuleURI
+    @@enDesc:
+      A URI of the owner module of the resource.
+    @@Type: DIS|AnyURI
+    @@nullCase:
+      @@@enDesc:
+        The resource does not belong to any module since the
+        resource definition is not read yet.
+    @@Get:
+      @@@PerlDef: 
+        if (defined $self->{<H::DIS|definingModule>}) {
+          $r = ${$self->{<H::DIS|definingModule>}};
+        }
+
+  @Attr:
+    @@Name: ownerModuleURIRef
+    @@enDesc:
+      A reference to a URI of the owner module of the resource.
+    @@Type: DISPerl|SCALAR||ManakaiDOM|Perl
+    @@nullCase:
+      @@@enDesc:
+        The resource does not belong to any module since the
+        resource definition is not read yet.
+    @@Get:
+      @@@PerlDef: 
+        $r = $self->{<H::DIS|definingModule>};
 
   @Attr:
     @@Name: isReferred
@@ -4934,8 +5017,7 @@ IFClsDef:
             $r = $self->{<Q::dis:Type>}-><M::dv|DVURIValue.getResource>
                      ($self-><AG::DISAnyResource.database>);
           } else {
-            my $pr = $self-><M::DISResourceProp.getPropertyResource>
-                                  (<Q::DIS|dynamicParentResource>);
+            my $pr = $self-><AG::DIS|DISResource.dynamicParentResource>;
             $r = $pr-><AG::DISResource.disDataTypeResource> if $pr;
           }
         }__;
@@ -4962,8 +5044,7 @@ IFClsDef:
           if (UNIVERSAL::isa ($self->{<Q::dis:Type>}, <IFName::dv|DVURIValue>)) {
             $r = $self->{<Q::dis:Type>};
           } else {
-            my $pr = $self-><M::DISResourceProp.getPropertyResource>
-                                  (<Q::DIS|dynamicParentResource>);
+            my $pr = $self-><AG::DIS|DISResource.dynamicParentResource>;
             $r = $pr-><AG::DISResource.disDataTypeValue> if $pr;
           }
         }__;
@@ -4997,8 +5078,7 @@ IFClsDef:
             $r = $self->{<Q::dis:Type>}-><M::dv|DVURIValue.getResource>
                     ($self-><AG::DISAnyResource.database>);
           } else {
-            my $pr = $self-><M::DISResourceProp.getPropertyResource>
-                                  (<Q::DIS|dynamicParentResource>);
+            my $pr = $self-><AG::DIS|DISResource.dynamicParentResource>;
             $r = $pr-><AG::DISResource.disActualDataTypeResource> if $pr;
           }
         }__;
@@ -5030,8 +5110,7 @@ IFClsDef:
                                    <IFName::dv|DVURIValue>)) {
             $r = $self->{<Q::dis:Type>};
           } else {
-            my $pr = $self-><M::DISResourceProp.getPropertyResource>
-                                  (<Q::DIS|dynamicParentResource>);
+            my $pr = $self-><AG::DIS|DISResource.dynamicParentResource>;
             $r = $pr-><AG::DISResource.disActualDataTypeValue> if $pr;
           }
         }__;
@@ -5048,16 +5127,22 @@ IFClsDef:
       @@@ContentType:
         lang:Perl
     @@enDesc:
-      Which is greater (i.e. the spaceship operator). 
-      A resource is less than another if it is loaded by
-      <M::ManakaiDISDatabase.loadResource> before another is loaded. 
-      Order for non-loaded resource definitions are not defined. 
-      \
-      {NOTE:: In the current implementation, non-loaded resources 
-              are less than any loaded resource and the order in 
-              non-loaded resources is unknown. 
-      \
-      }
+      Compares two resources.  If the first character of the 
+      node in the source tree by which the resource is defined
+      occures before the other resource's first character, then
+      the former resource is <DFN::less> than the later resource.
+      If two resources are the same resource, they are <DFN::equal>.
+      Otherwise, the former resource is <DFN::greater> than
+      the later resource.
+
+      There are two exceptions.  If two resources belongs to
+      two different modules, i.e. their <A::DIS|DISAnyResource.ownerModule>s
+      are different, the order is not defined.  Also, if
+      one of resources is not yet defined, i.e. one's 
+      <A::DIS|DISAnyResource.isDefined> takes <DOM::false> value,
+      then the order is not defined.  Even in these cases, two
+      calls for the method with the same parameter would return
+      the same result while the resources are left unchanged.
     @@Param:
       @@@Name: anotherResource
       @@@Type: DISResource
@@ -5070,8 +5155,76 @@ IFClsDef:
                             <ClassName::ManakaiDISResourceDefinition>)) {
           $r = $self->{seq} <=> $anotherResource->{seq};
         } else {
-          $r = overload::Overloaded ($self) <=> $anotherResource;
+          $r = $self->{uri} <=> $anotherResource;
         }
+
+  @Method:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@ManakaiDOM:isForInternal:1
+    @@Name: addChildResource
+    @@enDesc:
+      Registers a resource as a static child of the resource.
+    @@Param:
+      @@@Name: disResource
+      @@@Type: DIS|DISResource
+      @@@enDesc:
+        The resurce to add.
+    @@Return:
+      @@@PerlDef:
+        __DEEP{
+          push @{$self->{<H::DIS|childResource>}||=[]},
+               $disResource-><AG::DIS|DISAnyResource.uriRef>;
+        }__;
+
+  @Method:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@ManakaiDOM:isForInternal:1
+    @@Name: addDynamicChildResource
+    @@enDesc:
+      Registers a resource as a dynamic child of the resource.
+    @@Param:
+      @@@Name: disResource
+      @@@Type: DIS|DISResource
+      @@@enDesc:
+        The resurce to add.
+    @@Return:
+      @@@PerlDef:
+        __DEEP{
+          push @{$self->{<H::DIS|dynamicChildResource>}||=[]},
+               $disResource-><AG::DIS|DISAnyResource.uriRef>;
+        }__;
+
+  @Method:
+    @@Name: getChildResourceList
+    @@enDesc:
+      Returns the list of static child resources of the resource.
+    @@Return:
+      @@@Type: DIS|ResourceList
+      @@@enDesc:
+        The current snapshot of children.
+      @@@PerlDef:
+        __DEEP{
+          my $db = $self-><AG::DIS|DISAnyResource.database>;
+          $r = [map {
+                  $db-><M::DIS|DISDatabase.getResource> ($$_)
+                } @{$self->{<H::DIS|childResource>}}];
+        }__;
+
+  @Method:
+    @@Name: getDynamicChildResourceList
+    @@enDesc:
+      Returns the list of dynamic child resources of the resource.
+    @@Return:
+      @@@Type: DIS|ResourceList
+      @@@enDesc:
+        The current snapshot of children.
+      @@@PerlDef:
+        __DEEP{
+          my $db = $self-><AG::DIS|DISAnyResource.database>;
+          $r = [map {
+                  $db-><M::DIS|DISDatabase.getResource> ($$_)
+                } @{$self->{<H::DIS|dynamicChildResource>}}];
+        }__;
 
   @Method:
     @@Name: getChildResourceByType
@@ -5085,8 +5238,9 @@ IFClsDef:
     @@ImplNote:
       @@@lang:en
       @@@@:
-        ISSUE: Some inheritance tracing required for 
+        {ISSUE:: Some inheritance tracing required for 
         e.g. <Q::DISLang:InputProcessor> and <Q::DOMMain:ReflectGet>?
+        }
     @@Return:
       @@@Type: DISResource
       @@@clsActualType: ManakaiDISResourceDefinition
@@ -5098,16 +5252,37 @@ IFClsDef:
           There is no resource whose type is <P::typeURI>.
       @@@PerlDef:
         __DEEP{
-          for my $cr_uri (map {
-                            $_-><AG::dv|DVURIValue.uri>
-                          } @{$self->{<Q::DIS:childResource>}}) {
-            my $cr = $self->{db}-><M::ManakaiDISDatabase.getResource>
-                                             ($cr_uri);
-            if ($cr-><M::ManakaiDISResourceDefinition.isTypeURI> ($typeURI)) {
+          my $db = $self-><AG::DIS|DISAnyResource.database>;
+          C: for my $cr_uri (@{$self->{<H::DIS:childResource>}||[]}) {
+            my $cr = $db-><M::DIS|DISDatabase.getResource> ($$cr_uri);
+            if ($cr-><M::DIS|DISResource.isTypeURI> ($typeURI)) {
               $r = $cr;
-              last;
+              last C;
             }
           }
+        }__;
+
+  @Method:
+    @@Name: getChildResourceListByType
+    @@enDesc:
+      Returns a list of child resources of a specific type.
+    @@Param:
+      @@@Name: typeURI
+      @@@Type: DIS|AnyURI
+      @@@enDesc:
+        A URI of the type.
+    @@Return:
+      @@@Type: DIS|ResourceList
+      @@@enDesc:
+        The current snapshot of the child resources of type <P::typeURI>.
+      @@@PerlDef:
+        __DEEP{
+          my $db = $self-><AG::DIS|DISAnyResource.database>;
+          $r = [grep {
+                  $_-><M::DIS|DISResource.isTypeURI> ($typeURI)
+                } map {
+                  $db-><M::DIS|DISDatabase.getResource> ($$_)
+                } @{$self->{<H::DIS|childResource>}||[]}];
         }__;
 
   @Method:
@@ -5137,16 +5312,14 @@ IFClsDef:
           whose type is <P::typeURI>.
       @@@PerlDef:
         __DEEP{
-          for my $cr_uri (map {
-                            $_-><AG::dv|DVURIValue.uri>
-                          } @{$self->{<Q::DIS:childResource>}}) {
-            my $cr = $self->{db}-><M::ManakaiDISDatabase.getResource>
-                                             ($cr_uri);
-            my $ln = $cr-><AG::DISAnyResource.localName>;
+          my $db = $self-><AG::DIS|DISAnyResource.database>;
+          C: for my $cr_uri (@{$self->{<H::DIS:childResource>}||[]}) {
+            my $cr = $db-><M::DIS|DISDatabase.getResource> ($$cr_uri);
+            my $ln = $cr-><AG::DIS|DISAnyResource.localName>;
             if (defined $ln and $ln eq $localName and
-                $cr-><M::ManakaiDISResourceDefinition.isTypeURI> ($typeURI)) {
+                $cr-><M::DIS|DISResource.isTypeURI> ($typeURI)) {
               $r = $cr;
-              last;
+              last C;
             }
           }
         }__;
@@ -5172,29 +5345,81 @@ IFClsDef:
       @@@PerlDef:
         __DEEP{
           my @constGroup;
-          for my $cr_uri (map {
-                            $_-><AG::dv|DVURIValue.uri>
-                          } @{$self->{<Q::DIS:childResource>}}) {
-            my $cr = $self->{db}-><M::ManakaiDISDatabase.getResource>
-                                             ($cr_uri);
-            my $ln = $cr-><AG::DISAnyResource.localName>;
+          my $db = $self-><AG::DIS|DISAnyResource.database>;
+          C: for my $cr_uri (@{$self->{<H::DIS:childResource>}||[]}) {
+            my $cr = $db-><M::DIS|DISDatabase.getResource> ($$cr_uri);
+            my $ln = $cr-><AG::DIS|DISAnyResource.localName>;
             if ($ln and $ln eq $localName and
-                $cr-><M::ManakaiDISResourceDefinition.isTypeURI>
-                         (<Q::ManakaiDOM:Const>)) {
+                $cr-><M::DIS|DISResource.isTypeURI> (<Q::DISLang:Const>)) {
               $r = $cr;
-              last;
-            } elsif ($cr-><M::ManakaiDISResourceDefinition.isTypeURI>
-                                (<Q::ManakaiDOM:ConstGroup>)) {
+              last C;
+            } elsif ($cr-><M::DIS|DISResource.isTypeURI>
+                                (<Q::DISLang:ConstGroup>)) {
               push @constGroup, $cr;
             }
           }
           unless ($r) {
-            for my $cg (@constGroup) {
-              $r = $cg-><M::ManakaiDISResourceDefinition
-                                .getChildResourceByNameAndType>
-                             ($localName, <Q::ManakaiDOM:Const>);
-              last if $r;
+            D: for my $cg (@constGroup) {
+              $r = $cg-><M::DIS|DISResource.getChildResourceByNameAndType>
+                             ($localName, <Q::DISLang:Const>);
+              last D if $r;
             }
+          }
+        }__;
+
+  @Attr:
+    @@Name: parentResource
+    @@enDesc:
+      The static parent resource of the resource.
+    @@Type: DIS|DISResource
+    @@nullCase:
+      @@@enDesc: No parent resource.
+    @@Get:
+      @@@PerlDef:
+        __DEEP{
+          if ($self->{<H::DIS|parentResource>}) {
+            $r = $self-><AG::DIS|DISAnyResource.database>
+                      -><M::DIS|DISDatabase.getResource>
+                            (${$self->{<H::DIS|parentResource>}});
+          }
+        }__;
+    @@Set:
+      @@@ForCheck: ManakaiDOM|ForClass
+      @@@PerlDef:
+        __DEEP{
+          if ($given) {
+            $self->{<H::DIS|parentResource>}
+              = $given-><AG::DIS|DISAnyResource.uriRef>;
+          } else {
+            CORE::delete $self->{<H::DIS|parentResource>};
+          }
+        }__;
+
+  @Attr:
+    @@Name: dynamicParentResource
+    @@enDesc:
+      The dynamic parent resource of the resource.
+    @@Type: DIS|DISResource
+    @@nullCase:
+      @@@enDesc: No parent resource.
+    @@Get:
+      @@@PerlDef:
+        __DEEP{
+          if ($self->{<H::DIS|dynamicParentResource>}) {
+            $r = $self-><AG::DIS|DISAnyResource.database>
+                      -><M::DIS|DISDatabase.getResource>
+                            (${$self->{<H::DIS|dynamicParentResource>}});
+          }
+        }__;
+    @@Set:
+      @@@ForCheck: ManakaiDOM|ForClass
+      @@@PerlDef:
+        __DEEP{
+          if ($given) {
+            $self->{<H::DIS|dynamicParentResource>}
+              = $given-><AG::DIS|DISAnyResource.uriRef>;
+          } else {
+            CORE::delete $self->{<H::DIS|dynamicParentResource>};
           }
         }__;
 
@@ -5223,8 +5448,7 @@ IFClsDef:
                              (<Q::ManakaiDOM:Class>)) {
                 $r = $res-><AG::DISAnyResource.sourceNodeID>;
               } else {
-                $res = $res-><M::ManakaiDISPropertyAccessor
-                              .getPropertyResource> (<Q::dis2pm:parentResource>);
+                $res = $res-><AG::DIS|DISResource.parentResource>;
                 redo RES if $res;
               }
             }
@@ -5280,9 +5504,7 @@ IFClsDef:
             }
           }
         } else {
-          my $parent = $self-><M::ManakaiDISPropertyAccessor
-                                 .getPropertyResource>
-                                   (<Q::dis2pm:parentResource>);
+          my $parent = $self-><AG::DIS|DISResource.parentResource>;
           $r = $parent-><M::ManakaiDISResourceDefinition.isFeatureProvided>
                                    ($featureResourceURI)
             if $parent;
@@ -5346,8 +5568,7 @@ IFClsDef:
                             (<Q::DOMFeature:name>)}];
           unless (@$r) {
             ## TODO: instance feature
-            my $pr = $self-><M::DISResourceProp
-                              .getPropertyResource> (<Q::dis2pm:parentResource>);
+            my $pr = $self-><AG::DIS|DISResource.parentResource>;
             if ($pr) {
               if ($pr-><M::DISResource.isTypeURI> (<Q::DOMFeature:Feature>) and
                   not $pr-><AG::DISAnyResource.isAnonymous>) {
@@ -5551,10 +5772,9 @@ IFClsDef:
             $r = $self->{db}-><M::ManakaiDISDatabase.getResource>
                                 ($self->{<H::DIS:mvOwnerElementURI>})
               if defined $self->{<H::DIS:mvOwnerElementURI>};
-          } elsif (defined $self->{<Q::dis2pm:parentResource>}) {
-            $r = $self->{db}-><M::ManakaiDISDatabase.getResource>
-                                ($self->{<Q::dis2pm:parentResource>});
-            undef $r unless $r-><M::ManakaiDISResourceDefinition
+          } else {
+            $r = $self-><AG::DIS|DISResource.parentResource>;
+            undef $r unless $r-><M::DIS|DISResource
                                    .isTypeURI> (<Q::s:AnyOwnerElement>);
             $self->{<H::DIS:mvOwnerElementURI>} = $r->{uri} if $r;
           }
@@ -5651,7 +5871,7 @@ IFClsDef:
           The property has no value.
       @@@PerlDef:
         if ($self->{$propName}) {
-          $r = $self->{$propName};
+          $r = $self->{$propName}->[0];
         } else {
           my $pr = $self-><AG::DISAnyResource.database>
                         -><M::DISDatabase.getResource> ($propName);
@@ -6469,15 +6689,22 @@ ResourceDef:
           already defined. 
         @@@@XSourceNodeParam:
         @@@@XParam:
-          @@@@@QName: anotherSourceNode
+          @@@@@@: anotherSourceNode
           @@@@@enDesc:
             The node that defines the <QUOTE::for> URI reference before. 
         @@@@XParam:
-          @@@@@Name: uri
+          @@@@@@: uri
           @@@@@enDesc:
             The URI reference of the resource attempted to define. 
+        @@@@XParam:
+          @@@@@@: moduleURI
+          @@@@@enDesc:
+            A URI of the module in which the <Q::DIS|uri> resource is
+            defined.
         @@@@enMufDef:
-          Resource <%p (name => {<Q::DIS:uri>});> is already defined
+          %p (name => {<Q::DIS:moduleURI>}, prefix => {Module <},
+          suffix => {>: })
+          ;Resource <%p (name => {<Q::DIS:uri>});> is already defined
       @@@XSubTypeDef:
         @@@@QName: ELEMENT_NOT_ALLOWED_ERR
         @@@@enDesc:
@@ -6543,6 +6770,10 @@ ResourceDef:
             The URI reference of the resource from whose child resources
             a resource is tried to find.
         @@@@XParam:
+          @@@@@QName: moduleURI
+          @@@@@enDesc:
+            The URI of the module in which the resourece should be included.
+        @@@@XParam:
           @@@@@QName: localName
           @@@@@enDesc:
             The local name of the undefined resource.
@@ -6555,10 +6786,12 @@ ResourceDef:
           @@@@@enDesc:
             Expected resource type.
         @@@@enMufDef:
-          %p (name => {<Q::DIS:sourceNodePath>}, suffix => {: });
-          %p (name => {<Q::DIS:sourceCode>}, prefix => {"}, suffix => {": });
-          %p (name => {<Q::DIS:parentURI>}, prefix => {(In <}, suffix => {>) });
-          Resource%p (name => {<Q::DIS:uri>}, prefix => { <},
+           %p (name => {<Q::DIS:moduleURI>}, prefix => {Module <},
+               suffix => {>: })
+          ;%p (name => {<Q::DIS:sourceNodePath>}, suffix => {: })
+          ;%p (name => {<Q::DIS:sourceCode>}, prefix => {"}, suffix => {": })
+          ;%p (name => {<Q::DIS:parentURI>}, prefix => {(In <}, suffix => {>) })
+          ;Resource%p (name => {<Q::DIS:uri>}, prefix => { <},
           suffix => {>});%p (name => {<Q::DIS:localName>},
           prefix => { "}, suffix => {"}); is not defined or wrong type%p
           (name => {<Q::DIS:expectedType>}, prefix => { (<},
@@ -6963,7 +7196,7 @@ ResourceDef:
           <%p (name => {<Q::DIS:uri>});>:
           Hash key %p (name => {<Q::DIS:hashKeyName>}); in
           <%p (mame => {<Q::DIS:hashKeyScope>});> is already
-          defined for %p (name => {<Q::DIS:anotherURI>});
+          defined for <%p (name => {<Q::DIS:anotherURI>});>
   @ImplNote:
     @@lang:en
     @@@:
@@ -7204,7 +7437,7 @@ ElementTypeBinding:
     @@rdf:type:
       rdf:Property
     @@For:
-      @@@For: =ManakaiDOM|all
+      =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: MethodRedef
@@ -7412,6 +7645,11 @@ ElementTypeBinding:
       DOMMain:XWParameter
     @@For:
       =ManakaiDOM:all
+
+XParamDef:
+  @QName: DIS|moduleURI
+  @enDesc:
+    A URI of the module in which the resource is defined.
 
 ElementTypeBinding:
   @Name: enMufDef

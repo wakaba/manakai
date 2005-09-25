@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/24 11:57:20 $
+      $Date: 2005/09/25 14:53:03 $
     @@ContentType:
       dis:Date.RCS
 
@@ -1463,13 +1463,15 @@ ElementTypeBinding:
   @Name: Exception
   @ElementType:
     ManakaiDOM:raises
-  @ForCheck: !ManakaiDOM|all
+  @ShadowContent:
+    @@ForCheck: !ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: RaiseException
   @ElementType:
     ManakaiDOM:raises
-  @ForCheck: !ManakaiDOM|all
+  @ShadowContent:
+    @@ForCheck: !ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: Return
@@ -4914,7 +4916,7 @@ IfCls1ETsDef:
   @s:elementType:
     @@@: ||ForHTML40SE||ForH1
     @@ForCheck: ManakaiDOM|DOM1 !ManakaiDOM|DOM2
-    @@ContentType: DISCore|TFPQName
+    @@ContentType: DISCore|TFPQNames
     @@DISCore:stopISARecursive:1
   @s:elementType:
     @@@: ||ForHTML401||ForH1

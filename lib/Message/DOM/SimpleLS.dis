@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/24 11:57:22 $
+      $Date: 2005/09/25 14:53:03 $
     @@ContentType: dis|Date.RCS
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
@@ -598,7 +598,7 @@ IFClsXDef:
                 push @csrc, '>' . $etag, [];
               }
               unshift @src, @csrc;
-            } elsif ($src->{<H::DOMCore:nodeType>} eq <H::DOMCore:Text>) {
+            } elsif ($src->{<H::DOMCore:nodeType>} eq <H::DOMCore:TextNode>) {
               $r .= $xescape->($src->{<H::infoset:content>});
             } elsif ($src->{<H::DOMCore:nodeType>} eq <H::DOMXML:CDATASectionNode>) {
               my $text = $src->{<H::infoset:content>};

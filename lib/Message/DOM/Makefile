@@ -2,7 +2,9 @@ MANAKAI_ROOT_DIR = ../../../
 MANAKAI_BIN_DIR = $(MANAKAI_ROOT_DIR)bin/
 MANAKAI_LIB_DIR = $(MANAKAI_ROOT_DIR)lib/
 
-DAC_SUFFIX = .dad
+DIS_SUFFIX = .dis
+DAC_SUFFIX = .dae
+DAEM_SUFFIX = .daem
 PM_SUFFIX = .pm
 
 CD = cd
@@ -21,16 +23,22 @@ TOUCH = touch
 NS_MDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#ManakaiDOM.
 NS_MANAKAIDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#
 
-DAC_PL = $(MANAKAI_BIN_DIR)dac.pl
-DAC = $(PERL_) $(DAC_PL) \
+DIS_OPTIONS = 
+DIS_OPTIONS_ALL = $(DIS_OPTIONS) \
       --search-path-catalog-file-name="$(MANAKAI_LIB_DIR)manakai/dis-catalog" \
+      --dis-file-suffix="$(DIS_SUFFIX)" \
+      --daem-file-suffix="$(DAEM_SUFFIX)"
+
+DAC_OPTIONS =
+DAC_PL = $(MANAKAI_BIN_DIR)dac.pl
+DAC = $(PERL_) $(DAC_PL) $(DAC_OPTIONS) $(DIS_OPTIONS_ALL) \
       --db-base-directory-path="$(MANAKAI_ROOT_DIR)" \
       --output-file-name=
 
 DAC2PM_OPTIONS3 = --enable-assert
 DAC2PM_OPTIONS = $(DAC2PM_OPTIONS3)
 DAC2PM_PL = $(MANAKAI_BIN_DIR)dac2pm.pl
-DAC2PM = $(PERL_) $(DAC2PM_PL) $(DAC2PM_OPTIONS)
+DAC2PM = $(PERL_) $(DAC2PM_PL) $(DAC2PM_OPTIONS) $(DIS_OPTIONS_ALL)
 
 UTIL_CORE_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Util/core$(DAC_SUFFIX)
 
@@ -120,5 +128,5 @@ clean:
 	$(RM) .*.tmp *~ .*~ *.BAK .*.BAK
 	$(RM) .core$(PM_SUFFIX) .ls$(PM_SUFFIX) .html$(PM_SUFFIX)
 
-## $Date: 2005/09/23 18:24:57 $
+## $Date: 2005/09/25 14:53:03 $
 ## License: Public Domain.

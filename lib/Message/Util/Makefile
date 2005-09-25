@@ -3,7 +3,9 @@ MANAKAI_BIN_DIR = $(MANAKAI_ROOT_DIR)bin/
 MANAKAI_LIB_DIR = $(MANAKAI_ROOT_DIR)lib/
 MANAKAI_LIB_MANAKAI_DIR = $(MANAKAI_LIB_DIR)manakai/
 
-DAC_SUFFIX = .dad
+DIS_SUFFIX = .dis
+DAC_SUFFIX = .dae
+DAEM_SUFFIX = .daem
 PM_SUFFIX = .pm
 
 CD = cd
@@ -27,16 +29,22 @@ NS_UTIL       = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 NS_UTIL_ERR   = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/
 NS_UTIL_DIS   = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS\#
 
-DAC_PL = $(MANAKAI_BIN_DIR)dac.pl
-DAC = $(PERL_) $(DAC_PL) \
+DIS_OPTIONS = 
+DIS_OPTIONS_ALL = $(DIS_OPTIONS) \
       --search-path-catalog-file-name="$(MANAKAI_LIB_DIR)manakai/dis-catalog" \
+      --dis-file-suffix="$(DIS_SUFFIX)" \
+      --daem-file-suffix="$(DAEM_SUFFIX)"
+
+DAC_OPTIONS =
+DAC_PL = $(MANAKAI_BIN_DIR)dac.pl
+DAC = $(PERL_) $(DAC_PL) $(DAC_OPTIONS) $(DIS_OPTIONS_ALL) \
       --db-base-directory-path="$(MANAKAI_ROOT_DIR)" \
       --output-file-name=
 
 DAC2PM_OPTIONS3 = --enable-assert
 DAC2PM_OPTIONS = $(DAC2PM_OPTIONS3)
 DAC2PM_PL = $(MANAKAI_BIN_DIR)dac2pm.pl
-DAC2PM = $(PERL_) $(DAC2PM_PL) $(DAC2PM_OPTIONS)
+DAC2PM = $(PERL_) $(DAC2PM_PL) $(DAC2PM_OPTIONS) $(DIS_OPTIONS_ALL)
 
 CORE_DAC_FILE = $(MANAKAI_LIB_DIR)manakai/all$(DAC_SUFFIX)
 SWCFG_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Markup/all$(DAC_SUFFIX)
@@ -57,7 +65,7 @@ GENERATED_FILES = \
   disdoc$(DAC_SUFFIX)   DIS/DISDoc$(PM_SUFFIX) DIS/DISDump$(PM_SUFFIX)
 GENERATED_DAC_FILES = core$(DAC_SUFFIX) discore$(DAC_SUFFIX) disdoc$(DAC_SUFFIX)
 
-all: .discore$(PM_SUFFIX) .disdoc$(PM_SUFFIX) $(GENERATED_DAC_FILES)
+all: .discore$(PM_SUFFIX) .disdoc$(PM_SUFFIX) $(GENERATED_FILES)
 
 core$(DAC_SUFFIX): $(CORE_DAC_FILE) $(UTIL_CORE_DIS_FILES) $(DAC_PL)
 	$(DAC)$@.1.tmp --input-db-file-name="$<" ManakaiNode.dis

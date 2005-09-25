@@ -7,34 +7,14 @@ use Message::Util::QName::Filter {
   swcfg21 => q<http://suika.fam.cx/~wakaba/archive/2005/swcfg21#>,
 };
 
-sub status_msg ($) {
-  my $s = shift;
-  $s .= "\n" unless $s =~ /\n$/;
-  print STDERR $s;
-}
-
-sub status_msg_ ($) {
-  my $s = shift;
-  print STDERR $s;
-}
-
-sub verbose_msg ($) {
-  my $s = shift;
-  $s .= "\n" unless $s =~ /\n$/;
-  print STDERR $s;
-}
-
-sub verbose_msg_ ($) {
-  my $s = shift;
-  print STDERR $s;
-}
-
 use Getopt::Long;
 use Pod::Usage;
 my %Opt = ();
 GetOptions (
   'db-base-directory-path=s' => \$Opt{db_base_path},
   'debug' => \$Opt{debug},
+  'dis-file-suffix=s' => \$Opt{dis_suffix},
+  'daem-file-suffix=s' => \$Opt{daem_suffix},
   'for=s' => \$Opt{For},
   'help' => \$Opt{help},
   'input-db-file-name=s' => \$Opt{input_file_name},
@@ -77,7 +57,7 @@ GetOptions (
     ## NOTE: Future version might use file: URI instead of file path.
   },
   'undef-check!' => \$Opt{no_undef_check},
-  'verbose!' => $Opt{verbose},
+  'verbose!' => \$Opt{verbose},
 ) or pod2usage (2);
 pod2usage ({-exitval => 0, -verbose => 1}) if $Opt{help};
 $Opt{file_name} = shift;
@@ -85,7 +65,31 @@ pod2usage ({-exitval => 2, -verbose => 0}) unless $Opt{file_name};
 pod2usage ({-exitval => 2, -verbose => 0}) unless $Opt{output_file_name};
 $Opt{no_undef_check} = defined $Opt{no_undef_check}
                          ? $Opt{no_undef_check} ? 0 : 1 : 0;
+$Opt{dis_suffix} = '.dis' unless defined $Opt{dis_suffix};
+$Opt{daem_suffix} = '.daem' unless defined $Opt{daem_suffix};
 $Message::DOM::DOMFeature::DEBUG = 1 if $Opt{debug};
+
+sub status_msg ($) {
+  my $s = shift;
+  $s .= "\n" unless $s =~ /\n$/;
+  print STDERR $s;
+}
+
+sub status_msg_ ($) {
+  my $s = shift;
+  print STDERR $s;
+}
+
+sub verbose_msg ($) {
+  my $s = shift;
+  $s .= "\n" unless $s =~ /\n$/;
+  print STDERR $s if $Opt{verbose};
+}
+
+sub verbose_msg_ ($) {
+  my $s = shift;
+  print STDERR $s if $Opt{verbose};
+}
 
 my $start_time;
 BEGIN { $start_time = time }
@@ -102,15 +106,29 @@ our $DNi = $impl->get_feature (ExpandedURI q<DIS:DNLite> => '1.0');
 my $db;
 
 if (defined $Opt{input_file_name}) {
-  $db = $impl->pl_load_dis_database ($Opt{input_file_name});
+  status_msg_ qq<Loading database "$Opt{input_file_name}"...>;
+  $db = $impl->pl_load_dis_database ($Opt{input_file_name}, sub ($$) {
+    my ($db, $mod) = @_;
+    my $ns = $mod->namespace_uri;
+    my $ln = $mod->local_name;
+    verbose_msg qq<Database module <$ns$ln> is requested>;
+    my $name = dac_search_file_path_stem ($ns, $ln, $Opt{daem_suffix});
+    if (defined $name) {
+      return $name.$Opt{daem_suffix};
+    } else {
+      return undef;
+    }
+  });
+  status_msg qq<done>;
 } else {  ## New database
   $db = $impl->create_dis_database;
 }
 
 require Cwd;
 my $file_name = Cwd::abs_path ($Opt{file_name});
-my $base_path = Cwd::abs_path ($Opt{db_base_path}) if length $Opt{db_base_path};
-my $doc = dac_load_module_file ($db, $parser, $file_name, $base_path);
+$Opt{db_base_path} = Cwd::abs_path ($Opt{db_base_path})
+  if length $Opt{db_base_path};
+my $doc = dac_load_module_file ($db, $parser, $file_name, $Opt{db_base_path});
 
 my $for = $Opt{For};
 $for = $doc->module_element->default_for_uri unless length $for;
@@ -129,15 +147,10 @@ $db->load_module ($doc, sub ($$$$$$) {
   return $doc if $doc;
   
   ## -- Finds the source file
-  require File::Spec;
-  for my $dir ('.', @{$Opt{input_search_path}->{$ns}||[]}) {
-    my $name = Cwd::abs_path
-                  (File::Spec->canonpath
-                       (File::Spec->catfile ($dir, $ln.'.dis')));
-    if (-f $name) {
-      my $doc = dac_load_module_file ($db, $parser, $name, $base_path);
-      return $doc;
-    }
+  my $name = dac_search_file_path_stem ($ns, $ln, $Opt{dis_suffix});
+  if (defined $name) {
+    return dac_load_module_file
+             ($db, $parser, $name.$Opt{dis_suffix}, $Opt{db_base_path});
   }
 
   ## -- Not found
@@ -173,7 +186,27 @@ status_msg '';
 status_msg "done";
 
 status_msg_ qq<Writing file "$Opt{output_file_name}"...>;
-$db->pl_store ($Opt{output_file_name});
+$db->pl_store ($Opt{output_file_name}, sub ($$) {
+  my ($db, $mod) = @_;
+  my $ns = $mod->namespace_uri;
+  my $ln = $mod->local_name;
+  my $name = dac_search_file_path_stem ($ns, $ln, $Opt{daem_suffix});
+  if (defined $name) {
+    $name .= $Opt{daem_suffix};
+  } elsif (defined ($name = dac_search_file_path_stem
+                              ($ns, $ln, $Opt{dis_suffix}))) {
+    $name .= $Opt{daem_suffix};
+  } else {
+    $name = Cwd::abs_path
+              (File::Spec->canonpath
+                 (File::Spec->catfile
+                    (defined $Opt{input_search_path}->{$ns}->[0]
+                       ? $Opt{input_search_path}->{$ns}->[0] : '.',
+                     $ln.$Opt{daem_suffix})));
+  }
+  verbose_msg qq<Database module <$ns$ln> is written to "$name">;
+  return $name;
+});
 status_msg "done";
 
 unless ($Opt{no_undef_check}) {
@@ -209,7 +242,7 @@ sub dac_load_module_file ($$$;$) {
   my $file_uri = URI::file->new ($file_name)->rel ($base_uri);
   my $dis = $db->get_source_file ($file_uri);
   unless ($dis) {
-    status_msg_ qq<Opening file <$file_uri>...>;
+    status_msg_ qq<Opening source file <$file_uri>...>;
     open my $file, '<', $file_name or die "$0: $file_name: $!";
     $dis = $parser->parse ({character_stream => $file});
     $dis->flag (ExpandedURI q<swcfg21:fileName> => $file_uri);
@@ -240,6 +273,20 @@ sub dac_load_module_file ($$$;$) {
   }
   $dis;
 }
+
+sub dac_search_file_path_stem ($$$) {
+  my ($ns, $ln, $suffix) = @_;
+  require File::Spec;
+  for my $dir ('.', @{$Opt{input_search_path}->{$ns}||[]}) {
+    my $name = Cwd::abs_path
+        (File::Spec->canonpath
+         (File::Spec->catfile ($dir, $ln)));
+    if (-f $name.$suffix) {
+      return $name;
+    }
+  }
+  return undef;
+} # dac_search_file_path_stem;
 
 __END__
 

@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/09/24 11:57:27 $
+      $Date: 2005/09/25 14:53:05 $
     @@ContentType:
       dis:Date.RCS
   
@@ -664,9 +664,9 @@ IFClassDef:
           parameter is not specified. 
       @@@PerlDef:
       __DEEP{
-        my $lang = $self->{o}-><M::dv|DVValue.getProperty> (<Q::dis:lang>);
+        my $lang = $self->{o}->[0]-><M::dv|DVValue.getProperty> (<Q::dis:lang>);
         if ($lang) {
-          my $r = $lang->isa (<IFName::dv|DVURIValue>)
+          $r = $lang->isa (<IFName::dv|DVURIValue>)
                   ? $lang-><AG::dv|DVURIValue.uri>
                   : $lang-><AG::dv|DVValue.stringValue>;
           unless (defined $r) {
@@ -702,9 +702,9 @@ IFClassDef:
           parameter is not specified. 
       @@@PerlDef:
       __DEEP{
-        my $lang = $self->{o}-><M::dv|DVValue.getProperty> (<Q::dis:script>);
+        my $lang = $self->{o}->[0]-><M::dv|DVValue.getProperty> (<Q::dis:script>);
         if ($lang) {
-          my $r = $lang->isa (<IFName::dv|DVURIValue>)
+          $r = $lang->isa (<IFName::dv|DVURIValue>)
                   ? $lang-><AG::dv|DVURIValue.uri>
                   : $lang-><AG::dv|DVValue.stringValue>;
           unless (defined $r) {
@@ -922,7 +922,7 @@ IFClassDef:
         An opaque identifier value.
       @@@PerlDef:
         __DEEP{
-          my $ddid = $self->{o}-><M::dv|DVValue.getProperty> (<Q::dd:>, 'id');
+          my $ddid = $self->{o}->[0]-><M::dv|DVValue.getProperty> (<Q::dd:>, 'id');
           $r = $ddid ? $ddid-><AG::dv|DVValue.stringValue> : '';
         }__;
 

@@ -23,7 +23,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/24 11:57:30 $
+      $Date: 2005/09/25 14:53:06 $
     @@ContentType:
       dis:Date.RCS
   
@@ -336,6 +336,14 @@ ElementTypeBinding:
       DISLang:MethodReturn
 
 ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+
+ElementTypeBinding:
   @Name: nullCase
   @ElementType:
     dis:ResourceDef
@@ -459,6 +467,16 @@ ResourceDef:
     @@enDesc:
       This method is called when a <Perl::report> 
       is called on this object.
+    @@Param:
+      @@@Name: err
+      @@@Type: MUError
+      @@@enDesc:
+        The <CODE::report>ed error object.
+
+        {NOTE:: Application <kwd:MAY> choose to <M::Error.throw> this
+                error or <kwd:MAY> choose not to throw and to
+                process the error by itself.
+        }
     @@Return:
 ##MUErrorTarget
 
