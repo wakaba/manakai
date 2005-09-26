@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/24 11:57:22 $
+      $Date: 2005/09/26 14:37:35 $
     @@ContentType:
       dis:Date.RCS
 
@@ -633,7 +633,7 @@ ResourceDef:
         @@@@@:
           The new object for the <IF::CDATASection> node.
       @@@PerlDef:
-        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject>;
+        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject> ($self);
         push @{$r->{<Q::TreeCore:origin>}}, <H::infoset:parent>;
         $r->{<H::DOMCore:nodeType>} = <H::DOMXML:CDATASectionNode>;
         $r->{<H::infoset:content>} = '';
@@ -645,6 +645,9 @@ ResourceDef:
          \
          Other available properties: <Q::infoset:parent>, 
          <Q::infoset:content>.
+
+  @mn:irefnode0: DOMCore|ownerDocument
+  @mn:origin0: infoset|parent
 
   @Method:
      @@Name:  getFeature
@@ -1048,7 +1051,7 @@ NodeTypeDef:
         @@@@@:
           The new object for the <IF::DocumentType> node.
       @@@PerlDef:
-        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject>;
+        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject> ($self);
         push @{$r->{<Q::TreeCore:origin>}}, <H::infoset:parent>;
         $r->{<H::DOMCore:nodeType>} = <H::infoset:DocumentTypeDeclaration>;
      @@ImplNote:
@@ -1062,6 +1065,9 @@ NodeTypeDef:
          Other available properties: <Q::infoset:parent>, 
          <Q::infoset:publicIdentifier>, <Q::infoset:systemIdentifier>, 
          <Q::infoset:prefix>, <Q::DOMCore:read-only>, <Q::DOMCore:ownerDocument>.
+
+  @mn:irefnode0: DOMCore|ownerDocument
+  @mn:origin0: infoset|parent
 
   @Method:
      @@Name:  getFeature
@@ -1772,6 +1778,9 @@ NodeTypeDef:
          <Q::infoset:characterEncodingScheme>,
          <Q::infoset:baseURI>.
 
+  @mn:irefnode0: DOMCore|ownerDocument
+  @mn:subnode1: infoset|children
+
   @Method:
      @@Name:  getFeature
      @@enDesc:
@@ -1964,7 +1973,7 @@ NodeTypeDef:
         @@@@@:
           The new object for the <IF::EntityReference> node.
       @@@PerlDef:
-        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject>;
+        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject> ($self);
         push @{$r->{<Q::TreeCore:subnode>}}, <H::infoset:children>;
         $r->{<H::infoset:children>} = [];
         push @{$r->{<Q::TreeCore:origin>}}, <H::infoset:parent>;
@@ -1983,6 +1992,10 @@ NodeTypeDef:
          Other available properties (for external entity): 
          <Q::infoset:baseURI>, <Q::DOMCore:documentURI>, 
          <Q::infoset:publicIdentifier>, <Q::infoset:systemIdentifier>.
+
+  @mn:irefnode0: DOMCore|ownerDocument
+  @mn:origin0: infoset|parent
+  @mn:subnode1: infoset|children
 ##EntityReference
 
 NodeTypeDef:
@@ -2222,7 +2235,7 @@ NodeTypeDef:
         @@@@@:
           The new object for the <IF::ProcessingInstruction> node.
       @@@PerlDef:
-        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject>;
+        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject> ($self);
         push @{$r->{<Q::TreeCore:origin>}}, <H::infoset:parent>;
         $r->{<H::DOMCore:nodeType>} = <H::infoset:ProcessingInstruction>;
         $r->{<H::infoset:content>} = '';
@@ -2235,6 +2248,9 @@ NodeTypeDef:
          \
          Other available properties: <Q::infoset:baseURI>, 
          <Q::DOMCore:read-only>, <Q::infoset:parent>, <Q::infoset:content>.
+
+  @mn:irefnode0: DOMCore|ownerDocument
+  @mn:origin0: infoset|parent
 
   @Method:
      @@Name:  getFeature

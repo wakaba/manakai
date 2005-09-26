@@ -13,7 +13,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/24 11:57:30 $
+      $Date: 2005/09/26 14:37:43 $
     @@ContentType:
       dis:Date.RCS
   
@@ -231,6 +231,13 @@ DataTypeDef:
 ResourceDef:
   @QName: pl|SCALAR
   @AliasFor: DISPerl|SCALAR
+
+DataTypeDef:
+  @QName: DISPerl|Regexp
+  @enFN: Perl regular expression
+  @rdfs:subClassOf: DISPerl|SCALAR
+  @subsetOf: DISPerl|Scalar
+  @rdf:type: DISLang|Class
 
 DataTypeDef:
   @QName: DISPerl|Array

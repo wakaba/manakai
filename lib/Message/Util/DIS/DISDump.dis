@@ -19,20 +19,19 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/24 11:57:27 $
+      $Date: 2005/09/26 14:37:40 $
     @@ContentType:
       dis:Date.RCS
   
   @Require:
     @@Module:
-      @@@QName: DIS|DISDoc
-      @@@WithFor: DIS|ForLatest
-    @@Module:
       @@@QName: MDOM|DOMCore
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName: DIS|DISDump
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
 
-  @DefaultFor: 
-    DIS:ForLatest
+  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
   @dd:
@@ -140,7 +139,8 @@ FeatureDef:
     @@QName: DIS|Dump10
     @@Version: 1.0
     @@DOMMetaImpl:instanceFeatureOf: DIS|Dump
-    @@DOMMain:requireFeature: DIS|Doc20
+    @@DOMFeature:requires: DOMXML|XMLFeature30
+    @@DOMFeature:requires: DOMXML|XMLVersionFeature11
     @@FullName:
       @@@lang:en
       @@@@:
@@ -217,7 +217,7 @@ ElementTypeBinding:
 
     @@DOMMain:implementFeature: DIS|Dump10
 
-    @@ForCheck: DIS|ForEmpty
+    @@ForCheck: ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: IFDef
@@ -233,7 +233,7 @@ ElementTypeBinding:
       @@@@: DISLang|Interface
       @@@ForCheck: ManakaiDOM|ForIF
 
-    @@ForCheck: DIS|ForEmpty
+    @@ForCheck: ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: IFQName
@@ -294,7 +294,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@For: !=DIS|ForEmpty
+    @@For: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Return
@@ -316,7 +316,6 @@ IFClassDef:
   @IFQName: DISImplementationDISDump
   @ClsQName: ManakaiDISImplementationDISDump
   
-  @ClsISA: DISDoc|ManakaiDISImplementationDISDoc
   @ClsISA: DOMCore|ManakaiDOMImplementation||ManakaiDOM|ManakaiDOMLatest
 
   @DOMMetaImpl:provideFeature: DIS|Dump10
@@ -385,7 +384,7 @@ ResourceDef:
     @@@: dump|*
     @@ContentType: DISCore|QName
   @enDesc:
-    Any element type in the <URI^^dis|TypeQName::dump:> namespace.
+    Any element type in the <URI^^DISCore|QName::dump:> namespace.
   @rdf:type: s|AnyElementInNS
 
 IFClassDef:
@@ -1024,7 +1023,8 @@ IFClassETDef:
 
 ResourceDef:
   @QName: URI
-  @AliasFor: DIS|AnyURI
+  @AliasFor: DOMMain|DOMString
+  @For: ManakaiDOM|ManakaiDOM
 
 IFClassETDef:
   @IFQName: DISDumpModuleElement
@@ -2073,7 +2073,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
-    @@For: !=DIS|ForEmpty
+    @@For: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Get
@@ -2111,7 +2111,7 @@ ElementTypeBinding:
       @@@@: ||+||s|ForML
       @@@ContentType: DISCore|TFPQNames
       @@@ForCheck: ManakaiDOM|ForIF
-    @@ForCheck: !=DIS|ForEmpty
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: DOMName

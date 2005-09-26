@@ -41,7 +41,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/24 11:57:20 $
+      $Date: 2005/09/26 14:37:35 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1795,7 +1795,8 @@ minIFClsDef:
         @@@@@:
           The newly created implementation object.
       @@@PerlDef:
-          my $node = <ClassM::ManakaiNode:ManakaiNodeStem::ManakaiDOM:Perl.new>;
+          my $node = <ClassM::ManakaiNode:ManakaiNodeStem::ManakaiDOM:Perl.new>
+                         ($self);
           __CODE{ManakaiNode|getNewReference||ManakaiDOM|Perl::
             $object => $node,
             $ref => $r,

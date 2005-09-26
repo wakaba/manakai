@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/24 13:50:50 $
+      $Date: 2005/09/26 14:37:34 $
     @@ContentType:
       dis:Date.RCS
 
@@ -5879,6 +5879,11 @@ IFCls1Def:
       @@@lang:en
       @@@@: 
         Construct an object for a new instance of the <IF::Node>.
+    @@Param:
+      @@@Name: refClass
+      @@@Type: DOMString
+      @@@enDesc:
+        The name of a <IF::mn|NodeRef||ManakaiDOM|Perl> class.
     @@Return:
       @@@Type: NodeStem
       @@@Description:
@@ -5887,7 +5892,7 @@ IFCls1Def:
           The object for the <IF::Node> to be created.
       @@@PerlDef:
           my $node = $r = bless <ClassM::ManakaiNode|ManakaiNodeStem||
-                                         ManakaiDOM|Perl.new>,
+                                         ManakaiDOM|Perl.new> ($refClass),
                             <ClassName::ManakaiDOMCore:ManakaiDOMNodeObjectNode>;
           push @{$node->{<Q::TreeCore:irefnode>}}, <H::DOMCore:ownerDocument>;
           push @{$node->{<Q::TreeCore:anydata2>}}, <H::DOMEvents:eventListener>;
@@ -5902,6 +5907,8 @@ IFCls1Def:
            type is other than <IF::Document> and <IF::DOMXML:DocumentType>), 
            <Q::infoset:namespaceName>, <Q::DOMCore:name>,
            <Q::DOMCore:read-only>.
+
+  @mn:anydata2: DOMEvents|eventListener
 
   @IntMethod:
     @@Name: getNodeReference
@@ -10238,7 +10245,7 @@ NodeTypeDef:
         @@@@@:
           The new object for the <IF::Attr> node.
       @@@PerlDef:
-          $r = <ClassM::ManakaiDOMNode.newObject>;
+          $r = <ClassM::ManakaiDOMNode.newObject> ($self);
           push @{$r->{<Q::TreeCore:origin>}}, <H::infoset:ownerElement>;
           push @{$r->{<Q::TreeCore:subnode>}}, <H::infoset:children>;
           $r->{<H::infoset:children>} = [];
@@ -10254,6 +10261,10 @@ NodeTypeDef:
          <Q::DOMCore:read-only>, <Q::infoset:specified>, 
          <Q::infoset:ownerElement>, <Q::infoset:children>, 
          <Q::infoset:namespaceName>, <Q::DOMCore:userDeterminedId>.
+
+  @mn:irefnode0: DOMCore|ownerDocument
+  @mn:origin0: infoset|ownerElement
+  @mn:subnode1: infoset|children
 
   @Method:
      @@Name:  getFeature
@@ -12767,7 +12778,7 @@ NodeTypeDef:
         @@@@@:
           The new object for the <IF::Element> node.
       @@@PerlDef:
-        $r = <ClassM::ManakaiDOMNode.newObject>;
+        $r = <ClassM::ManakaiDOMNode.newObject> ($self);
         push @{$r->{<Q::TreeCore:origin>}}, <H::infoset:parent>;
         push @{$r->{<Q::TreeCore:subnode2>}}, <H::infoset:attributes>;
         $r->{<H::infoset:attributes>} = {};
@@ -12784,6 +12795,11 @@ NodeTypeDef:
          Other available properties: <Q::infoset:prefix>, 
          <Q::DOMCore:read-only>, <Q::infoset:parent>, <Q::infoset:children>, 
          <Q::infoset:attributes>, <Q::infoset:namespaceName>.
+
+  @mn:irefnode0: DOMCore|ownerDocument
+  @mn:origin0: infoset|parent
+  @mn:subnode2: infoset|attributes
+  @mn:subnode1: infoset|children
 
   @Method:
      @@Name:  getFeature
@@ -13277,7 +13293,7 @@ IFCls1Def:
         @@@@@:
           The new object for the <IF::Text> node.
       @@@PerlDef:
-          $r = <ClassM::ManakaiDOMNode.newObject>;
+          $r = <ClassM::ManakaiDOMNode.newObject> ($self);
           push @{$r->{<Q::TreeCore:origin>}}, <H::infoset:parent>;
           $r->{<H::DOMCore:nodeType>} = <H::DOMCore:TextNode>;
           $r->{<H::infoset:content>} = '';
@@ -13289,6 +13305,9 @@ IFCls1Def:
          \
          Other available properties: <Q::infoset:ElementContentWhitespace>, 
          <Q::infoset:parent>, <Q::infoset:content>, <Q::DOMCore:read-only>.
+
+  @mn:irefnode0: DOMCore|ownerDocument
+  @mn:origin0: infoset|parent
 
   @Method:
      @@Name:  getFeature
@@ -13429,7 +13448,7 @@ IFCls1Def:
         @@@@@:
           The new object for the <IF::Comment> node.
       @@@PerlDef:
-          $r = <ClassM::ManakaiDOMNode.newObject>;
+          $r = <ClassM::ManakaiDOMNode.newObject> ($self);
           push @{$r->{<Q::TreeCore:origin>}}, <H::infoset:parent>;
           $r->{<H::DOMCore:nodeType>} = <H::infoset:Comment>;    
           $r->{<H::infoset:content>} = '';
@@ -13441,6 +13460,9 @@ IFCls1Def:
         \
          Other available properties: <Q::infoset:parent>, <Q::infoset:content>, 
          <Q::DOMCore:read-only>.
+
+  @mn:irefnode0: DOMCore|ownerDocument
+  @mn:origin0: infoset|parent
 
   @Method:
      @@Name:  getFeature
@@ -14629,7 +14651,7 @@ NodeTypeDef:
         @@@@@: 
           The new node stem object of type <IF::DocumentFragment>.
       @@@PerlDef:
-          $r = <ClassM::ManakaiDOMNode.newObject>;
+          $r = <ClassM::ManakaiDOMNode.newObject> ($self);
           push @{$r->{<Q::TreeCore:origin>}}, <H::infoset:parent>;
           push @{$r->{<Q::TreeCore:subnode>}}, <H::infoset:children>;
           $r->{<H::infoset:children>} = [];
@@ -14642,6 +14664,10 @@ NodeTypeDef:
          \
            Other available properties: <Q::infoset:children>, 
            <Q::DOMCore:read-only>.
+
+  @mn:irefnode0: DOMCore|ownerDocument
+  @mn:origin0: infoset|parent
+  @mn:subnode1: infoset|children
   
   @ReMethod:
      @@Name:  lookupPrefix
@@ -16796,7 +16822,7 @@ NodeTypeDef:
         @@@@lang:en
         @@@@@: The new object for the "Document".
       @@@PerlDef:
-          $r = <ClassM::ManakaiDOMNode.newObject>;
+          $r = <ClassM::ManakaiDOMNode.newObject> ($self);
           push @{$r->{<Q::TreeCore:origin>}}, <H::infoset:parent>;
           $r->{<H::DOMCore:nodeType>} = <H::infoset:Document>;
           $r->{<H::infoset:version>} = '1.0';
@@ -16818,6 +16844,10 @@ NodeTypeDef:
            <Q::DOMCore:documentURI>, <Q::DOMCore:strictErrorChecking>, 
            <Q::infoset:children>, <Q::DOMViews:view>.
 
+  @mn:irefnode0: DOMCore|ownerDocument
+  @mn:origin0: infoset|parent
+  @mn:subnode1: infoset|children
+  @mn:subnode1: DOMViews|view
 
   @Method:
      @@Name:  getFeature

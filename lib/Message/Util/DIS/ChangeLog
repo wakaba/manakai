@@ -1,3 +1,15 @@
+2005-09-26  Wakaba  <wakaba@suika.fam.cx>
+
+	* DISDump.dis: Removes reference to DISDoc module.
+	(DIS:DISDump10): Requires "XML" version "3.0" and
+	"XMLVersion" version "1.1".
+	(ManakaiDISImplementationDISDump): No longer extends
+	the "ManakaiDISImplementationDISDoc" class.
+
+	* Perl.dis (plLoadDISDatabaseModule): Support
+	for loading "for"s and modules.
+	(plCodeFragment): New "mn:NodeRefRole" role support added.
+
 2005-09-25  Wakaba  <wakaba@suika.fam.cx>
 
 	* Perl.dis (plLoadDISDatabase): New "moduleResolver" parameter

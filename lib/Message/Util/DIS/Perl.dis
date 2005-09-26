@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/25 14:53:05 $
+      $Date: 2005/09/26 14:37:41 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1002,8 +1002,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       rdf:Property
-    @@AliasFor:
-      @@@For: =ManakaiDOM|all
+    @@For: =ManakaiDOM|all
 
 IFClsDef:
   @IFQName: DVValuePerl
@@ -1336,7 +1335,10 @@ IFClsDef:
 
         ## Updates resource to module mapping
         my %mod_res;
+        my %mod_for;
+        my %mod_mod;
         my %undefined_res;
+        my %undefined_for;
         __DEEP{
           for my $res (values %{$self->{resDef}}) {
             if ($res-><AG::DIS|DISAnyResource.isDefined>) {
@@ -1352,26 +1354,50 @@ IFClsDef:
               }
             }
           }
+
+          for my $res (values %{$self->{forDef}}) {
+            if ($res-><AG::DIS|DISAnyResource.isDefined>) {
+              my $mod_urir = $res-><AG::DIS|DISAnyResource.ownerModuleURIRef>;
+              for my $res_uri (@{$res-><AG::DIS|DISAnyResource.uris>}) {
+                $self->{<H::DIS|resourceModuleMap>}->{$res_uri} = $mod_urir;
+                $mod_for{$$mod_urir}->{$res_uri} = $res;
+              }
+              CORE::delete $res->{db};
+            } else {  ## Not defined yet
+              for my $res_uri (@{$res-><AG::DIS|DISAnyResource.uris>}) {
+                $undefined_for{$res_uri} = $res;
+              }
+            }
+          }
+
+          for my $res (values %{$self->{modDef}}) {
+            if ($res-><AG::DIS|DISAnyResource.isDefined>) {
+
+            }
+          }
         }__;
 
         ## Obtains module file names and contents
         my %mod_file;
         __DEEP{
-          for my $mod_uri (keys %mod_res) {
+          for my $mod_uri (keys %{{%mod_res, %mod_for}}) {
             my $mod_file_name = ($moduleResolver or sub ($$) {})
               ->($self, $self-><M::DIS|DISDatabase.getModule> ($mod_uri));
-            $mod_file{$mod_file_name}->{$_} = $mod_res{$mod_uri}->{$_}
-              for keys %{$mod_res{$mod_uri}};
+            $mod_file{$mod_file_name}->{resDef}->{$_} = $mod_res{$mod_uri}->{$_}
+              for keys %{$mod_res{$mod_uri}||{}};
+            $mod_file{$mod_file_name}->{forDef}->{$_} = $mod_for{$mod_uri}->{$_}
+              for keys %{$mod_for{$mod_uri}||{}};
           }
         }__;
 
         ## Database module files
         for my $mod_file_name (keys %mod_file) {
-          nstore {resDef => $mod_file{$mod_file_name}}, $mod_file_name;
+          nstore $mod_file{$mod_file_name}, $mod_file_name;
         }
 
         require Scalar::Util;
-        for my $res (map {values %$_} values %mod_file) {
+        for my $res (map {values %{$_->{forDef}||{}},
+                          values %{$_->{resDef}||{}}} values %mod_file) {
           $res->{db} = $self;
           Scalar::Util::weaken ($res->{db});
         }
@@ -1380,6 +1406,7 @@ IFClsDef:
         {
           local $self->{<H::dp|dbModuleResolver>} = null;
           local $self->{resDef} = \%undefined_res;
+          local $self->{forDef} = \%undefined_for;
           nstore $self, $fileName;
         }
 
@@ -1455,7 +1482,38 @@ IFClsDef:
             $dbmod = retrieve $fileName;
           }
 
+          S: for my $res_uri (keys %{$dbmod->{modDef}}) {
+            my $res = $dbmod->{modDef}->{$res_uri};
+            my $dres = $self->{modDef}->{$res_uri};
+
+            if (ref $dres ne <ClassName::DIS|ManakaiDISModuleLite>) {
+              __UNDEEP{__EXCEPTION{DIS|RESOURCE_ALREADY_DEFINED_ERR::
+                DIS:uri => {$res_uri},
+                DIS:moduleURI => {$disModule-><AG::DIS|DISAnyResource.uri>},
+              }__}__;
+            }
+            for my $pn (keys %$res) {
+              $dres->{$pn} = $res->{$pn};
+            }
+
+            bless $dres, <ClassName::DIS|ManakaiDISModuleDefinition>;
+          } # S
+
           require Scalar::Util;        
+          S: for my $res_uri (keys %{$dbmod->{forDef}}) {
+            my $res = $dbmod->{forDef}->{$res_uri};
+            next S unless $res_uri eq $res-><AG::DIS|DISAnyResource.uri>;
+            $res->{db} = $self;
+            Scalar::Util::weaken ($res->{db});
+            if (defined $self->{forDef}->{$res_uri}) {
+              __UNDEEP{__EXCEPTION{DIS|RESOURCE_ALREADY_DEFINED_ERR::
+                DIS:uri => {$res_uri},
+                DIS:moduleURI => {$disModule-><AG::DIS|DISAnyResource.uri>},
+              }__}__;
+            }
+            $self->{forDef}->{$res_uri} = $res;
+          } # S
+
           S: for my $res_uri (keys %{$dbmod->{resDef}}) {
             my $res = $dbmod->{resDef}->{$res_uri};
             next S unless $res_uri eq $res-><AG::DIS|DISAnyResource.uri>;
@@ -1471,7 +1529,7 @@ IFClsDef:
                          keys %{$res->{aliasURI}}) {
               $self->{resDef}->{$uri} = $res;
             }
-          }
+          } # S
         }__;
 ##DISDatabasePerl
 
@@ -1748,8 +1806,9 @@ IFClsDef:
                                      .getPropertyResource> (<Q::dis:License>);
           unless ($license) {
             __UNDEEP{__EXCEPTION{DIS|NO_LICENSE_ATTR_ERR::
-              DIS:sourceNode => {$ownermod->{src}},
-              DIS:uri => {$ownermod->{uri}},
+              DIS:sourceNode => {$ownermod-><AG::DIS|DISAnyResource
+                                                  .sourceElement>},
+              DIS:uri => {$ownermod-><AG::DIS|DISAnyResource.uri>},
             }__}__;
           }
           $r-><AS::DIS|PLFile.licenseURI>
@@ -1762,9 +1821,7 @@ IFClsDef:
                                      ($thismod_name, make_new_package => true);
           my %const;
           my %processed_class;
-          for my $cls (@{$self-><M::DIS|DISResourceProp
-                                   .getPropertyResourceList>
-                                              (<Q::DIS:resource>)}) {
+          for my $cls (@{$self-><M::DIS|DISModule.getResourceList>}) {
             if ($cls-><AG::DIS|DISAnyResource.ownerModule>
                    eq $ownermod and
                 not $processed_class{$cls-><AG::DIS|DISAnyResource.uri>}) {
@@ -2129,6 +2186,31 @@ IFClsDef:
                           ('$Message::Util::DIS::Value::ManakaiDVValue'.
                            '::CompatClass{q<' . $pack_name . '>} = 1');
                   }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::mn|NodeRefRole>)) {
+                    my %nrp;
+                    for my $p (['s0', <Q::mn|subnode0>],
+                               ['s1', <Q::mn|subnode1>],
+                               ['s2', <Q::mn|subnode2>],
+                               ['o0', <Q::mn|origin0>],
+                               ['i0', <Q::mn|irefnode0>],
+                               ['a1', <Q::mn|anydata1>],
+                               ['a2', <Q::mn|anydata2>],) {
+                      $nrp{$p->[0]} = [map {
+                        $_-><M::DIS|DISResourceProp.getPropertyText>
+                                  (<Q::DISPerl:propHashKey>,
+                                   $_-><AG::DIS|DISAnyResource.uri>)
+                      } @{$cls-><M::DIS|DISResourceProp.getPropertyResourceList>
+                                  ($p->[1], isa_recursive => true)}];
+                    }
+                    for (keys %nrp) {
+                      CORE::delete $nrp{$_} unless @{$nrp{$_}};
+                    }
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::Util::ManakaiNode::ManakaiNodeRef'.
+                           '::Prop{q<' . $pack_name . '>} = '.
+                           <ClassM::PLImplClass.perlLiteral> (\%nrp));
+                  }
                 }
               } elsif ($cls-><M::DIS|DISResource.isTypeURI>
                               (<Q::ManakaiDOM:ExceptionIF>)) {
@@ -2223,9 +2305,7 @@ IFClsDef:
                          ->{$featureResourceURI};
         } elsif ($self->isa (<ClassName::DIS|ManakaiDISModuleDefinition>)) {
           $r = true;
-          C: for my $cls (@{$self-><M::DIS|DISResourceProp
-                                   .getPropertyResourceList>
-                                      (<Q::DIS:resource>)}) {
+          C: for my $cls (@{$self-><M::DIS|DISModule.getResourceList>}) {
             if ($cls-><M::DIS|DISResource.isTypeURI>
                                       (<Q::ManakaiDOM:Class>)) {
               unless ($cls-><M::DISResourcePerlModule

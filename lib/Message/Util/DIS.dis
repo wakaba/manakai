@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/09/25 14:53:03 $
+      $Date: 2005/09/26 14:37:36 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2550,6 +2550,20 @@ IFClsDef:
         $forURI = <Q::ManakaiDOM:all> unless defined $forURI;
         if (defined $self->{forDef}->{$forURI}) {
           $r = $self->{forDef}->{$forURI};
+        } elsif (defined $self->{<H::DIS|resourceModuleMap>}->{$forURI}) {
+          __DEEP{
+            $self-><M::dp|ManakaiDISDatabasePerl.plLoadDISDatabaseModule>
+              ($self-><M::DIS|DISDatabase.getModule>
+                 (${$self->{<H::DIS|resourceModuleMap>}->{$forURI}}));
+          }__;
+          unless (defined $self->{forDef}->{$forURI}) {
+            __EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
+              DIS:uri => {$forURI},
+              DIS:moduleURI => {${$self->{<H::DIS|resourceModuleMap>}
+                                       ->{$forURI}}},
+            }__;
+          }
+          $r = $self->{forDef}->{$forURI};
         } else {
           $r = $self->{forDef}->{$forURI}
              = bless {
@@ -3135,8 +3149,7 @@ IFClsDef:
           $res->{forp} = $forpArg;
           $res->{src} = $el;
           $res->{<H::DIS|definingModule>} = \ ($mod->{uri});
-          $mod-><M::ManakaiDISPropertyAccessor.addPropertyResourceList>
-                                            (<Q::DIS:resource>, $res);
+          $mod-><M::DIS|ManakaiDISModuleDefinition.addResourceList> ($res);
           $res-><AS::DIS|ManakaiDISResourceDefinition.parentResource>
             ($parentResource) if $parentResource;
           $res-><AS::DIS|ManakaiDISResourceDefinition.dynamicParentResource>
@@ -3532,14 +3545,18 @@ PropDef:
   @QName: sourceNodeID
   @enDesc:
     The URI reference of the source node identifier. 
-  @rdfs:domain: ManakaiDISResourceDefinition
+  @rdfs:domain: DIS|DISResource||DIS|ForEmpty
+  @DIS:key: snid
+  @Type: DISPerl|SCALAR
 
 PropDef:
-  @QName: resource
-  @enDesc:
+  @QName: DIS|resource
+  @enDesc:    
     Resources defined in a module. 
-  @rdfs:range: ManakaiDISResourceDefinition
-  @rdfs:domain: ManakaiDISModuleDefinition
+  @rdfs:range: DIS|DISResource||DIS|ForEmpty
+  @rdfs:domain: DIS|DISModule||DIS|ForEmpty
+  @DIS:key: mres
+  @Type: DISPerl|ARRAY
 
 PropDef:
   @QName: DIS|parentResource
@@ -4586,8 +4603,128 @@ IFClsDef:
       @@@TrueCase:
         @@@@enDesc:
           A module <kwd:MUST> have a name.
-      @@@PerlDef: $r = true;
+      @@@PerlDef: $r = false;
+
+  @Method:
+    @@Name: addResourceList
+    @@ForCheck: ManakaiDOM|ForClass
+    @@enDesc:
+      Adds a resource to the list of resources belongs to the module.
+    @@Param:
+      @@@Name: disResource
+      @@@Type: DIS|DISResource
+      @@@enDesc: The resource to add.
+    @@Return:
+      @@@PerlDef:
+        __DEEP{
+          push @{$self->{<H::DIS|resource>}||=[]},
+               $disResource-><AG::DIS|DISAnyResource.uriRef>;
+        }__;
+
+  @Method:
+    @@Name: getResourceList
+    @@enDesc:
+      Returns the list of resources belongs to the module.
+    @@Return:
+      @@@Type: DIS|ResourceList
+      @@@enDesc:
+        The current snapshot of children.
+      @@@PerlDef:
+        __DEEP{
+          my $db = $self-><AG::DIS|DISAnyResource.database>;
+          $r = [map {
+                  $db-><M::DIS|DISDatabase.getResource> ($$_)
+                } @{$self->{<H::DIS|resource>}}];
+        }__;
 ##DISModule
+
+ClsDef:
+  @ClsQName: ManakaiDISModuleLite
+
+  @ClsISA: DIS|ManakaiDISAnyResource
+ 
+  @Implement: DOMMinImpl
+  @Implement: dx|MUErrorTarget||ManakaiDOM|Perl
+  @Implement: DIS|DISResourceProp
+  @Implement: dp|DISAnyResourcePerl
+  @Implement: dp|DISModulePerl
+  @Implement: dp|DISResourcePerlModule
+
+  @enDesc:
+    The <Class::ManakaiDISModuleLite> class provides very small
+    subset of <Class::ManakaiDISModuleDefinition> class.  If a
+    method or attribute which is not implemented by the class, then
+    the object is updated to the <Class::ManakaiDISModuleDefinition>
+    by reading additional properties from the <QUOTE::dis> database.
+
+  @Attr:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: uris
+    @@Type:
+      Perl:Array::ManakaiDOM:all
+    @@enDesc:
+      A reference to the snapshot array containing the URI reference
+      of the module.
+    @@Get:
+      @@@PerlDef:
+        $r = [$self->{uri}];
+
+  @Attr:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: ownerModule
+    @@ManakaiDOM:isRedefining:1
+    @@enDesc:
+      This module itself.
+    @@Get:
+      @@@Type: DISModule
+      @@@clsActualType: ManakaiDISModuleDefinition
+      @@@nullCase:
+        @@@@enDesc:
+          The resource is not part of any module since
+          its definition is not read (<IF::DISModule.isDefined> is <DOM::false>).
+      @@@PerlDef: $r = $self;
+
+  @Attr:
+    @@Name: isAnonymous
+    @@enDesc:
+      Whether the resource has persistent name or not. 
+    @@Type: 
+      DOMMain:boolean::ManakaiDOM:all
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Get:
+      @@@TrueCase:
+        @@@@enDesc:
+          A module <kwd:MUST> have a name.
+      @@@PerlDef: $r = false;
+
+  @Method:
+    @@Operator:
+      @@@@: AUTOLOAD
+      @@@ContentType: lang|Perl
+    @@Return:
+      @@@PerlDef:
+        __DEEP{
+          $self-><AG::DIS|DISAnyResource.database>
+               -><M::dp|ManakaiDISDatabasePerl.plLoadDISDatabaseModule> ($self);
+        }__;        
+        if (ref $self eq <ClassName::ManakaiDISModuleLite>) {
+          __EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
+            DIS:uri => {$self-><AG::DIS|DISAnyResource.uri>},
+            DIS:moduleURI => {$self-><AG::DIS|DISAnyResource.uri>},
+          }__;
+        }
+
+        my $al = our $AUTOLOAD;
+        $al =~ s/.+:://;
+        my $code = $self->can ($al);
+        if ($code) {
+          goto &$code;
+        } else {
+          require Carp;
+          local $Carp::CarpLevel = $Error::Level;
+          Carp::croak (qq<Can't locate method "$AUTOLOAD">);
+        }
+##DISModuleLite
 
 IFClsDef:
   @IFQName: DISFor

@@ -19,7 +19,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/25 14:53:05 $
+      $Date: 2005/09/26 14:37:39 $
     @@ContentType:
       dis:Date.RCS
   
@@ -173,6 +173,16 @@ ClassDef:
       @@@@: 
         Constructs a new instance of 
         <Class::ManakaiDOM:ManakaiDOMNodeObject> and returns it.
+    @@Param:
+      @@@ForCheck: ForCompact
+      @@@Name: className
+      @@@Type: DISLang|String||ManakaiDOM|all
+      @@@enDesc:
+        The name of a class which is typically used as reference
+        to the node.  The class <kwd:SHOULD> implement the 
+        <IF::NodeRef> interface.  The <QUOTE::dis> definition
+        for the class <kwd:SHOULD> play the role of <Q::mn|NodeRefRole
+        ||ManakaiDOM|all>.
     @@Return:
       @@@Type: NodeStem
       @@@Description:
@@ -205,6 +215,7 @@ ClassDef:
             <Q::TreeCore:irefnode> => [],
             <Q::TreeCore:anydata> => [],
             <Q::TreeCore:anydata2> => [],
+            <H::mn:type> => $className,
             <H::mn:rc> => 0,
             <H::mn:treeID> => \ (<Code::ManakaiDOM:generateUniqueID>),
             <H::mn:nodeID> => <Code::ManakaiDOM:generateUniqueID>,
@@ -878,6 +889,10 @@ ClassDef:
     @@@: NodeRef
     @@ForCheck: ForCompact
 
+  @DISLang:role:
+    @@@: mn|NodeRefRole
+    @@ForCheck: ForCompact
+
   @Description:
     @@lang:en
     @@@:
@@ -964,6 +979,83 @@ ClassDef:
         from that class, since that module defines its own 
         destructor. 
 ##NodeRef
+
+ResourceDef:
+  @QName: mn|NodeRefRole
+  @rdf:type: DISLang|Role
+  @For: =ManakaiDOM|all
+  @enDesc: 
+    The <QUOTE::dis> definition for a class which plays the role
+    of <Q::mn|NodeRefRole> provides a set of <QUOTE::dis> properties such
+    as <Q::mn|subnode0> which identify the set of object internal
+    property names (or hash key names) used to construct groves.
+
+PropDef:
+  @QName: mn|type
+  @mn:stemName: t
+
+PropDef:
+  @QName: mn|noderef
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|UnorderedList
+
+PropDef:
+  @QName: mn|subnode0
+  @enDesc:
+    A property of type <Q::mn|subnode0> takes a value of 
+    reference to another node (<Q::mn|NodeStem||ManakaiDOM|Perl>)
+    in the same grove.  The referenced node is considered
+    to make a part of the node and just one <Q::mn|origin0>
+    property of the referenced node <kwd:MUST> have a reference
+    to the node.  That is, these properties shows
+    a origin-subnode-relationship.
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|UnorderedList
+
+PropDef:
+  @QName: mn|subnode1
+  @enDesc:
+    A property of type <Q::mn|subnode1> is similar to <Q::mn|subnode0>
+    properties, but its value is an array or hash reference whose
+    values are references to subnodes.
+  @rdfs:subPropertyOf: mn|noderef
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|UnorderedList
+
+PropDef:
+  @QName: mn|subnode2
+  @enDesc:
+    A property of type <Q::mn|subnode2> is similar to <Q::mn|subnode1>
+    properties, but its value is an array or hash reference whose
+    values are array or hash references whose values are
+    references to subnodes.
+  @rdfs:subPropertyOf: mn|noderef
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|UnorderedList
+
+PropDef:
+  @QName: mn|origin0
+  @rdfs:subPropertyOf: mn|noderef
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|UnorderedList
+
+PropDef:
+  @QName: mn|irefnode0
+  @rdfs:subPropertyOf: mn|noderef
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|UnorderedList
+
+PropDef:
+  @QName: mn|anydata1
+  @rdfs:subPropertyOf: mn|noderef
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|UnorderedList
+
+PropDef:
+  @QName: mn|anydata2
+  @rdfs:subPropertyOf: mn|noderef
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|UnorderedList
 
 PropDef:
   @QName: mn|nodeID

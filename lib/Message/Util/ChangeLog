@@ -1,3 +1,19 @@
+2005-09-26  Wakaba  <wakaba@suika.fam.cx>
+
+	* ManakaiNode.dis (new): New "className" parameter added.
+	(mn:NodeRefRole): New role.
+	(mn:type): New property.
+	(mn:subnode0, mn:subnode1, mn:subnode2, mn:irefnode0,
+	mn:origin0, mn:anydata1, mn:anydata2, mn:noderef): New properties.
+
+	* Makefile: Rules to make "DIS/DISDump" is separeted
+	from "DIS/DISDoc".
+
+	* DIS.dis (getFor): Loads database module if unread
+	"for" is referenced.
+	(addResourceList, getResourceList): New method.
+	(ManakaiDISModuleLite): New class.
+
 2005-09-25  Wakaba  <wakaba@suika.fam.cx>
 
 	* DIS.dis (RESOURCE_NOT_DEFINED_ERR): New error code.

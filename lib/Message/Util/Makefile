@@ -47,25 +47,28 @@ DAC2PM_PL = $(MANAKAI_BIN_DIR)dac2pm.pl
 DAC2PM = $(PERL_) $(DAC2PM_PL) $(DAC2PM_OPTIONS) $(DIS_OPTIONS_ALL)
 
 CORE_DAC_FILE = $(MANAKAI_LIB_DIR)manakai/all$(DAC_SUFFIX)
+DOM_CORE_DAC_FILE = $(MANAKAI_LIB_DIR)Message/DOM/core$(DAC_SUFFIX)
 SWCFG_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Markup/all$(DAC_SUFFIX)
 
-UTIL_CORE_DIS_FILES = ManakaiNode.dis Error/DOMException.dis Error/Core.dis
+UTIL_CORE_DIS_FILES    = ManakaiNode.dis Error/DOMException.dis Error/Core.dis
 DIS_CORE_DIS_FILES_    = DIS.dis PerlCode.dis
 DIS_CORE_DIS_FILES_DIS = DIS/Perl.dis DIS/Value.dis DIS/DNLite.dis
 DIS_CORE_DIS_FILES     = $(DIS_CORE_DIS_FILES_) $(DIS_CORE_DIS_FILES_DIS)
-DIS_DOC_DIS_FILES = DIS/DISDoc.dis DIS/DISDump.dis
+DIS_DOC_DIS_FILES      = DIS/DISDoc.dis
+DIS_DUMP_DIS_FILES     = DIS/DISDump.dis
 DIS_FILES = $(UTIL_CORE_DIS_FILES) $(DIS_CORE_DIS_FILES) \
-  $(DIS_DOC_DIS_FILES)
+  $(DIS_DOC_DIS_FILES) $(DIS_DUMP_DIS_FILES)
 
 GENERATED_FILES = \
   core$(DAC_SUFFIX)     ManakaiNode$(PM_SUFFIX) Error/DOMException$(PM_SUFFIX) \
   discore$(DAC_SUFFIX)  DIS$(PM_SUFFIX) PerlCode$(PM_SUFFIX) \
                         DIS/Perl$(PM_SUFFIX) DIS/Value$(PM_SUFFIX) \
                         DIS/DNLite$(PM_SUFFIX) \
-  disdoc$(DAC_SUFFIX)   DIS/DISDoc$(PM_SUFFIX) DIS/DISDump$(PM_SUFFIX)
+  disdoc$(DAC_SUFFIX)   DIS/DISDoc$(PM_SUFFIX) \
+  disdump$(DAC_SUFFIX)  DIS/DISDump$(PM_SUFFIX)
 GENERATED_DAC_FILES = core$(DAC_SUFFIX) discore$(DAC_SUFFIX) disdoc$(DAC_SUFFIX)
 
-all: .discore$(PM_SUFFIX) .disdoc$(PM_SUFFIX) $(GENERATED_FILES)
+all: .discore$(PM_SUFFIX) $(GENERATED_FILES)
 
 core$(DAC_SUFFIX): $(CORE_DAC_FILE) $(UTIL_CORE_DIS_FILES) $(DAC_PL)
 	$(DAC)$@.1.tmp --input-db-file-name="$<" ManakaiNode.dis
@@ -76,6 +79,9 @@ discore$(DAC_SUFFIX): $(SWCFG_DAC_FILE) $(DIS_CORE_DIS_FILES) $(DAC_PL)
 	$(DAC)$@ --input-db-file-name="$<" DIS/DNLite.dis
 
 disdoc$(DAC_SUFFIX): discore$(DAC_SUFFIX) $(DIS_DOC_DIS_FILES) $(DAC_PL)
+	$(DAC)$@ --input-db-file-name="$<" DIS/DISDoc.dis
+
+disdump$(DAC_SUFFIX): $(DOM_CORE_DAC_FILE) $(DIS_DUMP_DIS_FILES) $(DAC_PL)
 	$(DAC)$@ --input-db-file-name="$<" DIS/DISDump.dis
 
 ManakaiNode$(PM_SUFFIX): core$(DAC_SUFFIX) $(DAC2PM_PL)
@@ -149,19 +155,11 @@ DIS/DISDoc$(PM_SUFFIX): disdoc$(DAC_SUFFIX) $(DAC2PM_PL)
 	  --output-file-path="$@"
 	$(PERL_CHK) $@
 
-DIS/DISDump$(PM_SUFFIX): disdoc$(DAC_SUFFIX) $(DAC2PM_PL)
+DIS/DISDump$(PM_SUFFIX): disdump$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< \
 	  --module-uri="$(NS_UTIL_DIS)DISDump" \
 	  --output-file-path="$@"
 	$(PERL_CHK) $@
-
-.disdoc$(PM_SUFFIX): disdoc$(DAC_SUFFIX) $(DAC2PM_PL)
-	$(DAC2PM) $< \
-	  --create-perl-module="$(NS_UTIL_DIS)DISDoc  DIS/DISDoc$(PM_SUFFIX)" \
-	  --create-perl-module="$(NS_UTIL_DIS)DISDump DIS/DISDump$(PM_SUFFIX)"
-	$(PERL_CHK) DIS/DISDoc$(PM_SUFFIX)
-	$(PERL_CHK) DIS/DISDump$(PM_SUFFIX)
-	$(TOUCH) $@
 
 # $(CORE_DAC_FILE)
 $(MANAKAI_LIB_DIR)manakai/all$(DAC_SUFFIX): dummy
@@ -175,5 +173,4 @@ dummy:
 
 clean:
 	$(RM) $(GENERATED_FILES)
-	$(RM) .*.tmp .discore$(PM_SUFFIX) .disdoc$(PM_SUFFIX) \
-	  .discore-all$(PM_SUFFIX)
+	$(RM) .*.tmp .discore$(PM_SUFFIX) .discore-all$(PM_SUFFIX)

@@ -247,8 +247,7 @@ sub append_module_documentation (%) {
     return;
   }
 
-  for my $rres (@{$opt{source_resource}->get_property_resource_list
-                           (ExpandedURI q<DIS:resource>)}) {
+  for my $rres (@{$opt{source_resource}->get_resource_list}) {
     if ($rres->owner_module eq $opt{source_resource} and## Defined in this module
         not ($ReferredResource{$rres->uri} < 0)) {
                           ## TODO: Modification required to support modplans
@@ -356,8 +355,7 @@ sub append_interface_documentation (%) {
                       result_parent => $section,
                       class_uri => $class_uri);
 
-  for my $memres (@{$opt{source_resource}->get_property_resource_list
-                              (ExpandedURI q<DIS:childResource>)}) {
+  for my $memres (@{$opt{source_resource}->get_child_resource_list}) {
     if ($memres->is_type_uri (ExpandedURI q<DISLang:Method>)) {
       append_method_documentation (source_resource => $memres,
                                    result_parent => $section,
@@ -406,8 +404,7 @@ sub append_class_documentation (%) {
   }
 
   my $has_const = 0;
-  for my $memres (@{$opt{source_resource}->get_property_resource_list
-                              (ExpandedURI q<DIS:childResource>)}) {
+  for my $memres (@{$opt{source_resource}->get_child_resource_list}) {
     if ($memres->is_type_uri (ExpandedURI q<DISLang:Method>)) {
       append_method_documentation (source_resource => $memres,
                                    result_parent => $section,
@@ -485,8 +482,7 @@ sub append_method_documentation (%) {
                    method_resource => $opt{source_resource});
   }
 
-  for my $cr (@{$opt{source_resource}->get_property_resource_list
-                  (ExpandedURI q<DIS:childResource>)}) {
+  for my $cr (@{$opt{source_resource}->get_child_resource_list}) {
     if ($cr->is_type_uri (ExpandedURI q<DISLang:MethodParameter>)) {
       append_param_documentation (source_resource => $cr,
                                   result_parent => $m,
@@ -591,8 +587,7 @@ sub append_constgroup_documentation (%) {
   append_subclassof (source_resource => $opt{source_resource},
                      result_parent => $m);
 
-  for my $cr (@{$opt{source_resource}->get_property_resource_list
-                  (ExpandedURI q<DIS:childResource>)}) {
+  for my $cr (@{$opt{source_resource}->get_child_resource_list}) {
     if ($cr->is_type_uri (ExpandedURI q<ManakaiDOM:Const>)) {
       append_const_documentation (source_resource => $cr,
                                   result_parent => $m);
@@ -622,8 +617,7 @@ sub append_const_documentation (%) {
     $m->create_value->text_content ($value->stringify);
   }
   
-  for my $cr (@{$opt{source_resource}->get_property_resource_list
-                  (ExpandedURI q<DIS:childResource>)}) {
+  for my $cr (@{$opt{source_resource}->get_child_resource_list}) {
     if ($cr->is_type_uri (ExpandedURI q<ManakaiDOM:ExceptionOrWarningSubType>)) {
       append_xsubtype_documentation (source_resource => $cr,
                                      result_parent => $m);
@@ -695,8 +689,7 @@ sub append_description (%) {
   }
 
   if ($opt{has_case}) {
-    for my $caser (@{$opt{source_resource}->get_property_resource_list
-                      (ExpandedURI q<DIS:childResource>)}) {
+    for my $caser (@{$opt{source_resource}->get_child_resource_list}) {
       if ($caser->is_type_uri (ExpandedURI q<ManakaiDOM:InCase>)) {
         my $case = $opt{result_parent}->append_case;
         my $cased = $caser->get_feature (ExpandedURI q<DIS:Doc>, '2.0');
@@ -1395,4 +1388,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/09/25 14:53:02 $
+1; # $Date: 2005/09/26 14:37:34 $
