@@ -19,7 +19,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/24 11:57:31 $
+      $Date: 2005/09/27 05:30:52 $
     @@ContentType:
       dis:Date.RCS
   
@@ -44,6 +44,8 @@ Namespace:
   @dp:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
   @dx:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/XML#
+  @dxm:
     http://suika.fam.cx/~wakaba/archive/2004/dis/XML#
   @is:
     http://suika.fam.cx/~wakaba/archive/2004/dis/XML#
@@ -248,7 +250,7 @@ InfoItemDef:
   @QName:
     infoset:Document
   @InfosetName: document
-  @DISPerl:propHashKey: doc
+  @dxm:nodeTypeName: d
   @enDesc:
     There is exactly one document information item in the information
     set for an XML document and all other information items are
@@ -529,7 +531,7 @@ InfoItemDef:
   @QName:
     infoset:Element
   @InfosetName: element
-  @DISPerl:propHashKey: el
+  @dxm:nodeTypeName: e
   @enDesc:
     An element in the XML document.
   @is:hasProperty:
@@ -745,7 +747,7 @@ InfoItemDef:
   @QName:
     infoset:Attribute
   @InfosetName: attribute
-  @DISPerl:propHashKey: a
+  @dxm:nodeTypeName: a
   @enDesc:
     Attributes of elements in the document, including 
     those which are namespace declarations. 
@@ -1001,7 +1003,7 @@ InfoItemDef:
   @QName:
     infoset:ProcessingInstruction
   @InfosetName: processing instruction
-  @DISPerl:propHashKey: pi
+  @dxm:nodeTypeName: p
   @enDesc:
     Processing instructions in the document. 
     \
@@ -1325,7 +1327,7 @@ InfoItemDef:
   @QName:
     infoset:Comment
   @InfosetName: comment
-  @DISPerl:propHashKey: com
+  @dxm:nodeTypeName: c
   @enDesc:
     An XML comment.
   @is:hasProperty:
@@ -1338,7 +1340,7 @@ InfoItemDef:
   @QName:
     infoset:DocumentTypeDeclaration
   @InfosetName: document type declaration
-  @DISPerl:propHashKey: dtdecl
+  @dxm:nodeTypeName: t
   @enDesc:
     A document type declaration.
     \
@@ -1358,7 +1360,7 @@ InfoItemDef:
   @QName:
     infoset:UnparsedEntity
   @InfosetName: unparsed entity
-  @DISPerl:propHashKey: uent
+  @dxm:nodeTypeName: ue
   @enDesc:
     An unparsed entity declared in the DTD.
   @is:hasProperty:
@@ -1417,7 +1419,7 @@ InfoItemDef:
   @QName:
     infoset:Notation
   @InfosetName: notation
-  @DISPerl:propHashKey: not
+  @dxm:nodeTypeName: n
   @enDesc:
     A notation declared in the DTD.
   @is:hasProperty:
@@ -1433,7 +1435,7 @@ InfoItemDef:
   @QName:
     infoset:Namespace
   @InfosetName: namespace
-  @DISPerl:propHashKey: ins
+  @dxm:nodeTypeName: s
   @enDesc:
     A namespace that is in scope for an element.
   @is:hasProperty:
@@ -1927,3 +1929,14 @@ ForDef:
       For XML 1.1
   @ISA:
     dx:ForXML1
+
+ResourceDef:
+  @rdf:type: rdf|Property
+  @QName: dxm|nodeTypeName
+  @enDesc:
+    A node type abbreviation string for internal use.
+  @rdfs:subPropertyOf: DISPerl|propHashKey
+  @subsetOf: DISPerl|propHashKey
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|Single
+

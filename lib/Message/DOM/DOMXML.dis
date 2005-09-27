@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/26 14:37:35 $
+      $Date: 2005/09/27 05:30:40 $
     @@ContentType:
       dis:Date.RCS
 
@@ -62,6 +62,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @DOMMetaImpl:
     http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
+  @dxm:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/XML#
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @infoset:
@@ -717,11 +719,13 @@ PropDef:
   @QName: ManakaiDOM|isExpanded
   @enDesc:
     Whether an entity reference is expanded or not.
+  @DOMCore:nodeProp: xp
 
 PropDef:
   @QName: ManakaiDOM|isExternalEntity
   @enDesc:
     Whether an entity is external entity or not.
+  @DOMCore:nodeProp: xe
 
 ElementTypeBinding:
   @Name: PropDef
@@ -736,19 +740,19 @@ ResourceDef:
   @For: =ManakaiDOM|all
   @rdf:type: rdfs|Resource
   @QName: DOMXML|EntityNode
-  @DISPerl:propHashKey: ent
+  @dxm:nodeTypeName: ge
 
 ResourceDef:
   @For: =ManakaiDOM|all
   @rdf:type: rdfs|Resource
   @QName: DOMXML|EntityReferenceNode
-  @DISPerl:propHashKey: entr
+  @dxm:nodeTypeName: r
 
 ResourceDef:
   @For: =ManakaiDOM|all
   @rdf:type: rdfs|Resource
   @QName: DOMXML|CDATASectionNode
-  @DISPerl:propHashKey: cdsect
+  @dxm:nodeTypeName: cs
 
 NodeTypeDef:
   @IFQName: DocumentType

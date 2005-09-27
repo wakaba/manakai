@@ -19,7 +19,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/26 14:37:39 $
+      $Date: 2005/09/27 05:30:45 $
     @@ContentType:
       dis:Date.RCS
   
@@ -489,7 +489,10 @@ ClassDef:
                 next NODES;
               }
               my @n;
-              for my $p (@{$node->{<Q::TreeCore:subnode2>}}) {
+              my $nt = $Message::Util::ManakaiNode::ManakaiNodeRef::Prop{
+                $node->{<H::mn:type>}
+              }; 
+              for my $p (@{$nt->{<H::mn:subnode2>}||[]}) {
                 if (ref $node->{$p} eq 'ARRAY') {
                   push @n, @{$node->{$p}};
                 } elsif (ref $node->{$p} eq 'HASH') {
@@ -497,20 +500,20 @@ ClassDef:
                 }
               }
               for my $p (@n,
-                         map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}) {
+                         map {$node->{$_}} @{$nt->{<H::mn:subnode1>}||[]}) {
                 if (ref $p eq 'ARRAY') {
                   push @node, @$p;
                 } elsif (ref $p eq 'HASH') {
                   push @node, values %$p;
                 }
               }
-              for my $p (@{$node->{<Q::TreeCore:origin>}}) {
+              for my $p (@{$nt->{<H::mn:origin0>}||[]}) {
                 unshift @node, $node->{$p} if $node->{$p};
                 ## NOTE: Puts the top of the list,
                 ##       since upper-level nodes are expected to be referred
                 ##       more than lower-levels.
               }
-              for my $p (@{$node->{<Q::TreeCore:subnode0>}}) {
+              for my $p (@{$nt->{<H::mn:subnode0>}}) {
                 push @node, $node->{$p} if $node->{$p};
               }
               $checked{$node->{<H::mn:nodeID>}} = 1;
@@ -565,7 +568,10 @@ ClassDef:
         NODES: while (defined (my $node = shift @node)) {
           next unless ref $node and defined $node->{<H::mn:nodeID>};
           my @n;
-              for my $p (@{$node->{<Q::TreeCore:subnode2>}}) {
+              my $nt = $Message::Util::ManakaiNode::ManakaiNodeRef::Prop{
+                $node->{<H::mn:type>}
+              }; 
+              for my $p (@{$nt->{<H::mn:subnode2>}}) {
                 if (ref $node->{$p} eq 'ARRAY') {
                   push @n, @{$node->{$p}};
                 } elsif (ref $node->{$p} eq 'HASH') {
@@ -573,15 +579,15 @@ ClassDef:
                 }
               }
               for my $p (@n,
-                         map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}) {
+                         map {$node->{$_}} @{$nt->{<H::mn:subnode1>}}) {
                 if (ref $p eq 'ARRAY') {
                   push @node, @$p;
                 } elsif (ref $p eq 'HASH') {
                   push @node, values %$p;
                 }
               }
-              for my $p (@{$node->{<Q::TreeCore:origin>}},
-           \             @{$node->{<Q::TreeCore:subnode0>}}) {
+              for my $p (@{$nt->{<H::mn:origin0>}},
+           \             @{$nt->{<H::mn:subnode0>}}) {
                 push @node, $node->{$p};
               }
           %$node = ();
@@ -662,7 +668,10 @@ ClassDef:
             next if ${$node->{<H::mn:treeID>}} eq
                     ${$self->{<H::mn:treeID>}};
             my @n;
-              for my $p (@{$node->{<Q::TreeCore:subnode2>}}) {
+              my $nt = $Message::Util::ManakaiNode::ManakaiNodeRef::Prop{
+                $node->{<H::mn:type>}
+              }; 
+              for my $p (@{$nt->{<H::mn:subnode2>}}) {
                 if (ref $node->{$p} eq 'ARRAY') {
                   push @n, @{$node->{$p}};
                 } elsif (ref $node->{$p} eq 'HASH') {
@@ -670,15 +679,15 @@ ClassDef:
                 }
               }
               for my $p (@n,
-                         map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}) {
+                         map {$node->{$_}} @{$nt->{<H::mn:subnode1>}}) {
                 if (ref $p eq 'ARRAY') {
                   push @node, @$p;
                 } elsif (ref $p eq 'HASH') {
                   push @node, values %$p;
                 }
               }
-            for my $p (@{$node->{<Q::TreeCore:origin>}},
-           \           @{$node->{<Q::TreeCore:subnode0>}}) {
+            for my $p (@{$nt->{<H::mn:origin0>}},
+           \           @{$nt->{<H::mn:subnode0>}}) {
               push @node, $node->{$p};
             }
             $node->{<H::mn:treeID>} = $self->{<H::mn:treeID>};
@@ -752,7 +761,10 @@ ClassDef:
             next unless ref $node;
             next if ${$node->{<H::mn:treeID>}} eq $$tid;
               my @n;
-              for my $p (@{$node->{<Q::TreeCore:subnode2>}}) {
+              my $nt = $Message::Util::ManakaiNode::ManakaiNodeRef::Prop{
+                $node->{<H::mn:type>}
+              }; 
+              for my $p (@{$nt->{<H::mn:subnode2>}}) {
                 if (ref $node->{$p} eq 'ARRAY') {
                   push @n, @{$node->{$p}};
                 } elsif (ref $node->{$p} eq 'HASH') {
@@ -760,15 +772,15 @@ ClassDef:
                 }
               }
               for my $p (@n,
-                         map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}) {
+                         map {$node->{$_}} @{$nt->{<H::mn:subnode1>}}) {
                 if (ref $p eq 'ARRAY') {
                   push @node, @$p;
                 } elsif (ref $p eq 'HASH') {
                   push @node, values %$p;
                 }
               }
-            for my $p (@{$node->{<Q::TreeCore:origin>}},
-       \               @{$node->{<Q::TreeCore:subnode0>}}) {
+            for my $p (@{$nt->{<H::mn:origin0>}},
+       \               @{$nt->{<H::mn:subnode0>}}) {
               push @node, $node->{$p};
             }
             $node->{<H::mn:treeID>} = $tid;
@@ -815,7 +827,7 @@ ClassDef:
         @@@@ForCheck: ForCompact
         @@@@@:
           if (ref $node and
-              UNIVERSAL::isa ($node, <ClassName::NodeStem>) and
+              UNIVERSAL::isa ($node, <ClassName::ManakaiNodeStem>) and
               $node->{<H::mn:nodeID>} eq $self->{<H::mn:nodeID>}) {
             $r = true;
           }
@@ -1011,6 +1023,7 @@ PropDef:
     a origin-subnode-relationship.
   @dataType: DISCore|QName
   @multipleProperties: DISCore|UnorderedList
+  @mn:stemName: s0
 
 PropDef:
   @QName: mn|subnode1
@@ -1021,6 +1034,7 @@ PropDef:
   @rdfs:subPropertyOf: mn|noderef
   @dataType: DISCore|QName
   @multipleProperties: DISCore|UnorderedList
+  @mn:stemName: s
 
 PropDef:
   @QName: mn|subnode2
@@ -1032,30 +1046,35 @@ PropDef:
   @rdfs:subPropertyOf: mn|noderef
   @dataType: DISCore|QName
   @multipleProperties: DISCore|UnorderedList
+  @mn:stemName: s2
 
 PropDef:
   @QName: mn|origin0
   @rdfs:subPropertyOf: mn|noderef
   @dataType: DISCore|QName
   @multipleProperties: DISCore|UnorderedList
+  @mn:stemName: o
 
 PropDef:
   @QName: mn|irefnode0
   @rdfs:subPropertyOf: mn|noderef
   @dataType: DISCore|QName
   @multipleProperties: DISCore|UnorderedList
+  @mn:stemName: i
 
 PropDef:
   @QName: mn|anydata1
   @rdfs:subPropertyOf: mn|noderef
   @dataType: DISCore|QName
   @multipleProperties: DISCore|UnorderedList
+  @mn:stemName: a1
 
 PropDef:
   @QName: mn|anydata2
   @rdfs:subPropertyOf: mn|noderef
   @dataType: DISCore|QName
   @multipleProperties: DISCore|UnorderedList
+  @mn:stemName: a2
 
 PropDef:
   @QName: mn|nodeID

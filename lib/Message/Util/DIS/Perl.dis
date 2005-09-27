@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/26 14:37:41 $
+      $Date: 2005/09/27 05:30:49 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2189,19 +2189,24 @@ IFClsDef:
                   if ($role-><M::DIS|DISResource.isSubsetOfURI>
                                 (<Q::mn|NodeRefRole>)) {
                     my %nrp;
-                    for my $p (['s0', <Q::mn|subnode0>],
-                               ['s1', <Q::mn|subnode1>],
-                               ['s2', <Q::mn|subnode2>],
-                               ['o0', <Q::mn|origin0>],
-                               ['i0', <Q::mn|irefnode0>],
-                               ['a1', <Q::mn|anydata1>],
-                               ['a2', <Q::mn|anydata2>],) {
-                      $nrp{$p->[0]} = [map {
+                    my $db = $self-><AG::DIS|DISAnyResource.database>;
+                    for my $p (<Q::mn|subnode0>,
+                               <Q::mn|subnode1>,
+                               <Q::mn|subnode2>,
+                               <Q::mn|origin0>,
+                               <Q::mn|irefnode0>,
+                               <Q::mn|anydata1>,
+                               <Q::mn|anydata2>) {
+                      $nrp{
+                        $db-><M::DIS|DISDatabase.getResource> ($p)
+                           -><M::DIS|DISResourceProp.getPropertyText>
+                                  (<Q::mn:stemName>, $p)
+                      } = [map {
                         $_-><M::DIS|DISResourceProp.getPropertyText>
                                   (<Q::DISPerl:propHashKey>,
                                    $_-><AG::DIS|DISAnyResource.uri>)
                       } @{$cls-><M::DIS|DISResourceProp.getPropertyResourceList>
-                                  ($p->[1], isa_recursive => true)}];
+                                  ($p, isa_recursive => true)}];
                     }
                     for (keys %nrp) {
                       CORE::delete $nrp{$_} unless @{$nrp{$_}};

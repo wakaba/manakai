@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/26 14:37:34 $
+      $Date: 2005/09/27 05:30:36 $
     @@ContentType:
       dis:Date.RCS
 
@@ -102,6 +102,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
   @DOMViews:
     http://suika.fam.cx/~wakaba/archive/2004/dom/views#
+  @dxm:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/XML#
   @ev:
     http://www.w3.org/2001/xml-events
   @f:
@@ -6245,11 +6247,20 @@ PropDef:
   @ImplNote: Temporary.
 
 PropDef:
+  @QName: DOMCore|nodeProp
+  @enDesc:
+    The name of the property when it is used as an internal property
+    hash key for nodes.
+  @rdfs:subPropertyOf: mn|stemName
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|Single
+
+PropDef:
   @QName: DOMCore|read-only
   @enDesc:
     Whether a node is read-only or not.
   @Type: DISPerl|Boolean
-  @mn:stemName: ro
+  @DOMCore:nodeProp: ro
 
 ElementTypeBinding:
   @Name: RoleDef
@@ -14185,13 +14196,13 @@ ResourceDef:
   @For: =ManakaiDOM|all
   @rdf:type: rdfs|Resource
   @QName: DOMCore|TextNode
-  @DISPerl:propHashKey: txt
+  @dxm:nodeTypeName: x
 
 ResourceDef:
   @For: =ManakaiDOM|all
   @rdf:type: rdfs|Resource
   @QName: DOMCore|DocumentFragmentNode
-  @DISPerl:propHashKey: dfrag
+  @dxm:nodeTypeName: f
 
 PropDef:
   @QName: ManakaiDOMCore|nodeMatch
@@ -14204,12 +14215,13 @@ PropDef:
   @enDesc:
     The type of the node, i.e. <A::Node||ManakaiDOM|ManakaiDOM.nodeType>.
   @Type: DISPerl|String
-  @mn:stemName: nt
+  @DOMCore:nodeProp: nt
 
 PropDef:
   @QName: xmlEncoding
   @enDesc:
     <A::Document.xmlEncoding>
+  @DOMCore:nodeProp: xcs
 
 PropDef:
   @QName:
@@ -16922,12 +16934,13 @@ PropDef:
   @QName: ownerDocument
   @enDesc:
     <A::Node.ownerDocument>.
-  @mn:stemName: od
+  @DOMCore:nodeProp: od
 
 PropDef:
   @QName: documentURI
   @enDesc:
     <A::Document.documentURI>.
+  @DOMCore:nodeProp: duri
 
 PropDef:
   @QName: domConfig
@@ -16936,12 +16949,13 @@ PropDef:
     associated with the subject resource.
   @rdfs:range:
     DOMConfiguration
+  @DOMCore:nodeProp: cfg
 
 PropDef:
   @QName: strictErrorChecking
   @enDesc:
     <A::Document.strictErrorChecking>.
-  @mn:stemName: errchk
+  @DOMCore:nodeProp: chk
 
 PropDef:
   @Name: name
@@ -16949,7 +16963,7 @@ PropDef:
     @@lang:en
     @@@:
       A name.
-  @mn:stemName: xmlname
+  @DOMCore:nodeProp: xnm
 
 PropDef:
   @QName: hasFeature
@@ -16982,7 +16996,7 @@ PropDef:
         - <M::Document.createElementNS>.
         \
        }
-  @mn:stemName: feature
+  @DOMCore:nodeProp: hf
 
 ConfigParam:
   @ForCheck: !ManakaiDOM|all
