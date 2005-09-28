@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/24 11:57:27 $
+      $Date: 2005/09/28 04:02:03 $
     @@ContentType:
       dis:Date.RCS
   
@@ -524,8 +524,7 @@ IFClsDef:
             FIND: for my $mod_uri (keys %{$db->{modDef}}) {
               my $mod = $db-><M::DIS|DISDatabase.getModule> ($mod_uri);
               if ($mod-><AG::DIS|DISAnyResource.localName> eq $prefix) {
-                $r = $mod-><M::DIS|DISResourceProp.getPropertyText>
-                                                   (<Q::dis:Namespace>, null);
+                $r = $mod-><AG::DIS|DISModule.targetNamespaceURI>;
                 last FIND;
               }
             }
@@ -977,8 +976,7 @@ IFClsDef:
                                                 ($mod_uri);
                 my $prefix = $mod-><AG::DIS|DISAnyResource.localName>;
                 $self->{ns}->{$prefix}
-                  = $mod-><M::DIS|DISResourceProp.getPropertyText>
-                      (<Q::dis:Namespace>, null)
+                  = $mod-><AG::DIS|DISModule.targetNamespaceURI>
                   unless defined $self->{ns}->{$prefix};
               }
             }
@@ -1044,8 +1042,7 @@ IFClsDef:
                                                 ($mod_uri);
                 my $prefix = $mod-><AG::DIS|DISAnyResource.localName>;
                 $self->{ns}->{$prefix}
-                  = $mod-><M::DIS|DISResourceProp.getPropertyText>
-                      (<Q::dis:Namespace>, null)
+                  = $mod-><AG::DIS|DISModule.targetNamespaceURI>
                   unless defined $self->{ns}->{$prefix};
               }
             }

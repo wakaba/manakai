@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/09/27 05:30:40 $
+      $Date: 2005/09/28 04:01:52 $
     @@ContentType:
       dis:Date.RCS
   
@@ -104,7 +104,6 @@ Namespace:
     http://www.w3.org/2000/01/rdf-schema#
   @swcfg21:
     http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
-  @TreeCore:\
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
   @UtilError:
@@ -2569,10 +2568,6 @@ IFClsDef:
           my $node =
              $r = <ClassM::ManakaiNode|ManakaiNodeStem||ManakaiDOM|Perl.new>
                     ($refClass);
-          push @{$node->{<Q::TreeCore:origin>}}, <H::swcfg21:parent>;
-          push @{$node->{<Q::TreeCore:subnode>}}, <H::swcfg21:childNodes>;
-          push @{$node->{<Q::TreeCore:irefnode>}}, <H::swcfg21:ownerDocument>;
-          push @{$node->{<Q::TreeCore:anydata2>}}, <H::swcfg21:flag>, <H::swcfg21:option>;
           $node->{<H::swcfg21:childNodes>} = [];
         @@@@ImplNote:
           @@@@@lang:en
@@ -3197,8 +3192,6 @@ IFClsDef:
         @@@@@:
           $r = <ClassM::ManakaiSWCFGNode.newObject> ($self);
           $r->{<H::swcfg21:nodeType>} = '#element';
-          push @{$r->{<Q::TreeCore:subnode0>}}, <H::swcfg21:shadowContent>,
-                                                <H::swcfg21:shadowSibling>;
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
@@ -3553,7 +3546,6 @@ IFClsDef:
           $r->{<H::swcfg21:etBinding>} = {};
           $r->{<H::swcfg21:namespaceExpanded>} = true; ## Always t r u e
           $r->{<H::swcfg21:etExpanded>} = true; ## Always t r u e
-          push @{$r->{<Q::TreeCore:subnode2>}}, <H::swcfg21:etBinding>;
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
@@ -3638,8 +3630,6 @@ IFClsDef:
           $r->{<H::swcfg21:nodeType>} = '#fragment';
           $r->{<H::swcfg21:namespaceExpanded>} = true; ## Always t r u e
           $r->{<H::swcfg21:etExpanded>} = true; ## Always t r u e
-          push @{$r->{<Q::TreeCore:origin>}},
-                     <H::swcfg21:shadowOwner>, <H::swcfg21:shadowParent>, <H::swcfg21:shadowSiblingOf>;
         @@@@ImplNote:
           @@@@@lang:en
           @@@@@@:
@@ -4654,8 +4644,6 @@ IFClsDef:
                     $sc->{<H::swcfg21:etExpanded>} = true;
                     $sc->{<H::mn:type>}
                       = <ClassName::ManakaiSWCFGDocumentFragment>;
-                    push @{$sc->{<Q::TreeCore:origin>}}, <H::swcfg21:shadowOwner>, 
-                             <H::swcfg21:shadowParent>, <H::swcfg21:shadowSiblingOf>;
                   } elsif ($cn->{<H::swcfg21:localName>} eq 'ShadowSibling') {
                     $ss = $cn;
                     $ss->{<H::swcfg21:nodeType>} = '#fragment';
@@ -4666,8 +4654,6 @@ IFClsDef:
                     $ss->{<H::swcfg21:etExpanded>} = true;
                     $ss->{<H::mn:type>}
                       = <ClassName::ManakaiSWCFGDocumentFragment>;
-                    push @{$ss->{<Q::TreeCore:origin>}}, <H::swcfg21:shadowOwner>,
-                             <H::swcfg21:shadowParent>, <H::swcfg21:shadowSiblingOf>;
                   }
                 }
                 $n->{<H::swcfg21:childNodes>} = [];

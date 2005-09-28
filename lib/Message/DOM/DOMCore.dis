@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/27 05:30:36 $
+      $Date: 2005/09/28 04:01:50 $
     @@ContentType:
       dis:Date.RCS
 
@@ -145,7 +145,6 @@ Namespace:
     http://www.w3.org/2000/01/rdf-schema#
   @sw010:
     urn:x-suika-fam-cx:markup:suikawiki:0:10:
-  @TreeCore: \
   @xhtml1:
     http://www.w3.org/1999/xhtml
   @xml:
@@ -5896,8 +5895,6 @@ IFCls1Def:
           my $node = $r = bless <ClassM::ManakaiNode|ManakaiNodeStem||
                                          ManakaiDOM|Perl.new> ($refClass),
                             <ClassName::ManakaiDOMCore:ManakaiDOMNodeObjectNode>;
-          push @{$node->{<Q::TreeCore:irefnode>}}, <H::DOMCore:ownerDocument>;
-          push @{$node->{<Q::TreeCore:anydata2>}}, <H::DOMEvents:eventListener>;
        @@@ImplNote:
          @@@@lang:en
          @@@@@:
@@ -10257,8 +10254,6 @@ NodeTypeDef:
           The new object for the <IF::Attr> node.
       @@@PerlDef:
           $r = <ClassM::ManakaiDOMNode.newObject> ($self);
-          push @{$r->{<Q::TreeCore:origin>}}, <H::infoset:ownerElement>;
-          push @{$r->{<Q::TreeCore:subnode>}}, <H::infoset:children>;
           $r->{<H::infoset:children>} = [];
           $r->{<H::DOMCore:nodeType>} = <H::infoset:Attribute>;
      @@ImplNote:
@@ -12790,10 +12785,7 @@ NodeTypeDef:
           The new object for the <IF::Element> node.
       @@@PerlDef:
         $r = <ClassM::ManakaiDOMNode.newObject> ($self);
-        push @{$r->{<Q::TreeCore:origin>}}, <H::infoset:parent>;
-        push @{$r->{<Q::TreeCore:subnode2>}}, <H::infoset:attributes>;
         $r->{<H::infoset:attributes>} = {};
-        push @{$r->{<Q::TreeCore:subnode>}}, <H::infoset:children>;
         $r->{<H::infoset:children>} = [];
         $r->{<H::DOMCore:nodeType>} = <H::infoset:Element>;
      @@ImplNote:
@@ -13305,7 +13297,6 @@ IFCls1Def:
           The new object for the <IF::Text> node.
       @@@PerlDef:
           $r = <ClassM::ManakaiDOMNode.newObject> ($self);
-          push @{$r->{<Q::TreeCore:origin>}}, <H::infoset:parent>;
           $r->{<H::DOMCore:nodeType>} = <H::DOMCore:TextNode>;
           $r->{<H::infoset:content>} = '';
      @@ImplNote:
@@ -13460,7 +13451,6 @@ IFCls1Def:
           The new object for the <IF::Comment> node.
       @@@PerlDef:
           $r = <ClassM::ManakaiDOMNode.newObject> ($self);
-          push @{$r->{<Q::TreeCore:origin>}}, <H::infoset:parent>;
           $r->{<H::DOMCore:nodeType>} = <H::infoset:Comment>;    
           $r->{<H::infoset:content>} = '';
      @@ImplNote:
@@ -14664,8 +14654,6 @@ NodeTypeDef:
           The new node stem object of type <IF::DocumentFragment>.
       @@@PerlDef:
           $r = <ClassM::ManakaiDOMNode.newObject> ($self);
-          push @{$r->{<Q::TreeCore:origin>}}, <H::infoset:parent>;
-          push @{$r->{<Q::TreeCore:subnode>}}, <H::infoset:children>;
           $r->{<H::infoset:children>} = [];
           $r->{<H::DOMCore:nodeType>} = <H::DOMCore:DocumentFragmentNode>;
        @@@ImplNote:
@@ -16827,7 +16815,7 @@ NodeTypeDef:
       @@@lang:en
       @@@@:
         The caller of this internal method MUST ensure to set 
-        the attributes: <CODE::TreeCore:implementation>.
+        the attributes: <Q::DOMCore:implementation>.
     @@Return:
       @@@Type: NodeStem
       @@@Description:
@@ -16835,12 +16823,9 @@ NodeTypeDef:
         @@@@@: The new object for the "Document".
       @@@PerlDef:
           $r = <ClassM::ManakaiDOMNode.newObject> ($self);
-          push @{$r->{<Q::TreeCore:origin>}}, <H::infoset:parent>;
           $r->{<H::DOMCore:nodeType>} = <H::infoset:Document>;
           $r->{<H::infoset:version>} = '1.0';
           $r->{<H::DOMCore:strictErrorChecking>} = true;
-          push @{$r->{<Q::TreeCore:subnode>}},
-               <Q::infoset:children>, <H::DOMViews:view>;
           $r->{<H::infoset:children>} = [];
           $r->{<H::DOMViews:view>} = [];
        @@@ImplNote:

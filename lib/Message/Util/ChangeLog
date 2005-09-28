@@ -1,5 +1,16 @@
 2005-09-27  Wakaba  <wakaba@suika.fam.cx>
 
+	* ManakaiNode.dis (ManakaiNodeStem->new): Don't set "TreeCore:*"
+	properties.
+	(generateUniqueID): Use "tag:" URI.
+
+	* DIS.dis (targetNamespaceURI): New attribute.
+	(ManakaiDISModuleLite): Extends dx:ManakaiDefaultErrorHandler.
+	(ManakaiDISModuleLite->AUTOLOAD): Don't load module
+	if method name is "DESTROY".
+
+2005-09-27  Wakaba  <wakaba@suika.fam.cx>
+
 	* ManakaiNode.dis (ManakaiNodeStem): Use per-class
 	variable for searching noderel properties instead 
 	of per-node properties.

@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/09/27 05:30:42 $
+      $Date: 2005/09/28 04:01:57 $
     @@ContentType:
       dis:Date.RCS
   
@@ -793,9 +793,8 @@ IFClsDef:
                 my $mod = $db-><M::ManakaiDISDatabase.getModule> ($mod_uri);
                 my $mod_ln = $mod-><AG::DISAnyResource.localName>;
                 next if exists $binds->{$mod_ln};
-                my $ns_uri = $mod-><M::DISResourceProp
-                                            .getPropertyText>
-                                                 (<Q::dis:Namespace>, '');
+                my $ns_uri = $mod-><AG::DIS|DISModule.targetNamespaceURI>;
+                $ns_uri = '' unless defined $ns_uri;
                 if ($ns_uri eq $namespaceURI) {
                   $r = $mod_ln;
                   last FIND;
@@ -924,8 +923,7 @@ IFClsDef:
                 my $mod = $db-><M::ManakaiDISDatabase.getModule> ($mod_uri);
                 if ($mod-><AG::DISAnyResource.localName>
                       eq $prefix) {
-                  $r = $mod-><M::DISResourceProp.getPropertyText>
-                                                   (<Q::dis:Namespace>, null);
+                  $r = $mod-><AG::DIS|DISModule.targetNamespaceURI>;
                   last FIND;
                 }            
               }
@@ -1319,6 +1317,7 @@ PropDef:
   @QName: defaultNamespaceURI
   @enDesc:
     Default namespace URI for an element.
+  @DIS:key: dns
 
 IFClsDef:
   @IFQName: DISElement
@@ -2120,8 +2119,7 @@ IFClsDef:
               my $mod = $databaseArg-><M::DISDatabase.getModule> ($mod_uri);
               $ods->{<H::DIS|allNSBindings>}
                   ->{$mod-><AG::DISAnyResource.localName>}
-                = $mod-><M::DISResourceProp.getPropertyText>
-                      (<Q::dis:Namespace>, null);
+                = $mod-><AG::DIS|DISModule.targetNamespaceURI>;
             }
           }
           for my $prefix (keys %{$ods->{<H::swcfg21:nsBinding>}}) {
@@ -2768,10 +2766,8 @@ IFClsDef:
             $mod->{<Q::DIS|isDefined>} = true;
             $self-><M::DISDatabase.setSourceFile> ($mod_name_uri => $doc);
 
-            __CODE{dv:createURI::
-              $uri => {$mod_node-><AG::DISModuleElement.definingNamespaceURI>},
-              $result => {$mod->{<Q::dis:Namespace>}},
-            }__;
+            $mod-><AS::DIS|ManakaiDISModuleDefinition.targetNamespaceURI>
+                      ($mod_node-><AG::DISModuleElement.definingNamespaceURI>);
 
             __CODE{dv:createValue::
               $result => {$mod->{<Q::DIS:sourceFile>}},
@@ -4636,15 +4632,33 @@ IFClsDef:
                   $db-><M::DIS|DISDatabase.getResource> ($$_)
                 } @{$self->{<H::DIS|resource>}}];
         }__;
+
+  @Attr:
+    @@Name: targetNamespaceURI
+    @@enDesc:
+      The default namespace URI of the resources defined in the module.
+    @@Type: DIS|AnyURI
+    @@Get:
+      @@@PerlDef:
+        $r = defined $self->{<H::DIS|defaultNamespaceURI>}
+             ? ${$self->{<H::DIS|defaultNamespaceURI>}} : null;
+    @@Set:
+      @@@ForCheck: ManakaiDOM|ForClass
+      @@@PerlDef:
+        if (defined $given) {
+          $self->{<H::DIS|defaultNamespaceURI>} = \$given;
+        } else {
+          CORE::delete $self->{<H::DIS|defaultNamespaceURI>};
+        }
 ##DISModule
 
 ClsDef:
   @ClsQName: ManakaiDISModuleLite
 
   @ClsISA: DIS|ManakaiDISAnyResource
+  @ClsISA: dx|ManakaiDefaultErrorHandler||ManakaiDOM|Perl
  
   @Implement: DOMMinImpl
-  @Implement: dx|MUErrorTarget||ManakaiDOM|Perl
   @Implement: DIS|DISResourceProp
   @Implement: dp|DISAnyResourcePerl
   @Implement: dp|DISModulePerl
@@ -4703,6 +4717,10 @@ ClsDef:
       @@@ContentType: lang|Perl
     @@Return:
       @@@PerlDef:
+        my $al = our $AUTOLOAD;
+        $al =~ s/.+:://;
+        if ($al ne 'DESTROY') {
+
         __DEEP{
           $self-><AG::DIS|DISAnyResource.database>
                -><M::dp|ManakaiDISDatabasePerl.plLoadDISDatabaseModule> ($self);
@@ -4714,8 +4732,6 @@ ClsDef:
           }__;
         }
 
-        my $al = our $AUTOLOAD;
-        $al =~ s/.+:://;
         my $code = $self->can ($al);
         if ($code) {
           goto &$code;
@@ -4724,6 +4740,18 @@ ClsDef:
           local $Carp::CarpLevel = $Error::Level;
           Carp::croak (qq<Can't locate method "$AUTOLOAD">);
         }
+
+        } # $al
+
+  @Attr:
+    @@Name: targetNamespaceURI
+    @@enDesc:
+      The default namespace URI of the resources defined in the module.
+    @@Type: DIS|AnyURI
+    @@Get:
+      @@@PerlDef:
+        $r = defined $self->{<H::DIS|defaultNamespaceURI>}
+             ? ${$self->{<H::DIS|defaultNamespaceURI>}} : null;
 ##DISModuleLite
 
 IFClsDef:

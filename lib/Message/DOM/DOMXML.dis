@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/27 05:30:40 $
+      $Date: 2005/09/28 04:01:52 $
     @@ContentType:
       dis:Date.RCS
 
@@ -88,8 +88,6 @@ Namespace:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
-  @TreeCore:\
-
 
 ElementTypeBinding:
   @Name: NodeTypeDef
@@ -636,7 +634,6 @@ ResourceDef:
           The new object for the <IF::CDATASection> node.
       @@@PerlDef:
         $r = <ClassM::DOMCore:ManakaiDOMNode.newObject> ($self);
-        push @{$r->{<Q::TreeCore:origin>}}, <H::infoset:parent>;
         $r->{<H::DOMCore:nodeType>} = <H::DOMXML:CDATASectionNode>;
         $r->{<H::infoset:content>} = '';
      @@ImplNote:
@@ -1056,7 +1053,6 @@ NodeTypeDef:
           The new object for the <IF::DocumentType> node.
       @@@PerlDef:
         $r = <ClassM::DOMCore:ManakaiDOMNode.newObject> ($self);
-        push @{$r->{<Q::TreeCore:origin>}}, <H::infoset:parent>;
         $r->{<H::DOMCore:nodeType>} = <H::infoset:DocumentTypeDeclaration>;
      @@ImplNote:
        @@@lang:en
@@ -1757,7 +1753,6 @@ NodeTypeDef:
           The new object for the <IF::Entity> node.
       @@@PerlDef:
         $r = <ClassM::DOMCore:ManakaiDOMNode.newObject>;
-        push @{$r->{<Q::TreeCore:subnode>}}, <H::infoset:children>;
         $r->{<H::infoset:children>} = [];
         $r->{<H::DOMCore:nodeType>} = <H::DOMXML:EntityNode>;
      @@Level[list]:
@@ -1978,9 +1973,7 @@ NodeTypeDef:
           The new object for the <IF::EntityReference> node.
       @@@PerlDef:
         $r = <ClassM::DOMCore:ManakaiDOMNode.newObject> ($self);
-        push @{$r->{<Q::TreeCore:subnode>}}, <H::infoset:children>;
         $r->{<H::infoset:children>} = [];
-        push @{$r->{<Q::TreeCore:origin>}}, <H::infoset:parent>;
         $r->{<H::DOMCore:nodeType>} = <H::DOMXML:EntityReferenceNode>;
      @@ImplNote:
        @@@lang:en
@@ -2240,7 +2233,6 @@ NodeTypeDef:
           The new object for the <IF::ProcessingInstruction> node.
       @@@PerlDef:
         $r = <ClassM::DOMCore:ManakaiDOMNode.newObject> ($self);
-        push @{$r->{<Q::TreeCore:origin>}}, <H::infoset:parent>;
         $r->{<H::DOMCore:nodeType>} = <H::infoset:ProcessingInstruction>;
         $r->{<H::infoset:content>} = '';
      @@ImplNote:

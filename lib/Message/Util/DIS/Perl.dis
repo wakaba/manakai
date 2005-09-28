@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/27 05:30:49 $
+      $Date: 2005/09/28 04:02:03 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1339,6 +1339,7 @@ IFClsDef:
         my %mod_mod;
         my %undefined_res;
         my %undefined_for;
+        my %temp_mod;
         __DEEP{
           for my $res (values %{$self->{resDef}}) {
             if ($res-><AG::DIS|DISAnyResource.isDefined>) {
@@ -1371,8 +1372,21 @@ IFClsDef:
           }
 
           for my $res (values %{$self->{modDef}}) {
-            if ($res-><AG::DIS|DISAnyResource.isDefined>) {
-
+            if ($res-><AG::DIS|DISAnyResource.isDefined> and
+                not $res->isa (<ClassName::DIS|ManakaiDISModuleLite>)) {
+              $mod_mod{$res->{uri}} = $res;
+              CORE::delete $res->{db};
+              $temp_mod{$res->{uri}} = bless {},
+                                       <ClassName::DIS|ManakaiDISModuleLite>;
+              for ('uri', 'localName', 'namespaceURI', 'for', 'forp',
+                   <H::DIS|isDefined>, <H::DIS|isReferred>,
+                   <H::DIS|sourceNodeID>, <H::DIS|defaultNamespaceURI>) {
+                $temp_mod{$res->{uri}}->{$_} = $res->{$_}
+                  if defined $res->{$_};
+              }
+              $temp_mod{$res->{uri}}->{db} = $self;
+            } else {
+              $temp_mod{$res->{uri}} = $res;
             }
           }
         }__;
@@ -1380,13 +1394,15 @@ IFClsDef:
         ## Obtains module file names and contents
         my %mod_file;
         __DEEP{
-          for my $mod_uri (keys %{{%mod_res, %mod_for}}) {
+          for my $mod_uri (keys %{{%mod_res, %mod_for, %mod_mod}}) {
             my $mod_file_name = ($moduleResolver or sub ($$) {})
               ->($self, $self-><M::DIS|DISDatabase.getModule> ($mod_uri));
             $mod_file{$mod_file_name}->{resDef}->{$_} = $mod_res{$mod_uri}->{$_}
               for keys %{$mod_res{$mod_uri}||{}};
             $mod_file{$mod_file_name}->{forDef}->{$_} = $mod_for{$mod_uri}->{$_}
               for keys %{$mod_for{$mod_uri}||{}};
+            $mod_file{$mod_file_name}->{modDef}->{$mod_uri} = $mod_mod{$mod_uri}
+              if $mod_mod{$mod_uri};
           }
         }__;
 
@@ -1397,7 +1413,8 @@ IFClsDef:
 
         require Scalar::Util;
         for my $res (map {values %{$_->{forDef}||{}},
-                          values %{$_->{resDef}||{}}} values %mod_file) {
+                          values %{$_->{resDef}||{}},
+                          values %{$_->{modDef}||{}}} values %mod_file) {
           $res->{db} = $self;
           Scalar::Util::weaken ($res->{db});
         }
@@ -1407,6 +1424,7 @@ IFClsDef:
           local $self->{<H::dp|dbModuleResolver>} = null;
           local $self->{resDef} = \%undefined_res;
           local $self->{forDef} = \%undefined_for;
+          local $self->{modDef} = \%temp_mod;
           nstore $self, $fileName;
         }
 

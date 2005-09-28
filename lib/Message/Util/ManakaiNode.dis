@@ -19,7 +19,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/27 05:30:45 $
+      $Date: 2005/09/28 04:02:00 $
     @@ContentType:
       dis:Date.RCS
   
@@ -208,13 +208,6 @@ ClassDef:
         @@@@ForCheck: ForCompact
         @@@@@:
           $r = bless {
-            <Q::TreeCore:origin> => [],
-            <Q::TreeCore:subnode0> => [],
-            <Q::TreeCore:subnode> => [],
-            <Q::TreeCore:subnode2> => [],
-            <Q::TreeCore:irefnode> => [],
-            <Q::TreeCore:anydata> => [],
-            <Q::TreeCore:anydata2> => [],
             <H::mn:type> => $className,
             <H::mn:rc> => 0,
             <H::mn:treeID> => \ (<Code::ManakaiDOM:generateUniqueID>),
@@ -1165,7 +1158,7 @@ ResourceDef:
 
   @PerlDef:
       (
-        sprintf 'mid:%d.%d.%s.dom.manakai@suika.fam.cx#',
+        sprintf 'tag:suika.fam.cx,2005-09:%x:%x%s',
                 time, $$,
                 ['A'..'Z', 'a'..'z', '0'..'9']->[rand 62] .
                 ['A'..'Z', 'a'..'z', '0'..'9']->[rand 62] .

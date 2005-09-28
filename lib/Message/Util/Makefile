@@ -128,13 +128,6 @@ $(DIS_CORE_DIS_FILES_DIS:.dis=$(PM_SUFFIX)): %$(PM_SUFFIX): \
 	$(DAC2PM) $< \
 	  --create-perl-module="$(NS_UTIL)ManakaiNode ManakaiNode$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_UTIL_ERR)DOMException Error/DOMException$(PM_SUFFIX)" \
-	  --create-perl-module="$(NS_MDOM)DOMFeature ../DOM/DOMFeature$(PM_SUFFIX)" \
-	  --create-perl-module="$(NS_MDOM)DOMFeature ../DOM/DOMFeature$(PM_SUFFIX)" \
-	  --create-perl-module="$(NS_MDOM)DOMMain    ../DOM/DOMMain$(PM_SUFFIX)" \
-	  --create-perl-module="$(NS_MDOM)DOMCore    ../DOM/DOMCore$(PM_SUFFIX)" \
-	  --create-perl-module="$(NS_MDOM)DOMXML     ../DOM/DOMXML$(PM_SUFFIX)" \
-	  --create-perl-module="$(NS_MDOM)DOMLS      ../DOM/DOMLS$(PM_SUFFIX)" \
-	  --create-perl-module="$(NS_MDOM)GenericLS  ../DOM/GenericLS$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MARKUP)SuikaWikiConfig21 ../Markup/SuikaWikiConfig21$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_UTIL)DIS        DIS$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_UTIL)PerlCode   PerlCode$(PM_SUFFIX)" \
@@ -147,6 +140,19 @@ $(DIS_CORE_DIS_FILES_DIS:.dis=$(PM_SUFFIX)): %$(PM_SUFFIX): \
 	$(PERL_CHK) DIS/Value$(PM_SUFFIX)
 	$(PERL_CHK) DIS/Perl$(PM_SUFFIX)
 	$(PERL_CHK) DIS/DNLite$(PM_SUFFIX)
+	$(DAC2PM) $< \
+	  --create-perl-module="$(NS_MDOM)DOMFeature ../DOM/DOMFeature$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)DOMMain    ../DOM/DOMMain$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)DOMCore    ../DOM/DOMCore$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)DOMXML     ../DOM/DOMXML$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)DOMLS      ../DOM/DOMLS$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)GenericLS  ../DOM/GenericLS$(PM_SUFFIX)"
+	$(PERL_CHK) ../DOM/DOMFeature$(PM_SUFFIX)
+	$(PERL_CHK) ../DOM/DOMMain$(PM_SUFFIX)
+	$(PERL_CHK) ../DOM/DOMCore$(PM_SUFFIX)
+	$(PERL_CHK) ../DOM/DOMXML$(PM_SUFFIX)
+	$(PERL_CHK) ../DOM/DOMLS$(PM_SUFFIX)
+	$(PERL_CHK) ../DOM/GenericLS$(PM_SUFFIX)
 	$(TOUCH) $@
 
 DIS/DISDoc$(PM_SUFFIX): disdoc$(DAC_SUFFIX) $(DAC2PM_PL)
