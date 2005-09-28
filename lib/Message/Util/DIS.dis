@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/09/28 04:01:57 $
+      $Date: 2005/09/28 09:49:10 $
     @@ContentType:
       dis:Date.RCS
   
@@ -508,10 +508,9 @@ IFClsDef:
           my $__turi = $turi;
           my $__furi = $furi;
           for my $__uri ($__turi, $__furi) {
-            $__uri =~ s{([^0-9A-Za-z:;?=_./-])}{sprintf '%%%02X', ord $1}ge;
+            $__uri =~ s{([^0-9A-Za-z!\$'()*,:;=?\@_./~-])}{sprintf '%%%02X', ord $1}ge;
           }
-          $uri = qq<data:,200411tf#xmlns(t=data:,200411tf%23)>.
-                                qq<t:tf($__turi,$__furi)>;
+          $uri = qq<tag:suika.fam.cx,2005-09:$__turi+$__furi>;
         }
 
   @ResourceDef:
@@ -529,25 +528,23 @@ IFClsDef:
           my $__turi = $turi;
           my $__furi = $furi;
           for my $__uri ($__turi, $__furi) {
-            $__uri =~ s{([^0-9A-Za-z:;?=_./~!&+-])}{sprintf '%%%02X', ord $1}ge;
+            $__uri =~ s{([^0-9A-Za-z!\$'()*,:;=?\@_./~-])}{sprintf '%%%02X', ord $1}ge;
           }
           my @__fp;
           for my $__uri (@{$forp}) {
             my $__fpuri = $__uri;
-            $__fpuri =~ s{([^0-9A-Za-z:;?=_./~!&+-])}
+            $__fpuri =~ s{([^0-9A-Za-z!\$'()*,:;=?\@_./~-])}
                          {sprintf '%%%02X', ord $1}ge;
             push @__fp, $__fpuri;
           }
-          $uri = qq<data:,200411tf#xmlns(t=data:,200411tf%23)>.
-                               qq<t:tfp($__turi,$__furi,>.join (',', @__fp).q<)>;
+          $uri = qq<tag:suika.fam.cx,2005-09:$__turi+$__furi+>.join ('+', @__fp);
         } else {
           my $__turi = $turi;
           my $__furi = $furi;
           for my $__uri ($__turi, $__furi) {
-            $__uri =~ s{([^0-9A-Za-z:;?=_./-])}{sprintf '%%%02X', ord $1}ge;
+            $__uri =~ s{([^0-9A-Za-z!\$'(),*:;=?\@_./~-])}{sprintf '%%%02X', ord $1}ge;
           }
-          $uri = qq<data:,200411tf#xmlns(t=data:,200411tf%23)>.
-                                qq<t:tf($__turi,$__furi)>;
+          $uri = qq<tag:suika.fam.cx,2005-09:$__turi+$__furi>;
         }
 
   @ImplNote:
@@ -568,10 +565,9 @@ IFClsDef:
       my $__parent = $parentURI;
       my $__ln = $localName;
       for my $__uri ($__parent, $__ln) {
-        $__uri =~ s{([^0-9A-Za-z:;?=_./~!&+-])}{sprintf '%%%02X', ord $1}ge;
+        $__uri =~ s{([^0-9A-Za-z!\$'(),*:;=?\@_./~-])}{sprintf '%%%02X', ord $1}ge;
       }
-      $result = q<data:,200411tf#xmlns(t=data:,200411tf%23)>.
-                              qq<t:child($__parent,$__ln)>;
+      $result = qq<data:suika.fam.cx,2005-09::$__parent+$__ln>;
 
   @IntMethod:
     @@Name: camelCaseToUnderscoreName
