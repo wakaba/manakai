@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/09/28 04:01:52 $
+      $Date: 2005/09/29 09:15:00 $
     @@ContentType:
       dis:Date.RCS
   
@@ -4625,15 +4625,24 @@ IFClsDef:
                 }
                 ## TODO: DOM error if unknown node
                 push @remove, $i;
+                CORE::delete $n->{<H::swcfg21:parent>};
+                CORE::delete $n->{<H::swcfg21:ownerDocument>};
+                $n-><M::NodeStem.orphanate>;
               } elsif (not $no_binding and
                        $n->{<H::swcfg21:localName>} eq 'ElementTypeBinding') {
                 my ($et, $sn, $sc, $ss) = ('', '');
-                for my $cn (@{$n->{<H::swcfg21:childNodes>}}) {
-                  next unless $cn->{<H::swcfg21:nodeType>} eq '#element';
+                my @etr;
+                CN: for my $cn (@{$n->{<H::swcfg21:childNodes>}}) {
+                  unless ($cn->{<H::swcfg21:nodeType>} eq '#element') {
+                    push @etr, $cn;
+                    next CN;
+                  }
                   if ($cn->{<H::swcfg21:localName>} eq 'Name') {
                     $et = $cn->{<H::swcfg21:value>} if defined $cn->{<H::swcfg21:value>};
+                    push @etr, $cn;
                   } elsif ($cn->{<H::swcfg21:localName>} eq 'ElementType') {
                     $sn = $cn->{<H::swcfg21:value>} if defined $cn->{<H::swcfg21:value>};
+                    push @etr, $cn;
                   } elsif ($cn->{<H::swcfg21:localName>} eq 'ShadowContent') {
                     $sc = $cn;
                     $sc->{<H::swcfg21:nodeType>} = '#fragment';
@@ -4654,9 +4663,16 @@ IFClsDef:
                     $ss->{<H::swcfg21:etExpanded>} = true;
                     $ss->{<H::mn:type>}
                       = <ClassName::ManakaiSWCFGDocumentFragment>;
+                  } else {
+                    push @etr, $cn;
                   }
                 }
                 $n->{<H::swcfg21:childNodes>} = [];
+                for (@etr) {
+                  CORE::delete $_->{<H::swcfg21:parent>};
+                  CORE::delete $_->{<H::swcfg21:ownerDocument>};
+                  $_-><M::NodeStem.orphanate>;
+                }
                 unless (defined $root->{<H::mn:node>}
                                      ->{<H::swcfg21:etBinding>}->{$et}) {
                   $root->{<H::mn:node>}
@@ -4670,6 +4686,9 @@ IFClsDef:
                 }
                 ## TODO: DOM error if unknown node
                 push @remove, $i;
+                CORE::delete $n->{<H::swcfg21:parent>};
+                CORE::delete $n->{<H::swcfg21:ownerDocument>};
+                $n-><M::NodeStem.orphanate>;
               }
             } # $i
             for my $i (reverse @remove) {

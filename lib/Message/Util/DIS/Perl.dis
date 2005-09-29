@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/28 04:02:03 $
+      $Date: 2005/09/29 09:14:58 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2252,7 +2252,7 @@ IFClsDef:
           if (keys %const) {
             my $map = <ClassM::PLImplClass.perlLiteral> (\%const);
             $thismod_pack-><M::DIS|PLBlockCon.appendStatement> ("sub $_ ()")
-              for keys %const;
+              for sort {$a cmp $b} keys %const;
             $thismod_pack-><M::DIS|PLPack.getSub> ('AUTOLOAD',
                                                    make_new_node => true)
               -><M::DIS|PLBlockCon.appendCode> (q[

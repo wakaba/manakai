@@ -19,7 +19,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/28 04:02:00 $
+      $Date: 2005/09/29 09:14:58 $
     @@ContentType:
       dis:Date.RCS
   
@@ -207,9 +207,11 @@ ClassDef:
       @@@PerlDef: 
         @@@@ForCheck: ForCompact
         @@@@@:
+          my $grc = 0;
           $r = bless {
-            <H::mn:type> => $className,
-            <H::mn:rc> => 0,
+            <H::mn:type>   => $className,
+            <H::mn:groveReferenceCounter> => \$grc,
+            <H::mn:rc>     => 0,
             <H::mn:treeID> => \ (<Code::ManakaiDOM:generateUniqueID>),
             <H::mn:nodeID> => <Code::ManakaiDOM:generateUniqueID>,
           }, ref $self || $self;
@@ -220,9 +222,6 @@ ClassDef:
       @@@lang:en
       @@@@:
         Creates a new reference to this node and returns it.
-    @@DISCore:isDeprecated:
-      @@@@:1
-      @@@DISCore:alt: getNewReference
     @@ForCheck: ForFull
     @@Param:
       @@@Name: class
@@ -288,6 +287,7 @@ ClassDef:
       @@@DISPerl:paramStyle: any
     @@PerlDef:
       $object->{<H::mn:rc>}++;
+      ${$object->{<H::mn:groveReferenceCounter>}}++;
       $ref = bless {
         <H::mn:node> => $object,
       }, $class;
@@ -428,9 +428,10 @@ ClassDef:
           } else {
             my @node = ($self);
             my %checked;
-            NODES: while (defined (my $node = shift @node)) {
-              next unless UNIVERSAL::isa ($node,
-                          <ClassName::ManakaiDOM:ManakaiDOMNodeObject>);
+            NODES: while (@node) {
+              my $node = shift @node;
+              next NODES unless UNIVERSAL::isa ($node,
+                           <ClassName::ManakaiDOM:ManakaiDOMNodeObject>);
               if ($node->{<H::mn:rc>}) {
                 $r = true;
                 last NODES;
@@ -473,8 +474,9 @@ ClassDef:
           } else {
             my @node = ($self);
             my %checked;
-            NODES: while (defined (my $node = shift @node)) {
-              next unless ref $node;
+            NODES: while (@node) {
+              my $node = shift @node;
+              next NODES unless ref $node;
               if ($node->{<H::mn:rc>}) {
                 $r = true;
                 last NODES;
@@ -485,7 +487,7 @@ ClassDef:
               my $nt = $Message::Util::ManakaiNode::ManakaiNodeRef::Prop{
                 $node->{<H::mn:type>}
               }; 
-              for my $p (@{$nt->{<H::mn:subnode2>}||[]}) {
+              for my $p (@{$nt->{<H::mn:subnode2>}}) {
                 if (ref $node->{$p} eq 'ARRAY') {
                   push @n, @{$node->{$p}};
                 } elsif (ref $node->{$p} eq 'HASH') {
@@ -493,14 +495,14 @@ ClassDef:
                 }
               }
               for my $p (@n,
-                         map {$node->{$_}} @{$nt->{<H::mn:subnode1>}||[]}) {
+                         map {$node->{$_}} @{$nt->{<H::mn:subnode1>}}) {
                 if (ref $p eq 'ARRAY') {
                   push @node, @$p;
                 } elsif (ref $p eq 'HASH') {
                   push @node, values %$p;
                 }
               }
-              for my $p (@{$nt->{<H::mn:origin0>}||[]}) {
+              for my $p (@{$nt->{<H::mn:origin0>}}) {
                 unshift @node, $node->{$p} if $node->{$p};
                 ## NOTE: Puts the top of the list,
                 ##       since upper-level nodes are expected to be referred
@@ -509,9 +511,16 @@ ClassDef:
               for my $p (@{$nt->{<H::mn:subnode0>}}) {
                 push @node, $node->{$p} if $node->{$p};
               }
-              $checked{$node->{<H::mn:nodeID>}} = 1;
+              $checked{$node->{<H::mn:nodeID>}} = true;
             }
           }
+
+  @ResourceDef:
+    @@QName: mn|isGroveReferenced
+    @@rdf:type: DISPerl|InlineCode
+    @@PerlDef:
+      (${$node->{<H::mn:groveReferenceCounter>}} > 0)
+    @@ForCheck: ForCompact
 
   @IntMethod:
     @@Name: destroy
@@ -524,7 +533,8 @@ ClassDef:
         @@@@ForCheck: ForFull
         @@@@@:
         my @node = ($self);
-        NODES: while (defined (my $node = shift @node)) {
+        NODES: while (@node) {
+              my $node = shift @node;
               my @n;
               for my $p (@{$node->{<Q::TreeCore:subnode2>}}) {
                 if (ref $node->{$p} eq 'ARRAY') {
@@ -558,13 +568,14 @@ ClassDef:
         @@@@ForCheck: ForCompact
         @@@@@:
         my @node = ($self);
-        NODES: while (defined (my $node = shift @node)) {
-          next unless ref $node and defined $node->{<H::mn:nodeID>};
+        NODES: while (@node) {
+          my $node = shift @node;
+          next NODES unless ref $node and defined $node->{<H::mn:nodeID>};
           my @n;
               my $nt = $Message::Util::ManakaiNode::ManakaiNodeRef::Prop{
                 $node->{<H::mn:type>}
               }; 
-              for my $p (@{$nt->{<H::mn:subnode2>}}) {
+              for my $p (@{$nt->{<H::mn:subnode2>}||[]}) {
                 if (ref $node->{$p} eq 'ARRAY') {
                   push @n, @{$node->{$p}};
                 } elsif (ref $node->{$p} eq 'HASH') {
@@ -572,15 +583,15 @@ ClassDef:
                 }
               }
               for my $p (@n,
-                         map {$node->{$_}} @{$nt->{<H::mn:subnode1>}}) {
+                         map {$node->{$_}} @{$nt->{<H::mn:subnode1>}||[]}) {
                 if (ref $p eq 'ARRAY') {
                   push @node, @$p;
                 } elsif (ref $p eq 'HASH') {
                   push @node, values %$p;
                 }
               }
-              for my $p (@{$nt->{<H::mn:origin0>}},
-           \             @{$nt->{<H::mn:subnode0>}}) {
+              for my $p (@{$nt->{<H::mn:origin0>}||[]},
+           \             @{$nt->{<H::mn:subnode0>}||[]}) {
                 push @node, $node->{$p};
               }
           %$node = ();
@@ -616,9 +627,10 @@ ClassDef:
         unless ($node->{<H::mn:treeID>} eq
                 $self->{<H::mn:treeID>}) {
           my @node = ($node);
-          NODES: while (defined (my $node = shift @node)) {
-            next unless UNIVERSAL::isa ($node,
-                        <ClassName::ManakaiDOM:ManakaiDOMNodeObject>);
+          NODES: while (@node) {
+            my $node = shift @node;
+            next NODES unless UNIVERSAL::isa ($node,
+                         <ClassName::ManakaiDOM:ManakaiDOMNodeObject>);
               my @n;
               for my $p (@{$node->{<Q::TreeCore:subnode2>}}) {
                 if (ref $node->{$p} eq 'ARRAY') {
@@ -656,15 +668,17 @@ ClassDef:
         @@@@ForCheck: ForCompact
         @@@@@:
           my @node = ($node);
-          NODES: while (defined (my $node = shift @node)) {
-            next unless ref $node;
-            next if ${$node->{<H::mn:treeID>}} eq
-                    ${$self->{<H::mn:treeID>}};
+          my $newgrc = $self->{<H::mn:groveReferenceCounter>};
+          my $newtid = $self->{<H::mn:treeID>};
+          NODES: while (@node) {
+            my $node = shift @node;
+            next NODES unless ref $node;
+            next NODES if ${$node->{<H::mn:treeID>}} eq $$newtid;
             my @n;
               my $nt = $Message::Util::ManakaiNode::ManakaiNodeRef::Prop{
                 $node->{<H::mn:type>}
               }; 
-              for my $p (@{$nt->{<H::mn:subnode2>}}) {
+              for my $p (@{$nt->{<H::mn:subnode2>}||[]}) {
                 if (ref $node->{$p} eq 'ARRAY') {
                   push @n, @{$node->{$p}};
                 } elsif (ref $node->{$p} eq 'HASH') {
@@ -672,18 +686,22 @@ ClassDef:
                 }
               }
               for my $p (@n,
-                         map {$node->{$_}} @{$nt->{<H::mn:subnode1>}}) {
+                         map {$node->{$_}} @{$nt->{<H::mn:subnode1>}||[]}) {
                 if (ref $p eq 'ARRAY') {
                   push @node, @$p;
                 } elsif (ref $p eq 'HASH') {
                   push @node, values %$p;
                 }
               }
-            for my $p (@{$nt->{<H::mn:origin0>}},
-           \           @{$nt->{<H::mn:subnode0>}}) {
+            for my $p (@{$nt->{<H::mn:origin0>}||[]},
+           \           @{$nt->{<H::mn:subnode0>}||[]}) {
               push @node, $node->{$p};
             }
-            $node->{<H::mn:treeID>} = $self->{<H::mn:treeID>};
+
+            ${$node->{<H::mn:groveReferenceCounter>}} -= $node->{<H::mn:rc>};
+            $node->{<H::mn:treeID>} = $newtid;
+            $node->{<H::mn:groveReferenceCounter>} = $newgrc;
+            ${$node->{<H::mn:groveReferenceCounter>}} += $node->{<H::mn:rc>};
           }
 
   @IntMethod:
@@ -705,14 +723,21 @@ ClassDef:
         @@@@enDesc:
           A reference to the new tree identifier.
           The tree will reference the identifier as it.
+    @@Param:
+      @@@ForCheck: ForCompact
+      @@@Name: groveRC
+      @@@Type: DISPerl|SCALAR||ManakaiDOM|all
+      @@@enDesc:
+        The new reference counter.
     @@Return:
       @@@PerlDef:
         @@@@ForCheck: ForFull
         @@@@@:
         unless ($self->{<H::mn:treeID>} eq $treeID) {
           my @node = ($self);
-          NODES: while (defined (my $node = shift @node)) {
-            next unless UNIVERSAL::isa ($node,
+          NODES: while (@node) {
+            my $node = shift @node;
+            next NODES unless UNIVERSAL::isa ($node,
                         <ClassName::ManakaiDOM:ManakaiDOMNodeObject>);
               my @n;
               for my $p (@{$node->{<Q::TreeCore:subnode2>}}) {
@@ -750,14 +775,15 @@ ClassDef:
         @@@@@:
           my $tid = ref $treeID ? $treeID : \$treeID;
           my @node = ($self);
-          NODES: while (defined (my $node = shift @node)) {
-            next unless ref $node;
-            next if ${$node->{<H::mn:treeID>}} eq $$tid;
+          NODES: while (@node) {
+            my $node = shift @node;
+            next NODES unless ref $node;
+            next NODES if ${$node->{<H::mn:treeID>}} eq $$tid;
               my @n;
               my $nt = $Message::Util::ManakaiNode::ManakaiNodeRef::Prop{
                 $node->{<H::mn:type>}
               }; 
-              for my $p (@{$nt->{<H::mn:subnode2>}}) {
+              for my $p (@{$nt->{<H::mn:subnode2>}||[]}) {
                 if (ref $node->{$p} eq 'ARRAY') {
                   push @n, @{$node->{$p}};
                 } elsif (ref $node->{$p} eq 'HASH') {
@@ -765,18 +791,22 @@ ClassDef:
                 }
               }
               for my $p (@n,
-                         map {$node->{$_}} @{$nt->{<H::mn:subnode1>}}) {
+                         map {$node->{$_}} @{$nt->{<H::mn:subnode1>}||[]}) {
                 if (ref $p eq 'ARRAY') {
                   push @node, @$p;
                 } elsif (ref $p eq 'HASH') {
                   push @node, values %$p;
                 }
               }
-            for my $p (@{$nt->{<H::mn:origin0>}},
-       \               @{$nt->{<H::mn:subnode0>}}) {
+            for my $p (@{$nt->{<H::mn:origin0>}||[]},
+       \               @{$nt->{<H::mn:subnode0>}||[]}) {
               push @node, $node->{$p};
             }
+
+            ${$node->{<H::mn:groveReferenceCounter>}} -= $node->{<H::mn:rc>};
             $node->{<H::mn:treeID>} = $tid;
+            $node->{<H::mn:groveReferenceCounter>} = $groveRC;
+            ${$node->{<H::mn:groveReferenceCounter>}} += $node->{<H::mn:rc>};
           }
 
   @IntMethod:
@@ -857,8 +887,9 @@ ClassDef:
         @@@@ForCheck: ForCompact
         @@@@@:
           if ($self-><M::NodeStem.isExternallyReferred>) {
+            my $grc = 0;
             $self-><M::NodeStem.changeTreeID>
-                         (\(<Code::ManakaiDOM:generateUniqueID>));
+                         (\(<Code::ManakaiDOM:generateUniqueID>), \$grc);
           } else {
             $self-><M::NodeStem.destroy>;
           }
@@ -942,6 +973,7 @@ ClassDef:
       @@@@: DESTROY
     @@Return:
       @@@PerlDef:
+        @@@@ForCheck: ForFull
         @@@@@:
           my $node = $self->{<H::mn:node>};
           if ($node) {
@@ -949,6 +981,24 @@ ClassDef:
             unless ($self->{<H::mn:isWeak>}) {
               $node->{<H::mn:rc>}--;
               unless ($node-><M::NodeStem.isExternallyReferred>) {
+                $node-><M::NodeStem.destroy>;
+              }
+            }
+          } else {
+            warn ref ($self) . q{->DESTROY: there is no associated }.
+                 q{node object - you have a global variable or }.
+                 qq{potential memory-leak detected\n};
+          }
+      @@@PerlDef:
+        @@@@ForCheck: ForCompact
+        @@@@@:
+          my $node = $self->{<H::mn:node>};
+          if ($node) {
+            CORE::delete $self->{<H::mn:node>};
+            unless ($self->{<H::mn:isWeak>}) {
+              $node->{<H::mn:rc>}--;
+              ${$node->{<H::mn:groveReferenceCounter>}}--;
+              unless (<Code::isGroveReferenced:: $node = $node>) {
                 $node-><M::NodeStem.destroy>;
               }
             }
@@ -1089,6 +1139,13 @@ PropDef:
   @mn:stemName: rc
 
 PropDef:
+  @QName: mn|groveReferenceCounter
+  @enDesc:
+    A reference to the number of references that reference
+    a node in the grove.
+  @mn:stemName: grc
+
+PropDef:
   @QName: mn|node
   @mn:refName: node
   @rdfs:domain: mn|NodeRef||ManakaiDOM|Perl
@@ -1218,32 +1275,25 @@ ElementTypeBinding:
       @@@ForCheck:
         !ForFull !ForCompact !ManakaiDOM:ForIF
     @@rdf:type:
-      @@@@:
-        ManakaiDOM:IF
-      @@@ForCheck:
-        ManakaiDOM:ForIF
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
     @@rdf:type:
-      @@@@:
-        ManakaiDOM:Class
+      @@@@: DISLang|Class
       @@@ForCheck: ForFull
     @@rdf:type:
-      @@@@:
-        ManakaiDOM:Class
+      @@@@: DISLang|Class
       @@@ForCheck: ForCompact
-    @@ForCheck:
-      ManakaiDOM:Perl
+    @@ForCheck: ManakaiDOM|Perl
 
 ForDef:
   @QName:
     mn:ForFull
-  @ISA:
-    ManakaiDOM:ForClass
+  @ISA: ManakaiDOM|ForClass
 
 ForDef:
   @QName:
     mn:ForCompact
-  @ISA:
-    ManakaiDOM:ForClass
+  @ISA: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: IntMethod

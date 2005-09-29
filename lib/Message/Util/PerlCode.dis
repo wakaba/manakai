@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/09/24 11:57:26 $
+      $Date: 2005/09/29 09:14:58 $
     @@ContentType:
       dis:Date.RCS
   
@@ -3838,8 +3838,10 @@ IFClsDef:
           }__;
         } elsif (ref $val eq 'HASH') {
           __DEEP{
-            $r = q<{> . <ClassM::ManakaiPerlCodeImplementation
-                                            .perlList> ([%$val]) . q<}>;
+            $r = q<{>
+               . <ClassM::ManakaiPerlCodeImplementation.perlList>
+                   ([map {$_ => $val->{$_}} sort {$a cmp $b} keys %$val])
+               . q<}>;
           }__;
         } else {
           $val =~ s/(['\\])/\\$1/g;

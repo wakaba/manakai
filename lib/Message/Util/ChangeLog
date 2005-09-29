@@ -1,5 +1,22 @@
 2005-09-28  Wakaba  <wakaba@suika.fam.cx>
 
+        * PerlCode.dis (perlLiteral): Sorts output by hash key.
+	
+	* ManakaiNode.dis (new): Sets "mn:groveReferenceCounter"
+	property.
+	(getNewReference): Increments "mn:groveReferenceCounter"
+	property.
+	(ManakaiDOM:ManakaiDOMNodeObject, ManakaiNodeStem): Don't
+	check "defined" to allow "undef" value in "while" condition.
+	(mn:isGroveReferenced): New code.
+	(changeTreeID): New "groveRC" parameter added.
+	(importTree, changeTreeID): Updates "mn:groveReferenceCounter"
+	properties.
+	(destroy): Uses "mn:isGroveReferenced" instead of "isExternallyReferred".
+	(mn:groveReferenceCounter): New property.
+
+2005-09-28  Wakaba  <wakaba@suika.fam.cx>
+
 	* DIS.dis: Use "tag:" URI for internal URIs.
 
 2005-09-27  Wakaba  <wakaba@suika.fam.cx>
