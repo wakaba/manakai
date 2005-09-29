@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/29 09:14:58 $
+      $Date: 2005/09/29 15:18:11 $
     @@ContentType:
       dis:Date.RCS
   
@@ -668,7 +668,7 @@ IFClsDef:
               unless (defined $val) {
                 __UNDEEP{__EXCEPTION{DIS|NO_CONST_VALUE_ERR::
                   DIS:uri => {$const->{uri}},
-                  DIS:localName => {$const->{localName}},
+                  DIS:localName => {$const-><AG::DIS|DISAnyResource.localName>},
                   DIS:sourceNode => {$const->{src}},
                   DIS:elementType => {$et},
                 }__}__;
@@ -701,7 +701,8 @@ IFClsDef:
                       DIS:sourceNode => {$const->{src}},
                       DIS:elementType => {$et},
                       DIS:uri => {$const->{uri}},
-                      DIS:localName => {$const->{localName}},
+                      DIS:localName => {$const-><AG::DIS|DISAnyResource
+                                                    .localName>},
                     }__;
                   } elsif ($on and $on eq 'set') {
                     __EXCEPTION{DIS|NO_ATTR_SET_ERR::
@@ -726,14 +727,14 @@ IFClsDef:
               if ($et eq <Q::DISLang:constValue>) {
                 __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
                   DIS:uri => {$const->{uri}},
-                  DIS:localName => {$const->{localName}},
+                  DIS:localName => {$const-><AG::DIS|DISAnyResource.localName>},
                   DIS:sourceNode => {$self},
                   DIS:expectedType => {<Q::ManakaiDOM:Const>},
                 }__}__;
               } else {  # DISPerl:cloneCode
                 __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
                   DIS:uri => {$const->{uri}},
-                  DIS:localName => {$const->{localName}},
+                  DIS:localName => {$const-><AG::DIS|DISAnyResource.localName>},
                   DIS:sourceNode => {$self},
                   DIS:expectedType => {<Q::DISLang:AnyMethod>},
                 }__}__;
@@ -1816,7 +1817,8 @@ IFClsDef:
                                 (<Q::DIS:sourceFile>, ''));
           $r-><AS::DIS|PLFile.sourceModule>
                   ($self-><AG::DIS|DISAnyResource.nameURI>);
-          $r-><AS::DIS|PLFile.sourceFor> ($self->{for});
+          $r-><AS::DIS|PLFile.sourceFor>
+                                ($self-><AG::DIS|DISAnyResource.forURI>);
           
           ## -- License information
           my $ownermod = $self-><AG::DIS|DISAnyResource.ownerModule>;
@@ -2478,7 +2480,7 @@ IFClsDef:
             }
           } elsif ($self-><M::DIS|DISResource.isTypeURI>
                               (<Q::ManakaiDOM:Const>)) {
-            unless (defined $self->{localName}) {
+            unless (defined $self-><AG::DIS|DISAnyResource.localName>) {
               __UNDEEP{
                 __EXCEPTION{DIS|NO_LOCAL_NAME_ERR::
                   DIS:uri => {$self-><AG::DIS|DISAnyResource.uri>},
@@ -2487,7 +2489,7 @@ IFClsDef:
                 }__;
               }__;
             }
-            $r = uc $self->{localName};
+            $r = uc $self-><AG::DIS|DISAnyResource.localName>;
             if ($r =~ /^_/ or $r =~ /_$/) {
               __UNDEEP{
                 __EXCEPTION{DIS|RESERVED_PERL_METHOD_NAME_ERR::
@@ -2569,7 +2571,7 @@ IFClsDef:
             if (defined $r) {
               ## NOTE: "lang:Perl" is fully-qualified name by definition
             } else {
-              unless (defined $self->{localName}) {
+              unless (defined $self-><AG::DIS|DISAnyResource.localName>) {
                 __UNDEEP{
                   __EXCEPTION{DIS|NO_LOCAL_NAME_ERR::
                     DIS:sourceNode => {$self->{src}},
@@ -2580,11 +2582,11 @@ IFClsDef:
                               (<Q::ManakaiDOM:IF>)) {
                 $r = $self-><AG::DIS|DISAnyResource.ownerModule>
                           -><AG::DISModulePerl.plInterfaceName>
-                   . '::' . $self->{localName};
+                   . '::' . $self-><AG::DIS|DISAnyResource.localName>;
               } else {
                 $r = $self-><AG::DIS|DISAnyResource.ownerModule>
                           -><AG::DISModulePerl.plFullyQualifiedName>
-                   . '::' . $self->{localName};
+                   . '::' . $self-><AG::DIS|DISAnyResource.localName>;
               }
             }
           } elsif ($self-><M::DIS|DISResource.isTypeURI>
@@ -2805,8 +2807,9 @@ IFClsDef:
               $r = $self->{<H::DIS|plCodeFragment>}
                  = $def-><AG::dv|DVValue.value>
                        -><M::DISElementPerl.plCodeFragment>
-                            ($self, for_arg => $self->{for},
-                             forp_arg => $self->{forp},
+                            ($self,
+                             for_arg => $self-><AG::DIS|DISAnyResource.forURI>,
+                             forp_arg => $self-><AG::DIS|DISAnyResource.forpURI>,
                              contains_statements => (not $is_inline),
                       database_arg => $self-><AG::DIS|DISAnyResource.database>); 
             } else {
@@ -2828,7 +2831,7 @@ IFClsDef:
                   DIS:errResource => {$self},
                   DIS:sourceNode => {$self->{src}},
                   DIS:uri => {$self->{uri}},
-                  DIS:localName => {$self->{localName}},
+                  DIS:localName => {$self-><AG::DIS|DISAnyResource.localName>},
                 }__;
               }__;
             }
@@ -2896,7 +2899,8 @@ IFClsDef:
                   __UNDEEP{__EXCEPTION{DIS|NON_NAMED_PARAMETER_AFTER_NAMED_ERR::
                     DIS:sourceNode => {$param->{src}},
                     DIS:uri => {$param->{uri}},
-                    DIS:localName => {$param->{localName}},
+                    DIS:localName => {$param-><AG::DIS|DISAnyResource
+                                                  .localName>},
                   }__}__;
                 } elsif ($param-><AG::DISResourcePerl.plIsNullable>) {
                   $prototype =~ s/;%$/%/;
@@ -3769,7 +3773,7 @@ IFClsDef:
                     = @{$self->{db}-><M::DIS|DISDatabase.xcrefToResource>
                                          ($1, $nsr,
                                           node => $node,
-                                          for_arg => $self->{for})};
+                            for_arg => $self-><AG::DIS|DISAnyResource.forURI>)};
                   my $param = $self-><M::ManakaiDISResourcePerl
                                         .plParsePreprocessParameter>
                                          ($source_code, node => $node,
@@ -3812,8 +3816,9 @@ IFClsDef:
                                         namespace_context=> $namespaceContext);
                   my $code_uri = $nsr-><M::DIS|NSResolverDIS
                                            .tfqnamesToURI>
-                                           ($code_name, null, $self->{for},
-                                            node => $node);
+                                         ($code_name, null,
+                                          $self-><AG::DIS|DISAnyResource.forURI>,
+                                          node => $node);
                   my $code = $self->{db}-><M::DIS|DISDatabase.getResource>
                                            ($code_uri);
                   $code-><AS::DIS|DISAnyResource.isReferred>
@@ -4160,7 +4165,7 @@ IFClsDef:
                                        ($class_qname,
                                         $self-><AG::DIS|DISResource
                                                      .ownerClassNodeURI>,
-                                        $self->{for},
+                                        $self-><AG::DIS|DISAnyResource.forURI>,
                                         node => $node);
                   my $class = $self->{db}-><M::DIS|DISDatabase.getResource>
                                                    ($class_uri);
@@ -4234,7 +4239,7 @@ IFClsDef:
                                        ($source_code,
                                         $self-><AG::DIS|DISResource
                                                      .ownerClassNodeURI>,
-                                        $self->{for},
+                                        $self-><AG::DIS|DISAnyResource.forURI>,
                                         node => $node);
                   my $class = $self->{db}-><M::DIS|DISDatabase.getResource>
                                                    ($class_uri);
@@ -4282,8 +4287,9 @@ IFClsDef:
                                            ($source_code, node => $node,
                                         namespace_context=> $namespaceContext);
                   my $code_uri = $nsr-><M::DIS|NSResolverDIS.tfqnamesToURI>
-                                           ($code_name, null, $self->{for},
-                                            node => $node);
+                                         ($code_name, null,
+                                          $self-><AG::DIS|DISAnyResource.forURI>,
+                                          node => $node);
                   my $code = $self->{db}-><M::DIS|DISDatabase.getResource>
                                            ($code_uri);
                   $code-><AS::DIS|DISAnyResource.isReferred>
@@ -4332,7 +4338,7 @@ IFClsDef:
                                        ($class_qname,
                                         $self-><AG::DIS|DISResource
                                                      .ownerClassNodeURI>,
-                                        $self->{for},
+                                        $self-><AG::DIS|DISAnyResource.forURI>,
                                         node => $node);
                   my $class = $self->{db}-><M::DIS|DISDatabase.getResource>
                                                    ($class_uri);
@@ -4363,7 +4369,8 @@ IFClsDef:
                   } else {
                     __UNDEEP{__EXCEPTION{DIS|NO_CONST_VALUE_ERR::
                       DIS:uri => {$const->{uri}},
-                      DIS:localName => {$const->{localName}},
+                      DIS:localName => {$const-><AG::DIS|DISAnyResource
+                                                    .localName>},
                       DIS:sourceNode => {$const->{src}},
                       DIS:elementType => {$et},
                    }__}__;
@@ -4699,7 +4706,7 @@ IFClsDef:
           __EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
             DIS:sourceNode => {$self->{src}},
             DIS:uri => {$xclass->{uri}},
-            DIS:localName => {$xclass->{localName}},
+            DIS:localName => {$xclass-><AG::DIS|DISAnyResource.localName>},
             DIS:expectedType => {<Q::DOMException:AnyExceptionClass>},
           }__;
         }

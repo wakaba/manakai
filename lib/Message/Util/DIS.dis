@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/09/28 09:49:10 $
+      $Date: 2005/09/29 15:18:09 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2753,11 +2753,20 @@ IFClsDef:
         
           unless ($mod-><AG::DISAnyResource.isDefined>) {
             ## -- Initializes Module Definition Object
-            $mod->{localName} = $mod_name_node-><AG::DISElement
-                                                       .qnameValueLocalName>;
-            $mod->{namespaceURI} = $mod_name_node-><AG::DISElement
-                                                       .qnameValueNamespaceURI>;
-            $mod->{for} = $forArg;
+            my $v = $mod_name_node-><AG::DISElement.qnameValueLocalName>;
+            __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+              $result => {$mod->{localName}},
+              $given => {$v},
+            }__;
+            my $ns = $mod_name_node-><AG::DISElement.qnameValueNamespaceURI>;
+            __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+              $result => {$mod->{namespaceURI}},
+              $given => {$ns},
+            }__;
+            __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+              $result => {$mod->{for}},
+              $given => {$forArg},
+            }__;
             $mod->{src} = $mod_node;
             $mod->{<Q::DIS|isDefined>} = true;
             $self-><M::DISDatabase.setSourceFile> ($mod_name_uri => $doc);
@@ -3062,10 +3071,10 @@ IFClsDef:
           my $al_canon_uri;
           if ($al_node) {
             $al_canon_uri = $al_node-><M::DISElement.tfqnamesValueURI>
-                                   ($$node_id, $forArg,
-                                    for_arg => $self->{for},
-                                    forp_arg => $self->{forp},
-                                    database_arg => $self);
+                            ($$node_id, $forArg,
+                             for_arg => $forArg,
+                             forp_arg => $forpArg,
+                             database_arg => $self);
           }
 
           ## User defined resource identifiers
@@ -3090,10 +3099,16 @@ IFClsDef:
                 }__;
               }__;
             }
-            $res->{localName} = $qn_node-><AG::ManakaiDISElement
-                                                       .qnameValueLocalName>;
-            $res->{namespaceURI} = $qn_node-><AG::ManakaiDISElement
-                                                       .qnameValueNamespaceURI>;
+            my $v = $qn_node-><AG::DIS|DISElement.qnameValueLocalName>;
+            __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+              $result => {$res->{localName}},
+              $given => {$v},
+            }__;
+            my $ns = $qn_node-><AG::DIS|DISElement.qnameValueNamespaceURI>;
+            __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+              $result => {$res->{namespaceURI}},
+              $given => {$ns},
+            }__;
           } else { ## Anonymous or local
             my $n_node = $el-><M::ManakaiDISElement.disGetAttribute>
                                       (<Q::dis:Name>, for_arg => $forArg,
@@ -3110,7 +3125,11 @@ IFClsDef:
                                              $result => $ru}__;
                 $res = $self-><M::ManakaiDISDatabase.getResource>
                                     ($ru, for_arg => $forArg);
-                $res->{localName} = $n_node-><M::SWCFGNode.value>;
+                my $v = $n_node-><M::SWCFGNode.value>;
+                __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+                  $result => {$res->{localName}},
+                  $given => {$v},
+                }__;
                 $res->{<H::DIS|isAnon>} = true;
               } else {  ## Root local name resource
                 my $ln = $n_node-><M::SWCFGNode.value>;
@@ -3129,15 +3148,24 @@ IFClsDef:
                     }__;
                  }__;
                 }
-                $res->{namespaceURI} = $ns_uri;
-                $res->{localName} = $ln;
+                __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+                  $result => {$res->{namespaceURI}},
+                  $given => {$ns_uri},
+                }__;
+                __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+                  $result => {$res->{localName}},
+                  $given => {$ln},
+                }__;
               }
             } else {
               $res = $self-><M::DISDatabase.getResource> ($node_uri);
               $res->{<H::DIS|isAnon>} = true;
             }
           } # anon
-          $res->{for} = $forArg;
+          __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+            $result => {$res->{for}},
+            $given => {$forArg},
+          }__;
           $res->{forp} = $forpArg;
           $res->{src} = $el;
           $res->{<H::DIS|definingModule>} = \ ($mod->{uri});
@@ -3431,7 +3459,7 @@ IFClsDef:
                       .isTypeURI> (<Q::ManakaiDOM:Const>)) {
             __UNDEEP{__EXCEPTION{RESOURCE_NOT_DEFINED_ERR::
               DIS:uri => {$r->[1]->{uri}},
-              DIS:localName => {$r->[1]->{localName}},
+              DIS:localName => {$r->[1]-><AG::DIS|DISAnyResource.localName>},
               DIS:expectedType => {<Q::ManakaiDOM:Const>},
               DIS:sourceNode => {$node},
               DIS:sourceCode => {$xcref},
@@ -3449,7 +3477,7 @@ IFClsDef:
                     .isTypeURI> (<Q::DOMException:AnyExceptionAnyClass>)) {
             __UNDEEP{__EXCEPTION{RESOURCE_NOT_DEFINED_ERR::
               DIS:uri => {$r->[0]->{uri}},
-              DIS:localName => {$r->[0]->{localName}},
+              DIS:localName => {$r->[0]-><AG::DIS|DISAnyResource.localName>},
               DIS:expectedType => {<Q::DOMException:AnyExceptionAnyClass>},
               DIS:sourceNode => {$node},
               DIS:sourceCode => {$xcref},
@@ -3836,8 +3864,8 @@ IFClsDef:
       @@@PerlDef:
         if (defined $self->{localName}) {
           $r = defined $self->{namespaceURI}
-             ? $self->{namespaceURI} . $self->{localName}
-             : $self->{localName};
+             ? ${$self->{namespaceURI}} . ${$self->{localName}}
+             : ${$self->{localName}};
         }
 
   @Attr:
@@ -3851,7 +3879,7 @@ IFClsDef:
       DISCore:LocalName::ManakaiDOM:all
     @@Get:
       @@@PerlDef:
-        $r = $self->{localName};
+        $r = defined $self->{localName} ? ${$self->{localName}} : null;
 
   @Attr:
     @@Name: namespaceURI
@@ -3863,7 +3891,7 @@ IFClsDef:
       }
     @@Get:
       @@@PerlDef:
-        $r = $self->{namespaceURI};
+        $r = defined $self->{namespaceURI} ? ${$self->{namespaceURI}} : null;
 
   @Attr:
     @@Name: forURI
@@ -3872,7 +3900,7 @@ IFClsDef:
       The <QUOTE::for> URI reference for which this module is defined. 
     @@Get:
       @@@PerlDef:
-        $r = $self->{for};
+        $r = defined $self->{for} ? ${$self->{for}} : null;
 
   @Attr:
     @@Name: forpURI
@@ -3910,7 +3938,7 @@ IFClsDef:
           This resource is not for <P::forURI>.
       @@@PerlDef:
         __DEEP{
-          C: for my $this_for_uri ($self->{for}, @{$self->{forp}}) {
+          C: for my $this_for_uri (${$self->{for}||\''}, @{$self->{forp}||[]}) {
             if ($this_for_uri eq $forURI) { ## Shortcut
               $r = true;
               last C;
@@ -4285,7 +4313,8 @@ IFClsDef:
                               $mtopt{default_media_type}, %mtopt)) {
                     my $x = $db-><M::DISDatabase.xcrefToResource>
                                  ($el-><M::SWCFGNode.value>,
-                                  $el, node => $el, for_arg => $self->{for});
+                                  $el, node => $el,
+                              for_arg => $self-><AG::DIS|DISAnyResource.forURI>);
                     __CODE{dv|createURI::
                       $uri => {($x->[2] or $x->[1] or $x->[0])
                                -><AG::DISAnyResource.uri>},
@@ -5862,7 +5891,7 @@ IFClsDef:
                               <IFName::dv|DVQNameValue>)) {
             $r = $self->{<Q::dis|AppName>}-><AG::dv|DVQNameValue.localName>;
           } else {
-            $r = $self->{localName};
+            $r = $self-><AG::DIS|DISAnyResource.localName>;
           }
         }__;
 
@@ -5911,7 +5940,7 @@ IFClsDef:
                               <IFName::dv|DVQNameValue>)) {
             $r = $self->{<Q::dis|AppName>}-><AG::dv|DVQNameValue.namespaceURI>;
           } else {
-            $r = $self->{namespaceURI};
+            $r = $self-><AG::DIS|DISAnyResource.namespaceURI>;
           }
         }__;
 

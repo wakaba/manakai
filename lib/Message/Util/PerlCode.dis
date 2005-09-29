@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/09/29 09:14:58 $
+      $Date: 2005/09/29 15:18:10 $
     @@ContentType:
       dis:Date.RCS
   
@@ -934,7 +934,7 @@ IFClsDef:
           ## -- Requires
           my $req = $self-><M::ManakaiPerlCodeFragment
                               .getRequirePerlModuleNameList>;
-          for my $pack (@$req) {
+          for my $pack (sort {$a cmp $b} @$req) {
             $r .= qq<require $pack;\n>;
           }
 

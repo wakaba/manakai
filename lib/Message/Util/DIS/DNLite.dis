@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/28 04:02:03 $
+      $Date: 2005/09/29 15:18:11 $
     @@ContentType:
       dis:Date.RCS
   
@@ -369,7 +369,6 @@ IFClsDef:
             } else {
               my $np;
               my $a = bless {
-                uri => $xu,
                 ns => $result_parent->{ns},
                 defaultNS => $result_parent->{defaultNS},
                 parentNodePath => [@{$result_parent->{parentNodePath}},
@@ -377,11 +376,15 @@ IFClsDef:
                 nodePath => \$np,
               }, <ClassName::ManakaiDNLElement>;
               push @{$result_parent->{child}||=[]}, $a;
+              __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+                $result => {$a->{uri}},
+                $given => {$xu},
+              }__;
               for ($source_node-><AG::SNode.valueRef>) {
                 $a->{value} = $_ if defined $_;
               }
               $a->{nodeID} = $source_node-><AG::SNode.nodeIDRef>
-                if $a->{uri} eq <Q::dis:ResourceDef>;
+                if ${$a->{uri}} eq <Q::dis:ResourceDef>;
               my $source_childs = $source_node-><AG::SNode.childNodes>;
               __DEEP{
                 for (my $i = 0;
@@ -401,7 +404,7 @@ IFClsDef:
                   [<Q::dis:Type> => 'Type'],
                   [<Q::rdf:type> => 'type'],
                 ) {
-                  if ($cel->{uri} eq $et->[0]) {
+                  if (${$cel->{uri}} eq $et->[0]) {
                     $np .= '[@'.$et->[1].'='.
                            (defined $cel->{value} ? ${$cel->{value}} : '').']';
                     next CEL;
@@ -623,7 +626,7 @@ IFClsDef:
       @@@PerlDef:
         my $nm = $namespaceURI . $localName;
         C: for my $cn (@{$self->{child}||[]}) {
-          if ($cn->{uri} eq $nm) {
+          if (${$cn->{uri}} eq $nm) {
             $r = $cn;
             last C;
           }
@@ -910,7 +913,7 @@ IFClsDef:
       @@@NoDBException:
       @@@PerlDef:
         __DEEP{
-          $r = ($self->{uri} eq <Q::dis:ResourceDef>);
+          $r = (${$self->{uri}} eq <Q::dis:ResourceDef>);
         }__;
 
   @Method:
@@ -1091,7 +1094,7 @@ IFClsDef:
       @@@Type: DNLElement
       @@@PerlDef:
         M: for my $n (@{$self->{child}||[]}) {
-          if ($n->{uri} eq <Q::dis:Module>) {
+          if (${$n->{uri}} eq <Q::dis:Module>) {
             $r = $n;
             last M;
           }
@@ -1141,7 +1144,7 @@ IFClsDef:
       @@@Type: DNLElement
       @@@PerlDef:
         M: for my $n (@{$self->{child}||[]}) {
-          if ($n->{uri} eq <Q::dis:Require>) {
+          if (${$n->{uri}} eq <Q::dis:Require>) {
             $r = $n;
             last M;
           }
@@ -1153,7 +1156,7 @@ IFClsDef:
       @@@Type: DISString
       @@@PerlDef:
         M: for my $n (@{$self->{child}||[]}) {
-          if ($n->{uri} eq <Q::dis:DefaultFor>) {
+          if (${$n->{uri}} eq <Q::dis:DefaultFor>) {
             __DEEP{
               $r = $n-><AG::DNLNode.qnameValueURI> if defined $n->{value};
             }__;
@@ -1167,7 +1170,7 @@ IFClsDef:
       @@@Type: DISString
       @@@PerlDef:
         M: for my $n (@{$self->{child}||[]}) {
-          if ($n->{uri} eq <Q::dis:Namespace>) {
+          if (${$n->{uri}} eq <Q::dis:Namespace>) {
             $r = ${$n->{value}} if defined $n->{value};
             last M;
           }
@@ -1384,7 +1387,7 @@ IFClsDef:
     @@Get:
       @@@Type: DISString
       @@@PerlDef:
-        $r = $self->{uri};
+        $r = ${$self->{uri}};
 
   @Method:
     @@Name: disGetAttribute
@@ -1415,7 +1418,7 @@ IFClsDef:
         C: for my $c (@{$self-><M::DNLNode.disChildElements>
                                   (for_arg => $forArg, forp_arg => $forpArg,
                                    database_arg => $databaseArg)}) {
-          if ($c->{uri} eq $attrName and
+          if (${$c->{uri}} eq $attrName and
               $c-><M::DNLElement.mediaTypeMatch>
                                   ($mediaType, $defaultMediaType,
                                    for_arg => $forArg, forp_arg => $forpArg,
