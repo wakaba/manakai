@@ -1,0 +1,545 @@
+Module:
+  @QName: DIS|Document
+  @enFN:
+    <QUOTE::dis> Documentation Module
+
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Document#
+
+  @DISCore:author: DISCore|Wakaba
+  @Date:
+    $Date: 2005/09/30 13:06:21 $
+  @License: license|Perl+MPL
+  
+  @DefaultFor: ManakaiDOM|all
+
+  @Require:
+    @@Module:
+      @@@QName: DIS|DISCore
+
+Namespace:
+  @DIS:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @doc:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Document#
+  @foaf:
+    http://xmlns.com/foaf/0.1/
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+
+
+ElementTypeBinding:
+  @Name: ResourceTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdfs:Class
+    @@ISA:
+      rdfs:Class
+
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdf:Property
+
+## -- For documentation
+
+ForDef:
+  @QName: doc|ForDoc
+  @enFN: For documentation
+
+## -- Names  
+
+
+PropDef:
+  @QName: doc|uri
+  @enDesc:
+    A URI that identifies the document.
+  @dataType: DISCore|URI
+  @multipleProperties: DISCore|OrderedList
+
+PropDef:
+  @QName: doc|thisURI
+  @enDesc:
+    A URI that identifies <EM::this> version of the document.
+  @rdfs:subPropertyOf: doc|uri
+  @multipleProperties: DISCore|OrderedList
+  @dataType: DISCore|URI
+
+PropDef:
+  @QName: doc|latestURI
+  @enDesc:
+    A URI that identifies the latest version of the document.
+  @rdfs:subPropertyOf: doc|uri
+  @multipleProperties: DISCore|OrderedList
+  @dataType: DISCore|URI
+
+PropDef:
+  @QName: doc|previousURI
+  @enDesc:
+    A URI that identifies the previous version of the document.
+  @rdfs:subPropertyOf: doc|uri
+  @multipleProperties: DISCore|OrderedList
+  @dataType: DISCore|URI
+
+PropDef:
+  @QName:
+    dis:Label
+  @Description:
+    @@lang:en
+    @@@:
+      A human-readable simple header of a resource.
+  @rdfs:subPropertyOf: rdfs|label
+  @subsetOf: rdfs|label
+  @dataType: lang|disdocInline
+  @multipleProperties: DISCore|OrderedList
+
+PropDef:
+  @QName: doc|title
+  @enDesc:
+    The title of the document.
+  @rdfs:subPropertyOf: dis|Label
+  @subsetOf: dis|Label
+  @dataType: lang|disdocInline
+  @multipleProperties: DISCore|OrderedList
+
+PropDef:
+  @QName: doc|shortTitle
+  @enDesc:
+    The short title of the document.
+  @rdfs:subPropertyOf: doc|title
+  @subsetOf: doc|title
+  @dataType: lang|disdocInline
+  @multipleProperties: DISCore|OrderedList
+
+PropDef:
+  @QName: doc|longTitle
+  @enDesc:
+    The long title of the document.
+  @rdfs:subPropertyOf: doc|title
+  @subsetOf: doc|title
+  @rdfs:subPropertyOf: dis|FullName
+  @subsetOf: dis|FullName
+  @dataType: lang|disdocInline
+  @multipleProperties: DISCore|OrderedList
+
+## -- Descriptions
+
+PropDef:
+  @QName:
+    dis:Description
+  @Description:
+    @@lang:en
+    @@@:
+      A human-readable description of a resource.
+  @ISA:
+    rdfs:comment
+  @dataType: lang|disdoc
+  @multipleProperties: DISCore|OrderedList
+
+PropDef:
+  @QName:
+    dis:ImplNote
+  @Description:
+    @@lang:en
+    @@@:
+      An implementor's node about resource.
+  @dataType: lang|disdoc
+  @multipleProperties: DISCore|OrderedList
+
+PropDef:
+  @QName:
+    dis:Spec
+  @Description:
+    @@lang:en
+    @@@:
+      A reference to a specification.  (Obsolete)
+PropDef:
+  @QName:
+    dis:Level
+  @Description:
+    @@lang:en
+    @@@:
+      DOM Level (obsolete)
+PropDef:
+  @QName:
+    dis:SpecLevel
+  @Description:
+    @@lang:en
+    @@@:
+      DOM Level of specification (obsolete) - use <CODE::For> instead.
+
+## -- Documentations
+
+ResourceTypeDef:
+  @QName: doc|Documentation
+  @enFN: Document fragment
+  @enDesc: A fragment of document.
+  @rdfs:subClassOf: DISCore|AnyDefContainer
+  @subsetOf: DISCore|AnyDefContainer
+
+ResourceTypeDef:
+  @QName: doc|Document
+  @enFN: Document
+  @rdfs:subClassOf: doc|Documentation
+  @subsetOf: doc|Documentation
+
+ResourceTypeDef:
+  @QName: doc|Section
+  @enFN: Document Section
+  @rdfs:subClassOf: doc|Documentation
+  @subsetOf: doc|Documentation
+
+PropDef:
+  @QName: doc|content
+  @rdfs:subPropertyOf: dis|Def
+  @subsetOf: dis|Def
+  @dataType: lang|disdoc
+  @multipleProperties: DISCore|OrderedList
+
+PropDef:
+  @QName: doc|descriptionContent
+  @rdfs:subPropertyOf: doc|content
+  @subsetOf: doc|content
+  @rdfs:subPropertyOf: dis|Description
+  @subsetOf: dis|Description
+  @dataType: lang|disdoc
+  @multipleProperties: DISCore|OrderedList
+
+PropDef:
+  @QName:
+    dis:lang
+  @rdfs:domain:
+    rdfs:Resource
+  @Description:
+    @@lang:en
+    @@@:
+      The natural language in which the content is written.
+  @dataType: DISCore|LanguageTag
+  @multipleProperties: DISCore|Single
+
+PropDef:
+  @QName:
+    dis:script
+  @rdfs:domain:
+    rdfs:Resource
+  @Description:
+    @@lang:en
+    @@@:
+      The writting script in which the content is written.
+  @dataType: DISCore|ScriptTag
+  @multipleProperties: DISCore|Single
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: enFN
+  @ElementType:
+    dis:FullName
+  @ShadowContent:
+    @@lang:en
+
+PropDef:
+  @QName: doc|part
+  @enFN: Part of Document Fragment
+  @rdfs:domain: doc|DocumentFragment
+  @rdfs:range: doc|DocumentFragment
+  @multipleProperties: DISCore|OrderedList
+  @dataType: DISCore|TFQNames
+  @rdfs:subPropertyOf: DISCore|resource
+  @subsetOf: DISCore|resource
+
+PropDef:
+  @QName: doc|section
+  @enDesc:
+    A main, additional or appendix section.
+  @rdfs:subPropertyOf: doc|part
+  @subsetOf: doc|part
+  @multipleProperties: DISCore|OrderedList
+  @dataType: DISCore|TFQNames
+
+PropDef:
+  @QName: doc|mainSection
+  @enDesc:
+    A section of the document fragment, which is not an additional section.
+  @rdfs:subPropertyOf: doc|section
+  @subsetOf: doc|section
+  @multipleProperties: DISCore|OrderedList
+  @dataType: DISCore|TFQNames
+
+PropDef:
+  @QName: doc|additionalSection
+  @rdfs:subPropertyOf: doc|section
+  @subsetOf: doc|section
+  @multipleProperties: DISCore|OrderedList
+  @dataType: DISCore|TFQNames
+
+PropDef:
+  @QName: doc|appendix
+  @rdfs:subPropertyOf: doc|section
+  @subsetOf: doc|section
+  @multipleProperties: DISCore|OrderedList
+  @dataType: DISCore|TFQNames
+
+PropDef:
+  @QName: doc|abstract
+  @enFN: Abstract
+  @enDesc:
+    The abstract of the document.
+  @rdfs:domain: doc|DocumentFragment
+  @rdfs:range: doc|DocumentFragment
+  @rdfs:subPropertyOf: doc|part
+  @subsetOf: doc|part
+  @multipleProperties: DISCore|OrderedList
+  @dataType: DISCore|TFQNames
+
+PropDef:
+  @QName: doc|status
+  @enFN: Status of the document
+  @rdfs:subPropertyOf: doc|part
+  @subsetOf: doc|part
+  @multipleProperties: DISCore|OrderedList
+  @dataType: DISCore|TFQNames
+
+PropDef:
+  @QName: doc|toc
+  @enFN: Table of contents
+  @rdfs:subPropertyOf: doc|part
+  @subsetOf: doc|part
+  @multipleProperties: DISCore|OrderedList
+  @dataType: DISCore|TFQNames
+
+PropDef:
+  @QName: doc|shortTOC
+  @enFN: Table of Contents
+  @rdfs:subPropertyOf: doc|toc
+  @subsetOf: doc|toc
+  @multipleProperties: DISCore|OrderedList
+  @dataType: DISCore|TFQNames
+
+PropDef:
+  @QName: doc|longTOC
+  @enFN: Expanded Table of Contents
+  @rdfs:subPropertyOf: doc|toc
+  @subsetOf: doc|toc
+  @multipleProperties: DISCore|OrderedList
+  @dataType: DISCore|TFQNames
+
+PropDef:
+  @QName: doc|references
+  @enFN: References
+  @rdfs:subPropertyOf: doc|part
+  @subsetOf: doc|part
+  @multipleProperties: DISCore|OrderedList
+  @dataType: DISCore|TFQNames
+
+PropDef:
+  @QName: doc|normativeReferences
+  @enFN: Normative References
+  @rdfs:subPropertyOf: doc|references
+  @subsetOf: doc|references
+  @multipleProperties: DISCore|OrderedList
+  @dataType: DISCore|TFQNames
+
+PropDef:
+  @QName: doc|informativeReferences
+  @enFN: Informative References
+  @rdfs:subPropertyOf: doc|references
+  @subsetOf: doc|references
+  @multipleProperties: DISCore|OrderedList
+  @dataType: DISCore|TFQNames
+
+PropDef:
+  @QName: doc|index
+  @enFN: Index
+  @rdfs:subPropertyOf: doc|part
+  @subsetOf: doc|part
+  @multipleProperties: DISCore|OrderedList
+  @dataType: DISCore|TFQNames
+
+PropDef:
+  @QName: doc|isNormative
+  @dataType: DISCore|Boolean
+  @multipleProperties: DISCore|Single
+
+ResourceTypeDef:
+  @QName: doc|DocumentSeries
+  @enDesc:
+    A named set of documents.
+
+PropDef:
+  @QName: doc|documentSeries
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|UnorderedList
+
+PropDef:
+  @QName: doc|errata
+  @dataType: DISCore|TFQNames
+  @multipleProperties: DISCore|Single
+
+## -- Properties describing authors and licenses
+
+ResourceDef:
+  @QName: Wakaba
+  @FullName:
+    @@lang:ja
+    @@@: Wakaba
+  @rdf:type: rdfs|Resource
+  @foaf:mbox: w@suika.fam.cx
+
+PropDef:
+  @QName: doc|author
+  @enFN: Author
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|OrderedList
+
+ResourceDef:
+  @QName: DISCore|author
+  @AliasFor: doc|author
+
+PropDef:
+  @QName: doc|editor
+  @enFN: Editor
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|OrderedList
+
+PropDef:
+  @QName: dis|Date
+  @FullName:
+    @@lang:en
+    @@@: Date
+  @dataType: dis|Date.RCS
+  @multipleProperties: DISCore|Single
+
+PropDef:
+  @QName: doc|publishedDate
+  @multipleProperties: DISCore|Single
+
+ResourceTypeDef:
+  @QName: DISCore|License
+  @enFN: License
+  @enDesc:
+    License term.  It includes, but is not limited to,
+    the copyright statement.
+
+PropDef:
+  @QName:
+    dis:License
+  @enFN: License
+  @enDesc:
+    The license term for the resource.  It includes but not limited
+    to the copyright statement.
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|Single
+  @rdfs:range: DISCore|License
+
+ResourceDef:
+  @QName:
+    license:Perl+MPL
+  @rdf:type: DISCore|License
+  @enFN:
+    Perl / MPL / GPL / LGPL
+  @Description:
+    @@lang:en
+    @@@:
+      <QUOTE::Same as Perl> or <QUOTE::MPL 1.1/GPL 2.0/LGPL 2.1> license. 
+  @ImplNote:
+    @@lang:en
+    @@@:
+      {TODO:: Full text is required.
+      }
+
+PropDef:
+  @QName: dis|Original
+  @FullName:
+    @@lang:en
+    @@@:
+      Original work
+  @multipleProperties: DISCore|OrderedList
+
+PropDef:
+  @QName: dis|Year
+  @dataType: DISCore|Integer
+  @multipleProperties: DISCore|Single
+
+
+## -- The disdoc Documentation Format
+
+ElementTypeBinding:
+  @Name: LexTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISCore|LexicalType
+
+LexTypeDef:
+  @QName: DISCore|AnyDISDoc
+  @enFN:
+    Any <QUOTE::disdoc> text
+  @enDesc:
+    The <QUOTE::disdoc> text format, either block context or inline context.
+  @rdfs:subClassOf: DISCore|NSString
+  @subsetOf: DISCore|NSString
+
+LexTypeDef:
+  @QName:
+    lang:disdoc
+  @enFN: 
+    <QUOTE::disdoc> text
+  @enDesc:
+    The <QUOTE::disdoc> text format, block context.
+  @rdfs:subClassOf: DISCore|AnyDISDoc
+  @subsetOf: DISCore|AnyDISDoc
+
+LexTypeDef:
+  @QName: 
+    lang:disdocInline
+  @enFN:
+    <QUOTE::disdoc> inline text
+  @enDesc:
+    The <QUOTE::disdoc> text format, inline context.
+  @rdfs:subClassOf: DISCore|AnyDISDoc
+  @subsetOf: DISCore|AnyDISDoc
+
+LexTypeDef:
+  @QName: DISCore|LanguageTag
+  @enFN:
+    <QUOTE::dis> language tag
+  @Description:
+    @@lang:en
+    @@@:
+      A qualified name whose default namespace bound to
+      the language tag namespace.  See <Module::DIS:NaturalLanguage> module.
+  @rdfs:subClassOf: DISCore|QName
+  @subsetOf: DISCore|QName
+
+LexTypeDef:
+  @QName: DISCore|ScriptTag
+  @enFN:
+    <QUOTE::dis> script tag
+  @Description:
+    @@lang:en
+    @@@:
+      A qualified name whose default namespace bound to
+      the script tag namespace.  See <Module::DIS:NaturalLanguage> module.
+  @rdfs:subClassOf: DISCore|QName
+  @subsetOf: DISCore|QName

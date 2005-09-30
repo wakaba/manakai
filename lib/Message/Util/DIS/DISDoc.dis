@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/09/25 14:53:05 $
+      $Date: 2005/09/30 13:06:19 $
     @@ContentType:
       dis:Date.RCS
   
@@ -344,11 +344,10 @@ IFClassDef:
                     -><M::DVValueDISDoc.getDISDocTree>
                               ($ownerDocumentArg, <Q::lang:disdocInline>,
                                $self->{o}-><AG::DIS|DISAnyResource.database>,
-                               for_arg => $self->{o}->{for},
-                               forp_arg => $self->{o}->{forp},
-                               default_name_uri => $self->{o}-><AG::DIS|DISAnyResource.nameURI> ||
-                                            $self->{o}->{<Q::DIS:sourceNodeID>},
-                               default_for_uri => $self->{o}->{for});
+                               for_arg => $self->{o}-><AG::DIS|DISAnyResource.forURI>,
+                               forp_arg => $self->{o}-><AG::DIS|DISAnyResource.forpURI>,
+                               default_name_uri => $self->{o}-><AG::DIS|DISAnyResource.sourceNodeID>,
+                               default_for_uri => $self->{o}-><AG::DIS|DISAnyResource.forURI>);
           }
         }__;
 
@@ -433,11 +432,11 @@ IFClassDef:
               next unless $el;
               my $elr = $el-><M::DVValueDISDoc.getDISDocTree>
                               ($ownerDocumentArg, <Q::lang:disdoc>, $db,
-                               for_arg => $self->{o}->{for},
-                               forp_arg => $self->{o}->{forp},
+                               for_arg => $self->{o}-><AG::DIS|DISAnyResource.forURI>,
+                               forp_arg => $self->{o}-><AG::DIS|DISAnyResource.forpURI>,
                                default_name_uri => $self->{o}-><AG::DIS|DISAnyResource.nameURI> ||
                                             $self->{o}->{<Q::DIS:sourceNodeID>},
-                               default_for_uri => $self->{o}->{for});
+                               default_for_uri => $self->{o}-><AG::DIS|DISAnyResource.forURI>);
               if ($elr) {
                 if ($el-><AG::DVValueDISDoc.ddType> eq <Q::dis:ImplNote>) {
                   if ($elr-><AG::Node.nodeType> ==
@@ -501,11 +500,11 @@ IFClassDef:
                     -><M::DVValueDISDoc.getDISDocTree>
                               ($ownerDocumentArg, <Q::lang:disdocInline>,
                                $self->{o}-><AG::DIS|DISAnyResource.database>,
-                               for_arg => $self->{o}->{for},
-                               forp_arg => $self->{o}->{forp},
+                               for_arg => $self->{o}-><AG::DIS|DISAnyResource.forURI>,
+                               forp_arg => $self->{o}-><AG::DIS|DISAnyResource.forpURI>,
                                default_name_uri => $self->{o}-><AG::DIS|DISAnyResource.nameURI> ||
                                             $self->{o}->{<H::DIS:sourceNodeID>},
-                               default_for_uri => $self->{o}->{for});
+                               default_for_uri => $self->{o}-><AG::DIS|DISAnyResource.forURI>);
           }
         }__;
 ##DISResourceDISDoc

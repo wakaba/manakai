@@ -18,7 +18,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/29 15:18:13 $
+      $Date: 2005/09/30 13:06:21 $
     @@ContentType:
       dis:Date.RCS
   
@@ -394,6 +394,7 @@ IFClsDef:
         for ($baseType, $dataType) {
           $class = {
             <Q::dis:TypeQName> => <ClassName::ManakaiDVQNameValue>,
+            <Q::DISCore:QName> => <ClassName::ManakaiDVQNameValue>,
             <Q::DISCore:URI> => <ClassName::ManakaiDVURIValue>,
             <Q::lang:Perl> => <ClassName::ManakaiDVNSValue>,
             <Q::lang:dis> => <ClassName::ManakaiDVSWCFGElement>,
@@ -439,6 +440,7 @@ IFClsDef:
         for ($baseType, $dataType) {
           $class = {
             <Q::dis:TypeQName> => <ClassName::ManakaiDVQNameOrderedList>,
+            <Q::DISCore:QName> => <ClassName::ManakaiDVQNameOrderedList>,
             <Q::DISCore:URI> => <ClassName::ManakaiDVURIOrderedList>,
             <Q::lang:dis> => <ClassName::ManakaiDVSWCFGElementOrderedList>,
             <Q::lang:Perl> => <ClassName::ManakaiDVNSOrderedList>,
@@ -478,6 +480,7 @@ IFClsDef:
         for ($baseType, $dataType) {
           $class = {
             <Q::dis:TypeQName> => <ClassName::ManakaiDVQNameUnorderedList>,
+            <Q::DISCore:QName> => <ClassName::ManakaiDVQNameUnorderedList>,
             <Q::DISCore:URI> => <ClassName::ManakaiDVURIUnorderedList>,
           }->{$_} || $class;
         }
@@ -494,6 +497,9 @@ IFClsDef:
     @@PerlDef:
       $result = <ClassM::ManakaiDISImplementationValue.createDVValue>
                       ($type, $value, base_type => $base_type);
+      __DEEP{
+        $result-><AS::DVValue.name> ($name);
+      }__;
 
   @ResourceDef:
     @@ForCheck: ManakaiDOM|ForClass
@@ -504,6 +510,9 @@ IFClsDef:
     @@PerlDef:
       $result = <ClassM::ManakaiDISImplementationValue.createDVValueRef>
                       ($type, $value_ref, base_type => $base_type);
+      __DEEP{
+        $result-><AS::DVValue.name> ($name);
+      }__
 
   @ResourceDef:
     @@ForCheck: ManakaiDOM|ForClass
@@ -514,6 +523,9 @@ IFClsDef:
     @@PerlDef:
       $result = <ClassM::ManakaiDISImplementationValue.createDVValue>
                       (<Q::DISCore:URI>, $uri);
+      __DEEP{
+        $result-><AS::DVValue.name> ($name);
+      }__;
 ##DISImplementationValue
 
 ElementTypeBinding:
@@ -885,6 +897,21 @@ IFClsDef:
               last CLASS;
             }
           }
+
+  @Attr:
+    @@Name: name
+    @@enDesc:
+      The name of the value.
+    @@Type: DISString
+    @@Get:
+      @@@PerlDef:
+        $r = defined $$self->{name} ? ${$$self->{name}} : null;
+    @@Set:
+      @@@PerlDef:
+        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+          $result => {$$self->{name}},
+          $given => $given,
+        }__;
 ##DVValue
 
 ElementTypeBinding:
@@ -1105,6 +1132,24 @@ IFClsDef:
           my $v = $self->[0];
           $v-><M::DVValue.setProperty> ($propName => $newValue)
             if $v;
+        }__;
+
+  @Attr:
+    @@Name: name
+    @@enDesc:
+      The name of the first item.
+    @@Type: DISString
+    @@Get:
+      @@@PerlDef:
+        __DEEP{
+          my $v = $self->[0];
+          $r = $v-><AG::DVValue.name> if $v;
+        }__;
+    @@Set:
+      @@@PerlDef:
+        __DEEP{
+          my $v = $self->[0];
+          $v-><AS::DVValue.name> if $v;
         }__;
 ##DVList
 

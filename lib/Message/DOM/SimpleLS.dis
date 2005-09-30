@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/25 14:53:03 $
+      $Date: 2005/09/30 13:06:15 $
     @@ContentType: dis|Date.RCS
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
@@ -486,7 +486,7 @@ IFClsXDef:
 
                   ## Available from element itself?
                   if (defined $src->{<H::infoset:namespaceName>} and
-                      $src->{<H::infoset:namespaceName>} eq $ans and
+                      ${$src->{<H::infoset:namespaceName>}} eq $ans and
                       defined $src->{<H::infoset:prefix>}) {
                     if (defined $ns->{$src->{<H::infoset:prefix>}}) {
                       if ($ns->{$src->{<H::infoset:prefix>}} eq $ans) {
@@ -523,7 +523,7 @@ IFClsXDef:
                   if (defined $src->{<H::infoset:prefix>} and
                       defined $ns->{$src->{<H::infoset:prefix>}} and
                       $ns->{$src->{<H::infoset:prefix>}}
-                         eq $src->{<H::infoset:namespaceName>}) {
+                         eq ${$src->{<H::infoset:namespaceName>}}) {
                     ## Non-NULL namespace and prefix is defined
                     $r .= '<' . $src->{<H::infoset:prefix>} . ':'
                        .  $src->{<H::infoset:localName>};
@@ -532,9 +532,9 @@ IFClsXDef:
                   } elsif (defined $src->{<H::infoset:prefix>} and
                            not defined $ns->{$src->{<H::infoset:prefix>}}) {
                     $attrr{'xmlns:'.$src->{<H::infoset:prefix>}}
-                      = [$xescape->($src->{<H::infoset:namespaceName>})];
+                      = [$xescape->(${$src->{<H::infoset:namespaceName>}})];
                     $ns->{$src->{<H::infoset:prefix>}}
-                      = $src->{<H::infoset:namespaceName>};
+                      = ${$src->{<H::infoset:namespaceName>}};
                     $r .= '<' . $src->{<H::infoset:prefix>} . ':'
                        .  $src->{<H::infoset:localName>};
                     $etag = '</' . $src->{<H::infoset:prefix>} . ':'
@@ -545,7 +545,7 @@ IFClsXDef:
                       ## but already declared as namespace attribute
                       for my $pfx (keys %$ns) {
                         next unless $ns->{$pfx}
-                                      eq $src->{<H::infoset:namespaceName>};
+                                      eq ${$src->{<H::infoset:namespaceName>}};
                         if (length $pfx) {
                           $r .= '<' . $pfx . ':'
                              .  $src->{<H::infoset:localName>};
@@ -561,7 +561,7 @@ IFClsXDef:
                       ## Non-NULL namespace and prefix is not defined anywhere
                       my $i = 1;
                       $i++ while (exists $ns->{'ns'.$i});
-                      $ns->{'ns'.$i} = $src->{<H::infoset:namespaceName>};
+                      $ns->{'ns'.$i} = ${$src->{<H::infoset:namespaceName>}};
                       $attrr{'xmlns:ns'.$i} = [$xescape->($ns->{'ns'.$i})];
                       $r .= '<'.'ns' . $i . ':' . $src->{<H::infoset:localName>};
                       $etag = '</ns'.$i.':'.$src->{<H::infoset:localName>} . '>';

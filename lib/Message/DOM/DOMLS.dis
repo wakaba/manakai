@@ -29,7 +29,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/24 11:57:21 $
+      $Date: 2005/09/30 13:06:15 $
     @@ContentType:
       dis:Date.RCS
 
@@ -63,12 +63,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @DOMCore:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
-  @DOMFeature:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
-  @DOMMetaImpl:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @infoset:
@@ -81,26 +77,16 @@ Namespace:
     http://www.w3.org/2002/DOMLS
   @ManakaiDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
-  @ManakaiDOMCore:
-    http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
   @ManakaiDOMLS:
     http://suika.fam.cx/~wakaba/archive/2004/mdom-ls#
-  @ManakaiDOMLS2003:
-    http://suika.fam.cx/~wakaba/archive/2004/9/27/mdom-old-ls#
   @MDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
-  @null:
-    http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
-  @Perl:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
-  @undef:
-    http://suika.fam.cx/~wakaba/-temp/2003/09/27/undef
   @xml:
     http://www.w3.org/XML/1998/namespace
   @xmlns:
@@ -143,7 +129,7 @@ FeatureDef:
   @FeatureVerDef:
     @@Version:3.0
     @@QName: LSFeature30
-    @@DOMMetaImpl:instanceFeatureOf: LSFeature
+    @@f:instanceOf: LSFeature
     @@DOMMain:requireFeature: 
       DOMCore:CoreFeature20
     @@FullName:
@@ -157,7 +143,7 @@ FeatureDef:
   @FeatureVerDef:
     @@Version:3.0
     @@QName: LSAsyncFeature30
-    @@DOMMetaImpl:instanceFeatureOf: LSAsyncFeature
+    @@f:instanceOf: LSAsyncFeature
     @@DOMMain:requireFeature: LSFeature30
     @@FullName:
       @@@lang:en
@@ -742,7 +728,7 @@ IFCls3Def:
 
   @ClsISA: DOMCore|ManakaiDOMImplementation
 
-  @DOMMetaImpl:provideFeature: LSFeature30
+  @f:provides: LSFeature30
 
   @DOMMain:implementFeature:
     @@@@: LSAsyncFeature30
@@ -1286,7 +1272,7 @@ IFCls3Def:
      @@Set:
        @@@InCase:
          @@@@Type:
-           Perl:SCALAR::ManakaiDOM:all
+           DISPerl:SCALAR::ManakaiDOM:all
          @@@@Description:
            @@@@@lang:en
            @@@@@@:

@@ -41,7 +41,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/26 14:37:35 $
+      $Date: 2005/09/30 13:06:15 $
     @@ContentType:
       dis:Date.RCS
   
@@ -86,12 +86,16 @@ Module:
     ManakaiDOM:ManakaiDOMLatest
 
 Namespace:
+  @def:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#spec.
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @dis2pm:
     http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
   @DISlib:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @doc:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Document#
   @DOMCore:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @DOMEvents:
@@ -108,6 +112,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xml#
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @idl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
   @infoset:
     http://www.w3.org/2001/04/infoset#
   @kwd:
@@ -326,6 +332,30 @@ ForDef:
   @ISA:
     ManakaiDOM:ManakaiDOM3
 
+ForDef:
+  @QName: ManakaiDOM|ForSpec
+  @ISA: doc|ForDoc
+  @ISA: ManakaiDOM|DOM
+  @FullName:
+    @@lang:en
+    @@@: For specification
+
+ForDef:
+  @QName: ManakaiDOM|ForSpec3
+  @ISA: ManakaiDOM|DOM3
+  @ISA: ManakaiDOM|ForSpec
+  @FullName:
+    @@lang:en
+    @@@: For Level 3 of specification
+
+ForDef:
+  @QName: ManakaiDOM|ForSpecLatest
+  @ISA: ManakaiDOM|DOMLatest
+  @ISA: ManakaiDOM|ForSpec3
+  @FullName:
+    @@@: For the latest version of specification
+    @@lang:en
+
 ## -- The DOM "feature" system
 
 StringDataTypeDef:
@@ -333,9 +363,10 @@ StringDataTypeDef:
   @FullName:
     @@lang:en
     @@@: DOM feature name
-  @Description:
-    @@lang:en
-    @@@:
+
+  @enTitle: Feature Names
+
+  @enDescContent:
       A <DFN::feature name> identifies a <DFN::feature> with
       its version.
 
@@ -397,9 +428,10 @@ StringDataTypeDef:
   @FullName:
     @@lang:en
     @@@: DOM feature version
-  @Description:
-    @@lang:en
-    @@@: 
+
+  @enTitle: Feature Version Numbers
+
+  @enDescContent:
       A DOM feature version number. 
       \
       In most contexts, an empty string and the <DOM::null> value are 
@@ -420,13 +452,16 @@ StringDataTypeDef:
   @QName: FeaturesString
   @For:
     ManakaiDOM:DOM3
+  @For: ManakaiDOM|ForSpec3
   @FullName:
     @@lang:en
     @@@: 
       DOM <CODE::features>
-  @Description:
-    @@lang:en
-    @@@:
+
+  @enTitle:
+    <CODE::features>
+
+  @enDescContent:
       A list of zero or more pairs of a <TYPE::ManakaiDOM:ManakaiDOMFeature> 
       and an optional <TYPE::ManakaiDOM:ManakaiDOMFeatureVersion>, 
       separated by white space.
@@ -688,18 +723,6 @@ ResourceDef:
   @AliasFor: requires
   @For: =ManakaiDOM|all
 
-FeatureDef:
-  @QName: min
-  @FeatureVerDef:
-    @@featureQName: ManakaiDOM|Minimum
-    @@Version: 3.0
-    @@QName: min30
-    @@Description:
-      @@@lang:en
-      @@@@:
-        Minimum DOM implementation, level 3.
-    @@DOMMetaImpl:instanceFeatureOf: min
-
 ## -- Roles
 
 ResourceDef:
@@ -941,13 +964,126 @@ ElementTypeBinding:
   @ShadowContent:
     @@lang:en
 
+ElementTypeBinding:
+  @Name: enDescContent
+  @ElementType:
+    doc:descriptionContent
+  @ShadowContent:
+    @@lang:en
+
+## -- The Minimum Implementation Specification
+
+FeatureDef:
+  @QName: min
+  @FeatureVerDef:
+    @@featureQName: ManakaiDOM|Minimum
+    @@Version: 3.0
+    @@QName: min30
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Minimum DOM implementation, level 3.
+    @@DOMMetaImpl:instanceFeatureOf: min
+
+ElementTypeBinding:
+  @Name: Doc
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@For: ManakaiDOM|ForSpec
+    @@rdf:type: doc|Documentation
+
+Doc:
+  @QName: def|Document
+
+  @enTitle:
+    Document Object Model (DOM) Minimum Implementation Level 3
+  @doc:shortTitle:
+    @@lang:en
+    @@@:
+      DOM Minimum Implementation Level 3
+
+  @rdf:type: doc|Document
+
+  @doc:author: DISCore|Wakaba
+
+  @doc:abstract: def|Abstract
+
+  @doc:mainSection: def|MinImpl
+
+  @FileName: Overview
+
+Doc:
+  @QName: def|MinImpl
+
+  @enTitle: Document Object Model Minimum Implementation
+  @doc:shortTitle:
+    @@lang:en
+    @@@:
+      DOM Minimum Implementation
+
+  @doc:mainSection: def|Introduction
+  @doc:mainSection: def|Definitions
+  @doc:mainSection: def|Interfaces
+
+  @FileName: minimpl
+
+ElementTypeBinding:
+  @Name: enContent
+  @ElementType:
+    doc:content
+  @ShadowContent:
+    @@lang:en
+    @@ForCheck: ManakaiDOM|ForSpec
+
+ElementTypeBinding:
+  @Name: enTitle
+  @ElementType:
+    doc:title
+  @ShadowContent:
+    @@lang:en
+    @@ForCheck: ManakaiDOM|ForSpec
+
+Doc:
+  @QName: def|Abstract
+  @enContent:
+    This specification defines the Document Object Model
+    Minimum Implementation Level 3, a set of interface
+    that allows applications to dynamically obtain
+    implementations of DOM or any other object model.
+
+Doc:
+  @QName: def|Introduction
+
+Doc:
+  @QName: def|Definitions
+
+  @doc:part: f|FeatureNameString
+  @doc:part: f|FeatureVersionString
+  @doc:part: f|FeaturesString
+  @doc:part: f|ImplementationRegistry
+
+Doc:
+  @QName: def|Interfaces
+
 ## -- The implementation registry object
 
 ResourceDef:
   @QName: ImplementationRegistry
-  @rdf:type: ManakaiDOM|Class
+  @enTitle:
+    The <CODE::ImplementationRegistry> Object
+
+  @rdf:type:
+    @@@@: DISLang|Class
+    @@@ForCheck: ManakaiDOM|ManakaiDOM
+
+  @rdf:type:
+    @@@@: doc|Documentation
+    @@@ForCheck: ManakaiDOM|ForSpec
 
   @For: ManakaiDOM|DOM3
+  @For: ManakaiDOM|ForSpec3
+
   @Implement: ImplementationSource||ManakaiDOM|ManakaiDOM3
   @Implement:
     @@@: ImplementationSource||ManakaiDOM|ManakaiDOMLatest
@@ -1220,10 +1356,15 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
     @@For: ManakaiDOM|DOM3
     @@For: =ManakaiDOM|ManakaiDOM
+    @@For: ManakaiDOM|ForSpecLatest
 
     @@rdf:type:
       @@@@: DISLang|Interface
-      @@@ForCheck: ManakaiDOM|ForIF
+      @@@ForCheck: ManakaiDOM|ForIF ManakaiDOM|ManakaiDOM
+
+    @@rdf:type:
+      @@@@: idl|Interface
+      @@@ForCheck: ManakaiDOM|ForIF ManakaiDOM|ForSpecLatest
 
     @@rdf:type:
       @@@@: DISLang|Class
@@ -2059,9 +2200,17 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
-      ManakaiDOM:DataType
-    @@ForCheck: ManakaiDOM|DOM
-    @@rdfs:subClassOf: DISLang|String||ManakaiDOM|all
+      @@@@: DISLang|DataType
+      @@@For: ManakaiDOM|DOM
+    @@rdfs:subClassOf:
+      @@@@: DISLang|String||ManakaiDOM|all
+      @@@For: ManakaiDOM|DOM
+    @@For: ManakaiDOM|DOM
+
+    @@rdf:type:
+      @@@@: doc|Documentation
+      @@@For: ManakaiDOM|ForSpec
+    @@For: ManakaiDOM|ForSpec
 
 ElementTypeBinding:
   @Name: IFQName
@@ -2078,4 +2227,3 @@ ElementTypeBinding:
   @ShadowContent:
     @@ForCheck:
       ManakaiDOM:ForClass
-

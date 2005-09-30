@@ -25,7 +25,7 @@ DIS_OPTIONS_ALL = $(DIS_OPTIONS) \
   --daem-file-suffix="$(DAEM_SUFFIX)"
 
 MKDISDUMP_PL = $(MANAKAI_BIN_DIR)mkdisdump.pl
-MKDISDUMP_OPTIONS =
+MKDISDUMP_OPTIONS = --with-implementators-note
 MKDISDUMP = $(PERL_) $(MKDISDUMP_PL) $(MKDISDUMP_OPTIONS) $(DIS_OPTIONS_ALL)
 
 DUMP_STYLESHEET_PATH = template/disdump.ja.xsl
@@ -36,14 +36,17 @@ HTML_CSS_STYLE_SHEET_URI = style/disdump-style.css
 
 NS_DIS = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS\#
 NS_DISLIB = http://suika.fam.cx/~wakaba/archive/2004/dis/
+NS_DX = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException\#
 NS_ERROR = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/
 NS_MARKUP = http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup\#
+NS_MANAKAIDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#
 NS_MDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#ManakaiDOM.
 NS_UTIL = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 
 ALL_HTML = dom.html util.html
 
 DOM_DAC_FILE = $(MANAKAI_LIB_DIR)Message/DOM/core$(DAC_SUFFIX)
+MINIMPL_DAC_FILE = $(MANAKAI_LIB_DIR)Message/DOM/feature-spec$(DAC_SUFFIX)
 UTIL_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Util/core$(DAC_SUFFIX)
 DIS_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Util/disdoc$(DAC_SUFFIX)
 
@@ -92,6 +95,16 @@ util.xml: $(UTIL_DAC_FILE)
 	  --module-uri="$(NS_ERROR)DOMException" \
 	  --with-implementators-note > $@
 
+error.xml: $(UTIL_DAC_FILE)
+	$(MKDISDUMP) $< \
+	  --resource-uri="$(NS_DX)ManakaiErrorModules" \
+	  > $@
+
+minimpl.xml: $(MINIMPL_DAC_FILE)
+	$(MKDISDUMP) $< \
+	  --resource-uri="http://suika.fam.cx/~wakaba/archive/2004/dom/feature#spec.Document $(NS_MANAKAIDOM)ForSpecLatest" \
+	  > $@
+
 dis.xml: $(DIS_DAC_FILE)
 	$(MKDISDUMP) $< \
 	  --module-uri="$(NS_MARKUP)SuikaWikiConfig21" \
@@ -112,5 +125,5 @@ clean:
 distclean: clean
 	$(RMR) ./Message ./http
 
-## $Date: 2005/09/25 14:53:02 $
+## $Date: 2005/09/30 13:06:13 $
 ## License: Public Domain

@@ -42,27 +42,30 @@ DAC2PM = $(PERL_) $(DAC2PM_PL) $(DAC2PM_OPTIONS) $(DIS_OPTIONS_ALL)
 
 UTIL_CORE_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Util/core$(DAC_SUFFIX)
 
-DOM_CORE_DIS_FILES = DOMFeature.dis DOMMain.dis DOMCore.dis DOMXML.dis \
+DOM_FEATURE_DIS_FILES = DOMFeature$(DIS_SUFFIX)
+DOM_CORE_DIS_FILES = DOMMain.dis DOMCore.dis DOMXML.dis \
                      DOMLS.dis GenericLS.dis
 DOM_LS_DIS_FILES   = SimpleLS.dis
 DOM_HTML_DIS_FILES = DOMHTML.dis DOMWebForms.dis
-DIS_FILES = $(DOM_CORE_DIS_FILES) $(DOM_LS_DIS_FILES) $(DOM_HTML_DIS_FILES)
-
-_DIS_FILES = \
-  ManakaiDOMLS2003.dis \
-  DOMEvents.dis DOMViews.dis
+DIS_FILES = $(DOM_FEATURE_DIS_FILES) $(DOM_CORE_DIS_FILES) \
+  $(DOM_LS_DIS_FILES) $(DOM_HTML_DIS_FILES)
 
 GENERATED_FILES = \
-  core$(DAC_SUFFIX)  DOMFeature$(PM_SUFFIX) DOMMain$(PM_SUFFIX) \
+  feature$(DAC_SUFFIX) DOMFeature$(PM_SUFFIX) \
+  core$(DAC_SUFFIX)  DOMMain$(PM_SUFFIX) \
                      DOMCore$(PM_SUFFIX) DOMXML$(PM_SUFFIX) DOMLS$(PM_SUFFIX) \
                      GenericLS$(PM_SUFFIX) \
   ls$(DAC_SUFFIX)    SimpleLS$(PM_SUFFIX) \
   html$(DAC_SUFFIX)  DOMHTML$(PM_SUFFIX) DOMWebForms$(PM_SUFFIX)
-GENERATED_DAC_FILES = core$(DAC_SUFFIX) ls$(DAC_SUFFIX) html$(DAC_SUFFIX)
+GENERATED_DAC_FILES = feature$(DAC_SUFFIX) \
+  core$(DAC_SUFFIX) ls$(DAC_SUFFIX) html$(DAC_SUFFIX)
 
 all: .core$(PM_SUFFIX) .ls$(PM_SUFFIX) .html$(PM_SUFFIX) $(GENERATED_DAC_FILES)
 
-core$(DAC_SUFFIX): $(UTIL_CORE_DAC_FILE) $(DOM_CORE_DIS_FILES) $(DAC_PL)
+feature$(DAC_SUFFIX): $(UTIL_CORE_DAC_FILE) $(DOM_FEATURE_DIS_FILES) $(DAC_PL)
+	$(DAC)$@ --input-db-file-name="$<" DOMFeature.dis
+
+core$(DAC_SUFFIX): feature$(DAC_SUFFIX) $(DOM_CORE_DIS_FILES) $(DAC_PL)
 	$(DAC)$@.tmp.1 --input-db-file-name="$<" DOMLS.dis
 	$(DAC)$@ --input-db-file-name="$@.tmp.1" GenericLS.dis
 	$(RM) $@.tmp.1
@@ -117,6 +120,10 @@ $(DOM_HTML_DIS_FILES:.dis=$(PM_SUFFIX)): html$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(PERL_CHK) DOMWebForms$(PM_SUFFIX)
 	$(TOUCH) $@
 
+feature-spec$(DAC_SUFFIX): feature$(DAC_SUFFIX) DOMFeature.dis $(DAC_PL)
+	$(DAC)$@ --input-db-file-name="$<" DOMFeature.dis \
+	  --for="$(NS_MANAKAIDOM)ForSpecLatest"
+
 # $(UTIL_CORE_DAC_FILE)
 $(MANAKAI_LIB_DIR)Message/Util/core$(DAC_SUFFIX): dummy
 	$(CD) $(MANAKAI_LIB_DIR)Message/Util/ && $(MAKE) core$(DAC_SUFFIX)
@@ -128,5 +135,5 @@ clean:
 	$(RM) .*.tmp *~ .*~ *.BAK .*.BAK
 	$(RM) .core$(PM_SUFFIX) .ls$(PM_SUFFIX) .html$(PM_SUFFIX)
 
-## $Date: 2005/09/25 14:53:03 $
+## $Date: 2005/09/30 13:06:15 $
 ## License: Public Domain.

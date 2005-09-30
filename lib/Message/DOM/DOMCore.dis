@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/28 04:01:50 $
+      $Date: 2005/09/30 13:06:13 $
     @@ContentType:
       dis:Date.RCS
 
@@ -3043,7 +3043,10 @@ IFCls1Def:
               my $docElObj = <ClassM::ManakaiDOMElement.newObject>;
               $node-><M::NodeStem.importTree> ($docElObj);
               $docElObj->{<H::infoset:prefix>} = $prefix;
-              $docElObj->{<H::infoset:namespaceName>} = $namespaceURI;
+              __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+                $result => {$docElObj->{<H::infoset:namespaceName>}},
+                $given => $namespaceURI,
+              }__;
               $docElObj->{<H::infoset:localName>} = $lname;
               $docElObj->{<H::infoset:parent>} = $node;
               $docElObj->{<H::DOMCore:ownerDocument>} = $node;
@@ -3124,7 +3127,10 @@ IFCls1Def:
               my $docElObj = <ClassM::ManakaiDOMElement.newObject>;
               $node-><M::NodeStem.importTree> ($docElObj);
               $docElObj->{<H::infoset:prefix>} = $prefix;
-              $docElObj->{<H::infoset:namespaceName>} = $namespaceURI;
+              __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+                $result => {$docElObj->{<H::infoset:namespaceName>}},
+                $given => $namespaceURI,
+              }__;
               $docElObj->{<H::infoset:localName>} = $lname;
               $docElObj->{<H::infoset:parent>} = $node;
               $docElObj->{<H::DOMCore:ownerDocument>} = $node;
@@ -5940,29 +5946,29 @@ IFCls1Def:
             my $ln;
             if (defined $object->{<H::infoset:localName>}) { ## Namespace-aware
               $ns = $object->{<H::infoset:namespaceName>};
-              $ns = '' unless defined $ns;
+              $ns = \'' unless defined $ns;
               $ln = $object->{<H::infoset:localName>};
             } elsif ($object->{<H::DOMCore:ownerDocument>}
                             ->{<H::DOMCore:hasFeature>}->{HTML}) {
-              $ns = <Q::xhtml1:>;
+              $ns = \<Q::xhtml1:>;
               $ln = lc $object->{<H::DOMCore:name>};
             }
             if (defined $ln) {
               for my $pack ((sort {
                 $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
               } grep {
-                $Message::DOM::ManakaiDOMElement::CompatClassET{$ns}
+                $Message::DOM::ManakaiDOMElement::CompatClassET{$$ns}
                         ->{$ln}->{$_} and
                 $_->isa (<IFName::Element>)
-              } keys %{$Message::DOM::ManakaiDOMElement::CompatClassET{$ns}
+              } keys %{$Message::DOM::ManakaiDOMElement::CompatClassET{$$ns}
                                ->{$ln}}),
               (sort {
                 $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
               } grep {
-                $Message::DOM::ManakaiDOMElement::CompatClassET{$ns}
+                $Message::DOM::ManakaiDOMElement::CompatClassET{$$ns}
                         ->{'*'}->{$_} and
                 $_->isa (<IFName::Element>)
-              } keys %{$Message::DOM::ManakaiDOMElement::CompatClassET{$ns}
+              } keys %{$Message::DOM::ManakaiDOMElement::CompatClassET{$$ns}
                                ->{'*'}})) {
                 $class = $pack;
                 last FIND;
@@ -6020,11 +6026,11 @@ IFCls1Def:
                 my $ln;
                 if (defined $co->{<H::infoset:localName>}) { ## Namespace-aware
                   $ns = $co->{<H::infoset:namespaceName>};
-                  $ns = '' unless defined $ns;
+                  $ns = \'' unless defined $ns;
                   $ln = $co->{<H::infoset:localName>};
                 } elsif ($co->{<H::DOMCore:ownerDocument>}
                             ->{<H::DOMCore:hasFeature>}->{HTML}) {
-                  $ns = <Q::xhtml1:>;
+                  $ns = \<Q::xhtml1:>;
                   $ln = lc $co->{<H::DOMCore:name>};
                 }
                 if (defined $ln) {
@@ -6032,19 +6038,19 @@ IFCls1Def:
                     $Message::DOM::ClassPoint{$b} <=>
                     $Message::DOM::ClassPoint{$a}
                   } grep {
-                    $Message::DOM::ManakaiDOMDocument::CompatClassET{$ns}
+                    $Message::DOM::ManakaiDOMDocument::CompatClassET{$$ns}
                         ->{$ln}->{$_} and
                     $_->isa (<IFName::Document>)
-                  } keys %{$Message::DOM::ManakaiDOMDocument::CompatClassET{$ns}
+                  } keys %{$Message::DOM::ManakaiDOMDocument::CompatClassET{$$ns}
                                ->{$ln}}),
                   (sort {
                     $Message::DOM::ClassPoint{$b} <=>
                     $Message::DOM::ClassPoint{$a}
                   } grep {
-                    $Message::DOM::ManakaiDOMDocument::CompatClassET{$ns}
+                    $Message::DOM::ManakaiDOMDocument::CompatClassET{$$ns}
                         ->{'*'}->{$_} and
                     $_->isa (<IFName::Document>)
-                  } keys %{$Message::DOM::ManakaiDOMDocument::CompatClassET{$ns}
+                  } keys %{$Message::DOM::ManakaiDOMDocument::CompatClassET{$$ns}
                                ->{'*'}})) {
                     $class = $pack;
                     last FIND;
@@ -6440,7 +6446,7 @@ ClassDef:
               if ((defined $self->{<H::infoset:localName>} and
                    $self->{<H::infoset:localName>} eq 'base' and
                    defined $self->{<H::infoset:namespaceName>} and
-                   $self->{<H::infoset:namespaceName>} eq <Q::xml:>) or
+                   ${$self->{<H::infoset:namespaceName>}} eq <Q::xml:>) or
                   (not defined $self->{<H::infoset:localName>} and
                    $self->{<H::DOMCore:name>} eq 'xml:base')) {
                 my $attrcls = <ClassName::ManakaiDOMAttr>;
@@ -6573,7 +6579,7 @@ ClassDef:
                     (defined $_->{<H::infoset:localName>} and
                      $_->{<H::infoset:localName>} eq 'html' and
                      ((defined $_->{<H::infoset:namespaceName>} and
-                       $_->{<H::infoset:namespaceName>} eq <Q::xhtml1:>) or
+                       ${$_->{<H::infoset:namespaceName>}} eq <Q::xhtml1:>) or
                       not defined $_->{<H::infoset:namespaceName>})) or
                     (not defined $_->{<H::infoset:localName>} and
                      $_->{<H::DOMCore:name>} eq 'html')) {
@@ -6582,7 +6588,7 @@ ClassDef:
                         (defined $_->{<H::infoset:localName>} and
                          $_->{<H::infoset:localName>} eq 'head' and
                          ((defined $_->{<H::infoset:namespaceName>} and
-                           $_->{<H::infoset:namespaceName>} eq <Q::xhtml1:>) or
+                           ${$_->{<H::infoset:namespaceName>}} eq <Q::xhtml1:>) or
                           not defined $_->{<H::infoset:namespaceName>})) or
                         (not defined $_->{<H::infoset:localName>} and
                          $_->{<H::DOMCore:name>} eq 'head')) {
@@ -6591,7 +6597,7 @@ ClassDef:
                             (defined $_->{<H::infoset:localName>} and
                              $_->{<H::infoset:localName>} eq 'base' and
                              ((defined $_->{<H::infoset:namespaceName>} and
-                               $_->{<H::infoset:namespaceName>} eq <Q::xhtml1:>) or
+                               ${$_->{<H::infoset:namespaceName>}} eq <Q::xhtml1:>) or
                               not defined $_->{<H::infoset:namespaceName>})) or
                             (not defined $_->{<H::infoset:localName>} and
                              $_->{<H::DOMCore:name>} eq 'base')) {
@@ -6698,7 +6704,7 @@ ClassDef:
           FIND: {
           if ($originalElement) {
             if (defined $self->{<H::infoset:namespaceName>} and
-                $self->{<H::infoset:namespaceName>} eq $namespaceURI and
+                ${$self->{<H::infoset:namespaceName>}} eq $namespaceURI and
                 defined $self->{<H::infoset:prefix>} and
                 $originalElement-><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
                                          .lookupNamespaceURI>
@@ -6775,7 +6781,7 @@ ClassDef:
             if (not defined $self->{<H::infoset:prefix>}) {
               if (defined $namespaceURI and
                   defined $self->{<H::infoset:namespaceName>} and
-                  $namespaceURI eq $self->{<H::infoset:namespaceName>}) {
+                  $namespaceURI eq ${$self->{<H::infoset:namespaceName>}}) {
                 $r = true;
               } elsif (not defined $namespaceURI and
                        not defined $self->{<H::infoset:namespaceName>}) {
@@ -6911,7 +6917,7 @@ ClassDef:
                   $self->{<H::infoset:prefix>} eq $prefix) or
                  (not defined $self->{<H::infoset:prefix>} and
                   not defined $prefix))) {
-              $r = $self->{<H::infoset:namespaceName>};
+              $r = ${$self->{<H::infoset:namespaceName>}};
               last FIND;
             }
             my $ac = <ClassName::ManakaiDOMAttr>;
@@ -8886,7 +8892,7 @@ ResourceDef:
             if (defined $attrNode->{<H::infoset:localName>}) {
               $r = $self->{<H::mn:node>}->{<H::infoset:attributes>}
                      ->{defined $attrNode->{<H::infoset:namespaceName>}
-                              ? $attrNode->{<H::infoset:namespaceName>}
+                              ? ${$attrNode->{<H::infoset:namespaceName>}}
                               : <Q::null:>}
                      ->{$attrNode->{<H::infoset:localName>}};
             } else {
@@ -8906,7 +8912,7 @@ ResourceDef:
               if (defined $attrNode->{<H::infoset:localName>}) {
                 $self->{<H::mn:node>}->{<H::infoset:attributes>}
                      ->{defined $attrNode->{<H::infoset:namespaceName>}
-                              ? $attrNode->{<H::infoset:namespaceName>}
+                              ? ${$attrNode->{<H::infoset:namespaceName>}}
                               : <Q::null:>}
                      ->{$attrNode->{<H::infoset:localName>}} = $attrNode;
               } else {
@@ -10004,9 +10010,9 @@ NodeTypeDef:
               The namespace URI is unspecified (the attribute in a 
               per-element-type partition) or 
               the node is created with a DOM Level 1 methods.
-        @@@disDef:
-          @@@@GetProp:
-            infoset:namespaceName
+        @@@PerlDef:
+          $r = defined $self->{<H::mn:node>}->{<H::infoset:namespaceName>}
+             ? $self->{<H::mn:node>}->{<H::infoset:namespaceName>} : null;
      @@For:
        ManakaiDOM:DOM2
      @@Level[list]:  2
@@ -10195,8 +10201,7 @@ NodeTypeDef:
               if (not defined $given) {
                 if (defined $nsURI) {
                   __EXCEPTION{MDOMX:MDOM_NS_NOPREFIX_WITH_NON_NULL_URI::
-                    infoset:namespaceName
-                        => {$node->{<H::infoset:namespaceName>}},
+                    infoset:namespaceName => {$$nsURI},
                     DOMCore:qualifiedName => {$node->{<H::infoset:localName>}},
                   }__;
                 }
@@ -10206,27 +10211,27 @@ NodeTypeDef:
                     MDOMX:MDOM_NS_PREFIX_WITH_NULL_URI::
                       infoset:prefix => {$given},
                   }__;
-                } elsif ($given eq 'xml' and $nsURI ne <Q::xml:>) {
+                } elsif ($given eq 'xml' and $$nsURI ne <Q::xml:>) {
                   __EXCEPTION{
                     MDOMX:MDOM_NS_XML_WITH_OTHER_URI::
                       infoset:prefix => {$given},
-                      infoset:namespaceName => {$nsURI},
+                      infoset:namespaceName => {$$nsURI},
                   }__;
-                } elsif ($given eq 'xmlns' and $nsURI ne <Q::xmlns:>) {
+                } elsif ($given eq 'xmlns' and $$nsURI ne <Q::xmlns:>) {
                   __EXCEPTION{
                     MDOMX:MDOM_NS_XMLNS_WITH_OTHER_URI::
                       infoset:prefix => {$given},
-                      infoset:namespaceName => {$nsURI},
+                      infoset:namespaceName => {$$nsURI},
                   }__;
-                } elsif ($nsURI eq <Q::xml:> and $given ne 'xml') {
+                } elsif ($$nsURI eq <Q::xml:> and $given ne 'xml') {
                   __EXCEPTION{MDOMX:MDOM_NS_OTHER_WITH_XML_URI::
                     infoset:prefix => {$given},
-                    infoset:namespaceName => {$nsURI},
+                    infoset:namespaceName => {$$nsURI},
                   }__;
-                } elsif ($nsURI eq <Q::xmlns:> and $given ne 'xmlns') {
+                } elsif ($$nsURI eq <Q::xmlns:> and $given ne 'xmlns') {
                   __EXCEPTION{MDOMX:MDOM_NS_OTHER_WITH_XMLNS_URI::
                     infoset:prefix => {$given},
-                    infoset:namespaceName => {$nsURI},
+                    infoset:namespaceName => {$$nsURI},
                   }__;
                 }
               }
@@ -10644,8 +10649,8 @@ NodeTypeDef:
                                              $INPUT_PARAM_NAME => 'name',
                                              $XMLVERSION => $version}__;
               $r = <ClassM::ManakaiDOMAttr.newObject>;
-              $r->{<H::DOMCore:name>} = $name;
               $node-><M::NodeStem.importTree> ($r);
+              $r->{<H::DOMCore:name>} = $name;
               $r->{<H::infoset:ownerElement>} = $node;
               $r->{<H::DOMCore:ownerDocument>} = $node
                                                  ->{<H::DOMCore:ownerDocument>};
@@ -10832,7 +10837,7 @@ NodeTypeDef:
             if (defined $attrNode->{<H::infoset:localName>}) {
               $r = $self->{<H::mn:node>}->{<H::infoset:attributes>}
                      ->{defined $attrNode->{<H::infoset:namespaceName>}
-                              ? $attrNode->{<H::infoset:namespaceName>}
+                              ? ${$attrNode->{<H::infoset:namespaceName>}}
                               : <Q::null:>}
                      ->{$attrNode->{<H::infoset:localName>}};
             } else {
@@ -10852,7 +10857,7 @@ NodeTypeDef:
               if (defined $attrNode->{<H::infoset:localName>}) {
                 $self->{<H::mn:node>}->{<H::infoset:attributes>}
                      ->{defined $attrNode->{<H::infoset:namespaceName>}
-                              ? $attrNode->{<H::infoset:namespaceName>}
+                              ? ${$attrNode->{<H::infoset:namespaceName>}}
                               : <Q::null:>}
                      ->{$attrNode->{<H::infoset:localName>}} = $attrNode;
               } else {
@@ -11400,7 +11405,10 @@ NodeTypeDef:
               $r->{<H::DOMCore:ownerDocument>} = $node
                                                  ->{<H::DOMCore:ownerDocument>};
               $r->{<H::infoset:prefix>} = $prefix;
-              $r->{<H::infoset:namespaceName>} = $namespaceURI;
+              __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+                $result => {$r->{<H::infoset:namespaceName>}},
+                $given => $namespaceURI,
+              }__;
               $r->{<H::infoset:localName>} = $localName;
               $r->{<H::infoset:ownerElement>} = $node;
               $node->{<H::infoset:attributes>}
@@ -11697,7 +11705,7 @@ NodeTypeDef:
             if (defined $attrNode->{<H::infoset:localName>}) {
               $r = $self->{<H::mn:node>}->{<H::infoset:attributes>}
                      ->{defined $attrNode->{<H::infoset:namespaceName>}
-                              ? $attrNode->{<H::infoset:namespaceName>}
+                              ? ${$attrNode->{<H::infoset:namespaceName>}}
                               : <Q::null:>}
                      ->{$attrNode->{<H::infoset:localName>}};
             } else {
@@ -11719,7 +11727,7 @@ NodeTypeDef:
               if (defined $attrNode->{<H::infoset:localName>}) {
                 $self->{<H::mn:node>}->{<H::infoset:attributes>}
                      ->{defined $attrNode->{<H::infoset:namespaceName>}
-                              ? $attrNode->{<H::infoset:namespaceName>}
+                              ? ${$attrNode->{<H::infoset:namespaceName>}}
                               : <Q::null:>}
                      ->{$attrNode->{<H::infoset:localName>}} = $attrNode;
               } else {
@@ -11857,7 +11865,7 @@ NodeTypeDef:
                   $chk = sub {
                     my ($self) = @_;
                     return (defined $self->{<H::infoset:namespaceName>} and
-                            $self->{<H::infoset:namespaceName>} eq $namespaceURI)
+                            ${$self->{<H::infoset:namespaceName>}} eq $namespaceURI)
                               ? true : false;
                   };
                 } else {
@@ -11867,7 +11875,7 @@ NodeTypeDef:
                     return
                         (defined $self->{<H::infoset:localName>} and
                          defined $self->{<H::infoset:namespaceName>} and
-                         $self->{<H::infoset:namespaceName>} eq $namespaceURI and
+                         ${$self->{<H::infoset:namespaceName>}} eq $namespaceURI and
                          $self->{<H::infoset:localName>} eq $localName)
                            ? true : false;
                   };
@@ -12585,9 +12593,9 @@ NodeTypeDef:
             @@@@@@:
               The namespace URI is unspecified (the "null" namespace) or 
               the node is created with a DOM Level 1 methods.
-        @@@disDef:
-          @@@@GetProp:
-            infoset:namespaceName
+        @@@PerlDef:
+          $r = defined $self->{<H::mn::node>}->{<H::infoset:namespaceName>}
+             ? $self->{<H::mn:node>}->{<H::infoset:namespaceName>} : null;
      @@Level[list]:  2
      @@SpecLevel:2
      @@For:
@@ -12720,15 +12728,17 @@ NodeTypeDef:
               }__;
               my $nsURI = $node->{<H::infoset:namespaceName>};
               if (not defined $given) {
-                if ($nsURI eq <Q::xml:>) {
+                if (not defined $nsURI) {
+                  #
+                } elsif ($$nsURI eq <Q::xml:>) {
                   __EXCEPTION{MDOMX:MDOM_NS_OTHER_WITH_XML_URI::
-                    infoset:prefix => {undef},
-                    infoset:namespaceName => {$nsURI},
+                    infoset:prefix => {null},
+                    infoset:namespaceName => {$$nsURI},
                   }__;
-                } elsif ($nsURI eq <Q::xmlns:>) {
+                } elsif ($$nsURI eq <Q::xmlns:>) {
                   __EXCEPTION{MDOMX:MDOM_NS_OTHER_WITH_XMLNS_URI::
-                    infoset:prefix => {undef},
-                    infoset:namespaceName => {$nsURI},
+                    infoset:prefix => {null},
+                    infoset:namespaceName => {$$nsURI},
                   }__;
                 }
               } else {
@@ -12737,27 +12747,27 @@ NodeTypeDef:
                     MDOMX:MDOM_NS_PREFIX_WITH_NULL_URI::
                       infoset:prefix => {$given},
                   }__;
-                } elsif ($given eq 'xml' and $nsURI ne <Q::xml:>) {
+                } elsif ($given eq 'xml' and $$nsURI ne <Q::xml:>) {
                   __EXCEPTION{
                     MDOMX:MDOM_NS_XML_WITH_OTHER_URI::
                       infoset:prefix => {$given},
-                      infoset:namespaceName => {$nsURI},
+                      infoset:namespaceName => {$$nsURI},
                   }__;
-                } elsif ($given eq 'xmlns' and $nsURI ne <Q::xmlns:>) {
+                } elsif ($given eq 'xmlns' and $$nsURI ne <Q::xmlns:>) {
                   __EXCEPTION{
                     MDOMX:MDOM_NS_XMLNS_WITH_OTHER_URI::
                       infoset:prefix => {$given},
-                      infoset:namespaceName => {$nsURI},
+                      infoset:namespaceName => {$$nsURI},
                   }__;
-                } elsif ($nsURI eq <Q::xml:> and $given ne 'xml') {
+                } elsif ($$nsURI eq <Q::xml:> and $given ne 'xml') {
                   __EXCEPTION{MDOMX:MDOM_NS_OTHER_WITH_XML_URI::
                     infoset:prefix => {$given},
-                    infoset:namespaceName => {$nsURI},
+                    infoset:namespaceName => {$$nsURI},
                   }__;
-                } elsif ($nsURI eq <Q::xmlns:> and $given ne 'xmlns') {
+                } elsif ($$nsURI eq <Q::xmlns:> and $given ne 'xmlns') {
                   __EXCEPTION{MDOMX:MDOM_NS_OTHER_WITH_XMLNS_URI::
                     infoset:prefix => {$given},
-                    infoset:namespaceName => {$nsURI},
+                    infoset:namespaceName => {$$nsURI},
                   }__;
                 }
               }
@@ -12858,27 +12868,27 @@ NodeTypeDef:
               my $ln;
               if (defined $object->{<H::infoset:localName>}) { ## Namespace-aware
                 $ns = $object->{<H::infoset:namespaceName>};
-                $ns = '' unless defined $ns;
+                $ns = \'' unless defined $ns;
                 $ln = $object->{<H::infoset:localName>};
               } elsif ($object->{<H::DOMCore:ownerDocument>}
                               ->{<H::DOMCore:hasFeature>}->{HTML}) {
-                $ns = <Q::xhtml1:>;
+                $ns = \<Q::xhtml1:>;
                 $ln = lc $object->{<H::DOMCore:name>};
               }
               if (defined $ln) {
                 for my $pack ((sort {
                   $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
                 } grep {
-                  $Message::DOM::ManakaiDOMElement::CompatClassET{$ns}
+                  $Message::DOM::ManakaiDOMElement::CompatClassET{$$ns}
                           ->{$ln}->{$_}
-                } keys %{$Message::DOM::ManakaiDOMElement::CompatClassET{$ns}
+                } keys %{$Message::DOM::ManakaiDOMElement::CompatClassET{$$ns}
                                  ->{$ln}}),
                 (sort {
                   $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
                 } grep {
-                  $Message::DOM::ManakaiDOMElement::CompatClassET{$ns}
+                  $Message::DOM::ManakaiDOMElement::CompatClassET{$$ns}
                           ->{'*'}->{$_}
-                } keys %{$Message::DOM::ManakaiDOMElement::CompatClassET{$ns}
+                } keys %{$Message::DOM::ManakaiDOMElement::CompatClassET{$$ns}
                                  ->{'*'}})) {
                   if ($Message::DOM::ClassFeature{$pack}
                             ->{$feature}->{$version}) {
@@ -15713,7 +15723,10 @@ NodeTypeDef:
 
             my $node = <ClassM::ManakaiDOMElement.newObject>;
             $node->{<H::DOMCore:ownerDocument>} = $docNode;
-            $node->{<H::infoset:namespaceName>} = $namespaceURI;
+            __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+              $result => {$node->{<H::infoset:namespaceName>}},
+              $given => $namespaceURI,
+            }__;
             $node->{<H::infoset:prefix>} = $prefix;
             $node->{<H::infoset:localName>} = $lname;
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node);
@@ -15898,7 +15911,10 @@ NodeTypeDef:
             my $node = <ClassM::ManakaiDOMAttr.newObject>;
             $node->{<H::DOMCore:ownerDocument>} = $docNode;
             $node->{<H::infoset:localName>} = $lname;
-            $node->{<H::infoset:namespaceName>} = $namespaceURI;
+            __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+              $result => {$node->{<H::infoset:namespaceName>}},
+              $given => $namespaceURI,
+            }__;
             $node->{<H::infoset:prefix>} = $prefix;
             $node->{<H::infoset:specified>} = true;
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node);
@@ -16023,7 +16039,7 @@ NodeTypeDef:
                   $chk = sub {
                     my ($self) = @_;
                     return (defined $self->{<H::infoset:namespaceName>} and
-                            $self->{<H::infoset:namespaceName>} eq $namespaceURI)
+                            ${$self->{<H::infoset:namespaceName>}} eq $namespaceURI)
                               ? true : false;
                   };
                 } else {
@@ -16033,7 +16049,7 @@ NodeTypeDef:
                     return
                         (defined $self->{<H::infoset:localName>} and
                          defined $self->{<H::infoset:namespaceName>} and
-                         $self->{<H::infoset:namespaceName>} eq $namespaceURI and
+                         ${$self->{<H::infoset:namespaceName>}} eq $namespaceURI and
                          $self->{<H::infoset:localName>} eq $localName)
                            ? true : false;
                   };

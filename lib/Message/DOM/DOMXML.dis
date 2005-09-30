@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/28 04:01:52 $
+      $Date: 2005/09/30 13:06:15 $
     @@ContentType:
       dis:Date.RCS
 
@@ -1357,7 +1357,7 @@ NodeTypeDef:
         @@@@@:
           The new object for the <IF::Notation> node.
       @@@PerlDef:
-        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject>;
+        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject> ($self);
         $r->{<H::DOMCore:nodeType>} = <H::infoset:Notation>;
      @@ImplNote:
        @@@lang:en
@@ -1752,7 +1752,7 @@ NodeTypeDef:
         @@@@@:
           The new object for the <IF::Entity> node.
       @@@PerlDef:
-        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject>;
+        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject> ($self);
         $r->{<H::infoset:children>} = [];
         $r->{<H::DOMCore:nodeType>} = <H::DOMXML:EntityNode>;
      @@Level[list]:

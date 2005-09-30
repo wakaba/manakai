@@ -23,7 +23,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/25 14:53:06 $
+      $Date: 2005/09/30 13:06:21 $
     @@ContentType:
       dis:Date.RCS
   
@@ -473,9 +473,9 @@ ResourceDef:
       @@@enDesc:
         The <CODE::report>ed error object.
 
-        {NOTE:: Application <kwd:MAY> choose to <M::Error.throw> this
-                error or <kwd:MAY> choose not to throw and to
-                process the error by itself.
+        {NOTE:: Application <kwd:MAY> choose to <M::ErrorInterface.throw> this
+                error or it <kwd:MAY> choose not to throw it and to
+                process the error by its own way.
         }
     @@Return:
 ##MUErrorTarget

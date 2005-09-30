@@ -20,7 +20,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/23 18:25:09 $
+      $Date: 2005/09/30 13:06:21 $
     @@ContentType:
       dis:Date.RCS
   
@@ -82,6 +82,47 @@ Namespace:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
+
+## -- Module group for documentation
+
+ResourceDef:
+  @For: =ManakaiDOM|all
+  @rdf:type: dis|ModuleGroup
+
+  @QName: dx|ManakaiErrorModules
+  @Label:
+    @@@: manakai Error Modules
+    @@lang:en
+  @FileName: Message/Util/errors
+
+  @enDesc:
+    The <DFN::manakai Error Modules> is a set of modules that
+    provide facilities for error and exception handling.
+
+    The <Class::ecore|Error||ManakaiDOM|Perl> module, which is
+    strictly not part of manakai, enables Perl programs
+    to throw exceptions and to catch them by <Perl::try> and
+    <Perl::catch> syntax.
+
+    The <Class::ecore|MUError||ManakaiDOM|Perl> module
+    extends the <Class::ecore|Error||ManakaiDOM|Perl> module
+    so that programs can report errors by various ways,
+    e.g. via <Class::ecore|Error||ManakaiDOM|Perl>'s exception
+    <Perl::throw>ing or via so-called error handler code, through
+    the one <Perl::report> statement.
+
+    The <Module::Err|DOMException||ManakaiDOM|Perl> module
+    again extends the <Class::ecore|MUError||ManakaiDOM|Perl>
+    module and it provides a base implementation for
+    DOM-compatible exception system.  Not only it has
+    an attribute for DOM error code, it also has a
+    property for <QUOTE::sub-code> that describes the 
+    situation clearer than the DOM code.  In addition,
+    parameters can be defined for each sub-codes.
+
+  @DISCore:module: Err|Core||ManakaiDOM|Perl
+  @DISCore:module: Err|DOMException||ManakaiDOM|Perl
+##ManakaiErrorModules
 
 ElementTypeBinding:
   @Name: enDesc

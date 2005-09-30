@@ -19,7 +19,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/23 18:25:10 $
+      $Date: 2005/09/30 13:06:21 $
     @@ContentType:
       dis:Date.RCS
   
@@ -28,7 +28,11 @@ Module:
 
   @Require:
     @@Module:
-      @@@Name: DISRDF
+      @@@QName: DIS|DISRDF
+    @@Module:
+      @@@QName: DIS|DISPerl
+    @@Module:
+      @@@QName: DIS|Document
 
 Namespace:
   @DIS:
@@ -138,14 +142,14 @@ ElementTypeBinding:
   @ElementType:
     dis:dataType
   @ShadowContent:
-    @@ContentType: dis|TypeQName
+    @@ContentType: DISCore|QName
 
 ElementTypeBinding:
   @Name: multipleProperties
   @ElementType:
     dis:multipleProperties
   @ShadowContent:
-    @@ContentType: dis|TypeQName
+    @@ContentType: DISCore|QName
 
 ## -- Module group defining
 
@@ -165,6 +169,7 @@ ResourceDef:
     @@lang:en
     @@@:
       The <QUOTE::dis> core library.
+  @DISPerl:packageName: manakai
 
 ## -- Module defining
 
@@ -185,6 +190,21 @@ PropDef:
     @@@: 
       References to external modules.
   @multipleProperties: Single
+
+PropDef:
+  @QName: DISCore|module
+  @enDesc:
+    The subject resource has the object module as a member.
+  @multipleProperties: DISCore|UnorderedList
+  @dataType: DISCore|TFQNames
+  @rdfs:range: dis|Module
+
+PropDef:
+  @QName: DISCore|resource
+  @enDesc:
+    The subject resource has the object <QUOTE::dis> resource as a member.
+  @multipleProperties: DISCore|UnorderedList
+  @dataType: DISCore|TFQNames
 
 ## -- Resource defining
 
@@ -314,19 +334,7 @@ PropDef:
   @ISA:
     rdfs:label
   @dataType: lang|disdocInline
-  @multipleProperties: UnorderedList
-
-PropDef:
-  @QName:
-    dis:Label
-  @Description:
-    @@lang:en
-    @@@:
-      A human-readable simple header of a resource.
-  @ISA:
-    rdfs:label
-  @dataType: lang|disdocInline
-  @multipleProperties: UnorderedList
+  @multipleProperties: DISCore|OrderedList
 
 PropDef:
   @QName: 
@@ -338,51 +346,6 @@ PropDef:
   @dataType: String
   @multipleProperties: Single
 
-## -- Resource description
-
-PropDef:
-  @QName:
-    dis:Description
-  @Description:
-    @@lang:en
-    @@@:
-      A human-readable description of a resource.
-  @ISA:
-    rdfs:comment
-  @dataType: lang|disdoc
-  @multipleProperties: OrderedList
-
-PropDef:
-  @QName:
-    dis:ImplNote
-  @Description:
-    @@lang:en
-    @@@:
-      An implementor's node about resource.
-  @dataType: lang|disdoc
-  @multipleProperties: OrderedList
-
-PropDef:
-  @QName:
-    dis:Spec
-  @Description:
-    @@lang:en
-    @@@:
-      A reference to a specification.  (Obsolete)
-PropDef:
-  @QName:
-    dis:Level
-  @Description:
-    @@lang:en
-    @@@:
-      DOM Level (obsolete)
-PropDef:
-  @QName:
-    dis:SpecLevel
-  @Description:
-    @@lang:en
-    @@@:
-      DOM Level of specification (obsolete) - use <CODE::For> instead.
 PropDef:
   @QName:
     dis:Condition
@@ -650,30 +613,6 @@ PropDef:
       The lexical data type of the content of e.g. a <QUOTE::dis> element.
   @multipleProperties: Single
 
-PropDef:
-  @QName:
-    dis:lang
-  @rdfs:domain:
-    rdfs:Resource
-  @Description:
-    @@lang:en
-    @@@:
-      The natural language in which the content is written.
-  @dataType: LanguageTag
-  @multipleProperties: Single
-
-PropDef:
-  @QName:
-    dis:script
-  @rdfs:domain:
-    rdfs:Resource
-  @Description:
-    @@lang:en
-    @@@:
-      The writting script in which the content is written.
-  @dataType: ScriptTag
-  @multipleProperties: Single
-
 ElementTypeBinding:
   @Name: enDesc
   @ElementType:
@@ -814,35 +753,6 @@ LexTypeDef:
   @subsetOf: DISCore|AnyString
 
 LexTypeDef:
-  @QName: DISCore|AnyDISDoc
-  @enFN:
-    Any <QUOTE::disdoc> text
-  @enDesc:
-    The <QUOTE::disdoc> text format, either block context or inline context.
-  @rdfs:subClassOf: DISCore|NSString
-  @subsetOf: DISCore|NSString
-
-LexTypeDef:
-  @QName:
-    lang:disdoc
-  @enFN: 
-    <QUOTE::disdoc> text
-  @enDesc:
-    The <QUOTE::disdoc> text format, block context.
-  @rdfs:subClassOf: DISCore|AnyDISDoc
-  @subsetOf: DISCore|AnyDISDoc
-
-LexTypeDef:
-  @QName: 
-    lang:disdocInline
-  @enFN:
-    <QUOTE::disdoc> inline text
-  @enDesc:
-    The <QUOTE::disdoc> text format, inline context.
-  @rdfs:subClassOf: DISCore|AnyDISDoc
-  @subsetOf: DISCore|AnyDISDoc
-
-LexTypeDef:
   @QName: DISCore|NCName
   @FullName:
     @@lang:en
@@ -906,30 +816,6 @@ LexTypeDef:
       A QName with or without <CHAR::COLON>.  If
       it does not contain a <CHAR::COLON>, it is namespace-unaware
       or in the null namespace.
-  @rdfs:subClassOf: DISCore|QName
-  @subsetOf: DISCore|QName
-
-LexTypeDef:
-  @QName: DISCore|LanguageTag
-  @enFN:
-    <QUOTE::dis> language tag
-  @Description:
-    @@lang:en
-    @@@:
-      A qualified name whose default namespace bound to
-      the language tag namespace.  See <Module::DIS:NaturalLanguage> module.
-  @rdfs:subClassOf: DISCore|QName
-  @subsetOf: DISCore|QName
-
-LexTypeDef:
-  @QName: DISCore|ScriptTag
-  @enFN:
-    <QUOTE::dis> script tag
-  @Description:
-    @@lang:en
-    @@@:
-      A qualified name whose default namespace bound to
-      the script tag namespace.  See <Module::DIS:NaturalLanguage> module.
   @rdfs:subClassOf: DISCore|QName
   @subsetOf: DISCore|QName
 
@@ -1054,6 +940,9 @@ ResourceTypeDef:
     @@@:
       Resources which have one or more <Q::dis:Def>s.
 
+ResourceTypeDef:
+  @QName: DISCore|AnyValueContainer
+
 ## -- Access controls
 
 PropDef:
@@ -1092,89 +981,3 @@ PropDef:
       <Q::isDeprecated> property element.
   @multipleProperties: OrderedList
 
-## -- Properties describing authors and licenses
-
-ResourceDef:
-  @QName: Wakaba
-  @FullName:
-    @@lang:ja
-    @@@: Wakaba
-  @rdf:type: rdfs|Resource
-  @Mail: w@suika.fam.cx
-
-PropDef:
-  @QName: DISCore|author
-  @enFN: Author
-  @dataType: DISCore|QName
-  @multipleProperties: DISCore|OrderedList
-
-PropDef:
-  @QName: dis|Author
-  @FullName:
-    @@lang:en
-    @@@: Author (obsolete)
-  @dataType: DISCore|Text
-  @multipleProperties: OrderedList
-
-PropDef:
-  @QName: dis|Mail
-  @FullName:
-    @@lang:en
-    @@@: Internet mail address
-  @dataType: DISCore|MailAddress
-  @multipleProperties: UnorderedList
-
-PropDef:
-  @QName: dis|Date
-  @FullName:
-    @@lang:en
-    @@@: Date
-  @dataType: dis|Date.RCS
-  @multipleProperties: Single
-
-ResourceTypeDef:
-  @QName: DISCore|License
-  @enFN: License
-  @enDesc:
-    License term.  It includes, but is not limited to,
-    the copyright statement.
-
-PropDef:
-  @QName:
-    dis:License
-  @enFN: License
-  @enDesc:
-    The license term for the resource.  It includes but not limited
-    to the copyright statement.
-  @dataType: DISCore|QName
-  @multipleProperties: Single
-  @rdfs:range: DISCore|License
-
-ResourceDef:
-  @QName:
-    license:Perl+MPL
-  @rdf:type: DISCore|License
-  @enFN:
-    Perl / MPL / GPL / LGPL
-  @Description:
-    @@lang:en
-    @@@:
-      <QUOTE::Same as Perl> or <QUOTE::MPL 1.1/GPL 2.0/LGPL 2.1> license. 
-  @ImplNote:
-    @@lang:en
-    @@@:
-      {TODO:: Full text is required.
-      }
-
-PropDef:
-  @QName: dis|Original
-  @FullName:
-    @@lang:en
-    @@@:
-      Original work
-  @multipleProperties: OrderedList
-
-PropDef:
-  @QName: dis|Year
-  @dataType: DISCore|Integer
-  @multipleProperties: Single

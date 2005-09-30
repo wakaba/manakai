@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/29 15:18:11 $
+      $Date: 2005/09/30 13:06:19 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1703,25 +1703,32 @@ IFClsDef:
       @@@NoPerlModuleNameException:
       @@@PerlDef:
         __DEEP{
-          my $mg = $self-><AG::DIS|DISAnyResource.database>
-                        -><M::DIS|DISDatabase.getResource>
+          my $man = $self-><M::DIS|DISResourceProp.getPropertyValue>
+                             (<Q::DISPerl:packageName>);
+          if ($man) {
+            $r = $man-><AG::dv|DVValue.stringValue>;
+          } else {
+            my $mg = $self-><AG::DIS|DISAnyResource.database>
+                          -><M::DIS|DISDatabase.getResource>
                              ($self-><AG::DIS|DISAnyResource.namespaceURI>,
                               for_arg => $self-><AG::DIS|DISAnyResource.forURI>);
-          unless ($self-><AG::DIS|DISAnyResource.isDefined>) {
-            __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
-              DIS:uri => {$self-><AG::DIS|DISAnyResource.namespaceURI>},
-              DIS:sourceNode => {$self-><AG::DIS|DISAnyResource.sourceElement>},
-            }__}__;
-          }
-          my $an = $mg-><M::DIS|DISResourceProp.getPropertyValue>
+            unless ($self-><AG::DIS|DISAnyResource.isDefined>) {
+              __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
+                DIS:uri => {$self-><AG::DIS|DISAnyResource.namespaceURI>},
+                DIS:sourceNode =>
+                          {$self-><AG::DIS|DISAnyResource.sourceElement>},
+              }__}__;
+            }
+            my $an = $mg-><M::DIS|DISResourceProp.getPropertyValue>
                              (<Q::DISPerl:packageName>);
-          $r = $an ? $an-><AG::dv|DVValue.stringValue>
-                   : $mg-><AG::DIS|DISAnyResource.localName> || 'main';
-          $r =~ s/::$//g;
-          $r .= '::' . $self-><AG::DIS|DISAnyResource.localName>;
-          my $sf = $an-><M::dv|DVValue.getProperty>
+            $r = $an ? $an-><AG::dv|DVValue.stringValue>
+                     : $mg-><AG::DIS|DISAnyResource.localName> || 'main';
+            $r =~ s/::$//g;
+            $r .= '::' . $self-><AG::DIS|DISAnyResource.localName>;
+            my $sf = $an-><M::dv|DVValue.getProperty>
                              (<Q::ManakaiDOM:moduleSuffix>) if $an;
-          $r .= $sf-><AG::dv|DVValue.stringValue> if $sf;
+            $r .= $sf-><AG::dv|DVValue.stringValue> if $sf;
+          }
         }__;
 
   @Attr:
@@ -1734,26 +1741,37 @@ IFClsDef:
       @@@NoPerlModuleNameException:
       @@@PerlDef:
         __DEEP{
-          my $mg = $self-><AG::DIS|DISAnyResource.database>
-                        -><M::DIS|DISDatabase.getResource>
+          my $man = $self-><M::DIS|DISResourceProp.getPropertyValue>
+                             (<Q::DISPerl:interfacePackageName>) ||
+                    $self-><M::DIS|DISResourceProp.getPropertyValue>
+                             (<Q::DISPerl:packageName>);
+          if ($man) {
+            $r = $man-><AG::dv|DVValue.stringValue>;
+          } else {
+            my $mg = $self-><AG::DIS|DISAnyResource.database>
+                          -><M::DIS|DISDatabase.getResource>
                              ($self-><AG::DIS|DISAnyResource.namespaceURI>,
                               for_arg => $self-><AG::DIS|DISAnyResource.forURI>);
-          unless ($self-><AG::DIS|DISAnyResource.isDefined>) {
-            __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
-              DIS:uri => {$self-><AG::DIS|DISAnyResource.namespaceURI>},
-              DIS:sourceNode => {$self-><AG::DIS|DISAnyResource.sourceElement>},
-            }__}__;
-          }
-          my $an = $mg-><M::DIS|DISResourceProp.getPropertyValue>
-                             (<Q::DISPerl:interfacePackageName>);
-          if ($an) {
-            $r = $an-><AG::dv|DVValue.stringValue>;
-            $r =~ s/::$//g;
-            my $sf = $an-><M::dv|DVValue.getProperty>
+            unless ($self-><AG::DIS|DISAnyResource.isDefined>) {
+              __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
+                DIS:uri => {$self-><AG::DIS|DISAnyResource.namespaceURI>},
+                DIS:sourceNode =>
+                          {$self-><AG::DIS|DISAnyResource.sourceElement>},
+              }__}__;
+            }
+            my $an = $mg-><M::DIS|DISResourceProp.getPropertyValue>
+                             (<Q::DISPerl:interfacePackageName>) ||
+                     $mg-><M::DIS|DISResourceProp.getPropertyValue>
+                             (<Q::DISPerl:packageName>);
+            if ($an) {
+              $r = $an-><AG::dv|DVValue.stringValue>;
+              $r =~ s/::$//g;
+              my $sf = $an-><M::dv|DVValue.getProperty>
                                (<Q::ManakaiDOM:moduleSuffix>);
-            $r .= $sf-><AG::dv|DVValue.stringValue> if $sf;
-          } else {
-            $r = $self-><AG::DISModulePerl.plFullyQualifiedName>;
+              $r .= $sf-><AG::dv|DVValue.stringValue> if $sf;
+            } else {
+              $r = $self-><AG::DISModulePerl.plFullyQualifiedName>;
+            }
           }
         }__;
 ##DISModulePerl

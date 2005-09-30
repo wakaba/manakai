@@ -25,7 +25,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/23 18:25:10 $
+      $Date: 2005/09/30 13:06:21 $
     @@ContentType:
       dis:Date.RCS
   
@@ -47,8 +47,12 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @DISCore:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Core#
+  @foaf:
+    http://xmlns.com/foaf/0.1/
   @infoset:
     http://www.w3.org/2001/04/infoset#
+  @lang:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
   @ManakaiDOM:
@@ -445,3 +449,47 @@ ResourceDef:
     rdf:Seq
   @rdf:type:
     rdfs:Class
+
+## -- From FOAF
+
+ResourceDef:
+  @QName: foaf|Agent
+  @enFN: Agent
+  @rdfs:subClassOf: rdfs|Class
+  @subsetOf: rdfs|Class
+  @rdf:type: rdfs|Class
+
+ResourceDef:
+  @QName: foaf|Person
+  @enFN: Person
+  @rdfs:subClassOf: foaf|Agent
+  @subsetOf: foaf|Agent
+  @rdf:type: rdfs|Class
+
+ResourceDef:
+  @QName: foaf|Group
+  @enFN: Group
+  @rdfs:subClassOf: foaf|Agent
+  @subsetOf: foaf|Agent
+  @rdf:type: rdfs|Class
+
+PropDef:
+  @QName: foaf|name
+  @enFN: Name
+  @rdfs:subPropertyOf: rdf|label
+  @subsetOf: rdf|label
+  @multipleProperties: DISCore|UnorderedList
+  @dataType: lang|disdocInline
+
+PropDef:
+  @QName: foaf|mbox
+  @enFN: Mailbox
+  @multipleProperties: DISCore|UnorderedList
+  @dataType: DISCore|MailAddress
+
+ElementTypeBinding:
+  @Name: enFN
+  @ElementType:
+    dis:FullName
+  @ShadowContent:
+    @@lang:en

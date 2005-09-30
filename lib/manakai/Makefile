@@ -39,7 +39,7 @@ DAC2PM = $(PERL_) $(DAC2PM_PL) $(DAC2PM_OPTIONS) $(DIS_OPTIONS_ALL)
 CORE_DAC_FILE = $(MANAKAI_LIB_DIR)manakai/all$(DAC_SUFFIX)
 
 DIS_FILES = DISCore.dis DISLang.dis DISRDF.dis DISIDL.dis \
-  DISPerl.dis XML.dis DISMarkup.dis NaturalLanguage.dis
+  DISPerl.dis XML.dis DISMarkup.dis NaturalLanguage.dis Document.dis 
 
 GENERATED_FILES = all$(DAC_SUFFIX)
 
@@ -55,5 +55,5 @@ all$(DAC_SUFFIX): $(DIS_FILES) $(DAC_PL)
 clean:
 	$(RM) $(GENERATED_FILES) .*.tmp *~ .*~
 
-## $Date: 2005/09/25 14:53:06 $
+## $Date: 2005/09/30 13:06:21 $
 ## License: Public Domain.

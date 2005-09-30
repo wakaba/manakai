@@ -1,3 +1,15 @@
+2005-09-30  Wakaba  <wakaba@suika.fam.cx>
+
+	* mkdisdump.pl (append_module_group_documentation,
+	append_document_documentation): New functions.
+	(append_class_documentation, append_interface_documentation):
+	Generates method/attribute/constgroup information (in partial mode)
+	even if "is_partial" option is true to compute inheriting
+	class member information correctly.
+	(--resource-uri): New option.
+
+	* Makefile (error.xml, minimpl.xml): New rules.
+
 2005-09-25  Wakaba  <wakaba@suika.fam.cx>
 
 	* dac.pl, dac2pm.pl, mkdisdump.pl: Parameters "--dis-file-suffix",

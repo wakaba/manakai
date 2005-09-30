@@ -26,7 +26,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/23 18:25:10 $
+      $Date: 2005/09/30 13:06:21 $
     @@ContentType:
       dis:Date.RCS
   
@@ -44,10 +44,12 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @idl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
   @lang:
-     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
-     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
   @ManakaiDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @owl:
@@ -84,6 +86,338 @@ ElementTypeBinding:
   @ShadowContent:
     @@lang:en
 
+## -- IDL concepts
+
+ElementTypeBinding:
+  @Name: ResourceTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdfs|Class
+    @@rdfs:subClassOf: rdfs|Class
+
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdf|Property
+
+PropDef:
+  @QName: idl|name
+  @enFN: IDL Name
+  @rdfs:subPropertyOf: dis|AppName
+  @subsetOf: dis|AppName
+  @multipleProperties: DISCore|Single
+
+ResourceTypeDef:
+  @QName: idl|File
+  @enFN: IDL File
+
+PropDef:
+  @QName: idl|fileMacroName
+  @enFN: IDL File Macro Name
+  @enDesc:
+    The name of the macro that is used to memorize the IDL file
+    is already loaded.
+  @rdfs:subPropertyOf: idl|name
+  @subsetOf: idl|name
+  @multipleProperties: DISCore|Single
+  @rdfs:domain: idl|File
+
+PropDef:
+  @QName: idl|filePathStem
+  @enFN: IDL File Name Path Stem
+  @enDesc:
+    The main part of the IDL file name.
+  @multipleProperties: DISCore|Single
+  @rdfs:subPropertyOf: dis|FileName
+  @subsetOf: dis|FileName
+  @rdfs:domain: idl|File
+
+PropDef:
+  @QName: idl|prefix
+  @enFN:
+    IDL <CODE::pragma> <CODE::prefix>
+  @multipleProperties: DISCore|Single
+
+ResourceDef:
+  @QName: dis|prefix
+  @AliasFor: idl|prefix
+
+PropDef:
+  @QName: idl|include
+  @enFN:
+    IDL <CODE::include>
+  @multipleProperties: DISCore|Single
+
+ResourceTypeDef:
+  @QName: idl|Module
+  @enFN: IDL Module
+
+PropDef:
+  @QName: idl|moduleName
+  @enFN: IDL Module Name
+  @enDesc:
+    The module name (unqualified) in IDL.
+  @rdfs:subPropertyOf: idl|name
+  @subsetOf: idl|name
+  @multipleProperties: DISCore|Single
+  @rdfs:domain: idl|Module
+
+ResourceTypeDef:
+  @QName: idl|AnyModuleMember
+
+ResourceTypeDef:
+  @QName: idl|AnyType
+  @enFN: IDL Type, Interface or Exception
+  @rdfs:subClassOf: DISLang|AnyDataType
+  @subsetOf: DISLang|AnyDataType
+
+ResourceTypeDef:
+  @QName: idl|TypeDef
+  @enFN: IDL Type Definition
+  @rdfs:subClassOf: idl|AnyModuleMember
+  @subsetOf: idl|AnyModuleMember
+
+PropDef:
+  @QName: idl|aliasFor
+  @enFN: IDL Type Reference
+  @multipleProperties: DISCore|Single
+  @dataType: DISCore|TFQNames
+
+ResourceTypeDef:
+  @QName: idl|ValueType
+  @enFN: IDL Value Type
+  @rdfs:subClassOf: idl|AnyModuleMember
+  @subsetOf: idl|AnyModuleMember
+  @rdfs:subClassOf: idl|AnyType
+  @subsetOf: idl|AnyType
+
+PropDef:
+  @QName: idl|sequenceOf
+  @enDesc:
+    The IDL type is defined as a <CODE::sequence> of the type.
+  @dataType: DISCore|TFQNames
+  @multipleProperties: DISCore|Single
+
+PropDef:
+  @QName: idl|typeName
+  @enFN: IDL Type Name
+  @multipleProperties: DISCore|Single
+
+ResourceTypeDef:
+  @QName: idl|AnyTyped
+  @enFN: IDL Typed Object
+
+PropDef:
+  @QName: idl|type
+  @enFN: IDL Type
+  @rdfs:range: idl|AnyType
+  @rdfs:domain: idl|AnyTyped
+  @multipleProperties: DISCore|Single
+  @dataType: DISCore|TFQNames
+
+ResourceTypeDef:
+  @QName: idl|AnyInterface
+  @enFN: IDL Interface or Exception
+  @rdfs:subClassOf: idl|AnyType
+  @subsetOf: idl|AnyType
+  @rdfs:subClassOf: DISLang|Interface
+  @subsetOf: DISLang|Interface
+  @rdfs:subClassOf: idl|AnyModuleMember
+  @subsetOf: idl|AnyModuleMember
+
+ResourceTypeDef:
+  @QName: idl|Interface
+  @enFN: IDL Interface
+  @rdfs:subClassOf: idl|AnyInterface
+  @subsetOf: idl|AnyInterface
+
+PropDef:
+  @QName: idl|interfaceName
+  @enFN: IDL Interface Name
+  @enDesc:
+    The interface name (unqualified) in IDL.
+  @rdfs:subPropertyOf: idl|name
+  @subsetOf: idl|name
+  @multipleProperties: DISCore|Single
+  @rdfs:domain: idl|Interface
+
+PropDef:
+  @QName: idl|extends
+  @enFN: IDL Super-Interface
+  @rdfs:subPropertyOf: dis|ISA
+  @subsetOf: dis|ISA
+  @multipleProperties: DISCore|OrderedList
+  @dataType: DISCore|TFQNames
+  @rdfs:domain: idl|Interface
+  @rdfs:range: idl|Interface
+
+ResourceTypeDef:
+  @QName: idl|Exception
+  @rdfs:subClassOf: idl|AnyInterface
+  @subsetOf: idl|AnyInterface
+
+PropDef:
+  @QName: idl|exceptionName
+  @enFN: IDL Exception Name
+  @rdfs:subPropertyOf: idl|name
+  @subsetOf: idl|name
+
+ResourceTypeDef:
+  @QName: idl|InterfaceMember
+
+ResourceTypeDef:
+  @QName: idl|Attribute
+  @enFN: IDL Attribute
+  @rdfs:subClassOf: idl|AnyInterfaceMember
+  @subsetOf: idl|AnyInterfaceMember
+  @rdfs:subClassOf: DISLang|Attribute
+  @subsetOf: DISLang|Attribute
+  @rdfs:subClassOf: idl|AnyTyped
+  @subsetOf: idl|AnyTyped
+
+PropDef:
+  @QName: idl|attributeName
+  @enFN: IDL Attribute Name
+  @rdfs:subClassOf: idl|name
+  @subsetOf: idl|name
+  @rdfs:domain: idl|Attribute
+  @multipleProperties: DISCore|Single
+
+PropDef:
+  @QName: idl|readonly
+  @enFN: Readonly attribute
+  @rdfs:domain: idl|Attribute
+  @multipleProperties: DISCore|Single
+  @dataType: DISCore|Boolean
+
+ResourceTypeDef:
+  @QName: idl|Method
+  @enFN: IDL Method
+  @rdfs:subClassOf: idl|AnyInterfaceMember
+  @subsetOf: idl|AnyInterfaceMember
+  @rdfs:subClassOf: DISLang|Method
+  @subsetOf: DISLang|Method
+  @rdfs:subClassOf: idl|AnyTyped
+  @subsetOf: idl|AnyTyped
+
+PropDef:
+  @QName: idl|methodName
+  @enFN: IDL Method Name
+  @rdfs:subClassOf: idl|name
+  @subsetOf: idl|name
+  @rdfs:domain: idl|Method
+  @multipleProperties: DISCore|Single
+
+ResourceTypeDef:
+  @QName: idl|MethodParameter
+  @enFN: IDL Method Parameter
+  @rdfs:subClassOf: DISLang|MethodParameter
+  @subsetOf: DISLang|MethodParameter
+  @rdfs:subClassOf: idl|AnyTyped
+  @subsetOf: idl|AnyTyped
+
+PropDef:
+  @QName: idl|paramName
+  @enFN: IDL Method Parameter Name
+  @rdfs:subClassOf: idl|name
+  @subsetOf: idl|name
+  @rdfs:domain: idl|MethodParameter
+  @multipleProperties: DISCore|Single
+
+PropDef:
+  @QName: idl|raises
+  @enFN:
+    IDL <CODE::raises>
+  @multipleProperties: DISCore|OrderedList
+  @dataType: DISCore|TFQNames
+
+PropDef:
+  @QName: idl|raisesOnRetrieveal
+  @enFN:
+    <CODE::raises> on attribute retrieveal
+  @multipleProperties: DISCore|OrderedList
+  @dataType: DISCore|TFQNames
+  @rdfs:subPropertyOf: idl|raises
+  @subsetOf: idl|raises
+  @rdfs:subPropertyOf: idl|comment
+  @subsetOf: idl|comment
+
+PropDef:
+  @QName: idl|raisesOnSetting
+  @enFN:
+    <CODE::raises> on attribute setting
+  @multipleProperties: DISCore|OrderedList
+  @dataType: DISCore|TFQNames
+  @rdfs:subPropertyOf: idl|raises
+  @subsetOf: idl|raises
+  @rdfs:subPropertyOf: idl|comment
+  @subsetOf: idl|comment
+
+ResourceTypeDef:
+  @QName: idl|ConstGroup
+  @enFN: Constant Values
+  @rdfs:subClassOf: DISLang|ConstGroup
+  @subsetOf: DISLang|ConstGroup
+
+PropDef:
+  @QName: idl|constGroupName
+  @enFN: Name of Constant Values
+  @rdfs:subPropertyOf: idl|name
+  @subsetOf: idl|name
+  @multipleProperties: DISCore|Single
+
+ResourceTypeDef:
+  @QName: idl|Const
+  @enFN: IDL Constant Value
+  @rdfs:subClassOf: idl|AnyTyped
+  @subsetOf: idl|AnyTyped
+  @rdfs:subClassOf: DISCore|AnyValueContainer
+  @subsetOf: DISCore|AnyValueContainer
+
+PropDef:
+  @QName: idl|comment
+  @enFN: IDL Comment
+  @multipleProperties: DISCore|Single
+
+PropDef:
+  @QName: idl|note
+  @enFN: Comment
+  @rdfs:subPropertyOf: idl|comment
+  @subsetOf: idl|comment
+  @rdfs:subPropertyOf: dis|Description
+  @subsetOf: dis|Description
+  @dataType: lang|disdoc
+  @multipleProperties: DISCore|Single
+
+PropDef:
+  @QName: idl|label
+  @enFN: Label
+  @rdfs:subPropertyOf: idl|comment
+  @subsetOf: idl|comment
+  @rdfs:subPropertyOf: dis|Label
+  @subsetOf: dis|Label
+  @dataType: lang|disdocInline
+  @multipleProperties: DISCore|Single
+
+PropDef:
+  @QName: idl|introduced
+  @enFN: Introduced Specification
+  @rdfs:subPropertyOf: idl|comment
+  @subsetOf: idl|comment
+  @dataType: DISCore|TFQNames
+  @multipleProperties: DISCore|OrderedList
+
+PropDef:
+  @QName: idl|modified
+  @enFN: Modified Specification
+  @rdfs:subPropertyOf: idl|comment
+  @subsetOf: idl|comment
+  @dataType: DISCore|TFQNames
+  @multipleProperties: DISCore|OrderedList
+
 ## -- IDL datatypes
 
 ResourceDef:
@@ -105,6 +439,11 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: IDLDataType
 
+IDLDataTypeDef:
+  @QName: idl|void
+  @enFN:
+    IDL <CODE::void> Type
+
 ResourceDef:
   @QName: AnyRealNumber
   @enFN: Real number
@@ -112,12 +451,10 @@ ResourceDef:
     @@lang:en
     @@@:
       Any IDL datatype that represents a subset of the real numbers.
-  @rdf:type:
-    ManakaiDOM:DataType
+  @rdf:type: DISLang|DataType
 
 IDLDataTypeDef:
-  @QName: 
-    DOMMain:long
+  @QName: idl|long
   @enFN: Long integer
   @Description:
     @@lang:en
@@ -126,9 +463,12 @@ IDLDataTypeDef:
   @rdfs:subClassOf: AnyRealNumber
   @subsetOf: DISIDL|AnyRealNumber
 
+ResourceDef:
+  @QName: DOMMain|long
+  @AliasFor: idl|long
+
 IDLDataTypeDef:
-  @QName: 
-    DOMMain:unsigned-long
+  @QName: idl|unsignedLong
   @enFN: Unsigned long integer
   @Def:
     @@ContentType: 
@@ -141,9 +481,12 @@ IDLDataTypeDef:
   @rdfs:subClassOf: AnyRealNumber
   @subsetOf: DISIDL|AnyRealNumber
 
+ResourceDef:
+  @QName: DOMMain|unsigned-long
+  @AliasFor: idl|unsignedLong
+
 IDLDataTypeDef:
-  @QName: 
-    DOMMain:short
+  @QName: idl|short
   @enFN: Short integer
   @Def:
     @@ContentType:
@@ -156,9 +499,12 @@ IDLDataTypeDef:
   @rdfs:subClassOf: AnyRealNumber
   @subsetOf: DISIDL|AnyRealNumber
 
+ResourceDef:
+  @QName: DOMMain|short
+  @AliasFor: idl|short
+
 IDLDataTypeDef:
-  @QName: 
-    DOMMain:unsigned-short
+  @QName: idl|unsignedShort
   @enFN: Unsigned short integer
   @Def:
     @@ContentType: 
@@ -171,9 +517,12 @@ IDLDataTypeDef:
   @rdfs:subClassOf: AnyRealNumber
   @subsetOf: DISIDL|AnyRealNumber
 
+ResourceDef:
+  @QName: DOMMain|unsigned-short
+  @AliasFor: idl|unsignedShort
+
 IDLDataTypeDef:
-  @QName:
-    DOMMain:float
+  @QName: idl|float
   @enFN:
     Single-precision floating point number
   @Description:
@@ -191,9 +540,12 @@ IDLDataTypeDef:
   @rdfs:subClassOf: AnyRealNumber
   @subsetOf: DISIDL|AnyRealNumber
 
+ResourceDef:
+  @QName: DOMMain|float
+  @AliasFor: idl|float
+
 IDLDataTypeDef:
-  @QName: 
-    DOMMain:double
+  @QName: idl|double
   @enFN: Double-precision floating point number
   @Description:
     @@lang:en
@@ -210,9 +562,12 @@ IDLDataTypeDef:
   @rdfs:subClassOf: AnyRealNumber
   @subsetOf: DISIDL|AnyRealNumber
 
+ResourceDef:
+  @QName: DOMMain|double
+  @AliasFor: idl|double
+
 IDLDataTypeDef:
-  @QName: 
-    DOMMain:char
+  @QName: idl|char
   @enFN: ISO/IEC 8859-1 character
   @Description:
     @@lang:en
@@ -224,17 +579,19 @@ IDLDataTypeDef:
       the semantics of the character. 
 
 IDLDataTypeDef:
-  @QName:
-    DOMMain:boolean
+  @QName: idl|boolean
   @enFN: Boolean
   @Description:
     @@lang:en
     @@@:
       The boolean data type, i.e. true or false. 
 
+ResourceDef:
+  @QName: DOMMain|boolean
+  @AliasFor: idl|boolean
+
 IDLDataTypeDef:
-  @QName:
-    DOMMain:octet
+  @QName: idl|octet
   @enFN: Octet
   @Description:
     @@lang:en
@@ -243,8 +600,7 @@ IDLDataTypeDef:
       when transmitted by the communication system. 
 
 IDLDataTypeDef:
-  @QName: 
-    DOMMain:any
+  @QName: idl|any
   @enFN: Any IDL type
   @Description:
     @@lang:en
@@ -254,17 +610,23 @@ IDLDataTypeDef:
   @rdfs:subClassOf: DISLang|Any
   @subsetOf: DISLang|Any
 
+ResourceDef:
+  @QName: DOMMain|any
+  @AliasFor: idl|any
+
 IDLDataTypeDef: 
-  @QName: 
-    DOMMain:Object
+  @QName: idl|Object
   @enFN: Object
   @Description:
     @@lang:en
     @@@: An object.
 
+ResourceDef:
+  @QName: DOMMain|Object
+  @AliasFor: idl|Object
+
 IDLDataTypeDef:
-  @QName: 
-    DOMMain:unsigned-long-long
+  @QName: idl|unsignedLongLong
   @enFN: Unsigned long long integer
   @Def:
     @@ContentType: 
@@ -280,11 +642,15 @@ IDLDataTypeDef:
   @subsetOf: DISIDL|AnyRealNumber
 
 ResourceDef:
+  @QName: DOMMain|unsigned-long-long
+  @AliasFor: idl|unsignedLongLong
+
+ResourceDef:
   @QName: lang|IDL
   @rdf:type: DISCore|LexicalType
   @FullName:
     @@lang:en
-    @@@: IDL
+    @@@: IDL (obsolete)
   @rdfs:subClassOf: DISCore|String
   @subsetOf: DISCore|String
 
@@ -297,7 +663,7 @@ ResourceDef:
   @Description:
     @@lang:en
     @@@:
-      The IDL format as used in W3C DOM specifications.
+      The IDL format as used in W3C DOM specifications. (obsolete)
   @rdfs:subClassOf: lang|IDL
   @subsetOf: lang|IDL
 

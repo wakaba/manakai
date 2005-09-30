@@ -1,3 +1,8 @@
+2005-09-30  Wakaba  <wakaba@suika.fam.cx>
+
+	* DIS.dis (readProperties): Saves property name to values.
+	(getPropertyModuleList): New method.
+
 2005-09-29  Wakaba  <wakaba@suika.fam.cx>
 
 	* DIS.dis: Shares local name, namespace URI and for URI
@@ -74,10 +79,13 @@
 	* Makefile (DAC_SUFFIX): Changed to ".dae".
 	(DAEM_SUFFIX): New.
 
+
 2005-09-24  Wakaba  <wakaba@suika.fam.cx>
 
-	* ManakaiNode.dis (NodeStem): Property value "mn:treeID"
-	has changed to scalar reference.
+	* ManakaiNode.dis: Use "disPerl:H" instead
+	of "disPerl:Q" for hash keys.
+	(NodeStem): Property value "mn:treeID"
+	has changed to scalar reference. 
 
 2005-09-24  Wakaba  <wakaba@suika.fam.cx>
 
