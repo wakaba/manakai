@@ -173,6 +173,14 @@
     <span lang="ja" xml:lang="ja">型</span>
   </t:template>
   
+  <t:template name="label-overall-description">
+    <span lang="ja" xml:lang="ja">概観</span>
+  </t:template>
+  
+  <t:template name="label-documents">
+    <span lang="ja" xml:lang="ja">文書</span>
+  </t:template>
+  
   <t:template name="label-examples">
     <span lang="ja" xml:lang="ja">例</span>
   </t:template>
@@ -345,6 +353,27 @@
     </t:when>
     <t:when test="$mode = 'modules-menu-frame'">
       <t:apply-templates select="/child::dump:moduleSet" mode="doc-menu-frame"/>
+    </t:when>
+    <t:when test="$mode = 'module-group'">
+      <t:apply-templates select="/child::dump:moduleSet
+                                 /child::dump:moduleGroup
+                                 [
+                                   child::dump:uri/@dump:uri = string ($uri)
+                                 ]" mode="doc"/>
+    </t:when>
+    <t:when test="$mode = 'module-group-menu'">
+      <t:apply-templates select="/child::dump:moduleSet
+                                 /child::dump:moduleGroup
+                                 [
+                                   child::dump:uri/@dump:uri = string ($uri)
+                                 ]" mode="doc-menu"/>
+    </t:when>
+    <t:when test="$mode = 'module-group-menu-frame'">
+      <t:apply-templates select="/child::dump:moduleSet
+                                 /child::dump:moduleGroup
+                                 [
+                                   child::dump:uri/@dump:uri = string ($uri)
+                                 ]" mode="doc-menu-frame"/>
     </t:when>
     <t:when test="$mode = 'module'">
       <t:apply-templates select="/child::dump:moduleSet
@@ -541,6 +570,171 @@
     <t:value-of select="$html-type-suffix"/>
   </t:template>
   
+<!-- Module Groups -->
+  
+  <t:template match="dump:moduleGroup" mode="h1b">
+    <t:apply-templates select="self::node ()" mode="h1-heading"/>
+    <t:apply-templates select="child::dump:description"/>
+    <dl class="dump-info dump-info-module">
+      <t:choose>
+      <t:when test="child::dump:fullName">
+        <t:apply-templates select="child::dump:fullName" mode="dl"/>
+      </t:when>
+      <t:otherwise>
+        <t:apply-templates select="child::dump:label" mode="dl"/>
+      </t:otherwise>
+      </t:choose>
+      <t:apply-templates select="self::node ()" mode="dl-modules"/>
+      <t:apply-templates select="self::node ()" mode="dl-documents"/>
+      <t:apply-templates select="self::node ()" mode="dl-examples"/>
+    </dl>
+  </t:template>
+  <t:template match="dump:moduleGroup" mode="heading-content">
+    <t:apply-templates select="self::node ()" mode="human-module-name"/>
+  </t:template>
+  <t:template match="dump:moduleGroup" mode="file-name-stem">
+    <t:if test="@dump:filePathStem">
+      <t:value-of select="@dump:filePathStem"/>
+    </t:if>
+  </t:template>
+  <t:template match="dump:moduleGroup" mode="ref">
+    <t:param name="ddoct:basePath" select="''"/>
+    <t:param name="short" select="false ()"/>
+    <a class="dump-ref dump-ref-module-group">
+      <t:attribute name="href">
+        <t:apply-templates select="self::node ()" mode="uri">
+          <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+        </t:apply-templates>
+      </t:attribute>
+      <t:apply-templates select="self::node ()" mode="human-module-name-text">
+        <t:with-param name="short" select="$short"/>
+      </t:apply-templates>
+    </a>
+  </t:template>
+  
+  <t:template match="dump:moduleGroup" mode="dl-modules">
+    <t:if test="child::dump:module">
+      <dt><t:call-template name="label-modules"/></dt>
+      <t:apply-templates select="child::dump:module" mode="dd">
+        <t:with-param name="ddoct:basePath">
+          <t:apply-templates select="self::node ()" mode="base-path"/>
+        </t:with-param>
+        <t:sort select="child::dump:perlPackageName"/>
+      </t:apply-templates>
+    </t:if>
+  </t:template>
+  
+  <t:template match="dump:moduleGroup" mode="dl-documents">
+    <t:if test="child::dump:document">
+      <dt><t:call-template name="label-documents"/></dt>
+      <t:apply-templates select="child::dump:document" mode="dd">
+        <t:with-param name="ddoct:basePath">
+          <t:apply-templates select="self::node ()" mode="base-path"/>
+        </t:with-param>
+      </t:apply-templates>
+    </t:if>
+  </t:template>
+  
+  <t:template match="dump:moduleGroup" mode="doc">
+    <html class="dump-module-group-doc">
+      <t:call-template name="global-lang-attr"/>
+      <head>
+        <t:apply-templates select="self::node ()" mode="doc-head-common"/>
+        <title>
+          <t:apply-templates select="self::node ()" mode="human-module-name-attr"/>
+        </title>
+      </head>
+      <body>
+        <t:apply-templates select="self::node ()" mode="h1b"/>
+      </body>
+    </html>
+  </t:template>
+  <t:template match="dump:moduleGroup" mode="doc-menu">
+    <html class="dump-module-group-doc-menu">
+      <t:call-template name="global-lang-attr"/>
+      <head>
+        <t:apply-templates select="self::node ()" mode="doc-head-common"/>
+        <title>
+          <t:apply-templates select="self::node ()" mode="human-module-name-attr"/>
+        </title>
+        <base target="maindocument"/>
+      </head>
+      <body>
+        <h1>
+          <t:apply-templates select="self::node ()" mode="human-module-name"/>
+        </h1>
+        <ul>
+          <li>
+            <a>
+              <t:attribute name="href">
+                <t:apply-templates select="self::node ()" mode="uri-menu"/>
+              </t:attribute>
+              <t:call-template name="label-overall-description"/>
+            </a>
+          </li>
+          <t:variable name="mod" select="/child::dump:moduleSet
+                                         /child::dump:module
+                                         [child::dump:uri/@dump:uri =
+                                          current ()/child::dump:module/@dump:ref]"/>
+          <t:apply-templates select="$mod/child::dump:class |
+                                     $mod/child::dump:interface |
+                                     $mod/child::dump:dataType" mode="li">
+            <t:with-param name="short" select="true ()"/>
+            <t:with-param name="ddoct:basePath">
+              <t:apply-templates select="self::node ()" mode="base-path"/>
+            </t:with-param>
+            <t:sort select="child::dump:perlName |
+                            child::dump:label |
+                            child::dump:dataType"/>
+          </t:apply-templates>
+        </ul>
+      </body>
+    </html>
+  </t:template>
+  <t:template match="dump:moduleGroup" mode="doc-menu-frame">
+    <t:param name="ddoct:basePath">
+      <t:apply-templates select="self::node ()" mode="base-path"/>
+    </t:param>
+    <html class="dump-module-group-doc-menu-frame">
+      <t:call-template name="global-lang-attr"/>
+      <head>
+        <t:apply-templates select="self::node ()" mode="doc-head-common"/>
+        <title>
+          <t:apply-templates select="self::node ()" mode="human-module-name-attr"/>
+        </title>
+      </head>
+      <frameset cols="20%,*">
+        <frame name="menu">
+          <t:attribute name="src">
+            <t:apply-templates select="self::node ()" mode="uri-menu">
+              <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+            </t:apply-templates>
+          </t:attribute>
+        </frame>
+        <frame name="maindocument">
+          <t:attribute name="src">
+            <t:apply-templates select="self::node ()" mode="uri">
+              <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+            </t:apply-templates>
+          </t:attribute>
+        </frame>
+        <noframes>
+          <body>
+            <h1>
+              <t:call-template name="prefix-module"/>
+              <t:apply-templates select="self::node ()" mode="human-module-name"/>
+            </h1>
+            <p>
+              <t:apply-templates select="self::node ()" mode="ref">
+                <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+              </t:apply-templates>
+            </p>
+          </body>
+        </noframes>
+      </frameset>
+    </html>
+  </t:template>
+  
   <t:template match="dump:module" mode="h1b">
     <t:apply-templates select="self::node ()" mode="h1-heading"/>
     <t:apply-templates select="child::dump:description"/>
@@ -638,34 +832,34 @@
     </t:if>
     <t:value-of select="'module'"/>
   </t:template>
-  <t:template match="dump:module" mode="file-name">
+  <t:template match="dump:module | dump:moduleGroup" mode="file-name">
     <t:apply-templates select="self::node ()" mode="file-name-stem"/>
     <t:value-of select="$lang-suffix"/>
     <t:value-of select="$html-type-suffix"/>
   </t:template>
-  <t:template match="dump:module" mode="file-name-menu">
+  <t:template match="dump:module | dump:moduleGroup" mode="file-name-menu">
     <t:apply-templates select="self::node ()" mode="file-name-stem"/>
     <t:value-of select="'-menu'"/>
     <t:value-of select="$lang-suffix"/>
     <t:value-of select="$html-type-suffix"/>
   </t:template>
-  <t:template match="dump:module" mode="file-name-menu-frame">
+  <t:template match="dump:module | dump:moduleGroup" mode="file-name-menu-frame">
     <t:apply-templates select="self::node ()" mode="file-name-stem"/>
     <t:value-of select="'-with-menu'"/>
     <t:value-of select="$lang-suffix"/>
     <t:value-of select="$html-type-suffix"/>
   </t:template>
-  <t:template match="dump:module" mode="uri">
+  <t:template match="dump:module | dump:moduleGroup" mode="uri">
     <t:param name="ddoct:basePath" select="''"/>
     <t:copy-of select="$ddoct:basePath"/>
     <t:apply-templates select="self::node ()" mode="file-name"/>
   </t:template>
-  <t:template match="dump:module" mode="uri-menu">
+  <t:template match="dump:module | dump:moduleGroup" mode="uri-menu">
     <t:param name="ddoct:basePath" select="''"/>
     <t:copy-of select="$ddoct:basePath"/>
     <t:apply-templates select="self::node ()" mode="file-name-menu"/>
   </t:template>
-  <t:template match="dump:module" mode="uri-menu-frame">
+  <t:template match="dump:module | dump:moduleGroup" mode="uri-menu-frame">
     <t:param name="ddoct:basePath" select="''"/>
     <t:copy-of select="$ddoct:basePath"/>
     <t:apply-templates select="self::node ()" mode="file-name-menu-frame"/>
@@ -821,6 +1015,27 @@
         select="child::dump:perlPackageName" mode="human-module-name"/>;</code></pre>
       </div>
     </dd>
+  </t:template>
+  
+  <t:template match="dump:module[@dump:ref]" mode="dd">
+    <t:param name="ddoct:basePath" select="''"/>
+    <t:param name="short" select="false ()"/>
+    <t:apply-templates select="/child::dump:moduleSet/child::dump:module
+                               [child::dump:uri/@dump:uri = current ()/@dump:ref]"
+        mode="dd">
+      <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+      <t:with-param name="short" select="$short"/>
+    </t:apply-templates>
+  </t:template>
+  <t:template match="dump:module[@dump:ref]" mode="li">
+    <t:param name="ddoct:basePath" select="''"/>
+    <t:param name="short" select="false ()"/>
+    <t:apply-templates select="/child::dump:moduleSet/child::dump:module
+                               [child::dump:uri/@dump:uri = current ()/@dump:ref]"
+        mode="li">
+      <t:with-param name="ddoct:basePath" select="$ddoct:basePath"/>
+      <t:with-param name="short" select="$short"/>
+    </t:apply-templates>
   </t:template>
   
   <t:template match="dump:class" mode="h1b">
@@ -1377,7 +1592,7 @@
     <t:call-template name="prefix-datatype"/>
     <t:apply-templates select="self::node ()" mode="human-module-name"/>
   </t:template>
-  <t:template match="dump:dataType" mode="human-module-name">
+  <t:template match="dump:dataType | dump:moduleGroup" mode="human-module-name">
     <t:choose>
     <t:when test="child::dump:label">
       <t:apply-templates select="child::dump:label" mode="human-module-name"/>
@@ -1397,7 +1612,7 @@
     </t:otherwise>
     </t:choose>
   </t:template>
-  <t:template match="dump:dataType" mode="human-module-name-text">
+  <t:template match="dump:dataType | dump:moduleGroup" mode="human-module-name-text">
     <t:param name="short" select="false ()"/>
     <t:choose>
     <t:when test="child::dump:label">
@@ -1421,7 +1636,7 @@
     </t:otherwise>
     </t:choose>
   </t:template>
-  <t:template match="dump:dataType" mode="human-module-name-attr">
+  <t:template match="dump:dataType | dump:moduleGroup" mode="human-module-name-attr">
     <t:choose>
     <t:when test="child::dump:label">
       <t:apply-templates select="child::dump:label"
@@ -3330,6 +3545,13 @@
     </div>
   </t:template>
   
+  <t:template match="ddel:ISSUE">
+    <div class="issue ed memo">
+      <t:apply-templates select="@*"/>
+      <t:apply-templates select="child::node ()"/>
+    </div>
+  </t:template>
+  
   <t:template match="ddel:listMarker">
     <span class="marker">
       <t:apply-templates select="@*"/>
@@ -3338,6 +3560,13 @@
   </t:template>
   <t:template match="ddel:listContent">
     <span class="list-content">
+      <t:apply-templates select="@*"/>
+      <t:apply-templates select="child::node ()"/>
+    </span>
+  </t:template>
+  
+  <t:template match="ddel:InfoItem">
+    <span class="{local-name ()}">
       <t:apply-templates select="@*"/>
       <t:apply-templates select="child::node ()"/>
     </span>
@@ -3383,9 +3612,17 @@
     
     <t:variable name="name" select="string (self::node ())"/>
     <t:choose>
+    <t:when test="$name = 'COLON'">
+      <t:text> </t:text>
+      (<code class="char">:</code>)
+    </t:when>
     <t:when test="$name = 'PLUS SIGN'">
       <t:text> </t:text>
       (<code class="char">+</code>)
+    </t:when>
+    <t:when test="$name = 'SPACE'">
+      <t:text> </t:text>
+      (<code class="char" xml:space="preserve"> </code>)
     </t:when>
     </t:choose>
   </t:template>
@@ -3605,11 +3842,11 @@
   </t:template>
   
   <t:template match="ddel:XE[@ddel:lexType =
-              'http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--TypeQName' or
+              'http://suika.fam.cx/~wakaba/archive/2004/dis/Core#QName' or
               @ddel:lexType =
               'http://suika.fam.cx/~wakaba/archive/2004/dis/Core#NCNameOrQName'] |
               ddel:XA[@ddel:lexType =
-              'http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--TypeQName' or
+              'http://suika.fam.cx/~wakaba/archive/2004/dis/Core#QName' or
               @ddel:lexType =
               'http://suika.fam.cx/~wakaba/archive/2004/dis/Core#NCNameOrQName']">
     <code>
@@ -3634,7 +3871,7 @@
   <t:template match="ddel:XA/@ddel:lexTypeImplied"/>
   
   <t:template match="ddel:Q[@ddel:lexType =
-              'http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--TypeQName']">
+              'http://suika.fam.cx/~wakaba/archive/2004/dis/Core#QName']">
     <code class="qname">
       <t:apply-templates select="@*"/>
       <t:if test="child::ddel:prefix">
@@ -3665,6 +3902,36 @@
     <code class="qname-local-name">
       <t:apply-templates select="@*"/>
       <t:apply-templates select="child::node ()"/>
+    </code>
+  </t:template>
+  
+  <t:template match="ddel:Feature[@dump:namespaceURI]
+      [@ddel:lexType =
+         'http://suika.fam.cx/~wakaba/archive/2004/dis/Core#NCNameOrQName']">
+    <t:variable name="uri"
+        select="concat (@dump:namespaceURI, child::ddel:localName)"/>
+    <code class="uri dump-feature-name" lang="en" xml:lang="en">
+      <t:text>&lt;</t:text>
+      <a href="{$uri}">
+        <t:value-of select="$uri"/>
+      </a>
+      <t:text>&gt;</t:text>
+    </code>
+  </t:template>
+  
+  <t:template match="ddel:Feature[not (@dump:namespaceURI)]
+      [@ddel:lexType =
+         'http://suika.fam.cx/~wakaba/archive/2004/dis/Core#NCNameOrQName']">
+    <code class="dump-feature-name" lang="en" xml:lang="en">
+      <t:apply-templates select="@*"/>
+      <t:apply-templates/>
+    </code>
+  </t:template>
+  
+  <t:template match="ddel:FeatureVer">
+    <code class="dump-feature-version">
+      <t:apply-templates select="@*"/>
+      <t:apply-templates/>
     </code>
   </t:template>
   
@@ -3788,23 +4055,61 @@
   </t:template>
   
   <t:template match="dump:moduleSet" mode="list">
-    <ddoct:item ddoct:mode="modules">
+    <t:choose>
+    <t:when test="child::dump:moduleGroup[not (@dump:isPartial)]">
+      <t:apply-templates select="child::dump:moduleGroup
+                                 [not (@dump:isPartial)]" mode="list"/>
+    </t:when>
+    <t:otherwise>
+      <ddoct:item ddoct:mode="modules">
+        <t:attribute name="ddoct:fileName">
+          <t:apply-templates select="self::node ()" mode="file-name"/>
+        </t:attribute>
+      </ddoct:item>
+      <ddoct:item ddoct:mode="modules-menu">
+        <t:attribute name="ddoct:fileName">
+          <t:apply-templates select="self::node ()" mode="file-name-menu"/>
+        </t:attribute>
+      </ddoct:item>
+      <ddoct:item ddoct:mode="modules-menu-frame">
+        <t:attribute name="ddoct:fileName">
+          <t:apply-templates select="self::node ()" mode="file-name-menu-frame"/>
+        </t:attribute>
+      </ddoct:item>
+    </t:otherwise>
+    </t:choose>
+    <t:apply-templates select="child::dump:module
+                               [not (@dump:isPartial)]" mode="list"/>
+  </t:template>
+  
+  <t:template match="dump:moduleGroup" mode="list">
+    <ddoct:item ddoct:mode="module-group">
+      <t:attribute name="ddoct:uri">
+        <t:apply-templates select="self::node ()" mode="list-uri"/>
+      </t:attribute>
       <t:attribute name="ddoct:fileName">
         <t:apply-templates select="self::node ()" mode="file-name"/>
       </t:attribute>
     </ddoct:item>
-    <ddoct:item ddoct:mode="modules-menu">
+    <ddoct:item ddoct:mode="module-group-menu">
+      <t:attribute name="ddoct:uri">
+        <t:apply-templates select="self::node ()" mode="list-uri"/>
+      </t:attribute>
       <t:attribute name="ddoct:fileName">
         <t:apply-templates select="self::node ()" mode="file-name-menu"/>
       </t:attribute>
     </ddoct:item>
-    <ddoct:item ddoct:mode="modules-menu-frame">
+    <ddoct:item ddoct:mode="module-group-menu-frame">
+      <t:attribute name="ddoct:uri">
+        <t:apply-templates select="self::node ()" mode="list-uri"/>
+      </t:attribute>
       <t:attribute name="ddoct:fileName">
         <t:apply-templates select="self::node ()" mode="file-name-menu-frame"/>
       </t:attribute>
     </ddoct:item>
-    <t:apply-templates select="child::dump:module
-                               [not (@dump:isPartial)]" mode="list"/>
+    <t:apply-templates select="(child::dump:document)
+                               [not (@dump:isPartial)]"
+        mode="list"/>
   </t:template>
   
   <t:template match="dump:module" mode="list">
@@ -3890,7 +4195,7 @@
         </code>
         <t:value-of select="concat (':', local-name (), '}')"/>
       </code>
-      <t:apply-templates select="@*"/>
+      <t:apply-templates select="@*" mode="unknown"/>
       <t:apply-templates/>
       <code>
         <t:value-of select="'{/}'"/>
@@ -3999,7 +4304,7 @@
   </t:template>
 </t:stylesheet>
 
-<!-- Revision: $Date: 2005/09/09 04:20:51 $ -->
+<!-- Revision: $Date: 2005/09/30 10:43:12 $ -->
 
 <!-- ***** BEGIN LICENSE BLOCK *****
    - Copyright 2005 Wakaba <w@suika.fam.cx>.  All rights reserved.
