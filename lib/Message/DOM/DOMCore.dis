@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/30 13:06:13 $
+      $Date: 2005/10/01 12:14:29 $
     @@ContentType:
       dis:Date.RCS
 
@@ -12594,8 +12594,8 @@ NodeTypeDef:
               The namespace URI is unspecified (the "null" namespace) or 
               the node is created with a DOM Level 1 methods.
         @@@PerlDef:
-          $r = defined $self->{<H::mn::node>}->{<H::infoset:namespaceName>}
-             ? $self->{<H::mn:node>}->{<H::infoset:namespaceName>} : null;
+          $r = defined $self->{<H::mn:node>}->{<H::infoset:namespaceName>}
+             ? ${$self->{<H::mn:node>}->{<H::infoset:namespaceName>}} : null;
      @@Level[list]:  2
      @@SpecLevel:2
      @@For:

@@ -8,7 +8,7 @@ Module:
 
   @DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2005/09/30 13:06:21 $
+    $Date: 2005/10/01 12:14:31 $
   @License: license|Perl+MPL
   
   @DefaultFor: ManakaiDOM|all
@@ -375,6 +375,11 @@ PropDef:
   @subsetOf: doc|part
   @multipleProperties: DISCore|OrderedList
   @dataType: DISCore|TFQNames
+
+PropDef:
+  @QName: doc|rel
+  @multipleProperties: DISCore|UnorderedList
+  @dataType: DISCore|QName
 
 PropDef:
   @QName: doc|isNormative

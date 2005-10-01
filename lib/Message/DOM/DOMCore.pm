@@ -11370,7 +11370,7 @@ $r = defined $self->{
 'ns'
 #line 1 "/document (lib/Message/DOM/DOMCore.dis)/NodeTypeDef[@QName=Attr][@QName=ManakaiDOMAttr][@type=dis|MultipleResource][@type=ManakaiDOM|IF][@type=ManakaiDOM|Class]/ReAttr[@Name=namespaceURI][@type=DISLang|Attribute]/Get[@Type=DOMMain:DOMString][@type=DISLang|AttributeGet]/PerlDef [u] (Chunk #3859)"
 }
-   ? $self->{
+   ? ${$self->{
 #line 1 "lib/Message/DOM/DOMCore.dis [/u] (Chunk #3860)"
 'node'
 #line 2 "/document (lib/Message/DOM/DOMCore.dis)/NodeTypeDef[@QName=Attr][@QName=ManakaiDOMAttr][@type=dis|MultipleResource][@type=ManakaiDOM|IF][@type=ManakaiDOM|Class]/ReAttr[@Name=namespaceURI][@type=DISLang|Attribute]/Get[@Type=DOMMain:DOMString][@type=DISLang|AttributeGet]/PerlDef [u] (Chunk #3861)"
@@ -11378,7 +11378,7 @@ $r = defined $self->{
 #line 1 "lib/Message/DOM/DOMCore.dis [/u] (Chunk #3862)"
 'ns'
 #line 2 "/document (lib/Message/DOM/DOMCore.dis)/NodeTypeDef[@QName=Attr][@QName=ManakaiDOMAttr][@type=dis|MultipleResource][@type=ManakaiDOM|IF][@type=ManakaiDOM|Class]/ReAttr[@Name=namespaceURI][@type=DISLang|Attribute]/Get[@Type=DOMMain:DOMString][@type=DISLang|AttributeGet]/PerlDef [u] (Chunk #3863)"
-} : 
+}} : 
 #line 1 "lib/Message/DOM/DOMCore.dis [/u] (Chunk #3864)"
 undef
 #line 2 "/document (lib/Message/DOM/DOMCore.dis)/NodeTypeDef[@QName=Attr][@QName=ManakaiDOMAttr][@type=dis|MultipleResource][@type=ManakaiDOM|IF][@type=ManakaiDOM|Class]/ReAttr[@Name=namespaceURI][@type=DISLang|Attribute]/Get[@Type=DOMMain:DOMString][@type=DISLang|AttributeGet]/PerlDef [u] (Chunk #3865)"
@@ -13908,21 +13908,16 @@ my ($self) = @_;
 my $r;
 
 {
-#line 1 "/document (lib/Message/DOM/DOMCore.dis)/NodeTypeDef[@QName=Element][@QName=ManakaiDOMElement][@type=dis|MultipleResource][@type=ManakaiDOM|IF][@type=ManakaiDOM|Class]/ReAttr[@Name=namespaceURI][@type=DISLang|Attribute]/Get[@Type=DOMMain:DOMString][@type=DISLang|AttributeGet]/PerlDef [b] (Chunk #4839)"
-
-#line 1 "/document (lib/Message/DOM/DOMCore.dis)/NodeTypeDef[@QName=Element][@QName=ManakaiDOMElement][@type=dis|MultipleResource][@type=ManakaiDOM|IF][@type=ManakaiDOM|Class]/ReAttr[@Name=namespaceURI][@type=DISLang|Attribute]/Get[@Type=DOMMain:DOMString][@type=DISLang|AttributeGet]/PerlDef [bc] (Chunk #4837)"
-
-#line 1 "/document (lib/Message/DOM/DOMCore.dis)/NodeTypeDef[@QName=Element][@QName=ManakaiDOMElement][@type=dis|MultipleResource][@type=ManakaiDOM|IF][@type=ManakaiDOM|Class]/ReAttr[@Name=namespaceURI][@type=DISLang|Attribute]/Get[@Type=DOMMain:DOMString][@type=DISLang|AttributeGet]/PerlDef [u] (Chunk #4825)"
 $r = defined $self->{
-#line 1 "lib/Message/DOM/DOMCore.dis [/u] (Chunk #4826)"
-'http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#:node'
-#line 1 "/document (lib/Message/DOM/DOMCore.dis)/NodeTypeDef[@QName=Element][@QName=ManakaiDOMElement][@type=dis|MultipleResource][@type=ManakaiDOM|IF][@type=ManakaiDOM|Class]/ReAttr[@Name=namespaceURI][@type=DISLang|Attribute]/Get[@Type=DOMMain:DOMString][@type=DISLang|AttributeGet]/PerlDef [u] (Chunk #4827)"
+
+'node'
+
 }->{
 #line 1 "lib/Message/DOM/DOMCore.dis [/u] (Chunk #4828)"
 'ns'
 #line 1 "/document (lib/Message/DOM/DOMCore.dis)/NodeTypeDef[@QName=Element][@QName=ManakaiDOMElement][@type=dis|MultipleResource][@type=ManakaiDOM|IF][@type=ManakaiDOM|Class]/ReAttr[@Name=namespaceURI][@type=DISLang|Attribute]/Get[@Type=DOMMain:DOMString][@type=DISLang|AttributeGet]/PerlDef [u] (Chunk #4829)"
 }
-   ? $self->{
+   ? ${$self->{
 #line 1 "lib/Message/DOM/DOMCore.dis [/u] (Chunk #4830)"
 'node'
 #line 2 "/document (lib/Message/DOM/DOMCore.dis)/NodeTypeDef[@QName=Element][@QName=ManakaiDOMElement][@type=dis|MultipleResource][@type=ManakaiDOM|IF][@type=ManakaiDOM|Class]/ReAttr[@Name=namespaceURI][@type=DISLang|Attribute]/Get[@Type=DOMMain:DOMString][@type=DISLang|AttributeGet]/PerlDef [u] (Chunk #4831)"
@@ -13930,7 +13925,7 @@ $r = defined $self->{
 #line 1 "lib/Message/DOM/DOMCore.dis [/u] (Chunk #4832)"
 'ns'
 #line 2 "/document (lib/Message/DOM/DOMCore.dis)/NodeTypeDef[@QName=Element][@QName=ManakaiDOMElement][@type=dis|MultipleResource][@type=ManakaiDOM|IF][@type=ManakaiDOM|Class]/ReAttr[@Name=namespaceURI][@type=DISLang|Attribute]/Get[@Type=DOMMain:DOMString][@type=DISLang|AttributeGet]/PerlDef [u] (Chunk #4833)"
-} : 
+}} : 
 #line 1 "lib/Message/DOM/DOMCore.dis [/u] (Chunk #4834)"
 undef
 #line 2 "/document (lib/Message/DOM/DOMCore.dis)/NodeTypeDef[@QName=Element][@QName=ManakaiDOMElement][@type=dis|MultipleResource][@type=ManakaiDOM|IF][@type=ManakaiDOM|Class]/ReAttr[@Name=namespaceURI][@type=DISLang|Attribute]/Get[@Type=DOMMain:DOMString][@type=DISLang|AttributeGet]/PerlDef [u] (Chunk #4835)"
@@ -16922,6 +16917,7 @@ report Message::Util::Error::DOMException::CoreException -object => $self, '-typ
 sub get_attribute_ns ($$$) {
 my ($self, $namespaceURI, $localName) = @_;
 
+
 {
 #line 1 "/document (lib/Message/DOM/DOMMain.dis)/StringDataTypeDef[@QName=ManakaiDOM:ManakaiDOMNamespaceURI][@type=ManakaiDOM:DataType]/ResourceDef[@type=DISLang|InputProcessor]/PerlDef [b] (Chunk #5961)"
 
@@ -17000,6 +16996,8 @@ $namespaceURI =
 #line 2 "/document (lib/Message/DOM/DOMCore.dis)/NodeTypeDef[@QName=Element][@QName=ManakaiDOMElement][@type=dis|MultipleResource][@type=ManakaiDOM|IF][@type=ManakaiDOM|Class]/ResourceDef[@type=dis:MultipleResource][@QName=selectAttrNodeObjectNS][@type=dis2pm:BlockCode][@QName=selectAttrNodeObjectForRemoveNS][@type=dis2pm:BlockCode]/PerlDef [u] (Chunk #5971)"
 defined $namespaceURI;
 $r = $attr->{$namespaceURI}->{$localName};
+
+
 
 #line 1 "lib/Message/DOM/DOMCore.dis [/u] (Chunk #5972)"
 

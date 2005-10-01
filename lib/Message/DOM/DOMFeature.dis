@@ -41,7 +41,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/30 13:06:15 $
+      $Date: 2005/10/01 12:14:30 $
     @@ContentType:
       dis:Date.RCS
   
@@ -366,7 +366,7 @@ StringDataTypeDef:
 
   @enTitle: Feature Names
 
-  @enDescContent:
+  @enDesc:
       A <DFN::feature name> identifies a <DFN::feature> with
       its version.
 
@@ -431,7 +431,7 @@ StringDataTypeDef:
 
   @enTitle: Feature Version Numbers
 
-  @enDescContent:
+  @enDesc:
       A DOM feature version number. 
       \
       In most contexts, an empty string and the <DOM::null> value are 
@@ -461,7 +461,7 @@ StringDataTypeDef:
   @enTitle:
     <CODE::features>
 
-  @enDescContent:
+  @enDesc:
       A list of zero or more pairs of a <TYPE::ManakaiDOM:ManakaiDOMFeature> 
       and an optional <TYPE::ManakaiDOM:ManakaiDOMFeatureVersion>, 
       separated by white space.
@@ -937,7 +937,7 @@ ResourceDef:
       <ClassName::ImplementationRegistry::ManakaiDOM:ManakaiDOMLatest>
     @@ContentType:
       lang:Perl
-  @Type: DISLang|String||ManakaiDOM|all
+  @Type: DISPerl|String||ManakaiDOM|all
   @For:
     ManakaiDOM:ManakaiDOMLatest
 
@@ -961,13 +961,6 @@ ElementTypeBinding:
   @Name: enDesc
   @ElementType:
     dis:Description
-  @ShadowContent:
-    @@lang:en
-
-ElementTypeBinding:
-  @Name: enDescContent
-  @ElementType:
-    doc:descriptionContent
   @ShadowContent:
     @@lang:en
 
@@ -1007,26 +1000,91 @@ Doc:
 
   @doc:author: DISCore|Wakaba
 
-  @doc:abstract: def|Abstract
+  @doc:part:
+    @@@: def|Abstract
+    @@doc:rel: doc|abstract
+    @@doc:rel: doc|additionalSection
 
-  @doc:mainSection: def|MinImpl
+  @doc:part:
+    @@@: def|Status
+    @@doc:rel: doc|status
+    @@doc:rel: doc|additionalSection
+
+  @doc:part:
+    @@@: def|TOC
+    @@doc:rel: doc|shortTOC
+    @@doc:rel: doc|additionalSection
+
+  @doc:part:
+    @@@: def|expandedTOC
+    @@doc:rel: doc|longTOC
+    @@doc:rel: doc|additionalSection
+    @@doc:rel: f|Chapter
+
+  @doc:part:
+    @@@: def|MinImpl
+    @@doc:rel: doc|mainSection
+    @@doc:rel: f|Chapter
+
+  @doc:part:
+    @@@: def|IDLDefinitions
+    @@doc:rel: f|IDLDefinitions
+    @@doc:rel: doc|appendix
+    @@doc:rel: f|Chapter
+  @doc:part:
+    @@@: def|JavaBinding
+    @@doc:rel: f|JavaBinding
+    @@doc:rel: doc|appendix
+    @@doc:rel: f|Chapter
+  @doc:part:
+    @@@: def|ECMAScriptBinding
+    @@doc:rel: f|ECMAScriptBinding
+    @@doc:rel: doc|appendix
+    @@doc:rel: f|Chapter
+  @doc:part:
+    @@@: def|PerlBinding
+    @@doc:rel: f|PerlBinding
+    @@doc:rel: doc|appendix
+    @@doc:rel: f|Chapter
+
+  @doc:part:
+    @@@: def|References
+    @@doc:rel: doc|references
+    @@doc:rel: doc|additionalSection
+    @@doc:rel: f|Chapter
+
+  @doc:part:
+    @@@: def|Index
+    @@doc:rel: doc|index
+    @@doc:rel: doc|additionalSection
+    @@doc:rel: f|Chapter
 
   @FileName: Overview
 
-Doc:
-  @QName: def|MinImpl
+ResourceDef:
+  @QName: f|IDLDefinitions
+  @For: =ManakaiDOM|all
+  @rdf:type: rdfs|Resource
 
-  @enTitle: Document Object Model Minimum Implementation
-  @doc:shortTitle:
-    @@lang:en
-    @@@:
-      DOM Minimum Implementation
+ResourceDef:
+  @QName: f|JavaBinding
+  @For: =ManakaiDOM|all
+  @rdf:type: rdfs|Resource
 
-  @doc:mainSection: def|Introduction
-  @doc:mainSection: def|Definitions
-  @doc:mainSection: def|Interfaces
+ResourceDef:
+  @QName: f|ECMAScriptBinding
+  @For: =ManakaiDOM|all
+  @rdf:type: rdfs|Resource
 
-  @FileName: minimpl
+ResourceDef:
+  @QName: f|PerlBinding
+  @For: =ManakaiDOM|all
+  @rdf:type: rdfs|Resource
+
+ResourceDef:
+  @QName: f|Chapter
+  @For: =ManakaiDOM|all
+  @rdf:type: rdfs|Resource
 
 ElementTypeBinding:
   @Name: enContent
@@ -1053,11 +1111,58 @@ Doc:
     implementations of DOM or any other object model.
 
 Doc:
+  @QName: def|Status
+
+Doc:
+  @QName: def|TOC
+  @doc:part: f|ShortTOC||ManakaiDOM|all
+
+Doc:
+  @QName: def|expandedTOC
+  @doc:part: f|LongTOC||ManakaiDOM|all
+
+  @FileName: expanded-toc
+
+ResourceDef:
+  @QName: f|ShortTOC
+  @rdf:type: rdfs|Resource
+  @For: =ManakaiDOM|all
+
+ResourceDef:
+  @QName: f|LongTOC
+  @rdf:type: rdfs|Resource
+  @For: =ManakaiDOM|all
+
+Doc:
+  @QName: def|MinImpl
+
+  @enTitle: Document Object Model Minimum Implementation
+  @doc:shortTitle:
+    @@lang:en
+    @@@:
+      DOM Minimum Implementation
+
+  @doc:part:
+    @@@: def|Introduction
+    @@doc:rel: doc|mainSection
+  @doc:part:
+    @@@: def|Definitions
+    @@doc:rel: doc|mainSection
+  @doc:part:
+    @@@: def|Interfaces
+    @@doc:rel: doc|mainSection
+
+  @FileName: minimpl
+
+Doc:
   @QName: def|Introduction
+  @enTitle: Introduction
 
 Doc:
   @QName: def|Definitions
+  @enTitle: Definitions
 
+  @doc:part: def|MIString
   @doc:part: f|FeatureNameString
   @doc:part: f|FeatureVersionString
   @doc:part: f|FeaturesString
@@ -1065,6 +1170,107 @@ Doc:
 
 Doc:
   @QName: def|Interfaces
+  @enTitle: Interfaces
+
+  @doc:part: f|ImplementationList
+  @doc:part: f|ImplementationSource
+  @doc:part: f|MinimumImplementation
+  @doc:part: f|GetFeature
+
+Doc:
+  @QName: def|IDLDefinitions
+
+  @enContent:
+    This appendix comtains the complete OMG IDL <SRC::OMG IDL> for the
+    Level 3 Document Object Model Minimum Implementation definitions.
+
+  # The IDL files are also available as: <idl.zip>.
+
+  # IDL file
+
+  @FileName: idl-definitions
+
+Doc:
+  @QName: def|JavaBinding
+
+  @FileName: java-binding
+
+Doc:
+  @QName: def|ECMAScriptBinding
+
+  @FileName: ecma-script-binding
+
+Doc:
+  @QName: def|PerlBinding
+
+  @FileName: perl-binding
+
+Doc:
+  @QName: def|References
+
+  @doc:part:
+    @@@: def|NormativeReferences
+    @@doc:rel: doc|normativeReferences
+  @doc:part:
+    @@@: def|InformativeReferences
+    @@doc:rel: doc|informativeReferences
+
+  @FileName: references
+
+Doc:
+  @QName: def|NormativeReferences
+
+Doc:
+  @QName: def|InformativeReferences
+
+Doc:
+  @QName: def|Index
+  @doc:part: f|Index||ManakaiDOM|all
+
+  @FileName: def-index
+
+ResourceDef:
+  @QName: f|Index
+  @rdf:type: rdfs|Resource
+  @For: =ManakaiDOM|all
+
+Doc:
+  @QName: def|MIString
+  @enTitle:
+    The <TYPE::MIString> Type
+  @enContent:
+    The <TYPE::MIString> type is used to store character.
+  @doc:part: f|MIString
+  @doc:part: def|MIStringBindings
+
+ResourceDef:
+  @QName: MIString
+  @For: ManakaiDOM|DOM
+  @Label:
+    @@lang:en
+    @@@:
+      <DOM::MIString>
+  @rdf:type: idl|IDLDataType
+  @rdf:type: idl|ValueType
+
+  @rdfs:subClassOf: DISLang|String||ManakaiDOM|all
+
+  @enDesc:
+    A <TYPE::MIString> is a sequence of characters.  How
+    the characters are represented is implementation dependent.
+
+  @idl:sequenceOf: idl|unsignedShort||ManakaiDOM|all
+
+Doc:
+  @QName: def|MIStringBindings
+  @enContent:
+    For Java and ECMAScript, <TYPE::MIString> is bound to
+    the <CODE::String> type, which is a sequence of UTF-16's
+    16-bit units.
+
+    For Perl, <TYPE::MIString> is bound to Perl string.  If 
+    the utf8 flag is unset, the string is interpreted as
+    a sequence of ISO/IEC 8859-1 characters.
 
 ## -- The implementation registry object
 
@@ -1124,7 +1330,7 @@ ResourceDef:
          desired features. 
      @@Param:
         @@@Name:  features
-        @@@Type:  DISLang|String||ManakaiDOM|all
+        @@@Type:  MIString
         @@@actualType: FeaturesString
         @@@Description:
           @@@@lang:en
@@ -1183,7 +1389,7 @@ ResourceDef:
          desired features. 
      @@Param:
         @@@Name:  features
-        @@@Type:  DISLang|String||ManakaiDOM|all
+        @@@Type:  MIString
         @@@actualType: FeaturesString
         @@@Description:
           @@@@lang:en
@@ -1240,7 +1446,7 @@ ResourceDef:
          desired features.
      @@Param:
         @@@Name:  features
-        @@@Type:  DISLang|String||ManakaiDOM|all
+        @@@Type:  MIString
         @@@actualType: FeaturesString
         @@@Description:
           @@@@lang:en
@@ -1296,7 +1502,7 @@ ResourceDef:
          desired features.
      @@Param:
         @@@Name:  features
-        @@@Type:  DISLang|String||ManakaiDOM|all
+        @@@Type:  MIString
         @@@actualType: FeaturesString
         @@@Description:
           @@@@lang:en
@@ -1509,7 +1715,7 @@ minIFClsDef:
           features.
      @@Param:
         @@@Name:  features
-        @@@Type: DISLang|String||ManakaiDOM|all
+        @@@Type: MIString
         @@@actualType: FeaturesString
         @@@Description:
           @@@@lang:en
@@ -1599,7 +1805,7 @@ minIFClsDef:
           features.
      @@Param:
         @@@Name:  features
-        @@@Type: DISLang|String||ManakaiDOM|all
+        @@@Type: MIString
         @@@actualType: FeaturesString
         @@@Description:
           @@@@lang:en
@@ -1636,7 +1842,7 @@ minIFClsDef:
          features and versions.
      @@Param:
         @@@Name:  features
-        @@@Type: DISLang|String||ManakaiDOM|all
+        @@@Type: MIString
         @@@actualType: FeaturesString
         @@@Description:
           @@@@lang:en
@@ -1710,7 +1916,7 @@ minIFClsDef:
          features and versions.
      @@Param:
         @@@Name:  features
-        @@@Type: DISLang|String||ManakaiDOM|all
+        @@@Type: MIString
         @@@actualType: FeaturesString
         @@@Description:
           @@@@lang:en
@@ -1796,7 +2002,7 @@ minIFClsDef:
          feature and version or not.
     @@Param:
       @@@Name:  feature
-      @@@Type: DISLang|String||ManakaiDOM|all
+      @@@Type: MIString
       @@@actualType: FeatureNameString
       @@@Description:
         @@@@lang:en
@@ -1805,7 +2011,7 @@ minIFClsDef:
           <CHAR::PLUS SIGN> prefix.
     @@Param:
       @@@Name:  version
-      @@@Type: DISLang|String||ManakaiDOM|all
+      @@@Type: MIString
       @@@actualType: FeatureVersionString
       @@@Description:
         @@@@lang:en
@@ -1865,7 +2071,7 @@ minIFClsDef:
           interfaces of the specified feature and version.
      @@Param:
         @@@Name:  feature
-        @@@Type: DISLang|String||ManakaiDOM|all
+        @@@Type: MIString
         @@@actualType: FeatureNameString
         @@@Description:
           @@@@lang:en
@@ -1873,7 +2079,7 @@ minIFClsDef:
             A feature name to request.
      @@Param:
         @@@Name:  version
-        @@@Type: DISLang|String||ManakaiDOM|all
+        @@@Type: MIString
         @@@actualType: FeatureVersionString
         @@@Description:
           @@@@lang:en
@@ -1982,6 +2188,11 @@ ResourceDef:
   @rdf:type:
     @@@: DISLang|Interface
     @@ForCheck: ManakaiDOM|ForIF
+    @@For: ManakaiDOM|ManakaiDOM
+  @rdf:type:
+    @@@: idl|Interface
+    @@ForCheck: ManakaiDOM|ForIF
+    @@For: ManakaiDOM|ForSpec
   @IFQName: GetFeature
 
   @rdf:type:
@@ -2015,7 +2226,7 @@ ResourceDef:
          feature and version or not.
     @@Param:
       @@@Name:  feature
-      @@@Type: DISLang|String||ManakaiDOM|all
+      @@@Type: MIString
       @@@actualType: FeatureNameString
       @@@Description:
         @@@@lang:en
@@ -2024,7 +2235,7 @@ ResourceDef:
           <CHAR::PLUS SIGN> prefix.
     @@Param:
       @@@Name:  version
-      @@@Type: DISLang|String||ManakaiDOM|all
+      @@@Type: MIString
       @@@actualType: FeatureVersionString
       @@@Description:
         @@@@lang:en
@@ -2068,7 +2279,7 @@ ResourceDef:
           interfaces of the specified feature and version.
      @@Param:
         @@@Name:  feature
-        @@@Type: DISLang|String||ManakaiDOM|all
+        @@@Type: MIString
         @@@actualType: FeatureNameString
         @@@Description:
           @@@@lang:en
@@ -2076,7 +2287,7 @@ ResourceDef:
             A feature name to request.
      @@Param:
         @@@Name:  version
-        @@@Type: DISLang|String||ManakaiDOM|all
+        @@@Type: MIString
         @@@actualType: FeatureVersionString
         @@@Description:
           @@@@lang:en
@@ -2199,17 +2410,11 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      @@@@: DISLang|DataType
-      @@@For: ManakaiDOM|DOM
+    @@rdf:type: DISLang|DataType
     @@rdfs:subClassOf:
-      @@@@: DISLang|String||ManakaiDOM|all
+      @@@@: MIString
       @@@For: ManakaiDOM|DOM
     @@For: ManakaiDOM|DOM
-
-    @@rdf:type:
-      @@@@: doc|Documentation
-      @@@For: ManakaiDOM|ForSpec
     @@For: ManakaiDOM|ForSpec
 
 ElementTypeBinding:

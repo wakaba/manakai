@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/30 13:06:19 $
+      $Date: 2005/10/01 12:14:30 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1501,11 +1501,16 @@ IFClsDef:
             $dbmod = retrieve $fileName;
           }
 
+          require Scalar::Util;        
           S: for my $res_uri (keys %{$dbmod->{modDef}}) {
             my $res = $dbmod->{modDef}->{$res_uri};
             my $dres = $self->{modDef}->{$res_uri};
 
-            if (ref $dres ne <ClassName::DIS|ManakaiDISModuleLite>) {
+            unless (defined $dres) {
+              $dres = $self->{modDef}->{$res_uri}
+                    = {db => $self};
+              Scalar::Util::weaken ($dres->{db});
+            } elsif (ref $dres ne <ClassName::DIS|ManakaiDISModuleLite>) {
               __UNDEEP{__EXCEPTION{DIS|RESOURCE_ALREADY_DEFINED_ERR::
                 DIS:uri => {$res_uri},
                 DIS:moduleURI => {$disModule-><AG::DIS|DISAnyResource.uri>},
@@ -1518,7 +1523,6 @@ IFClsDef:
             bless $dres, <ClassName::DIS|ManakaiDISModuleDefinition>;
           } # S
 
-          require Scalar::Util;        
           S: for my $res_uri (keys %{$dbmod->{forDef}}) {
             my $res = $dbmod->{forDef}->{$res_uri};
             next S unless $res_uri eq $res-><AG::DIS|DISAnyResource.uri>;

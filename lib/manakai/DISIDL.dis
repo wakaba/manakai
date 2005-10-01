@@ -26,7 +26,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/30 13:06:21 $
+      $Date: 2005/10/01 12:14:31 $
     @@ContentType:
       dis:Date.RCS
   
@@ -200,11 +200,15 @@ PropDef:
     The IDL type is defined as a <CODE::sequence> of the type.
   @dataType: DISCore|TFQNames
   @multipleProperties: DISCore|Single
+  @rdfs:subPropertyOf: dis|Def
+  @subsetOf: dis|Def
 
 PropDef:
   @QName: idl|typeName
   @enFN: IDL Type Name
   @multipleProperties: DISCore|Single
+  @rdfs:subPropertyOf: idl|name
+  @subsetOf: idl|name
 
 ResourceTypeDef:
   @QName: idl|AnyTyped
@@ -470,16 +474,13 @@ ResourceDef:
 IDLDataTypeDef:
   @QName: idl|unsignedLong
   @enFN: Unsigned long integer
-  @Def:
-    @@ContentType: 
-      lang:IDL-DOM
-    @@@: unsigned long
   @Description:
     @@lang:en
     @@@: 
       Long unsigned integer representing the range 0 ... 2^32 - 1. 
   @rdfs:subClassOf: AnyRealNumber
   @subsetOf: DISIDL|AnyRealNumber
+  @idl:typeName: unsigned long
 
 ResourceDef:
   @QName: DOMMain|unsigned-long
@@ -488,10 +489,6 @@ ResourceDef:
 IDLDataTypeDef:
   @QName: idl|short
   @enFN: Short integer
-  @Def:
-    @@ContentType:
-      lang:IDL-DOM
-    @@@: short
   @Description:
     @@lang:en
     @@@: 
@@ -506,10 +503,7 @@ ResourceDef:
 IDLDataTypeDef:
   @QName: idl|unsignedShort
   @enFN: Unsigned short integer
-  @Def:
-    @@ContentType: 
-      lang:IDL-DOM
-    @@@: unsigned short
+  @idl:typeName: unsigned short
   @Description:
     @@lang:en
     @@@: 
@@ -628,10 +622,7 @@ ResourceDef:
 IDLDataTypeDef:
   @QName: idl|unsignedLongLong
   @enFN: Unsigned long long integer
-  @Def:
-    @@ContentType: 
-      lang:IDL-DOM
-    @@@: unsigned long long
+  @idl:typeName: unsigned long long
   @Label:
     @@lang:en
     @@@: unsigned long long

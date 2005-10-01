@@ -2238,7 +2238,11 @@ local $Error::Depth = $Error::Depth + 1;
     my $res = $dbmod->{modDef}->{$res_uri};
     my $dres = $self->{modDef}->{$res_uri};
 
-    if (ref $dres ne 
+    unless (defined $dres) {
+              $dres = $self->{modDef}->{$res_uri}
+                    = {db => $self};
+              Scalar::Util::weaken ($dres->{db});
+            } elsif (ref $dres ne 
 #line 1 "lib/Message/Util/DIS/Perl.dis [/u] (Chunk #804)"
 'Message::Util::DIS::ManakaiDISModuleLite'
 #line 16 "/document (lib/Message/Util/DIS/Perl.dis)/IFClsDef[@QName=DISDatabasePerl][@QName=ManakaiDISDatabasePerl][@type=dis|MultipleResource][@type=ManakaiDOM|IF][@type=ManakaiDOM|Class]/Method[@Name=plLoadDISDatabaseModule][@type=DISLang|Method]/Return[@type=DISLang|MethodReturn]/PerlDef [u] (Chunk #805)"

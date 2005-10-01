@@ -36,6 +36,7 @@ use Message::Util::QName::Filter {
   dump => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#DISDump/>,
   dx => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#>,
   ecore => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/>,
+  idl => q<http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#>,
   infoset => q<http://www.w3.org/2001/04/infoset#>,
   lang => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#>,
   ManakaiDOM => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#>,
@@ -293,9 +294,11 @@ sub append_document_documentation (%) {
   $section->set_attribute_ns
       (ExpandedURI q<ddoct:>, 'ddoct:basePath', '../' x ($path =~ tr#/#/#));
 
-  $section->set_attribute_ns (ExpandedURI q<dump:>,
-                              'dump:docType' => ExpandedURI q<doc:Document>)
-    if $opt{source_resource}->is_type_uri (ExpandedURI q<doc:Document>);
+  if ($opt{source_resource}->is_type_uri (ExpandedURI q<doc:Document>)) {
+    $section->append_child ($od->create_element_ns (ExpandedURI q<doc:>, 'rel'))
+      ->set_attribute_ns (ExpandedURI q<dump:>, 'dump:uri', 
+                          ExpandedURI q<doc:Document>);
+  }
   
   ## TODO: Conneg
   for my $con (@{$opt{source_resource}->get_property_value_list
@@ -311,19 +314,9 @@ sub append_document_documentation (%) {
       ->append_child (transform_disdoc_tree ($tree));
   }
 
-  for my $con (@{$opt{source_resource}->get_property_value_list
-                   (ExpandedURI q<dis:Label>)}) {
-    my $cond = $con->get_feature (ExpandedURI q<DIS:Doc>, '2.0');
-    my $tree = $cond->get_disdoc_tree
-      ($od, ExpandedURI q<lang:disdocInline>,
-       $opt{source_resource}->database,
-       default_name_uri => $opt{source_resource}->source_node_id,
-       default_for_uri => $opt{source_resource}->for_uri);
-    my $ns = $con->name;
-    my $ln = $1 if ($ns =~ s/(\w+)$//);
-    $section->append_child ($od->create_element_ns ($ns, $ln))
-        ->append_child (transform_disdoc_tree ($tree));
-  }
+  append_document_properties
+    (source_resource => $opt{source_resource},
+     result_parent => $section);
 
   for my $v (@{$opt{source_resource}->get_property_value_list
                    (ExpandedURI q<doc:part>)}) {
@@ -332,7 +325,10 @@ sub append_document_documentation (%) {
     my $doc = $section->append_child
       ($od->create_element_ns (ExpandedURI q<dump:>, 'document'));
     $doc->ref ($res->uri);
-    $doc->set_attribute_ns (ExpandedURI q<dump:>, 'dump:docType' => $v->name);
+    for my $vv (@{$v->get_property (ExpandedURI q<doc:rel>)||[]}) {
+      $doc->append_child ($od->create_element_ns (ExpandedURI q<doc:>, 'rel'))
+        ->set_attribute_ns (ExpandedURI q<dump:>, 'dump:uri', $vv->uri);
+    }
   }
 } # append_document_documentation
 
@@ -392,8 +388,13 @@ sub append_module_documentation (%) {
 
 sub append_datatype_documentation (%) {
   my %opt = @_;
-  my $section = $opt{result_parent}->create_data_type
-                                        ($opt{source_resource}->uri);
+  my $od = $opt{result_parent}->owner_document;
+  my $section = $opt{result_parent}->can ('create_data_type')
+    ? $opt{result_parent}->create_data_type
+                                        ($opt{source_resource}->uri)
+    : $opt{result_parent}->append_child
+      ($od->create_element_ns
+       (ExpandedURI q<dump:>, 'dataType'));
   
   add_uri ($opt{source_resource} => $section);
 
@@ -414,6 +415,23 @@ sub append_datatype_documentation (%) {
   $section->set_attribute_ns
       (ExpandedURI q<ddoct:>, 'ddoct:basePath', '../' x (@file - 1));
 
+  for my $con (@{$opt{source_resource}->get_property_value_list
+                   (ExpandedURI q<dis:AppName>)},
+               @{$opt{source_resource}->get_property_value_list
+                   (ExpandedURI q<dis:Def>)}) {
+    my $ns = $con->name;
+    my $ln = $1 if ($ns =~ s/(\w+)$//);
+    $section->append_child ($od->create_element_ns ($ns, $ln))
+      ->text_content ($con->string_value);
+    if ($con->isa ('Message::Util::IF::DVURIValue')) {
+      $ReferredResource{$con->uri} ||= 1;
+    }
+  }
+
+  append_document_properties
+    (source_resource => $opt{source_resource},
+     result_parent => $section);
+                                 
   append_description (source_resource => $opt{source_resource},
                       result_parent => $section,
                       has_label => 1);
@@ -488,6 +506,51 @@ sub append_interface_documentation (%) {
                       class_uri => $class_uri);
 
 } # append_interface_documentation
+
+sub append_idl_interface_documentation (%) {
+  my %opt = @_;
+  my $section = $opt{result_parent}->append_child
+    ($opt{result_parent}->owner_document->create_element_ns
+       (ExpandedURI q<dump:>, 'interface'));
+  
+  add_uri ($opt{source_resource} => $section);
+
+  my $path = $opt{source_resource}->get_property_text
+                   (ExpandedURI q<dis:FileName>,
+                    $opt{source_resource}->local_name);
+  $path =~ s#::#/#g;
+  $section->resource_file_path_stem ($path);
+
+  $section->set_attribute_ns
+      (ExpandedURI q<ddoct:>, 'ddoct:basePath',
+       join '', '../' x ($path =~ tr#/#/#));
+
+  $section->is_exception_interface (1)
+    if $opt{source_resource}->is_type_uri (ExpandedURI q<idl:Exception>);
+
+  append_description (source_resource => $opt{source_resource},
+                      result_parent => $section);
+
+  for my $memres (@{$opt{source_resource}->get_child_resource_list}) {
+    if ($memres->is_type_uri (ExpandedURI q<DISLang:Method>)) {
+      append_method_documentation (source_resource => $memres,
+                                   result_parent => $section);
+    } elsif ($memres->is_type_uri (ExpandedURI q<DISLang:Attribute>)) {
+      append_attr_documentation (source_resource => $memres,
+                                 result_parent => $section);
+    } elsif ($memres->is_type_uri (ExpandedURI q<DISLang:ConstGroup>)) {
+      append_constgroup_documentation (source_resource => $memres,
+                                       result_parent => $section);
+    }
+  }
+
+  ## Inheritance
+  append_inheritance (source_resource => $opt{source_resource},
+                      result_parent => $section,
+                      target => 'idl');
+
+  $ReferredResource{ExpandedURI q<idl:void>} ||= 1;
+} # append_idl_interface_documentation
 
 sub append_class_documentation (%) {
   my %opt = @_;
@@ -870,6 +933,25 @@ sub append_description (%) {
     }
   }
 } # append_description
+
+sub append_document_properties (%) {
+  my %opt = @_;
+  my $od = $opt{result_parent}->owner_document;
+
+  for my $con (@{$opt{source_resource}->get_property_value_list
+                   (ExpandedURI q<dis:Label>)}) {
+    my $cond = $con->get_feature (ExpandedURI q<DIS:Doc>, '2.0');
+    my $tree = $cond->get_disdoc_tree
+      ($od, ExpandedURI q<lang:disdocInline>,
+       $opt{source_resource}->database,
+       default_name_uri => $opt{source_resource}->source_node_id,
+       default_for_uri => $opt{source_resource}->for_uri);
+    my $ns = $con->name;
+    my $ln = $1 if ($ns =~ s/(\w+)$//);
+    $opt{result_parent}->append_child ($od->create_element_ns ($ns, $ln))
+      ->append_child (transform_disdoc_tree ($tree));
+  }
+} # append_document_properties
 
 sub transform_disdoc_tree ($;%) {
   my ($el, %opt) = @_;
@@ -1311,6 +1393,11 @@ while (my @ruri = grep {$ReferredResource{$_} > 0} keys %ReferredResource) {
         (result_parent => $body,
          source_resource => $res,
          is_partial => 1);
+    } elsif ($res->is_type_uri (ExpandedURI q<idl:Interface>) or
+             $res->is_type_uri (ExpandedURI q<idl:Exception>)) {
+      append_idl_interface_documentation
+        (result_parent => $body,
+         source_resource => $res);
     } elsif ($res->is_type_uri (ExpandedURI q<DISLang:Class>)) {
       my $mod = $res->owner_module;
       unless ($ReferredResource{$mod->uri} < 0) {
@@ -1337,18 +1424,24 @@ while (my @ruri = grep {$ReferredResource{$_} > 0} keys %ReferredResource) {
          source_resource => $res,
          is_partial => 1);
     } elsif ($res->is_type_uri (ExpandedURI q<DISCore:AnyType>)) {
-      my $mod = $res->owner_module;
-      unless ($mod->is_defined) {
-        $ReferredResource{$uri} = -1;
-        next U;
-      } elsif (not ($ReferredResource{$mod->uri} < 0)) {
-        unshift @ruri, $uri;
-        unshift @ruri, $mod->uri;
-        next U;
+      if ($res->is_type_uri (ExpandedURI q<idl:IDLDataType>)) {
+        append_datatype_documentation
+          (result_parent => $body,
+           source_resource => $res);
+      } else {
+        my $mod = $res->owner_module;
+        unless ($mod->is_defined) {
+          $ReferredResource{$uri} = -1;
+          next U;
+        } elsif (not ($ReferredResource{$mod->uri} < 0)) {
+          unshift @ruri, $uri;
+          unshift @ruri, $mod->uri;
+          next U;
+        }
+        append_datatype_documentation
+          (result_parent => $body->create_module ($mod->uri),
+           source_resource => $res);
       }
-      append_datatype_documentation
-        (result_parent => $body->create_module ($mod->uri),
-         source_resource => $res);
     } elsif ($res->is_type_uri (ExpandedURI q<DISLang:AnyMethod>) or
              $res->is_type_uri (ExpandedURI q<DISLang:ConstGroup>)) {
       my $cls = $res->parent_resource;
@@ -1576,4 +1669,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/09/30 13:06:13 $
+1; # $Date: 2005/10/01 12:14:29 $
