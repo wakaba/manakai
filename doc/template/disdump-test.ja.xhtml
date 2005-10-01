@@ -7,7 +7,7 @@
   <script type="text/javascript">
   <![CDATA[
     var sourceDocumentURI = '../minimpl.xml';
-    var stylesheetDocumentURI = '../template/disdump.ja.xsl';
+    var stylesheetDocumentURI = '../template/ddspec.en.xsl';
     var ddlistStylesheetDocumentURI = '../template/ddlist.ja.xsl';
     
     function loadDocument (uri, onload) {
@@ -22,6 +22,8 @@
       var xp3 = new XSLTProcessor ();
       xp3.setParameter (null, 'mode', el.getAttributeNS (ddoct, 'mode'));
       xp3.setParameter (null, 'uri', el.getAttributeNS (ddoct, 'uri'));
+      xp3.setParameter (null, 'referencer-uri',
+                        el.getAttributeNS (ddoct, 'referencer-uri'));
       loadDocument (sourceDocumentURI, function (srcDoc) {
         loadDocument (stylesheetDocumentURI, function (doc) {
           xp3.importStylesheet (doc);
@@ -80,7 +82,7 @@ document.SourceDocument = loadDocument (sourceDocumentURI, function (srcDoc) {
 </body>
 </html>
 
-<!-- Revision: $Date: 2005/09/30 10:43:12 $ -->
+<!-- Revision: $Date: 2005/10/01 12:17:37 $ -->
 
 <!-- ***** BEGIN LICENSE BLOCK *****
    - Copyright 2005 Wakaba <w@suika.fam.cx>.  All rights reserved.

@@ -44,6 +44,7 @@
   <t:template match="ddoct:item">
     <li><a xml:lang="ja" lang="ja" onclick="javascript:t (this)"
         ddoct:mode="{@ddoct:mode}" ddoct:uri="{@ddoct:uri}"
+        ddoct:referencer-uri="{@ddoct:referencer-uri}"
         title="&lt;{@ddoct:uri}>">
       モード <code><t:value-of select="@ddoct:mode"/></code>,
       URI ...,
@@ -89,6 +90,8 @@
           var xp3 = new XSLTProcessor ();
           xp3.setParameter (null, 'mode', "<t:value-of select="@ddoct:mode"/>");
           xp3.setParameter (null, 'uri', "<t:value-of select="@ddoct:uri"/>");
+          xp3.setParameter (null, 'referencer-uri',
+                            "<t:value-of select="@ddoct:referencer-uri"/>");
           xp3.setParameter (null, 'lang', "ja");
           xp3.importStylesheet (doc);
           var tfra = xp3.transformToDocument (srcDoc);
@@ -155,6 +158,7 @@
         %common_param,
         mode => "<t:value-of select="@ddoct:mode"/>",
         uri => "<t:value-of select="@ddoct:uri"/>",
+        'referencer-uri' => "<t:value-of select="@ddoct:referencer-uri"/>",
         lang => "ja",
       );
       my $output_path = "<t:value-of select="@ddoct:fileName"/>";
@@ -170,7 +174,7 @@
   
 </t:stylesheet>
 
-<!-- Revision: $Date: 2005/09/05 15:09:58 $ -->
+<!-- Revision: $Date: 2005/10/01 12:17:37 $ -->
 
 <!-- ***** BEGIN LICENSE BLOCK *****
    - Copyright 2005 Wakaba <w@suika.fam.cx>.  All rights reserved.

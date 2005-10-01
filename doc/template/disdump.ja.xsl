@@ -33,17 +33,100 @@
   <t:variable name="anyClass"
         select="$allClass |
                 /child::dump:moduleSet/child::dump:module/child::dump:interface"/>
+  <t:variable name="allDataType"
+        select="/child::dump:moduleSet/child::dump:module/child::dump:dataType"/>
 
   <t:template name="global-lang-attr">
     <t:attribute name="lang">ja</t:attribute>
     <t:attribute name="xml:lang">ja</t:attribute>
   </t:template>
   
+  <t:template name="name-abstract">
+    <span lang="ja" xml:lang="ja">概要</span>
+  </t:template>
+  
+  <t:template name="name-abstract-attr">概要</t:template>
+  
   <t:template name="name-anonymous">
     <span lang="ja" xml:lang="ja">(匿名)</span>
   </t:template>
   
   <t:template name="name-anonymous-attr">(匿名)</t:template>
+  
+  <t:template name="name-ecma-script-binding">
+    <span lang="en" xml:lang="en">ECMAScript</span>
+    <t:text> </t:text>
+    <span lang="ja" xml:lang="ja">束縛</span>
+  </t:template>
+  <t:template name="name-ecma-script-binding-attr">ECMAScript 束縛</t:template>
+  
+  <t:template name="name-java-binding">
+    <span lang="en" xml:lang="en">Java</span>
+    <t:text> </t:text>
+    <span lang="ja" xml:lang="ja">束縛</span>
+  </t:template>
+  <t:template name="name-java-binding-attr">Java 束縛</t:template>
+  
+  <t:template name="name-perl-binding">
+    <span lang="en" xml:lang="en">Perl</span>
+    <t:text> </t:text>
+    <span lang="ja" xml:lang="ja">束縛</span>
+  </t:template>
+  <t:template name="name-perl-binding-attr">Perl 束縛</t:template>
+  
+  <t:template name="name-idl-definitions">
+    <abbr lang="en" xml:lang="en">IDL</abbr>
+    <t:text> </t:text>
+    <span lang="ja" xml:lang="ja">定義</span>
+  </t:template>
+  <t:template name="name-idl-definitions-attr">IDL 定義</t:template>
+  
+  <t:template name="name-index">
+    <span lang="ja" xml:lang="ja">索引</span>
+  </t:template>
+  <t:template name="name-index-attr">索引</t:template>
+  
+  <t:template name="name-the-interface">
+    <t:param name="name" select="/parent::node ()"/>
+    <span lang="ja" xml:lang="ja">界面</span>
+    <t:text> </t:text>
+    <t:copy-of select="$name"/>
+  </t:template>
+  <t:template name="name-the-interface-attr">
+    <t:param name="name" select="/parent::node ()"/>
+    <t:text>界面 </t:text>
+    <t:value-of select="$name"/>
+  </t:template>
+  
+  <t:template name="name-references">
+    <span lang="ja" xml:lang="ja">参考文献</span>
+  </t:template>
+  <t:template name="name-references-attr">参考文献</t:template>
+  
+  <t:template name="name-normative-references">
+    <span lang="ja" xml:lang="ja">引用規格 (規定)</span>
+  </t:template>
+  <t:template name="name-normative-references-attr">引用規格 (規定)</t:template>
+  
+  <t:template name="name-informative-references">
+    <span lang="ja" xml:lang="ja">参考文献 (参考)</span>
+  </t:template>
+  <t:template name="name-informative-references-attr">参考文献 (参考)</t:template>
+  
+  <t:template name="name-status">
+    <span lang="ja" xml:lang="ja">この文書の状態</span>
+  </t:template>
+  <t:template name="name-status-attr">この文書の状態</t:template>
+  
+  <t:template name="name-toc">
+    <span lang="ja" xml:lang="ja">目次</span>
+  </t:template>
+  <t:template name="name-toc-attr">目次</t:template>
+  
+  <t:template name="name-expanded-toc">
+    <span lang="ja" xml:lang="ja">詳細目次</span>
+  </t:template>
+  <t:template name="name-expanded-toc-attr">詳細目次</t:template>
   
   <t:template name="prefix-attribute">
     <span lang="ja" xml:lang="ja">属性</span>
@@ -201,6 +284,12 @@
     <span lang="ja" xml:lang="ja">名前</span>
   </t:template>
   
+  <t:template name="label-idl-definition">
+    <abbr lang="en" xml:lang="en">IDL</abbr>
+    <t:text> </t:text>
+    <span lang="ja" xml:lang="ja">定義</span>
+  </t:template>
+  
   <t:template name="label-implements">
     <span lang="ja" xml:lang="ja">実装する界面</span>
   </t:template>
@@ -285,6 +374,10 @@
     <span lang="ja" xml:lang="ja">省略可能</span>
   </t:template>
   
+  <t:template name="label-read-only">
+    <span lang="ja" xml:lang="ja">読取専用</span>
+  </t:template>
+  
   <t:template name="label-return-value">
     <span lang="ja" xml:lang="ja">返し値</span>
   </t:template>
@@ -303,6 +396,10 @@
   
   <t:template name="label-no-return-value-short">
     <span lang="ja" xml:lang="ja">なし</span>
+  </t:template>
+  
+  <t:template name="label-type-definition">
+    <span lang="ja" xml:lang="ja">型定義</span>
   </t:template>
   
   <t:template name="label-uri">
@@ -338,6 +435,18 @@
     <t:param name="param"/>
     <t:copy-of select="$param"/>
     <t:value-of select="' が指定されていない場合。'"/>
+  </t:template>
+  
+  <t:template name="space">
+    <t:param name="length" select="1"/>
+    <t:if test="$length > 0">
+      <t:if test="$length > 1">
+        <t:call-template name="space">
+          <t:with-param name="length" select="$length - 1"/>
+        </t:call-template>
+      </t:if>
+      <t:text> </t:text>
+    </t:if>
   </t:template>
   
   <t:template match="/">
@@ -3002,6 +3111,67 @@
     </link>
   </t:template>
   
+  <t:template match="dump:*" mode="heading">
+    <t:param name="rank" select="1"/>
+    <t:param name="docType" select="/parent::node ()"/>
+    <t:param name="number" select="/parent::node ()"/>
+    <t:choose>
+    <t:when test="$rank = 1">
+      <h1>
+        <t:apply-templates select="self::node ()" mode="heading-content">
+          <t:with-param name="rank" select="$rank"/>
+          <t:with-param name="docType" select="$docType"/>
+          <t:with-param name="number" select="$number"/>
+        </t:apply-templates>
+      </h1>
+    </t:when>
+    <t:when test="$rank = 2">
+      <h2>
+        <t:apply-templates select="self::node ()" mode="heading-content">
+          <t:with-param name="rank" select="$rank"/>
+          <t:with-param name="docType" select="$docType"/>
+          <t:with-param name="number" select="$number"/>
+        </t:apply-templates>
+      </h2>
+    </t:when>
+    <t:when test="$rank = 3">
+      <h3>
+        <t:apply-templates select="self::node ()" mode="heading-content">
+          <t:with-param name="rank" select="$rank"/>
+          <t:with-param name="docType" select="$docType"/>
+          <t:with-param name="number" select="$number"/>
+        </t:apply-templates>
+      </h3>
+    </t:when>
+    <t:when test="$rank = 4">
+      <h4>
+        <t:apply-templates select="self::node ()" mode="heading-content">
+          <t:with-param name="rank" select="$rank"/>
+          <t:with-param name="docType" select="$docType"/>
+          <t:with-param name="number" select="$number"/>
+        </t:apply-templates>
+      </h4>
+    </t:when>
+    <t:when test="$rank = 5">
+      <h5>
+        <t:apply-templates select="self::node ()" mode="heading-content">
+          <t:with-param name="rank" select="$rank"/>
+          <t:with-param name="docType" select="$docType"/>
+          <t:with-param name="number" select="$number"/>
+        </t:apply-templates>
+      </h5>
+    </t:when>
+    <t:otherwise>
+      <h6>
+        <t:apply-templates select="self::node ()" mode="heading-content">
+          <t:with-param name="rank" select="$rank"/>
+          <t:with-param name="docType" select="$docType"/>
+          <t:with-param name="number" select="$number"/>
+        </t:apply-templates>
+      </h6>
+    </t:otherwise>
+    </t:choose>
+  </t:template>
   <t:template match="dump:*" mode="h1-heading">
     <h1><t:apply-templates select="self::node ()" mode="heading-content"/></h1>
   </t:template>
@@ -4205,6 +4375,12 @@
   <t:template match="child::*">
     <t:apply-templates select="self::node ()" mode="unknown"/>
   </t:template>
+  <t:template match="child::*" mode="h">
+    <t:apply-templates select="self::node ()" mode="unknown"/>
+  </t:template>
+  <t:template match="child::*" mode="heading">
+    <t:apply-templates select="self::node ()" mode="unknown"/>
+  </t:template>
   <t:template match="child::*" mode="hb">
     <t:apply-templates select="self::node ()" mode="unknown"/>
   </t:template>
@@ -4304,7 +4480,7 @@
   </t:template>
 </t:stylesheet>
 
-<!-- Revision: $Date: 2005/09/30 10:43:12 $ -->
+<!-- Revision: $Date: 2005/10/01 12:17:37 $ -->
 
 <!-- ***** BEGIN LICENSE BLOCK *****
    - Copyright 2005 Wakaba <w@suika.fam.cx>.  All rights reserved.
